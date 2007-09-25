@@ -1,5 +1,13 @@
 2007-09-25  Peter Bloomfield
 
+	* src/toolbar-factory.c: (menu_item_toggled_cb),
+	(tm_popup_idle_cb), (tm_popup_deactivated_cb),
+	(tm_remove_underscore), (tm_popup_position_func),
+	(tm_do_popup_menu), (tm_button_press_cb), (tm_popup_menu_cb),
+	(balsa_toolbar_new): add a popup-position func; clean up.
+
+2007-09-25  Peter Bloomfield
+
 	* src/toolbar-factory.c: (tm_load_model), (tm_save_model),
 	(tm_gconf_notify), (balsa_toolbar_model_new), (tm_default_style),
 	(tm_set_style), (tm_changed_cb), (do_popup_menu),

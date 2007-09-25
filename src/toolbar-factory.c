@@ -565,6 +565,7 @@ tm_changed_cb(BalsaToolbarModel * model, GtkUIManager * ui_manager)
 typedef struct {
     BalsaToolbarModel *model;
     GtkUIManager      *ui_manager;
+    GtkWidget         *menu;
 } toolbar_info;
 
 static void
@@ -585,6 +586,8 @@ menu_item_toggled_cb(GtkCheckMenuItem * item, toolbar_info * info)
             GPOINTER_TO_INT(g_object_get_data
                             (G_OBJECT(item), BALSA_TOOLBAR_STYLE));
         balsa_toolbar_model_changed(info->model);
+        if (info->menu)
+            gtk_menu_shell_deactivate(GTK_MENU_SHELL(info->menu));
     }
 }
 
@@ -592,20 +595,23 @@ menu_item_toggled_cb(GtkCheckMenuItem * item, toolbar_info * info)
  * signal; the "deactivate" signal is apparently emitted before
  * "toggled", so we have to use an idle callback. */
 static gboolean
-do_popup_idle_cb(GtkWidget *menu)
+tm_popup_idle_cb(GtkWidget *menu)
 {
     gtk_widget_destroy(menu);
     return FALSE;
 }
 
 static void
-do_popup_deactivated_cb(GtkWidget *menu)
+tm_popup_deactivated_cb(GtkWidget * menu, toolbar_info * info)
 {
-    g_idle_add((GSourceFunc) do_popup_idle_cb, menu);
+    if (info->menu) {
+        g_idle_add((GSourceFunc) tm_popup_idle_cb, menu);
+        info->menu = NULL;
+    }
 }
 
 static gchar *
-remove_underscore(const gchar * text)
+tm_remove_underscore(const gchar * text)
 {
     gchar *p, *q, *r = g_strdup(text);
 
@@ -617,9 +623,43 @@ remove_underscore(const gchar * text)
     return r;
 }
 
+/* If the menu is popped up in response to a keystroke, center it
+ * immediately below the toolbar.
+ */
 static void
-do_popup_menu(GtkWidget * toolbar, GdkEventButton * event,
-              toolbar_info * info)
+tm_popup_position_func(GtkMenu * menu, gint * x, gint * y,
+                       gboolean * push_in, gpointer user_data)
+{
+    GtkWidget *toolbar = GTK_WIDGET(user_data);
+    GdkScreen *screen = gtk_widget_get_screen(toolbar);
+    GtkRequisition req;
+    gint monitor_num;
+    GdkRectangle monitor;
+
+    g_return_if_fail(GTK_WIDGET_REALIZED(toolbar));
+
+    gdk_window_get_origin(toolbar->window, x, y);
+
+    gtk_widget_size_request(GTK_WIDGET(menu), &req);
+
+    *x += (toolbar->allocation.width - req.width) / 2;
+    *y += toolbar->allocation.height;
+
+    monitor_num = gdk_screen_get_monitor_at_point(screen, *x, *y);
+    gtk_menu_set_monitor(menu, monitor_num);
+    gdk_screen_get_monitor_geometry(screen, monitor_num, &monitor);
+
+    *x = CLAMP(*x, monitor.x,
+               monitor.x + MAX(0, monitor.width - req.width));
+    *y = CLAMP(*y, monitor.y,
+               monitor.y + MAX(0, monitor.height - req.height));
+
+    *push_in = FALSE;
+}
+
+static gboolean
+tm_do_popup_menu(GtkWidget * toolbar, GdkEventButton * event,
+                 toolbar_info * info)
 {
     GtkWidget *menu;
     int button, event_time;
@@ -627,9 +667,12 @@ do_popup_menu(GtkWidget * toolbar, GdkEventButton * event,
     GSList *group = NULL;
     GtkToolbarStyle default_style = tm_default_style();
 
-    menu = gtk_menu_new();
+    if (info->menu)
+        return FALSE;
+
+    info->menu = menu = gtk_menu_new();
     g_signal_connect(menu, "deactivate",
-                     G_CALLBACK(do_popup_deactivated_cb), NULL);
+                     G_CALLBACK(tm_popup_deactivated_cb), info);
 
     /* ... add menu items ... */
     for (i = 0; i < G_N_ELEMENTS(tm_toolbar_options); i++) {
@@ -663,7 +706,8 @@ do_popup_menu(GtkWidget * toolbar, GdkEventButton * event,
             gtk_menu_shell_append(GTK_MENU_SHELL(menu),
                                   gtk_separator_menu_item_new());
 
-            option_text = remove_underscore(_(tm_toolbar_options[i].text));
+            option_text =
+                tm_remove_underscore(_(tm_toolbar_options[i].text));
             text =
                 g_strdup_printf(_("Use Desktop _Default (%s)"),
                                 option_text);
@@ -710,8 +754,14 @@ do_popup_menu(GtkWidget * toolbar, GdkEventButton * event,
 #if GTK_CHECK_VERSION(2, 10, 0)
     gtk_menu_attach_to_widget(GTK_MENU(menu), toolbar, NULL);
 #endif                          /* GTK_CHECK_VERSION(2, 10, 0) */
-    gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL, button,
-                   event_time);
+    if (button)
+        gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL, button,
+                       event_time);
+    else
+        gtk_menu_popup(GTK_MENU(menu), NULL, NULL, tm_popup_position_func,
+                       toolbar, button, event_time);
+
+    return TRUE;
 }
 
 static gboolean
@@ -719,19 +769,16 @@ tm_button_press_cb(GtkWidget * toolbar, GdkEventButton * event,
                    toolbar_info * info)
 {
     /* Ignore double-clicks and triple-clicks */
-    if (event->button == 3 && event->type == GDK_BUTTON_PRESS) {
-        do_popup_menu(toolbar, event, info);
-        return TRUE;
-    }
+    if (event->button == 3 && event->type == GDK_BUTTON_PRESS)
+        return tm_do_popup_menu(toolbar, event, info);
 
     return FALSE;
 }
 
-static gboolean tm_popup_menu_cb(GtkWidget * toolbar, toolbar_info * info)
+static gboolean
+tm_popup_menu_cb(GtkWidget * toolbar, toolbar_info * info)
 {
-    do_popup_menu(toolbar, NULL, info);
-
-    return TRUE;
+    return tm_do_popup_menu(toolbar, NULL, info);
 }
 
 GtkWidget *balsa_toolbar_new(BalsaToolbarModel * model,
@@ -751,6 +798,7 @@ GtkWidget *balsa_toolbar_new(BalsaToolbarModel * model,
     info = g_new(toolbar_info, 1);
     info->model = model;
     info->ui_manager = g_object_ref(ui_manager);
+    info->menu = NULL;
 
     toolbar = gtk_ui_manager_get_widget(ui_manager, "/Toolbar");
     tm_set_style(toolbar, model);

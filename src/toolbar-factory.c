@@ -193,59 +193,17 @@ balsa_toolbar_remove_all(GtkWidget * widget)
 /* Load and save config
  */
 
-static const struct {
-    const gchar *text;
-    const gchar *config_name;
-    GtkToolbarStyle style;
-} tm_toolbar_options[] = {
-    {
-    N_("Text Be_low Icons"),  "both",       GTK_TOOLBAR_BOTH},       {
-    N_("Text Be_side Icons"), "both-horiz", GTK_TOOLBAR_BOTH_HORIZ}, {
-    NULL,                     "both_horiz", GTK_TOOLBAR_BOTH_HORIZ}, {
-    N_("_Icons Only"),        "icons",      GTK_TOOLBAR_ICONS},      {
-    N_("_Text Only"),         "text",       GTK_TOOLBAR_TEXT}
-};
-
-static GtkToolbarStyle
-tm_default_toolbar_style(void)
-{
-    GConfClient *conf;
-    gchar *str;
-    GtkToolbarStyle default_style = (GtkToolbarStyle) -1;
-
-    /* Get global setting */
-    conf = gconf_client_get_default();
-    str  = gconf_client_get_string(conf,
-                                   "/desktop/gnome/interface/toolbar_style",
-                                   NULL);
-    if (str) {
-        guint i;
-
-        for (i = 0; i < G_N_ELEMENTS(tm_toolbar_options); i++)
-            if (strcmp(tm_toolbar_options[i].config_name, str) == 0) {
-                default_style = tm_toolbar_options[i].style;
-                break;
-            }
-        g_free(str);
-    }
-
-    return default_style;
-}
-
 static void
 tm_load_model(BalsaToolbarModel * model)
 {
     gchar *key;
-    gboolean def;
     guint j;
 
     key = g_strconcat("toolbar-", model->name, NULL);
     libbalsa_conf_push_group(key);
     g_free(key);
 
-    model->style = libbalsa_conf_get_int_with_default("Style", &def);
-    if (def)
-        model->style = tm_default_toolbar_style();
+    model->style = libbalsa_conf_get_int_with_default("Style=-1", NULL);
 
     model->current = NULL;
     for (j = 0;; j++) {
@@ -277,7 +235,7 @@ tm_save_model(BalsaToolbarModel * model)
     libbalsa_conf_push_group(key);
     g_free(key);
 
-    if (model->style != tm_default_toolbar_style())
+    if (model->style != (GtkToolbarStyle) (-1))
         libbalsa_conf_set_int("Style", model->style);
 
     for (j = 0, list = model->current;
@@ -291,6 +249,16 @@ tm_save_model(BalsaToolbarModel * model)
     libbalsa_conf_pop_group();
 }
 
+/* GConfClientNotifyFunc
+ */
+static void
+tm_gconf_notify(GConfClient * client, guint cnxn_id, GConfEntry * entry,
+                BalsaToolbarModel * model)
+{
+    if (model->style == (GtkToolbarStyle) (-1))
+        balsa_toolbar_model_changed(model);
+}
+
 /* Create a BalsaToolbarModel structure.
  */
 BalsaToolbarModel *
@@ -298,10 +266,20 @@ balsa_toolbar_model_new(const gchar * name, GSList * standard)
 {
     BalsaToolbarModel *model =
         g_object_new(BALSA_TYPE_TOOLBAR_MODEL, NULL);
+    GConfClient *conf;
+    guint notify_id;
 
     model->name = name;
     model->standard = standard;
     tm_load_model(model);
+
+    conf = gconf_client_get_default();
+    /* We never destroy a model, so we do nothing with the notify-id: */
+    notify_id =
+        gconf_client_notify_add(conf,
+                                "/desktop/gnome/interface/toolbar_style",
+                                (GConfClientNotifyFunc) tm_gconf_notify,
+                                model, NULL, NULL);
 
     return model;
 }
@@ -513,6 +491,53 @@ bt_free_merge_ids(GArray * merge_ids)
     g_array_free(merge_ids, TRUE);
 }
 
+static const struct {
+    const gchar *text;
+    const gchar *config_name;
+    GtkToolbarStyle style;
+} tm_toolbar_options[] = {
+    {
+    N_("Text Be_low Icons"),  "both",       GTK_TOOLBAR_BOTH},       {
+    N_("Text Be_side Icons"), "both-horiz", GTK_TOOLBAR_BOTH_HORIZ}, {
+    NULL,                     "both_horiz", GTK_TOOLBAR_BOTH_HORIZ}, {
+    N_("_Icons Only"),        "icons",      GTK_TOOLBAR_ICONS},      {
+    N_("_Text Only"),         "text",       GTK_TOOLBAR_TEXT}
+};
+
+static GtkToolbarStyle
+tm_default_style(void)
+{
+    GConfClient *conf;
+    gchar *str;
+    GtkToolbarStyle default_style = GTK_TOOLBAR_BOTH;
+
+    /* Get global setting */
+    conf = gconf_client_get_default();
+    str  = gconf_client_get_string(conf,
+                                   "/desktop/gnome/interface/toolbar_style",
+                                   NULL);
+    if (str) {
+        guint i;
+
+        for (i = 0; i < G_N_ELEMENTS(tm_toolbar_options); i++)
+            if (strcmp(tm_toolbar_options[i].config_name, str) == 0) {
+                default_style = tm_toolbar_options[i].style;
+                break;
+            }
+        g_free(str);
+    }
+
+    return default_style;
+}
+
+static void
+tm_set_style(GtkWidget * toolbar, BalsaToolbarModel * model)
+{
+    gtk_toolbar_set_style(GTK_TOOLBAR(toolbar),
+                          model->style != (GtkToolbarStyle) (-1) ?
+                          model->style : tm_default_style());
+}
+
 /* Update a real toolbar when the model has changed.
  */
 static void
@@ -532,7 +557,7 @@ tm_changed_cb(BalsaToolbarModel * model, GtkUIManager * ui_manager)
     tm_populate(model, ui_manager, merge_ids);
 
     toolbar = gtk_ui_manager_get_widget(ui_manager, "/Toolbar");
-    gtk_toolbar_set_style(GTK_TOOLBAR(toolbar), model->style);
+    tm_set_style(toolbar, model);
 
     tm_save_model(model);
 }
@@ -600,7 +625,7 @@ do_popup_menu(GtkWidget * toolbar, GdkEventButton * event,
     int button, event_time;
     guint i;
     GSList *group = NULL;
-    GtkToolbarStyle default_style = tm_default_toolbar_style();
+    GtkToolbarStyle default_style = tm_default_style();
 
     menu = gtk_menu_new();
     g_signal_connect(menu, "deactivate",
@@ -619,8 +644,7 @@ do_popup_menu(GtkWidget * toolbar, GdkEventButton * event,
                                                     text));
         group = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(item));
 
-        if (tm_toolbar_options[i].style == info->model->style
-            && info->model->style != default_style)
+        if (tm_toolbar_options[i].style == info->model->style)
             gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item),
                                            TRUE);
 
@@ -648,14 +672,12 @@ do_popup_menu(GtkWidget * toolbar, GdkEventButton * event,
             item = gtk_radio_menu_item_new_with_mnemonic(group, text);
             g_free(text);
 
-            if (tm_toolbar_options[i].style == info->model->style)
+            if (info->model->style == (GtkToolbarStyle) (-1))
                 gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM
                                                (item), TRUE);
             gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
-            g_object_set_data(G_OBJECT(item),
-                              BALSA_TOOLBAR_STYLE,
-                              GINT_TO_POINTER(tm_toolbar_options[i].
-                                              style));
+            g_object_set_data(G_OBJECT(item), BALSA_TOOLBAR_STYLE,
+                              GINT_TO_POINTER(-1));
             g_signal_connect(item, "toggled",
                              G_CALLBACK(menu_item_toggled_cb), info);
         }
@@ -731,7 +753,7 @@ GtkWidget *balsa_toolbar_new(BalsaToolbarModel * model,
     info->ui_manager = g_object_ref(ui_manager);
 
     toolbar = gtk_ui_manager_get_widget(ui_manager, "/Toolbar");
-    gtk_toolbar_set_style(GTK_TOOLBAR(toolbar), model->style);
+    tm_set_style(toolbar, model);
     g_object_weak_ref(G_OBJECT(toolbar),
                       (GWeakNotify) tm_toolbar_weak_notify, info);
 

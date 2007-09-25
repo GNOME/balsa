@@ -1,3 +1,10 @@
+2007-09-25  Peter Bloomfield
+
+	* src/toolbar-factory.c: (tm_load_model), (tm_save_model),
+	(tm_gconf_notify), (balsa_toolbar_model_new), (tm_default_style),
+	(tm_set_style), (tm_changed_cb), (do_popup_menu),
+	(balsa_toolbar_new): catch changes in desktop toolbar style.
+
 2007-09-24  Peter Bloomfield
 
 	* src/toolbar-factory.c: (tm_default_toolbar_style),

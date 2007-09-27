@@ -623,11 +623,11 @@ static void md_response_cb(GtkWidget * dialog, gint response,
                            GtkTreeView * tree);
 static void md_name_changed(GtkEntry * name, GtkTreeView * tree);
 
-#ifdef HAVE_GPGME
 static void ident_dialog_add_gpg_menu(GtkWidget * table, gint row,
                                       GtkDialog * dialog,
                                       const gchar * label_name,
                                       const gchar * menu_key);
+#ifdef HAVE_GPGME
 static void display_frame_set_gpg_mode(GObject * dialog,
                                        const gchar * key, gint * value);
 #endif /* HAVE_GPGME */
@@ -901,7 +901,8 @@ new_ident_cb(GtkTreeView * tree, GObject * dialog)
  */
 static GtkWidget*
 append_ident_notebook_page(GtkNotebook *notebook, guint rows,
-			   const gchar * tab_label)
+			   const gchar * tab_label,
+                           const gchar * footnote)
 {
     GtkWidget *vbox;
     GtkWidget *table;
@@ -910,6 +911,9 @@ append_ident_notebook_page(GtkNotebook *notebook, guint rows,
     table = libbalsa_create_table(rows, 2);
     gtk_container_set_border_width(GTK_CONTAINER(table), padding);
     gtk_box_pack_start(GTK_BOX(vbox), table, FALSE, FALSE, 0);
+    if (footnote)
+        gtk_box_pack_start(GTK_BOX(vbox), gtk_label_new(footnote),
+                           FALSE, FALSE, 0);
     gtk_notebook_append_page(notebook, vbox, gtk_label_new(tab_label));
     
     return table;
@@ -958,9 +962,10 @@ setup_ident_frame(GtkDialog * dialog, gboolean createp, gpointer tree)
     gint row;
     GObject *name;
     gpointer path;
+    gchar *footnote;
 
     /* create the "General" tab */
-    table = append_ident_notebook_page(notebook, 5, _("General"));
+    table = append_ident_notebook_page(notebook, 5, _("General"), NULL);
     row = 0;
     ident_dialog_add_entry(table, row++, dialog, _("_Identity Name:"), 
 		           "identity-name");
@@ -974,7 +979,7 @@ setup_ident_frame(GtkDialog * dialog, gboolean createp, gpointer tree)
                            "identity-domain");
 
     /* create the "Messages" tab */
-    table = append_ident_notebook_page(notebook, 8, _("Messages"));
+    table = append_ident_notebook_page(notebook, 8, _("Messages"), NULL);
     row = 0;
     ident_dialog_add_entry(table, row++, dialog, _("_Bcc:"), 
                            "identity-bcc");
@@ -998,7 +1003,7 @@ setup_ident_frame(GtkDialog * dialog, gboolean createp, gpointer tree)
 #endif /* ENABLE_ESMTP */
 
     /* create the "Signature" tab */
-    table = append_ident_notebook_page(notebook, 7, _("Signature"));
+    table = append_ident_notebook_page(notebook, 7, _("Signature"), NULL);
     row = 0;
     ident_dialog_add_check_and_entry(table, row++, dialog,
                                      _("Signature _Path"),
@@ -1023,8 +1028,14 @@ setup_ident_frame(GtkDialog * dialog, gboolean createp, gpointer tree)
                                  "identity-sigprepend", FALSE);
 
 #ifdef HAVE_GPGME
+    footnote = NULL;
+#else
+    footnote = _("Signing and encrypting messages are possible\n"
+                 "only if Balsa is built with cryptographic support.");
+#endif
     /* create the "Security" tab */
-    table = append_ident_notebook_page(notebook, 4, _("Security"));
+    table =
+        append_ident_notebook_page(notebook, 4, _("Security"), footnote);
     row = 0;
     ident_dialog_add_checkbutton(table, row++, dialog, 
                                  _("sign messages by default"),
@@ -1038,6 +1049,8 @@ setup_ident_frame(GtkDialog * dialog, gboolean createp, gpointer tree)
     ident_dialog_add_checkbutton(table, row++, dialog,
                                  _("always trust GnuPG keys when encrypting"),
                                  "identity-trust-always", TRUE);
+#ifndef HAVE_GPGME
+    gtk_widget_set_sensitive(table, FALSE);
 #endif
 
     name = g_object_get_data(G_OBJECT(dialog), "identity-name");
@@ -2035,12 +2048,41 @@ libbalsa_identity_set_crypt_protocol(LibBalsaIdentity* ident, gint protocol)
 }
 
 
+
+static void
+display_frame_set_gpg_mode(GObject * dialog, const gchar* key, gint * value)
+{
+    GtkComboBox *opt_menu = g_object_get_data(G_OBJECT(dialog), key);
+ 
+    switch (*value)
+        {
+        case LIBBALSA_PROTECT_OPENPGP:
+	    gtk_combo_box_set_active(opt_menu, 1);
+            break;
+#ifdef HAVE_SMIME
+        case LIBBALSA_PROTECT_SMIMEV3:
+	    gtk_combo_box_set_active(opt_menu, 2);
+            break;
+#endif
+        case LIBBALSA_PROTECT_RFC3156:
+        default:
+	    gtk_combo_box_set_active(opt_menu, 0);
+            *value = LIBBALSA_PROTECT_RFC3156;
+        }
+}
+#endif  /* HAVE_GPGME */
+
 /*
  * Add an option menu to the given dialog with a label next to it
  * explaining the contents.  A reference to the entry is stored as
  * object data attached to the dialog with the given key.
  */
 
+#ifndef HAVE_GPGME
+/* So we can build a dummy Security page: */
+#define LIBBALSA_PROTECT_RFC3156 0
+#define LIBBALSA_PROTECT_OPENPGP 0
+#endif
 static void
 ident_dialog_add_gpg_menu(GtkWidget * table, gint row, GtkDialog * dialog,
                           const gchar * label_name, const gchar * menu_key)
@@ -2069,30 +2111,6 @@ ident_dialog_add_gpg_menu(GtkWidget * table, gint row, GtkDialog * dialog,
                   GINT_TO_POINTER(LIBBALSA_PROTECT_SMIMEV3), opt_menu);
 #endif
 }
-
-
-static void
-display_frame_set_gpg_mode(GObject * dialog, const gchar* key, gint * value)
-{
-    GtkComboBox *opt_menu = g_object_get_data(G_OBJECT(dialog), key);
- 
-    switch (*value)
-        {
-        case LIBBALSA_PROTECT_OPENPGP:
-	    gtk_combo_box_set_active(opt_menu, 1);
-            break;
-#ifdef HAVE_SMIME
-        case LIBBALSA_PROTECT_SMIMEV3:
-	    gtk_combo_box_set_active(opt_menu, 2);
-            break;
-#endif
-        case LIBBALSA_PROTECT_RFC3156:
-        default:
-	    gtk_combo_box_set_active(opt_menu, 0);
-            *value = LIBBALSA_PROTECT_RFC3156;
-        }
-}
-#endif  /* HAVE_GPGME */
 
 #if ENABLE_ESMTP
 static void

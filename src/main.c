@@ -621,7 +621,7 @@ periodic_expunge_cb(void)
 /*
  * Initialize the progress bar and set text.
  */
-static gdouble prev_fraction;
+static GTimeVal prev_time_val;
 static void
 balsa_progress_set_text(LibBalsaProgress * progress, const gchar * text,
                         guint total)
@@ -637,7 +637,7 @@ balsa_progress_set_text(LibBalsaProgress * progress, const gchar * text,
 
     if (!text || total >= LIBBALSA_PROGRESS_MIN_COUNT)
         rc = balsa_window_setup_progress(balsa_app.main_window, text);
-    prev_fraction = 0;
+    g_get_current_time(&prev_time_val);
     gdk_threads_leave();
 
     *progress = (text && rc) ?
@@ -651,11 +651,18 @@ balsa_progress_set_text(LibBalsaProgress * progress, const gchar * text,
 static void
 balsa_progress_set_fraction(LibBalsaProgress * progress, gdouble fraction)
 {
+    GTimeVal time_val;
+    gdouble elapsed;
+
+    g_get_current_time(&time_val);
+    elapsed = time_val.tv_sec - prev_time_val.tv_sec;
+    elapsed += 1e-6 * (time_val.tv_usec - prev_time_val.tv_usec);
+
     if (*progress == LIBBALSA_PROGRESS_NO
         || (fraction != 0 && fraction != 1
-            && fraction < prev_fraction + LIBBALSA_PROGRESS_MIN_UPDATE))
+            && elapsed < LIBBALSA_PROGRESS_MIN_UPDATE))
         return;
-    prev_fraction = fraction;
+    prev_time_val = time_val;
 
     gdk_threads_enter();
     if (balsa_app.main_window)

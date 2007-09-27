@@ -1,3 +1,16 @@
+2007-09-27  Peter Bloomfield
+
+	* doc/C/balsa.xml: fix identity-dialog and toolbar-editor 
+	documentation.
+	* libbalsa/identity.c: (append_ident_notebook_page),
+	(setup_ident_frame), (display_frame_set_gpg_mode): show Security
+	page even when GnuPG isn't supported, but grayed out and with an
+	explanatory label.
+	* libbalsa/libbalsa.h: update progress bar after a set time, not
+	a set fraction of the work.
+	* src/main.c: (balsa_progress_set_text),
+	(balsa_progress_set_fraction): ditto.
+
 2007-09-25  Peter Bloomfield
 
 	* src/toolbar-factory.c: (menu_item_toggled_cb),

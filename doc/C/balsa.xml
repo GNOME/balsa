@@ -1250,13 +1250,12 @@ This is version 2.721 of the &Balsa; manual.
   When the <guibutton>New Message</guibutton> or
   <guibutton>Reply</guibutton> or <guibutton>Forward</guibutton>
   action is selected, the message to be sent is brought up in the
-  Message Composer.  This window is where you
-  can type the text of the message, attach files, and specify
-  recipients.  The window also provides an interface to spell check
-  the message.  In the near future, it will be possible to perform
-  signing and encryption of messages using
-  <application>GnuPG</application> or
-  <application><acronym>PGP</acronym></application>.
+  Message Composer.  This window is where you can type the text of
+  the message, attach files, and specify recipients.  The window also
+  provides an interface to spell check the message.  Signing and
+  encryption of messages using <application>GnuPG</application> or
+  <application><acronym>PGP</acronym></application> are also supported,
+  when &Balsa; is built with cryptographic support.
 </para>
 
 <para>
@@ -3342,9 +3341,7 @@ This is version 2.721 of the &Balsa; manual.
   Below the notebook is a checkbox for wrapping the button labels
   (the text that may accompany the buttons). This option applies to
   the toolbars on all three types of window. If you choose wrapping,
-  long labels will be shown on two lines.  You control whether and where
-  the labels are shown using the popup (right click) menu for any actual
-  toolbar, not this dialog.
+  long labels will be shown on two lines.
 </para>
 <para>
   This is an <quote>instant apply</quote> dialog: the changes you make
@@ -3354,6 +3351,13 @@ This is version 2.721 of the &Balsa; manual.
   is the one that you see before the toolbar has been customized. If
   you use this option, all current <emphasis>and past</emphasis> changes
   will be undone.
+</para>
+<para>
+  A second button below the Preview toolbar pops up a menu that gives
+  you control over what is shown in the toolbar: icons, text, or both.
+  The popup (right click) menu for any actual toolbar offers the same
+  choices, as well as the option to open up this dialog
+  (<quote>Customize Toolbars...</quote>).
 </para>
 </sect1>
 
@@ -3699,6 +3703,14 @@ the third is an alias (currently not used and replaced by 'TODO').</para>
       </para>
     </listitem>
   </varlistentry>
+</variablelist>
+
+<para>
+    The <quote>Messages</quote> page shows various initial settings for
+    the new message:
+</para>
+
+<variablelist>
 
   <varlistentry>
     <term><guilabel>Bcc</guilabel></term>
@@ -3741,8 +3753,9 @@ the third is an alias (currently not used and replaced by 'TODO').</para>
 
 </variablelist>
 
-<para>You control the signature that &Balsa; appends to your messages on
-    the second page:
+<para>
+    You control the signature that &Balsa; appends to your messages on
+    the <quote>Signature</quote> page:
 </para>
 
 <variablelist>
@@ -3842,7 +3855,7 @@ the third is an alias (currently not used and replaced by 'TODO').</para>
   </varlistentry>
 </variablelist>
 
-<para>Security settings are on the third page: </para>
+<para>Security settings are on the fourth page: </para>
 
 <variablelist>
 
@@ -3880,6 +3893,12 @@ the third is an alias (currently not used and replaced by 'TODO').</para>
 
 </variablelist>
 
+<note>
+  <para>
+    These security options are available only if &Balsa; is built
+    with <application>GnuPG</application> support.
+  </para>
+</note>
 </sect1>
 
 <!-- ################################################################# -->

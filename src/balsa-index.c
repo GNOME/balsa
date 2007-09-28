@@ -973,8 +973,6 @@ balsa_index_load_mailbox_node (BalsaIndex * index,
 	    	     G_CALLBACK(bndx_mailbox_row_inserted_cb), index);
     g_signal_connect(mailbox, "message-expunged",
 	    	     G_CALLBACK(bndx_mailbox_message_expunged_cb), index);
-
-    balsa_window_enable_mailbox_menus(balsa_app.main_window, index);
     gdk_threads_leave();
 
     view_filter = balsa_window_get_view_filter(balsa_app.main_window, TRUE);

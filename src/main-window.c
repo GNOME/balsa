@@ -132,6 +132,7 @@ static gboolean mailbox_check_func(GtkTreeModel * model,
 				   GSList ** list);
 static gboolean imap_check_test(const gchar * path);
 
+static void enable_mailbox_menus(BalsaWindow * window, BalsaIndex * index);
 static void enable_message_menus(BalsaWindow * window, guint msgno);
 static void enable_edit_menus(BalsaWindow * window, BalsaMessage * bm);
 #ifdef HAVE_GTKHTML
@@ -1604,7 +1605,7 @@ balsa_window_new()
 
     /* Disable menu items at start up */
     balsa_window_update_book_menus(window);
-    balsa_window_enable_mailbox_menus(window, NULL);
+    enable_mailbox_menus(window, NULL);
     enable_message_menus(window, 0);
     enable_edit_menus(window, NULL);
 #ifdef HAVE_GTKHTML
@@ -1678,8 +1679,8 @@ bw_next_unread_mailbox(LibBalsaMailbox * current_mailbox)
     return next_mailbox;
 }
 
-void
-balsa_window_enable_mailbox_menus(BalsaWindow * window, BalsaIndex * index)
+static void
+enable_mailbox_menus(BalsaWindow * window, BalsaIndex * index)
 {
     LibBalsaMailbox *mailbox = NULL;
     BalsaMailboxNode *mbnode = NULL;
@@ -2276,7 +2277,7 @@ balsa_window_real_close_mbnode(BalsaWindow * window,
             gtk_statusbar_push(statusbar, context_id, "Mailbox closed");
 
             /* Disable menus */
-            balsa_window_enable_mailbox_menus(window, NULL);
+            enable_mailbox_menus(window, NULL);
             enable_message_menus(window, 0);
             enable_edit_menus(window, NULL);
 	    if (window->current_index)
@@ -4463,7 +4464,7 @@ notebook_switch_page_cb(GtkWidget * notebook,
     g_object_set_data(G_OBJECT(window), BALSA_INDEX_GRAB_FOCUS, index);
     balsa_window_idle_replace(window, index);
     enable_message_menus(window, index->current_msgno);
-    balsa_window_enable_mailbox_menus(window, index);
+    enable_mailbox_menus(window, index);
 
     gtk_entry_set_text(GTK_ENTRY(window->sos_entry),
                        index->filter_string ? index->filter_string : "");
@@ -4493,7 +4494,7 @@ balsa_window_index_changed_cb(GtkWidget * widget, gpointer data)
         return;
 
     index = BALSA_INDEX(widget);
-    balsa_window_enable_mailbox_menus(window, index);
+    enable_mailbox_menus(window, index);
     enable_message_menus(window, index->current_msgno);
     if (index->current_msgno == 0) {
         enable_edit_menus(window, NULL);

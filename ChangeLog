@@ -1,5 +1,12 @@
 2007-09-27  Peter Bloomfield
 
+	* src/main-window.c: do not export enable_mailbox_menus.
+	* src/main-window.h: ditto.
+	* src/balsa-index.c: (balsa_index_load_mailbox_node):
+	enable_mailbox_menus is no longer exported.
+
+2007-09-27  Peter Bloomfield
+
 	* doc/C/balsa.xml: fix identity-dialog and toolbar-editor 
 	documentation.
 	* libbalsa/identity.c: (append_ident_notebook_page),

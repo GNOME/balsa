@@ -88,8 +88,6 @@ enum {
 GtkType balsa_window_get_type(void);
 GtkWidget *balsa_window_new(void);
 GtkWidget *balsa_window_find_current_index(BalsaWindow * window);
-void balsa_window_enable_mailbox_menus(BalsaWindow * window,
-				       BalsaIndex * index);
 void balsa_window_update_book_menus(BalsaWindow *window);
 LibBalsaCondition* balsa_window_get_view_filter(BalsaWindow *window,
                                                 gboolean flags_only);

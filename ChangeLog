@@ -1,5 +1,9 @@
 2007-09-29  Peter Bloomfield
 
+	* src/main-window.c: block actions while we set active.
+
+2007-09-29  Peter Bloomfield
+
 	* src/balsa-index.c: (balsa_index_load_mailbox_node): set
 	threading in main-window instead of balsa-index.
 	* src/main-window.c: ditto.

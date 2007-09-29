@@ -238,6 +238,7 @@ static void threading_radio_cb(GtkRadioAction * action,
                                GtkRadioAction * current, gpointer data);
 static void balsa_window_set_threading_menu(BalsaWindow * window,
 					    int option);
+static void bw_show_mbtree(BalsaWindow * window);
 #endif /* ENABLE_TOUCH_UI */
 static void balsa_window_set_filter_menu(BalsaWindow * window,
 					 int gui_filter);
@@ -1264,7 +1265,16 @@ bw_set_active(BalsaWindow * window, const gchar * action_name,
               gboolean active)
 {
     GtkAction *action = bw_get_action(window, action_name);
+    GtkAction *block_action =
+        GTK_IS_RADIO_ACTION(action) ?
+        g_slist_last(gtk_radio_action_get_group
+                     (GTK_RADIO_ACTION(action)))->data : action;
+
+    g_signal_handlers_block_matched(block_action, G_SIGNAL_MATCH_DATA, 0,
+                                    (GQuark) 0, NULL, NULL, window);
     gtk_toggle_action_set_active(GTK_TOGGLE_ACTION(action), active);
+    g_signal_handlers_unblock_matched(block_action, G_SIGNAL_MATCH_DATA, 0,
+                                      (GQuark) 0, NULL, NULL, window);
 }
 
 static gboolean
@@ -1561,6 +1571,7 @@ balsa_window_new()
     /*PKGW: do it this way, without the usizes. */
 #if !defined(ENABLE_TOUCH_UI)
     bw_set_active(window, "ShowMailboxTree", balsa_app.show_mblist);
+    bw_show_mbtree(window);
 #endif                          /* !defined(ENABLE_TOUCH_UI) */
 
     gtk_paned_set_position(GTK_PANED(window->hpaned), 
@@ -4267,7 +4278,7 @@ hide_changed_cb(GtkToggleAction * toggle_action, gpointer data)
                 && hide_states[states_idx].set !=
                 hide_states[curr_idx].set) {
                 bw_set_active(bw, hide_states[i].action_name, FALSE);
-                return;         /* triggered menu change will do the job */
+                break;
             }
         }
     }
@@ -4356,14 +4367,12 @@ empty_trash(BalsaWindow * window)
 
 #if !defined(ENABLE_TOUCH_UI)
 static void
-show_mbtree_cb(GtkToggleAction * action, gpointer data)
+bw_show_mbtree(BalsaWindow * bw)
 {
-    BalsaWindow *bw = BALSA_WINDOW(data);
     GtkWidget *parent;
     parent = gtk_widget_get_ancestor(bw->mblist, GTK_TYPE_HPANED);
     g_assert(parent != NULL);
 
-    balsa_app.show_mblist = gtk_toggle_action_get_active(action);
     if (balsa_app.show_mblist) {
         gtk_widget_show(bw->mblist);
         gtk_paned_set_position(GTK_PANED(parent), balsa_app.mblist_width);
@@ -4371,6 +4380,13 @@ show_mbtree_cb(GtkToggleAction * action, gpointer data)
         gtk_widget_hide(bw->mblist);
         gtk_paned_set_position(GTK_PANED(parent), 0);
     }
+}
+
+static void
+show_mbtree_cb(GtkToggleAction * action, gpointer data)
+{
+    balsa_app.show_mblist = gtk_toggle_action_get_active(action);
+    bw_show_mbtree(BALSA_WINDOW(data));
 }
 
 static void
@@ -4965,7 +4981,7 @@ show_all_headers_tool_cb(GtkToggleAction * action, gpointer data)
     }
 }
 
-void
+static void
 reset_show_all_headers(BalsaWindow * window)
 {
     bw_set_active(window, "ShowAllHeaders", FALSE);

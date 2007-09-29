@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa.HEAD.es\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-09-25 03:07+0100\n"
-"PO-Revision-Date: 2007-09-26 11:24+0200\n"
+"POT-Creation-Date: 2007-09-27 22:57+0100\n"
+"PO-Revision-Date: 2007-09-29 12:38+0200\n"
 "Last-Translator: Jorge González <jorgegonz@svn.gnome.org>\n"
 "Language-Team: Spanish <traductores@es.gnome.org>\n"
 "MIME-Version: 1.0\n"
@@ -403,170 +403,177 @@ msgstr "Predeterminado"
 # src/mailbox-conf.c:890
 # src/mailbox-conf.c:965
 #. Translators: please do not translate Face.
-#: ../libbalsa/identity.c:931
+#: ../libbalsa/identity.c:935
 msgid "_Face Path"
 msgstr "Ruta de la _cara"
 
 #. Translators: please do not translate Face.
-#: ../libbalsa/identity.c:937
+#: ../libbalsa/identity.c:941
 msgid "_X-Face Path"
 msgstr "Ruta _X-Face"
 
 # src/address-book.c:477
 # src/address-book.c:523
 #. create the "General" tab
-#: ../libbalsa/identity.c:963
+#: ../libbalsa/identity.c:968
 msgid "General"
 msgstr "General"
 
 # src/pref-manager.c:234 src/pref-manager.c:867
 # src/pref-manager.c:236 src/pref-manager.c:992
-#: ../libbalsa/identity.c:965
+#: ../libbalsa/identity.c:970
 msgid "_Identity Name:"
 msgstr "_Nombre de la identidad:"
 
 # src/store-address.c:50
 # src/store-address.c:52
-#: ../libbalsa/identity.c:967
+#: ../libbalsa/identity.c:972
 msgid "_Full Name:"
 msgstr "Nombre _completo:"
 
 # src/store-address.c:52
 # src/store-address.c:54
-#: ../libbalsa/identity.c:969
+#: ../libbalsa/identity.c:974
 msgid "_Mailing Address:"
 msgstr "_Dirección de correo:"
 
 # src/sendmsg-window.c:885
 # src/sendmsg-window.c:928
-#: ../libbalsa/identity.c:971
+#: ../libbalsa/identity.c:976
 msgid "Reply _To:"
 msgstr "_Responder a:"
 
 # src/filter-edit-dialog.c:454
 # src/filter-edit-dialog.c:404
-#: ../libbalsa/identity.c:973
+#: ../libbalsa/identity.c:978
 msgid "_Domain:"
 msgstr "_Dominio:"
 
 # src/main-window.c:421
 # src/main-window.c:428
 #. create the "Messages" tab
-#: ../libbalsa/identity.c:977
+#: ../libbalsa/identity.c:982
 msgid "Messages"
 msgstr "Mensajes"
 
 # src/sendmsg-window.c:228
 # src/sendmsg-window.c:232
-#: ../libbalsa/identity.c:979
+#: ../libbalsa/identity.c:984
 msgid "_Bcc:"
 msgstr "_Cco:"
 
 # src/pref-manager.c:1007
 # src/pref-manager.c:1137
-#: ../libbalsa/identity.c:981
+#: ../libbalsa/identity.c:986
 msgid "Reply _String:"
 msgstr "_Cadena de respuesta:"
 
 # src/message-window.c:120
 # src/message-window.c:114
-#: ../libbalsa/identity.c:983
+#: ../libbalsa/identity.c:988
 msgid "F_orward String:"
 msgstr "Cadena de r_eenvío:"
 
 # src/filter-edit-dialog.c:626
 # src/filter-edit-dialog.c:538
-#: ../libbalsa/identity.c:986
+#: ../libbalsa/identity.c:991
 msgid "request _Message Disposition Notification by default"
 msgstr "Solicitar notificación de entrega de _mensaje de forma predeterminada"
 
 # libinit_balsa/balsa-druid-page-user.gob:91
 # libinit_balsa/balsa-druid-page-user.gob:91
-#: ../libbalsa/identity.c:996
+#: ../libbalsa/identity.c:1001
 msgid "SMT_P Server:"
 msgstr "Servidor _SMTP:"
 
 # src/pref-manager.c:237 src/pref-manager.c:949 src/pref-manager.c:1027
 # src/pref-manager.c:241 src/pref-manager.c:1074 src/pref-manager.c:1157
 #. create the "Signature" tab
-#: ../libbalsa/identity.c:1001
+#: ../libbalsa/identity.c:1006
 msgid "Signature"
 msgstr "Firma"
 
 # src/pref-manager.c:237 src/pref-manager.c:949 src/pref-manager.c:1027
 # src/pref-manager.c:241 src/pref-manager.c:1074 src/pref-manager.c:1157
-#: ../libbalsa/identity.c:1004
+#: ../libbalsa/identity.c:1009
 msgid "Signature _Path"
 msgstr "Ruta de la _firma"
 
 # src/pref-manager.c:237 src/pref-manager.c:949 src/pref-manager.c:1027
 # src/pref-manager.c:1838
-#: ../libbalsa/identity.c:1007
+#: ../libbalsa/identity.c:1012
 msgid "_Execute Signature"
 msgstr "_Ejecutar firma"
 
 # src/sendmsg-window.c:1434
 # src/sendmsg-window.c:1483
-#: ../libbalsa/identity.c:1010
+#: ../libbalsa/identity.c:1015
 msgid "Incl_ude Signature"
 msgstr "Incl_uir firma"
 
-#: ../libbalsa/identity.c:1013
+#: ../libbalsa/identity.c:1018
 msgid "Include Signature When For_warding"
 msgstr "Incluir firma cuando se _reenvíe"
 
-#: ../libbalsa/identity.c:1016
+#: ../libbalsa/identity.c:1021
 msgid "Include Signature When Rep_lying"
 msgstr "Incluir firma cua_ndo se conteste"
 
 # src/pref-manager.c:1021
 # src/pref-manager.c:1151
-#: ../libbalsa/identity.c:1019
+#: ../libbalsa/identity.c:1024
 msgid "_Add Signature Separator"
 msgstr "_Añadir separador de firma"
 
 # src/pref-manager.c:237 src/pref-manager.c:949 src/pref-manager.c:1027
 # src/pref-manager.c:241 src/pref-manager.c:1074 src/pref-manager.c:1157
-#: ../libbalsa/identity.c:1022
+#: ../libbalsa/identity.c:1027
 msgid "Prepend Si_gnature"
 msgstr "An_teponer firma"
 
-#. create the "Security" tab
-#: ../libbalsa/identity.c:1027
+#: ../libbalsa/identity.c:1033
+msgid ""
+"Signing and encrypting messages are possible\n"
+"only if Balsa is built with cryptographic support."
+msgstr ""
+"Sólo es posible firmar y cifrar mensajes\n"
+"si Balsa se construye con soporte criptográfico."
+
+#: ../libbalsa/identity.c:1038
 msgid "Security"
 msgstr "Seguridad"
 
-#: ../libbalsa/identity.c:1030
+#: ../libbalsa/identity.c:1041
 msgid "sign messages by default"
 msgstr "firmar mensajes por omisión"
 
-#: ../libbalsa/identity.c:1033
+#: ../libbalsa/identity.c:1044
 msgid "encrypt messages by default"
 msgstr "cifrar mensajes por omisión"
 
-#: ../libbalsa/identity.c:1036
+#: ../libbalsa/identity.c:1047
 msgid "default protocol"
 msgstr "protocolo predeterminado"
 
-#: ../libbalsa/identity.c:1039
+#: ../libbalsa/identity.c:1050
 msgid "always trust GnuPG keys when encrypting"
 msgstr "confiar siempre en las claves GnuPG al cifrar"
 
 # src/sendmsg-window.c:1694
 # src/sendmsg-window.c:1749
-#: ../libbalsa/identity.c:1176
+#: ../libbalsa/identity.c:1189
 #, c-format
 msgid "Error reading file %s: %s"
 msgstr "Ha ocurrido un error al leer el archivo %s: %s"
 
 #. Translators: please do not translate Face.
-#: ../libbalsa/identity.c:1187
+#: ../libbalsa/identity.c:1200
 #, c-format
 msgid "Face header file %s is too long (%lu bytes)."
 msgstr "El archivo de cabecera de la cara %s es demasiado largo (%lu bytes)."
 
 #. Translators: please do not translate Face.
-#: ../libbalsa/identity.c:1197
+#: ../libbalsa/identity.c:1210
 #, c-format
 msgid "Face header file %s contains binary data."
 msgstr "El archivo de cabecera de la cara %s contiene datos binarios."
@@ -574,43 +581,43 @@ msgstr "El archivo de cabecera de la cara %s contiene datos binarios."
 # src/sendmsg-window.c:1694
 # src/sendmsg-window.c:1749
 #. Translators: please do not translate Face.
-#: ../libbalsa/identity.c:1217 ../src/balsa-message.c:1224
+#: ../libbalsa/identity.c:1230 ../src/balsa-message.c:1224
 #, c-format
 msgid "Error loading Face: %s"
 msgstr "Ha ocurrido un error al cargar la cara: %s"
 
-#: ../libbalsa/identity.c:1413
+#: ../libbalsa/identity.c:1426
 msgid "Error: The identity does not have a name"
 msgstr "Error: La identidad no tiene un nombre"
 
-#: ../libbalsa/identity.c:1423
+#: ../libbalsa/identity.c:1436
 msgid "Error: An identity with that name already exists"
 msgstr "Error: Ya existe una identidad con ese nombre"
 
-#: ../libbalsa/identity.c:1620
+#: ../libbalsa/identity.c:1633
 msgid "Do you really want to delete the selected identity?"
 msgstr "¿Está seguro que quiere borrar la identidad seleccionada?"
 
-#: ../libbalsa/identity.c:1655
+#: ../libbalsa/identity.c:1668
 #, c-format
 msgid "Error displaying help for identities: %s\n"
 msgstr "Error mostrando ayuda para identidades: %s\n"
 
 # src/main-window.c:259
 # src/main-window.c:262
-#: ../libbalsa/identity.c:1701
+#: ../libbalsa/identity.c:1714
 msgid "Manage Identities"
 msgstr "Gestionar identidades"
 
-#: ../libbalsa/identity.c:2063
+#: ../libbalsa/identity.c:2105
 msgid "GnuPG MIME mode"
 msgstr "Modo MIME de GnuPG"
 
-#: ../libbalsa/identity.c:2065
+#: ../libbalsa/identity.c:2107
 msgid "GnuPG OpenPGP mode"
 msgstr "Modo OpenPGP de GnuPG"
 
-#: ../libbalsa/identity.c:2068
+#: ../libbalsa/identity.c:2110
 msgid "GpgSM S/MIME mode"
 msgstr "Modo S/MIME de GpgSM"
 
@@ -7912,37 +7919,37 @@ msgstr ""
 "Purgar\n"
 "borrados"
 
-#: ../src/toolbar-factory.c:347
+#: ../src/toolbar-factory.c:366
 #, c-format
 msgid "Unknown toolbar icon \"%s\""
 msgstr "Icono de barra de herramientas «%s» desconocido"
 
-#: ../src/toolbar-factory.c:399
+#: ../src/toolbar-factory.c:418
 msgid "Queue"
 msgstr "Encolar"
 
-#: ../src/toolbar-factory.c:567
+#: ../src/toolbar-factory.c:500
 msgid "Text Be_low Icons"
 msgstr "Texto _debajo de los iconos"
 
-#: ../src/toolbar-factory.c:568
+#: ../src/toolbar-factory.c:501
 msgid "Text Be_side Icons"
 msgstr "Texto j_unto a los iconos"
 
-#: ../src/toolbar-factory.c:570
+#: ../src/toolbar-factory.c:503
 msgid "_Icons Only"
 msgstr "Sólo _iconos"
 
-#: ../src/toolbar-factory.c:571
+#: ../src/toolbar-factory.c:504
 msgid "_Text Only"
 msgstr "Sólo _texto"
 
-#: ../src/toolbar-factory.c:629
+#: ../src/toolbar-factory.c:712
 #, c-format
 msgid "Use Desktop _Default (%s)"
 msgstr "Usar los pre_determinados del escritorio (%s)"
 
-#: ../src/toolbar-factory.c:656
+#: ../src/toolbar-factory.c:738
 msgid "_Customize Toolbars..."
 msgstr "_Personalizar barras de herramientas..."
 

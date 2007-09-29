@@ -1,3 +1,12 @@
+2007-09-29  Peter Bloomfield
+
+	* src/balsa-index.c: (balsa_index_load_mailbox_node):
+	balsa_window_get_view_filter is no longer exported;
+	(bndx_do_popup): BalsaIndex::window no longer exists.
+	* src/balsa-index.h: remove BalsaIndex::window.
+	* src/main-window.c: do not export balsa_window_get_view_filter.
+	* src/main-window.h: ditto.
+
 2007-09-27  Peter Bloomfield
 
 	* src/main-window.c: do not export enable_mailbox_menus.

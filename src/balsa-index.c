@@ -923,7 +923,6 @@ balsa_index_load_mailbox_node (BalsaIndex * index,
     LibBalsaMailbox* mailbox;
     gboolean successp;
     gint try_cnt;
-    LibBalsaCondition *view_filter;
 
     g_return_val_if_fail(BALSA_IS_INDEX(index), TRUE);
     g_return_val_if_fail(index->mailbox_node == NULL, TRUE);
@@ -975,10 +974,6 @@ balsa_index_load_mailbox_node (BalsaIndex * index,
 	    	     G_CALLBACK(bndx_mailbox_message_expunged_cb), index);
     gdk_threads_leave();
 
-    view_filter = balsa_window_get_view_filter(balsa_app.main_window, TRUE);
-    libbalsa_mailbox_set_view_filter(mailbox, view_filter, FALSE);
-    libbalsa_condition_unref(view_filter);
-    libbalsa_mailbox_make_view_filter_persistent(mailbox);
     libbalsa_mailbox_set_threading(mailbox,
                                    libbalsa_mailbox_get_threading_type
                                    (mailbox));
@@ -1894,10 +1889,11 @@ bndx_do_popup(BalsaIndex * index, GdkEventButton * event)
     gtk_widget_set_sensitive(index->move_to_item,
                              any && !mailbox->readonly);
 
-    submenu = balsa_mblist_mru_menu(GTK_WINDOW(index->window),
-                                    &balsa_app.folder_mru,
-                                    G_CALLBACK(mru_menu_cb),
-                                    index);
+    submenu =
+        balsa_mblist_mru_menu(GTK_WINDOW
+                              (gtk_widget_get_toplevel(GTK_WIDGET(index))),
+                              &balsa_app.folder_mru,
+                              G_CALLBACK(mru_menu_cb), index);
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(index->move_to_item),
                               submenu);
 

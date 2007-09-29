@@ -241,6 +241,10 @@ static void balsa_window_set_threading_menu(BalsaWindow * window,
 #endif /* ENABLE_TOUCH_UI */
 static void balsa_window_set_filter_menu(BalsaWindow * window,
 					 int gui_filter);
+static LibBalsaCondition *balsa_window_get_view_filter(BalsaWindow *
+                                                       window,
+                                                       gboolean
+                                                       flags_only);
 #if defined(ENABLE_TOUCH_UI)
 static gboolean open_mailbox_cb(GtkWidget *w, GdkEventKey *e, gpointer data);
 static void enable_view_filter_cb(GtkToggleAction * action, gpointer data);
@@ -264,7 +268,8 @@ static void mw_size_alloc_cb(GtkWidget * window, GtkAllocation * alloc);
 
 static void notebook_switch_page_cb(GtkWidget * notebook,
                                     GtkNotebookPage * page,
-                                    guint page_num);
+                                    guint page_num,
+                                    gpointer data);
 #if !defined(ENABLE_TOUCH_UI)
 static void send_msg_window_destroy_cb(GtkWidget * widget, gpointer data);
 #endif /*ENABLE_TOUCH_UI */
@@ -1516,7 +1521,7 @@ balsa_window_new()
     g_signal_connect(G_OBJECT(window->notebook), "size_allocate",
                      G_CALLBACK(notebook_size_alloc_cb), NULL);
     g_signal_connect(G_OBJECT(window->notebook), "switch_page",
-                     G_CALLBACK(notebook_switch_page_cb), NULL);
+                     G_CALLBACK(notebook_switch_page_cb), window);
     gtk_drag_dest_set (GTK_WIDGET (window->notebook), GTK_DEST_DEFAULT_ALL,
                        notebook_drop_types, NUM_DROP_TYPES,
                        GDK_ACTION_DEFAULT | GDK_ACTION_COPY | GDK_ACTION_MOVE);
@@ -2105,6 +2110,7 @@ real_open_mbnode(struct bw_open_mbnode_info * info)
     gboolean failurep;
     GError *err = NULL;
     gchar *message;
+    LibBalsaCondition *view_filter;
 
 #ifdef BALSA_USE_THREADS
     static pthread_mutex_t open_lock = PTHREAD_MUTEX_INITIALIZER;
@@ -2124,7 +2130,6 @@ real_open_mbnode(struct bw_open_mbnode_info * info)
     }
 
     index = BALSA_INDEX(balsa_index_new());
-    index->window = GTK_WIDGET(info->window);
 
     message = g_strdup_printf(_("Opening %s"), info->mbnode->mailbox->name);
     balsa_window_increase_activity(info->window, message);
@@ -2187,7 +2192,15 @@ real_open_mbnode(struct bw_open_mbnode_info * info)
     gtk_notebook_set_current_page(GTK_NOTEBOOK
                                   (info->window->notebook),
                                   page_num);
-    /* Enable relavent menu items... */
+
+    /* switch_page_cb has now set the hide-states for this mailbox, so
+     * we can set up the view-filter: */
+    view_filter = balsa_window_get_view_filter(info->window, TRUE);
+    libbalsa_mailbox_set_view_filter(info->mbnode->mailbox, view_filter,
+                                     FALSE);
+    libbalsa_condition_unref(view_filter);
+    libbalsa_mailbox_make_view_filter_persistent(info->mbnode->mailbox);
+
     register_open_mailbox(info->mbnode->mailbox);
     /* scroll may select the message and GtkTreeView does not like selecting
      * without being shown first. */
@@ -4131,7 +4144,7 @@ mailbox_tab_close_cb(GtkWidget * widget, gpointer data)
 }
 
 
-LibBalsaCondition*
+static LibBalsaCondition*
 balsa_window_get_view_filter(BalsaWindow *window, gboolean flags_only)
 {
     static struct {
@@ -4266,6 +4279,12 @@ hide_changed_cb(GtkToggleAction * toggle_action, gpointer data)
      * be the new one. */
     libbalsa_mailbox_set_filter(mailbox, balsa_window_filter_to_int(bw));
 
+    /* Set the flags part of this filter as persistent: */
+    filter = balsa_window_get_view_filter(bw, TRUE);
+    libbalsa_mailbox_set_view_filter(mailbox, filter, FALSE);
+    libbalsa_condition_unref(filter);
+    libbalsa_mailbox_make_view_filter_persistent(mailbox);
+
     filter = balsa_window_get_view_filter(bw, FALSE);
     /* libbalsa_mailbox_set_view_filter() will ref the
      * filter.  We need also to rethread to take into account that
@@ -4273,7 +4292,6 @@ hide_changed_cb(GtkToggleAction * toggle_action, gpointer data)
     if (libbalsa_mailbox_set_view_filter(mailbox, filter, TRUE))
         balsa_index_ensure_visible(BALSA_INDEX(index));
     libbalsa_condition_unref(filter);
-    libbalsa_mailbox_make_view_filter_persistent(mailbox);
 }
 
 static void
@@ -4423,11 +4441,12 @@ mw_size_alloc_cb(GtkWidget * window, GtkAllocation * alloc)
  */
 static void
 notebook_switch_page_cb(GtkWidget * notebook,
-                        GtkNotebookPage * notebookpage, guint page_num)
+                        GtkNotebookPage * notebookpage, guint page_num,
+                        gpointer data)
 {
+    BalsaWindow *window = BALSA_WINDOW(data);
     GtkWidget *page;
     BalsaIndex *index;
-    BalsaWindow *window;
     LibBalsaMailbox *mailbox;
     gchar *title;
 
@@ -4435,7 +4454,6 @@ notebook_switch_page_cb(GtkWidget * notebook,
     index = BALSA_INDEX(gtk_bin_get_child(GTK_BIN(page)));
 
     mailbox = index->mailbox_node->mailbox;
-    window = BALSA_WINDOW(index->window);
     if (window->current_index) {
 	g_object_remove_weak_pointer(G_OBJECT(window->current_index),
 				     (gpointer) &window->current_index);
@@ -4494,7 +4512,6 @@ balsa_window_index_changed_cb(GtkWidget * widget, gpointer data)
         return;
 
     index = BALSA_INDEX(widget);
-    enable_mailbox_menus(window, index);
     enable_message_menus(window, index->current_msgno);
     if (index->current_msgno == 0) {
         enable_edit_menus(window, NULL);

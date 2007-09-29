@@ -46,8 +46,6 @@ extern "C" {
     struct _BalsaIndex {
         GtkTreeView tree_view;
         
-        GtkWidget* window;       
-
         /* the popup menu and some items we need to refer to */
         GtkWidget *popup_menu;
         GtkWidget *delete_item;

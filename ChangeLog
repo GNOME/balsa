@@ -1,5 +1,11 @@
 2007-09-29  Peter Bloomfield
 
+	* src/balsa-index.c: (balsa_index_load_mailbox_node): set
+	threading in main-window instead of balsa-index.
+	* src/main-window.c: ditto.
+
+2007-09-29  Peter Bloomfield
+
 	* src/balsa-index.c: (balsa_index_load_mailbox_node):
 	balsa_window_get_view_filter is no longer exported;
 	(bndx_do_popup): BalsaIndex::window no longer exists.

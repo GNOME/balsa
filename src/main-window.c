@@ -2111,6 +2111,7 @@ real_open_mbnode(struct bw_open_mbnode_info * info)
     GError *err = NULL;
     gchar *message;
     LibBalsaCondition *view_filter;
+    LibBalsaMailbox *mailbox;
 
 #ifdef BALSA_USE_THREADS
     static pthread_mutex_t open_lock = PTHREAD_MUTEX_INITIALIZER;
@@ -2119,7 +2120,7 @@ real_open_mbnode(struct bw_open_mbnode_info * info)
 #endif
     /* FIXME: the check is not needed in non-MT-mode */
     gdk_threads_enter();
-    if (!info->window || is_open_mailbox(info->mbnode->mailbox)) {
+    if (!info->window || is_open_mailbox(mailbox = info->mbnode->mailbox)) {
 	gdk_threads_leave();
 #ifdef BALSA_USE_THREADS
         pthread_mutex_unlock(&open_lock);
@@ -2131,7 +2132,7 @@ real_open_mbnode(struct bw_open_mbnode_info * info)
 
     index = BALSA_INDEX(balsa_index_new());
 
-    message = g_strdup_printf(_("Opening %s"), info->mbnode->mailbox->name);
+    message = g_strdup_printf(_("Opening %s"), mailbox->name);
     balsa_window_increase_activity(info->window, message);
 
     /* Call balsa_index_load_mailbox_node NOT holding the gdk lock. */
@@ -2196,14 +2197,17 @@ real_open_mbnode(struct bw_open_mbnode_info * info)
     /* switch_page_cb has now set the hide-states for this mailbox, so
      * we can set up the view-filter: */
     view_filter = balsa_window_get_view_filter(info->window, TRUE);
-    libbalsa_mailbox_set_view_filter(info->mbnode->mailbox, view_filter,
+    libbalsa_mailbox_set_view_filter(mailbox, view_filter,
                                      FALSE);
     libbalsa_condition_unref(view_filter);
-    libbalsa_mailbox_make_view_filter_persistent(info->mbnode->mailbox);
+    libbalsa_mailbox_make_view_filter_persistent(mailbox);
 
-    register_open_mailbox(info->mbnode->mailbox);
+    register_open_mailbox(mailbox);
     /* scroll may select the message and GtkTreeView does not like selecting
      * without being shown first. */
+    libbalsa_mailbox_set_threading(mailbox,
+                                   libbalsa_mailbox_get_threading_type
+                                   (mailbox));
     balsa_index_scroll_on_open(index);
     gdk_threads_leave();    
 #ifdef BALSA_USE_THREADS

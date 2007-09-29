@@ -972,13 +972,7 @@ balsa_index_load_mailbox_node (BalsaIndex * index,
 	    	     G_CALLBACK(bndx_mailbox_row_inserted_cb), index);
     g_signal_connect(mailbox, "message-expunged",
 	    	     G_CALLBACK(bndx_mailbox_message_expunged_cb), index);
-    gdk_threads_leave();
 
-    libbalsa_mailbox_set_threading(mailbox,
-                                   libbalsa_mailbox_get_threading_type
-                                   (mailbox));
-
-    gdk_threads_enter();
     /* Set the tree store*/
 #ifndef GTK2_FETCHES_ONLY_VISIBLE_CELLS
     g_object_set_data(G_OBJECT(mailbox), "tree-view", tree_view);

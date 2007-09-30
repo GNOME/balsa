@@ -3709,29 +3709,14 @@ static void
 threading_radio_cb(GtkRadioAction * action, GtkRadioAction * current,
                    gpointer data)
 {
-    BalsaWindow *bw;
+    BalsaWindow *bw = BALSA_WINDOW(data);
     GtkWidget *index;
     LibBalsaMailboxThreadingType type;
     BalsaMailboxNode *mbnode;
     LibBalsaMailbox *mailbox;
 
-    /* According to
-     * http://library.gnome.org/devel/gtk/unstable/GtkRadioAction.html#GtkRadioAction-changed
-     * "The ::changed signal is emitted on every member of a radio group
-     * when the active member is changed", but in fact it's currently
-     * emitted only once.
-    if (action != current)
-        return;
-     */
-
-    bw = BALSA_WINDOW(data);
     index = balsa_window_find_current_index(bw);
-    /* We seem to have a race condition here, and index is in fact NULL
-     * occasionally on startup.
     g_return_if_fail(index != NULL);
-     */
-    if (!index)
-        return;
 
     type = gtk_radio_action_get_current_value(action);
     balsa_index_set_threading_type(BALSA_INDEX(index), type);

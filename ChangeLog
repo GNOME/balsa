@@ -1,5 +1,9 @@
 2007-09-30  Peter Bloomfield
 
+	* src/main-window.c: clean up.
+
+2007-09-30  Peter Bloomfield
+
 	* src/main-window.c: block only some actions.
 	* src/message-window.c: (mw_set_active), (message_window_new),
 	(reset_show_all_headers): ditto.

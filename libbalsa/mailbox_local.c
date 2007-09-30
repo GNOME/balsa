@@ -855,6 +855,8 @@ message_match_real(LibBalsaMailbox *mailbox, guint msgno,
      * fetch it here, and that will also populate entry and info. */
     if (!entry || !info) {
         message = libbalsa_mailbox_get_message(mailbox, msgno);
+        if (!message)
+            return FALSE;
         libbalsa_mailbox_local_cache_message(local, msgno, message);
         entry = g_ptr_array_index(mailbox->mindex, msgno-1);
         info  = g_ptr_array_index(local->threading_info, msgno - 1);
@@ -871,6 +873,8 @@ message_match_real(LibBalsaMailbox *mailbox, guint msgno,
             (cond, (CONDITION_MATCH_CC | CONDITION_MATCH_BODY))) {
             if (!message)
                 message = libbalsa_mailbox_get_message(mailbox, msgno);
+            if (!message)
+                return FALSE;
             is_refed = libbalsa_message_body_ref(message, FALSE, FALSE);
             if (!is_refed) {
                 libbalsa_information(LIBBALSA_INFORMATION_ERROR,
@@ -886,6 +890,8 @@ message_match_real(LibBalsaMailbox *mailbox, guint msgno,
 	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_TO)) {
             if (!message)
                 message = libbalsa_mailbox_get_message(mailbox, msgno);
+            if (!message)
+                return FALSE;
             str = internet_address_list_to_string(message->headers->to_list,
                                                   FALSE);
             match = libbalsa_utf8_strstr(str,cond->match.string.string);
@@ -921,6 +927,8 @@ message_match_real(LibBalsaMailbox *mailbox, guint msgno,
 
                 if (!message)
                     message = libbalsa_mailbox_get_message(mailbox, msgno);
+                if (!message)
+                    return FALSE;
                 header =
                     libbalsa_message_get_user_header(message,
                                                      cond->match.string.

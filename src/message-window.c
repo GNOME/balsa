@@ -796,7 +796,7 @@ shown_hdrs_radio_cb(GtkRadioAction * action, GtkRadioAction * current,
     mw->headers_shown = sh;
     reset_show_all_headers(mw);
     if (mw->message)
-        balsa_message_set_displayed_headers(BALSA_MESSAGE(mw->message),
+        balsa_message_set_displayed_headers(BALSA_MESSAGE(mw->bmessage),
                                             sh);
 }
 
@@ -865,6 +865,8 @@ mw_set_selected(MessageWindow * mw, void (*select_func) (BalsaIndex *))
     select_func(mw->bindex);
     msgno = balsa_index_get_next_msgno(mw->bindex);
     message = libbalsa_mailbox_get_message(mw->message->mailbox, msgno);
+    if (!message)
+        return;
 
     if ((tmp = g_object_get_data(G_OBJECT(message), 
                                  BALSA_MESSAGE_WINDOW_KEY))) {

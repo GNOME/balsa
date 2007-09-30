@@ -1,3 +1,19 @@
+2007-09-30  Peter Bloomfield
+
+	* libbalsa/mailbox.c: (lbm_get_index_entry): check for NULL
+	message returned by libbalsa_mailbox_get_message().
+	* libbalsa/mailbox_local.c: (message_match_real): ditto.
+	* libbalsa/send.c: (lbs_process_queue),
+	(libbalsa_process_queue): ditto.
+	* src/balsa-index.c: (bndx_view_source),
+	(balsa_index_selected_list_func): ditto.
+	* src/balsa-message.c: (balsa_message_set): ditto.
+	* src/main-window.c: ditto.
+	* src/message-window.c: (mw_set_selected): ditto;
+	(shown_hdrs_radio_cb): fix typo.
+	* src/sendmsg-window.c: (attachments_add), (drag_data_quote),
+	(sendmsg_window_new_from_list): ditto.
+
 2007-09-29  Peter Bloomfield
 
 	* src/main-window.c: block actions while we set active.

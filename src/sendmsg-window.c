@@ -2462,6 +2462,9 @@ attachments_add(GtkWidget * widget,
 	    guint msgno = g_array_index(selected, guint, i);
 	    LibBalsaMessage *message =
 		libbalsa_mailbox_get_message(mailbox, msgno);
+            if (!message)
+                continue;
+
             if(!attach_message(bsmsg, message))
                 libbalsa_information(LIBBALSA_INFORMATION_WARNING,
                                      _("Attaching message failed.\n"
@@ -3031,6 +3034,9 @@ drag_data_quote(GtkWidget * widget,
             GString *body;
 
 	    message = libbalsa_mailbox_get_message(mailbox, msgno);
+            if (!message)
+                continue;
+
             body = quote_message_body(bsmsg, message, QUOTE_ALL);
 	    g_object_unref(message);
             libbalsa_insert_with_url(buffer, body->str, NULL, NULL, NULL);
@@ -6577,6 +6583,9 @@ sendmsg_window_new_from_list(LibBalsaMailbox * mailbox,
     g_return_val_if_fail(selected->len > 0, NULL);
 
     message = libbalsa_mailbox_get_message(mailbox, msgno);
+    if (!message)
+        return NULL;
+
     switch(type) {
     case SEND_FORWARD_ATTACH:
     case SEND_FORWARD_INLINE:
@@ -6597,6 +6606,9 @@ sendmsg_window_new_from_list(LibBalsaMailbox * mailbox,
 
 	msgno = g_array_index(selected, guint, i);
         message = libbalsa_mailbox_get_message(mailbox, msgno);
+        if (!message)
+            continue;
+
         if (type == SEND_FORWARD_ATTACH)
             attach_message(bsmsg, message);
         else if (type == SEND_FORWARD_INLINE) {

@@ -2829,6 +2829,8 @@ message_print_cb(GtkAction * action, gpointer data)
         LibBalsaMessage *message =
             libbalsa_mailbox_get_message(bindex->mailbox_node->mailbox,
                                          bindex->current_msgno);
+        if (!message)
+            return;
         message_print(message, GTK_WINDOW(data));
         g_object_unref(message);
     }

@@ -800,17 +800,23 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMailbox * mailbox, guint msgno)
     }
 
     bm->message = message = libbalsa_mailbox_get_message(mailbox, msgno);
-
-    is_new = LIBBALSA_MESSAGE_IS_UNREAD(message);
-    if(!libbalsa_message_body_ref(message, TRUE, TRUE)) {
-	LibBalsaMailbox *mailbox = message->mailbox;
-	libbalsa_mailbox_check(mailbox);
+    if (!message) {
 	balsa_information(LIBBALSA_INFORMATION_WARNING,
                           _("Could not access message %ld "
                             "in mailbox \"%s\"."),
 			  msgno, mailbox->name);
+        return FALSE;
+    }
+
+    is_new = LIBBALSA_MESSAGE_IS_UNREAD(message);
+    if(!libbalsa_message_body_ref(message, TRUE, TRUE)) {
+	libbalsa_mailbox_check(mailbox);
         g_object_unref(bm->message);
         bm->message = NULL;
+	balsa_information(LIBBALSA_INFORMATION_WARNING,
+                          _("Could not access message %ld "
+                            "in mailbox \"%s\"."),
+			  msgno, mailbox->name);
         return FALSE;
     }
 

@@ -629,6 +629,8 @@ lbs_process_queue(LibBalsaMailbox * outbox, LibBalsaFccboxFinder finder,
             continue;
 
 	msg = libbalsa_mailbox_get_message(outbox, msgno);
+        if (!msg) /* error? */
+            continue;
         libbalsa_message_body_ref(msg, TRUE, TRUE);
         smtp_server_name =
             libbalsa_message_get_user_header(msg, "X-Balsa-SmtpServer");
@@ -1184,6 +1186,8 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, LibBalsaFccboxFinder finder,
             continue;
 
 	msg = libbalsa_mailbox_get_message(outbox, msgno);
+        if (!msg) /* error? */
+            continue;
         libbalsa_message_body_ref(msg, TRUE, TRUE); /* FIXME: do we need
                                                       * all headers? */
 	new_message = msg_queue_item_new(finder);

@@ -1426,6 +1426,8 @@ bndx_view_source(gpointer data)
         LibBalsaMessage *message =
             libbalsa_mailbox_get_message(mailbox, msgno);
 
+        if (!message)
+            continue;
 	libbalsa_show_message_source(message, balsa_app.message_font,
 				     &balsa_app.source_escape_specials);
         g_object_unref(message);
@@ -1453,6 +1455,8 @@ balsa_index_selected_list_func(GtkTreeModel * model, GtkTreePath * path,
 
     gtk_tree_model_get(model, iter, LB_MBOX_MSGNO_COL, &msgno, -1);
     message = libbalsa_mailbox_get_message(LIBBALSA_MAILBOX(model), msgno);
+    if (!message)
+        return;
     *list = g_list_prepend(*list, message);
 }
 

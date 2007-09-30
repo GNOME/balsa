@@ -2761,9 +2761,11 @@ lbm_get_index_entry(LibBalsaMailbox * lmm, GNode * node)
     if (!entry) {
         LibBalsaMessage *message =
             libbalsa_mailbox_get_message(lmm, msgno);
-        libbalsa_mailbox_cache_message(lmm, msgno, message);
-        g_object_unref(message);
-        entry = g_ptr_array_index(lmm->mindex, msgno - 1);
+        if (message) {
+            libbalsa_mailbox_cache_message(lmm, msgno, message);
+            g_object_unref(message);
+            entry = g_ptr_array_index(lmm->mindex, msgno - 1);
+        }
     }
 #endif                          /*BALSA_USE_THREADS */
 

@@ -1,5 +1,12 @@
 2007-09-30  Peter Bloomfield
 
+	* src/main-window.c: block only some actions.
+	* src/message-window.c: (mw_set_active), (message_window_new),
+	(reset_show_all_headers): ditto.
+	* src/sendmsg-window.c: block no actions--just document it.
+
+2007-09-30  Peter Bloomfield
+
 	* libbalsa/mailbox.c: (lbm_get_index_entry): check for NULL
 	message returned by libbalsa_mailbox_get_message().
 	* libbalsa/mailbox_local.c: (message_match_real): ditto.

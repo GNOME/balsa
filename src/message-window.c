@@ -158,13 +158,31 @@ mw_set_sensitive(MessageWindow * mw, const gchar * action_name,
     gtk_action_set_sensitive(action, sensitive);
 }
 
+/* Set the state of a GtkToggleAction; if block_action_name != NULL,
+ * block the handling of signals emitted on that action.
+ * Note: if action_name is a GtkRadioAction, block_action_name must be
+ * the name of the first action in the group; otherwise it must be the
+ * same as action_name.
+ */
 static void
 mw_set_active(MessageWindow * mw, const gchar * action_name,
-              gboolean active)
+              gboolean active, const gchar * block_action_name)
 {
     GtkAction *action =
         gtk_action_group_get_action(mw->action_group, action_name);
+    GtkAction *block_action = block_action_name ?
+        gtk_action_group_get_action(mw->action_group, block_action_name) :
+        NULL;
+
+    if (block_action)
+        g_signal_handlers_block_matched(block_action,
+                                        G_SIGNAL_MATCH_DATA, 0,
+                                        (GQuark) 0, NULL, NULL, mw);
     gtk_toggle_action_set_active(GTK_TOGGLE_ACTION(action), active);
+    if (block_action)
+        g_signal_handlers_unblock_matched(block_action,
+                                          G_SIGNAL_MATCH_DATA, 0,
+                                          (GQuark) 0, NULL, NULL, mw);
 }
 
 /*
@@ -522,7 +540,6 @@ message_window_new(LibBalsaMailbox * mailbox, guint msgno)
     GtkWidget *menubar;
     GtkWidget *toolbar;
     GtkWidget *move_menu, *submenu;
-    GtkAction *action;
     GtkWidget *close_widget;
     GtkWidget *vbox;
 
@@ -613,21 +630,14 @@ message_window_new(LibBalsaMailbox * mailbox, guint msgno)
 
     if (balsa_app.shown_headers >= HEADERS_NONE &&
         balsa_app.shown_headers <= HEADERS_ALL) {
-#if GTK_CHECK_VERSION(2, 10, 0)
-        action =
-            gtk_action_group_get_action(mw->action_group, "NoHeaders");
-        gtk_radio_action_set_current_value(GTK_RADIO_ACTION(action),
-                                           balsa_app.shown_headers);
-#else                           /* GTK_CHECK_VERSION(2, 10, 0) */
         static const gchar *const header_options[] = {
             "NoHeaders", "SelectedHeaders", "AllHeaders"
         };
-        gchar *header_option = header_options[balsa_app.shown_headers];
-        mw_set_active(mw, header_option, TRUE);
-#endif                          /* GTK_CHECK_VERSION(2, 10, 0) */
+        mw_set_active(mw, header_options[balsa_app.shown_headers], TRUE,
+                      header_options[0]);
     }
 
-    mw_set_active(mw, "Wrap", balsa_app.browse_wrap);
+    mw_set_active(mw, "Wrap", balsa_app.browse_wrap, NULL);
 
     gtk_window_set_default_size(GTK_WINDOW(window),
                                 balsa_app.message_window_width, 
@@ -959,7 +969,8 @@ show_all_headers_tool_cb(GtkToggleAction * action, gpointer data)
 static void
 reset_show_all_headers(MessageWindow *mw)
 {
-    mw_set_active(mw, "ShowAllHeaders", FALSE);
+    mw_set_active(mw, "ShowAllHeaders", FALSE, "ShowAllHeaders");
+    mw->show_all_headers = FALSE;
 }
 
 #ifdef HAVE_GTKHTML

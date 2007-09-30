@@ -1234,6 +1234,8 @@ bw_set_panes(BalsaWindow * window)
  * GtkAction helpers
  */
 
+/* Find a GtkAction by name.
+ */
 static GtkAction *
 bw_get_action(BalsaWindow * window, const gchar * action_name)
 {
@@ -1252,6 +1254,8 @@ bw_get_action(BalsaWindow * window, const gchar * action_name)
                                        action_name);
 }
 
+/* Set the sensitivity of a GtkAction.
+ */
 static void
 bw_set_sensitive(BalsaWindow * window, const gchar * action_name,
                  gboolean sensitive)
@@ -1260,21 +1264,29 @@ bw_set_sensitive(BalsaWindow * window, const gchar * action_name,
     gtk_action_set_sensitive(action, sensitive);
 }
 
+/* Set the state of a GtkToggleAction; if block_action_name != NULL,
+ * block the handling of signals emitted on that action.
+ * Note: if action_name is a GtkRadioAction, block_action_name must be
+ * the name of the first action in the group; otherwise it must be the
+ * same as action_name.
+ */
 static void
 bw_set_active(BalsaWindow * window, const gchar * action_name,
-              gboolean active)
+              gboolean active, const gchar * block_action_name)
 {
     GtkAction *action = bw_get_action(window, action_name);
-    GtkAction *block_action =
-        GTK_IS_RADIO_ACTION(action) ?
-        g_slist_last(gtk_radio_action_get_group
-                     (GTK_RADIO_ACTION(action)))->data : action;
+    GtkAction *block_action = block_action_name ?
+        bw_get_action(window, block_action_name) : NULL;
 
-    g_signal_handlers_block_matched(block_action, G_SIGNAL_MATCH_DATA, 0,
-                                    (GQuark) 0, NULL, NULL, window);
+    if (block_action)
+        g_signal_handlers_block_matched(block_action,
+                                        G_SIGNAL_MATCH_DATA, 0,
+                                        (GQuark) 0, NULL, NULL, window);
     gtk_toggle_action_set_active(GTK_TOGGLE_ACTION(action), active);
-    g_signal_handlers_unblock_matched(block_action, G_SIGNAL_MATCH_DATA, 0,
-                                      (GQuark) 0, NULL, NULL, window);
+    if (block_action)
+        g_signal_handlers_unblock_matched(block_action,
+                                          G_SIGNAL_MATCH_DATA, 0,
+                                          (GQuark) 0, NULL, NULL, window);
 }
 
 static gboolean
@@ -1459,7 +1471,6 @@ balsa_window_new()
     GError *error;
     GtkWidget *menubar;
     GtkWidget *toolbar;
-    GtkAction *action;
     GtkWidget *hbox;
 
     /* Call to register custom balsa pixmaps with GNOME_STOCK_PIXMAPS
@@ -1570,8 +1581,7 @@ balsa_window_new()
 
     /*PKGW: do it this way, without the usizes. */
 #if !defined(ENABLE_TOUCH_UI)
-    bw_set_active(window, "ShowMailboxTree", balsa_app.show_mblist);
-    bw_show_mbtree(window);
+    bw_set_active(window, "ShowMailboxTree", balsa_app.show_mblist, NULL);
 #endif                          /* !defined(ENABLE_TOUCH_UI) */
 
     gtk_paned_set_position(GTK_PANED(window->hpaned), 
@@ -1596,23 +1606,16 @@ balsa_window_new()
 
     if (balsa_app.shown_headers >= HEADERS_NONE
         && balsa_app.shown_headers <= HEADERS_ALL) {
-#if GTK_CHECK_VERSION(2, 10, 0)
-        action =
-            gtk_action_group_get_action(window->action_group, "NoHeaders");
-        gtk_radio_action_set_current_value(GTK_RADIO_ACTION(action),
-                                           balsa_app.shown_headers);
-#else                           /* GTK_CHECK_VERSION(2, 10, 0) */
-        static const gchar * const header_options[] = {
-            "NoHeaders", "SelectedHeaders", "AllHeaders"
-        };
-        gchar *header_option = header_options[balsa_app.shown_headers];
-        bw_set_active(window, header_option, TRUE);
-#endif                          /* GTK_CHECK_VERSION(2, 10, 0) */
+        static const gchar *const header_options[] =
+            { "NoHeaders", "SelectedHeaders", "AllHeaders" };
+        bw_set_active(window, header_options[balsa_app.shown_headers],
+                      TRUE, header_options[0]);
     }
 
 #if !defined(ENABLE_TOUCH_UI)
-    bw_set_active(window, "ShowMailboxTabs", balsa_app.show_notebook_tabs);
-    bw_set_active(window, "Wrap", balsa_app.browse_wrap);
+    bw_set_active(window, "ShowMailboxTabs", balsa_app.show_notebook_tabs,
+                  "ShowMailboxTabs");
+    bw_set_active(window, "Wrap", balsa_app.browse_wrap, NULL);
 #else
     bw_set_sensitive(window, "ViewFilter", balsa_app.enable_view_filter);
     g_signal_connect_after(G_OBJECT(window), "key_press_event",
@@ -1632,7 +1635,8 @@ balsa_window_new()
 #endif /*ENABLE_TOUCH_UI */
 
     /* set initial state of toggle preview pane button */
-    bw_set_active(window, "ShowPreviewPane", balsa_app.previewpane);
+    bw_set_active(window, "ShowPreviewPane", balsa_app.previewpane,
+                  "ShowPreviewPane");
 
     /* set initial state of next-unread controls */
     bw_enable_next_unread(window, FALSE);
@@ -1920,11 +1924,11 @@ balsa_window_set_threading_menu(BalsaWindow * window, int option)
 
     switch(option) {
     case LB_MAILBOX_THREADING_FLAT:
-    bw_set_active(window, "FlatIndex", TRUE); break;
+    bw_set_active(window, "FlatIndex", TRUE, "FlatIndex"); break;
     case LB_MAILBOX_THREADING_SIMPLE:
-    bw_set_active(window, "SimpleThreading", TRUE); break;
+    bw_set_active(window, "SimpleThreading", TRUE, "FlatIndex"); break;
     case LB_MAILBOX_THREADING_JWZ:
-    bw_set_active(window, "JWZThreading", TRUE); break;
+    bw_set_active(window, "JWZThreading", TRUE, "FlatIndex"); break;
     default: return;
     }
 
@@ -4279,8 +4283,8 @@ hide_changed_cb(GtkToggleAction * toggle_action, gpointer data)
             if (hide_states[states_idx].flag == hide_states[curr_idx].flag
                 && hide_states[states_idx].set !=
                 hide_states[curr_idx].set) {
-                bw_set_active(bw, hide_states[i].action_name, FALSE);
-                break;
+                bw_set_active(bw, hide_states[i].action_name, FALSE, NULL);
+                return; /* triggered menu change will do the job */
             }
         }
     }
@@ -4986,7 +4990,7 @@ show_all_headers_tool_cb(GtkToggleAction * action, gpointer data)
 static void
 reset_show_all_headers(BalsaWindow * window)
 {
-    bw_set_active(window, "ShowAllHeaders", FALSE);
+    bw_set_active(window, "ShowAllHeaders", FALSE, "ShowAllHeaders");
     balsa_app.show_all_headers = FALSE;
 }
 
@@ -5005,19 +5009,9 @@ void
 update_view_menu(BalsaWindow * window)
 {
 #if !defined(ENABLE_TOUCH_UI)
-    GtkAction *action =
-        gtk_action_group_get_action(window->action_group, "Wrap");
-
-    g_signal_handlers_block_by_func(G_OBJECT(action), 
-                                    G_CALLBACK(wrap_message_cb), window);
-    gtk_toggle_action_set_active(GTK_TOGGLE_ACTION(action),
-                                 balsa_app.browse_wrap);
-    g_signal_handlers_unblock_by_func(G_OBJECT(action), 
-                                      G_CALLBACK(wrap_message_cb),
-                                      window);
-    if (window->preview)
-        balsa_message_set_wrap(BALSA_MESSAGE(window->preview),
-                               balsa_app.browse_wrap);
+    bw_set_active(window, "Wrap", balsa_app.browse_wrap, "Wrap");
+    balsa_message_set_wrap(BALSA_MESSAGE(window->preview),
+                           balsa_app.browse_wrap);
 #endif /* ENABLE_TOUCH_UI */
 }
 

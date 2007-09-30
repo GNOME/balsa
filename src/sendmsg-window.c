@@ -1350,6 +1350,10 @@ sw_get_sensitive(BalsaSendmsg * bsmsg, const gchar * action_name)
 }
 #endif                          /* HAVE_GTKSOURCEVIEW */
 
+/* Set the state of a GtkToggleAction.
+ * Note: most calls expect the corresponding action to be taken, so we
+ * do not block any handlers.
+ */
 static void
 sw_set_active(BalsaSendmsg * bsmsg, const gchar * action_name,
               gboolean active)

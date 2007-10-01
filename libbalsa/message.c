@@ -318,7 +318,7 @@ libbalsa_message_header_get_helper(LibBalsaMessageHeaders* headers,
     for (list = headers->user_hdrs; list; list = list->next) {
         const gchar * const *tmp = list->data;
         
-        if (g_ascii_strncasecmp(tmp[0], find, strlen(find)) == 0) 
+        if (g_ascii_strcasecmp(tmp[0], find) == 0) 
             return list;
     }
     return NULL;
@@ -1158,7 +1158,7 @@ lb_message_set_headers_from_string(LibBalsaMessage *message,
     gchar *header, *value;
     const gchar *val, *eoh;
     do {
-        for(val = lines; *val && *val >32 && *val<126 && *val != ':'; val++)
+        for(val = lines; *val && *val >32 && *val<127 && *val != ':'; val++)
             ;
         if(*val != ':') /* parsing error */
             return FALSE;
@@ -1173,8 +1173,7 @@ lb_message_set_headers_from_string(LibBalsaMessage *message,
         
         lbmsg_set_header(message, header, value, all);
         g_free(header); g_free(value);
-        if(!*lines) break;
-        lines++;
+        if(!*lines || !*++lines) break;
     } while(1);
     return TRUE;
 }

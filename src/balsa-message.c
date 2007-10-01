@@ -920,6 +920,9 @@ balsa_message_set_displayed_headers(BalsaMessage * bmessage,
     g_return_if_fail(bmessage != NULL);
     g_return_if_fail(sh >= HEADERS_NONE && sh <= HEADERS_ALL);
     
+    if (bmessage->shown_headers == sh)
+        return;
+
     bmessage->shown_headers = sh;
     
     if (bmessage->message) {

@@ -186,6 +186,8 @@ static void toggle_new_message_cb      (GtkAction * action, gpointer data);
 static void toggle_answered_message_cb (GtkAction * action, gpointer data);
 static void store_address_cb           (GtkAction * action, gpointer data);
 static void empty_trash_cb             (GtkAction * action, gpointer data);
+
+static void bw_header_activate_cb      (GtkAction * action, gpointer data);
 static void expand_all_cb              (GtkAction * action, gpointer data);
 static void collapse_all_cb            (GtkAction * action, gpointer data);
 #ifdef HAVE_GTKHTML
@@ -229,8 +231,6 @@ static void hide_changed_cb         (GtkToggleAction * action, gpointer data);
 static void wrap_message_cb         (GtkToggleAction * action, gpointer data);
 static void show_all_headers_tool_cb(GtkToggleAction * action, gpointer data);
 static void show_preview_pane_cb    (GtkToggleAction * action, gpointer data);
-static void shown_hdrs_radio_cb(GtkRadioAction * action,
-                                GtkRadioAction * current, gpointer data);
 static void reset_show_all_headers(BalsaWindow * window);
 
 #if !defined(ENABLE_TOUCH_UI)
@@ -1387,7 +1387,7 @@ bw_get_ui_manager(BalsaWindow * window)
                                        shown_hdrs_radio_entries,
                                        G_N_ELEMENTS
                                        (shown_hdrs_radio_entries), 0,
-                                       G_CALLBACK(shown_hdrs_radio_cb),
+                                       NULL, /* no callback */
                                        window);
 
     gtk_ui_manager_insert_action_group(ui_manager, action_group, 0);
@@ -1472,6 +1472,9 @@ balsa_window_new()
     GtkWidget *menubar;
     GtkWidget *toolbar;
     GtkWidget *hbox;
+    static const gchar *const header_options[] =
+        { "NoHeaders", "SelectedHeaders", "AllHeaders" };
+    guint i;
 
     /* Call to register custom balsa pixmaps with GNOME_STOCK_PIXMAPS
      * - allows for grey out */
@@ -1604,12 +1607,12 @@ balsa_window_new()
     /* set the toolbar style */
     balsa_window_refresh(window);
 
-    if (balsa_app.shown_headers >= HEADERS_NONE
-        && balsa_app.shown_headers <= HEADERS_ALL) {
-        static const gchar *const header_options[] =
-            { "NoHeaders", "SelectedHeaders", "AllHeaders" };
-        bw_set_active(window, header_options[balsa_app.shown_headers],
-                      TRUE, header_options[0]);
+    for (i = 0; i < G_N_ELEMENTS(header_options); i++) {
+        GtkAction *action = bw_get_action(window, header_options[i]);
+        if (i == balsa_app.shown_headers)
+            gtk_toggle_action_set_active(GTK_TOGGLE_ACTION(action), TRUE);
+        g_signal_connect(action, "activate", 
+                         G_CALLBACK(bw_header_activate_cb), window);
     }
 
 #if !defined(ENABLE_TOUCH_UI)
@@ -3694,14 +3697,18 @@ wrap_message_cb(GtkToggleAction * action, gpointer data)
 }
 
 static void
-shown_hdrs_radio_cb(GtkRadioAction *action, GtkRadioAction *current, gpointer data) 
+bw_header_activate_cb(GtkAction * action, gpointer data)
 {
-    ShownHeaders sh = gtk_radio_action_get_current_value(action);
-    BalsaWindow *bw = BALSA_WINDOW(data);
+    if (gtk_toggle_action_get_active(GTK_TOGGLE_ACTION(action))) {
+        ShownHeaders sh =
+            gtk_radio_action_get_current_value(GTK_RADIO_ACTION(action));
+        BalsaWindow *bw = BALSA_WINDOW(data);
 
-    reset_show_all_headers(bw);
-    balsa_app.shown_headers = sh;
-    balsa_message_set_displayed_headers(BALSA_MESSAGE(bw->preview), sh);
+        balsa_app.shown_headers = sh;
+        reset_show_all_headers(bw);
+        balsa_message_set_displayed_headers(BALSA_MESSAGE(bw->preview),
+                                            sh);
+    }
 }
 
 #if !defined(ENABLE_TOUCH_UI)
@@ -4956,27 +4963,26 @@ mark_all_cb(GtkAction * action, gpointer data)
 static void
 show_all_headers_tool_cb(GtkToggleAction * action, gpointer data)
 {
-    BalsaWindow *bw;
+    BalsaWindow *bw = BALSA_WINDOW(data);
 
-    bw = BALSA_WINDOW(data);
     if (gtk_toggle_action_get_active(action)) {
         balsa_app.show_all_headers = TRUE;
-        if (bw->preview)
-            balsa_message_set_displayed_headers(BALSA_MESSAGE(bw->preview),
-                                                HEADERS_ALL);
+        balsa_message_set_displayed_headers(BALSA_MESSAGE(bw->preview),
+                                            HEADERS_ALL);
     } else {
         balsa_app.show_all_headers = FALSE;
-        if (bw->preview)
-            balsa_message_set_displayed_headers(BALSA_MESSAGE(bw->preview),
-                                                balsa_app.shown_headers);
+        balsa_message_set_displayed_headers(BALSA_MESSAGE(bw->preview),
+                                            balsa_app.shown_headers);
     }
 }
 
 static void
 reset_show_all_headers(BalsaWindow * window)
 {
-    bw_set_active(window, "ShowAllHeaders", FALSE, "ShowAllHeaders");
-    balsa_app.show_all_headers = FALSE;
+    if (balsa_app.show_all_headers) {
+        bw_set_active(window, "ShowAllHeaders", FALSE, "ShowAllHeaders");
+        balsa_app.show_all_headers = FALSE;
+    }
 }
 
 static void

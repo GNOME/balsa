@@ -1,3 +1,14 @@
+2007-10-01  Peter Bloomfield
+
+	* libbalsa/message.c: (libbalsa_message_header_get_helper),
+	(lb_message_set_headers_from_string): match headers exactly.
+	* src/balsa-message.c: (balsa_message_set_displayed_headers):
+	check whether this is an actual change.
+	* src/main-window.c: connect to "activate" signal instead of
+	"changed", to see every click.
+	* src/message-window.c: (mw_get_ui_manager), (message_window_new),
+	(mw_header_activate_cb), (reset_show_all_headers): ditto.
+
 2007-09-30  Peter Bloomfield
 
 	* src/main-window.c: clean up.

@@ -59,6 +59,8 @@ static void view_msg_source_cb         (GtkAction * action, gpointer data);
 static void copy_cb                    (GtkAction * action, MessageWindow * mw);
 static void select_all_cb              (GtkAction * action, gpointer);
 
+static void mw_header_activate_cb      (GtkAction * action, gpointer data);
+
 static void next_message_cb            (GtkAction * action, gpointer data);
 static void previous_message_cb        (GtkAction * action, gpointer data);
 static void next_unread_cb             (GtkAction * action, gpointer);
@@ -81,9 +83,6 @@ static void mw_set_selected(MessageWindow * mw, void (*select_func)(BalsaIndex *
 
 static void wrap_message_cb         (GtkToggleAction * action, gpointer data);
 static void show_all_headers_tool_cb(GtkToggleAction * action, gpointer data);
-
-static void shown_hdrs_radio_cb(GtkRadioAction * action,
-                                GtkRadioAction * current, gpointer data);
 
 static void mw_select_part_cb(BalsaMessage * bm, MessageWindow * mw);
 
@@ -403,7 +402,7 @@ mw_get_ui_manager(MessageWindow * mw)
                                        shown_hdrs_radio_entries,
                                        G_N_ELEMENTS
                                        (shown_hdrs_radio_entries), 0,
-                                       G_CALLBACK(shown_hdrs_radio_cb),
+                                       NULL, /* no callback */
                                        mw);
 
     gtk_ui_manager_insert_action_group(ui_manager, action_group, 0);
@@ -542,6 +541,9 @@ message_window_new(LibBalsaMailbox * mailbox, guint msgno)
     GtkWidget *move_menu, *submenu;
     GtkWidget *close_widget;
     GtkWidget *vbox;
+    static const gchar *const header_options[] =
+        { "NoHeaders", "SelectedHeaders", "AllHeaders" };
+    guint i;
 
     if (!mailbox || !msgno)
 	return;
@@ -628,13 +630,14 @@ message_window_new(LibBalsaMailbox * mailbox, guint msgno)
     g_signal_connect(mw->bmessage, "select-part",
 		     G_CALLBACK(mw_select_part_cb), mw);
 
-    if (balsa_app.shown_headers >= HEADERS_NONE &&
-        balsa_app.shown_headers <= HEADERS_ALL) {
-        static const gchar *const header_options[] = {
-            "NoHeaders", "SelectedHeaders", "AllHeaders"
-        };
-        mw_set_active(mw, header_options[balsa_app.shown_headers], TRUE,
-                      header_options[0]);
+    for (i = 0; i < G_N_ELEMENTS(header_options); i++) {
+        GtkAction *action =
+            gtk_action_group_get_action(mw->action_group,
+                                        header_options[i]);
+        if (i == balsa_app.shown_headers)
+            gtk_toggle_action_set_active(GTK_TOGGLE_ACTION(action), TRUE);
+        g_signal_connect(action, "activate",
+                         G_CALLBACK(mw_header_activate_cb), mw);
     }
 
     mw_set_active(mw, "Wrap", balsa_app.browse_wrap, NULL);
@@ -797,17 +800,18 @@ wrap_message_cb(GtkToggleAction * action, gpointer data)
 }
 
 static void
-shown_hdrs_radio_cb(GtkRadioAction * action, GtkRadioAction * current,
-                    gpointer data)
+mw_header_activate_cb(GtkAction * action, gpointer data)
 {
-    ShownHeaders sh = gtk_radio_action_get_current_value(action);
-    MessageWindow *mw = (MessageWindow *) data;
+    if (gtk_toggle_action_get_active(GTK_TOGGLE_ACTION(action))) {
+        ShownHeaders sh =
+            gtk_radio_action_get_current_value(GTK_RADIO_ACTION(action));
+        MessageWindow *mw = (MessageWindow *) data;
 
-    mw->headers_shown = sh;
-    reset_show_all_headers(mw);
-    if (mw->message)
+        balsa_app.shown_headers = sh;
+        reset_show_all_headers(mw);
         balsa_message_set_displayed_headers(BALSA_MESSAGE(mw->bmessage),
                                             sh);
+    }
 }
 
 static void
@@ -969,8 +973,10 @@ show_all_headers_tool_cb(GtkToggleAction * action, gpointer data)
 static void
 reset_show_all_headers(MessageWindow *mw)
 {
-    mw_set_active(mw, "ShowAllHeaders", FALSE, "ShowAllHeaders");
-    mw->show_all_headers = FALSE;
+    if (mw->show_all_headers) {
+        mw_set_active(mw, "ShowAllHeaders", FALSE, "ShowAllHeaders");
+        mw->show_all_headers = FALSE;
+    }
 }
 
 #ifdef HAVE_GTKHTML

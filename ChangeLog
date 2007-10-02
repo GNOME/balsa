@@ -1,3 +1,10 @@
+2007-10-02  Peter Bloomfield
+
+	* src/toolbar-factory.c: (tm_do_popup_menu): show the
+	appropriate page of the toolbar editor.
+	* src/toolbar-prefs.c: (customize_dialog_cb): ditto.
+	* src/toolbar-prefs.h: ditto.
+
 2007-10-01  Peter Bloomfield
 
 	* libbalsa/message.c: (libbalsa_message_header_get_helper),

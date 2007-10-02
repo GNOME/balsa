@@ -114,6 +114,7 @@ customize_dialog_cb(GtkWidget * widget, gpointer data)
     GtkWidget *active_window = data;
     BalsaToolbarModel *model;
     GtkUIManager * ui_manager;
+    const gchar *model_name;
 
     /* There can only be one */
     if (customize_widget) {
@@ -177,6 +178,17 @@ customize_dialog_cb(GtkWidget * widget, gpointer data)
     gtk_box_pack_start(GTK_BOX(option_box), wrap_button, FALSE, FALSE, 0);
 
     gtk_widget_show_all(customize_widget);
+
+    /* Now that the pages are shown, we can switch to the page
+     * corresponding to the toolbar that the user clicked on. */
+    model_name =
+        g_object_get_data(G_OBJECT(widget), BALSA_TOOLBAR_MODEL_NAME);
+    if (model_name) {
+        if (strcmp(model_name, "ComposeWindow") == 0)
+            gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), 1);
+        else if (strcmp(model_name, "MessageWindow") == 0)
+            gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), 2);
+    }
 }
 
 /* get_toolbar_button_index:

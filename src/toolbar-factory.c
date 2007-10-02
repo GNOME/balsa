@@ -739,6 +739,11 @@ tm_do_popup_menu(GtkWidget * toolbar, GdkEventButton * event,
         g_signal_connect(item, "activate", G_CALLBACK(customize_dialog_cb),
                          gtk_widget_get_toplevel(toolbar));
         gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
+
+        /* Pass the model name to the customize widget, so that it can
+         * show the appropriate notebook page. */
+        g_object_set_data(G_OBJECT(item), BALSA_TOOLBAR_MODEL_NAME,
+                          (gchar *) info->model->name);
     }
 
     gtk_widget_show_all(menu);

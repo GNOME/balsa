@@ -3019,7 +3019,7 @@ imap_cache_manager_new_from_file(const char *header_cache_path)
 	i++;
     }
     fclose(f);
-    printf("Read %u header entries from %s\n", i, header_cache_path);
+
     return icm;
 }
 
@@ -3176,7 +3176,6 @@ icm_save_to_file(struct ImapCacheManager *icm, const gchar *file_name)
             }
         }
 	fclose(f);
-	printf("Saved header entries to %s\n", file_name);
     }
     return success;
 }

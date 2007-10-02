@@ -1,3 +1,10 @@
+2007-10-02  Pawel Salek
+
+	* src/mailbox-node.c, libbalsa/{mailbox_imap,server}.c:
+	remove debug output.
+	* libbalsa/mailbox.c: compile against older glib.
+	* src/sendmsg-window.c: fix bug 481842 (Stephane Raimbault).
+
 2007-10-02  Peter Bloomfield
 
 	* src/toolbar-factory.c: (tm_do_popup_menu): show the

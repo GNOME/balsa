@@ -792,7 +792,6 @@ restore_children_from_cache(BalsaMailboxNode *mn)
         }
     }
     
-    printf("%s's children restored from cache.\n", mn->name);
     return TRUE;
 }
 

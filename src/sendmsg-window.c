@@ -3309,14 +3309,19 @@ tree_add_quote_body(LibBalsaMessageBody * body, GtkTreeStore * store, GtkTreeIte
 	disp_type = NULL;
     preselect = !disp_type || *disp_type == '\0' ||
 	!g_ascii_strcasecmp(disp_type, "inline");
-    if (body->filename && *body->filename)
-	description = g_strdup_printf(_("%s file \"%s\" (%s)"),
-				      preselect ? _("inlined") : _("attached"),
-				      body->filename, mime_type);
-    else
-	description = g_strdup_printf(_("%s %s part"),
-				      preselect ? _("inlined") : _("attached"),
-				      mime_type);
+    if (body->filename && *body->filename) {
+        if (preselect)
+            description = g_strdup_printf(_("inlined file \"%s\" (%s)"),
+                                          body->filename, mime_type);
+        else
+            description = g_strdup_printf(_("attached file \"%s\" (%s)"),
+                                          body->filename, mime_type);
+    } else {
+        if (preselect)
+            description = g_strdup_printf(_("inlined %s part"), mime_type);
+        else
+            description = g_strdup_printf(_("attached %s part"), mime_type);
+    }
     g_free(mime_type);
     gtk_tree_store_set(store, &iter,
 		       QUOTE_INCLUDE, preselect,

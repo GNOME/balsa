@@ -1706,9 +1706,11 @@ libbalsa_mailbox_get_message(LibBalsaMailbox * mailbox, guint msgno)
     }
 
 #ifdef BALSA_USE_THREADS
-    g_return_val_if_fail(msgno > 0 && msgno <=
-                         libbalsa_mailbox_total_messages(mailbox),
-                         (libbalsa_unlock_mailbox(mailbox), NULL));
+    if( !(msgno > 0 && msgno <= libbalsa_mailbox_total_messages(mailbox)) ) {
+	libbalsa_unlock_mailbox(mailbox);
+	g_warning("get_message: msgno %d out of range", msgno);
+	return NULL;
+    }
 #else                           /* BALSA_USE_THREADS */
     g_return_val_if_fail(msgno > 0 && msgno <=
                          libbalsa_mailbox_total_messages(mailbox), NULL);

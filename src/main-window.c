@@ -1353,12 +1353,18 @@ bw_get_toolbar_model(void)
     for (i = 0; i < ELEMENTS(main_toolbar); i++)
         standard = g_slist_append(standard, g_strdup(main_toolbar[i]));
 
-    model = balsa_toolbar_model_new("MainWindow", standard);
-    balsa_toolbar_model_add_actions(model, entries, G_N_ELEMENTS(entries));
-    balsa_toolbar_model_add_actions(model, mailbox_entries, G_N_ELEMENTS(mailbox_entries));
-    balsa_toolbar_model_add_actions(model, message_entries, G_N_ELEMENTS(message_entries));
-    balsa_toolbar_model_add_actions(model, modify_message_entries, G_N_ELEMENTS(modify_message_entries));
-    balsa_toolbar_model_add_toggle_actions(model, toggle_entries, G_N_ELEMENTS(toggle_entries));
+    model =
+        balsa_toolbar_model_new(BALSA_TOOLBAR_TYPE_MAIN_WINDOW, standard);
+    balsa_toolbar_model_add_actions(model, entries,
+                                    G_N_ELEMENTS(entries));
+    balsa_toolbar_model_add_actions(model, mailbox_entries,
+                                    G_N_ELEMENTS(mailbox_entries));
+    balsa_toolbar_model_add_actions(model, message_entries,
+                                    G_N_ELEMENTS(message_entries));
+    balsa_toolbar_model_add_actions(model, modify_message_entries,
+                                    G_N_ELEMENTS(modify_message_entries));
+    balsa_toolbar_model_add_toggle_actions(model, toggle_entries,
+                                           G_N_ELEMENTS(toggle_entries));
 
     return model;
 }

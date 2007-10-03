@@ -54,6 +54,12 @@ typedef struct t_button_data {
 extern button_data toolbar_buttons[];
 extern const int toolbar_button_count;
 
+typedef enum {
+    BALSA_TOOLBAR_TYPE_MAIN_WINDOW,
+    BALSA_TOOLBAR_TYPE_COMPOSE_WINDOW,
+    BALSA_TOOLBAR_TYPE_MESSAGE_WINDOW
+} BalsaToolbarType;
+
 void update_all_toolbars(void);
 void balsa_toolbar_remove_all(GtkWidget * toolbar);
 
@@ -61,7 +67,7 @@ void balsa_toolbar_remove_all(GtkWidget * toolbar);
 const gchar *balsa_toolbar_sanitize_id(const gchar * id);
 
 /* BalsaToolbarModel */
-BalsaToolbarModel *balsa_toolbar_model_new(const gchar * name,
+BalsaToolbarModel *balsa_toolbar_model_new(BalsaToolbarType type,
                                            GSList * standard);
 void balsa_toolbar_model_add_actions(BalsaToolbarModel * model,
                                      const GtkActionEntry * entries,

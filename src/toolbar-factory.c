@@ -37,6 +37,10 @@
 #include "toolbar-prefs.h"
 #include "toolbar-factory.h"
 
+/* Must be consistent with BalsaToolbarType enum: */
+static const gchar *const balsa_toolbar_names[] =
+    { "MainWindow", "ComposeWindow", "MessageWindow" };
+
 /*
  * The BalsaToolbarModel class.
  */
@@ -44,11 +48,11 @@
 struct BalsaToolbarModel_ {
     GObject object;
 
-    GHashTable     *legal;
-    GSList         *standard;
-    GSList         *current;
-    const gchar    *name;
-    GtkToolbarStyle style;
+    GHashTable      *legal;
+    GSList          *standard;
+    GSList          *current;
+    BalsaToolbarType type;
+    GtkToolbarStyle  style;
 };
 
 enum {
@@ -199,7 +203,7 @@ tm_load_model(BalsaToolbarModel * model)
     gchar *key;
     guint j;
 
-    key = g_strconcat("toolbar-", model->name, NULL);
+    key = g_strconcat("toolbar-", balsa_toolbar_names[model->type], NULL);
     libbalsa_conf_push_group(key);
     g_free(key);
 
@@ -230,7 +234,7 @@ tm_save_model(BalsaToolbarModel * model)
     guint j;
     GSList *list;
 
-    key = g_strconcat("toolbar-", model->name, NULL);
+    key = g_strconcat("toolbar-", balsa_toolbar_names[model->type], NULL);
     libbalsa_conf_remove_group(key);
     libbalsa_conf_push_group(key);
     g_free(key);
@@ -262,14 +266,14 @@ tm_gconf_notify(GConfClient * client, guint cnxn_id, GConfEntry * entry,
 /* Create a BalsaToolbarModel structure.
  */
 BalsaToolbarModel *
-balsa_toolbar_model_new(const gchar * name, GSList * standard)
+balsa_toolbar_model_new(BalsaToolbarType type, GSList * standard)
 {
     BalsaToolbarModel *model =
         g_object_new(BALSA_TYPE_TOOLBAR_MODEL, NULL);
     GConfClient *conf;
     guint notify_id;
 
-    model->name = name;
+    model->type = type;
     model->standard = standard;
     tm_load_model(model);
 
@@ -740,10 +744,10 @@ tm_do_popup_menu(GtkWidget * toolbar, GdkEventButton * event,
                          gtk_widget_get_toplevel(toolbar));
         gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
 
-        /* Pass the model name to the customize widget, so that it can
+        /* Pass the model type to the customize widget, so that it can
          * show the appropriate notebook page. */
-        g_object_set_data(G_OBJECT(item), BALSA_TOOLBAR_MODEL_NAME,
-                          (gchar *) info->model->name);
+        g_object_set_data(G_OBJECT(item), BALSA_TOOLBAR_MODEL_TYPE,
+                          GINT_TO_POINTER(info->model->type));
     }
 
     gtk_widget_show_all(menu);

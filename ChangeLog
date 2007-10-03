@@ -1,3 +1,15 @@
+2007-10-03  Peter Bloomfield
+
+	* src/main-window.c: use an enum instead of a string to
+	distinguish toolbar types.
+	* src/message-window.c: (mw_get_toolbar_model): ditto.
+	* src/sendmsg-window.c: (sw_get_toolbar_model): ditto.
+	* src/toolbar-factory.c: (tm_load_model), (tm_save_model),
+	(balsa_toolbar_model_new), (tm_do_popup_menu): ditto.
+	* src/toolbar-factory.h: ditto.
+	* src/toolbar-prefs.c: (customize_dialog_cb): ditto.
+	* src/toolbar-prefs.h: ditto.
+
 2007-10-02  Pawel Salek
 
 	* src/mailbox-node.c, libbalsa/{mailbox_imap,server}.c:

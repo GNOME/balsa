@@ -4361,8 +4361,11 @@ sw_get_toolbar_model(void)
     for (i = 0; i < ELEMENTS(compose_toolbar); i++)
         standard = g_slist_append(standard, g_strdup(compose_toolbar[i]));
 
-    model = balsa_toolbar_model_new("ComposeWindow", standard);
-    balsa_toolbar_model_add_actions(model, entries, G_N_ELEMENTS(entries));
+    model =
+        balsa_toolbar_model_new(BALSA_TOOLBAR_TYPE_COMPOSE_WINDOW,
+                                standard);
+    balsa_toolbar_model_add_actions(model, entries,
+                                    G_N_ELEMENTS(entries));
     balsa_toolbar_model_add_actions(model, ready_entries,
                                     G_N_ELEMENTS(ready_entries));
     balsa_toolbar_model_add_toggle_actions(model, toggle_entries,

@@ -458,9 +458,12 @@ mw_get_toolbar_model(void)
     for (i = 0; i < ELEMENTS(message_toolbar); i++)
         standard = g_slist_append(standard, g_strdup(message_toolbar[i]));
 
-    model = balsa_toolbar_model_new("MessageWindow", standard);
+    model =
+        balsa_toolbar_model_new(BALSA_TOOLBAR_TYPE_MESSAGE_WINDOW,
+                                standard);
     balsa_toolbar_model_add_actions(model, entries, G_N_ELEMENTS(entries));
-    balsa_toolbar_model_add_toggle_actions(model, toggle_entries, G_N_ELEMENTS(toggle_entries));
+    balsa_toolbar_model_add_toggle_actions(model, toggle_entries,
+                                           G_N_ELEMENTS(toggle_entries));
 
     return model;
 }

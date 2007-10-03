@@ -30,6 +30,7 @@
 #include "main-window.h"
 #include "message-window.h"
 #include "sendmsg-window.h"
+#include "toolbar-factory.h"
 #include "toolbar-prefs.h"
 
 #ifndef MAX
@@ -113,8 +114,8 @@ customize_dialog_cb(GtkWidget * widget, gpointer data)
     GtkWidget *wrap_button;
     GtkWidget *active_window = data;
     BalsaToolbarModel *model;
+    BalsaToolbarType   type;
     GtkUIManager * ui_manager;
-    const gchar *model_name;
 
     /* There can only be one */
     if (customize_widget) {
@@ -142,6 +143,8 @@ customize_dialog_cb(GtkWidget * widget, gpointer data)
                            "Balsa");
     gtk_window_set_default_size(GTK_WINDOW(customize_widget), 600, 440);
 
+    /* The order of pages must be consistent with the BalsaToolbarType
+     * enum. */
     model = balsa_window_get_toolbar_model(&ui_manager);
     child = create_toolbar_page(model, ui_manager);
     g_object_unref(ui_manager);
@@ -181,14 +184,10 @@ customize_dialog_cb(GtkWidget * widget, gpointer data)
 
     /* Now that the pages are shown, we can switch to the page
      * corresponding to the toolbar that the user clicked on. */
-    model_name =
-        g_object_get_data(G_OBJECT(widget), BALSA_TOOLBAR_MODEL_NAME);
-    if (model_name) {
-        if (strcmp(model_name, "ComposeWindow") == 0)
-            gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), 1);
-        else if (strcmp(model_name, "MessageWindow") == 0)
-            gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), 2);
-    }
+    type =
+        GPOINTER_TO_INT(g_object_get_data
+                        (G_OBJECT(widget), BALSA_TOOLBAR_MODEL_TYPE));
+    gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), type);
 }
 
 /* get_toolbar_button_index:

@@ -4537,6 +4537,7 @@ balsa_window_index_changed_cb(GtkWidget * widget, gpointer data)
 
     index = BALSA_INDEX(widget);
     enable_message_menus(window, index->current_msgno);
+    enable_mailbox_menus(window, index);
     if (index->current_msgno == 0) {
         enable_edit_menus(window, NULL);
     }

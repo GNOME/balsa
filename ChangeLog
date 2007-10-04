@@ -1,3 +1,8 @@
+2007-10-04  Peter Bloomfield
+
+	* src/main-window.c: restore enable_mailbox_menus() to
+	index_changed_cb()--removed by mistake a few commits ago.
+
 2007-10-03  Peter Bloomfield
 
 	* src/main-window.c: use an enum instead of a string to

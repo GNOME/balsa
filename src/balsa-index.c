@@ -454,21 +454,26 @@ bndx_selection_changed_real(BalsaIndex * index)
 
     if (msgno) {
         GtkTreePath *path;
-        index->current_message_is_deleted =
-            libbalsa_mailbox_msgno_has_flags(mailbox, msgno,
-                                             LIBBALSA_MESSAGE_FLAG_DELETED,
-                                             0);
-        libbalsa_mailbox_msgno_change_flags(mailbox, msgno,
-                                            LIBBALSA_MESSAGE_FLAG_SELECTED,
-                                            0);
-        if (libbalsa_mailbox_msgno_find(mailbox, msgno, &path, NULL)) {
+
+        if (!libbalsa_mailbox_msgno_find(mailbox, msgno, &path, NULL))
+            msgno = 0;
+        else {
             GtkTreeSelection *selection =
                 gtk_tree_view_get_selection(GTK_TREE_VIEW(index));
+
             if (!gtk_tree_selection_path_is_selected(selection, path)) {
                 bndx_expand_to_row(index, path);
                 bndx_select_row(index, path);
             }
             gtk_tree_path_free(path);
+
+            index->current_message_is_deleted =
+                libbalsa_mailbox_msgno_has_flags(mailbox, msgno,
+                                                 LIBBALSA_MESSAGE_FLAG_DELETED,
+                                                 0);
+            libbalsa_mailbox_msgno_change_flags(mailbox, msgno,
+                                                LIBBALSA_MESSAGE_FLAG_SELECTED,
+                                                0);
         }
     }
 

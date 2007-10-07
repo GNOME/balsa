@@ -72,6 +72,7 @@ struct _MessageQueueItem {
     long acc;
     long update;
     int refcount;
+    gboolean error;
 #endif
 };
 
@@ -137,6 +138,8 @@ msg_queue_item_new(LibBalsaFccboxFinder finder)
 #if !ENABLE_ESMTP
     mqi->next_message = NULL;
     mqi->status = MQI_WAITING;
+#else
+    mqi->error = FALSE;
 #endif
     mqi->stream=NULL;
     mqi->tempfile[0] = '\0';
@@ -540,8 +543,8 @@ libbalsa_message_cb (void **buf, int *len, void *arg)
 }
 
 static void
-add_recipients(smtp_message_t message, smtp_message_t bcc_message, 
-               InternetAddressList *recipient_list, const char *header)
+add_recipients(smtp_message_t message,
+               InternetAddressList * recipient_list)
 {
     for (; recipient_list; recipient_list = recipient_list->next) {
         InternetAddress *ia = recipient_list->address;
@@ -549,12 +552,19 @@ add_recipients(smtp_message_t message, smtp_message_t bcc_message,
 	if (ia->type == INTERNET_ADDRESS_NAME)
 	    smtp_add_recipient (message, ia->value.addr);
 	else if (ia->type == INTERNET_ADDRESS_GROUP)
-	    add_recipients(message, bcc_message, ia->value.members, header);
+	    add_recipients(message, ia->value.members);
 
             /* XXX  - this is where to add DSN requests.  It would be
                cool if LibBalsaAddress could contain DSN options
                for a particular recipient. */
     }
+}
+
+static gboolean
+lbs_list_has_one_address(InternetAddressList * recipient_list)
+{
+    return recipient_list && !recipient_list->next && 
+	recipient_list->address->type == INTERNET_ADDRESS_NAME;
 }
 
 /* libbalsa_process_queue:
@@ -690,22 +700,20 @@ lbs_process_queue(LibBalsaMailbox * outbox, LibBalsaFccboxFinder finder,
 		new_message->stream = mem_stream;
 	    }
 
-	    /* If the Bcc: recipient list is present, add a additional
-	       copy of the message to the session.  The recipient list
-	       for the main copy of the message is generated from the
-	       To: and Cc: recipient list and libESMTP is asked to strip
-	       the Bcc: header.  The BCC copy of the message recipient
-	       list is taken from the Bcc recipient list and the Bcc:
-	       header is preserved in the message. */
-	    if (!msg->headers->bcc_list)
-		bcc_message = NULL;
-	    else
+            /* If the Bcc: recipient list is present and contains
+             * exactly one address, add a additional copy of the message
+             * to the session for that one recipient, in which the Bcc:
+             * header is preserved.  The main copy never contains a Bcc:
+             * header. */
+            if (lbs_list_has_one_address(msg->headers->bcc_list))
 		bcc_message = smtp_add_message (session);
+	    else
+		bcc_message = NULL;
             new_message->refcount = bcc_message ? 2 : 1;
 
 	    /* Add this after the Bcc: copy. */
 	    message = smtp_add_message (session);
-	    if (bcc_message)
+	    if (msg->headers->bcc_list)
 		smtp_set_header_option (message, "Bcc", Hdr_PROHIBIT, 1);
 
 	    smtp_message_set_application_data (message, new_message);
@@ -780,21 +788,21 @@ lbs_process_queue(LibBalsaMailbox * outbox, LibBalsaFccboxFinder finder,
 #endif
 
 	    /* Now need to add the recipients to the message.  The main
-	       copy of the message gets the To and Cc recipient list.
-	       The bcc copy gets the Bcc recipients.  */
+	       copy of the message gets the To and Cc recipient list, and
+	       the Bcc recipient list, when it has more than one address.
+	       The bcc copy gets the single Bcc recipient.  */
 
-            add_recipients(message, bcc_message, msg->headers->to_list, "To");
-            add_recipients(message, bcc_message, msg->headers->cc_list, "Cc");
+            add_recipients(message, msg->headers->to_list);
+            add_recipients(message, msg->headers->cc_list);
 
-            add_recipients(bcc_message, NULL, msg->headers->bcc_list, "Cc");
+            add_recipients(bcc_message ? bcc_message : message, 
+                           msg->headers->bcc_list);
 
 	    /* Prohibit status headers. */
 	    smtp_set_header_option(message, "Status", Hdr_PROHIBIT, 1);
 	    smtp_set_header_option(message, "X-Status", Hdr_PROHIBIT, 1);
-            /* ... and FCC header. */
-            smtp_set_header_option(message, "X-Balsa-Fcc", Hdr_PROHIBIT, 1);
-            smtp_set_header_option(message, "X-Balsa-SmtpServer",
-		                   Hdr_PROHIBIT, 1);
+            /* ... and all X-Balsa-* headers. */
+            smtp_set_header_option(message, "X-Balsa-", Hdr_PROHIBIT, 1);
 
 
 	    /* Estimate the size of the message.  This need not be exact
@@ -895,7 +903,7 @@ handle_successful_send(smtp_message_t message, void *be_verbose)
     if (mqi != NULL)
       mqi->refcount--;
 
-    if(mqi != NULL && mqi->orig != NULL && mqi->orig->mailbox)
+    if(mqi != NULL && mqi->orig != NULL && mqi->orig->mailbox && !mqi->error)
 	libbalsa_message_change_flags(mqi->orig, 0,
                                       LIBBALSA_MESSAGE_FLAG_FLAGGED);
     else printf("mqi: %p mqi->orig: %p mqi->orig->mailbox: %p\n",
@@ -904,7 +912,7 @@ handle_successful_send(smtp_message_t message, void *be_verbose)
     status = smtp_message_transfer_status (message);
     if (status->code / 100 == 2) {
 	if (mqi != NULL && mqi->orig != NULL && mqi->refcount <= 0 &&
-            mqi->orig->mailbox) {
+            mqi->orig->mailbox && !mqi->error) {
             gboolean remove = TRUE;
             const gchar *fccurl =
                 libbalsa_message_get_user_header(mqi->orig, "X-Balsa-Fcc");
@@ -933,6 +941,16 @@ handle_successful_send(smtp_message_t message, void *be_verbose)
                                           LIBBALSA_MESSAGE_FLAG_FLAGGED, 0);
 	}
     } else {
+        /* Record the error, so that the message will not be deleted
+         * later... */
+        mqi->error = TRUE;
+        /* ...and mark it as:
+         *   - flagged, so it will not be sent again until the error
+         *     is fixed and the user manually clears the flag;
+         *   - undeleted, in case it was already deleted. */
+        libbalsa_message_change_flags(mqi->orig,
+                                      LIBBALSA_MESSAGE_FLAG_FLAGGED,
+                                      LIBBALSA_MESSAGE_FLAG_DELETED);
 	/* Check whether it was a problem with transfer. */
         if(*(gboolean*)be_verbose) {
             int cnt = 0;

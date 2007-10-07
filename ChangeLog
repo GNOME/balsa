@@ -1,3 +1,16 @@
+2007-10-07  Peter Bloomfield
+
+	* libbalsa/send.c: (msg_queue_item_new), (add_recipients),
+	(lbs_list_has_one_address), (lbs_process_queue),
+	(handle_successful_send): create separate bcc-message only if it
+	has exactly one recipient; really leave message in outbox if any
+	address, including bcc addresses, has an error.
+
+2007-10-05  Peter Bloomfield
+
+	* src/balsa-index.c: (bndx_selection_changed_real): do not show
+	next message if msgno is no longer in the tree.
+
 2007-10-04  Peter Bloomfield
 
 	* src/main-window.c: restore enable_mailbox_menus() to

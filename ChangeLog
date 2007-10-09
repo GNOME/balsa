@@ -1,5 +1,13 @@
 2007-10-09  Peter Bloomfield
 
+	* libbalsa/mailbox.c: (mbox_model_iter_n_children): return 0 if
+	iter is NULL and mailbox has no msg_tree.
+	* src/balsa-index.c: (bndx_scroll_to_row),
+	(balsa_index_scroll_on_open): do not use idle callback;
+	(balsa_index_ensure_visible): typo?
+
+2007-10-09  Peter Bloomfield
+
 	* src/balsa-index.c: (bndx_selection_changed_real),
 	(bndx_mailbox_changed_func), (bndx_mailbox_changed_cb): when a
 	message is deleted, select next message to be displayed in the

@@ -614,49 +614,11 @@ bndx_row_activated(GtkTreeView * tree_view, GtkTreePath * path,
         message_window_new(mailbox, msgno);
 }
 
-/*
- * Scroll in an idle handler, otherwise it gets ignored.
- */
-#define BALSA_INDEX_ROW_REF_KEY "balsa-index-row-ref-key"
-static gboolean
-bndx_scroll_idle(BalsaIndex * index)
-{
-    GtkTreeRowReference *row_ref;
-    GtkTreePath *path;
-
-    gdk_threads_enter();
-
-    row_ref = g_object_get_data(G_OBJECT(index), BALSA_INDEX_ROW_REF_KEY);
-    if (row_ref && (path = gtk_tree_row_reference_get_path(row_ref))) {
-        gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(index), path, NULL,
-                                     FALSE, 0, 0);
-        gtk_tree_path_free(path);
-    }
-
-    g_object_set_data(G_OBJECT(index), BALSA_INDEX_ROW_REF_KEY, NULL);
-    g_object_unref(index);
-
-    gdk_threads_leave();
-
-    return FALSE;
-}
-
 static void
 bndx_scroll_to_row(BalsaIndex * index, GtkTreePath * path)
 {
-    GtkTreeRowReference *row_ref;
-
-    row_ref = g_object_get_data(G_OBJECT(index), BALSA_INDEX_ROW_REF_KEY);
-    if (!row_ref) {
-        g_object_ref(index);
-        g_idle_add((GSourceFunc) bndx_scroll_idle, index);
-    }
-
-    row_ref =
-        gtk_tree_row_reference_new(gtk_tree_view_get_model
-                                   (GTK_TREE_VIEW(index)), path);
-    g_object_set_data_full(G_OBJECT(index), BALSA_INDEX_ROW_REF_KEY, row_ref,
-                           (GDestroyNotify) gtk_tree_row_reference_free);
+    gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(index), path, NULL,
+                                 FALSE, 0, 0);
 }
 
 static gboolean
@@ -818,10 +780,7 @@ balsa_index_scroll_on_open(BalsaIndex *index)
     }
 
     bndx_expand_to_row(index, path);
-    /* Scroll now, not in the idle handler, to make sure the initial
-     * view is correct. */
-    gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(index), path, NULL,
-                                 FALSE, 0, 0);
+    bndx_scroll_to_row(index, path);
 
     view_on_open =
         g_object_get_data(G_OBJECT(mailbox), BALSA_INDEX_VIEW_ON_OPEN);
@@ -2369,7 +2328,7 @@ balsa_index_ensure_visible(BalsaIndex * index)
     GdkRectangle rect;
     GtkTreePath *path = NULL;
 
-    if (bndx_find_current_msgno(index, &path, NULL)) {
+    if (!bndx_find_current_msgno(index, &path, NULL)) {
         /* Current message not displayed, make sure that something
            else is... */
         gtk_tree_view_get_visible_rect(tree_view, &rect);

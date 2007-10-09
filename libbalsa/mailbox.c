@@ -2949,7 +2949,7 @@ mbox_model_iter_n_children(GtkTreeModel      *tree_model,
     node = iter ? iter->user_data
                 : LIBBALSA_MAILBOX(tree_model)->msg_tree;
 
-    return g_node_n_children(node);
+    return node ? g_node_n_children(node) : 0;
 }
 
 static gboolean

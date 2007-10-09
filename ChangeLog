@@ -1,3 +1,10 @@
+2007-10-09  Peter Bloomfield
+
+	* src/balsa-index.c: (bndx_selection_changed_real),
+	(bndx_mailbox_changed_func), (bndx_mailbox_changed_cb): when a
+	message is deleted, select next message to be displayed in the
+	signal handler instead of the idle callback.
+
 2007-10-07  Peter Bloomfield
 
 	* libbalsa/send.c: (msg_queue_item_new), (add_recipients),

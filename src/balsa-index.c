@@ -446,6 +446,7 @@ bndx_selection_changed_real(BalsaIndex * index)
 
     /* Save next_msgno, because changing flags may zero it. */
     msgno = index->next_msgno;
+    index->next_msgno = 0;
     if (index->current_msgno)
         /* The current message has been deselected. */
         libbalsa_mailbox_msgno_change_flags(mailbox, index->current_msgno,
@@ -1320,18 +1321,6 @@ bndx_mailbox_changed_func(BalsaIndex * bindex)
     LibBalsaMailbox *mailbox = bindex->mailbox_node->mailbox;
     GtkTreePath *path;
 
-    if (!GTK_WIDGET_REALIZED(GTK_WIDGET(bindex)))
-        return;
-
-    if (bindex->current_msgno) {
-        if (libbalsa_mailbox_msgno_has_flags(mailbox,
-                                             bindex->current_msgno, 0,
-                                             LIBBALSA_MESSAGE_FLAG_DELETED))
-            bindex->current_message_is_deleted = FALSE;
-        else if (!bindex->current_message_is_deleted)
-            bndx_select_next_threaded(bindex);
-    }
-
     if (mailbox->first_unread
         && libbalsa_mailbox_msgno_find(mailbox, mailbox->first_unread,
                                        &path, NULL)) {
@@ -1374,7 +1363,22 @@ bndx_mailbox_changed_idle(struct index_info* arg)
 static void
 bndx_mailbox_changed_cb(BalsaIndex * bindex)
 {
+    LibBalsaMailbox *mailbox = bindex->mailbox_node->mailbox;
     struct index_info *arg;
+
+    if (!GTK_WIDGET_REALIZED(GTK_WIDGET(bindex)))
+        return;
+
+    /* Find the next message to be shown now, not later in the idle
+     * callback. */
+    if (bindex->current_msgno) {
+        if (libbalsa_mailbox_msgno_has_flags(mailbox,
+                                             bindex->current_msgno, 0,
+                                             LIBBALSA_MESSAGE_FLAG_DELETED))
+            bindex->current_message_is_deleted = FALSE;
+        else if (!bindex->current_message_is_deleted)
+            bndx_select_next_threaded(bindex);
+    }
 
     if (bindex->has_mailbox_changed_idle)
         return;

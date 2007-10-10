@@ -1,5 +1,10 @@
 2007-10-10  Peter Bloomfield
 
+	* libbalsa/server.h: include libbalsa.h (bug 477580, Jens
+	Granseuer).
+
+2007-10-10  Peter Bloomfield
+
 	* src/main-window.c: hide resize grip when window is maximized.
 	* src/sendmsg-window.c: (calculate_expander_toggles): drop
 	unused variable (Albrecht Dreß);

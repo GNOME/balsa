@@ -24,6 +24,7 @@
 #define __LIBBALSA_SERVER_H__
 
 #include "imap/libimap.h"
+#include "libbalsa.h"
 
 #define LIBBALSA_TYPE_SERVER \
     (libbalsa_server_get_type())

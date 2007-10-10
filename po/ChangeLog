@@ -1,3 +1,8 @@
+2005-10-10  Pawel Salek <pawsa-gpa@theochem.kth.se>
+
+	* POTFILES.in: add libinit_balsa/assisstant*c files
+	(bug 485423, Gil Forcada).
+
 2007-10-07  Jorge Gonzalez  <jorgegonz@svn.gnome.org>
 
         * es.po: Updated Spanish translation.

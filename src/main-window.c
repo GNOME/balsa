@@ -1467,6 +1467,23 @@ balsa_window_get_toolbar_model(GtkUIManager ** ui_manager)
     return bw_get_toolbar_model_and_ui_manager(NULL, ui_manager);
 }
 
+/*
+ * "window-state-event" signal handler
+ *
+ * If the window is maximized, the resize grip is still sensitive but
+ * does nothing, so leaving it showing could be confusing.
+ */
+static gboolean
+bw_window_state_event_cb(BalsaWindow * window,
+                         GdkEventWindowState * event,
+                         GtkStatusbar * statusbar)
+{
+    gtk_statusbar_set_has_resize_grip(statusbar,
+                                      !(event->new_window_state &
+                                        GDK_WINDOW_STATE_MAXIMIZED));
+    return FALSE;
+}
+
 GtkWidget *
 balsa_window_new()
 {
@@ -1532,6 +1549,9 @@ balsa_window_new()
                        0);
 
     window->statusbar = gtk_statusbar_new();
+    g_signal_connect(window, "window-state-event",
+                     G_CALLBACK(bw_window_state_event_cb),
+                     window->statusbar);
     gtk_box_pack_start(GTK_BOX(hbox), window->statusbar, TRUE, TRUE, 0);
 
 #if 0

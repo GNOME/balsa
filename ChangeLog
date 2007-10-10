@@ -1,3 +1,11 @@
+2007-10-10  Peter Bloomfield
+
+	* src/main-window.c: hide resize grip when window is maximized.
+	* src/sendmsg-window.c: (calculate_expander_toggles): drop
+	unused variable (Albrecht Dreß);
+	(tree_find_single_part), (collect_for_quote): search deeper for
+	a single text part (Albrecht Dreß).
+
 2007-10-09  Peter Bloomfield
 
 	* src/balsa-index.c: restore 'N' and 'P' actions.

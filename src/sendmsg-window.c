@@ -3432,10 +3432,8 @@ static gboolean
 calculate_expander_toggles(GtkTreeModel * model, GtkTreeIter * iter)
 {
     gint count, on;
-    gboolean have_incons;
 
     count = on = 0;
-    have_incons = FALSE;
     do {
 	GtkTreeIter children;
 	gboolean value;
@@ -3615,6 +3613,19 @@ quote_parts_select_dlg(GtkTreeStore *tree_store, GtkWindow * parent)
     return result;
 }
 
+static gboolean
+tree_find_single_part(GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter,
+		      gpointer data)
+{
+    LibBalsaMessageBody ** this_body = (LibBalsaMessageBody **) data;
+
+    gtk_tree_model_get(model, iter, QUOTE_BODY, this_body, -1);
+    if (*this_body)
+	return TRUE;
+    else
+	return FALSE;
+}
+
 static GString *
 collect_for_quote(LibBalsaMessageBody *root, gchar * reply_prefix_str,
 		  gint llen, gboolean ignore_html, gboolean flow,
@@ -3636,20 +3647,14 @@ collect_for_quote(LibBalsaMessageBody *root, gchar * reply_prefix_str,
     if (text_bodies == 1) {
 	/* note: the only text body may be buried in an attached message, so
 	 * we have to search the tree store... */
-	GtkTreeIter iter;
+	LibBalsaMessageBody *this_body;
 
-	gtk_tree_model_get_iter_first(GTK_TREE_MODEL(tree_store), &iter);
-	do {
-	    LibBalsaMessageBody *this_body;
-
-	    gtk_tree_model_get(GTK_TREE_MODEL(tree_store), &iter, QUOTE_BODY,
-			       &this_body, -1);
-	    if (this_body)
-		q_body = process_mime_part(message, this_body, reply_prefix_str,
-					   llen, FALSE, flow, charset_cb,
-					   charset_cb_data);
-	} while (!q_body &&
-		 gtk_tree_model_iter_next(GTK_TREE_MODEL(tree_store), &iter));
+	gtk_tree_model_foreach(GTK_TREE_MODEL(tree_store), tree_find_single_part,
+			       &this_body);
+	if (this_body)
+	    q_body = process_mime_part(message, this_body, reply_prefix_str,
+				       llen, FALSE, flow, charset_cb,
+				       charset_cb_data);
     } else if (text_bodies > 1) {
 	if (quote_parts_select_dlg(tree_store, NULL)) {
 	    GtkTreeIter iter;

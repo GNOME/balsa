@@ -446,7 +446,6 @@ bndx_selection_changed_real(BalsaIndex * index)
 
     /* Save next_msgno, because changing flags may zero it. */
     msgno = index->next_msgno;
-    index->next_msgno = 0;
     if (index->current_msgno)
         /* The current message has been deselected. */
         libbalsa_mailbox_msgno_change_flags(mailbox, index->current_msgno,

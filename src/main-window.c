@@ -103,207 +103,202 @@ GtkWidget *progress_dialog_bar = NULL;
 GSList *list = NULL;
 static int quiet_check=0;
 
-static void check_messages_thread(GSList * list);
+static void bw_check_messages_thread(GSList * list);
 
 #endif
-static void display_new_mail_notification(int num_new, int has_new);
+static void bw_display_new_mail_notification(int num_new, int has_new);
 
 static void balsa_window_class_init(BalsaWindowClass * klass);
 static void balsa_window_init(BalsaWindow * window);
 static void balsa_window_real_open_mbnode(BalsaWindow *window,
-					   BalsaMailboxNode *mbnode);
+                                          BalsaMailboxNode *mbnode);
 static void balsa_window_real_close_mbnode(BalsaWindow *window,
 					   BalsaMailboxNode *mbnode);
 static void balsa_window_destroy(GtkObject * object);
 
-static gboolean balsa_close_mailbox_on_timer(void);
+static gboolean bw_close_mailbox_on_timer(void);
 
-static void balsa_window_index_changed_cb(GtkWidget * widget,
-                                          gpointer data);
-static void balsa_window_idle_replace(BalsaWindow * window,
-                                      BalsaIndex * bindex);
-static void balsa_window_idle_remove(BalsaWindow * window);
-static gboolean balsa_window_idle_cb(BalsaWindow * window);
+static void bw_index_changed_cb(GtkWidget * widget, gpointer data);
+static void bw_idle_replace(BalsaWindow * window, BalsaIndex * bindex);
+static void bw_idle_remove(BalsaWindow * window);
+static gboolean bw_idle_cb(BalsaWindow * window);
 
 
-static void check_mailbox_list(GList * list);
-static gboolean mailbox_check_func(GtkTreeModel * model,
-				   GtkTreePath * path, GtkTreeIter * iter,
-				   GSList ** list);
-static gboolean imap_check_test(const gchar * path);
+static void bw_check_mailbox_list(GList * list);
+static gboolean bw_mailbox_check_func(GtkTreeModel * model,
+                                      GtkTreePath * path,
+                                      GtkTreeIter * iter,
+                                      GSList ** list);
+static gboolean bw_imap_check_test(const gchar * path);
 
-static void enable_mailbox_menus(BalsaWindow * window, BalsaIndex * index);
-static void enable_message_menus(BalsaWindow * window, guint msgno);
-static void enable_edit_menus(BalsaWindow * window, BalsaMessage * bm);
+static void bw_enable_mailbox_menus(BalsaWindow * window, BalsaIndex * index);
+static void bw_enable_message_menus(BalsaWindow * window, guint msgno);
+static void bw_enable_edit_menus(BalsaWindow * window, BalsaMessage * bm);
 #ifdef HAVE_GTKHTML
-static void enable_view_menus(BalsaWindow * window, BalsaMessage * bm);
+static void bw_enable_view_menus(BalsaWindow * window, BalsaMessage * bm);
 #endif				/* HAVE_GTKHTML */
-static void register_open_mailbox(LibBalsaMailbox *m);
-static void unregister_open_mailbox(LibBalsaMailbox *m);
-static gboolean is_open_mailbox(LibBalsaMailbox *m);
+static void bw_register_open_mailbox(LibBalsaMailbox *m);
+static void bw_unregister_open_mailbox(LibBalsaMailbox *m);
+static gboolean bw_is_open_mailbox(LibBalsaMailbox *m);
 
 /* dialogs */
-static void show_about_box(BalsaWindow * window);
+static void bw_show_about_box(BalsaWindow * window);
 
 /* callbacks */
-static void send_outbox_messages_cb    (GtkAction *, gpointer data);
-static void send_receive_messages_cb   (GtkAction *, gpointer data);
+static void bw_send_outbox_messages_cb    (GtkAction *, gpointer data);
+static void bw_send_receive_messages_cb   (GtkAction *, gpointer data);
 #ifdef HAVE_GTK_PRINT
-static void page_setup_cb              (GtkAction * action, gpointer data);
+static void bw_page_setup_cb              (GtkAction * action, gpointer data);
 #endif
-static void message_print_cb           (GtkAction * action, gpointer data);
+static void bw_message_print_cb           (GtkAction * action, gpointer data);
 
-static void new_message_cb             (GtkAction * action, gpointer data);
-static void replyto_message_cb         (GtkAction * action, gpointer data);
-static void replytoall_message_cb      (GtkAction * action, gpointer data);
-static void replytogroup_message_cb    (GtkAction * action, gpointer data);
+static void bw_new_message_cb             (GtkAction * action, gpointer data);
+static void bw_replyto_message_cb         (GtkAction * action, gpointer data);
+static void bw_replytoall_message_cb      (GtkAction * action, gpointer data);
+static void bw_replytogroup_message_cb    (GtkAction * action, gpointer data);
 #if !defined(ENABLE_TOUCH_UI)
-static void forward_message_attached_cb(GtkAction * action, gpointer data);
-static void forward_message_inline_cb  (GtkAction * action, gpointer data);
+static void bw_forward_message_attached_cb(GtkAction * action, gpointer data);
+static void bw_forward_message_inline_cb  (GtkAction * action, gpointer data);
 #endif /* ENABLE_TOUCH_UI */
-static void forward_message_default_cb (GtkAction * action, gpointer data);
+static void bw_forward_message_default_cb (GtkAction * action, gpointer data);
 #if !defined(ENABLE_TOUCH_UI)
-static void pipe_message_cb            (GtkAction * action, gpointer data);
+static void bw_pipe_message_cb            (GtkAction * action, gpointer data);
 #endif /* ENABLE_TOUCH_UI */
-static void continue_message_cb        (GtkAction * action, gpointer data);
+static void bw_continue_message_cb        (GtkAction * action, gpointer data);
 
-static void next_message_cb            (GtkAction * action, gpointer data);
-static void next_unread_message_cb     (GtkAction * action, gpointer data);
-static void next_flagged_message_cb    (GtkAction * action, gpointer data);
-static void previous_message_cb        (GtkAction * action, gpointer data);
+static void bw_next_message_cb            (GtkAction * action, gpointer data);
+static void bw_next_unread_message_cb     (GtkAction * action, gpointer data);
+static void bw_next_flagged_message_cb    (GtkAction * action, gpointer data);
+static void bw_previous_message_cb        (GtkAction * action, gpointer data);
 
 #if !defined(ENABLE_TOUCH_UI)
-static void next_part_cb               (GtkAction * action, gpointer data);
-static void previous_part_cb           (GtkAction * action, gpointer data);
+static void bw_next_part_cb               (GtkAction * action, gpointer data);
+static void bw_previous_part_cb           (GtkAction * action, gpointer data);
 #endif
-static void save_current_part_cb       (GtkAction * action, gpointer data);
-static void view_msg_source_cb         (GtkAction * action, gpointer data);
+static void bw_save_current_part_cb       (GtkAction * action, gpointer data);
+static void bw_view_msg_source_cb         (GtkAction * action, gpointer data);
 
-static void trash_message_cb           (GtkAction * action, gpointer data);
-static void toggle_flagged_message_cb  (GtkAction * action, gpointer data);
-static void toggle_deleted_message_cb  (GtkAction * action, gpointer data);
-static void toggle_new_message_cb      (GtkAction * action, gpointer data);
-static void toggle_answered_message_cb (GtkAction * action, gpointer data);
-static void store_address_cb           (GtkAction * action, gpointer data);
-static void empty_trash_cb             (GtkAction * action, gpointer data);
+static void bw_trash_message_cb           (GtkAction * action, gpointer data);
+static void bw_toggle_flagged_message_cb  (GtkAction * action, gpointer data);
+static void bw_toggle_deleted_message_cb  (GtkAction * action, gpointer data);
+static void bw_toggle_new_message_cb      (GtkAction * action, gpointer data);
+static void bw_toggle_answered_message_cb (GtkAction * action, gpointer data);
+static void bw_store_address_cb           (GtkAction * action, gpointer data);
+static void bw_empty_trash_cb             (GtkAction * action, gpointer data);
 
-static void bw_header_activate_cb      (GtkAction * action, gpointer data);
-static void expand_all_cb              (GtkAction * action, gpointer data);
-static void collapse_all_cb            (GtkAction * action, gpointer data);
+static void bw_header_activate_cb         (GtkAction * action, gpointer data);
+static void bw_expand_all_cb              (GtkAction * action, gpointer data);
+static void bw_collapse_all_cb            (GtkAction * action, gpointer data);
 #ifdef HAVE_GTKHTML
-static void zoom_in_cb                 (GtkAction * action, gpointer data);
-static void zoom_out_cb                (GtkAction * action, gpointer data);
-static void zoom_100_cb                (GtkAction * action, gpointer data);
+static void bw_zoom_in_cb                 (GtkAction * action, gpointer data);
+static void bw_zoom_out_cb                (GtkAction * action, gpointer data);
+static void bw_zoom_100_cb                (GtkAction * action, gpointer data);
 #endif				/* HAVE_GTKHTML */
 
-static void copy_cb                    (GtkAction * action, BalsaWindow *bw);
-static void select_all_cb              (GtkAction * action, gpointer);
+static void bw_copy_cb                    (GtkAction * action, gpointer data);
+static void bw_select_all_cb              (GtkAction * action, gpointer data);
 #if !defined(ENABLE_TOUCH_UI)
-static void message_copy_cb            (GtkAction * action, gpointer data);
-static void message_select_all_cb      (GtkAction * action, gpointer data);
+static void bw_message_copy_cb            (GtkAction * action, gpointer data);
+static void bw_message_select_all_cb      (GtkAction * action, gpointer data);
 #endif /* ENABLE_TOUCH_UI */
-static void mark_all_cb                (GtkAction * action, gpointer);
+static void bw_mark_all_cb                (GtkAction * action, gpointer data);
 
-static void find_cb                    (GtkAction * action, gpointer data);
-static void find_again_cb              (GtkAction * action, gpointer data);
-static void filter_dlg_cb              (GtkAction * action, gpointer data);
-static void filter_export_cb           (GtkAction * action, gpointer data);
-static void filter_run_cb              (GtkAction * action, gpointer data);
+static void bw_find_cb                    (GtkAction * action, gpointer data);
+static void bw_find_again_cb              (GtkAction * action, gpointer data);
+static void bw_filter_dlg_cb              (GtkAction * action, gpointer data);
+static void bw_filter_export_cb           (GtkAction * action, gpointer data);
+static void bw_filter_run_cb              (GtkAction * action, gpointer data);
 #if !defined(ENABLE_TOUCH_UI)
-static void remove_duplicates_cb       (GtkAction * action, gpointer data);
+static void bw_remove_duplicates_cb       (GtkAction * action, gpointer data);
 #endif /* ENABLE_TOUCH_UI */
 
-static void mailbox_close_cb           (GtkAction * action, gpointer data);
+static void bw_mailbox_close_cb           (GtkAction * action, gpointer data);
 
-static void reset_filter_cb            (GtkAction * action, gpointer data);
-static void mailbox_expunge_cb         (GtkAction * action, gpointer data);
-static void mailbox_tab_close_cb(GtkWidget * widget, gpointer data);
+static void bw_reset_filter_cb            (GtkAction * action, gpointer data);
+static void bw_mailbox_expunge_cb         (GtkAction * action, gpointer data);
+static void bw_mailbox_tab_close_cb(GtkWidget * widget, gpointer data);
 
 #if defined(ENABLE_TOUCH_UI)
-static void sort_change_cb(GtkRadioAction * action,
-                           GtkRadioAction * current, gpointer data);
-static void toggle_order_cb(GtkToggleAction * action, gpointer data);
-static void balsa_window_set_sort_menu(BalsaWindow *window,
-                                       LibBalsaMailboxSortFields col,
-                                       LibBalsaMailboxSortType   order);
+static void bw_sort_change_cb(GtkRadioAction * action,
+                              GtkRadioAction * current, gpointer data);
+static void bw_toggle_order_cb(GtkToggleAction * action, gpointer data);
+static void bw_set_sort_menu(BalsaWindow *window,
+                             LibBalsaMailboxSortFields col,
+                             LibBalsaMailboxSortType   order);
 #endif /* ENABLE_TOUCH_UI */
-static void hide_changed_cb         (GtkToggleAction * action, gpointer data);
-static void wrap_message_cb         (GtkToggleAction * action, gpointer data);
-static void show_all_headers_tool_cb(GtkToggleAction * action, gpointer data);
-static void show_preview_pane_cb    (GtkToggleAction * action, gpointer data);
-static void reset_show_all_headers(BalsaWindow * window);
+static void bw_hide_changed_cb         (GtkToggleAction * action, gpointer data);
+static void bw_wrap_message_cb         (GtkToggleAction * action, gpointer data);
+static void bw_show_all_headers_tool_cb(GtkToggleAction * action, gpointer data);
+static void bw_show_preview_pane_cb    (GtkToggleAction * action, gpointer data);
+static void bw_reset_show_all_headers(BalsaWindow * window);
 
 #if !defined(ENABLE_TOUCH_UI)
-static void threading_radio_cb(GtkRadioAction * action,
-                               GtkRadioAction * current, gpointer data);
-static void balsa_window_set_threading_menu(BalsaWindow * window,
-					    int option);
+static void bw_threading_radio_cb(GtkRadioAction * action,
+                                  GtkRadioAction * current, gpointer data);
+static void bw_set_threading_menu(BalsaWindow * window, int option);
 static void bw_show_mbtree(BalsaWindow * window);
 #endif /* ENABLE_TOUCH_UI */
-static void balsa_window_set_filter_menu(BalsaWindow * window,
-					 int gui_filter);
-static LibBalsaCondition *balsa_window_get_view_filter(BalsaWindow *
-                                                       window,
-                                                       gboolean
-                                                       flags_only);
+static void bw_set_filter_menu(BalsaWindow * window, int gui_filter);
+static LibBalsaCondition *bw_get_view_filter(BalsaWindow * window,
+                                             gboolean flags_only);
 #if defined(ENABLE_TOUCH_UI)
-static gboolean open_mailbox_cb(GtkWidget *w, GdkEventKey *e, gpointer data);
-static void enable_view_filter_cb(GtkToggleAction * action, gpointer data);
+static gboolean bw_open_mailbox_cb(GtkWidget *w, GdkEventKey *e, gpointer data);
+static void bw_enable_view_filter_cb(GtkToggleAction * action, gpointer data);
 #endif /* ENABLE_TOUCH_UI */
 
-static void address_book_cb(GtkWindow *widget, gpointer data);
+static void bw_address_book_cb(GtkWindow *widget, gpointer data);
 
-static void select_part_cb(BalsaMessage * bm, gpointer data);
+static void bw_select_part_cb(BalsaMessage * bm, gpointer data);
 
-static void find_real(BalsaWindow * window, BalsaIndex * bindex,
-		      gboolean again);
+static void bw_find_real(BalsaWindow * window, BalsaIndex * bindex,
+                         gboolean again);
 
 #if !defined(ENABLE_TOUCH_UI)
-static void show_mbtree_cb(GtkToggleAction * action, gpointer data);
-static void show_mbtabs_cb(GtkToggleAction * action, gpointer data);
+static void bw_show_mbtree_cb(GtkToggleAction * action, gpointer data);
+static void bw_show_mbtabs_cb(GtkToggleAction * action, gpointer data);
 #endif /* ENABLE_TOUCH_UI */
 
-static void notebook_size_alloc_cb(GtkWidget * notebook,
-                                   GtkAllocation * alloc);
-static void mw_size_alloc_cb(GtkWidget * window, GtkAllocation * alloc);
+static void bw_notebook_size_alloc_cb(GtkWidget * notebook,
+                                      GtkAllocation * alloc);
+static void bw_size_alloc_cb(GtkWidget * window, GtkAllocation * alloc);
 
-static void notebook_switch_page_cb(GtkWidget * notebook,
-                                    GtkNotebookPage * page,
-                                    guint page_num,
-                                    gpointer data);
+static void bw_notebook_switch_page_cb(GtkWidget * notebook,
+                                       GtkNotebookPage * page,
+                                       guint page_num,
+                                       gpointer data);
 #if !defined(ENABLE_TOUCH_UI)
-static void send_msg_window_destroy_cb(GtkWidget * widget, gpointer data);
+static void bw_send_msg_window_destroy_cb(GtkWidget * widget, gpointer data);
 #endif /*ENABLE_TOUCH_UI */
-static BalsaIndex* balsa_window_notebook_find_page (GtkNotebook* notebook, 
-                                                    gint x, gint y);
-static void notebook_drag_received_cb (GtkWidget* widget, 
-                                            GdkDragContext* context, 
-                                            gint x, gint y, 
-                                            GtkSelectionData* selection_data, 
-                                            guint info, guint32 time, 
-                                            gpointer data);
-static gboolean notebook_drag_motion_cb (GtkWidget* widget,
-                                       GdkDragContext* context,
-                                       gint x, gint y, guint time,
-                                       gpointer user_data);
+static BalsaIndex *bw_notebook_find_page(GtkNotebook * notebook,
+                                         gint x, gint y);
+static void bw_notebook_drag_received_cb(GtkWidget* widget, 
+                                         GdkDragContext* context, 
+                                         gint x, gint y, 
+                                         GtkSelectionData* selection_data, 
+                                         guint info, guint32 time, 
+                                         gpointer data);
+static gboolean bw_notebook_drag_motion_cb(GtkWidget* widget,
+                                           GdkDragContext* context,
+                                           gint x, gint y, guint time,
+                                           gpointer user_data);
 
 
-static GtkWidget *balsa_notebook_label_new (BalsaMailboxNode* mbnode);
-static void ident_manage_dialog_cb(GtkAction * action, gpointer user_data);
+static GtkWidget *bw_notebook_label_new (BalsaMailboxNode* mbnode);
+static void bw_ident_manage_dialog_cb(GtkAction * action, gpointer user_data);
 
-static void contents_cb(void);
+static void bw_contents_cb(void);
 
 #ifdef HAVE_NOTIFY
-static gboolean cancel_new_mail_notification(void);
+static gboolean bw_cancel_new_mail_notification(void);
 #endif
 
-static void balsa_window_increase_activity(BalsaWindow * window,
-                                           const gchar * message);
-static void balsa_window_decrease_activity(BalsaWindow * window,
-                                           const gchar * message);
+static void bw_increase_activity(BalsaWindow * window,
+                                 const gchar * message);
+static void bw_decrease_activity(BalsaWindow * window,
+                                 const gchar * message);
 
 static void
-balsa_quit_nicely(GtkAction * action, gpointer data)
+bw_quit_nicely(GtkAction * action, gpointer data)
 {
     GdkEventAny e = { GDK_DELETE, NULL, 0 };
     e.window = GTK_WIDGET(data)->window;
@@ -343,34 +338,34 @@ static const GtkActionEntry entries[] = {
     {"ToolsMenu", NULL, N_("_Tools")},
     {"ToolsFiltersMenu", NULL, N_("_Filters")},
     {"ManageFilters", GTK_STOCK_PROPERTIES, N_("F_ilters"), NULL,
-     N_("Manage filters"), G_CALLBACK(filter_dlg_cb)},
+     N_("Manage filters"), G_CALLBACK(bw_filter_dlg_cb)},
 #endif /* ENABLE_TOUCH_UI */
     /* File menu items */
     /* Not in the touchpad menu, but still available as a toolbar
      * button: */
     {"Continue", BALSA_PIXMAP_CONTINUE, N_("_Continue"), "C",
      N_("Continue editing current message"),
-     G_CALLBACK(continue_message_cb)},
+     G_CALLBACK(bw_continue_message_cb)},
     {"GetNewMail", BALSA_PIXMAP_RECEIVE, N_("_Get New Mail"), "<control>M",
      N_("Fetch new incoming mail"), G_CALLBACK(check_new_messages_cb)},
     {"SendQueuedMail", BALSA_PIXMAP_SEND, N_("_Send Queued Mail"),
      "<control>T", N_("Send messages from the outbox"),
-     G_CALLBACK(send_outbox_messages_cb)},
+     G_CALLBACK(bw_send_outbox_messages_cb)},
     {"SendAndReceiveMail", BALSA_PIXMAP_SEND_RECEIVE,
      N_("Send and _Receive Mail"), "<control>B",
      N_("Send and Receive messages"),
-     G_CALLBACK(send_receive_messages_cb)},
+     G_CALLBACK(bw_send_receive_messages_cb)},
 #ifdef HAVE_GTK_PRINT
     {"PageSetup", NULL, N_("Page _Setup"), "<control>S",
-     N_("Set up page for printing"), G_CALLBACK(page_setup_cb)},
+     N_("Set up page for printing"), G_CALLBACK(bw_page_setup_cb)},
 #endif                          /* HAVE_GTK_PRINT */
     {"AddressBook", BALSA_PIXMAP_BOOK_RED, N_("_Address Book..."), "B",
-     N_("Open the address book"), G_CALLBACK(address_book_cb)},
+     N_("Open the address book"), G_CALLBACK(bw_address_book_cb)},
     {"Quit", GTK_STOCK_QUIT, N_("_Quit"), "<control>Q", N_("Quit Balsa"),
-     G_CALLBACK(balsa_quit_nicely)},
+     G_CALLBACK(bw_quit_nicely)},
     /* File:New submenu items */
     {"NewMessage", BALSA_PIXMAP_COMPOSE, N_("_Message..."), "M",
-     N_("Compose a new message"), G_CALLBACK(new_message_cb)},
+     N_("Compose a new message"), G_CALLBACK(bw_new_message_cb)},
 #if !defined(ENABLE_TOUCH_UI)
     {"NewMbox", GTK_STOCK_ADD, N_("Local mbox mailbox..."), NULL,
      N_("Add a new mbox style mailbox"),
@@ -386,7 +381,7 @@ static const GtkActionEntry entries[] = {
      G_CALLBACK(mailbox_conf_add_mbox_cb)},
     {"NewMaildir", GTK_STOCK_ADD, N_("New \"Maildir\" mailbox..."), NULL,
      N_("Add a new Maildir style mailbox"),
-     G_CALLBACK(mailbox_conf_add_maildir_cb)},
+     G_CALLBACK(bw_mailbox_conf_add_maildir_cb)},
     {"NewMH", GTK_STOCK_ADD, N_("New \"MH\" mailbox..."), NULL,
      N_("Add a new MH style mailbox"), G_CALLBACK(mailbox_conf_add_mh_cb)},
 #endif /* ENABLE_TOUCH_UI */
@@ -399,71 +394,71 @@ static const GtkActionEntry entries[] = {
      G_CALLBACK(folder_conf_add_imap_sub_cb)},
     /* Edit menu items */
     {"Copy", GTK_STOCK_COPY, N_("_Copy"), "<control>C", NULL,
-     G_CALLBACK(copy_cb)},
+     G_CALLBACK(bw_copy_cb)},
     {"Filters", GTK_STOCK_PROPERTIES, N_("F_ilters..."), NULL,
-     N_("Manage filters"), G_CALLBACK(filter_dlg_cb)},
+     N_("Manage filters"), G_CALLBACK(bw_filter_dlg_cb)},
     {"ExportFilters", GTK_STOCK_PROPERTIES, N_("_Export Filters"), NULL,
-     N_("Export filters as Sieve scripts"), G_CALLBACK(filter_export_cb)},
+     N_("Export filters as Sieve scripts"), G_CALLBACK(bw_filter_export_cb)},
     {"Preferences", GTK_STOCK_PREFERENCES, N_("Prefere_nces"), NULL, NULL,
      G_CALLBACK(open_preferences_manager)},
     /* View menu items */
     {"ExpandAll", NULL, N_("E_xpand All"), "<control>E",
-     N_("Expand all threads"), G_CALLBACK(expand_all_cb)},
+     N_("Expand all threads"), G_CALLBACK(bw_expand_all_cb)},
     {"CollapseAll", NULL, N_("_Collapse All"), "<control>L",
-     N_("Collapse all expanded threads"), G_CALLBACK(collapse_all_cb)},
+     N_("Collapse all expanded threads"), G_CALLBACK(bw_collapse_all_cb)},
 #ifdef HAVE_GTKHTML
     {"ZoomIn", GTK_STOCK_ZOOM_IN, N_("Zoom _In"), "<control>plus",
-     N_("Increase magnification"), G_CALLBACK(zoom_in_cb)},
+     N_("Increase magnification"), G_CALLBACK(bw_zoom_in_cb)},
     {"ZoomOut", GTK_STOCK_ZOOM_OUT, N_("Zoom _Out"), "<control>minus",
-     N_("Decrease magnification"), G_CALLBACK(zoom_out_cb)},
+     N_("Decrease magnification"), G_CALLBACK(bw_zoom_out_cb)},
     /* To warn msgfmt that the % sign isn't a format specifier: */
     /* xgettext:no-c-format */
     {"Zoom100", GTK_STOCK_ZOOM_100, N_("Zoom _100%"), NULL,
-     N_("No magnification"), G_CALLBACK(zoom_100_cb)},
+     N_("No magnification"), G_CALLBACK(bw_zoom_100_cb)},
 #endif                          /* HAVE_GTKHTML */
     /* Mailbox menu item that does not require a mailbox */
     {"NextUnread", BALSA_PIXMAP_NEXT_UNREAD, N_("Next Unread Message"),
      "<control>N", N_("Next Unread Message"),
-     G_CALLBACK(next_unread_message_cb)},
+     G_CALLBACK(bw_next_unread_message_cb)},
     {"EmptyTrash", GTK_STOCK_REMOVE, N_("Empty _Trash"), NULL,
      N_("Delete messages from the Trash mailbox"),
-     G_CALLBACK(empty_trash_cb)},
+     G_CALLBACK(bw_empty_trash_cb)},
     /* Settings menu items */
     {"Toolbars", GTK_STOCK_EXECUTE, N_("_Toolbars..."), NULL,
      N_("Customize toolbars"), G_CALLBACK(customize_dialog_cb)},
     {"Identities", BALSA_PIXMAP_IDENTITY, N_("_Identities..."), NULL,
      N_("Create and set current identities"),
-     G_CALLBACK(ident_manage_dialog_cb)},
+     G_CALLBACK(bw_ident_manage_dialog_cb)},
     /* Help menu items */
     {"TableOfContents", GTK_STOCK_HELP, N_("_Contents"), "F1",
-     N_("Table of Contents"), G_CALLBACK(contents_cb)},
+     N_("Table of Contents"), G_CALLBACK(bw_contents_cb)},
     {"About", GTK_STOCK_ABOUT, N_("_About"), NULL, N_("About Balsa"),
-     G_CALLBACK(show_about_box)}
+     G_CALLBACK(bw_show_about_box)}
 };
 
 /* Actions that are sensitive only when a mailbox is selected: */
 static const GtkActionEntry mailbox_entries[] = { 
     /* Edit menu items */
     {"SelectAll", NULL, N_("Select _All"), "<control>A", NULL,
-     G_CALLBACK(select_all_cb)},
+     G_CALLBACK(bw_select_all_cb)},
     {"Find", GTK_STOCK_FIND, N_("_Find"), "<control>F", NULL,
-     G_CALLBACK(find_cb)},
+     G_CALLBACK(bw_find_cb)},
     {"FindNext", GTK_STOCK_FIND, N_("Find Ne_xt"), "<control>G", NULL,
-     G_CALLBACK(find_again_cb)},
+     G_CALLBACK(bw_find_again_cb)},
     /* Mailbox menu items */
     {"NextMessage", BALSA_PIXMAP_NEXT, N_("Next Message"), "N",
-     N_("Next Message"), G_CALLBACK(next_message_cb)},
+     N_("Next Message"), G_CALLBACK(bw_next_message_cb)},
     {"PreviousMessage", BALSA_PIXMAP_PREVIOUS, N_("Previous Message"), "P",
-     N_("Previous Message"), G_CALLBACK(previous_message_cb)},
+     N_("Previous Message"), G_CALLBACK(bw_previous_message_cb)},
     {"NextFlagged", BALSA_PIXMAP_NEXT_FLAGGED, N_("Next Flagged Message"),
      "<control><alt>F", N_("Next Flagged Message"),
-     G_CALLBACK(next_flagged_message_cb)},
+     G_CALLBACK(bw_next_flagged_message_cb)},
     {"MailboxHideMenu", NULL, N_("_Hide Messages")},
     {"ResetFilter", GTK_STOCK_CLEAR, N_("_Reset Filter"), NULL,
-     N_("Reset mailbox filter"), G_CALLBACK(reset_filter_cb)},
+     N_("Reset mailbox filter"), G_CALLBACK(bw_reset_filter_cb)},
     {"MailboxSelectAll", BALSA_PIXMAP_MARK_ALL, N_("_Select All"), NULL,
      N_("Select all messages in current mailbox"),
-     G_CALLBACK(mark_all_cb)},
+     G_CALLBACK(bw_mark_all_cb)},
     {"MailboxEdit", GTK_STOCK_PREFERENCES, N_("_Edit..."), NULL,
      N_("Edit the selected mailbox"), G_CALLBACK(mailbox_conf_edit_cb)},
     {"MailboxDelete", GTK_STOCK_REMOVE, N_("_Delete..."), NULL,
@@ -476,16 +471,16 @@ static const GtkActionEntry mailbox_entries[] = {
     {"Expunge", GTK_STOCK_REMOVE, N_("E_xpunge Deleted Messages"), NULL,
      N_("Expunge messages marked as deleted in the current mailbox"),
 #endif /* ENABLE_TOUCH_UI */
-     G_CALLBACK(mailbox_expunge_cb)},
+     G_CALLBACK(bw_mailbox_expunge_cb)},
     {"Close", GTK_STOCK_CANCEL, N_("_Close"), NULL, N_("Close mailbox"),
-     G_CALLBACK(mailbox_close_cb)},
+     G_CALLBACK(bw_mailbox_close_cb)},
     {"SelectFilters", GTK_STOCK_PROPERTIES, N_("Select _Filters"), NULL,
      N_("Select filters to be applied automatically to current mailbox"),
-     G_CALLBACK(filter_run_cb)},
+     G_CALLBACK(bw_filter_run_cb)},
 #if !defined(ENABLE_TOUCH_UI)
     {"RemoveDuplicates", GTK_STOCK_REMOVE, N_("_Remove Duplicates"), NULL,
      N_("Remove duplicated messages from the current mailbox"),
-     G_CALLBACK(remove_duplicates_cb)}
+     G_CALLBACK(bw_remove_duplicates_cb)}
 #endif /* ENABLE_TOUCH_UI */
 };
 
@@ -493,50 +488,50 @@ static const GtkActionEntry mailbox_entries[] = {
 static const GtkActionEntry message_entries[] = { 
     /* File menu item */
     {"Print", GTK_STOCK_PRINT, N_("_Print..."), "<control>P",
-     N_("Print current message"), G_CALLBACK(message_print_cb)},
+     N_("Print current message"), G_CALLBACK(bw_message_print_cb)},
     /* Message menu items */
     {"Reply", BALSA_PIXMAP_REPLY, N_("_Reply..."), "R",
-     N_("Reply to the current message"), G_CALLBACK(replyto_message_cb)},
+     N_("Reply to the current message"), G_CALLBACK(bw_replyto_message_cb)},
     {"ReplyAll", BALSA_PIXMAP_REPLY_ALL, N_("Reply to _All..."), "A",
      N_("Reply to all recipients of the current message"),
-     G_CALLBACK(replytoall_message_cb)},
+     G_CALLBACK(bw_replytoall_message_cb)},
     {"ReplyGroup", BALSA_PIXMAP_REPLY_GROUP, N_("Reply to _Group..."), "G",
-     N_("Reply to mailing list"), G_CALLBACK(replytogroup_message_cb)},
+     N_("Reply to mailing list"), G_CALLBACK(bw_replytogroup_message_cb)},
     {"StoreAddress", BALSA_PIXMAP_BOOK_RED, N_("_Store Address..."), "S",
      N_("Store address of sender in addressbook"),
-     G_CALLBACK(store_address_cb)},
+     G_CALLBACK(bw_store_address_cb)},
     {"SavePart", GTK_STOCK_SAVE, N_("Save Current Part..."), "<control>S",
      N_("Save currently displayed part of message"),
-     G_CALLBACK(save_current_part_cb)},
+     G_CALLBACK(bw_save_current_part_cb)},
     {"ViewSource", BALSA_PIXMAP_BOOK_OPEN, N_("_View Source..."),
      "<control>U", N_("View source form of the message"),
-     G_CALLBACK(view_msg_source_cb)},
+     G_CALLBACK(bw_view_msg_source_cb)},
     /* All three "Forward" actions and the "Pipe" action have the same
      * stock_id; the first in this list defines the action tied to the
      * toolbar's Forward button, so "ForwardDefault" must come before
      * the others. */
     {"ForwardDefault", BALSA_PIXMAP_FORWARD, N_("_Forward..."), "F",
      N_("Forward the current message"),
-     G_CALLBACK(forward_message_default_cb)},
+     G_CALLBACK(bw_forward_message_default_cb)},
 #if !defined(ENABLE_TOUCH_UI)
     {"ForwardAttached", BALSA_PIXMAP_FORWARD, N_("_Forward attached..."), "F",
      N_("Forward the current message as attachment"),
-     G_CALLBACK(forward_message_attached_cb)},
+     G_CALLBACK(bw_forward_message_attached_cb)},
     {"ForwardInline", BALSA_PIXMAP_FORWARD, N_("Forward _inline..."), NULL,
      N_("Forward the current message inline"),
-     G_CALLBACK(forward_message_inline_cb)},
+     G_CALLBACK(bw_forward_message_inline_cb)},
     {"Pipe", BALSA_PIXMAP_FORWARD, N_("_Pipe through..."), NULL,
      N_("Pipe the message through another program"),
-     G_CALLBACK(pipe_message_cb)},
+     G_CALLBACK(bw_pipe_message_cb)},
     {"NextPart", BALSA_PIXMAP_NEXT_PART, N_("_Next Part"), "<control>period",
-     N_("Next part in message"), G_CALLBACK(next_part_cb)},
+     N_("Next part in message"), G_CALLBACK(bw_next_part_cb)},
     {"PreviousPart", BALSA_PIXMAP_PREVIOUS_PART, N_("_Previous Part"),
      "<control>comma", N_("Previous part in message"),
-     G_CALLBACK(previous_part_cb)},
+     G_CALLBACK(bw_previous_part_cb)},
     {"CopyMessage", GTK_STOCK_COPY, N_("_Copy"), "<control>C",
-     N_("Copy message"), G_CALLBACK(message_copy_cb)},
+     N_("Copy message"), G_CALLBACK(bw_message_copy_cb)},
     {"SelectText", NULL, N_("_Select Text"), NULL,
-     N_("Select entire mail"), G_CALLBACK(message_select_all_cb)}
+     N_("Select entire mail"), G_CALLBACK(bw_message_select_all_cb)}
 #endif /* ENABLE_TOUCH_UI */
 };
 
@@ -547,24 +542,24 @@ static const GtkActionEntry modify_message_entries[] = {
 #if !defined(ENABLE_TOUCH_UI)
     {"MoveToTrash", GTK_STOCK_DELETE, N_("_Move to Trash"), "D",
      N_("Move the current message to Trash mailbox"),
-     G_CALLBACK(trash_message_cb)},
+     G_CALLBACK(bw_trash_message_cb)},
 #else  /* ENABLE_TOUCH_UI */
     {"MoveToTrash", GTK_STOCK_DELETE, N_("_Delete to Trash"), "D",
      N_("Move the current message to Trash mailbox"),
-     G_CALLBACK(trash_message_cb)},
+     G_CALLBACK(bw_trash_message_cb)},
     {"ToolbarToggleNew", BALSA_PIXMAP_MARKED_NEW, N_("_New"), NULL,
-     N_("Toggle New"), G_CALLBACK(toggle_new_message_cb)},
+     N_("Toggle New"), G_CALLBACK(bw_toggle_new_message_cb)},
 #endif /* ENABLE_TOUCH_UI */
     {"MessageToggleFlagMenu", NULL, N_("_Toggle Flag")},
     /* Message:toggle-flag submenu items */
     {"ToggleFlagged", BALSA_PIXMAP_INFO_FLAGGED, N_("_Flagged"), "X",
-     N_("Toggle flagged"), G_CALLBACK(toggle_flagged_message_cb)},
+     N_("Toggle flagged"), G_CALLBACK(bw_toggle_flagged_message_cb)},
     {"ToggleDeleted", GTK_STOCK_DELETE, N_("_Deleted"), "<control>D",
-     N_("Toggle deleted flag"), G_CALLBACK(toggle_deleted_message_cb)},
+     N_("Toggle deleted flag"), G_CALLBACK(bw_toggle_deleted_message_cb)},
     {"ToggleNew", BALSA_PIXMAP_INFO_NEW, N_("_New"), "<control>R",
-     N_("Toggle New"), G_CALLBACK(toggle_new_message_cb)},
+     N_("Toggle New"), G_CALLBACK(bw_toggle_new_message_cb)},
     {"ToggleAnswered", BALSA_PIXMAP_INFO_REPLIED, N_("_Answered"), NULL,
-     N_("Toggle Answered"), G_CALLBACK(toggle_answered_message_cb)},
+     N_("Toggle Answered"), G_CALLBACK(bw_toggle_answered_message_cb)},
 };
 
 /* Toggle items */
@@ -573,43 +568,43 @@ static const GtkToggleActionEntry toggle_entries[] = {
 #if !defined(ENABLE_TOUCH_UI)
     {"ShowMailboxTree", NULL, N_("_Show Mailbox Tree"), "F9",
      N_("Toggle display of mailbox and folder tree"),
-     G_CALLBACK(show_mbtree_cb), FALSE},
+     G_CALLBACK(bw_show_mbtree_cb), FALSE},
     {"ShowMailboxTabs", NULL, N_("Show Mailbox _Tabs"), NULL,
      N_("Toggle display of mailbox notebook tabs"),
-     G_CALLBACK(show_mbtabs_cb), FALSE},
+     G_CALLBACK(bw_show_mbtabs_cb), FALSE},
 #else  /* ENABLE_TOUCH_UI */
     {"SortDescending", NULL, N_("_Descending"), NULL,
      N_("Sort in a descending order"),
-     G_CALLBACK(toggle_order_cb), FALSE},
+     G_CALLBACK(bw_toggle_order_cb), FALSE},
     {"ViewFilter", NULL, N_("_View filter"), NULL,
      N_("Enable quick message index filter"),
-     G_CALLBACK(enable_view_filter_cb), FALSE},
+     G_CALLBACK(bw_enable_view_filter_cb), FALSE},
 #endif /* ENABLE_TOUCH_UI */
     {"Wrap", NULL, N_("_Wrap"), NULL, N_("Wrap message lines"),
-     G_CALLBACK(wrap_message_cb), FALSE},
+     G_CALLBACK(bw_wrap_message_cb), FALSE},
     /* Hide messages menu items */
     {"HideDeleted", NULL, N_("_Deleted"), NULL, NULL,
-     G_CALLBACK(hide_changed_cb), FALSE},
+     G_CALLBACK(bw_hide_changed_cb), FALSE},
     {"HideUndeleted", NULL, N_("Un_Deleted"), NULL, NULL,
-     G_CALLBACK(hide_changed_cb), FALSE},
+     G_CALLBACK(bw_hide_changed_cb), FALSE},
     {"HideRead", NULL, N_("_Read"), NULL, NULL,
-     G_CALLBACK(hide_changed_cb), FALSE},
+     G_CALLBACK(bw_hide_changed_cb), FALSE},
     {"HideUnread", NULL, N_("Un_read"), NULL, NULL,
-     G_CALLBACK(hide_changed_cb), FALSE},
+     G_CALLBACK(bw_hide_changed_cb), FALSE},
     {"HideFlagged", NULL, N_("_Flagged"), NULL, NULL,
-     G_CALLBACK(hide_changed_cb), FALSE},
+     G_CALLBACK(bw_hide_changed_cb), FALSE},
     {"HideUnflagged", NULL, N_("Un_flagged"), NULL, NULL,
-     G_CALLBACK(hide_changed_cb), FALSE},
+     G_CALLBACK(bw_hide_changed_cb), FALSE},
     {"HideAnswered", NULL, N_("_Answered"), NULL, NULL,
-     G_CALLBACK(hide_changed_cb), FALSE},
+     G_CALLBACK(bw_hide_changed_cb), FALSE},
     {"HideUnanswered", NULL, N_("Un_answered"), NULL, NULL,
-     G_CALLBACK(hide_changed_cb), FALSE},
+     G_CALLBACK(bw_hide_changed_cb), FALSE},
     /* Toolbar items not on any menu */
     {"ShowAllHeaders", BALSA_PIXMAP_SHOW_HEADERS, N_("All\nheaders"),
      NULL, N_("Show all headers"),
-     G_CALLBACK(show_all_headers_tool_cb), FALSE},
+     G_CALLBACK(bw_show_all_headers_tool_cb), FALSE},
     {"ShowPreviewPane", BALSA_PIXMAP_SHOW_PREVIEW, N_("Msg Preview"),
-     NULL, N_("Show preview pane"), G_CALLBACK(show_preview_pane_cb),
+     NULL, N_("Show preview pane"), G_CALLBACK(bw_show_preview_pane_cb),
      FALSE}
 };
 
@@ -947,7 +942,7 @@ balsa_window_class_init(BalsaWindowClass * klass)
     /* Signals */
     klass->identities_changed = NULL;
 
-    g_timeout_add(30000, (GSourceFunc) balsa_close_mailbox_on_timer, NULL);
+    g_timeout_add(30000, (GSourceFunc) bw_close_mailbox_on_timer, NULL);
 
 }
 
@@ -957,7 +952,7 @@ balsa_window_init(BalsaWindow * window)
 }
 
 static gboolean
-delete_cb(GtkWidget* main_window)
+bw_delete_cb(GtkWidget* main_window)
 {
 #ifdef BALSA_USE_THREADS
     /* we cannot leave main window disabled because compose windows
@@ -981,7 +976,7 @@ delete_cb(GtkWidget* main_window)
     return FALSE; /* allow delete */
 }
 static void
-size_allocate_cb(GtkWidget * widget, GtkAllocation * alloc)
+bw_size_allocate_cb(GtkWidget * widget, GtkAllocation * alloc)
 {
     if (balsa_app.show_mblist) {
 	GtkWidget *paned = gtk_widget_get_ancestor(widget, GTK_TYPE_PANED);
@@ -1034,7 +1029,7 @@ bw_set_view_filter(BalsaWindow * bw, gint filter_no, GtkWidget * entry)
     if (!index)
         return;
 
-    view_filter = balsa_window_get_view_filter(bw, FALSE);
+    view_filter = bw_get_view_filter(bw, FALSE);
     balsa_index_set_view_filter(BALSA_INDEX(index), filter_no,
                                 gtk_entry_get_text(GTK_ENTRY(entry)),
                                 view_filter);
@@ -1062,7 +1057,7 @@ bw_filter_entry_changed(GtkWidget *entry, GtkWidget *button)
    trees than via calling special routines... */
 
 static LibBalsaCondition *
-filter_sos_or_sor(const char *str, ConditionMatchType field)
+bw_filter_sos_or_sor(const char *str, ConditionMatchType field)
 {
     LibBalsaCondition *subject, *address, *retval;
 
@@ -1083,24 +1078,28 @@ filter_sos_or_sor(const char *str, ConditionMatchType field)
     return retval;
 }
 
-static LibBalsaCondition *filter_sos(const char *str)
+static LibBalsaCondition *
+bw_filter_sos(const char *str)
 {
-    return  filter_sos_or_sor(str, CONDITION_MATCH_FROM);
+    return  bw_filter_sos_or_sor(str, CONDITION_MATCH_FROM);
 }
 
-static LibBalsaCondition *filter_sor(const char *str)
+static LibBalsaCondition *
+bw_filter_sor(const char *str)
 {
-    return  filter_sos_or_sor(str, CONDITION_MATCH_TO);
+    return  bw_filter_sos_or_sor(str, CONDITION_MATCH_TO);
 }
 
-static LibBalsaCondition *filter_s(const char *str)
+static LibBalsaCondition *
+bw_filter_s(const char *str)
 {
     return (str && *str) ?
         libbalsa_condition_new_string
         (FALSE, CONDITION_MATCH_SUBJECT, g_strdup(str), NULL)
         : NULL;
 }
-static LibBalsaCondition *filter_body(const char *str)
+static LibBalsaCondition *
+bw_filter_body(const char *str)
 {
     return (str && *str) ?
         libbalsa_condition_new_string
@@ -1108,7 +1107,8 @@ static LibBalsaCondition *filter_body(const char *str)
         : NULL;
 }
 
-static LibBalsaCondition *filter_old(const char *str)
+static LibBalsaCondition *
+bw_filter_old(const char *str)
 {
     int days;
     if(str && sscanf(str, "%d", &days) == 1) {
@@ -1123,11 +1123,11 @@ static struct {
     char *str;
     LibBalsaCondition *(*filter)(const char *str);
 } view_filters[] = {
-    { N_("Subject or Sender Contains:"),    filter_sos  },
-    { N_("Subject or Recipient Contains:"), filter_sor  },
-    { N_("Subject Contains:"),              filter_s    },
-    { N_("Body Contains:"),                 filter_body },
-    { N_("Older than (days):"),             filter_old  }
+    { N_("Subject or Sender Contains:"),    bw_filter_sos  },
+    { N_("Subject or Recipient Contains:"), bw_filter_sor  },
+    { N_("Subject Contains:"),              bw_filter_s    },
+    { N_("Body Contains:"),                 bw_filter_body },
+    { N_("Older than (days):"),             bw_filter_old  }
 };
 static gboolean view_filters_translated = FALSE;
 
@@ -1410,7 +1410,7 @@ bw_get_ui_manager(BalsaWindow * window)
                                        threading_radio_entries,
                                        G_N_ELEMENTS
                                        (threading_radio_entries), 0,
-                                       G_CALLBACK(threading_radio_cb),
+                                       G_CALLBACK(bw_threading_radio_cb),
                                        window);
 
     gtk_ui_manager_insert_action_group(ui_manager, action_group, 0);
@@ -1420,7 +1420,7 @@ bw_get_ui_manager(BalsaWindow * window)
                                        sort_radio_entries,
                                        G_N_ELEMENTS
                                        (sort_radio_entries), 0,
-                                       G_CALLBACK(sort_change_cb),
+                                       G_CALLBACK(bw_sort_change_cb),
                                        window);
 
     gtk_ui_manager_insert_action_group(ui_manager, action_group, 0);
@@ -1549,16 +1549,16 @@ balsa_window_new()
     gtk_notebook_set_show_border (GTK_NOTEBOOK(window->notebook), FALSE);
     gtk_notebook_set_scrollable (GTK_NOTEBOOK (window->notebook), TRUE);
     g_signal_connect(G_OBJECT(window->notebook), "size_allocate",
-                     G_CALLBACK(notebook_size_alloc_cb), NULL);
+                     G_CALLBACK(bw_notebook_size_alloc_cb), NULL);
     g_signal_connect(G_OBJECT(window->notebook), "switch_page",
-                     G_CALLBACK(notebook_switch_page_cb), window);
+                     G_CALLBACK(bw_notebook_switch_page_cb), window);
     gtk_drag_dest_set (GTK_WIDGET (window->notebook), GTK_DEST_DEFAULT_ALL,
                        notebook_drop_types, NUM_DROP_TYPES,
                        GDK_ACTION_DEFAULT | GDK_ACTION_COPY | GDK_ACTION_MOVE);
     g_signal_connect(G_OBJECT (window->notebook), "drag-data-received",
-                     G_CALLBACK (notebook_drag_received_cb), NULL);
+                     G_CALLBACK (bw_notebook_drag_received_cb), NULL);
     g_signal_connect(G_OBJECT (window->notebook), "drag-motion",
-                     G_CALLBACK (notebook_drag_motion_cb), NULL);
+                     G_CALLBACK (bw_notebook_drag_motion_cb), NULL);
     balsa_app.notebook = window->notebook;
     g_object_add_weak_pointer(G_OBJECT(window->notebook),
 			      (gpointer) &balsa_app.notebook);
@@ -1566,7 +1566,7 @@ balsa_window_new()
     window->preview = balsa_message_new();
 
     g_signal_connect(G_OBJECT(window->preview), "select-part",
-                     G_CALLBACK(select_part_cb), window);
+                     G_CALLBACK(bw_select_part_cb), window);
 
     /* XXX */
     balsa_app.mblist =  BALSA_MBLIST(balsa_mblist_new());
@@ -1580,7 +1580,7 @@ balsa_window_new()
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(window->mblist),
                                    GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
     g_signal_connect(G_OBJECT(balsa_app.mblist), "size_allocate",
-		     G_CALLBACK(size_allocate_cb), NULL);
+		     G_CALLBACK(bw_size_allocate_cb), NULL);
     g_signal_connect_swapped(balsa_app.mblist, "has-unread-mailbox",
 		             G_CALLBACK(bw_enable_next_unread), window);
     balsa_mblist_default_signal_bindings(balsa_app.mblist);
@@ -1628,16 +1628,16 @@ balsa_window_new()
 #else
     bw_set_sensitive(window, "ViewFilter", balsa_app.enable_view_filter);
     g_signal_connect_after(G_OBJECT(window), "key_press_event",
-                     G_CALLBACK(open_mailbox_cb), NULL);
+                     G_CALLBACK(bw_open_mailbox_cb), NULL);
 #endif
 
     /* Disable menu items at start up */
     balsa_window_update_book_menus(window);
-    enable_mailbox_menus(window, NULL);
-    enable_message_menus(window, 0);
-    enable_edit_menus(window, NULL);
+    bw_enable_mailbox_menus(window, NULL);
+    bw_enable_message_menus(window, 0);
+    bw_enable_edit_menus(window, NULL);
 #ifdef HAVE_GTKHTML
-    enable_view_menus(window, NULL);
+    bw_enable_view_menus(window, NULL);
 #endif				/* HAVE_GTKHTML */
 #if !defined(ENABLE_TOUCH_UI)
     balsa_window_enable_continue(window);
@@ -1651,16 +1651,16 @@ balsa_window_new()
     bw_enable_next_unread(window, FALSE);
 
     g_signal_connect(G_OBJECT(window), "size_allocate",
-                     G_CALLBACK(mw_size_alloc_cb), NULL);
+                     G_CALLBACK(bw_size_alloc_cb), NULL);
     g_signal_connect(G_OBJECT (window), "destroy",
                      G_CALLBACK (gtk_main_quit), NULL);
     g_signal_connect(G_OBJECT(window), "delete-event",
-                     G_CALLBACK(delete_cb), NULL);
+                     G_CALLBACK(bw_delete_cb), NULL);
 
 #ifdef HAVE_NOTIFY
     /* Cancel new-mail notification when we get the focus. */
     g_signal_connect(G_OBJECT(window), "notify::is-active",
-                     G_CALLBACK(cancel_new_mail_notification), NULL);
+                     G_CALLBACK(bw_cancel_new_mail_notification), NULL);
 #endif
 
     gtk_widget_show_all(GTK_WIDGET(window));
@@ -1672,7 +1672,7 @@ balsa_window_new()
  * on whether there is a mailbox open. 
  */
 static void
-enable_expand_collapse(BalsaWindow * window, LibBalsaMailbox * mailbox)
+bw_enable_expand_collapse(BalsaWindow * window, LibBalsaMailbox * mailbox)
 {
     gboolean enable;
 
@@ -1709,7 +1709,7 @@ bw_next_unread_mailbox(LibBalsaMailbox * current_mailbox)
 }
 
 static void
-enable_mailbox_menus(BalsaWindow * window, BalsaIndex * index)
+bw_enable_mailbox_menus(BalsaWindow * window, BalsaIndex * index)
 {
     LibBalsaMailbox *mailbox = NULL;
     BalsaMailboxNode *mbnode = NULL;
@@ -1753,22 +1753,22 @@ enable_mailbox_menus(BalsaWindow * window, BalsaIndex * index)
 
     if (mailbox) {
 #if defined(ENABLE_TOUCH_UI)
-        balsa_window_set_sort_menu(window,
+        bw_set_sort_menu(window,
                                    libbalsa_mailbox_get_sort_field(mailbox),
                                    libbalsa_mailbox_get_sort_type(mailbox));
 #else
-	balsa_window_set_threading_menu(window,
+	bw_set_threading_menu(window,
 					libbalsa_mailbox_get_threading_type
 					(mailbox));
 #endif
-	balsa_window_set_filter_menu(window,
+	bw_set_filter_menu(window,
 				     libbalsa_mailbox_get_filter(mailbox));
     }
 
     bw_enable_next_unread(window, libbalsa_mailbox_get_unread(mailbox) > 0
                           || bw_next_unread_mailbox(mailbox));
 
-    enable_expand_collapse(window, mailbox);
+    bw_enable_expand_collapse(window, mailbox);
 }
 
 void
@@ -1787,7 +1787,7 @@ balsa_window_update_book_menus(BalsaWindow * window)
  * on if there is a message selected. 
  */
 static void
-enable_message_menus(BalsaWindow * window, guint msgno)
+bw_enable_message_menus(BalsaWindow * window, guint msgno)
 {
     gboolean enable, enable_mod, enable_store;
     BalsaIndex *bindex = BALSA_INDEX(window->current_index);
@@ -1812,7 +1812,7 @@ enable_message_menus(BalsaWindow * window, guint msgno)
  * and select all buttons
  */
 static void
-enable_edit_menus(BalsaWindow * window, BalsaMessage * bm)
+bw_enable_edit_menus(BalsaWindow * window, BalsaMessage * bm)
 {
 #if !defined(ENABLE_TOUCH_UI)
     gboolean enable = (bm && balsa_message_can_select(bm));
@@ -1822,7 +1822,7 @@ enable_edit_menus(BalsaWindow * window, BalsaMessage * bm)
     bw_set_sensitive(window, "SelectText",  enable);
 #endif /* ENABLE_TOUCH_UI */
 #ifdef HAVE_GTKHTML
-    enable_view_menus(window, bm);
+    bw_enable_view_menus(window, bm);
 #endif				/* HAVE_GTKHTML */
 }
 
@@ -1831,7 +1831,7 @@ enable_edit_menus(BalsaWindow * window, BalsaMessage * bm)
  * Enable/disable the Zoom menu items on the View menu.
  */
 static void
-enable_view_menus(BalsaWindow * window, BalsaMessage * bm)
+bw_enable_view_menus(BalsaWindow * window, BalsaMessage * bm)
 {
     gboolean enable = bm && balsa_message_can_zoom(bm);
 
@@ -1914,7 +1914,7 @@ balsa_window_enable_continue(BalsaWindow * window)
 
 #if !defined(ENABLE_TOUCH_UI)
 static void
-enable_part_menu_items(BalsaWindow * window)
+bw_enable_part_menu_items(BalsaWindow * window)
 {
     BalsaMessage *msg = window ? BALSA_MESSAGE(window->preview) : NULL;
 
@@ -1925,7 +1925,7 @@ enable_part_menu_items(BalsaWindow * window)
 }
 
 static void
-balsa_window_set_threading_menu(BalsaWindow * window, int option)
+bw_set_threading_menu(BalsaWindow * window, int option)
 {
     GtkWidget *index;
     BalsaMailboxNode *mbnode;
@@ -1944,7 +1944,7 @@ balsa_window_set_threading_menu(BalsaWindow * window, int option)
     if ((index = balsa_window_find_current_index(window))
 	&& (mbnode = BALSA_INDEX(index)->mailbox_node)
 	&& (mailbox = mbnode->mailbox))
-	enable_expand_collapse(window, mailbox);
+	bw_enable_expand_collapse(window, mailbox);
 }
 #endif /* ENABLE_TOUCH_UI */
 
@@ -1968,7 +1968,7 @@ static const struct {
 };
 
 static void
-balsa_window_set_filter_menu(BalsaWindow * window, int mask)
+bw_set_filter_menu(BalsaWindow * window, int mask)
 {
     unsigned i;
 
@@ -1978,12 +1978,12 @@ balsa_window_set_filter_menu(BalsaWindow * window, int mask)
             gtk_action_group_get_action(window->action_group,
                                         hide_states[i].action_name);
         g_signal_handlers_block_by_func(G_OBJECT(action),
-                                        G_CALLBACK(hide_changed_cb),
+                                        G_CALLBACK(bw_hide_changed_cb),
                                         window);
         gtk_toggle_action_set_active(GTK_TOGGLE_ACTION(action),
                                      (mask >> states_index) & 1);
         g_signal_handlers_unblock_by_func(G_OBJECT(action),
-                                          G_CALLBACK(hide_changed_cb),
+                                          G_CALLBACK(bw_hide_changed_cb),
                                           window);
     }
 }
@@ -2014,7 +2014,7 @@ balsa_window_close_mbnode(BalsaWindow * window, BalsaMailboxNode * mbnode)
 }
 
 static void
-mailbox_tab_size_request(GtkWidget * widget, GtkRequisition * requisition,
+bw_mailbox_tab_size_request(GtkWidget * widget, GtkRequisition * requisition,
                          gpointer user_data)
 {
     gint focus_width;
@@ -2058,7 +2058,7 @@ bw_notebook_label_notify(LibBalsaMailbox * mailbox, GtkLabel * lab)
 }
 
 static GtkWidget *
-balsa_notebook_label_new(BalsaMailboxNode * mbnode)
+bw_notebook_label_new(BalsaMailboxNode * mbnode)
 {
     GtkWidget *close_pix;
     GtkWidget *box = gtk_hbox_new(FALSE, 4);
@@ -2095,7 +2095,7 @@ balsa_notebook_label_new(BalsaMailboxNode * mbnode)
     gtk_widget_set_size_request(but, w + 2, h + 2);
 
     g_signal_connect(G_OBJECT(but), "size-request",
-                     G_CALLBACK(mailbox_tab_size_request), NULL);
+                     G_CALLBACK(bw_mailbox_tab_size_request), NULL);
 
     gtk_button_set_relief(GTK_BUTTON(but), GTK_RELIEF_NONE);
     gtk_container_add(GTK_CONTAINER(but), close_pix);
@@ -2106,7 +2106,7 @@ balsa_notebook_label_new(BalsaMailboxNode * mbnode)
     gtk_container_add(GTK_CONTAINER(ev), box);
 
     g_signal_connect(G_OBJECT(but), "clicked",
-                     G_CALLBACK(mailbox_tab_close_cb), mbnode);
+                     G_CALLBACK(bw_mailbox_tab_close_cb), mbnode);
 
 #if GTK_CHECK_VERSION(2, 11, 0)
     gtk_widget_set_tooltip_text(ev, mbnode->mailbox->url);
@@ -2125,7 +2125,7 @@ struct bw_open_mbnode_info {
 };
 
 static void
-real_open_mbnode(struct bw_open_mbnode_info * info)
+bw_real_open_mbnode(struct bw_open_mbnode_info * info)
 {
     BalsaIndex * index;
     GtkWidget *label;
@@ -2144,7 +2144,7 @@ real_open_mbnode(struct bw_open_mbnode_info * info)
 #endif
     /* FIXME: the check is not needed in non-MT-mode */
     gdk_threads_enter();
-    if (!info->window || is_open_mailbox(mailbox = info->mbnode->mailbox)) {
+    if (!info->window || bw_is_open_mailbox(mailbox = info->mbnode->mailbox)) {
 	gdk_threads_leave();
 #ifdef BALSA_USE_THREADS
         pthread_mutex_unlock(&open_lock);
@@ -2157,7 +2157,7 @@ real_open_mbnode(struct bw_open_mbnode_info * info)
     index = BALSA_INDEX(balsa_index_new());
 
     message = g_strdup_printf(_("Opening %s"), mailbox->name);
-    balsa_window_increase_activity(info->window, message);
+    bw_increase_activity(info->window, message);
 
     /* Call balsa_index_load_mailbox_node NOT holding the gdk lock. */
     gdk_threads_leave();
@@ -2166,7 +2166,7 @@ real_open_mbnode(struct bw_open_mbnode_info * info)
     gdk_threads_enter();
 
     if (info->window) {
-	balsa_window_decrease_activity(info->window, message);
+	bw_decrease_activity(info->window, message);
 	g_object_remove_weak_pointer(G_OBJECT(info->window),
 				     (gpointer) &info->window);
     }
@@ -2189,12 +2189,12 @@ real_open_mbnode(struct bw_open_mbnode_info * info)
     }
     g_assert(index->mailbox_node);
     g_signal_connect(G_OBJECT (index), "index-changed",
-                     G_CALLBACK (balsa_window_index_changed_cb),
+                     G_CALLBACK (bw_index_changed_cb),
                      info->window);
 
     /* if(config_short_label) label = gtk_label_new(mbnode->mailbox->name);
        else */
-    label = balsa_notebook_label_new(info->mbnode);
+    label = bw_notebook_label_new(info->mbnode);
 
     /* store for easy access */
     scroll = gtk_scrolled_window_new(NULL, NULL);
@@ -2218,15 +2218,15 @@ real_open_mbnode(struct bw_open_mbnode_info * info)
                                   (info->window->notebook),
                                   page_num);
 
-    /* switch_page_cb has now set the hide-states for this mailbox, so
+    /* bw_switch_page_cb has now set the hide-states for this mailbox, so
      * we can set up the view-filter: */
-    view_filter = balsa_window_get_view_filter(info->window, TRUE);
+    view_filter = bw_get_view_filter(info->window, TRUE);
     libbalsa_mailbox_set_view_filter(mailbox, view_filter,
                                      FALSE);
     libbalsa_condition_unref(view_filter);
     libbalsa_mailbox_make_view_filter_persistent(mailbox);
 
-    register_open_mailbox(mailbox);
+    bw_register_open_mailbox(mailbox);
     /* scroll may select the message and GtkTreeView does not like selecting
      * without being shown first. */
     libbalsa_mailbox_set_threading(mailbox,
@@ -2255,11 +2255,11 @@ balsa_window_real_open_mbnode(BalsaWindow * window, BalsaMailboxNode * mbnode)
     info->mbnode = mbnode;
     g_object_ref(mbnode);
 #ifdef BALSA_USE_THREADS
-    pthread_create(&open_thread, NULL, (void*(*)(void*))real_open_mbnode, 
+    pthread_create(&open_thread, NULL, (void*(*)(void*))bw_real_open_mbnode, 
                    info);
     pthread_detach(open_thread);
 #else
-    real_open_mbnode(info);
+    bw_real_open_mbnode(info);
 #endif
 }
 
@@ -2298,7 +2298,7 @@ balsa_window_real_close_mbnode(BalsaWindow * window,
             gtk_notebook_get_nth_page(GTK_NOTEBOOK(balsa_app.notebook), i);
 
         gtk_notebook_remove_page(GTK_NOTEBOOK(window->notebook), i);
-        unregister_open_mailbox(mbnode->mailbox);
+        bw_unregister_open_mailbox(mbnode->mailbox);
 
         /* If this is the last notebook page clear the message preview
            and the status bar */
@@ -2310,7 +2310,7 @@ balsa_window_real_close_mbnode(BalsaWindow * window,
             guint context_id;
 
             gtk_window_set_title(GTK_WINDOW(window), "Balsa");
-            balsa_window_idle_replace(window, NULL);
+            bw_idle_replace(window, NULL);
 
             statusbar = GTK_STATUSBAR(window->statusbar);
             context_id = gtk_statusbar_get_context_id(statusbar, "BalsaWindow mailbox");
@@ -2318,9 +2318,9 @@ balsa_window_real_close_mbnode(BalsaWindow * window,
             gtk_statusbar_push(statusbar, context_id, "Mailbox closed");
 
             /* Disable menus */
-            enable_mailbox_menus(window, NULL);
-            enable_message_menus(window, 0);
-            enable_edit_menus(window, NULL);
+            bw_enable_mailbox_menus(window, NULL);
+            bw_enable_message_menus(window, 0);
+            bw_enable_edit_menus(window, NULL);
 	    if (window->current_index)
 		g_object_remove_weak_pointer(G_OBJECT(window->current_index),
 					     (gpointer)
@@ -2354,7 +2354,7 @@ balsa_identities_changed(BalsaWindow *bw)
 }
 
 static gboolean
-balsa_close_mailbox_on_timer(void)
+bw_close_mailbox_on_timer(void)
 {
     time_t current_time;
     GtkWidget *page;
@@ -2385,7 +2385,7 @@ balsa_close_mailbox_on_timer(void)
             if (balsa_app.debug)
                 fprintf(stderr, "Closing Page %d unused for %d s\n",
                         i, delta_time);
-            unregister_open_mailbox(index->mailbox_node->mailbox);
+            bw_unregister_open_mailbox(index->mailbox_node->mailbox);
             gtk_notebook_remove_page(GTK_NOTEBOOK(balsa_app.notebook), i);
             if (i < c)
                 c--;
@@ -2399,7 +2399,7 @@ balsa_close_mailbox_on_timer(void)
 static void
 balsa_window_destroy(GtkObject * object)
 {
-    balsa_window_idle_remove(BALSA_WINDOW(object));
+    bw_idle_remove(BALSA_WINDOW(object));
 
     if (GTK_OBJECT_CLASS(balsa_window_parent_class)->destroy)
         GTK_OBJECT_CLASS(balsa_window_parent_class)->
@@ -2431,7 +2431,7 @@ balsa_window_refresh(BalsaWindow * window)
     paned = gtk_widget_get_ancestor(balsa_app.notebook, GTK_TYPE_VPANED);
     g_assert(paned != NULL);
     if (balsa_app.previewpane) {
-        balsa_window_idle_replace(window, bindex);
+        bw_idle_replace(window, bindex);
 	gtk_paned_set_position(GTK_PANED(paned), balsa_app.notebook_height);
     } else {
 	/* Set the height to something really big (those new hi-res
@@ -2451,7 +2451,8 @@ static pthread_mutex_t open_list_lock = PTHREAD_MUTEX_INITIALIZER;
 #define LOCK_OPEN_LIST 
 #define UNLOCK_OPEN_LIST
 #endif
-static void register_open_mailbox(LibBalsaMailbox *m)
+static void
+bw_register_open_mailbox(LibBalsaMailbox *m)
 {
     LOCK_OPEN_LIST;
     balsa_app.open_mailbox_list =
@@ -2459,7 +2460,8 @@ static void register_open_mailbox(LibBalsaMailbox *m)
     UNLOCK_OPEN_LIST;
     libbalsa_mailbox_set_open(m, TRUE);
 }
-static void unregister_open_mailbox(LibBalsaMailbox *m)
+static void
+bw_unregister_open_mailbox(LibBalsaMailbox *m)
 {
     LOCK_OPEN_LIST;
     balsa_app.open_mailbox_list =
@@ -2467,7 +2469,8 @@ static void unregister_open_mailbox(LibBalsaMailbox *m)
     UNLOCK_OPEN_LIST;
     libbalsa_mailbox_set_open(m, FALSE);
 }
-static gboolean is_open_mailbox(LibBalsaMailbox *m)
+static gboolean
+bw_is_open_mailbox(LibBalsaMailbox *m)
 {
     GList *res;
     LOCK_OPEN_LIST;
@@ -2477,7 +2480,7 @@ static gboolean is_open_mailbox(LibBalsaMailbox *m)
 }
 
 static void
-contents_cb(void)
+bw_contents_cb(void)
 {
     GError *err = NULL;
 
@@ -2493,7 +2496,7 @@ contents_cb(void)
  * show the about box for Balsa
  */
 static void
-show_about_box(BalsaWindow * window)
+bw_show_about_box(BalsaWindow * window)
 {
     const gchar *authors[] = {
         "Balsa Maintainers <balsa-maintainer@theochem.kth.se>:",
@@ -2572,7 +2575,7 @@ show_about_box(BalsaWindow * window)
  *
  */
 static void
-check_mailbox_list(GList * mailbox_list)
+bw_check_mailbox_list(GList * mailbox_list)
 {
     GList *list;
     LibBalsaMailbox *mailbox;
@@ -2590,7 +2593,7 @@ check_mailbox_list(GList * mailbox_list)
 
 /*Callback to check a mailbox in a balsa-mblist */
 static gboolean
-mailbox_check_func(GtkTreeModel * model, GtkTreePath * path,
+bw_mailbox_check_func(GtkTreeModel * model, GtkTreePath * path,
 		   GtkTreeIter * iter, GSList ** list)
 {
     BalsaMailboxNode *mbnode;
@@ -2600,7 +2603,7 @@ mailbox_check_func(GtkTreeModel * model, GtkTreePath * path,
 
     if (mbnode->mailbox) {	/* mailbox, not a folder */
 	if (!LIBBALSA_IS_MAILBOX_IMAP(mbnode->mailbox) ||
-	    imap_check_test(mbnode->dir ? mbnode->dir :
+	    bw_imap_check_test(mbnode->dir ? mbnode->dir :
 			    libbalsa_mailbox_imap_get_path
 			    (LIBBALSA_MAILBOX_IMAP(mbnode->mailbox)))) {
 	    g_object_ref(mbnode->mailbox);
@@ -2617,7 +2620,7 @@ mailbox_check_func(GtkTreeModel * model, GtkTreePath * path,
  * Called from mutt_buffy_check
  */
 static gboolean
-imap_check_test(const gchar * path)
+bw_imap_check_test(const gchar * path)
 {
     /* path has been parsed, so it's just the folder path */
     if (balsa_app.check_imap && balsa_app.check_imap_inbox)
@@ -2628,7 +2631,7 @@ imap_check_test(const gchar * path)
 
 #if BALSA_USE_THREADS
 static void
-progress_dialog_destroy_cb(GtkWidget * widget, gpointer data)
+bw_progress_dialog_destroy_cb(GtkWidget * widget, gpointer data)
 {
     progress_dialog = NULL;
     progress_dialog_source = NULL;
@@ -2636,7 +2639,7 @@ progress_dialog_destroy_cb(GtkWidget * widget, gpointer data)
     progress_dialog_bar = NULL;
 }
 static void
-progress_dialog_response_cb(GtkWidget* dialog, gint response)
+bw_progress_dialog_response_cb(GtkWidget* dialog, gint response)
 {
     if(response == GTK_RESPONSE_CLOSE)
         /* this should never be done in response handler, but... */
@@ -2662,9 +2665,9 @@ ensure_check_mail_dialog(BalsaWindow * window)
 			   "progress_dialog", "Balsa");
         
     g_signal_connect(G_OBJECT(progress_dialog), "destroy",
-		     G_CALLBACK(progress_dialog_destroy_cb), NULL);
+		     G_CALLBACK(bw_progress_dialog_destroy_cb), NULL);
     g_signal_connect(G_OBJECT(progress_dialog), "response",
-		     G_CALLBACK(progress_dialog_response_cb), NULL);
+		     G_CALLBACK(bw_progress_dialog_response_cb), NULL);
     
     progress_dialog_source = gtk_label_new(_("Checking Mail..."));
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(progress_dialog)->vbox),
@@ -2717,12 +2720,12 @@ check_new_messages_real(BalsaWindow * window, int type)
 	ensure_check_mail_dialog(window);
 
     gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
-			   (GtkTreeModelForeachFunc) mailbox_check_func,
+			   (GtkTreeModelForeachFunc) bw_mailbox_check_func,
 			   &list);
 
     /* initiate threads */
     pthread_create(&get_mail_thread,
-                   NULL, (void *) &check_messages_thread, (void *) list);
+                   NULL, (void *) &bw_check_messages_thread, (void *) list);
     
     /* Detach so we don't need to pthread_join
      * This means that all resources will be
@@ -2731,11 +2734,11 @@ check_new_messages_real(BalsaWindow * window, int type)
     pthread_detach(get_mail_thread);
 #else
 
-    /* NOT USED: libbalsa_notify_start_check(imap_check_test); */
-    check_mailbox_list(balsa_app.inbox_input);
+    /* NOT USED: libbalsa_notify_start_check(bw_imap_check_test); */
+    bw_check_mailbox_list(balsa_app.inbox_input);
 
     gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
-			   (GtkTreeModelForeachFunc) mailbox_check_func,
+			   (GtkTreeModelForeachFunc) bw_mailbox_check_func,
 			   &list);
     g_slist_foreach(list, (GFunc) libbalsa_mailbox_check, NULL);
     g_slist_foreach(list, (GFunc) g_object_unref, NULL);
@@ -2743,11 +2746,11 @@ check_new_messages_real(BalsaWindow * window, int type)
 #endif
 }
 
-/* send_receive_messages_cb:
+/* bw_send_receive_messages_cb:
    check messages first to satisfy those that use smtp-after-pop.
 */
 static void
-send_receive_messages_cb(GtkAction * action, gpointer data)
+bw_send_receive_messages_cb(GtkAction * action, gpointer data)
 {
     check_new_messages_real(data, TYPE_CALLBACK);
     libbalsa_process_queue(balsa_app.outbox, balsa_find_sentbox_by_url,
@@ -2793,19 +2796,19 @@ check_new_messages_count(LibBalsaMailbox * mailbox, gboolean notify)
             has_new = 0;
 
         if (num_new || has_new)
-	    display_new_mail_notification(num_new, has_new);
+	    bw_display_new_mail_notification(num_new, has_new);
     }
 
     info->unread_messages = mailbox->unread_messages;
     info->has_unread_messages = mailbox->has_unread_messages;
 }
 
-/* send_outbox_messages_cb:
+/* bw_send_outbox_messages_cb:
    tries again to send the messages queued in outbox.
 */
 
 static void
-send_outbox_messages_cb(GtkAction * action, gpointer data)
+bw_send_outbox_messages_cb(GtkAction * action, gpointer data)
 {
     libbalsa_process_queue(balsa_app.outbox, balsa_find_sentbox_by_url,
 #if ENABLE_ESMTP
@@ -2817,7 +2820,7 @@ send_outbox_messages_cb(GtkAction * action, gpointer data)
 #ifdef HAVE_GTK_PRINT
 /* Callback for `Page setup' item on the `File' menu */
 static void
-page_setup_cb(GtkAction * action, gpointer data)
+bw_page_setup_cb(GtkAction * action, gpointer data)
 {
     message_print_page_setup(GTK_WINDOW(data));
 }
@@ -2826,7 +2829,7 @@ page_setup_cb(GtkAction * action, gpointer data)
 /* Callback for `Print current message' item on the `File' menu, 
  * and the toolbar button. */
 static void
-message_print_cb(GtkAction * action, gpointer data)
+bw_message_print_cb(GtkAction * action, gpointer data)
 {
     GtkWidget *index;
     BalsaIndex *bindex;
@@ -2852,7 +2855,7 @@ message_print_cb(GtkAction * action, gpointer data)
 /* this one is called only in the threaded code */
 #ifdef BALSA_USE_THREADS
 static void
-balsa_window_mailbox_check(LibBalsaMailbox * mailbox)
+bw_mailbox_check(LibBalsaMailbox * mailbox)
 {
     MailThreadMessage *threadmessage;
     gchar *string = NULL;
@@ -2873,7 +2876,7 @@ balsa_window_mailbox_check(LibBalsaMailbox * mailbox)
 }
 
 static void
-check_messages_thread(GSList * list)
+bw_check_messages_thread(GSList * list)
 {
     /*  
      *  It is assumed that this will always be called as a pthread,
@@ -2885,9 +2888,9 @@ check_messages_thread(GSList * list)
     pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
 
     MSGMAILTHREAD(threadmessage, LIBBALSA_NTFY_SOURCE, NULL, "POP3", 0, 0);
-    check_mailbox_list(balsa_app.inbox_input);
+    bw_check_mailbox_list(balsa_app.inbox_input);
 
-    g_slist_foreach(list, (GFunc) balsa_window_mailbox_check, NULL);
+    g_slist_foreach(list, (GFunc) bw_mailbox_check, NULL);
     g_slist_foreach(list, (GFunc) g_object_unref, NULL);
     g_slist_free(list);
 
@@ -3138,7 +3141,7 @@ send_progress_notify_cb(GIOChannel * source, GIOCondition condition,
     mailbox.
 */
 static gchar*
-get_new_message_notification_string(int num_new, int num_total)
+bw_get_new_message_notification_string(int num_new, int num_total)
 {
     return num_new > 0 ?
 	g_strdup_printf(ngettext("You have received %d new message.",
@@ -3155,7 +3158,7 @@ static NotifyNotification *new_mail_note = NULL;
 #endif
 
 static void
-display_new_mail_notification(int num_new, int has_new)
+bw_display_new_mail_notification(int num_new, int has_new)
 {
     static GtkWidget *dlg = NULL;
     static gint num_total = 0;
@@ -3220,7 +3223,7 @@ display_new_mail_notification(int num_new, int has_new)
 #ifdef HAVE_NOTIFY
     }
 
-    msg = get_new_message_notification_string(num_new, num_total);
+    msg = bw_get_new_message_notification_string(num_new, num_total);
     if (new_mail_note) {
         notify_notification_update(new_mail_note, "Balsa", msg, 
                                    GTK_STOCK_DIALOG_INFO);
@@ -3230,7 +3233,7 @@ display_new_mail_notification(int num_new, int has_new)
         gtk_label_set_text(GTK_LABEL(GTK_MESSAGE_DIALOG(dlg)->label), msg);
 #else
 
-    msg = get_new_message_notification_string(num_new, num_total);
+    msg = bw_get_new_message_notification_string(num_new, num_total);
     gtk_label_set_text(GTK_LABEL(GTK_MESSAGE_DIALOG(dlg)->label), msg);
 #endif
     g_free(msg);
@@ -3238,7 +3241,7 @@ display_new_mail_notification(int num_new, int has_new)
 
 #ifdef HAVE_NOTIFY
 static gboolean
-cancel_new_mail_notification(void)
+bw_cancel_new_mail_notification(void)
 {
     if (new_mail_note
         && gtk_window_is_active(GTK_WINDOW(balsa_app.main_window))) {
@@ -3260,7 +3263,7 @@ balsa_window_find_current_index(BalsaWindow * window)
 
 
 static void
-new_message_cb(GtkAction * action, gpointer data)
+bw_new_message_cb(GtkAction * action, gpointer data)
 {
     BalsaSendmsg *smwindow;
 
@@ -3268,27 +3271,27 @@ new_message_cb(GtkAction * action, gpointer data)
 
 #if !defined(ENABLE_TOUCH_UI)
     g_signal_connect(G_OBJECT(smwindow->window), "destroy",
-                     G_CALLBACK(send_msg_window_destroy_cb), data);
+                     G_CALLBACK(bw_send_msg_window_destroy_cb), data);
 #endif /*ENABLE_TOUCH_UI */
 }
 
 
 static void
-replyto_message_cb(GtkAction * action, gpointer data)
+bw_replyto_message_cb(GtkAction * action, gpointer data)
 {
     balsa_message_reply(balsa_window_find_current_index
                         (BALSA_WINDOW(data)));
 }
 
 static void
-replytoall_message_cb(GtkAction * action, gpointer data)
+bw_replytoall_message_cb(GtkAction * action, gpointer data)
 {
     balsa_message_replytoall(balsa_window_find_current_index
                              (BALSA_WINDOW(data)));
 }
 
 static void
-replytogroup_message_cb(GtkAction * action, gpointer data)
+bw_replytogroup_message_cb(GtkAction * action, gpointer data)
 {
     balsa_message_replytogroup(balsa_window_find_current_index
                                (BALSA_WINDOW(data)));
@@ -3296,14 +3299,14 @@ replytogroup_message_cb(GtkAction * action, gpointer data)
 
 #if !defined(ENABLE_TOUCH_UI)
 static void
-forward_message_attached_cb(GtkAction * action, gpointer data)
+bw_forward_message_attached_cb(GtkAction * action, gpointer data)
 {
     balsa_message_forward_attached(balsa_window_find_current_index
                                    (BALSA_WINDOW(data)));
 }
 
 static void
-forward_message_inline_cb(GtkAction * action, gpointer data)
+bw_forward_message_inline_cb(GtkAction * action, gpointer data)
 {
     balsa_message_forward_inline(balsa_window_find_current_index
                                  (BALSA_WINDOW(data)));
@@ -3311,7 +3314,7 @@ forward_message_inline_cb(GtkAction * action, gpointer data)
 #endif /* ENABLE_TOUCH_UI */
 
 static void
-forward_message_default_cb(GtkAction * action, gpointer data)
+bw_forward_message_default_cb(GtkAction * action, gpointer data)
 {
     balsa_message_forward_default(balsa_window_find_current_index
                                   (BALSA_WINDOW(data)));
@@ -3319,7 +3322,7 @@ forward_message_default_cb(GtkAction * action, gpointer data)
 
 #if !defined(ENABLE_TOUCH_UI)
 static void
-pipe_message_cb(GtkAction * action, gpointer data)
+bw_pipe_message_cb(GtkAction * action, gpointer data)
 {
     balsa_index_pipe(BALSA_INDEX
                      (balsa_window_find_current_index
@@ -3328,7 +3331,7 @@ pipe_message_cb(GtkAction * action, gpointer data)
 #endif /* ENABLE_TOUCH_UI */
 
 static void
-continue_message_cb(GtkAction * action, gpointer data)
+bw_continue_message_cb(GtkAction * action, gpointer data)
 {
     GtkWidget *index;
 
@@ -3342,7 +3345,7 @@ continue_message_cb(GtkAction * action, gpointer data)
 
 
 static void
-next_message_cb(GtkAction * action, gpointer data)
+bw_next_message_cb(GtkAction * action, gpointer data)
 {
     balsa_index_select_next(
         BALSA_INDEX(balsa_window_find_current_index(BALSA_WINDOW(data))));
@@ -3365,7 +3368,7 @@ balsa_window_next_unread(BalsaWindow * window)
         if (!balsa_index_select_next_unread(index)) {
             /* All unread messages must be hidden; we assume that the
              * user wants to see them, and try again. */
-            reset_filter_cb(NULL, window);
+            bw_reset_filter_cb(NULL, window);
             balsa_index_select_next_unread(index);
         }
         return FALSE;
@@ -3403,20 +3406,20 @@ balsa_window_next_unread(BalsaWindow * window)
 }
 
 static void
-next_unread_message_cb(GtkAction * action, gpointer data)
+bw_next_unread_message_cb(GtkAction * action, gpointer data)
 {
     balsa_window_next_unread(BALSA_WINDOW(data));
 }
 
 static void
-next_flagged_message_cb(GtkAction * action, gpointer data)
+bw_next_flagged_message_cb(GtkAction * action, gpointer data)
 {
     balsa_index_select_next_flagged(
         BALSA_INDEX(balsa_window_find_current_index(BALSA_WINDOW(data))));
 }
 
 static void
-previous_message_cb(GtkAction * action, gpointer data)
+bw_previous_message_cb(GtkAction * action, gpointer data)
 {
     balsa_index_select_previous(
         BALSA_INDEX(balsa_window_find_current_index(BALSA_WINDOW(data))));
@@ -3424,28 +3427,29 @@ previous_message_cb(GtkAction * action, gpointer data)
 
 #if !defined(ENABLE_TOUCH_UI)
 static void
-next_part_cb(GtkAction * action, gpointer data)
+bw_next_part_cb(GtkAction * action, gpointer data)
 {
     BalsaWindow *bw = BALSA_WINDOW(data);
     balsa_message_next_part(BALSA_MESSAGE(bw->preview));
-    enable_edit_menus(bw, BALSA_MESSAGE(bw->preview));
-    enable_part_menu_items(bw);
+    bw_enable_edit_menus(bw, BALSA_MESSAGE(bw->preview));
+    bw_enable_part_menu_items(bw);
 }
 
 static void
-previous_part_cb(GtkAction * action, gpointer data)
+bw_previous_part_cb(GtkAction * action, gpointer data)
 {
     BalsaWindow *bw = BALSA_WINDOW(data);
     balsa_message_previous_part(BALSA_MESSAGE(bw->preview));
-    enable_edit_menus(bw, BALSA_MESSAGE(bw->preview));
-    enable_part_menu_items(bw);
+    bw_enable_edit_menus(bw, BALSA_MESSAGE(bw->preview));
+    bw_enable_part_menu_items(bw);
 }
 #endif /* ENABLE_TOUCH_UI */
 
 /* Edit menu callbacks. */
 static void
-copy_cb(GtkAction * action, BalsaWindow * bw)
+bw_copy_cb(GtkAction * action, gpointer data)
 {
+    BalsaWindow *bw = BALSA_WINDOW(data);
     guint signal_id;
     GtkWidget *focus_widget = gtk_window_get_focus(GTK_WINDOW(bw));
 
@@ -3460,7 +3464,7 @@ copy_cb(GtkAction * action, BalsaWindow * bw)
 }
 
 static void
-select_all_cb(GtkAction * action, gpointer data)
+bw_select_all_cb(GtkAction * action, gpointer data)
 {
     balsa_window_select_all(data);
 }
@@ -3468,15 +3472,15 @@ select_all_cb(GtkAction * action, gpointer data)
 /* Message menu callbacks. */
 #if !defined(ENABLE_TOUCH_UI)
 static void
-message_copy_cb(GtkAction * action, gpointer data)
+bw_message_copy_cb(GtkAction * action, gpointer data)
 {
     BalsaWindow *bw = BALSA_WINDOW(data);
     if (balsa_message_grab_focus(BALSA_MESSAGE(bw->preview)))
-        copy_cb(action, data);
+        bw_copy_cb(action, data);
 }
 
 static void
-message_select_all_cb(GtkAction * action, gpointer data)
+bw_message_select_all_cb(GtkAction * action, gpointer data)
 {
     BalsaWindow *bw = BALSA_WINDOW(data);
     if (balsa_message_grab_focus(BALSA_MESSAGE(bw->preview)))
@@ -3485,14 +3489,14 @@ message_select_all_cb(GtkAction * action, gpointer data)
 #endif /* ENABLE_TOUCH_UI */
 
 static void
-save_current_part_cb(GtkAction * action, gpointer data)
+bw_save_current_part_cb(GtkAction * action, gpointer data)
 {
     BalsaWindow *bw = BALSA_WINDOW(data);
     balsa_message_save_current_part(BALSA_MESSAGE(bw->preview));
 }
 
 static void
-view_msg_source_cb(GtkAction * action, gpointer data)
+bw_view_msg_source_cb(GtkAction * action, gpointer data)
 {
     BalsaWindow *bw;
     GtkWidget *bindex;
@@ -3514,14 +3518,14 @@ view_msg_source_cb(GtkAction * action, gpointer data)
 }
 
 static void
-trash_message_cb(GtkAction * action, gpointer data)
+bw_trash_message_cb(GtkAction * action, gpointer data)
 {
     balsa_message_move_to_trash(balsa_window_find_current_index
                                 (BALSA_WINDOW(data)));
 }
 
 static void
-toggle_deleted_message_cb(GtkAction * action, gpointer data)
+bw_toggle_deleted_message_cb(GtkAction * action, gpointer data)
 {
     LibBalsaMessageFlag f = LIBBALSA_MESSAGE_FLAG_DELETED; 
     balsa_index_toggle_flag
@@ -3531,7 +3535,7 @@ toggle_deleted_message_cb(GtkAction * action, gpointer data)
 
 
 static void
-toggle_flagged_message_cb(GtkAction * action, gpointer data)
+bw_toggle_flagged_message_cb(GtkAction * action, gpointer data)
 {
     balsa_index_toggle_flag
         (BALSA_INDEX(balsa_window_find_current_index(BALSA_WINDOW(data))),
@@ -3539,7 +3543,7 @@ toggle_flagged_message_cb(GtkAction * action, gpointer data)
 }
 
 static void
-toggle_new_message_cb(GtkAction * action, gpointer data)
+bw_toggle_new_message_cb(GtkAction * action, gpointer data)
 {
     balsa_index_toggle_flag
         (BALSA_INDEX(balsa_window_find_current_index(BALSA_WINDOW(data))),
@@ -3547,7 +3551,7 @@ toggle_new_message_cb(GtkAction * action, gpointer data)
 }
 
 static void
-toggle_answered_message_cb(GtkAction * action, gpointer data)
+bw_toggle_answered_message_cb(GtkAction * action, gpointer data)
 {
     balsa_index_toggle_flag
         (BALSA_INDEX(balsa_window_find_current_index(BALSA_WINDOW(data))),
@@ -3555,7 +3559,7 @@ toggle_answered_message_cb(GtkAction * action, gpointer data)
 }
 
 static void
-store_address_cb(GtkAction * action, gpointer data)
+bw_store_address_cb(GtkAction * action, gpointer data)
 {
     GtkWidget *index = balsa_window_find_current_index(BALSA_WINDOW(data));
     GList *messages;
@@ -3570,9 +3574,9 @@ store_address_cb(GtkAction * action, gpointer data)
 
 #if defined(ENABLE_TOUCH_UI)
 static void
-balsa_window_set_sort_menu(BalsaWindow *window,
-                           LibBalsaMailboxSortFields col,
-                           LibBalsaMailboxSortType   order)
+bw_set_sort_menu(BalsaWindow *window,
+                 LibBalsaMailboxSortFields col,
+                 LibBalsaMailboxSortType   order)
 {
     const gchar *action_name;
     GtkAction *action;
@@ -3591,30 +3595,30 @@ balsa_window_set_sort_menu(BalsaWindow *window,
         gtk_action_group_get_action(window->mailbox_action_group,
                                     action_name);
     g_signal_handlers_block_by_func(G_OBJECT(action),
-                                    G_CALLBACK(sort_change_cb),
+                                    G_CALLBACK(bw_sort_change_cb),
                                     window);
     gtk_toggle_action_set_active(GTK_TOGGLE_ACTION(action), TRUE);
     g_signal_handlers_unblock_by_func(G_OBJECT(action),
-                                      G_CALLBACK(sort_change_cb),
+                                      G_CALLBACK(bw_sort_change_cb),
                                       window);
 
     action =
         gtk_action_group_get_action(window->action_group,
                                     "SortDescending");
     g_signal_handlers_block_by_func(G_OBJECT(action),
-                                    G_CALLBACK(sort_change_cb),
+                                    G_CALLBACK(bw_sort_change_cb),
                                     window);
     gtk_toggle_action_set_active(GTK_TOGGLE_ACTION(action),
                                  order == LB_MAILBOX_SORT_TYPE_DESC);
     g_signal_handlers_unblock_by_func(G_OBJECT(action),
-                                      G_CALLBACK(sort_change_cb),
+                                      G_CALLBACK(bw_sort_change_cb),
                                       window);
 
     gtk_action_set_sensitive(action, strcmp(action_name, "Threaded") != 0);
 }
 
 static void
-sort_change_cb(GtkRadioAction *action, GtkRadioAction *current, gpointer data) 
+bw_sort_change_cb(GtkRadioAction *action, GtkRadioAction *current, gpointer data) 
 {
     BalsaWindow *window = BALSA_WINDOW(data);
     LibBalsaMailboxSortFields key;
@@ -3658,7 +3662,7 @@ sort_change_cb(GtkRadioAction *action, GtkRadioAction *current, gpointer data)
 }
 
 static void
-toggle_order_cb(GtkToggleAction * action, gpointer data)
+bw_toggle_order_cb(GtkToggleAction * action, gpointer data)
 {
     LibBalsaMailboxSortType   order;
     GtkWidget       *bindex;
@@ -3691,7 +3695,7 @@ toggle_order_cb(GtkToggleAction * action, gpointer data)
 
 #endif /* ENABLE_TOUCH_UI */
 static void
-wrap_message_cb(GtkToggleAction * action, gpointer data)
+bw_wrap_message_cb(GtkToggleAction * action, gpointer data)
 {
     BalsaWindow *bw = BALSA_WINDOW(data);
 
@@ -3711,7 +3715,7 @@ bw_header_activate_cb(GtkAction * action, gpointer data)
         BalsaWindow *bw = BALSA_WINDOW(data);
 
         balsa_app.shown_headers = sh;
-        reset_show_all_headers(bw);
+        bw_reset_show_all_headers(bw);
         balsa_message_set_displayed_headers(BALSA_MESSAGE(bw->preview),
                                             sh);
     }
@@ -3719,7 +3723,7 @@ bw_header_activate_cb(GtkAction * action, gpointer data)
 
 #if !defined(ENABLE_TOUCH_UI)
 static void
-threading_radio_cb(GtkRadioAction * action, GtkRadioAction * current,
+bw_threading_radio_cb(GtkRadioAction * action, GtkRadioAction * current,
                    gpointer data)
 {
     BalsaWindow *bw = BALSA_WINDOW(data);
@@ -3735,12 +3739,12 @@ threading_radio_cb(GtkRadioAction * action, GtkRadioAction * current,
     balsa_index_set_threading_type(BALSA_INDEX(index), type);
     if ((mbnode = BALSA_INDEX(index)->mailbox_node)
 	&& (mailbox = mbnode->mailbox))
-	enable_expand_collapse(bw, mailbox);
+	bw_enable_expand_collapse(bw, mailbox);
 }
 #endif /* ENABLE_TOUCH_UI */
 
 static void
-expand_all_cb(GtkAction * action, gpointer data)
+bw_expand_all_cb(GtkAction * action, gpointer data)
 {
     GtkWidget *index;
 
@@ -3750,7 +3754,7 @@ expand_all_cb(GtkAction * action, gpointer data)
 }
 
 static void
-collapse_all_cb(GtkAction * action, gpointer data)
+bw_collapse_all_cb(GtkAction * action, gpointer data)
 {
     GtkWidget *index;
 
@@ -3761,21 +3765,21 @@ collapse_all_cb(GtkAction * action, gpointer data)
 
 #ifdef HAVE_GTKHTML
 static void
-zoom_in_cb(GtkAction * action, gpointer data)
+bw_zoom_in_cb(GtkAction * action, gpointer data)
 {
     GtkWidget *bm = BALSA_WINDOW(data)->preview;
     balsa_message_zoom(BALSA_MESSAGE(bm), 1);
 }
 
 static void
-zoom_out_cb(GtkAction * action, gpointer data)
+bw_zoom_out_cb(GtkAction * action, gpointer data)
 {
     GtkWidget *bm = BALSA_WINDOW(data)->preview;
     balsa_message_zoom(BALSA_MESSAGE(bm), -1);
 }
 
 static void
-zoom_100_cb(GtkAction * action, gpointer data)
+bw_zoom_100_cb(GtkAction * action, gpointer data)
 {
     GtkWidget *bm = BALSA_WINDOW(data)->preview;
     balsa_message_zoom(BALSA_MESSAGE(bm), 0);
@@ -3784,7 +3788,7 @@ zoom_100_cb(GtkAction * action, gpointer data)
 
 #if defined(ENABLE_TOUCH_UI)
 static gboolean
-open_mailbox_cb(GtkWidget *widget, GdkEventKey *event, gpointer data)
+bw_open_mailbox_cb(GtkWidget *widget, GdkEventKey *event, gpointer data)
 {
     LibBalsaMailbox *mailbox;
 
@@ -3803,7 +3807,7 @@ open_mailbox_cb(GtkWidget *widget, GdkEventKey *event, gpointer data)
 }
 
 static void
-enable_view_filter_cb(GtkToggleAction * action, gpointer data)
+bw_enable_view_filter_cb(GtkToggleAction * action, gpointer data)
 {
     BalsaWindow *mw       = BALSA_WINDOW(data);
     GtkWidget *parent_box = gtk_widget_get_parent(mw->sos_entry);
@@ -3817,7 +3821,7 @@ enable_view_filter_cb(GtkToggleAction * action, gpointer data)
 #endif /* ENABLE_TOUCH_UI */
 
 static void
-address_book_cb(GtkWindow *widget, gpointer data)
+bw_address_book_cb(GtkWindow *widget, gpointer data)
 {
     GtkWidget *ab;
 
@@ -3826,7 +3830,7 @@ address_book_cb(GtkWindow *widget, gpointer data)
 }
 
 static GtkToggleButton*
-add_check_button(GtkWidget* table, const gchar* label, gint x, gint y)
+bw_add_check_button(GtkWidget* table, const gchar* label, gint x, gint y)
 {
     GtkWidget* res = gtk_check_button_new_with_mnemonic(label);
     gtk_table_attach(GTK_TABLE(table),
@@ -3849,7 +3853,7 @@ bw_find_button_clicked(GtkWidget * widget, gpointer data)
 }
 
 static void 
-find_real(BalsaWindow * window, BalsaIndex * bindex, gboolean again)
+bw_find_real(BalsaWindow * window, BalsaIndex * bindex, gboolean again)
 {
     /* Condition set up for the search, it will be of type
        CONDITION_NONE if nothing has been set up */
@@ -3906,11 +3910,11 @@ find_real(BalsaWindow * window, BalsaIndex * bindex, gboolean again)
 	gtk_box_pack_start(GTK_BOX(vbox), frame, FALSE, FALSE, 2);
     
 	table = gtk_table_new(2, 3, TRUE);
-	matching_body    = add_check_button(table, _("_Body"),    0, 0);
-	matching_to      = add_check_button(table, _("_To:"),     1, 0);
-	matching_from    = add_check_button(table, _("_From:"),   1, 1);
-        matching_subject = add_check_button(table, _("S_ubject"), 2, 0);
-	matching_cc      = add_check_button(table, _("_Cc:"),     2, 1);
+	matching_body    = bw_add_check_button(table, _("_Body"),    0, 0);
+	matching_to      = bw_add_check_button(table, _("_To:"),     1, 0);
+	matching_from    = bw_add_check_button(table, _("_From:"),   1, 1);
+        matching_subject = bw_add_check_button(table, _("S_ubject"), 2, 0);
+	matching_cc      = bw_add_check_button(table, _("_Cc:"),     2, 1);
 	gtk_container_add(GTK_CONTAINER(frame), table);
 
 	/* Frame with Apply and Clear buttons */
@@ -4033,7 +4037,7 @@ find_real(BalsaWindow * window, BalsaIndex * bindex, gboolean again)
 		}
 		break;
             case FIND_RESPONSE_RESET:
-		reset_filter_cb(NULL, window);
+		bw_reset_filter_cb(NULL, window);
 		/* fall through */
             default:
 		ok = GTK_RESPONSE_CANCEL; 
@@ -4052,7 +4056,7 @@ find_real(BalsaWindow * window, BalsaIndex * bindex, gboolean again)
             LibBalsaMailbox *mailbox = 
                 BALSA_INDEX(bindex)->mailbox_node->mailbox;
             LibBalsaCondition *filter, *res;
-            filter = balsa_window_get_view_filter(window, FALSE);
+            filter = bw_get_view_filter(window, FALSE);
             res = libbalsa_condition_new_bool_ptr(FALSE, CONDITION_AND,
                                                   filter, cnd);
             libbalsa_condition_unref(filter);
@@ -4072,37 +4076,37 @@ find_real(BalsaWindow * window, BalsaIndex * bindex, gboolean again)
 }
 
 static void
-find_cb(GtkAction * action,gpointer data)
+bw_find_cb(GtkAction * action,gpointer data)
 {
     BalsaWindow *window = data;
     GtkWidget * bindex;
     if ((bindex=balsa_window_find_current_index(window)))
-	find_real(window, BALSA_INDEX(bindex),FALSE);
+	bw_find_real(window, BALSA_INDEX(bindex),FALSE);
 }
 
 static void
-find_again_cb(GtkAction * action,gpointer data)
+bw_find_again_cb(GtkAction * action,gpointer data)
 {
     BalsaWindow *window = data;
     GtkWidget * bindex;
     if ((bindex=balsa_window_find_current_index(window)))
-	find_real(window, BALSA_INDEX(bindex), TRUE);
+	bw_find_real(window, BALSA_INDEX(bindex), TRUE);
 }
 
 static void
-filter_dlg_cb(GtkAction * action, gpointer data)
+bw_filter_dlg_cb(GtkAction * action, gpointer data)
 {
     filters_edit_dialog();
 }
 
 static void
-filter_export_cb(GtkAction * action, gpointer data)
+bw_filter_export_cb(GtkAction * action, gpointer data)
 {
     filters_export_dialog();
 }
 
 static void
-filter_run_cb(GtkAction * action, gpointer data)
+bw_filter_run_cb(GtkAction * action, gpointer data)
 {
     GtkWidget *index = balsa_window_find_current_index(BALSA_WINDOW(data));
 
@@ -4118,7 +4122,7 @@ filter_run_cb(GtkAction * action, gpointer data)
 
 #if !defined(ENABLE_TOUCH_UI)
 static void
-remove_duplicates_cb(GtkAction * action, gpointer data)
+bw_remove_duplicates_cb(GtkAction * action, gpointer data)
 {
     GtkWidget *index = balsa_window_find_current_index(BALSA_WINDOW(data));
     if (index) {
@@ -4138,14 +4142,14 @@ remove_duplicates_cb(GtkAction * action, gpointer data)
 #endif /* ENABLE_TOUCH_UI */
 
 static void
-empty_trash_cb(GtkAction * action, gpointer data)
+bw_empty_trash_cb(GtkAction * action, gpointer data)
 {
     empty_trash(BALSA_WINDOW(data));
 }
 
 /* closes the mailbox on the notebook's active page */
 static void
-mailbox_close_cb(GtkAction * action, gpointer data)
+bw_mailbox_close_cb(GtkAction * action, gpointer data)
 {
     GtkWidget *index = balsa_window_find_current_index(BALSA_WINDOW(data));
 
@@ -4155,7 +4159,7 @@ mailbox_close_cb(GtkAction * action, gpointer data)
 }
 
 static void
-mailbox_tab_close_cb(GtkWidget * widget, gpointer data)
+bw_mailbox_tab_close_cb(GtkWidget * widget, gpointer data)
 {
     GtkWidget * window = gtk_widget_get_toplevel(widget);
     balsa_window_real_close_mbnode(BALSA_WINDOW(window),
@@ -4164,7 +4168,7 @@ mailbox_tab_close_cb(GtkWidget * widget, gpointer data)
 
 
 static LibBalsaCondition*
-balsa_window_get_view_filter(BalsaWindow *window, gboolean flags_only)
+bw_get_view_filter(BalsaWindow *window, gboolean flags_only)
 {
     static struct {
         LibBalsaMessageFlag flag;
@@ -4237,11 +4241,11 @@ balsa_window_get_view_filter(BalsaWindow *window, gboolean flags_only)
     return filter;
 }
 
-/**balsa_window_filter_to_int() returns an integer representing the
+/**bw_filter_to_int() returns an integer representing the
    view filter.
 */
 static int
-balsa_window_filter_to_int(BalsaWindow * window)
+bw_filter_to_int(BalsaWindow * window)
 {
     unsigned i;
     int res = 0;
@@ -4252,7 +4256,7 @@ balsa_window_filter_to_int(BalsaWindow * window)
 }
 
 static void
-hide_changed_cb(GtkToggleAction * toggle_action, gpointer data)
+bw_hide_changed_cb(GtkToggleAction * toggle_action, gpointer data)
 {
     LibBalsaMailbox *mailbox;
     BalsaWindow *bw = BALSA_WINDOW(data);
@@ -4293,18 +4297,18 @@ hide_changed_cb(GtkToggleAction * toggle_action, gpointer data)
     /* PART 2: do the job. */
     mailbox = BALSA_INDEX(index)->mailbox_node->mailbox;
     /* Store the new filter mask in the mailbox view before we set the
-     * view filter; rethreading triggers balsa_window_set_filter_menu,
+     * view filter; rethreading triggers bw_set_filter_menu,
      * which retrieves the mask from the mailbox view, and we want it to
      * be the new one. */
-    libbalsa_mailbox_set_filter(mailbox, balsa_window_filter_to_int(bw));
+    libbalsa_mailbox_set_filter(mailbox, bw_filter_to_int(bw));
 
     /* Set the flags part of this filter as persistent: */
-    filter = balsa_window_get_view_filter(bw, TRUE);
+    filter = bw_get_view_filter(bw, TRUE);
     libbalsa_mailbox_set_view_filter(mailbox, filter, FALSE);
     libbalsa_condition_unref(filter);
     libbalsa_mailbox_make_view_filter_persistent(mailbox);
 
-    filter = balsa_window_get_view_filter(bw, FALSE);
+    filter = bw_get_view_filter(bw, FALSE);
     /* libbalsa_mailbox_set_view_filter() will ref the
      * filter.  We need also to rethread to take into account that
      * some messages might have been removed or added to the view. */
@@ -4314,7 +4318,7 @@ hide_changed_cb(GtkToggleAction * toggle_action, gpointer data)
 }
 
 static void
-reset_filter_cb(GtkAction * action, gpointer data)
+bw_reset_filter_cb(GtkAction * action, gpointer data)
 {
     BalsaWindow *bw = BALSA_WINDOW(data);
     BalsaIndex *bindex = BALSA_INDEX(balsa_window_find_current_index(bw));
@@ -4325,7 +4329,7 @@ reset_filter_cb(GtkAction * action, gpointer data)
 }
 
 static void
-mailbox_expunge_cb(GtkAction * action, gpointer data)
+bw_mailbox_expunge_cb(GtkAction * action, gpointer data)
 {
     GtkWidget *index;
 
@@ -4387,14 +4391,14 @@ bw_show_mbtree(BalsaWindow * bw)
 }
 
 static void
-show_mbtree_cb(GtkToggleAction * action, gpointer data)
+bw_show_mbtree_cb(GtkToggleAction * action, gpointer data)
 {
     balsa_app.show_mblist = gtk_toggle_action_get_active(action);
     bw_show_mbtree(BALSA_WINDOW(data));
 }
 
 static void
-show_mbtabs_cb(GtkToggleAction * action, gpointer data)
+bw_show_mbtabs_cb(GtkToggleAction * action, gpointer data)
 {
     balsa_app.show_notebook_tabs = gtk_toggle_action_get_active(action);
     gtk_notebook_set_show_tabs(GTK_NOTEBOOK(balsa_app.notebook),
@@ -4445,7 +4449,7 @@ balsa_change_window_layout(BalsaWindow *window)
 
 /* PKGW: remember when they change the position of the vpaned. */
 static void
-notebook_size_alloc_cb(GtkWidget * notebook, GtkAllocation * alloc)
+bw_notebook_size_alloc_cb(GtkWidget * notebook, GtkAllocation * alloc)
 {
     if (balsa_app.previewpane) {
 	GtkWidget *paned = gtk_widget_get_ancestor(notebook, GTK_TYPE_PANED);
@@ -4454,7 +4458,7 @@ notebook_size_alloc_cb(GtkWidget * notebook, GtkAllocation * alloc)
 }
 
 static void
-mw_size_alloc_cb(GtkWidget * window, GtkAllocation * alloc)
+bw_size_alloc_cb(GtkWidget * window, GtkAllocation * alloc)
 {
     balsa_app.mw_height = alloc->height;
     balsa_app.mw_width = alloc->width;
@@ -4464,7 +4468,7 @@ mw_size_alloc_cb(GtkWidget * window, GtkAllocation * alloc)
    mailbox in the mailbox tree.
  */
 static void
-notebook_switch_page_cb(GtkWidget * notebook,
+bw_notebook_switch_page_cb(GtkWidget * notebook,
                         GtkNotebookPage * notebookpage, guint page_num,
                         gpointer data)
 {
@@ -4504,9 +4508,9 @@ notebook_switch_page_cb(GtkWidget * notebook,
     }
 
     g_object_set_data(G_OBJECT(window), BALSA_INDEX_GRAB_FOCUS, index);
-    balsa_window_idle_replace(window, index);
-    enable_message_menus(window, index->current_msgno);
-    enable_mailbox_menus(window, index);
+    bw_idle_replace(window, index);
+    bw_enable_message_menus(window, index->current_msgno);
+    bw_enable_mailbox_menus(window, index);
 
     gtk_entry_set_text(GTK_ENTRY(window->sos_entry),
                        index->filter_string ? index->filter_string : "");
@@ -4520,13 +4524,13 @@ notebook_switch_page_cb(GtkWidget * notebook,
     balsa_index_ensure_visible(index);
 
 #if !defined(ENABLE_TOUCH_UI)
-    enable_edit_menus(window, NULL);
-    enable_part_menu_items(window);
+    bw_enable_edit_menus(window, NULL);
+    bw_enable_part_menu_items(window);
 #endif /*ENABLE_TOUCH_UI */
 }
 
 static void
-balsa_window_index_changed_cb(GtkWidget * widget, gpointer data)
+bw_index_changed_cb(GtkWidget * widget, gpointer data)
 {
     BalsaWindow *window = data;
     BalsaIndex *index;
@@ -4536,31 +4540,31 @@ balsa_window_index_changed_cb(GtkWidget * widget, gpointer data)
         return;
 
     index = BALSA_INDEX(widget);
-    enable_message_menus(window, index->current_msgno);
-    enable_mailbox_menus(window, index);
+    bw_enable_message_menus(window, index->current_msgno);
+    bw_enable_mailbox_menus(window, index);
     if (index->current_msgno == 0) {
-        enable_edit_menus(window, NULL);
+        bw_enable_edit_menus(window, NULL);
     }
 
     current_msgno = BALSA_MESSAGE(window->preview)->message ?
         BALSA_MESSAGE(window->preview)->message->msgno : 0;
 
     if (current_msgno != index->current_msgno)
-        balsa_window_idle_replace(window, index);
+        bw_idle_replace(window, index);
 }
 
 static void
-balsa_window_idle_replace(BalsaWindow * window, BalsaIndex * bindex)
+bw_idle_replace(BalsaWindow * window, BalsaIndex * bindex)
 {
     if (balsa_app.previewpane) {
-        balsa_window_idle_remove(window);
+        bw_idle_remove(window);
         window->set_message_id =
-            g_idle_add((GSourceFunc) balsa_window_idle_cb, window);
+            g_idle_add((GSourceFunc) bw_idle_cb, window);
     }
 }
 
 static void
-balsa_window_idle_remove(BalsaWindow * window)
+bw_idle_remove(BalsaWindow * window)
 {
     if (window->set_message_id) {
         g_source_remove(window->set_message_id);
@@ -4569,10 +4573,10 @@ balsa_window_idle_remove(BalsaWindow * window)
 }
 
 
-static volatile gboolean balsa_window_idle_cb_active = FALSE;
+static volatile gboolean bw_idle_cb_active = FALSE;
 
 static gboolean
-balsa_window_idle_cb(BalsaWindow * window)
+bw_idle_cb(BalsaWindow * window)
 {
     BalsaIndex *index;
 
@@ -4582,11 +4586,11 @@ balsa_window_idle_cb(BalsaWindow * window)
         gdk_threads_leave();
         return FALSE;
     }
-    if (balsa_window_idle_cb_active) {
+    if (bw_idle_cb_active) {
         gdk_threads_leave();
 	return TRUE;
     }
-    balsa_window_idle_cb_active = TRUE;
+    bw_idle_cb_active = TRUE;
 
     window->set_message_id = 0;
 
@@ -4605,23 +4609,23 @@ balsa_window_idle_cb(BalsaWindow * window)
     }
 
     gdk_threads_leave();
-    balsa_window_idle_cb_active = FALSE;
+    bw_idle_cb_active = FALSE;
 
     return FALSE;
 }
 
 static void
-select_part_cb(BalsaMessage * bm, gpointer data)
+bw_select_part_cb(BalsaMessage * bm, gpointer data)
 {
-    enable_edit_menus(BALSA_WINDOW(data), bm);
+    bw_enable_edit_menus(BALSA_WINDOW(data), bm);
 #if !defined(ENABLE_TOUCH_UI)
-    enable_part_menu_items(BALSA_WINDOW(data));
+    bw_enable_part_menu_items(BALSA_WINDOW(data));
 #endif /*ENABLE_TOUCH_UI */
 }
 
 #if !defined(ENABLE_TOUCH_UI)
 static void
-send_msg_window_destroy_cb(GtkWidget * widget, gpointer data)
+bw_send_msg_window_destroy_cb(GtkWidget * widget, gpointer data)
 {
     balsa_window_enable_continue(BALSA_WINDOW(data));
 }
@@ -4634,7 +4638,7 @@ send_msg_window_destroy_cb(GtkWidget * widget, gpointer data)
  * coordinates are over.
  **/
 static BalsaIndex*
-balsa_window_notebook_find_page (GtkNotebook* notebook, gint x, gint y)
+bw_notebook_find_page (GtkNotebook* notebook, gint x, gint y)
 {
     GtkWidget* page;
     GtkWidget* label;
@@ -4670,17 +4674,17 @@ balsa_window_notebook_find_page (GtkNotebook* notebook, gint x, gint y)
 }
 
 
-/* notebook_drag_received_cb
+/* bw_notebook_drag_received_cb
  * 
  * Description: Signal handler for the drag-data-received signal from
  * the GtkNotebook widget.  Finds the tab the messages were dragged
  * over, then transfers them.
  **/
 static void
-notebook_drag_received_cb (GtkWidget* widget, GdkDragContext* context, 
-                           gint x, gint y, 
-                           GtkSelectionData* selection_data, 
-                           guint info, guint32 time, gpointer data)
+bw_notebook_drag_received_cb(GtkWidget * widget, GdkDragContext * context,
+                             gint x, gint y,
+                             GtkSelectionData * selection_data, guint info,
+                             guint32 time, gpointer data)
 {
     BalsaIndex* index;
     LibBalsaMailbox* mailbox;
@@ -4703,7 +4707,7 @@ notebook_drag_received_cb (GtkWidget* widget, GdkDragContext* context,
 
     orig_mailbox = orig_index->mailbox_node->mailbox;
 
-    index = balsa_window_notebook_find_page (GTK_NOTEBOOK(widget), x, y);
+    index = bw_notebook_find_page (GTK_NOTEBOOK(widget), x, y);
 
     if (index == NULL)
         return;
@@ -4716,9 +4720,10 @@ notebook_drag_received_cb (GtkWidget* widget, GdkDragContext* context,
     balsa_index_selected_msgnos_free(orig_index, selected);
 }
 
-static gboolean
-notebook_drag_motion_cb(GtkWidget * widget, GdkDragContext * context,
-                        gint x, gint y, guint time, gpointer user_data)
+static gboolean bw_notebook_drag_motion_cb(GtkWidget * widget,
+                                           GdkDragContext * context,
+                                           gint x, gint y, guint time,
+                                           gpointer user_data)
 {
     gdk_drag_status(context,
                     (context->actions ==
@@ -4728,7 +4733,7 @@ notebook_drag_motion_cb(GtkWidget * widget, GdkDragContext * context,
     return FALSE;
 }
 
-/* balsa_window_progress_timeout
+/* bw_progress_timeout
  * 
  * This function is called at a preset interval to cause the progress
  * bar to move in activity mode.  
@@ -4738,7 +4743,7 @@ notebook_drag_motion_cb(GtkWidget * widget, GdkDragContext * context,
  * Use of the progress bar to show a fraction of a task takes priority.
  **/
 static gint
-balsa_window_progress_timeout(GtkProgressBar ** progress_bar)
+bw_progress_timeout(GtkProgressBar ** progress_bar)
 {
     gdk_threads_enter();
 
@@ -4757,7 +4762,7 @@ balsa_window_progress_timeout(GtkProgressBar ** progress_bar)
 }
 
 
-/* balsa_window_increase_activity
+/* bw_increase_activity
  * 
  * Calling this causes this to the progress bar of the window to
  * switch into activity mode if it's not already going.  Otherwise it
@@ -4765,7 +4770,7 @@ balsa_window_progress_timeout(GtkProgressBar ** progress_bar)
  * indicate activity simultaneously).
  **/
 static void 
-balsa_window_increase_activity(BalsaWindow * window, const gchar * message)
+bw_increase_activity(BalsaWindow * window, const gchar * message)
 {
     gint activity_handler;
     guint activity_counter = 0;
@@ -4784,7 +4789,7 @@ balsa_window_increase_activity(BalsaWindow * window, const gchar * message)
     if (!activity_handler) {
         /* add a timeout to make the activity bar move */
         activity_handler =
-            g_timeout_add(50, (GSourceFunc) balsa_window_progress_timeout,
+            g_timeout_add(50, (GSourceFunc) bw_progress_timeout,
                           &progress_bar);
         g_object_set_data(G_OBJECT(progress_bar), "activity_handler", 
                           GINT_TO_POINTER(activity_handler));
@@ -4808,14 +4813,14 @@ balsa_window_increase_activity(BalsaWindow * window, const gchar * message)
 }
 
 
-/* balsa_window_decrease_activity
+/* bw_decrease_activity
  * 
  * When called, decreases the reference counter of the progress
  * activity bar, if it goes to zero the progress bar is stopped and
  * cleared.
  **/
 static void 
-balsa_window_decrease_activity(BalsaWindow* window, const gchar * message)
+bw_decrease_activity(BalsaWindow* window, const gchar * message)
 {
     gint activity_handler;
     guint activity_counter = 0;
@@ -4942,7 +4947,7 @@ balsa_window_increment_progress(BalsaWindow * window, gdouble fraction,
  */
 
 static void
-ident_manage_dialog_cb(GtkAction * action, gpointer user_data)
+bw_ident_manage_dialog_cb(GtkAction * action, gpointer user_data)
 {
     libbalsa_identity_config_dialog(GTK_WINDOW(user_data),
                                     &balsa_app.identities,
@@ -4956,7 +4961,7 @@ ident_manage_dialog_cb(GtkAction * action, gpointer user_data)
 
 
 static void
-mark_all_cb(GtkAction * action, gpointer data)
+bw_mark_all_cb(GtkAction * action, gpointer data)
 {
     GtkWidget *index;
 
@@ -4968,7 +4973,7 @@ mark_all_cb(GtkAction * action, gpointer data)
 }
 
 static void
-show_all_headers_tool_cb(GtkToggleAction * action, gpointer data)
+bw_show_all_headers_tool_cb(GtkToggleAction * action, gpointer data)
 {
     BalsaWindow *bw = BALSA_WINDOW(data);
 
@@ -4984,7 +4989,7 @@ show_all_headers_tool_cb(GtkToggleAction * action, gpointer data)
 }
 
 static void
-reset_show_all_headers(BalsaWindow * window)
+bw_reset_show_all_headers(BalsaWindow * window)
 {
     if (balsa_app.show_all_headers) {
         bw_set_active(window, "ShowAllHeaders", FALSE, "ShowAllHeaders");
@@ -4993,7 +4998,7 @@ reset_show_all_headers(BalsaWindow * window)
 }
 
 static void
-show_preview_pane_cb(GtkToggleAction * action, gpointer data)
+bw_show_preview_pane_cb(GtkToggleAction * action, gpointer data)
 {
     balsa_app.previewpane = gtk_toggle_action_get_active(action);
     balsa_window_refresh(BALSA_WINDOW(data));
@@ -5022,7 +5027,7 @@ balsa_window_update_tab(BalsaMailboxNode * mbnode)
 	GtkWidget *page =
 	    gtk_notebook_get_nth_page(GTK_NOTEBOOK(balsa_app.notebook), i);
 	gtk_notebook_set_tab_label(GTK_NOTEBOOK(balsa_app.notebook), page,
-				   balsa_notebook_label_new(mbnode));
+				   bw_notebook_label_new(mbnode));
     }
 }
 

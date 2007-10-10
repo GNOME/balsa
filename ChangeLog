@@ -1,5 +1,11 @@
 2007-10-09  Peter Bloomfield
 
+	* src/balsa-index.c: restore 'N' and 'P' actions.
+	* src/main-window.c: use consistent "bw_" prefix on local
+	functions to aid debugging.
+
+2007-10-09  Peter Bloomfield
+
 	* libbalsa/mailbox.c: (mbox_model_iter_n_children): return 0 if
 	iter is NULL and mailbox has no msg_tree.
 	* src/balsa-index.c: (bndx_scroll_to_row),

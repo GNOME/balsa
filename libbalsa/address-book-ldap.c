@@ -52,7 +52,7 @@
 #include "address-book-ldap.h"
 #include "information.h"
 #include "libbalsa-conf.h"
-#include "i18n.h"
+#include <glib/gi18n.h>
 
 static const int DEBUG_LDAP = 0;
 /* don't search when prefix has length shorter than LDAP_MIN_LEN */

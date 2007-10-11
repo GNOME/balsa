@@ -72,7 +72,6 @@ libbalsa_a_SOURCES = 		\
 	folder-scanners.h	\
 	html.c                  \
 	html.h                  \
-	i18n.h			\
 	identity.c		\
 	identity.h		\
 	imap-server.c		\

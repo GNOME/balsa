@@ -15,7 +15,7 @@
 #include "imap-handle.h"
 #include "imap-server.h"
 #include "imap-commands.h"
-#include "i18n.h"
+#include <glib/gi18n.h>
 
 #ifdef USE_TLS
 #define REQ_SSL(s) (LIBBALSA_SERVER(s)->use_ssl)

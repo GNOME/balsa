@@ -27,7 +27,7 @@
 
 #include "address.h"
 #include "misc.h"
-#include "i18n.h"
+#include <glib/gi18n.h>
 
 static GObjectClass *parent_class;
 

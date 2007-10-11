@@ -32,7 +32,7 @@
 #include "save-restore.h"
 #include "filter.h"
 #include "imap-server.h"
-#include "i18n.h"
+#include <glib/gi18n.h>
 #include "libbalsa-conf.h"
 
 /* MailboxNode object is a GUI representation of a mailbox, or entire 

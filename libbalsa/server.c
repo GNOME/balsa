@@ -34,7 +34,7 @@
 #include "libbalsa_private.h"
 #include "libbalsa-marshal.h"
 #include "libbalsa-conf.h"
-#include "i18n.h"
+#include <glib/gi18n.h>
 
 static GObjectClass *parent_class = NULL;
 static void libbalsa_server_class_init(LibBalsaServerClass * klass);

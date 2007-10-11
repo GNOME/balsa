@@ -61,7 +61,7 @@
 #include "quote-color.h"
 
 #include <string.h>
-#include "i18n.h"
+#include <glib/gi18n.h>
 
 #define BALSA_PRINT_TYPE_HEADER     1
 #define BALSA_PRINT_TYPE_SEPARATOR  2

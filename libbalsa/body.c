@@ -31,7 +31,7 @@
 
 #include "libbalsa.h"
 #include "misc.h"
-#include "i18n.h"
+#include <glib/gi18n.h>
 
 LibBalsaMessageBody *
 libbalsa_message_body_new(LibBalsaMessage * message)

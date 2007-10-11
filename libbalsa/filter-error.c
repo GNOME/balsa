@@ -28,7 +28,7 @@
 #include "config.h"
 
 #include "filter.h"
-#include "i18n.h"
+#include <glib/gi18n.h>
 
 /*
  * Error reporting use this global gint. All function that positions it will destroy previous error, so

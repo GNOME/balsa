@@ -40,7 +40,7 @@
 #include "libbalsa.h"
 #include "misc.h"
 #include "html.h"
-#include "i18n.h"
+#include <glib/gi18n.h>
 
 #include "ab-window.h"
 #include "balsa-app.h"

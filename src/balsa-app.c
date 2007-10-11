@@ -39,7 +39,7 @@
 #include "balsa-app.h"
 #include "save-restore.h"
 
-#include "i18n.h"	/* Must come after balsa-app.h. */
+#include <glib/gi18n.h>	/* Must come after balsa-app.h. */
 
 /* Global application structure */
 struct BalsaApplication balsa_app;

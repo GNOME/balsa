@@ -44,7 +44,7 @@
 /* for mx_lock_file and mx_unlock_file */
 #include "mailbackend.h"
 #include "mime-stream-shared.h"
-#include "i18n.h"
+#include <glib/gi18n.h>
 
 struct message_info {
     LibBalsaMailboxLocalMessageInfo local_info;

@@ -22,7 +22,7 @@
 #include <gtk/gtk.h>
 #include <string.h>
 #include "config.h"
-#include "i18n.h"
+#include <glib/gi18n.h>
 #include "balsa-print-object.h"
 #include "balsa-print-object-decor.h"
 #include "balsa-print-object-default.h"

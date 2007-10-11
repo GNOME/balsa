@@ -23,7 +23,7 @@
 
 #include <string.h>
 #include <gnome.h>
-#include "i18n.h"
+#include <glib/gi18n.h>
 
 #include "balsa-app.h"
 #include "balsa-icons.h"

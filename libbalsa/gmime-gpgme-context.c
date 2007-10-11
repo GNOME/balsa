@@ -26,7 +26,7 @@
 #include <gpgme.h>
 #include <time.h>
 #include "gmime-gpgme-context.h"
-#include "i18n.h"
+#include <glib/gi18n.h>
 
 #define GPGME_ERROR_QUARK (g_quark_from_static_string ("gmime-gpgme"))
 

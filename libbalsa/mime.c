@@ -28,7 +28,7 @@
 #include "libbalsa.h"
 #include "misc.h"
 #include "html.h"
-#include "i18n.h"
+#include <glib/gi18n.h>
 
 /* FIXME: The content of this file could go to message.c */
 

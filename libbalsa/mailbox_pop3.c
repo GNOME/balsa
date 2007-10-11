@@ -41,7 +41,7 @@
 #include "misc.h"
 #include "mailbox.h"
 #include "mailbox_pop3.h"
-#include "i18n.h"
+#include <glib/gi18n.h>
 
 int PopDebug = 0;
 

@@ -61,7 +61,7 @@
 #include "misc.h"
 #include "server.h"
 
-#include "i18n.h"
+#include <glib/gi18n.h>
 
 #define ENABLE_CLIENT_SIDE_SORT 1
 

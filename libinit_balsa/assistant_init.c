@@ -21,7 +21,7 @@
 
 #include "assistant_init.h"
 
-#include "i18n.h"
+#include <glib/gi18n.h>
 #include "libbalsa-conf.h"
 #include "misc.h"
 #include "save-restore.h"

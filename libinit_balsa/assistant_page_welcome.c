@@ -20,7 +20,7 @@
  */
 
 #include "assistant_page_welcome.h"
-#include "i18n.h"
+#include <glib/gi18n.h>
 
 void
 balsa_druid_page_welcome(GtkAssistant * druid, GdkPixbuf * default_logo)

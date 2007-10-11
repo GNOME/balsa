@@ -30,7 +30,7 @@
 #include "libbalsa.h"
 #include "libbalsa_private.h"
 #include "misc.h"
-#include "i18n.h"
+#include <glib/gi18n.h>
 
 static void close_cb(GtkAction * action, gpointer data);
 static void copy_cb(GtkAction * action, gpointer data);

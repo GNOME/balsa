@@ -33,7 +33,7 @@
 
 #include "misc.h"
 #include "files.h"
-#include "i18n.h"
+#include <glib/gi18n.h>
 
 static const gchar *permanent_prefixes[] = {
 /*	BALSA_DATA_PREFIX,

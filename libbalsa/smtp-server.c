@@ -37,7 +37,7 @@
 #include "smtp-server.h"
 #include "libbalsa-conf.h"
 #include "misc.h"
-#include "i18n.h"
+#include <glib/gi18n.h>
 
 static LibBalsaServerClass *parent_class = NULL;
 

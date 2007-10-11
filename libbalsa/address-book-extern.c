@@ -50,7 +50,7 @@
 #include "address-book-extern.h"
 #include "information.h"
 #include "abook-completion.h"
-#include "i18n.h"
+#include <glib/gi18n.h>
 
 /* FIXME: Arbitrary constant */
 #define LINE_LEN 256

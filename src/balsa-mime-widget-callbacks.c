@@ -24,7 +24,7 @@
 #include <libgnomevfs/gnome-vfs-mime-handlers.h>
 #include "config.h"
 #include "balsa-app.h"
-#include "i18n.h"
+#include <glib/gi18n.h>
 #include "balsa-message.h"
 #include "balsa-mime-widget.h"
 #include "balsa-mime-widget-callbacks.h"

@@ -26,7 +26,7 @@
 #include "filter-edit.h"
 #include "filter-funcs.h"
 #include "message.h"
-#include "i18n.h"
+#include <glib/gi18n.h>
 
 #define FILTER_EDIT_ENTRY_MAX_LENGTH 256
 #define FILTER_EDIT_PADDING 6

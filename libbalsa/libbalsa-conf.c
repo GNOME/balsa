@@ -93,7 +93,7 @@ libbalsa_conf_has_group(const char *group)
 
 #include "libbalsa.h"
 #include "misc.h"
-#include "i18n.h"
+#include <glib/gi18n.h>
 
 typedef struct {
     GKeyFile *key_file;

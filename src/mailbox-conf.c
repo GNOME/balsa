@@ -53,7 +53,7 @@
 
 #include "libbalsa.h"
 #include "imap-server.h"
-#include "i18n.h"
+#include <glib/gi18n.h>
 
 struct _BalsaMailboxConfView {
     GtkWindow *window;

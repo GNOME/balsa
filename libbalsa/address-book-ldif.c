@@ -30,7 +30,7 @@
 #include <string.h>
 
 #include "address-book-ldif.h"
-#include "i18n.h"
+#include <glib/gi18n.h>
 
 static void
 libbalsa_address_book_ldif_class_init(LibBalsaAddressBookLdifClass *

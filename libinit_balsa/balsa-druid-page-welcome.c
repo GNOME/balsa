@@ -20,7 +20,7 @@
  */
 
 #include "balsa-druid-page-welcome.h"
-#include "i18n.h"
+#include <glib/gi18n.h>
 
 static void balsa_druid_page_welcome_prepare(GnomeDruidPage * page,
                                              GnomeDruid * druid);

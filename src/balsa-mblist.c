@@ -31,7 +31,7 @@
 #include "balsa-index.h"
 #include "balsa-mblist.h"
 #include "libbalsa.h"
-#include "i18n.h"
+#include <glib/gi18n.h>
 #include "mailbox-node.h"
 #include "main-window.h"
 

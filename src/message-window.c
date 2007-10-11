@@ -34,7 +34,7 @@
 #include "mailbox-node.h"
 
 #include "libbalsa.h"
-#include "i18n.h"
+#include <glib/gi18n.h>
 
 typedef struct _MessageWindow MessageWindow;
 

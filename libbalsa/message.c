@@ -45,7 +45,7 @@
 #include "misc.h"
 
 #include "mime-stream-shared.h"
-#include "i18n.h"
+#include <glib/gi18n.h>
 
 #include <gmime/gmime.h>
 

@@ -36,7 +36,7 @@
 #include <gmime/gmime-multipart-signed.h>
 #include <gmime/gmime-multipart-encrypted.h>
 #include "gmime-application-pkcs7.h"
-#include "i18n.h"
+#include <glib/gi18n.h>
 
 
 #define GMIME_PKCS7_ERR_QUARK (g_quark_from_static_string ("gmime-app-pkcs7"))

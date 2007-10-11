@@ -44,7 +44,7 @@
 #include "address-book-config.h"
 #include "libbalsa-conf.h"
 #include "libbalsa.h"
-#include "i18n.h"
+#include <glib/gi18n.h>
 
 struct ABMainWindow {
     GtkWindow *window;

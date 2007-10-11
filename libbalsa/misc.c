@@ -47,7 +47,7 @@
 #include "libbalsa_private.h"
 #include "misc.h"
 #include "html.h"
-#include "i18n.h"
+#include <glib/gi18n.h>
 
 static const gchar *libbalsa_get_codeset_name(const gchar *txt, 
 					      LibBalsaCodeset Codeset);

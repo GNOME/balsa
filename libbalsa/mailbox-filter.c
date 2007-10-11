@@ -34,7 +34,7 @@
 #include "libbalsa-conf.h"
 #include "mailbox-filter.h"
 #include "misc.h"
-#include "i18n.h"
+#include <glib/gi18n.h>
 
 /* Returns a slist of filters having the corresponding when field
  * There is no copy, the new list references object of the source list

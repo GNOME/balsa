@@ -30,7 +30,7 @@
 #include "balsa-druid-page-welcome.h"
 #endif /* HAVE_GNOME */
 
-#include "i18n.h"	/* Must come after helper.h. */
+#include <glib/gi18n.h>	/* Must come after helper.h. */
 
 static gboolean
 dismiss_the_wizard(GtkWidget *wizard)

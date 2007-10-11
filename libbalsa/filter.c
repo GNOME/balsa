@@ -45,7 +45,7 @@
 #include "filter-funcs.h"
 #include "filter-private.h"
 #include "misc.h"
-#include "i18n.h"
+#include <glib/gi18n.h>
 
 /* from libmutt */
 #define REGCOMP(X,Y,Z) regcomp(X, Y, REG_WORDS|REG_EXTENDED|(Z))

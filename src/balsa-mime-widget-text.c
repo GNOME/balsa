@@ -23,7 +23,7 @@
 #include "config.h"
 #include "balsa-app.h"
 #include "html.h"
-#include "i18n.h"
+#include <glib/gi18n.h>
 #include "quote-color.h"
 #include "sendmsg-window.h"
 #include "store-address.h"

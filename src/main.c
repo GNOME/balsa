@@ -39,7 +39,7 @@
 #include <locale.h>
 #endif
 
-#include "i18n.h"
+#include <glib/gi18n.h>
 
 #include "address-entry.h"
 

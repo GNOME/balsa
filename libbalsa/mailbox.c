@@ -36,7 +36,7 @@
 #include "message.h"
 #include "misc.h"
 #include "libbalsa_private.h"
-#include "i18n.h"
+#include <glib/gi18n.h>
 
 /* Class functions */
 static void libbalsa_mailbox_class_init(LibBalsaMailboxClass * klass);

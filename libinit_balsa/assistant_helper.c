@@ -30,7 +30,7 @@
 #include <gtk/gtk.h>
 
 #include "assistant_helper.h"
-#include "i18n.h"
+#include <glib/gi18n.h>
 #include "libbalsa.h"
 #include "url.h"
 

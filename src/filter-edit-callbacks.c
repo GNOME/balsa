@@ -41,7 +41,7 @@
 #include "balsa-app.h"
 #include "save-restore.h"
 #include "mailbox-filter.h"
-#include "i18n.h"
+#include <glib/gi18n.h>
 #include "libbalsa-conf.h"
 
 /* Defined in filter-edit-dialog.c*/

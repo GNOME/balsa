@@ -27,7 +27,7 @@
 #include <sys/stat.h>
 #include <string.h>
 
-#include "i18n.h"
+#include <glib/gi18n.h>
 #include "imap-server.h"
 #include "smtp-server.h"
 #include "server.h"

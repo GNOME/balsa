@@ -29,7 +29,7 @@
 #include "mailbox-filter.h"
 #include "save-restore.h"
 #include "libbalsa/filter-funcs.h"
-#include "i18n.h"
+#include <glib/gi18n.h>
 
 /* fe_already_open is TRUE when the filters dialog is opened, we use
  * this to prevent incoherency if we have both filters dialog and

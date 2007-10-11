@@ -26,7 +26,7 @@
 #include "balsa-app.h"
 #include "balsa-icons.h"
 #include "mime-stream-shared.h"
-#include "i18n.h"
+#include <glib/gi18n.h>
 #include "balsa-mime-widget-image.h"
 #include "balsa-mime-widget-message.h"
 #include "balsa-mime-widget-multipart.h"

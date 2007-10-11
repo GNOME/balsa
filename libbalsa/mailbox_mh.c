@@ -40,7 +40,7 @@
 #include "libbalsa_private.h"
 #include "libbalsa-conf.h"
 #include "mime-stream-shared.h"
-#include "i18n.h"
+#include <glib/gi18n.h>
 
 struct message_info {
     LibBalsaMailboxLocalMessageInfo local_info;

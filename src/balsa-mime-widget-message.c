@@ -25,7 +25,7 @@
 #include "balsa-icons.h"
 #include "send.h"
 #include "rfc3156.h"
-#include "i18n.h"
+#include <glib/gi18n.h>
 #include "balsa-mime-widget.h"
 #include "balsa-mime-widget-callbacks.h"
 #include "balsa-mime-widget-message.h"

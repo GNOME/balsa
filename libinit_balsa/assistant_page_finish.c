@@ -24,7 +24,7 @@
 #include "assistant_page_directory.h"
 #include "assistant_page_finish.h"
 
-#include "i18n.h"
+#include <glib/gi18n.h>
 #include "save-restore.h"
 
 #if 0

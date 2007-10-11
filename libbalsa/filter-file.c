@@ -48,7 +48,7 @@
 #include "filter-funcs.h"
 #include "libbalsa-conf.h"
 #include "mailbox-filter.h"
-#include "i18n.h"
+#include <glib/gi18n.h>
 
 /* Load the header of a filter filter (you have to separately load the
  * associated conditions) Filter is marked as invalid Position

@@ -49,7 +49,7 @@
 
 #include "filter-funcs.h"
 #include "misc.h"
-#include "i18n.h"
+#include <glib/gi18n.h>
 
 /* TREE_VIEW_FIXED_HEIGHT enables hight-performance mode of GtkTreeView
  * very useful for large mailboxes (#msg >5000) but: a. is available only

@@ -42,7 +42,7 @@
 #include "libbalsa-conf.h"
 #endif                          /* ENABLE_ESMTP */
 
-#include "i18n.h"
+#include <glib/gi18n.h>
 
 #define ELEMENTS(x) (sizeof (x) / sizeof (x[0]))
 

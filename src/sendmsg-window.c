@@ -33,7 +33,7 @@
 #include <gnome.h>
 #include <libgnomevfs/gnome-vfs-uri.h>
 #include <libgnomevfs/gnome-vfs-mime-handlers.h>
-#include "i18n.h"
+#include <glib/gi18n.h>
 #include <ctype.h>
 #include <glib.h>
 

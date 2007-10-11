@@ -26,7 +26,7 @@
 #include <sys/stat.h>
 #include <gconf/gconf-client.h>
 
-#include "i18n.h"
+#include <glib/gi18n.h>
 #include "balsa-app.h"
 
 /* here are local prototypes */

@@ -30,7 +30,7 @@
 #include "save-restore.h"
 #include "pref-manager.h"
 #include "imap-server.h"
-#include "i18n.h"
+#include <glib/gi18n.h>
 
 typedef struct _CommonDialogData CommonDialogData;
 typedef struct _FolderDialogData FolderDialogData;

@@ -3757,7 +3757,11 @@ bw_threading_radio_cb(GtkRadioAction * action, GtkRadioAction * current,
 
     type = gtk_radio_action_get_current_value(action);
     balsa_index_set_threading_type(BALSA_INDEX(index), type);
-    if ((mbnode = BALSA_INDEX(index)->mailbox_node)
+
+    /* bw->current_index may have been destroyed and cleared during
+     * set-threading: */
+    index = balsa_window_find_current_index(bw);
+    if (index && (mbnode = BALSA_INDEX(index)->mailbox_node)
 	&& (mailbox = mbnode->mailbox))
 	bw_enable_expand_collapse(bw, mailbox);
 }

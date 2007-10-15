@@ -1187,6 +1187,7 @@ lbm_local_update_view_filter(LibBalsaMailbox * mailbox,
     LibBalsaProgress progress = LIBBALSA_PROGRESS_INIT;
     LibBalsaMailboxSearchIter *iter_view;
     guint msgno;
+    gboolean is_flag_only = TRUE;
 
     total = libbalsa_mailbox_total_messages(mailbox);
     if (view_filter
@@ -1196,6 +1197,7 @@ lbm_local_update_view_filter(LibBalsaMailbox * mailbox,
         text = g_strdup_printf(_("Filtering %s"), mailbox->name);
         libbalsa_progress_set_text(&progress, text, total);
         g_free(text);
+        is_flag_only = FALSE;
     }
 
     iter_view = libbalsa_mailbox_search_iter_new(view_filter);
@@ -1208,7 +1210,10 @@ lbm_local_update_view_filter(LibBalsaMailbox * mailbox,
     libbalsa_progress_set_text(&progress, NULL, 0);
     libbalsa_mailbox_search_iter_free(iter_view);
 
-    lbm_local_queue_save_tree(LIBBALSA_MAILBOX_LOCAL(mailbox));
+    /* If this is not a flags-only filter, the new mailbox tree is
+     * temporary, so we don't want to save it. */
+    if (is_flag_only)
+        lbm_local_queue_save_tree(LIBBALSA_MAILBOX_LOCAL(mailbox));
 }
 
 /*
@@ -1392,6 +1397,7 @@ struct _ThreadingInfo {
     GHashTable *id_table;
     GHashTable *subject_table;
     GSList *unthreaded;
+    LibBalsaMailboxThreadingType type;
 };
 typedef struct _ThreadingInfo ThreadingInfo;
 
@@ -1961,6 +1967,7 @@ lbml_threading_simple(LibBalsaMailbox * mailbox,
 	g_node_traverse(msg_tree, G_POST_ORDER, G_TRAVERSE_ALL,
 			-1, (GNodeTraverseFunc) lbml_insert_message, &ti);
 
+    ti.type = type;
     g_node_traverse(msg_tree, G_POST_ORDER, G_TRAVERSE_ALL, -1,
 		    (GNodeTraverseFunc) lbml_thread_message, &ti);
 
@@ -1999,6 +2006,8 @@ lbml_thread_message(GNode * node, ThreadingInfo * ti)
         return FALSE;
 
     info = lbml_get_info(node, ti);
+    if (ti->type == LB_MAILBOX_THREADING_SIMPLE && !info)
+        return FALSE;
 
     if (info) {
         GList *refs = info->refs_for_threading;
@@ -2134,8 +2143,8 @@ lbm_local_sync_queue(LibBalsaMailboxLocal * local)
 static void
 lbm_local_sort(LibBalsaMailbox * mailbox, GArray *sort_array)
 {
-    lbm_local_queue_save_tree(LIBBALSA_MAILBOX_LOCAL(mailbox));
     LIBBALSA_MAILBOX_CLASS(parent_class)->sort(mailbox, sort_array);
+    lbm_local_queue_save_tree(LIBBALSA_MAILBOX_LOCAL(mailbox));
 }
 
 #define FLAGS_REALLY_DIFFER(flags0, flags1) \

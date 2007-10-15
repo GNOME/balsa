@@ -1,3 +1,16 @@
+2007-10-14  Peter Bloomfield
+
+	* libbalsa/mailbox.c: (lbm_get_view): do not assert url is not
+	in hash table;
+	(lbm_sort): set msg-tree-changed;
+	(libbalsa_mailbox_unlink_and_prepend): set msg-tree-changed only
+	if we are sure it was.
+	* libbalsa/mailbox_local.c: (lbm_local_update_view_filter): set
+	msg-tree-changed only if it is a flags-only filter; fix bug
+	saving and restoring simple threading.
+	* src/main-window.c: avoid critical warning if Balsa is closed
+	during a threadind.
+
 2007-10-10  Peter Bloomfield
 
 	* libbalsa/Makefile.am:

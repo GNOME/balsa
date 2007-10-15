@@ -2108,16 +2108,16 @@ lbm_get_view(LibBalsaMailbox * mailbox)
 	return &libbalsa_mailbox_view_default;
 
     view = mailbox->view;
-    if (view)
-	return view;
-
-    g_assert(g_hash_table_lookup(libbalsa_mailbox_view_table, mailbox->url)
-	     == NULL);
-
-    view = libbalsa_mailbox_view_new();
-    mailbox->view = view;
-    g_hash_table_insert(libbalsa_mailbox_view_table, g_strdup(mailbox->url),
-			view);
+    if (!view) {
+        view =
+            g_hash_table_lookup(libbalsa_mailbox_view_table, mailbox->url);
+        if (!view) {
+            view = libbalsa_mailbox_view_new();
+            g_hash_table_insert(libbalsa_mailbox_view_table,
+                                g_strdup(mailbox->url), view);
+        }
+        mailbox->view = view;
+    }
 
     return view;
 }
@@ -3333,6 +3333,7 @@ lbm_sort(LibBalsaMailbox * mbox, GNode * parent)
             else
                 node = parent->children = tmp_node;
             tmp_node->prev = prev;
+            mbox->msg_tree_changed = TRUE;
         } else
             g_assert(prev == NULL || prev->next == tmp_node);
         prev = tmp_node;
@@ -3553,9 +3554,9 @@ libbalsa_mailbox_unlink_and_prepend(LibBalsaMailbox * mailbox,
                           libbalsa_mbox_model_signals[ROW_HAS_CHILD_TOGGLED],
                           0, path, &iter);
         gtk_tree_path_free(path);
-    }
 
-    mailbox->msg_tree_changed = TRUE;
+        mailbox->msg_tree_changed = TRUE;
+    }
 }
 
 struct lbm_update_msg_tree_info {

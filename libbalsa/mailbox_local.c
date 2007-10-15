@@ -1999,28 +1999,33 @@ lbml_insert_message(GNode * node, ThreadingInfo * ti)
 static gboolean
 lbml_thread_message(GNode * node, ThreadingInfo * ti)
 {
-    LibBalsaMailboxLocalInfo *info;
-    GNode *parent = NULL;
-
     if (!node->parent)
         return FALSE;
 
-    info = lbml_get_info(node, ti);
-    if (ti->type == LB_MAILBOX_THREADING_SIMPLE && !info)
-        return FALSE;
+    if (ti->type == LB_MAILBOX_THREADING_FLAT) {
+        if (node->parent != ti->mailbox->msg_tree)
+            libbalsa_mailbox_unlink_and_prepend(ti->mailbox, node,
+                                                ti->mailbox->msg_tree);
+    } else {
+        LibBalsaMailboxLocalInfo *info;
+        GList *refs;
+        GNode *parent = NULL;
 
-    if (info) {
-        GList *refs = info->refs_for_threading;
+        info = lbml_get_info(node, ti);
+        if (!info)
+            return FALSE;
+
+        refs = info->refs_for_threading;
         if (refs)
             parent = g_hash_table_lookup(ti->id_table,
                                          g_list_last(refs)->data);
-    }
 
-    if (!parent)
-        parent = ti->mailbox->msg_tree;
-    if (parent != node->parent && parent != node
-        && !g_node_is_ancestor(node, parent))
-        libbalsa_mailbox_unlink_and_prepend(ti->mailbox, node, parent);
+        if (!parent)
+            parent = ti->mailbox->msg_tree;
+        if (parent != node->parent && parent != node
+            && !g_node_is_ancestor(node, parent))
+            libbalsa_mailbox_unlink_and_prepend(ti->mailbox, node, parent);
+    }
 
     return FALSE;
 }

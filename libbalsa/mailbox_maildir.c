@@ -556,7 +556,7 @@ libbalsa_mailbox_maildir_check(LibBalsaMailbox * mailbox)
 	libbalsa_mailbox_set_mtime(mailbox, st.st_mtime);
         return;
     }
-    if (st.st_mtime <= mtime)
+    if (st.st_mtime == mtime)
 	return;
 
     libbalsa_mailbox_set_mtime(mailbox, st.st_mtime);

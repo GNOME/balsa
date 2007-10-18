@@ -1,3 +1,10 @@
+2007-10-17  Peter Bloomfield
+
+	* libbalsa/mailbox_maildir.c: skip check only if mtime matches
+	exactly.
+	* src/balsa-index.c: revert to scrolling in an idle callback,
+	but now at low priority.
+
 2007-10-15  Peter Bloomfield
 
 	* libbalsa/mailbox_local.c: clarify simple and flat threading.

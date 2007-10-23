@@ -52,6 +52,9 @@ typedef struct _LibBalsaCondition LibBalsaCondition;
 #if HAVE_SQLITE
 #include "address-book-gpe.h"
 #endif
+#if HAVE_RUBRICA
+#include "address-book-rubrica.h"
+#endif
 
 #include "mailbox.h"
 #include "mailbox_local.h"

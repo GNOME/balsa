@@ -1,3 +1,17 @@
+2007-10-23  Albrecht Dreß
+
+	* configure.in:
+	* libbalsa/Makefile.am:
+	* libbalsa/address-book-rubrica.c:
+	* libbalsa/address-book-rubrica.h:
+	* libbalsa/libbalsa.c:
+	* libbalsa/libbalsa.h:
+	* src/ab-main.c:
+	* src/ab-window.c:
+	* src/address-book-config.c:
+	* src/main.c:
+	* src/pref-manager.c: add support for Rubrica address book.
+
 2007-10-17  Peter Bloomfield
 
 	* libbalsa/mailbox_maildir.c: skip check only if mtime matches

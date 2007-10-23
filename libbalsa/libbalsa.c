@@ -113,6 +113,9 @@ libbalsa_init(LibBalsaInformationFunc information_callback)
 #if HAVE_SQLITE
     LIBBALSA_TYPE_ADDRESS_BOOK_GPE;
 #endif
+#if HAVE_RUBRICA
+    LIBBALSA_TYPE_ADDRESS_BOOK_RUBRICA;
+#endif
 }
 
 

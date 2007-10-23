@@ -41,6 +41,9 @@
 #if HAVE_SQLITE
 #include "address-book-gpe.h"
 #endif /* HAVE_SQLITE */
+#if HAVE_RUBRICA
+#include "address-book-rubrica.h"
+#endif /* HAVE_RUBRICA */
 #include "address-book-config.h"
 #include "libbalsa-conf.h"
 #include "libbalsa.h"
@@ -198,6 +201,10 @@ bab_window_set_title(LibBalsaAddressBook * address_book)
     else if (LIBBALSA_IS_ADDRESS_BOOK_GPE(address_book))
         type = "GPE";
 #endif
+#if HAVE_RUBRICA
+    else if (LIBBALSA_IS_ADDRESS_BOOK_RUBRICA(address_book))
+        type = "Rubrica";
+#endif /* HAVE_RUBRICA */
 
     title =
         g_strconcat(type, _(" address book: "), address_book->name, NULL);
@@ -384,6 +391,16 @@ file_new_gpe_cb(GtkAction * action, gpointer user_data)
 }
 #endif /* HAVE_SQLITE */
 
+#if HAVE_RUBRICA
+static void
+file_new_rubrica_cb(GtkAction * action, gpointer user_data)
+{
+    balsa_address_book_config_new_from_type
+        (LIBBALSA_TYPE_ADDRESS_BOOK_RUBRICA, address_book_change,
+         contacts_app.window);
+}
+#endif /* HAVE_RUBRICA */
+
 static void
 file_properties_cb(GtkAction * action, gpointer user_data)
 {
@@ -485,6 +502,10 @@ static GtkActionEntry entries[] = {
     {"NewGpe", NULL, N_("GPE Address Book"), NULL, NULL,
      G_CALLBACK(file_new_gpe_cb)},
 #endif /* HAVE_SQLITE */
+#if HAVE_RUBRICA
+    {"NewRubrica", NULL, N_("Rubrica Address Book"), NULL, NULL,
+     G_CALLBACK(file_new_rubrica_cb)},
+#endif /* HAVE_RUBRICA */
     {"Properties", GTK_STOCK_PROPERTIES, N_("_Properties"), NULL,
      N_("Edit address book properties"), G_CALLBACK(file_properties_cb)},
     {"Delete", GTK_STOCK_DELETE, N_("_Delete"), NULL,
@@ -516,6 +537,9 @@ static const char *ui_description =
 #if HAVE_SQLITE
 "        <menuitem action='NewGpe'/>"
 #endif /* HAVE_SQLITE */
+#if HAVE_RUBRICA
+"        <menuitem action='NewRubrica'/>"
+#endif /* HAVE_RUBRICA */
 "      </menu>"
 "      <menuitem action='Properties'/>"
 "      <menuitem action='Delete'/>"
@@ -985,6 +1009,9 @@ bab_init(void)
 #if HAVE_SQLITE
     LIBBALSA_TYPE_ADDRESS_BOOK_GPE;
 #endif
+#if HAVE_RUBRICA
+    LIBBALSA_TYPE_ADDRESS_BOOK_RUBRICA;
+#endif /* HAVE_RUBRICA */
     memset(&contacts_app, 0, sizeof(contacts_app));
 }
 
@@ -1039,6 +1066,9 @@ main(int argc, char *argv[])
 #if HAVE_SQLITE
     LIBBALSA_TYPE_ADDRESS_BOOK_GPE;
 #endif
+#if HAVE_RUBRICA
+    LIBBALSA_TYPE_ADDRESS_BOOK_RUBRICA;
+#endif /* HAVE_RUBRICA */
     libbalsa_real_information_func = (LibBalsaInformationFunc)information_real;
     g_mime_init(0);
 

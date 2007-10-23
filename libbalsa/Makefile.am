@@ -46,6 +46,8 @@ libbalsa_a_SOURCES = 		\
 	address-book-ldap.h	\
 	address-book-ldif.c	\
 	address-book-ldif.h	\
+	address-book-rubrica.c	\
+	address-book-rubrica.h	\
 	address-book-text.c	\
 	address-book-text.h	\
 	address-book-vcard.c	\

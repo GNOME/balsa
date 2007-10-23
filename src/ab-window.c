@@ -675,6 +675,10 @@ balsa_ab_window_set_title(BalsaAbWindow *ab)
     else if (LIBBALSA_IS_ADDRESS_BOOK_GPE(address_book))
         type = "GPE";
 #endif
+#if HAVE_RUBRICA
+    else if (LIBBALSA_IS_ADDRESS_BOOK_RUBRICA(address_book))
+        type = "Rubrica";
+#endif
 
     title =
         g_strconcat(type, _(" address book: "), address_book->name, NULL);
@@ -697,11 +701,10 @@ balsa_ab_window_load(BalsaAbWindow *ab)
 	return;
 
     filter = gtk_entry_get_text(GTK_ENTRY(ab->filter_entry));
-    if( (err=libbalsa_address_book_load(ab->current_address_book, 
-                                        filter,
-                                        (LibBalsaAddressBookLoadFunc)
-                                        balsa_ab_window_load_cb,
-                                        ab)) != LBABERR_OK) {
+    err = libbalsa_address_book_load(ab->current_address_book, filter,
+                                     (LibBalsaAddressBookLoadFunc)
+                                     balsa_ab_window_load_cb, ab);
+    if (err != LBABERR_OK && err != LBABERR_CANNOT_READ) {
 	const gchar *desc =
 	    libbalsa_address_book_strerror(ab->current_address_book, err);
         balsa_information_parented(GTK_WINDOW(ab),

@@ -39,6 +39,10 @@
 #include <locale.h>
 #endif
 
+#ifdef HAVE_RUBRICA
+#include <libxml/xmlversion.h>
+#endif
+
 #include <glib/gi18n.h>
 
 #include "address-entry.h"
@@ -713,6 +717,11 @@ main(int argc, char *argv[])
 #ifdef BALSA_USE_THREADS
     /* initiate thread mutexs, variables */
     threads_init();
+#endif
+
+#ifdef HAVE_RUBRICA
+    /* initialise libxml */
+    LIBXML_TEST_VERSION
 #endif
 
 #ifdef HAVE_GPGME

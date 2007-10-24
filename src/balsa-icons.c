@@ -80,6 +80,8 @@ load_balsa_pixmap(GtkIconTheme *icon_theme, GtkIconFactory *factory,
     static pixmap_fallback_t fallback_id[] = {
 	{ "user-trash", GTK_STOCK_DELETE },
 	{ "user-trash-full", GTK_STOCK_DELETE },
+	{ "mail-attachment", "stock_attach" },
+	{ "emblem-important", "stock_mail-flag-for-followup"},
 	{ NULL, NULL } };
 
     BICONS_LOG("loading icon %s (stock id %s)", bpixmap->name,
@@ -185,7 +187,7 @@ register_balsa_pixmaps(void)
 	  { GTK_ICON_SIZE_LARGE_TOOLBAR, GTK_ICON_SIZE_MENU } },
 	{ BALSA_PIXMAP_MARK_ALL,	"balsa-mark-all",
 	  { GTK_ICON_SIZE_LARGE_TOOLBAR, GTK_ICON_SIZE_MENU } },
-	{ BALSA_PIXMAP_ATTACHMENT,	"stock_attach",
+	{ BALSA_PIXMAP_ATTACHMENT,	"mail-attachment",
 	  { GTK_ICON_SIZE_LARGE_TOOLBAR, GTK_ICON_SIZE_MENU } },
 	{ BALSA_PIXMAP_NEXT,		"balsa-next",
 	  { GTK_ICON_SIZE_LARGE_TOOLBAR, GTK_ICON_SIZE_MENU } },
@@ -270,7 +272,7 @@ register_balsa_pixmaps(void)
 	  { GTK_ICON_SIZE_MENU, GTK_ICON_SIZE_INVALID } },
         { BALSA_PIXMAP_INFO_NEW,        "stock_mail-unread",
 	  { GTK_ICON_SIZE_MENU, GTK_ICON_SIZE_INVALID } },
-	{ BALSA_PIXMAP_INFO_FLAGGED,    "stock_mail-flag-for-followup",
+	{ BALSA_PIXMAP_INFO_FLAGGED,    "emblem-important",
 	  { GTK_ICON_SIZE_MENU, GTK_ICON_SIZE_INVALID } },
 
 	};

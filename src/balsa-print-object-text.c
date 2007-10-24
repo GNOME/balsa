@@ -23,6 +23,7 @@
 #include <string.h>
 #include "config.h"
 #include <glib/gi18n.h>
+#include "balsa-icons.h"
 #include "balsa-print-object.h"
 #include "balsa-print-object-decor.h"
 #include "balsa-print-object-default.h"
@@ -462,7 +463,7 @@ balsa_print_object_text_vcard(GList * list,
     /* get the stock contacts icon or the mime type icon on fail */
     pod->pixbuf =
 	gtk_icon_theme_load_icon(gtk_icon_theme_get_default(),
-				 "stock_contact", 48,
+				 BALSA_PIXMAP_IDENTITY, 48,
 				 GTK_ICON_LOOKUP_USE_BUILTIN, NULL);
     if (!pod->pixbuf) {
 	gchar *conttype = libbalsa_message_body_get_mime_type(body);

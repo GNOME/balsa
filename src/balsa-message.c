@@ -326,7 +326,7 @@ bm_header_tl_buttons(BalsaMessage * bm)
 		     (gpointer) bm);
     gtk_button_set_relief(GTK_BUTTON(button), GTK_RELIEF_NONE);
     gtk_container_add(GTK_CONTAINER(button), 
-		      gtk_image_new_from_stock("gnome-stock-attach", 
+		      gtk_image_new_from_stock(BALSA_PIXMAP_ATTACHMENT, 
 					       GTK_ICON_SIZE_LARGE_TOOLBAR));
     gtk_box_pack_start(GTK_BOX(vbox), button, FALSE, FALSE, 0);
     g_signal_connect(button, "clicked",

@@ -1,5 +1,11 @@
 2007-10-25  Peter Bloomfield
 
+	* libbalsa/cell-renderer-button.c:
+	* libbalsa/cell-renderer-button.h: forgot to add these for
+	initial commit.
+
+2007-10-25  Peter Bloomfield
+
 	* libbalsa/Makefile.am:
 	* libbalsa/address-entry.c:
 	* libbalsa/address-entry.h:

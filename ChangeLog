@@ -1,3 +1,16 @@
+2007-10-25  Peter Bloomfield
+
+	* libbalsa/Makefile.am:
+	* libbalsa/address-entry.c:
+	* libbalsa/address-entry.h:
+	* libbalsa/address-view.c:
+	* libbalsa/address-view.h:
+	* src/ab-window.c:
+	* src/main.c:
+	* src/save-restore.c:
+	* src/sendmsg-window.c:
+	* src/sendmsg-window.h: initial commit on address-view branch.
+
 2007-10-24  Albrecht Dreß
 
 	* src/balsa-icons.c:

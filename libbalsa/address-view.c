@@ -810,26 +810,31 @@ lbav_sort_func(GtkTreeModel * model, GtkTreeIter * a, GtkTreeIter * b,
                gpointer user_data)
 {
     LibBalsaAddressType type_a, type_b;
-    gchar *name_a, *name_b;
     gint retval;
 
-    gtk_tree_model_get(model, a, ADDRESS_TYPE_COL, &type_a,
-                       ADDRESS_NAME_COL, &name_a, -1);
-    gtk_tree_model_get(model, b, ADDRESS_TYPE_COL, &type_b,
-                       ADDRESS_NAME_COL, &name_b, -1);
+    gtk_tree_model_get(model, a, ADDRESS_TYPE_COL, &type_a, -1);
+    gtk_tree_model_get(model, b, ADDRESS_TYPE_COL, &type_b, -1);
 
     /* Sort by type. */
     retval = type_a - type_b;
     if (retval == 0) {
         /* Within type, make sure a blank line sorts to the bottom. */
-        if (!name_a)
+        gchar *name;
+        gboolean is_blank_a, is_blank_b;
+
+        gtk_tree_model_get(model, a, ADDRESS_NAME_COL, &name, -1);
+        is_blank_a = !name || !*name;
+        g_free(name);
+
+        gtk_tree_model_get(model, b, ADDRESS_NAME_COL, &name, -1);
+        is_blank_b = !name || !*name;
+        g_free(name);
+
+        if (is_blank_a && !is_blank_b)
             retval = 1;
-        else if (!name_b)
+        else if (is_blank_b && !is_blank_a)
             retval = -1;
     }
-
-    g_free(name_a);
-    g_free(name_b);
 
     return retval;
 }
@@ -879,16 +884,16 @@ LibBalsaAddressView *libbalsa_address_view_new(const gchar *
     gtk_tree_sortable_set_sort_column_id
         (GTK_TREE_SORTABLE(address_store),
          GTK_TREE_SORTABLE_DEFAULT_SORT_COLUMN_ID, GTK_SORT_ASCENDING);
-#if DEBUG_LIBBALSA_ADDRESS_VIEW
-    g_print("%s store %p\n", __func__, address_store);
-    g_object_weak_ref(G_OBJECT(address_store),
-                      (GWeakNotify) lbav_address_store_weak_notify, NULL);
-#endif                          /* DEBUG_LIBBALSA_ADDRESS_VIEW */
 
     /* The widget: */
     address_view =
         g_object_new(LIBBALSA_TYPE_ADDRESS_VIEW, "model", address_store,
                      "headers-visible", FALSE, NULL);
+#if DEBUG_LIBBALSA_ADDRESS_VIEW
+    g_print("%s view %p store %p\n", __func__, address_view, address_store);
+    g_object_weak_ref(G_OBJECT(address_store),
+                      (GWeakNotify) lbav_address_store_weak_notify, NULL);
+#endif                          /* DEBUG_LIBBALSA_ADDRESS_VIEW */
     g_object_unref(address_store);
     tree_view = GTK_TREE_VIEW(address_view);
 

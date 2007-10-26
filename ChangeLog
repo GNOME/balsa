@@ -1,3 +1,9 @@
+2007-10-26  Peter Bloomfield
+
+	* libbalsa/address-view.c: (lbav_sort_func): make sort-func
+	reflexive;
+	(libbalsa_address_view_new): more debug info.
+
 2007-10-26  Peter Bloomfield 
 
 	* libbalsa/address-view.c: make blank line sort below addresses

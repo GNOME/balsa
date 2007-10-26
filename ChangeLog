@@ -1,3 +1,8 @@
+2007-10-26  Peter Bloomfield 
+
+	* libbalsa/address-view.c: make blank line sort below addresses
+	of the same type; try to have only one blank line.
+
 2007-10-25  Peter Bloomfield
 
 	* libbalsa/cell-renderer-button.c:

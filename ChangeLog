@@ -1,3 +1,8 @@
+2007-10-27  Peter Bloomfield
+
+	* libbalsa/address-view.c: localize address types; check address
+	types.
+
 2007-10-26  Peter Bloomfield
 
 	* libbalsa/address-view.c: (lbav_sort_func): make sort-func

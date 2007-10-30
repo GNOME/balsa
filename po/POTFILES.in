@@ -8,7 +8,7 @@ libbalsa/address-book-ldap.c
 libbalsa/address-book-ldif.c
 libbalsa/address-book-vcard.c
 libbalsa/address-book.c
-libbalsa/address-entry.c
+libbalsa/address-view.c
 libbalsa/address.c
 libbalsa/body.c
 libbalsa/files.c

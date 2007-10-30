@@ -1,3 +1,11 @@
+2007-10-30  Peter Bloomfield
+
+	* libbalsa/address-view.c:
+	* libbalsa/address-view.h:
+	* src/save-restore.c:
+	* src/sendmsg-window.c:
+	* src/sendmsg-window.h: use a separate widget for Reply-To.
+
 2007-10-27  Peter Bloomfield
 
 	* libbalsa/address-view.c: localize address types; check address

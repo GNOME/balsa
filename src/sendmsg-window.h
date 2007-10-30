@@ -53,8 +53,8 @@ extern "C" {
 
     struct _BalsaSendmsg {
 	GtkWidget *window;
-        LibBalsaAddressView *address_view;
-	GtkWidget *from[2], *addresses[2], *subject[2], *fcc[2];
+        LibBalsaAddressView *recipient_view, *replyto_view;
+	GtkWidget *from[2], *recipients[2], *replyto[2], *subject[2], *fcc[2];
 	GtkWidget *attachments[4];
         gchar *in_reply_to;
         GList *references;

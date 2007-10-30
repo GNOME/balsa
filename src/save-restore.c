@@ -1102,10 +1102,10 @@ config_global_load(void)
         }
         if (!libbalsa_conf_get_bool("LibBalsaAddressView")) {
             /* No warning */
-            if (!libbalsa_find_word("Addresses",
+            if (!libbalsa_find_word("Recipients",
                                     balsa_app.compose_headers)) {
                 gchar *compose_headers =
-                    g_strconcat(balsa_app.compose_headers, " Addresses",
+                    g_strconcat(balsa_app.compose_headers, " Recipients",
                                 NULL);
                 g_free(balsa_app.compose_headers);
                 balsa_app.compose_headers = compose_headers;

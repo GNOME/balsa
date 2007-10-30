@@ -54,13 +54,15 @@ static guint address_view_signals[LAST_SIGNAL] = { 0 };
 G_DEFINE_TYPE(LibBalsaAddressView, libbalsa_address_view,
               GTK_TYPE_TREE_VIEW)
 
-static void libbalsa_address_view_init(LibBalsaAddressView * address_view)
+static void
+libbalsa_address_view_init(LibBalsaAddressView * address_view)
 {
 }
 
 #define DEBUG_LIBBALSA_ADDRESS_VIEW TRUE
 
-static void libbalsa_address_view_finalize(GObject * object)
+static void
+libbalsa_address_view_finalize(GObject * object)
 {
     LibBalsaAddressView *address_view = LIBBALSA_ADDRESS_VIEW(object);
 
@@ -142,9 +144,9 @@ const gchar *const libbalsa_address_view_types[] = {
 /*
  *     Create a GList of addresses matching the prefix.
  */
-static GList *lbav_get_matching_addresses(const gchar * prefix,
-                                          LibBalsaAddressViewMatchType
-                                          type)
+static GList *
+lbav_get_matching_addresses(const gchar * prefix,
+                            LibBalsaAddressViewMatchType type)
 {
     GList *match = NULL, *list;
     gchar *prefix_n;
@@ -239,6 +241,7 @@ lbav_ensure_blank_line_idle_cb(LibBalsaAddressView * address_view)
 {
     GtkTreeView *tree_view;
     GtkTreeModel *model;
+    GtkTreePath *focus_path;
 
     gdk_threads_enter();
 
@@ -248,26 +251,18 @@ lbav_ensure_blank_line_idle_cb(LibBalsaAddressView * address_view)
 #endif                          /* DEBUG_LIBBALSA_ADDRESS_VIEW */
     tree_view = GTK_TREE_VIEW(address_view);
     model = gtk_tree_view_get_model(tree_view);
-    /* One last check that the tree-view is sane: */
-    if (GTK_IS_TREE_MODEL(model)) {
-        GtkTreePath *focus_path =
-            gtk_tree_row_reference_get_path(address_view->focus_row);
+    focus_path = gtk_tree_row_reference_get_path(address_view->focus_row);
 
-        /* This will open the entry for editing;
-         * NOTE: the GtkTreeView documentation states that:
-         *  "This function is often followed by
-         *   gtk_widget_grab_focus(tree_view) in order to give keyboard
-         *   focus to the widget."
-         * but in fact, that leaves the entry /not/ open for editing. */
-        gtk_tree_view_set_cursor_on_cell(tree_view, focus_path,
-                                         address_view->focus_column,
-                                         address_view->focus_cell, TRUE);
-        gtk_tree_path_free(focus_path);
-    }
-#if DEBUG_LIBBALSA_ADDRESS_VIEW
-    else
-        g_print(" !GTK_IS_TREE_MODEL(model)\n");
-#endif                          /* DEBUG_LIBBALSA_ADDRESS_VIEW */
+    /* This will open the entry for editing;
+     * NOTE: the GtkTreeView documentation states that:
+     *  "This function is often followed by
+     *   gtk_widget_grab_focus(tree_view) in order to give keyboard
+     *   focus to the widget."
+     * but in fact, that leaves the entry /not/ open for editing. */
+    gtk_tree_view_set_cursor_on_cell(tree_view, focus_path,
+                                     address_view->focus_column,
+                                     address_view->focus_cell, TRUE);
+    gtk_tree_path_free(focus_path);
 
     gtk_tree_row_reference_free(address_view->focus_row);
     address_view->focus_row = NULL;
@@ -295,7 +290,7 @@ lbav_ensure_blank_line(LibBalsaAddressView * address_view,
 
     g_assert(type < LIBBALSA_ADDRESS_N_TYPES);
 
-    this_type = LIBBALSA_ADDRESS_TYPE_TO;
+    this_type = address_view->default_type;
     name = NULL;
     for (valid = gtk_tree_model_get_iter_first(model, iter);
          valid; valid = gtk_tree_model_iter_next(model, iter)) {
@@ -423,14 +418,15 @@ lbav_set_or_add(LibBalsaAddressView * address_view,
                 LibBalsaAddressType type,
                 const gchar * address, gboolean clear)
 {
+    GtkTreeModel *model =
+        gtk_tree_view_get_model(GTK_TREE_VIEW(address_view));
+    GtkTreeIter iter;
+
     if (clear)
         lbav_remove(address_view, type);
 
     if (address && *address) {
-        GtkTreeModel *model =
-            gtk_tree_view_get_model(GTK_TREE_VIEW(address_view));
         GtkListStore *address_store = GTK_LIST_STORE(model);
-        GtkTreeIter iter;
 
         lbav_ensure_blank_line(address_view, &iter, type);
         gtk_list_store_set(address_store, &iter,
@@ -439,7 +435,9 @@ lbav_set_or_add(LibBalsaAddressView * address_view,
                            _(libbalsa_address_view_types[type]), -1);
         lbav_add_from_string(address_view, &iter, address);
         lbav_ensure_blank_line(address_view, &iter, type);
-    }
+    } else
+        lbav_ensure_blank_line(address_view, &iter,
+                               address_view->default_type);
 }
 
 /*
@@ -520,19 +518,6 @@ lbav_count_addresses_in_list(InternetAddressList * list, gint * addresses)
         } else if (ia->type == INTERNET_ADDRESS_GROUP)
             lbav_count_addresses_in_list(ia->value.members, addresses);
     }
-}
-
-/*
- *     Count addresses of the given type
- */
-static void
-lbav_count_addresses(LibBalsaAddressView * address_view,
-                     LibBalsaAddressType type, gint * addresses)
-{
-    InternetAddressList *list =
-        libbalsa_address_view_get_list(address_view, type);
-    lbav_count_addresses_in_list(list, addresses);
-    internet_address_list_destroy(list);
 }
 
 /*
@@ -856,16 +841,15 @@ lbav_address_store_weak_notify(gpointer data, GObject * address_store)
 }
 #endif                          /* DEBUG_LIBBALSA_ADDRESS_VIEW */
 
-LibBalsaAddressView *libbalsa_address_view_new(const gchar *
-                                               address_book_stock_id,
-                                               const gchar *
-                                               remove_stock_id)
+LibBalsaAddressView *
+libbalsa_address_view_new(LibBalsaAddressViewType type,
+                          const gchar * address_book_stock_id,
+                          const gchar * remove_stock_id)
 {
     GtkListStore *address_store;
     GtkTreeIter iter;
     GtkTreeView *tree_view;
     LibBalsaAddressView *address_view;
-    GtkListStore *type_store;
     guint i;
     GtkCellRenderer *renderer;
     GtkTreeViewColumn *column;
@@ -892,39 +876,46 @@ LibBalsaAddressView *libbalsa_address_view_new(const gchar *
         g_object_new(LIBBALSA_TYPE_ADDRESS_VIEW, "model", address_store,
                      "headers-visible", FALSE, NULL);
 #if DEBUG_LIBBALSA_ADDRESS_VIEW
-    g_print("%s view %p store %p\n", __func__, address_view, address_store);
+    g_print("%s view %p store %p\n", __func__, address_view,
+            address_store);
     g_object_weak_ref(G_OBJECT(address_store),
                       (GWeakNotify) lbav_address_store_weak_notify, NULL);
 #endif                          /* DEBUG_LIBBALSA_ADDRESS_VIEW */
     g_object_unref(address_store);
     tree_view = GTK_TREE_VIEW(address_view);
 
+    address_view->default_type =
+        type == LIBBALSA_ADDRESS_VIEW_TYPE_RECIPIENTS ?
+        LIBBALSA_ADDRESS_TYPE_TO : LIBBALSA_ADDRESS_TYPE_REPLYTO;
     address_view->remove_stock_id = g_strdup(remove_stock_id);
     address_view->address_book_stock_id = g_strdup(address_book_stock_id);
 
-    /* List-store for the address type combo: */
-    type_store = gtk_list_store_new(1, G_TYPE_STRING);
-    for (i = 0; i < G_N_ELEMENTS(libbalsa_address_view_types); i++) {
-        gtk_list_store_append(type_store, &iter);
-        gtk_list_store_set(type_store, &iter,
-                           0, _(libbalsa_address_view_types[i]), -1);
-    }
+    if (type == LIBBALSA_ADDRESS_VIEW_TYPE_RECIPIENTS) {
+        /* List-store for the address type combo: */
+        GtkListStore *type_store = gtk_list_store_new(1, G_TYPE_STRING);
 
-    /* The address type combo: */
-    renderer = gtk_cell_renderer_combo_new();
-    g_object_set(renderer,
-                 "editable", TRUE,
-                 "has-entry", FALSE,
-                 "model", type_store, "text-column", 0, NULL);
-    g_object_unref(type_store);
-    g_signal_connect(renderer, "edited",
-                     G_CALLBACK(lbav_combo_edited_cb), address_view);
-    column =
-        gtk_tree_view_column_new_with_attributes(NULL, renderer,
-                                                 "text",
-                                                 ADDRESS_TYPESTRING_COL,
-                                                 NULL);
-    gtk_tree_view_append_column(tree_view, column);
+        for (i = 0; i < LIBBALSA_ADDRESS_TYPE_REPLYTO; i++) {
+            gtk_list_store_append(type_store, &iter);
+            gtk_list_store_set(type_store, &iter,
+                               0, _(libbalsa_address_view_types[i]), -1);
+        }
+
+        /* The address type combo: */
+        renderer = gtk_cell_renderer_combo_new();
+        g_object_set(renderer,
+                     "editable", TRUE,
+                     "has-entry", FALSE,
+                     "model", type_store, "text-column", 0, NULL);
+        g_object_unref(type_store);
+        g_signal_connect(renderer, "edited",
+                         G_CALLBACK(lbav_combo_edited_cb), address_view);
+        column =
+            gtk_tree_view_column_new_with_attributes(NULL, renderer,
+                                                     "text",
+                                                     ADDRESS_TYPESTRING_COL,
+                                                     NULL);
+        gtk_tree_view_append_column(tree_view, column);
+    }
 
     /* Column for the entry widget and the address-book/remove button. */
     address_view->focus_column = column = gtk_tree_view_column_new();
@@ -955,7 +946,8 @@ LibBalsaAddressView *libbalsa_address_view_new(const gchar *
 
     gtk_tree_view_append_column(tree_view, column);
 
-    lbav_ensure_blank_line(address_view, &iter, LIBBALSA_ADDRESS_TYPE_TO);
+    lbav_ensure_blank_line(address_view, &iter,
+                           address_view->default_type);
 
     return address_view;
 }
@@ -963,7 +955,8 @@ LibBalsaAddressView *libbalsa_address_view_new(const gchar *
 /*
  *     Must be called before using the widget.
  */
-void libbalsa_address_view_set_address_book_list(GList * list)
+void
+libbalsa_address_view_set_address_book_list(GList * list)
 {
     lbav_address_book_list = list;
 }
@@ -1055,6 +1048,8 @@ libbalsa_address_view_set_from_list(LibBalsaAddressView * address_view,
                                     LibBalsaAddressType type,
                                     InternetAddressList * list)
 {
+    GtkTreeIter iter;
+
     g_return_if_fail(LIBBALSA_IS_ADDRESS_VIEW(address_view));
     g_return_if_fail(type < LIBBALSA_ADDRESS_N_TYPES);
 
@@ -1064,7 +1059,6 @@ libbalsa_address_view_set_from_list(LibBalsaAddressView * address_view,
         GtkTreeModel *model =
             gtk_tree_view_get_model(GTK_TREE_VIEW(address_view));
         GtkListStore *address_store = GTK_LIST_STORE(model);
-        GtkTreeIter iter;
 
         lbav_ensure_blank_line(address_view, &iter, type);
         gtk_list_store_set(address_store, &iter,
@@ -1073,32 +1067,29 @@ libbalsa_address_view_set_from_list(LibBalsaAddressView * address_view,
                            _(libbalsa_address_view_types[type]), -1);
         lbav_add_from_list(address_view, &iter, list);
         lbav_ensure_blank_line(address_view, &iter, type);
-    }
+    } else
+        lbav_ensure_blank_line(address_view, &iter,
+                               address_view->default_type);
 }
 
 /*
  *     Number of complete addresses, or -1 if any is incomplete.
  */
 gint
-libbalsa_address_view_n_addresses(LibBalsaAddressView * address_view,
-                                  LibBalsaAddressType type)
+libbalsa_address_view_n_addresses(LibBalsaAddressView * address_view)
 {
     gint addresses;
+    LibBalsaAddressType type;
 
     g_return_val_if_fail(LIBBALSA_IS_ADDRESS_VIEW(address_view), -1);
-    /* type == LIBBALSA_ADDRESS_N_TYPES is valid: */
-    g_return_val_if_fail(type <= LIBBALSA_ADDRESS_N_TYPES, -1);
 
     addresses = 0;
-    if (type == LIBBALSA_ADDRESS_N_TYPES) {
-        for (type = 0; type < LIBBALSA_ADDRESS_N_TYPES; type++)
-#if !defined(ENABLE_TOUCH_UI)
-            if (type != LIBBALSA_ADDRESS_TYPE_REPLYTO)
-#endif                          /* ENABLE_TOUCH_UI */
-                lbav_count_addresses(address_view, type, &addresses);
-
-    } else
-        lbav_count_addresses(address_view, type, &addresses);
+    for (type = 0; type < LIBBALSA_ADDRESS_N_TYPES; type++) {
+        InternetAddressList *list =
+            libbalsa_address_view_get_list(address_view, type);
+        lbav_count_addresses_in_list(list, &addresses);
+        internet_address_list_destroy(list);
+    }
 
     return addresses;
 }
@@ -1107,10 +1098,9 @@ libbalsa_address_view_n_addresses(LibBalsaAddressView * address_view,
  *     Create InternetAddressList corresponding to the view content.
  *     The list must be destroyed using internet_address_list_destroy().
  */
-InternetAddressList *libbalsa_address_view_get_list(LibBalsaAddressView *
-                                                    address_view,
-                                                    LibBalsaAddressType
-                                                    type)
+InternetAddressList *
+libbalsa_address_view_get_list(LibBalsaAddressView * address_view,
+                               LibBalsaAddressType type)
 {
     GtkTreeModel *model;
     InternetAddressList *address_list;

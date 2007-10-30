@@ -51,12 +51,28 @@ G_BEGIN_DECLS
 typedef struct _LibBalsaAddressView LibBalsaAddressView;
 typedef struct _LibBalsaAddressViewClass LibBalsaAddressViewClass;
 
+typedef enum {
+    LIBBALSA_ADDRESS_VIEW_TYPE_RECIPIENTS,
+    LIBBALSA_ADDRESS_VIEW_TYPE_REPLYTO
+} LibBalsaAddressViewType;
+
+typedef enum {
+    LIBBALSA_ADDRESS_TYPE_TO,
+    LIBBALSA_ADDRESS_TYPE_CC,
+    LIBBALSA_ADDRESS_TYPE_BCC,
+#if !defined(ENABLE_TOUCH_UI)
+    LIBBALSA_ADDRESS_TYPE_REPLYTO,
+#endif                          /* ENABLE_TOUCH_UI */
+    LIBBALSA_ADDRESS_N_TYPES
+} LibBalsaAddressType;
+
 struct _LibBalsaAddressView {
     GtkTreeView parent;
 
     /*
      * Permanent data
      */
+    LibBalsaAddressType default_type;
     gchar *address_book_stock_id;
     gchar *remove_stock_id;
     gchar *domain;
@@ -82,20 +98,11 @@ struct _LibBalsaAddressViewClass {
 };
 
 GType libbalsa_address_view_get_type(void) G_GNUC_CONST;
-
-typedef enum {
-    LIBBALSA_ADDRESS_TYPE_TO,
-    LIBBALSA_ADDRESS_TYPE_CC,
-    LIBBALSA_ADDRESS_TYPE_BCC,
-#if !defined(ENABLE_TOUCH_UI)
-    LIBBALSA_ADDRESS_TYPE_REPLYTO,
-#endif                          /* ENABLE_TOUCH_UI */
-    LIBBALSA_ADDRESS_N_TYPES
-} LibBalsaAddressType;
 extern const gchar *const
     libbalsa_address_view_types[LIBBALSA_ADDRESS_N_TYPES];
 
-LibBalsaAddressView *libbalsa_address_view_new(const gchar *
+LibBalsaAddressView *libbalsa_address_view_new(LibBalsaAddressViewType type,
+                                               const gchar *
                                                address_book_stock_id,
                                                const gchar *
                                                remove_stock_id);
@@ -121,8 +128,7 @@ void libbalsa_address_view_set_from_list(LibBalsaAddressView *
                                          LibBalsaAddressType type,
                                          InternetAddressList * list);
 
-gint libbalsa_address_view_n_addresses(LibBalsaAddressView * address_view,
-                                       LibBalsaAddressType type);
+gint libbalsa_address_view_n_addresses(LibBalsaAddressView * address_view);
 InternetAddressList *libbalsa_address_view_get_list(LibBalsaAddressView *
                                                     address_view,
                                                     LibBalsaAddressType

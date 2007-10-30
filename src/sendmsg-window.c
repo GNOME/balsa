@@ -118,7 +118,9 @@ static void check_readiness(BalsaSendmsg * bsmsg);
 static void init_menus(BalsaSendmsg *);
 static void toggle_from_cb         (GtkToggleAction * toggle_action,
                                     BalsaSendmsg * bsmsg);
-static void toggle_addresses_cb    (GtkToggleAction * toggle_action,
+static void toggle_recipients_cb   (GtkToggleAction * toggle_action,
+                                    BalsaSendmsg * bsmsg);
+static void toggle_replyto_cb      (GtkToggleAction * toggle_action,
                                     BalsaSendmsg * bsmsg);
 static void toggle_fcc_cb          (GtkToggleAction * toggle_action,
                                     BalsaSendmsg * bsmsg);
@@ -384,11 +386,13 @@ static const GtkToggleActionEntry toggle_entries[] = {
      N_("Check the spelling of the message"),
      G_CALLBACK(spell_check_menu_cb), FALSE},
 #endif                          /* HAVE_GTKSPELL */
-    {"From", NULL, N_("Fr_om"), NULL, NULL,
+    {"From", NULL, N_("F_rom"), NULL, NULL,
      G_CALLBACK(toggle_from_cb), TRUE},
-    {"Addresses", NULL, N_("_Addresses"), NULL, NULL,
-     G_CALLBACK(toggle_addresses_cb), TRUE},
-    {"Fcc", NULL, N_("_Fcc"), NULL, NULL,
+    {"Recipients", NULL, N_("Rec_ipients"), NULL, NULL,
+     G_CALLBACK(toggle_recipients_cb), TRUE},
+    {"ReplyTo", NULL, N_("R_eply To"), NULL, NULL,
+     G_CALLBACK(toggle_replyto_cb), TRUE},
+    {"Fcc", NULL, N_("F_cc"), NULL, NULL,
      G_CALLBACK(toggle_fcc_cb), TRUE},
     {"RequestMDN", NULL, N_("_Request Disposition Notification"), NULL,
      NULL, G_CALLBACK(toggle_reqdispnotify_cb), FALSE},
@@ -474,7 +478,8 @@ static const char *ui_description =
 "    </menu>"
 "    <menu action='ShowMenu'>"
 "      <menuitem action='From'/>"
-"      <menuitem action='Addresses'/>"
+"      <menuitem action='Recipients'/>"
+"      <menuitem action='ReplyTo'/>"
 "      <menuitem action='Fcc'/>"
 "    </menu>"
 "    <menu action='LanguageMenu'>"
@@ -851,7 +856,7 @@ static gint
 delete_handler(BalsaSendmsg * bsmsg)
 {
     InternetAddressList *l =
-        libbalsa_address_view_get_list(bsmsg->address_view,
+        libbalsa_address_view_get_list(bsmsg->recipient_view,
                                        LIBBALSA_ADDRESS_TYPE_TO);
     const gchar *tmp = l && l->address && l->address->name ?
         l->address->name : _("(No name)");
@@ -1086,7 +1091,7 @@ edit_with_gnome_check(gpointer data) {
                     _(libbalsa_address_view_types[type]);
                 if (libbalsa_str_has_prefix(line, type_string))
                     libbalsa_address_view_set_from_string
-                        (data_real->bsmsg->address_view, type,
+                        (data_real->bsmsg->recipient_view, type,
                          line + strlen(type_string) + 1);
             }
         }
@@ -1200,7 +1205,7 @@ edit_with_gnome(GtkAction * action, BalsaSendmsg* bsmsg)
                 gtk_entry_get_text(GTK_ENTRY(bsmsg->subject[1])));
         for (type = 0; type < G_N_ELEMENTS(libbalsa_address_view_types); type++) {
             InternetAddressList *list =
-                libbalsa_address_view_get_list(bsmsg->address_view,
+                libbalsa_address_view_get_list(bsmsg->recipient_view,
                                                type);
             gchar *p = internet_address_list_to_string(list, FALSE);
             internet_address_list_destroy(list);
@@ -1402,9 +1407,13 @@ update_bsmsg_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity* ident)
                              g_list_index(balsa_app.identities, ident));
 
 #if !defined(ENABLE_TOUCH_UI)
-    libbalsa_address_view_set_from_string(bsmsg->address_view,
-                                          LIBBALSA_ADDRESS_TYPE_REPLYTO,
-                                          ident->replyto);
+    if (ident->replyto && *ident->replyto) {
+        libbalsa_address_view_set_from_string(bsmsg->replyto_view,
+                                              LIBBALSA_ADDRESS_TYPE_REPLYTO,
+                                              ident->replyto);
+        gtk_widget_show(bsmsg->replyto[0]);
+        gtk_widget_show(bsmsg->replyto[1]);
+    }
 #endif
 
     if (bsmsg->ident->bcc) {
@@ -1416,7 +1425,7 @@ update_bsmsg_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity* ident)
          * from the old identity: */
         old_ident_list = internet_address_parse_string(bsmsg->ident->bcc);
         old_list =
-            libbalsa_address_view_get_list(bsmsg->address_view,
+            libbalsa_address_view_get_list(bsmsg->recipient_view,
                                            LIBBALSA_ADDRESS_TYPE_BCC);
         for (l = old_list; l; l = l->next) {
             InternetAddress *ia = l->address;
@@ -1437,7 +1446,7 @@ update_bsmsg_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity* ident)
         internet_address_list_destroy(new_ident_list);
 
         /* Set the resulting list: */
-        libbalsa_address_view_set_from_list(bsmsg->address_view,
+        libbalsa_address_view_set_from_list(bsmsg->recipient_view,
                                             LIBBALSA_ADDRESS_TYPE_BCC,
                                             new_list);
         internet_address_list_destroy(new_list);
@@ -1576,7 +1585,7 @@ update_bsmsg_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity* ident)
     g_free(new_sig);
     g_free(message_text);
 
-    libbalsa_address_view_set_domain(bsmsg->address_view, ident->domain);
+    libbalsa_address_view_set_domain(bsmsg->recipient_view, ident->domain);
 
     sw_set_active(bsmsg, "RequestMDN", ident->request_mdn);
 }
@@ -2534,9 +2543,13 @@ create_email_or_string_entry(GtkWidget * table, const gchar * label,
                              int y_pos, GtkWidget * arr[])
 {
     PangoFontDescription *desc;
+    GtkWidget *mnemonic_widget;
 
+    mnemonic_widget = arr[1];
+    if (GTK_IS_FRAME(mnemonic_widget))
+        mnemonic_widget = gtk_bin_get_child(GTK_BIN(mnemonic_widget));
     arr[0] = gtk_label_new_with_mnemonic(label);
-    gtk_label_set_mnemonic_widget(GTK_LABEL(arr[0]), arr[1]);
+    gtk_label_set_mnemonic_widget(GTK_LABEL(arr[0]), mnemonic_widget);
     gtk_misc_set_alignment(GTK_MISC(arr[0]), 0.0, 0.5);
     gtk_misc_set_padding(GTK_MISC(arr[0]), GNOME_PAD_SMALL,
 			 GNOME_PAD_SMALL);
@@ -2616,14 +2629,22 @@ sw_scroll_size_request(GtkWidget * widget, GtkRequisition * requisition)
 }
 
 static void
-create_email_entry(GtkWidget * table, int y_pos, BalsaSendmsg *bsmsg)
+create_email_entry(GtkWidget * table, int y_pos, BalsaSendmsg *bsmsg,
+                   LibBalsaAddressViewType type)
 {
     GtkWidget *scroll;
     GtkWidget *frame;
+#if !defined(ENABLE_TOUCH_UI)
+    LibBalsaAddressView **view =
+        type == LIBBALSA_ADDRESS_VIEW_TYPE_RECIPIENTS ?
+        &bsmsg->recipient_view : &bsmsg->replyto_view;
+#else
+    LibBalsaAddressView **view = &bsmsg->recipient_view;
+#endif
 
-    bsmsg->address_view =
-        libbalsa_address_view_new(BALSA_PIXMAP_BOOK_RED, GTK_STOCK_CLOSE);
-    libbalsa_address_view_set_fallback(bsmsg->address_view,
+    *view = libbalsa_address_view_new(type, BALSA_PIXMAP_BOOK_RED,
+                                      GTK_STOCK_CLOSE);
+    libbalsa_address_view_set_fallback(*view,
                                        balsa_app.convert_unknown_8bit);
 
     scroll = gtk_scrolled_window_new(NULL, NULL);
@@ -2632,32 +2653,35 @@ create_email_entry(GtkWidget * table, int y_pos, BalsaSendmsg *bsmsg)
 				   GTK_POLICY_AUTOMATIC);
     g_signal_connect(scroll, "size-request",
                      G_CALLBACK(sw_scroll_size_request), NULL);
-    gtk_container_add(GTK_CONTAINER(scroll), GTK_WIDGET(bsmsg->address_view));
+    gtk_container_add(GTK_CONTAINER(scroll), GTK_WIDGET(*view));
 
     frame = gtk_frame_new(NULL);
     gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_IN);
     gtk_container_add(GTK_CONTAINER(frame), scroll);
-    bsmsg->addresses[1] = frame;
+    if (type == LIBBALSA_ADDRESS_VIEW_TYPE_RECIPIENTS) {
+        bsmsg->recipients[1] = frame;
+        create_email_or_string_entry(table, _("Rec_ipients"), y_pos,
+                                     bsmsg->recipients);
+    } else {
+        bsmsg->replyto[1] = frame;
+        create_email_or_string_entry(table, _("R_eply To:"), y_pos,
+                                     bsmsg->replyto);
+    }
 
-    create_email_or_string_entry(table, _("_Addresses:"), y_pos, bsmsg->addresses);
-
-    g_signal_connect(bsmsg->address_view, "drag_data_received",
-		     G_CALLBACK(to_add), NULL);
-    g_signal_connect(bsmsg->address_view, "open-address-book",
+    g_signal_connect(*view, "drag_data_received",
+                     G_CALLBACK(to_add), NULL);
+    g_signal_connect(*view, "open-address-book",
 		     G_CALLBACK(address_book_cb), bsmsg);
-    gtk_drag_dest_set(GTK_WIDGET(bsmsg->address_view), GTK_DEST_DEFAULT_ALL,
+    gtk_drag_dest_set(GTK_WIDGET(*view), GTK_DEST_DEFAULT_ALL,
 		      email_field_drop_types,
 		      ELEMENTS(email_field_drop_types),
 		      GDK_ACTION_COPY | GDK_ACTION_MOVE | GDK_ACTION_LINK);
 
-    libbalsa_address_view_set_domain(bsmsg->address_view,
-                                     bsmsg->ident->domain);
-    g_signal_connect_swapped(gtk_tree_view_get_model
-                             (GTK_TREE_VIEW(bsmsg->address_view)),
+    libbalsa_address_view_set_domain(*view, bsmsg->ident->domain);
+    g_signal_connect_swapped(gtk_tree_view_get_model(GTK_TREE_VIEW(*view)),
                              "row-changed", G_CALLBACK(check_readiness),
                              bsmsg);
-    g_signal_connect_swapped(gtk_tree_view_get_model
-                             (GTK_TREE_VIEW(bsmsg->address_view)),
+    g_signal_connect_swapped(gtk_tree_view_get_model(GTK_TREE_VIEW(*view)),
                              "row-deleted", G_CALLBACK(check_readiness),
                              bsmsg);
 }
@@ -2833,14 +2857,15 @@ create_info_pane(BalsaSendmsg * bsmsg)
     /* From: */
     create_from_entry(table, bsmsg);
 
-    /* To: */
-    create_email_entry(table, ++row, bsmsg);
+    /* To:, Cc:, and Bcc: */
+    create_email_entry(table, ++row, bsmsg,
+                       LIBBALSA_ADDRESS_VIEW_TYPE_RECIPIENTS);
     g_signal_connect_swapped(gtk_tree_view_get_model
-                             (GTK_TREE_VIEW(bsmsg->address_view)),
+                             (GTK_TREE_VIEW(bsmsg->recipient_view)),
                              "row-changed",
                              G_CALLBACK(sendmsg_window_set_title), bsmsg);
     g_signal_connect_swapped(gtk_tree_view_get_model
-                             (GTK_TREE_VIEW(bsmsg->address_view)),
+                             (GTK_TREE_VIEW(bsmsg->recipient_view)),
                              "row-deleted",
                              G_CALLBACK(sendmsg_window_set_title), bsmsg);
 
@@ -2849,14 +2874,20 @@ create_info_pane(BalsaSendmsg * bsmsg)
     g_signal_connect_swapped(G_OBJECT(bsmsg->subject[1]), "changed",
                              G_CALLBACK(sendmsg_window_set_title), bsmsg);
 
+#if !defined(ENABLE_TOUCH_UI)
+    /* Reply To: */
+    create_email_entry(table, ++row, bsmsg,
+                       LIBBALSA_ADDRESS_VIEW_TYPE_REPLYTO);
+#endif
+
     /* fcc: mailbox folder where the message copy will be written to */
     bsmsg->fcc[0] = gtk_label_new_with_mnemonic(_("F_cc:"));
     gtk_misc_set_alignment(GTK_MISC(bsmsg->fcc[0]), 0.0, 0.5);
     gtk_misc_set_padding(GTK_MISC(bsmsg->fcc[0]), GNOME_PAD_SMALL,
 			 GNOME_PAD_SMALL);
     ++row;
-    gtk_table_attach(GTK_TABLE(table), bsmsg->fcc[0], 0, 1, row, row + 1, GTK_FILL,
-		     GTK_FILL | GTK_SHRINK, 0, 0);
+    gtk_table_attach(GTK_TABLE(table), bsmsg->fcc[0], 0, 1, row, row + 1,
+                     GTK_FILL, GTK_FILL | GTK_SHRINK, 0, 0);
 
     if (!balsa_app.fcc_mru)
         balsa_mblist_mru_add(&balsa_app.fcc_mru, balsa_app.sentbox->url);
@@ -4109,13 +4140,13 @@ setup_headers_from_message(BalsaSendmsg* bsmsg, LibBalsaMessage *message)
 {
     g_return_if_fail(message->headers);
 
-    libbalsa_address_view_set_from_list(bsmsg->address_view,
+    libbalsa_address_view_set_from_list(bsmsg->recipient_view,
                                         LIBBALSA_ADDRESS_TYPE_TO,
                                         message->headers->to_list);
-    libbalsa_address_view_set_from_list(bsmsg->address_view,
+    libbalsa_address_view_set_from_list(bsmsg->recipient_view,
                                         LIBBALSA_ADDRESS_TYPE_CC,
                                         message->headers->cc_list);
-    libbalsa_address_view_set_from_list(bsmsg->address_view,
+    libbalsa_address_view_set_from_list(bsmsg->recipient_view,
                                         LIBBALSA_ADDRESS_TYPE_BCC,
                                         message->headers->bcc_list);
 }
@@ -4240,12 +4271,12 @@ setup_headers_from_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity *ident)
                              g_list_index(balsa_app.identities, ident));
 #if !defined(ENABLE_TOUCH_UI)
     if(ident->replyto)
-        libbalsa_address_view_set_from_string(bsmsg->address_view,
+        libbalsa_address_view_set_from_string(bsmsg->replyto_view,
                                               LIBBALSA_ADDRESS_TYPE_REPLYTO,
                                               ident->replyto);
 #endif
     if(ident->bcc)
-        libbalsa_address_view_set_from_string(bsmsg->address_view,
+        libbalsa_address_view_set_from_string(bsmsg->recipient_view,
                                               LIBBALSA_ADDRESS_TYPE_BCC,
                                               ident->bcc);
 }
@@ -4625,7 +4656,7 @@ sendmsg_window_compose(void)
     sendmsg_window_set_title(bsmsg);
     if(bsmsg->ident->sig_sending)
         insert_initial_sig(bsmsg);
-    gtk_widget_grab_focus(GTK_WIDGET(bsmsg->address_view));
+    gtk_widget_grab_focus(GTK_WIDGET(bsmsg->recipient_view));
     bsmsg->state = SENDMSG_STATE_CLEAN;
     return bsmsg;
 }
@@ -4634,7 +4665,7 @@ BalsaSendmsg*
 sendmsg_window_compose_with_address(const gchar * address)
 {
     BalsaSendmsg *bsmsg = sendmsg_window_compose();
-    libbalsa_address_view_add_from_string(bsmsg->address_view,
+    libbalsa_address_view_add_from_string(bsmsg->recipient_view,
                                           LIBBALSA_ADDRESS_TYPE_TO,
                                           address);
     return bsmsg;
@@ -4681,7 +4712,7 @@ set_cc_from_all_recipients(BalsaSendmsg* bsmsg,
     sw_cc_add_list(&new_cc, headers->to_list);
     sw_cc_add_list(&new_cc, headers->cc_list);
 
-    libbalsa_address_view_set_from_list(bsmsg->address_view,
+    libbalsa_address_view_set_from_list(bsmsg->recipient_view,
                                         LIBBALSA_ADDRESS_TYPE_CC,
                                         new_cc);
     internet_address_list_destroy(new_cc);
@@ -4723,7 +4754,7 @@ set_to(BalsaSendmsg *bsmsg, LibBalsaMessageHeaders *headers)
         InternetAddressList *addr = headers->reply_to ?
             headers->reply_to : headers->from;
 
-        libbalsa_address_view_set_from_list(bsmsg->address_view,
+        libbalsa_address_view_set_from_list(bsmsg->recipient_view,
                                             LIBBALSA_ADDRESS_TYPE_TO,
                                             addr);
     }
@@ -4887,7 +4918,7 @@ sendmsg_window_forward(LibBalsaMailbox *mailbox, guint msgno,
         gtk_text_buffer_get_start_iter(buffer, &pos);
         gtk_text_buffer_place_cursor(buffer, &pos);
      }
-    gtk_widget_grab_focus(GTK_WIDGET(bsmsg->address_view));
+    gtk_widget_grab_focus(GTK_WIDGET(bsmsg->recipient_view));
     return bsmsg;
 }
 
@@ -4908,7 +4939,7 @@ sendmsg_window_continue(LibBalsaMailbox * mailbox, guint msgno)
     setup_headers_from_message(bsmsg, message);
 
 #if !defined(ENABLE_TOUCH_UI)
-    libbalsa_address_view_set_from_list(bsmsg->address_view,
+    libbalsa_address_view_set_from_list(bsmsg->replyto_view,
                                         LIBBALSA_ADDRESS_TYPE_REPLYTO,
                                         message->headers->reply_to);
 #endif
@@ -5127,12 +5158,16 @@ sendmsg_window_set_field(BalsaSendmsg * bsmsg, const gchar * key,
         }
     }
 #if !defined(ENABLE_TOUCH_UI)
-    else if(g_ascii_strcasecmp(key, "replyto") == 0)
-        type = LIBBALSA_ADDRESS_TYPE_REPLYTO;
+    else if(g_ascii_strcasecmp(key, "replyto") == 0) {
+        libbalsa_address_view_add_from_string(bsmsg->replyto_view,
+                                              LIBBALSA_ADDRESS_TYPE_REPLYTO,
+                                              val);
+        return;
+    }
 #endif
     else return;
 
-    libbalsa_address_view_add_from_string(bsmsg->address_view, type, val);
+    libbalsa_address_view_add_from_string(bsmsg->recipient_view, type, val);
 }
 
 
@@ -5390,15 +5425,15 @@ bsmsg2message(BalsaSendmsg * bsmsg)
     g_free(tmp);
 
     message->headers->to_list =
-        libbalsa_address_view_get_list(bsmsg->address_view,
+        libbalsa_address_view_get_list(bsmsg->recipient_view,
                                        LIBBALSA_ADDRESS_TYPE_TO);
 
     message->headers->cc_list =
-        libbalsa_address_view_get_list(bsmsg->address_view,
+        libbalsa_address_view_get_list(bsmsg->recipient_view,
                                        LIBBALSA_ADDRESS_TYPE_CC);
     
     message->headers->bcc_list =
-        libbalsa_address_view_get_list(bsmsg->address_view,
+        libbalsa_address_view_get_list(bsmsg->recipient_view,
                                        LIBBALSA_ADDRESS_TYPE_BCC);
 
 
@@ -5408,7 +5443,7 @@ bsmsg2message(BalsaSendmsg * bsmsg)
 
 #if !defined(ENABLE_TOUCH_UI)
     message->headers->reply_to =
-        libbalsa_address_view_get_list(bsmsg->address_view,
+        libbalsa_address_view_get_list(bsmsg->replyto_view,
                                        LIBBALSA_ADDRESS_TYPE_REPLYTO);
 #endif
 
@@ -6260,13 +6295,10 @@ static void
 check_readiness(BalsaSendmsg * bsmsg)
 {
     gboolean ready =
-        libbalsa_address_view_n_addresses(bsmsg->address_view,
-                                          LIBBALSA_ADDRESS_N_TYPES) > 0;
+        libbalsa_address_view_n_addresses(bsmsg->recipient_view) > 0;
 #if !defined(ENABLE_TOUCH_UI)
     if (ready
-        && libbalsa_address_view_n_addresses(bsmsg->address_view,
-                                             LIBBALSA_ADDRESS_TYPE_REPLYTO)
-        < 0)
+        && libbalsa_address_view_n_addresses(bsmsg->replyto_view) < 0)
         ready = FALSE;
 #endif
 
@@ -6274,7 +6306,7 @@ check_readiness(BalsaSendmsg * bsmsg)
 }
 
 static const gchar * const header_action_names[] = {
-    "From", "Addresses", "Fcc"
+    "From", "Recipients", "ReplyTo", "Fcc"
 };
 
 /* toggle_entry:
@@ -6285,12 +6317,14 @@ static void
 toggle_entry(GtkToggleAction * toggle_action, BalsaSendmsg * bsmsg,
              GtkWidget * entry[])
 {
-    void (*widget_func) (GtkWidget *) =
-        gtk_toggle_action_get_active(toggle_action) ?
-        gtk_widget_show_all : gtk_widget_hide;
-
-    widget_func(entry[0]);
-    widget_func(entry[1]);
+    if (gtk_toggle_action_get_active(toggle_action)) {
+        gtk_widget_show_all(entry[0]);
+        gtk_widget_show_all(entry[1]);
+        gtk_widget_grab_focus(entry[1]);
+    } else {
+        gtk_widget_hide(entry[0]);
+        gtk_widget_hide(entry[1]);
+    }
 
     if (bsmsg->update_config) { /* then save the config */
         GString *str = g_string_new(NULL);
@@ -6315,9 +6349,15 @@ toggle_from_cb(GtkToggleAction * action, BalsaSendmsg * bsmsg)
 }
 
 static void
-toggle_addresses_cb(GtkToggleAction * action, BalsaSendmsg * bsmsg)
+toggle_recipients_cb(GtkToggleAction * action, BalsaSendmsg * bsmsg)
 {
-    toggle_entry(action, bsmsg, bsmsg->addresses);
+    toggle_entry(action, bsmsg, bsmsg->recipients);
+}
+
+static void
+toggle_replyto_cb(GtkToggleAction * action, BalsaSendmsg * bsmsg)
+{
+    toggle_entry(action, bsmsg, bsmsg->replyto);
 }
 
 static void
@@ -6601,7 +6641,7 @@ set_list_post_address(BalsaSendmsg * bsmsg)
     mailing_list_address =
 	libbalsa_mailbox_get_mailing_list_address(message->mailbox);
     if (mailing_list_address) {
-        libbalsa_address_view_set_from_list(bsmsg->address_view,
+        libbalsa_address_view_set_from_list(bsmsg->recipient_view,
                                             LIBBALSA_ADDRESS_TYPE_TO,
                                             mailing_list_address);
         internet_address_list_destroy(mailing_list_address);
@@ -6618,7 +6658,7 @@ set_list_post_address(BalsaSendmsg * bsmsg)
     if ((header = libbalsa_message_get_user_header(message, "x-beenthere"))
         || (header =
             libbalsa_message_get_user_header(message, "x-mailing-list")))
-        libbalsa_address_view_set_from_string(bsmsg->address_view,
+        libbalsa_address_view_set_from_string(bsmsg->recipient_view,
                                               LIBBALSA_ADDRESS_TYPE_TO,
                                               header);
 }
@@ -6737,7 +6777,7 @@ sendmsg_window_set_title(BalsaSendmsg * bsmsg)
         break;
     }
 
-    list = libbalsa_address_view_get_list(bsmsg->address_view,
+    list = libbalsa_address_view_get_list(bsmsg->recipient_view,
                                           LIBBALSA_ADDRESS_TYPE_TO);
     to_string = internet_address_list_to_string(list, FALSE);
     title = g_strdup_printf(title_format, to_string,

@@ -233,8 +233,7 @@ static void bw_show_preview_pane_cb    (GtkToggleAction * action, gpointer data)
 static void bw_reset_show_all_headers(BalsaWindow * window);
 
 #if !defined(ENABLE_TOUCH_UI)
-static void bw_threading_radio_cb(GtkRadioAction * action,
-                                  GtkRadioAction * current, gpointer data);
+static void bw_threading_activate_cb(GtkAction * action, gpointer data);
 static void bw_set_threading_menu(BalsaWindow * window, int option);
 static void bw_show_mbtree(BalsaWindow * window);
 #endif /* ENABLE_TOUCH_UI */
@@ -1389,12 +1388,18 @@ bw_get_ui_manager(BalsaWindow * window)
     gtk_action_group_add_toggle_actions(action_group, toggle_entries,
                                         G_N_ELEMENTS(toggle_entries),
                                         window);
+    /* Add the header option actions.
+     * Note: if we provide a callback, it's connected to the "changed"
+     * signal, which is emitted only when the radio list changes state.
+     * We want to respond also to a click on the current option, so we
+     * connect later to the "activate" signal, and pass a NULL callback
+     * here.  */
     gtk_action_group_add_radio_actions(action_group,
                                        shown_hdrs_radio_entries,
                                        G_N_ELEMENTS
                                        (shown_hdrs_radio_entries), 0,
                                        NULL, /* no callback */
-                                       window);
+                                       NULL);
 
     gtk_ui_manager_insert_action_group(ui_manager, action_group, 0);
 
@@ -1406,14 +1411,18 @@ bw_get_ui_manager(BalsaWindow * window)
                                  G_N_ELEMENTS(mailbox_entries),
                                  window);
 #if !defined(ENABLE_TOUCH_UI)
+    /* Add the threading option actions.
+     * Note: if we provide a callback, it's connected to the "changed"
+     * signal, which is emitted only when the radio list changes state.
+     * We want to respond also to a click on the current option, so we
+     * connect later to the "activate" signal, and pass a NULL callback
+     * here.  */
     gtk_action_group_add_radio_actions(action_group,
                                        threading_radio_entries,
                                        G_N_ELEMENTS
                                        (threading_radio_entries), 0,
-                                       G_CALLBACK(bw_threading_radio_cb),
-                                       window);
-
-    gtk_ui_manager_insert_action_group(ui_manager, action_group, 0);
+                                       NULL, /* no callback */
+                                       NULL);
 #endif /* ENABLE_TOUCH_UI */
 #if defined(ENABLE_TOUCH_UI)
     gtk_action_group_add_radio_actions(action_group,
@@ -1422,9 +1431,9 @@ bw_get_ui_manager(BalsaWindow * window)
                                        (sort_radio_entries), 0,
                                        G_CALLBACK(bw_sort_change_cb),
                                        window);
+#endif /* ENABLE_TOUCH_UI */
 
     gtk_ui_manager_insert_action_group(ui_manager, action_group, 0);
-#endif /* ENABLE_TOUCH_UI */
 
     action_group = gtk_action_group_new("BalsaWindow");
     gtk_action_group_set_translation_domain(action_group, NULL);
@@ -1497,6 +1506,8 @@ balsa_window_new()
     GtkWidget *hbox;
     static const gchar *const header_options[] =
         { "NoHeaders", "SelectedHeaders", "AllHeaders" };
+    static const gchar *const threading_options[] =
+        { "FlatIndex", "SimpleThreading", "JWZThreading" };
     guint i;
 
     /* Call to register custom balsa pixmaps with GNOME_STOCK_PIXMAPS
@@ -1642,6 +1653,12 @@ balsa_window_new()
     }
 
 #if !defined(ENABLE_TOUCH_UI)
+    for (i = 0; i < G_N_ELEMENTS(threading_options); i++) {
+        GtkAction *action = bw_get_action(window, threading_options[i]);
+        g_signal_connect(action, "activate", 
+                         G_CALLBACK(bw_threading_activate_cb), window);
+    }
+
     bw_set_active(window, "ShowMailboxTabs", balsa_app.show_notebook_tabs,
                   "ShowMailboxTabs");
     bw_set_active(window, "Wrap", balsa_app.browse_wrap, NULL);
@@ -3726,6 +3743,11 @@ bw_wrap_message_cb(GtkToggleAction * action, gpointer data)
     refresh_preferences_manager();
 }
 
+/*
+ * Callback for the "activate" signal of the View menu's header options.
+ * We use this instead of the GtkRadioAction's "changed" signal so that
+ * we can respond to a click on the current choice.
+ */
 static void
 bw_header_activate_cb(GtkAction * action, gpointer data)
 {
@@ -3742,28 +3764,35 @@ bw_header_activate_cb(GtkAction * action, gpointer data)
 }
 
 #if !defined(ENABLE_TOUCH_UI)
+/*
+ * Callback for the "activate" signal of the View menu's threading options.
+ * We use this instead of the GtkRadioAction's "changed" signal so that
+ * we can respond to a click on the current choice.
+ */
 static void
-bw_threading_radio_cb(GtkRadioAction * action, GtkRadioAction * current,
-                   gpointer data)
+bw_threading_activate_cb(GtkAction * action, gpointer data)
 {
-    BalsaWindow *bw = BALSA_WINDOW(data);
-    GtkWidget *index;
-    LibBalsaMailboxThreadingType type;
-    BalsaMailboxNode *mbnode;
-    LibBalsaMailbox *mailbox;
+    if (gtk_toggle_action_get_active(GTK_TOGGLE_ACTION(action))) {
+        BalsaWindow *bw = BALSA_WINDOW(data);
+        GtkWidget *index;
+        LibBalsaMailboxThreadingType type;
+        BalsaMailboxNode *mbnode;
+        LibBalsaMailbox *mailbox;
 
-    index = balsa_window_find_current_index(bw);
-    g_return_if_fail(index != NULL);
+        index = balsa_window_find_current_index(bw);
+        g_return_if_fail(index != NULL);
 
-    type = gtk_radio_action_get_current_value(action);
-    balsa_index_set_threading_type(BALSA_INDEX(index), type);
+        type =
+            gtk_radio_action_get_current_value(GTK_RADIO_ACTION(action));
+        balsa_index_set_threading_type(BALSA_INDEX(index), type);
 
-    /* bw->current_index may have been destroyed and cleared during
-     * set-threading: */
-    index = balsa_window_find_current_index(bw);
-    if (index && (mbnode = BALSA_INDEX(index)->mailbox_node)
-	&& (mailbox = mbnode->mailbox))
-	bw_enable_expand_collapse(bw, mailbox);
+        /* bw->current_index may have been destroyed and cleared during
+         * set-threading: */
+        index = balsa_window_find_current_index(bw);
+        if (index && (mbnode = BALSA_INDEX(index)->mailbox_node)
+            && (mailbox = mbnode->mailbox))
+            bw_enable_expand_collapse(bw, mailbox);
+    }
 }
 #endif /* ENABLE_TOUCH_UI */
 

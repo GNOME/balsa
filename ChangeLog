@@ -1,3 +1,8 @@
+2007-10-31  Peter Bloomfield
+
+	* src/main-window.c: connect to "activate" signal instead of
+	"changed", to see every click on threading options.
+
 2007-10-24  Albrecht Dreß
 
 	* src/balsa-icons.c:

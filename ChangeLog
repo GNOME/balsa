@@ -1,5 +1,11 @@
 2007-11-03  Peter Bloomfield
 
+	* libbalsa/address-view.c:
+	* src/sendmsg-window.c: simplify LibBalsaAddressView api.
+	* src/main.c: (main): libbalsa_address_book_list has gone away.
+
+2007-11-03  Peter Bloomfield
+
 	* libbalsa/address-view.c: (libbalsa_address_view_finalize):
 	do not leak GtkTreeRowReference;
 	(lbav_append_addresses), (lbav_ensure_blank_line_idle_cb),

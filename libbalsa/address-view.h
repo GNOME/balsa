@@ -51,46 +51,34 @@ G_BEGIN_DECLS
 typedef struct _LibBalsaAddressView LibBalsaAddressView;
 typedef struct _LibBalsaAddressViewClass LibBalsaAddressViewClass;
 
-typedef enum {
-    LIBBALSA_ADDRESS_VIEW_TYPE_RECIPIENTS,
-    LIBBALSA_ADDRESS_VIEW_TYPE_REPLYTO
-} LibBalsaAddressViewType;
-
-typedef enum {
-    LIBBALSA_ADDRESS_TYPE_TO,
-    LIBBALSA_ADDRESS_TYPE_CC,
-    LIBBALSA_ADDRESS_TYPE_BCC,
-#if !defined(ENABLE_TOUCH_UI)
-    LIBBALSA_ADDRESS_TYPE_REPLYTO,
-#endif                          /* ENABLE_TOUCH_UI */
-    LIBBALSA_ADDRESS_N_TYPES
-} LibBalsaAddressType;
-
 struct _LibBalsaAddressView {
     GtkTreeView parent;
 
     /*
      * Permanent data
      */
-    LibBalsaAddressType default_type;
+    const gchar **types;
+    guint n_types;
     gchar *address_book_stock_id;
     gchar *remove_stock_id;
-    gchar *domain;
     gboolean fallback;
+    GList *address_book_list;
 
-    GtkTreeViewColumn   *focus_column;
-    GtkCellRenderer     *focus_cell;
+    gchar *domain;
+
+    GtkTreeViewColumn *focus_column;
+    GtkCellRenderer *focus_cell;
 
     /*
      * Ephemera
      */
-    gboolean last_was_escape;           /* keystroke    */
+    gboolean last_was_escape;   /* keystroke    */
 
     GtkTreeRowReference *focus_row;     /* set cursor   */
-    guint focus_idle_id;                /* ditto        */
+    guint focus_idle_id;        /* ditto        */
 
-    GtkCellEditable *editable;          /* cell editing */
-    gchar *path_string;                 /* ditto        */
+    GtkCellEditable *editable;  /* cell editing */
+    gchar *path_string;         /* ditto        */
 };
 
 struct _LibBalsaAddressViewClass {
@@ -98,41 +86,38 @@ struct _LibBalsaAddressViewClass {
 };
 
 GType libbalsa_address_view_get_type(void) G_GNUC_CONST;
-extern const gchar *const
-    libbalsa_address_view_types[LIBBALSA_ADDRESS_N_TYPES];
 
-LibBalsaAddressView *libbalsa_address_view_new(LibBalsaAddressViewType type,
+LibBalsaAddressView *libbalsa_address_view_new(const gchar * const *types,
+                                               guint n_types,
                                                const gchar *
                                                address_book_stock_id,
                                                const gchar *
-                                               remove_stock_id);
-void libbalsa_address_view_set_address_book_list(GList *
-                                                 address_book_list);
+                                               remove_stock_id,
+                                               GList * address_book_list,
+                                               gboolean fallback);
 void libbalsa_address_view_set_domain(LibBalsaAddressView * address_view,
                                       const gchar * domain);
-void libbalsa_address_view_set_fallback(LibBalsaAddressView * address_view,
-                                        gboolean fallback);
 void libbalsa_address_view_set_from_string(LibBalsaAddressView *
                                            address_view,
-                                           LibBalsaAddressType type,
+                                           const gchar * address_type,
                                            const gchar * addresses);
 void libbalsa_address_view_add_from_string(LibBalsaAddressView *
                                            address_view,
-                                           LibBalsaAddressType type,
+                                           const gchar * address_type,
                                            const gchar * addresses);
 void libbalsa_address_view_add_to_row(LibBalsaAddressView * address_view,
                                       GtkTreeRowReference * row_ref,
                                       const gchar * addresses);
 void libbalsa_address_view_set_from_list(LibBalsaAddressView *
                                          address_view,
-                                         LibBalsaAddressType type,
+                                         const gchar * address_type,
                                          InternetAddressList * list);
 
 gint libbalsa_address_view_n_addresses(LibBalsaAddressView * address_view);
 InternetAddressList *libbalsa_address_view_get_list(LibBalsaAddressView *
                                                     address_view,
-                                                    LibBalsaAddressType
-                                                    type);
+                                                    const gchar *
+                                                    address_type);
 
 G_END_DECLS
 #endif                          /* __LIBBALSA_ADDRESS_VIEW_H__ */

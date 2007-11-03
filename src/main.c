@@ -768,7 +768,6 @@ main(int argc, char *argv[])
     
     /* checking for valid config files */
     config_init(cmd_get_stats);
-    libbalsa_address_view_set_address_book_list(balsa_app.address_book_list);
 
     libbalsa_mailbox_view_table =
 	g_hash_table_new_full(g_str_hash, g_str_equal,

@@ -1,3 +1,11 @@
+2007-11-03  Peter Bloomfield
+
+	* libbalsa/address-view.c: (libbalsa_address_view_finalize):
+	do not leak GtkTreeRowReference;
+	(lbav_append_addresses), (lbav_ensure_blank_line_idle_cb),
+	(lbav_ensure_blank_line), (lbav_row_editing_cb),
+	(libbalsa_address_view_new): remove debugging output.
+
 2007-10-30  Peter Bloomfield
 
 	* libbalsa/address-view.c:

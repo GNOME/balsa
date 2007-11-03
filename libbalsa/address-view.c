@@ -59,21 +59,18 @@ libbalsa_address_view_init(LibBalsaAddressView * address_view)
 {
 }
 
-#define DEBUG_LIBBALSA_ADDRESS_VIEW TRUE
-
 static void
 libbalsa_address_view_finalize(GObject * object)
 {
     LibBalsaAddressView *address_view = LIBBALSA_ADDRESS_VIEW(object);
 
-#if DEBUG_LIBBALSA_ADDRESS_VIEW
-    g_print("%s %p focus_idle_id %d\n", __func__, address_view,
-            address_view->focus_idle_id);
-#endif                          /* DEBUG_LIBBALSA_ADDRESS_VIEW */
     g_free(address_view->address_book_stock_id);
     g_free(address_view->remove_stock_id);
     g_free(address_view->domain);
     g_free(address_view->path_string);
+
+    if (address_view->focus_row)
+        gtk_tree_row_reference_free(address_view->focus_row);
 
     if (address_view->focus_idle_id)
         g_source_remove(address_view->focus_idle_id);
@@ -239,19 +236,13 @@ lbav_entry_setup_matches(LibBalsaAddressView * address_view,
 static gboolean
 lbav_ensure_blank_line_idle_cb(LibBalsaAddressView * address_view)
 {
-    GtkTreeView *tree_view;
-    GtkTreeModel *model;
     GtkTreePath *focus_path;
 
     gdk_threads_enter();
 
-#if DEBUG_LIBBALSA_ADDRESS_VIEW
-    g_print("%s address_view %p clearing id %d\n", __func__, address_view,
-            address_view->focus_idle_id);
-#endif                          /* DEBUG_LIBBALSA_ADDRESS_VIEW */
-    tree_view = GTK_TREE_VIEW(address_view);
-    model = gtk_tree_view_get_model(tree_view);
     focus_path = gtk_tree_row_reference_get_path(address_view->focus_row);
+    gtk_tree_row_reference_free(address_view->focus_row);
+    address_view->focus_row = NULL;
 
     /* This will open the entry for editing;
      * NOTE: the GtkTreeView documentation states that:
@@ -259,16 +250,16 @@ lbav_ensure_blank_line_idle_cb(LibBalsaAddressView * address_view)
      *   gtk_widget_grab_focus(tree_view) in order to give keyboard
      *   focus to the widget."
      * but in fact, that leaves the entry /not/ open for editing. */
-    gtk_tree_view_set_cursor_on_cell(tree_view, focus_path,
+    gtk_tree_view_set_cursor_on_cell(GTK_TREE_VIEW(address_view),
+                                     focus_path,
                                      address_view->focus_column,
                                      address_view->focus_cell, TRUE);
     gtk_tree_path_free(focus_path);
 
-    gtk_tree_row_reference_free(address_view->focus_row);
-    address_view->focus_row = NULL;
     address_view->focus_idle_id = 0;
 
     gdk_threads_leave();
+
     return FALSE;
 }
 
@@ -319,15 +310,10 @@ lbav_ensure_blank_line(LibBalsaAddressView * address_view,
     address_view->focus_row = gtk_tree_row_reference_new(model, path);
     gtk_tree_path_free(path);
 
-    if (!address_view->focus_idle_id) {
+    if (!address_view->focus_idle_id)
         address_view->focus_idle_id =
             g_idle_add((GSourceFunc) lbav_ensure_blank_line_idle_cb,
                        address_view);
-#if DEBUG_LIBBALSA_ADDRESS_VIEW
-        g_print("%s address_view %p add idle id %d\n", __func__,
-                address_view, address_view->focus_idle_id);
-#endif                          /* DEBUG_LIBBALSA_ADDRESS_VIEW */
-    }
 }
 
 /*
@@ -833,14 +819,6 @@ lbav_sort_func(GtkTreeModel * model, GtkTreeIter * a, GtkTreeIter * b,
 /*
  *     Allocate a new LibBalsaAddressView for use.
  */
-#if DEBUG_LIBBALSA_ADDRESS_VIEW
-static void
-lbav_address_store_weak_notify(gpointer data, GObject * address_store)
-{
-    g_print("%s %p\n", __func__, address_store);
-}
-#endif                          /* DEBUG_LIBBALSA_ADDRESS_VIEW */
-
 LibBalsaAddressView *
 libbalsa_address_view_new(LibBalsaAddressViewType type,
                           const gchar * address_book_stock_id,
@@ -864,6 +842,7 @@ libbalsa_address_view_new(LibBalsaAddressViewType type,
                                        G_TYPE_STRING,
                                        /* ADDRESS_STOCK_ID_COL: */
                                        G_TYPE_STRING);
+
     gtk_tree_sortable_set_default_sort_func(GTK_TREE_SORTABLE
                                             (address_store),
                                             lbav_sort_func, NULL, NULL);
@@ -875,14 +854,7 @@ libbalsa_address_view_new(LibBalsaAddressViewType type,
     address_view =
         g_object_new(LIBBALSA_TYPE_ADDRESS_VIEW, "model", address_store,
                      "headers-visible", FALSE, NULL);
-#if DEBUG_LIBBALSA_ADDRESS_VIEW
-    g_print("%s view %p store %p\n", __func__, address_view,
-            address_store);
-    g_object_weak_ref(G_OBJECT(address_store),
-                      (GWeakNotify) lbav_address_store_weak_notify, NULL);
-#endif                          /* DEBUG_LIBBALSA_ADDRESS_VIEW */
     g_object_unref(address_store);
-    tree_view = GTK_TREE_VIEW(address_view);
 
     address_view->default_type =
         type == LIBBALSA_ADDRESS_VIEW_TYPE_RECIPIENTS ?
@@ -890,6 +862,7 @@ libbalsa_address_view_new(LibBalsaAddressViewType type,
     address_view->remove_stock_id = g_strdup(remove_stock_id);
     address_view->address_book_stock_id = g_strdup(address_book_stock_id);
 
+    tree_view = GTK_TREE_VIEW(address_view);
     if (type == LIBBALSA_ADDRESS_VIEW_TYPE_RECIPIENTS) {
         /* List-store for the address type combo: */
         GtkListStore *type_store = gtk_list_store_new(1, G_TYPE_STRING);

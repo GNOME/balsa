@@ -1,6 +1,12 @@
 2007-11-03  Peter Bloomfield
 
 	* libbalsa/address-view.c:
+	* libbalsa/address-view.h: do not copy strings.
+	* src/sendmsg-window.c: mark strings for translation.
+
+2007-11-03  Peter Bloomfield
+
+	* libbalsa/address-view.c:
 	* src/sendmsg-window.c: simplify LibBalsaAddressView api.
 	* src/main.c: (main): libbalsa_address_book_list has gone away.
 

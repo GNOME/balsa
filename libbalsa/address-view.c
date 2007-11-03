@@ -64,7 +64,6 @@ libbalsa_address_view_finalize(GObject * object)
 {
     LibBalsaAddressView *address_view = LIBBALSA_ADDRESS_VIEW(object);
 
-    g_free(address_view->types);
     g_free(address_view->address_book_stock_id);
     g_free(address_view->remove_stock_id);
     g_free(address_view->domain);
@@ -881,19 +880,18 @@ libbalsa_address_view_new(const gchar * const *types,
                      "headers-visible", FALSE, NULL);
     g_object_unref(address_store);
 
+    address_view->types = types;
+    address_view->n_types = n_types;
     address_view->remove_stock_id = g_strdup(remove_stock_id);
     address_view->address_book_stock_id = g_strdup(address_book_stock_id);
     address_view->address_book_list = address_book_list;
     address_view->fallback = fallback;
 
     tree_view = GTK_TREE_VIEW(address_view);
-    if (n_types) {
+    if (n_types > 0) {
         /* List-store for the address type combo: */
         GtkListStore *type_store = gtk_list_store_new(1, G_TYPE_STRING);
         guint i;
-
-        address_view->types = g_memdup(types, n_types * sizeof(gchar *));
-        address_view->n_types = n_types;
 
         for (i = 0; i < n_types; i++) {
             GtkTreeIter iter;

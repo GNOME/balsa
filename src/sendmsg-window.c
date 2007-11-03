@@ -2656,7 +2656,7 @@ create_email_entry(GtkWidget * table, int y_pos, BalsaSendmsg * bsmsg,
     gtk_frame_set_shadow_type(GTK_FRAME(widget[1]), GTK_SHADOW_IN);
     gtk_container_add(GTK_CONTAINER(widget[1]), scroll);
 
-    create_email_or_string_entry(table, _(label), y_pos, widget);
+    create_email_or_string_entry(table, label, y_pos, widget);
 
     g_signal_connect(*view, "drag_data_received",
                      G_CALLBACK(to_add), NULL);
@@ -2849,7 +2849,7 @@ create_info_pane(BalsaSendmsg * bsmsg)
 
     /* To:, Cc:, and Bcc: */
     create_email_entry(table, ++row, bsmsg, &bsmsg->recipient_view,
-                       bsmsg->recipients, "Rec_ipients", address_types,
+                       bsmsg->recipients, _("Rec_ipients"), address_types,
                        G_N_ELEMENTS(address_types));
     g_signal_connect_swapped(gtk_tree_view_get_model
                              (GTK_TREE_VIEW(bsmsg->recipient_view)),
@@ -2868,7 +2868,7 @@ create_info_pane(BalsaSendmsg * bsmsg)
 #if !defined(ENABLE_TOUCH_UI)
     /* Reply To: */
     create_email_entry(table, ++row, bsmsg, &bsmsg->replyto_view,
-                       bsmsg->replyto, "R_eply To:", NULL, 0);
+                       bsmsg->replyto, _("R_eply To:"), NULL, 0);
 #endif
 
     /* fcc: mailbox folder where the message copy will be written to */

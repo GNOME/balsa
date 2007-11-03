@@ -57,7 +57,7 @@ struct _LibBalsaAddressView {
     /*
      * Permanent data
      */
-    const gchar **types;
+    const gchar *const *types;
     guint n_types;
     gchar *address_book_stock_id;
     gchar *remove_stock_id;

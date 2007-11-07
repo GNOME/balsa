@@ -638,19 +638,30 @@ config_global_load(void)
     /* ... window sizes */
     balsa_app.mw_width = libbalsa_conf_get_int("MainWindowWidth=640");
     balsa_app.mw_height = libbalsa_conf_get_int("MainWindowHeight=480");
+    balsa_app.mw_maximized =
+        libbalsa_conf_get_bool("MainWindowMaximized=false");
     balsa_app.mblist_width = libbalsa_conf_get_int("MailboxListWidth=130");
+    balsa_app.mblist_width_maximized =
+        libbalsa_conf_get_int("MailboxListWidthMaximized=130");
     /* sendmsg window sizes */
     balsa_app.sw_width = libbalsa_conf_get_int("SendMsgWindowWidth=640");
     balsa_app.sw_height = libbalsa_conf_get_int("SendMsgWindowHeight=480");
+    balsa_app.sw_maximized =
+        libbalsa_conf_get_bool("SendmsgWindowMaximized=false");
+    /* message window sizes */
     balsa_app.message_window_width =
         libbalsa_conf_get_int("MessageWindowWidth=400");
     balsa_app.message_window_height =
         libbalsa_conf_get_int("MessageWindowHeight=500");
+    balsa_app.message_window_maximized =
+        libbalsa_conf_get_bool("MessageWindowMaximized=false");
     /* FIXME: PKGW: why comment this out? Breaks my Transfer context menu. */
     if (balsa_app.mblist_width < 100)
 	balsa_app.mblist_width = 170;
 
     balsa_app.notebook_height = libbalsa_conf_get_int("NotebookHeight=170");
+    balsa_app.notebook_height_maximized =
+        libbalsa_conf_get_int("NotebookHeightMaximized=170");
     /*FIXME: Why is this here?? */
     if (balsa_app.notebook_height < 100)
 	balsa_app.notebook_height = 200;
@@ -1207,16 +1218,30 @@ config_save(void)
 			 balsa_app.index_subject_width);
     libbalsa_conf_set_int("IndexDateWidth", balsa_app.index_date_width);
     libbalsa_conf_set_int("IndexSizeWidth", balsa_app.index_size_width);
+
     libbalsa_conf_set_int("MainWindowWidth", balsa_app.mw_width);
     libbalsa_conf_set_int("MainWindowHeight", balsa_app.mw_height);
+    libbalsa_conf_set_bool("MainWindowMaximized",
+                           !!balsa_app.mw_maximized);
     libbalsa_conf_set_int("MailboxListWidth", balsa_app.mblist_width);
+    libbalsa_conf_set_int("MailboxListWidthMaximized",
+                          balsa_app.mblist_width_maximized);
+
     libbalsa_conf_set_int("SendMsgWindowWidth", balsa_app.sw_width);
     libbalsa_conf_set_int("SendMsgWindowHeight", balsa_app.sw_height);
+    libbalsa_conf_set_bool("SendmsgWindowMaximized",
+                           !!balsa_app.sw_maximized);
+
     libbalsa_conf_set_int("MessageWindowWidth",
                          balsa_app.message_window_width);
     libbalsa_conf_set_int("MessageWindowHeight",
                          balsa_app.message_window_height);
+    libbalsa_conf_set_bool("MessageWindowMaximized",
+                           !!balsa_app.message_window_maximized);
+
     libbalsa_conf_set_int("NotebookHeight", balsa_app.notebook_height);
+    libbalsa_conf_set_int("NotebookHeightMaximized",
+                          balsa_app.notebook_height_maximized);
 
     libbalsa_conf_pop_group();
 

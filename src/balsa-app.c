@@ -294,10 +294,15 @@ balsa_app_init(void)
     /* GUI settings */
     balsa_app.mblist = NULL;
     balsa_app.mblist_width = 100;
+    balsa_app.mblist_width_maximized = 100;
     balsa_app.mw_width = MW_DEFAULT_WIDTH;
     balsa_app.mw_height = MW_DEFAULT_HEIGHT;
+    balsa_app.mw_maximized = FALSE;
+
     balsa_app.sw_width = 0;
     balsa_app.sw_height = 0;
+    balsa_app.sw_maximized = FALSE;
+
     balsa_app.toolbar_wrap_button_text = TRUE;
     balsa_app.pwindow_option = WHILERETR;
     balsa_app.wordwrap = TRUE;

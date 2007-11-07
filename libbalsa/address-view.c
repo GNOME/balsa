@@ -454,8 +454,10 @@ lbav_set_text_at_path(LibBalsaAddressView * address_view,
     guint count;
 
     path = gtk_tree_path_new_from_string(path_string);
-    gtk_tree_model_get_iter(model, &iter, path);
+    valid = gtk_tree_model_get_iter(model, &iter, path);
     gtk_tree_path_free(path);
+    if (!valid)
+        return;
 
     gtk_tree_model_get(model, &iter, ADDRESS_TYPE_COL, &type, -1);
 
@@ -676,6 +678,7 @@ lbav_combo_edited_cb(GtkCellRendererText * renderer,
     GtkTreePath *path;
     GtkTreeIter iter;
     guint type;
+    gboolean valid;
 
     for (type = 0; type < address_view->n_types; type++)
         if (strcmp(new_text, _(lbav_type_string(address_view, type)))
@@ -683,8 +686,11 @@ lbav_combo_edited_cb(GtkCellRendererText * renderer,
             break;
 
     path = gtk_tree_path_new_from_string(path_string);
-    gtk_tree_model_get_iter(model, &iter, path);
+    valid = gtk_tree_model_get_iter(model, &iter, path);
     gtk_tree_path_free(path);
+    if (!valid)
+        return;
+
     gtk_list_store_set(address_store, &iter,
                        ADDRESS_TYPE_COL, type,
                        ADDRESS_TYPESTRING_COL, new_text, -1);
@@ -779,7 +785,11 @@ lbav_button_activated_cb(LibBalsaCellRendererButton * button,
     gchar *stock_id;
 
     path = gtk_tree_path_new_from_string(path_string);
-    gtk_tree_model_get_iter(model, &iter, path);
+    if (!gtk_tree_model_get_iter(model, &iter, path)) {
+        gtk_tree_path_free(path);
+        return;
+    }
+
     gtk_tree_model_get(model, &iter, ADDRESS_STOCK_ID_COL, &stock_id, -1);
 
     if (strcmp(stock_id, address_view->remove_stock_id) == 0) {
@@ -1016,13 +1026,16 @@ libbalsa_address_view_add_to_row(LibBalsaAddressView * address_view,
     GtkTreePath *path;
     GtkTreeIter iter;
     guint type;
+    gboolean valid;
 
     g_return_if_fail(LIBBALSA_IS_ADDRESS_VIEW(address_view));
 
     model = gtk_tree_view_get_model(GTK_TREE_VIEW(address_view));
     path = gtk_tree_row_reference_get_path(row_ref);
-    gtk_tree_model_get_iter(model, &iter, path);
+    valid = gtk_tree_model_get_iter(model, &iter, path);
     gtk_tree_path_free(path);
+    if (!valid)
+        return;
 
     lbav_add_from_string(address_view, &iter, addresses);
 

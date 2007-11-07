@@ -1,3 +1,10 @@
+2007-11-07  Peter Bloomfield
+
+	* libbalsa/address-view.c: (lbav_set_text_at_path),
+	(lbav_combo_edited_cb), (lbav_row_editing_cb),
+	(lbav_button_activated_cb), (libbalsa_address_view_add_to_row):
+	check validity of iter.
+
 2007-11-03  Peter Bloomfield
 
 	* libbalsa/address-view.c:

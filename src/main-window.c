@@ -259,8 +259,7 @@ static void bw_show_mbtabs_cb(GtkToggleAction * action, gpointer data);
 #endif /* ENABLE_TOUCH_UI */
 
 static void bw_notebook_size_alloc_cb(GtkWidget * notebook,
-                                      GtkAllocation * alloc,
-                                      BalsaWindow * bw);
+                                      GtkAllocation * alloc);
 static void bw_size_alloc_cb(GtkWidget * window, GtkAllocation * alloc);
 
 static void bw_notebook_switch_page_cb(GtkWidget * notebook,
@@ -976,18 +975,12 @@ bw_delete_cb(GtkWidget* main_window)
 #endif
     return FALSE; /* allow delete */
 }
-
 static void
-bw_size_allocate_cb(GtkWidget * widget, GtkAllocation * alloc,
-                    BalsaWindow * bw)
+bw_size_allocate_cb(GtkWidget * widget, GtkAllocation * alloc)
 {
-    if (balsa_app.show_mblist && GTK_WIDGET_REALIZED(bw)) {
-        if (balsa_app.mw_maximized)
-            balsa_app.mblist_width_maximized =
-                gtk_paned_get_position(GTK_PANED(bw->hpaned));
-        else
-            balsa_app.mblist_width =
-                gtk_paned_get_position(GTK_PANED(bw->hpaned));
+    if (balsa_app.show_mblist) {
+	GtkWidget *paned = gtk_widget_get_ancestor(widget, GTK_TYPE_PANED);
+	balsa_app.mblist_width = gtk_paned_get_position(GTK_PANED(paned));
     }
 }
 
@@ -1485,22 +1478,9 @@ bw_window_state_event_cb(BalsaWindow * window,
                          GdkEventWindowState * event,
                          GtkStatusbar * statusbar)
 {
-    gboolean maximized =
-        (event->new_window_state & GDK_WINDOW_STATE_MAXIMIZED) != 0;
-
-    gtk_statusbar_set_has_resize_grip(statusbar, !maximized);
-
-    if (maximized && !balsa_app.mw_maximized) {
-        if (balsa_app.show_mblist)
-            gtk_paned_set_position(GTK_PANED(window->hpaned),
-                                   balsa_app.mblist_width_maximized);
-        if (balsa_app.previewpane)
-            gtk_paned_set_position(GTK_PANED(window->vpaned),
-                                   balsa_app.notebook_height_maximized);
-    }
-
-    balsa_app.mw_maximized = maximized;
-
+    gtk_statusbar_set_has_resize_grip(statusbar,
+                                      !(event->new_window_state &
+                                        GDK_WINDOW_STATE_MAXIMIZED));
     return FALSE;
 }
 
@@ -1582,12 +1562,6 @@ balsa_window_new()
     gtk_window_set_resizable(GTK_WINDOW(window), TRUE);
     gtk_window_set_default_size(GTK_WINDOW(window), balsa_app.mw_width,
                                 balsa_app.mw_height);
-    if (balsa_app.mw_maximized) {
-        /* reset balsa_app.mw_maximized, so we detect the change in
-         * the state-event handler: */
-        balsa_app.mw_maximized = FALSE;
-        gtk_window_maximize(GTK_WINDOW(window));
-    }
 
     window->notebook = gtk_notebook_new();
     gtk_notebook_set_show_tabs(GTK_NOTEBOOK(window->notebook),
@@ -1595,7 +1569,7 @@ balsa_window_new()
     gtk_notebook_set_show_border (GTK_NOTEBOOK(window->notebook), FALSE);
     gtk_notebook_set_scrollable (GTK_NOTEBOOK (window->notebook), TRUE);
     g_signal_connect(G_OBJECT(window->notebook), "size_allocate",
-                     G_CALLBACK(bw_notebook_size_alloc_cb), window);
+                     G_CALLBACK(bw_notebook_size_alloc_cb), NULL);
     g_signal_connect(G_OBJECT(window->notebook), "switch_page",
                      G_CALLBACK(bw_notebook_switch_page_cb), window);
     gtk_drag_dest_set (GTK_WIDGET (window->notebook), GTK_DEST_DEFAULT_ALL,
@@ -1626,7 +1600,7 @@ balsa_window_new()
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(window->mblist),
                                    GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
     g_signal_connect(G_OBJECT(balsa_app.mblist), "size_allocate",
-		     G_CALLBACK(bw_size_allocate_cb), window);
+		     G_CALLBACK(bw_size_allocate_cb), NULL);
     g_signal_connect_swapped(balsa_app.mblist, "has-unread-mailbox",
 		             G_CALLBACK(bw_enable_next_unread), window);
     balsa_mblist_default_signal_bindings(balsa_app.mblist);
@@ -4499,28 +4473,19 @@ balsa_change_window_layout(BalsaWindow *window)
 
 /* PKGW: remember when they change the position of the vpaned. */
 static void
-bw_notebook_size_alloc_cb(GtkWidget * notebook, GtkAllocation * alloc,
-                          BalsaWindow * bw)
+bw_notebook_size_alloc_cb(GtkWidget * notebook, GtkAllocation * alloc)
 {
-    if (balsa_app.previewpane && GTK_WIDGET_REALIZED(bw)) {
-        if (balsa_app.mw_maximized)
-            balsa_app.notebook_height_maximized =
-                gtk_paned_get_position(GTK_PANED(bw->vpaned));
-        else
-            balsa_app.notebook_height =
-                gtk_paned_get_position(GTK_PANED(bw->vpaned));
+    if (balsa_app.previewpane) {
+	GtkWidget *paned = gtk_widget_get_ancestor(notebook, GTK_TYPE_PANED);
+        balsa_app.notebook_height = gtk_paned_get_position(GTK_PANED(paned));
     }
 }
 
 static void
 bw_size_alloc_cb(GtkWidget * window, GtkAllocation * alloc)
 {
-    if (GTK_WIDGET_REALIZED(window)
-        && !(gdk_window_get_state(window->window)
-             & GDK_WINDOW_STATE_MAXIMIZED)) {
-        balsa_app.mw_height = alloc->height;
-        balsa_app.mw_width = alloc->width;
-    }
+    balsa_app.mw_height = alloc->height;
+    balsa_app.mw_width = alloc->width;
 }
 
 /* When page is switched we change the preview window and the selected 

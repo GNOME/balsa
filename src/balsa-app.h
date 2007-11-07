@@ -223,22 +223,13 @@ extern struct BalsaApplication {
     gint msg_size_limit; /* for POP mailboxes; in kB */
 
     /* GUI settings */
-
-    gint mw_width;              /* main window */
+    gint mw_width;
     gint mw_height;
-    gboolean mw_maximized;
     gint mblist_width;
-    gint mblist_width_maximized;
-    gint notebook_height;	/* PKGW: used :-) */
-    gint notebook_height_maximized;
-
     gint sw_width; /* sendmsg window */
     gint sw_height;
-    gboolean sw_maximized;
-
-    gint message_window_width;  /* message window */
+    gint message_window_width;
     gint message_window_height;
-    gboolean message_window_maximized;
 
     /* toolbars */
     int toolbar_wrap_button_text;
@@ -260,6 +251,7 @@ extern struct BalsaApplication {
     gint index_size_width;
 
     /*gint mblist_height; PKGW: unused */
+    gint notebook_height;	/* PKGW: used :-) */
 
     /* Column width settings for mailbox list window, not fully implemented yet */
     gint mblist_name_width;

@@ -1596,14 +1596,8 @@ update_bsmsg_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity* ident)
 static void
 sw_size_alloc_cb(GtkWidget * window, GtkAllocation * alloc)
 {
-    if (!GTK_WIDGET_REALIZED(window))
-        return;
-
-    if (!(balsa_app.sw_maximized = gdk_window_get_state(window->window)
-          & GDK_WINDOW_STATE_MAXIMIZED)) {
-        balsa_app.sw_height = alloc->height;
-        balsa_app.sw_width = alloc->width;
-    }
+    balsa_app.sw_height = alloc->height;
+    balsa_app.sw_width = alloc->width;
 }
 
 
@@ -2662,7 +2656,7 @@ create_email_entry(GtkWidget * table, int y_pos, BalsaSendmsg * bsmsg,
     gtk_frame_set_shadow_type(GTK_FRAME(widget[1]), GTK_SHADOW_IN);
     gtk_container_add(GTK_CONTAINER(widget[1]), scroll);
 
-    create_email_or_string_entry(table, label, y_pos, widget);
+    create_email_or_string_entry(table, _(label), y_pos, widget);
 
     g_signal_connect(*view, "drag_data_received",
                      G_CALLBACK(to_add), NULL);
@@ -2855,7 +2849,7 @@ create_info_pane(BalsaSendmsg * bsmsg)
 
     /* To:, Cc:, and Bcc: */
     create_email_entry(table, ++row, bsmsg, &bsmsg->recipient_view,
-                       bsmsg->recipients, _("Rec_ipients"), address_types,
+                       bsmsg->recipients, "Rec_ipients", address_types,
                        G_N_ELEMENTS(address_types));
     g_signal_connect_swapped(gtk_tree_view_get_model
                              (GTK_TREE_VIEW(bsmsg->recipient_view)),
@@ -2874,7 +2868,7 @@ create_info_pane(BalsaSendmsg * bsmsg)
 #if !defined(ENABLE_TOUCH_UI)
     /* Reply To: */
     create_email_entry(table, ++row, bsmsg, &bsmsg->replyto_view,
-                       bsmsg->replyto, _("R_eply To:"), NULL, 0);
+                       bsmsg->replyto, "R_eply To:", NULL, 0);
 #endif
 
     /* fcc: mailbox folder where the message copy will be written to */
@@ -4487,8 +4481,6 @@ sendmsg_window_new()
     gtk_window_set_default_size(GTK_WINDOW(window), 
                                 balsa_app.sw_width,
                                 balsa_app.sw_height);
-    if (balsa_app.sw_maximized)
-        gtk_window_maximize(GTK_WINDOW(window));
 
     gtk_window_set_wmclass(GTK_WINDOW(window), "compose", "Balsa");
 

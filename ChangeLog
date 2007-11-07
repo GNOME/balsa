@@ -1,5 +1,15 @@
 2007-11-07  Peter Bloomfield
 
+	* src/balsa-app.c:
+	* src/balsa-app.h:
+	* src/main-window.c:
+	* src/message-window.c:
+	* src/save-restore.c:
+	* src/sendmsg-window.c: revert previous unintentional commit of
+	changes in src/.
+
+2007-11-07  Peter Bloomfield
+
 	* libbalsa/address-view.c: (lbav_set_text_at_path),
 	(lbav_combo_edited_cb), (lbav_row_editing_cb),
 	(lbav_button_activated_cb), (libbalsa_address_view_add_to_row):

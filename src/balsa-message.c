@@ -1929,23 +1929,17 @@ balsa_message_current_part_widget(BalsaMessage * bmessage)
 	return NULL;
 }
 
-GtkWindow*
-balsa_get_parent_window(GtkWidget *widget)
+GtkWindow *
+balsa_get_parent_window(GtkWidget * widget)
 {
-    GtkWidget *a_widget, *parent_widget;
+    if (widget) {
+        GtkWidget *toplevel = gtk_widget_get_toplevel(widget);
 
-    if(!widget)
-        return GTK_WINDOW(balsa_app.main_window);
+        if (GTK_WIDGET_TOPLEVEL(toplevel) && GTK_IS_WINDOW(toplevel))
+            return GTK_WINDOW(toplevel);
+    }
 
-    for(a_widget = widget, parent_widget=NULL;
-        a_widget;
-        a_widget = gtk_widget_get_parent(a_widget)) 
-        parent_widget = a_widget;
-
-    g_return_val_if_fail(GTK_IS_WINDOW(parent_widget),
-                         GTK_WINDOW(balsa_app.main_window));
-
-    return GTK_WINDOW(parent_widget);
+    return GTK_WINDOW(balsa_app.main_window);
 }
 
 

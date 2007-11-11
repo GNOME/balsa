@@ -1,3 +1,8 @@
+2007-11-10  Peter Bloomfield
+
+	* src/balsa-message.c: (balsa_get_parent_window): use
+	gtk_widget_get_toplevel.
+
 2007-10-31  Peter Bloomfield
 
 	* src/main-window.c: connect to "activate" signal instead of

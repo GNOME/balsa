@@ -172,6 +172,15 @@ const int toolbar_button_count =
 
 /* Public methods. */
 const gchar *
+balsa_toolbar_button_text(gint button)
+{
+    return _(strcmp(toolbar_buttons[button].pixmap_id,
+                    BALSA_PIXMAP_SEND) == 0
+             && balsa_app.always_queue_sent_mail ?
+             N_("Queue") : toolbar_buttons[button].button_text);
+}
+
+const gchar *
 balsa_toolbar_sanitize_id(const gchar *id)
 {
     gint button = get_toolbar_button_index(id);
@@ -399,7 +408,7 @@ tm_has_second_line(BalsaToolbarModel * model)
             continue;
         }
 
-        if (strchr(_(toolbar_buttons[button].button_text), '\n'))
+        if (strchr(balsa_toolbar_button_text(button), '\n'))
             return TRUE;
     }
 
@@ -407,34 +416,39 @@ tm_has_second_line(BalsaToolbarModel * model)
 }
 
 static gint
-tm_set_tool_item_label(GtkToolButton * tool_item, const gchar * stock_id,
+tm_set_tool_item_label(GtkToolItem * tool_item, const gchar * stock_id,
                        gboolean make_two_line)
 {
     gint button = get_toolbar_button_index(stock_id);
-    gchar *tmp, *text;
+    const gchar *text;
+    gchar *label;
 
     if (button < 0)
         return button;
 
-    tmp = _(toolbar_buttons[button].button_text);
-    if (strcmp(toolbar_buttons[button].pixmap_id, BALSA_PIXMAP_SEND) == 0
-        && balsa_app.always_queue_sent_mail)
-        tmp = _("Queue");
+    text = balsa_toolbar_button_text(button);
     if (balsa_app.toolbar_wrap_button_text) {
         /* Make sure all buttons have the same number of lines of
          * text (1 or 2), to keep icons aligned */
-        text = make_two_line && !strchr(tmp, '\n') ?
-            g_strconcat(tmp, "\n", NULL) : g_strdup(tmp);
+        label = make_two_line && !strchr(text, '\n') ?
+            g_strconcat(text, "\n", NULL) : g_strdup(text);
     } else {
-        text = tmp = g_strdup(tmp);
-        while ((tmp = strchr(tmp, '\n')))
-            *tmp++ = ' ';
+        gchar *p = label = g_strdup(text);
+        while ((p = strchr(p, '\n')))
+            *p++ = ' ';
     }
 
-    gtk_tool_button_set_label(tool_item, text);
-    g_free(text);
+    gtk_tool_button_set_label(GTK_TOOL_BUTTON(tool_item), label);
+    g_free(label);
 
-    gtk_tool_item_set_is_important(GTK_TOOL_ITEM(tool_item), TRUE);
+    gtk_tool_item_set_is_important(tool_item, TRUE);
+
+#if GTK_CHECK_VERSION(2, 12, 0)
+    if (strcmp(toolbar_buttons[button].pixmap_id, BALSA_PIXMAP_SEND) == 0
+        && balsa_app.always_queue_sent_mail)
+        gtk_tool_item_set_tooltip_text(tool_item,
+                                       _("Queue this message for sending"));
+#endif                          /* GTK_CHECK_VERSION(2, 12, 0) */
 
     return button;
 }
@@ -482,7 +496,7 @@ tm_populate(BalsaToolbarModel * model, GtkUIManager * ui_manager,
             path = g_strconcat("/Toolbar/", name, NULL);
             tool_item = gtk_ui_manager_get_widget(ui_manager, path);
             g_free(path);
-            tm_set_tool_item_label(GTK_TOOL_BUTTON(tool_item), stock_id,
+            tm_set_tool_item_label(GTK_TOOL_ITEM(tool_item), stock_id,
                                    make_two_line);
         }
     }

@@ -801,7 +801,7 @@ tp_store_set(GtkListStore * store, GtkTreeIter * iter, gint item)
     GdkPixbuf *pixbuf;
     gchar *text;
 
-    text = g_strdup(_(toolbar_buttons[item].button_text));
+    text = g_strdup(balsa_toolbar_button_text(item));
     replace_nl_with_space(text);
     pixbuf = (item > 0
               ? gtk_widget_render_icon(customize_widget,

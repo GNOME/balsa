@@ -64,6 +64,7 @@ void update_all_toolbars(void);
 void balsa_toolbar_remove_all(GtkWidget * toolbar);
 
 /* toolbar code for gtk+-2 */
+const gchar *balsa_toolbar_button_text(gint button);
 const gchar *balsa_toolbar_sanitize_id(const gchar * id);
 
 /* BalsaToolbarModel */

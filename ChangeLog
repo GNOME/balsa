@@ -1,3 +1,11 @@
+2007-11-13  Peter Bloomfield
+
+	Bug #496316: Send/Queue button has inconsistent labeling.
+	* src/toolbar-factory.h: new function balsa_toolbar_button_text.
+	* src/toolbar-factory.c: (balsa_toolbar_button_text,
+	tm_has_second_line, tm_set_tool_item_label): implement and use it.
+	* src/toolbar-prefs.c: (tp_store_set): use it.
+
 2007-11-10  Peter Bloomfield
 
 	* src/balsa-message.c: (balsa_get_parent_window): use

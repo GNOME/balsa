@@ -330,6 +330,33 @@ lbav_ensure_blank_line(LibBalsaAddressView * address_view,
 }
 
 /*
+ *     Replace non-printable chars by spaces
+ */
+static void
+lbav_clean_text(gchar * text)
+{
+    gchar *p;
+    gboolean was_graph = FALSE;
+
+    p = text;
+    while (*p) {
+        gunichar c  = g_utf8_get_char(p);
+        gchar *next = g_utf8_next_char(p);
+
+        if (g_unichar_isprint(c)) {
+            was_graph = g_unichar_isgraph(c);
+            p = next;
+        } else {
+            if (was_graph)
+                *p++ = ' ';
+            was_graph = FALSE;
+            if (p != next)
+                memmove(p, next, strlen(next) + 1);
+        }
+    }
+}
+
+/*
  *     Add the addresses in an InternetAddressList, starting at iter and
  *     inserting lines of the same type as necessary;
  *     on return, iter points to the last line inserted.
@@ -352,6 +379,7 @@ lbav_add_from_list(LibBalsaAddressView * address_view,
             gchar *name = internet_address_to_string(ia, FALSE);
 
             libbalsa_utf8_sanitize(&name, address_view->fallback, NULL);
+            lbav_clean_text(name);
 
             gtk_list_store_set(address_store, iter,
                                ADDRESS_TYPE_COL, type,
@@ -465,11 +493,15 @@ lbav_set_text_at_path(LibBalsaAddressView * address_view,
         /* Parse the new text and store it in this line. */
         if (lbav_add_from_string(address_view, &iter, text))
             lbav_ensure_blank_line(address_view, &iter, type);
-        else
+        else {
             /* No valid addresses found; just set the new text and keep
              * the focus in this line. */
+            gchar *name = g_strdup(text);
+            lbav_clean_text(name);
             gtk_list_store_set(address_store, &iter,
-                               ADDRESS_NAME_COL, text, -1);
+                               ADDRESS_NAME_COL, name, -1);
+            g_free(name);
+        }
         return;
     }
 

@@ -1,3 +1,9 @@
+2007-11-16  Peter Bloomfield
+
+	* libbalsa/address-view.c: (lbav_clean_text): new helper to
+	remove control characters from text.
+	(lbav_add_from_list, lbav_set_text_at_path): use it.
+
 2007-11-07  Peter Bloomfield
 
 	* src/balsa-app.c:

@@ -225,11 +225,14 @@ extern struct BalsaApplication {
     /* GUI settings */
     gint mw_width;
     gint mw_height;
+    gboolean mw_maximized;
     gint mblist_width;
     gint sw_width; /* sendmsg window */
     gint sw_height;
+    gboolean sw_maximized;
     gint message_window_width;
     gint message_window_height;
+    gboolean message_window_maximized;
 
     /* toolbars */
     int toolbar_wrap_button_text;

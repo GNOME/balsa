@@ -1,3 +1,13 @@
+2007-11-17  Peter Bloomfield
+
+	* src/save-restore.c:
+	* src/balsa-app.c:
+	* src/balsa-app.h: add fields to save/restore maximized state of
+	windows.
+	* src/main-window.c:
+	* src/message-window.c:
+	* src/sendmsg-window.c: use them.
+
 2007-11-13  Peter Bloomfield
 
 	Bug #496316: Send/Queue button has inconsistent labeling.

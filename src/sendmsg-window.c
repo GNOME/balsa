@@ -1578,8 +1578,14 @@ update_bsmsg_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity* ident)
 static void
 sw_size_alloc_cb(GtkWidget * window, GtkAllocation * alloc)
 {
-    balsa_app.sw_height = alloc->height;
-    balsa_app.sw_width = alloc->width;
+    if (!GTK_WIDGET_REALIZED(window))
+        return;
+
+    if (!(balsa_app.sw_maximized = gdk_window_get_state(window->window)
+          & GDK_WINDOW_STATE_MAXIMIZED)) {
+        balsa_app.sw_height = alloc->height;
+        balsa_app.sw_width  = alloc->width;
+    }
 }
 
 
@@ -4469,6 +4475,8 @@ sendmsg_window_new()
     gtk_window_set_default_size(GTK_WINDOW(window), 
                                 balsa_app.sw_width,
                                 balsa_app.sw_height);
+    if (balsa_app.sw_maximized)
+        gtk_window_maximize(GTK_WINDOW(window));
 
     gtk_window_set_wmclass(GTK_WINDOW(window), "compose", "Balsa");
 

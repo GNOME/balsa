@@ -648,6 +648,8 @@ message_window_new(LibBalsaMailbox * mailbox, guint msgno)
     gtk_window_set_default_size(GTK_WINDOW(window),
                                 balsa_app.message_window_width, 
                                 balsa_app.message_window_height);
+    if (balsa_app.message_window_maximized)
+        gtk_window_maximize(GTK_WINDOW(window));
 
     gtk_widget_show_all(window);
     mw_set_message(mw, message);
@@ -820,8 +822,15 @@ mw_header_activate_cb(GtkAction * action, gpointer data)
 static void
 size_alloc_cb(GtkWidget * window, GtkAllocation * alloc)
 {
-    balsa_app.message_window_height = alloc->height;
-    balsa_app.message_window_width = alloc->width;
+    if (!GTK_WIDGET_REALIZED(window))
+        return;
+
+    if (!(balsa_app.message_window_maximized =
+          gdk_window_get_state(window->window)
+          & GDK_WINDOW_STATE_MAXIMIZED)) {
+        balsa_app.message_window_height = alloc->height;
+        balsa_app.message_window_width  = alloc->width;
+    }
 }
 
 static void

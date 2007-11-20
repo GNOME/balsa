@@ -1,21 +1,24 @@
+# translation of oc.po to Occitan
 # Occitan translation of balsa.
 # Copyright (C) 2007 Free Software Foundation, Inc.
 # This file is distributed under the same license as the balsa package.
 #
-# Yannig MARCHEGAY (yannig@marchegay.org). 2007 
-# 
+# Yannig MARCHEGAY (yannig@marchegay.org). 2007
+#
+# Yannig Marchegay (Kokoyaya) <yannig@marchegay.org>, 2007.
 msgid ""
 msgstr ""
-"Project-Id-Version: balsa 2.3.14\n"
+"Project-Id-Version: oc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2007-10-13 17:46+0200\n"
-"PO-Revision-Date: 2007-10-14 11:49+0200\n"
-"Last-Translator: Yannig MARCHEGAY (Kokoyaya) <yannig@marchegay.org>\n"
-"Language-Team: Occitan (post 1500) <ubuntu-l10n-oci@lists.ubuntu.com>\n"
+"PO-Revision-Date: 2007-11-20 14:29+0100\n"
+"Last-Translator: Yannig Marchegay (Kokoyaya) <yannig@marchegay.org>\n"
+"Language-Team: Occitan <ubuntu-l10n-oci@lists.ubuntu.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n > 1);"
+"Plural-Forms: nplurals=2; plural=(n > 1);X-Generator: KBabel 1.11.4\n"
+"X-Generator: KBabel 1.11.4\n"
 
 #: ../balsa.desktop.in.h:1
 msgid "Balsa"
@@ -258,8 +261,7 @@ msgstr ""
 
 #: ../libbalsa/gmime-gpgme-context.c:865
 #, c-format
-msgid ""
-"%s: a key for %s is present, but it is expired, disabled, revoked or invalid"
+msgid "%s: a key for %s is present, but it is expired, disabled, revoked or invalid"
 msgstr ""
 
 #: ../libbalsa/gmime-gpgme-context.c:869
@@ -291,7 +293,7 @@ msgstr ""
 
 #: ../libbalsa/identity.c:161
 msgid "New Identity"
-msgstr ""
+msgstr "Identitat novèla"
 
 #: ../libbalsa/identity.c:332
 #, c-format
@@ -422,7 +424,7 @@ msgstr ""
 
 #: ../libbalsa/identity.c:1038
 msgid "Security"
-msgstr "Seguretat"
+msgstr "Seguritat"
 
 #: ../libbalsa/identity.c:1041
 msgid "sign messages by default"
@@ -1128,8 +1130,7 @@ msgid "The signature is valid but expired."
 msgstr ""
 
 #: ../libbalsa/rfc3156.c:929
-msgid ""
-"The signature is valid but the key used to verify the signature has expired."
+msgid "The signature is valid but the key used to verify the signature has expired."
 msgstr ""
 
 #: ../libbalsa/rfc3156.c:932
@@ -1607,7 +1608,7 @@ msgstr "_Tampar"
 
 #: ../libbalsa/source-viewer.c:48
 msgid "Close the window"
-msgstr ""
+msgstr "Ferme la fenêtre"
 
 #. Edit menu items
 #: ../libbalsa/source-viewer.c:49 ../src/main-window.c:396
@@ -1930,7 +1931,7 @@ msgstr "_Sortir"
 
 #: ../src/ab-main.c:492
 msgid "Exit the program"
-msgstr ""
+msgstr "Sortir del programa"
 
 #: ../src/ab-main.c:494
 msgid "_New Entry"
@@ -2060,7 +2061,7 @@ msgstr ""
 
 #: ../src/address-book-config.c:462
 msgid "_Password"
-msgstr ""
+msgstr "Mot de _pas :"
 
 #: ../src/address-book-config.c:468
 msgid "_User Address Book DN"
@@ -2525,15 +2526,15 @@ msgstr "Escais"
 
 #: ../src/balsa-print-object-text.c:491 ../src/balsa-mime-widget-text.c:1219
 msgid "First Name"
-msgstr ""
+msgstr "Pichon nom"
 
 #: ../src/balsa-print-object-text.c:493 ../src/balsa-mime-widget-text.c:1220
 msgid "Last Name"
-msgstr ""
+msgstr "Nom"
 
 #: ../src/balsa-print-object-text.c:495 ../src/balsa-mime-widget-text.c:1221
 msgid "Organization"
-msgstr ""
+msgstr "Organizacion"
 
 #: ../src/balsa-print-object-text.c:498 ../src/balsa-mime-widget-text.c:1223
 msgid "Email Address"
@@ -2909,7 +2910,7 @@ msgstr ""
 #. up button
 #: ../src/filter-run-dialog.c:364
 msgid "_Up"
-msgstr ""
+msgstr "_Aval"
 
 #. down button
 #: ../src/filter-run-dialog.c:369
@@ -3388,7 +3389,7 @@ msgstr "_Messatge"
 
 #: ../src/main-window.c:327
 msgid "_Settings"
-msgstr ""
+msgstr "_Paramètres"
 
 #: ../src/main-window.c:332
 msgid "Mail_boxes"
@@ -3634,7 +3635,7 @@ msgstr ""
 
 #: ../src/main-window.c:428
 msgid "Customize toolbars"
-msgstr ""
+msgstr "Personalizar las barras d'espleches"
 
 #: ../src/main-window.c:429
 msgid "_Identities..."
@@ -3647,7 +3648,7 @@ msgstr ""
 #. Help menu items
 #: ../src/main-window.c:433
 msgid "_Contents"
-msgstr "_Ensenhador"
+msgstr "_Somari"
 
 #: ../src/main-window.c:434
 msgid "Table of Contents"
@@ -3661,15 +3662,15 @@ msgstr "A prepaus de Balsa"
 #: ../src/main-window.c:442 ../src/message-window.c:252
 #: ../src/sendmsg-window.c:344
 msgid "Select _All"
-msgstr ""
+msgstr "Seleccionar un fichièr"
 
 #: ../src/main-window.c:444
 msgid "_Find"
-msgstr ""
+msgstr "_Recercar"
 
 #: ../src/main-window.c:446
 msgid "Find Ne_xt"
-msgstr ""
+msgstr "Recercar lo seguent"
 
 #. Mailbox menu items
 #: ../src/main-window.c:449 ../src/main-window.c:450
@@ -4091,7 +4092,7 @@ msgstr ""
 #: ../src/main-window.c:2159
 #, c-format
 msgid "Opening %s"
-msgstr ""
+msgstr "Dobertura de %s"
 
 #: ../src/main-window.c:2178
 #, c-format
@@ -4577,7 +4578,7 @@ msgstr "Tipe :"
 #: ../src/balsa-print-object-default.c:165
 #: ../src/balsa-print-object-default.c:169 ../src/print.c:984
 msgid "File name:"
-msgstr "Nom de fichièrs :"
+msgstr "Nom de fichièrs :"
 
 #: ../src/pref-manager.c:386
 msgid "While Retrieving Messages"
@@ -4805,7 +4806,7 @@ msgstr ""
 
 #: ../src/pref-manager.c:2050
 msgid "Other Options"
-msgstr "Autras opcions"
+msgstr "Opcions generalas"
 
 #: ../src/pref-manager.c:2055
 msgid "Reply Prefix:"
@@ -5007,7 +5008,7 @@ msgstr ""
 
 #: ../src/pref-manager.c:2521
 msgid "Debug"
-msgstr ""
+msgstr "Débogage"
 
 #: ../src/pref-manager.c:2522
 msgid "Empty Trash on exit"
@@ -5127,7 +5128,7 @@ msgstr ""
 
 #: ../src/pref-manager.c:3248
 msgid "Ask me"
-msgstr ""
+msgstr "Me demandar"
 
 #: ../src/pref-manager.c:3325
 msgid "Show next unread message"
@@ -5327,8 +5328,7 @@ msgid ""
 msgstr ""
 
 #: ../src/save-restore.c:1018
-msgid ""
-"The option to request a MDN is now on the Options menu of the compose window."
+msgid "The option to request a MDN is now on the Options menu of the compose window."
 msgstr ""
 
 #: ../src/save-restore.c:1098
@@ -5575,7 +5575,7 @@ msgstr ""
 
 #: ../src/sendmsg-window.c:338
 msgid "Cu_t"
-msgstr ""
+msgstr "_Copar"
 
 #: ../src/sendmsg-window.c:339
 msgid "Cut the selected text"
@@ -6054,7 +6054,7 @@ msgstr ""
 
 #: ../src/sendmsg-window.c:5727
 msgid "_Send"
-msgstr "_Enviar"
+msgstr "_Velocitat :"
 
 #: ../src/sendmsg-window.c:5785
 msgid ""
@@ -6151,8 +6151,7 @@ msgid "Replace the current word with the selected suggestion"
 msgstr ""
 
 #: ../src/spell-check.c:526 ../src/spell-check.c:530
-msgid ""
-"Replace all occurrences of the current word with the selected suggestion"
+msgid "Replace all occurrences of the current word with the selected suggestion"
 msgstr ""
 
 #: ../src/spell-check.c:544 ../src/spell-check.c:547
@@ -6225,7 +6224,7 @@ msgstr "Separador"
 
 #: ../src/toolbar-factory.c:131
 msgid "Quit"
-msgstr ""
+msgstr "Quitar"
 
 #: ../src/toolbar-factory.c:132
 msgid "Check"
@@ -6307,7 +6306,7 @@ msgstr "Estampar"
 
 #: ../src/toolbar-factory.c:148
 msgid "Send"
-msgstr "Enviar"
+msgstr "Segondas"
 
 #: ../src/toolbar-factory.c:149
 msgid "Exchange"
@@ -6458,5 +6457,3 @@ msgstr "Amont"
 msgid "Down"
 msgstr "Aval"
 
-#~ msgid "_New..."
-#~ msgstr "_Novèl..."

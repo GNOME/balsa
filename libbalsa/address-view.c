@@ -730,6 +730,49 @@ lbav_combo_edited_cb(GtkCellRendererText * renderer,
     gtk_widget_grab_focus(GTK_WIDGET(address_view));
 }
 
+
+/*
+ * Focus Out callback
+ * If only one completion matches, fill it into the entry
+ */
+static gboolean
+lbav_focus_out_cb(GtkEntry * entry, GdkEventFocus * event,
+                  LibBalsaAddressView * address_view)
+{
+    const gchar *the_entry = gtk_entry_get_text(entry);
+
+    if (the_entry && *the_entry) {
+        GList *match;
+
+        match = lbav_get_matching_addresses(address_view,
+                                            the_entry,
+                                            LIBBALSA_ADDRESS_VIEW_MATCH_ALL);
+
+        if (match) {
+            if (!match->next) {
+                gchar *the_addr =
+                    internet_address_to_string((InternetAddress *) match->
+                                               data, FALSE);
+
+                g_signal_handlers_block_by_func(entry,
+                                                lbav_entry_changed_cb,
+                                                address_view);
+                gtk_entry_set_text(entry, the_addr);
+                g_signal_handlers_unblock_by_func(entry,
+                                                  lbav_entry_changed_cb,
+                                                  address_view);
+                gtk_cell_editable_editing_done(GTK_CELL_EDITABLE(entry));
+                g_free(the_addr);
+            }
+            g_list_foreach(match, (GFunc) internet_address_unref, NULL);
+            g_list_free(match);
+        }
+    }
+
+    return FALSE;
+}
+
+
 /*
  *     Callback for the tree-view's "editing-started" signal
  *     Set up the GtkEntryCompletion.
@@ -766,6 +809,8 @@ lbav_row_editing_cb(GtkCellRenderer * renderer,
                      G_CALLBACK(lbav_key_pressed_cb), address_view);
     g_signal_connect(editable, "insert-text",
                      G_CALLBACK(lbav_insert_text_cb), address_view);
+    g_signal_connect_after(GTK_ENTRY(editable), "focus-out-event",
+			   G_CALLBACK(lbav_focus_out_cb), address_view);
     gtk_entry_set_completion(GTK_ENTRY(editable), completion);
     g_object_unref(completion);
 

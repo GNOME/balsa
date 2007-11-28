@@ -90,6 +90,8 @@ typedef struct {
 typedef enum { QUOTE_HEADERS, QUOTE_ALL, QUOTE_NOPREFIX } QuoteType;
 
 static void include_file_cb    (GtkAction * action, BalsaSendmsg * bsmsg);
+static void toolbar_send_message_cb
+                               (GtkAction * action, BalsaSendmsg * bsmsg);
 static void send_message_cb    (GtkAction * action, BalsaSendmsg * bsmsg);
 static void queue_message_cb   (GtkAction * action, BalsaSendmsg * bsmsg);
 static void save_message_cb    (GtkAction * action, BalsaSendmsg * bsmsg);
@@ -368,6 +370,12 @@ static const GtkActionEntry entries[] = {
 
 /* Actions that are sensitive only when the message is ready to send */
 static const GtkActionEntry ready_entries[] = {
+    /* All three "Send" and "Queue" actions have the same
+     * stock_id; the first in this list defines the action tied to the
+     * toolbar's "Send" button, so "ToolbarSend" must come before
+     * the others. */
+    {"ToolbarSend", BALSA_PIXMAP_SEND, N_("Sen_d"), "<control>Return",
+     N_("Send this message"), G_CALLBACK(toolbar_send_message_cb)},
     {"Send", BALSA_PIXMAP_SEND, N_("Sen_d"), "<control>Return",
      N_("Send this message"), G_CALLBACK(send_message_cb)},
 #if !defined(ENABLE_TOUCH_UI)
@@ -375,7 +383,7 @@ static const GtkActionEntry ready_entries[] = {
      N_("Queue this message in Outbox for sending"),
      G_CALLBACK(queue_message_cb)},
     {"Postpone", BALSA_PIXMAP_POSTPONE, N_("_Postpone"), NULL,
-     NULL, G_CALLBACK(postpone_message_cb)},
+     N_("Save this message and close"), G_CALLBACK(postpone_message_cb)},
 #else                           /* ENABLE_TOUCH_UI */
     {"Queue", BALSA_PIXMAP_SEND, N_("Send _Later"), "<control>Q",
      N_("Queue this message in Outbox for sending"),
@@ -5882,6 +5890,12 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
 
 
 /* "send message" menu callback */
+static void
+toolbar_send_message_cb(GtkAction * action, BalsaSendmsg * bsmsg)
+{
+    send_message_handler(bsmsg, balsa_app.always_queue_sent_mail);
+}
+
 static void
 send_message_cb(GtkAction * action, BalsaSendmsg * bsmsg)
 {

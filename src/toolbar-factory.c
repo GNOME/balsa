@@ -164,7 +164,8 @@ button_data toolbar_buttons[]={
 #endif
     {GTK_STOCK_UNDO, N_("Undo")},
     {GTK_STOCK_REDO, N_("Redo")},
-    {GTK_STOCK_CLEAR, N_("Expunge\nDeleted")},
+    {GTK_STOCK_CLEAR, N_("Reset\nFilter")},
+    {GTK_STOCK_REMOVE, N_("Empty\nTrash")},
 };
 
 const int toolbar_button_count =

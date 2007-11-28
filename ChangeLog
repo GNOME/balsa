@@ -1,3 +1,11 @@
+2007-11-27  Peter Bloomfield
+
+	Thanks to Nuno Monteiro
+	<http://mail.gnome.org/archives/balsa-list/2007-November/msg00016.html>
+	* src/sendmsg-window.c: (toolbar_send_message_cb): new action
+	for toolbar send/queue button.
+	* src/toolbar-factory.c: correct toolbar button labels.
+
 2007-11-17  Peter Bloomfield
 
 	* src/save-restore.c:

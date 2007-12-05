@@ -1,3 +1,12 @@
+2007-12-05  Peter Bloomfield
+
+	* libbalsa/mailbox.c: (libbalsa_mailbox_changed): hold gdk lock
+	while emitting "changed" signal;
+	(libbalsa_mailbox_msgno_changed, libbalsa_mailbox_msgno_filt_in,
+	libbalsa_mailbox_msgno_removed,
+	libbalsa_mailbox_msgno_filt_out): eliminate obsolete
+	lbm_threads_{enter,leave}.
+
 2007-11-27  Peter Bloomfield
 
 	Thanks to Nuno Monteiro

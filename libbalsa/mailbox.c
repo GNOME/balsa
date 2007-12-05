@@ -686,7 +686,10 @@ libbalsa_mailbox_changed(LibBalsaMailbox * mailbox)
         libbalsa_mailbox_set_total(mailbox, -1);
         libbalsa_mailbox_set_unread(mailbox, 1);
     }
+
+    gdk_threads_enter();
     g_signal_emit(mailbox, libbalsa_mailbox_signals[CHANGED], 0);
+    gdk_threads_leave();
 }
 
 /* libbalsa_mailbox_message_match:
@@ -1159,26 +1162,14 @@ lbm_msgno_changed(LibBalsaMailbox * mailbox, guint seqno,
 #endif /* CACHE_UNSEEN_CHILD */
 }
 
-static void 
-lbm_threads_enter(LibBalsaMailbox * mailbox)
-{
-    gdk_threads_enter();
-}
-
-static void 
-lbm_threads_leave(LibBalsaMailbox * mailbox)
-{
-    gdk_threads_leave();
-}
-
 void
 libbalsa_mailbox_msgno_changed(LibBalsaMailbox * mailbox, guint seqno)
 {
     GtkTreeIter iter;
 
-    lbm_threads_enter(mailbox);
+    gdk_threads_enter();
     if (!mailbox->msg_tree) {
-        lbm_threads_leave(mailbox);
+        gdk_threads_leave();
         return;
     }
 
@@ -1194,7 +1185,7 @@ libbalsa_mailbox_msgno_changed(LibBalsaMailbox * mailbox, guint seqno)
             lbm_msgno_changed(mailbox, seqno, &iter);
     }
 
-    lbm_threads_leave(mailbox);
+    gdk_threads_leave();
 }
 
 void
@@ -1245,9 +1236,9 @@ libbalsa_mailbox_msgno_filt_in(LibBalsaMailbox *mailbox, guint seqno)
     GtkTreeIter iter;
     GtkTreePath *path;
 
-    lbm_threads_enter(mailbox);
+    gdk_threads_enter();
     if (!mailbox->msg_tree) {
-        lbm_threads_leave(mailbox);
+        gdk_threads_leave();
         return;
     }
 
@@ -1264,7 +1255,7 @@ libbalsa_mailbox_msgno_filt_in(LibBalsaMailbox *mailbox, guint seqno)
     mailbox->msg_tree_changed = TRUE;
     g_signal_emit(mailbox, libbalsa_mailbox_signals[CHANGED], 0);
 
-    lbm_threads_leave(mailbox);
+    gdk_threads_leave();
 }
 
 struct remove_data {LibBalsaMailbox *mailbox; unsigned seqno; GNode *node; };
@@ -1296,9 +1287,9 @@ libbalsa_mailbox_msgno_removed(LibBalsaMailbox * mailbox, guint seqno)
     g_signal_emit(mailbox, libbalsa_mailbox_signals[MESSAGE_EXPUNGED],
                   0, seqno);
 
-    lbm_threads_enter(mailbox);
+    gdk_threads_enter();
     if (!mailbox->msg_tree) {
-        lbm_threads_leave(mailbox);
+        gdk_threads_leave();
         return;
     }
 
@@ -1319,7 +1310,7 @@ libbalsa_mailbox_msgno_removed(LibBalsaMailbox * mailbox, guint seqno)
 
     if (!dt.node) {
         /* It's ok, apparently the view did not include this message */
-        lbm_threads_leave(mailbox);
+        gdk_threads_leave();
         return;
     }
 
@@ -1370,7 +1361,7 @@ libbalsa_mailbox_msgno_removed(LibBalsaMailbox * mailbox, guint seqno)
     gtk_tree_path_free(path);
     mailbox->stamp++;
 
-    lbm_threads_leave(mailbox);
+    gdk_threads_leave();
 }
 
 void
@@ -1380,9 +1371,9 @@ libbalsa_mailbox_msgno_filt_out(LibBalsaMailbox * mailbox, guint seqno)
     GtkTreePath *path;
     GNode *child, *parent, *node;
 
-    lbm_threads_enter(mailbox);
+    gdk_threads_enter();
     if (!mailbox->msg_tree) {
-        lbm_threads_leave(mailbox);
+        gdk_threads_leave();
         return;
     }
 
@@ -1390,7 +1381,7 @@ libbalsa_mailbox_msgno_filt_out(LibBalsaMailbox * mailbox, guint seqno)
                        GUINT_TO_POINTER(seqno));
     if (!node) {
         g_warning("filt_out: msgno %d not found", seqno);
-        lbm_threads_leave(mailbox);
+        gdk_threads_leave();
         return;
     }
 
@@ -1438,7 +1429,7 @@ libbalsa_mailbox_msgno_filt_out(LibBalsaMailbox * mailbox, guint seqno)
     mailbox->msg_tree_changed = TRUE;
     g_signal_emit(mailbox, libbalsa_mailbox_signals[CHANGED], 0);
 
-    lbm_threads_leave(mailbox);
+    gdk_threads_leave();
 }
 
 /*

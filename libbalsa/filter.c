@@ -263,6 +263,7 @@ libbalsa_filter_mailbox_messages(LibBalsaFilter * filt,
 #endif /* HAVE_GNOME */
     if (filt->popup_text)
 	libbalsa_information(LIBBALSA_INFORMATION_MESSAGE,
+			     "%s",
 			     filt->popup_text);
 
     libbalsa_lock_mailbox(mailbox);

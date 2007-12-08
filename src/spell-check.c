@@ -845,6 +845,7 @@ balsa_spell_check_start(BalsaSpellCheck * spell_check, GtkWindow *parent_wnd)
 	/* quit without breaking things */
 	balsa_information_parented(parent_wnd,
                                    LIBBALSA_INFORMATION_ERROR,
+                                   "%s",
                                    pspell_error_message(spell_error));
 
 	/* Generate a response signal. */

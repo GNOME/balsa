@@ -1968,7 +1968,7 @@ add_attachment(BalsaSendmsg * bsmsg, gchar *filename,
     if (balsa_app.debug)
 	fprintf(stderr, "Trying to attach '%s'\n", filename);
     if ( (err_bsmsg=check_if_regular_file(filename)) != NULL) {
-        balsa_information(LIBBALSA_INFORMATION_ERROR, err_bsmsg);
+        balsa_information(LIBBALSA_INFORMATION_ERROR, "%s", err_bsmsg);
 	g_free(err_bsmsg);
 	g_free(filename);
 	return FALSE;

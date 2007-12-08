@@ -112,7 +112,7 @@ libbalsa_check_crypto_engine(gpgme_protocol_t protocol)
 	g_string_append_printf(message,
 			       _("\nDisable support for protocol %s."),
 			       gpgme_get_protocol_name(protocol));
-	libbalsa_information(LIBBALSA_INFORMATION_ERROR, message->str);
+	libbalsa_information(LIBBALSA_INFORMATION_ERROR, "%s", message->str);
 	g_string_free(message, TRUE);
 	return FALSE;
     } else

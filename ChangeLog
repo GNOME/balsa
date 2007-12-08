@@ -1,3 +1,8 @@
+2007-12-08  Pawel Salek
+
+	* src/{main,sendmsg}-window.c...: format string bug fixes
+	(bug 488432, Evil Ninja Squirrel).
+
 2007-12-05  Peter Bloomfield
 
 	* libbalsa/mailbox.c: (libbalsa_mailbox_changed): hold gdk lock

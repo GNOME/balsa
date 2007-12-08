@@ -3070,6 +3070,7 @@ mail_progress_notify_cb(GIOChannel * source, GIOCondition condition,
 
         case LIBBALSA_NTFY_ERROR:
             balsa_information(LIBBALSA_INFORMATION_ERROR,
+                              "%s",
                               threadmessage->message_string);
             break;
 

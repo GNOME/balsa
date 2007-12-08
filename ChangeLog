@@ -1,5 +1,10 @@
 2007-12-08  Pawel Salek
 
+	* balsa.desktop.in: fix bug 414361 in bugzilla.redhat.com.
+	* NEWS, configure.in: release 2.3.21.
+
+2007-12-08  Pawel Salek
+
 	* src/{main,sendmsg}-window.c...: format string bug fixes
 	(bug 488432, Evil Ninja Squirrel).
 

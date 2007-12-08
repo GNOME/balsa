@@ -64,6 +64,7 @@
 #include "Balsa.h"
 #include "balsa-bonobo.h"
 #include <bonobo-activation/bonobo-activation.h>
+#include <bonobo/bonobo-exception.h>
 
 #ifdef HAVE_GPGME
 #include <string.h>
@@ -146,10 +147,11 @@ balsa_handle_automation_options() {
        ("OAFIID:GNOME_Balsa_Application_Factory",
 	Bonobo_ACTIVATION_FLAG_EXISTING_ONLY,
 	NULL, &ev);
-
-   if (factory) {
+   
+   if ( !(BONOBO_EX (&ev) || factory == CORBA_OBJECT_NIL) ) {
        /* there already is a server. good */
        CORBA_Object app;
+       printf("Another Balsa found. Talking to it...\n");
        app =  
 	   bonobo_activation_activate_from_id ("OAFIID:GNOME_Balsa_Application",
 						   0, NULL, &ev);

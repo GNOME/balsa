@@ -1,3 +1,9 @@
+* Balsa-2.3.21 release. Release date 2007-12-08
+
+- migration from GnomeUI to GtkUIManager
+- Rubrica address book support.
+- bugs fixed: GNOME: 481842, 488432, 496316; Redhat: 414361.
+
 * Balsa-2.3.20 release. Release date 2007-09-07
 
 - fix buffer overflow (#474366).

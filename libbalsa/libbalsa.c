@@ -782,6 +782,7 @@ void (*libbalsa_progress_set_text) (LibBalsaProgress * progress,
                                     const gchar * text, guint total);
 void (*libbalsa_progress_set_fraction) (LibBalsaProgress * progress,
                                         gdouble fraction);
+void (*libbalsa_progress_set_activity) (gboolean set, const gchar * text);
 
 /*
  * Face and X-Face header support.

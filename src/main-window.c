@@ -80,12 +80,6 @@ enum {
 };
 
 enum {
-    BALSA_PROGRESS_NONE = 0,
-    BALSA_PROGRESS_ACTIVITY,
-    BALSA_PROGRESS_INCREMENT
-};
-
-enum {
     TARGET_MESSAGES
 };
 
@@ -291,11 +285,6 @@ static void bw_contents_cb(void);
 #ifdef HAVE_NOTIFY
 static gboolean bw_cancel_new_mail_notification(void);
 #endif
-
-static void bw_increase_activity(BalsaWindow * window,
-                                 const gchar * message);
-static void bw_decrease_activity(BalsaWindow * window,
-                                 const gchar * message);
 
 static void
 bw_quit_nicely(GtkAction * action, gpointer data)
@@ -2088,9 +2077,7 @@ bw_notebook_label_style(GtkLabel * lab, gboolean has_unread_messages)
 static void
 bw_mailbox_changed(LibBalsaMailbox * mailbox, GtkLabel * lab)
 {
-    gdk_threads_enter();
     bw_notebook_label_style(lab, libbalsa_mailbox_get_unread(mailbox) > 0);
-    gdk_threads_leave();
 }
 
 static void
@@ -2200,7 +2187,7 @@ bw_real_open_mbnode(struct bw_open_mbnode_info * info)
     index = BALSA_INDEX(balsa_index_new());
 
     message = g_strdup_printf(_("Opening %s"), mailbox->name);
-    bw_increase_activity(info->window, message);
+    balsa_window_increase_activity(info->window, message);
 
     /* Call balsa_index_load_mailbox_node NOT holding the gdk lock. */
     gdk_threads_leave();
@@ -2209,7 +2196,7 @@ bw_real_open_mbnode(struct bw_open_mbnode_info * info)
     gdk_threads_enter();
 
     if (info->window) {
-	bw_decrease_activity(info->window, message);
+	balsa_window_decrease_activity(info->window, message);
 	g_object_remove_weak_pointer(G_OBJECT(info->window),
 				     (gpointer) &info->window);
     }
@@ -4805,129 +4792,91 @@ static gboolean bw_notebook_drag_motion_cb(GtkWidget * widget,
  * Use of the progress bar to show a fraction of a task takes priority.
  **/
 static gint
-bw_progress_timeout(GtkProgressBar ** progress_bar)
+bw_progress_timeout(BalsaWindow ** window)
 {
     gdk_threads_enter();
 
-    if (*progress_bar) {
-        gint in_use =
-            GPOINTER_TO_INT(g_object_get_data
-                            (G_OBJECT(*progress_bar), "in_use"));
-        if (in_use != BALSA_PROGRESS_INCREMENT)
-            gtk_progress_bar_pulse(*progress_bar);
-    }
+    if (*window && (*window)->progress_type == BALSA_PROGRESS_ACTIVITY)
+        gtk_progress_bar_pulse(GTK_PROGRESS_BAR((*window)->progress_bar));
 
     gdk_threads_leave();
 
     /* return true so it continues to be called */
-    return *progress_bar != NULL;
+    return *window != NULL;
 }
 
 
-/* bw_increase_activity
+/* balsa_window_increase_activity
  * 
  * Calling this causes this to the progress bar of the window to
  * switch into activity mode if it's not already going.  Otherwise it
  * simply increments the counter (so that multiple threads can
  * indicate activity simultaneously).
  **/
-static void 
-bw_increase_activity(BalsaWindow * window, const gchar * message)
+void
+balsa_window_increase_activity(BalsaWindow * window, const gchar * message)
 {
-    gint activity_handler;
-    guint activity_counter = 0;
-    GSList *activity_messages;
-    static GtkProgressBar *progress_bar = NULL;
+    static BalsaWindow *window_save = NULL;
 
-    if (!progress_bar) {
-        progress_bar = GTK_PROGRESS_BAR(window->progress_bar);
-        g_object_add_weak_pointer(G_OBJECT(progress_bar),
-                                  (gpointer) & progress_bar);
+    if (!window_save) {
+        window_save = window;
+        g_object_add_weak_pointer(G_OBJECT(window_save),
+                                  (gpointer) &window_save);
     }
 
-    activity_handler =
-        GPOINTER_TO_INT(g_object_get_data
-                        (G_OBJECT(progress_bar), "activity_handler"));
-    if (!activity_handler) {
+    if (!window->activity_handler)
         /* add a timeout to make the activity bar move */
-        activity_handler =
+        window->activity_handler =
             g_timeout_add(50, (GSourceFunc) bw_progress_timeout,
-                          &progress_bar);
-        g_object_set_data(G_OBJECT(progress_bar), "activity_handler", 
-                          GINT_TO_POINTER(activity_handler));
-    }
-    
-    /* increment the reference counter */
-    activity_counter =
-        GPOINTER_TO_UINT(g_object_get_data(G_OBJECT(progress_bar),
-                                           "activity_counter"));
-    ++activity_counter;
-    g_object_set_data(G_OBJECT(progress_bar), "activity_counter", 
-                      GUINT_TO_POINTER(activity_counter));
+                          &window_save);
 
-    gtk_progress_bar_set_text(progress_bar, message);
-    activity_messages = g_object_get_data(G_OBJECT(progress_bar),
-                                          "activity_messages");
-    activity_messages = 
-        g_slist_prepend(activity_messages, (gpointer) message);
-    g_object_set_data(G_OBJECT(progress_bar), "activity_messages", 
-                      activity_messages);
+    /* increment the reference counter */
+    ++window->activity_counter;
+    if (window->progress_type == BALSA_PROGRESS_NONE)
+        window->progress_type = BALSA_PROGRESS_ACTIVITY;
+
+    if (window->progress_type == BALSA_PROGRESS_ACTIVITY)
+        gtk_progress_bar_set_text(GTK_PROGRESS_BAR(window->progress_bar),
+                                  message);
+    window->activity_messages =
+        g_slist_prepend(window->activity_messages, g_strdup(message));
 }
 
 
-/* bw_decrease_activity
+/* balsa_window_decrease_activity
  * 
  * When called, decreases the reference counter of the progress
  * activity bar, if it goes to zero the progress bar is stopped and
  * cleared.
  **/
-static void 
-bw_decrease_activity(BalsaWindow* window, const gchar * message)
+void
+balsa_window_decrease_activity(BalsaWindow * window, const gchar * message)
 {
-    gint activity_handler;
-    guint activity_counter = 0;
-    GSList *activity_messages;
+    GSList *link;
     GtkProgressBar *progress_bar;
     
-    progress_bar = GTK_PROGRESS_BAR(window->progress_bar);
+    link = g_slist_find_custom(window->activity_messages, message,
+                               (GCompareFunc) strcmp);
+    g_free(link->data);
+    window->activity_messages =
+        g_slist_delete_link(window->activity_messages, link);
 
-    activity_counter =
-        GPOINTER_TO_UINT(g_object_get_data(G_OBJECT(progress_bar),
-                                           "activity_counter"));
-    
-    /* decrement the counter if it exists */
-    if (activity_counter) {
-        --activity_counter;
-        
-        /* if the reference count is now zero, clear the bar and make
-         * it available for others to use */
-        if (!activity_counter) {
-            activity_handler =
-                GPOINTER_TO_INT(g_object_get_data
-                                (G_OBJECT(progress_bar),
-                                 "activity_handler"));
-            g_source_remove(activity_handler);
-            activity_handler = 0;
-            
-            g_object_set_data(G_OBJECT(progress_bar), "activity_handler",
-                              GINT_TO_POINTER(activity_handler));
-            g_object_set_data(G_OBJECT(progress_bar), "in_use",
-                              GINT_TO_POINTER(BALSA_PROGRESS_NONE));
+    progress_bar = GTK_PROGRESS_BAR(window->progress_bar);
+    if (window->progress_type == BALSA_PROGRESS_ACTIVITY)
+        gtk_progress_bar_set_text(progress_bar,
+                                  window->activity_messages ?
+                                  window->activity_messages->data : NULL);
+
+    /* decrement the counter if positive */
+    if (window->activity_counter > 0 && --window->activity_counter == 0) {
+        /* clear the bar and make it available for others to use */
+        g_source_remove(window->activity_handler);
+        window->activity_handler = 0;
+        if (window->progress_type == BALSA_PROGRESS_ACTIVITY) {
+            window->progress_type = BALSA_PROGRESS_NONE;
             gtk_progress_bar_set_fraction(progress_bar, 0);
         }
-        /* make sure to store the counter value */
-        g_object_set_data(G_OBJECT(progress_bar), "activity_counter",
-                          GUINT_TO_POINTER(activity_counter));
     }
-
-    activity_messages = g_object_get_data(G_OBJECT(progress_bar),
-                                          "activity_messages");
-    activity_messages = g_slist_remove(activity_messages, message);
-    gtk_progress_bar_set_text(progress_bar,
-                              activity_messages ?
-                              activity_messages->data : NULL);
-    g_object_set_data(G_OBJECT(progress_bar), "activity_messages", 
-                      activity_messages);
 }
 
 
@@ -4947,24 +4896,17 @@ bw_decrease_activity(BalsaWindow* window, const gchar * message)
 gboolean
 balsa_window_setup_progress(BalsaWindow * window, const gchar * text)
 {
-    gint in_use;
     GtkProgressBar *progress_bar;
-
-    progress_bar = GTK_PROGRESS_BAR(window->progress_bar);
-    in_use = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(progress_bar),
-                                               "in_use"));
-
+    
     if (text) {
         /* make sure the progress bar is currently unused */
-        if (in_use == BALSA_PROGRESS_INCREMENT) 
+        if (window->progress_type == BALSA_PROGRESS_INCREMENT) 
             return FALSE;
-        in_use = BALSA_PROGRESS_INCREMENT;
+        window->progress_type = BALSA_PROGRESS_INCREMENT;
     } else
-        in_use = BALSA_PROGRESS_NONE;
-    
-    g_object_set_data(G_OBJECT(progress_bar), "in_use",
-                      GINT_TO_POINTER(in_use));
-    
+        window->progress_type = BALSA_PROGRESS_NONE;
+
+    progress_bar = GTK_PROGRESS_BAR(window->progress_bar);
     gtk_progress_bar_set_text(progress_bar, text);
     gtk_progress_bar_set_fraction(progress_bar, 0);
 
@@ -4986,18 +4928,12 @@ void
 balsa_window_increment_progress(BalsaWindow * window, gdouble fraction,
                                 gboolean flush)
 {
-    gint in_use;
-    GtkProgressBar *progress_bar;
-    
-    progress_bar = GTK_PROGRESS_BAR(window->progress_bar);
-    in_use = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(progress_bar),
-                                               "in_use"));
-
     /* make sure the progress bar is being incremented */
-    if (in_use != BALSA_PROGRESS_INCREMENT)
+    if (window->progress_type != BALSA_PROGRESS_INCREMENT)
         return;
 
-    gtk_progress_bar_set_fraction(progress_bar, fraction);
+    gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(window->progress_bar),
+                                  fraction);
 
     if (flush)
         while (gtk_events_pending())

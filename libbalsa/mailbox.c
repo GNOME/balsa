@@ -1580,11 +1580,9 @@ libbalsa_mailbox_msgno_find(LibBalsaMailbox * mailbox, guint seqno,
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
     g_return_val_if_fail(seqno > 0, FALSE);
 
-    tmp_iter.user_data =
+    if (!mailbox->msg_tree || !(tmp_iter.user_data =
         g_node_find(mailbox->msg_tree, G_PRE_ORDER, G_TRAVERSE_ALL,
-                    GINT_TO_POINTER(seqno));
-
-    if (!tmp_iter.user_data)
+                    GINT_TO_POINTER(seqno))))
         return FALSE;
 
     tmp_iter.stamp = mailbox->stamp;
@@ -2017,7 +2015,8 @@ lbm_set_threading(LibBalsaMailbox * mailbox,
     LIBBALSA_MAILBOX_GET_CLASS(mailbox)->set_threading(mailbox,
                                                        thread_type);
     gdk_threads_enter();
-    lbm_sort(mailbox, mailbox->msg_tree);
+    if (mailbox->msg_tree)
+        lbm_sort(mailbox, mailbox->msg_tree);
 
 #if CACHE_UNSEEN_CHILD
     g_node_traverse(mailbox->msg_tree, G_PRE_ORDER, G_TRAVERSE_ALL, -1,

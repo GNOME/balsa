@@ -154,16 +154,20 @@ typedef enum {
 #define LIBBALSA_PROGRESS_INIT LIBBALSA_PROGRESS_NO
 /* We will not use the progress bar if the number of increments is less
  * than LIBBALSA_PROGRESS_MIN_COUNT, and we will not update the fraction
- * if the time since the last updata is less than
- * LIBBALSA_PROGRESS_MIN_UPDATE seconds. */
-#define LIBBALSA_PROGRESS_MIN_COUNT  400
-#define LIBBALSA_PROGRESS_MIN_UPDATE 0.05
+ * if the time since the last update is less than
+ * LIBBALSA_PROGRESS_MIN_UPDATE_SECS seconds or if the fraction has
+ * increased by less than LIBBALSA_PROGRESS_MIN_UPDATE_STEP. */
+#define LIBBALSA_PROGRESS_MIN_COUNT        400
+#define LIBBALSA_PROGRESS_MIN_UPDATE_USECS 50000
+#define LIBBALSA_PROGRESS_MIN_UPDATE_STEP  0.05
 
 extern void (*libbalsa_progress_set_text) (LibBalsaProgress * progress,
                                            const gchar * text,
                                            guint total);
 extern void (*libbalsa_progress_set_fraction) (LibBalsaProgress * progress,
                                                gdouble fraction);
+extern void (*libbalsa_progress_set_activity) (gboolean set,
+                                               const gchar * text);
 
 /*
  * Face and X-Face header support.

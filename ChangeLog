@@ -1,3 +1,30 @@
+2007-12-08  Peter Bloomfield
+
+	* libbalsa/libbalsa.c: add pointer
+	libbalsa_progress_set_activity so that libbalsa functions can
+	show activity in the progress bar (currently unused, but it's
+	there when we need it!).
+	* libbalsa/libbalsa.h: ditto; use separate constants for minimum
+	fraction and minimum elapsed time when updating progress bar
+	(Albrecht Dreß).
+	* libbalsa/mailbox.c: (libbalsa_mailbox_msgno_find,
+	lbm_set_threading): check that msg_tree exists.
+	* src/balsa-index.c: (balsa_index_ensure_visible): check that
+	tree_view is realized.
+	* src/balsa-mblist.c: (bmbl_mailbox_changed_cb): no need to grab
+	GDK lock.
+	* src/main-window.c: make sure that increment mode takes
+	precedence over activity mode; use new members in BalsaWindow
+	to avoid using g_object_{set,get}_data.
+	* src/main-window.h: add members to BalsaWindow to avoid using
+	g_object_{set,get}_data; export
+	balsa_window_{increase,decrease}_activity.
+	* src/main.c: (balsa_progress_set_text,
+	balsa_progress_set_fraction, balsa_progress_set_activity, main):
+	use separate constants for minimum fraction and minimum elapsed
+	time when updating progress bar (Albrecht Dreß); initialize
+	libbalsa_progress_set_activity.
+
 2007-12-08  Pawel Salek
 
 	* balsa.desktop.in: fix bug 414361 in bugzilla.redhat.com.

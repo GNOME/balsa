@@ -38,6 +38,12 @@ enum MailboxCheckType {
 
 typedef struct _BalsaWindow BalsaWindow;
 typedef struct _BalsaWindowClass BalsaWindowClass;
+typedef enum {
+    BALSA_PROGRESS_NONE = 0,
+    BALSA_PROGRESS_ACTIVITY,
+    BALSA_PROGRESS_INCREMENT
+} BalsaWindowProgress;
+
 
 struct _BalsaWindow {
     GtkWindow window;
@@ -61,6 +67,12 @@ struct _BalsaWindow {
     GtkActionGroup *mailbox_action_group;
     GtkActionGroup *message_action_group;
     GtkActionGroup *modify_message_action_group;
+
+    /* Progress bar stuff: */
+    BalsaWindowProgress progress_type;
+    guint activity_handler;
+    guint activity_counter;
+    GSList *activity_messages;
 };
 
 struct _BalsaWindowClass {
@@ -120,6 +132,10 @@ gboolean balsa_window_setup_progress(BalsaWindow * window,
 void balsa_window_clear_progress(BalsaWindow* window);
 void balsa_window_increment_progress(BalsaWindow * window,
                                      gdouble fraction, gboolean flush);
+void balsa_window_increase_activity(BalsaWindow * window,
+                                    const gchar * message);
+void balsa_window_decrease_activity(BalsaWindow * window,
+                                    const gchar * message);
 
 #if defined(__FILE__) && defined(__LINE__)
 # ifdef __FUNCTION__

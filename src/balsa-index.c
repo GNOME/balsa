@@ -2370,6 +2370,9 @@ balsa_index_ensure_visible(BalsaIndex * index)
     GdkRectangle rect;
     GtkTreePath *path = NULL;
 
+    if (!GTK_WIDGET_REALIZED(tree_view))
+        return;
+
     if (!bndx_find_current_msgno(index, &path, NULL)) {
         /* Current message not displayed, make sure that something
            else is... */

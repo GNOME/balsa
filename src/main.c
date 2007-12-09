@@ -628,6 +628,7 @@ periodic_expunge_cb(void)
  * Initialize the progress bar and set text.
  */
 static GTimeVal prev_time_val;
+static gdouble  min_fraction;
 static void
 balsa_progress_set_text(LibBalsaProgress * progress, const gchar * text,
                         guint total)
@@ -644,6 +645,7 @@ balsa_progress_set_text(LibBalsaProgress * progress, const gchar * text,
     if (!text || total >= LIBBALSA_PROGRESS_MIN_COUNT)
         rc = balsa_window_setup_progress(balsa_app.main_window, text);
     g_get_current_time(&prev_time_val);
+    min_fraction = LIBBALSA_PROGRESS_MIN_UPDATE_STEP;
     gdk_threads_leave();
 
     *progress = (text && rc) ?
@@ -658,22 +660,41 @@ static void
 balsa_progress_set_fraction(LibBalsaProgress * progress, gdouble fraction)
 {
     GTimeVal time_val;
-    gdouble elapsed;
+    guint elapsed;
+
+    if (*progress == LIBBALSA_PROGRESS_NO)
+        return;
+
+    if (fraction > 0.0 && fraction < min_fraction)
+        return;
 
     g_get_current_time(&time_val);
     elapsed = time_val.tv_sec - prev_time_val.tv_sec;
-    elapsed += 1e-6 * (time_val.tv_usec - prev_time_val.tv_usec);
-
-    if (*progress == LIBBALSA_PROGRESS_NO
-        || (fraction != 0 && fraction != 1
-            && elapsed < LIBBALSA_PROGRESS_MIN_UPDATE))
+    elapsed *= G_USEC_PER_SEC;
+    elapsed += time_val.tv_usec - prev_time_val.tv_usec;
+    if (elapsed < LIBBALSA_PROGRESS_MIN_UPDATE_USECS)
         return;
-    prev_time_val = time_val;
+
+    g_time_val_add(&time_val, LIBBALSA_PROGRESS_MIN_UPDATE_USECS);
+    min_fraction += LIBBALSA_PROGRESS_MIN_UPDATE_STEP;
 
     gdk_threads_enter();
     if (balsa_app.main_window)
         balsa_window_increment_progress(balsa_app.main_window, fraction,
                                         !libbalsa_am_i_subthread());
+    gdk_threads_leave();
+}
+
+static void
+balsa_progress_set_activity(gboolean set, const gchar * text)
+{
+    gdk_threads_enter();
+    if (balsa_app.main_window) {
+        if (set)
+            balsa_window_increase_activity(balsa_app.main_window, text);
+        else
+            balsa_window_decrease_activity(balsa_app.main_window, text);
+    }
     gdk_threads_leave();
 }
 
@@ -769,6 +790,7 @@ main(int argc, char *argv[])
 
     libbalsa_progress_set_text     = balsa_progress_set_text;
     libbalsa_progress_set_fraction = balsa_progress_set_fraction;
+    libbalsa_progress_set_activity = balsa_progress_set_activity;
     
     /* checking for valid config files */
     config_init(cmd_get_stats);

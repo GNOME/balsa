@@ -1074,10 +1074,6 @@ bmbl_mailbox_changed_cb(LibBalsaMailbox * mailbox, gpointer data)
 
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
 
-    /* Signal may be emitted without holding the gdk lock, so we'd
-     * better grab it. */
-    gdk_threads_enter();
-
     umd = g_object_get_data(G_OBJECT(mailbox), "mblist-update");
 
     if (!umd) {
@@ -1091,8 +1087,6 @@ bmbl_mailbox_changed_cb(LibBalsaMailbox * mailbox, gpointer data)
 
     umd->notify = (mailbox->state == LB_MAILBOX_STATE_OPEN
                    || mailbox->state == LB_MAILBOX_STATE_CLOSED);
-
-    gdk_threads_leave();
 }
 
 /* public methods */

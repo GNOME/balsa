@@ -1,3 +1,11 @@
+2007-12-11  Peter Bloomfield
+
+	* src/sendmsg-window.c: (sendmsg_window_compose,
+	sw_grab_focus_to_text, sendmsg_window_reply,
+	sendmsg_window_reply_embedded, sendmsg_window_forward,
+	sendmsg_window_continue): grab focus to the message body when
+	replying.
+
 2007-12-11  Jens Granseuer
 
 	* libbalsa/identity.c: (add_show_menu, ident_dialog_free_values,

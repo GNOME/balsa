@@ -4660,7 +4660,6 @@ sendmsg_window_compose(void)
     sendmsg_window_set_title(bsmsg);
     if(bsmsg->ident->sig_sending)
         insert_initial_sig(bsmsg);
-    gtk_widget_grab_focus(GTK_WIDGET(bsmsg->recipient_view));
     bsmsg->state = SENDMSG_STATE_CLEAN;
     return bsmsg;
 }
@@ -4796,6 +4795,16 @@ set_identity(BalsaSendmsg * bsmsg, LibBalsaMessage * message)
     setup_headers_from_identity(bsmsg, bsmsg->ident);
 }
 
+static gboolean
+sw_grab_focus_to_text(GtkWidget * text)
+{
+    gdk_threads_enter();
+    gtk_widget_grab_focus(text);
+    g_object_unref(text);
+    gdk_threads_leave();
+    return FALSE;
+}
+
 BalsaSendmsg *
 sendmsg_window_reply(LibBalsaMailbox * mailbox, guint msgno,
                      SendType reply_type)
@@ -4832,7 +4841,8 @@ sendmsg_window_reply(LibBalsaMailbox * mailbox, guint msgno,
     if(bsmsg->ident->sig_whenreply)
         insert_initial_sig(bsmsg);
     bsm_finish_setup(bsmsg, message->body_list);
-    gtk_widget_grab_focus(bsmsg->text);
+    g_idle_add((GSourceFunc) sw_grab_focus_to_text,
+               g_object_ref(bsmsg->text));
     return bsmsg;
 }
 
@@ -4881,7 +4891,8 @@ sendmsg_window_reply_embedded(LibBalsaMessageBody *part,
     bsm_finish_setup(bsmsg, part);
     if(bsmsg->ident->sig_whenreply)
         insert_initial_sig(bsmsg);
-    gtk_widget_grab_focus(bsmsg->text);
+    g_idle_add((GSourceFunc) sw_grab_focus_to_text,
+               g_object_ref(bsmsg->text));
     return bsmsg;
 }
 
@@ -4920,7 +4931,6 @@ sendmsg_window_forward(LibBalsaMailbox *mailbox, guint msgno,
         gtk_text_buffer_get_start_iter(buffer, &pos);
         gtk_text_buffer_place_cursor(buffer, &pos);
      }
-    gtk_widget_grab_focus(GTK_WIDGET(bsmsg->recipient_view));
     return bsmsg;
 }
 
@@ -4979,7 +4989,8 @@ sendmsg_window_continue(LibBalsaMailbox * mailbox, guint msgno)
 
     continue_body(bsmsg, message);
     bsm_finish_setup(bsmsg, message->body_list);
-    gtk_widget_grab_focus(bsmsg->text);
+    g_idle_add((GSourceFunc) sw_grab_focus_to_text,
+               g_object_ref(bsmsg->text));
     return bsmsg;
 }
 

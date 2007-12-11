@@ -54,12 +54,14 @@ libbalsa_a_SOURCES = 		\
 	address-book-vcard.h	\
 	address-book.c		\
 	address-book.h		\
-	address-entry.c		\
-	address-entry.h		\
+	address-view.c		\
+	address-view.h		\
 	address.c		\
 	address.h		\
 	body.c			\
 	body.h			\
+	cell-renderer-button.c  \
+	cell-renderer-button.h  \
 	files.c			\
 	files.h			\
 	filter-error.c		\

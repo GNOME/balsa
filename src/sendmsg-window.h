@@ -26,6 +26,8 @@
 extern "C" {
 #endif				/* __cplusplus */
 
+#include "address-view.h"
+
     typedef enum {
        SEND_NORMAL,            /* initialized by Compose */
        SEND_REPLY,             /* by Reply               */
@@ -48,23 +50,11 @@ extern "C" {
 #define VIEW_MENU_LENGTH 5
 #endif
     typedef struct _BalsaSendmsg BalsaSendmsg;
-    typedef struct _BalsaSendmsgAddress BalsaSendmsgAddress;
-
-    struct _BalsaSendmsgAddress {
-        BalsaSendmsg *bsmsg;
-        GtkWidget *label;
-        gint min_addresses, max_addresses;
-        gboolean ready;
-    };
 
     struct _BalsaSendmsg {
 	GtkWidget *window;
-	GtkWidget *to[3], *from[3], *subject[2], *cc[3], *bcc[3], *fcc[3];
-        BalsaSendmsgAddress to_info, cc_info, bcc_info;
-#if !defined(ENABLE_TOUCH_UI)        
-        GtkWidget *reply_to[3];
-        BalsaSendmsgAddress reply_to_info;
-#endif
+        LibBalsaAddressView *recipient_view, *replyto_view;
+	GtkWidget *from[2], *recipients[2], *replyto[2], *subject[2], *fcc[2];
 	GtkWidget *attachments[4];
         gchar *in_reply_to;
         GList *references;
@@ -127,6 +117,8 @@ extern "C" {
     };
 
     BalsaSendmsg *sendmsg_window_compose(void);
+    BalsaSendmsg *sendmsg_window_compose_with_address(const gchar *
+                                                      address);
     BalsaSendmsg *sendmsg_window_reply(LibBalsaMailbox *,
                                        guint msgno, SendType rt);
     BalsaSendmsg *sendmsg_window_reply_embedded(LibBalsaMessageBody *part,

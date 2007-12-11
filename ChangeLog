@@ -1,3 +1,15 @@
+2007-12-10  Peter Bloomfield
+
+	merge balsa-address-view branch
+	* libbalsa/Makefile.am:
+	* libbalsa/address-entry.c:
+	* libbalsa/address-entry.h:
+	* src/ab-window.c:
+	* src/main.c:
+	* src/save-restore.c:
+	* src/sendmsg-window.c:
+	* src/sendmsg-window.h:
+
 2007-12-08  Peter Bloomfield
 
 	* libbalsa/libbalsa.c: add pointer
@@ -52,6 +64,11 @@
 	for toolbar send/queue button.
 	* src/toolbar-factory.c: correct toolbar button labels.
 
+2007-11-26  Albrecht Dreß
+
+	* libbalsa/address-view.c: (lbav_focus_out_cb,
+	lbav_row_editing_cb): on focus-out, accept a unique match.
+
 2007-11-17  Peter Bloomfield
 
 	* src/save-restore.c:
@@ -61,6 +78,12 @@
 	* src/main-window.c:
 	* src/message-window.c:
 	* src/sendmsg-window.c: use them.
+
+2007-11-16  Peter Bloomfield
+
+	* libbalsa/address-view.c: (lbav_clean_text): new helper to
+	remove control characters from text.
+	(lbav_add_from_list, lbav_set_text_at_path): use it.
 
 2007-11-13  Peter Bloomfield
 
@@ -75,10 +98,91 @@
 	* src/balsa-message.c: (balsa_get_parent_window): use
 	gtk_widget_get_toplevel.
 
+2007-11-07  Peter Bloomfield
+
+	* src/balsa-app.c:
+	* src/balsa-app.h:
+	* src/main-window.c:
+	* src/message-window.c:
+	* src/save-restore.c:
+	* src/sendmsg-window.c: revert previous unintentional commit of
+	changes in src/.
+
+2007-11-07  Peter Bloomfield
+
+	* libbalsa/address-view.c: (lbav_set_text_at_path),
+	(lbav_combo_edited_cb), (lbav_row_editing_cb),
+	(lbav_button_activated_cb), (libbalsa_address_view_add_to_row):
+	check validity of iter.
+
+2007-11-03  Peter Bloomfield
+
+	* libbalsa/address-view.c:
+	* libbalsa/address-view.h: do not copy strings.
+	* src/sendmsg-window.c: mark strings for translation.
+
+2007-11-03  Peter Bloomfield
+
+	* libbalsa/address-view.c:
+	* src/sendmsg-window.c: simplify LibBalsaAddressView api.
+	* src/main.c: (main): libbalsa_address_book_list has gone away.
+
+2007-11-03  Peter Bloomfield
+
+	* libbalsa/address-view.c: (libbalsa_address_view_finalize):
+	do not leak GtkTreeRowReference;
+	(lbav_append_addresses), (lbav_ensure_blank_line_idle_cb),
+	(lbav_ensure_blank_line), (lbav_row_editing_cb),
+	(libbalsa_address_view_new): remove debugging output.
+
+
 2007-10-31  Peter Bloomfield
 
 	* src/main-window.c: connect to "activate" signal instead of
 	"changed", to see every click on threading options.
+
+2007-10-30  Peter Bloomfield
+
+	* libbalsa/address-view.c:
+	* libbalsa/address-view.h:
+	* src/save-restore.c:
+	* src/sendmsg-window.c:
+	* src/sendmsg-window.h: use a separate widget for Reply-To.
+
+2007-10-27  Peter Bloomfield
+
+	* libbalsa/address-view.c: localize address types; check address
+	types.
+
+2007-10-26  Peter Bloomfield
+
+	* libbalsa/address-view.c: (lbav_sort_func): make sort-func
+	reflexive;
+	(libbalsa_address_view_new): more debug info.
+
+2007-10-26  Peter Bloomfield 
+
+	* libbalsa/address-view.c: make blank line sort below addresses
+	of the same type; try to have only one blank line.
+
+2007-10-25  Peter Bloomfield
+
+	* libbalsa/cell-renderer-button.c:
+	* libbalsa/cell-renderer-button.h: forgot to add these for
+	initial commit.
+
+2007-10-25  Peter Bloomfield
+
+	* libbalsa/Makefile.am:
+	* libbalsa/address-entry.c:
+	* libbalsa/address-entry.h:
+	* libbalsa/address-view.c:
+	* libbalsa/address-view.h:
+	* src/ab-window.c:
+	* src/main.c:
+	* src/save-restore.c:
+	* src/sendmsg-window.c:
+	* src/sendmsg-window.h: initial commit on address-view branch.
 
 2007-10-24  Albrecht Dreß
 

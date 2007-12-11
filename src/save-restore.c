@@ -1015,7 +1015,7 @@ config_global_load(void)
     balsa_app.quote_str = libbalsa_conf_get_string("QuoteString=> ");
     g_free(balsa_app.compose_headers);
     balsa_app.compose_headers =
-	libbalsa_conf_get_string("ComposeHeaders=to subject cc");
+	libbalsa_conf_get_string("ComposeHeaders=Recipients Subject");
 
     /* Obsolete. */
     libbalsa_conf_get_bool_with_default("RequestDispositionNotification=false",
@@ -1106,6 +1106,18 @@ config_global_load(void)
                          "if you have changed Balsa's keyboard accelerators, "
                          "you will need to set them again."));
             libbalsa_conf_set_bool("GtkUIManager", TRUE);
+        }
+        if (!libbalsa_conf_get_bool("LibBalsaAddressView")) {
+            /* No warning */
+            if (!libbalsa_find_word("Recipients",
+                                    balsa_app.compose_headers)) {
+                gchar *compose_headers =
+                    g_strconcat(balsa_app.compose_headers, " Recipients",
+                                NULL);
+                g_free(balsa_app.compose_headers);
+                balsa_app.compose_headers = compose_headers;
+            }
+            libbalsa_conf_set_bool("LibBalsaAddressView", TRUE);
         }
         libbalsa_conf_pop_group();
     }

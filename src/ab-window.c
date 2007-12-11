@@ -24,6 +24,7 @@
 #include <gnome.h>
 #include <string.h>
 #include <glib/gi18n.h>
+#include "address-view.h"
 #include "balsa-app.h"
 #include "sendmsg-window.h"
 #include "save-restore.h"
@@ -582,14 +583,13 @@ balsa_ab_window_activate_address(GtkTreeView * view,
         gint which_multiple;
         gchar *addr;
 
-        snd = sendmsg_window_compose();
         gtk_tree_model_get_iter(model, &iter, path);
         gtk_tree_model_get(model, &iter,
                            LIST_COLUMN_ADDRESS, &address,
                            LIST_COLUMN_WHICH, &which_multiple, -1);
         addr = libbalsa_address_to_gchar(address, which_multiple);
 	g_object_unref(G_OBJECT(address));
-        gtk_entry_set_text(GTK_ENTRY(snd->to[1]), addr);
+        snd = sendmsg_window_compose_with_address(addr);
         g_free(addr);
 
         gtk_widget_grab_focus(snd->subject[1]);

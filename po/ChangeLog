@@ -1,3 +1,9 @@
+2007-12-10  Peter Bloomfield  <peter@cp2100>
+
+	reviewed by: <delete if not using a buddy>
+
+	* POTFILES.in:
+
 2007-11-28  Jorge Gonzalez  <jorgegonz@svn.gnome.org>
 
         * es.po: Updated Spanish translation
@@ -13,6 +19,11 @@
 2007-11-14  Jorge Gonzalez  <jorgegonz@svn.gnome.org>  
 
         * es.po: Updated Spanish translation.
+
+2005-10-30  Peter Bloomfield
+
+	* POTFILES.in: replace libbalsa/address-entry.c with
+	libbalsa/address-view.c.
 
 2007-10-28  Daniel Nylander <po@danielnylander.se>
 

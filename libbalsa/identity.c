@@ -28,6 +28,7 @@
 #ifdef HAVE_GPGME
 #  include "rfc3156.h"
 #endif
+#include "libbalsa.h"
 #include "identity.h"
 #include "information.h"
 #include "libbalsa-conf.h"
@@ -627,6 +628,10 @@ static void ident_dialog_add_gpg_menu(GtkWidget * table, gint row,
                                       GtkDialog * dialog,
                                       const gchar * label_name,
                                       const gchar * menu_key);
+static void add_show_menu(const char *label, gpointer data,
+                          GtkWidget * menu);
+static void ident_dialog_free_values(GPtrArray * values);
+
 #ifdef HAVE_GPGME
 static void display_frame_set_gpg_mode(GObject * dialog,
                                        const gchar * key, gint * value);
@@ -644,11 +649,8 @@ static void display_frame_set_server(GObject * dialog,
 #endif /* ENABLE_ESMTP */
 
 #if defined(HAVE_GPGME) || ENABLE_ESMTP
-static void add_show_menu(const char *label, gpointer data,
-                          GtkWidget * menu);
 static gpointer ident_dialog_get_value(GObject * dialog,
                                        const gchar * key);
-static void ident_dialog_free_values(GPtrArray * values);
 #endif                          /* defined(HAVE_GPGME) || ENABLE_ESMTP */
 
 /* Callback for the "toggled" signal of the "Default" column. */
@@ -2112,6 +2114,24 @@ ident_dialog_add_gpg_menu(GtkWidget * table, gint row, GtkDialog * dialog,
 #endif
 }
 
+/* add_show_menu: helper function */
+static void
+add_show_menu(const char *label, gpointer data, GtkWidget * menu)
+{
+    GPtrArray *values =
+        g_object_get_data(G_OBJECT(menu), "identity-value");
+
+    gtk_combo_box_append_text(GTK_COMBO_BOX(menu), label);
+    g_ptr_array_add(values, data);
+}
+
+/* ident_dialog_free_values: helper function */
+static void
+ident_dialog_free_values(GPtrArray * values)
+{
+    g_ptr_array_free(values, TRUE);
+}
+
 #if ENABLE_ESMTP
 static void
 ident_dialog_add_smtp_menu(GtkWidget * table, gint row, GtkDialog * dialog,
@@ -2162,17 +2182,6 @@ display_frame_set_server(GObject * dialog, const gchar * key,
 #endif                          /* ENABLE_ESMTP */
 
 #if defined(HAVE_GPGME) || ENABLE_ESMTP
-/* add_show_menu: helper function */
-static void
-add_show_menu(const char *label, gpointer data, GtkWidget * menu)
-{
-    GPtrArray *values =
-        g_object_get_data(G_OBJECT(menu), "identity-value");
-
-    gtk_combo_box_append_text(GTK_COMBO_BOX(menu), label);
-    g_ptr_array_add(values, data);
-}
-
 /*
  * Get the value of the active option menu item
  */
@@ -2189,11 +2198,5 @@ ident_dialog_get_value(GObject * dialog, const gchar * key)
     
     return g_ptr_array_index(values, value);
 }
-
-/* ident_dialog_free_values: helper function */
-static void
-ident_dialog_free_values(GPtrArray * values)
-{
-    g_ptr_array_free(values, TRUE);
-}
 #endif /* defined(HAVE_GPGME) || ENABLE_ESMTP */
+

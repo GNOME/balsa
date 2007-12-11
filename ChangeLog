@@ -1,3 +1,8 @@
+2007-12-11  Jens Granseuer
+
+	* libbalsa/identity.c: (add_show_menu, ident_dialog_free_values,
+	ident_dialog_get_value): build without ESMTP and GPG/SMIME.
+
 2007-12-10  Peter Bloomfield
 
 	merge balsa-address-view branch

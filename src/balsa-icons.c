@@ -28,6 +28,7 @@
 #include "balsa-icons.h"
 #include "libbalsa.h"
 #include "mailbox.h"
+#include "address-view.h"
 
 #define ELEMENTS(x) (sizeof (x) / sizeof (x[0]))
 
@@ -275,6 +276,9 @@ register_balsa_pixmaps(void)
 	{ BALSA_PIXMAP_INFO_FLAGGED,    "emblem-important",
 	  { GTK_ICON_SIZE_MENU, GTK_ICON_SIZE_INVALID } },
 
+        /* drop-down icon for the address-view (16x16) */
+	{ BALSA_PIXMAP_DROP_DOWN,       "balsa-drop-down",
+	  { GTK_ICON_SIZE_MENU, GTK_ICON_SIZE_INVALID } },
 	};
 
     unsigned i;
@@ -313,6 +317,10 @@ register_balsa_pixbufs(GtkWidget * widget)
 	libbalsa_mailbox_set_sign_icon, BALSA_PIXMAP_SIGN}, {
 	libbalsa_mailbox_set_encr_icon, BALSA_PIXMAP_ENCR},
 #endif
+        {
+        libbalsa_address_view_set_book_icon,  BALSA_PIXMAP_BOOK_RED}, {
+        libbalsa_address_view_set_close_icon, GTK_STOCK_CLOSE}, {
+        libbalsa_address_view_set_drop_down_icon, BALSA_PIXMAP_DROP_DOWN},
     };
     guint i;
 

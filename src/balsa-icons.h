@@ -86,6 +86,8 @@
 #define BALSA_PIXMAP_BOOK_BLUE                  "balsa_book_blue"
 #define BALSA_PIXMAP_BOOK_OPEN                  "balsa_book_open"
 
+#define BALSA_PIXMAP_DROP_DOWN                  "balsa_drop_down"
+
 void register_balsa_pixmaps(void);
 void register_balsa_pixbufs(GtkWidget * widget);
 void balsa_icon_create(const gchar ** data, GdkPixmap ** pmap,

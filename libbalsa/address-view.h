@@ -89,10 +89,6 @@ GType libbalsa_address_view_get_type(void) G_GNUC_CONST;
 
 LibBalsaAddressView *libbalsa_address_view_new(const gchar * const *types,
                                                guint n_types,
-                                               const gchar *
-                                               address_book_stock_id,
-                                               const gchar *
-                                               remove_stock_id,
                                                GList * address_book_list,
                                                gboolean fallback);
 void libbalsa_address_view_set_domain(LibBalsaAddressView * address_view,
@@ -118,6 +114,10 @@ InternetAddressList *libbalsa_address_view_get_list(LibBalsaAddressView *
                                                     address_view,
                                                     const gchar *
                                                     address_type);
+
+void libbalsa_address_view_set_book_icon(GdkPixbuf * book_icon);
+void libbalsa_address_view_set_close_icon(GdkPixbuf * close_icon);
+void libbalsa_address_view_set_drop_down_icon(GdkPixbuf * drop_down_icon);
 
 G_END_DECLS
 #endif                          /* __LIBBALSA_ADDRESS_VIEW_H__ */

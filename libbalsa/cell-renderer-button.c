@@ -80,7 +80,6 @@ libbalsa_cell_renderer_button_class_init(LibBalsaCellRendererButtonClass *
 
 /**
  * libbalsa_cell_renderer_button_new:
- * @stock_id: the stock_id for the button.
  * 
  * Creates a new #LibBalsaCellRendererButton.
  * 

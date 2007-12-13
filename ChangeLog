@@ -1,3 +1,22 @@
+2007-12-13  Peter Bloomfield
+
+	* images/16x16/balsa-drop-down.png: new icon, used to signify that
+	the list of recipient types in address-view is a drop-down list.
+	* libbalsa/address-view.c: (libbalsa_address_view_finalize,
+	lbav_ensure_blank_line, lbav_add_from_list,
+	lbav_button_activated_cb, libbalsa_address_view_new,
+	libbalsa_address_view_set_book_icon,
+	libbalsa_address_view_set_close_icon,
+	libbalsa_address_view_set_drop_down_icon): use pixbuf instead of
+	stock-id; use the new icon.
+	* libbalsa/address-view.h: change to pixbuf instead of stock-id.
+	* libbalsa/cell-renderer-button.c: fix documentation.
+	* src/balsa-icons.c: (register_balsa_pixmaps,
+	register_balsa_pixbufs): define and register new icon.
+	* src/balsa-icons.h: ditto.
+	* src/sendmsg-window.c: (create_email_entry): new api for
+	address-view.
+
 2007-12-11  Peter Bloomfield
 
 	* src/sendmsg-window.c: (sendmsg_window_compose,

@@ -64,8 +64,6 @@ libbalsa_address_view_finalize(GObject * object)
 {
     LibBalsaAddressView *address_view = LIBBALSA_ADDRESS_VIEW(object);
 
-    g_free(address_view->address_book_stock_id);
-    g_free(address_view->remove_stock_id);
     g_free(address_view->domain);
     g_free(address_view->path_string);
 
@@ -114,7 +112,7 @@ enum {
     ADDRESS_TYPE_COL,
     ADDRESS_TYPESTRING_COL,
     ADDRESS_NAME_COL,
-    ADDRESS_STOCK_ID_COL
+    ADDRESS_ICON_COL
 };
 
 typedef enum LibBalsaAddressViewMatchType_ LibBalsaAddressViewMatchType;
@@ -132,6 +130,9 @@ const gchar *const libbalsa_address_view_types[] = {
     N_("Reply To:"),
 #endif                          /* ENABLE_TOUCH_UI */
 };
+
+/* Pixbufs */
+static GdkPixbuf *lbav_book_icon, *lbav_close_icon, *lbav_drop_down_icon;
 
 /*
  *     Helpers
@@ -314,8 +315,8 @@ lbav_ensure_blank_line(LibBalsaAddressView * address_view,
                            ADDRESS_TYPE_COL, type,
                            ADDRESS_TYPESTRING_COL,
                            _(lbav_type_string(address_view, type)),
-                           ADDRESS_STOCK_ID_COL,
-                           address_view->address_book_stock_id, -1);
+                           ADDRESS_ICON_COL, lbav_book_icon,
+                           -1);
 
     if (address_view->focus_row)
         gtk_tree_row_reference_free(address_view->focus_row);
@@ -386,8 +387,8 @@ lbav_add_from_list(LibBalsaAddressView * address_view,
                                ADDRESS_TYPESTRING_COL,
                                _(lbav_type_string(address_view, type)),
                                ADDRESS_NAME_COL, name,
-                               ADDRESS_STOCK_ID_COL,
-                               address_view->remove_stock_id, -1);
+                               ADDRESS_ICON_COL, lbav_close_icon,
+                               -1);
             g_free(name);
         }
 
@@ -859,7 +860,7 @@ lbav_button_activated_cb(LibBalsaCellRendererButton * button,
     GtkTreeModel *model = gtk_tree_view_get_model(tree_view);
     GtkTreePath *path;
     GtkTreeIter iter;
-    gchar *stock_id;
+    GdkPixbuf *pixbuf;
 
     path = gtk_tree_path_new_from_string(path_string);
     if (!gtk_tree_model_get_iter(model, &iter, path)) {
@@ -867,9 +868,9 @@ lbav_button_activated_cb(LibBalsaCellRendererButton * button,
         return;
     }
 
-    gtk_tree_model_get(model, &iter, ADDRESS_STOCK_ID_COL, &stock_id, -1);
+    gtk_tree_model_get(model, &iter, ADDRESS_ICON_COL, &pixbuf, -1);
 
-    if (strcmp(stock_id, address_view->remove_stock_id) == 0) {
+    if (pixbuf == lbav_close_icon) {
         /* User clicked a remove button. */
         GtkListStore *address_store = GTK_LIST_STORE(model);
         guint type;
@@ -889,7 +890,7 @@ lbav_button_activated_cb(LibBalsaCellRendererButton * button,
         gtk_tree_row_reference_free(row_ref);
     }
 
-    g_free(stock_id);
+    g_object_unref(pixbuf);
     gtk_tree_path_free(path);
 }
 
@@ -933,8 +934,6 @@ lbav_sort_func(GtkTreeModel * model, GtkTreeIter * a, GtkTreeIter * b,
 LibBalsaAddressView *
 libbalsa_address_view_new(const gchar * const *types,
                           guint n_types,
-                          const gchar * address_book_stock_id,
-                          const gchar * remove_stock_id,
                           GList * address_book_list, gboolean fallback)
 {
     GtkListStore *address_store;
@@ -951,8 +950,8 @@ libbalsa_address_view_new(const gchar * const *types,
                                        G_TYPE_STRING,
                                        /* ADDRESS_NAME_COL: */
                                        G_TYPE_STRING,
-                                       /* ADDRESS_STOCK_ID_COL: */
-                                       G_TYPE_STRING);
+                                       /* ADDRESS_ICON_COL: */
+                                       GDK_TYPE_PIXBUF);
 
     gtk_tree_sortable_set_default_sort_func(GTK_TREE_SORTABLE
                                             (address_store),
@@ -969,8 +968,6 @@ libbalsa_address_view_new(const gchar * const *types,
 
     address_view->types = types;
     address_view->n_types = n_types;
-    address_view->remove_stock_id = g_strdup(remove_stock_id);
-    address_view->address_book_stock_id = g_strdup(address_book_stock_id);
     address_view->address_book_list = address_book_list;
     address_view->fallback = fallback;
 
@@ -987,22 +984,32 @@ libbalsa_address_view_new(const gchar * const *types,
             gtk_list_store_set(type_store, &iter, 0, _(types[i]), -1);
         }
 
+        column = gtk_tree_view_column_new();
+
         /* The address type combo: */
         renderer = gtk_cell_renderer_combo_new();
         g_object_set(renderer,
                      "editable", TRUE,
                      "has-entry", FALSE,
-                     "model", type_store, "text-column", 0, NULL);
+                     "model", type_store,
+                     "text-column", 0,
+                     NULL);
         g_object_unref(type_store);
 
         g_signal_connect(renderer, "edited",
                          G_CALLBACK(lbav_combo_edited_cb), address_view);
 
-        column =
-            gtk_tree_view_column_new_with_attributes(NULL, renderer,
-                                                     "text",
-                                                     ADDRESS_TYPESTRING_COL,
-                                                     NULL);
+        gtk_tree_view_column_pack_start(column, renderer, TRUE);
+        gtk_tree_view_column_set_attributes(column, renderer,
+                                            "text", ADDRESS_TYPESTRING_COL,
+                                            NULL);
+
+        /* Add a drop-down icon to indicate that this is in fact a
+         * combo: */
+        renderer = gtk_cell_renderer_pixbuf_new();
+        g_object_set(renderer, "pixbuf", lbav_drop_down_icon, NULL);
+        gtk_tree_view_column_pack_start(column, renderer, FALSE);
+
         gtk_tree_view_append_column(tree_view, column);
     }
 
@@ -1030,7 +1037,7 @@ libbalsa_address_view_new(const gchar * const *types,
                      G_CALLBACK(lbav_button_activated_cb), address_view);
     gtk_tree_view_column_pack_start(column, renderer, FALSE);
     gtk_tree_view_column_set_attributes(column, renderer,
-                                        "stock-id", ADDRESS_STOCK_ID_COL,
+                                        "pixbuf", ADDRESS_ICON_COL,
                                         NULL);
 
     gtk_tree_view_append_column(tree_view, column);
@@ -1225,4 +1232,22 @@ libbalsa_address_view_get_list(LibBalsaAddressView * address_view,
     }
 
     return address_list;
+}
+
+void
+libbalsa_address_view_set_book_icon(GdkPixbuf * book_icon)
+{
+    lbav_book_icon = book_icon;
+}
+
+void
+libbalsa_address_view_set_close_icon(GdkPixbuf * close_icon)
+{
+    lbav_close_icon = close_icon;
+}
+
+void
+libbalsa_address_view_set_drop_down_icon(GdkPixbuf * drop_down_icon)
+{
+    lbav_drop_down_icon = drop_down_icon;
 }

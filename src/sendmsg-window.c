@@ -2653,8 +2653,6 @@ create_email_entry(GtkWidget * table, int y_pos, BalsaSendmsg * bsmsg,
     GtkWidget *scroll;
 
     *view = libbalsa_address_view_new(types, n_types,
-                                      BALSA_PIXMAP_BOOK_RED,
-                                      GTK_STOCK_CLOSE,
                                       balsa_app.address_book_list,
                                       balsa_app.convert_unknown_8bit);
 

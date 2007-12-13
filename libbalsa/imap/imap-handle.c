@@ -1195,7 +1195,7 @@ imap_envelope_from_stringi(const gchar *s, gchar const **end)
 {
   ImapEnvelope *env;
   gchar *n;
-  const gchar *nc;
+  const gchar *nc = NULL;
   if(!s || !*s)
     return NULL;
 

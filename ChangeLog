@@ -1,3 +1,8 @@
+2007-12-13  Albrecht Dreß
+
+	* libbalsa/imap/imap-handle.c: (imap_envelope_from_stringi):
+	compile fix.
+
 2007-12-13  Peter Bloomfield
 
 	* images/16x16/balsa-drop-down.png: new icon, used to signify that

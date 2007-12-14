@@ -1,5 +1,7 @@
 2007-12-14  Peter Bloomfield
 
+	* src/main-window.c: (bw_notebook_label_new): drop redundant
+	event box.
 	* libbalsa/imap/imap-handle.c: (imap_get_address): unfold
 	address string.
 	* libbalsa/mailbox_imap.c: (get_struct_from_cache): crlf-filter

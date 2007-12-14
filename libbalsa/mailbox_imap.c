@@ -2019,7 +2019,8 @@ get_struct_from_cache(LibBalsaMailbox *mailbox, LibBalsaMessage *message,
     if (!message->mime_msg) {
         gchar **pair, *filename;
         int fd;
-        GMimeStream *stream = NULL;
+        GMimeStream *stream, *fstream;
+        GMimeFilter *filter;
         GMimeParser *mime_parser;
 
         pair = get_cache_name_pair(LIBBALSA_MAILBOX_IMAP(mailbox), "body",
@@ -2033,12 +2034,20 @@ get_struct_from_cache(LibBalsaMailbox *mailbox, LibBalsaMessage *message,
             return FALSE;
 
         stream = g_mime_stream_fs_new(fd);
+        fstream = g_mime_stream_filter_new_with_stream(stream);
+        g_object_unref(stream);
 
-        mime_parser = g_mime_parser_new_with_stream(stream);
+        filter = g_mime_filter_crlf_new(GMIME_FILTER_CRLF_DECODE,
+                                        GMIME_FILTER_CRLF_MODE_CRLF_ONLY);
+        g_mime_stream_filter_add(GMIME_STREAM_FILTER(fstream), filter);
+        g_object_unref(filter);
+
+        mime_parser = g_mime_parser_new_with_stream(fstream);
+        g_object_unref(fstream);
+
         g_mime_parser_set_scan_from(mime_parser, FALSE);
         message->mime_msg = g_mime_parser_construct_message(mime_parser);
         g_object_unref(mime_parser);
-        g_object_unref(stream);
     }
     
     /* follow libbalsa_mailbox_local_fetch_structure here;

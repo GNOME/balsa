@@ -2679,7 +2679,7 @@ imap_address_to_string(const ImapAddress *addr)
 static ImapAddress*
 imap_get_address(struct siobuf* sio)
 {
-  char *addr[4];
+  char *addr[4], *p;
   ImapAddress *res = NULL;
   int i, c;
 
@@ -2701,6 +2701,24 @@ imap_get_address(struct siobuf* sio)
     addr[i] = imap_get_nstring(sio);
     if( (c=sio_getc(sio)) != ' '); /* error if i < 3 but do nothing */
   }
+
+  if (addr[0] && (p = strchr(addr[0], '\r'))) {
+    /* Server sent a folded string--unfold it */
+    char *q;
+    for (q = p; *q; q++) {
+      if (*q == '\r') {
+        while (p > addr[0] && (p[-1] == ' ' || p[-1] == '\t')) --p;
+        do q++;
+        while (*q == '\n' || *q == ' ' || *q == '\t');
+        if (!*q) break;
+        /* Replace FWS with a single space */
+        *p++ = ' ';
+      }
+      *p++ = *q;
+    }
+    *p = '\0';
+  }
+
   if(c == ')') {
     if(addr[2] == NULL) /* end group */
       res = imap_address_new(NULL, NULL);

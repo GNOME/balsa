@@ -1,3 +1,10 @@
+2007-12-14  Peter Bloomfield
+
+	* libbalsa/imap/imap-handle.c: (imap_get_address): unfold
+	address string.
+	* libbalsa/mailbox_imap.c: (get_struct_from_cache): crlf-filter
+	the message.
+
 2007-12-13  Peter Bloomfield
 
 	* libbalsa/mailbox_imap.c:

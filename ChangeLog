@@ -1,3 +1,10 @@
+2007-12-13  Peter Bloomfield
+
+	* libbalsa/mailbox_imap.c:
+	(internet_address_new_from_imap_address,
+	internet_address_new_list_from_imap_address_list): handle RFC
+	2822 groups.
+
 2007-12-13  Albrecht Dreß
 
 	* libbalsa/imap/imap-handle.c: (imap_envelope_from_stringi):

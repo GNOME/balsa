@@ -1782,9 +1782,13 @@ libbalsa_mailbox_imap_sync(LibBalsaMailbox * mailbox, gboolean expunge)
     return res;
 }
 
+static InternetAddressList
+    *internet_address_new_list_from_imap_address_list(ImapAddress * list);
+
 static InternetAddress *
-internet_address_new_from_imap_address(ImapAddress *addr)
+internet_address_new_from_imap_address(ImapAddress ** list)
 {
+    ImapAddress *addr = *list;
     InternetAddress *address;
 
     if (!addr || (addr->name==NULL && addr->addr_spec==NULL))
@@ -1813,9 +1817,15 @@ internet_address_new_from_imap_address(ImapAddress *addr)
 #endif /* HAVE_GMIME_2_2_5 */
 	internet_address_set_addr(address, tmp);
 	g_free(tmp);
-    } else { /* FIXME: is that a right thing? */
-        internet_address_unref(address);
-        address = NULL;
+    } else {
+        /* Begin group */
+        internet_address_set_group
+            (address,
+             internet_address_new_list_from_imap_address_list(addr->next));
+        /* Skip to end of group */
+        while (addr->next && (addr->name || addr->addr_spec))
+            addr = addr->next;
+        *list = addr;
     }
     return address;
 }
@@ -1827,7 +1837,7 @@ internet_address_new_list_from_imap_address_list(ImapAddress *list)
     InternetAddressList *res = NULL;
 
     for (; list; list = list->next) {
-       addr = internet_address_new_from_imap_address(list);
+       addr = internet_address_new_from_imap_address(&list);
        if (addr) {
            res = internet_address_list_append(res, addr);
 	   internet_address_unref(addr);

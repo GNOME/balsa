@@ -624,14 +624,16 @@ bndx_scroll_idle(BalsaIndex * index)
     GtkTreePath *path;
 
     gdk_threads_enter();
-
-    row_ref = g_object_get_data(G_OBJECT(index), BALSA_INDEX_ROW_REF_KEY);
-    if (row_ref && (path = gtk_tree_row_reference_get_path(row_ref))) {
-        gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(index), path, NULL,
-                                     FALSE, 0, 0);
-        gtk_tree_path_free(path);
+    /* The index might have been destroyed since the idle function was
+       registered. Check whether we still exist... */
+    if(gtk_tree_view_get_model(GTK_TREE_VIEW(index))) {
+        row_ref = g_object_get_data(G_OBJECT(index), BALSA_INDEX_ROW_REF_KEY);
+        if (row_ref && (path = gtk_tree_row_reference_get_path(row_ref))) {
+            gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(index), path, NULL,
+                                         FALSE, 0, 0);
+            gtk_tree_path_free(path);
+        }
     }
-
     g_object_set_data(G_OBJECT(index), BALSA_INDEX_ROW_REF_KEY, NULL);
     g_object_unref(index);
 
@@ -772,7 +774,8 @@ balsa_index_new(void)
  * the index, or the last message if none is unread, and selects
  * it. Since this routine is usually called from a thread, we have to
  * take care and and make sure the row is selected from the main
- * thread only.
+ * thread only. And we also check whether the mailbox hasn't been
+ * destroyed by now, of course.
  */
 struct view_on_open_data {
     BalsaIndex *bindex;
@@ -782,8 +785,10 @@ static gboolean
 bi_view_on_open(struct view_on_open_data *data)
 {
     gdk_threads_enter();
-    bndx_select_row(data->bindex, data->path);
-    gtk_tree_path_free(data->path);
+    if(gtk_tree_view_get_model(GTK_TREE_VIEW(data->bindex))) {
+        bndx_select_row(data->bindex, data->path);
+        gtk_tree_path_free(data->path);
+    }
     g_object_unref(data->bindex);
     g_free(data);
     gdk_threads_leave();

@@ -1558,8 +1558,11 @@ update_bsmsg_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity* ident)
 		i++;
 	    }
         }
-        /* if no sig seperators found, do a slower brute force approach */
-        if (!found_sig) {
+        /* if no sig seperators found, do a slower brute force
+         * approach.  We could have stopped earlier if the message was
+         * empty, but we didn't. Now, it is really time to do
+         * that... */
+        if (*message_text && !found_sig) {
             compare_str = message_text;
             replace_offset = 0;
 

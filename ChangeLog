@@ -1,3 +1,9 @@
+2007-12-16  Pawel Salek
+
+	* src/balsa-index.c: check in idle functions whether the model
+	still exists.
+	* src/sendmsg-window.c: do not go beyond the end of the string.
+
 2007-12-16  Peter Bloomfield
 
 	* src/main-window.c: (bw_notebook_label_new): use

@@ -1,3 +1,9 @@
+2007-12-16  Peter Bloomfield
+
+	* src/main-window.c: (bw_notebook_label_new): use
+	gtk_widget_set_size_request for the button instead of a signal
+	callback.
+
 2007-12-14  Peter Bloomfield
 
 	* src/main-window.c: (bw_notebook_label_new): drop redundant

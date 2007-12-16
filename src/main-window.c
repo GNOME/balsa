@@ -2046,25 +2046,6 @@ balsa_window_close_mbnode(BalsaWindow * window, BalsaMailboxNode * mbnode)
 }
 
 static void
-bw_mailbox_tab_size_request(GtkWidget * widget, GtkRequisition * requisition,
-                         gpointer user_data)
-{
-    gint focus_width;
-    gint focus_pad;
-    gint border_width;
-
-    gtk_widget_size_request(GTK_BIN(widget)->child, requisition);
-
-    gtk_widget_style_get(widget, "focus-line-width", &focus_width,
-                         "focus-padding", &focus_pad, NULL);
-    border_width = (GTK_CONTAINER(widget)->border_width +
-                    focus_width + focus_pad) * 2;
-
-    requisition->width += border_width;
-    requisition->height += border_width;
-}
-
-static void
 bw_notebook_label_style(GtkLabel * lab, gboolean has_unread_messages)
 {
     gchar *str = has_unread_messages ?
@@ -2098,6 +2079,8 @@ bw_notebook_label_new(BalsaMailboxNode * mbnode)
     GtkWidget *ev;
 #endif                          /* GTK_CHECK_VERSION(2, 11, 0) */
     GtkRcStyle *rcstyle;
+    GtkSettings *settings;
+    gint w, h;
 
     box = gtk_hbox_new(FALSE, 4);
 
@@ -2111,6 +2094,9 @@ bw_notebook_label_new(BalsaMailboxNode * mbnode)
     gtk_box_pack_start(GTK_BOX(box), lab, TRUE, TRUE, 0);
 
     but = gtk_button_new();
+    gtk_button_set_focus_on_click(GTK_BUTTON(but), FALSE);
+    gtk_button_set_relief(GTK_BUTTON(but), GTK_RELIEF_NONE);
+
     rcstyle = gtk_rc_style_new();
     rcstyle->xthickness = rcstyle->ythickness = 0;
     gtk_widget_modify_style(but, rcstyle);
@@ -2120,12 +2106,12 @@ bw_notebook_label_new(BalsaMailboxNode * mbnode)
     gtk_rc_style_unref(rcstyle);
 #endif                          /* GTK_CHECK_VERSION(2, 11, 0) */
 
-    g_signal_connect(but, "size-request",
-                     G_CALLBACK(bw_mailbox_tab_size_request), NULL);
+    settings = gtk_widget_get_settings(GTK_WIDGET(lab));
+    gtk_icon_size_lookup_for_settings(settings, GTK_ICON_SIZE_MENU, &w, &h);
+    gtk_widget_set_size_request(but, w + 2, h + 2);
+
     g_signal_connect(but, "clicked",
                      G_CALLBACK(bw_mailbox_tab_close_cb), mbnode);
-
-    gtk_button_set_relief(GTK_BUTTON(but), GTK_RELIEF_NONE);
 
     close_pix = gtk_image_new_from_stock(GTK_STOCK_CLOSE,
                                          GTK_ICON_SIZE_MENU);

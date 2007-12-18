@@ -166,7 +166,7 @@ static void address_book_cb(LibBalsaAddressView * address_view,
 static void address_book_response(GtkWidget * ab, gint response,
                                   LibBalsaAddressView * address_view);
 
-static gint set_locale(BalsaSendmsg *, gint);
+static void set_locale(BalsaSendmsg * bsmsg, gint idx);
 
 #if !defined(ENABLE_TOUCH_UI)
 static void edit_with_gnome(GtkAction * action, BalsaSendmsg* bsmsg);
@@ -287,6 +287,19 @@ struct SendLocales {
     {"uk_UK", "KOI8-U",        N_("_Ukrainian")},
     {"", "UTF-8",              N_("_Generic UTF-8")}
 };
+
+static const gchar *
+sw_preferred_charset(BalsaSendmsg * bsmsg)
+{
+    guint i;
+
+    for (i = 0; i < G_N_ELEMENTS(locales); i++)
+        if (bsmsg->spell_check_lang && locales[i].locale
+            && strcmp(bsmsg->spell_check_lang, locales[i].locale) == 0)
+            return locales[i].charset;
+
+    return NULL;
+}
 
 /* ===================================================================
    Balsa menus. Touchpad has some simplified menus which do not
@@ -971,15 +984,12 @@ balsa_sendmsg_destroy_handler(BalsaSendmsg * bsmsg)
         g_object_unref(G_OBJECT(bsmsg->bad_address_style));
     quit_on_close = bsmsg->quit_on_close;
     g_free(bsmsg->fcc_url);
-    g_free(bsmsg->charset);
     g_free(bsmsg->in_reply_to);
     if(bsmsg->references) {
         g_list_foreach(bsmsg->references, (GFunc) g_free, NULL);
         g_list_free(bsmsg->references);
         bsmsg->references = NULL;
     }
-    g_slist_foreach(bsmsg->charsets, (GFunc) g_free, NULL);
-    g_slist_free(bsmsg->charsets);
 
 #if !HAVE_GTKSPELL
     if (bsmsg->spell_checker)
@@ -3195,6 +3205,9 @@ sw_can_convert(const gchar * string, gssize len,
     GError *err = NULL;
     gchar *s;
 
+    if (!(to_codeset && from_codeset))
+        return FALSE;
+
     s = g_convert(string, len, to_codeset, from_codeset,
                   &bytes_read, &bytes_written, &err);
     if (err) {
@@ -3209,36 +3222,6 @@ sw_can_convert(const gchar * string, gssize len,
         g_free(s);
 
     return !err;
-}
-
-/*
- * bsmsg->charsets is a list of charsets associated with quoted or
- * included messages, and included files; we use GMime's
- * "iconv-friendly" name and try to avoid duplicates; the first charset
- * that works is used, and we prepend new choices, so the priority is:
- * - the user's new language choice;
- * - the charsets of quoted and included text;
- * - the user's default language.
- */
-static void
-sw_prepend_charset(BalsaSendmsg * bsmsg, const gchar * charset)
-{
-    const gchar *charset_iconv;
-
-    if (!charset || g_ascii_strcasecmp(charset, "UTF-8") == 0)
-	return;
-
-    charset_iconv = g_mime_charset_iconv_name(charset);
-    if (!g_slist_find_custom(bsmsg->charsets, charset_iconv,
-                             (GCompareFunc) strcmp))
-        bsmsg->charsets =
-            g_slist_prepend(bsmsg->charsets, g_strdup(charset_iconv));
-}
-
-static void
-sw_charset_cb(const gchar * charset, gpointer data)
-{
-    sw_prepend_charset((BalsaSendmsg *) data, charset);
 }
 
 /* continue_body --------------------------------------------------------
@@ -3270,8 +3253,7 @@ continue_body(BalsaSendmsg * bsmsg, LibBalsaMessage * message)
                 llen = balsa_app.wraplength;
 	    if (!strcmp(body_type, "text/plain") &&
 		(rbdy = process_mime_part(message, body, NULL, llen, FALSE,
-                                          bsmsg->flow, sw_charset_cb,
-					  bsmsg))) {
+                                          bsmsg->flow))) {
                 libbalsa_insert_with_url(buffer, rbdy->str, NULL, NULL, NULL);
 		g_string_free(rbdy, TRUE);
 	    }
@@ -3523,8 +3505,7 @@ cell_toggled_cb(GtkCellRendererToggle *cell, gchar *path_str, GtkTreeView *treev
 static void
 append_parts(GString * q_body, LibBalsaMessage *message, GtkTreeModel * model,
 	     GtkTreeIter * iter, const gchar * from_msg, gchar * reply_prefix_str,
-	     gint llen, gboolean flow, LibBalsaCharsetFunc charset_cb,
-	     gpointer charset_cb_data)
+	     gint llen, gboolean flow)
 {
     gboolean used_from_msg = FALSE;
 
@@ -3536,7 +3517,7 @@ append_parts(GString * q_body, LibBalsaMessage *message, GtkTreeModel * model,
 
 	    gtk_tree_model_get(model, iter, QUOTE_DESCRIPTION, &description, -1);
 	    append_parts(q_body, message, model, &children, description,
-			 reply_prefix_str, llen, flow, charset_cb, charset_cb_data);
+			 reply_prefix_str, llen, flow);
 	    g_free(description);
 	} else {
 	    gboolean do_include;
@@ -3548,9 +3529,9 @@ append_parts(GString * q_body, LibBalsaMessage *message, GtkTreeModel * model,
 		gtk_tree_model_get(model, iter, QUOTE_BODY, &this_body, -1);
 		if (this_body) {
 		    GString * this_part;
-		    this_part= process_mime_part(message, this_body, reply_prefix_str,
-						 llen, FALSE, flow, charset_cb,
-						 charset_cb_data);
+		    this_part= process_mime_part(message, this_body,
+                                                 reply_prefix_str, llen,
+                                                 FALSE, flow);
 		    
 		    if (q_body->len > 0 && q_body->str[q_body->len - 1] != '\n')
 			g_string_append_c(q_body, '\n');
@@ -3667,8 +3648,7 @@ tree_find_single_part(GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter,
 
 static GString *
 collect_for_quote(LibBalsaMessageBody *root, gchar * reply_prefix_str,
-		  gint llen, gboolean ignore_html, gboolean flow,
-		  LibBalsaCharsetFunc charset_cb, gpointer charset_cb_data)
+		  gint llen, gboolean ignore_html, gboolean flow)
 {
     GtkTreeStore * tree_store;
     gint text_bodies;
@@ -3692,8 +3672,7 @@ collect_for_quote(LibBalsaMessageBody *root, gchar * reply_prefix_str,
 			       &this_body);
 	if (this_body)
 	    q_body = process_mime_part(message, this_body, reply_prefix_str,
-				       llen, FALSE, flow, charset_cb,
-				       charset_cb_data);
+				       llen, FALSE, flow);
     } else if (text_bodies > 1) {
 	if (quote_parts_select_dlg(tree_store, NULL)) {
 	    GtkTreeIter iter;
@@ -3701,7 +3680,7 @@ collect_for_quote(LibBalsaMessageBody *root, gchar * reply_prefix_str,
 	    q_body = g_string_new("");
 	    gtk_tree_model_get_iter_first(GTK_TREE_MODEL(tree_store), &iter);
 	    append_parts(q_body, message, GTK_TREE_MODEL(tree_store), &iter, NULL,
-			 reply_prefix_str, llen, flow, charset_cb, charset_cb_data);
+			 reply_prefix_str, llen, flow);
 	}
     }
 
@@ -3810,8 +3789,7 @@ quote_body(BalsaSendmsg * bsmsg, LibBalsaMessageHeaders *headers,
 	body = collect_for_quote(root,
 				 qtype == QUOTE_ALL ? balsa_app.quote_str : NULL,
 				 bsmsg->flow ? -1 : balsa_app.wraplength,
-				 balsa_app.reply_strip_html, bsmsg->flow,
-				 sw_charset_cb, bsmsg);
+				 balsa_app.reply_strip_html, bsmsg->flow);
 	if (body) {
 	    gchar *buf;
 
@@ -4297,50 +4275,50 @@ comp_send_locales(const void* a, const void* b)
 */
 #define BALSA_LANGUAGE_MENU_POS "balsa-language-menu-pos"
 static void
-create_lang_menu(GtkWidget* parent, BalsaSendmsg *bsmsg)
+create_lang_menu(GtkWidget * parent, BalsaSendmsg * bsmsg)
 {
     unsigned i, selected_pos;
     GtkWidget *langs = gtk_menu_new();
     static gboolean locales_sorted = FALSE;
     GSList *group = NULL;
 
-    if(!locales_sorted) {
-        for(i=0; i<ELEMENTS(locales); i++)
+    if (!locales_sorted) {
+        for (i = 0; i < ELEMENTS(locales); i++)
             locales[i].lang_name = _(locales[i].lang_name);
         qsort(locales, ELEMENTS(locales), sizeof(struct SendLocales),
               comp_send_locales);
         locales_sorted = TRUE;
     }
+
     /* find the preferred charset... */
     selected_pos = find_locale_index_by_locale(setlocale(LC_CTYPE, NULL));
     set_locale(bsmsg, selected_pos);
 
-    for(i=0; i<ELEMENTS(locales); i++) {
-        GtkWidget *w = 
-            gtk_radio_menu_item_new_with_mnemonic(group,
-                                                  locales[i].lang_name);
-        group = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(w));
-        if (i == selected_pos) {
-#if HAVE_GTKSPELL
-            /* Steal balsa_app.spell_check_lang and restore it. */
-            gchar *lang;
+    for (i = 0; i < ELEMENTS(locales); i++) {
+        GtkSpell *spell;
 
-            lang = balsa_app.spell_check_lang;
-            balsa_app.spell_check_lang = NULL;
-#endif                          /* HAVE_GTKSPELL */
-            gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(w), TRUE);
-#if HAVE_GTKSPELL
-            g_free(balsa_app.spell_check_lang);
-            balsa_app.spell_check_lang = lang;
-#endif                          /* HAVE_GTKSPELL */
+        spell = gtkspell_new_attach(GTK_TEXT_VIEW(bsmsg->text),
+                                    locales[i].locale, NULL);
+        if (spell) {
+            GtkWidget *w;
+
+            gtkspell_detach(spell);
+
+            w = gtk_radio_menu_item_new_with_mnemonic(group,
+                                                      locales[i].
+                                                      lang_name);
+            group = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(w));
+            if (i == selected_pos)
+                gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(w),
+                                               TRUE);
+
+            g_signal_connect(G_OBJECT(w), "activate",
+                             G_CALLBACK(lang_set_cb), bsmsg);
+            g_object_set_data(G_OBJECT(w), BALSA_LANGUAGE_MENU_POS,
+                              GINT_TO_POINTER(i));
+            gtk_widget_show(w);
+            gtk_menu_shell_append(GTK_MENU_SHELL(langs), w);
         }
-
-        g_signal_connect(G_OBJECT(w), "activate", 
-                         G_CALLBACK(lang_set_cb), bsmsg);
-        g_object_set_data(G_OBJECT(w), BALSA_LANGUAGE_MENU_POS, 
-                          GINT_TO_POINTER(i));
-        gtk_widget_show(w);
-        gtk_menu_shell_append(GTK_MENU_SHELL(langs), w);
     }
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(parent), langs);
     gtk_widget_show(parent);
@@ -4464,9 +4442,6 @@ sendmsg_window_new()
     GtkWidget *window;
     GtkWidget *main_box = gtk_vbox_new(FALSE, 0);
     BalsaSendmsg *bsmsg = NULL;
-#if HAVE_GTKSPELL
-    gchar* tmp;
-#endif
 #if HAVE_GTKSOURCEVIEW
     GtkSourceBuffer *source_buffer;
 #endif                          /* HAVE_GTKSOURCEVIEW */
@@ -4478,8 +4453,6 @@ sendmsg_window_new()
     bsmsg = g_malloc(sizeof(BalsaSendmsg));
     bsmsg->in_reply_to = NULL;
     bsmsg->references = NULL;
-    bsmsg->charset  = NULL;
-    bsmsg->charsets = NULL;
     bsmsg->spell_check_lang = NULL;
     bsmsg->fcc_url  = NULL;
     bsmsg->insert_mark = NULL;
@@ -4507,8 +4480,6 @@ sendmsg_window_new()
     bsmsg->type = SEND_NORMAL;
 #if !HAVE_GTKSPELL
     bsmsg->spell_checker = NULL;
-#else
-    bsmsg->spell_check_error = FALSE;
 #endif                          /* HAVE_GTKSPELL */
 #ifdef HAVE_GPGME
     bsmsg->gpg_mode = LIBBALSA_PROTECT_RFC3156;
@@ -4619,12 +4590,7 @@ sendmsg_window_new()
     create_lang_menu(bsmsg->current_language_menu, bsmsg);
 
 #if HAVE_GTKSPELL
-    /* Steal balsa_app.spell_check_lang and restore it. */
-    tmp = balsa_app.spell_check_lang;
-    balsa_app.spell_check_lang = NULL;
-    sw_set_active(bsmsg, "CheckSpelling", tmp != NULL);
-    g_free(balsa_app.spell_check_lang);
-    balsa_app.spell_check_lang = tmp;
+    sw_set_active(bsmsg, "CheckSpelling", balsa_app.spell_check_active);
 #endif
     setup_headers_from_identity(bsmsg, bsmsg->ident);
 
@@ -4973,11 +4939,18 @@ sendmsg_window_continue(LibBalsaMailbox * mailbox, guint msgno)
         GtkWidget *langs =
             gtk_menu_item_get_submenu(GTK_MENU_ITEM
                                       (bsmsg->current_language_menu));
-        GList *children = gtk_container_get_children(GTK_CONTAINER(langs));
+        GList *list, *children =
+            gtk_container_get_children(GTK_CONTAINER(langs));
         unsigned selected_pos = find_locale_index_by_locale(postpone_hdr);
         set_locale(bsmsg, selected_pos);
-        gtk_check_menu_item_set_active
-            (g_list_nth(children, selected_pos)->data, TRUE);
+        for (list = children; list; list = list->next) {
+            GtkCheckMenuItem *menu_item = list->data;
+            if (GPOINTER_TO_UINT
+                (g_object_get_data(G_OBJECT(menu_item),
+                                   BALSA_LANGUAGE_MENU_POS)) ==
+                selected_pos)
+                gtk_check_menu_item_set_active(menu_item, TRUE);
+        }
         g_list_free(children);
     }
     if ((postpone_hdr =
@@ -5213,7 +5186,6 @@ do_insert_string_select_ch(BalsaSendmsg* bsmsg, GtkTextBuffer *buffer,
         g_print("Trying charset: %s\n", charset);
         if (sw_can_convert(string, len, "UTF-8", charset, &s)) {
             libbalsa_insert_with_url(buffer, s, NULL, NULL, NULL);
-	    sw_prepend_charset(bsmsg, charset);
             g_free(s);
             break;
         }
@@ -5253,7 +5225,6 @@ insert_file_response(GtkWidget * selector, gint response,
 
     if (string) {
         LibBalsaTextAttribute attr;
-        GSList *list;
 
         attr = libbalsa_text_attr_string(string);
         if (!attr || attr & LIBBALSA_TEXT_HI_UTF8)
@@ -5262,21 +5233,14 @@ insert_file_response(GtkWidget * selector, gint response,
         else {
             /* Neither ascii nor utf-8... */
             gchar *s = NULL;
+            const gchar *charset = sw_preferred_charset(bsmsg);
 
-            for (list = bsmsg->charsets; list; list = list->next) {
-                if (sw_can_convert
-                    (string, -1, "UTF-8", (const gchar *) list->data, &s))
-                    break;
-                g_free(s);
-                s = NULL;
-            }
-
-            if (s) {
-                /* ...but seems to be in a current charset. */
+            if (sw_can_convert(string, -1, "UTF-8", charset, &s)) {
+                /* ...but seems to be in current charset. */
                 libbalsa_insert_with_url(buffer, s, NULL, NULL, NULL);
                 g_free(s);
             } else
-                /* ...and can't be decoded from any current charset. */
+                /* ...and can't be decoded from current charset. */
                 do_insert_string_select_ch(bsmsg, buffer, string, len,
                                            fname);
         }
@@ -5416,6 +5380,20 @@ sw_set_header_from_path(LibBalsaMessage * message, const gchar * header,
     g_free(content);
 }
 
+static const gchar *
+sw_required_charset(BalsaSendmsg * bsmsg, const gchar * text)
+{
+    const gchar *charset = "us-ascii";
+
+    if (libbalsa_text_attr_string(text)) {
+        charset = sw_preferred_charset(bsmsg);
+        if (!sw_can_convert(text, -1, charset, "UTF-8", NULL))
+            charset = "UTF-8";
+    }
+
+    return charset;
+}
+
 static LibBalsaMessage *
 bsmsg2message(BalsaSendmsg * bsmsg)
 {
@@ -5509,8 +5487,7 @@ bsmsg2message(BalsaSendmsg * bsmsg)
     sw_buffer_set_undo(bsmsg, FALSE, FALSE);
 #endif                          /* HAVE_GTKSOURCEVIEW */
 
-    body->charset = g_strdup(libbalsa_text_attr_string(body->buffer) ?
-                             bsmsg->charset : "us-ascii");
+    body->charset = g_strdup(sw_required_charset(bsmsg, body->buffer));
     libbalsa_message_append_part(message, body);
 
     /* add attachments */
@@ -5532,107 +5509,6 @@ bsmsg2message(BalsaSendmsg * bsmsg)
 
     return message;
 }
-
-/*
- * is_charset_ok and friends.
- */
-static gboolean
-sw_confirm_utf8(BalsaSendmsg * bsmsg, const gchar * content)
-{
-    GtkWidget *dialog;
-    gint response;
-
-    dialog = gtk_message_dialog_new
-        (GTK_WINDOW(bsmsg->window), 0, GTK_MESSAGE_INFO,
-         GTK_BUTTONS_OK_CANCEL,
-         _("Message contains national (8-bit) characters"));
-#if GTK_CHECK_VERSION(2,6,0)
-    gtk_message_dialog_format_secondary_text
-        (GTK_MESSAGE_DIALOG(dialog),
-         _("Balsa will encode the message in UTF-8.\n"
-           "Cancel the operation to choose a different language."));
-#else
-    /* Do not miss the space after </b>! */
-    gtk_message_dialog_set_markup
-        (GTK_MESSAGE_DIALOG(dialog),
-         _("<b><big>Message contains national (8-bit) characters.</big></b> "
-           "Balsa will encode the message in UTF-8.\n"
-           "Cancel the operation to choose a different language."));
-#endif
-    gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
-
-    response = gtk_dialog_run(GTK_DIALOG(dialog));
-    gtk_widget_destroy(dialog);
-    
-    return response == GTK_RESPONSE_OK;
-}
-
-static gboolean
-is_charset_ok(BalsaSendmsg *bsmsg, gboolean auto_utf8)
-{
-    GtkTextBuffer *buffer =
-        gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
-    GtkTextIter start, end;
-    gchar *tmp;
-    GSList *list;
-    gboolean retval = TRUE;
-
-    g_assert(bsmsg->charset); /* ... or strcmp below will segfault. */
-    if (strcmp(bsmsg->charset, "UTF-8") == 0)
-        /* User already agreed to use utf-8. */
-        return TRUE;
-
-    gtk_text_buffer_get_bounds(buffer, &start, &end);
-    tmp = gtk_text_iter_get_text(&start, &end);
-
-    if (!libbalsa_text_attr_string(tmp)) {
-	g_free(tmp);
-	return retval;
-    }
-
-    for (list = bsmsg->charsets; list; list = list->next) {
-	const gchar *charset = list->data;
-
-	if (sw_can_convert(tmp, -1, charset, "UTF-8", NULL)) {
-            g_free(bsmsg->charset);
-	    bsmsg->charset = g_strdup(charset);
-	    g_free(tmp);
-	    return retval;
-	}
-    }
-
-    for (list = bsmsg->charsets; list; list = list->next) {
-	const gchar *charset = list->data;
-	/* Try the corresponding CP125x charset, if any. */
-        const gchar *windows_charset =
-	    g_mime_charset_iso_to_windows(charset);
-
-        if (strcmp(windows_charset, g_mime_charset_canon_name(charset))) {
-	    /* Yes, there is one. */
-            const gchar *iconv_charset =
-                g_mime_charset_iconv_name(windows_charset);
-
-            if (sw_can_convert(tmp, -1, iconv_charset, "UTF-8", NULL)) {
-		/* Change the message charset. */
-                g_free(bsmsg->charset);
-                bsmsg->charset = g_strdup(iconv_charset);
-		g_free(tmp);
-		return retval;
-            }
-        }
-    }
-
-    if (auto_utf8 || sw_confirm_utf8(bsmsg, tmp)) {
-        g_free(bsmsg->charset);
-        bsmsg->charset = g_strdup("UTF-8");
-    } else
-        retval = FALSE;
-
-    g_free(tmp);
-    
-    return retval;
-}
-
 
 /* ask the user for a subject */
 static gboolean
@@ -5765,12 +5641,6 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
     if (!gtk_action_group_get_sensitive(bsmsg->ready_action_group))
 	return FALSE;
 
-    if (balsa_app.debug)
-	fprintf(stderr, "sending with charset: %s\n", bsmsg->charset);
-
-    if(!is_charset_ok(bsmsg, FALSE))
-        return FALSE;
-
     if(!subject_not_empty(bsmsg))
 	return FALSE;
 
@@ -5901,8 +5771,6 @@ message_postpone(BalsaSendmsg * bsmsg)
     GPtrArray *headers;
 
     /* Silent fallback to UTF-8 */
-    if(!is_charset_ok(bsmsg, TRUE))
-        return FALSE;
     message = bsmsg2message(bsmsg);
 
     /* sufficiently long for fcc, mdn, gpg */
@@ -6120,10 +5988,8 @@ sw_spell_attach(BalsaSendmsg * bsmsg)
 
     spell = gtkspell_new_attach(GTK_TEXT_VIEW(bsmsg->text),
                                 bsmsg->spell_check_lang, &err);
-    if (spell)
-        bsmsg->spell_check_error = FALSE;
-    else {
-        bsmsg->spell_check_error = TRUE;
+    if (!spell) {
+        /* Should not happen, since we now check the language. */
         libbalsa_information(LIBBALSA_INFORMATION_WARNING,
                              _("Error starting spell checker: %s"),
                              err->message);
@@ -6469,27 +6335,11 @@ init_menus(BalsaSendmsg * bsmsg)
    idx - corresponding entry index in locales.
 */
 
-static gint
+static void
 set_locale(BalsaSendmsg * bsmsg, gint idx)
 {
-#if HAVE_GTKSPELL
-    gboolean had_spell = sw_spell_detach(bsmsg);
-
-#endif                          /* HAVE_GTKSPELL */
-    g_free(bsmsg->charset);
-    bsmsg->charset = g_strdup(locales[idx].charset);
-    sw_prepend_charset(bsmsg, bsmsg->charset);
     if (locales[idx].locale && *locales[idx].locale)
         bsmsg->spell_check_lang = locales[idx].locale;
-#if HAVE_GTKSPELL
-
-    if (had_spell)
-        sw_spell_attach(bsmsg);
-    else if (bsmsg->spell_check_error)
-        sw_set_active(bsmsg, "CheckSpelling", TRUE);
-
-#endif                          /* HAVE_GTKSPELL */
-    return FALSE;
 }
 
 #if HAVE_GTKSPELL
@@ -6500,16 +6350,11 @@ set_locale(BalsaSendmsg * bsmsg, gint idx)
 static void
 spell_check_menu_cb(GtkToggleAction * action, BalsaSendmsg * bsmsg)
 {
-    gboolean is_active = gtk_toggle_action_get_active(action);
-
-    sw_spell_detach(bsmsg);
-    g_free(balsa_app.spell_check_lang);
-    balsa_app.spell_check_lang = NULL;
-
-    if (is_active) {
+    if ((balsa_app.spell_check_active =
+         gtk_toggle_action_get_active(action)))
         sw_spell_attach(bsmsg);
-        balsa_app.spell_check_lang = g_strdup(bsmsg->spell_check_lang);
-    }
+    else
+        sw_spell_detach(bsmsg);
 }
 
 #else                           /* HAVE_GTKSPELL */
@@ -6576,11 +6421,12 @@ lang_set_cb(GtkWidget * w, BalsaSendmsg * bsmsg)
         gint i = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(w),
                                                    BALSA_LANGUAGE_MENU_POS));
         set_locale(bsmsg, i);
-    }
 #if HAVE_GTKSPELL
-    g_free(balsa_app.spell_check_lang);
-    balsa_app.spell_check_lang = g_strdup(bsmsg->spell_check_lang);
+        g_free(balsa_app.spell_check_lang);
+        balsa_app.spell_check_lang = g_strdup(bsmsg->spell_check_lang);
+        sw_set_active(bsmsg, "CheckSpelling", TRUE);
 #endif                          /* HAVE_GTKSPELL */
+    }
 }
 
 /* sendmsg_window_new_from_list:

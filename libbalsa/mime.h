@@ -32,13 +32,9 @@ typedef void (*LibBalsaCharsetFunc) (const gchar * charset, gpointer data);
 GString *process_mime_part(LibBalsaMessage * message,
 			   LibBalsaMessageBody * body,
 			   gchar * reply_prefix_str, gint llen,
-			   gboolean ignore_html, gboolean flow,
-			   LibBalsaCharsetFunc charset_cb,
-			   gpointer charset_cb_data);
+			   gboolean ignore_html, gboolean flow);
 GString *content2reply(LibBalsaMessageBody *root,
 		       gchar * reply_prefix_str, gint llen,
-		       gboolean ignore_html, gboolean flow,
-		       LibBalsaCharsetFunc charset_cb,
-		       gpointer charset_cb_data);
+		       gboolean ignore_html, gboolean flow);
 
 #endif				/* __LIBBALSA_MIME_H__ */

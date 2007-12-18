@@ -875,6 +875,10 @@ config_global_load(void)
 #if HAVE_GTKSPELL
     balsa_app.spell_check_lang =
         libbalsa_conf_get_string("SpellCheckLanguage");
+    balsa_app.spell_check_active =
+        libbalsa_conf_get_bool_with_default("SpellCheckActive", &def_used);
+    if (def_used)
+        balsa_app.spell_check_active = balsa_app.spell_check_lang != NULL;
 #else                           /* HAVE_GTKSPELL */
     balsa_app.module = d_get_gint("PspellModule", DEFAULT_PSPELL_MODULE);
     balsa_app.suggestion_mode =
@@ -1363,9 +1367,10 @@ config_save(void)
     libbalsa_conf_push_group("Spelling");
 
 #if HAVE_GTKSPELL
-    if (balsa_app.spell_check_lang)
-        libbalsa_conf_set_string("SpellCheckLanguage",
-                                 balsa_app.spell_check_lang);
+    libbalsa_conf_set_string("SpellCheckLanguage",
+                             balsa_app.spell_check_lang);
+    libbalsa_conf_set_bool("SpellCheckActive", 
+                           balsa_app.spell_check_active);
 #else                           /* HAVE_GTKSPELL */
     libbalsa_conf_set_int("PspellModule", balsa_app.module);
     libbalsa_conf_set_int("PspellSuggestMode", balsa_app.suggestion_mode);

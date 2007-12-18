@@ -948,9 +948,7 @@ message_match_real(LibBalsaMailbox *mailbox, guint msgno,
                 g_object_unref(message);
 		return FALSE; /* We don't want to match if an error occurred */
             }
-            body =
-                content2reply(message->body_list, NULL, 
-                              0, FALSE, FALSE, NULL, NULL);
+            body = content2reply(message->body_list, NULL, 0, FALSE, FALSE);
 	    if (body) {
 		if (body->str)
                     match = libbalsa_utf8_strstr(body->str,

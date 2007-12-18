@@ -61,16 +61,12 @@ extern "C" {
 	GtkWidget *text;
 #if !HAVE_GTKSPELL
 	GtkWidget *spell_checker;
-#else
-        gboolean   spell_check_error;
 #endif                          /* HAVE_GTKSPELL */
 	GtkWidget *notebook;
 	LibBalsaMessage *parent_message; /* to which we're replying     */
 	LibBalsaMessage *draft_message;  /* where the message was saved */
 	SendType type;
 	/* language selection related data */
-	gchar *charset;
-	GSList *charsets;
 	const gchar *spell_check_lang;
 	GtkWidget *current_language_menu;
 	/* identity related data */

@@ -376,7 +376,8 @@ extern struct BalsaApplication {
 
     /* spell checking */
 #if HAVE_GTKSPELL
-    gchar *spell_check_lang;
+    gchar   *spell_check_lang;
+    gboolean spell_check_active;
 #else                           /* HAVE_GTKSPELL */
     SpellCheckModule module;
     SpellCheckSuggestMode suggestion_mode;

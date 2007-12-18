@@ -1,3 +1,21 @@
+2007-12-18  Peter Bloomfield
+
+	* libbalsa/filter.c: (libbalsa_condition_matches): new
+	content2reply api.
+	* libbalsa/mailbox_local.c: (message_match_real): ditto.
+	* libbalsa/mime.c: (process_mime_part, process_mime_multipart,
+	content2reply): remove charset callback.
+	* libbalsa/mime.h: ditto.
+	* src/balsa-app.c: (balsa_app_init): new member
+	BalsaApp::spell_check_active; make spell modules conditional.
+	* src/balsa-app.h:
+	* src/save-restore.c: (config_global_load, config_save): manage
+	BalsaApp::spell_check_active.
+	* src/sendmsg-window.c: simplify charset and spell-checker
+	handling.
+	* src/sendmsg-window.h: remove newly redundant members in
+	BalsaSendmsg.
+
 2007-12-16  Pawel Salek
 
 	* src/balsa-index.c: check in idle functions whether the model

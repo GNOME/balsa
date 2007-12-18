@@ -44,6 +44,7 @@
 /* Global application structure */
 struct BalsaApplication balsa_app;
 
+#if !HAVE_GTKSPELL
 const gchar *pspell_modules[] = {
     "ispell",
     "aspell"
@@ -54,6 +55,7 @@ const gchar *pspell_suggest_modes[] = {
     "normal",
     "bad-spellers"
 };
+#endif                          /* HAVE_GTKSPELL */
 
 /* ask_password:
    asks the user for the password to the mailbox on given remote server.
@@ -389,6 +391,7 @@ balsa_app_init(void)
     /* spell check */
 #if HAVE_GTKSPELL
     balsa_app.spell_check_lang = NULL;
+    balsa_app.spell_check_active = FALSE;
 #else                           /* HAVE_GTKSPELL */
     balsa_app.module = SPELL_CHECK_MODULE_ASPELL;
     balsa_app.suggestion_mode = SPELL_CHECK_SUGGEST_NORMAL;

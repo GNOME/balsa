@@ -1,3 +1,9 @@
+2007-12-21  Pawel Salek
+
+	* src/main-window.c: remove duplicate shortcut.
+	* src/sendmsg-window.c: Fix language switching (Peter B).
+	* libbalsa/imap/imap-commands.c: Add a handle lock.
+
 2007-12-18  Peter Bloomfield
 
 	* libbalsa/filter.c: (libbalsa_condition_matches): new

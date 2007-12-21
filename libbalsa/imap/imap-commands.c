@@ -1596,17 +1596,22 @@ make_msgno_table(ImapMboxHandle*handle, unsigned seqno, GHashTable *msgnos)
                       GUINT_TO_POINTER(seqno));
 }
 
+/** Appends to given hash the message numbers that match specified
+    filter. */
 ImapResponse
 imap_mbox_filter_msgnos(ImapMboxHandle *handle, ImapSearchKey *filter,
 			GHashTable *msgnos)
 {
-  return imap_search_exec(handle, FALSE, filter,
-                          (ImapSearchCb)make_msgno_table, msgnos);
+  ImapResponse res;
+  HANDLE_LOCK(handle);
+  res= imap_search_exec(handle, FALSE, filter,
+			(ImapSearchCb)make_msgno_table, msgnos);
+  HANDLE_UNLOCK(handle);
+  return res;
 }
 
-/* imap_mbox_complete_msgids:
-   finds which msgnos are missing from the supplied table and
-   completes them if needed.
+/** Helper function for imap_mbox_complete_msgids. Tells whether
+    msg-id for a specific message needs to be fetched.
 */
 static unsigned
 need_msgid(unsigned seqno, GPtrArray* msgids)
@@ -1622,6 +1627,13 @@ msgid_cb(unsigned seqno, const char *buf, int buflen, void* arg)
   g_ptr_array_index(arr, seqno-1) = g_strdup(buf);
 }
 
+/** Fills in provided array with msg-ids, starting at specified message.
+ *  @returns IMAP response code (OK, NO, etc).
+ * @param h the connection handle.
+ * @param msgids is the array of message ids.
+ * @param first_seqno_to_fetch the number of the first message to be
+ * fetched.
+ */
 ImapResponse
 imap_mbox_complete_msgids(ImapMboxHandle *h,
 			  GPtrArray *msgids,

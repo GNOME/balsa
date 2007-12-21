@@ -345,7 +345,7 @@ static const GtkActionEntry entries[] = {
      N_("Send and Receive messages"),
      G_CALLBACK(bw_send_receive_messages_cb)},
 #ifdef HAVE_GTK_PRINT
-    {"PageSetup", NULL, N_("Page _Setup"), "<control>S",
+    {"PageSetup", NULL, N_("Page _Setup"), NULL,
      N_("Set up page for printing"), G_CALLBACK(bw_page_setup_cb)},
 #endif                          /* HAVE_GTK_PRINT */
     {"AddressBook", BALSA_PIXMAP_BOOK_RED, N_("_Address Book..."), "B",

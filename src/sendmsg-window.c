@@ -4291,7 +4291,10 @@ create_lang_menu(GtkWidget * parent, BalsaSendmsg * bsmsg)
     }
 
     /* find the preferred charset... */
-    selected_pos = find_locale_index_by_locale(setlocale(LC_CTYPE, NULL));
+    selected_pos = 
+	find_locale_index_by_locale(balsa_app.spell_check_lang
+				    ? balsa_app.spell_check_lang
+				    : setlocale(LC_CTYPE, NULL));
     set_locale(bsmsg, selected_pos);
 
     for (i = 0; i < ELEMENTS(locales); i++) {

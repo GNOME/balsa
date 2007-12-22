@@ -6343,6 +6343,11 @@ set_locale(BalsaSendmsg * bsmsg, gint idx)
 {
     if (locales[idx].locale && *locales[idx].locale)
         bsmsg->spell_check_lang = locales[idx].locale;
+#if HAVE_GTKSPELL
+
+    if (sw_spell_detach(bsmsg))
+        sw_spell_attach(bsmsg);
+#endif                          /* HAVE_GTKSPELL */
 }
 
 #if HAVE_GTKSPELL

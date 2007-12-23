@@ -1,3 +1,11 @@
+2007-12-23  Peter Bloomfield
+
+	* libbalsa/address-view.c: (lbav_selection_changed_cb,
+	libbalsa_address_view_new): connect to selection's changed
+	signal, to implement one-click close.
+	* libbalsa/address-view.h: add members needed for one-click
+	actions; remove deadwood.
+
 2007-12-23  Albrecht Dreß
 
 	* src/main-window.c: show tray icon on mail arrival.

@@ -59,15 +59,14 @@ struct _LibBalsaAddressView {
      */
     const gchar *const *types;
     guint n_types;
-    gchar *address_book_stock_id;
-    gchar *remove_stock_id;
     gboolean fallback;
     GList *address_book_list;
 
     gchar *domain;
 
+    GtkTreeViewColumn *type_column;
     GtkTreeViewColumn *focus_column;
-    GtkCellRenderer *focus_cell;
+    GtkCellRenderer   *focus_cell;
 
     /*
      * Ephemera

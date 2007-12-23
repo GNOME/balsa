@@ -283,7 +283,8 @@ static void bw_ident_manage_dialog_cb(GtkAction * action, gpointer user_data);
 static void bw_contents_cb(void);
 
 #ifdef HAVE_NOTIFY
-static gboolean bw_cancel_new_mail_notification(void);
+static void bw_cancel_new_mail_notification(GObject *gobject, GParamSpec *arg1,
+					    gpointer user_data);
 #endif
 
 static void
@@ -3174,12 +3175,24 @@ bw_get_new_message_notification_string(int num_new, int num_total)
 static NotifyNotification *new_mail_note = NULL;
 #endif
 
+#if GTK_CHECK_VERSION(2, 10, 0)
+static void
+hide_sys_tray_icon(GObject *gobject, GParamSpec *arg1, gpointer user_data)
+{
+    if (gtk_window_is_active(GTK_WINDOW(gobject)))
+	gtk_status_icon_set_visible(GTK_STATUS_ICON(user_data), FALSE);
+}
+#endif
+
 static void
 bw_display_new_mail_notification(int num_new, int has_new)
 {
     static GtkWidget *dlg = NULL;
     static gint num_total = 0;
     gchar *msg = NULL;
+#if GTK_CHECK_VERSION(2, 10, 0)
+    static GtkStatusIcon *new_mail_tray = NULL;
+#endif
 
     if (num_new <= 0 && has_new <= 0)
         return;
@@ -3187,6 +3200,32 @@ bw_display_new_mail_notification(int num_new, int has_new)
     if (balsa_app.notify_new_mail_sound)
         gnome_triggers_do("New mail has arrived", "email",
                           "balsa", "newmail", NULL);
+
+#if GTK_CHECK_VERSION(2, 10, 0)
+    /* set up the sys tray icon when it is not yet present */
+    if (!new_mail_tray) {
+	new_mail_tray = gtk_status_icon_new_from_icon_name("stock_mail-compose");
+	g_signal_connect_swapped(G_OBJECT(new_mail_tray), "activate",
+				 G_CALLBACK(gtk_window_present),
+				 balsa_app.main_window);
+	/* hide tray icon when the main window gets the focus. */
+	g_signal_connect(G_OBJECT(balsa_app.main_window), "notify::is-active",
+			 G_CALLBACK(hide_sys_tray_icon), new_mail_tray);
+    }
+
+    /* show sys tray icon if we don't have the focus */
+    if (!gtk_window_is_active(GTK_WINDOW(balsa_app.main_window))) {
+	if (num_new > 0)
+	    msg = g_strdup_printf(ngettext("Balsa: you have received %d new message.",
+					   "Balsa: you have received %d new messages.",
+					   num_new + num_total), num_new + num_total);
+	else
+	    msg = g_strdup(_("Balsa: you have new mail."));
+	gtk_status_icon_set_tooltip(new_mail_tray, msg);
+	gtk_status_icon_set_visible(new_mail_tray, TRUE);
+	g_free(msg);
+    }
+#endif
 
     if (!balsa_app.notify_new_mail_dialog)
         return;
@@ -3257,8 +3296,9 @@ bw_display_new_mail_notification(int num_new, int has_new)
 }
 
 #ifdef HAVE_NOTIFY
-static gboolean
-bw_cancel_new_mail_notification(void)
+static void
+bw_cancel_new_mail_notification(GObject *gobject, GParamSpec *arg1,
+				gpointer user_data)
 {
     if (new_mail_note
         && gtk_window_is_active(GTK_WINDOW(balsa_app.main_window))) {
@@ -3266,7 +3306,6 @@ bw_cancel_new_mail_notification(void)
         notify_notification_set_timeout(new_mail_note, 1);
         notify_notification_show(new_mail_note, NULL);
     }
-    return FALSE;
 }
 #endif
 

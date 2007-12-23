@@ -1,3 +1,7 @@
+2007-12-23  Albrecht Dreß
+
+	* src/main-window.c: show tray icon on mail arrival.
+
 2007-12-22  Peter Bloomfield
 
 	* src/sendmsg-window.c: (create_lang_menu): build without

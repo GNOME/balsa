@@ -1,3 +1,9 @@
+* Balsa-2.3.22 release. Release date 2007-12-23
+
+- new address edition widget in the compose window.
+- compose window displays languages available for spell checking.
+- more new icons.
+
 * Balsa-2.3.21 release. Release date 2007-12-08
 
 - migration from GnomeUI to GtkUIManager

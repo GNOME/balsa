@@ -945,7 +945,11 @@ lbav_selection_changed_cb(GtkTreeSelection * selection,
                 GtkTreePath *path;
                 GtkTreeViewColumn *column;
 
+#if GTK_CHECK_VERSION(2, 12, 0)
                 gtk_tree_view_convert_widget_to_bin_window_coords
+#else                           /* GTK_CHECK_VERSION(2, 12, 0) */
+                gtk_tree_view_widget_to_tree_coords
+#endif                          /* GTK_CHECK_VERSION(2, 12, 0) */
                     (tree_view, (gint) event_button->x,
                      (gint) event_button->y, &x, &y);
 

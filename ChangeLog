@@ -1,3 +1,8 @@
+2007-12-24  Peter Bloomfield
+
+	* libbalsa/address-view.c: (lbav_selection_changed_cb): compile
+	with gtk pre-2.12.
+
 2007-12-23  Peter Bloomfield
 
 	* libbalsa/address-view.c: (lbav_selection_changed_cb,

@@ -1,17 +1,27 @@
 /** @file imap_tst.c tests some IMAP capabilities. It is very useful
     for stress-testing the imap part of balsa. */
 
-#include <sys/ioctl.h>
-#include <termios.h>
 #include <ctype.h>
+#include <dirent.h>
+#include <errno.h>
+#include <fcntl.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/ioctl.h>
 #include <sys/stat.h>
-#include <fcntl.h>
+#include <sys/types.h>
+#include <termios.h>
+#include <unistd.h>
 
 #include "libimap.h"
 #include "imap-handle.h"
 #include "imap-commands.h"
+
+struct {
+  char *user;
+  char *password;
+  gboolean monitor;
+} TestContext = { NULL, NULL, FALSE };
 
 static void
 monitor_cb(const char *buffer, int length, int direction, void *arg)
@@ -30,45 +40,51 @@ get_user(const char* method) {
   char buf[256];
   size_t len;
 
-  printf("Login with method %s as user: ", method);
-  fflush(stdout);
-  if(!fgets(buf, sizeof(buf), stdin))
-    return NULL;
+  if(TestContext.user) {
+    printf("Login with method %s as user: %s\n", method, TestContext.user);
+    return g_strdup(TestContext.user);
+  } else {
+    printf("Login with method %s as user: ", method);
+    fflush(stdout);
+    if(!fgets(buf, sizeof(buf), stdin))
+      return NULL;
 
-  len = strlen(buf);
-  if(len>0 && buf[len-1] == '\n')
-    buf[len-1] = '\0';
+    len = strlen(buf);
+    if(len>0 && buf[len-1] == '\n')
+      buf[len-1] = '\0';
 
-  printf("User: %s\n", buf);
-  return g_strdup(buf);
+    return g_strdup(buf);
+  }
 }
 
 static gchar*
 get_password()
 {
-  char buf[255];
-  int ttyfd = open ("/dev/tty", O_RDWR);
-  int n;
-  struct termios tty, oldtty;
+  if(TestContext.password) {
+    return g_strdup(TestContext.password);
+  } else {
+    char buf[255];
+    int ttyfd = open ("/dev/tty", O_RDWR);
+    int n;
+    struct termios tty, oldtty;
 
-  if(write (ttyfd, "Password: ", 10) != 10)
-    return NULL;
-  tcgetattr(ttyfd, &oldtty);
-  tty = oldtty;
-  tty.c_lflag &= ~ECHO;
-  tcsetattr(ttyfd, TCSANOW, &tty);
+    if(write (ttyfd, "Password: ", 10) != 10)
+      return NULL;
+    tcgetattr(ttyfd, &oldtty);
+    tty = oldtty;
+    tty.c_lflag &= ~ECHO;
+    tcsetattr(ttyfd, TCSANOW, &tty);
 
-  n = read(ttyfd, buf, sizeof(buf)-1);
-  tcsetattr(ttyfd, TCSANOW, &oldtty);
-  close (ttyfd);
+    n = read(ttyfd, buf, sizeof(buf)-1);
+    tcsetattr(ttyfd, TCSANOW, &oldtty);
+    close(ttyfd);
 
-  buf[n+1] = '\0';
-  printf("A Password:%d %s %d\n", n, buf, buf[n]);
-  while(n && !isgraph(buf[n]))
-    buf[n--] = '\0';
+    buf[n] = '\0'; /* Truncate trailing '\n' */
+    while(n && !isgraph(buf[n]))
+      buf[n--] = '\0';
 
-  printf("B:Password: %d %s\n", n, buf);
-  return g_strdup(buf);
+    return g_strdup(buf);
+  }
 }
 
 static void
@@ -219,8 +235,9 @@ test_body_strings()
 
 /** Tests whether all messages from a test mailbox can be extracted
     from a mailbox. */
-static gboolean
-test_mbox_dump(const gchar *host, const gchar *mailbox)
+static int
+dump_mbox(const char *host, const char *mailbox,
+	  ImapFetchBodyCb cb, void *cb_data)
 {
   gboolean read_only;
   ImapMboxHandle *h;
@@ -228,49 +245,334 @@ test_mbox_dump(const gchar *host, const gchar *mailbox)
   h = imap_mbox_handle_new();
 
   imap_handle_set_tls_mode(h, IMAP_TLS_DISABLED);
-  if(0) imap_handle_set_monitorcb(h, monitor_cb, NULL);
+
+  if(TestContext.monitor)
+    imap_handle_set_monitorcb(h, monitor_cb, NULL);
+
   imap_handle_set_usercb(h,    user_cb, NULL);
   if(imap_mbox_handle_connect(h, host, FALSE) != IMAP_SUCCESS) {
-    printf("Connection to %s failed.\n", host);
-    return FALSE;
+    fprintf(stderr, "Connection to %s failed.\n", host);
+    return 1;
   }
 
   if(imap_mbox_select(h, mailbox, &read_only) == IMR_OK) {
     unsigned cnt = imap_mbox_handle_get_exists(h);
     unsigned i;
-    FILE *fl = fopen("dump.mbox", "wt");
-    if(!fl) {
-      fprintf(stderr, "Cannot open dump.mbox for writing\n");
-    } else {
-#define FETCH_AT_ONCE 500
-      for(i=0; i<cnt; i+= FETCH_AT_ONCE) {
-	unsigned arr[FETCH_AT_ONCE], j;
-	unsigned batch_length = i+FETCH_AT_ONCE > cnt ? cnt-i : FETCH_AT_ONCE;
-	printf("Fetching %u:%u\n", i+1, i+batch_length);
-	for(j=0; j<batch_length; j++) arr[j] = i+1+j;
-	if( imap_mbox_handle_fetch_rfc822(h, batch_length, arr, fl) != IMR_OK) {
-	  fprintf(stderr, "fetching %u:%u failed: %s\n", i+1,
-		  i+batch_length,
-		  imap_mbox_handle_get_last_msg(h));
-	  break;
-	}
+#define FETCH_AT_ONCE 300
+    for(i=0; i<cnt; i+= FETCH_AT_ONCE) {
+      unsigned arr[FETCH_AT_ONCE], j;
+      unsigned batch_length = i+FETCH_AT_ONCE > cnt ? cnt-i : FETCH_AT_ONCE;
+      printf("Fetching %u:%u\n", i+1, i+batch_length);
+      for(j=0; j<batch_length; j++) arr[j] = i+1+j;
+      if( imap_mbox_handle_fetch_rfc822(h, batch_length, arr,
+					cb, cb_data) != IMR_OK) {
+	fprintf(stderr, "Fetching %u:%u failed: %s\n", i+1,
+		i+batch_length,
+		imap_mbox_handle_get_last_msg(h));
+	break;
       }
-      fclose(fl);
     }
   }
   g_object_unref(h);
-  return TRUE;
+  return 0;
 }
 
-int main(int argc, char *argv[]) {
+struct DumpfileState {
+  FILE *fl;
+  int error;
+};
+
+static void
+dumpfile_cb(unsigned seqno, const char *buf, size_t buflen, void *arg)
+{
+  struct DumpfileState *dfs = (struct DumpfileState*)arg;
+  static const char header[] =
+    "From addr@example.com Thu Oct 18 00:50:45 2007\r\n";
+  
+  if(fwrite(header, 1, sizeof(header)-1, dfs->fl) != sizeof(header)-1 ||
+     fwrite(buf, 1, buflen, dfs->fl) != buflen) {
+    if(!dfs->error) {
+      fprintf(stderr, "Cannot write\n");
+      dfs->error = 1;
+    }
+  }
+}
+
+static int
+test_mbox_dumpfile(int argc, char *argv[])
+{
+  struct DumpfileState state = { NULL, 0 };
+  int res = 1;
+
+  if(argc<2) {
+    fprintf(stderr, "dump HOST MAILBOX\n");
+    return 1;
+  }
+  state.fl = fopen("dump.mbox", "at");
+  if(!state.fl) {
+    fprintf(stderr, "Cannot open dump.mbox for writing\n");
+  } else {
+    res= dump_mbox(argv[0], argv[1], dumpfile_cb, &state);
+    fclose(state.fl);
+  }
+  return res;
+}
+
+struct DumpdirState {
+  const char *dst_directory;
+  int error;
+};
+
+static void
+dumpdir_cb(unsigned seqno, const char *buf, size_t buflen, void *arg)
+{
+  struct DumpdirState *dds = (struct DumpdirState*)arg;
+  FILE *f;
+  char num[16];
+  char *fname;
+
+  g_snprintf(num, sizeof(num), "%u", seqno);
+  fname = g_build_filename(dds->dst_directory, num, NULL);
+  f = fopen(fname, "wt");
+  if(!f) {
+    fprintf(stderr, "Cannot open %s for writing.\n", fname);
+    dds->error = 1;
+  } else {
+    if( fwrite(buf, 1, buflen, f) != buflen) {
+      if(!dds->error) {
+	fprintf(stderr, "Cannot write %lu bytes to %s.\n",
+		(unsigned long)buflen, fname);
+	dds->error = 1;
+      }
+    }
+    fclose(f);
+  }
+  g_free(fname);
+}
+
+/** Tests whether specified mailbox can be dumped to a directory. */
+static int
+test_mbox_dumpdir(int argc, char *argv[])
+{
+  struct DumpdirState state;
+  struct stat buf;
+  if(argc<3) {
+    fprintf(stderr, "dumpdir HOST MAILBOX DST_DIRECTORY\n");
+    return 1;
+  }
+  state.dst_directory = argv[2];
+  if(stat(state.dst_directory, &buf) != 0) {
+    fprintf(stderr, "Cannot stat %s\n", state.dst_directory);
+    return 1;
+  }
+  if(!S_ISDIR(buf.st_mode)) {
+    fprintf(stderr, "%s is not a directory\n", state.dst_directory);
+    return 1;
+  }
+
+  return dump_mbox(argv[0], argv[1], dumpdir_cb, &state);
+}
+
+struct MsgIterator {
+  const char *src_dir;
+  DIR *dir;
+  FILE *fh;
+};
+
+static size_t
+msg_iterator(char* buffer, size_t buffer_size, ImapAppendMultiStage stage,
+	     ImapMsgFlags *flags, void *arg)
+{
+  struct MsgIterator *mi = (struct MsgIterator*)arg;
+  struct stat buf;
+  size_t msg_size;
+  struct dirent *file;
+
+  switch(stage) {
+  case IMA_STAGE_NEW_MSG:
+    *flags = 0;
+    if(mi->fh) {
+      fclose(mi->fh);
+      mi->fh = NULL;
+    }
+    
+    for(msg_size = 0;
+	msg_size == 0 &&
+	(file = readdir(mi->dir)) != NULL;) {
+      gchar *file_name = g_build_filename(mi->src_dir, file->d_name, NULL);
+
+      if(stat(file_name, &buf) == 0) {
+	if(S_ISREG(buf.st_mode)) {
+	  mi->fh = fopen(file_name, "rb");
+	  
+	  if(mi->fh) /* Ready to read! */
+	    msg_size = buf.st_size;
+	}
+      }
+      g_free(file_name);
+    }
+    return msg_size;
+    break;
+
+  case IMA_STAGE_PASS_DATA:
+    return fread(buffer, 1, buffer_size, mi->fh);
+  }
+
+  g_assert_not_reached();
+  return 0;
+}
+    
+
+static size_t
+pass_file(char* buffer, size_t buffer_size, void* arg)
+{
+  FILE *f = (FILE*)arg;
+  return fread(buffer, 1, buffer_size, f);
+}
+
+/** Tests whether specified set of messages can be appended to given
+    mailbox.
+ */
+static int
+test_mbox_append_common(gboolean multi, int argc, char *argv[])
+{
+  const char *host, *mailbox, *src_dir;
+  ImapMboxHandle *h;
+  DIR *dir;
+  struct dirent *file;
+  ImapResponse res;
+
+  if(argc<3) {
+    fprintf(stderr, "dumpdir HOST MAILBOX SRC_DIRECTORY\n");
+    return 1;
+  }
+  host = argv[0];
+  mailbox = argv[1];
+  src_dir = argv[2];
+
+  dir = opendir(src_dir);
+  if(!dir) {
+    fprintf(stderr, "Cannot open directory %s for reading: %s\n", src_dir,
+	    strerror(errno));
+    return 1;
+  }
+  h = imap_mbox_handle_new();
+  imap_handle_set_tls_mode(h, IMAP_TLS_DISABLED);
+
+  if(TestContext.monitor)
+    imap_handle_set_monitorcb(h, monitor_cb, NULL);
+
+  imap_handle_set_usercb(h, user_cb, NULL);
+  if(imap_mbox_handle_connect(h, host, FALSE) != IMAP_SUCCESS) {
+    fprintf(stderr, "Connection to %s failed.\n", host);
+    return 1;
+  }
+
+  imap_mbox_create(h, mailbox); /* Ignore the result. */
+  
+  /* Now, keep appending... */
+  if(multi) {
+    struct MsgIterator mi;
+
+    mi.src_dir = src_dir;
+    mi.dir = dir;
+    mi.fh = NULL;
+    res = imap_mbox_append_multi(h, mailbox, msg_iterator, &mi);
+
+  } else {
+    for(res = IMR_OK; res == IMR_OK && (file = readdir(dir)) != NULL;) {
+      struct stat buf;
+      char *file_name = g_build_filename(src_dir, file->d_name, NULL);
+
+      if(stat(file_name, &buf) == 0) {
+	if(S_ISREG(buf.st_mode)) {
+	  FILE *fh = fopen(file_name, "rb");
+
+	  if(fh) {
+	    printf("Processing file %s of size %lu\n", file_name,
+		   (unsigned long)buf.st_size);
+	    res = imap_mbox_append(h, mailbox, 0, buf.st_size, pass_file, fh);
+	    fclose(fh);
+	  } else 
+	    printf("Cannot open %s for reading: %s\n", file_name,
+		   strerror(errno));
+	}
+      } else
+	printf("Cannot stat %s: %s\n", file_name, strerror(errno));
+
+      g_free(file_name);
+    }
+    closedir(dir);
+  }
+
+  g_object_unref(h);
+  return 0;
+}
+
+/** Tests appending message by message. */
+static int
+test_mbox_append(int argc, char *argv[])
+{
+  return test_mbox_append_common(FALSE, argc, argv);
+}
+
+/** Tests appending using the MULTIAPPEND interface. */
+static int
+test_mbox_append_multi(int argc, char *argv[])
+{
+  return test_mbox_append_common(TRUE, argc, argv);
+}
+
+static unsigned
+process_options(int argc, char *argv[])
+{
+  int first_arg;
+  for(first_arg = 1; first_arg<argc; first_arg++) {
+    if( strcmp(argv[first_arg], "-u") == 0 &&
+	first_arg+1 < argc) {
+      TestContext.user = argv[++first_arg];
+    } else if( strcmp(argv[first_arg], "-p") == 0 &&
+	       first_arg+1 < argc) {
+      TestContext.password = argv[++first_arg];
+    } else if( strcmp(argv[first_arg], "-m") == 0) {
+      TestContext.monitor = TRUE;
+    } else {
+      break; /* break the loop - non-option encountered. */
+    }
+  }
+  return first_arg;
+}
+
+int
+main(int argc, char *argv[]) {
   g_type_init();
 
-  test_envelope_strings();
-  test_body_strings();
-  if(argc>2) {
-    test_mbox_dump(argv[1], argv[2]);
+  if(argc<=1) {
+    test_envelope_strings();
+    test_body_strings();
   } else {
-    printf("Call as \"imap_tst host mailbox\" to dump messages from given mailbox.\n");
+    static const struct {
+      int (*func)(int argc, char *argv[]);
+      const char *cmd;
+      const char *help;
+    } cmds[] = {
+      { test_mbox_dumpfile, "dump", "HOST MAILBOX (dumps to dump.mbox)" },
+      { test_mbox_dumpdir, "dumpdir", "HOST MAILBOX DST_DIRECTORY" },
+      { test_mbox_append, "append", "HOST MAILBOX SRC_DIRECTORY" },
+      { test_mbox_append_multi, "multi", "HOST MAILBOX SRC_DIRECTORY" }
+    };
+    unsigned i;
+    int first_arg = process_options(argc, argv);
+    for(i=0; i<sizeof(cmds)/sizeof(cmds[0]); i++) {
+      if(strcmp(argv[first_arg], cmds[i].cmd) == 0) {
+	return cmds[i].func(argc-first_arg-1, argv+first_arg+1);
+      }
+    }
+    fprintf(stderr, "Unknown command '%s'. Known commands:\n",
+	    argv[first_arg]);
+    for(i=0; i<sizeof(cmds)/sizeof(cmds[0]); i++)
+      fprintf(stderr, "%s %s\n", cmds[i].cmd, cmds[i].help);
+    return 1;
   }
 
   return 0;

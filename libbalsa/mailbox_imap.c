@@ -2234,7 +2234,7 @@ get_section_for(LibBalsaMessage *msg, LibBalsaMessageBody *part)
 }
 struct part_data { char *block; unsigned pos; ImapBody *body; };
 static void
-append_str(unsigned seqno, const char *buf, int buflen, void *arg)
+append_str(unsigned seqno, const char *buf, size_t buflen, void *arg)
 {
     struct part_data *dt = (struct part_data*)arg;
 

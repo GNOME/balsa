@@ -56,28 +56,29 @@ typedef char ImapCmdTag[7]; /* Imap command tag */
 typedef enum
 {
   IMCAP_IMAP4 = 0,
-  IMCAP_IMAP4REV1,
+  IMCAP_IMAP4REV1,              /* RFC 3501: Internet Message Access Protocol */
   IMCAP_STATUS,
-  IMCAP_ACL,			/* RFC 2086: IMAP4 ACL extension */
-  IMCAP_NAMESPACE,              /* RFC 2342: IMAP4 Namespace */
   IMCAP_AANONYMOUS, 	        /* RFC 2245: AUTH=ANONYMOUS */
   IMCAP_ACRAM_MD5,		/* RFC 2195: CRAM-MD5 authentication */
   IMCAP_AGSSAPI,		/* RFC 1731: GSSAPI authentication */
   IMCAP_APLAIN,                 /* RFC 2595: */
+  IMCAP_ACL,			/* RFC 2086: IMAP4 ACL extension */
+  IMCAP_BINARY,                 /* RFC 3516 */
+  IMCAP_CHILDREN,               /* RFC 3348 */
+  IMCAP_ESEARCH,                /* RFC 4731 */
+  IMCAP_IDLE,                   /* RFC 2177 */
+  IMCAP_LITERAL,                /* RFC 2088 */
+  IMCAP_LOGINDISABLED,		/* RFC 2595 */
+  IMCAP_MULTIAPPEND,            /* RFC 3502 */
+  IMCAP_NAMESPACE,              /* RFC 2342: IMAP4 Namespace */
+  IMCAP_SASLIR,                 /* imap-sasl-initial-response: SASL-IR */
+  IMCAP_SCAN,                   /* FIXME: RFC? */
   IMCAP_STARTTLS,		/* RFC 2595: STARTTLS */
-  IMCAP_LOGINDISABLED,		/*           LOGINDISABLED */
   IMCAP_SORT,                   /* SORT and THREAD described at: */
-  /* http://www.ietf.org/internet-drafts/draft-ietf-imapext-sort-13.txt */
   IMCAP_THREAD_ORDEREDSUBJECT,
   IMCAP_THREAD_REFERENCES,
-  IMCAP_UNSELECT,               /* FIXME: RFC? */
-  IMCAP_SCAN,                   /* FIXME: RFC? */
-  IMCAP_CHILDREN,               /* RFC 3348 */
-  IMCAP_LITERAL,                /* RFC 2088 */
-  IMCAP_IDLE,                   /* RFC 2177 */
-  IMCAP_SASLIR,                 /* imap-sasl-initial-response: SASL-IR */
-  IMCAP_BINARY,                 /* RFC 3516 */
-  IMCAP_ESEARCH,                /* RFC 4731 */
+  /* http://www.ietf.org/internet-drafts/draft-ietf-imapext-sort-13.txt */
+  IMCAP_UNSELECT,               /* RFC 3691 */
   IMCAP_FETCHBODY,              /* basic imap implemented correctly by
                                  * most imap servers but not all. We
                                  * have to detect that. */

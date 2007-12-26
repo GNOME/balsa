@@ -1,3 +1,10 @@
+2007-12-27  Pawel Salek
+
+	* libbalsa/mailbox_imap.c: buflen is of size_t type.
+	* libbalsa/imap/imap-handle.[hc]: register MULTIAPPEND extension
+	* libbalsa/imap/imap-commands.[hc]: add MULTIAPPEND aware interface.
+	* libbalsa/imap/imap_tst.c: test it.
+
 2007-12-25  Pawel Salek
 
 	* NEWS, configure.in: release balsa-2.3.22.

@@ -440,69 +440,167 @@ enum_flag_to_str(ImapMsgFlags flg)
   return g_string_free(flags_str, FALSE);
 }
 
+struct SingleAppendData {
+  ImapAppendFunc cb;
+  void *cb_data;
+  size_t size;
+  ImapMsgFlags flags;
+};
+
+static size_t
+single_append_cb(char *buf, size_t buf_sz, ImapAppendMultiStage stage,
+		 ImapMsgFlags *f, void *arg)
+{
+  struct SingleAppendData *sad = (struct SingleAppendData*)arg;
+  size_t sz;
+  switch(stage) {
+  case IMA_STAGE_NEW_MSG:
+    *f = sad->flags; 
+    sz = sad->size; sad->size = 0;
+    return sz;
+  case IMA_STAGE_PASS_DATA:
+    return sad->cb(buf, buf_sz, sad->cb_data);
+  }
+  g_assert_not_reached();
+  return 0;
+}
+ 
 ImapResponse
 imap_mbox_append(ImapMboxHandle *handle, const char *mbox,
                  ImapMsgFlags flags, size_t sz,
                  ImapAppendFunc dump_cb, void *arg)
 {
+  struct SingleAppendData sad = { dump_cb, arg, sz, flags };
   IMAP_REQUIRED_STATE2(handle,IMHS_AUTHENTICATED, IMHS_SELECTED, IMR_BAD);
-  {
-  int use_literal = imap_mbox_handle_can_do(handle, IMCAP_LITERAL);
+  return imap_mbox_append_multi(handle, mbox, single_append_cb, &sad);
+}
+
+/** Appends multiple messages at once, using MULTIAPPEND extension if
+    available.
+    @param handle the IMAP connection.
+
+    @param mbox the UTF-8 encoded mailbox name the messages are to be
+    appended to.
+
+    @param dump_cb function providing the data. It is called first
+    once for each message with IMA_STAGE_NEW_MSG stage parameter to
+    get the message size and message flags. Size zero indicates last
+    message. Next, it is called several times with IMA_STAGE_PASS_DATA
+    stage parameter to actually get the message data.
+
+    @param cb_arg the context passed to dump_cb.
+ */
+ImapResponse
+imap_mbox_append_multi(ImapMboxHandle *handle,
+		       const char *mbox,
+		       ImapAppendMultiFunc dump_cb,
+		       void* cb_arg)
+{
+  int use_literal, use_multiappend;
   unsigned cmdno;
-  ImapResponse rc;
-  gchar *mbx7 = imap_utf8_to_mailbox(mbox);
-  gchar *cmd;
-  char *litstr = use_literal ? "+" : "";
-  char buf[8192];
-  size_t s, delta;
-  int c;
+  ImapResponse rc = IMR_OK;
+  char *litstr;
+  char buf[16384];
+  size_t s, msg_size, delta;
+  int c, msg_cnt;
+  ImapMsgFlags flags;
+
+  IMAP_REQUIRED_STATE2(handle,IMHS_AUTHENTICATED, IMHS_SELECTED, IMR_BAD);
+
+  use_literal = imap_mbox_handle_can_do(handle, IMCAP_LITERAL);
+  use_multiappend = imap_mbox_handle_can_do(handle, IMCAP_MULTIAPPEND);
+  litstr = use_literal ? "+" : "";
 
   imap_handle_idle_disable(handle);
-  if(flags) {
-    gchar *str = enum_flag_to_str(flags);
-    cmd = g_strdup_printf("APPEND \"%s\" (%s) {%u%s}", mbx7, str,
-                          (unsigned)sz, litstr);
-    g_free(str);
-  } else 
-    cmd = g_strdup_printf("APPEND \"%s\" {%u%s}", mbx7, (unsigned)sz, litstr);
+  for(msg_cnt=0;
+      (msg_size = dump_cb(buf, sizeof(buf),
+			  IMA_STAGE_NEW_MSG, &flags, cb_arg)) >0;
+      msg_cnt++) {
 
-  c = imap_cmd_start(handle, cmd, &cmdno);
-  g_free(mbx7); g_free(cmd);
-  if (c<0) /* irrecoverable connection error. */
-    return IMR_SEVERED;
-  if(use_literal)
-    rc = IMR_RESPOND; /* we do it without flushing */
-  else {
+    if (handle->state == IMHS_DISCONNECTED)
+      return IMR_SEVERED;
+  
+    if(msg_cnt == 0 || !use_multiappend) {
+      gchar *cmd;
+      gchar *mbx7 = imap_utf8_to_mailbox(mbox);
+      if(flags) {
+	gchar *str = enum_flag_to_str(flags);
+	cmd = g_strdup_printf("APPEND \"%s\" (%s) {%lu%s}",
+			      mbx7, str, (unsigned long)msg_size, litstr);
+	g_free(str);
+      } else 
+	cmd = g_strdup_printf("APPEND \"%s\" {%lu%s}",
+			      mbx7, (unsigned long)msg_size, litstr);
+      c = imap_cmd_start(handle, cmd, &cmdno);
+      g_free(mbx7); g_free(cmd);
+
+      if (c<0) /* irrecoverable connection error. */
+	return IMR_SEVERED;
+
+    } else {
+      /* MULTIAPPEND continuation */
+      if(flags) {
+	gchar *str = enum_flag_to_str(flags);
+	sio_printf(handle->sio, " (%s) {%lu%s}\r\n", str,
+		   (unsigned long)msg_size, litstr);
+	g_free(str);
+      } else 
+	sio_printf(handle->sio, " {%lu%s}\r\n",
+		   (unsigned long)msg_size, litstr);
+    }
+
+    if(use_literal)
+      rc = IMR_RESPOND; /* we do it without flushing */
+    else {
+      sio_flush(handle->sio);
+      do {
+	rc = imap_cmd_step (handle, cmdno);
+      } while (rc == IMR_UNTAGGED);
+      if(rc != IMR_RESPOND) return rc;
+      while( (c=sio_getc(handle->sio)) != -1 && c != '\n');
+      if(c == -1) {
+	imap_handle_disconnect(handle);
+	return IMR_SEVERED;
+      }
+    }
+
+    for(s=0; s<msg_size; s+= delta) {
+      delta = dump_cb(buf, sizeof(buf), IMA_STAGE_PASS_DATA, NULL, cb_arg);
+      if(s+delta>msg_size) delta = msg_size-s;
+      sio_write(handle->sio, buf, delta);
+    }
+  
+
+    if(!use_multiappend) { /* Grab the response. */
+      /* Data written, tie up the message.  It has been though
+       * observed that "Cyrus IMAP4 v2.0.16-p1 server" can hang if the
+       * flush isn't done under following conditions: a). TLS is
+       * enabled, b). message contains NUL characters.  NUL characters
+       * are forbidden (RFC3501, sect. 4.3.1) and we probably should
+       * make sure on a higher level that they are not sent.
+       */
+      /* sio_flush(handle->sio); */
+      sio_write(handle->sio, "\r\n", 2);
+      sio_flush(handle->sio);
+      do {
+	rc = imap_cmd_step (handle, cmdno);
+      } while (rc == IMR_UNTAGGED);
+      if(rc != IMR_OK)
+	return rc;
+    }
+    /* And move to the next message... */
+  }
+
+  if(use_multiappend) { /* We get the server response here... */
+    sio_write(handle->sio, "\r\n", 2);
     sio_flush(handle->sio);
     do {
       rc = imap_cmd_step (handle, cmdno);
     } while (rc == IMR_UNTAGGED);
-    if(rc != IMR_RESPOND) return rc;
-    while( (c=sio_getc(handle->sio)) != -1 && c != '\n');
-  } 
-
-  for(s=0; s<sz; s+= delta) {
-    delta = dump_cb(buf, sizeof(buf), arg);
-    if(s+delta>sz) delta = sz-s;
-    sio_write(handle->sio, buf, delta);
   }
-  
-  /* It has been though observed that "Cyrus IMAP4 v2.0.16-p1
-   * server" can hang if the flush isn't done under following conditions:
-   * a). TLS is enabled, b). message contains NUL characters.  NUL
-   * characters are forbidden (RFC3501, sect. 4.3.1) and we probably
-   * should make sure on a higher level that they are not sent.
-   */
-  /* sio_flush(handle->sio); */
-  sio_write(handle->sio, "\r\n", 2);
-  sio_flush(handle->sio);
-  do {
-    rc = imap_cmd_step (handle, cmdno);
-  } while (rc == IMR_UNTAGGED);
 
   imap_handle_idle_enable(handle, 30);
   return rc;
-  }
 }
 
 #ifdef USE_IMAP_APPEND_STR	/* not used currently */
@@ -913,16 +1011,17 @@ imap_mbox_handle_fetch_set(ImapMboxHandle* handle,
 }
 
 static void
-write_nstring(unsigned seqno, const char *str, int len, void *fl)
+write_nstring(unsigned seqno, const char *str, size_t len, void *fl)
 {
-  if (fwrite(str, 1, len, (FILE*)fl) != (size_t) len)
+  if (fwrite(str, 1, len, (FILE*)fl) != len)
     perror("write_nstring");
 }
 
 ImapResponse
 imap_mbox_handle_fetch_rfc822(ImapMboxHandle* handle,
 			      unsigned cnt, unsigned *set,
-                              FILE *fl)
+			      ImapFetchBodyCb fetch_cb,
+			      void *fetch_cb_data)
 {
   ImapResponse rc = IMR_OK;
   gchar *seq;
@@ -936,8 +1035,8 @@ imap_mbox_handle_fetch_rfc822(ImapMboxHandle* handle,
     ImapFetchBodyCb cb = handle->body_cb;
     void          *arg = handle->body_arg;
     gchar *cmd = g_strdup_printf("FETCH %s RFC822", seq);
-    handle->body_cb  = write_nstring;
-    handle->body_arg = fl;
+    handle->body_cb  = fetch_cb;
+    handle->body_arg = fetch_cb_data;
     rc = imap_cmd_exec(handle, cmd);
     handle->body_cb  = cb;
     handle->body_arg = arg;
@@ -981,7 +1080,7 @@ struct ImapBinaryData {
 
 static void
 imap_binary_handler(unsigned seqno, const char *buf,
-                    int buflen, void* arg)
+                    size_t buflen, void* arg)
 {
   struct ImapBinaryData *ibd = (struct ImapBinaryData*)arg;
   if(ibd->first_run) {
@@ -1620,7 +1719,7 @@ need_msgid(unsigned seqno, GPtrArray* msgids)
 }
 
 static void
-msgid_cb(unsigned seqno, const char *buf, int buflen, void* arg)
+msgid_cb(unsigned seqno, const char *buf, size_t buflen, void* arg)
 {
   GPtrArray *arr = (GPtrArray*)arg;
   g_return_if_fail(seqno>=1 && seqno<=arr->len);

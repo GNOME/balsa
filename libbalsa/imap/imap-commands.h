@@ -59,6 +59,19 @@ typedef size_t (*ImapAppendFunc)(char*, size_t, void*);
 ImapResponse imap_mbox_append(ImapMboxHandle *handle, const char *mbox,
                               ImapMsgFlags flags, size_t sz, 
                               ImapAppendFunc dump_cb,  void* arg);
+
+typedef enum {
+  IMA_STAGE_NEW_MSG,
+  IMA_STAGE_PASS_DATA
+} ImapAppendMultiStage;
+
+typedef size_t (*ImapAppendMultiFunc)(char*, size_t,
+				      ImapAppendMultiStage stage,
+				      ImapMsgFlags *flags, void*);
+ImapResponse imap_mbox_append_multi(ImapMboxHandle *handle,
+				    const char *mbox,
+				    ImapAppendMultiFunc dump_cb,
+				    void* arg);
 #ifdef USE_IMAP_APPEND_STR /* not used currently */
 ImapResponse imap_mbox_append_str(ImapMboxHandle *handle, const char *mbox,
                               ImapMsgFlags flags, size_t sz, char *txt);
@@ -96,13 +109,17 @@ ImapResponse imap_mbox_handle_fetch_set(ImapMboxHandle* handle,
                                         unsigned *set, unsigned cnt,
                                         ImapFetchType ift);
 
+typedef void (*ImapFetchBodyCb)(unsigned seqno, const char *buf,
+				size_t buflen, void* arg);
+
 ImapResponse imap_mbox_handle_fetch_rfc822(ImapMboxHandle* handle,
 					   unsigned cnt, unsigned *seqno, 
-                                           FILE *fl);
+                                           ImapFetchBodyCb cb,
+					   void *cb_data);
+
 ImapResponse imap_mbox_handle_fetch_rfc822_uid(ImapMboxHandle* handle,
                                                unsigned uid, FILE *fl);
-typedef void (*ImapFetchBodyCb)(unsigned seqno, const char *buf,
-				int buflen, void* arg);
+
 ImapResponse imap_mbox_handle_fetch_body(ImapMboxHandle* handle, 
                                          unsigned seqno, 
                                          const char *section,

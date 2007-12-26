@@ -20,8 +20,11 @@
 struct {
   char *user;
   char *password;
+  ImapTlsMode tls_mode;
+  gboolean over_ssl;
   gboolean monitor;
-} TestContext = { NULL, NULL, FALSE };
+  
+} TestContext = { NULL, NULL, IMAP_TLS_ENABLED, FALSE, FALSE };
 
 static void
 monitor_cb(const char *buffer, int length, int direction, void *arg)
@@ -244,13 +247,13 @@ dump_mbox(const char *host, const char *mailbox,
 
   h = imap_mbox_handle_new();
 
-  imap_handle_set_tls_mode(h, IMAP_TLS_DISABLED);
+  imap_handle_set_tls_mode(h, TestContext.tls_mode);
 
   if(TestContext.monitor)
     imap_handle_set_monitorcb(h, monitor_cb, NULL);
 
   imap_handle_set_usercb(h,    user_cb, NULL);
-  if(imap_mbox_handle_connect(h, host, FALSE) != IMAP_SUCCESS) {
+  if(imap_mbox_handle_connect(h, host, TestContext.over_ssl) != IMAP_SUCCESS) {
     fprintf(stderr, "Connection to %s failed.\n", host);
     return 1;
   }
@@ -457,13 +460,13 @@ test_mbox_append_common(gboolean multi, int argc, char *argv[])
     return 1;
   }
   h = imap_mbox_handle_new();
-  imap_handle_set_tls_mode(h, IMAP_TLS_DISABLED);
+  imap_handle_set_tls_mode(h, TestContext.tls_mode);
 
   if(TestContext.monitor)
     imap_handle_set_monitorcb(h, monitor_cb, NULL);
 
   imap_handle_set_usercb(h, user_cb, NULL);
-  if(imap_mbox_handle_connect(h, host, FALSE) != IMAP_SUCCESS) {
+  if(imap_mbox_handle_connect(h, host, TestContext.over_ssl) != IMAP_SUCCESS) {
     fprintf(stderr, "Connection to %s failed.\n", host);
     return 1;
   }
@@ -489,8 +492,6 @@ test_mbox_append_common(gboolean multi, int argc, char *argv[])
 	  FILE *fh = fopen(file_name, "rb");
 
 	  if(fh) {
-	    printf("Processing file %s of size %lu\n", file_name,
-		   (unsigned long)buf.st_size);
 	    res = imap_mbox_append(h, mailbox, 0, buf.st_size, pass_file, fh);
 	    fclose(fh);
 	  } else 
@@ -523,6 +524,37 @@ test_mbox_append_multi(int argc, char *argv[])
   return test_mbox_append_common(TRUE, argc, argv);
 }
 
+/** Tests appending using the MULTIAPPEND interface. */
+static int
+test_mbox_delete(int argc, char *argv[])
+{
+  ImapResponse rc;
+  ImapMboxHandle *h;
+
+  if(argc<1) {
+    fprintf(stderr, "delete HOST MAILBOX\n");
+    return 1;
+  }
+
+  h = imap_mbox_handle_new();
+  imap_handle_set_tls_mode(h, TestContext.tls_mode);
+
+  if(TestContext.monitor)
+    imap_handle_set_monitorcb(h, monitor_cb, NULL);
+
+  imap_handle_set_usercb(h, user_cb, NULL);
+  if(imap_mbox_handle_connect(h, argv[0],
+			      TestContext.over_ssl) != IMAP_SUCCESS) {
+    fprintf(stderr, "Connection to %s failed.\n", argv[0]);
+    return 1;
+  }
+
+  rc = imap_mbox_delete(h, argv[1]);
+  g_object_unref(h);
+
+  return rc == IMR_OK ? 0 : 1;
+}
+
 static unsigned
 process_options(int argc, char *argv[])
 {
@@ -536,6 +568,12 @@ process_options(int argc, char *argv[])
       TestContext.password = argv[++first_arg];
     } else if( strcmp(argv[first_arg], "-m") == 0) {
       TestContext.monitor = TRUE;
+    } else if( strcmp(argv[first_arg], "-T") == 0) {
+      TestContext.tls_mode = IMAP_TLS_REQUIRED;
+    } else if( strcmp(argv[first_arg], "-t") == 0) {
+      TestContext.tls_mode = IMAP_TLS_DISABLED;
+    } else if( strcmp(argv[first_arg], "-s") == 0) {
+      TestContext.over_ssl = TRUE;
     } else {
       break; /* break the loop - non-option encountered. */
     }
@@ -559,7 +597,8 @@ main(int argc, char *argv[]) {
       { test_mbox_dumpfile, "dump", "HOST MAILBOX (dumps to dump.mbox)" },
       { test_mbox_dumpdir, "dumpdir", "HOST MAILBOX DST_DIRECTORY" },
       { test_mbox_append, "append", "HOST MAILBOX SRC_DIRECTORY" },
-      { test_mbox_append_multi, "multi", "HOST MAILBOX SRC_DIRECTORY" }
+      { test_mbox_append_multi, "multi", "HOST MAILBOX SRC_DIRECTORY" },
+      { test_mbox_delete, "delete", "HOST MAILBOX" }
     };
     unsigned i;
     int first_arg = process_options(argc, argv);

@@ -146,11 +146,10 @@ static gboolean libbalsa_mailbox_imap_get_msg_part(LibBalsaMessage *msg,
 static GArray *libbalsa_mailbox_imap_duplicate_msgnos(LibBalsaMailbox *
 						      mailbox);
 
-static gboolean libbalsa_mailbox_imap_add_message(LibBalsaMailbox *
-                                                  mailbox,
-                                                  GMimeStream * stream,
-                                                  LibBalsaMessageFlag
-                                                  flags, GError ** err);
+static guint libbalsa_mailbox_imap_add_messages(LibBalsaMailbox *mailbox,
+						LibBalsaAddMessageIterator mi,
+						void *mi_arg,
+						GError ** err);
 
 static gboolean lbm_imap_messages_change_flags(LibBalsaMailbox * mailbox,
                                                GArray * seqno,
@@ -270,7 +269,7 @@ libbalsa_mailbox_imap_class_init(LibBalsaMailboxImapClass * klass)
 	libbalsa_mailbox_imap_get_message_stream;
     libbalsa_mailbox_class->duplicate_msgnos =
         libbalsa_mailbox_imap_duplicate_msgnos;
-    libbalsa_mailbox_class->add_message = libbalsa_mailbox_imap_add_message;
+    libbalsa_mailbox_class->add_messages = libbalsa_mailbox_imap_add_messages;
     libbalsa_mailbox_class->messages_change_flags =
 	lbm_imap_messages_change_flags;
     libbalsa_mailbox_class->msgno_has_flags =
@@ -402,7 +401,7 @@ get_header_cache_path(LibBalsaMailboxImap *mimap)
 {
     LibBalsaServer *s = LIBBALSA_MAILBOX_REMOTE(mimap)->server;
     gchar *cache_dir = get_cache_dir(TRUE); /* FIXME */
-    gchar *header_file = g_strdup_printf("%s@%s-%s-%u-headers",
+    gchar *header_file = g_strdup_printf("%s@%s-%s-%u-headers2",
 					 s->user, s->host,
 					 (mimap->path ? mimap->path : "INBOX"),
 					 mimap->uid_validity);
@@ -2541,85 +2540,228 @@ libbalsa_mailbox_imap_duplicate_msgnos(LibBalsaMailbox *mailbox)
     return res;
 }
 
-/* libbalsa_mailbox_imap_add_message: 
-   can be called for a closed mailbox.
-   Called with mailbox locked.
+/** Adds given set of messages to given imap mailbox. 
+    Method can be called on a closed mailbox.
+    Called with mailbox locked.
 */
-static gboolean
-libbalsa_mailbox_imap_add_message(LibBalsaMailbox * mailbox,
-                                  GMimeStream * stream,
-                                  LibBalsaMessageFlag flags, GError ** err)
+#if 0
+static guint
+libbalsa_mailbox_imap_add_messages(LibBalsaMailbox * mailbox,
+				   LibBalsaAddMessageIterator msg_iterator,
+				   void *arg, GError ** err)
 {
     LibBalsaMailboxImap *mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
-    ImapMsgFlags imap_flags = IMAP_FLAGS_EMPTY;
-    ImapResponse rc;
-    GMimeStream *tmpstream;
-    GMimeFilter *crlffilter;
-    ImapMboxHandle *handle;
-    gint outfd;
-    gchar *outfile;
-    GMimeStream *outstream;
-    gssize len;
+    LibBalsaMessageFlag flags;
+    GMimeStream *stream;
+    unsigned successfully_copied = 0;
 
-    if (!(flags & LIBBALSA_MESSAGE_FLAG_NEW))
-        IMSG_FLAG_SET(imap_flags, IMSGF_SEEN);
-    if (flags & LIBBALSA_MESSAGE_FLAG_DELETED)
-        IMSG_FLAG_SET(imap_flags, IMSGF_DELETED);
-    if (flags & LIBBALSA_MESSAGE_FLAG_FLAGGED)
-        IMSG_FLAG_SET(imap_flags, IMSGF_FLAGGED);
-    if (flags & LIBBALSA_MESSAGE_FLAG_REPLIED)
-        IMSG_FLAG_SET(imap_flags, IMSGF_ANSWERED);
+    while( msg_iterator(&flags, &stream, arg) ) {
+	ImapMsgFlags imap_flags = IMAP_FLAGS_EMPTY;
+	ImapResponse rc;
+	GMimeStream *tmpstream;
+	GMimeFilter *crlffilter;
+	ImapMboxHandle *handle;
+	gint outfd;
+	gchar *outfile;
+	GMimeStream *outstream;
+	gssize len;
 
-    tmpstream = g_mime_stream_filter_new_with_stream(stream);
+	if (!(flags & LIBBALSA_MESSAGE_FLAG_NEW))
+	    IMSG_FLAG_SET(imap_flags, IMSGF_SEEN);
+	if (flags & LIBBALSA_MESSAGE_FLAG_DELETED)
+	    IMSG_FLAG_SET(imap_flags, IMSGF_DELETED);
+	if (flags & LIBBALSA_MESSAGE_FLAG_FLAGGED)
+	    IMSG_FLAG_SET(imap_flags, IMSGF_FLAGGED);
+	if (flags & LIBBALSA_MESSAGE_FLAG_REPLIED)
+	    IMSG_FLAG_SET(imap_flags, IMSGF_ANSWERED);
 
-    crlffilter =
-        g_mime_filter_crlf_new(GMIME_FILTER_CRLF_ENCODE,
-                               GMIME_FILTER_CRLF_MODE_CRLF_ONLY);
-    g_mime_stream_filter_add(GMIME_STREAM_FILTER(tmpstream), crlffilter);
-    g_object_unref(crlffilter);
+	tmpstream = g_mime_stream_filter_new_with_stream(stream);
 
-    outfd = g_file_open_tmp("balsa-tmp-file-XXXXXX", &outfile, err);
-    if (outfd < 0) {
-        g_warning("Could not create temporary file: %s", (*err)->message);
-        g_object_unref(tmpstream);
-        return FALSE;
+	crlffilter =
+	    g_mime_filter_crlf_new(GMIME_FILTER_CRLF_ENCODE,
+				   GMIME_FILTER_CRLF_MODE_CRLF_ONLY);
+	g_mime_stream_filter_add(GMIME_STREAM_FILTER(tmpstream), crlffilter);
+	g_object_unref(crlffilter);
+
+	outfd = g_file_open_tmp("balsa-tmp-file-XXXXXX", &outfile, err);
+	if (outfd < 0) {
+	    g_warning("Could not create temporary file: %s", (*err)->message);
+	    g_object_unref(tmpstream);
+	    g_object_unref(stream);
+	    return successfully_copied;
+	}
+
+	handle = libbalsa_mailbox_imap_get_handle(mimap, err);
+	if (!handle)
+	    /* Perhaps the mailbox was closed and the authentication
+	       failed or was cancelled? err is set already, we just
+	       return. */
+	    return successfully_copied;
+
+	outstream = g_mime_stream_fs_new(outfd);
+	libbalsa_mime_stream_shared_lock(stream);
+	g_mime_stream_write_to_stream(tmpstream, outstream);
+	libbalsa_mime_stream_shared_unlock(stream);
+	g_object_unref(tmpstream);
+	g_object_unref(stream);
+
+	len = g_mime_stream_tell(outstream);
+	g_mime_stream_reset(outstream);
+
+	if (len > (signed) SizeMsgThreshold)
+	    libbalsa_information(LIBBALSA_INFORMATION_MESSAGE,
+				 _("Uploading %ld kB"), (long) len / 1024);
+	rc = imap_mbox_append_stream(handle, mimap->path,
+				     imap_flags, outstream, len);
+	if (rc != IMR_OK) {
+	    gchar *msg = imap_mbox_handle_get_last_msg(handle);
+	    g_set_error(err, LIBBALSA_MAILBOX_ERROR,
+			LIBBALSA_MAILBOX_APPEND_ERROR, "%s", msg);
+	    g_free(msg);
+	}
+	libbalsa_mailbox_imap_release_handle(mimap);
+
+	g_object_unref(outstream);
+	unlink(outfile);
+	g_free(outfile);
+
+	if(rc != IMR_OK)
+	    return successfully_copied;
+
+	successfully_copied++;
     }
-
-    outstream = g_mime_stream_fs_new(outfd);
-    libbalsa_mime_stream_shared_lock(stream);
-    g_mime_stream_write_to_stream(tmpstream, outstream);
-    libbalsa_mime_stream_shared_unlock(stream);
-    g_object_unref(tmpstream);
-
-    len = g_mime_stream_tell(outstream);
-    g_mime_stream_reset(outstream);
-
-    handle = libbalsa_mailbox_imap_get_handle(mimap, err);
-    if (!handle)
-        /* Perhaps the mailbox was closed and the authentication
-           failed or was cancelled? err is set already, we just
-           return. */
-        return FALSE;
-
-    if (len > (signed) SizeMsgThreshold)
-        libbalsa_information(LIBBALSA_INFORMATION_MESSAGE,
-                             _("Uploading %ld kB"), (long) len / 1024);
-    rc = imap_mbox_append_stream(handle, mimap->path,
-                                 imap_flags, outstream, len);
-    if (rc != IMR_OK) {
-        gchar *msg = imap_mbox_handle_get_last_msg(mimap->handle);
-        g_set_error(err, LIBBALSA_MAILBOX_ERROR,
-                    LIBBALSA_MAILBOX_APPEND_ERROR, "%s", msg);
-        g_free(msg);
-    }
-    libbalsa_mailbox_imap_release_handle(mimap);
-
-    g_object_unref(outstream);
-    unlink(outfile);
-    g_free(outfile);
-
-    return rc == IMR_OK;
+    return successfully_copied;
 }
+#else
+
+struct MultiAppendCbData {
+    LibBalsaAddMessageIterator msg_iterator;
+    void *iterator_data;
+    GMimeStream *outstream;
+    gchar *outfile;
+    GError **err;
+    guint copied;
+};
+
+static void
+macd_clear(struct MultiAppendCbData *macd)
+{
+    if(macd->outstream) {
+	g_object_unref(macd->outstream);
+	macd->outstream = NULL;
+	unlink(macd->outfile);
+	g_free(macd->outfile);
+    }
+}
+
+static size_t
+multi_append_cb(char * buf, size_t buflen,
+		ImapAppendMultiStage stage,
+		ImapMsgFlags *return_flags, void *arg)
+{
+    struct MultiAppendCbData *macd = (struct MultiAppendCbData*)arg;
+
+    switch(stage) {
+    case IMA_STAGE_NEW_MSG: {
+	ImapMsgFlags imap_flags = IMAP_FLAGS_EMPTY;
+	GMimeStream *tmpstream;
+	GMimeFilter *crlffilter;
+	gint outfd;
+	GMimeStream *stream = NULL;
+	gssize len;
+	LibBalsaMessageFlag flags;
+	GError**err = macd->err;
+
+	macd_clear(macd);
+
+	while( macd->msg_iterator(&flags, &stream, macd->iterator_data) &&
+	       !stream)
+	    ;
+
+	if(!stream) /* No more messages to append! */
+	    return 0;
+
+	if (!(flags & LIBBALSA_MESSAGE_FLAG_NEW))
+	    IMSG_FLAG_SET(imap_flags, IMSGF_SEEN);
+	if (flags & LIBBALSA_MESSAGE_FLAG_DELETED)
+	    IMSG_FLAG_SET(imap_flags, IMSGF_DELETED);
+	if (flags & LIBBALSA_MESSAGE_FLAG_FLAGGED)
+	    IMSG_FLAG_SET(imap_flags, IMSGF_FLAGGED);
+	if (flags & LIBBALSA_MESSAGE_FLAG_REPLIED)
+	    IMSG_FLAG_SET(imap_flags, IMSGF_ANSWERED);
+
+	tmpstream = g_mime_stream_filter_new_with_stream(stream);
+
+	crlffilter =
+	    g_mime_filter_crlf_new(GMIME_FILTER_CRLF_ENCODE,
+				   GMIME_FILTER_CRLF_MODE_CRLF_ONLY);
+	g_mime_stream_filter_add(GMIME_STREAM_FILTER(tmpstream), crlffilter);
+	g_object_unref(crlffilter);
+
+	outfd = g_file_open_tmp("balsa-tmp-file-XXXXXX", &macd->outfile, err);
+	if (outfd < 0) {
+	    g_warning("Could not create temporary file: %s", (*err)->message);
+	    g_object_unref(tmpstream);
+	    g_object_unref(stream);
+	    return 0;
+	}
+
+	macd->outstream = g_mime_stream_fs_new(outfd);
+	libbalsa_mime_stream_shared_lock(stream);
+	g_mime_stream_write_to_stream(tmpstream, macd->outstream);
+	libbalsa_mime_stream_shared_unlock(stream);
+	g_object_unref(tmpstream);
+	g_object_unref(stream);
+
+	len = g_mime_stream_tell(macd->outstream);
+	g_mime_stream_reset(macd->outstream);
+
+	if (len > (signed) SizeMsgThreshold)
+	    libbalsa_information(LIBBALSA_INFORMATION_MESSAGE,
+				 _("Uploading %ld kB"), (long) len / 1024);
+
+	*return_flags = imap_flags;
+	macd->copied++;
+	return g_mime_stream_length(macd->outstream);
+    }
+	break;
+    case IMA_STAGE_PASS_DATA:
+	return g_mime_stream_read(macd->outstream, buf, buflen);
+    }
+    g_assert_not_reached();
+    return 0;
+}
+
+static guint
+libbalsa_mailbox_imap_add_messages(LibBalsaMailbox * mailbox,
+				   LibBalsaAddMessageIterator msg_iterator,
+				   void *arg, GError ** err)
+{
+    LibBalsaMailboxImap *mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
+    ImapMboxHandle *handle = libbalsa_mailbox_imap_get_handle(mimap, err);
+    struct MultiAppendCbData macd;
+    ImapResponse rc;
+
+    if (!handle) {
+	/* Perhaps the mailbox was closed and the authentication
+	   failed or was cancelled? err is set already, we just
+	   return. */
+	return 0;
+    }
+
+    macd.msg_iterator = msg_iterator;
+    macd.iterator_data = arg;
+    macd.outstream = NULL;
+    macd.outfile = NULL;
+    macd.err = err;
+    macd.copied = 0;
+    rc = imap_mbox_append_multi(handle,	mimap->path,
+				multi_append_cb, &macd);
+    libbalsa_mailbox_imap_release_handle(mimap);
+    macd_clear(&macd);
+    return rc == IMR_OK ? macd.copied : 0;
+}
+#endif
 
 static void
 transform_flags(LibBalsaMessageFlag set, LibBalsaMessageFlag clr,
@@ -3000,7 +3142,9 @@ imap_cache_manager_new(guint cnt)
 static struct ImapCacheManager*
 imap_cache_manager_new_from_file(const char *header_cache_path)
 {
-    unsigned i;
+    /* The cache data should be transferable between 32- and 64-bit
+       systems. */
+    uint32_t i;
     ImapUID uid;
     struct ImapCacheManager *icm;
     FILE *f = fopen(header_cache_path, "rb");
@@ -3024,7 +3168,7 @@ imap_cache_manager_new_from_file(const char *header_cache_path)
     i = 0;
     while(fread(&uid, sizeof(uid), 1, f) == 1) {
 	if(uid) {
-	    size_t slen;
+	    uint32_t slen; /* Architecture-independent size */
 	    gchar *s;
 	    if(fread(&slen, sizeof(slen), 1, f) != 1)
 		break;
@@ -3160,7 +3304,7 @@ icm_save_header(uint32_t uid, gpointer value, FILE *f)
 {
     if(fwrite(&uid, sizeof(uid), 1, f) != 1) return FALSE;
     if(uid) {
-	size_t slen = imap_serialized_message_size(value);
+	uint32_t slen = imap_serialized_message_size(value);
 	if(fwrite(&slen, sizeof(slen), 1, f) != 1 ||
            fwrite(value, 1, slen, f) != slen)
             return FALSE;
@@ -3177,7 +3321,7 @@ icm_save_to_file(struct ImapCacheManager *icm, const gchar *file_name)
 
     success = f != NULL;
     if(success) {
-	unsigned i = icm->uidmap->len;
+	uint32_t i = icm->uidmap->len;
 	if(fwrite(&i, sizeof(i), 1, f) != 1                       ||
            fwrite(&icm->uidvalidity, sizeof(uint32_t), 1, f) != 1 ||
            fwrite(&icm->uidnext,     sizeof(uint32_t), 1, f) != 1 ||

@@ -1,3 +1,17 @@
+2007-12-30  Pawel Salek
+
+	* libbalsa/mailbox.h: add ability to add multiple messages at
+	once: replace add_message with add_messages.
+
+	* libbalsa/mailbox.c: libbalsa_mailbox_add_message uses
+	add_messages handler now.
+	
+	* libbalsa/mailbox_{mh,maildir,mbox}.c: simple implementations.
+	* libbalsa/mailbox_imap.c: MULTIAPPEND-aware add_messages.
+	* libbalsa/imap/imap_tst.c: add anonymous authentication support.
+	* libbalsa/imap/imap-commands.c: add handle locking around 
+	imap_mbox_append_multi() and transaction size limits.
+
 2007-12-27  Pawel Salek
 
 	* libbalsa/mailbox_imap.c: buflen is of size_t type.

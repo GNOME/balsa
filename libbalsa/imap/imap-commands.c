@@ -474,36 +474,22 @@ imap_mbox_append(ImapMboxHandle *handle, const char *mbox,
   IMAP_REQUIRED_STATE2(handle,IMHS_AUTHENTICATED, IMHS_SELECTED, IMR_BAD);
   return imap_mbox_append_multi(handle, mbox, single_append_cb, &sad);
 }
-
-/** Appends multiple messages at once, using MULTIAPPEND extension if
-    available.
-    @param handle the IMAP connection.
-
-    @param mbox the UTF-8 encoded mailbox name the messages are to be
-    appended to.
-
-    @param dump_cb function providing the data. It is called first
-    once for each message with IMA_STAGE_NEW_MSG stage parameter to
-    get the message size and message flags. Size zero indicates last
-    message. Next, it is called several times with IMA_STAGE_PASS_DATA
-    stage parameter to actually get the message data.
-
-    @param cb_arg the context passed to dump_cb.
- */
-ImapResponse
-imap_mbox_append_multi(ImapMboxHandle *handle,
-		       const char *mbox,
-		       ImapAppendMultiFunc dump_cb,
-		       void* cb_arg)
+static ImapResponse
+imap_mbox_append_multi_real(ImapMboxHandle *handle,
+			    const char *mbox,
+			    ImapAppendMultiFunc dump_cb,
+			    void* cb_arg)
 {
+  static const unsigned TRANSACTION_SIZE = 10*1024*1024;
   int use_literal, use_multiappend;
   unsigned cmdno;
   ImapResponse rc = IMR_OK;
   char *litstr;
   char buf[16384];
-  size_t s, msg_size, delta;
+  size_t s, msg_size, delta, current_transaction_size = 0;
   int c, msg_cnt;
   ImapMsgFlags flags;
+  gboolean new_append = TRUE;
 
   IMAP_REQUIRED_STATE2(handle,IMHS_AUTHENTICATED, IMHS_SELECTED, IMR_BAD);
 
@@ -520,9 +506,10 @@ imap_mbox_append_multi(ImapMboxHandle *handle,
     if (handle->state == IMHS_DISCONNECTED)
       return IMR_SEVERED;
   
-    if(msg_cnt == 0 || !use_multiappend) {
+    if(new_append || !use_multiappend) {
       gchar *cmd;
       gchar *mbx7 = imap_utf8_to_mailbox(mbox);
+      new_append = FALSE;
       if(flags) {
 	gchar *str = enum_flag_to_str(flags);
 	cmd = g_strdup_printf("APPEND \"%s\" (%s) {%lu%s}",
@@ -570,8 +557,12 @@ imap_mbox_append_multi(ImapMboxHandle *handle,
       sio_write(handle->sio, buf, delta);
     }
   
-
-    if(!use_multiappend) { /* Grab the response. */
+    current_transaction_size += msg_size;
+    if(current_transaction_size > TRANSACTION_SIZE) {
+      current_transaction_size = 0;
+      new_append = TRUE;
+    }
+    if(new_append || !use_multiappend) { /* Grab the response. */
       /* Data written, tie up the message.  It has been though
        * observed that "Cyrus IMAP4 v2.0.16-p1 server" can hang if the
        * flush isn't done under following conditions: a). TLS is
@@ -591,7 +582,7 @@ imap_mbox_append_multi(ImapMboxHandle *handle,
     /* And move to the next message... */
   }
 
-  if(use_multiappend) { /* We get the server response here... */
+  if(!new_append && use_multiappend) { /* We get the server response here... */
     sio_write(handle->sio, "\r\n", 2);
     sio_flush(handle->sio);
     do {
@@ -600,6 +591,35 @@ imap_mbox_append_multi(ImapMboxHandle *handle,
   }
 
   imap_handle_idle_enable(handle, 30);
+  return rc;
+}
+
+
+/** Appends multiple messages at once, using MULTIAPPEND extension if
+    available.
+    @param handle the IMAP connection.
+
+    @param mbox the UTF-8 encoded mailbox name the messages are to be
+    appended to.
+
+    @param dump_cb function providing the data. It is called first
+    once for each message with IMA_STAGE_NEW_MSG stage parameter to
+    get the message size and message flags. Size zero indicates last
+    message. Next, it is called several times with IMA_STAGE_PASS_DATA
+    stage parameter to actually get the message data.
+
+    @param cb_arg the context passed to dump_cb.
+ */
+ImapResponse
+imap_mbox_append_multi(ImapMboxHandle *handle,
+		       const char *mbox,
+		       ImapAppendMultiFunc dump_cb,
+		       void* cb_arg)
+{
+  ImapResponse rc;
+  HANDLE_LOCK(handle);
+  rc = imap_mbox_append_multi_real(handle, mbox, dump_cb, cb_arg);
+  HANDLE_UNLOCK(handle);
   return rc;
 }
 

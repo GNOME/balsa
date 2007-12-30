@@ -259,6 +259,13 @@ struct _LibBalsaMailboxSearchIter {
     gpointer user_data;		/* private backend info */
 };
 
+/** Iterates over a list of messages, returning each time it is called
+    flags and the stream to a message. It is the responsibility of the
+    called to un-ref the stream after use. */
+typedef gboolean (*LibBalsaAddMessageIterator)(LibBalsaMessageFlag *,
+					       GMimeStream **stream,
+					       void *);
+
 struct _LibBalsaMailboxClass {
     GObjectClass parent_class;
 
@@ -297,9 +304,9 @@ struct _LibBalsaMailboxClass {
     void (*save_config) (LibBalsaMailbox * mailbox, const gchar * prefix);
     void (*load_config) (LibBalsaMailbox * mailbox, const gchar * prefix);
     gboolean (*sync) (LibBalsaMailbox * mailbox, gboolean expunge);
-    gboolean (*add_message) (LibBalsaMailbox * mailbox,
-                             GMimeStream * stream,
-                             LibBalsaMessageFlag flags, GError ** err);
+    guint (*add_messages) (LibBalsaMailbox * mailbox,
+			   LibBalsaAddMessageIterator msg_iterator,
+			   void *iter_arg, GError ** err);
     gboolean (*messages_change_flags) (LibBalsaMailbox * mailbox,
 				       GArray *msgnos,
 				       LibBalsaMessageFlag set,
@@ -449,6 +456,12 @@ gboolean libbalsa_mailbox_add_message(LibBalsaMailbox * mailbox,
                                       GMimeStream * stream,
                                       LibBalsaMessageFlag flags,
                                       GError ** err);
+
+guint libbalsa_mailbox_add_messages(LibBalsaMailbox * mailbox,
+				    LibBalsaAddMessageIterator msg_iterator,
+				    void *arg,
+				    GError ** err);
+
 gboolean libbalsa_mailbox_close_backend(LibBalsaMailbox * mailbox);
 
 /* Message number-list methods */

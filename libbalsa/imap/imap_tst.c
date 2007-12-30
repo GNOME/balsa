@@ -23,8 +23,8 @@ struct {
   ImapTlsMode tls_mode;
   gboolean over_ssl;
   gboolean monitor;
-  
-} TestContext = { NULL, NULL, IMAP_TLS_ENABLED, FALSE, FALSE };
+  gboolean anonymous;
+} TestContext = { NULL, NULL, IMAP_TLS_ENABLED, FALSE, FALSE, FALSE };
 
 static void
 monitor_cb(const char *buffer, int length, int direction, void *arg)
@@ -140,6 +140,26 @@ user_cb(ImapUserEventType ue, void *arg, ...)
     va_end(alist);
 }
 
+static ImapMboxHandle*
+get_handle(const char *host)
+{
+  ImapMboxHandle *h = imap_mbox_handle_new();
+
+  imap_handle_set_tls_mode(h, TestContext.tls_mode);
+  if(TestContext.anonymous)
+    imap_handle_set_option(h, IMAP_OPT_ANONYMOUS, TRUE);
+
+  if(TestContext.monitor)
+    imap_handle_set_monitorcb(h, monitor_cb, NULL);
+
+  imap_handle_set_usercb(h, user_cb, NULL);
+  if(imap_mbox_handle_connect(h, host, TestContext.over_ssl) != IMAP_SUCCESS) {
+    g_object_unref(h);
+    return NULL;
+  }
+  return h;
+}
+
 /* =================================================================== 
    Test routines.
 */
@@ -245,15 +265,8 @@ dump_mbox(const char *host, const char *mailbox,
   gboolean read_only;
   ImapMboxHandle *h;
 
-  h = imap_mbox_handle_new();
-
-  imap_handle_set_tls_mode(h, TestContext.tls_mode);
-
-  if(TestContext.monitor)
-    imap_handle_set_monitorcb(h, monitor_cb, NULL);
-
-  imap_handle_set_usercb(h,    user_cb, NULL);
-  if(imap_mbox_handle_connect(h, host, TestContext.over_ssl) != IMAP_SUCCESS) {
+  h = get_handle(host);
+  if(!h) {
     fprintf(stderr, "Connection to %s failed.\n", host);
     return 1;
   }
@@ -459,14 +472,9 @@ test_mbox_append_common(gboolean multi, int argc, char *argv[])
 	    strerror(errno));
     return 1;
   }
-  h = imap_mbox_handle_new();
-  imap_handle_set_tls_mode(h, TestContext.tls_mode);
 
-  if(TestContext.monitor)
-    imap_handle_set_monitorcb(h, monitor_cb, NULL);
-
-  imap_handle_set_usercb(h, user_cb, NULL);
-  if(imap_mbox_handle_connect(h, host, TestContext.over_ssl) != IMAP_SUCCESS) {
+  h = get_handle(host);
+  if(!h) {
     fprintf(stderr, "Connection to %s failed.\n", host);
     return 1;
   }
@@ -536,15 +544,8 @@ test_mbox_delete(int argc, char *argv[])
     return 1;
   }
 
-  h = imap_mbox_handle_new();
-  imap_handle_set_tls_mode(h, TestContext.tls_mode);
-
-  if(TestContext.monitor)
-    imap_handle_set_monitorcb(h, monitor_cb, NULL);
-
-  imap_handle_set_usercb(h, user_cb, NULL);
-  if(imap_mbox_handle_connect(h, argv[0],
-			      TestContext.over_ssl) != IMAP_SUCCESS) {
+  h = get_handle(argv[0]);
+  if(!h) {
     fprintf(stderr, "Connection to %s failed.\n", argv[0]);
     return 1;
   }
@@ -574,6 +575,8 @@ process_options(int argc, char *argv[])
       TestContext.tls_mode = IMAP_TLS_DISABLED;
     } else if( strcmp(argv[first_arg], "-s") == 0) {
       TestContext.over_ssl = TRUE;
+    }  else if( strcmp(argv[first_arg], "-a") == 0) {
+      TestContext.anonymous = TRUE;
     } else {
       break; /* break the loop - non-option encountered. */
     }

@@ -869,6 +869,64 @@ libbalsa_mailbox_real_release_message(LibBalsaMailbox * mailbox,
     }
 }
 
+struct MsgCopyData {
+    LibBalsaMailbox *src_mailbox;
+    GArray *msgnos;
+    GMimeStream *stream;
+    guint current_idx;
+    guint copied_cnt;
+    LibBalsaProgress progress;
+};
+
+static gboolean
+copy_iterator(LibBalsaMessageFlag *flags, GMimeStream **stream, void * arg)
+{
+    struct MsgCopyData *mcd = (struct MsgCopyData*)arg;
+    guint msgno;
+    gboolean (*msgno_has_flags)(LibBalsaMailbox *, guint,
+				LibBalsaMessageFlag, LibBalsaMessageFlag);
+    LibBalsaMailbox *mailbox = mcd->src_mailbox;
+	
+    if(mcd->current_idx >= mcd->msgnos->len)
+	return FALSE; /* no more messages */
+	
+    if(mcd->stream) {
+	g_object_unref(mcd->stream);
+	mcd->stream = NULL;
+    }
+    msgno_has_flags = LIBBALSA_MAILBOX_GET_CLASS(mailbox)->msgno_has_flags;
+    msgno = g_array_index(mcd->msgnos, guint, mcd->current_idx);
+
+    libbalsa_progress_set_fraction(&mcd->progress, 
+				   ((gdouble) (mcd->current_idx + 1)) /
+				   ((gdouble) mcd->msgnos->len));
+    mcd->current_idx++;
+    
+    *flags = 0;
+    /* Copy flags. */
+    if (msgno_has_flags(mailbox, msgno, LIBBALSA_MESSAGE_FLAG_NEW, 0))
+	*flags |= LIBBALSA_MESSAGE_FLAG_NEW;
+    if (msgno_has_flags
+	(mailbox, msgno, LIBBALSA_MESSAGE_FLAG_REPLIED, 0))
+	*flags |= LIBBALSA_MESSAGE_FLAG_REPLIED;
+    if (msgno_has_flags
+	(mailbox, msgno, LIBBALSA_MESSAGE_FLAG_FLAGGED, 0))
+	*flags |= LIBBALSA_MESSAGE_FLAG_FLAGGED;
+    if (msgno_has_flags
+	(mailbox, msgno, LIBBALSA_MESSAGE_FLAG_DELETED, 0))
+	*flags |= LIBBALSA_MESSAGE_FLAG_DELETED;
+
+    /* Copy stream */
+    *stream = libbalsa_mailbox_get_message_stream(mailbox, msgno);
+    if(!*stream) {
+	printf("Connection broken for message %u\n",
+	       (unsigned)msgno);
+	return FALSE;
+    }
+
+    return TRUE;
+}
+
 /* Default method; imap backend replaces with its own method, optimized
  * for server-side copy, but falls back to this one if it's not a
  * server-side copy. */
@@ -879,14 +937,8 @@ libbalsa_mailbox_real_messages_copy(LibBalsaMailbox * mailbox,
                                     LibBalsaMailbox * dest, GError ** err)
 {
     gchar *text;
-    LibBalsaProgress progress = LIBBALSA_PROGRESS_INIT;
-    gboolean retval = TRUE;
-    gboolean any = FALSE;
-    guint i;
-    gboolean (*msgno_has_flags)(LibBalsaMailbox *, guint,
-                                LibBalsaMessageFlag, LibBalsaMessageFlag);
-    gboolean (*add_message)(LibBalsaMailbox *, GMimeStream *,
-                            LibBalsaMessageFlag, GError **);
+    guint successfully_copied;
+    struct MsgCopyData mcd;
 
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(dest), FALSE);
@@ -894,50 +946,30 @@ libbalsa_mailbox_real_messages_copy(LibBalsaMailbox * mailbox,
 
     text = g_strdup_printf(_("Copying from %s to %s"), mailbox->name,
                            dest->name);
-    libbalsa_progress_set_text(&progress, text, msgnos->len);
+    mcd.progress = LIBBALSA_PROGRESS_INIT;
+    libbalsa_progress_set_text(&mcd.progress, text, msgnos->len);
     g_free(text);
 
-    msgno_has_flags = LIBBALSA_MAILBOX_GET_CLASS(mailbox)->msgno_has_flags;
-    add_message     = LIBBALSA_MAILBOX_GET_CLASS(dest)->add_message;
+    mcd.src_mailbox = mailbox;
+    mcd.msgnos = msgnos;
+    mcd.stream = NULL;
+    mcd.current_idx = 0;
+    mcd.copied_cnt = 0;
+    successfully_copied =
+	LIBBALSA_MAILBOX_GET_CLASS(dest)->add_messages(dest,
+						       copy_iterator,
+						       &mcd,
+						       err);
+    if(mcd.stream)
+	g_object_unref(mcd.stream);
 
-    for (i = 0; i < msgnos->len; i++) {
-        guint msgno = g_array_index(msgnos, guint, i);
-        LibBalsaMessageFlag flags = 0;
-        GMimeStream *stream =
-            libbalsa_mailbox_get_message_stream(mailbox, msgno);
+    libbalsa_progress_set_text(&mcd.progress, NULL, 0);
 
-        /* Copy flags. */
-        if (msgno_has_flags(mailbox, msgno, LIBBALSA_MESSAGE_FLAG_NEW, 0))
-            flags |= LIBBALSA_MESSAGE_FLAG_NEW;
-        if (msgno_has_flags
-            (mailbox, msgno, LIBBALSA_MESSAGE_FLAG_REPLIED, 0))
-            flags |= LIBBALSA_MESSAGE_FLAG_REPLIED;
-        if (msgno_has_flags
-            (mailbox, msgno, LIBBALSA_MESSAGE_FLAG_FLAGGED, 0))
-            flags |= LIBBALSA_MESSAGE_FLAG_FLAGGED;
-        if (msgno_has_flags
-            (mailbox, msgno, LIBBALSA_MESSAGE_FLAG_DELETED, 0))
-            flags |= LIBBALSA_MESSAGE_FLAG_DELETED;
-
-        if (add_message(dest, stream, flags, err)) {
-            if (flags & LIBBALSA_MESSAGE_FLAG_NEW)
-                libbalsa_mailbox_set_unread_messages_flag(dest, TRUE);
-            any = TRUE;
-        } else
-            retval = FALSE;
-
-        g_object_unref(stream);
-        libbalsa_progress_set_fraction(&progress, ((gdouble) (i + 1)) /
-                                       ((gdouble) msgnos->len));
-    }
-
-    libbalsa_progress_set_text(&progress, NULL, 0);
-
-    if (any)
+    if (successfully_copied)
         /* Some messages copied. */
         lbm_queue_check(dest);
 
-    return retval;
+    return successfully_copied == msgnos->len;
 }
 
 static gint mbox_compare_func(const SortTuple * a,
@@ -1596,25 +1628,80 @@ libbalsa_mailbox_msgno_find(LibBalsaMailbox * mailbox, guint seqno,
     return TRUE;
 }
 
+struct AddMessageData {
+    GMimeStream *stream;
+    LibBalsaMessageFlag flags;
+    gboolean processed;
+};
+
+static gboolean
+msg_iterator(LibBalsaMessageFlag *flg, GMimeStream **stream, void *arg)
+{
+    struct AddMessageData * amd = (struct AddMessageData*)arg;
+    gboolean res = !amd->processed;
+    amd->processed = TRUE;
+    *flg = amd->flags;
+    *stream = amd->stream;
+ /* Make sure ::add_messages does not destroy the stream. */
+    g_object_ref(amd->stream);
+    return res;
+}
+
 gboolean
 libbalsa_mailbox_add_message(LibBalsaMailbox * mailbox,
                              GMimeStream * stream,
                              LibBalsaMessageFlag flags, GError ** err)
 {
-    gboolean retval;
+    guint retval;
+    struct AddMessageData amd;
+    g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
+
+    libbalsa_lock_mailbox(mailbox);
+
+    amd.stream = stream;
+    amd.flags  = flags;
+    amd.processed = FALSE;
+    retval =
+        LIBBALSA_MAILBOX_GET_CLASS(mailbox)->add_messages(mailbox, 
+							  msg_iterator, &amd,
+							  err);
+    if (retval) {
+        if (!(flags & LIBBALSA_MESSAGE_FLAG_DELETED)
+            && (flags & LIBBALSA_MESSAGE_FLAG_NEW))
+            libbalsa_mailbox_set_unread_messages_flag(mailbox, TRUE);
+        lbm_queue_check(mailbox);
+    }
+
+    libbalsa_unlock_mailbox(mailbox);
+
+    return retval;
+}
+
+guint
+libbalsa_mailbox_add_messages(LibBalsaMailbox * mailbox,
+			      LibBalsaAddMessageIterator msg_iterator,
+			      void *arg,
+			      GError ** err)
+{
+    guint retval;
 
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
 
     libbalsa_lock_mailbox(mailbox);
 
     retval =
-        LIBBALSA_MAILBOX_GET_CLASS(mailbox)->add_message(mailbox, stream,
-                                                         flags, err);
+        LIBBALSA_MAILBOX_GET_CLASS(mailbox)->add_messages(mailbox, 
+							  msg_iterator, arg,
+							  err);
 
     if (retval) {
+#ifdef FIXED
+	/* this is something that should be returned/taken care of by
+	   add_messages? */
         if (!(flags & LIBBALSA_MESSAGE_FLAG_DELETED)
             && (flags & LIBBALSA_MESSAGE_FLAG_NEW))
             libbalsa_mailbox_set_unread_messages_flag(mailbox, TRUE);
+#endif
         lbm_queue_check(mailbox);
     }
 

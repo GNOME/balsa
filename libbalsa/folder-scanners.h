@@ -23,7 +23,7 @@
 #define __FOLDER_SCANNERS_H__
 
 typedef gboolean LocalCheck(const gchar * fn, guint depth);
-typedef void LocalMark(gpointer node);
+typedef gboolean LocalMark(gpointer node);
 typedef gpointer LocalHandler(gpointer root, const char *d_name,
 			      const char *fn, GType type);
 

@@ -361,10 +361,13 @@ check_local_path(const gchar * path, guint depth)
     return cpi.must_scan;
 }
 
-static void
+static gboolean
 mark_local_path(BalsaMailboxNode *mbnode)
 {
+    if (mbnode->scanned)
+        return FALSE;
     mbnode->scanned = TRUE;
+    return TRUE;
 }
 
 /** Read local directory in search for mailboxes. Never does any

@@ -1,3 +1,12 @@
+2007-12-31  Peter Bloomfield
+
+	* src/mailbox-node.c: (mark_local_path): change from void to
+	gboolean, with FALSE indicating that node->scanned is already
+	set.
+	* libbalsa/folder-scanners.c: (libbalsa_scanner_mdir,
+	libbalsa_scanner_local_dir_helper): use return value.
+	* libbalsa/folder-scanners.h: new definition of LocalMark.
+
 2007-12-30  Pawel Salek
 
 	* libbalsa/mailbox.h: add ability to add multiple messages at

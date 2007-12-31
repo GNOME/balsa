@@ -65,10 +65,9 @@ libbalsa_scanner_mdir(gpointer rnode, const gchar * prefix,
     struct stat st;
     gpointer parent_node = NULL;
 
-    if (!check_local_path(prefix, *depth))
+    if (!check_local_path(prefix, *depth)
+        || !mark_local_path(rnode))
         return;
-
-    mark_local_path(rnode);
 
     dpc = opendir(prefix);
     if (!dpc)
@@ -124,10 +123,9 @@ libbalsa_scanner_local_dir_helper(gpointer rnode, const gchar * prefix,
     GType mailbox_type;
     gpointer current_node;
 
-    if (!check_local_path(prefix, *depth))
+    if (!check_local_path(prefix, *depth)
+        || !mark_local_path(rnode))
         return;
-
-    mark_local_path(rnode);
 
     dpc = opendir(prefix);
     if (!dpc)

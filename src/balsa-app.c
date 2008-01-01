@@ -885,3 +885,33 @@ balsa_find_index_by_mailbox(LibBalsaMailbox * mailbox)
     /* didn't find a matching mailbox */
     return NULL;
 }
+
+#if GLIB_CHECK_VERSION(2, 14, 0)
+GRegex *
+balsa_quote_regex_new(void)
+{
+    static GRegex *regex  = NULL;
+    static gchar  *string = NULL;
+
+    if (string && strcmp(string, balsa_app.quote_regex) != 0) {
+        g_free(string);
+        string = NULL;
+        g_regex_unref(regex);
+        regex = NULL;
+    }
+
+    if (!regex) {
+        GError *err = NULL;
+
+        regex = g_regex_new(balsa_app.quote_regex, 0, 0, &err);
+        if (err) {
+            g_warning("quote regex compilation failed: %s", err->message);
+            g_error_free(err);
+            return NULL;
+        }
+        string = g_strdup(balsa_app.quote_regex);
+    }
+
+    return g_regex_ref(regex);
+}
+#endif                          /* GLIB_CHECK_VERSION(2, 14, 0) */

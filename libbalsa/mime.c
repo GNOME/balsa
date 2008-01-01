@@ -670,7 +670,11 @@ is_in_url(GtkTextIter * iter, gint offset, GtkTextTag * url_tag)
 static gboolean prescanner(const gchar * p);
 static void mark_urls(GtkTextBuffer * buffer, GtkTextIter * iter,
                       GtkTextTag * tag, const gchar * p);
+#if GLIB_CHECK_VERSION(2, 14, 0)
+static GRegex *get_url_reg(void);
+#else                           /* GLIB_CHECK_VERSION(2, 14, 0) */
 static regex_t *get_url_reg(void);
+#endif                          /* GLIB_CHECK_VERSION(2, 14, 0) */
 
 void
 libbalsa_unwrap_buffer(GtkTextBuffer * buffer, GtkTextIter * iter,
@@ -778,6 +782,29 @@ mark_urls(GtkTextBuffer * buffer, GtkTextIter * iter, GtkTextTag * tag,
           const gchar * line)
 {
     const gchar *p = line;
+#if GLIB_CHECK_VERSION(2, 14, 0)
+    GRegex *url_reg = get_url_reg();
+    GMatchInfo *url_match;
+    GtkTextIter start = *iter;
+    GtkTextIter end = *iter;
+
+    while (g_regex_match(url_reg, p, 0, &url_match)) {
+        gint start_pos, end_pos;
+
+        if (g_match_info_fetch_pos(url_match, 0, &start_pos, &end_pos)) {
+            glong offset = g_utf8_pointer_to_offset(line, p + start_pos);
+            gtk_text_iter_set_line_offset(&start, offset);
+            offset = g_utf8_pointer_to_offset(line, p + end_pos);
+            gtk_text_iter_set_line_offset(&end, offset);
+            gtk_text_buffer_apply_tag(buffer, tag, &start, &end);
+
+            p += end_pos;
+        }
+        g_match_info_free(url_match);
+        if (!prescanner(p))
+            break;
+    }
+#else                           /* GLIB_CHECK_VERSION(2, 14, 0) */
     regex_t *url_reg = get_url_reg();
     regmatch_t url_match;
     GtkTextIter start = *iter;
@@ -794,6 +821,7 @@ mark_urls(GtkTextBuffer * buffer, GtkTextIter * iter, GtkTextTag * tag,
         if (!prescanner(p))
             break;
     }
+#endif                          /* GLIB_CHECK_VERSION(2, 14, 0) */
 }
 
 /* Prepare the buffer for sending with DelSp=Yes. */
@@ -868,6 +896,70 @@ prescanner(const gchar * s)
     return FALSE;
 }
 
+#if GLIB_CHECK_VERSION(2, 14, 0)
+struct url_regex_info {
+    GRegex *url_reg;
+    const gchar *str;
+    const gchar *func;
+    const gchar *msg;
+};
+
+static GRegex *
+get_url_helper(struct url_regex_info *info)
+{
+    if (!info->url_reg) {
+        GError *err = NULL;
+
+        info->url_reg = g_regex_new(info->str, G_REGEX_CASELESS, 0, &err);
+        if (err) {
+            g_warning("%s %s: %s", info->func, info->msg, err->message);
+            g_error_free(err);
+        }
+    }
+
+    return info->url_reg;
+}
+
+static GRegex *
+get_url_reg(void)
+{
+    static struct url_regex_info info = {
+        NULL,
+        "(((https?|ftps?|nntp)://)|(mailto:|news:))"
+            "(%[0-9A-F]{2}|[-_.!~*';/?:@&=+$,#[:alnum:]])+",
+        __func__,
+        "url regex compilation failed"
+    };
+
+    return get_url_helper(&info);
+}
+
+static GRegex *
+get_ml_url_reg(void)
+{
+    static struct url_regex_info info = {
+        NULL,
+        "(%[0-9A-F]{2}|[-_.!~*';/?:@&=+$,#[:alnum:]]|[ \t]*[\r\n]+[ \t]*)+>",
+        __func__,
+        "multiline url regex compilation failed"
+    };
+
+    return get_url_helper(&info);
+}
+
+static GRegex *
+get_ml_flowed_url_reg(void)
+{
+    static struct url_regex_info info = {
+        NULL,
+        "(%[0-9A-F]{2}|[-_.!~*';/?:@&=+$,#[:alnum:]]|[ \t]+)+>",
+        __func__,
+        "multiline url regex compilation failed"
+    };
+
+    return get_url_helper(&info);
+}
+#else                           /* GLIB_CHECK_VERSION(2, 14, 0) */
 static regex_t *
 get_url_reg(void)
 {
@@ -925,6 +1017,7 @@ get_ml_flowed_url_reg(void)
     
     return url_reg;
 }
+#endif                          /* GLIB_CHECK_VERSION(2, 14, 0) */
 
 gboolean
 libbalsa_insert_with_url(GtkTextBuffer * buffer,
@@ -975,43 +1068,95 @@ libbalsa_insert_with_url(GtkTextBuffer * buffer,
 
 	if (prescanner(p)) {
 	    gint offset = 0;
+#if GLIB_CHECK_VERSION(2, 14, 0)
+            GRegex *url_reg = get_url_reg();
+            GMatchInfo *url_match;
+            gboolean match = g_regex_match(url_reg, p, 0, &url_match);
+#else                           /* GLIB_CHECK_VERSION(2, 14, 0) */
 	    regex_t *url_reg = get_url_reg();
 	    regmatch_t url_match;
-	    gint match = regexec(url_reg, p, 1, &url_match, 0);
+	    gboolean match = regexec(url_reg, p, 1, &url_match, 0) == 0;
+#endif                          /* GLIB_CHECK_VERSION(2, 14, 0) */
 
-	    while (!match) {
+	    while (match) {
 		gchar *buf;
 		gchar *spc;
+                gint start_pos, end_pos;
 
-		if (url_match.rm_so) {
+#if GLIB_CHECK_VERSION(2, 14, 0)
+                if (!g_match_info_fetch_pos(url_match, 0, &start_pos, &end_pos))
+                    break;
+#else                           /* GLIB_CHECK_VERSION(2, 14, 0) */
+                start_pos = url_match.rm_so;
+                end_pos   = url_match.rm_eo;
+#endif                          /* GLIB_CHECK_VERSION(2, 14, 0) */
+
+		if (start_pos > 0) {
 		    /* check if we hit a multi-line URL... (see RFC 1738) */
-		    if (all_p && (p[url_match.rm_so - 1] == '<' ||
-				  (url_match.rm_so > 4 &&
-				   !g_ascii_strncasecmp(p + url_match.rm_so - 5, "<URL:", 5)))) {
+		    if (all_p && (p[start_pos - 1] == '<' ||
+				  (start_pos > 4 &&
+				   !g_ascii_strncasecmp(p + start_pos - 5, "<URL:", 5)))) {
 			/* if the input is flowed, we will see a space at
 			 * url_match.rm_eo - in this case the complete remainder
 			 * of the ml uri should be in the passed buffer... */
 			if (url_info && url_info->buffer_is_flowed &&
-			    *(p + url_match.rm_eo) == ' ') {
+			    *(p + end_pos) == ' ') {
+#if GLIB_CHECK_VERSION(2, 14, 0)
+                            GRegex *ml_flowed_url_reg = get_ml_flowed_url_reg();
+                            GMatchInfo *ml_url_match;
+                            gint ml_start_pos, ml_end_pos;
+
+                            if (g_regex_match(ml_flowed_url_reg,
+                                              all_chars + offset + end_pos,
+                                              0, &ml_url_match)
+                                && g_match_info_fetch_pos(ml_url_match, 0,
+                                                          &ml_start_pos,
+                                                          &ml_end_pos)
+                                && ml_start_pos == 0)
+                                end_pos += ml_end_pos - 1;
+#else                           /* GLIB_CHECK_VERSION(2, 14, 0) */
 			    regex_t *ml_flowed_url_reg = get_ml_flowed_url_reg();
 			    regmatch_t ml_url_match;
 
 			    if (!regexec(ml_flowed_url_reg,
-					 all_chars + offset + url_match.rm_eo, 1,
-					 &ml_url_match, 0) && ml_url_match.rm_so == 0)
-				url_match.rm_eo += ml_url_match.rm_eo - 1;
-			} else if (!strchr(p + url_match.rm_eo, '>')) {
+					 all_chars + offset + end_pos, 1,
+					 &ml_url_match, 0)
+                                && ml_url_match.rm_so == 0)
+				end_pos += ml_url_match.rm_eo - 1;
+#endif                          /* GLIB_CHECK_VERSION(2, 14, 0) */
+			} else if (!strchr(p + end_pos, '>')) {
+                            gint ml_end_pos;
+#if GLIB_CHECK_VERSION(2, 14, 0)
+                            GRegex *ml_url_reg = get_ml_url_reg();
+                            GMatchInfo *ml_url_match;
+
+                            if (g_regex_match(ml_url_reg,
+                                              all_chars + offset + end_pos,
+                                              0, &ml_url_match)
+                                && g_match_info_fetch_pos(ml_url_match, 0,
+                                                          NULL,
+                                                          &ml_end_pos)) {
+				GString *ml_url = g_string_new("");
+				const gchar *ml_p =
+                                    all_chars + offset + start_pos;
+				gint ml_cnt;
+
+#else                           /* GLIB_CHECK_VERSION(2, 14, 0) */
 			    regex_t *ml_url_reg = get_ml_url_reg();
 			    regmatch_t ml_url_match;
 		    
 			    if (!regexec(ml_url_reg,
-					 all_chars + offset + url_match.rm_eo, 1,
-					 &ml_url_match, 0) && ml_url_match.rm_so == 0) {
+					 all_chars + offset + end_pos, 1,
+					 &ml_url_match, 0)
+                                && ml_url_match.rm_so == 0) {
 				GString *ml_url = g_string_new("");
-				const gchar *ml_p = all_chars + offset + url_match.rm_so;
-				gint ml_cnt =
-				    url_match.rm_eo - url_match.rm_so + ml_url_match.rm_eo - 1;
+				const gchar *ml_p =
+                                    all_chars + offset + start_pos;
+				gint ml_cnt;
 
+                                ml_end_pos = ml_url_match.rm_eo;
+#endif                          /* GLIB_CHECK_VERSION(2, 14, 0) */
+				ml_cnt = end_pos - start_pos + ml_end_pos - 1;
 				for (; ml_cnt; (ml_p++, ml_cnt--))
 				    if (*ml_p > ' ')
 					ml_url = g_string_append_c(ml_url, *ml_p);
@@ -1021,22 +1166,21 @@ libbalsa_insert_with_url(GtkTextBuffer * buffer,
 			}
 		    }
 
-		    buf = g_strndup(p, url_match.rm_so);
+		    buf = g_strndup(p, start_pos);
 		    gtk_text_buffer_insert_with_tags(buffer, &iter,
 						     buf, -1, tag, NULL);
 		    g_free(buf);
 		}
 
 		if (url_info->ml_url) {
-		    url_info->ml_url_buffer = g_string_new(p + url_match.rm_so);
+		    url_info->ml_url_buffer = g_string_new(p + start_pos);
 		    url_info->ml_url_buffer =
 			g_string_append_c(url_info->ml_url_buffer, '\n');
 		    return TRUE;
 		}
 
 		/* add the url - it /may/ contain spaces if the text is flowed */
-		buf = g_strndup(p + url_match.rm_so,
-				url_match.rm_eo - url_match.rm_so);
+		buf = g_strndup(p + start_pos, end_pos - start_pos);
 		if ((spc = strchr(buf, ' '))) {
 		    GString *uri_real = g_string_new("");
 		    gchar * p = buf;
@@ -1063,12 +1207,16 @@ libbalsa_insert_with_url(GtkTextBuffer * buffer,
 		}
 		g_free(buf);
 
-		p += url_match.rm_eo;
-		offset += url_match.rm_eo;
+		p += end_pos;
+		offset += end_pos;
 		if (prescanner(p))
-		    match = regexec(url_reg, p, 1, &url_match, 0);
+#if GLIB_CHECK_VERSION(2, 14, 0)
+                    match = g_regex_match(url_reg, p, 0, &url_match);
+#else                           /* GLIB_CHECK_VERSION(2, 14, 0) */
+		    match = regexec(url_reg, p, 1, &url_match, 0) == 0;
+#endif                          /* GLIB_CHECK_VERSION(2, 14, 0) */
 		else
-		    match = -1;
+		    match = FALSE;
 	    }
 	}
     }
@@ -1081,7 +1229,11 @@ libbalsa_insert_with_url(GtkTextBuffer * buffer,
 }
 
 void
+#if GLIB_CHECK_VERSION(2, 14, 0)
+libbalsa_unwrap_selection(GtkTextBuffer * buffer, GRegex * rex)
+#else                           /* GLIB_CHECK_VERSION(2, 14, 0) */
 libbalsa_unwrap_selection(GtkTextBuffer * buffer, regex_t * rex)
+#endif                          /* GLIB_CHECK_VERSION(2, 14, 0) */
 {
     GtkTextIter start, end;
     gchar *line;
@@ -1152,6 +1304,34 @@ libbalsa_unwrap_selection(GtkTextBuffer * buffer, regex_t * rex)
     }
 }
 
+#if GLIB_CHECK_VERSION(2, 14, 0)
+gboolean
+libbalsa_match_regex(const gchar * line, GRegex * rex, guint * count,
+                     guint * index)
+{
+    GMatchInfo *rm;
+    gint c;
+    const gchar *p;
+    gint end_pos;
+
+    c = 0;
+    for (p = line;
+         g_regex_match(rex, p, 0, &rm)
+         && g_match_info_fetch_pos(rm, 0, NULL, &end_pos)
+         && end_pos > 0;
+         p += end_pos) {
+        c++;
+        g_match_info_free(rm);
+    }
+    g_match_info_free(rm);
+
+    if (count)
+        *count = c;
+    if (index)
+        *index = p - line;
+    return c > 0;
+}
+#else                           /* GLIB_CHECK_VERSION(2, 14, 0) */
 gboolean
 libbalsa_match_regex(const gchar * line, regex_t * rex, guint * count,
 		     guint * index)
@@ -1169,4 +1349,4 @@ libbalsa_match_regex(const gchar * line, regex_t * rex, guint * count,
 	*index = p - line;
     return c > 0;
 }
-
+#endif                          /* GLIB_CHECK_VERSION(2, 14, 0) */

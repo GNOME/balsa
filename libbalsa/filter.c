@@ -47,11 +47,6 @@
 #include "misc.h"
 #include <glib/gi18n.h>
 
-/* from libmutt */
-#define REGCOMP(X,Y,Z) regcomp(X, Y, REG_WORDS|REG_EXTENDED|(Z))
-#define REGEXEC(X,Y) regexec(&X, Y, (size_t)0, (regmatch_t *)0, (int)0)
-
-
 /* filters_trash_mbox points to a mailbox that is used as Trash by filters
  *  code. */
 static LibBalsaMailbox* filters_trash_mbox = NULL;

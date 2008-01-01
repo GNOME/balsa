@@ -132,7 +132,11 @@ balsa_print_object_text_plain(GList *list, GtkPrintContext * context,
 			      LibBalsaMessageBody * body,
 			      BalsaPrintSetup * psetup)
 {
+#if GLIB_CHECK_VERSION(2, 14, 0)
+    GRegex *rex;
+#else                           /* GLIB_CHECK_VERSION(2, 14, 0) */
     regex_t rex;
+#endif                          /* GLIB_CHECK_VERSION(2, 14, 0) */
     gchar *textbuf;
     PangoFontDescription *font;
     gdouble c_at_x;
@@ -143,7 +147,11 @@ balsa_print_object_text_plain(GList *list, GtkPrintContext * context,
     gint par_len;
 
     /* set up the regular expression for qouted text */
+#if GLIB_CHECK_VERSION(2, 14, 0)
+    if (!(rex = balsa_quote_regex_new()))
+#else                           /* GLIB_CHECK_VERSION(2, 14, 0) */
     if (regcomp(&rex, balsa_app.quote_regex, REG_EXTENDED) != 0)
+#endif                          /* GLIB_CHECK_VERSION(2, 14, 0) */
 	return balsa_print_object_default(list, context, body, psetup);
 
     /* start on new page if less than 2 lines can be printed */
@@ -210,8 +218,14 @@ balsa_print_object_text_plain(GList *list, GtkPrintContext * context,
 	    thispar = g_strndup(par_start, par_len);
 
 	    /* get the cite level and strip off the prefix */
+#if GLIB_CHECK_VERSION(2, 14, 0)
 	    if (libbalsa_match_regex
-		(thispar, &rex, &cite_level, &cite_idx)) {
+		(thispar, rex, &cite_level, &cite_idx))
+#else                           /* GLIB_CHECK_VERSION(2, 14, 0) */
+	    if (libbalsa_match_regex
+		(thispar, &rex, &cite_level, &cite_idx))
+#endif                          /* GLIB_CHECK_VERSION(2, 14, 0) */
+            {
 		gchar *new;
 
 		new = thispar + cite_idx;
@@ -316,6 +330,9 @@ balsa_print_object_text_plain(GList *list, GtkPrintContext * context,
     /* clean up */
     pango_font_description_free(font);
     g_free(textbuf);
+#if GLIB_CHECK_VERSION(2, 14, 0)
+    g_regex_unref(rex);
+#endif                          /* GLIB_CHECK_VERSION(2, 14, 0) */
     return list;
 }
 

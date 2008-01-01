@@ -127,7 +127,11 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
     size_t alloced;
     BalsaMimeWidget *mw;
     GtkTextBuffer *buffer;
+#if GLIB_CHECK_VERSION(2, 14, 0)
+    GRegex *rex;
+#else                           /* GLIB_CHECK_VERSION(2, 14, 0) */
     regex_t rex;
+#endif                          /* GLIB_CHECK_VERSION(2, 14, 0) */
     GList *url_list = NULL;
     const gchar *target_cs;
     GError *err = NULL;
@@ -231,11 +235,17 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
     gtk_text_buffer_create_tag(buffer, "soft", NULL, NULL);
     allocate_quote_colors(GTK_WIDGET(bm), balsa_app.quoted_color,
 			  0, MAX_QUOTED_COLOR - 1);
+#if GLIB_CHECK_VERSION(2, 14, 0)
+    if (!(rex = balsa_quote_regex_new()))
+	gtk_text_buffer_insert_at_cursor(buffer, ptr, -1);
+#else                           /* GLIB_CHECK_VERSION(2, 14, 0) */
     if (regcomp(&rex, balsa_app.quote_regex, REG_EXTENDED) != 0) {
 	g_warning
 	    ("part_info_init_mimetext: quote regex compilation failed.");
 	gtk_text_buffer_insert_at_cursor(buffer, ptr, -1);
-    } else {
+    }
+#endif                          /* GLIB_CHECK_VERSION(2, 14, 0) */
+    else {
 	gchar *line_start;
 	LibBalsaUrlInsertInfo url_info;
 	GList * cite_bars_list;
@@ -281,7 +291,11 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
 		guint cite_idx;
 
 		/* get the cite level only for text/plain parts */
+#if GLIB_CHECK_VERSION(2, 14, 0)
+		libbalsa_match_regex(this_line, rex, &quote_level, &cite_idx);
+#else                           /* GLIB_CHECK_VERSION(2, 14, 0) */
 		libbalsa_match_regex(this_line, &rex, &quote_level, &cite_idx);
+#endif                          /* GLIB_CHECK_VERSION(2, 14, 0) */
 	    
 		/* check if the citation level changed */
 		if (cite_level != quote_level) {
@@ -343,7 +357,11 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
 	    g_signal_connect_after(G_OBJECT(mw->widget), "expose-event",
 				   G_CALLBACK(draw_cite_bars), cite_bars_list);
 	}
+#if GLIB_CHECK_VERSION(2, 14, 0)
+	g_regex_unref(rex);
+#else                           /* GLIB_CHECK_VERSION(2, 14, 0) */
 	regfree(&rex);
+#endif                          /* GLIB_CHECK_VERSION(2, 14, 0) */
     }
 
     prepare_url_offsets(buffer, url_list);

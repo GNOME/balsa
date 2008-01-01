@@ -28,12 +28,14 @@
 #ifndef __FILTER_PRIVATE_H__
 #define __FILTER_PRIVATE_H__
 
-#ifdef HAVE_PCRE
-#  include <pcreposix.h>
-#else
-#  include <sys/types.h>
-#  include <regex.h>
-#endif
+#if !GLIB_CHECK_VERSION(2, 14, 0)
+#  ifdef HAVE_PCRE
+#    include <pcreposix.h>
+#  else
+#    include <sys/types.h>
+#    include <regex.h>
+#  endif
+#endif                          /* GLIB_CHECK_VERSION(2, 14, 0) */
 
 
 /* regex options */
@@ -43,7 +45,11 @@
 /* regex struct */
 struct _LibBalsaConditionRegex {
     gchar *string;
+#if GLIB_CHECK_VERSION(2, 14, 0)
+    GRegex *compiled;
+#else                           /* GLIB_CHECK_VERSION(2, 14, 0) */
     regex_t *compiled;
+#endif                          /* GLIB_CHECK_VERSION(2, 14, 0) */
 };
 
 #endif				/* __FILTER_PRIVATE_H__ */

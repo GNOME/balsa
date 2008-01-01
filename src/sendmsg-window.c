@@ -6194,17 +6194,26 @@ reflow_selected_cb(GtkAction * action, BalsaSendmsg * bsmsg)
 {
     GtkTextView *text_view;
     GtkTextBuffer *buffer;
+#if GLIB_CHECK_VERSION(2, 14, 0)
+    GRegex *rex;
+#else                           /* GLIB_CHECK_VERSION(2, 14, 0) */
     regex_t rex;
+#endif                          /* GLIB_CHECK_VERSION(2, 14, 0) */
 
     if (!bsmsg->flow)
 	return;
 
+#if GLIB_CHECK_VERSION(2, 14, 0)
+    if (!(rex = balsa_quote_regex_new()))
+        return;
+#else                           /* GLIB_CHECK_VERSION(2, 14, 0) */
     if (regcomp(&rex, balsa_app.quote_regex, REG_EXTENDED)) {
 	balsa_information(LIBBALSA_INFORMATION_WARNING,
 			  _("Could not compile %s"),
 			  _("Quoted Text Regular Expression"));
 	return;
     }
+#endif                          /* GLIB_CHECK_VERSION(2, 14, 0) */
 
 #if !HAVE_GTKSOURCEVIEW
     sw_buffer_save(bsmsg);
@@ -6213,7 +6222,11 @@ reflow_selected_cb(GtkAction * action, BalsaSendmsg * bsmsg)
     text_view = GTK_TEXT_VIEW(bsmsg->text);
     buffer = gtk_text_view_get_buffer(text_view);
     sw_buffer_signals_block(bsmsg, buffer);
+#if GLIB_CHECK_VERSION(2, 14, 0)
+    libbalsa_unwrap_selection(buffer, rex);
+#else                           /* GLIB_CHECK_VERSION(2, 14, 0) */
     libbalsa_unwrap_selection(buffer, &rex);
+#endif                          /* GLIB_CHECK_VERSION(2, 14, 0) */
     sw_buffer_signals_unblock(bsmsg, buffer);
 
     bsmsg->state = SENDMSG_STATE_MODIFIED;
@@ -6221,7 +6234,11 @@ reflow_selected_cb(GtkAction * action, BalsaSendmsg * bsmsg)
 				 gtk_text_buffer_get_insert(buffer),
 				 0, FALSE, 0, 0);
 
+#if GLIB_CHECK_VERSION(2, 14, 0)
+    g_regex_unref(rex);
+#else                           /* GLIB_CHECK_VERSION(2, 14, 0) */
     regfree(&rex);
+#endif                          /* GLIB_CHECK_VERSION(2, 14, 0) */
 }
 
 /* To field "changed" signal callback. */

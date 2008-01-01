@@ -44,13 +44,6 @@
 
 #include <gdk-pixbuf/gdk-pixbuf.h>
 
-#ifdef HAVE_PCRE
-#  include <pcreposix.h>
-#else
-#  include <sys/types.h>
-#  include <regex.h>
-#endif
-
 #include "send.h"
 #include "quote-color.h"
 #include "sendmsg-window.h"

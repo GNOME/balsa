@@ -1,5 +1,34 @@
 2008-01-01  Peter Bloomfield
 
+	* configure.in: if glib is 2.14+, we use GRegex, so do not
+	configure PCRE.
+	* libbalsa/filter-funcs.c: (libbalsa_condition_regex_free): use
+	GRegex if available.
+	* libbalsa/filter-private.h: ditto.
+	* libbalsa/filter.c: ditto.
+	* libbalsa/mime.c: (mark_urls, get_url_helper, get_url_reg,
+	get_ml_url_reg, get_ml_flowed_url_reg): ditto.
+	* libbalsa/misc.h: ditto.
+	* src/balsa-app.c: (balsa_quote_regex_new): new function--if
+	GRegex is available, compile the quote regex once, and return
+	a ref.
+	* src/balsa-app.h: balsa_quote_regex_new is new.
+	* src/balsa-message.c: use balsa_quote_regex_new.
+	* src/balsa-mime-widget-text.c: (balsa_mime_widget_new_text):
+	ditto.
+	* src/balsa-print-object-text.c:
+	(balsa_print_object_text_plain): ditto.
+	* src/print.c: (print_wrap_body): ditto.
+	* src/quote-color.c: (is_a_quote): use GRegex if available.
+	* src/quote-color.h: ditto.
+	* src/sendmsg-window.c: (reflow_selected_cb): use
+	balsa_quote_regex_new.
+	* src/spell-check.c: (balsa_spell_check_start): use
+	balsa_quote_regex_new.
+	(balsa_spell_check_destroy, next_word): use GRegex if available.
+
+2008-01-01  Peter Bloomfield
+
 	* configure.in: configuring GtkSourceView when version is not
 	specified, try GtkSourceView2 then GtkSourceView1.
 

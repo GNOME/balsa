@@ -566,7 +566,10 @@ fi
 #
 
 AC_MSG_CHECKING(whether to use PCRE)
-if test x"$check_pcre" = xyes ; then
+if $PKG_CONFIG --atleast-version=2.14.0 glib-2.0; then
+   AC_MSG_RESULT(glib)
+else
+   if   test x"$check_pcre" = xyes ; then
 	if pcre-config --libs-posix > /dev/null 2>&1; then
         	vers=`pcre-config --version`
 	        case $vers in
@@ -588,9 +591,10 @@ if test x"$check_pcre" = xyes ; then
 	else
 	        AC_MSG_RESULT(not found)
 	fi
-else
+   else
 	have_pcre=no
 	AC_MSG_RESULT(no)
+   fi
 fi
 
 # OpenSSL configuration.

@@ -449,4 +449,8 @@ BalsaIndex* balsa_find_index_by_mailbox(LibBalsaMailbox* mailbox);
 
 void  balsa_remove_children_mailbox_nodes(BalsaMailboxNode * mbnode);
 
+#if GLIB_CHECK_VERSION(2, 14, 0)
+GRegex *balsa_quote_regex_new(void);
+#endif                          /* GLIB_CHECK_VERSION(2, 14, 0) */
+
 #endif				/* __BALSA_APP_H__ */

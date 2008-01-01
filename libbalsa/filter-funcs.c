@@ -385,7 +385,11 @@ libbalsa_condition_regex_free(LibBalsaConditionRegex* reg, gpointer throwaway)
 
     g_free(reg->string);
     if (reg->compiled) 
+#if GLIB_CHECK_VERSION(2, 14, 0)
+        g_regex_unref(reg->compiled);
+#else                           /* GLIB_CHECK_VERSION(2, 14, 0) */
 	regfree(reg->compiled);
+#endif                          /* GLIB_CHECK_VERSION(2, 14, 0) */
 }				/* end condition_regex_free() */
 
 void 

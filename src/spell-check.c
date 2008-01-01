@@ -32,13 +32,14 @@
 #include <string.h>
 #include <glib/gi18n.h>
 
-#ifdef HAVE_PCRE
-#  include <pcre.h>
-#  include <pcreposix.h>
-#else
-#  include <sys/types.h>
-#  include <regex.h>
-#endif
+#if !GLIB_CHECK_VERSION(2, 14, 0)
+#  ifdef HAVE_PCRE
+#    include <pcreposix.h>
+#  else
+#    include <sys/types.h>
+#    include <regex.h>
+#  endif
+#endif                          /* GLIB_CHECK_VERSION(2, 14, 0) */
 
 #include "balsa-app.h"
 #include "quote-color.h"
@@ -803,7 +804,11 @@ done_cb(GtkButton * button, gpointer data)
  * PSpellManager to do the checking.
  * */
 
+#if GLIB_CHECK_VERSION(2, 14, 0)
+static GRegex *quoted_rex;
+#else                           /* GLIB_CHECK_VERSION(2, 14, 0) */
 static regex_t quoted_rex;
+#endif                          /* GLIB_CHECK_VERSION(2, 14, 0) */
 static gboolean quoted_rex_compiled = FALSE;
 
 void
@@ -814,6 +819,9 @@ balsa_spell_check_start(BalsaSpellCheck * spell_check, GtkWindow *parent_wnd)
     GtkTextBuffer *buffer = gtk_text_view_get_buffer(spell_check->view);
     GtkTextIter start, end, iter;
     GtkTextMark *insert;
+#if GLIB_CHECK_VERSION(2, 14, 0)
+    GError *err = NULL;
+#endif                          /* GLIB_CHECK_VERSION(2, 14, 0) */
 
 
     /* Config the spell check */
@@ -887,6 +895,15 @@ balsa_spell_check_start(BalsaSpellCheck * spell_check, GtkWindow *parent_wnd)
      * balsa_app.quote_regex may change, so compile it new every
      * time!)
      */
+#if GLIB_CHECK_VERSION(2, 14, 0)
+    if (quoted_rex_compiled)
+        g_regex_unref(quoted_rex);
+    quoted_rex = balsa_quote_regex_new();
+    if (!quoted_rex)
+        quoted_rex_compiled = FALSE;
+    else
+        quoted_rex_compiled = TRUE;
+#else                           /* GLIB_CHECK_VERSION(2, 14, 0) */
     if (quoted_rex_compiled)
         regfree(&quoted_rex);
     if (regcomp(&quoted_rex, balsa_app.quote_regex, REG_EXTENDED)) {
@@ -896,6 +913,7 @@ balsa_spell_check_start(BalsaSpellCheck * spell_check, GtkWindow *parent_wnd)
         quoted_rex_compiled = FALSE;
     } else
         quoted_rex_compiled = TRUE;
+#endif                          /* GLIB_CHECK_VERSION(2, 14, 0) */
 
     spell_check->end_iter = start;
 
@@ -1129,7 +1147,11 @@ balsa_spell_check_destroy(GtkObject * object)
     }
 
     if (quoted_rex_compiled) {
+#if GLIB_CHECK_VERSION(2, 14, 0)
+        g_regex_unref(quoted_rex);
+#else                           /* GLIB_CHECK_VERSION(2, 14, 0) */
         regfree(&quoted_rex);
+#endif                          /* GLIB_CHECK_VERSION(2, 14, 0) */
         quoted_rex_compiled = FALSE;
     }
 
@@ -1366,8 +1388,13 @@ next_word(BalsaSpellCheck * spell_check)
                                         &line_end, FALSE);
             skip_sig = (!balsa_app.check_sig
                         && strcmp(line, "-- \n") == 0);
+#if GLIB_CHECK_VERSION(2, 14, 0)
+            skip_quoted = (!balsa_app.check_quoted && quoted_rex_compiled
+                           && is_a_quote(line, quoted_rex));
+#else                           /* GLIB_CHECK_VERSION(2, 14, 0) */
             skip_quoted = (!balsa_app.check_quoted && quoted_rex_compiled
                            && is_a_quote(line, &quoted_rex));
+#endif                          /* GLIB_CHECK_VERSION(2, 14, 0) */
             g_free(line);
 
             if (skip_sig)

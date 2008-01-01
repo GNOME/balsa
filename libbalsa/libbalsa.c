@@ -48,8 +48,16 @@
 #if HAVE_GTKSOURCEVIEW
 #include <gtksourceview/gtksourceview.h>
 #include <gtksourceview/gtksourcebuffer.h>
-#include <gtksourceview/gtksourcetag.h>
-#include <gtksourceview/gtksourcetagstyle.h>
+/* note GtkSourceview 1 and 2 have a slightly different API */
+#if (HAVE_GTKSOURCEVIEW == 1)
+#  include <gtksourceview/gtksourcetag.h>
+#  include <gtksourceview/gtksourcetagstyle.h>
+#else
+#  include <gtksourceview/gtksourcelanguage.h>
+#  include <gtksourceview/gtksourcelanguagemanager.h>
+#  include <gtksourceview/gtksourcestylescheme.h>
+#  include <gtksourceview/gtksourcestyleschememanager.h>
+#endif
 #endif
 
 #include "libbalsa.h"
@@ -929,12 +937,15 @@ libbalsa_get_image_from_x_face_header(const gchar * content, GError ** err)
 GtkWidget *
 libbalsa_source_view_new(gboolean highlight_phrases, GdkColor *q_colour)
 {
+    GtkSourceBuffer *sbuffer;
+    GtkWidget *sview;
+
+#if (HAVE_GTKSOURCEVIEW == 1)
+
     GtkTextTag * text_tag;
     GtkSourceTagStyle *tag_style;
     GtkSourceTagTable *tag_table;
     GSList *tag_list;
-    GtkSourceBuffer *sbuffer;
-    GtkWidget *sview;
 
     /* create the tag table */
     tag_list = NULL;
@@ -1006,6 +1017,59 @@ libbalsa_source_view_new(gboolean highlight_phrases, GdkColor *q_colour)
     g_object_unref(tag_table);
     gtk_source_buffer_set_highlight(sbuffer, highlight_phrases || q_colour);
     gtk_source_buffer_set_check_brackets(sbuffer, FALSE);
+
+#else /* (HAVE_GTKSOURCEVIEW == 1) */
+
+    static GtkSourceLanguageManager * lm = NULL;
+    static GtkSourceStyleScheme * scheme = NULL;
+    static GtkSourceLanguage * src_lang = NULL;
+
+    /* initialise the source language manager if necessary */
+    if (!lm) {
+	const gchar * const * lm_dpaths;
+
+	if ((lm = gtk_source_language_manager_new()) &&
+	    (lm_dpaths = gtk_source_language_manager_get_search_path(lm))) {
+	    gchar ** lm_rpaths;
+	    gint n;
+
+	    /* add the balsa share path to the language manager's paths - we
+	     * cannot simply replace it as it still wants to see the
+	     * RelaxNG schema... */
+	    for (n = 0; lm_dpaths[n]; n++);
+	    lm_rpaths = g_new0(gchar *, n + 2);
+	    for (n = 0; lm_dpaths[n]; n++)
+		lm_rpaths[n] = g_strdup(lm_dpaths[n]);
+	    lm_rpaths[n] = g_strdup(BALSA_DATA_PREFIX "/gtksourceview-2.0");
+	    gtk_source_language_manager_set_search_path(lm, lm_rpaths);
+	    g_strfreev(lm_rpaths);
+
+	    /* try to load the language */
+	    if ((src_lang =
+		 gtk_source_language_manager_get_language(lm, "balsa"))) {
+		GtkSourceStyleSchemeManager *smgr =
+		    gtk_source_style_scheme_manager_new();
+		gchar * sm_paths[] = {
+		    BALSA_DATA_PREFIX "/gtksourceview-2.0",
+		    NULL };
+	    
+		/* try to load the colouring scheme */
+		gtk_source_style_scheme_manager_set_search_path(smgr, sm_paths);
+		scheme = gtk_source_style_scheme_manager_get_scheme(smgr, "balsa-mail");
+	    }
+	}
+    }
+
+    /* create a new buffer and set the language and scheme */
+    sbuffer = gtk_source_buffer_new(NULL);
+    if (src_lang)
+	gtk_source_buffer_set_language(sbuffer, src_lang);
+    if (scheme)
+	gtk_source_buffer_set_style_scheme(sbuffer, scheme);
+    gtk_source_buffer_set_highlight_syntax(sbuffer, TRUE);
+    gtk_source_buffer_set_highlight_matching_brackets(sbuffer, FALSE);
+
+#endif /* (HAVE_GTKSOURCEVIEW == 1) */
 
     /* create & return the source view */
     sview = gtk_source_view_new_with_buffer(sbuffer);

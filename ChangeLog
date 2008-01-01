@@ -1,3 +1,14 @@
+2008-01-01  Albrecht Dreß
+
+	* Makefile.am: support GtkSourceView2.
+	* configure.in: ditto.
+	* libbalsa/libbalsa.c: (libbalsa_source_view_new): ditto.
+	* src/balsa-mime-widget-text.c: (create_text_widget): ditto.
+	* src/sendmsg-window.c: (sw_can_redo_cb, sw_can_undo_cb,
+	create_text_area): ditto.
+	* balsa-mail-style.xml: new file for GtkSourceView2.
+	* balsa-mail.lang: ditto.
+
 2007-12-31  Peter Bloomfield
 
 	* src/mailbox-node.c: (mark_local_path): change from void to

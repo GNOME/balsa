@@ -144,7 +144,7 @@ AC_ARG_WITH([libnotify],
 
 AC_ARG_WITH([gtksourceview],
         AC_HELP_STRING([--with-gtksourceview],
-                [Use GtkSourceView if available (default=no)]),[
+                [Use GtkSourceView if available (default=no, specify version 1 or 2, yes=2)]),[
 	with_gtksourceview=$withval
 ],[
 	with_gtksourceview=no
@@ -684,11 +684,20 @@ fi
 # GtkSourceView configuration
 #
 if test x$with_gtksourceview != xno; then
-    PKG_CHECK_MODULES(SOURCEVIEW, [ gtksourceview-1.0 ])
-    AC_DEFINE(HAVE_GTKSOURCEVIEW,1,[Defined when GtkSourceView can be used.])
-    BALSA_CFLAGS="$BALSA_CFLAGS $SOURCEVIEW_CFLAGS"
-    BALSA_LIBS="$BALSA_LIBS $SOURCEVIEW_LIBS"
+    if test x$with_gtksourceview = x1; then
+	PKG_CHECK_MODULES(GTKSOURCEVIEW, [ gtksourceview-1.0 ])
+    	AC_DEFINE(HAVE_GTKSOURCEVIEW,1,[Defined when GtkSourceView can be used.])
+	AC_MSG_NOTICE([Note: using GtkSourceview Version 1])
+    else
+	PKG_CHECK_MODULES(GTKSOURCEVIEW, [ gtksourceview-2.0 ])
+    	AC_DEFINE(HAVE_GTKSOURCEVIEW,2,[Defined when GtkSourceView can be used.])
+	AC_MSG_NOTICE([Note: using GtkSourceview Version 2])
+	with_gtksourceview=2
+    fi
+    BALSA_CFLAGS="$BALSA_CFLAGS $GTKSOURCEVIEW_CFLAGS"
+    BALSA_LIBS="$BALSA_LIBS $GTKSOURCEVIEW_LIBS"
 fi
+AM_CONDITIONAL([BUILD_WITH_GTKSOURCEVIEW2], [test x$with_gtksourceview = x2 ])
 
 dnl #####################################################################
 dnl 5. Headers.

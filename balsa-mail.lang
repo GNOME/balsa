@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- mail Language definition to highlight structured phrases and quoted lines
+     in messages using FtkSourceview-2.0
+     
+     This file is part of the Balsa E-Mail Client
+
+     Copyright (C) 1997-2007 Stuart Parmenter and others,
+                             See the file AUTHORS for a list.
+     Written by Albrecht Dreß <albrecht.dress@arcor.de>
+
+     This program is free software; you can redistribute it and/or modify
+     it under the terms of the GNU General Public License as published by
+     the Free Software Foundation; either version 2, or (at your option) 
+     any later version.
+ 
+     This program is distributed in the hope that it will be useful,
+     but WITHOUT ANY WARRANTY; without even the implied warranty of 
+     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
+     GNU General Public License for more details.
+ 
+     You should have received a copy of the GNU General Public License
+     along with this program; if not, write to the Free Software
+     Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  
+     02111-1307, USA.
+-->
+<language id="balsa" _name="Balsa email body" version="2.0" _section="Others">
+  <styles>
+    <style id="underbar" _name="Underline"/>
+    <style id="bold-face" _name="Bold face"/>
+    <style id="emph" _name="Emphasised"/>
+    <style id="quote-even" _name="Even quote level"/>
+    <style id="quote-odd" _name="Odd quote level"/>
+  </styles>
+  <definitions>
+    <context id="balsa">
+      <include>
+        <context id="underline">
+          <match>(^|[[:space:]])(_[[:alnum:]][^_\n]*[[:alnum:]]_)</match>
+          <include>
+            <context sub-pattern="2" style-ref="underbar"/>
+          </include>
+        </context>
+        <context id="bold">
+          <match>(^|[[:space:]])(\*[[:alnum:]][^*\n]*[[:alnum:]]\*)</match>
+          <include>
+            <context sub-pattern="2" style-ref="bold-face"/>
+          </include>
+        </context>
+        <context id="emphasise">
+          <match>(^|[[:space:]])(/[[:alnum:]][^/\n]*[[:alnum:]]/)</match>
+          <include>
+            <context sub-pattern="2" style-ref="emph"/>
+          </include>
+        </context>
+        <context id="quote1" style-ref="quote-odd" end-at-line-end="true">
+          <start>^&gt; *($|[^ |&gt;:}#\n])</start>
+        </context>
+        <context id="quote2" style-ref="quote-even" end-at-line-end="true">
+          <start>^(&gt; *){2}($|[^ |&gt;:}#\n])</start>
+        </context>
+        <context id="quote3" style-ref="quote-odd" end-at-line-end="true">
+          <start>^(&gt; *){3}($|[^ |&gt;:}#\n])</start>
+        </context>
+        <context id="quote4" style-ref="quote-even" end-at-line-end="true">
+          <start>^(&gt; *){4}($|[^ |&gt;:}#\n])</start>
+        </context>
+        <context id="quote5" style-ref="quote-odd" end-at-line-end="true">
+          <start>^(&gt; *){5}($|[^ |&gt;:}#\n])</start>
+        </context>
+        <context id="quote6" style-ref="quote-even" end-at-line-end="true">
+          <start>^(&gt; *){6}($|[^ |&gt;:}#\n])</start>
+        </context>
+        <context id="quote7" style-ref="quote-odd" end-at-line-end="true">
+          <start>^(&gt; *){7}($|[^ |&gt;:}#\n])</start>
+        </context>
+        <context id="quote8" style-ref="quote-even" end-at-line-end="true">
+          <start>^(&gt; *){8}($|[^ |&gt;:}#\n])</start>
+        </context>
+        <context id="quote9" style-ref="quote-odd" end-at-line-end="true">
+          <start>^(&gt; *){9}($|[^ |&gt;:}#\n])</start>
+        </context>
+      </include>
+    </context>
+  </definitions>
+</language>

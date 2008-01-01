@@ -26,11 +26,19 @@ EXTRA_DIST = \
 	docs/mh-mail-HOWTO	\
 	docs/vconvert.awk	\
 	docs/pine2vcard		\
-	GNOME_Balsa.server.in
+	GNOME_Balsa.server.in	\
+	balsa-mail.lang		\
+	balsa-mail-style.xml
 
 serverdir       = $(libdir)/bonobo/servers
 server_in_files = GNOME_Balsa.server
 server_DATA     = $(server_in_files:.server.in=.server)
+
+if BUILD_WITH_GTKSOURCEVIEW2
+gtksourceviewdir = $(BALSA_DATA_PREFIX)/gtksourceview-2.0
+gtksourceview_DATA = balsa-mail.lang		\
+	balsa-mail-style.xml
+endif
 
 $(server_in_files): $(server_in_files).in
 	sed -e "s|\@bindir\@|$(bindir)|" $< > $@

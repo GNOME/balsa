@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- mail Styles to highlight structured phrases and quoted lines in messages
+     using FtkSourceview-2.0
+     
+     This file is part of the Balsa E-Mail Client
+
+     Copyright (C) 1997-2007 Stuart Parmenter and others,
+                             See the file AUTHORS for a list.
+     Written by Albrecht Dreß <albrecht.dress@arcor.de>
+
+     This program is free software; you can redistribute it and/or modify
+     it under the terms of the GNU General Public License as published by
+     the Free Software Foundation; either version 2, or (at your option) 
+     any later version.
+ 
+     This program is distributed in the hope that it will be useful,
+     but WITHOUT ANY WARRANTY; without even the implied warranty of 
+     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
+     GNU General Public License for more details.
+ 
+     You should have received a copy of the GNU General Public License
+     along with this program; if not, write to the Free Software
+     Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  
+     02111-1307, USA.
+-->
+<style-scheme id="balsa-mail" _name="Balsa message with structured phrases" version="1.0">
+  <author>Albrecht Dreß</author>
+  <_description>Colour scheme for Balsa messages structured phrases</_description>
+  <style name="balsa:underbar" underline="true"/>
+  <style name="balsa:bold-face" bold="true"/>
+  <style name="balsa:emph" italic="true"/>
+  <style name="balsa:quote-even" foreground="#880000"/>
+  <style name="balsa:quote-odd" foreground="#008888"/>
+</style-scheme>

@@ -36,7 +36,11 @@
 #include <gtksourceview/gtksourceview.h>
 #include <gtksourceview/gtksourcebuffer.h>
 #include <gtksourceview/gtksourcelanguage.h>
-#include <gtksourceview/gtksourcelanguagesmanager.h>
+#if (HAVE_GTKSOURCEVIEW == 1)
+#  include <gtksourceview/gtksourcelanguagesmanager.h>
+#else
+#  include <gtksourceview/gtksourcelanguagemanager.h>
+#endif
 #endif
 
 
@@ -380,7 +384,7 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
 static GtkWidget *
 create_text_widget(const char * content_type)
 {
-#if HAVE_GTKSOURCEVIEW
+#if (HAVE_GTKSOURCEVIEW == 1)
     static GtkSourceLanguagesManager * lm = NULL;
     GtkSourceLanguage * lang;
     GtkSourceBuffer * buffer;
@@ -405,7 +409,53 @@ create_text_widget(const char * content_type)
     widget = gtk_source_view_new_with_buffer(buffer);
     g_object_unref(buffer);
     return widget;
-#else
+#elif (HAVE_GTKSOURCEVIEW == 2)
+    static GtkSourceLanguageManager * lm = NULL;
+    static const gchar * const * lm_ids = NULL;
+    GtkWidget * widget = NULL;
+    gint n;
+
+    /* we use or own highlighting for text/plain */
+    if (!g_ascii_strcasecmp(content_type, "text/plain"))
+	return gtk_text_view_new();
+    
+    /* try to initialise the source language manager and return a "simple"
+     * text view if this fails */
+    if (!lm)
+	lm = gtk_source_language_manager_get_default();
+    if (lm && !lm_ids)
+	lm_ids = gtk_source_language_manager_get_language_ids(lm);
+    if (!lm_ids)
+	return gtk_text_view_new();
+    
+    /* search for a language supporting our mime type */
+    for (n = 0; !widget && lm_ids[n]; n++) {
+	GtkSourceLanguage * src_lang =
+	    gtk_source_language_manager_get_language(lm, lm_ids[n]);
+	gchar ** mime_types;
+
+	if (src_lang &&
+	    (mime_types = gtk_source_language_get_mime_types(src_lang))) {
+	    gint k;
+
+	    for (k = 0;
+		 mime_types[k] && g_ascii_strcasecmp(mime_types[k], content_type);
+		 k++);
+	    if (mime_types[k]) {
+		GtkSourceBuffer * buffer =
+		    gtk_source_buffer_new_with_language(src_lang);
+		
+		gtk_source_buffer_set_highlight_syntax(buffer, TRUE);
+		widget = gtk_source_view_new_with_buffer(buffer);
+		g_object_unref(buffer);
+	    }
+	    g_strfreev(mime_types);
+	}
+    }
+    
+    /* fall back to the simple text view if the mime type is not supported */
+    return widget ? widget : gtk_text_view_new();
+#else /* no GtkSourceview */
     return gtk_text_view_new();
 #endif
 }

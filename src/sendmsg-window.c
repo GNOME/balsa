@@ -3126,7 +3126,8 @@ drag_data_quote(GtkWidget * widget,
 /* create_text_area 
    Creates the text entry part of the compose window.
 */
-#if HAVE_GTKSOURCEVIEW
+#if (HAVE_GTKSOURCEVIEW == 1)
+
 static void
 sw_can_undo_cb(GtkSourceBuffer * source_buffer, gboolean can_undo,
                BalsaSendmsg * bsmsg)
@@ -3138,8 +3139,31 @@ static void
 sw_can_redo_cb(GtkSourceBuffer * source_buffer, gboolean can_redo,
                BalsaSendmsg * bsmsg)
 {
-    sw_set_sensitive(bsmsg, "Undo", can_redo);
+    sw_set_sensitive(bsmsg, "Redo", can_redo);
 }
+
+#elif (HAVE_GTKSOURCEVIEW == 2)
+
+static void
+sw_can_undo_cb(GtkSourceBuffer * source_buffer, GParamSpec *arg1,
+	       BalsaSendmsg * bsmsg)
+{
+    gboolean can_undo;
+
+    g_object_get(G_OBJECT(source_buffer), "can-undo", &can_undo, NULL);
+    sw_set_sensitive(bsmsg, "Undo", can_undo);
+}
+
+static void
+sw_can_redo_cb(GtkSourceBuffer * source_buffer, GParamSpec *arg1,
+	       BalsaSendmsg * bsmsg)
+{
+    gboolean can_redo;
+
+    g_object_get(G_OBJECT(source_buffer), "can-redo", &can_redo, NULL);
+    sw_set_sensitive(bsmsg, "Redo", can_redo);
+}
+
 #endif                          /* HAVE_GTKSOURCEVIEW */
 
 static GtkWidget *
@@ -3165,10 +3189,15 @@ create_text_area(BalsaSendmsg * bsmsg)
     pango_font_description_free(desc);
 
     buffer = gtk_text_view_get_buffer(text_view);
-#if HAVE_GTKSOURCEVIEW
+#if (HAVE_GTKSOURCEVIEW == 1)
     g_signal_connect(buffer, "can-undo",
                      G_CALLBACK(sw_can_undo_cb), bsmsg);
     g_signal_connect(buffer, "can-redo",
+                     G_CALLBACK(sw_can_redo_cb), bsmsg);
+#elif (HAVE_GTKSOURCEVIEW == 2)
+    g_signal_connect(G_OBJECT(buffer), "notify::can-undo",
+                     G_CALLBACK(sw_can_undo_cb), bsmsg);
+    g_signal_connect(G_OBJECT(buffer), "notify::can-redo",
                      G_CALLBACK(sw_can_redo_cb), bsmsg);
 #else                           /* HAVE_GTKSOURCEVIEW */
     bsmsg->buffer2 =

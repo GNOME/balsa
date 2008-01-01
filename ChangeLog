@@ -1,3 +1,8 @@
+2008-01-01  Peter Bloomfield
+
+	* configure.in: configuring GtkSourceView when version is not
+	specified, try GtkSourceView2 then GtkSourceView1.
+
 2008-01-01  Albrecht Dreß
 
 	* Makefile.am: support GtkSourceView2.

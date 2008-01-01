@@ -684,7 +684,7 @@ fi
 # GtkSourceView configuration
 #
 if test x$with_gtksourceview != xno; then
-    if test x$with_gtksourceview = x1; then
+    if test x$with_gtksourceview = x1 || ! $PKG_CONFIG --exists gtksourceview-2.0 ; then
 	PKG_CHECK_MODULES(GTKSOURCEVIEW, [ gtksourceview-1.0 ])
     	AC_DEFINE(HAVE_GTKSOURCEVIEW,1,[Defined when GtkSourceView can be used.])
 	AC_MSG_NOTICE([Note: using GtkSourceview Version 1])

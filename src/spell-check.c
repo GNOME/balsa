@@ -819,10 +819,6 @@ balsa_spell_check_start(BalsaSpellCheck * spell_check, GtkWindow *parent_wnd)
     GtkTextBuffer *buffer = gtk_text_view_get_buffer(spell_check->view);
     GtkTextIter start, end, iter;
     GtkTextMark *insert;
-#if GLIB_CHECK_VERSION(2, 14, 0)
-    GError *err = NULL;
-#endif                          /* GLIB_CHECK_VERSION(2, 14, 0) */
-
 
     /* Config the spell check */
     spell_check->spell_config = new_pspell_config();

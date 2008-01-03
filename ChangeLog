@@ -1,3 +1,8 @@
+2008-01-02  Peter Bloomfield
+
+	* src/spell-check.c: (balsa_spell_check_start): compile without
+	GtkSpell.
+
 2008-01-01  Peter Bloomfield
 
 	* configure.in: if glib is 2.14+, we use GRegex, so do not

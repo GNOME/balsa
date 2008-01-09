@@ -109,6 +109,8 @@ struct _LibBalsaSourceViewerInfo {
     GtkWidget *text;
     GtkWidget *window;
     gboolean *escape_specials;
+    gint *width;
+    gint *height;
 };
 
 typedef struct _LibBalsaSourceViewerInfo LibBalsaSourceViewerInfo;
@@ -226,9 +228,22 @@ lbsv_app_set_menus(GtkWindow * app, GtkAction ** action)
     return menubar;
 }
 
+static void
+lsv_size_allocate_cb(GtkWindow * window, GtkAllocation * alloc,
+                     LibBalsaSourceViewerInfo * lsvi)
+{
+    if (GTK_WIDGET_REALIZED(lsvi->window)
+        && !(gdk_window_get_state(lsvi->window->window)
+             & GDK_WINDOW_STATE_MAXIMIZED)) {
+        *lsvi->width  = alloc->width;
+        *lsvi->height = alloc->height;
+    }
+}
+
 void
 libbalsa_show_message_source(LibBalsaMessage* msg, const gchar * font,
-			     gboolean* escape_specials)
+			     gboolean* escape_specials,
+                             gint * width, gint * height)
 {
     GtkWidget *text;
     PangoFontDescription *desc;
@@ -252,14 +267,15 @@ libbalsa_show_message_source(LibBalsaMessage* msg, const gchar * font,
     interior = gtk_scrolled_window_new(GTK_TEXT_VIEW(text)->hadjustment,
                                        GTK_TEXT_VIEW(text)->vadjustment);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(interior),
-                                   GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
+                                   GTK_POLICY_AUTOMATIC,
+                                   GTK_POLICY_ALWAYS);
     gtk_container_add(GTK_CONTAINER(interior), GTK_WIDGET(text));
 
     window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title(GTK_WINDOW(window), _("Message Source"));
     g_object_set_data(G_OBJECT(window), "text", text);
     gtk_window_set_wmclass(GTK_WINDOW(window), "message-source", "Balsa");
-    gtk_window_set_default_size(GTK_WINDOW(window), 500, 400);
+    gtk_window_set_default_size(GTK_WINDOW(window), *width, *height);
     vbox = gtk_vbox_new(FALSE, 1);
     gtk_box_pack_start(GTK_BOX(vbox), 
                        lbsv_app_set_menus(GTK_WINDOW(window),
@@ -268,13 +284,17 @@ libbalsa_show_message_source(LibBalsaMessage* msg, const gchar * font,
     gtk_container_add(GTK_CONTAINER(window), vbox);
 
     lsvi = g_new(LibBalsaSourceViewerInfo, 1);
-    lsvi->msg = msg;
-    g_object_ref(msg);
+    lsvi->msg = g_object_ref(msg);
     lsvi->text = text;
     lsvi->window = window;
     lsvi->escape_specials = escape_specials;
+    lsvi->width = width;
+    lsvi->height = height;
     g_object_set_data_full(G_OBJECT(window), "lsvi", lsvi,
                            (GDestroyNotify) lsv_window_destroy_notify);
+
+    g_signal_connect(window, "size-allocate",
+                     G_CALLBACK(lsv_size_allocate_cb), lsvi);
 
     gtk_widget_show_all(window);
     if (*escape_specials)

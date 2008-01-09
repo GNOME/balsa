@@ -103,7 +103,8 @@ void libbalsa_set_spool(const gchar * spool);
 
 void libbalsa_show_message_source(LibBalsaMessage * msg,
                                   const gchar * font,
-                                  gboolean *escape_specials);
+                                  gboolean *escape_specials,
+                                  gint * width, gint * height);
 gchar *libbalsa_rot(const gchar * pass);
 
 gchar *libbalsa_guess_email_address(void);

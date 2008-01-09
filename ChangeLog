@@ -1,3 +1,18 @@
+2008-01-09  Peter Bloomfield
+
+	* libbalsa/libbalsa.h: add width and height to api for
+	libbalsa_show_message_source.
+	* libbalsa/source-viewer.c: (lsv_size_allocate_cb): save width
+	and height.
+	(libbalsa_show_message_source): add width and height to api;
+	change horizontal scroll policy to GTK_POLICY_AUTOMATIC.
+	* src/balsa-app.h: add source viewer width and height.
+	* src/balsa-index.c: (bndx_view_source): use new api.
+	* src/main-window.c: ditto.
+	* src/message-window.c: (view_msg_source_cb): ditto.
+	* src/save-restore.c: (config_global_load, config_save): load
+	and save source viewer width and height.
+
 2008-01-02  Peter Bloomfield
 
 	* src/spell-check.c: (balsa_spell_check_start): compile without

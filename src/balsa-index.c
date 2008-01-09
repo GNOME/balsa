@@ -1444,7 +1444,9 @@ bndx_view_source(gpointer data)
         if (!message)
             continue;
 	libbalsa_show_message_source(message, balsa_app.message_font,
-				     &balsa_app.source_escape_specials);
+				     &balsa_app.source_escape_specials,
+                                     &balsa_app.source_width,
+                                     &balsa_app.source_height);
         g_object_unref(message);
     }
     balsa_index_selected_msgnos_free(index, selected);

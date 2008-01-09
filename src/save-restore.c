@@ -805,6 +805,8 @@ config_global_load(void)
     libbalsa_conf_push_group("SourcePreview");
     balsa_app.source_escape_specials = 
         libbalsa_conf_get_bool("EscapeSpecials=true");
+    balsa_app.source_width  = libbalsa_conf_get_int("Width=500");
+    balsa_app.source_height = libbalsa_conf_get_int("Height=400");
     libbalsa_conf_pop_group();
 
     /* Printing options ... */
@@ -1308,6 +1310,8 @@ config_save(void)
     libbalsa_conf_push_group("SourcePreview");
     libbalsa_conf_set_bool("EscapeSpecials",
                           balsa_app.source_escape_specials);
+    libbalsa_conf_set_int("Width",  balsa_app.source_width);
+    libbalsa_conf_set_int("Height", balsa_app.source_height);
     libbalsa_conf_pop_group();
 
     /* Printing options ... */

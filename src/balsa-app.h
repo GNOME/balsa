@@ -298,8 +298,12 @@ extern struct BalsaApplication {
 
     gboolean empty_trash_on_exit;
     gboolean previewpane;
-    gboolean source_escape_specials;
     gboolean debug;
+
+    /* Source viewer */
+    gboolean source_escape_specials;
+    gint source_width;
+    gint source_height;
 
     /* what to do with message window after moving the message */
     MwActionAfterMove mw_action_after_move;

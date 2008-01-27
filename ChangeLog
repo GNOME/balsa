@@ -1,3 +1,13 @@
+2008-01-26  Peter Bloomfield
+
+	Initial commit on mailbox-gsequence branch (rev 7831).
+	* libbalsa/mailbox.c: reimplement LibBalsaMailbox::msg_tree
+	using GSequence.
+	* libbalsa/mailbox.h: ditto.
+	* libbalsa/mailbox_imap.c: ditto.
+	* libbalsa/mailbox_local.c: ditto.
+	* src/balsa-mblist.c: (balsa_mblist_set_status_bar): ditto.
+
 2008-01-09  Peter Bloomfield
 
 	* libbalsa/libbalsa.h: add width and height to api for

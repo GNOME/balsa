@@ -618,12 +618,12 @@ struct collect_seq_data {
 
 static const unsigned MAX_CHUNK_LENGTH = 20; 
 static gboolean
-collect_seq_cb(GNode *node, gpointer data)
+collect_seq_cb(GSequenceIter *node, gpointer data)
 {
     /* We prefetch envelopes in chunks to save on RTTs.
      * Try to get the messages both before and after the message. */
     struct collect_seq_data *csd = (struct collect_seq_data*)data;
-    unsigned msgno = GPOINTER_TO_UINT(node->data);
+    unsigned msgno = libbalsa_mailbox_get_msgno(node);
     if(msgno==0) /* root node */
         return FALSE;
     csd->msgno_arr[(csd->cnt++) % MAX_CHUNK_LENGTH] = msgno;
@@ -658,9 +658,8 @@ mi_get_imsg(LibBalsaMailboxImap *mimap, unsigned msgno)
     csd.cnt          = 0;
     csd.has_it       = 0;
     if(LIBBALSA_MAILBOX(mimap)->msg_tree) {
-        g_node_traverse(LIBBALSA_MAILBOX(mimap)->msg_tree,
-                        G_PRE_ORDER, G_TRAVERSE_ALL, -1, collect_seq_cb,
-                        &csd);
+        libbalsa_mailbox_traverse(LIBBALSA_MAILBOX(mimap),
+                                  G_PRE_ORDER, collect_seq_cb, &csd);
         if(csd.cnt>MAX_CHUNK_LENGTH) csd.cnt = MAX_CHUNK_LENGTH;
         qsort(csd.msgno_arr, csd.cnt, sizeof(csd.msgno_arr[0]), cmp_msgno);
     } else {
@@ -779,7 +778,7 @@ imap_exists_cb(ImapMboxHandle *handle, LibBalsaMailboxImap *mimap)
     if(cnt != mimap->messages_info->len) {
         unsigned i;
         struct message_info a = {0};
-        GNode *sibling = NULL;
+        GSequenceIter *sibling = NULL;
 
         if(cnt<mimap->messages_info->len) {
             /* remove messages; we probably missed some EXPUNGE responses
@@ -813,12 +812,12 @@ imap_exists_cb(ImapMboxHandle *handle, LibBalsaMailboxImap *mimap)
         gdk_threads_enter();
 
         if (mailbox->msg_tree)
-            sibling = g_node_last_child(mailbox->msg_tree);
+            sibling = g_sequence_get_end_iter(mailbox->msg_tree);
         for(i=mimap->messages_info->len+1; i <= cnt; i++) {
             g_array_append_val(mimap->messages_info, a);
             g_ptr_array_add(mimap->msgids, NULL);
-            libbalsa_mailbox_msgno_inserted(mailbox, i, mailbox->msg_tree,
-                                            &sibling);
+            sibling = libbalsa_mailbox_msgno_inserted(mailbox, i,
+                                                      NULL, sibling);
         }
         ++mimap->search_stamp;
         
@@ -2991,9 +2990,9 @@ lbmi_compare_func(const SortTuple * a,
     int retval;
     LibBalsaMailbox *mbox = (LibBalsaMailbox *) mimap;
 
-    seqnoa = GPOINTER_TO_UINT(a->node->data);
+    seqnoa = libbalsa_mailbox_get_msgno(a->node);
     g_assert(seqnoa <= mimap->sort_ranks->len);
-    seqnob = GPOINTER_TO_UINT(b->node->data);
+    seqnob = libbalsa_mailbox_get_msgno(b->node);
     g_assert(seqnob <= mimap->sort_ranks->len);
     retval = g_array_index(mimap->sort_ranks, guint, seqnoa - 1) -
 	g_array_index(mimap->sort_ranks, guint, seqnob - 1);

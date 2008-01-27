@@ -2293,7 +2293,7 @@ balsa_mblist_set_status_bar(LibBalsaMailbox * mailbox)
 
     hidden_messages =
         mailbox->msg_tree ? total_messages -
-        (g_node_n_nodes(mailbox->msg_tree, G_TRAVERSE_ALL) - 1) : 0;
+        (libbalsa_mailbox_n_nodes(mailbox) - 1) : 0;
 
     /* xgettext: this is the first part of the message
      * "Shown mailbox: %s with %d messages, %d new, %d hidden". */

@@ -88,7 +88,7 @@ typedef struct _SortTuple SortTuple;
 /* Sorting */
 struct _SortTuple {
     guint offset;
-    GNode *node;
+    GSequenceIter *node;
 };
 
 typedef enum {
@@ -219,7 +219,7 @@ struct _LibBalsaMailbox {
     GPtrArray *mindex;  /* the basic message index used for index
                          * displaying/columns of GtkTreeModel interface
                          * and NOTHING else. */
-    GNode *msg_tree; /* the possibly filtered tree of messages;
+    GSequence *msg_tree; /* the possibly filtered tree of messages;
                       * gdk lock MUST BE HELD when accessing. */
     LibBalsaCondition *view_filter; /* to choose a subset of messages
                                      * to be displayed, e.g., only
@@ -512,15 +512,26 @@ gboolean libbalsa_mailbox_can_do(LibBalsaMailbox *mailbox,
     to produce a tree of messages. The tree is put in msg_tree and used
     later by GtkTreeModel interface.
     libbalsa_mailbox_set_threading() is the public method;
-    libbalsa_mailbox_set_msg_tree and libbalsa_mailbox_unlink_and_prepend
+    libbalsa_mailbox_set_msg_tree and libbalsa_mailbox_check_parent
     are helpers for the subclass methods.
 */
 void libbalsa_mailbox_set_threading(LibBalsaMailbox *mailbox,
 				    LibBalsaMailboxThreadingType thread_type);
 void libbalsa_mailbox_set_msg_tree(LibBalsaMailbox * mailbox,
-				   GNode * msg_tree);
-void libbalsa_mailbox_unlink_and_prepend(LibBalsaMailbox * mailbox,
-					 GNode * node, GNode * parent);
+				   GNode           * msg_tree);
+void libbalsa_mailbox_check_parent(LibBalsaMailbox * mailbox,
+                                   GSequenceIter   * node,
+                                   GSequenceIter   * parent);
+
+typedef gboolean (*LBMTraverseFunc) (GSequenceIter * node, gpointer data);
+void libbalsa_mailbox_traverse(LibBalsaMailbox * mailbox,
+                               GTraverseType type, LBMTraverseFunc func,
+                               gpointer data);
+guint libbalsa_mailbox_n_nodes(LibBalsaMailbox * mailbox);
+guint libbalsa_mailbox_get_msgno(GSequenceIter * node);
+GSequenceIter *libbalsa_mailbox_get_parent(GSequenceIter * node);
+gboolean libbalsa_mailbox_node_is_ancestor(GSequenceIter * node,
+                                           GSequenceIter * descendant);
 
 /* Mailbox views. */
 extern GHashTable *libbalsa_mailbox_view_table;
@@ -579,12 +590,11 @@ time_t libbalsa_mailbox_get_mtime(LibBalsaMailbox * mailbox);
 
 /** force update of given msgno */
 void libbalsa_mailbox_msgno_changed(LibBalsaMailbox  *mailbox, guint seqno);
-void libbalsa_mailbox_msgno_inserted(LibBalsaMailbox * mailbox,
-                                     guint seqno, GNode * parent,
-                                     GNode ** sibling);
+GSequenceIter *libbalsa_mailbox_msgno_inserted(LibBalsaMailbox * mailbox,
+                                               guint seqno,
+                                               GSequenceIter * parent,
+                                               GSequenceIter * sibling);
 void libbalsa_mailbox_msgno_removed(LibBalsaMailbox  *mailbox, guint seqno);
-void libbalsa_mailbox_msgno_filt_in(LibBalsaMailbox * mailbox, guint seqno);
-void libbalsa_mailbox_msgno_filt_out(LibBalsaMailbox * mailbox, guint seqno);
 void libbalsa_mailbox_msgno_filt_check(LibBalsaMailbox * mailbox,
 				       guint seqno,
 				       LibBalsaMailboxSearchIter

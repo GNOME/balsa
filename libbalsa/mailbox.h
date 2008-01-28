@@ -219,6 +219,7 @@ struct _LibBalsaMailbox {
     GPtrArray *mindex;  /* the basic message index used for index
                          * displaying/columns of GtkTreeModel interface
                          * and NOTHING else. */
+    GPtrArray *nodes;   /* map msgno to a node in msg_tree */
     GSequence *msg_tree; /* the possibly filtered tree of messages;
                       * gdk lock MUST BE HELD when accessing. */
     LibBalsaCondition *view_filter; /* to choose a subset of messages
@@ -530,8 +531,6 @@ void libbalsa_mailbox_traverse(LibBalsaMailbox * mailbox,
 guint libbalsa_mailbox_n_nodes(LibBalsaMailbox * mailbox);
 guint libbalsa_mailbox_get_msgno(GSequenceIter * node);
 GSequenceIter *libbalsa_mailbox_get_parent(GSequenceIter * node);
-gboolean libbalsa_mailbox_node_is_ancestor(GSequenceIter * node,
-                                           GSequenceIter * descendant);
 
 /* Mailbox views. */
 extern GHashTable *libbalsa_mailbox_view_table;

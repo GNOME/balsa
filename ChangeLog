@@ -1,3 +1,10 @@
+2008-01-27  Peter Bloomfield
+
+	* libbalsa/mailbox.c: LibBalsaMailbox::nodes is a GPtrArray
+	mapping msgno into LibBalsaMailbox::msg_tree; reimplement
+	lbm_node_find using it.
+	* libbalsa/mailbox.h: ditto.
+
 2008-01-26  Peter Bloomfield
 
 	Initial commit on mailbox-gsequence branch (rev 7831).

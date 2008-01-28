@@ -337,7 +337,6 @@ BONOBO_ACTIVATION_IDL="`$PKG_CONFIG --variable=idldir bonobo-activation-2.0`"
 AC_SUBST(BONOBO_ACTIVATION_IDL)
 
 AC_SUBST(BALSA_CFLAGS)
-BALSA_LIBS="$BALSA_LIBS -pg"
 AC_SUBST(BALSA_LIBS)
 AC_SUBST(BALSA_AB_LIBS)
 
@@ -766,7 +765,7 @@ fi
 
 if test -d "${srcdir}/.svn" ; then
 	BALSA_FROM_SVN=yes
-	BALSA_CFLAGS="$BALSA_CFLAGS -Wall -Werror -pg"
+	BALSA_CFLAGS="$BALSA_CFLAGS -Wall -Werror"
 else
 	BALSA_FROM_SVN=no
 fi

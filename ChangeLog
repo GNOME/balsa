@@ -1,5 +1,12 @@
 2008-01-28  Peter Bloomfield
 
+	* libbalsa/mailbox.c: (libbalsa_mailbox_n_nodes): test for
+	msg_tree == NULL.
+	* src/balsa-mblist.c: (balsa_mblist_set_status_bar): don't test
+	msg_tree; don't decrement count.
+
+2008-01-28  Peter Bloomfield
+
 	* libbalsa/mailbox.c: (libbalsa_mailbox_open,
 	libbalsa_mailbox_close): clear mailbox->nodes;
 	(lbm_node_new): new, creates info structure;

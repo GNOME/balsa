@@ -705,12 +705,13 @@ lbm_node_count(GSequenceIter * node, gpointer data)
 guint
 libbalsa_mailbox_n_nodes(LibBalsaMailbox * mailbox)
 {
-    guint n = 0;
-
-    libbalsa_mailbox_traverse(mailbox, G_PRE_ORDER,
-                              lbm_node_count, &n);
-
-    return n;
+    if (mailbox->msg_tree) {
+        guint n = 0;
+        libbalsa_mailbox_traverse(mailbox, G_PRE_ORDER,
+                                  lbm_node_count, &n);
+        return n;
+    } else
+        return libbalsa_mailbox_total_messages(mailbox);
 }
 
 static gboolean

@@ -2286,14 +2286,11 @@ balsa_mblist_set_status_bar(LibBalsaMailbox * mailbox)
 {
     gint total_messages = libbalsa_mailbox_total_messages(mailbox);
     gint unread_messages = mailbox->unread_messages;
-    gint hidden_messages;
+    gint hidden_messages =
+        total_messages - libbalsa_mailbox_n_nodes(mailbox);
     GString *desc = g_string_new(NULL);
     GtkStatusbar *statusbar;
     guint context_id;
-
-    hidden_messages =
-        mailbox->msg_tree ? total_messages -
-        (libbalsa_mailbox_n_nodes(mailbox) - 1) : 0;
 
     /* xgettext: this is the first part of the message
      * "Shown mailbox: %s with %d messages, %d new, %d hidden". */

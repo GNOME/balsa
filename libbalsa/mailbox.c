@@ -580,7 +580,8 @@ typedef struct {
 } LibBalsaMailboxSequenceInfo;
 
 static LibBalsaMailboxSequenceInfo *
-lbm_node_new(LibBalsaMailbox * mailbox, guint msgno, GSequenceIter * parent)
+lbm_node_info_new(LibBalsaMailbox * mailbox, guint msgno,
+                  GSequenceIter * parent)
 {
     LibBalsaMailboxSequenceInfo *info =
         g_new(LibBalsaMailboxSequenceInfo, 1);
@@ -593,17 +594,37 @@ lbm_node_new(LibBalsaMailbox * mailbox, guint msgno, GSequenceIter * parent)
     return info;
 }
 
+static void
+lbm_node_info_free(LibBalsaMailboxSequenceInfo * info)
+{
+    if (info->children)
+        g_sequence_free(info->children);
+    if (info->msgno <= info->nodes->len)
+        g_ptr_array_index(info->nodes, info->msgno - 1) = NULL;
+    g_free(info);
+}
+
 guint
 libbalsa_mailbox_get_msgno(GSequenceIter * node)
 {
-    LibBalsaMailboxSequenceInfo *info = g_sequence_get(node);
+    LibBalsaMailboxSequenceInfo *info;
+
+    g_return_val_if_fail(node != NULL, 0);
+
+    info = g_sequence_get(node);
+
     return info->msgno;
 }
 
 GSequenceIter *
 libbalsa_mailbox_get_parent(GSequenceIter * node)
 {
-    LibBalsaMailboxSequenceInfo *info = g_sequence_get(node);
+    LibBalsaMailboxSequenceInfo *info;
+
+    g_return_val_if_fail(node != NULL, NULL);
+
+    info = g_sequence_get(node);
+
     return info->parent;
 }
 
@@ -627,23 +648,13 @@ lbm_node_get_children(GSequenceIter * node)
     return info->children;
 }
 
-static void
-lbm_msg_tree_free_info(LibBalsaMailboxSequenceInfo * info)
-{
-    if (info->children)
-        g_sequence_free(info->children);
-    if (info->msgno <= info->nodes->len)
-        g_ptr_array_index(info->nodes, info->msgno - 1) = NULL;
-    g_free(info);
-}
-
 static GSequence *
 lbm_node_init_children(GSequenceIter * node)
 {
     LibBalsaMailboxSequenceInfo *info = g_sequence_get(node);
     if (!info->children)
         info->children =
-            g_sequence_new((GDestroyNotify) lbm_msg_tree_free_info);
+            g_sequence_new((GDestroyNotify) lbm_node_info_free);
     return info->children;
 }
 
@@ -661,8 +672,6 @@ lbm_nodes_traverse(GSequence * seq, GTraverseType type,
     GSequenceIter *node = g_sequence_get_begin_iter(seq);
     GSequenceIter *end  = g_sequence_get_end_iter(seq);
 
-    g_assert(type == G_PRE_ORDER || type == G_POST_ORDER);
-
     while (node != end) {
         GSequenceIter *next = g_sequence_iter_next(node);
         GSequence *children = lbm_node_get_children(node);
@@ -677,9 +686,8 @@ lbm_nodes_traverse(GSequence * seq, GTraverseType type,
                     || (*func) (node, data))
                     return TRUE;
             }
-        } else
-            if ((*func) (node, data))
-                return TRUE;
+        } else if ((*func) (node, data))
+            return TRUE;
 
         node = next;
     }
@@ -691,27 +699,30 @@ void
 libbalsa_mailbox_traverse(LibBalsaMailbox * mailbox, GTraverseType type,
                           LBMTraverseFunc func, gpointer data)
 {
+    g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
+    g_return_if_fail(mailbox->msg_tree != NULL);
+    g_return_if_fail(type == G_PRE_ORDER || type == G_POST_ORDER);
+    g_return_if_fail(func != NULL);
+
     lbm_nodes_traverse(mailbox->msg_tree, type, func, data);
-}
-
-static gboolean
-lbm_node_count(GSequenceIter * node, gpointer data)
-{
-    ++*(guint *) data;
-
-    return FALSE;
 }
 
 guint
 libbalsa_mailbox_n_nodes(LibBalsaMailbox * mailbox)
 {
-    if (mailbox->msg_tree) {
-        guint n = 0;
-        libbalsa_mailbox_traverse(mailbox, G_PRE_ORDER,
-                                  lbm_node_count, &n);
+    g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), 0);
+
+    if (mailbox->nodes) {
+        guint i, n = 0;
+
+        for (i = 0; i < mailbox->nodes->len; i++)
+            if (g_ptr_array_index(mailbox->nodes, i))
+                ++n;
+
         return n;
-    } else
-        return libbalsa_mailbox_total_messages(mailbox);
+    }
+
+    return libbalsa_mailbox_total_messages(mailbox);
 }
 
 static gboolean
@@ -1423,7 +1434,7 @@ libbalsa_mailbox_msgno_inserted(LibBalsaMailbox *mailbox, guint seqno,
         return NULL;
 
     /* Insert node into the message tree before getting path. */
-    info = lbm_node_new(mailbox, seqno, parent);
+    info = lbm_node_info_new(mailbox, seqno, parent);
 
     if (sibling) {
         insert = g_sequence_iter_next(sibling);
@@ -1468,7 +1479,7 @@ lbm_msgno_filt_in(LibBalsaMailbox *mailbox, guint seqno)
     LibBalsaMailboxSequenceInfo *info;
 
     /* Insert node into the message tree before getting path. */
-    info = lbm_node_new(mailbox, seqno, NULL);
+    info = lbm_node_info_new(mailbox, seqno, NULL);
     iter.user_data = g_sequence_prepend(mailbox->msg_tree, info);
     iter.stamp = mailbox->stamp;
     lbm_node_cache(mailbox, seqno, iter.user_data);
@@ -1481,35 +1492,6 @@ lbm_msgno_filt_in(LibBalsaMailbox *mailbox, guint seqno)
 
     mailbox->msg_tree_changed = TRUE;
     g_signal_emit(mailbox, libbalsa_mailbox_signals[CHANGED], 0);
-}
-
-struct remove_data {
-    LibBalsaMailbox *mailbox;
-    unsigned seqno;
-    GSequenceIter *node;
-};
-
-/* LBMTraverseFunc for finding a deleted message, and updating msgnos. */
-static gboolean
-decrease_post(GSequenceIter * node, gpointer data)
-{
-    LibBalsaMailboxSequenceInfo *info = g_sequence_get(node);
-    struct remove_data *dt = (struct remove_data*)data;
-    unsigned seqno = info->msgno;
-
-    if(seqno == dt->seqno) 
-        dt->node = node;
-    else if (seqno > dt->seqno) {
-        GtkTreeIter iter; 
-
-        g_ptr_array_index(dt->mailbox->nodes, info->msgno - 1) = NULL;
-        --info->msgno;
-        g_ptr_array_index(dt->mailbox->nodes, info->msgno - 1) = node;
-        iter.user_data = node;
-        lbm_msgno_changed(dt->mailbox, seqno, &iter);
-    }
-
-    return FALSE;
 }
 
 static void
@@ -1574,7 +1556,7 @@ lbm_node_remove(LibBalsaMailbox * mailbox, GSequenceIter * node)
 void
 libbalsa_mailbox_msgno_removed(LibBalsaMailbox * mailbox, guint seqno)
 {
-    struct remove_data dt;
+    GSequenceIter *node;
 
     g_signal_emit(mailbox, libbalsa_mailbox_signals[MESSAGE_EXPUNGED],
                   0, seqno);
@@ -1592,15 +1574,21 @@ libbalsa_mailbox_msgno_removed(LibBalsaMailbox * mailbox, guint seqno)
         g_ptr_array_remove_index(mailbox->mindex, seqno - 1);
     }
 
-    dt.mailbox = mailbox;
-    dt.seqno = seqno;
-    dt.node = NULL;
-    libbalsa_mailbox_traverse(mailbox, G_PRE_ORDER, decrease_post, &dt);
+    node = lbm_node_find(mailbox, seqno);
+    if (node)
+        lbm_node_remove(mailbox, node);
+    /* else apparently the view did not include this message, which is ok */
 
-    if (dt.node)
-        /* dt.node == NULL is ok, apparently the view did not include
-         * this message */
-        lbm_node_remove(mailbox, dt.node);
+    g_ptr_array_remove_index(mailbox->nodes, seqno - 1);
+
+    while (seqno <= mailbox->nodes->len) {
+        if ((node = lbm_node_find(mailbox, seqno)) != NULL) {
+            LibBalsaMailboxSequenceInfo *info = g_sequence_get(node);
+            --info->msgno;
+            g_assert(info->msgno == seqno);
+        }
+        ++seqno;
+    }
 
     gdk_threads_leave();
 }
@@ -3820,7 +3808,7 @@ libbalsa_mailbox_set_msg_tree(LibBalsaMailbox * mailbox, GNode * new_tree)
 
     if (!mailbox->msg_tree)
         mailbox->msg_tree =
-            g_sequence_new((GDestroyNotify) lbm_msg_tree_free_info);
+            g_sequence_new((GDestroyNotify) lbm_node_info_free);
 
     lbm_update_msg_tree(mailbox, new_tree);
     g_node_destroy(new_tree);
@@ -4188,14 +4176,18 @@ libbalsa_mailbox_search_iter_step(LibBalsaMailbox * mailbox,
         g_warning("Thread is not holding gdk lock");
 
     node = iter->user_data;
-    if (!node)
-        node = g_sequence_get_begin_iter(mailbox->msg_tree);
 
     total = libbalsa_mailbox_total_messages(mailbox);
     for (;;) {
         guint msgno;
 
-        node = forward ? lbm_next(node) : lbm_prev(node);
+        if (node)
+            node = forward ? lbm_next(node) : lbm_prev(node);
+        else
+            node = forward ?
+                g_sequence_get_begin_iter(mailbox->msg_tree) :
+                g_sequence_iter_prev(g_sequence_get_end_iter
+                                     (mailbox->msg_tree));
         msgno = node ? libbalsa_mailbox_get_msgno(node) : 0;
         if (msgno == stop_msgno
 	    || --total < 0 /* Runaway? */ ) {
@@ -4209,11 +4201,6 @@ libbalsa_mailbox_search_iter_step(LibBalsaMailbox * mailbox,
             retval = TRUE;
             break;
         }
-        if (!node)
-            node = forward ?
-                g_sequence_get_begin_iter(mailbox->msg_tree) :
-                g_sequence_iter_prev(g_sequence_get_end_iter
-                                     (mailbox->msg_tree));
     }
 
     if (retval)

@@ -1,3 +1,16 @@
+2008-01-29  Peter Bloomfield
+
+	* libbalsa/mailbox.c:
+	(libbalsa_mailbox_n_nodes): traverse nodes instead of msg_tree;
+	(libbalsa_mailbox_msgno_removed): ditto.
+	(libbalsa_mailbox_search_iter_step): fix corner case.
+	(lbm_node_info_new, lbm_node_info_free,
+	libbalsa_mailbox_get_msgno, libbalsa_mailbox_get_parent,
+	lbm_node_init_children, lbm_nodes_traverse,
+	libbalsa_mailbox_traverse,
+	libbalsa_mailbox_msgno_inserted, lbm_msgno_filt_in,
+	libbalsa_mailbox_set_msg_tree): clean up.
+
 2008-01-28  Peter Bloomfield
 
 	* libbalsa/mailbox.c: (libbalsa_mailbox_n_nodes): test for

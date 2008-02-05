@@ -1,3 +1,7 @@
+2008-02-05  Jovan Naumovski  <jovan@lugola.net>
+	
+	* mk.po: Fix for bug #514613O
+
 2008-01-31  Marcel Telka  <marcel@telka.sk>
 
 	* sk.po: Updated Slovak translation.

@@ -1,5 +1,14 @@
 2008-02-08  Peter Bloomfield
 
+	* libbalsa/libbalsa.c: (libbalsa_threads_leave): restore
+	warning.
+	* src/balsa-message.c: (bm_find_entry_changed_cb, bm_find_again,
+	bm_pass_to_find_entry): do not hide separator, that triggers
+	warnings;
+	(balsa_message_find_in_message): find again only if found.
+
+2008-02-08  Peter Bloomfield
+
 	* src/balsa-message.c: (bm_find_entry_changed_cb,
 	bm_find_again): do not mess with thread lock.
 

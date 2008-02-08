@@ -431,7 +431,9 @@ bm_find_entry_changed_cb(GtkEditable * editable, gpointer data)
     }
 
     if (found) {
+#if CAN_HIDE_SEPARATOR_WITHOUT_TRIGGERING_CRITICAL_WARNINGS
         gtk_widget_hide(bm->find_sep);
+#endif
         gtk_widget_hide(bm->find_label);
         gtk_widget_set_sensitive(bm->find_prev, TRUE);
         gtk_widget_set_sensitive(bm->find_next, TRUE);
@@ -469,7 +471,9 @@ bm_find_again(BalsaMessage * bm, gboolean find_forward)
     }
 
     if (found) {
+#if CAN_HIDE_SEPARATOR_WITHOUT_TRIGGERING_CRITICAL_WARNINGS
         gtk_widget_hide(bm->find_sep);
+#endif
         gtk_widget_hide(bm->find_label);
     } else {
         if (find_forward) {
@@ -571,7 +575,7 @@ bm_pass_to_find_entry(BalsaMessage * bm, GdkEventKey * event)
         return res;
     case GDK_g:
         if ((event->state & (GDK_SHIFT_MASK | GDK_CONTROL_MASK)) ==
-            GDK_CONTROL_MASK) {
+            GDK_CONTROL_MASK && GTK_WIDGET_SENSITIVE(bm->find_next)) {
             bm_find_again(bm, bm->find_forward);
             return res;
         }
@@ -3126,7 +3130,9 @@ balsa_message_find_in_message(BalsaMessage * bm)
                                  "key-press-event",
                                  G_CALLBACK(bm_pass_to_find_entry), bm);
 
+#if CAN_HIDE_SEPARATOR_WITHOUT_TRIGGERING_CRITICAL_WARNINGS
         gtk_widget_hide(bm->find_sep);
+#endif
         gtk_widget_hide(bm->find_label);
 
         gtk_widget_set_sensitive(bm->find_prev, FALSE);

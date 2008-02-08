@@ -750,7 +750,9 @@ libbalsa_threads_leave(void)
     self = pthread_self();
 
     if (libbalsa_threads_lock == 0 || self != libbalsa_threads_id) {
-	g_warning("Not holding gdk lock!!!");
+#if WARN_ABOUT_THREADS_ERRORS
+        g_warning("%s: Not holding gdk lock!!!", __func__);
+#endif                          /* WARN_ABOUT_THREADS_ERRORS */
 	return;
     }
 

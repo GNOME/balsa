@@ -1,3 +1,16 @@
+2008-02-07  Peter Bloomfield
+
+	* libbalsa/libbalsa.c: (libbalsa_threads_leave): disable
+	warning about dropping lock when not holding it--GtkTextView
+	seems to trigger it.
+	* src/balsa-message.c: (bm_scroll_to_iter,
+	bm_find_entry_changed_cb, bm_find_again, bm_find_prev_cb,
+	bm_find_next_cb, bm_find_bar_new, bm_pass_to_find_entry,
+	bm_disable_find_entry, balsa_message_init, balsa_message_set,
+	balsa_message_find_in_message): implement find-in-message.
+	* src/balsa-message.h: api for find-in-message.
+	* src/main-window.c: use it.
+
 2008-01-09  Peter Bloomfield
 
 	* libbalsa/libbalsa.h: add width and height to api for

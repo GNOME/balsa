@@ -80,6 +80,16 @@ struct _BalsaMessage {
 	gboolean close_with_msg;
 
         BalsaMessageFocusState focus_state;
+
+        /* Find-in-message stuff */
+        GtkWidget  *find_bar;
+        GtkWidget  *find_entry;
+        GtkWidget  *find_next;
+        GtkWidget  *find_prev;
+        GtkWidget  *find_sep;
+        GtkWidget  *find_label;
+        GtkTextIter find_iter;
+        gboolean    find_forward;
 };
 
 struct _BalsaMessageClass {
@@ -124,6 +134,8 @@ void balsa_message_perform_crypto(LibBalsaMessage * message,
 				  gboolean no_mp_signed,
 				  guint max_ref);
 #endif
+
+void balsa_message_find_in_message (BalsaMessage * bm);
 
 #ifdef __cplusplus
 }

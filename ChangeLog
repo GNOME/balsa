@@ -1,5 +1,10 @@
 2008-02-08  Peter Bloomfield
 
+	* src/balsa-message.c: (bm_find_entry_changed_cb,
+	bm_find_again): do not mess with thread lock.
+
+2008-02-08  Peter Bloomfield
+
 	* src/balsa-message.c: (bm_pass_to_find_entry): test only SHIFT
 	and CONTROL bits.
 

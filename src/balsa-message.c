@@ -416,7 +416,6 @@ bm_find_entry_changed_cb(GtkEditable * editable, gpointer data)
             found = gtk_text_iter_forward_search(&bm->find_iter, text, 0,
                                                  &match_begin, &match_end,
                                                  NULL);
-            gdk_threads_enter();        /* Just a guess! */
         }
     } else {
         found = gtk_text_iter_backward_search(&bm->find_iter, text, 0,
@@ -428,7 +427,6 @@ bm_find_entry_changed_cb(GtkEditable * editable, gpointer data)
             found = gtk_text_iter_backward_search(&bm->find_iter, text, 0,
                                                   &match_begin, &match_end,
                                                   NULL);
-            gdk_threads_enter();        /* Just a guess! */
         }
     }
 
@@ -487,7 +485,6 @@ bm_find_again(BalsaMessage * bm, gboolean find_forward)
                            _("Wrapped"));
         gtk_widget_show(bm->find_sep);
         gtk_widget_show(bm->find_label);
-        gdk_threads_enter();        /* Just a guess! */
     }
 
     gtk_text_buffer_select_range(buffer, &match_begin, &match_end);

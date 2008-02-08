@@ -372,9 +372,46 @@ on_content_size_alloc(GtkWidget * widget, GtkAllocation * allocation,
  * Callbacks and helpers for the find bar.
  */
 
+typedef enum {
+    BM_FIND_STATUS_INIT,
+    BM_FIND_STATUS_FOUND,
+    BM_FIND_STATUS_WRAPPED,
+    BM_FIND_STATUS_NOT_FOUND
+} BalsaMessageFindStatus;
+
 static void
-bm_scroll_to_iter(BalsaMessage * bm, GtkTextView * text_view,
-                  GtkTextIter * iter)
+bm_find_set_status(BalsaMessage * bm, BalsaMessageFindStatus status)
+{
+    const gchar *text = "";
+    gboolean sensitive = FALSE;
+
+    switch (status) {
+        default:
+        case BM_FIND_STATUS_INIT:
+            break;
+        case BM_FIND_STATUS_FOUND:
+            sensitive = TRUE;
+            break;
+        case BM_FIND_STATUS_WRAPPED:
+            text = _("Wrapped");
+            sensitive = TRUE;
+            break;
+        case BM_FIND_STATUS_NOT_FOUND:
+            text = _("Not found");
+            break;
+    }
+
+    gtk_label_set_text(GTK_LABEL(bm->find_label), text);
+    gtk_separator_tool_item_set_draw(GTK_SEPARATOR_TOOL_ITEM
+                                     (bm->find_sep), text[0] != '\0');
+    gtk_widget_set_sensitive(bm->find_prev, sensitive);
+    gtk_widget_set_sensitive(bm->find_next, sensitive);
+}
+
+static void
+bm_find_scroll_to_iter(BalsaMessage * bm,
+                       GtkTextView  * text_view,
+                       GtkTextIter  * iter)
 {
     GtkAdjustment *adj = GTK_VIEWPORT(bm->cont_viewport)->vadjustment;
     GdkRectangle location;
@@ -398,11 +435,11 @@ bm_scroll_to_iter(BalsaMessage * bm, GtkTextView * text_view,
 static void
 bm_find_entry_changed_cb(GtkEditable * editable, gpointer data)
 {
-    GtkEntry *entry = GTK_ENTRY(editable);
-    const gchar *text = gtk_entry_get_text(entry);
+    const gchar *text = gtk_entry_get_text(GTK_ENTRY(editable));
     BalsaMessage *bm = data;
-    GtkWidget *w = bm->current_part->mime_widget->widget;
-    GtkTextBuffer *buffer = gtk_text_view_get_buffer((GtkTextView *) w);
+    GtkTextView *text_view =
+        GTK_TEXT_VIEW(bm->current_part->mime_widget->widget);
+    GtkTextBuffer *buffer = gtk_text_view_get_buffer(text_view);
     GtkTextIter match_begin, match_end;
     gboolean found;
 
@@ -431,31 +468,22 @@ bm_find_entry_changed_cb(GtkEditable * editable, gpointer data)
     }
 
     if (found) {
-#if CAN_HIDE_SEPARATOR_WITHOUT_TRIGGERING_CRITICAL_WARNINGS
-        gtk_widget_hide(bm->find_sep);
-#endif
-        gtk_widget_hide(bm->find_label);
-        gtk_widget_set_sensitive(bm->find_prev, TRUE);
-        gtk_widget_set_sensitive(bm->find_next, TRUE);
         gtk_text_buffer_select_range(buffer, &match_begin, &match_end);
-        bm_scroll_to_iter(bm, (GtkTextView *) w, &match_begin);
+        bm_find_scroll_to_iter(bm, text_view, &match_begin);
         bm->find_iter = match_begin;
-    } else {
-        gtk_label_set_text(GTK_LABEL(bm->find_label), _("Not found"));
-        gtk_widget_show(bm->find_sep);
-        gtk_widget_show(bm->find_label);
-        gtk_widget_set_sensitive(bm->find_prev, FALSE);
-        gtk_widget_set_sensitive(bm->find_next, FALSE);
     }
+    bm_find_set_status(bm, found ?
+                       BM_FIND_STATUS_FOUND : BM_FIND_STATUS_NOT_FOUND);
 }
 
 static void
 bm_find_again(BalsaMessage * bm, gboolean find_forward)
 {
     const gchar *text = gtk_entry_get_text(GTK_ENTRY(bm->find_entry));
+    GtkTextView *text_view =
+        GTK_TEXT_VIEW(bm->current_part->mime_widget->widget);
+    GtkTextBuffer *buffer = gtk_text_view_get_buffer(text_view);
     GtkTextIter match_begin, match_end;
-    GtkWidget *w = bm->current_part->mime_widget->widget;
-    GtkTextBuffer *buffer = gtk_text_view_get_buffer((GtkTextView *) w);
     gboolean found;
 
     if (find_forward) {
@@ -470,12 +498,7 @@ bm_find_again(BalsaMessage * bm, gboolean find_forward)
                                               NULL);
     }
 
-    if (found) {
-#if CAN_HIDE_SEPARATOR_WITHOUT_TRIGGERING_CRITICAL_WARNINGS
-        gtk_widget_hide(bm->find_sep);
-#endif
-        gtk_widget_hide(bm->find_label);
-    } else {
+    if (!found) {
         if (find_forward) {
             gtk_text_buffer_get_start_iter(buffer, &bm->find_iter);
             gtk_text_iter_forward_search(&bm->find_iter, text, 0,
@@ -485,14 +508,12 @@ bm_find_again(BalsaMessage * bm, gboolean find_forward)
             gtk_text_iter_backward_search(&bm->find_iter, text, 0,
                                           &match_begin, &match_end, NULL);
         }
-        gtk_label_set_text(GTK_LABEL(bm->find_label),
-                           _("Wrapped"));
-        gtk_widget_show(bm->find_sep);
-        gtk_widget_show(bm->find_label);
     }
+    bm_find_set_status(bm, found ?
+                       BM_FIND_STATUS_FOUND : BM_FIND_STATUS_WRAPPED);
 
     gtk_text_buffer_select_range(buffer, &match_begin, &match_end);
-    bm_scroll_to_iter(bm, (GtkTextView *) w, &match_begin);
+    bm_find_scroll_to_iter(bm, text_view, &match_begin);
     bm->find_iter = match_begin;
     bm->find_forward = find_forward;
 }
@@ -560,10 +581,10 @@ bm_find_bar_new(BalsaMessage * bm)
     return toolbar;
 }
 
-static gboolean bm_disable_find_entry(BalsaMessage * bm);
+static void bm_disable_find_entry(BalsaMessage * bm);
 
 static gboolean
-bm_pass_to_find_entry(BalsaMessage * bm, GdkEventKey * event)
+bm_find_pass_to_entry(BalsaMessage * bm, GdkEventKey * event)
 {
     gboolean res = TRUE;
 
@@ -591,15 +612,13 @@ bm_pass_to_find_entry(BalsaMessage * bm, GdkEventKey * event)
     return res;
 }
 
-static gboolean
+static void
 bm_disable_find_entry(BalsaMessage * bm)
 {
     g_signal_handlers_disconnect_by_func
         (gtk_widget_get_toplevel(GTK_WIDGET(bm)),
-         G_CALLBACK(bm_pass_to_find_entry), bm);
+         G_CALLBACK(bm_find_pass_to_entry), bm);
     gtk_widget_hide(bm->find_bar);
-
-    return FALSE;
 }
 
 /*
@@ -3121,22 +3140,17 @@ balsa_message_find_in_message(BalsaMessage * bm)
     if (bm->current_part
         && (w = bm->current_part->mime_widget->widget)
         && GTK_IS_TEXT_VIEW(w)) {
-        GtkTextBuffer *buffer = gtk_text_view_get_buffer((GtkTextView *) w);
+        GtkTextView *text_view = (GtkTextView *) w;
+        GtkTextBuffer *buffer = gtk_text_view_get_buffer(text_view);
 
         bm->find_forward = TRUE;
         gtk_text_buffer_get_start_iter(buffer, &bm->find_iter);
         gtk_entry_set_text(GTK_ENTRY(bm->find_entry), "");
         g_signal_connect_swapped(gtk_widget_get_toplevel(GTK_WIDGET(bm)),
                                  "key-press-event",
-                                 G_CALLBACK(bm_pass_to_find_entry), bm);
+                                 G_CALLBACK(bm_find_pass_to_entry), bm);
 
-#if CAN_HIDE_SEPARATOR_WITHOUT_TRIGGERING_CRITICAL_WARNINGS
-        gtk_widget_hide(bm->find_sep);
-#endif
-        gtk_widget_hide(bm->find_label);
-
-        gtk_widget_set_sensitive(bm->find_prev, FALSE);
-        gtk_widget_set_sensitive(bm->find_next, FALSE);
+        bm_find_set_status(bm, BM_FIND_STATUS_INIT);
 
         gtk_widget_show(bm->find_bar);
         gtk_widget_grab_focus(bm->find_entry);

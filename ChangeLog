@@ -1,5 +1,14 @@
 2008-02-08  Peter Bloomfield
 
+	* src/balsa-message.c: (bm_find_set_status): new function, hides
+	the separator using gtk_separator_tool_item_set_draw instead of
+	gtk_widget_hide;
+	(bm_find_entry_changed_cb, bm_find_again,
+	balsa_message_find_in_message): use bm_find_set_status;
+	(bm_disable_find_entry): boolean => void.
+
+2008-02-08  Peter Bloomfield
+
 	* libbalsa/libbalsa.c: (libbalsa_threads_leave): restore
 	warning.
 	* src/balsa-message.c: (bm_find_entry_changed_cb, bm_find_again,

@@ -1,3 +1,8 @@
+2008-02-08  Peter Bloomfield
+
+	* src/balsa-message.c: (bm_pass_to_find_entry): test only SHIFT
+	and CONTROL bits.
+
 2008-02-07  Peter Bloomfield
 
 	* libbalsa/libbalsa.c: (libbalsa_threads_leave): disable

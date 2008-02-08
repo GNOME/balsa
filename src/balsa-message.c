@@ -573,7 +573,8 @@ bm_pass_to_find_entry(BalsaMessage * bm, GdkEventKey * event)
         bm_disable_find_entry(bm);
         return res;
     case GDK_g:
-        if (event->state == GDK_CONTROL_MASK) {
+        if ((event->state & (GDK_SHIFT_MASK | GDK_CONTROL_MASK)) ==
+            GDK_CONTROL_MASK) {
             bm_find_again(bm, bm->find_forward);
             return res;
         }

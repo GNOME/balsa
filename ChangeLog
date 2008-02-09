@@ -1,5 +1,9 @@
 2008-02-08  Peter Bloomfield
 
+	* src/balsa-message.c: (bm_find_again): clean up.
+
+2008-02-08  Peter Bloomfield
+
 	* src/balsa-message.c: (bm_find_set_status): new function, hides
 	the separator using gtk_separator_tool_item_set_draw instead of
 	gtk_widget_hide;

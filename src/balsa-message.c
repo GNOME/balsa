@@ -491,19 +491,17 @@ bm_find_again(BalsaMessage * bm, gboolean find_forward)
         found = gtk_text_iter_forward_search(&bm->find_iter, text, 0,
                                              &match_begin, &match_end,
                                              NULL);
+        if (!found) {
+            gtk_text_buffer_get_start_iter(buffer, &bm->find_iter);
+            gtk_text_iter_forward_search(&bm->find_iter, text, 0,
+                                         &match_begin, &match_end, NULL);
+        }
     } else {
         gtk_text_iter_backward_char(&bm->find_iter);
         found = gtk_text_iter_backward_search(&bm->find_iter, text, 0,
                                               &match_begin, &match_end,
                                               NULL);
-    }
-
-    if (!found) {
-        if (find_forward) {
-            gtk_text_buffer_get_start_iter(buffer, &bm->find_iter);
-            gtk_text_iter_forward_search(&bm->find_iter, text, 0,
-                                         &match_begin, &match_end, NULL);
-        } else {
+        if (!found) {
             gtk_text_buffer_get_end_iter(buffer, &bm->find_iter);
             gtk_text_iter_backward_search(&bm->find_iter, text, 0,
                                           &match_begin, &match_end, NULL);

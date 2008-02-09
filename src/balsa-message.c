@@ -428,8 +428,7 @@ bm_find_scroll_to_iter(BalsaMessage * bm,
                                      NULL, &location.y);
 
     y = location.y;
-    gtk_adjustment_clamp_page(adj, y - adj->step_increment,
-                                   y + adj->step_increment);
+    gtk_adjustment_clamp_page(adj, y, y + location.height);
 }
 
 static void

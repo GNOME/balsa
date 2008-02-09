@@ -1,5 +1,10 @@
 2008-02-09  Peter Bloomfield
 
+	* src/balsa-message.c: (bm_find_scroll_to_iter): scroll least
+	amount to get text on screen.
+
+2008-02-09  Peter Bloomfield
+
 	* src/balsa-mblist.c: (bmbl_select_mailbox): check that
 	button-press event was on the correct window.
 

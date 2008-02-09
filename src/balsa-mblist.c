@@ -956,7 +956,9 @@ bmbl_select_mailbox(GtkTreeSelection * selection, gpointer data)
     if (event->type != GDK_BUTTON_PRESS
             /* keyboard navigation */
         || event->button.button != 1
-            /* soft select */ ) {
+            /* soft select */
+        || event->button.window != gtk_tree_view_get_bin_window(tree_view)
+            /* click on a different widget */ ) {
         gdk_event_free(event);
         return;
     }

@@ -380,6 +380,9 @@ AC_MSG_CHECKING(whether to build with gpgme/GnuPG support)
 if test x"$gpgmecfg" = xyes ; then
 	AC_MSG_RESULT(yes)
 	AC_PATH_PROG(gpgmecfg, gpgme-config, no)
+	if test "$gpgmecfg" = no; then
+	AC_MSG_ERROR([GPGme build requested but gpgme-config program not found.])
+        fi
 fi
 if test x"$gpgmecfg" != xno ; then
 	AC_MSG_CHECKING([gpgme library version])

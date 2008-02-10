@@ -5676,6 +5676,116 @@ subject_not_empty(BalsaSendmsg * bsmsg)
     return response == GTK_RESPONSE_OK;
 }
 
+#ifdef HAVE_GPGME
+static gboolean
+check_suggest_encryption(BalsaSendmsg * bsmsg)
+{
+    InternetAddressList * ia_list;
+    gboolean can_encrypt;
+    InternetAddressList * from_list;
+    InternetAddressList * cc_list;
+    gpgme_protocol_t protocol;
+
+    /* check if the user wants to see the message */
+    if (!bsmsg->ident->warn_send_plain)
+	return TRUE;
+
+    /* nothing to do if encryption is already enabled */
+    if ((bsmsg->gpg_mode & LIBBALSA_PROTECT_ENCRYPT) != 0)
+	return TRUE;
+
+    /* we can not encrypt if we have bcc recipients */
+    if ((ia_list = libbalsa_address_view_get_list(bsmsg->recipient_view, "Bcc:"))) {
+	internet_address_list_destroy(ia_list);
+	return TRUE;
+    }
+
+    /* collect all to and cc recipients */
+    ia_list = libbalsa_address_view_get_list(bsmsg->recipient_view, "To:");
+    cc_list = libbalsa_address_view_get_list(bsmsg->recipient_view, "Cc:");
+    from_list = internet_address_list_prepend(NULL, bsmsg->ident->ia);
+    protocol = bsmsg->gpg_mode & LIBBALSA_PROTECT_SMIMEV3 ?
+	GPGME_PROTOCOL_CMS : GPGME_PROTOCOL_OpenPGP;
+    can_encrypt = libbalsa_can_encrypt_for_all(from_list, protocol) &
+	libbalsa_can_encrypt_for_all(ia_list, protocol) &
+	libbalsa_can_encrypt_for_all(cc_list, protocol);
+    internet_address_list_destroy(from_list);
+    internet_address_list_destroy(ia_list);
+    internet_address_list_destroy(cc_list);
+
+    /* ask the user if we could encrypt this message */
+    if (can_encrypt) {
+	GtkWidget *dialog;
+	gint choice;
+	gchar * message;
+	GtkWidget *dialog_action_area;
+	GtkWidget *button;
+	GtkWidget *alignment;
+	GtkWidget *hbox;
+	GtkWidget *image;
+	GtkWidget *label;
+
+	message =
+	    g_strdup_printf(_("You did not select encryption for this message, although "
+			      "%s public keys are available for all recipients. In order "
+			      "to protect your privacy, the message could be %s encrypted."),
+			    gpgme_get_protocol_name(protocol),
+			    gpgme_get_protocol_name(protocol));
+	dialog = gtk_message_dialog_new
+	    (GTK_WINDOW(bsmsg->window),
+	     GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_MODAL,
+	     GTK_MESSAGE_QUESTION,
+	     GTK_BUTTONS_NONE,
+	     message);
+
+	dialog_action_area = GTK_DIALOG(dialog)->action_area;
+	gtk_button_box_set_layout(GTK_BUTTON_BOX(dialog_action_area), GTK_BUTTONBOX_END);
+ 
+	button = gtk_button_new();
+	gtk_dialog_add_action_widget(GTK_DIALOG(dialog), button, GTK_RESPONSE_YES);
+	GTK_WIDGET_SET_FLAGS(button, GTK_CAN_DEFAULT);
+	gtk_widget_grab_focus(button);
+	alignment = gtk_alignment_new (0.5, 0.5, 0, 0);
+	gtk_container_add(GTK_CONTAINER(button), alignment);
+
+	hbox = gtk_hbox_new(FALSE, 2);
+	gtk_container_add(GTK_CONTAINER(alignment), hbox);
+	image = gtk_image_new_from_stock(BALSA_PIXMAP_GPG_ENCRYPT, GTK_ICON_SIZE_BUTTON);
+	gtk_box_pack_start(GTK_BOX(hbox), image, FALSE, FALSE, 0);
+	label = gtk_label_new_with_mnemonic(_("Send _encrypted"));
+	gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, FALSE, 0);
+	gtk_widget_show_all(button);
+
+	button = gtk_button_new();
+	gtk_dialog_add_action_widget(GTK_DIALOG(dialog), button, GTK_RESPONSE_NO);
+	GTK_WIDGET_SET_FLAGS(button, GTK_CAN_DEFAULT);
+	alignment = gtk_alignment_new (0.5, 0.5, 0, 0);
+	gtk_container_add(GTK_CONTAINER(button), alignment);
+
+	hbox = gtk_hbox_new(FALSE, 2);
+	gtk_container_add(GTK_CONTAINER(alignment), hbox);
+	image = gtk_image_new_from_stock(BALSA_PIXMAP_SEND, GTK_ICON_SIZE_BUTTON);
+	gtk_box_pack_start(GTK_BOX(hbox), image, FALSE, FALSE, 0);
+	label = gtk_label_new_with_mnemonic(_("Send _plain"));
+	gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, FALSE, 0);
+	gtk_widget_show_all(button);
+
+	button = gtk_button_new_from_stock(GTK_STOCK_CANCEL);
+	gtk_widget_show(button);
+	gtk_dialog_add_action_widget(GTK_DIALOG(dialog), button, GTK_RESPONSE_CANCEL);
+	GTK_WIDGET_SET_FLAGS(button, GTK_CAN_DEFAULT);
+
+	choice = gtk_dialog_run(GTK_DIALOG(dialog));
+	gtk_widget_destroy(dialog);
+	if (choice == GTK_RESPONSE_YES)
+	    bsmsg_setup_gpg_ui_by_mode(bsmsg, bsmsg->gpg_mode | LIBBALSA_PROTECT_ENCRYPT);
+	else if (choice == GTK_RESPONSE_CANCEL || choice == GTK_RESPONSE_DELETE_EVENT)
+	    return FALSE;
+    }
+
+    return TRUE;
+}
+#endif
 
 /* "send message" menu and toolbar callback.
  */
@@ -5697,6 +5807,9 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
 	return FALSE;
 
 #ifdef HAVE_GPGME
+    if (!check_suggest_encryption(bsmsg))
+	return FALSE;
+
     if ((bsmsg->gpg_mode & LIBBALSA_PROTECT_OPENPGP) != 0 &&
         (bsmsg->gpg_mode & LIBBALSA_PROTECT_MODE) != 0 &&
 	gtk_tree_model_get_iter_first(BALSA_MSG_ATTACH_MODEL(bsmsg), &iter)) {

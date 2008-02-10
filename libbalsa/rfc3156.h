@@ -58,6 +58,8 @@
 gboolean libbalsa_check_crypto_engine(gpgme_protocol_t protocol);
 
 gint libbalsa_message_body_protection(LibBalsaMessageBody * body);
+gboolean libbalsa_can_encrypt_for_all(InternetAddressList * recipients,
+				      gpgme_protocol_t protocol);
 
 /* routines dealing with RFC 2633 and RFC 3156 stuff */
 gboolean libbalsa_sign_mime_object(GMimeObject ** content,

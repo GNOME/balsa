@@ -84,6 +84,7 @@ extern "C"
 	gboolean gpg_sign;
 	gboolean gpg_encrypt;
 	gboolean always_trust;
+	gboolean warn_send_plain;
 	gint crypt_protocol;
 #endif
 #if ENABLE_ESMTP

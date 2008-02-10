@@ -1,3 +1,11 @@
+2008-02-10  Albrecht Dreß
+
+	* libbalsa/rfc3156.[hc]: libbalsa_can_encrypt_for_all().
+	* libbalsa/identity.[ch]: remind if encryption is possible.
+	* src/sendmsg-window.c: encourage encryption if possible.
+	* configure.in: stop if gpgme-enabled build requested but
+	gpgme-config not found (PS).
+
 2008-02-09  Peter Bloomfield
 
 	* src/balsa-message.c: (bm_find_scroll_to_iter): scroll least

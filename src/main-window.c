@@ -1268,20 +1268,16 @@ bw_set_sensitive(BalsaWindow * window, const gchar * action_name,
  */
 static void
 bw_set_active(BalsaWindow * window, const gchar * action_name,
-              gboolean active, const gchar * block_action_name)
+              gboolean active, gboolean block)
 {
     GtkAction *action = bw_get_action(window, action_name);
-    GtkAction *block_action = block_action_name ?
-        bw_get_action(window, block_action_name) : NULL;
 
-    if (block_action)
-        g_signal_handlers_block_matched(block_action,
-                                        G_SIGNAL_MATCH_DATA, 0,
+    if (block)
+        g_signal_handlers_block_matched(action, G_SIGNAL_MATCH_DATA, 0,
                                         (GQuark) 0, NULL, NULL, window);
     gtk_toggle_action_set_active(GTK_TOGGLE_ACTION(action), active);
-    if (block_action)
-        g_signal_handlers_unblock_matched(block_action,
-                                          G_SIGNAL_MATCH_DATA, 0,
+    if (block)
+        g_signal_handlers_unblock_matched(action, G_SIGNAL_MATCH_DATA, 0,
                                           (GQuark) 0, NULL, NULL, window);
 }
 
@@ -1624,7 +1620,7 @@ balsa_window_new()
 
     /*PKGW: do it this way, without the usizes. */
 #if !defined(ENABLE_TOUCH_UI)
-    bw_set_active(window, "ShowMailboxTree", balsa_app.show_mblist, NULL);
+    bw_set_active(window, "ShowMailboxTree", balsa_app.show_mblist, FALSE);
 #endif                          /* !defined(ENABLE_TOUCH_UI) */
 
     gtk_paned_set_position(GTK_PANED(window->hpaned), 
@@ -1663,8 +1659,8 @@ balsa_window_new()
     }
 
     bw_set_active(window, "ShowMailboxTabs", balsa_app.show_notebook_tabs,
-                  "ShowMailboxTabs");
-    bw_set_active(window, "Wrap", balsa_app.browse_wrap, NULL);
+                  TRUE);
+    bw_set_active(window, "Wrap", balsa_app.browse_wrap, FALSE);
 #else
     bw_set_sensitive(window, "ViewFilter", balsa_app.enable_view_filter);
     g_signal_connect_after(G_OBJECT(window), "key_press_event",
@@ -1684,8 +1680,7 @@ balsa_window_new()
 #endif /*ENABLE_TOUCH_UI */
 
     /* set initial state of toggle preview pane button */
-    bw_set_active(window, "ShowPreviewPane", balsa_app.previewpane,
-                  "ShowPreviewPane");
+    bw_set_active(window, "ShowPreviewPane", balsa_app.previewpane, TRUE);
 
     /* set initial state of next-unread controls */
     bw_enable_next_unread(window, FALSE);
@@ -1973,11 +1968,11 @@ bw_set_threading_menu(BalsaWindow * window, int option)
 
     switch(option) {
     case LB_MAILBOX_THREADING_FLAT:
-    bw_set_active(window, "FlatIndex", TRUE, "FlatIndex"); break;
+    bw_set_active(window, "FlatIndex", TRUE, TRUE); break;
     case LB_MAILBOX_THREADING_SIMPLE:
-    bw_set_active(window, "SimpleThreading", TRUE, "FlatIndex"); break;
+    bw_set_active(window, "SimpleThreading", TRUE, TRUE); break;
     case LB_MAILBOX_THREADING_JWZ:
-    bw_set_active(window, "JWZThreading", TRUE, "FlatIndex"); break;
+    bw_set_active(window, "JWZThreading", TRUE, TRUE); break;
     default: return;
     }
 
@@ -4374,7 +4369,7 @@ bw_hide_changed_cb(GtkToggleAction * toggle_action, gpointer data)
             if (hide_states[states_idx].flag == hide_states[curr_idx].flag
                 && hide_states[states_idx].set !=
                 hide_states[curr_idx].set) {
-                bw_set_active(bw, hide_states[i].action_name, FALSE, NULL);
+                bw_set_active(bw, hide_states[i].action_name, FALSE, FALSE);
                 return; /* triggered menu change will do the job */
             }
         }
@@ -5032,7 +5027,7 @@ static void
 bw_reset_show_all_headers(BalsaWindow * window)
 {
     if (balsa_app.show_all_headers) {
-        bw_set_active(window, "ShowAllHeaders", FALSE, "ShowAllHeaders");
+        bw_set_active(window, "ShowAllHeaders", FALSE, TRUE);
         balsa_app.show_all_headers = FALSE;
     }
 }
@@ -5052,7 +5047,7 @@ void
 update_view_menu(BalsaWindow * window)
 {
 #if !defined(ENABLE_TOUCH_UI)
-    bw_set_active(window, "Wrap", balsa_app.browse_wrap, "Wrap");
+    bw_set_active(window, "Wrap", balsa_app.browse_wrap, TRUE);
     balsa_message_set_wrap(BALSA_MESSAGE(window->preview),
                            balsa_app.browse_wrap);
 #endif /* ENABLE_TOUCH_UI */

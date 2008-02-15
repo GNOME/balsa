@@ -1,3 +1,7 @@
+2008-02-14  Peter Bloomfield
+
+	* src/main-window.c: block the correct signal handler.
+
 2008-01-29  Peter Bloomfield
 
 	* libbalsa/mailbox.c:

@@ -1260,11 +1260,16 @@ bw_set_sensitive(BalsaWindow * window, const gchar * action_name,
     gtk_action_set_sensitive(action, sensitive);
 }
 
-/* Set the state of a GtkToggleAction; if block_action_name != NULL,
- * block the handling of signals emitted on that action.
- * Note: if action_name is a GtkRadioAction, block_action_name must be
- * the name of the first action in the group; otherwise it must be the
- * same as action_name.
+/* Set the state of a GtkToggleAction; if block == TRUE,
+ * block the handling of signals emitted on the action.
+ * Note: if action_name is a GtkRadioAction, and we are connected to the
+ * "toggled" signal, we must block the first action in the group, since
+ * that is the only action in the group that is connected to the signal;
+ * as of now (2008-02-14), we do not use the "toggled" signal, as it is
+ * not emitted when the user clicks on the currently active member of
+ * the group; instead, we connect to the "activate" signal for all
+ * members of the group, so the correct action to block is the one in
+ * the call.
  */
 static void
 bw_set_active(BalsaWindow * window, const gchar * action_name,

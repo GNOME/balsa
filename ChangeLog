@@ -1,5 +1,9 @@
 2008-02-14  Peter Bloomfield
 
+	* src/main-window.c: fix a comment.
+
+2008-02-14  Peter Bloomfield
+
 	* src/main-window.c: block the correct signal handler.
 
 2008-02-10  Albrecht Dreß

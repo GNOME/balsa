@@ -842,7 +842,7 @@ message_match_real(LibBalsaMailbox *mailbox, guint msgno,
     gboolean is_refed = FALSE;
     gchar *str;
     LibBalsaMailboxIndexEntry *entry =
-        g_ptr_array_index(mailbox->mindex, msgno-1);
+        libbalsa_mailbox_get_index_entry(mailbox, msgno);
     LibBalsaMailboxLocalInfo *info =
         msgno <= local->threading_info->len ?
         g_ptr_array_index(local->threading_info, msgno - 1) : NULL;
@@ -855,7 +855,7 @@ message_match_real(LibBalsaMailbox *mailbox, guint msgno,
         if (!message)
             return FALSE;
         libbalsa_mailbox_local_cache_message(local, msgno, message);
-        entry = g_ptr_array_index(mailbox->mindex, msgno-1);
+        entry = libbalsa_mailbox_get_index_entry(mailbox, msgno);
         info  = g_ptr_array_index(local->threading_info, msgno - 1);
     }
 

@@ -216,10 +216,9 @@ struct _LibBalsaMailbox {
     gboolean readonly;
     gboolean disconnected;
 
-    GPtrArray *mindex;  /* the basic message index used for index
-                         * displaying/columns of GtkTreeModel interface
-                         * and NOTHING else. */
-    GPtrArray *nodes;   /* map msgno to a node in msg_tree */
+    GArray *mindex;  /* the basic message index used for index
+                      * displaying/columns of GtkTreeModel interface
+                      * and NOTHING else. */
     GSequence *msg_tree; /* the possibly filtered tree of messages;
                       * gdk lock MUST BE HELD when accessing. */
     LibBalsaCondition *view_filter; /* to choose a subset of messages
@@ -641,6 +640,9 @@ void libbalsa_mailbox_unregister_msgnos(LibBalsaMailbox * mailbox,
 					GArray * msgnos);
 
 /* Accessors for LibBalsaMailboxIndexEntry */
+LibBalsaMailboxIndexEntry *libbalsa_mailbox_get_index_entry(LibBalsaMailbox
+                                                            * mailbox,
+                                                            guint msgno);
 LibBalsaMessageStatus libbalsa_mailbox_msgno_get_status(LibBalsaMailbox *
 							mailbox,
 							guint msgno);

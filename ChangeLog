@@ -1,3 +1,10 @@
+2008-02-15  Peter Bloomfield
+
+	* libbalsa/mailbox.c: use a single array of structures instead
+	of two pointer arrays.
+	* libbalsa/mailbox.h: ditto.
+	* libbalsa/mailbox_local.c: (message_match_real): api change.
+
 2008-02-14  Peter Bloomfield
 
 	* src/main-window.c: block the correct signal handler.

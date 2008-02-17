@@ -1,3 +1,8 @@
+2008-02-17  Peter Bloomfield
+
+	* src/message-window.c: (mw_find_in_message_cb): add UI for
+	find-in-message.
+
 2008-02-14  Peter Bloomfield
 
 	* src/main-window.c: fix a comment.

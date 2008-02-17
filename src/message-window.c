@@ -58,6 +58,7 @@ static void view_msg_source_cb         (GtkAction * action, gpointer data);
 
 static void copy_cb                    (GtkAction * action, MessageWindow * mw);
 static void select_all_cb              (GtkAction * action, gpointer);
+static void mw_find_in_message_cb      (GtkAction * action, gpointer data);
 
 static void mw_header_activate_cb      (GtkAction * action, gpointer data);
 
@@ -251,6 +252,9 @@ static const GtkActionEntry entries[] = {
      G_CALLBACK(copy_cb)},
     {"SelectAll", NULL, N_("Select _All"), "<control>A", NULL,
      G_CALLBACK(select_all_cb)},
+    {"FindInMessage", NULL, N_("_Find in message"), "slash",
+     N_("Find a string in this message"),
+     G_CALLBACK(mw_find_in_message_cb)},
 #ifdef HAVE_GTKHTML
     {"ZoomIn", GTK_STOCK_ZOOM_IN, N_("Zoom _In"), "<control>plus",
      N_("Increase magnification"), G_CALLBACK(mw_zoom_in_cb)},
@@ -339,6 +343,8 @@ static const char *ui_description =
 "    <menu action='EditMenu'>"
 "      <menuitem action='Copy'/>"
 "      <menuitem action='SelectAll'/>"
+"      <separator/>"
+"      <menuitem action='FindInMessage'/>"
 "    </menu>"
 "    <menu action='ViewMenu'>"
 "      <menuitem action='Wrap'/>"
@@ -880,6 +886,14 @@ select_all_cb(GtkAction * action, gpointer data)
     MessageWindow *mw = (MessageWindow *) (data);
 
     balsa_window_select_all(GTK_WINDOW(mw->window));
+}
+
+static void
+mw_find_in_message_cb(GtkAction * action, gpointer data)
+{
+    MessageWindow *mw = (MessageWindow *) (data);
+
+    balsa_message_find_in_message(BALSA_MESSAGE(mw->bmessage));
 }
 
 static void

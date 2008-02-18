@@ -54,6 +54,24 @@
 #  include "gmime-part-rfc2440.h"
 #endif
 
+#if HAVE_GTKSOURCEVIEW
+/* Use GtkSourceIter's case-insensitive search functions. */
+#  include <gtksourceview/gtksourceiter.h>
+#  define FORWARD_SEARCH(iter, text, match_begin, match_end)            \
+    gtk_source_iter_forward_search((iter), (text),                      \
+    GTK_SOURCE_SEARCH_CASE_INSENSITIVE, (match_begin), (match_end), NULL)
+#  define BACKWARD_SEARCH(iter, text, match_begin, match_end)           \
+    gtk_source_iter_backward_search((iter), (text),                     \
+    GTK_SOURCE_SEARCH_CASE_INSENSITIVE, (match_begin), (match_end), NULL)
+#else                           /* HAVE_GTKSOURCEVIEW */
+#  define FORWARD_SEARCH(iter, text, match_begin, match_end)            \
+    gtk_text_iter_forward_search((iter), (text),                        \
+    0, (match_begin), (match_end), NULL)
+#  define BACKWARD_SEARCH(iter, text, match_begin, match_end)           \
+    gtk_text_iter_backward_search((iter), (text),                       \
+    0, (match_begin), (match_end), NULL)
+#endif                          /* HAVE_GTKSOURCEVIEW */
+
 enum {
     SELECT_PART,
     LAST_SIGNAL,
@@ -443,26 +461,22 @@ bm_find_entry_changed_cb(GtkEditable * editable, gpointer data)
     gboolean found;
 
     if (bm->find_forward) {
-        found = gtk_text_iter_forward_search(&bm->find_iter, text, 0,
-                                             &match_begin, &match_end,
-                                             NULL);
+        found = FORWARD_SEARCH(&bm->find_iter, text,
+                               &match_begin, &match_end);
         if (!found) {
             /* Silently wrap to the top. */
             gtk_text_buffer_get_start_iter(buffer, &bm->find_iter);
-            found = gtk_text_iter_forward_search(&bm->find_iter, text, 0,
-                                                 &match_begin, &match_end,
-                                                 NULL);
+            found = FORWARD_SEARCH(&bm->find_iter, text,
+                                   &match_begin, &match_end);
         }
     } else {
-        found = gtk_text_iter_backward_search(&bm->find_iter, text, 0,
-                                              &match_begin, &match_end,
-                                              NULL);
+        found = BACKWARD_SEARCH(&bm->find_iter, text,
+                                &match_begin, &match_end);
         if (!found) {
             /* Silently wrap to the bottom. */
             gtk_text_buffer_get_end_iter(buffer, &bm->find_iter);
-            found = gtk_text_iter_backward_search(&bm->find_iter, text, 0,
-                                                  &match_begin, &match_end,
-                                                  NULL);
+            found = BACKWARD_SEARCH(&bm->find_iter, text,
+                                    &match_begin, &match_end);
         }
     }
 
@@ -487,23 +501,21 @@ bm_find_again(BalsaMessage * bm, gboolean find_forward)
 
     if (find_forward) {
         gtk_text_iter_forward_char(&bm->find_iter);
-        found = gtk_text_iter_forward_search(&bm->find_iter, text, 0,
-                                             &match_begin, &match_end,
-                                             NULL);
+        found = FORWARD_SEARCH(&bm->find_iter, text,
+                               &match_begin, &match_end);
         if (!found) {
             gtk_text_buffer_get_start_iter(buffer, &bm->find_iter);
-            gtk_text_iter_forward_search(&bm->find_iter, text, 0,
-                                         &match_begin, &match_end, NULL);
+            found = FORWARD_SEARCH(&bm->find_iter, text,
+                                   &match_begin, &match_end);
         }
     } else {
         gtk_text_iter_backward_char(&bm->find_iter);
-        found = gtk_text_iter_backward_search(&bm->find_iter, text, 0,
-                                              &match_begin, &match_end,
-                                              NULL);
+        found = BACKWARD_SEARCH(&bm->find_iter, text,
+                                &match_begin, &match_end);
         if (!found) {
             gtk_text_buffer_get_end_iter(buffer, &bm->find_iter);
-            gtk_text_iter_backward_search(&bm->find_iter, text, 0,
-                                          &match_begin, &match_end, NULL);
+            found = BACKWARD_SEARCH(&bm->find_iter, text,
+                                    &match_begin, &match_end);
         }
     }
     bm_find_set_status(bm, found ?

@@ -1,5 +1,12 @@
 2008-02-17  Peter Bloomfield
 
+	* libbalsa/filter-funcs.c: (libbalsa_condition_compare): allow
+	NULL conditions.
+	* libbalsa/mailbox.c: (libbalsa_mailbox_set_view_filter): update
+	only if the new filter is a real change.
+
+2008-02-17  Peter Bloomfield
+
 	* src/message-window.c: (mw_find_in_message_cb): add UI for
 	find-in-message.
 

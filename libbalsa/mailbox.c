@@ -35,6 +35,7 @@
 #include "mailbox-filter.h"
 #include "message.h"
 #include "misc.h"
+#include "filter-funcs.h"
 #include "libbalsa_private.h"
 #include <glib/gi18n.h>
 
@@ -2001,9 +2002,12 @@ libbalsa_mailbox_set_view_filter(LibBalsaMailbox *mailbox,
                                  LibBalsaCondition *cond,
                                  gboolean update_immediately)
 {
-    gboolean retval = update_immediately;
+    gboolean retval = FALSE;
 
     libbalsa_lock_mailbox(mailbox);
+
+    if (libbalsa_condition_compare(mailbox->view_filter, cond))
+        update_immediately = FALSE;
 
     libbalsa_condition_unref(mailbox->view_filter);
     mailbox->view_filter = libbalsa_condition_ref(cond);

@@ -481,12 +481,17 @@ compare_regexs(GSList * c1,GSList * c2)
 /* Helper to compare conditions, a bit obscure at first glance
    but we have to compare complex structure, so we must check
    all fields.
+   NULL conditions are OK, and compare equal only if both are NULL.
 */
 
 gboolean
 libbalsa_condition_compare(LibBalsaCondition *c1,LibBalsaCondition *c2)
 {
     gboolean res = FALSE;
+
+    if (c1 == NULL || c2 == NULL)
+        return c1 == c2;
+
     switch (c1->type) {
     case CONDITION_STRING:
         res = (c2->type == CONDITION_STRING ||

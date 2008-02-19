@@ -1,5 +1,10 @@
 2008-02-18  Peter Bloomfield
 
+	* libbalsa/filter-funcs.c: (libbalsa_condition_compare): check
+	for equality.
+
+2008-02-18  Peter Bloomfield
+
 	* src/balsa-message.c: (bm_find_entry_changed_cb,
 	bm_find_again): use GtkSourceIter's case-insensitive search
 	capability, if available.

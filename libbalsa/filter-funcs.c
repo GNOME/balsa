@@ -489,8 +489,11 @@ libbalsa_condition_compare(LibBalsaCondition *c1,LibBalsaCondition *c2)
 {
     gboolean res = FALSE;
 
+    if (c1 == c2) 
+        return TRUE;
+
     if (c1 == NULL || c2 == NULL)
-        return c1 == c2;
+        return FALSE;
 
     switch (c1->type) {
     case CONDITION_STRING:

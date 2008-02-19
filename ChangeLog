@@ -1,3 +1,8 @@
+2008-02-18  Peter Bloomfield
+
+	* libbalsa/mailbox.c: take more care in public methods, less in
+	private methods.
+
 2008-02-15  Peter Bloomfield
 
 	* libbalsa/mailbox.c: use a single array of structures instead

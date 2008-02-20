@@ -1,3 +1,13 @@
+2008-02-20  Peter Bloomfield
+
+	* libbalsa/mailbox.c: (libbalsa_mailbox_index_set_flags): check
+	msg-tree != NULL;
+	(libbalsa_mailbox_msgno_removed): check seqno only if msg-tree
+	!= NULL;
+	(libbalsa_mailbox_open, libbalsa_mailbox_set_msg_tree): create
+	mindex, if necessary, when creating msg-tree, instead of when
+	opening.
+
 2008-02-18  Peter Bloomfield
 
 	* libbalsa/mailbox.c: take more care in public methods, less in

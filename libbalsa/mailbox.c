@@ -385,17 +385,19 @@ libbalsa_mailbox_get_index_entry(LibBalsaMailbox * mailbox, guint msgno)
 }
 
 void
-libbalsa_mailbox_index_set_flags(LibBalsaMailbox *mailbox,
-                                 unsigned msgno, LibBalsaMessageFlag f)
+libbalsa_mailbox_index_set_flags(LibBalsaMailbox   * mailbox,
+                                 unsigned            msgno,
+                                 LibBalsaMessageFlag f)
 {
-    LibBalsaMailboxIndexEntry *entry =
-        libbalsa_mailbox_get_index_entry(mailbox, msgno);
+    if (mailbox->msg_tree) {
+        LibBalsaMailboxIndexEntry *entry =
+            libbalsa_mailbox_get_index_entry(mailbox, msgno);
 
-    if (VALID_ENTRY(entry)) {
-        entry->status_icon = 
-            libbalsa_get_icon_from_flags(f);
-        entry->unseen = f & LIBBALSA_MESSAGE_FLAG_NEW;
-        libbalsa_mailbox_msgno_changed(mailbox, msgno);
+        if (VALID_ENTRY(entry)) {
+            entry->status_icon = libbalsa_get_icon_from_flags(f);
+            entry->unseen = f & LIBBALSA_MESSAGE_FLAG_NEW;
+            libbalsa_mailbox_msgno_changed(mailbox, msgno);
+        }
     }
 }
 
@@ -535,9 +537,6 @@ libbalsa_mailbox_open(LibBalsaMailbox * mailbox, GError **err)
 	LibBalsaMailboxState saved_state;
 
         mailbox->stamp++;
-        if(mailbox->mindex) g_warning("mindex set - I leak memory");
-        mailbox->mindex =
-            g_array_new(FALSE, TRUE, sizeof(LibBalsaMailboxIndex));
 
 	saved_state = mailbox->state;
 	mailbox->state = LB_MAILBOX_STATE_OPENING;
@@ -1555,7 +1554,6 @@ libbalsa_mailbox_msgno_removed(LibBalsaMailbox * mailbox, guint seqno)
     GSequenceIter *node;
 
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
-    g_return_if_fail(seqno > 0 && seqno <= mailbox->mindex->len);
 
     g_signal_emit(mailbox, libbalsa_mailbox_signals[MESSAGE_EXPUNGED],
                   0, seqno);
@@ -1563,6 +1561,12 @@ libbalsa_mailbox_msgno_removed(LibBalsaMailbox * mailbox, guint seqno)
     gdk_threads_enter();
 
     if (!mailbox->msg_tree) {
+        gdk_threads_leave();
+        return;
+    }
+
+    if (seqno == 0 || seqno > mailbox->mindex->len) {
+        g_warning("Message number %u out of range", seqno);
         gdk_threads_leave();
         return;
     }
@@ -3799,6 +3803,9 @@ libbalsa_mailbox_set_msg_tree(LibBalsaMailbox * mailbox, GNode * new_tree)
     if (!mailbox->msg_tree)
         mailbox->msg_tree =
             g_sequence_new((GDestroyNotify) lbm_node_info_free);
+    if (!mailbox->mindex)
+        mailbox->mindex =
+            g_array_new(FALSE, TRUE, sizeof(LibBalsaMailboxIndex));
 
     lbm_update_msg_tree(mailbox, new_tree);
     g_node_destroy(new_tree);

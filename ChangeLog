@@ -1,3 +1,16 @@
+2008-02-22  Peter Bloomfield
+
+	* src/filter-edit-callbacks.c: (fe_typesmenu_cb,
+	condition_validate, clear_condition_widgets,
+	fill_condition_widgets, build_type_notebook): do not offer regex
+	filter.
+	* src/save-restore.c: (view_by_url_prefix, save_view,
+	config_view_remove): new public function to remove a
+	mailbox-view.
+	* src/save-restore.h: ditto.
+	* src/mailbox-conf.c: (mailbox_conf_delete): remove filters and
+	the view.
+
 2008-02-18  Peter Bloomfield
 
 	* libbalsa/filter-funcs.c: (libbalsa_condition_compare): check

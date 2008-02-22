@@ -57,6 +57,7 @@ void config_address_books_load(void);
 void config_identities_save(void);
 void config_views_load(void);
 void config_views_save(void);
+void config_view_remove(const gchar * url);
 
 void config_filters_save(void);
 void config_mailbox_filters_save(LibBalsaMailbox * mbox);

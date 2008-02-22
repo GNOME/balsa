@@ -53,6 +53,8 @@
 
 #include "libbalsa.h"
 #include "imap-server.h"
+#include "mailbox-filter.h"
+#include "libbalsa-conf.h"
 #include <glib/gi18n.h>
 
 struct _BalsaMailboxConfView {
@@ -371,6 +373,7 @@ mailbox_conf_delete(BalsaMailboxNode * mbnode)
     gint button;
     GtkWidget *ask;
     LibBalsaMailbox* mailbox = mbnode->mailbox;
+    gchar *url, *group;
 
     if(BALSA_IS_MAILBOX_SPECIAL(mailbox)) {
 	balsa_information(
@@ -449,6 +452,9 @@ mailbox_conf_delete(BalsaMailboxNode * mbnode)
     if ( button < 0)
 	return;
 
+    /* Save the mailbox URL */
+    url = g_strdup(mailbox->url ? mailbox->url : mailbox->name);
+
     /* Delete it from the config file and internal nodes */
     config_mailbox_delete(mailbox);
 
@@ -492,6 +498,18 @@ mailbox_conf_delete(BalsaMailboxNode * mbnode)
     } else
 	balsa_mblist_mailbox_node_remove(mbnode);
     update_mail_servers();
+
+    /* Clean up filters */
+    group = mailbox_filters_section_lookup(url);
+    if (group) {
+        libbalsa_conf_remove_group(group);
+        g_free(group);
+    }
+
+    /* Remove view */
+    config_view_remove(url);
+
+    g_free(url);
 }
 
 #define MCW_RESPONSE 1

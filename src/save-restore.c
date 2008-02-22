@@ -1830,22 +1830,33 @@ config_views_load(void)
                                 GINT_TO_POINTER(FALSE));
 }
 
+/* Get viewByUrl prefix */
+static gchar *
+view_by_url_prefix(const gchar * url)
+{
+    gchar *url_enc;
+    gchar *prefix;
+
+    url_enc = libbalsa_urlencode(url);
+    prefix = g_strconcat(VIEW_BY_URL_SECTION_PREFIX, url_enc, NULL);
+    g_free(url_enc);
+
+    return prefix;
+}
+
 /* config_views_save:
    iterates over all mailbox views.
 */
 static void
 save_view(const gchar * url, LibBalsaMailboxView * view)
 {
-    gchar *url_enc;
     gchar *prefix;
 
     if (!view || (view->in_sync && view->used))
 	return;
     view->in_sync = TRUE;
 
-    url_enc = libbalsa_urlencode(url);
-    prefix = g_strconcat(VIEW_BY_URL_SECTION_PREFIX, url_enc, NULL);
-    g_free(url_enc);
+    prefix = view_by_url_prefix(url);
 
     /* Remove the view--it will be recreated if any member needs to be
      * saved. */
@@ -1909,6 +1920,15 @@ config_views_save(void)
     /* save current */
     g_hash_table_foreach(libbalsa_mailbox_view_table, (GHFunc) save_view,
 			 NULL);
+}
+
+void
+config_view_remove(const gchar * url)
+{
+    gchar *prefix = view_by_url_prefix(url);
+    libbalsa_conf_remove_group(prefix);
+    g_free(prefix);
+    g_hash_table_remove(libbalsa_mailbox_view_table, url);
 }
 
 static void

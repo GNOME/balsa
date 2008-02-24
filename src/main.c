@@ -135,7 +135,7 @@ accel_map_save(void)
 static void
 balsa_handle_automation_options() {
    CORBA_Object factory;
-   CORBA_Environment ev;
+   CORBA_Environment ev, *ev_p = &ev;
    BonoboObject *balsacomposer;
    BonoboObject *balsaapp;
  
@@ -146,7 +146,7 @@ balsa_handle_automation_options() {
 	Bonobo_ACTIVATION_FLAG_EXISTING_ONLY,
 	NULL, &ev);
    
-   if ( !(BONOBO_EX (&ev) || factory == CORBA_OBJECT_NIL) ) {
+   if ( !(BONOBO_EX (ev_p) || factory == CORBA_OBJECT_NIL) ) {
        /* there already is a server. good */
        CORBA_Object app;
        printf("Another Balsa found. Talking to it...\n");

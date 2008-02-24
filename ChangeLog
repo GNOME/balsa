@@ -1,5 +1,10 @@
 2008-02-24  Peter Bloomfield
 
+	* src/balsa-index.c: (bndx_popup_position_func, bndx_do_popup):
+	add a popup-position func.
+
+2008-02-24  Peter Bloomfield
+
 	* libbalsa/imap/imap-handle.c: (ir_fetch_seq): compile with
 	gcc-4.3.
 	* src/main.c: (balsa_handle_automation_options): ditto.

@@ -1,3 +1,9 @@
+2008-02-24  Peter Bloomfield
+
+	* libbalsa/imap/imap-handle.c: (ir_fetch_seq): compile with
+	gcc-4.3.
+	* src/main.c: (balsa_handle_automation_options): ditto.
+
 2008-02-22  Peter Bloomfield
 
 	* src/filter-edit-callbacks.c: (fe_typesmenu_cb,

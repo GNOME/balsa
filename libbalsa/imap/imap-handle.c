@@ -1355,6 +1355,7 @@ imap_body_get_content_type(ImapBody *body)
   return g_string_free(res, FALSE);
 }
 
+#if 0
 static void
 do_indent(int indent)
 { int i; for(i=0; i<indent; i++) putchar(' '); }
@@ -1370,6 +1371,7 @@ print_body_structure(ImapBody *body, int indent)
     body = body->next;
   }
 }
+#endif
 
 static ImapBody*
 get_body_from_section(ImapBody *body, const char *section)
@@ -3619,7 +3621,7 @@ ir_fetch_seq(ImapMboxHandle *h, unsigned seqno)
   char atom[LONG_STRING]; /* make sure LONG_STRING is longer than all */
                           /* strings above */
   unsigned i;
-  int c;
+  int c = 0;
   ImapResponse rc;
 
   if(seqno<1 || seqno > h->exists) return IMR_PROTOCOL;

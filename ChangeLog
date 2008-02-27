@@ -1,5 +1,11 @@
 2008-02-27  Peter Bloomfield
 
+	* libbalsa/mailbox.c: (libbalsa_mailbox_set_view_filter):
+	remember if the view needs to be updated.
+	* libbalsa/mailbox.h: new member.
+
+2008-02-27  Peter Bloomfield
+
 	* libbalsa/mailbox.c: (libbalsa_mailbox_changed): allow for
 	default count (== -1).
 	* libbalsa/mailbox_imap.c: (lbm_imap_check): get UNREAD count

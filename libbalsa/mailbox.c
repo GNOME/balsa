@@ -2003,19 +2003,24 @@ libbalsa_mailbox_set_view_filter(LibBalsaMailbox *mailbox,
                                  gboolean update_immediately)
 {
     gboolean retval = FALSE;
+    gboolean view_is_stale;
 
     libbalsa_lock_mailbox(mailbox);
 
-    if (libbalsa_condition_compare(mailbox->view_filter, cond))
-        update_immediately = FALSE;
+    view_is_stale = mailbox->view_filter_pending
+        || !libbalsa_condition_compare(mailbox->view_filter, cond);
 
     libbalsa_condition_unref(mailbox->view_filter);
     mailbox->view_filter = libbalsa_condition_ref(cond);
 
-    if (update_immediately) {
-        LIBBALSA_MAILBOX_GET_CLASS(mailbox)->update_view_filter(mailbox,
-                                                                cond);
-        retval = lbm_set_threading(mailbox, mailbox->view->threading_type);
+    if (view_is_stale) {
+        if (update_immediately) {
+            LIBBALSA_MAILBOX_GET_CLASS(mailbox)->update_view_filter(mailbox,
+                                                                    cond);
+            retval = lbm_set_threading(mailbox, mailbox->view->threading_type);
+            mailbox->view_filter_pending = FALSE;
+        } else
+            mailbox->view_filter_pending = TRUE;
     }
 
     libbalsa_unlock_mailbox(mailbox);

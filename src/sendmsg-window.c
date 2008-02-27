@@ -1433,6 +1433,9 @@ update_bsmsg_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity* ident)
                                               ident->replyto);
         gtk_widget_show(bsmsg->replyto[0]);
         gtk_widget_show(bsmsg->replyto[1]);
+    } else if (!sw_get_active(bsmsg, "ReplyTo")) {
+        gtk_widget_hide(bsmsg->replyto[0]);
+        gtk_widget_hide(bsmsg->replyto[1]);
     }
 #endif
 

@@ -1,3 +1,19 @@
+2008-02-27  Peter Bloomfield
+
+	* libbalsa/mailbox.c: (libbalsa_mailbox_changed): allow for
+	default count (== -1).
+	* libbalsa/mailbox_imap.c: (lbm_imap_check): get UNREAD count
+	instead of RECENT.
+	* src/balsa-mblist.c: (bmbl_sort_idle,
+	balsa_mblist_mailbox_node_append): inhibit sorting while
+	building the tree, to avoid quadratic cost; prepend to tree
+	instead of appending, for the same reason.
+	* src/balsa-mblist.h: new members for sorting.
+	* src/mailbox-node.c: (add_local_mailbox): respect
+	subscribe-for-new-mail setting.
+	* src/sendmsg-window.c: (update_bsmsg_identity): hide reply-to
+	widget if we showed it temporarily.
+
 2008-02-24  Peter Bloomfield
 
 	* src/balsa-index.c: (bndx_popup_position_func, bndx_do_popup):

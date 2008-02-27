@@ -40,6 +40,10 @@ struct _BalsaMBList {
     gboolean display_info;
     /* signal handler id */
     gulong toggled_handler_id;
+
+    /* to set sort order in an idle callback */
+    gint  sort_column_id;
+    guint sort_idle_id;
 };
 
 struct _BalsaMBListClass {

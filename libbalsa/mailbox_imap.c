@@ -1197,7 +1197,7 @@ lbm_imap_check(LibBalsaMailbox * mailbox)
 
     if(libbalsa_imap_server_get_use_status(LIBBALSA_IMAP_SERVER(server))) {
         static struct ImapStatusResult info[] = {
-            { IMSTAT_RECENT, 0 }, { IMSTAT_NONE, 0 } };
+            { IMSTAT_UNSEEN, 0 }, { IMSTAT_NONE, 0 } };
         /* cannot do status on an open mailbox */
         g_return_val_if_fail(!mimap->opened, FALSE);
         if(imap_mbox_status(handle, mimap->path, info) != IMR_OK)

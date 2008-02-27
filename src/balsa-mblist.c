@@ -2347,6 +2347,24 @@ bmbl_expand_to_row(BalsaMBList * mblist, GtkTreePath * path)
 /* Make a new row for mbnode in balsa_app.mblist_tree_store; the row
  * will be a child to the row for root, if we find it, and a top-level
  * row otherwise. */
+static gboolean
+bmbl_sort_idle(gpointer data)
+{
+    GtkTreeSortable *sortable = data;
+
+    gdk_threads_enter();
+
+    gtk_tree_sortable_set_sort_column_id(sortable,
+                                         balsa_app.mblist->sort_column_id,
+                                         GTK_SORT_ASCENDING);
+    balsa_app.mblist->sort_idle_id = 0;
+    g_object_unref(sortable);
+
+    gdk_threads_leave();
+
+    return FALSE;
+}
+
 void 
 balsa_mblist_mailbox_node_append(BalsaMailboxNode * root,
 				 BalsaMailboxNode * mbnode)
@@ -2359,9 +2377,21 @@ balsa_mblist_mailbox_node_append(BalsaMailboxNode * root,
     gdk_threads_enter();
 
     model = GTK_TREE_MODEL(balsa_app.mblist_tree_store);
+
+    if (!balsa_app.mblist->sort_idle_id) {
+        GtkTreeSortable *sortable = GTK_TREE_SORTABLE(model);
+        gtk_tree_sortable_get_sort_column_id
+            (sortable, &balsa_app.mblist->sort_column_id, NULL);
+        gtk_tree_sortable_set_sort_column_id
+            (sortable, GTK_TREE_SORTABLE_UNSORTED_SORT_COLUMN_ID,
+                       GTK_SORT_ASCENDING);
+        balsa_app.mblist->sort_idle_id =
+            g_idle_add(bmbl_sort_idle, g_object_ref(sortable));
+    }
+
     if (root && balsa_find_iter_by_data(&parent, root))
 	parent_iter = &parent;
-    gtk_tree_store_append(balsa_app.mblist_tree_store, &iter, parent_iter);
+    gtk_tree_store_prepend(balsa_app.mblist_tree_store, &iter, parent_iter);
     bmbl_store_redraw_mbnode(&iter, mbnode);
 
     if (parent_iter) {

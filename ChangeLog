@@ -1,3 +1,29 @@
+2008-02-27  Peter Bloomfield
+
+	Port changes from trunk.
+	* libbalsa/filter-funcs.c:
+	* libbalsa/identity.c:
+	* libbalsa/identity.h:
+	* libbalsa/libbalsa.c:
+	* libbalsa/libbalsa_private.h:
+	* libbalsa/mailbox.c:
+	* libbalsa/mailbox.h:
+	* libbalsa/rfc3156.c:
+	* libbalsa/rfc3156.h:
+	* src/balsa-index.c:
+	* src/balsa-mblist.c:
+	* src/balsa-mblist.h:
+	* src/balsa-message.c:
+	* src/balsa-message.h:
+	* src/filter-edit-callbacks.c:
+	* src/mailbox-conf.c:
+	* src/mailbox-node.c:
+	* src/main-window.c:
+	* src/message-window.c:
+	* src/save-restore.c:
+	* src/save-restore.h:
+	* src/sendmsg-window.c:
+
 2008-02-24  Peter Bloomfield
 
 	* libbalsa/imap/imap-handle.c: (ir_fetch_seq): compile with

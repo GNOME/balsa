@@ -48,10 +48,12 @@
 extern option_list fe_search_type[4];
 extern GList * fe_user_headers_list;
 
+#if REGULAR_EXPRESSION_FILTERING_IS_IMPLEMENTED
 static void fe_add_pressed(GtkWidget * widget, gpointer throwaway);
 static void fe_remove_pressed(GtkWidget * widget, gpointer throwaway);
 static void fe_regexs_selection_changed(GtkTreeSelection * selection,
                                         gpointer user_data);
+#endif                  /* REGULAR_EXPRESSION_FILTERING_IS_IMPLEMENTED */
 static void fe_free_associated_filters(void);
 static void fe_free_associated_conditions(void);
 static GtkWidget *fe_date_sample(void);
@@ -242,6 +244,7 @@ unique_filter_name(const gchar * name)
 
 /**************** Conditions *************************/
 
+#if REGULAR_EXPRESSION_FILTERING_IS_IMPLEMENTED
 /* Callback function to fill the regex entry with the selected regex */
 
 static void
@@ -262,6 +265,7 @@ fe_regexs_selection_changed(GtkTreeSelection *selection,
     else gtk_entry_set_text(GTK_ENTRY(fe_type_regex_entry),"");
     gtk_widget_set_sensitive(fe_regex_remove_button, selected);
 }
+#endif                  /* REGULAR_EXPRESSION_FILTERING_IS_IMPLEMENTED */
 
 /* Helper. */
 static gint
@@ -293,11 +297,16 @@ fe_typesmenu_cb(GtkWidget * widget, GtkWidget * field_frame)
 
     switch (type) {
     case CONDITION_STRING:
+#if REGULAR_EXPRESSION_FILTERING_IS_IMPLEMENTED
     case CONDITION_REGEX:
+#endif                  /* REGULAR_EXPRESSION_FILTERING_IS_IMPLEMENTED */
         gtk_widget_show(field_frame);
         break;
     case CONDITION_DATE:
     case CONDITION_FLAG:
+#if !REGULAR_EXPRESSION_FILTERING_IS_IMPLEMENTED
+    case CONDITION_REGEX:
+#endif                  /* REGULAR_EXPRESSION_FILTERING_IS_IMPLEMENTED */
         gtk_widget_hide(field_frame);
     default:
         break;
@@ -480,9 +489,11 @@ condition_validate(LibBalsaCondition* new_cnd)
     const gchar *c_str;
     gint row, col;
     struct tm date;
+#if REGULAR_EXPRESSION_FILTERING_IS_IMPLEMENTED
     GtkTreeModel *model =
         gtk_tree_view_get_model(fe_type_regex_list);
     GtkTreeIter iter;
+#endif                  /* REGULAR_EXPRESSION_FILTERING_IS_IMPLEMENTED */
 
 
     /* Sanity checks, prevent "empty" condition */
@@ -535,12 +546,14 @@ condition_validate(LibBalsaCondition* new_cnd)
         }
         break;
     case CONDITION_REGEX:
+#if REGULAR_EXPRESSION_FILTERING_IS_IMPLEMENTED
         if (!gtk_tree_model_get_iter_first(model, &iter)) {
             balsa_information(LIBBALSA_INFORMATION_ERROR,
                               _("You must provide at least one "
                                 "regular expression"));
             return FALSE;
         }
+#endif                  /* REGULAR_EXPRESSION_FILTERING_IS_IMPLEMENTED */
         break;
     case CONDITION_DATE:
         c_str = gtk_entry_get_text(GTK_ENTRY(fe_type_date_low_entry));
@@ -629,12 +642,16 @@ condition_validate(LibBalsaCondition* new_cnd)
 static void
 clear_condition_widgets()
 {
+#if REGULAR_EXPRESSION_FILTERING_IS_IMPLEMENTED
     GtkTreeModel *model =
         gtk_tree_view_get_model(fe_type_regex_list);
+#endif                  /* REGULAR_EXPRESSION_FILTERING_IS_IMPLEMENTED */
 
     gtk_entry_set_text(GTK_ENTRY(fe_type_simple_entry),"");
+#if REGULAR_EXPRESSION_FILTERING_IS_IMPLEMENTED
     gtk_entry_set_text(GTK_ENTRY(fe_type_regex_entry),"");          
     gtk_list_store_clear(GTK_LIST_STORE(model));
+#endif                  /* REGULAR_EXPRESSION_FILTERING_IS_IMPLEMENTED */
     gtk_entry_set_text(GTK_ENTRY(fe_type_date_low_entry),"");
     gtk_entry_set_text(GTK_ENTRY(fe_type_date_high_entry),"");
 }
@@ -682,8 +699,10 @@ set_button_sensitivities(gboolean sensitive)
 static void
 fill_condition_widgets(LibBalsaCondition* cnd)
 {
+#if REGULAR_EXPRESSION_FILTERING_IS_IMPLEMENTED
     GtkTreeModel *model =
         gtk_tree_view_get_model(fe_type_regex_list);
+#endif                  /* REGULAR_EXPRESSION_FILTERING_IS_IMPLEMENTED */
     gchar str[20];
     struct tm date;
     gint row,col;
@@ -698,7 +717,9 @@ fill_condition_widgets(LibBalsaCondition* cnd)
     if (cnd->type!=CONDITION_REGEX)
         gtk_entry_set_text(GTK_ENTRY(fe_type_regex_entry),"");      
 
+#if REGULAR_EXPRESSION_FILTERING_IS_IMPLEMENTED
     gtk_list_store_clear(GTK_LIST_STORE(model));
+#endif                  /* REGULAR_EXPRESSION_FILTERING_IS_IMPLEMENTED */
 
     gtk_notebook_set_current_page(GTK_NOTEBOOK(fe_type_notebook),
                                   cnd->type - 1);
@@ -938,7 +959,11 @@ static void
 build_type_notebook()
 {
     GtkWidget *page,*frame;
+#if REGULAR_EXPRESSION_FILTERING_IS_IMPLEMENTED
     GtkWidget *scroll;
+#else                   /* REGULAR_EXPRESSION_FILTERING_IS_IMPLEMENTED */
+    const gchar *msg;
+#endif                  /* REGULAR_EXPRESSION_FILTERING_IS_IMPLEMENTED */
     GtkWidget *box;
     GtkWidget *button, *table;
     gint row,col;
@@ -986,10 +1011,11 @@ build_type_notebook()
     /* The regex page of the type notebook */
     box = gtk_vbox_new(FALSE, 5);
 
+    gtk_notebook_append_page(GTK_NOTEBOOK(fe_type_notebook), box, NULL);
+
+#if REGULAR_EXPRESSION_FILTERING_IS_IMPLEMENTED
     page = gtk_table_new(5, 6, FALSE);
     gtk_box_pack_start_defaults(GTK_BOX(box), page);
-
-    gtk_notebook_append_page(GTK_NOTEBOOK(fe_type_notebook), box, NULL);
 
     fe_type_regex_label = 
         gtk_label_new_with_mnemonic(_("_One of the regular expressions matches"));
@@ -1037,6 +1063,10 @@ build_type_notebook()
                      fe_type_regex_entry,
                      0, 5, 5, 6,
                      GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 2, 2);
+#else                   /* REGULAR_EXPRESSION_FILTERING_IS_IMPLEMENTED */
+    msg = _("Filtering using regular expressions is not yet implemented.");
+    gtk_box_pack_start_defaults(GTK_BOX(box), gtk_label_new(msg));
+#endif                  /* REGULAR_EXPRESSION_FILTERING_IS_IMPLEMENTED */
 
     /* The date page of the notebook */
 
@@ -1506,6 +1536,7 @@ fe_action_changed(GtkWidget * widget, gpointer data)
     set_button_sensitivities(TRUE);
 }
 
+#if REGULAR_EXPRESSION_FILTERING_IS_IMPLEMENTED
 /*
  * fe_add_pressed()
  *
@@ -1559,6 +1590,7 @@ fe_remove_pressed(GtkWidget * widget, gpointer throwaway)
     gtk_tree_path_free(path);
     condition_has_changed=TRUE;
 }                       /* end fe_remove_pressed() */
+#endif                  /* REGULAR_EXPRESSION_FILTERING_IS_IMPLEMENTED */
 
 /************************************************************/
 /******** Functions handling filters ************************/

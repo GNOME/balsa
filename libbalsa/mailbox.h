@@ -224,7 +224,12 @@ struct _LibBalsaMailbox {
     LibBalsaCondition *view_filter; /* to choose a subset of messages
                                      * to be displayed, e.g., only
                                      * undeleted. */
-    LibBalsaCondition *persistent_view_filter;
+    LibBalsaCondition *persistent_view_filter; /* the part of the view 
+                                                * filter that will persist 
+                                                * to the next time the
+                                                * mailbox is opened */
+    gboolean view_filter_pending;  /* a view filter has been set
+                                    * but the view has not been updated */
 
     /* info fields */
     gboolean has_unread_messages;

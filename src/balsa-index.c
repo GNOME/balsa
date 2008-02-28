@@ -1856,6 +1856,41 @@ bndx_popup_menu_create(BalsaIndex * index)
  * set sensitivity of menuitems on the popup
  * menu, and populate the mru submenu
  */
+
+/* If the menu is popped up in response to a keystroke, center it
+ * below the headers of the tree-view.
+ */
+static void
+bndx_popup_position_func(GtkMenu * menu, gint * x, gint * y,
+                         gboolean * push_in, gpointer user_data)
+{
+    GtkWidget *bindex = GTK_WIDGET(user_data);
+    GdkScreen *screen = gtk_widget_get_screen(bindex);
+    GtkRequisition req;
+    gint monitor_num;
+    GdkRectangle monitor;
+
+    g_return_if_fail(GTK_WIDGET_REALIZED(bindex));
+
+    gdk_window_get_origin(gtk_tree_view_get_bin_window
+                          (GTK_TREE_VIEW(bindex)), x, y);
+
+    gtk_widget_size_request(GTK_WIDGET(menu), &req);
+
+    *x += (bindex->allocation.width - req.width) / 2;
+
+    monitor_num = gdk_screen_get_monitor_at_point(screen, *x, *y);
+    gtk_menu_set_monitor(menu, monitor_num);
+    gdk_screen_get_monitor_geometry(screen, monitor_num, &monitor);
+
+    *x = CLAMP(*x, monitor.x,
+               monitor.x + MAX(0, monitor.width - req.width));
+    *y = CLAMP(*y, monitor.y,
+               monitor.y + MAX(0, monitor.height - req.height));
+
+    *push_in = FALSE;
+}
+
 static void
 bndx_do_popup(BalsaIndex * index, GdkEventButton * event)
 {
@@ -1866,8 +1901,6 @@ bndx_do_popup(BalsaIndex * index, GdkEventButton * event)
     gboolean any;
     gboolean any_deleted = FALSE;
     gboolean any_not_deleted = FALSE;
-    gint event_button;
-    guint event_time;
     GArray *selected = balsa_index_selected_msgnos_new(index);
     guint i;
 
@@ -1914,15 +1947,13 @@ bndx_do_popup(BalsaIndex * index, GdkEventButton * event)
 
     gtk_widget_show_all(menu);
 
-    if (event) {
-        event_button = event->button;
-        event_time = event->time;
-    } else {
-        event_button = 0;
-        event_time = gtk_get_current_event_time();
-    }
-    gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL,
-                   event_button, event_time);
+    if (event)
+        gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL,
+                       event->button, event->time);
+    else
+        gtk_menu_popup(GTK_MENU(menu), NULL, NULL,
+                       bndx_popup_position_func, index,
+                       0, gtk_get_current_event_time());
 }
 
 static GtkWidget *

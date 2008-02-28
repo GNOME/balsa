@@ -1215,7 +1215,9 @@ add_local_mailbox(BalsaMailboxNode *root, const gchar * name,
 	    g_print(_("Local mailbox %s loaded as: %s\n"),
 		    mailbox->name,
 		    g_type_name(G_OBJECT_TYPE(mailbox)));
-	if (balsa_app.check_mail_upon_startup) {
+        if (balsa_app.check_mail_upon_startup
+            && libbalsa_mailbox_get_subscribe(mailbox) !=
+            LB_MAILBOX_SUBSCRIBE_NO) {
             g_object_ref(mailbox);
             g_idle_add((GSourceFunc) mailbox_check_idle, mailbox);
         }

@@ -194,6 +194,7 @@ static void bw_select_all_cb              (GtkAction * action, gpointer data);
 #if !defined(ENABLE_TOUCH_UI)
 static void bw_message_copy_cb            (GtkAction * action, gpointer data);
 static void bw_message_select_all_cb      (GtkAction * action, gpointer data);
+static void bw_find_in_message_cb         (GtkAction * action, gpointer data);
 #endif /* ENABLE_TOUCH_UI */
 static void bw_mark_all_cb                (GtkAction * action, gpointer data);
 
@@ -521,7 +522,10 @@ static const GtkActionEntry message_entries[] = {
     {"CopyMessage", GTK_STOCK_COPY, N_("_Copy"), "<control>C",
      N_("Copy message"), G_CALLBACK(bw_message_copy_cb)},
     {"SelectText", NULL, N_("_Select Text"), NULL,
-     N_("Select entire mail"), G_CALLBACK(bw_message_select_all_cb)}
+     N_("Select entire mail"), G_CALLBACK(bw_message_select_all_cb)},
+    {"FindInMessage", NULL, N_("_Find in message"), "slash",
+     N_("Find a string in this message"),
+     G_CALLBACK(bw_find_in_message_cb)}
 #endif /* ENABLE_TOUCH_UI */
 };
 
@@ -669,6 +673,7 @@ static const char *ui_description =
 "      <separator/>"
 "      <menuitem action='Find'/>"
 "      <menuitem action='FindNext'/>"
+"      <menuitem action='FindInMessage'/>"
 "      <separator/>"
 "      <menuitem action='Filters'/>"
 "      <menuitem action='ExportFilters'/>"
@@ -1511,6 +1516,7 @@ balsa_window_new()
 
     window = g_object_new(BALSA_TYPE_WINDOW, NULL);
     window->vbox = gtk_vbox_new(FALSE, 0);
+    gtk_widget_show(window->vbox);
     gtk_container_add(GTK_CONTAINER(window), window->vbox);
 
     gtk_window_set_title(GTK_WINDOW(window), "Balsa");
@@ -1559,6 +1565,7 @@ balsa_window_new()
                      G_CALLBACK(bw_window_state_event_cb),
                      window->statusbar);
     gtk_box_pack_start(GTK_BOX(hbox), window->statusbar, TRUE, TRUE, 0);
+    gtk_widget_show_all(hbox);
 
 #if 0
     gnome_app_install_appbar_menu_hints(GNOME_APPBAR(balsa_app.appbar),
@@ -1696,7 +1703,7 @@ balsa_window_new()
                      G_CALLBACK(bw_cancel_new_mail_notification), NULL);
 #endif
 
-    gtk_widget_show_all(GTK_WIDGET(window));
+    gtk_widget_show(GTK_WIDGET(window));
     return GTK_WIDGET(window);
 }
 
@@ -4165,6 +4172,14 @@ bw_find_again_cb(GtkAction * action,gpointer data)
     GtkWidget * bindex;
     if ((bindex=balsa_window_find_current_index(window)))
 	bw_find_real(window, BALSA_INDEX(bindex), TRUE);
+}
+
+static void
+bw_find_in_message_cb(GtkAction * action,gpointer data)
+{
+    BalsaWindow *window = data;
+    if (balsa_app.previewpane)
+        balsa_message_find_in_message(BALSA_MESSAGE(window->preview));
 }
 
 static void

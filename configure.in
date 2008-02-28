@@ -766,6 +766,8 @@ fi
 if test -d "${srcdir}/.svn" ; then
 	BALSA_FROM_SVN=yes
 	BALSA_CFLAGS="$BALSA_CFLAGS -Wall -Werror"
+	BALSA_CFLAGS="$BALSA_CFLAGS -pg"
+	BALSA_LIBS="$BALSA_LIBS -pg"
 else
 	BALSA_FROM_SVN=no
 fi

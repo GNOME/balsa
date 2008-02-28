@@ -65,6 +65,8 @@ static gboolean accept_low_trust_key(const gchar * name,
 				     GMimeGpgmeContext * ctx);
 static gboolean gpg_updates_trustdb(void);
 static gchar *fix_EMail_info(gchar * str);
+static gboolean have_pub_key_for(gpgme_ctx_t gpgme_ctx,
+				 InternetAddressList * recipients);
 
 
 /* ==== public functions =================================================== */
@@ -138,6 +140,43 @@ body_is_type(LibBalsaMessageBody * body, const gchar * type,
     }
 
     return retval;
+}
+
+
+/* return TRUE if we can encrypt for every recipient in the recipients list
+ * using protocol */
+gboolean
+libbalsa_can_encrypt_for_all(InternetAddressList * recipients,
+			     gpgme_protocol_t protocol)
+{
+    gpgme_ctx_t gpgme_ctx;
+    gboolean result;
+
+    /* silent paranoia checks */
+    if (!recipients)
+	return TRUE;  /* we can of course encrypt for nobody... */
+#ifndef HAVE_SMIME
+    if (protocol == GPGME_PROTOCOL_OpenPGP)
+	return FALSE;
+#endif
+
+    /* check if gpg is currently available */
+    if (protocol == GPGME_PROTOCOL_OpenPGP && gpg_updates_trustdb())
+	return FALSE;
+
+    /* create the gpgme context and set the protocol */
+    if (gpgme_new(&gpgme_ctx) != GPG_ERR_NO_ERROR)
+	return FALSE;
+    if (gpgme_set_protocol(gpgme_ctx, protocol) != GPG_ERR_NO_ERROR) {
+	gpgme_release(gpgme_ctx);
+	return FALSE;
+    }
+
+    /* loop over all recipients and try to find valid keys */
+    result = have_pub_key_for(gpgme_ctx, recipients);
+    gpgme_release(gpgme_ctx);
+
+    return result;
 }
 
 
@@ -1690,6 +1729,51 @@ gpg_updates_trustdb(void)
 	return TRUE;
     } else
 	return FALSE;
+}
+
+
+/* check if the context contains a public key for the passed recipients */
+#define KEY_IS_OK(k)   (!((k)->expired || (k)->revoked || \
+                          (k)->disabled || (k)->invalid))
+static gboolean
+have_pub_key_for(gpgme_ctx_t gpgme_ctx, InternetAddressList * recipients)
+{
+    gpgme_key_t key;
+    gboolean result = TRUE;
+    time_t now = time(NULL);
+
+    for (; result && recipients; recipients = recipients->next) {
+        InternetAddress *ia = recipients->address;
+
+	/* check all entries in the list, handle groups recursively */
+	if (ia->type == INTERNET_ADDRESS_GROUP)
+	    result = have_pub_key_for(gpgme_ctx, ia->value.members);
+	else if (recipients->address->type == INTERNET_ADDRESS_NAME) {
+	    if (gpgme_op_keylist_start(gpgme_ctx, ia->value.addr, FALSE) !=
+		GPG_ERR_NO_ERROR)
+		return FALSE;
+
+	    result = FALSE;
+	    while (!result &&
+		   gpgme_op_keylist_next(gpgme_ctx, &key) == GPG_ERR_NO_ERROR) {
+		/* check if this key and the relevant subkey are usable */
+		if (KEY_IS_OK(key)) {
+		    gpgme_subkey_t subkey = key->subkeys;
+
+		    while (subkey && !subkey->can_encrypt)
+			subkey = subkey->next;
+
+		    if (subkey && KEY_IS_OK(subkey) && 
+			(subkey->expires == 0 || subkey->expires > now))
+			result = TRUE;
+		}
+		gpgme_key_unref(key);
+	    }
+	    gpgme_op_keylist_end(gpgme_ctx);
+	}
+    }
+
+    return result;
 }
 
 #endif				/* HAVE_GPGME */

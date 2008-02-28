@@ -1,5 +1,6 @@
 2008-02-27  Peter Bloomfield
 
+	* libbalsa/mailbox.c: (libbalsa_mailbox_changed):
 	* libbalsa/mailbox_imap.c: (lbm_imap_check):
 	* libbalsa/filter-funcs.c: (libbalsa_condition_compare): port
 	more changes from trunk.

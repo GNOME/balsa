@@ -907,7 +907,7 @@ libbalsa_mailbox_changed(LibBalsaMailbox * mailbox)
                                    (mailbox));
         libbalsa_mailbox_set_unread(mailbox, mailbox->unread_messages);
     } else if (mailbox->has_unread_messages
-               && libbalsa_mailbox_get_unread(mailbox) == 0) {
+               && libbalsa_mailbox_get_unread(mailbox) <= 0) {
         /* Mail has arrived in a closed mailbox since our last check;
          * total is unknown, but mailbox->has_unread_messages is valid. */
         libbalsa_mailbox_set_total(mailbox, -1);

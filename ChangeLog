@@ -1,3 +1,8 @@
+2008-03-03  Peter Bloomfield
+
+	* libbalsa/mailbox.c: (libbalsa_mailbox_messages_change_flags):
+	do not crash when mindex == NULL.
+
 2008-03-02  Peter Bloomfield
 
 	* src/balsa-index.c: (bndx_instance_init): remember

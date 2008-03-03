@@ -68,6 +68,7 @@ extern "C" {
         /* signal handler ids */
         gulong row_expanded_id;
         gulong row_collapsed_id;
+        gulong selection_changed_id;
 
 	LibBalsaMailboxSearchIter *search_iter;
     };
@@ -170,6 +171,9 @@ extern "C" {
 
     /* Make sure messages are visible. */
     void balsa_index_ensure_visible(BalsaIndex * index);
+
+    /* Select all without previewing any. */
+    void balsa_index_select_all(BalsaIndex * bindex);
 
 #define BALSA_INDEX_VIEW_ON_OPEN "balsa-index-view-on-open"
 

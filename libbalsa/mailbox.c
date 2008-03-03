@@ -1982,7 +1982,7 @@ libbalsa_mailbox_messages_change_flags(LibBalsaMailbox * mailbox,
     retval = LIBBALSA_MAILBOX_GET_CLASS(mailbox)->
 	messages_change_flags(mailbox, msgnos, set, clear);
 
-    if (retval && mailbox->view_filter) {
+    if (retval && mailbox->mindex && mailbox->view_filter) {
         LibBalsaMailboxSearchIter *iter_view =
             libbalsa_mailbox_search_iter_view(mailbox);
         for (i = 0; i < msgnos->len; i++) {

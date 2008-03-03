@@ -5103,10 +5103,11 @@ balsa_window_select_all(GtkWindow * window)
         if (gtk_tree_selection_get_mode(selection) ==
             GTK_SELECTION_MULTIPLE) {
 	    if (BALSA_IS_INDEX(focus_widget))
-		balsa_index_update_tree((BalsaIndex *) focus_widget, TRUE);
-	    else
+		balsa_index_select_all((BalsaIndex *) focus_widget);
+	    else {
 		gtk_tree_view_expand_all((GtkTreeView *) focus_widget);
-            gtk_tree_selection_select_all(selection);
+                gtk_tree_selection_select_all(selection);
+            }
 	}
 #ifdef    HAVE_GTKHTML
     } else if (libbalsa_html_can_select(focus_widget)) {

@@ -387,8 +387,9 @@ bndx_instance_init(BalsaIndex * index)
 
     /* handle select row signals to display message in the window
      * preview pane */
-    g_signal_connect(selection, "changed",
-                     G_CALLBACK(bndx_selection_changed), index);
+    index->selection_changed_id =
+        g_signal_connect(selection, "changed",
+                         G_CALLBACK(bndx_selection_changed), index);
 
     /* we want to handle button presses to pop up context menus if
      * necessary */
@@ -2450,4 +2451,16 @@ balsa_index_ensure_visible(BalsaIndex * index)
         bndx_scroll_to_row(index, path);
         gtk_tree_path_free(path);
     }
+}
+
+void
+balsa_index_select_all(BalsaIndex * bindex)
+{
+    GtkTreeView *tree_view = GTK_TREE_VIEW(bindex);
+    GtkTreeSelection *selection = gtk_tree_view_get_selection(tree_view);
+
+    gtk_tree_view_expand_all(tree_view);
+    g_signal_handler_block(selection, bindex->selection_changed_id);
+    gtk_tree_selection_select_all(selection);
+    g_signal_handler_unblock(selection, bindex->selection_changed_id);
 }

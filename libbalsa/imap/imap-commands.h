@@ -118,11 +118,13 @@ ImapResponse imap_mbox_handle_fetch_rfc822(ImapMboxHandle* handle,
 					   void *cb_data);
 
 ImapResponse imap_mbox_handle_fetch_rfc822_uid(ImapMboxHandle* handle,
-                                               unsigned uid, FILE *fl);
+                                               unsigned uid, gboolean peek,
+                                               FILE *fl);
 
 ImapResponse imap_mbox_handle_fetch_body(ImapMboxHandle* handle, 
                                          unsigned seqno, 
                                          const char *section,
+                                         gboolean peek_only,
                                          ImapFetchBodyOptions options,
                                          ImapFetchBodyCb body_handler,
                                          void *arg);

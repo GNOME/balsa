@@ -1,3 +1,10 @@
+2008-03-03  Pawel Salek
+
+	* libbalsa/mailbox_imap.c: peek only into mailboxes, do no trigger
+	implicit \seen flag toggling.
+	* libbalsa/imap/imap-handle.c: recognize BODY[TEXT].
+	* libbalsa/imap/imap-commands.[ch]: add peek argument.
+
 2008-03-03  Peter Bloomfield
 
 	* libbalsa/mailbox.c: (libbalsa_mailbox_messages_change_flags):

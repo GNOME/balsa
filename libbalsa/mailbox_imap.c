@@ -1125,7 +1125,8 @@ get_cache_stream(LibBalsaMailbox *mailbox, guint msgno)
         cache = fopen(path, "wb");
         if(cache) {
             II(rc,mimap->handle,
-               imap_mbox_handle_fetch_rfc822_uid(mimap->handle, uid, cache));
+               imap_mbox_handle_fetch_rfc822_uid(mimap->handle, uid,
+                                                 TRUE, cache));
             fclose(cache);
         }
 
@@ -2340,7 +2341,7 @@ lbm_imap_get_msg_part_from_cache(LibBalsaMessage * msg,
         if (dt.body->octets > 0)
         II(rc,mimap->handle,
            imap_mbox_handle_fetch_body(mimap->handle, msg->msgno,
-                                       section, ifbo, append_str, &dt));
+                                       section, TRUE, ifbo, append_str, &dt));
         libbalsa_unlock_mailbox(msg->mailbox);
         if(rc != IMR_OK) {
             fprintf(stderr, "Error fetching imap message no %lu section %s\n",

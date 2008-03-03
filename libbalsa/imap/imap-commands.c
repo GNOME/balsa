@@ -1070,9 +1070,9 @@ imap_mbox_handle_fetch_rfc822(ImapMboxHandle* handle,
 
 ImapResponse
 imap_mbox_handle_fetch_rfc822_uid(ImapMboxHandle* handle, unsigned uid, 
-                              FILE *fl)
+                                  gboolean peek, FILE *fl)
 {
-  char cmd[40];
+  char cmd[80];
   ImapFetchBodyCb cb = handle->body_cb;
   void          *arg = handle->body_arg;
   ImapResponse rc;
@@ -1081,7 +1081,9 @@ imap_mbox_handle_fetch_rfc822_uid(ImapMboxHandle* handle, unsigned uid,
   HANDLE_LOCK(handle);
   handle->body_cb  = write_nstring;
   handle->body_arg = fl;
-  sprintf(cmd, "UID FETCH %u RFC822", uid);
+  sprintf(cmd, peek 
+          ? "UID FETCH %u (BODY.PEEK[HEADER] BODY.PEEK[TEXT])"
+          : "UID FETCH %u RFC822", uid);
   rc = imap_cmd_exec(handle, cmd);
   handle->body_cb  = cb;
   handle->body_arg = arg;
@@ -1121,6 +1123,7 @@ imap_binary_handler(unsigned seqno, const char *buf,
 ImapResponse
 imap_mbox_handle_fetch_body(ImapMboxHandle* handle, 
                             unsigned seqno, const char *section,
+                            gboolean peek_only,
                             ImapFetchBodyOptions options,
                             ImapFetchBodyCb body_cb, void *arg)
 {
@@ -1128,6 +1131,7 @@ imap_mbox_handle_fetch_body(ImapMboxHandle* handle,
   ImapFetchBodyCb fcb = handle->body_cb;
   void          *farg = handle->body_arg;
   ImapResponse rc;
+  const gchar *peek_string = peek_only ? ".PEEK" : "";
 
   IMAP_REQUIRED_STATE1(handle, IMHS_SELECTED, IMR_BAD);
 
@@ -1142,8 +1146,8 @@ imap_mbox_handle_fetch_body(ImapMboxHandle* handle,
     ibd.first_run = TRUE;
     handle->body_cb = imap_binary_handler;
     handle->body_arg = &ibd;
-    snprintf(cmd, sizeof(cmd), "FETCH %u BINARY[%s]",
-             seqno, section);
+    snprintf(cmd, sizeof(cmd), "FETCH %u BINARY%s[%s]",
+             seqno, peek_string, section);
     rc = imap_cmd_exec(handle, cmd);
     if(rc != IMR_NO) { /* unknown-cte */
       handle->body_cb  = fcb;
@@ -1155,8 +1159,8 @@ imap_mbox_handle_fetch_body(ImapMboxHandle* handle,
   handle->body_arg = arg;
   /* Pure IMAP without extensions */
   if(options == IMFB_NONE)
-    snprintf(cmd, sizeof(cmd), "FETCH %u BODY[%s]",
-             seqno, section);
+    snprintf(cmd, sizeof(cmd), "FETCH %u BODY%s[%s]",
+             seqno, peek_string, section);
   else {
     char prefix[160];
     if(options == IMFB_HEADER) {
@@ -1173,8 +1177,8 @@ imap_mbox_handle_fetch_body(ImapMboxHandle* handle,
       prefix[sizeof(prefix)-1] = '\0';
     } else
       snprintf(prefix, sizeof(prefix), "%s.MIME", section);
-    snprintf(cmd, sizeof(cmd), "FETCH %u (BODY[%s] BODY[%s])",
-             seqno, prefix, section);
+    snprintf(cmd, sizeof(cmd), "FETCH %u (BODY%s[%s] BODY%s[%s])",
+             seqno, peek_string, prefix, peek_string, section);
   }
   rc = imap_cmd_exec(handle, cmd);
   handle->body_cb  = fcb;

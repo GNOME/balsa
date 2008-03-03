@@ -3544,7 +3544,8 @@ ir_msg_att_body(ImapMboxHandle *h, int c, unsigned seqno)
     }
     c = imap_get_atom(h->sio, buf, sizeof buf);
     if (c == ']' &&
-        g_ascii_strcasecmp(buf, "HEADER") == 0) {
+        (g_ascii_strcasecmp(buf, "HEADER") == 0 ||
+         g_ascii_strcasecmp(buf, "TEXT") == 0)) {
       sio_ungetc (h->sio); /* put the ']' back */
       rc = ir_body_section(h->sio, seqno, h->body_cb, h->body_arg);
     } else {

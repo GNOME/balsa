@@ -1124,7 +1124,7 @@ libbalsa_signature_info_to_gchar(GMimeGpgmeSigstat * info,
 #include <sys/wait.h>
 #include <fcntl.h>
 
-/* run gpg asynchronously to import a key */
+/* run gpg asynchronously to import or update a key */
 typedef struct _spawned_gpg_T {
     gint child_pid;
     gint standard_error;
@@ -1135,7 +1135,8 @@ typedef struct _spawned_gpg_T {
 static gboolean check_gpg_child(gpointer data);
 
 gboolean
-gpg_run_import_key(const gchar * fingerprint, GtkWindow * parent)
+gpg_keyserver_op(const gchar * fingerprint, gpg_keyserver_action_t action,
+                 GtkWindow * parent)
 {
     gchar **argv;
     spawned_gpg_T *spawned_gpg;
@@ -1145,7 +1146,16 @@ gpg_run_import_key(const gchar * fingerprint, GtkWindow * parent)
     argv = g_new(gchar *, 5);
     argv[0] = g_strdup(GPG_PATH);
     argv[1] = g_strdup("--no-greeting");
-    argv[2] = g_strdup("--recv-keys");
+    switch (action) {
+    case GPG_KEYSERVER_IMPORT:
+        argv[2] = g_strdup("--recv-keys");
+        break;
+    case GPG_KEYSERVER_UPDATE:
+        argv[2] = g_strdup("--refresh-keys");
+        break;
+    default:
+        g_assert_not_reached();
+    }
     argv[3] = g_strdup(fingerprint);
     argv[4] = NULL;
     spawned_gpg = g_new0(spawned_gpg_T, 1);
@@ -1159,7 +1169,7 @@ gpg_run_import_key(const gchar * fingerprint, GtkWindow * parent)
     if (spawnres == FALSE) {
 	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
 			     _
-			     ("Could not launch %s to get the public key %s."),
+			     ("Could not launch %s to query the public key %s."),
 			     GPG_PATH, fingerprint);
 	g_free(spawned_gpg);
 	return FALSE;
@@ -1209,15 +1219,15 @@ check_gpg_child(gpointer data)
 				   GTK_DIALOG_DESTROY_WITH_PARENT,
 				   GTK_MESSAGE_WARNING, GTK_BUTTONS_CLOSE,
 				   _
-				   ("Running gpg failed with return value %d:\n%s"),
-				   WEXITSTATUS(status), gpg_message);
+				   ("Running %s failed with return value %d:\n%s"),
+				   GPG_PATH, WEXITSTATUS(status), gpg_message);
     else
 	dialog =
 	    gtk_message_dialog_new(spawned_gpg->parent,
 				   GTK_DIALOG_DESTROY_WITH_PARENT,
 				   GTK_MESSAGE_INFO, GTK_BUTTONS_CLOSE,
-				   _("Running gpg successful:\n%s"),
-				   gpg_message);
+				   _("Running %s successful:\n%s"),
+				   GPG_PATH, gpg_message);
     g_free(gpg_message);
     g_string_free(spawned_gpg->stderr_buf, TRUE);
     g_free(spawned_gpg);

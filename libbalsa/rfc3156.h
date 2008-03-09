@@ -107,7 +107,15 @@ gchar *libbalsa_signature_info_to_gchar(GMimeGpgmeSigstat * info,
 					const gchar * date_string);
 
 #ifdef HAVE_GPG
-gboolean gpg_run_import_key(const gchar * fingerprint, GtkWindow * parent);
+
+typedef enum {
+    GPG_KEYSERVER_IMPORT = 1,
+    GPG_KEYSERVER_UPDATE
+} gpg_keyserver_action_t;
+
+gboolean gpg_keyserver_op(const gchar * fingerprint,
+                          gpg_keyserver_action_t action,
+                          GtkWindow * parent);
 
 #endif
 #endif				/* HAVE_GPGME */

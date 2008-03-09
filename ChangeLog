@@ -1,3 +1,13 @@
+2008-03-09  Albrecht Dreß
+
+	* libbalsa/rfc3156.c: (gpg_keyserver_op, check_gpg_child): add
+	"refresh" as an alternative action to "import".
+	* libbalsa/rfc3156.h: add gpg_keyserver_action_t enum for
+	actions.
+	* src/balsa-mime-widget-crypto.c:
+	(balsa_mime_widget_signature_widget, on_gpg_key_button):
+	implement "refresh" button.
+
 2008-03-03  Pawel Salek
 
 	* libbalsa/mailbox_imap.c: peek only into mailboxes, do no trigger

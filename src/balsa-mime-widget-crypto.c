@@ -30,7 +30,7 @@
 
 
 #ifdef HAVE_GPG
-static void on_import_gpg_key_button(GtkButton * button, const gchar * fingerprint);
+static void on_gpg_key_button(GtkButton * button, const gchar * fingerprint);
 #endif
 
 
@@ -83,15 +83,22 @@ balsa_mime_widget_signature_widget(LibBalsaMessageBody * mime_body,
     gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 0);
     g_free(infostr);
 #ifdef HAVE_GPG
-    if (mime_body->sig_info->protocol == GPGME_PROTOCOL_OpenPGP &&
-        mime_body->sig_info->status == GPG_ERR_NO_PUBKEY) {
-        GtkWidget *button =
-            gtk_button_new_with_mnemonic(_("_Run gpg to import this key"));
+    if (mime_body->sig_info->protocol == GPGME_PROTOCOL_OpenPGP) {
+        GtkWidget *button;
 
-        gtk_box_pack_start(GTK_BOX(vbox), button, FALSE, FALSE, 0);
+        if (mime_body->sig_info->status == GPG_ERR_NO_PUBKEY) {
+            button = gtk_button_new_with_mnemonic(_("_Run GnuPG to import this key"));
+            g_object_set_data(G_OBJECT(button), "gpg-keyserver-op",
+                              GINT_TO_POINTER(GPG_KEYSERVER_IMPORT));
+        } else {
+            button = gtk_button_new_with_mnemonic(_("_Run GnuPG to check for an update of this key"));
+            g_object_set_data(G_OBJECT(button), "gpg-keyserver-op",
+                              GINT_TO_POINTER(GPG_KEYSERVER_UPDATE));
+        }
         g_signal_connect(G_OBJECT(button), "clicked",
-                         G_CALLBACK(on_import_gpg_key_button),
+                         G_CALLBACK(on_gpg_key_button),
                          (gpointer)mime_body->sig_info->fingerprint);
+        gtk_box_pack_start(GTK_BOX(vbox), button, FALSE, FALSE, 0);
     }
 #endif /* HAVE_GPG */
 
@@ -160,9 +167,12 @@ balsa_mime_widget_signature_icon_name(LibBalsaMsgProtectState protect_state)
 
 /* Callback: run gpg to import a public key */
 static void
-on_import_gpg_key_button(GtkButton * button, const gchar * fingerprint)
+on_gpg_key_button(GtkButton * button, const gchar * fingerprint)
 {
-    gpg_run_import_key(fingerprint, GTK_WINDOW(balsa_app.main_window));
+    gpg_keyserver_action_t action =
+        GPOINTER_TO_INT(g_object_get_data(G_OBJECT(button), "gpg-keyserver-op"));
+
+    gpg_keyserver_op(fingerprint, action, GTK_WINDOW(balsa_app.main_window));
 }
 #endif /* HAVE_GPG */
 

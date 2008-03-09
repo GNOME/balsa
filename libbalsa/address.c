@@ -748,6 +748,7 @@ libbalsa_address_set_edit_entries(const LibBalsaAddress * address,
     g_free(new_name);
     g_free(first_name);
     g_free(last_name);
+    g_free(nick_name);
     g_free(new_email);
     g_free(new_organization);
     gtk_widget_grab_focus(entries[FULL_NAME]);

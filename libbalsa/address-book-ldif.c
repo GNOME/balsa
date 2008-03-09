@@ -323,6 +323,7 @@ address_new_prefill(LibBalsaAddress * address, GList * address_list,
     address->first_name = givenn ? givenn : g_strdup(nickn ? nickn : "");
     address->last_name = surn ? surn : g_strdup("");
     address->full_name = build_name(fulln, address->first_name, surn);
+    g_free(fulln);
     address->organization = org ? org : g_strdup("");
     
     address->nick_name = nickn ? nickn : 
@@ -500,6 +501,7 @@ libbalsa_address_book_ldif_parse_address(FILE * stream,
 	    } 
             /* Record without e-mail address, or we're not creating
              * addresses: free memory. */
+            g_free(fullname);
             g_free(nickname);
             g_free(givenname);
             g_free(surname);

@@ -1,3 +1,8 @@
+2008-03-09  Pawel Salek
+
+	* src/ab-main.c: trying out alternative address book layout.
+	* libbalsa/{address,address-book-ldif}.c: plug some memory leaks.
+
 2008-03-09  Albrecht Dreß
 
 	* libbalsa/rfc3156.c: (gpg_keyserver_op, check_gpg_child): add

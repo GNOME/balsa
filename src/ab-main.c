@@ -51,6 +51,7 @@
 
 struct ABMainWindow {
     GtkWindow *window;
+    GtkWidget *notebook; /**< notebook containing browse and edit pages. */
     GtkWidget *entry_list; /* GtkTreeView widget */
     GtkWidget *apply_button, *remove_button, *cancel_button;
     GtkWidget *edit_widget;
@@ -107,6 +108,7 @@ static void ab_warning(const char *fmt, ...)
 
 enum {
     LIST_COLUMN_NAME,
+    LIST_COLUMN_ADDRSPEC,
     LIST_COLUMN_ADDRESS,
     N_COLUMNS
 };
@@ -137,6 +139,7 @@ bab_load_cb(LibBalsaAddressBook *libbalsa_ab,
         /* GtkListStore refs address, and unrefs it when cleared  */
         gtk_list_store_set(GTK_LIST_STORE(model), &iter,
                            LIST_COLUMN_NAME, address->full_name,
+                           LIST_COLUMN_ADDRSPEC, address_string,
                            LIST_COLUMN_ADDRESS, address,
                            -1);
 
@@ -150,6 +153,7 @@ bab_load_cb(LibBalsaAddressBook *libbalsa_ab,
              * cleared */
             gtk_list_store_set(GTK_LIST_STORE(model), &iter,
                                LIST_COLUMN_NAME, address->full_name,
+                               LIST_COLUMN_ADDRSPEC, address_list->data,
                                LIST_COLUMN_ADDRESS, address,
                                -1);
 
@@ -473,6 +477,7 @@ edit_new_entry_cb(GtkAction * action, gpointer user_data)
     GtkTreeSelection *selection;
 
     contacts_app.displayed_address = NULL;
+    gtk_notebook_set_current_page(GTK_NOTEBOOK(contacts_app.notebook), 1);
     ab_set_edit_widget(NULL, FALSE);
     gtk_widget_set_sensitive(contacts_app.remove_button, FALSE);
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW
@@ -615,11 +620,13 @@ ab_clear_edit_widget(void)
     gtk_widget_set_sensitive(contacts_app.remove_button, FALSE);
     gtk_widget_set_sensitive(contacts_app.cancel_button, FALSE);
     contacts_app.displayed_address = NULL;
+    gtk_notebook_set_current_page(GTK_NOTEBOOK(contacts_app.notebook), 0);
 }
 
 static void
 list_selection_changed_cb(GtkTreeSelection *selection, gpointer data)
 {
+#if 0
     GtkTreeIter iter;
     GtkTreeModel *model;
     GValue gv = {0,};
@@ -635,11 +642,12 @@ list_selection_changed_cb(GtkTreeSelection *selection, gpointer data)
     if (address) {
         if (address != contacts_app.displayed_address)
             ab_set_edit_widget(address, TRUE);
-	gtk_widget_set_sensitive(contacts_app.edit_widget, FALSE);
+	/* gtk_widget_set_sensitive(contacts_app.edit_widget, FALSE); */
     } else
         ab_clear_edit_widget();
     g_value_unset(&gv);
     contacts_app.displayed_address = address;
+#endif
 }
 
 static void
@@ -659,7 +667,10 @@ list_row_activated_cb(GtkTreeView *tree, gpointer data)
     if (address) {
         if (address != contacts_app.displayed_address)
             ab_set_edit_widget(address, TRUE);
-	gtk_widget_set_sensitive(contacts_app.edit_widget, TRUE);
+	printf("Switch page..\n");
+	gtk_notebook_set_current_page(GTK_NOTEBOOK(contacts_app.notebook), 1);
+	/* gtk_widget_set_sensitive(contacts_app.edit_widget, TRUE); */
+	contacts_app.displayed_address = address;
     } else
         ab_clear_edit_widget();
     g_value_unset(&gv);
@@ -711,6 +722,7 @@ bab_window_list_new(gpointer cb_data)
     store =
         gtk_list_store_new(N_COLUMNS,
                            G_TYPE_STRING,   /* LIST_COLUMN_NAME           */
+                           G_TYPE_STRING,   /* LIST_COLUMN_ADDRSPEC       */
                            G_TYPE_OBJECT);  /* LIST_COLUMN_ADDRESS        */
     /*
     gtk_tree_sortable_set_sort_func(GTK_TREE_SORTABLE(store), 0,
@@ -744,6 +756,14 @@ bab_window_list_new(gpointer cb_data)
                         GDK_ACTION_COPY);
     g_signal_connect(G_OBJECT(tree), "drag-data-get",
                      G_CALLBACK(addrlist_drag_get_cb), NULL);
+
+    renderer = gtk_cell_renderer_text_new();
+    column =
+        gtk_tree_view_column_new_with_attributes(_("_Address"),
+                                                 renderer,
+                                                 "text",
+                                                 LIST_COLUMN_ADDRSPEC, NULL);
+    gtk_tree_view_append_column(GTK_TREE_VIEW(tree), column);
 
     gtk_widget_show(tree);
     return tree;
@@ -798,6 +818,8 @@ apply_button_cb(GtkWidget * w, gpointer data)
         }
         if (!gtk_tree_selection_get_selected(selection, NULL, NULL))
             ab_clear_edit_widget();
+	gtk_notebook_set_current_page(GTK_NOTEBOOK(contacts_app.notebook), 0);
+	
     } else 
         ab_warning(contacts_app.displayed_address ?
                    "Cannot modify: %s\n" : "Cannot add: %s\n",
@@ -918,9 +940,9 @@ ew_key_pressed(GtkEntry * entry, GdkEventKey * event, struct ABMainWindow *abmw)
 static GtkWidget*
 bab_window_new()
 {
-    GtkWidget* menubar = NULL, *main_vbox, *cont_box, *vbox, *scroll;
+    GtkWidget* menubar = NULL, *main_vbox, *scroll;
     GtkWidget *wnd = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-    GtkWidget *edit_box;
+    GtkWidget *browse_widget, *edit_widget;
 
     gtk_window_set_title(GTK_WINDOW(wnd), "Contacts");
 
@@ -933,35 +955,42 @@ bab_window_new()
         gtk_box_pack_start(GTK_BOX(main_vbox),
                            menubar, FALSE, FALSE, 1);
 
-    /* Entry widget for finding an address */
+    contacts_app.notebook = gtk_notebook_new();
     gtk_box_pack_start(GTK_BOX(main_vbox),
+		       contacts_app.notebook, TRUE, TRUE, 1);
+
+    browse_widget = gtk_vbox_new(FALSE, 1);
+
+    /* Entry widget for finding an address */
+    gtk_box_pack_start(GTK_BOX(browse_widget),
                        bab_get_filter_box(), FALSE, FALSE, 1);
  
-    cont_box = gtk_hbox_new(FALSE, 1);
-    gtk_box_pack_start(GTK_BOX(main_vbox), cont_box, TRUE,TRUE, 1);
-
     scroll = gtk_scrolled_window_new(NULL, NULL);
     gtk_widget_show(scroll);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll),
 				   GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-    gtk_box_pack_start(GTK_BOX(cont_box), scroll, TRUE, TRUE, 1);
+    gtk_box_pack_start(GTK_BOX(browse_widget), scroll, TRUE, TRUE, 1);
     
     contacts_app.entry_list = bab_window_list_new(&contacts_app);
     gtk_container_add(GTK_CONTAINER(scroll), contacts_app.entry_list);
 
-    vbox = gtk_vbox_new(FALSE, 1);
-    gtk_box_pack_start(GTK_BOX(cont_box), vbox, FALSE, FALSE, 1);
-    edit_box = gtk_vbox_new(FALSE, 1);
+    gtk_notebook_append_page(GTK_NOTEBOOK(contacts_app.notebook), browse_widget,
+			     gtk_label_new("Browse"));
+
+    edit_widget = gtk_vbox_new(FALSE, 1);
     contacts_app.edit_widget = 
         libbalsa_address_get_edit_widget(NULL, contacts_app.entries,
                                          G_CALLBACK(address_changed_cb),
                                          &contacts_app);
-    gtk_box_pack_start(GTK_BOX(edit_box), contacts_app.edit_widget,
+    gtk_box_pack_start(GTK_BOX(edit_widget), contacts_app.edit_widget,
                        FALSE, FALSE, 1);
-    gtk_box_pack_start(GTK_BOX(vbox), edit_box, TRUE, TRUE, 1);
-    gtk_box_pack_start(GTK_BOX(vbox),
+    gtk_box_pack_start(GTK_BOX(edit_widget),
                        bab_get_edit_button_box(&contacts_app),
                        FALSE, FALSE, 1);
+
+    gtk_notebook_append_page(GTK_NOTEBOOK(contacts_app.notebook), edit_widget,
+			     gtk_label_new("Edit"));
+
     /*
     g_signal_connect(G_OBJECT(find_entry), "changed",
 		     G_CALLBACK(balsa_ab_window_find), ab);
@@ -1103,7 +1132,11 @@ main(int argc, char *argv[])
     gdk_threads_enter();
     gtk_main();
     gdk_threads_leave();
-    
+  
+    /* Proper shutdown here */
+    g_list_foreach(contacts_app.address_book_list, (GFunc)g_object_unref, NULL);
+    g_list_free(contacts_app.address_book_list);
+
     return 0;
 }
 

@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-03-07 20:31+0100\n"
-"PO-Revision-Date: 2008-03-07 20:31+0100\n"
+"POT-Creation-Date: 2008-03-10 22:35+0100\n"
+"PO-Revision-Date: 2008-03-10 22:37+0100\n"
 "Last-Translator: Daniel Nylander <po@danielnylander.se>\n"
 "Language-Team: Swedish <tp-sv@listor.tp-sv.se>\n"
 "MIME-Version: 1.0\n"
@@ -31,7 +31,7 @@ msgstr "E-postverktyg"
 #. The externq database doesn't support Id's, sorry!
 #: ../libbalsa/address-book-extern.c:210
 #: ../libbalsa/address-book-ldap.c:494
-#: ../libbalsa/address-book-ldif.c:329
+#: ../libbalsa/address-book-ldif.c:330
 msgid "No-Id"
 msgstr "Inget-Id"
 
@@ -39,9 +39,9 @@ msgstr "Inget-Id"
 #: ../libbalsa/address-book-extern.c:370
 #: ../libbalsa/address-book-ldap.c:500
 #: ../libbalsa/address-book-ldif.c:309
-#: ../libbalsa/address-book-ldif.c:332
-#: ../libbalsa/address-book-ldif.c:351
-#: ../libbalsa/address-book-ldif.c:355
+#: ../libbalsa/address-book-ldif.c:333
+#: ../libbalsa/address-book-ldif.c:352
+#: ../libbalsa/address-book-ldif.c:356
 #: ../libbalsa/address-book-vcard.c:158
 #: ../libbalsa/address-book-vcard.c:256
 #: ../libbalsa/address.c:393
@@ -127,32 +127,32 @@ msgstr "Blindkopia:"
 msgid "Reply To:"
 msgstr "Svara till:"
 
-#: ../libbalsa/address.c:920
+#: ../libbalsa/address.c:921
 msgid "D_isplayed Name:"
 msgstr "V_isat namn:"
 
-#: ../libbalsa/address.c:921
+#: ../libbalsa/address.c:922
 msgid "_First Name:"
 msgstr "_Förnamn:"
 
-#: ../libbalsa/address.c:922
+#: ../libbalsa/address.c:923
 msgid "_Last Name:"
 msgstr "_Efternamn:"
 
-#: ../libbalsa/address.c:923
+#: ../libbalsa/address.c:924
 msgid "_Nickname:"
 msgstr "_Smeknamn:"
 
-#: ../libbalsa/address.c:924
+#: ../libbalsa/address.c:925
 msgid "O_rganization:"
 msgstr "O_rganisation:"
 
-#: ../libbalsa/address.c:925
+#: ../libbalsa/address.c:926
 msgid "_Email Address:"
 msgstr "_E-postadress:"
 
 #. Right/Add button
-#: ../libbalsa/address.c:944
+#: ../libbalsa/address.c:945
 #: ../src/filter-edit-callbacks.c:1048
 #: ../src/filter-run-dialog.c:327
 msgid "A_dd"
@@ -228,7 +228,7 @@ msgid "Failed to decrypt MIME part: parse error"
 msgstr "Misslyckades att dekryptera MIME-del: tolkningsfel"
 
 #: ../libbalsa/gmime-gpgme-context.c:282
-#: ../libbalsa/rfc3156.c:1566
+#: ../libbalsa/rfc3156.c:1576
 #, c-format
 msgid ""
 "The passphrase for this key was bad, please try again!\n"
@@ -240,7 +240,7 @@ msgstr ""
 "Nyckel: %s"
 
 #: ../libbalsa/gmime-gpgme-context.c:287
-#: ../libbalsa/rfc3156.c:1571
+#: ../libbalsa/rfc3156.c:1581
 #, c-format
 msgid ""
 "Please enter the passphrase for the secret key!\n"
@@ -1276,7 +1276,7 @@ msgid "The signature could not be verified due to an invalid crypto engine."
 msgstr "Signaturen kunde inte verifieras på grund av en ogiltig krypteringsmotor."
 
 #: ../libbalsa/rfc3156.c:985
-#: ../libbalsa/rfc3156.c:1727
+#: ../libbalsa/rfc3156.c:1737
 msgid "GnuPG is rebuilding the trust database and is currently unavailable."
 msgstr "GnuPG bygger om tillitsdatabasen och är för närvarande inte tillgänglig."
 
@@ -1309,7 +1309,7 @@ msgid "The user ID is ultimately valid."
 msgstr "Användar-id är ultimat giltigt."
 
 #: ../libbalsa/rfc3156.c:1008
-#: ../libbalsa/rfc3156.c:1255
+#: ../libbalsa/rfc3156.c:1265
 msgid "bad validity"
 msgstr "felaktig giltighet"
 
@@ -1466,100 +1466,100 @@ msgstr ""
 "\n"
 "Kedje-id: %s"
 
-#: ../libbalsa/rfc3156.c:1162
+#: ../libbalsa/rfc3156.c:1172
 #, c-format
-msgid "Could not launch %s to get the public key %s."
-msgstr "Kunde inte starta %s för att hitta publika nyckeln %s."
+msgid "Could not launch %s to query the public key %s."
+msgstr "Kunde inte starta %s för att fråga efter den publika nyckeln %s."
 
-#: ../libbalsa/rfc3156.c:1212
-#, c-format
-msgid ""
-"Running gpg failed with return value %d:\n"
-"%s"
-msgstr ""
-"Körande av gpg misslyckades med returvärde %d:\n"
-"%s"
-
-#: ../libbalsa/rfc3156.c:1219
+#: ../libbalsa/rfc3156.c:1222
 #, c-format
 msgid ""
-"Running gpg successful:\n"
+"Running %s failed with return value %d:\n"
 "%s"
 msgstr ""
-"Körande av gpg lyckades:\n"
+"Körning av %s misslyckades med returvärde %d:\n"
 "%s"
 
-#: ../libbalsa/rfc3156.c:1243
+#: ../libbalsa/rfc3156.c:1229
+#, c-format
+msgid ""
+"Running %s successful:\n"
+"%s"
+msgstr ""
+"Körning av %s lyckades:\n"
+"%s"
+
+#: ../libbalsa/rfc3156.c:1253
 msgid "unknown"
 msgstr "okänd"
 
-#: ../libbalsa/rfc3156.c:1245
+#: ../libbalsa/rfc3156.c:1255
 msgid "undefined"
 msgstr "odefinierad"
 
-#: ../libbalsa/rfc3156.c:1247
+#: ../libbalsa/rfc3156.c:1257
 #: ../src/address-book-config.c:196
 msgid "never"
 msgstr "aldrig"
 
-#: ../libbalsa/rfc3156.c:1249
+#: ../libbalsa/rfc3156.c:1259
 msgid "marginal"
 msgstr "marginell"
 
-#: ../libbalsa/rfc3156.c:1251
+#: ../libbalsa/rfc3156.c:1261
 msgid "full"
 msgstr "fullständig"
 
-#: ../libbalsa/rfc3156.c:1253
+#: ../libbalsa/rfc3156.c:1263
 msgid "ultimate"
 msgstr "ultimat"
 
-#: ../libbalsa/rfc3156.c:1316
+#: ../libbalsa/rfc3156.c:1326
 msgid "User ID"
 msgstr "Användar-id"
 
-#: ../libbalsa/rfc3156.c:1316
+#: ../libbalsa/rfc3156.c:1326
 msgid "Key ID"
 msgstr "Nyckel-ID"
 
-#: ../libbalsa/rfc3156.c:1316
+#: ../libbalsa/rfc3156.c:1326
 msgid "Length"
 msgstr "Längd"
 
-#: ../libbalsa/rfc3156.c:1316
+#: ../libbalsa/rfc3156.c:1326
 msgid "Validity"
 msgstr "Giltighet"
 
 #. FIXME: create dialog according to the Gnome HIG
-#: ../libbalsa/rfc3156.c:1360
+#: ../libbalsa/rfc3156.c:1370
 msgid "Select key"
 msgstr "Välj dialog"
 
-#: ../libbalsa/rfc3156.c:1371
+#: ../libbalsa/rfc3156.c:1381
 #, c-format
 msgid "Select the private key for the signer %s"
 msgstr "Välj den privata nyckeln för signeraren %s"
 
-#: ../libbalsa/rfc3156.c:1375
+#: ../libbalsa/rfc3156.c:1385
 #, c-format
 msgid "Select the public key for the recipient %s"
 msgstr "Välj den publika nyckeln för mottagaren %s"
 
-#: ../libbalsa/rfc3156.c:1506
+#: ../libbalsa/rfc3156.c:1516
 #, c-format
 msgid "Insufficient trust for recipient %s"
 msgstr "Otillräcklig tillit för mottagaren %s"
 
-#: ../libbalsa/rfc3156.c:1508
+#: ../libbalsa/rfc3156.c:1518
 #, c-format
 msgid "The validity of the key with user ID \"%s\" is \"%s\"."
 msgstr "Giltigheten för nyckeln med användar-id \"%s\" är \"%s\"."
 
-#: ../libbalsa/rfc3156.c:1519
+#: ../libbalsa/rfc3156.c:1529
 msgid "Use this key anyway?"
 msgstr "Använd den här nyckeln ändå?"
 
-#: ../libbalsa/rfc3156.c:1728
+#: ../libbalsa/rfc3156.c:1738
 msgid "Try again later."
 msgstr "Försök igen senare."
 
@@ -1768,7 +1768,7 @@ msgstr "MB"
 #. Top level
 #. Menus
 #: ../libbalsa/source-viewer.c:43
-#: ../src/ab-main.c:487
+#: ../src/ab-main.c:492
 #: ../src/main-window.c:313
 #: ../src/message-window.c:237
 #: ../src/sendmsg-window.c:312
@@ -2116,22 +2116,22 @@ msgstr "Besked om nytt meddelande"
 msgid "Program startup"
 msgstr "Programstart"
 
-#: ../src/ab-main.c:210
+#: ../src/ab-main.c:214
 #: ../src/ab-window.c:684
 msgid " address book: "
 msgstr " adressbok: "
 
-#: ../src/ab-main.c:488
+#: ../src/ab-main.c:493
 msgid "_Entry"
 msgstr "_Post"
 
-#: ../src/ab-main.c:489
+#: ../src/ab-main.c:494
 #: ../src/main-window.c:319
 msgid "_Help"
 msgstr "_Hjälp"
 
 #. new button
-#: ../src/ab-main.c:490
+#: ../src/ab-main.c:495
 #: ../src/filter-edit-dialog.c:217
 #: ../src/mailbox-node.c:1045
 #: ../src/main-window.c:321
@@ -2140,45 +2140,45 @@ msgstr "_Hjälp"
 msgid "_New"
 msgstr "_Nytt"
 
-#: ../src/ab-main.c:491
+#: ../src/ab-main.c:496
 #: ../src/address-book-config.c:934
 msgid "VCard Address Book (GnomeCard)"
 msgstr "VCard-adressbok (GnomeCard)"
 
-#: ../src/ab-main.c:493
+#: ../src/ab-main.c:498
 #: ../src/address-book-config.c:940
 msgid "External query (a program)"
 msgstr "Extern fråga (ett program)"
 
-#: ../src/ab-main.c:495
+#: ../src/ab-main.c:500
 #: ../src/address-book-config.c:945
 msgid "LDIF Address Book"
 msgstr "LDIF-adressbok"
 
-#: ../src/ab-main.c:498
+#: ../src/ab-main.c:503
 #: ../src/address-book-config.c:951
 msgid "LDAP Address Book"
 msgstr "LDAP-adressbok"
 
-#: ../src/ab-main.c:502
+#: ../src/ab-main.c:507
 #: ../src/address-book-config.c:516
 #: ../src/address-book-config.c:958
 msgid "GPE Address Book"
 msgstr "GPE-adressbok"
 
-#: ../src/ab-main.c:506
+#: ../src/ab-main.c:511
 msgid "Rubrica Address Book"
 msgstr "Rubrica-adressbok"
 
-#: ../src/ab-main.c:509
+#: ../src/ab-main.c:514
 msgid "_Properties"
 msgstr "_Egenskaper"
 
-#: ../src/ab-main.c:510
+#: ../src/ab-main.c:515
 msgid "Edit address book properties"
 msgstr "Redigera egenskaper för adressbok"
 
-#: ../src/ab-main.c:511
+#: ../src/ab-main.c:516
 #: ../src/balsa-index.c:1812
 #: ../src/filter-edit-dialog.c:223
 #: ../src/mailbox-node.c:1072
@@ -2189,37 +2189,41 @@ msgstr "Redigera egenskaper för adressbok"
 msgid "_Delete"
 msgstr "_Ta bort"
 
-#: ../src/ab-main.c:512
+#: ../src/ab-main.c:517
 msgid "Delete address book"
 msgstr "Ta bort adressbok"
 
-#: ../src/ab-main.c:513
+#: ../src/ab-main.c:518
 #: ../src/main-window.c:355
 msgid "_Quit"
 msgstr "A_vsluta"
 
-#: ../src/ab-main.c:513
+#: ../src/ab-main.c:518
 msgid "Exit the program"
 msgstr "Avsluta programmet"
 
-#: ../src/ab-main.c:515
+#: ../src/ab-main.c:520
 msgid "_New Entry"
 msgstr "_Ny post"
 
-#: ../src/ab-main.c:516
+#: ../src/ab-main.c:521
 msgid "Add new entry"
 msgstr "Lägg till ny post"
 
-#: ../src/ab-main.c:523
+#: ../src/ab-main.c:528
 #: ../src/main-window.c:426
 msgid "_About"
 msgstr "_Om"
 
-#: ../src/ab-main.c:734
+#: ../src/ab-main.c:746
 msgid "_Name"
 msgstr "_Namn"
 
-#: ../src/ab-main.c:884
+#: ../src/ab-main.c:762
+msgid "_Address"
+msgstr "_Adress"
+
+#: ../src/ab-main.c:906
 msgid "F_ilter:"
 msgstr "F_ilter:"
 
@@ -2877,9 +2881,13 @@ msgstr ""
 msgid "OpenPGP"
 msgstr "OpenPGP"
 
-#: ../src/balsa-mime-widget-crypto.c:89
-msgid "_Run gpg to import this key"
-msgstr "_Kör gpg för att importera den här nyckeln"
+#: ../src/balsa-mime-widget-crypto.c:90
+msgid "_Run GnuPG to import this key"
+msgstr "_Kör GnuPG för att importera den här nyckeln"
+
+#: ../src/balsa-mime-widget-crypto.c:94
+msgid "_Run GnuPG to check for an update of this key"
+msgstr "_Kör GnuPG för att leta efter en uppdaterad nyckel"
 
 #: ../src/balsa-mime-widget-image.c:51
 #: ../src/balsa-mime-widget-image.c:159

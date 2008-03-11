@@ -800,10 +800,12 @@ mark_urls(GtkTextBuffer * buffer, GtkTextIter * iter, GtkTextTag * tag,
 
             p += end_pos;
         }
-        g_match_info_free(url_match);
-        if (!prescanner(p))
+        if (prescanner(p))
+            g_match_info_free(url_match);
+        else
             break;
     }
+    g_match_info_free(url_match);
 #else                           /* GLIB_CHECK_VERSION(2, 14, 0) */
     regex_t *url_reg = get_url_reg();
     regmatch_t url_match;
@@ -1072,24 +1074,14 @@ libbalsa_insert_with_url(GtkTextBuffer * buffer,
             GRegex *url_reg = get_url_reg();
             GMatchInfo *url_match;
             gboolean match = g_regex_match(url_reg, p, 0, &url_match);
-#else                           /* GLIB_CHECK_VERSION(2, 14, 0) */
-	    regex_t *url_reg = get_url_reg();
-	    regmatch_t url_match;
-	    gboolean match = regexec(url_reg, p, 1, &url_match, 0) == 0;
-#endif                          /* GLIB_CHECK_VERSION(2, 14, 0) */
 
 	    while (match) {
 		gchar *buf;
 		gchar *spc;
                 gint start_pos, end_pos;
 
-#if GLIB_CHECK_VERSION(2, 14, 0)
                 if (!g_match_info_fetch_pos(url_match, 0, &start_pos, &end_pos))
                     break;
-#else                           /* GLIB_CHECK_VERSION(2, 14, 0) */
-                start_pos = url_match.rm_so;
-                end_pos   = url_match.rm_eo;
-#endif                          /* GLIB_CHECK_VERSION(2, 14, 0) */
 
 		if (start_pos > 0) {
 		    /* check if we hit a multi-line URL... (see RFC 1738) */
@@ -1101,7 +1093,6 @@ libbalsa_insert_with_url(GtkTextBuffer * buffer,
 			 * of the ml uri should be in the passed buffer... */
 			if (url_info && url_info->buffer_is_flowed &&
 			    *(p + end_pos) == ' ') {
-#if GLIB_CHECK_VERSION(2, 14, 0)
                             GRegex *ml_flowed_url_reg = get_ml_flowed_url_reg();
                             GMatchInfo *ml_url_match;
                             gint ml_start_pos, ml_end_pos;
@@ -1114,19 +1105,9 @@ libbalsa_insert_with_url(GtkTextBuffer * buffer,
                                                           &ml_end_pos)
                                 && ml_start_pos == 0)
                                 end_pos += ml_end_pos - 1;
-#else                           /* GLIB_CHECK_VERSION(2, 14, 0) */
-			    regex_t *ml_flowed_url_reg = get_ml_flowed_url_reg();
-			    regmatch_t ml_url_match;
-
-			    if (!regexec(ml_flowed_url_reg,
-					 all_chars + offset + end_pos, 1,
-					 &ml_url_match, 0)
-                                && ml_url_match.rm_so == 0)
-				end_pos += ml_url_match.rm_eo - 1;
-#endif                          /* GLIB_CHECK_VERSION(2, 14, 0) */
+                            g_match_info_free(ml_url_match);
 			} else if (!strchr(p + end_pos, '>')) {
                             gint ml_end_pos;
-#if GLIB_CHECK_VERSION(2, 14, 0)
                             GRegex *ml_url_reg = get_ml_url_reg();
                             GMatchInfo *ml_url_match;
 
@@ -1141,7 +1122,100 @@ libbalsa_insert_with_url(GtkTextBuffer * buffer,
                                     all_chars + offset + start_pos;
 				gint ml_cnt;
 
+				ml_cnt = end_pos - start_pos + ml_end_pos - 1;
+				for (; ml_cnt; (ml_p++, ml_cnt--))
+				    if (*ml_p > ' ')
+					ml_url = g_string_append_c(ml_url, *ml_p);
+				url_info->ml_url = ml_url->str;
+				g_string_free(ml_url, FALSE);
+			    }
+                            g_match_info_free(ml_url_match);
+			}
+		    }
+
+		    buf = g_strndup(p, start_pos);
+		    gtk_text_buffer_insert_with_tags(buffer, &iter,
+						     buf, -1, tag, NULL);
+		    g_free(buf);
+		}
+
+		if (url_info->ml_url) {
+		    url_info->ml_url_buffer = g_string_new(p + start_pos);
+		    url_info->ml_url_buffer =
+			g_string_append_c(url_info->ml_url_buffer, '\n');
+		    return TRUE;
+		}
+
+		/* add the url - it /may/ contain spaces if the text is flowed */
+		buf = g_strndup(p + start_pos, end_pos - start_pos);
+		if ((spc = strchr(buf, ' '))) {
+		    GString *uri_real = g_string_new("");
+		    gchar * p = buf;
+
+		    while (spc) {
+			*spc = '\n';
+			g_string_append_len(uri_real, p, spc - p);
+			p = spc + 1;
+			spc = strchr(p, ' ');
+		    }
+		    g_string_append(uri_real, p);
+		    gtk_text_buffer_insert_with_tags(buffer, &iter, buf, -1,
+						     url_tag, tag, NULL);
+		    if (url_info->callback)
+			url_info->callback(buffer, &iter, uri_real->str, url_info->callback_data);
+		    g_string_free(uri_real, TRUE);
+		} else {
+		    gtk_text_buffer_insert_with_tags(buffer, &iter, buf, -1,
+						     url_tag, tag, NULL);
+
+		    /* remember the URL and its position within the text */
+		    if (url_info->callback)
+			url_info->callback(buffer, &iter, buf, url_info->callback_data);
+		}
+		g_free(buf);
+
+		p += end_pos;
+		offset += end_pos;
+		if (prescanner(p)) {
+                    g_match_info_free(url_match);
+                    match = g_regex_match(url_reg, p, 0, &url_match);
+                } else
+		    match = FALSE;
+	    }
+            g_match_info_free(url_match);
 #else                           /* GLIB_CHECK_VERSION(2, 14, 0) */
+	    regex_t *url_reg = get_url_reg();
+	    regmatch_t url_match;
+	    gboolean match = regexec(url_reg, p, 1, &url_match, 0) == 0;
+
+	    while (match) {
+		gchar *buf;
+		gchar *spc;
+                gint start_pos, end_pos;
+
+                start_pos = url_match.rm_so;
+                end_pos   = url_match.rm_eo;
+
+		if (start_pos > 0) {
+		    /* check if we hit a multi-line URL... (see RFC 1738) */
+		    if (all_p && (p[start_pos - 1] == '<' ||
+				  (start_pos > 4 &&
+				   !g_ascii_strncasecmp(p + start_pos - 5, "<URL:", 5)))) {
+			/* if the input is flowed, we will see a space at
+			 * url_match.rm_eo - in this case the complete remainder
+			 * of the ml uri should be in the passed buffer... */
+			if (url_info && url_info->buffer_is_flowed &&
+			    *(p + end_pos) == ' ') {
+			    regex_t *ml_flowed_url_reg = get_ml_flowed_url_reg();
+			    regmatch_t ml_url_match;
+
+			    if (!regexec(ml_flowed_url_reg,
+					 all_chars + offset + end_pos, 1,
+					 &ml_url_match, 0)
+                                && ml_url_match.rm_so == 0)
+				end_pos += ml_url_match.rm_eo - 1;
+			} else if (!strchr(p + end_pos, '>')) {
+                            gint ml_end_pos;
 			    regex_t *ml_url_reg = get_ml_url_reg();
 			    regmatch_t ml_url_match;
 		    
@@ -1155,7 +1229,6 @@ libbalsa_insert_with_url(GtkTextBuffer * buffer,
 				gint ml_cnt;
 
                                 ml_end_pos = ml_url_match.rm_eo;
-#endif                          /* GLIB_CHECK_VERSION(2, 14, 0) */
 				ml_cnt = end_pos - start_pos + ml_end_pos - 1;
 				for (; ml_cnt; (ml_p++, ml_cnt--))
 				    if (*ml_p > ' ')
@@ -1210,14 +1283,11 @@ libbalsa_insert_with_url(GtkTextBuffer * buffer,
 		p += end_pos;
 		offset += end_pos;
 		if (prescanner(p))
-#if GLIB_CHECK_VERSION(2, 14, 0)
-                    match = g_regex_match(url_reg, p, 0, &url_match);
-#else                           /* GLIB_CHECK_VERSION(2, 14, 0) */
 		    match = regexec(url_reg, p, 1, &url_match, 0) == 0;
-#endif                          /* GLIB_CHECK_VERSION(2, 14, 0) */
 		else
 		    match = FALSE;
 	    }
+#endif                          /* GLIB_CHECK_VERSION(2, 14, 0) */
 	}
     }
 

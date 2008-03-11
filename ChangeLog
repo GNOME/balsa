@@ -1,3 +1,8 @@
+2008-03-11  Peter Bloomfield
+
+	* libbalsa/mime.c: (mark_urls, libbalsa_insert_with_url): plug
+	leaks, and clean up conditional code.
+
 2008-03-09  Pawel Salek
 
 	* src/ab-main.c: trying out alternative address book layout.

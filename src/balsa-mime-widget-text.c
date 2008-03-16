@@ -164,6 +164,7 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
                                        GTK_POLICY_ALWAYS);
         return bm_widget_new_html(bm, mime_body, ptr, alloced);
 #else
+	g_free(ptr);
         return NULL;
 #endif
     }

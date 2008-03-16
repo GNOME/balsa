@@ -1,3 +1,10 @@
+2008-03-16  Pawel Salek
+
+	* src/balsa-mime-widget-text.c: plug a leak if gtkhtml disabled.
+	* libbalsa/mailbox_mbox.c: release all resources before disposing
+	the mailbox.
+	* libbalsa/message.c (lbmsg_set_header): plug a leak.
+	
 2008-03-11  Peter Bloomfield
 
 	* libbalsa/mime.c: (mark_urls, libbalsa_insert_with_url): plug

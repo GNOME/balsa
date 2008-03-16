@@ -65,6 +65,7 @@ static LibBalsaMailboxLocalClass *parent_class = NULL;
 
 static void libbalsa_mailbox_mbox_class_init(LibBalsaMailboxMboxClass *klass);
 static void libbalsa_mailbox_mbox_init(LibBalsaMailboxMbox * mailbox);
+static void libbalsa_mailbox_mbox_dispose(GObject * object);
 
 static GMimeStream *libbalsa_mailbox_mbox_get_message_stream(LibBalsaMailbox *
 							     mailbox,
@@ -174,6 +175,7 @@ libbalsa_mailbox_mbox_class_init(LibBalsaMailboxMboxClass * klass)
 	libbalsa_mailbox_mbox_remove_files;
 
     libbalsa_mailbox_local_class->get_info = lbm_mbox_get_info;
+    object_class->dispose = libbalsa_mailbox_mbox_dispose;
 }
 
 
@@ -181,6 +183,13 @@ libbalsa_mailbox_mbox_class_init(LibBalsaMailboxMboxClass * klass)
 static void
 libbalsa_mailbox_mbox_init(LibBalsaMailboxMbox * mbox)
 {
+}
+
+static void
+libbalsa_mailbox_mbox_dispose(GObject * object)
+{
+    if(MAILBOX_OPEN(LIBBALSA_MAILBOX(object)))
+	libbalsa_mailbox_mbox_close_mailbox(LIBBALSA_MAILBOX(object), FALSE);
 }
 
 static gint

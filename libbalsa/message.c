@@ -900,7 +900,7 @@ lb_message_headers_basic_from_gmime(LibBalsaMessageHeaders *headers,
 	 */
 	const GMimeContentType *content_type;
 	gchar *str;
-
+	g_return_if_fail(headers->content_type == NULL);
 	content_type = g_mime_object_get_content_type(mime_msg->mime_part);
 	str = g_mime_content_type_to_string(content_type);
 	headers->content_type = g_mime_content_type_new_from_string(str);
@@ -1113,25 +1113,30 @@ lbmsg_set_header(LibBalsaMessage *message, const gchar *name,
 	message->headers->date = g_mime_utils_header_decode_date(value, NULL);
     } else
     if (g_ascii_strcasecmp(name, "From") == 0) {
+	g_return_val_if_fail(message->headers->from == NULL, FALSE);
         message->headers->from = internet_address_parse_string(value);
     } else
     if (g_ascii_strcasecmp(name, "To") == 0) {
+	g_return_val_if_fail(message->headers->to_list == NULL, FALSE);
 	message->headers->to_list = internet_address_parse_string(value);
     } else
     if (g_ascii_strcasecmp(name, "In-Reply-To") == 0) {
 	libbalsa_message_set_in_reply_to_from_string(message, value);
     } else
     if (g_ascii_strcasecmp(name, "Message-ID") == 0) {
+	g_return_val_if_fail(message->message_id==NULL, FALSE);
 	message->message_id = g_mime_utils_decode_message_id(value);
     } else
     if (g_ascii_strcasecmp(name, "References") == 0) {
 	libbalsa_message_set_references_from_string(message, value);
     } else
-    if (g_ascii_strcasecmp(name, "Content-Type") == 0) {
+    if (message->headers->content_type == NULL &&
+	g_ascii_strcasecmp(name, "Content-Type") == 0) {
 	message->headers->content_type =
 	    g_mime_content_type_new_from_string(value);
     } else
     if (g_ascii_strcasecmp(name, "Disposition-Notification-To") == 0) {
+	g_return_val_if_fail(message->headers->dispnotify_to == NULL, FALSE);
         message->headers->dispnotify_to =
             internet_address_parse_string(value);
     } else

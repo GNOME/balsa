@@ -1,3 +1,8 @@
+2008-03-19  Albrecht Dreß
+
+	* doc/C/balsa.xml: document crypto in help file for composer and
+	identities dialogs.
+
 2008-03-16  Pawel Salek
 
 	* src/balsa-mime-widget-text.c: plug a leak if gtkhtml disabled.

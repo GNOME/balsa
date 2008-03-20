@@ -8,6 +8,7 @@
 <!ENTITY GnomeCard "<application>GnomeCard</application>"> 
 <!ENTITY Pine      "<application>pine</application>">
 <!ENTITY procmail  "<application>procmail</application>">
+<!ENTITY GnuPG     "<application>GnuPG</application>">
 <!ENTITY balsalist "http://mail.gnome.org/mailman/listinfo/balsa-list">
 <!ENTITY IMAP 
 '<glossterm linkend="glossary-imap"><acronym>IMAP</acronym></glossterm>'>
@@ -1695,7 +1696,105 @@ This is version 2.721 of the &Balsa; manual.
           will be sent back.
 	</para>
       </listitem>
-    </itemizedlist>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <guimenu>Options</guimenu>
+	    <guimenuitem>Format = Flowed</guimenuitem>
+	  </menuchoice>
+
+	  &mdash;
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <guimenu>Options</guimenu>
+	    <guimenuitem>Sign message</guimenuitem>
+	  </menuchoice>
+
+	  &mdash; Cryptographically sign the message. The recipients can check the
+          signature to prove the sender's (=your) identity or to detect any tampering
+          with the message.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <guimenu>Options</guimenu>
+	    <guimenuitem>Encrypt message</guimenuitem>
+	  </menuchoice>
+
+	  &mdash; Encrypt the message. Only the intended recipient(s) can decrypt and
+          read the contents.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+        The following options determine the protocol used for signing and/or encrypting
+        the message. You should choose the appropriate protocol which all recipients can
+        use.
+        </para>
+
+      <itemizedlist>
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <guimenu>Options</guimenu>
+	    <guimenuitem>GnuPG uses MIME mode</guimenuitem>
+	  </menuchoice>
+
+	  &mdash; Sign and/or encrypt the complete message, including all attachments,
+          using the PGP/MIME mode (RFC 3156). Note that the message envelope (including
+          the Subject) is not protected.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <guimenu>Options</guimenu>
+	    <guimenuitem>GnuPG uses old OpenPGP mode</guimenuitem>
+	  </menuchoice>
+
+	  &mdash; Sign and/or encrypt only the message text, but not attachments, using
+          the OpenPGP mode (RFC 2440). If you want to add any attachments, sign and/or
+          encrypt them manually before adding.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <guimenu>Options</guimenu>
+	    <guimenuitem>S/MIME mode (GpgSM)</guimenuitem>
+	  </menuchoice>
+
+	  &mdash; Sign and/or encrypt the complete message, including all attachments,
+          using the S/MIME mode (RFC 2633). Note that the message envelope (including
+          the Subject) is not protected.
+	</para>
+      </listitem>
+   </itemizedlist>
+      </listitem>
+   </itemizedlist>
+
+    <note>
+      <para>
+         Cryptographic signatures and encryption are available only when
+         &Balsa; has been built with &GnuPG; support. For a detailed description of
+         E-Mail cryptography, see the
+         <ulink url="http://www.gnupg.org/documentation/manuals/gnupg/"
+                type="http">GnuPG Manual</ulink> and the 
+         <ulink url="http://www.dewinter.com/gnupg_howto/english/GPGMiniHowto.html"
+                type="http">GnuPG HOWTO</ulink>.
+      </para>
+    </note>
+
   </listitem>
 </varlistentry>
 </variablelist>
@@ -3863,6 +3962,9 @@ the third is an alias (currently not used and replaced by 'TODO').</para>
     <term><guilabel>Sign messages by default.</guilabel></term>
     <listitem>
       <para>
+        By default enable the cryptographic signature for every new message.
+        The default protocol is determined by the <quote>Default protocol</quote>
+        option.
       </para>
     </listitem>
   </varlistentry>
@@ -3871,6 +3973,8 @@ the third is an alias (currently not used and replaced by 'TODO').</para>
     <term><guilabel>Encrypt messages by default.</guilabel></term>
     <listitem>
       <para>
+        By default encrypt every new message. The default protocol is determined
+        by the <quote>Default protocol</quote> option.
       </para>
     </listitem>
   </varlistentry>
@@ -3879,6 +3983,8 @@ the third is an alias (currently not used and replaced by 'TODO').</para>
     <term><guilabel>Default protocol.</guilabel></term>
     <listitem>
       <para>
+        Choose the default protocol for the cryptographic signature and message
+        encryption.
       </para>
     </listitem>
   </varlistentry>
@@ -3887,6 +3993,18 @@ the third is an alias (currently not used and replaced by 'TODO').</para>
     <term><guilabel>Always trust GnuPG keys when encrypting.</guilabel></term>
     <listitem>
       <para>
+        Do not ask for confirmation when encrypting for a recipient whose GnuPG
+        key is not fully trusted.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guilabel>Remind me if messages can be encrypted.</guilabel></term>
+    <listitem>
+      <para>
+        Before sending a message, check if valid keys are present for all recipients
+        and show a dialog in this case.
       </para>
     </listitem>
   </varlistentry>

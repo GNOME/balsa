@@ -136,7 +136,7 @@ static void bw_unregister_open_mailbox(LibBalsaMailbox *m);
 static gboolean bw_is_open_mailbox(LibBalsaMailbox *m);
 
 /* dialogs */
-static void bw_show_about_box(BalsaWindow * window);
+static void bw_show_about_box(GtkAction *, gpointer data);
 
 /* callbacks */
 static void bw_send_outbox_messages_cb    (GtkAction *, gpointer data);
@@ -2520,7 +2520,7 @@ bw_contents_cb(void)
  * show the about box for Balsa
  */
 static void
-bw_show_about_box(BalsaWindow * window)
+bw_show_about_box(GtkAction * action, gpointer user_data)
 {
     const gchar *authors[] = {
         "Balsa Maintainers <balsa-maintainer@theochem.kth.se>:",
@@ -2543,7 +2543,7 @@ bw_show_about_box(BalsaWindow * window)
                                  "/pixmaps/balsa_logo.png", NULL);
 
 #if GTK_CHECK_VERSION(2, 6, 0)
-    gtk_show_about_dialog(GTK_WINDOW(window),
+    gtk_show_about_dialog(GTK_WINDOW(user_data),
                           "name", "Balsa",
                           "version", BALSA_VERSION,
                           "copyright",

@@ -1,3 +1,10 @@
+* Balsa-2.3.23 release. Release date 2008-03-20
+
+- Suppport for IMAP MULTIAPPEND extension for faster uploading of
+  message batches to and from IMAP servers.
+- improved scanning of mailbox trees.
+- GtkSourceView2 support.
+
 * Balsa-2.3.22 release. Release date 2007-12-23
 
 - new address edition widget in the compose window.

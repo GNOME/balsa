@@ -1,3 +1,9 @@
+2008-03-16  Pawel Salek
+
+	* src/main-window.c: Fix a runtime warning.
+	* configure.in, NEWS: release 2.3.23
+	* doc/C/balsa.xml: document Face and X-Face headers.
+
 2008-03-19  Albrecht Dreß
 
 	* doc/C/balsa.xml: document crypto in help file for composer and

@@ -3841,6 +3841,41 @@ the third is an alias (currently not used and replaced by 'TODO').</para>
   </varlistentry>
 
   <varlistentry>
+    <term><guilabel>Request Message Disposition Notification</guilabel></term>
+    <listitem>
+      <para>
+	Whether Message Disposition Notification should be requested by default.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><guilabel>Face Path</guilabel></term>
+    <listitem>
+      <para>
+	Whether a &quot;Face&quot; header should be attached to a
+	program. Specified patch points out to a file containing a
+	textual representation of the face icon. Please
+	see <ulink url="http://quimby.gnus.org/circus/face/"
+	type="http">a description of Face and X-Face</ulink> headers
+	for more details as well as the list of mail programs
+	supporting this feature.
+      </para>
+    </listitem>
+  </varlistentry>
+
+
+  <varlistentry>
+    <term><guilabel>X-Face Path</guilabel></term>
+    <listitem>
+      <para>Whether a &quot;Face&quot; header should be attached to a
+	program. Specified patch points out to a file containing a
+	textual representation of the face icon.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
     <term><guilabel>SMTP server</guilabel></term>
     <listitem>
       <para>

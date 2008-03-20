@@ -1,3 +1,12 @@
+2008-03-20  Pawel Salek
+
+	* libbalsa/imap/imap_search.[ch]: make it easier to explicitly
+	select message sets for searching.
+	* libbalsa/imap/imap-handle.c: put coalesce routines back here.
+	* libbalsa/imap/imap-handle.h: move search functions to imap_search.h
+	* libbalsa/imap/imap_private.h: declare coalesce routines here.
+	* libbalsa/imap/imap-commands.c: remove coalesce routines.
+
 2008-03-20  Peter Bloomfield
 
 	* libbalsa/misc.{c,h}: (libbalsa_path_is_below_dir): careful
@@ -10,7 +19,7 @@
 	* libinit_balsa/assistant_page_directory.c:
 	(balsa_druid_page_directory_prepare): use g_build_filename.
 
-2008-03-16  Pawel Salek
+2008-03-20  Pawel Salek
 
 	* src/main-window.c: Fix a runtime warning.
 	* configure.in, NEWS: release 2.3.23

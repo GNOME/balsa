@@ -1,5 +1,5 @@
 /* libimap library.
- * Copyright (C) 2003-2004 Pawel Salek.
+ * Copyright (C) 2003-2008 Pawel Salek.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,16 +24,18 @@
 #include <time.h>
 
 #include "siobuf.h"
-#include "imap-handle.h"
+#include "imap_search.h"
 #include "imap_private.h"
+
+typedef enum {
+  IMSE_NOT, IMSE_OR, IMSE_FLAG, IMSE_STRING, IMSE_DATE, IMSE_SIZE,
+  IMSE_SEQUENCE
+} ImapSearchKeyType;
 
 struct ImapSearchKey_ {
   struct ImapSearchKey_ *next; /* message must match all the conditions 
                                 * on the list. */
-  enum {
-    IMSE_NOT, IMSE_OR, IMSE_FLAG, IMSE_STRING, IMSE_DATE, IMSE_SIZE,
-    IMSE_SEQUENCE
-  } type;
+  ImapSearchKeyType type;
   union {
     /* IMSE_NOT */
     struct ImapSearchKey_ *not;
@@ -161,6 +163,23 @@ imap_search_key_new_range(unsigned negated, int uid,
   }
 }
 
+ImapSearchKey*
+imap_search_key_new_set(unsigned negated, int uid, int cnt, unsigned *seqnos)
+
+{
+  if(cnt>0) {
+    ImapSearchKey *s = g_new(ImapSearchKey,1);
+    s->next = NULL;
+    s->type = IMSE_SEQUENCE;
+    s->negated = negated;
+    s->d.seq.uid = uid;
+    s->d.seq.string = imap_coalesce_set(cnt, seqnos);
+    return s;
+  } else { /* always false */
+    return NULL;
+  }
+}
+
 void
 imap_search_key_free(ImapSearchKey *s)
 {
@@ -216,29 +235,25 @@ imap_search_checks_body(const ImapSearchKey *s)
 }
 
 static gboolean
-imap_search_checks_headers(const ImapSearchKey *s)
+imap_search_checks(const ImapSearchKey *s, ImapSearchKeyType s_type)
 {
   while(s) {
     switch(s->type) {
     case IMSE_NOT: /* NOOP */ break; 
     case IMSE_OR: 
-      if(imap_search_checks_headers(s->d.or.l) ||
-         imap_search_checks_headers(s->d.or.r))
+      if(imap_search_checks(s->d.or.l, s_type) ||
+         imap_search_checks(s->d.or.r, s_type))
         return TRUE;
       break;
-    case IMSE_FLAG: break;
-    case IMSE_STRING:
-      return TRUE;
-    case IMSE_DATE:
-    case IMSE_SIZE:
-    case IMSE_SEQUENCE:
+    default:
+      if(s->type == s_type)
+	return TRUE;
       break;
     }
     s = s->next;
   }
   return FALSE;
 }
-
 
 void
 imap_search_key_set_next(ImapSearchKey *list, ImapSearchKey *next)
@@ -441,10 +456,10 @@ execute_flag_only_search(ImapMboxHandle *h, ImapSearchKey *s,
     (flags) and immutable terms (anything else).
  */
 ImapResponse
-imap_search_exec(ImapMboxHandle *h, gboolean uid, ImapSearchKey *s,
-                 ImapSearchCb cb, void *cb_arg)
+imap_search_exec(ImapMboxHandle *h, gboolean uid, 
+		 ImapSearchKey *s, ImapSearchCb cb, void *cb_arg)
 {
-  static const unsigned BODY_TO_SEARCH_AT_ONCE   = 500;
+  static const unsigned BODY_TO_SEARCH_AT_ONCE   = 500000;
   static const unsigned HEADER_TO_SEARCH_AT_ONCE = 2000;
   static const unsigned UIDS_TO_SEARCH_AT_ONCE   = 100000;
   int can_do_literals =
@@ -461,6 +476,7 @@ imap_search_exec(ImapMboxHandle *h, gboolean uid, ImapSearchKey *s,
   void *oarg;
   unsigned cmdno, lo, delta;
   const gchar *cmd_string;
+  gboolean split;
 
   IMAP_REQUIRED_STATE1(h, IMHS_SELECTED, IMR_BAD);
 
@@ -480,32 +496,44 @@ imap_search_exec(ImapMboxHandle *h, gboolean uid, ImapSearchKey *s,
   
   imap_handle_idle_disable(h);
 
-  if(imap_search_checks_body(s)) {
-    delta = BODY_TO_SEARCH_AT_ONCE;
-  } else if(imap_search_checks_headers(s)) {
-    delta = HEADER_TO_SEARCH_AT_ONCE;
-  } else {
-    delta = UIDS_TO_SEARCH_AT_ONCE;
-  }
+  split = imap_search_checks(s, IMSE_SEQUENCE);
+  if(split) {
+    if(imap_search_checks_body(s)) {
+      delta = BODY_TO_SEARCH_AT_ONCE;
+    } else if(imap_search_checks(s, IMSE_STRING)) {
+      delta = HEADER_TO_SEARCH_AT_ONCE;
+    } else {
+      delta = UIDS_TO_SEARCH_AT_ONCE;
+    }
 
-  /* This loop may take long time to execute. Consider providing some
-     feedback to the user... */
-  for(lo = 1; ir == IMR_OK && lo<=h->exists; lo += delta) {
-    unsigned hi = lo + delta-1;
-    if(hi>h->exists)
-      hi = h->exists;
-    cmdno = imap_make_tag(tag);
-    sio_printf(h->sio, "%s%s %s %u:%u ", tag, uid ? " UID" : "", cmd_string,
+    /* This loop may take long time to execute. Consider providing some
+       feedback to the user... */
+    for(lo = 1; ir == IMR_OK && lo<=h->exists; lo += delta) {
+      unsigned hi = lo + delta-1;
+      if(hi>h->exists)
+	hi = h->exists;
+      cmdno = imap_make_tag(tag);
+      sio_printf(h->sio, "%s%s %s %u:%u ", tag, uid ? " UID" : "", cmd_string,
                lo, hi);
+      if( (ir=imap_write_key(h, s, cmdno, can_do_literals)) == IMR_OK) {
+	sio_write(h->sio, "\r\n", 2);
+	imap_handle_flush(h);
+	do {
+	  ir = imap_cmd_step(h, cmdno);
+	} while(ir == IMR_UNTAGGED);
+      } else break;
+    }
+  } else { /* no split */
+    cmdno = imap_make_tag(tag);
+    sio_printf(h->sio, "%s%s %s ", tag, uid ? " UID" : "", cmd_string);
     if( (ir=imap_write_key(h, s, cmdno, can_do_literals)) == IMR_OK) {
       sio_write(h->sio, "\r\n", 2);
       imap_handle_flush(h);
       do {
-        ir = imap_cmd_step(h, cmdno);
+	  ir = imap_cmd_step(h, cmdno);
       } while(ir == IMR_UNTAGGED);
-    } else break;
+    }
   }
-
   h->search_cb  = ocb;
   h->search_arg = oarg;
   imap_handle_idle_enable(h, 30);

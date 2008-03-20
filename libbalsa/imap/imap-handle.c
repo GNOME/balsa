@@ -3825,6 +3825,65 @@ imap_mbox_handle_get_thread_root(ImapMboxHandle* handle)
   return handle->thread_root;
 }
 
+gchar*
+imap_coalesce_seq_range(int lo, int hi, ImapCoalesceFunc incl, void *data)
+{
+  GString * res = g_string_sized_new(16);
+  enum { BEGIN, LASTOUT, LASTIN, RANGE } mode = BEGIN;
+  int seq;
+  unsigned prev =0, num = 0;
+
+  for(seq=lo; seq<=hi+1; seq++) {
+    if(seq<=hi && (num=incl(seq, data)) != 0) {
+      switch(mode) {
+      case BEGIN: 
+        g_string_append_printf(res, "%u", num);
+        mode = LASTIN; break;
+      case RANGE:
+        if(num!=prev+1) {
+          g_string_append_printf(res, ":%u,%u", prev, num);
+          mode = LASTIN;
+        }
+        break;
+      case LASTIN: 
+        if(num==prev+1) {
+          mode = RANGE;
+          break;
+        } /* else fall through */
+      case LASTOUT: 
+        g_string_append_printf(res, ",%u", num);
+        mode = LASTIN; break;
+      }
+    } else {
+      switch(mode) {
+      case BEGIN:
+      case LASTOUT: break;
+      case LASTIN: mode = LASTOUT; break;
+      case RANGE: 
+        g_string_append_printf(res, ":%u", prev);
+        mode = LASTOUT;
+        break;
+      }
+    }
+    prev = num;
+  }
+  return g_string_free(res, mode == BEGIN);
+}
+
+unsigned
+imap_coalesce_func_simple(int i, unsigned msgno[])
+{
+  return msgno[i];
+}
+
+gchar*
+imap_coalesce_set(int cnt, unsigned *seqnos)
+{
+ return imap_coalesce_seq_range(0, cnt-1,
+				(ImapCoalesceFunc)imap_coalesce_func_simple,
+				seqnos);
+}
+
 
 /* =================================================================== */
 /*               MboxView routines                                     */

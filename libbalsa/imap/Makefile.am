@@ -23,7 +23,8 @@ libimap_a_SOURCES = \
 	imap-commands.h	\
 	imap-handle.c	\
 	imap-handle.h	\
-	imap-search.c	\
+	imap_search.c	\
+	imap_search.h	\
 	imap-tls.c	\
 	imap_private.h	\
 	libimap-marshal.c	\

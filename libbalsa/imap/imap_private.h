@@ -167,6 +167,12 @@ void imap_mbox_handle_set_state(ImapMboxHandle *h,
 #define imap_mbox_handle_set_msg(h,s) \
   do{g_free((h)->last_msg); (h)->last_msg = g_strdup(s); }while(0)
 
+typedef unsigned (*ImapCoalesceFunc)(int, void*);
+gchar* imap_coalesce_seq_range(int lo, int hi,
+			       ImapCoalesceFunc fun, void *data);
+unsigned imap_coalesce_func_simple(int i, unsigned msgno[]);
+gchar *imap_coalesce_set(int cnt, unsigned *seqnos);
+
 /* even more private functions */
 int imap_cmd_start(ImapMboxHandle* handle, const char* cmd, unsigned* cmdno);
 ImapResponse imap_cmd_step(ImapMboxHandle* handle, unsigned cmdno);

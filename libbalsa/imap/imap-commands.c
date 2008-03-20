@@ -30,59 +30,6 @@
 
 #define ELEMENTS(x) (sizeof (x) / sizeof(x[0]))
 
-typedef unsigned (*CoalesceFunc)(int, void*);
-static gchar*
-coalesce_seq_range(int lo, int hi, CoalesceFunc incl, void *data)
-{
-  GString * res = g_string_sized_new(16);
-  enum { BEGIN, LASTOUT, LASTIN, RANGE } mode = BEGIN;
-  int seq;
-  unsigned prev =0, num = 0;
-
-  for(seq=lo; seq<=hi+1; seq++) {
-    if(seq<=hi && (num=incl(seq, data)) != 0) {
-      switch(mode) {
-      case BEGIN: 
-        g_string_append_printf(res, "%u", num);
-        mode = LASTIN; break;
-      case RANGE:
-        if(num!=prev+1) {
-          g_string_append_printf(res, ":%u,%u", prev, num);
-          mode = LASTIN;
-        }
-        break;
-      case LASTIN: 
-        if(num==prev+1) {
-          mode = RANGE;
-          break;
-        } /* else fall through */
-      case LASTOUT: 
-        g_string_append_printf(res, ",%u", num);
-        mode = LASTIN; break;
-      }
-    } else {
-      switch(mode) {
-      case BEGIN:
-      case LASTOUT: break;
-      case LASTIN: mode = LASTOUT; break;
-      case RANGE: 
-        g_string_append_printf(res, ":%u", prev);
-        mode = LASTOUT;
-        break;
-      }
-    }
-    prev = num;
-  }
-  return g_string_free(res, mode == BEGIN);
-}
-
-static unsigned
-simple_coealesce_func(int i, unsigned msgno[])
-{
-  return msgno[i];
-}
-
-
 struct fetch_data {
   ImapMboxHandle* h;
   ImapFetchType ift;
@@ -845,8 +792,8 @@ imap_assure_needed_flags(ImapMboxHandle *h, ImapMsgFlag needed_flags)
           if( (f->known_flags & fnd.flag) ==0)
             f->flag_values |= fnd.flag;
         }
-      seqno = coalesce_seq_range(1, h->exists,
-                                 (CoalesceFunc)flag_unknown, &fnd);
+      seqno = imap_coalesce_seq_range(1, h->exists,
+				      (ImapCoalesceFunc)flag_unknown, &fnd);
       if(!seqno) /* oops, why were we called in the first place!? */
         continue;
       switch(fnd.flag) {
@@ -978,8 +925,9 @@ imap_mbox_handle_fetch_range(ImapMboxHandle* handle,
   gchar * seq;
   ImapResponse rc;
   unsigned exists = imap_mbox_handle_get_exists(handle);
-  CoalesceFunc cf = (CoalesceFunc)(mbox_view_is_active(&handle->mbox_view)
-                                   ? need_fetch_view : need_fetch);
+  ImapCoalesceFunc cf = 
+    (ImapCoalesceFunc)(mbox_view_is_active(&handle->mbox_view)
+		       ? need_fetch_view : need_fetch);
   struct fetch_data fd;
 
   IMAP_REQUIRED_STATE1(handle, IMHS_SELECTED, IMR_BAD);
@@ -988,7 +936,7 @@ imap_mbox_handle_fetch_range(ImapMboxHandle* handle,
   if(lo>hi) return IMR_OK;
   if(lo<1) lo = 1;
   if(hi>exists) hi = exists;
-  seq = coalesce_seq_range(lo, hi, cf, &fd);
+  seq = imap_coalesce_seq_range(lo, hi, cf, &fd);
   if(seq) {
     const char* hdr[13];
     ic_construct_header_list(hdr, fd.req_fetch_type);
@@ -1007,7 +955,7 @@ imap_mbox_handle_fetch_set(ImapMboxHandle* handle,
 {
   gchar * seq;
   ImapResponse rc;
-  CoalesceFunc cf;
+  ImapCoalesceFunc cf;
   struct fetch_data_set fd;
 
   IMAP_REQUIRED_STATE1(handle, IMHS_SELECTED, IMR_BAD);
@@ -1015,9 +963,9 @@ imap_mbox_handle_fetch_set(ImapMboxHandle* handle,
 
   fd.fd.h = handle; fd.fd.ift = fd.fd.req_fetch_type = ift;
   fd.set = set;
-  cf = (CoalesceFunc)(mbox_view_is_active(&handle->mbox_view)
-                      ? need_fetch_view_set : need_fetch_set);
-  seq = coalesce_seq_range(1, cnt, cf, &fd);
+  cf = (ImapCoalesceFunc)(mbox_view_is_active(&handle->mbox_view)
+			  ? need_fetch_view_set : need_fetch_set);
+  seq = imap_coalesce_seq_range(1, cnt, cf, &fd);
   if(seq) {
     const char* hdr[13];
     ic_construct_header_list(hdr, fd.fd.req_fetch_type);
@@ -1049,7 +997,7 @@ imap_mbox_handle_fetch_rfc822(ImapMboxHandle* handle,
   IMAP_REQUIRED_STATE1(handle, IMHS_SELECTED, IMR_BAD);
   HANDLE_LOCK(handle);
 
-  seq = coalesce_seq_range(0, cnt-1, (CoalesceFunc)simple_coealesce_func, set);
+  seq = imap_coalesce_set(cnt, set);
 
   if(seq) {
     ImapFetchBodyCb cb = handle->body_cb;
@@ -1218,7 +1166,7 @@ imap_store_prepare(ImapMboxHandle *h, unsigned msgcnt, unsigned*seqno,
   csd.handle = h; csd.msgcnt = msgcnt; csd.seqno = seqno;
   csd.flag = flg; csd.state = state;
   if(msgcnt == 0) return NULL;
-  seq = coalesce_seq_range(0, msgcnt-1, (CoalesceFunc)cf_flag, &csd);
+  seq = imap_coalesce_seq_range(0, msgcnt-1, (ImapCoalesceFunc)cf_flag, &csd);
   if(!seq) return NULL;
   str = enum_flag_to_str(flg);
   for(i=0; i<msgcnt; i++) {
@@ -1290,8 +1238,7 @@ imap_mbox_handle_copy(ImapMboxHandle* handle, unsigned cnt, unsigned *seqno,
   IMAP_REQUIRED_STATE1(handle, IMHS_SELECTED, IMR_BAD);
   {
   gchar *mbx7 = imap_utf8_to_mailbox(dest);
-  char *seq = 
-    coalesce_seq_range(0, cnt-1,(CoalesceFunc)simple_coealesce_func, seqno);
+  char *seq = imap_coalesce_set(cnt, seqno);
   gchar *cmd = g_strdup_printf("COPY %s \"%s\"", seq, mbx7);
   ImapResponse rc = imap_cmd_exec(handle, cmd);
   g_free(seq); g_free(mbx7); g_free(cmd);
@@ -1420,8 +1367,7 @@ imap_mbox_sort_msgno_srv(ImapMboxHandle *handle, ImapSortKey key,
   /* seq can be pretty long and g_strdup_printf has a limit on
    * string length so we create the command string in two steps. */
   keystr = sort_code_to_string(key);
-  seq = coalesce_seq_range(0, cnt-1,(CoalesceFunc)simple_coealesce_func,
-                           msgno);
+  seq = imap_coalesce_set(cnt, msgno);
   cmd= g_strdup_printf("SORT (%s%s) UTF-8 ", 
                        ascending ? "" : "REVERSE ",
                        keystr);
@@ -1768,8 +1714,8 @@ imap_mbox_complete_msgids(ImapMboxHandle *h,
   void *arg;
 
   IMAP_REQUIRED_STATE1(h, IMHS_SELECTED, IMR_BAD);
-  seq = coalesce_seq_range(first_seqno_to_fetch, msgids->len,
-			   (CoalesceFunc)need_msgid, msgids);
+  seq = imap_coalesce_seq_range(first_seqno_to_fetch, msgids->len,
+				(ImapCoalesceFunc)need_msgid, msgids);
   if(seq) {
     cmd = g_strdup_printf("FETCH %s BODY.PEEK[HEADER.FIELDS (message-id)]",
 			  seq);

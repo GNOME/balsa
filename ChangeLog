@@ -1,3 +1,15 @@
+2008-03-20  Peter Bloomfield
+
+	* libbalsa/misc.{c,h}: (libbalsa_path_is_below_dir): careful
+	check for a file being below a directory.
+	* src/mailbox-conf.c: (mailbox_conf_add): use it.
+	* src/mailbox-node.c: (check_local_path): ditto.
+	* src/save-restore.c: (config_mailbox_set_as_special): ditto.
+	* src/sendmsg-window.c: (render_attach_size): use
+	g_format_size_for_display.
+	* libinit_balsa/assistant_page_directory.c:
+	(balsa_druid_page_directory_prepare): use g_build_filename.
+
 2008-03-16  Pawel Salek
 
 	* src/main-window.c: Fix a runtime warning.

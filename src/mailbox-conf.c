@@ -993,9 +993,9 @@ mailbox_conf_add(MailboxConfWindow * mcw)
 	    return;
 	}
 
-	save_to_config = balsa_app.local_mail_directory == NULL
-	    || strncmp(balsa_app.local_mail_directory, path,
-		       strlen(balsa_app.local_mail_directory)) != 0;
+	save_to_config =
+            !libbalsa_path_is_below_dir(path,
+                                        balsa_app.local_mail_directory);
         printf("Save to config: %d\n", save_to_config);
 	mcw->mailbox->name = g_path_get_basename(path);
 	balsa_mailbox_local_append(mcw->mailbox);

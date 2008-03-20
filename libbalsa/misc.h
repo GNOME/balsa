@@ -186,4 +186,6 @@ gchar *libbalsa_guess_ldif_file(void);
 
 gboolean libbalsa_ldap_exists(const gchar *server);
 
+gboolean libbalsa_path_is_below_dir(const gchar * path, const gchar * dir);
+
 #endif				/* __LIBBALSA_MISC_H__ */

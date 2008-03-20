@@ -2837,12 +2837,17 @@ render_attach_size(GtkTreeViewColumn *column, GtkCellRenderer *cell,
 		       ATTACH_SIZE_COLUMN, &size, -1);
     if (mode == LIBBALSA_ATTACH_AS_EXTBODY)
         sstr = g_strdup("-");
+#if GLIB_CHECK_VERSION(2, 16, 0)
+    else
+        sstr = g_format_size_for_display((goffset) size);
+#else                           /* GLIB_CHECK_VERSION(2, 16, 0) */
     else if (size > 1.2e6)
 	sstr = g_strdup_printf("%.2fMB", size / (1024 * 1024));
     else if (size > 1.2e3)
 	sstr = g_strdup_printf("%.2fkB", size / 1024);
     else
 	sstr = g_strdup_printf("%dB", (gint) size);
+#endif                          /* GLIB_CHECK_VERSION(2, 16, 0) */
     g_object_set(cell, "text", sstr, NULL);
     g_free(sstr);
 }

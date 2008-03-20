@@ -195,11 +195,10 @@ config_mailbox_set_as_special(LibBalsaMailbox * mailbox, specialType which)
     if (*special) {
 	g_free((*special)->config_prefix); 
 	(*special)->config_prefix = NULL;
-        if(balsa_app.local_mail_directory == NULL
-           || !LIBBALSA_IS_MAILBOX_LOCAL(*special)
-           || strncmp(balsa_app.local_mail_directory, 
-                      libbalsa_mailbox_local_get_path(*special),
-                      strlen(balsa_app.local_mail_directory)) != 0) 
+        if (!LIBBALSA_IS_MAILBOX_LOCAL(*special)
+            || !libbalsa_path_is_below_dir(libbalsa_mailbox_local_get_path
+                                           (*special),
+                                           balsa_app.local_mail_directory))
             config_mailbox_add(*special, NULL);
 	g_object_remove_weak_pointer(G_OBJECT(*special), (gpointer) special);
 

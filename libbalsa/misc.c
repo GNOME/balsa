@@ -1366,3 +1366,16 @@ gchar *libbalsa_guess_ldif_file()
 			guesses[i], NULL); /* *** Or NULL */
     
 }
+
+gboolean
+libbalsa_path_is_below_dir(const gchar * path, const gchar * dir)
+{
+    gsize len;
+
+    if (!path || !dir || !g_str_has_prefix(path, dir))
+        return FALSE;
+
+    len = strlen(dir);
+
+    return dir[len - 1] == G_DIR_SEPARATOR || path[len] == G_DIR_SEPARATOR;
+}

@@ -341,7 +341,7 @@ check_local_path(const gchar * path, guint depth)
         return TRUE;
 
     len = strlen(balsa_app.local_mail_directory);
-    if (!strncmp(path, balsa_app.local_mail_directory, len)
+    if (libbalsa_path_is_below_dir(path, balsa_app.local_mail_directory)
 	&& !strchr(&path[++len], G_DIR_SEPARATOR))
 	/* Top level folder. */
 	return TRUE;

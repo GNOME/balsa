@@ -294,21 +294,23 @@ balsa_druid_page_directory_prepare(GtkAssistant * druid,
      */
 
     if (!dir->paths_locked) {
-        buf = g_strconcat(balsa_app.local_mail_directory, "/outbox", NULL);
+        buf = g_build_filename(balsa_app.local_mail_directory, "outbox",
+                               NULL);
         gtk_entry_set_text(GTK_ENTRY(dir->outbox), buf);
         g_free(buf);
 
-        buf =
-            g_strconcat(balsa_app.local_mail_directory, "/sentbox", NULL);
+        buf = g_build_filename(balsa_app.local_mail_directory, "sentbox",
+                               NULL);
         gtk_entry_set_text(GTK_ENTRY(dir->sentbox), buf);
         g_free(buf);
 
-        buf =
-            g_strconcat(balsa_app.local_mail_directory, "/draftbox", NULL);
+        buf = g_build_filename(balsa_app.local_mail_directory, "draftbox",
+                               NULL);
         gtk_entry_set_text(GTK_ENTRY(dir->draftbox), buf);
         g_free(buf);
 
-        buf = g_strconcat(balsa_app.local_mail_directory, "/trash", NULL);
+        buf = g_build_filename(balsa_app.local_mail_directory, "trash",
+                               NULL);
         gtk_entry_set_text(GTK_ENTRY(dir->trash), buf);
         g_free(buf);
     }

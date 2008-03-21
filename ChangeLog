@@ -1,3 +1,7 @@
+2008-03-20  Peter Bloomfield
+
+	* src/balsa-message.c: (bm_find_again): actually show "Wrapped".
+
 2008-03-20  Pawel Salek
 
 	* libbalsa/imap/imap_search.[ch]: make it easier to explicitly

@@ -1268,7 +1268,7 @@ libbalsa_message_stream(LibBalsaMessage * message)
 
     if (mailbox)
         return libbalsa_mailbox_get_message_stream(mailbox,
-                                                   message->msgno);
+                                                   message->msgno, FALSE);
 
     mime_stream = g_mime_stream_mem_new();
     g_mime_object_write_to_stream(GMIME_OBJECT(message->mime_msg),

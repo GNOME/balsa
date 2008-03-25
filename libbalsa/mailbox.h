@@ -296,7 +296,7 @@ struct _LibBalsaMailboxClass {
 				  LibBalsaMessageBody *part,
                                   GError **err);
     GMimeStream *(*get_message_stream) (LibBalsaMailbox * mailbox,
-                                        guint msgno);
+                                        guint msgno, gboolean peek);
 
     void (*check) (LibBalsaMailbox * mailbox);
 
@@ -412,7 +412,7 @@ gboolean libbalsa_mailbox_get_message_part(LibBalsaMessage    *message,
     with full RFC822 text of the message.
 */
 GMimeStream *libbalsa_mailbox_get_message_stream(LibBalsaMailbox * mailbox,
-						 guint msgno);
+						 guint msgno, gboolean peek);
 
 
 /** libbalsa_mailbox_sync_storage() asks the mailbox to synchronise

@@ -918,7 +918,7 @@ copy_iterator(LibBalsaMessageFlag *flags, GMimeStream **stream, void * arg)
 	*flags |= LIBBALSA_MESSAGE_FLAG_DELETED;
 
     /* Copy stream */
-    *stream = libbalsa_mailbox_get_message_stream(mailbox, msgno);
+    *stream = libbalsa_mailbox_get_message_stream(mailbox, msgno, TRUE);
     if(!*stream) {
 	printf("Connection broken for message %u\n",
 	       (unsigned)msgno);
@@ -1866,14 +1866,16 @@ libbalsa_mailbox_get_message_part(LibBalsaMessage    *message,
 }
 
 GMimeStream *
-libbalsa_mailbox_get_message_stream(LibBalsaMailbox * mailbox, guint msgno)
+libbalsa_mailbox_get_message_stream(LibBalsaMailbox * mailbox, guint msgno,
+				    gboolean peek)
 {
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), NULL);
     g_return_val_if_fail(msgno <= libbalsa_mailbox_total_messages(mailbox),
                          NULL);
 
     return LIBBALSA_MAILBOX_GET_CLASS(mailbox)->get_message_stream(mailbox,
-                                                                   msgno);
+                                                                   msgno,
+								   peek);
 }
 
 /* libbalsa_mailbox_change_msgs_flags() changes stored message flags
@@ -3825,7 +3827,8 @@ lbm_get_mime_msg(LibBalsaMailbox * mailbox, LibBalsaMessage * msg)
         GMimeStream *stream;
         GMimeParser *parser;
 
-        stream = libbalsa_mailbox_get_message_stream(mailbox, msg->msgno);
+        stream = libbalsa_mailbox_get_message_stream(mailbox, msg->msgno,
+						     TRUE);
         parser = g_mime_parser_new_with_stream(stream);
         g_object_unref(stream);
         mime_msg = g_mime_parser_construct_message(parser);

@@ -2252,7 +2252,7 @@ bndx_pipe(LibBalsaMailbox * mailbox, guint msgno, const gchar * pipe_cmd)
         fprintf(stderr, "popen failed for message %d\n", msgno);
     } else {
         GMimeStream *stream =
-            libbalsa_mailbox_get_message_stream(mailbox, msgno);
+            libbalsa_mailbox_get_message_stream(mailbox, msgno, TRUE);
         GMimeStream *pipe;
 
         g_return_if_fail(stream);

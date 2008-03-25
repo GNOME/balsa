@@ -60,7 +60,8 @@ static void libbalsa_mailbox_mh_load_config(LibBalsaMailbox * mailbox,
 
 static GMimeStream *libbalsa_mailbox_mh_get_message_stream(LibBalsaMailbox *
 							   mailbox,
-							   guint msgno);
+							   guint msgno,
+							   gboolean peek);
 static gint lbm_mh_check_files(const gchar * path, gboolean create);
 static void lbm_mh_set_path(LibBalsaMailboxLocal * mailbox,
                             const gchar * path);
@@ -264,7 +265,7 @@ libbalsa_mailbox_mh_load_config(LibBalsaMailbox * mailbox,
 
 static GMimeStream *
 libbalsa_mailbox_mh_get_message_stream(LibBalsaMailbox * mailbox,
-				       guint msgno)
+				       guint msgno, gboolean peek)
 {
     GMimeStream *stream;
     struct message_info *msg_info;

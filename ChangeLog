@@ -1,3 +1,11 @@
+2008-03-25  Pawel Salek
+
+	* src/balsa-index.c: pass "peek" parameter to get_message_stream().
+	* libbalsa/{message,source-viewer}.c: ditto.
+	* libbalsa/mailbox.[ch]: get_message_stream() has "peek" parameter now.
+	* libbalsa/mailbox_{mh,mbox,maildir}.c: make related trivial changes.
+	* libbalsa/mailbox_imap.c: pass "peek" further to save one RTT.
+
 2008-03-20  Peter Bloomfield
 
 	* src/balsa-message.c: (bm_find_again): actually show "Wrapped".

@@ -72,7 +72,8 @@ static void libbalsa_mailbox_maildir_load_config(LibBalsaMailbox * mailbox,
 
 static GMimeStream *libbalsa_mailbox_maildir_get_message_stream(LibBalsaMailbox *
 							   mailbox,
-							   guint msgno);
+								guint msgno,
+								gboolean peek);
 
 static gboolean libbalsa_mailbox_maildir_open(LibBalsaMailbox * mailbox,
 					      GError **err);
@@ -311,7 +312,7 @@ libbalsa_mailbox_maildir_load_config(LibBalsaMailbox * mailbox,
 
 static GMimeStream *
 libbalsa_mailbox_maildir_get_message_stream(LibBalsaMailbox * mailbox,
-					    guint msgno)
+					    guint msgno, gboolean peek)
 {
     struct message_info *msg_info;
 

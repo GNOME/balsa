@@ -156,7 +156,8 @@ lsv_escape_cb(GtkAction * action, gpointer data)
 			     _("Mailbox closed"));
 	return;
     }
-    msg_stream = libbalsa_mailbox_get_message_stream(msg->mailbox, msg->msgno);
+    msg_stream = libbalsa_mailbox_get_message_stream(msg->mailbox, msg->msgno,
+						     TRUE);
     if (msg_stream == NULL)
 	return;
 

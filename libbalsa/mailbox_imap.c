@@ -108,7 +108,8 @@ static void libbalsa_mailbox_imap_close(LibBalsaMailbox * mailbox,
                                         gboolean expunge);
 static GMimeStream *libbalsa_mailbox_imap_get_message_stream(LibBalsaMailbox *
 							     mailbox,
-							     guint msgno);
+							     guint msgno,
+							     gboolean peek);
 static void libbalsa_mailbox_imap_check(LibBalsaMailbox * mailbox);
 
 static void
@@ -1100,7 +1101,7 @@ libbalsa_mailbox_imap_close(LibBalsaMailbox * mailbox, gboolean expunge)
 }
 
 static FILE*
-get_cache_stream(LibBalsaMailbox *mailbox, guint msgno)
+get_cache_stream(LibBalsaMailbox *mailbox, guint msgno, gboolean peek)
 {
     unsigned uid = IMAP_MSGNO_UID(mailbox, msgno);
     LibBalsaMailboxImap *mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
@@ -1126,7 +1127,7 @@ get_cache_stream(LibBalsaMailbox *mailbox, guint msgno)
         if(cache) {
             II(rc,mimap->handle,
                imap_mbox_handle_fetch_rfc822_uid(mimap->handle, uid,
-                                                 TRUE, cache));
+                                                 peek, cache));
             fclose(cache);
         }
 
@@ -1144,7 +1145,7 @@ get_cache_stream(LibBalsaMailbox *mailbox, guint msgno)
 */
 static GMimeStream *
 libbalsa_mailbox_imap_get_message_stream(LibBalsaMailbox * mailbox,
-					 guint msgno)
+					 guint msgno, gboolean peek)
 {
     FILE *stream;
 
@@ -1158,7 +1159,7 @@ libbalsa_mailbox_imap_get_message_stream(LibBalsaMailbox * mailbox,
         return NULL;
     }
 
-    stream = get_cache_stream(mailbox, msgno);
+    stream = get_cache_stream(mailbox, msgno, peek);
     libbalsa_unlock_mailbox(mailbox);
 
     return stream ? g_mime_stream_file_new(stream) : NULL;
@@ -2098,7 +2099,8 @@ libbalsa_mailbox_imap_fetch_structure(LibBalsaMailbox *mailbox,
         /* we could optimize this part a little bit: we do not need to
          * keep reopening the stream. */
         GMimeStream *stream = 
-            libbalsa_mailbox_imap_get_message_stream(mailbox, message->msgno);
+            libbalsa_mailbox_imap_get_message_stream(mailbox, message->msgno,
+						     FALSE);
         if(!stream) /* oops, connection broken or the message disappeared? */
             return FALSE;
         g_object_unref(stream);
@@ -2341,7 +2343,7 @@ lbm_imap_get_msg_part_from_cache(LibBalsaMessage * msg,
         if (dt.body->octets > 0)
         II(rc,mimap->handle,
            imap_mbox_handle_fetch_body(mimap->handle, msg->msgno,
-                                       section, TRUE, ifbo, append_str, &dt));
+                                       section, FALSE, ifbo, append_str, &dt));
         libbalsa_unlock_mailbox(msg->mailbox);
         if(rc != IMR_OK) {
             fprintf(stderr, "Error fetching imap message no %lu section %s\n",

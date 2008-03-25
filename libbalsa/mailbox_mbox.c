@@ -69,7 +69,8 @@ static void libbalsa_mailbox_mbox_dispose(GObject * object);
 
 static GMimeStream *libbalsa_mailbox_mbox_get_message_stream(LibBalsaMailbox *
 							     mailbox,
-							     guint msgno);
+							     guint msgno,
+							     gboolean peek);
 static gint lbm_mbox_check_files(const gchar * path, gboolean create);
 static void libbalsa_mailbox_mbox_remove_files(LibBalsaMailboxLocal *mailbox);
 
@@ -281,7 +282,7 @@ message_info_from_msgno(LibBalsaMailboxMbox * mbox, guint msgno)
 
 static GMimeStream *
 libbalsa_mailbox_mbox_get_message_stream(LibBalsaMailbox * mailbox,
-                                         guint msgno)
+                                         guint msgno, gboolean peek)
 {
     LibBalsaMailboxMbox *mbox;
     struct message_info *msg_info;
@@ -1095,7 +1096,7 @@ lbm_mbox_get_mime_message(LibBalsaMailbox * mailbox,
     GMimeParser *parser;
     GMimeMessage *mime_message;
 
-    stream = libbalsa_mailbox_mbox_get_message_stream(mailbox, msgno);
+    stream = libbalsa_mailbox_mbox_get_message_stream(mailbox, msgno, TRUE);
     if (!stream)
 	return NULL;
     libbalsa_mime_stream_shared_lock(stream);

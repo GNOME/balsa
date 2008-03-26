@@ -1323,6 +1323,10 @@ add_toggle_inline_menu_item(GtkMenuShell * menu, BalsaMessage * bm,
 		     GTK_SIGNAL_FUNC (toggle_all_inline_cb),
 		     (gpointer) info);
     gtk_menu_shell_append(menu, menuitem);
+
+    /* Clear force-inline to be consistent with initial FALSE state of
+     * check-menu-item. */
+    bm->force_inline = FALSE;
 }
 
 static void

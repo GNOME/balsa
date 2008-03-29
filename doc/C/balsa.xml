@@ -3854,7 +3854,7 @@ the third is an alias (currently not used and replaced by 'TODO').</para>
     <listitem>
       <para>
 	Whether a &quot;Face&quot; header should be attached to a
-	program. Specified patch points out to a file containing a
+	program. Specified path points out to a file containing a
 	textual representation of the face icon. Please
 	see <ulink url="http://quimby.gnus.org/circus/face/"
 	type="http">a description of Face and X-Face</ulink> headers
@@ -3869,7 +3869,7 @@ the third is an alias (currently not used and replaced by 'TODO').</para>
     <term><guilabel>X-Face Path</guilabel></term>
     <listitem>
       <para>Whether a &quot;Face&quot; header should be attached to a
-	program. Specified patch points out to a file containing a
+	program. Specified path points out to a file containing a
 	textual representation of the face icon.
       </para>
     </listitem>

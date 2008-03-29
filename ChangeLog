@@ -1,3 +1,7 @@
+2008-03-29  Jean-Luc Coulon
+
+	* doc/C/balsa.xml: fix typos.
+
 2008-03-26  Peter Bloomfield
 
 	* src/balsa-message.c: (add_toggle_inline_menu_item): clear

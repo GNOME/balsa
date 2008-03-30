@@ -101,7 +101,9 @@ GtkWidget *fe_type_date_low_entry,*fe_type_date_high_entry;
 /* widgets for the type notebook regex page */
 GtkTreeView *fe_type_regex_list;
 GtkWidget *fe_type_regex_label;
+#if REGULAR_EXPRESSION_FILTERING_IS_IMPLEMENTED
 GtkWidget *fe_type_regex_entry;
+#endif                  /* REGULAR_EXPRESSION_FILTERING_IS_IMPLEMENTED */
 
 /* widgets for the type notebook condition flag page */
 GtkWidget *fe_type_flag_label;
@@ -714,10 +716,10 @@ fill_condition_widgets(LibBalsaCondition* cnd)
     if (cnd->type!=CONDITION_STRING)
         gtk_entry_set_text(GTK_ENTRY(fe_type_simple_entry),"");
 
+#if REGULAR_EXPRESSION_FILTERING_IS_IMPLEMENTED
     if (cnd->type!=CONDITION_REGEX)
         gtk_entry_set_text(GTK_ENTRY(fe_type_regex_entry),"");      
 
-#if REGULAR_EXPRESSION_FILTERING_IS_IMPLEMENTED
     gtk_list_store_clear(GTK_LIST_STORE(model));
 #endif                  /* REGULAR_EXPRESSION_FILTERING_IS_IMPLEMENTED */
 

@@ -28,7 +28,6 @@
 
 
 #include <gnome.h>
-#include <pspell/pspell.h>
 
 #ifdef __cplusplus
 extern "C" {

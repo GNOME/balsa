@@ -3,7 +3,7 @@
 %define mdk    0
 %define gmimever 2.1.17
 %if %fedora
-%define config_opts --prefix=%{_prefix} --sysconfdir=%{_sysconfdir} --mandir=%{_mandir} --libdir=%{_libdir} --bindir=%{_bindir} --includedir=%{_includedir} --datadir=%{_datadir} --enable-threads --disable-more-warnings --with-ssl --with-gss
+%define config_opts --prefix=%{_prefix} --sysconfdir=%{_sysconfdir} --mandir=%{_mandir} --libdir=%{_libdir} --bindir=%{_bindir} --includedir=%{_includedir} --datadir=%{_datadir} --enable-threads --disable-more-warnings --with-ssl --with-gss --with-gtkspell
 %endif
 %if %mdk
 %define config_opts --prefix=%{_prefix} --sysconfdir=%{_sysconfdir} --mandir=%{_mandir} --libdir=%{_libdir} --bindir=%{_bindir} --includedir=%{_includedir} --datadir=%{_datadir} --enable-threads --disable-more-warnings
@@ -12,7 +12,7 @@
 Name:           balsa
 Version:        @BALSA_VERSION@
 Release:        1
-Summary:        Balsa Mail Client
+Summary:        Mail Client
 
 Group:          Applications/Internet
 License:        GPL
@@ -23,39 +23,44 @@ Source1:        http://balsa.gnome.org/gmime-%{gmimever}.tar.bz2
 %endif
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
-Requires: libesmtp >= 1.0.3
-Requires: aspell
-Requires: openssl
-BuildRequires: libesmtp-devel >= 1.0.3
-BuildRequires: aspell-devel
-BuildRequires: openssl-devel
 
 %if %fedora
-Requires: gtk2 >= 2.0.0
-Requires: libgnome >= 2.0.0
-Requires: libgnomeui >= 2.0.0
-Requires: gnome-vfs2 >= 2.0.0
-Requires:  libgnomeprint22 >= 2.2.0
-Requires:  libgnomeprintui22 >= 2.2.0
-Requires: gmime
-BuildRequires:  gtk2-devel >= 2.0.0
-BuildRequires:  libgnome-devel >= 2.0.0
-BuildRequires:  libgnomeui-devel >= 2.0.0
-BuildRequires:  gnome-vfs2-devel >= 2.0.0
-BuildRequires:  gmime-devel
+Requires: libesmtp >= 1.0.4
+Requires: scrollkeeper
+BuildRequires: automake
+BuildRequires: desktop-file-utils
+BuildRequires: gettext
+BuildRequires: gmime-devel
+BuildRequires: gnome-vfs2-devel
+BuildRequires: gtk2-devel
+BuildRequires: gtkhtml2-devel
+BuildRequires: gtkspell-devel
+BuildRequires: intltool
+BuildRequires: libesmtp-devel >= 1.0.4
+BuildRequires: libgnome-devel
+BuildRequires: libgnomeui-devel
+BuildRequires: libnotify-devel
+BuildRequires: openssl-devel
+BuildRequires: scrollkeeper
 %endif
 %if %mdk
-Requires: gtk+2.0
-Requires: libgnome2_0 
-Requires: libgnomeui2_0
-Requires: libgnome-vfs2_0
-BuildRequires:  libgtk+2.0_0-devel
+BuildRequires:  libgnome-vfs2_0-devel
 BuildRequires:  libgnome2_0-devel 
 BuildRequires:  libgnomeui2_0-devel
-BuildRequires:  libgnome-vfs2_0-devel
-BuildRequires:  libpspell4-devel
+BuildRequires:  libgtk+2.0_0-devel
 BuildRequires:  libltdl3-devel
 BuildRequires:  libpcre0-devel
+BuildRequires:  libpspell4-devel
+BuildRequires: gtkspell-devel
+BuildRequires: gtkspell-devel
+BuildRequires: libesmtp-devel >= 1.0.4
+BuildRequires: openssl-devel
+BuildRequires: openssl-devel
+Requires: gtk+2.0
+Requires: libesmtp >= 1.0.4
+Requires: libgnome-vfs2_0
+Requires: libgnome2_0 
+Requires: libgnomeui2_0
 %endif
 
 %description
@@ -83,27 +88,37 @@ make %{?_smp_mflags}
 
 
 %install
-rm -rf $RPM_BUILD_ROOT
+rm -rf "$RPM_BUILD_ROOT"
 make install DESTDIR="$RPM_BUILD_ROOT"
+
+desktop-file-install $RPM_BUILD_ROOT%{_datadir}/applications/balsa.desktop \
+        --vendor=fedora \
+        --add-category=X-Fedora \
+        --dir=$RPM_BUILD_ROOT%{_datadir}/applications \
+        --copy-name-to-generic-name \
+        --delete-original
 
 %find_lang %{name}
 
 %clean
-rm -rf $RPM_BUILD_ROOT
+rm -rf "$RPM_BUILD_ROOT"
 
 %post
-which scrollkeeper-update>/dev/null 2>&1 && scrollkeeper-update
+scrollkeeper-update -q -o %{_datadir}/omf/%{name} || :
 
-if which gtk-update-icon-cache >/dev/null 2>&1; then
-    # cf. images/Makefile - this is probably incomplete.
-    gtk-update-icon-cache %{_datadir}/balsa/hicolor
-    gtk-update-icon-cache %{_datadir}/icons/hicolor
+/bin/touch --no-create %{_datadir}/icons/hicolor
+touch --no-create %{_datadir}/icons/hicolor || :
+if [ -x %{_bindir}/gtk-update-icon-cache ]; then
+   %{_bindir}/gtk-update-icon-cache --quiet %{_datadir}/icons/hicolor || :
 fi
 
 %postun
-which scrollkeeper-update>/dev/null 2>&1 && scrollkeeper-update
+scrollkeeper-update -q || :
 
-# no need to update cache - it will be removed.
+touch --no-create %{_datadir}/icons/hicolor || :
+if [ -x %{_bindir}/gtk-update-icon-cache ]; then
+   %{_bindir}/gtk-update-icon-cache --quiet %{_datadir}/icons/hicolor || :
+fi
 
 %files -f %{name}.lang
 %defattr(-,root,root,-)
@@ -112,9 +127,9 @@ which scrollkeeper-update>/dev/null 2>&1 && scrollkeeper-update
 %{_bindir}/balsa
 %{_bindir}/balsa-ab
 %{_libdir}/bonobo/servers/GNOME_Balsa.server
-%{_datadir}/applications/balsa.desktop
+%{_datadir}/applications/*.desktop
 %{_datadir}/balsa
-@HICOLOR_ICON_DIR@/*
+/usr/share/icons/hicolor/*
 %{_datadir}/gnome/help/balsa/*
 %{_datadir}/idl/Balsa.idl
 %{_datadir}/omf/balsa/*
@@ -125,6 +140,9 @@ which scrollkeeper-update>/dev/null 2>&1 && scrollkeeper-update
 
 
 %changelog
+* Mon Mar 31 2008 Pawel Salek <pawsa at theochem.kth.se> - 2.3.23-1
+- adapt to fedora 9.
+
 * Fri May 20 2005 Pawel Salek <pawsa@theochem.kth.se> - 2.3.2-1
 - adapt to Fedora Extras template.
 

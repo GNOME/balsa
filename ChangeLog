@@ -1,3 +1,8 @@
+2008-03-31  Pawel Salek
+
+	* src/spell-check.h: remove lingering reference to pspell.h
+	* balsa.spec.in: update to modern standards.
+
 2008-03-30  Peter Bloomfield
 
 	* src/filter-edit-callbacks.c: (fill_condition_widgets): fix a

@@ -427,10 +427,10 @@ get_cache_name_pair(LibBalsaMailboxImap* mailbox, const gchar *type,
     gchar *fname;
 
     res[0] = get_cache_dir(is_persistent);
-    fname = g_strdup_printf("%s@%s-%s-%s-%u-%u",
+    fname = g_strdup_printf("%s@%s-%s-%u-%u-%s",
                             s->user, s->host,
                             (mailbox->path ? mailbox->path : "INBOX"),
-                            type, uid_validity, uid);
+                            uid_validity, uid, type);
     res[1] = libbalsa_urlencode(fname);
     g_free(fname);
     res[2] = NULL;
@@ -2641,7 +2641,7 @@ struct MultiAppendCbData {
     LibBalsaAddMessageIterator msg_iterator;
     void *iterator_data;
     GMimeStream *outstream;
-    gchar *outfile;
+    GList *outfiles;
     GError **err;
     guint copied;
 };
@@ -2652,9 +2652,18 @@ macd_clear(struct MultiAppendCbData *macd)
     if(macd->outstream) {
 	g_object_unref(macd->outstream);
 	macd->outstream = NULL;
-	unlink(macd->outfile);
-	g_free(macd->outfile);
     }
+}
+
+static void
+macd_destroy(struct MultiAppendCbData *macd)
+{
+    GList *outmsgs;
+    for(outmsgs = macd->outfiles; outmsgs; outmsgs = outmsgs->next) {
+	unlink(outmsgs->data);
+	g_free(outmsgs->data);
+    }
+    g_list_free(macd->outfiles);
 }
 
 static size_t
@@ -2674,6 +2683,7 @@ multi_append_cb(char * buf, size_t buflen,
 	gssize len;
 	LibBalsaMessageFlag flags;
 	GError**err = macd->err;
+	gchar *outf = NULL;
 
 	macd_clear(macd);
 
@@ -2701,7 +2711,7 @@ multi_append_cb(char * buf, size_t buflen,
 	g_mime_stream_filter_add(GMIME_STREAM_FILTER(tmpstream), crlffilter);
 	g_object_unref(crlffilter);
 
-	outfd = g_file_open_tmp("balsa-tmp-file-XXXXXX", &macd->outfile, err);
+	outfd = g_file_open_tmp("balsa-tmp-file-XXXXXX", &outf, err);
 	if (outfd < 0) {
 	    g_warning("Could not create temporary file: %s", (*err)->message);
 	    g_object_unref(tmpstream);
@@ -2710,6 +2720,7 @@ multi_append_cb(char * buf, size_t buflen,
 	}
 
 	macd->outstream = g_mime_stream_fs_new(outfd);
+	macd->outfiles = g_list_append(macd->outfiles, outf);
 	libbalsa_mime_stream_shared_lock(stream);
 	g_mime_stream_write_to_stream(tmpstream, macd->outstream);
 	libbalsa_mime_stream_shared_unlock(stream);
@@ -2735,6 +2746,59 @@ multi_append_cb(char * buf, size_t buflen,
     return 0;
 }
 
+struct append_to_cache_data {
+    const gchar *user, *host, *path, *cache_dir;
+    GList *curr_name;
+    unsigned uid_validity;
+};
+
+static void
+append_to_cache(unsigned uid, void *arg)
+{
+    struct append_to_cache_data *atcd = (struct append_to_cache_data*)arg;
+    gchar *name = g_strdup_printf("%s@%s-%s-%u-%u-%s",
+				  atcd->user, atcd->host, atcd->path,
+				  atcd->uid_validity,
+				  uid, "body");
+    gchar *fname = libbalsa_urlencode(name);
+    gchar *cache_name = g_build_filename(atcd->cache_dir, fname, NULL);
+    gchar *msg = atcd->curr_name->data;
+
+    g_free(name);
+    g_free(fname);
+
+    atcd->curr_name = g_list_next(atcd->curr_name);
+
+    g_return_if_fail(msg);
+
+    printf("Copy tmp file %s  to cache %s\n", msg, cache_name);
+
+    if(link(msg, cache_name) == 0) {
+	printf("Linking msg for message UID %u succeeded.\n", uid);
+    } else {
+	FILE *in  = fopen(msg, "r");
+
+	if(in) {
+	    FILE *out = fopen(cache_name, "w");
+	    char buf[65536];
+	    size_t sz;
+	    if(out) {
+		gboolean err;
+		while( (sz=fread(buf, 1, sizeof(buf), in)) > 0)
+		    if(fwrite(buf, 1, sz, out) != sz)
+			break;
+		err = ferror(in) || ferror(out);
+		fclose(out);
+		if(err)
+		    unlink(cache_name);
+	    }
+	    fclose(in);
+	}
+	printf("Copying msg for message UID %u succeeded.\n", uid);
+    }
+    g_free(cache_name);
+}
+
 static guint
 libbalsa_mailbox_imap_add_messages(LibBalsaMailbox * mailbox,
 				   LibBalsaAddMessageIterator msg_iterator,
@@ -2744,6 +2808,7 @@ libbalsa_mailbox_imap_add_messages(LibBalsaMailbox * mailbox,
     ImapMboxHandle *handle = libbalsa_mailbox_imap_get_handle(mimap, err);
     struct MultiAppendCbData macd;
     ImapResponse rc;
+    ImapSequence uid_sequence;
 
     if (!handle) {
 	/* Perhaps the mailbox was closed and the authentication
@@ -2755,13 +2820,40 @@ libbalsa_mailbox_imap_add_messages(LibBalsaMailbox * mailbox,
     macd.msg_iterator = msg_iterator;
     macd.iterator_data = arg;
     macd.outstream = NULL;
-    macd.outfile = NULL;
+    macd.outfiles = NULL;
     macd.err = err;
     macd.copied = 0;
+    uid_sequence.uid_validity = 0;
+    uid_sequence.ranges = NULL;
     rc = imap_mbox_append_multi(handle,	mimap->path,
-				multi_append_cb, &macd);
+				multi_append_cb, &macd, &uid_sequence);
     libbalsa_mailbox_imap_release_handle(mimap);
     macd_clear(&macd);
+    printf("Counts: tmp files : %u uids: %u\n",
+	   g_list_length(macd.outfiles), imap_sequence_length(&uid_sequence));
+    if(!imap_sequence_empty(&uid_sequence) &&
+       g_list_length(macd.outfiles) == imap_sequence_length(&uid_sequence)) {
+	/* Hurray, server returned UID data on appended messages! */
+	LibBalsaMailboxImap *mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
+	LibBalsaServer *s      = LIBBALSA_MAILBOX_REMOTE(mailbox)->server;
+	LibBalsaImapServer *is = LIBBALSA_IMAP_SERVER(s);
+	gboolean is_persistent = libbalsa_imap_server_has_persistent_cache(is);
+	struct append_to_cache_data atcd;
+	gchar *cache_dir;
+
+	atcd.user = s->user;
+	atcd.host = s->host;
+	atcd.path = mimap->path ? mimap->path : "INBOX";
+	atcd.cache_dir = cache_dir = get_cache_dir(is_persistent);
+	atcd.curr_name = macd.outfiles;
+	atcd.uid_validity = uid_sequence.uid_validity;
+
+	imap_sequence_foreach(&uid_sequence, append_to_cache, &atcd);
+	imap_sequence_release(&uid_sequence);
+	g_free(cache_dir);
+    }
+
+    macd_destroy(&macd);
     return rc == IMR_OK ? macd.copied : 0;
 }
 #endif
@@ -3057,14 +3149,25 @@ libbalsa_mailbox_imap_messages_copy(LibBalsaMailbox * mailbox,
 	LIBBALSA_MAILBOX_REMOTE(dest)->server ==
 	LIBBALSA_MAILBOX_REMOTE(mailbox)->server) {
         gboolean ret;
+	LibBalsaMailboxImap *mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
 	ImapMboxHandle *handle = LIBBALSA_MAILBOX_IMAP(mailbox)->handle;
+	ImapSequence uid_sequence;
+	unsigned *seqno = (unsigned*)msgnos->data, *uids;
+	unsigned im;
 	g_return_val_if_fail(handle, FALSE);
-
+	
 	/* User server-side copy. */
 	g_array_sort(msgnos, cmp_msgno);
+	uids = g_new(unsigned, msgnos->len);
+	for(im=0; im<msgnos->len; im++) {
+	    ImapMessage * imsg = imap_mbox_handle_get_msg(handle, seqno[im]);
+	    uids[im] = imsg ? imsg->uid : 0;
+	}
+	    
 	ret = imap_mbox_handle_copy(handle, msgnos->len,
                                     (guint *) msgnos->data,
-                                    LIBBALSA_MAILBOX_IMAP(dest)->path)
+                                    LIBBALSA_MAILBOX_IMAP(dest)->path,
+				    &uid_sequence)
 	    == IMR_OK;
         if(!ret) {
             gchar *msg = imap_mbox_handle_get_last_msg(handle);
@@ -3072,7 +3175,69 @@ libbalsa_mailbox_imap_messages_copy(LibBalsaMailbox * mailbox,
                         LIBBALSA_MAILBOX_COPY_ERROR,
                         "%s", msg);
             g_free(msg);
-        }
+        } else {
+	    /* Copy cache files. */
+	    GDir *dir;
+	    LibBalsaServer *s      = LIBBALSA_MAILBOX_REMOTE(mailbox)->server;
+	    LibBalsaImapServer *is = LIBBALSA_IMAP_SERVER(s);
+	    LibBalsaMailboxImap *dst_imap = LIBBALSA_MAILBOX_IMAP(dest);
+	    gboolean is_persistent =
+		libbalsa_imap_server_has_persistent_cache(is);
+	    gchar *dir_name = get_cache_dir(is_persistent);
+	    gchar *src_prefix = g_strdup_printf("%s@%s-%s-%u-",
+						s->user, s->host,
+						(mimap->path 
+						 ? mimap->path : "INBOX"),
+						mimap->uid_validity);
+	    gchar *encoded_path = libbalsa_urlencode(src_prefix);
+	    g_free(src_prefix);
+	    dir = g_dir_open(dir_name, 0, NULL);
+	    if(dir) {
+		const gchar *filename;
+		size_t prefix_length = strlen(encoded_path);
+		unsigned nth;
+		printf("UIDVAL=%u Look for files that match %s \n",
+		       uid_sequence.uid_validity, encoded_path);
+		while ((filename = g_dir_read_name(dir)) != NULL) {
+		    unsigned msg_uid;
+		    gchar *tail;
+		    if(strncmp(encoded_path, filename, prefix_length))
+			continue;
+		    msg_uid = strtol(filename + prefix_length, &tail, 10);
+		    for(im = 0; im<msgnos->len; im++) {
+			if(uids[im]>msg_uid) break;
+			else if(uids[im]==msg_uid &&
+				(nth = imap_sequence_nth(&uid_sequence, im))
+				 ) {
+			    gchar *dst;
+			    /* Copy by hardlinks! */
+			    gchar *src =
+				g_build_filename(dir_name, filename, NULL);
+			    gchar *dst_prefix =
+				g_strdup_printf("%s@%s-%s-%u-%u%s",
+						s->user, s->host,
+						(dst_imap->path 
+						 ? dst_imap->path : "INBOX"),
+						uid_sequence.uid_validity,
+						nth, tail);
+			    gchar *encoded = libbalsa_urlencode(dst_prefix);
+
+			    g_free(dst_prefix);
+			    dst = g_build_filename(dir_name, encoded, NULL);
+			    printf("Linking %s to %s...\n", src, dst);
+			    if(link(src, dst) != 0)
+				printf("...failed.\n");
+			    g_free(dst);
+			    break;
+			}
+		    }
+		}
+		g_dir_close(dir);
+	    }
+	    g_free(dir_name);
+	}
+	g_free(uids);
+	imap_sequence_release(&uid_sequence);
         return ret;
     }
 

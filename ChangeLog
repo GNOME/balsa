@@ -1,3 +1,11 @@
+2008-04-01  Pawel Salek
+
+	* libbalsa/mailbox_imap.c: use UIDPLUS information returned by server
+	to improve caching.
+	* libbalsa/imap/imap-handle.[ch]: parse returned UIDPLUS data.
+	* libbalsa/imap/imap_private.h: add ImapMboxHandle::uidplus field.
+	* libbalsa/imap/imap-commands.[ch]: add API for accessing UIDPLUS data.
+
 2008-03-31  Pawel Salek
 
 	* src/spell-check.h: remove lingering reference to pspell.h

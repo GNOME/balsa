@@ -419,16 +419,57 @@ imap_mbox_append(ImapMboxHandle *handle, const char *mbox,
 {
   struct SingleAppendData sad = { dump_cb, arg, sz, flags };
   IMAP_REQUIRED_STATE2(handle,IMHS_AUTHENTICATED, IMHS_SELECTED, IMR_BAD);
-  return imap_mbox_append_multi(handle, mbox, single_append_cb, &sad);
+  return imap_mbox_append_multi(handle, mbox, single_append_cb, &sad, NULL);
 }
+
+static ImapResponse
+append_commit(ImapMboxHandle *handle, unsigned cmdno, ImapSequence *uid_seq)
+{
+  ImapResponse rc;
+
+  if(handle->uidplus.dst)
+    g_warning("Leaking memory in imap_append");
+
+  if(uid_seq) {
+    handle->uidplus.dst = uid_seq->ranges;
+    handle->uidplus.store_response = 1;
+  }
+  sio_write(handle->sio, "\r\n", 2);
+  sio_flush(handle->sio);
+  do {
+    rc = imap_cmd_step (handle, cmdno);
+  } while (rc == IMR_UNTAGGED);
+
+  if(uid_seq) {
+    if(uid_seq->uid_validity == 0) {
+      uid_seq->uid_validity = handle->uidplus.dst_uid_validity;
+      uid_seq->ranges = handle->uidplus.dst;
+    } else if(uid_seq->uid_validity != handle->uidplus.dst_uid_validity) {
+      printf("The IMAP server keeps changing UID validity, "
+	     "ignoring UIDPLUS response (%u -> %u)\n",
+	     uid_seq->uid_validity, handle->uidplus.dst_uid_validity);
+      uid_seq->uid_validity = handle->uidplus.dst_uid_validity;
+      g_list_free(uid_seq->ranges);
+      uid_seq->ranges = NULL;
+    } else {
+      uid_seq->ranges = handle->uidplus.dst;
+    }
+  }
+  handle->uidplus.dst = NULL;
+  handle->uidplus.store_response = 0;
+
+  return rc;
+}
+
 static ImapResponse
 imap_mbox_append_multi_real(ImapMboxHandle *handle,
 			    const char *mbox,
 			    ImapAppendMultiFunc dump_cb,
-			    void* cb_arg)
+			    void* cb_arg,
+			    ImapSequence *uid_sequence)
 {
   static const unsigned TRANSACTION_SIZE = 10*1024*1024;
-  int use_literal, use_multiappend;
+  int use_literal, use_multiappend, use_uidplus;
   unsigned cmdno;
   ImapResponse rc = IMR_OK;
   char *litstr;
@@ -442,6 +483,7 @@ imap_mbox_append_multi_real(ImapMboxHandle *handle,
 
   use_literal = imap_mbox_handle_can_do(handle, IMCAP_LITERAL);
   use_multiappend = imap_mbox_handle_can_do(handle, IMCAP_MULTIAPPEND);
+  use_uidplus = imap_mbox_handle_can_do(handle, IMCAP_UIDPLUS);
   litstr = use_literal ? "+" : "";
 
   imap_handle_idle_disable(handle);
@@ -518,26 +560,24 @@ imap_mbox_append_multi_real(ImapMboxHandle *handle,
        * make sure on a higher level that they are not sent.
        */
       /* sio_flush(handle->sio); */
-      sio_write(handle->sio, "\r\n", 2);
-      sio_flush(handle->sio);
-      do {
-	rc = imap_cmd_step (handle, cmdno);
-      } while (rc == IMR_UNTAGGED);
-      if(rc != IMR_OK)
-	return rc;
+      if( (rc=append_commit(handle, cmdno,
+			   use_uidplus ? uid_sequence : NULL)) != IMR_OK)
+      return rc;
     }
     /* And move to the next message... */
   }
 
   if(!new_append && use_multiappend) { /* We get the server response here... */
-    sio_write(handle->sio, "\r\n", 2);
-    sio_flush(handle->sio);
-    do {
-      rc = imap_cmd_step (handle, cmdno);
-    } while (rc == IMR_UNTAGGED);
+    rc = append_commit(handle, cmdno, use_uidplus ? uid_sequence : NULL);
   }
 
   imap_handle_idle_enable(handle, 30);
+
+  if(uid_sequence) {
+    printf("Handle returns uid seq of length %u\n",
+	   imap_sequence_length(uid_sequence));
+    uid_sequence->ranges = g_list_reverse(uid_sequence->ranges);
+  }
   return rc;
 }
 
@@ -561,11 +601,12 @@ ImapResponse
 imap_mbox_append_multi(ImapMboxHandle *handle,
 		       const char *mbox,
 		       ImapAppendMultiFunc dump_cb,
-		       void* cb_arg)
+		       void* cb_arg,
+		       ImapSequence *uids)
 {
   ImapResponse rc;
   HANDLE_LOCK(handle);
-  rc = imap_mbox_append_multi_real(handle, mbox, dump_cb, cb_arg);
+  rc = imap_mbox_append_multi_real(handle, mbox, dump_cb, cb_arg, uids);
   HANDLE_UNLOCK(handle);
   return rc;
 }
@@ -632,8 +673,13 @@ imap_mbox_close(ImapMboxHandle *h)
 ImapResponse
 imap_mbox_expunge(ImapMboxHandle *handle)
 {
+  ImapResponse rc;
+
   IMAP_REQUIRED_STATE2(handle,IMHS_AUTHENTICATED, IMHS_SELECTED, IMR_BAD);
-  return imap_cmd_exec(handle, "EXPUNGE");
+  HANDLE_LOCK(handle);
+  rc = imap_cmd_exec(handle, "EXPUNGE");
+  HANDLE_UNLOCK(handle);
+  return rc;
 }
 
 ImapResponse
@@ -1233,17 +1279,36 @@ imap_mbox_store_flag_a(ImapMboxHandle *h, unsigned msgcnt, unsigned*seqno,
     selected in handle to given mailbox on same server. */
 ImapResponse
 imap_mbox_handle_copy(ImapMboxHandle* handle, unsigned cnt, unsigned *seqno,
-                      const gchar *dest)
+                      const gchar *dest,
+		      ImapSequence *ret_sequence)
 {
+  ImapResponse rc;
   IMAP_REQUIRED_STATE1(handle, IMHS_SELECTED, IMR_BAD);
+  HANDLE_LOCK(handle);
   {
-  gchar *mbx7 = imap_utf8_to_mailbox(dest);
-  char *seq = imap_coalesce_set(cnt, seqno);
-  gchar *cmd = g_strdup_printf("COPY %s \"%s\"", seq, mbx7);
-  ImapResponse rc = imap_cmd_exec(handle, cmd);
-  g_free(seq); g_free(mbx7); g_free(cmd);
-  return rc;
+    gchar *mbx7 = imap_utf8_to_mailbox(dest);
+    char *seq = imap_coalesce_set(cnt, seqno);
+    gchar *cmd = g_strdup_printf("COPY %s \"%s\"", seq, mbx7);
+    unsigned cmdno;
+    gboolean use_uidplus = imap_mbox_handle_can_do(handle, IMCAP_UIDPLUS);
+
+    handle->uidplus.store_response = ret_sequence ? 1 : 0;
+
+    rc = imap_cmd_exec_cmdno(handle, cmd, &cmdno);
+    g_free(seq); g_free(mbx7); g_free(cmd);
+    if(use_uidplus && ret_sequence) {
+      if(rc == IMR_OK /* && cmdno == handle->uidplus.cmdno */ ) {
+	ret_sequence->uid_validity = handle->uidplus.dst_uid_validity;
+	ret_sequence->ranges = g_list_reverse(handle->uidplus.dst);
+      } else {
+	g_list_free(handle->uidplus.dst);
+      }
+      handle->uidplus.dst = NULL;
+      handle->uidplus.store_response = 0;
+    }
   }
+  HANDLE_UNLOCK(handle);
+  return rc;
 }
 
 /* 6.4.8 UID Command */

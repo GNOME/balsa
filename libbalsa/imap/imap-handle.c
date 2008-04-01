@@ -878,6 +878,7 @@ imap_mbox_handle_finalize(GObject* gobject)
   ImapMboxHandle* handle = IMAP_MBOX_HANDLE(gobject);
   g_return_if_fail(handle);
 
+  HANDLE_LOCK(handle);
   if(handle->state != IMHS_DISCONNECTED) {
     handle->doing_logout = TRUE;
     imap_cmd_exec(handle, "LOGOUT");
@@ -895,6 +896,8 @@ imap_mbox_handle_finalize(GObject* gobject)
   imap_mbox_resize_cache(handle, 0);
   g_free(handle->msg_cache); handle->msg_cache = NULL;
   g_array_free(handle->flag_cache, TRUE);
+
+  HANDLE_UNLOCK(handle);
 #if defined(BALSA_USE_THREADS)
   pthread_mutex_destroy(&handle->mutex);
 #endif
@@ -1411,6 +1414,57 @@ imap_message_get_body_from_section(ImapMessage *msg,
 }
 
 
+unsigned
+imap_sequence_length(ImapSequence *i_seq)
+{
+  unsigned length = 0;
+  GList *l;
+  for(l = i_seq->ranges; l; l = l->next) {
+    ImapUidRange *r = (ImapUidRange*)l->data;
+    length += r->hi - r->lo +1;
+  }
+  return length;
+}
+
+unsigned
+imap_sequence_nth(ImapSequence *i_seq, unsigned nth)
+{
+  GList *l;
+
+  g_return_val_if_fail(i_seq->ranges, 0);
+
+  for(l = i_seq->ranges; l; l = l->next) {
+    ImapUidRange *r = (ImapUidRange*)l->data;
+    unsigned range_length = r->hi - r->lo +1;
+    if( nth < range_length)
+      return r->lo + nth;
+    nth -= range_length;
+  }
+  g_warning("imap_sequence_nth: too large parameter; returning bogus data\n");
+  return 0;
+}
+
+void
+imap_sequence_foreach(ImapSequence *i_seq,
+		      void(*cb)(unsigned uid, void *arg), void *cb_arg)
+{
+  GList *l;
+  for(l = i_seq->ranges; l; l = l->next) {
+    unsigned uid;
+    ImapUidRange *iur = (ImapUidRange*)l->data;
+    for(uid=iur->lo; uid<=iur->hi; uid++)
+      cb(uid, cb_arg);
+  }
+}
+
+
+void
+imap_sequence_release(ImapSequence *i_seq)
+{
+  g_list_foreach(i_seq->ranges, (GFunc)g_free, NULL);
+  i_seq->ranges = NULL;
+}
+
 void
 imap_body_append_part(ImapBody* body, ImapBody* sibling)
 {
@@ -1903,16 +1957,18 @@ imap_cmd_step(ImapMboxHandle* handle, unsigned lastcmd)
     return lastcmd == cmdno ? rc : IMR_UNTAGGED;
 }
 
-/* imap_cmd_exec: 
- * execute a command, and wait for the response from the server.
+/**executes a command, and wait for the response from the server.
  * Also, handle untagged responses.
  * Returns ImapResponse.
  */
 ImapResponse
-imap_cmd_exec(ImapMboxHandle* handle, const char* cmd)
+imap_cmd_exec_cmdno(ImapMboxHandle* handle, const char* cmd,
+		    unsigned *ret_cmdno)
 {
   unsigned cmdno;
   ImapResponse rc;
+
+  if(ret_cmdno) *ret_cmdno = 0;
 
   g_return_val_if_fail(handle, IMR_BAD);
   if (handle->state == IMHS_DISCONNECTED)
@@ -1923,6 +1979,7 @@ imap_cmd_exec(ImapMboxHandle* handle, const char* cmd)
   if (imap_cmd_start(handle, cmd, &cmdno)<0)
     return IMR_SEVERED;  /* irrecoverable connection error. */
 
+  if(ret_cmdno) *ret_cmdno = cmdno;
   sio_flush(handle->sio);
   do {
     rc = imap_cmd_step (handle, cmdno);
@@ -2090,7 +2147,7 @@ imap_get_binary_string(struct siobuf *sio)
 
 #include "imap-handle.h"
 
-static void
+static int
 ignore_bad_charset(struct siobuf *sio, int c)
 {
   while(c==' ') {
@@ -2099,13 +2156,19 @@ ignore_bad_charset(struct siobuf *sio, int c)
   }
   if(c != ')')
     fprintf(stderr,"ignore_bad_charset: expected ')' got '%c'\n", c);
+  else c = sio_getc(sio);
+  return c;
 }
-static void
+
+static int
 ir_permanent_flags(ImapMboxHandle *h)
 {
-  while(sio_getc(h->sio) != ']')
+  int c;
+  while( (c=sio_getc(h->sio)) != EOF && c != ']')
     ;
+  return c;
 }
+
 static int
 ir_capability_data(ImapMboxHandle *handle)
 {
@@ -2117,7 +2180,7 @@ ir_capability_data(ImapMboxHandle *handle)
     "LOGINDISABLED", "MULTIAPPEND", "NAMESPACE", "SASL-IR",
     "SCAN", "STARTTLS",
     "SORT", "THREAD=ORDEREDSUBJECT", "THREAD=REFERENCES",
-    "UNSELECT"
+    "UIDPLUS", "UNSELECT"
   };
   unsigned x;
   int c;
@@ -2137,48 +2200,151 @@ ir_capability_data(ImapMboxHandle *handle)
   return c;
 }
 
+typedef void (*ImapUidRangeCb)(ImapUidRange *iur, void *arg);
+
+static ImapResponse
+imap_get_sequence(ImapMboxHandle *h, ImapUidRangeCb seq_cb, void *seq_arg)
+{
+  char value[30];
+  gchar *p;
+  int offset = 0;
+  int c = ' ';
+
+  do {
+    size_t value_len;
+    if(c != '\r' && c != '\n') /* Dont try to read beyond the line. */
+      c = imap_get_atom(h->sio, value + offset, sizeof(value)-offset);
+    value_len = strlen(value);
+
+    if(seq_cb) { /* makes sense to parse it ... */
+      static const unsigned LENGTH_OF_LARGEST_UNSIGNED = 10;
+      ImapUidRange seq;
+
+      for(p=value; *p &&
+	    (unsigned)(p-value) <=
+	    sizeof(value)-(2*LENGTH_OF_LARGEST_UNSIGNED+1); ) {
+	if(sscanf(p, "%u", &seq.lo) != 1)
+	  return IMR_PROTOCOL;
+	while(*p && isdigit(*p)) p++;
+	if( *p == ':') {
+	  p++;
+	  if(sscanf(p, "%u", &seq.hi) != 1)
+	    return c;
+	} else seq.hi = seq.lo;
+
+	seq_cb(&seq, seq_arg);
+
+	while(*p && isdigit(*p)) p++;
+	if(*p == ',') p++;
+      } /* End of for */
+	
+      /* Reuse what's left. */
+      if(*p) {
+	offset = value_len - (p-value);
+	memmove(value, p, offset+1);
+      } else offset = 0;
+
+    } /* End of if(search_cb) */
+
+  }  while (isdigit(c)|| offset);
+
+  if(c != EOF)
+    sio_ungetc(h->sio);
+  return IMR_OK;
+}
+
+static void
+append_uid_range(ImapUidRange *iur, GList **dst)
+{
+  ImapUidRange *iur_copy = g_new(ImapUidRange, 1);
+  /* printf("Prepending %u:%u\n", iur->lo, iur->hi); */
+  iur_copy->lo = iur->lo;
+  iur_copy->hi = iur->hi;
+  *dst = g_list_prepend(*dst, iur_copy);
+}
+
+static ImapResponse
+ir_get_append_copy_uids(ImapMboxHandle *h, gboolean append_only)
+{
+  int c;
+  char buf[12];
+  ImapResponse rc;
+
+  if( (c=imap_get_atom(h->sio, buf, sizeof(buf))) == EOF)
+    return IMR_PROTOCOL;
+  h->uidplus.dst_uid_validity = strtol(buf, NULL, 10);
+
+  if(c != ' ')
+    return IMR_PROTOCOL;
+
+  if(!append_only) {
+    if( (rc = imap_get_sequence(h, NULL, NULL)) != IMR_OK)
+      return rc;
+    if( (c=sio_getc(h->sio)) != ' ') {
+      printf("Expected ' ' found '%c'\n", c);
+      return IMR_PROTOCOL;
+    }
+  }
+  return imap_get_sequence(h, (ImapUidRangeCb)append_uid_range,
+			   &h->uidplus.dst);
+}
+
 static ImapResponse
 ir_resp_text_code(ImapMboxHandle *h)
 {
   static const char* resp_text_code[] = {
     "ALERT", "BADCHARSET", "CAPABILITY","PARSE", "PERMANENTFLAGS",
     "READ-ONLY", "READ-WRITE", "TRYCREATE", "UIDNEXT", "UIDVALIDITY",
-    "UNSEEN"
+    "UNSEEN", "APPENDUID", "COPYUID"
   };
   unsigned o;
   char buf[128];
   int c = imap_get_atom(h->sio, buf, sizeof(buf));
   ImapResponse rc = IMR_OK;
 
-
   for(o=0; o<ELEMENTS(resp_text_code); o++)
     if(g_ascii_strcasecmp(buf, resp_text_code[o]) == 0) break;
 
   switch(o) {
   case 0: rc = IMR_ALERT;        break;
-  case 1: ignore_bad_charset(h->sio, c); break;
-  case 2: ir_capability_data(h); break;
+  case 1: c = ignore_bad_charset(h->sio, c); break;
+  case 2: c = ir_capability_data(h); break;
   case 3: rc = IMR_PARSE;        break;
-  case 4: ir_permanent_flags(h); break;
+  case 4: c = ir_permanent_flags(h); break;
   case 5: h->readonly_mbox = TRUE;  /* read-only */; break;
   case 6: h->readonly_mbox = FALSE; /* read-write */; break;
   case 7: /* ignore try-create */; break;
   case 8:
-    imap_get_atom(h->sio, buf, sizeof(buf));
+    c = imap_get_atom(h->sio, buf, sizeof(buf));
     h->uidnext = strtol(buf, NULL, 10);
     break;
   case 9:
-    imap_get_atom(h->sio, buf, sizeof(buf));
+    c = imap_get_atom(h->sio, buf, sizeof(buf));
     h->uidval = strtol(buf, NULL, 10);
     break;
   case 10:
-    imap_get_atom(h->sio, buf, sizeof(buf));
+    c = imap_get_atom(h->sio, buf, sizeof(buf));
     h->unseen =strtol(buf, NULL, 10);
+    break;
+  case 11: /* APPENDUID */
+    if( (rc=ir_get_append_copy_uids(h, TRUE)) != IMR_OK)
+      return rc;
+    /* printf("APPENDUID: uid_validity=\n"); */
+    c = sio_getc(h->sio);
+    break;
+  case 12: /* COPYUID */
+    /* printf("Copyuid\n"); */
+    if( (rc=ir_get_append_copy_uids(h, FALSE)) != IMR_OK)
+      return rc;
+    c = sio_getc(h->sio);
     break;
   default: while( c != ']' && (c=sio_getc(h->sio)) != EOF) ; break;
   }
-  return c != EOF ? rc : IMR_SEVERED;
+  if(c != ']')
+    printf("ir_resp_text_code, on exit c=%c\n", c);
+  return c == ']' ? rc : IMR_PROTOCOL;
 }
+
 static ImapResponse
 ir_ok(ImapMboxHandle *h)
 {
@@ -2398,6 +2564,15 @@ ir_status(ImapMboxHandle *h)
   return ir_check_crlf(h, sio_getc(h->sio));
 }
 
+static void
+esearch_cb(ImapUidRange *iur, void *arg)
+{
+  ImapMboxHandle *h = (ImapMboxHandle*)arg;
+  unsigned i;
+  for(i=iur->lo; i<= iur->hi; i++)
+    h->search_cb(h, i, h->search_arg);
+}
+
 /** Process ESEARCH response. Consult RFC4466 and RFC4731 before
    modification.  */
 static ImapResponse
@@ -2436,56 +2611,19 @@ ir_esearch(ImapMboxHandle *h)
   }
   if(c == EOF) return IMR_SEVERED;
 
-  while(c == ' ') {
-    static const unsigned LENGTH_OF_LARGEST_UNSIGNED = 10;
-    char value[30];
-    gchar *p;
-    int offset = 0;
+  while(c == ' ') { /* search-return-data in rfc4466 speak */
+    ImapResponse rc;
     /* atom contains search-modifier-name, time to fetch
-       search-return-value. In ESEARCH, it is always an atom, so we
-       cut the corners here. We get values in chunks.  The chunk size
-       is pretty arbitrary as long as it can fit two largest possible
-       32-bit unsigned numbers and a colon. */
-    do {
-      size_t value_len;
-      if(c != '\r' && c != '\n') /* Dont try to read beyond the line. */
-        c = imap_get_atom(h->sio, value + offset, sizeof(value)-offset);
-      value_len = strlen(value);
+       search-return-value. In ESEARCH, it is always an
+       tagged-ext-simple=sequence-set/number, which are an atoms, so
+       we cut the corners here. We get values in chunks.  The chunk
+       size is pretty arbitrary as long as it can fit two largest
+       possible 32-bit unsigned numbers and a colon. */
+    if ( (rc=imap_get_sequence(h, esearch_cb, h)) != IMR_OK)
+      return rc;
 
-      if(h->search_cb) {
-        unsigned seq, seq1;
-
-        for(p=value; *p &&
-              (unsigned)(p-value) <=
-              sizeof(value)-(2*LENGTH_OF_LARGEST_UNSIGNED+1); ) {
-          if(sscanf(p, "%u", &seq) != 1)
-            return IMR_PROTOCOL;
-          while(*p && isdigit(*p)) p++;
-          if( *p == ':') {
-            p++;
-            if(sscanf(p, "%u", &seq1) != 1)
-              return IMR_PROTOCOL;
-          } else seq1 = seq;
-
-          for(; seq<=seq1; seq++) {
-            h->search_cb(h, seq, h->search_arg);
-          }
-          while(*p && isdigit(*p)) p++;
-          if(*p == ',') p++;
-        } /* End of for */
-	
-	  /* Reuse what's left. */
-        if(*p) {
-          offset = value_len - (p-value);
-          memmove(value, p, offset+1);
-        } else offset = 0;
-
-      } /* End of if(h->search_cb) */
-
-    }  while (isdigit(c)|| offset);
-
-    if(c == ' ')
-      c = imap_get_atom(h->sio, value, sizeof(value));
+    if( (c=sio_getc(h->sio)) == ' ')
+      c = imap_get_atom(h->sio, atom, sizeof(atom));
   }
 
   return ir_check_crlf(h, c);

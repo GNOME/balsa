@@ -488,7 +488,7 @@ test_mbox_append_common(gboolean multi, int argc, char *argv[])
     mi.src_dir = src_dir;
     mi.dir = dir;
     mi.fh = NULL;
-    res = imap_mbox_append_multi(h, mailbox, msg_iterator, &mi);
+    res = imap_mbox_append_multi(h, mailbox, msg_iterator, &mi, NULL);
 
   } else {
     for(res = IMR_OK; res == IMR_OK && (file = readdir(dir)) != NULL;) {

@@ -72,7 +72,8 @@ typedef size_t (*ImapAppendMultiFunc)(char*, size_t,
 ImapResponse imap_mbox_append_multi(ImapMboxHandle *handle,
 				    const char *mbox,
 				    ImapAppendMultiFunc dump_cb,
-				    void* arg);
+				    void* arg,
+				    ImapSequence *uid_range);
 #ifdef USE_IMAP_APPEND_STR /* not used currently */
 ImapResponse imap_mbox_append_str(ImapMboxHandle *handle, const char *mbox,
                               ImapMsgFlags flags, size_t sz, char *txt);
@@ -94,8 +95,11 @@ ImapResponse imap_mbox_store_flag(ImapMboxHandle *r, unsigned cnt,
 unsigned imap_mbox_store_flag_a(ImapMboxHandle *r, unsigned cnt,
 				unsigned *seqno, ImapMsgFlag flg,
 				gboolean state);
-ImapResponse imap_mbox_handle_copy(ImapMboxHandle* handle, unsigned cnt,
-                                   unsigned *seqno, const gchar *dest);
+
+ImapResponse imap_mbox_handle_copy(ImapMboxHandle* handle,
+				   unsigned cnt, unsigned *seqno,
+				   const gchar *dest,
+				   ImapSequence *ret_sequence);
 
 ImapResponse imap_mbox_find_unseen(ImapMboxHandle * h, unsigned *msgcnt,
 				   unsigned **msgs);

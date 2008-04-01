@@ -76,6 +76,13 @@ struct _ImapMboxHandle {
                           * processing of current line is finished. */
   GNode *thread_root; /* deprecated! */
 
+  struct {
+    GList* src; /**< returned by COPY */
+    GList* dst; /**< returned by APPEND and COPY */
+    unsigned dst_uid_validity;
+    unsigned store_response:1;
+  } uidplus;
+
   /* BYE handling depends on the state */
   gboolean doing_logout;
   ImapInfoCb info_cb;
@@ -144,7 +151,10 @@ extern const char* msg_flags[6];
 
 void imap_mbox_resize_cache(ImapMboxHandle *h, unsigned new_size);
 
-ImapResponse imap_cmd_exec(ImapMboxHandle* handle, const char* cmd);
+ImapResponse imap_cmd_exec_cmdno(ImapMboxHandle* handle, const char* cmd,
+				 unsigned *cmdno);
+#define imap_cmd_exec(h, c) imap_cmd_exec_cmdno((h),(c),NULL)
+
 ImapResponse imap_cmd_issue(ImapMboxHandle* handle, const char* cmd);
 char* imap_mbox_gets(ImapMboxHandle *h, char* buf, size_t sz);
 

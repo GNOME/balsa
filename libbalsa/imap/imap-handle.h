@@ -78,6 +78,7 @@ typedef enum
   IMCAP_THREAD_ORDEREDSUBJECT,
   IMCAP_THREAD_REFERENCES,
   /* http://www.ietf.org/internet-drafts/draft-ietf-imapext-sort-13.txt */
+  IMCAP_UIDPLUS,                /* RFC 4315 */
   IMCAP_UNSELECT,               /* RFC 3691 */
   IMCAP_FETCHBODY,              /* basic imap implemented correctly by
                                  * most imap servers but not all. We
@@ -180,6 +181,24 @@ ImapBody *imap_message_get_body_from_section(ImapMessage *msg,
                                              const char *section);
 
 /* ================ END OF BODY STRUCTURE FUNCTIONS ==================== */
+
+/** Stores data returned when UIDPLUS extension is provided. */
+typedef struct ImapSequence_ {
+  GList *ranges; /**< list of ImapUidRange items */
+  unsigned uid_validity;
+}  ImapSequence;
+
+/** defines range [lo, hi] */
+typedef struct ImapUidRange_ {
+  unsigned lo, hi; 
+} ImapUidRange;
+
+#define imap_sequence_empty(i_seq) ( (i_seq)->ranges == NULL)
+unsigned imap_sequence_length(ImapSequence *i_seq);
+unsigned imap_sequence_nth(ImapSequence *i_seq, unsigned nth);
+void imap_sequence_foreach(ImapSequence *i_seq,
+			   void(*cb)(unsigned uid, void *arg), void *cb_arg);
+void imap_sequence_release(ImapSequence *i_seq);
 
 /* ================ BEGIN OF MBOX_VIEW FUNCTIONS ======================= */
 typedef struct _MboxView MboxView;

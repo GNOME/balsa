@@ -2,6 +2,7 @@
 
 	* libbalsa/mailbox_imap.c: don't print warnings on copy when
 	UIDPLUS is unavailable. Better code reuse.
+	* libbalsa/message.c: don't modify invariants.
 
 2008-04-02  Ildar Mulyukov <ildar at altlinux dot ru>
 

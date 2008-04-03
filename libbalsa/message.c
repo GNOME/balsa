@@ -1135,10 +1135,10 @@ lbmsg_set_header(LibBalsaMessage *message, const gchar *name,
 	message->headers->content_type =
 	    g_mime_content_type_new_from_string(value);
     } else
-    if (g_ascii_strcasecmp(name, "Disposition-Notification-To") == 0) {
-	g_return_val_if_fail(message->headers->dispnotify_to == NULL, FALSE);
-        message->headers->dispnotify_to =
-            internet_address_parse_string(value);
+    if (message->headers->dispnotify_to == NULL &&
+	g_ascii_strcasecmp(name, "Disposition-Notification-To") == 0) {
+	message->headers->dispnotify_to =
+	    internet_address_parse_string(value);
     } else
 #ifdef MESSAGE_COPY_CONTENT
     if (g_ascii_strcasecmp(name, "Content-Length") == 0) {

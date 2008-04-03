@@ -574,8 +574,6 @@ imap_mbox_append_multi_real(ImapMboxHandle *handle,
   imap_handle_idle_enable(handle, 30);
 
   if(uid_sequence) {
-    printf("Handle returns uid seq of length %u\n",
-	   imap_sequence_length(uid_sequence));
     uid_sequence->ranges = g_list_reverse(uid_sequence->ranges);
   }
   return rc;

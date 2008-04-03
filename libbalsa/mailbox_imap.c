@@ -2753,33 +2753,17 @@ struct append_to_cache_data {
 };
 
 static void
-append_to_cache(unsigned uid, void *arg)
+create_cache_copy(const gchar *src, const gchar *cache_dir, const gchar *name)
 {
-    struct append_to_cache_data *atcd = (struct append_to_cache_data*)arg;
-    gchar *name = g_strdup_printf("%s@%s-%s-%u-%u-%s",
-				  atcd->user, atcd->host, atcd->path,
-				  atcd->uid_validity,
-				  uid, "body");
     gchar *fname = libbalsa_urlencode(name);
-    gchar *cache_name = g_build_filename(atcd->cache_dir, fname, NULL);
-    gchar *msg = atcd->curr_name->data;
-
-    g_free(name);
-    g_free(fname);
-
-    atcd->curr_name = g_list_next(atcd->curr_name);
-
-    g_return_if_fail(msg);
-
-    printf("Copy tmp file %s  to cache %s\n", msg, cache_name);
-
-    if(link(msg, cache_name) == 0) {
-	printf("Linking msg for message UID %u succeeded.\n", uid);
+    gchar *dst = g_build_filename(cache_dir, fname, NULL);
+    if(link(src, dst) == 0) {
+	printf("Cache %s linked.\n", fname);
     } else {
-	FILE *in  = fopen(msg, "r");
+	FILE *in  = fopen(src, "r");
 
 	if(in) {
-	    FILE *out = fopen(cache_name, "w");
+	    FILE *out = fopen(dst, "w");
 	    char buf[65536];
 	    size_t sz;
 	    if(out) {
@@ -2790,13 +2774,32 @@ append_to_cache(unsigned uid, void *arg)
 		err = ferror(in) || ferror(out);
 		fclose(out);
 		if(err)
-		    unlink(cache_name);
+		    unlink(dst);
 	    }
 	    fclose(in);
 	}
-	printf("Copying msg for message UID %u succeeded.\n", uid);
+	printf("Cache %s copied to.\n", fname);
     }
-    g_free(cache_name);
+    g_free(fname);
+    g_free(dst);
+}
+
+static void
+append_to_cache(unsigned uid, void *arg)
+{
+    struct append_to_cache_data *atcd = (struct append_to_cache_data*)arg;
+    gchar *name = g_strdup_printf("%s@%s-%s-%u-%u-%s",
+				  atcd->user, atcd->host, atcd->path,
+				  atcd->uid_validity,
+				  uid, "body");
+    gchar *msg = atcd->curr_name->data;
+
+    atcd->curr_name = g_list_next(atcd->curr_name);
+
+    g_return_if_fail(msg);
+
+    create_cache_copy(msg, atcd->cache_dir, name);
+    g_free(name);
 }
 
 static guint
@@ -2829,8 +2832,7 @@ libbalsa_mailbox_imap_add_messages(LibBalsaMailbox * mailbox,
 				multi_append_cb, &macd, &uid_sequence);
     libbalsa_mailbox_imap_release_handle(mimap);
     macd_clear(&macd);
-    printf("Counts: tmp files : %u uids: %u\n",
-	   g_list_length(macd.outfiles), imap_sequence_length(&uid_sequence));
+
     if(!imap_sequence_empty(&uid_sequence) &&
        g_list_length(macd.outfiles) == imap_sequence_length(&uid_sequence)) {
 	/* Hurray, server returned UID data on appended messages! */
@@ -3175,7 +3177,7 @@ libbalsa_mailbox_imap_messages_copy(LibBalsaMailbox * mailbox,
                         LIBBALSA_MAILBOX_COPY_ERROR,
                         "%s", msg);
             g_free(msg);
-        } else {
+        } else if(!imap_sequence_empty(&uid_sequence)) {
 	    /* Copy cache files. */
 	    GDir *dir;
 	    LibBalsaServer *s      = LIBBALSA_MAILBOX_REMOTE(mailbox)->server;
@@ -3196,8 +3198,6 @@ libbalsa_mailbox_imap_messages_copy(LibBalsaMailbox * mailbox,
 		const gchar *filename;
 		size_t prefix_length = strlen(encoded_path);
 		unsigned nth;
-		printf("UIDVAL=%u Look for files that match %s \n",
-		       uid_sequence.uid_validity, encoded_path);
 		while ((filename = g_dir_read_name(dir)) != NULL) {
 		    unsigned msg_uid;
 		    gchar *tail;
@@ -3209,8 +3209,6 @@ libbalsa_mailbox_imap_messages_copy(LibBalsaMailbox * mailbox,
 			else if(uids[im]==msg_uid &&
 				(nth = imap_sequence_nth(&uid_sequence, im))
 				 ) {
-			    gchar *dst;
-			    /* Copy by hardlinks! */
 			    gchar *src =
 				g_build_filename(dir_name, filename, NULL);
 			    gchar *dst_prefix =
@@ -3220,14 +3218,9 @@ libbalsa_mailbox_imap_messages_copy(LibBalsaMailbox * mailbox,
 						 ? dst_imap->path : "INBOX"),
 						uid_sequence.uid_validity,
 						nth, tail);
-			    gchar *encoded = libbalsa_urlencode(dst_prefix);
 
+			    create_cache_copy(src, dir_name, dst_prefix);
 			    g_free(dst_prefix);
-			    dst = g_build_filename(dir_name, encoded, NULL);
-			    printf("Linking %s to %s...\n", src, dst);
-			    if(link(src, dst) != 0)
-				printf("...failed.\n");
-			    g_free(dst);
 			    break;
 			}
 		    }

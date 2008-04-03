@@ -1,3 +1,8 @@
+2008-04-03  Pawel Salek
+
+	* libbalsa/mailbox_imap.c: don't print warnings on copy when
+	UIDPLUS is unavailable. Better code reuse.
+
 2008-04-02  Ildar Mulyukov <ildar at altlinux dot ru>
 
 	* src/sendmsg-window.c: Some RU/KZ locales fixes.

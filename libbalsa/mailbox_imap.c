@@ -2826,8 +2826,7 @@ libbalsa_mailbox_imap_add_messages(LibBalsaMailbox * mailbox,
     macd.outfiles = NULL;
     macd.err = err;
     macd.copied = 0;
-    uid_sequence.uid_validity = 0;
-    uid_sequence.ranges = NULL;
+    imap_sequence_init(&uid_sequence);
     rc = imap_mbox_append_multi(handle,	mimap->path,
 				multi_append_cb, &macd, &uid_sequence);
     libbalsa_mailbox_imap_release_handle(mimap);
@@ -3158,6 +3157,7 @@ libbalsa_mailbox_imap_messages_copy(LibBalsaMailbox * mailbox,
 	unsigned im;
 	g_return_val_if_fail(handle, FALSE);
 	
+	imap_sequence_init(&uid_sequence);
 	/* User server-side copy. */
 	g_array_sort(msgnos, cmp_msgno);
 	uids = g_new(unsigned, msgnos->len);

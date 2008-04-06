@@ -198,6 +198,7 @@ unsigned imap_sequence_length(ImapSequence *i_seq);
 unsigned imap_sequence_nth(ImapSequence *i_seq, unsigned nth);
 void imap_sequence_foreach(ImapSequence *i_seq,
 			   void(*cb)(unsigned uid, void *arg), void *cb_arg);
+#define imap_sequence_init(i_seq) do { (i_seq)->ranges = NULL; }while(0)
 void imap_sequence_release(ImapSequence *i_seq);
 
 /* ================ BEGIN OF MBOX_VIEW FUNCTIONS ======================= */

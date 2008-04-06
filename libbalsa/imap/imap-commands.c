@@ -486,6 +486,9 @@ imap_mbox_append_multi_real(ImapMboxHandle *handle,
   use_uidplus = imap_mbox_handle_can_do(handle, IMCAP_UIDPLUS);
   litstr = use_literal ? "+" : "";
 
+  if(uid_sequence)
+    uid_sequence->ranges = NULL;
+
   imap_handle_idle_disable(handle);
   for(msg_cnt=0;
       (msg_size = dump_cb(buf, sizeof(buf),
@@ -1290,7 +1293,11 @@ imap_mbox_handle_copy(ImapMboxHandle* handle, unsigned cnt, unsigned *seqno,
     unsigned cmdno;
     gboolean use_uidplus = imap_mbox_handle_can_do(handle, IMCAP_UIDPLUS);
 
-    handle->uidplus.store_response = ret_sequence ? 1 : 0;
+    if(ret_sequence) {
+      ret_sequence->ranges = NULL;
+      handle->uidplus.store_response = 1;
+    } else
+      handle->uidplus.store_response = 0;
 
     rc = imap_cmd_exec_cmdno(handle, cmd, &cmdno);
     g_free(seq); g_free(mbx7); g_free(cmd);

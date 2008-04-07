@@ -1,5 +1,9 @@
 2008-04-06  Pawel Salek
 
+	* libbalsa/imap/imap-handle.h: fix that macro.
+
+2008-04-06  Pawel Salek
+
 	* libbalsa/mailbox_imap.c: initalise ImapSequence data.
 	* libbalsa/imap/imap-handle.h: provide a macro for that purpose.
 

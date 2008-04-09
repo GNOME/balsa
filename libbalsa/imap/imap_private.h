@@ -26,6 +26,7 @@
 #if defined(BALSA_USE_THREADS)
 #include <pthread.h>
 #define HANDLE_LOCK(h)   pthread_mutex_lock(&h->mutex)
+#define HANDLE_TRYLOCK(h) pthread_mutex_trylock(&h->mutex)
 #define HANDLE_UNLOCK(h) pthread_mutex_unlock(&h->mutex)
 #else
 #define HANDLE_LOCK(h) 

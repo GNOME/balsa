@@ -1112,8 +1112,8 @@ lbmsg_set_header(LibBalsaMessage *message, const gchar *name,
     if (g_ascii_strcasecmp(name, "Date") == 0) {
 	message->headers->date = g_mime_utils_header_decode_date(value, NULL);
     } else
-    if (g_ascii_strcasecmp(name, "From") == 0) {
-	g_return_val_if_fail(message->headers->from == NULL, FALSE);
+    if (message->headers->from == NULL &&
+	g_ascii_strcasecmp(name, "From") == 0) {
         message->headers->from = internet_address_parse_string(value);
     } else
     if (g_ascii_strcasecmp(name, "To") == 0) {

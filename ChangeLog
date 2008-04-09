@@ -1,3 +1,12 @@
+2008-04-09  Pawel Salek
+
+	* src/sendmsg-window.c: make postpone button and menu entry work.
+	* libbalsa/message.c: do not complain when setting headers->from again.
+	* libbalsa/imap/imap-handle.[ch]: make set_timeout() return the
+	old value.
+	* libbalsa/imap/imap_private.h: add HANDLE_TRYLOCK macro.
+	* libbalsa/imap/imap-commands.c: use it for noop().
+
 2008-04-06  Pawel Salek
 
 	* libbalsa/imap/imap-handle.h: fix that macro.

@@ -151,9 +151,13 @@ imap_mbox_handle_can_do(ImapMboxHandle* handle, ImapCapability cap)
 ImapResponse
 imap_mbox_handle_noop(ImapMboxHandle *handle)
 {
+  ImapResponse rc;
   IMAP_REQUIRED_STATE3(handle, IMHS_CONNECTED, IMHS_AUTHENTICATED,
                        IMHS_SELECTED, IMR_BAD);
-  return imap_cmd_exec(handle, "NOOP");
+  if(HANDLE_TRYLOCK(handle) != 0) return IMR_OK;
+  rc = imap_cmd_exec(handle, "NOOP");
+  HANDLE_UNLOCK(handle);
+  return rc;
 }
 
 /* 6.1.3 LOGOUT Command */
@@ -1250,12 +1254,14 @@ imap_mbox_store_flag(ImapMboxHandle *h, unsigned msgcnt, unsigned*seqno,
   gchar* cmd;
 
   IMAP_REQUIRED_STATE1(h, IMHS_SELECTED, IMR_BAD);
+  HANDLE_LOCK(h);
   cmd = imap_store_prepare(h, msgcnt, seqno, flg, state);
   if(cmd) {
     res = imap_cmd_exec(h, cmd);
     g_free(cmd);
-    return res;
-  } else return IMR_OK;
+  } res = IMR_OK;
+  HANDLE_UNLOCK(h);
+  return res;
 }
 
 ImapResponse

@@ -317,12 +317,15 @@ static gboolean
 cmdi_empty(ImapMboxHandle *h, void *d)
 { return TRUE; }
 
-void
+/** Sets new timeout. Returns the old one. */
+int
 imap_handle_set_timeout(ImapMboxHandle *h, int milliseconds)
 {
+  int old_timeout = h->timeout;
   h->timeout = milliseconds;
   if(h->sio)
     sio_set_timeout(h->sio, milliseconds);
+  return old_timeout;
 }
 
 /* imap_handle_idle_enable: enables calling IDLE command after seconds

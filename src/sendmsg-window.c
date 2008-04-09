@@ -6002,7 +6002,7 @@ message_postpone(BalsaSendmsg * bsmsg)
 static void
 postpone_message_cb(GtkAction * action, BalsaSendmsg * bsmsg)
 {
-    if (!gtk_action_group_get_sensitive(bsmsg->ready_action_group)) {
+    if (gtk_action_group_get_sensitive(bsmsg->ready_action_group)) {
         if(message_postpone(bsmsg)) {
             balsa_information_parented(GTK_WINDOW(bsmsg->window),
                                        LIBBALSA_INFORMATION_MESSAGE,

@@ -465,6 +465,11 @@ lbm_maildir_parse_subdirs(LibBalsaMailboxMaildir * mdir)
     }
 
     lbm_maildir_parse(mdir, "cur", &fileno);
+    /* We parse "new" after "cur", so that any recent messages will have
+     * higher msgnos than any current messages. That ensures that the
+     * message tree saved by LibBalsaMailboxLocal is still valid, and
+     * that the new messages will be inserted correctly into the tree by
+     * libbalsa_mailbox_local_add_messages. */
     lbm_maildir_parse(mdir, "new", &fileno);
 }
 
@@ -816,6 +821,7 @@ libbalsa_mailbox_maildir_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 
         /* Reparse, to get the fileno entries right. */
         lbm_maildir_parse_subdirs(mdir);
+        mailbox->msg_tree_changed = TRUE;
 
         if (stat(mdir->tmpdir, &st) == 0)
             libbalsa_mailbox_set_mtime(mailbox, st.st_mtime);

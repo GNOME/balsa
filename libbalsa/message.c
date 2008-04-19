@@ -1116,15 +1116,15 @@ lbmsg_set_header(LibBalsaMessage *message, const gchar *name,
 	g_ascii_strcasecmp(name, "From") == 0) {
         message->headers->from = internet_address_parse_string(value);
     } else
-    if (g_ascii_strcasecmp(name, "To") == 0) {
-	g_return_val_if_fail(message->headers->to_list == NULL, FALSE);
+    if (message->headers->to_list == NULL &&
+        g_ascii_strcasecmp(name, "To") == 0) {
 	message->headers->to_list = internet_address_parse_string(value);
     } else
     if (g_ascii_strcasecmp(name, "In-Reply-To") == 0) {
 	libbalsa_message_set_in_reply_to_from_string(message, value);
     } else
-    if (g_ascii_strcasecmp(name, "Message-ID") == 0) {
-	g_return_val_if_fail(message->message_id==NULL, FALSE);
+    if (message->message_id == NULL &&
+        g_ascii_strcasecmp(name, "Message-ID") == 0) {
 	message->message_id = g_mime_utils_decode_message_id(value);
     } else
     if (g_ascii_strcasecmp(name, "References") == 0) {

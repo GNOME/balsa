@@ -1,3 +1,10 @@
+2008-04-19  Peter Bloomfield  <peter@t43>
+
+	reviewed by: <delete if not using a buddy>
+
+	* libbalsa/message.c: (lbmsg_set_header): scrap remaining
+	warnings.
+
 2008-04-12  Peter Bloomfield
 
 	* libbalsa/mailbox_maildir.c: (lbm_maildir_parse_subdirs,

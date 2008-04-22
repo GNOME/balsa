@@ -53,14 +53,14 @@
 #include <libbalsa.h>
 #include "html.h"
 
-#if !GLIB_CHECK_VERSION(2, 14, 0)
+#if !USE_GREGEX
 #  ifdef HAVE_PCRE
 #    include <pcreposix.h>
 #  else
 #    include <sys/types.h>
 #    include <regex.h>
 #  endif
-#endif                          /* GLIB_CHECK_VERSION(2, 14, 0) */
+#endif                          /* USE_GREGEX */
 
 #include "quote-color.h"
 
@@ -787,25 +787,25 @@ print_wrap_body(gchar * str, GnomeFont * font, gint width, gint tab_width)
 {
     gchar *ptr, *line = str;
     gchar *eol;
-#if GLIB_CHECK_VERSION(2, 14, 0)
+#if USE_GREGEX
     GRegex *rex = NULL;
-#else                           /* GLIB_CHECK_VERSION(2, 14, 0) */
+#else                           /* USE_GREGEX */
     regex_t rex;
-#endif                          /* GLIB_CHECK_VERSION(2, 14, 0) */
+#endif                          /* USE_GREGEX */
     gboolean checkQuote = balsa_app.print_highlight_cited;
     GList *wrappedLines = NULL;
     gdouble space_width = gnome_font_get_width_utf8(font, " ");
  
-#if GLIB_CHECK_VERSION(2, 14, 0)
+#if USE_GREGEX
     if (checkQuote && !(rex = balsa_quote_regex_new()))
         checkQuote = FALSE;
-#else                           /* GLIB_CHECK_VERSION(2, 14, 0) */
+#else                           /* USE_GREGEX */
     if (checkQuote)
 	if (regcomp(&rex, balsa_app.quote_regex, REG_EXTENDED) != 0) {
 	    g_warning("quote regex compilation failed.");
 	    checkQuote = FALSE;
 	}
-#endif                          /* GLIB_CHECK_VERSION(2, 14, 0) */
+#endif                          /* USE_GREGEX */
     
     g_strchomp(str);
     while (line) {
@@ -817,11 +817,11 @@ print_wrap_body(gchar * str, GnomeFont * font, gint width, gint tab_width)
 	if (eol)
 	    *eol = '\0';
 	ptr = line;
-#if GLIB_CHECK_VERSION(2, 14, 0)
+#if USE_GREGEX
 	lineInfo->quoteLevel = checkQuote ? is_a_quote(ptr, rex) : 0;
-#else                           /* GLIB_CHECK_VERSION(2, 14, 0) */
+#else                           /* USE_GREGEX */
 	lineInfo->quoteLevel = checkQuote ? is_a_quote(ptr, &rex) : 0;
-#endif                          /* GLIB_CHECK_VERSION(2, 14, 0) */
+#endif                          /* USE_GREGEX */
 	while (*ptr) {
 	    gint pos = 0;
 	    gint last_space = 0;
@@ -870,11 +870,11 @@ print_wrap_body(gchar * str, GnomeFont * font, gint width, gint tab_width)
     }
 
     if (checkQuote)
-#if GLIB_CHECK_VERSION(2, 14, 0)
+#if USE_GREGEX
         g_regex_unref(rex);
-#else                           /* GLIB_CHECK_VERSION(2, 14, 0) */
+#else                           /* USE_GREGEX */
 	regfree(&rex);
-#endif                          /* GLIB_CHECK_VERSION(2, 14, 0) */
+#endif                          /* USE_GREGEX */
 
     return g_list_reverse(wrappedLines);
 }

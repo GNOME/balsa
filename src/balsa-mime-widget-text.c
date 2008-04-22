@@ -127,11 +127,11 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
     size_t alloced;
     BalsaMimeWidget *mw;
     GtkTextBuffer *buffer;
-#if GLIB_CHECK_VERSION(2, 14, 0)
+#if USE_GREGEX
     GRegex *rex;
-#else                           /* GLIB_CHECK_VERSION(2, 14, 0) */
+#else                           /* USE_GREGEX */
     regex_t rex;
-#endif                          /* GLIB_CHECK_VERSION(2, 14, 0) */
+#endif                          /* USE_GREGEX */
     GList *url_list = NULL;
     const gchar *target_cs;
     GError *err = NULL;
@@ -236,16 +236,16 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
     gtk_text_buffer_create_tag(buffer, "soft", NULL, NULL);
     allocate_quote_colors(GTK_WIDGET(bm), balsa_app.quoted_color,
 			  0, MAX_QUOTED_COLOR - 1);
-#if GLIB_CHECK_VERSION(2, 14, 0)
+#if USE_GREGEX
     if (!(rex = balsa_quote_regex_new()))
 	gtk_text_buffer_insert_at_cursor(buffer, ptr, -1);
-#else                           /* GLIB_CHECK_VERSION(2, 14, 0) */
+#else                           /* USE_GREGEX */
     if (regcomp(&rex, balsa_app.quote_regex, REG_EXTENDED) != 0) {
 	g_warning
 	    ("part_info_init_mimetext: quote regex compilation failed.");
 	gtk_text_buffer_insert_at_cursor(buffer, ptr, -1);
     }
-#endif                          /* GLIB_CHECK_VERSION(2, 14, 0) */
+#endif                          /* USE_GREGEX */
     else {
 	gchar *line_start;
 	LibBalsaUrlInsertInfo url_info;
@@ -292,11 +292,11 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
 		guint cite_idx;
 
 		/* get the cite level only for text/plain parts */
-#if GLIB_CHECK_VERSION(2, 14, 0)
+#if USE_GREGEX
 		libbalsa_match_regex(this_line, rex, &quote_level, &cite_idx);
-#else                           /* GLIB_CHECK_VERSION(2, 14, 0) */
+#else                           /* USE_GREGEX */
 		libbalsa_match_regex(this_line, &rex, &quote_level, &cite_idx);
-#endif                          /* GLIB_CHECK_VERSION(2, 14, 0) */
+#endif                          /* USE_GREGEX */
 	    
 		/* check if the citation level changed */
 		if (cite_level != quote_level) {
@@ -358,11 +358,11 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
 	    g_signal_connect_after(G_OBJECT(mw->widget), "expose-event",
 				   G_CALLBACK(draw_cite_bars), cite_bars_list);
 	}
-#if GLIB_CHECK_VERSION(2, 14, 0)
+#if USE_GREGEX
 	g_regex_unref(rex);
-#else                           /* GLIB_CHECK_VERSION(2, 14, 0) */
+#else                           /* USE_GREGEX */
 	regfree(&rex);
-#endif                          /* GLIB_CHECK_VERSION(2, 14, 0) */
+#endif                          /* USE_GREGEX */
     }
 
     prepare_url_offsets(buffer, url_list);

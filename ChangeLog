@@ -1,6 +1,27 @@
-2008-04-19  Peter Bloomfield  <peter@t43>
+2008-04-21  Peter Bloomfield
 
-	reviewed by: <delete if not using a buddy>
+	* configure.in: implement --enable-gregex (default=no); change
+	default for --enable-pcre to no.
+	* libbalsa/filter-funcs.c: (libbalsa_condition_regex_free):
+	condition on USE_REGEX.
+	* libbalsa/filter-private.h: ditto.
+	* libbalsa/mime.c: (mark_urls, libbalsa_insert_with_url,
+	libbalsa_unwrap_selection): ditto.
+	* libbalsa/misc.h: ditto.
+	* src/balsa-app.c: ditto.
+	* src/balsa-app.h: ditto.
+	* src/balsa-mime-widget-text.c: (balsa_mime_widget_new_text):
+	ditto.
+	* src/balsa-print-object-text.c:
+	(balsa_print_object_text_plain): ditto.
+	* src/print.c: (print_wrap_body): ditto.
+	* src/quote-color.c: (is_a_quote): ditto.
+	* src/quote-color.h: ditto.
+	* src/sendmsg-window.c: (reflow_selected_cb): ditto.
+	* src/spell-check.c: (balsa_spell_check_start,
+	balsa_spell_check_destroy, next_word): ditto.
+
+2008-04-19  Peter Bloomfield
 
 	* libbalsa/message.c: (lbmsg_set_header): scrap remaining
 	warnings.

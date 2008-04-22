@@ -670,11 +670,11 @@ is_in_url(GtkTextIter * iter, gint offset, GtkTextTag * url_tag)
 static gboolean prescanner(const gchar * p);
 static void mark_urls(GtkTextBuffer * buffer, GtkTextIter * iter,
                       GtkTextTag * tag, const gchar * p);
-#if GLIB_CHECK_VERSION(2, 14, 0)
+#if USE_GREGEX
 static GRegex *get_url_reg(void);
-#else                           /* GLIB_CHECK_VERSION(2, 14, 0) */
+#else                           /* USE_GREGEX */
 static regex_t *get_url_reg(void);
-#endif                          /* GLIB_CHECK_VERSION(2, 14, 0) */
+#endif                          /* USE_GREGEX */
 
 void
 libbalsa_unwrap_buffer(GtkTextBuffer * buffer, GtkTextIter * iter,
@@ -782,7 +782,7 @@ mark_urls(GtkTextBuffer * buffer, GtkTextIter * iter, GtkTextTag * tag,
           const gchar * line)
 {
     const gchar *p = line;
-#if GLIB_CHECK_VERSION(2, 14, 0)
+#if USE_GREGEX
     GRegex *url_reg = get_url_reg();
     GMatchInfo *url_match;
     GtkTextIter start = *iter;
@@ -806,7 +806,7 @@ mark_urls(GtkTextBuffer * buffer, GtkTextIter * iter, GtkTextTag * tag,
             break;
     }
     g_match_info_free(url_match);
-#else                           /* GLIB_CHECK_VERSION(2, 14, 0) */
+#else                          /* USE_GREGEX */
     regex_t *url_reg = get_url_reg();
     regmatch_t url_match;
     GtkTextIter start = *iter;
@@ -823,7 +823,7 @@ mark_urls(GtkTextBuffer * buffer, GtkTextIter * iter, GtkTextTag * tag,
         if (!prescanner(p))
             break;
     }
-#endif                          /* GLIB_CHECK_VERSION(2, 14, 0) */
+#endif                          /* USE_GREGEX */
 }
 
 /* Prepare the buffer for sending with DelSp=Yes. */
@@ -898,7 +898,7 @@ prescanner(const gchar * s)
     return FALSE;
 }
 
-#if GLIB_CHECK_VERSION(2, 14, 0)
+#if USE_GREGEX
 struct url_regex_info {
     GRegex *url_reg;
     const gchar *str;
@@ -961,7 +961,7 @@ get_ml_flowed_url_reg(void)
 
     return get_url_helper(&info);
 }
-#else                           /* GLIB_CHECK_VERSION(2, 14, 0) */
+#else                           /* USE_GREGEX */
 static regex_t *
 get_url_reg(void)
 {
@@ -1019,7 +1019,7 @@ get_ml_flowed_url_reg(void)
     
     return url_reg;
 }
-#endif                          /* GLIB_CHECK_VERSION(2, 14, 0) */
+#endif                          /* USE_GREGEX */
 
 gboolean
 libbalsa_insert_with_url(GtkTextBuffer * buffer,
@@ -1070,7 +1070,7 @@ libbalsa_insert_with_url(GtkTextBuffer * buffer,
 
 	if (prescanner(p)) {
 	    gint offset = 0;
-#if GLIB_CHECK_VERSION(2, 14, 0)
+#if USE_GREGEX
             GRegex *url_reg = get_url_reg();
             GMatchInfo *url_match;
             gboolean match = g_regex_match(url_reg, p, 0, &url_match);
@@ -1183,7 +1183,7 @@ libbalsa_insert_with_url(GtkTextBuffer * buffer,
 		    match = FALSE;
 	    }
             g_match_info_free(url_match);
-#else                           /* GLIB_CHECK_VERSION(2, 14, 0) */
+#else                           /* USE_GREGEX */
 	    regex_t *url_reg = get_url_reg();
 	    regmatch_t url_match;
 	    gboolean match = regexec(url_reg, p, 1, &url_match, 0) == 0;
@@ -1287,7 +1287,7 @@ libbalsa_insert_with_url(GtkTextBuffer * buffer,
 		else
 		    match = FALSE;
 	    }
-#endif                          /* GLIB_CHECK_VERSION(2, 14, 0) */
+#endif                          /* USE_GREGEX */
 	}
     }
 
@@ -1299,11 +1299,11 @@ libbalsa_insert_with_url(GtkTextBuffer * buffer,
 }
 
 void
-#if GLIB_CHECK_VERSION(2, 14, 0)
+#if USE_GREGEX
 libbalsa_unwrap_selection(GtkTextBuffer * buffer, GRegex * rex)
-#else                           /* GLIB_CHECK_VERSION(2, 14, 0) */
+#else                           /* USE_GREGEX */
 libbalsa_unwrap_selection(GtkTextBuffer * buffer, regex_t * rex)
-#endif                          /* GLIB_CHECK_VERSION(2, 14, 0) */
+#endif                          /* USE_GREGEX */
 {
     GtkTextIter start, end;
     gchar *line;
@@ -1374,7 +1374,7 @@ libbalsa_unwrap_selection(GtkTextBuffer * buffer, regex_t * rex)
     }
 }
 
-#if GLIB_CHECK_VERSION(2, 14, 0)
+#if USE_GREGEX
 gboolean
 libbalsa_match_regex(const gchar * line, GRegex * rex, guint * count,
                      guint * index)
@@ -1401,7 +1401,7 @@ libbalsa_match_regex(const gchar * line, GRegex * rex, guint * count,
         *index = p - line;
     return c > 0;
 }
-#else                           /* GLIB_CHECK_VERSION(2, 14, 0) */
+#else                           /* USE_GREGEX */
 gboolean
 libbalsa_match_regex(const gchar * line, regex_t * rex, guint * count,
 		     guint * index)
@@ -1419,4 +1419,4 @@ libbalsa_match_regex(const gchar * line, regex_t * rex, guint * count,
 	*index = p - line;
     return c > 0;
 }
-#endif                          /* GLIB_CHECK_VERSION(2, 14, 0) */
+#endif                          /* USE_GREGEX */

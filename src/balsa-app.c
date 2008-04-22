@@ -886,7 +886,7 @@ balsa_find_index_by_mailbox(LibBalsaMailbox * mailbox)
     return NULL;
 }
 
-#if GLIB_CHECK_VERSION(2, 14, 0)
+#if USE_GREGEX
 GRegex *
 balsa_quote_regex_new(void)
 {
@@ -914,4 +914,4 @@ balsa_quote_regex_new(void)
 
     return g_regex_ref(regex);
 }
-#endif                          /* GLIB_CHECK_VERSION(2, 14, 0) */
+#endif                          /* USE_GREGEX */

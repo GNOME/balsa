@@ -31,21 +31,21 @@ extern "C" {
 #endif
 #include "config.h"
 
-#if !GLIB_CHECK_VERSION(2, 14, 0)
+#if !USE_GREGEX
 #  ifdef HAVE_PCRE
 #    include <pcreposix.h>
 #  else
 #    include <sys/types.h>
 #    include <regex.h>
 #  endif
-#endif                          /* GLIB_CHECK_VERSION(2, 14, 0) */
+#endif                          /* USE_GREGEX */
 
     extern void make_gradient(GdkColor colors[], gint, gint);
-#if GLIB_CHECK_VERSION(2, 14, 0)
+#if USE_GREGEX
     extern guint is_a_quote(const gchar *, GRegex * rex);
-#else                           /* GLIB_CHECK_VERSION(2, 14, 0) */
+#else                           /* USE_GREGEX */
     extern guint is_a_quote(const gchar *, regex_t * rex);
-#endif                          /* GLIB_CHECK_VERSION(2, 14, 0) */
+#endif                          /* USE_GREGEX */
     extern void allocate_quote_colors(GtkWidget *, GdkColor color[], gint, gint);
 
 

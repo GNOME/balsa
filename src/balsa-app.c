@@ -306,9 +306,9 @@ balsa_app_init(void)
 
     balsa_app.toolbar_wrap_button_text = TRUE;
     balsa_app.pwindow_option = WHILERETR;
-    balsa_app.wordwrap = TRUE;
+    balsa_app.wordwrap = FALSE; /* default to format=flowed. */
     balsa_app.wraplength = 72;
-    balsa_app.browse_wrap = TRUE;
+    balsa_app.browse_wrap = FALSE; /* GtkTextView will wrap for us. */
     balsa_app.browse_wrap_length = 79;
     balsa_app.shown_headers = HEADERS_SELECTED;
     balsa_app.show_all_headers = FALSE;

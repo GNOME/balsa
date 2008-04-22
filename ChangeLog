@@ -1,3 +1,10 @@
+2008-04-22  Pawel Salek
+
+	* src/balsa-app.c: format=flowed by default.
+	* libinit_balsa/assistant_page_user.[ch]: guess more stuff.
+	* libinit_balsa/assistant_init.c: we have new code already, keep
+	it silent.
+
 2008-04-21  Peter Bloomfield
 
 	* libbalsa/misc.h: if !USE_REGEX is enough.

@@ -46,22 +46,6 @@ static gboolean balsa_druid_page_user_next(GnomeDruidPage * page,
                                            GnomeDruid * druid,
                                            BalsaDruidPageUser * user);
 
-static void 
-srv_changed_cb(GtkEditable *incoming_srv, gpointer data)
-{
-    BalsaDruidPageUser * user = (BalsaDruidPageUser*)data;
-    const gchar *prev_name;
-
-    prev_name = g_object_get_data(G_OBJECT(incoming_srv), "prev-name");
-    if(!prev_name ||
-       strcmp(prev_name, 
-              gtk_entry_get_text(GTK_ENTRY(user->account_name))) == 0) {
-        const gchar *aname = gtk_entry_get_text(GTK_ENTRY(incoming_srv));
-        gtk_entry_set_text(GTK_ENTRY(user->account_name), aname);
-        g_object_set_data_full(G_OBJECT(incoming_srv), "prev-name",
-                               g_strdup(aname), g_free);
-    }
-}
 
 static void
 balsa_druid_page_user_init(BalsaDruidPageUser * user,
@@ -154,12 +138,7 @@ balsa_druid_page_user_init(BalsaDruidPageUser * user,
                                 _("_Remember your password:"),
                                remember_passwd, druid,
                                 &(user->remember_passwd));
-    balsa_init_add_table_entry(table, row, _("_Refer to this account as:"),
-                               "",
-                               NULL, druid, &(user->account_name));
     gtk_table_set_row_spacing(table, row++, 10);
-    g_signal_connect(user->incoming_srv, "changed",
-                     (GCallback)srv_changed_cb, user);
 #if !defined(ENABLE_TOUCH_UI)
     preset = g_strconcat(g_get_home_dir(), "/mail", NULL);
     balsa_init_add_table_entry(table, row++, _("_Local mail directory:"),
@@ -255,7 +234,7 @@ static gboolean
 balsa_druid_page_user_next(GnomeDruidPage * page, GnomeDruid * druid,
                            BalsaDruidPageUser * user)
 {
-    const gchar *host;
+    const gchar *host, *mailbox;
     gchar *uhoh;
     LibBalsaIdentity *ident;
 #if ENABLE_ESMTP
@@ -266,7 +245,6 @@ balsa_druid_page_user_next(GnomeDruidPage * page, GnomeDruid * druid,
     host = gtk_entry_get_text(GTK_ENTRY(user->incoming_srv));
     if(host && *host) {
         LibBalsaMailbox *mbx = NULL;
-        const gchar *name = gtk_entry_get_text(GTK_ENTRY(user->account_name));
         const gchar *login = gtk_entry_get_text(GTK_ENTRY(user->login));
         const gchar *passwd = gtk_entry_get_text(GTK_ENTRY(user->passwd));
         gboolean ssl = 
@@ -275,28 +253,32 @@ balsa_druid_page_user_next(GnomeDruidPage * page, GnomeDruid * druid,
             balsa_option_get_active(user->remember_passwd) == 0;
         switch(balsa_option_get_active(user->incoming_type)) {
         case 0: /* POP */
-            mbx = create_pop3_mbx(name, host, ssl, login, passwd, remember);
+            mbx = create_pop3_mbx(host, host, ssl, login, passwd, remember);
             if(mbx)
                 config_mailbox_add(mbx, NULL);
             break;
         case 1: /* IMAP */
-            create_imap_mbx(name, host, ssl, login, passwd, remember);
+            create_imap_mbx(host, host, ssl, login, passwd, remember);
             break; 
         default: /* hm */;
         }
     }
 
     /* identity */
+    mailbox = gtk_entry_get_text(GTK_ENTRY(user->email));
     if (balsa_app.identities == NULL) {
-        ident = LIBBALSA_IDENTITY(libbalsa_identity_new());
+	gchar *domain = strrchr(mailbox, '@');
+        ident = LIBBALSA_IDENTITY(libbalsa_identity_new_with_name
+				  (_("Default Identity")));
         balsa_app.identities = g_list_append(NULL, ident);
+	if(domain)
+	    libbalsa_identity_set_domain(ident, domain+1);
     } else {
         ident = balsa_app.current_ident;
     }
     internet_address_set_name(ident->ia,
                               gtk_entry_get_text(GTK_ENTRY(user->name)));
-    internet_address_set_addr(ident->ia,
-                              gtk_entry_get_text(GTK_ENTRY(user->email)));
+    internet_address_set_addr(ident->ia, mailbox);
 
     /* outgoing mail */
 #if ENABLE_ESMTP

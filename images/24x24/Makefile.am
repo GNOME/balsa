@@ -1,4 +1,25 @@
-extra_appicons_IMGS = $(wildcard balsa-*.png)
+extra_appicons_IMGS = \
+	balsa-crypt-check.png	\
+	balsa-encrypted.png	\
+	balsa-encrypt.png	\
+	balsa-mark-all.png	\
+	balsa-marked-new.png	\
+	balsa-next-flagged.png	\
+	balsa-next-part.png	\
+	balsa-next.png	\
+	balsa-next-unread.png	\
+	balsa-postpone.png	\
+	balsa-preview.png	\
+	balsa-previous-part.png	\
+	balsa-previous.png	\
+	balsa-reply-all.png	\
+	balsa-signature-bad.png	\
+	balsa-signature-good.png	\
+	balsa-signature-notrust.png	\
+	balsa-signature-unknown.png	\
+	balsa-sign.png	\
+	balsa-trash-empty.png
+
 
 EXTRA_DIST = $(extra_appicons_IMGS)
 

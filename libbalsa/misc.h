@@ -31,7 +31,7 @@
 #include <auth-client.h>
 #endif
 
-#if 1 || !USE_GREGEX
+#if !USE_GREGEX
 #  ifdef HAVE_PCRE
 #    include <pcreposix.h>
 #  else

@@ -1,5 +1,9 @@
 2008-04-21  Peter Bloomfield
 
+	* libbalsa/misc.h: if !USE_REGEX is enough.
+
+2008-04-21  Peter Bloomfield
+
 	* configure.in: implement --enable-gregex (default=no); change
 	default for --enable-pcre to no.
 	* libbalsa/filter-funcs.c: (libbalsa_condition_regex_free):

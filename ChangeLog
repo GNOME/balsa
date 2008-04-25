@@ -1,3 +1,7 @@
+2008-04-25  Pawel Salek
+
+	* libbalsa/mailbox_imap.c: create header even for empty parts.
+
 2008-04-25  Albrecht Dreß
 
 	* src/balsa-mime-widget-message.c: use URIs instead of paths.

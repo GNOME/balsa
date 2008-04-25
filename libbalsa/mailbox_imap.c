@@ -2369,7 +2369,7 @@ lbm_imap_get_msg_part_from_cache(LibBalsaMessage * msg,
                         _("Cannot create temporary file"));
             return FALSE;
         }
-        if(ifbo == IMFB_NONE) {
+        if(ifbo == IMFB_NONE || dt.body->octets == 0) {
             fprintf(fp,"MIME-version: 1.0\r\ncontent-type: %s\r\n"
                     "Content-Transfer-Encoding: %s\r\n\r\n",
                     part->content_type ? part->content_type : "text/plain",

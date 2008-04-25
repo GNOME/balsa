@@ -29,6 +29,7 @@
 #include <gmime/gmime.h>
 #include <gdk/gdk.h>
 
+#include "libbalsa-vfs.h"
 #include "config.h"
 
 #ifdef HAVE_GPGME
@@ -73,6 +74,7 @@ struct _LibBalsaMessageBody {
     const gchar *content_dsp;	/* content-disposition */ 
     const gchar *content_id;    /* content-id */
     gchar *filename;		/* holds filename for attachments and such (used mostly for sending) */
+    LibbalsaVfs * file_uri;     /* file uri for attachments (used for sending) */
     LibBalsaAttachMode attach_mode; /* attachment mode for sending */
     gchar *temp_filename;	/* Holds the filename of a the temporary file where this part is saved */
     gchar *charset;		/* the charset, used for sending, replying. */
@@ -103,11 +105,18 @@ gssize libbalsa_message_body_get_content(LibBalsaMessageBody * body,
 GdkPixbuf *libbalsa_message_body_get_pixbuf(LibBalsaMessageBody * body,
                                             GError ** err);
 
-gboolean libbalsa_message_body_save_fd(LibBalsaMessageBody * body, int fd,
-                                       gboolean filter_crlf, GError **err);
+gboolean libbalsa_message_body_save_stream(LibBalsaMessageBody * body,
+                                           GMimeStream * dest,
+                                           gboolean filter_crlf,
+                                           GError **err);
 gboolean libbalsa_message_body_save(LibBalsaMessageBody * body,
                                     const gchar * filename, mode_t mode,
                                     gboolean filter_crlf, GError **err);
+gboolean libbalsa_message_body_save_vfs(LibBalsaMessageBody * body,
+                                        LibbalsaVfs * dest,
+                                        mode_t mode,
+                                        gboolean filter_crlf,
+                                        GError **err);
 gboolean libbalsa_message_body_save_temporary(LibBalsaMessageBody * body,
                                               GError **err);
 

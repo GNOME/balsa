@@ -402,8 +402,8 @@ libbalsa_message_queue(LibBalsaMessage * message, LibBalsaMailbox * outbox,
     guint big_message;
 #endif /* ESMTP */
     gboolean rc;
-    GError *err = NULL;
 
+    g_assert(error != NULL);
     g_return_val_if_fail(message, LIBBALSA_MESSAGE_CREATE_ERROR);
 
     if ((result = libbalsa_create_msg(message, flow, error)) !=
@@ -441,24 +441,17 @@ libbalsa_message_queue(LibBalsaMessage * message, LibBalsaMailbox * outbox,
             }
             if (rc) {
                 message->mime_msg = mime_msgs[i];
-                rc = libbalsa_message_copy(message, outbox, &err);
+                rc = libbalsa_message_copy(message, outbox, error);
             }
             g_object_unref(mime_msgs[i]);
         }
         g_free(mime_msgs);
         message->mime_msg = mime_msg;
     } else
-        rc = libbalsa_message_copy(message, outbox, &err);
+        rc = libbalsa_message_copy(message, outbox, error);
 #else                           /* ESMTP */
-    rc = libbalsa_message_copy(message, outbox, &err);
+    rc = libbalsa_message_copy(message, outbox, error);
 #endif                          /* ESMTP */
-
-    if (!rc) {
-        libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-                             _("Copying message to outbox failed: %s"),
-                             err ? err->message : "?");
-        g_clear_error(&err);
-    }
 
     return rc ?  LIBBALSA_MESSAGE_CREATE_OK : LIBBALSA_MESSAGE_QUEUE_ERROR;
 }
@@ -1617,11 +1610,11 @@ libbalsa_message_create_mime_message(LibBalsaMessage* message, gboolean flow,
 	GMimeObject *mime_part;
 	mime_part=NULL;
 
-	if (body->filename) {
+	if (body->file_uri || body->filename) {
 	    if (body->content_type) {
 		mime_type = parse_content_type(body->content_type);
 	    } else {
-		gchar* mt = libbalsa_lookup_mime_type(body->filename);
+                gchar * mt = g_strdup(libbalsa_vfs_get_mime_type(body->file_uri));
 		mime_type = g_strsplit(mt,"/", 2);
 		g_free(mt);
 	    }
@@ -1633,7 +1626,7 @@ libbalsa_message_create_mime_message(LibBalsaMessage* message, gboolean flow,
 		g_mime_object_set_content_type(mime_part, content_type);
 		g_mime_part_set_encoding(GMIME_PART(mime_part),
 			                 GMIME_PART_ENCODING_7BIT);
-		if(!strncmp( body->filename, "URL", 3 )) {
+		if (body->filename && !strncmp(body->filename, "URL", 3)) {
 		    g_mime_object_set_content_type_parameter(mime_part,
 					     "access-type", "URL");
 		    g_mime_object_set_content_type_parameter(mime_part,
@@ -1642,18 +1635,32 @@ libbalsa_message_create_mime_message(LibBalsaMessage* message, gboolean flow,
 		    g_mime_object_set_content_type_parameter(mime_part,
 					     "access-type", "local-file");
 		    g_mime_object_set_content_type_parameter(mime_part,
-					     "name", body->filename);
+                                             "name", libbalsa_vfs_get_uri_utf8(body->file_uri));
 		}
 		lbs_set_content(GMIME_PART(mime_part),
                                 "Note: this is _not_ the real body!\n");
 	    } else if (g_ascii_strcasecmp(mime_type[0], "message") == 0) {
-		int fd;
 		GMimeStream *stream;
 		GMimeParser *parser;
 		GMimeMessage *mime_message;
+		GError *err = NULL;
 
-		fd = open(body->filename, O_RDONLY);
-		stream = g_mime_stream_fs_new(fd);
+		stream = libbalsa_vfs_create_stream(body->file_uri, 0, FALSE, &err);
+		if(!stream) {
+		    if(err) {
+			gchar *msg = 
+			    err->message
+			    ? g_strdup_printf(_("Cannot read %s: %s"),
+					      libbalsa_vfs_get_uri_utf8(body->file_uri),
+					      err->message)
+			    : g_strdup_printf(_("Cannot read %s"),
+					      libbalsa_vfs_get_uri_utf8(body->file_uri));
+			g_set_error(error, err->domain, err->code, msg);
+			g_clear_error(&err);
+			g_free(msg);
+		    }
+		    return LIBBALSA_MESSAGE_CREATE_ERROR;
+		}
 		parser = g_mime_parser_new_with_stream(stream);
 		g_object_unref(stream);
 		mime_message = g_mime_parser_construct_message(parser);
@@ -1666,12 +1673,11 @@ libbalsa_message_create_mime_message(LibBalsaMessage* message, gboolean flow,
 		const gchar *charset = NULL;
 		GMimeStream *stream;
 		GMimeDataWrapper *content;
-		int fd;
-		gchar *utf8name;
+		GError *err = NULL;
 
 		if (!strcasecmp(mime_type[0], "text")
 		    && !(charset = body->charset)) {
-		    charset = libbalsa_file_get_charset(body->filename);
+		    charset = libbalsa_vfs_get_charset(body->file_uri);
 		    if (!charset) {
 			static const gchar default_type[] =
 			    "application/octet-stream";
@@ -1680,7 +1686,8 @@ libbalsa_message_create_mime_message(LibBalsaMessage* message, gboolean flow,
 					     _("Cannot determine charset "
 					       "for text file `%s'; "
 					       "sending as mime type `%s'"),
-					     body->filename, default_type);
+					     libbalsa_vfs_get_uri_utf8(body->file_uri),
+                                             default_type);
 			g_strfreev(mime_type);
 			mime_type = g_strsplit(default_type, "/", 2);
 		    }
@@ -1705,14 +1712,25 @@ libbalsa_message_create_mime_message(LibBalsaMessage* message, gboolean flow,
 							     charset);
 		}
 
-		tmp = g_path_get_basename(body->filename);
-		utf8name = g_filename_to_utf8(tmp, -1, NULL, NULL, NULL);
-		g_free(tmp);
-		g_mime_part_set_filename(GMIME_PART(mime_part), utf8name);
-		g_free(utf8name);
-
-		fd = open(body->filename, O_RDONLY);
-		stream = g_mime_stream_fs_new(fd);
+		g_mime_part_set_filename(GMIME_PART(mime_part),
+                                         libbalsa_vfs_get_basename_utf8(body->file_uri));
+		stream = libbalsa_vfs_create_stream(body->file_uri, 0, FALSE, &err);
+		if(!stream) {
+		    if(err) {
+			gchar *msg = 
+			    err->message
+			    ? g_strdup_printf(_("Cannot read %s: %s"),
+					      libbalsa_vfs_get_uri_utf8(body->file_uri),
+					      err->message)
+			    : g_strdup_printf(_("Cannot read %s"),
+					      libbalsa_vfs_get_uri_utf8(body->file_uri));
+			g_set_error(error, err->domain, err->code, msg);
+			g_clear_error(&err);
+			g_free(msg);
+		    }
+		    g_object_unref(G_OBJECT(mime_part));
+		    return LIBBALSA_MESSAGE_CREATE_ERROR;
+		}
 		content = g_mime_data_wrapper_new_with_stream(stream,
 			GMIME_PART_ENCODING_DEFAULT);
 		g_object_unref(stream);
@@ -1858,16 +1876,12 @@ gboolean
 libbalsa_message_postpone(LibBalsaMessage * message,
                           LibBalsaMailbox * draftbox,
                           LibBalsaMessage * reply_message,
-			  gchar ** extra_headers, gboolean flow)
+			  gchar ** extra_headers, gboolean flow,
+			  GError **error)
 {
-    gboolean retval;
-    GError *err = NULL;
-
-    /* in postpone mode no crypto operation is triggered, so we don't need to
-       pass the error */
     if (!message->mime_msg
         && libbalsa_message_create_mime_message(message, flow,
-                                                TRUE, NULL) !=
+                                                TRUE, error) !=
         LIBBALSA_MESSAGE_CREATE_OK)
         return FALSE;
 
@@ -1879,16 +1893,7 @@ libbalsa_message_postpone(LibBalsaMessage * message,
 				      extra_headers[i + 1]);
     }
 
-    retval = libbalsa_message_copy(message, draftbox, &err);
-
-    if (!retval) {
-        libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-                             _("Postponing message failed: %s"),
-                             err ? err->message : "?");
-        g_clear_error(&err);
-    }
-
-    return retval;
+    return libbalsa_message_copy(message, draftbox, error);
 }
 
 

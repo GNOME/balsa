@@ -30,6 +30,7 @@
 #include <fcntl.h>
 
 #include "libbalsa.h"
+#include "libbalsa-vfs.h"
 #include "misc.h"
 #include <glib/gi18n.h>
 
@@ -45,6 +46,7 @@ libbalsa_message_body_new(LibBalsaMessage * message)
     body->embhdrs = NULL;
     body->content_type = NULL;
     body->filename = NULL;
+    body->file_uri = NULL;
     body->temp_filename = NULL;
     body->charset = NULL;
 
@@ -72,7 +74,8 @@ libbalsa_message_body_free(LibBalsaMessageBody * body)
     libbalsa_message_headers_destroy(body->embhdrs);
     g_free(body->content_type);
     g_free(body->filename);
-
+    if (body->file_uri)
+        g_object_unref(body->file_uri);
     if (body->temp_filename)
 	unlink(body->temp_filename);
     g_free(body->temp_filename);
@@ -322,8 +325,18 @@ libbalsa_message_body_save_temporary(LibBalsaMessageBody * body, GError **err)
 		body->temp_filename = tmp_file_name;
 	    fd = open(body->temp_filename, O_WRONLY | O_EXCL | O_CREAT,
                       LIBBALSA_MESSAGE_BODY_SAFE);
-	    if (fd >= 0)
-		return libbalsa_message_body_save_fd(body, fd, FALSE, err);
+	    if (fd >= 0) {
+                GMimeStream *tmp_stream;
+
+                if ((tmp_stream = g_mime_stream_fs_new(fd)) != NULL)
+                    return libbalsa_message_body_save_stream(body, tmp_stream, FALSE, err);
+                else {
+                    g_set_error(err, LIBBALSA_ERROR_QUARK, 1,
+                                _("Failed to create output stream"));
+                    close(fd);
+                    return FALSE;
+                }
+            }
 	} while (errno == EEXIST && --count > 0);
 
 	/* Either we hit a real error, or we used up 100 attempts. */
@@ -356,15 +369,41 @@ libbalsa_message_body_save(LibBalsaMessageBody * body,
 {
     int fd;
     int flags = O_CREAT | O_EXCL | O_WRONLY;
+    GMimeStream *out_stream;
 
 #ifdef O_NOFOLLOW
     flags |= O_NOFOLLOW;
 #endif
 
-    if ((fd=libbalsa_safe_open(filename, flags, mode)) < 0)
+    if ((fd = libbalsa_safe_open(filename, flags, mode, err)) < 0)
 	return FALSE;
-    return libbalsa_message_body_save_fd(body, fd, filter_crlf, err);
+
+    if ((out_stream = g_mime_stream_fs_new(fd)) != NULL)
+        return libbalsa_message_body_save_stream(body, out_stream,
+                                                 filter_crlf, err);
+
+    /* could not create stream */
+    g_set_error(err, LIBBALSA_ERROR_QUARK, 1,
+                _("Failed to create output stream"));
+    close(fd);
+    return FALSE;
 }
+
+
+gboolean
+libbalsa_message_body_save_vfs(LibBalsaMessageBody * body,
+                               LibbalsaVfs * dest, mode_t mode,
+                               gboolean filter_crlf,
+                               GError **err)
+{
+    GMimeStream * out_stream;
+    
+    if (!(out_stream = libbalsa_vfs_create_stream(dest, mode, TRUE, err)))
+        return FALSE;
+
+    return libbalsa_message_body_save_stream(body, out_stream, filter_crlf, err);
+}
+
 
 static GMimeStream *
 libbalsa_message_body_stream_add_filter(GMimeStream * stream,
@@ -568,17 +607,17 @@ libbalsa_message_body_get_pixbuf(LibBalsaMessageBody * body, GError ** err)
 }
 
 gboolean
-libbalsa_message_body_save_fd(LibBalsaMessageBody * body, int fd,
-                              gboolean filter_crlf, GError ** err)
+libbalsa_message_body_save_stream(LibBalsaMessageBody * body,
+                                  GMimeStream * dest, gboolean filter_crlf,
+                                  GError ** err)
 {
-    GMimeStream *stream, *stream_fs;
+    GMimeStream *stream;
     ssize_t len;
 
     stream = libbalsa_message_body_get_stream(body, err);
     if (!body->mime_part)
         return FALSE;
 
-    stream_fs = g_mime_stream_fs_new(fd);
     libbalsa_mailbox_lock_store(body->message->mailbox);
 
     if (stream) {
@@ -600,7 +639,7 @@ libbalsa_message_body_save_fd(LibBalsaMessageBody * body, int fd,
             g_object_unref(filter);
         }
 
-        len = g_mime_stream_write_to_stream(stream, stream_fs);
+        len = g_mime_stream_write_to_stream(stream, dest);
         g_object_unref(stream);
     } else {
         /* body->mime_part is not a GMimePart. */
@@ -612,11 +651,11 @@ libbalsa_message_body_save_fd(LibBalsaMessageBody * body, int fd,
             mime_part =
                 GMIME_OBJECT(GMIME_MESSAGE_PART(mime_part)->message);
 
-        len = g_mime_object_write_to_stream(mime_part, stream_fs);
+        len = g_mime_object_write_to_stream(mime_part, dest);
     }
 
     libbalsa_mailbox_unlock_store(body->message->mailbox);
-    g_object_unref(stream_fs);
+    g_object_unref(dest);
 
     return len >= 0;
 }

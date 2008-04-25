@@ -31,10 +31,20 @@ enum _BalsaInformationShow {
     BALSA_INFORMATION_SHOW_STDERR,
 };
 
-void balsa_information(LibBalsaInformationType type, const char *fmt, ...);
+void balsa_information(LibBalsaInformationType type, const char *fmt, ...)
+#ifdef __GNUC__
+    __attribute__ ((format (printf, 2, 3)))
+#endif
+;
+
 void balsa_information_parented(GtkWindow *widget,
                                 LibBalsaInformationType type, 
-                                const char *fmt, ...);
+                                const char *fmt, ...)
+#ifdef __GNUC__
+    __attribute__ ((format (printf, 3, 4)));
+#endif
+;
+
 void balsa_information_real(GtkWindow *parent, LibBalsaInformationType type,
                             const char *msg);
 

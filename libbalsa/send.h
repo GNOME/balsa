@@ -39,6 +39,14 @@ enum _LibBalsaMsgCreateResult {
     LIBBALSA_MESSAGE_SERVER_ERROR
 };
 
+gboolean libbalsa_message_postpone(LibBalsaMessage * message,
+				   LibBalsaMailbox * draftbox,
+				   LibBalsaMessage * reply_message,
+				   gchar ** extra_headers,
+				   gboolean flow, 
+				   GError **error);
+
+
 #if ENABLE_ESMTP
 #include <libesmtp.h>
 

@@ -34,6 +34,7 @@
 #include <libgnomevfs/gnome-vfs-uri.h>
 #include <libgnomevfs/gnome-vfs-mime-handlers.h>
 #include <glib/gi18n.h>
+#include <glib/gstdio.h>
 #include <ctype.h>
 #include <glib.h>
 
@@ -41,7 +42,6 @@
 #include <locale.h>
 #endif
 
-#include <sys/stat.h>		/* for check_if_regular_file() */
 #include <sys/wait.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -114,7 +114,6 @@ static void include_message_cb (GtkAction * action, BalsaSendmsg * bsmsg);
 
 static void close_window_cb    (GtkAction * action, gpointer data);
 
-static gchar* check_if_regular_file(const gchar *);
 static void balsa_sendmsg_destroy_handler(BalsaSendmsg * bsmsg);
 static void check_readiness(BalsaSendmsg * bsmsg);
 static void init_menus(BalsaSendmsg *);
@@ -667,7 +666,8 @@ struct _BalsaAttachInfo {
     BalsaSendmsg *bm;                 /* send message back reference */
 
     GtkWidget *popup_menu;            /* popup menu */
-    gchar *filename;                  /* file name of the attachment */
+    LibbalsaVfs *file_uri;            /* file uri of the attachment */
+    gchar *uri_ref;                   /* external body URI reference */
     gchar *force_mime_type;           /* force using this particular mime type */
     gchar *charset;                   /* forced character set */
     gboolean delete_on_destroy;       /* destroy the file when not used any more */
@@ -735,7 +735,7 @@ balsa_attach_info_init(GObject *object, gpointer data)
     BalsaAttachInfo * info = BALSA_ATTACH_INFO(object);
     
     info->popup_menu = NULL;
-    info->filename = NULL;
+    info->file_uri = NULL;
     info->force_mime_type = NULL;
     info->charset = NULL;
     info->delete_on_destroy = FALSE;
@@ -763,24 +763,32 @@ balsa_attach_info_destroy(GObject * object)
     info = BALSA_ATTACH_INFO(object);
 
     /* unlink the file if necessary */
-    if (info->delete_on_destroy) {
-	char *last_slash = strrchr(info->filename, '/');
+    if (info->delete_on_destroy && info->file_uri) {
+        gchar * folder_name;
 
+        /* unlink the file */
 	if (balsa_app.debug)
 	    fprintf (stderr, "%s:%s: unlink `%s'\n", __FILE__, __FUNCTION__,
-		     info->filename);
-	unlink(info->filename);
-	*last_slash = 0;
-	if (balsa_app.debug)
-	    fprintf (stderr, "%s:%s: rmdir `%s'\n", __FILE__, __FUNCTION__,
-		     info->filename);
-	rmdir(info->filename);
+		     libbalsa_vfs_get_uri_utf8(info->file_uri));
+	libbalsa_vfs_file_unlink(info->file_uri, NULL);
+
+        /* remove the folder if possible */
+        folder_name = g_filename_from_uri(libbalsa_vfs_get_folder(info->file_uri),
+                                          NULL, NULL);
+        if (folder_name) {
+            if (balsa_app.debug)
+                fprintf (stderr, "%s:%s: rmdir `%s'\n", __FILE__, __FUNCTION__,
+                         folder_name);
+            g_rmdir(folder_name);
+            g_free(folder_name);
+        }
     }
 
     /* clean up memory */
     if (info->popup_menu)
         gtk_widget_destroy(info->popup_menu);
-    g_free(info->filename);
+    if (info->file_uri)
+        g_object_unref(G_OBJECT(info->file_uri));
     g_free(info->force_mime_type);
     g_free(info->charset);
     libbalsa_message_headers_destroy(info->headers);
@@ -1702,14 +1710,9 @@ change_attach_mode(GtkWidget * menu_item, BalsaAttachInfo *info)
     /* verify that the user *really* wants to attach as reference */
     if (info->mode != new_mode && new_mode == LIBBALSA_ATTACH_AS_EXTBODY) {
 	GtkWidget *extbody_dialog, *parent;
-	gchar *utf8name;
-	GError *err = NULL;
 	gint result;
 
 	parent = gtk_widget_get_ancestor(menu_item, GNOME_TYPE_APP);
-	utf8name = g_filename_to_utf8(info->filename, -1, NULL, NULL, &err);
-	if (err)
-	    g_error_free(err);
 	extbody_dialog =
 	    gtk_message_dialog_new(GTK_WINDOW(parent),
 				   GTK_DIALOG_DESTROY_WITH_PARENT,
@@ -1723,8 +1726,7 @@ change_attach_mode(GtkWidget * menu_item, BalsaAttachInfo *info)
 				     "`real' file.\n\n"
 				     "Do you really want to attach "
 				     "this file as reference?"),
-				   utf8name);
-	g_free(utf8name);
+				   libbalsa_vfs_get_uri_utf8(info->file_uri));
 	gtk_window_set_title(GTK_WINDOW(extbody_dialog),
 			     _("Attach as Reference?"));
 	result = gtk_dialog_run(GTK_DIALOG(extbody_dialog));
@@ -1763,7 +1765,7 @@ attachment_menu_vfs_cb(GtkWidget * menu_item, BalsaAttachInfo * info)
 #endif /* HAVE_GNOME_VFS29 */
         if (app) {
 #if HAVE_GNOME_VFS29
-            gchar *uri = g_strconcat("file://", info->filename, NULL);
+            gchar *uri = g_strdup(libbalsa_vfs_get_uri(info->file_uri));
             GList *uris = g_list_prepend(NULL, uri);
             gnome_vfs_mime_application_launch(app, uris);
             g_free(uri);
@@ -1793,15 +1795,18 @@ static void
 on_open_url_cb(GtkWidget * menu_item, BalsaAttachInfo * info)
 {
     GError *err = NULL;
+    const gchar * uri;
 
     g_return_if_fail(info != NULL);
+    uri = libbalsa_vfs_get_uri(info->file_uri);
+    g_return_if_fail(uri != NULL);
 
-    g_message("open URL %s", info->filename + 4);
-    //    gnome_url_show(info->filename + 4, &err);
+    g_message("open URL %s", uri);
+    gnome_url_show(uri, &err);
     if (err) {
         balsa_information(LIBBALSA_INFORMATION_WARNING,
 			  _("Error showing %s: %s\n"),
-			  info->filename + 4, err->message);
+			  uri, err->message);
         g_error_free(err);
     }
 }
@@ -1917,10 +1922,11 @@ sw_set_charset(BalsaSendmsg * bsmsg, const gchar * filename,
         charset = info->std;
         if (info->win && (attr & LIBBALSA_TEXT_HI_CTRL)) {
             charset = info->win;
-            libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-                                 _("Character set for file %s changed "
-                                   "from \"%s\" to \"%s\"."), filename,
-                                 info->std, info->win);
+            balsa_information_parented(GTK_WINDOW(bsmsg->window),
+                                       LIBBALSA_INFORMATION_WARNING,
+                                       _("Character set for file %s changed "
+                                         "from \"%s\" to \"%s\"."), filename,
+                                       info->std, info->win);
         }
     }
     *attach_charset = g_strdup(charset);
@@ -1981,38 +1987,46 @@ get_fwd_mail_headers(const gchar *mailfile)
 
 
 /* add_attachment:
-   adds given filename to the list.
-   takes over the ownership of filename.
+   adds given filename (uri format) to the list.
 */
 gboolean
-add_attachment(BalsaSendmsg * bsmsg, gchar *filename, 
+add_attachment(BalsaSendmsg * bsmsg, const gchar *filename, 
                gboolean is_a_temp_file, const gchar *forced_mime_type)
 {
+    LibbalsaVfs * file_uri;
     GtkTreeModel *model;
     GtkTreeIter iter;
     BalsaAttachInfo *attach_data;
     gboolean can_inline, is_fwd_message;
     gchar *content_type = NULL;
-    gchar *err_bsmsg;
     gchar *utf8name;
     GError *err = NULL;
     GdkPixbuf *pixbuf;
     GtkWidget *menu_item;
-    struct stat attach_stat;
 
     if (balsa_app.debug)
 	fprintf(stderr, "Trying to attach '%s'\n", filename);
-    if ( (err_bsmsg=check_if_regular_file(filename)) != NULL) {
-        balsa_information(LIBBALSA_INFORMATION_ERROR, "%s", err_bsmsg);
-	g_free(err_bsmsg);
-	g_free(filename);
+    if (!(file_uri = libbalsa_vfs_new_from_uri(filename))) {
+        balsa_information_parented(GTK_WINDOW(bsmsg->window),
+                                   LIBBALSA_INFORMATION_ERROR,
+                                   _("Cannot create file URI object for %s"),
+                                   filename);
+        return FALSE;
+    }
+    if (!libbalsa_vfs_is_regular_file(file_uri, &err)) {
+        balsa_information_parented(GTK_WINDOW(bsmsg->window),
+                                   LIBBALSA_INFORMATION_ERROR,
+                                   "%s: %s", filename,
+                                   err && err->message ? err->message : _("unknown error"));
+	g_error_free(err);
+	g_object_unref(file_uri);
 	return FALSE;
     }
 
 #if defined(ENABLE_TOUCH_UI)
     if(!bsmsg_check_format_compatibility(GTK_WINDOW(bsmsg->window),
 		                         filename)) {
-	g_free(filename);
+	g_object_unref(file_uri);
         return FALSE;
     }
 #endif /* ENABLE_TOUCH_UI */
@@ -2023,7 +2037,7 @@ add_attachment(BalsaSendmsg * bsmsg, gchar *filename,
     if (is_fwd_message)
 	content_type = g_strdup(forced_mime_type);
     pixbuf = 
-	libbalsa_icon_finder(forced_mime_type, filename, &content_type,
+	libbalsa_icon_finder(forced_mime_type, file_uri, &content_type,
 			     GTK_ICON_SIZE_LARGE_TOOLBAR);
     if (!content_type)
 	/* Last ditch. */
@@ -2038,7 +2052,6 @@ add_attachment(BalsaSendmsg * bsmsg, gchar *filename,
 			    &change_type, &attach_data->charset)) {
 	    g_free(content_type);
 	    g_object_unref(attach_data);
-	    g_free(filename);
 	    return FALSE;
 	}
 	if (change_type) {
@@ -2062,32 +2075,20 @@ add_attachment(BalsaSendmsg * bsmsg, gchar *filename,
 	    g_free(tmp);
 	}
     } else {
+        const gchar *uri_utf8 = libbalsa_vfs_get_uri_utf8(file_uri);
 	const gchar *home = g_getenv("HOME");
 
-	if (home && !strncmp(filename, home, strlen(home))) {
-	    utf8name = g_filename_to_utf8(filename + strlen(home) - 1, -1,
-					  NULL, NULL, &err);
-	    if (utf8name)
-		*utf8name = '~';
+	if (home && !strncmp(uri_utf8, "file://", 7) &&
+            !strncmp(uri_utf8 + 7, home, strlen(home))) {
+	    utf8name = g_strdup_printf("~%s", uri_utf8 + 7 + strlen(home));
 	} else
-	    utf8name = g_filename_to_utf8(filename, -1, NULL, NULL, &err);
-
-	if (err) {
-	    balsa_information(LIBBALSA_INFORMATION_WARNING,
-			      _("Error converting \"%s\" to UTF-8: %s\n"),
-			      filename, err->message);
-	    g_error_free(err);
-	}
+	    utf8name = g_strdup(uri_utf8);
     }
 
-    /* determine the size of the attachment */
-    if (stat(filename, &attach_stat) == -1)
-	attach_stat.st_size = 0;
-    
     model = BALSA_MSG_ATTACH_MODEL(bsmsg);
     gtk_list_store_append(GTK_LIST_STORE(model), &iter);
     
-    attach_data->filename = filename;
+    attach_data->file_uri = file_uri;
     attach_data->force_mime_type = g_strdup(forced_mime_type);
     
     attach_data->delete_on_destroy = is_a_temp_file;
@@ -2166,7 +2167,7 @@ add_attachment(BalsaSendmsg * bsmsg, gchar *filename,
 		       ATTACH_ICON_COLUMN, pixbuf,
 		       ATTACH_TYPE_COLUMN, content_type,
 		       ATTACH_MODE_COLUMN, attach_data->mode,
-		       ATTACH_SIZE_COLUMN, (gfloat) attach_stat.st_size,
+		       ATTACH_SIZE_COLUMN, (gfloat) libbalsa_vfs_get_size(file_uri),
 		       ATTACH_DESC_COLUMN, utf8name,
 		       -1);
     g_object_unref(attach_data);
@@ -2207,7 +2208,7 @@ add_urlref_attachment(BalsaSendmsg * bsmsg, gchar *url)
     model = BALSA_MSG_ATTACH_MODEL(bsmsg);
     gtk_list_store_append(GTK_LIST_STORE(model), &iter);
     
-    attach_data->filename = g_strconcat("URL:", url, NULL);
+    attach_data->uri_ref = g_strconcat("URL:", url, NULL);
     attach_data->force_mime_type = g_strdup("message/external-body");
     attach_data->delete_on_destroy = FALSE;
     attach_data->mode = LIBBALSA_ATTACH_AS_EXTBODY;
@@ -2241,7 +2242,7 @@ add_urlref_attachment(BalsaSendmsg * bsmsg, gchar *url)
 		       ATTACH_ICON_COLUMN, pixbuf,
 		       ATTACH_TYPE_COLUMN, _("(URL)"),
 		       ATTACH_MODE_COLUMN, attach_data->mode,
-		       ATTACH_SIZE_COLUMN, 0,
+		       ATTACH_SIZE_COLUMN, (gfloat) 0.0,
 		       ATTACH_DESC_COLUMN, url,
 		       -1);
     g_object_unref(attach_data);
@@ -2251,26 +2252,6 @@ add_urlref_attachment(BalsaSendmsg * bsmsg, gchar *url)
     show_attachment_widget(bsmsg);
 
     return TRUE;
-}
-
-static gchar* 
-check_if_regular_file(const gchar * filename)
-{
-    struct stat s;
-    gchar *ptr = NULL;
-
-    if (stat(filename, &s))
-	ptr = g_strdup_printf(_("Cannot get info on file '%s': %s"),
-			      filename, strerror(errno));
-    else if (!S_ISREG(s.st_mode))
-	ptr =
-	    g_strdup_printf(
-		_("Attachment %s is not a regular file."), filename);
-    else if(access(filename, R_OK) != 0) {
-	ptr =
-	    g_strdup_printf(_("File %s cannot be read\n"), filename);
-    }
-    return ptr;
 }
 
 /* attach_dialog_ok:
@@ -2294,16 +2275,17 @@ attach_dialog_response(GtkWidget * dialog, gint response,
     }
 
     fc = GTK_FILE_CHOOSER(dialog);
-    files = gtk_file_chooser_get_filenames(fc);
-    for (list = files; list; list = list->next)
+    files = gtk_file_chooser_get_uris(fc);
+    for (list = files; list; list = list->next) {
         if(!add_attachment(bsmsg, list->data, FALSE, NULL))
 	    res++;
+        g_free(list->data);
+    }
 
-    /* add_attachment takes ownership of the filenames. */
     g_slist_free(files);
     
     g_free(balsa_app.attach_dir);
-    balsa_app.attach_dir = gtk_file_chooser_get_current_folder(fc);
+    balsa_app.attach_dir = gtk_file_chooser_get_current_folder_uri(fc);
 
     if (res == 0)
         gtk_widget_destroy(dialog);
@@ -2321,12 +2303,14 @@ sw_attach_dialog(BalsaSendmsg * bsmsg)
                                     GTK_FILE_CHOOSER_ACTION_OPEN,
                                     GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                                     GTK_STOCK_OK, GTK_RESPONSE_OK, NULL);
+    gtk_file_chooser_set_local_only(GTK_FILE_CHOOSER(fsw),
+                                    libbalsa_vfs_local_only());
     gtk_window_set_destroy_with_parent(GTK_WINDOW(fsw), TRUE);
 
     fc = GTK_FILE_CHOOSER(fsw);
     gtk_file_chooser_set_select_multiple(fc, TRUE);
     if (balsa_app.attach_dir)
-	gtk_file_chooser_set_current_folder(fc, balsa_app.attach_dir);
+	gtk_file_chooser_set_current_folder_uri(fc, balsa_app.attach_dir);
 
     g_signal_connect(G_OBJECT(fc), "response",
 		     G_CALLBACK(attach_dialog_response), bsmsg);
@@ -2360,8 +2344,10 @@ attach_message(BalsaSendmsg *bsmsg, LibBalsaMessage *message)
         g_free(name);
         return FALSE;
     }
-    add_attachment(bsmsg, name,
-		   TRUE, "message/rfc822");
+    tmp_file_name = g_filename_to_uri(name, NULL, NULL);
+    g_free(name);
+    add_attachment(bsmsg, tmp_file_name, TRUE, "message/rfc822");
+    g_free(tmp_file_name);
     return TRUE;
 }
 
@@ -2408,9 +2394,10 @@ attach_message_cb(GtkAction * action, BalsaSendmsg *bsmsg)
 	    LibBalsaMessage *message = node->data;
 
 	    if(!attach_message(bsmsg, message)) {
-                libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-                                     _("Attaching message failed.\n"
-                                       "Possible reason: not enough temporary space"));
+                balsa_information_parented(GTK_WINDOW(bsmsg->window),
+                                           LIBBALSA_INFORMATION_WARNING,
+                                           _("Attaching message failed.\n"
+                                             "Possible reason: not enough temporary space"));
                 break;
             }
 	}
@@ -2442,14 +2429,11 @@ uri2gslist(const char *uri_list)
     
     length = linebreak - uri_list;
 
-    if (length && uri_list[0] != '#' && strncmp(uri_list,"file://",7)==0) {
+    if (length && uri_list[0] != '#') {
 	gchar *this_uri = g_strndup(uri_list, length);
-	gchar *uri;
 
-	uri = g_filename_from_uri(this_uri, NULL, NULL);
-	g_free(this_uri);
-	if (uri)
-	    list = g_slist_append(list, uri);
+	if (this_uri)
+	    list = g_slist_append(list, this_uri);
       }
 
     uri_list = linebreak + 2;
@@ -2519,17 +2503,18 @@ attachments_add(GtkWidget * widget,
                 continue;
 
             if(!attach_message(bsmsg, message))
-                libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-                                     _("Attaching message failed.\n"
-                                       "Possible reason: not enough temporary space"));
+                balsa_information_parented(GTK_WINDOW(bsmsg->window),
+                                           LIBBALSA_INFORMATION_WARNING,
+                                           _("Attaching message failed.\n"
+                                             "Possible reason: not enough temporary space"));
 	    g_object_unref(message);
         }
         balsa_index_selected_msgnos_free(index, selected);
     } else if (info == TARGET_URI_LIST) {
         GSList *uri_list = uri2gslist((gchar *) selection_data->data);
         for (; uri_list; uri_list = g_slist_next(uri_list)) {
-	    add_attachment(bsmsg,
-			   uri_list->data, FALSE, NULL); /* steal strings */
+	    add_attachment(bsmsg, uri_list->data, FALSE, NULL);
+            g_free(uri_list->data);
         }
         g_slist_free(uri_list);
     } else if( info == TARGET_STRING) {
@@ -3054,11 +3039,13 @@ has_file_attached(GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter,
 {
     has_file_attached_t *find_file = (has_file_attached_t *)data;
     BalsaAttachInfo *info;
+    const gchar * uri;
 
     gtk_tree_model_get(model, iter, ATTACH_INFO_COLUMN, &info, -1);
     if (!info)
 	return FALSE;
-    if (!strcmp(find_file->name, info->filename))
+    uri = libbalsa_vfs_get_uri(info->file_uri);
+    if (uri && !strcmp(find_file->name, uri))
 	find_file->found = TRUE;
     g_object_unref(info);
 
@@ -3119,9 +3106,9 @@ drag_data_quote(GtkWidget * widget,
 	    gtk_tree_model_foreach(BALSA_MSG_ATTACH_MODEL(bsmsg),
 				   has_file_attached, &find_file);
             if (!find_file.found)
-                add_attachment(bsmsg,  /* steal strings */
-                               uri_list->data, FALSE, NULL);
+                add_attachment(bsmsg, uri_list->data, FALSE, NULL);
         }
+        g_slist_foreach(uri_list, (GFunc) g_free, NULL);
         g_slist_free(uri_list);
     }
         break;
@@ -3300,9 +3287,9 @@ continue_body(BalsaSendmsg * bsmsg, LibBalsaMessage * message)
 	}
 	while (body) {
 	    gchar *name, *body_type, *tmp_file_name;
-	    int fd;
             GError *err = NULL;
-            gboolean res;
+            gboolean res = FALSE;
+            
 	    if (body->filename) {
 		libbalsa_mktempdir(&tmp_file_name);
 		name = g_strdup_printf("%s/%s", tmp_file_name, body->filename);
@@ -3311,19 +3298,31 @@ continue_body(BalsaSendmsg * bsmsg, LibBalsaMessage * message)
                                                  LIBBALSA_MESSAGE_BODY_SAFE,
                                                  FALSE, &err);
 	    } else {
-		fd = g_file_open_tmp("balsa-continue-XXXXXX", &name, NULL);
-		res = libbalsa_message_body_save_fd(body, fd, FALSE, &err);
+                int fd;
+
+		if ((fd = g_file_open_tmp("balsa-continue-XXXXXX", &name, NULL)) > 0) {
+                    GMimeStream * tmp_stream;
+
+                    if ((tmp_stream = g_mime_stream_fs_new(fd)) != NULL)
+                        res = libbalsa_message_body_save_stream(body, tmp_stream, FALSE, &err);
+                    else
+                        close(fd);
+                }
 	    }
             if(!res) {
-                balsa_information(LIBBALSA_INFORMATION_ERROR,
-                                  _("Could not save attachment: %s"),
-                                  err ? err->message : "Unknown error");
+                balsa_information_parented(GTK_WINDOW(bsmsg->window),
+                                           LIBBALSA_INFORMATION_ERROR,
+                                           _("Could not save attachment: %s"),
+                                           err ? err->message : "Unknown error");
                 g_clear_error(&err);
                 /* FIXME: do not try any further? */
             }
 	    body_type = libbalsa_message_body_get_mime_type(body);
-	    add_attachment(bsmsg, name, TRUE, body_type);
+            tmp_file_name = g_filename_to_uri(name, NULL, NULL);
+            g_free(name);
+	    add_attachment(bsmsg, tmp_file_name, TRUE, body_type);
 	    g_free(body_type);
+	    g_free(tmp_file_name);
 	    body = body->next;
 	}
     }
@@ -4936,9 +4935,10 @@ sendmsg_window_forward(LibBalsaMailbox *mailbox, guint msgno,
     bsmsg->type = attach ? SEND_FORWARD_ATTACH : SEND_FORWARD_INLINE;
     if (attach) {
 	if(!attach_message(bsmsg, message))
-            libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-                                 _("Attaching message failed.\n"
-                                   "Possible reason: not enough temporary space"));
+            balsa_information_parented(GTK_WINDOW(bsmsg->window),
+                                       LIBBALSA_INFORMATION_WARNING,
+                                       _("Attaching message failed.\n"
+                                         "Possible reason: not enough temporary space"));
         bsmsg->state = SENDMSG_STATE_CLEAN;
         set_entry_to_subject(GTK_ENTRY(bsmsg->subject[1]), message->body_list,
                              bsmsg->type, bsmsg->ident);
@@ -5100,28 +5100,32 @@ sw_attach_file(BalsaSendmsg * bsmsg, const gchar * val)
     GtkFileChooser *attach;
 
     if (!g_path_is_absolute(val)) {
-        balsa_information(LIBBALSA_INFORMATION_WARNING,
-                          _("Could not attach the file %s: %s."), val,
-                          _("not an absolute path"));
+        balsa_information_parented(GTK_WINDOW(bsmsg->window),
+                                   LIBBALSA_INFORMATION_WARNING,
+                                   _("Could not attach the file %s: %s."), val,
+                                   _("not an absolute path"));
         return;
     }
     if (!(g_str_has_prefix(val, g_get_home_dir())
           || g_str_has_prefix(val, g_get_tmp_dir()))) {
-        balsa_information(LIBBALSA_INFORMATION_WARNING,
-                          _("Could not attach the file %s: %s."), val,
-                          _("not in your directory"));
+        balsa_information_parented(GTK_WINDOW(bsmsg->window),
+                                   LIBBALSA_INFORMATION_WARNING,
+                                   _("Could not attach the file %s: %s."), val,
+                                   _("not in your directory"));
         return;
     }
     if (!g_file_test(val, G_FILE_TEST_EXISTS)) {
-        balsa_information(LIBBALSA_INFORMATION_WARNING,
-                          _("Could not attach the file %s: %s."), val,
-                          _("does not exist"));
+        balsa_information_parented(GTK_WINDOW(bsmsg->window),
+                                   LIBBALSA_INFORMATION_WARNING,
+                                   _("Could not attach the file %s: %s."), val,
+                                   _("does not exist"));
         return;
     }
     if (!g_file_test(val, G_FILE_TEST_IS_REGULAR)) {
-        balsa_information(LIBBALSA_INFORMATION_WARNING,
-                          _("Could not attach the file %s: %s."), val,
-                          _("not a regular file"));
+        balsa_information_parented(GTK_WINDOW(bsmsg->window),
+                                   LIBBALSA_INFORMATION_WARNING,
+                                   _("Could not attach the file %s: %s."), val,
+                                   _("not a regular file"));
         return;
     }
     attach = g_object_get_data(G_OBJECT(bsmsg->window),
@@ -5142,9 +5146,10 @@ sw_attach_file(BalsaSendmsg * bsmsg, const gchar * val)
         g_free(valdir);
         if (!good) {
             /* gtk_file_chooser_select_filename will crash */
-            balsa_information(LIBBALSA_INFORMATION_WARNING,
-                              _("Could not attach the file %s: %s."), val,
-                              _("not in current directory"));
+            balsa_information_parented(GTK_WINDOW(bsmsg->window),
+                                       LIBBALSA_INFORMATION_WARNING,
+                                       _("Could not attach the file %s: %s."), val,
+                                       _("not in current directory"));
             return;
         }
     }
@@ -5273,8 +5278,9 @@ insert_file_response(GtkWidget * selector, gint response,
     fname = gtk_file_chooser_get_filename(fc);
 
     if ((fl = fopen(fname, "rt")) ==NULL) {
-	balsa_information(LIBBALSA_INFORMATION_WARNING,
-			  _("Could not open the file %s.\n"), fname);
+	balsa_information_parented(GTK_WINDOW(bsmsg->window),
+                                   LIBBALSA_INFORMATION_WARNING,
+                                   _("Could not open the file %s.\n"), fname);
 	g_free(fname);
 	return;
     }
@@ -5403,7 +5409,11 @@ attachment2message(GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter,
 
     /* create the attachment */
     body = libbalsa_message_body_new(message);
-    body->filename = g_strdup(attachment->filename);
+    body->file_uri = attachment->file_uri;
+    if (attachment->file_uri)
+        g_object_ref(attachment->file_uri);
+    else
+        body->filename = g_strdup(attachment->uri_ref);
     body->content_type = g_strdup(attachment->force_mime_type);
     body->charset = g_strdup(attachment->charset);
     body->attach_mode = attachment->mode;
@@ -5432,8 +5442,8 @@ sw_set_header_from_path(LibBalsaMessage * message, const gchar * header,
     if (path && !(content =
                   libbalsa_get_header_from_path(header, path, NULL,
                                                 &err))) {
-        libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-                             error_format, path, err->message);
+        balsa_information(LIBBALSA_INFORMATION_WARNING,
+                          error_format, path, err->message);
         g_error_free(err);
     }
 
@@ -5846,9 +5856,10 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
     fcc = balsa_find_mailbox_by_url(bsmsg->fcc_url);
 
 #ifdef HAVE_GPGME
-    balsa_information(LIBBALSA_INFORMATION_DEBUG,
-		      _("sending message with gpg mode %d"),
-		      message->gpg_mode);
+    balsa_information_parented(GTK_WINDOW(bsmsg->window),
+                               LIBBALSA_INFORMATION_DEBUG,
+                               _("sending message with gpg mode %d"),
+                               message->gpg_mode);
 #endif
 
 #if ENABLE_ESMTP
@@ -5900,12 +5911,12 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
         }
 	if (error)
 	    balsa_information_parented(GTK_WINDOW(bsmsg->window),
-				       LIBBALSA_INFORMATION_WARNING,
+				       LIBBALSA_INFORMATION_ERROR,
 				       _("Send failed: %s\n%s"), msg,
 				       error->message);
 	else
 	    balsa_information_parented(GTK_WINDOW(bsmsg->window),
-				       LIBBALSA_INFORMATION_WARNING,
+				       LIBBALSA_INFORMATION_ERROR,
 				       _("Send failed: %s"), msg);
 	return FALSE;
     }
@@ -5943,6 +5954,7 @@ message_postpone(BalsaSendmsg * bsmsg)
     gboolean successp;
     LibBalsaMessage *message;
     GPtrArray *headers;
+    GError *error = NULL;
 
     /* Silent fallback to UTF-8 */
     message = bsmsg2message(bsmsg);
@@ -5978,21 +5990,24 @@ message_postpone(BalsaSendmsg * bsmsg)
 	successp = libbalsa_message_postpone(message, balsa_app.draftbox,
                                              bsmsg->parent_message,
                                              (gchar **) headers->pdata,
-                                             bsmsg->flow);
+                                             bsmsg->flow, &error);
     else
 	successp = libbalsa_message_postpone(message, balsa_app.draftbox, 
                                              NULL,
                                              (gchar **) headers->pdata,
-                                             bsmsg->flow);
+                                             bsmsg->flow, &error);
     g_ptr_array_foreach(headers, (GFunc) g_free, NULL);
     g_ptr_array_free(headers, TRUE);
 
     if(successp)
         sw_delete_draft(bsmsg);
-    else
+    else {
         balsa_information_parented(GTK_WINDOW(bsmsg->window),
-                                   LIBBALSA_INFORMATION_WARNING,
-                                   _("Could not postpone message."));
+                                   LIBBALSA_INFORMATION_ERROR,
+                                   _("Could not postpone message: %s"),
+				   error ? error->message : "");
+	g_clear_error(&error);
+    }
 
     g_object_unref(G_OBJECT(message));
     return successp;
@@ -6164,9 +6179,10 @@ sw_spell_attach(BalsaSendmsg * bsmsg)
                                 bsmsg->spell_check_lang, &err);
     if (!spell) {
         /* Should not happen, since we now check the language. */
-        libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-                             _("Error starting spell checker: %s"),
-                             err->message);
+        balsa_information_parented(GTK_WINDOW(bsmsg->window),
+                                   LIBBALSA_INFORMATION_WARNING,
+                                   _("Error starting spell checker: %s"),
+                                   err->message);
         g_error_free(err);
 
         /* No spell checker, so deactivate the button. */
@@ -6330,9 +6346,10 @@ reflow_selected_cb(GtkAction * action, BalsaSendmsg * bsmsg)
         return;
 #else                           /* USE_GREGEX */
     if (regcomp(&rex, balsa_app.quote_regex, REG_EXTENDED)) {
-	balsa_information(LIBBALSA_INFORMATION_WARNING,
-			  _("Could not compile %s"),
-			  _("Quoted Text Regular Expression"));
+	balsa_information_parented(GTK_WINDOW(bsmsg->window),
+                                   LIBBALSA_INFORMATION_WARNING,
+                                   _("Could not compile %s"),
+                                   _("Quoted Text Regular Expression"));
 	return;
     }
 #endif                          /* USE_GREGEX */

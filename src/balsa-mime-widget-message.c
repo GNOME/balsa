@@ -90,7 +90,6 @@ balsa_mime_widget_new_message(BalsaMessage * bm,
     if (!g_ascii_strcasecmp("message/external-body", content_type)) {
 	gchar *access_type;
 	rfc_extbody_id *extbody_type = rfc_extbodys;
-	BalsaMimeWidget *mw = NULL;
 
 	access_type =
 	    libbalsa_message_body_get_parameter(mime_body, "access-type");
@@ -150,19 +149,14 @@ bmw_message_extbody_url(LibBalsaMessageBody * mime_body,
     BalsaMimeWidget *mw;
 
     if (url_type == RFC2046_EXTBODY_LOCALFILE) {
-	gchar *local_name;
+	url = libbalsa_message_body_get_parameter(mime_body, "name");
 
-	local_name =
-	    libbalsa_message_body_get_parameter(mime_body, "name");
-
-	if (!local_name)
+	if (!url)
 	    return NULL;
 
-	url = g_strdup_printf("file:%s", local_name);
 	msg = g_string_new(_("Content Type: external-body\n"));
 	g_string_append_printf(msg, _("Access type: local-file\n"));
-	g_string_append_printf(msg, _("File name: %s"), local_name);
-	g_free(local_name);
+	g_string_append_printf(msg, _("File name: %s"), url);
     } else if (url_type == RFC2017_EXTBODY_URL) {
 	gchar *local_name;
 

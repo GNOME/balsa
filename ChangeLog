@@ -1,3 +1,18 @@
+2008-04-25  Albrecht Dreß
+
+	* src/balsa-mime-widget-message.c: use URIs instead of paths.
+	* src/sendmsg-window.[ch]: use gnome-vfs for attachment reading.
+	* src/balsa-mime-widget-callbacks.c: ditto.
+	* src/balsa-message.c: allow saving to URIs.
+	* src/main.c: -o flag accepts an URI now.
+	* src/information-dialog.h: add argument checking.
+	* libbalsa/misc.[hc]: return more detailed error information.
+	* libbalsa/body.h: store attachment URIs.
+	* libbalsa/send.[ch]: handle errors when reading from URIs.
+	* libbalsa/files.[ch]: file access operations use URIs now.
+	* libbalsa/misc.c: move some functions to libbalsa-vfs.c
+	* libbalsa/body.c: part operations accept URIs now.
+
 2008-04-22  Pawel Salek
 
 	* src/balsa-app.c: format=flowed by default.

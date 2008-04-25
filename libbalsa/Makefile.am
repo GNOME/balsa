@@ -74,6 +74,8 @@ libbalsa_a_SOURCES = 		\
 	filter.h		\
 	folder-scanners.c	\
 	folder-scanners.h	\
+	gmime-stream-gnome-vfs.c\
+	gmime-stream-gnome-vfs.h\
 	html.c                  \
 	html.h                  \
 	identity.c		\
@@ -89,6 +91,8 @@ libbalsa_a_SOURCES = 		\
 	libbalsa.c		\
 	libbalsa.h		\
 	libbalsa_private.h	\
+	libbalsa-vfs.c		\
+	libbalsa-vfs.h		\
 	mailbackend.h		\
 	mailbox-filter.c	\
 	mailbox-filter.h	\

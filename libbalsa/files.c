@@ -34,6 +34,7 @@
 #include "misc.h"
 #include "files.h"
 #include <glib/gi18n.h>
+#include "libbalsa-vfs.h"
 
 static const gchar *permanent_prefixes[] = {
 /*	BALSA_DATA_PREFIX,
@@ -132,7 +133,7 @@ libbalsa_default_attachment_pixbuf(gint size)
  *   return the complete path to the icon file.
  */
 GdkPixbuf *
-libbalsa_icon_finder(const char *mime_type, const char *filename, 
+libbalsa_icon_finder(const char *mime_type, const LibbalsaVfs * for_file, 
                      gchar** used_type, GtkIconSize size)
 {
     char *content_type;
@@ -142,6 +143,7 @@ libbalsa_icon_finder(const char *mime_type, const char *filename,
 #ifdef HAVE_GNOME
     const char *icon_file;
     GtkIconTheme *icon_theme;
+    const gchar * filename = NULL;
 #endif
 
     if (!gtk_icon_size_lookup(size, &width, &height))
@@ -149,9 +151,10 @@ libbalsa_icon_finder(const char *mime_type, const char *filename,
     
     if (mime_type)
         content_type = g_strdup(mime_type);
-    else if(filename)
-        content_type = libbalsa_lookup_mime_type(filename);
-    else
+    else if (for_file) {
+        content_type = g_strdup(libbalsa_vfs_get_mime_type(for_file));
+        filename = libbalsa_vfs_get_uri(for_file);
+    } else
 	content_type = g_strdup("application/octet-stream");
 
 #ifdef HAVE_GNOME

@@ -128,7 +128,8 @@ extern "C" {
     void sendmsg_window_set_field(BalsaSendmsg *bsmsg, const gchar* key,
                                   const gchar* val);
 
-    gboolean add_attachment(BalsaSendmsg * bsmsg, char *filename, 
+    gboolean add_attachment(BalsaSendmsg * bsmsg,
+                            const gchar *filename, 
                             gboolean is_a_tmp_file, 
                             const gchar *forced_mime_type);
 

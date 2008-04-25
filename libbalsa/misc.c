@@ -53,36 +53,6 @@ static const gchar *libbalsa_get_codeset_name(const gchar *txt,
 					      LibBalsaCodeset Codeset);
 static int getdnsdomainname(char *s, size_t l);
 
-/* libbalsa_lookup_mime_type:
-   find out mime type of a file. Must work for both relative and absolute
-   paths.
-*/
-gchar*
-libbalsa_lookup_mime_type(const gchar * path)
-{
-#ifdef HAVE_GNOME
-    GnomeVFSFileInfo* vi = gnome_vfs_file_info_new();
-    gchar* uri, *mime_type;
-
-    if(g_path_is_absolute(path))
-        uri = g_strconcat("file://", path, NULL);
-    else {
-        gchar* curr_dir = g_get_current_dir();
-        uri = g_strconcat("file://", curr_dir, "/", path, NULL);
-        g_free(curr_dir);
-    }
-    gnome_vfs_get_file_info (uri, vi,
-                             GNOME_VFS_FILE_INFO_GET_MIME_TYPE
-                             | GNOME_VFS_FILE_INFO_FOLLOW_LINKS);
-    g_free(uri);
-    mime_type = g_strdup(gnome_vfs_file_info_get_mime_type(vi));
-    gnome_vfs_file_info_unref(vi);
-    return mime_type ? mime_type : g_strdup("application/octet-stream");
-#else
-    return g_strdup("application/octet-stream");
-#endif/* HAVE_GNOME */
-}
-
 gchar *
 libbalsa_get_hostname(void)
 {
@@ -829,43 +799,28 @@ libbalsa_text_attr_file(const gchar * filename)
     return attr;
 }
 
-/* Check whether a file is all ascii or utf-8, and return charset
- * accordingly (NULL if it's neither).
- * This function is called only as a last resort when a message is being
- * prepared for sending.  The charset should always be set when the file
- * is being attached.
- */
-const gchar *
-libbalsa_file_get_charset(const gchar * filename)
-{
-    LibBalsaTextAttribute attr = libbalsa_text_attr_file(filename);
-
-    if (!(attr & LIBBALSA_TEXT_HI_BIT))
-	return "us-ascii";
-    if (attr & LIBBALSA_TEXT_HI_UTF8)
-	return "utf-8";
-    return NULL;
-}
-
 #define compare_stat(osb, nsb)  ( (osb.st_dev != nsb.st_dev || osb.st_ino != nsb.st_ino || osb.st_rdev != nsb.st_rdev) ? -1 : 0 )
 
 int 
-libbalsa_safe_open (const char *path, int flags, mode_t mode)
+libbalsa_safe_open (const char *path, int flags, mode_t mode, GError **err)
 {
   struct stat osb, nsb;
   int fd;
  
-  if ((fd = open (path, flags, mode)) < 0)
-    return fd;
+  if ((fd = open (path, flags, mode)) < 0) {
+      g_set_error(err, LIBBALSA_ERROR_QUARK, errno,
+                  _("Cannot open %s: %s"), path, g_strerror(errno));
+      return fd;
+  }
  
   /* make sure the file is not symlink */
   if (lstat (path, &osb) < 0 || fstat (fd, &nsb) < 0 ||
-      compare_stat(osb, nsb) == -1)
-      {
-	  g_warning("safe_open(): %s is a symlink!\n", path);
-	  close (fd);
-	  return (-1);
-      }
+      compare_stat(osb, nsb) == -1) {
+      close (fd);
+      g_set_error(err, LIBBALSA_ERROR_QUARK, errno,
+                  _("Cannot open %s: is a symbolic link"), path);
+      return (-1);
+  }
  
   return (fd);
 }

@@ -284,7 +284,7 @@ balsa_init(int argc, char **argv)
 	{"compose", 'm', 0, G_OPTION_ARG_STRING, &(opt_compose_email),
 	 N_("Compose a new email to EMAIL@ADDRESS"), "EMAIL@ADDRESS"},
 	{"attach", 'a', 0, G_OPTION_ARG_FILENAME_ARRAY, &(attach_vect),
-	 N_("Attach file at PATH"), "PATH"},
+	 N_("Attach file at URI"), "URI"},
 	{"open-mailbox", 'o', 0, G_OPTION_ARG_STRING,
          &(cmd_line_open_mailboxes),
 	 N_("Opens MAILBOXNAME"), N_("MAILBOXNAME")},
@@ -859,7 +859,7 @@ main(int argc, char *argv[])
         for(lst = opt_attach_list; lst; lst = g_slist_next(lst))
             add_attachment(snd, lst->data, FALSE, NULL);
 	snd->quit_on_close = FALSE;
-    };
+    }
     gtk_widget_show(window);
 
     if (cmd_check_mail_on_startup || balsa_app.check_mail_upon_startup)

@@ -25,6 +25,7 @@
 #include "config.h"
 #include "balsa-app.h"
 #include <glib/gi18n.h>
+#include "libbalsa-vfs.h"
 #include "balsa-message.h"
 #include "balsa-mime-widget.h"
 #include "balsa-mime-widget-callbacks.h"
@@ -136,7 +137,8 @@ balsa_mime_widget_ctx_menu_save(GtkWidget * parent_widget,
 {
     gchar *cont_type, *title;
     GtkWidget *save_dialog;
-    gchar *filename;
+    gchar *file_uri;
+    LibbalsaVfs *save_file;
     gboolean do_save;
     GError *err = NULL;
 
@@ -156,12 +158,14 @@ balsa_mime_widget_ctx_menu_save(GtkWidget * parent_widget,
     g_free(title);
     g_free(cont_type);
 
+    gtk_file_chooser_set_local_only(GTK_FILE_CHOOSER(save_dialog),
+                                    libbalsa_vfs_local_only());
     if (balsa_app.save_dir)
-	gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(save_dialog),
-					    balsa_app.save_dir);
+        gtk_file_chooser_set_current_folder_uri(GTK_FILE_CHOOSER(save_dialog),
+                                                balsa_app.save_dir);
 
     if (mime_body->filename) {
-	gchar *filename = g_strdup(mime_body->filename);
+        gchar * filename = g_strdup(mime_body->filename);
 	libbalsa_utf8_sanitize(&filename, balsa_app.convert_unknown_8bit,
 			       NULL);
 	gtk_file_chooser_set_current_name(GTK_FILE_CHOOSER(save_dialog),
@@ -175,15 +179,23 @@ balsa_mime_widget_ctx_menu_save(GtkWidget * parent_widget,
 	return;
     }
 
-    /* attempt to save the file */
-    filename
-	= gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(save_dialog));
+    /* get the file name */
+    file_uri = gtk_file_chooser_get_uri(GTK_FILE_CHOOSER(save_dialog));
     gtk_widget_destroy(save_dialog);
+    if (!(save_file = libbalsa_vfs_new_from_uri(file_uri))) {
+        balsa_information(LIBBALSA_INFORMATION_ERROR,
+                          _("Could not construct uri from %s"),
+                          file_uri);
+        g_free(file_uri);
+	return;
+    }
 
+    /* remember the folder uri */
     g_free(balsa_app.save_dir);
-    balsa_app.save_dir = g_path_get_dirname(filename);
+    balsa_app.save_dir = g_strdup(libbalsa_vfs_get_folder(save_file));
 
-    if (access(filename, F_OK) == 0) {
+    /* get a confirmation to overwrite if the file exists */
+    if (libbalsa_vfs_file_exists(save_file)) {
 	GtkWidget *confirm;
 
 	/* File exists. check if they really want to overwrite */
@@ -196,19 +208,27 @@ balsa_mime_widget_ctx_menu_save(GtkWidget * parent_widget,
 	    (gtk_dialog_run(GTK_DIALOG(confirm)) == GTK_RESPONSE_YES);
 	gtk_widget_destroy(confirm);
 	if (do_save)
-	    unlink(filename);
+	    if (libbalsa_vfs_file_unlink(save_file, &err) != 0)
+                balsa_information(LIBBALSA_INFORMATION_ERROR,
+                                  _("Unlink %s: %s"),
+                                  file_uri, err ? err->message : "Unknown error");
     } else
 	do_save = TRUE;
 
-    if (do_save)
-	if (!libbalsa_message_body_save(mime_body, filename,
-                                        LIBBALSA_MESSAGE_BODY_UNSAFE,
-					mime_body->body_type ==
-					LIBBALSA_MESSAGE_BODY_TYPE_TEXT, &err))
+    /* save the file */
+    if (do_save) {
+	if (!libbalsa_message_body_save_vfs(mime_body, save_file,
+                                            LIBBALSA_MESSAGE_BODY_UNSAFE,
+                                            mime_body->body_type ==
+                                            LIBBALSA_MESSAGE_BODY_TYPE_TEXT,
+                                            &err))
 	    balsa_information(LIBBALSA_INFORMATION_ERROR,
 			      _("Could not save %s: %s"),
-			      filename, err ? err->message : "Unknown error");
-    g_free(filename);
+			      file_uri, err ? err->message : "Unknown error");
+    }
+
+    g_object_unref(save_file);
+    g_free(file_uri);
 }
 
 static void

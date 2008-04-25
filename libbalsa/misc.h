@@ -96,13 +96,12 @@ struct _LibBalsaUrlInsertInfo {
     GString *ml_url_buffer;
 };
 
+#define LIBBALSA_ERROR_QUARK (g_quark_from_static_string("libbalsa"))
+
 extern LibBalsaCodesetInfo libbalsa_codeset_info[];
 GtkWidget *libbalsa_charset_button_new(void);
 LibBalsaTextAttribute libbalsa_text_attr_string(const gchar * string);
 LibBalsaTextAttribute libbalsa_text_attr_file(const gchar * filename);
-const gchar *libbalsa_file_get_charset(const gchar * filename);
-
-gchar *libbalsa_lookup_mime_type(const gchar * path);
 
 size_t libbalsa_readfile(FILE * fp, char **buf);
 size_t libbalsa_readfile_nostat(FILE * fp, char **buf);
@@ -153,7 +152,7 @@ gboolean libbalsa_match_regex(const gchar * line, regex_t * rex,
 			      guint * count, guint * index);
 #endif                          /* USE_GREGEX */
 
-int libbalsa_safe_open (const char *path, int flags, mode_t mode);
+int libbalsa_safe_open (const char *path, int flags, mode_t mode, GError **err);
 int libbalsa_lock_file (const char *path, int fd, int excl, int dot, int timeout);
 int libbalsa_unlock_file (const char *path, int fd, int dot);
 int libbalsa_safe_rename (const char *src, const char *target);

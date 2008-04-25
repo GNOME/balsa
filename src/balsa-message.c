@@ -47,6 +47,7 @@
 #include "send.h"
 #include "quote-color.h"
 #include "sendmsg-window.h"
+#include "libbalsa-vfs.h"
 
 #include <libgnomevfs/gnome-vfs-mime-handlers.h>
 
@@ -1072,9 +1073,9 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMailbox * mailbox, guint msgno)
     bm->message = message = libbalsa_mailbox_get_message(mailbox, msgno);
     if (!message) {
 	balsa_information(LIBBALSA_INFORMATION_WARNING,
-                          _("Could not access message %ld "
+                          _("Could not access message %u "
                             "in mailbox \"%s\"."),
-			  msgno, mailbox->name);
+			  (unsigned int) msgno, mailbox->name);
         return FALSE;
     }
 
@@ -1084,9 +1085,9 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMailbox * mailbox, guint msgno)
         g_object_unref(bm->message);
         bm->message = NULL;
 	balsa_information(LIBBALSA_INFORMATION_WARNING,
-                          _("Could not access message %ld "
+                          _("Could not access message %u "
                             "in mailbox \"%s\"."),
-			  msgno, mailbox->name);
+			  (unsigned int) msgno, mailbox->name);
         return FALSE;
     }
 
@@ -1420,7 +1421,7 @@ display_part(BalsaMessage * bm, LibBalsaMessageBody * body,
 #endif
         if (!content_icon)
 	    content_icon = 
-		libbalsa_icon_finder(content_type, body->filename, NULL,
+		libbalsa_icon_finder(content_type, NULL, NULL,
 				     GTK_ICON_SIZE_LARGE_TOOLBAR);
         gtk_tree_store_set (GTK_TREE_STORE(model), iter, 
                             PART_INFO_COLUMN, info,
@@ -1432,7 +1433,7 @@ display_part(BalsaMessage * bm, LibBalsaMessageBody * body,
         g_free(icon_title);
     } else {
 	content_icon =
-	    libbalsa_icon_finder(content_type, body->filename, NULL,
+	    libbalsa_icon_finder(content_type, NULL, NULL,
 				 GTK_ICON_SIZE_LARGE_TOOLBAR);
         gtk_tree_store_set (GTK_TREE_STORE(model), iter, 
                             PART_INFO_COLUMN, NULL,
@@ -1649,30 +1650,38 @@ part_context_dump_all_cb(GtkWidget * menu_item, GList * info_list)
                                     GTK_STOCK_OK, GTK_RESPONSE_OK, NULL);
     gtk_dialog_set_default_response(GTK_DIALOG(dump_dialog),
                                     GTK_RESPONSE_CANCEL);
-
+    gtk_file_chooser_set_local_only(GTK_FILE_CHOOSER(dump_dialog),
+                                    libbalsa_vfs_local_only());
     if (balsa_app.save_dir)
-        gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dump_dialog),
-                                            balsa_app.save_dir);
+        gtk_file_chooser_set_current_folder_uri(GTK_FILE_CHOOSER(dump_dialog),
+                                                balsa_app.save_dir);
 
     if (gtk_dialog_run(GTK_DIALOG(dump_dialog)) == GTK_RESPONSE_OK) {
-	gchar *dirname =
-	    gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dump_dialog));
+	gchar *dir_name =
+            gtk_file_chooser_get_uri(GTK_FILE_CHOOSER(dump_dialog));
+        LibbalsaVfs * dir_uri;
+
+        g_message("store to URI: %s", dir_name);
+        if (!(dir_uri = libbalsa_vfs_new_from_uri(dir_name)))
+            balsa_information(LIBBALSA_INFORMATION_ERROR,
+                              _("Could not create URI for %s"),
+                              dir_name);
 
 	/* remember the folder */
 	g_free(balsa_app.save_dir);
-	balsa_app.save_dir = g_strdup(dirname);
+	balsa_app.save_dir = dir_name;
 
 	/* save all parts without further user interaction */
 	info_list = g_list_first(info_list);
-	while (info_list) {
+	while (dir_uri && info_list) {
 	    BalsaPartInfo *info = BALSA_PART_INFO(info_list->data);
-	    gchar *save_name;
+            LibbalsaVfs * save_uri;
 	    gboolean result;
             GError *err = NULL;
 
 	    if (info->body->filename)
-		save_name =
-		    g_build_filename(dirname, info->body->filename, NULL);
+		save_uri =
+		    libbalsa_vfs_dir_append(dir_uri, info->body->filename);
 	    else {
 		gchar *cont_type =
 		    libbalsa_message_body_get_mime_type(info->body);
@@ -1682,41 +1691,46 @@ part_context_dump_all_cb(GtkWidget * menu_item, GList * info_list)
 		g_strdelimit(cont_type, G_DIR_SEPARATOR_S, '-');
 		p = g_strdup_printf(_("%s message part"), cont_type);
 		g_free(cont_type);
-		save_name = g_build_filename(dirname, p, NULL);
+		save_uri = libbalsa_vfs_dir_append(dir_uri, p);
 		g_free(p);
 	    }
+            g_message("store to file: %s", libbalsa_vfs_get_uri_utf8(save_uri));
 
 	    /* don't overwrite existing files, append (1), (2), ... instead */
-	    if (access(save_name, F_OK) == 0) {
+	    if (libbalsa_vfs_file_exists(save_uri)) {
 		gint n = 1;
-		gchar *base_name = save_name;
+		LibbalsaVfs * base_uri = save_uri;
 
-		save_name = NULL;
+		save_uri = NULL;
 		do {
-		    g_free(save_name);
-		    save_name = g_strdup_printf("%s (%d)", base_name, n++);
-		} while (access(save_name, F_OK) == 0);
-		g_free(base_name);
+                    gchar * ext = g_strdup_printf(" (%d)", n++);
+		    if (save_uri)
+                        g_object_unref(save_uri);
+                    save_uri = libbalsa_vfs_append(base_uri, ext);
+                    g_free(ext);
+		} while (libbalsa_vfs_file_exists(save_uri));
+		g_object_unref(base_uri);
 	    }
+            g_message("store to file: %s", libbalsa_vfs_get_uri_utf8(save_uri));
 
 	    /* try to save the file */
             result =
-                libbalsa_message_body_save(info->body, save_name,
-                                           LIBBALSA_MESSAGE_BODY_UNSAFE,
-                                           info->body->body_type ==
-                                           LIBBALSA_MESSAGE_BODY_TYPE_TEXT,
-                                           &err);
+                libbalsa_message_body_save_vfs(info->body, save_uri,
+                                               LIBBALSA_MESSAGE_BODY_UNSAFE,
+                                               info->body->body_type ==
+                                               LIBBALSA_MESSAGE_BODY_TYPE_TEXT,
+                                               &err);
 	    if (!result)
 		balsa_information(LIBBALSA_INFORMATION_ERROR,
 				  _("Could not save %s: %s"),
-				  save_name,
-                                  err->message ? 
+				  libbalsa_vfs_get_uri_utf8(save_uri),
+                                  err && err->message ? 
                                   err->message : "Unknown error");
             g_clear_error(&err);
-	    g_free(save_name);
+	    g_object_unref(save_uri);
 	    info_list = g_list_next(info_list);
 	}
-	g_free(dirname);
+	g_object_unref(dir_uri);
     }
     gtk_widget_destroy(dump_dialog);
 }

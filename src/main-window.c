@@ -475,11 +475,9 @@ static const GtkActionEntry mailbox_entries[] = {
 #endif /* ENABLE_TOUCH_UI */
 };
 
-/* Actions that are sensitive only when a message is selected: */
+/* Actions that are sensitive only when one or more messages are
+ * selected: */
 static const GtkActionEntry message_entries[] = { 
-    /* File menu item */
-    {"Print", GTK_STOCK_PRINT, N_("_Print..."), "<control>P",
-     N_("Print current message"), G_CALLBACK(bw_message_print_cb)},
     /* Message menu items */
     {"Reply", BALSA_PIXMAP_REPLY, N_("_Reply..."), "R",
      N_("Reply to the current message"), G_CALLBACK(bw_replyto_message_cb)},
@@ -491,9 +489,6 @@ static const GtkActionEntry message_entries[] = {
     {"StoreAddress", BALSA_PIXMAP_BOOK_RED, N_("_Store Address..."), "S",
      N_("Store address of sender in addressbook"),
      G_CALLBACK(bw_store_address_cb)},
-    {"SavePart", GTK_STOCK_SAVE, N_("Save Current Part..."), "<control>S",
-     N_("Save currently displayed part of message"),
-     G_CALLBACK(bw_save_current_part_cb)},
     {"ViewSource", BALSA_PIXMAP_BOOK_OPEN, N_("_View Source..."),
      "<control>U", N_("View source form of the message"),
      G_CALLBACK(bw_view_msg_source_cb)},
@@ -514,6 +509,18 @@ static const GtkActionEntry message_entries[] = {
     {"Pipe", BALSA_PIXMAP_FORWARD, N_("_Pipe through..."), NULL,
      N_("Pipe the message through another program"),
      G_CALLBACK(bw_pipe_message_cb)},
+#endif /* ENABLE_TOUCH_UI */
+};
+
+/* Actions that are sensitive only when some message is current: */
+static const GtkActionEntry current_message_entries[] = {
+    /* File menu item */
+    {"Print", GTK_STOCK_PRINT, N_("_Print..."), "<control>P",
+     N_("Print current message"), G_CALLBACK(bw_message_print_cb)},
+    {"SavePart", GTK_STOCK_SAVE, N_("Save Current Part..."), "<control>S",
+     N_("Save currently displayed part of message"),
+     G_CALLBACK(bw_save_current_part_cb)},
+#if !defined(ENABLE_TOUCH_UI)
     {"NextPart", BALSA_PIXMAP_NEXT_PART, N_("_Next Part"), "<control>period",
      N_("Next part in message"), G_CALLBACK(bw_next_part_cb)},
     {"PreviousPart", BALSA_PIXMAP_PREVIOUS_PART, N_("_Previous Part"),
@@ -1246,6 +1253,11 @@ bw_get_action(BalsaWindow * window, const gchar * action_name)
                                      action_name)))
         return action;
 
+    if ((action =
+         gtk_action_group_get_action(window->current_message_action_group,
+                                     action_name)))
+        return action;
+
     return gtk_action_group_get_action(window->message_action_group,
                                        action_name);
 }
@@ -1358,6 +1370,8 @@ bw_get_toolbar_model(void)
                                     G_N_ELEMENTS(mailbox_entries));
     balsa_toolbar_model_add_actions(model, message_entries,
                                     G_N_ELEMENTS(message_entries));
+    balsa_toolbar_model_add_actions(model, current_message_entries,
+                                    G_N_ELEMENTS(current_message_entries));
     balsa_toolbar_model_add_actions(model, modify_message_entries,
                                     G_N_ELEMENTS(modify_message_entries));
     balsa_toolbar_model_add_toggle_actions(model, toggle_entries,
@@ -1439,6 +1453,16 @@ bw_get_ui_manager(BalsaWindow * window)
         window->message_action_group = action_group;
     gtk_action_group_add_actions(action_group, message_entries,
                                  G_N_ELEMENTS(message_entries),
+                                 window);
+
+    gtk_ui_manager_insert_action_group(ui_manager, action_group, 0);
+
+    action_group = gtk_action_group_new("BalsaWindow");
+    gtk_action_group_set_translation_domain(action_group, NULL);
+    if (window)
+        window->current_message_action_group = action_group;
+    gtk_action_group_add_actions(action_group, current_message_entries,
+                                 G_N_ELEMENTS(current_message_entries),
                                  window);
 
     gtk_ui_manager_insert_action_group(ui_manager, action_group, 0);
@@ -1833,6 +1857,11 @@ bw_enable_message_menus(BalsaWindow * window, guint msgno)
     BalsaIndex *bindex = BALSA_INDEX(window->current_index);
 
     enable = (msgno != 0 && bindex != NULL);
+    gtk_action_group_set_sensitive(window->current_message_action_group,
+                                   enable);
+
+    enable = (bindex != NULL
+              && balsa_index_count_selected_messages(bindex) > 0);
     gtk_action_group_set_sensitive(window->message_action_group, enable);
 
     enable_mod = (enable && !bindex->mailbox_node->mailbox->readonly);

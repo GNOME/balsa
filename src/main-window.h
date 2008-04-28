@@ -66,6 +66,7 @@ struct _BalsaWindow {
     GtkActionGroup *action_group;
     GtkActionGroup *mailbox_action_group;
     GtkActionGroup *message_action_group;
+    GtkActionGroup *current_message_action_group;
     GtkActionGroup *modify_message_action_group;
 
     /* Progress bar stuff: */

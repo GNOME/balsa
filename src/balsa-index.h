@@ -175,6 +175,9 @@ extern "C" {
     /* Select all without previewing any. */
     void balsa_index_select_all(BalsaIndex * bindex);
 
+    /* Count of selected messages. */
+    gint balsa_index_count_selected_messages(BalsaIndex * bindex);
+
 #define BALSA_INDEX_VIEW_ON_OPEN "balsa-index-view-on-open"
 
 #ifdef __cplusplus

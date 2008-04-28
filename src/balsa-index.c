@@ -2463,4 +2463,15 @@ balsa_index_select_all(BalsaIndex * bindex)
     g_signal_handler_block(selection, bindex->selection_changed_id);
     gtk_tree_selection_select_all(selection);
     g_signal_handler_unblock(selection, bindex->selection_changed_id);
+    g_signal_emit(bindex, balsa_index_signals[INDEX_CHANGED], 0);
+}
+
+gint
+balsa_index_count_selected_messages(BalsaIndex * bindex)
+{
+    g_return_val_if_fail(BALSA_IS_INDEX(bindex), -1);
+
+    return
+        gtk_tree_selection_count_selected_rows(gtk_tree_view_get_selection
+                                               (GTK_TREE_VIEW(bindex)));
 }

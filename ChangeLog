@@ -1,5 +1,10 @@
 2008-04-28  Peter Bloomfield
 
+	* src/sendmsg-window.c: use GTK_STOCK_EDIT for "Edit with Gnome".
+	* src/toolbar-factory.c: add it to the legal toolbar buttons.
+
+2008-04-28  Peter Bloomfield
+
 	* src/balsa-index.c: (balsa_index_select_all): emit changed
 	signal; (balsa_index_count_selected_messages): new method.
 	* src/balsa-index.h: new method

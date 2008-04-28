@@ -369,7 +369,7 @@ static const GtkActionEntry entries[] = {
      NULL, N_("Select the Identity to use for the message"),
      G_CALLBACK(change_identity_dialog_cb)},
 #if !defined(ENABLE_TOUCH_UI)
-    {"EditWithGnome", GTK_STOCK_EXECUTE, N_("_Edit with Gnome-Editor"),
+    {"EditWithGnome", GTK_STOCK_EDIT, N_("_Edit with Gnome-Editor"),
      NULL, N_("Edit the current message with the default Gnome editor"),
      G_CALLBACK(edit_with_gnome)},
 #endif                          /* ENABLE_TOUCH_UI */

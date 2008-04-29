@@ -4342,6 +4342,11 @@ create_lang_menu(GtkWidget * parent, BalsaSendmsg * bsmsg)
 #if HAVE_GTKSPELL
         GtkSpell *spell;
 
+        if (locales[i].locale == NULL || locales[i].locale[0] == '\0')
+            /* GtkSpell handles NULL lang, but complains about empty
+             * lang; in either case, it does not go in the langs menu. */
+            continue;
+
         spell = gtkspell_new_attach(GTK_TEXT_VIEW(bsmsg->text),
                                     locales[i].locale, NULL);
         if (spell) {

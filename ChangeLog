@@ -1,3 +1,8 @@
+2008-04-29  Peter Bloomfield
+
+	* src/sendmsg-window.c: (create_lang_menu): fix whining from
+	Enchant via GtkSpell.
+
 2008-04-28  Peter Bloomfield
 
 	* src/sendmsg-window.c: use GTK_STOCK_EDIT for "Edit with Gnome".

@@ -1,3 +1,10 @@
+2008-05-17  Peter Bloomfield
+
+	* libbalsa/message.c:
+	(libbalsa_message_load_envelope_from_stream): crlf-filter the
+	stream; detect end-of-file by failed read instead of
+	g_mime_stream_eos.
+
 2008-04-29  Peter Bloomfield
 
 	* src/sendmsg-window.c: (create_lang_menu): fix whining from

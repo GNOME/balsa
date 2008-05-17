@@ -1194,31 +1194,48 @@ void
 libbalsa_message_load_envelope_from_stream(LibBalsaMessage * message,
                                            GMimeStream *gmime_stream)
 {
+    GMimeStream *gmime_stream_filter;
+    GMimeFilter *gmime_filter_crlf;
     GMimeStream *gmime_stream_buffer;
     GByteArray *line;
     guchar lookahead;
-    gboolean ret = FALSE;
 
     libbalsa_mime_stream_shared_lock(gmime_stream);
-    gmime_stream_buffer =
-        g_mime_stream_buffer_new(gmime_stream,
-                                 GMIME_STREAM_BUFFER_BLOCK_READ);
 
+    /* CRLF-filter the message stream; we do not want '\r' in header
+     * fields, and finding the empty line that separates the body from
+     * the header is simpler if it has no '\r' in it. */
+    gmime_stream_filter =
+        g_mime_stream_filter_new_with_stream(gmime_stream);
+
+    gmime_filter_crlf =
+        g_mime_filter_crlf_new(GMIME_FILTER_CRLF_DECODE,
+                               GMIME_FILTER_CRLF_MODE_CRLF_ONLY);
+    g_mime_stream_filter_add(GMIME_STREAM_FILTER(gmime_stream_filter),
+                                                 gmime_filter_crlf);
+    g_object_unref(gmime_filter_crlf);
+
+    /* Buffer the message stream, so we can read it line by line. */
+    gmime_stream_buffer =
+        g_mime_stream_buffer_new(gmime_stream_filter,
+                                 GMIME_STREAM_BUFFER_BLOCK_READ);
+    g_object_unref(gmime_stream_filter);
+
+    /* Read header fields until either:
+     * - we find an empty line, or
+     * - end of file.
+     */
     line = g_byte_array_new();
     do {
 	g_mime_stream_buffer_readln(gmime_stream_buffer, line);
-	while (!g_mime_stream_eos(gmime_stream_buffer)
-	       && g_mime_stream_read(gmime_stream_buffer,
-		                     (char *) &lookahead, 1) == 1) {
-		if (lookahead == ' ' || lookahead == '\t') {
-		    g_byte_array_append(line, &lookahead, 1);
-		    g_mime_stream_buffer_readln(gmime_stream_buffer, line);
-		} else
-		    break;
+	while (g_mime_stream_read(gmime_stream_buffer,
+		                  (char *) &lookahead, 1) == 1 
+               && (lookahead == ' ' || lookahead == '\t')) {
+            g_byte_array_append(line, &lookahead, 1);
+            g_mime_stream_buffer_readln(gmime_stream_buffer, line);
 	}
 	if (line->len == 0 || line->data[line->len-1]!='\n') {
-	    /* read error */
-	    ret = FALSE;
+	    /* EOF or read error; in either case, message has no body. */
 	    break;
 	}
 	line->data[line->len-1]='\0'; /* terminate line by overwriting '\n' */
@@ -1227,19 +1244,19 @@ libbalsa_message_load_envelope_from_stream(LibBalsaMessage * message,
 						FALSE)) {
 	    /* Ignore error return caused by malformed header. */
 	}
-	if (lookahead == '\n') {/* end of headers */
-	    ret = TRUE;
+	if (lookahead == '\n') {/* end of header */
+            /* Message looks valid--set its length. */
+            message->length = g_mime_stream_length(gmime_stream);
 	    break;
 	}
 	line->len = 0;
 	g_byte_array_append(line, &lookahead, 1);
-    } while (!g_mime_stream_eos(gmime_stream_buffer));
-    if (ret)
-        message->length = g_mime_stream_length(gmime_stream);
+    } while (TRUE);
+    g_byte_array_free(line, TRUE);
+
     g_object_unref(gmime_stream_buffer);
     g_mime_stream_reset(gmime_stream);
     libbalsa_mime_stream_shared_unlock(gmime_stream);
-    g_byte_array_free(line, TRUE);
 }
 
 void

@@ -187,4 +187,7 @@ gboolean libbalsa_ldap_exists(const gchar *server);
 
 gboolean libbalsa_path_is_below_dir(const gchar * path, const gchar * dir);
 
+gchar * libbalsa_text_to_html(const gchar * title, const gchar * body, const gchar * lang);
+GString * libbalsa_html_encode_hyperlinks(GString * paragraph);
+
 #endif				/* __LIBBALSA_MISC_H__ */

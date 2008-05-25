@@ -43,6 +43,7 @@ libbalsa_message_body_new(LibBalsaMessage * message)
 
     body->message = message;
     body->buffer = NULL;
+    body->html_buffer = NULL;
     body->embhdrs = NULL;
     body->content_type = NULL;
     body->filename = NULL;
@@ -71,6 +72,7 @@ libbalsa_message_body_free(LibBalsaMessageBody * body)
 	return;
 
     g_free(body->buffer);
+    g_free(body->html_buffer);
     libbalsa_message_headers_destroy(body->embhdrs);
     g_free(body->content_type);
     g_free(body->filename);

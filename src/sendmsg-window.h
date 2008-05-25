@@ -87,6 +87,7 @@ extern "C" {
         SendmsgState state;
         gulong identities_changed_id;
 	gboolean flow;          /* send format=flowed */ 
+	gboolean send_mp_alt;   /* send multipart/alternative (plain and html) */ 
 	gboolean req_dispnotify; /* send a MDN */ 
 	gboolean quit_on_close; /* quit balsa after the compose window */
 	                        /* is closed.                          */

@@ -1,3 +1,32 @@
+2008-05-25  Albrecht Dreß
+
+	Offer the option of sending a new message with both text/plain
+	and text/html versions, specifically to avoid right-to-left text
+	being mangled by text-to-html converters. The option is
+	per-identity.
+
+	* libbalsa/body.h: new member for html version.
+	* libbalsa/body.c: (libbalsa_message_body_new,
+	libbalsa_message_body_free): manage it.
+	* libbalsa/identity.h: new member for option.
+	* libbalsa/identity.c: (libbalsa_identity_init,
+	libbalsa_identity_set_send_mp_alternative, setup_ident_frame,
+	ident_dialog_update, display_frame_update,
+	libbalsa_identity_new_config, libbalsa_identity_save): manage
+	the option.
+	* libbalsa/misc.h: new methods for html version.
+	* libbalsa/mime.c: (libbalsa_html_encode_hyperlinks,
+	libbalsa_text_to_html): implement them.
+	* libbalsa/send.c: (add_mime_body_plain,
+	libbalsa_message_create_mime_message,
+	libbalsa_create_rfc2440_buffer): create multipart/alternative
+	message with text/plain and text/html parts.
+	* src/sendmsg-window.h: new member for html option.
+	* src/sendmsg-window.c: (update_bsmsg_identity,
+	sendmsg_window_new, sendmsg_window_continue, bsmsg2message,
+	send_message_handler, message_postpone, toggle_mp_alt_cb):
+	manage and act on the option.
+
 2008-05-17  Peter Bloomfield
 
 	* libbalsa/message.c:

@@ -197,7 +197,7 @@ send_message_info_destroy(SendMessageInfo *smi)
 
 #if HAVE_GPGME
 static LibBalsaMsgCreateResult
-libbalsa_create_rfc2440_buffer(LibBalsaMessageBody *body, GMimePart *mime_part,
+libbalsa_create_rfc2440_buffer(LibBalsaMessage *message, GMimePart *mime_part,
 			       GtkWindow * parent, GError ** error);
 static LibBalsaMsgCreateResult
 do_multipart_crypto(LibBalsaMessage * message, GMimeObject ** mime_root,
@@ -301,12 +301,22 @@ lbs_set_content(GMimePart * mime_part, gchar * content)
     g_object_unref(wrapper);
 }
 
+#ifdef HAVE_GPGME
 static GMimeObject *
-add_mime_body_plain(LibBalsaMessageBody *body, gboolean flow)
+add_mime_body_plain(LibBalsaMessageBody *body, gboolean flow, gboolean postpone,
+                    guint use_gpg_mode,
+                    LibBalsaMsgCreateResult * crypt_res, GError ** error)
+#else
+static GMimeObject *
+add_mime_body_plain(LibBalsaMessageBody *body, gboolean flow, gboolean postpone)
+#endif
 {
     GMimePart *mime_part;
     const gchar * charset;
-  
+#ifdef HAVE_GPGME
+    GtkWindow * parent = g_object_get_data(G_OBJECT(body->message), "parent-window");
+#endif
+
     g_return_val_if_fail(body, NULL);
     
     charset=body->charset;
@@ -369,7 +379,55 @@ add_mime_body_plain(LibBalsaMessageBody *body, gboolean flow)
     } else
 	lbs_set_content(mime_part, body->buffer);
 
-    return GMIME_OBJECT(mime_part);
+#ifdef HAVE_GPGME
+    /* rfc 2440 sign/encrypt if requested */
+    if (use_gpg_mode != 0) {
+        *crypt_res =
+            libbalsa_create_rfc2440_buffer(body->message,
+                                           GMIME_PART(mime_part),
+                                           parent, error);
+
+        if (*crypt_res != LIBBALSA_MESSAGE_CREATE_OK) {
+            g_object_unref(G_OBJECT(mime_part));
+            return NULL;
+        }
+    }
+#endif
+
+    /* if requested, add a text/html version in a multipart/alternative */
+    if (body->html_buffer && !postpone) {
+        GMimeMultipart *mpa = g_mime_multipart_new_with_subtype("alternative");
+
+        g_mime_multipart_add_part(mpa, GMIME_OBJECT(mime_part));
+        g_object_unref(G_OBJECT(mime_part));
+
+        mime_part = g_mime_part_new_with_type("text", "html");
+        g_mime_multipart_add_part(mpa, GMIME_OBJECT(mime_part));
+        g_object_unref(G_OBJECT(mime_part));
+        g_mime_part_set_content_disposition(mime_part, GMIME_DISPOSITION_INLINE);
+        g_mime_part_set_encoding(mime_part, GMIME_PART_ENCODING_QUOTEDPRINTABLE);
+        g_mime_object_set_content_type_parameter(GMIME_OBJECT(mime_part),
+                                                 "charset", "UTF-8");
+	lbs_set_content(mime_part, body->html_buffer);
+
+#ifdef HAVE_GPGME
+        if (use_gpg_mode != 0 &&
+            (use_gpg_mode & LIBBALSA_PROTECT_MODE) != LIBBALSA_PROTECT_SIGN) {
+            *crypt_res =
+                libbalsa_create_rfc2440_buffer(body->message,
+                                               GMIME_PART(mime_part),
+                                               parent, error);
+
+            if (*crypt_res != LIBBALSA_MESSAGE_CREATE_OK) {
+                g_object_unref(G_OBJECT(mpa));
+                return NULL;
+            }
+        }
+#endif
+
+        return GMIME_OBJECT(mpa);
+    } else
+        return GMIME_OBJECT(mime_part);
 }
 
 #if 0
@@ -1741,25 +1799,25 @@ libbalsa_message_create_mime_message(LibBalsaMessage* message, gboolean flow,
 	    g_strfreev(mime_type);
 	} else if (body->buffer) {
 #ifdef HAVE_GPGME
-	    mime_part = add_mime_body_plain(body, flow);
+            guint use_gpg_mode;
+            LibBalsaMsgCreateResult crypt_res = LIBBALSA_MESSAGE_CREATE_OK;
+
 	    /* in '2440 mode, touch *only* the first body! */
 	    if (!postponing && body == body->message->body_list &&
 		message->gpg_mode > 0 &&
-		(message->gpg_mode & LIBBALSA_PROTECT_OPENPGP) != 0) {
-		LibBalsaMsgCreateResult crypt_res =
-		    libbalsa_create_rfc2440_buffer(body,
-			                           GMIME_PART(mime_part),
-						   parent, error);
-
-		if (crypt_res != LIBBALSA_MESSAGE_CREATE_OK) {
-		    g_object_unref(G_OBJECT(mime_part));
-		    if (mime_root)
-			g_object_unref(G_OBJECT(mime_root));
-		    return crypt_res;
-		}
-	    }
+		(message->gpg_mode & LIBBALSA_PROTECT_OPENPGP) != 0)
+                use_gpg_mode = message->gpg_mode;
+            else
+                use_gpg_mode = 0;
+            mime_part = add_mime_body_plain(body, flow, postponing, use_gpg_mode,
+                                            &crypt_res, error);
+            if (!mime_part) {
+                if (mime_root)
+                    g_object_unref(G_OBJECT(mime_root));
+                return crypt_res;
+            }
 #else
-	    mime_part = add_mime_body_plain(body, flow);
+            mime_part = add_mime_body_plain(body, flow, postponing);
 #endif /* HAVE_GPGME */
 	}
 
@@ -1998,10 +2056,9 @@ lb_send_from(LibBalsaMessage *message)
 }
 
 static LibBalsaMsgCreateResult
-libbalsa_create_rfc2440_buffer(LibBalsaMessageBody *body, GMimePart *mime_part,
+libbalsa_create_rfc2440_buffer(LibBalsaMessage *message, GMimePart *mime_part,
 			       GtkWindow * parent, GError ** error)
 {
-    LibBalsaMessage *message = body->message;
     gint mode = message->gpg_mode;
     gboolean always_trust = (mode & LIBBALSA_PROTECT_ALWAYS_TRUST) != 0;
 

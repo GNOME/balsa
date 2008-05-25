@@ -102,6 +102,7 @@ libbalsa_identity_init(LibBalsaIdentity* ident)
     ident->bcc = NULL;
     ident->reply_string = g_strdup(_("Re:"));
     ident->forward_string = g_strdup(_("Fwd:"));
+    ident->send_mp_alternative = FALSE;
     ident->signature_path = NULL;
     ident->sig_executable = FALSE;
     ident->sig_sending = TRUE;
@@ -248,6 +249,14 @@ libbalsa_identity_set_forward_string(LibBalsaIdentity* ident, const gchar* forwa
     
     g_free(ident->forward_string);
     ident->forward_string = g_strdup(forward);
+}
+
+
+void
+libbalsa_identity_set_send_mp_alternative(LibBalsaIdentity* ident, gboolean send_mp_alternative)
+{
+    g_return_if_fail(ident != NULL);
+    ident->send_mp_alternative = send_mp_alternative;
 }
 
 
@@ -982,7 +991,7 @@ setup_ident_frame(GtkDialog * dialog, gboolean createp, gpointer tree)
                            "identity-domain");
 
     /* create the "Messages" tab */
-    table = append_ident_notebook_page(notebook, 8, _("Messages"), NULL);
+    table = append_ident_notebook_page(notebook, 9, _("Messages"), NULL);
     row = 0;
     ident_dialog_add_entry(table, row++, dialog, _("_Bcc:"), 
                            "identity-bcc");
@@ -990,6 +999,9 @@ setup_ident_frame(GtkDialog * dialog, gboolean createp, gpointer tree)
                            "identity-replystring");
     ident_dialog_add_entry(table, row++, dialog, _("F_orward String:"), 
                            "identity-forwardstring");
+    ident_dialog_add_checkbutton(table, row++, dialog, 
+                                 _("send messages in both plain text and _HTML format"),
+                                 "identity-sendmpalternative", TRUE);
     ident_dialog_add_checkbutton(table, row++, dialog, 
                                  _("request _Message Disposition Notification by default"),
                                  "identity-requestmdn", TRUE);
@@ -1469,6 +1481,7 @@ ident_dialog_update(GObject * dlg)
     id->reply_string    = ident_dialog_get_text(dlg, "identity-replystring");
     g_free(id->forward_string);
     id->forward_string  = ident_dialog_get_text(dlg, "identity-forwardstring");
+    id->send_mp_alternative = ident_dialog_get_bool(dlg, "identity-sendmpalternative");
 #if ENABLE_ESMTP
     if(id->smtp_server) g_object_unref(id->smtp_server);
     id->smtp_server = ident_dialog_get_value(dlg, "identity-smtp-server");
@@ -1836,6 +1849,8 @@ display_frame_update(GObject * dialog, LibBalsaIdentity* ident)
                             ident->reply_string);
     display_frame_set_field(dialog, "identity-forwardstring", 
                             ident->forward_string);
+    display_frame_set_boolean(dialog, "identity-sendmpalternative",
+                              ident->send_mp_alternative);
 #if ENABLE_ESMTP
     display_frame_set_server(dialog, "identity-smtp-server",
                              ident->smtp_server);
@@ -1962,6 +1977,8 @@ libbalsa_identity_new_config(const gchar* name)
         g_free(ident->forward_string);
         ident->forward_string = tmpstr;
     }
+    ident->send_mp_alternative =
+        libbalsa_conf_get_bool("SendMultipartAlternative");
     
     ident->signature_path = libbalsa_conf_get_string("SignaturePath");
     ident->sig_executable = libbalsa_conf_get_bool("SigExecutable");
@@ -2001,6 +2018,7 @@ libbalsa_identity_save(LibBalsaIdentity* ident, const gchar* group)
     libbalsa_conf_set_string("Bcc", ident->bcc);
     libbalsa_conf_set_string("ReplyString", ident->reply_string);
     libbalsa_conf_set_string("ForwardString", ident->forward_string);
+    libbalsa_conf_set_bool("SendMultipartAlternative", ident->send_mp_alternative);
 #if ENABLE_ESMTP
     libbalsa_conf_set_string("SmtpServer",
                              libbalsa_smtp_server_get_name(ident->

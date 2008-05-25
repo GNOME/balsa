@@ -129,6 +129,8 @@ static void toggle_reqdispnotify_cb(GtkToggleAction * toggle_action,
                                     BalsaSendmsg * bsmsg);
 static void toggle_format_cb       (GtkToggleAction * toggle_action,
                                     BalsaSendmsg * bsmsg);
+static void toggle_mp_alt_cb       (GtkToggleAction * toggle_action,
+                                    BalsaSendmsg * bsmsg);
 #ifdef HAVE_GPGME
 static void toggle_sign_cb         (GtkToggleAction * toggle_action,
                                     BalsaSendmsg * bsmsg);
@@ -419,6 +421,8 @@ static const GtkToggleActionEntry toggle_entries[] = {
      NULL, G_CALLBACK(toggle_reqdispnotify_cb), FALSE},
     {"Flowed", NULL, N_("_Format = Flowed"), NULL,
      NULL, G_CALLBACK(toggle_format_cb), FALSE},
+    {"SendMPAlt", NULL, N_("Send as plain text and _HTML"), NULL,
+     NULL, G_CALLBACK(toggle_mp_alt_cb), FALSE},
 #ifdef HAVE_GPGME
 #if !defined(ENABLE_TOUCH_UI)
     {"SignMessage", BALSA_PIXMAP_GPG_SIGN, N_("_Sign Message"), NULL,
@@ -508,6 +512,7 @@ static const char *ui_description =
 "    <menu action='OptionsMenu'>"
 "      <menuitem action='RequestMDN'/>"
 "      <menuitem action='Flowed'/>"
+"      <menuitem action='SendMPAlt'/>"
 #ifdef HAVE_GPGME
 "      <separator/>"
 "      <menuitem action='SignMessage'/>"
@@ -1611,6 +1616,7 @@ update_bsmsg_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity* ident)
         }
         g_strfreev(message_split);
     }
+    sw_set_active(bsmsg, "SendMPAlt", bsmsg->ident->send_mp_alternative);
     
 #ifdef HAVE_GPGME
     bsmsg_update_gpg_ui_on_ident_change(bsmsg, ident);
@@ -4591,6 +4597,7 @@ sendmsg_window_new()
 
     bsmsg->flow = !balsa_app.wordwrap;
     sw_set_sensitive(bsmsg, "Reflow", bsmsg->flow);
+    bsmsg->send_mp_alt = FALSE;
 
     sw_set_sensitive(bsmsg, "SelectIdentity",
                      balsa_app.identities->next != NULL);
@@ -4606,6 +4613,7 @@ sendmsg_window_new()
     bsmsg->req_dispnotify = FALSE;
 
     sw_set_active(bsmsg, "Flowed", bsmsg->flow);
+    sw_set_active(bsmsg, "SendMPAlt", bsmsg->ident->send_mp_alternative);
 
 #ifdef HAVE_GPGME
     bsmsg_setup_gpg_ui(bsmsg);
@@ -5022,6 +5030,9 @@ sendmsg_window_continue(LibBalsaMailbox * mailbox, guint msgno)
     if ((postpone_hdr =
          libbalsa_message_get_user_header(message, "X-Balsa-Format")))
         sw_set_active(bsmsg, "Flowed", strcmp(postpone_hdr, "Fixed"));
+    if ((postpone_hdr =
+         libbalsa_message_get_user_header(message, "X-Balsa-MP-Alt")))
+        sw_set_active(bsmsg, "SendMPAlt", !strcmp(postpone_hdr, "yes"));
 
     for (list = message->references; list; list = list->next)
         refs = g_list_prepend(refs, g_strdup(list->data));
@@ -5554,10 +5565,15 @@ bsmsg2message(BalsaSendmsg * bsmsg)
     gtk_text_buffer_get_bounds(bsmsg->buffer2, &start, &end);
     body->buffer = gtk_text_iter_get_text(&start, &end);
 #endif                          /* HAVE_GTKSOURCEVIEW */
+    if (bsmsg->send_mp_alt)
+        body->html_buffer = 
+            libbalsa_text_to_html(message->subj, body->buffer,
+                                  bsmsg->spell_check_lang);
     if (bsmsg->flow)
 	body->buffer =
 	    libbalsa_wrap_rfc2646(body->buffer, balsa_app.wraplength,
                                   TRUE, FALSE, TRUE);
+
 #if !HAVE_GTKSOURCEVIEW
     /* Disable undo and redo, because buffer2 was changed. */
     sw_buffer_set_undo(bsmsg, FALSE, FALSE);
@@ -5834,26 +5850,48 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
     if (!check_suggest_encryption(bsmsg))
 	return FALSE;
 
-    if ((bsmsg->gpg_mode & LIBBALSA_PROTECT_OPENPGP) != 0 &&
-        (bsmsg->gpg_mode & LIBBALSA_PROTECT_MODE) != 0 &&
-	gtk_tree_model_get_iter_first(BALSA_MSG_ATTACH_MODEL(bsmsg), &iter)) {
-	/* we are going to RFC2440 sign/encrypt a multipart... */
-	GtkWidget *dialog;
-	gint choice;
+    if ((bsmsg->gpg_mode & LIBBALSA_PROTECT_OPENPGP) != 0) {
+        gboolean warn_mp;
+        gboolean warn_html_sign;
 
-	dialog = gtk_message_dialog_new
-            (GTK_WINDOW(bsmsg->window),
-             GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_MODAL,
-             GTK_MESSAGE_QUESTION,
-             GTK_BUTTONS_OK_CANCEL,
-             _("You selected OpenPGP mode for a message with attachments. "
-               "In this mode, only the first part will be signed and/or "
-               "encrypted. You should select MIME mode if the complete "
-               "message shall be protected. Do you really want to proceed?"));
-	choice = gtk_dialog_run(GTK_DIALOG(dialog));
-	gtk_widget_destroy(dialog);
-	if (choice != GTK_RESPONSE_OK)
-	    return FALSE;
+        warn_mp = (bsmsg->gpg_mode & LIBBALSA_PROTECT_MODE) != 0 &&
+            gtk_tree_model_get_iter_first(BALSA_MSG_ATTACH_MODEL(bsmsg), &iter);
+        warn_html_sign = (bsmsg->gpg_mode & LIBBALSA_PROTECT_MODE) == LIBBALSA_PROTECT_SIGN &&
+            bsmsg->send_mp_alt;
+            
+        if (warn_mp || warn_html_sign) {
+            /* we are going to RFC2440 sign/encrypt a multipart, or to
+             * RFC2440 sign a multipart/alternative... */
+            GtkWidget *dialog;
+            gint choice;
+            GString * message =
+                g_string_new(_("You selected OpenPGP security for this message.\n"));
+
+            if (warn_html_sign)
+                message =
+                    g_string_append(message,
+                        _("The message text will be sent as plain text and as "
+                          "HTML, but only the plain part can be signed.\n"));
+            if (warn_mp)
+                message =
+                    g_string_append(message,
+                        _("The message contains attachments, which cannot be "
+                          "signed or encrypted\n."));
+            message = 
+                g_string_append(message, 
+                    _("You should select MIME mode if the complete "
+                      "message shall be protected. Do you really want to proceed?"));
+            dialog = gtk_message_dialog_new
+                (GTK_WINDOW(bsmsg->window),
+                 GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_MODAL,
+                 GTK_MESSAGE_QUESTION,
+                 GTK_BUTTONS_OK_CANCEL, message->str);
+            g_string_free(message, TRUE);
+            choice = gtk_dialog_run(GTK_DIALOG(dialog));
+            gtk_widget_destroy(dialog);
+            if (choice != GTK_RESPONSE_OK)
+                return FALSE;
+        }
     }
 #endif
 
@@ -5988,6 +6026,8 @@ message_postpone(BalsaSendmsg * bsmsg)
 #endif /* HAVE_GTKSPELL */
     g_ptr_array_add(headers, g_strdup("X-Balsa-Format"));
     g_ptr_array_add(headers, g_strdup(bsmsg->flow ? "Flowed" : "Fixed"));
+    g_ptr_array_add(headers, g_strdup("X-Balsa-MP-Alt"));
+    g_ptr_array_add(headers, g_strdup(bsmsg->send_mp_alt ? "yes" : "no"));
     g_ptr_array_add(headers, NULL);
 
     if ((bsmsg->type == SEND_REPLY || bsmsg->type == SEND_REPLY_ALL ||
@@ -6473,6 +6513,12 @@ toggle_format_cb(GtkToggleAction * toggle_action, BalsaSendmsg * bsmsg)
 {
     bsmsg->flow = gtk_toggle_action_get_active(toggle_action);
     sw_set_sensitive(bsmsg, "Reflow", bsmsg->flow);
+}
+
+static void
+toggle_mp_alt_cb(GtkToggleAction * toggle_action, BalsaSendmsg * bsmsg)
+{
+    bsmsg->send_mp_alt = gtk_toggle_action_get_active(toggle_action);
 }
 
 #ifdef HAVE_GPGME

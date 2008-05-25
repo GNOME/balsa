@@ -1420,3 +1420,171 @@ libbalsa_match_regex(const gchar * line, regex_t * rex, guint * count,
     return c > 0;
 }
 #endif                          /* USE_GREGEX */
+
+
+GString *
+libbalsa_html_encode_hyperlinks(GString * paragraph)
+{
+    GString * retval;
+    gchar * p;
+#if USE_GREGEX
+    GRegex *url_reg = get_url_reg();
+    GMatchInfo *url_match;
+#else
+    regex_t *url_reg = get_url_reg();
+    regmatch_t url_match;
+#endif
+    gboolean match;
+    gchar * markup;
+
+    /* check for any url */
+    if (!prescanner(paragraph->str)) {
+        markup = g_markup_escape_text(paragraph->str, -1);
+        g_string_assign(paragraph, markup);
+        g_free(markup);
+        return paragraph;
+    }
+
+    /* got some url's... */
+    retval = g_string_new("");
+    p = paragraph->str;
+
+#if USE_GREGEX
+    match = g_regex_match(url_reg, p, 0, &url_match);
+#else
+    match = regexec(url_reg, p, 1, &url_match, 0) == 0;
+#endif
+
+    while (match) {
+        gint start_pos, end_pos;
+
+#if USE_GREGEX
+        if (!g_match_info_fetch_pos(url_match, 0, &start_pos, &end_pos))
+            break;
+#else
+        start_pos = url_match.rm_so;
+        end_pos   = url_match.rm_eo;
+#endif
+
+        /* add the url to the result */
+        if (start_pos > 0) {
+            markup = g_markup_escape_text(p, start_pos);
+            retval = g_string_append(retval, markup);
+            g_free(markup);
+        }
+        retval = g_string_append(retval, "<a href=\"");
+        retval = g_string_append_len(retval, p + start_pos, end_pos - start_pos);
+        retval = g_string_append(retval, "\">");
+        retval = g_string_append_len(retval, p + start_pos, end_pos - start_pos);
+        retval = g_string_append(retval, "</a>");
+
+        /* find next (if any) */
+        p += end_pos;
+        if (prescanner(p)) {
+#if USE_GREGEX
+            g_match_info_free(url_match);
+            match = g_regex_match(url_reg, p, 0, &url_match);
+#else
+            match = regexec(url_reg, p, 1, &url_match, 0) == 0;
+#endif
+        } else
+            match = FALSE;
+    }
+#if USE_GREGEX
+    g_match_info_free(url_match);
+#endif                          /* USE_GREGEX */
+
+    /* copy remainder */
+    if (*p != '\0') {
+        markup = g_markup_escape_text(p, -1);
+        retval = g_string_append(retval, markup);
+        g_free(markup);
+    }
+
+    /* done - free original, return new */
+    g_string_free(paragraph, TRUE);
+    return retval;
+}
+
+
+gchar *
+libbalsa_text_to_html(const gchar * title, const gchar * body, const gchar * lang)
+{
+    GString * html_body =
+        g_string_new("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\">\n");
+    gchar * html_subject;
+    const gchar * start = body;
+    gchar * html_lang;
+    gchar * p;
+
+    /* set the html header, including the primary language and the title */
+    if (lang) {
+        html_lang = g_strdup(lang);
+        if ((p = strchr(html_lang, '_')))
+            *p = '-';
+    } else
+        html_lang = g_strdup("x-unknown");
+    html_subject = g_markup_escape_text(title, -1);
+    g_string_append_printf(html_body, 
+                           "<html lang=\"%s\"><head>\n"
+                           "<title>%s</title>\n"
+                           "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">\n"
+                           "<style type=\"text/css\">\n"
+                           "  p { margin-top: 0px; margin-bottom: 0px; }\n"
+                           "</style></head>\n"
+                           "<body>\n", html_lang, html_subject);
+    g_free(html_subject);
+    g_free(html_lang);
+
+    /* add the lines of the message body */
+    while (*start) {
+        const gchar * eol = strchr(start, '\n');
+        const gchar * p = start;
+        PangoDirection direction = PANGO_DIRECTION_NEUTRAL;
+        GString * html;
+        gsize idx;
+
+        if (!eol)
+            eol = start + strlen(start);
+
+        /* find the first real char to determine the paragraph direction */
+        while (p < eol && direction == PANGO_DIRECTION_NEUTRAL) {
+            direction = pango_unichar_direction(g_utf8_get_char(p));
+            p = g_utf8_next_char(p);
+        }
+
+        /* html escape the line */
+        html = g_string_new_len(start, eol - start);
+
+        /* encode hyperlinks */
+        html = libbalsa_html_encode_hyperlinks(html);
+
+        /* replace a series of n spaces by (n - 1) &nbsp; and one space */
+        idx = 0;
+        while (idx < html->len) {
+            if (html->str[idx] == ' ' && (idx == 0 || html->str[idx + 1] == ' ')) {
+                html->str[idx++] = '&';
+                html = g_string_insert(html, idx, "nbsp;");
+                idx += 5;
+            } else
+                idx = g_utf8_next_char(html->str + idx) - html->str;
+        }
+
+        /* append the paragraph, always stating the proper direction */
+        g_string_append_printf(html_body, "<p dir=\"%s\">%s</p>\n",
+                               direction == PANGO_DIRECTION_RTL ? "rtl" : "ltr",
+                               *html->str ? html->str : "&nbsp;");
+        g_string_free(html, TRUE);
+
+        /* next line */
+        start = eol;
+        if (*start)
+            start++;
+    }
+
+    /* close the html context */
+    html_body = g_string_append(html_body, "</body></html>\n");
+    
+    /* return the utf-8 encoded text/html */
+    return g_string_free(html_body, FALSE);
+}

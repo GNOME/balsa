@@ -65,6 +65,7 @@ struct _LibBalsaMessageBody {
     LibBalsaMessage *message;	/* The message of which this is a part */
     /* FIXME: remove buffer and buf_len to decrease memory usage. */
     gchar *buffer;		/* holds raw data of the MIME part, or NULL */
+    gchar *html_buffer;         /* holds the html representation of the part or NULL */
     ssize_t buflen;             /* size of the block */
     LibBalsaMessageHeaders *embhdrs;  /* headers of a message/rfc822 part */
     LibBalsaMessageBodyType body_type;

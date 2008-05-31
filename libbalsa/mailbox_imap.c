@@ -2757,9 +2757,9 @@ create_cache_copy(const gchar *src, const gchar *cache_dir, const gchar *name)
 {
     gchar *fname = libbalsa_urlencode(name);
     gchar *dst = g_build_filename(cache_dir, fname, NULL);
-    if(link(src, dst) == 0) {
-	printf("Cache %s linked.\n", fname);
-    } else {
+    if(link(src, dst) != 0) {
+	/* Link failed possibly because the two caches reside on
+	   different file systems. We attempt to copy the cache instead. */
 	FILE *in  = fopen(src, "r");
 
 	if(in) {
@@ -2778,7 +2778,6 @@ create_cache_copy(const gchar *src, const gchar *cache_dir, const gchar *name)
 	    }
 	    fclose(in);
 	}
-	printf("Cache %s copied to.\n", fname);
     }
     g_free(fname);
     g_free(dst);

@@ -604,6 +604,12 @@ libbalsa_address_book_ldap_add_address(LibBalsaAddressBook *ab,
 	    return LBABERR_CANNOT_CONNECT;
     }
 
+    if(ldap_ab->priv_book_dn == NULL) {
+        libbalsa_address_book_set_status
+            (ab, _("Undefined location of user address book"));
+        return LBABERR_CANNOT_WRITE;
+    }                                    
+
     dn = g_strdup_printf("mail=%s,%s",
                          (char*)address->address_list->data,
                          ldap_ab->priv_book_dn);

@@ -1,3 +1,10 @@
+* Balsa-2.3.24 release. Release date 2008-05-31
+
+- Support for accessing files over gnome-vfs (smb, ssh mounts, etc.)
+- maildir tree scanning fixes.
+- Rudimentary support for sending text/html messages.
+- UIDPLUS IMAP extension support.
+
 * Balsa-2.3.23 release. Release date 2008-03-20
 
 - Suppport for IMAP MULTIAPPEND extension for faster uploading of

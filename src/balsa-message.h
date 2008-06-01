@@ -57,7 +57,6 @@ struct _BalsaMessage {
 
 	/* header-related information */
 	ShownHeaders shown_headers;
-	gboolean show_all_headers;
 
 	/* Widgets to hold content */
         GtkWidget *cont_viewport;

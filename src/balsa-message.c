@@ -752,7 +752,6 @@ balsa_message_init(BalsaMessage * bm)
 
     bm->wrap_text = balsa_app.browse_wrap;
     bm->shown_headers = balsa_app.shown_headers;
-    bm->show_all_headers = FALSE;
     bm->close_with_msg = FALSE;
 
     gtk_widget_show_all(GTK_WIDGET(bm));

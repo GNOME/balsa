@@ -1,5 +1,13 @@
 2008-06-01  Peter Bloomfield
 
+	* src/balsa-message.h: remove unused member show_all_headers.
+	* src/balsa-message.c: (balsa_message_init): do not init it.
+	* src/balsa-mime-widget-message.c: (add_header_gchar,
+	add_header_address_list,
+	balsa_mime_widget_message_set_headers_d): do not test it.
+
+2008-06-01  Peter Bloomfield
+
 	Make the new mail tray icon optional.
 
 	* src/balsa-app.h: new member notify_new_mail_icon.

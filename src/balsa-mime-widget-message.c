@@ -541,7 +541,7 @@ add_header_gchar(BalsaMessage * bm, GtkTextView * view,
     GtkTextIter insert;
     gboolean truncated = FALSE;
 
-    if (!(bm->show_all_headers || bm->shown_headers == HEADERS_ALL ||
+    if (!(bm->shown_headers == HEADERS_ALL ||
 	  libbalsa_find_word(header, balsa_app.selected_headers)))
 	return;
 
@@ -619,7 +619,7 @@ add_header_address_list(BalsaMessage * bm, GtkTextView * view,
     if (list == NULL)
 	return;
 
-    if (!(bm->show_all_headers || bm->shown_headers == HEADERS_ALL ||
+    if (!(bm->shown_headers == HEADERS_ALL ||
 	  libbalsa_find_word(header, balsa_app.selected_headers)))
 	return;
 
@@ -675,7 +675,7 @@ balsa_mime_widget_message_set_headers_d(BalsaMessage * bm,
     gtk_text_buffer_set_text(buffer, "", 0);
     g_return_if_fail(headers);
 
-    if (!bm->show_all_headers && bm->shown_headers == HEADERS_NONE) {
+    if (bm->shown_headers == HEADERS_NONE) {
 	gtk_widget_hide(widget);
 	return;
     } else

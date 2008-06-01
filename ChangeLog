@@ -1,3 +1,9 @@
+2008-06-01  Peter Bloomfield
+
+	* src/main-window.c: reassign icons to get "Expunge" as a
+	toolbar option.
+	* src/toolbar-factory.c: change labels accordingly.
+
 2008-06-01  Pawel Salek
 
 	* src/balsa-mime-widget-message.c: truncate long headers when

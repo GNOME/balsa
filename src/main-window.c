@@ -445,7 +445,7 @@ static const GtkActionEntry mailbox_entries[] = {
      "<control><alt>F", N_("Next Flagged Message"),
      G_CALLBACK(bw_next_flagged_message_cb)},
     {"MailboxHideMenu", NULL, N_("_Hide Messages")},
-    {"ResetFilter", GTK_STOCK_CLEAR, N_("_Reset Filter"), NULL,
+    {"ResetFilter", GTK_STOCK_CANCEL, N_("_Reset Filter"), NULL,
      N_("Reset mailbox filter"), G_CALLBACK(bw_reset_filter_cb)},
     {"MailboxSelectAll", BALSA_PIXMAP_MARK_ALL, N_("_Select All"), NULL,
      N_("Select all messages in current mailbox"),
@@ -456,14 +456,14 @@ static const GtkActionEntry mailbox_entries[] = {
      N_("Delete the selected mailbox"),
      G_CALLBACK(mailbox_conf_delete_cb)},
 #if !defined(ENABLE_TOUCH_UI)
-    {"Expunge", GTK_STOCK_REMOVE, N_("E_xpunge Deleted Messages"), NULL,
+    {"Expunge", GTK_STOCK_CLEAR, N_("E_xpunge Deleted Messages"), NULL,
      N_("Expunge messages marked as deleted in the current mailbox"),
 #else  /* ENABLE_TOUCH_UI */
     {"Expunge", GTK_STOCK_REMOVE, N_("E_xpunge Deleted Messages"), NULL,
      N_("Expunge messages marked as deleted in the current mailbox"),
 #endif /* ENABLE_TOUCH_UI */
      G_CALLBACK(bw_mailbox_expunge_cb)},
-    {"Close", GTK_STOCK_CANCEL, N_("_Close"), NULL, N_("Close mailbox"),
+    {"Close", GTK_STOCK_CLOSE, N_("_Close"), NULL, N_("Close mailbox"),
      G_CALLBACK(bw_mailbox_close_cb)},
     {"SelectFilters", GTK_STOCK_PROPERTIES, N_("Select _Filters"), NULL,
      N_("Select filters to be applied automatically to current mailbox"),

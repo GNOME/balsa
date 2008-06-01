@@ -155,8 +155,7 @@ button_data toolbar_buttons[]={
     {BALSA_PIXMAP_MARKED_NEW, N_("Toggle\nnew")},
     {BALSA_PIXMAP_MARK_ALL, N_("Mark all")},
     {BALSA_PIXMAP_SHOW_HEADERS, N_("All\nheaders")},
-    {BALSA_PIXMAP_TRASH_EMPTY, N_("Empty Trash")},
-    {GTK_STOCK_CANCEL, N_("Close")},
+    {GTK_STOCK_CANCEL, N_("Reset\nFilter")},
     {BALSA_PIXMAP_SHOW_PREVIEW, N_("Msg Preview")},
 #ifdef HAVE_GPGME
     {BALSA_PIXMAP_GPG_SIGN, N_("Sign")},
@@ -164,7 +163,7 @@ button_data toolbar_buttons[]={
 #endif
     {GTK_STOCK_UNDO, N_("Undo")},
     {GTK_STOCK_REDO, N_("Redo")},
-    {GTK_STOCK_CLEAR, N_("Reset\nFilter")},
+    {GTK_STOCK_CLEAR, N_("Expunge")},
     {GTK_STOCK_REMOVE, N_("Empty\nTrash")},
     {GTK_STOCK_EDIT, N_("Edit")},
 };

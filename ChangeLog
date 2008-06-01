@@ -1,3 +1,12 @@
+2008-06-02  Pawel Salek
+
+	* libbalsa/imap/imap-handle.c: be more robust to servers returning
+	resposes in a changed order. Handle GMail's wrong BODYSTRUCTURE
+	response.
+	* libbalsa/imap/imap_private.h: define ImapFetchBodyType to detect
+	changed response order.
+	* libbalsa/imap/imap-commands.c: detect changed response order.
+
 2008-06-01  Peter Bloomfield
 
 	* src/balsa-message.h: remove unused member show_all_headers.

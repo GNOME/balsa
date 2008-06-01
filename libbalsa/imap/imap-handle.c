@@ -2059,7 +2059,6 @@ imap_get_string_with_lookahead(struct siobuf* sio, int c)
     if(c=='~') /* BINARY extension literal8 indicator */
       c = sio_getc(sio);
     if(c!='{') {
-      g_string_free(res, TRUE);
       return NULL; /* ERROR */
     }
 
@@ -2083,7 +2082,7 @@ static char*
 imap_get_string(struct siobuf* sio)
 {
   GString * s = imap_get_string_with_lookahead(sio, sio_getc(sio));
-  return g_string_free(s, FALSE);
+  return s ? g_string_free(s, FALSE) : NULL;
 }
 
 static gboolean
@@ -2101,7 +2100,10 @@ imap_get_nstring(struct siobuf* sio)
   if(toupper(c)=='N') { /* nil */
     sio_getc(sio); sio_getc(sio); /* ignore i and l */
     return NULL;
-  } else return g_string_free(imap_get_string_with_lookahead(sio, c), FALSE);
+  } else {
+    GString *s = imap_get_string_with_lookahead(sio, c);
+    return s ? g_string_free(s, FALSE) : NULL;
+  }
 }
 
 /* see the spec for the definition of astring */
@@ -2977,7 +2979,7 @@ ir_msg_att_rfc822(ImapMboxHandle *h, int c, unsigned seqno)
 {
   gchar *str = imap_get_nstring(h->sio);
   if(str && h->body_cb)
-    h->body_cb(seqno, str, strlen(str), h->body_arg);
+    h->body_cb(seqno, IMAP_BODY_TYPE_RFC822, str, strlen(str), h->body_arg);
   g_free(str);
   return IMR_OK;
 }
@@ -3391,7 +3393,23 @@ ir_body_ext_1part (struct siobuf *sio, ImapBody * body,
 
   if (type == IMB_NON_EXTENSIBLE)
     return IMR_PROTOCOL;
-
+#define GMAIL_BUG_20080601
+#ifdef GMAIL_BUG_20080601
+  /* GMail sends number of lines on some parts like application/pgp-signature */
+  { int c = sio_getc(sio);
+    if(c == -1)
+      return IMR_PROTOCOL;
+    sio_ungetc(sio);
+    if(isdigit(c)) { 
+      char buf[20];
+      printf("Incorrect GMail number-of-lines entry detected. "
+	     "Working around.\n");
+      c = imap_get_atom(sio, buf, sizeof(buf));
+      if(c != ' ')
+	return IMR_PROTOCOL;
+    }
+  }
+#endif
   /* body_fld_md5 = nstring */
   str = imap_get_nstring (sio);
   if (body && str)
@@ -3619,18 +3637,24 @@ ir_body (struct siobuf *sio, int c, ImapBody * body,
 /* read [section] and following string. FIXME: other kinds of body. */ 
 static ImapResponse
 ir_body_section(struct siobuf *sio, unsigned seqno,
-		ImapFetchBodyCb body_cb, void *arg)
+		ImapFetchBodyType body_type,
+		ImapFetchBodyInternalCb body_cb, void *arg)
 {
   char buf[80];
   GString *bs;
-  int c = imap_get_atom(sio, buf, sizeof(buf));
+  int i, c = imap_get_atom(sio, buf, sizeof(buf));
+
+  for(i=0; buf[i] && (isdigit((int)buf[i]) || buf[i] == '.'); i++)
+    ;
+  if(i>0 && isalpha(buf[i])) /* we have \[[.0-9]something] */
+    body_type = IMAP_BODY_TYPE_HEADER;
 
   if(c != ']') { puts("] expected"); return IMR_PROTOCOL; }
   if(sio_getc(sio) != ' ') { puts("space expected"); return IMR_PROTOCOL;}
   bs = imap_get_binary_string(sio);
   if(bs) {
     if(bs->str && body_cb)
-      body_cb(seqno, bs->str, bs->len, arg);
+      body_cb(seqno, body_type, bs->str, bs->len, arg);
     g_string_free(bs, TRUE);
   }
   return IMR_OK;
@@ -3657,7 +3681,8 @@ ir_body_header_fields(ImapMboxHandle *h, unsigned seqno)
 
   tmp = imap_get_nstring(h->sio);
   if(h->body_cb) {
-    if(tmp) h->body_cb(seqno, tmp, strlen(tmp), h->body_arg);
+    if(tmp) h->body_cb(seqno, IMAP_BODY_TYPE_HEADER,
+		       tmp, strlen(tmp), h->body_arg);
     g_free(tmp);
   } else {
     CREATE_IMSG_IF_NEEDED(h, seqno);
@@ -3680,15 +3705,19 @@ ir_msg_att_body(ImapMboxHandle *h, int c, unsigned seqno)
     c = sio_getc (h->sio);
     sio_ungetc (h->sio);
     if(isdigit (c)) {
-      rc = ir_body_section(h->sio, seqno, h->body_cb, h->body_arg);
+      rc = ir_body_section(h->sio, seqno, IMAP_BODY_TYPE_BODY,
+			   h->body_cb, h->body_arg);
       break;
     }
     c = imap_get_atom(h->sio, buf, sizeof buf);
     if (c == ']' &&
         (g_ascii_strcasecmp(buf, "HEADER") == 0 ||
          g_ascii_strcasecmp(buf, "TEXT") == 0)) {
+      ImapFetchBodyType body_type = 
+	(g_ascii_strcasecmp(buf, "TEXT") == 0)
+	? IMAP_BODY_TYPE_TEXT : IMAP_BODY_TYPE_HEADER;
       sio_ungetc (h->sio); /* put the ']' back */
-      rc = ir_body_section(h->sio, seqno, h->body_cb, h->body_arg);
+      rc = ir_body_section(h->sio, seqno, body_type, h->body_cb, h->body_arg);
     } else {
       if (c == ' ' && 
           (g_ascii_strcasecmp(buf, "HEADER.FIELDS") == 0 ||

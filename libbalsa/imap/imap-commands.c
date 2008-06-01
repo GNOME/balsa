@@ -1030,10 +1030,27 @@ imap_mbox_handle_fetch_set(ImapMboxHandle* handle,
 }
 
 static void
-write_nstring(unsigned seqno, const char *str, size_t len, void *fl)
+write_nstring(unsigned seqno, ImapFetchBodyType body_type,
+              const char *str, size_t len, void *fl)
 {
   if (fwrite(str, 1, len, (FILE*)fl) != len)
     perror("write_nstring");
+}
+
+struct FetchBodyPassthroughData {
+  ImapFetchBodyCb cb;
+  void *arg;
+};
+
+static void
+fetch_body_passthrough(unsigned seqno,
+		       ImapFetchBodyType body_type,
+		       const char *buf,
+		       size_t buflen, void* arg)
+{
+  struct FetchBodyPassthroughData* data = (struct FetchBodyPassthroughData*)arg;
+
+  data->cb(seqno, buf, buflen, data->arg);
 }
 
 ImapResponse
@@ -1051,11 +1068,14 @@ imap_mbox_handle_fetch_rfc822(ImapMboxHandle* handle,
   seq = imap_coalesce_set(cnt, set);
 
   if(seq) {
-    ImapFetchBodyCb cb = handle->body_cb;
-    void          *arg = handle->body_arg;
+    ImapFetchBodyInternalCb cb = handle->body_cb;
+    void                   *arg = handle->body_arg;
     gchar *cmd = g_strdup_printf("FETCH %s RFC822", seq);
-    handle->body_cb  = fetch_cb;
-    handle->body_arg = fetch_cb_data;
+    struct FetchBodyPassthroughData passthrough_data;
+    passthrough_data.cb = fetch_cb;
+    passthrough_data.arg = fetch_cb_data;
+    handle->body_cb  = fetch_cb ? fetch_body_passthrough : NULL;
+    handle->body_arg = &passthrough_data;
     rc = imap_cmd_exec(handle, cmd);
     handle->body_cb  = cb;
     handle->body_arg = arg;
@@ -1067,23 +1087,128 @@ imap_mbox_handle_fetch_rfc822(ImapMboxHandle* handle,
   return rc;
 }
 
+/* When peeking into message, we need to assure that we save header
+   first and body later: the order the fields are returned is in
+   principle undefined. */
+struct FetchBodyHeaderText {
+  FILE *out_file;
+  char *body;
+  size_t length;
+  gboolean wrote_header;
+};
+
+static void
+write_header_text_ordered(unsigned seqno, ImapFetchBodyType body_type,
+			  const char *str, size_t len, void *arg)
+{
+  struct FetchBodyHeaderText *fbht = (struct FetchBodyHeaderText*)arg;
+  switch(body_type) {
+  case IMAP_BODY_TYPE_RFC822:
+    g_warning("Server sends unrequested RFC822 response");
+    break; /* This is really unexpected response! */
+  case IMAP_BODY_TYPE_HEADER:
+    if (fwrite(str, 1, len, fbht->out_file) != len)
+      perror("write_nstring");
+    fbht->wrote_header = TRUE;
+    if(fbht->body) {
+      if (fwrite(fbht->body, 1, fbht->length, fbht->out_file) != fbht->length)
+	perror("write_nstring");
+      g_free(fbht->body); fbht->body = NULL;
+    }
+    break;
+  case IMAP_BODY_TYPE_TEXT:
+  case IMAP_BODY_TYPE_BODY:
+    if(fbht->wrote_header) {
+      if (fwrite(str, 1, len, fbht->out_file) != len)
+	perror("write_nstring");
+    } else {
+      fbht->body = g_malloc(len);
+      fbht->length = len;
+      memcpy(fbht->body, str, len);
+    }
+    break;
+  }
+}
+
+/* There is some point to code reuse here. */
+struct PassHeaderTextOrdered {
+  ImapFetchBodyCb cb;
+  void *arg;
+  char *body;
+  size_t length;
+  gboolean wrote_header;
+};
+
+static void
+pass_header_text_ordered(unsigned seqno, ImapFetchBodyType body_type,
+			  const char *str, size_t len, void *arg)
+{
+  struct PassHeaderTextOrdered *phto = (struct PassHeaderTextOrdered*)arg;
+  switch(body_type) {
+  case IMAP_BODY_TYPE_RFC822:
+    g_warning("Server sends unrequested RFC822 response");
+    break; /* This is really unexpected response! */
+  case IMAP_BODY_TYPE_HEADER:
+    phto->cb(seqno, str, len, phto->arg);
+    phto->wrote_header = TRUE;
+    if(phto->body) {
+    printf("Writing saved body\n");
+      phto->cb(seqno, phto->body, phto->length, phto->arg);
+      g_free(phto->body); phto->body = NULL;
+    }
+    break;
+  case IMAP_BODY_TYPE_TEXT:
+  case IMAP_BODY_TYPE_BODY:
+    if(phto->wrote_header) {
+      phto->cb(seqno, str, len, phto->arg);
+    } else {
+      printf("saving body\n");
+      phto->body = g_malloc(len);
+      phto->length = len;
+      memcpy(phto->body, str, len);
+    }
+    break;
+  }
+}
+
+
 ImapResponse
 imap_mbox_handle_fetch_rfc822_uid(ImapMboxHandle* handle, unsigned uid, 
                                   gboolean peek, FILE *fl)
 {
   char cmd[80];
-  ImapFetchBodyCb cb = handle->body_cb;
+  ImapFetchBodyInternalCb cb = handle->body_cb;
   void          *arg = handle->body_arg;
   ImapResponse rc;
+  char *cmdstr;
+  struct FetchBodyHeaderText separate_arg;
+
 
   IMAP_REQUIRED_STATE1(handle, IMHS_SELECTED, IMR_BAD);
   HANDLE_LOCK(handle);
-  handle->body_cb  = write_nstring;
-  handle->body_arg = fl;
-  sprintf(cmd, peek 
-          ? "UID FETCH %u (BODY.PEEK[HEADER] BODY.PEEK[TEXT])"
-          : "UID FETCH %u RFC822", uid);
+
+  /* Consider switching between BODY.PEEK[HEADER] BODY.PEEK[TEXT] and
+     BODY[HEADER] BODY[TEXT] - this would simplify the callback
+     code. */
+  if(peek) {
+    handle->body_cb  = write_header_text_ordered;
+    handle->body_arg = &separate_arg;
+    separate_arg.body = NULL;
+    separate_arg.wrote_header = FALSE;
+    separate_arg.out_file = fl;
+    cmdstr = "UID FETCH %u (BODY.PEEK[HEADER] BODY.PEEK[TEXT])";
+  } else {
+    handle->body_cb  = write_nstring;
+    handle->body_arg = fl;
+    cmdstr = "UID FETCH %u RFC822";
+  }
+
+  snprintf(cmd, sizeof(cmd), cmdstr, uid);
   rc = imap_cmd_exec(handle, cmd);
+  if(peek) {
+    g_free(separate_arg.body); /* This should never be needed. */
+  }
+
   handle->body_cb  = cb;
   handle->body_arg = arg;
   HANDLE_UNLOCK(handle);
@@ -1100,20 +1225,18 @@ struct ImapBinaryData {
 };
 
 static void
-imap_binary_handler(unsigned seqno, const char *buf,
-                    size_t buflen, void* arg)
+imap_binary_handler(unsigned seqno, ImapFetchBodyType body_type,
+		    const char *buf, size_t buflen, void* arg)
 {
   struct ImapBinaryData *ibd = (struct ImapBinaryData*)arg;
   if(ibd->first_run) {
-    static const char binary_header[] =
-      "Content-Transfer-Encoding: binary\r\n\r\n";
     char *content_type = imap_body_get_content_type(ibd->body);
-    char *str = g_strdup_printf("Content-Type: %s\r\n", content_type);
+    char *str = g_strdup_printf("Content-Type: %s\r\n"
+				"Content-Transfer-Encoding: binary\r\n\r\n",
+				content_type);
     g_free(content_type);
     ibd->body_cb(seqno, str, strlen(str), ibd->body_arg);
     g_free(str);
-    ibd->body_cb(seqno, binary_header, sizeof(binary_header)-1,
-                 ibd->body_arg);
     ibd->first_run = FALSE;
   }
   ibd->body_cb(seqno, buf, buflen, ibd->body_arg);
@@ -1127,10 +1250,11 @@ imap_mbox_handle_fetch_body(ImapMboxHandle* handle,
                             ImapFetchBodyCb body_cb, void *arg)
 {
   char cmd[160];
-  ImapFetchBodyCb fcb = handle->body_cb;
+  ImapFetchBodyInternalCb fcb = handle->body_cb;
   void          *farg = handle->body_arg;
   ImapResponse rc;
   const gchar *peek_string = peek_only ? ".PEEK" : "";
+  struct PassHeaderTextOrdered pass_ordered_data;
 
   IMAP_REQUIRED_STATE1(handle, IMHS_SELECTED, IMR_BAD);
 
@@ -1154,8 +1278,13 @@ imap_mbox_handle_fetch_body(ImapMboxHandle* handle,
       return rc;
     }
   }
-  handle->body_cb  = body_cb;
-  handle->body_arg = arg;
+
+  handle->body_cb  = pass_header_text_ordered;
+  handle->body_arg = &pass_ordered_data;
+  pass_ordered_data.cb = body_cb;
+  pass_ordered_data.arg = arg;
+  pass_ordered_data.body = NULL;
+  pass_ordered_data.wrote_header = FALSE;
   /* Pure IMAP without extensions */
   if(options == IMFB_NONE)
     snprintf(cmd, sizeof(cmd), "FETCH %u BODY%s[%s]",
@@ -1180,6 +1309,7 @@ imap_mbox_handle_fetch_body(ImapMboxHandle* handle,
              seqno, peek_string, prefix, peek_string, section);
   }
   rc = imap_cmd_exec(handle, cmd);
+  g_free(pass_ordered_data.body);
   handle->body_cb  = fcb;
   handle->body_arg = farg;
   return rc;
@@ -1765,7 +1895,8 @@ need_msgid(unsigned seqno, GPtrArray* msgids)
 }
 
 static void
-msgid_cb(unsigned seqno, const char *buf, size_t buflen, void* arg)
+msgid_cb(unsigned seqno, ImapFetchBodyType body_type,
+	 const char *buf, size_t buflen, void* arg)
 {
   GPtrArray *arr = (GPtrArray*)arg;
   g_return_if_fail(seqno>=1 && seqno<=arr->len);
@@ -1786,7 +1917,7 @@ imap_mbox_complete_msgids(ImapMboxHandle *h,
 {
   gchar *seq, *cmd;
   ImapResponse rc = IMR_OK;
-  ImapFetchBodyCb cb;
+  ImapFetchBodyInternalCb cb;
   void *arg;
 
   IMAP_REQUIRED_STATE1(h, IMHS_SELECTED, IMR_BAD);

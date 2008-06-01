@@ -35,6 +35,20 @@
 
 #include "imap-commands.h"
 
+typedef enum {
+  IMAP_BODY_TYPE_RFC822, /**< as fetched with RFC822 */
+  IMAP_BODY_TYPE_HEADER, /** header of the message: BODY[HEADER] */
+  IMAP_BODY_TYPE_TEXT,   /**< content of the message part: BODY[TEXT] */
+  IMAP_BODY_TYPE_BODY    /**< a part as fetched with BODY[x] */
+} ImapFetchBodyType;
+
+
+typedef void (*ImapFetchBodyInternalCb)(unsigned seqno,
+					ImapFetchBodyType body_type,
+					const char *buf,
+					size_t buflen, void* arg);
+
+
 struct _MboxView {
   unsigned *arr;
   unsigned allocated, entries;
@@ -93,7 +107,7 @@ struct _ImapMboxHandle {
 
   ImapFlagsCb flags_cb;
   void *flags_arg;
-  ImapFetchBodyCb body_cb;
+  ImapFetchBodyInternalCb body_cb;
   void *body_arg;
 
   ImapMonitorCb monitor_cb;

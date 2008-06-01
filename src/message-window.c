@@ -820,7 +820,7 @@ mw_header_activate_cb(GtkAction * action, gpointer data)
             gtk_radio_action_get_current_value(GTK_RADIO_ACTION(action));
         MessageWindow *mw = (MessageWindow *) data;
 
-        balsa_app.shown_headers = sh;
+        mw->headers_shown = sh;
         reset_show_all_headers(mw);
         balsa_message_set_displayed_headers(BALSA_MESSAGE(mw->bmessage),
                                             sh);
@@ -986,16 +986,10 @@ static void
 show_all_headers_tool_cb(GtkToggleAction * action, gpointer data)
 {
     MessageWindow *mw = (MessageWindow *) (data);
-
-    if (gtk_toggle_action_get_active(action)) {
-        mw->show_all_headers = TRUE;
-	balsa_message_set_displayed_headers(BALSA_MESSAGE(mw->bmessage),
-					    HEADERS_ALL);
-    } else {
-        mw->show_all_headers = FALSE;
-	balsa_message_set_displayed_headers(BALSA_MESSAGE(mw->bmessage),
-					    mw->headers_shown);
-    }
+    mw->show_all_headers = gtk_toggle_action_get_active(action);
+    balsa_message_set_displayed_headers(BALSA_MESSAGE(mw->bmessage),
+                                        mw->show_all_headers ?
+                                        HEADERS_ALL : mw->headers_shown);
 }
 
 static void

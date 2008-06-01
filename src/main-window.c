@@ -5053,15 +5053,11 @@ bw_show_all_headers_tool_cb(GtkToggleAction * action, gpointer data)
 {
     BalsaWindow *bw = BALSA_WINDOW(data);
 
-    if (gtk_toggle_action_get_active(action)) {
-        balsa_app.show_all_headers = TRUE;
-        balsa_message_set_displayed_headers(BALSA_MESSAGE(bw->preview),
-                                            HEADERS_ALL);
-    } else {
-        balsa_app.show_all_headers = FALSE;
-        balsa_message_set_displayed_headers(BALSA_MESSAGE(bw->preview),
-                                            balsa_app.shown_headers);
-    }
+    balsa_app.show_all_headers = gtk_toggle_action_get_active(action);
+    balsa_message_set_displayed_headers(BALSA_MESSAGE(bw->preview),
+                                        balsa_app.show_all_headers ?
+                                        HEADERS_ALL :
+                                        balsa_app.shown_headers);
 }
 
 static void

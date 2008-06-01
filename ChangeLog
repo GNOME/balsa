@@ -1,3 +1,10 @@
+2008-06-01  Peter Bloomfield
+
+	* src/main-window.c: tighten code.
+	* src/message-window.c: (mw_header_activate): do not change
+	balsa-app.shown_headers.
+	(show_all_headers_tool_cb): tighten code.
+
 2008-06-02  Pawel Salek
 
 	* libbalsa/imap/imap-handle.c: be more robust to servers returning

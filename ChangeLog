@@ -1,5 +1,17 @@
 2008-06-01  Peter Bloomfield
 
+	Make the new mail tray icon optional.
+
+	* src/balsa-app.h: new member notify_new_mail_icon.
+	* src/balsa-app.c: (balsa_app_init): initialize it to 1.
+	* src/main-window.c: test it.
+	* src/pref-manager.c: (open_preferences_manager, apply_prefs,
+	set_prefs, checking_group): manage it.
+	* src/save-restore.c: (config_global_load, config_save): load
+	and save it.
+
+2008-06-01  Peter Bloomfield
+
 	* src/main-window.c: reassign icons to get "Expunge" as a
 	toolbar option.
 	* src/toolbar-factory.c: change labels accordingly.

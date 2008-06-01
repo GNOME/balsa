@@ -208,6 +208,9 @@ extern struct BalsaApplication {
     gint notify_new_mail_sound;
     
     gint notify_new_mail_dialog;
+#if GTK_CHECK_VERSION(2, 10, 0)
+    gint notify_new_mail_icon;
+#endif                          /* GTK_CHECK_VERSION(2, 10, 0) */
 
     /* automatically close mailboxes after XX minutes */
     gboolean close_mailbox_auto;

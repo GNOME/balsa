@@ -910,6 +910,10 @@ config_global_load(void)
 	d_get_gint("NewMailNotificationDialog", 0);
     balsa_app.notify_new_mail_sound =
 	d_get_gint("NewMailNotificationSound", 1);
+#if GTK_CHECK_VERSION(2, 10, 0)
+    balsa_app.notify_new_mail_icon =
+	d_get_gint("NewMailNotificationIcon", 1);
+#endif                          /* GTK_CHECK_VERSION(2, 10, 0) */
     balsa_app.check_mail_upon_startup =
 	libbalsa_conf_get_bool("OnStartup=false");
     balsa_app.check_mail_auto = libbalsa_conf_get_bool("Auto=false");
@@ -1395,10 +1399,14 @@ config_save(void)
     /* Maibox checking options ... */
     libbalsa_conf_push_group("MailboxChecking");
 
-	libbalsa_conf_set_int("NewMailNotificationDialog",
-				balsa_app.notify_new_mail_dialog);
-	libbalsa_conf_set_int("NewMailNotificationSound",
-				balsa_app.notify_new_mail_sound);
+    libbalsa_conf_set_int("NewMailNotificationDialog",
+                          balsa_app.notify_new_mail_dialog);
+    libbalsa_conf_set_int("NewMailNotificationSound",
+                          balsa_app.notify_new_mail_sound);
+#if GTK_CHECK_VERSION(2, 10, 0)
+    libbalsa_conf_set_int("NewMailNotificationIcon",
+                          balsa_app.notify_new_mail_icon);
+#endif                          /* GTK_CHECK_VERSION(2, 10, 0) */
     libbalsa_conf_set_bool("OnStartup", balsa_app.check_mail_upon_startup);
     libbalsa_conf_set_bool("Auto", balsa_app.check_mail_auto);
     libbalsa_conf_set_int("AutoDelay", balsa_app.check_mail_timer);

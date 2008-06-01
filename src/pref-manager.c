@@ -92,6 +92,9 @@ typedef struct _PropertyUI {
     GtkWidget *check_imap_inbox;
     GtkWidget *notify_new_mail_dialog;
     GtkWidget *notify_new_mail_sound;
+#if GTK_CHECK_VERSION(2, 10, 0)
+    GtkWidget *notify_new_mail_icon;
+#endif                          /* GTK_CHECK_VERSION(2, 10, 0) */
     GtkWidget *mdn_reply_clean_menu, *mdn_reply_notclean_menu;
 
     GtkWidget *close_mailbox_auto;
@@ -643,6 +646,11 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
     g_signal_connect(G_OBJECT(pui->notify_new_mail_sound), "toggled",
                      G_CALLBACK(properties_modified_cb), property_box);
 
+#if GTK_CHECK_VERSION(2, 10, 0)
+    g_signal_connect(G_OBJECT(pui->notify_new_mail_icon), "toggled",
+                     G_CALLBACK(properties_modified_cb), property_box);
+#endif                          /* GTK_CHECK_VERSION(2, 10, 0) */
+
     g_signal_connect(G_OBJECT(pui->close_mailbox_auto), "toggled",
                      G_CALLBACK(mailbox_close_timer_modified_cb),
                      property_box);
@@ -876,6 +884,10 @@ apply_prefs(GtkDialog * pbox)
         GTK_TOGGLE_BUTTON(pui->notify_new_mail_dialog)->active;
     balsa_app.notify_new_mail_sound =
         GTK_TOGGLE_BUTTON(pui->notify_new_mail_sound)->active;
+#if GTK_CHECK_VERSION(2, 10, 0)
+    balsa_app.notify_new_mail_icon =
+        GTK_TOGGLE_BUTTON(pui->notify_new_mail_icon)->active;
+#endif                          /* GTK_CHECK_VERSION(2, 10, 0) */
     balsa_app.mdn_reply_clean =
         pm_combo_box_get_level(pui->mdn_reply_clean_menu);
     balsa_app.mdn_reply_notclean =
@@ -1114,6 +1126,11 @@ set_prefs(void)
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
                                  (pui->notify_new_mail_sound),
                                  balsa_app.notify_new_mail_sound);
+#if GTK_CHECK_VERSION(2, 10, 0)
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
+                                 (pui->notify_new_mail_icon),
+                                 balsa_app.notify_new_mail_icon);
+#endif                          /* GTK_CHECK_VERSION(2, 10, 0) */
     if (!balsa_app.check_imap)
         gtk_widget_set_sensitive(GTK_WIDGET(pui->check_imap_inbox), FALSE);
 
@@ -1769,68 +1786,91 @@ checking_group(GtkWidget * page)
 {
     GtkWidget *group;
     GtkWidget *table;
+    guint row;
     GtkObject *spinbutton_adj;
     GtkWidget *label;
+    GtkWidget *hbox;
 
     group = pm_group_new(_("Checking"));
     table = create_table(6, 3, page);
     pm_group_add(group, table, FALSE);
 
+    row = 0;
     pui->check_mail_auto = gtk_check_button_new_with_mnemonic(
 	_("_Check mail automatically every"));
-    gtk_table_attach(GTK_TABLE(table), pui->check_mail_auto, 0, 1, 0, 1,
-                     GTK_FILL, 0, 0, 0);
+    gtk_table_attach(GTK_TABLE(table), pui->check_mail_auto,
+                     0, 1, row, row + 1, GTK_FILL, 0, 0, 0);
     pm_page_add_to_size_group(page, pui->check_mail_auto);
 
     spinbutton_adj = gtk_adjustment_new(10, 1, 100, 1, 10, 10);
     pui->check_mail_minutes =
 	gtk_spin_button_new(GTK_ADJUSTMENT(spinbutton_adj), 1, 0);
-    gtk_table_attach(GTK_TABLE(table), pui->check_mail_minutes, 1, 2, 0, 1,
-                     GTK_EXPAND | GTK_FILL, 0, 0, 0);
+    gtk_table_attach(GTK_TABLE(table), pui->check_mail_minutes,
+                     1, 2, row, row + 1, GTK_EXPAND | GTK_FILL, 0, 0, 0);
 
     label = gtk_label_new(_("minutes"));
     gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
-    gtk_table_attach(GTK_TABLE(table), label, 2, 3, 0, 1,
-                     GTK_FILL, 0, 0, 0);
+    gtk_table_attach(GTK_TABLE(table), label,
+                     2, 3, row, row + 1, GTK_FILL, 0, 0, 0);
 
+    ++row;
     pui->check_imap = gtk_check_button_new_with_mnemonic(
 	_("Check _IMAP mailboxes"));
-    gtk_table_attach(GTK_TABLE(table), pui->check_imap, 0, 1, 1, 2,
-                     GTK_FILL, 0, 0, 0);
+    gtk_table_attach(GTK_TABLE(table), pui->check_imap,
+                     0, 1, row, row + 1, GTK_FILL, 0, 0, 0);
     pm_page_add_to_size_group(page, pui->check_imap);
     
     pui->check_imap_inbox = gtk_check_button_new_with_mnemonic(
 	_("Check INBOX _only"));
-    gtk_table_attach(GTK_TABLE(table), pui->check_imap_inbox, 1, 3, 1, 2,
-                     GTK_FILL, 0, 0, 0);
+    gtk_table_attach(GTK_TABLE(table), pui->check_imap_inbox,
+                     1, 3, row, row + 1, GTK_FILL, 0, 0, 0);
     
-    pui->notify_new_mail_dialog = gtk_check_button_new_with_label(
-	_("Display message if new mail has arrived"));
-    gtk_table_attach(GTK_TABLE(table), pui->notify_new_mail_dialog,
-                     0, 3, 2, 3, GTK_FILL, 0, 0, 0);
+    ++row;
+    hbox = gtk_hbox_new(FALSE, COL_SPACING);
+
+    label = gtk_label_new(_("When mail arrives:"));
+    gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
+    gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, FALSE, 0);
+
+    pui->notify_new_mail_dialog =
+        gtk_check_button_new_with_label(_("Display message"));
+    gtk_box_pack_start(GTK_BOX(hbox), pui->notify_new_mail_dialog,
+                       FALSE, FALSE, 0);
+
+    pui->notify_new_mail_sound =
+        gtk_check_button_new_with_label(_("Play sound"));
+    gtk_box_pack_start(GTK_BOX(hbox), pui->notify_new_mail_sound,
+                       FALSE, FALSE, 0);
+
+#if GTK_CHECK_VERSION(2, 10, 0)
+    pui->notify_new_mail_icon =
+        gtk_check_button_new_with_label(_("Show icon"));
+    gtk_box_pack_start(GTK_BOX(hbox), pui->notify_new_mail_icon,
+                       FALSE, FALSE, 0);
+#endif                          /* GTK_CHECK_VERSION(2, 10, 0) */
+
+    gtk_table_attach(GTK_TABLE(table), hbox,
+                     0, 3, row, row + 1, GTK_FILL, 0, 0, 0);
     
-    pui->notify_new_mail_sound = gtk_check_button_new_with_label(
-	_("Play sound if new mail has arrived"));
-    gtk_table_attach(GTK_TABLE(table), pui->notify_new_mail_sound,
-                     0, 3, 3, 4, GTK_FILL, 0, 0, 0);
-    
+    ++row;
     pui->quiet_background_check = gtk_check_button_new_with_label(
 	_("Do background check quietly (no messages in status bar)"));
     gtk_table_attach(GTK_TABLE(table), pui->quiet_background_check,
-                     0, 3, 4, 5, GTK_FILL, 0, 0, 0);
+                     0, 3, row, row + 1, GTK_FILL, 0, 0, 0);
 
+    ++row;
     label = gtk_label_new_with_mnemonic(_("_POP message size limit:"));
     gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
-    gtk_table_attach(GTK_TABLE(table), label, 0, 1, 5, 6,
-                     GTK_FILL, 0, 0, 0);
+    gtk_table_attach(GTK_TABLE(table), label,
+                     0, 1, row, row + 1, GTK_FILL, 0, 0, 0);
     pui->msg_size_limit = gtk_spin_button_new_with_range(0.1, 100, 0.1);
     gtk_label_set_mnemonic_widget(GTK_LABEL(label), pui->msg_size_limit);
-    gtk_table_attach(GTK_TABLE(table), pui->msg_size_limit, 1, 2, 5, 6,
-                     GTK_EXPAND | GTK_FILL, 0, 0, 0);
+    gtk_table_attach(GTK_TABLE(table), pui->msg_size_limit,
+                     1, 2, row, row + 1, GTK_EXPAND | GTK_FILL, 0, 0, 0);
     label = gtk_label_new(_("MB"));
     gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
-    gtk_table_attach(GTK_TABLE(table), label, 2, 3, 5, 6,
-                     GTK_FILL, 0, 0, 0);
+    gtk_table_attach(GTK_TABLE(table), label,
+                     2, 3, row, row + 1, GTK_FILL, 0, 0, 0);
     
     return group;
 }

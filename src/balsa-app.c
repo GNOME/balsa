@@ -410,6 +410,9 @@ balsa_app_init(void)
 
     balsa_app.notify_new_mail_sound = 1;
     balsa_app.notify_new_mail_dialog = 0;
+#if GTK_CHECK_VERSION(2, 10, 0)
+    balsa_app.notify_new_mail_icon = 1;
+#endif                          /* GTK_CHECK_VERSION(2, 10, 0) */
 
 #if !GTK_CHECK_VERSION(2, 11, 0)
     /* Tooltips */

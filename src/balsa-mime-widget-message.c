@@ -515,6 +515,9 @@ bm_header_widget_new(BalsaMessage * bm, GtkWidget * buttons)
 
     g_object_set_data(G_OBJECT(widget), BALSA_MESSAGE_TEXT_VIEW,
 		      text_view);
+    gtk_text_buffer_create_tag
+	(gtk_text_view_get_buffer(GTK_TEXT_VIEW(text_view)), "url",
+	 "foreground-gdk", &balsa_app.url_color, NULL);
 
     return widget;
 }
@@ -531,10 +534,12 @@ add_header_gchar(BalsaMessage * bm, GtkTextView * view,
 		 const gchar * header, const gchar * label,
 		 const gchar * value)
 {
+    static const gchar * all_tag_const = N_("... [truncated]");
     PangoTabArray *tab;
     GtkTextBuffer *buffer;
     GtkTextTag *font_tag;
     GtkTextIter insert;
+    gboolean truncated = FALSE;
 
     if (!(bm->show_all_headers || bm->shown_headers == HEADERS_ALL ||
 	  libbalsa_find_word(header, balsa_app.selected_headers)))
@@ -576,12 +581,30 @@ add_header_gchar(BalsaMessage * bm, GtkTextView * view,
 
 	gtk_text_buffer_insert(buffer, &insert, "\t", 1);
 	wrapped_value = g_strdup(value);
-	libbalsa_wrap_string(wrapped_value,
-			     balsa_app.wraplength - BALSA_INDENT_CHARS);
 	libbalsa_utf8_sanitize(&wrapped_value,
 			       balsa_app.convert_unknown_8bit, NULL);
+
+        if(bm->shown_headers != HEADERS_ALL) {
+            static const gssize MAXLEN = 160;
+            const gchar *all_tag = _(all_tag_const);
+            ssize_t all_tag_len = strlen(all_tag)+1;
+            glong header_length = g_utf8_strlen(value, MAXLEN+all_tag_len+5);
+            if(header_length > MAXLEN+all_tag_len) {
+                gchar *p = g_utf8_offset_to_pointer(wrapped_value, MAXLEN);
+                *p = '\0';
+		truncated = TRUE;
+            }
+        }
+
+	libbalsa_wrap_string(wrapped_value,
+			     balsa_app.wraplength - BALSA_INDENT_CHARS);
 	gtk_text_buffer_insert_with_tags(buffer, &insert, wrapped_value,
 					 -1, indent_tag, font_tag, NULL);
+	if(truncated) {
+	    GtkTextTag *url_tag = gtk_text_tag_table_lookup(table, "url");
+	    gtk_text_buffer_insert_with_tags(buffer, &insert, _(all_tag_const),
+					     -1, indent_tag, url_tag, NULL);
+	}
 	g_free(wrapped_value);
     }
 }

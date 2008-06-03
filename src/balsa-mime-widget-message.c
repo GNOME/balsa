@@ -474,11 +474,20 @@ bm_header_extend_popup(GtkTextView *textview, GtkMenu *menu, gpointer arg)
     gtk_widget_show(menu_item);
 }
 
+/* Indents in pixels: */
+#define BALSA_ONE_CHAR     7
+#define BALSA_INDENT_CHARS 15
+#define BALSA_TAB1         (BALSA_ONE_CHAR * BALSA_INDENT_CHARS)
+#define BALSA_TAB2         (BALSA_TAB1 + BALSA_ONE_CHAR)
+
 static GtkWidget *
 bm_header_widget_new(BalsaMessage * bm, GtkWidget * buttons)
 {
     GtkWidget *widget;
     GtkWidget *text_view;
+    GtkTextView *view;
+    GtkTextBuffer *buffer;
+    PangoTabArray *tab;
     GtkWidget *hbox;
 
     widget = gtk_frame_new(NULL);
@@ -499,12 +508,29 @@ bm_header_widget_new(BalsaMessage * bm, GtkWidget * buttons)
 		     G_CALLBACK(balsa_mime_widget_unlimit_focus),
 		     (gpointer) bm);
     bm_modify_font_from_string(text_view, balsa_app.message_font);
-    gtk_text_view_set_editable(GTK_TEXT_VIEW(text_view), FALSE);
-    gtk_text_view_set_left_margin(GTK_TEXT_VIEW(text_view),
-				  BMW_HEADER_MARGIN_LEFT);
-    gtk_text_view_set_right_margin(GTK_TEXT_VIEW(text_view),
-				   BMW_HEADER_MARGIN_RIGHT);
-    gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(text_view), GTK_WRAP_WORD);
+
+    view = GTK_TEXT_VIEW(text_view);
+    gtk_text_view_set_editable(view, FALSE);
+    gtk_text_view_set_left_margin(view, BMW_HEADER_MARGIN_LEFT);
+    gtk_text_view_set_right_margin(view, BMW_HEADER_MARGIN_RIGHT);
+    gtk_text_view_set_wrap_mode(view, GTK_WRAP_WORD);
+
+    tab = pango_tab_array_new_with_positions(2, TRUE,
+                                             PANGO_TAB_LEFT, BALSA_TAB1,
+                                             PANGO_TAB_LEFT, BALSA_TAB2);
+    gtk_text_view_set_tabs(view, tab);
+    pango_tab_array_free(tab);
+
+    buffer = gtk_text_view_get_buffer(view);
+    gtk_text_buffer_create_tag(buffer, "subject-font",
+                               "font", balsa_app.subject_font,
+                               NULL);
+    gtk_text_buffer_create_tag(buffer, "hanging-indent",
+                               "indent", -BALSA_TAB1,
+                               NULL);
+    gtk_text_buffer_create_tag(buffer, "url",
+                               "foreground-gdk", &balsa_app.url_color,
+                               NULL);
 
     g_signal_connect(text_view, "key_press_event",
 		     G_CALLBACK(balsa_mime_widget_key_press_event), bm);
@@ -515,19 +541,9 @@ bm_header_widget_new(BalsaMessage * bm, GtkWidget * buttons)
 
     g_object_set_data(G_OBJECT(widget), BALSA_MESSAGE_TEXT_VIEW,
 		      text_view);
-    gtk_text_buffer_create_tag
-	(gtk_text_view_get_buffer(GTK_TEXT_VIEW(text_view)), "url",
-	 "foreground-gdk", &balsa_app.url_color, NULL);
 
     return widget;
 }
-
-
-/* Indents in pixels: */
-#define BALSA_ONE_CHAR     7
-#define BALSA_INDENT_CHARS 15
-#define BALSA_TAB1         (BALSA_ONE_CHAR * BALSA_INDENT_CHARS)
-#define BALSA_TAB2         (BALSA_TAB1 + BALSA_ONE_CHAR)
 
 static void
 add_header_gchar(BalsaMessage * bm, GtkTextView * view,
@@ -535,77 +551,57 @@ add_header_gchar(BalsaMessage * bm, GtkTextView * view,
 		 const gchar * value)
 {
     static const gchar * all_tag_const = N_("... [truncated]");
-    PangoTabArray *tab;
     GtkTextBuffer *buffer;
-    GtkTextTag *font_tag;
     GtkTextIter insert;
+    const gchar *font;
     gboolean truncated = FALSE;
 
     if (!(bm->shown_headers == HEADERS_ALL ||
 	  libbalsa_find_word(header, balsa_app.selected_headers)))
 	return;
 
-    tab = pango_tab_array_new_with_positions(2, TRUE,
-					     PANGO_TAB_LEFT, BALSA_TAB1,
-					     PANGO_TAB_LEFT, BALSA_TAB2);
-    gtk_text_view_set_tabs(view, tab);
-    pango_tab_array_free(tab);
-
     /* always display the label in the predefined font */
     buffer = gtk_text_view_get_buffer(view);
-    font_tag = NULL;
-    if (strcmp(header, "subject") == 0)
-	font_tag =
-	    gtk_text_buffer_create_tag(buffer, NULL,
-				       "font", balsa_app.subject_font,
-				       NULL);
 
     gtk_text_buffer_get_iter_at_mark(buffer, &insert,
 				     gtk_text_buffer_get_insert(buffer));
-    if (gtk_text_buffer_get_char_count(buffer))
+    if (gtk_text_buffer_get_char_count(buffer) > 0)
 	gtk_text_buffer_insert(buffer, &insert, "\n", 1);
-    gtk_text_buffer_insert_with_tags(buffer, &insert,
-				     label, -1, font_tag, NULL);
+    font = strcmp(header, "subject") == 0 ? "subject-font" : NULL;
+    gtk_text_buffer_insert_with_tags_by_name(buffer, &insert, label, -1,
+                                             "hanging-indent", font,
+                                             NULL);
 
     if (value && *value != '\0') {
-	GtkTextTagTable *table;
-	GtkTextTag *indent_tag;
-	gchar *wrapped_value;
-
-	table = gtk_text_buffer_get_tag_table(buffer);
-	indent_tag = gtk_text_tag_table_lookup(table, "indent");
-	if (!indent_tag)
-	    indent_tag =
-		gtk_text_buffer_create_tag(buffer, "indent",
-					   "indent", BALSA_TAB1, NULL);
+        gchar *sanitized;
+        const gchar *all_tag = _(all_tag_const);
 
 	gtk_text_buffer_insert(buffer, &insert, "\t", 1);
-	wrapped_value = g_strdup(value);
-	libbalsa_utf8_sanitize(&wrapped_value,
-			       balsa_app.convert_unknown_8bit, NULL);
+
+        sanitized = g_strdup(value);
+        libbalsa_utf8_sanitize(&sanitized,
+                               balsa_app.convert_unknown_8bit, NULL);
 
         if(bm->shown_headers != HEADERS_ALL) {
             static const gssize MAXLEN = 160;
-            const gchar *all_tag = _(all_tag_const);
             ssize_t all_tag_len = strlen(all_tag)+1;
             glong header_length = g_utf8_strlen(value, MAXLEN+all_tag_len+5);
             if(header_length > MAXLEN+all_tag_len) {
-                gchar *p = g_utf8_offset_to_pointer(wrapped_value, MAXLEN);
+                gchar *p = g_utf8_offset_to_pointer(sanitized, MAXLEN);
                 *p = '\0';
 		truncated = TRUE;
             }
         }
 
-	libbalsa_wrap_string(wrapped_value,
-			     balsa_app.wraplength - BALSA_INDENT_CHARS);
-	gtk_text_buffer_insert_with_tags(buffer, &insert, wrapped_value,
-					 -1, indent_tag, font_tag, NULL);
-	if(truncated) {
-	    GtkTextTag *url_tag = gtk_text_tag_table_lookup(table, "url");
-	    gtk_text_buffer_insert_with_tags(buffer, &insert, _(all_tag_const),
-					     -1, indent_tag, url_tag, NULL);
-	}
-	g_free(wrapped_value);
+        gtk_text_buffer_insert_with_tags_by_name(buffer, &insert,
+                                                 sanitized, -1,
+                                                 font, NULL);
+        g_free(sanitized);
+
+	if (truncated)
+            gtk_text_buffer_insert_with_tags_by_name(buffer, &insert,
+                                                     all_tag, -1,
+                                                     "url", NULL);
     }
 }
 

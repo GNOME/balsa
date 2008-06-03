@@ -1,3 +1,8 @@
+2008-06-02  Peter Bloomfield
+
+	* src/balsa-mime-widget-message.c: (bm_header_widget_new,
+	add_header_gchar): let GtkTextView wrap headers.
+
 2008-06-01  Peter Bloomfield
 
 	* src/main-window.c: tighten code.

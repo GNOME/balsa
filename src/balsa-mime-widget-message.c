@@ -584,8 +584,10 @@ add_header_gchar(BalsaMessage * bm, GtkTextView * view,
 
         if(bm->shown_headers != HEADERS_ALL) {
             static const gssize MAXLEN = 160;
-            ssize_t all_tag_len = strlen(all_tag)+1;
-            glong header_length = g_utf8_strlen(value, MAXLEN+all_tag_len+5);
+            ssize_t all_tag_len = g_utf8_strlen(all_tag, -1);
+            /* Look far enough into value to be sure that we can tell if
+             * the length is more than MAXLEN+all_tag_len: */
+            glong header_length = g_utf8_strlen(value, 4*(MAXLEN+all_tag_len+1));
             if(header_length > MAXLEN+all_tag_len) {
                 gchar *p = g_utf8_offset_to_pointer(sanitized, MAXLEN);
                 *p = '\0';

@@ -1,3 +1,9 @@
+2008-06-04  Peter Bloomfield
+
+	* src/balsa-mime-widget-message.c: (add_header_gchar): look
+	further into the value, to make sure we detect a long header
+	field.
+
 2008-06-02  Peter Bloomfield
 
 	* src/balsa-mime-widget-message.c: (bm_header_widget_new,

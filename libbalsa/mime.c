@@ -87,26 +87,27 @@ process_mime_part(LibBalsaMessage * message, LibBalsaMessageBody * body,
 	}
 #endif /* HAVE_GTKHTML */
 
-	if (llen > 0) {
-            if (flow && libbalsa_message_body_is_flowed(body)) {
-                /* we're making a `format=flowed' message, and the
-                 * message we're quoting was flowed
-                 *
-                 * we'll assume it's going to the screen */
-		gboolean delsp = libbalsa_message_body_is_delsp(body);
+        if (flow && libbalsa_message_body_is_flowed(body)) {
+            /* we're making a `format=flowed' message, and the
+             * message we're quoting was flowed
+             *
+             * we'll assume it's going to the screen */
+            gboolean delsp = libbalsa_message_body_is_delsp(body);
 
-		reply =
-		    libbalsa_process_text_rfc2646(res, G_MAXINT, FALSE,
-						  TRUE,
-						  reply_prefix_str != NULL,
-						  delsp);
-                g_free(res);
-                break;
-            }
+            reply =
+                libbalsa_process_text_rfc2646(res, G_MAXINT, FALSE, TRUE,
+                                              reply_prefix_str != NULL,
+                                              delsp);
+            g_free(res);
+            break;
+        }
+
+        if (llen > 0) {
 	    if (reply_prefix_str)
 		llen -= strlen(reply_prefix_str);
 	    libbalsa_wrap_string(res, llen);
 	}
+
         if (reply_prefix_str || flow) {
 	    gchar *str, *ptr;
 	    /* prepend the prefix to all the lines */

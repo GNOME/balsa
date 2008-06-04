@@ -1,5 +1,10 @@
 2008-06-04  Peter Bloomfield
 
+	* libbalsa/mime.c: (process_mime_part): quote a flowed message
+	as flowed.
+
+2008-06-04  Peter Bloomfield
+
 	* src/balsa-mime-widget-message.c: (add_header_gchar): look
 	further into the value, to make sure we detect a long header
 	field.

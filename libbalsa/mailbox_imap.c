@@ -802,7 +802,7 @@ imap_exists_cb(ImapMboxHandle *handle, LibBalsaMailboxImap *mimap)
                     g_free(msgid);
                     g_ptr_array_index(mimap->msgids, i) = NULL;
                 }
-                libbalsa_mailbox_cache_message(mailbox, i + 1, NULL);
+                libbalsa_mailbox_index_entry_clear(mailbox, i + 1);
             }
             for(i=mimap->messages_info->len; i>cnt; i--) {
                 g_array_remove_index(mimap->messages_info, i-1);

@@ -1,3 +1,23 @@
+2008-06-05  Peter Bloomfield
+
+	New method libbalsa_mailbox_index_entry_clear to avoid using
+	libbalsa_mailbox_cache_message with a NULL message to clear the
+	index entry.
+
+	* libbalsa/mailbox.h: remove
+	libbalsa_mailbox_index_entry_free--no need to export;
+	new method libbalsa_mailbox_index_entry_clear.
+	* libbalsa/mailbox.c: (lbm_index_entry_free,
+	libbalsa_mailbox_index_entry_clear,
+	libbalsa_mailbox_free_mindex, libbalsa_mailbox_msgno_removed):
+	replace public
+	libbalsa_mailbox_index_entry_free with static
+	lbm_index_entry_free; new public method
+	libbalsa_mailbox_index_entry_clear;
+	(libbalsa_mailbox_cache_message): require a non-NULL message.
+	* libbalsa/mailbox_imap.c: (imap_exists_cb): use
+	libbalsa_mailbox_index_entry_clear.
+
 2008-06-04  Peter Bloomfield
 
 	* libbalsa/mime.c: (process_mime_part): quote a flowed message

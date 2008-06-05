@@ -350,8 +350,8 @@ lbm_index_entry_new_pending(void)
 }
 #endif                          /*BALSA_USE_THREADS */
 
-void
-libbalsa_mailbox_index_entry_free(LibBalsaMailboxIndexEntry *entry)
+static void
+lbm_index_entry_free(LibBalsaMailboxIndexEntry *entry)
 {
     if(entry) {
 #ifdef BALSA_USE_THREADS
@@ -362,6 +362,22 @@ libbalsa_mailbox_index_entry_free(LibBalsaMailboxIndexEntry *entry)
             g_free(entry->subject);
         }
         g_free(entry);
+    }
+}
+
+void
+libbalsa_mailbox_index_entry_clear(LibBalsaMailbox * mailbox, guint msgno)
+{
+    g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
+    g_return_if_fail(msgno > 0);
+
+    if (msgno <= mailbox->mindex->len) {
+        LibBalsaMailboxIndexEntry **entry = (LibBalsaMailboxIndexEntry **)
+            & g_ptr_array_index(mailbox->mindex, msgno - 1);
+        lbm_index_entry_free(*entry);
+        *entry = NULL;
+
+        libbalsa_mailbox_msgno_changed(mailbox, msgno);
     }
 }
 
@@ -497,8 +513,7 @@ libbalsa_mailbox_free_mindex(LibBalsaMailbox *mailbox)
         unsigned i;
         /* we could have used g_ptr_array_foreach but it is >=2.4.0 */
         for(i=0; i<mailbox->mindex->len; i++)
-            libbalsa_mailbox_index_entry_free
-                (g_ptr_array_index(mailbox->mindex, i));
+            lbm_index_entry_free(g_ptr_array_index(mailbox->mindex, i));
         g_ptr_array_free(mailbox->mindex, TRUE);
         mailbox->mindex = NULL;
     }
@@ -1334,8 +1349,8 @@ libbalsa_mailbox_msgno_removed(LibBalsaMailbox * mailbox, guint seqno)
                     decrease_post, &dt);
 
     if (seqno <= mailbox->mindex->len) {
-        libbalsa_mailbox_index_entry_free(g_ptr_array_index(mailbox->mindex,
-                                                            seqno - 1));
+        lbm_index_entry_free(g_ptr_array_index(mailbox->mindex,
+                                               seqno - 1));
         g_ptr_array_remove_index(mailbox->mindex, seqno - 1);
     }
 
@@ -4269,26 +4284,19 @@ libbalsa_mailbox_cache_message(LibBalsaMailbox * mailbox, guint msgno,
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
     if (!mailbox->mindex)
         return;
+    g_return_if_fail(msgno > 0);
+    g_return_if_fail(LIBBALSA_IS_MESSAGE(message));
 
-    if (message) {
-        while (mailbox->mindex->len < msgno)
-            g_ptr_array_add(mailbox->mindex, NULL);
+    if (mailbox->mindex->len < msgno)
+        g_ptr_array_set_size(mailbox->mindex, msgno);
 
-        entry = g_ptr_array_index(mailbox->mindex, msgno - 1);
+    entry = g_ptr_array_index(mailbox->mindex, msgno - 1);
 
-        if (!entry)
-            g_ptr_array_index(mailbox->mindex, msgno - 1) =
-                libbalsa_mailbox_index_entry_new_from_msg(message);
+    if (!entry)
+        g_ptr_array_index(mailbox->mindex, msgno - 1) =
+            libbalsa_mailbox_index_entry_new_from_msg(message);
 #if BALSA_USE_THREADS
-        else if (entry->idle_pending)
-            lbm_index_entry_populate_from_msg(entry, message);
+    else if (entry->idle_pending)
+        lbm_index_entry_populate_from_msg(entry, message);
 #endif                          /* BALSA_USE_THREADS */
-        else
-            return;
-    } else if (msgno <= mailbox->mindex->len) {
-        libbalsa_mailbox_index_entry_free(g_ptr_array_index
-                                          (mailbox->mindex, msgno - 1));
-        g_ptr_array_index(mailbox->mindex, msgno - 1) = NULL;
-        libbalsa_mailbox_msgno_changed(mailbox, msgno);
-    }
 }

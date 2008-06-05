@@ -500,7 +500,8 @@ LibBalsaMailboxIndexEntry* libbalsa_mailbox_index_entry_new_from_msg
                            (LibBalsaMessage *msg);
 void libbalsa_mailbox_index_entry_set_no(LibBalsaMailboxIndexEntry *entry,
                                          unsigned no);
-void libbalsa_mailbox_index_entry_free(LibBalsaMailboxIndexEntry *entry);
+void libbalsa_mailbox_index_entry_clear(LibBalsaMailbox * mailbox,
+                                        guint msgno);
 void libbalsa_mailbox_index_set_flags(LibBalsaMailbox *mailbox,
 				      unsigned msgno, LibBalsaMessageFlag f);
 gboolean libbalsa_mailbox_set_view_filter(LibBalsaMailbox * mailbox,

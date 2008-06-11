@@ -1,3 +1,8 @@
+2008-06-11  Paweł Sałek
+
+	* libbalsa/imap/imap-handle.c: detect disconnect on write.
+	* src/ab-main.c: add "Delete Entry" menu entry.
+
 2008-06-05  Peter Bloomfield
 
 	New method libbalsa_mailbox_index_entry_clear to avoid using

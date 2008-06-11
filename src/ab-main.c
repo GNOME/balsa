@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2002 Stuart Parmenter and others,
+ * Copyright (C) 1997-2008 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -487,6 +487,53 @@ edit_new_entry_cb(GtkAction * action, gpointer user_data)
                           focus_child);
 }
 
+static LibBalsaABErr
+ab_remove_address(LibBalsaAddress* address)
+{
+    LibBalsaABErr err = LBABERR_OK;
+
+    g_return_val_if_fail(address, err);
+
+    libbalsa_address_book_remove_address(contacts_app.address_book, address);
+
+    if(err == LBABERR_OK) {
+        GtkTreeIter       iter;
+        GtkTreeSelection *selection;
+        GtkTreeView  *v = GTK_TREE_VIEW(contacts_app.entry_list);
+        GtkTreeModel *m;
+        selection       = gtk_tree_view_get_selection(v);
+        if(gtk_tree_selection_get_selected(selection, &m, &iter))
+            gtk_list_store_remove(GTK_LIST_STORE(m), &iter);
+	if(address == contacts_app.displayed_address) {
+	    ab_clear_edit_widget();
+	    contacts_app.displayed_address = NULL;
+	}
+    } else 
+        ab_warning("Cannot remove: %s\n",
+                   libbalsa_address_book_strerror(contacts_app.address_book,
+                                                  err));
+    return err;
+}
+
+static void
+edit_delete_entry_cb(GtkAction * action, gpointer user_data)
+{
+    GtkTreeView  *v = GTK_TREE_VIEW(contacts_app.entry_list);
+    GtkTreeSelection *selection = gtk_tree_view_get_selection(v);
+    GtkTreeModel *model;
+    GtkTreeIter   iter;
+
+    if(gtk_tree_selection_get_selected(selection, &model, &iter)) {
+	GValue gv = {0,};
+	LibBalsaAddress *address;
+
+	gtk_tree_model_get_value(model, &iter, LIST_COLUMN_ADDRESS, &gv);
+	address = LIBBALSA_ADDRESS(g_value_get_object(&gv));
+	if (address)
+	    ab_remove_address(address);
+    }
+}
+
 /* Normal items */
 static GtkActionEntry entries[] = {
     {"FileMenu", NULL, N_("_File")},
@@ -519,6 +566,8 @@ static GtkActionEntry entries[] = {
      gtk_main_quit},
     {"NewEntry", GTK_STOCK_NEW, N_("_New Entry"), "<shift><control>N",
      N_("Add new entry"), G_CALLBACK(edit_new_entry_cb)},
+    {"DeleteEntry", GTK_STOCK_NEW, N_("_Delete Entry"), NULL,
+     N_("Delete entry"), G_CALLBACK(edit_delete_entry_cb)},
     {"About",
 #if GTK_CHECK_VERSION(2, 6, 0)
      GTK_STOCK_ABOUT,
@@ -554,6 +603,7 @@ static const char *ui_description =
 "    </menu>"
 "    <menu action='EntryMenu'>"
 "      <menuitem action='NewEntry'/>"
+"      <menuitem action='DeleteEntry'/>"
 "    </menu>"
 "    <menu action='HelpMenu'>"
 "      <menuitem action='About'/>"
@@ -831,25 +881,7 @@ apply_button_cb(GtkWidget * w, gpointer data)
 static void
 remove_button_cb(GtkWidget *w, gpointer data)
 {
-    LibBalsaABErr err = LBABERR_OK;
-
-    if (contacts_app.displayed_address)
-        libbalsa_address_book_remove_address(contacts_app.address_book,
-                                             contacts_app.displayed_address);
-    if(err == LBABERR_OK) {
-        GtkTreeIter       iter;
-        GtkTreeSelection *selection;
-        GtkTreeView  *v = GTK_TREE_VIEW(contacts_app.entry_list);
-        GtkTreeModel *m;
-        selection       = gtk_tree_view_get_selection(v);
-        if(gtk_tree_selection_get_selected(selection, &m, &iter))
-            gtk_list_store_remove(GTK_LIST_STORE(m), &iter);
-        ab_clear_edit_widget();
-        contacts_app.displayed_address = NULL;
-    } else 
-        ab_warning("Cannot remove: %s\n",
-                   libbalsa_address_book_strerror(contacts_app.address_book,
-                                                  err));
+    ab_remove_address(contacts_app.displayed_address);
 }
 
 static void

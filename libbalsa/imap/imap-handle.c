@@ -1983,7 +1983,11 @@ imap_cmd_exec_cmdno(ImapMboxHandle* handle, const char* cmd,
     return IMR_SEVERED;  /* irrecoverable connection error. */
 
   if(ret_cmdno) *ret_cmdno = cmdno;
+  g_return_val_if_fail(handle->state != IMHS_DISCONNECTED && 1, IMR_BAD);
   sio_flush(handle->sio);
+  if(handle->state == IMHS_DISCONNECTED)
+    return IMR_SEVERED;
+
   do {
     rc = imap_cmd_step (handle, cmdno);
   } while (rc == IMR_UNTAGGED);

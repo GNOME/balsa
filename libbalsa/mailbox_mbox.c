@@ -341,9 +341,9 @@ static void mbox_unlock(LibBalsaMailbox * mailbox, GMimeStream *stream)
 static void
 lbm_mbox_header_cb(GMimeParser * parser, const char *header,
                    const char *value, off_t offset,
-                   struct message_info **msg_info_p)
+                   gpointer user_data)
 {
-    struct message_info *msg_info = *msg_info_p;
+    struct message_info *msg_info = *(struct message_info **) user_data;
 
     if (g_ascii_strcasecmp(header, "Status") == 0 && msg_info->status < 0)
         msg_info->status = offset;
@@ -470,7 +470,6 @@ parse_mailbox(LibBalsaMailboxMbox * mbox)
     g_mime_parser_set_respect_content_length(gmime_parser, TRUE);
     g_mime_parser_set_header_regex(gmime_parser,
                                    "^Status|^X-Status|^MIME-Version",
-				   (GMimeParserHeaderRegexFunc)
 				   lbm_mbox_header_cb, &msg_info_p);
 
     libbalsa_mailbox_local_set_threading_info(local);
@@ -1618,7 +1617,6 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
     g_mime_parser_set_respect_content_length(gmime_parser, TRUE);
     g_mime_parser_set_header_regex(gmime_parser,
                                    "^Status|^X-Status|^MIME-Version",
-				   (GMimeParserHeaderRegexFunc)
 				   lbm_mbox_header_cb, &msg_info);
     for (j = first; j < mbox->msgno_2_msg_info->len; ) {
 	GMimeMessage *mime_msg;

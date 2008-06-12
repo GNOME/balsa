@@ -1,3 +1,9 @@
+2008-06-12  Peter Bloomfield
+
+	* libbalsa/mailbox_mbox.c: (lbm_mbox_header_cb, parse_mailbox),
+	libbalsa_mailbox_mbox_sync): declare GMimeParserHeaderRegexFunc
+	callback properly, and do not cast references to it.
+
 2008-06-11  Paweł Sałek
 
 	* libbalsa/imap/imap-handle.c: detect disconnect on write.

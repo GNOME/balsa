@@ -1,4 +1,5 @@
 #intl dir needed for tarball --disable-nls build.
+DISTCHECK_CONFIGURE_FLAGS="--disable-extra-mimeicons"
 SUBDIRS = po sounds images doc libbalsa libinit_balsa src
 # set tar in case it is not set by automake or make
 

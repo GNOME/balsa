@@ -23,6 +23,7 @@ libbalsa/gmime-part-rfc2440.c
 libbalsa/identity.c
 libbalsa/imap-server.c
 libbalsa/libbalsa-conf.c
+libbalsa/libbalsa-vfs.c
 libbalsa/libbalsa.c
 libbalsa/libbalsa_private.h
 libbalsa/mailbox.c

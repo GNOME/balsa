@@ -68,5 +68,21 @@ install-data-local: index.html
 	$(INSTALL_DATA) $$file $(DESTDIR)$(balsa_helpdir)/stylesheet-images/$$basefile;\
 	done
 
+uninstall-data-local: index.html
+	$(mkinstalldirs) $(DESTDIR)$(balsa_helpdir)/images
+	$(mkinstalldirs) $(DESTDIR)$(balsa_helpdir)/stylesheet-images
+	-for file in balsa/*.html; do \
+	basefile=`basename $$file`; \
+	$(INSTALL_DATA) $$file $(DESTDIR)$(balsa_helpdir)/$$basefile; \
+	done
+	-for file in $(srcdir)/images/*.png ; do \
+	basefile=`basename $$file`; \
+	$(INSTALL_DATA) $$file $(DESTDIR)$(balsa_helpdir)/images/$$basefile;\
+	done
+	-for file in $(srcdir)/stylesheet-images/*.gif ; do \
+	basefile=`basename $$file`; \
+	$(INSTALL_DATA) $$file $(DESTDIR)$(balsa_helpdir)/stylesheet-images/$$basefile;\
+	done
+
 clean-hook:
 	-cd images && rm *.eps

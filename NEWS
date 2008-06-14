@@ -1,3 +1,10 @@
+* Balsa-2.3.25 release. Release date 2008-06-14
+
+- GMail compatibility.
+- notification in GNOME panel are optional now.
+- wrapping of flowed text improved.
+- lots of various bug fixes.
+
 * Balsa-2.3.24 release. Release date 2008-05-31
 
 - Support for accessing files over gnome-vfs (smb, ssh mounts, etc.)

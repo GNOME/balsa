@@ -1,2 +1,4 @@
 # List of source files that should NOT be translated.
 # Please keep this list in alphabetical order.
+balsa-mail.lang
+balsa-mail-style.xml

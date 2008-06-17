@@ -1726,6 +1726,26 @@ libbalsa_mailbox_sync_storage(LibBalsaMailbox * mailbox, gboolean expunge)
     return retval;
 }
 
+static void
+lbm_cache_message(LibBalsaMailbox * mailbox, guint msgno,
+                  LibBalsaMessage * message)
+{
+    LibBalsaMailboxIndexEntry *entry;
+
+    if (mailbox->mindex->len < msgno)
+        g_ptr_array_set_size(mailbox->mindex, msgno);
+
+    entry = g_ptr_array_index(mailbox->mindex, msgno - 1);
+
+    if (!entry)
+        g_ptr_array_index(mailbox->mindex, msgno - 1) =
+            libbalsa_mailbox_index_entry_new_from_msg(message);
+#if BALSA_USE_THREADS
+    else if (entry->idle_pending)
+        lbm_index_entry_populate_from_msg(entry, message);
+#endif                          /* BALSA_USE_THREADS */
+}
+
 LibBalsaMessage *
 libbalsa_mailbox_get_message(LibBalsaMailbox * mailbox, guint msgno)
 {
@@ -1757,6 +1777,10 @@ libbalsa_mailbox_get_message(LibBalsaMailbox * mailbox, guint msgno)
     message = LIBBALSA_MAILBOX_GET_CLASS(mailbox)->get_message(mailbox,
                                                                msgno);
     libbalsa_unlock_mailbox(mailbox);
+
+    if (message && mailbox->mindex)
+        /* Cache the message info, if we do not already have it. */
+        lbm_cache_message(mailbox, msgno, message);
 
     return message;
 }
@@ -2716,10 +2740,10 @@ lbm_get_index_entry_real(LibBalsaMailbox * mailbox)
             break;
 
         pthread_mutex_unlock(&get_index_entry_lock);
-        if ( (message = libbalsa_mailbox_get_message(mailbox, msgno)) ) {
-            libbalsa_mailbox_cache_message(mailbox, msgno, message);
+        if ((message = libbalsa_mailbox_get_message(mailbox, msgno)))
+            /* get-message has cached the message info, so we just unref
+             * message. */
             g_object_unref(message);
-        }
         pthread_mutex_lock(&get_index_entry_lock);
     }
 
@@ -2742,8 +2766,8 @@ lbm_get_index_entry(LibBalsaMailbox * lmm, GNode * node)
     if (!lmm->mindex)
         return NULL;
 
-    while (lmm->mindex->len < msgno )
-        g_ptr_array_add(lmm->mindex, NULL);
+    if (lmm->mindex->len < msgno )
+        g_ptr_array_set_size(lmm->mindex, msgno);
 
     entry = g_ptr_array_index(lmm->mindex, msgno - 1);
 #ifdef BALSA_USE_THREADS
@@ -2777,7 +2801,8 @@ lbm_get_index_entry(LibBalsaMailbox * lmm, GNode * node)
         LibBalsaMessage *message =
             libbalsa_mailbox_get_message(lmm, msgno);
         if (message) {
-            libbalsa_mailbox_cache_message(lmm, msgno, message);
+            /* get-message has cached the message info, so we just unref
+             * message. */
             g_object_unref(message);
             entry = g_ptr_array_index(lmm->mindex, msgno - 1);
         }
@@ -4184,24 +4209,11 @@ void
 libbalsa_mailbox_cache_message(LibBalsaMailbox * mailbox, guint msgno,
                                LibBalsaMessage * message)
 {
-    LibBalsaMailboxIndexEntry *entry;
-
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
     if (!mailbox->mindex)
         return;
     g_return_if_fail(msgno > 0);
     g_return_if_fail(LIBBALSA_IS_MESSAGE(message));
 
-    if (mailbox->mindex->len < msgno)
-        g_ptr_array_set_size(mailbox->mindex, msgno);
-
-    entry = g_ptr_array_index(mailbox->mindex, msgno - 1);
-
-    if (!entry)
-        g_ptr_array_index(mailbox->mindex, msgno - 1) =
-            libbalsa_mailbox_index_entry_new_from_msg(message);
-#if BALSA_USE_THREADS
-    else if (entry->idle_pending)
-        lbm_index_entry_populate_from_msg(entry, message);
-#endif                          /* BALSA_USE_THREADS */
+    lbm_cache_message(mailbox, msgno, message);
 }

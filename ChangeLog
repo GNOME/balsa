@@ -1,5 +1,14 @@
 2008-06-17  Peter Bloomfield
 
+	* libbalsa/mailbox.c: (lbm_cache_message,
+	libbalsa_mailbox_get_message, lbm_get_index_entry_real,
+	lbm_get_index_entry, libbalsa_mailbox_cache_message): cache
+	message info for the display at get-message time.
+	* libbalsa/mailbox_mbox.c: (parse_mailbox): remove redundant
+	call to libbalsa_mailbox_cache_message.
+
+2008-06-17  Peter Bloomfield
+
 	* libbalsa/libbalsa_private.h: scrap unused cache-unseen-child
 	code.
 	* libbalsa/mailbox.c: (lbm_index_entry_populate_from_msg,

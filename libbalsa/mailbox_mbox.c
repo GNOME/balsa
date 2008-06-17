@@ -520,13 +520,13 @@ parse_mailbox(LibBalsaMailboxMbox * mbox)
         msg->mailbox = LIBBALSA_MAILBOX(mbox);
         msg->msgno = ++msgno;
 	/* We must drop the mime-stream lock to call
+         * libbalsa_mailbox_local_cache_message, which calls
 	 * libbalsa_mailbox_cache_message(), as it may grab the
 	 * gdk lock to emit gtk signals; we save and restore the current
 	 * stream position, in case someone changes it while we're not
 	 * holding the lock. */
         offset = g_mime_stream_tell(mbox->gmime_stream);
         libbalsa_mime_stream_shared_unlock(mbox->gmime_stream);
-        libbalsa_mailbox_cache_message(LIBBALSA_MAILBOX(mbox), msgno, msg);
         libbalsa_mailbox_local_cache_message(local, msgno, msg);
         libbalsa_mime_stream_shared_lock(mbox->gmime_stream);
         g_mime_stream_seek(mbox->gmime_stream, offset, GMIME_STREAM_SEEK_SET);

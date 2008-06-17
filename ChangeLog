@@ -1,3 +1,11 @@
+2008-06-17  Peter Bloomfield
+
+	* libbalsa/libbalsa_private.h: scrap unused cache-unseen-child
+	code.
+	* libbalsa/mailbox.c: (lbm_index_entry_populate_from_msg,
+	lbm_node_has_unseen_child, lbm_msgno_changed,
+	lbm_set_threading, mbox_model_get_value): ditto.
+
 2008-06-14  Paweł Sałek
 
 	* NEWS, configure.in: release 2.3.25.

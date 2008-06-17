@@ -40,13 +40,6 @@ struct LibBalsaMailboxIndexEntry_ {
 #ifdef BALSA_USE_THREADS
     unsigned idle_pending:1;
 #endif                          /* BALSA_USE_THREADS */
-#define CACHE_UNSEEN_CHILD FALSE
-#if CACHE_UNSEEN_CHILD
-    /* Code for managing this cached bit is incomplete; if calculating
-     * has-unseen-child status on the fly is a performance hit, we'll
-     * have to finish it. */
-    unsigned has_unseen_child:1;
-#endif /* CACHE_UNSEEN_CHILD */
 } ;
 
 #ifdef BALSA_USE_THREADS

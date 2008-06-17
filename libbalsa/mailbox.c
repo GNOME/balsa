@@ -326,9 +326,6 @@ lbm_index_entry_populate_from_msg(LibBalsaMailboxIndexEntry * entry,
 #ifdef BALSA_USE_THREADS
     entry->idle_pending  = 0;
 #endif                          /*BALSA_USE_THREADS */
-#if CACHE_UNSEEN_CHILD
-    entry->has_unseen_child = 0; /* Find out after threading. */
-#endif /* CACHE_UNSEEN_CHILD */
     libbalsa_mailbox_msgno_changed(msg->mailbox, msg->msgno);
 }
 
@@ -1110,52 +1107,6 @@ libbalsa_mailbox_type_from_path(const gchar * path)
  * a GtkTreeView, so the emission must be made holding the gdk lock.
  */
 
-#if CACHE_UNSEEN_CHILD
-/* Does the node have an unseen child? */
-static gboolean
-lbm_node_has_unseen_child(LibBalsaMailbox * mailbox, GNode * node)
-{
-    if (!node)
-	return FALSE;
-    for (node = node->children; node; node = node->next) {
-	guint msgno = GPOINTER_TO_UINT(node->data);
-	LibBalsaMailboxIndexEntry *entry =
-	    g_ptr_array_index(mailbox->mindex, msgno - 1);
-	if (entry && (entry->unseen || entry->has_unseen_child))
-	    return TRUE;
-    }
-    return FALSE;
-}
-
-/* Called when a row is changed: check ancestors' has_unread_child
- * status. */
-static void
-lbm_entry_check(LibBalsaMailbox * mailbox, guint msgno)
-{
-    LibBalsaMailboxIndexEntry *entry;
-    GNode *node;
-    gboolean unread;
-
-    entry = g_ptr_array_index(mailbox->mindex, msgno - 1);
-    if (!entry)
-	return;
-    if (!mailbox->msg_tree)
-	return;
-    node = g_node_find(mailbox->msg_tree, G_PRE_ORDER, G_TRAVERSE_ALL,
-		       GUINT_TO_POINTER(msgno));
-    if (!node)
-	return;
-
-    unread = (entry->status_icon == LIBBALSA_MESSAGE_STATUS_UNREAD);
-    while ((node = node->parent) && (msgno = GPOINTER_TO_UINT(node->data))) {
-	entry = g_ptr_array_index(mailbox->mindex, msgno - 1);
-        if(entry) /* We may have info about the children but not about
-                   * the parent: eg. imap. */
-            entry->has_unseen_child =
-                unread ? 1 : lbm_node_has_unseen_child(mailbox, node);
-    }
-}
-#else  /* CACHE_UNSEEN_CHILD */
 static LibBalsaMailboxIndexEntry *lbm_get_index_entry(LibBalsaMailbox *
 						      lmm, GNode * node);
 /* Does the node (non-NULL) have unseen children? */
@@ -1171,7 +1122,6 @@ lbm_node_has_unseen_child(LibBalsaMailbox * lmm, GNode * node)
     }
     return FALSE;
 }
-#endif /* CACHE_UNSEEN_CHILD */
 
 /* Called with gdk lock held. */
 static void
@@ -1204,10 +1154,6 @@ lbm_msgno_changed(LibBalsaMailbox * mailbox, guint seqno,
     g_signal_emit(mailbox, libbalsa_mbox_model_signals[ROW_CHANGED], 0,
                   path, iter);
     gtk_tree_path_free(path);
-
-#if CACHE_UNSEEN_CHILD
-    lbm_entry_check(mailbox, seqno);
-#endif /* CACHE_UNSEEN_CHILD */
 }
 
 void
@@ -2086,37 +2032,6 @@ libbalsa_mailbox_can_do(LibBalsaMailbox *mailbox,
 }
 
 
-#if CACHE_UNSEEN_CHILD
-/* GNode traverse func, called top-down: clear the current node's
- * has_unseen_child flag, and if current node is unseen, set ancestors'
- * flags; break when we find an ancestor with the flag already set,
- * because all further ancestors must also have it set. */
-static gboolean
-lbm_check_unseen_child(GNode * node, LibBalsaMailbox * mailbox)
-{
-    LibBalsaMailboxIndexEntry *entry;
-    guint msgno = GPOINTER_TO_UINT(node->data);
-    if (msgno == 0)
-	return FALSE;
-    entry = g_ptr_array_index(mailbox->mindex, msgno - 1);
-    if (!entry)
-	return FALSE;
-    entry->has_unseen_child = 0;
-    if (entry->status_icon == LIBBALSA_MESSAGE_STATUS_UNREAD) {
-	while ((node = node->parent)
-	       && (msgno = GPOINTER_TO_UINT(node->data))) {
-	    entry = g_ptr_array_index(mailbox->mindex, msgno - 1);
-	    if (!entry)
-		continue;
-	    if (entry->has_unseen_child)
-		break;
-	    entry->has_unseen_child = 1;
-	}
-    }
-    return FALSE;
-}
-#endif /* CACHE_UNSEEN_CHILD */
-
 static void lbm_sort(LibBalsaMailbox * mbox, GNode * parent);
 static gboolean
 lbm_set_threading(LibBalsaMailbox * mailbox,
@@ -2130,11 +2045,6 @@ lbm_set_threading(LibBalsaMailbox * mailbox,
     gdk_threads_enter();
     if (mailbox->msg_tree)
         lbm_sort(mailbox, mailbox->msg_tree);
-
-#if CACHE_UNSEEN_CHILD
-    g_node_traverse(mailbox->msg_tree, G_PRE_ORDER, G_TRAVERSE_ALL, -1,
-		    (GNodeTraverseFunc) lbm_check_unseen_child, mailbox);
-#endif /* CACHE_UNSEEN_CHILD */
 
     libbalsa_mailbox_changed(mailbox);
     gdk_threads_leave();
@@ -2974,15 +2884,10 @@ mbox_model_get_value(GtkTreeModel *tree_model,
                          ? PANGO_WEIGHT_BOLD : PANGO_WEIGHT_NORMAL);
         break;
     case LB_MBOX_STYLE_COL:
-#if CACHE_UNSEEN_CHILD
-        g_value_set_uint(value, msg && msg->has_unseen_child
-                         ? PANGO_STYLE_OBLIQUE : PANGO_STYLE_NORMAL);
-#else  /* CACHE_UNSEEN_CHILD */
         g_value_set_uint(value, msg &&
 			 lbm_node_has_unseen_child(lmm,
 						   (GNode *) iter->user_data)
                          ? PANGO_STYLE_OBLIQUE : PANGO_STYLE_NORMAL);
-#endif /* CACHE_UNSEEN_CHILD */
         break;
     }
 }

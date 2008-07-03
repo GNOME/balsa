@@ -464,7 +464,7 @@ balsa_print_object_text_vcard(GList * list,
     addr = libbalsa_address_new_from_vcard(textbuf, body->charset);
     if (!addr) {
 	g_free(textbuf);
-	return balsa_print_object_default(list, context, body, psetup);
+	return balsa_print_object_text(list, context, body, psetup);
     }
 
     /* proceed with the address information */

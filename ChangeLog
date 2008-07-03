@@ -1,3 +1,20 @@
+2008-07-02  Peter Bloomfield
+
+	* libbalsa/address.c: (vcard_strsplit): skip empty fields;
+	(libbalsa_address_new_from_vcard): return NULL if the we do not
+	find a complete vCard with at least one address.
+	* src/balsa-mime-widget-text.c: (balsa_mime_widget_new_text):
+	check text/directory as well as text/x-vcard; check for NULL
+	return value;
+	(bm_widget_new_vcard): return NULL if
+	libbalsa_address_new_from_vcard returns NULL.
+	* src/balsa-print-object-text.c:
+	(balsa_print_object_text_vcard): print broken text/x-vcard and
+	non-vcard text/directory parts as text/plain instead of default.
+	* src/balsa-print-object.c:
+	(balsa_print_objects_append_from_body): check text/directory as
+	well as text/x-vcard.
+
 2008-06-17  Peter Bloomfield
 
 	* libbalsa/mailbox.c: (lbm_cache_message,

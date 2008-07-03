@@ -168,8 +168,13 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
         return NULL;
 #endif
     }
-    if(g_ascii_strcasecmp(content_type, "text/x-vcard") == 0) {
-        return bm_widget_new_vcard(bm, mime_body, ptr, alloced);
+    if(g_ascii_strcasecmp(content_type, "text/x-vcard") == 0 ||
+       g_ascii_strcasecmp(content_type, "text/directory") == 0) {
+        mw = bm_widget_new_vcard(bm, mime_body, ptr, alloced);
+        if (mw)
+            return mw;
+        /* else it was not a vCard with at least one address; we'll just
+         * show it as if it were text/plain. */
     }
 
     /* prepare a text part */
@@ -1258,7 +1263,7 @@ bm_widget_new_html(BalsaMessage * bm, LibBalsaMessageBody * mime_body, gchar * p
         row++;                                                    \
     }
 
-BalsaMimeWidget *
+static BalsaMimeWidget *
 bm_widget_new_vcard(BalsaMessage *bm, LibBalsaMessageBody *mime_body,
                     gchar *ptr, size_t len)
 {
@@ -1268,6 +1273,9 @@ bm_widget_new_vcard(BalsaMessage *bm, LibBalsaMessageBody *mime_body,
     GtkTable *table;
     GtkWidget *w;
     int row = 1;
+
+    if (!addr)
+        return NULL;
 
     mw->widget = gtk_table_new(10, 2, FALSE);
     table = (GtkTable*)mw->widget;

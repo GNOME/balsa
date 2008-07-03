@@ -267,11 +267,9 @@ vcard_strsplit(const gchar * string)
     gchar **str_array, *s;
     guint n = 0;
     const gchar *remainder;
-    gint max_tokens = G_MAXINT;
 
     g_return_val_if_fail(string != NULL, NULL);
 
-    max_tokens = G_MAXINT;
     remainder = string;
     s = strchr(remainder, ';');
     while (s && s > remainder && s[-1] == '\\')
@@ -281,9 +279,12 @@ vcard_strsplit(const gchar * string)
 	gsize len;
 
 	len = s - remainder;
-	string_list = g_slist_prepend(string_list,
-				      g_strndup(remainder, len));
-	n++;
+        /* skip empty fields: */
+        if (len > 0) {
+            string_list =
+                g_slist_prepend(string_list, g_strndup(remainder, len));
+            n++;
+        }
 	remainder = s + 1;
 	s = strchr(remainder, ';');
 	while (s && s > remainder && s[-1] == '\\')
@@ -318,11 +319,14 @@ vcard_strsplit(const gchar * string)
     return str_array;
 }
 
+/*
+ * Create a LibBalsaAddress from a vCard; return NULL if the string does
+ * not contain a complete vCard with at least one email address.
+ */
 
 LibBalsaAddress*
 libbalsa_address_new_from_vcard(const gchar *str, const gchar *charset)
 {
-    LibBalsaAddress *address = g_object_new(LIBBALSA_TYPE_ADDRESS, NULL);
     gchar *name = NULL, *nick_name = NULL, *org = NULL;
     gchar *full_name = NULL, *last_name = NULL, *first_name = NULL;
     gint in_vcard = FALSE;
@@ -330,7 +334,7 @@ libbalsa_address_new_from_vcard(const gchar *str, const gchar *charset)
     const gchar *string, *next_line;
     gchar * vcard;
 
-    g_return_val_if_fail(str, address);
+    g_return_val_if_fail(str, NULL);
 
     /* rfc 2425 unfold the string */
     vcard = g_strdup(str);
@@ -366,6 +370,8 @@ libbalsa_address_new_from_vcard(const gchar *str, const gchar *charset)
 
     /* process */
     for(string = vcard; *string; string = next_line) {
+        gchar *line;
+
         next_line = strchr(string, '\n');
         if (next_line)
             ++next_line;
@@ -374,49 +380,40 @@ libbalsa_address_new_from_vcard(const gchar *str, const gchar *charset)
 	/*
 	 * Check if it is a card.
 	 */
-	if (g_ascii_strncasecmp(string, "BEGIN:VCARD", 11) == 0) {
+	if (g_ascii_strncasecmp(string, "BEGIN:VCARD", 11) == 0)
 	    in_vcard = TRUE;
-	} else if (g_ascii_strncasecmp(string, "END:VCARD", 9) == 0) {
-            /*
-             * We are done loading a card.
-             */
-	    if (address_list) {
-                if (address) {
-                    if (full_name) {
-                        address->full_name = full_name;
-                        g_free(name);
-                    } else if (name)
-                        address->full_name = name;
-                    else if (nick_name)
-                        address->full_name = g_strdup(nick_name);
-                    else
-                        address->full_name = g_strdup(_("No-Name"));
+	else if (in_vcard) {
+	    if (g_ascii_strncasecmp(string, "END:VCARD", 9) == 0) {
+		/*
+		 * We are done loading a card.
+		 */
+		LibBalsaAddress *address;
 
-                    address->last_name = last_name;
-                    address->first_name = first_name;
-                    address->nick_name = nick_name;
-                    address->organization = org;
-                    address->address_list = g_list_reverse(address_list);
-
+		if (!address_list)
                     break;
-                }
-                g_list_foreach(address_list, (GFunc) g_free, NULL);
-                g_list_free(address_list);
-	    }
-            /* Record without e-mail address, or we're not creating
-             * addresses: free memory. */
-            g_free(full_name);
-            g_free(name);
-            g_free(last_name);
-            g_free(first_name);
-            g_free(nick_name);
-            g_free(org);
-            
-            /* We return just one address... */
-            return address;
-	} else if (in_vcard) {
-            gchar *line = g_strndup(string, next_line-string);
 
+		address = g_object_new(LIBBALSA_TYPE_ADDRESS, NULL);
+
+		if (full_name) {
+		    address->full_name = full_name;
+		    g_free(name);
+		} else if (name)
+		    address->full_name = name;
+		else if (nick_name)
+		    address->full_name = g_strdup(nick_name);
+		else
+		    address->full_name = g_strdup(_("No-Name"));
+
+                address->last_name = last_name;
+                address->first_name = first_name;
+                address->nick_name = nick_name;
+                address->organization = org;
+                address->address_list = g_list_reverse(address_list);
+
+                return address;
+            }
+
+            line = g_strndup(string, next_line - string);
             g_strchomp(line);
 
 	    /* Encoding of national characters:
@@ -473,11 +470,15 @@ libbalsa_address_new_from_vcard(const gchar *str, const gchar *charset)
 
             if (g_ascii_strncasecmp(line, "FN:", 3) == 0) {
 
+                g_free(full_name);
                 full_name = g_strdup(line + 3);
                 full_name = validate_vcard_string(full_name, charset);
 
             } else if (g_ascii_strncasecmp(line, "N:", 2) == 0) {
 
+                g_free(name);
+                g_free(last_name);
+                g_free(first_name);
                 name = libbalsa_address_extract_name(line + 2,
                                                      &last_name, &first_name);
                 name = validate_vcard_string(name, charset);
@@ -486,12 +487,14 @@ libbalsa_address_new_from_vcard(const gchar *str, const gchar *charset)
 
             } else if (g_ascii_strncasecmp(line, "NICKNAME:", 9) == 0) {
 
+                g_free(nick_name);
                 nick_name = g_strdup(line + 9);
                 nick_name = validate_vcard_string(nick_name, charset);
 
             } else if (g_ascii_strncasecmp(line, "ORG:", 4) == 0) {
 		gchar ** org_strs = vcard_strsplit(line + 4);
 
+                g_free(org);
                 org = g_strjoinv(", ", org_strs);
 		g_strfreev(org_strs);
                 org = validate_vcard_string(org, charset);
@@ -505,7 +508,16 @@ libbalsa_address_new_from_vcard(const gchar *str, const gchar *charset)
         }
     }
 
-    return address;
+    g_free(full_name);
+    g_free(name);
+    g_free(last_name);
+    g_free(first_name);
+    g_free(nick_name);
+    g_free(org);
+    g_list_foreach(address_list, (GFunc) g_free, NULL);
+    g_list_free(address_list);
+
+    return NULL;
 }
 
 void

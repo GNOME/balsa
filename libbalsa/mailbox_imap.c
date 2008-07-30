@@ -1129,8 +1129,11 @@ get_cache_stream(LibBalsaMailbox *mailbox, guint msgno, gboolean peek)
                imap_mbox_handle_fetch_rfc822_uid(mimap->handle, uid,
                                                  peek, cache));
             fclose(cache);
+	    if(rc != IMR_OK) {
+		printf("Error fetching RFC822 message, removing cache.\n");
+		unlink(path);
+	    }
         }
-
 	stream = fopen(path,"rb");
     }
     g_free(path); 

@@ -120,6 +120,7 @@ g_mime_part_rfc2440_sign_encrypt(GMimePart * part,
 
     /* get the raw content */
     wrapper = g_mime_part_get_content_object(part);
+    g_return_val_if_fail(wrapper, -1); /* Incomplete part. */
     stream = g_mime_data_wrapper_get_stream(wrapper);
     g_object_unref(wrapper);
     g_mime_stream_reset(stream);
@@ -220,6 +221,7 @@ g_mime_part_rfc2440_verify(GMimePart * part,
 
     /* get the raw content */
     wrapper = g_mime_part_get_content_object(GMIME_PART(part));
+    g_return_val_if_fail(wrapper, NULL); /* Incomplete part. */
     wrapper_stream = g_mime_data_wrapper_get_stream(wrapper);
     stream = g_mime_stream_mem_new();
     g_mime_data_wrapper_write_to_stream(wrapper, stream);
@@ -277,6 +279,7 @@ g_mime_part_rfc2440_decrypt(GMimePart * part,
 
     /* get the raw content */
     wrapper = g_mime_part_get_content_object(part);
+    g_return_val_if_fail(wrapper, -1); /* Incomplete part. */
     stream = g_mime_stream_mem_new();
     g_mime_data_wrapper_write_to_stream(wrapper, stream);
     g_object_unref(wrapper);

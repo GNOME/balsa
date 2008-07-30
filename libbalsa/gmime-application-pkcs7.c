@@ -194,6 +194,7 @@ g_mime_application_pkcs7_verify(GMimePart * pkcs7,
 
     /* get the ciphertext stream */
     wrapper = g_mime_part_get_content_object(GMIME_PART(pkcs7));
+    g_return_val_if_fail(wrapper, NULL); /* Incomplete part. */
     ciphertext = g_mime_stream_mem_new ();
     g_mime_data_wrapper_write_to_stream (wrapper, ciphertext);
     g_mime_stream_reset(ciphertext);
@@ -339,6 +340,7 @@ g_mime_application_pkcs7_decrypt (GMimePart *pkcs7, GMimeCipherContext *ctx,
 
     /* get the ciphertext stream */
     wrapper = g_mime_part_get_content_object(GMIME_PART(pkcs7));
+    g_return_val_if_fail(wrapper, NULL); /* Incomplete part. */
     ciphertext = g_mime_stream_mem_new();
     g_mime_data_wrapper_write_to_stream (wrapper, ciphertext);
     g_mime_stream_reset(ciphertext);

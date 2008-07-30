@@ -1,3 +1,10 @@
+2006-07-30  Paweł Sałek
+
+	* libbalsa/gmime-part-rfc2440.c: wrapper is not guaranteed to exist.
+	* libbalsa/gmime-application-pkcs7.c: ditto.
+	* libbalsa/body.c: ditto.
+	* libbalsa/mailbox_imap.c: remove cache file if download failed.
+
 2008-07-02  Peter Bloomfield
 
 	* libbalsa/address.c: (vcard_strsplit): skip empty fields;

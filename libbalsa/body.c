@@ -444,6 +444,8 @@ libbalsa_message_body_get_stream(LibBalsaMessageBody * body, GError **err)
 
         wrapper =
             g_mime_part_get_content_object(GMIME_PART(body->mime_part));
+	if(!wrapper) /* part is incomplete. */
+	    return NULL;
         stream = g_mime_data_wrapper_get_stream(wrapper);
         encoding = g_mime_data_wrapper_get_encoding(wrapper);
         g_object_unref(wrapper);

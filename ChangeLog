@@ -1,5 +1,12 @@
 2008-08-03  Peter Bloomfield
 
+	* libbalsa/send.c: (lbs_list_n_addresses): count the addresses
+	in an InternetAddressList;
+	(lbs_process_queue): handle a message with a single Bcc: holder
+	and no other recipients.
+
+2008-08-03  Peter Bloomfield
+
 	* src/sendmsg-window.c: (find_locale_index_by_locale): return -1
 	if locale is not found;
 	(create_lang_menu): default spell-check language to first item

@@ -611,11 +611,24 @@ add_recipients(smtp_message_t message,
     }
 }
 
-static gboolean
-lbs_list_has_one_address(InternetAddressList * recipient_list)
+static guint
+lbs_list_n_addresses(InternetAddressList * recipient_list)
 {
-    return recipient_list && !recipient_list->next && 
-	recipient_list->address->type == INTERNET_ADDRESS_NAME;
+    guint n_addresses = 0;
+
+    for (; recipient_list; recipient_list = recipient_list->next) {
+        InternetAddress *ia;
+
+        if ((ia = recipient_list->address) == NULL)
+            continue;
+
+        if (ia->type == INTERNET_ADDRESS_NAME && ia->value.addr != NULL)
+            ++n_addresses;
+        else if (ia->type == INTERNET_ADDRESS_GROUP)
+            n_addresses += lbs_list_n_addresses(ia->value.members);
+    }
+
+    return n_addresses;
 }
 
 /* libbalsa_process_queue:
@@ -711,6 +724,8 @@ lbs_process_queue(LibBalsaMailbox * outbox, LibBalsaFccboxFinder finder,
 	if (created != LIBBALSA_MESSAGE_CREATE_OK) {
 	    msg_queue_item_destroy(new_message);
 	} else {
+            gboolean has_open_recipients;
+            guint n_bcc_recipients;
 	    InternetAddress *ia;
 
 	    libbalsa_message_change_flags(msg,
@@ -751,12 +766,17 @@ lbs_process_queue(LibBalsaMailbox * outbox, LibBalsaFccboxFinder finder,
 		new_message->stream = mem_stream;
 	    }
 
-            /* If the Bcc: recipient list is present and contains
-             * exactly one address, add a additional copy of the message
-             * to the session for that one recipient, in which the Bcc:
-             * header is preserved.  The main copy never contains a Bcc:
-             * header. */
-            if (lbs_list_has_one_address(msg->headers->bcc_list))
+            /* If the message has To: or Cc: recipients, and the Bcc:
+             * recipient list is present and contains exactly one
+             * address, add an additional copy of the message to the
+             * session for that one recipient, in which the Bcc: header
+             * is preserved. */
+            has_open_recipients =
+                lbs_list_n_addresses(msg->headers->to_list) > 0 ||
+                lbs_list_n_addresses(msg->headers->cc_list) > 0;
+            n_bcc_recipients =
+                lbs_list_n_addresses(msg->headers->bcc_list);
+            if (has_open_recipients && n_bcc_recipients == 1)
 		bcc_message = smtp_add_message (session);
 	    else
 		bcc_message = NULL;
@@ -764,7 +784,12 @@ lbs_process_queue(LibBalsaMailbox * outbox, LibBalsaFccboxFinder finder,
 
 	    /* Add this after the Bcc: copy. */
 	    message = smtp_add_message (session);
-	    if (msg->headers->bcc_list)
+
+            /* The main copy must not contain a Bcc: header, unless the
+             * message has no To: recipients and no Cc: recipients, and
+             * exactly one Bcc: recipient: */
+            if ((has_open_recipients && n_bcc_recipients > 0)
+                || n_bcc_recipients > 1)
 		smtp_set_header_option (message, "Bcc", Hdr_PROHIBIT, 1);
 
 	    smtp_message_set_application_data (message, new_message);

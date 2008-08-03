@@ -1,5 +1,14 @@
 2008-08-03  Peter Bloomfield
 
+	* src/sendmsg-window.c: (find_locale_index_by_locale): return -1
+	if locale is not found;
+	(create_lang_menu): default spell-check language to first item
+	in menu, when balsa_app.spell_check_lang is not found;
+	(sendmsg_window_continue): find_locale_index_by_locale is
+	now signed.
+
+2008-08-03  Peter Bloomfield
+
 	* libbalsa/body.c: (libbalsa_message_body_set_message_part):
 	handle NULL value from g_mime_message_part_get_message.
 

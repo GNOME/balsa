@@ -1042,10 +1042,11 @@ balsa_sendmsg_destroy_handler(BalsaSendmsg * bsmsg)
    the questions (OTOH, I am afraid that people will start claiming "but
    balsa can recognize my language!" on failures in other software.
 */
-static unsigned
+static gint
 find_locale_index_by_locale(const gchar * locale)
 {
-    unsigned i, j, maxfit = 0, maxpos = 0;
+    unsigned i, j, maxfit = 0;
+    gint maxpos = -1;
 
     if (!locale || strcmp(locale, "C") == 0)
         locale = "en_US";
@@ -4320,7 +4321,8 @@ comp_send_locales(const void* a, const void* b)
 static void
 create_lang_menu(GtkWidget * parent, BalsaSendmsg * bsmsg)
 {
-    unsigned i, selected_pos;
+    unsigned i;
+    gint selected_pos;
     GtkWidget *langs = gtk_menu_new();
     static gboolean locales_sorted = FALSE;
     GSList *group = NULL;
@@ -4342,7 +4344,6 @@ create_lang_menu(GtkWidget * parent, BalsaSendmsg * bsmsg)
 #else                           /* HAVE_GTKSPELL */
     selected_pos = find_locale_index_by_locale(setlocale(LC_CTYPE, NULL));
 #endif                          /* HAVE_GTKSPELL */
-    set_locale(bsmsg, selected_pos);
 
     for (i = 0; i < ELEMENTS(locales); i++) {
 #if HAVE_GTKSPELL
@@ -4358,13 +4359,17 @@ create_lang_menu(GtkWidget * parent, BalsaSendmsg * bsmsg)
         if (spell) {
             GtkWidget *w;
 
+            if (selected_pos < 0)
+                /* We did not find balsa_app.spell_check_lang. */
+                selected_pos = i;
+
             gtkspell_detach(spell);
 
             w = gtk_radio_menu_item_new_with_mnemonic(group,
                                                       locales[i].
                                                       lang_name);
             group = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(w));
-            if (i == selected_pos)
+            if (i == (unsigned) selected_pos)
                 gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(w),
                                                TRUE);
 
@@ -4380,7 +4385,7 @@ create_lang_menu(GtkWidget * parent, BalsaSendmsg * bsmsg)
             gtk_radio_menu_item_new_with_mnemonic(group,
                                                   locales[i].lang_name);
         group = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(w));
-        if (i == selected_pos)
+        if (i == (unsigned) selected_pos)
             gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(w), TRUE);
 
         g_signal_connect(G_OBJECT(w), "activate",
@@ -4391,6 +4396,8 @@ create_lang_menu(GtkWidget * parent, BalsaSendmsg * bsmsg)
         gtk_menu_shell_append(GTK_MENU_SHELL(langs), w);
 #endif                          /* HAVE_GTKSPELL */
     }
+    if (selected_pos >= 0)
+        set_locale(bsmsg, selected_pos);
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(parent), langs);
     gtk_widget_show(parent);
 }
@@ -5015,11 +5022,11 @@ sendmsg_window_continue(LibBalsaMailbox * mailbox, guint msgno)
                                       (bsmsg->current_language_menu));
         GList *list, *children =
             gtk_container_get_children(GTK_CONTAINER(langs));
-        unsigned selected_pos = find_locale_index_by_locale(postpone_hdr);
+        gint selected_pos = find_locale_index_by_locale(postpone_hdr);
         set_locale(bsmsg, selected_pos);
         for (list = children; list; list = list->next) {
             GtkCheckMenuItem *menu_item = list->data;
-            if (GPOINTER_TO_UINT
+            if (GPOINTER_TO_INT
                 (g_object_get_data(G_OBJECT(menu_item),
                                    BALSA_LANGUAGE_MENU_POS)) ==
                 selected_pos)

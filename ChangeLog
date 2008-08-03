@@ -1,3 +1,8 @@
+2008-08-03  Peter Bloomfield
+
+	* libbalsa/body.c: (libbalsa_message_body_set_message_part):
+	handle NULL value from g_mime_message_part_get_message.
+
 2006-07-30  Paweł Sałek
 
 	* libbalsa/gmime-part-rfc2440.c: wrapper is not guaranteed to exist.

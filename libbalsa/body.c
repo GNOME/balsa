@@ -182,16 +182,19 @@ libbalsa_message_body_set_message_part(LibBalsaMessageBody * body,
     message_part = GMIME_MESSAGE_PART(body->mime_part);
     embedded_message = g_mime_message_part_get_message(message_part);
 
-    libbalsa_message_headers_destroy(body->embhdrs);
-    body->embhdrs =
-	libbalsa_message_body_extract_embedded_headers(embedded_message);
-    if (!*next_part)
-	*next_part = libbalsa_message_body_new(body->message);
-    libbalsa_message_body_set_mime_body(*next_part,
-					embedded_message->mime_part);
-    g_object_unref(embedded_message);
+    if (embedded_message) {
+        libbalsa_message_headers_destroy(body->embhdrs);
+        body->embhdrs =
+            libbalsa_message_body_extract_embedded_headers
+            (embedded_message);
+        if (!*next_part)
+            *next_part = libbalsa_message_body_new(body->message);
+        libbalsa_message_body_set_mime_body(*next_part,
+                                            embedded_message->mime_part);
+        g_object_unref(embedded_message);
+    }
 
-    return &(*next_part)->next;
+    return *next_part ? &(*next_part)->next : next_part;
 }
 
 static LibBalsaMessageBody **

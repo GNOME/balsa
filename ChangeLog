@@ -1,5 +1,10 @@
 2008-08-20  Peter Bloomfield
 
+	* libbalsa/mime.c: (dowrap_rfc2646): do not append a space after
+	a trailing tab when format=flowed.
+
+2008-08-20  Peter Bloomfield
+
 	* src/balsa-mime-widget-text.c: (balsa_mime_widget_new_text):
 	plug memory leak.
 

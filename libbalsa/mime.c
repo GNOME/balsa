@@ -398,12 +398,7 @@ dowrap_rfc2646(GList * list, gint width, gboolean to_screen,
                 first_word = FALSE;
                 line_break = str;
             }                   /* end of loop over words */
-            /* 
-             * make sure that a line ending in whitespace ends in an
-             * actual ' ' 
-             * */
-            if (str > start && isspace((int)str[-1]) && str[-1] != ' ')
-                g_string_append_c(result, ' ');
+
             if (*str) {         /* line separator */
                 if (to_screen || str == start)
 		    g_string_append_c(result, '\n');

@@ -5549,8 +5549,11 @@ bsmsg2message(BalsaSendmsg * bsmsg)
     body = libbalsa_message_body_new(message);
 
     /* Get the text from the buffer. First make sure it's wrapped. */
-    if (!bsmsg->flow)
-	sw_wrap_body(bsmsg);
+    /* Note: if bmsmg->flow, sw_wrap_body just uses
+     * libbalsa_unwrap_buffer to unwrap each paragraph, removing
+     * whitespace before any hard newline, and does not really wrap the
+     * buffer. */
+    sw_wrap_body(bsmsg);
     /* Copy it to buffer2, so we can change it without changing the
      * display. */
 #if HAVE_GTKSOURCEVIEW

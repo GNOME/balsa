@@ -220,8 +220,6 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
 	       )
 	libbalsa_wrap_string(ptr, balsa_app.browse_wrap_length);
 
-    mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
-    mw->widget = create_text_widget(content_type);
     gtk_text_view_set_editable(GTK_TEXT_VIEW(mw->widget), FALSE);
     gtk_text_view_set_left_margin(GTK_TEXT_VIEW(mw->widget), 2);
     gtk_text_view_set_right_margin(GTK_TEXT_VIEW(mw->widget), 15);

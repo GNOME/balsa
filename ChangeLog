@@ -1,5 +1,10 @@
 2008-08-20  Peter Bloomfield
 
+	* src/balsa-mime-widget-text.c: (balsa_mime_widget_new_text):
+	plug memory leak.
+
+2008-08-20  Peter Bloomfield
+
 	* src/sendmsg-window.c: (bsmsg2message): pass the message to
 	sw_wrap_body even if it is flowed, so that
 	libbalsa_unwrap_buffer will remove whitespace preceding a hard

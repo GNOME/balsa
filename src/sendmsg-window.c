@@ -3206,7 +3206,6 @@ create_text_area(BalsaSendmsg * bsmsg)
     bsmsg->buffer2 =
          gtk_text_buffer_new(gtk_text_buffer_get_tag_table(buffer));
 #endif                          /* HAVE_GTKSOURCEVIEW */
-    gtk_text_buffer_create_tag(buffer, "soft", NULL, NULL);
     gtk_text_buffer_create_tag(buffer, "url", NULL, NULL);
     gtk_text_view_set_editable(text_view, TRUE);
     gtk_text_view_set_wrap_mode(text_view, GTK_WRAP_WORD_CHAR);
@@ -5497,8 +5496,7 @@ bsmsg2message(BalsaSendmsg * bsmsg)
     GtkTextIter start, end;
     LibBalsaIdentity *ident = bsmsg->ident;
 #if HAVE_GTKSOURCEVIEW
-    GtkTextBuffer *buffer, *buffer2;
-    GtkTextIter iter;
+    GtkTextBuffer *buffer;
 #endif                          /* HAVE_GTKSOURCEVIEW */
 
     message = libbalsa_message_new();
@@ -5551,30 +5549,19 @@ bsmsg2message(BalsaSendmsg * bsmsg)
     /* Get the text from the buffer. First make sure it's wrapped. */
     /* Note: if bmsmg->flow, sw_wrap_body just uses
      * libbalsa_unwrap_buffer to unwrap each paragraph, removing
-     * whitespace before any hard newline, and does not really wrap the
+     * spaces before any hard newline, and does not really wrap the
      * buffer. */
     sw_wrap_body(bsmsg);
     /* Copy it to buffer2, so we can change it without changing the
      * display. */
 #if HAVE_GTKSOURCEVIEW
     buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
-    buffer2 =
-         gtk_text_buffer_new(gtk_text_buffer_get_tag_table(buffer));
     gtk_text_buffer_get_bounds(buffer, &start, &end);
-    gtk_text_buffer_get_start_iter(buffer2, &iter);
-    gtk_text_buffer_insert_range(buffer2, &iter, &start, &end);
-    if (bsmsg->flow)
-	libbalsa_prepare_delsp(buffer2);
-    gtk_text_buffer_get_bounds(buffer2, &start, &end);
-    body->buffer = gtk_text_iter_get_text(&start, &end);
-    g_object_unref(buffer2);
 #else                           /* HAVE_GTKSOURCEVIEW */
     sw_buffer_save(bsmsg);
-    if (bsmsg->flow)
-	libbalsa_prepare_delsp(bsmsg->buffer2);
     gtk_text_buffer_get_bounds(bsmsg->buffer2, &start, &end);
-    body->buffer = gtk_text_iter_get_text(&start, &end);
 #endif                          /* HAVE_GTKSOURCEVIEW */
+    body->buffer = gtk_text_iter_get_text(&start, &end);
     if (bsmsg->send_mp_alt)
         body->html_buffer = 
             libbalsa_text_to_html(message->subj, body->buffer,

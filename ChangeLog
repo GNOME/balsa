@@ -1,3 +1,13 @@
+2008-08-23  Peter Bloomfield
+
+	* libbalsa/mime.c: (libbalsa_wrap_view, libbalsa_unwrap_buffer):
+	no more soft newlines.
+	* libbalsa/misc.h: remove libbalsa_prepare_delsp.
+	* src/balsa-mime-widget-text.c: (balsa_mime_widget_new_text):
+	no soft-newline tag.
+	* src/sendmsg-window.c: (create_text_area): no soft-newline tag;
+	(bsmsg2message): remove libbalsa_prepare_delsp.
+
 2008-08-20  Peter Bloomfield
 
 	* libbalsa/mime.c: (dowrap_rfc2646): do not append a space after

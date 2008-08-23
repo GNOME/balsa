@@ -483,7 +483,6 @@ libbalsa_wrap_view(GtkTextView * view, gint length)
     GtkTextBuffer *buffer = gtk_text_view_get_buffer(view);
     GtkTextTagTable *table = gtk_text_buffer_get_tag_table(buffer);
     GtkTextTag *url_tag = gtk_text_tag_table_lookup(table, "url");
-    GtkTextTag *soft_tag = gtk_text_tag_table_lookup(table, "soft");
     GtkTextIter iter;
     PangoContext *context = gtk_widget_get_pango_context(GTK_WIDGET(view));
     PangoLanguage *language = pango_context_get_language(context);
@@ -567,8 +566,7 @@ libbalsa_wrap_view(GtkTextView * view, gint length)
                 gtk_text_buffer_delete(buffer, &start, &iter);
 	    }
 
-	    gtk_text_buffer_insert_with_tags(buffer, &iter, "\n", 1,
-					     soft_tag, NULL);
+	    gtk_text_buffer_insert(buffer, &iter, "\n", 1);
 	    if (quote_string)
 		gtk_text_buffer_insert_with_tags(buffer, &iter,
 						 quote_string, -1,
@@ -677,64 +675,28 @@ libbalsa_unwrap_buffer(GtkTextBuffer * buffer, GtkTextIter * iter,
 		       gint num_paras)
 {
     GtkTextTagTable *table = gtk_text_buffer_get_tag_table(buffer);
-    GtkTextTag *soft_tag = gtk_text_tag_table_lookup(table, "soft");
     GtkTextTag *url_tag = gtk_text_tag_table_lookup(table, "url");
 
     /* Check whether the previous line flowed into this one. */
     gtk_text_iter_set_line_offset(iter, 0);
-    if (gtk_text_iter_ends_tag(iter, soft_tag))
-	gtk_text_iter_backward_line(iter);
 
     for (; num_paras; num_paras--) {
 	gint quote_depth;
-	gint qd;
 	GtkTextIter start;
 	gchar *line;
 
 	gtk_text_iter_set_line_offset(iter, 0);
 	quote_depth = get_quote_depth(iter, NULL);
 
-	for (;;) {
-	    gchar *quote_string;
-	    gboolean stuffed;
-
-	    /* Move to the end of the line, if not there already. */
-	    if (!gtk_text_iter_ends_line(iter)
-		&& !gtk_text_iter_forward_to_line_end(iter))
-		return;
-	    /* Save this iter as the start of a possible deletion. */
-	    start = *iter;
-	    /* Move to the start of the next line. */
-	    if (!gtk_text_iter_forward_line(iter))
-		return;
-
-	    qd = get_quote_depth(iter, &quote_string);
-	    stuffed = quote_string && quote_string[qd];
-	    g_free(quote_string);
-
-	    if (gtk_text_iter_has_tag(&start, soft_tag)) {
-		if (qd != quote_depth) {
-		    /* Broken: use quote-depth-wins. */
-		    GtkTextIter end = start;
-		    gtk_text_iter_forward_to_tag_toggle(&end, soft_tag);
-		    gtk_text_buffer_remove_tag(buffer, soft_tag,
-					       &start, &end);
-		    break;
-		}
-	    } else
-		/* Hard newline. */
-		break;
-
-	    if (qd > 0 && !stuffed) {
-		/* User deleted the space following the '>' chars; we'll
-		 * delete the space at the end of the previous line, if
-		 * there was one. */
-		gtk_text_iter_backward_char(&start);
-		if (gtk_text_iter_get_char(&start) != ' ')
-		    gtk_text_iter_forward_char(&start);
-	    }
-	    gtk_text_buffer_delete(buffer, &start, iter);
-	}
+	/* Move to the end of the line, if not there already. */
+	if (!gtk_text_iter_ends_line(iter)
+	    && !gtk_text_iter_forward_to_line_end(iter))
+	    return;
+	/* Save this iter as the start of a possible deletion. */
+	start = *iter;
+	/* Move to the start of the next line. */
+	if (!gtk_text_iter_forward_line(iter))
+	    return;
 
 	if (num_paras < 0) {
 	    /* This is a wrap_body call, not a continuous wrap, so we'll
@@ -749,10 +711,11 @@ libbalsa_unwrap_buffer(GtkTextBuffer * buffer, GtkTextIter * iter,
 		  && gtk_text_iter_get_char(&tmp_iter) == '-'
 		  && gtk_text_iter_backward_char(&tmp_iter)
 		  && gtk_text_iter_get_char(&tmp_iter) == '-'
-		  && gtk_text_iter_get_line_offset(&tmp_iter) == qd)) {
+		  && gtk_text_iter_get_line_offset(&tmp_iter) ==
+		  quote_depth)) {
 		*iter = start;
 		while (gtk_text_iter_get_line_offset(&start) >
-		       (qd ? qd + 1 : 0)) {
+		       (quote_depth ? quote_depth + 1 : 0)) {
 		    gtk_text_iter_backward_char(&start);
 		    if (gtk_text_iter_get_char(&start) != ' ') {
 			gtk_text_iter_forward_char(&start);
@@ -820,20 +783,6 @@ mark_urls(GtkTextBuffer * buffer, GtkTextIter * iter, GtkTextTag * tag,
             break;
     }
 #endif                          /* USE_GREGEX */
-}
-
-/* Prepare the buffer for sending with DelSp=Yes. */
-void
-libbalsa_prepare_delsp(GtkTextBuffer * buffer)
-{
-    GtkTextTagTable *table = gtk_text_buffer_get_tag_table(buffer);
-    GtkTextTag *soft_tag = gtk_text_tag_table_lookup(table, "soft");
-    GtkTextIter iter;
-
-    gtk_text_buffer_get_start_iter(buffer, &iter);
-    while (gtk_text_iter_forward_to_line_end(&iter))
-	if (gtk_text_iter_has_tag(&iter, soft_tag))
-	    gtk_text_buffer_insert(buffer, &iter, " ", 1);
 }
 
 /*

@@ -236,7 +236,6 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
 		     (gpointer)mime_body);
 
     buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(mw->widget));
-    gtk_text_buffer_create_tag(buffer, "soft", NULL, NULL);
     allocate_quote_colors(GTK_WIDGET(bm), balsa_app.quoted_color,
 			  0, MAX_QUOTED_COLOR - 1);
 #if USE_GREGEX

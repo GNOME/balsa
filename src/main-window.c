@@ -1348,8 +1348,8 @@ static const gchar* main_toolbar[] = {
 #endif /* defined(ENABLE_TOUCH_UI) */
 };
 
-static BalsaToolbarModel *
-bw_get_toolbar_model(void)
+BalsaToolbarModel *
+balsa_window_get_toolbar_model(void)
 {
     static BalsaToolbarModel *model = NULL;
     GSList *standard;
@@ -1383,8 +1383,8 @@ bw_get_toolbar_model(void)
 /* Create a GtkUIManager for a main window, with all the actions, but no
  * ui.
  */
-static GtkUIManager *
-bw_get_ui_manager(BalsaWindow * window)
+GtkUIManager *
+balsa_window_ui_manager_new(BalsaWindow * window)
 {
     GtkUIManager *ui_manager;
     GtkActionGroup *action_group;
@@ -1480,24 +1480,6 @@ bw_get_ui_manager(BalsaWindow * window)
     return ui_manager;
 }
 
-static BalsaToolbarModel *
-bw_get_toolbar_model_and_ui_manager(BalsaWindow * window,
-                                    GtkUIManager ** ui_manager)
-{
-    BalsaToolbarModel *model = bw_get_toolbar_model();
-
-    if (ui_manager)
-        *ui_manager = bw_get_ui_manager(window);
-
-    return model;
-}
-
-BalsaToolbarModel *
-balsa_window_get_toolbar_model(GtkUIManager ** ui_manager)
-{
-    return bw_get_toolbar_model_and_ui_manager(NULL, ui_manager);
-}
-
 /*
  * "window-state-event" signal handler
  *
@@ -1546,7 +1528,8 @@ balsa_window_new()
     gtk_window_set_title(GTK_WINDOW(window), "Balsa");
     register_balsa_pixbufs(GTK_WIDGET(window));
 
-    model = bw_get_toolbar_model_and_ui_manager(window, &ui_manager);
+    model = balsa_window_get_toolbar_model();
+    ui_manager = balsa_window_ui_manager_new(window);
 
     accel_group = gtk_ui_manager_get_accel_group(ui_manager);
     gtk_window_add_accel_group(GTK_WINDOW(window), accel_group);

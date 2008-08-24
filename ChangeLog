@@ -1,3 +1,16 @@
+2008-08-24  Peter Bloomfield
+
+	* src/main-window.c: simplify get-toolbar and ui-manager.
+	* src/main-window.h: ditto.
+	* src/message-window.c: (message_window_ui_manager_new,
+	message_window_get_toolbar_model, message_window_new): ditto.
+	* src/message-window.h: ditto.
+	* src/pref-manager.c: (apply_prefs): ditto.
+	* src/sendmsg-window.c: (sendmsg_window_ui_manager_new,
+	sendmsg_window_get_toolbar_model, sendmsg_window_new): ditto.
+	* src/sendmsg-window.h: ditto.
+	* src/toolbar-prefs.c: (customize_dialog_cb): ditto.
+
 2008-08-23  Peter Bloomfield
 
 	* libbalsa/mime.c: (libbalsa_wrap_view, libbalsa_unwrap_buffer):

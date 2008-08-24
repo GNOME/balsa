@@ -21,22 +21,17 @@
 
 #include "config.h"
 
-#include <gnome.h>
+#include "message-window.h"
 #include "balsa-app.h"
 #include "balsa-message.h"
 #include "balsa-icons.h"
 #include "balsa-index.h"
 #include "main-window.h"
 #include "sendmsg-window.h"
-#include "message-window.h"
 #include "print.h"
-#include "toolbar-factory.h"
 #include "mailbox-node.h"
 
-#include "libbalsa.h"
 #include <glib/gi18n.h>
-
-typedef struct _MessageWindow MessageWindow;
 
 /* callbacks */
 static void destroy_message_window(GtkWidget * widget, MessageWindow * mw);
@@ -388,8 +383,8 @@ static const char *ui_description =
 /* Create a GtkUIManager for a message window, with all the actions, but no
  * ui.
  */
-static GtkUIManager *
-mw_get_ui_manager(MessageWindow * mw)
+GtkUIManager *
+message_window_ui_manager_new(MessageWindow * mw)
 {
     GtkUIManager *ui_manager;
     GtkActionGroup *action_group;
@@ -450,8 +445,8 @@ static const gchar* message_toolbar[] = {
 
 /* Create the toolbar model for the message window's toolbar.
  */
-static BalsaToolbarModel *
-mw_get_toolbar_model(void)
+BalsaToolbarModel *
+message_window_get_toolbar_model(void)
 {
     static BalsaToolbarModel *model = NULL;
     GSList *standard;
@@ -472,24 +467,6 @@ mw_get_toolbar_model(void)
                                            G_N_ELEMENTS(toggle_entries));
 
     return model;
-}
-
-static BalsaToolbarModel *
-mw_get_toolbar_model_and_ui_manager(MessageWindow * window,
-                                    GtkUIManager ** ui_manager)
-{
-    BalsaToolbarModel *model = mw_get_toolbar_model();
-
-    if (ui_manager)
-        *ui_manager = mw_get_ui_manager(window);
-
-    return model;
-}
-
-BalsaToolbarModel *
-message_window_get_toolbar_model(GtkUIManager ** ui_manager)
-{
-    return mw_get_toolbar_model_and_ui_manager(NULL, ui_manager);
 }
 
 /*
@@ -575,7 +552,8 @@ message_window_new(LibBalsaMailbox * mailbox, guint msgno)
     mw->headers_shown=balsa_app.shown_headers;
     mw->show_all_headers = FALSE;
 
-    model = mw_get_toolbar_model_and_ui_manager(mw, &ui_manager);
+    model = message_window_get_toolbar_model();
+    ui_manager = message_window_ui_manager_new(mw);
 
     accel_group = gtk_ui_manager_get_accel_group(ui_manager);
     gtk_window_add_accel_group(GTK_WINDOW(window), accel_group);

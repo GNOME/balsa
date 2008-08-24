@@ -911,7 +911,7 @@ apply_prefs(GtkDialog * pbox)
     balsa_app.always_queue_sent_mail =
         GTK_TOGGLE_BUTTON(pui->always_queue_sent_mail)->active;
     if (balsa_app.always_queue_sent_mail != save_setting)
-        balsa_toolbar_model_changed(balsa_window_get_toolbar_model(NULL));
+        balsa_toolbar_model_changed(balsa_window_get_toolbar_model());
 
     balsa_app.copy_to_sentbox =
         GTK_TOGGLE_BUTTON(pui->copy_to_sentbox)->active;

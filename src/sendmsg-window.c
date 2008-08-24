@@ -596,8 +596,8 @@ static const char *ui_description =
 /* Create a GtkUIManager for a compose window, with all the actions, but
  * no ui.
  */
-static GtkUIManager *
-sw_get_ui_manager(BalsaSendmsg * bsmsg)
+GtkUIManager *
+sendmsg_window_ui_manager_new(BalsaSendmsg * bsmsg)
 {
     GtkUIManager *ui_manager;
     GtkActionGroup *action_group;
@@ -4439,8 +4439,8 @@ static const gchar* compose_toolbar[] = {
 
 /* Create the toolbar model for the compose window's toolbar.
  */
-static BalsaToolbarModel *
-sw_get_toolbar_model(void)
+BalsaToolbarModel *
+sendmsg_window_get_toolbar_model(void)
 {
     static BalsaToolbarModel *model = NULL;
     GSList *standard;
@@ -4464,24 +4464,6 @@ sw_get_toolbar_model(void)
                                            G_N_ELEMENTS(toggle_entries));
 
     return model;
-}
-
-static BalsaToolbarModel *
-sw_get_toolbar_model_and_ui_manager(BalsaSendmsg * bsmsg,
-                                    GtkUIManager ** ui_manager)
-{
-    BalsaToolbarModel *model = sw_get_toolbar_model();
-
-    if (ui_manager)
-        *ui_manager = sw_get_ui_manager(bsmsg);
-
-    return model;
-}
-
-BalsaToolbarModel *
-sendmsg_window_get_toolbar_model(GtkUIManager ** ui_manager)
-{
-    return sw_get_toolbar_model_and_ui_manager(NULL, ui_manager);
 }
 
 static void
@@ -4574,7 +4556,8 @@ sendmsg_window_new()
     g_signal_connect(G_OBJECT(window), "size_allocate",
 		     G_CALLBACK(sw_size_alloc_cb), bsmsg);
 
-    model = sw_get_toolbar_model_and_ui_manager(bsmsg, &ui_manager);
+    model = sendmsg_window_get_toolbar_model();
+    ui_manager = sendmsg_window_ui_manager_new(bsmsg);
 
     accel_group = gtk_ui_manager_get_accel_group(ui_manager);
     gtk_window_add_accel_group(GTK_WINDOW(window), accel_group);

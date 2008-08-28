@@ -207,6 +207,9 @@ struct _LibBalsaMessage {
 
     /* protection (i.e. sign/encrypt) status (received message) */
     LibBalsaMsgProtectState prot_state;
+
+    /* forced id of the senders secret key, empty to choose it from the mail address */
+    gchar * force_key_id;
 #endif
 
     /* a forced multipart subtype or NULL for mixed; used only for

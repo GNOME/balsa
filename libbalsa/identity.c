@@ -116,6 +116,7 @@ libbalsa_identity_init(LibBalsaIdentity* ident)
     ident->always_trust = FALSE;
     ident->warn_send_plain = TRUE;
     ident->crypt_protocol = LIBBALSA_PROTECT_OPENPGP;
+    ident->force_key_id = NULL;
 #endif
     ident->request_mdn = FALSE;
     /*
@@ -146,6 +147,9 @@ libbalsa_identity_finalize(GObject * object)
 #endif                          /* ENABLE_ESMTP */
     g_free(ident->face);
     g_free(ident->x_face);
+#ifdef HAVE_GPGME
+    g_free(ident->force_key_id);
+#endif
 
     G_OBJECT_CLASS(parent_class)->finalize(object);
 }
@@ -1067,6 +1071,9 @@ setup_ident_frame(GtkDialog * dialog, gboolean createp, gpointer tree)
     ident_dialog_add_checkbutton(table, row++, dialog,
                                  _("remind me if messages can be encrypted"),
                                  "identity-warn-send-plain", TRUE);
+    ident_dialog_add_entry(table, row++, dialog,
+                           _("use secret key with this id for signing\n(leave empty for automatic selection)"), 
+                           "identity-keyid");
 #ifndef HAVE_GPGME
     gtk_widget_set_sensitive(table, FALSE);
 #endif
@@ -1511,6 +1518,7 @@ ident_dialog_update(GObject * dlg)
     id->warn_send_plain = ident_dialog_get_bool(dlg, "identity-warn-send-plain");
     id->crypt_protocol  = GPOINTER_TO_INT(ident_dialog_get_value
                                           (dlg, "identity-crypt-protocol"));
+    id->force_key_id    = g_strstrip(ident_dialog_get_text(dlg, "identity-keyid"));
 #endif
    
     return TRUE;
@@ -1895,6 +1903,7 @@ display_frame_update(GObject * dialog, LibBalsaIdentity* ident)
                               ident->warn_send_plain);    
     display_frame_set_gpg_mode(dialog, "identity-crypt-protocol",
 			   &ident->crypt_protocol);
+    display_frame_set_field(dialog, "identity-keyid", ident->force_key_id);
 #endif
 }
 
@@ -1997,6 +2006,7 @@ libbalsa_identity_new_config(const gchar* name)
     ident->always_trust = libbalsa_conf_get_bool("GpgTrustAlways");
     ident->warn_send_plain = libbalsa_conf_get_bool("GpgWarnSendPlain=true");
     ident->crypt_protocol = libbalsa_conf_get_int("CryptProtocol=16");
+    ident->force_key_id = libbalsa_conf_get_string("ForceKeyID");
 #endif
 
     return ident;
@@ -2044,6 +2054,7 @@ libbalsa_identity_save(LibBalsaIdentity* ident, const gchar* group)
     libbalsa_conf_set_bool("GpgTrustAlways", ident->always_trust);
     libbalsa_conf_set_bool("GpgWarnSendPlain", ident->warn_send_plain);
     libbalsa_conf_set_int("CryptProtocol", ident->crypt_protocol);
+    libbalsa_conf_set_string("ForceKeyID", ident->force_key_id);
 #endif
 
     libbalsa_conf_pop_group();

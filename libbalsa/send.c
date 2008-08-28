@@ -2067,6 +2067,9 @@ static const gchar *
 lb_send_from(LibBalsaMessage *message)
 {
     InternetAddress *ia = message->headers->from->address;
+
+    if (message->force_key_id)
+        return message->force_key_id;
     
     if (ia->type == INTERNET_ADDRESS_NONE)
 	return NULL;

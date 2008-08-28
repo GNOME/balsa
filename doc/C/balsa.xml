@@ -4044,6 +4044,19 @@ the third is an alias (currently not used and replaced by 'TODO').</para>
     </listitem>
   </varlistentry>
 
+  <varlistentry>
+    <term><guilabel>Use secret key with this id for signing.</guilabel></term>
+    <listitem>
+      <para>
+        Usually, &Balsa; automaticylly selects a proper secret key for cryptographic
+        signatures from the identity's mail address. Therefore, most users should
+        leave this entry empty. If you want to force using a specific secret key for
+        cryptographic signatures, enter the key id here. You can get the key id by
+        running the command 'gpg --list-secret-keys'.
+      </para>
+    </listitem>
+  </varlistentry>
+
 </variablelist>
 
 <note>

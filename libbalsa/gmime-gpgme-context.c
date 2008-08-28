@@ -860,14 +860,25 @@ get_key_from_name(GMimeGpgmeContext * ctx, const gchar * name,
 
     if (!keys) {
 	if (error) {
-	    if (found_bad)
-		g_set_error(error, GPGME_ERROR_QUARK, GPG_ERR_KEY_SELECTION,
-			    _("%s: a key for %s is present, but it is expired, disabled, revoked or invalid"),
-			    "gmime-gpgme", name);
-	    else
-		g_set_error(error, GPGME_ERROR_QUARK, GPG_ERR_KEY_SELECTION,
-			    _("%s: could not find a key for %s"),
-			    "gmime-gpgme", name);
+            if (strchr(name, '@')) {
+                if (found_bad)
+                    g_set_error(error, GPGME_ERROR_QUARK, GPG_ERR_KEY_SELECTION,
+                                _("%s: a key for %s is present, but it is expired, disabled, revoked or invalid"),
+                                "gmime-gpgme", name);
+                else
+                    g_set_error(error, GPGME_ERROR_QUARK, GPG_ERR_KEY_SELECTION,
+                                _("%s: could not find a key for %s"),
+                                "gmime-gpgme", name);
+            } else {
+                if (found_bad)
+                    g_set_error(error, GPGME_ERROR_QUARK, GPG_ERR_KEY_SELECTION,
+                                _("%s: a key with id %s is present, but it is expired, disabled, revoked or invalid"),
+                                "gmime-gpgme", name);
+                else
+                    g_set_error(error, GPGME_ERROR_QUARK, GPG_ERR_KEY_SELECTION,
+                                _("%s: could not find a key with id %s"),
+                                "gmime-gpgme", name);
+            }
 	}
 	return NULL;
     }

@@ -87,6 +87,7 @@ extern "C"
 	gboolean always_trust;
 	gboolean warn_send_plain;
 	gint crypt_protocol;
+        gchar *force_key_id;
 #endif
 #if ENABLE_ESMTP
 	LibBalsaSmtpServer *smtp_server;

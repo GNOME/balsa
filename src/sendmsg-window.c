@@ -5573,6 +5573,8 @@ bsmsg2message(BalsaSendmsg * bsmsg)
             (bsmsg->gpg_mode & LIBBALSA_PROTECT_MODE) != 0 ? bsmsg->gpg_mode : 0;
     else
         message->gpg_mode = 0;
+    if (ident->force_key_id && *ident->force_key_id)
+        message->force_key_id = strdup(ident->force_key_id);
 #endif
 
     /* remember the parent window */

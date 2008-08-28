@@ -101,6 +101,7 @@ libbalsa_message_init(LibBalsaMessage * message)
     message->has_all_headers = 0;
 #ifdef HAVE_GPGME
     message->prot_state = LIBBALSA_MSG_PROTECT_NONE;
+    message->force_key_id = NULL;
 #endif
 }
 
@@ -177,6 +178,11 @@ libbalsa_message_finalize(GObject * object)
 	g_object_unref(message->mime_msg);
 	message->mime_msg = NULL;
     }
+
+#ifdef HAVE_GPGME
+    g_free(message->force_key_id);
+#endif
+
     G_OBJECT_CLASS(parent_class)->finalize(object);
 }
 

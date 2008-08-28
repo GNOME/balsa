@@ -1,3 +1,22 @@
+2008-08-28  Albrecht Dreß
+
+	specify a key id for an identity
+
+	* doc/C/balsa.xml: document it.
+	* libbalsa/gmime-gpgme-context.c: (get_key_from_name):
+	check whether it's a name or an id.
+	* libbalsa/identity.c: (libbalsa_identity_init,
+	libbalsa_identity_finalize, setup_ident_frame,
+	ident_dialog_update, display_frame_update,
+	libbalsa_identity_new_config, libbalsa_identity_save): new entry
+	for forced key id.
+	* libbalsa/identity.h: new member for forced key id.
+	* libbalsa/message.c: (libbalsa_message_init,
+	libbalsa_message_finalize): ditto.
+	* libbalsa/message.h: ditto.
+	* libbalsa/send.c: (lb_send_from): use it.
+	* src/sendmsg-window.c: (bsmsg2message): set it.
+
 2008-08-24  Peter Bloomfield
 
 	* src/main-window.c: simplify get-toolbar and ui-manager.

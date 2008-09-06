@@ -355,6 +355,13 @@ async_process(GIOChannel *source, GIOCondition condition, gpointer data)
     if(ASYNC_DEBUG) printf("async_process() on disconnected\n");
     return FALSE;
   }
+  if( (condition & G_IO_HUP) == G_IO_HUP) {
+      imap_handle_disconnect(h);
+      g_source_remove(h->async_watch_id);
+      h->async_watch_id = 0;
+      return FALSE;
+  }
+
   async_cmd = cmdi_get_pending(h->cmd_info);
   if(ASYNC_DEBUG) printf("async_process() enter loop\n");
   while( (retval = sio_poll(h->sio, TRUE, FALSE, TRUE)) != -1 &&
@@ -418,7 +425,8 @@ idle_start(gpointer data)
     h->iochannel = g_io_channel_unix_new(h->sd);
     g_io_channel_set_encoding(h->iochannel, NULL, NULL);
   }
-  h->async_watch_id = g_io_add_watch(h->iochannel, G_IO_IN, async_process, h);
+  h->async_watch_id = g_io_add_watch(h->iochannel, G_IO_IN|G_IO_HUP,
+				     async_process, h);
   h->idle_enable_id = 0;
   h->idle_issued = 1;
   return FALSE;
@@ -495,6 +503,10 @@ imap_handle_disconnect(ImapMboxHandle *h)
   }
   if(h->iochannel) {
     g_io_channel_unref(h->iochannel); h->iochannel = NULL;
+  }
+  if(h->async_watch_id) {
+    g_source_remove(h->async_watch_id);
+    h->async_watch_id = 0;
   }
   close(h->sd);
   h->state = IMHS_DISCONNECTED;

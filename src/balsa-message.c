@@ -147,10 +147,11 @@ static void part_create_menu (BalsaPartInfo* info);
 static GtkNotebookClass *parent_class = NULL;
 
 /* stuff needed for sending Message Disposition Notifications */
-static void handle_mdn_request(LibBalsaMessage *message);
+static void handle_mdn_request(GtkWindow *parent, LibBalsaMessage *message);
 static LibBalsaMessage *create_mdn_reply (LibBalsaMessage *for_msg,
                                           gboolean manual);
-static GtkWidget* create_mdn_dialog (gchar *sender, gchar *mdn_to_address,
+static GtkWidget* create_mdn_dialog (GtkWindow *parent, gchar *sender,
+				     gchar *mdn_to_address,
                                      LibBalsaMessage *send_msg);
 static void mdn_dialog_response(GtkWidget * dialog, gint response,
                                 gpointer user_data);
@@ -1127,7 +1128,7 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMailbox * mailbox, guint msgno)
      *
      */
     if (is_new && message->headers->dispnotify_to)
-        handle_mdn_request (message);
+        handle_mdn_request (balsa_get_parent_window(GTK_WIDGET(bm)), message);
 
     if (!gtk_tree_model_get_iter_first (gtk_tree_view_get_model(GTK_TREE_VIEW(bm->treeview)),
                                         &iter))
@@ -2287,7 +2288,7 @@ bm_get_mailbox(const InternetAddressList * list)
 }
 
 static void
-handle_mdn_request(LibBalsaMessage *message)
+handle_mdn_request(GtkWindow *parent, LibBalsaMessage *message)
 {
     gboolean suspicious, found;
     const InternetAddressList *use_from;
@@ -2348,12 +2349,11 @@ handle_mdn_request(LibBalsaMessage *message)
     if (action == BALSA_MDN_REPLY_ASKME) {
         gchar *sender;
         gchar *reply_to;
-        
         sender = internet_address_to_string (use_from->address, FALSE);
         reply_to = 
             internet_address_list_to_string (message->headers->dispnotify_to,
 		                             FALSE);
-        gtk_widget_show_all (create_mdn_dialog (sender, reply_to, mdn));
+        gtk_widget_show_all (create_mdn_dialog (parent, sender, reply_to, mdn));
         g_free (reply_to);
         g_free (sender);
     } else {
@@ -2456,13 +2456,13 @@ static LibBalsaMessage *create_mdn_reply (LibBalsaMessage *for_msg,
 }
 
 static GtkWidget *
-create_mdn_dialog(gchar * sender, gchar * mdn_to_address,
+create_mdn_dialog(GtkWindow *parent, gchar * sender, gchar * mdn_to_address,
                   LibBalsaMessage * send_msg)
 {
     GtkWidget *mdn_dialog;
 
     mdn_dialog =
-        gtk_message_dialog_new(GTK_WINDOW(balsa_app.main_window),
+        gtk_message_dialog_new(parent,
                                GTK_DIALOG_DESTROY_WITH_PARENT,
                                GTK_MESSAGE_QUESTION,
                                GTK_BUTTONS_YES_NO,

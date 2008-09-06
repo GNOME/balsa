@@ -1,3 +1,11 @@
+2006-09-06  Paweł Sałek
+
+	* src/balsa-bonobo.c: raise main window after receiving Bonobo cmds.
+	* src/balsa-app.c: add some HIG padding in the password dialog.
+	* src/balsa-message.c: specify parent for the MDN dialog.
+	* balsa.spec.in: merge minor fixes from Fedora's spec.
+	* libbalsa/imap/imap-handle.c: process HUPs on idle IMAP connections.
+
 2008-08-28  Albrecht Dreß
 
 	specify a key id for an identity

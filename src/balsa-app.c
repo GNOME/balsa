@@ -57,6 +57,8 @@ const gchar *pspell_suggest_modes[] = {
 };
 #endif                          /* HAVE_GTKSPELL */
 
+#define HIG_PADDING 12
+
 /* ask_password:
    asks the user for the password to the mailbox on given remote server.
 */
@@ -83,6 +85,7 @@ ask_password_real(LibBalsaServer * server, LibBalsaMailbox * mbox)
                                          GTK_STOCK_OK, GTK_RESPONSE_OK,
                                          GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                                          NULL); 
+    gtk_box_set_spacing(GTK_BOX(GTK_DIALOG(dialog)->vbox), HIG_PADDING);
     gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox),
                       gtk_label_new_with_mnemonic(prompt));
     g_free(prompt);

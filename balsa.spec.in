@@ -15,7 +15,7 @@ Release:        1
 Summary:        Mail Client
 
 Group:          Applications/Internet
-License:        GPL
+License:        GPLv2+
 URL:            http://balsa.gnome.org/
 Source0:        http://balsa.gnome.org/%{name}-%{version}.tar.bz2
 %if ! %fedora
@@ -70,7 +70,7 @@ IMAP.
 
 %prep
 %if %fedora
-%setup -q -D
+%setup -q
 %else
 %setup -q -D -a 1
 %endif
@@ -129,10 +129,10 @@ fi
 %{_libdir}/bonobo/servers/GNOME_Balsa.server
 %{_datadir}/applications/*.desktop
 %{_datadir}/balsa
+%{_datadir}/gnome/help/balsa/
 /usr/share/icons/hicolor/*
-%{_datadir}/gnome/help/balsa/*
 %{_datadir}/idl/Balsa.idl
-%{_datadir}/omf/balsa/*
+%{_datadir}/omf/balsa/
 %{_datadir}/pixmaps/gnome-balsa2.png
 %{_datadir}/sounds/balsa/*
 %{_mandir}/man1/balsa.1*

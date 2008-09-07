@@ -357,8 +357,6 @@ async_process(GIOChannel *source, GIOCondition condition, gpointer data)
   }
   if( (condition & G_IO_HUP) == G_IO_HUP) {
       imap_handle_disconnect(h);
-      g_source_remove(h->async_watch_id);
-      h->async_watch_id = 0;
       return FALSE;
   }
 

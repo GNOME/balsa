@@ -1,7 +1,12 @@
+* Balsa-2.3.26 release. Release date 2008-09-07
+
+- composing format=flowed messages with spaces pasted in works better.
+- allow to explicitly specify a GPG key id for an identity.
+
 * Balsa-2.3.25 release. Release date 2008-06-14
 
 - GMail compatibility.
-- notification in GNOME panel are optional now.
+- notification icon in GNOME panel is optional now.
 - wrapping of flowed text improved.
 - lots of various bug fixes.
 

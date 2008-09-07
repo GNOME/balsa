@@ -1,3 +1,8 @@
+2006-09-07  Paweł Sałek
+
+	* libbalsa/imap/imap-handle.c: don't g_source_remove() twice.
+	* NEWS, configure.in: release 2.3.26.
+
 2006-09-06  Paweł Sałek
 
 	* src/balsa-bonobo.c: raise main window after receiving Bonobo cmds.
@@ -86,7 +91,7 @@
 	* libbalsa/body.c: (libbalsa_message_body_set_message_part):
 	handle NULL value from g_mime_message_part_get_message.
 
-2006-07-30  Paweł Sałek
+2008-07-30  Paweł Sałek
 
 	* libbalsa/gmime-part-rfc2440.c: wrapper is not guaranteed to exist.
 	* libbalsa/gmime-application-pkcs7.c: ditto.

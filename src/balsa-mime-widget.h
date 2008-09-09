@@ -42,9 +42,9 @@ extern "C" {
 
 
 #define BALSA_TYPE_MIME_WIDGET          (balsa_mime_widget_get_type ())
-#define BALSA_MIME_WIDGET(obj)          GTK_CHECK_CAST (obj, BALSA_TYPE_MIME_WIDGET, BalsaMimeWidget)
-#define BALSA_MIME_WIDGET_CLASS(klass)  GTK_CHECK_CLASS_CAST (klass, BALSA_TYPE_MIME_WIDGET, BalsaMimeWidgetClass)
-#define BALSA_IS_MIME_WIDGET(obj)       GTK_CHECK_TYPE (obj, BALSA_TYPE_MIME_WIDGET)
+#define BALSA_MIME_WIDGET(obj)          G_TYPE_CHECK_INSTANCE_CAST (obj, BALSA_TYPE_MIME_WIDGET, BalsaMimeWidget)
+#define BALSA_MIME_WIDGET_CLASS(klass)  G_TYPE_CHECK_CLASS_CAST (klass, BALSA_TYPE_MIME_WIDGET, BalsaMimeWidgetClass)
+#define BALSA_IS_MIME_WIDGET(obj)       G_TYPE_CHECK_INSTANCE_TYPE (obj, BALSA_TYPE_MIME_WIDGET)
 
 
 typedef struct _BalsaMimeWidgetClass BalsaMimeWidgetClass;

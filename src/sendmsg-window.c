@@ -2115,7 +2115,7 @@ add_attachment(BalsaSendmsg * bsmsg, const gchar *filename,
 	g_object_set_data(G_OBJECT(menu_item), "new-mode",
 			  GINT_TO_POINTER(LIBBALSA_ATTACH_AS_INLINE));
 	g_signal_connect(G_OBJECT(menu_item), "activate",
-			 GTK_SIGNAL_FUNC(change_attach_mode),
+			 G_CALLBACK(change_attach_mode),
 			 (gpointer)attach_data);
 	gtk_menu_shell_append(GTK_MENU_SHELL(attach_data->popup_menu),
 			      menu_item);
@@ -2130,7 +2130,7 @@ add_attachment(BalsaSendmsg * bsmsg, const gchar *filename,
 	g_object_set_data(G_OBJECT(menu_item), "new-mode",
 			  GINT_TO_POINTER(LIBBALSA_ATTACH_AS_ATTACHMENT));
 	g_signal_connect(G_OBJECT(menu_item), "activate",
-			 GTK_SIGNAL_FUNC(change_attach_mode),
+			 G_CALLBACK(change_attach_mode),
 			 (gpointer)attach_data);
 	gtk_menu_shell_append(GTK_MENU_SHELL(attach_data->popup_menu),
 			      menu_item);
@@ -2144,7 +2144,7 @@ add_attachment(BalsaSendmsg * bsmsg, const gchar *filename,
 	g_object_set_data(G_OBJECT(menu_item), "new-mode",
 			  GINT_TO_POINTER(LIBBALSA_ATTACH_AS_EXTBODY));
 	g_signal_connect(G_OBJECT(menu_item), "activate",
-			 GTK_SIGNAL_FUNC(change_attach_mode),
+			 G_CALLBACK(change_attach_mode),
 			 (gpointer)attach_data);
 	gtk_menu_shell_append(GTK_MENU_SHELL(attach_data->popup_menu),
 			      menu_item);
@@ -2154,7 +2154,7 @@ add_attachment(BalsaSendmsg * bsmsg, const gchar *filename,
     menu_item = 
 	gtk_menu_item_new_with_label(_("Remove"));
     g_signal_connect(G_OBJECT (menu_item), "activate",
-		     GTK_SIGNAL_FUNC(remove_attachment),
+		     G_CALLBACK(remove_attachment),
 		     (gpointer)attach_data);
     gtk_menu_shell_append(GTK_MENU_SHELL(attach_data->popup_menu),
 			  menu_item);
@@ -2164,7 +2164,7 @@ add_attachment(BalsaSendmsg * bsmsg, const gchar *filename,
     if (!is_fwd_message)
 	libbalsa_fill_vfs_menu_by_content_type(GTK_MENU(attach_data->popup_menu),
 					       content_type, 
-					       GTK_SIGNAL_FUNC(attachment_menu_vfs_cb),
+					       G_CALLBACK(attachment_menu_vfs_cb),
 					       (gpointer)attach_data);
     gtk_widget_show_all(attach_data->popup_menu);
 
@@ -2225,7 +2225,7 @@ add_urlref_attachment(BalsaSendmsg * bsmsg, gchar *url)
     menu_item = 
 	gtk_menu_item_new_with_label(_("Remove"));
     g_signal_connect(G_OBJECT (menu_item), "activate",
-		     GTK_SIGNAL_FUNC(remove_attachment),
+		     G_CALLBACK(remove_attachment),
 		     (gpointer)attach_data);
     gtk_menu_shell_append(GTK_MENU_SHELL(attach_data->popup_menu),
 			  menu_item);
@@ -2237,7 +2237,7 @@ add_urlref_attachment(BalsaSendmsg * bsmsg, gchar *url)
     menu_item = 
 	gtk_menu_item_new_with_label(_("Open..."));
     g_signal_connect(G_OBJECT (menu_item), "activate",
-		     GTK_SIGNAL_FUNC(on_open_url_cb),
+		     G_CALLBACK(on_open_url_cb),
 		     (gpointer)attach_data);
     gtk_menu_shell_append(GTK_MENU_SHELL(attach_data->popup_menu),
 			  menu_item);
@@ -7028,13 +7028,13 @@ bsmsg_check_format_compatibility(GtkWindow *parent, const gchar *filename)
          compatibility_table[i].other_program,
          compatibility_table[i].other_extension);
     gtk_box_set_spacing(GTK_BOX(dialog->vbox), 10);
-    gtk_box_pack_start_defaults(GTK_BOX(dialog->vbox),
-                       label = gtk_label_new(str));
+    gtk_box_pack_start(GTK_BOX(dialog->vbox), label = gtk_label_new(str),
+                       TRUE, TRUE, 0);
     gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
     g_free(str);
     checkbox = gtk_check_button_new_with_mnemonic
         ("_Do not show this dialog any more.");
-    gtk_box_pack_start_defaults(GTK_BOX(dialog->vbox), checkbox);
+    gtk_box_pack_start(GTK_BOX(dialog->vbox), checkbox, TRUE, TRUE, 0);
     gtk_widget_show(checkbox);
     gtk_widget_show(label);
     response = gtk_dialog_run(dialog);

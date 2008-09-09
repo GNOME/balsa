@@ -86,10 +86,10 @@ struct _BalsaAbWindowClass
     GtkDialogClass parent_class;
 };
 
-GtkType
+GType
 balsa_ab_window_get_type(void)
 {
-    static GtkType ab_type = 0;
+    static GType ab_type = 0;
 
     if ( !ab_type ) {
 	static const GTypeInfo ab_info = {

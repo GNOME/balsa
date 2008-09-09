@@ -26,9 +26,9 @@
 #include "mailbox-node.h"
 
 #define BALSA_TYPE_MBLIST          (balsa_mblist_get_type ())
-#define BALSA_MBLIST(obj)          GTK_CHECK_CAST (obj, BALSA_TYPE_MBLIST, BalsaMBList)
-#define BALSA_MBLIST_CLASS(klass)  GTK_CHECK_CLASS_CAST (klass, BALSA_TYPE_MBLIST, BalsaMBListClass)
-#define BALSA_IS_MBLIST(obj)       GTK_CHECK_TYPE (obj, BALSA_TYPE_MBLIST)
+#define BALSA_MBLIST(obj)          G_TYPE_CHECK_INSTANCE_CAST (obj, BALSA_TYPE_MBLIST, BalsaMBList)
+#define BALSA_MBLIST_CLASS(klass)  G_TYPE_CHECK_CLASS_CAST (klass, BALSA_TYPE_MBLIST, BalsaMBListClass)
+#define BALSA_IS_MBLIST(obj)       G_TYPE_CHECK_INSTANCE_TYPE (obj, BALSA_TYPE_MBLIST)
 
 typedef struct _BalsaMBList BalsaMBList;
 typedef struct _BalsaMBListClass BalsaMBListClass;
@@ -53,7 +53,7 @@ struct _BalsaMBListClass {
                                gboolean has_unread_mailbox);
 };
 
-GtkType balsa_mblist_get_type(void);
+GType balsa_mblist_get_type(void);
 
 GtkWidget *balsa_mblist_new(void);
 

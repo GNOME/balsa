@@ -36,21 +36,21 @@ extern "C" {
 #define BALSA_TYPE_SPELL_CHECK \
         (balsa_spell_check_get_type ())
 #define BALSA_SPELL_CHECK(obj) \
-        GTK_CHECK_CAST (obj, BALSA_TYPE_SPELL_CHECK, BalsaSpellCheck)
+        G_TYPE_CHECK_INSTANCE_CAST (obj, BALSA_TYPE_SPELL_CHECK, BalsaSpellCheck)
 #define BALSA_SPELL_CHECK_CLASS(klass) \
-        GTK_CHECK_CLASS_CAST (klass, BALSA_TYPE_SPELL_CHECK, \
+        G_TYPE_CHECK_CLASS_CAST (klass, BALSA_TYPE_SPELL_CHECK, \
                 BalsaSpellCheckClass)
 #define BALSA_IS_SPELL_CHECK(obj) \
-        GTK_CHECK_TYPE (obj, BALSA_TYPE_SPELL_CHECK)
+        G_TYPE_CHECK_INSTANCE_TYPE (obj, BALSA_TYPE_SPELL_CHECK)
 #define BALSA_IS_SPELL_CHECK_CLASS(klass) \
-        (GTK_CHECK_CLASS_TYPE ((klass), BALSA_TYPE_SPELL_CHECK))
+        (G_TYPE_CHECK_CLASS_TYPE ((klass), BALSA_TYPE_SPELL_CHECK))
 
 
 /* opaque structures, declared in spell-check.c */
     typedef struct _BalsaSpellCheck BalsaSpellCheck;
     typedef struct _BalsaSpellCheckClass BalsaSpellCheckClass;
 
-    GtkType balsa_spell_check_get_type(void);
+    GType balsa_spell_check_get_type(void);
 
 /* argument setters */
     void balsa_spell_check_set_module(BalsaSpellCheck *, const gchar *);

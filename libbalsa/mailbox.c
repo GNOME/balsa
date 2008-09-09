@@ -3185,11 +3185,11 @@ static void mbox_set_sort_column_id(GtkTreeSortable * sortable,
 static void mbox_set_sort_func(GtkTreeSortable * sortable,
                                gint sort_column_id,
                                GtkTreeIterCompareFunc func, gpointer data,
-                               GtkDestroyNotify destroy);
+                               GDestroyNotify destroy);
 static void mbox_set_default_sort_func(GtkTreeSortable * sortable,
                                        GtkTreeIterCompareFunc func,
                                        gpointer data,
-                                       GtkDestroyNotify destroy);
+                                       GDestroyNotify destroy);
 static gboolean mbox_has_default_sort_func(GtkTreeSortable * sortable);
 
 static void
@@ -3504,7 +3504,7 @@ static void
 mbox_set_sort_func(GtkTreeSortable * sortable,
                    gint sort_column_id,
                    GtkTreeIterCompareFunc func,
-                   gpointer data, GtkDestroyNotify destroy)
+                   gpointer data, GDestroyNotify destroy)
 {
     g_warning("%s called but not implemented.\n", __func__);
 }
@@ -3512,7 +3512,7 @@ mbox_set_sort_func(GtkTreeSortable * sortable,
 static void
 mbox_set_default_sort_func(GtkTreeSortable * sortable,
                            GtkTreeIterCompareFunc func,
-                           gpointer data, GtkDestroyNotify destroy)
+                           gpointer data, GDestroyNotify destroy)
 {
     g_warning("%s called but not implemented.\n", __func__);
 }

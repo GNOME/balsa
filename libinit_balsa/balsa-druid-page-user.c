@@ -84,7 +84,8 @@ balsa_druid_page_user_init(BalsaDruidPageUser * user,
 #endif
     label = GTK_LABEL(gtk_label_new(_(header2)));
     gtk_label_set_line_wrap(label, TRUE);
-    gtk_box_pack_start_defaults(GTK_BOX(page->vbox), GTK_WIDGET(label));
+    gtk_box_pack_start(GTK_BOX(page->vbox), GTK_WIDGET(label),
+                       TRUE, TRUE, 0);
 
     table = GTK_TABLE(gtk_table_new(10, 2, FALSE));
 

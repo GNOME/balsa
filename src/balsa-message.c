@@ -204,10 +204,10 @@ balsa_part_info_get_type()
     return balsa_part_info_type;
 }
 
-GtkType
+GType
 balsa_message_get_type()
 {
-    static GtkType balsa_message_type = 0;
+    static GType balsa_message_type = 0;
 
     if (!balsa_message_type) {
         static const GTypeInfo balsa_message_info = {
@@ -926,14 +926,14 @@ tree_mult_selection_popup(BalsaMessage * bm, GdkEventButton * event,
             gtk_menu_item_new_with_label (_("Save selected as..."));
         gtk_widget_show(menu_item);
         g_signal_connect (G_OBJECT (menu_item), "activate",
-                          GTK_SIGNAL_FUNC (part_context_save_all_cb),
+                          G_CALLBACK (part_context_save_all_cb),
                           (gpointer) bm->save_all_list);
         gtk_menu_shell_append (GTK_MENU_SHELL (bm->save_all_popup), menu_item);
         menu_item = 
             gtk_menu_item_new_with_label (_("Save selected to folder..."));
         gtk_widget_show(menu_item);
         g_signal_connect (G_OBJECT (menu_item), "activate",
-                          GTK_SIGNAL_FUNC (part_context_dump_all_cb),
+                          G_CALLBACK (part_context_dump_all_cb),
                           (gpointer) bm->save_all_list);
         gtk_menu_shell_append (GTK_MENU_SHELL (bm->save_all_popup), menu_item);
         if (event)
@@ -1293,7 +1293,7 @@ add_to_attachments_popup(GtkMenuShell * menu, const gchar * item,
     
     g_object_set_data(G_OBJECT(menuitem), "balsa-message", bm);
     g_signal_connect(G_OBJECT (menuitem), "activate",
-		     GTK_SIGNAL_FUNC (atattchments_menu_cb),
+		     G_CALLBACK (atattchments_menu_cb),
 		     (gpointer) info);
     gtk_menu_shell_append(menu, menuitem);
 }
@@ -1321,7 +1321,7 @@ add_toggle_inline_menu_item(GtkMenuShell * menu, BalsaMessage * bm,
     
     g_object_set_data(G_OBJECT(menuitem), "balsa-message", bm);
     g_signal_connect(G_OBJECT (menuitem), "activate",
-		     GTK_SIGNAL_FUNC (toggle_all_inline_cb),
+		     G_CALLBACK (toggle_all_inline_cb),
 		     (gpointer) info);
     gtk_menu_shell_append(menu, menuitem);
 

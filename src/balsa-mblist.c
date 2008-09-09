@@ -139,10 +139,10 @@ static void bmbl_expand_to_row(BalsaMBList * mblist, GtkTreePath * path);
 
 /* class methods */
 
-GtkType
+GType
 balsa_mblist_get_type(void)
 {
-    static GtkType mblist_type = 0;
+    static GType mblist_type = 0;
 
     if (!mblist_type) {
 	static const GTypeInfo mblist_info = {

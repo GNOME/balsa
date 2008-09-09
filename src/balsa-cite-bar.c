@@ -72,7 +72,7 @@ balsa_cite_bar_class_init(BalsaCiteBarClass *class)
     object_class = (GtkObjectClass*) class;
     widget_class = (GtkWidgetClass*) class;
 
-    parent_class = gtk_type_class(gtk_widget_get_type());
+    parent_class = g_type_class_peek_parent(class);
 
     object_class->destroy = balsa_cite_bar_destroy;
 

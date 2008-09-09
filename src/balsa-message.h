@@ -31,9 +31,9 @@ extern "C" {
 
 
 #define BALSA_TYPE_MESSAGE          (balsa_message_get_type ())
-#define BALSA_MESSAGE(obj)          GTK_CHECK_CAST (obj, BALSA_TYPE_MESSAGE, BalsaMessage)
-#define BALSA_MESSAGE_CLASS(klass)  GTK_CHECK_CLASS_CAST (klass, BALSA_TYPE_MESSAGE, BalsaMessageClass)
-#define BALSA_IS_MESSAGE(obj)       GTK_CHECK_TYPE (obj, BALSA_TYPE_MESSAGE)
+#define BALSA_MESSAGE(obj)          G_TYPE_CHECK_INSTANCE_CAST (obj, BALSA_TYPE_MESSAGE, BalsaMessage)
+#define BALSA_MESSAGE_CLASS(klass)  G_TYPE_CHECK_CLASS_CAST (klass, BALSA_TYPE_MESSAGE, BalsaMessageClass)
+#define BALSA_IS_MESSAGE(obj)       G_TYPE_CHECK_INSTANCE_TYPE (obj, BALSA_TYPE_MESSAGE)
 
 
 typedef struct _BalsaMessage BalsaMessage;
@@ -97,7 +97,7 @@ struct _BalsaMessageClass {
 	void (*select_part) (BalsaMessage * message);
 };
 
-GtkType balsa_message_get_type(void);
+GType balsa_message_get_type(void);
 GtkWidget *balsa_message_new(void);
 void balsa_message_set_close(BalsaMessage * bmessage,
 			     gboolean close_with_msg);

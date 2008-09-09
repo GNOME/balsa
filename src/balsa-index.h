@@ -31,13 +31,13 @@
 extern "C" {
 #endif				/* __cplusplus */
 
-    GtkType balsa_index_get_type(void);
+    GType balsa_index_get_type(void);
 
 #define BALSA_TYPE_INDEX          (balsa_index_get_type ())
-#define BALSA_INDEX(obj)          (GTK_CHECK_CAST (obj, BALSA_TYPE_INDEX, BalsaIndex))
-#define BALSA_INDEX_CLASS(klass)  (GTK_CHECK_CLASS_CAST (klass, BALSA_TYPE_INDEX, BalsaIndexClass))
-#define BALSA_IS_INDEX(obj)       (GTK_CHECK_TYPE (obj, BALSA_TYPE_INDEX))
-#define BALSA_IS_INDEX_CLASS(klass) (GTK_CHECK_CLASS_TYPE (klass, BALSA_TYPE_INDEX))
+#define BALSA_INDEX(obj)          (G_TYPE_CHECK_INSTANCE_CAST (obj, BALSA_TYPE_INDEX, BalsaIndex))
+#define BALSA_INDEX_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST (klass, BALSA_TYPE_INDEX, BalsaIndexClass))
+#define BALSA_IS_INDEX(obj)       (G_TYPE_CHECK_INSTANCE_TYPE (obj, BALSA_TYPE_INDEX))
+#define BALSA_IS_INDEX_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE (klass, BALSA_TYPE_INDEX))
 
 
     typedef struct _BalsaIndex BalsaIndex;

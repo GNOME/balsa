@@ -1,3 +1,42 @@
+2008-09-09  Peter Bloomfield
+
+	Gtk 2.14 deprecation cleanup
+
+	* libbalsa/mailbox.c: (mbox_set_sort_func),
+	(mbox_set_default_sort_func):
+	* libbalsa/source-viewer.c: (libbalsa_show_message_source):
+	* libinit_balsa/assistant_page_user.c:
+	(balsa_druid_page_user_init):
+	* libinit_balsa/balsa-druid-page-user.c:
+	(balsa_druid_page_user_init):
+	* src/ab-window.c: (balsa_ab_window_get_type):
+	* src/ab-window.h:
+	* src/balsa-cite-bar.c: (balsa_cite_bar_class_init):
+	* src/balsa-index.c: (balsa_index_get_type), (bndx_class_init),
+	(bndx_popup_menu_create), (create_stock_menu_item):
+	* src/balsa-index.h:
+	* src/balsa-mblist.c: (balsa_mblist_get_type):
+	* src/balsa-mblist.h:
+	* src/balsa-message.c: (balsa_message_get_type),
+	(tree_mult_selection_popup), (add_to_attachments_popup),
+	(add_toggle_inline_menu_item):
+	* src/balsa-message.h:
+	* src/balsa-mime-widget.h:
+	* src/filter-edit-callbacks.c: (build_type_notebook):
+	* src/mailbox-conf.c: (run_mailbox_conf), (mailbox_conf_new),
+	(create_local_mailbox_dialog), (create_pop_mailbox_dialog),
+	(create_imap_mailbox_dialog):
+	* src/mailbox-conf.h:
+	* src/mailbox-node.c: (add_menu_entry),
+	(balsa_mailbox_node_get_context_menu):
+	* src/main-window.c:
+	* src/main-window.h:
+	* src/sendmsg-window.c: (add_attachment), (add_urlref_attachment),
+	(bsmsg_check_format_compatibility):
+	* src/spell-check.c: (balsa_spell_check_get_type),
+	(balsa_spell_check_class_init):
+	* src/spell-check.h:
+
 2006-09-07  Paweł Sałek
 
 	* libbalsa/imap/imap-handle.c: don't g_source_remove() twice.

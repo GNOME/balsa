@@ -159,10 +159,10 @@ static GtkDialogClass *parent_class = NULL;
 
 
 /* begin actual code */
-GtkType
+GType
 balsa_spell_check_get_type()
 {
-    static GtkType balsa_spell_check_type = 0;
+    static GType balsa_spell_check_type = 0;
 
     if (!balsa_spell_check_type) {
 	static const GTypeInfo balsa_spell_check_info = {
@@ -199,7 +199,7 @@ balsa_spell_check_class_init(BalsaSpellCheckClass * klass)
     widget_class = (GtkWidgetClass *) klass;
     container_class = (GtkContainerClass *) klass;
 
-    parent_class = gtk_type_class(GTK_TYPE_FRAME);
+    parent_class = g_type_class_peek_parent(klass);
 
     /* GObject signals */
     o_class->set_property = spch_set_property;

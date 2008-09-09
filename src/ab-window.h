@@ -23,10 +23,10 @@
 #define __AB_WINDOW_H__
 
 #define BALSA_TYPE_AB_WINDOW            (balsa_ab_window_get_type ())
-#define BALSA_AB_WINDOW(obj)            (GTK_CHECK_CAST ((obj), BALSA_TYPE_AB_WINDOW, BalsaAbWindow))
-#define BALSA_AB_WINDOW_CLASS(klass)    (GTK_CHECK_CLASS_CAST ((klass), BALSA_TYPE_AB_WINDOW, BalsaAbWindowClass))
-#define BALSA_IS_AB_WINDOW(obj)         (GTK_CHECK_TYPE ((obj), BALSA_TYPE_AB_WINDOW))
-#define BALSA_IS_AB_WINDOW_CLASS(klass) (GTK_CHECK_CLASS_TYPE ((klass), BALSA_TYPE_AB_WINDOW))
+#define BALSA_AB_WINDOW(obj)            (G_TYPE_CHECK_INSTANCE_CAST ((obj), BALSA_TYPE_AB_WINDOW, BalsaAbWindow))
+#define BALSA_AB_WINDOW_CLASS(klass)    (G_TYPE_CHECK_CLASS_CAST ((klass), BALSA_TYPE_AB_WINDOW, BalsaAbWindowClass))
+#define BALSA_IS_AB_WINDOW(obj)         (G_TYPE_CHECK_INSTANCE_TYPE ((obj), BALSA_TYPE_AB_WINDOW))
+#define BALSA_IS_AB_WINDOW_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), BALSA_TYPE_AB_WINDOW))
 
 
 typedef struct _BalsaAbWindow BalsaAbWindow;
@@ -65,7 +65,7 @@ struct _BalsaAbWindow
     GtkWidget *combo_box;
 };
 
-GtkType balsa_ab_window_get_type(void);
+GType balsa_ab_window_get_type(void);
 GtkWidget *balsa_ab_window_new(gboolean composing, GtkWindow* parent);
 
 gchar *balsa_ab_window_get_recipients(BalsaAbWindow *ab);

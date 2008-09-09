@@ -28,7 +28,7 @@
 
 typedef struct _BalsaMailboxConfView BalsaMailboxConfView;
 
-void mailbox_conf_new(GtkType mailbox_type);
+void mailbox_conf_new(GType mailbox_type);
 void mailbox_conf_edit(BalsaMailboxNode * mbnode);
 void mailbox_conf_delete(BalsaMailboxNode * mbnode);
 

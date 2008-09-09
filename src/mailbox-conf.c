@@ -75,7 +75,7 @@ struct _MailboxConfWindow {
     void (*ok_handler)(MailboxConfWindow*);
     const gchar *ok_button_name;
     GtkWidget *mailbox_name;
-    GtkType mailbox_type;
+    GType mailbox_type;
     BalsaMailboxConfView *view_info;
     gboolean ok_sensitive;
 
@@ -532,7 +532,7 @@ conf_response_cb(GtkDialog* dialog, gint response, MailboxConfWindow * mcw)
 }
 
 static GtkWidget *
-run_mailbox_conf(BalsaMailboxNode* mbnode, GtkType mailbox_type, 
+run_mailbox_conf(BalsaMailboxNode* mbnode, GType mailbox_type, 
 		 gboolean update)
 {
     MailboxConfWindow* mcw;
@@ -575,7 +575,7 @@ run_mailbox_conf(BalsaMailboxNode* mbnode, GtkType mailbox_type,
  * If the used clicks save add the new mailbox to the tree.
  */
 void
-mailbox_conf_new(GtkType mailbox_type)
+mailbox_conf_new(GType mailbox_type)
 {
     static GtkWidget *dialog;
 
@@ -1092,7 +1092,7 @@ create_local_mailbox_dialog(MailboxConfWindow *mcw)
         label = libbalsa_create_label(_("_Mailbox Name:"), table, ++row);
         mcw->mailbox_name = 
             libbalsa_create_entry(table,
-                         GTK_SIGNAL_FUNC(check_for_blank_fields),
+                         G_CALLBACK(check_for_blank_fields),
                          mcw, row, NULL, label);
     } else mcw->mailbox_name = NULL;
 
@@ -1157,12 +1157,12 @@ create_pop_mailbox_dialog(MailboxConfWindow *mcw)
     /* mailbox name */
     label = libbalsa_create_label(_("Mailbox _Name:"), table, 0);
     mcw->mailbox_name = libbalsa_create_entry(table,
-				     GTK_SIGNAL_FUNC(check_for_blank_fields),
+				     G_CALLBACK(check_for_blank_fields),
 				     mcw, 0, NULL, label);
     /* pop server */
     label = libbalsa_create_label(_("_Server:"), table, 1);
     mcw->mb_data.pop3.bsc.server = libbalsa_create_entry(table,
-				     GTK_SIGNAL_FUNC(check_for_blank_fields),
+				     G_CALLBACK(check_for_blank_fields),
 				     mcw, 1, "localhost", label);
     mcw->mb_data.pop3.bsc.default_ports = POP3_DEFAULT_PORTS;
 
@@ -1170,7 +1170,7 @@ create_pop_mailbox_dialog(MailboxConfWindow *mcw)
     /* username  */
     label= libbalsa_create_label(_("Use_r name:"), table, 2);
     mcw->mb_data.pop3.username = libbalsa_create_entry(table,
-				     GTK_SIGNAL_FUNC(check_for_blank_fields),
+				     G_CALLBACK(check_for_blank_fields),
 				     mcw, 2, g_get_user_name(), label);
 
     /* password field */
@@ -1199,7 +1199,7 @@ create_pop_mailbox_dialog(MailboxConfWindow *mcw)
     label = libbalsa_create_label(_("Fi_lter Command:"), table, 7);
     mcw->mb_data.pop3.filter_cmd =
 	libbalsa_create_entry(table,
-		     GTK_SIGNAL_FUNC(check_for_blank_fields),
+		     G_CALLBACK(check_for_blank_fields),
 		     mcw, 7, "procmail -f -", label);
 
     advanced =
@@ -1259,14 +1259,14 @@ create_imap_mailbox_dialog(MailboxConfWindow *mcw)
     /* mailbox name */
     label = libbalsa_create_label(_("Mailbox _Name:"), table, ++row);
     mcw->mailbox_name =  libbalsa_create_entry(table,
-                                      GTK_SIGNAL_FUNC(check_for_blank_fields),
+                                      G_CALLBACK(check_for_blank_fields),
                                       mcw, row, NULL, label);
 
     /* imap server */
     label = libbalsa_create_label(_("_Server:"), table, ++row);
     mcw->mb_data.imap.bsc.server = 
 	libbalsa_create_entry(table,
-		     GTK_SIGNAL_FUNC(check_for_blank_fields),
+		     G_CALLBACK(check_for_blank_fields),
 		     mcw, row, "localhost", label);
     mcw->mb_data.imap.bsc.default_ports = IMAP_DEFAULT_PORTS;
 
@@ -1274,7 +1274,7 @@ create_imap_mailbox_dialog(MailboxConfWindow *mcw)
     label = libbalsa_create_label(_("_Username:"), table, ++row);
     mcw->mb_data.imap.username = 
 	libbalsa_create_entry(table,
-		     GTK_SIGNAL_FUNC(check_for_blank_fields),
+		     G_CALLBACK(check_for_blank_fields),
 		     mcw, row, g_get_user_name(), label);
 
     /* toggle for anonymous password */

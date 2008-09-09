@@ -897,7 +897,7 @@ bmbn_scan_children_idle(BalsaMailboxNode ** mbnode)
  * Context menu, helpers, and callbacks.
  * --------------------------------------------------------------------- */
 static void
-add_menu_entry(GtkWidget * menu, const gchar * label, GtkSignalFunc cb,
+add_menu_entry(GtkWidget * menu, const gchar * label, GCallback cb,
 	       BalsaMailboxNode * mbnode)
 {
     GtkWidget *menuitem;
@@ -1028,18 +1028,18 @@ balsa_mailbox_node_get_context_menu(BalsaMailboxNode * mbnode)
 
     submenu = gtk_menu_new();
     add_menu_entry(submenu, _("Local _mbox mailbox..."),  
-		   GTK_SIGNAL_FUNC(mailbox_conf_add_mbox_cb), NULL);
+		   G_CALLBACK(mailbox_conf_add_mbox_cb), NULL);
     add_menu_entry(submenu, _("Local Mail_dir mailbox..."), 
-		   GTK_SIGNAL_FUNC(mailbox_conf_add_maildir_cb), NULL);
+		   G_CALLBACK(mailbox_conf_add_maildir_cb), NULL);
     add_menu_entry(submenu, _("Local M_H mailbox..."),
-		   GTK_SIGNAL_FUNC(mailbox_conf_add_mh_cb), NULL);
+		   G_CALLBACK(mailbox_conf_add_mh_cb), NULL);
     add_menu_entry(submenu, _("Remote _IMAP mailbox..."), 
-		   GTK_SIGNAL_FUNC(mailbox_conf_add_imap_cb), NULL);
+		   G_CALLBACK(mailbox_conf_add_imap_cb), NULL);
     add_menu_entry(submenu, NULL, NULL, mbnode);
     add_menu_entry(submenu, _("Remote IMAP _folder..."), 
-		   GTK_SIGNAL_FUNC(folder_conf_add_imap_cb), NULL);
+		   G_CALLBACK(folder_conf_add_imap_cb), NULL);
     add_menu_entry(submenu, _("Remote IMAP _subfolder..."), 
-		   GTK_SIGNAL_FUNC(folder_conf_add_imap_sub_cb), NULL);
+		   G_CALLBACK(folder_conf_add_imap_sub_cb), NULL);
     gtk_widget_show(submenu);
     
     menuitem = gtk_menu_item_new_with_mnemonic(_("_New"));
@@ -1049,7 +1049,7 @@ balsa_mailbox_node_get_context_menu(BalsaMailboxNode * mbnode)
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
     
     if(mbnode == NULL) {/* clicked on the empty space */
-        add_menu_entry(menu, _("_Rescan"), GTK_SIGNAL_FUNC(mb_rescan_cb), 
+        add_menu_entry(menu, _("_Rescan"), G_CALLBACK(mb_rescan_cb), 
                        NULL);
 	return menu;
     }
@@ -1066,7 +1066,7 @@ balsa_mailbox_node_get_context_menu(BalsaMailboxNode * mbnode)
 		                     balsa_mailbox_node_signals
 				     [APPEND_SUBTREE], 0, FALSE))
 	add_menu_entry(menu, _("_Rescan"),
-		       GTK_SIGNAL_FUNC(mb_rescan_cb), mbnode);
+		       G_CALLBACK(mb_rescan_cb), mbnode);
 
     if (mbnode->config_prefix)
 	add_menu_entry(menu, _("_Delete"), G_CALLBACK(mb_del_cb),  mbnode);
@@ -1090,29 +1090,29 @@ balsa_mailbox_node_get_context_menu(BalsaMailboxNode * mbnode)
     if(LIBBALSA_IS_MAILBOX_IMAP(mailbox)) {
         add_menu_entry(menu, NULL, NULL, NULL);
         add_menu_entry(menu, _("_Subscribe"),   
-                       GTK_SIGNAL_FUNC(mb_subscribe_cb),   mbnode);
+                       G_CALLBACK(mb_subscribe_cb),   mbnode);
         add_menu_entry(menu, _("_Unsubscribe"), 
-                       GTK_SIGNAL_FUNC(mb_unsubscribe_cb), mbnode);
+                       G_CALLBACK(mb_unsubscribe_cb), mbnode);
     }
 
     if (!special) {
         add_menu_entry(menu, NULL, NULL, NULL);
         add_menu_entry(menu, _("Mark as _Inbox"),    
-                       GTK_SIGNAL_FUNC(mb_inbox_cb),    mbnode);
+                       G_CALLBACK(mb_inbox_cb),    mbnode);
         add_menu_entry(menu, _("_Mark as Sentbox"), 
-                       GTK_SIGNAL_FUNC(mb_sentbox_cb),  mbnode);
+                       G_CALLBACK(mb_sentbox_cb),  mbnode);
         add_menu_entry(menu, _("Mark as _Trash"),    
-                       GTK_SIGNAL_FUNC(mb_trash_cb),    mbnode);
+                       G_CALLBACK(mb_trash_cb),    mbnode);
         add_menu_entry(menu, _("Mark as D_raftbox"),
-                       GTK_SIGNAL_FUNC(mb_draftbox_cb), mbnode);
+                       G_CALLBACK(mb_draftbox_cb), mbnode);
     } else if (mailbox == balsa_app.trash)
         add_menu_entry(menu, _("_Empty trash"),    
-                       GTK_SIGNAL_FUNC(mb_empty_trash_cb), mbnode);
+                       G_CALLBACK(mb_empty_trash_cb), mbnode);
 
     /* FIXME : No test on mailbox type is made yet, should we ? */
     add_menu_entry(menu, NULL, NULL, NULL);
     add_menu_entry(menu, _("_Edit/Apply filters"), 
-                   GTK_SIGNAL_FUNC(mb_filter_cb), mbnode);
+                   G_CALLBACK(mb_filter_cb), mbnode);
 
     return menu;
 }

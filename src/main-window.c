@@ -4051,12 +4051,12 @@ bw_find_real(BalsaWindow * window, BalsaIndex * bindex, gboolean again)
 	gtk_container_set_border_width(GTK_CONTAINER(w), 6);
 	reverse_button = 
             gtk_check_button_new_with_mnemonic(_("_Reverse search"));
-	gtk_box_pack_start_defaults(GTK_BOX(w), reverse_button);
+	gtk_box_pack_start(GTK_BOX(w), reverse_button, TRUE, TRUE, 0);
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(reverse_button),
                                      reverse);
 	wrap_button = 
             gtk_check_button_new_with_mnemonic(_("_Wrap around"));
-	gtk_box_pack_start_defaults(GTK_BOX(w), wrap_button);
+	gtk_box_pack_start(GTK_BOX(w), wrap_button, TRUE, TRUE, 0);
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(wrap_button),
                                      wrap);
 	gtk_box_pack_start(GTK_BOX(box), w, TRUE, TRUE, 0);

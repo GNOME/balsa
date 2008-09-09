@@ -281,7 +281,7 @@ libbalsa_show_message_source(LibBalsaMessage* msg, const gchar * font,
     gtk_box_pack_start(GTK_BOX(vbox), 
                        lbsv_app_set_menus(GTK_WINDOW(window),
                                           &escape_action), FALSE, TRUE, 1);
-    gtk_box_pack_start_defaults(GTK_BOX(vbox), interior);
+    gtk_box_pack_start(GTK_BOX(vbox), interior, TRUE, TRUE, 0);
     gtk_container_add(GTK_CONTAINER(window), vbox);
 
     lsvi = g_new(LibBalsaSourceViewerInfo, 1);

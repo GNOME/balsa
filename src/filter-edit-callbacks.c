@@ -982,7 +982,7 @@ build_type_notebook()
 
     box = gtk_vbox_new(FALSE, 5);
     table = gtk_table_new(7, 2, FALSE);
-    gtk_box_pack_start_defaults(GTK_BOX(box), table);
+    gtk_box_pack_start(GTK_BOX(box), table, TRUE, TRUE, 0);
 
     fe_type_simple_label = 
 	gtk_label_new_with_mnemonic(_("One of the specified f_ields contains"));
@@ -1017,7 +1017,7 @@ build_type_notebook()
 
 #if REGULAR_EXPRESSION_FILTERING_IS_IMPLEMENTED
     page = gtk_table_new(5, 6, FALSE);
-    gtk_box_pack_start_defaults(GTK_BOX(box), page);
+    gtk_box_pack_start(GTK_BOX(box), page, TRUE, TRUE, 0);
 
     fe_type_regex_label = 
         gtk_label_new_with_mnemonic(_("_One of the regular expressions matches"));
@@ -1067,7 +1067,7 @@ build_type_notebook()
                      GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 2, 2);
 #else                   /* REGULAR_EXPRESSION_FILTERING_IS_IMPLEMENTED */
     msg = _("Filtering using regular expressions is not yet implemented.");
-    gtk_box_pack_start_defaults(GTK_BOX(box), gtk_label_new(msg));
+    gtk_box_pack_start(GTK_BOX(box), gtk_label_new(msg), TRUE, TRUE, 0);
 #endif                  /* REGULAR_EXPRESSION_FILTERING_IS_IMPLEMENTED */
 
     /* The date page of the notebook */

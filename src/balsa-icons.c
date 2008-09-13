@@ -83,6 +83,11 @@ load_balsa_pixmap(GtkIconTheme *icon_theme, GtkIconFactory *factory,
 	{ "user-trash-full", GTK_STOCK_DELETE },
 	{ "mail-attachment", "stock_attach" },
 	{ "emblem-important", "stock_mail-flag-for-followup"},
+        { "stock_mail-reply", "stock_mail-replied"}, 
+        { "stock_mail-reply-to-all", "stock_mail-replied"}, 
+        { "stock_mail-forward", "stock_mail-replied"}, 
+        { "gnome-fs-directory-accept", GTK_STOCK_OPEN},
+        { "gnome-fs-directory", GTK_STOCK_DIRECTORY},
 	{ NULL, NULL } };
 
     BICONS_LOG("loading icon %s (stock id %s)", bpixmap->name,
@@ -94,11 +99,13 @@ load_balsa_pixmap(GtkIconTheme *icon_theme, GtkIconFactory *factory,
 	pixmap_fallback_t *fb = fallback_id;
 	while (fb->def_id && strcmp(fb->def_id, bpixmap->stock_id))
 	    fb++;
-	if (fb->def_id)
+	if (fb->def_id) {
 	    use_id = fb->fb_id;
-	else {
+            BICONS_LOG("\t(%s not found, fall back to %s)",
+                       bpixmap->stock_id, use_id);
+        } else {
 	    BICONS_ERR("icon %s unknown, no fallback", bpixmap->stock_id);
-	    return;
+	    use_id = GTK_STOCK_MISSING_IMAGE;
 	}
     } else
 	use_id = bpixmap->stock_id;

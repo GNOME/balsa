@@ -1,3 +1,10 @@
+2008-09-13  Peter Bloomfield
+
+	* src/balsa-icons.c: (load_balsa_pixmap): add more fallbacks to
+	cope with woeful gnome-icon-theme-2.23+; use
+	GTK_STOCK_MISSING_IMAGE when all else fails, to avoid Gtk
+	warnings.
+
 2008-09-09  Peter Bloomfield
 
 	Gtk 2.14 deprecation cleanup

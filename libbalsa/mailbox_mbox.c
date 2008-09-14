@@ -46,6 +46,8 @@
 #include "mime-stream-shared.h"
 #include <glib/gi18n.h>
 
+#define DEBUG_SEEK TRUE
+
 struct message_info {
     LibBalsaMailboxLocalMessageInfo local_info;
     LibBalsaMessageFlag orig_flags;     /* Has only real flags */
@@ -252,6 +254,13 @@ lbm_mbox_stream_seek_to_message(GMimeStream * stream, off_t offset)
     retval = g_mime_stream_seek(stream, offset, GMIME_STREAM_SEEK_SET) >= 0
         && g_mime_stream_read(stream, buffer, sizeof buffer) == sizeof buffer
         && strncmp("From ", buffer, 5) == 0;
+#if DEBUG_SEEK
+    if (!retval) {
+        buffer[4] = 0;
+        g_print("%s at %ld failed: saw \"%s\"\n", __func__, offset,
+                buffer);
+    }
+#endif
 
     g_mime_stream_seek(stream, offset, GMIME_STREAM_SEEK_SET);
 
@@ -548,6 +557,7 @@ free_message_info(struct message_info *msg_info)
                                      (gpointer) & msg_info->local_info.message);
 	msg_info->local_info.message = NULL;
     }
+    g_free(msg_info);
 }
 
 static void
@@ -559,7 +569,6 @@ free_messages_info(GPtrArray * msgno_2_msg_info)
         struct message_info *msg_info =
             g_ptr_array_index(msgno_2_msg_info, i);
         free_message_info(msg_info);
-        g_free(msg_info);
     }
     g_ptr_array_free(msgno_2_msg_info, TRUE);
 }
@@ -705,6 +714,10 @@ libbalsa_mailbox_mbox_open(LibBalsaMailbox * mailbox, GError **err)
     }
 
     mbox->size = st.st_size;
+#if DEBUG_SEEK
+    g_print("%s %s set size from stat %d\n", __func__, mailbox->name,
+            mbox->size);
+#endif
     libbalsa_mailbox_set_mtime(mailbox, st.st_mtime);
     mbox->gmime_stream = gmime_stream;
 
@@ -975,6 +988,10 @@ libbalsa_mailbox_mbox_check(LibBalsaMailbox * mailbox)
 	/* First check--just cache the mtime and size. */
         libbalsa_mailbox_set_mtime(mailbox, st.st_mtime);
 	mbox->size = st.st_size;
+#if DEBUG_SEEK
+        g_print("%s %s set size from stat %d\n", __func__, mailbox->name,
+                mbox->size);
+#endif
 	return;
     }
     if (st.st_mtime == mtime && st.st_size == mbox->size)
@@ -988,6 +1005,10 @@ libbalsa_mailbox_mbox_check(LibBalsaMailbox * mailbox)
 								 path));
 	/* Cache the file size, so we don't check the next time. */
 	mbox->size = st.st_size;
+#if DEBUG_SEEK
+        g_print("%s %s set size from stat %d\n", __func__, mailbox->name,
+                mbox->size);
+#endif
 	return;
     }
 
@@ -1015,6 +1036,23 @@ libbalsa_mailbox_mbox_check(LibBalsaMailbox * mailbox)
     /* If Balsa appended a message, it was prefixed with "\nFrom ", so
      * we first check one byte beyond the end of the last message: */
     start = mbox->size + 1;
+#if DEBUG_SEEK
+    g_print("%s %s looking where to start parsing.\n",
+              __func__, mailbox->name);
+    if (!lbm_mbox_stream_seek_to_message(mbox_stream, start)) {
+        g_print(" did not find a message at offset %ld\n", start);
+        --start;
+        if (lbm_mbox_stream_seek_to_message(mbox_stream, start))
+            g_print(" found a message at offset %ld\n", start);
+        else
+            g_print(" did not find a message at offset %ld\n", start);
+    } else
+        g_print(" found a message at offset %ld\n", start);
+#else
+    if (!lbm_mbox_stream_seek_to_message(mbox_stream, start))
+        /* Sometimes we seem to be off by 1: */
+        --start;
+#endif
 
     while ((msgno = mbox->msgno_2_msg_info->len) > 0) {
 	off_t offset;
@@ -1025,6 +1063,9 @@ libbalsa_mailbox_mbox_check(LibBalsaMailbox * mailbox)
 	     * the first new message--start parsing here. */
             break;
 
+#if DEBUG_SEEK
+        g_print(" backing up over message %d\n", msgno);
+#endif
 	/* Back up over this message and try again. */
         msg_info = message_info_from_msgno(mbox, msgno);
         start = msg_info->start;
@@ -1056,6 +1097,10 @@ libbalsa_mailbox_mbox_check(LibBalsaMailbox * mailbox)
 #endif
     parse_mailbox(mbox);
     mbox->size = g_mime_stream_tell(mbox_stream);
+#if DEBUG_SEEK
+    g_print("%s %s set size from tell %d\n", __func__, mailbox->name,
+            mbox->size);
+#endif
     libbalsa_mime_stream_shared_unlock(mbox_stream);
     mbox_unlock(mailbox, mbox_stream);
     libbalsa_mailbox_local_load_messages(mailbox, msgno);
@@ -1549,6 +1594,10 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
         g_warning("mbox_sync: message not in expected position.\n");
     else if (g_mime_stream_write_to_stream(temp_stream, mbox_stream) != -1) {
         mbox->size = g_mime_stream_tell(mbox_stream);
+#if DEBUG_SEEK
+        g_print("%s %s set size from tell %d\n", __func__, mailbox->name,
+                mbox->size);
+#endif
         if (ftruncate(GMIME_STREAM_FS(mbox_stream)->fd, mbox->size) == 0)
             save_failed = FALSE;
     }

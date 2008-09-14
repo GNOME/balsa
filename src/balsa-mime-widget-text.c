@@ -124,7 +124,7 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
 {
     LibBalsaHTMLType html_type;
     gchar *ptr = NULL;
-    size_t alloced;
+    ssize_t alloced;
     BalsaMimeWidget *mw;
     GtkTextBuffer *buffer;
 #if USE_GREGEX
@@ -143,7 +143,7 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
 
     is_text_plain = !g_ascii_strcasecmp(content_type, "text/plain");
     alloced = libbalsa_message_body_get_content(mime_body, &ptr, &err);
-    if (!ptr) {
+    if (alloced < 0) {
         balsa_information(LIBBALSA_INFORMATION_ERROR,
                           _("Could not save a text part: %s"),
                           err ? err->message : "Unknown error");

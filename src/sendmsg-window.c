@@ -3873,6 +3873,9 @@ fill_body_from_part(BalsaSendmsg * bsmsg, LibBalsaMessageHeaders *headers,
 
     body = quote_body(bsmsg, headers, message_id, references,
                       root, qtype);
+
+    g_return_if_fail(body != NULL);
+
     if(body->len && body->str[body->len] != '\n')
         g_string_append_c(body, '\n');
     libbalsa_insert_with_url(buffer, body->str, NULL, NULL, NULL);
@@ -4723,7 +4726,9 @@ bsm_prepare_for_setup(LibBalsaMessage *message)
 static void
 bsm_finish_setup(BalsaSendmsg *bsmsg, LibBalsaMessageBody *part)
 {
-    g_return_if_fail(part->message);
+    g_return_if_fail(part != NULL);
+    g_return_if_fail(part->message != NULL);
+
     if (part->message->mailbox &&
         !bsmsg->parent_message && !bsmsg->draft_message)
         libbalsa_mailbox_close(part->message->mailbox, FALSE);

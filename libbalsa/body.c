@@ -476,19 +476,6 @@ libbalsa_message_body_get_stream(LibBalsaMessageBody * body, GError **err)
         default:
             break;
         }
-    } else if (body->mime_part) {
-        /* Not a GMimePart... */
-        GMimeObject *object = body->mime_part;
-        if (GMIME_IS_MESSAGE_PART(object))
-            object = GMIME_OBJECT(g_mime_message_part_get_message
-                                  ((GMimeMessagePart *) object));
-        else
-            g_object_ref(object);
-        stream = g_mime_stream_mem_new();
-        libbalsa_mailbox_lock_store(body->message->mailbox);
-        g_mime_object_write_to_stream(object, stream);
-        libbalsa_mailbox_unlock_store(body->message->mailbox);
-        g_object_unref(object);
     } else {
         g_set_error(err, LIBBALSA_MAILBOX_ERROR, LIBBALSA_MAILBOX_ACCESS_ERROR,
                     "Internal error in get_stream");

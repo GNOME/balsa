@@ -452,7 +452,7 @@ balsa_print_object_text_vcard(GList * list,
     PangoTabArray *tabs;
     GString *desc_buf;
     gdouble c_max_height;
-    LibBalsaAddress * addr;
+    LibBalsaAddress * addr = NULL;
     gchar *textbuf;
 
     /* check if we can create an address from the body and fall back to default if 
@@ -461,7 +461,8 @@ balsa_print_object_text_vcard(GList * list,
 	textbuf = g_strdup(body->buffer);
     else
 	libbalsa_message_body_get_content(body, &textbuf, NULL);
-    addr = libbalsa_address_new_from_vcard(textbuf, body->charset);
+    if (textbuf)
+        addr = libbalsa_address_new_from_vcard(textbuf, body->charset);
     if (!addr) {
 	g_free(textbuf);
 	return balsa_print_object_text(list, context, body, psetup);

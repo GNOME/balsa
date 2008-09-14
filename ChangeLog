@@ -1,3 +1,20 @@
+2008-09-14  Peter Bloomfield
+
+	* libbalsa/body.c:
+	(libbalsa_message_body_get_stream): fail if message has no mailbox.
+	* libbalsa/mailbox_mbox.c:
+	(free_message_info, free_messages_info): plug memory leak;
+	(lbm_mbox_stream_seek_to_message, libbalsa_mailbox_mbox_open,
+	libbalsa_mailbox_mbox_sync): debugging output;
+	(libbalsa_mailbox_mbox_check): ditto; more careful check for
+	new mail.
+	* src/balsa-mime-widget-text.c:
+	(balsa_mime_widget_new_text): check for NULL part.
+	* src/balsa-print-object-text.c:
+	(balsa_print_object_text_vcard): ditto
+	* src/sendmsg-window.c:
+	(fill_body_from_part, bsm_finish_setup): ditto.
+
 2008-09-13  Peter Bloomfield
 
 	* src/balsa-icons.c: (load_balsa_pixmap): add more fallbacks to

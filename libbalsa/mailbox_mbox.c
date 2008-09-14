@@ -249,16 +249,18 @@ static gboolean
 lbm_mbox_stream_seek_to_message(GMimeStream * stream, off_t offset)
 {
     char buffer[5];
+    ssize_t nread = 0;
     gboolean retval;
 
     retval = g_mime_stream_seek(stream, offset, GMIME_STREAM_SEEK_SET) >= 0
-        && g_mime_stream_read(stream, buffer, sizeof buffer) == sizeof buffer
+        && (nread = g_mime_stream_read(stream, buffer, sizeof buffer))
+        == sizeof buffer
         && strncmp("From ", buffer, 5) == 0;
 #if DEBUG_SEEK
     if (!retval) {
-        buffer[4] = 0;
-        g_print("%s at %ld failed: saw \"%s\"\n", __func__, offset,
-                buffer);
+        buffer[nread] = 0;
+        g_print("%s at %ld failed: read %d, saw \"%s\"\n", __func__, offset,
+                nread, buffer);
     }
 #endif
 

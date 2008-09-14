@@ -1,3 +1,8 @@
+2008-09-14  Peter Bloomfield
+
+	* libbalsa/mailbox_mbox.c: (lbm_mbox_stream_seek_to_message):
+	better debugging.
+
 2006-09-14  Paweł Sałek
 
 	* src/balsa-index.c: process messages with external program -

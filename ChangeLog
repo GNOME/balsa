@@ -1,3 +1,8 @@
+2006-09-14  Paweł Sałek
+
+	* src/balsa-index.c: process messages with external program -
+	asynchronously.
+
 2008-09-14  Peter Bloomfield
 
 	* libbalsa/body.c:

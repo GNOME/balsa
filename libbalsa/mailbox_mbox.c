@@ -259,8 +259,8 @@ lbm_mbox_stream_seek_to_message(GMimeStream * stream, off_t offset)
 #if DEBUG_SEEK
     if (!retval) {
         buffer[nread] = 0;
-        g_print("%s at %ld failed: read %d, saw \"%s\"\n", __func__, offset,
-                nread, buffer);
+        g_print("%s at %ld failed: read %ld chars, saw \"%s\"\n", __func__,
+                (long) offset, (long) nread, buffer);
     }
 #endif
 
@@ -1042,14 +1042,14 @@ libbalsa_mailbox_mbox_check(LibBalsaMailbox * mailbox)
     g_print("%s %s looking where to start parsing.\n",
               __func__, mailbox->name);
     if (!lbm_mbox_stream_seek_to_message(mbox_stream, start)) {
-        g_print(" did not find a message at offset %ld\n", start);
+        g_print(" did not find a message at offset %ld\n", (long) start);
         --start;
         if (lbm_mbox_stream_seek_to_message(mbox_stream, start))
-            g_print(" found a message at offset %ld\n", start);
+            g_print(" found a message at offset %ld\n", (long) start);
         else
-            g_print(" did not find a message at offset %ld\n", start);
+            g_print(" did not find a message at offset %ld\n", (long) start);
     } else
-        g_print(" found a message at offset %ld\n", start);
+        g_print(" found a message at offset %ld\n", (long) start);
 #else
     if (!lbm_mbox_stream_seek_to_message(mbox_stream, start))
         /* Sometimes we seem to be off by 1: */

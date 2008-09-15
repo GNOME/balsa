@@ -1,3 +1,9 @@
+2008-09-15  Peter Bloomfield
+
+	* libbalsa/mailbox_mbox.c: (lbm_mbox_stream_seek_to_message,
+	libbalsa_mailbox_mbox_check): cast off_t and ssize_t to long in
+	calls to g_print.
+
 2008-09-14  Peter Bloomfield
 
 	* libbalsa/mailbox_mbox.c: (lbm_mbox_stream_seek_to_message):

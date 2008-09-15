@@ -258,7 +258,9 @@ lbm_mbox_stream_seek_to_message(GMimeStream * stream, off_t offset)
         && strncmp("From ", buffer, 5) == 0;
 #if DEBUG_SEEK
     if (!retval) {
-        buffer[MIN(nread, sizeof buffer - 1)] = 0;
+        if (nread == sizeof buffer)
+            --nread;
+        buffer[nread] = 0;
         g_print("%s at %ld failed: read %ld chars, saw \"%s\"\n", __func__,
                 (long) offset, (long) nread, buffer);
     }

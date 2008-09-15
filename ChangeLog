@@ -1,6 +1,11 @@
 2008-09-15  Peter Bloomfield
 
 	* libbalsa/mailbox_mbox.c: (lbm_mbox_stream_seek_to_message):
+	fix stupid comparison.
+
+2008-09-15  Peter Bloomfield
+
+	* libbalsa/mailbox_mbox.c: (lbm_mbox_stream_seek_to_message):
 	do not trash stack.
 
 2008-09-15  Peter Bloomfield

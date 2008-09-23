@@ -1,3 +1,9 @@
+2008-09-22  Peter Bloomfield
+
+	* src/pref-manager.c: (checking_group, misc_group,
+	deleting_messages_group): GtkAdjustment::page_size must be zero
+	when the GtkAdjustment is used in a GtkSpinButton.
+
 2008-09-15  Peter Bloomfield
 
 	* libbalsa/mailbox_mbox.c: (lbm_mbox_stream_seek_to_message):

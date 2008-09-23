@@ -1802,7 +1802,7 @@ checking_group(GtkWidget * page)
                      0, 1, row, row + 1, GTK_FILL, 0, 0, 0);
     pm_page_add_to_size_group(page, pui->check_mail_auto);
 
-    spinbutton_adj = gtk_adjustment_new(10, 1, 100, 1, 10, 10);
+    spinbutton_adj = gtk_adjustment_new(10, 1, 100, 1, 10, 0);
     pui->check_mail_minutes =
 	gtk_spin_button_new(GTK_ADJUSTMENT(spinbutton_adj), 1, 0);
     gtk_table_attach(GTK_TABLE(table), pui->check_mail_minutes,
@@ -2575,7 +2575,7 @@ misc_group(GtkWidget * page)
                        FALSE, FALSE, 0);
     pm_page_add_to_size_group(page, pui->close_mailbox_auto);
 
-    close_spinbutton_adj = gtk_adjustment_new(10, 1, 100, 1, 10, 10);
+    close_spinbutton_adj = gtk_adjustment_new(10, 1, 100, 1, 10, 0);
     pui->close_mailbox_minutes =
 	gtk_spin_button_new(GTK_ADJUSTMENT(close_spinbutton_adj), 1, 0);
     gtk_widget_show(pui->close_mailbox_minutes);
@@ -2635,7 +2635,7 @@ deleting_messages_group(GtkWidget * page)
                        FALSE, FALSE, 0);
     pm_page_add_to_size_group(page, pui->expunge_auto);
 
-    expunge_spinbutton_adj = gtk_adjustment_new(120, 1, 1440, 1, 10, 10);
+    expunge_spinbutton_adj = gtk_adjustment_new(120, 1, 1440, 1, 10, 0);
     pui->expunge_minutes =
 	gtk_spin_button_new(GTK_ADJUSTMENT(expunge_spinbutton_adj), 1, 0);
     gtk_widget_show(pui->expunge_minutes);

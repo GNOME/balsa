@@ -1,3 +1,7 @@
+2008-09-28  Peter Bloomfield
+
+	* libbalsa/mailbox_mbox.c: turn off debugging.
+
 2008-09-22  Peter Bloomfield
 
 	* src/pref-manager.c: (checking_group, misc_group,

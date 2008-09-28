@@ -46,7 +46,7 @@
 #include "mime-stream-shared.h"
 #include <glib/gi18n.h>
 
-#define DEBUG_SEEK TRUE
+/* #define DEBUG_SEEK TRUE */
 
 struct message_info {
     LibBalsaMailboxLocalMessageInfo local_info;

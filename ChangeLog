@@ -1,3 +1,8 @@
+2008-10-03  Mario Blättermann <mariobl@svn.gnome.org>
+
+	* doc/de/*: Added partial German translation
+	* doc/Makefile.am: Added de to the translation subdirs
+
 2008-09-28  Peter Bloomfield
 
 	* libbalsa/mailbox_mbox.c: turn off debugging.

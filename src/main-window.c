@@ -2128,7 +2128,7 @@ bw_notebook_label_new(BalsaMailboxNode * mbnode)
 
     settings = gtk_widget_get_settings(GTK_WIDGET(lab));
     gtk_icon_size_lookup_for_settings(settings, GTK_ICON_SIZE_MENU, &w, &h);
-    gtk_widget_set_size_request(but, w + 2, h + 2);
+    gtk_widget_set_size_request(but, w + 4, h + 4);
 
     g_signal_connect(but, "clicked",
                      G_CALLBACK(bw_mailbox_tab_close_cb), mbnode);

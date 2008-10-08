@@ -1,3 +1,7 @@
+2008-10-08  Peter Bloomfield
+
+	* src/main-window.c: update the magic number.
+
 2008-10-03  Mario Blättermann <mariobl@svn.gnome.org>
 
 	* doc/de/*: Added partial German translation

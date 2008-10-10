@@ -1,3 +1,7 @@
+2008-10-09  Peter Bloomfield
+
+	* src/main-window.c: smaller notebook tab button.
+
 2008-10-08  Peter Bloomfield
 
 	* src/main-window.c: update the magic number.

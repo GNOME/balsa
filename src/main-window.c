@@ -911,6 +911,16 @@ balsa_window_class_init(BalsaWindowClass * klass)
 {
     GtkObjectClass *object_class = (GtkObjectClass *) klass;
 
+    gtk_rc_parse_string("style \"balsa-notebook-tab-button-style\"\n"
+                        "{\n"
+                          "GtkWidget::focus-padding = 0\n"
+                          "GtkWidget::focus-line-width = 0\n"
+                          "xthickness = 0\n"
+                          "ythickness = 0\n"
+                        "}\n"
+                        "widget \"*.balsa-notebook-tab-button\"\n"
+                        "style    \"balsa-notebook-tab-button-style\"");
+
     window_signals[OPEN_MAILBOX_NODE] =
         g_signal_new("open_mailbox_node",
                      G_TYPE_FROM_CLASS(object_class),
@@ -2098,7 +2108,6 @@ bw_notebook_label_new(BalsaMailboxNode * mbnode)
 #if !GTK_CHECK_VERSION(2, 11, 0)
     GtkWidget *ev;
 #endif                          /* GTK_CHECK_VERSION(2, 11, 0) */
-    GtkRcStyle *rcstyle;
     GtkSettings *settings;
     gint w, h;
 
@@ -2116,19 +2125,11 @@ bw_notebook_label_new(BalsaMailboxNode * mbnode)
     but = gtk_button_new();
     gtk_button_set_focus_on_click(GTK_BUTTON(but), FALSE);
     gtk_button_set_relief(GTK_BUTTON(but), GTK_RELIEF_NONE);
-
-    rcstyle = gtk_rc_style_new();
-    rcstyle->xthickness = rcstyle->ythickness = 0;
-    gtk_widget_modify_style(but, rcstyle);
-#if GTK_CHECK_VERSION(2, 11, 0)
-    g_object_unref(rcstyle);
-#else                           /* GTK_CHECK_VERSION(2, 11, 0) */
-    gtk_rc_style_unref(rcstyle);
-#endif                          /* GTK_CHECK_VERSION(2, 11, 0) */
+    gtk_widget_set_name(but, "balsa-notebook-tab-button");
 
     settings = gtk_widget_get_settings(GTK_WIDGET(lab));
     gtk_icon_size_lookup_for_settings(settings, GTK_ICON_SIZE_MENU, &w, &h);
-    gtk_widget_set_size_request(but, w + 4, h + 4);
+    gtk_widget_set_size_request(but, w, h);
 
     g_signal_connect(but, "clicked",
                      G_CALLBACK(bw_mailbox_tab_close_cb), mbnode);

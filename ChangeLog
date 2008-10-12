@@ -1,3 +1,7 @@
+2008-10-12  Petr Kovar  <pknbe@volny.cz>
+
+	* configure.in: Added "be" and "mk" to ALL_LINGUAS.
+
 2008-10-09  Peter Bloomfield
 
 	* src/main-window.c: smaller notebook tab button.

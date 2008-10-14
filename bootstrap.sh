@@ -4,6 +4,13 @@ echo "Running gettextize...  Ignore non-fatal messages."
 glib-gettextize --force --copy || exit 1
 echo "running intltoolize..."
 intltoolize --copy --force --automake || exit 1
+echo "Running gnome-doc-prepare --force - ignore errors."
+if gnome-doc-prepare --force > /dev/null 2>&1; then
+   :
+else
+    test -L gnome-doc-utils.make && rm gnome-doc-utils.make
+    touch gnome-doc-utils.make
+fi
 echo "Running libtoolize..."
 libtoolize --force || exit 1
 echo "Running aclocal..."

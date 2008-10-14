@@ -1,3 +1,13 @@
+2008-10-14  Peter Bloomfield & Pawel Salek
+
+	* bootstrap.sh: run gnome-doc-prepare.
+	* src/Makefile.am: clean generated IDL files.
+	* doc/C/balsa.xml: follow DTD.
+	* doc/Makefile.am: use new gnome-doc format.
+	* sounds/Makefile.am: clean up generated files.
+	* configure.in: detect gnome-doc
+	* Makefile.am: adapt to gnome-doc.
+
 2008-10-12  Petr Kovar  <pknbe@volny.cz>
 
 	* configure.in: Added "be" and "mk" to ALL_LINGUAS.

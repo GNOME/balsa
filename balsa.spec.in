@@ -42,6 +42,7 @@ BuildRequires: libgnomeui-devel
 BuildRequires: libnotify-devel
 BuildRequires: openssl-devel
 BuildRequires: scrollkeeper
+BuildRequires: gnome-doc-utils
 %endif
 %if %mdk
 BuildRequires:  libgnome-vfs2_0-devel

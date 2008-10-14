@@ -127,6 +127,7 @@ balsa_SOURCES =			\
 # see http://sources.redhat.com/automake/dependencies.html
 BUILT_SOURCES = Balsa.h
 
+DISTCLEANFILES = $(balsa_IDL_SRCLIST)
 
 EXTRA_DIST =			\
 	Balsa.idl		\

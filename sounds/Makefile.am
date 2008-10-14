@@ -9,3 +9,5 @@ soundlist_DATA = $(soundlist_in_files:.soundlist.in=.soundlist)
 @INTLTOOL_SOUNDLIST_RULE@
 
 EXTRA_DIST = $(balsa_SOUNDS) $(soundlist_in_files)
+
+DISTCLEANFILES = $(soundlist_DATA)

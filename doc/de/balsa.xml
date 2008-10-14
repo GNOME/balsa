@@ -48,7 +48,12 @@ General advices:
 
 <articleinfo>
 
-<title>Balsa-Benutzerhandbuch</title>
+<title><application><application>Balsa</application></application> Balsa User's Guide</title>
+
+<author role="maintainer">
+<firstname>Pawel</firstname>
+<surname>Salek</surname>
+</author>
 
 <copyright>
   <year>1997-2006</year>
@@ -84,9 +89,24 @@ General advices:
   <para> All other trademarks are property of their respective owners.</para>
 </legalnotice>
 
-<releaseinfo>Dies ist Version 2.721 des <application>Balsa</application>-Handbuchs.</releaseinfo>
+<releaseinfo> 
+This is version 2.721 of the Balsa manual.
+</releaseinfo>
 
-<revhistory><revision><date>26. Februar 2006</date></revision></revhistory>
+<revhistory>
+    <revision>
+        <revnumber>
+            2.721
+        </revnumber>
+        <date>26. Februar 2006</date>
+    </revision>
+</revhistory>
+
+<abstract role="description">
+    <para>
+        This document is the extensive balsa manual.
+    </para>
+</abstract>
 
 </articleinfo>
 
@@ -235,7 +255,8 @@ General advices:
   here.
 </para>
 
-  <sect2 id="menubar">
+
+<sect2 id="menu-toolbar">
   <title>Menüs &amp; Werkzeugleisten</title>
 
   <figure>
@@ -778,8 +799,13 @@ General advices:
 
   </listitem>
 </varlistentry>
+</variablelist>
+</sect2>
 
 <sect2 id="subwin-messagemenu">
+<title>Message Menu</title>
+
+<variablelist>
 <varlistentry>
   <term><guimenu>Nachricht</guimenu></term>
   
@@ -936,16 +962,13 @@ General advices:
 	</para>
       </listitem>
 
-    <listitem>
-      <itemizedlist>
 
-	<variablelist>
-	  <varlistentry>
-    <term>
+    <listitem>
+      <para>
       <menuchoice>
         <guimenu>Nachricht</guimenu><guisubmenu>Toggle flag</guisubmenu>
       </menuchoice>
-    </term>
+      <itemizedlist>
 
 	<listitem>
 	  <para>
@@ -1008,11 +1031,8 @@ General advices:
        Toggles the reply icon for a message.
 	  </para>
 	</listitem>
-
-	  </varlistentry>
-	</variablelist>
-
       </itemizedlist>
+      </para>
     </listitem>
 
       <listitem>
@@ -1031,8 +1051,10 @@ General advices:
     </itemizedlist>
   </listitem>
 </varlistentry>
-</sect2>
+</variablelist>
 
+
+<variablelist>
 <varlistentry>
 <term><guimenu>Einstellungen</guimenu></term>
 
@@ -1109,8 +1131,7 @@ General advices:
 <para>
   The message index displays the messages in the current folder, and
   lets you choose which messages to view. Click on the notebook tabs,
-  or click on a folder in the <link linkend="subwin-mblist">mailbox list</link>
-  to bring it to the front.
+  or click on a folder in the mailbox list to bring it to the front.
 </para>
       
 <para>
@@ -1665,11 +1686,11 @@ General advices:
       <listitem>
 	<para>
 	  <menuchoice>
-	    <guimenu>Optionen</guimenu>
+	    <guimenu>Options</guimenu>
 	    <guimenuitem>Format = Flowed</guimenuitem>
 	  </menuchoice>
 
-	  &mdash;
+	  --
 	</para>
       </listitem>
 
@@ -2553,7 +2574,7 @@ General advices:
 <!--             SUBSECTION: PREFERENCES/MAIL OPTIONS/OUTGOING         -->
 <!-- ################################################################# -->
 <sect2 id="preferences-outgoing">
-<title>Ausgehend</title>"mail-options-outgoing
+<title>Ausgehend</title>
 
 <variablelist>
   <varlistentry>
@@ -4672,10 +4693,9 @@ the third is an alias (currently not used and replaced by 'TODO').</para>
     <listitem><para><link linkend="inw-main-to-imap">I want one of the
     main folders to be IMAP </link></para></listitem>
 
-    <listitem><para><link linkend="inw-frozen"><application>Balsa</application> ist eingefroren!</link></para></listitem>
+    <listitem><para><link linkend="inw-frozen"><application>Balsa</application>'s frozen!
+    </link></para></listitem>
 
-    <listitem><para><link linkend="inw-didnt-delete">I thought I
-    deleted that message!</link></para></listitem>
 
     <listitem><para><link linkend="inw-spooky-win">What's that window
     that flashed on the screen?  </link></para></listitem>
@@ -4737,6 +4757,7 @@ the third is an alias (currently not used and replaced by 'TODO').</para>
 
 <!-- ################################################################# -->
 <!--  SECTION: AUTHORS -->
+
 <sect1 id="authors">
   <title>Autoren</title>
     

@@ -13,6 +13,27 @@ desktop_in_files = balsa.desktop.in
 desktop_DATA = balsa.desktop
 @INTLTOOL_DESKTOP_RULE@
 
+if BUILD_WITH_G_D_U
+EXTRA_DIST = \
+	balsa.1.in \
+	balsa.spec.in \
+	balsa.desktop.in \
+	intltool-extract.in	\
+	intltool-merge.in	\
+	intltool-update.in	\
+	gnome-balsa2.png \
+	bootstrap.sh	\
+	mkinstalldirs	\
+	HACKING			\
+	docs/mh-mail-HOWTO	\
+	docs/vconvert.awk	\
+	docs/pine2vcard		\
+	GNOME_Balsa.server.in	\
+	balsa-mail.lang		\
+	balsa-mail-style.xml	\
+	gnome-doc-utils.make
+
+else
 EXTRA_DIST = \
 	balsa.1.in \
 	balsa.spec.in \
@@ -30,6 +51,10 @@ EXTRA_DIST = \
 	GNOME_Balsa.server.in	\
 	balsa-mail.lang		\
 	balsa-mail-style.xml
+endif
+DISTCLEANFILES = $(desktop_DATA) $(server_DATA) \
+	intltool-extract intltool-merge intltool-update	\
+	gnome-doc-utils.make
 
 serverdir       = $(libdir)/bonobo/servers
 server_in_files = GNOME_Balsa.server

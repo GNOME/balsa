@@ -9,7 +9,6 @@ dnl ###########################################################################
 dnl Boilerplace and versioning
 dnl ###########################################################################
 
-SCROLLKEEPER_REQUIRED=0.1.4
 BALSA_MAJOR=2
 BALSA_REVISION=3
 BALSA_PATCHLEVEL=26
@@ -22,6 +21,7 @@ AC_SUBST(BALSA_VERSION)
 
 AM_INIT_AUTOMAKE(balsa, "$BALSA_MAJOR.$BALSA_REVISION.${BALSA_PATCHLEVEL}")
 AC_CONFIG_SRCDIR([src/main.c])
+AC_CONFIG_MACRO_DIR([m4])
 AM_CONFIG_HEADER([config.h])
 
 AC_DEFINE_UNQUOTED(BALSA_MAJOR, $BALSA_MAJOR,
@@ -224,18 +224,37 @@ dnl #####################################################################
 dnl 3. Programs: compilers and their options.
 dnl #####################################################################
 AC_PROG_CC
-dnl AM_PROG_LIBTOOL
-AC_PROG_RANLIB
+AM_PROG_LIBTOOL
+dnl AC_PROG_RANLIB
 AC_PROG_LN_S
+
+# pkg-config
+#
+AC_PATH_PROG(PKG_CONFIG, pkg-config, no)
 
 # scrollkeeper.
 #
-if test x$with_gnome != xno; then
-AC_SUBST(SCROLLKEEPER_REQUIRED)
-AC_PATH_PROG(SCROLLKEEPER_CONFIG, scrollkeeper-config,no)
-if test x$SCROLLKEEPER_CONFIG = xno; then
-      AC_MSG_ERROR([Couldn't find scrollkeeper-config, please install the scrollkeeper package])
+
+AC_MSG_CHECKING([whether we have gnome-doc-utils])
+if $PKG_CONFIG --exists gnome-doc-utils; then
+    AC_PATH_PROG(gdtool, gnome-doc-tool, no)
+    if test "$gdtool" = no; then
+    with_g_d_u=no
+    else
+    with_g_d_u=yes
+    fi
+else
+    with_g_d_u=no
 fi
+
+AC_MSG_RESULT($with_g_d_u)
+AM_CONDITIONAL([BUILD_WITH_G_D_U], [test $with_g_d_u = "yes"])
+
+if test $with_g_d_u = yes ; then
+GNOME_DOC_INIT
+else
+AM_CONDITIONAL([HAVE_GNOME_DOC_UTILS],[false])
+AM_CONDITIONAL([ENABLE_SK],[false])
 fi
 
 # glib-genmarshal
@@ -269,7 +288,6 @@ dnl #####################################################################
 dnl GtkPrint
 dnl #####################################################################
 
-AC_PATH_PROG(PKG_CONFIG, pkg-config, no)
 if test x"$with_gtkprint" = xtestme ; then
   AC_MSG_CHECKING([for gtk+ >= 2.10])
   if $PKG_CONFIG --atleast-version=2.10.0 gtk+-2.0 ; then
@@ -478,6 +496,8 @@ if test x"$gpgmecfg" != xno ; then
 		AC_MSG_WARN([cannot find a suitable gpg application])
 		AC_MSG_WARN([please consider using --with-gpg-app to specify it])
 	fi
+else
+	AC_MSG_RESULT([no])
 fi
 
 # s/mime is mature for gpg >= 2.0.4
@@ -888,7 +908,6 @@ images/mimetypes/Makefile
 images/16x16/Makefile
 images/24x24/Makefile
 doc/Makefile
-doc/C/Makefile
 libbalsa/Makefile
 libbalsa/imap/Makefile
 libinit_balsa/Makefile

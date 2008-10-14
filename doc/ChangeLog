@@ -1,0 +1,5 @@
+2008-10-04  Peter Bloomfield
+
+	* C/balsa.xml: add items needed by gnome-doc-utilities.
+	* Makefile.am: create as needed by gnome-doc-utilities.
+

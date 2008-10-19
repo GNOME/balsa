@@ -3,6 +3,7 @@
 echo "Running gettextize...  Ignore non-fatal messages."
 glib-gettextize --force --copy || exit 1
 echo "running intltoolize..."
+[ -d m4 ] || mkdir m4
 intltoolize --copy --force --automake || exit 1
 echo "Running gnome-doc-prepare --force - ignore errors."
 if gnome-doc-prepare --force > /dev/null 2>&1; then

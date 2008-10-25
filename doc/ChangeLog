@@ -1,3 +1,10 @@
+2008-10-25  Mario Blättermann <mariobl@svn.gnome.org>
+
+	* de/*.xml: Deleted unneeded xml files.
+	* de/.xml2po.mo: Deleted unneeded gettext file.
+	* de/de.po: Updated German translation.
+	* de/figures/druid-start.png: Added screenshot.
+
 2008-10-04  Peter Bloomfield
 
 	* C/balsa.xml: add items needed by gnome-doc-utilities.

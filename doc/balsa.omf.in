@@ -1,7 +1,7 @@
 <?xml version="1.0" standalone="no"?>
 <omf>
     <resource>
-        <subject category="GNOME|Applications"/>
+        <subject category="GNOME|Internet"/>
         <type> manual </type>
 	<relation seriesid="4f1da026-c99e-11d6-95f0-ae2166108028"/>
 	<rights type="GNU FDL" license.version="1.1" holder="Balsa Team"/>

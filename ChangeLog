@@ -1,3 +1,9 @@
+2008-11-08  Paweł Sałek
+
+	* configure.in: replace --without-gnome with --with-gnome to reduce 
+	confusion described on the web site.
+	* doc/balsa.omf.in: fix #559825.
+
 2008-10-14  Peter Bloomfield & Pawel Salek
 
 	* bootstrap.sh: run gnome-doc-prepare.
@@ -56,7 +62,7 @@
 	* libbalsa/mailbox_mbox.c: (lbm_mbox_stream_seek_to_message):
 	better debugging.
 
-2006-09-14  Paweł Sałek
+2008-09-14  Paweł Sałek
 
 	* src/balsa-index.c: process messages with external program -
 	asynchronously.

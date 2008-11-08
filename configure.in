@@ -44,8 +44,8 @@ AC_ARG_WITH(iconv,
                    LDFLAGS="-liconv -L${with_iconv}/lib $LDFLAGS"
             fi])
 AC_ARG_WITH([gnome],
-        AC_HELP_STRING([--without-gnome],
-                [Use GNOME if available (default=yes)]),[
+        AC_HELP_STRING([--with-gnome],
+                [Use GNOME libraries (default=yes)]),[
 	with_gnome=$withval
 ],[
 	with_gnome=yes

@@ -22,7 +22,7 @@
 
 #include "config.h"
 
-#include <gtk/gtkmarshal.h>
+#include <gtk/gtk.h>
 
 #include "address-book.h"
 #include "libbalsa-marshal.h"

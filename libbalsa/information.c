@@ -25,7 +25,7 @@
 #include "information.h"
 #ifdef HAVE_NOTIFY
 #include <libnotify/notify.h>
-#include <gtk/gtkstock.h>
+#include <gtk/gtk.h>
 #endif
 #include <string.h>
 

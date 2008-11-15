@@ -24,7 +24,7 @@
 #ifndef __LIBBALSA_ADDRESS_VIEW_H__
 #define __LIBBALSA_ADDRESS_VIEW_H__
 
-#include <gtk/gtktreeview.h>
+#include <gtk/gtk.h>
 #include <gmime/gmime.h>
 
 G_BEGIN_DECLS

@@ -23,7 +23,7 @@
 #define __BALSA_CITE_BAR_H__
 
 #include <gdk/gdk.h>
-#include <gtk/gtkmisc.h>
+#include <gtk/gtk.h>
 
 
 G_BEGIN_DECLS

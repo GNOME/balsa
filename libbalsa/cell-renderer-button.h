@@ -24,7 +24,7 @@
 #ifndef __LIBBALSA_CELL_RENDERER_BUTTON_H__
 #define __LIBBALSA_CELL_RENDERER_BUTTON_H__
 
-#include <gtk/gtkcellrendererpixbuf.h>
+#include <gtk/gtk.h>
 
 
 G_BEGIN_DECLS

@@ -1,3 +1,9 @@
+2008-11-16  Paweł Sałek
+
+	* src/balsa-mime-widget-{message,text}.c: fall back to gnome_url_Show
+	if gtk2 >= 2.14.0 is unavailable.
+	* src/sendmsg-window.c: ditto.
+
 2008-11-15  Peter Bloomfield
 
 	Use gtk_show_uri instead of gnome_help_display and

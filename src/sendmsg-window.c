@@ -1809,7 +1809,11 @@ on_open_url_cb(GtkWidget * menu_item, BalsaAttachInfo * info)
     g_return_if_fail(uri != NULL);
 
     g_message("open URL %s", uri);
+#if GTK_CHECK_VERSION(2, 14, 0)
     gtk_show_uri(NULL, uri, gtk_get_current_event_time(), &err);
+#else
+    gnome_url_show(uri, &err);
+#endif
     if (err) {
         balsa_information(LIBBALSA_INFORMATION_WARNING,
 			  _("Error showing %s: %s\n"),

@@ -32,6 +32,10 @@
 #include "balsa-mime-widget-text.h"
 #include "balsa-cite-bar.h"
 
+#if !GTK_CHECK_VERSION(2, 14, 0)
+#include <libgnome/gnome-url.h>
+#endif
+
 #if HAVE_GTKSOURCEVIEW
 #include <gtksourceview/gtksourceview.h>
 #include <gtksourceview/gtksourcebuffer.h>
@@ -929,7 +933,11 @@ handle_url(const message_url_t* url)
         gtk_statusbar_push(statusbar, context_id, notice);
         SCHEDULE_BAR_REFRESH();
         g_free(notice);
+#if GTK_CHECK_VERSION(2, 14, 0)
         gtk_show_uri(NULL, url->url, gtk_get_current_event_time(), &err);
+#else
+    gnome_url_show(url->url, &err);
+#endif
         if (err) {
             balsa_information(LIBBALSA_INFORMATION_WARNING,
                     _("Error showing %s: %s\n"), url->url,
@@ -1214,7 +1222,11 @@ balsa_gtk_html_link_clicked(GObject *obj, const gchar *url)
 {
     GError *err = NULL;
 
+#if GTK_CHECK_VERSION(2, 14, 0)
     gtk_show_uri(NULL, url, gtk_get_current_event_time(), &err);
+#else
+    gnome_url_show(url, &err);
+#endif
     if (err) {
         balsa_information(LIBBALSA_INFORMATION_WARNING,
                 _("Error showing %s: %s\n"), url, err->message);

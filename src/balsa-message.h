@@ -22,7 +22,6 @@
 #ifndef __BALSA_MESSAGE_H__
 #define __BALSA_MESSAGE_H__
 
-#include <gnome.h>
 #include "libbalsa.h"
 
 #ifdef __cplusplus

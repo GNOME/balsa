@@ -22,7 +22,6 @@
 #include "config.h"
 
 #include <string.h>
-#include <gnome.h>
 #include <glib/gi18n.h>
 
 #include "balsa-app.h"
@@ -33,11 +32,20 @@
 #include "toolbar-factory.h"
 #include "toolbar-prefs.h"
 
+#if !GTK_CHECK_VERSION(2, 14, 0)
+#ifdef HAVE_GNOME
+#include <gnome.h>
+#endif
+#endif                          /* GTK_CHECK_VERSION(2, 14, 0) */
+
 #ifndef MAX
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #endif
 
 #define OLD_BALSA_COMPATIBILITY_TRANSLATION
+#ifdef OLD_BALSA_COMPATIBILITY_TRANSLATION
+#include <gnome.h> /* for GNOME_STOCK_* pixmaps */
+#endif
 
 /* Enumeration for GtkTreeModel columns. */
 enum {
@@ -378,7 +386,9 @@ current_selection_changed_cb(GtkTreeSelection * selection, ToolbarPage * page)
 static void
 tp_dialog_response_cb(GtkDialog * dialog, gint response, gpointer data)
 {
+#if GTK_CHECK_VERSION(2, 14, 0) || HAVE_GNOME
     GError *err = NULL;
+#endif
 
     switch (response) {
     case GTK_RESPONSE_DELETE_EVENT:
@@ -386,13 +396,20 @@ tp_dialog_response_cb(GtkDialog * dialog, gint response, gpointer data)
         gtk_widget_destroy(GTK_WIDGET(dialog));
         break;
     case GTK_RESPONSE_HELP:
+#if GTK_CHECK_VERSION(2, 14, 0) || HAVE_GNOME
+#if GTK_CHECK_VERSION(2, 14, 0)
+        gtk_show_uri(NULL, "ghelp:balsa?toolbar-prefs",
+                     gtk_get_current_event_time(), &err);
+#else                           /* GTK_CHECK_VERSION(2, 14, 0) */
         gnome_help_display("balsa", "toolbar-prefs", &err);
+#endif                          /* GTK_CHECK_VERSION(2, 14, 0) */
         if (err) {
             balsa_information(LIBBALSA_INFORMATION_WARNING,
 		    _("Error displaying toolbar help: %s\n"),
 		    err->message);
             g_error_free(err);
         }
+#endif
         break;
     default:
         break;

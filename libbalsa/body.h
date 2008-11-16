@@ -24,6 +24,7 @@
 #define __LIBBALSA_BODY_H__
 
 #include <stdio.h>
+#include <sys/stat.h>
 
 #include <glib.h>
 #include <gmime/gmime.h>

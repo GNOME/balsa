@@ -22,7 +22,6 @@
 #ifndef __BALSA_APP_H__
 #define __BALSA_APP_H__
 
-#include <gnome.h>
 #include "libbalsa.h"
 #include "identity.h"
 #include "balsa-index.h"

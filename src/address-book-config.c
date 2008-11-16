@@ -22,10 +22,12 @@
 #include "config.h"
 
 #include <gtk/gtk.h>
-#if !GTK_CHECK_VERSION(2, 6, 0)
-#undef GTK_DISABLE_DEPRECATED
+
+#if !GTK_CHECK_VERSION(2, 14, 0)
+#ifdef HAVE_GNOME
 #include <gnome.h>
 #endif
+#endif                          /* GTK_CHECK_VERSION(2, 14, 0) */
 
 #include "balsa-app.h"
 #include "address-book-config.h"
@@ -535,9 +537,15 @@ create_rubrica_dialog(AddressBookConfig * abc)
 static void
 help_button_cb(AddressBookConfig * abc)
 {
+#if GTK_CHECK_VERSION(2, 14, 0) || HAVE_GNOME
     GError *err = NULL;
 
+#if GTK_CHECK_VERSION(2, 14, 0)
+    gtk_show_uri(NULL, "ghelp:balsa?preferences-address-books",
+                 gtk_get_current_event_time(), &err);
+#else                           /* GTK_CHECK_VERSION(2, 14, 0) */
     gnome_help_display("balsa", "preferences-1", &err);
+#endif                          /* GTK_CHECK_VERSION(2, 14, 0) */
 
     if (err) {
         libbalsa_information(LIBBALSA_INFORMATION_WARNING,
@@ -545,6 +553,7 @@ help_button_cb(AddressBookConfig * abc)
                              err->message);
         g_error_free(err);
     }
+#endif                          /* GTK_CHECK_VERSION(2, 14, 0) */
 }
 
 

@@ -30,7 +30,6 @@
 #include "config.h"
 
 #include <string.h>
-#include <gnome.h>
 #include <gdk-pixbuf/gdk-pixbuf.h>
 
 #ifdef HAVE_NOTIFY
@@ -60,6 +59,14 @@
 #include "save-restore.h"
 #include "toolbar-prefs.h"
 #include "toolbar-factory.h"
+
+#if !GTK_CHECK_VERSION(2, 14, 0)
+#ifdef HAVE_GNOME
+#include <gnome.h>
+#endif
+#endif                          /* GTK_CHECK_VERSION(2, 14, 0) */
+
+#include <gnome.h> /* for gnome_triggers_do() */
 
 #ifdef BALSA_USE_THREADS
 #include "threads.h"
@@ -2519,14 +2526,20 @@ bw_is_open_mailbox(LibBalsaMailbox *m)
 static void
 bw_contents_cb(void)
 {
+#if GTK_CHECK_VERSION(2, 14, 0) || HAVE_GNOME
     GError *err = NULL;
 
+#if GTK_CHECK_VERSION(2, 14, 0)
+    gtk_show_uri(NULL, "ghelp:balsa", gtk_get_current_event_time(), &err);
+#else                           /* GTK_CHECK_VERSION(2, 14, 0) */
     gnome_help_display("balsa", NULL, &err);
+#endif                          /* GTK_CHECK_VERSION(2, 14, 0) */
     if (err) {
         balsa_information(LIBBALSA_INFORMATION_WARNING,
                           _("Error displaying help: %s\n"), err->message);
         g_error_free(err);
     }
+#endif
 }
 
 /*
@@ -4094,7 +4107,9 @@ bw_find_real(BalsaWindow * window, BalsaIndex * bindex, gboolean again)
 	gtk_entry_set_activates_default(GTK_ENTRY(search_entry), TRUE);
         gtk_dialog_set_default_response(GTK_DIALOG(dia), GTK_RESPONSE_OK);
 	do {
+#if GTK_CHECK_VERSION(2, 14, 0) || HAVE_GNOME
 	    GError *err = NULL;
+#endif
 
 	    ok=gtk_dialog_run(GTK_DIALOG(dia));
             switch(ok) {
@@ -4129,13 +4144,20 @@ bw_find_real(BalsaWindow * window, BalsaIndex * bindex, gboolean again)
                     ok = GTK_RESPONSE_CANCEL; 
                 break;
 	    case GTK_RESPONSE_HELP:
+#if GTK_CHECK_VERSION(2, 14, 0) || HAVE_GNOME
+#if GTK_CHECK_VERSION(2, 14, 0)
+                gtk_show_uri(NULL, "ghelp:balsa?win-search",
+                             gtk_get_current_event_time(), &err);
+#else                           /* GTK_CHECK_VERSION(2, 14, 0) */
 		gnome_help_display("balsa", "win-search", &err);
+#endif                          /* GTK_CHECK_VERSION(2, 14, 0) */
 		if (err) {
 		    balsa_information(LIBBALSA_INFORMATION_WARNING,
 				      _("Error displaying help: %s\n"),
 				      err->message);
 		    g_error_free(err);
 		}
+#endif
 		break;
             case FIND_RESPONSE_RESET:
 		bw_reset_filter_cb(NULL, window);

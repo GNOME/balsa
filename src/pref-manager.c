@@ -22,7 +22,6 @@
 /* MAKE SURE YOU USE THE HELPER FUNCTIONS, like create_table(, page), etc. */
 #include "config.h"
 
-#include <gnome.h>
 #include "balsa-app.h"
 #include "pref-manager.h"
 #include "mailbox-conf.h"
@@ -34,6 +33,12 @@
 #include "quote-color.h"
 #include "misc.h"
 #include "imap-server.h"
+
+#if !GTK_CHECK_VERSION(2, 14, 0)
+#ifdef HAVE_GNOME
+#include <gnome.h>
+#endif
+#endif                          /* GTK_CHECK_VERSION(2, 14, 0) */
 
 #if ENABLE_ESMTP
 #include <libesmtp.h>
@@ -3386,12 +3391,16 @@ refresh_preferences_manager(void)
 static void
 balsa_help_pbox_display(void)
 {
+#if GTK_CHECK_VERSION(2, 14, 0) || HAVE_GNOME
     GtkTreeSelection *selection;
     GtkTreeModel *model;
     GtkTreeIter iter;
     gchar *text, *p;
     gchar *link_id;
     GError *err = NULL;
+#if GTK_CHECK_VERSION(2, 14, 0)
+    gchar *uri;
+#endif                          /* GTK_CHECK_VERSION(2, 14, 0) */
 
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(pui->view));
     if (!gtk_tree_selection_get_selected(selection, &model, &iter))
@@ -3403,7 +3412,13 @@ balsa_help_pbox_display(void)
     link_id = g_strconcat("preferences-", text, NULL);
     g_free(text);
 
+#if GTK_CHECK_VERSION(2, 14, 0)
+    uri = g_strconcat("ghelp:balsa?", link_id, NULL);
+    gtk_show_uri(NULL, uri, gtk_get_current_event_time(), &err);
+    g_free(uri);
+#else                           /* GTK_CHECK_VERSION(2, 14, 0) */
     gnome_help_display("balsa", link_id, &err);
+#endif                          /* GTK_CHECK_VERSION(2, 14, 0) */
     if (err) {
         balsa_information(LIBBALSA_INFORMATION_WARNING,
 		_("Error displaying link_id %s: %s\n"),
@@ -3412,6 +3427,7 @@ balsa_help_pbox_display(void)
     }
 
     g_free(link_id);
+#endif
 }
 
 /* pm_page: methods for making the contents of a notebook page

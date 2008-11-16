@@ -929,7 +929,7 @@ handle_url(const message_url_t* url)
         gtk_statusbar_push(statusbar, context_id, notice);
         SCHEDULE_BAR_REFRESH();
         g_free(notice);
-        gnome_url_show(url->url, &err);
+        gtk_show_uri(NULL, url->url, gtk_get_current_event_time(), &err);
         if (err) {
             balsa_information(LIBBALSA_INFORMATION_WARNING,
                     _("Error showing %s: %s\n"), url->url,
@@ -1214,7 +1214,7 @@ balsa_gtk_html_link_clicked(GObject *obj, const gchar *url)
 {
     GError *err = NULL;
 
-    gnome_url_show(url, &err);
+    gtk_show_uri(NULL, url, gtk_get_current_event_time(), &err);
     if (err) {
         balsa_information(LIBBALSA_INFORMATION_WARNING,
                 _("Error showing %s: %s\n"), url, err->message);

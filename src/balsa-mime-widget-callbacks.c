@@ -30,6 +30,8 @@
 #include "balsa-mime-widget.h"
 #include "balsa-mime-widget-callbacks.h"
 
+#include <gnome.h> /* for gnome_execute_shell() */
+#include <gdk/gdkkeysyms.h>
 
 void
 balsa_mime_widget_ctx_menu_cb(GtkWidget * menu_item,

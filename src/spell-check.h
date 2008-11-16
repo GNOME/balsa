@@ -26,9 +26,6 @@
 
 #define USE_ORIGINAL_MANAGER_FUNCS
 
-
-#include <gnome.h>
-
 #ifdef __cplusplus
 extern "C" {
 #endif				/* __cplusplus */

@@ -32,6 +32,7 @@
 #include "mailbox-node.h"
 
 #include <glib/gi18n.h>
+#include <gdk/gdkkeysyms.h>
 
 /* callbacks */
 static void destroy_message_window(GtkWidget * widget, MessageWindow * mw);

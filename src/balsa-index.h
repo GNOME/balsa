@@ -22,7 +22,6 @@
 #ifndef __BALSA_INDEX_H__
 #define __BALSA_INDEX_H__
 
-#include <gnome.h>
 #include "libbalsa.h"
 #include "filter.h"
 #include "mailbox-node.h"

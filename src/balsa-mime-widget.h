@@ -22,7 +22,6 @@
 #ifndef __BALSA_MIME_WIDGET_H__
 #define __BALSA_MIME_WIDGET_H__
 
-#include <gnome.h>
 #include "libbalsa.h"
 #include "balsa-message.h"
 

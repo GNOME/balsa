@@ -24,7 +24,6 @@
 #define USE_ORIGINAL_MANAGER_FUNCS
 
 #include <ctype.h>
-#include <gnome.h>
 /* use old 0.11-style API in pspell */
 #define USE_ORIGINAL_MANAGER_FUNCS
 #include <pspell/pspell.h>

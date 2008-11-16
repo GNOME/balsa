@@ -42,6 +42,7 @@
 #include "balsa-mime-widget-image.h"
 #include "balsa-mime-widget-crypto.h"
 
+#include <gdk/gdkkeysyms.h>
 #include <gdk-pixbuf/gdk-pixbuf.h>
 
 #include "send.h"

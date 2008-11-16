@@ -1,3 +1,35 @@
+2008-11-15  Peter Bloomfield
+
+	Use gtk_show_uri instead of gnome_help_display and
+	gnome_url_show, in various places; no longer need to include
+	<gnome.h> in as many places.
+
+	* libbalsa/identity.c: (help_ident_cb): replace
+	gnome_help_display and gnome_url_show with gtk_show_uri.
+	* libbalsa/smtp-server.c: (smtp_server_response): ditto.
+	* src/address-book-config.c: (help_button_cb): ditto.
+	* src/balsa-message.c: ditto.
+	* src/balsa-mime-widget-callbacks.c: ditto.
+	* src/balsa-mime-widget-message.c: (extbody_call_url): ditto.
+	* src/balsa-mime-widget-text.c: (handle_url),
+	(balsa_gtk_html_link_clicked): ditto.
+	* src/filter-edit-callbacks.c: (condition_dialog_response),
+	(fe_dialog_response): ditto.
+	* src/filter-run-callbacks.c: (fr_dialog_response): ditto.
+	* src/folder-conf.c: (folder_conf_response): ditto.
+	* src/main-window.c: ditto.
+	* src/message-window.c: ditto.
+	* src/pref-manager.c: (balsa_help_pbox_display): ditto.
+	* src/sendmsg-window.c: (on_open_url_cb): ditto.
+	* src/toolbar-prefs.c: (tp_dialog_response_cb): ditto.
+	* src/balsa-app.h: do not include <gnome.h>
+	* src/balsa-index.h: ditto.
+	* src/balsa-message.h: ditto.
+	* src/spell-check.c: ditto.
+	* src/spell-check.h: ditto.
+	* src/balsa-mime-widget.h: ditto.
+	* libbalsa/body.h: include <sys/stat.h>.
+
 2008-11-14  Peter Bloomfield
 
 	* libbalsa/address-book.c: include only top level <gtk/gtk.h>.

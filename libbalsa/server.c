@@ -25,6 +25,10 @@
 #include <string.h>
 #include <stdlib.h>
 
+#if defined(HAVE_GNOME_KEYRING)
+#include <gnome-keyring.h>
+#endif
+
 #ifdef USE_TLS
 #include <openssl/err.h>
 #endif
@@ -35,6 +39,20 @@
 #include "libbalsa-marshal.h"
 #include "libbalsa-conf.h"
 #include <glib/gi18n.h>
+
+#if defined(HAVE_GNOME_KEYRING)
+static const GnomeKeyringPasswordSchema server_schema = {
+    GNOME_KEYRING_ITEM_GENERIC_SECRET,
+    {
+	{ "protocol", GNOME_KEYRING_ATTRIBUTE_TYPE_STRING },
+	{ "server",   GNOME_KEYRING_ATTRIBUTE_TYPE_STRING },
+	{ "user",     GNOME_KEYRING_ATTRIBUTE_TYPE_STRING },
+	{ NULL, 0 }
+    }
+};
+const GnomeKeyringPasswordSchema* LIBBALSA_SERVER_KEYRING_SCHEMA =
+    &server_schema;
+#endif /* HAVE_GNOME_KEYRING */
 
 static GObjectClass *parent_class = NULL;
 static void libbalsa_server_class_init(LibBalsaServerClass * klass);
@@ -146,6 +164,7 @@ libbalsa_server_class_init(LibBalsaServerClass * klass)
 static void
 libbalsa_server_init(LibBalsaServer * server)
 {
+    server->protocol = "pop3"; /* Is this a sane default value? */
     server->host = NULL;
     server->user = NULL;
     server->passwd = NULL;
@@ -166,7 +185,7 @@ libbalsa_server_finalize(GObject * object)
 
     g_free(server->host);   server->host = NULL;
     g_free(server->user);   server->user = NULL;
-    g_free(server->passwd); server->passwd = NULL;
+    libbalsa_free_password(server->passwd); server->passwd = NULL;
 
     G_OBJECT_CLASS(parent_class)->finalize(object);
 }
@@ -198,7 +217,7 @@ libbalsa_server_set_password(LibBalsaServer * server,
 {
     g_return_if_fail(LIBBALSA_IS_SERVER(server));
 
-    g_free(server->passwd);
+    libbalsa_free_password(server->passwd);
     if(passwd && passwd[0])
 	server->passwd = g_strdup(passwd);
     else server->passwd = NULL;
@@ -298,22 +317,44 @@ libbalsa_server_load_config(LibBalsaServer * server)
     server->tls_mode = libbalsa_conf_get_int_with_default("TLSMode", &d);
     if(d) server->tls_mode = LIBBALSA_TLS_ENABLED;
     server->user = libbalsa_conf_private_get_string("Username");
-    server->try_anonymous = libbalsa_conf_get_bool("Anonymous=false");
-    server->remember_passwd = libbalsa_conf_get_bool("RememberPasswd=false");
-    if(server->remember_passwd)
-        server->passwd = libbalsa_conf_private_get_string("Password");
-    if(server->passwd && server->passwd[0] == '\0') {
-	g_free(server->passwd);
-	server->passwd = NULL;
-    }
-	
     if (!server->user)
 	server->user = g_strdup(getenv("USER"));
 
-    if (server->passwd != NULL) {
-	gchar *buff = libbalsa_rot(server->passwd);
-	g_free(server->passwd);
-	server->passwd = buff;
+    server->try_anonymous = libbalsa_conf_get_bool("Anonymous=false");
+    server->remember_passwd = libbalsa_conf_get_bool("RememberPasswd=false");
+
+    if(server->remember_passwd) {
+#if defined (HAVE_GNOME_KEYRING)
+	GnomeKeyringResult res =
+	    gnome_keyring_find_password_sync(LIBBALSA_SERVER_KEYRING_SCHEMA,
+					     &server->passwd,
+					     "protocol", server->protocol,
+					     "server", server->host,
+					     "user", server->user,
+					     NULL);
+	if(res != GNOME_KEYRING_RESULT_OK) {
+	    gnome_keyring_free_password(server->passwd);
+	    server->passwd = NULL;
+	    printf("Error retrieving password from key ring. Falling back\n");
+	    server->passwd = libbalsa_conf_private_get_string("Password");
+	    if (server->passwd != NULL) {
+		gchar *buff = libbalsa_rot(server->passwd);
+		libbalsa_free_password(server->passwd);
+		server->passwd = buff;
+	    }
+	}
+#else
+	server->passwd = libbalsa_conf_private_get_string("Password");
+	if (server->passwd != NULL) {
+	    gchar *buff = libbalsa_rot(server->passwd);
+	    libbalsa_free_password(server->passwd);
+	    server->passwd = buff;
+	}
+#endif
+    }
+    if(server->passwd && server->passwd[0] == '\0') {
+	libbalsa_free_password(server->passwd);
+	server->passwd = NULL;
     }
 }
 
@@ -333,9 +374,20 @@ libbalsa_server_save_config(LibBalsaServer * server)
                           server->remember_passwd && server->passwd != NULL);
 
     if (server->remember_passwd && server->passwd != NULL) {
+#if defined(HAVE_GNOME_KEYRING)
+	gnome_keyring_store_password_sync(LIBBALSA_SERVER_KEYRING_SCHEMA,
+				     NULL,
+				     _("Balsa passwords"),
+				     server->passwd,
+				     "protocol", server->protocol,
+				     "server", server->host,
+				     "user", server->user,
+				     NULL);
+#else
 	gchar *buff = libbalsa_rot(server->passwd);
 	libbalsa_conf_private_set_string("Password", buff);
 	g_free(buff);
+#endif
     }
     libbalsa_conf_set_bool("SSL", server->use_ssl);
     libbalsa_conf_set_int("TLSMode", server->tls_mode);

@@ -1,3 +1,13 @@
+2008-11-17  Paweł Sałek
+
+	* src/{folder,mailbox}-conf.c: capitalize according to HID.
+	* src/{balsa-app,pref-manager}.c: ditto.
+	* libbalsa/identity.c: ditto.
+	* configure.in: gnome-keyring detection.
+	* libbalsa/smtp-server.c: store server protocol.
+	* libbalsa/imap-server.c: read password from keyring.
+	* libbalsa/server.[ch]: ditto.
+
 2008-11-16  Paweł Sałek
 
 	* src/balsa-mime-widget-{message,text}.c: fall back to gnome_url_Show

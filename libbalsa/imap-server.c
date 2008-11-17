@@ -4,9 +4,16 @@
   server. Idle connections are disconnected after a timeout, or when
   the user switches to offline mode.
 */
+
+#include "config.h"
+
 #include <string.h>
 #include <stdlib.h>
 #include <pthread.h>
+
+#if defined(HAVE_GNOME_KEYRING)
+#include <gnome-keyring.h>
+#endif
 
 #include "libbalsa.h"
 #include "libbalsa-conf.h"
@@ -166,6 +173,7 @@ libbalsa_imap_server_class_init(LibBalsaImapServerClass * klass)
 static void
 libbalsa_imap_server_init(LibBalsaImapServer * imap_server)
 {
+    LIBBALSA_SERVER(imap_server)->protocol = "imap";
     imap_server->key = NULL;
     imap_server->lock = g_mutex_new();
     imap_server->max_connections = MAX_CONNECTIONS_PER_SERVER;
@@ -495,17 +503,40 @@ libbalsa_imap_server_new_from_config(void)
     if(!d) imap_server->use_idle = !!d1;
     if (!server->passwd) {
         server->remember_passwd = libbalsa_conf_get_bool("RememberPasswd=false");
-        if(server->remember_passwd)
+        if(server->remember_passwd) {
+#if defined (HAVE_GNOME_KEYRING)
+	    GnomeKeyringResult r;
+	    server->passwd = NULL;
+	    r = gnome_keyring_find_password_sync(LIBBALSA_SERVER_KEYRING_SCHEMA,
+						 &server->passwd,
+						 "protocol", server->protocol,
+						 "server", server->host,
+						 "user", server->user,
+						 NULL);
+	    if(r != GNOME_KEYRING_RESULT_OK) {
+		gnome_keyring_free_password(server->passwd);
+		server->passwd = NULL;
+		printf("Keyring has no password for %s@%s\n",
+		       server->user, server->host);
+		server->passwd = libbalsa_conf_private_get_string("Password");
+		if (server->passwd != NULL) {
+		    gchar *buff = libbalsa_rot(server->passwd);
+		    libbalsa_free_password(server->passwd);
+		    server->passwd = buff;
+		}
+	    }
+#else
             server->passwd = libbalsa_conf_private_get_string("Password");
+	    if (server->passwd != NULL) {
+		gchar *buff = libbalsa_rot(server->passwd);
+		libbalsa_free_password(server->passwd);
+		server->passwd = buff;
+	    }
+#endif
+	}
         if(server->passwd && server->passwd[0] == '\0') {
-            g_free(server->passwd);
+            libbalsa_free_password(server->passwd);
             server->passwd = NULL;
-        }
-
-        if (server->passwd != NULL) {
-            gchar *buff = libbalsa_rot(server->passwd);
-            g_free(server->passwd);
-            server->passwd = buff;
         }
     }
     return imap_server;

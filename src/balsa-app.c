@@ -67,6 +67,13 @@ ask_password_real(LibBalsaServer * server, LibBalsaMailbox * mbox)
 {
     GtkWidget *dialog, *entry, *rememb;
     gchar *prompt, *passwd = NULL;
+#if defined(HAVE_GNOME_KEYRING)
+    static const gchar *remember_password_message =
+        N_("_Remember password in keyring");
+#else
+    static const gchar *remember_password_message =
+        N_("_Remember password");
+#endif
 
     g_return_val_if_fail(server != NULL, NULL);
     if (mbox)
@@ -94,7 +101,7 @@ ask_password_real(LibBalsaServer * server, LibBalsaMailbox * mbox)
     gtk_entry_set_width_chars(GTK_ENTRY(entry), 20);
     gtk_entry_set_visibility(GTK_ENTRY(entry), FALSE);
 
-    rememb =  gtk_check_button_new_with_mnemonic(_("_Remember password"));
+    rememb =  gtk_check_button_new_with_mnemonic(_(remember_password_message));
     gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox), rememb);
     if(server->remember_passwd)
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(rememb), TRUE);

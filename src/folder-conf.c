@@ -278,6 +278,14 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
     gchar *default_server;
     int r = 0;
 
+#if defined(HAVE_GNOME_KEYRING)
+    static const gchar *remember_password_message =
+        N_("_Remember password in keyring");
+#else
+    static const gchar *remember_password_message =
+        N_("_Remember password");
+#endif
+
     /* Allow only one dialog per mailbox node, and one with mn == NULL
      * for creating a new folder. */
     fcw = mn ? g_object_get_data(G_OBJECT(mn), BALSA_FOLDER_CONF_IMAP_KEY)
@@ -363,7 +371,7 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
                              gtk_label_new_with_mnemonic(_("_Advanced")));
 
     /* INPUT FIELD CREATION */
-    label = libbalsa_create_label(_("Descriptive _Name:"), table, 0);
+    label = libbalsa_create_label(_("Descriptive _name:"), table, 0);
     fcw->folder_name = libbalsa_create_entry(table,
                                    G_CALLBACK(validate_folder),
                                    fcw, r++, mn ? mn->name : NULL, 
@@ -393,7 +401,7 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
                                 table, r++, s ? s->try_anonymous : FALSE);
     g_signal_connect(G_OBJECT(fcw->anonymous), "toggled",
                      G_CALLBACK(anonymous_cb), fcw);
-    fcw->remember = libbalsa_create_check(_("_Remember password"), 
+    fcw->remember = libbalsa_create_check(_(remember_password_message), 
                                 table, r++, s ? s->remember_passwd : TRUE);
     g_signal_connect(G_OBJECT(fcw->remember), "toggled",
                      G_CALLBACK(remember_cb), fcw);

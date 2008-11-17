@@ -51,18 +51,6 @@ AC_ARG_WITH([gnome],
 	with_gnome=yes
 ])
 
-
-if test x$with_gnome != xno; then
-   gnome_extras="libgnome-2.0 libgnomeui-2.0 
-   gnome-vfs-2.0 gnome-vfs-module-2.0 libbonobo-2.0"
-   gnome_print_extras="libgnomeprint-2.2 >= 2.1.4 libgnomeprintui-2.2 >= 2.1.4"
-   AC_DEFINE(HAVE_GNOME,1,[Defined when gnome libs are available.])
-else
-   gnome_extras=""
-   gnome_print_extras=""
-fi
-AM_CONDITIONAL([BUILD_WITH_GNOME], [test $with_gnome = "yes"])
-
 dnl ###########################################################################
 dnl Configure locking
 dnl ###########################################################################
@@ -235,19 +223,20 @@ AC_PATH_PROG(PKG_CONFIG, pkg-config, no)
 # scrollkeeper.
 #
 
-AC_MSG_CHECKING([whether we have gnome-doc-utils])
-if $PKG_CONFIG --exists gnome-doc-utils; then
-    AC_PATH_PROG(gdtool, gnome-doc-tool, no)
-    if test "$gdtool" = no; then
-    with_g_d_u=no
-    else
-    with_g_d_u=yes
-    fi
+AC_PATH_PROG(gdtool, gnome-doc-tool, no)
+if test "$gdtool" = no; then
+with_g_d_u=no
 else
-    with_g_d_u=no
+   AC_MSG_CHECKING([whether we have gnome-doc-utils])
+   if $PKG_CONFIG --exists gnome-doc-utils; then
+       with_g_d_u=yes
+   else
+       with_g_d_u=no
+   fi
+   AC_MSG_RESULT($with_g_d_u)
 fi
 
-AC_MSG_RESULT($with_g_d_u)
+
 AM_CONDITIONAL([BUILD_WITH_G_D_U], [test $with_g_d_u = "yes"])
 
 if test $with_g_d_u = yes ; then
@@ -283,6 +272,29 @@ AC_PATH_PROG(SENDMAIL, sendmail, no, $PATH:/usr/sbin:/usr/lib)
 AC_DEFINE_UNQUOTED(SENDMAIL, "$ac_cv_path_SENDMAIL",
 		   [Path to sendmail program.])
 fi
+
+dnl #####################################################################
+dnl GNOME libs
+dnl #####################################################################
+if test x$with_gnome != xno; then
+   gnome_extras="libgnome-2.0 libgnomeui-2.0 
+   gnome-vfs-2.0 gnome-vfs-module-2.0 libbonobo-2.0"
+   gnome_print_extras="libgnomeprint-2.2 >= 2.1.4 libgnomeprintui-2.2 >= 2.1.4"
+   AC_MSG_CHECKING([whether we have gnome-keyring])
+   if $PKG_CONFIG --exists gnome-keyring-1; then
+      gnome_extras="$gnome_extras gnome-keyring-1"
+      AC_DEFINE(HAVE_GNOME_KEYRING,1,[Defined when gnome-keyring is there.])
+      with_gnome_keyring=yes
+   else
+      with_gnome_keyring=no
+   fi
+   AC_MSG_RESULT($with_gnome_keyring)
+   AC_DEFINE(HAVE_GNOME,1,[Defined when gnome libs are available.])
+else
+   gnome_extras=""
+   gnome_print_extras=""
+fi
+AM_CONDITIONAL([BUILD_WITH_GNOME], [test $with_gnome = "yes"])
 
 dnl #####################################################################
 dnl GtkPrint

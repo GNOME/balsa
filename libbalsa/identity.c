@@ -985,13 +985,13 @@ setup_ident_frame(GtkDialog * dialog, gboolean createp, gpointer tree)
     /* create the "General" tab */
     table = append_ident_notebook_page(notebook, 5, _("General"), NULL);
     row = 0;
-    ident_dialog_add_entry(table, row++, dialog, _("_Identity Name:"), 
+    ident_dialog_add_entry(table, row++, dialog, _("_Identity name:"), 
 		           "identity-name");
-    ident_dialog_add_entry(table, row++, dialog, _("_Full Name:"), 
+    ident_dialog_add_entry(table, row++, dialog, _("_Full name:"), 
                            "identity-fullname");
-    ident_dialog_add_entry(table, row++, dialog, _("_Mailing Address:"), 
+    ident_dialog_add_entry(table, row++, dialog, _("_Mailing address:"), 
                            "identity-address");
-    ident_dialog_add_entry(table, row++, dialog, _("Reply _To:"), 
+    ident_dialog_add_entry(table, row++, dialog, _("Reply _to:"), 
                            "identity-replyto");
     ident_dialog_add_entry(table, row++, dialog, _("_Domain:"), 
                            "identity-domain");
@@ -1001,9 +1001,9 @@ setup_ident_frame(GtkDialog * dialog, gboolean createp, gpointer tree)
     row = 0;
     ident_dialog_add_entry(table, row++, dialog, _("_Bcc:"), 
                            "identity-bcc");
-    ident_dialog_add_entry(table, row++, dialog, _("Reply _String:"), 
+    ident_dialog_add_entry(table, row++, dialog, _("Reply _string:"), 
                            "identity-replystring");
-    ident_dialog_add_entry(table, row++, dialog, _("F_orward String:"), 
+    ident_dialog_add_entry(table, row++, dialog, _("F_orward string:"), 
                            "identity-forwardstring");
     ident_dialog_add_checkbutton(table, row++, dialog, 
                                  _("send messages in both plain text and _HTML format"),
@@ -1019,7 +1019,7 @@ setup_ident_frame(GtkDialog * dialog, gboolean createp, gpointer tree)
                            path_info[LBI_PATH_TYPE_FACE].box_key,
                            path_info[LBI_PATH_TYPE_XFACE].box_key);
 #if ENABLE_ESMTP
-    ident_dialog_add_smtp_menu(table, row++, dialog, _("SMT_P Server:"),
+    ident_dialog_add_smtp_menu(table, row++, dialog, _("SMT_P server:"),
                                "identity-smtp-server", smtp_servers);
 #endif /* ENABLE_ESMTP */
 
@@ -1027,25 +1027,25 @@ setup_ident_frame(GtkDialog * dialog, gboolean createp, gpointer tree)
     table = append_ident_notebook_page(notebook, 7, _("Signature"), NULL);
     row = 0;
     ident_dialog_add_check_and_entry(table, row++, dialog,
-                                     _("Signature _Path"),
+                                     _("Signature _path"),
                                      "identity-sigpath");
     ident_dialog_add_checkbutton(table, row++, dialog,
-                                _("_Execute Signature"),
+                                _("_Execute signature"),
 				 "identity-sigexecutable", FALSE);
     ident_dialog_add_checkbutton(table, row++, dialog,
-                                 _("Incl_ude Signature"), 
+                                 _("Incl_ude signature"), 
                                  "identity-sigappend", FALSE);
     ident_dialog_add_checkbutton(table, row++, dialog, 
-                                 _("Include Signature When For_warding"),
+                                 _("Include signature when for_warding"),
                                  "identity-whenforward", FALSE);
     ident_dialog_add_checkbutton(table, row++, dialog,
-                                 _("Include Signature When Rep_lying"),
+                                 _("Include signature when rep_lying"),
                                  "identity-whenreply", FALSE);
     ident_dialog_add_checkbutton(table, row++, dialog, 
-                                 _("_Add Signature Separator"),
+                                 _("_Add signature separator"),
                                  "identity-sigseparator", FALSE);
     ident_dialog_add_checkbutton(table, row++, dialog,
-                                 _("Prepend Si_gnature"),
+                                 _("Prepend si_gnature"),
                                  "identity-sigprepend", FALSE);
 
 #ifdef HAVE_GPGME

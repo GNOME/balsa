@@ -1155,7 +1155,7 @@ create_pop_mailbox_dialog(MailboxConfWindow *mcw)
                              gtk_label_new_with_mnemonic(_("_Basic")));
 
     /* mailbox name */
-    label = libbalsa_create_label(_("Mailbox _Name:"), table, 0);
+    label = libbalsa_create_label(_("Mailbox _name:"), table, 0);
     mcw->mailbox_name = libbalsa_create_entry(table,
 				     G_CALLBACK(check_for_blank_fields),
 				     mcw, 0, NULL, label);
@@ -1250,6 +1250,14 @@ create_imap_mailbox_dialog(MailboxConfWindow *mcw)
     GtkWidget *entry;
     gint row = -1;
 
+#if defined(HAVE_GNOME_KEYRING)
+    static const gchar *remember_password_message =
+        N_("_Remember password in keyring");
+#else
+    static const gchar *remember_password_message =
+        N_("_Remember password");
+#endif
+
     notebook = gtk_notebook_new();
     table = libbalsa_create_table(8, 2);
     gtk_container_set_border_width(GTK_CONTAINER(table), 12);
@@ -1257,7 +1265,7 @@ create_imap_mailbox_dialog(MailboxConfWindow *mcw)
                              gtk_label_new_with_mnemonic(_("_Basic")));
 
     /* mailbox name */
-    label = libbalsa_create_label(_("Mailbox _Name:"), table, ++row);
+    label = libbalsa_create_label(_("Mailbox _name:"), table, ++row);
     mcw->mailbox_name =  libbalsa_create_entry(table,
                                       G_CALLBACK(check_for_blank_fields),
                                       mcw, row, NULL, label);
@@ -1285,7 +1293,7 @@ create_imap_mailbox_dialog(MailboxConfWindow *mcw)
                      G_CALLBACK(anon_toggle_cb), mcw);
     /* toggle for remember password */
     mcw->mb_data.imap.remember = 
-	libbalsa_create_check(_("_Remember Password"), table, ++row,
+	libbalsa_create_check(_(remember_password_message), table, ++row,
 		     FALSE);
     g_signal_connect(G_OBJECT(mcw->mb_data.imap.remember), "toggled",
                      G_CALLBACK(remember_toggle_cb), mcw);
@@ -1296,7 +1304,7 @@ create_imap_mailbox_dialog(MailboxConfWindow *mcw)
 	libbalsa_create_entry(table, NULL, NULL, row, NULL, label);
     gtk_entry_set_visibility(GTK_ENTRY(mcw->mb_data.imap.password), FALSE);
 
-    label = libbalsa_create_label(_("F_older Path:"), table, ++row);
+    label = libbalsa_create_label(_("F_older path:"), table, ++row);
 
     mcw->mb_data.imap.folderpath = entry = gtk_entry_new();
     gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.imap.folderpath), "INBOX");

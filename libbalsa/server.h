@@ -26,6 +26,14 @@
 #include "imap/libimap.h"
 #include "libbalsa.h"
 
+#if defined (HAVE_GNOME_KEYRING)
+#include <gnome-keyring.h>
+extern const GnomeKeyringPasswordSchema* LIBBALSA_SERVER_KEYRING_SCHEMA;
+#define libbalsa_free_password gnome_keyring_free_password
+#else
+#define libbalsa_free_password g_free
+#endif /* HAVE_GNOME_KEYRING */
+
 #define LIBBALSA_TYPE_SERVER \
     (libbalsa_server_get_type())
 #define LIBBALSA_SERVER(obj) \
@@ -50,6 +58,7 @@ typedef enum {
 
 struct _LibBalsaServer {
     GObject object;
+    const gchar *protocol; /**< type of the server: imap, pop3, or smtp. */
 
     gchar *host;
     gchar *user;
@@ -93,4 +102,5 @@ void libbalsa_server_user_cb(ImapUserEventType ue, void *arg, ...);
 
 void libbalsa_server_connect_signals(LibBalsaServer * server, GCallback cb,
                                      gpointer cb_data);
+
 #endif				/* __LIBBALSA_SERVER_H__ */

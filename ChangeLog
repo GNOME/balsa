@@ -1,3 +1,7 @@
+2008-11-17  Peter Bloomfield
+
+	* src/main-window.c: make "about" website clickable.
+
 2008-11-17  Paweł Sałek
 
 	* src/{folder,mailbox}-conf.c: capitalize according to HID.

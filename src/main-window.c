@@ -2545,6 +2545,27 @@ bw_contents_cb(void)
 /*
  * show the about box for Balsa
  */
+#if GTK_CHECK_VERSION(2, 6, 0)
+static void
+bw_show_about_box_url_hook(GtkAboutDialog * about, const gchar * link,
+                           gpointer data)
+{
+    GError *err = NULL;
+
+#if GTK_CHECK_VERSION(2, 14, 0)
+    gtk_show_uri(NULL, link, gtk_get_current_event_time(), &err);
+#else                           /* GTK_CHECK_VERSION(2, 14, 0) */
+    gnome_url_show(link, &err);
+#endif                          /* GTK_CHECK_VERSION(2, 14, 0) */
+
+    if (err) {
+        balsa_information(LIBBALSA_INFORMATION_WARNING,
+                          _("Error showing %s: %s\n"), link, err->message);
+        g_error_free(err);
+    }
+}
+#endif /* GTK_CHECK_VERSION(2, 6, 0) */
+
 static void
 bw_show_about_box(GtkAction * action, gpointer user_data)
 {
@@ -2569,25 +2590,24 @@ bw_show_about_box(GtkAction * action, gpointer user_data)
                                  "/pixmaps/balsa_logo.png", NULL);
 
 #if GTK_CHECK_VERSION(2, 6, 0)
+    gtk_about_dialog_set_url_hook(bw_show_about_box_url_hook, NULL, NULL);
     gtk_show_about_dialog(GTK_WINDOW(user_data),
-                          "name", "Balsa",
                           "version", BALSA_VERSION,
                           "copyright",
-                          "Copyright \xc2\xa9 1997-2005 The Balsa Developers",
+                          "Copyright \xc2\xa9 1997-2008 The Balsa Developers",
                           "comments",
                           _("The Balsa email client is part of "
-                            "the GNOME desktop environment.  "
-                            "Information on Balsa can be found at "
-                            "http://balsa.gnome.org/\n\n"
-                            "If you need to report bugs, "
-                            "please do so at: "
-                            "http://bugzilla.gnome.org/"),
+                            "the GNOME desktop environment."),
                           "authors", authors,
                           "documenters", documenters,
+                          /* license ? */
+                          "title", _("About Balsa"),
                           "translator-credits",
                           strcmp(translator_credits, "translator-credits") ?
 			  translator_credits : NULL,
 			  "logo", balsa_logo,
+                          "website", "http://balsa.gnome.org",
+                          "wrap-license", TRUE,
                           NULL);
     g_object_unref(balsa_logo);
 #else /* GTK_CHECK_VERSION(2, 6, 0) */

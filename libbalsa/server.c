@@ -40,7 +40,7 @@
 #include "libbalsa-conf.h"
 #include <glib/gi18n.h>
 
-#if defined(HAVE_GNOME_KEYRING)
+#if defined(HAVE_GNOME_KEYRING) && !defined(HAVE_GNOME_KEYRING_24)
 static const GnomeKeyringPasswordSchema server_schema = {
     GNOME_KEYRING_ITEM_GENERIC_SECRET,
     {

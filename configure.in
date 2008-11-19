@@ -284,6 +284,11 @@ if test x$with_gnome != xno; then
    if $PKG_CONFIG --exists gnome-keyring-1; then
       gnome_extras="$gnome_extras gnome-keyring-1"
       AC_DEFINE(HAVE_GNOME_KEYRING,1,[Defined when gnome-keyring is there.])
+      # Work around http://bugzilla.gnome.org/show_bug.cgi?id=556530
+      if $PKG_CONFIG --atleast-version=2.24.1 gnome-keyring-1; then
+         AC_DEFINE(HAVE_GNOME_KEYRING_24,1,
+                   [Defined with gnome-keyring-2.24 or newer.])
+      fi
       with_gnome_keyring=yes
    else
       with_gnome_keyring=no

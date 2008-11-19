@@ -1,3 +1,9 @@
+2008-11-19  Paweł Sałek
+
+	* configure.in: detect gnome-keyring-2.24 to work around bug 556530.
+	* libbalsa/{imap-,}server.c: store passwords asap to keyring (Peter B.).
+	* libbalsa/server.h: use own schema only with buggy gnome-keyring.
+
 2008-11-17  Peter Bloomfield
 
 	* src/main-window.c: make "about" website clickable.

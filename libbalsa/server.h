@@ -28,7 +28,13 @@
 
 #if defined (HAVE_GNOME_KEYRING)
 #include <gnome-keyring.h>
+
+#if defined(HAVE_GNOME_KEYRING_24)
+#define LIBBALSA_SERVER_KEYRING_SCHEMA GNOME_KEYRING_NETWORK_PASSWORD
+#else
 extern const GnomeKeyringPasswordSchema* LIBBALSA_SERVER_KEYRING_SCHEMA;
+#endif /* HAVE_GNOME_KEYRING_24 */
+
 #define libbalsa_free_password gnome_keyring_free_password
 #else
 #define libbalsa_free_password g_free

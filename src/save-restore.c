@@ -488,6 +488,8 @@ config_load_smtp_server(const gchar * key, const gchar * value, gpointer data)
 
     libbalsa_conf_push_group(key);
     smtp_server = libbalsa_smtp_server_new_from_config(value);
+    libbalsa_server_connect_signals(LIBBALSA_SERVER(smtp_server),
+				    G_CALLBACK(ask_password), NULL);
     libbalsa_conf_pop_group();
     libbalsa_smtp_server_add_to_list(smtp_server, smtp_servers);
 

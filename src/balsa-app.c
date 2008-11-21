@@ -83,8 +83,8 @@ ask_password_real(LibBalsaServer * server, LibBalsaMailbox * mbox)
 			    mbox->name, server->user, server->host);
     else
 	prompt =
-	    g_strdup_printf(_("Mailbox _password for %s@%s:"), server->user,
-			    server->host);
+	    g_strdup_printf(_("_Password for %s@%s (%s):"), server->user,
+			    server->host, server->protocol);
 
     dialog = gtk_dialog_new_with_buttons(_("Password needed"),
                                          GTK_WINDOW(balsa_app.main_window),

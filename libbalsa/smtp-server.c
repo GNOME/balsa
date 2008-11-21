@@ -107,8 +107,15 @@ authinteract(auth_client_request_t request, char **result, int fields,
     int i;
 
     for (i = 0; i < fields; i++) {
-        if (request[i].flags & AUTH_PASS)
+        if (request[i].flags & AUTH_PASS) {
+	    /* We need to return a const pointer, this is why we
+	       ignore the result from get_password, and take and
+	       advantage of the fact that this function sets the
+	       passwd field of the server. */
+	    if(!server->passwd)
+		g_free(libbalsa_server_get_password(server, NULL));
             result[i] = server->passwd;
+	}
         else if (request[i].flags & AUTH_USER)
             result[i] = (server->user
                          && *server->user) ? server->user : NULL;
@@ -203,6 +210,9 @@ libbalsa_smtp_server_new(void)
 
     smtp_server = g_object_new(LIBBALSA_TYPE_SMTP_SERVER, NULL);
 
+    /* Change the default. */
+    LIBBALSA_SERVER(smtp_server)->remember_passwd = TRUE;
+
     return smtp_server;
 }
 
@@ -234,8 +244,6 @@ libbalsa_smtp_server_new_from_config(const gchar * name)
 void
 libbalsa_smtp_server_save_config(LibBalsaSmtpServer * smtp_server)
 {
-    /* FIXME: isn't it a bit of a brute force? */
-    LIBBALSA_SERVER(smtp_server)->remember_passwd = TRUE;
     libbalsa_server_save_config(LIBBALSA_SERVER(smtp_server));
 
 #if HAVE_SMTP_TLS_CLIENT_CERTIFICATE

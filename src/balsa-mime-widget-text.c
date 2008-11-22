@@ -20,6 +20,7 @@
  */
 
 #include <string.h>
+#include <stdlib.h>
 #include "config.h"
 #include "balsa-app.h"
 #include "html.h"

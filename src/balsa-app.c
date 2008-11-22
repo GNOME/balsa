@@ -21,6 +21,7 @@
 
 #include "config.h"
 #include <string.h>
+#include <stdlib.h>
 #ifdef BALSA_USE_THREADS
 /* _XOPEN_SOURCE is needed for rwlocks */
 #define _XOPEN_SOURCE 500

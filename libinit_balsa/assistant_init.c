@@ -21,6 +21,8 @@
 
 #include "assistant_init.h"
 
+#include <stdlib.h>
+
 #include <glib/gi18n.h>
 #include "libbalsa-conf.h"
 #include "misc.h"

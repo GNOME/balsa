@@ -1,5 +1,13 @@
 2008-11-22  Peter Bloomfield
 
+	* libinit_balsa/assistant_init.c: include stdlib.h.
+	* libinit_balsa/assistant_page_directory.c: ditto.
+	* src/balsa-app.c: ditto.
+	* src/balsa-mime-widget-text.c: ditto.
+	* src/spell-check.c: ditto.
+
+2008-11-22  Peter Bloomfield
+
 	* libbalsa/html.h: work around gtkhtml2's use of deprecated api.
 
 2008-11-22  Peter Bloomfield

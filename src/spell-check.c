@@ -28,6 +28,7 @@
 #define USE_ORIGINAL_MANAGER_FUNCS
 #include <pspell/pspell.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <glib/gi18n.h>
 

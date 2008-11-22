@@ -25,6 +25,11 @@
 
 #include "config.h"
 
+# ifndef HAVE_GTKHTML3
+/* gtkhtml2 uses deprecated api */
+#  undef GTK_DISABLE_DEPRECATED
+# endif
+
 #  include <gtk/gtk.h>
 
 /* We need this enum even if we're not using GtkHtml. */

@@ -1,5 +1,9 @@
 2008-11-22  Peter Bloomfield
 
+	* libbalsa/html.h: work around gtkhtml2's use of deprecated api.
+
+2008-11-22  Peter Bloomfield
+
 	disable deprecated apis only in svn tree (fixes bug #561875).
 
 	* configure.in:

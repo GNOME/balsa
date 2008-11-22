@@ -563,7 +563,7 @@ libbalsa_vfs_create_stream(const LibbalsaVfs * file, mode_t mode,
         result = gnome_vfs_open_uri(&handle, priv->gvfs_uri, openmode);
     if (result != GNOME_VFS_OK) {
         g_set_error(err, LIBBALSA_ERROR_QUARK, result,
-                    gnome_vfs_result_to_string(result));
+                    "%s", gnome_vfs_result_to_string(result));
         return NULL;
     }
 
@@ -711,7 +711,7 @@ libbalsa_vfs_file_unlink(const LibbalsaVfs * file, GError **err)
 
     if ((vfs_res = gnome_vfs_unlink_from_uri(priv->gvfs_uri)) != GNOME_VFS_OK)
         g_set_error(err, LIBBALSA_VFS_ERROR_QUARK, vfs_res,
-                    gnome_vfs_result_to_string(vfs_res));
+                    "%s", gnome_vfs_result_to_string(vfs_res));
     else
         result = 0;
 #else

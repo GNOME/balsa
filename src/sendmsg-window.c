@@ -5748,7 +5748,6 @@ check_suggest_encryption(BalsaSendmsg * bsmsg)
     if (can_encrypt) {
 	GtkWidget *dialog;
 	gint choice;
-	gchar * message;
 	GtkWidget *dialog_action_area;
 	GtkWidget *button;
 	GtkWidget *alignment;
@@ -5756,18 +5755,16 @@ check_suggest_encryption(BalsaSendmsg * bsmsg)
 	GtkWidget *image;
 	GtkWidget *label;
 
-	message =
-	    g_strdup_printf(_("You did not select encryption for this message, although "
-			      "%s public keys are available for all recipients. In order "
-			      "to protect your privacy, the message could be %s encrypted."),
-			    gpgme_get_protocol_name(protocol),
-			    gpgme_get_protocol_name(protocol));
 	dialog = gtk_message_dialog_new
 	    (GTK_WINDOW(bsmsg->window),
 	     GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_MODAL,
 	     GTK_MESSAGE_QUESTION,
 	     GTK_BUTTONS_NONE,
-	     message);
+	     _("You did not select encryption for this message, although "
+               "%s public keys are available for all recipients. In order "
+               "to protect your privacy, the message could be %s encrypted."),
+             gpgme_get_protocol_name(protocol),
+             gpgme_get_protocol_name(protocol));
 
 	dialog_action_area = GTK_DIALOG(dialog)->action_area;
 	gtk_button_box_set_layout(GTK_BUTTON_BOX(dialog_action_area), GTK_BUTTONBOX_END);
@@ -5876,7 +5873,7 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
                 (GTK_WINDOW(bsmsg->window),
                  GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_MODAL,
                  GTK_MESSAGE_QUESTION,
-                 GTK_BUTTONS_OK_CANCEL, message->str);
+                 GTK_BUTTONS_OK_CANCEL, "%s", message->str);
             g_string_free(message, TRUE);
             choice = gtk_dialog_run(GTK_DIALOG(dialog));
             gtk_widget_destroy(dialog);

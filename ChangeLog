@@ -1,3 +1,15 @@
+2008-11-22  Albrecht Dreß
+
+	Use only static format strings.
+
+	* libbalsa/libbalsa-vfs.c: (libbalsa_vfs_create_stream),
+	(libbalsa_vfs_file_unlink):
+	* libbalsa/send.c: (libbalsa_message_create_mime_message):
+	* src/ab-main.c: (ab_warning):
+	* src/sendmsg-window.c: (check_suggest_encryption),
+	(send_message_handler):
+	* src/store-address.c: (store_address_from_entries):
+
 2008-11-22  Peter Bloomfield
 
 	* libinit_balsa/assistant_init.c: include stdlib.h.

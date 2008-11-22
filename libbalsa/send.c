@@ -1738,7 +1738,7 @@ libbalsa_message_create_mime_message(LibBalsaMessage* message, gboolean flow,
 					      err->message)
 			    : g_strdup_printf(_("Cannot read %s"),
 					      libbalsa_vfs_get_uri_utf8(body->file_uri));
-			g_set_error(error, err->domain, err->code, msg);
+			g_set_error(error, err->domain, err->code, "%s", msg);
 			g_clear_error(&err);
 			g_free(msg);
 		    }
@@ -1807,7 +1807,7 @@ libbalsa_message_create_mime_message(LibBalsaMessage* message, gboolean flow,
 					      err->message)
 			    : g_strdup_printf(_("Cannot read %s"),
 					      libbalsa_vfs_get_uri_utf8(body->file_uri));
-			g_set_error(error, err->domain, err->code, msg);
+			g_set_error(error, err->domain, err->code, "%s", msg);
 			g_clear_error(&err);
 			g_free(msg);
 		    }

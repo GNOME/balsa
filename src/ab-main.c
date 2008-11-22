@@ -1053,7 +1053,8 @@ ab_warning(const char *fmt, ...)
     va_end(va_args);
     d = gtk_message_dialog_new(GTK_WINDOW(ab_window),
                                GTK_DIALOG_DESTROY_WITH_PARENT,
-                               GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, msg);
+                               GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE,
+                               "%s", msg);
     gtk_dialog_run(GTK_DIALOG(d));
     gtk_widget_destroy(d);
 }

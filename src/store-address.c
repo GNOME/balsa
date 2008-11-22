@@ -258,7 +258,7 @@ store_address_from_entries(GtkWindow *window, StoreAddressInfo * info,
                 msg = _("Unexpected address book error. Report it."); break;
             }
         }
-        balsa_information_parented(window, LIBBALSA_INFORMATION_ERROR, msg);
+        balsa_information_parented(window, LIBBALSA_INFORMATION_ERROR, "%s", msg);
     }
     
     g_object_unref(address);

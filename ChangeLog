@@ -1,3 +1,21 @@
+2008-12-01  Peter Bloomfield
+
+	Initial experimental support for WebKit.
+
+	* configure.in: configure it.
+	* libbalsa/html.c: (lbh_hovering_over_link_cb,
+	lbh_size_request_cb, lbh_navigation_requested_cb,
+	libbalsa_html_new, libbalsa_html_to_string,
+	libbalsa_html_can_zoom, libbalsa_html_zoom,
+	libbalsa_html_can_select, libbalsa_html_select_all,
+	libbalsa_html_copy, lbh_new): new conditional section; new api
+	needed, because WebKitWebView has different signals and is not a
+	subclass of GtkLayout.
+	* libbalsa/html.h: new api.
+	* src/balsa-mime-widget-text.c: (pointer_over_url,
+	bm_widget_on_url, bm_widget_link_clicked, bm_widget_new_html):
+	adapt to new api.
+
 2008-11-22  Albrecht Dreß
 
 	Use only static format strings.

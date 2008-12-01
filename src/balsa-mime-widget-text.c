@@ -109,7 +109,7 @@ static gboolean check_call_url(GtkWidget * widget, GdkEventButton * event, GList
 static message_url_t * find_url(GtkWidget * widget, gint x, gint y, GList * url_list);
 static void handle_url(const message_url_t* url);
 static void free_url_list(GList * url_list);
-static void balsa_gtk_html_on_url(GtkWidget *html, const gchar *url);
+static void bm_widget_on_url(const gchar *url);
 static void phrase_highlight(GtkTextBuffer * buffer, const gchar * id,
 			     gunichar tag_char, const gchar * property,
 			     gint value);
@@ -802,10 +802,10 @@ pointer_over_url(GtkWidget * widget, message_url_t * url, gboolean set)
     
     if (set) {
         gtk_text_buffer_apply_tag(buffer, tag, &start, &end);
-        balsa_gtk_html_on_url(NULL, url->url);
+        bm_widget_on_url(url->url);
     } else {
         gtk_text_buffer_remove_tag(buffer, tag, &start, &end);
-        balsa_gtk_html_on_url(NULL, NULL);
+        bm_widget_on_url(NULL);
     }
 }
 
@@ -1114,7 +1114,7 @@ draw_cite_bars(GtkWidget * widget, GdkEventExpose *event, GList * cite_bars)
 
 /* --- HTML related functions -- */
 static void
-balsa_gtk_html_on_url(GtkWidget *html, const gchar *url)
+bm_widget_on_url(const gchar *url)
 {
     GtkStatusbar *statusbar;
     guint context_id;
@@ -1204,22 +1204,8 @@ balsa_gtk_html_button_press_cb(GtkWidget * html, GdkEventButton * event,
             ? balsa_gtk_html_popup(html, bm) : FALSE);
 }
 
-/* balsa_gtk_html_size_request:
-   report the requested size of the HTML widget.
-*/
 static void
-balsa_gtk_html_size_request(GtkWidget * widget,
-                            GtkRequisition * requisition, gpointer data)
-{
-    g_return_if_fail(widget != NULL);
-    g_return_if_fail(requisition != NULL);
-
-    requisition->width  = GTK_LAYOUT(widget)->hadjustment->upper;
-    requisition->height = GTK_LAYOUT(widget)->vadjustment->upper;
-}
-
-static void
-balsa_gtk_html_link_clicked(GObject *obj, const gchar *url)
+bm_widget_link_clicked(const gchar *url)
 {
     GError *err = NULL;
 
@@ -1244,13 +1230,12 @@ bm_widget_new_html(BalsaMessage * bm, LibBalsaMessageBody * mime_body, gchar * p
         libbalsa_html_new(ptr, len,
 			  libbalsa_message_body_charset(mime_body),
 			  bm->message,
-                          G_CALLBACK(balsa_gtk_html_link_clicked));
+                          (LibBalsaHtmlCallback)
+                          bm_widget_on_url,
+                          (LibBalsaHtmlCallback)
+                          bm_widget_link_clicked);
     g_object_set_data(G_OBJECT(mw->widget), "mime-body", mime_body);
 
-    g_signal_connect(G_OBJECT(mw->widget), "size-request",
-                     G_CALLBACK(balsa_gtk_html_size_request), bm);
-    g_signal_connect(G_OBJECT(mw->widget), "on-url",
-                     G_CALLBACK(balsa_gtk_html_on_url), bm);
     g_signal_connect(G_OBJECT(mw->widget), "button-press-event",
                      G_CALLBACK(balsa_gtk_html_button_press_cb), bm);
     g_signal_connect(G_OBJECT(mw->widget), "key_press_event",

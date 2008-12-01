@@ -106,6 +106,14 @@ AC_ARG_WITH([gpg-app],
                   [use PATH as GnuPG application (default=gpg2 if >= 2.0.4, otherwise gpg 1.x)]),
 	          [ gpgapp=$withval ], [ gpgapp=no ])
 
+AC_ARG_WITH([webkit],
+              AC_HELP_STRING([--with-webkit],
+                [Use WebKit if available (default=no)]),[
+	use_webkit=$withval
+],[
+	use_webkit=no
+])
+
 AC_ARG_WITH([gtkhtml],
               AC_HELP_STRING([--with-gtkhtml],
                              [Preferred GtkHTML version, 2 or 3 (default=3)]),[
@@ -381,6 +389,22 @@ AC_SUBST(BALSA_CFLAGS)
 AC_SUBST(BALSA_LIBS)
 AC_SUBST(BALSA_AB_LIBS)
 AC_SUBST(BALSA_DEFS)
+
+# WebKit
+#
+AC_MSG_CHECKING(whether to use WebKit)
+if test x"$use_webkit" != xno ; then
+    AC_MSG_RESULT([yes])
+    PKG_CHECK_MODULES(WEBKIT, [webkit-1.0])
+    AC_DEFINE(HAVE_WEBKIT,1,[Defined when WebKit can be used.])
+    AC_DEFINE(HAVE_GTKHTML,1,[Defined when GtkHtml can be used.])
+    BALSA_CFLAGS="$BALSA_CFLAGS $WEBKIT_CFLAGS"
+    BALSA_LIBS="$BALSA_LIBS $WEBKIT_LIBS"
+    BALSA_AB_LIBS="$BALSA_AB_LIBS $WEBKIT_LIBS"
+    use_gtkhtml=no
+else
+    AC_MSG_RESULT([no])
+fi
 
 # GtkHtml library.
 #
@@ -952,6 +976,7 @@ echo "    Installing into prefix: $prefix"
 echo "      Using multithreading: $use_threads"
 echo "   Enable compile warnings: $set_more_warnings"
 echo "                Use ESMTP : $with_esmtp"
+echo " Use WebKit (experimental): $use_webkit"
 echo "               Use GtkHTML: $use_gtkhtml"
 echo "                 Use GPGME: $gpgmecfg"
 echo "                  Use LDAP: $with_ldap"

@@ -25,7 +25,7 @@
 
 #include "config.h"
 
-# ifndef HAVE_GTKHTML3
+# if defined(HAVE_GTKHTML2)
 /* gtkhtml2 uses deprecated api */
 #  undef GTK_DISABLE_DEPRECATED
 # endif
@@ -42,10 +42,13 @@ typedef enum {
 
 # ifdef HAVE_GTKHTML
 
+typedef void (*LibBalsaHtmlCallback) (const gchar * uri);
+
 GtkWidget *libbalsa_html_new(const gchar * text, size_t len,
 			     const gchar * charset,
 			     gpointer message,
-			     GCallback link_clicked_cb);
+                             LibBalsaHtmlCallback hover_cb,
+                             LibBalsaHtmlCallback clicked_cb);
 void libbalsa_html_to_string(gchar ** text, size_t len);
 gboolean libbalsa_html_can_zoom(GtkWidget * widget);
 void libbalsa_html_zoom(GtkWidget * widget, gint in_out);

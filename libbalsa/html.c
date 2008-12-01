@@ -49,11 +49,230 @@
  * including it indirectly through "libbalsa.h" doesn't! */
 #include "libbalsa.h"
 
+# if defined(HAVE_WEBKIT)
+
+/*
+ * Experimental support for WebKit.
+ *
+ * Issues as of WebKit 1.0.3:
+ *
+ * (a) no mechanism for satisfying "cid:" requests;
+ * (b) no assurance that remote servers named in "src=" attributes
+ *     will not be contacted.
+ *
+ * GtkHtml-{2,3} resolve both issues with the "url-requested" or
+ * "request-url" signal; WebKit does not have one.  We turn off its
+ * "auto-load-images" setting, which seems to mean that <img src="...">
+ * tags are ignored.  However, that is apparently intended to save
+ * bandwidth rather than to protect privacy.  The server in a <frame
+ * src="..."> is known to be contacted; whether "src=" attributes on
+ * other tags are followed is unknown.
+ *
+ * We do disable scripts, so the server in a <script src="..."> should
+ * not be contacted.
+ *
+ * The action taken on a <frame src="..."> tag seems buggy: it results
+ * in a "navigation-requested" signal, which is otherwise emitted when
+ * the user clicks on a link.  Consequently, we pass it to the Gnome
+ * browser without verifying that the user wants it.
+ *
+ * https://bugs.webkit.org/show_bug.cgi?id=17147 discusses these issues.
+ */
+
+#include <webkit/webkit.h>
+
+typedef struct {
+    LibBalsaHtmlCallback hover_cb;
+    LibBalsaHtmlCallback clicked_cb;
+    GtkObject *hadj, *vadj;
+} LibBalsaWebKitInfo;
+
+static void
+lbh_hovering_over_link_cb(GtkWidget   * web_view,
+                          const gchar * title,
+                          const gchar * uri,
+                          gpointer      data)
+{
+    LibBalsaWebKitInfo *info = data;
+
+    (*info->hover_cb)(uri);
+}
+
+static void
+lbh_size_request_cb(GtkWidget      * widget,
+                    GtkRequisition * requisition,
+                    gpointer         data)
+{
+    LibBalsaWebKitInfo *info = data;
+
+    requisition->width  = GTK_ADJUSTMENT(info->hadj)->upper;
+    requisition->height = GTK_ADJUSTMENT(info->vadj)->upper;
+}
+
+static WebKitNavigationResponse
+lbh_navigation_requested_cb(WebKitWebView        * web_view,
+                            WebKitWebFrame       * frame,
+                            WebKitNetworkRequest * request,
+                            gpointer               data)
+{
+    LibBalsaWebKitInfo *info = data;
+    const gchar *uri = webkit_network_request_get_uri(request);
+
+    g_print("%s %s\n", __func__, uri);
+    (*info->clicked_cb)(uri);
+
+    return WEBKIT_NAVIGATION_RESPONSE_IGNORE;
+}
+
+/* Create a new WebKitWebView widget:
+ * text			the HTML source;
+ * len			length of text;
+ * charset		ignored;
+ * message 		the LibBalsaMessage from which to extract any
+ *			HTML objects (by url); ignored if NULL;
+ * hover_cb             callback for link-hover signal;
+ * clicked_cb	        callback for the "link-clicked" signal; ignored
+ *			if NULL.
+ */
+
+GtkWidget *
+libbalsa_html_new(const gchar * text, size_t len,
+		  const gchar * charset,
+		  gpointer message,
+                  LibBalsaHtmlCallback hover_cb,
+                  LibBalsaHtmlCallback clicked_cb)
+{
+    GtkWidget *widget;
+    WebKitWebView *web_view;
+    LibBalsaWebKitInfo *info;
+
+    widget = webkit_web_view_new();
+    web_view = WEBKIT_WEB_VIEW(widget);
+
+    g_object_set(webkit_web_view_get_settings(web_view),
+                 "auto-load-images", FALSE,
+                 "enable-scripts",   FALSE,
+                 "enable-plugins",   FALSE,
+                 NULL);
+     
+    info = g_new(LibBalsaWebKitInfo, 1);
+    g_object_weak_ref(G_OBJECT(web_view), (GWeakNotify) g_free, info);
+
+    info->hadj = gtk_adjustment_new(0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+    info->vadj = gtk_adjustment_new(0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+    g_signal_emit_by_name(web_view, "set-scroll-adjustments",
+                          info->hadj, info->vadj);
+
+    info->hover_cb = hover_cb;
+    g_signal_connect(web_view, "hovering-over-link",
+                     G_CALLBACK(lbh_hovering_over_link_cb), info);
+
+    info->clicked_cb = clicked_cb;
+    g_signal_connect(web_view, "navigation-requested",
+                     G_CALLBACK(lbh_navigation_requested_cb), info);
+
+    g_signal_connect(web_view, "size-request",
+                     G_CALLBACK(lbh_size_request_cb), info);
+
+    g_signal_connect(web_view, "load-progress-changed",
+                     G_CALLBACK(gtk_widget_queue_resize), NULL);
+
+    webkit_web_view_load_html_string(web_view, text, NULL);
+
+    return widget;
+}
+
+void
+libbalsa_html_to_string(gchar ** text, size_t len)
+{
+    return; /* this widget does not support conversion to a string. The
+             * string won't be altered. Other alternative would be to set
+             * it to an empty string. */
+}
+
+gboolean
+libbalsa_html_can_zoom(GtkWidget * widget)
+{
+    return WEBKIT_IS_WEB_VIEW(widget);
+}
+
+void libbalsa_html_zoom(GtkWidget * widget, gint in_out)
+{
+    switch (in_out) {
+    case +1:
+	webkit_web_view_zoom_in(WEBKIT_WEB_VIEW(widget));
+	break;
+    case -1:
+	webkit_web_view_zoom_out(WEBKIT_WEB_VIEW(widget));
+	break;
+    case 0:
+	webkit_web_view_set_zoom_level(WEBKIT_WEB_VIEW(widget), 1.0);
+	break;
+    default:
+	break;
+    }
+}
+
+gboolean libbalsa_html_can_select(GtkWidget * widget)
+{
+    return WEBKIT_IS_WEB_VIEW(widget);
+}
+
+void libbalsa_html_select_all(GtkWidget * widget)
+{
+    webkit_web_view_select_all(WEBKIT_WEB_VIEW(widget));
+}
+
+void libbalsa_html_copy(GtkWidget * widget)
+{
+    webkit_web_view_copy_clipboard(WEBKIT_WEB_VIEW(widget));
+}
+
+# else                          /* defined(HAVE_WEBKIT) */
+
+/* Common code for both GtkHtml widgets. */
+
 /* Forward reference. */
 static gboolean libbalsa_html_url_requested(GtkWidget * html,
 					    const gchar * url,
 					    gpointer stream,
 					    LibBalsaMessage * msg);
+
+typedef struct {
+    LibBalsaHtmlCallback hover_cb;
+    LibBalsaHtmlCallback clicked_cb;
+} LibBalsaHTMLInfo;
+
+static void
+lbh_navigation_requested_cb(GtkWidget   * widget,
+                            const gchar * uri,
+                            gpointer      data)
+{
+    LibBalsaHTMLInfo *info = data;
+
+    if (info->clicked_cb)
+        (*info->clicked_cb)(uri);
+}
+
+static void
+lbh_hovering_over_link_cb(GtkWidget   * widget,
+                          const gchar * uri,
+                          gpointer      data)
+{
+    LibBalsaHTMLInfo *info = data;
+
+    if (info->hover_cb)
+        (*info->hover_cb) (uri);
+}
+
+static void
+lbh_size_request_cb(GtkWidget      * widget,
+                    GtkRequisition * requisition,
+                    gpointer         data)
+{
+    requisition->width  = GTK_LAYOUT(widget)->hadjustment->upper;
+    requisition->height = GTK_LAYOUT(widget)->vadjustment->upper;
+}
 
 # ifdef HAVE_GTKHTML3
 
@@ -98,20 +317,12 @@ libbalsa_html_write_mime_stream(GtkHTMLStream * stream,
 static GtkWidget *
 lbh_new(const gchar * text, size_t len,
 	const gchar * charset,
-        GString * export_string,
-	gpointer message, GCallback link_clicked_cb)
+        GString * export_string)
 {
     GtkWidget *html;
     GtkHTMLStream *stream;
 
     html = gtk_html_new();
-    if (message)
-	g_signal_connect(G_OBJECT(html), "url-requested",
-			 G_CALLBACK(libbalsa_html_url_requested), message);
-    if (link_clicked_cb)
-	g_signal_connect(G_OBJECT(html), "link-clicked",
-			 link_clicked_cb, NULL);
-
     stream = gtk_html_begin(GTK_HTML(html));
     if (len > 0) {
         if (charset && g_ascii_strcasecmp(charset, "us-ascii") != 0
@@ -162,10 +373,33 @@ lbh_new(const gchar * text, size_t len,
  */
 GtkWidget *
 libbalsa_html_new(const gchar * text, size_t len,
-		  const gchar * charset,
-		  gpointer message, GCallback link_clicked_cb)
+                  const gchar * charset,
+                  gpointer message,
+                  LibBalsaHtmlCallback hover_cb,
+                  LibBalsaHtmlCallback clicked_cb)
 {
-    return lbh_new(text, len, charset, NULL, message, link_clicked_cb);
+    GtkWidget *widget;
+    LibBalsaHTMLInfo *info;
+
+    widget = lbh_new(text, len, charset, NULL);
+    info = g_new(LibBalsaHTMLInfo, 1);
+    g_object_weak_ref(G_OBJECT(widget), (GWeakNotify) g_free, info);
+
+    info->hover_cb = hover_cb;
+    g_signal_connect(widget, "on-url",
+                     G_CALLBACK(lbh_hovering_over_link_cb), info);
+
+    info->clicked_cb = clicked_cb;
+    g_signal_connect(widget, "link-clicked",
+                     G_CALLBACK(lbh_navigation_requested_cb), info);
+
+    g_signal_connect(widget, "url-requested",
+                     G_CALLBACK(libbalsa_html_url_requested), message);
+
+    g_signal_connect(widget, "size-request",
+                     G_CALLBACK(lbh_size_request_cb), info);
+
+    return widget;
 }
 
 /* Use an HtmlView widget to convert html text to a (null-terminated) string:
@@ -180,7 +414,7 @@ libbalsa_html_to_string(gchar ** text, size_t len)
     GString *str;
 
     str = g_string_new(NULL);	/* We want only the text, in str. */
-    html = lbh_new(*text, len, NULL, str, NULL, NULL);
+    html = lbh_new(*text, len, NULL, str);
     gtk_widget_destroy(html);
 
     g_free(*text);
@@ -349,23 +583,38 @@ libbalsa_html_write_mime_stream(HtmlStream * stream,
 GtkWidget *
 libbalsa_html_new(const gchar * text, size_t len,
 		  const gchar * charset,
-		  gpointer message, GCallback link_clicked_cb)
+		  gpointer message,
+                  LibBalsaHtmlCallback hover_cb,
+                  LibBalsaHtmlCallback link_clicked_cb)
 {
     GtkWidget *html;
+    LibBalsaHTMLInfo *info;
     HtmlDocument *document;
 
     document = html_document_new();
+    info = g_new(LibBalsaHTMLInfo, 1);
+    g_object_weak_ref(G_OBJECT(document), (GWeakNotify) g_free, info);
+
     if (message)
-	g_signal_connect(G_OBJECT(document), "request-url",
+	g_signal_connect(document, "request-url",
 			 G_CALLBACK(libbalsa_html_url_requested), message);
+
+    info->clicked_cb = link_clicked_cb;
     if (link_clicked_cb)
-	g_signal_connect(G_OBJECT(document), "link-clicked",
-			 link_clicked_cb, NULL);
+        g_signal_connect(document, "link-clicked",
+                         G_CALLBACK(lbh_navigation_requested_cb), info);
 
     /* We need to first set_document and then do *_stream() operations
      * or gtkhtml2 will crash. */
     html = html_view_new();
     html_view_set_document(HTML_VIEW(html), document);
+
+    info->hover_cb = hover_cb;
+    g_signal_connect(html, "on-url",
+                     G_CALLBACK(lbh_hovering_over_link_cb), info);
+
+    g_signal_connect(html, "size-request",
+                     G_CALLBACK(lbh_size_request_cb), info);
 
     html_document_open_stream(document, "text/html");
     html_document_write_stream(document, text, len);
@@ -509,6 +758,7 @@ libbalsa_html_url_requested(GtkWidget * html, const gchar * url,
 
     return TRUE;
 }
+# endif                         /* defined(HAVE_WEBKIT) */
 
 /* Filter text/enriched or text/richtext to text/html, if we have GMime
  * >= 2.1.0; free and reallocate the text. */

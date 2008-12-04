@@ -84,7 +84,7 @@
 typedef struct {
     LibBalsaHtmlCallback hover_cb;
     LibBalsaHtmlCallback clicked_cb;
-    GtkObject *hadj, *vadj;
+    GtkAdjustment *hadj, *vadj;
 } LibBalsaWebKitInfo;
 
 static void
@@ -105,8 +105,8 @@ lbh_size_request_cb(GtkWidget      * widget,
 {
     LibBalsaWebKitInfo *info = data;
 
-    requisition->width  = GTK_ADJUSTMENT(info->hadj)->upper;
-    requisition->height = GTK_ADJUSTMENT(info->vadj)->upper;
+    requisition->width  = info->hadj->upper;
+    requisition->height = info->vadj->upper;
 }
 
 static WebKitNavigationResponse
@@ -158,10 +158,13 @@ libbalsa_html_new(const gchar * text, size_t len,
     info = g_new(LibBalsaWebKitInfo, 1);
     g_object_weak_ref(G_OBJECT(web_view), (GWeakNotify) g_free, info);
 
-    info->hadj = gtk_adjustment_new(0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-    info->vadj = gtk_adjustment_new(0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-    g_signal_emit_by_name(web_view, "set-scroll-adjustments",
-                          info->hadj, info->vadj);
+    info->hadj =
+        GTK_ADJUSTMENT(gtk_adjustment_new(0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
+    info->vadj =
+        GTK_ADJUSTMENT(gtk_adjustment_new(0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
+    gtk_widget_set_scroll_adjustments(widget, info->hadj, info->vadj);
+    g_signal_connect(web_view, "size-request",
+                     G_CALLBACK(lbh_size_request_cb), info);
 
     info->hover_cb = hover_cb;
     g_signal_connect(web_view, "hovering-over-link",
@@ -170,9 +173,6 @@ libbalsa_html_new(const gchar * text, size_t len,
     info->clicked_cb = clicked_cb;
     g_signal_connect(web_view, "navigation-requested",
                      G_CALLBACK(lbh_navigation_requested_cb), info);
-
-    g_signal_connect(web_view, "size-request",
-                     G_CALLBACK(lbh_size_request_cb), info);
 
     g_signal_connect(web_view, "load-progress-changed",
                      G_CALLBACK(gtk_widget_queue_resize), NULL);

@@ -1,3 +1,9 @@
+2008-12-03  Peter Bloomfield
+
+	* libbalsa/html.c: (lbh_size_request_cb, libbalsa_html_new): use
+	gtk_widget_set_scroll_adjustments instead of a signal; dynamic
+	cast once instead of many times.
+
 2008-12-01  Peter Bloomfield
 
 	Initial experimental support for WebKit.

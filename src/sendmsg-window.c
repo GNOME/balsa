@@ -1140,7 +1140,7 @@ edit_with_gnome_check(gpointer data) {
     gtk_text_buffer_set_text(buffer, "", 0);
     curposition = 0;
     while(fgets(line, sizeof(line), tmp))
-        libbalsa_insert_with_url(buffer, line, NULL, NULL, NULL);
+        gtk_text_buffer_insert_at_cursor(buffer, line, -1);
     sw_buffer_signals_unblock(data_real->bsmsg, buffer);
 
     g_free(data_real->filename);
@@ -1335,7 +1335,7 @@ repl_identity_signature(BalsaSendmsg* bsmsg, LibBalsaIdentity* new_ident,
         gtk_text_buffer_get_end_iter(buffer, &ins);
     }
     gtk_text_buffer_place_cursor(buffer, &ins);
-    libbalsa_insert_with_url(buffer, new_sig, NULL, NULL, NULL);
+    gtk_text_buffer_insert_at_cursor(buffer, new_sig, -1);
 }
 
 /*
@@ -2377,7 +2377,7 @@ insert_selected_messages(BalsaSendmsg *bsmsg, QuoteType type)
 	for (node = l; node; node = g_list_next(node)) {
 	    LibBalsaMessage *message = node->data;
             GString *body = quote_message_body(bsmsg, message, type);
-            libbalsa_insert_with_url(buffer, body->str, NULL, NULL, NULL);
+            gtk_text_buffer_insert_at_cursor(buffer, body->str, body->len);
             g_string_free(body, TRUE);
 	}
 	g_list_foreach(l, (GFunc)g_object_unref, NULL);
@@ -3099,7 +3099,7 @@ drag_data_quote(GtkWidget * widget,
 
             body = quote_message_body(bsmsg, message, QUOTE_ALL);
 	    g_object_unref(message);
-            libbalsa_insert_with_url(buffer, body->str, NULL, NULL, NULL);
+            gtk_text_buffer_insert_at_cursor(buffer, body->str, body->len);
             g_string_free(body, TRUE);
         }
         balsa_index_selected_msgnos_free(index, selected);
@@ -3289,7 +3289,7 @@ continue_body(BalsaSendmsg * bsmsg, LibBalsaMessage * message)
 	    if (!strcmp(body_type, "text/plain") &&
 		(rbdy = process_mime_part(message, body, NULL, llen, FALSE,
                                           bsmsg->flow))) {
-                libbalsa_insert_with_url(buffer, rbdy->str, NULL, NULL, NULL);
+                gtk_text_buffer_insert_at_cursor(buffer, rbdy->str, rbdy->len);
 		g_string_free(rbdy, TRUE);
 	    }
 	    g_free(body_type);
@@ -3882,7 +3882,7 @@ fill_body_from_part(BalsaSendmsg * bsmsg, LibBalsaMessageHeaders *headers,
 
     if(body->len && body->str[body->len] != '\n')
         g_string_append_c(body, '\n');
-    libbalsa_insert_with_url(buffer, body->str, NULL, NULL, NULL);
+    gtk_text_buffer_insert_at_cursor(buffer, body->str, body->len);
     
     if(qtype == QUOTE_HEADERS)
         gtk_text_buffer_get_end_iter(buffer, &start);
@@ -3932,7 +3932,7 @@ insert_signature_cb(GtkAction * action, BalsaSendmsg *bsmsg)
         sw_buffer_save(bsmsg);
 #endif                          /* HAVE_GTKSOURCEVIEW */	
         sw_buffer_signals_block(bsmsg, buffer);
-        libbalsa_insert_with_url(buffer, signature, NULL, NULL, NULL);
+        gtk_text_buffer_insert_at_cursor(buffer, signature, -1);
         sw_buffer_signals_unblock(bsmsg, buffer);
 	
 	g_free(signature);
@@ -5182,7 +5182,7 @@ sendmsg_window_set_field(BalsaSendmsg * bsmsg, const gchar * key,
         GtkTextBuffer *buffer =
             gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
 
-        libbalsa_insert_with_url(buffer, val, NULL, NULL, NULL);
+        gtk_text_buffer_insert_at_cursor(buffer, val, -1);
 
         return;
     }
@@ -5265,7 +5265,7 @@ do_insert_string_select_ch(BalsaSendmsg* bsmsg, GtkTextBuffer *buffer,
 
         g_print("Trying charset: %s\n", charset);
         if (sw_can_convert(string, len, "UTF-8", charset, &s)) {
-            libbalsa_insert_with_url(buffer, s, NULL, NULL, NULL);
+            gtk_text_buffer_insert_at_cursor(buffer, s, -1);
             g_free(s);
             break;
         }
@@ -5310,7 +5310,7 @@ insert_file_response(GtkWidget * selector, gint response,
         attr = libbalsa_text_attr_string(string);
         if (!attr || attr & LIBBALSA_TEXT_HI_UTF8)
             /* Ascii or utf-8 */
-            libbalsa_insert_with_url(buffer, string, NULL, NULL, NULL);
+            gtk_text_buffer_insert_at_cursor(buffer, string, -1);
         else {
             /* Neither ascii nor utf-8... */
             gchar *s = NULL;
@@ -5318,7 +5318,7 @@ insert_file_response(GtkWidget * selector, gint response,
 
             if (sw_can_convert(string, -1, "UTF-8", charset, &s)) {
                 /* ...but seems to be in current charset. */
-                libbalsa_insert_with_url(buffer, s, NULL, NULL, NULL);
+                gtk_text_buffer_insert_at_cursor(buffer, s, -1);
                 g_free(s);
             } else
                 /* ...and can't be decoded from current charset. */
@@ -5397,7 +5397,7 @@ sw_wrap_body(BalsaSendmsg * bsmsg)
         the_text = gtk_text_iter_get_text(&start, &end);
         libbalsa_wrap_string(the_text, balsa_app.wraplength);
         gtk_text_buffer_set_text(buffer, "", 0);
-        libbalsa_insert_with_url(buffer, the_text, NULL, NULL, NULL);
+        gtk_text_buffer_insert_at_cursor(buffer, the_text, -1);
         g_free(the_text);
 
         gtk_text_buffer_get_iter_at_offset(buffer, &now, pos);
@@ -6730,7 +6730,7 @@ sendmsg_window_new_from_list(LibBalsaMailbox * mailbox,
         else if (type == SEND_FORWARD_INLINE) {
             GString *body =
                 quote_message_body(bsmsg, message, QUOTE_NOPREFIX);
-            libbalsa_insert_with_url(buffer, body->str, NULL, NULL, NULL);
+            gtk_text_buffer_insert_at_cursor(buffer, body->str, body->len);
             g_string_free(body, TRUE);
         }
         g_object_unref(message);

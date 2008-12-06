@@ -86,13 +86,12 @@ struct _LibBalsaCodesetInfo {
 };
 
 typedef void (*libbalsa_url_cb_t) (GtkTextBuffer *, GtkTextIter *,
-				   const gchar *, gpointer);
+				   const gchar *, guint, gpointer);
 typedef struct _LibBalsaUrlInsertInfo LibBalsaUrlInsertInfo;
 struct _LibBalsaUrlInsertInfo {
     libbalsa_url_cb_t callback;
     gpointer callback_data;
     gboolean buffer_is_flowed;
-    gchar *ml_url;
     GString *ml_url_buffer;
 };
 
@@ -138,7 +137,7 @@ gboolean libbalsa_utf8_sanitize(gchar ** text, gboolean fallback,
 gboolean libbalsa_utf8_strstr(const gchar *s1,const gchar *s2);
 gboolean libbalsa_insert_with_url(GtkTextBuffer * buffer,
 				  const char *chars,
-				  const char *all_chars,
+				  guint len,
 				  GtkTextTag * tag,
 				  LibBalsaUrlInsertInfo *url_info);
 #if USE_GREGEX

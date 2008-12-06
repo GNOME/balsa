@@ -1,3 +1,27 @@
+2008-12-06  Peter Bloomfield
+
+	rewrite of libbalsa_insert_with_url
+
+	* libbalsa/mime.c: (libbalsa_unwrap_buffer, mark_urls,
+	prescanner, libbalsa_html_encode_hyperlinks):
+	pass string length to prescanner;
+	(get_ml_url_reg): make sure the url ends with a real url
+	character;
+	(libbalsa_insert_with_url): avoid allocating and freeing
+	strings.
+	* libbalsa/misc.h: new signature for libbalsa_url_cb_t.
+	* src/balsa-mime-widget-text.c: (balsa_mime_widget_new_text):
+	avoid allocating and freeing strings;
+	(url_found_cb): new signature for libbalsa_url_cb_t.
+	* src/sendmsg-window.c: (edit_with_gnome_check,
+	repl_identity_signature, insert_selected_messages,
+	drag_data_quote, continue_body, fill_body_from_part,
+	insert_signature_cb, sendmsg_window_set_field,
+	do_insert_string_select_ch, insert_file_response,
+	sw_wrap_body, sendmsg_window_new_from_list): use
+	gtk_text_buffer_insert_at_cursor instead of
+	libbalsa_insert_with_url.
+
 2008-12-03  Peter Bloomfield
 
 	* libbalsa/html.c: (lbh_size_request_cb, libbalsa_html_new): use

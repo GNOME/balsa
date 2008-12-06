@@ -104,7 +104,8 @@ static gboolean store_button_coords(GtkWidget * widget, GdkEventButton * event, 
 static gboolean check_over_url(GtkWidget * widget, GdkEventMotion * event, GList * url_list);
 static void pointer_over_url(GtkWidget * widget, message_url_t * url, gboolean set);
 static void prepare_url_offsets(GtkTextBuffer * buffer, GList * url_list);
-static void url_found_cb(GtkTextBuffer * buffer, GtkTextIter * iter, const gchar * buf, gpointer data);
+static void url_found_cb(GtkTextBuffer * buffer, GtkTextIter * iter,
+                         const gchar * buf, guint len, gpointer data);
 static gboolean check_call_url(GtkWidget * widget, GdkEventButton * event, GList * url_list);
 static message_url_t * find_url(GtkWidget * widget, gint x, gint y, GList * url_list);
 static void handle_url(const message_url_t* url);
@@ -254,7 +255,7 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
     }
 #endif                          /* USE_GREGEX */
     else {
-	gchar *line_start;
+	const gchar *line_start;
 	LibBalsaUrlInsertInfo url_info;
 	GList * cite_bars_list;
 	guint cite_level;
@@ -276,23 +277,19 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
 	url_info.callback = url_found_cb;
 	url_info.callback_data = &url_list;
 	url_info.buffer_is_flowed = libbalsa_message_body_is_flowed(mime_body);
-	url_info.ml_url = NULL;
 	url_info.ml_url_buffer = NULL;
 
 	line_start = ptr;
 	cite_bars_list = NULL;
 	cite_level = 0;
 	cite_start = 0;
-	while (line_start) {
-	    gchar *newline, *this_line;
+	while (*line_start) {
+	    const gchar *line_end;
 	    GtkTextTag *tag = NULL;
 	    int len;
 
-	    newline = strchr(line_start, '\n');
-	    if (newline)
-		this_line = g_strndup(line_start, newline - line_start);
-	    else
-		this_line = g_strdup(line_start);
+	    if (!(line_end = strchr(line_start, '\n')))
+                line_end = line_start + strlen(line_start);
 
 	    if (is_text_plain) {
 		guint quote_level;
@@ -300,9 +297,11 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
 
 		/* get the cite level only for text/plain parts */
 #if USE_GREGEX
-		libbalsa_match_regex(this_line, rex, &quote_level, &cite_idx);
+		libbalsa_match_regex(line_start, rex, &quote_level,
+                                     &cite_idx);
 #else                           /* USE_GREGEX */
-		libbalsa_match_regex(this_line, &rex, &quote_level, &cite_idx);
+		libbalsa_match_regex(line_start, &rex, &quote_level,
+                                     &cite_idx);
 #endif                          /* USE_GREGEX */
 	    
 		/* check if the citation level changed */
@@ -320,31 +319,26 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
 		    cite_level = quote_level;
 		}
 
-		/* strip off the citation prefix */
+		/* skip the citation prefix */
 		if (quote_level) {
-		    gchar *new;
-		
-		    new = this_line + cite_idx;
-		    if (g_unichar_isspace(g_utf8_get_char(new)))
-			new = g_utf8_next_char(new);
-		    new = g_strdup(new);
-		    g_free(this_line);
-		    this_line = new;
+		    line_start += cite_idx;
+                    if (line_start < line_end
+                        && g_unichar_isspace(g_utf8_get_char(line_start)))
+                        line_start = g_utf8_next_char(line_start);
 		}
 		tag = quote_tag(buffer, quote_level, margin);
 	    }
 
-	    len = strlen(this_line);
-	    if (len > 0 && this_line[len - 1] == '\r')
-		this_line[len - 1] = '\0';
+            len = line_end - line_start;
+	    if (len > 0 && line_start[len - 1] == '\r')
+                --len;
 	    /* tag is NULL if the line isn't quoted, but it causes
 	     * no harm */
-	    if (!libbalsa_insert_with_url(buffer, this_line, line_start,
+	    if (!libbalsa_insert_with_url(buffer, line_start, len,
 					  tag, &url_info))
 		gtk_text_buffer_insert_at_cursor(buffer, "\n", 1);
 	    
-	    g_free(this_line);
-	    line_start = newline ? newline + 1 : NULL;
+	    line_start = *line_end ? line_end + 1 : line_end;
 	}
 
 	/* add any pending cited part */
@@ -836,7 +830,7 @@ prepare_url_offsets(GtkTextBuffer * buffer, GList * url_list)
 
 static void
 url_found_cb(GtkTextBuffer * buffer, GtkTextIter * iter,
-             const gchar * buf, gpointer data)
+             const gchar * buf, guint len, gpointer data)
 {
     GList **url_list = data;
     message_url_t *url_found;
@@ -844,7 +838,7 @@ url_found_cb(GtkTextBuffer * buffer, GtkTextIter * iter,
     url_found = g_new(message_url_t, 1);
     url_found->end_mark =
         gtk_text_buffer_create_mark(buffer, NULL, iter, TRUE);
-    url_found->url = g_strdup(buf);       /* gets freed later... */
+    url_found->url = g_strndup(buf, len);       /* gets freed later... */
     *url_list = g_list_append(*url_list, url_found);
 }
 

@@ -1040,6 +1040,10 @@ write_nstring(unsigned seqno, ImapFetchBodyType body_type,
 struct FetchBodyPassthroughData {
   ImapFetchBodyCb cb;
   void *arg;
+  char *body;
+  size_t body_length;
+  unsigned seqno;
+  unsigned pipeline_error;
 };
 
 static void
@@ -1049,13 +1053,54 @@ fetch_body_passthrough(unsigned seqno,
 		       size_t buflen, void* arg)
 {
   struct FetchBodyPassthroughData* data = (struct FetchBodyPassthroughData*)arg;
-
-  data->cb(seqno, buf, buflen, data->arg);
+  switch(body_type) {
+  case IMAP_BODY_TYPE_RFC822:
+    data->cb(seqno, buf, buflen, data->arg);
+    break;
+  case IMAP_BODY_TYPE_HEADER:
+    if(data->seqno == 0) {
+      data->seqno = seqno;
+      data->cb(seqno, buf, buflen, data->arg);
+    } else {
+      if(data->seqno == seqno) {
+	data->cb(seqno, buf, buflen, data->arg);
+	data->cb(seqno, data->body, data->body_length, data->arg);
+	g_free(data->body);
+	data->body = NULL;
+	data->seqno = 0;
+      } else {
+	/* This server sends data in a strange order that makes
+	   efficient pipeline processing impossible. Just signal an
+	   error. */
+	data->pipeline_error++;
+      }
+    }
+    break;
+  case IMAP_BODY_TYPE_TEXT:
+    if(data->seqno == seqno) {
+      data->cb(seqno, buf, buflen, data->arg);
+      data->seqno = 0;
+    } else {
+      /* Text before header. Still, we can afford to invert it.. */
+      if(data->body)
+	data->pipeline_error++; /* Unlikely... */
+      else {
+	data->body = g_malloc(buflen);
+	memcpy(data->body, buf, buflen);
+	data->body_length = buflen;
+	data->seqno = seqno;
+      }
+    }
+    break;
+  default:
+    data->pipeline_error++;
+  }
 }
 
 ImapResponse
 imap_mbox_handle_fetch_rfc822(ImapMboxHandle* handle,
 			      unsigned cnt, unsigned *set,
+			      gboolean peek_only,
 			      ImapFetchBodyCb fetch_cb,
 			      void *fetch_cb_data)
 {
@@ -1070,10 +1115,16 @@ imap_mbox_handle_fetch_rfc822(ImapMboxHandle* handle,
   if(seq) {
     ImapFetchBodyInternalCb cb = handle->body_cb;
     void                   *arg = handle->body_arg;
-    gchar *cmd = g_strdup_printf("FETCH %s RFC822", seq);
+    gchar *cmd = g_strdup_printf("FETCH %s %s", seq,
+				 peek_only
+				 ? "(BODY.PEEK[HEADER] BODY.PEEK[TEXT])"
+				 : "RFC822");
     struct FetchBodyPassthroughData passthrough_data;
     passthrough_data.cb = fetch_cb;
     passthrough_data.arg = fetch_cb_data;
+    passthrough_data.body = NULL;
+    passthrough_data.seqno = 0;
+    passthrough_data.pipeline_error = 0;
     handle->body_cb  = fetch_cb ? fetch_body_passthrough : NULL;
     handle->body_arg = &passthrough_data;
     rc = imap_cmd_exec(handle, cmd);
@@ -1081,6 +1132,10 @@ imap_mbox_handle_fetch_rfc822(ImapMboxHandle* handle,
     handle->body_arg = arg;
     g_free(cmd);
     g_free(seq);
+    if(passthrough_data.pipeline_error){
+      rc = IMR_NO;
+      imap_mbox_handle_set_msg(handle, "Unordered data received from server");
+    }
   }
   HANDLE_UNLOCK(handle);
 

@@ -1,3 +1,11 @@
+2008-12-14  Paweł Sałek
+
+	* src/main-window.c: Add ability to display recent messages only.
+	* libbalsa/imap-server.c: give more details in error messages.
+	* libbalsa/imap/imap-handle.c: ditto.
+	* libbalsa/imap/imap-commands.[ch]: Add "peek" argument to 
+	imap_mbox_handle_fetch_rfc822().
+	
 2008-12-06  Peter Bloomfield
 
 	rewrite of libbalsa_insert_with_url

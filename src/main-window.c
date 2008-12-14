@@ -1137,6 +1137,16 @@ bw_filter_old(const char *str)
     } else return NULL;
 }
 
+static LibBalsaCondition *
+bw_filter_recent(const char *str)
+{
+    int days;
+    if(str && sscanf(str, "%d", &days) == 1) {
+        time_t lowerbound = time(NULL)-(days-1)*24*3600;
+        return libbalsa_condition_new_date(FALSE, &lowerbound, NULL);
+    } else return NULL;
+}
+
 /* Subject or sender must match FILTER_SENDER, and Subject or
    Recipient must match FILTER_RECIPIENT constant. */
 static struct {
@@ -1147,7 +1157,8 @@ static struct {
     { N_("Subject or Recipient Contains:"), bw_filter_sor  },
     { N_("Subject Contains:"),              bw_filter_s    },
     { N_("Body Contains:"),                 bw_filter_body },
-    { N_("Older than (days):"),             bw_filter_old  }
+    { N_("Older than (days):"),             bw_filter_old  },
+    { N_("Old at most (days):"),            bw_filter_recent }
 };
 static gboolean view_filters_translated = FALSE;
 

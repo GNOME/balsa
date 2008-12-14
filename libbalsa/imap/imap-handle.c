@@ -876,7 +876,9 @@ imap_mbox_handle_get_delim(ImapMboxHandle* handle,
 char*
 imap_mbox_handle_get_last_msg(ImapMboxHandle *handle)
 {
-  return g_strdup(handle->last_msg ? handle->last_msg : "");
+  return g_strdup(handle->state == IMHS_DISCONNECTED
+		  ? "Connection severed"
+		  : (handle->last_msg ? handle->last_msg : "") );
 }
 
 void

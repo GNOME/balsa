@@ -280,7 +280,7 @@ dump_mbox(const char *host, const char *mailbox,
       unsigned batch_length = i+FETCH_AT_ONCE > cnt ? cnt-i : FETCH_AT_ONCE;
       printf("Fetching %u:%u\n", i+1, i+batch_length);
       for(j=0; j<batch_length; j++) arr[j] = i+1+j;
-      if( imap_mbox_handle_fetch_rfc822(h, batch_length, arr,
+      if( imap_mbox_handle_fetch_rfc822(h, batch_length, arr, TRUE,
 					cb, cb_data) != IMR_OK) {
 	fprintf(stderr, "Fetching %u:%u failed: %s\n", i+1,
 		i+batch_length,

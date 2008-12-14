@@ -118,7 +118,8 @@ typedef void (*ImapFetchBodyCb)(unsigned seqno, const char *buf,
 				size_t buflen, void* arg);
 
 ImapResponse imap_mbox_handle_fetch_rfc822(ImapMboxHandle* handle,
-					   unsigned cnt, unsigned *seqno, 
+					   unsigned cnt, unsigned *seqno,
+					   gboolean peek_only,
                                            ImapFetchBodyCb cb,
 					   void *cb_data);
 

@@ -576,7 +576,7 @@ handle_connection_error(int rc, struct handle_info *info,
     case IMAP_CONNECT_FAILED:
         g_set_error(err, LIBBALSA_MAILBOX_ERROR,
                     LIBBALSA_MAILBOX_NETWORK_ERROR,
-                    _("Cannot connect to the server"));
+                    _("Cannot connect to %s"), server->host);
         break;
     case IMAP_AUTH_CANCELLED:
         g_set_error(err, LIBBALSA_MAILBOX_ERROR,

@@ -1,3 +1,13 @@
+2008-12-20  Peter Bloomfield
+
+	button for MDN in message composition toolbar (Jean-Luc Coulon)
+
+	* src/balsa-icons.h: define new icon.
+	* src/balsa-icons.c: (register_balsa_pixmaps): register it as
+	"stock_mail-reply".
+	* src/toolbar-factory.c: list it with short label.
+	* src/sendmsg-window.c: use it with tooltip.
+
 2008-12-14  Paweł Sałek
 
 	* src/main-window.c: Add ability to display recent messages only.

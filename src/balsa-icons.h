@@ -37,6 +37,7 @@
 #define BALSA_PIXMAP_PREVIOUS			"balsa_previous"
 #define BALSA_PIXMAP_PREVIOUS_PART		"balsa_previous_part"
 #define BALSA_PIXMAP_POSTPONE			"balsa_postpone"
+#define BALSA_PIXMAP_REQUEST_MDN                "balsa_request_mdn"
 #define BALSA_PIXMAP_SEND			"balsa_send"
 #define BALSA_PIXMAP_SEND_RECEIVE		"balsa_send_receive"
 #define BALSA_PIXMAP_TRASH_EMPTY		"balsa_trash_empty"

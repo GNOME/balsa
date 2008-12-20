@@ -145,6 +145,7 @@ button_data toolbar_buttons[]={
     {GTK_STOCK_DELETE, N_("Trash /\nDelete")},
     {BALSA_PIXMAP_POSTPONE, N_("Postpone")},
     {GTK_STOCK_PRINT, N_("Print")},
+    {BALSA_PIXMAP_REQUEST_MDN, N_("Request\nMDN")},
     {BALSA_PIXMAP_SEND, N_("Send")},
     {BALSA_PIXMAP_SEND_RECEIVE, N_("Exchange")},
     {BALSA_PIXMAP_ATTACHMENT, N_("Attach")},

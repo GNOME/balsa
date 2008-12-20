@@ -173,6 +173,8 @@ register_balsa_pixmaps(void)
 	  { GTK_ICON_SIZE_LARGE_TOOLBAR, GTK_ICON_SIZE_MENU } },
 	{ BALSA_PIXMAP_REPLY_GROUP,     "stock_mail-reply-to-all", 
 	  { GTK_ICON_SIZE_LARGE_TOOLBAR, GTK_ICON_SIZE_MENU } },
+	{ BALSA_PIXMAP_REQUEST_MDN,     "stock_mail-reply", 
+	  { GTK_ICON_SIZE_LARGE_TOOLBAR, GTK_ICON_SIZE_MENU } },
 	{ BALSA_PIXMAP_SEND,            "stock_mail-send",
 	  { GTK_ICON_SIZE_LARGE_TOOLBAR, GTK_ICON_SIZE_MENU } },
 	{ BALSA_PIXMAP_RECEIVE,         "stock_mail-receive",

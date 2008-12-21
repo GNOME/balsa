@@ -348,15 +348,21 @@ async_process(GIOChannel *source, GIOCondition condition, gpointer data)
   ImapResponse rc = IMR_UNTAGGED;
   int retval;
   unsigned async_cmd;
+  gboolean retval_async;
+
   g_return_val_if_fail(h, FALSE);
 
+  if(HANDLE_TRYLOCK(h) != 0) 
+    return FALSE;/* async data on already locked handle? Don't try again. */
   if(ASYNC_DEBUG) printf("async_process() ENTER\n");
   if(h->state == IMHS_DISCONNECTED) {
     if(ASYNC_DEBUG) printf("async_process() on disconnected\n");
+    HANDLE_UNLOCK(h);
     return FALSE;
   }
   if( (condition & G_IO_HUP) == G_IO_HUP) {
       imap_handle_disconnect(h);
+      HANDLE_UNLOCK(h);
       return FALSE;
   }
 
@@ -371,6 +377,7 @@ async_process(GIOChannel *source, GIOCondition condition, gpointer data)
              "Last message was: \"%s\" - shutting down connection.\n",
              rc, h->last_msg);
       imap_handle_disconnect(h);
+      HANDLE_UNLOCK(h);
       return FALSE;
     }
     async_cmd = cmdi_get_pending(h->cmd_info);
@@ -391,7 +398,9 @@ async_process(GIOChannel *source, GIOCondition condition, gpointer data)
     printf("async_process() sio: %d rc: %d returns %d (%d cmds in queue)\n",
            retval, rc, !h->idle_issued && async_cmd == 0,
            g_list_length(h->cmd_info));
-  return h->idle_issued || async_cmd != 0;
+  retval_async = h->idle_issued || async_cmd != 0;
+  HANDLE_UNLOCK(h);
+  return retval_async;
 }
 
 static gboolean
@@ -661,6 +670,9 @@ imap_timeout_cb(void *arg)
   ImapMboxHandle *h = (ImapMboxHandle*)arg;
   int ok = 1;
 
+  /* No reason to lock the handle here: if we get here, we have
+     already been performing some operation and keep the handle
+     locked. */
   if(h->user_cb) {
     h->user_cb(IME_TIMEOUT, h->user_arg, &ok);
     if(ok) {
@@ -678,6 +690,7 @@ imap_mbox_connect(ImapMboxHandle* handle)
   static const int SIO_BUFSZ=8192;
   ImapResponse resp;
   const char *service = "imap";
+  HANDLE_LOCK(handle);
 
   /* reset some handle status */
   handle->op_cancelled = FALSE;
@@ -695,12 +708,16 @@ imap_mbox_connect(ImapMboxHandle* handle)
 #endif
 
   handle->sd = imap_socket_open(handle->host, service);
-  if(handle->sd<0) return IMAP_CONNECT_FAILED;
+  if(handle->sd<0) {
+    HANDLE_UNLOCK(handle);
+    return IMAP_CONNECT_FAILED;
+  }
   
   /* Add buffering to the socket */
   handle->sio = sio_attach(handle->sd, handle->sd, SIO_BUFSZ);
   if (handle->sio == NULL) {
     close(handle->sd);
+    HANDLE_UNLOCK(handle);
     return IMAP_NOMEM;
   }
   if(handle->timeout>0) {
@@ -712,6 +729,7 @@ imap_mbox_connect(ImapMboxHandle* handle)
     SSL *ssl = imap_create_ssl();
     if(!ssl) {
       imap_mbox_handle_set_msg(handle,"SSL context could not be created");
+      HANDLE_UNLOCK(handle);
       return IMAP_UNSECURE;
     }
     if(imap_setup_ssl(handle->sio, handle->host, ssl,
@@ -720,6 +738,7 @@ imap_mbox_connect(ImapMboxHandle* handle)
     else {
       imap_mbox_handle_set_msg(handle,"SSL negotiation failed");
       imap_handle_disconnect(handle);
+      HANDLE_UNLOCK(handle);
       return IMAP_UNSECURE;
     }
   }
@@ -732,6 +751,7 @@ imap_mbox_connect(ImapMboxHandle* handle)
     g_message("imap_mbox_connect:unexpected initial response(%d):\n%s\n",
 	      resp, handle->last_msg);
     imap_handle_disconnect(handle);
+    HANDLE_UNLOCK(handle);
     return IMAP_PROTOCOL_ERROR;
   }
   handle->can_fetch_body = 
@@ -743,6 +763,7 @@ imap_mbox_connect(ImapMboxHandle* handle)
           imap_mbox_handle_can_do(handle, IMCAP_STARTTLS)) {
     if( imap_handle_starttls(handle) != IMR_OK) {
       imap_mbox_handle_set_msg(handle,"TLS negotiation failed");
+      HANDLE_UNLOCK(handle);
       return IMAP_UNSECURE; /* TLS negotiation error */
     }
     resp = IMR_OK; /* secured with TLS */
@@ -753,8 +774,10 @@ imap_mbox_connect(ImapMboxHandle* handle)
 #endif
   if(handle->tls_mode == IMAP_TLS_REQUIRED && resp != IMR_OK) {
     imap_mbox_handle_set_msg(handle,"TLS required but not available");
+    HANDLE_UNLOCK(handle);
     return IMAP_UNSECURE;
   }
+  HANDLE_UNLOCK(handle);
   return IMAP_SUCCESS;
 }
 
@@ -860,15 +883,20 @@ imap_mbox_handle_get_delim(ImapMboxHandle* handle,
                            const char *namespace)
 {
   int delim;
-  /* FIXME: block other list response signals here? */
-  guint handler_id = g_signal_connect(G_OBJECT(handle), "list-response",
-                                      G_CALLBACK(get_delim),
-                                       &delim);
+  guint handler_id;
+  gchar * cmd;
 
-  gchar * cmd = g_strdup_printf("LIST \"%s\" \"\"", namespace);
+  HANDLE_LOCK(handle);
+  /* FIXME: block other list response signals here? */
+  handler_id = g_signal_connect(G_OBJECT(handle), "list-response",
+				G_CALLBACK(get_delim),
+				&delim);
+
+  cmd = g_strdup_printf("LIST \"%s\" \"\"", namespace);
   imap_cmd_exec(handle, cmd);
   g_free(cmd);
   g_signal_handler_disconnect(G_OBJECT(handle), handler_id);
+  HANDLE_UNLOCK(handle);
   return delim;
 
 }

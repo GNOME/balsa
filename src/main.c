@@ -812,8 +812,6 @@ main(int argc, char *argv[])
     balsa_app.main_window = BALSA_WINDOW(window);
     g_object_add_weak_pointer(G_OBJECT(window),
 			      (gpointer) &balsa_app.main_window);
-    g_signal_connect(G_OBJECT(window), "destroy",
-                     G_CALLBACK(balsa_cleanup), NULL);
 
     /* load mailboxes */
     config_load_sections();
@@ -873,6 +871,8 @@ main(int argc, char *argv[])
     gdk_threads_enter();
     gtk_main();
     gdk_threads_leave();
+
+    balsa_cleanup();
     accel_map_save();
 
 #ifdef BALSA_USE_THREADS

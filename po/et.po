@@ -1,4 +1,4 @@
-# Balsa eesti keele t�lge.
+# Balsa eesti keele tõlge.
 # Estonian translation of balsa
 #
 # Copyright (C) 2005 Free Software Foundation, Inc.
@@ -16,7 +16,7 @@ msgstr ""
 "Last-Translator: Olle Niit <olle@paalalinn.com>\n"
 "Language-Team:  <gnome-et@linux.ee>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=ISO-8859-15\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: KBabel 1.9.1\n"
@@ -45,7 +45,7 @@ msgstr "Nimetu"
 
 #: ../libbalsa/address-book-ldap.c:275
 msgid "TLS requested but not compiled in"
-msgstr "Nõutakse TSL-i aga seda pole programmi sisse kompileeritud"
+msgstr "NÃµutakse TSL-i aga seda pole programmi sisse kompileeritud"
 
 #: ../libbalsa/address-book.c:301 ../libbalsa/filter-error.c:45
 msgid "No error"
@@ -61,7 +61,7 @@ msgstr "Aadressiraamatusse ei saa kirjutada"
 
 #: ../libbalsa/address-book.c:304
 msgid "Cannot connect to server"
-msgstr "Ei saa serveriga ühendust"
+msgstr "Ei saa serveriga ÃŒhendust"
 
 #: ../libbalsa/address-book.c:305
 msgid "Cannot search in the address book"
@@ -83,7 +83,7 @@ msgstr "Tundmatu viga"
 
 #: ../libbalsa/address.c:436
 msgid "_Displayed Name:"
-msgstr "_Näidatav nimi:"
+msgstr "_NÃ€idatav nimi:"
 
 #: ../libbalsa/address.c:437
 msgid "_First Name:"
@@ -95,7 +95,7 @@ msgstr "_Perekonnanimi:"
 
 #: ../libbalsa/address.c:439
 msgid "_Nickname:"
-msgstr "_Hüüdnimi:"
+msgstr "_HÃŒÃŒdnimi:"
 
 #: ../libbalsa/address.c:440
 msgid "O_rganization:"
@@ -117,19 +117,19 @@ msgstr "Ava %s-ga"
 
 #: ../libbalsa/filter-error.c:46
 msgid "Syntax error in the filter configuration file"
-msgstr "Süntaksiviga filtri häälestusfailis"
+msgstr "SÃŒntaksiviga filtri hÃ€Ã€lestusfailis"
 
 #: ../libbalsa/filter-error.c:47
 msgid "Unable to allocate memory"
-msgstr "Võimatu jaotada mälu"
+msgstr "VÃµimatu jaotada mÃ€lu"
 
 #: ../libbalsa/filter-error.c:48
 msgid "Error in regular expression syntax"
-msgstr "Tavalise avaldise süntaksiviga"
+msgstr "Tavalise avaldise sÃŒntaksiviga"
 
 #: ../libbalsa/filter-error.c:49
 msgid "Attempt to apply an invalid filter"
-msgstr "Üritasid rakendada vigast filtrit"
+msgstr "Ãritasid rakendada vigast filtrit"
 
 #: ../libbalsa/filter-file.c:141
 #, c-format
@@ -158,12 +158,12 @@ msgstr "Viga meili kopeerimisel: %s"
 #: ../libbalsa/filter.c:293
 #, c-format
 msgid "Error when trashing messages: %s"
-msgstr "Viga prügikasti tõstmisel: %s"
+msgstr "Viga prÃŒgikasti tÃµstmisel: %s"
 
 #: ../libbalsa/filter.c:306
 #, c-format
 msgid "Error when moving messages: %s"
-msgstr "Viga meilide ümbertõstmisel: %s"
+msgstr "Viga meilide ÃŒmbertÃµstmisel: %s"
 
 #: ../libbalsa/gmime-application-pkcs7.c:237
 #: ../libbalsa/gmime-application-pkcs7.c:380
@@ -301,7 +301,7 @@ msgstr "_Isiku nimi:"
 
 #: ../libbalsa/identity.c:856
 msgid "_Full Name:"
-msgstr "_Täispikk nimi:"
+msgstr "_TÃ€ispikk nimi:"
 
 #: ../libbalsa/identity.c:858
 msgid "_Mailing Address:"
@@ -326,7 +326,7 @@ msgstr "Vaikimisi Bcc saaja:"
 
 #: ../libbalsa/identity.c:868
 msgid "F_orward String:"
-msgstr "_Edasta tekstilõik:"
+msgstr "_Edasta tekstilÃµik:"
 
 #: ../libbalsa/identity.c:871
 msgid "SMT_P Server"
@@ -343,7 +343,7 @@ msgstr "Allkirja _Tee:"
 
 #: ../libbalsa/identity.c:881
 msgid "_Execute Signature"
-msgstr "_Käivita Allkiri"
+msgstr "_KÃ€ivita Allkiri"
 
 #: ../libbalsa/identity.c:884
 msgid "Incl_ude Signature"
@@ -377,7 +377,7 @@ msgstr ""
 
 #: ../libbalsa/identity.c:907
 msgid "encrypt messages by default"
-msgstr "krüpteeri sõnum vaikimisi"
+msgstr "krÃŒpteeri sÃµnum vaikimisi"
 
 #: ../libbalsa/identity.c:910
 msgid "default protocol"
@@ -467,7 +467,7 @@ msgstr ""
 
 #: ../libbalsa/libbalsa.c:391
 msgid "Invalid date"
-msgstr "Vigane kuupäev"
+msgstr "Vigane kuupÃ€ev"
 
 #: ../libbalsa/libbalsa.c:407 ../src/pref-manager.c:1206
 #: ../src/pref-manager.c:1301
@@ -522,7 +522,7 @@ msgstr "Ei saa luua postkasti '%s' : %s\n"
 #: ../libbalsa/mailbox.c:397
 #, fuzzy, c-format
 msgid "No such mailbox type: %s"
-msgstr "Uue postikasti tüüp:"
+msgstr "Uue postikasti tÃŒÃŒp:"
 
 #: ../libbalsa/mailbox.c:414
 #, fuzzy, c-format
@@ -595,12 +595,12 @@ msgstr "Serveripoolne seostamine ei ole toetatud."
 #: ../libbalsa/mailbox_local.c:1450
 #, c-format
 msgid "Open of %s failed. Errno = %d, "
-msgstr "%s avamine ebaõnnestus. Viga = %d"
+msgstr "%s avamine ebaÃµnnestus. Viga = %d"
 
 #: ../libbalsa/mailbox_local.c:1472
 #, c-format
 msgid "Failed to sync mailbox \"%s\""
-msgstr "Ebaõnnestus sünkroniseerimine meilikastiga \"%s\""
+msgstr "EbaÃµnnestus sÃŒnkroniseerimine meilikastiga \"%s\""
 
 #: ../libbalsa/mailbox_maildir.c:205
 #, c-format
@@ -696,7 +696,7 @@ msgstr "\"%s\" ei ole kehtiva postkasti nimi."
 #: ../libbalsa/mailbox_mh.c:194
 #, fuzzy, c-format
 msgid "Could not create MH directory at %s (%s)"
-msgstr "Ei suutnud luua kataloogi: mkdir() rajaga \"%s\" ei õnnestunud."
+msgstr "Ei suutnud luua kataloogi: mkdir() rajaga \"%s\" ei Ãµnnestunud."
 
 #: ../libbalsa/mailbox_mh.c:201
 #, c-format
@@ -709,7 +709,7 @@ msgstr "Ei suuda meili luua"
 
 #: ../libbalsa/mailbox_mh.c:1140
 msgid "Message rename error"
-msgstr "Viga meili ümbernimetamisel"
+msgstr "Viga meili ÃŒmbernimetamisel"
 
 #: ../libbalsa/mailbox_pop3.c:204
 #, c-format
@@ -724,22 +724,22 @@ msgstr "Viga meili lisamisel %d from %s to %s: %s"
 #: ../libbalsa/mailbox_pop3.c:380
 #, c-format
 msgid "Retrieving Message %d of %d"
-msgstr "Vastu võetud %d %d-st"
+msgstr "Vastu vÃµetud %d %d-st"
 
 #: ../libbalsa/mailbox_pop3.c:403
 #, c-format
 msgid "Received %ld kB of %ld"
-msgstr "Vastu võetud %ld kB %ld-st"
+msgstr "Vastu vÃµetud %ld kB %ld-st"
 
 #: ../libbalsa/mailbox_pop3.c:417
 #, c-format
 msgid "Saving POP message to %s failed."
-msgstr "POP maili salvestamine ebaõnnestus %s."
+msgstr "POP maili salvestamine ebaÃµnnestus %s."
 
 #: ../libbalsa/mailbox_pop3.c:427
 #, c-format
 msgid "Transfering POP message to %s failed."
-msgstr "POP kirja saatmine ebaõnnestus aadressile %s."
+msgstr "POP kirja saatmine ebaÃµnnestus aadressile %s."
 
 #: ../libbalsa/mailbox_pop3.c:508 ../libbalsa/mailbox_pop3.c:519
 #, c-format
@@ -820,7 +820,7 @@ msgstr ""
 #: ../libbalsa/misc.c:1253
 #, fuzzy
 msgid "turkish"
-msgstr "Prügikast:"
+msgstr "PrÃŒgikast:"
 
 #: ../libbalsa/misc.c:1255
 msgid "nordic"
@@ -935,7 +935,7 @@ msgstr "saates kirja"
 #: ../libbalsa/rfc3156.c:799
 #, fuzzy
 msgid "encryption failed"
-msgstr "Trükkimise käsklus:"
+msgstr "TrÃŒkkimise kÃ€sklus:"
 
 #: ../libbalsa/rfc3156.c:552 ../libbalsa/rfc3156.c:557
 #: ../libbalsa/rfc3156.c:875 ../libbalsa/rfc3156.c:881
@@ -1272,7 +1272,7 @@ msgstr "saates kirja"
 #: ../libbalsa/send.c:247 ../src/main-window.c:2685
 #, fuzzy
 msgid "_Hide"
-msgstr "Päis"
+msgstr "PÃ€is"
 
 #: ../libbalsa/send.c:838
 #, c-format
@@ -1285,7 +1285,7 @@ msgstr ""
 #: ../libbalsa/send.c:884
 #, fuzzy, c-format
 msgid "Saving sent message to %s failed: %s"
-msgstr "Jätka kirjutamist"
+msgstr "JÃ€tka kirjutamist"
 
 #: ../libbalsa/send.c:903
 #, c-format
@@ -1294,9 +1294,9 @@ msgid ""
 "%d: %s\n"
 "Message left in your outbox.\n"
 msgstr ""
-"Server keeldus kirja vastu võtmast:\n"
+"Server keeldus kirja vastu vÃµtmast:\n"
 "%d: %s\n"
-"Meil jäi sinu Saatmisel meilikasti.\n"
+"Meil jÃ€i sinu Saatmisel meilikasti.\n"
 
 #: ../libbalsa/send.c:913
 msgid ""
@@ -1346,7 +1346,7 @@ msgstr ""
 
 #: ../libbalsa/send.c:1291
 msgid "Message left in Outbox (try again later)"
-msgstr "Meil jäi Saatmisel meilikasti (proovi hiljem uuesti)"
+msgstr "Meil jÃ€i Saatmisel meilikasti (proovi hiljem uuesti)"
 
 #: ../libbalsa/send.c:1295
 #, c-format
@@ -1379,16 +1379,16 @@ msgstr "Ei kunagi"
 #: ../libbalsa/smtp-server.c:349 ../src/mailbox-conf.c:199
 #: ../src/mailbox-conf.c:1361
 msgid "If Possible"
-msgstr "Kui võimalik"
+msgstr "Kui vÃµimalik"
 
 #: ../libbalsa/smtp-server.c:350 ../src/mailbox-conf.c:200
 msgid "Required"
-msgstr "Nõutud"
+msgstr "NÃµutud"
 
 #: ../libbalsa/smtp-server.c:387 ../src/folder-conf.c:104
 #, c-format
 msgid "Error displaying %s: %s\n"
-msgstr "Viga %s: näitamisel %s\n"
+msgstr "Viga %s: nÃ€itamisel %s\n"
 
 #: ../libbalsa/smtp-server.c:484
 #, fuzzy
@@ -1469,7 +1469,7 @@ msgstr "Kirja algtekst"
 
 #: ../libinit_balsa/balsa-druid-page-defclient.c:58
 msgid "Use balsa as default email client?"
-msgstr "Kas eelistatud meililugejana võtame kasutusele balsa?"
+msgstr "Kas eelistatud meililugejana vÃµtame kasutusele balsa?"
 
 #: ../libinit_balsa/balsa-druid-page-defclient.c:62
 msgid "_Yes"
@@ -1501,7 +1501,7 @@ msgstr "Mustandid:"
 
 #: ../libinit_balsa/balsa-druid-page-directory.c:44
 msgid "_Trash:"
-msgstr "_Prügikast:"
+msgstr "_PrÃŒgikast:"
 
 #: ../libinit_balsa/balsa-druid-page-directory.c:71
 #, c-format
@@ -1542,7 +1542,7 @@ msgid ""
 "You've successfully set up Balsa. Have fun!\n"
 "   -- The Balsa development team"
 msgstr ""
-"Teie Balsa paigaldamine õnnestus. Edu ka edaspidiseks!\n"
+"Teie Balsa paigaldamine Ãµnnestus. Edu ka edaspidiseks!\n"
 "  -- Balsa arendusmeeskond"
 
 #: ../libinit_balsa/balsa-druid-page-finish.c:47
@@ -1575,11 +1575,11 @@ msgstr ""
 
 #: ../libinit_balsa/balsa-druid-page-user.c:82
 msgid "Yes, remember it"
-msgstr "Jah, jäta meelde"
+msgstr "Jah, jÃ€ta meelde"
 
 #: ../libinit_balsa/balsa-druid-page-user.c:82
 msgid "No, type it in every time"
-msgstr "Ei, trükin alati ise"
+msgstr "Ei, trÃŒkin alati ise"
 
 #: ../libinit_balsa/balsa-druid-page-user.c:114
 msgid "Name of mail server for incoming _mail:"
@@ -1587,11 +1587,11 @@ msgstr "Saabuvate kirjade _meiliserveri nimi:"
 
 #: ../libinit_balsa/balsa-druid-page-user.c:119
 msgid "_Type of mail server:"
-msgstr "Meiliserveri _Tüüp:"
+msgstr "Meiliserveri _TÃŒÃŒp:"
 
 #: ../libinit_balsa/balsa-druid-page-user.c:123
 msgid "Connect using _SSL:"
-msgstr "Turvalisem _SSL ühendus:"
+msgstr "Turvalisem _SSL ÃŒhendus:"
 
 #: ../libinit_balsa/balsa-druid-page-user.c:126
 msgid "Your email _login name:"
@@ -1617,7 +1617,7 @@ msgstr "Sinu meiliaadress:"
 
 #: ../libinit_balsa/balsa-druid-page-user.c:153
 msgid "_Remember your password:"
-msgstr "_Jäta parool meelde:"
+msgstr "_JÃ€ta parool meelde:"
 
 #: ../libinit_balsa/balsa-druid-page-user.c:156
 msgid "_Refer to this account as:"
@@ -1655,12 +1655,12 @@ msgid ""
 "-- or your Network Administrator at your place of work/study/similar may "
 "have set up your computer to connect to the network."
 msgstr ""
-"Enne kui sa saad meili saata või vastu võtta:\n"
+"Enne kui sa saad meili saata vÃµi vastu vÃµtta:\n"
 "\n"
-"-- Peab sul olema juba töötav internetiühendus. Ka meili kasutajakonto "
+"-- Peab sul olema juba tÃ¶Ã¶tav internetiÃŒhendus. Ka meili kasutajakonto "
 "peab juba tehtud olema.\n"
 "\n"
-"-- On sinu arvutivõrgu administraator sinu arvuti internetiühenduse jaoks "
+"-- On sinu arvutivÃµrgu administraator sinu arvuti internetiÃŒhenduse jaoks "
 "valmis seadnud. "
 
 #: ../libinit_balsa/balsa-initdruid.c:81
@@ -1668,8 +1668,8 @@ msgid ""
 "This will exit Balsa.\n"
 "Do you really want to do this?"
 msgstr ""
-"See lõpetab Balsa.\n"
-"Kas sa tõesti tahad seda?"
+"See lÃµpetab Balsa.\n"
+"Kas sa tÃµesti tahad seda?"
 
 #: ../libinit_balsa/helper.c:66
 #, c-format
@@ -1679,12 +1679,12 @@ msgstr "Viga laadimisel %s: %s\n"
 #: ../libinit_balsa/helper.c:202
 #, c-format
 msgid "The path %s must be relative to the filesystem root (start with /)."
-msgstr "Rada %s peab algama failisüsteemi algusest (algama / märgiga)."
+msgstr "Rada %s peab algama failisÃŒsteemi algusest (algama / mÃ€rgiga)."
 
 #: ../libinit_balsa/helper.c:215 ../libinit_balsa/helper.c:239
 #, c-format
 msgid "Couldn't create a directory: mkdir() failed on pathname \"%s\"."
-msgstr "Ei suutnud luua kataloogi: mkdir() rajaga \"%s\" ei õnnestunud."
+msgstr "Ei suutnud luua kataloogi: mkdir() rajaga \"%s\" ei Ãµnnestunud."
 
 #: ../libinit_balsa/helper.c:225 ../libinit_balsa/helper.c:248
 #, c-format
@@ -1693,7 +1693,7 @@ msgstr "Rada \"%s\" ei ole kataloog."
 
 #: ../libinit_balsa/init_balsa.c:48
 msgid "Configure Balsa"
-msgstr "Balsa häälestus"
+msgstr "Balsa hÃ€Ã€lestus"
 
 #: ../sounds/balsa.soundlist.in.h:1
 msgid "Balsa E-mail reader"
@@ -1702,7 +1702,7 @@ msgstr "Balsa meililugeja"
 #: ../sounds/balsa.soundlist.in.h:2
 #, fuzzy
 msgid "New mail notification"
-msgstr "Märguanne:"
+msgstr "MÃ€rguanne:"
 
 #: ../sounds/balsa.soundlist.in.h:3
 msgid "Program startup"
@@ -1755,7 +1755,7 @@ msgstr "E-posti aadress:"
 #. Entry widget for finding an address
 #: ../src/ab-window.c:263
 msgid "_Search for Name:"
-msgstr "_Otsi nime järgi:"
+msgstr "_Otsi nime jÃ€rgi:"
 
 #: ../src/ab-window.c:323
 msgid "Send-To"
@@ -1773,7 +1773,7 @@ msgstr "Impordi uuesti"
 #. mode switching stuff
 #: ../src/ab-window.c:360
 msgid "Treat multiple addresses as:"
-msgstr "Käsitle mitut aadressi kui:"
+msgstr "KÃ€sitle mitut aadressi kui:"
 
 #: ../src/ab-window.c:364
 msgid "alternative addresses for the same person"
@@ -1863,7 +1863,7 @@ msgstr ""
 #: ../src/address-book-config.c:542 ../src/main-window.c:3949
 #, fuzzy, c-format
 msgid "Error displaying help: %s\n"
-msgstr "Viga lpr käivitamisel"
+msgstr "Viga lpr kÃ€ivitamisel"
 
 #: ../src/address-book-config.c:643
 msgid "No path found.  Do you want to give one?"
@@ -1925,7 +1925,7 @@ msgstr "Teema"
 
 #: ../src/balsa-index.c:384 ../src/pref-manager.c:369
 msgid "Date"
-msgstr "Kuupäev"
+msgstr "KuupÃ€ev"
 
 #: ../src/balsa-index.c:396 ../src/pref-manager.c:370
 #: ../src/sendmsg-window.c:2823
@@ -1940,7 +1940,7 @@ msgstr ""
 #: ../src/balsa-index.c:1616
 #, fuzzy, c-format
 msgid "Move to Trash failed: %s"
-msgstr "%s avamine ebaõnnestus: %s"
+msgstr "%s avamine ebaÃµnnestus: %s"
 
 #. R
 #: ../src/balsa-index.c:1770 ../src/main-window.c:584
@@ -1952,7 +1952,7 @@ msgstr "Vasta"
 #: ../src/balsa-index.c:1772
 #, fuzzy
 msgid "Reply To _All..."
-msgstr "Vasta kõigile"
+msgstr "Vasta kÃµigile"
 
 #: ../src/balsa-index.c:1774
 #, fuzzy
@@ -1992,7 +1992,7 @@ msgstr "Taasta"
 
 #: ../src/balsa-index.c:1807
 msgid "Move To _Trash"
-msgstr "Tõsta _Prügikasti"
+msgstr "TÃµsta _PrÃŒgikasti"
 
 #: ../src/balsa-index.c:1811
 #, fuzzy
@@ -2039,7 +2039,7 @@ msgstr ""
 #: ../src/balsa-index.c:2250
 #, fuzzy, c-format
 msgid "Committing mailbox %s failed."
-msgstr "Ühtegi postkasti pole valitud."
+msgstr "Ãhtegi postkasti pole valitud."
 
 #: ../src/balsa-index.c:2423
 msgid "Pipe message through a program"
@@ -2105,7 +2105,7 @@ msgstr "Valige kasutatav font"
 #: ../src/balsa-message.c:381
 #, fuzzy
 msgid "Content"
-msgstr "Jätka"
+msgstr "JÃ€tka"
 
 #: ../src/balsa-message.c:460
 #, fuzzy
@@ -2115,17 +2115,17 @@ msgstr "Kiri"
 #: ../src/balsa-message.c:643
 #, fuzzy
 msgid "Save selected as..."
-msgstr "Ühtegi postkasti pole valitud."
+msgstr "Ãhtegi postkasti pole valitud."
 
 #: ../src/balsa-message.c:650
 #, fuzzy
 msgid "Save selected to folder..."
-msgstr "Ühtegi postkasti pole valitud."
+msgstr "Ãhtegi postkasti pole valitud."
 
 #: ../src/balsa-message.c:788
 #, fuzzy
 msgid "(No sender)"
-msgstr "Päis"
+msgstr "PÃ€is"
 
 #: ../src/balsa-message.c:856
 #, fuzzy, c-format
@@ -2147,11 +2147,11 @@ msgstr "allkirjastatud osad"
 
 #: ../src/balsa-message.c:1044
 msgid "encrypted parts"
-msgstr "krüpteeritud osad"
+msgstr "krÃŒpteeritud osad"
 
 #: ../src/balsa-message.c:1046
 msgid "rfc822 message"
-msgstr "rfc822 sõnum"
+msgstr "rfc822 sÃµnum"
 
 #: ../src/balsa-message.c:1048
 #, c-format
@@ -2165,7 +2165,7 @@ msgstr ""
 
 #: ../src/balsa-message.c:1108
 msgid "complete message"
-msgstr "lõpeta sõnum"
+msgstr "lÃµpeta sÃµnum"
 
 #: ../src/balsa-message.c:1125
 #, c-format
@@ -2179,7 +2179,7 @@ msgstr "osa %s: %s"
 
 #: ../src/balsa-message.c:1151
 msgid "encrypted: "
-msgstr "krüpteeritud: "
+msgstr "krÃŒpteeritud: "
 
 #: ../src/balsa-message.c:1254 ../src/balsa-mime-widget-text.c:344
 #: ../src/balsa-mime-widget-text.c:649
@@ -2224,7 +2224,7 @@ msgstr ""
 #: ../src/balsa-message.c:2519
 #, fuzzy, c-format
 msgid "Parsing a message part failed: %s"
-msgstr "Jätka kirjutamist"
+msgstr "JÃ€tka kirjutamist"
 
 #: ../src/balsa-message.c:2323 ../src/balsa-message.c:2405
 #: ../src/balsa-message.c:2520
@@ -2277,7 +2277,7 @@ msgstr "S/MIME"
 
 #: ../src/balsa-message.c:2455 ../src/balsa-message.c:2577
 msgid "Detected a good signature"
-msgstr "Kirjal on usaldusväärne allkiri"
+msgstr "Kirjal on usaldusvÃ€Ã€rne allkiri"
 
 #: ../src/balsa-message.c:2461
 #, fuzzy
@@ -2321,35 +2321,35 @@ msgstr ""
 
 #: ../src/filter-edit-callbacks.c:311
 msgid "One of the specified fields contains:"
-msgstr "Üks valitud väljadest sisaldab:"
+msgstr "Ãks valitud vÃ€ljadest sisaldab:"
 
 #: ../src/filter-edit-callbacks.c:312
 msgid "None of the specified fields contains:"
-msgstr "Ükski valitud väljadest ei sisalda:"
+msgstr "Ãkski valitud vÃ€ljadest ei sisalda:"
 
 #: ../src/filter-edit-callbacks.c:314
 msgid "One of the regular expressions matches"
-msgstr "Üks lihtne avaldis sobis"
+msgstr "Ãks lihtne avaldis sobis"
 
 #: ../src/filter-edit-callbacks.c:315
 msgid "None of the regular expressions matches"
-msgstr "Ükski lihtsatest avaldistest ei sobinud"
+msgstr "Ãkski lihtsatest avaldistest ei sobinud"
 
 #: ../src/filter-edit-callbacks.c:317
 msgid "Match when date is in the interval:"
-msgstr "Sobib kui kuupäev jääb ajavahemikku:"
+msgstr "Sobib kui kuupÃ€ev jÃ€Ã€b ajavahemikku:"
 
 #: ../src/filter-edit-callbacks.c:318
 msgid "Match when date is outside the interval:"
-msgstr "Sobib kui kuupäev on väljapool ajavahemikku:"
+msgstr "Sobib kui kuupÃ€ev on vÃ€ljapool ajavahemikku:"
 
 #: ../src/filter-edit-callbacks.c:320 ../src/filter-edit-callbacks.c:1070
 msgid "Match when one of these flags is set:"
-msgstr "Sobib kui üks nendest lippudest on püsti:"
+msgstr "Sobib kui ÃŒks nendest lippudest on pÃŒsti:"
 
 #: ../src/filter-edit-callbacks.c:321
 msgid "Match when none of these flags is set:"
-msgstr "Sobib kui ükski nendest lippudest pole püsti:"
+msgstr "Sobib kui ÃŒkski nendest lippudest pole pÃŒsti:"
 
 #: ../src/filter-edit-callbacks.c:512
 msgid "You must specify the name of the user header to match on"
@@ -2357,11 +2357,11 @@ msgstr ""
 
 #: ../src/filter-edit-callbacks.c:523
 msgid "You must specify at least one field for matching"
-msgstr "Sa pead vähemalt ühe välja sobivuse kontrolliks valima"
+msgstr "Sa pead vÃ€hemalt ÃŒhe vÃ€lja sobivuse kontrolliks valima"
 
 #: ../src/filter-edit-callbacks.c:533
 msgid "You must provide a string"
-msgstr "Sa pead ette andma tekstilõigu"
+msgstr "Sa pead ette andma tekstilÃµigu"
 
 #: ../src/filter-edit-callbacks.c:540
 msgid "You must provide at least one regular expression"
@@ -2369,15 +2369,15 @@ msgstr ""
 
 #: ../src/filter-edit-callbacks.c:552
 msgid "Low date is incorrect"
-msgstr "Alguskuupäev on ebakorrektne"
+msgstr "AlguskuupÃ€ev on ebakorrektne"
 
 #: ../src/filter-edit-callbacks.c:563
 msgid "High date is incorrect"
-msgstr "Lõpukuupäev on ebakorrektne"
+msgstr "LÃµpukuupÃ€ev on ebakorrektne"
 
 #: ../src/filter-edit-callbacks.c:571
 msgid "Low date is greater than high date"
-msgstr "Alguskuupäev on uuem hilisem kui lõpukuupäev"
+msgstr "AlguskuupÃ€ev on uuem hilisem kui lÃµpukuupÃ€ev"
 
 #: ../src/filter-edit-callbacks.c:841
 #, c-format
@@ -2391,7 +2391,7 @@ msgstr "Postifailid"
 
 #: ../src/filter-edit-callbacks.c:892
 msgid "_All"
-msgstr "_Kõik"
+msgstr "_KÃµik"
 
 #: ../src/filter-edit-callbacks.c:893
 msgid "C_lear"
@@ -2421,7 +2421,7 @@ msgstr "_Cc:"
 
 #: ../src/filter-edit-callbacks.c:901
 msgid "_User header:"
-msgstr "_Kasuta päist:"
+msgstr "_Kasuta pÃ€ist:"
 
 #: ../src/filter-edit-callbacks.c:931
 msgid "Unread"
@@ -2441,7 +2441,7 @@ msgstr "Lipuga"
 
 #: ../src/filter-edit-callbacks.c:946
 msgid "One of the specified f_ields contains"
-msgstr "Üks valitud _väljadest sisaldab"
+msgstr "Ãks valitud _vÃ€ljadest sisaldab"
 
 #: ../src/filter-edit-callbacks.c:961
 msgid "Contain/Does _Not Contain"
@@ -2449,7 +2449,7 @@ msgstr "Sisaldab/_Ei sisalda"
 
 #: ../src/filter-edit-callbacks.c:980
 msgid "_One of the regular expressions matches"
-msgstr "_Üks tavaline avaldis sobib"
+msgstr "_Ãks tavaline avaldis sobib"
 
 #. Right/Add button
 #: ../src/filter-edit-callbacks.c:1007 ../src/filter-run-dialog.c:327
@@ -2464,16 +2464,16 @@ msgstr "_Eemalda"
 
 #: ../src/filter-edit-callbacks.c:1015
 msgid "One _Matches/None Matches"
-msgstr "Üks _sobib/Ükski ei sobi"
+msgstr "Ãks _sobib/Ãkski ei sobi"
 
 #: ../src/filter-edit-callbacks.c:1032
 #, fuzzy
 msgid "Match when message date is in the interval:"
-msgstr "Sobib kui kuupäev jääb ajavahemikku:"
+msgstr "Sobib kui kuupÃ€ev jÃ€Ã€b ajavahemikku:"
 
 #: ../src/filter-edit-callbacks.c:1052
 msgid "Inside/outside the date interval"
-msgstr "Kuupäevade vahemiku sees/väljas"
+msgstr "KuupÃ€evade vahemiku sees/vÃ€ljas"
 
 #: ../src/filter-edit-callbacks.c:1099
 msgid "Match when one flag is set/when no flag is set"
@@ -2481,7 +2481,7 @@ msgstr ""
 
 #: ../src/filter-edit-callbacks.c:1117
 msgid "Search T_ype:"
-msgstr "Otsingu _tüüp:"
+msgstr "Otsingu _tÃŒÃŒp:"
 
 #: ../src/filter-edit-callbacks.c:1191
 msgid "Edit condition for filter: "
@@ -2490,7 +2490,7 @@ msgstr "Redigeeri filtri tingimusi:"
 #: ../src/filter-edit-callbacks.c:1431
 #, c-format
 msgid "Error displaying filter help: %s\n"
-msgstr "Viga filri abiinfo näitamisel: %s\n"
+msgstr "Viga filri abiinfo nÃ€itamisel: %s\n"
 
 #: ../src/filter-edit-callbacks.c:1621
 msgid "New filter"
@@ -2507,7 +2507,7 @@ msgstr "Filter \"%s\" on juba olemas."
 
 #: ../src/filter-edit-callbacks.c:1766
 msgid "Filter must have conditions."
-msgstr "Filtri peab olema tingimus mida täita."
+msgstr "Filtri peab olema tingimus mida tÃ€ita."
 
 #: ../src/filter-edit-callbacks.c:1823
 #, fuzzy
@@ -2516,7 +2516,7 @@ msgstr "Filtri nimi:"
 
 #: ../src/filter-edit-callbacks.c:1848
 msgid "You must provide a sound to play"
-msgstr "Pead valima heli mida mängida"
+msgstr "Pead valima heli mida mÃ€ngida"
 
 #: ../src/filter-edit-callbacks.c:2002
 #, c-format
@@ -2533,7 +2533,7 @@ msgstr "Tavaline avaldis"
 
 #: ../src/filter-edit-dialog.c:91
 msgid "Date interval"
-msgstr "Kuupäeva vahemik"
+msgstr "KuupÃ€eva vahemik"
 
 #: ../src/filter-edit-dialog.c:92
 msgid "Flag condition"
@@ -2545,23 +2545,23 @@ msgstr "Kopeeri kausta:"
 
 #: ../src/filter-edit-dialog.c:97
 msgid "Move to folder:"
-msgstr "Tõsta kausta:"
+msgstr "TÃµsta kausta:"
 
 #: ../src/filter-edit-dialog.c:98
 msgid "Print on printer:"
-msgstr "Trüki printerile:"
+msgstr "TrÃŒki printerile:"
 
 #: ../src/filter-edit-dialog.c:99
 msgid "Run program:"
-msgstr "Käivita programm:"
+msgstr "KÃ€ivita programm:"
 
 #: ../src/filter-edit-dialog.c:100
 msgid "Send to Trash"
-msgstr "Saada prügikasti"
+msgstr "Saada prÃŒgikasti"
 
 #: ../src/filter-edit-dialog.c:104
 msgid "OR"
-msgstr "VÕI"
+msgstr "VÃI"
 
 #: ../src/filter-edit-dialog.c:105
 msgid "AND"
@@ -2595,12 +2595,12 @@ msgstr "_Uus"
 #. The notification area
 #: ../src/filter-edit-dialog.c:348
 msgid "Notification:"
-msgstr "Märguanne:"
+msgstr "MÃ€rguanne:"
 
 #. Notification buttons
 #: ../src/filter-edit-dialog.c:358
 msgid "Play sound:"
-msgstr "Mängi heli:"
+msgstr "MÃ€ngi heli:"
 
 #: ../src/filter-edit-dialog.c:365 ../src/filter-edit-dialog.c:378
 msgid "Use Sound..."
@@ -2661,7 +2661,7 @@ msgstr "Balsa filtrite eksport"
 #: ../src/filter-run-callbacks.c:182
 #, c-format
 msgid "Error displaying run filters help: %s\n"
-msgstr "Tekkis viga filtrijooksutamise abiinfo näitamisel: %s\n"
+msgstr "Tekkis viga filtrijooksutamise abiinfo nÃ€itamisel: %s\n"
 
 #: ../src/filter-run-callbacks.c:230 ../src/filter-run-callbacks.c:252
 msgid "Error when applying filters"
@@ -2687,9 +2687,9 @@ msgid ""
 "mailboxes, it is done by a very slow method; if possible, use substring "
 "match instead."
 msgstr ""
-"Filter \"%s\" ei ühildu \"%s\" tüüpi postkastiga.\n"
-"See juttub näiteks kui kasutad tavalisi väljendeid mis sobivad IMAP "
-"postkastiga. See on väga aeglase meetodiga tehtav. Kui võimalik, kasuta "
+"Filter \"%s\" ei ÃŒhildu \"%s\" tÃŒÃŒpi postkastiga.\n"
+"See juttub nÃ€iteks kui kasutad tavalisi vÃ€ljendeid mis sobivad IMAP "
+"postkastiga. See on vÃ€ga aeglase meetodiga tehtav. Kui vÃµimalik, kasuta "
 "parem alamteksti otsimist."
 
 #: ../src/filter-run-dialog.c:189
@@ -2698,11 +2698,11 @@ msgstr "Balsa postkasti filtrid: "
 
 #: ../src/filter-run-dialog.c:230
 msgid "On reception"
-msgstr "Vastuvõtmisel"
+msgstr "VastuvÃµtmisel"
 
 #: ../src/filter-run-dialog.c:242
 msgid "On exit"
-msgstr "Väljumisel"
+msgstr "VÃ€ljumisel"
 
 #: ../src/filter-run-dialog.c:316
 msgid "Apply Selected"
@@ -2711,7 +2711,7 @@ msgstr ""
 #. up button
 #: ../src/filter-run-dialog.c:364
 msgid "_Up"
-msgstr "Ü_les"
+msgstr "Ã_les"
 
 #. down button
 #: ../src/filter-run-dialog.c:369
@@ -2728,7 +2728,7 @@ msgid ""
 "The filters dialog is opened, close it before you can run filters on any "
 "mailbox"
 msgstr ""
-"Filtrite aken on lahti, sulge see, enne kui saad üheski postkastis filtrit "
+"Filtrite aken on lahti, sulge see, enne kui saad ÃŒheski postkastis filtrit "
 "jooksutama hakata."
 
 #: ../src/folder-conf.c:275
@@ -2751,15 +2751,15 @@ msgstr "_Lihtne"
 
 #: ../src/folder-conf.c:305
 msgid "_Max number of connections"
-msgstr "_Maksimaalne ühenduste arv"
+msgstr "_Maksimaalne ÃŒhenduste arv"
 
 #: ../src/folder-conf.c:312 ../src/mailbox-conf.c:1254
 msgid "Enable _persistent cache"
-msgstr "Luba _püsiv vahemälu"
+msgstr "Luba _pÃŒsiv vahemÃ€lu"
 
 #: ../src/folder-conf.c:320 ../src/mailbox-conf.c:1258
 msgid "Enable _bug workarounds"
-msgstr "Luba _vigade jälgimise masinavärk"
+msgstr "Luba _vigade jÃ€lgimise masinavÃ€rk"
 
 #: ../src/folder-conf.c:327
 msgid "Use STATUS for mailbox checking"
@@ -2797,7 +2797,7 @@ msgstr "ainult _tellitud kataloogid"
 
 #: ../src/folder-conf.c:369
 msgid "Always show _INBOX"
-msgstr "Näita alati _Sisendkasti"
+msgstr "NÃ€ita alati _Sisendkasti"
 
 #: ../src/folder-conf.c:372
 msgid "Pr_efix"
@@ -2819,11 +2819,11 @@ msgstr ""
 
 #: ../src/folder-conf.c:598
 msgid "Question"
-msgstr "Küsimus"
+msgstr "KÃŒsimus"
 
 #: ../src/folder-conf.c:603
 msgid "Rename INBOX"
-msgstr "Nimeta INBOX ümber"
+msgstr "Nimeta INBOX ÃŒmber"
 
 #: ../src/folder-conf.c:605
 msgid "Cancel"
@@ -2832,12 +2832,12 @@ msgstr "Vabandust"
 #: ../src/folder-conf.c:626
 #, c-format
 msgid "Folder rename failed. Reason: %s"
-msgstr "Kataloogi ümbernimetamine ebaõnnestus. Põhjus: %s"
+msgstr "Kataloogi ÃŒmbernimetamine ebaÃµnnestus. PÃµhjus: %s"
 
 #: ../src/folder-conf.c:678
 #, c-format
 msgid "Folder creation failed. Reason: %s"
-msgstr "Kataloogi loomine ebaõnnestus. Põhjus: %s"
+msgstr "Kataloogi loomine ebaÃµnnestus. PÃµhjus: %s"
 
 #: ../src/folder-conf.c:718
 msgid ""
@@ -2857,7 +2857,7 @@ msgstr "_Loo"
 
 #: ../src/folder-conf.c:757
 msgid "Rename or move subfolder"
-msgstr "Alamkataloogi liigutamine või ümbernimetamine"
+msgstr "Alamkataloogi liigutamine vÃµi ÃŒmbernimetamine"
 
 #: ../src/folder-conf.c:758
 msgid "Create subfolder"
@@ -2895,7 +2895,7 @@ msgid ""
 "You may use \"New IMAP Folder\" later to add this folder again.\n"
 msgstr ""
 "See eemaldab kataloogi nimega \"%s\" postkastide nimekirjast\n"
-"Sa võid hiljem kasutada \"Uus IMAP kataloog\" nuppu,\n"
+"Sa vÃµid hiljem kasutada \"Uus IMAP kataloog\" nuppu,\n"
 " et seda postkasti uuesti lisada.\n"
 
 #: ../src/folder-conf.c:828
@@ -2927,7 +2927,7 @@ msgstr "Kasuta _SSL-i"
 
 #: ../src/mailbox-conf.c:352
 msgid "No mailbox selected."
-msgstr "Ühtegi postkasti pole valitud."
+msgstr "Ãhtegi postkasti pole valitud."
 
 #: ../src/mailbox-conf.c:379
 #, c-format
@@ -2947,7 +2947,7 @@ msgid ""
 "What would you like to do?"
 msgstr ""
 "See eemaldab postikasti postikastide nimekirjast\n"
-"Sa võid kasutada \"Lisa postkasti\" nuppu, et seda postkasti taas kasutada\n"
+"Sa vÃµid kasutada \"Lisa postkasti\" nuppu, et seda postkasti taas kasutada\n"
 "Oled sa kindel, et sa tahad seda postkasti eemaldada?"
 
 #: ../src/mailbox-conf.c:401
@@ -2968,7 +2968,7 @@ msgid ""
 "What would you like to do?"
 msgstr ""
 "See eemaldab postikasti postikastide nimekirjast\n"
-"Sa võid kasutada \"Lisa postkasti\" nuppu, et seda postkasti taas kasutada\n"
+"Sa vÃµid kasutada \"Lisa postkasti\" nuppu, et seda postkasti taas kasutada\n"
 "Oled sa kindel, et sa tahad seda postkasti eemaldada?"
 
 #: ../src/mailbox-conf.c:423
@@ -2984,7 +2984,7 @@ msgid ""
 "What would you like to do?"
 msgstr ""
 "See eemaldab postikasti postikastide nimekirjast\n"
-"Sa võid kasutada \"Lisa postkasti\" nuppu, et seda postkasti taas kasutada\n"
+"Sa vÃµid kasutada \"Lisa postkasti\" nuppu, et seda postkasti taas kasutada\n"
 "Oled sa kindel, et sa tahad seda postkasti eemaldada?"
 
 #: ../src/mailbox-conf.c:439
@@ -3011,7 +3011,7 @@ msgstr " on "
 msgid ""
 "Rename of %s to %s failed:\n"
 "%s"
-msgstr "%s avamine ebaõnnestus: %s"
+msgstr "%s avamine ebaÃµnnestus: %s"
 
 #. mailbox name
 #: ../src/mailbox-conf.c:1046 ../src/mailbox-conf.c:1105
@@ -3039,11 +3039,11 @@ msgstr "_Kustuta kirjad serverist peale allalaadimist"
 
 #: ../src/mailbox-conf.c:1137
 msgid "_Filter messages through procmail"
-msgstr "_Filtreeri sõnumeid procmaili abil"
+msgstr "_Filtreeri sÃµnumeid procmaili abil"
 
 #: ../src/mailbox-conf.c:1141
 msgid "Fi_lter Command:"
-msgstr "Fi_ltri käsk:"
+msgstr "Fi_ltri kÃ€sk:"
 
 #: ../src/mailbox-conf.c:1149
 msgid "_Enable check for new mail"
@@ -3060,7 +3060,7 @@ msgstr "_Kasutajanimi:"
 
 #: ../src/mailbox-conf.c:1222
 msgid "_Remember Password"
-msgstr "_Jäta parool meelde"
+msgstr "_JÃ€ta parool meelde"
 
 #: ../src/mailbox-conf.c:1233
 msgid "F_older Path:"
@@ -3072,7 +3072,7 @@ msgstr "Isik:"
 
 #: ../src/mailbox-conf.c:1338
 msgid "Show address:"
-msgstr "Näita aadressi:"
+msgstr "NÃ€ita aadressi:"
 
 #: ../src/mailbox-conf.c:1341
 msgid "_From"
@@ -3106,7 +3106,7 @@ msgstr ""
 #: ../src/mailbox-node.c:433
 #, fuzzy, c-format
 msgid "Scanning of %s failed: %s"
-msgstr "%s avamine ebaõnnestus: %s"
+msgstr "%s avamine ebaÃµnnestus: %s"
 
 #: ../src/mailbox-node.c:482
 #, c-format
@@ -3173,7 +3173,7 @@ msgstr "Saadetud"
 
 #: ../src/mailbox-node.c:1013
 msgid "Mark as _Trash"
-msgstr "Märgi _Prügiks"
+msgstr "MÃ€rgi _PrÃŒgiks"
 
 #: ../src/mailbox-node.c:1015
 #, fuzzy
@@ -3183,7 +3183,7 @@ msgstr "Mustandid"
 #: ../src/mailbox-node.c:1018
 #, fuzzy
 msgid "_Empty trash"
-msgstr "Tühjenda prügikast"
+msgstr "TÃŒhjenda prÃŒgikast"
 
 #: ../src/mailbox-node.c:1023
 msgid "_Edit/Apply filters"
@@ -3206,7 +3206,7 @@ msgstr "Kohalik kaust %s\n"
 
 #: ../src/main-window.c:280
 msgid "Balsa closes files and connections. Please wait..."
-msgstr "Balsa sulgeb faile ja ühendusi. Palun oota..."
+msgstr "Balsa sulgeb faile ja ÃŒhendusi. Palun oota..."
 
 #: ../src/main-window.c:319 ../src/main-window.c:365
 msgid "_Deleted"
@@ -3238,11 +3238,11 @@ msgstr "V_astamata"
 
 #: ../src/main-window.c:346
 msgid "_No Headers"
-msgstr "Päiseid ei _näidata"
+msgstr "PÃ€iseid ei _nÃ€idata"
 
 #: ../src/main-window.c:346
 msgid "Display no headers"
-msgstr "Päiseid ei näidata"
+msgstr "PÃ€iseid ei nÃ€idata"
 
 #: ../src/main-window.c:348
 msgid "S_elected Headers"
@@ -3251,15 +3251,15 @@ msgstr "Tavalin_e kuva"
 #: ../src/main-window.c:349
 #, fuzzy
 msgid "Display selected headers"
-msgstr "Näita kõiki päiseid"
+msgstr "NÃ€ita kÃµiki pÃ€iseid"
 
 #: ../src/main-window.c:351 ../src/message-window.c:90
 msgid "All _Headers"
-msgstr "Näita kõiki _päiseid"
+msgstr "NÃ€ita kÃµiki _pÃ€iseid"
 
 #: ../src/main-window.c:351
 msgid "Display all headers"
-msgstr "Näita kõiki päiseid"
+msgstr "NÃ€ita kÃµiki pÃ€iseid"
 
 #: ../src/main-window.c:360
 msgid "Toggle flagged"
@@ -3281,7 +3281,7 @@ msgstr "Saaja"
 
 #: ../src/main-window.c:392
 msgid "_Message..."
-msgstr "_Sõnum..."
+msgstr "_SÃµnum..."
 
 #: ../src/main-window.c:392 ../src/main-window.c:1041
 msgid "Compose a new message"
@@ -3341,49 +3341,49 @@ msgstr "Lisa uus IMAP alamkataloog"
 
 #: ../src/main-window.c:434
 msgid "_Continue"
-msgstr "_Jätka"
+msgstr "_JÃ€tka"
 
 #: ../src/main-window.c:435
 msgid "Continue editing current message"
-msgstr "Jätka käesoleva sõnumi kirjutamist"
+msgstr "JÃ€tka kÃ€esoleva sÃµnumi kirjutamist"
 
 #. Ctrl-M
 #: ../src/main-window.c:442 ../src/main-window.c:877
 msgid "_Get New Mail"
-msgstr "_Tõmba ära uued sõnumid"
+msgstr "_TÃµmba Ã€ra uued sÃµnumid"
 
 #: ../src/main-window.c:442 ../src/main-window.c:877
 msgid "Fetch new incoming mail"
-msgstr "Tõmba uued sissetulevad kirjad"
+msgstr "TÃµmba uued sissetulevad kirjad"
 
 #. Ctrl-S
 #: ../src/main-window.c:448 ../src/main-window.c:872
 msgid "_Send Queued Mail"
-msgstr "_Saada järjekorras olevad"
+msgstr "_Saada jÃ€rjekorras olevad"
 
 #: ../src/main-window.c:449 ../src/main-window.c:873
 msgid "Send messages from the outbox"
-msgstr "Saada sõnumid väljundkastist"
+msgstr "Saada sÃµnumid vÃ€ljundkastist"
 
 #. Ctrl-B
 #: ../src/main-window.c:455 ../src/main-window.c:867
 msgid "Send and _Receive Mail"
-msgstr "Saada / võta vastu"
+msgstr "Saada / vÃµta vastu"
 
 #: ../src/main-window.c:456 ../src/main-window.c:868
 #: ../src/toolbar-factory.c:113
 msgid "Send and Receive messages"
-msgstr "Saada / võta vastu"
+msgstr "Saada / vÃµta vastu"
 
 #: ../src/main-window.c:461 ../src/main-window.c:882
 #: ../src/sendmsg-window.c:331 ../src/sendmsg-window.c:492
 msgid "_Print..."
-msgstr "_Trüki..."
+msgstr "_TrÃŒki..."
 
 #: ../src/main-window.c:462 ../src/main-window.c:883
 #: ../src/toolbar-factory.c:109
 msgid "Print current message"
-msgstr "Trüki aktiivne sõnum"
+msgstr "TrÃŒki aktiivne sÃµnum"
 
 #: ../src/main-window.c:468 ../src/main-window.c:1100
 msgid "_Address Book..."
@@ -3403,7 +3403,7 @@ msgstr "Halda filtreid"
 
 #: ../src/main-window.c:495 ../src/main-window.c:1093
 msgid "_Export Filters"
-msgstr "_Väljundfiltrid"
+msgstr "_VÃ€ljundfiltrid"
 
 #: ../src/main-window.c:495 ../src/main-window.c:1094
 msgid "Export filters as Sieve scripts"
@@ -3435,7 +3435,7 @@ msgstr ""
 
 #: ../src/main-window.c:526
 msgid "_Show Mailbox Tree"
-msgstr "_Näita postkastipuud"
+msgstr "_NÃ€ita postkastipuud"
 
 #: ../src/main-window.c:527
 msgid "Toggle display of mailbox and folder tree"
@@ -3444,7 +3444,7 @@ msgstr ""
 #: ../src/main-window.c:531
 #, fuzzy
 msgid "Show Mailbox _Tabs"
-msgstr "Uue postikasti tüüp:"
+msgstr "Uue postikasti tÃŒÃŒp:"
 
 #: ../src/main-window.c:532
 msgid "Toggle display of mailbox notebook tabs"
@@ -3463,19 +3463,19 @@ msgstr "Edasta kiri"
 
 #: ../src/main-window.c:545 ../src/main-window.c:958
 msgid "E_xpand All"
-msgstr "_Ava kõik"
+msgstr "_Ava kÃµik"
 
 #: ../src/main-window.c:546 ../src/main-window.c:959
 msgid "Expand all threads"
-msgstr "Ava kõik teemalõngad"
+msgstr "Ava kÃµik teemalÃµngad"
 
 #: ../src/main-window.c:550 ../src/main-window.c:963
 msgid "_Collapse All"
-msgstr "_Sulge kõik"
+msgstr "_Sulge kÃµik"
 
 #: ../src/main-window.c:551 ../src/main-window.c:964
 msgid "Collapse all expanded threads"
-msgstr "Sulge kõik avatud teemalõngad"
+msgstr "Sulge kÃµik avatud teemalÃµngad"
 
 #: ../src/main-window.c:557 ../src/main-window.c:994
 #: ../src/message-window.c:127
@@ -3490,12 +3490,12 @@ msgstr "Lisab suurust"
 #: ../src/main-window.c:561 ../src/main-window.c:998
 #: ../src/message-window.c:131
 msgid "Zoom _Out"
-msgstr "_Vähenda"
+msgstr "_VÃ€henda"
 
 #: ../src/main-window.c:561 ../src/main-window.c:998
 #: ../src/message-window.c:131
 msgid "Decrease magnification"
-msgstr "Vähendab suurust"
+msgstr "VÃ€hendab suurust"
 
 #. To warn msgfmt that the % sign isn't a format specifier:
 #. To warn msgfmt that the % sign isn't a
@@ -3514,26 +3514,26 @@ msgstr "Ei suurenda"
 #: ../src/main-window.c:585 ../src/main-window.c:1048
 #: ../src/toolbar-factory.c:85
 msgid "Reply to the current message"
-msgstr "Vasta aktiivsele sõnumile"
+msgstr "Vasta aktiivsele sÃµnumile"
 
 #. A
 #: ../src/main-window.c:592 ../src/main-window.c:1054
 #: ../src/message-window.c:153
 msgid "Reply to _All..."
-msgstr "Vasta _Kõigile..."
+msgstr "Vasta _KÃµigile..."
 
 #: ../src/main-window.c:593 ../src/main-window.c:1055
 msgid "Reply to all recipients of the current message"
-msgstr "Vastab kõigile aktiivse sõnumi adressaatidele"
+msgstr "Vastab kÃµigile aktiivse sÃµnumi adressaatidele"
 
 #: ../src/main-window.c:600 ../src/message-window.c:159
 msgid "Reply to _Group..."
-msgstr "Vasta _Kõigile..."
+msgstr "Vasta _KÃµigile..."
 
 #: ../src/main-window.c:601 ../src/message-window.c:160
 #: ../src/toolbar-factory.c:89
 msgid "Reply to mailing list"
-msgstr "Vastab kõigile algse sõnumi saajatele"
+msgstr "Vastab kÃµigile algse sÃµnumi saajatele"
 
 #: ../src/main-window.c:608 ../src/message-window.c:165
 msgid "_Forward attached..."
@@ -3541,7 +3541,7 @@ msgstr "_Edasta manusena..."
 
 #: ../src/main-window.c:609
 msgid "Forward the current message as attachment"
-msgstr "Edastab valitud sõnum manusena"
+msgstr "Edastab valitud sÃµnum manusena"
 
 #: ../src/main-window.c:615
 msgid "Forward _inline..."
@@ -3549,7 +3549,7 @@ msgstr "Edasta _samal joonel..."
 
 #: ../src/main-window.c:616
 msgid "Forward the current message inline"
-msgstr "Edastab valitud sõnum samal joonel"
+msgstr "Edastab valitud sÃµnum samal joonel"
 
 #: ../src/main-window.c:624
 msgid "Pipe the message through another program"
@@ -3558,7 +3558,7 @@ msgstr ""
 #: ../src/main-window.c:631
 #, fuzzy
 msgid "_Next Part"
-msgstr "Järgmine"
+msgstr "JÃ€rgmine"
 
 #: ../src/main-window.c:631 ../src/message-window.c:177
 #, fuzzy
@@ -3597,16 +3597,16 @@ msgstr ""
 
 #: ../src/main-window.c:670 ../src/message-window.c:228
 msgid "_Move to Trash"
-msgstr "_Liiguta prügikasti"
+msgstr "_Liiguta prÃŒgikasti"
 
 #: ../src/main-window.c:671 ../src/main-window.c:1076
 msgid "Move the current message to Trash mailbox"
-msgstr "Saada akriivne sõnum prügikasti"
+msgstr "Saada akriivne sÃµnum prÃŒgikasti"
 
 #. !
 #: ../src/main-window.c:677 ../src/main-window.c:1027
 msgid "_Toggle flag"
-msgstr "_Pööra lipp"
+msgstr "_PÃ¶Ã¶ra lipp"
 
 #: ../src/main-window.c:683 ../src/main-window.c:1032
 msgid "Store address of sender in addressbook"
@@ -3614,28 +3614,28 @@ msgstr ""
 
 #: ../src/main-window.c:694 ../src/main-window.c:985
 msgid "Next Message"
-msgstr "Järgmine sõnum"
+msgstr "JÃ€rgmine sÃµnum"
 
 #: ../src/main-window.c:700 ../src/main-window.c:989
 #: ../src/message-window.c:207
 msgid "Previous Message"
-msgstr "Eelmine sõnum"
+msgstr "Eelmine sÃµnum"
 
 #: ../src/main-window.c:706 ../src/main-window.c:707 ../src/main-window.c:979
 #: ../src/main-window.c:980 ../src/message-window.c:213
 #: ../src/message-window.c:214
 msgid "Next Unread Message"
-msgstr "Järgmine lugemata sõnum"
+msgstr "JÃ€rgmine lugemata sÃµnum"
 
 #: ../src/main-window.c:713 ../src/main-window.c:714 ../src/main-window.c:944
 #: ../src/main-window.c:945 ../src/message-window.c:220
 #: ../src/message-window.c:221
 msgid "Next Flagged Message"
-msgstr "Järgmine lipuga kiri"
+msgstr "JÃ€rgmine lipuga kiri"
 
 #: ../src/main-window.c:721
 msgid "_Hide messages"
-msgstr "_Peida sõnumid"
+msgstr "_Peida sÃµnumid"
 
 #: ../src/main-window.c:723
 #, fuzzy
@@ -3649,11 +3649,11 @@ msgstr "Postiserverid"
 
 #: ../src/main-window.c:728
 msgid "_Select All"
-msgstr "_Vali kõik"
+msgstr "_Vali kÃµik"
 
 #: ../src/main-window.c:729
 msgid "Select all messages in current mailbox"
-msgstr "Vali kõik sõnumid aktiivses kirjakastis"
+msgstr "Vali kÃµik sÃµnumid aktiivses kirjakastis"
 
 #: ../src/main-window.c:735 ../src/main-window.c:845
 #, fuzzy
@@ -3676,7 +3676,7 @@ msgstr "Kustuta valitud postkast"
 #: ../src/main-window.c:746
 #, fuzzy
 msgid "E_xpunge Deleted Messages"
-msgstr "Trüki käesolev kiri"
+msgstr "TrÃŒki kÃ€esolev kiri"
 
 #: ../src/main-window.c:747 ../src/main-window.c:852
 #, fuzzy
@@ -3690,12 +3690,12 @@ msgstr "Sule postkast"
 
 #: ../src/main-window.c:756 ../src/main-window.c:1105
 msgid "Empty _Trash"
-msgstr "Tühjenda _prügikast"
+msgstr "TÃŒhjenda _prÃŒgikast"
 
 #: ../src/main-window.c:757 ../src/main-window.c:1106
 #: ../src/toolbar-factory.c:131
 msgid "Delete messages from the Trash mailbox"
-msgstr "Kustuta kirjad prügikastist"
+msgstr "Kustuta kirjad prÃŒgikastist"
 
 #: ../src/main-window.c:761
 #, fuzzy
@@ -3705,7 +3705,7 @@ msgstr "Valige kasutatav font"
 #: ../src/main-window.c:762 ../src/main-window.c:1091
 #, fuzzy
 msgid "Select filters to be applied automatically to current mailbox"
-msgstr "Kustuta kirjad prügikastist"
+msgstr "Kustuta kirjad prÃŒgikastist"
 
 #: ../src/main-window.c:767
 msgid "_Remove Duplicates"
@@ -3714,11 +3714,11 @@ msgstr ""
 #: ../src/main-window.c:768
 #, fuzzy
 msgid "Remove duplicated messages from the selected mailbox"
-msgstr "Kustuta kirjad prügikastist"
+msgstr "Kustuta kirjad prÃŒgikastist"
 
 #: ../src/main-window.c:783
 msgid "_Toolbars..."
-msgstr "_Tööriistaribad..."
+msgstr "_TÃ¶Ã¶riistaribad..."
 
 #: ../src/main-window.c:784
 msgid "Customize toolbars"
@@ -3822,17 +3822,17 @@ msgstr ""
 #: ../src/main-window.c:951
 #, fuzzy
 msgid "_Headers"
-msgstr "Päis"
+msgstr "PÃ€is"
 
 #: ../src/main-window.c:954
 #, fuzzy
 msgid "_Sort Mailbox"
-msgstr "Uue postikasti tüüp:"
+msgstr "Uue postikasti tÃŒÃŒp:"
 
 #: ../src/main-window.c:955
 #, fuzzy
 msgid "H_ide messages"
-msgstr "Trüki käesolev kiri"
+msgstr "TrÃŒki kÃ€esolev kiri"
 
 #: ../src/main-window.c:969
 #, fuzzy
@@ -3862,7 +3862,7 @@ msgstr "Edasta"
 
 #: ../src/main-window.c:1062 ../src/toolbar-factory.c:91
 msgid "Forward the current message"
-msgstr "Saadab valitud sõnumi kellelegi edasi"
+msgstr "Saadab valitud sÃµnumi kellelegi edasi"
 
 #. D
 #: ../src/main-window.c:1075
@@ -3886,7 +3886,7 @@ msgstr "_Filtrid"
 
 #: ../src/main-window.c:1124 ../src/sendmsg-window.c:628
 msgid "_Tools"
-msgstr "_Tööriistaribad"
+msgstr "_TÃ¶Ã¶riistaribad"
 
 #: ../src/main-window.c:1228
 msgid ""
@@ -3896,7 +3896,7 @@ msgstr ""
 
 #: ../src/main-window.c:1398 ../src/main-window.c:4941
 msgid "Subject or Sender _Contains:"
-msgstr "Teema või Saatja _Sisaldab: "
+msgstr "Teema vÃµi Saatja _Sisaldab: "
 
 #: ../src/main-window.c:2227
 #, fuzzy, c-format
@@ -3917,7 +3917,7 @@ msgid ""
 "\n"
 "If you need to report bugs, please do so at: http://bugzilla.gnome.org/"
 msgstr ""
-"Balsa e-posti lugeja on osa GNOME töölaua keskkonnast. Teavet Balsa kohta "
+"Balsa e-posti lugeja on osa GNOME tÃ¶Ã¶laua keskkonnast. Teavet Balsa kohta "
 "leiate aadressil http://www.balsa.net/\n"
 "\n"
 "Kui teil on vaja teatada vigadest, kasutage selleks palun aadressi http://"
@@ -3939,7 +3939,7 @@ msgstr "Kohalik postikast"
 
 #: ../src/main-window.c:3010
 msgid "Finished Checking."
-msgstr "Kontollimine lõpetatud."
+msgstr "Kontollimine lÃµpetatud."
 
 #: ../src/main-window.c:3072
 #, c-format
@@ -3969,7 +3969,7 @@ msgstr "Kohalik postikast"
 #: ../src/main-window.c:3807
 #, fuzzy
 msgid "_Search for:"
-msgstr "Otsingu tüüp:"
+msgstr "Otsingu tÃŒÃŒp:"
 
 #. builds the toggle buttons to specify fields concerned by
 #. * the search.
@@ -3986,13 +3986,13 @@ msgstr "Teema"
 #. Frame with Apply and Clear buttons
 #: ../src/main-window.c:3836
 msgid "Show only matching messages"
-msgstr "Näita ainult ühtivaid sõnumeid"
+msgstr "NÃ€ita ainult ÃŒhtivaid sÃµnumeid"
 
 #. Frame with OK button
 #: ../src/main-window.c:3857
 #, fuzzy
 msgid "Open next matching message"
-msgstr "Ava järgmine kiri"
+msgstr "Ava jÃ€rgmine kiri"
 
 #: ../src/main-window.c:3868
 msgid "_Reverse search"
@@ -4009,12 +4009,12 @@ msgstr ""
 #: ../src/main-window.c:4048
 #, fuzzy, c-format
 msgid "Removing duplicates failed: %s"
-msgstr "Saatmine ebaõnnestus: %s"
+msgstr "Saatmine ebaÃµnnestus: %s"
 
 #: ../src/main-window.c:4249
 #, c-format
 msgid "Could not open trash: %s"
-msgstr "Ei suutnud avada prügi: %s"
+msgstr "Ei suutnud avada prÃŒgi: %s"
 
 #: ../src/main-window.c:4378
 #, c-format
@@ -4033,7 +4033,7 @@ msgstr ""
 #: ../src/main.c:214
 #, fuzzy
 msgid "Get new mail on startup"
-msgstr "Vaata uut posti käivitumisel"
+msgstr "Vaata uut posti kÃ€ivitumisel"
 
 #: ../src/main.c:216
 msgid "Compose a new email to EMAIL@ADDRESS"
@@ -4060,12 +4060,12 @@ msgstr "Ava valitud postkast"
 #: ../src/main.c:226
 #, fuzzy
 msgid "Opens default Inbox on startup"
-msgstr "Vaata uut posti käivitumisel"
+msgstr "Vaata uut posti kÃ€ivitumisel"
 
 #: ../src/main.c:229
 #, fuzzy
 msgid "Prints number unread and unsent messages"
-msgstr "Trüki käesolev kiri"
+msgstr "TrÃŒki kÃ€esolev kiri"
 
 #: ../src/main.c:231
 msgid "Debug POP3 connection"
@@ -4091,7 +4091,7 @@ msgstr "Sisendkast"
 
 #: ../src/main.c:278
 msgid "Outbox"
-msgstr "Väljundkast"
+msgstr "VÃ€ljundkast"
 
 #: ../src/main.c:284
 msgid "Sentbox"
@@ -4103,7 +4103,7 @@ msgstr "Mustandid"
 
 #: ../src/main.c:295
 msgid "Trash"
-msgstr "Prügikast"
+msgstr "PrÃŒgikast"
 
 #: ../src/main.c:513
 #, fuzzy
@@ -4113,12 +4113,12 @@ msgstr "Ava postkast"
 #: ../src/message-window.c:86
 #, fuzzy
 msgid "N_o Headers"
-msgstr "Päis"
+msgstr "PÃ€is"
 
 #: ../src/message-window.c:88
 #, fuzzy
 msgid "_Selected Headers"
-msgstr "Näita kõiki päiseid"
+msgstr "NÃ€ita kÃµiki pÃ€iseid"
 
 #: ../src/message-window.c:148
 msgid "Reply to this message"
@@ -4126,11 +4126,11 @@ msgstr "Vasta sellele kirjale"
 
 #: ../src/message-window.c:154
 msgid "Reply to all recipients of this message"
-msgstr "Vasta kõigile selle kirja saajatele"
+msgstr "Vasta kÃµigile selle kirja saajatele"
 
 #: ../src/message-window.c:166
 msgid "Forward this message as attachment"
-msgstr "Edasta sõnum manusena"
+msgstr "Edasta sÃµnum manusena"
 
 #: ../src/message-window.c:170
 #, fuzzy
@@ -4139,12 +4139,12 @@ msgstr "Edasta"
 
 #: ../src/message-window.c:171
 msgid "Forward this message inline"
-msgstr "Edasta sõnum samal joonel"
+msgstr "Edasta sÃµnum samal joonel"
 
 #: ../src/message-window.c:177
 #, fuzzy
 msgid "Next Part"
-msgstr "Järgmine"
+msgstr "JÃ€rgmine"
 
 #: ../src/message-window.c:182
 #, fuzzy
@@ -4158,19 +4158,19 @@ msgstr "Saada viimati redigeeritud kiri"
 
 #: ../src/message-window.c:200
 msgid "_Next Message"
-msgstr "_Järgmine sõnum"
+msgstr "_JÃ€rgmine sÃµnum"
 
 #: ../src/message-window.c:200
 msgid "Next message"
-msgstr "Järgmine sõnum"
+msgstr "JÃ€rgmine sÃµnum"
 
 #: ../src/message-window.c:206
 msgid "_Previous Message"
-msgstr "_Eelmine sõnum"
+msgstr "_Eelmine sÃµnum"
 
 #: ../src/message-window.c:229
 msgid "Move the message to Trash mailbox"
-msgstr "Tõsta valitud sõnum prügikasti"
+msgstr "TÃµsta valitud sÃµnum prÃŒgikasti"
 
 #: ../src/message-window.c:244
 msgid "M_ove"
@@ -4218,7 +4218,7 @@ msgstr ""
 #: ../src/balsa-mime-widget-image.c:51 ../src/balsa-mime-widget-image.c:156
 #, fuzzy, c-format
 msgid "Error loading attached image: %s\n"
-msgstr "Viga lpr käivitamisel"
+msgstr "Viga lpr kÃ€ivitamisel"
 
 #: ../src/balsa-mime-widget-message.c:164
 #: ../src/balsa-mime-widget-message.c:177
@@ -4278,13 +4278,13 @@ msgstr "Teema: %s\n"
 #: ../src/balsa-mime-widget-message.c:279
 #, fuzzy
 msgid "Se_nd message to obtain this part"
-msgstr "Kustuta kirjad prügikastist"
+msgstr "Kustuta kirjad prÃŒgikastist"
 
 #: ../src/balsa-mime-widget-message.c:300 ../src/balsa-mime-widget-text.c:568
 #: ../src/balsa-mime-widget-text.c:693 ../src/sendmsg-window.c:1653
 #, c-format
 msgid "Error showing %s: %s\n"
-msgstr "Viga %s näitamisel: %s\n"
+msgstr "Viga %s nÃ€itamisel: %s\n"
 
 #: ../src/balsa-mime-widget-message.c:332
 #, fuzzy, c-format
@@ -4299,7 +4299,7 @@ msgstr "Teema:"
 #: ../src/balsa-mime-widget-message.c:605 ../src/print.c:356
 #: ../src/sendmsg-window.c:3159
 msgid "Date:"
-msgstr "Kuupäev"
+msgstr "KuupÃ€ev"
 
 #. Cannot edit the new "From:" header.
 #. { N_("From:"),     G_STRUCT_OFFSET(BalsaSendmsg, from[1])},
@@ -4329,7 +4329,7 @@ msgstr "Fcc:"
 #: ../src/balsa-mime-widget-message.c:634 ../src/print.c:374
 #, fuzzy
 msgid "Disposition-Notification-To:"
-msgstr "Märguanne:"
+msgstr "MÃ€rguanne:"
 
 #: ../src/balsa-mime-widget-text.c:100
 #, fuzzy, c-format
@@ -4351,17 +4351,17 @@ msgstr ""
 #: ../src/balsa-mime-widget.c:254
 #, fuzzy, c-format
 msgid "Error reading message part: %s"
-msgstr "Viga prügikasti tõstmisel: %s"
+msgstr "Viga prÃŒgikasti tÃµstmisel: %s"
 
 #: ../src/balsa-mime-widget.c:276
 #, c-format
 msgid "Type: %s (%s)"
-msgstr "Tüüp: %s (%s)"
+msgstr "TÃŒÃŒp: %s (%s)"
 
 #: ../src/balsa-mime-widget.c:279
 #, c-format
 msgid "Content Type: %s"
-msgstr "Sisu tüüp: %s"
+msgstr "Sisu tÃŒÃŒp: %s"
 
 #: ../src/balsa-mime-widget.c:293
 msgid "No open or view action defined in GNOME MIME for this content type"
@@ -4430,15 +4430,15 @@ msgstr "Aadressraamat"
 
 #: ../src/pref-manager.c:459
 msgid "Mail Options"
-msgstr "Posti määrangud"
+msgstr "Posti mÃ€Ã€rangud"
 
 #: ../src/pref-manager.c:463 ../src/pref-manager.c:1941
 msgid "Display"
-msgstr "Näit"
+msgstr "NÃ€it"
 
 #: ../src/pref-manager.c:467 ../src/toolbar-factory.c:120
 msgid "Spelling"
-msgstr "Õigekiri"
+msgstr "Ãigekiri"
 
 #: ../src/pref-manager.c:471
 msgid "Misc"
@@ -4446,7 +4446,7 @@ msgstr "Muud"
 
 #: ../src/pref-manager.c:475
 msgid "Startup"
-msgstr "Käivitus"
+msgstr "KÃ€ivitus"
 
 #: ../src/pref-manager.c:1209
 #, c-format
@@ -4460,7 +4460,7 @@ msgstr "Meiliserverid"
 #: ../src/pref-manager.c:1477 ../src/pref-manager.c:2600
 #: ../src/sendmsg-window.c:2805
 msgid "Type"
-msgstr "Tüüp:"
+msgstr "TÃŒÃŒp:"
 
 #: ../src/pref-manager.c:1485
 #, fuzzy
@@ -4484,12 +4484,12 @@ msgstr "Valige kohalik postikataloog"
 #: ../src/pref-manager.c:1549
 #, fuzzy
 msgid "Outgoing Mail Servers"
-msgstr "Väljaminevad kirjad"
+msgstr "VÃ€ljaminevad kirjad"
 
 #: ../src/pref-manager.c:1571
 #, fuzzy
 msgid "Server Name"
-msgstr "Otsingu tüüp:"
+msgstr "Otsingu tÃŒÃŒp:"
 
 #: ../src/pref-manager.c:1608
 msgid "Incoming"
@@ -4497,7 +4497,7 @@ msgstr "Sissetulevad"
 
 #: ../src/pref-manager.c:1610
 msgid "Outgoing"
-msgstr "Väljuvad"
+msgstr "VÃ€ljuvad"
 
 #: ../src/pref-manager.c:1634
 msgid "Checking"
@@ -4505,7 +4505,7 @@ msgstr "Kontrollimine"
 
 #: ../src/pref-manager.c:1639
 msgid "_Check mail automatically every:"
-msgstr "Tõmba ära uued sõnumid automaatselt intervalliga:"
+msgstr "TÃµmba Ã€ra uued sÃµnumid automaatselt intervalliga:"
 
 #: ../src/pref-manager.c:1650 ../src/pref-manager.c:2396
 #: ../src/pref-manager.c:2447
@@ -4522,15 +4522,15 @@ msgstr "Kontrolli ainult _Sisendkasti"
 
 #: ../src/pref-manager.c:1667
 msgid "Display message if new mail has arrived in an open mailbox"
-msgstr "Näita teadet kui avatud postkasti saabus uus kiri"
+msgstr "NÃ€ita teadet kui avatud postkasti saabus uus kiri"
 
 #: ../src/pref-manager.c:1672
 msgid "Do background check quietly (no messages in status bar)"
-msgstr "Kontrolli vaikselt tagaplaanil (olekuribal teadeid ei näidata)"
+msgstr "Kontrolli vaikselt tagaplaanil (olekuribal teadeid ei nÃ€idata)"
 
 #: ../src/pref-manager.c:1676
 msgid "_POP message size limit:"
-msgstr "_POP sõnumi maksimaalne suurus:"
+msgstr "_POP sÃµnumi maksimaalne suurus:"
 
 #: ../src/pref-manager.c:1683
 msgid "MB"
@@ -4549,11 +4549,11 @@ msgstr ""
 
 #: ../src/pref-manager.c:1717
 msgid "Wrap Incoming Text at:"
-msgstr "Poolita sissetulevate sõnumite read alates:"
+msgstr "Poolita sissetulevate sÃµnumite read alates:"
 
 #: ../src/pref-manager.c:1728 ../src/pref-manager.c:1891
 msgid "characters"
-msgstr "tähemärgid"
+msgstr "tÃ€hemÃ€rgid"
 
 #. handling of multipart/alternative
 #: ../src/pref-manager.c:1743
@@ -4571,17 +4571,17 @@ msgstr ""
 
 #: ../src/pref-manager.c:1768
 msgid "display as \"?\""
-msgstr "näita kui \"?\""
+msgstr "nÃ€ita kui \"?\""
 
 #: ../src/pref-manager.c:1777
 msgid "display using codeset"
-msgstr "Näita kasutades koodilehekülge"
+msgstr "NÃ€ita kasutades koodilehekÃŒlge"
 
 #. How to handle received MDN requests
 #: ../src/pref-manager.c:1809
 #, fuzzy
 msgid "Message Disposition Notification Requests"
-msgstr "Märguanne:"
+msgstr "MÃ€rguanne:"
 
 #: ../src/pref-manager.c:1811
 msgid ""
@@ -4598,19 +4598,19 @@ msgstr ""
 
 #: ../src/pref-manager.c:1837
 msgid "The message header looks suspicious."
-msgstr "Sõnumi päis paistab olevat kahtlane."
+msgstr "SÃµnumi pÃ€is paistab olevat kahtlane."
 
 #: ../src/pref-manager.c:1872
 msgid "Word Wrap"
-msgstr "Poolitus sõnade vahel"
+msgstr "Poolitus sÃµnade vahel"
 
 #: ../src/pref-manager.c:1877
 msgid "Wrap Outgoing Text at:"
-msgstr "Poolit väljuvate kirjade read:"
+msgstr "Poolit vÃ€ljuvate kirjade read:"
 
 #: ../src/pref-manager.c:1905
 msgid "Other Options"
-msgstr "Muud võimalused"
+msgstr "Muud vÃµimalused"
 
 #: ../src/pref-manager.c:1910
 msgid "Reply Prefix:"
@@ -4618,7 +4618,7 @@ msgstr "Vastamise eesliide:"
 
 #: ../src/pref-manager.c:1913
 msgid "Edit headers in external editor"
-msgstr "Redigeeri päiseid välises tekstitöötlusprogrammis"
+msgstr "Redigeeri pÃ€iseid vÃ€lises tekstitÃ¶Ã¶tlusprogrammis"
 
 #: ../src/pref-manager.c:1915
 msgid "Automatically quote original when replying"
@@ -4631,15 +4631,15 @@ msgstr "Lisa allkiri kirju edastades"
 
 #: ../src/pref-manager.c:1921
 msgid "Forward a mail as attachment instead of quoting it"
-msgstr "Sõnumi edasisaatmisel pane originaal manusena kaasa, mitte tsitaadina"
+msgstr "SÃµnumi edasisaatmisel pane originaal manusena kaasa, mitte tsitaadina"
 
 #: ../src/pref-manager.c:1924
 msgid "Send button always queues outgoing mail in outbox"
-msgstr "Saada nupp paneb saadetava sõnumi alati väljundkasti järjekorda"
+msgstr "Saada nupp paneb saadetava sÃµnumi alati vÃ€ljundkasti jÃ€rjekorda"
 
 #: ../src/pref-manager.c:1927
 msgid "Copy outgoing messages to sentbox"
-msgstr "Kopeeri väljuvad meilid Saadetud meilikasti"
+msgstr "Kopeeri vÃ€ljuvad meilid Saadetud meilikasti"
 
 #: ../src/pref-manager.c:1944
 msgid "Status Messages"
@@ -4647,27 +4647,27 @@ msgstr "Olekuteated"
 
 #: ../src/pref-manager.c:1946
 msgid "Colors"
-msgstr "Värvid"
+msgstr "VÃ€rvid"
 
 #: ../src/pref-manager.c:1948
 msgid "Message"
-msgstr "Sõnum"
+msgstr "SÃµnum"
 
 #: ../src/pref-manager.c:1950
 msgid "Sort and Thread"
-msgstr "Sortimine ja lõng"
+msgstr "Sortimine ja lÃµng"
 
 #: ../src/pref-manager.c:1975
 msgid "Main Window"
-msgstr "Põhiaken"
+msgstr "PÃµhiaken"
 
 #: ../src/pref-manager.c:1978
 msgid "Use preview pane"
-msgstr "Kasuta ülevaatepaneeli"
+msgstr "Kasuta ÃŒlevaatepaneeli"
 
 #: ../src/pref-manager.c:1980
 msgid "Show mailbox statistics in left pane"
-msgstr "Näita vasakus aknas postkasti statistikat"
+msgstr "NÃ€ita vasakus aknas postkasti statistikat"
 
 #: ../src/pref-manager.c:1982
 msgid "Use alternative main window layout"
@@ -4675,11 +4675,11 @@ msgstr "Kasuta alternatiivset peaakna paigutust "
 
 #: ../src/pref-manager.c:1984
 msgid "Automatically view message when mailbox opened"
-msgstr "Postkasti avamisel näita automaatselt sõnumit"
+msgstr "Postkasti avamisel nÃ€ita automaatselt sÃµnumit"
 
 #: ../src/pref-manager.c:1990
 msgid "PageUp/PageDown keys scroll message by:"
-msgstr "PageUp/PageDown klahvid kerivad sõnumit:"
+msgstr "PageUp/PageDown klahvid kerivad sÃµnumit:"
 
 #: ../src/pref-manager.c:2001
 msgid "percent"
@@ -4687,7 +4687,7 @@ msgstr "protsenti"
 
 #: ../src/pref-manager.c:2016
 msgid "Display Progress Dialog"
-msgstr "Näita progressidialoogi"
+msgstr "NÃ€ita progressidialoogi"
 
 #: ../src/pref-manager.c:2036
 msgid "Encoding"
@@ -4695,11 +4695,11 @@ msgstr "Kodeering"
 
 #: ../src/pref-manager.c:2041
 msgid "Date encoding (for strftime):"
-msgstr "Kuupäeva kodeerimine (strftime jaoks):"
+msgstr "KuupÃ€eva kodeerimine (strftime jaoks):"
 
 #: ../src/pref-manager.c:2043
 msgid "Selected headers:"
-msgstr "Valitud päised:"
+msgstr "Valitud pÃ€ised:"
 
 #: ../src/pref-manager.c:2064 ../src/pref-manager.c:2069
 msgid "Information Messages"
@@ -4723,20 +4723,20 @@ msgstr "Avasta meilides vigu"
 
 #: ../src/pref-manager.c:2111
 msgid "Message Colors"
-msgstr "Meili värvid"
+msgstr "Meili vÃ€rvid"
 
 #: ../src/pref-manager.c:2116
 #, c-format
 msgid "Quote level %d color"
-msgstr "%d taseme tsitaadi värv"
+msgstr "%d taseme tsitaadi vÃ€rv"
 
 #: ../src/pref-manager.c:2129
 msgid "Link Color"
-msgstr "Lingi värv"
+msgstr "Lingi vÃ€rv"
 
 #: ../src/pref-manager.c:2131
 msgid "Hyperlink color"
-msgstr "Hüperlingi värv"
+msgstr "HÃŒperlingi vÃ€rv"
 
 #: ../src/pref-manager.c:2142
 msgid "Composition Window"
@@ -4744,7 +4744,7 @@ msgstr "Koostamise aken"
 
 #: ../src/pref-manager.c:2146
 msgid "Invalid or incomplete address label color"
-msgstr "Vigase või lõpetamata aadressi sildi värv"
+msgstr "Vigase vÃµi lÃµpetamata aadressi sildi vÃ€rv"
 
 #: ../src/pref-manager.c:2171
 msgid "Fonts"
@@ -4760,7 +4760,7 @@ msgstr "Meili Teema kirjastiil"
 
 #: ../src/pref-manager.c:2218
 msgid "Sorting and Threading"
-msgstr "Sorteerimine ja teemalõng"
+msgstr "Sorteerimine ja teemalÃµng"
 
 #: ../src/pref-manager.c:2222
 msgid "Default sort column"
@@ -4768,11 +4768,11 @@ msgstr "Vaikimisi sorteerimisveerg"
 
 #: ../src/pref-manager.c:2226
 msgid "Default threading style"
-msgstr "Vaikimisi teemalõnga stiil"
+msgstr "Vaikimisi teemalÃµnga stiil"
 
 #: ../src/pref-manager.c:2231
 msgid "Expand threads on open"
-msgstr "Haruta teemalõngad avamisel lahti"
+msgstr "Haruta teemalÃµngad avamisel lahti"
 
 #: ../src/pref-manager.c:2307
 #, fuzzy
@@ -4795,7 +4795,7 @@ msgstr ""
 
 #: ../src/pref-manager.c:2345
 msgid "Miscellaneous Spelling Settings"
-msgstr "Mitmesugused õigekirja seaded"
+msgstr "Mitmesugused Ãµigekirja seaded"
 
 #: ../src/pref-manager.c:2347
 msgid "Check signature"
@@ -4811,11 +4811,11 @@ msgstr "Mitmesugust"
 
 #: ../src/pref-manager.c:2375
 msgid "Debug"
-msgstr "Prussakatõrje"
+msgstr "PrussakatÃµrje"
 
 #: ../src/pref-manager.c:2376
 msgid "Empty Trash on exit"
-msgstr "Tühjenda lahkumisel prügikast"
+msgstr "TÃŒhjenda lahkumisel prÃŒgikast"
 
 #: ../src/pref-manager.c:2382
 msgid "Automatically close mailbox if unused more than"
@@ -4823,28 +4823,28 @@ msgstr "Sulge kirjakast automaatselt kui pole kasutatud rohkem kui"
 
 #: ../src/pref-manager.c:2410
 msgid "Deleting Messages"
-msgstr "Sõnumite kustutamine"
+msgstr "SÃµnumite kustutamine"
 
 #: ../src/pref-manager.c:2412
 msgid ""
 "The following setting is global, but may be overridden\n"
 "for the selected mailbox using Mailbox -> Hide messages:"
 msgstr ""
-"Järgmine säte on üleprogrammiline, kuid seda saab alistada\n"
-"valitud postkastis kasutades Postkast -> Peida sõnumid:"
+"JÃ€rgmine sÃ€te on ÃŒleprogrammiline, kuid seda saab alistada\n"
+"valitud postkastis kasutades Postkast -> Peida sÃµnumid:"
 
 #: ../src/pref-manager.c:2420
 msgid "Hide messages marked as deleted"
-msgstr "Peida sõnumid mis on kustutatuks märgitud"
+msgstr "Peida sÃµnumid mis on kustutatuks mÃ€rgitud"
 
 #: ../src/pref-manager.c:2422
 msgid "The following settings are global."
-msgstr "Järgmine seade on üleprogrammiline."
+msgstr "JÃ€rgmine seade on ÃŒleprogrammiline."
 
 #: ../src/pref-manager.c:2427
 msgid "Expunge deleted messages when mailbox is closed"
 msgstr ""
-"Peale postkasti sulgemist hävita lõplikult kirjad mis on märgitud "
+"Peale postkasti sulgemist hÃ€vita lÃµplikult kirjad mis on mÃ€rgitud "
 "kustutatuks"
 
 #: ../src/pref-manager.c:2434
@@ -4853,11 +4853,11 @@ msgstr "... ja kui postkasti pole kasutatud rohkem kui "
 
 #: ../src/pref-manager.c:2460
 msgid "Message Window"
-msgstr "Sõnumi aken"
+msgstr "SÃµnumi aken"
 
 #: ../src/pref-manager.c:2462
 msgid "Action after moving/trashing a message"
-msgstr "Tegevus peale sõnumi kustutamist"
+msgstr "Tegevus peale sÃµnumi kustutamist"
 
 #: ../src/pref-manager.c:2497
 msgid "Options"
@@ -4865,15 +4865,15 @@ msgstr "Valikud"
 
 #: ../src/pref-manager.c:2500
 msgid "Open Inbox upon startup"
-msgstr "Ava käivitamisel sisendkast"
+msgstr "Ava kÃ€ivitamisel sisendkast"
 
 #: ../src/pref-manager.c:2502
 msgid "Check mail upon startup"
-msgstr "Kontrolli käivitamisel kas on uusi sõnumeid"
+msgstr "Kontrolli kÃ€ivitamisel kas on uusi sÃµnumeid"
 
 #: ../src/pref-manager.c:2504
 msgid "Remember open mailboxes between sessions"
-msgstr "Sessioonide vahel jäta meelde millised postkastid on avatud"
+msgstr "Sessioonide vahel jÃ€ta meelde millised postkastid on avatud"
 
 #: ../src/pref-manager.c:2518
 msgid "Folder Scanning"
@@ -4912,39 +4912,39 @@ msgstr "Eemal POP3 kirjakast..."
 
 #: ../src/pref-manager.c:3072
 msgid "Show nothing"
-msgstr "Ära näita midagi"
+msgstr "Ãra nÃ€ita midagi"
 
 #: ../src/pref-manager.c:3074
 msgid "Show dialog"
-msgstr "Näita dialoogi"
+msgstr "NÃ€ita dialoogi"
 
 #: ../src/pref-manager.c:3076
 msgid "Show in list"
-msgstr "Näita nimekirjas"
+msgstr "NÃ€ita nimekirjas"
 
 #: ../src/pref-manager.c:3078
 msgid "Show in status bar"
-msgstr "Näita olekuribal"
+msgstr "NÃ€ita olekuribal"
 
 #: ../src/pref-manager.c:3080
 msgid "Print to console"
-msgstr "Trüki puldile"
+msgstr "TrÃŒki puldile"
 
 #: ../src/pref-manager.c:3091
 msgid "Ask me"
-msgstr "Küsi minult"
+msgstr "KÃŒsi minult"
 
 #: ../src/pref-manager.c:3168
 msgid "Show next unread message"
-msgstr "Näita järgmist lugemata sõnumit"
+msgstr "NÃ€ita jÃ€rgmist lugemata sÃµnumit"
 
 #: ../src/pref-manager.c:3169
 msgid "Show next message"
-msgstr "Näita järgmist sõnumit"
+msgstr "NÃ€ita jÃ€rgmist sÃµnumit"
 
 #: ../src/pref-manager.c:3170
 msgid "Close message window"
-msgstr "Sulge sõnumi aken"
+msgstr "Sulge sÃµnumi aken"
 
 #: ../src/pref-manager.c:3194
 #, c-format
@@ -4961,8 +4961,8 @@ msgid ""
 "Preparing an HTML part, which must start on a new page.\n"
 "Print this part?"
 msgstr ""
-"Valmistan ette HTML-i osa, mis peab algama uuel leheküljel.\n"
-"Kas see osa üldse trükkida ?"
+"Valmistan ette HTML-i osa, mis peab algama uuel lehekÃŒljel.\n"
+"Kas see osa ÃŒldse trÃŒkkida ?"
 
 #: ../src/print.c:675
 #, fuzzy, c-format
@@ -4973,7 +4973,7 @@ msgstr "Ei suuda avada faili.\n"
 #. four fields, one terminator
 #: ../src/print.c:981
 msgid "Type:"
-msgstr "Tüüp:"
+msgstr "TÃŒÃŒp:"
 
 #: ../src/print.c:984
 msgid "File name:"
@@ -4986,12 +4986,12 @@ msgstr ""
 
 #: ../src/print.c:1547
 msgid "Font available for printing"
-msgstr "Font on trükkimiseks saadaval"
+msgstr "Font on trÃŒkkimiseks saadaval"
 
 #: ../src/print.c:1553
 #, c-format
 msgid "Font <b>not</b> available for printing. Closest: %s"
-msgstr "Font <b>ei ole</b> trükkimiseks saadaval. Lähim: %s"
+msgstr "Font <b>ei ole</b> trÃŒkkimiseks saadaval. LÃ€him: %s"
 
 #: ../src/print.c:1566
 msgid "Select Font"
@@ -5003,7 +5003,7 @@ msgstr "Muuda..."
 
 #: ../src/print.c:1634
 msgid "Print message"
-msgstr "Trüki sõnum"
+msgstr "TrÃŒki sÃµnum"
 
 #. create a 2nd notebook page for the fonts
 #: ../src/print.c:1645
@@ -5012,7 +5012,7 @@ msgstr "_Fondid"
 
 #: ../src/print.c:1648
 msgid "Header font"
-msgstr "Päise font"
+msgstr "PÃ€ise font"
 
 #: ../src/print.c:1650
 msgid "Body font"
@@ -5040,7 +5040,7 @@ msgstr ""
 
 #: ../src/print.c:1787
 msgid "Balsa: message print preview"
-msgstr "Balsa: sõnumi trükkimise eelvaade"
+msgstr "Balsa: sÃµnumi trÃŒkkimise eelvaade"
 
 #: ../src/save-restore.c:631
 msgid "Error during filters loading: "
@@ -5053,7 +5053,7 @@ msgid ""
 "Filters may not be correct."
 msgstr ""
 "Viga filtrite laadimisel: %s\n"
-"Filtrid võivad vigased olla."
+"Filtrid vÃµivad vigased olla."
 
 #: ../src/save-restore.c:748
 msgid "The option not to recognize \"format=flowed\" text has been removed."
@@ -5081,7 +5081,7 @@ msgstr "Viga GConf andmebaasi avamisel\n"
 #: ../src/save-restore.c:2048 ../src/save-restore.c:2059
 #, c-format
 msgid "Error setting GConf field: %s\n"
-msgstr "GConf välja: %s seadmise viga\n"
+msgstr "GConf vÃ€lja: %s seadmise viga\n"
 
 #: ../src/sendmsg-window.c:211
 msgid "_Brazilian"
@@ -5101,7 +5101,7 @@ msgstr "_Hiina traditsiooniline"
 
 #: ../src/sendmsg-window.c:215
 msgid "_Czech"
-msgstr "_Tšehhi"
+msgstr "_TÅ¡ehhi"
 
 #: ../src/sendmsg-window.c:216
 msgid "_Danish"
@@ -5165,7 +5165,7 @@ msgstr "_Korea"
 
 #: ../src/sendmsg-window.c:231
 msgid "_Latvian"
-msgstr "_Läti"
+msgstr "_LÃ€ti"
 
 #: ../src/sendmsg-window.c:232
 msgid "_Lithuanian"
@@ -5217,7 +5217,7 @@ msgstr "_Rootsi"
 
 #: ../src/sendmsg-window.c:244
 msgid "_Turkish"
-msgstr "_Türgi"
+msgstr "_TÃŒrgi"
 
 #: ../src/sendmsg-window.c:245
 msgid "_Ukrainian"
@@ -5249,11 +5249,11 @@ msgstr "_Manusta fail..."
 
 #: ../src/sendmsg-window.c:304 ../src/sendmsg-window.c:472
 msgid "I_nclude Message(s)"
-msgstr "Lisa sõ_num(id)"
+msgstr "Lisa sÃµ_num(id)"
 
 #: ../src/sendmsg-window.c:307 ../src/sendmsg-window.c:475
 msgid "Attach _Message(s)"
-msgstr "Lisa _Sõnum(id)"
+msgstr "Lisa _SÃµnum(id)"
 
 #: ../src/sendmsg-window.c:313 ../src/sendmsg-window.c:500
 msgid "Sen_d"
@@ -5262,19 +5262,19 @@ msgstr "Saa_da"
 #: ../src/sendmsg-window.c:314 ../src/sendmsg-window.c:501
 #: ../src/toolbar-factory.c:111
 msgid "Send this message"
-msgstr "Saadab selle sõnumi"
+msgstr "Saadab selle sÃµnumi"
 
 #: ../src/sendmsg-window.c:318
 msgid "_Queue"
-msgstr "_Pane järjekorda"
+msgstr "_Pane jÃ€rjekorda"
 
 #: ../src/sendmsg-window.c:319 ../src/sendmsg-window.c:506
 msgid "Queue this message in Outbox for sending"
-msgstr "Pane see sõnum Väljundkasti saatmiseks järjekorda"
+msgstr "Pane see sÃµnum VÃ€ljundkasti saatmiseks jÃ€rjekorda"
 
 #: ../src/sendmsg-window.c:323
 msgid "_Postpone"
-msgstr "Lükka edasi"
+msgstr "LÃŒkka edasi"
 
 #: ../src/sendmsg-window.c:326 ../src/sendmsg-window.c:487
 msgid "_Save"
@@ -5282,11 +5282,11 @@ msgstr "_Salvesta"
 
 #: ../src/sendmsg-window.c:327 ../src/sendmsg-window.c:488
 msgid "Save this message"
-msgstr "Salvestab selle sõnumi"
+msgstr "Salvestab selle sÃµnumi"
 
 #: ../src/sendmsg-window.c:331 ../src/sendmsg-window.c:492
 msgid "Print the edited message"
-msgstr "Trüki aktiivne sõnum"
+msgstr "TrÃŒki aktiivne sÃµnum"
 
 #: ../src/sendmsg-window.c:360 ../src/sendmsg-window.c:517
 msgid "_Wrap Body"
@@ -5302,15 +5302,15 @@ msgstr "_Lisa allkiri"
 
 #: ../src/sendmsg-window.c:373 ../src/sendmsg-window.c:525
 msgid "_Quote Message(s)"
-msgstr "_Tsiteeri sõnumeid"
+msgstr "_Tsiteeri sÃµnumeid"
 
 #: ../src/sendmsg-window.c:378 ../src/sendmsg-window.c:598
 msgid "C_heck Spelling"
-msgstr "_Kontrolli õigekirja"
+msgstr "_Kontrolli Ãµigekirja"
 
 #: ../src/sendmsg-window.c:379 ../src/sendmsg-window.c:599
 msgid "Check the spelling of the message"
-msgstr "Kontrollib sõnumi õigekirja"
+msgstr "Kontrollib sÃµnumi Ãµigekirja"
 
 #: ../src/sendmsg-window.c:384 ../src/sendmsg-window.c:605
 msgid "Select _Identity..."
@@ -5318,7 +5318,7 @@ msgstr "Vali _Isik..."
 
 #: ../src/sendmsg-window.c:385 ../src/sendmsg-window.c:606
 msgid "Select the Identity to use for the message"
-msgstr "Vali sõnumi saatmiseks isik"
+msgstr "Vali sÃµnumi saatmiseks isik"
 
 #: ../src/sendmsg-window.c:390
 msgid "_Edit with Gnome-Editor"
@@ -5326,7 +5326,7 @@ msgstr "_Redigeeri Gnome-Editoriga"
 
 #: ../src/sendmsg-window.c:391
 msgid "Edit the current message with the default Gnome editor"
-msgstr "Muuda aktiivset sõnumit Gnome vaikimisi tekstitöötlusprogrammiga"
+msgstr "Muuda aktiivset sÃµnumit Gnome vaikimisi tekstitÃ¶Ã¶tlusprogrammiga"
 
 #: ../src/sendmsg-window.c:403 ../src/sendmsg-window.c:562
 msgid "Fr_om"
@@ -5350,7 +5350,7 @@ msgstr "_Kellele veel"
 
 #: ../src/sendmsg-window.c:417 ../src/sendmsg-window.c:610
 msgid "_Request Disposition Notification"
-msgstr "_Nõua kirja kohalejõudmise teadet"
+msgstr "_NÃµua kirja kohalejÃµudmise teadet"
 
 #: ../src/sendmsg-window.c:420 ../src/sendmsg-window.c:580
 msgid "_Format = Flowed"
@@ -5358,7 +5358,7 @@ msgstr ""
 
 #: ../src/sendmsg-window.c:425 ../src/sendmsg-window.c:585
 msgid "_Sign Message"
-msgstr "_Allkirjasta sõnum"
+msgstr "_Allkirjasta sÃµnum"
 
 #: ../src/sendmsg-window.c:426 ../src/sendmsg-window.c:586
 msgid "signs the message using GnuPG"
@@ -5366,7 +5366,7 @@ msgstr ""
 
 #: ../src/sendmsg-window.c:429 ../src/sendmsg-window.c:589
 msgid "_Encrypt Message"
-msgstr "_Krüpteeri sõnum"
+msgstr "_KrÃŒpteeri sÃµnum"
 
 #: ../src/sendmsg-window.c:430 ../src/sendmsg-window.c:590
 msgid "signs the message using GnuPG for all To: and CC: recipients"
@@ -5374,7 +5374,7 @@ msgstr ""
 
 #: ../src/sendmsg-window.c:450 ../src/sendmsg-window.c:626
 msgid "_Show"
-msgstr "_Näita"
+msgstr "_NÃ€ita"
 
 #: ../src/sendmsg-window.c:452 ../src/sendmsg-window.c:603
 msgid "_Language"
@@ -5382,7 +5382,7 @@ msgstr "_Keel"
 
 #: ../src/sendmsg-window.c:454
 msgid "_Options"
-msgstr "_Häälestus"
+msgstr "_HÃ€Ã€lestus"
 
 #: ../src/sendmsg-window.c:496
 msgid "Sa_ve and Close"
@@ -5410,8 +5410,8 @@ msgid ""
 "The message to '%s' is modified.\n"
 "Save message to Draftbox?"
 msgstr ""
-"Sõnumit '%s' on muudetud.\n"
-"Kas salvestame sõnumi Mustandite kausta?"
+"SÃµnumit '%s' on muudetud.\n"
+"Kas salvestame sÃµnumi Mustandite kausta?"
 
 #: ../src/sendmsg-window.c:1140
 msgid "Gnome editor is not defined in your preferred applications."
@@ -5450,7 +5450,7 @@ msgstr ""
 
 #: ../src/sendmsg-window.c:1715
 msgid "Attach as MIME type:"
-msgstr "Manusta kui MIME tüüp:"
+msgstr "Manusta kui MIME tÃŒÃŒp:"
 
 #: ../src/sendmsg-window.c:1771
 #, c-format
@@ -5463,7 +5463,7 @@ msgstr "(teema puudub)"
 
 #: ../src/sendmsg-window.c:1900
 msgid "forwarded message"
-msgstr "edasisaadetud sõnum"
+msgstr "edasisaadetud sÃµnum"
 
 #: ../src/sendmsg-window.c:1905
 #, c-format
@@ -5473,7 +5473,7 @@ msgstr ""
 #: ../src/sendmsg-window.c:1923
 #, fuzzy, c-format
 msgid "Error converting \"%s\" to UTF-8: %s\n"
-msgstr "Viga lpr käivitamisel"
+msgstr "Viga lpr kÃ€ivitamisel"
 
 #: ../src/sendmsg-window.c:1993 ../src/sendmsg-window.c:2064
 msgid "Remove"
@@ -5512,8 +5512,8 @@ msgid ""
 "Attaching message failed.\n"
 "Possible reason: not enough temporary space"
 msgstr ""
-"Manuste lisamine ei õnnestunud.\n"
-"Võimalik põhjus: pole piisavalt ajutist kõvakettaruumi"
+"Manuste lisamine ei Ãµnnestunud.\n"
+"VÃµimalik pÃµhjus: pole piisavalt ajutist kÃµvakettaruumi"
 
 #: ../src/sendmsg-window.c:2582
 msgid "F_rom:"
@@ -5559,12 +5559,12 @@ msgstr "sina"
 #: ../src/sendmsg-window.c:3153
 #, c-format
 msgid "------forwarded message from %s------\n"
-msgstr "------edasisaadetud sõnum saatjalt %s------\n"
+msgstr "------edasisaadetud sÃµnum saatjalt %s------\n"
 
 #: ../src/sendmsg-window.c:3192
 #, c-format
 msgid "Message-ID: %s\n"
-msgstr "Sõnumi ID: %s\n"
+msgstr "SÃµnumi ID: %s\n"
 
 #: ../src/sendmsg-window.c:3198
 msgid "References:"
@@ -5597,7 +5597,7 @@ msgstr "Ei suuda avada faili.\n"
 #: ../src/sendmsg-window.c:4164
 #, fuzzy, c-format
 msgid "Error reading signature from %s"
-msgstr "Viga lpr käivitamisel"
+msgstr "Viga lpr kÃ€ivitamisel"
 
 #: ../src/sendmsg-window.c:4168
 #, c-format
@@ -5627,7 +5627,7 @@ msgstr ""
 
 #: ../src/sendmsg-window.c:4702
 msgid "Message could not be created"
-msgstr "Ei suuda sõnumit luua"
+msgstr "Ei suuda sÃµnumit luua"
 
 #: ../src/sendmsg-window.c:4704
 msgid "Message could not be queued in outbox"
@@ -5635,24 +5635,24 @@ msgstr ""
 
 #: ../src/sendmsg-window.c:4706
 msgid "Message could not be saved in sentbox"
-msgstr "Sõnumit ei saanud salvestada Saadetud kirjakasti"
+msgstr "SÃµnumit ei saanud salvestada Saadetud kirjakasti"
 
 #: ../src/sendmsg-window.c:4708
 msgid "Message could not be sent"
-msgstr "Ei suutnud sõnumit saata"
+msgstr "Ei suutnud sÃµnumit saata"
 
 #: ../src/sendmsg-window.c:4712
 #, c-format
 msgid "Send failed: %s"
-msgstr "Saatmine ebaõnnestus: %s"
+msgstr "Saatmine ebaÃµnnestus: %s"
 
 #: ../src/sendmsg-window.c:4778
 msgid "Could not postpone message."
-msgstr "Ei suutnud saatmist edasi lükata."
+msgstr "Ei suutnud saatmist edasi lÃŒkata."
 
 #: ../src/sendmsg-window.c:4792
 msgid "Message postponed."
-msgstr "Sõnumi saatmine edasi lükatud."
+msgstr "SÃµnumi saatmine edasi lÃŒkatud."
 
 #: ../src/sendmsg-window.c:4808
 #, c-format
@@ -5661,7 +5661,7 @@ msgstr ""
 
 #: ../src/sendmsg-window.c:4830
 msgid "Message saved."
-msgstr "Sõnum salvestatud."
+msgstr "SÃµnum salvestatud."
 
 #: ../src/sendmsg-window.c:4998
 #, fuzzy, c-format
@@ -5676,17 +5676,17 @@ msgstr "Vasta "
 #: ../src/sendmsg-window.c:5496
 #, c-format
 msgid "Forward message to %s: %s"
-msgstr "Edasta sõnum %s: %s"
+msgstr "Edasta sÃµnum %s: %s"
 
 #: ../src/sendmsg-window.c:5500
 #, c-format
 msgid "Continue message to %s: %s"
-msgstr "Jätka sõnumit %s: %s"
+msgstr "JÃ€tka sÃµnumit %s: %s"
 
 #: ../src/sendmsg-window.c:5504
 #, c-format
 msgid "New message to %s: %s"
-msgstr "Uus sõnum %s: %s"
+msgstr "Uus sÃµnum %s: %s"
 
 #: ../src/spell-check.c:511
 msgid "Replace the current word with the selected suggestion"
@@ -5703,7 +5703,7 @@ msgstr ""
 #: ../src/spell-check.c:537
 #, fuzzy
 msgid "Skip all occurrences of the current word"
-msgstr "Vasta kõigile käesoleva kirja adressaatidele"
+msgstr "Vasta kÃµigile kÃ€esoleva kirja adressaatidele"
 
 #: ../src/spell-check.c:547
 msgid "Add the current word to your personal dictionary"
@@ -5768,12 +5768,12 @@ msgstr "Eraldaja"
 #: ../src/toolbar-factory.c:78
 msgid "Check"
 msgstr ""
-"Tõmba\n"
-"sõnumid"
+"TÃµmba\n"
+"sÃµnumid"
 
 #: ../src/toolbar-factory.c:79
 msgid "Check for new email"
-msgstr "Tõmbab ära uued sõnumid "
+msgstr "TÃµmbab Ã€ra uued sÃµnumid "
 
 #: ../src/toolbar-factory.c:80
 msgid "Compose"
@@ -5781,15 +5781,15 @@ msgstr "Kirjuta"
 
 #: ../src/toolbar-factory.c:81
 msgid "Compose message"
-msgstr "Loo uus e-posti sõnum"
+msgstr "Loo uus e-posti sÃµnum"
 
 #: ../src/toolbar-factory.c:82
 msgid "Continue"
-msgstr "Jätka"
+msgstr "JÃ€tka"
 
 #: ../src/toolbar-factory.c:83
 msgid "Continue message"
-msgstr "Jätka kirjutamist"
+msgstr "JÃ€tka kirjutamist"
 
 #: ../src/toolbar-factory.c:84
 msgid "Reply"
@@ -5801,11 +5801,11 @@ msgid ""
 "to all"
 msgstr ""
 "Vasta\n"
-"kõigile"
+"kÃµigile"
 
 #: ../src/toolbar-factory.c:87
 msgid "Reply to all recipients"
-msgstr "Vasta kõigile selle kirja saajatele"
+msgstr "Vasta kÃµigile selle kirja saajatele"
 
 #: ../src/toolbar-factory.c:88
 msgid ""
@@ -5813,7 +5813,7 @@ msgid ""
 "to group"
 msgstr ""
 "Vasta\n"
-"kõigile"
+"kÃµigile"
 
 #: ../src/toolbar-factory.c:90
 msgid "Forward"
@@ -5830,12 +5830,12 @@ msgstr "Ava eelmine kiri"
 
 #: ../src/toolbar-factory.c:94
 msgid "Next"
-msgstr "Järgmine"
+msgstr "JÃ€rgmine"
 
 #: ../src/toolbar-factory.c:95
 #, fuzzy
 msgid "Open next"
-msgstr "Ava järgmine kiri"
+msgstr "Ava jÃ€rgmine kiri"
 
 #: ../src/toolbar-factory.c:96
 #, fuzzy
@@ -5846,7 +5846,7 @@ msgstr "Kustuta kiri"
 
 #: ../src/toolbar-factory.c:97
 msgid "Open next unread message"
-msgstr "Ava järgmine lugemata sõnum"
+msgstr "Ava jÃ€rgmine lugemata sÃµnum"
 
 #: ../src/toolbar-factory.c:98
 #, fuzzy
@@ -5857,7 +5857,7 @@ msgstr "Kustuta kiri"
 
 #: ../src/toolbar-factory.c:99
 msgid "Open next flagged message"
-msgstr "Ava järgmine lipuga kiri"
+msgstr "Ava jÃ€rgmine lipuga kiri"
 
 #: ../src/toolbar-factory.c:100
 #, fuzzy
@@ -5876,7 +5876,7 @@ msgstr "Ava eelmine kiri"
 msgid ""
 "Next\n"
 "part"
-msgstr "Järgmine"
+msgstr "JÃ€rgmine"
 
 #: ../src/toolbar-factory.c:103
 #, fuzzy
@@ -5891,19 +5891,19 @@ msgstr "Kustuta"
 
 #: ../src/toolbar-factory.c:105
 msgid "Move the current message to trash"
-msgstr "Märgib valitud sõnumid kustutatuks"
+msgstr "MÃ€rgib valitud sÃµnumid kustutatuks"
 
 #: ../src/toolbar-factory.c:106
 msgid "Postpone"
-msgstr "Lükka edasi"
+msgstr "LÃŒkka edasi"
 
 #: ../src/toolbar-factory.c:107
 msgid "Postpone current message"
-msgstr "Trüki aktiivne sõnum"
+msgstr "TrÃŒki aktiivne sÃµnum"
 
 #: ../src/toolbar-factory.c:108
 msgid "Print"
-msgstr "Trüki"
+msgstr "TrÃŒki"
 
 #: ../src/toolbar-factory.c:110
 msgid "Send"
@@ -5911,7 +5911,7 @@ msgstr "Saada"
 
 #: ../src/toolbar-factory.c:112
 msgid "Exchange"
-msgstr "Saada/ võta vastu"
+msgstr "Saada/ vÃµta vastu"
 
 #: ../src/toolbar-factory.c:114
 msgid "Attach"
@@ -5919,7 +5919,7 @@ msgstr "Lisa"
 
 #: ../src/toolbar-factory.c:115
 msgid "Add attachments to this message"
-msgstr "Lisab sõnumile faili"
+msgstr "Lisab sÃµnumile faili"
 
 #: ../src/toolbar-factory.c:116
 msgid "Save"
@@ -5927,7 +5927,7 @@ msgstr "Salvesta"
 
 #: ../src/toolbar-factory.c:117
 msgid "Save the current item"
-msgstr "Salvestab aktiivse sõnumi"
+msgstr "Salvestab aktiivse sÃµnumi"
 
 #: ../src/toolbar-factory.c:118
 msgid "Identity"
@@ -5935,11 +5935,11 @@ msgstr "Isik"
 
 #: ../src/toolbar-factory.c:119
 msgid "Set identity to use for this message"
-msgstr "Seo isik selles sõnumiga"
+msgstr "Seo isik selles sÃµnumiga"
 
 #: ../src/toolbar-factory.c:121
 msgid "Run a spell check"
-msgstr "Käivitab õigekirjakontrolli"
+msgstr "KÃ€ivitab Ãµigekirjakontrolli"
 
 #: ../src/toolbar-factory.c:122 ../src/toolbar-factory.c:132
 msgid "Close"
@@ -5947,7 +5947,7 @@ msgstr "Sulge"
 
 #: ../src/toolbar-factory.c:123
 msgid "Close the compose window"
-msgstr "Sulge sõnumi koostamise aken"
+msgstr "Sulge sÃµnumi koostamise aken"
 
 #: ../src/toolbar-factory.c:124
 #, fuzzy
@@ -5963,7 +5963,7 @@ msgstr "Kirjuta uus kiri"
 
 #: ../src/toolbar-factory.c:126
 msgid "Mark all"
-msgstr "Märgi kõik"
+msgstr "MÃ€rgi kÃµik"
 
 #: ../src/toolbar-factory.c:127
 msgid "Mark all messages in current mailbox"
@@ -5974,16 +5974,16 @@ msgid ""
 "All\n"
 "headers"
 msgstr ""
-"Kõik\n"
-"päiseid"
+"KÃµik\n"
+"pÃ€iseid"
 
 #: ../src/toolbar-factory.c:129
 msgid "Show all headers"
-msgstr "Näita kõiki päiseid"
+msgstr "NÃ€ita kÃµiki pÃ€iseid"
 
 #: ../src/toolbar-factory.c:130
 msgid "Empty Trash"
-msgstr "Tühjenda prügikast"
+msgstr "TÃŒhjenda prÃŒgikast"
 
 #: ../src/toolbar-factory.c:133
 msgid "Close current mailbox"
@@ -5992,12 +5992,12 @@ msgstr "Sulge aktiivne postkast"
 #: ../src/toolbar-factory.c:134
 #, fuzzy
 msgid "Msg Preview"
-msgstr "Ülevaatepaneel"
+msgstr "Ãlevaatepaneel"
 
 #: ../src/toolbar-factory.c:135
 #, fuzzy
 msgid "Show preview pane"
-msgstr "kasuta ülevaatepaneeli"
+msgstr "kasuta ÃŒlevaatepaneeli"
 
 #: ../src/toolbar-factory.c:137
 #, fuzzy
@@ -6019,7 +6019,7 @@ msgstr "Edasta kiri"
 
 #: ../src/toolbar-factory.c:142
 msgid "Undo"
-msgstr "Tühista"
+msgstr "TÃŒhista"
 
 #: ../src/toolbar-factory.c:143
 msgid "Undo most recent change"
@@ -6031,7 +6031,7 @@ msgstr "Taasta"
 
 #: ../src/toolbar-factory.c:145
 msgid "Redo most recent change"
-msgstr "Taastab seisu mis oli enne tühistamist"
+msgstr "Taastab seisu mis oli enne tÃŒhistamist"
 
 #: ../src/toolbar-factory.c:233
 #, c-format
@@ -6041,21 +6041,21 @@ msgstr ""
 #: ../src/toolbar-factory.c:315
 #, fuzzy
 msgid "Queue"
-msgstr "_Pane järjekorda"
+msgstr "_Pane jÃ€rjekorda"
 
 #: ../src/toolbar-factory.c:352
 #, fuzzy
 msgid "Queue this message for sending"
-msgstr "Pane see sõnum Väljundkasti saatmiseks järjekorda"
+msgstr "Pane see sÃµnum VÃ€ljundkasti saatmiseks jÃ€rjekorda"
 
 #: ../src/toolbar-prefs.c:123
 #, fuzzy
 msgid "Customize Toolbars"
-msgstr "Tööriistaribad"
+msgstr "TÃ¶Ã¶riistaribad"
 
 #: ../src/toolbar-prefs.c:144
 msgid "Main window"
-msgstr "Põhiaken"
+msgstr "PÃµhiaken"
 
 #: ../src/toolbar-prefs.c:148
 #, fuzzy
@@ -6065,12 +6065,12 @@ msgstr "Kirjuta"
 #: ../src/toolbar-prefs.c:152
 #, fuzzy
 msgid "Message window"
-msgstr "Põhiaken"
+msgstr "PÃµhiaken"
 
 #: ../src/toolbar-prefs.c:154
 #, fuzzy
 msgid "Toolbar options"
-msgstr "Tööriistaribad"
+msgstr "TÃ¶Ã¶riistaribad"
 
 #: ../src/toolbar-prefs.c:164
 msgid "_Wrap button labels"
@@ -6085,7 +6085,7 @@ msgstr ""
 #: ../src/toolbar-prefs.c:399
 #, fuzzy
 msgid "Preview"
-msgstr "Ülevaatepaneel"
+msgstr "Ãlevaatepaneel"
 
 #: ../src/toolbar-prefs.c:427
 msgid "_Restore toolbar to standard buttons"
@@ -6101,14 +6101,14 @@ msgstr ""
 
 #: ../src/toolbar-prefs.c:479
 msgid "Up"
-msgstr "Üles"
+msgstr "Ãles"
 
 #: ../src/toolbar-prefs.c:495
 msgid "Down"
 msgstr "Alla"
 
 #~ msgid "Run GnomeCard"
-#~ msgstr "Käivita GnomeCard"
+#~ msgstr "KÃ€ivita GnomeCard"
 
 #, fuzzy
 #~ msgid "Match In"

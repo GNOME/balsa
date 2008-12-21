@@ -1776,11 +1776,11 @@ libbalsa_mailbox_get_message(LibBalsaMailbox * mailbox, guint msgno)
 
     message = LIBBALSA_MAILBOX_GET_CLASS(mailbox)->get_message(mailbox,
                                                                msgno);
-    libbalsa_unlock_mailbox(mailbox);
-
     if (message && mailbox->mindex)
         /* Cache the message info, if we do not already have it. */
         lbm_cache_message(mailbox, msgno, message);
+
+    libbalsa_unlock_mailbox(mailbox);
 
     return message;
 }
@@ -3495,7 +3495,9 @@ mbox_set_sort_column_id(GtkTreeSortable * sortable,
             /* Prepare-threading failed--perhaps mailbox was closed. */
             return;
     }
+    libbalsa_lock_mailbox(mbox);
     lbm_sort(mbox, mbox->msg_tree);
+    libbalsa_unlock_mailbox(mbox);
 
     libbalsa_mailbox_changed(mbox);
 }

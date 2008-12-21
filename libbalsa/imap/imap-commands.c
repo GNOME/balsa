@@ -668,9 +668,11 @@ imap_mbox_close(ImapMboxHandle *h)
   ImapResponse rc;
   IMAP_REQUIRED_STATE1(h, IMHS_SELECTED, IMR_BAD);
 
+  HANDLE_LOCK(h);
   rc = imap_cmd_exec(h, "CLOSE");  
   if(rc == IMR_OK)
     h->state = IMHS_AUTHENTICATED;
+  HANDLE_UNLOCK(h);
   return rc;
 }
 

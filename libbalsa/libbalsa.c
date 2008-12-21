@@ -103,14 +103,26 @@ libbalsa_init(LibBalsaInformationFunc information_callback)
 
     g_mime_init(0);
 
-    /* Register our types */
-    /* So that libbalsa_mailbox_new_from_config will work... */
+    GMIME_TYPE_DATA_WRAPPER;
+    GMIME_TYPE_FILTER;
+    GMIME_TYPE_FILTER_CRLF;
+    GMIME_TYPE_PARSER;
+    GMIME_TYPE_STREAM;
+    GMIME_TYPE_STREAM_BUFFER;
+    GMIME_TYPE_STREAM_MEM;
+    GMIME_TYPE_STREAM_NULL;
+
+    /* Register our types to avoid possible race conditions. See
+       output of "valgrind --tool=helgrind --log-file=balsa.log balsa"
+       Mailbox type registration is needed also for
+       libbalsa_mailbox_new_from_config() to work. */
     LIBBALSA_TYPE_MAILBOX_LOCAL;
     LIBBALSA_TYPE_MAILBOX_POP3;
     LIBBALSA_TYPE_MAILBOX_IMAP;
     LIBBALSA_TYPE_MAILBOX_MBOX;
     LIBBALSA_TYPE_MAILBOX_MH;
     LIBBALSA_TYPE_MAILBOX_MAILDIR;
+    LIBBALSA_TYPE_MESSAGE;
 
     LIBBALSA_TYPE_ADDRESS_BOOK_VCARD;
     LIBBALSA_TYPE_ADDRESS_BOOK_EXTERN;

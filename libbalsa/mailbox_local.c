@@ -2165,7 +2165,7 @@ libbalsa_mailbox_local_messages_change_flags(LibBalsaMailbox * mailbox,
         LIBBALSA_MAILBOX_LOCAL_GET_CLASS(local)->get_info;
     guint i;
     guint changed = 0;
-
+    libbalsa_lock_mailbox(mailbox);
     for (i = 0; i < msgnos->len; i++) {
         guint msgno = g_array_index(msgnos, guint, i);
         LibBalsaMailboxLocalMessageInfo *msg_info;
@@ -2199,6 +2199,7 @@ libbalsa_mailbox_local_messages_change_flags(LibBalsaMailbox * mailbox,
         mailbox->unread_messages +=
             is_unread_undeleted - was_unread_undeleted;
     }
+    libbalsa_unlock_mailbox(mailbox);
 
     if (changed > 0) {
         libbalsa_mailbox_set_unread_messages_flag(mailbox,

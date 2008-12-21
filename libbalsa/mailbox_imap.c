@@ -1922,6 +1922,7 @@ libbalsa_mailbox_imap_get_message(LibBalsaMailbox * mailbox, guint msgno)
     struct message_info *msg_info;
     LibBalsaMailboxImap *mimap = (LibBalsaMailboxImap *) mailbox;
 
+    libbalsa_lock_mailbox(mailbox);
     msg_info = message_info_from_msgno(mimap, msgno);
 
     if (!msg_info->message) {
@@ -1940,6 +1941,8 @@ libbalsa_mailbox_imap_get_message(LibBalsaMailbox * mailbox, guint msgno)
     }
     if (msg_info->message)
 	g_object_ref(msg_info->message); /* we want to keep one copy */
+    libbalsa_unlock_mailbox(mailbox);
+
     return msg_info->message;
 }
 
@@ -3135,8 +3138,10 @@ static guint
 libbalsa_mailbox_imap_total_messages(LibBalsaMailbox * mailbox)
 {
     LibBalsaMailboxImap *mimap = (LibBalsaMailboxImap *) mailbox;
+    guint cnt;
 
-    return mimap->messages_info ? mimap->messages_info->len : 0;
+    cnt = mimap->messages_info ? mimap->messages_info->len : 0;
+    return cnt;
 }
 
 /* Copy messages in the list to dest; use server-side copy if mailbox

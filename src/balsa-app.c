@@ -460,9 +460,6 @@ balsa_app_destroy(void)
     g_list_free(balsa_app.address_book_list);
     balsa_app.address_book_list = NULL;
 
-    /* close all mailboxes */
-    gtk_widget_destroy(balsa_app.notebook);
-
     /* now free filters */
     g_slist_foreach(balsa_app.filters, (GFunc)libbalsa_filter_free, 
 		    GINT_TO_POINTER(TRUE));

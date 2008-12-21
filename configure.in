@@ -289,7 +289,7 @@ if test x$with_gnome != xno; then
    gnome-vfs-2.0 gnome-vfs-module-2.0 libbonobo-2.0"
    gnome_print_extras="libgnomeprint-2.2 >= 2.1.4 libgnomeprintui-2.2 >= 2.1.4"
    AC_MSG_CHECKING([whether we have gnome-keyring])
-   if $PKG_CONFIG --exists gnome-keyring-1; then
+   if $PKG_CONFIG --atleast-version=1.0 gnome-keyring-1; then
       gnome_extras="$gnome_extras gnome-keyring-1"
       AC_DEFINE(HAVE_GNOME_KEYRING,1,[Defined when gnome-keyring is there.])
       # Work around http://bugzilla.gnome.org/show_bug.cgi?id=556530

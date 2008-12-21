@@ -1,3 +1,15 @@
+2008-12-21  Paweł Sałek
+
+	* configure.in: we require gnome-keyring >= 1.0
+	Remove some of the race conditions as found with helgrind.
+	* src/balsa-app.c: do not manually destroy widgets.
+	* src/main.c: cleanup explicitly before exit from main, no signals
+	needed.
+	* libbalsa/mailbox_{imap,local}.c: lock mailbox.
+	* libbalsa/mailbox.c: keep the lock a bit longer.
+	* libbalsa/libbalsa.c: preregister more object types.
+	* libbalsa/imap/imap-{commands,handle}.c: lock the handle.
+
 2008-12-20  Peter Bloomfield
 
 	button for MDN in message composition toolbar (Jean-Luc Coulon)

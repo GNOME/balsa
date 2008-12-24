@@ -4642,22 +4642,28 @@ bw_notebook_switch_page_cb(GtkWidget * notebook,
     LibBalsaMailbox *mailbox;
     gchar *title;
 
-    page = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), page_num);
-    index = BALSA_INDEX(gtk_bin_get_child(GTK_BIN(page)));
-
-    mailbox = index->mailbox_node->mailbox;
     if (window->current_index) {
 	g_object_remove_weak_pointer(G_OBJECT(window->current_index),
 				     (gpointer) &window->current_index);
 	/* Note when this mailbox was hidden, for use in auto-closing. */
 	time(&BALSA_INDEX(window->current_index)->mailbox_node->last_use);
+        window->current_index = NULL;
     }
+
+    if (!balsa_app.mblist_tree_store)
+        /* Quitt'n time! */
+        return;
+
+    page = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), page_num);
+    index = BALSA_INDEX(gtk_bin_get_child(GTK_BIN(page)));
+
     window->current_index = GTK_WIDGET(index);
     g_object_add_weak_pointer(G_OBJECT(window->current_index),
 			      (gpointer) &window->current_index);
     /* Note when this mailbox was exposed, for use in auto-expunge. */
     time(&BALSA_INDEX(window->current_index)->mailbox_node->last_use);
 
+    mailbox = index->mailbox_node->mailbox;
     if (mailbox->name) {
         if (mailbox->readonly) {
             title =

@@ -389,6 +389,18 @@ pop3_progress_notify(LibBalsaMailbox* mailbox, int msg_type, int prog, int tot,
 
 /* Initialize the specified mailbox, creating the internal data
    structures which represent the mailbox. */
+static void
+sr_special_notify(gpointer data, GObject * mailbox)
+{
+    LibBalsaMailbox **special = data;
+
+    if (special == &balsa_app.trash && !balsa_app.mblist_tree_store
+        && balsa_app.empty_trash_on_exit)
+        empty_trash(balsa_app.main_window);
+
+    *special = NULL;
+}
+
 static gint
 config_mailbox_init(const gchar * prefix)
 {
@@ -441,7 +453,8 @@ config_mailbox_init(const gchar * prefix)
 	     * and outbox, and view->subscribe gets set correctly for
              * trashbox. */
 	    *special = mailbox;
-	    g_object_add_weak_pointer(G_OBJECT(mailbox), (gpointer) special);
+            g_object_weak_ref(G_OBJECT(mailbox),
+                              (GWeakNotify) sr_special_notify, special);
 	}
 
         balsa_mblist_mailbox_node_append(NULL, mbnode);

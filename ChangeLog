@@ -1,3 +1,13 @@
+2008-12-24  Peter Bloomfield
+
+	* src/balsa-app.c: (balsa_app_destroy): do not empty trash--it's
+	too late.
+	* src/main-window.c: in notebook-switch-page callback, check if
+	Balsa is quitting.
+	* src/save-restore.c: (sr_special_notify, config_mailbox_init):
+	weak-ref special mailboxes, and at notify time, if Balsa is
+	quitting, empty the trash.
+
 2008-12-21  Paweł Sałek
 
 	* configure.in: we require gnome-keyring >= 1.0

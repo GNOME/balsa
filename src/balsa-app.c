@@ -451,9 +451,6 @@ void
 balsa_app_destroy(void)
 {
     config_views_save();
-    if (balsa_app.empty_trash_on_exit)
-	empty_trash(balsa_app.main_window);
-
     config_save();
 
     g_list_foreach(balsa_app.address_book_list, (GFunc)g_object_unref, NULL);

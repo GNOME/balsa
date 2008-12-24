@@ -1891,46 +1891,37 @@ balsa_message_has_previous_part(BalsaMessage * bmessage)
     return FALSE;
 }
 
+static gboolean
+libbalsa_can_display(LibBalsaMessageBody *part)
+{
+    gchar *content_type = libbalsa_message_body_get_mime_type(part);
+    gboolean res = FALSE;
+    if (!balsa_app.display_alt_plain &&
+	libbalsa_html_type(content_type))
+	res = TRUE;
+    else if(g_ascii_strcasecmp(content_type, "multipart/related") == 0 &&
+	    part->parts)
+	res = libbalsa_can_display(part->parts);
+    g_free(content_type);
+    return res;
+}
+
+/** Determines whether given part can be displayed. We display plain
+   text, parts html/rtf parts unless it has been disabled in the
+   preferences. We make sure the process is correctly recurrsive, to
+   display properly messages of following structure:
+
+   multiplart/alternative
+     text/plain "A"
+     multipart/related
+       text/plain "B"
+       image/jpeg "C"
+
+   In the case as above, B & C should be displayed.
+*/
 static LibBalsaMessageBody*
 preferred_part(LibBalsaMessageBody *parts)
 {
-#if 0
-    /* TODO: Consult preferences and/or previous selections */
-
-    LibBalsaMessageBody *body, *html_body = NULL;
-    gchar *content_type;
-
-#ifdef HAVE_GTKHTML
-    for(body=parts; body; body=body->next) {
-        content_type = libbalsa_message_body_get_mime_type(body);
-
-        if(g_ascii_strcasecmp(content_type, "text/html")==0) {
-            if (balsa_app.display_alt_plain)
-                html_body = body;
-            else {
-                g_free(content_type);
-                return body;
-            }
-        }
-        g_free(content_type);
-    }
-#endif /* HAVE_GTKHTML */
-
-    for(body=parts; body; body=body->next) {
-        content_type = libbalsa_message_body_get_mime_type(body);
-
-        if(g_ascii_strcasecmp(content_type, "text/plain")==0) {
-            g_free(content_type);
-            return body;
-        }
-        g_free(content_type);
-    }
-
-    if (html_body)
-        return html_body;
-    else
-        return parts;
-#else
     LibBalsaMessageBody *body, *preferred = parts;
 
     for (body = parts; body; body = body->next) {
@@ -1941,8 +1932,7 @@ preferred_part(LibBalsaMessageBody *parts)
         if (g_ascii_strcasecmp(content_type, "text/plain") == 0)
             preferred = body;
 #ifdef HAVE_GTKHTML
-        else if (!balsa_app.display_alt_plain
-		 && libbalsa_html_type(content_type))
+        else if (libbalsa_can_display(body))
             preferred = body;
 #endif                          /* HAVE_GTKHTML */
 
@@ -1950,7 +1940,6 @@ preferred_part(LibBalsaMessageBody *parts)
     }
 
     return preferred;
-#endif
 }
 
 typedef struct _treeSearchT {

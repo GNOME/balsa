@@ -1,3 +1,9 @@
+2008-12-24  Paweł Sałek
+
+	* src/balsa-mblist.c: there are no unread mailboxes at destroy time.
+	* src/balsa-message.c: display an interesting case of
+	multipart/related embedded in a multipart/alternative.
+
 2008-12-24  Peter Bloomfield
 
 	* src/mailbox-node.c: (balsa_mailbox_node_rescan): handle rescan

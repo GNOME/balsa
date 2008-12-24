@@ -1154,6 +1154,10 @@ balsa_mblist_find_all_unread_mboxes(LibBalsaMailbox * mailbox)
     info.mailbox = mailbox;
     info.list = NULL;
 
+    if (!balsa_app.mblist_tree_store) /* We have no mailboxes, maybe
+					 we are about to quit? */
+	return NULL;
+
     gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
                            bmbl_find_all_unread_mboxes_func, &info);
 

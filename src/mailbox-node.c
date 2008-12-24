@@ -752,9 +752,15 @@ balsa_mailbox_node_rescan(BalsaMailboxNode * mn)
     if (!balsa_app.mblist_tree_store)
         return;
 
-    balsa_mailbox_node_clear_children_cache(mn);
-    balsa_remove_children_mailbox_nodes(mn);
-    balsa_mailbox_node_append_subtree(mn ? mn : balsa_app.root_node);
+    if (mn) {
+        balsa_mailbox_node_clear_children_cache(mn);
+        balsa_remove_children_mailbox_nodes(mn);
+    } else {
+        balsa_remove_children_mailbox_nodes(mn);
+        mn = balsa_app.root_node;
+        mn->scanned = FALSE;
+    }
+    balsa_mailbox_node_append_subtree(mn);
 }
 
 void

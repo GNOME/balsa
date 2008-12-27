@@ -441,9 +441,33 @@ libbalsa_message_body_get_stream(LibBalsaMessageBody * body, GError **err)
     if (body->message->mailbox) {
         GMimeDataWrapper *wrapper;
         GMimePartEncodingType encoding;
-
         if(!libbalsa_mailbox_get_message_part(body->message, body, err))
             return NULL;
+	
+	/* We handle "real" parts and embedded rfc822 messages
+	   differently. There is probably a way to unify if we use
+	   GMimeObject common denominator.  */
+	if(GMIME_IS_MESSAGE_PART(body->mime_part)) {
+	    ssize_t bytes_written;
+	    GMimeMessage *msg = g_mime_message_part_get_message
+		(GMIME_MESSAGE_PART(body->mime_part));
+	    stream = g_mime_stream_mem_new();
+	    libbalsa_mailbox_lock_store(body->message->mailbox);
+	    bytes_written =
+		g_mime_object_write_to_stream(GMIME_OBJECT(msg), stream);
+	    libbalsa_mailbox_unlock_store(body->message->mailbox);
+            printf("Written %ld bytes of embedded message\n",
+                   (long) bytes_written);
+	    if(bytes_written < 0) {
+		g_object_unref(stream);
+		g_set_error(err, LIBBALSA_MAILBOX_ERROR,
+			    LIBBALSA_MAILBOX_ACCESS_ERROR,
+			    _("Could not read embedded message"));
+		return NULL;
+	    }
+	    g_mime_stream_reset(stream);
+	    return stream;
+	}
 
         wrapper =
             g_mime_part_get_content_object(GMIME_PART(body->mime_part));

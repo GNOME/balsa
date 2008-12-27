@@ -1,3 +1,14 @@
+2008-12-27  Paweł Sałek and Peter Bloomfield
+
+	* src/balsa-mime-widget-message.c: call balsa_message_save_part()
+	from header context menu.
+	* src/balsa-message.[ch]: implement balsa_message_save_part().
+	Call it from the "Message parts" tab.
+	* libbalsa/mailbox_imap.c: mark GMimeMessagePart as saveable as well.
+	* libbalsa/mailbox_local.c: ditto.
+	* libbalsa/body.c: GMime streams for MessageParts have to be
+	created in a particular way.
+
 2008-12-24  Paweł Sałek
 
 	* src/balsa-mblist.c: there are no unread mailboxes at destroy time.

@@ -1541,6 +1541,35 @@ display_content(BalsaMessage * bm)
     gtk_tree_view_expand_all(GTK_TREE_VIEW(bm->treeview));
 }
 
+void
+balsa_message_copy_part(const gchar *url, LibBalsaMessageBody *part)
+{
+    GError *err = NULL;
+    LibBalsaMailbox *mailbox = balsa_find_mailbox_by_url(url);
+    GMimeStream *stream;
+
+    g_return_if_fail(mailbox != NULL);
+
+    stream = libbalsa_message_body_get_stream(part, &err);
+
+    if (!stream) {
+	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
+			     _("Reading embedded message failed: %s"),
+			     err ? err->message : "?");
+	g_clear_error(&err);
+	return;
+    }
+
+    if (!libbalsa_mailbox_add_message(mailbox, stream, 0, &err)) {
+	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
+			     _("Appending message to %s failed: %s"),
+			     mailbox->name,
+			     err ? err->message : "?");
+	g_clear_error(&err);
+    }
+    g_object_unref(stream);
+}
+
 static void
 part_create_menu (BalsaPartInfo* info) 
 /* Remarks: Will add items in the following order:
@@ -1567,10 +1596,25 @@ part_create_menu (BalsaPartInfo* info)
 					   G_CALLBACK (balsa_mime_widget_ctx_menu_vfs_cb),
 					   (gpointer)info->body);
 
-    menu_item = gtk_menu_item_new_with_label (_("Save..."));
+    menu_item = gtk_menu_item_new_with_mnemonic (_("_Save..."));
     g_signal_connect (G_OBJECT (menu_item), "activate",
                       G_CALLBACK (balsa_mime_widget_ctx_menu_save), (gpointer) info->body);
     gtk_menu_shell_append (GTK_MENU_SHELL (info->popup_menu), menu_item);
+
+    if (g_ascii_strcasecmp(content_type, "message/rfc822") == 0) {
+        GtkWidget *submenu;
+
+        menu_item =
+            gtk_menu_item_new_with_mnemonic(_("_Copy to folder..."));
+        gtk_menu_shell_append(GTK_MENU_SHELL(info->popup_menu), menu_item);
+
+        submenu =
+            balsa_mblist_mru_menu(GTK_WINDOW(gtk_widget_get_toplevel(info->popup_menu)),
+                                  &balsa_app.folder_mru,
+                                  G_CALLBACK(balsa_message_copy_part),
+                                  info->body);
+        gtk_menu_item_set_submenu(GTK_MENU_ITEM(menu_item), submenu);
+    }
 
     gtk_widget_show_all (info->popup_menu);
     g_free (content_type);

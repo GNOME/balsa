@@ -1758,7 +1758,7 @@ bi_toggle_new_cb(gpointer user_data)
 
 
 static void
-mru_menu_cb(gchar * url, BalsaIndex * index)
+mru_menu_cb(const gchar * url, BalsaIndex * index)
 {
     LibBalsaMailbox *mailbox = balsa_find_mailbox_by_url(url);
 

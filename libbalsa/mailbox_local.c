@@ -1371,7 +1371,9 @@ libbalsa_mailbox_local_get_msg_part(LibBalsaMessage *msg,
 {
     g_return_val_if_fail(part->mime_part, FALSE);
 
-    return GMIME_IS_PART(part->mime_part);
+    return GMIME_IS_PART(part->mime_part)
+        || GMIME_IS_MULTIPART(part->mime_part)
+	|| GMIME_IS_MESSAGE_PART(part->mime_part);
 }
 
 /*--------------------------------*/

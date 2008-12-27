@@ -456,16 +456,9 @@ bm_header_ctx_menu_reply(GtkWidget * menu_item,
 }
 
 static void
-bm_header_ctx_menu_copy(GtkWidget * menu_item,
-                        LibBalsaMessageBody *part)
-{
-    printf("IMplement me!\n");
-}
-
-static void
 bm_header_extend_popup(GtkTextView *textview, GtkMenu *menu, gpointer arg)
 {
-    GtkWidget *menu_item;
+    GtkWidget *menu_item, *submenu;
     GtkWidget *separator = gtk_separator_menu_item_new();
 
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), separator);
@@ -476,12 +469,20 @@ bm_header_extend_popup(GtkTextView *textview, GtkMenu *menu, gpointer arg)
                      arg);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
     gtk_widget_show(menu_item);
-    menu_item = gtk_menu_item_new_with_label(_("Copy to folder..."));
-    g_signal_connect(G_OBJECT(menu_item), "activate",
-                     G_CALLBACK(bm_header_ctx_menu_copy),
-                     arg);
+
+
+    menu_item = gtk_menu_item_new_with_mnemonic(_("_Copy to folder..."));
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
     gtk_widget_show(menu_item);
+
+    submenu =
+        balsa_mblist_mru_menu(GTK_WINDOW
+                              (gtk_widget_get_toplevel(GTK_WIDGET(textview))),
+                              &balsa_app.folder_mru,
+                              G_CALLBACK(balsa_message_copy_part), arg);
+    gtk_menu_item_set_submenu(GTK_MENU_ITEM(menu_item),
+                              submenu);
+    gtk_widget_show_all(submenu);
 }
 
 /* Indents in pixels: */

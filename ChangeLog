@@ -1,5 +1,9 @@
 2008-12-30  Paweł Sałek
 
+	* NEWS, configure.in: release 2.3.27
+
+2008-12-30  Paweł Sałek
+
 	* libbalsa/imap/imap_search.c: keep ImapHandle locked when searching.
 	* libbalsa/imap/imap-handle.c: .. and when switching to IDLE mode.
 	* libbalsa/imap/imap-commands.c: and when threading and sorting.

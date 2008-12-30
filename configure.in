@@ -1,4 +1,4 @@
-nl -*- mode: m4 -*-
+dnl -*- mode: m4 -*-
 dnl follow section 5.3 of Autoconf, Automake book.
 dnl
 dnl 1. Boilerplate.
@@ -11,7 +11,7 @@ dnl ###########################################################################
 
 BALSA_MAJOR=2
 BALSA_REVISION=3
-BALSA_PATCHLEVEL=26
+BALSA_PATCHLEVEL=27
 BALSA_VERSION="$BALSA_MAJOR.$BALSA_REVISION.${BALSA_PATCHLEVEL}"
 
 AC_SUBST(BALSA_MAJOR)

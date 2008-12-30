@@ -1,3 +1,12 @@
+* Balsa-2.3.27 release. Release date 2008-12-30
+
+- porting to most recent GTK versions.
+- documentation ported to gnome-doc format. (#559825)
+- partial translations of the manual to German and Spanish.
+- gnome-keyring is used if available (experimental).
+- disable deprecated apis only in svn tree (#561875).
+- initial experimental support for WebKit.
+
 * Balsa-2.3.26 release. Release date 2008-09-07
 
 - composing format=flowed messages with spaces pasted in works better.

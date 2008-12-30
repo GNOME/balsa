@@ -807,7 +807,8 @@ flag_unknown(int i, struct flag_needed_data* d)
 }
   
 /* imap_assure_needed_flags issues several SEARCH queries in one shot
-   and hopes the output is not intermixed */
+   and hopes the output is not intermixed. This functionl must be
+   called with handle locked. */
 ImapResponse
 imap_assure_needed_flags(ImapMboxHandle *h, ImapMsgFlag needed_flags)
 {
@@ -896,16 +897,22 @@ imap_mbox_handle_msgno_has_flags(ImapMboxHandle *h, unsigned msgno,
 {
   ImapFlagCache *flags;
   ImapMsgFlag needed_flags;
+  gboolean retval;
 
   IMAP_REQUIRED_STATE1(h, IMHS_SELECTED, IMR_BAD);
+
+  HANDLE_LOCK(h);
   flags = &g_array_index(h->flag_cache, ImapFlagCache, msgno-1);
   
   needed_flags = ~flags->known_flags & (flag_set | flag_unset);
   
-  return 
+  retval =
     (!needed_flags||imap_assure_needed_flags(h, needed_flags) == IMR_OK) &&
     (flags->flag_values & flag_set) == flag_set &&
     (flags->flag_values & flag_unset) == 0;
+  HANDLE_UNLOCK(h);
+
+  return retval;
 }
 
 
@@ -1555,7 +1562,11 @@ imap_mbox_unselect(ImapMboxHandle *h)
 ImapResponse
 imap_mbox_thread(ImapMboxHandle *h, const char *how, ImapSearchKey *filter)
 {
+  ImapResponse rc = IMR_NO;
+
   IMAP_REQUIRED_STATE1(h, IMHS_SELECTED, IMR_BAD);
+
+  HANDLE_LOCK(h);
   if(imap_mbox_handle_can_do(h, IMCAP_THREAD_REFERENCES)) {
     int can_do_literals = imap_mbox_handle_can_do(h, IMCAP_LITERAL);
     unsigned cmdno;
@@ -1579,9 +1590,10 @@ imap_mbox_thread(ImapMboxHandle *h, const char *how, ImapSearchKey *filter)
       rc = imap_cmd_step(h, cmdno);
     while(rc == IMR_UNTAGGED);
     imap_handle_idle_enable(h, 30);
-    return rc;
-  } else
-    return IMR_NO;
+  }
+  HANDLE_UNLOCK(h);
+
+  return rc;
 }
 
 
@@ -1803,15 +1815,19 @@ ImapResponse
 imap_mbox_sort_msgno(ImapMboxHandle *handle, ImapSortKey key,
                      int ascending, unsigned int *msgno, unsigned cnt)
 {
+  ImapResponse rc;
   IMAP_REQUIRED_STATE1(handle, IMHS_SELECTED, IMR_BAD);
+
+  HANDLE_LOCK(handle);
   if(imap_mbox_handle_can_do(handle, IMCAP_SORT)) 
-    return imap_mbox_sort_msgno_srv(handle, key, ascending, msgno, cnt);
+    rc = imap_mbox_sort_msgno_srv(handle, key, ascending, msgno, cnt);
   else {
-    return 
-      handle->enable_client_sort
+    rc = handle->enable_client_sort
       ? imap_mbox_sort_msgno_client(handle, key, ascending, msgno, cnt)
       : IMR_NO;
   }
+  HANDLE_UNLOCK(handle);
+  return rc;
 }
 
 static void
@@ -1838,12 +1854,14 @@ imap_mbox_sort_filter(ImapMboxHandle *handle, ImapSortKey key, int ascending,
   unsigned i;
 
   IMAP_REQUIRED_STATE1(handle, IMHS_SELECTED, IMR_BAD);
+
+  HANDLE_LOCK(handle);
   if(key == IMSO_MSGNO) {
     if(filter) { /* CASE 1a */
       handle->mbox_view.entries = 0; /* FIXME: I do not like this! 
                                       * we should not be doing such 
                                       * low level manipulations here */
-      rc = imap_search_exec(handle, FALSE, filter, append_no, NULL);
+      rc = imap_search_exec_unlocked(handle, FALSE, filter, append_no, NULL);
     } else { /* CASE 1b */
       if(handle->thread_root)
         g_node_destroy(handle->thread_root);
@@ -1857,7 +1875,7 @@ imap_mbox_sort_filter(ImapMboxHandle *handle, ImapSortKey key, int ascending,
           g_node_prepend_data(handle->thread_root,
                               GUINT_TO_POINTER(i));
       }
-      return IMR_OK;
+      rc = IMR_OK;
     }
   } else { 
     if(imap_mbox_handle_can_do(handle, IMCAP_SORT)) { /* CASE 2a */
@@ -1890,23 +1908,23 @@ imap_mbox_sort_filter(ImapMboxHandle *handle, ImapSortKey key, int ascending,
       while(rc == IMR_UNTAGGED);
     } else {                                           /* CASE 2b */
       /* try client-side sorting... */
-      if(!handle->enable_client_sort)
-        return IMR_NO;
-      handle->mbox_view.entries = 0; /* FIXME: I do not like this! 
-                                      * we should not be doing such 
-                                      * low level manipulations here */
-      if(filter)
-        rc = imap_search_exec(handle, FALSE, filter, append_no, NULL);
-      else {
-        rc = IMR_OK;
-        for(i=0; i<handle->exists; i++)
-          mbox_view_append_no(&handle->mbox_view, i+1);
-      }
-      if(rc != IMR_OK)
-        return rc;
-      rc = imap_mbox_sort_msgno_client(handle, key, ascending,
-                                       handle->mbox_view.arr,
-                                       handle->mbox_view.entries);
+      if(handle->enable_client_sort) {
+	handle->mbox_view.entries = 0; /* FIXME: I do not like this! 
+					* we should not be doing such 
+					* low level manipulations here */
+	if(filter)
+	  rc = imap_search_exec_unlocked(handle, FALSE, filter,
+					 append_no, NULL);
+	else {
+	  rc = IMR_OK;
+	  for(i=0; i<handle->exists; i++)
+	    mbox_view_append_no(&handle->mbox_view, i+1);
+	}
+	if(rc == IMR_OK)
+	  rc = imap_mbox_sort_msgno_client(handle, key, ascending,
+					   handle->mbox_view.arr,
+					   handle->mbox_view.entries);
+      } else rc = IMR_NO;
     }
   }
   if(rc == IMR_OK) {
@@ -1918,6 +1936,9 @@ imap_mbox_sort_filter(ImapMboxHandle *handle, ImapSortKey key, int ascending,
       g_node_append_data(handle->thread_root,
                          GUINT_TO_POINTER(handle->mbox_view.arr[i]));
   }
+
+  HANDLE_UNLOCK(handle);
+
   return rc;
 }
 
@@ -1936,8 +1957,8 @@ imap_mbox_filter_msgnos(ImapMboxHandle *handle, ImapSearchKey *filter,
 {
   ImapResponse res;
   HANDLE_LOCK(handle);
-  res= imap_search_exec(handle, FALSE, filter,
-			(ImapSearchCb)make_msgno_table, msgnos);
+  res = imap_search_exec_unlocked(handle, FALSE, filter,
+				  (ImapSearchCb)make_msgno_table, msgnos);
   HANDLE_UNLOCK(handle);
   return res;
 }

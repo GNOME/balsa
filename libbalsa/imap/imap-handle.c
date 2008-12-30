@@ -416,6 +416,8 @@ idle_start(gpointer data)
      channel to get disconnected before IDLE gets activated */
   IMAP_REQUIRED_STATE3(h, IMHS_CONNECTED, IMHS_AUTHENTICATED,
                        IMHS_SELECTED, FALSE);
+
+  HANDLE_LOCK(h);
   asyncno = imap_make_tag(tag); sio_write(h->sio, tag, strlen(tag));
   sio_write(h->sio, " IDLE\r\n", 7); sio_flush(h->sio);
   cmdi_add_handler(&h->cmd_info, asyncno, cmdi_empty, NULL);
@@ -425,6 +427,7 @@ idle_start(gpointer data)
   } while (rc == IMR_UNTAGGED);
   if(rc != IMR_RESPOND) {
     g_message("idle_start() expected IMR_RESPOND but got %d\n", rc);
+    HANDLE_UNLOCK(h);
     return FALSE;
   }
   while( (c=sio_getc(h->sio)) != -1 && c != '\n');
@@ -436,9 +439,12 @@ idle_start(gpointer data)
 				     async_process, h);
   h->idle_enable_id = 0;
   h->idle_issued = 1;
+
+  HANDLE_UNLOCK(h);
   return FALSE;
 }
 
+/** Called with handle locked. */
 ImapResponse
 imap_cmd_issue(ImapMboxHandle* h, const char* cmd)
 {
@@ -501,6 +507,7 @@ imap_handle_op_cancelled(ImapMboxHandle *h)
   return h->op_cancelled;
 }
 
+/** Called with handle locked. */
 void
 imap_handle_disconnect(ImapMboxHandle *h)
 {

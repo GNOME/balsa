@@ -175,6 +175,9 @@ char* imap_mbox_gets(ImapMboxHandle *h, char* buf, size_t sz);
 
 ImapResponse imap_write_key(ImapMboxHandle *handle, ImapSearchKey *s,
                             unsigned cmdno, int use_literal);
+ImapResponse imap_search_exec_unlocked(ImapMboxHandle *h, gboolean uid, 
+				       ImapSearchKey *s,
+				       ImapSearchCb cb, void *cb_arg);
 ImapResponse imap_assure_needed_flags(ImapMboxHandle *h,
                                       ImapMsgFlag needed_flags);
 

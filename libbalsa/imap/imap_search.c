@@ -456,8 +456,8 @@ execute_flag_only_search(ImapMboxHandle *h, ImapSearchKey *s,
     (flags) and immutable terms (anything else).
  */
 ImapResponse
-imap_search_exec(ImapMboxHandle *h, gboolean uid, 
-		 ImapSearchKey *s, ImapSearchCb cb, void *cb_arg)
+imap_search_exec_unlocked(ImapMboxHandle *h, gboolean uid, 
+			  ImapSearchKey *s, ImapSearchCb cb, void *cb_arg)
 {
   static const unsigned BODY_TO_SEARCH_AT_ONCE   = 500000;
   static const unsigned HEADER_TO_SEARCH_AT_ONCE = 2000;
@@ -539,6 +539,19 @@ imap_search_exec(ImapMboxHandle *h, gboolean uid,
   imap_handle_idle_enable(h, 30);
   /* Set disconnected state here if necessary? */
   return ir;
+}
+
+ImapResponse
+imap_search_exec(ImapMboxHandle *h, gboolean uid, 
+		 ImapSearchKey *s, ImapSearchCb cb, void *cb_arg)
+{
+  ImapResponse rc;
+
+  HANDLE_LOCK(h);
+  rc = imap_search_exec_unlocked(h, uid, s, cb, cb_arg);
+  HANDLE_UNLOCK(h);
+
+  return rc;
 }
 
 /* == optimized branch for flag-only searches..  Since we know most of

@@ -1,3 +1,9 @@
+2008-12-30  Paweł Sałek
+
+	* libbalsa/imap/imap_search.c: keep ImapHandle locked when searching.
+	* libbalsa/imap/imap-handle.c: .. and when switching to IDLE mode.
+	* libbalsa/imap/imap-commands.c: and when threading and sorting.
+
 2008-12-27  Paweł Sałek and Peter Bloomfield
 
 	* src/balsa-mime-widget-message.c: call balsa_message_save_part()
@@ -147,7 +153,6 @@
 	passwords.
 	* src/balsa-app.c: display the type of the password (imap/smtp).
 	* libbalsa/smtp-server.c: ask for password when one needs one.
-
 
 2008-11-19  Paweł Sałek
 

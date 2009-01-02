@@ -4291,14 +4291,21 @@ bw_remove_duplicates_cb(GtkAction * action, gpointer data)
         LibBalsaMailbox *mailbox =
             BALSA_INDEX(index)->mailbox_node->mailbox;
         GError *err = NULL;
-        libbalsa_mailbox_move_duplicates(mailbox, balsa_app.trash, &err);
+        gint dup_count = libbalsa_mailbox_move_duplicates(mailbox, NULL, &err);
         if (err) {
             balsa_information(LIBBALSA_INFORMATION_WARNING,
                               _("Removing duplicates failed: %s"),
                               err->message);
             g_error_free(err);
-        } else
-            balsa_index_ensure_visible(BALSA_INDEX(index));
+        } else {
+	    if(dup_count)
+		balsa_information(LIBBALSA_INFORMATION_MESSAGE,
+				  _("Removed %d duplicates"), dup_count);
+	    else
+		balsa_information(LIBBALSA_INFORMATION_MESSAGE,
+				  _("No duplicates found"));
+	}
+
     }
 }
 #endif /* ENABLE_TOUCH_UI */

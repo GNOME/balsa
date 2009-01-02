@@ -324,7 +324,14 @@ lb_imap_server_info_new(LibBalsaServer *server)
     imap_handle_set_tls_mode(handle, mode);
     imap_handle_set_option(handle, IMAP_OPT_ANONYMOUS, server->try_anonymous);
     imap_handle_set_option(handle, IMAP_OPT_CLIENT_SORT, TRUE);
+#ifdef HAVE_GPGME
+    /* binary fetches change encoding and the checksums, and
+       signatures, disable them if we ever consider verifying message
+       integrity. */
+    imap_handle_set_option(handle, IMAP_OPT_BINARY, FALSE);
+#else
     imap_handle_set_option(handle, IMAP_OPT_BINARY, TRUE);
+#endif
     imap_handle_set_option(handle, IMAP_OPT_IDLE,
                            LIBBALSA_IMAP_SERVER(server)->use_idle);
     return info;

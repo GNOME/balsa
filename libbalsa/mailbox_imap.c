@@ -2539,7 +2539,6 @@ libbalsa_mailbox_imap_duplicate_msgnos(LibBalsaMailbox *mailbox)
 	    g_hash_table_insert(dupes, msg_id, GINT_TO_POINTER(1));
 	else {
 	    g_array_append_val(res, i);
-	    printf("(IMAP) Found duplicate: %u for '%s'\n", i, msg_id);
 	}
     }
     g_hash_table_destroy(dupes);

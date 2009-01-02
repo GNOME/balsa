@@ -1,3 +1,9 @@
+2009-01-02  Paweł Sałek
+
+	* src/main-window.c: report number of deleted message duplicates.
+	* libbalsa/mailbox.[ch]: provide it.
+	* libbalsa/imap-server.c: using binary fetches breaks integrity checks.
+
 2008-12-30  Paweł Sałek
 
 	* NEWS, configure.in: release 2.3.27

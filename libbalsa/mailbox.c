@@ -4157,11 +4157,12 @@ libbalsa_mailbox_can_move_duplicates(LibBalsaMailbox * mailbox)
     return LIBBALSA_MAILBOX_GET_CLASS(mailbox)->duplicate_msgnos != NULL;
 }
 
-void
+gint
 libbalsa_mailbox_move_duplicates(LibBalsaMailbox * mailbox,
                                  LibBalsaMailbox * dest, GError ** err)
 {
     GArray *msgnos = NULL;
+    gint retval;
 
     if (libbalsa_mailbox_can_move_duplicates(mailbox))
         msgnos =
@@ -4172,22 +4173,23 @@ libbalsa_mailbox_move_duplicates(LibBalsaMailbox * mailbox,
         g_set_error(err, LIBBALSA_MAILBOX_ERROR,
                     LIBBALSA_MAILBOX_DUPLICATES_ERROR,
                     _("Finding duplicate messages in source mailbox failed"));
-        return;
+        return 0;
     }
 
     if (!msgnos)
-        return;
+        return 0;
 
     if (msgnos->len > 0) {
-        if (mailbox != dest)
+        if (dest && mailbox != dest)
             libbalsa_mailbox_messages_move(mailbox, msgnos, dest, err);
         else
             libbalsa_mailbox_messages_change_flags(mailbox, msgnos,
                                                    LIBBALSA_MESSAGE_FLAG_DELETED,
                                                    0);
     }
-
+    retval = msgnos->len;
     g_array_free(msgnos, TRUE);
+    return retval;
 }
 
 #if BALSA_USE_THREADS

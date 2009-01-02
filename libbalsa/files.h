@@ -47,8 +47,4 @@ gchar *balsa_file_finder(const gchar * filename, const gchar * splice,
 GdkPixbuf *libbalsa_icon_finder(const char *mime_type, const LibbalsaVfs * for_file,
 				gchar** used_type, GtkIconSize size);
 
-void libbalsa_fill_vfs_menu_by_content_type(GtkMenu * menu,
-					    const gchar * content_type,
-					    GCallback callback, gpointer data);
-
 #endif

@@ -1,3 +1,25 @@
+2009-01-02  Albrecht Dreß
+
+	* configure.in: prefer gio >= 2.16.0, fallback to gnome-vfs.
+	* libbalsa/gmime-stream-gnome-vfs.[hc]: build only if using gnome-vfs 
+	* libbalsa/files.[hc]: implement icon lookup for gio
+	* libbalsa/libbalsa-vfs.[hc]:  add support for GIO
+	* libbalsa/gmime-stream-gio.[hc]: gmime gio stream wrapper.
+	* libbalsa/misc.c: remove unnecessary #include of gnome-vfs.h
+	* libbalsa/Makefile.am: add gmime-stream-gio.[hc]
+
+	* src/balsa-print-object-default.c: use libbalsa-vfs instead of
+	gnome-vfs, enabling in this way a clean GIO usage.
+	
+	* src/sendmsg-window.c: call external editor through gio or gnome-vfs;
+	use libbalsa-vfs helper to open attachment with external app;
+	show description in attachment list
+	* src/balsa-mime-widget-callbacks.[ch]: use libbalsa-vfs to open parts
+	* src/balsa-mime-widget-text.c: use changed balsa-mime-widget-callbacks API.
+	* src/ab-window.c: launch app using glib
+	* src/balsa-message.c: use description instead of plain MIME type.
+	* src/balsa-mime-widget.c: create a mime button via libbalsa-vfs.
+	
 2009-01-02  Paweł Sałek
 
 	* src/main-window.c: report number of deleted message duplicates.

@@ -42,7 +42,9 @@
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #endif
 
+#ifdef HAVE_GNOME
 #define OLD_BALSA_COMPATIBILITY_TRANSLATION
+#endif
 #ifdef OLD_BALSA_COMPATIBILITY_TRANSLATION
 #include <gnome.h> /* for GNOME_STOCK_* pixmaps */
 #endif

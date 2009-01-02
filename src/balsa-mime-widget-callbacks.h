@@ -33,7 +33,6 @@ extern "C" {
 
 
 void balsa_mime_widget_ctx_menu_cb(GtkWidget * menu_item, LibBalsaMessageBody * mime_body);
-void balsa_mime_widget_ctx_menu_vfs_cb(GtkWidget * menu_item, LibBalsaMessageBody * mime_body);
 void balsa_mime_widget_ctx_menu_save(GtkWidget * parent_widget,
                                      LibBalsaMessageBody * mime_body);
 gint balsa_mime_widget_key_press_event(GtkWidget * widget, GdkEventKey * event,

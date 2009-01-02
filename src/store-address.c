@@ -21,7 +21,6 @@
 
 #include "config.h"
 
-#include <gnome.h>
 #include <string.h>
 #include <glib/gi18n.h>
 

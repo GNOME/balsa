@@ -34,7 +34,6 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <gnome.h>
 #include <glib.h>
 
 #include "balsa-app.h"

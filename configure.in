@@ -281,12 +281,33 @@ AC_DEFINE_UNQUOTED(SENDMAIL, "$ac_cv_path_SENDMAIL",
 		   [Path to sendmail program.])
 fi
 
+# GIO in glib 2.16.0 and above
+AC_MSG_CHECKING([for gio >= 2.16])
+if $PKG_CONFIG --atleast-version=2.16.0 gio-2.0 ; then
+   with_gio=yes
+   gio_extra=gio-2.0
+   AC_DEFINE(HAVE_GIO,1,[Defined when GIO can be used.])
+   giover=`$PKG_CONFIG --modversion gio-2.0`
+   AC_MSG_RESULT($giover)
+else
+   with_gio=no
+   AC_MSG_RESULT($with_gio)
+fi
+
 dnl #####################################################################
 dnl GNOME libs
 dnl #####################################################################
 if test x$with_gnome != xno; then
-   gnome_extras="libgnome-2.0 libgnomeui-2.0 
-   gnome-vfs-2.0 gnome-vfs-module-2.0 libbonobo-2.0"
+   gnome_extras="libgnome-2.0 libgnomeui-2.0 libbonobo-2.0"
+   if test x$with_gio != xyes ; then
+      gnome_extras="$gnome_extras gnome-vfs-2.0 >= 2.4.0 gnome-vfs-module-2.0"
+      AC_DEFINE(HAVE_GNOME_VFS,1,
+	        [Defined when gnome-vfs shall be used])
+      if $PKG_CONFIG --atleast-version=2.9.0 gnome-vfs-2.0 ; then
+         AC_DEFINE(HAVE_GNOME_VFS29,1,
+	           [Defined when gnome-vfs-2.0 version is at least 2.9.0])
+      fi
+   fi
    gnome_print_extras="libgnomeprint-2.2 >= 2.1.4 libgnomeprintui-2.2 >= 2.1.4"
    AC_MSG_CHECKING([whether we have gnome-keyring])
    if $PKG_CONFIG --atleast-version=1.0 gnome-keyring-1; then
@@ -351,6 +372,8 @@ PKG_CHECK_MODULES(BALSA, [
 glib-2.0
 gtk+-2.0 >= 2.4
 gmime-2.0 >= 2.1.9
+gconf-2.0
+$gio_extra
 $gnome_extras
 $gnome_print_extras
 ])
@@ -365,13 +388,6 @@ PKG_CHECK_MODULES(BALSA_AB, [
 dnl ##########################################################################
 dnl Check versions
 dnl ##########################################################################
-
-if test x$with_gnome != xno; then
-  if $PKG_CONFIG --atleast-version=2.9.0 gnome-vfs-2.0 ; then
-    AC_DEFINE(HAVE_GNOME_VFS29,1,
-	      [Defined when gnome-vfs-2.0 version is at least 2.9.0])
-  fi
-fi
 
 # CORBA interface.
 #
@@ -977,6 +993,8 @@ echo "      Using multithreading: $use_threads"
 echo "   Enable compile warnings: $set_more_warnings"
 echo "                Use ESMTP : $with_esmtp"
 echo " Use WebKit (experimental): $use_webkit"
+echo "                 Use GNOME: $with_gnome"
+echo "                   Use GIO: $with_gio"
 echo "               Use GtkHTML: $use_gtkhtml"
 echo "                 Use GPGME: $gpgmecfg"
 echo "                  Use LDAP: $with_ldap"

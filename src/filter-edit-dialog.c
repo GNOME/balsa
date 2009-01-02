@@ -21,7 +21,6 @@
 
 #include "config.h"
 
-#include <gnome.h>
 #include "balsa-app.h"
 #include "filter-edit.h"
 #include "filter-funcs.h"

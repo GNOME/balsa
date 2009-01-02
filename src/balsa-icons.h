@@ -22,6 +22,7 @@
 #ifndef __BALSA_ICONS_H__
 #define __BALSA_ICONS_H__
 
+#include <gtk/gtk.h>
 #include "config.h"
 
 #define BALSA_PIXMAP_ATTACHMENT			"balsa_attachment"

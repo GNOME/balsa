@@ -30,9 +30,17 @@
 
 #include <stdio.h>
 #include <string.h>
+#if HAVE_GNOME
 #include <gnome.h>
-#include <libgnomevfs/gnome-vfs-uri.h>
+#else
+#define GNOME_PAD_SMALL    4
+#endif
+#if HAVE_GIO
+#include <gio/gio.h>
+#elif HAVE_GNOME_VFS
+#include <libgnomevfs/gnome-vfs.h>
 #include <libgnomevfs/gnome-vfs-mime-handlers.h>
+#endif
 #include <glib/gi18n.h>
 #include <glib/gstdio.h>
 #include <ctype.h>
@@ -1178,14 +1186,32 @@ edit_with_gnome(GtkAction * action, BalsaSendmsg* bsmsg)
         gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
     GtkTextIter start, end;
     gchar *p;
+#if HAVE_GIO
+    GAppInfo *app;
+#elif HAVE_GNOME_VFS
     GnomeVFSMimeApplication *app;
+#endif
     char **argv;
     int argc;
 
     strcpy(filename, TMP_PATTERN);
     tmpfd = mkstemp(filename);
+#if HAVE_GIO
+    app = g_app_info_get_default_for_type("text/plain", FALSE);
+#elif HAVE_GNOME_VFS
     app = gnome_vfs_mime_get_default_application ("text/plain");
+#endif
     if (app) {
+#if HAVE_GIO
+        argc = 2;
+        argv = g_new0 (char *, argc + 1);
+
+        argv[0] = g_strdup(g_app_info_get_executable(app));
+        argv[1] = g_strdup_printf("%s%s",
+                                  g_app_info_supports_uris(app) ? "file://" : "", filename);
+        // FIXME: how can I detect if the called application needs the terminal???
+        g_object_unref(app);
+#elif HAVE_GNOME_VFS
 #if HAVE_GNOME_VFS29
         gboolean adduri = gnome_vfs_mime_application_supports_uris(app);
 	const gchar *exec, *pct;
@@ -1224,6 +1250,7 @@ edit_with_gnome(GtkAction * action, BalsaSendmsg* bsmsg)
             }
         }
         gnome_vfs_mime_application_free (app);
+#endif
     } else {
         balsa_information_parented(GTK_WINDOW(bsmsg->window),
                                    LIBBALSA_INFORMATION_ERROR,
@@ -1760,42 +1787,19 @@ change_attach_mode(GtkWidget * menu_item, BalsaAttachInfo *info)
 static void
 attachment_menu_vfs_cb(GtkWidget * menu_item, BalsaAttachInfo * info)
 {
-    gchar *id;
-    
+    GError *err = NULL;
+    gboolean result;
+
     g_return_if_fail(info != NULL);
 
-    if ((id = g_object_get_data (G_OBJECT (menu_item), "mime_action"))) {
-#if HAVE_GNOME_VFS29
-        GnomeVFSMimeApplication *app=
-            gnome_vfs_mime_application_new_from_desktop_id(id);
-#else /* HAVE_GNOME_VFS29 */
-        GnomeVFSMimeApplication *app=
-            gnome_vfs_mime_application_new_from_id(id);
-#endif /* HAVE_GNOME_VFS29 */
-        if (app) {
-#if HAVE_GNOME_VFS29
-            gchar *uri = g_strdup(libbalsa_vfs_get_uri(info->file_uri));
-            GList *uris = g_list_prepend(NULL, uri);
-            gnome_vfs_mime_application_launch(app, uris);
-            g_free(uri);
-            g_list_free(uris);
-#else /* HAVE_GNOME_VFS29 */
-	    gboolean tmp =
-		(app->expects_uris ==
-		 GNOME_VFS_MIME_APPLICATION_ARGUMENT_TYPE_URIS);
-	    gchar *exe_str =
-		g_strdup_printf("%s \"%s%s\"", app->command,
-				tmp ? "file://" : "", info->filename);
-                
-	    gnome_execute_shell(NULL, exe_str);
-	    fprintf(stderr, "Executed: %s\n", exe_str);
-	    g_free (exe_str);
-#endif /* HAVE_GNOME_VFS29 */
-	    gnome_vfs_mime_application_free(app);    
-        } else {
-            fprintf(stderr, "lookup for application %s returned NULL\n", id);
-        }
-    }
+    result = libbalsa_vfs_launch_app(info->file_uri,
+                                     G_OBJECT(menu_item),
+                                     &err);
+    if (!result)
+        balsa_information(LIBBALSA_INFORMATION_WARNING,
+                          _("Could not launch application: %s"),
+                          err ? err->message : "Unknown error");
+    g_clear_error(&err);
 }
 
 
@@ -2016,6 +2020,7 @@ add_attachment(BalsaSendmsg * bsmsg, const gchar *filename,
     GError *err = NULL;
     GdkPixbuf *pixbuf;
     GtkWidget *menu_item;
+    gchar *content_desc;
 
     if (balsa_app.debug)
 	fprintf(stderr, "Trying to attach '%s'\n", filename);
@@ -2168,17 +2173,18 @@ add_attachment(BalsaSendmsg * bsmsg, const gchar *filename,
     /* add the usual vfs menu so the user can inspect what (s)he actually
        attached... (only for non-message attachments) */
     if (!is_fwd_message)
-	libbalsa_fill_vfs_menu_by_content_type(GTK_MENU(attach_data->popup_menu),
+	libbalsa_vfs_fill_menu_by_content_type(GTK_MENU(attach_data->popup_menu),
 					       content_type, 
 					       G_CALLBACK(attachment_menu_vfs_cb),
 					       (gpointer)attach_data);
     gtk_widget_show_all(attach_data->popup_menu);
 
     /* append to the list store */
+    content_desc =libbalsa_vfs_content_description(content_type);
     gtk_list_store_set(GTK_LIST_STORE(model), &iter,
 		       ATTACH_INFO_COLUMN, attach_data,
 		       ATTACH_ICON_COLUMN, pixbuf,
-		       ATTACH_TYPE_COLUMN, content_type,
+		       ATTACH_TYPE_COLUMN, content_desc,
 		       ATTACH_MODE_COLUMN, attach_data->mode,
 		       ATTACH_SIZE_COLUMN, (gfloat) libbalsa_vfs_get_size(file_uri),
 		       ATTACH_DESC_COLUMN, utf8name,
@@ -2187,6 +2193,7 @@ add_attachment(BalsaSendmsg * bsmsg, const gchar *filename,
     g_object_unref(pixbuf);
     g_free(utf8name);
     g_free(content_type);
+    g_free(content_desc);
     
     show_attachment_widget(bsmsg);
 

@@ -26,7 +26,6 @@
 #include <string.h>
 #include <ctype.h>
 #include <iconv.h>
-#include <libgnomevfs/gnome-vfs-mime-info.h>
 #include <sys/utsname.h>
 
 #include "balsa-app.h"
@@ -49,8 +48,6 @@
 #include "quote-color.h"
 #include "sendmsg-window.h"
 #include "libbalsa-vfs.h"
-
-#include <libgnomevfs/gnome-vfs-mime-handlers.h>
 
 #ifdef HAVE_GPGME
 #  include "gmime-part-rfc2440.h"
@@ -1340,6 +1337,9 @@ display_part(BalsaMessage * bm, LibBalsaMessageBody * body,
     gchar *icon_title = NULL;
     gboolean is_multipart=libbalsa_message_body_is_multipart(body);
     GdkPixbuf *content_icon;
+    gchar *content_desc;
+
+    content_desc = libbalsa_vfs_content_description(content_type);
 
     if(!is_multipart ||
        g_ascii_strcasecmp(content_type, "message/rfc822")==0 ||
@@ -1382,13 +1382,13 @@ display_part(BalsaMessage * bm, LibBalsaMessageBody * body,
             libbalsa_utf8_sanitize(&filename, balsa_app.convert_unknown_8bit, 
                                    NULL);
             icon_title =
-                g_strdup_printf("%s (%s)", filename, content_type);
+                g_strdup_printf("%s (%s)", filename, content_desc);
 	    
 	    /* this should neither be a message nor multipart, so add it to the
 	       attachments popup */
 	    menu_label =
 		g_strdup_printf(_("part %s: %s (file %s)"), part_id,
-				content_type, filename);
+				content_desc, filename);
 	    add_to_attachments_popup(GTK_MENU_SHELL(bm->parts_popup),
 				     menu_label, bm, info);
 	    g_free(menu_label);
@@ -1396,9 +1396,9 @@ display_part(BalsaMessage * bm, LibBalsaMessageBody * body,
         } else {
 	    gchar * menu_label;
 
-            icon_title = g_strdup_printf("%s", content_type);
+            icon_title = g_strdup_printf("%s", content_desc);
 	    menu_label =
-		g_strdup_printf(_("part %s: %s"), part_id, content_type);
+		g_strdup_printf(_("part %s: %s"), part_id, content_desc);
 	    add_to_attachments_popup(GTK_MENU_SHELL(bm->parts_popup),
 				     menu_label, bm, info);
 	    g_free(menu_label);
@@ -1440,11 +1440,12 @@ display_part(BalsaMessage * bm, LibBalsaMessageBody * body,
                             PART_INFO_COLUMN, NULL,
 			    PART_NUM_COLUMN, part_id,
                             MIME_ICON_COLUMN, content_icon,
-                            MIME_TYPE_COLUMN, content_type, -1);
+                            MIME_TYPE_COLUMN, content_desc, -1);
     }
         
     if (content_icon)
 	g_object_unref(G_OBJECT(content_icon));
+    g_free(content_desc);
     g_free(content_type);
 }
 
@@ -1591,9 +1592,9 @@ part_create_menu (BalsaPartInfo* info)
 #endif                          /* GLIB_CHECK_VERSION(2, 10, 0) */
     
     content_type = libbalsa_message_body_get_mime_type (info->body);
-    libbalsa_fill_vfs_menu_by_content_type(GTK_MENU(info->popup_menu),
+    libbalsa_vfs_fill_menu_by_content_type(GTK_MENU(info->popup_menu),
 					   content_type,
-					   G_CALLBACK (balsa_mime_widget_ctx_menu_vfs_cb),
+					   G_CALLBACK (balsa_mime_widget_ctx_menu_cb),
 					   (gpointer)info->body);
 
     menu_item = gtk_menu_item_new_with_mnemonic (_("_Save..."));

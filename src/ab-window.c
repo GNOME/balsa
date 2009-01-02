@@ -21,7 +21,6 @@
 
 #include "config.h"
 
-#include <gnome.h>
 #include <string.h>
 #include <glib/gi18n.h>
 #include "address-view.h"
@@ -412,9 +411,15 @@ balsa_ab_window_class_init(BalsaAbWindowClass *klass)
 static void
 balsa_ab_window_run_editor(GtkWidget * widget, gpointer data)
 {
-    char *argv[] = { "balsa-ab" };
+    char *argv[] = { "balsa-ab", NULL };
+    GError * err = NULL;
 
-    gnome_execute_async(NULL, 1, argv);
+    if (!g_spawn_async(NULL, argv, NULL, G_SPAWN_SEARCH_PATH,
+                       NULL, NULL, NULL, &err))
+        balsa_information(LIBBALSA_INFORMATION_WARNING,
+                          _("Could not launch %s: %s"), argv[0],
+                          err ? err->message : "Unknown error");
+    g_clear_error(&err);
 }
 
 /*

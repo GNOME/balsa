@@ -423,9 +423,6 @@ balsa_print_object_text(GList *list, GtkPrintContext * context,
 
 /* note: a vcard is an icon plus a series of labels/text, so this function actually
  * returns a BalsaPrintObjectDefault... */
-#ifdef HAVE_GNOME
-#include <libgnomevfs/gnome-vfs-mime-handlers.h>
-#endif
 
 #define ADD_VCARD_FIELD(buf, labwidth, layout, field, descr)		\
     do {								\

@@ -22,7 +22,10 @@
 #include "config.h"
 
 #include <string.h>
+#include <gtk/gtk.h>
+#if HAVE_GNOME
 #include <gnome.h>
+#endif
 #ifdef GTKHTML_HAVE_GCONF
 # include <gconf/gconf.h>
 #endif
@@ -1177,7 +1180,9 @@ main(int argc, char *argv[])
 static void
 bab_cleanup(void)
 {
+#if HAVE_GNOME
     gnome_sound_shutdown();
+#endif
     gtk_main_quit();
 }
 

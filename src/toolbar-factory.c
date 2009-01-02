@@ -22,7 +22,6 @@
 #include "config.h"
 
 #include <string.h>
-#include <gnome.h>
 #include <gconf/gconf-client.h>
 
 #include <glib/gi18n.h>

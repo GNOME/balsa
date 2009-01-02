@@ -39,10 +39,6 @@
 #include <sys/types.h>
 #include <sys/utsname.h>
 
-#ifdef HAVE_GNOME
-#include <libgnomevfs/gnome-vfs.h>
-#endif
-
 #include "libbalsa.h"
 #include "libbalsa_private.h"
 #include "misc.h"

@@ -23,9 +23,7 @@
 #include "config.h"
 #include <glib/gi18n.h>
 #include "balsa-print-object.h"
-#ifdef HAVE_GNOME
-#include <libgnomevfs/gnome-vfs-mime-handlers.h>
-#endif
+#include "libbalsa-vfs.h"
 #include "balsa-print-object-default.h"
 
 
@@ -120,9 +118,7 @@ balsa_print_object_default(GList * list,
     PangoTabArray *tabs;
     GString *desc_buf;
     gdouble c_max_height;
-#ifdef HAVE_GNOME
-    const gchar *part_desc;
-#endif
+    gchar *part_desc;
 
     pod = g_object_new(BALSA_TYPE_PRINT_OBJECT_DEFAULT, NULL);
     g_assert(pod != NULL);
@@ -152,13 +148,12 @@ balsa_print_object_default(GList * list,
     /* add type and filename (if available) */
     pod->p_label_width =
 	p_string_width_from_layout(test_layout, _("Type:"));
-#ifdef HAVE_GNOME
-    if ((part_desc = gnome_vfs_mime_get_description(conttype)))
+    if ((part_desc = libbalsa_vfs_content_description(conttype)))
 	g_string_append_printf(desc_buf, "%s\t%s (%s)", _("Type:"),
 			       part_desc, conttype);
     else
-#endif
 	g_string_append_printf(desc_buf, "%s\t%s", _("Type:"), conttype);
+    g_free(part_desc);
     g_free(conttype);
     if (body->filename) {
 	gint p_fnwidth =

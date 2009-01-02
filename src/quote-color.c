@@ -21,8 +21,6 @@
 
 #include "config.h"
 
-#include <gnome.h>
-
 #include "balsa-app.h"
 #include "quote-color.h"
 

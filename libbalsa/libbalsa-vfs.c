@@ -30,20 +30,32 @@
 #include <glib/gi18n.h>
 #include <glib/gstdio.h>
 #include <gmime/gmime.h>
-#include "gmime-stream-gnome-vfs.h"
+#include "libbalsa.h"
 #include "misc.h"
 #include "libbalsa-vfs.h"
 
-
-#ifdef HAVE_GNOME
+#if HAVE_GIO
+#  include <gio/gio.h>
+#  include "gmime-stream-gio.h"
+#elif HAVE_GNOME_VFS
 #  include <libgnomevfs/gnome-vfs.h>
-#  define USE_GNOME_VFS  1
-#else
-#  undef USE_GNOME_VFS
+#  include <libgnomevfs/gnome-vfs-mime-handlers.h>
+#  include "gmime-stream-gnome-vfs.h"
 #endif
 
 
 #define LIBBALSA_VFS_ERROR_QUARK (g_quark_from_static_string("libbalsa-vfs"))
+
+
+#define LIBBALSA_VFS_MIME_ACTION "mime_action"
+
+#if HAVE_GIO
+#define GIO_INFO_ATTS                           \
+    G_FILE_ATTRIBUTE_STANDARD_TYPE ","          \
+    G_FILE_ATTRIBUTE_STANDARD_CONTENT_TYPE ","  \
+    G_FILE_ATTRIBUTE_STANDARD_SIZE ","          \
+    "access::*"
+#endif
 
 
 struct _LibbalsaVfsPriv {
@@ -53,7 +65,10 @@ struct _LibbalsaVfsPriv {
     gchar * mime_type;
     gchar * charset;
     LibBalsaTextAttribute text_attr;
-#ifdef USE_GNOME_VFS
+#if HAVE_GIO
+    GFile * gio_gfile;
+    GFileInfo * info;
+#elif HAVE_GNOME_VFS
     GnomeVFSURI * gvfs_uri;
     GnomeVFSFileInfo * info;
 #else
@@ -73,7 +88,7 @@ static void libbalsa_vfs_finalize(LibbalsaVfs * self);
 gboolean
 libbalsa_vfs_local_only(void)
 {
-#ifdef USE_GNOME_VFS
+#if (HAVE_GIO || HAVE_GNOME_VFS)
     return FALSE;
 #else
     return TRUE;
@@ -141,7 +156,12 @@ libbalsa_vfs_finalize(LibbalsaVfs * self)
         g_free(priv->folder_uri);
         g_free(priv->mime_type);
         g_free(priv->charset);
-#ifdef USE_GNOME_VFS
+#if HAVE_GIO
+        if (priv->gio_gfile)
+            g_object_unref(priv->gio_gfile);
+        if (priv->info)
+            g_object_unref(priv->info);
+#elif HAVE_GNOME_VFS
         if (priv->gvfs_uri)
             gnome_vfs_uri_unref(priv->gvfs_uri);
         if (priv->info)
@@ -179,7 +199,9 @@ libbalsa_vfs_new_from_uri(const gchar * uri)
     retval->priv->text_attr = (LibBalsaTextAttribute) -1;
 
     retval->priv->file_uri = g_strdup(uri);
-#ifdef USE_GNOME_VFS
+#if HAVE_GIO
+    retval->priv->gio_gfile = g_file_new_for_uri(uri);
+#elif HAVE_GNOME_VFS
     retval->priv->gvfs_uri = gnome_vfs_uri_new(uri);
     if (!retval->priv->gvfs_uri)
         g_message(_("Failed to convert %s to a Gnome VFS URI"), uri);
@@ -349,7 +371,19 @@ libbalsa_vfs_get_mime_type(const LibbalsaVfs * file)
     g_return_val_if_fail(priv->file_uri, NULL);
 
     if (!priv->mime_type) {
-#ifdef USE_GNOME_VFS
+#if HAVE_GIO
+        /* use GIO to determine the mime type of the file */
+        g_return_val_if_fail(priv->gio_gfile, FALSE);
+
+        if (!priv->info)
+            priv->info = 
+                g_file_query_info(priv->gio_gfile, GIO_INFO_ATTS,
+                                  G_FILE_QUERY_INFO_NONE, NULL, NULL);
+        if (priv->info)
+            priv->mime_type =
+                g_strdup(g_file_info_get_attribute_string(priv->info,
+                                                          G_FILE_ATTRIBUTE_STANDARD_CONTENT_TYPE));
+#elif HAVE_GNOME_VFS
         /* use GnomeVFS to determine the mime type of the file */
         g_return_val_if_fail(priv->gvfs_uri, FALSE);
 
@@ -367,10 +401,10 @@ libbalsa_vfs_get_mime_type(const LibbalsaVfs * file)
                  GNOME_VFS_FILE_INFO_FIELDS_MIME_TYPE) != 0)
                 priv->mime_type = g_strdup(gnome_vfs_file_info_get_mime_type(priv->info));
         }
+#endif
 
         /* always fall back to application/octet-stream */
         if (!priv->mime_type)
-#endif
             priv->mime_type = g_strdup("application/octet-stream");
     }
 
@@ -412,7 +446,72 @@ libbalsa_vfs_get_text_attr(const LibbalsaVfs * file)
     g_return_val_if_fail(priv->file_uri, 0);
 
     if (priv->text_attr == (LibBalsaTextAttribute) -1) {
-#ifdef USE_GNOME_VFS
+#if HAVE_GIO
+        GInputStream * stream;
+
+        /* use GIO to determine the text attributes of the file */
+        g_return_val_if_fail(priv->gio_gfile, 0);
+        priv->text_attr = 0;
+
+        /* read and check - see libbalsa_text_attr_file() */
+        if ((stream = G_INPUT_STREAM(g_file_read(priv->gio_gfile, NULL, NULL))) != NULL) {
+            gchar buf[1024];
+            gchar *new_chars = buf;
+            gboolean has_esc = FALSE;
+            gboolean has_hi_bit = FALSE;
+            gboolean has_hi_ctrl = FALSE;
+            gboolean is_utf8 = TRUE;
+            gssize bytes_read;
+
+            while ((is_utf8 || (!has_esc || !has_hi_bit || !has_hi_ctrl)) &&
+                   ((bytes_read = g_input_stream_read(stream,
+                                                      new_chars,
+                                                      (sizeof buf) - (new_chars - buf) - 1,
+                                                      NULL,
+                                                      NULL)) > 0)) {
+                new_chars[bytes_read] = '\0';
+                
+                if (!has_esc || !has_hi_bit || !has_hi_ctrl) {
+                    guchar * p;
+
+                    for (p = (guchar *) new_chars; *p; p++)
+                        if (*p == 0x1b)
+                            has_esc = TRUE;
+                        else if (*p >= 0x80) {
+                            has_hi_bit = TRUE;
+                            if (*p <= 0x9f)
+                                has_hi_ctrl = TRUE;
+                        }
+                }
+
+                if (is_utf8) {
+                    const gchar *end;
+
+                    new_chars = buf;
+                    if (!g_utf8_validate(buf, -1, &end)) {
+                        if (g_utf8_get_char_validated(end, -1) == (gunichar) (-1))
+                            is_utf8 = FALSE;
+                        else
+                            /* copy any remaining bytes, including the
+                             * terminating '\0', to start of buffer */
+                            while ((*new_chars = *end++) != '\0')
+                                new_chars++;
+                    }
+                }
+            }
+
+            g_object_unref(stream);
+
+            if (has_esc)
+                priv->text_attr |= LIBBALSA_TEXT_ESC;
+            if (has_hi_bit)
+                priv->text_attr |= LIBBALSA_TEXT_HI_BIT;
+            if (has_hi_ctrl)
+                priv->text_attr |= LIBBALSA_TEXT_HI_CTRL;
+            if (is_utf8 && has_hi_bit)
+                priv->text_attr |= LIBBALSA_TEXT_HI_UTF8;
+        }
+#elif HAVE_GNOME_VFS
         GnomeVFSHandle *handle;
 
         /* use GnomeVFS to determine the text attributes of the file */
@@ -490,7 +589,7 @@ libbalsa_vfs_get_text_attr(const LibbalsaVfs * file)
 gsize
 libbalsa_vfs_get_size(const LibbalsaVfs * file)
 {
-#ifndef USE_GNOME_VFS
+#if (!defined(HAVE_GIO) && !defined(HAVE_GNOME_VFS))
     struct stat s;
 #endif
     gsize retval = 0;
@@ -501,7 +600,19 @@ libbalsa_vfs_get_size(const LibbalsaVfs * file)
     priv = file->priv;
     g_return_val_if_fail(priv->file_uri, 0);
 
-#ifdef USE_GNOME_VFS
+#if HAVE_GIO
+    /* use GIO to determine the size of the file */
+    g_return_val_if_fail(priv->gio_gfile, 0);
+
+    if (!priv->info)
+        priv->info = 
+            g_file_query_info(priv->gio_gfile, GIO_INFO_ATTS,
+                              G_FILE_QUERY_INFO_NONE, NULL, NULL);
+    if (priv->info)
+        retval =
+            (gsize) g_file_info_get_attribute_uint64(priv->info,
+                                                     G_FILE_ATTRIBUTE_STANDARD_SIZE);
+#elif HAVE_GNOME_VFS
     /* use GnomeVFS to determine the size of the file */
     g_return_val_if_fail(priv->gvfs_uri, 0);
 
@@ -513,7 +624,7 @@ libbalsa_vfs_get_size(const LibbalsaVfs * file)
              GNOME_VFS_FILE_INFO_FIELDS_SIZE) == 0)
             gnome_vfs_get_file_info_uri(priv->gvfs_uri, priv->info,
                                         GNOME_VFS_FILE_INFO_GET_ACCESS_RIGHTS |
-                                       GNOME_VFS_FILE_INFO_FOLLOW_LINKS);
+                                        GNOME_VFS_FILE_INFO_FOLLOW_LINKS);
         if ((priv->info->valid_fields &
              GNOME_VFS_FILE_INFO_FIELDS_SIZE) != 0)
             retval = (gsize) priv->info->size;
@@ -536,7 +647,8 @@ GMimeStream *
 libbalsa_vfs_create_stream(const LibbalsaVfs * file, mode_t mode, 
                            gboolean rdwr, GError ** err)
 {
-#ifdef USE_GNOME_VFS
+#if HAVE_GIO
+#elif HAVE_GNOME_VFS
     GnomeVFSOpenMode openmode = GNOME_VFS_OPEN_RANDOM | GNOME_VFS_OPEN_READ;
     GnomeVFSHandle * handle;
     GnomeVFSResult result;
@@ -551,8 +663,13 @@ libbalsa_vfs_create_stream(const LibbalsaVfs * file, mode_t mode,
     priv = file->priv;
     g_return_val_if_fail(priv->file_uri, NULL);
 
-#ifdef USE_GNOME_VFS
-    /* use GnomeVFS to create a GMime Gnome VFS stream */
+#if HAVE_GIO
+    /* use GIO to create a GMime stream */
+    g_return_val_if_fail(priv->gio_gfile, NULL);
+
+    return g_mime_stream_gio_new(priv->gio_gfile);
+#elif HAVE_GNOME_VFS
+    /* use GnomeVFS to create a GMime stream */
     g_return_val_if_fail(priv->gvfs_uri, NULL);
 
     if (rdwr) {
@@ -562,7 +679,7 @@ libbalsa_vfs_create_stream(const LibbalsaVfs * file, mode_t mode,
     } else
         result = gnome_vfs_open_uri(&handle, priv->gvfs_uri, openmode);
     if (result != GNOME_VFS_OK) {
-        g_set_error(err, LIBBALSA_ERROR_QUARK, result,
+        g_set_error(err, LIBBALSA_VFS_ERROR_QUARK, result,
                     "%s", gnome_vfs_result_to_string(result));
         return NULL;
     }
@@ -598,7 +715,16 @@ libbalsa_vfs_file_exists(const LibbalsaVfs * file)
     priv = file->priv;
     g_return_val_if_fail(priv->file_uri, FALSE);
 
-#ifdef USE_GNOME_VFS
+#if HAVE_GIO
+    /* use GIO to get the file's attributes - fails if the file does not exist */
+    g_return_val_if_fail(priv->gio_gfile, 0);
+
+    if (!priv->info)
+        priv->info = 
+            g_file_query_info(priv->gio_gfile, GIO_INFO_ATTS,
+                              G_FILE_QUERY_INFO_NONE, NULL, NULL);
+    result = priv->info != NULL;
+#elif HAVE_GNOME_VFS
     /* use GnomeVFS to check if the file exists */
     g_return_val_if_fail(priv->gvfs_uri, FALSE);
 
@@ -629,7 +755,7 @@ libbalsa_vfs_file_exists(const LibbalsaVfs * file)
 gboolean
 libbalsa_vfs_is_regular_file(const LibbalsaVfs * file, GError **err)
 {
-#ifndef USE_GNOME_VFS
+#if (!defined(HAVE_GIO) && !defined(HAVE_GNOME_VFS))
     struct stat s;
 #endif
     gboolean result = FALSE;
@@ -640,7 +766,31 @@ libbalsa_vfs_is_regular_file(const LibbalsaVfs * file, GError **err)
     priv = file->priv;
     g_return_val_if_fail(priv->file_uri, FALSE);
 
-#ifdef USE_GNOME_VFS
+#if HAVE_GIO
+    /* use GIO to check if the file is a regular one which can be read */
+    g_return_val_if_fail(priv->gio_gfile, 0);
+
+    if (!priv->info)
+        priv->info = 
+            g_file_query_info(priv->gio_gfile, GIO_INFO_ATTS,
+                              G_FILE_QUERY_INFO_NONE, NULL, err);
+    if (priv->info) {
+        if (g_file_info_get_file_type(priv->info) != G_FILE_TYPE_REGULAR)
+            g_set_error(err, LIBBALSA_VFS_ERROR_QUARK, -1,
+                        _("not a regular file"));
+        else if (!g_file_info_get_attribute_boolean(priv->info,
+                                                    G_FILE_ATTRIBUTE_ACCESS_CAN_READ)) {
+            /* the read flag may not be set for some remote file systems (like smb),
+             * so try to actually open the file... */
+            GFileInputStream * stream = g_file_read(priv->gio_gfile, NULL, err);
+            if (stream) {
+                g_object_unref(stream);
+                result = TRUE;
+            }
+        } else
+            result = TRUE;
+    }
+#elif HAVE_GNOME_VFS
     /* use GnomeVFS to check if the file is a regular one which can be read */
     g_return_val_if_fail(priv->gvfs_uri, FALSE);
 
@@ -654,7 +804,6 @@ libbalsa_vfs_is_regular_file(const LibbalsaVfs * file, GError **err)
             gnome_vfs_get_file_info_uri(priv->gvfs_uri, priv->info,
                                         GNOME_VFS_FILE_INFO_GET_ACCESS_RIGHTS |
                                         GNOME_VFS_FILE_INFO_FOLLOW_LINKS);
-        g_message("fields = %x", priv->info->valid_fields);
         if ((priv->info->valid_fields &
              (GNOME_VFS_FILE_INFO_FIELDS_TYPE |
               GNOME_VFS_FILE_INFO_FIELDS_PERMISSIONS)) !=
@@ -670,7 +819,8 @@ libbalsa_vfs_is_regular_file(const LibbalsaVfs * file, GError **err)
             g_set_error(err, LIBBALSA_VFS_ERROR_QUARK, -1, _("cannot read"));
         else
             result = TRUE;
-    }
+    } else
+        g_set_error(err, LIBBALSA_VFS_ERROR_QUARK, -1, _("cannot access file"));
 #else
     /* use libc to check if the file is a regular one which can be read */
     g_return_val_if_fail(priv->local_name, FALSE);
@@ -694,7 +844,7 @@ libbalsa_vfs_is_regular_file(const LibbalsaVfs * file, GError **err)
 gint
 libbalsa_vfs_file_unlink(const LibbalsaVfs * file, GError **err)
 {
-#ifdef USE_GNOME_VFS
+#ifdef HAVE_GNOME_VFS
     GnomeVFSResult vfs_res;
 #endif
     gint result = -1;
@@ -705,7 +855,12 @@ libbalsa_vfs_file_unlink(const LibbalsaVfs * file, GError **err)
     priv = file->priv;
     g_return_val_if_fail(priv->file_uri, -1);
 
-#ifdef USE_GNOME_VFS
+#if HAVE_GIO
+    /* use GIO to delete the file */
+    g_return_val_if_fail(priv->gio_gfile, -1);
+    if (g_file_delete(priv->gio_gfile, NULL, err))
+        result = 0;
+#elif HAVE_GNOME_VFS
     /* use GnomeVFS to unlink the file */
     g_return_val_if_fail(priv->gvfs_uri, -1);
 
@@ -725,4 +880,263 @@ libbalsa_vfs_file_unlink(const LibbalsaVfs * file, GError **err)
 #endif
 
     return result;
+}
+
+
+gboolean
+libbalsa_vfs_launch_app(const LibbalsaVfs * file, GObject * object, GError **err)
+{
+#if HAVE_GIO
+    GAppInfo *app;
+    GList * args;
+    gboolean result;
+#elif HAVE_GNOME_VFS
+    gchar *id;
+    GnomeVFSMimeApplication *app;
+    GnomeVFSResult gvfs_result;
+    GList *uris;
+#endif
+
+    g_return_val_if_fail(file != NULL, FALSE);
+    g_return_val_if_fail(object != NULL, FALSE);
+
+#if HAVE_GIO /* -- launch the requested application using GIO */
+
+    app = G_APP_INFO(g_object_get_data(object, LIBBALSA_VFS_MIME_ACTION));
+    if (!app) {
+        g_set_error(err, LIBBALSA_VFS_ERROR_QUARK, -1,
+                    _("Cannot launch, missing application"));
+        return FALSE;
+    }
+    args = g_list_prepend(NULL, file->priv->gio_gfile);
+    result = g_app_info_launch(app, args, NULL, err);
+    g_list_free(args);
+    return result;
+
+#elif HAVE_GNOME_VFS /* -- launch the requested application using Gnome-VFS -- */
+
+    id = (gchar *) g_object_get_data(object, LIBBALSA_VFS_MIME_ACTION);
+    if (!id) {
+        g_set_error(err, LIBBALSA_VFS_ERROR_QUARK, -1,
+                    _("Cannot launch, missing application"));
+        return FALSE;
+    }
+#if HAVE_GNOME_VFS29
+    app = gnome_vfs_mime_application_new_from_desktop_id(id);
+#else				/* HAVE_GNOME_VFS29 */
+    app = gnome_vfs_mime_application_new_from_id(id);
+#endif				/* HAVE_GNOME_VFS29 */
+    if (!app) {
+        g_set_error(err, LIBBALSA_VFS_ERROR_QUARK, -1,
+                    _("Cannot find application for id %s"), id);
+        return FALSE;
+    }
+
+    uris = g_list_prepend(NULL, file->priv->file_uri);
+    gvfs_result = gnome_vfs_mime_application_launch(app, uris);
+    g_list_free(uris);
+    if (gvfs_result != GNOME_VFS_OK)
+        g_set_error(err, LIBBALSA_VFS_ERROR_QUARK, -1,
+                    _("Cannot launch %s: %s"), app->name,
+                    gnome_vfs_result_to_string(gvfs_result));
+    return gvfs_result == GNOME_VFS_OK;
+    
+#else /* -- no GIO or Gnome-VFS support -- */
+
+    return FALSE;
+
+#endif
+}
+
+
+gboolean
+libbalsa_vfs_launch_app_for_body(LibBalsaMessageBody * mime_body,
+                                 GObject * object, GError **err)
+{
+    gchar *uri;
+    LibbalsaVfs * file;
+    gboolean result;
+
+    g_return_val_if_fail(mime_body != NULL, FALSE);
+    g_return_val_if_fail(object != NULL, FALSE);
+
+    if (!libbalsa_message_body_save_temporary(mime_body, err))
+        return FALSE;
+
+    uri = g_filename_to_uri(mime_body->temp_filename, NULL, NULL);
+    file = libbalsa_vfs_new_from_uri(uri);
+    g_free(uri);
+    result = libbalsa_vfs_launch_app(file,object , err);
+    g_object_unref(file);
+
+    return result;
+}
+
+
+gchar *
+libbalsa_vfs_content_description(const gchar * mime_type)
+{
+    g_return_val_if_fail(mime_type != NULL, NULL);
+
+#if HAVE_GIO
+    return g_content_type_get_description(mime_type);
+#elif HAVE_GNOME_VFS
+    return g_strdup(gnome_vfs_mime_get_description(mime_type));
+#else
+    return NULL;
+#endif
+}
+
+gchar *
+libbalsa_vfs_content_type_of_buffer(const guchar * buffer,
+                                    gsize length)
+{
+#if HAVE_GIO
+    gchar * retval;
+    gboolean content_uncertain;
+#endif
+
+    g_return_val_if_fail(buffer != NULL, NULL);
+    g_return_val_if_fail(length > 0, NULL);
+
+#if HAVE_GIO
+    retval = g_content_type_guess(NULL, buffer, length, &content_uncertain);
+    if (content_uncertain) {
+        g_free(retval);
+        retval = g_strdup("application/octet-stream");
+    }
+    return retval;
+#elif HAVE_GNOME_VFS
+    return g_strdup(gnome_vfs_get_mime_type_for_data(buffer, length));
+#else
+    return g_strdup("application/octet-stream");
+#endif
+}
+
+
+#ifdef HAVE_GIO
+static void 
+gio_add_vfs_menu_item(GtkMenu * menu, GAppInfo *app, GCallback callback,
+                      gpointer data)
+{
+    gchar *menu_label =
+        g_strdup_printf(_("Open with %s"), g_app_info_get_name(app));
+    GtkWidget *menu_item = gtk_menu_item_new_with_label (menu_label);
+    
+    g_object_ref(G_OBJECT(app));
+    g_object_set_data_full(G_OBJECT(menu_item), LIBBALSA_VFS_MIME_ACTION,
+			   app, g_object_unref);
+    g_signal_connect(G_OBJECT (menu_item), "activate", callback, data);
+    gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
+    g_free(menu_label);
+}
+#elif HAVE_GNOME_VFS
+static void 
+gvfs_add_vfs_menu_item(GtkMenu * menu, const GnomeVFSMimeApplication *app,
+                       GCallback callback, gpointer data)
+{
+    gchar *menu_label = g_strdup_printf(_("Open with %s"), app->name);
+    GtkWidget *menu_item = gtk_menu_item_new_with_label (menu_label);
+    
+    g_object_set_data_full(G_OBJECT (menu_item), LIBBALSA_VFS_MIME_ACTION, 
+			   g_strdup(app->id), g_free);
+    g_signal_connect(G_OBJECT (menu_item), "activate", callback, data);
+    gtk_menu_shell_append (GTK_MENU_SHELL (menu), menu_item);
+    g_free (menu_label);
+}
+#endif
+
+
+/* fill the passed menu with vfs items */
+void
+libbalsa_vfs_fill_menu_by_content_type(GtkMenu * menu,
+				       const gchar * content_type,
+				       GCallback callback, gpointer data)
+{
+#if HAVE_GIO
+    GList* list;
+    GAppInfo *def_app;
+    GList *app_list;
+    
+    g_return_if_fail(data != NULL);
+
+    if ((def_app = g_app_info_get_default_for_type(content_type, FALSE)))
+        gio_add_vfs_menu_item(menu, def_app, callback, data);
+
+    app_list = g_app_info_get_all_for_type(content_type);
+    for (list = app_list; list; list = g_list_next(list)) {
+        GAppInfo *app = G_APP_INFO(list->data);
+
+        if (app && g_app_info_should_show(app) &&
+            (!def_app || !g_app_info_equal(app, def_app)))
+            gio_add_vfs_menu_item(menu, app, callback, data);
+    }
+    if (def_app)
+        g_object_unref(def_app);
+    if (app_list) {
+        g_list_foreach(app_list, (GFunc) g_object_unref, NULL);
+        g_list_free(app_list);
+    }
+#elif HAVE_GNOME_VFS
+    GList* list;
+    GnomeVFSMimeApplication *def_app;
+    GList *app_list;
+    
+    g_return_if_fail(data != NULL);
+
+    if((def_app=gnome_vfs_mime_get_default_application(content_type)))
+        gvfs_add_vfs_menu_item(menu, def_app, callback, data);
+
+    app_list = gnome_vfs_mime_get_all_applications(content_type);
+    for (list = app_list; list; list = g_list_next(list)) {
+        GnomeVFSMimeApplication *app = (GnomeVFSMimeApplication *) list->data;
+
+        if (app && (!def_app || strcmp(app->name, def_app->name) != 0))
+            gvfs_add_vfs_menu_item(menu, app, callback, data);
+    }
+    gnome_vfs_mime_application_free(def_app);
+    
+    gnome_vfs_mime_application_list_free (app_list);
+#endif /* HAVE_GNOME_VFS */
+}
+
+GtkWidget *
+libbalsa_vfs_mime_button(LibBalsaMessageBody * mime_body,
+                         const gchar * content_type,
+                         GCallback callback, gpointer data)
+{
+    GtkWidget *button = NULL;
+#if HAVE_GIO
+    gchar *msg;
+    GAppInfo *app = g_app_info_get_default_for_type(content_type, FALSE);
+
+    if (app) {
+	msg = g_strdup_printf(_("Open _part with %s"), g_app_info_get_name(app));
+	button = gtk_button_new_with_mnemonic(msg);
+	g_object_set_data_full(G_OBJECT(button), LIBBALSA_VFS_MIME_ACTION,
+			       (gpointer) app, g_object_unref);
+	g_free(msg);
+
+	g_signal_connect(G_OBJECT(button), "clicked",
+                         callback, data);
+    }
+#elif HAVE_GNOME_VFS
+    gchar *msg;
+    GnomeVFSMimeApplication *app =
+	gnome_vfs_mime_get_default_application(content_type);
+
+    if (app) {
+	msg = g_strdup_printf(_("Open _part with %s"), app->name);
+	button = gtk_button_new_with_mnemonic(msg);
+	g_object_set_data_full(G_OBJECT(button), LIBBALSA_VFS_MIME_ACTION,
+			       (gpointer) g_strdup(app->id), g_free);
+	g_free(msg);
+	gnome_vfs_mime_application_free(app);
+
+	g_signal_connect(G_OBJECT(button), "clicked",
+                         callback, data);
+    }
+#endif
+
+    return button;
 }

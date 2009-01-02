@@ -24,7 +24,6 @@
 
 #include <string.h>
 #include <gconf/gconf-client.h>
-#include <gnome.h>
 #include <glib/gi18n.h>
 #include "balsa-app.h"
 #include "save-restore.h"

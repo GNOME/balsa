@@ -20,8 +20,6 @@
  */
 
 #include <string.h>
-#include <libgnomevfs/gnome-vfs-mime-info.h>
-#include <libgnomevfs/gnome-vfs-mime-handlers.h>
 #include "config.h"
 #include "balsa-app.h"
 #include <glib/gi18n.h>
@@ -30,99 +28,25 @@
 #include "balsa-mime-widget.h"
 #include "balsa-mime-widget-callbacks.h"
 
-#include <gnome.h> /* for gnome_execute_shell() */
 #include <gdk/gdkkeysyms.h>
+
 
 void
 balsa_mime_widget_ctx_menu_cb(GtkWidget * menu_item,
 			      LibBalsaMessageBody * mime_body)
 {
-    gchar *content_type, *fpos;
-    const gchar *cmd;
-    gchar *key;
     GError *err = NULL;
+    gboolean result;
+
     g_return_if_fail(mime_body != NULL);
-
-    content_type = libbalsa_message_body_get_mime_type(mime_body);
-    key = g_object_get_data(G_OBJECT(menu_item), "mime_action");
-
-    if (key != NULL
-	&& (cmd = gnome_vfs_mime_get_value(content_type, key)) != NULL) {
-	if (!libbalsa_message_body_save_temporary(mime_body, &err)) {
-	    balsa_information(LIBBALSA_INFORMATION_WARNING,
-			      _("Could not create temporary file %s: %s"),
-			      mime_body->temp_filename,
-                              err ? err->message : "Unknown error");
-            g_clear_error(&err);
-	    g_free(content_type);
-	    return;
-	}
-
-	if ((fpos = strstr(cmd, "%f")) != NULL) {
-	    gchar *exe_str, *cps = g_strdup(cmd);
-	    cps[fpos - cmd + 1] = 's';
-	    exe_str = g_strdup_printf(cps, mime_body->temp_filename);
-	    gnome_execute_shell(NULL, exe_str);
-	    fprintf(stderr, "Executed: %s\n", exe_str);
-	    g_free(cps);
-	    g_free(exe_str);
-	}
-    } else
-	fprintf(stderr, "view for %s returned NULL\n", content_type);
-
-    g_free(content_type);
-}
-
-
-void
-balsa_mime_widget_ctx_menu_vfs_cb(GtkWidget * menu_item,
-				  LibBalsaMessageBody * mime_body)
-{
-    gchar *id;
-
-    if ((id = g_object_get_data(G_OBJECT(menu_item), "mime_action"))) {
-        GError *err = NULL;
-#if HAVE_GNOME_VFS29
-	GnomeVFSMimeApplication *app =
-	    gnome_vfs_mime_application_new_from_desktop_id(id);
-#else				/* HAVE_GNOME_VFS29 */
-	GnomeVFSMimeApplication *app =
-	    gnome_vfs_mime_application_new_from_id(id);
-#endif				/* HAVE_GNOME_VFS29 */
-	if (app) {
-	    if (libbalsa_message_body_save_temporary(mime_body, &err)) {
-#if HAVE_GNOME_VFS29
-		gchar *uri = g_filename_to_uri(mime_body->temp_filename, NULL, NULL);
-		GList *uris = g_list_prepend(NULL, uri);
-		gnome_vfs_mime_application_launch(app, uris);
-		g_free(uri);
-		g_list_free(uris);
-#else				/* HAVE_GNOME_VFS29 */
-		gboolean tmp =
-		    (app->expects_uris ==
-		     GNOME_VFS_MIME_APPLICATION_ARGUMENT_TYPE_URIS);
-		gchar *uri = g_filename_to_uri(mime_body->temp_filename, NULL, NULL);
-		gchar *exe_str =
-		    g_strdup_printf("%s \"%s\"", app->command,
-				    tmp ? uri : mime_body->temp_filename);
-
-		gnome_execute_shell(NULL, exe_str);
-		fprintf(stderr, "Executed: %s\n", exe_str);
-		g_free(uri);
-		g_free(exe_str);
-#endif				/* HAVE_GNOME_VFS29 */
-	    } else {
-		balsa_information(LIBBALSA_INFORMATION_WARNING,
-				  _("Could not create temporary file %s: %s"),
-				  mime_body->temp_filename,
-                                  err ? err->message : "Unknown error");
-	    }
-	    gnome_vfs_mime_application_free(app);
-	} else {
-	    fprintf(stderr, "lookup for application %s returned NULL\n",
-		    id);
-	}
-    }
+    result = libbalsa_vfs_launch_app_for_body(mime_body,
+                                              G_OBJECT(menu_item),
+                                              &err);
+    if (!result)
+        balsa_information(LIBBALSA_INFORMATION_WARNING,
+                          _("Could not launch application: %s"),
+                          err ? err->message : "Unknown error");
+    g_clear_error(&err);
 }
 
 

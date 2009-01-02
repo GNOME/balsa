@@ -678,8 +678,8 @@ text_view_populate_popup(GtkTextView *textview, GtkMenu *menu,
                           (GtkCallback)gtk_widget_destroy_insensitive, NULL);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu),
 			  gtk_separator_menu_item_new ());
-    libbalsa_fill_vfs_menu_by_content_type(menu, "text/plain",
-					   G_CALLBACK (balsa_mime_widget_ctx_menu_vfs_cb),
+    libbalsa_vfs_fill_menu_by_content_type(menu, "text/plain",
+					   G_CALLBACK (balsa_mime_widget_ctx_menu_cb),
 					   (gpointer)mime_body);
 
     menu_item = gtk_menu_item_new_with_label (_("Save..."));
@@ -1168,8 +1168,8 @@ balsa_gtk_html_popup(GtkWidget * html, BalsaMessage * bm)
     menuitem = gtk_separator_menu_item_new ();
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
 
-    libbalsa_fill_vfs_menu_by_content_type(GTK_MENU(menu), "text/html",
-					   G_CALLBACK (balsa_mime_widget_ctx_menu_vfs_cb),
+    libbalsa_vfs_fill_menu_by_content_type(GTK_MENU(menu), "text/html",
+					   G_CALLBACK (balsa_mime_widget_ctx_menu_cb),
 					   mime_body);
 
     menuitem = gtk_menu_item_new_with_label (_("Save..."));

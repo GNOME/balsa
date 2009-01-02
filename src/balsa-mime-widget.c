@@ -20,9 +20,8 @@
  */
 
 #include <string.h>
-#include <libgnomevfs/gnome-vfs-mime-info.h>
-#include <libgnomevfs/gnome-vfs-mime-handlers.h>
 #include "config.h"
+#include "libbalsa.h"
 #include "balsa-app.h"
 #include "balsa-icons.h"
 #include "mime-stream-shared.h"
@@ -47,14 +46,6 @@ static BalsaMimeWidget *balsa_mime_widget_new_unknown(BalsaMessage * bm,
 						      mime_body,
 						      const gchar *
 						      content_type);
-
-/* buttons to handle unknown mime types */
-static GtkWidget *part_info_mime_button(LibBalsaMessageBody * mime_body,
-					const gchar * content_type,
-					const gchar * key);
-static GtkWidget *part_info_mime_button_vfs(LibBalsaMessageBody *
-					    mime_body,
-					    const gchar * content_type);
 
 static void vadj_change_cb(GtkAdjustment *vadj, GtkWidget *widget);
 
@@ -226,7 +217,7 @@ balsa_mime_widget_new_unknown(BalsaMessage * bm,
     GtkWidget *hbox;
     GtkWidget *button = NULL;
     gchar *msg;
-    const gchar *content_desc;
+    gchar *content_desc;
     BalsaMimeWidget *mw;
     gchar *use_content_type;
 
@@ -267,8 +258,7 @@ balsa_mime_widget_new_unknown(BalsaMessage * bm,
             size = g_mime_stream_read(stream, buffer, length);
             libbalsa_mime_stream_shared_unlock(stream);
             g_object_unref(stream);
-            use_content_type =
-                g_strdup(gnome_vfs_get_mime_type_for_data(buffer, size));
+            use_content_type = libbalsa_vfs_content_type_of_buffer(buffer, size);
             if (g_ascii_strncasecmp(use_content_type, "text", 4) == 0
                 && libbalsa_text_attr_string(buffer) & LIBBALSA_TEXT_HI_BIT) {
                 /* Hmmm...better stick with application/octet-stream. */
@@ -280,27 +270,26 @@ balsa_mime_widget_new_unknown(BalsaMessage * bm,
     } else
 	use_content_type = g_strdup(content_type);
 
-    if ((content_desc = gnome_vfs_mime_get_description(use_content_type)))
+    content_desc = libbalsa_vfs_content_description(use_content_type);
+    if (content_desc) {
 	msg = g_strdup_printf(_("Type: %s (%s)"), content_desc,
 			      use_content_type);
-    else
+        g_free(content_desc);
+    } else
 	msg = g_strdup_printf(_("Content Type: %s"), use_content_type);
     gtk_box_pack_start(GTK_BOX(mw->widget), gtk_label_new(msg), FALSE,
 		       FALSE, 0);
     g_free(msg);
 
     hbox = gtk_hbox_new(TRUE, BMW_HBOX_SPACE);
-    if ((button = part_info_mime_button_vfs(mime_body, use_content_type))
-	|| (button =
-	    part_info_mime_button(mime_body, use_content_type, "view"))
-	|| (button =
-	    part_info_mime_button(mime_body, use_content_type, "open")))
+    if ((button = libbalsa_vfs_mime_button(mime_body, use_content_type,
+                                           G_CALLBACK(balsa_mime_widget_ctx_menu_cb),
+                                           (gpointer) mime_body)))
 	gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 0);
     else
 	gtk_box_pack_start(GTK_BOX(mw->widget),
 			   gtk_label_new(_("No open or view action "
-					   "defined in GNOME MIME "
-					   "for this content type")),
+					   "defined for this content type")),
 			   FALSE, FALSE, 0);
     g_free(use_content_type);
 
@@ -313,57 +302,6 @@ balsa_mime_widget_new_unknown(BalsaMessage * bm,
     gtk_box_pack_start(GTK_BOX(mw->widget), hbox, FALSE, FALSE, 0);
 
     return mw;
-}
-
-
-static GtkWidget *
-part_info_mime_button(LibBalsaMessageBody * mime_body,
-		      const gchar * content_type, const gchar * key)
-{
-    GtkWidget *button = NULL;
-    gchar *msg;
-    const gchar *cmd =
-	gnome_vfs_mime_get_value(content_type, (char *) key);
-
-    if (cmd) {
-	msg = g_strdup_printf(_("View _part with %s"), cmd);
-	button = gtk_button_new_with_mnemonic(msg);
-	g_object_set_data(G_OBJECT(button), "mime_action", (gpointer) key);
-	g_free(msg);
-
-	g_signal_connect(G_OBJECT(button), "clicked",
-			 G_CALLBACK(balsa_mime_widget_ctx_menu_cb),
-			 (gpointer) mime_body);
-    }
-
-    return button;
-}
-
-
-static GtkWidget *
-part_info_mime_button_vfs(LibBalsaMessageBody * mime_body,
-			  const gchar * content_type)
-{
-    GtkWidget *button = NULL;
-    gchar *msg;
-    GnomeVFSMimeApplication *app =
-	gnome_vfs_mime_get_default_application(content_type);
-
-    if (app) {
-	msg = g_strdup_printf(_("View _part with %s"), app->name);
-	button = gtk_button_new_with_mnemonic(msg);
-	g_object_set_data_full(G_OBJECT(button), "mime_action",
-			       (gpointer) g_strdup(app->id), g_free);
-	g_free(msg);
-
-	g_signal_connect(G_OBJECT(button), "clicked",
-			 G_CALLBACK(balsa_mime_widget_ctx_menu_vfs_cb),
-			 (gpointer) mime_body);
-
-	gnome_vfs_mime_application_free(app);
-
-    }
-    return button;
 }
 
 

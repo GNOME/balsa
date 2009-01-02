@@ -22,8 +22,8 @@
 
 #include "config.h"
 
-/* note: this module will be compiled only if Gnome is available */
-#ifdef HAVE_GNOME
+/* note: this module will be compiled only if Gnome-Vfs is available */
+#ifdef HAVE_GNOME_VFS
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -463,4 +463,4 @@ g_mime_stream_gvfs_set_owner(GMimeStreamGvfs * stream, gboolean owner)
     stream->owner = owner;
 }
 
-#endif				/* HAVE_GNOME */
+#endif				/* HAVE_GNOME_VFS */

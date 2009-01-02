@@ -21,7 +21,6 @@
 
 #include "config.h"
 
-#include <gnome.h>
 /* #include <gtk/gtkfeatures.h> */
 #include <string.h>
 #include <gdk/gdkfont.h>

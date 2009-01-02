@@ -66,7 +66,9 @@
 #endif
 #endif                          /* GTK_CHECK_VERSION(2, 14, 0) */
 
+#if HAVE_GNOME
 #include <gnome.h> /* for gnome_triggers_do() */
+#endif
 
 #ifdef BALSA_USE_THREADS
 #include "threads.h"
@@ -3261,9 +3263,11 @@ bw_display_new_mail_notification(int num_new, int has_new)
     if (num_new <= 0 && has_new <= 0)
         return;
 
+#if HAVE_GNOME
     if (balsa_app.notify_new_mail_sound)
         gnome_triggers_do("New mail has arrived", "email",
                           "balsa", "newmail", NULL);
+#endif
 
 #if GTK_CHECK_VERSION(2, 10, 0)
     if (balsa_app.notify_new_mail_icon) {

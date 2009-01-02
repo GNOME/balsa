@@ -20,7 +20,6 @@
  */
 
 #include <string.h>
-#include <gnome.h>
 #include <gdk/gdkx.h>
 
 #include "config.h"

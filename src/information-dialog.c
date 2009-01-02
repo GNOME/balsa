@@ -26,7 +26,6 @@
 
 #include "config.h"
 
-#include <gnome.h>
 #include <string.h>
 
 #include "libbalsa.h"

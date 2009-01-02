@@ -24,17 +24,22 @@
 #include <ctype.h>
 #include <string.h>
 
-#ifdef HAVE_GNOME
+#if HAVE_GIO
+#include <gio/gio.h>
+#endif
+
+#if HAVE_GNOME
 #include <gnome.h>
-#include <libgnomevfs/gnome-vfs-mime-handlers.h>
+#endif
+#if HAVE_GNOME_VFS
 #include <libgnomevfs/gnome-vfs-mime-info.h>
 #include <libgnomevfs/gnome-vfs.h>
 #endif
 
 #include "misc.h"
+#include "libbalsa.h"
 #include "files.h"
 #include <glib/gi18n.h>
-#include "libbalsa-vfs.h"
 
 static const gchar *permanent_prefixes[] = {
 /*	BALSA_DATA_PREFIX,
@@ -140,10 +145,12 @@ libbalsa_icon_finder(const char *mime_type, const LibbalsaVfs * for_file,
     gchar *icon = NULL;
     GdkPixbuf *pixbuf = NULL;
     gint width, height;
-#ifdef HAVE_GNOME
+    const gchar * filename = NULL;
+#if HAVE_GIO
+    GtkIconTheme *icon_theme;
+#elif HAVE_GNOME
     const char *icon_file;
     GtkIconTheme *icon_theme;
-    const gchar * filename = NULL;
 #endif
 
     if (!gtk_icon_size_lookup(size, &width, &height))
@@ -157,7 +164,47 @@ libbalsa_icon_finder(const char *mime_type, const LibbalsaVfs * for_file,
     } else
 	content_type = g_strdup("application/octet-stream");
 
-#ifdef HAVE_GNOME
+#if HAVE_GIO
+    /* ask GIO for the icon */
+    if ((icon_theme = gtk_icon_theme_get_default())) {
+        GIcon * icon = g_content_type_get_icon(content_type);
+
+        if (icon && G_IS_THEMED_ICON(icon)) {
+            int i = 0;
+            GStrv icon_names;
+
+            g_object_get(G_OBJECT(icon), "names", &icon_names, NULL);
+            while (!pixbuf && icon_names && icon_names[i]) {
+                pixbuf = gtk_icon_theme_load_icon(icon_theme, icon_names[i],
+                                                  width, 0, NULL);
+                i++;
+            }
+            g_strfreev(icon_names);
+            g_object_unref(icon);
+            
+            /* last resort: try gnome-mime-<base mime type> */
+            if (!pixbuf) {
+                gchar * base_type_icon = g_strdup_printf("gnome-mime-%s", content_type);
+                gchar * slash = strchr(base_type_icon, '/');
+
+                if (slash)
+                    *slash = '\0';
+                pixbuf = gtk_icon_theme_load_icon(icon_theme, base_type_icon,
+                                                   width, 0, NULL);
+                g_free(base_type_icon);
+            }
+
+            /* return if we found a proper pixbuf */
+	    if (pixbuf) {
+		if (used_type)
+		    *used_type = content_type;
+		else 
+		    g_free(content_type);
+		return pixbuf;
+	    }
+        }
+    }
+#elif HAVE_GNOME
     /* gtk+ 2.4.0 and above: use the default icon theme to get the icon */
     if ((icon_theme = gtk_icon_theme_get_default()))
 	if ((icon =
@@ -175,11 +222,8 @@ libbalsa_icon_finder(const char *mime_type, const LibbalsaVfs * for_file,
 	    }
 	}
 
-#if 0
-    icon_file = gnome_vfs_mime_get_icon(content_type);
-#else
+#if HAVE_GNOME_VFS
     icon_file = gnome_vfs_mime_get_value(content_type, "icon_filename");
-#endif
     
     /* check if the icon file is good and try harder otherwise */
     if (icon_file && g_file_test (icon_file, G_FILE_TEST_IS_REGULAR))
@@ -201,7 +245,9 @@ libbalsa_icon_finder(const char *mime_type, const LibbalsaVfs * for_file,
 	
 	g_free (gnome_icon);
     }
+#endif /* HAVE_GNOME_VFS */
 #endif /* HAVE_GNOME */
+
     /* load the pixbuf */
     if (icon == NULL)
 	pixbuf = libbalsa_default_attachment_pixbuf(width);
@@ -225,49 +271,3 @@ libbalsa_icon_finder(const char *mime_type, const LibbalsaVfs * for_file,
     
     return pixbuf;
 }
-
-#ifdef HAVE_GNOME
-static void 
-add_vfs_menu_item(GtkMenu * menu, const GnomeVFSMimeApplication *app,
-		  GCallback callback, gpointer data)
-{
-    gchar *menu_label = g_strdup_printf(_("Open with %s"), app->name);
-    GtkWidget *menu_item = gtk_menu_item_new_with_label (menu_label);
-    
-    g_object_set_data_full(G_OBJECT (menu_item), "mime_action", 
-			   g_strdup(app->id), g_free);
-    g_signal_connect(G_OBJECT (menu_item), "activate", callback, data);
-    gtk_menu_shell_append (GTK_MENU_SHELL (menu), menu_item);
-    g_free (menu_label);
-}
-#endif /* HAVE_GNOME */
-/* helper: fill the passed menu with vfs items */
-void
-libbalsa_fill_vfs_menu_by_content_type(GtkMenu * menu,
-				       const gchar * content_type,
-				       GCallback callback, gpointer data)
-{
-#ifdef HAVE_GNOME
-    GList* list;
-    GnomeVFSMimeApplication *def_app;
-    GList *app_list;
-    
-    g_return_if_fail(data != NULL);
-
-    if((def_app=gnome_vfs_mime_get_default_application(content_type))) {
-        add_vfs_menu_item(menu, def_app, callback, data);
-    }
-    
-
-    app_list = gnome_vfs_mime_get_all_applications(content_type);
-    for (list = app_list; list; list = list->next) {
-        GnomeVFSMimeApplication *app = list->data;
-        if (app && (!def_app || strcmp(app->name, def_app->name) != 0))
-            add_vfs_menu_item(menu, app, callback, data);
-    }
-    gnome_vfs_mime_application_free(def_app);
-    
-    gnome_vfs_mime_application_list_free (app_list);
-#endif /* HAVE_GNOME */
-}
-

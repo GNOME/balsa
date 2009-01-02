@@ -7,14 +7,14 @@
 # Héctor García Álvarez <hector@scouts-es.org>, 1999-2000.
 # Francisco Javier F. Serrador <serrador@cvs.gnome.org>, 2003, 2004, 2005, 2006.
 # Jorge Bernal <koke@amedias.org>, 2004, 2005.
-# Jorge González <jorgegonz@svn.gnome.org>, 2007, 2008.
+# Jorge González <jorgegonz@svn.gnome.org>, 2007, 200, 2009.
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa.HEAD\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
-"product=balsa&amp;component=general\n"
-"POT-Creation-Date: 2008-12-27 13:15+0000\n"
-"PO-Revision-Date: 2008-12-28 13:01+0100\n"
+"product=balsa&component=general\n"
+"POT-Creation-Date: 2009-01-02 13:35+0000\n"
+"PO-Revision-Date: 2009-01-02 21:45+0100\n"
 "Last-Translator: Jorge González <jorgegonz@svn.gnome.org>\n"
 "Language-Team: Español <gnome-es-list@gnome.org>\n"
 "MIME-Version: 1.0\n"
@@ -106,7 +106,7 @@ msgstr "No se puede encontrar la dirección en la libreta"
 # libmutt/imap/imap_ssl.c:254
 # libmutt/imap/imap_ssl.c:254
 #: ../libbalsa/address-book.c:324 ../src/main-window.c:2234
-#: ../src/main-window.c:4517 ../src/sendmsg-window.c:4134
+#: ../src/main-window.c:4524 ../src/sendmsg-window.c:4134
 msgid "Unknown error"
 msgstr "Se ha producido un error desconocido"
 
@@ -744,26 +744,26 @@ msgstr "%s: %s"
 
 # src/mailbox-conf.c:827 src/mailbox-conf.c:886
 # src/mailbox-conf.c:904 src/mailbox-conf.c:961
-#: ../libbalsa/imap-server.c:528 ../libbalsa/server.c:346
+#: ../libbalsa/imap-server.c:535 ../libbalsa/server.c:346
 #: ../libbalsa/server.c:390
 msgid "Balsa passwords"
 msgstr "Contraseñas de Balsa"
 
 # libmutt/imap/imap_ssl.c:229
 # libmutt/imap/imap_ssl.c:229
-#: ../libbalsa/imap-server.c:579
+#: ../libbalsa/imap-server.c:586
 #, c-format
 msgid "Cannot connect to %s"
 msgstr "No se puede conectar con %s"
 
 # libmutt/imap/imap_ssl.c:229
 # libmutt/imap/imap_ssl.c:229
-#: ../libbalsa/imap-server.c:584 ../libbalsa/imap-server.c:589
+#: ../libbalsa/imap-server.c:591 ../libbalsa/imap-server.c:596
 #, c-format
 msgid "Cannot connect to the server: %s"
 msgstr "No se puede conectar con el servidor: %s"
 
-#: ../libbalsa/imap-server.c:737
+#: ../libbalsa/imap-server.c:744
 #, c-format
 msgid "Exceeded the number of connections per server %s"
 msgstr "Se sobrepasó el número de conexiones por servidor %s"
@@ -967,7 +967,7 @@ msgstr "Reconstruyendo el mensaje"
 
 # src/main-window.c:403
 # src/main-window.c:406
-#: ../libbalsa/mailbox.c:4174
+#: ../libbalsa/mailbox.c:4175
 #, c-format
 msgid "Finding duplicate messages in source mailbox failed"
 msgstr "Ha fallado la búsqueda de mensajes duplicados en el buzón de origen"
@@ -1045,12 +1045,12 @@ msgstr "No se pudo crear el archivo temporal"
 msgid "Cannot write to temporary file %s"
 msgstr "No se pudo escribir en el archivo temporal %s"
 
-#: ../libbalsa/mailbox_imap.c:2623 ../libbalsa/mailbox_imap.c:2742
+#: ../libbalsa/mailbox_imap.c:2622 ../libbalsa/mailbox_imap.c:2741
 #, c-format
 msgid "Uploading %ld kB"
 msgstr "Subiendo %ld KiB"
 
-#: ../libbalsa/mailbox_imap.c:3041
+#: ../libbalsa/mailbox_imap.c:3040
 msgid "Server-side threading not supported."
 msgstr "Los hilos de conversación en el lado del servidor no están soportados."
 
@@ -5835,7 +5835,7 @@ msgstr ""
 #: ../src/main-window.c:2597
 msgid "translator-credits"
 msgstr ""
-"Jorge González <jorgegonz@svn.gnome.org>, 2007-2008\n"
+"Jorge González <jorgegonz@svn.gnome.org>, 2007-2009\n"
 "Jorge Bernal <koke@amedias.org>\n"
 "Francisco F. Serrador <serrador@cvs.gnome.org>"
 
@@ -5985,22 +5985,35 @@ msgstr "Sólo puede aplicar filtros en su buzón\n"
 msgid "Removing duplicates failed: %s"
 msgstr "La eliminación de duplicados falló: %s"
 
+# src/pref-manager.c:1058
+# src/pref-manager.c:1188
+#: ../src/main-window.c:4303
+#, c-format
+msgid "Removed %d duplicates"
+msgstr "%d duplicados eliminados"
+
+# src/pref-manager.c:237 src/pref-manager.c:949 src/pref-manager.c:1027
+# src/pref-manager.c:1838
+#: ../src/main-window.c:4306
+msgid "No duplicates found"
+msgstr "No se encontraron duplicados"
+
 # libmutt/mbox.c:1028
-#: ../src/main-window.c:4516
+#: ../src/main-window.c:4523
 #, c-format
 msgid "Could not open trash: %s"
 msgstr "No se pudo abrir la papelera: %s"
 
 # libmutt/mx.c:1050
 # libmutt/mx.c:1050
-#: ../src/main-window.c:4670
+#: ../src/main-window.c:4677
 #, c-format
 msgid "Balsa: %s (readonly)"
 msgstr "Balsa: %s (sólo lectura)"
 
 # src/filter-edit-dialog.c:783
 # src/filter-edit-dialog.c:693
-#: ../src/main-window.c:4672
+#: ../src/main-window.c:4679
 #, c-format
 msgid "Balsa: %s"
 msgstr "Balsa: %s"

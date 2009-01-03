@@ -1570,7 +1570,6 @@ imap_mbox_thread(ImapMboxHandle *h, const char *how, ImapSearchKey *filter)
   if(imap_mbox_handle_can_do(h, IMCAP_THREAD_REFERENCES)) {
     int can_do_literals = imap_mbox_handle_can_do(h, IMCAP_LITERAL);
     unsigned cmdno;
-    ImapResponse rc;
     ImapCmdTag tag;
 
     cmdno = imap_make_tag(tag);

@@ -1,3 +1,8 @@
+2009-01-03  Peter Bloomfield
+
+	* libbalsa/imap/imap-commands.c: (imap_mbox_thread): do not
+	shadow-declare rc.
+
 2009-01-03  Albrecht Dreß
 
 	* libbalsa/html.c: (libbalsa_html_new): tell WebKit the charset.

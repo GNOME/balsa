@@ -1,3 +1,8 @@
+2009-01-03  Peter Bloomfield
+
+	* libbalsa/gmime-gpgme-context.c: (g_mime_gpgme_encrypt):
+	clarify string--leonardof gnome org.
+
 2009-01-02  Albrecht Dreß
 
 	* configure.in: prefer gio >= 2.16.0, fallback to gnome-vfs.

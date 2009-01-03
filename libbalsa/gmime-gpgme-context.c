@@ -558,7 +558,7 @@ g_mime_gpgme_encrypt(GMimeCipherContext * context, gboolean sign,
     if (sign && (!ctx->singlepart_mode || protocol != GPGME_PROTOCOL_OpenPGP)) {
 	if (error)
 	    g_set_error(error, GPGME_ERROR_QUARK, GPG_ERR_INV_ENGINE,
-			_("combined signing and encryption is only defined for RFC 2440"));
+			_("combined signing and encryption is defined only for RFC 2440"));
 	return -1;
     }
 

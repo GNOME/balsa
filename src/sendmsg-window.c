@@ -5873,7 +5873,7 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
                 message =
                     g_string_append(message,
                         _("The message contains attachments, which cannot be "
-                          "signed or encrypted\n."));
+                          "signed or encrypted.\n"));
             message = 
                 g_string_append(message, 
                     _("You should select MIME mode if the complete "

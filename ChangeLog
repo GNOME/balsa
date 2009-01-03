@@ -1,5 +1,10 @@
 2009-01-03  Peter Bloomfield
 
+	* src/sendmsg-window.c: (send_message_handler): fix
+	string--leonardof gnome org (fixes bug #566426).
+
+2009-01-03  Peter Bloomfield
+
 	* libbalsa/imap/imap-commands.c: (imap_mbox_thread): do not
 	shadow-declare rc.
 

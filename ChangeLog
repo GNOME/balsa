@@ -1,3 +1,7 @@
+2009-01-03  Albrecht Dreß
+
+	* libbalsa/html.c: (libbalsa_html_new): tell WebKit the charset.
+
 2009-01-03  Peter Bloomfield
 
 	* libbalsa/send.c: (libbalsa_create_rfc2440_buffer): use

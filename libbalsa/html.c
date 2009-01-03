@@ -177,7 +177,8 @@ libbalsa_html_new(const gchar * text, size_t len,
     g_signal_connect(web_view, "load-progress-changed",
                      G_CALLBACK(gtk_widget_queue_resize), NULL);
 
-    webkit_web_view_load_html_string(web_view, text, NULL);
+    webkit_web_view_load_string(web_view, text, "text/html", charset,
+                                NULL);
 
     return widget;
 }

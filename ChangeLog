@@ -1,7 +1,13 @@
 2009-01-03  Peter Bloomfield
 
+	* libbalsa/send.c: (libbalsa_create_rfc2440_buffer): use
+	ngettext to handle plural--leonardof gnome org (fixes bug
+	#566420).
+
+2009-01-03  Peter Bloomfield
+
 	* libbalsa/gmime-gpgme-context.c: (g_mime_gpgme_encrypt):
-	clarify string--leonardof gnome org.
+	clarify string--leonardof gnome org (fixes bug #566415).
 
 2009-01-02  Albrecht Dreß
 

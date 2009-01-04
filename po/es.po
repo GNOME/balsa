@@ -13,8 +13,8 @@ msgstr ""
 "Project-Id-Version: balsa.HEAD\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=balsa&component=general\n"
-"POT-Creation-Date: 2009-01-02 20:48+0000\n"
-"PO-Revision-Date: 2009-01-03 16:32+0100\n"
+"POT-Creation-Date: 2009-01-03 20:35+0000\n"
+"PO-Revision-Date: 2009-01-04 13:55+0100\n"
 "Last-Translator: Jorge González <jorgegonz@svn.gnome.org>\n"
 "Language-Team: Español <gnome-es-list@gnome.org>\n"
 "MIME-Version: 1.0\n"
@@ -331,7 +331,7 @@ msgstr "la verificación de la firma ha fallado"
 
 #: ../libbalsa/gmime-gpgme-context.c:561
 #, c-format
-msgid "combined signing and encryption is only defined for RFC 2440"
+msgid "combined signing and encryption is defined only for RFC 2440"
 msgstr "la firma y el cifrado combinado sólo están definidos para el RFC 2440"
 
 #: ../libbalsa/gmime-gpgme-context.c:624
@@ -2050,7 +2050,13 @@ msgstr ""
 "No puedo determinar el conjunto de caracteres para el archivo de texto «%s»; "
 "enviando como tipo mime «%s»"
 
-#: ../libbalsa/send.c:2119 ../libbalsa/send.c:2200
+#: ../libbalsa/send.c:2120
+msgid "This message will not be encrypted for the BCC: recipient."
+msgid_plural "This message will not be encrypted for the BCC: recipients."
+msgstr[0] "Este mensaje no se cifrará para el destinatario Cco:"
+msgstr[1] "Este mensaje no se cifrará para los destinatarios Cco:"
+
+#: ../libbalsa/send.c:2206
 msgid "This message will not be encrypted for the BCC: recipient(s)."
 msgstr "Este mensaje no será cifrado para los destinatarios Cco:"
 
@@ -7930,11 +7936,8 @@ msgstr ""
 
 #: ../src/sendmsg-window.c:5875
 msgid ""
-"The message contains attachments, which cannot be signed or encrypted\n"
-"."
-msgstr ""
-"El mensaje contiene adjuntos que no se pueden firmar o cifrar\n"
-"."
+"The message contains attachments, which cannot be signed or encrypted.\n"
+msgstr "El mensaje contiene adjuntos que no se pueden firmar o cifrar.\n"
 
 #: ../src/sendmsg-window.c:5879
 msgid ""

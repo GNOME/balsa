@@ -1,3 +1,8 @@
+2009-01-10  Peter Bloomfield
+
+	* src/main-window.c: fix string--marcel telka sk (fixes bug
+	#567323).
+
 2009-01-03  Peter Bloomfield
 
 	* src/sendmsg-window.c: (send_message_handler): fix

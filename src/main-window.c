@@ -4303,8 +4303,10 @@ bw_remove_duplicates_cb(GtkAction * action, gpointer data)
             g_error_free(err);
         } else {
 	    if(dup_count)
-		balsa_information(LIBBALSA_INFORMATION_MESSAGE,
-				  _("Removed %d duplicates"), dup_count);
+                balsa_information(LIBBALSA_INFORMATION_MESSAGE,
+                                  ngettext("Removed %d duplicate",
+                                           "Removed %d duplicates",
+                                           dup_count), dup_count);
 	    else
 		balsa_information(LIBBALSA_INFORMATION_MESSAGE,
 				  _("No duplicates found"));

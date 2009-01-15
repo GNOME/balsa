@@ -1,3 +1,7 @@
+2009-01-15  Peter Bloomfield
+
+	* src/print-gtk.c: (add_margin_spinbtn): do not leak string.
+
 2009-01-10  Peter Bloomfield
 
 	* src/main-window.c: fix string--marcel telka sk (fixes bug

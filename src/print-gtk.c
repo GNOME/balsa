@@ -423,7 +423,7 @@ add_margin_spinbtn(const gchar * text, gdouble min, gdouble max, gdouble dflt,
 {
     GtkWidget *label;
     GtkWidget *spinbtn;
-    gchar * unit;
+    const gchar *unit;
 
     label = gtk_label_new_with_mnemonic(text);
     gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
@@ -432,14 +432,14 @@ add_margin_spinbtn(const gchar * text, gdouble min, gdouble max, gdouble dflt,
     gtk_table_attach(table, label, 0, 1, row, row + 1, GTK_FILL, 0, 0, 0);
 
     if (get_default_user_units() == GTK_UNIT_INCH) {
-	unit = g_strdup(_("inch"));
+	unit = _("inch");
 	spinbtn = gtk_spin_button_new_with_range(min / 72.0,
 						 max / 72.0, 0.01);
 	gtk_spin_button_set_value(GTK_SPIN_BUTTON(spinbtn), dflt / 72.0);
 	gtk_spin_button_set_digits(GTK_SPIN_BUTTON(spinbtn), 2);
 	gtk_spin_button_set_increments(GTK_SPIN_BUTTON(spinbtn), 0.1, 1.0);
     } else {
-	unit = g_strdup(_("mm"));
+	unit = _("mm");
 	spinbtn = gtk_spin_button_new_with_range(min / 72.0 * 25.4,
 						 max / 72.0 * 25.4, 0.1);
 	gtk_spin_button_set_value(GTK_SPIN_BUTTON(spinbtn), dflt / 72.0 * 25.4);

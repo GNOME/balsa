@@ -328,43 +328,13 @@ imap_handle_set_timeout(ImapMboxHandle *h, int milliseconds)
   return old_timeout;
 }
 
-/* imap_handle_idle_enable: enables calling IDLE command after seconds
-   of inactivity. IDLE support consists of three subroutines:
-
-1. imap_handle_idle_{enable,disable}() switch to and from the IDLE
-   mode.  switching to the mode is done by registering an idle
-   callback idle_start() with 30 seconds delay time.
-
-2. idle start() sends the IDLE command and registers idle_process() to
-   be notified whenever data is available on the specified descriptor.
-
-3. async_process() processes the data sent from the server. It is used
-   by IDLE and STORE commands, for example. */
-
+/** Called with a locked handle. */
 static gboolean
-async_process(GIOChannel *source, GIOCondition condition, gpointer data)
+async_process_real(ImapMboxHandle *h)
 {
-  ImapMboxHandle *h = (ImapMboxHandle*)data;
   ImapResponse rc = IMR_UNTAGGED;
-  int retval;
   unsigned async_cmd;
-  gboolean retval_async;
-
-  g_return_val_if_fail(h, FALSE);
-
-  if(HANDLE_TRYLOCK(h) != 0) 
-    return FALSE;/* async data on already locked handle? Don't try again. */
-  if(ASYNC_DEBUG) printf("async_process() ENTER\n");
-  if(h->state == IMHS_DISCONNECTED) {
-    if(ASYNC_DEBUG) printf("async_process() on disconnected\n");
-    HANDLE_UNLOCK(h);
-    return FALSE;
-  }
-  if( (condition & G_IO_HUP) == G_IO_HUP) {
-      imap_handle_disconnect(h);
-      HANDLE_UNLOCK(h);
-      return FALSE;
-  }
+  int retval;
 
   async_cmd = cmdi_get_pending(h->cmd_info);
   if(ASYNC_DEBUG) printf("async_process() enter loop\n");
@@ -377,7 +347,6 @@ async_process(GIOChannel *source, GIOCondition condition, gpointer data)
              "Last message was: \"%s\" - shutting down connection.\n",
              rc, h->last_msg);
       imap_handle_disconnect(h);
-      HANDLE_UNLOCK(h);
       return FALSE;
     }
     async_cmd = cmdi_get_pending(h->cmd_info);
@@ -398,7 +367,46 @@ async_process(GIOChannel *source, GIOCondition condition, gpointer data)
     printf("async_process() sio: %d rc: %d returns %d (%d cmds in queue)\n",
            retval, rc, !h->idle_issued && async_cmd == 0,
            g_list_length(h->cmd_info));
-  retval_async = h->idle_issued || async_cmd != 0;
+  return h->idle_issued || async_cmd != 0;
+}
+
+/* imap_handle_idle_enable: enables calling IDLE command after seconds
+   of inactivity. IDLE support consists of three subroutines:
+
+1. imap_handle_idle_{enable,disable}() switch to and from the IDLE
+   mode.  switching to the mode is done by registering an idle
+   callback idle_start() with 30 seconds delay time.
+
+2. idle start() sends the IDLE command and registers idle_process() to
+   be notified whenever data is available on the specified descriptor.
+
+3. async_process() processes the data sent from the server. It is used
+   by IDLE and STORE commands, for example. */
+
+static gboolean
+async_process(GIOChannel *source, GIOCondition condition, gpointer data)
+{
+  ImapMboxHandle *h = (ImapMboxHandle*)data;
+  gboolean retval_async;
+
+  g_return_val_if_fail(h, FALSE);
+
+  if(ASYNC_DEBUG) printf("async_process() ENTER\n");
+  if(HANDLE_TRYLOCK(h) != 0) 
+    return FALSE;/* async data on already locked handle? Don't try again. */
+  if(ASYNC_DEBUG) printf("async_process() LOCKED\n");
+  if(h->state == IMHS_DISCONNECTED) {
+    if(ASYNC_DEBUG) printf("async_process() on disconnected\n");
+    HANDLE_UNLOCK(h);
+    return FALSE;
+  }
+  if( (condition & G_IO_HUP) == G_IO_HUP) {
+      imap_handle_disconnect(h);
+      HANDLE_UNLOCK(h);
+      return FALSE;
+  }
+  retval_async = async_process_real(h);
+
   HANDLE_UNLOCK(h);
   return retval_async;
 }
@@ -435,10 +443,15 @@ idle_start(gpointer data)
     h->iochannel = g_io_channel_unix_new(h->sd);
     g_io_channel_set_encoding(h->iochannel, NULL, NULL);
   }
+  if(ASYNC_DEBUG) printf("async_process() registered\n");
   h->async_watch_id = g_io_add_watch(h->iochannel, G_IO_IN|G_IO_HUP,
 				     async_process, h);
   h->idle_enable_id = 0;
   h->idle_issued = 1;
+
+  /* In principle, IMAP server can send some data in the same packet
+     as the RESPOND line. GMail does it. Process it. */
+  async_process_real(h);
 
   HANDLE_UNLOCK(h);
   return FALSE;

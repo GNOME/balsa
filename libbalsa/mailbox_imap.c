@@ -754,30 +754,21 @@ imap_flags_cb(unsigned cnt, const unsigned seqno[], LibBalsaMailboxImap *mimap)
 }
 
 static gboolean
-update_counters_and_filter(void *data)
+imap_exists_idle(gpointer data)
 {
-    LibBalsaMailbox *mailbox= (LibBalsaMailbox*)data;
+    LibBalsaMailboxImap *mimap = (LibBalsaMailboxImap*)data;
+    LibBalsaMailbox *mailbox = LIBBALSA_MAILBOX(mimap);
+    unsigned cnt;
 
+    printf("Exists_idle ENTER\n");
     libbalsa_lock_mailbox(mailbox);
     gdk_threads_enter();
-    libbalsa_mailbox_run_filters_on_reception(mailbox);
-    lbm_imap_get_unseen(LIBBALSA_MAILBOX_IMAP(mailbox));
-    gdk_threads_leave();
-    libbalsa_unlock_mailbox(mailbox);
-    g_object_unref(G_OBJECT(mailbox));
-    return FALSE;
-}
-
-static void
-imap_exists_cb(ImapMboxHandle *handle, LibBalsaMailboxImap *mimap)
-{
-    unsigned cnt;
-    LibBalsaMailbox *mailbox = LIBBALSA_MAILBOX(mimap);
-    libbalsa_lock_mailbox(mailbox);
 
     mimap->sort_field = -1;	/* Invalidate. */
-    cnt = imap_mbox_handle_get_exists(mimap->handle);
-    if(cnt != mimap->messages_info->len) {
+
+    if(mimap->handle && /* was it closed in meantime? */
+       (cnt = imap_mbox_handle_get_exists(mimap->handle))
+       != mimap->messages_info->len) {
         unsigned i;
         struct message_info a = {0};
         GNode *sibling = NULL;
@@ -811,8 +802,6 @@ imap_exists_cb(ImapMboxHandle *handle, LibBalsaMailboxImap *mimap)
             }
         } 
 
-        gdk_threads_enter();
-
         if (mailbox->msg_tree)
             sibling = g_node_last_child(mailbox->msg_tree);
         for(i=mimap->messages_info->len+1; i <= cnt; i++) {
@@ -823,16 +812,23 @@ imap_exists_cb(ImapMboxHandle *handle, LibBalsaMailboxImap *mimap)
         }
         ++mimap->search_stamp;
         
-        gdk_threads_leave();
-    
-        /* we run filters and get unseen messages in a idle callback:
-         * these things do not need to be done immediately and we do 
-         * not want to issue too many new overlapping IMAP requests.
-         */
-        g_object_ref(G_OBJECT(mailbox));
-        g_idle_add(update_counters_and_filter, mailbox);
+	libbalsa_mailbox_run_filters_on_reception(mailbox);
+	lbm_imap_get_unseen(LIBBALSA_MAILBOX_IMAP(mailbox));    
     }
+
+    gdk_threads_leave();
     libbalsa_unlock_mailbox(mailbox);
+    g_object_unref(G_OBJECT(mailbox));
+
+    return FALSE;
+}
+
+static void
+imap_exists_cb(ImapMboxHandle *handle, LibBalsaMailboxImap *mimap)
+{
+    printf("Imap exist callback, registering idle handler\n");
+    g_object_ref(G_OBJECT(mimap));
+    g_idle_add(imap_exists_idle, mimap);
 }
 
 static void
@@ -1100,6 +1096,19 @@ libbalsa_mailbox_imap_close(LibBalsaMailbox * mailbox, gboolean expunge)
     mbox->sort_field = -1;	/* Invalidate. */
 }
 
+struct SaveToData {
+    FILE *f;
+    gboolean error;
+};
+
+static void
+save_to(unsigned seqno, const char *buf, size_t buflen, void* arg)
+{
+    struct SaveToData *std  = (struct SaveToData*)arg;
+    if(fwrite(buf, 1, buflen, std->f) != buflen)
+	std->error = TRUE;
+}
+
 static FILE*
 get_cache_stream(LibBalsaMailbox *mailbox, guint msgno, gboolean peek)
 {
@@ -1125,11 +1134,14 @@ get_cache_stream(LibBalsaMailbox *mailbox, guint msgno, gboolean peek)
 #endif
         cache = fopen(path, "wb");
         if(cache) {
+	    struct SaveToData std;
+	    std.f = cache;
+	    std.error = FALSE;
             II(rc,mimap->handle,
-               imap_mbox_handle_fetch_rfc822_uid(mimap->handle, uid,
-                                                 peek, cache));
+               imap_mbox_handle_fetch_rfc822(mimap->handle, 1, &msgno,
+					     peek, save_to, &std));
             fclose(cache);
-	    if(rc != IMR_OK) {
+	    if(std.error || rc != IMR_OK) {
 		printf("Error fetching RFC822 message, removing cache.\n");
 		unlink(path);
 	    }

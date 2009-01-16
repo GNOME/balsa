@@ -1,3 +1,14 @@
+2009-01-16  Paweł Sałek
+
+	* libbalsa/files.c: simplify conditional code.
+	* libbalsa/mailbox_imap.c: the only way to make sure that the
+	exist handler does not trigger imap operations and a related
+	deadlock is to process it entirely in an idle handler. Fetch
+	message data using seqnos, otherwise we can get surprising EXPUNGE
+	notifications. 
+	* libbalsa/imap/imap-handle.c: some imap servers send data in the
+	same packet as the IDLE prompt. Process it immediately.
+
 2009-01-15  Peter Bloomfield
 
 	* src/print-gtk.c: (add_margin_spinbtn): do not leak string.

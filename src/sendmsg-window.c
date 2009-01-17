@@ -900,10 +900,8 @@ sw_delete_draft(BalsaSendmsg * bsmsg)
 static gint
 delete_handler(BalsaSendmsg * bsmsg)
 {
-    InternetAddressList *l =
-        libbalsa_address_view_get_list(bsmsg->recipient_view, "To:");
-    const gchar *tmp = l && l->address && l->address->name ?
-        l->address->name : _("(No name)");
+    InternetAddressList *l;
+    const gchar *tmp;
     gint reply;
     GtkWidget *d;
 
@@ -912,6 +910,10 @@ delete_handler(BalsaSendmsg * bsmsg)
 
     if (bsmsg->state == SENDMSG_STATE_CLEAN)
         return FALSE;
+
+    l = libbalsa_address_view_get_list(bsmsg->recipient_view, "To:");
+    tmp = l && l->address && l->address->name ?
+        l->address->name : _("(No name)");
 
     d = gtk_message_dialog_new(GTK_WINDOW(bsmsg->window),
                                GTK_DIALOG_DESTROY_WITH_PARENT,
@@ -6900,6 +6902,8 @@ sendmsg_window_set_title(BalsaSendmsg * bsmsg)
 
     list = libbalsa_address_view_get_list(bsmsg->recipient_view, "To:");
     to_string = internet_address_list_to_string(list, FALSE);
+    internet_address_list_destroy(list);
+
     title = g_strdup_printf(title_format, to_string,
                             gtk_entry_get_text(GTK_ENTRY(bsmsg->subject[1])));
     g_free(to_string);

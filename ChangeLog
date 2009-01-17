@@ -1,3 +1,12 @@
+2009-01-16  Peter Bloomfield
+
+	* libbalsa/misc.c: (libbalsa_set_fallback_codeset): do not
+	allocate and leak strings, now that bug #509434 has been fixed.
+	* src/balsa-icons.c: (load_balsa_pixmap): free the icon_source.
+	* src/save-restore.c: include stdlib.h.
+	* src/sendmsg-window.c: (delete_handler, sendmsg_window_set_title):
+	do not leak address list.
+
 2009-01-16  Paweł Sałek
 
 	* libbalsa/files.c: simplify conditional code.

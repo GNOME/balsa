@@ -22,6 +22,7 @@
 
 #define _XOPEN_SOURCE 500
 
+#include <stdlib.h>
 #include <string.h>
 #include <gconf/gconf-client.h>
 #include <glib/gi18n.h>

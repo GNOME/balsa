@@ -1,3 +1,10 @@
+* Balsa-2.3.28 release. Release date 2009-01-18
+
+- Fix the IMAP message threading regression.
+- Use GIO library when available.
+- Improve GMail IMAP compatibility.
+- Bug fixes for 509434, 567323, 566426, 566420, 566415.
+
 * Balsa-2.3.27 release. Release date 2008-12-30
 
 - porting to most recent GTK versions.

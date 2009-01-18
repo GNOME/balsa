@@ -1,3 +1,7 @@
+2009-01-18  Paweł Sałek
+
+	* NEWS, configure.in: release 2.3.28
+
 2009-01-16  Peter Bloomfield
 
 	* libbalsa/misc.c: (libbalsa_set_fallback_codeset): do not

@@ -760,7 +760,6 @@ imap_exists_idle(gpointer data)
     LibBalsaMailbox *mailbox = LIBBALSA_MAILBOX(mimap);
     unsigned cnt;
 
-    printf("Exists_idle ENTER\n");
     libbalsa_lock_mailbox(mailbox);
     gdk_threads_enter();
 
@@ -826,7 +825,6 @@ imap_exists_idle(gpointer data)
 static void
 imap_exists_cb(ImapMboxHandle *handle, LibBalsaMailboxImap *mimap)
 {
-    printf("Imap exist callback, registering idle handler\n");
     g_object_ref(G_OBJECT(mimap));
     g_idle_add(imap_exists_idle, mimap);
 }

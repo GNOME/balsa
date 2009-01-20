@@ -61,6 +61,7 @@ extern "C" {
         gboolean next_message:1;
         gboolean has_selection_changed_idle:1;
         gboolean has_mailbox_changed_idle:1;
+        gboolean collapsing:1;
         int    filter_no;
         gchar *filter_string; /* Quick view filter string, if any */
 

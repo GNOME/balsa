@@ -92,6 +92,10 @@ static void bndx_column_resize(GtkWidget * widget,
 static void bndx_tree_expand_cb(GtkTreeView * tree_view,
                                 GtkTreeIter * iter, GtkTreePath * path,
                                 gpointer user_data);
+static gboolean bndx_test_collapse_row_cb(GtkTreeView * tree_view,
+                                          GtkTreeIter * iter,
+                                          GtkTreePath * path,
+                                          gpointer user_data);
 static void bndx_tree_collapse_cb(GtkTreeView * tree_view,
                                   GtkTreeIter * iter, GtkTreePath * path,
                                   gpointer user_data);
@@ -401,6 +405,8 @@ bndx_instance_init(BalsaIndex * index)
     index->row_expanded_id =
         g_signal_connect_after(tree_view, "row-expanded",
                                G_CALLBACK(bndx_tree_expand_cb), NULL);
+    g_signal_connect(tree_view, "test-collapse-row",
+                     G_CALLBACK(bndx_test_collapse_row_cb), NULL);
     index->row_collapsed_id =
         g_signal_connect_after(tree_view, "row-collapsed",
                                G_CALLBACK(bndx_tree_collapse_cb), NULL);
@@ -524,17 +530,31 @@ bndx_selection_changed(GtkTreeSelection * selection, BalsaIndex * index)
 
     if (index->current_msgno) {
         GtkTreePath *path;
+
         if (libbalsa_mailbox_msgno_find(index->mailbox_node->mailbox,
                                         index->current_msgno,
                                         &path, NULL)) {
-            gboolean ok =
-                gtk_tree_selection_path_is_selected(selection, path)
-                || !bndx_row_is_viewable(index, path);
+            gboolean update_preview = TRUE;
+
+            if (gtk_tree_selection_path_is_selected(selection, path)) {
+                /* The current message is still selected; we leave the
+                 * preview unchanged. */
+                update_preview = FALSE;
+            } else if (index->collapsing
+                       && !bndx_row_is_viewable(index, path)) {
+                /* The current message was deselected because its thread
+                 * was collapsed; we leave the preview unchanged, and to
+                 * avoid confusion, we unselect all messages. */
+                g_signal_handler_block(selection,
+                                       index->selection_changed_id);
+                gtk_tree_selection_unselect_all(selection);
+                g_signal_handler_unblock(selection,
+                                         index->selection_changed_id);
+                update_preview = FALSE;
+            }
             gtk_tree_path_free(path);
-            if (ok)
-                /* Either the current message is still selected, or it
-                 * was hidden by collapsing its thread; in either case,
-                 * we leave the preview unchanged. */
+
+            if (!update_preview)
                 return;
         }
     }
@@ -696,7 +716,21 @@ bndx_tree_expand_cb(GtkTreeView * tree_view, GtkTreeIter * iter,
     bndx_changed_find_row(index);
 }
 
+/* bndx_test_collapse_row_cb:
+ * callback on "test-collapse-row" events
+ * just set collapsing, and return FALSE to allow the row (thread) to be
+ * collapsed. */
+static gboolean
+bndx_test_collapse_row_cb(GtkTreeView * tree_view, GtkTreeIter * iter,
+                          GtkTreePath * path, gpointer user_data)
+{
+    BalsaIndex *index = BALSA_INDEX(tree_view);
+    index->collapsing = TRUE;
+    return FALSE;
+}
+
 /* callback on collapse events;
+ * clear collapsing;
  * the next message may have become invisible, so we must check whether
  * a next message still exists. */
 static void
@@ -704,6 +738,7 @@ bndx_tree_collapse_cb(GtkTreeView * tree_view, GtkTreeIter * iter,
                       GtkTreePath * path, gpointer user_data)
 {
     BalsaIndex *index = BALSA_INDEX(tree_view);
+    index->collapsing = FALSE;
     bndx_changed_find_row(index);
 }
 

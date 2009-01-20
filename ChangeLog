@@ -1,3 +1,17 @@
+2009-01-20  Peter Bloomfield
+
+	Fix BUG - threading view and selecting, reported by Mario
+	Mikocevic <mario.mikocevic t-com hr>
+	(http://mail.gnome.org/archives/balsa-list/2009-January/msg00015.html)
+
+	* src/balsa-index.h: new boolean BalsaIndex::collapsing.
+	* src/balsa-index.c:
+	(bndx_test_collapse_row_cb) new callback to set it;
+	(bndx_tree_collapse_cb): clear it;
+	(bndx_selection_changed): use it to manage preview;
+	(bndx_instance_init) connect to "test-collapse-row" signal to
+	set it;
+
 2009-01-18  Paweł Sałek
 
 	* NEWS, configure.in: release 2.3.28

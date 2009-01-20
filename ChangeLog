@@ -1,5 +1,13 @@
 2009-01-20  Peter Bloomfield
 
+	* libbalsa/gmime-stream-gio.c: (stream_read, stream_write,
+	stream_seek, stream_substream,
+	g_mime_stream_gio_new_with_bounds): build on 32-bit box with
+	GMime-2.2.
+	* libbalsa/gmime-stream-gio.h: ditto.
+
+2009-01-20  Peter Bloomfield
+
 	Fix BUG - threading view and selecting, reported by Mario
 	Mikocevic <mario.mikocevic t-com hr>
 	(http://mail.gnome.org/archives/balsa-list/2009-January/msg00015.html)

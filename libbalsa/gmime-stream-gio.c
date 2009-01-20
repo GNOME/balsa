@@ -48,14 +48,14 @@ static int stream_flush(GMimeStream *stream);
 static int stream_close(GMimeStream *stream);
 static gboolean stream_eos(GMimeStream *stream);
 static int stream_reset(GMimeStream *stream);
-static gint64 stream_seek(GMimeStream *stream,
-			  gint64 offset,
+static off_t stream_seek(GMimeStream *stream,
+			  off_t offset,
 			  GMimeSeekWhence whence);
-static gint64 stream_tell(GMimeStream *stream);
+static off_t stream_tell(GMimeStream *stream);
 static ssize_t stream_length(GMimeStream *stream);
 static GMimeStream *stream_substream(GMimeStream *stream,
-				     gint64 start,
-				     gint64 end);
+				     off_t start,
+				     off_t end);
 
 
 static GMimeStreamClass *parent_class = NULL;
@@ -168,7 +168,7 @@ stream_read(GMimeStream *stream, char *buf, size_t len)
 	return -1;
 	
     if (stream->bound_end != -1)
-	len = MIN (stream->bound_end - stream->position, (gint64) len);
+	len = MIN (stream->bound_end - stream->position, (off_t) len);
     
     /* try to create the stream if necessary */
     if (!gios->stream) {
@@ -207,7 +207,7 @@ stream_write(GMimeStream *stream, const char *buf, size_t len)
 	return -1;
 	
     if (stream->bound_end != -1)
-	len = MIN (stream->bound_end - stream->position, (gint64) len);
+	len = MIN (stream->bound_end - stream->position, (off_t) len);
     
     /* try to create the stream if necessary */
     if (!gios->stream) {
@@ -300,8 +300,8 @@ stream_reset(GMimeStream *stream)
     return 0;
 }
 
-static gint64
-stream_seek(GMimeStream *stream, gint64 offset, GMimeSeekWhence whence)
+static off_t
+stream_seek(GMimeStream *stream, off_t offset, GMimeSeekWhence whence)
 {
     GMimeStreamGio *gios = (GMimeStreamGio *) stream;
     goffset real;
@@ -374,7 +374,7 @@ stream_seek(GMimeStream *stream, gint64 offset, GMimeSeekWhence whence)
     return real;
 }
 
-static gint64
+static off_t
 stream_tell (GMimeStream *stream)
 {
     g_return_val_if_fail(stream, -1);
@@ -414,7 +414,7 @@ stream_length(GMimeStream *stream)
 }
 
 static GMimeStream *
-stream_substream(GMimeStream *stream, gint64 start, gint64 end)
+stream_substream(GMimeStream *stream, off_t start, off_t end)
 {
     GMimeStreamGio *gios;
 	
@@ -467,7 +467,7 @@ g_mime_stream_gio_new(GFile * gfile)
  * Returns: a stream using @fd with bounds @start and @end.
  **/
 GMimeStream *
-g_mime_stream_gio_new_with_bounds(GFile * gfile, gint64 start, gint64 end)
+g_mime_stream_gio_new_with_bounds(GFile * gfile, off_t start, off_t end)
 {
     GMimeStreamGio *gios;
 	

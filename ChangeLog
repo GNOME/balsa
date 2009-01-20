@@ -1,5 +1,15 @@
 2009-01-20  Peter Bloomfield
 
+	* libbalsa/body.c: (libbalsa_message_body_get_stream): check
+	that we have a GMimePart;
+	(libbalsa_message_body_save_stream): use
+	libbalsa_message_body_stream_add_filter;
+	* libbalsa/mailbox_imap.c: (libbalsa_mailbox_imap_get_msg_part):
+	check for GMimeMultipart and GMimeMessagePart, as well as
+	GMimePart.
+
+2009-01-20  Peter Bloomfield
+
 	* libbalsa/gmime-stream-gio.c: (stream_read, stream_write,
 	stream_seek, stream_substream,
 	g_mime_stream_gio_new_with_bounds): build on 32-bit box with

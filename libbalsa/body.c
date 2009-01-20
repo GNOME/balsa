@@ -431,6 +431,8 @@ GMimeStream *
 libbalsa_message_body_get_stream(LibBalsaMessageBody * body, GError **err)
 {
     GMimeStream *stream;
+    GMimeDataWrapper *wrapper;
+    GMimePartEncodingType encoding;
     GMimeFilter *filter;
     gchar *mime_type = NULL;
     const gchar *charset;
@@ -438,72 +440,74 @@ libbalsa_message_body_get_stream(LibBalsaMessageBody * body, GError **err)
     g_return_val_if_fail(body != NULL, NULL);
     g_return_val_if_fail(body->message != NULL, NULL);
 
-    if (body->message->mailbox) {
-        GMimeDataWrapper *wrapper;
-        GMimePartEncodingType encoding;
-        if(!libbalsa_mailbox_get_message_part(body->message, body, err))
-            return NULL;
-	
-	/* We handle "real" parts and embedded rfc822 messages
-	   differently. There is probably a way to unify if we use
-	   GMimeObject common denominator.  */
-	if(GMIME_IS_MESSAGE_PART(body->mime_part)) {
-	    ssize_t bytes_written;
-	    GMimeMessage *msg = g_mime_message_part_get_message
-		(GMIME_MESSAGE_PART(body->mime_part));
-	    stream = g_mime_stream_mem_new();
-	    libbalsa_mailbox_lock_store(body->message->mailbox);
-	    bytes_written =
-		g_mime_object_write_to_stream(GMIME_OBJECT(msg), stream);
-	    libbalsa_mailbox_unlock_store(body->message->mailbox);
-            printf("Written %ld bytes of embedded message\n",
-                   (long) bytes_written);
-	    if(bytes_written < 0) {
-		g_object_unref(stream);
-		g_set_error(err, LIBBALSA_MAILBOX_ERROR,
-			    LIBBALSA_MAILBOX_ACCESS_ERROR,
-			    _("Could not read embedded message"));
-		return NULL;
-	    }
-	    g_mime_stream_reset(stream);
-	    return stream;
-	}
-
-        wrapper =
-            g_mime_part_get_content_object(GMIME_PART(body->mime_part));
-	if(!wrapper) /* part is incomplete. */
-	    return NULL;
-        stream = g_mime_data_wrapper_get_stream(wrapper);
-        encoding = g_mime_data_wrapper_get_encoding(wrapper);
-        g_object_unref(wrapper);
-
-        switch (encoding) {
-        case GMIME_PART_ENCODING_BASE64:
-            filter =
-                g_mime_filter_basic_new_type
-                (GMIME_FILTER_BASIC_BASE64_DEC);
-            stream =
-                libbalsa_message_body_stream_add_filter(stream, filter);
-            break;
-        case GMIME_PART_ENCODING_QUOTEDPRINTABLE:
-            filter =
-                g_mime_filter_basic_new_type(GMIME_FILTER_BASIC_QP_DEC);
-            stream =
-                libbalsa_message_body_stream_add_filter(stream, filter);
-            break;
-        case GMIME_PART_ENCODING_UUENCODE:
-            filter =
-                g_mime_filter_basic_new_type(GMIME_FILTER_BASIC_UU_DEC);
-            stream =
-                libbalsa_message_body_stream_add_filter(stream, filter);
-            break;
-        default:
-            break;
-        }
-    } else {
-        g_set_error(err, LIBBALSA_MAILBOX_ERROR, LIBBALSA_MAILBOX_ACCESS_ERROR,
+    if (!body->message->mailbox) {
+        g_set_error(err, LIBBALSA_MAILBOX_ERROR,
+                    LIBBALSA_MAILBOX_ACCESS_ERROR,
                     "Internal error in get_stream");
         return NULL;
+    }
+
+    if (!libbalsa_mailbox_get_message_part(body->message, body, err)) {
+        if (!*err)
+            g_set_error(err, LIBBALSA_MAILBOX_ERROR,
+                        LIBBALSA_MAILBOX_ACCESS_ERROR,
+                        "Cannot get stream for part of type %s",
+                        g_type_name(G_TYPE_FROM_INSTANCE
+                                    (body->mime_part)));
+        return NULL;
+    }
+
+    /* We handle "real" parts and embedded rfc822 messages
+       differently. There is probably a way to unify if we use
+       GMimeObject common denominator.  */
+    if (GMIME_IS_MESSAGE_PART(body->mime_part)) {
+        ssize_t bytes_written;
+        GMimeMessage *msg = g_mime_message_part_get_message
+            (GMIME_MESSAGE_PART(body->mime_part));
+        stream = g_mime_stream_mem_new();
+        libbalsa_mailbox_lock_store(body->message->mailbox);
+        bytes_written =
+            g_mime_object_write_to_stream(GMIME_OBJECT(msg), stream);
+        libbalsa_mailbox_unlock_store(body->message->mailbox);
+        printf("Written %ld bytes of embedded message\n",
+               (long) bytes_written);
+        if (bytes_written < 0) {
+            g_object_unref(stream);
+            g_set_error(err, LIBBALSA_MAILBOX_ERROR,
+                        LIBBALSA_MAILBOX_ACCESS_ERROR,
+                        _("Could not read embedded message"));
+            return NULL;
+        }
+        g_mime_stream_reset(stream);
+        return stream;
+    }
+
+    if (!GMIME_IS_PART(body->mime_part))
+        return NULL;
+
+    wrapper = g_mime_part_get_content_object(GMIME_PART(body->mime_part));
+    if (!wrapper)               /* part is incomplete. */
+        return NULL;
+    stream = g_mime_data_wrapper_get_stream(wrapper);
+    encoding = g_mime_data_wrapper_get_encoding(wrapper);
+    g_object_unref(wrapper);
+
+    switch (encoding) {
+    case GMIME_PART_ENCODING_BASE64:
+        filter =
+            g_mime_filter_basic_new_type(GMIME_FILTER_BASIC_BASE64_DEC);
+        stream = libbalsa_message_body_stream_add_filter(stream, filter);
+        break;
+    case GMIME_PART_ENCODING_QUOTEDPRINTABLE:
+        filter = g_mime_filter_basic_new_type(GMIME_FILTER_BASIC_QP_DEC);
+        stream = libbalsa_message_body_stream_add_filter(stream, filter);
+        break;
+    case GMIME_PART_ENCODING_UUENCODE:
+        filter = g_mime_filter_basic_new_type(GMIME_FILTER_BASIC_UU_DEC);
+        stream = libbalsa_message_body_stream_add_filter(stream, filter);
+        break;
+    default:
+        break;
     }
 
     /* convert text bodies but HTML - gtkhtml does conversion on its own. */
@@ -642,35 +646,18 @@ libbalsa_message_body_save_stream(LibBalsaMessageBody * body,
         g_mime_stream_reset(stream);
 
         if (filter_crlf) {
-            GMimeFilter *filter;
-
-            if (!GMIME_IS_STREAM_FILTER(stream)) {
-                GMimeStream *stream_filter =
-                    g_mime_stream_filter_new_with_stream(stream);
-                g_object_unref(stream);
-                stream = stream_filter;
-            }
-
-            filter = g_mime_filter_crlf_new(GMIME_FILTER_CRLF_DECODE,
-                                            GMIME_FILTER_CRLF_MODE_CRLF_ONLY);
-            g_mime_stream_filter_add(GMIME_STREAM_FILTER(stream), filter);
-            g_object_unref(filter);
+            GMimeFilter *filter =
+                g_mime_filter_crlf_new(GMIME_FILTER_CRLF_DECODE,
+                                       GMIME_FILTER_CRLF_MODE_CRLF_ONLY);
+            stream =
+                libbalsa_message_body_stream_add_filter(stream, filter);
         }
 
         len = g_mime_stream_write_to_stream(stream, dest);
         g_object_unref(stream);
-    } else {
-        /* body->mime_part is not a GMimePart. */
-        GMimeObject *mime_part = body->mime_part;
-
-        if (GMIME_IS_MESSAGE_PART(mime_part))
-            /* The user probably wants the message without the part's
-             * mime headers. */
-            mime_part =
-                GMIME_OBJECT(GMIME_MESSAGE_PART(mime_part)->message);
-
-        len = g_mime_object_write_to_stream(mime_part, dest);
-    }
+    } else
+        /* body->mime_part is neither a GMimePart nor a GMimeMessagePart. */
+        len = g_mime_object_write_to_stream(body->mime_part, dest);
 
     libbalsa_mailbox_unlock_store(body->message->mailbox);
     g_object_unref(dest);

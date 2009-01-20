@@ -2496,7 +2496,9 @@ libbalsa_mailbox_imap_get_msg_part(LibBalsaMessage *msg,
                                    GError **err)
 {
     if (part->mime_part)
-        return GMIME_IS_PART(part->mime_part);
+        return GMIME_IS_PART(part->mime_part)
+            || GMIME_IS_MULTIPART(part->mime_part)
+            || GMIME_IS_MESSAGE_PART(part->mime_part);
 
     return lbm_imap_get_msg_part(msg, part, FALSE, NULL, err);
 }

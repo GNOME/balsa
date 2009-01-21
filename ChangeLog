@@ -1,3 +1,16 @@
+2009-01-21  Peter Bloomfield
+
+	* libbalsa/body.c: (libbalsa_message_body_get_part_stream,
+	libbalsa_message_body_get_message_part_stream): new helpers;
+	(libbalsa_message_body_get_stream): use them;
+	(libbalsa_message_body_get_content,
+	libbalsa_message_body_save_stream): set GError when returning
+	error.
+	* libbalsa/files.c: (libbalsa_default_attachment_pixbuf,
+	libbalsa_icon_finder): remove unused GError.
+	* src/balsa-mime-widget-callbacks.c:
+	(balsa_mime_widget_ctx_menu_save): clear GError.
+
 2009-01-20  Peter Bloomfield
 
 	* libbalsa/body.c: (libbalsa_message_body_get_stream): check

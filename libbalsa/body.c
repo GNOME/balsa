@@ -427,8 +427,9 @@ libbalsa_message_body_stream_add_filter(GMimeStream * stream,
     return stream;
 }
 
-GMimeStream *
-libbalsa_message_body_get_stream(LibBalsaMessageBody * body, GError **err)
+static GMimeStream *
+libbalsa_message_body_get_part_stream(LibBalsaMessageBody * body,
+                                      GError ** err)
 {
     GMimeStream *stream;
     GMimeDataWrapper *wrapper;
@@ -437,57 +438,15 @@ libbalsa_message_body_get_stream(LibBalsaMessageBody * body, GError **err)
     gchar *mime_type = NULL;
     const gchar *charset;
 
-    g_return_val_if_fail(body != NULL, NULL);
-    g_return_val_if_fail(body->message != NULL, NULL);
-
-    if (!body->message->mailbox) {
+    wrapper = g_mime_part_get_content_object(GMIME_PART(body->mime_part));
+    if (!wrapper) {
+        /* part is incomplete. */
         g_set_error(err, LIBBALSA_MAILBOX_ERROR,
                     LIBBALSA_MAILBOX_ACCESS_ERROR,
                     "Internal error in get_stream");
         return NULL;
     }
 
-    if (!libbalsa_mailbox_get_message_part(body->message, body, err)) {
-        if (!*err)
-            g_set_error(err, LIBBALSA_MAILBOX_ERROR,
-                        LIBBALSA_MAILBOX_ACCESS_ERROR,
-                        "Cannot get stream for part of type %s",
-                        g_type_name(G_TYPE_FROM_INSTANCE
-                                    (body->mime_part)));
-        return NULL;
-    }
-
-    /* We handle "real" parts and embedded rfc822 messages
-       differently. There is probably a way to unify if we use
-       GMimeObject common denominator.  */
-    if (GMIME_IS_MESSAGE_PART(body->mime_part)) {
-        ssize_t bytes_written;
-        GMimeMessage *msg = g_mime_message_part_get_message
-            (GMIME_MESSAGE_PART(body->mime_part));
-        stream = g_mime_stream_mem_new();
-        libbalsa_mailbox_lock_store(body->message->mailbox);
-        bytes_written =
-            g_mime_object_write_to_stream(GMIME_OBJECT(msg), stream);
-        libbalsa_mailbox_unlock_store(body->message->mailbox);
-        printf("Written %ld bytes of embedded message\n",
-               (long) bytes_written);
-        if (bytes_written < 0) {
-            g_object_unref(stream);
-            g_set_error(err, LIBBALSA_MAILBOX_ERROR,
-                        LIBBALSA_MAILBOX_ACCESS_ERROR,
-                        _("Could not read embedded message"));
-            return NULL;
-        }
-        g_mime_stream_reset(stream);
-        return stream;
-    }
-
-    if (!GMIME_IS_PART(body->mime_part))
-        return NULL;
-
-    wrapper = g_mime_part_get_content_object(GMIME_PART(body->mime_part));
-    if (!wrapper)               /* part is incomplete. */
-        return NULL;
     stream = g_mime_data_wrapper_get_stream(wrapper);
     encoding = g_mime_data_wrapper_get_encoding(wrapper);
     g_object_unref(wrapper);
@@ -550,6 +509,69 @@ libbalsa_message_body_get_stream(LibBalsaMessageBody * body, GError **err)
     return stream;
 }
 
+static GMimeStream *
+libbalsa_message_body_get_message_part_stream(LibBalsaMessageBody * body,
+                                              GError ** err)
+{
+    GMimeStream *stream;
+    ssize_t bytes_written;
+    GMimeMessage *msg = g_mime_message_part_get_message
+        (GMIME_MESSAGE_PART(body->mime_part));
+
+    stream = g_mime_stream_mem_new();
+    libbalsa_mailbox_lock_store(body->message->mailbox);
+    bytes_written =
+        g_mime_object_write_to_stream(GMIME_OBJECT(msg), stream);
+    libbalsa_mailbox_unlock_store(body->message->mailbox);
+    printf("Written %ld bytes of embedded message\n",
+           (long) bytes_written);
+
+    if (bytes_written < 0) {
+        g_object_unref(stream);
+        g_set_error(err, LIBBALSA_MAILBOX_ERROR,
+                    LIBBALSA_MAILBOX_ACCESS_ERROR,
+                    _("Could not read embedded message"));
+        return NULL;
+    }
+
+    g_mime_stream_reset(stream);
+    return stream;
+}
+
+GMimeStream *
+libbalsa_message_body_get_stream(LibBalsaMessageBody * body, GError **err)
+{
+    g_return_val_if_fail(body != NULL, NULL);
+    g_return_val_if_fail(body->message != NULL, NULL);
+
+    if (!body->message->mailbox) {
+        g_set_error(err, LIBBALSA_MAILBOX_ERROR,
+                    LIBBALSA_MAILBOX_ACCESS_ERROR,
+                    "Internal error in get_stream");
+        return NULL;
+    }
+
+    if (!libbalsa_mailbox_get_message_part(body->message, body, err)
+        || !(GMIME_IS_PART(body->mime_part)
+             || GMIME_IS_MESSAGE_PART(body->mime_part))) {
+        if (err && !*err)
+            g_set_error(err, LIBBALSA_MAILBOX_ERROR,
+                        LIBBALSA_MAILBOX_ACCESS_ERROR,
+                        "Cannot get stream for part of type %s",
+                        g_type_name(G_TYPE_FROM_INSTANCE
+                                    (body->mime_part)));
+        return NULL;
+    }
+
+    /* We handle "real" parts and embedded rfc822 messages
+       differently. There is probably a way to unify if we use
+       GMimeObject common denominator.  */
+    if (GMIME_IS_MESSAGE_PART(body->mime_part))
+        return libbalsa_message_body_get_message_part_stream(body, err);
+
+    return libbalsa_message_body_get_part_stream(body, err);
+}
+
 gssize
 libbalsa_message_body_get_content(LibBalsaMessageBody * body, gchar ** buf,
                                   GError **err)
@@ -584,8 +606,12 @@ libbalsa_message_body_get_content(LibBalsaMessageBody * body, gchar ** buf,
 	/* NULL-terminate, in case it is used as a string. */
 	g_byte_array_append(array, &zero, 1);
         *buf = (gchar *) g_byte_array_free(array, FALSE);
-    } else
+    } else {
         g_byte_array_free(array, TRUE);
+        g_set_error(err, LIBBALSA_MAILBOX_ERROR,
+                    LIBBALSA_MAILBOX_ACCESS_ERROR,
+                    "Write error in get_content");
+    }
 
     return len;
 }
@@ -639,6 +665,7 @@ libbalsa_message_body_save_stream(LibBalsaMessageBody * body,
     stream = libbalsa_message_body_get_stream(body, err);
     if (!body->mime_part)
         return FALSE;
+    g_clear_error(err);
 
     libbalsa_mailbox_lock_store(body->message->mailbox);
 
@@ -661,6 +688,10 @@ libbalsa_message_body_save_stream(LibBalsaMessageBody * body,
 
     libbalsa_mailbox_unlock_store(body->message->mailbox);
     g_object_unref(dest);
+
+    if (len < 0)
+        g_set_error(err, LIBBALSA_MAILBOX_ERROR, LIBBALSA_MAILBOX_ACCESS_ERROR,
+                    "Write error in save_stream");
 
     return len >= 0;
 }

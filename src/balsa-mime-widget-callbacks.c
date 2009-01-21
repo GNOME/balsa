@@ -147,10 +147,12 @@ balsa_mime_widget_ctx_menu_save(GtkWidget * parent_widget,
                                             LIBBALSA_MESSAGE_BODY_UNSAFE,
                                             mime_body->body_type ==
                                             LIBBALSA_MESSAGE_BODY_TYPE_TEXT,
-                                            &err))
+                                            &err)) {
 	    balsa_information(LIBBALSA_INFORMATION_ERROR,
 			      _("Could not save %s: %s"),
 			      file_uri, err ? err->message : "Unknown error");
+            g_clear_error(&err);
+        }
     }
 
     g_object_unref(save_file);

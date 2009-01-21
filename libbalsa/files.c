@@ -113,15 +113,12 @@ libbalsa_default_attachment_pixbuf(gint size)
 {
     char *icon;
     GdkPixbuf *tmp, *retval;
-    GError * error = NULL;
 
     icon = balsa_pixmap_finder ("attachment.png");
-    tmp = gdk_pixbuf_new_from_file(icon, &error);
+    tmp = gdk_pixbuf_new_from_file(icon, NULL);
     g_free(icon);
-    if (!tmp) {
-	g_error_free(error);
+    if (!tmp)
         return NULL;
-    }
 
     retval = gdk_pixbuf_scale_simple(tmp, size, size, GDK_INTERP_BILINEAR);
     g_object_unref(tmp);
@@ -249,17 +246,14 @@ libbalsa_icon_finder(const char *mime_type, const LibbalsaVfs * for_file,
     if (icon == NULL)
 	pixbuf = libbalsa_default_attachment_pixbuf(width);
     else {
-	GError *error = NULL;
 	GdkPixbuf *tmp_pb;
 	
-	if ((tmp_pb = gdk_pixbuf_new_from_file(icon, &error))) {
+	if ((tmp_pb = gdk_pixbuf_new_from_file(icon, NULL))) {
 	    pixbuf = gdk_pixbuf_scale_simple(tmp_pb, width, width,
 					     GDK_INTERP_BILINEAR);
 	    g_object_unref(tmp_pb);
-	} else {
+	} else
 	    pixbuf = libbalsa_default_attachment_pixbuf(width);
- 	    g_error_free(error);
-	}
 	g_free(icon);
     }
     

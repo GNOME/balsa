@@ -1445,7 +1445,7 @@ balsa_window_ui_manager_new(BalsaWindow * window)
 
     gtk_ui_manager_insert_action_group(ui_manager, action_group, 0);
 
-    action_group = gtk_action_group_new("BalsaWindow");
+    action_group = gtk_action_group_new("BalsaWindowMailbox");
     gtk_action_group_set_translation_domain(action_group, NULL);
     if (window)
         window->mailbox_action_group = action_group;
@@ -1477,7 +1477,7 @@ balsa_window_ui_manager_new(BalsaWindow * window)
 
     gtk_ui_manager_insert_action_group(ui_manager, action_group, 0);
 
-    action_group = gtk_action_group_new("BalsaWindow");
+    action_group = gtk_action_group_new("BalsaWindowMessage");
     gtk_action_group_set_translation_domain(action_group, NULL);
     if (window)
         window->message_action_group = action_group;
@@ -1487,7 +1487,7 @@ balsa_window_ui_manager_new(BalsaWindow * window)
 
     gtk_ui_manager_insert_action_group(ui_manager, action_group, 0);
 
-    action_group = gtk_action_group_new("BalsaWindow");
+    action_group = gtk_action_group_new("BalsaWindowCurrentMessage");
     gtk_action_group_set_translation_domain(action_group, NULL);
     if (window)
         window->current_message_action_group = action_group;
@@ -1497,7 +1497,7 @@ balsa_window_ui_manager_new(BalsaWindow * window)
 
     gtk_ui_manager_insert_action_group(ui_manager, action_group, 0);
 
-    action_group = gtk_action_group_new("BalsaWindow");
+    action_group = gtk_action_group_new("BalsaWindowModifyMessage");
     gtk_action_group_set_translation_domain(action_group, NULL);
     if (window)
         window->modify_message_action_group = action_group;

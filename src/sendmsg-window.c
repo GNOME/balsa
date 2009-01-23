@@ -626,7 +626,7 @@ sendmsg_window_ui_manager_new(BalsaSendmsg * bsmsg)
 
     gtk_ui_manager_insert_action_group(ui_manager, action_group, 0);
 
-    action_group = gtk_action_group_new("ComposeWindow");
+    action_group = gtk_action_group_new("ComposeWindowReady");
     gtk_action_group_set_translation_domain(action_group, NULL);
     if (bsmsg)
         bsmsg->ready_action_group = action_group;
@@ -637,7 +637,7 @@ sendmsg_window_ui_manager_new(BalsaSendmsg * bsmsg)
 
 #ifdef HAVE_GPGME
 #if !defined(ENABLE_TOUCH_UI)
-    action_group = gtk_action_group_new("ComposeWindow");
+    action_group = gtk_action_group_new("ComposeWindowGPG");
     gtk_action_group_set_translation_domain(action_group, NULL);
     if (bsmsg)
         bsmsg->gpg_action_group = action_group;

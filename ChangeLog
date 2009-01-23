@@ -1,5 +1,10 @@
 2009-01-23  Peter Bloomfield
 
+	* src/main-window.c: use unique names in GtkActionGroup.
+	* src/sendmsg-window.c: (sendmsg_window_ui_manager_new): ditto.
+
+2009-01-23  Peter Bloomfield
+
 	* src/main-window.c: Gtk-2.16 deprecation cleanup.
 
 2009-01-21  Peter Bloomfield

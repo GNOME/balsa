@@ -1,3 +1,7 @@
+2009-01-23  Peter Bloomfield
+
+	* src/main-window.c: Gtk-2.16 deprecation cleanup.
+
 2009-01-21  Peter Bloomfield
 
 	* libbalsa/body.c: (libbalsa_message_body_get_part_stream,

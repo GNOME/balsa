@@ -3295,7 +3295,11 @@ bw_display_new_mail_notification(int num_new, int has_new)
                       num_new + num_total), num_new + num_total);
             else
                 msg = g_strdup(_("Balsa: you have new mail."));
+#if GTK_CHECK_VERSION(2, 15, 0)
+            gtk_status_icon_set_tooltip_text(new_mail_tray, msg);
+#else                           /* GTK_CHECK_VERSION(2, 16, 0) */
             gtk_status_icon_set_tooltip(new_mail_tray, msg);
+#endif                          /* GTK_CHECK_VERSION(2, 16, 0) */
             gtk_status_icon_set_visible(new_mail_tray, TRUE);
             g_free(msg);
         }

@@ -2654,7 +2654,7 @@ ir_esearch(ImapMboxHandle *h)
     gchar *str;
     c = imap_get_atom(h->sio, atom, sizeof(atom));
     if(c == EOF) return IMR_SEVERED;
-    if(strcasecmp(atom, "TAG")) { /* TAG is the only acceptable response here! */
+    if(g_ascii_strcasecmp(atom, "TAG")) { /* TAG is the only acceptable response here! */
       printf("ESearch expected TAG encountered %s\n", atom);
       return IMR_PROTOCOL; 
     }
@@ -2674,7 +2674,7 @@ ir_esearch(ImapMboxHandle *h)
   /* Now, an atom has to follow */
   c = imap_get_atom(h->sio, atom, sizeof(atom));
 
-  if(strcasecmp(atom, "UID") == 0) {
+  if(g_ascii_strcasecmp(atom, "UID") == 0) {
     uid_data = 1;
     c = imap_get_atom(h->sio, atom, sizeof(atom));
   }
@@ -3869,7 +3869,7 @@ ir_fetch_seq(ImapMboxHandle *h, unsigned seqno)
     }
     atom[i] = '\0';
     for(i=0; i<ELEMENTS(msg_att); i++) {
-      if(strcasecmp(atom, msg_att[i].name) == 0) {
+      if(g_ascii_strcasecmp(atom, msg_att[i].name) == 0) {
         if( (rc=msg_att[i].handler(h, c, seqno)) != IMR_OK)
           return rc;
         break;

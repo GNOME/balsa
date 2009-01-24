@@ -1750,7 +1750,7 @@ change_attach_mode(GtkWidget * menu_item, BalsaAttachInfo *info)
 	GtkWidget *extbody_dialog, *parent;
 	gint result;
 
-	parent = gtk_widget_get_ancestor(menu_item, GNOME_TYPE_APP);
+	parent = gtk_widget_get_toplevel(menu_item);
 	extbody_dialog =
 	    gtk_message_dialog_new(GTK_WINDOW(parent),
 				   GTK_DIALOG_DESTROY_WITH_PARENT,

@@ -1,3 +1,13 @@
+2009-01-24  Albrecht Dreß
+
+	Small compatibility fixes
+
+	* src/sendmsg-window.c: search for toplevel window, not for
+	Gnome application;
+	* libbalsa/send.c, libbalsa/imap/imap-handle.c: do not use
+	strcasecmp which OS X apparently doesn't define;
+	* libbalsa/rfc3156.c: use utf8-clean time conversion helper.
+
 2009-01-23  Peter Bloomfield
 
 	* src/main-window.c: use unique names in GtkActionGroup.

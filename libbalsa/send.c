@@ -1758,7 +1758,7 @@ libbalsa_message_create_mime_message(LibBalsaMessage* message, gboolean flow,
 		GMimeDataWrapper *content;
 		GError *err = NULL;
 
-		if (!strcasecmp(mime_type[0], "text")
+		if (!g_ascii_strcasecmp(mime_type[0], "text")
 		    && !(charset = body->charset)) {
 		    charset = libbalsa_vfs_get_charset(body->file_uri);
 		    if (!charset) {
@@ -1784,7 +1784,7 @@ libbalsa_message_create_mime_message(LibBalsaMessage* message, gboolean flow,
 		g_mime_part_set_content_disposition(GMIME_PART(mime_part),
 			body->attach_mode == LIBBALSA_ATTACH_AS_INLINE ?
 			GMIME_DISPOSITION_INLINE : GMIME_DISPOSITION_ATTACHMENT);
-		if(strcasecmp(mime_type[0],"text") != 0)
+		if(g_ascii_strcasecmp(mime_type[0],"text") != 0)
 		{
 		    g_mime_part_set_encoding(GMIME_PART(mime_part),
 			    GMIME_PART_ENCODING_BASE64);

@@ -1021,14 +1021,22 @@ libbalsa_gpgme_sig_protocol_name(gpgme_protocol_t protocol)
     }
 }
 
+#define APPEND_TIMET(t,label)                                           \
+    do {                                                                \
+        if (t) {                                                        \
+            gchar * _tbuf = libbalsa_date_to_utf8(&t, date_string);     \
+            g_string_append_printf(msg, "\n%s: %s", label, _tbuf);      \
+            g_free(_tbuf);                                              \
+        }                                                               \
+    } while (0)
+
 gchar *
 libbalsa_signature_info_to_gchar(GMimeGpgmeSigstat * info,
 				 const gchar * date_string)
 {
     GString *msg;
     gchar *retval;
-    struct tm date;
-    char buf[128];
+
     g_return_val_if_fail(info != NULL, NULL);
     g_return_val_if_fail(date_string != NULL, NULL);
     msg = g_string_new(libbalsa_gpgme_sig_protocol_name(info->protocol));
@@ -1045,11 +1053,7 @@ libbalsa_signature_info_to_gchar(GMimeGpgmeSigstat * info,
     } else if (info->sign_email && strlen(info->sign_email))
 	g_string_append_printf(msg, _("\nMail address: %s"),
 			       info->sign_email);
-    if (info->sign_time) {
-	localtime_r(&info->sign_time, &date);
-	strftime(buf, sizeof(buf), date_string, &date);
-	g_string_append_printf(msg, _("\nSigned on: %s"), buf);
-    }
+    APPEND_TIMET(info->sign_time, _("Signed on"));
     g_string_append_printf(msg, _("\nUser ID validity: %s"),
 			   libbalsa_gpgme_validity_to_gchar(info->
 							    validity));
@@ -1060,16 +1064,8 @@ libbalsa_signature_info_to_gchar(GMimeGpgmeSigstat * info,
     if (info->fingerprint)
 	g_string_append_printf(msg, _("\nKey fingerprint: %s"),
 			       info->fingerprint);
-    if (info->key_created) {
-	localtime_r(&info->key_created, &date);
-	strftime(buf, sizeof(buf), date_string, &date);
-	g_string_append_printf(msg, _("\nSubkey created on: %s"), buf);
-    }
-    if (info->key_expires) {
-	localtime_r(&info->key_expires, &date);
-	strftime(buf, sizeof(buf), date_string, &date);
-	g_string_append_printf(msg, _("\nSubkey expires on: %s"), buf);
-    }
+    APPEND_TIMET(info->key_created, _("Subkey created on"));
+    APPEND_TIMET(info->key_expires, _("Subkey expires on"));
     if (info->key_revoked || info->key_expired || info->key_disabled ||
        info->key_invalid) {
        GString * attrs = g_string_new("");

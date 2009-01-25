@@ -581,20 +581,23 @@ static void
 lbm_mbox_restore(LibBalsaMailboxMbox * mbox)
 {
     gchar *filename;
+    struct stat st;
     gchar *contents;
     gsize length;
-    gboolean tmp;
     off_t end;
     struct message_info *msg_info;
     GMimeStream *mbox_stream;
 
     filename = lbm_mbox_get_cache_filename(mbox);
-    tmp = g_file_get_contents(filename, &contents, &length, NULL);
-    g_free(filename);
-
-    if (!tmp)
-        /* Nonexistent file is no error. */
+    if (stat(filename, &st) < 0 
+        || st.st_mtime < libbalsa_mailbox_get_mtime(LIBBALSA_MAILBOX(mbox))
+        || !g_file_get_contents(filename, &contents, &length, NULL)) {
+        /* No cache file, stale cache, or read error. */
+        g_free(filename);
         return;
+    }
+
+    g_free(filename);
 
     if (length < sizeof(struct message_info)) {
         /* Error: file always contains at least one record. */

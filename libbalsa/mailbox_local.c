@@ -592,6 +592,7 @@ lbm_local_restore_tree(LibBalsaMailboxLocal * local, guint * total)
     LibBalsaMailbox *mailbox = LIBBALSA_MAILBOX(local);
     gchar *filename;
     gchar *name;
+    struct stat st;
     gchar *contents;
     gsize length;
     GError *err = NULL;
@@ -603,7 +604,8 @@ lbm_local_restore_tree(LibBalsaMailboxLocal * local, guint * total)
     name = mailbox->name ? g_strdup(mailbox->name) :
         g_path_get_basename(libbalsa_mailbox_local_get_path(local));
 
-    if (!g_file_test(filename, G_FILE_TEST_IS_REGULAR)) {
+    if (stat(filename, &st) < 0
+        || st.st_mtime < libbalsa_mailbox_get_mtime(mailbox)) {
         /* No error, but we return FALSE so the caller can grab all the
          * message info needed to rethread from scratch. */
         if (libbalsa_mailbox_total_messages(mailbox) > 0)

@@ -3272,21 +3272,20 @@ bw_display_new_mail_notification(int num_new, int has_new)
 #if GTK_CHECK_VERSION(2, 10, 0)
     if (balsa_app.notify_new_mail_icon) {
         /* set up the sys tray icon when it is not yet present */
-        if (!new_mail_tray) {
-            new_mail_tray =
-                gtk_status_icon_new_from_icon_name("stock_mail-compose");
-            g_signal_connect_swapped(G_OBJECT(new_mail_tray), "activate",
-                                     G_CALLBACK(gtk_window_present),
-                                     balsa_app.main_window);
-            /* hide tray icon when the main window gets the focus. */
-            g_signal_connect(G_OBJECT(balsa_app.main_window),
-                             "notify::is-active",
-                             G_CALLBACK(hide_sys_tray_icon),
-                             new_mail_tray);
-        }
-
-        /* show sys tray icon if we don't have the focus */
         if (!gtk_window_is_active(GTK_WINDOW(balsa_app.main_window))) {
+	    if (!new_mail_tray) {
+		new_mail_tray =
+		    gtk_status_icon_new_from_icon_name("stock_mail-compose");
+		g_signal_connect_swapped(G_OBJECT(new_mail_tray), "activate",
+					 G_CALLBACK(gtk_window_present),
+					 balsa_app.main_window);
+		/* hide tray icon when the main window gets the focus. */
+		g_signal_connect(G_OBJECT(balsa_app.main_window),
+				 "notify::is-active",
+				 G_CALLBACK(hide_sys_tray_icon),
+				 new_mail_tray);
+	    }
+	    /* show sys tray icon if we don't have the focus */
             if (num_new > 0)
                 msg = g_strdup_printf
                     (ngettext

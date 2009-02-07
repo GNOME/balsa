@@ -1,3 +1,7 @@
+2009-02-07  Paweł Sałek
+
+	* src/main-window.c: get rid of spurious new-mail notifications.
+
 2009-01-25  Peter Bloomfield
 
 	* libbalsa/mailbox_local.c: (lbm_local_restore_tree): check for

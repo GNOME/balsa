@@ -154,11 +154,7 @@ int libbalsa_safe_open (const char *path, int flags, mode_t mode, GError **err);
 int libbalsa_lock_file (const char *path, int fd, int excl, int dot, int timeout);
 int libbalsa_unlock_file (const char *path, int fd, int dot);
 int libbalsa_safe_rename (const char *src, const char *target);
-#if GLIB_CHECK_VERSION(2, 2, 0)
 #define libbalsa_str_has_prefix(str, prefix) g_str_has_prefix((str), (prefix))
-#else				/* GLIB_CHECK_VERSION(2, 2, 0) */
-gboolean libbalsa_str_has_prefix(const gchar * str, const gchar * prefix);
-#endif				/* GLIB_CHECK_VERSION(2, 2, 0) */
 
 gboolean libbalsa_ia_rfc2821_equal(const InternetAddress * a,
 				   const InternetAddress * b);

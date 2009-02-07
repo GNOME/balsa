@@ -377,7 +377,7 @@ get_default_user_units(void)
      */
     gchar *e = _("default:mm");
   
-#ifdef HAVE_LANGINFO
+#if (HAVE_LANGINFO && defined(_NL_MEASUREMENT_MEASUREMENT))
     gchar *imperial = NULL;
   
     imperial = nl_langinfo(_NL_MEASUREMENT_MEASUREMENT);

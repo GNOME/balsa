@@ -42,9 +42,6 @@
 #include "config.h"
 
 #include <gtk/gtk.h>
-#if !GTK_CHECK_VERSION(2, 6, 0) && HAVE_GNOME
-#include <gnome.h>  /* needed by GnomeFileEntry */
-#endif
 #include <string.h>
 
 #include "balsa-app.h"
@@ -83,12 +80,6 @@ struct _MailboxConfWindow {
     gboolean ok_sensitive;
 
     union {
-#if !GTK_CHECK_VERSION(2, 6, 0) && HAVE_GNOME
-	/* for local mailboxes */
-	struct local { 
-	    GnomeFileEntry *path;
-	} local;
-#endif /* GTK_CHECK_VERSION(2, 6, 0) */
 	/* for imap mailboxes & directories */
 	struct {
 	    GtkWidget *port;

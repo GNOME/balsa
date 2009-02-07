@@ -21,6 +21,10 @@
 
 #include "assistant_page_defclient.h"
 
+#if HAVE_GNOME
+/* setting the default Gnome mail client doesn't make sense if we don't build
+ for Gnome */
+
 #include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -106,3 +110,4 @@ balsa_druid_page_defclient_toggle(GtkWidget * page,
     defclient->default_client = ! (defclient->default_client);
 }
 
+#endif /* HAVE_GNOME */

@@ -90,6 +90,8 @@ libbalsa_a_SOURCES = 		\
 	libbalsa-conf.h		\
 	libbalsa-marshal.c	\
 	libbalsa-marshal.h	\
+	missing.h		\
+	missing_time.c		\
 	libbalsa.c		\
 	libbalsa.h		\
 	libbalsa_private.h	\

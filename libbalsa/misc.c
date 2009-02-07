@@ -1036,22 +1036,6 @@ libbalsa_unlock_file (const char *path, int fd, int dot)
     return 0;
 }
 
-#if !GLIB_CHECK_VERSION(2, 2, 0)
-gboolean
-libbalsa_str_has_prefix(const gchar * str, const gchar * prefix)
-{
-    g_return_val_if_fail(str != NULL, FALSE);
-    g_return_val_if_fail(prefix != NULL, FALSE);
-
-    while (*prefix == *str && *prefix) {
-	++prefix;
-	++str;
-    }
-
-    return *prefix == '\0';
-}
-#endif				/* !GLIB_CHECK_VERSION(2, 2, 0) */
-
 
 /* libbalsa_ia_rfc2821_equal
    compares two addresses according to rfc2821: local-part@domain is equal,

@@ -30,6 +30,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include "missing.h"
 
 #include "filter-funcs.h"
 #include "filter-private.h"

@@ -62,6 +62,7 @@
 
 #include "libbalsa.h"
 #include "misc.h"
+#include "missing.h"
 #include <glib/gi18n.h>
 
 #ifdef BALSA_USE_THREADS

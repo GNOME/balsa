@@ -44,6 +44,8 @@
 /* for mx_lock_file and mx_unlock_file */
 #include "mailbackend.h"
 #include "mime-stream-shared.h"
+#include "missing.h"
+
 #include <glib/gi18n.h>
 
 /* #define DEBUG_SEEK TRUE */

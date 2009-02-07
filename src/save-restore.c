@@ -24,7 +24,9 @@
 
 #include <stdlib.h>
 #include <string.h>
+#if HAVE_GNOME
 #include <gconf/gconf-client.h>
+#endif
 #include <glib/gi18n.h>
 #include "balsa-app.h"
 #include "save-restore.h"
@@ -2173,6 +2175,7 @@ check_for_old_sigs(GList * id_list_tmp)
     }
 }
 
+#if HAVE_GNOME
 void
 config_defclient_save(void)
 {
@@ -2222,3 +2225,4 @@ config_defclient_save(void)
         }
     }
 }
+#endif /* HAVE_GNOME */

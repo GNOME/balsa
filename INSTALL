@@ -9,8 +9,8 @@ See 'AUTHORS' for a list of contributors.
 
 Please make sure you have the following things:
 
-	Glib        >= 2.0.0
-	GTK         >= 2.0.0
+	Glib        >= 2.6.0
+	GTK         >= 2.6.0
 	gnome-libs  >= 2.0.0  (see notes below)
 	gnome-print >= 0.25
 	libpspell   >= 0.11.2 (and at least one spell check module)
@@ -48,7 +48,7 @@ Please make sure you have the following things:
 	signed and encrypted MIME messages according to RFC 3156.
 	Further information is available at
 
-	http://home.arcor.de/dralbrecht.dress/balsa/balsa2-gpg.html
+	http://www.mynetcologne.de/~nc-dreszal/balsa/balsa23-secure-mail.html
 
 Build Instructions:
 

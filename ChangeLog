@@ -1,3 +1,37 @@
+2009-02-07  Albrecht Dreß
+
+	* INSTALL: minimum gtk version upgraded, link cleanup (Incomplete!).
+	* configure.in: Check min versions, new option for Mac OS X desktop,
+	check for *time_r funcs, remove unnecessary check for iconv
+	* src/filter-edit.h, src/balsa-index.c, src/balsa-mblist.c
+	* src/mailbox-conf.c, src/filter-edit-dialog.c, src/pref-manager.c
+	* src/address-book-config.c, libbalsa/misc.[hc]
+	* libbalsa/libbalsa-conf.[hc], libbalsa/address.c, libbalsa/identity.c
+	* src/filter-edit-callbacks.c:
+	Assume we have Gtk+/glib >= 2.6.0
+	* libbalsa/imap/imap_search.c:
+	use GDate instead of localtime_r (avoid dependency to libbalsa)
+	* libbalsa/rfc3156.c: use glib random func
+	* libbalsa/Makefile.am, libbalsa/missing{_time.c,.h}:
+	add system-dependent time_r funcs
+	* src/main-window.c:
+	Add basic Mac OS X menu integration, assume we have Gtk+/glib >= 2.6.0
+	* src/sendmsg-window.c:
+	Add basic Mac OS X menu integration, use g_strdup.
+	* src/save-restore.[hc], libinit_balsa/assistant_page_defclient.[hc],
+	* libinit_balsa/assistant_init.c:
+	No Gnome default client without Gnome
+	* src/toolbar-factory.c, src/main.c, src/Makefile.am
+	Build without Gnome support
+	* src/print-gtk.c: Mac OS X doesn't define _NL_MEASUREMENT_MEASUREMENT
+	* src/balsa-icons.c:  Remove unnecessary include.
+	* src/balsa-bonobo.[hc]: Only compiled if building with Gnome support
+	* src/balsa-app.c:
+	Gdk on Mac OS X cannot create a new colour map, fall back to system
+	* src/ab-main.c:
+	Build Gnome stuff only when available, assume we have Gtk+/glib >=
+	2.6.0, add basic Mac OS X menu integration.
+
 2009-02-07  Paweł Sałek
 
 	* src/main-window.c: get rid of spurious new-mail notifications.

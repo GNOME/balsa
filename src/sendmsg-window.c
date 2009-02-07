@@ -58,6 +58,10 @@
 #include <unistd.h>
 #endif
 #include <errno.h>
+ 
+#if HAVE_MACOSX_DESKTOP
+#include <ige-mac-integration.h>
+#endif
 
 #include "libbalsa.h"
 #include "misc.h"
@@ -74,6 +78,7 @@
 #include "threads.h"
 #endif
 
+#include "missing.h"
 #include "sendmsg-window.h"
 #include "ab-window.h"
 #include "address-view.h"
@@ -4593,7 +4598,12 @@ sendmsg_window_new()
     }
 
     menubar = gtk_ui_manager_get_widget(ui_manager, "/MainMenu");
+#if 0 && HAVE_MACOSX_DESKTOP
+    /* FIXME - this call destroys the main balsa menu after closing the composer... */
+    ige_mac_menu_set_menu_bar(GTK_MENU_SHELL(menubar));
+#else
     gtk_box_pack_start(GTK_BOX(main_box), menubar, FALSE, FALSE, 0);
+#endif
 
     toolbar = balsa_toolbar_new(model, ui_manager);
     gtk_box_pack_start(GTK_BOX(main_box), toolbar, FALSE, FALSE, 0);
@@ -5594,7 +5604,7 @@ bsmsg2message(BalsaSendmsg * bsmsg)
     else
         message->gpg_mode = 0;
     if (ident->force_key_id && *ident->force_key_id)
-        message->force_key_id = strdup(ident->force_key_id);
+        message->force_key_id = g_strdup(ident->force_key_id);
 #endif
 
     /* remember the parent window */

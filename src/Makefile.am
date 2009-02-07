@@ -116,16 +116,27 @@ balsa_gtkspell_extra =		\
 		spell-check.h
 endif
 
+if BUILD_WITH_GNOME
 balsa_IDL_SRCLIST = Balsa-common.c Balsa-skels.c Balsa-stubs.c Balsa.h
 balsa_IDL_OBJS    = Balsa-common.o Balsa-skels.o Balsa-stubs.o
+# see http://sources.redhat.com/automake/dependencies.html
+BUILT_SOURCES     = Balsa.h
+
+#auto* *SHOULD* figure this out *grr*
+$(srcdir)/balsa-bonobo.c: Balsa.h
+
+
+else
+balsa_IDL_SRCLIST = 
+balsa_IDL_OBJS    = 
+BUILT_SOURCES = 
+endif
 
 balsa_SOURCES =			\
 	$(balsa_BASE_SRCLIST)	\
 	$(balsa_gtkspell_extra) \
 	$(balsa_print_source)
 
-# see http://sources.redhat.com/automake/dependencies.html
-BUILT_SOURCES = Balsa.h
 
 DISTCLEANFILES = $(balsa_IDL_SRCLIST)
 
@@ -166,10 +177,6 @@ balsa_ab_LDADD = \
 dist-hook:
 	mkdir $(distdir)/pixmaps
 	cp $(srcdir)/pixmaps/*.{xpm,png} $(distdir)/pixmaps
-
-
-#auto* *SHOULD* figure this out *grr*
-$(srcdir)/balsa-bonobo.c: Balsa.h
 
 $(balsa_IDL_SRCLIST): $(srcdir)/$(idl_DATA) 
 	$(ORBIT_IDL) -I $(LIBBONOBO_IDL) -I $(BONOBO_ACTIVATION_IDL) \

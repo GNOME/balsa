@@ -40,6 +40,10 @@
 #include "misc.h"
 #include "html.h"
 #include <glib/gi18n.h>
+ 
+#if HAVE_MACOSX_DESKTOP
+#include <ige-mac-integration.h>
+#endif
 
 #include "ab-window.h"
 #include "balsa-app.h"
@@ -1545,6 +1549,9 @@ balsa_window_new()
     static const gchar *const threading_options[] =
         { "FlatIndex", "SimpleThreading", "JWZThreading" };
     guint i;
+#if HAVE_MACOSX_DESKTOP
+    IgeMacMenuGroup *group;
+#endif
 
     /* Call to register custom balsa pixmaps with GNOME_STOCK_PIXMAPS
      * - allows for grey out */
@@ -1576,7 +1583,22 @@ balsa_window_new()
     }
 
     menubar = gtk_ui_manager_get_widget(ui_manager, "/MainMenu");
+#if HAVE_MACOSX_DESKTOP
+    ige_mac_menu_set_menu_bar(GTK_MENU_SHELL(menubar));
+    ige_mac_menu_set_quit_menu_item(GTK_MENU_ITEM(gtk_ui_manager_get_widget(ui_manager, "/MainMenu/FileMenu/Quit")));
+ 
+    group = ige_mac_menu_add_app_menu_group();
+    ige_mac_menu_add_app_menu_item(group,
+                                  GTK_MENU_ITEM(gtk_ui_manager_get_widget(ui_manager, "/MainMenu/HelpMenu/About")), 
+                                   NULL);
+				   
+    group = ige_mac_menu_add_app_menu_group();
+    ige_mac_menu_add_app_menu_item(group,
+                                  GTK_MENU_ITEM(gtk_ui_manager_get_widget(ui_manager, "/MainMenu/EditMenu/Preferences")), 
+                                   NULL);
+#else
     gtk_box_pack_start(GTK_BOX(window->vbox), menubar, FALSE, FALSE, 0);
+#endif
 
     toolbar = balsa_toolbar_new(model, ui_manager);
     gtk_box_pack_start(GTK_BOX(window->vbox), toolbar, FALSE, FALSE, 0);
@@ -2558,7 +2580,6 @@ bw_contents_cb(void)
 /*
  * show the about box for Balsa
  */
-#if GTK_CHECK_VERSION(2, 6, 0)
 static void
 bw_show_about_box_url_hook(GtkAboutDialog * about, const gchar * link,
                            gpointer data)
@@ -2577,7 +2598,6 @@ bw_show_about_box_url_hook(GtkAboutDialog * about, const gchar * link,
         g_error_free(err);
     }
 }
-#endif /* GTK_CHECK_VERSION(2, 6, 0) */
 
 static void
 bw_show_about_box(GtkAction * action, gpointer user_data)
@@ -2602,7 +2622,6 @@ bw_show_about_box(GtkAction * action, gpointer user_data)
         gdk_pixbuf_new_from_file(BALSA_DATA_PREFIX
                                  "/pixmaps/balsa_logo.png", NULL);
 
-#if GTK_CHECK_VERSION(2, 6, 0)
     gtk_about_dialog_set_url_hook(bw_show_about_box_url_hook, NULL, NULL);
     gtk_show_about_dialog(GTK_WINDOW(user_data),
                           "version", BALSA_VERSION,
@@ -2623,35 +2642,6 @@ bw_show_about_box(GtkAction * action, gpointer user_data)
                           "wrap-license", TRUE,
                           NULL);
     g_object_unref(balsa_logo);
-#else /* GTK_CHECK_VERSION(2, 6, 0) */
-    static GtkWidget *about = NULL;
-
-    /* only show one about box at a time */
-    if (about) {
-        gdk_window_raise(about->window);
-        return;
-    }
-
-    about = gnome_about_new("Balsa",
-                            BALSA_VERSION,
-                            "Copyright \xc2\xa9 1997-2003 The Balsa Developers",
-                            _("The Balsa email client is part of "
-                              "the GNOME desktop environment.  "
-                              "Information on Balsa can be found at "
-                              "http://balsa.gnome.org/\n\n"
-                              "If you need to report bugs, "
-                              "please do so at: "
-                              "http://bugzilla.gnome.org/"),
-                            authors,
-                            documenters,
-                            strcmp(translator_credits, "translator-credits") != 0 ? translator_credits : NULL,
-                            balsa_logo
-                            );
-
-    g_object_add_weak_pointer(G_OBJECT(about), (gpointer) &about);
-
-    gtk_widget_show(about);
-#endif /* GTK_CHECK_VERSION(2, 6, 0) */
 }
 
 /* Check all mailboxes in a list

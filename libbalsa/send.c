@@ -42,6 +42,7 @@
 #include "server.h"
 #include "send.h"
 #include "misc.h"
+#include "missing.h"
 #include "information.h"
 
 #if ENABLE_ESMTP

@@ -44,33 +44,6 @@ void libbalsa_conf_foreach_group(const gchar * prefix,
                                  LibBalsaConfForeachFunc func,
                                  gpointer data);
 
-#if !GLIB_CHECK_VERSION(2, 6, 0)
-
-#define libbalsa_conf_pop_group               gnome_config_pop_prefix
-#define libbalsa_conf_set_string              gnome_config_set_string
-#define libbalsa_conf_get_string              gnome_config_get_string
-#define libbalsa_conf_private_set_string      gnome_config_private_set_string
-#define libbalsa_conf_private_get_string      gnome_config_private_get_string
-#define libbalsa_conf_get_string_with_default gnome_config_get_string_with_default
-#define libbalsa_conf_set_bool                gnome_config_set_bool
-#define libbalsa_conf_get_bool                gnome_config_get_bool
-#define libbalsa_conf_get_bool_with_default   gnome_config_get_bool_with_default
-#define libbalsa_conf_set_int                 gnome_config_set_int
-#define libbalsa_conf_get_int                 gnome_config_get_int
-#define libbalsa_conf_get_int_with_default    gnome_config_get_int_with_default
-
-#define libbalsa_conf_set_vector              gnome_config_set_vector
-#define libbalsa_conf_get_vector_with_default gnome_config_get_vector_with_default
-
-#define libbalsa_conf_push_prefix             gnome_config_push_prefix
-#define libbalsa_conf_pop_prefix              gnome_config_pop_prefix
-#define libbalsa_conf_clean_key               gnome_config_clean_key
-#define libbalsa_conf_drop_all                gnome_config_drop_all
-#define libbalsa_conf_sync                    gnome_config_sync
-#include <libgnome/gnome-config.h>
-
-#else                           /* !GLIB_CHECK_VERSION(2, 6, 0) */
-
 void libbalsa_conf_foreach_keys              (const gchar * group,
 					      LibBalsaConfForeachFunc func,
 					      gpointer data);
@@ -149,7 +122,5 @@ void libbalsa_conf_get_vector_with_default   (const char *path,
 
 void libbalsa_conf_drop_all                  (void);
 void libbalsa_conf_sync                      (void);
-
-#endif                          /* !GLIB_CHECK_VERSION(2, 6, 0) */
 
 #endif                          /* __LIBCONFIG_H__ */

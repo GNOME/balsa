@@ -24,6 +24,10 @@
 #ifndef __BALSA_BONOBO_H
 #define __BALSA_BONOBO_H
 
+#include "config.h"
+
+#if HAVE_GNOME
+
 #include "Balsa.h" 
 #include <bonobo/bonobo-control.h>
 #include <bonobo/bonobo-object.h>
@@ -87,6 +91,7 @@ typedef struct
  
 GType          balsa_application_get_type (void);
 BonoboObject  *balsa_application_new      (void);
- 
+
+#endif /* HAVE_GNOME */ 
  
 #endif /* __BALSA_BONOBO_H */

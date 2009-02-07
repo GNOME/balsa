@@ -42,6 +42,7 @@
 #include "mailbox-filter.h"
 #include <glib/gi18n.h>
 #include "libbalsa-conf.h"
+#include "missing.h"
 
 #if !GTK_CHECK_VERSION(2, 14, 0)
 #ifdef HAVE_GNOME
@@ -1780,9 +1781,6 @@ fe_delete_pressed(GtkWidget * widget, gpointer data)
         gtk_entry_set_text(GTK_ENTRY(fe_name_entry),"");
         gtk_entry_set_text(GTK_ENTRY(fe_popup_entry),"");
         /*gtk_option_menu_set_history(GTK_OPTION_MENU(fe_mailboxes), 0); */
-#if !GTK_CHECK_VERSION(2, 6, 0)
-        gtk_entry_set_text(GTK_ENTRY(gnome_file_entry_gtk_entry(GNOME_FILE_ENTRY(fe_sound_entry))),"");
-#endif /* GTK_CHECK_VERSION(2, 6, 0) */
         gtk_list_store_clear(GTK_LIST_STORE
                              (gtk_tree_view_get_model
                               (fe_conditions_list)));
@@ -1912,13 +1910,8 @@ fe_apply_pressed(GtkWidget * widget, gpointer data)
     if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fe_sound_button))) {
         gchar *tmpstr;
         
-#if GTK_CHECK_VERSION(2, 6, 0)
         tmpstr = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER
                                                (fe_sound_entry));
-#else /* GTK_CHECK_VERSION(2, 6, 0) */
-        tmpstr =
-            gtk_editable_get_chars(GTK_EDITABLE(fe_sound_entry), 0, -1);
-#endif /* GTK_CHECK_VERSION(2, 6, 0) */
         if ((!tmpstr) || (tmpstr[0] == '\0')) {
             g_free(tmpstr);
             libbalsa_filter_free(fil, GINT_TO_POINTER(TRUE));
@@ -2020,14 +2013,9 @@ fe_filters_list_selection_changed(GtkTreeSelection * selection,
                        ? fil->popup_text : "");
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fe_sound_button),
                                  fil->sound!=NULL);
-#if GTK_CHECK_VERSION(2, 6, 0)
     if (fil->sound)
         gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(fe_sound_entry),
                                       fil->sound);
-#else /* GTK_CHECK_VERSION(2, 6, 0) */
-    gtk_entry_set_text(GTK_ENTRY(gnome_file_entry_gtk_entry(GNOME_FILE_ENTRY(fe_sound_entry))),
-                       fil->sound!=NULL ? fil->sound : "");
-#endif /* GTK_CHECK_VERSION(2, 6, 0) */
     
     gtk_combo_box_set_active(GTK_COMBO_BOX(fe_action_option_menu),
                              fil->action - 1);
@@ -2090,7 +2078,6 @@ fe_date_sample(void)
     return label;
 }                               /* end fe_date_sample */
 
-#if GTK_CHECK_VERSION(2, 6, 0)
 /* Callback for the sound file-chooser-button's dialog. */
 void
 fe_sound_response(GtkDialog * dialog, gint response)
@@ -2098,4 +2085,3 @@ fe_sound_response(GtkDialog * dialog, gint response)
     if (response == GTK_RESPONSE_ACCEPT)
         set_button_sensitivities(TRUE);
 }
-#endif /* GTK_CHECK_VERSION(2, 6, 0) */

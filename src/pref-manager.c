@@ -420,7 +420,6 @@ const gchar *threading_type_label[NUM_THREADING_STYLES] = {
 };
 
     /* and now the important stuff: */
-#if GTK_CHECK_VERSION(2, 6, 0)
 static gboolean
 open_preferences_manager_idle(void)
 {
@@ -449,7 +448,6 @@ open_preferences_manager_idle(void)
     gdk_threads_leave();
     return FALSE;
 }                               /* open_preferences_manager_idle */
-#endif                          /* GTK_CHECK_VERSION(2, 6, 0) */
 
 enum {
     PM_TEXT_COL,
@@ -618,16 +616,11 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
                      G_CALLBACK(properties_modified_cb), property_box);
 #endif                          /* HAVE_GTKSPELL */
 
-#if GTK_CHECK_VERSION(2, 6, 0)
     /* Connect signal in an idle handler, after the file chooser has
      * been initialized. */
     g_idle_add_full(G_PRIORITY_LOW,
                     (GSourceFunc) open_preferences_manager_idle,
                     NULL, NULL);
-#else                           /* GTK_CHECK_VERSION(2, 6, 0) */
-    g_signal_connect(G_OBJECT(pui->mail_directory), "changed",
-                     G_CALLBACK(properties_modified_cb), property_box);
-#endif                          /* GTK_CHECK_VERSION(2, 6, 0) */
     g_signal_connect(G_OBJECT(pui->check_mail_auto), "toggled",
                      G_CALLBACK(timer_modified_cb), property_box);
 
@@ -830,14 +823,9 @@ apply_prefs(GtkDialog * pbox)
                          (GHFunc) update_view_defaults, NULL);
 
     g_free(balsa_app.local_mail_directory);
-#if GTK_CHECK_VERSION(2, 6, 0)
     balsa_app.local_mail_directory =
         gtk_file_chooser_get_filename(GTK_FILE_CHOOSER
                                       (pui->mail_directory));
-#else                           /* GTK_CHECK_VERSION(2, 6, 0) */
-    balsa_app.local_mail_directory =
-        g_strdup(gtk_entry_get_text(GTK_ENTRY(pui->mail_directory)));
-#endif                          /* GTK_CHECK_VERSION(2, 6, 0) */
 
     /* 
      * display page 
@@ -1082,14 +1070,9 @@ set_prefs(void)
             break;
         }
 
-#if GTK_CHECK_VERSION(2, 6, 0)
     gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER
                                         (pui->mail_directory),
                                   balsa_app.local_mail_directory);
-#else                           /* GTK_CHECK_VERSION(2, 6, 0) */
-    gtk_entry_set_text(GTK_ENTRY(pui->mail_directory),
-                       balsa_app.local_mail_directory);
-#endif                          /* GTK_CHECK_VERSION(2, 6, 0) */
 
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->previewpane),
                                  balsa_app.previewpane);
@@ -1665,26 +1648,10 @@ static GtkWidget *
 local_mail_group(GtkWidget * page)
 {
     GtkWidget *group = pm_group_new(_("Local mail directory"));
-#if GTK_CHECK_VERSION(2, 6, 0)
     pui->mail_directory =
         gtk_file_chooser_button_new(_("Select your local mail directory"),
                                     GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER);
     pm_group_add(group, pui->mail_directory, FALSE);
-#else                           /* GTK_CHECK_VERSION(2, 6, 0) */
-    GtkWidget *fileentry;
-
-    fileentry = gnome_file_entry_new("MAIL-DIR",
-                                     _
-                                     ("Select your local mail directory"));
-    pm_group_add(group, fileentry, FALSE);
-
-    gnome_file_entry_set_directory_entry(GNOME_FILE_ENTRY(fileentry),
-                                         TRUE);
-    gnome_file_entry_set_modal(GNOME_FILE_ENTRY(fileentry), TRUE);
-
-    pui->mail_directory =
-        gnome_file_entry_gtk_entry(GNOME_FILE_ENTRY(fileentry));
-#endif                          /* GTK_CHECK_VERSION(2, 6, 0) */
 
     return group;
 }

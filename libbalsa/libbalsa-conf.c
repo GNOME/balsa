@@ -23,67 +23,6 @@
 #include <string.h>
 #include "libbalsa-conf.h"
 
-#if !GLIB_CHECK_VERSION(2, 6, 0)
-
-#define BALSA_CONFIG_PREFIX "balsa/"
-
-/* 
- * Call @func for each section name that begins with @prefix.
- * @func is called with arguments:
- *   const gchar * @key		the section;
- *   const gchar * @value	the trailing part of the section name,
- *   				following the @prefix;
- *   gpointer @data		the @data passed in.
- * Iteration terminates when @func returns TRUE.
- */
-void
-libbalsa_conf_foreach_group(const gchar * prefix,
-                            LibBalsaConfForeachFunc func, gpointer data)
-{
-    gsize pref_len;
-    void *iterator;
-    gchar *key;
-
-    pref_len = strlen(prefix);
-    iterator = gnome_config_init_iterator_sections(BALSA_CONFIG_PREFIX);
-    while ((iterator = gnome_config_iterator_next(iterator, &key, NULL))) {
-        if (strncmp(key, prefix, pref_len) == 0
-            && func(key, key + pref_len, data)) {
-            g_free(key);
-            g_free(iterator);
-            break;
-        }
-        g_free(key);
-    }
-}
-
-void
-libbalsa_conf_push_group(const char *group)
-{
-    gchar *prefix = g_strconcat(BALSA_CONFIG_PREFIX, group, "/", NULL);
-    gnome_config_push_prefix(prefix);
-    g_free(prefix);
-}
-
-void
-libbalsa_conf_remove_group_(const char *group, gboolean priv)
-{
-    gchar *prefix = g_strconcat(BALSA_CONFIG_PREFIX, group, "/", NULL);
-    gnome_config_clean_section_(prefix, priv);
-    g_free(prefix);
-}
-
-gboolean
-libbalsa_conf_has_group(const char *group)
-{
-    gchar *prefix = g_strconcat(BALSA_CONFIG_PREFIX, group, "/", NULL);
-    gboolean retval = gnome_config_has_section(prefix);
-    g_free(prefix);
-    return retval;
-}
-
-#else                           /* !GLIB_CHECK_VERSION(2, 6, 0) */
-
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -663,5 +602,3 @@ libbalsa_conf_sync(void)
     lbc_sync(&lbc_conf_priv);
     lbc_unlock();
 }
-
-#endif                          /* !GLIB_CHECK_VERSION(2, 6, 0) */

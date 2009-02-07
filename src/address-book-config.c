@@ -370,16 +370,10 @@ create_externq_dialog(AddressBookConfig * abc)
     gtk_misc_set_alignment(GTK_MISC(label), 1.0, 0.5);
     gtk_table_attach(GTK_TABLE(table), label, 0, 1, 1, 2,
 		     GTK_FILL, GTK_FILL, 0, 0);
-#if GTK_CHECK_VERSION(2, 6, 0)
     abc->ab_specific.externq.load =
         gtk_file_chooser_button_new
         (_("Select load program for address book"),
          GTK_FILE_CHOOSER_ACTION_OPEN);
-#else /* GTK_CHECK_VERSION(2, 6, 0) */
-    abc->ab_specific.externq.load =
-	gnome_file_entry_new("ExternAddressBookLoadPath",
-			     _("Select load program for address book"));
-#endif /* GTK_CHECK_VERSION(2, 6, 0) */
     gtk_table_attach(GTK_TABLE(table), abc->ab_specific.externq.load, 1, 2,
 		     1, 2, GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0);
     gtk_label_set_mnemonic_widget(GTK_LABEL(label), 
@@ -389,16 +383,10 @@ create_externq_dialog(AddressBookConfig * abc)
     gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
     gtk_table_attach(GTK_TABLE(table), label, 0, 1, 2, 3,
 		     GTK_FILL, GTK_FILL, 0, 0);
-#if GTK_CHECK_VERSION(2, 6, 0)
     abc->ab_specific.externq.save =
         gtk_file_chooser_button_new
         (_("Select save program for address book"),
          GTK_FILE_CHOOSER_ACTION_OPEN);
-#else /* GTK_CHECK_VERSION(2, 6, 0) */
-    abc->ab_specific.externq.save =
-	gnome_file_entry_new("ExternAddressBookSavePath",
-			     _("Select save program for address book"));
-#endif /* GTK_CHECK_VERSION(2, 6, 0) */
     gtk_table_attach(GTK_TABLE(table), abc->ab_specific.externq.save, 1, 2,
 		     2, 3, GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0);
     gtk_label_set_mnemonic_widget(GTK_LABEL(label), 
@@ -407,23 +395,12 @@ create_externq_dialog(AddressBookConfig * abc)
     add_radio_buttons(table, 3, abc);
 
     if (ab) {
-#if GTK_CHECK_VERSION(2, 6, 0)
         gtk_file_chooser_set_filename(GTK_FILE_CHOOSER
                                       (abc->ab_specific.externq.load),
                                       ab->load);
         gtk_file_chooser_set_filename(GTK_FILE_CHOOSER
                                       (abc->ab_specific.externq.save),
                                       ab->save);
-#else /* GTK_CHECK_VERSION(2, 6, 0) */
-	GtkWidget *entry;
-	entry = GTK_WIDGET(gnome_file_entry_gtk_entry
-			   (GNOME_FILE_ENTRY(abc->ab_specific.externq.load)));
-	gtk_entry_set_text(GTK_ENTRY(entry), ab->load);
-
-	entry = GTK_WIDGET(gnome_file_entry_gtk_entry
-			   (GNOME_FILE_ENTRY(abc->ab_specific.externq.save)));
-	gtk_entry_set_text(GTK_ENTRY(entry), ab->save);
-#endif /* GTK_CHECK_VERSION(2, 6, 0) */
     }
 
     dialog = create_generic_dialog(abc);
@@ -577,15 +554,6 @@ chooser_bad_path(GtkFileChooser * chooser, GtkWindow * window, gint type)
     return bad_path(gtk_file_chooser_get_filename(chooser), window, type);
 }
 
-#if !GTK_CHECK_VERSION(2, 6, 0)
-static gboolean
-entry_bad_path(GnomeFileEntry * entry, GtkWindow * window, gint type)
-{
-    return bad_path(gnome_file_entry_get_full_path(entry, TRUE), window,
-                    type);
-}
-#endif                          /* GTK_CHECK_VERSION(2, 6, 0) */
-
 static gboolean
 handle_close(AddressBookConfig * abc)
 {
@@ -600,7 +568,6 @@ handle_close(AddressBookConfig * abc)
                      ADDRESS_BOOK_CONFIG_PATH_FILE))
             return FALSE;
     } else if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_EXTERN) {
-#if GTK_CHECK_VERSION(2, 6, 0)
         if (chooser_bad_path(GTK_FILE_CHOOSER(abc->ab_specific.externq.load),
                      GTK_WINDOW(abc->window),
                      ADDRESS_BOOK_CONFIG_PATH_LOAD))
@@ -609,16 +576,6 @@ handle_close(AddressBookConfig * abc)
                      GTK_WINDOW(abc->window),
                      ADDRESS_BOOK_CONFIG_PATH_SAVE))
             return FALSE;
-#else /* GTK_CHECK_VERSION(2, 6, 0) */
-        if (entry_bad_path(GNOME_FILE_ENTRY(abc->ab_specific.externq.load),
-                     GTK_WINDOW(abc->window),
-                     ADDRESS_BOOK_CONFIG_PATH_LOAD))
-            return FALSE;
-        if (entry_bad_path(GNOME_FILE_ENTRY(abc->ab_specific.externq.save),
-                     GTK_WINDOW(abc->window),
-                     ADDRESS_BOOK_CONFIG_PATH_SAVE))
-            return FALSE;
-#endif /* GTK_CHECK_VERSION(2, 6, 0) */
     }
 
     if (abc->address_book == NULL)
@@ -636,9 +593,6 @@ handle_close(AddressBookConfig * abc)
 static gboolean
 bad_path(gchar * path, GtkWindow * window, gint type)
 {
-#if !GTK_CHECK_VERSION(2, 6, 0)
-    gchar *message, *question;
-#endif /* GTK_CHECK_VERSION(2, 6, 0) */
     GtkWidget *ask;
     gint clicked_button;
 
@@ -646,38 +600,12 @@ bad_path(gchar * path, GtkWindow * window, gint type)
         g_free(path);
         return FALSE;
     }
-#if GTK_CHECK_VERSION(2, 6, 0)
     ask = gtk_message_dialog_new(window,
 				 GTK_DIALOG_MODAL|
 				 GTK_DIALOG_DESTROY_WITH_PARENT,
                                  GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO,
                                  _("No path found.  "
 				   "Do you want to give one?"));
-#else /* GTK_CHECK_VERSION(2, 6, 0) */
-    switch (type) {
-        case ADDRESS_BOOK_CONFIG_PATH_FILE:
-            message =
-                _("The address book file path \"%s\" is not correct. %s");
-            break;
-        case ADDRESS_BOOK_CONFIG_PATH_LOAD:
-            message = _("The load program path \"%s\" is not correct. %s");
-            break;
-        case ADDRESS_BOOK_CONFIG_PATH_SAVE:
-            message = _("The save program path \"%s\" is not correct. %s");
-            break;
-        default:
-            message = _("The path \"%s\" is not correct. %s");
-            break;
-    }
-    question = _("Do you want to correct the path?");
-    ask = gtk_message_dialog_new(window,
-				 GTK_DIALOG_MODAL|
-				 GTK_DIALOG_DESTROY_WITH_PARENT,
-                                 GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO,
-                                 message, path, question);
-    g_free(path);
-#endif /* GTK_CHECK_VERSION(2, 6, 0) */
-
     gtk_dialog_set_default_response(GTK_DIALOG(ask), GTK_RESPONSE_YES);
     clicked_button = gtk_dialog_run(GTK_DIALOG(ask));
     gtk_widget_destroy(ask);
@@ -697,13 +625,8 @@ create_book(AddressBookConfig * abc)
             address_book = libbalsa_address_book_vcard_new(name, path);
         g_free(path);
     } else if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_EXTERN) {
-#if GTK_CHECK_VERSION(2, 6, 0)
 #define GET_FILENAME(chooser) \
   gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(chooser))
-#else /* GTK_CHECK_VERSION(2, 6, 0) */
-#define GET_FILENAME(entry) \
-  gnome_file_entry_get_full_path(GNOME_FILE_ENTRY(entry), FALSE)
-#endif /* GTK_CHECK_VERSION(2, 6, 0) */
         gchar *load = GET_FILENAME(abc->ab_specific.externq.load);
         gchar *save = GET_FILENAME(abc->ab_specific.externq.save);
         if (load != NULL && save != NULL)
@@ -788,23 +711,12 @@ modify_book(AddressBookConfig * abc)
         }
     } else if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_EXTERN) {
         LibBalsaAddressBookExtern *externq;
-#if GTK_CHECK_VERSION(2, 6, 0)
         gchar *load =
             gtk_file_chooser_get_filename(GTK_FILE_CHOOSER
                                            (abc->ab_specific.externq.load));
         gchar *save =
             gtk_file_chooser_get_filename(GTK_FILE_CHOOSER
                                            (abc->ab_specific.externq.save));
-#else /* GTK_CHECK_VERSION(2, 6, 0) */
-        gchar *load =
-            gnome_file_entry_get_full_path(GNOME_FILE_ENTRY
-                                           (abc->ab_specific.externq.load),
-                                           FALSE);
-        gchar *save =
-            gnome_file_entry_get_full_path(GNOME_FILE_ENTRY
-                                           (abc->ab_specific.externq.save),
-                                           FALSE);
-#endif /* GTK_CHECK_VERSION(2, 6, 0) */
 
         externq = LIBBALSA_ADDRESS_BOOK_EXTERN(address_book);
         if (load) {

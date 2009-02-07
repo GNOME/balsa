@@ -22,7 +22,9 @@
 #include "config.h"
 
 #include <string.h>
+#if HAVE_GNOME
 #include <gconf/gconf-client.h>
+#endif
 
 #include <glib/gi18n.h>
 
@@ -263,6 +265,7 @@ tm_save_model(BalsaToolbarModel * model)
     libbalsa_conf_pop_group();
 }
 
+#if HAVE_GNOME
 /* GConfClientNotifyFunc
  */
 static void
@@ -272,6 +275,7 @@ tm_gconf_notify(GConfClient * client, guint cnxn_id, GConfEntry * entry,
     if (model->style == (GtkToolbarStyle) (-1))
         balsa_toolbar_model_changed(model);
 }
+#endif /* HAVE_GNOME */
 
 /* Create a BalsaToolbarModel structure.
  */
@@ -280,13 +284,16 @@ balsa_toolbar_model_new(BalsaToolbarType type, GSList * standard)
 {
     BalsaToolbarModel *model =
         g_object_new(BALSA_TYPE_TOOLBAR_MODEL, NULL);
+#if HAVE_GNOME
     GConfClient *conf;
     guint notify_id;
+#endif
 
     model->type = type;
     model->standard = standard;
     tm_load_model(model);
 
+#if HAVE_GNOME
     conf = gconf_client_get_default();
     /* We never destroy a model, so we do nothing with the notify-id: */
     notify_id =
@@ -294,6 +301,7 @@ balsa_toolbar_model_new(BalsaToolbarType type, GSList * standard)
                                 "/desktop/gnome/interface/toolbar_style",
                                 (GConfClientNotifyFunc) tm_gconf_notify,
                                 model, NULL, NULL);
+#endif /* HAVE_GNOME */
 
     return model;
 }
@@ -526,9 +534,10 @@ static const struct {
 static GtkToolbarStyle
 tm_default_style(void)
 {
+    GtkToolbarStyle default_style = GTK_TOOLBAR_BOTH;
+#if HAVE_GNOME
     GConfClient *conf;
     gchar *str;
-    GtkToolbarStyle default_style = GTK_TOOLBAR_BOTH;
 
     /* Get global setting */
     conf = gconf_client_get_default();
@@ -545,6 +554,7 @@ tm_default_style(void)
             }
         g_free(str);
     }
+#endif /* HAVE_GNOME */
 
     return default_style;
 }

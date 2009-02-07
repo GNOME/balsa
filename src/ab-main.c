@@ -22,6 +22,7 @@
 #include "config.h"
 
 #include <string.h>
+#include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 #if HAVE_GNOME
 #include <gnome.h>
@@ -32,6 +33,10 @@
 
 #ifdef HAVE_LOCALE_H
 #include <locale.h>
+#endif
+
+#if HAVE_MACOSX_DESKTOP
+#include <ige-mac-integration.h>
 #endif
 
 #include "address-book.h"
@@ -73,11 +78,13 @@ struct ABMainWindow {
 
 static void bab_cleanup(void);
 
+#if HAVE_GNOME
 static gint bab_save_session(GnomeClient * client, gint phase,
                              GnomeSaveStyle save_style, gint is_shutdown,
                              GnomeInteractStyle interact_style, gint is_fast,
                              gpointer client_data);
 static gint bab_kill_session(GnomeClient * client, gpointer client_data);
+#endif
 
 static void ab_set_edit_widget(LibBalsaAddress * address,
                                gboolean can_remove);
@@ -571,13 +578,7 @@ static GtkActionEntry entries[] = {
      N_("Add new entry"), G_CALLBACK(edit_new_entry_cb)},
     {"DeleteEntry", GTK_STOCK_NEW, N_("_Delete Entry"), NULL,
      N_("Delete entry"), G_CALLBACK(edit_delete_entry_cb)},
-    {"About",
-#if GTK_CHECK_VERSION(2, 6, 0)
-     GTK_STOCK_ABOUT,
-#else
-     GNOME_STOCK_ABOUT,
-#endif                          /* GTK_CHECK_VERSION(2, 6, 0) */
-     N_("_About"), NULL, NULL, NULL}
+    {"About", GTK_STOCK_ABOUT, N_("_About"), NULL, NULL, NULL}
 };
 
 static const char *ui_description =
@@ -623,6 +624,9 @@ get_main_menu(GtkWidget * window, GtkWidget ** menubar,
     GtkAccelGroup *accel_group;
     GError *error;
     GList *ab;
+#if HAVE_MACOSX_DESKTOP
+    IgeMacMenuGroup *group;
+#endif
 
     contacts_app.action_group = action_group =
         gtk_action_group_new("MenuActions");
@@ -646,6 +650,16 @@ get_main_menu(GtkWidget * window, GtkWidget ** menubar,
 
     for (ab = address_books; ab; ab = ab->next)
         add_address_book(LIBBALSA_ADDRESS_BOOK(ab->data));
+    
+#if HAVE_MACOSX_DESKTOP
+    ige_mac_menu_set_menu_bar(GTK_MENU_SHELL(gtk_ui_manager_get_widget(ui_manager, "/MainMenu")));
+    ige_mac_menu_set_quit_menu_item(GTK_MENU_ITEM(gtk_ui_manager_get_widget(ui_manager, "/MainMenu/FileMenu/Quit")));
+
+    group = ige_mac_menu_add_app_menu_group();
+    ige_mac_menu_add_app_menu_item(group,
+				   GTK_MENU_ITEM(gtk_ui_manager_get_widget(ui_manager, "/MainMenu/HelpMenu/About")), 
+                                   NULL);
+#endif
 
     if (menubar)
         /* Finally, return the actual menu bar created by the UIManager. */
@@ -986,9 +1000,11 @@ bab_window_new()
     gtk_container_add(GTK_CONTAINER(wnd), main_vbox);
 
     get_main_menu(GTK_WIDGET(wnd), &menubar, contacts_app.address_book_list);
+#ifndef HAVE_MACOSX_DESKTOP
     if (menubar)
         gtk_box_pack_start(GTK_BOX(main_vbox),
                            menubar, FALSE, FALSE, 1);
+#endif
 
     contacts_app.notebook = gtk_notebook_new();
     gtk_box_pack_start(GTK_BOX(main_vbox),
@@ -1089,7 +1105,9 @@ information_real(void)
 int
 main(int argc, char *argv[])
 {
+#if HAVE_GNOME
     GnomeClient *client;
+#endif
 #ifdef GTKHTML_HAVE_GCONF
     GError *gconf_error;
 #endif
@@ -1104,6 +1122,7 @@ main(int argc, char *argv[])
 
     /* FIXME: do we need to allow a non-GUI mode? */
     gtk_init_check(&argc, &argv);
+#if HAVE_GNOME
     gnome_program_init(PACKAGE, VERSION, LIBGNOMEUI_MODULE, argc, argv,
 #ifndef GNOME_PARAM_GOPTION_CONTEXT
                        GNOME_PARAM_POPT_TABLE, NULL,
@@ -1113,6 +1132,7 @@ main(int argc, char *argv[])
 #else
                        GNOME_PARAM_GOPTION_CONTEXT, NULL,
                        GNOME_PARAM_NONE);
+#endif
 #endif
 
 #ifdef GTKHTML_HAVE_GCONF
@@ -1153,11 +1173,13 @@ main(int argc, char *argv[])
                      G_CALLBACK(bab_delete_ok), NULL);
 
     /* session management */
+#if HAVE_GNOME
     client = gnome_master_client();
     g_signal_connect(G_OBJECT(client), "save_yourself",
 		     G_CALLBACK(bab_save_session), argv[0]);
     g_signal_connect(G_OBJECT(client), "die",
 		     G_CALLBACK(bab_kill_session), NULL);
+#endif
 
     gtk_widget_show_all(ab_window);
     gtk_widget_hide(contacts_app.edit_widget);
@@ -1186,6 +1208,7 @@ bab_cleanup(void)
     gtk_main_quit();
 }
 
+#if HAVE_GNOME
 static gint
 bab_kill_session(GnomeClient * client, gpointer client_data)
 {
@@ -1215,3 +1238,4 @@ bab_save_session(GnomeClient * client, gint phase,
 
     return TRUE;
 }
+#endif /* HAVE_GNOME */

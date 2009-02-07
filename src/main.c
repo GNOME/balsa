@@ -22,8 +22,10 @@
 #define _XOPEN_SOURCE 500
 #include "config.h"
 
+#if HAVE_GNOME
 #include <gnome.h>
 #include <libgnomeui/gnome-window-icon.h>
+#endif
 
 #ifdef GTKHTML_HAVE_GCONF
 # include <gconf/gconf.h>
@@ -59,10 +61,12 @@
 
 #include "libinit_balsa/init_balsa.h"
 
+#if HAVE_GNOME
 #include "Balsa.h"
 #include "balsa-bonobo.h"
 #include <bonobo-activation/bonobo-activation.h>
 #include <bonobo/bonobo-exception.h>
+#endif
 
 #ifdef HAVE_GPGME
 #include <string.h>
@@ -92,11 +96,13 @@ static void balsa_init(int argc, char **argv);
 static void config_init(gboolean check_only);
 static void mailboxes_init(gboolean check_only);
 static void balsa_cleanup(void);
+#if HAVE_GNOME
 static gint balsa_kill_session(GnomeClient * client, gpointer client_data);
 static gint balsa_save_session(GnomeClient * client, gint phase,
 			       GnomeSaveStyle save_style, gint is_shutdown,
 			       GnomeInteractStyle interact_style,
 			       gint is_fast, gpointer client_data);
+#endif
 gboolean initial_open_unread_mailboxes(void); 
 /* yes void is there cause gcc is tha suck */
 gboolean initial_open_inbox(void);
@@ -132,6 +138,7 @@ accel_map_save(void)
     g_free(accel_map_filename);
 }
 
+#if HAVE_GNOME
 static void
 balsa_handle_automation_options() {
    CORBA_Object factory;
@@ -216,6 +223,7 @@ balsa_handle_automation_options() {
    }
    
 }
+#endif /* HAVE_GNOME */
 
 /* balsa_init:
    FIXME - check for memory leaks.
@@ -223,7 +231,7 @@ balsa_handle_automation_options() {
 static void
 balsa_init(int argc, char **argv)
 {
-#ifndef GNOME_PARAM_GOPTION_CONTEXT
+#if (HAVE_GNOME && !defined(GNOME_PARAM_GOPTION_CONTEXT))
     static char *attachment = NULL;
     int opt;
     poptContext context;
@@ -307,6 +315,7 @@ balsa_init(int argc, char **argv)
           "Special option that collects any remaining arguments for us" },
         { NULL }
     };
+#if HAVE_GNOME
     GOptionContext *option_context = g_option_context_new("balsa");
     GnomeProgram *my_app;
     g_option_context_add_main_entries(option_context, option_entries, NULL);
@@ -317,6 +326,9 @@ balsa_init(int argc, char **argv)
                                 GNOME_PARAM_APP_DATADIR,
                                 BALSA_STD_PREFIX "/share",
                                 GNOME_PARAM_NONE);
+#else /* HAVE_GNOME */
+    gtk_init_with_args(&argc, &argv, PACKAGE, option_entries, NULL, NULL);
+#endif  /* HAVE_GNOME */
 
     if (remaining_args != NULL) {
         gint i, num_args;
@@ -340,8 +352,10 @@ balsa_init(int argc, char **argv)
         attach_vect = NULL;
     }
 #endif /* OPTION HANDLING */
-    balsa_handle_automation_options();  
-    
+
+#if HAVE_GNOME
+    balsa_handle_automation_options();
+#endif
 }
 
 /* check_special_mailboxes: 
@@ -389,7 +403,9 @@ config_init(gboolean check_only)
 {
     while(!config_load() && !check_only) {
 	balsa_init_begin();
+#if HAVE_GNOME
         config_defclient_save();
+#endif
     }
 }
 
@@ -400,7 +416,9 @@ mailboxes_init(gboolean check_only)
     if (!balsa_app.inbox && !check_only) {
 	g_warning("*** error loading mailboxes\n");
 	balsa_init_begin();
+#if HAVE_GNOME
         config_defclient_save();
+#endif
 	return;
     }
 }
@@ -721,7 +739,9 @@ int
 main(int argc, char *argv[])
 {
     GtkWidget *window;
+#if HAVE_GNOME
     GnomeClient *client;
+#endif
     gchar *default_icon;
 #ifdef GTKHTML_HAVE_GCONF
     GError *gconf_error;
@@ -806,7 +826,9 @@ main(int argc, char *argv[])
     }
 
     signal( SIGPIPE, SIG_IGN );
+#if HAVE_GNOME
     gnome_triggers_do("", "program", "balsa", "startup", NULL);
+#endif
 
     window = balsa_window_new();
     balsa_app.main_window = BALSA_WINDOW(window);
@@ -825,11 +847,13 @@ main(int argc, char *argv[])
     }
 
     /* session management */
+#if HAVE_GNOME
     client = gnome_master_client();
     g_signal_connect(G_OBJECT(client), "save_yourself",
 		     G_CALLBACK(balsa_save_session), argv[0]);
     g_signal_connect(G_OBJECT(client), "die",
 		     G_CALLBACK(balsa_kill_session), NULL);
+#endif
 
 #ifdef HAVE_GPGME
     balsa_app.has_openpgp = 
@@ -924,9 +948,12 @@ balsa_cleanup(void)
     g_hash_table_destroy(libbalsa_mailbox_view_table);
     libbalsa_mailbox_view_table = NULL;
 
+#if HAVE_GNOME
     gnome_sound_shutdown();
+#endif
 }
 
+#if HAVE_GNOME
 static gint
 balsa_kill_session(GnomeClient * client, gpointer client_data)
 {
@@ -988,3 +1015,4 @@ balsa_save_session(GnomeClient * client, gint phase,
 
     return TRUE;
 }
+#endif /* HAVE_GNOME */

@@ -253,7 +253,7 @@ vcard_charset_to_utf8(gchar * str, const gchar * charset)
 
     convstr = g_convert(str, -1, "utf-8", charset, NULL, &bytes_written, NULL);
     g_free(str);
-    return convstr ? convstr : strdup("");
+    return convstr ? convstr : g_strdup("");
 }
 
 
@@ -827,12 +827,7 @@ add_row(GtkWidget*button, gpointer data)
     GtkListStore *store = GTK_LIST_STORE(gtk_tree_view_get_model(tv));
     GtkTreeIter iter;
     GtkTreePath *path;
-#if GTK_CHECK_VERSION(2, 6, 0)
     gtk_list_store_insert_with_values(store, &iter, 99999, 0, "", -1);
-#else                           /* GTK_CHECK_VERSION(2, 6, 0) */
-    gtk_list_store_append(store, &iter);
-    gtk_list_store_set(store, &iter, 0, "", -1);
-#endif                          /* GTK_CHECK_VERSION(2, 6, 0) */
     gtk_widget_grab_focus(GTK_WIDGET(tv));
     path = gtk_tree_model_get_path(GTK_TREE_MODEL(store), &iter);
     gtk_tree_view_set_cursor(tv, path, NULL, TRUE);
@@ -863,18 +858,11 @@ addrlist_drag_received_cb(GtkWidget * widget, GdkDragContext * context,
             addr = *(LibBalsaAddress**)selection_data->data;
             if(addr && addr->address_list) {
                 g_print ("string: %s\n", (gchar*)addr->address_list->data);
-#if GTK_CHECK_VERSION(2, 6, 0)
                 gtk_list_store_insert_with_values(GTK_LIST_STORE(model),
                                                   &iter, 99999,
                                                   0,
                                                   addr->address_list->data,
                                                   -1);
-#else                           /* GTK_CHECK_VERSION(2, 6, 0) */
-                gtk_list_store_append(GTK_LIST_STORE(model), &iter);
-                gtk_list_store_set(GTK_LIST_STORE(model), &iter,
-                                   0, addr->address_list->data,
-                                   -1);
-#endif                          /* GTK_CHECK_VERSION(2, 6, 0) */
                 dnd_success = TRUE;
             }
             break;

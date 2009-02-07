@@ -20,7 +20,6 @@
  */
 
 #include <string.h>
-#include <gdk/gdkx.h>
 
 #include "config.h"
 

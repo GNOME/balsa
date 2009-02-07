@@ -51,13 +51,8 @@
 #include <glib/gi18n.h>
 
 /* TREE_VIEW_FIXED_HEIGHT enables hight-performance mode of GtkTreeView
- * very useful for large mailboxes (#msg >5000) but: a. is available only
- * in gtk2>=2.3.5 b. may expose some bugs in gtk.
- * gtk-2.4.9 has been tested with a positive result.
- */
-#if GTK_CHECK_VERSION(2,4,9)
+ * very useful for large mailboxes (#msg >5000)  */
 #define TREE_VIEW_FIXED_HEIGHT 1
-#endif
 
 
 /* gtk widget */
@@ -415,9 +410,7 @@ bndx_instance_init(BalsaIndex * index)
     g_signal_connect_after(tree_view, "size-allocate",
                            G_CALLBACK(bndx_column_resize),
                            NULL);
-#if GTK_CHECK_VERSION(2,4,9)
     gtk_tree_view_set_enable_search(tree_view, FALSE);
-#endif
 
     gtk_drag_source_set(GTK_WIDGET (index), 
                         GDK_BUTTON1_MASK | GDK_SHIFT_MASK | GDK_CONTROL_MASK,
@@ -2585,14 +2578,8 @@ bndx_pipe_response(GtkWidget * dialog, gint response,
         gchar *pipe_cmd;
         GList *active_cmd;
 
-#if GTK_CHECK_VERSION(2, 6, 0)
         pipe_cmd =
             gtk_combo_box_get_active_text(GTK_COMBO_BOX(info->entry));
-#else                           /* GTK_CHECK_VERSION(2, 6, 0) */
-        pipe_cmd =
-            gtk_editable_get_chars(GTK_EDITABLE
-                                   (GTK_BIN(info->entry)->child), 0, -1);
-#endif                          /* GTK_CHECK_VERSION(2, 6, 0) */
         active_cmd =
             g_list_find_custom(balsa_app.pipe_cmds, pipe_cmd,
                                (GCompareFunc) strcmp);

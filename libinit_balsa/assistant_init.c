@@ -120,7 +120,9 @@ balsa_initdruid(GtkAssistant * assistant)
     balsa_druid_page_user(assistant, default_logo);
 #if !defined(ENABLE_TOUCH_UI)
     balsa_druid_page_directory(assistant, default_logo);
+#if HAVE_GNOME
     balsa_druid_page_defclient(assistant, default_logo);
+#endif
 #endif
     balsa_druid_page_finish(assistant, default_logo);
 }

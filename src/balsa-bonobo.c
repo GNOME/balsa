@@ -20,9 +20,9 @@
  */
 
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
+#include "config.h"
+
+#if HAVE_GNOME
 
 #include <string.h>
 
@@ -276,3 +276,5 @@ BONOBO_TYPE_FUNC_FULL ( BalsaApplication,
 			GNOME_Balsa_Application,
 			BONOBO_TYPE_OBJECT,
 			balsa_application );
+
+#endif /* HAVE_GNOME */ 

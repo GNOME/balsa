@@ -68,6 +68,10 @@ GList *balsa_print_object_text_vcard(GList *list,
 				     GtkPrintContext * context,
 				     LibBalsaMessageBody * body,
 				     BalsaPrintSetup * psetup);
+GList *balsa_print_object_text_calendar(GList *list,
+                                        GtkPrintContext * context,
+                                        LibBalsaMessageBody * body,
+                                        BalsaPrintSetup * psetup);
 
 
 G_END_DECLS

@@ -223,9 +223,10 @@ balsa_print_object_default_draw(BalsaPrintObject * self,
     c_offset = pod->c_image_width + 4 * C_LABEL_SEP;
 
     /* print the icon */
-    cairo_print_pixbuf(cairo_ctx, pod->pixbuf, self->c_at_x,
-		       self->c_at_y + (c_max_height -
-				       pod->c_image_height) * 0.5, 1.0);
+    if (pod->pixbuf)
+        cairo_print_pixbuf(cairo_ctx, pod->pixbuf, self->c_at_x,
+                           self->c_at_y + (c_max_height -
+                                           pod->c_image_height) * 0.5, 1.0);
 
     /* print the description */
     font = pango_font_description_from_string(balsa_app.print_header_font);

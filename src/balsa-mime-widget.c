@@ -30,6 +30,7 @@
 #include "balsa-mime-widget-message.h"
 #include "balsa-mime-widget-multipart.h"
 #include "balsa-mime-widget-text.h"
+#include "balsa-mime-widget-vcalendar.h"
 #include "balsa-mime-widget-callbacks.h"
 #include "balsa-mime-widget-crypto.h"
 #include "balsa-mime-widget.h"
@@ -111,8 +112,9 @@ typedef struct _mime_delegate_t {
 } mime_delegate_t;
 
 static mime_delegate_t mime_delegate[] =
-    { {FALSE,  "message/delivery-status",      balsa_mime_widget_new_text},
+    { {FALSE, "message/delivery-status",       balsa_mime_widget_new_text},
       {TRUE,  "message/",                      balsa_mime_widget_new_message},
+      {FALSE, "text/calendar",                 balsa_mime_widget_new_vcalendar},
       {TRUE,  "text/",                         balsa_mime_widget_new_text},
       {TRUE,  "multipart/",                    balsa_mime_widget_new_multipart},
       {TRUE,  "image/",                        balsa_mime_widget_new_image},

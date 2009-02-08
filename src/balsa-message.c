@@ -1974,7 +1974,8 @@ preferred_part(LibBalsaMessageBody *parts)
 
         content_type = libbalsa_message_body_get_mime_type(body);
 
-        if (g_ascii_strcasecmp(content_type, "text/plain") == 0)
+        if (g_ascii_strcasecmp(content_type, "text/plain") == 0 ||
+            g_ascii_strcasecmp(content_type, "text/calendar") == 0)
             preferred = body;
 #ifdef HAVE_GTKHTML
         else if (libbalsa_can_display(body))

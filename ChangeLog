@@ -1,3 +1,15 @@
+2009-02-08  Albrecht Dreß
+
+	* libbalsa/rfc2445.[hc]: Implement VCALENDAR and VEVENT objects.
+	* src/balsa-mime-widget-vcalendar.[hc]:
+	display vevent's, and the stuff for sending a text/calendar reply;
+	* src/balsa-mime-widget.c: call functions to display text/calendar
+	* src/balsa-print-object-text.[hc]:  support print these parts
+	* src/balsa-print-object.c:: call functions to print text/calendar
+	* src/balsa-message.c: make text/calendar the preferred part.
+	* src/balsa-print-object-default.c: catch missing pixbuf
+	* src/Makefile.am, libbalsa/Makefile.am: add new source files
+
 2009-02-07  Albrecht Dreß
 
 	* INSTALL: minimum gtk version upgraded, link cleanup (Incomplete!).

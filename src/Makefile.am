@@ -31,6 +31,8 @@ balsa_BASE_SRCLIST =	\
 	balsa-mime-widget-multipart.h	\
 	balsa-mime-widget-text.c	\
 	balsa-mime-widget-text.h	\
+	balsa-mime-widget-vcalendar.c	\
+	balsa-mime-widget-vcalendar.h	\
 	balsa-cite-bar.c	\
 	balsa-cite-bar.h	\
 	filter-edit-callbacks.c	\

@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-01-25 11:34+0100\n"
-"PO-Revision-Date: 2009-01-25 11:36+0100\n"
+"POT-Creation-Date: 2009-02-11 07:16+0100\n"
+"PO-Revision-Date: 2009-02-11 07:19+0100\n"
 "Last-Translator: Marcel Telka <marcel@telka.sk>\n"
 "Language-Team: Slovak <sk-i18n@lists.linux.sk>\n"
 "MIME-Version: 1.0\n"
@@ -77,28 +77,28 @@ msgstr "Nemožno pridať duplikátnu položku"
 msgid "Cannot find address in address book"
 msgstr "Nemožno nájsť adresu v adresári"
 
-#: ../libbalsa/address-book.c:324 ../src/main-window.c:2236
-#: ../src/main-window.c:4534 ../src/sendmsg-window.c:4143
+#: ../libbalsa/address-book.c:324 ../src/main-window.c:2258
+#: ../src/main-window.c:4523 ../src/sendmsg-window.c:4148
 msgid "Unknown error"
 msgstr "Neznáma chyba"
 
 #: ../libbalsa/address-view.c:126 ../src/balsa-mime-widget-message.c:713
 #: ../src/balsa-print-object-header.c:167 ../src/print.c:369
-#: ../src/sendmsg-window.c:1096 ../src/sendmsg-window.c:3812
+#: ../src/sendmsg-window.c:1101 ../src/sendmsg-window.c:3817
 #: ../src/store-address.c:325
 msgid "To:"
 msgstr "Pre:"
 
 #: ../libbalsa/address-view.c:127 ../src/balsa-mime-widget-message.c:714
 #: ../src/balsa-print-object-header.c:169 ../src/print.c:370
-#: ../src/sendmsg-window.c:1096 ../src/sendmsg-window.c:3820
+#: ../src/sendmsg-window.c:1101 ../src/sendmsg-window.c:3825
 #: ../src/store-address.c:326
 msgid "Cc:"
 msgstr "Kópia:"
 
 #: ../libbalsa/address-view.c:128 ../src/balsa-mime-widget-message.c:715
 #: ../src/balsa-print-object-header.c:171 ../src/print.c:371
-#: ../src/sendmsg-window.c:1096 ../src/store-address.c:327
+#: ../src/sendmsg-window.c:1101 ../src/store-address.c:327
 msgid "Bcc:"
 msgstr "Skrytá kópia:"
 
@@ -106,37 +106,37 @@ msgstr "Skrytá kópia:"
 msgid "Reply To:"
 msgstr "Odpoveď pre:"
 
-#: ../libbalsa/address.c:933
+#: ../libbalsa/address.c:921
 msgid "D_isplayed Name:"
 msgstr "_Zobrazené meno:"
 
-#: ../libbalsa/address.c:934
+#: ../libbalsa/address.c:922
 msgid "_First Name:"
 msgstr "_Krstné meno:"
 
-#: ../libbalsa/address.c:935
+#: ../libbalsa/address.c:923
 msgid "_Last Name:"
 msgstr "_Priezvisko:"
 
-#: ../libbalsa/address.c:936
+#: ../libbalsa/address.c:924
 msgid "_Nickname:"
 msgstr "Pre_zývka:"
 
-#: ../libbalsa/address.c:937
+#: ../libbalsa/address.c:925
 msgid "O_rganization:"
 msgstr "_Organizácia:"
 
-#: ../libbalsa/address.c:938
+#: ../libbalsa/address.c:926
 msgid "_Email Address:"
 msgstr "Adresa _elektronickej pošty:"
 
 #. Right/Add button
-#: ../libbalsa/address.c:957 ../src/filter-edit-callbacks.c:1064
+#: ../libbalsa/address.c:945 ../src/filter-edit-callbacks.c:1065
 #: ../src/filter-run-dialog.c:327
 msgid "A_dd"
 msgstr "Pri_dať"
 
-#: ../libbalsa/body.c:124 ../libbalsa/mailbox_local.c:1791
+#: ../libbalsa/body.c:124 ../libbalsa/mailbox_local.c:1793
 #: ../libbalsa/message.c:831
 msgid "(No subject)"
 msgstr "(Bez predmetu)"
@@ -172,7 +172,7 @@ msgstr "Pokus o aplikáciu neplatného filtra"
 msgid "Invalid filters %s for mailbox %s"
 msgstr "Neplatné filtre %s pre poštovú schránku %s"
 
-#: ../libbalsa/filter.c:125 ../libbalsa/mailbox_local.c:881
+#: ../libbalsa/filter.c:125 ../libbalsa/mailbox_local.c:883
 msgid "Unable to load message body to match filter"
 msgstr "Nemôžem načítať telo správy pre filtráciu"
 
@@ -330,14 +330,14 @@ msgid "%s: insufficient validity for uid %s"
 msgstr "%s: nedostatočná platnosť pre uid %s"
 
 #. should "re" be localized ?
-#: ../libbalsa/identity.c:105 ../libbalsa/mailbox_local.c:1910
-#: ../libbalsa/mailbox_local.c:1912 ../src/sendmsg-window.c:4041
-#: ../src/sendmsg-window.c:4042
+#: ../libbalsa/identity.c:105 ../libbalsa/mailbox_local.c:1912
+#: ../libbalsa/mailbox_local.c:1914 ../src/sendmsg-window.c:4046
+#: ../src/sendmsg-window.c:4047
 msgid "Re:"
 msgstr "Odp:"
 
-#: ../libbalsa/identity.c:106 ../src/sendmsg-window.c:3986
-#: ../src/sendmsg-window.c:3987 ../src/sendmsg-window.c:3988
+#: ../libbalsa/identity.c:106 ../src/sendmsg-window.c:3991
+#: ../src/sendmsg-window.c:3992 ../src/sendmsg-window.c:3993
 msgid "Fwd:"
 msgstr "Posl:"
 
@@ -510,59 +510,59 @@ msgstr ""
 "pre podpisovanie použiť tajný kľúč s týmto identifikátorom\n"
 "(ponechať prázdne pre automatický výber)"
 
-#: ../libbalsa/identity.c:1216
+#: ../libbalsa/identity.c:1211
 #, c-format
 msgid "Error reading file %s: %s"
 msgstr "Chyba pri čítaní súboru %s: %s"
 
 #. Translators: please do not translate Face.
-#: ../libbalsa/identity.c:1227
+#: ../libbalsa/identity.c:1221
 #, c-format
 msgid "Face header file %s is too long (%lu bytes)."
 msgstr "Hlavičkový súbor Face %s je príliš dlhý (%lu bajtov)."
 
 #. Translators: please do not translate Face.
-#: ../libbalsa/identity.c:1237
+#: ../libbalsa/identity.c:1231
 #, c-format
 msgid "Face header file %s contains binary data."
 msgstr "Hlavičkový súbor Face %s obsahuje binárne dáta."
 
 #. Translators: please do not translate Face.
-#: ../libbalsa/identity.c:1257 ../src/balsa-message.c:1510
+#: ../libbalsa/identity.c:1251 ../src/balsa-message.c:1510
 #, c-format
 msgid "Error loading Face: %s"
 msgstr "Chyba pri nahrávaní Face: %s"
 
-#: ../libbalsa/identity.c:1453
+#: ../libbalsa/identity.c:1431
 msgid "Error: The identity does not have a name"
 msgstr "Chyba: Identita nemá názov"
 
-#: ../libbalsa/identity.c:1463
+#: ../libbalsa/identity.c:1441
 msgid "Error: An identity with that name already exists"
 msgstr "Chyba: Identita s týmto názvom už existuje"
 
-#: ../libbalsa/identity.c:1663
+#: ../libbalsa/identity.c:1637
 msgid "Do you really want to delete the selected identity?"
 msgstr "Naozaj chcete odstrániť označenú identitu?"
 
-#: ../libbalsa/identity.c:1702
+#: ../libbalsa/identity.c:1676
 #, c-format
 msgid "Error displaying help for identities: %s\n"
 msgstr "Chyba pri zobrazovaní pomocníka pre identity: %s\n"
 
-#: ../libbalsa/identity.c:1749
+#: ../libbalsa/identity.c:1723
 msgid "Manage Identities"
 msgstr "Spravovať identity"
 
-#: ../libbalsa/identity.c:2152
+#: ../libbalsa/identity.c:2126
 msgid "GnuPG MIME mode"
 msgstr "GnuPG režim MIME"
 
-#: ../libbalsa/identity.c:2154
+#: ../libbalsa/identity.c:2128
 msgid "GnuPG OpenPGP mode"
 msgstr "GnuPG režim OpenPGP"
 
-#: ../libbalsa/identity.c:2157
+#: ../libbalsa/identity.c:2131
 msgid "GpgSM S/MIME mode"
 msgstr "GpgSM režim S/MIME"
 
@@ -608,7 +608,7 @@ msgstr "Nemožno sa spojiť so serverom: %s"
 msgid "Exceeded the number of connections per server %s"
 msgstr "Počet spojení na server %s bol prekročený"
 
-#: ../libbalsa/libbalsa-conf.c:203
+#: ../libbalsa/libbalsa-conf.c:142
 msgid "Your Balsa configuration is now stored in \"~/.balsa/config\"."
 msgstr ""
 "Vaša konfigurácia programu Balsa je teraz uložená v \"~/.balsa/config\"."
@@ -619,7 +619,7 @@ msgid "Failed to convert %s to a Gnome VFS URI"
 msgstr "Zlyhala konverzia %s na Gnome VFS URI"
 
 #: ../libbalsa/libbalsa-vfs.c:780 ../libbalsa/libbalsa-vfs.c:816
-#: ../libbalsa/libbalsa-vfs.c:832 ../src/sendmsg-window.c:5153
+#: ../libbalsa/libbalsa-vfs.c:832 ../src/sendmsg-window.c:5163
 #, c-format
 msgid "not a regular file"
 msgstr "nie je bežný súbor"
@@ -664,16 +664,16 @@ msgstr "Otvoriť pomocou %s"
 msgid "Open _part with %s"
 msgstr "Otvoriť časť _pomocou %s"
 
-#: ../libbalsa/libbalsa.c:377
+#: ../libbalsa/libbalsa.c:378
 msgid "Invalid date"
 msgstr "Neplatný dátum"
 
-#: ../libbalsa/libbalsa.c:393 ../src/pref-manager.c:1347
-#: ../src/pref-manager.c:1443
+#: ../libbalsa/libbalsa.c:394 ../src/pref-manager.c:1330
+#: ../src/pref-manager.c:1426
 msgid "Unknown"
 msgstr "Neznámy"
 
-#: ../libbalsa/libbalsa.c:539
+#: ../libbalsa/libbalsa.c:540
 #, c-format
 msgid ""
 "Authenticity of this certificate could not be verified.\n"
@@ -684,7 +684,7 @@ msgstr ""
 "<b>Dôvod:</b> %s\n"
 "<b>Tento certifikát patrí k:</b>\n"
 
-#: ../libbalsa/libbalsa.c:551
+#: ../libbalsa/libbalsa.c:552
 msgid ""
 "\n"
 "<b>This certificate was issued by:</b>\n"
@@ -692,7 +692,7 @@ msgstr ""
 "\n"
 "<b>Tento certifikát bol vydaný:</b>\n"
 
-#: ../libbalsa/libbalsa.c:562
+#: ../libbalsa/libbalsa.c:563
 #, c-format
 msgid ""
 "<b>This certificate is valid</b>\n"
@@ -705,44 +705,44 @@ msgstr ""
 "do %s\n"
 "<b>Odtlačok:</b> %s"
 
-#: ../libbalsa/libbalsa.c:571
+#: ../libbalsa/libbalsa.c:572
 msgid "SSL/TLS certificate"
 msgstr "SSL/TLS certifikát"
 
-#: ../libbalsa/libbalsa.c:573
+#: ../libbalsa/libbalsa.c:574
 msgid "_Accept Once"
 msgstr "_Akceptovať len raz"
 
-#: ../libbalsa/libbalsa.c:574
+#: ../libbalsa/libbalsa.c:575
 msgid "Accept&_Save"
 msgstr "Akceptovať a _Uložiť"
 
-#: ../libbalsa/libbalsa.c:575
+#: ../libbalsa/libbalsa.c:576
 msgid "_Reject"
 msgstr "_Odmietnuť"
 
-#: ../libbalsa/libbalsa.c:620
+#: ../libbalsa/libbalsa.c:621
 #, c-format
 msgid "Connection to %s timed out. Abort?"
 msgstr "Časový limit spojenia k %s vypršal. Ukončiť?"
 
-#: ../libbalsa/libbalsa.c:861
+#: ../libbalsa/libbalsa.c:862
 #, c-format
 msgid "No image data"
 msgstr "Bez obrazových dát"
 
-#: ../libbalsa/libbalsa.c:905
+#: ../libbalsa/libbalsa.c:906
 #, c-format
 msgid "Invalid input format"
 msgstr "Neplatný vstupný formát"
 
-#: ../libbalsa/libbalsa.c:909
+#: ../libbalsa/libbalsa.c:910
 #, c-format
 msgid "Internal buffer overrun"
 msgstr "Pretečenie vnútornej vyrovnávacej pamäte"
 
 #. Translators: please do not translate Face.
-#: ../libbalsa/libbalsa.c:926
+#: ../libbalsa/libbalsa.c:927
 #, c-format
 msgid "Bad X-Face data"
 msgstr "Zlé dáta X-Face"
@@ -827,7 +827,7 @@ msgid "Async IMAP cmd %s could not be executed. Reconnecting..."
 msgstr "Asynchrónny IMAP príkaz %s nemohol byť vykonaný. Opätovné spájanie..."
 
 #: ../libbalsa/mailbox_imap.c:1034 ../libbalsa/mailbox_maildir.c:511
-#: ../libbalsa/mailbox_mbox.c:744 ../libbalsa/mailbox_mh.c:547
+#: ../libbalsa/mailbox_mbox.c:749 ../libbalsa/mailbox_mh.c:547
 #, c-format
 msgid "%s: Opening %s Refcount: %d\n"
 msgstr "%s: Otváram %s Počet odkazov: %d\n"
@@ -885,7 +885,7 @@ msgstr "Odosielam %ld kB"
 msgid "Server-side threading not supported."
 msgstr "Vlákna na serveri nie sú podporované."
 
-#: ../libbalsa/mailbox_local.c:551 ../libbalsa/mailbox_mbox.c:438
+#: ../libbalsa/mailbox_local.c:551 ../libbalsa/mailbox_mbox.c:440
 #, c-format
 msgid "Failed to create temporary file \"%s\": %s"
 msgstr "Zlyhalo vytváranie dočasného súboru \"%s\": %s"
@@ -895,45 +895,45 @@ msgstr "Zlyhalo vytváranie dočasného súboru \"%s\": %s"
 msgid "Failed to save cache file \"%s\": %s."
 msgstr "Zlyhalo ukladanie súboru vyrovnávacej pamäte \"%s\": %s."
 
-#: ../libbalsa/mailbox_local.c:580 ../libbalsa/mailbox_mbox.c:450
+#: ../libbalsa/mailbox_local.c:580 ../libbalsa/mailbox_mbox.c:452
 #, c-format
 msgid "Failed to save cache file \"%s\": %s.  New version saved as \"%s\""
 msgstr ""
 "Zlyhalo ukladanie súboru vyrovnávacej pamäte \"%s\": %s. Nová verzia uložená "
 "ako \"%s\""
 
-#: ../libbalsa/mailbox_local.c:611
+#: ../libbalsa/mailbox_local.c:613
 #, c-format
 msgid "Cache file for mailbox %s will be created"
 msgstr "Bude vytvorený súbor vyrovnávacej pamäte pre poštovú schránku %s"
 
-#: ../libbalsa/mailbox_local.c:620
+#: ../libbalsa/mailbox_local.c:622
 #, c-format
 msgid "Failed to read cache file %s: %s"
 msgstr "Zlyhalo čítanie súboru vyrovnávacej pamäte %s: %s"
 
-#: ../libbalsa/mailbox_local.c:638 ../libbalsa/mailbox_local.c:655
-#: ../libbalsa/mailbox_local.c:679
+#: ../libbalsa/mailbox_local.c:640 ../libbalsa/mailbox_local.c:657
+#: ../libbalsa/mailbox_local.c:681
 #, c-format
 msgid "Cache file for mailbox %s will be repaired"
 msgstr "Súbor vyrovnávacej pamäte pre poštovú schránku %s bude opravený"
 
-#: ../libbalsa/mailbox_local.c:1195
+#: ../libbalsa/mailbox_local.c:1197
 #, c-format
 msgid "Filtering %s"
 msgstr "Filtrovanie %s"
 
-#: ../libbalsa/mailbox_local.c:1283
+#: ../libbalsa/mailbox_local.c:1285
 #, c-format
 msgid "Preparing %s"
 msgstr "Príprava %s"
 
-#: ../libbalsa/mailbox_local.c:2079
+#: ../libbalsa/mailbox_local.c:2081
 #, c-format
 msgid "Open of %s failed. Errno = %d, "
 msgstr "Otváranie %s zlyhalo. Errno = %d, "
 
-#: ../libbalsa/mailbox_local.c:2101
+#: ../libbalsa/mailbox_local.c:2103
 #, c-format
 msgid "Failed to sync mailbox \"%s\""
 msgstr "Zlyhala synchronizácia poštovej schránky \"%s\""
@@ -963,7 +963,7 @@ msgstr ""
 "Nemôžem odstrániť obsah z %s:\n"
 "%s"
 
-#: ../libbalsa/mailbox_maildir.c:347 ../libbalsa/mailbox_mbox.c:323
+#: ../libbalsa/mailbox_maildir.c:347 ../libbalsa/mailbox_mbox.c:325
 #: ../libbalsa/mailbox_mh.c:300
 #, c-format
 msgid ""
@@ -973,59 +973,59 @@ msgstr ""
 "Nemôžem vymazať %s:\n"
 "%s"
 
-#: ../libbalsa/mailbox_maildir.c:490 ../libbalsa/mailbox_mbox.c:688
+#: ../libbalsa/mailbox_maildir.c:490 ../libbalsa/mailbox_mbox.c:693
 #: ../libbalsa/mailbox_mh.c:528
 #, c-format
 msgid "Mailbox does not exist."
 msgstr "Poštová schránka neexistuje."
 
-#: ../libbalsa/mailbox_maildir.c:932 ../libbalsa/mailbox_mbox.c:2004
+#: ../libbalsa/mailbox_maildir.c:932 ../libbalsa/mailbox_mbox.c:2009
 #: ../libbalsa/mailbox_mh.c:1110
 #, c-format
 msgid "Data copy error"
 msgstr "Chyba kopírovania dát"
 
-#: ../libbalsa/mailbox_mbox.c:208
+#: ../libbalsa/mailbox_mbox.c:210
 #, c-format
 msgid "Mailbox %s does not appear to be an Mbox mailbox."
 msgstr "Zdá sa, že poštová schránka \"%s\" nie je typu Mbox."
 
-#: ../libbalsa/mailbox_mbox.c:426
+#: ../libbalsa/mailbox_mbox.c:428
 #, c-format
 msgid "Could not write file %s: %s"
 msgstr "Nepodarilo sa zapísať súbor %s: %s"
 
-#: ../libbalsa/mailbox_mbox.c:458
+#: ../libbalsa/mailbox_mbox.c:460
 #, c-format
 msgid "Could not unlink file %s: %s"
 msgstr "Nepodarilo sa odpojiť súbor %s: %s"
 
-#: ../libbalsa/mailbox_mbox.c:696
+#: ../libbalsa/mailbox_mbox.c:701
 #, c-format
 msgid "Cannot open mailbox."
 msgstr "Nemožno otvoriť poštovú schránku."
 
-#: ../libbalsa/mailbox_mbox.c:708
+#: ../libbalsa/mailbox_mbox.c:713
 #, c-format
 msgid "Mailbox is not in mbox format."
 msgstr "Poštová schránka nie je vo formáte mbox."
 
-#: ../libbalsa/mailbox_mbox.c:716
+#: ../libbalsa/mailbox_mbox.c:721
 #, c-format
 msgid "Cannot lock mailbox."
 msgstr "Nemožno uzamknúť poštovú schránku."
 
-#: ../libbalsa/mailbox_mbox.c:1961
+#: ../libbalsa/mailbox_mbox.c:1966
 #, c-format
 msgid "%s: could not open %s."
 msgstr "%s: nepodarilo sa otvoriť %s."
 
-#: ../libbalsa/mailbox_mbox.c:1972
+#: ../libbalsa/mailbox_mbox.c:1977
 #, c-format
 msgid "%s: could not get new mime stream."
 msgstr "%s: nepodarilo sa získať nový mime prúd."
 
-#: ../libbalsa/mailbox_mbox.c:1980
+#: ../libbalsa/mailbox_mbox.c:1985
 #, c-format
 msgid "%s: %s is not in mbox format."
 msgstr "%s: %s nie je vo formáte mbox."
@@ -1224,7 +1224,7 @@ msgstr "Časový interval vypršal počas pokusu urobiť zámok flock!"
 msgid "Waiting for flock attempt... %d"
 msgstr "Čakám na pokus o flock... %d"
 
-#: ../libbalsa/misc.c:1284
+#: ../libbalsa/misc.c:1268
 #, c-format
 msgid "LDAP Directory for %s"
 msgstr "Adresár LDAP pre %s"
@@ -1595,15 +1595,15 @@ msgstr "Použiť tento kľúč aj napriek tomu?"
 msgid "Try again later."
 msgstr "Skúste opäť neskôr."
 
-#: ../libbalsa/send.c:248 ../libbalsa/send.c:255
+#: ../libbalsa/send.c:249 ../libbalsa/send.c:256
 msgid "Sending Mail..."
 msgstr "Odosielanie správy..."
 
-#: ../libbalsa/send.c:251 ../src/main-window.c:2745
+#: ../libbalsa/send.c:252 ../src/main-window.c:2735
 msgid "_Hide"
 msgstr "_Skryť"
 
-#: ../libbalsa/send.c:961
+#: ../libbalsa/send.c:962
 #, c-format
 msgid ""
 "Could not send the message to %s:\n"
@@ -1614,12 +1614,12 @@ msgstr ""
 "%d: %s\n"
 "Správa bola ponechaná medzi poštou na odoslanie.\n"
 
-#: ../libbalsa/send.c:1007
+#: ../libbalsa/send.c:1008
 #, c-format
 msgid "Saving sent message to %s failed: %s"
 msgstr "Ukladanie odoslanej správy do %s zlyhalo: %s"
 
-#: ../libbalsa/send.c:1036 ../libbalsa/send.c:1048
+#: ../libbalsa/send.c:1037 ../libbalsa/send.c:1049
 #, c-format
 msgid ""
 "Relaying refused:\n"
@@ -1630,7 +1630,7 @@ msgstr ""
 "%d: %s\n"
 "Správa bola ponechaná medzi poštou na odoslanie.\n"
 
-#: ../libbalsa/send.c:1055
+#: ../libbalsa/send.c:1056
 msgid ""
 "Message submission problem, placing it into your outbox.\n"
 "System will attempt to resubmit the message until you delete it."
@@ -1638,39 +1638,39 @@ msgstr ""
 "Problém pri posielaní správy. Ukladám ju do priečinka Pošta na odoslanie.\n"
 "Systém sa bude pokúšať správu opätovne odoslať, dokiaľ ju nevymažete."
 
-#: ../libbalsa/send.c:1085
+#: ../libbalsa/send.c:1086
 msgid "Connected to MTA"
 msgstr "Pripojený k MTA"
 
 #. status code, mailbox
-#: ../libbalsa/send.c:1094
+#: ../libbalsa/send.c:1095
 #, c-format
 msgid "From: %d <%s>"
 msgstr "Od: %d <%s>"
 
 #. mailbox, status code, status text
-#: ../libbalsa/send.c:1098
+#: ../libbalsa/send.c:1099
 #, c-format
 msgid "From %s: %d %s"
 msgstr "Od %s: %d %s"
 
 #. status code, mailbox
-#: ../libbalsa/send.c:1109
+#: ../libbalsa/send.c:1110
 #, c-format
 msgid "To: %d <%s>"
 msgstr "Pre: %d <%s>"
 
 #. mailbox, status code, status text
-#: ../libbalsa/send.c:1113
+#: ../libbalsa/send.c:1114
 #, c-format
 msgid "To %s: %d %s"
 msgstr "Pre %s: %d %s"
 
-#: ../libbalsa/send.c:1151
+#: ../libbalsa/send.c:1152
 msgid "Disconnected"
 msgstr "Odpojený"
 
-#: ../libbalsa/send.c:1433
+#: ../libbalsa/send.c:1434
 msgid ""
 "SMTP server refused connection.\n"
 "Check your internet connection."
@@ -1678,7 +1678,7 @@ msgstr ""
 "SMTP server odmietol spojenie.\n"
 "Skontrolujte vaše internetové pripojenie."
 
-#: ../libbalsa/send.c:1438
+#: ../libbalsa/send.c:1439
 msgid ""
 "SMTP server cannot be reached.\n"
 "Check your internet connection."
@@ -1686,11 +1686,11 @@ msgstr ""
 "SMTP server nemohol byť dosiahnutý.\n"
 "Skontrolujte vaše internetové pripojenie."
 
-#: ../libbalsa/send.c:1447
+#: ../libbalsa/send.c:1448
 msgid "Message left in Outbox (try again later)"
 msgstr "Správa bola ponechaná v Odoslanej pošte (skúste znova neskôr)"
 
-#: ../libbalsa/send.c:1451
+#: ../libbalsa/send.c:1452
 #, c-format
 msgid ""
 "SMTP server problem (%d): %s\n"
@@ -1699,31 +1699,31 @@ msgstr ""
 "Problém SMTP servera (%d): %s\n"
 "Správa bola ponechaná medzi poštou na odoslanie."
 
-#: ../libbalsa/send.c:1736 ../libbalsa/send.c:1805
+#: ../libbalsa/send.c:1737 ../libbalsa/send.c:1806
 #, c-format
 msgid "Cannot read %s: %s"
 msgstr "Nemožno prečítať %s: %s"
 
-#: ../libbalsa/send.c:1739 ../libbalsa/send.c:1808
+#: ../libbalsa/send.c:1740 ../libbalsa/send.c:1809
 #, c-format
 msgid "Cannot read %s"
 msgstr "Nemožno prečítať %s"
 
-#: ../libbalsa/send.c:1769
+#: ../libbalsa/send.c:1770
 #, c-format
 msgid "Cannot determine charset for text file `%s'; sending as mime type `%s'"
 msgstr ""
 "Nemožno určiť znakovú sadu pre textový súbor `%s'; odosielanie ako mime typ `"
 "%s'"
 
-#: ../libbalsa/send.c:2120
+#: ../libbalsa/send.c:2121
 msgid "This message will not be encrypted for the BCC: recipient."
 msgid_plural "This message will not be encrypted for the BCC: recipients."
 msgstr[0] "Táto správa nebude zašifrovaná pre skrytých príjemcov."
 msgstr[1] "Táto správa nebude zašifrovaná pre skrytého príjemcu."
 msgstr[2] "Táto správa nebude zašifrovaná pre skrytých príjemcov."
 
-#: ../libbalsa/send.c:2206
+#: ../libbalsa/send.c:2207
 msgid "This message will not be encrypted for the BCC: recipient(s)."
 msgstr "Táto správa nebude zašifrovaná pre skrytých príjemcov."
 
@@ -1733,18 +1733,18 @@ msgstr "Táto správa nebude zašifrovaná pre skrytých príjemcov."
 msgid "Logging in to %s using %s"
 msgstr "Prihlasovanie k %s pomocou %s"
 
-#: ../libbalsa/smtp-server.c:388 ../src/mailbox-conf.c:209
-#: ../src/mailbox-conf.c:1422 ../src/pref-manager.c:396
-#: ../src/pref-manager.c:3296
+#: ../libbalsa/smtp-server.c:388 ../src/mailbox-conf.c:200
+#: ../src/mailbox-conf.c:1413 ../src/pref-manager.c:396
+#: ../src/pref-manager.c:3263
 msgid "Never"
 msgstr "Nikdy"
 
-#: ../libbalsa/smtp-server.c:389 ../src/mailbox-conf.c:210
-#: ../src/mailbox-conf.c:1423
+#: ../libbalsa/smtp-server.c:389 ../src/mailbox-conf.c:201
+#: ../src/mailbox-conf.c:1414
 msgid "If Possible"
 msgstr "Ak je možné"
 
-#: ../libbalsa/smtp-server.c:390 ../src/mailbox-conf.c:211
+#: ../libbalsa/smtp-server.c:390 ../src/mailbox-conf.c:202
 msgid "Required"
 msgstr "Vyžadované"
 
@@ -1764,7 +1764,7 @@ msgstr "_Popisný názov:"
 #. pop server
 #. imap server
 #: ../libbalsa/smtp-server.c:575 ../src/folder-conf.c:381
-#: ../src/mailbox-conf.c:1166 ../src/mailbox-conf.c:1277
+#: ../src/mailbox-conf.c:1157 ../src/mailbox-conf.c:1268
 msgid "_Server:"
 msgstr "_Server:"
 
@@ -1776,7 +1776,7 @@ msgstr "Meno po_užívateľa:"
 msgid "_Pass Phrase:"
 msgstr "_Heslo:"
 
-#: ../libbalsa/smtp-server.c:598 ../src/mailbox-conf.c:230
+#: ../libbalsa/smtp-server.c:598 ../src/mailbox-conf.c:221
 msgid "Use _TLS:"
 msgstr "Použiť _TLS:"
 
@@ -1788,33 +1788,33 @@ msgstr "Heslo c_ertifikátu:"
 msgid "Sp_lit message larger than"
 msgstr "Rozde_liť správu väčšiu ako"
 
-#: ../libbalsa/smtp-server.c:621 ../src/pref-manager.c:1875
+#: ../libbalsa/smtp-server.c:621 ../src/pref-manager.c:1842
 msgid "MB"
 msgstr "MB"
 
 #. Top level
 #. Menus
-#: ../libbalsa/source-viewer.c:43 ../src/ab-main.c:542
-#: ../src/main-window.c:322 ../src/message-window.c:233
-#: ../src/sendmsg-window.c:322
+#: ../libbalsa/source-viewer.c:43 ../src/ab-main.c:549
+#: ../src/main-window.c:326 ../src/message-window.c:233
+#: ../src/sendmsg-window.c:327
 msgid "_File"
 msgstr "_Súbor"
 
 #: ../libbalsa/source-viewer.c:44 ../src/filter-edit-dialog.c:311
-#: ../src/main-window.c:323 ../src/message-window.c:234
-#: ../src/sendmsg-window.c:323
+#: ../src/main-window.c:327 ../src/message-window.c:234
+#: ../src/sendmsg-window.c:328
 msgid "_Edit"
 msgstr "_Upraviť"
 
-#: ../libbalsa/source-viewer.c:45 ../src/main-window.c:324
+#: ../libbalsa/source-viewer.c:45 ../src/main-window.c:328
 #: ../src/message-window.c:235
 msgid "_View"
 msgstr "_Zobraziť"
 
 #. Items
 #: ../libbalsa/source-viewer.c:47 ../src/mailbox-node.c:1086
-#: ../src/main-window.c:475 ../src/message-window.c:244
-#: ../src/sendmsg-window.c:351
+#: ../src/main-window.c:479 ../src/message-window.c:244
+#: ../src/sendmsg-window.c:356
 msgid "_Close"
 msgstr "_Zatvoriť"
 
@@ -1823,9 +1823,9 @@ msgid "Close the window"
 msgstr "Zatvoriť okno"
 
 #. Edit menu items
-#: ../libbalsa/source-viewer.c:49 ../src/main-window.c:396
-#: ../src/main-window.c:538 ../src/message-window.c:247
-#: ../src/sendmsg-window.c:359
+#: ../libbalsa/source-viewer.c:49 ../src/main-window.c:400
+#: ../src/main-window.c:542 ../src/message-window.c:247
+#: ../src/sendmsg-window.c:364
 msgid "_Copy"
 msgstr "_Kopírovať"
 
@@ -1833,11 +1833,11 @@ msgstr "_Kopírovať"
 msgid "Copy text"
 msgstr "Kopírovať text"
 
-#: ../libbalsa/source-viewer.c:51 ../src/main-window.c:540
+#: ../libbalsa/source-viewer.c:51 ../src/main-window.c:544
 msgid "_Select Text"
 msgstr "Ozn_ačiť text"
 
-#: ../libbalsa/source-viewer.c:52 ../src/main-window.c:541
+#: ../libbalsa/source-viewer.c:52 ../src/main-window.c:545
 msgid "Select entire mail"
 msgstr "Označiť celú správu"
 
@@ -1901,26 +1901,26 @@ msgstr "Adresár Gnome"
 msgid "Address Book"
 msgstr "Adresár"
 
-#: ../libinit_balsa/assistant_init.c:145 ../libinit_balsa/init_balsa.c:48
+#: ../libinit_balsa/assistant_init.c:147 ../libinit_balsa/init_balsa.c:48
 msgid "Configure Balsa"
 msgstr "Konfigurácia programu Balsa"
 
-#: ../libinit_balsa/assistant_page_defclient.c:52
+#: ../libinit_balsa/assistant_page_defclient.c:56
 #: ../libinit_balsa/balsa-druid-page-defclient.c:58
 msgid "Use balsa as default email client?"
 msgstr "Použiť program balsa ako predvoleného klienta na elektronickú poštu?"
 
-#: ../libinit_balsa/assistant_page_defclient.c:56
+#: ../libinit_balsa/assistant_page_defclient.c:60
 #: ../libinit_balsa/balsa-druid-page-defclient.c:62
 msgid "_Yes"
 msgstr "Án_o"
 
-#: ../libinit_balsa/assistant_page_defclient.c:58
+#: ../libinit_balsa/assistant_page_defclient.c:62
 #: ../libinit_balsa/balsa-druid-page-defclient.c:64
 msgid "_No"
 msgstr "_Nie"
 
-#: ../libinit_balsa/assistant_page_defclient.c:95
+#: ../libinit_balsa/assistant_page_defclient.c:99
 #: ../libinit_balsa/balsa-druid-page-defclient.c:100
 msgid "Default Client"
 msgstr "Predvolený klient"
@@ -2147,106 +2147,106 @@ msgstr "Oznámenie príchodu novej správy"
 msgid "Program startup"
 msgstr "Start programu"
 
-#: ../src/ab-main.c:217 ../src/ab-window.c:689
+#: ../src/ab-main.c:224 ../src/ab-window.c:689
 msgid " address book: "
 msgstr " adresár: "
 
-#: ../src/ab-main.c:543
+#: ../src/ab-main.c:550
 msgid "_Entry"
 msgstr "_Položka"
 
-#: ../src/ab-main.c:544 ../src/main-window.c:328
+#: ../src/ab-main.c:551 ../src/main-window.c:332
 msgid "_Help"
 msgstr "_Pomocník"
 
 #. new button
-#: ../src/ab-main.c:545 ../src/filter-edit-dialog.c:216
-#: ../src/mailbox-node.c:1051 ../src/main-window.c:330
-#: ../src/main-window.c:560 ../src/main-window.c:569
+#: ../src/ab-main.c:552 ../src/filter-edit-dialog.c:216
+#: ../src/mailbox-node.c:1051 ../src/main-window.c:334
+#: ../src/main-window.c:564 ../src/main-window.c:573
 msgid "_New"
 msgstr "_Nová"
 
-#: ../src/ab-main.c:546 ../src/address-book-config.c:943
+#: ../src/ab-main.c:553 ../src/address-book-config.c:855
 msgid "VCard Address Book (GnomeCard)"
 msgstr "vCard (Adresár Gnome)"
 
-#: ../src/ab-main.c:548 ../src/address-book-config.c:949
+#: ../src/ab-main.c:555 ../src/address-book-config.c:861
 msgid "External query (a program)"
 msgstr "Externý dotaz (program)"
 
-#: ../src/ab-main.c:550 ../src/address-book-config.c:954
+#: ../src/ab-main.c:557 ../src/address-book-config.c:866
 msgid "LDIF Address Book"
 msgstr "Adresár LDIF"
 
-#: ../src/ab-main.c:553 ../src/address-book-config.c:960
+#: ../src/ab-main.c:560 ../src/address-book-config.c:872
 msgid "LDAP Address Book"
 msgstr "Adresár LDAP"
 
-#: ../src/ab-main.c:557 ../src/address-book-config.c:518
-#: ../src/address-book-config.c:967
+#: ../src/ab-main.c:564 ../src/address-book-config.c:495
+#: ../src/address-book-config.c:879
 msgid "GPE Address Book"
 msgstr "GPE adresár"
 
-#: ../src/ab-main.c:561
+#: ../src/ab-main.c:568
 msgid "Rubrica Address Book"
 msgstr "Adresár Rubrica"
 
-#: ../src/ab-main.c:564
+#: ../src/ab-main.c:571
 msgid "_Properties"
 msgstr "_Vlastnosti"
 
-#: ../src/ab-main.c:565
+#: ../src/ab-main.c:572
 msgid "Edit address book properties"
 msgstr "Upraviť vlastnosti adresára"
 
-#: ../src/ab-main.c:566 ../src/balsa-index.c:1846
+#: ../src/ab-main.c:573 ../src/balsa-index.c:1839
 #: ../src/filter-edit-dialog.c:222 ../src/mailbox-node.c:1078
-#: ../src/mailbox-node.c:1094 ../src/pref-manager.c:1655
-#: ../src/pref-manager.c:1746 ../src/pref-manager.c:2839
+#: ../src/mailbox-node.c:1094 ../src/pref-manager.c:1638
+#: ../src/pref-manager.c:1713 ../src/pref-manager.c:2806
 msgid "_Delete"
 msgstr "Vy_mazať"
 
-#: ../src/ab-main.c:567
+#: ../src/ab-main.c:574
 msgid "Delete address book"
 msgstr "Odstrániť adresár"
 
-#: ../src/ab-main.c:568 ../src/main-window.c:364
+#: ../src/ab-main.c:575 ../src/main-window.c:368
 msgid "_Quit"
 msgstr "_Koniec"
 
-#: ../src/ab-main.c:568
+#: ../src/ab-main.c:575
 msgid "Exit the program"
 msgstr "Ukončiť program"
 
-#: ../src/ab-main.c:570
+#: ../src/ab-main.c:577
 msgid "_New Entry"
 msgstr "_Nová položka"
 
-#: ../src/ab-main.c:571
+#: ../src/ab-main.c:578
 msgid "Add new entry"
 msgstr "Pridať novú položku"
 
-#: ../src/ab-main.c:572
+#: ../src/ab-main.c:579
 msgid "_Delete Entry"
 msgstr "Vy_mazať položku"
 
-#: ../src/ab-main.c:573
+#: ../src/ab-main.c:580
 msgid "Delete entry"
 msgstr "Vymazať položku"
 
-#: ../src/ab-main.c:580 ../src/main-window.c:435
+#: ../src/ab-main.c:581 ../src/main-window.c:439
 msgid "_About"
 msgstr "_O programe"
 
-#: ../src/ab-main.c:799
+#: ../src/ab-main.c:813
 msgid "_Name"
 msgstr "_Meno"
 
-#: ../src/ab-main.c:815
+#: ../src/ab-main.c:829
 msgid "_Address"
 msgstr "_Adresa"
 
-#: ../src/ab-main.c:941
+#: ../src/ab-main.c:955
 msgid "F_ilter:"
 msgstr "F_ilter:"
 
@@ -2331,7 +2331,7 @@ msgstr "Pridať adresár"
 #. may be NULL
 #. mailbox name
 #: ../src/address-book-config.c:247 ../src/address-book-config.c:364
-#: ../src/address-book-config.c:451 ../src/address-book-config.c:516
+#: ../src/address-book-config.c:428 ../src/address-book-config.c:493
 msgid "A_ddress Book Name:"
 msgstr "Názov a_dresára:"
 
@@ -2339,85 +2339,61 @@ msgstr "Názov a_dresára:"
 msgid "Load program location:"
 msgstr "Umiestnenie programu pre načítanie:"
 
-#: ../src/address-book-config.c:376 ../src/address-book-config.c:381
+#: ../src/address-book-config.c:375
 msgid "Select load program for address book"
 msgstr "Nastaviť program pre načítanie pre adresár"
 
-#: ../src/address-book-config.c:388
+#: ../src/address-book-config.c:382
 msgid "Save program location:"
 msgstr "Umiestnenie programu pre ukladanie:"
 
-#: ../src/address-book-config.c:395 ../src/address-book-config.c:400
+#: ../src/address-book-config.c:388
 msgid "Select save program for address book"
 msgstr "Nastaviť program pre ukladanie pre adresár"
 
-#: ../src/address-book-config.c:456
+#: ../src/address-book-config.c:433
 msgid "_Host Name"
 msgstr "Názov _hostiteľa"
 
-#: ../src/address-book-config.c:461
+#: ../src/address-book-config.c:438
 msgid "Base Domain _Name"
 msgstr "_Základný názov domény"
 
-#: ../src/address-book-config.c:466
+#: ../src/address-book-config.c:443
 msgid "_User Name (Bind DN)"
 msgstr "Meno _používateľa (Bind DN)"
 
-#: ../src/address-book-config.c:471
+#: ../src/address-book-config.c:448
 msgid "_Password"
 msgstr "_Heslo"
 
-#: ../src/address-book-config.c:477
+#: ../src/address-book-config.c:454
 msgid "_User Address Book DN"
 msgstr "Adresár DN po_užívateľa"
 
-#: ../src/address-book-config.c:483
+#: ../src/address-book-config.c:460
 msgid "Enable _TLS"
 msgstr "Povoliť _TLS"
 
-#: ../src/address-book-config.c:552 ../src/main-window.c:2552
-#: ../src/main-window.c:4195
+#: ../src/address-book-config.c:529 ../src/main-window.c:2574
+#: ../src/main-window.c:4184
 #, c-format
 msgid "Error displaying help: %s\n"
 msgstr "Chyba pri zobrazovaní pomocníka: %s\n"
 
-#: ../src/address-book-config.c:654
+#: ../src/address-book-config.c:607
 msgid "No path found.  Do you want to give one?"
 msgstr "Cesta nebola nájdená. Chcete ju zadať?"
 
-#: ../src/address-book-config.c:660
-#, c-format
-msgid "The address book file path \"%s\" is not correct. %s"
-msgstr "Cesta k súboru adresára \"%s\" je nesprávna. %s"
-
-#: ../src/address-book-config.c:663
-#, c-format
-msgid "The load program path \"%s\" is not correct. %s"
-msgstr "Cesta programu načítania \"%s\" je nesprávna. %s"
-
-#: ../src/address-book-config.c:666
-#, c-format
-msgid "The save program path \"%s\" is not correct. %s"
-msgstr "Cesta programu uloženia \"%s\" je nesprávna. %s"
-
-#: ../src/address-book-config.c:669
-#, c-format
-msgid "The path \"%s\" is not correct. %s"
-msgstr "Cesta \"%s\" je nesprávna. %s"
-
-#: ../src/address-book-config.c:672
-msgid "Do you want to correct the path?"
-msgstr "Chcete opraviť cestu?"
-
-#: ../src/address-book-config.c:974
+#: ../src/address-book-config.c:886
 msgid "Rubrica2 Address Book"
 msgstr "Adresár Rubrica2"
 
-#: ../src/balsa-app.c:73 ../src/folder-conf.c:283 ../src/mailbox-conf.c:1258
+#: ../src/balsa-app.c:73 ../src/folder-conf.c:283 ../src/mailbox-conf.c:1249
 msgid "_Remember password in keyring"
 msgstr "_Zapamätať heslo na zväzku kľúčov"
 
-#: ../src/balsa-app.c:76 ../src/folder-conf.c:286 ../src/mailbox-conf.c:1261
+#: ../src/balsa-app.c:76 ../src/folder-conf.c:286 ../src/mailbox-conf.c:1252
 msgid "_Remember password"
 msgstr "_Zapamätať heslo"
 
@@ -2439,98 +2415,98 @@ msgstr "_Heslo pre %s@%s (%s):"
 msgid "Password needed"
 msgstr "Je potrebné heslo"
 
-#: ../src/balsa-app.c:566
+#: ../src/balsa-app.c:569
 #, c-format
 msgid "Couldn't open mailbox \"%s\""
 msgstr "Nepodarilo sa otvoriť poštovú schránku \"%s\""
 
-#: ../src/balsa-index.c:328
+#: ../src/balsa-index.c:323
 msgid "From"
 msgstr "Od"
 
-#: ../src/balsa-index.c:341 ../src/pref-manager.c:410
+#: ../src/balsa-index.c:336 ../src/pref-manager.c:410
 msgid "Subject"
 msgstr "Predmet"
 
-#: ../src/balsa-index.c:355 ../src/pref-manager.c:411
+#: ../src/balsa-index.c:350 ../src/pref-manager.c:411
 msgid "Date"
 msgstr "Dátum"
 
-#: ../src/balsa-index.c:367 ../src/pref-manager.c:412
-#: ../src/sendmsg-window.c:3005
+#: ../src/balsa-index.c:362 ../src/pref-manager.c:412
+#: ../src/sendmsg-window.c:3010
 msgid "Size"
 msgstr "Veľkosť"
 
 #. FIXME: this is hack!
-#: ../src/balsa-index.c:1012
+#: ../src/balsa-index.c:1005
 msgid "To"
 msgstr "Pre"
 
-#: ../src/balsa-index.c:1661
+#: ../src/balsa-index.c:1654
 #, c-format
 msgid "Move to Trash failed: %s"
 msgstr "Presúvanie do Koša zlyhalo: %s"
 
 #. Message menu items
-#: ../src/balsa-index.c:1819 ../src/main-window.c:491
+#: ../src/balsa-index.c:1812 ../src/main-window.c:495
 #: ../src/message-window.c:264
 msgid "_Reply..."
 msgstr "_Odpovedať..."
 
-#: ../src/balsa-index.c:1821
+#: ../src/balsa-index.c:1814
 msgid "Reply To _All..."
 msgstr "Odpovedať _všetkým..."
 
-#: ../src/balsa-index.c:1823
+#: ../src/balsa-index.c:1816
 msgid "Reply To _Group..."
 msgstr "Odpovedať _skupine..."
 
-#: ../src/balsa-index.c:1825
+#: ../src/balsa-index.c:1818
 msgid "_Forward Attached..."
 msgstr "_Poslať ďalej ako prílohu..."
 
-#: ../src/balsa-index.c:1827
+#: ../src/balsa-index.c:1820
 msgid "Forward _Inline..."
 msgstr "Poslať ďalej _citované..."
 
-#: ../src/balsa-index.c:1829 ../src/main-window.c:518
+#: ../src/balsa-index.c:1822 ../src/main-window.c:522
 msgid "_Pipe through..."
 msgstr "_Presmerovať cez..."
 
-#: ../src/balsa-index.c:1831 ../src/main-window.c:498
+#: ../src/balsa-index.c:1824 ../src/main-window.c:502
 msgid "_Store Address..."
 msgstr "_Uložiť adresu..."
 
-#: ../src/balsa-index.c:1851
+#: ../src/balsa-index.c:1844
 msgid "_Undelete"
 msgstr "O_bnoviť vymazanú"
 
-#: ../src/balsa-index.c:1856
+#: ../src/balsa-index.c:1849
 msgid "Move To _Trash"
 msgstr "Presunúť do _koša"
 
-#: ../src/balsa-index.c:1860
+#: ../src/balsa-index.c:1853
 msgid "T_oggle"
 msgstr "_Označiť"
 
 #. Message:toggle-flag submenu items
-#: ../src/balsa-index.c:1864 ../src/main-window.c:565 ../src/main-window.c:604
+#: ../src/balsa-index.c:1857 ../src/main-window.c:569 ../src/main-window.c:608
 msgid "_Flagged"
 msgstr "O_značené"
 
-#: ../src/balsa-index.c:1867
+#: ../src/balsa-index.c:1860
 msgid "_Unread"
 msgstr "_Neprečítané"
 
-#: ../src/balsa-index.c:1875
+#: ../src/balsa-index.c:1868
 msgid "_Move to"
 msgstr "_Presunúť do"
 
-#: ../src/balsa-index.c:1883
+#: ../src/balsa-index.c:1876
 msgid "_View Source"
 msgstr "_Zobraziť zdroj"
 
-#: ../src/balsa-index.c:2120
+#: ../src/balsa-index.c:2113
 #, c-format
 msgid "Failed to copy %d message to mailbox \"%s\": %s"
 msgid_plural "Failed to copy %d messages to mailbox \"%s\": %s"
@@ -2538,45 +2514,45 @@ msgstr[0] "Nepodarilo sa skopírovať %d správ do poštovej schránky \"%s\": %
 msgstr[1] "Nepodarilo sa skopírovať %d správu do poštovej schránky \"%s\": %s"
 msgstr[2] "Nepodarilo sa skopírovať %d správy do poštovej schránky \"%s\": %s"
 
-#: ../src/balsa-index.c:2134
+#: ../src/balsa-index.c:2127
 #, c-format
 msgid "Copied to \"%s\"."
 msgstr "Skopírované do \"%s\"."
 
-#: ../src/balsa-index.c:2135
+#: ../src/balsa-index.c:2128
 #, c-format
 msgid "Moved to \"%s\"."
 msgstr "Presunuté do \"%s\"."
 
-#: ../src/balsa-index.c:2237
+#: ../src/balsa-index.c:2230
 #, c-format
 msgid "Committing mailbox %s failed."
 msgstr "Potvrdenie poštovej schránky %s zlyhalo."
 
-#: ../src/balsa-index.c:2335
+#: ../src/balsa-index.c:2328
 #, c-format
 msgid "Cannot process the message: %s"
 msgstr "Nemožno spracovať správu: %s"
 
-#: ../src/balsa-index.c:2458
+#: ../src/balsa-index.c:2451
 #, c-format
 msgid "Cannot access message %u to pass to %s"
 msgstr "Nemožno pristúpiť k správe %u na odovzdanie do %s"
 
-#: ../src/balsa-index.c:2485
+#: ../src/balsa-index.c:2478
 #, c-format
 msgid "Cannot read message %u to pass to %s"
 msgstr "Nemožno prečítať správu %u na odovzdanie do %s"
 
-#: ../src/balsa-index.c:2655
+#: ../src/balsa-index.c:2642
 msgid "Pipe message through a program"
 msgstr "Presmerovať správu cez program"
 
-#: ../src/balsa-index.c:2658
+#: ../src/balsa-index.c:2645
 msgid "_Run"
 msgstr "_Spustiť"
 
-#: ../src/balsa-index.c:2667
+#: ../src/balsa-index.c:2654
 msgid "Specify the program to run:"
 msgstr "Zadať program, ktorý bude spustený:"
 
@@ -2596,18 +2572,18 @@ msgstr "_Ostatné..."
 msgid "Choose destination folder"
 msgstr "Vybrať cieľový priečinok"
 
-#: ../src/balsa-mblist.c:2135 ../src/balsa-mblist.c:2138
+#: ../src/balsa-mblist.c:2120
 msgid "Other..."
 msgstr "Ostatné..."
 
 #. xgettext: this is the first part of the message
 #. * "Shown mailbox: %s with %d messages, %d new, %d hidden".
-#: ../src/balsa-mblist.c:2305
+#: ../src/balsa-mblist.c:2279
 #, c-format
 msgid "Shown mailbox: %s "
 msgstr "Zobrazená poštová schránka: %s "
 
-#: ../src/balsa-mblist.c:2310
+#: ../src/balsa-mblist.c:2284
 #, c-format
 msgid "with %d message"
 msgid_plural "with %d messages"
@@ -2615,7 +2591,7 @@ msgstr[0] "s %d správami"
 msgstr[1] "s %d správou"
 msgstr[2] "s %d správami"
 
-#: ../src/balsa-mblist.c:2317
+#: ../src/balsa-mblist.c:2291
 #, c-format
 msgid ", %d new"
 msgid_plural ", %d new"
@@ -2623,7 +2599,7 @@ msgstr[0] ", %d nových"
 msgstr[1] ", %d nová"
 msgstr[2] ", %d nové"
 
-#: ../src/balsa-mblist.c:2324
+#: ../src/balsa-mblist.c:2298
 #, c-format
 msgid ", %d hidden"
 msgid_plural ", %d hidden"
@@ -2651,11 +2627,11 @@ msgstr "Nenájdené!"
 msgid "Find:"
 msgstr "Nájsť:"
 
-#: ../src/balsa-message.c:564 ../src/toolbar-factory.c:138
+#: ../src/balsa-message.c:564 ../src/toolbar-factory.c:140
 msgid "Previous"
 msgstr "Predchádzajúca"
 
-#: ../src/balsa-message.c:572 ../src/toolbar-factory.c:139
+#: ../src/balsa-message.c:572 ../src/toolbar-factory.c:141
 msgid "Next"
 msgstr "Ďalšia"
 
@@ -2773,12 +2749,12 @@ msgstr "%s časť správy"
 msgid "Could not save %s: %s"
 msgstr "Nepodarilo sa uložiť %s: %s"
 
-#: ../src/balsa-message.c:2410 ../src/balsa-message.c:2541
+#: ../src/balsa-message.c:2411 ../src/balsa-message.c:2542
 #, c-format
 msgid "Sending the disposition notification failed: %s"
 msgstr "Odoslanie oznámenia o doručení zlyhalo: %s"
 
-#: ../src/balsa-message.c:2504
+#: ../src/balsa-message.c:2505
 #, c-format
 msgid ""
 "The sender of this mail, %s, requested \n"
@@ -2789,11 +2765,11 @@ msgstr ""
 "Oznámenie o doručení správy (MDN) na adresu `%s'.\n"
 "Chcete poslať takéto oznámenie?"
 
-#: ../src/balsa-message.c:2511
+#: ../src/balsa-message.c:2512
 msgid "Reply to MDN?"
 msgstr "Odpovedať na MDN?"
 
-#: ../src/balsa-message.c:2713
+#: ../src/balsa-message.c:2714
 msgid ""
 "The decryption cannot be performed because this message is displayed more "
 "than once.\n"
@@ -2803,18 +2779,18 @@ msgstr ""
 "raz.\n"
 "Prosím, zatvorte ostatné inštancie tejto správy a skúste znova."
 
-#: ../src/balsa-message.c:2734 ../src/balsa-message.c:2819
-#: ../src/balsa-message.c:2941
+#: ../src/balsa-message.c:2735 ../src/balsa-message.c:2820
+#: ../src/balsa-message.c:2942
 #, c-format
 msgid "Parsing a message part failed: %s"
 msgstr "Analýza časti správy zlyhala: %s"
 
-#: ../src/balsa-message.c:2735 ../src/balsa-message.c:2820
-#: ../src/balsa-message.c:2942
+#: ../src/balsa-message.c:2736 ../src/balsa-message.c:2821
+#: ../src/balsa-message.c:2943
 msgid "Possible disk space problem."
 msgstr "Pravdepodobne problém s priestorom na disku."
 
-#: ../src/balsa-message.c:2749
+#: ../src/balsa-message.c:2750
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains an encrypted part, but "
@@ -2823,7 +2799,7 @@ msgstr ""
 "Správa odoslaná od %s s predmetom \"%s\" obsahuje zašifrovanú časť, ale jej "
 "štruktúra je neplatná."
 
-#: ../src/balsa-message.c:2757
+#: ../src/balsa-message.c:2758
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains a PGP encrypted part, "
@@ -2832,7 +2808,7 @@ msgstr ""
 "Správa odoslaná od %s s predmetom \"%s\" obsahuje PGP zašifrovanú časť, ale "
 "tento šifrovací protokol nie je dostupný."
 
-#: ../src/balsa-message.c:2770
+#: ../src/balsa-message.c:2771
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains a S/MIME encrypted part, "
@@ -2841,7 +2817,7 @@ msgstr ""
 "Správa odoslaná od %s s predmetom \"%s\" obsahuje S/MIME zašifrovanú časť, "
 "ale tento šifrovací protokol nie je dostupný."
 
-#: ../src/balsa-message.c:2837
+#: ../src/balsa-message.c:2838
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains a signed part, but its "
@@ -2850,7 +2826,7 @@ msgstr ""
 "Správa odoslaná od %s s predmetom \"%s\" obsahuje podpísanú časť, ale jej "
 "štruktúra je neplatná. Podpis, ak tam je nejaký, nemožno skontrolovať."
 
-#: ../src/balsa-message.c:2850
+#: ../src/balsa-message.c:2851
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains a %s signed part, but "
@@ -2859,28 +2835,28 @@ msgstr ""
 "Správa odoslaná od %s s predmetom \"%s\" obsahuje podpísanú časť %s, ale "
 "tento šifrovací protokol nie je dostupný."
 
-#: ../src/balsa-message.c:2853
+#: ../src/balsa-message.c:2854
 msgid "PGP"
 msgstr "PGP"
 
-#: ../src/balsa-message.c:2853 ../src/balsa-mime-widget-crypto.c:72
+#: ../src/balsa-message.c:2854 ../src/balsa-mime-widget-crypto.c:72
 #: ../src/print-gtk.c:191 ../src/print.c:1323
 msgid "S/MIME"
 msgstr "S/MIME"
 
-#: ../src/balsa-message.c:2877 ../src/balsa-message.c:3004
+#: ../src/balsa-message.c:2878 ../src/balsa-message.c:3005
 msgid "Detected a good signature"
 msgstr "Zdetekovaný dobrý podpis"
 
-#: ../src/balsa-message.c:2883
+#: ../src/balsa-message.c:2884
 msgid "Detected a good signature with insufficient validity"
 msgstr "Zdetekovaný dobrý podpis s nedostatočnou platnosťou"
 
-#: ../src/balsa-message.c:2888 ../src/balsa-message.c:3008
+#: ../src/balsa-message.c:2889 ../src/balsa-message.c:3009
 msgid "Detected a good signature with insufficient validity/trust"
 msgstr "Zdetekovaný dobrý podpis s nedostatočnou platnosťou/dôverou"
 
-#: ../src/balsa-message.c:2895 ../src/balsa-message.c:3014
+#: ../src/balsa-message.c:2896 ../src/balsa-message.c:3015
 #, c-format
 msgid ""
 "Checking the signature of the message sent by %s with subject \"%s\" "
@@ -2890,7 +2866,7 @@ msgstr ""
 "Kontrola podpisu správy, ktorú odoslal %s, s predmetom \"%s\" vrátila:\n"
 "%s"
 
-#: ../src/balsa-message.c:2907
+#: ../src/balsa-message.c:2908
 #, c-format
 msgid ""
 "Checking the signature of the message sent by %s with subject \"%s\" failed "
@@ -2899,14 +2875,14 @@ msgstr ""
 "Kontrola podpisu správy, ktorú odoslal %s, s predmetom \"%s\" zlyhala s "
 "chybou!"
 
-#: ../src/balsa-message.c:2966
+#: ../src/balsa-message.c:2967
 msgid ""
 "The decryption cannot be performed because this message is displayed more "
 "than once."
 msgstr ""
 "Dešifrovanie nemožno vykonať, pretože táto správa je zobrazená viac ako raz."
 
-#: ../src/balsa-message.c:2968
+#: ../src/balsa-message.c:2969
 msgid ""
 "The signature check and removal of the OpenPGP armor cannot be performed "
 "because this message is displayed more than once."
@@ -2914,11 +2890,11 @@ msgstr ""
 "Kontrola podpisu a odstránenie brnenia OpenPGP nemožno vykonať, pretože táto "
 "správa je zobrazená viac ako raz."
 
-#: ../src/balsa-message.c:2971
+#: ../src/balsa-message.c:2972
 msgid "Please close the other instances of this message and try again."
 msgstr "Prosím, zatvorte ostatné inštancie tejto správy a skúste znova."
 
-#: ../src/balsa-mime-widget-callbacks.c:47 ../src/sendmsg-window.c:1802
+#: ../src/balsa-mime-widget-callbacks.c:47 ../src/sendmsg-window.c:1807
 #, c-format
 msgid "Could not launch application: %s"
 msgstr "Nepodarilo sa spustiť aplikáciu: %s"
@@ -2982,7 +2958,7 @@ msgid "Access type: local-file\n"
 msgstr "Typ prístupu: lokálny-súbor\n"
 
 #: ../src/balsa-mime-widget-message.c:165
-#: ../src/balsa-mime-widget-message.c:211 ../src/balsa-mime-widget.c:232
+#: ../src/balsa-mime-widget-message.c:211 ../src/balsa-mime-widget.c:234
 #, c-format
 msgid "File name: %s"
 msgstr "Názov súboru: %s"
@@ -3031,8 +3007,8 @@ msgid "Se_nd message to obtain this part"
 msgstr "_Poslať správu na získanie tejto časti"
 
 #: ../src/balsa-mime-widget-message.c:302 ../src/balsa-mime-widget-text.c:938
-#: ../src/balsa-mime-widget-text.c:1213 ../src/main-window.c:2576
-#: ../src/sendmsg-window.c:1827
+#: ../src/balsa-mime-widget-text.c:1213 ../src/main-window.c:2597
+#: ../src/sendmsg-window.c:1832
 #, c-format
 msgid "Error showing %s: %s\n"
 msgstr "Chyba pri zobrazení %s: %s\n"
@@ -3057,22 +3033,22 @@ msgstr "... [odseknuté]"
 
 #: ../src/balsa-mime-widget-message.c:693
 #: ../src/balsa-print-object-header.c:152 ../src/print.c:354
-#: ../src/sendmsg-window.c:1128 ../src/sendmsg-window.c:1130
-#: ../src/sendmsg-window.c:1270 ../src/sendmsg-window.c:3797
-#: ../src/sendmsg-window.c:5672
+#: ../src/sendmsg-window.c:1133 ../src/sendmsg-window.c:1135
+#: ../src/sendmsg-window.c:1275 ../src/sendmsg-window.c:3802
+#: ../src/sendmsg-window.c:5682
 msgid "Subject:"
 msgstr "Predmet:"
 
 #: ../src/balsa-mime-widget-message.c:697
 #: ../src/balsa-print-object-header.c:160 ../src/print.c:360
-#: ../src/sendmsg-window.c:3793
+#: ../src/sendmsg-window.c:3798
 msgid "Date:"
 msgstr "Dátum:"
 
 #. addresses
 #: ../src/balsa-mime-widget-message.c:703
 #: ../src/balsa-print-object-header.c:165 ../src/print.c:365
-#: ../src/sendmsg-window.c:3804 ../src/store-address.c:324
+#: ../src/sendmsg-window.c:3809 ../src/store-address.c:324
 msgid "From:"
 msgstr "Od:"
 
@@ -3137,51 +3113,51 @@ msgstr "Adresa"
 msgid "S_tore"
 msgstr "_Uložiť"
 
-#: ../src/balsa-mime-widget-text.c:1283 ../src/balsa-print-object-text.c:503
+#: ../src/balsa-mime-widget-text.c:1283 ../src/balsa-print-object-text.c:505
 msgid "Full Name"
 msgstr "Celé meno"
 
-#: ../src/balsa-mime-widget-text.c:1284 ../src/balsa-print-object-text.c:505
+#: ../src/balsa-mime-widget-text.c:1284 ../src/balsa-print-object-text.c:507
 msgid "Nick Name"
 msgstr "Prezývka"
 
-#: ../src/balsa-mime-widget-text.c:1285 ../src/balsa-print-object-text.c:507
+#: ../src/balsa-mime-widget-text.c:1285 ../src/balsa-print-object-text.c:509
 msgid "First Name"
 msgstr "Krstné meno"
 
-#: ../src/balsa-mime-widget-text.c:1286 ../src/balsa-print-object-text.c:509
+#: ../src/balsa-mime-widget-text.c:1286 ../src/balsa-print-object-text.c:511
 msgid "Last Name"
 msgstr "Priezvisko"
 
-#: ../src/balsa-mime-widget-text.c:1287 ../src/balsa-print-object-text.c:511
+#: ../src/balsa-mime-widget-text.c:1287 ../src/balsa-print-object-text.c:513
 msgid "Organization"
 msgstr "Organizácia"
 
-#: ../src/balsa-mime-widget-text.c:1289 ../src/balsa-print-object-text.c:514
+#: ../src/balsa-mime-widget-text.c:1289 ../src/balsa-print-object-text.c:516
 msgid "Email Address"
 msgstr "Adresa elektronickej pošty"
 
-#: ../src/balsa-mime-widget.c:251
+#: ../src/balsa-mime-widget.c:253
 #, c-format
 msgid "Error reading message part: %s"
 msgstr "Chyba pri čítaní časti správy: %s"
 
-#: ../src/balsa-mime-widget.c:275
+#: ../src/balsa-mime-widget.c:277
 #, c-format
 msgid "Type: %s (%s)"
 msgstr "Typ: %s (%s)"
 
-#: ../src/balsa-mime-widget.c:279
+#: ../src/balsa-mime-widget.c:281
 #, c-format
 msgid "Content Type: %s"
 msgstr "Typ obsahu: %s"
 
-#: ../src/balsa-mime-widget.c:291
+#: ../src/balsa-mime-widget.c:293
 msgid "No open or view action defined for this content type"
 msgstr ""
 "Pre tento typ obsahu nie je definovaná akcia pre otvorenie alebo zobrazenie"
 
-#: ../src/balsa-mime-widget.c:296
+#: ../src/balsa-mime-widget.c:298
 msgid "S_ave part"
 msgstr "_Uložiť časť"
 
@@ -3198,204 +3174,236 @@ msgstr "Typ:"
 msgid "File name:"
 msgstr "Názov súboru:"
 
-#: ../src/filter-edit-callbacks.c:327
+#: ../src/balsa-print-object-text.c:653
+msgid "Summary"
+msgstr "Súhrn"
+
+#: ../src/balsa-print-object-text.c:655
+msgid "Organizer"
+msgstr "Organizátor"
+
+#: ../src/balsa-print-object-text.c:657
+msgid "Start"
+msgstr "Začiatok"
+
+#: ../src/balsa-print-object-text.c:659
+msgid "End"
+msgstr "Koniec"
+
+#: ../src/balsa-print-object-text.c:661
+msgid "Location"
+msgstr "Miesto"
+
+#: ../src/balsa-print-object-text.c:670
+msgid "Attendees"
+msgstr "Účastníci"
+
+#: ../src/balsa-print-object-text.c:670
+msgid "Attendee"
+msgstr "Účastník"
+
+#: ../src/balsa-print-object-text.c:684 ../src/sendmsg-window.c:3022
+msgid "Description"
+msgstr "Popis"
+
+#: ../src/filter-edit-callbacks.c:328
 msgid "One of the specified fields contains:"
 msgstr "Jedno zo zadaných polí obsahuje:"
 
-#: ../src/filter-edit-callbacks.c:328
+#: ../src/filter-edit-callbacks.c:329
 msgid "None of the specified fields contains:"
 msgstr "Žiadne zo zadaných polí neobsahuje:"
 
-#: ../src/filter-edit-callbacks.c:330
+#: ../src/filter-edit-callbacks.c:331
 msgid "One of the regular expressions matches"
 msgstr "Jeden z regulárnych výrazov vyhovuje"
 
-#: ../src/filter-edit-callbacks.c:331
+#: ../src/filter-edit-callbacks.c:332
 msgid "None of the regular expressions matches"
 msgstr "Žiadny z regulárnych výrazov nevyhovuje"
 
-#: ../src/filter-edit-callbacks.c:333
+#: ../src/filter-edit-callbacks.c:334
 msgid "Match when date is in the interval:"
 msgstr "Zhoda, ak je dátum v intervale:"
 
-#: ../src/filter-edit-callbacks.c:334
+#: ../src/filter-edit-callbacks.c:335
 msgid "Match when date is outside the interval:"
 msgstr "Zhoda, ak je dátum mimo intervalu:"
 
-#: ../src/filter-edit-callbacks.c:336 ../src/filter-edit-callbacks.c:1131
+#: ../src/filter-edit-callbacks.c:337 ../src/filter-edit-callbacks.c:1132
 msgid "Match when one of these flags is set:"
 msgstr "Zhoda, ak je nastavený jeden z týchto príznakov:"
 
-#: ../src/filter-edit-callbacks.c:337
+#: ../src/filter-edit-callbacks.c:338
 msgid "Match when none of these flags is set:"
 msgstr "Zhoda, ak nie je nastavený žiaden z týchto príznakov:"
 
-#: ../src/filter-edit-callbacks.c:530
+#: ../src/filter-edit-callbacks.c:531
 msgid "You must specify the name of the user header to match on"
 msgstr "Musíte zadať názov používateľskej hlavičky pre zhodu"
 
-#: ../src/filter-edit-callbacks.c:541
+#: ../src/filter-edit-callbacks.c:542
 msgid "You must specify at least one field for matching"
 msgstr "Musíte zadať aspoň jedno pole pre zhodu"
 
-#: ../src/filter-edit-callbacks.c:551
+#: ../src/filter-edit-callbacks.c:552
 msgid "You must provide a string"
 msgstr "Musíte zadať reťazec"
 
-#: ../src/filter-edit-callbacks.c:559
+#: ../src/filter-edit-callbacks.c:560
 msgid "You must provide at least one regular expression"
 msgstr "Musíte zadať aspoň jeden regulárny výraz"
 
-#: ../src/filter-edit-callbacks.c:572
+#: ../src/filter-edit-callbacks.c:573
 msgid "Low date is incorrect"
 msgstr "Nižší dátum je nesprávny"
 
-#: ../src/filter-edit-callbacks.c:583
+#: ../src/filter-edit-callbacks.c:584
 msgid "High date is incorrect"
 msgstr "Vyšší dátum je nesprávny"
 
-#: ../src/filter-edit-callbacks.c:591
+#: ../src/filter-edit-callbacks.c:592
 msgid "Low date is greater than high date"
 msgstr "Nižší dátum je novší ako vyšší dátum"
 
-#: ../src/filter-edit-callbacks.c:892
+#: ../src/filter-edit-callbacks.c:893
 #, c-format
 msgid "Error displaying condition help: %s\n"
 msgstr "Chyba pri zobrazovaní pomocníka podmienok: %s\n"
 
-#: ../src/filter-edit-callbacks.c:934
+#: ../src/filter-edit-callbacks.c:935
 msgid "Match Fields"
 msgstr "Zhodné polia"
 
-#: ../src/filter-edit-callbacks.c:944
+#: ../src/filter-edit-callbacks.c:945
 msgid "_All"
 msgstr "_Všetky"
 
-#: ../src/filter-edit-callbacks.c:945
+#: ../src/filter-edit-callbacks.c:946
 msgid "C_lear"
 msgstr "V_yčistiť"
 
-#: ../src/filter-edit-callbacks.c:947 ../src/main-window.c:4066
+#: ../src/filter-edit-callbacks.c:948 ../src/main-window.c:4055
 msgid "_Body"
 msgstr "_Telo"
 
-#: ../src/filter-edit-callbacks.c:948 ../src/main-window.c:4067
+#: ../src/filter-edit-callbacks.c:949 ../src/main-window.c:4056
 msgid "_To:"
 msgstr "_Pre:"
 
-#: ../src/filter-edit-callbacks.c:949 ../src/main-window.c:4068
+#: ../src/filter-edit-callbacks.c:950 ../src/main-window.c:4057
 msgid "_From:"
 msgstr "_Od:"
 
-#: ../src/filter-edit-callbacks.c:950
+#: ../src/filter-edit-callbacks.c:951
 msgid "_Subject"
 msgstr "Pre_dmet"
 
-#: ../src/filter-edit-callbacks.c:951 ../src/main-window.c:4070
+#: ../src/filter-edit-callbacks.c:952 ../src/main-window.c:4059
 msgid "_Cc:"
 msgstr "Kó_pia:"
 
-#: ../src/filter-edit-callbacks.c:953
+#: ../src/filter-edit-callbacks.c:954
 msgid "_User header:"
 msgstr "_Používateľská hlavička:"
 
-#: ../src/filter-edit-callbacks.c:987
+#: ../src/filter-edit-callbacks.c:988
 msgid "Unread"
 msgstr "Neprečítané"
 
-#: ../src/filter-edit-callbacks.c:987
+#: ../src/filter-edit-callbacks.c:988
 msgid "Deleted"
 msgstr "Vymazané"
 
-#: ../src/filter-edit-callbacks.c:987
+#: ../src/filter-edit-callbacks.c:988
 msgid "Replied"
 msgstr "Odpovedané"
 
-#: ../src/filter-edit-callbacks.c:987
+#: ../src/filter-edit-callbacks.c:988
 msgid "Flagged"
 msgstr "Značka"
 
-#: ../src/filter-edit-callbacks.c:1002
+#: ../src/filter-edit-callbacks.c:1003
 msgid "One of the specified f_ields contains"
 msgstr "Jedno zo zadaných p_olí obsahuje"
 
-#: ../src/filter-edit-callbacks.c:1017
+#: ../src/filter-edit-callbacks.c:1018
 msgid "Contain/Does _Not Contain"
 msgstr "Obsahuje/_Neobsahuje"
 
-#: ../src/filter-edit-callbacks.c:1037
+#: ../src/filter-edit-callbacks.c:1038
 msgid "_One of the regular expressions matches"
 msgstr "_Jeden z regulárnych výrazov vyhovuje"
 
 #. Left/Remove button
-#: ../src/filter-edit-callbacks.c:1068 ../src/filter-edit-dialog.c:320
+#: ../src/filter-edit-callbacks.c:1069 ../src/filter-edit-dialog.c:320
 #: ../src/filter-run-dialog.c:332
 msgid "_Remove"
 msgstr "Odst_rániť"
 
-#: ../src/filter-edit-callbacks.c:1072
+#: ../src/filter-edit-callbacks.c:1073
 msgid "One _Matches/None Matches"
 msgstr "Jeden _vyhovuje/žiaden nevyhovuje"
 
-#: ../src/filter-edit-callbacks.c:1083
+#: ../src/filter-edit-callbacks.c:1084
 msgid "Filtering using regular expressions is not yet implemented."
 msgstr "Filtrovanie pomocou regulárnych výrazov ešte nie je implementované."
 
-#: ../src/filter-edit-callbacks.c:1093
+#: ../src/filter-edit-callbacks.c:1094
 msgid "Match when message date is in the interval:"
 msgstr "Zhoda, ak je dátum správy v intervale:"
 
-#: ../src/filter-edit-callbacks.c:1113
+#: ../src/filter-edit-callbacks.c:1114
 msgid "Inside/outside the date interval"
 msgstr "Dátum v intervale/mimo intervalu"
 
-#: ../src/filter-edit-callbacks.c:1160
+#: ../src/filter-edit-callbacks.c:1161
 msgid "Match when one flag is set/when no flag is set"
 msgstr "Zhoda, ak je jeden príznak nastavený/nie je nastavený žiaden príznak"
 
-#: ../src/filter-edit-callbacks.c:1178
+#: ../src/filter-edit-callbacks.c:1179
 msgid "Search T_ype:"
 msgstr "T_yp vyhľadávania:"
 
-#: ../src/filter-edit-callbacks.c:1252
+#: ../src/filter-edit-callbacks.c:1253
 msgid "Edit condition for filter: "
 msgstr "Upraviť podmienku pre filter: "
 
-#: ../src/filter-edit-callbacks.c:1472 ../src/save-restore.c:2000
+#: ../src/filter-edit-callbacks.c:1473 ../src/save-restore.c:2002
 msgid "Filter with no condition was omitted"
 msgstr "Filter bez podmienok bol vynechaný"
 
-#: ../src/filter-edit-callbacks.c:1504
+#: ../src/filter-edit-callbacks.c:1505
 #, c-format
 msgid "Error displaying filter help: %s\n"
 msgstr "Chyba pri zobrazovaní pomocníka filtrov: %s\n"
 
-#: ../src/filter-edit-callbacks.c:1697
+#: ../src/filter-edit-callbacks.c:1698
 msgid "New filter"
 msgstr "Nový filter"
 
-#: ../src/filter-edit-callbacks.c:1829
+#: ../src/filter-edit-callbacks.c:1827
 msgid "No filter name specified."
 msgstr "Nebol zadaný názov filtra."
 
-#: ../src/filter-edit-callbacks.c:1834
+#: ../src/filter-edit-callbacks.c:1832
 #, c-format
 msgid "Filter \"%s\" already exists."
 msgstr "Filter \"%s\" už existuje."
 
-#: ../src/filter-edit-callbacks.c:1844
+#: ../src/filter-edit-callbacks.c:1842
 msgid "Filter must have conditions."
 msgstr "Filter musí mať podmienky."
 
-#: ../src/filter-edit-callbacks.c:1901
+#: ../src/filter-edit-callbacks.c:1899
 msgid "Filter has matched"
 msgstr "Filter sa zhodoval"
 
-#: ../src/filter-edit-callbacks.c:1926
+#: ../src/filter-edit-callbacks.c:1919
 msgid "You must provide a sound to play"
 msgstr "Musíte zadať zvuk, ktorý sa má prehrať"
 
-#: ../src/filter-edit-callbacks.c:2085
+#: ../src/filter-edit-callbacks.c:2073
 #, c-format
 msgid "(Example: write December 31, 2000, as %s)"
 msgstr "(Príklad: napíšte 31. december 2000 ako %s)"
@@ -3459,51 +3467,51 @@ msgid "Ne_w"
 msgstr "_Nový"
 
 #. The notification area
-#: ../src/filter-edit-dialog.c:349
+#: ../src/filter-edit-dialog.c:347
 msgid "Notification:"
 msgstr "Oznámenie:"
 
 #. Notification buttons
-#: ../src/filter-edit-dialog.c:359
+#: ../src/filter-edit-dialog.c:357
 msgid "Play sound:"
 msgstr "Prehrať zvuk:"
 
-#: ../src/filter-edit-dialog.c:366 ../src/filter-edit-dialog.c:379
+#: ../src/filter-edit-dialog.c:363
 msgid "Use Sound..."
 msgstr "Použiť zvuk..."
 
-#: ../src/filter-edit-dialog.c:398
+#: ../src/filter-edit-dialog.c:384
 msgid "Popup text:"
 msgstr "Vyskakovací text:"
 
 #. The action area
-#: ../src/filter-edit-dialog.c:419
+#: ../src/filter-edit-dialog.c:405
 msgid "Action to perform:"
 msgstr "Vykonať činnosť:"
 
-#: ../src/filter-edit-dialog.c:470
+#: ../src/filter-edit-dialog.c:456
 msgid "Match"
 msgstr "Zhoda"
 
-#: ../src/filter-edit-dialog.c:473
+#: ../src/filter-edit-dialog.c:459
 msgid "Action"
 msgstr "Akcia"
 
-#: ../src/filter-edit-dialog.c:485
+#: ../src/filter-edit-dialog.c:471
 msgid "Revert"
 msgstr "Vrátiť"
 
-#: ../src/filter-edit-dialog.c:536
+#: ../src/filter-edit-dialog.c:522
 msgid "A filter run dialog is open.Close it before you can modify filters."
 msgstr ""
 "Dialógové okno pre spustenie filtra je otvorené. Zatvorte ho, aby ste mohli "
 "modifikovať filtre."
 
-#: ../src/filter-edit-dialog.c:549
+#: ../src/filter-edit-dialog.c:535
 msgid "Balsa Filters"
 msgstr "Filtre programu Balsa"
 
-#: ../src/filter-edit-dialog.c:617
+#: ../src/filter-edit-dialog.c:603
 #, c-format
 msgid "Filter \"%s\" has no condition."
 msgstr "Filter \"%s\" nemá podmienku."
@@ -3609,7 +3617,7 @@ msgid "Remote IMAP folder"
 msgstr "Vzdialený priečinok IMAP"
 
 #. must NOT be modal
-#: ../src/folder-conf.c:308 ../src/folder-conf.c:778 ../src/mailbox-conf.c:550
+#: ../src/folder-conf.c:308 ../src/folder-conf.c:778 ../src/mailbox-conf.c:541
 msgid "_Update"
 msgstr "_Aktualizovať"
 
@@ -3617,8 +3625,8 @@ msgstr "_Aktualizovať"
 msgid "C_reate"
 msgstr "_Vytvoriť"
 
-#: ../src/folder-conf.c:331 ../src/mailbox-conf.c:1158
-#: ../src/mailbox-conf.c:1268
+#: ../src/folder-conf.c:331 ../src/mailbox-conf.c:1149
+#: ../src/mailbox-conf.c:1259
 msgid "_Basic"
 msgstr "_Základný"
 
@@ -3626,7 +3634,7 @@ msgstr "_Základný"
 msgid "_Max number of connections:"
 msgstr "_Maximálny počet spojení:"
 
-#: ../src/folder-conf.c:343 ../src/mailbox-conf.c:1331
+#: ../src/folder-conf.c:343 ../src/mailbox-conf.c:1322
 msgid "Enable _persistent cache"
 msgstr "Povoliť _trvalú vyrovnávaciu pamäť"
 
@@ -3634,7 +3642,7 @@ msgstr "Povoliť _trvalú vyrovnávaciu pamäť"
 msgid "Use IDLE command"
 msgstr "Použiť príkaz IDLE"
 
-#: ../src/folder-conf.c:358 ../src/mailbox-conf.c:1335
+#: ../src/folder-conf.c:358 ../src/mailbox-conf.c:1326
 msgid "Enable _bug workarounds"
 msgstr "Povoliť obchádzanie _chýb"
 
@@ -3642,8 +3650,8 @@ msgstr "Povoliť obchádzanie _chýb"
 msgid "Use STATUS for mailbox checking"
 msgstr "Použiť STATUS pre kontrolu poštovej schránky"
 
-#: ../src/folder-conf.c:371 ../src/mailbox-conf.c:1212
-#: ../src/mailbox-conf.c:1337
+#: ../src/folder-conf.c:371 ../src/mailbox-conf.c:1203
+#: ../src/mailbox-conf.c:1328
 msgid "_Advanced"
 msgstr "_Rozšírený"
 
@@ -3653,7 +3661,7 @@ msgid "Descriptive _name:"
 msgstr "Popisný _názov:"
 
 #. username
-#: ../src/folder-conf.c:389 ../src/mailbox-conf.c:1174
+#: ../src/folder-conf.c:389 ../src/mailbox-conf.c:1165
 msgid "Use_r name:"
 msgstr "Meno po_užívateľa:"
 
@@ -3661,7 +3669,7 @@ msgstr "Meno po_užívateľa:"
 msgid "_Password:"
 msgstr "_Heslo:"
 
-#: ../src/folder-conf.c:400 ../src/mailbox-conf.c:1293
+#: ../src/folder-conf.c:400 ../src/mailbox-conf.c:1284
 msgid "_Anonymous access"
 msgstr "_Anonymný prístup"
 
@@ -3799,15 +3807,15 @@ msgstr "CHYBA: "
 msgid "FATAL: "
 msgstr "ZÁVAŽNÉ: "
 
-#: ../src/mailbox-conf.c:226
+#: ../src/mailbox-conf.c:217
 msgid "Use _SSL"
 msgstr "Použiť _SSL"
 
-#: ../src/mailbox-conf.c:354
+#: ../src/mailbox-conf.c:345
 msgid "No mailbox selected."
 msgstr "Nebola vybraná žiadna poštová schránka."
 
-#: ../src/mailbox-conf.c:384
+#: ../src/mailbox-conf.c:375
 #, c-format
 msgid ""
 "Mailbox \"%s\" is used by Balsa and I cannot remove it.\n"
@@ -3818,7 +3826,7 @@ msgstr ""
 "odstrániť. Ak ju naozaj chcete odstrániť, priraďte jej funkciu nejakej\n"
 "inej poštovej schránke."
 
-#: ../src/mailbox-conf.c:394
+#: ../src/mailbox-conf.c:385
 #, c-format
 msgid ""
 "This will remove the mailbox \"%s\" from the list of mailboxes.  You may "
@@ -3833,15 +3841,15 @@ msgstr ""
 "jej opätovné sprístupnenie.\n"
 "Čo chcete urobiť?"
 
-#: ../src/mailbox-conf.c:406
+#: ../src/mailbox-conf.c:397
 msgid "Remove from _list"
 msgstr "Odstrániť zo _zoznamu"
 
-#: ../src/mailbox-conf.c:407
+#: ../src/mailbox-conf.c:398
 msgid "Remove from list and _disk"
 msgstr "Odstrániť zo zoznamu a z _disku"
 
-#: ../src/mailbox-conf.c:415
+#: ../src/mailbox-conf.c:406
 #, c-format
 msgid ""
 "This will remove the mailbox \"%s\" and all its messages from your IMAP "
@@ -3857,11 +3865,11 @@ msgstr ""
 "schránky s týmto názvom.\n"
 "Čo chcete urobiť?"
 
-#: ../src/mailbox-conf.c:428
+#: ../src/mailbox-conf.c:419
 msgid "_Remove from server"
 msgstr "_Odstrániť zo servera"
 
-#: ../src/mailbox-conf.c:435
+#: ../src/mailbox-conf.c:426
 #, c-format
 msgid ""
 "This will remove the mailbox \"%s\" from the list of mailboxes.\n"
@@ -3873,26 +3881,26 @@ msgstr ""
 "sprístupnenie.\n"
 "Čo chcete urobiť?"
 
-#: ../src/mailbox-conf.c:444
+#: ../src/mailbox-conf.c:435
 msgid "_Remove from list"
 msgstr "_Odstrániť zo zoznamu"
 
-#: ../src/mailbox-conf.c:485
+#: ../src/mailbox-conf.c:476
 #, c-format
 msgid "Folder deletion failed. Reason: %s"
 msgstr "Odstránenie priečinka zlyhalo. Dôvod: %s"
 
-#: ../src/mailbox-conf.c:554 ../src/pref-manager.c:1651
-#: ../src/pref-manager.c:1739 ../src/pref-manager.c:2833
+#: ../src/mailbox-conf.c:545 ../src/pref-manager.c:1634
+#: ../src/pref-manager.c:1706 ../src/pref-manager.c:2800
 msgid "_Add"
 msgstr "_Pridať"
 
-#: ../src/mailbox-conf.c:774
+#: ../src/mailbox-conf.c:765
 #, c-format
 msgid "%s on %s"
 msgstr "%s na %s"
 
-#: ../src/mailbox-conf.c:916
+#: ../src/mailbox-conf.c:907
 #, c-format
 msgid ""
 "Rename of %s to %s failed:\n"
@@ -3901,66 +3909,66 @@ msgstr ""
 "Premenovanie %s na %s zlyhalo:\n"
 "%s"
 
-#: ../src/mailbox-conf.c:1095
+#: ../src/mailbox-conf.c:1086
 msgid "_Mailbox Name:"
 msgstr "Me_no poštovej schránky:"
 
-#: ../src/mailbox-conf.c:1106
+#: ../src/mailbox-conf.c:1097
 msgid "Local Mailbox Configurator"
 msgstr "Konfigurátor miestnej poštovej schránky"
 
-#: ../src/mailbox-conf.c:1139
+#: ../src/mailbox-conf.c:1130
 msgid "Remote Mailbox Configurator"
 msgstr "Konfigurátor vzdialenej poštovej schránky"
 
 #. mailbox name
-#: ../src/mailbox-conf.c:1161 ../src/mailbox-conf.c:1271
+#: ../src/mailbox-conf.c:1152 ../src/mailbox-conf.c:1262
 msgid "Mailbox _name:"
 msgstr "_Názov poštovej schránky:"
 
 #. password field
-#: ../src/mailbox-conf.c:1180 ../src/mailbox-conf.c:1305
+#: ../src/mailbox-conf.c:1171 ../src/mailbox-conf.c:1296
 msgid "Pass_word:"
 msgstr "_Heslo:"
 
-#: ../src/mailbox-conf.c:1188
+#: ../src/mailbox-conf.c:1179
 msgid "_Delete messages from server after download"
 msgstr "_Vymazať správy zo servera po stiahnutí"
 
-#: ../src/mailbox-conf.c:1193
+#: ../src/mailbox-conf.c:1184
 msgid "_Enable check for new mail"
 msgstr "Povoliť kontrolu novej _elektronickej pošty"
 
-#: ../src/mailbox-conf.c:1198
+#: ../src/mailbox-conf.c:1189
 msgid "_Filter messages through procmail"
 msgstr "_Filtrovať správy cez procmail"
 
-#: ../src/mailbox-conf.c:1202
+#: ../src/mailbox-conf.c:1193
 msgid "Fi_lter Command:"
 msgstr "Príkaz _filtra:"
 
-#: ../src/mailbox-conf.c:1216
+#: ../src/mailbox-conf.c:1207
 msgid "Disable _APOP"
 msgstr "Zakázať _APOP"
 
 #. username
-#: ../src/mailbox-conf.c:1285
+#: ../src/mailbox-conf.c:1276
 msgid "_Username:"
 msgstr "Meno po_užívateľa:"
 
-#: ../src/mailbox-conf.c:1310
+#: ../src/mailbox-conf.c:1301
 msgid "F_older path:"
 msgstr "Cesta k pr_iečinku:"
 
-#: ../src/mailbox-conf.c:1396
+#: ../src/mailbox-conf.c:1387
 msgid "_Identity:"
 msgstr "_Identita:"
 
-#: ../src/mailbox-conf.c:1424 ../src/pref-manager.c:3298
+#: ../src/mailbox-conf.c:1415 ../src/pref-manager.c:3265
 msgid "Always"
 msgstr "vždy"
 
-#: ../src/mailbox-conf.c:1428
+#: ../src/mailbox-conf.c:1419
 msgid ""
 "_Decrypt and check\n"
 "signatures automatically:"
@@ -3968,11 +3976,11 @@ msgstr ""
 "_Dešifrovať a overiť\n"
 "podpisy automaticky:"
 
-#: ../src/mailbox-conf.c:1449
+#: ../src/mailbox-conf.c:1440
 msgid "Show _Recipient column instead of Sender"
 msgstr "Zobraziť stĺpec _Príjemcu namiesto Odosielateľa"
 
-#: ../src/mailbox-conf.c:1456
+#: ../src/mailbox-conf.c:1447
 msgid "_Subscribe for new mail check"
 msgstr "Prihlásiť sa ku kontrole novej pošty"
 
@@ -4083,414 +4091,414 @@ msgstr "Lokálna poštová schránka %s načítaná ako: %s\n"
 msgid "Local folder %s\n"
 msgstr "Lokálny priečinok %s\n"
 
-#: ../src/main-window.c:306
+#: ../src/main-window.c:310
 msgid "Balsa closes files and connections. Please wait..."
 msgstr "Balsa uzatvára súbory a spojenia. Prosím, čakajte..."
 
-#: ../src/main-window.c:325
+#: ../src/main-window.c:329
 msgid "Mail_box"
 msgstr "Poštová schrán_ka"
 
-#: ../src/main-window.c:326 ../src/message-window.c:237
+#: ../src/main-window.c:330 ../src/message-window.c:237
 msgid "_Message"
 msgstr "S_práva"
 
-#: ../src/main-window.c:327
+#: ../src/main-window.c:331
 msgid "_Settings"
 msgstr "_Nastavenia"
 
-#: ../src/main-window.c:332
+#: ../src/main-window.c:336
 msgid "Mail_boxes"
 msgstr "Poštové schrán_ky"
 
-#: ../src/main-window.c:333 ../src/main-window.c:337
-#: ../src/sendmsg-window.c:329 ../src/sendmsg-window.c:330
-#: ../src/sendmsg-window.c:331
+#: ../src/main-window.c:337 ../src/main-window.c:341
+#: ../src/sendmsg-window.c:334 ../src/sendmsg-window.c:335
+#: ../src/sendmsg-window.c:336
 msgid "_More"
 msgstr "_Viac"
 
-#: ../src/main-window.c:334
+#: ../src/main-window.c:338
 msgid "_Headers"
 msgstr "_Hlavičky"
 
-#: ../src/main-window.c:335
+#: ../src/main-window.c:339
 msgid "_Sort Mailbox"
 msgstr "_Usporiadať poštovú schránku"
 
-#: ../src/main-window.c:336
+#: ../src/main-window.c:340
 msgid "H_ide messages"
 msgstr "_Skryť správy"
 
-#: ../src/main-window.c:338 ../src/sendmsg-window.c:328
+#: ../src/main-window.c:342 ../src/sendmsg-window.c:333
 msgid "_Tools"
 msgstr "_Nástroje"
 
-#: ../src/main-window.c:339
+#: ../src/main-window.c:343
 msgid "_Filters"
 msgstr "Fi_ltre"
 
-#: ../src/main-window.c:340
+#: ../src/main-window.c:344
 msgid "F_ilters"
 msgstr "F_iltre"
 
-#: ../src/main-window.c:341 ../src/main-window.c:399
+#: ../src/main-window.c:345 ../src/main-window.c:403
 msgid "Manage filters"
 msgstr "Spravovať filtre"
 
 #. File menu items
 #. Not in the touchpad menu, but still available as a toolbar
 #. * button:
-#: ../src/main-window.c:346
+#: ../src/main-window.c:350
 msgid "_Continue"
 msgstr "_Pokračovať"
 
-#: ../src/main-window.c:347
+#: ../src/main-window.c:351
 msgid "Continue editing current message"
 msgstr "Pokračovať v písaní aktuálnej správy"
 
-#: ../src/main-window.c:349
+#: ../src/main-window.c:353
 msgid "_Get New Mail"
 msgstr "_Získať novú poštu"
 
-#: ../src/main-window.c:350
+#: ../src/main-window.c:354
 msgid "Fetch new incoming mail"
 msgstr "Stiahnuť novú prichádzajúcu poštu"
 
-#: ../src/main-window.c:351
+#: ../src/main-window.c:355
 msgid "_Send Queued Mail"
 msgstr "_Odoslať poštu z radu"
 
-#: ../src/main-window.c:352
+#: ../src/main-window.c:356
 msgid "Send messages from the outbox"
 msgstr "Odoslať správy z pošty na odoslanie"
 
-#: ../src/main-window.c:355
+#: ../src/main-window.c:359
 msgid "Send and _Receive Mail"
 msgstr "Odoslať a p_rijať poštu"
 
-#: ../src/main-window.c:356
+#: ../src/main-window.c:360
 msgid "Send and Receive messages"
 msgstr "Odoslať a prijať správy"
 
-#: ../src/main-window.c:359 ../src/message-window.c:239
-#: ../src/sendmsg-window.c:345
+#: ../src/main-window.c:363 ../src/message-window.c:239
+#: ../src/sendmsg-window.c:350
 msgid "Page _Setup"
 msgstr "Nastavenie _strany"
 
-#: ../src/main-window.c:360 ../src/message-window.c:240
-#: ../src/sendmsg-window.c:346
+#: ../src/main-window.c:364 ../src/message-window.c:240
+#: ../src/sendmsg-window.c:351
 msgid "Set up page for printing"
 msgstr "Nastaviť stranu pre tlač"
 
-#: ../src/main-window.c:362
+#: ../src/main-window.c:366
 msgid "_Address Book..."
 msgstr "_Adresár..."
 
-#: ../src/main-window.c:363
+#: ../src/main-window.c:367
 msgid "Open the address book"
 msgstr "Otvoriť adresár"
 
-#: ../src/main-window.c:364
+#: ../src/main-window.c:368
 msgid "Quit Balsa"
 msgstr "Ukončiť program Balsa"
 
 #. File:New submenu items
-#: ../src/main-window.c:367
+#: ../src/main-window.c:371
 msgid "_Message..."
 msgstr "S_práva..."
 
-#: ../src/main-window.c:368
+#: ../src/main-window.c:372
 msgid "Compose a new message"
 msgstr "Vytvoriť novú správu"
 
-#: ../src/main-window.c:370
+#: ../src/main-window.c:374
 msgid "Local mbox mailbox..."
 msgstr "Lokálna poštová schránka typu mbox..."
 
-#: ../src/main-window.c:371 ../src/main-window.c:380
+#: ../src/main-window.c:375 ../src/main-window.c:384
 msgid "Add a new mbox style mailbox"
 msgstr "Pridať novú poštovú schránku typu mbox"
 
-#: ../src/main-window.c:373
+#: ../src/main-window.c:377
 msgid "Local Maildir mailbox..."
 msgstr "Lokálna poštová schránka typu Maildir..."
 
-#: ../src/main-window.c:374 ../src/main-window.c:383
+#: ../src/main-window.c:378 ../src/main-window.c:387
 msgid "Add a new Maildir style mailbox"
 msgstr "Pridať novú poštovú schránku typu Maildir"
 
-#: ../src/main-window.c:376
+#: ../src/main-window.c:380
 msgid "Local MH mailbox..."
 msgstr "Lokálna poštová schránka typu MH..."
 
-#: ../src/main-window.c:377 ../src/main-window.c:386
+#: ../src/main-window.c:381 ../src/main-window.c:390
 msgid "Add a new MH style mailbox"
 msgstr "Pridať novú poštovú schránku typu MH"
 
-#: ../src/main-window.c:379
+#: ../src/main-window.c:383
 msgid "New mailbox..."
 msgstr "Nová poštová schránka..."
 
-#: ../src/main-window.c:382
+#: ../src/main-window.c:386
 msgid "New \"Maildir\" mailbox..."
 msgstr "Nová poštová schránka typu \"Maildir\"..."
 
-#: ../src/main-window.c:385
+#: ../src/main-window.c:389
 msgid "New \"MH\" mailbox..."
 msgstr "Nová poštová schránka typu \"MH\"..."
 
-#: ../src/main-window.c:388 ../src/pref-manager.c:3157
+#: ../src/main-window.c:392 ../src/pref-manager.c:3124
 msgid "Remote IMAP mailbox..."
 msgstr "Vzdialená poštová schránka typu IMAP..."
 
-#: ../src/main-window.c:389
+#: ../src/main-window.c:393
 msgid "Add a new IMAP mailbox"
 msgstr "Pridať novú poštovú schránku typu IMAP"
 
-#: ../src/main-window.c:390 ../src/pref-manager.c:3162
+#: ../src/main-window.c:394 ../src/pref-manager.c:3129
 msgid "Remote IMAP folder..."
 msgstr "Vzdialená poštová schránka typu IMAP..."
 
-#: ../src/main-window.c:391
+#: ../src/main-window.c:395
 msgid "Add a new IMAP folder"
 msgstr "Pridať novú priečinok typu IMAP"
 
-#: ../src/main-window.c:392
+#: ../src/main-window.c:396
 msgid "Remote IMAP subfolder..."
 msgstr "Vzdialený podpriečinok typu IMAP..."
 
-#: ../src/main-window.c:393
+#: ../src/main-window.c:397
 msgid "Add a new IMAP subfolder"
 msgstr "Pridať nový podpriečinok typu IMAP"
 
-#: ../src/main-window.c:398
+#: ../src/main-window.c:402
 msgid "F_ilters..."
 msgstr "_Filtre..."
 
-#: ../src/main-window.c:400
+#: ../src/main-window.c:404
 msgid "_Export Filters"
 msgstr "_Exportovať filtre"
 
-#: ../src/main-window.c:401
+#: ../src/main-window.c:405
 msgid "Export filters as Sieve scripts"
 msgstr "Exportovať filtre ako skripty Sieve"
 
-#: ../src/main-window.c:402
+#: ../src/main-window.c:406
 msgid "Prefere_nces"
 msgstr "Pred_voľby"
 
 #. View menu items
-#: ../src/main-window.c:405
+#: ../src/main-window.c:409
 msgid "E_xpand All"
 msgstr "Rozbaliť vš_etko"
 
-#: ../src/main-window.c:406
+#: ../src/main-window.c:410
 msgid "Expand all threads"
 msgstr "Rozbaliť všetky vlákna"
 
-#: ../src/main-window.c:407
+#: ../src/main-window.c:411
 msgid "_Collapse All"
 msgstr "Z_baliť všetko"
 
-#: ../src/main-window.c:408
+#: ../src/main-window.c:412
 msgid "Collapse all expanded threads"
 msgstr "Zbaliť všetky rozbalené vlákna"
 
-#: ../src/main-window.c:410 ../src/message-window.c:255
+#: ../src/main-window.c:414 ../src/message-window.c:255
 msgid "Zoom _In"
 msgstr "Z_väčšiť"
 
-#: ../src/main-window.c:411 ../src/message-window.c:256
+#: ../src/main-window.c:415 ../src/message-window.c:256
 msgid "Increase magnification"
 msgstr "Zvýšiť zväčšenie"
 
-#: ../src/main-window.c:412 ../src/message-window.c:257
+#: ../src/main-window.c:416 ../src/message-window.c:257
 msgid "Zoom _Out"
 msgstr "Z_menšiť"
 
-#: ../src/main-window.c:413 ../src/message-window.c:258
+#: ../src/main-window.c:417 ../src/message-window.c:258
 msgid "Decrease magnification"
 msgstr "Znížiť zväčšenie"
 
 #. To warn msgfmt that the % sign isn't a format specifier:
-#: ../src/main-window.c:416 ../src/message-window.c:261
+#: ../src/main-window.c:420 ../src/message-window.c:261
 #, no-c-format
 msgid "Zoom _100%"
 msgstr "Zväčšenie _100%"
 
-#: ../src/main-window.c:417 ../src/message-window.c:262
+#: ../src/main-window.c:421 ../src/message-window.c:262
 msgid "No magnification"
 msgstr "Bez zväčšenia"
 
 #. Mailbox menu item that does not require a mailbox
-#: ../src/main-window.c:420 ../src/main-window.c:421
+#: ../src/main-window.c:424 ../src/main-window.c:425
 #: ../src/message-window.c:296 ../src/message-window.c:297
 msgid "Next Unread Message"
 msgstr "Ďalšia neprečítaná správa"
 
-#: ../src/main-window.c:423
+#: ../src/main-window.c:427
 msgid "Empty _Trash"
 msgstr "Vyprázdniť _kôš"
 
-#: ../src/main-window.c:424
+#: ../src/main-window.c:428
 msgid "Delete messages from the Trash mailbox"
 msgstr "Vymazať správy z koša"
 
 #. Settings menu items
-#: ../src/main-window.c:427
+#: ../src/main-window.c:431
 msgid "_Toolbars..."
 msgstr "_Nástrojové lišty..."
 
-#: ../src/main-window.c:428
+#: ../src/main-window.c:432
 msgid "Customize toolbars"
 msgstr "Prispôsobiť nástrojové lišty"
 
-#: ../src/main-window.c:429
+#: ../src/main-window.c:433
 msgid "_Identities..."
 msgstr "_Identity..."
 
-#: ../src/main-window.c:430
+#: ../src/main-window.c:434
 msgid "Create and set current identities"
 msgstr "Vytvoriť a nastaviť aktuálne identity"
 
 #. Help menu items
-#: ../src/main-window.c:433
+#: ../src/main-window.c:437
 msgid "_Contents"
 msgstr "_Obsah"
 
-#: ../src/main-window.c:434
+#: ../src/main-window.c:438
 msgid "Table of Contents"
 msgstr "Obsah"
 
 #. license ?
-#: ../src/main-window.c:435 ../src/main-window.c:2617
+#: ../src/main-window.c:439 ../src/main-window.c:2636
 msgid "About Balsa"
 msgstr "O programe Balsa"
 
 #. Edit menu items
-#: ../src/main-window.c:442 ../src/message-window.c:249
-#: ../src/sendmsg-window.c:363
+#: ../src/main-window.c:446 ../src/message-window.c:249
+#: ../src/sendmsg-window.c:368
 msgid "Select _All"
 msgstr "Ozn_ačiť všetko"
 
-#: ../src/main-window.c:444
+#: ../src/main-window.c:448
 msgid "_Find"
 msgstr "_Nájsť"
 
-#: ../src/main-window.c:446
+#: ../src/main-window.c:450
 msgid "Find Ne_xt"
 msgstr "Ná_jsť ďalšie"
 
 #. Mailbox menu items
-#: ../src/main-window.c:449 ../src/main-window.c:450
+#: ../src/main-window.c:453 ../src/main-window.c:454
 #: ../src/message-window.c:294 ../src/message-window.c:295
 msgid "Next Message"
 msgstr "Ďalšia správa"
 
-#: ../src/main-window.c:451 ../src/main-window.c:452
+#: ../src/main-window.c:455 ../src/main-window.c:456
 #: ../src/message-window.c:299 ../src/message-window.c:300
 msgid "Previous Message"
 msgstr "Predchádzajúca správa"
 
-#: ../src/main-window.c:453 ../src/main-window.c:454
+#: ../src/main-window.c:457 ../src/main-window.c:458
 #: ../src/message-window.c:301 ../src/message-window.c:302
 msgid "Next Flagged Message"
 msgstr "Ďalšia správa so značkou"
 
-#: ../src/main-window.c:456
+#: ../src/main-window.c:460
 msgid "_Hide Messages"
 msgstr "_Skryť správy"
 
-#: ../src/main-window.c:457
+#: ../src/main-window.c:461
 msgid "_Reset Filter"
 msgstr "_Vyčistiť filter"
 
-#: ../src/main-window.c:458
+#: ../src/main-window.c:462
 msgid "Reset mailbox filter"
 msgstr "Vyčistiť filter poštovej schránky"
 
-#: ../src/main-window.c:459
+#: ../src/main-window.c:463
 msgid "_Select All"
 msgstr "_Označiť všetko"
 
-#: ../src/main-window.c:460
+#: ../src/main-window.c:464
 msgid "Select all messages in current mailbox"
 msgstr "Označiť všetky správy v aktuálnej poštovej schránke"
 
-#: ../src/main-window.c:462
+#: ../src/main-window.c:466
 msgid "_Edit..."
 msgstr "_Upraviť..."
 
-#: ../src/main-window.c:463
+#: ../src/main-window.c:467
 msgid "Edit the selected mailbox"
 msgstr "Upraviť vybranú poštovú schránku"
 
-#: ../src/main-window.c:464
+#: ../src/main-window.c:468
 msgid "_Delete..."
 msgstr "_Vymazať..."
 
-#: ../src/main-window.c:465
+#: ../src/main-window.c:469
 msgid "Delete the selected mailbox"
 msgstr "Vymazať vybranú poštovú schránku"
 
-#: ../src/main-window.c:468 ../src/main-window.c:471
+#: ../src/main-window.c:472 ../src/main-window.c:475
 msgid "E_xpunge Deleted Messages"
 msgstr "_Vymazať odstránené správy"
 
-#: ../src/main-window.c:469 ../src/main-window.c:472
+#: ../src/main-window.c:473 ../src/main-window.c:476
 msgid "Expunge messages marked as deleted in the current mailbox"
 msgstr "Vymazať správy označené ako odstránené v aktuálnej poštovej schránke"
 
-#: ../src/main-window.c:475
+#: ../src/main-window.c:479
 msgid "Close mailbox"
 msgstr "Zatvoriť poštovú schránku"
 
-#: ../src/main-window.c:477
+#: ../src/main-window.c:481
 msgid "Select _Filters"
 msgstr "Vybrať _filtre"
 
-#: ../src/main-window.c:478
+#: ../src/main-window.c:482
 msgid "Select filters to be applied automatically to current mailbox"
 msgstr ""
 "Vybrať filtre, ktoré budú aplikované automaticky na aktuálnu poštovú schránku"
 
-#: ../src/main-window.c:481
+#: ../src/main-window.c:485
 msgid "_Remove Duplicates"
 msgstr "_Odstrániť duplikáty"
 
-#: ../src/main-window.c:482
+#: ../src/main-window.c:486
 msgid "Remove duplicated messages from the current mailbox"
 msgstr "Odstrániť duplikátne správy z aktuálnej poštovej schránky"
 
-#: ../src/main-window.c:492 ../src/message-window.c:265
+#: ../src/main-window.c:496 ../src/message-window.c:265
 msgid "Reply to the current message"
 msgstr "Odpovedať na aktuálnu správu"
 
-#: ../src/main-window.c:493 ../src/message-window.c:266
+#: ../src/main-window.c:497 ../src/message-window.c:266
 msgid "Reply to _All..."
 msgstr "Odpoved_ať všetkým..."
 
-#: ../src/main-window.c:494 ../src/message-window.c:267
+#: ../src/main-window.c:498 ../src/message-window.c:267
 msgid "Reply to all recipients of the current message"
 msgstr "Odpovedať všetkým príjemcom aktuálnej správy"
 
-#: ../src/main-window.c:496 ../src/message-window.c:269
+#: ../src/main-window.c:500 ../src/message-window.c:269
 msgid "Reply to _Group..."
 msgstr "Odpovedať _skupine..."
 
-#: ../src/main-window.c:497 ../src/message-window.c:270
+#: ../src/main-window.c:501 ../src/message-window.c:270
 msgid "Reply to mailing list"
 msgstr "Odpovedať zoznamu príjemcov"
 
-#: ../src/main-window.c:499
+#: ../src/main-window.c:503
 msgid "Store address of sender in addressbook"
 msgstr "Uložiť adresu odosielateľa do adresára"
 
-#: ../src/main-window.c:501 ../src/message-window.c:274
+#: ../src/main-window.c:505 ../src/message-window.c:274
 msgid "_View Source..."
 msgstr "_Zobraziť zdroj..."
 
-#: ../src/main-window.c:502 ../src/message-window.c:275
+#: ../src/main-window.c:506 ../src/message-window.c:275
 msgid "View source form of the message"
 msgstr "Zobraziť zdrojový tvar správy"
 
@@ -4498,184 +4506,184 @@ msgstr "Zobraziť zdrojový tvar správy"
 #. * stock_id; the first in this list defines the action tied to the
 #. * toolbar's Forward button, so "ForwardDefault" must come before
 #. * the others.
-#: ../src/main-window.c:508
+#: ../src/main-window.c:512
 msgid "_Forward..."
 msgstr "_Poslať ďalej..."
 
-#: ../src/main-window.c:509 ../src/message-window.c:281
+#: ../src/main-window.c:513 ../src/message-window.c:281
 msgid "Forward the current message"
 msgstr "Poslať ďalej aktuálnu správu"
 
-#: ../src/main-window.c:512 ../src/message-window.c:283
+#: ../src/main-window.c:516 ../src/message-window.c:283
 msgid "_Forward attached..."
 msgstr "_Poslať ďalej ako prílohu..."
 
-#: ../src/main-window.c:513 ../src/message-window.c:284
+#: ../src/main-window.c:517 ../src/message-window.c:284
 msgid "Forward the current message as attachment"
 msgstr "Poslať ďalej aktuálnu správu ako prílohu"
 
-#: ../src/main-window.c:515 ../src/message-window.c:286
+#: ../src/main-window.c:519 ../src/message-window.c:286
 msgid "Forward _inline..."
 msgstr "Poslať ďalej _citované..."
 
-#: ../src/main-window.c:516 ../src/message-window.c:287
+#: ../src/main-window.c:520 ../src/message-window.c:287
 msgid "Forward the current message inline"
 msgstr "Poslať ďalej aktuálnu správu citovanú v tele správy"
 
-#: ../src/main-window.c:519
+#: ../src/main-window.c:523
 msgid "Pipe the message through another program"
 msgstr "Presmerovať správu cez iný program"
 
 #. File menu item
-#: ../src/main-window.c:527 ../src/message-window.c:242
-#: ../src/sendmsg-window.c:349
+#: ../src/main-window.c:531 ../src/message-window.c:242
+#: ../src/sendmsg-window.c:354
 msgid "_Print..."
 msgstr "_Tlačiť..."
 
-#: ../src/main-window.c:528 ../src/message-window.c:243
+#: ../src/main-window.c:532 ../src/message-window.c:243
 msgid "Print current message"
 msgstr "Vytlačiť aktuálnu správu"
 
-#: ../src/main-window.c:529 ../src/message-window.c:271
+#: ../src/main-window.c:533 ../src/message-window.c:271
 msgid "Save Current Part..."
 msgstr "Uložiť aktuálnu časť..."
 
-#: ../src/main-window.c:530 ../src/message-window.c:272
+#: ../src/main-window.c:534 ../src/message-window.c:272
 msgid "Save currently displayed part of message"
 msgstr "Uložiť aktuálne zobrazenú časť správy"
 
-#: ../src/main-window.c:533 ../src/message-window.c:289
+#: ../src/main-window.c:537 ../src/message-window.c:289
 msgid "_Next Part"
 msgstr "Ď_alšia časť"
 
-#: ../src/main-window.c:534 ../src/message-window.c:290
+#: ../src/main-window.c:538 ../src/message-window.c:290
 msgid "Next part in message"
 msgstr "Ďalšia časť v správe"
 
-#: ../src/main-window.c:535 ../src/message-window.c:291
+#: ../src/main-window.c:539 ../src/message-window.c:291
 msgid "_Previous Part"
 msgstr "_Predchádzajúca časť"
 
-#: ../src/main-window.c:536 ../src/message-window.c:292
+#: ../src/main-window.c:540 ../src/message-window.c:292
 msgid "Previous part in message"
 msgstr "Predchádzajúca časť v správe"
 
-#: ../src/main-window.c:539
+#: ../src/main-window.c:543
 msgid "Copy message"
 msgstr "Kopírovať správu"
 
-#: ../src/main-window.c:542 ../src/message-window.c:251
+#: ../src/main-window.c:546 ../src/message-window.c:251
 msgid "_Find in message"
 msgstr "_Nájsť v správe"
 
-#: ../src/main-window.c:543 ../src/message-window.c:252
+#: ../src/main-window.c:547 ../src/message-window.c:252
 msgid "Find a string in this message"
 msgstr "Nájsť reťazec v tejto správe"
 
-#: ../src/main-window.c:553 ../src/message-window.c:304
+#: ../src/main-window.c:557 ../src/message-window.c:304
 msgid "_Move to Trash"
 msgstr "Presunúť do _Koša"
 
-#: ../src/main-window.c:554 ../src/main-window.c:558
+#: ../src/main-window.c:558 ../src/main-window.c:562
 msgid "Move the current message to Trash mailbox"
 msgstr "Presunúť aktuálnu správu do priečinka Kôš"
 
-#: ../src/main-window.c:557
+#: ../src/main-window.c:561
 msgid "_Delete to Trash"
 msgstr "_Vymazať do Koša"
 
-#: ../src/main-window.c:561 ../src/main-window.c:570
+#: ../src/main-window.c:565 ../src/main-window.c:574
 msgid "Toggle New"
 msgstr "Označiť ako nová"
 
-#: ../src/main-window.c:563
+#: ../src/main-window.c:567
 msgid "_Toggle Flag"
 msgstr "_Prepnúť značku"
 
-#: ../src/main-window.c:566
+#: ../src/main-window.c:570
 msgid "Toggle flagged"
 msgstr "Prepnúť značku"
 
 #. Hide messages menu items
-#: ../src/main-window.c:567 ../src/main-window.c:596
+#: ../src/main-window.c:571 ../src/main-window.c:600
 msgid "_Deleted"
 msgstr "Vy_mazané"
 
-#: ../src/main-window.c:568
+#: ../src/main-window.c:572
 msgid "Toggle deleted flag"
 msgstr "Prepnúť príznak vymazania"
 
-#: ../src/main-window.c:571 ../src/main-window.c:608
+#: ../src/main-window.c:575 ../src/main-window.c:612
 msgid "_Answered"
 msgstr "_Odpovedané"
 
-#: ../src/main-window.c:572
+#: ../src/main-window.c:576
 msgid "Toggle Answered"
 msgstr "Prepnúť odpovedané"
 
-#: ../src/main-window.c:579
+#: ../src/main-window.c:583
 msgid "_Show Mailbox Tree"
 msgstr "Zobraziť _strom poštových schránok"
 
-#: ../src/main-window.c:580
+#: ../src/main-window.c:584
 msgid "Toggle display of mailbox and folder tree"
 msgstr "Prepnúť zobrazovanie stromu poštových schránok a zložiek"
 
-#: ../src/main-window.c:582
+#: ../src/main-window.c:586
 msgid "Show Mailbox _Tabs"
 msgstr "Zobraziť zá_ložky poštových schránok"
 
-#: ../src/main-window.c:583
+#: ../src/main-window.c:587
 msgid "Toggle display of mailbox notebook tabs"
 msgstr "Prepnúť zobrazovanie záložiek poštových schránok"
 
-#: ../src/main-window.c:586
+#: ../src/main-window.c:590
 msgid "_Descending"
 msgstr "_Zostupne"
 
-#: ../src/main-window.c:587
+#: ../src/main-window.c:591
 msgid "Sort in a descending order"
 msgstr "Triediť v zostupnom poradí"
 
-#: ../src/main-window.c:589
+#: ../src/main-window.c:593
 msgid "_View filter"
 msgstr "_Zobraziť filter"
 
-#: ../src/main-window.c:590
+#: ../src/main-window.c:594
 msgid "Enable quick message index filter"
 msgstr "Povoliť filter rýchleho indexu správ"
 
-#: ../src/main-window.c:593 ../src/message-window.c:311
+#: ../src/main-window.c:597 ../src/message-window.c:311
 msgid "_Wrap"
 msgstr "_Zalomiť"
 
-#: ../src/main-window.c:593 ../src/message-window.c:311
-#: ../src/sendmsg-window.c:366
+#: ../src/main-window.c:597 ../src/message-window.c:311
+#: ../src/sendmsg-window.c:371
 msgid "Wrap message lines"
 msgstr "Zalomiť riadky správy"
 
-#: ../src/main-window.c:598
+#: ../src/main-window.c:602
 msgid "Un_Deleted"
 msgstr "_Obnovené po vymyzaní"
 
-#: ../src/main-window.c:600
+#: ../src/main-window.c:604
 msgid "_Read"
 msgstr "_Prečítať"
 
-#: ../src/main-window.c:602
+#: ../src/main-window.c:606
 msgid "Un_read"
 msgstr "Nep_rečítané"
 
-#: ../src/main-window.c:606
+#: ../src/main-window.c:610
 msgid "Un_flagged"
 msgstr "Neo_značené"
 
-#: ../src/main-window.c:610
+#: ../src/main-window.c:614
 msgid "Un_answered"
 msgstr "Ne_odpovedané"
 
 #. Toolbar items not on any menu
-#: ../src/main-window.c:613 ../src/toolbar-factory.c:157
+#: ../src/main-window.c:617 ../src/toolbar-factory.c:159
 msgid ""
 "All\n"
 "headers"
@@ -4683,107 +4691,107 @@ msgstr ""
 "Všetky\n"
 "hlavičky"
 
-#: ../src/main-window.c:614 ../src/message-window.c:314
+#: ../src/main-window.c:618 ../src/message-window.c:314
 msgid "Show all headers"
 msgstr "Zobraziť všetky hlavičky"
 
-#: ../src/main-window.c:616 ../src/toolbar-factory.c:159
+#: ../src/main-window.c:620 ../src/toolbar-factory.c:161
 msgid "Msg Preview"
 msgstr "Náhľad správy"
 
-#: ../src/main-window.c:617
+#: ../src/main-window.c:621
 msgid "Show preview pane"
 msgstr "Zobraziť panel náhľadu"
 
-#: ../src/main-window.c:623
+#: ../src/main-window.c:627
 msgid "_No Headers"
 msgstr "_Bez hlavičiek"
 
-#: ../src/main-window.c:624 ../src/message-window.c:321
+#: ../src/main-window.c:628 ../src/message-window.c:321
 msgid "Display no headers"
 msgstr "Nezobrazovať hlavičky správ"
 
-#: ../src/main-window.c:625
+#: ../src/main-window.c:629
 msgid "S_elected Headers"
 msgstr "_Vybrané hlavičky"
 
-#: ../src/main-window.c:626 ../src/message-window.c:323
+#: ../src/main-window.c:630 ../src/message-window.c:323
 msgid "Display selected headers"
 msgstr "Zobrazovať vybrané hlavičky správ"
 
-#: ../src/main-window.c:627 ../src/message-window.c:324
+#: ../src/main-window.c:631 ../src/message-window.c:324
 msgid "All _Headers"
 msgstr "Všetky _hlavičky"
 
-#: ../src/main-window.c:628 ../src/message-window.c:325
+#: ../src/main-window.c:632 ../src/message-window.c:325
 msgid "Display all headers"
 msgstr "Zobrazovať všetky hlavičky správ"
 
-#: ../src/main-window.c:632
+#: ../src/main-window.c:636
 msgid "_Flat index"
 msgstr "_Postupný index"
 
-#: ../src/main-window.c:633
+#: ../src/main-window.c:637
 msgid "No threading at all"
 msgstr "Bez vláken"
 
-#: ../src/main-window.c:634
+#: ../src/main-window.c:638
 msgid "Si_mple threading"
 msgstr "J_ednoduché vlákna"
 
-#: ../src/main-window.c:635
+#: ../src/main-window.c:639
 msgid "Simple threading algorithm"
 msgstr "Algoritmus jednoduchých vláken"
 
-#: ../src/main-window.c:636
+#: ../src/main-window.c:640
 msgid "_JWZ threading"
 msgstr "Vlákna _JWZ"
 
-#: ../src/main-window.c:637
+#: ../src/main-window.c:641
 msgid "Elaborate JWZ threading"
 msgstr "Prepracované vlákna JWZ"
 
-#: ../src/main-window.c:642
+#: ../src/main-window.c:646
 msgid "By _Arrival"
 msgstr "Podľa _príchodu"
 
-#: ../src/main-window.c:643
+#: ../src/main-window.c:647
 msgid "Arrival order"
 msgstr "Poradie príchodu"
 
-#: ../src/main-window.c:644
+#: ../src/main-window.c:648
 msgid "By _Sender"
 msgstr "Podľa _odosielateľa"
 
-#: ../src/main-window.c:645
+#: ../src/main-window.c:649
 msgid "Sender order"
 msgstr "Poradie odosielateľa"
 
-#: ../src/main-window.c:646
+#: ../src/main-window.c:650
 msgid "By S_ubject"
 msgstr "Podľa _predmetu"
 
-#: ../src/main-window.c:647
+#: ../src/main-window.c:651
 msgid "Subject order"
 msgstr "Poradie predmetu"
 
-#: ../src/main-window.c:648
+#: ../src/main-window.c:652
 msgid "By Si_ze"
 msgstr "Podľa _veľkosti"
 
-#: ../src/main-window.c:649
+#: ../src/main-window.c:653
 msgid "By message size"
 msgstr "Podľa veľkosti správy"
 
-#: ../src/main-window.c:650
+#: ../src/main-window.c:654
 msgid "_Threaded"
 msgstr "_Vlákna"
 
-#: ../src/main-window.c:651
+#: ../src/main-window.c:655
 msgid "Use message threading"
 msgstr "Použiť vlákna správ"
 
-#: ../src/main-window.c:988
+#: ../src/main-window.c:992
 msgid ""
 "Balsa is sending a mail now.\n"
 "Abort sending?"
@@ -4791,36 +4799,36 @@ msgstr ""
 "Balsa teraz odosiela poštu.\n"
 "Prerušiť odosielanie?"
 
-#: ../src/main-window.c:1158
+#: ../src/main-window.c:1162
 msgid "Subject or Sender Contains:"
 msgstr "Predmet alebo odosielateľ obsahujú:"
 
-#: ../src/main-window.c:1159
+#: ../src/main-window.c:1163
 msgid "Subject or Recipient Contains:"
 msgstr "Predmet alebo príjemca obsahujú:"
 
-#: ../src/main-window.c:1160
+#: ../src/main-window.c:1164
 msgid "Subject Contains:"
 msgstr "Predmet obsahuje:"
 
-#: ../src/main-window.c:1161
+#: ../src/main-window.c:1165
 msgid "Body Contains:"
 msgstr "Telo obsahuje:"
 
-#: ../src/main-window.c:1162
+#: ../src/main-window.c:1166
 msgid "Older than (days):"
 msgstr "Staršie ako (dni):"
 
-#: ../src/main-window.c:1163
+#: ../src/main-window.c:1167
 msgid "Old at most (days):"
 msgstr "Staršie najviac (dni):"
 
-#: ../src/main-window.c:2216
+#: ../src/main-window.c:2238
 #, c-format
 msgid "Opening %s"
 msgstr "Otváranie %s"
 
-#: ../src/main-window.c:2235
+#: ../src/main-window.c:2257
 #, c-format
 msgid ""
 "Unable to Open Mailbox!\n"
@@ -4829,52 +4837,39 @@ msgstr ""
 "Nepodarilo sa otvoriť poštovú schránku!\n"
 "%s."
 
-#: ../src/main-window.c:2599
+#: ../src/main-window.c:2619
 msgid "translator-credits"
 msgstr "Marcel Telka <marcel@telka.sk>"
 
-#: ../src/main-window.c:2612
+#: ../src/main-window.c:2631
 msgid "The Balsa email client is part of the GNOME desktop environment."
 msgstr ""
 "Klient elektronickej pošty Balsa je súčasťou pracovného prostredia GNOME."
 
-#: ../src/main-window.c:2638
-msgid ""
-"The Balsa email client is part of the GNOME desktop environment.  "
-"Information on Balsa can be found at http://balsa.gnome.org/\n"
-"\n"
-"If you need to report bugs, please do so at: http://bugzilla.gnome.org/"
-msgstr ""
-"Klient elektronickej pošty Balsa je súčasťou pracovného prostredia GNOME.  "
-"Informácie o programe Balsa môžete nájsť na adrese http://balsa.gnome.org/\n"
-"\n"
-"Ak potrebujete oznámiť chyby v programe, urobte tak, prosím, na adrese "
-"http://bugzilla.gnome.org/"
-
-#: ../src/main-window.c:2742 ../src/main-window.c:2755
+#: ../src/main-window.c:2732 ../src/main-window.c:2745
 msgid "Checking Mail..."
 msgstr "Kontrolujem poštu..."
 
-#: ../src/main-window.c:2950
+#: ../src/main-window.c:2940
 #, c-format
 msgid "IMAP mailbox: %s"
 msgstr "Poštová schránka IMAP: %s"
 
-#: ../src/main-window.c:2954
+#: ../src/main-window.c:2944
 #, c-format
 msgid "Local mailbox: %s"
 msgstr "Lokálna poštová schránka: %s"
 
-#: ../src/main-window.c:3101
+#: ../src/main-window.c:3091
 msgid "Finished Checking."
 msgstr "Kontrola ukončená."
 
-#: ../src/main-window.c:3166
+#: ../src/main-window.c:3156
 #, c-format
 msgid "Sending error: %s"
 msgstr "Chyba pri posielaní: %s"
 
-#: ../src/main-window.c:3231
+#: ../src/main-window.c:3221
 #, c-format
 msgid "You have received %d new message."
 msgid_plural "You have received %d new messages."
@@ -4882,11 +4877,11 @@ msgstr[0] "Prijali ste %d nových správ."
 msgstr[1] "Prijali ste %d novú správu."
 msgstr[2] "Prijali ste %d nové správy."
 
-#: ../src/main-window.c:3234
+#: ../src/main-window.c:3224
 msgid "You have new mail."
 msgstr "Máte novú poštu."
 
-#: ../src/main-window.c:3293
+#: ../src/main-window.c:3282
 #, c-format
 msgid "Balsa: you have received %d new message."
 msgid_plural "Balsa: you have received %d new messages."
@@ -4894,70 +4889,70 @@ msgstr[0] "Balsa: prijali ste %d nových správ."
 msgstr[1] "Balsa: prijali ste %d novú správu."
 msgstr[2] "Balsa: prijali ste %d nové správy."
 
-#: ../src/main-window.c:3297
+#: ../src/main-window.c:3286
 msgid "Balsa: you have new mail."
 msgstr "Balsa: máte novú poštu."
 
-#: ../src/main-window.c:3348
+#: ../src/main-window.c:3337
 msgid "Balsa: New mail"
 msgstr "Balsa: Nová pošta"
 
-#: ../src/main-window.c:3521
+#: ../src/main-window.c:3510
 #, c-format
 msgid "The next unread message is in %s"
 msgstr "Ďalšia neprečítaná správa je v %s"
 
-#: ../src/main-window.c:3525
+#: ../src/main-window.c:3514
 #, c-format
 msgid "Do you want to switch to %s?"
 msgstr "Chcete sa prepnúť do %s?"
 
-#: ../src/main-window.c:4028
+#: ../src/main-window.c:4017
 msgid "Search mailbox"
 msgstr "Vyhľadať v poštovej schránke"
 
-#: ../src/main-window.c:4045
+#: ../src/main-window.c:4034
 msgid "_Search for:"
 msgstr "_Vyhľadať:"
 
 #. builds the toggle buttons to specify fields concerned by
 #. * the search.
-#: ../src/main-window.c:4058
+#: ../src/main-window.c:4047
 msgid "In:"
 msgstr "V:"
 
-#: ../src/main-window.c:4069
+#: ../src/main-window.c:4058
 msgid "S_ubject"
 msgstr "_Predmet"
 
 #. Frame with Apply and Clear buttons
-#: ../src/main-window.c:4074
+#: ../src/main-window.c:4063
 msgid "Show only matching messages"
 msgstr "Zobraziť len zodpovedajúce správy"
 
 #. Frame with OK button
-#: ../src/main-window.c:4095
+#: ../src/main-window.c:4084
 msgid "Open next matching message"
 msgstr "Otvoriť ďalšiu zodpovedajúcu správu"
 
-#: ../src/main-window.c:4106
+#: ../src/main-window.c:4095
 msgid "_Reverse search"
 msgstr "_Spätné vyhľadávanie"
 
-#: ../src/main-window.c:4111
+#: ../src/main-window.c:4100
 msgid "_Wrap around"
 msgstr "_Prechádzať dookola"
 
-#: ../src/main-window.c:4290
+#: ../src/main-window.c:4279
 msgid "You can apply filters only on mailbox\n"
 msgstr "Môžete aplikovať filtre len na poštovú schránku\n"
 
-#: ../src/main-window.c:4305
+#: ../src/main-window.c:4294
 #, c-format
 msgid "Removing duplicates failed: %s"
 msgstr "Odstránenie suplikátov zlyhalo: %s"
 
-#: ../src/main-window.c:4311
+#: ../src/main-window.c:4300
 #, c-format
 msgid "Removed %d duplicate"
 msgid_plural "Removed %d duplicates"
@@ -4965,100 +4960,100 @@ msgstr[0] "Odstránených %d duplikátov"
 msgstr[1] "Odstránený %d duplikát"
 msgstr[2] "Odstránené %d duplikáty"
 
-#: ../src/main-window.c:4316
+#: ../src/main-window.c:4305
 msgid "No duplicates found"
 msgstr "Duplikáty neboli nájdené!"
 
-#: ../src/main-window.c:4533
+#: ../src/main-window.c:4522
 #, c-format
 msgid "Could not open trash: %s"
 msgstr "Nepodarilo sa otvoriť kôš: %s"
 
-#: ../src/main-window.c:4687
+#: ../src/main-window.c:4676
 #, c-format
 msgid "Balsa: %s (readonly)"
 msgstr "Balsa: %s (len na čítanie)"
 
-#: ../src/main-window.c:4689
+#: ../src/main-window.c:4678
 #, c-format
 msgid "Balsa: %s"
 msgstr "Balsa: %s"
 
-#: ../src/main.c:234 ../src/main.c:283
+#: ../src/main.c:242 ../src/main.c:291
 msgid "Get new mail on startup"
 msgstr "Získať novú poštu pri štarte programu"
 
-#: ../src/main.c:236 ../src/main.c:285
+#: ../src/main.c:244 ../src/main.c:293
 msgid "Compose a new email to EMAIL@ADDRESS"
 msgstr "Vytvoriť novú správu pre ELEKTRONICKÁ@ADRESA"
 
-#: ../src/main.c:238
+#: ../src/main.c:246
 msgid "Attach file at PATH"
 msgstr "Pripojiť súbor na CESTE"
 
-#: ../src/main.c:240 ../src/main.c:290
+#: ../src/main.c:248 ../src/main.c:298
 msgid "Opens MAILBOXNAME"
 msgstr "Otvorí POŠTOVÚSCHRÁNKU"
 
-#: ../src/main.c:240 ../src/main.c:290
+#: ../src/main.c:248 ../src/main.c:298
 msgid "MAILBOXNAME"
 msgstr "POŠTOVÁSCHRÁNKA"
 
-#: ../src/main.c:243 ../src/main.c:293
+#: ../src/main.c:251 ../src/main.c:301
 msgid "Opens first unread mailbox"
 msgstr "Otvoriť prvú poštovú schránku s neprečítanými správami"
 
-#: ../src/main.c:246 ../src/main.c:296
+#: ../src/main.c:254 ../src/main.c:304
 msgid "Opens default Inbox on startup"
 msgstr "Otvorí štandardne Doručenú poštu pri štarte programu"
 
-#: ../src/main.c:249 ../src/main.c:299
+#: ../src/main.c:257 ../src/main.c:307
 msgid "Prints number unread and unsent messages"
 msgstr "Vytlačiť počet neprečítaných a neodoslaných správ"
 
-#: ../src/main.c:251 ../src/main.c:301
+#: ../src/main.c:259 ../src/main.c:309
 msgid "Debug POP3 connection"
 msgstr "Ladiť POP3 spojenie"
 
-#: ../src/main.c:253 ../src/main.c:303
+#: ../src/main.c:261 ../src/main.c:311
 msgid "Debug IMAP connection"
 msgstr "Ladiť IMAP spojenie"
 
-#: ../src/main.c:275
+#: ../src/main.c:283
 msgid "The Balsa E-Mail Client"
 msgstr "Klient elektronickej pošty Balsa"
 
-#: ../src/main.c:287
+#: ../src/main.c:295
 msgid "Attach file at URI"
 msgstr "Pripojiť súbor na URI"
 
-#: ../src/main.c:357 ../src/main.c:362 ../src/main.c:368 ../src/main.c:374
-#: ../src/main.c:380
+#: ../src/main.c:371 ../src/main.c:376 ../src/main.c:382 ../src/main.c:388
+#: ../src/main.c:394
 #, c-format
 msgid "Balsa cannot open your \"%s\" mailbox."
 msgstr "Balsa nemôže otvoriť vašu poštovú schránku \"%s\"."
 
-#: ../src/main.c:357
+#: ../src/main.c:371
 msgid "Inbox"
 msgstr "Doručená pošta"
 
-#: ../src/main.c:363
+#: ../src/main.c:377
 msgid "Outbox"
 msgstr "Pošta na odoslanie"
 
-#: ../src/main.c:369
+#: ../src/main.c:383
 msgid "Sentbox"
 msgstr "Odoslaná pošta"
 
-#: ../src/main.c:375
+#: ../src/main.c:389
 msgid "Draftbox"
 msgstr "Nedokončená pošta"
 
-#: ../src/main.c:380
+#: ../src/main.c:394
 msgid "Trash"
 msgstr "Kôš"
 
-#: ../src/main.c:597
+#: ../src/main.c:615
 msgid "Compressing mail folders..."
 msgstr "Komprimujem poštové priečinky..."
 
@@ -5124,137 +5119,137 @@ msgid "JWZ"
 msgstr "JWZ"
 
 #. must NOT be modal
-#: ../src/pref-manager.c:517
+#: ../src/pref-manager.c:515
 msgid "Balsa Preferences"
 msgstr "Nastavenia programu Balsa"
 
-#: ../src/pref-manager.c:566
+#: ../src/pref-manager.c:564
 msgid "Mail options"
 msgstr "Nastavenia pošty"
 
-#: ../src/pref-manager.c:568
+#: ../src/pref-manager.c:566
 msgid "Display options"
 msgstr "Nastavenia zobrazenia"
 
-#: ../src/pref-manager.c:570 ../src/pref-manager.c:2780
+#: ../src/pref-manager.c:568 ../src/pref-manager.c:2747
 msgid "Address books"
 msgstr "Adresáre"
 
-#: ../src/pref-manager.c:574 ../src/toolbar-factory.c:153
+#: ../src/pref-manager.c:572 ../src/toolbar-factory.c:155
 msgid "Spelling"
 msgstr "Korekcia preklepov"
 
-#: ../src/pref-manager.c:578
+#: ../src/pref-manager.c:576
 msgid "Startup"
 msgstr "Pri štarte"
 
-#: ../src/pref-manager.c:580 ../src/pref-manager.c:2568
+#: ../src/pref-manager.c:578 ../src/pref-manager.c:2535
 msgid "Miscellaneous"
 msgstr "Rôzne"
 
-#: ../src/pref-manager.c:1350
+#: ../src/pref-manager.c:1333
 #, c-format
 msgid "%s (default)"
 msgstr "%s (predvolené)"
 
-#: ../src/pref-manager.c:1610
+#: ../src/pref-manager.c:1593
 msgid "Remote mailbox servers"
 msgstr "Vzdialené servery s poštovými schránkami"
 
-#: ../src/pref-manager.c:1631 ../src/pref-manager.c:2801
-#: ../src/sendmsg-window.c:2987
+#: ../src/pref-manager.c:1614 ../src/pref-manager.c:2768
+#: ../src/sendmsg-window.c:2992
 msgid "Type"
 msgstr "Typ"
 
-#: ../src/pref-manager.c:1639
+#: ../src/pref-manager.c:1622
 msgid "Mailbox name"
 msgstr "Názov poštovej schránky"
 
-#: ../src/pref-manager.c:1653 ../src/pref-manager.c:1742
-#: ../src/pref-manager.c:2836
+#: ../src/pref-manager.c:1636 ../src/pref-manager.c:1709
+#: ../src/pref-manager.c:2803
 msgid "_Modify"
 msgstr "_Upraviť"
 
-#: ../src/pref-manager.c:1667
+#: ../src/pref-manager.c:1650
 msgid "Local mail directory"
 msgstr "Miestny poštový adresár"
 
-#: ../src/pref-manager.c:1670 ../src/pref-manager.c:1678
+#: ../src/pref-manager.c:1652
 msgid "Select your local mail directory"
 msgstr "Vyberte váš lokálny adresár pre poštu"
 
-#: ../src/pref-manager.c:1706
+#: ../src/pref-manager.c:1673
 msgid "Outgoing mail servers"
 msgstr "Servery odchádzajúcej pošty"
 
-#: ../src/pref-manager.c:1728
+#: ../src/pref-manager.c:1695
 msgid "Server name"
 msgstr "Názov servera"
 
-#: ../src/pref-manager.c:1768
+#: ../src/pref-manager.c:1735
 msgid "Mail servers"
 msgstr "Poštové servery"
 
-#: ../src/pref-manager.c:1770
+#: ../src/pref-manager.c:1737
 msgid "Incoming"
 msgstr "Prichádzajúca"
 
-#: ../src/pref-manager.c:1772
+#: ../src/pref-manager.c:1739
 msgid "Outgoing"
 msgstr "Odchádzajúca"
 
-#: ../src/pref-manager.c:1799
+#: ../src/pref-manager.c:1766
 msgid "Checking"
 msgstr "Kontrola"
 
-#: ../src/pref-manager.c:1805
+#: ../src/pref-manager.c:1772
 msgid "_Check mail automatically every"
 msgstr "_Kontrolovať poštu automaticky každých"
 
-#: ../src/pref-manager.c:1816 ../src/pref-manager.c:2591
-#: ../src/pref-manager.c:2651
+#: ../src/pref-manager.c:1783 ../src/pref-manager.c:2558
+#: ../src/pref-manager.c:2618
 msgid "minutes"
 msgstr "minút"
 
-#: ../src/pref-manager.c:1823
+#: ../src/pref-manager.c:1790
 msgid "Check _IMAP mailboxes"
 msgstr "Kontrolovať poštové schránky typu _IMAP"
 
-#: ../src/pref-manager.c:1829
+#: ../src/pref-manager.c:1796
 msgid "Check INBOX _only"
 msgstr "Kontrolovať _len Doručenú poštu"
 
-#: ../src/pref-manager.c:1836
+#: ../src/pref-manager.c:1803
 msgid "When mail arrives:"
 msgstr "Keď príde pošta:"
 
-#: ../src/pref-manager.c:1841
+#: ../src/pref-manager.c:1808
 msgid "Display message"
 msgstr "Zobraziť správu"
 
-#: ../src/pref-manager.c:1846
+#: ../src/pref-manager.c:1813
 msgid "Play sound"
 msgstr "Prehrať zvuk"
 
-#: ../src/pref-manager.c:1852
+#: ../src/pref-manager.c:1819
 msgid "Show icon"
 msgstr "Zobraziť ikonu"
 
-#: ../src/pref-manager.c:1862
+#: ../src/pref-manager.c:1829
 msgid "Do background check quietly (no messages in status bar)"
 msgstr "Kontrolovať na pozadí bez oznámenia (bez správ na stavovej lište)"
 
-#: ../src/pref-manager.c:1867
+#: ../src/pref-manager.c:1834
 msgid "_POP message size limit:"
 msgstr "Limit veľkosti _POP správy:"
 
 #. Quoted text regular expression
 #. and RFC2646-style flowed text
-#: ../src/pref-manager.c:1894
+#: ../src/pref-manager.c:1861
 msgid "Quoted and flowed text"
 msgstr "Citovaný a formátovaný text"
 
-#: ../src/pref-manager.c:1898
+#: ../src/pref-manager.c:1865
 msgid ""
 "Quoted text\n"
 "regular expression:"
@@ -5262,43 +5257,43 @@ msgstr ""
 "Regulárny výraz\n"
 "pre citovaný text:"
 
-#: ../src/pref-manager.c:1906
+#: ../src/pref-manager.c:1873
 msgid "Wrap text at"
 msgstr "Zalomiť text na"
 
-#: ../src/pref-manager.c:1918 ../src/pref-manager.c:2085
+#: ../src/pref-manager.c:1885 ../src/pref-manager.c:2052
 msgid "characters"
 msgstr "znakov"
 
 #. handling of multipart/alternative
-#: ../src/pref-manager.c:1933
+#: ../src/pref-manager.c:1900
 msgid "Display of multipart/alternative parts"
 msgstr "Zobrazenie častí multipart/alternative"
 
-#: ../src/pref-manager.c:1936
+#: ../src/pref-manager.c:1903
 msgid "Prefer text/plain over html"
 msgstr "Preferovať text/plain pred html"
 
-#: ../src/pref-manager.c:1952
+#: ../src/pref-manager.c:1919
 msgid "National (8-bit) characters in broken messages without codeset header"
 msgstr ""
 "Národné (8 bitové) znaky v poškodených správach bez hlavičky so znakovou "
 "sadou"
 
-#: ../src/pref-manager.c:1959
+#: ../src/pref-manager.c:1926
 msgid "display as \"?\""
 msgstr "zobraziť ako \"?\""
 
-#: ../src/pref-manager.c:1968
+#: ../src/pref-manager.c:1935
 msgid "display in codeset"
 msgstr "zobraziť v znakovej sade"
 
 #. How to handle received MDN requests
-#: ../src/pref-manager.c:1998
+#: ../src/pref-manager.c:1965
 msgid "Message disposition notification requests"
 msgstr "Požadavky na Oznámenie o doručení správy (MDN)"
 
-#: ../src/pref-manager.c:2000
+#: ../src/pref-manager.c:1967
 msgid ""
 "When I receive a message whose sender requested a Message Disposition "
 "Notification (MDN), send it if:"
@@ -5306,7 +5301,7 @@ msgstr ""
 "Keď dostanem správu, ktorej odosielateľ požadoval Oznámenie\n"
 "o doručení správy (MDN), poslať ho ak:"
 
-#: ../src/pref-manager.c:2012
+#: ../src/pref-manager.c:1979
 msgid ""
 "The message header looks clean\n"
 "(the notify-to address is the return path,\n"
@@ -5316,241 +5311,241 @@ msgstr ""
 "(adresa oznámenie-pre je návratovou adresou,\n"
 "a som v zozname príjemcov alebo príjemcov kópie)"
 
-#: ../src/pref-manager.c:2029
+#: ../src/pref-manager.c:1996
 msgid "The message header looks suspicious."
 msgstr "Hlavička správy vyzerá podozrivo."
 
-#: ../src/pref-manager.c:2066
+#: ../src/pref-manager.c:2033
 msgid "Word wrap"
 msgstr "Zalamovanie"
 
-#: ../src/pref-manager.c:2071
+#: ../src/pref-manager.c:2038
 msgid "Wrap outgoing text at"
 msgstr "Zalomiť odchádzajúci text na pozícii"
 
-#: ../src/pref-manager.c:2099
+#: ../src/pref-manager.c:2066
 msgid "Other options"
 msgstr "Ostatné nastavenia"
 
-#: ../src/pref-manager.c:2104
+#: ../src/pref-manager.c:2071
 msgid "Reply prefix:"
 msgstr "Predpona pri odpovedi:"
 
-#: ../src/pref-manager.c:2107
+#: ../src/pref-manager.c:2074
 msgid "Automatically quote original when replying"
 msgstr "Automaticky citovať originál pri odpovedi"
 
-#: ../src/pref-manager.c:2110
+#: ../src/pref-manager.c:2077
 msgid "Forward a mail as attachment instead of quoting it"
 msgstr "Poslať správu ďalej ako prílohu namiesto jej citovania"
 
-#: ../src/pref-manager.c:2113
+#: ../src/pref-manager.c:2080
 msgid "Copy outgoing messages to sentbox"
 msgstr "Kopírujem odchádzajúce správy to odoslanej pošty"
 
-#: ../src/pref-manager.c:2115
+#: ../src/pref-manager.c:2082
 msgid "Send button always queues outgoing mail in outbox"
 msgstr ""
 "Odoslanie vždy zaradí správu do radu v priečinku \"Pošta na odoslanie\""
 
-#: ../src/pref-manager.c:2118
+#: ../src/pref-manager.c:2085
 msgid "Edit headers in external editor"
 msgstr "Upraviť hlavičky v externom editore"
 
-#: ../src/pref-manager.c:2120
+#: ../src/pref-manager.c:2087
 msgid "Include HTML parts as text when replying or forwarding"
 msgstr "Vložiť časti HTML ako text pri odpovedaní alebo posielaní ďalej"
 
-#: ../src/pref-manager.c:2137
+#: ../src/pref-manager.c:2104
 msgid "Layout"
 msgstr "Usporiadanie"
 
-#: ../src/pref-manager.c:2139
+#: ../src/pref-manager.c:2106
 msgid "Sort and thread"
 msgstr "Triedenie a vlákno"
 
-#: ../src/pref-manager.c:2141 ../src/print-gtk.c:483
+#: ../src/pref-manager.c:2108 ../src/print-gtk.c:483
 msgid "Message"
 msgstr "Správa"
 
-#: ../src/pref-manager.c:2143
+#: ../src/pref-manager.c:2110
 msgid "Colors"
 msgstr "Farby"
 
-#: ../src/pref-manager.c:2145 ../src/pref-manager.c:2233
+#: ../src/pref-manager.c:2112 ../src/pref-manager.c:2200
 msgid "Format"
 msgstr "Formát"
 
-#: ../src/pref-manager.c:2147
+#: ../src/pref-manager.c:2114
 msgid "Status messages"
 msgstr "Stavové správy"
 
-#: ../src/pref-manager.c:2172 ../src/toolbar-prefs.c:163
+#: ../src/pref-manager.c:2139 ../src/toolbar-prefs.c:163
 msgid "Main window"
 msgstr "Hlavné okno"
 
-#: ../src/pref-manager.c:2175
+#: ../src/pref-manager.c:2142
 msgid "Use preview pane"
 msgstr "Použiť panel rýchleho zobrazovania"
 
-#: ../src/pref-manager.c:2177
+#: ../src/pref-manager.c:2144
 msgid "Show mailbox statistics in left pane"
 msgstr "Zobraziť štatistiky poštových schránok v ľavom paneli"
 
-#: ../src/pref-manager.c:2179
+#: ../src/pref-manager.c:2146
 msgid "Use alternative main window layout"
 msgstr "Použiť alternatívne usporiadanie hlavného okna"
 
-#: ../src/pref-manager.c:2181
+#: ../src/pref-manager.c:2148
 msgid "Automatically view message when mailbox opened"
 msgstr "Automaticky zobraziť správu pri otvorení poštovej schránky"
 
-#: ../src/pref-manager.c:2187
+#: ../src/pref-manager.c:2154
 msgid "PageUp/PageDown keys scroll text by"
 msgstr "Klávesy PageUp/PageDown rolujú text o"
 
-#: ../src/pref-manager.c:2198
+#: ../src/pref-manager.c:2165
 msgid "percent"
 msgstr "percento"
 
-#: ../src/pref-manager.c:2213
+#: ../src/pref-manager.c:2180
 msgid "Display progress dialog"
 msgstr "Zobraziť okno so stavom vykonávania"
 
-#: ../src/pref-manager.c:2238
+#: ../src/pref-manager.c:2205
 msgid "Date encoding (for strftime):"
 msgstr "Kódovanie dátumu (pre strftime):"
 
-#: ../src/pref-manager.c:2240
+#: ../src/pref-manager.c:2207
 msgid "Selected headers:"
 msgstr "Vybrané hlavičky:"
 
-#: ../src/pref-manager.c:2262
+#: ../src/pref-manager.c:2229
 msgid "Information messages"
 msgstr "Informačné správy"
 
-#: ../src/pref-manager.c:2267
+#: ../src/pref-manager.c:2234
 msgid "Information messages:"
 msgstr "Informačné správy:"
 
-#: ../src/pref-manager.c:2271
+#: ../src/pref-manager.c:2238
 msgid "Warning messages:"
 msgstr "Upozorňovacie správy:"
 
-#: ../src/pref-manager.c:2275
+#: ../src/pref-manager.c:2242
 msgid "Error messages:"
 msgstr "Chybové správy:"
 
-#: ../src/pref-manager.c:2279
+#: ../src/pref-manager.c:2246
 msgid "Fatal error messages:"
 msgstr "Závažné chybové správy:"
 
-#: ../src/pref-manager.c:2283
+#: ../src/pref-manager.c:2250
 msgid "Debug messages:"
 msgstr "Ladiace správy:"
 
-#: ../src/pref-manager.c:2309
+#: ../src/pref-manager.c:2276
 msgid "Message colors"
 msgstr "Farby správy"
 
-#: ../src/pref-manager.c:2314
+#: ../src/pref-manager.c:2281
 #, c-format
 msgid "Quote level %d color"
 msgstr "Farba citovaného textu úrovne %d"
 
-#: ../src/pref-manager.c:2327
+#: ../src/pref-manager.c:2294
 msgid "Link color"
 msgstr "Farba odkazu"
 
-#: ../src/pref-manager.c:2329
+#: ../src/pref-manager.c:2296
 msgid "Hyperlink color"
 msgstr "Farba hyperlinky"
 
-#: ../src/pref-manager.c:2340
+#: ../src/pref-manager.c:2307
 msgid "Composition window"
 msgstr "Okno novej správy"
 
-#: ../src/pref-manager.c:2344
+#: ../src/pref-manager.c:2311
 msgid "Invalid or incomplete address label color"
 msgstr "Neplatná alebo nekompletná farba návestia adresy"
 
-#: ../src/pref-manager.c:2367 ../src/print-gtk.c:492
+#: ../src/pref-manager.c:2334 ../src/print-gtk.c:492
 msgid "Fonts"
 msgstr "Písma"
 
-#: ../src/pref-manager.c:2371
+#: ../src/pref-manager.c:2338
 msgid "Message font:"
 msgstr "Písmo správy:"
 
-#: ../src/pref-manager.c:2379
+#: ../src/pref-manager.c:2346
 msgid "Subject font:"
 msgstr "Písmo predmetu:"
 
-#: ../src/pref-manager.c:2417
+#: ../src/pref-manager.c:2384
 msgid "Sorting and threading"
 msgstr "Triedenie a vytváranie vláken"
 
-#: ../src/pref-manager.c:2421
+#: ../src/pref-manager.c:2388
 msgid "Default sort column:"
 msgstr "Predvolený stĺpec triedenia:"
 
-#: ../src/pref-manager.c:2425
+#: ../src/pref-manager.c:2392
 msgid "Default threading style:"
 msgstr "Predvolený štýl vláken:"
 
-#: ../src/pref-manager.c:2430
+#: ../src/pref-manager.c:2397
 msgid "Expand threads on open"
 msgstr "Rozbaliť vlákna pri otvorení"
 
-#: ../src/pref-manager.c:2505
+#: ../src/pref-manager.c:2472
 msgid "Pspell settings"
 msgstr "Nastavenia pre pspell"
 
-#: ../src/pref-manager.c:2511
+#: ../src/pref-manager.c:2478
 msgid "Spell check module"
 msgstr "Modul pre kontrolu preklepov"
 
-#: ../src/pref-manager.c:2517
+#: ../src/pref-manager.c:2484
 msgid "Suggestion level"
 msgstr "Úroveň návrhov"
 
 #. do the ignore length
-#: ../src/pref-manager.c:2522
+#: ../src/pref-manager.c:2489
 msgid "Ignore words shorter than"
 msgstr "Ignorovať slová kratšie ako"
 
-#: ../src/pref-manager.c:2540
+#: ../src/pref-manager.c:2507
 msgid "Miscellaneous spelling settings"
 msgstr "Rôzne nastavenia korektora"
 
-#: ../src/pref-manager.c:2542
+#: ../src/pref-manager.c:2509
 msgid "Check signature"
 msgstr "Kontrolovať podpis"
 
-#: ../src/pref-manager.c:2543
+#: ../src/pref-manager.c:2510
 msgid "Check quoted"
 msgstr "Kontrolovať citované"
 
-#: ../src/pref-manager.c:2570
+#: ../src/pref-manager.c:2537
 msgid "Debug"
 msgstr "Ladenie"
 
-#: ../src/pref-manager.c:2571
+#: ../src/pref-manager.c:2538
 msgid "Empty trash on exit"
 msgstr "Pri odchode vyprázdniť kôš"
 
-#: ../src/pref-manager.c:2578
+#: ../src/pref-manager.c:2545
 msgid "Close mailbox if unused more than"
 msgstr "Zatvoriť poštovú schránku, ak je nepoužívaná dlhšie ako"
 
-#: ../src/pref-manager.c:2606
+#: ../src/pref-manager.c:2573
 msgid "Deleting messages"
 msgstr "Vymazávanie správ"
 
 #. Translators: this used to be "using Mailbox -> Hide messages";
 #. * the UTF-8 string for the right-arrow symbol is broken out to
 #. * avoid msgconv problems.
-#: ../src/pref-manager.c:2611
+#: ../src/pref-manager.c:2578
 #, c-format
 msgid ""
 "The following setting is global, but may be overridden for the selected "
@@ -5559,51 +5554,51 @@ msgstr ""
 "Nasledujúce nastavenie je globálne, ale môže byť prekryté pre vybranú "
 "poštovú schránku pomocou Poštová schránky %s Skryť správy:"
 
-#: ../src/pref-manager.c:2623
+#: ../src/pref-manager.c:2590
 msgid "Hide messages marked as deleted"
 msgstr "Skryť správy označené na vymazanie"
 
-#: ../src/pref-manager.c:2625
+#: ../src/pref-manager.c:2592
 msgid "The following settings are global:"
 msgstr "Nasledujúce nastavenia sú globálne:"
 
-#: ../src/pref-manager.c:2631
+#: ../src/pref-manager.c:2598
 msgid "Expunge deleted messages when mailbox is closed"
 msgstr "Vymazať odstránené správy pri zatváraní poštovej schránky"
 
-#: ../src/pref-manager.c:2638
+#: ../src/pref-manager.c:2605
 msgid "...and if unused more than"
 msgstr "...a ak je nepoužívaná dlhšie ako"
 
-#: ../src/pref-manager.c:2663 ../src/toolbar-prefs.c:177
+#: ../src/pref-manager.c:2630 ../src/toolbar-prefs.c:177
 msgid "Message window"
 msgstr "Okno správy"
 
-#: ../src/pref-manager.c:2668
+#: ../src/pref-manager.c:2635
 msgid "After moving a message:"
 msgstr "Po presunutí správy:"
 
-#: ../src/pref-manager.c:2697
+#: ../src/pref-manager.c:2664
 msgid "Startup options"
 msgstr "Nastavenia spustenia"
 
-#: ../src/pref-manager.c:2700
+#: ../src/pref-manager.c:2667
 msgid "Open Inbox upon startup"
 msgstr "Otvoriť Doručenú poštu počas štartu programu"
 
-#: ../src/pref-manager.c:2702
+#: ../src/pref-manager.c:2669
 msgid "Check mail upon startup"
 msgstr "Kontrola pošty počas štartu programu"
 
-#: ../src/pref-manager.c:2704
+#: ../src/pref-manager.c:2671
 msgid "Remember open mailboxes between sessions"
 msgstr "Zapamätať otvorené poštové schránky medzi sedeniami"
 
-#: ../src/pref-manager.c:2718
+#: ../src/pref-manager.c:2685
 msgid "Folder scanning"
 msgstr "Skúmanie pričinka"
 
-#: ../src/pref-manager.c:2720
+#: ../src/pref-manager.c:2687
 msgid ""
 "Choose depth 1 for fast startup; this defers scanning some folders.  To see "
 "more of the tree at startup, choose a greater depth."
@@ -5611,67 +5606,67 @@ msgstr ""
 "Vyberte hĺbku 1 pre rýchlejší štart. Toto odloží skúmanie niektorých "
 "pričinkov. Aby ste videli úplnejší strom na začiatku, zvoľte väčšiu hĺbku."
 
-#: ../src/pref-manager.c:2731
+#: ../src/pref-manager.c:2698
 msgid "Scan local folders to depth"
 msgstr "Skúmať miestne priečinky do hĺbky"
 
-#: ../src/pref-manager.c:2744
+#: ../src/pref-manager.c:2711
 msgid "Scan IMAP folders to depth"
 msgstr "Skúmať IMAP priečinky do hĺbky"
 
-#: ../src/pref-manager.c:2809
+#: ../src/pref-manager.c:2776
 msgid "Address book name"
 msgstr "Názov adresára"
 
-#: ../src/pref-manager.c:2817
+#: ../src/pref-manager.c:2784
 msgid "Auto-complete"
 msgstr "Automatické dopĺňanie"
 
-#: ../src/pref-manager.c:2842
+#: ../src/pref-manager.c:2809
 msgid "_Set as default"
 msgstr "_Nastaviť ako predvolené"
 
-#: ../src/pref-manager.c:3152
+#: ../src/pref-manager.c:3119
 msgid "Remote POP3 mailbox..."
 msgstr "Vzdialená poštová schránka typu POP3..."
 
-#: ../src/pref-manager.c:3278
+#: ../src/pref-manager.c:3245
 msgid "Show nothing"
 msgstr "Nezobraziť nič"
 
-#: ../src/pref-manager.c:3280
+#: ../src/pref-manager.c:3247
 msgid "Show dialog"
 msgstr "Zobraziť dialógové okno"
 
-#: ../src/pref-manager.c:3282
+#: ../src/pref-manager.c:3249
 msgid "Show in list"
 msgstr "Zobraziť v zozname"
 
-#: ../src/pref-manager.c:3284
+#: ../src/pref-manager.c:3251
 msgid "Show in status bar"
 msgstr "Zobraziť na stavovej lište"
 
-#: ../src/pref-manager.c:3286
+#: ../src/pref-manager.c:3253
 msgid "Print to console"
 msgstr "Vytlačiť na konzolu"
 
-#: ../src/pref-manager.c:3297
+#: ../src/pref-manager.c:3264
 msgid "Ask me"
 msgstr "Opýtať sa"
 
-#: ../src/pref-manager.c:3374
+#: ../src/pref-manager.c:3341
 msgid "Show next unread message"
 msgstr "Zobraziť ďalšiu neprečítanú správu"
 
-#: ../src/pref-manager.c:3375
+#: ../src/pref-manager.c:3342
 msgid "Show next message"
 msgstr "Zobraziť ďalšiu správu"
 
-#: ../src/pref-manager.c:3376
+#: ../src/pref-manager.c:3343
 msgid "Close message window"
 msgstr "Zatvoriť okno správy"
 
-#: ../src/pref-manager.c:3424
+#: ../src/pref-manager.c:3391
 #, c-format
 msgid "Error displaying link_id %s: %s\n"
 msgstr "Chyba pri zobrazovaní link_id %s: %s\n"
@@ -5840,11 +5835,11 @@ msgstr ""
 msgid "Balsa: message print preview"
 msgstr "Balsa: Náhľad pred tlačou správy"
 
-#: ../src/save-restore.c:600
+#: ../src/save-restore.c:602
 msgid "Error during filters loading: "
 msgstr "Chyba pri načítavaní filtrov: "
 
-#: ../src/save-restore.c:602
+#: ../src/save-restore.c:604
 #, c-format
 msgid ""
 "Error during filters loading: %s\n"
@@ -5853,11 +5848,11 @@ msgstr ""
 "Chyba pri načítavaní filtrov: %s\n"
 "Filtre nemusia byť správne."
 
-#: ../src/save-restore.c:724
+#: ../src/save-restore.c:726
 msgid "The option not to recognize \"format=flowed\" text has been removed."
 msgstr "Voľba na nerozpoznávanie \"format=flowed\" textu bola odstránená."
 
-#: ../src/save-restore.c:1017
+#: ../src/save-restore.c:1019
 msgid ""
 "The option not to send \"format=flowed\" text is now on the Options menu of "
 "the compose window."
@@ -5865,12 +5860,12 @@ msgstr ""
 "Voľba pre neodosielanie textu \"format=flowed\" je teraz v menu Voľby okna "
 "písania novej správy."
 
-#: ../src/save-restore.c:1049
+#: ../src/save-restore.c:1051
 msgid ""
 "The option to request a MDN is now on the Options menu of the compose window."
 msgstr "Voľba na žiadost MDN je teraz v menu Voľby okna písania novej správy."
 
-#: ../src/save-restore.c:1129
+#: ../src/save-restore.c:1131
 msgid ""
 "This version of Balsa uses a new user interface; if you have changed Balsa's "
 "keyboard accelerators, you will need to set them again."
@@ -5878,11 +5873,11 @@ msgstr ""
 "Táto verzia programu Balsa používa nové používateľské rozhranie; ak ste "
 "zmenili klávesové skratky pre program Balsa, musíte si ich znova nastaviť."
 
-#: ../src/save-restore.c:2197
+#: ../src/save-restore.c:2200
 msgid "Error opening GConf database\n"
 msgstr "Chyba pri otváraní GConf databázy\n"
 
-#: ../src/save-restore.c:2205 ../src/save-restore.c:2216
+#: ../src/save-restore.c:2208 ../src/save-restore.c:2219
 #, c-format
 msgid "Error setting GConf field: %s\n"
 msgstr "Chyba pri nastavovaní GConf poľa: %s\n"
@@ -5890,291 +5885,291 @@ msgstr "Chyba pri nastavovaní GConf poľa: %s\n"
 #. Translators: please use the initial letter of each language as
 #. * its accelerator; this is a long list, and unique accelerators
 #. * cannot be found.
-#: ../src/sendmsg-window.c:260
+#: ../src/sendmsg-window.c:265
 msgid "_Brazilian Portuguese"
 msgstr "portugalský (_Brazília)"
 
-#: ../src/sendmsg-window.c:261
+#: ../src/sendmsg-window.c:266
 msgid "_Catalan"
 msgstr "_katalánsky"
 
-#: ../src/sendmsg-window.c:262
+#: ../src/sendmsg-window.c:267
 msgid "_Chinese Simplified"
 msgstr "čí_nsky zjednodušený"
 
-#: ../src/sendmsg-window.c:263
+#: ../src/sendmsg-window.c:268
 msgid "_Chinese Traditional"
 msgstr "čí_nsky tradičný"
 
-#: ../src/sendmsg-window.c:264
+#: ../src/sendmsg-window.c:269
 msgid "_Czech"
 msgstr "če_ský"
 
-#: ../src/sendmsg-window.c:265
+#: ../src/sendmsg-window.c:270
 msgid "_Danish"
 msgstr "_dánsky"
 
-#: ../src/sendmsg-window.c:266
+#: ../src/sendmsg-window.c:271
 msgid "_Dutch"
 msgstr "_holandský"
 
-#: ../src/sendmsg-window.c:267
+#: ../src/sendmsg-window.c:272
 msgid "_English (American)"
 msgstr "_anglický (americký)"
 
-#: ../src/sendmsg-window.c:268
+#: ../src/sendmsg-window.c:273
 msgid "_English (British)"
 msgstr "_anglický (britský)"
 
-#: ../src/sendmsg-window.c:269
+#: ../src/sendmsg-window.c:274
 msgid "_Esperanto"
 msgstr "_esperanto"
 
-#: ../src/sendmsg-window.c:270
+#: ../src/sendmsg-window.c:275
 msgid "_Estonian"
 msgstr "_estónsky"
 
-#: ../src/sendmsg-window.c:271
+#: ../src/sendmsg-window.c:276
 msgid "_Finnish"
 msgstr "_fínsky"
 
-#: ../src/sendmsg-window.c:272
+#: ../src/sendmsg-window.c:277
 msgid "_French"
 msgstr "_francúzsky"
 
-#: ../src/sendmsg-window.c:273
+#: ../src/sendmsg-window.c:278
 msgid "_German"
 msgstr "_nemecký"
 
-#: ../src/sendmsg-window.c:274
+#: ../src/sendmsg-window.c:279
 msgid "_German (Austrian)"
 msgstr "_nemecký (rakúsky)"
 
-#: ../src/sendmsg-window.c:275
+#: ../src/sendmsg-window.c:280
 msgid "_German (Swiss)"
 msgstr "_nemecký (švajčiarsky)"
 
-#: ../src/sendmsg-window.c:276
+#: ../src/sendmsg-window.c:281
 msgid "_Greek"
 msgstr "_grécky"
 
-#: ../src/sendmsg-window.c:277
+#: ../src/sendmsg-window.c:282
 msgid "_Hebrew"
 msgstr "_hebrejský"
 
-#: ../src/sendmsg-window.c:278
+#: ../src/sendmsg-window.c:283
 msgid "_Hungarian"
 msgstr "_maďarský"
 
-#: ../src/sendmsg-window.c:279
+#: ../src/sendmsg-window.c:284
 msgid "_Italian"
 msgstr "_taliansky"
 
-#: ../src/sendmsg-window.c:280
+#: ../src/sendmsg-window.c:285
 msgid "_Japanese (JIS)"
 msgstr "_japonský (JIS)"
 
-#: ../src/sendmsg-window.c:281
+#: ../src/sendmsg-window.c:286
 msgid "_Kazakh"
 msgstr "_kazašský"
 
-#: ../src/sendmsg-window.c:282
+#: ../src/sendmsg-window.c:287
 msgid "_Korean"
 msgstr "_kórejský"
 
-#: ../src/sendmsg-window.c:283
+#: ../src/sendmsg-window.c:288
 msgid "_Latvian"
 msgstr "_lotyšský"
 
-#: ../src/sendmsg-window.c:284
+#: ../src/sendmsg-window.c:289
 msgid "_Lithuanian"
 msgstr "_litovský"
 
-#: ../src/sendmsg-window.c:285
+#: ../src/sendmsg-window.c:290
 msgid "_Norwegian"
 msgstr "_nórsky"
 
-#: ../src/sendmsg-window.c:286
+#: ../src/sendmsg-window.c:291
 msgid "_Polish"
 msgstr "_poľský"
 
-#: ../src/sendmsg-window.c:287
+#: ../src/sendmsg-window.c:292
 msgid "_Portugese"
 msgstr "_portugalský"
 
-#: ../src/sendmsg-window.c:288
+#: ../src/sendmsg-window.c:293
 msgid "_Romanian"
 msgstr "_rumunský"
 
-#: ../src/sendmsg-window.c:289
+#: ../src/sendmsg-window.c:294
 msgid "_Russian"
 msgstr "_ruský"
 
-#: ../src/sendmsg-window.c:290
+#: ../src/sendmsg-window.c:295
 msgid "_Serbian"
 msgstr "_srbský"
 
-#: ../src/sendmsg-window.c:291
+#: ../src/sendmsg-window.c:296
 msgid "_Serbian (Latin)"
 msgstr "_srbský (latinka)"
 
-#: ../src/sendmsg-window.c:292
+#: ../src/sendmsg-window.c:297
 msgid "_Slovak"
 msgstr "_slovenský"
 
-#: ../src/sendmsg-window.c:293
+#: ../src/sendmsg-window.c:298
 msgid "_Spanish"
 msgstr "š_panielský"
 
-#: ../src/sendmsg-window.c:294
+#: ../src/sendmsg-window.c:299
 msgid "_Swedish"
 msgstr "š_védsky"
 
-#: ../src/sendmsg-window.c:295
+#: ../src/sendmsg-window.c:300
 msgid "_Tatar"
 msgstr "_tatársky"
 
-#: ../src/sendmsg-window.c:296
+#: ../src/sendmsg-window.c:301
 msgid "_Turkish"
 msgstr "_turecký"
 
-#: ../src/sendmsg-window.c:297
+#: ../src/sendmsg-window.c:302
 msgid "_Ukrainian"
 msgstr "_ukrajinský"
 
-#: ../src/sendmsg-window.c:298
+#: ../src/sendmsg-window.c:303
 msgid "_Generic UTF-8"
 msgstr "_Všeobecný UTF-8"
 
-#: ../src/sendmsg-window.c:324
+#: ../src/sendmsg-window.c:329
 msgid "_Show"
 msgstr "_Zobraziť"
 
-#: ../src/sendmsg-window.c:325
+#: ../src/sendmsg-window.c:330
 msgid "_Language"
 msgstr "_Jazyk"
 
-#: ../src/sendmsg-window.c:326
+#: ../src/sendmsg-window.c:331
 msgid "_Options"
 msgstr "V_oľby"
 
-#: ../src/sendmsg-window.c:333
+#: ../src/sendmsg-window.c:338
 msgid "_Include File..."
 msgstr "_Vložiť súbor..."
 
-#: ../src/sendmsg-window.c:334
+#: ../src/sendmsg-window.c:339
 msgid "Include a file"
 msgstr "Vložiť súbor"
 
-#: ../src/sendmsg-window.c:335
+#: ../src/sendmsg-window.c:340
 msgid "_Attach File..."
 msgstr "_Pripojiť súbor..."
 
-#: ../src/sendmsg-window.c:336
+#: ../src/sendmsg-window.c:341
 msgid "Attach a file"
 msgstr "Pripojiť súbor"
 
-#: ../src/sendmsg-window.c:337
+#: ../src/sendmsg-window.c:342
 msgid "I_nclude Message(s)"
 msgstr "_Vložiť správu/správy"
 
-#: ../src/sendmsg-window.c:338
+#: ../src/sendmsg-window.c:343
 msgid "Include selected message(s)"
 msgstr "Vložiť vybrané správu/správy"
 
-#: ../src/sendmsg-window.c:339
+#: ../src/sendmsg-window.c:344
 msgid "Attach _Message(s)"
 msgstr "Pripojiť _správu/správy"
 
-#: ../src/sendmsg-window.c:340
+#: ../src/sendmsg-window.c:345
 msgid "Attach selected message(s)"
 msgstr "Pripojiť vybrané _správu/správy"
 
-#: ../src/sendmsg-window.c:341
+#: ../src/sendmsg-window.c:346
 msgid "_Save"
 msgstr "_Uložiť"
 
-#: ../src/sendmsg-window.c:342
+#: ../src/sendmsg-window.c:347
 msgid "Save this message"
 msgstr "Uložiť túto správu"
 
-#: ../src/sendmsg-window.c:350
+#: ../src/sendmsg-window.c:355
 msgid "Print the edited message"
 msgstr "Vytlačiť túto správu"
 
-#: ../src/sendmsg-window.c:353
+#: ../src/sendmsg-window.c:358
 msgid "_Undo"
 msgstr "_Vrátiť"
 
-#: ../src/sendmsg-window.c:354
+#: ../src/sendmsg-window.c:359
 msgid "Undo most recent change"
 msgstr "Vrátiť posledná zmenu"
 
-#: ../src/sendmsg-window.c:355
+#: ../src/sendmsg-window.c:360
 msgid "_Redo"
 msgstr "_Opakovať vrátené"
 
-#: ../src/sendmsg-window.c:356
+#: ../src/sendmsg-window.c:361
 msgid "Redo most recent change"
 msgstr "Opakovať poslednú vrátenú zmenu"
 
-#: ../src/sendmsg-window.c:357
+#: ../src/sendmsg-window.c:362
 msgid "Cu_t"
 msgstr "Vys_trihnúť"
 
-#: ../src/sendmsg-window.c:358
+#: ../src/sendmsg-window.c:363
 msgid "Cut the selected text"
 msgstr "Vystrihnúť označený text"
 
-#: ../src/sendmsg-window.c:360
+#: ../src/sendmsg-window.c:365
 msgid "Copy to the clipboard"
 msgstr "Kopírovať do schránky"
 
-#: ../src/sendmsg-window.c:361
+#: ../src/sendmsg-window.c:366
 msgid "_Paste"
 msgstr "_Vlepiť"
 
-#: ../src/sendmsg-window.c:362
+#: ../src/sendmsg-window.c:367
 msgid "Paste from the clipboard"
 msgstr "Vlepiť zo schránky"
 
-#: ../src/sendmsg-window.c:365
+#: ../src/sendmsg-window.c:370
 msgid "_Wrap Body"
 msgstr "_Zalomiť text"
 
-#: ../src/sendmsg-window.c:367
+#: ../src/sendmsg-window.c:372
 msgid "_Reflow Selected Text"
 msgstr "_Znovu zalomiť označený text"
 
-#: ../src/sendmsg-window.c:369
+#: ../src/sendmsg-window.c:374
 msgid "Insert Si_gnature"
 msgstr "Vložiť podpi_s"
 
-#: ../src/sendmsg-window.c:371
+#: ../src/sendmsg-window.c:376
 msgid "_Quote Message(s)"
 msgstr "_Citovať správu/správy"
 
-#: ../src/sendmsg-window.c:374 ../src/sendmsg-window.c:416
+#: ../src/sendmsg-window.c:379 ../src/sendmsg-window.c:421
 msgid "C_heck Spelling"
 msgstr "_Kontrolovať preklepy"
 
-#: ../src/sendmsg-window.c:375 ../src/sendmsg-window.c:417
+#: ../src/sendmsg-window.c:380 ../src/sendmsg-window.c:422
 msgid "Check the spelling of the message"
 msgstr "Skontrolovať pravopis správy"
 
-#: ../src/sendmsg-window.c:378
+#: ../src/sendmsg-window.c:383
 msgid "Select _Identity..."
 msgstr "Vybrať _identitu..."
 
-#: ../src/sendmsg-window.c:379
+#: ../src/sendmsg-window.c:384
 msgid "Select the Identity to use for the message"
 msgstr "Vybrať identitu pre správu"
 
-#: ../src/sendmsg-window.c:382
+#: ../src/sendmsg-window.c:387
 msgid "_Edit with Gnome-Editor"
 msgstr "Upraviť pomocou _editora Gnome"
 
-#: ../src/sendmsg-window.c:383
+#: ../src/sendmsg-window.c:388
 msgid "Edit the current message with the default Gnome editor"
 msgstr "Upraviť aktuálnu správu pomocou predvoleného editora Gnome"
 
@@ -6182,125 +6177,125 @@ msgstr "Upraviť aktuálnu správu pomocou predvoleného editora Gnome"
 #. * stock_id; the first in this list defines the action tied to the
 #. * toolbar's "Send" button, so "ToolbarSend" must come before
 #. * the others.
-#: ../src/sendmsg-window.c:394 ../src/sendmsg-window.c:396
+#: ../src/sendmsg-window.c:399 ../src/sendmsg-window.c:401
 msgid "Sen_d"
 msgstr "Odos_lať"
 
-#: ../src/sendmsg-window.c:395 ../src/sendmsg-window.c:397
+#: ../src/sendmsg-window.c:400 ../src/sendmsg-window.c:402
 msgid "Send this message"
 msgstr "Poslať túto správu"
 
-#: ../src/sendmsg-window.c:399
+#: ../src/sendmsg-window.c:404
 msgid "_Queue"
 msgstr "_Zaradiť"
 
-#: ../src/sendmsg-window.c:400 ../src/sendmsg-window.c:406
+#: ../src/sendmsg-window.c:405 ../src/sendmsg-window.c:411
 msgid "Queue this message in Outbox for sending"
 msgstr "Zaradiť túto správu do poštovej schránky 'Pošta na odoslanie'"
 
-#: ../src/sendmsg-window.c:402
+#: ../src/sendmsg-window.c:407
 msgid "_Postpone"
 msgstr "_Odložiť"
 
-#: ../src/sendmsg-window.c:403
+#: ../src/sendmsg-window.c:408
 msgid "Save this message and close"
 msgstr "Uložiť túto správu a zatvoriť"
 
-#: ../src/sendmsg-window.c:405
+#: ../src/sendmsg-window.c:410
 msgid "Send _Later"
 msgstr "Odoslať _neskôr"
 
-#: ../src/sendmsg-window.c:408
+#: ../src/sendmsg-window.c:413
 msgid "Sa_ve and Close"
 msgstr "U_ložiť a zatvoriť"
 
-#: ../src/sendmsg-window.c:420
+#: ../src/sendmsg-window.c:425
 msgid "F_rom"
 msgstr "_Od"
 
-#: ../src/sendmsg-window.c:422
+#: ../src/sendmsg-window.c:427
 msgid "Rec_ipients"
 msgstr "Príjemcov_ia"
 
-#: ../src/sendmsg-window.c:424
+#: ../src/sendmsg-window.c:429
 msgid "R_eply To"
 msgstr "Odpoveď p_re"
 
-#: ../src/sendmsg-window.c:426
+#: ../src/sendmsg-window.c:431
 msgid "F_cc"
 msgstr "_Automatická kópia"
 
-#: ../src/sendmsg-window.c:429
+#: ../src/sendmsg-window.c:434
 msgid "_Request Disposition Notification"
 msgstr "Požadovať Oznámenie o doručení"
 
-#: ../src/sendmsg-window.c:430
+#: ../src/sendmsg-window.c:435
 msgid "Request Message Disposition Notification"
 msgstr "Požadovať Oznámenie o doručení správy (MDN)"
 
-#: ../src/sendmsg-window.c:432
+#: ../src/sendmsg-window.c:437
 msgid "_Format = Flowed"
 msgstr "_Formát = voľný"
 
-#: ../src/sendmsg-window.c:434
+#: ../src/sendmsg-window.c:439
 msgid "Send as plain text and _HTML"
 msgstr "Odoslať ako obyčajný text aj ako _HTML"
 
-#: ../src/sendmsg-window.c:438 ../src/sendmsg-window.c:444
+#: ../src/sendmsg-window.c:443 ../src/sendmsg-window.c:449
 msgid "_Sign Message"
 msgstr "Podpí_sať správu"
 
-#: ../src/sendmsg-window.c:439
+#: ../src/sendmsg-window.c:444
 msgid "Sign message using GPG"
 msgstr "Podpísať správu pomocou GnuPG"
 
-#: ../src/sendmsg-window.c:440 ../src/sendmsg-window.c:447
+#: ../src/sendmsg-window.c:445 ../src/sendmsg-window.c:452
 msgid "_Encrypt Message"
 msgstr "_Zašifrovať správu"
 
-#: ../src/sendmsg-window.c:441
+#: ../src/sendmsg-window.c:446
 msgid "Encrypt message using GPG"
 msgstr "Zašifrovať správu pomocou GPG"
 
-#: ../src/sendmsg-window.c:445
+#: ../src/sendmsg-window.c:450
 msgid "signs the message using GnuPG"
 msgstr "podpíše správu pomocou GnuPG"
 
-#: ../src/sendmsg-window.c:449
+#: ../src/sendmsg-window.c:454
 msgid "signs the message using GnuPG for all To: and CC: recipients"
 msgstr ""
 "podpíše správu pomocou GnuPG pre všetkých priamych príjemcov a príjemcov "
 "kópií"
 
-#: ../src/sendmsg-window.c:459
+#: ../src/sendmsg-window.c:464
 msgid "_GnuPG uses MIME mode"
 msgstr "_GnuPG používa režim MIME"
 
-#: ../src/sendmsg-window.c:461
+#: ../src/sendmsg-window.c:466
 msgid "_GnuPG uses old OpenPGP mode"
 msgstr "_GnuPG používa starý režim OpenPGP"
 
-#: ../src/sendmsg-window.c:464
+#: ../src/sendmsg-window.c:469
 msgid "_S/MIME mode (GpgSM)"
 msgstr "Režim _S/MIME (GpgSM)"
 
-#: ../src/sendmsg-window.c:676
+#: ../src/sendmsg-window.c:681
 msgid "Attachment"
 msgstr "Príloha"
 
-#: ../src/sendmsg-window.c:676
+#: ../src/sendmsg-window.c:681
 msgid "Inline"
 msgstr "Vložené"
 
-#: ../src/sendmsg-window.c:676
+#: ../src/sendmsg-window.c:681
 msgid "Reference"
 msgstr "Odkaz"
 
-#: ../src/sendmsg-window.c:916
+#: ../src/sendmsg-window.c:921
 msgid "(No name)"
 msgstr "(Bez mena)"
 
-#: ../src/sendmsg-window.c:922
+#: ../src/sendmsg-window.c:927
 #, c-format
 msgid ""
 "The message to '%s' is modified.\n"
@@ -6309,16 +6304,16 @@ msgstr ""
 "Správa pre '%s' je zmenená.\n"
 "Uložiť správu do priečinka 'Nedokončená pošta'?"
 
-#: ../src/sendmsg-window.c:1259
+#: ../src/sendmsg-window.c:1264
 msgid "Gnome editor is not defined in your preferred applications."
 msgstr ""
 "Gnome editor nie je definovaný vo vašich uprednostňovaných aplikáciách."
 
-#: ../src/sendmsg-window.c:1315
+#: ../src/sendmsg-window.c:1320
 msgid "Select Identity"
 msgstr "Vybrať identitu"
 
-#: ../src/sendmsg-window.c:1759
+#: ../src/sendmsg-window.c:1764
 #, c-format
 msgid ""
 "Saying yes will not send the file `%s' itself, but just a MIME message/"
@@ -6333,15 +6328,15 @@ msgstr ""
 "\n"
 "Chcete naozaj pripojiť tento súbor ako odkaz?"
 
-#: ../src/sendmsg-window.c:1769
+#: ../src/sendmsg-window.c:1774
 msgid "Attach as Reference?"
 msgstr "Pripojiť ako odkaz?"
 
-#: ../src/sendmsg-window.c:1866
+#: ../src/sendmsg-window.c:1871
 msgid "Choose charset"
 msgstr "Vybrať znakovú sadu"
 
-#: ../src/sendmsg-window.c:1873
+#: ../src/sendmsg-window.c:1878
 #, c-format
 msgid ""
 "File\n"
@@ -6354,55 +6349,55 @@ msgstr ""
 "nie je kódovaný v US-ASCII alebo v UTF-8.\n"
 "Prosím zvoľte znakovú sadu použitú pri kódovaní tohoto súboru."
 
-#: ../src/sendmsg-window.c:1889
+#: ../src/sendmsg-window.c:1894
 msgid "Attach as MIME type:"
 msgstr "Pripojiť ako typ MIME:"
 
-#: ../src/sendmsg-window.c:1946
+#: ../src/sendmsg-window.c:1951
 #, c-format
 msgid "Character set for file %s changed from \"%s\" to \"%s\"."
 msgstr "Znaková sada pre súbor %s zmenená z \"%s\" na \"%s\"."
 
-#: ../src/sendmsg-window.c:1989 ../src/sendmsg-window.c:5676
+#: ../src/sendmsg-window.c:1994 ../src/sendmsg-window.c:5686
 msgid "(no subject)"
 msgstr "(bez predmetu)"
 
-#: ../src/sendmsg-window.c:2032
+#: ../src/sendmsg-window.c:2037
 #, c-format
 msgid "Cannot create file URI object for %s"
 msgstr "Nemožno vytvoriť súborový URI objekt pre %s"
 
-#: ../src/sendmsg-window.c:2040
+#: ../src/sendmsg-window.c:2045
 msgid "unknown error"
 msgstr "neznáma chyba"
 
-#: ../src/sendmsg-window.c:2087
+#: ../src/sendmsg-window.c:2092
 msgid "forwarded message"
 msgstr "správa poslaná ďalej"
 
-#: ../src/sendmsg-window.c:2092
+#: ../src/sendmsg-window.c:2097
 #, c-format
 msgid "Message from %s, subject: \"%s\""
 msgstr "Správa od %s, predmet: \"%s\""
 
-#: ../src/sendmsg-window.c:2168 ../src/sendmsg-window.c:2241
+#: ../src/sendmsg-window.c:2173 ../src/sendmsg-window.c:2246
 msgid "Remove"
 msgstr "Odstrániť"
 
-#: ../src/sendmsg-window.c:2253
+#: ../src/sendmsg-window.c:2258
 msgid "Open..."
 msgstr "Otvoriť..."
 
-#: ../src/sendmsg-window.c:2265
+#: ../src/sendmsg-window.c:2270
 msgid "(URL)"
 msgstr "(URL)"
 
-#: ../src/sendmsg-window.c:2323
+#: ../src/sendmsg-window.c:2328
 msgid "Attach file"
 msgstr "Pripojiť súbor"
 
-#: ../src/sendmsg-window.c:2421 ../src/sendmsg-window.c:2530
-#: ../src/sendmsg-window.c:4962
+#: ../src/sendmsg-window.c:2426 ../src/sendmsg-window.c:2535
+#: ../src/sendmsg-window.c:4972
 msgid ""
 "Attaching message failed.\n"
 "Possible reason: not enough temporary space"
@@ -6410,152 +6405,148 @@ msgstr ""
 "Pripojenie správy zlyhalo.\n"
 "Pravdepodobný dôvod: málo dočasného priestoru"
 
-#: ../src/sendmsg-window.c:2758
+#: ../src/sendmsg-window.c:2763
 msgid "F_rom:"
 msgstr "_Od:"
 
 #. Subject:
-#: ../src/sendmsg-window.c:2905
+#: ../src/sendmsg-window.c:2910
 msgid "S_ubject:"
 msgstr "_Predmet:"
 
 #. fcc: mailbox folder where the message copy will be written to
-#: ../src/sendmsg-window.c:2916
+#: ../src/sendmsg-window.c:2921
 msgid "F_cc:"
 msgstr "_Automatická kópia:"
 
 #. Attachment list
-#: ../src/sendmsg-window.c:2945
+#: ../src/sendmsg-window.c:2950
 msgid "_Attachments:"
 msgstr "Prí_lohy:"
 
-#: ../src/sendmsg-window.c:2994
+#: ../src/sendmsg-window.c:2999
 msgid "Mode"
 msgstr "Režim"
 
-#: ../src/sendmsg-window.c:3017
-msgid "Description"
-msgstr "Popis"
-
-#: ../src/sendmsg-window.c:3336
+#: ../src/sendmsg-window.c:3341
 #, c-format
 msgid "Could not save attachment: %s"
 msgstr "Nepodarilo sa uložiť prílohu: %s"
 
-#: ../src/sendmsg-window.c:3360
+#: ../src/sendmsg-window.c:3365
 msgid "No subject"
 msgstr "Bez predmetu"
 
-#: ../src/sendmsg-window.c:3393
+#: ../src/sendmsg-window.c:3398
 #, c-format
 msgid "inlined file \"%s\" (%s)"
 msgstr "vložený súbor \"%s\" (%s)"
 
-#: ../src/sendmsg-window.c:3396
+#: ../src/sendmsg-window.c:3401
 #, c-format
 msgid "attached file \"%s\" (%s)"
 msgstr "pripojený súbor \"%s\" (%si)"
 
-#: ../src/sendmsg-window.c:3400
+#: ../src/sendmsg-window.c:3405
 #, c-format
 msgid "inlined %s part"
 msgstr "vložená časť %s"
 
-#: ../src/sendmsg-window.c:3402
+#: ../src/sendmsg-window.c:3407
 #, c-format
 msgid "attached %s part"
 msgstr "pripojená časť %s"
 
-#: ../src/sendmsg-window.c:3470
+#: ../src/sendmsg-window.c:3475
 #, c-format
 msgid "message from %s, subject \"%s\""
 msgstr "správa od %s, predmet: \"%s\""
 
-#: ../src/sendmsg-window.c:3597
+#: ../src/sendmsg-window.c:3602
 msgid "quoted"
 msgstr "citované"
 
-#: ../src/sendmsg-window.c:3602 ../src/sendmsg-window.c:3605
+#: ../src/sendmsg-window.c:3607 ../src/sendmsg-window.c:3610
 msgid "quoted attachment"
 msgstr "citovaná príloha"
 
-#: ../src/sendmsg-window.c:3630
+#: ../src/sendmsg-window.c:3635
 msgid "Select parts for quotation"
 msgstr "Vybrať časti pre citovanie"
 
-#: ../src/sendmsg-window.c:3636
+#: ../src/sendmsg-window.c:3641
 msgid "Select the parts of the message which shall be quoted in the reply"
 msgstr "Vybrať časti správy, ktoré majú byť citované v odpovedi"
 
-#: ../src/sendmsg-window.c:3778
+#: ../src/sendmsg-window.c:3783
 msgid "you"
 msgstr "vy"
 
-#: ../src/sendmsg-window.c:3787
+#: ../src/sendmsg-window.c:3792
 #, c-format
 msgid "------forwarded message from %s------\n"
 msgstr "------spáva poslaná ďalej od %s------\n"
 
-#: ../src/sendmsg-window.c:3824
+#: ../src/sendmsg-window.c:3829
 #, c-format
 msgid "Message-ID: %s\n"
 msgstr "ID-správy: %s\n"
 
-#: ../src/sendmsg-window.c:3830
+#: ../src/sendmsg-window.c:3835
 msgid "References:"
 msgstr "Odkazy:"
 
-#: ../src/sendmsg-window.c:3841
+#: ../src/sendmsg-window.c:3846
 #, c-format
 msgid "On %s, %s wrote:\n"
 msgstr "Napísané dňa %s, (autor: %s):\n"
 
-#: ../src/sendmsg-window.c:3843
+#: ../src/sendmsg-window.c:3848
 #, c-format
 msgid "%s wrote:\n"
 msgstr "Napísané, (autor: %s):\n"
 
-#: ../src/sendmsg-window.c:3953
+#: ../src/sendmsg-window.c:3958
 msgid "No signature found!"
 msgstr "Podpis nebol nájdený!"
 
-#: ../src/sendmsg-window.c:4135
+#: ../src/sendmsg-window.c:4140
 msgid "Could not save message."
 msgstr "Nepodarilo sa uložiť správu."
 
-#: ../src/sendmsg-window.c:4142
+#: ../src/sendmsg-window.c:4147
 #, c-format
 msgid "Could not open draftbox: %s"
 msgstr "Nepodarilo sa otvoriť nedokončenú poštu: %s"
 
-#: ../src/sendmsg-window.c:4163
+#: ../src/sendmsg-window.c:4168
 msgid "Message saved."
 msgstr "Správa uložená."
 
-#: ../src/sendmsg-window.c:5130 ../src/sendmsg-window.c:5138
-#: ../src/sendmsg-window.c:5145 ../src/sendmsg-window.c:5152
-#: ../src/sendmsg-window.c:5176
+#: ../src/sendmsg-window.c:5140 ../src/sendmsg-window.c:5148
+#: ../src/sendmsg-window.c:5155 ../src/sendmsg-window.c:5162
+#: ../src/sendmsg-window.c:5186
 #, c-format
 msgid "Could not attach the file %s: %s."
 msgstr "Nepodarilo sa pripojiť súbor %s: %s."
 
-#: ../src/sendmsg-window.c:5131
+#: ../src/sendmsg-window.c:5141
 msgid "not an absolute path"
 msgstr "nie je absolútna cesta"
 
-#: ../src/sendmsg-window.c:5139
+#: ../src/sendmsg-window.c:5149
 msgid "not in your directory"
 msgstr "nie je vo vašom priečinku"
 
-#: ../src/sendmsg-window.c:5146
+#: ../src/sendmsg-window.c:5156
 msgid "does not exist"
 msgstr "neexistuje"
 
-#: ../src/sendmsg-window.c:5177
+#: ../src/sendmsg-window.c:5187
 msgid "not in current directory"
 msgstr "nie je v aktuálnom priečinku"
 
-#: ../src/sendmsg-window.c:5227
+#: ../src/sendmsg-window.c:5237
 msgid ""
 "The link that you selected created\n"
 "a \"Blind copy\" (Bcc) address.\n"
@@ -6567,40 +6558,40 @@ msgstr ""
 "Prosím, skontrolujte, či je adresa\n"
 "správna."
 
-#: ../src/sendmsg-window.c:5308
+#: ../src/sendmsg-window.c:5318
 #, c-format
 msgid "Could not open the file %s.\n"
 msgstr "Nemôžem otvoriť súbor %s.\n"
 
-#: ../src/sendmsg-window.c:5356
+#: ../src/sendmsg-window.c:5366
 msgid "Include file"
 msgstr "Vložiť súbor"
 
 #. Translators: please do not translate Face.
-#: ../src/sendmsg-window.c:5538
+#: ../src/sendmsg-window.c:5548
 #, c-format
 msgid "Could not load Face header file %s: %s"
 msgstr "Nepodarilo sa načítať hlavičkový súbor Face %s: %s"
 
 #. Translators: please do not translate Face.
-#: ../src/sendmsg-window.c:5541
+#: ../src/sendmsg-window.c:5551
 #, c-format
 msgid "Could not load X-Face header file %s: %s"
 msgstr "Nepodarilo sa načítať hlavičkový súbor X-Face %s: %s"
 
-#: ../src/sendmsg-window.c:5660
+#: ../src/sendmsg-window.c:5670
 msgid "You did not specify a subject for this message"
 msgstr "Nezadali ste predmet pre túto správu"
 
-#: ../src/sendmsg-window.c:5661
+#: ../src/sendmsg-window.c:5671
 msgid "If you would like to provide one, enter it below."
 msgstr "Ak ho chcete poskytnúť, zadajte ho nižšie."
 
-#: ../src/sendmsg-window.c:5702
+#: ../src/sendmsg-window.c:5712
 msgid "_Send"
 msgstr "_Odoslať"
 
-#: ../src/sendmsg-window.c:5774
+#: ../src/sendmsg-window.c:5784
 #, c-format
 msgid ""
 "You did not select encryption for this message, although %s public keys are "
@@ -6611,19 +6602,19 @@ msgstr ""
 "kľúče sú dostupné pre všetkých príjemcov. Aby ste chránili svoje súkromie, "
 "môžete správu zašifrovať pomocou %s."
 
-#: ../src/sendmsg-window.c:5794
+#: ../src/sendmsg-window.c:5804
 msgid "Send _encrypted"
 msgstr "Odoslať _zašifrované"
 
-#: ../src/sendmsg-window.c:5808
+#: ../src/sendmsg-window.c:5818
 msgid "Send _plain"
 msgstr "Odoslať _obyčajne"
 
-#: ../src/sendmsg-window.c:5867
+#: ../src/sendmsg-window.c:5877
 msgid "You selected OpenPGP security for this message.\n"
 msgstr "Pre túto správu ste si zvolili bezpečnosť OpenPGP.\n"
 
-#: ../src/sendmsg-window.c:5872
+#: ../src/sendmsg-window.c:5882
 msgid ""
 "The message text will be sent as plain text and as HTML, but only the plain "
 "part can be signed.\n"
@@ -6631,13 +6622,13 @@ msgstr ""
 "Text správy bude odoslaný ako obyčajný text aj ako HTML, ale len časť s "
 "obyčajným textom môže byť podpísaná.\n"
 
-#: ../src/sendmsg-window.c:5877
+#: ../src/sendmsg-window.c:5887
 msgid ""
 "The message contains attachments, which cannot be signed or encrypted.\n"
 msgstr ""
 "Správa obsahuje prílohy, ktoré nemôžu byť podpísané alebo zašifrované.\n"
 
-#: ../src/sendmsg-window.c:5881
+#: ../src/sendmsg-window.c:5891
 msgid ""
 "You should select MIME mode if the complete message shall be protected. Do "
 "you really want to proceed?"
@@ -6645,36 +6636,36 @@ msgstr ""
 "Ak má byť chránená celá správa, mali by ste si zvoliť režim MIME. Naozaj "
 "chcete pokračovať?"
 
-#: ../src/sendmsg-window.c:5903
+#: ../src/sendmsg-window.c:5913
 #, c-format
 msgid "sending message with gpg mode %d"
 msgstr "odosielanie správy v režime gpg %d"
 
-#: ../src/sendmsg-window.c:5940
+#: ../src/sendmsg-window.c:5950
 msgid "Message could not be created"
 msgstr "Nepodarilo sa vytvoriť správu"
 
-#: ../src/sendmsg-window.c:5942
+#: ../src/sendmsg-window.c:5952
 msgid "Message could not be queued in outbox"
 msgstr "Nepodarilo sa správu zaradiť do pošty na odoslanie"
 
-#: ../src/sendmsg-window.c:5944
+#: ../src/sendmsg-window.c:5954
 msgid "Message could not be saved in sentbox"
 msgstr "Správu sa nepodarilo uložiť do odoslanej pošty"
 
-#: ../src/sendmsg-window.c:5946
+#: ../src/sendmsg-window.c:5956
 msgid "Message could not be sent"
 msgstr "Správu sa nepodarilo odoslať"
 
-#: ../src/sendmsg-window.c:5949
+#: ../src/sendmsg-window.c:5959
 msgid "Message could not be signed"
 msgstr "Správu sa nepodarilo podpísať"
 
-#: ../src/sendmsg-window.c:5951
+#: ../src/sendmsg-window.c:5961
 msgid "Message could not be encrypted"
 msgstr "Správu sa nepodarilo zašifrovať"
 
-#: ../src/sendmsg-window.c:5957
+#: ../src/sendmsg-window.c:5967
 #, c-format
 msgid ""
 "Send failed: %s\n"
@@ -6683,54 +6674,54 @@ msgstr ""
 "Odoslanie zlyhalo: %s\n"
 "%s"
 
-#: ../src/sendmsg-window.c:5962
+#: ../src/sendmsg-window.c:5972
 #, c-format
 msgid "Send failed: %s"
 msgstr "Odoslanie zlyhalo: %s"
 
-#: ../src/sendmsg-window.c:6051
+#: ../src/sendmsg-window.c:6061
 #, c-format
 msgid "Could not postpone message: %s"
 msgstr "Nepodarilo sa odložiť správu: %s"
 
-#: ../src/sendmsg-window.c:6068
+#: ../src/sendmsg-window.c:6078
 msgid "Message postponed."
 msgstr "Správa odložená."
 
-#: ../src/sendmsg-window.c:6073
+#: ../src/sendmsg-window.c:6083
 msgid "Could not postpone message."
 msgstr "Nepodarilo sa odložiť správu."
 
-#: ../src/sendmsg-window.c:6228
+#: ../src/sendmsg-window.c:6238
 #, c-format
 msgid "Error starting spell checker: %s"
 msgstr "Chyba pri spúšťaní kontroly pravopisu: %s"
 
-#: ../src/sendmsg-window.c:6395
+#: ../src/sendmsg-window.c:6405
 #, c-format
 msgid "Could not compile %s"
 msgstr "Nepodarilo sa skompilovať %s"
 
-#: ../src/sendmsg-window.c:6396
+#: ../src/sendmsg-window.c:6406
 msgid "Quoted Text Regular Expression"
 msgstr "Regulárny výraz pre citovaný text"
 
-#: ../src/sendmsg-window.c:6886
+#: ../src/sendmsg-window.c:6896
 #, c-format
 msgid "Reply to %s: %s"
 msgstr "Odpoveď pre %s: %s"
 
-#: ../src/sendmsg-window.c:6891
+#: ../src/sendmsg-window.c:6901
 #, c-format
 msgid "Forward message to %s: %s"
 msgstr "Poslať správu ďalej pre %s: %s"
 
-#: ../src/sendmsg-window.c:6895
+#: ../src/sendmsg-window.c:6905
 #, c-format
 msgid "Continue message to %s: %s"
 msgstr "Pokračovať v písaní správy pre %s: %s"
 
-#: ../src/sendmsg-window.c:6899
+#: ../src/sendmsg-window.c:6909
 #, c-format
 msgid "New message to %s: %s"
 msgstr "Nová správa pre %s: %s"
@@ -6808,31 +6799,31 @@ msgstr "Vybrať adresár"
 msgid "Choose Address"
 msgstr "Vybrať adresu"
 
-#: ../src/toolbar-factory.c:129
+#: ../src/toolbar-factory.c:131
 msgid "Separator"
 msgstr "Oddeľovač"
 
-#: ../src/toolbar-factory.c:130
+#: ../src/toolbar-factory.c:132
 msgid "Quit"
 msgstr "Koniec"
 
-#: ../src/toolbar-factory.c:131
+#: ../src/toolbar-factory.c:133
 msgid "Check"
 msgstr "Kontrolovať"
 
-#: ../src/toolbar-factory.c:132
+#: ../src/toolbar-factory.c:134
 msgid "Compose"
 msgstr "Nová správa"
 
-#: ../src/toolbar-factory.c:133
+#: ../src/toolbar-factory.c:135
 msgid "Continue"
 msgstr "Pokračovať"
 
-#: ../src/toolbar-factory.c:134
+#: ../src/toolbar-factory.c:136
 msgid "Reply"
 msgstr "Odpovedať"
 
-#: ../src/toolbar-factory.c:135
+#: ../src/toolbar-factory.c:137
 msgid ""
 "Reply\n"
 "to all"
@@ -6840,7 +6831,7 @@ msgstr ""
 "Odpovedať\n"
 "všetkým"
 
-#: ../src/toolbar-factory.c:136
+#: ../src/toolbar-factory.c:138
 msgid ""
 "Reply\n"
 "to group"
@@ -6848,11 +6839,11 @@ msgstr ""
 "Odpovedať\n"
 "skupine"
 
-#: ../src/toolbar-factory.c:137
+#: ../src/toolbar-factory.c:139
 msgid "Forward"
 msgstr "Poslať ďalej"
 
-#: ../src/toolbar-factory.c:140
+#: ../src/toolbar-factory.c:142
 msgid ""
 "Next\n"
 "unread"
@@ -6860,7 +6851,7 @@ msgstr ""
 "Ďalšia\n"
 "neprečítaná"
 
-#: ../src/toolbar-factory.c:141
+#: ../src/toolbar-factory.c:143
 msgid ""
 "Next\n"
 "flagged"
@@ -6868,7 +6859,7 @@ msgstr ""
 "Ďalšia\n"
 "so značkou"
 
-#: ../src/toolbar-factory.c:142
+#: ../src/toolbar-factory.c:144
 msgid ""
 "Previous\n"
 "part"
@@ -6876,7 +6867,7 @@ msgstr ""
 "Predchádzajúca\n"
 "časť"
 
-#: ../src/toolbar-factory.c:143
+#: ../src/toolbar-factory.c:145
 msgid ""
 "Next\n"
 "part"
@@ -6884,7 +6875,7 @@ msgstr ""
 "Ďalšia\n"
 "časť"
 
-#: ../src/toolbar-factory.c:144
+#: ../src/toolbar-factory.c:146
 msgid ""
 "Trash /\n"
 "Delete"
@@ -6892,15 +6883,15 @@ msgstr ""
 "Kôš /\n"
 "vymazať"
 
-#: ../src/toolbar-factory.c:145
+#: ../src/toolbar-factory.c:147
 msgid "Postpone"
 msgstr "Odložiť"
 
-#: ../src/toolbar-factory.c:146
+#: ../src/toolbar-factory.c:148
 msgid "Print"
 msgstr "Vytlačiť"
 
-#: ../src/toolbar-factory.c:147
+#: ../src/toolbar-factory.c:149
 msgid ""
 "Request\n"
 "MDN"
@@ -6909,31 +6900,31 @@ msgstr ""
 "MDNPožadovať\n"
 "MDN"
 
-#: ../src/toolbar-factory.c:148
+#: ../src/toolbar-factory.c:150
 msgid "Send"
 msgstr "Odoslať"
 
-#: ../src/toolbar-factory.c:149
+#: ../src/toolbar-factory.c:151
 msgid "Exchange"
 msgstr "Vymeniť"
 
-#: ../src/toolbar-factory.c:150
+#: ../src/toolbar-factory.c:152
 msgid "Attach"
 msgstr "Pripojiť"
 
-#: ../src/toolbar-factory.c:151
+#: ../src/toolbar-factory.c:153
 msgid "Save"
 msgstr "Uložiť"
 
-#: ../src/toolbar-factory.c:152
+#: ../src/toolbar-factory.c:154
 msgid "Identity"
 msgstr "Identita"
 
-#: ../src/toolbar-factory.c:154
+#: ../src/toolbar-factory.c:156
 msgid "Close"
 msgstr "Zatvoriť"
 
-#: ../src/toolbar-factory.c:155
+#: ../src/toolbar-factory.c:157
 msgid ""
 "Toggle\n"
 "new"
@@ -6941,11 +6932,11 @@ msgstr ""
 "Prepnúť\n"
 "nová"
 
-#: ../src/toolbar-factory.c:156
+#: ../src/toolbar-factory.c:158
 msgid "Mark all"
 msgstr "Označiť všetky"
 
-#: ../src/toolbar-factory.c:158
+#: ../src/toolbar-factory.c:160
 msgid ""
 "Reset\n"
 "Filter"
@@ -6953,27 +6944,27 @@ msgstr ""
 "Vyčistiť\n"
 "filter"
 
-#: ../src/toolbar-factory.c:161
+#: ../src/toolbar-factory.c:163
 msgid "Sign"
 msgstr "Podpísať"
 
-#: ../src/toolbar-factory.c:162
+#: ../src/toolbar-factory.c:164
 msgid "Encrypt"
 msgstr "Zašifrovať"
 
-#: ../src/toolbar-factory.c:164
+#: ../src/toolbar-factory.c:166
 msgid "Undo"
 msgstr "Vrátiť"
 
-#: ../src/toolbar-factory.c:165
+#: ../src/toolbar-factory.c:167
 msgid "Redo"
 msgstr "Opakovať vrátené"
 
-#: ../src/toolbar-factory.c:166
+#: ../src/toolbar-factory.c:168
 msgid "Expunge"
 msgstr "Vymazať"
 
-#: ../src/toolbar-factory.c:167
+#: ../src/toolbar-factory.c:169
 msgid ""
 "Empty\n"
 "Trash"
@@ -6981,45 +6972,45 @@ msgstr ""
 "Vyprázdniť\n"
 "kôš"
 
-#: ../src/toolbar-factory.c:168
+#: ../src/toolbar-factory.c:170
 msgid "Edit"
 msgstr "Upraviť"
 
-#: ../src/toolbar-factory.c:181
+#: ../src/toolbar-factory.c:183
 msgid "Queue"
 msgstr "Zaradiť"
 
-#: ../src/toolbar-factory.c:380
+#: ../src/toolbar-factory.c:388
 #, c-format
 msgid "Unknown toolbar icon \"%s\""
 msgstr "Neznáma ikona lišty nástrojov \"%s\""
 
-#: ../src/toolbar-factory.c:451
+#: ../src/toolbar-factory.c:459
 msgid "Queue this message for sending"
 msgstr "Zaradiť túto správu na odoslanie"
 
-#: ../src/toolbar-factory.c:519
+#: ../src/toolbar-factory.c:527
 msgid "Text Be_low Icons"
 msgstr "Text po_d ikonami"
 
-#: ../src/toolbar-factory.c:520
+#: ../src/toolbar-factory.c:528
 msgid "Text Be_side Icons"
 msgstr "Text v_edľa ikon"
 
-#: ../src/toolbar-factory.c:522
+#: ../src/toolbar-factory.c:530
 msgid "_Icons Only"
 msgstr "Len _ikony"
 
-#: ../src/toolbar-factory.c:523
+#: ../src/toolbar-factory.c:531
 msgid "_Text Only"
 msgstr "Len _text"
 
-#: ../src/toolbar-factory.c:731
+#: ../src/toolbar-factory.c:741
 #, c-format
 msgid "Use Desktop _Default (%s)"
 msgstr "Použiť štan_dard pracovnej plochy (%s)"
 
-#: ../src/toolbar-factory.c:757
+#: ../src/toolbar-factory.c:767
 msgid "_Customize Toolbars..."
 msgstr "_Prispôsobiť nástrojové lišty..."
 

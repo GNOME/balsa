@@ -1,3 +1,7 @@
+2009-02-12  Inaki Larranaga Murgoitio  <dooteo@euskalgnu.org>
+
+	* configure.in: Added 'eu' (Basque) to ALL_LINGUAS
+
 2009-02-08  Albrecht Dreß
 
 	* libbalsa/rfc2445.[hc]: Implement VCALENDAR and VEVENT objects.

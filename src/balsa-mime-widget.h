@@ -57,6 +57,9 @@ struct _BalsaMimeWidget {
 
     /* container widget if more sub-parts can be added */
     GtkWidget *container;
+
+    /* headers */
+    GtkWidget *header_widget;
 };
 
 

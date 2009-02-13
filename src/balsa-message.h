@@ -88,6 +88,9 @@ struct _BalsaMessage {
         GtkWidget  *find_label;
         GtkTextIter find_iter;
         gboolean    find_forward;
+
+        /* Tab position for headers */
+        gint tab_position;
 };
 
 struct _BalsaMessageClass {

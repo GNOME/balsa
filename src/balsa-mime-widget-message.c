@@ -132,10 +132,9 @@ balsa_mime_widget_new_message(BalsaMessage * bm,
 				       BMW_MESSAGE_PADDING);
 	gtk_container_add(GTK_CONTAINER(mw->widget), mw->container);
 
-	emb_hdrs = bm_header_widget_new(bm, NULL);
+        mw->header_widget = emb_hdrs = bm_header_widget_new(bm, NULL);
 	gtk_box_pack_start(GTK_BOX(mw->container), emb_hdrs, FALSE, FALSE, 0);
 	
-	g_object_set_data(G_OBJECT(mw), "header-widget", emb_hdrs);
 	balsa_mime_widget_message_set_headers(bm, mw, mime_body);
     }
 
@@ -386,9 +385,8 @@ balsa_mime_widget_new_message_tl(BalsaMessage * bm, GtkWidget * tl_buttons)
     mw->widget = gtk_vbox_new(FALSE, BMW_MESSAGE_PADDING);
     gtk_container_set_border_width(GTK_CONTAINER(mw->widget), BMW_MESSAGE_PADDING);
 
-    headers = bm_header_widget_new(bm, tl_buttons);
+    mw->header_widget = headers = bm_header_widget_new(bm, tl_buttons);
     gtk_box_pack_start(GTK_BOX(mw->widget), headers, FALSE, FALSE, 0);
-    g_object_set_data(G_OBJECT(mw), "header-widget", headers);
 
     mw->container = gtk_vbox_new(FALSE, BMW_MESSAGE_PADDING);
     gtk_box_pack_start(GTK_BOX(mw->widget), mw->container, TRUE, TRUE,
@@ -440,15 +438,6 @@ bm_header_widget_set_style(GtkWidget * widget, GtkStyle * previous_style,
 }
 
 static void
-bm_modify_font_from_string(GtkWidget * widget, const char *font)
-{
-    PangoFontDescription *desc =
-	pango_font_description_from_string(balsa_app.message_font);
-    gtk_widget_modify_font(widget, desc);
-    pango_font_description_free(desc);
-}
-
-static void
 bm_header_ctx_menu_reply(GtkWidget * menu_item,
                          LibBalsaMessageBody *part)
 {
@@ -485,12 +474,6 @@ bm_header_extend_popup(GtkTextView *textview, GtkMenu *menu, gpointer arg)
     gtk_widget_show_all(submenu);
 }
 
-/* Indents in pixels: */
-#define BALSA_ONE_CHAR     7
-#define BALSA_INDENT_CHARS 15
-#define BALSA_TAB1         (BALSA_ONE_CHAR * BALSA_INDENT_CHARS)
-#define BALSA_TAB2         (BALSA_TAB1 + BALSA_ONE_CHAR)
-
 static GtkWidget *
 bm_header_widget_new(BalsaMessage * bm, GtkWidget * buttons)
 {
@@ -498,7 +481,6 @@ bm_header_widget_new(BalsaMessage * bm, GtkWidget * buttons)
     GtkWidget *text_view;
     GtkTextView *view;
     GtkTextBuffer *buffer;
-    PangoTabArray *tab;
     GtkWidget *hbox;
 
     widget = gtk_frame_new(NULL);
@@ -518,7 +500,6 @@ bm_header_widget_new(BalsaMessage * bm, GtkWidget * buttons)
     g_signal_connect(G_OBJECT(text_view), "focus_out_event",
 		     G_CALLBACK(balsa_mime_widget_unlimit_focus),
 		     (gpointer) bm);
-    bm_modify_font_from_string(text_view, balsa_app.message_font);
 
     view = GTK_TEXT_VIEW(text_view);
     gtk_text_view_set_editable(view, FALSE);
@@ -526,22 +507,12 @@ bm_header_widget_new(BalsaMessage * bm, GtkWidget * buttons)
     gtk_text_view_set_right_margin(view, BMW_HEADER_MARGIN_RIGHT);
     gtk_text_view_set_wrap_mode(view, GTK_WRAP_WORD);
 
-    tab = pango_tab_array_new_with_positions(2, TRUE,
-                                             PANGO_TAB_LEFT, BALSA_TAB1,
-                                             PANGO_TAB_LEFT, BALSA_TAB2);
-    gtk_text_view_set_tabs(view, tab);
-    pango_tab_array_free(tab);
 
     buffer = gtk_text_view_get_buffer(view);
-    gtk_text_buffer_create_tag(buffer, "subject-font",
-                               "font", balsa_app.subject_font,
-                               NULL);
-    gtk_text_buffer_create_tag(buffer, "hanging-indent",
-                               "indent", -BALSA_TAB1,
-                               NULL);
-    gtk_text_buffer_create_tag(buffer, "url",
-                               "foreground-gdk", &balsa_app.url_color,
-                               NULL);
+    gtk_text_buffer_create_tag(buffer, "subject-font", NULL);
+    gtk_text_buffer_create_tag(buffer, "message-font", NULL);
+    gtk_text_buffer_create_tag(buffer, "hanging-indent", NULL);
+    gtk_text_buffer_create_tag(buffer, "url", NULL);
 
     g_signal_connect(text_view, "key_press_event",
 		     G_CALLBACK(balsa_mime_widget_key_press_event), bm);
@@ -557,6 +528,31 @@ bm_header_widget_new(BalsaMessage * bm, GtkWidget * buttons)
 }
 
 static void
+bmwm_set_tabs(BalsaMessage * bm, GtkTextView * view,
+              GtkTextBuffer * buffer, gint tab_position)
+{
+    PangoTabArray *tabs;
+    GtkTextTagTable *table;
+    GtkTextTag *hanging_indent;
+
+    if (tab_position <= bm->tab_position)
+        return;
+
+    bm->tab_position = tab_position;
+    tabs = pango_tab_array_new_with_positions(1, TRUE, PANGO_TAB_LEFT,
+                                              tab_position);
+    gtk_text_view_set_tabs(view, tabs);
+    pango_tab_array_free(tabs);
+
+    table = gtk_text_buffer_get_tag_table(buffer);
+    hanging_indent = gtk_text_tag_table_lookup(table, "hanging-indent");
+    g_object_set(hanging_indent, "indent", -tab_position, NULL);
+}
+
+/* Indent in pixels: */
+#define BALSA_MESSAGE_HEADER_SEP     6
+
+static void
 add_header_gchar(BalsaMessage * bm, GtkTextView * view,
 		 const gchar * header, const gchar * label,
 		 const gchar * value)
@@ -565,7 +561,7 @@ add_header_gchar(BalsaMessage * bm, GtkTextView * view,
     GtkTextBuffer *buffer;
     GtkTextIter insert;
     const gchar *font;
-    gboolean truncated = FALSE;
+    GdkRectangle location;
 
     if (!(bm->shown_headers == HEADERS_ALL ||
 	  libbalsa_find_word(header, balsa_app.selected_headers)))
@@ -578,14 +574,19 @@ add_header_gchar(BalsaMessage * bm, GtkTextView * view,
 				     gtk_text_buffer_get_insert(buffer));
     if (gtk_text_buffer_get_char_count(buffer) > 0)
 	gtk_text_buffer_insert(buffer, &insert, "\n", 1);
-    font = strcmp(header, "subject") == 0 ? "subject-font" : NULL;
+    font =
+        strcmp(header, "subject") == 0 ? "subject-font" : "message-font";
     gtk_text_buffer_insert_with_tags_by_name(buffer, &insert, label, -1,
                                              "hanging-indent", font,
                                              NULL);
 
+    gtk_text_view_get_iter_location(view, &insert, &location);
+    bmwm_set_tabs(bm, view, buffer, location.x + BALSA_MESSAGE_HEADER_SEP);
+
     if (value && *value != '\0') {
         gchar *sanitized;
         const gchar *all_tag = _(all_tag_const);
+        gboolean truncated = FALSE;
 
 	gtk_text_buffer_insert(buffer, &insert, "\t", 1);
 
@@ -648,8 +649,7 @@ balsa_mime_widget_message_set_headers(BalsaMessage * bm, BalsaMimeWidget *mw,
 
     balsa_mime_widget_message_set_headers_d(bm, mw, part->embhdrs, part->parts,
                                             part->embhdrs->subject);
-    if (!(widget =
-	  GTK_WIDGET(g_object_get_data(G_OBJECT(mw), "header-widget"))))
+    if (!(widget = mw->header_widget))
 	return;
     view = bm_header_widget_get_text_view(widget);
     if( !g_object_get_data(G_OBJECT(view), "popup-extended") ) {
@@ -659,6 +659,27 @@ balsa_mime_widget_message_set_headers(BalsaMessage * bm, BalsaMimeWidget *mw,
         g_object_set_data(G_OBJECT(view), "popup-extended",
                           GINT_TO_POINTER(1));
     }
+}
+
+/*
+ * Set up the message according to the user preferences.
+ * Do it each time we display a message, in case the prefs have been
+ * changed.
+ */
+static void
+bmwm_buffer_set_prefs(GtkTextBuffer * buffer)
+{
+    GtkTextTagTable *table = gtk_text_buffer_get_tag_table(buffer);
+    GtkTextTag *tag;
+
+    tag = gtk_text_tag_table_lookup(table, "subject-font");
+    g_object_set(tag, "font", balsa_app.subject_font, NULL);
+
+    tag = gtk_text_tag_table_lookup(table, "message-font");
+    g_object_set(tag, "font", balsa_app.message_font, NULL);
+
+    tag = gtk_text_tag_table_lookup(table, "url");
+    g_object_set(tag, "foreground-gdk", &balsa_app.url_color, NULL);
 }
 
 void
@@ -674,12 +695,12 @@ balsa_mime_widget_message_set_headers_d(BalsaMessage * bm,
     gchar *date;
     GtkWidget * widget;
 
-    if (!(widget =
-	  GTK_WIDGET(g_object_get_data(G_OBJECT(mw), "header-widget"))))
+    if (!(widget = mw->header_widget))
 	return;
 
     view = bm_header_widget_get_text_view(widget);
     buffer = gtk_text_view_get_buffer(view);
+    bmwm_buffer_set_prefs(buffer);
 
     gtk_text_buffer_set_text(buffer, "", 0);
     g_return_if_fail(headers);
@@ -689,6 +710,8 @@ balsa_mime_widget_message_set_headers_d(BalsaMessage * bm,
 	return;
     } else
 	gtk_widget_show_all(widget);
+
+    bm->tab_position = 0;
 
     add_header_gchar(bm, view, "subject", _("Subject:"), subject);
 

@@ -1,3 +1,19 @@
+2009-02-12  Peter Bloomfield
+
+	* src/balsa-message.h: new member gint BalsaMessage::tab_position,
+	the position of the tab for header values.
+	* src/balsa-mime-widget.h: new member GtkWidget *
+	BalsaMimeWidget::header_widget, pointer to the header widget for
+	the message.
+	* src/balsa-mime-widget-message.c: (balsa_mime_widget_new_message,
+	balsa_mime_widget_new_message_tl, bm_header_widget_new,
+	bmwm_set_tabs, add_header_gchar,
+	balsa_mime_widget_message_set_headers, bmwm_buffer_set_prefs,
+	balsa_mime_widget_message_set_headers_d): set the tab position 6
+	pixels beyond the length of the longest header label; set user
+	prefs for fonts and colors each time we render a message, in
+	case prefs have changed.
+
 2009-02-12  Inaki Larranaga Murgoitio  <dooteo@euskalgnu.org>
 
 	* configure.in: Added 'eu' (Basque) to ALL_LINGUAS

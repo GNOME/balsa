@@ -20,10 +20,16 @@
  */
 
 #include "config.h"
+
+#if HAVE_STDLIB_H
+#include <stdlib.h>
+#endif
+
 #include <glib.h>
 #include <glib/gi18n.h>
 #include <glib-object.h>
 #include "libbalsa.h"
+#include "missing.h"
 #include "rfc2445.h"
 
 
@@ -70,6 +76,11 @@ static LibBalsaVCalMethod vcal_str_to_method(const gchar * method);
 static LibBalsaVCalRole vcal_str_to_role(const gchar * role);
 static LibBalsaVCalPartStat vcal_str_to_part_stat(const gchar * pstat);
 
+
+#define LB_ROLE2PTR(r)      GINT_TO_POINTER((gint) (r))
+#define LB_PSTAT2PTR(r)     GINT_TO_POINTER((gint) (r))
+#define LB_PTR2ROLE(p)      ((LibBalsaVCalRole) GPOINTER_TO_INT(p))
+#define LB_PTR2PSTAT(p)     ((LibBalsaVCalPartStat) GPOINTER_TO_INT(p))
 
 static struct {
     gchar *str_2445;
@@ -248,16 +259,12 @@ libbalsa_vcal_new_from_body(LibBalsaMessageBody * body)
 
     g_return_val_if_fail(body != NULL, NULL);
 
-    /* get the method parameter which is not required, but we ignore all parts
-     * which don't have it */
-    method = libbalsa_message_body_get_parameter(body, "method");
-    g_return_val_if_fail(method != NULL, NULL);
-
     /* get the body buffer */
     if (libbalsa_message_body_get_content(body, &vcal_buf, NULL) <= 0)
 	return NULL;
 
-    /* check if the body has a charset (default is utf-8, see '2445, sect 4.1.4) */
+    /* check if the body has a charset (default is utf-8, see '2445,
+     * sect 4.1.4) */
     charset = libbalsa_message_body_get_parameter(body, "charset");
     if (charset && g_ascii_strcasecmp(charset, "utf-8")) {
 	gsize written;
@@ -275,8 +282,14 @@ libbalsa_vcal_new_from_body(LibBalsaMessageBody * body)
 
     /* o.k., create a new object */
     retval = libbalsa_vcal_new();
-    retval->method = vcal_str_to_method(method);
-    g_free(method);
+
+    /* replace \r\n by \n */
+    p = strchr(vcal_buf, '\r');
+    while (p) {
+        if (p[1] =='\n')
+	    memmove(p, p + 1, strlen(p + 1) + 1);
+	p = strchr(p + 1, '\r');
+    }
 
     /* unfold the body and split into lines */
     p = strchr(vcal_buf, '\n');
@@ -290,8 +303,11 @@ libbalsa_vcal_new_from_body(LibBalsaMessageBody * body)
 
     /* scan lines to extract vevent(s) */
     event = NULL;
+    method = NULL;
     for (k = 0; lines[k]; k++) {
 	if (!event) {
+            if (!method && !g_ascii_strncasecmp("METHOD:", lines[k], 7))
+                method = g_strdup(lines[k] + 7);
 	    if (!g_ascii_strcasecmp("BEGIN:VEVENT", lines[k]))
 		event = libbalsa_vevent_new();
 	} else {
@@ -336,6 +352,10 @@ libbalsa_vcal_new_from_body(LibBalsaMessageBody * body)
     if (event)
 	g_object_unref(event);
 
+    /* set the method */
+    retval->method = vcal_str_to_method(method);
+    g_free(method);
+
     return retval;
 }
 
@@ -354,9 +374,8 @@ libbalsa_vcal_attendee_to_str(LibBalsaAddress * person)
 
     retval = g_string_new("");
 
-    role =
-	(LibBalsaVCalRole) g_object_get_data(G_OBJECT(person),
-					     RFC2445_ROLE);
+    role = LB_PTR2ROLE(g_object_get_data(G_OBJECT(person),
+                                         RFC2445_ROLE));
     if (role != VCAL_ROLE_UNKNOWN)
 	g_string_printf(retval, "%s ", vcal_role_to_str(role));
 
@@ -364,9 +383,8 @@ libbalsa_vcal_attendee_to_str(LibBalsaAddress * person)
     retval = g_string_append(retval, str);
     g_free(str);
 
-    pstat =
-	(LibBalsaVCalPartStat) g_object_get_data(G_OBJECT(person),
-						 RFC2445_PARTSTAT);
+    pstat = LB_PTR2PSTAT(g_object_get_data(G_OBJECT(person),
+                                           RFC2445_PARTSTAT));
     if (pstat != VCAL_PSTAT_UNKNOWN)
 	g_string_append_printf(retval, " (%s)",
 			       libbalsa_vcal_part_stat_to_str(pstat));
@@ -596,7 +614,7 @@ cal_address_2445_to_lbaddress(const gchar * uri, gchar ** attributes,
     retval->address_list = g_list_prepend(NULL, g_strdup(uri + 7));
     if (!is_organizer)
 	g_object_set_data(G_OBJECT(retval), RFC2445_ROLE,
-			  (gpointer) VCAL_ROLE_REQ_PART);
+			  LB_ROLE2PTR(VCAL_ROLE_REQ_PART));
 
     if (attributes) {
 	int n;
@@ -608,10 +626,10 @@ cal_address_2445_to_lbaddress(const gchar * uri, gchar ** attributes,
 		retval->full_name = g_strdup(the_attr + 3);
 	    else if (!g_ascii_strncasecmp(the_attr, "ROLE=", 5))
 		g_object_set_data(G_OBJECT(retval), RFC2445_ROLE,
-				  (gpointer) vcal_str_to_role(the_attr + 5));
+				  LB_ROLE2PTR(vcal_str_to_role(the_attr + 5)));
 	    else if (!g_ascii_strncasecmp(the_attr, "PARTSTAT=", 9))
 		g_object_set_data(G_OBJECT(retval), RFC2445_PARTSTAT,
-				  (gpointer) vcal_str_to_part_stat(the_attr + 9));
+				  LB_PSTAT2PTR(vcal_str_to_part_stat(the_attr + 9)));
 	    else if (!g_ascii_strncasecmp(the_attr, "RSVP=", 5))
 		g_object_set_data(G_OBJECT(retval), RFC2445_RSVP,
 				  GINT_TO_POINTER(! g_ascii_strcasecmp(the_attr + 5, "TRUE")));
@@ -637,9 +655,10 @@ vcal_str_to_method(const gchar * method)
         { "CANCEL", ITIP_CANCEL },
         { NULL, ITIP_UNKNOWN}
     };
-
     gint n;
 
+    if (!method)
+        return ITIP_UNKNOWN;
     for (n = 0;
 	 meth_list[n].meth_id
 	 && g_ascii_strcasecmp(method, meth_list[n].meth_id); n++);
@@ -700,6 +719,8 @@ vcal_str_to_role(const gchar * role)
     };
     gint n;
 
+    if (!role)
+        return VCAL_ROLE_UNKNOWN;
     for (n = 0;
 	 role_list[n].role_id
 	 && g_ascii_strcasecmp(role, role_list[n].role_id); n++);
@@ -737,6 +758,8 @@ vcal_str_to_part_stat(const gchar * pstat)
     };
     gint n;
 
+    if (!pstat)
+        return VCAL_PSTAT_UNKNOWN;
     for (n = 0;
 	 pstat_list[n].pstat_id
 	 && g_ascii_strcasecmp(pstat, pstat_list[n].pstat_id); n++);

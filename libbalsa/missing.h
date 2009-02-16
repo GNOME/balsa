@@ -26,15 +26,15 @@
 #include <time.h>
 
 #ifndef HAVE_CTIME_R
-char * libbalsa_ctime_r(const time_t *clock, char *buf);
+char * ctime_r(const time_t *clock, char *buf);
 #endif
 
 #ifndef HAVE_LOCALTIME_R
-struct tm * libbalsa_localtime_r(const time_t *clock, struct tm *result);
+struct tm * localtime_r(const time_t *clock, struct tm *result);
 #endif
 
 #ifndef HAVE_GMTIME_R
-struct tm * libbalsa_gmtime_r(const time_t *clock, struct tm *result);
+struct tm * gmtime_r(const time_t *clock, struct tm *result);
 #endif
 
 #endif

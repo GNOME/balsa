@@ -27,7 +27,6 @@
 #include "config.h"
 
 #define _SVID_SOURCE           1
-#define _XOPEN_SOURCE          500
 #include <ctype.h>
 #include <dirent.h>
 #include <errno.h>

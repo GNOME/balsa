@@ -26,10 +26,12 @@
 
 #include "config.h"
 
-#define _XOPEN_SOURCE 500
 
 #include <stdio.h>
 #include <string.h>
+#if HAVE_STDLIB_H
+#include <stdlib.h>
+#endif
 #if HAVE_GNOME
 #include <gnome.h>
 #else

@@ -29,8 +29,6 @@
 
 #include "config.h"
 
-/* define _XOPEN_SOURCE to make strptime visible */
-#define _XOPEN_SOURCE
 /* extensions  needed additonally on Solaris for strptime */
 #define __EXTENSIONS__
 #include <stdlib.h>

@@ -3129,11 +3129,11 @@ send_progress_notify_cb(GIOChannel * source, GIOCondition condition,
     ssize_t count;
     float fraction;
 
-    msgbuffer = malloc(2049);
+    msgbuffer = g_malloc(2049);
     count = read(send_thread_pipes[0], msgbuffer, 2048);
 
     if (count < (ssize_t) sizeof(void *)) {
-        free(msgbuffer);
+        g_free(msgbuffer);
         return TRUE;
     }
 
@@ -3193,14 +3193,14 @@ send_progress_notify_cb(GIOChannel * source, GIOCondition condition,
             fprintf(stderr, " Unknown: %s \n",
                     threadmessage->message_string);
         }
-        free(threadmessage);
+        g_free(threadmessage);
         currentpos++;
         count -= sizeof(void *);
     }
 
     gdk_threads_leave();
 
-    free(msgbuffer);
+    g_free(msgbuffer);
 
     return TRUE;
 }

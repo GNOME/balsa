@@ -19,7 +19,6 @@
  * 02111-1307, USA.
  */
 
-#define _XOPEN_SOURCE 500
 #include "config.h"
 
 #if HAVE_GNOME
@@ -32,6 +31,9 @@
 #endif
 
 #include <signal.h>
+#if HAVE_STDLIB_H
+#include <stdlib.h>
+#endif
 
 #ifdef BALSA_USE_THREADS
 #include <pthread.h>

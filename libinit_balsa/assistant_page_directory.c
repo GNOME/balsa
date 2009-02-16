@@ -19,7 +19,6 @@
  * 02111-1307, USA.
  */
 
-#define _XOPEN_SOURCE 500
 
 #include "config.h"
 

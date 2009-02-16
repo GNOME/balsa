@@ -1,3 +1,18 @@
+2009-02-16  Albrecht Dreß and Paweł Sałek
+
+	* src/main-window.c:
+	  use g_(malloc|free) instead of malloc and free
+	* src/sendmsg-window.c, src/ab-main.c, src/main.c:
+	  add missing include of stdlib.h if it is available
+	* configure.in: always define _XOPEN_SOURCE
+	* libbalsa/missing.h: declare (local|gm|c)time_r if necessary
+	* libbalsa/rfc2445.c: add proper casting macros, catch and convert
+	\r\n line endings (iCal compatibility), work around iCal method
+	parameter bug, fix crash on NULL pointers passed to conversion
+	funcs.
+	* libbalsa/filter-funcs.c: use glib for time conversion if available.
+	* libbalsa/mailbox_imap.c: sync the cache when closing mbox.
+
 2009-02-15  Peter Bloomfield
 
 	* src/balsa-mime-widget-vcalendar.c: (balsa_vevent_widget,

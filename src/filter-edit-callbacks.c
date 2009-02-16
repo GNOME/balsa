@@ -25,7 +25,6 @@
 
 #include "config.h"
 
-#define _XOPEN_SOURCE /* glibc2 needs this */
 /* yellow dog has crappy libc and needs pthread.h to be included here */
 #ifdef BALSA_USE_THREADS
 #  include <pthread.h>

@@ -21,7 +21,6 @@
 
 #include "config.h"
 
-#define _XOPEN_SOURCE 500
 
 #include <gnome.h>
 #include "balsa-app.h"

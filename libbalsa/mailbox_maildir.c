@@ -22,8 +22,6 @@
 
 #include "config.h"
 
-#define _XOPEN_SOURCE          500
-#define _XOPEN_SOURCE_EXTENDED 1
 
 #include <unistd.h>
 #include <fcntl.h>

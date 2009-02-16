@@ -30,7 +30,6 @@
 */
 #include "config.h"
 
-#define _XOPEN_SOURCE 500
 
 #include <stdlib.h>
 #include <dirent.h>
@@ -1071,6 +1070,21 @@ libbalsa_mailbox_imap_close(LibBalsaMailbox * mailbox, gboolean expunge)
     LibBalsaMailboxImap *mbox = LIBBALSA_MAILBOX_IMAP(mailbox);
     struct ImapCacheManager *icm = icm_store_cached_data(mbox->handle);
 
+    mbox->opened = FALSE;
+    g_object_set_data_full(G_OBJECT(mailbox), "cache-manager", icm,
+                           (GDestroyNotify) imap_cache_manager_free);
+
+    /* we do not attempt to reconnect here */
+    if (expunge) {
+	if (is_persistent) { /* We appreciate expunge info to simplify
+				next resync. */
+	    imap_mbox_expunge_a(mbox->handle);
+	}
+	imap_mbox_close(mbox->handle);
+    } else
+	imap_mbox_unselect(mbox->handle);
+
+    /* We have received last notificiations, we can save the cache now. */
     if(is_persistent) {
 	/* Implement only for persistent. Cache dir is shared for all
 	   non-persistent caches. */
@@ -1080,15 +1094,7 @@ libbalsa_mailbox_imap_close(LibBalsaMailbox * mailbox, gboolean expunge)
     }
     clean_cache(mailbox);
 
-    mbox->opened = FALSE;
-    g_object_set_data_full(G_OBJECT(mailbox), "cache-manager", icm,
-                           (GDestroyNotify) imap_cache_manager_free);
 
-    /* we do not attempt to reconnect here */
-    if (expunge)
-	imap_mbox_close(mbox->handle);
-    else
-	imap_mbox_unselect(mbox->handle);
     free_messages_info(mbox);
     libbalsa_mailbox_imap_release_handle(mbox);
     mbox->sort_field = -1;	/* Invalidate. */

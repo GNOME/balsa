@@ -25,15 +25,15 @@
 
 #include <time.h>
 
-#ifndef HAVE_CTIME_R
+#if (HAVE_DECL_CTIME_R == 0)
 char * ctime_r(const time_t *clock, char *buf);
 #endif
 
-#ifndef HAVE_LOCALTIME_R
+#if (HAVE_DECL_LOCALTIME_R == 0)
 struct tm * localtime_r(const time_t *clock, struct tm *result);
 #endif
 
-#ifndef HAVE_GMTIME_R
+#if (HAVE_DECL_GMTIME_R == 0)
 struct tm * gmtime_r(const time_t *clock, struct tm *result);
 #endif
 

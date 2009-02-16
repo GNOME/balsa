@@ -1,3 +1,8 @@
+2009-02-16  Albrecht Dreß
+
+	* configure.in: detect the *time_r function declarations.
+	* libbalsa/missing.h: HAVE_DECL_*TIME_R is always defined to a value.
+
 2009-02-16  Albrecht Dreß and Paweł Sałek
 
 	* src/main-window.c:

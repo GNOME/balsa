@@ -1,3 +1,8 @@
+2009-02-15  Peter Bloomfield
+
+	* src/balsa-mime-widget-vcalendar.c: (balsa_vevent_widget,
+	vevent_reply): check all identities.
+
 2009-02-12  Peter Bloomfield
 
 	* src/balsa-message.h: new member gint BalsaMessage::tab_position,

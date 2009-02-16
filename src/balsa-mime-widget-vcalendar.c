@@ -136,7 +136,7 @@ balsa_vevent_widget(LibBalsaVEvent * event, gboolean may_reply,
 {
     GtkTable *table;
     int row = 0;
-    gboolean reply_widget = FALSE;
+    LibBalsaIdentity *vevent_ident = NULL;
 
     table = GTK_TABLE(gtk_table_new(7, 2, FALSE));
     TABLE_ATTACH(table, event->summary, _("Summary"));
@@ -160,11 +160,16 @@ balsa_vevent_widget(LibBalsaVEvent * event, gboolean may_reply,
 
 	    if (may_reply && libbalsa_vcal_attendee_rsvp(lba)) {
 		InternetAddress *ia = internet_address_new();
+                GList *list;
 
-		internet_address_set_addr(ia,
-					  (const gchar *) lba->address_list->data);
-		if (libbalsa_ia_rfc2821_equal(balsa_app.current_ident->ia, ia))
-		    reply_widget = TRUE;
+                internet_address_set_addr(ia, lba->address_list->data);
+                for (list = balsa_app.identities; list; list = list->next) {
+                    LibBalsaIdentity *ident = list->data;
+                    if (libbalsa_ia_rfc2821_equal(ident->ia, ia)) {
+                        vevent_ident = ident;
+                        break;
+                    }
+                }
 		internet_address_unref(ia);
 	    }
 	}
@@ -174,7 +179,7 @@ balsa_vevent_widget(LibBalsaVEvent * event, gboolean may_reply,
     }
     TABLE_ATTACH(table, event->description, _("Description"));
 
-    if (sender && reply_widget) {
+    if (sender && vevent_ident) {
 	GtkWidget *box = gtk_vbox_new(FALSE, 6);
 	GtkWidget *label;
 	GtkWidget *bbox;
@@ -186,6 +191,9 @@ balsa_vevent_widget(LibBalsaVEvent * event, gboolean may_reply,
 	g_object_set_data_full(G_OBJECT(event), "ev:sender",
 			       internet_address_to_string(sender, FALSE),
 			       (GDestroyNotify) g_free);
+        g_object_set_data_full(G_OBJECT(event), "ev:ident",
+                               g_object_ref(vevent_ident),
+			       (GDestroyNotify) g_object_unref);
 
 	/* pack everything into a box */
 	gtk_container_add(GTK_CONTAINER(box), GTK_WIDGET(table));
@@ -241,17 +249,20 @@ vevent_reply(GObject * button, GtkWidget * box)
     gchar **params;
     GError *error = NULL;
     LibBalsaMsgCreateResult result;
+    LibBalsaIdentity *ident;
 
     g_return_if_fail(event != NULL);
     rcpt = (gchar *) g_object_get_data(G_OBJECT(event), "ev:sender");
     g_return_if_fail(rcpt != NULL);
+    ident = g_object_get_data(G_OBJECT(event), "ev:ident");
+    g_return_if_fail(ident != NULL);
 
     /* make the button box insensitive... */
     gtk_widget_set_sensitive(box, FALSE);
 
     /* create a message with the header set from the incoming message */
     message = libbalsa_message_new();
-    dummy = internet_address_to_string(balsa_app.current_ident->ia, FALSE);
+    dummy = internet_address_to_string(ident->ia, FALSE);
     message->headers->from = internet_address_parse_string(dummy);
     g_free(dummy);
     message->headers->to_list = internet_address_parse_string(rcpt);
@@ -268,7 +279,7 @@ vevent_reply(GObject * button, GtkWidget * box)
     body = libbalsa_message_body_new(message);
     body->buffer =
 	libbalsa_vevent_reply(event,
-			      internet_address_get_addr(balsa_app.current_ident->ia),
+			      internet_address_get_addr(ident->ia),
 			      pstat);
     body->charset = g_strdup("utf-8");
     body->content_type = g_strdup("text/calendar");

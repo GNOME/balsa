@@ -146,11 +146,13 @@ static GtkNotebookClass *parent_class = NULL;
 
 /* stuff needed for sending Message Disposition Notifications */
 static void handle_mdn_request(GtkWindow *parent, LibBalsaMessage *message);
-static LibBalsaMessage *create_mdn_reply (LibBalsaMessage *for_msg,
+static LibBalsaMessage *create_mdn_reply (const LibBalsaIdentity *mdn_ident,
+                                          LibBalsaMessage *for_msg,
                                           gboolean manual);
 static GtkWidget* create_mdn_dialog (GtkWindow *parent, gchar *sender,
 				     gchar *mdn_to_address,
-                                     LibBalsaMessage *send_msg);
+                                     LibBalsaMessage *send_msg,
+                                     LibBalsaIdentity *mdn_ident);
 static void mdn_dialog_response(GtkWidget * dialog, gint response,
                                 gpointer user_data);
 
@@ -2326,11 +2328,12 @@ bm_get_mailbox(const InternetAddressList * list)
 static void
 handle_mdn_request(GtkWindow *parent, LibBalsaMessage *message)
 {
-    gboolean suspicious, found;
+    gboolean suspicious;
     const InternetAddressList *use_from;
     const InternetAddressList *list;
     BalsaMDNReply action;
     LibBalsaMessage *mdn;
+    LibBalsaIdentity *mdn_ident = NULL;
 
     /* Check if the dispnotify_to address is equal to the (in this order,
        if present) reply_to, from or sender address. */
@@ -2348,38 +2351,48 @@ handle_mdn_request(GtkWindow *parent, LibBalsaMessage *message)
 	!libbalsa_ia_rfc2821_equal(message->headers->dispnotify_to->address,
 				   use_from->address);
     
-    if (!suspicious) {
-        /* Try to find "my" address first in the to, then in the cc list */
-        list = message->headers->to_list;
-        found = FALSE;
-        while (list && !found) {
-            found = libbalsa_ia_rfc2821_equal(balsa_app.current_ident->ia,
-					      bm_get_mailbox(list));
-            list = list->next;
+    /* Try to find "my" identity first in the to, then in the cc list */
+    for (list = message->headers->to_list; list && !mdn_ident;
+         list = list->next) {
+        GList * id_list;
+        
+        for (id_list = balsa_app.identities; !mdn_ident && id_list;
+             id_list = id_list->next) {
+            LibBalsaIdentity *ident = LIBBALSA_IDENTITY(id_list->data);
+            
+            if (libbalsa_ia_rfc2821_equal(ident->ia, bm_get_mailbox(list)))
+                mdn_ident = ident;
         }
-        if (!found) {
-            list = message->headers->cc_list;
-            while (list && !found) {
-                found = libbalsa_ia_rfc2821_equal(balsa_app.current_ident->ia,
-						  bm_get_mailbox(list));
-                list = list->next;
-            }
+    }
+    for (list = message->headers->cc_list; list && !mdn_ident;
+         list = list->next) {
+        GList * id_list;
+
+        for (id_list = balsa_app.identities; !mdn_ident && id_list;
+             id_list = id_list->next) {
+            LibBalsaIdentity *ident = LIBBALSA_IDENTITY(id_list->data);
+
+            if (libbalsa_ia_rfc2821_equal(ident->ia, bm_get_mailbox(list)))
+                mdn_ident = ident;
         }
-        suspicious = !found;
     }
     
     /* Now we decide from the settings of balsa_app.mdn_reply_[not]clean what
        to do...
     */
-    if (suspicious)
+    if (suspicious || !mdn_ident)
         action = balsa_app.mdn_reply_notclean;
     else
         action = balsa_app.mdn_reply_clean;
     if (action == BALSA_MDN_REPLY_NEVER)
         return;
+
+    /* fall back to the current identity if the requested one is empty */
+    if (!mdn_ident)
+        mdn_ident = balsa_app.current_ident;
     
     /* We *may* send a reply, so let's create a message for that... */
-    mdn = create_mdn_reply (message, action == BALSA_MDN_REPLY_ASKME);
+    mdn = create_mdn_reply (mdn_ident, message, action == BALSA_MDN_REPLY_ASKME);
 
     /* if the user wants to be asked, display a dialog, otherwise send... */
     if (action == BALSA_MDN_REPLY_ASKME) {
@@ -2389,7 +2402,8 @@ handle_mdn_request(GtkWindow *parent, LibBalsaMessage *message)
         reply_to = 
             internet_address_list_to_string (message->headers->dispnotify_to,
 		                             FALSE);
-        gtk_widget_show_all (create_mdn_dialog (parent, sender, reply_to, mdn));
+        gtk_widget_show_all (create_mdn_dialog (parent, sender, reply_to, mdn,
+                                                mdn_ident));
         g_free (reply_to);
         g_free (sender);
     } else {
@@ -2399,7 +2413,7 @@ handle_mdn_request(GtkWindow *parent, LibBalsaMessage *message)
 #if ENABLE_ESMTP
         result = libbalsa_message_send(mdn, balsa_app.outbox, NULL,
 				       balsa_find_sentbox_by_url,
-				       balsa_app.current_ident->smtp_server,
+				       mdn_ident->smtp_server,
 				       TRUE, balsa_app.debug, &error);
 #else
         result = libbalsa_message_send(mdn, balsa_app.outbox, NULL,
@@ -2415,7 +2429,8 @@ handle_mdn_request(GtkWindow *parent, LibBalsaMessage *message)
     }
 }
 
-static LibBalsaMessage *create_mdn_reply (LibBalsaMessage *for_msg, 
+static LibBalsaMessage *create_mdn_reply (const LibBalsaIdentity *mdn_ident,
+                                          LibBalsaMessage *for_msg, 
                                           gboolean manual)
 {
     LibBalsaMessage *message;
@@ -2428,7 +2443,7 @@ static LibBalsaMessage *create_mdn_reply (LibBalsaMessage *for_msg,
 
     /* create a message with the header set from the incoming message */
     message = libbalsa_message_new();
-    dummy = internet_address_to_string(balsa_app.current_ident->ia, FALSE);
+    dummy = internet_address_to_string(mdn_ident->ia, FALSE);
     message->headers->from = internet_address_parse_string(dummy);
     g_free (dummy);
     message->headers->date = time(NULL);
@@ -2475,7 +2490,7 @@ static LibBalsaMessage *create_mdn_reply (LibBalsaMessage *for_msg,
 	g_string_append_printf(report, "Original-Recipient: %s\n",
 			       original_rcpt);	
     g_string_append_printf(report, "Final-Recipient: rfc822; %s\n",
-			   balsa_app.current_ident->ia->value.addr);
+			   mdn_ident->ia->value.addr);
     if (for_msg->message_id)
         g_string_append_printf(report, "Original-Message-ID: <%s>\n",
                                for_msg->message_id);
@@ -2493,7 +2508,7 @@ static LibBalsaMessage *create_mdn_reply (LibBalsaMessage *for_msg,
 
 static GtkWidget *
 create_mdn_dialog(GtkWindow *parent, gchar * sender, gchar * mdn_to_address,
-                  LibBalsaMessage * send_msg)
+                  LibBalsaMessage * send_msg, LibBalsaIdentity *mdn_ident)
 {
     GtkWidget *mdn_dialog;
 
@@ -2511,6 +2526,8 @@ create_mdn_dialog(GtkWindow *parent, gchar * sender, gchar * mdn_to_address,
                                sender, mdn_to_address);
     gtk_window_set_title(GTK_WINDOW(mdn_dialog), _("Reply to MDN?"));
     g_object_set_data(G_OBJECT(mdn_dialog), "balsa-send-msg", send_msg);
+    g_object_set_data(G_OBJECT(mdn_dialog), "mdn-ident",
+                      g_object_ref(mdn_ident));
     g_signal_connect(G_OBJECT(mdn_dialog), "response",
                      G_CALLBACK(mdn_dialog_response), NULL);
 
@@ -2523,14 +2540,19 @@ mdn_dialog_response(GtkWidget * dialog, gint response, gpointer user_data)
     LibBalsaMessage *send_msg =
         LIBBALSA_MESSAGE(g_object_get_data(G_OBJECT(dialog),
                                            "balsa-send-msg"));
+    LibBalsaIdentity *mdn_ident =
+        LIBBALSA_IDENTITY(g_object_get_data(G_OBJECT(dialog), "mdn-ident"));
     GError * error = NULL;
     LibBalsaMsgCreateResult result;
+
+    g_return_if_fail(send_msg != NULL);
+    g_return_if_fail(mdn_ident != NULL);
 
     if (response == GTK_RESPONSE_YES) {
 #if ENABLE_ESMTP
         result = libbalsa_message_send(send_msg, balsa_app.outbox, NULL,
 				       balsa_find_sentbox_by_url,
-				       balsa_app.current_ident->smtp_server,
+				       mdn_ident->smtp_server,
 				       TRUE, balsa_app.debug, &error);
 #else
         result = libbalsa_message_send(send_msg, balsa_app.outbox, NULL,
@@ -2545,6 +2567,7 @@ mdn_dialog_response(GtkWidget * dialog, gint response, gpointer user_data)
             g_error_free(error);
     }
     g_object_unref(G_OBJECT(send_msg));
+    g_object_unref(G_OBJECT(mdn_ident));
     gtk_widget_destroy(dialog);
 }
 

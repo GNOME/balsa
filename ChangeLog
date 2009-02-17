@@ -1,3 +1,10 @@
+2009-02-16  Albrecht Dreß and Peter Bloomfield
+
+	* src/balsa-message.c: (handle_mdn_request, create_mdn_reply,
+	create_mdn_dialog, mdn_dialog_response): check all identities.
+	* src/balsa-mime-widget-vcalendar.c: (vevent_reply): use
+	smtp-server for attendee's identity.
+
 2009-02-16  Albrecht Dreß
 
 	* configure.in: detect the *time_r function declarations.

@@ -295,7 +295,7 @@ vevent_reply(GObject * button, GtkWidget * box)
 #if ENABLE_ESMTP
     result = libbalsa_message_send(message, balsa_app.outbox, NULL,
 				   balsa_find_sentbox_by_url,
-				   balsa_app.current_ident->smtp_server,
+				   ident->smtp_server,
 				   FALSE, balsa_app.debug, &error);
 #else
     result = libbalsa_message_send(message, balsa_app.outbox, NULL,

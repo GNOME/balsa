@@ -21,13 +21,11 @@
 
 #include "config.h"
 
-#if HAVE_STDLIB_H
 #include <stdlib.h>
-#endif
-
 #include <glib.h>
 #include <glib/gi18n.h>
 #include <glib-object.h>
+
 #include "libbalsa.h"
 #include "missing.h"
 #include "rfc2445.h"

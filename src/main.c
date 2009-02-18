@@ -31,9 +31,7 @@
 #endif
 
 #include <signal.h>
-#if HAVE_STDLIB_H
 #include <stdlib.h>
-#endif
 
 #ifdef BALSA_USE_THREADS
 #include <pthread.h>

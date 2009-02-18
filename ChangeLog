@@ -1,3 +1,8 @@
+2009-02-18  Paweł Sałek
+
+	* src/sendmsg-window.c:, src/{ab-,}main.c:
+	* libbalsa/rfc2445.c: we include stdlib.h unconditionally.
+	
 2009-02-16  Albrecht Dreß and Peter Bloomfield
 
 	* src/balsa-message.c: (handle_mdn_request, create_mdn_reply,

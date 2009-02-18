@@ -21,6 +21,7 @@
 
 #include "config.h"
 
+#include <stdlib.h>
 #include <string.h>
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
@@ -31,9 +32,6 @@
 # include <gconf/gconf.h>
 #endif
 
-#if HAVE_STDLIB_H
-#include <stdlib.h>
-#endif
 
 #ifdef HAVE_LOCALE_H
 #include <locale.h>

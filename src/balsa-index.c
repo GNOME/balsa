@@ -2437,7 +2437,7 @@ bndx_pipe_queue_last(struct BndxPipeQueue *queue)
     int std_input;
     int std_output;
     int std_error;
-    guint msgno;
+    guint msgno = 0;
 
     while(queue->msgnos->len>0){
 	msgno = g_array_index(queue->msgnos, guint, queue->msgnos->len-1);

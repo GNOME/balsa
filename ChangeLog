@@ -1,3 +1,11 @@
+2009-02-21  Paweł Sałek
+
+	* libbalsa/files.c:
+	* src/balsa-index.c: build against oldish gtk/gnome.
+	* libbalsa/rfc2445.c: with gcc-3.x
+	* libbalsa/imap/imap-commands.c: lock the handle when issuing
+	asynchronous EXPUNGE.
+
 2009-02-18  Paweł Sałek
 
 	* src/sendmsg-window.c:, src/{ab-,}main.c:

@@ -692,11 +692,15 @@ imap_mbox_expunge(ImapMboxHandle *handle)
 ImapResponse
 imap_mbox_expunge_a(ImapMboxHandle *handle)
 {
+  ImapResponse rc;
   IMAP_REQUIRED_STATE2(handle,IMHS_AUTHENTICATED, IMHS_SELECTED, IMR_BAD);
   /* extra care would be required to use this once since no other
      commands that use sequence numbers can be issued before this one
      finishes... */
-  return imap_cmd_issue(handle, "EXPUNGE");
+  HANDLE_LOCK(handle);
+  rc = imap_cmd_issue(handle, "EXPUNGE");
+  HANDLE_UNLOCK(handle);
+  return rc;
 }
 
 /* 6.4.4 SEARCH Command */

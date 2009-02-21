@@ -145,6 +145,9 @@ libbalsa_icon_finder(const char *mime_type, const LibbalsaVfs * for_file,
     const gchar * filename = NULL;
 #if HAVE_GIO || HAVE_GNOME
     GtkIconTheme *icon_theme;
+#ifdef HAVE_GNOME_VFS
+    const gchar *icon_file;
+#endif
 #endif
 
     if (!gtk_icon_size_lookup(size, &width, &height))

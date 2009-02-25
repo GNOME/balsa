@@ -22,6 +22,11 @@
 #ifndef __MAIN_WINDOW_H__
 #define __MAIN_WINDOW_H__
 
+#ifdef HAVE_NOTIFY
+#include <libnotify/notify.h>
+#endif
+
+#include "mailbox-node.h"
 #include "toolbar-factory.h"
 
 #define BALSA_TYPE_WINDOW		       (balsa_window_get_type ())
@@ -74,6 +79,14 @@ struct _BalsaWindow {
     guint activity_handler;
     guint activity_counter;
     GSList *activity_messages;
+
+    /* New mail notification: */
+#if GTK_CHECK_VERSION(2, 10, 0)
+    GtkStatusIcon *new_mail_tray;
+#endif                          /* GTK_CHECK_VERSION(2, 10, 0) */
+#ifdef HAVE_NOTIFY
+    NotifyNotification *new_mail_note;
+#endif                         /* HAVE_NOTIFY */
 };
 
 struct _BalsaWindowClass {

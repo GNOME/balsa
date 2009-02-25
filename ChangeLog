@@ -1,3 +1,10 @@
+2009-02-25  Peter Bloomfield
+
+	* src/main-window.h: add new_mail_tray and new_mail_note to
+	BalsaWindow.
+	* src/main-window.c: use gtk_window_set_urgency_hint to show new
+	mail; consolidate notify::is-active handling.
+
 2009-02-21  Paweł Sałek
 
 	* libbalsa/files.c:

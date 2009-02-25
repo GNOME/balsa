@@ -28,13 +28,10 @@
  */
 
 #include "config.h"
+#include "main-window.h"
 
 #include <string.h>
 #include <gdk-pixbuf/gdk-pixbuf.h>
-
-#ifdef HAVE_NOTIFY
-#include <libnotify/notify.h>
-#endif
 
 #include "libbalsa.h"
 #include "misc.h"
@@ -53,7 +50,6 @@
 #include "balsa-message.h"
 #include "folder-conf.h"
 #include "mailbox-conf.h"
-#include "main-window.h"
 #include "message-window.h"
 #include "pref-manager.h"
 #include "print.h"
@@ -295,11 +291,6 @@ static GtkWidget *bw_notebook_label_new (BalsaMailboxNode* mbnode);
 static void bw_ident_manage_dialog_cb(GtkAction * action, gpointer user_data);
 
 static void bw_contents_cb(void);
-
-#ifdef HAVE_NOTIFY
-static void bw_cancel_new_mail_notification(GObject *gobject, GParamSpec *arg1,
-					    gpointer user_data);
-#endif
 
 static void
 bw_quit_nicely(GtkAction * action, gpointer data)
@@ -1533,6 +1524,32 @@ bw_window_state_event_cb(BalsaWindow * window,
     return FALSE;
 }
 
+static void
+bw_is_active_notify(GObject * gobject, GParamSpec * pspec,
+                    gpointer user_data)
+{
+    GtkWindow *gtk_window = GTK_WINDOW(gobject);
+
+    if (gtk_window_is_active(gtk_window)) {
+        BalsaWindow *window = BALSA_WINDOW(gobject);
+
+#ifdef HAVE_NOTIFY
+        if (window->new_mail_note) {
+            /* Setting 0 would mean never timeout! */
+            notify_notification_set_timeout(window->new_mail_note, 1);
+            notify_notification_show(window->new_mail_note, NULL);
+        }
+#endif                          /* HAVE_NOTIFY */
+#if GTK_CHECK_VERSION(2, 10, 0)
+        if (window->new_mail_tray)
+            gtk_status_icon_set_visible(window->new_mail_tray, FALSE);
+#endif                          /* GTK_CHECK_VERSION(2, 10, 0) */
+#if GTK_CHECK_VERSION(2, 8, 0)
+        gtk_window_set_urgency_hint(gtk_window, FALSE);
+#endif                          /* GTK_CHECK_VERSION(2, 8, 0) */
+    }
+}
+
 GtkWidget *
 balsa_window_new()
 {
@@ -1749,18 +1766,16 @@ balsa_window_new()
     /* set initial state of next-unread controls */
     bw_enable_next_unread(window, FALSE);
 
-    g_signal_connect(G_OBJECT(window), "size_allocate",
+    g_signal_connect(window, "size_allocate",
                      G_CALLBACK(bw_size_allocate_cb), NULL);
-    g_signal_connect(G_OBJECT (window), "destroy",
+    g_signal_connect(window, "destroy",
                      G_CALLBACK (gtk_main_quit), NULL);
-    g_signal_connect(G_OBJECT(window), "delete-event",
+    g_signal_connect(window, "delete-event",
                      G_CALLBACK(bw_delete_cb), NULL);
 
-#ifdef HAVE_NOTIFY
     /* Cancel new-mail notification when we get the focus. */
-    g_signal_connect(G_OBJECT(window), "notify::is-active",
-                     G_CALLBACK(bw_cancel_new_mail_notification), NULL);
-#endif
+    g_signal_connect(window, "notify::is-active",
+                     G_CALLBACK(bw_is_active_notify), NULL);
 
     gtk_widget_show(GTK_WIDGET(window));
     return GTK_WIDGET(window);
@@ -3227,28 +3242,13 @@ bw_get_new_message_notification_string(int num_new, int num_total)
 /** Informs the user that new mail arrived. num_new is the number of
     the recently arrived messsages.
 */
-#ifdef HAVE_NOTIFY
-static NotifyNotification *new_mail_note = NULL;
-#endif
-
-#if GTK_CHECK_VERSION(2, 10, 0)
-static void
-hide_sys_tray_icon(GObject *gobject, GParamSpec *arg1, gpointer user_data)
-{
-    if (gtk_window_is_active(GTK_WINDOW(gobject)))
-	gtk_status_icon_set_visible(GTK_STATUS_ICON(user_data), FALSE);
-}
-#endif
-
 static void
 bw_display_new_mail_notification(int num_new, int has_new)
 {
+    GtkWindow *window = GTK_WINDOW(balsa_app.main_window);
     static GtkWidget *dlg = NULL;
     static gint num_total = 0;
     gchar *msg = NULL;
-#if GTK_CHECK_VERSION(2, 10, 0)
-    static GtkStatusIcon *new_mail_tray = NULL;
-#endif
 
     if (num_new <= 0 && has_new <= 0)
         return;
@@ -3259,21 +3259,22 @@ bw_display_new_mail_notification(int num_new, int has_new)
                           "balsa", "newmail", NULL);
 #endif
 
+#if GTK_CHECK_VERSION(2, 8, 0)
+    if (!gtk_window_is_active(window))
+        gtk_window_set_urgency_hint(window, TRUE);
+#endif                          /* GTK_CHECK_VERSION(2, 8, 0) */
+
 #if GTK_CHECK_VERSION(2, 10, 0)
     if (balsa_app.notify_new_mail_icon) {
         /* set up the sys tray icon when it is not yet present */
-        if (!gtk_window_is_active(GTK_WINDOW(balsa_app.main_window))) {
-	    if (!new_mail_tray) {
-		new_mail_tray =
+        if (!gtk_window_is_active(window)) {
+	    if (!balsa_app.main_window->new_mail_tray) {
+		balsa_app.main_window->new_mail_tray =
 		    gtk_status_icon_new_from_icon_name("stock_mail-compose");
-		g_signal_connect_swapped(G_OBJECT(new_mail_tray), "activate",
-					 G_CALLBACK(gtk_window_present),
-					 balsa_app.main_window);
-		/* hide tray icon when the main window gets the focus. */
-		g_signal_connect(G_OBJECT(balsa_app.main_window),
-				 "notify::is-active",
-				 G_CALLBACK(hide_sys_tray_icon),
-				 new_mail_tray);
+                g_signal_connect_swapped(balsa_app.main_window->
+                                         new_mail_tray, "activate",
+                                         G_CALLBACK(gtk_window_present),
+                                         balsa_app.main_window);
 	    }
 	    /* show sys tray icon if we don't have the focus */
             if (num_new > 0)
@@ -3285,11 +3286,14 @@ bw_display_new_mail_notification(int num_new, int has_new)
             else
                 msg = g_strdup(_("Balsa: you have new mail."));
 #if GTK_CHECK_VERSION(2, 15, 0)
-            gtk_status_icon_set_tooltip_text(new_mail_tray, msg);
+            gtk_status_icon_set_tooltip_text(balsa_app.main_window->
+                                             new_mail_tray, msg);
 #else                           /* GTK_CHECK_VERSION(2, 16, 0) */
-            gtk_status_icon_set_tooltip(new_mail_tray, msg);
+            gtk_status_icon_set_tooltip(balsa_app.main_window->
+                                        new_mail_tray, msg);
 #endif                          /* GTK_CHECK_VERSION(2, 16, 0) */
-            gtk_status_icon_set_visible(new_mail_tray, TRUE);
+            gtk_status_icon_set_visible(balsa_app.main_window->
+                                        new_mail_tray, TRUE);
             g_free(msg);
         }
     }
@@ -3304,21 +3308,23 @@ bw_display_new_mail_notification(int num_new, int has_new)
        dbus could not be created? In any case, we must not continue or
        ugly things will happen, at least with libnotify-0.4.2. */
     if (notify_is_initted()) {
-        if (gtk_window_is_active(GTK_WINDOW(balsa_app.main_window)))
+        if (gtk_window_is_active(window))
             return;
 
-        if (new_mail_note) {
+        if (balsa_app.main_window->new_mail_note) {
             /* the user didn't acknowledge the last info, so we'll
              * accumulate the count */
             num_total += num_new;
         } else {
             num_total = num_new;
-            new_mail_note =
+            balsa_app.main_window->new_mail_note =
                 notify_notification_new("Balsa", NULL, NULL, NULL);
-            g_object_add_weak_pointer(G_OBJECT(new_mail_note),
-                                      (gpointer) & new_mail_note);
-            g_signal_connect(new_mail_note, "closed",
-                             G_CALLBACK(g_object_unref), NULL);
+            g_object_add_weak_pointer(G_OBJECT(balsa_app.main_window->
+                                               new_mail_note),
+                                      (gpointer) & balsa_app.main_window->
+                                      new_mail_note);
+            g_signal_connect(balsa_app.main_window->new_mail_note,
+                             "closed", G_CALLBACK(g_object_unref), NULL);
         }
     } else {
 #endif
@@ -3348,11 +3354,14 @@ bw_display_new_mail_notification(int num_new, int has_new)
     }
 
     msg = bw_get_new_message_notification_string(num_new, num_total);
-    if (new_mail_note) {
-        notify_notification_update(new_mail_note, "Balsa", msg, 
-                                   GTK_STOCK_DIALOG_INFO);
-        notify_notification_set_timeout(new_mail_note, 30000); /* 30 seconds */
-        notify_notification_show(new_mail_note, NULL);
+    if (balsa_app.main_window->new_mail_note) {
+        notify_notification_update(balsa_app.main_window->new_mail_note,
+                                   "Balsa", msg, GTK_STOCK_DIALOG_INFO);
+        /* 30 seconds: */
+        notify_notification_set_timeout(balsa_app.main_window->
+                                        new_mail_note, 30000);
+        notify_notification_show(balsa_app.main_window->new_mail_note,
+                                 NULL);
     } else
         gtk_label_set_text(GTK_LABEL(GTK_MESSAGE_DIALOG(dlg)->label), msg);
 #else
@@ -3362,20 +3371,6 @@ bw_display_new_mail_notification(int num_new, int has_new)
 #endif
     g_free(msg);
 }
-
-#ifdef HAVE_NOTIFY
-static void
-bw_cancel_new_mail_notification(GObject *gobject, GParamSpec *arg1,
-				gpointer user_data)
-{
-    if (new_mail_note
-        && gtk_window_is_active(GTK_WINDOW(balsa_app.main_window))) {
-        /* Setting 0 would mean never timeout! */
-        notify_notification_set_timeout(new_mail_note, 1);
-        notify_notification_show(new_mail_note, NULL);
-    }
-}
-#endif
 
 GtkWidget *
 balsa_window_find_current_index(BalsaWindow * window)

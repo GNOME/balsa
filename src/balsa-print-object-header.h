@@ -22,7 +22,6 @@
 #ifndef __BALSA_PRINT_OBJECT_HEADER_H__
 #define __BALSA_PRINT_OBJECT_HEADER_H__
 
-#include "config.h"
 #include "balsa-print-object.h"
 
 G_BEGIN_DECLS

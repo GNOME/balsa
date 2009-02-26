@@ -19,7 +19,10 @@
  * 02111-1307, USA.
  */
 
-#include "config.h"
+#if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
+# include "config.h"
+#endif                          /* HAVE_CONFIG_H */
+#include "toolbar-prefs.h"
 
 #include <string.h>
 #include <glib/gi18n.h>
@@ -30,7 +33,6 @@
 #include "message-window.h"
 #include "sendmsg-window.h"
 #include "toolbar-factory.h"
-#include "toolbar-prefs.h"
 
 #if !GTK_CHECK_VERSION(2, 14, 0)
 #ifdef HAVE_GNOME

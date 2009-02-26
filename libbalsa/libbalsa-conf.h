@@ -23,8 +23,6 @@
 #ifndef __LIBCONFIG_H__
 #define __LIBCONFIG_H__
 
-#include "config.h"
-
 #include <gtk/gtk.h>
 
 void libbalsa_conf_push_group(const char *group);

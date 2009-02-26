@@ -39,14 +39,16 @@
    The mailbox_name field is displayed only for special mailboxes
    and POP3 mailboxes.
 */
-#include "config.h"
+#if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
+# include "config.h"
+#endif                          /* HAVE_CONFIG_H */
+#include "mailbox-conf.h"
 
 #include <gtk/gtk.h>
 #include <string.h>
 
 #include "balsa-app.h"
 #include "balsa-mblist.h"
-#include "mailbox-conf.h"
 #include "mailbox-node.h"
 #include "pref-manager.h"
 #include "save-restore.h"

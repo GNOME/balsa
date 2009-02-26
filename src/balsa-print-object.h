@@ -24,7 +24,6 @@
 
 #include <gtk/gtk.h>
 #include <libbalsa.h>
-#include "config.h"
 #include "balsa-app.h"
 #include "balsa-message.h"
 

@@ -28,9 +28,6 @@
 extern "C" {
 #endif                          /* __cplusplus */
 
-
-
-#include "config.h"
 #include <gnome.h>
 #include "helper.h"
 #include "balsa-initdruid.h"

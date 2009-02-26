@@ -19,10 +19,12 @@
  * 02111-1307, USA.
  */
 
-#include "config.h"
+#if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
+# include "config.h"
+#endif                          /* HAVE_CONFIG_H */
+#include "balsa-druid-page-finish.h"
 
 #include "balsa-druid-page-directory.h"
-#include "balsa-druid-page-finish.h"
 
 #include <glib/gi18n.h>
 #include "save-restore.h"

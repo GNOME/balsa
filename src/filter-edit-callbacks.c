@@ -23,7 +23,9 @@
  * Callbacks for the filter edit dialog
  */
 
-#include "config.h"
+#if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
+# include "config.h"
+#endif                          /* HAVE_CONFIG_H */
 
 /* yellow dog has crappy libc and needs pthread.h to be included here */
 #ifdef BALSA_USE_THREADS

@@ -28,10 +28,6 @@
 extern "C" {
 #endif                          /* __cplusplus */
 
-
-
-#include "config.h"
-
 #if HAVE_GNOME
 /* setting the default Gnome mail client doesn't make sense if we don't build
  for Gnome */

@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2005 Stuart Parmenter and others,
+ * Copyright (C) 1997-2009 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -28,10 +28,12 @@
  * Obviously, the best method would be to have file encoded in UTF-8.
  */
 
-#include "config.h"
+#if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
+# include "config.h"
+#endif                          /* HAVE_CONFIG_H */
+#include "address-book-vcard.h"
 
 #include <string.h>
-#include "address-book-vcard.h"
 #include <glib/gi18n.h>
 
 /* FIXME: Perhaps the whole thing could be rewritten to use a g_scanner ?? */

@@ -23,6 +23,8 @@
 #ifndef __LIBBALSA_H__
 #define __LIBBALSA_H__
 
+typedef struct _LibBalsaCondition LibBalsaCondition;
+typedef struct _LibBalsaIdentity LibBalsaIdentity;
 typedef struct _LibBalsaMailbox LibBalsaMailbox;
 typedef struct _LibBalsaMailboxRemote LibBalsaMailboxRemote;
 typedef struct _LibBalsaMailboxSearchIter LibBalsaMailboxSearchIter;
@@ -31,7 +33,7 @@ typedef struct _LibBalsaMessageHeaders LibBalsaMessageHeaders;
 typedef struct _LibBalsaMessageBody LibBalsaMessageBody;
 typedef struct _LibBalsaServer LibBalsaServer;
 typedef struct _LibBalsaSmtpServer LibBalsaSmtpServer;
-typedef struct _LibBalsaCondition LibBalsaCondition;
+typedef struct _LibbalsaVfs LibbalsaVfs;
 
 
 #include "message.h"

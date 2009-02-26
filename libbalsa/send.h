@@ -24,6 +24,8 @@
 #ifndef __SEND_H__
 #define __SEND_H__
 
+#include "libbalsa.h"
+
 typedef LibBalsaMailbox* (*LibBalsaFccboxFinder)(const gchar *url);
 typedef enum _LibBalsaMsgCreateResult LibBalsaMsgCreateResult;
 enum _LibBalsaMsgCreateResult {

@@ -24,8 +24,6 @@
 #ifndef __GMIME_STREAM_GVFS_H__
 #define __GMIME_STREAM_GVFS_H__
 
-#include "config.h"
-
 /* note: this module will be compiled only if Gnome-Vfs is available */
 #ifdef HAVE_GNOME_VFS
 

@@ -19,7 +19,10 @@
  * 02111-1307, USA.
  */
 
-#include "config.h"
+#if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
+# include "config.h"
+#endif                          /* HAVE_CONFIG_H */
+#include "toolbar-factory.h"
 
 #include <string.h>
 #if HAVE_GNOME
@@ -36,7 +39,6 @@
 #include "libbalsa-conf.h"
 
 #include "toolbar-prefs.h"
-#include "toolbar-factory.h"
 
 /* Must be consistent with BalsaToolbarType enum: */
 static const gchar *const balsa_toolbar_names[] =

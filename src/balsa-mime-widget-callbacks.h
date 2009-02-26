@@ -22,7 +22,6 @@
 #ifndef __BALSA_MIME_WIDGET_CALLBACKS_H__
 #define __BALSA_MIME_WIDGET_CALLBACKS_H__
 
-#include "config.h"
 #include "balsa-app.h"
 #include "balsa-message.h"
 

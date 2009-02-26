@@ -147,11 +147,11 @@ EXTRA_DIST = 				\
 	${libbalsa_gpgme_extra_dist}	\
 	${libbalsa_smime_extra_dist}
 
-INCLUDES= -I${top_builddir} -I${top_srcdir} -I${top_srcdir}/libbalsa \
+AM_CPPFLAGS = -I${top_builddir} -I${top_srcdir} -I${top_srcdir}/libbalsa \
 	-I${top_srcdir}/libbalsa/imap \
-	$(BALSA_CFLAGS)
+	$(BALSA_DEFS)
 
-DEFS = $(BALSA_DEFS)
+AM_CFLAGS = $(BALSA_CFLAGS)
 
 #Signal marshallers
 marshal_prefix = libbalsa

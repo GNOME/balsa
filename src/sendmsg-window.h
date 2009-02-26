@@ -26,7 +26,9 @@
 extern "C" {
 #endif				/* __cplusplus */
 
+#include "libbalsa.h"
 #include "address-view.h"
+#include "toolbar-factory.h"
 
     typedef enum {
        SEND_NORMAL,            /* initialized by Compose */

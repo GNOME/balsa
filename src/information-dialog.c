@@ -24,14 +24,15 @@
  * received from libbalsa
  */
 
-#include "config.h"
+#if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
+# include "config.h"
+#endif                          /* HAVE_CONFIG_H */
+#include "information-dialog.h"
 
 #include <string.h>
 
-#include "libbalsa.h"
 #include <glib/gi18n.h>
 #include "balsa-app.h"
-#include "information-dialog.h"
 
 static void balsa_information_bar(GtkWindow *parent,
                                   LibBalsaInformationType type,

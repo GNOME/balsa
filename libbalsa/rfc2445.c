@@ -19,7 +19,10 @@
  * 02111-1307, USA.
  */
 
-#include "config.h"
+#if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
+# include "config.h"
+#endif                          /* HAVE_CONFIG_H */
+#include "rfc2445.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -29,7 +32,6 @@
 
 #include "libbalsa.h"
 #include "missing.h"
-#include "rfc2445.h"
 
 
 /* participant roles as defined by RFC 2446 */

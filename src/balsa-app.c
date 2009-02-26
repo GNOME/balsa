@@ -19,7 +19,11 @@
  * 02111-1307, USA.
  */
 
-#include "config.h"
+#if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
+# include "config.h"
+#endif                          /* HAVE_CONFIG_H */
+#include "balsa-app.h"
+
 #include <string.h>
 #include <stdlib.h>
 #ifdef BALSA_USE_THREADS
@@ -35,7 +39,6 @@
 #include "misc.h"
 #include "server.h"
 #include "smtp-server.h"
-#include "balsa-app.h"
 #include "save-restore.h"
 
 #include <glib/gi18n.h>	/* Must come after balsa-app.h. */

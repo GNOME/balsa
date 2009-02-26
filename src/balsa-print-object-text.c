@@ -19,9 +19,13 @@
  * 02111-1307, USA.
  */
 
+#if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
+# include "config.h"
+#endif                          /* HAVE_CONFIG_H */
+#include "balsa-print-object-text.h"
+
 #include <gtk/gtk.h>
 #include <string.h>
-#include "config.h"
 #include <glib/gi18n.h>
 #include "libbalsa.h"
 #include "rfc2445.h"
@@ -29,7 +33,6 @@
 #include "balsa-print-object.h"
 #include "balsa-print-object-decor.h"
 #include "balsa-print-object-default.h"
-#include "balsa-print-object-text.h"
 
 
 typedef enum {

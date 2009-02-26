@@ -20,7 +20,10 @@
  *  02110-1301, USA.
  */
 
-#include "config.h"
+#if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
+# include "config.h"
+#endif                          /* HAVE_CONFIG_H */
+#include "gmime-stream-gio.h"
 
 /* note: this module will be compiled only if GIO is available */
 #if HAVE_GIO
@@ -29,9 +32,6 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <errno.h>
-
-#include "gmime-stream-gio.h"
-
 
 static void g_mime_stream_gio_class_init(GMimeStreamGioClass *klass);
 static void g_mime_stream_gio_init(GMimeStreamGio *stream,

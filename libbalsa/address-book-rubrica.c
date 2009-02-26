@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2005 Stuart Parmenter and others,
+ * Copyright (C) 1997-2009 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * Rubrica2 address book support was written by Copyright (C)
@@ -27,7 +27,10 @@
  * A Rubrica (XML) addressbook.
  */
 
-#include "config.h"
+#if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
+# include "config.h"
+#endif                          /* HAVE_CONFIG_H */
+#include "address-book-rubrica.h"
 
 #if HAVE_RUBRICA
 
@@ -40,7 +43,6 @@
 #include "libbalsa-conf.h"
 #include "abook-completion.h"
 #include "misc.h"
-#include "address-book-rubrica.h"
 #include <glib/gi18n.h>
 
 

@@ -19,11 +19,13 @@
  * 02111-1307, USA.
  */
 
-#include "config.h"
+#if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
+# include "config.h"
+#endif                          /* HAVE_CONFIG_H */
+#include "init_balsa.h"
 
 #include <gtk/gtk.h>
 
-#include "init_balsa.h"
 #ifdef HAVE_GNOME
 #include "helper.h"
 #include "balsa-initdruid.h"

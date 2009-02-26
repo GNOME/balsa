@@ -35,12 +35,13 @@
  * more complete API.
  */
 
-#include "config.h"
+#if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
+# include "config.h"
+#endif                          /* HAVE_CONFIG_H */
+#include "html.h"
 
 #include <stdio.h>
 #include <string.h>
-
-#include "html.h"
 
 #ifdef HAVE_GTKHTML
 

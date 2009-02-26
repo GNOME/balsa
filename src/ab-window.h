@@ -22,6 +22,9 @@
 #ifndef __AB_WINDOW_H__
 #define __AB_WINDOW_H__
 
+#include <gtk/gtk.h>
+#include <libbalsa.h>
+
 #define BALSA_TYPE_AB_WINDOW            (balsa_ab_window_get_type ())
 #define BALSA_AB_WINDOW(obj)            (G_TYPE_CHECK_INSTANCE_CAST ((obj), BALSA_TYPE_AB_WINDOW, BalsaAbWindow))
 #define BALSA_AB_WINDOW_CLASS(klass)    (G_TYPE_CHECK_CLASS_CAST ((klass), BALSA_TYPE_AB_WINDOW, BalsaAbWindowClass))

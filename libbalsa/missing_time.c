@@ -20,7 +20,10 @@
  * 02111-1307, USA.
  */
 
-#include "config.h"
+#if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
+# include "config.h"
+#endif                          /* HAVE_CONFIG_H */
+#include "missing.h"
 
 #include <string.h>
 
@@ -33,9 +36,6 @@ static pthread_mutex_t time_lock = PTHREAD_MUTEX_INITIALIZER;
 #define LOCK(mutex)
 #define UNLOCK(mutex)
 #endif /* HAVE_THREADS */
-
-#include "missing.h"
-
 
 #ifndef HAVE_CTIME_R
 char *

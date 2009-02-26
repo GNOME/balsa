@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2002 Stuart Parmenter and others,
+ * Copyright (C) 1997-2009 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -29,7 +29,10 @@
  * Primary author: Emmanuel ALLAUD
  */
 
-#include "config.h"
+#if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
+# include "config.h"
+#endif                          /* HAVE_CONFIG_H */
+#include "filter.h"
 
 #include <ctype.h>
 #include <string.h>
@@ -41,7 +44,6 @@
 #include "libbalsa.h"
 #include "libbalsa_private.h"
 
-#include "filter.h"
 #include "filter-funcs.h"
 #include "filter-private.h"
 #include "misc.h"

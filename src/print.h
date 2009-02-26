@@ -22,8 +22,6 @@
 #ifndef __PRINT_H__
 #define __PRINT_H__
 
-#include "config.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif				/* __cplusplus */

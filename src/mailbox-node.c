@@ -19,7 +19,10 @@
  * 02111-1307, USA.
  */
 
-#include "config.h"
+#if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
+# include "config.h"
+#endif                          /* HAVE_CONFIG_H */
+#include "mailbox-node.h"
 
 #include <unistd.h>
 #include <string.h>
@@ -28,7 +31,6 @@
 #include "folder-scanners.h"
 #include "folder-conf.h"
 #include "mailbox-conf.h"
-#include "mailbox-node.h"
 #include "save-restore.h"
 #include "filter.h"
 #include "imap-server.h"

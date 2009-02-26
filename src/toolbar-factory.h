@@ -22,6 +22,9 @@
 #ifndef __TOOLBAR_FACTORY_H__
 #define __TOOLBAR_FACTORY_H__
 
+#include <glib-object.h>
+#include "toolbar-prefs.h"
+
 GType balsa_toolbar_model_get_type(void);
 
 #define BALSA_TYPE_TOOLBAR_MODEL \

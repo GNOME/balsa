@@ -20,7 +20,10 @@
  *  02110-1301, USA.
  */
 
-#include "config.h"
+#if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
+# include "config.h"
+#endif                          /* HAVE_CONFIG_H */
+#include "gmime-stream-gnome-vfs.h"
 
 /* note: this module will be compiled only if Gnome-Vfs is available */
 #ifdef HAVE_GNOME_VFS
@@ -29,9 +32,6 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <errno.h>
-
-#include "gmime-stream-gnome-vfs.h"
-
 
 /**
  * SECTION: gmime-stream-gvfs

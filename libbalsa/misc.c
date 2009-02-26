@@ -24,7 +24,10 @@
    this file can be linked against the address book program balsa-ab
    without introducing extra dependencies. External library
    dependencies should go to libbalsa.c */
-#include "config.h"
+#if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
+# include "config.h"
+#endif                          /* HAVE_CONFIG_H */
+#include "misc.h"
 
 #define _SVID_SOURCE           1
 #include <ctype.h>
@@ -40,7 +43,6 @@
 
 #include "libbalsa.h"
 #include "libbalsa_private.h"
-#include "misc.h"
 #include "html.h"
 #include <glib/gi18n.h>
 

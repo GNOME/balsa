@@ -19,13 +19,14 @@
  * 02111-1307, USA.
  */
 
-#include "config.h"
-
+#if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
+# include "config.h"
+#endif                          /* HAVE_CONFIG_H */
+#include "print.h"
 
 #include <gnome.h>
 #include "balsa-app.h"
 
-#include "print.h"
 #include "misc.h"
 #include "balsa-message.h"
 

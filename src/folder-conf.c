@@ -19,11 +19,14 @@
  * 02111-1307, USA.
  */
 
-#include "config.h"
+#if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
+# include "config.h"
+#endif                          /* HAVE_CONFIG_H */
+#include "folder-conf.h"
+
 #include <string.h>
 #include "balsa-app.h"
 #include "balsa-icons.h"
-#include "folder-conf.h"
 #include "mailbox-conf.h"
 #include "mailbox-node.h"
 #include "save-restore.h"

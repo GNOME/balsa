@@ -28,7 +28,9 @@
    responses particularly for shared mailboxes before you try messing
    with this.
 */
-#include "config.h"
+#if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
+# include "config.h"
+#endif                          /* HAVE_CONFIG_H */
 
 
 #include <stdlib.h>

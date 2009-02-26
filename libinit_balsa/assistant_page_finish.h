@@ -27,9 +27,6 @@
 extern "C" {
 #endif                          /* __cplusplus */
 
-
-
-#include "config.h"
 #include <gtk/gtk.h>
 
 #include "assistant_helper.h"

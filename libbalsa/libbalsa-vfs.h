@@ -42,7 +42,6 @@ G_BEGIN_DECLS
 #define LIBBALSA_IS_VFS_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE((klass), LIBBALSA_TYPE_VFS))
 #define LIBBALSA_VFS_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS((obj), LIBBALSA_TYPE_VFS, LibbalsaVfsClass))
 
-typedef struct _LibbalsaVfs LibbalsaVfs;
 typedef struct _LibbalsaVfsClass LibbalsaVfsClass;
 
 

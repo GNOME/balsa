@@ -19,7 +19,10 @@
  * 02111-1307, USA.
  */
 
-#include "config.h"
+#if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
+# include "config.h"
+#endif                          /* HAVE_CONFIG_H */
+#include "spell-check.h"
 
 #define USE_ORIGINAL_MANAGER_FUNCS
 
@@ -43,7 +46,6 @@
 
 #include "balsa-app.h"
 #include "quote-color.h"
-#include "spell-check.h"
 #include "balsa-icons.h"
 
 #define SPELLMGR_CODESET "UTF-8"

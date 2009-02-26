@@ -18,8 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  
  * 02111-1307, USA.
  */
-#include "config.h"
 
+#if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
+# include "config.h"
+#endif                          /* HAVE_CONFIG_H */
+#include "save-restore.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -28,7 +31,6 @@
 #endif
 #include <glib/gi18n.h>
 #include "balsa-app.h"
-#include "save-restore.h"
 #include "server.h"
 #include "quote-color.h"
 #include "toolbar-prefs.h"

@@ -19,11 +19,13 @@
  * 02111-1307, USA.
  */
 
-#include <string.h>
-#include <config.h>
-
-#include <gmime/gmime.h>
+#if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
+# include "config.h"
+#endif                          /* HAVE_CONFIG_H */
 #include "gmime-part-rfc2440.h"
+
+#include <string.h>
+#include <gmime/gmime.h>
 
 
 #define RFC2440_BUF_LEN    4096

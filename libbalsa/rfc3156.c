@@ -18,7 +18,10 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  
  * 02111-1307, USA.
  */
-#include "config.h"
+#if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
+# include "config.h"
+#endif                          /* HAVE_CONFIG_H */
+#include "rfc3156.h"
 
 #ifdef HAVE_GPGME
 
@@ -31,7 +34,6 @@
 
 #include "libbalsa.h"
 #include "libbalsa_private.h"
-#include "rfc3156.h"
 
 #include "gmime-gpgme-context.h"
 #include "gmime-gpgme-signature.h"

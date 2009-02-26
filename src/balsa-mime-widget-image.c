@@ -19,12 +19,15 @@
  * 02111-1307, USA.
  */
 
-#include "config.h"
+#if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
+# include "config.h"
+#endif                          /* HAVE_CONFIG_H */
+#include "balsa-mime-widget-image.h"
+
 #include "balsa-app.h"
 #include <glib/gi18n.h>
 #include "balsa-mime-widget.h"
 #include "balsa-mime-widget-callbacks.h"
-#include "balsa-mime-widget-image.h"
 
 
 static gboolean balsa_image_button_press_cb(GtkWidget * widget, GdkEventButton * event,

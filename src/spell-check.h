@@ -22,8 +22,6 @@
 #ifndef __BALSA_SPELL_CHECK_H__
 #define __BALSA_SPELL_CHECK_H__
 
-#include "config.h"
-
 #define USE_ORIGINAL_MANAGER_FUNCS
 
 #ifdef __cplusplus

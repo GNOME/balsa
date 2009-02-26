@@ -19,7 +19,10 @@
  * 02111-1307, USA.
  */
 
-#include "config.h"
+#if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
+# include "config.h"
+#endif                          /* HAVE_CONFIG_H */
+#include "address-book-config.h"
 
 #include <gtk/gtk.h>
 
@@ -30,7 +33,6 @@
 #endif                          /* GTK_CHECK_VERSION(2, 14, 0) */
 
 #include "balsa-app.h"
-#include "address-book-config.h"
 #include <glib/gi18n.h>
 
 typedef struct _AddressBookConfig AddressBookConfig;

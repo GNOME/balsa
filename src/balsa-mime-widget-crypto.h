@@ -22,8 +22,6 @@
 #ifndef __BALSA_MIME_WIDGET_CRYPTO_H__
 #define __BALSA_MIME_WIDGET_CRYPTO_H__
 
-#include "config.h"
-
 #ifdef HAVE_GPGME
 
 #include "balsa-app.h"

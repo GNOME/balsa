@@ -22,6 +22,8 @@
 #ifndef __INFORMATION_DIALOG_H__
 #define __INFORMATION_DIALOG_H__
 
+#include "libbalsa.h"
+
 typedef enum _BalsaInformationShow BalsaInformationShow;
 enum _BalsaInformationShow {
     BALSA_INFORMATION_SHOW_NONE = 0,

@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /*
  * gmime/gpgme glue layer library
- * Copyright (C) 2004 Albrecht Dreﬂ <albrecht.dress@arcor.de>
+ * Copyright (C) 2004-2009 Albrecht Dreﬂ <albrecht.dress@arcor.de>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,14 +18,16 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  
  * 02111-1307, USA.
  */
-#include "config.h"
+#if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
+# include "config.h"
+#endif                          /* HAVE_CONFIG_H */
+#include "gmime-gpgme-context.h"
 
 #include <string.h>
 #include <glib.h>
 #include <gmime/gmime.h>
 #include <gpgme.h>
 #include <time.h>
-#include "gmime-gpgme-context.h"
 #include <glib/gi18n.h>
 
 #define GPGME_ERROR_QUARK (g_quark_from_static_string ("gmime-gpgme"))

@@ -19,14 +19,15 @@
  * 02111-1307, USA.
  */
 
+#if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
+# include "config.h"
+#endif                          /* HAVE_CONFIG_H */
+#include "balsa-mime-widget-image.h"
+
 #include <string.h>
-#include "config.h"
-#include "libbalsa.h"
-#include "balsa-app.h"
 #include "balsa-icons.h"
 #include "mime-stream-shared.h"
 #include <glib/gi18n.h>
-#include "balsa-mime-widget-image.h"
 #include "balsa-mime-widget-message.h"
 #include "balsa-mime-widget-multipart.h"
 #include "balsa-mime-widget-text.h"

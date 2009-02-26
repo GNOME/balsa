@@ -23,8 +23,6 @@
 #ifndef   __LIBBALSA_HTML_H__
 # define  __LIBBALSA_HTML_H__
 
-#include "config.h"
-
 # if defined(HAVE_GTKHTML2)
 /* gtkhtml2 uses deprecated api */
 #  undef GTK_DISABLE_DEPRECATED

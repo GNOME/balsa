@@ -22,6 +22,8 @@
 #ifndef __IMAP_SERVER_H__
 #define __IMAP_SERVER_H__
 
+#include <glib-object.h>
+
 #define LIBBALSA_TYPE_IMAP_SERVER \
     (libbalsa_imap_server_get_type())
 #define LIBBALSA_IMAP_SERVER(obj) \

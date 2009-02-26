@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2005 Stuart Parmenter and others,
+ * Copyright (C) 1997-2009 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -20,15 +20,16 @@
  * 02111-1307, USA.
  */
 
-#include "config.h"
+#if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
+# include "config.h"
+#endif                          /* HAVE_CONFIG_H */
+#include "address-book.h"
 
 #include <gtk/gtk.h>
-
-#include "address-book.h"
-#include "libbalsa-marshal.h"
-
-#include "libbalsa-conf.h"
 #include <glib/gi18n.h>
+
+#include "libbalsa-marshal.h"
+#include "libbalsa-conf.h"
 
 static GObjectClass *parent_class = NULL;
 

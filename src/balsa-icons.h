@@ -23,7 +23,6 @@
 #define __BALSA_ICONS_H__
 
 #include <gtk/gtk.h>
-#include "config.h"
 
 #define BALSA_PIXMAP_ATTACHMENT			"balsa_attachment"
 #define BALSA_PIXMAP_COMPOSE			"balsa_compose"

@@ -24,8 +24,6 @@
 #ifndef __BALSA_BONOBO_H
 #define __BALSA_BONOBO_H
 
-#include "config.h"
-
 #if HAVE_GNOME
 
 #include "Balsa.h" 

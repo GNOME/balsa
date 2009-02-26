@@ -29,7 +29,6 @@
 
 #include <gmime/gmime.h>
 
-#include "config.h"
 #ifdef HAVE_GPGME
 #include "rfc3156.h"
 #endif

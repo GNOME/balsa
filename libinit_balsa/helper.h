@@ -22,7 +22,6 @@
 #ifndef LIBINIT_BALSA_HELPER_H
 #define LIBINIT_BALSA_HELPER_H
 
-#include "config.h"
 #include <gnome.h>
 
 typedef struct EntryData_s EntryData;

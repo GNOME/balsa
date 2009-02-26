@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2002 Stuart Parmenter and others,
+ * Copyright (C) 1997-2009 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -24,14 +24,17 @@
  * filter-funcs.c
  */
 
-#include "config.h"
+#if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
+# include "config.h"
+#endif                          /* HAVE_CONFIG_H */
+#include "filter-funcs.h"
+
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
 #include "missing.h"
 
-#include "filter-funcs.h"
 #include "filter-private.h"
 
 /* Conditions */

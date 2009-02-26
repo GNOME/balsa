@@ -150,13 +150,13 @@ EXTRA_DIST =			\
 idldir = $(datadir)/idl
 idl_DATA = Balsa.idl
 
-INCLUDES = \
+AM_CPPFLAGS = \
 	-DGNOMELOCALEDIR=\""$(datadir)/locale"\" \
 	-I$(top_builddir) -I$(top_srcdir) \
 	-I$(top_srcdir)/libbalsa \
-	$(BALSA_CFLAGS)
+	$(BALSA_DEFS)
 
-DEFS = $(BALSA_DEFS)
+AM_CFLAGS = $(BALSA_CFLAGS)
 
 balsa_LDADD = \
 	$(top_builddir)/libinit_balsa/libinit_balsa.a \

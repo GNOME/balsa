@@ -19,7 +19,10 @@
  * 02111-1307, USA.
  */
 
-#include "config.h"
+#if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
+# include "config.h"
+#endif                          /* HAVE_CONFIG_H */
+#include "libbalsa-vfs.h"
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -32,7 +35,6 @@
 #include <gmime/gmime.h>
 #include "libbalsa.h"
 #include "misc.h"
-#include "libbalsa-vfs.h"
 
 #if HAVE_GIO
 #  include <gio/gio.h>

@@ -23,6 +23,7 @@
 #define __BALSA_MESSAGE_H__
 
 #include "libbalsa.h"
+#include "balsa-app.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -20,7 +20,10 @@
  */
 
 
-#include "config.h"
+#if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
+# include "config.h"
+#endif                          /* HAVE_CONFIG_H */
+#include "balsa-bonobo.h"
 
 #if HAVE_GNOME
 
@@ -33,9 +36,6 @@
 
 #include "balsa-app.h"
 #include "sendmsg-window.h"
-
-#include "balsa-bonobo.h"
-
 
 static void balsa_composer_class_init (BalsaComposerClass *klass);
 static void balsa_composer_init (BalsaComposer *a);

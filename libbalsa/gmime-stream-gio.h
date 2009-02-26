@@ -24,8 +24,6 @@
 #ifndef __GMIME_STREAM_GIO_H__
 #define __GMIME_STREAM_GIO_H__
 
-#include "config.h"
-
 /* note: this module will be compiled only if GIO is available */
 #if HAVE_GIO
 

@@ -22,7 +22,7 @@ AC_SUBST(BALSA_VERSION)
 AM_INIT_AUTOMAKE(balsa, "$BALSA_MAJOR.$BALSA_REVISION.${BALSA_PATCHLEVEL}")
 AC_CONFIG_SRCDIR([src/main.c])
 AC_CONFIG_MACRO_DIR([m4])
-AM_CONFIG_HEADER([config.h])
+AC_CONFIG_HEADERS([config.h])
 
 AC_DEFINE_UNQUOTED(BALSA_MAJOR, $BALSA_MAJOR,
                    [Define to the Balsa major version])
@@ -858,8 +858,7 @@ AC_CHECK_FUNCS([localtime_r gmtime_r ctime_r])
 if test "$GCC" = "yes" -a "$set_more_warnings" != "no"; then
 	for option in -Wsign-compare -Wpointer-arith -Wnested-externs \
             -Wchar-subscripts -Wuninitialized -Wmissing-prototypes    \
-            -Wreturn-type -Wdeclaration-after-statement               \
-            -D_FORTIFY_SOURCE=2 ; do
+            -Wreturn-type -Wdeclaration-after-statement ; do
                 SAVE_CFLAGS="$CFLAGS"
                 CFLAGS="$CFLAGS $option"
                 AC_MSG_CHECKING([whether gcc understands $option])
@@ -891,7 +890,8 @@ if test -d "${srcdir}/.svn" ; then
 -DGNOME_DISABLE_DEPRECATED_SOURCE \
 -DGNOME_VFS_DISABLE_DEPRECATED \
 -DGTK_DISABLE_DEPRECATED \
--DPANGO_DISABLE_DEPRECATED"
+-DPANGO_DISABLE_DEPRECATED \
+-D_FORTIFY_SOURCE=2"
 else
 	BALSA_FROM_SVN=no
 fi

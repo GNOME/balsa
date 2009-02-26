@@ -27,10 +27,12 @@
  * FIXME : should have a combo box for mailbox name when selecting a move or copy action
  */
 
-#include "config.h"
+#if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
+# include "config.h"
+#endif                          /* HAVE_CONFIG_H */
+#include "filter-export.h"
 
 #include "balsa-app.h"
-#include "filter-export.h"
 
 #include <glib/gi18n.h>	/* Must come after balsa-app.h. */
 

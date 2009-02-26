@@ -23,8 +23,6 @@
 #ifndef __LIBBALSA_IDENTITY_H__
 #define __LIBBALSA_IDENTITY_H__
 
-#include "config.h"
-
 #include <gtk/gtk.h>
 #include <gmime/internet-address.h>
 
@@ -52,7 +50,6 @@ extern "C"
 #define LIBBALSA_IS_IDENTITY_CLASS(klass) \
     (G_TYPE_CHECK_CLASS_TYPE (klass, LIBBALSA_TYPE_IDENTITY))
 
-    typedef struct _LibBalsaIdentity LibBalsaIdentity;
     typedef struct _LibBalsaIdentityClass LibBalsaIdentityClass;
     
     

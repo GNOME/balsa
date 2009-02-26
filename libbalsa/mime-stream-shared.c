@@ -31,13 +31,16 @@
  * read+test-eos.
  */
 
-#include "config.h"
+#if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
+# include "config.h"
+#endif                          /* HAVE_CONFIG_H */
 
 #if BALSA_USE_THREADS
 
+#include "mime-stream-shared.h"
+
 #include <gmime/gmime-stream.h>
 #include <gmime/gmime-stream-filter.h>
-#include "mime-stream-shared.h"
 
 typedef struct _LibBalsaMimeStreamSharedLock LibBalsaMimeStreamSharedLock;
 

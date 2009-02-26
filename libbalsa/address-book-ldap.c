@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2003 Stuart Parmenter and others,
+ * Copyright (C) 1997-2009 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -32,9 +32,13 @@
  * organizationalPerson type. We are lenient.
  *
  */
-#include "config.h"
+#if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
+# include "config.h"
+#endif                          /* HAVE_CONFIG_H */
 
 #if ENABLE_LDAP
+
+#include "address-book-ldap.h"
 
 #include <glib.h>
 #include <gnome.h>
@@ -49,7 +53,6 @@
 #endif
 
 #include "address-book.h"
-#include "address-book-ldap.h"
 #include "information.h"
 #include "libbalsa-conf.h"
 #include <glib/gi18n.h>

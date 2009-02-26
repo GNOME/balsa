@@ -26,10 +26,11 @@
 extern "C" {
 #endif				/* __cplusplus */
 
+#include <gtk/gtk.h>
+
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
 #endif
-#include "config.h"
 
 #if !USE_GREGEX
 #  ifdef HAVE_PCRE

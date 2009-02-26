@@ -19,6 +19,11 @@
  * 02111-1307, USA.
  */
 
+#if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
+# include "config.h"
+#endif                          /* HAVE_CONFIG_H */
+#include "balsa-mime-widget-message.h"
+
 #include <string.h>
 #include <gtk/gtk.h>
 
@@ -26,7 +31,6 @@
 #include <libgnome/gnome-url.h>
 #endif
 
-#include "config.h"
 #include "balsa-app.h"
 #include "balsa-icons.h"
 #include "send.h"
@@ -34,7 +38,6 @@
 #include <glib/gi18n.h>
 #include "balsa-mime-widget.h"
 #include "balsa-mime-widget-callbacks.h"
-#include "balsa-mime-widget-message.h"
 #include "sendmsg-window.h"
 
 typedef enum _rfc_extbody_t {

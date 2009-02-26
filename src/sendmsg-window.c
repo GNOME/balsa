@@ -24,8 +24,10 @@
 */
 
 
-#include "config.h"
-
+#if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
+# include "config.h"
+#endif                          /* HAVE_CONFIG_H */
+#include "sendmsg-window.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -79,7 +81,6 @@
 #endif
 
 #include "missing.h"
-#include "sendmsg-window.h"
 #include "ab-window.h"
 #include "address-view.h"
 #include "print.h"
@@ -88,7 +89,6 @@
 #else                           /* HAVE_GTKSPELL */
 #include "spell-check.h"
 #endif                          /* HAVE_GTKSPELL */
-#include "toolbar-factory.h"
 #if HAVE_GTKSOURCEVIEW
 #include <gtksourceview/gtksourceview.h>
 #endif                          /* HAVE_GTKSOURCEVIEW */

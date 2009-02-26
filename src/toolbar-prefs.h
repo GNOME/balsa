@@ -22,6 +22,8 @@
 #ifndef __TOOLBAR_PREFS_H__
 #define __TOOLBAR_PREFS_H__
 
+#include <gtk/gtk.h>
+
 int get_toolbar_button_index(const char *id);
 
 void customize_dialog_cb(GtkWidget *, gpointer);

@@ -19,15 +19,15 @@
  * 02111-1307, USA.
  */
 
-#include "config.h"
+#if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
+# include "config.h"
+#endif                          /* HAVE_CONFIG_H */
+#include "store-address.h"
 
 #include <string.h>
 #include <glib/gi18n.h>
 
 #include "balsa-app.h"
-#include "store-address.h"
-
-#include "libbalsa.h"
 
 /* global data */
 typedef struct _StoreAddressInfo StoreAddressInfo;

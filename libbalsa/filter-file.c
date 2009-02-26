@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2002 Stuart Parmenter and others,
+ * Copyright (C) 1997-2009 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -27,7 +27,10 @@
  *
  */
 
-#include "config.h"
+#if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
+# include "config.h"
+#endif                          /* HAVE_CONFIG_H */
+#include "filter-file.h"
 
 /* extensions  needed additonally on Solaris for strptime */
 #define __EXTENSIONS__
@@ -41,7 +44,6 @@
 #include <time.h>
 #include <sys/types.h>
 
-#include "filter-file.h"
 #include "filter-private.h"
 #include "filter-funcs.h"
 #include "libbalsa-conf.h"

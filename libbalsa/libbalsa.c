@@ -20,8 +20,10 @@
  * 02111-1307, USA.
  */
 
-#include "config.h"
-
+#if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
+# include "config.h"
+#endif                          /* HAVE_CONFIG_H */
+#include "libbalsa.h"
 
 #include <glib.h>
 
@@ -59,7 +61,6 @@
 #endif
 #endif
 
-#include "libbalsa.h"
 #include "misc.h"
 #include "missing.h"
 #include <glib/gi18n.h>

@@ -19,9 +19,13 @@
  * 02111-1307, USA.
  */
 
+#if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
+# include "config.h"
+#endif                          /* HAVE_CONFIG_H */
+#include "balsa-print-object.h"
+
 #include <gtk/gtk.h>
 #include <libbalsa.h>
-#include "config.h"
 #include "balsa-app.h"
 #include "balsa-message.h"
 #include "balsa-print-object-decor.h"
@@ -29,7 +33,6 @@
 #include "balsa-print-object-header.h"
 #include "balsa-print-object-image.h"
 #include "balsa-print-object-text.h"
-#include "balsa-print-object.h"
 
 
 /* object related functions */

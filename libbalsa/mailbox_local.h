@@ -23,6 +23,8 @@
 #ifndef __LIBBALSA_MAILBOX_LOCAL_H__
 #define __LIBBALSA_MAILBOX_LOCAL_H__
 
+#include "libbalsa.h"
+
 #define LIBBALSA_TYPE_MAILBOX_LOCAL \
     (libbalsa_mailbox_local_get_type())
 #define LIBBALSA_MAILBOX_LOCAL(obj) \

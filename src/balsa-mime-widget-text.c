@@ -19,9 +19,13 @@
  * 02111-1307, USA.
  */
 
+#if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
+# include "config.h"
+#endif                          /* HAVE_CONFIG_H */
+#include "balsa-mime-widget-text.h"
+
 #include <string.h>
 #include <stdlib.h>
-#include "config.h"
 #include "balsa-app.h"
 #include "html.h"
 #include <glib/gi18n.h>
@@ -30,7 +34,6 @@
 #include "store-address.h"
 #include "balsa-mime-widget.h"
 #include "balsa-mime-widget-callbacks.h"
-#include "balsa-mime-widget-text.h"
 #include "balsa-cite-bar.h"
 
 #if !GTK_CHECK_VERSION(2, 14, 0)

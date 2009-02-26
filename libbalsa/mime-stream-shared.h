@@ -20,8 +20,6 @@
  * 02111-1307, USA.
  */
 
-#include "config.h"
-
 #ifndef __LIBBALSA_MIME_STREAM_SHARED_H__
 #define __LIBBALSA_MIME_STREAM_SHARED_H__
 

@@ -19,13 +19,15 @@
  * 02111-1307, USA.
  */
 
-#include "config.h"
+#if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
+# include "config.h"
+#endif                          /* HAVE_CONFIG_H */
+#include "identity.h"
 
 #ifdef HAVE_GPGME
 #  include "rfc3156.h"
 #endif
 #include "libbalsa.h"
-#include "identity.h"
 #include "information.h"
 #include "libbalsa-conf.h"
 #include <glib/gi18n.h>

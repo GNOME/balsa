@@ -20,10 +20,13 @@
  */
 
 /* MAKE SURE YOU USE THE HELPER FUNCTIONS, like create_table(, page), etc. */
-#include "config.h"
+
+#if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
+# include "config.h"
+#endif                          /* HAVE_CONFIG_H */
+#include "pref-manager.h"
 
 #include "balsa-app.h"
-#include "pref-manager.h"
 #include "mailbox-conf.h"
 #include "folder-conf.h"
 #include "main-window.h"

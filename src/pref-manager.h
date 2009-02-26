@@ -22,6 +22,7 @@
 #ifndef __PREF_MANAGER_H__
 #define __PREF_MANAGER_H__
 
+#include <gtk/gtk.h>
 
 /* open the preferences manager window */
 void open_preferences_manager(GtkWidget * widget, gpointer data);

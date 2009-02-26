@@ -20,7 +20,10 @@
  */
 
 
-#include "config.h"
+#if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
+# include "config.h"
+#endif                          /* HAVE_CONFIG_H */
+#include "assistant_page_directory.h"
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -29,8 +32,6 @@
 #include <unistd.h>
 #include <errno.h>
 #include <stdlib.h>
-
-#include "assistant_page_directory.h"
 
 #include <glib/gi18n.h>
 #include "balsa-app.h"

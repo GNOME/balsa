@@ -22,8 +22,6 @@
 #ifndef __RFC3156_H__
 #define __RFC3156_H__
 
-#include "config.h"
-
 #ifdef HAVE_GPGME
 
 #include <gpgme.h>

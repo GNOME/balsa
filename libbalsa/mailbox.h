@@ -25,7 +25,6 @@
 
 #include <gdk/gdk.h>
 #include <gmime/gmime.h>
-#include "config.h"
 
 #ifdef BALSA_USE_THREADS
 #include <pthread.h>

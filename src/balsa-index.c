@@ -30,7 +30,10 @@
    key and replace the key on every change of the sort method.  
 */
 
-#include "config.h"
+#if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
+# include "config.h"
+#endif                          /* HAVE_CONFIG_H */
+#include "balsa-index.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -38,7 +41,6 @@
 
 #include "balsa-app.h"
 #include "balsa-icons.h"
-#include "balsa-index.h"
 #include "balsa-mblist.h"
 #include "balsa-message.h"
 #include "main-window.h"

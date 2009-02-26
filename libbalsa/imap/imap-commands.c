@@ -1013,9 +1013,10 @@ imap_mbox_handle_fetch_range(ImapMboxHandle* handle,
   return rc;
 }
 
-ImapResponse
-imap_mbox_handle_fetch_set(ImapMboxHandle* handle,
-                           unsigned *set, unsigned cnt, ImapFetchType ift)
+static ImapResponse
+imap_mbox_handle_fetch_set_unlocked(ImapMboxHandle* handle,
+				    unsigned *set, unsigned cnt,
+				    ImapFetchType ift)
 {
   gchar * seq;
   ImapResponse rc;
@@ -1033,12 +1034,21 @@ imap_mbox_handle_fetch_set(ImapMboxHandle* handle,
   if(seq) {
     const char* hdr[13];
     ic_construct_header_list(hdr, fd.fd.req_fetch_type);
-    HANDLE_LOCK(handle);
     rc = imap_mbox_handle_fetch(handle, seq, hdr);
     if(rc == IMR_OK) set_avail_headers(handle, seq, fd.fd.req_fetch_type);
-    HANDLE_UNLOCK(handle);
     g_free(seq);
   } else rc = IMR_OK;
+  return rc;
+}
+
+ImapResponse
+imap_mbox_handle_fetch_set(ImapMboxHandle* handle,
+                           unsigned *set, unsigned cnt, ImapFetchType ift)
+{
+  ImapResponse rc;
+  HANDLE_LOCK(handle);
+  rc = imap_mbox_handle_fetch_set_unlocked(handle, set, cnt, ift);
+  HANDLE_UNLOCK(handle);
   return rc;
 }
 
@@ -1779,8 +1789,8 @@ imap_mbox_sort_msgno_client(ImapMboxHandle *handle, ImapSortKey key,
     qsort(seqno_to_fetch, fetch_cnt, sizeof(unsigned), comp_unsigned);
     printf("Should the client side sorting code "
            "be sorry about your bandwidth usage?\n");
-    rc = imap_mbox_handle_fetch_set(handle, seqno_to_fetch,
-                                    fetch_cnt, fetch_type);
+    rc = imap_mbox_handle_fetch_set_unlocked(handle, seqno_to_fetch,
+					     fetch_cnt, fetch_type);
     if(rc != IMR_OK)
       return rc;
   }

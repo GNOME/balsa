@@ -1,3 +1,8 @@
+2009-02-26  Paweł Sałek
+
+	* libbalsa/imap/imap-commands.c: do not deadlock when opening imap
+	mailbox with new messages, sorted on the client side.
+
 2009-02-25  Peter Bloomfield
 
 	make sure -DHAVE_CONFIG_H is passed as a compiler flag.

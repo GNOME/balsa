@@ -1,3 +1,8 @@
+2009-02-27  Peter Bloomfield
+
+	* src/balsa-message.c: libbalsa_can_display is needed only if
+	HAVE_GTKHTML.
+
 2009-02-26  Paweł Sałek
 
 	* libbalsa/imap/imap-commands.c: do not deadlock when opening imap

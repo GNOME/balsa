@@ -1940,6 +1940,7 @@ balsa_message_has_previous_part(BalsaMessage * bmessage)
     return FALSE;
 }
 
+#ifdef HAVE_GTKHTML
 static gboolean
 libbalsa_can_display(LibBalsaMessageBody *part)
 {
@@ -1954,6 +1955,7 @@ libbalsa_can_display(LibBalsaMessageBody *part)
     g_free(content_type);
     return res;
 }
+#endif                          /* HAVE_GTKHTML */
 
 /** Determines whether given part can be displayed. We display plain
    text, parts html/rtf parts unless it has been disabled in the

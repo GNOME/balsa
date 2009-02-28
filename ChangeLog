@@ -1,5 +1,12 @@
 2009-02-28  Peter Bloomfield
 
+	* libbalsa/body.c: (libbalsa_message_body_get_pixbuf): tell
+	GdkPixbufLoader the mime type; some types, apparently including
+	compressed SVG, cannot be reliably identified by looking at
+	the data.
+
+2009-02-28  Peter Bloomfield
+
 	* src/main-window.c: tighten some old code.
 
 2009-02-28  Peter Bloomfield

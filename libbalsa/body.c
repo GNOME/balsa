@@ -621,37 +621,38 @@ libbalsa_message_body_get_content(LibBalsaMessageBody * body, gchar ** buf,
 GdkPixbuf *
 libbalsa_message_body_get_pixbuf(LibBalsaMessageBody * body, GError ** err)
 {
-    GdkPixbufLoader *loader;
     GMimeStream *stream;
-    gssize count;
-    gboolean ok = TRUE;
-    gchar buf[4096];
+    gchar *mime_type;
+    GdkPixbufLoader *loader;
     GdkPixbuf *pixbuf = NULL;
 
     stream = libbalsa_message_body_get_stream(body, err);
     if (!stream)
         return pixbuf;
+
     libbalsa_mailbox_lock_store(body->message->mailbox);
     g_mime_stream_reset(stream);
 
-    loader = gdk_pixbuf_loader_new();
-    while ((count = g_mime_stream_read(stream, buf, sizeof(buf))) > 0) {
-        if (!gdk_pixbuf_loader_write(loader, (guchar *) buf, count, err)) {
-            ok = FALSE;
-            break;
-        }
+    mime_type = libbalsa_message_body_get_mime_type(body);
+    loader = gdk_pixbuf_loader_new_with_mime_type(mime_type, err);
+    g_free(mime_type);
+
+    if (loader) {
+        gssize count;
+        gchar buf[4096];
+
+        while ((count = g_mime_stream_read(stream, buf, sizeof(buf))) > 0)
+            if (!gdk_pixbuf_loader_write(loader, (guchar *) buf, count, err))
+                break;
+
+        if (gdk_pixbuf_loader_close(loader, *err ? NULL : err))
+            pixbuf = g_object_ref(gdk_pixbuf_loader_get_pixbuf(loader));
+
+        g_object_unref(loader);
     }
+
     libbalsa_mailbox_unlock_store(body->message->mailbox);
     g_object_unref(stream);
-
-    if (!gdk_pixbuf_loader_close(loader, ok ? err : NULL))
-	ok = FALSE;
-
-    if (ok) {
-        pixbuf = gdk_pixbuf_loader_get_pixbuf(loader);
-	g_object_ref(pixbuf);
-    }
-    g_object_unref(loader);
 
     return pixbuf;
 }

@@ -2667,17 +2667,13 @@ bw_show_about_box(GtkAction * action, gpointer user_data)
 static void
 bw_check_mailbox_list(GList * mailbox_list)
 {
-    GList *list;
-    LibBalsaMailbox *mailbox;
-
-    list = g_list_first(mailbox_list);
-    while (list) {
-        mailbox = BALSA_MAILBOX_NODE(list->data)->mailbox;
+    for ( ; mailbox_list; mailbox_list = mailbox_list->next) {
+        LibBalsaMailbox *mailbox =
+            BALSA_MAILBOX_NODE(mailbox_list->data)->mailbox;
         libbalsa_mailbox_pop3_set_inbox(mailbox, balsa_app.inbox);
         libbalsa_mailbox_pop3_set_msg_size_limit
             (LIBBALSA_MAILBOX_POP3(mailbox), balsa_app.msg_size_limit*1024);
         libbalsa_mailbox_check(mailbox);
-        list = g_list_next(list);
     }
 }
 
@@ -2687,16 +2683,17 @@ bw_mailbox_check_func(GtkTreeModel * model, GtkTreePath * path,
 		   GtkTreeIter * iter, GSList ** list)
 {
     BalsaMailboxNode *mbnode;
+    LibBalsaMailbox *mailbox;
 
     gtk_tree_model_get(model, iter, 0, &mbnode, -1);
     g_return_val_if_fail(mbnode, FALSE);
 
-    if (mbnode->mailbox) {	/* mailbox, not a folder */
-	if (!LIBBALSA_IS_MAILBOX_IMAP(mbnode->mailbox) ||
+    if ((mailbox = mbnode->mailbox)) {	/* mailbox, not a folder */
+	if (!LIBBALSA_IS_MAILBOX_IMAP(mailbox) ||
 	    bw_imap_check_test(mbnode->dir ? mbnode->dir :
 			    libbalsa_mailbox_imap_get_path
-			    (LIBBALSA_MAILBOX_IMAP(mbnode->mailbox))))
-	    *list = g_slist_prepend(*list, g_object_ref(mbnode->mailbox));
+			    (LIBBALSA_MAILBOX_IMAP(mailbox))))
+	    *list = g_slist_prepend(*list, g_object_ref(mailbox));
     }
     g_object_unref(mbnode);
 
@@ -2705,16 +2702,13 @@ bw_mailbox_check_func(GtkTreeModel * model, GtkTreePath * path,
 
 /*
  * Callback for testing whether to check an IMAP mailbox
- * Called from mutt_buffy_check
  */
 static gboolean
 bw_imap_check_test(const gchar * path)
 {
     /* path has been parsed, so it's just the folder path */
-    if (balsa_app.check_imap && balsa_app.check_imap_inbox)
-        return strcmp(path, "INBOX") == 0;
-    else
-        return balsa_app.check_imap;
+    return balsa_app.check_imap && balsa_app.check_imap_inbox ?
+        strcmp(path, "INBOX") == 0 : balsa_app.check_imap;
 }
 
 #if BALSA_USE_THREADS
@@ -2822,7 +2816,6 @@ check_new_messages_real(BalsaWindow * window, int type)
     pthread_detach(get_mail_thread);
 #else
 
-    /* NOT USED: libbalsa_notify_start_check(bw_imap_check_test); */
     bw_check_mailbox_list(balsa_app.inbox_input);
 
     gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),

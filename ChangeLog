@@ -1,3 +1,9 @@
+2009-02-28  Peter Bloomfield
+
+	* src/main.c: (initial_open_unread_mailboxes,
+	initial_open_inbox, main): really check new mail after building
+	the tree.
+
 2009-02-27  Peter Bloomfield
 
 	* src/main-window.c: 

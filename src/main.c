@@ -485,14 +485,16 @@ threads_destroy(void)
 gboolean
 initial_open_unread_mailboxes()
 {
-    GList *i, *gl;
+    GList *l, *gl;
     gdk_threads_enter();
     gl = balsa_mblist_find_all_unread_mboxes(NULL);
 
     if (gl) {
-        for (i = g_list_first(gl); i; i = g_list_next(i)) {
-            printf("opening %s..\n", (LIBBALSA_MAILBOX(i->data))->name);
-            balsa_mblist_open_mailbox(LIBBALSA_MAILBOX(i->data));
+        for (l = gl; l; l = l->next) {
+            LibBalsaMailbox *mailbox = LIBBALSA_MAILBOX(l->data);
+
+            printf("opening %s..\n", mailbox->name);
+            balsa_mblist_open_mailbox(mailbox);
         }
         g_list_free(gl);
     }
@@ -507,9 +509,9 @@ initial_open_inbox()
     if (!balsa_app.inbox)
 	return FALSE;
 
-    printf("opening %s..\n", (LIBBALSA_MAILBOX(balsa_app.inbox))->name);
+    printf("opening %s..\n", balsa_app.inbox->name);
     gdk_threads_enter();
-    balsa_mblist_open_mailbox(LIBBALSA_MAILBOX(balsa_app.inbox));
+    balsa_mblist_open_mailbox(balsa_app.inbox);
     gdk_threads_leave();
     
     return FALSE;
@@ -893,11 +895,11 @@ main(int argc, char *argv[])
     }
     gtk_widget_show(window);
 
-    if (cmd_check_mail_on_startup || balsa_app.check_mail_upon_startup)
-        g_idle_add((GSourceFunc) balsa_main_check_new_messages, NULL);
-
     g_idle_add((GSourceFunc) scan_mailboxes_idle_cb, NULL);
     g_timeout_add(1801*1000, (GSourceFunc) periodic_expunge_cb, NULL);
+
+    if (cmd_check_mail_on_startup || balsa_app.check_mail_upon_startup)
+        g_idle_add((GSourceFunc) balsa_main_check_new_messages, NULL);
 
     accel_map_load();
     gdk_threads_enter();

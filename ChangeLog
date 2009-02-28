@@ -1,5 +1,12 @@
 2009-02-27  Peter Bloomfield
 
+	* src/main-window.c: 
+	* src/main.c: (balsa_main_check_new_messages, main): on startup,
+	check new mail in an idle handler, after the mailbox tree has
+	been built.
+
+2009-02-27  Peter Bloomfield
+
 	* src/balsa-message.c: libbalsa_can_display is needed only if
 	HAVE_GTKHTML.
 

@@ -736,6 +736,13 @@ get_utf8_locale(int category)
 }
 #endif
 
+static gboolean
+balsa_main_check_new_messages(gpointer data)
+{
+    check_new_messages_real(data, TYPE_CALLBACK);
+    return FALSE;
+}
+
 /* -------------------------- main --------------------------------- */
 int
 main(int argc, char *argv[])
@@ -887,8 +894,7 @@ main(int argc, char *argv[])
     gtk_widget_show(window);
 
     if (cmd_check_mail_on_startup || balsa_app.check_mail_upon_startup)
-	check_new_messages_cb(NULL, NULL);
-
+        g_idle_add((GSourceFunc) balsa_main_check_new_messages, NULL);
 
     g_idle_add((GSourceFunc) scan_mailboxes_idle_cb, NULL);
     g_timeout_add(1801*1000, (GSourceFunc) periodic_expunge_cb, NULL);

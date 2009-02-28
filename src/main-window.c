@@ -2695,10 +2695,8 @@ bw_mailbox_check_func(GtkTreeModel * model, GtkTreePath * path,
 	if (!LIBBALSA_IS_MAILBOX_IMAP(mbnode->mailbox) ||
 	    bw_imap_check_test(mbnode->dir ? mbnode->dir :
 			    libbalsa_mailbox_imap_get_path
-			    (LIBBALSA_MAILBOX_IMAP(mbnode->mailbox)))) {
-	    g_object_ref(mbnode->mailbox);
-	    *list = g_slist_prepend(*list, mbnode->mailbox);
-	}
+			    (LIBBALSA_MAILBOX_IMAP(mbnode->mailbox))))
+	    *list = g_slist_prepend(*list, g_object_ref(mbnode->mailbox));
     }
     g_object_unref(mbnode);
 

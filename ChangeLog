@@ -1,3 +1,8 @@
+2009-03-01  Peter Bloomfield
+
+	* libbalsa/mailbox_imap.c: (libbalsa_mailbox_imap_open): do not
+	leak ImapCacheManager.
+
 2009-02-28  Peter Bloomfield
 
 	* libbalsa/body.c: (libbalsa_message_body_get_pixbuf): tell

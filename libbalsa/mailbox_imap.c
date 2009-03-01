@@ -987,6 +987,7 @@ libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox, GError **err)
     unsigned i;
     guint total_messages;
     struct ImapCacheManager *icm;
+    gboolean from_file = FALSE;
 
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX_IMAP(mailbox), FALSE);
 
@@ -1017,10 +1018,14 @@ libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox, GError **err)
 	gchar *header_cache_path = get_header_cache_path(mimap);
 	icm = imap_cache_manager_new_from_file(header_cache_path);
 	g_free(header_cache_path);
+        from_file = TRUE;
     }
     if (icm) {
         icm_restore_from_cache(mimap->handle, icm);
-        g_object_set_data(G_OBJECT(mailbox), "cache-manager", NULL);
+        if (from_file)
+            imap_cache_manager_free(icm);
+        else
+            g_object_set_data(G_OBJECT(mailbox), "cache-manager", NULL);
     }
 
     mailbox->first_unread = imap_mbox_handle_first_unseen(mimap->handle);

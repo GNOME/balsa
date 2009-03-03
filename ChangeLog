@@ -1,5 +1,24 @@
 2009-03-03  Peter Bloomfield
 
+	Consistently initialize Gerror, and use g_clear_error when it
+	helps.
+
+	* libbalsa/gmime-stream-gio.c:
+	* libbalsa/libbalsa-conf.c: (lbc_init), (lbc_sync):
+	* libbalsa/mailbox_local.c: (lbm_local_save_tree):
+	* libbalsa/source-viewer.c: (lbsv_app_set_menus):
+	* src/ab-main.c: (get_main_menu), (main):
+	* src/balsa-icons.c: (load_balsa_pixmap):
+	* src/filter-edit-callbacks.c: (condition_dialog_response),
+	(fe_dialog_response):
+	* src/filter-run-callbacks.c: (fr_dialog_response):
+	* src/main-window.c:
+	* src/main.c: (main):
+	* src/message-window.c: (message_window_new):
+	* src/sendmsg-window.c: (sendmsg_window_new):
+
+2009-03-03  Peter Bloomfield
+
 	* libbalsa/identity.c: free force-key-id.
 	* src/balsa-icons.c: (load_balsa_pixmap): unref icon-set.
 	* src/balsa-mime-widget-text.c: (balsa_mime_widget_new_text,

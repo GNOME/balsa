@@ -168,7 +168,7 @@ void fr_dialog_response(GtkWidget * widget, gint response,
 {
     BalsaFilterRunDialog * p;
 #if GTK_CHECK_VERSION(2, 14, 0) || HAVE_GNOME
-    GError *err;
+    GError *err = NULL;
 #endif
 
     p=BALSA_FILTER_RUN_DIALOG(widget);
@@ -185,7 +185,6 @@ void fr_dialog_response(GtkWidget * widget, gint response,
 	break;
     case GTK_RESPONSE_HELP:     /* Help button */
 #if GTK_CHECK_VERSION(2, 14, 0) || HAVE_GNOME
-	err = NULL;
 #if GTK_CHECK_VERSION(2, 14, 0)
         gtk_show_uri(NULL, "ghelp:balsa?win-run-filters",
                      gtk_get_current_event_time(), &err);

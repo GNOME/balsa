@@ -71,8 +71,7 @@ static GMimeStreamClass *parent_class = NULL;
 	    g_debug("%s::%s::%d " textmsg ": err %d: %s\n",		\
 		    __FILE__, __FUNCTION__, __LINE__,			\
 		    gioerr->code, gioerr->message);			\
-	    g_error_free(gioerr);					\
-	    gioerr = NULL;						\
+	    g_clear_error(&gioerr);					\
 	}								\
     } while(0)
 #else

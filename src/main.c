@@ -754,9 +754,6 @@ main(int argc, char *argv[])
     GnomeClient *client;
 #endif
     gchar *default_icon;
-#ifdef GTKHTML_HAVE_GCONF
-    GError *gconf_error;
-#endif
 
 #ifdef ENABLE_NLS
     /* Initialize the i18n stuff */
@@ -805,9 +802,7 @@ main(int argc, char *argv[])
     balsa_init(argc, argv);
 
 #ifdef GTKHTML_HAVE_GCONF
-    if (!gconf_init(argc, argv, &gconf_error))
-	g_error_free(gconf_error);
-    gconf_error = NULL;
+    gconf_init(argc, argv, NULL);
 #endif
 
     balsa_app_init();

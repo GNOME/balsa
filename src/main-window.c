@@ -1559,7 +1559,7 @@ balsa_window_new()
     BalsaToolbarModel *model;
     GtkUIManager *ui_manager;
     GtkAccelGroup *accel_group;
-    GError *error;
+    GError *error = NULL;
     GtkWidget *menubar;
     GtkWidget *toolbar;
     GtkWidget *hbox;
@@ -1591,7 +1591,6 @@ balsa_window_new()
     gtk_window_add_accel_group(GTK_WINDOW(window), accel_group);
     g_object_unref(accel_group);
 
-    error = NULL;
     if (!gtk_ui_manager_add_ui_from_string
         (ui_manager, ui_description, -1, &error)) {
         g_message("building menus failed: %s", error->message);

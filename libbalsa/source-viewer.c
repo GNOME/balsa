@@ -197,7 +197,7 @@ lbsv_app_set_menus(GtkWindow * app, GtkAction ** action)
     GtkActionGroup *action_group;
     GtkUIManager *ui_manager;
     GtkAccelGroup *accel_group;
-    GError *error;
+    GError *error = NULL;
 
     window = GTK_WIDGET(app);
 
@@ -216,7 +216,6 @@ lbsv_app_set_menus(GtkWindow * app, GtkAction ** action)
     accel_group = gtk_ui_manager_get_accel_group(ui_manager);
     gtk_window_add_accel_group(GTK_WINDOW(window), accel_group);
 
-    error = NULL;
     if (!gtk_ui_manager_add_ui_from_string(ui_manager, ui_description,
                                            -1, &error)) {
         g_message("building menus failed: %s", error->message);

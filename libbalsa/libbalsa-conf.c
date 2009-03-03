@@ -81,7 +81,7 @@ lbc_init(LibBalsaConf * conf, const gchar * filename,
          const gchar * old_dir)
 {
     struct stat buf;
-    GError *error;
+    GError *error = NULL;
 
     if (!conf->path)
         conf->path =
@@ -97,7 +97,6 @@ lbc_init(LibBalsaConf * conf, const gchar * filename,
     conf->new_path = g_strconcat(conf->path, ".new", NULL);
 #endif                          /* !GLIB_CHECK_VERSION(2, 7, 0) */
     libbalsa_assure_balsa_dir();
-    error = NULL;
     if (!g_key_file_load_from_file
         (conf->key_file, conf->path, G_KEY_FILE_NONE, &error)) {
         gchar *old_path;
@@ -110,8 +109,7 @@ lbc_init(LibBalsaConf * conf, const gchar * filename,
         g_message("Could not load config from \"%s\":\n %s\n"
                   " trying \"%s\"", conf->path, error->message, old_path);
 #endif                          /* DEBUG */
-        g_error_free(error);
-        error = NULL;
+        g_clear_error(&error);
 
         buf = lbc_readfile(old_path);
         if (buf) {
@@ -130,20 +128,15 @@ lbc_init(LibBalsaConf * conf, const gchar * filename,
                       old_path,
                       error ? error->message : g_strerror(errno));
 #endif                          /* DEBUG */
-            if (error) {
-                g_error_free(error);
-                error = NULL;
-            }
+            g_clear_error(&error);
             warn = FALSE;
         }
         g_free(old_path);
-        if (warn) {
+        if (warn)
             libbalsa_information(LIBBALSA_INFORMATION_WARNING,
                                  _("Your Balsa configuration "
                                    "is now stored in "
                                    "\"~/.balsa/config\"."));
-            warn = FALSE;
-        }
     }
 }
 
@@ -502,7 +495,7 @@ lbc_sync(LibBalsaConf * conf)
     gchar **groups;
     gchar *buf;
     gsize len;
-    GError *error;
+    GError *error = NULL;
 #if !GLIB_CHECK_VERSION(2, 7, 0)
     gint fd;
 #endif                          /* !GLIB_CHECK_VERSION(2, 7, 0) */
@@ -519,7 +512,6 @@ lbc_sync(LibBalsaConf * conf)
     }
     g_strfreev(groups);
 
-    error = NULL;
     buf = g_key_file_to_data(conf->key_file, &len, &error);
     if (error) {
 #if DEBUG

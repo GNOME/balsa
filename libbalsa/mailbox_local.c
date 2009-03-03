@@ -515,7 +515,7 @@ lbm_local_save_tree(LibBalsaMailboxLocal * local)
     gchar *filename;
     LibBalsaMailboxLocalSaveTreeInfo save_info;
 #if GLIB_CHECK_VERSION(2, 8, 0)
-    GError *err;
+    GError *err = NULL;
 #else                           /* GLIB_CHECK_VERSION(2, 8, 0) */
     gchar *template;
 #endif                          /* GLIB_CHECK_VERSION(2, 8, 0) */
@@ -564,7 +564,6 @@ lbm_local_save_tree(LibBalsaMailboxLocal * local)
                     &save_info);
 
 #if GLIB_CHECK_VERSION(2, 8, 0)
-    err = NULL;
     if (!g_file_set_contents(filename, save_info.array->data,
                              save_info.array->len *
                              sizeof(LibBalsaMailboxLocalTreeInfo), &err)) {

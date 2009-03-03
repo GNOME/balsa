@@ -626,7 +626,7 @@ get_main_menu(GtkWidget * window, GtkWidget ** menubar,
     GtkActionGroup *action_group;
     GtkUIManager *ui_manager;
     GtkAccelGroup *accel_group;
-    GError *error;
+    GError *error = NULL;
     GList *ab;
 #if HAVE_MACOSX_DESKTOP
     IgeMacMenuGroup *group;
@@ -644,7 +644,6 @@ get_main_menu(GtkWidget * window, GtkWidget ** menubar,
     accel_group = gtk_ui_manager_get_accel_group(ui_manager);
     gtk_window_add_accel_group(GTK_WINDOW(window), accel_group);
 
-    error = NULL;
     if (!gtk_ui_manager_add_ui_from_string(ui_manager, ui_description,
                                            -1, &error)) {
         g_message("building menus failed: %s", error->message);
@@ -1112,9 +1111,6 @@ main(int argc, char *argv[])
 #if HAVE_GNOME
     GnomeClient *client;
 #endif
-#ifdef GTKHTML_HAVE_GCONF
-    GError *gconf_error;
-#endif
 
 #ifdef ENABLE_NLS
     /* Initialize the i18n stuff */
@@ -1140,9 +1136,7 @@ main(int argc, char *argv[])
 #endif
 
 #ifdef GTKHTML_HAVE_GCONF
-    if (!gconf_init(argc, argv, &gconf_error))
-	g_error_free(gconf_error);
-    gconf_error = NULL;
+    gconf_init(argc, argv, NULL);
 #endif
 
     bab_init();

@@ -143,8 +143,7 @@ load_balsa_pixmap(GtkIconTheme *icon_theme, GtkIconFactory *factory,
 	    if (!pixbuf) {
 		BICONS_ERR("additional size %d failed: %s", width,
 			   error->message);
-		g_error_free(error);
-		error = NULL;
+		g_clear_error(&error);
 	    } else {
 		GtkIconSource *icon_source = gtk_icon_source_new();
 		

@@ -823,7 +823,7 @@ condition_dialog_response(GtkWidget * dialog, gint response,
 {
     LibBalsaCondition *new_cnd;
 #if GTK_CHECK_VERSION(2, 14, 0) || HAVE_GNOME
-    GError *err;
+    GError *err = NULL;
 #endif
 
     switch (response) {
@@ -881,7 +881,6 @@ condition_dialog_response(GtkWidget * dialog, gint response,
         break;
     case GTK_RESPONSE_HELP:     /* Help button */
 #if GTK_CHECK_VERSION(2, 14, 0) || HAVE_GNOME
-	err = NULL;
 #if GTK_CHECK_VERSION(2, 14, 0)
         gtk_show_uri(NULL, "ghelp:balsa?win-condition",
                      gtk_get_current_event_time(), &err);
@@ -1452,7 +1451,7 @@ fe_dialog_response(GtkWidget * dialog, gint response, gpointer data)
     GtkTreeIter iter;
     gboolean valid;
 #if GTK_CHECK_VERSION(2, 14, 0) || HAVE_GNOME
-    GError *err;
+    GError *err = NULL;
 #endif
     
     switch (response) {
@@ -1493,7 +1492,6 @@ fe_dialog_response(GtkWidget * dialog, gint response, gpointer data)
 
     case GTK_RESPONSE_HELP:     /* Help button */
 #if GTK_CHECK_VERSION(2, 14, 0) || HAVE_GNOME
-	err = NULL;
 #if GTK_CHECK_VERSION(2, 14, 0)
         gtk_show_uri(NULL, "ghelp:balsa?win-filters",
                      gtk_get_current_event_time(), &err);

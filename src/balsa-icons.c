@@ -161,6 +161,7 @@ load_balsa_pixmap(GtkIconTheme *icon_theme, GtkIconFactory *factory,
     }
 
     gtk_icon_factory_add(factory, bpixmap->name, icon_set);
+    gtk_icon_set_unref(icon_set);
 }
 
 void

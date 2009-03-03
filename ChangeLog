@@ -1,3 +1,11 @@
+2009-03-03  Peter Bloomfield
+
+	* libbalsa/identity.c: free force-key-id.
+	* src/balsa-icons.c: (load_balsa_pixmap): unref icon-set.
+	* src/balsa-mime-widget-text.c: (balsa_mime_widget_new_text,
+	bm_widget_new_vcard): free ptr in balsa_mime_widget_new_text
+	instead of in bm_widget_new_vcard.
+
 2009-03-01  Peter Bloomfield
 
 	* libbalsa/mailbox_imap.c: (libbalsa_mailbox_imap_open): do not

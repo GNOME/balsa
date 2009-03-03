@@ -180,8 +180,10 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
     if(g_ascii_strcasecmp(content_type, "text/x-vcard") == 0 ||
        g_ascii_strcasecmp(content_type, "text/directory") == 0) {
         mw = bm_widget_new_vcard(bm, mime_body, ptr, alloced);
-        if (mw)
+        if (mw) {
+            g_free(ptr);
             return mw;
+        }
         /* else it was not a vCard with at least one address; we'll just
          * show it as if it were text/plain. */
     }
@@ -1294,6 +1296,5 @@ bm_widget_new_vcard(BalsaMessage *bm, LibBalsaMessageBody *mime_body,
         
     g_object_set_data(G_OBJECT(mw->widget), "mime-body", mime_body);
     gtk_widget_show_all(mw->widget);
-    g_free(ptr);
     return mw;
 }

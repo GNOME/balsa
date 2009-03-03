@@ -1500,6 +1500,7 @@ ident_dialog_update(GObject * dlg)
     id->warn_send_plain = ident_dialog_get_bool(dlg, "identity-warn-send-plain");
     id->crypt_protocol  = GPOINTER_TO_INT(ident_dialog_get_value
                                           (dlg, "identity-crypt-protocol"));
+    g_free(id->force_key_id);
     id->force_key_id    = g_strstrip(ident_dialog_get_text(dlg, "identity-keyid"));
 #endif
    

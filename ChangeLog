@@ -1,3 +1,8 @@
+2009-03-11  Peter Bloomfield
+
+	* libbalsa/address-book-ldap.c: (rfc_2254_escape): do not
+	include gnome.h; use g_{new,free} instead of {malloc,free}.
+
 2009-03-03  Peter Bloomfield
 
 	Consistently initialize Gerror, and use g_clear_error when it

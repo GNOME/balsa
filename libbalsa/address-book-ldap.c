@@ -41,7 +41,6 @@
 #include "address-book-ldap.h"
 
 #include <glib.h>
-#include <gnome.h>
 #include <sys/time.h>
 #include <string.h>
 #include <lber.h>
@@ -913,7 +912,7 @@ rfc_2254_escape(const gchar *raw)
     gchar *str;
     gchar *step;
 
-    new = (gchar *)malloc((strlen(raw) * 3) + 1);
+    new = g_new(gchar, (strlen(raw) * 3) + 1);
     str = new;
     for (step = (gchar *)raw;
          step[0] != '\0';
@@ -945,7 +944,7 @@ rfc_2254_escape(const gchar *raw)
     }
     str[0] = '\0';
     str = g_strdup(new);
-    free(new);
+    g_free(new);
     return str;
 }
 

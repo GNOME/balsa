@@ -256,6 +256,7 @@ libbalsa_vcal_new_from_body(LibBalsaMessageBody * body)
     gchar *p;
     gchar **lines;
     LibBalsaVEvent *event;
+    gboolean in_embedded;
     int k;
 
     g_return_val_if_fail(body != NULL, NULL);
@@ -305,6 +306,7 @@ libbalsa_vcal_new_from_body(LibBalsaMessageBody * body)
     /* scan lines to extract vevent(s) */
     event = NULL;
     method = NULL;
+    in_embedded = FALSE;
     for (k = 0; lines[k]; k++) {
 	if (!event) {
             if (!method && !g_ascii_strncasecmp("METHOD:", lines[k], 7))
@@ -319,33 +321,41 @@ libbalsa_vcal_new_from_body(LibBalsaMessageBody * body)
 		*value++ = '\0';
 	    entry = g_strsplit(lines[k], ";", -1);
 	    if (!g_ascii_strcasecmp(entry[0], "END")) {
-		retval->vevent = g_list_append(retval->vevent, event);
-		event = NULL;
-	    } else if (!g_ascii_strcasecmp(entry[0], "DTSTART"))
-		event->start = date_time_2445_to_time_t(value);
-	    else if (!g_ascii_strcasecmp(entry[0], "DTEND"))
-		event->end = date_time_2445_to_time_t(value);
-	    else if (!g_ascii_strcasecmp(entry[0], "DTSTAMP"))
-		event->stamp = date_time_2445_to_time_t(value);
-	    else if (!g_ascii_strcasecmp(entry[0], "UID"))
-		STR_REPL_2445_TXT(event->uid, value);
-	    else if (!g_ascii_strcasecmp(entry[0], "SUMMARY"))
-		STR_REPL_2445_TXT(event->summary, value);
-	    else if (!g_ascii_strcasecmp(entry[0], "LOCATION"))
-		STR_REPL_2445_TXT(event->location, value);
-	    else if (!g_ascii_strcasecmp(entry[0], "DESCRIPTION"))
-		STR_REPL_2445_TXT(event->description, value);
-	    else if (!g_ascii_strcasecmp(entry[0], "ORGANIZER")) {
-		if (event->organizer)
-		    g_object_unref(event->organizer);
-		event->organizer =
-		    cal_address_2445_to_lbaddress(value, entry + 1, TRUE);
-	    } else if (!g_ascii_strcasecmp(entry[0], "ATTENDEE"))
-		event->attendee =
-		    g_list_prepend(event->attendee,
-				   cal_address_2445_to_lbaddress(value,
-								 entry + 1,
-								 FALSE));
+                if (!g_ascii_strcasecmp(entry[1], "VEVENT")) {
+                    retval->vevent = g_list_append(retval->vevent, event);
+                    event = NULL;
+                } else {
+                    in_embedded = FALSE;
+                }
+            } else if (!g_ascii_strcasecmp(entry[0], "BEGIN"))
+                in_embedded = TRUE;
+            else if (!in_embedded) {
+                if (!g_ascii_strcasecmp(entry[0], "DTSTART"))
+                    event->start = date_time_2445_to_time_t(value);
+                else if (!g_ascii_strcasecmp(entry[0], "DTEND"))
+                    event->end = date_time_2445_to_time_t(value);
+                else if (!g_ascii_strcasecmp(entry[0], "DTSTAMP"))
+                    event->stamp = date_time_2445_to_time_t(value);
+                else if (!g_ascii_strcasecmp(entry[0], "UID"))
+                    STR_REPL_2445_TXT(event->uid, value);
+                else if (!g_ascii_strcasecmp(entry[0], "SUMMARY"))
+                    STR_REPL_2445_TXT(event->summary, value);
+                else if (!g_ascii_strcasecmp(entry[0], "LOCATION"))
+                    STR_REPL_2445_TXT(event->location, value);
+                else if (!g_ascii_strcasecmp(entry[0], "DESCRIPTION"))
+                    STR_REPL_2445_TXT(event->description, value);
+                else if (!g_ascii_strcasecmp(entry[0], "ORGANIZER")) {
+                    if (event->organizer)
+                        g_object_unref(event->organizer);
+                    event->organizer =
+                        cal_address_2445_to_lbaddress(value, entry + 1, TRUE);
+                } else if (!g_ascii_strcasecmp(entry[0], "ATTENDEE"))
+                    event->attendee =
+                        g_list_prepend(event->attendee,
+                                       cal_address_2445_to_lbaddress(value,
+                                                                     entry + 1,
+                                                                     FALSE));
+            }
 	    g_strfreev(entry);
 	}
     }

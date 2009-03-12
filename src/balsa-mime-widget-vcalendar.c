@@ -133,6 +133,26 @@ balsa_mime_widget_new_vcalendar(BalsaMessage * bm,
         }                                                               \
     } while (0)
 
+#define TABLE_ATTACH_TEXT(t,text,label)                                 \
+    do {                                                                \
+        if (text) {                                                     \
+            GtkWidget *lbl = gtk_label_new(label);                      \
+            GtkTextBuffer *tbuf = gtk_text_buffer_new(NULL);            \
+            GtkWidget *tview;                                           \
+            gtk_table_attach(t, lbl, 0, 1, row, row+1,                  \
+                             GTK_FILL, GTK_FILL, 4, 2);                 \
+            gtk_misc_set_alignment(GTK_MISC(lbl), 1.0, 0.0);            \
+            gtk_text_buffer_set_text(tbuf, text, -1);                   \
+            tview = gtk_text_view_new_with_buffer(tbuf);                \
+            gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(tview),           \
+                                        GTK_WRAP_WORD);                 \
+            gtk_table_attach(table, tview, 1, 2, row, row + 1,          \
+                             GTK_FILL|GTK_EXPAND, GTK_FILL|GTK_EXPAND,  \
+                             4, 2);                                     \
+            row++;                                                      \
+        }                                                               \
+    } while (0)
+
 static GtkWidget *
 balsa_vevent_widget(LibBalsaVEvent * event, gboolean may_reply,
 		    InternetAddress * sender)
@@ -180,7 +200,7 @@ balsa_vevent_widget(LibBalsaVEvent * event, gboolean may_reply,
 		     event->attendee->next ? _("Attendees") : _("Attendee"));
 	g_string_free(all_atts, TRUE);
     }
-    TABLE_ATTACH(table, event->description, _("Description"));
+    TABLE_ATTACH_TEXT(table, event->description, _("Description"));
 
     if (sender && vevent_ident) {
 	GtkWidget *box = gtk_vbox_new(FALSE, 6);

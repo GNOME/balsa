@@ -1,3 +1,10 @@
+2009-03-11  Albrecht Dreß
+
+	* libbalsa/rfc2445.c: (libbalsa_vcal_new_from_body): ignore
+	nested description.
+	* src/balsa-mime-widget-vcalendar.c: (balsa_vevent_widget): use
+	GtkTextView to show wrapped description.
+
 2009-03-11  Peter Bloomfield
 
 	* libbalsa/address-book-ldap.c: (rfc_2254_escape): do not

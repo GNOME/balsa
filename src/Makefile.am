@@ -7,8 +7,6 @@ balsa_BASE_SRCLIST =	\
 	ab-window.h		\
 	balsa-app.c		\
 	balsa-app.h		\
-	balsa-bonobo.c		\
-	balsa-bonobo.h		\
 	balsa-icons.c		\
 	balsa-icons.h		\
 	balsa-index.c		\
@@ -118,7 +116,20 @@ balsa_gtkspell_extra =		\
 		spell-check.h
 endif
 
+if BUILD_WITH_UNIQUE
+balsa_bonobo_extra_dist = \
+	balsa-bonobo.c    \
+	balsa-bonobo.h
+balsa_bonobo_extra =
+balsa_IDL_SRCLIST =
+balsa_IDL_OBJS    =
+BUILT_SOURCES =
+else
 if BUILD_WITH_GNOME
+balsa_bonobo_extra =      \
+	balsa-bonobo.c    \
+	balsa-bonobo.h
+balsa_bonobo_extra_dist =
 balsa_IDL_SRCLIST = Balsa-common.c Balsa-skels.c Balsa-stubs.c Balsa.h
 balsa_IDL_OBJS    = Balsa-common.o Balsa-skels.o Balsa-stubs.o
 # see http://sources.redhat.com/automake/dependencies.html
@@ -133,10 +144,12 @@ balsa_IDL_SRCLIST =
 balsa_IDL_OBJS    = 
 BUILT_SOURCES = 
 endif
+endif
 
 balsa_SOURCES =			\
 	$(balsa_BASE_SRCLIST)	\
 	$(balsa_gtkspell_extra) \
+	$(balsa_bonobo_extra)   \
 	$(balsa_print_source)
 
 
@@ -145,6 +158,7 @@ DISTCLEANFILES = $(balsa_IDL_SRCLIST)
 EXTRA_DIST =			\
 	Balsa.idl		\
 	$(balsa_gtkspell_extra_dist) \
+	$(balsa_bonobo_extra_dist)   \
 	$(balsa_print_extra_dist)
 
 idldir = $(datadir)/idl

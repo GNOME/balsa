@@ -23,9 +23,13 @@
 # include "config.h"
 #endif                          /* HAVE_CONFIG_H */
 
+#if HAVE_UNIQUE
+#include <gtk/gtk.h>
+#include <unique/unique.h>
+#endif                          /* HAVE_UNIQUE */
+
 #if HAVE_GNOME
 #include <gnome.h>
-#include <libgnomeui/gnome-window-icon.h>
 #endif
 
 #ifdef GTKHTML_HAVE_GCONF
@@ -63,12 +67,12 @@
 
 #include "libinit_balsa/init_balsa.h"
 
-#if HAVE_GNOME
+#if !HAVE_UNIQUE && HAVE_GNOME
 #include "Balsa.h"
 #include "balsa-bonobo.h"
 #include <bonobo-activation/bonobo-activation.h>
 #include <bonobo/bonobo-exception.h>
-#endif
+#endif                          /* HAVE_UNIQUE */
 
 #ifdef HAVE_GPGME
 #include <string.h>
@@ -94,7 +98,7 @@ static void threads_init(void);
 static void threads_destroy(void);
 #endif				/* BALSA_USE_THREADS */
 
-static void balsa_init(int argc, char **argv);
+static gboolean balsa_init(int argc, char **argv);
 static void config_init(gboolean check_only);
 static void mailboxes_init(gboolean check_only);
 static void balsa_cleanup(void);
@@ -140,7 +144,198 @@ accel_map_save(void)
     g_free(accel_map_filename);
 }
 
-#if HAVE_GNOME
+static gboolean
+balsa_main_check_new_messages(gpointer data)
+{
+    check_new_messages_real(data, TYPE_CALLBACK);
+    return FALSE;
+}
+
+void balsa_get_stats(long *unread, long *unsent);
+
+#if HAVE_UNIQUE
+enum {
+    COMMAND_0,                  /* unused: 0 is an invalid command */
+
+    COMMAND_CHECK_MAIL,
+    COMMAND_GET_STATS,
+    COMMAND_OPEN_UNREAD,
+    COMMAND_OPEN_INBOX,
+    COMMAND_OPEN_MAILBOX,
+    COMMAND_COMPOSE
+};
+
+static UniqueResponse
+mw_message_received_cb(UniqueApp         *app,
+                       UniqueCommand      command,
+                       UniqueMessageData *message,
+                       guint              message_time,
+                       gpointer           user_data)
+{
+    GtkWindow *window = GTK_WINDOW(user_data);
+    UniqueResponse res = UNIQUE_RESPONSE_OK;
+    glong unread, unsent;
+    GError *err = NULL;
+    gchar *text;
+    gchar *filename;
+    gchar **uris, **p;
+    BalsaSendmsg *snd;
+
+    switch (command) {
+    case UNIQUE_ACTIVATE:
+        /* move the main window to the screen that sent us the command */
+        gtk_window_set_screen(window,
+                              unique_message_data_get_screen(message));
+        gtk_window_present(window);
+        break;
+    case COMMAND_CHECK_MAIL:
+        balsa_main_check_new_messages(NULL);
+        break;
+    case COMMAND_GET_STATS:
+        balsa_get_stats(&unread, &unsent);
+        text =
+            g_strdup_printf("Unread: %ld Unsent: %ld\n", unread, unsent);
+#if UNIQUE_CHECK_VERSION(1, 0, 2)
+        filename = unique_message_data_get_filename(message);
+#else                           /* UNIQUE_CHECK_VERSION(1, 0, 2) */
+        filename = unique_message_data_get_text(message);
+#endif                          /* UNIQUE_CHECK_VERSION(1, 0, 2) */
+        if (!g_file_set_contents(filename, text, -1, &err)) {
+            balsa_information_parented(window,
+                                       LIBBALSA_INFORMATION_WARNING,
+                                       _("Could not write to %s: %s"),
+                                       filename, err->message);
+            g_error_free(err);
+        }
+        g_free(filename);
+        g_free(text);
+        break;
+    case COMMAND_OPEN_UNREAD:
+        initial_open_unread_mailboxes();
+        break;
+    case COMMAND_OPEN_INBOX:
+        initial_open_inbox();
+        break;
+    case COMMAND_OPEN_MAILBOX:
+        text = unique_message_data_get_text(message);
+        uris = g_strsplit(text, ";", 20);
+        g_free(text);
+        g_idle_add((GSourceFunc) open_mailboxes_idle_cb, uris);
+        break;
+    case COMMAND_COMPOSE:
+        gdk_threads_enter();
+        snd = sendmsg_window_compose();
+        gdk_threads_leave();
+
+        uris = unique_message_data_get_uris(message);
+        text = uris[0];
+        if (g_ascii_strncasecmp(text, "mailto:", 7) == 0)
+            sendmsg_window_process_url(text + 7,
+                                       sendmsg_window_set_field, snd);
+        else
+            sendmsg_window_set_field(snd, "to", text);
+        for (p = uris + 1; *p; p++)
+            add_attachment(snd, *p, FALSE, NULL);
+        g_strfreev(uris);
+        snd->quit_on_close = FALSE;
+        break;
+    default:
+        break;
+    }
+
+    return res;
+}
+
+static void
+balsa_handle_automation_options(UniqueApp * app)
+{
+    printf("Another Balsa found. Talking to it...\n");
+
+    if (!(opt_compose_email || opt_attach_list))
+        /* Move the main window to the request's screen */
+        unique_app_send_message(app, UNIQUE_ACTIVATE, NULL);
+
+    if (cmd_check_mail_on_startup)
+        unique_app_send_message(app, COMMAND_CHECK_MAIL, NULL);
+
+    if (cmd_get_stats) {
+        gint fd;
+        gchar *name_used;
+        GError *err = NULL;
+
+        fd = g_file_open_tmp("balsa-get-stats-XXXXXX", &name_used, &err);
+        if (fd < 0) {
+            g_warning("Could not create temporary file: %s", err->message);
+            g_error_free(err);
+        } else {
+            UniqueMessageData *message;
+            UniqueResponse response;
+
+            close(fd);
+
+            message = unique_message_data_new();
+#if UNIQUE_CHECK_VERSION(1, 0, 2)
+            unique_message_data_set_filename(message, name_used);
+#else                           /* UNIQUE_CHECK_VERSION(1, 0, 2) */
+            unique_message_data_set_text(message, name_used, -1);
+#endif                          /* UNIQUE_CHECK_VERSION(1, 0, 2) */
+            response =
+                unique_app_send_message(app, COMMAND_GET_STATS, message);
+            unique_message_data_free(message);
+
+            if (response == UNIQUE_RESPONSE_OK) {
+                gchar *text;
+
+                if (!g_file_get_contents(name_used, &text, NULL, &err)) {
+                    g_warning("Could not read %s: %s",
+                              name_used, err->message);
+                    g_error_free(err);
+                } else {
+                    g_print("%s", text);
+                    g_free(text);
+                }
+            }
+            if (unlink(name_used) < 0)
+                g_warning("Could not unlink temporary file %s: %s",
+                          name_used, g_strerror(errno));
+            g_free(name_used);
+        }
+    }
+
+    if (cmd_open_unread_mailbox)
+        unique_app_send_message(app, COMMAND_OPEN_UNREAD, NULL);
+
+    if (cmd_open_inbox)
+        unique_app_send_message(app, COMMAND_OPEN_INBOX, NULL);
+
+    if (cmd_line_open_mailboxes) {
+        UniqueMessageData *message = unique_message_data_new();
+        unique_message_data_set_text(message, cmd_line_open_mailboxes, -1);
+        unique_app_send_message(app, COMMAND_OPEN_MAILBOX, message);
+        unique_message_data_free(message);
+    }
+
+    if (opt_compose_email || opt_attach_list) {
+        UniqueMessageData *message = unique_message_data_new();
+        GSList *l;
+        gchar **uris = g_new(gchar *, g_slist_length(opt_attach_list) + 2);
+        gint i;
+
+        uris[0] =
+            g_strdup(opt_compose_email ? opt_compose_email : "mailto");
+
+        for (l = opt_attach_list, i = 1; l; l = l->next, i++)
+            uris[i] = g_strdup(l->data ? l->data : "");
+        uris[i] = NULL;
+
+        unique_message_data_set_uris(message, uris);
+        g_strfreev(uris);
+
+        unique_app_send_message(app, COMMAND_COMPOSE, message);
+        unique_message_data_free(message);
+    }
+}
+#elif HAVE_GNOME
 static void
 balsa_handle_automation_options() {
    CORBA_Object factory;
@@ -225,12 +420,12 @@ balsa_handle_automation_options() {
    }
    
 }
-#endif /* HAVE_GNOME */
+#endif                          /* HAVE_UNIQUE */
 
 /* balsa_init:
    FIXME - check for memory leaks.
 */
-static void
+static gboolean
 balsa_init(int argc, char **argv)
 {
 #if (HAVE_GNOME && !defined(GNOME_PARAM_GOPTION_CONTEXT))
@@ -328,8 +523,18 @@ balsa_init(int argc, char **argv)
                                 GNOME_PARAM_APP_DATADIR,
                                 BALSA_STD_PREFIX "/share",
                                 GNOME_PARAM_NONE);
+    gtk_init_check(&argc, &argv);
 #else /* HAVE_GNOME */
-    gtk_init_with_args(&argc, &argv, PACKAGE, option_entries, NULL, NULL);
+    GError *err = NULL;
+
+    if (!gtk_init_with_args(&argc, &argv, PACKAGE, option_entries, NULL,
+                            &err)) {
+        g_print("%s\n", err->message);
+        g_print(_("Run '%s --help' to see a full list"
+                  " of available command line options.\n"), argv[0]);
+        g_error_free(err);
+        return FALSE;
+    }
 #endif  /* HAVE_GNOME */
 
     if (remaining_args != NULL) {
@@ -355,9 +560,11 @@ balsa_init(int argc, char **argv)
     }
 #endif /* OPTION HANDLING */
 
-#if HAVE_GNOME
+#if !HAVE_UNIQUE && HAVE_GNOME
     balsa_handle_automation_options();
-#endif
+#endif /* HAVE_UNIQUE */
+
+    return TRUE;
 }
 
 /* check_special_mailboxes: 
@@ -517,7 +724,6 @@ initial_open_inbox()
     return FALSE;
 }
 
-void balsa_get_stats(long *unread, long *unsent);
 void
 balsa_get_stats(long *unread, long *unsent)
 {
@@ -738,13 +944,6 @@ get_utf8_locale(int category)
 }
 #endif
 
-static gboolean
-balsa_main_check_new_messages(gpointer data)
-{
-    check_new_messages_real(data, TYPE_CALLBACK);
-    return FALSE;
-}
-
 /* -------------------------- main --------------------------------- */
 int
 main(int argc, char *argv[])
@@ -754,6 +953,9 @@ main(int argc, char *argv[])
     GnomeClient *client;
 #endif
     gchar *default_icon;
+#if HAVE_UNIQUE
+    UniqueApp *app;
+#endif                          /* HAVE_UNIQUE */
 
 #ifdef ENABLE_NLS
     /* Initialize the i18n stuff */
@@ -772,6 +974,39 @@ main(int argc, char *argv[])
     /* initialise libxml */
     LIBXML_TEST_VERSION
 #endif
+
+    /* FIXME: do we need to allow a non-GUI mode? */
+    if (!balsa_init(argc, argv))
+        return 0;
+
+#if HAVE_UNIQUE
+    /* as soon as we create the UniqueApp instance we either have the name
+     * we requested ("org.mydomain.MyApplication", in the example) or we
+     * don't because there already is an application using the same name
+     */
+    app = unique_app_new_with_commands("org.desktop.Balsa", NULL,
+                                       "check-mail",   COMMAND_CHECK_MAIL,
+                                       "get-stats",    COMMAND_GET_STATS,
+                                       "open-unread",  COMMAND_OPEN_UNREAD,
+                                       "open-inbox",   COMMAND_OPEN_INBOX,
+                                       "open-mailbox", COMMAND_OPEN_MAILBOX,
+                                       "compose",      COMMAND_COMPOSE,
+                                       NULL);
+
+    /* if there already is an instance running, this will return TRUE; there
+     * is no race condition because the check is already performed at
+     * construction time
+     */
+    if (unique_app_is_running(app)) {
+        balsa_handle_automation_options(app);
+        g_object_unref(app);
+        return 0;
+    }
+
+    /* this is the first instance, so we can proceed with the usual
+     * application construction sequence
+     */
+#endif                          /* HAVE_UNIQUE */
 
 #ifdef HAVE_GPGME
     /* initialise the gpgme library */
@@ -796,10 +1031,6 @@ main(int argc, char *argv[])
 	    }
     }
 #endif
-
-    /* FIXME: do we need to allow a non-GUI mode? */
-    gtk_init_check(&argc, &argv);
-    balsa_init(argc, argv);
 
 #ifdef GTKHTML_HAVE_GCONF
     gconf_init(argc, argv, NULL);
@@ -840,6 +1071,23 @@ main(int argc, char *argv[])
     balsa_app.main_window = BALSA_WINDOW(window);
     g_object_add_weak_pointer(G_OBJECT(window),
 			      (gpointer) &balsa_app.main_window);
+
+#if HAVE_UNIQUE
+    /* the UniqueApp instance must "watch" all the top-level windows the
+     * application creates, so that it can terminate the startup
+     * notification sequence for us
+     */
+    unique_app_watch_window(app, GTK_WINDOW(window));
+
+    /* using this signal we get notifications from the newly launched instances
+     * and we can reply to them; the default signal handler will just return
+     * UNIQUE_RESPONSE_OK and terminate the startup notification sequence on each
+     * watched window, so you can connect to the message-received signal only if
+     * you want to handle the commands and responses
+     */
+    g_signal_connect(app, "message-received",
+                     G_CALLBACK(mw_message_received_cb), window);
+#endif                          /* HAVE_UNIQUE */
 
     /* load mailboxes */
     config_load_sections();
@@ -907,6 +1155,9 @@ main(int argc, char *argv[])
 #ifdef BALSA_USE_THREADS
     threads_destroy();
 #endif
+#if HAVE_UNIQUE
+    g_object_unref(app);
+#endif                          /* HAVE_UNIQUE */
     libbalsa_imap_server_close_all_connections();
     return 0;
 }

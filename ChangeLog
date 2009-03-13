@@ -1,3 +1,15 @@
+2009-03-13  Peter Bloomfield
+
+	Offer libUnique as an alternative to BonoboActivation to ensure
+	single instance.
+
+	* configure.in: new option --with-unique=no.
+	* src/Makefile.am: Bonobo files are conditional.
+	* src/main.c: (main, balsa_main_check_new_messages,
+	mw_message_received_cb, balsa_handle_automation_options):
+	implement it.
+	(balsa_init): Initialize Gtk only once, and check for error.
+
 2009-03-11  Albrecht Dreß
 
 	* libbalsa/rfc2445.c: (libbalsa_vcal_new_from_body): ignore

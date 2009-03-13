@@ -210,6 +210,11 @@ AC_ARG_WITH(compface,
                   [Enable Compface (default=no)]),
                   [with_compface=$withval],[with_compface=no])
 
+AC_ARG_WITH(unique,
+   AC_HELP_STRING([--with-unique],
+                  [Use libUnique instead of BonoboActivation (default=no)]),
+                  [with_unique=$withval],[with_unique=no])
+
 AC_ARG_ENABLE(more-warnings,
    AC_HELP_STRING([--enable-more-warnings],
                   [Enable maximum compiler warnings (default=yes)]),
@@ -803,6 +808,20 @@ if test x$with_gtksourceview != xno; then
 fi
 AM_CONDITIONAL([BUILD_WITH_GTKSOURCEVIEW2], [test x$with_gtksourceview = x2 ])
 
+# libUnique configuration
+#
+AC_MSG_CHECKING([whether to build with libUnique])
+if test x$with_unique != xno; then
+    AC_MSG_RESULT([yes])
+    PKG_CHECK_MODULES(UNIQUE, [ unique-1.0 ])
+    AC_DEFINE(HAVE_UNIQUE,1,[Defined when libUnique can be used.])
+    BALSA_CFLAGS="$BALSA_CFLAGS $UNIQUE_CFLAGS"
+    BALSA_LIBS="$BALSA_LIBS $UNIQUE_LIBS"
+else
+    AC_MSG_RESULT([no])
+fi
+AM_CONDITIONAL([BUILD_WITH_UNIQUE], [test $with_unique = "yes" ])
+
 # ige-mac-integration (Mac OS X desktop only)
 AC_MSG_CHECKING([whether to include Mac OS X Desktop Integration])
 if test x$use_igemacint != xno; then
@@ -1016,6 +1035,7 @@ echo "      Using multithreading: $use_threads"
 echo "   Enable compile warnings: $set_more_warnings"
 echo "                Use ESMTP : $with_esmtp"
 echo " Use WebKit (experimental): $use_webkit"
+echo " Use Unique (experimental): $with_unique"
 echo "                 Use GNOME: $with_gnome"
 echo "                   Use GIO: $with_gio"
 echo "               Use GtkHTML: $use_gtkhtml"

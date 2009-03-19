@@ -26,9 +26,7 @@
 #include <gtk/gtk.h>
 #include <gmime/internet-address.h>
 
-#if ENABLE_ESMTP
-#include "smtp-server.h"
-#endif
+#include "libbalsa.h"
 
 #ifdef __cpluscplus
 extern "C" 

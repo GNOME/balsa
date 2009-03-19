@@ -126,8 +126,9 @@ struct _ImapMboxHandle {
                            inactivity */
   guint async_watch_id;  /* callback to process incoming data */
   ImapTlsMode tls_mode; /* disabled, enabled, required */
+  enum { IDLE_INACTIVE, IDLE_RESPONSE_PENDING, IDLE_ACTIVE }
+    idle_state; /*  IDLE State? */
   unsigned op_cancelled:1; /* last op timed out and was cancelled by user */
-  unsigned idle_issued:1; /*  idle has been issued */
   unsigned readonly_mbox:1;
   unsigned can_fetch_body:1; /* set for servers that always respond
                               * correctly to FETCH x BODY[y]
@@ -161,6 +162,8 @@ struct _ImapMboxHandle {
 
 
 #define IS_ATOM_CHAR(c) (strchr("(){ %*\"\\]",(c))==NULL&&(c)>0x1f&&(c)!=0x7f)
+
+#define EAT_LINE(h, c) while( (c=sio_getc(h->sio)) != -1 && c != '\n')
 
 extern const char* msg_flags[6];
 

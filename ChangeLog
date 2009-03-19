@@ -1,3 +1,9 @@
+2006-03-19  Pawel Salek
+
+	* libbalsa/imap/imap-handle.c: make IDLE startup asynchronous.
+	* libbalsa/imap/imap_private.h: provide EAT_LINE macro.
+	* libbalsa/imap/imap-commands.c: use it.
+
 2009-03-13  Peter Bloomfield
 
 	Offer libUnique as an alternative to BonoboActivation to ensure

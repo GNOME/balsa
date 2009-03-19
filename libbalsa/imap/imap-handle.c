@@ -146,12 +146,14 @@ imap_mbox_handle_init(ImapMboxHandle *handle)
   handle->using_tls = 0;
 #endif
   handle->tls_mode = IMAP_TLS_ENABLED;
+  handle->idle_state = IDLE_INACTIVE;
   handle->cmd_info = NULL;
   handle->status_resps = g_hash_table_new_full(g_str_hash, g_str_equal,
                                                NULL, NULL);
 
   handle->info_cb  = NULL;
   handle->info_arg = NULL;
+  handle->op_cancelled = 0;
   handle->enable_anonymous = 0;
   handle->enable_client_sort = 0;
   handle->enable_binary    = 0;
@@ -340,9 +342,22 @@ async_process_real(ImapMboxHandle *h)
   if(ASYNC_DEBUG) printf("async_process() enter loop\n");
   while( (retval = sio_poll(h->sio, TRUE, FALSE, TRUE)) != -1 &&
          (retval & SIO_READ) != 0) {
-    if ( (rc=imap_cmd_step(h, async_cmd)) == IMR_UNKNOWN ||
-         rc == IMR_SEVERED || rc == IMR_BYE || rc == IMR_PROTOCOL ||
-         rc  == IMR_BAD) {
+    rc=imap_cmd_step(h, async_cmd);
+    if(h->idle_state == IDLE_RESPONSE_PENDING) {
+      int c;
+      if(rc != IMR_RESPOND) {
+	g_message("async_process_real() expected IMR_RESPOND but got %d\n", rc);
+	imap_handle_disconnect(h);
+	return FALSE;
+      }
+      EAT_LINE(h, c);
+      if (c == '\n') {
+	h->idle_state = IDLE_ACTIVE;
+	if (ASYNC_DEBUG) printf("IDLE is now ACTIVE\n");
+      }
+    } else if (rc == IMR_UNKNOWN ||
+	rc == IMR_SEVERED || rc == IMR_BYE || rc == IMR_PROTOCOL ||
+	rc  == IMR_BAD) {
       printf("async_process() got unexpected response %i!\n"
              "Last message was: \"%s\" - shutting down connection.\n",
              rc, h->last_msg);
@@ -355,7 +370,7 @@ async_process_real(ImapMboxHandle *h)
            async_cmd);
   }
   if(ASYNC_DEBUG) printf("async_process() loop left\n");
-  if(!h->idle_issued && async_cmd == 0) {
+  if(h->idle_state == IDLE_INACTIVE && async_cmd == 0) {
     if(ASYNC_DEBUG) printf("Last async command completed.\n");
     if(h->async_watch_id) {
       g_source_remove(h->async_watch_id);
@@ -365,9 +380,9 @@ async_process_real(ImapMboxHandle *h)
   }
   if(ASYNC_DEBUG)
     printf("async_process() sio: %d rc: %d returns %d (%d cmds in queue)\n",
-           retval, rc, !h->idle_issued && async_cmd == 0,
+           retval, rc, h->idle_state == IDLE_INACTIVE && async_cmd == 0,
            g_list_length(h->cmd_info));
-  return h->idle_issued || async_cmd != 0;
+  return h->idle_state != IDLE_INACTIVE || async_cmd != 0;
 }
 
 /* imap_handle_idle_enable: enables calling IDLE command after seconds
@@ -415,8 +430,6 @@ static gboolean
 idle_start(gpointer data)
 {
   ImapMboxHandle *h = (ImapMboxHandle*)data;
-  ImapResponse rc;
-  int c;
   ImapCmdTag tag;
   unsigned asyncno;
 
@@ -429,16 +442,6 @@ idle_start(gpointer data)
   asyncno = imap_make_tag(tag); sio_write(h->sio, tag, strlen(tag));
   sio_write(h->sio, " IDLE\r\n", 7); sio_flush(h->sio);
   cmdi_add_handler(&h->cmd_info, asyncno, cmdi_empty, NULL);
-  do { /* FIXME: we could at this stage just as well watch for
-          response instead of polling. */
-    rc = imap_cmd_step (h, asyncno);
-  } while (rc == IMR_UNTAGGED);
-  if(rc != IMR_RESPOND) {
-    g_message("idle_start() expected IMR_RESPOND but got %d\n", rc);
-    HANDLE_UNLOCK(h);
-    return FALSE;
-  }
-  while( (c=sio_getc(h->sio)) != -1 && c != '\n');
   if(!h->iochannel) {
     h->iochannel = g_io_channel_unix_new(h->sd);
     g_io_channel_set_encoding(h->iochannel, NULL, NULL);
@@ -447,11 +450,7 @@ idle_start(gpointer data)
   h->async_watch_id = g_io_add_watch(h->iochannel, G_IO_IN|G_IO_HUP,
 				     async_process, h);
   h->idle_enable_id = 0;
-  h->idle_issued = 1;
-
-  /* In principle, IMAP server can send some data in the same packet
-     as the RESPOND line. GMail does it. Process it. */
-  async_process_real(h);
+  h->idle_state = IDLE_RESPONSE_PENDING;
 
   HANDLE_UNLOCK(h);
   return FALSE;
@@ -487,7 +486,7 @@ imap_handle_idle_enable(ImapMboxHandle *h, int seconds)
 {
   if( !h->enable_idle || !imap_mbox_handle_can_do(h, IMCAP_IDLE))
     return FALSE;
-  if(h->idle_issued) {
+  if(h->idle_state != IDLE_INACTIVE) {
     fprintf(stderr, "IDLE already enabled\n");
     return FALSE;
   }
@@ -506,9 +505,29 @@ imap_handle_idle_disable(ImapMboxHandle *h)
   if(h->async_watch_id) {
     g_source_remove(h->async_watch_id);
     h->async_watch_id = 0;
-    if(h->sio && h->idle_issued) {/* we might have been disconnected before */
+    if(h->sio && h->idle_state == IDLE_RESPONSE_PENDING) {
+      int c;
+      ImapResponse rc;
+      unsigned async_cmd = cmdi_get_pending(h->cmd_info);
+
+      do {
+	rc = imap_cmd_step(h, async_cmd);
+      } while (rc == IMR_UNTAGGED);
+      if(rc != IMR_RESPOND) {
+	imap_handle_disconnect(h);
+	return FALSE;
+      }
+      EAT_LINE(h, c);
+      if(c == -1) {
+	imap_handle_disconnect(h);
+	return FALSE;
+      }
+      h->idle_state = IDLE_ACTIVE;
+    }
+    if (h->sio &&  h->idle_state == IDLE_ACTIVE) {
+      /* we might have been disconnected before */
       sio_write(h->sio,"DONE\r\n",6); sio_flush(h->sio);
-      h->idle_issued = 0;
+      h->idle_state = IDLE_INACTIVE;
     }
   }
   return TRUE;
@@ -716,7 +735,7 @@ imap_mbox_connect(ImapMboxHandle* handle)
   handle->op_cancelled = FALSE;
   handle->has_capabilities = FALSE;
   handle->can_fetch_body = TRUE;
-  handle->idle_issued = FALSE;
+  handle->idle_state = IDLE_INACTIVE;
   if(handle->sio) {
     sio_detach(handle->sio);
     handle->sio = NULL;
@@ -2112,7 +2131,7 @@ imap_get_string_with_lookahead(struct siobuf* sio, int c)
   GString *res = NULL;
   if(c=='"') { /* quoted */
     res = g_string_new("");
-    while( (c=sio_getc(sio)) != '"') {
+    while( (c=sio_getc(sio)) != '"' && c != EOF) {
       if(c== '\\')
         c = sio_getc(sio);
       g_string_append_c(res, c);
@@ -2733,7 +2752,7 @@ static ImapResponse
 ir_flags(ImapMboxHandle *h)
 {
   /* FIXME: implement! */
-  int c; while( (c=sio_getc(h->sio))!=EOF && c != 0x0a);
+  int c; EAT_LINE(h, c);
   return IMR_OK;
 }
 
@@ -3127,7 +3146,7 @@ ir_body_fld_param_hash(struct siobuf* sio, GHashTable * params)
       } else {
         g_free(key); g_free(val);
       }
-    } while( (c=sio_getc(sio)) != ')');
+    } while( (c=sio_getc(sio)) != ')' && c != EOF);
   } else if(toupper(c) != 'N' || toupper(sio_getc(sio)) != 'I' ||
             toupper(sio_getc(sio)) != 'L') return IMR_PROTOCOL;
   return IMR_OK;

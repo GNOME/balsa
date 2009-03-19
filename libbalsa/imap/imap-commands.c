@@ -540,7 +540,7 @@ imap_mbox_append_multi_real(ImapMboxHandle *handle,
 	rc = imap_cmd_step (handle, cmdno);
       } while (rc == IMR_UNTAGGED);
       if(rc != IMR_RESPOND) return rc;
-      while( (c=sio_getc(handle->sio)) != -1 && c != '\n');
+      EAT_LINE(handle, c);
       if(c == -1) {
 	imap_handle_disconnect(handle);
 	return IMR_SEVERED;

@@ -1,5 +1,11 @@
 2009-03-19  Peter Bloomfield
 
+	* Makefile.am: install BonoboActivation files only if
+	!BUILD_WITH_UNIQUE.
+	* src/Makefile.am: ditto.
+
+2009-03-19  Peter Bloomfield
+
 	Build --without-esmtp
 
 	* libbalsa/identity.h: typedef LibBalsaSmtpServer only if

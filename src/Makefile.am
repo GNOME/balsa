@@ -117,19 +117,11 @@ balsa_gtkspell_extra =		\
 endif
 
 if BUILD_WITH_UNIQUE
-balsa_bonobo_extra_dist = \
-	balsa-bonobo.c    \
-	balsa-bonobo.h
-balsa_bonobo_extra =
-balsa_IDL_SRCLIST =
-balsa_IDL_OBJS    =
-BUILT_SOURCES =
+balsa_bonobo_extra_dist = balsa-bonobo.c balsa-bonobo.h
 else
 if BUILD_WITH_GNOME
-balsa_bonobo_extra =      \
-	balsa-bonobo.c    \
-	balsa-bonobo.h
-balsa_bonobo_extra_dist =
+balsa_bonobo_extra = balsa-bonobo.c balsa-bonobo.h
+balsa_bonobo_extra_dist = Balsa.idl
 balsa_IDL_SRCLIST = Balsa-common.c Balsa-skels.c Balsa-stubs.c Balsa.h
 balsa_IDL_OBJS    = Balsa-common.o Balsa-skels.o Balsa-stubs.o
 # see http://sources.redhat.com/automake/dependencies.html
@@ -138,11 +130,9 @@ BUILT_SOURCES     = Balsa.h
 #auto* *SHOULD* figure this out *grr*
 $(srcdir)/balsa-bonobo.c: Balsa.h
 
+idldir = $(datadir)/idl
+idl_DATA = Balsa.idl
 
-else
-balsa_IDL_SRCLIST = 
-balsa_IDL_OBJS    = 
-BUILT_SOURCES = 
 endif
 endif
 
@@ -156,13 +146,9 @@ balsa_SOURCES =			\
 DISTCLEANFILES = $(balsa_IDL_SRCLIST)
 
 EXTRA_DIST =			\
-	Balsa.idl		\
 	$(balsa_gtkspell_extra_dist) \
 	$(balsa_bonobo_extra_dist)   \
 	$(balsa_print_extra_dist)
-
-idldir = $(datadir)/idl
-idl_DATA = Balsa.idl
 
 AM_CPPFLAGS = \
 	-DGNOMELOCALEDIR=\""$(datadir)/locale"\" \

@@ -8,9 +8,9 @@
 
 	Build --without-esmtp
 
-	* libbalsa/identity.h: typedef LibBalsaSmtpServer only if
+	* libbalsa/libbalsa.h: typedef LibBalsaSmtpServer only if
 	ENABLE_ESMTP.
-	* libbalsa/libbalsa.h: include "libbalsa.h" instead of
+	* libbalsa/identity.h: include "libbalsa.h" instead of
 	"smtp-server.h".
 
 2006-03-19  Pawel Salek

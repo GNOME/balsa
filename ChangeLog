@@ -1,3 +1,7 @@
+2009-03-26  Peter Bloomfield
+
+	* libbalsa/missing_time.c: build with enable-threads.
+
 2009-03-19  Peter Bloomfield
 
 	* Makefile.am: install BonoboActivation files only if

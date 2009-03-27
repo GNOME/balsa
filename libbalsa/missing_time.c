@@ -23,11 +23,16 @@
 #if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
 # include "config.h"
 #endif                          /* HAVE_CONFIG_H */
+
+#if !defined(HAVE_CTIME_R)     || \
+    !defined(HAVE_LOCALTIME_R) || \
+    !defined(HAVE_GMTIME_R)
+
 #include "missing.h"
 
 #include <string.h>
 
-#if HAVE_THREADS
+#if BALSA_USE_THREADS
 #include <pthread.h>
 static pthread_mutex_t time_lock = PTHREAD_MUTEX_INITIALIZER;
 #define LOCK(mutex)   pthread_mutex_lock(&mutex)
@@ -35,7 +40,7 @@ static pthread_mutex_t time_lock = PTHREAD_MUTEX_INITIALIZER;
 #else
 #define LOCK(mutex)
 #define UNLOCK(mutex)
-#endif /* HAVE_THREADS */
+#endif /* BALSA_USE_THREADS */
 
 #ifndef HAVE_CTIME_R
 char *
@@ -70,4 +75,5 @@ gmtime_r(const time_t *clock, struct tm *result)
     UNLOCK(time_lock);
     return result;
 }
+#endif
 #endif

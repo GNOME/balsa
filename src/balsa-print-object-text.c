@@ -604,11 +604,14 @@ balsa_print_object_text_calendar(GList * list,
     PangoLayout *test_layout;
     PangoTabArray *tabs;
     GString *desc_buf;
-    gdouble c_max_height;
-    LibBalsaVCal * vcal_obj = NULL;
+    LibBalsaVCal * vcal_obj;
     GList * this_ev;
+    guint first_page;
+    GList *par_parts;
+    GList *this_par_part;
+    gdouble c_at_y;
 
-    /* check if we can evaluate the body a calendar object and fall back
+    /* check if we can evaluate the body as calendar object and fall back
      * to text if not */
     if (!(vcal_obj = libbalsa_vcal_new_from_body(body)))
 	return balsa_print_object_text(list, context, body, psetup);
@@ -636,8 +639,14 @@ balsa_print_object_text_calendar(GList * list,
     pod->c_image_width = gdk_pixbuf_get_width(pod->pixbuf);
     pod->c_image_height = gdk_pixbuf_get_height(pod->pixbuf);
 
+    /* move to the next page if the icon doesn't fit */
+    if (psetup->c_y_pos + pod->c_image_height > psetup->c_height) {
+	psetup->c_y_pos = 0;
+	psetup->page_count++;
+    }
 
-    /* create a layout for calculating the maximum label width */
+    /* create a layout for calculating the maximum label width and for splitting
+     * the body (if necessary) */
     header_font =
 	pango_font_description_from_string(balsa_app.print_header_font);
     test_layout = gtk_print_context_create_pango_layout(context);
@@ -695,7 +704,7 @@ balsa_print_object_text_calendar(GList * list,
     /* add a small space between label and value */
     pod->p_label_width += C_TO_P(C_LABEL_SEP);
 
-    /* configure the layout so we can calculate the text height */
+    /* configure the layout so we can split the text */
     pango_layout_set_indent(test_layout, -pod->p_label_width);
     tabs =
 	pango_tab_array_new_with_positions(1, FALSE, PANGO_TAB_LEFT,
@@ -706,28 +715,56 @@ balsa_print_object_text_calendar(GList * list,
 			   C_TO_P(po->c_width -
 				  4 * C_LABEL_SEP - pod->c_image_width));
     pango_layout_set_alignment(test_layout, PANGO_ALIGN_LEFT);
+
+    /* split paragraph if necessary */
+    first_page = psetup->page_count - 1;
+    c_at_y = psetup->c_y_pos;
+    par_parts =
+        split_for_layout(test_layout, desc_buf->str, NULL, psetup, TRUE, NULL);
+    g_string_free(desc_buf, TRUE);
+
+    /* set the parameters of the first part */
+    pod->description = (gchar *) par_parts->data;
     pod->c_text_height =
-	P_TO_C(p_string_height_from_layout(test_layout, desc_buf->str));
-    pod->description = g_string_free(desc_buf, FALSE);
-
-    /* check if we should move to the next page */
-    c_max_height = MAX(pod->c_text_height, pod->c_image_height);
-    if (psetup->c_y_pos + c_max_height > psetup->c_height) {
-	psetup->c_y_pos = 0;
-	psetup->page_count++;
-    }
-
-    /* remember the extent */
-    po->on_page = psetup->page_count - 1;
+	P_TO_C(p_string_height_from_layout(test_layout, pod->description));
+    po->on_page = first_page++;
     po->c_at_x = psetup->c_x0 + po->depth * C_LABEL_SEP;
-    po->c_at_y = psetup->c_y0 + psetup->c_y_pos;
-    po->c_width = psetup->c_width - 2 * po->depth * C_LABEL_SEP;
-    po->c_height = c_max_height;
+    po->c_at_y = psetup->c_y0 + c_at_y;
+    po->c_height = MAX(pod->c_image_height, pod->c_text_height);
+    list = g_list_append(list, pod);
 
-    /* adjust the y position */
-    psetup->c_y_pos += c_max_height;
+    /* add more parts */
+    for (this_par_part = g_list_next(par_parts); this_par_part;
+         this_par_part = g_list_next(this_par_part)) {
+        BalsaPrintObjectDefault * new_pod;
+        BalsaPrintObject *new_po;
+        
+        /* create a new object */
+        new_pod = g_object_new(BALSA_TYPE_PRINT_OBJECT_DEFAULT, NULL);
+        g_assert(new_pod != NULL);
+        new_po = BALSA_PRINT_OBJECT(new_pod);
 
-    return g_list_append(list, po);
+        /* fill data */
+        new_pod->p_label_width = pod->p_label_width;
+        new_pod->c_image_width = pod->c_image_width;
+        new_pod->description = (gchar *) this_par_part->data;
+        new_pod->c_text_height =
+            P_TO_C(p_string_height_from_layout(test_layout, new_pod->description));
+        new_po->on_page = first_page++;
+        new_po->c_at_x = psetup->c_x0 + po->depth * C_LABEL_SEP;
+        new_po->c_at_y = psetup->c_y0;
+        new_po->c_height = new_pod->c_text_height;
+        new_po->depth = psetup->curr_depth;
+        new_po->c_width =
+            psetup->c_width - 2 * psetup->curr_depth * C_LABEL_SEP;
+        
+        /* append */
+        list = g_list_append(list, new_pod);
+    }
+    g_list_free(par_parts);
+    g_object_unref(G_OBJECT(test_layout));
+
+    return list;
 }
 
 

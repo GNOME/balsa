@@ -313,7 +313,7 @@ libbalsa_vcal_new_from_body(LibBalsaMessageBody * body)
                 method = g_strdup(lines[k] + 7);
 	    if (!g_ascii_strcasecmp("BEGIN:VEVENT", lines[k]))
 		event = libbalsa_vevent_new();
-	} else {
+	} else if (strlen(lines[k])) {
 	    gchar *value = strchr(lines[k], ':');
 	    gchar **entry;
 
@@ -321,7 +321,7 @@ libbalsa_vcal_new_from_body(LibBalsaMessageBody * body)
 		*value++ = '\0';
 	    entry = g_strsplit(lines[k], ";", -1);
 	    if (!g_ascii_strcasecmp(entry[0], "END")) {
-                if (!g_ascii_strcasecmp(entry[1], "VEVENT")) {
+                if (value && !g_ascii_strcasecmp(value, "VEVENT")) {
                     retval->vevent = g_list_append(retval->vevent, event);
                     event = NULL;
                 } else {
@@ -508,7 +508,7 @@ date_time_2445_to_time_t(const gchar * date_time)
     time_t utc_time;
     gint diff_min;
 
-    g_return_val_if_fail(date_time != NULL, (time_t) - 1);
+    g_return_val_if_fail(date_time != NULL, (time_t) (-1));
     len = strlen(date_time);
 
     /* must be yyyymmddThhmmssZ? */

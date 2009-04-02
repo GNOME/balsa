@@ -23,6 +23,10 @@
 #ifndef __LIBBALSA_MISC_H__
 #define __LIBBALSA_MISC_H__
 
+#ifndef BALSA_VERSION
+# error "Include config.h before this file."
+#endif
+
 #include <stdio.h>
 #include <gtk/gtk.h>
 #include <gmime/gmime.h>

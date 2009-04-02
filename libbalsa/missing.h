@@ -25,6 +25,10 @@
 
 #include <time.h>
 
+#ifndef BALSA_VERSION
+# error "Include config.h before this file."
+#endif
+
 #if (HAVE_DECL_CTIME_R == 0)
 char * ctime_r(const time_t *clock, char *buf);
 #endif

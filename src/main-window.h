@@ -22,6 +22,10 @@
 #ifndef __MAIN_WINDOW_H__
 #define __MAIN_WINDOW_H__
 
+#ifndef BALSA_VERSION
+# error "Include config.h before this file."
+#endif
+
 #ifdef HAVE_NOTIFY
 #include <libnotify/notify.h>
 #endif

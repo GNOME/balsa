@@ -23,6 +23,10 @@
 #ifndef __LIBBALSA_MIME_STREAM_SHARED_H__
 #define __LIBBALSA_MIME_STREAM_SHARED_H__
 
+#ifndef BALSA_VERSION
+# error "Include config.h before this file."
+#endif
+
 #if BALSA_USE_THREADS
 
 #include <gmime/gmime-stream-fs.h>

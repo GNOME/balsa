@@ -22,6 +22,10 @@
 #ifndef __RFC3156_H__
 #define __RFC3156_H__
 
+#ifndef BALSA_VERSION
+# error "Include config.h before this file."
+#endif
+
 #ifdef HAVE_GPGME
 
 #include <gpgme.h>

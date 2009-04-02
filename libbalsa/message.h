@@ -22,6 +22,10 @@
 #ifndef __LIBBALSA_MESSAGE_H__
 #define __LIBBALSA_MESSAGE_H__
 
+#ifndef BALSA_VERSION
+# error "Include config.h before this file."
+#endif
+
 #include <glib.h>
 
 #include <stdio.h>

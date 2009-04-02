@@ -22,6 +22,10 @@
 #ifndef __BALSA_SENDMSG_H__
 #define __BALSA_SENDMSG_H__
 
+#ifndef BALSA_VERSION
+# error "Include config.h before this file."
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif				/* __cplusplus */

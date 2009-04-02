@@ -23,6 +23,10 @@
 #ifndef __LIBBALSA_H__
 #define __LIBBALSA_H__
 
+#ifndef BALSA_VERSION
+# error "Include config.h before this file."
+#endif
+
 typedef struct _LibBalsaCondition LibBalsaCondition;
 typedef struct _LibBalsaIdentity LibBalsaIdentity;
 typedef struct _LibBalsaMailbox LibBalsaMailbox;

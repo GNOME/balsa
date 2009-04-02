@@ -23,6 +23,10 @@
 #ifndef __LIBBALSA_BODY_H__
 #define __LIBBALSA_BODY_H__
 
+#ifndef BALSA_VERSION
+# error "Include config.h before this file."
+#endif
+
 #include <stdio.h>
 #include <sys/stat.h>
 

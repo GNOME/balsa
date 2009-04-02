@@ -22,6 +22,10 @@
 #ifndef __PRINT_H__
 #define __PRINT_H__
 
+#ifndef BALSA_VERSION
+# error "Include config.h before this file."
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif				/* __cplusplus */

@@ -23,6 +23,10 @@
 #ifndef __LIBBALSA_PRIVATE_H__
 #define __LIBBALSA_PRIVATE_H__
 
+#ifndef BALSA_VERSION
+# error "Include config.h before this file."
+#endif
+
 #include <unistd.h>
 
 /* LibBalsaMailboxEntry handling code which is to be used for message

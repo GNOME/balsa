@@ -23,6 +23,10 @@
 #ifndef __LIBBALSA_SERVER_H__
 #define __LIBBALSA_SERVER_H__
 
+#ifndef BALSA_VERSION
+# error "Include config.h before this file."
+#endif
+
 #include "imap/libimap.h"
 #include "libbalsa.h"
 

@@ -22,6 +22,10 @@
 #ifndef __BALSA_PRINT_OBJECT_HEADER_H__
 #define __BALSA_PRINT_OBJECT_HEADER_H__
 
+#ifndef BALSA_VERSION
+# error "Include config.h before this file."
+#endif
+
 #include "balsa-print-object.h"
 
 G_BEGIN_DECLS

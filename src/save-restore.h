@@ -22,6 +22,10 @@
 #ifndef __SAVE_RESTORE_H__
 #define __SAVE_RESTORE_H__
 
+#ifndef BALSA_VERSION
+# error "Include config.h before this file."
+#endif
+
 #include "libbalsa.h"
 #include "mailbox-node.h"
 

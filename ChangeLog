@@ -1,5 +1,44 @@
 2009-04-02  Peter Bloomfield
 
+	Make sure that config.h is included before any header that
+	refers to a symbol defined there.
+
+	* libbalsa/address-book-gpe.h:
+	* libbalsa/body.h:
+	* libbalsa/filter-private.h:
+	* libbalsa/gmime-stream-gio.h:
+	* libbalsa/gmime-stream-gnome-vfs.h:
+	* libbalsa/html.h:
+	* libbalsa/identity.h:
+	* libbalsa/libbalsa.h:
+	* libbalsa/libbalsa_private.h:
+	* libbalsa/mailbox.h:
+	* libbalsa/message.h:
+	* libbalsa/mime-stream-shared.h:
+	* libbalsa/misc.h:
+	* libbalsa/missing.h:
+	* libbalsa/rfc3156.h:
+	* libbalsa/send.h:
+	* libbalsa/server.h:
+	* libinit_balsa/Makefile.am:
+	* libinit_balsa/assistant_page_defclient.h:
+	* src/balsa-app.h:
+	* src/balsa-bonobo.h:
+	* src/balsa-icons.h:
+	* src/balsa-message.h:
+	* src/balsa-mime-widget-crypto.h:
+	* src/balsa-print-object-header.h:
+	* src/main-window.h:
+	* src/print.h:
+	* src/quote-color.h:
+	* src/save-restore.h:
+	* src/sendmsg-window.h:
+	* libbalsa/libbalsa-conf.c: include config.h.
+	* libinit_balsa/assistant_page_defclient.c: ditto.
+	* libinit_balsa/assistant_init.c: ditto.
+
+2009-04-02  Peter Bloomfield
+
 	* src/balsa-print-object-decor.c: include config.h.
 	* src/balsa-print-object-image.c: ditto.
 

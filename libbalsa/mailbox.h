@@ -23,6 +23,10 @@
 #ifndef __LIBBALSA_MAILBOX_H__
 #define __LIBBALSA_MAILBOX_H__
 
+#ifndef BALSA_VERSION
+# error "Include config.h before this file."
+#endif
+
 #include <gdk/gdk.h>
 #include <gmime/gmime.h>
 

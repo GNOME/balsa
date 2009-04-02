@@ -22,6 +22,10 @@
 #ifndef __BALSA_MIME_WIDGET_CRYPTO_H__
 #define __BALSA_MIME_WIDGET_CRYPTO_H__
 
+#ifndef BALSA_VERSION
+# error "Include config.h before this file."
+#endif
+
 #ifdef HAVE_GPGME
 
 #include "balsa-app.h"

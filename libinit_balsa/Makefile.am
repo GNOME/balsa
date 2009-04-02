@@ -72,4 +72,4 @@ INCLUDES=-I$(top_builddir) -I$(top_srcdir) \
 	-I$(top_srcdir)/src \
         $(BALSA_CFLAGS)
 
-DEFS = $(BALSA_DEFS)
+AM_CFLAGS = $(BALSA_DEFS)

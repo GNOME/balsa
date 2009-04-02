@@ -24,6 +24,10 @@
 #ifndef __BALSA_BONOBO_H
 #define __BALSA_BONOBO_H
 
+#ifndef BALSA_VERSION
+# error "Include config.h before this file."
+#endif
+
 #if HAVE_GNOME
 
 #include "Balsa.h" 

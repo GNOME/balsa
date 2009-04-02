@@ -22,6 +22,10 @@
 #ifndef __BALSA_ICONS_H__
 #define __BALSA_ICONS_H__
 
+#ifndef BALSA_VERSION
+# error "Include config.h before this file."
+#endif
+
 #include <gtk/gtk.h>
 
 #define BALSA_PIXMAP_ATTACHMENT			"balsa_attachment"

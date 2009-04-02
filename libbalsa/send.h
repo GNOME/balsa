@@ -24,6 +24,10 @@
 #ifndef __SEND_H__
 #define __SEND_H__
 
+#ifndef BALSA_VERSION
+# error "Include config.h before this file."
+#endif
+
 #include "libbalsa.h"
 
 typedef LibBalsaMailbox* (*LibBalsaFccboxFinder)(const gchar *url);

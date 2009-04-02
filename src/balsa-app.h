@@ -22,6 +22,10 @@
 #ifndef __BALSA_APP_H__
 #define __BALSA_APP_H__
 
+#ifndef BALSA_VERSION
+# error "Include config.h before this file."
+#endif
+
 #include "libbalsa.h"
 #include "identity.h"
 #include "balsa-index.h"

@@ -28,6 +28,10 @@
 #ifndef __FILTER_PRIVATE_H__
 #define __FILTER_PRIVATE_H__
 
+#ifndef BALSA_VERSION
+# error "Include config.h before this file."
+#endif
+
 #if !USE_GREGEX
 #  ifdef HAVE_PCRE
 #    include <pcreposix.h>

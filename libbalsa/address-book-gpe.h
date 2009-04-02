@@ -27,6 +27,10 @@
 #ifndef __LIBBALSA_ADDRESS_BOOK_GPE_H__
 #define __LIBBALSA_ADDRESS_BOOK_GPE_H__
 
+#ifndef BALSA_VERSION
+# error "Include config.h before this file."
+#endif
+
 #ifdef HAVE_SQLITE
 
 #ifdef HAVE_SQLITE3

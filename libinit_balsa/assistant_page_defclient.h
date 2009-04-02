@@ -24,6 +24,10 @@
 #ifndef __BALSA_DRUID_PAGE_DEFCLIENT_H__
 #define __BALSA_DRUID_PAGE_DEFCLIENT_H__
 
+#ifndef BALSA_VERSION
+# error "Include config.h before this file."
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif                          /* __cplusplus */

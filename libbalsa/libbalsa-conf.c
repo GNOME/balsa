@@ -20,8 +20,12 @@
  * 02111-1307, USA.
  */
 
-#include <string.h>
+#if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
+# include "config.h"
+#endif                          /* HAVE_CONFIG_H */
 #include "libbalsa-conf.h"
+
+#include <string.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>

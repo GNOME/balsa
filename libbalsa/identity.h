@@ -23,6 +23,10 @@
 #ifndef __LIBBALSA_IDENTITY_H__
 #define __LIBBALSA_IDENTITY_H__
 
+#ifndef BALSA_VERSION
+# error "Include config.h before this file."
+#endif
+
 #include <gtk/gtk.h>
 #include <gmime/internet-address.h>
 

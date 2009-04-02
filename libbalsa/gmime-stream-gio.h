@@ -24,6 +24,10 @@
 #ifndef __GMIME_STREAM_GIO_H__
 #define __GMIME_STREAM_GIO_H__
 
+#ifndef BALSA_VERSION
+# error "Include config.h before this file."
+#endif
+
 /* note: this module will be compiled only if GIO is available */
 #if HAVE_GIO
 

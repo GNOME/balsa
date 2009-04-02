@@ -1,3 +1,8 @@
+2009-04-02  Peter Bloomfield
+
+	* src/balsa-print-object-decor.c: include config.h.
+	* src/balsa-print-object-image.c: ditto.
+
 2009-03-31  Albrecht Dreß
 
 	* libbalsa/rfc2445.c: (libbalsa_vcal_new_from_body,

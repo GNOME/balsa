@@ -1,3 +1,14 @@
+2009-04-06  Albrecht Dreß
+
+	* src/balsa-print-object.c: (balsa_print_object_emb_message,
+	balsa_print_object_mp_crypto,
+	balsa_print_objects_append_from_body): fix mem leak, select
+	print handlers from a list which needs two helpers due to
+	different prototypes;
+	* src/balsa-print-object-header.c:
+	(balsa_print_object_header_new_real): fix mem leak;
+	* src/print-gtk.c: (begin_print): simplify code.
+
 2009-04-02  Peter Bloomfield
 
 	Make sure that config.h is included before any header that

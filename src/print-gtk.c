@@ -312,8 +312,7 @@ begin_print(GtkPrintOperation * operation, GtkPrintContext * context,
 	pdata->setup.c_height -= P_TO_C(p_height) + C_HEADER_SEP;
 
 	/* remember in the context */
-	pdata->footer = footer_string->str;
-	g_string_free(footer_string, FALSE);
+	pdata->footer = g_string_free(footer_string, FALSE);
     }
     g_object_unref(G_OBJECT(layout));
 

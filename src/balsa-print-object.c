@@ -97,58 +97,71 @@ balsa_print_object_class_init(BalsaPrintObjectClass * klass)
 }
 
 
+static GList *
+balsa_print_object_emb_message(GList * list, GtkPrintContext * context,
+				     LibBalsaMessageBody * mime_body,
+				     BalsaPrintSetup * psetup)
+{
+    list = balsa_print_object_frame_begin(list, NULL, psetup);
+    return balsa_print_object_header_from_body(list, context, mime_body, psetup);
+}
+
+
+static GList *
+balsa_print_object_mp_crypto(GList * list, GtkPrintContext * context,
+                               LibBalsaMessageBody * mime_body,
+                               BalsaPrintSetup * psetup)
+{
+    return balsa_print_object_header_crypto(list, context, mime_body, NULL, psetup);
+}
+
+
 GList *
 balsa_print_objects_append_from_body(GList * list,
 				     GtkPrintContext * context,
 				     LibBalsaMessageBody * mime_body,
 				     BalsaPrintSetup * psetup)
 {
-    gchar *conttype;
-
-    conttype = libbalsa_message_body_get_mime_type(mime_body);
-
-    if (!g_ascii_strcasecmp("text/html", conttype) ||
-	!g_ascii_strcasecmp("text/enriched", conttype) ||
-	!g_ascii_strcasecmp("text/richtext", conttype))
-// #ifdef HAVE_GTKHTML
-// TODO - print HTML
-// #else
-	return balsa_print_object_default(list, context, mime_body, psetup);
-// #endif
-
-    if (!g_ascii_strcasecmp("text/x-vcard", conttype) ||
-        !g_ascii_strcasecmp("text/directory", conttype))
-	return balsa_print_object_text_vcard(list, context, mime_body, psetup);
-
-    if (!g_ascii_strcasecmp("text/calendar", conttype))
-	return balsa_print_object_text_calendar(list, context, mime_body, psetup);
-
-    if (!g_ascii_strcasecmp("text/plain", conttype))
-	return balsa_print_object_text_plain(list, context, mime_body, psetup);
-
-    if (!g_ascii_strncasecmp("text/", conttype, 5))
-	return balsa_print_object_text(list, context, mime_body, psetup);
-
-    if (!g_ascii_strncasecmp("image/", conttype, 6))
-	return balsa_print_object_image(list, context, mime_body, psetup);
-
-    if (!g_ascii_strcasecmp("message/rfc822", conttype)) {
-	list = balsa_print_object_frame_begin(list, NULL, psetup);
-	return balsa_print_object_header_from_body(list, context, mime_body, psetup);
-    }
-
+    static const struct {
+        char * type;  /* MIME type */
+        int use_len;  /* length for strncasecmp or -1 for strcasecmp */
+        GList * (*handler)(GList *, GtkPrintContext *, LibBalsaMessageBody *,
+                           BalsaPrintSetup *);
+    } pr_handlers[] = {
+        { "text/html",                     -1, balsa_print_object_default },
+        { "text/enriched",                 -1, balsa_print_object_default },
+        { "text/richtext",                 -1, balsa_print_object_default },
+        { "text/x-vcard",                  -1, balsa_print_object_text_vcard },
+        { "text/directory",                -1, balsa_print_object_text_vcard },
+        { "text/calendar",                 -1, balsa_print_object_text_calendar },
+        { "text/plain",                    -1, balsa_print_object_text_plain },
+        { "text/",                          5, balsa_print_object_text },
+        { "image/",                         6, balsa_print_object_image },
+        { "message/rfc822",                -1, balsa_print_object_emb_message },
 #ifdef HAVE_GPGME
-    if (!g_ascii_strcasecmp("application/pgp-signature", conttype))
-	return balsa_print_object_header_crypto(list, context, mime_body, NULL, psetup);
+        { "application/pgp-signature",     -1, balsa_print_object_mp_crypto },
 #ifdef HAVE_SMIME
-    if (!g_ascii_strcasecmp("application/pkcs7-signature", conttype) ||
-	!g_ascii_strcasecmp("application/x-pkcs7-signature", conttype))
-	return balsa_print_object_header_crypto(list, context, mime_body, NULL, psetup);
+        { "application/pkcs7-signature",   -1, balsa_print_object_mp_crypto },
+        { "application/x-pkcs7-signature", -1, balsa_print_object_mp_crypto },
 #endif				/* HAVE_SMIME */
 #endif				/* HAVE_GPGME */
+        { NULL,                            -1, balsa_print_object_default }
+    };
+    gchar *conttype;
+    GList *result;
+    int n;
 
-    /* default */
-    return balsa_print_object_default(list, context, mime_body, psetup);
+    conttype = libbalsa_message_body_get_mime_type(mime_body);
+    for (n = 0;
+         pr_handlers[n].type &&
+             ((pr_handlers[n].use_len == -1 &&
+               g_ascii_strcasecmp(pr_handlers[n].type, conttype)) ||
+              (pr_handlers[n].use_len > 0 &&
+               g_ascii_strncasecmp(pr_handlers[n].type, conttype, pr_handlers[n].use_len)));
+         n++);
+    result = pr_handlers[n].handler(list, context, mime_body, psetup);
+    g_free(conttype);
+    return result;
 }
 
 

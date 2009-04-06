@@ -227,16 +227,12 @@ balsa_print_object_header_new_real(GList * list,
 	gint prot = libbalsa_message_body_protection(sig_body);
 
 	if ((prot & LIBBALSA_PROTECT_SIGN) &&
-	    (prot & (LIBBALSA_PROTECT_RFC3156 | LIBBALSA_PROTECT_SMIMEV3)))
-	{
+	    (prot & (LIBBALSA_PROTECT_RFC3156 | LIBBALSA_PROTECT_SMIMEV3))) {
 	    GMimeGpgmeSigstat *siginfo = sig_body->parts->next->sig_info;
-	    gchar *sig_status;
 
-	    sig_status =
-		g_strconcat
-		(libbalsa_gpgme_sig_protocol_name(siginfo->protocol),
-		 libbalsa_gpgme_sig_stat_to_gchar(siginfo->status), NULL);
-	    g_string_append_printf(header_buf, "%s\n", sig_status);
+	    g_string_append_printf(header_buf, "%s%s\n",
+                                   libbalsa_gpgme_sig_protocol_name(siginfo->protocol),
+                                   libbalsa_gpgme_sig_stat_to_gchar(siginfo->status));
 	}
     }
 #endif				/* HAVE_GPGME */

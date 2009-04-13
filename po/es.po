@@ -14,7 +14,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=balsa&component=general\n"
 "POT-Creation-Date: 2009-03-13 12:47+0000\n"
-"PO-Revision-Date: 2009-03-20 13:53+0100\n"
+"PO-Revision-Date: 2009-04-13 07:18+0200\n"
 "Last-Translator: Jorge González <jorgegonz@svn.gnome.org>\n"
 "Language-Team: Español <gnome-es-list@gnome.org>\n"
 "MIME-Version: 1.0\n"
@@ -5291,7 +5291,7 @@ msgstr "Crear y establecer identidades actuales"
 #. Help menu items
 #: ../src/main-window.c:430
 msgid "_Contents"
-msgstr "_Índice"
+msgstr "Índ_ice"
 
 #: ../src/main-window.c:431
 msgid "Table of Contents"

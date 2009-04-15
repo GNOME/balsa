@@ -1,3 +1,8 @@
+2009-04-15  Peter Bloomfield
+
+	* src/balsa-mime-widget.c: (balsa_mime_widget_new_unknown):
+	ellipsize message label.
+
 2009-04-06  Albrecht Dreß
 
 	* src/balsa-print-object.c: (balsa_print_object_emb_message,

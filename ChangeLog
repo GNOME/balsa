@@ -1,3 +1,7 @@
+2009-04-21  Peter Bloomfield
+
+	* balsa.doap: new description-of-a-project file.
+
 2009-04-15  Peter Bloomfield
 
 	* src/balsa-mime-widget.c: (balsa_mime_widget_new_unknown):

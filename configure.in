@@ -10,8 +10,8 @@ dnl Boilerplace and versioning
 dnl ###########################################################################
 
 BALSA_MAJOR=2
-BALSA_REVISION=3
-BALSA_PATCHLEVEL=28
+BALSA_REVISION=4
+BALSA_PATCHLEVEL=0
 BALSA_VERSION="$BALSA_MAJOR.$BALSA_REVISION.${BALSA_PATCHLEVEL}"
 
 AC_SUBST(BALSA_MAJOR)
@@ -897,8 +897,8 @@ fi
 # extra warnings for Subversion.
 #
 
-if test -d "${srcdir}/.svn" ; then
-	BALSA_FROM_SVN=yes
+if test -d "${srcdir}/.git" ; then
+	BALSA_FROM_GIT=yes
 	BALSA_CFLAGS="$BALSA_CFLAGS -Wall -Werror"
         BALSA_DEFS="\
 -DG_DISABLE_DEPRECATED \
@@ -912,11 +912,11 @@ if test -d "${srcdir}/.svn" ; then
 -DPANGO_DISABLE_DEPRECATED \
 -D_FORTIFY_SOURCE=2"
 else
-	BALSA_FROM_SVN=no
+	BALSA_FROM_GIT=no
 fi
 
 AC_MSG_CHECKING([for Subversion information])
-AC_MSG_RESULT($BALSA_FROM_SVN)
+AC_MSG_RESULT($BALSA_FROM_GIT)
 
 dnl #####################################################################
 dnl 7. extra functions.
@@ -1043,9 +1043,9 @@ echo "  Install extra MIME icons: $install_mimeicons"
 dnl echo "                  Use SASL: $need_sasl"
 echo ""
 
-if test x"$BALSA_FROM_SVN" = xyes ; then
+if test x"$BALSA_FROM_GIT" = xyes ; then
 	echo "============================== NOTICE ================================"
-	echo "              You are using Balsa from Subversion source."
+	echo "                You are using Balsa from GIT source."
 	echo "  The program is likely to be unstable, contain incomplete features,"
 	echo "or just plain not work. Use it at your own risk. You have been warned."
 	echo "======================================================================"

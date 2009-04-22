@@ -56,12 +56,12 @@ static int stream_flush(GMimeStream * stream);
 static int stream_close(GMimeStream * stream);
 static gboolean stream_eos(GMimeStream * stream);
 static int stream_reset(GMimeStream * stream);
-static off_t stream_seek(GMimeStream * stream, off_t offset,
+static gint64 stream_seek(GMimeStream * stream, gint64 offset,
 			 GMimeSeekWhence whence);
-static off_t stream_tell(GMimeStream * stream);
+static gint64 stream_tell(GMimeStream * stream);
 static ssize_t stream_length(GMimeStream * stream);
-static GMimeStream *stream_substream(GMimeStream * stream, off_t start,
-				     off_t end);
+static GMimeStream *stream_substream(GMimeStream * stream, gint64 start,
+				     gint64 end);
 
 
 static GMimeStreamClass *parent_class = NULL;
@@ -147,7 +147,7 @@ stream_read(GMimeStream * stream, char *buf, size_t len)
 	return -1;
 
     if (stream->bound_end != -1)
-	len = MIN(stream->bound_end - stream->position, (off_t) len);
+	len = MIN(stream->bound_end - stream->position, (gint64) len);
 
     /* make sure we are at the right position */
     gnome_vfs_seek(gvfs->handle, GNOME_VFS_SEEK_START, stream->position);
@@ -178,7 +178,7 @@ stream_write(GMimeStream * stream, const char *buf, size_t len)
 	return -1;
 
     if (stream->bound_end != -1)
-	len = MIN(stream->bound_end - stream->position, (off_t) len);
+	len = MIN(stream->bound_end - stream->position, (gint64) len);
 
     /* make sure we are at the right position */
     gnome_vfs_seek(gvfs->handle, GNOME_VFS_SEEK_START, stream->position);
@@ -267,11 +267,11 @@ stream_reset(GMimeStream * stream)
     return 0;
 }
 
-static off_t
-stream_seek(GMimeStream * stream, off_t offset, GMimeSeekWhence whence)
+static gint64
+stream_seek(GMimeStream * stream, gint64 offset, GMimeSeekWhence whence)
 {
     GMimeStreamGvfs *gvfs = (GMimeStreamGvfs *) stream;
-    off_t real;
+    gint64 real;
     GnomeVFSFileSize gvfs_real;
 
     g_return_val_if_fail(gvfs->handle != NULL, -1);
@@ -323,7 +323,7 @@ stream_seek(GMimeStream * stream, off_t offset, GMimeSeekWhence whence)
         gnome_vfs_tell(gvfs->handle, &gvfs_real) != GNOME_VFS_OK)
 	return -1;
     else
-        real = (off_t) gvfs_real;
+        real = (gint64) gvfs_real;
 
     /* reset eos if appropriate */
     if ((stream->bound_end != -1 && real < stream->bound_end) ||
@@ -335,7 +335,7 @@ stream_seek(GMimeStream * stream, off_t offset, GMimeSeekWhence whence)
     return real;
 }
 
-static off_t
+static gint64
 stream_tell(GMimeStream * stream)
 {
     return stream->position;
@@ -353,14 +353,14 @@ stream_length(GMimeStream * stream)
     if (gnome_vfs_seek(gvfs->handle, GNOME_VFS_SEEK_END, 0) != GNOME_VFS_OK ||
         gnome_vfs_tell(gvfs->handle, &bound_end) != GNOME_VFS_OK ||
         gnome_vfs_seek(gvfs->handle, GNOME_VFS_SEEK_START, stream->position) != GNOME_VFS_OK ||
-        (off_t) bound_end < stream->bound_start)
+        (gint64) bound_end < stream->bound_start)
         return -1;
 
-    return (off_t) bound_end - stream->bound_start;
+    return (ssize_t) bound_end - stream->bound_start;
 }
 
 static GMimeStream *
-stream_substream(GMimeStream * stream, off_t start, off_t end)
+stream_substream(GMimeStream * stream, gint64 start, gint64 end)
 {
     GMimeStreamGvfs *gvfs;
 
@@ -392,7 +392,7 @@ g_mime_stream_gvfs_new(GnomeVFSHandle * handle)
         start = 0;
 
     gvfs = g_object_new(GMIME_TYPE_STREAM_GVFS, NULL);
-    g_mime_stream_construct(GMIME_STREAM(gvfs), (off_t) start, -1);
+    g_mime_stream_construct(GMIME_STREAM(gvfs), (gint64) start, -1);
     gvfs->owner = TRUE;
     gvfs->eos = FALSE;
     gvfs->handle = handle;
@@ -413,7 +413,7 @@ g_mime_stream_gvfs_new(GnomeVFSHandle * handle)
  * Returns a stream using @handle with bounds @start and @end.
  **/
 GMimeStream *
-g_mime_stream_gvfs_new_with_bounds(GnomeVFSHandle * handle, off_t start, off_t end)
+g_mime_stream_gvfs_new_with_bounds(GnomeVFSHandle * handle, gint64 start, gint64 end)
 {
     GMimeStreamGvfs *gvfs;
 

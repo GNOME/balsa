@@ -238,8 +238,7 @@ libbalsa_address_book_rubrica_alias_complete(LibBalsaAddressBook * ab,
 	 g_completion_complete(ab_text->name_complete, (gchar *) prefix,
 			       new_prefix); list; list = list->next) {
 	InternetAddress *ia = ((CompletionData *) list->data)->ia;
-	internet_address_ref(ia);
-	res = g_list_prepend(res, ia);
+	res = g_list_prepend(res, g_object_ref(ia));
     }
 
     return g_list_reverse(res);
@@ -471,28 +470,29 @@ lbab_rubrica_load_xml(LibBalsaAddressBookRubrica * ab_rubrica,
 	    && LIBBALSA_ADDRESS_BOOK(ab_rubrica)->dist_list_mode) {
 	    /* Create a group address. */
 	    InternetAddress *ia =
-		internet_address_new_group(address->full_name);
+		internet_address_group_new(address->full_name);
+            InternetAddressGroup *group = (InternetAddressGroup *) ia;
 
 	    for (l = address->address_list; l; l = l->next) {
 		InternetAddress *member =
-		    internet_address_new_name(NULL, l->data);
-		internet_address_add_member(ia, member);
-		internet_address_unref(member);
+		    internet_address_mailbox_new(NULL, l->data);
+		internet_address_group_add_member(group, member);
+		g_object_unref(member);
 	    }
 	    cmp_data = completion_data_new(ia, address->nick_name);
 	    completion_list = g_list_prepend(completion_list, cmp_data);
-	    internet_address_unref(ia);
+	    g_object_unref(ia);
 	} else {
 	    /* Create name addresses. */
 	    GList *l;
 
 	    for (l = address->address_list; l; l = l->next) {
 		InternetAddress *ia =
-		    internet_address_new_name(address->full_name, l->data);
+		    internet_address_mailbox_new(address->full_name, l->data);
 		cmp_data = completion_data_new(ia, address->nick_name);
 		completion_list =
 		    g_list_prepend(completion_list, cmp_data);
-		internet_address_unref(ia);
+		g_object_unref(ia);
 	    }
 	}
     }

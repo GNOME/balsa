@@ -131,14 +131,14 @@ body_is_type(LibBalsaMessageBody * body, const gchar * type,
     gboolean retval;
 
     if (body->mime_part) {
-	const GMimeContentType *content_type =
+	GMimeContentType *content_type =
 	    g_mime_object_get_content_type(body->mime_part);
 	retval = g_mime_content_type_is_type(content_type, type, sub_type);
     } else {
 	GMimeContentType *content_type =
 	    g_mime_content_type_new_from_string(body->content_type);
 	retval = g_mime_content_type_is_type(content_type, type, sub_type);
-	g_mime_content_type_destroy(content_type);
+	g_object_unref(content_type);
     }
 
     return retval;
@@ -392,6 +392,7 @@ libbalsa_encrypt_mime_object(GMimeObject ** content, GList * rfc822_for,
 	result = 
 	    g_mime_multipart_encrypted_encrypt(mpe, *content,
 					       GMIME_CIPHER_CONTEXT(ctx),
+                                               FALSE, NULL,
 					       recipients, error);
     }
 #ifdef HAVE_SMIME
@@ -508,7 +509,7 @@ libbalsa_body_check_signature(LibBalsaMessageBody * body,
 
     /* check if the body is really a multipart/signed */
     if (!GMIME_IS_MULTIPART_SIGNED(body->mime_part)
-        || (g_mime_multipart_get_number
+        || (g_mime_multipart_get_count
             (((GMimeMultipart *) body->mime_part))) < 2)
         return FALSE;
     if (body->parts->next->sig_info)
@@ -703,7 +704,6 @@ libbalsa_body_decrypt(LibBalsaMessageBody * body,
 #endif
 
     libbalsa_message_body_set_mime_body(body, mime_obj);
-    g_object_unref(G_OBJECT(mime_obj));
     if (ctx->sig_state && ctx->sig_state->status != GPG_ERR_NOT_SIGNED) {
 	g_object_ref(ctx->sig_state);
 	body->sig_info = ctx->sig_state;
@@ -920,7 +920,7 @@ libbalsa_rfc2440_decrypt(GMimePart * part, GMimeGpgmeSigstat ** sig_info,
     }
 
     /* decrypt */
-    if (g_mime_part_rfc2440_decrypt(part, ctx, &error) == -1) {
+    if (g_mime_part_rfc2440_decrypt(part, ctx, &error) == NULL) {
 	if (error) {
 	    if (error->code != GPG_ERR_CANCELED)
 		libbalsa_information(LIBBALSA_INFORMATION_ERROR, "%s: %s",
@@ -1749,16 +1749,22 @@ have_pub_key_for(gpgme_ctx_t gpgme_ctx, InternetAddressList * recipients)
     gpgme_key_t key;
     gboolean result = TRUE;
     time_t now = time(NULL);
+    gint i;
 
-    for (; result && recipients; recipients = recipients->next) {
-        InternetAddress *ia = recipients->address;
+    for (i = 0; result && i < internet_address_list_length(recipients);
+         i++) {
+        InternetAddress *ia =
+            internet_address_list_get_address(recipients, i);
 
 	/* check all entries in the list, handle groups recursively */
-	if (ia->type == INTERNET_ADDRESS_GROUP)
-	    result = have_pub_key_for(gpgme_ctx, ia->value.members);
-	else if (recipients->address->type == INTERNET_ADDRESS_NAME) {
-	    if (gpgme_op_keylist_start(gpgme_ctx, ia->value.addr, FALSE) !=
-		GPG_ERR_NO_ERROR)
+	if (INTERNET_ADDRESS_IS_GROUP(ia))
+	    result =
+                have_pub_key_for(gpgme_ctx,
+                                 INTERNET_ADDRESS_GROUP(ia)->members);
+	else {
+	    if (gpgme_op_keylist_start(gpgme_ctx,
+                                       INTERNET_ADDRESS_MAILBOX(ia)->addr,
+                                       FALSE) != GPG_ERR_NO_ERROR)
 		return FALSE;
 
 	    result = FALSE;

@@ -640,7 +640,12 @@ gboolean
 libbalsa_abort_on_timeout(const char *host)
 {  /* It appears not to be entirely thread safe... Some locks do not
       get released as they should be. */
-    return libbalsa_ask(ask_timeout_real, (void*)host) != 0; 
+    char *hostname;
+
+    hostname = g_alloca (strlen (host) + 1);
+    strcpy (hostname, host);
+    
+    return libbalsa_ask(ask_timeout_real, hostname) != 0; 
 }
 
 
@@ -847,9 +852,9 @@ libbalsa_get_image_from_face_header(const gchar * content, GError ** err)
     GtkWidget *image = NULL;
 
     stream = g_mime_stream_mem_new();
-    stream_filter = g_mime_stream_filter_new_with_stream(stream);
+    stream_filter = g_mime_stream_filter_new(stream);
 
-    filter = g_mime_filter_basic_new_type(GMIME_FILTER_BASIC_BASE64_DEC);
+    filter = g_mime_filter_basic_new(GMIME_CONTENT_ENCODING_BASE64, FALSE);
     g_mime_stream_filter_add(GMIME_STREAM_FILTER(stream_filter), filter);
     g_object_unref(filter);
 

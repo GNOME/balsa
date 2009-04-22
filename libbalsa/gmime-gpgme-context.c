@@ -64,9 +64,11 @@ static int g_mime_gpgme_encrypt(GMimeCipherContext * ctx, gboolean sign,
 				GMimeStream * istream,
 				GMimeStream * ostream, GError ** err);
 
-static int g_mime_gpgme_decrypt(GMimeCipherContext * ctx,
-				GMimeStream * istream,
-				GMimeStream * ostream, GError ** err);
+static GMimeSignatureValidity *g_mime_gpgme_decrypt(GMimeCipherContext *
+                                                    ctx,
+                                                    GMimeStream * istream,
+                                                    GMimeStream * ostream,
+                                                    GError ** err);
 
 
 /* internal passphrase callback */
@@ -636,7 +638,7 @@ g_mime_gpgme_encrypt(GMimeCipherContext * context, gboolean sign,
  * Decrypt istream to ostream. In RFC 2440 mode, also try to check an included
  * signature (if any).
  */
-static int
+static GMimeSignatureValidity *
 g_mime_gpgme_decrypt(GMimeCipherContext * context, GMimeStream * istream,
 		     GMimeStream * ostream, GError ** error)
 {
@@ -651,10 +653,11 @@ g_mime_gpgme_decrypt(GMimeCipherContext * context, GMimeStream * istream,
 	NULL,			/* seek method */
 	cb_data_release		/* release method */
     };
+    GMimeSignatureValidity *validity;
 
     /* some paranoia checks */
-    g_return_val_if_fail(ctx, -1);
-    g_return_val_if_fail(ctx->gpgme_ctx, -1);
+    g_return_val_if_fail(ctx, NULL);
+    g_return_val_if_fail(ctx->gpgme_ctx, NULL);
     gpgme_ctx = ctx->gpgme_ctx;
     protocol = gpgme_get_protocol(gpgme_ctx);
 
@@ -674,13 +677,13 @@ g_mime_gpgme_decrypt(GMimeCipherContext * context, GMimeStream * istream,
 	 gpgme_data_new_from_cbs(&crypt, &cbs,
 				 istream)) != GPG_ERR_NO_ERROR) {
 	g_set_error_from_gpgme(error, err, _("could not get data from stream"));
-	return -1;
+	return NULL;
     }
     if ((err = gpgme_data_new_from_cbs(&plain, &cbs, ostream)) !=
 	GPG_ERR_NO_ERROR) {
 	g_set_error_from_gpgme(error, err, _("could not create new data object"));
 	gpgme_data_release(crypt);
-	return -1;
+	return NULL;
     }
 
     /* try to decrypt */
@@ -690,7 +693,7 @@ g_mime_gpgme_decrypt(GMimeCipherContext * context, GMimeStream * istream,
 	g_set_error_from_gpgme(error, err, _("decryption failed"));
 	gpgme_data_release(plain);
 	gpgme_data_release(crypt);
-	return -1;
+	return NULL;
     }
     gpgme_data_release(plain);
     gpgme_data_release(crypt);
@@ -698,7 +701,23 @@ g_mime_gpgme_decrypt(GMimeCipherContext * context, GMimeStream * istream,
     /* try to get information about the signature (if any) */
     ctx->sig_state = g_mime_gpgme_sigstat_new_from_gpgme_ctx(gpgme_ctx);
 
-    return 0;
+    validity = g_mime_signature_validity_new();
+    if (ctx->sig_state) {
+	switch (ctx->sig_state->status)
+	    {
+	    case GPG_ERR_NO_ERROR:
+		g_mime_signature_validity_set_status(validity, GMIME_SIGNATURE_STATUS_GOOD);
+		break;
+	    case GPG_ERR_NOT_SIGNED:
+		g_mime_signature_validity_set_status(validity, GMIME_SIGNATURE_STATUS_UNKNOWN);
+		break;
+	    default:
+		g_mime_signature_validity_set_status(validity, GMIME_SIGNATURE_STATUS_BAD);
+	    }
+    } else
+	g_mime_signature_validity_set_status(validity, GMIME_SIGNATURE_STATUS_UNKNOWN);
+
+    return validity;
 }
 
 

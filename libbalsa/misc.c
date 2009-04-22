@@ -487,7 +487,6 @@ LibBalsaCodeset
 libbalsa_set_fallback_codeset(LibBalsaCodeset codeset)
 {
     LibBalsaCodeset ret = sanitize_fallback_codeset;
-#if defined(HAVE_GMIME_2_2_7)
     const gchar *charsets[] = {
         "UTF-8",
         libbalsa_get_codeset_name(NULL, codeset),
@@ -495,8 +494,6 @@ libbalsa_set_fallback_codeset(LibBalsaCodeset codeset)
     };
 
     g_mime_set_user_charsets(charsets);
-    /* GMime will free the strings. */
-#endif                          /* HAVE_GMIME_2_2_7 */
 
     sanitize_fallback_codeset = codeset;
     return ret;
@@ -1047,23 +1044,25 @@ libbalsa_ia_rfc2821_equal(const InternetAddress * a,
 			  const InternetAddress * b)
 {
     const gchar *a_atptr, *b_atptr;
+    const gchar *a_addr, *b_addr;
     gint a_atpos, b_atpos;
 
-    if (!a || !b || a->type != INTERNET_ADDRESS_NAME ||
-	b->type != INTERNET_ADDRESS_NAME)
+    if (!INTERNET_ADDRESS_IS_MAILBOX(a) || !INTERNET_ADDRESS_IS_MAILBOX(b))
         return FALSE;
 
     /* first find the "@" in the two addresses */
-    a_atptr = strchr(a->value.addr, '@');
-    b_atptr = strchr(b->value.addr, '@');
+    a_addr = INTERNET_ADDRESS_MAILBOX(a)->addr;
+    b_addr = INTERNET_ADDRESS_MAILBOX(b)->addr;
+    a_atptr = strchr(a_addr, '@');
+    b_atptr = strchr(b_addr, '@');
     if (!a_atptr || !b_atptr)
         return FALSE;
-    a_atpos = a_atptr - a->value.addr;
-    b_atpos = b_atptr - b->value.addr;
+    a_atpos = a_atptr - a_addr;
+    b_atpos = b_atptr - b_addr;
 
     /* now compare the strings */
     if (!a_atpos || !b_atpos || a_atpos != b_atpos || 
-        strncmp(a->value.addr, b->value.addr, a_atpos) ||
+        strncmp(a_addr, b_addr, a_atpos) ||
         g_ascii_strcasecmp(a_atptr, b_atptr))
         return FALSE;
     else

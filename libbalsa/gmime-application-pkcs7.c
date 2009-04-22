@@ -50,7 +50,7 @@
 static void
 sign_prepare (GMimeObject *mime_part)
 {
-    GMimePartEncodingType encoding;
+    GMimeContentEncoding encoding;
     GMimeObject *subpart;
 	
     if (GMIME_IS_MULTIPART (mime_part)) {
@@ -71,11 +71,11 @@ sign_prepare (GMimeObject *mime_part)
 	subpart = GMIME_MESSAGE_PART (mime_part)->message->mime_part;
 	sign_prepare (subpart);
     } else {
-	encoding = g_mime_part_get_encoding (GMIME_PART (mime_part));
+	encoding = g_mime_part_get_content_encoding (GMIME_PART (mime_part));
 		
-	if (encoding != GMIME_PART_ENCODING_BASE64)
-	    g_mime_part_set_encoding (GMIME_PART (mime_part),
-				      GMIME_PART_ENCODING_QUOTEDPRINTABLE);
+	if (encoding != GMIME_CONTENT_ENCODING_BASE64)
+	    g_mime_part_set_content_encoding (GMIME_PART (mime_part),
+				      GMIME_CONTENT_ENCODING_QUOTEDPRINTABLE);
     }
 }
 
@@ -105,7 +105,7 @@ g_mime_application_pkcs7_sign (GMimePart *pkcs7, GMimeObject *content,
 	
     /* get the cleartext */
     stream = g_mime_stream_mem_new ();
-    filtered_stream = g_mime_stream_filter_new_with_stream (stream);
+    filtered_stream = g_mime_stream_filter_new (stream);
 	
     /* See RFC 2633, Sect. 3.1- the following op's are "SHOULD", so we do it */
     from_filter = g_mime_filter_from_new (GMIME_FILTER_FROM_MODE_ARMOR);
@@ -117,9 +117,9 @@ g_mime_application_pkcs7_sign (GMimePart *pkcs7, GMimeObject *content,
     g_object_unref (filtered_stream);
     g_mime_stream_reset (stream);
 	
-    filtered_stream = g_mime_stream_filter_new_with_stream (stream);
-    crlf_filter = g_mime_filter_crlf_new (GMIME_FILTER_CRLF_ENCODE,
-					  GMIME_FILTER_CRLF_MODE_CRLF_ONLY);
+    filtered_stream = g_mime_stream_filter_new (stream);
+    crlf_filter = g_mime_filter_crlf_new (TRUE,
+					  FALSE);
     g_mime_stream_filter_add (GMIME_STREAM_FILTER (filtered_stream), crlf_filter);
     g_object_unref (crlf_filter);
 	
@@ -127,7 +127,7 @@ g_mime_application_pkcs7_sign (GMimePart *pkcs7, GMimeObject *content,
     sig_data_stream = g_mime_stream_mem_new ();
 	
     /* get the signed content */
-    if (g_mime_cipher_sign (ctx, userid, GMIME_CIPHER_HASH_DEFAULT, filtered_stream, sig_data_stream, err) == -1) {
+    if (g_mime_cipher_context_sign (ctx, userid, GMIME_CIPHER_HASH_DEFAULT, filtered_stream, sig_data_stream, err) == -1) {
 	g_object_unref (filtered_stream);
 	g_object_unref (sig_data_stream);
 	g_object_unref (stream);
@@ -144,8 +144,8 @@ g_mime_application_pkcs7_sign (GMimePart *pkcs7, GMimeObject *content,
     g_object_unref(sig_data_stream);
     g_mime_part_set_content_object(GMIME_PART(pkcs7), wrapper);
     g_mime_part_set_filename(GMIME_PART(pkcs7), "smime.p7m");
-    g_mime_part_set_encoding(GMIME_PART(pkcs7),
-			     GMIME_PART_ENCODING_BASE64);
+    g_mime_part_set_content_encoding(GMIME_PART(pkcs7),
+			     GMIME_CONTENT_ENCODING_BASE64);
     g_object_unref(wrapper);
 
     /* set the content-type params for this part */
@@ -198,18 +198,17 @@ g_mime_application_pkcs7_verify(GMimePart * pkcs7,
     ciphertext = g_mime_stream_mem_new ();
     g_mime_data_wrapper_write_to_stream (wrapper, ciphertext);
     g_mime_stream_reset(ciphertext);
-    g_object_unref(wrapper);
 
     stream = g_mime_stream_mem_new();
-    filtered_stream = g_mime_stream_filter_new_with_stream(stream);
-    crlf_filter = g_mime_filter_crlf_new(GMIME_FILTER_CRLF_DECODE,
-					 GMIME_FILTER_CRLF_MODE_CRLF_ONLY);
+    filtered_stream = g_mime_stream_filter_new(stream);
+    crlf_filter = g_mime_filter_crlf_new(FALSE,
+					 FALSE);
     g_mime_stream_filter_add(GMIME_STREAM_FILTER(filtered_stream),
 			     crlf_filter);
     g_object_unref(crlf_filter);
 
     /* get the cleartext */
-    *validity = g_mime_cipher_verify(ctx, GMIME_CIPHER_HASH_DEFAULT,
+    *validity = g_mime_cipher_context_verify(ctx, GMIME_CIPHER_HASH_DEFAULT,
 				     ciphertext, filtered_stream, err);
     if (!*validity) {
 	g_object_unref(filtered_stream);
@@ -264,10 +263,10 @@ g_mime_application_pkcs7_encrypt (GMimePart *pkcs7, GMimeObject *content,
 	
     /* get the cleartext */
     stream = g_mime_stream_mem_new ();
-    filtered_stream = g_mime_stream_filter_new_with_stream (stream);
+    filtered_stream = g_mime_stream_filter_new (stream);
 	
-    crlf_filter = g_mime_filter_crlf_new (GMIME_FILTER_CRLF_ENCODE,
-					  GMIME_FILTER_CRLF_MODE_CRLF_ONLY);
+    crlf_filter = g_mime_filter_crlf_new (TRUE,
+					  FALSE);
     g_mime_stream_filter_add (GMIME_STREAM_FILTER (filtered_stream), crlf_filter);
     g_object_unref (crlf_filter);
 	
@@ -280,7 +279,7 @@ g_mime_application_pkcs7_encrypt (GMimePart *pkcs7, GMimeObject *content,
 	
     /* encrypt the content stream */
     ciphertext = g_mime_stream_mem_new ();
-    if (g_mime_cipher_encrypt (ctx, FALSE, NULL, recipients, stream, ciphertext, err) == -1) {
+    if (g_mime_cipher_context_encrypt (ctx, FALSE, NULL, recipients, stream, ciphertext, err) == -1) {
 	g_object_unref (ciphertext);
 	g_object_unref (stream);
 	return -1;
@@ -295,7 +294,7 @@ g_mime_application_pkcs7_encrypt (GMimePart *pkcs7, GMimeObject *content,
     g_object_unref(ciphertext);
     g_mime_part_set_content_object(GMIME_PART(pkcs7), wrapper);
     g_mime_part_set_filename(GMIME_PART(pkcs7), "smime.p7m");
-    g_mime_part_set_encoding(GMIME_PART(pkcs7), GMIME_PART_ENCODING_BASE64);
+    g_mime_part_set_content_encoding(GMIME_PART(pkcs7), GMIME_CONTENT_ENCODING_BASE64);
     g_object_unref(wrapper);
 
     /* set the content-type params for this part */
@@ -344,18 +343,17 @@ g_mime_application_pkcs7_decrypt (GMimePart *pkcs7, GMimeCipherContext *ctx,
     ciphertext = g_mime_stream_mem_new();
     g_mime_data_wrapper_write_to_stream (wrapper, ciphertext);
     g_mime_stream_reset(ciphertext);
-    g_object_unref(wrapper);
 
     stream = g_mime_stream_mem_new();
-    filtered_stream = g_mime_stream_filter_new_with_stream(stream);
-    crlf_filter = g_mime_filter_crlf_new(GMIME_FILTER_CRLF_DECODE,
-					 GMIME_FILTER_CRLF_MODE_CRLF_ONLY);
+    filtered_stream = g_mime_stream_filter_new(stream);
+    crlf_filter = g_mime_filter_crlf_new(FALSE,
+					 FALSE);
     g_mime_stream_filter_add(GMIME_STREAM_FILTER(filtered_stream),
 			     crlf_filter);
     g_object_unref(crlf_filter);
 
     /* get the cleartext */
-    if (g_mime_cipher_decrypt(ctx, ciphertext, filtered_stream, err) == -1) {
+    if (g_mime_cipher_context_decrypt(ctx, ciphertext, filtered_stream, err) == NULL) {
 	g_object_unref(filtered_stream);
 	g_object_unref(ciphertext);
 	g_object_unref(stream);

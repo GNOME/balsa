@@ -791,7 +791,7 @@ libbalsa_html_filter(LibBalsaHTMLType html_type, gchar ** text, guint len)
     array = g_byte_array_new();
     g_mime_stream_mem_set_byte_array(GMIME_STREAM_MEM(stream), array);
 
-    filter_stream = g_mime_stream_filter_new_with_stream(stream);
+    filter_stream = g_mime_stream_filter_new(stream);
     g_object_unref(stream);
 
     filter = g_mime_filter_enriched_new(flags);

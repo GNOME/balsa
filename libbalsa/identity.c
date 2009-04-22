@@ -100,7 +100,7 @@ static void
 libbalsa_identity_init(LibBalsaIdentity* ident)
 {
     ident->identity_name = NULL;
-    ident->ia = internet_address_new();
+    ident->ia = NULL;
     ident->replyto = NULL;
     ident->domain = NULL;
     ident->bcc = NULL;
@@ -137,7 +137,8 @@ libbalsa_identity_finalize(GObject * object)
 {
     LibBalsaIdentity *ident = LIBBALSA_IDENTITY(object);
 
-    internet_address_unref(ident->ia);
+    if (ident->ia)
+	g_object_unref(ident->ia);
     g_free(ident->identity_name);
     g_free(ident->replyto);
     g_free(ident->domain);
@@ -205,7 +206,8 @@ libbalsa_identity_set_address(LibBalsaIdentity * ident,
 {
     g_return_if_fail(ident != NULL);
 
-    internet_address_unref(ident->ia);
+    if (ident->ia)
+	g_object_unref(ident->ia);
     ident->ia = ia;
 }
 
@@ -1449,16 +1451,15 @@ ident_dialog_update(GObject * dlg)
     g_free(id->identity_name); id->identity_name = text;
     set_identity_name_in_tree(GTK_TREE_VIEW(tree), id, text);
 
-    text = ident_dialog_get_text(dlg, "identity-fullname");
-    g_return_val_if_fail(text != NULL, FALSE);
-    ia = internet_address_new();
-    internet_address_set_name(ia, text);
-    g_free(text);
-    
     text = ident_dialog_get_text(dlg, "identity-address");
-    internet_address_set_addr(ia, text);
+    g_return_val_if_fail(text != NULL, FALSE);
+    ia = internet_address_mailbox_new(NULL, text);
     g_free(text);
+
+    text = ident_dialog_get_text(dlg, "identity-fullname");
+    internet_address_set_name(ia, text);
     libbalsa_identity_set_address(id, ia);
+    g_free(text);
 
     g_free(id->replyto);
     id->replyto         = ident_dialog_get_text(dlg, "identity-replyto");
@@ -1827,10 +1828,10 @@ display_frame_update(GObject * dialog, LibBalsaIdentity* ident)
 
     ident_dialog_update(dialog);
     display_frame_set_field(dialog, "identity-name", ident->identity_name);
-    display_frame_set_field(dialog, "identity-fullname", ident->ia->name);
-    if (ident->ia->type == INTERNET_ADDRESS_NAME)
+    display_frame_set_field(dialog, "identity-fullname", ident->ia ? ident->ia->name : NULL);
+    if (ident->ia && INTERNET_ADDRESS_IS_MAILBOX (ident->ia))
         display_frame_set_field(dialog, "identity-address", 
-                                ident->ia->value.addr);
+                                INTERNET_ADDRESS_MAILBOX(ident->ia)->addr);
     else
         display_frame_set_field(dialog, "identity-address", NULL);
     
@@ -1941,17 +1942,16 @@ LibBalsaIdentity*
 libbalsa_identity_new_config(const gchar* name)
 {
     LibBalsaIdentity* ident;
+    gchar *fname, *email;
     gchar* tmpstr;
     
+    fname = libbalsa_conf_get_string("FullName");
+    email = libbalsa_conf_get_string("Address");
+    
     ident = LIBBALSA_IDENTITY(libbalsa_identity_new_with_name(name));
-
-    tmpstr = libbalsa_conf_get_string("FullName");
-    internet_address_set_name(ident->ia, tmpstr);
-    g_free(tmpstr);
-
-    tmpstr = libbalsa_conf_get_string("Address");
-    internet_address_set_addr(ident->ia, tmpstr);
-    g_free(tmpstr);
+    ident->ia = internet_address_mailbox_new (fname, email);
+    g_free(fname);
+    g_free(email);
 
     ident->replyto = libbalsa_conf_get_string("ReplyTo");
     ident->domain = libbalsa_conf_get_string("Domain");
@@ -2002,10 +2002,10 @@ libbalsa_identity_save(LibBalsaIdentity* ident, const gchar* group)
     g_return_if_fail(ident);
 
     libbalsa_conf_push_group(group);
-    libbalsa_conf_set_string("FullName", ident->ia->name);
+    libbalsa_conf_set_string("FullName", ident->ia ? ident->ia->name : NULL);
     
-    if (ident->ia->type == INTERNET_ADDRESS_NAME)
-        libbalsa_conf_set_string("Address", ident->ia->value.addr);
+    if (ident->ia && INTERNET_ADDRESS_IS_MAILBOX (ident->ia))
+        libbalsa_conf_set_string("Address", INTERNET_ADDRESS_MAILBOX(ident->ia)->addr);
 
     libbalsa_conf_set_string("ReplyTo", ident->replyto);
     libbalsa_conf_set_string("Domain", ident->domain);

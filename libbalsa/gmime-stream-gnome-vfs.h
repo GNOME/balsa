@@ -63,8 +63,8 @@ GType g_mime_stream_gvfs_get_type(void);
 
 GMimeStream *g_mime_stream_gvfs_new(GnomeVFSHandle * handle);
 GMimeStream *g_mime_stream_gvfs_new_with_bounds(GnomeVFSHandle * handle,
-                                                off_t start,
-						off_t end);
+                                                gint64 start,
+						gint64 end);
 
 gboolean g_mime_stream_gvfs_get_owner(GMimeStreamGvfs * stream);
 void g_mime_stream_gvfs_set_owner(GMimeStreamGvfs * stream,

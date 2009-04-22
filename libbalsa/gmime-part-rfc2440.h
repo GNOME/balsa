@@ -56,8 +56,9 @@ int g_mime_part_rfc2440_sign_encrypt(GMimePart * part,
 GMimeSignatureValidity *g_mime_part_rfc2440_verify(GMimePart * part,
 						   GMimeGpgmeContext * ctx,
 						   GError ** err);
-gint g_mime_part_rfc2440_decrypt(GMimePart * part,
-				 GMimeGpgmeContext * ctx, GError ** err);
+GMimeSignatureValidity *g_mime_part_rfc2440_decrypt(GMimePart * part,
+                                                    GMimeGpgmeContext *
+                                                    ctx, GError ** err);
 
 #ifdef __cplusplus
 }

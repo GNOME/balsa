@@ -95,11 +95,12 @@ gchar * libbalsa_address_extract_name(const gchar * string,
 void libbalsa_address_set_copy(LibBalsaAddress *dest, LibBalsaAddress *src);
 gchar *libbalsa_address_to_gchar(LibBalsaAddress * address, gint n);
 
-const gchar *libbalsa_address_get_name_from_list(const InternetAddressList
+const gchar *libbalsa_address_get_name_from_list(InternetAddressList
                                                  * address_list);
-const gchar *libbalsa_address_get_mailbox_from_list(const
-                                                    InternetAddressList *
+const gchar *libbalsa_address_get_mailbox_from_list(InternetAddressList *
                                                     address_list);
+gint libbalsa_address_n_mailboxes_in_list(InternetAddressList *
+                                          address_list);
 
 /* =================================================================== */
 /*                                UI PART                              */

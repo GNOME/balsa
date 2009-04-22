@@ -230,7 +230,7 @@ lbav_entry_setup_matches(LibBalsaAddressView * address_view,
     if (*prefix)
         match = lbav_get_matching_addresses(address_view, prefix, type);
     lbav_append_addresses(address_view, completion, match, prefix);
-    g_list_foreach(match, (GFunc) internet_address_unref, NULL);
+    g_list_foreach(match, (GFunc) g_object_unref, NULL);
     g_list_free(match);
 }
 
@@ -372,30 +372,30 @@ lbav_add_from_list(LibBalsaAddressView * address_view,
     GtkTreeModel *model =
         gtk_tree_view_get_model(GTK_TREE_VIEW(address_view));
     GtkListStore *address_store = GTK_LIST_STORE(model);
+    InternetAddress *ia;
+    gchar *name;
     guint type;
-
+    int i;
+    
     gtk_tree_model_get(model, iter, ADDRESS_TYPE_COL, &type, -1);
 
-    while (list) {
-        InternetAddress *ia = list->address;
-
-        if (ia) {
-            gchar *name = internet_address_to_string(ia, FALSE);
-
-            libbalsa_utf8_sanitize(&name, address_view->fallback, NULL);
-            lbav_clean_text(name);
-
-            gtk_list_store_set(address_store, iter,
-                               ADDRESS_TYPE_COL, type,
-                               ADDRESS_TYPESTRING_COL,
-                               _(lbav_type_string(address_view, type)),
-                               ADDRESS_NAME_COL, name,
-                               ADDRESS_ICON_COL, lbav_close_icon,
-                               -1);
-            g_free(name);
-        }
-
-        if ((list = list->next))
+    for (i = 0; i < internet_address_list_length (list); i++) {
+        ia = internet_address_list_get_address (list, i);;
+	name = internet_address_to_string (ia, FALSE);
+	
+	libbalsa_utf8_sanitize(&name, address_view->fallback, NULL);
+	lbav_clean_text(name);
+	
+	gtk_list_store_set(address_store, iter,
+			   ADDRESS_TYPE_COL, type,
+			   ADDRESS_TYPESTRING_COL,
+			   _(lbav_type_string(address_view, type)),
+			   ADDRESS_NAME_COL, name,
+			   ADDRESS_ICON_COL, lbav_close_icon,
+			   -1);
+	g_free(name);
+	
+	if (i + 1 < internet_address_list_length (list))
             gtk_list_store_insert_after(address_store, iter, iter);
     }
 }
@@ -410,12 +410,13 @@ static gboolean
 lbav_add_from_string(LibBalsaAddressView * address_view,
                      GtkTreeIter * iter, const gchar * string)
 {
-    InternetAddressList *list = internet_address_parse_string(string);
+    InternetAddressList *list = internet_address_list_parse_string(string);
+    gboolean retval = internet_address_list_length(list) > 0;
 
     lbav_add_from_list(address_view, iter, list);
-    internet_address_list_destroy(list);
+    g_object_unref(list);
 
-    return list != NULL;
+    return retval;
 }
 
 /*
@@ -533,24 +534,6 @@ lbav_set_text_at_path(LibBalsaAddressView * address_view,
     if (count > 1) {
         gtk_list_store_remove(address_store, &iter);
         lbav_ensure_blank_line(address_view, &iter, type);
-    }
-}
-
-/*
- *     Count addresses in an InternetAddressList
- */
-static void
-lbav_count_addresses_in_list(InternetAddressList * list, gint * addresses)
-{
-    for (; list && *addresses >= 0; list = list->next) {
-        InternetAddress *ia = list->address;
-        if (ia->type == INTERNET_ADDRESS_NAME) {
-            if (strpbrk(ia->value.addr, "@%!"))
-                ++(*addresses);
-            else
-                *addresses = -1;
-        } else if (ia->type == INTERNET_ADDRESS_GROUP)
-            lbav_count_addresses_in_list(ia->value.members, addresses);
     }
 }
 
@@ -768,7 +751,7 @@ lbav_focus_out_cb(GtkEntry * entry, GdkEventFocus * event,
                 gtk_cell_editable_editing_done(GTK_CELL_EDITABLE(entry));
                 g_free(the_addr);
             }
-            g_list_foreach(match, (GFunc) internet_address_unref, NULL);
+            g_list_foreach(match, (GFunc) g_object_unref, NULL);
             g_list_free(match);
         }
     }
@@ -1193,7 +1176,7 @@ libbalsa_address_view_set_from_list(LibBalsaAddressView * address_view,
 
     lbav_remove(address_view, type);
 
-    if (list) {
+    if (list && internet_address_list_length(list) > 0) {
         GtkTreeModel *model =
             gtk_tree_view_get_model(GTK_TREE_VIEW(address_view));
         GtkListStore *address_store = GTK_LIST_STORE(model);
@@ -1216,19 +1199,18 @@ libbalsa_address_view_set_from_list(LibBalsaAddressView * address_view,
 gint
 libbalsa_address_view_n_addresses(LibBalsaAddressView * address_view)
 {
-    gint addresses;
+    gint addresses = 0;
     guint type;
 
     g_return_val_if_fail(LIBBALSA_IS_ADDRESS_VIEW(address_view), -1);
 
-    addresses = 0;
     for (type = 0; type < address_view->n_types; type++) {
         InternetAddressList *list =
             libbalsa_address_view_get_list(address_view,
                                            lbav_type_string(address_view,
                                                             type));
-        lbav_count_addresses_in_list(list, &addresses);
-        internet_address_list_destroy(list);
+        addresses += libbalsa_address_n_mailboxes_in_list(list);
+        g_object_unref(list);
     }
 
     return addresses;
@@ -1236,7 +1218,8 @@ libbalsa_address_view_n_addresses(LibBalsaAddressView * address_view)
 
 /*
  *     Create InternetAddressList corresponding to the view content.
- *     The list must be destroyed using internet_address_list_destroy().
+ *     The list, which is NULL only on error, must be destroyed using
+ *     g_object_unref().
  */
 InternetAddressList *
 libbalsa_address_view_get_list(LibBalsaAddressView * address_view,
@@ -1255,7 +1238,7 @@ libbalsa_address_view_get_list(LibBalsaAddressView * address_view,
                          || type < address_view->n_types, NULL);
 
     model = gtk_tree_view_get_model(GTK_TREE_VIEW(address_view));
-    address_list = NULL;
+    address_list = internet_address_list_new();
     for (valid = gtk_tree_model_get_iter_first(model, &iter);
          valid; valid = gtk_tree_model_iter_next(model, &iter)) {
         guint this_type;
@@ -1266,15 +1249,10 @@ libbalsa_address_view_get_list(LibBalsaAddressView * address_view,
                            ADDRESS_NAME_COL, &name, -1);
 
         if (this_type == type && name && *name) {
-            InternetAddressList *l, *tmp_list =
-                internet_address_parse_string(name);
-            for (l = tmp_list; l; l = l->next) {
-                InternetAddress *ia = l->address;
-                if (ia)
-                    address_list =
-                        internet_address_list_append(address_list, ia);
-            }
-            internet_address_list_destroy(tmp_list);
+            InternetAddressList *tmp_list =
+                internet_address_list_parse_string(name);
+            internet_address_list_append(address_list, tmp_list);
+            g_object_unref(tmp_list);
         }
         g_free(name);
     }

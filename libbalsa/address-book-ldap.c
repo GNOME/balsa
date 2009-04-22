@@ -549,7 +549,7 @@ lbabl_get_internet_address(LDAP *dir, LDAPMessage * e)
 
     if(!cn)
         cn = create_name(first, sn);
-    ia = internet_address_new_name(cn, email);
+    ia = internet_address_mailbox_new(cn, email);
     g_free(email); g_free(sn); g_free(cn); g_free(first);
 
     return ia;

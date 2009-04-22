@@ -42,14 +42,11 @@ g_mime_part_check_rfc2440(GMimePart * part)
     /* try to get the content stream */
     wrapper = g_mime_part_get_content_object(part);
     g_return_val_if_fail(wrapper, GMIME_PART_RFC2440_NONE);
+
     stream = g_mime_data_wrapper_get_stream(wrapper);
-    g_object_unref(wrapper);
-    if (!stream)
-        return retval;
-    if ((slen = g_mime_stream_length(stream)) == -1) {
-        g_object_unref(stream);
+    if (!stream || (slen = g_mime_stream_length(stream)) < 0)
 	return retval;
-    }
+
     g_mime_stream_reset(stream);
 
     /* check if the complete stream fits in the buffer */
@@ -89,7 +86,6 @@ g_mime_part_check_rfc2440(GMimePart * part)
 	}
     }
 
-    g_object_unref(stream);
     return retval;
 }
 
@@ -124,7 +120,6 @@ g_mime_part_rfc2440_sign_encrypt(GMimePart * part,
     wrapper = g_mime_part_get_content_object(part);
     g_return_val_if_fail(wrapper, -1); /* Incomplete part. */
     stream = g_mime_data_wrapper_get_stream(wrapper);
-    g_object_unref(wrapper);
     g_mime_stream_reset(stream);
 
     /* construct the stream for the crypto output */
@@ -136,15 +131,14 @@ g_mime_part_rfc2440_sign_encrypt(GMimePart * part,
     ctx->singlepart_mode = TRUE;
     if (recipients == NULL)
 	result =
-	    g_mime_cipher_sign(GMIME_CIPHER_CONTEXT(ctx), sign_userid,
+	    g_mime_cipher_context_sign(GMIME_CIPHER_CONTEXT(ctx), sign_userid,
 			       GMIME_CIPHER_HASH_DEFAULT, stream,
 			       cipherstream, err);
     else
 	result =
-	    g_mime_cipher_encrypt(GMIME_CIPHER_CONTEXT(ctx),
+	    g_mime_cipher_context_encrypt(GMIME_CIPHER_CONTEXT(ctx),
 				  sign_userid != NULL, sign_userid,
 				  recipients, stream, cipherstream, err);
-    g_object_unref(stream);
     if (result == -1) {
 	g_object_unref(cipherstream);
 	return -1;
@@ -180,15 +174,15 @@ g_mime_part_rfc2440_sign_encrypt(GMimePart * part,
      * and set the charset to us-ascii instead, as gpg added it's own armor.
      */
     if (recipients == NULL) {
-	if (g_mime_part_get_encoding(part) != GMIME_PART_ENCODING_BASE64)
-	    g_mime_part_set_encoding(part,
-				     GMIME_PART_ENCODING_QUOTEDPRINTABLE);
+	if (g_mime_part_get_content_encoding(part) != GMIME_CONTENT_ENCODING_BASE64)
+	    g_mime_part_set_content_encoding(part,
+				     GMIME_CONTENT_ENCODING_QUOTEDPRINTABLE);
 	g_mime_data_wrapper_set_encoding(wrapper,
-					 GMIME_PART_ENCODING_DEFAULT);
+					 GMIME_CONTENT_ENCODING_DEFAULT);
     } else {
-	g_mime_part_set_encoding(part, GMIME_PART_ENCODING_7BIT);
+	g_mime_part_set_content_encoding(part, GMIME_CONTENT_ENCODING_7BIT);
 	g_mime_data_wrapper_set_encoding(wrapper,
-					 GMIME_PART_ENCODING_7BIT);
+					 GMIME_CONTENT_ENCODING_7BIT);
 	g_mime_object_set_content_type_parameter(GMIME_OBJECT(part),
 						 "charset", "US-ASCII");
     }
@@ -212,7 +206,7 @@ GMimeSignatureValidity *
 g_mime_part_rfc2440_verify(GMimePart * part,
 			   GMimeGpgmeContext * ctx, GError ** err)
 {
-    GMimeStream *stream, *plainstream, *wrapper_stream;
+    GMimeStream *stream, *plainstream;
     GMimeDataWrapper * wrapper;
     GMimeSignatureValidity *valid;
 
@@ -224,12 +218,9 @@ g_mime_part_rfc2440_verify(GMimePart * part,
     /* get the raw content */
     wrapper = g_mime_part_get_content_object(GMIME_PART(part));
     g_return_val_if_fail(wrapper, NULL); /* Incomplete part. */
-    wrapper_stream = g_mime_data_wrapper_get_stream(wrapper);
     stream = g_mime_stream_mem_new();
     g_mime_data_wrapper_write_to_stream(wrapper, stream);
-    g_object_unref(wrapper_stream);
     g_mime_stream_reset(stream);
-    g_object_unref(wrapper);
 
     /* construct the stream for the checked output */
     plainstream = g_mime_stream_mem_new();
@@ -237,10 +228,9 @@ g_mime_part_rfc2440_verify(GMimePart * part,
     /* verify the signature */
     ctx->singlepart_mode = TRUE;
     valid =
-	g_mime_cipher_verify(GMIME_CIPHER_CONTEXT(ctx),
+	g_mime_cipher_context_verify(GMIME_CIPHER_CONTEXT(ctx),
 			     GMIME_CIPHER_HASH_DEFAULT, stream,
 			     plainstream, err);
-    g_object_unref(stream);
 
     /* upon success, replace the signed content by the checked one */
     if (valid) {
@@ -265,26 +255,25 @@ g_mime_part_rfc2440_verify(GMimePart * part,
  * verified and the result is placed in ctx by the underlying gpgme
  * context.
  */
-int
+GMimeSignatureValidity *
 g_mime_part_rfc2440_decrypt(GMimePart * part,
 			    GMimeGpgmeContext * ctx, GError ** err)
 {
     GMimeStream *stream, *plainstream;
     GMimeDataWrapper * wrapper;
-    gint result;
+    GMimeSignatureValidity *result;
     gchar *headbuf = g_malloc0(1024);
 
-    g_return_val_if_fail(GMIME_IS_PART(part), -1);
-    g_return_val_if_fail(GMIME_IS_GPGME_CONTEXT(ctx), -1);
+    g_return_val_if_fail(GMIME_IS_PART(part), NULL);
+    g_return_val_if_fail(GMIME_IS_GPGME_CONTEXT(ctx), NULL);
     g_return_val_if_fail(GMIME_CIPHER_CONTEXT(ctx)->encrypt_protocol !=
-			 NULL, -1);
+			 NULL, NULL);
 
     /* get the raw content */
     wrapper = g_mime_part_get_content_object(part);
-    g_return_val_if_fail(wrapper, -1); /* Incomplete part. */
+    g_return_val_if_fail(wrapper, NULL); /* Incomplete part. */
     stream = g_mime_stream_mem_new();
     g_mime_data_wrapper_write_to_stream(wrapper, stream);
-    g_object_unref(wrapper);
 
     g_mime_stream_reset(stream);
     g_mime_stream_read(stream, headbuf, 1023);
@@ -295,19 +284,18 @@ g_mime_part_rfc2440_decrypt(GMimePart * part,
 
     /* decrypt and (if possible) verify the input */
     result =
-	g_mime_cipher_decrypt(GMIME_CIPHER_CONTEXT(ctx), stream,
+	g_mime_cipher_context_decrypt(GMIME_CIPHER_CONTEXT(ctx), stream,
 			      plainstream, err);
 
-    if (result == 0) {
+    if (result != NULL) {
 	GMimeStream *filter_stream;
 	GMimeStream *out_stream;
 	GMimeFilter *filter;
 	GMimeDataWrapper *wrapper = g_mime_data_wrapper_new();
 
 	/* strip crlf off encrypted stuff coming from Winbloze crap */
-	filter_stream = g_mime_stream_filter_new_with_stream(plainstream);
-	filter = g_mime_filter_crlf_new(GMIME_FILTER_CRLF_DECODE,
-					GMIME_FILTER_CRLF_MODE_CRLF_ONLY);
+	filter_stream = g_mime_stream_filter_new(plainstream);
+	filter = g_mime_filter_crlf_new(FALSE, FALSE);
 	g_mime_stream_filter_add(GMIME_STREAM_FILTER(filter_stream), filter);
 	g_object_unref(filter);
 
@@ -315,12 +303,11 @@ g_mime_part_rfc2440_decrypt(GMimePart * part,
 	out_stream = g_mime_stream_mem_new();
 	g_mime_data_wrapper_set_stream(wrapper, out_stream);
 	g_mime_part_set_content_object(part, wrapper);
-	g_object_unref(wrapper);
 	g_mime_stream_reset(filter_stream);
 	g_mime_stream_write_to_stream(filter_stream, out_stream);
 	g_object_unref(filter_stream);
 
-	g_mime_part_set_encoding(part, GMIME_PART_ENCODING_8BIT);
+	g_mime_part_set_content_encoding(part, GMIME_CONTENT_ENCODING_8BIT);
 
 	/*
  	 * Set the charset of the decrypted content to the RFC 2440 "Charset:"

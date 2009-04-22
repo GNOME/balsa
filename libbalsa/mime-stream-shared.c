@@ -63,10 +63,10 @@ static ssize_t lbmss_stream_read(GMimeStream * stream, char *buf,
 static ssize_t lbmss_stream_write(GMimeStream * stream, const char *buf,
                                   size_t len);
 static int lbmss_stream_reset(GMimeStream * stream);
-static off_t lbmss_stream_seek(GMimeStream * stream, off_t offset,
+static gint64 lbmss_stream_seek(GMimeStream * stream, gint64 offset,
                                GMimeSeekWhence whence);
 static GMimeStream *lbmss_stream_substream(GMimeStream * stream,
-                                           off_t start, off_t end);
+                                           gint64 start, gint64 end);
 
 static GMimeStreamFsClass *parent_class = NULL;
 static GMutex *lbmss_mutex;
@@ -195,8 +195,8 @@ lbmss_stream_reset(GMimeStream * stream)
     return GMIME_STREAM_CLASS(parent_class)->reset(stream);
 }
 
-static off_t
-lbmss_stream_seek(GMimeStream * stream, off_t offset,
+static gint64
+lbmss_stream_seek(GMimeStream * stream, gint64 offset,
                   GMimeSeekWhence whence)
 {
     g_return_val_if_fail(lbmss_thread_has_lock(stream), -1);
@@ -204,7 +204,7 @@ lbmss_stream_seek(GMimeStream * stream, off_t offset,
 }
 
 static GMimeStream *
-lbmss_stream_substream(GMimeStream * stream, off_t start, off_t end)
+lbmss_stream_substream(GMimeStream * stream, gint64 start, gint64 end)
 {
     LibBalsaMimeStreamShared *stream_shared;
     GMimeStreamFs *fstream;
@@ -238,7 +238,7 @@ libbalsa_mime_stream_shared_new(int fd)
 {
     LibBalsaMimeStreamShared *stream_shared;
     GMimeStreamFs *fstream;
-    off_t start;
+    gint64 start;
 
     stream_shared =
         g_object_new(LIBBALSA_TYPE_MIME_STREAM_SHARED, NULL, NULL);

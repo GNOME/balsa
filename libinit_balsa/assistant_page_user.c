@@ -247,6 +247,7 @@ balsa_druid_page_user_next(GtkAssistant * druid, GtkWidget * page,
     const gchar *host, *mailbox;
     gchar *uhoh;
     LibBalsaIdentity *ident;
+    InternetAddress *ia;
 #if ENABLE_ESMTP
     LibBalsaSmtpServer *smtp_server;
 #endif /* ENABLE_ESMTP */
@@ -293,9 +294,9 @@ balsa_druid_page_user_next(GtkAssistant * druid, GtkWidget * page,
     } else {
         ident = balsa_app.current_ident;
     }
-    internet_address_set_name(ident->ia, mailbox);
-    internet_address_set_addr(ident->ia,
-                              gtk_entry_get_text(GTK_ENTRY(user->email)));
+    
+    ia = internet_address_mailbox_new (mailbox, gtk_entry_get_text(GTK_ENTRY(user->email)));
+    libbalsa_identity_set_address (ident, ia);
 
     /* outgoing mail */
 #if ENABLE_ESMTP

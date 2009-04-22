@@ -63,8 +63,8 @@ GType g_mime_stream_gio_get_type(void);
 
 GMimeStream *g_mime_stream_gio_new(GFile * gfile);
 GMimeStream *g_mime_stream_gio_new_with_bounds(GFile * gfile,
-					       off_t start,
-					       off_t end);
+					       gint64 start,
+					       gint64 end);
 
 G_END_DECLS
 

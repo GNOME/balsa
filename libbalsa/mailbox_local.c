@@ -1038,8 +1038,13 @@ libbalsa_mailbox_local_cache_message(LibBalsaMailboxLocal * local,
     info->message_id = g_strdup(message->message_id);
     info->refs_for_threading =
         libbalsa_message_refs_for_threading(message);
-    info->sender =
-        internet_address_list_to_string(message->headers->from, FALSE);
+
+    info->sender = NULL;
+    if (message->headers->from)
+        info->sender =
+            internet_address_list_to_string(message->headers->from, FALSE);
+    if (!info->sender)
+        info->sender = g_strdup("");
 }
 
 void

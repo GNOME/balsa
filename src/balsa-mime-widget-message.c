@@ -317,9 +317,9 @@ extbody_send_mail(GtkWidget * button, LibBalsaMessageBody * mime_body)
 
     /* create a message */
     message = libbalsa_message_new();
-    data = internet_address_to_string(balsa_app.current_ident->ia, FALSE);
-    message->headers->from = internet_address_parse_string(data);
-    g_free(data);
+    message->headers->from = internet_address_list_new();
+    internet_address_list_add(message->headers->from,
+                              balsa_app.current_ident->ia);
 
     data = libbalsa_message_body_get_parameter(mime_body, "subject");
     if (data) {
@@ -328,7 +328,7 @@ extbody_send_mail(GtkWidget * button, LibBalsaMessageBody * mime_body)
     }
 
     data = libbalsa_message_body_get_parameter(mime_body, "server");
-    message->headers->to_list = internet_address_parse_string(data);
+    message->headers->to_list = internet_address_list_parse_string(data);
     g_free(data);
 
     /* the original body my have some data to be returned as commands... */
@@ -629,7 +629,7 @@ add_header_address_list(BalsaMessage * bm, GtkTextView * view,
 {
     gchar *value;
 
-    if (list == NULL)
+    if (list == NULL || internet_address_list_length(list) == 0)
 	return;
 
     if (!(bm->shown_headers == HEADERS_ALL ||

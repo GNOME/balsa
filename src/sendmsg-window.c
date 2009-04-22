@@ -905,20 +905,21 @@ sw_delete_draft(BalsaSendmsg * bsmsg)
 static gint
 delete_handler(BalsaSendmsg * bsmsg)
 {
-    InternetAddressList *l;
+    InternetAddressList *list;
+    const InternetAddress *ia;
     const gchar *tmp;
     gint reply;
     GtkWidget *d;
 
     if (balsa_app.debug)
-        printf("delete_event_cb\n");
+        printf("%s\n", __func__);
 
     if (bsmsg->state == SENDMSG_STATE_CLEAN)
         return FALSE;
 
-    l = libbalsa_address_view_get_list(bsmsg->recipient_view, "To:");
-    tmp = l && l->address && l->address->name ?
-        l->address->name : _("(No name)");
+    list = libbalsa_address_view_get_list(bsmsg->recipient_view, "To:");
+    ia = internet_address_list_get_address(list, 0);
+    tmp = ia && ia->name ? ia->name : _("(No name)");
 
     d = gtk_message_dialog_new(GTK_WINDOW(bsmsg->window),
                                GTK_DIALOG_DESTROY_WITH_PARENT,
@@ -926,7 +927,7 @@ delete_handler(BalsaSendmsg * bsmsg)
                                GTK_BUTTONS_YES_NO,
                                _("The message to '%s' is modified.\n"
                                  "Save message to Draftbox?"), tmp);
-    internet_address_list_destroy(l);
+    g_object_unref(list);
     gtk_dialog_set_default_response(GTK_DIALOG(d), GTK_RESPONSE_YES);
     gtk_dialog_add_button(GTK_DIALOG(d),
                           GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL);
@@ -1279,7 +1280,7 @@ edit_with_gnome(GtkAction * action, BalsaSendmsg* bsmsg)
                 libbalsa_address_view_get_list(bsmsg->recipient_view,
                                                address_types[type]);
             gchar *p = internet_address_list_to_string(list, FALSE);
-            internet_address_list_destroy(list);
+            g_object_unref(list);
             fprintf(tmp, "%s %s\n", _(address_types[type]), p);
             g_free(p);
         }
@@ -1491,39 +1492,49 @@ update_bsmsg_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity* ident)
 #endif
 
     if (bsmsg->ident->bcc) {
-        InternetAddressList *l,
-                            *old_ident_list, *new_ident_list,
-                            *old_list, *new_list = NULL;
+        InternetAddressList *bcc_list, *ident_list;
+	int i, j;
 
-        /* Copy the old list of Bcc addresses, omitting any that came
-         * from the old identity: */
-        old_ident_list = internet_address_parse_string(bsmsg->ident->bcc);
-        old_list =
-            libbalsa_address_view_get_list(bsmsg->recipient_view,
-                                           "Bcc:");
-        for (l = old_list; l; l = l->next) {
-            InternetAddress *ia = l->address;
-            InternetAddressList *m;
+        bcc_list =
+            libbalsa_address_view_get_list(bsmsg->recipient_view, "Bcc:");
 
-            for (m = old_ident_list; m; m = m->next)
-                if (libbalsa_ia_rfc2821_equal(ia, m->address))
-                    break;
-            if (!m)     /* We didn't find this address. */
-                new_list = internet_address_list_append(new_list, ia);
+        ident_list = internet_address_list_parse_string(bsmsg->ident->bcc);
+        if (ident_list) {
+            /* Remove any Bcc addresses that came from the old identity
+             * from the list. */
+            gint ident_list_len = internet_address_list_length(ident_list);
+
+            for (i = 0; i < internet_address_list_length(bcc_list); i++) {
+                InternetAddress *ia =
+                    internet_address_list_get_address (bcc_list, i);
+
+                for (j = 0; j < ident_list_len; j++) {
+                    InternetAddress *ia2 =
+                        internet_address_list_get_address(ident_list, j);
+                    if (libbalsa_ia_rfc2821_equal(ia, ia2))
+                        break;
+                }
+
+                if (j < ident_list_len) {
+                    /* This address was found in the identity. */
+                    internet_address_list_remove_at(bcc_list, i);
+                    --i;
+                }
+            }
+            g_object_unref(ident_list);
         }
-        internet_address_list_destroy(old_list);
-        internet_address_list_destroy(old_ident_list);
 
         /* Add the new Bcc addresses, if any: */
-        new_ident_list = internet_address_parse_string(ident->bcc);
-        new_list = internet_address_list_concat(new_list, new_ident_list);
-        internet_address_list_destroy(new_ident_list);
+        ident_list = internet_address_list_parse_string(ident->bcc);
+        if (ident_list) {
+            internet_address_list_append(bcc_list, ident_list);
+            g_object_unref(ident_list);
+        }
 
         /* Set the resulting list: */
-        libbalsa_address_view_set_from_list(bsmsg->recipient_view,
-                                            "Bcc:",
-                                            new_list);
-        internet_address_list_destroy(new_list);
+        libbalsa_address_view_set_from_list(bsmsg->recipient_view, "Bcc:",
+                                            bcc_list);
+        g_object_unref(bcc_list);
     }
     
     /* change the subject to use the reply/forward strings */
@@ -1993,12 +2004,7 @@ get_fwd_mail_headers(const gchar *mailfile)
 	if (!subject)
 	    headers->subject = g_strdup(_("(no subject)"));
 	else
-#if HAVE_GMIME_2_2_5
 	    headers->subject = g_mime_utils_header_decode_text(subject);
-#else  /* HAVE_GMIME_2_2_5 */
-	    headers->subject =
-		g_mime_utils_header_decode_text((guchar *) subject);
-#endif /* HAVE_GMIME_2_2_5 */
     }
     libbalsa_utf8_sanitize(&headers->subject,
 			   balsa_app.convert_unknown_8bit,
@@ -3388,7 +3394,7 @@ tree_add_quote_body(LibBalsaMessageBody * body, GtkTreeStore * store, GtkTreeIte
 
     gtk_tree_store_append(store, &iter, parent);
     if (body->mime_part)
-	disp_type = g_mime_part_get_content_disposition(GMIME_PART(body->mime_part));
+	disp_type = g_mime_object_get_disposition(body->mime_part);
     else
 	disp_type = NULL;
     preselect = !disp_type || *disp_type == '\0' ||
@@ -3810,7 +3816,7 @@ quote_body(BalsaSendmsg * bsmsg, LibBalsaMessageHeaders *headers,
 	    g_free(from);
 	}
 
-	if (headers->to_list) {
+	if (internet_address_list_length(headers->to_list) > 0) {
 	    gchar *to_list =
 		internet_address_list_to_string(headers->to_list,
 			                        FALSE);
@@ -3818,7 +3824,7 @@ quote_body(BalsaSendmsg * bsmsg, LibBalsaMessageHeaders *headers,
 	    g_free(to_list);
 	}
 
-	if (headers->cc_list) {
+	if (internet_address_list_length(headers->cc_list) > 0) {
 	    gchar *cc_list = 
 		internet_address_list_to_string(headers->cc_list,
 			                        FALSE);
@@ -4237,77 +4243,58 @@ set_identity_from_mailbox(BalsaSendmsg* bsmsg, LibBalsaMessage * message)
  * particular identity, other than the default.  The to_list of the
  * original message needs to be set in order for it to work.
  **/
+/* First a helper; groups cannot be nested, and are not allowed in the
+ * From: list. */
+static gboolean
+guess_identity_from_list(BalsaSendmsg * bsmsg, InternetAddressList * list,
+                         gboolean allow_group)
+{
+    gint i;
+
+    for (i = 0; i < internet_address_list_length(list); i++) {
+        InternetAddress *ia = internet_address_list_get_address(list, i);
+
+        if (INTERNET_ADDRESS_IS_GROUP(ia)) {
+            InternetAddressList *members =
+                INTERNET_ADDRESS_GROUP(ia)->members;
+            if (allow_group
+                && guess_identity_from_list(bsmsg, members, FALSE))
+                return TRUE;
+        } else {
+            GList *l;
+
+            for (l = balsa_app.identities; l; l = l->next) {
+                LibBalsaIdentity *ident = LIBBALSA_IDENTITY(l->data);
+                if (libbalsa_ia_rfc2821_equal(ia, ident->ia)) {
+                    bsmsg->ident = ident;
+                    return TRUE;
+                }
+            }
+        }
+    }
+
+    return FALSE;
+}
+
 static gboolean
 guess_identity(BalsaSendmsg* bsmsg, LibBalsaMessage * message)
 {
-    const gchar *address_string;
-    GList *ilist;
-    LibBalsaIdentity *ident;
-    const gchar *tmp;
-
-
     if (!message  || !message->headers || !balsa_app.identities)
         return FALSE; /* use default */
 
-    if (bsmsg->type == SEND_CONTINUE) {
- 	if (message->headers->from) {
- 	    /*
- 	    * Look for an identity that matches the From: address.
- 	    */
- 	    address_string =
-		libbalsa_address_get_mailbox_from_list(message->headers->
-                                                       from);
- 	    for (ilist = balsa_app.identities; ilist;
- 		 ilist = g_list_next(ilist)) {
- 		ident = LIBBALSA_IDENTITY(ilist->data);
- 		if ((tmp = ident->ia->value.addr)
- 		    && !g_ascii_strcasecmp(address_string, tmp)) {
- 		    bsmsg->ident = ident;
- 		    return( TRUE );
- 		}
-	    }
- 	}
-    } else if (bsmsg->type != SEND_NORMAL) {
- 	/* bsmsg->type == SEND_REPLY || bsmsg->type == SEND_REPLY_ALL ||
- 	*  bsmsg->type == SEND_REPLY_GROUP || bsmsg->type == SEND_FORWARD_ATTACH ||
- 	*  bsmsg->type == SEND_FORWARD_INLINE */
- 	InternetAddressList *alist;
- 
- 	/*
- 	* Loop through all the addresses in the message's To:
- 	* field, and look for an identity that matches one of them.
- 	*/
- 	for (alist = message->headers->to_list; alist; alist = alist->next) {
-	    if (!(address_string =
-	          libbalsa_address_get_mailbox_from_list(alist)))
-		continue;
- 	    for (ilist = balsa_app.identities; ilist;
- 		 ilist = g_list_next(ilist)) {
- 		ident = LIBBALSA_IDENTITY(ilist->data);
- 		if ((tmp = ident->ia->value.addr)
- 		    && !g_ascii_strcasecmp(address_string, tmp)) {
- 		    bsmsg->ident = ident;
- 		    return TRUE;
- 		}
- 	    }
- 	}
- 
- 	/* No match in the to_list, try the cc_list */
- 	for (alist = message->headers->cc_list; alist; alist = alist->next) {
-	    if (!(address_string =
-		  libbalsa_address_get_mailbox_from_list(alist)))
-		continue;
- 	    for (ilist = balsa_app.identities; ilist;
- 		 ilist = g_list_next(ilist)) {
- 		ident = LIBBALSA_IDENTITY(ilist->data);
- 		if ((tmp = ident->ia->value.addr)
- 		    && !g_ascii_strcasecmp(address_string, tmp)) {
- 		    bsmsg->ident = ident;
- 		    return TRUE;
- 		}
- 	    }
- 	}
-    }
+    if (bsmsg->type == SEND_CONTINUE)
+        return guess_identity_from_list(bsmsg, message->headers->from,
+                                        FALSE);
+
+    if (bsmsg->type != SEND_NORMAL)
+	/* bsmsg->type == SEND_REPLY || bsmsg->type == SEND_REPLY_ALL ||
+	*  bsmsg->type == SEND_REPLY_GROUP || bsmsg->type == SEND_FORWARD_ATTACH ||
+	*  bsmsg->type == SEND_FORWARD_INLINE */
+        return guess_identity_from_list(bsmsg, message->headers->to_list,
+                                        TRUE)
+            || guess_identity_from_list(bsmsg, message->headers->cc_list,
+                                        TRUE);
+
     return FALSE;
 }
 
@@ -4499,19 +4486,21 @@ bsmsg_identities_changed_cb(BalsaSendmsg * bsmsg)
 static void
 sw_cc_add_list(InternetAddressList **new_cc, InternetAddressList * list)
 {
-    for (; list; list = list->next) {
-        InternetAddress *ia;
-
-        if ((ia = list->address)) {
-            GList *ident;
-
-            /* do not insert any of my identities into the cc: list */
-            for (ident = balsa_app.identities; ident; ident = ident->next)
-                if (libbalsa_ia_rfc2821_equal
-                    (ia, LIBBALSA_IDENTITY(ident->data)->ia))
-                    break;
-            if (!ident)
-                *new_cc = internet_address_list_append(*new_cc, ia);
+    int i;
+    
+    for (i = 0; i < internet_address_list_length(list); i++) {
+        InternetAddress *ia = internet_address_list_get_address (list, i);
+	GList *ident;
+	
+	/* do not insert any of my identities into the cc: list */
+	for (ident = balsa_app.identities; ident; ident = ident->next)
+	    if (libbalsa_ia_rfc2821_equal
+		(ia, LIBBALSA_IDENTITY(ident->data)->ia))
+		break;
+	if (!ident) {
+            if (*new_cc == NULL)
+                *new_cc = internet_address_list_new();
+	    internet_address_list_add(*new_cc, ia);
         }
     }
 }
@@ -4775,7 +4764,8 @@ set_cc_from_all_recipients(BalsaSendmsg* bsmsg,
     libbalsa_address_view_set_from_list(bsmsg->recipient_view,
                                         "Cc:",
                                         new_cc);
-    internet_address_list_destroy(new_cc);
+    if (new_cc)
+        g_object_unref(new_cc);
 }
 
 static void
@@ -5513,7 +5503,8 @@ bsmsg2message(BalsaSendmsg * bsmsg)
 
     message = libbalsa_message_new();
 
-    message->headers->from = internet_address_list_prepend(NULL, ident->ia);
+    message->headers->from = internet_address_list_new ();
+    internet_address_list_add(message->headers->from, ident->ia);
 
     tmp = gtk_editable_get_chars(GTK_EDITABLE(bsmsg->subject[1]), 0, -1);
     strip_chars(tmp, "\r\n");
@@ -5733,9 +5724,8 @@ check_suggest_encryption(BalsaSendmsg * bsmsg)
 {
     InternetAddressList * ia_list;
     gboolean can_encrypt;
-    InternetAddressList * from_list;
-    InternetAddressList * cc_list;
     gpgme_protocol_t protocol;
+    gint len;
 
     /* check if the user wants to see the message */
     if (!bsmsg->ident->warn_send_plain)
@@ -5746,23 +5736,30 @@ check_suggest_encryption(BalsaSendmsg * bsmsg)
 	return TRUE;
 
     /* we can not encrypt if we have bcc recipients */
-    if ((ia_list = libbalsa_address_view_get_list(bsmsg->recipient_view, "Bcc:"))) {
-	internet_address_list_destroy(ia_list);
-	return TRUE;
-    }
+    ia_list = libbalsa_address_view_get_list(bsmsg->recipient_view, "Bcc:");
+    len = internet_address_list_length(ia_list);
+    g_object_unref(ia_list);
+    if (len > 0)
+        return TRUE;
 
     /* collect all to and cc recipients */
-    ia_list = libbalsa_address_view_get_list(bsmsg->recipient_view, "To:");
-    cc_list = libbalsa_address_view_get_list(bsmsg->recipient_view, "Cc:");
-    from_list = internet_address_list_prepend(NULL, bsmsg->ident->ia);
     protocol = bsmsg->gpg_mode & LIBBALSA_PROTECT_SMIMEV3 ?
 	GPGME_PROTOCOL_CMS : GPGME_PROTOCOL_OpenPGP;
-    can_encrypt = libbalsa_can_encrypt_for_all(from_list, protocol) &
-	libbalsa_can_encrypt_for_all(ia_list, protocol) &
-	libbalsa_can_encrypt_for_all(cc_list, protocol);
-    internet_address_list_destroy(from_list);
-    internet_address_list_destroy(ia_list);
-    internet_address_list_destroy(cc_list);
+
+    ia_list = libbalsa_address_view_get_list(bsmsg->recipient_view, "To:");
+    can_encrypt = libbalsa_can_encrypt_for_all(ia_list, protocol);
+    g_object_unref(ia_list);
+    if (can_encrypt) {
+        ia_list = libbalsa_address_view_get_list(bsmsg->recipient_view, "Cc:");
+        can_encrypt = libbalsa_can_encrypt_for_all(ia_list, protocol);
+        g_object_unref(ia_list);
+    }
+    if (can_encrypt) {
+        ia_list = internet_address_list_new();
+        internet_address_list_add(ia_list, bsmsg->ident->ia);
+        can_encrypt = libbalsa_can_encrypt_for_all(ia_list, protocol);
+        g_object_unref(ia_list);
+    }
 
     /* ask the user if we could encrypt this message */
     if (can_encrypt) {
@@ -6777,7 +6774,7 @@ set_list_post_address(BalsaSendmsg * bsmsg)
     if (mailing_list_address) {
         libbalsa_address_view_set_from_list(bsmsg->recipient_view, "To:",
                                             mailing_list_address);
-        internet_address_list_destroy(mailing_list_address);
+        g_object_unref(mailing_list_address);
         return;
     }
 
@@ -6911,7 +6908,7 @@ sendmsg_window_set_title(BalsaSendmsg * bsmsg)
 
     list = libbalsa_address_view_get_list(bsmsg->recipient_view, "To:");
     to_string = internet_address_list_to_string(list, FALSE);
-    internet_address_list_destroy(list);
+    g_object_unref(list);
 
     title = g_strdup_printf(title_format, to_string,
                             gtk_entry_get_text(GTK_ENTRY(bsmsg->subject[1])));

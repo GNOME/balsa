@@ -116,11 +116,7 @@ libbalsa_message_body_extract_embedded_headers(GMimeMessage* msg)
     subj = g_mime_message_get_subject(msg);
     if (subj) {
 	ehdr->subject =
-#if HAVE_GMIME_2_2_5
 	    g_mime_utils_header_decode_text(subj);
-#else
-	    g_mime_utils_header_decode_text((const unsigned char *) subj);
-#endif
 	libbalsa_utf8_sanitize(&ehdr->subject, TRUE, NULL);
     } else 
 	ehdr->subject = g_strdup(_("(No subject)"));
@@ -149,7 +145,7 @@ libbalsa_message_body_set_filename(LibBalsaMessageBody * body)
 static void
 libbalsa_message_body_set_types(LibBalsaMessageBody * body)
 {
-    const GMimeContentType *type;
+    GMimeContentType *type;
 
     type = g_mime_object_get_content_type(body->mime_part);
     if      (g_mime_content_type_is_type(type, "audio", "*"))
@@ -193,7 +189,6 @@ libbalsa_message_body_set_message_part(LibBalsaMessageBody * body,
             *next_part = libbalsa_message_body_new(body->message);
         libbalsa_message_body_set_mime_body(*next_part,
                                             embedded_message->mime_part);
-        g_object_unref(embedded_message);
     }
 
     return *next_part ? &(*next_part)->next : next_part;
@@ -203,13 +198,16 @@ static LibBalsaMessageBody **
 libbalsa_message_body_set_multipart(LibBalsaMessageBody * body,
 				    LibBalsaMessageBody ** next_part)
 {
-    GList *child;
-
-    for (child = GMIME_MULTIPART(body->mime_part)->subparts; child;
-	 child = child->next) {
+    GMimeMultipart *multipart = GMIME_MULTIPART(body->mime_part);
+    GMimeObject *part;
+    int count, i;
+    
+    count = g_mime_multipart_get_count (multipart);
+    for (i = 0; i < count; i++) {
+	part = g_mime_multipart_get_part (multipart, i);
 	if (!*next_part)
 	    *next_part = libbalsa_message_body_new(body->message);
-	libbalsa_message_body_set_mime_body(*next_part, child->data);
+	libbalsa_message_body_set_mime_body(*next_part, part);
 	next_part = &(*next_part)->next;
     }
 
@@ -263,19 +261,18 @@ gchar *
 libbalsa_message_body_get_parameter(LibBalsaMessageBody * body,
 				    const gchar * param)
 {
+    GMimeContentType *type;
     gchar *res = NULL;
 
     g_return_val_if_fail(body != NULL, NULL);
 
     if (body->mime_part) {
-	const GMimeContentType *type =
-	    g_mime_object_get_content_type(body->mime_part);
+	type = g_mime_object_get_content_type(body->mime_part);
 	res = g_strdup(g_mime_content_type_get_parameter(type, param));
     } else if (body->content_type) {
-	GMimeContentType *type =
-	    g_mime_content_type_new_from_string(body->content_type);
+	type = g_mime_content_type_new_from_string(body->content_type);
 	res = g_strdup(g_mime_content_type_get_parameter(type, param));
-	g_mime_content_type_destroy(type);
+	g_object_unref(type);
     }
 
     return res;
@@ -418,7 +415,7 @@ libbalsa_message_body_stream_add_filter(GMimeStream * stream,
 {
     if (!GMIME_IS_STREAM_FILTER(stream)) {
         GMimeStream *filtered_stream =
-            g_mime_stream_filter_new_with_stream(stream);
+            g_mime_stream_filter_new(stream);
         g_object_unref(stream);
         stream = filtered_stream;
     }
@@ -435,7 +432,7 @@ libbalsa_message_body_get_part_stream(LibBalsaMessageBody * body,
 {
     GMimeStream *stream;
     GMimeDataWrapper *wrapper;
-    GMimePartEncodingType encoding;
+    GMimeContentEncoding encoding;
     GMimeFilter *filter;
     gchar *mime_type = NULL;
     const gchar *charset;
@@ -449,22 +446,26 @@ libbalsa_message_body_get_part_stream(LibBalsaMessageBody * body,
         return NULL;
     }
 
-    stream = g_mime_data_wrapper_get_stream(wrapper);
+    stream = g_object_ref(g_mime_data_wrapper_get_stream(wrapper));
     encoding = g_mime_data_wrapper_get_encoding(wrapper);
-    g_object_unref(wrapper);
 
     switch (encoding) {
-    case GMIME_PART_ENCODING_BASE64:
+    case GMIME_CONTENT_ENCODING_BASE64:
         filter =
-            g_mime_filter_basic_new_type(GMIME_FILTER_BASIC_BASE64_DEC);
+            g_mime_filter_basic_new(GMIME_CONTENT_ENCODING_BASE64,
+                                    FALSE);
         stream = libbalsa_message_body_stream_add_filter(stream, filter);
         break;
-    case GMIME_PART_ENCODING_QUOTEDPRINTABLE:
-        filter = g_mime_filter_basic_new_type(GMIME_FILTER_BASIC_QP_DEC);
+    case GMIME_CONTENT_ENCODING_QUOTEDPRINTABLE:
+        filter =
+            g_mime_filter_basic_new(GMIME_CONTENT_ENCODING_QUOTEDPRINTABLE,
+                                    FALSE);
         stream = libbalsa_message_body_stream_add_filter(stream, filter);
         break;
-    case GMIME_PART_ENCODING_UUENCODE:
-        filter = g_mime_filter_basic_new_type(GMIME_FILTER_BASIC_UU_DEC);
+    case GMIME_CONTENT_ENCODING_UUENCODE:
+        filter =
+            g_mime_filter_basic_new(GMIME_CONTENT_ENCODING_UUENCODE,
+                                    FALSE);
         stream = libbalsa_message_body_stream_add_filter(stream, filter);
         break;
     default:
@@ -482,7 +483,7 @@ libbalsa_message_body_get_part_stream(LibBalsaMessageBody * body,
         GMimeFilter *filter_windows;
 
         stream_null = g_mime_stream_null_new();
-        stream_filter = g_mime_stream_filter_new_with_stream(stream_null);
+        stream_filter = g_mime_stream_filter_new(stream_null);
         g_object_unref(stream_null);
 
         filter_windows = g_mime_filter_windows_new(charset);
@@ -676,9 +677,7 @@ libbalsa_message_body_save_stream(LibBalsaMessageBody * body,
         g_mime_stream_reset(stream);
 
         if (filter_crlf) {
-            GMimeFilter *filter =
-                g_mime_filter_crlf_new(GMIME_FILTER_CRLF_DECODE,
-                                       GMIME_FILTER_CRLF_MODE_CRLF_ONLY);
+            GMimeFilter *filter = g_mime_filter_crlf_new(FALSE, FALSE);
             stream =
                 libbalsa_message_body_stream_add_filter(stream, filter);
         }

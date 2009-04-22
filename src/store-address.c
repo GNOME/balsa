@@ -58,13 +58,13 @@ static void store_address_book_menu_cb(GtkWidget * widget,
                                        StoreAddressInfo * info);
 static void store_address_add_address(StoreAddressInfo * info,
                                       const gchar * label,
-                                      const InternetAddress * address,
-                                      const InternetAddress * group);
+                                      InternetAddress * address,
+                                      InternetAddress * group);
 static void store_address_add_lbaddress(StoreAddressInfo * info,
                                         const LibBalsaAddress *address);
 static void store_address_add_list(StoreAddressInfo * info,
                                    const gchar * label,
-				   const InternetAddressList * list);
+				   InternetAddressList * list);
 
 /* 
  * public interface: balsa_store_address
@@ -347,8 +347,8 @@ store_address_book_menu_cb(GtkWidget * widget,
  * make a new page in the notebook */
 static void
 store_address_add_address(StoreAddressInfo * info,
-                          const gchar * lab, const InternetAddress * ia,
-			  const InternetAddress * group)
+                          const gchar * lab, InternetAddress * ia,
+			  InternetAddress * group)
 {
     gchar *text;
     LibBalsaAddress *address;
@@ -365,7 +365,7 @@ store_address_add_address(StoreAddressInfo * info,
     address = libbalsa_address_new();
     address->full_name =
         g_strdup(ia->name ? ia->name : group ? group->name : NULL);
-    address->address_list = g_list_prepend(NULL, g_strdup(ia->value.addr));
+    address->address_list = g_list_prepend(NULL, g_strdup(INTERNET_ADDRESS_MAILBOX (ia)->addr));
     ew = libbalsa_address_get_edit_widget(address, entries, NULL, NULL);
     g_object_unref(address);
 
@@ -408,20 +408,22 @@ store_address_add_lbaddress(StoreAddressInfo * info,
 static void
 store_address_add_list(StoreAddressInfo * info,
                        const gchar * label,
-                       const InternetAddressList * list)
+                       InternetAddressList * list)
 {
-    for (; list; list = list->next) {
-        InternetAddress *ia = list->address;
-
-        if (ia->type == INTERNET_ADDRESS_NAME)
+    int i, j;
+    
+    for (i = 0; i < internet_address_list_length (list); i++) {
+        InternetAddress *ia = internet_address_list_get_address (list, i);
+	
+        if (INTERNET_ADDRESS_IS_MAILBOX (ia))
             store_address_add_address(info, label, ia, NULL);
-        else if (ia->type == INTERNET_ADDRESS_GROUP) {
-            InternetAddressList *member;
+        else {
+            InternetAddressList *members = INTERNET_ADDRESS_GROUP (ia)->members;
 
-            for (member = ia->value.members; member; member = member->next) {
-                InternetAddress *member_address = member->address;
+            for (j = 0; j < internet_address_list_length (members); j++) {
+                InternetAddress *member_address = internet_address_list_get_address (members, j);
 
-                if (member_address->type == INTERNET_ADDRESS_NAME)
+                if (INTERNET_ADDRESS_IS_MAILBOX (member_address))
                     store_address_add_address(info, label, member_address,
                                               ia);
             }

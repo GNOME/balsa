@@ -911,10 +911,10 @@ libbalsa_mailbox_maildir_add_message(LibBalsaMailbox * mailbox,
 	return FALSE;
     out_stream = g_mime_stream_fs_new(fd);
 
-    in_stream = g_mime_stream_filter_new_with_stream(stream);
+    in_stream = g_mime_stream_filter_new(stream);
     crlffilter =
-        g_mime_filter_crlf_new(GMIME_FILTER_CRLF_DECODE,
-                               GMIME_FILTER_CRLF_MODE_CRLF_ONLY);
+        g_mime_filter_crlf_new(FALSE,
+                               FALSE);
     g_mime_stream_filter_add(GMIME_STREAM_FILTER(in_stream), crlffilter);
     g_object_unref(crlffilter);
  

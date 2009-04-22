@@ -732,7 +732,7 @@ gpe_read_completion(void *arg, int argc, char **argv, char **names)
     if(!a->full_name)
         a->full_name = create_name(a->first_name, a->last_name);
     for(l=a->address_list; l; l = l->next) {
-        ia = internet_address_new_name(a->full_name, l->data);
+        ia = internet_address_mailbox_new(a->full_name, l->data);
         gc->res = g_list_prepend(gc->res, ia);
     }
     if(gc->new_prefix && !*gc->new_prefix)

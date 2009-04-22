@@ -1782,7 +1782,7 @@ config_view_load(const gchar * key, const gchar * value, gpointer data)
             libbalsa_conf_get_string_with_default("MailingListAddress",
                                                   &def);
         view->mailing_list_address =
-            def ? NULL : internet_address_parse_string(address);
+            def ? NULL : internet_address_list_parse_string(address);
         g_free(address);
 
         view->identity_name = libbalsa_conf_get_string("Identity");

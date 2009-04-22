@@ -1,6 +1,10 @@
 2009-04-21  Peter Bloomfield
 
-	create balsa-2-3 branch for updates to the pre-GMimje-2.4 tree.
+	port to GMime-2.4
+
+2009-04-21  Peter Bloomfield
+
+	create balsa-2-3 branch for updates to the pre-GMime-2.4 tree.
 
 2009-04-21  Peter Bloomfield
 

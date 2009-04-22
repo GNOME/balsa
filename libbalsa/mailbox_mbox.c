@@ -356,7 +356,7 @@ static void mbox_unlock(LibBalsaMailbox * mailbox, GMimeStream *stream)
  */
 static void
 lbm_mbox_header_cb(GMimeParser * parser, const char *header,
-                   const char *value, off_t offset,
+                   const char *value, gint64 offset,
                    gpointer user_data)
 {
     struct message_info *msg_info = *(struct message_info **) user_data;
@@ -1793,7 +1793,7 @@ lbm_mbox_message_new(GMimeMessage * mime_message,
 
     message = libbalsa_message_new();
 
-    header = g_mime_message_get_header (mime_message, "Status");
+    header = g_mime_object_get_header (GMIME_OBJECT(mime_message), "Status");
     if (header) {
 	if (strchr(header, 'R') == NULL) /* not found == not READ */
 	    flags |= LIBBALSA_MESSAGE_FLAG_NEW;
@@ -1803,7 +1803,7 @@ lbm_mbox_message_new(GMimeMessage * mime_message,
 	    flags |= LIBBALSA_MESSAGE_FLAG_RECENT;
     } else
 	    flags |= LIBBALSA_MESSAGE_FLAG_NEW |  LIBBALSA_MESSAGE_FLAG_RECENT;
-    header = g_mime_message_get_header (mime_message, "X-Status");
+    header = g_mime_object_get_header (GMIME_OBJECT(mime_message), "X-Status");
     if (header) {
 	if (strchr(header, 'D') != NULL) /* found == DELETED */
 	    flags |= LIBBALSA_MESSAGE_FLAG_DELETED;
@@ -1827,10 +1827,10 @@ static void update_message_status_headers(GMimeMessage *message,
     /* Create headers with spaces in place of flags, if necessary, so we
      * can later update them in place. */
     lbm_mbox_status_hdr(flags, 2, new_header);
-    g_mime_message_set_header(message, "Status", new_header->str);
+    g_mime_object_set_header(GMIME_OBJECT(message), "Status", new_header->str);
     g_string_truncate(new_header, 0);
     lbm_mbox_x_status_hdr(flags, 3, new_header);
-    g_mime_message_set_header(message, "X-Status", new_header->str);
+    g_mime_object_set_header(GMIME_OBJECT(message), "X-Status", new_header->str);
     g_string_free(new_header, TRUE);
 }
 
@@ -1838,7 +1838,8 @@ static void update_message_status_headers(GMimeMessage *message,
  * Encode text parts as quoted-printable.
  */
 static void
-lbm_mbox_prepare_object(GMimeObject * mime_part)
+lbm_mbox_prepare_object(GMimeObject * parent, GMimeObject * mime_part,
+                        gpointer data)
 {
     g_mime_object_remove_header(mime_part, "Content-Length");
 
@@ -1848,21 +1849,30 @@ lbm_mbox_prepare_object(GMimeObject * mime_part)
             /* Do not break crypto. */
             return;
 
+        if (parent)
+            /* We have been called by g_mime_multipart_foreach, which
+             * recursively descends the multipart tree, so we must not
+             * start another descent. */
+            return;
+
         g_mime_multipart_foreach((GMimeMultipart *) mime_part,
-                                 (GMimePartFunc) lbm_mbox_prepare_object,
+                                 lbm_mbox_prepare_object,
                                  NULL);
     } else if (GMIME_IS_MESSAGE_PART(mime_part))
-        lbm_mbox_prepare_object(GMIME_OBJECT
+        lbm_mbox_prepare_object(NULL, 
+                                GMIME_OBJECT
                                 (((GMimeMessagePart *) mime_part)->
-                                 message));
+                                 message), NULL);
     else if (GMIME_IS_MESSAGE(mime_part))
-        lbm_mbox_prepare_object(((GMimeMessage *) mime_part)->mime_part);
+        lbm_mbox_prepare_object(NULL, 
+                                ((GMimeMessage *) mime_part)->mime_part,
+                                NULL);
     else if (!GMIME_IS_MESSAGE_PARTIAL(mime_part)) {
-        GMimePartEncodingType encoding;
-        const GMimeContentType *mime_type;
+        GMimeContentEncoding encoding;
+        GMimeContentType *mime_type;
 
-        encoding = g_mime_part_get_encoding(GMIME_PART(mime_part));
-        if (encoding == GMIME_PART_ENCODING_BASE64)
+        encoding = g_mime_part_get_content_encoding(GMIME_PART(mime_part));
+        if (encoding == GMIME_CONTENT_ENCODING_BASE64)
             return;
 
         mime_type = g_mime_object_get_content_type(mime_part);
@@ -1874,8 +1884,8 @@ lbm_mbox_prepare_object(GMimeObject * mime_part)
                 return;
         }
 
-        g_mime_part_set_encoding(GMIME_PART(mime_part),
-                                 GMIME_PART_ENCODING_QUOTEDPRINTABLE);
+        g_mime_part_set_content_encoding(GMIME_PART(mime_part),
+                                 GMIME_CONTENT_ENCODING_QUOTEDPRINTABLE);
     }
 }
 
@@ -1888,7 +1898,7 @@ lbm_mbox_armored_object(GMimeStream * stream)
     parser = g_mime_parser_new_with_stream(stream);
     object = GMIME_OBJECT(g_mime_parser_construct_message(parser));
     g_object_unref(parser);
-    lbm_mbox_prepare_object(object);
+    lbm_mbox_prepare_object(NULL, object, NULL);
 
     return object;
 }
@@ -1899,10 +1909,10 @@ lbm_mbox_armored_stream(GMimeStream * stream)
     GMimeStream *fstream;
     GMimeFilter *filter;
     
-    fstream = g_mime_stream_filter_new_with_stream(stream);
+    fstream = g_mime_stream_filter_new(stream);
 
-    filter = g_mime_filter_crlf_new(GMIME_FILTER_CRLF_DECODE,
-				    GMIME_FILTER_CRLF_MODE_CRLF_ONLY);
+    filter = g_mime_filter_crlf_new(FALSE,
+				    FALSE);
     g_mime_stream_filter_add(GMIME_STREAM_FILTER(fstream), filter);
     g_object_unref(filter);
 

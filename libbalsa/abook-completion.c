@@ -48,7 +48,7 @@ completion_data_new(InternetAddress * ia, const gchar * nick_name)
 
     ret = g_new0(CompletionData, 1);
 
-    internet_address_ref(ia);
+    g_object_ref(ia);
     ret->ia = ia;
 
     string = g_string_new(nick_name);
@@ -80,7 +80,7 @@ completion_data_new(InternetAddress * ia, const gchar * nick_name)
 void
 completion_data_free(CompletionData * data)
 {
-    internet_address_unref(data->ia);
+    g_object_unref(data->ia);
     g_free(data->string);
     g_free(data);
 }

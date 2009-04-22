@@ -370,7 +370,7 @@ lbe_expand_cb(const gchar *email, const gchar *name, void *d)
         if(!name || !*name)
             name = _("No-Name");
         *res = g_list_prepend(*res,
-                              internet_address_new_name(name, email));
+                              internet_address_mailbox_new(name, email));
     }
 }
 

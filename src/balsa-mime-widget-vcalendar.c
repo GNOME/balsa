@@ -77,11 +77,15 @@ balsa_mime_widget_new_vcalendar(BalsaMessage * bm,
 	may_reply = TRUE;
 	if (lbm->headers) {
 	    if (lbm->headers->reply_to)
-		sender = lbm->headers->reply_to->address;
+                sender =
+                    internet_address_list_get_address(lbm->headers->
+                                                      reply_to, 0);
 	    else if (lbm->headers && lbm->headers->from)
-		sender = lbm->headers->from->address;
+                sender =
+                    internet_address_list_get_address(lbm->headers->from,
+                                                      0);
 	} else if (lbm->sender)
-	    sender = lbm->sender->address;
+	    sender = internet_address_list_get_address(lbm->sender, 0);
     }
 
     /* add events */
@@ -182,10 +186,11 @@ balsa_vevent_widget(LibBalsaVEvent * event, gboolean may_reply,
 	    g_free(this_att);
 
 	    if (may_reply && libbalsa_vcal_attendee_rsvp(lba)) {
-		InternetAddress *ia = internet_address_new();
+		InternetAddress *ia =
+                    internet_address_mailbox_new(NULL,
+                                                 lba->address_list->data);
                 GList *list;
 
-                internet_address_set_addr(ia, lba->address_list->data);
                 for (list = balsa_app.identities; list; list = list->next) {
                     LibBalsaIdentity *ident = list->data;
                     if (libbalsa_ia_rfc2821_equal(ident->ia, ia)) {
@@ -193,7 +198,7 @@ balsa_vevent_widget(LibBalsaVEvent * event, gboolean may_reply,
                         break;
                     }
                 }
-		internet_address_unref(ia);
+		g_object_unref(ia);
 	    }
 	}
 	TABLE_ATTACH(table, all_atts->str,
@@ -209,8 +214,8 @@ balsa_vevent_widget(LibBalsaVEvent * event, gboolean may_reply,
 	GtkWidget *button;
 
 	/* add the callback data to the event object */
-	g_object_ref(G_OBJECT(event));
-	internet_address_ref(sender);
+	g_object_ref(event);
+	g_object_ref(sender);
 	g_object_set_data_full(G_OBJECT(event), "ev:sender",
 			       internet_address_to_string(sender, FALSE),
 			       (GDestroyNotify) g_free);
@@ -285,10 +290,9 @@ vevent_reply(GObject * button, GtkWidget * box)
 
     /* create a message with the header set from the incoming message */
     message = libbalsa_message_new();
-    dummy = internet_address_to_string(ident->ia, FALSE);
-    message->headers->from = internet_address_parse_string(dummy);
-    g_free(dummy);
-    message->headers->to_list = internet_address_parse_string(rcpt);
+    message->headers->from = internet_address_list_new();
+    internet_address_list_add(message->headers->from, ident->ia);
+    message->headers->to_list = internet_address_list_parse_string(rcpt);
     message->headers->date = time(NULL);
 
     /* create the message subject */
@@ -302,7 +306,7 @@ vevent_reply(GObject * button, GtkWidget * box)
     body = libbalsa_message_body_new(message);
     body->buffer =
 	libbalsa_vevent_reply(event,
-			      internet_address_get_addr(ident->ia),
+			      INTERNET_ADDRESS_MAILBOX(ident->ia)->addr,
 			      pstat);
     body->charset = g_strdup("utf-8");
     body->content_type = g_strdup("text/calendar");

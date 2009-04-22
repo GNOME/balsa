@@ -286,29 +286,62 @@ libbalsa_mailbox_dispose(GObject * object)
 static gchar*
 get_from_field(LibBalsaMessage *message)
 {
-    gboolean append_dots = FALSE;
+    InternetAddressList *address_list = NULL;
     const gchar *name_str = NULL;
+    gboolean append_dots = FALSE;
     gchar *from;
-    const InternetAddressList *address_list = NULL;
 
     g_return_val_if_fail(message->mailbox, NULL);
-    if (message->mailbox->view &&
-        message->mailbox->view->show == LB_MAILBOX_SHOW_TO) {
-        if (message->headers && message->headers->to_list) {
+
+    if (message->headers) {
+        if (message->mailbox->view &&
+            message->mailbox->view->show == LB_MAILBOX_SHOW_TO)
             address_list = message->headers->to_list;
-            append_dots = internet_address_list_length(address_list) > 1;
-        }
-    } else {
-        if (message->headers && message->headers->from)
+        else
             address_list = message->headers->from;
     }
-    name_str = libbalsa_address_get_name_from_list(address_list);
-    if(!name_str)           /* !addy, or addy contained no name/address */
+
+    if (address_list) {
+        gint i, len = internet_address_list_length(address_list);
+
+        for (i = 0; i < len && name_str == NULL; i++) {
+            InternetAddress *ia =
+                internet_address_list_get_address(address_list, i);
+            if (ia->name && *ia->name) {
+                name_str = ia->name;
+                if (i < len - 1)
+                    append_dots = TRUE;
+            } else if (INTERNET_ADDRESS_IS_MAILBOX(ia)) {
+                name_str = ((InternetAddressMailbox *) ia)->addr;
+                if (i < len - 1)
+                    append_dots = TRUE;
+            } else {
+                InternetAddressGroup *g = (InternetAddressGroup *) ia;
+                gint gi, glen =
+                    internet_address_list_length(g->members);
+                for (gi = 0; gi < glen && name_str == NULL; gi++) {
+                    InternetAddress *ia2 =
+                        internet_address_list_get_address(g->members, gi);
+                    if (ia2->name && *ia2->name) {
+                        name_str = ia2->name;
+                        if (gi < glen - 1)
+                            append_dots = TRUE;
+                    } else if (INTERNET_ADDRESS_IS_MAILBOX(ia2)) {
+                        name_str = ((InternetAddressMailbox *) ia2)->addr;
+                        if (gi < glen - 1)
+                            append_dots = TRUE;
+                    }
+                }
+            }
+        }
+    }
+
+    if (name_str == NULL)
         name_str = "";
-    
     from = append_dots ? g_strconcat(name_str, ",...", NULL)
                        : g_strdup(name_str);
     libbalsa_utf8_sanitize(&from, TRUE, NULL);
+
     return from;
 }
 
@@ -2131,7 +2164,7 @@ void
 libbalsa_mailbox_view_free(LibBalsaMailboxView * view)
 {
     if (view->mailing_list_address)
-        internet_address_list_destroy(view->mailing_list_address);
+        g_object_unref(view->mailing_list_address);
     g_free(view->identity_name);
     g_free(view);
 }
@@ -3792,7 +3825,8 @@ lbm_get_mime_msg(LibBalsaMailbox * mailbox, LibBalsaMessage * msg)
  * message. */
 
 static void
-lbm_try_reassemble_func(GMimeObject * mime_part, gpointer data)
+lbm_try_reassemble_func(GMimeObject * parent, GMimeObject * mime_part,
+                        gpointer data)
 {
     if (GMIME_IS_MESSAGE_PART(mime_part))
         mime_part = ((GMimeMessagePart *) mime_part)->message->mime_part;
@@ -3880,7 +3914,6 @@ lbm_try_reassemble(LibBalsaMailbox * mailbox, const gchar * id)
             partial = NULL;
             g_mime_multipart_foreach((GMimeMultipart *)
                                      mime_message->mime_part,
-                                     (GMimePartFunc)
                                      lbm_try_reassemble_func, &partial);
             if (partial
                 && strcmp(g_mime_message_partial_get_id(partial), id) == 0) {

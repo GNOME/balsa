@@ -1821,39 +1821,32 @@ internet_address_new_from_imap_address(ImapAddress ** list)
     if (!addr || (addr->name==NULL && addr->addr_spec==NULL))
        return NULL;
 
-    address = internet_address_new();
-
     /* it will be owned by the caller */
 
-    if (addr->name) {
-	gchar *tmp =
-#if HAVE_GMIME_2_2_5
-	    g_mime_utils_header_decode_text(addr->name);
-#else  /* HAVE_GMIME_2_2_5 */
-	    g_mime_utils_header_decode_text((unsigned char *) addr->name);
-#endif /* HAVE_GMIME_2_2_5 */
-	internet_address_set_name(address, tmp);
-	g_free(tmp);
-    }
     if (addr->addr_spec) {
-	gchar *tmp =
-#if HAVE_GMIME_2_2_5
-	    g_mime_utils_header_decode_text(addr->addr_spec);
-#else  /* HAVE_GMIME_2_2_5 */
-	    g_mime_utils_header_decode_text((unsigned char *) addr->addr_spec);
-#endif /* HAVE_GMIME_2_2_5 */
-	internet_address_set_addr(address, tmp);
-	g_free(tmp);
+        gchar *tmp = g_mime_utils_header_decode_text(addr->addr_spec);
+        address = internet_address_mailbox_new(NULL, tmp);
+        g_free(tmp);
+        if (addr->name) {
+            tmp = g_mime_utils_header_decode_text(addr->name);
+            internet_address_set_name(address, tmp);
+            g_free(tmp);
+        }
     } else {
         /* Begin group */
-        internet_address_set_group
-            (address,
+        gchar *tmp = g_mime_utils_header_decode_text(addr->name);
+        address = internet_address_group_new(tmp);
+        g_free(tmp);
+
+        internet_address_group_set_members
+            (INTERNET_ADDRESS_GROUP(address),
              internet_address_new_list_from_imap_address_list(addr->next));
         /* Skip to end of group */
-        while (addr->next && (addr->name || addr->addr_spec))
+        while (addr && addr->addr_spec)
             addr = addr->next;
         *list = addr;
     }
+    
     return address;
 }
 
@@ -1861,13 +1854,13 @@ static InternetAddressList *
 internet_address_new_list_from_imap_address_list(ImapAddress *list)
 {
     InternetAddress *addr;
-    InternetAddressList *res = NULL;
+    InternetAddressList *res = internet_address_list_new();
 
     for (; list; list = list->next) {
        addr = internet_address_new_from_imap_address(&list);
        if (addr) {
-           res = internet_address_list_append(res, addr);
-	   internet_address_unref(addr);
+           internet_address_list_add(res, addr);
+	   g_object_unref(addr);
        }
     }
     return res;
@@ -1891,12 +1884,7 @@ lb_set_headers(LibBalsaMessageHeaders *headers, ImapEnvelope *  envelope,
 
     if(is_embedded) {
         headers->subject =
-#if HAVE_GMIME_2_2_5
             g_mime_utils_header_decode_text(envelope->subject);
-#else  /* HAVE_GMIME_2_2_5 */
-            g_mime_utils_header_decode_text((unsigned char *) envelope->
-                                            subject);
-#endif /* HAVE_GMIME_2_2_5 */
         libbalsa_utf8_sanitize(&headers->subject, TRUE, NULL);
     }
 }
@@ -2018,11 +2006,7 @@ lbm_imap_construct_body(LibBalsaMessageBody *lbbody, ImapBody *imap_body)
     if(!str) str = imap_body_get_param(imap_body, "name");
     if(str) {
         lbbody->filename  =
-#if HAVE_GMIME_2_2_5
 	    g_mime_utils_header_decode_text(str);
-#else  /* HAVE_GMIME_2_2_5 */
-	    g_mime_utils_header_decode_text((unsigned char *) str);
-#endif /* HAVE_GMIME_2_2_5 */
         libbalsa_utf8_sanitize(&lbbody->filename, TRUE, NULL);
     }
     lbbody->charset   = g_strdup(imap_body_get_param(imap_body, "charset"));
@@ -2064,11 +2048,10 @@ get_struct_from_cache(LibBalsaMailbox *mailbox, LibBalsaMessage *message,
             return FALSE;
 
         stream = g_mime_stream_fs_new(fd);
-        fstream = g_mime_stream_filter_new_with_stream(stream);
+        fstream = g_mime_stream_filter_new(stream);
         g_object_unref(stream);
 
-        filter = g_mime_filter_crlf_new(GMIME_FILTER_CRLF_DECODE,
-                                        GMIME_FILTER_CRLF_MODE_CRLF_ONLY);
+        filter = g_mime_filter_crlf_new(FALSE, FALSE);
         g_mime_stream_filter_add(GMIME_STREAM_FILTER(fstream), filter);
         g_object_unref(filter);
 
@@ -2468,7 +2451,7 @@ lbm_imap_get_msg_part(LibBalsaMessage * msg, LibBalsaMessageBody * part,
                 part->mime_part = GMIME_OBJECT(g_mime_multipart_new());
             g_mime_object_set_content_type(part->mime_part, type);
         } else {
-            g_mime_content_type_destroy(type);
+            g_object_unref(type);
             if (!lbm_imap_get_msg_part_from_cache(msg, part, err))
                 return FALSE;
         }
@@ -2477,8 +2460,8 @@ lbm_imap_get_msg_part(LibBalsaMessage * msg, LibBalsaMessageBody * part,
     if (parent_part) {
         /* GMime will unref and so will we. */
         g_object_ref(part->mime_part);
-	g_mime_multipart_add_part(GMIME_MULTIPART(parent_part),
-                                  part->mime_part);
+	g_mime_multipart_add(GMIME_MULTIPART(parent_part),
+			     part->mime_part);
     }
 
     if (GMIME_IS_MULTIPART_SIGNED(part->mime_part)
@@ -2609,11 +2592,11 @@ libbalsa_mailbox_imap_add_messages(LibBalsaMailbox * mailbox,
 	if (flags & LIBBALSA_MESSAGE_FLAG_REPLIED)
 	    IMSG_FLAG_SET(imap_flags, IMSGF_ANSWERED);
 
-	tmpstream = g_mime_stream_filter_new_with_stream(stream);
+	tmpstream = g_mime_stream_filter_new(stream);
 
 	crlffilter =
-	    g_mime_filter_crlf_new(GMIME_FILTER_CRLF_ENCODE,
-				   GMIME_FILTER_CRLF_MODE_CRLF_ONLY);
+	    g_mime_filter_crlf_new(TRUE,
+				   FALSE);
 	g_mime_stream_filter_add(GMIME_STREAM_FILTER(tmpstream), crlffilter);
 	g_object_unref(crlffilter);
 
@@ -2734,11 +2717,11 @@ multi_append_cb(char * buf, size_t buflen,
 	if (flags & LIBBALSA_MESSAGE_FLAG_REPLIED)
 	    IMSG_FLAG_SET(imap_flags, IMSGF_ANSWERED);
 
-	tmpstream = g_mime_stream_filter_new_with_stream(stream);
+	tmpstream = g_mime_stream_filter_new(stream);
 
 	crlffilter =
-	    g_mime_filter_crlf_new(GMIME_FILTER_CRLF_ENCODE,
-				   GMIME_FILTER_CRLF_MODE_CRLF_ONLY);
+	    g_mime_filter_crlf_new(TRUE,
+				   FALSE);
 	g_mime_stream_filter_add(GMIME_STREAM_FILTER(tmpstream), crlffilter);
 	g_object_unref(crlffilter);
 

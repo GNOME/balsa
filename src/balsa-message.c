@@ -1022,15 +1022,14 @@ tree_button_press_cb(GtkWidget * widget, GdkEventButton * event,
 gchar *
 balsa_message_sender_to_gchar(InternetAddressList * list, gint which)
 {
+    InternetAddress *ia;
+    
     if (!list)
 	return g_strdup(_("(No sender)"));
     if (which < 0)
 	return internet_address_list_to_string(list, FALSE);
-    while (which > 0 && list->next) {
-	list = list->next;
-	--which;
-    }
-    return internet_address_to_string(list->address, FALSE);
+    ia = internet_address_list_get_address (list, which);
+    return internet_address_to_string(ia, FALSE);
 }
 
 static void
@@ -2082,7 +2081,7 @@ add_multipart_mixed(BalsaMessage * bm, LibBalsaMessageBody * body)
 		 (g_mime_content_type_is_type(type, "application", "pkcs7-signature") ||
 		  g_mime_content_type_is_type(type, "application", "x-pkcs7-signature"))))
                 add_body(bm, body);
-	    g_mime_content_type_destroy(type);
+	    g_object_unref(type);
 #else
             if (libbalsa_message_body_is_inline(body) ||
 		bm->force_inline ||
@@ -2119,7 +2118,7 @@ add_multipart(BalsaMessage *bm, LibBalsaMessageBody *body)
     } else { /* default to multipart/mixed */
 	body = add_multipart_mixed(bm, body->parts);
     }
-    g_mime_content_type_destroy(type);
+    g_object_unref(type);
 
     return body;
 }
@@ -2309,21 +2308,21 @@ balsa_message_grab_focus(BalsaMessage * bmessage)
     return TRUE;
 }
 
-static const InternetAddress *
-bm_get_mailbox(const InternetAddressList * list)
+static InternetAddress *
+bm_get_mailbox(InternetAddressList * list)
 {
     InternetAddress *ia;
 
     if (!list)
 	return NULL;
 
-    ia = list->address;
-    if (!ia || ia->type == INTERNET_ADDRESS_NONE)
+    ia = internet_address_list_get_address (list, 0);
+    if (!ia)
 	return NULL;
 
-    while (ia->type == INTERNET_ADDRESS_GROUP && ia->value.members)
-	ia = ia->value.members->address;
-    if (!ia || ia->type == INTERNET_ADDRESS_NONE)
+    while (ia && INTERNET_ADDRESS_IS_GROUP (ia))
+	ia = internet_address_list_get_address (INTERNET_ADDRESS_GROUP (ia)->members, 0);
+    if (!ia)
 	return NULL;
 
     return ia;
@@ -2333,11 +2332,13 @@ static void
 handle_mdn_request(GtkWindow *parent, LibBalsaMessage *message)
 {
     gboolean suspicious;
-    const InternetAddressList *use_from;
-    const InternetAddressList *list;
+    InternetAddressList *use_from;
+    InternetAddressList *list;
+    InternetAddress *from, *dn;
     BalsaMDNReply action;
     LibBalsaMessage *mdn;
     LibBalsaIdentity *mdn_ident = NULL;
+    gint i, len;
 
     /* Check if the dispnotify_to address is equal to the (in this order,
        if present) reply_to, from or sender address. */
@@ -2351,25 +2352,14 @@ handle_mdn_request(GtkWindow *parent, LibBalsaMessage *message)
         use_from = NULL;
     /* note: neither Disposition-Notification-To: nor Reply-To:, From: or
        Sender: may be address groups */
-    suspicious =
-	!libbalsa_ia_rfc2821_equal(message->headers->dispnotify_to->address,
-				   use_from->address);
+    from = use_from ? internet_address_list_get_address (use_from, 0) : NULL;
+    dn = internet_address_list_get_address (message->headers->dispnotify_to, 0);
+    suspicious = !libbalsa_ia_rfc2821_equal(dn, from);
     
     /* Try to find "my" identity first in the to, then in the cc list */
-    for (list = message->headers->to_list; list && !mdn_ident;
-         list = list->next) {
-        GList * id_list;
-        
-        for (id_list = balsa_app.identities; !mdn_ident && id_list;
-             id_list = id_list->next) {
-            LibBalsaIdentity *ident = LIBBALSA_IDENTITY(id_list->data);
-            
-            if (libbalsa_ia_rfc2821_equal(ident->ia, bm_get_mailbox(list)))
-                mdn_ident = ident;
-        }
-    }
-    for (list = message->headers->cc_list; list && !mdn_ident;
-         list = list->next) {
+    list = message->headers->to_list;
+    len = list ? internet_address_list_length(list) : 0;
+    for (i = 0; i < len && !mdn_ident; i++) {
         GList * id_list;
 
         for (id_list = balsa_app.identities; !mdn_ident && id_list;
@@ -2380,6 +2370,20 @@ handle_mdn_request(GtkWindow *parent, LibBalsaMessage *message)
                 mdn_ident = ident;
         }
     }
+
+    list = message->headers->cc_list;
+    for (i = 0; i < len && !mdn_ident; i++) {
+        GList * id_list;
+
+        for (id_list = balsa_app.identities; !mdn_ident && id_list;
+             id_list = id_list->next) {
+            LibBalsaIdentity *ident = LIBBALSA_IDENTITY(id_list->data);
+
+            if (libbalsa_ia_rfc2821_equal(ident->ia, bm_get_mailbox(list)))
+                mdn_ident = ident;
+        }
+    }
+
     
     /* Now we decide from the settings of balsa_app.mdn_reply_[not]clean what
        to do...
@@ -2402,7 +2406,7 @@ handle_mdn_request(GtkWindow *parent, LibBalsaMessage *message)
     if (action == BALSA_MDN_REPLY_ASKME) {
         gchar *sender;
         gchar *reply_to;
-        sender = internet_address_to_string (use_from->address, FALSE);
+        sender = from ? internet_address_to_string (from, FALSE) : NULL;
         reply_to = 
             internet_address_list_to_string (message->headers->dispnotify_to,
 		                             FALSE);
@@ -2447,14 +2451,14 @@ static LibBalsaMessage *create_mdn_reply (const LibBalsaIdentity *mdn_ident,
 
     /* create a message with the header set from the incoming message */
     message = libbalsa_message_new();
-    dummy = internet_address_to_string(mdn_ident->ia, FALSE);
-    message->headers->from = internet_address_parse_string(dummy);
-    g_free (dummy);
+    message->headers->from = internet_address_list_new();
+    internet_address_list_add(message->headers->from,
+                              balsa_app.current_ident->ia);
     message->headers->date = time(NULL);
     libbalsa_message_set_subject(message, "Message Disposition Notification");
-    message->headers->to_list =
-	internet_address_list_prepend(NULL, for_msg->headers->
-		                      dispnotify_to->address);
+    message->headers->to_list = internet_address_list_new ();
+    internet_address_list_append(message->headers->to_list,
+                                 for_msg->headers->dispnotify_to);
 
     /* RFC 2298 requests this mime type... */
     message->subtype = g_strdup("report");
@@ -2494,7 +2498,9 @@ static LibBalsaMessage *create_mdn_reply (const LibBalsaIdentity *mdn_ident,
 	g_string_append_printf(report, "Original-Recipient: %s\n",
 			       original_rcpt);	
     g_string_append_printf(report, "Final-Recipient: rfc822; %s\n",
-			   mdn_ident->ia->value.addr);
+                           INTERNET_ADDRESS_MAILBOX(balsa_app.
+                                                    current_ident->ia)->
+                           addr);
     if (for_msg->message_id)
         g_string_append_printf(report, "Original-Message-ID: <%s>\n",
                                for_msg->message_id);

@@ -209,14 +209,10 @@ vcard_qp_decode(gchar * str)
     gint len = strlen(str);
     gchar * newstr = g_malloc0(len + 1);
     int state = 0;
-#if HAVE_GMIME_2_2_5
     guint32 save;
-#else  /* HAVE_GMIME_2_2_5 */
-    int save;
-#endif /* HAVE_GMIME_2_2_5 */
 
     /* qp decode the input string */
-    g_mime_utils_quoted_decode_step((unsigned char *) str, len,
+    g_mime_encoding_quoted_decode_step((unsigned char *) str, len,
 				    (unsigned char *) newstr, &state, &save);
 
     /* free input and return new string */
@@ -234,7 +230,7 @@ vcard_b64_decode(gchar * str)
     guint32 save;
 
     /* base64 decode the input string */
-    g_mime_utils_base64_decode_step((unsigned char *) str, len,
+    g_mime_encoding_base64_decode_step((unsigned char *) str, len,
 				    (unsigned char *) newstr, &state, &save);
 
     /* free input and return new string */
@@ -555,9 +551,9 @@ rfc2822_mailbox(const gchar * full_name, const gchar * address)
     InternetAddress *ia;
     gchar *new_str;
 
-    ia = internet_address_new_name(full_name, address);
+    ia = internet_address_mailbox_new(full_name, address);
     new_str = internet_address_to_string(ia, FALSE);
-    internet_address_unref(ia);
+    g_object_unref(ia);
 
     return new_str;
 }
@@ -568,16 +564,16 @@ rfc2822_group(const gchar *full_name, GList *addr_list)
     InternetAddress *ia;
     gchar *res;
 
-    ia = internet_address_new_group(full_name);
+    ia = internet_address_group_new(full_name);
     for (; addr_list; addr_list = addr_list->next) {
 	InternetAddress *member;
 
-	member = internet_address_new_name(NULL, addr_list->data);
-	internet_address_add_member(ia, member);
-	internet_address_unref(member);
+	member = internet_address_mailbox_new(NULL, addr_list->data);
+	internet_address_group_add_member(INTERNET_ADDRESS_GROUP(ia), member);
+	g_object_unref(member);
     }
     res = internet_address_to_string(ia, FALSE);
-    internet_address_unref(ia);
+    g_object_unref(ia);
 
     return res;
 }
@@ -615,24 +611,30 @@ libbalsa_address_to_gchar(LibBalsaAddress * address, gint n)
 
 /* Helper */
 static const gchar *
-lba_get_name_or_mailbox(const InternetAddressList * address_list,
+lba_get_name_or_mailbox(InternetAddressList * address_list,
                         gboolean get_name, gboolean in_group)
 {
     const gchar *retval = NULL;
+    InternetAddress *ia;
+    gint i, len;
+    
+    if (address_list == NULL)
+	return NULL;
 
-    for (; address_list; address_list = address_list->next) {
-        InternetAddress *ia = address_list->address;
+    len = internet_address_list_length(address_list);
+    for (i = 0; i < len; i++) {
+        ia = internet_address_list_get_address (address_list, i);
 
         if (get_name && ia->name && *ia->name)
             return ia->name;
 
-        if (ia->type == INTERNET_ADDRESS_NAME)
-            retval = ia->value.addr;
-        else if (ia->type == INTERNET_ADDRESS_GROUP) {
+        if (INTERNET_ADDRESS_IS_MAILBOX (ia))
+            retval = INTERNET_ADDRESS_MAILBOX (ia)->addr;
+        else {
             if (in_group)
                 g_message("Ignoring nested group address");
             else
-                retval = lba_get_name_or_mailbox(ia->value.members,
+                retval = lba_get_name_or_mailbox(INTERNET_ADDRESS_GROUP(ia)->members,
 			get_name, TRUE);
         }
         if (retval)
@@ -644,18 +646,40 @@ lba_get_name_or_mailbox(const InternetAddressList * address_list,
 
 /* Get either a name or a mailbox from an InternetAddressList. */
 const gchar *
-libbalsa_address_get_name_from_list(const InternetAddressList *
-                                    address_list)
+libbalsa_address_get_name_from_list(InternetAddressList *address_list)
 {
     return lba_get_name_or_mailbox(address_list, TRUE, FALSE);
 }
 
 /* Get a mailbox from an InternetAddressList. */
 const gchar *
-libbalsa_address_get_mailbox_from_list(const InternetAddressList *
-                                       address_list)
+libbalsa_address_get_mailbox_from_list(InternetAddressList *address_list)
 {
     return lba_get_name_or_mailbox(address_list, FALSE, FALSE);
+}
+
+/* Number of individual mailboxes in an InternetAddressList. */
+gint
+libbalsa_address_n_mailboxes_in_list(InternetAddressList * address_list)
+{
+    gint i, len, n_mailboxes = 0;
+
+    g_return_val_if_fail(IS_INTERNET_ADDRESS_LIST(address_list), -1);
+
+    len = internet_address_list_length(address_list);
+    for (i = 0; i < len; i++) {
+        const InternetAddress *ia =
+            internet_address_list_get_address(address_list, i);
+
+        if (INTERNET_ADDRESS_IS_MAILBOX(ia))
+            ++n_mailboxes;
+        else
+            n_mailboxes +=
+                libbalsa_address_n_mailboxes_in_list(INTERNET_ADDRESS_GROUP
+                                                     (ia)->members);
+    }
+
+    return n_mailboxes;
 }
 
 /* =================================================================== */

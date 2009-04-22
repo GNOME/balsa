@@ -783,7 +783,7 @@ libbalsa_mailbox_maildir_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 	    msg_info->local_info.flags &= ~LIBBALSA_MESSAGE_FLAG_RECENT;
 	if (((msg_info->local_info.flags & LIBBALSA_MESSAGE_FLAG_RECENT)
              && strcmp(msg_info->subdir, "new") != 0)
-            || ((!msg_info->local_info.flags & LIBBALSA_MESSAGE_FLAG_RECENT)
+            || (!(msg_info->local_info.flags & LIBBALSA_MESSAGE_FLAG_RECENT)
                 && strcmp(msg_info->subdir, "cur") != 0)
             || FLAGS_CHANGED(msg_info)) {
 	    if (!maildir_sync_add(msg_info, path))

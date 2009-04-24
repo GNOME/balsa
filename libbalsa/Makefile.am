@@ -74,8 +74,6 @@ libbalsa_a_SOURCES = 		\
 	filter.h		\
 	folder-scanners.c	\
 	folder-scanners.h	\
-	gmime-stream-gnome-vfs.c\
-	gmime-stream-gnome-vfs.h\
 	gmime-stream-gio.c      \
 	gmime-stream-gio.h      \
 	html.c                  \

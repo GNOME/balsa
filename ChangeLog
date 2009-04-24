@@ -1,3 +1,8 @@
+2009-04-23  Peter Bloomfield
+
+	bump version to 2.4.0, and require GMime-2.4, GLib-2.16, and
+	Gtk-2.14.
+
 2009-04-21  Peter Bloomfield
 
 	port to GMime-2.4

@@ -513,7 +513,6 @@ config_load_smtp_server(const gchar * key, const gchar * value, gpointer data)
 }
 #endif                          /* ENABLE_ESMTP */
 
-#ifdef HAVE_GTK_PRINT
 static gboolean
 load_gtk_print_setting(const gchar * key, const gchar * value, gpointer data)
 {
@@ -580,7 +579,6 @@ restore_gtk_page_setup()
     
     return page_setup;
 }
-#endif
 
 static gint
 config_global_load(void)
@@ -830,7 +828,6 @@ config_global_load(void)
     libbalsa_conf_push_group("Printing");
 
     /* ... Printing */
-#ifdef HAVE_GTK_PRINT
     if (balsa_app.page_setup)
 	g_object_unref(G_OBJECT(balsa_app.page_setup));
     balsa_app.page_setup = restore_gtk_page_setup();
@@ -838,27 +835,6 @@ config_global_load(void)
     balsa_app.margin_top = libbalsa_conf_get_double("TopMargin");
     balsa_app.margin_right = libbalsa_conf_get_double("RightMargin");
     balsa_app.margin_bottom = libbalsa_conf_get_double("BottomMargin");
-#else
-    g_free(balsa_app.paper_size);
-    balsa_app.paper_size =
-	libbalsa_conf_get_string("PaperSize=" DEFAULT_PAPER_SIZE);
-    g_free(balsa_app.margin_left);
-    balsa_app.margin_left   = libbalsa_conf_get_string("LeftMargin");
-    g_free(balsa_app.margin_top);
-    balsa_app.margin_top    = libbalsa_conf_get_string("TopMargin");
-    g_free(balsa_app.margin_right);
-    balsa_app.margin_right  = libbalsa_conf_get_string("RightMargin");
-    g_free(balsa_app.margin_bottom);
-    balsa_app.margin_bottom = libbalsa_conf_get_string("BottomMargin");
-    g_free(balsa_app.print_unit);
-    balsa_app.print_unit    = libbalsa_conf_get_string("PrintUnit");
-    g_free(balsa_app.print_layout);
-    balsa_app.print_layout  = libbalsa_conf_get_string("PrintLayout");
-    g_free(balsa_app.paper_orientation);
-    balsa_app.paper_orientation  = libbalsa_conf_get_string("PaperOrientation");
-    g_free(balsa_app.page_orientation);
-    balsa_app.page_orientation   = libbalsa_conf_get_string("PageOrientation");
-#endif
 
     g_free(balsa_app.print_header_font);
     balsa_app.print_header_font =
@@ -874,19 +850,15 @@ config_global_load(void)
                                 DEFAULT_PRINT_BODY_FONT);
     balsa_app.print_highlight_cited =
         libbalsa_conf_get_bool("PrintHighlightCited=false");
-#ifdef HAVE_GTK_PRINT
     balsa_app.print_highlight_phrases =
         libbalsa_conf_get_bool("PrintHighlightPhrases=false");
-#endif
     libbalsa_conf_pop_group();
 
-#ifdef HAVE_GTK_PRINT
     /* GtkPrint printing */
     libbalsa_conf_push_group("GtkPrint");
     libbalsa_conf_foreach_keys("GtkPrint", load_gtk_print_setting,
 			       balsa_app.print_settings);
     libbalsa_conf_pop_group();
-#endif
 
     /* Spelling options ... */
     libbalsa_conf_push_group("Spelling");
@@ -928,10 +900,8 @@ config_global_load(void)
 	d_get_gint("NewMailNotificationDialog", 0);
     balsa_app.notify_new_mail_sound =
 	d_get_gint("NewMailNotificationSound", 1);
-#if GTK_CHECK_VERSION(2, 10, 0)
     balsa_app.notify_new_mail_icon =
 	d_get_gint("NewMailNotificationIcon", 1);
-#endif                          /* GTK_CHECK_VERSION(2, 10, 0) */
     balsa_app.check_mail_upon_startup =
 	libbalsa_conf_get_bool("OnStartup=false");
     balsa_app.check_mail_auto = libbalsa_conf_get_bool("Auto=false");
@@ -1152,7 +1122,6 @@ config_global_load(void)
     return TRUE;
 }				/* config_global_load */
 
-#ifdef HAVE_GTK_PRINT
 static void
 save_gtk_print_setting(const gchar *key, const gchar *value, gpointer user_data)
 {
@@ -1198,7 +1167,6 @@ save_gtk_page_setup(GtkPageSetup *page_setup)
     libbalsa_conf_set_int("Orientation",
 			  gtk_page_setup_get_orientation(page_setup));
 }
-#endif
 
 gint
 config_save(void)
@@ -1337,32 +1305,11 @@ config_save(void)
 
     /* Printing options ... */
     libbalsa_conf_push_group("Printing");
-#ifdef HAVE_GTK_PRINT
     save_gtk_page_setup(balsa_app.page_setup);
     libbalsa_conf_set_double("LeftMargin", balsa_app.margin_left);
     libbalsa_conf_set_double("TopMargin", balsa_app.margin_top);
     libbalsa_conf_set_double("RightMargin", balsa_app.margin_right);
     libbalsa_conf_set_double("BottomMargin", balsa_app.margin_bottom);
-#else
-    libbalsa_conf_set_string("PaperSize",balsa_app.paper_size);
-    if(balsa_app.margin_left)
-	libbalsa_conf_set_string("LeftMargin",   balsa_app.margin_left);
-    if(balsa_app.margin_top)
-	libbalsa_conf_set_string("TopMargin",    balsa_app.margin_top);
-    if(balsa_app.margin_bottom)
-	libbalsa_conf_set_string("RightMargin",  balsa_app.margin_right);
-    if(balsa_app.margin_bottom)
-	libbalsa_conf_set_string("BottomMargin", balsa_app.margin_bottom);
-    if(balsa_app.print_unit)
-	libbalsa_conf_set_string("PrintUnit",    balsa_app.print_unit);
-    if(balsa_app.print_layout)
-	libbalsa_conf_set_string("PrintLayout", balsa_app.print_layout);
-    if(balsa_app.margin_bottom)
-	libbalsa_conf_set_string("PaperOrientation", 
-				balsa_app.paper_orientation);
-    if(balsa_app.margin_bottom)
-	libbalsa_conf_set_string("PageOrientation", balsa_app.page_orientation);
-#endif
 
     libbalsa_conf_set_string("PrintHeaderFont",
                             balsa_app.print_header_font);
@@ -1371,13 +1318,10 @@ config_save(void)
                             balsa_app.print_footer_font);
     libbalsa_conf_set_bool("PrintHighlightCited",
                           balsa_app.print_highlight_cited);
-#ifdef HAVE_GTK_PRINT
     libbalsa_conf_set_bool("PrintHighlightPhrases",
                           balsa_app.print_highlight_phrases);
-#endif
     libbalsa_conf_pop_group();
 
-#ifdef HAVE_GTK_PRINT
     /* GtkPrintSettings stuff */
     libbalsa_conf_remove_group("GtkPrint");
     libbalsa_conf_push_group("GtkPrint");
@@ -1385,7 +1329,6 @@ config_save(void)
 	gtk_print_settings_foreach(balsa_app.print_settings,
 				   save_gtk_print_setting, NULL);
     libbalsa_conf_pop_group();
-#endif
 
     /* Spelling options ... */
     libbalsa_conf_remove_group("Spelling");
@@ -1421,10 +1364,8 @@ config_save(void)
                           balsa_app.notify_new_mail_dialog);
     libbalsa_conf_set_int("NewMailNotificationSound",
                           balsa_app.notify_new_mail_sound);
-#if GTK_CHECK_VERSION(2, 10, 0)
     libbalsa_conf_set_int("NewMailNotificationIcon",
                           balsa_app.notify_new_mail_icon);
-#endif                          /* GTK_CHECK_VERSION(2, 10, 0) */
     libbalsa_conf_set_bool("OnStartup", balsa_app.check_mail_upon_startup);
     libbalsa_conf_set_bool("Auto", balsa_app.check_mail_auto);
     libbalsa_conf_set_int("AutoDelay", balsa_app.check_mail_timer);

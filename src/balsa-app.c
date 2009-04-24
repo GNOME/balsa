@@ -381,20 +381,14 @@ balsa_app_init(void)
     balsa_app.date_string = g_strdup(DEFAULT_DATE_FORMAT);
 
     /* printing */
-#ifdef HAVE_GTK_PRINT
     balsa_app.print_settings = gtk_print_settings_new();
     balsa_app.page_setup = gtk_page_setup_new();
-#else
-    balsa_app.paper_size = g_strdup(DEFAULT_PAPER_SIZE);
-#endif
 
     balsa_app.print_header_font = g_strdup(DEFAULT_PRINT_HEADER_FONT);
     balsa_app.print_footer_font = g_strdup(DEFAULT_PRINT_FOOTER_FONT);
     balsa_app.print_body_font   = g_strdup(DEFAULT_PRINT_BODY_FONT);
     balsa_app.print_highlight_cited = FALSE;
-#ifdef HAVE_GTK_PRINT
     balsa_app.print_highlight_phrases = FALSE;
-#endif
 
     /* address book */
     balsa_app.address_book_list = NULL;
@@ -425,14 +419,7 @@ balsa_app_init(void)
 
     balsa_app.notify_new_mail_sound = 1;
     balsa_app.notify_new_mail_dialog = 0;
-#if GTK_CHECK_VERSION(2, 10, 0)
     balsa_app.notify_new_mail_icon = 1;
-#endif                          /* GTK_CHECK_VERSION(2, 10, 0) */
-
-#if !GTK_CHECK_VERSION(2, 11, 0)
-    /* Tooltips */
-    balsa_app.tooltips = gtk_tooltips_new();
-#endif                          /* !GTK_CHECK_VERSION(2, 11, 0) */
 
     /* Local and IMAP */
     balsa_app.local_scan_depth = 1;

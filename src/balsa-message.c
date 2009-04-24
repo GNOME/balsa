@@ -280,11 +280,6 @@ bm_header_tl_buttons(BalsaMessage * bm)
     GtkWidget *vbox;
     GtkWidget *button;
 
-#if !GTK_CHECK_VERSION(2, 11, 0)
-    /* the event box is needed to set the background correctly */
-    GtkTooltips *tooltips = gtk_tooltips_new();
-#endif                          /* !GTK_CHECK_VERSION(2, 11, 0) */
-
     ebox = gtk_event_box_new();
 
     hbox2 = gtk_hbox_new(FALSE, 6);
@@ -300,13 +295,8 @@ bm_header_tl_buttons(BalsaMessage * bm)
     gtk_box_pack_start(GTK_BOX(hbox2), vbox, FALSE, FALSE, 0);
 
     button = gtk_button_new();
-#if GTK_CHECK_VERSION(2, 11, 0)
     gtk_widget_set_tooltip_text(button,
 			        _("Check cryptographic signature"));
-#else                           /* GTK_CHECK_VERSION(2, 11, 0) */
-    gtk_tooltips_set_tip(tooltips, button,
-			 _("Check cryptographic signature"), NULL);
-#endif                          /* GTK_CHECK_VERSION(2, 11, 0) */
     g_signal_connect(G_OBJECT(button), "focus_in_event",
 		     G_CALLBACK(balsa_mime_widget_limit_focus),
 		     (gpointer) bm);
@@ -326,13 +316,8 @@ bm_header_tl_buttons(BalsaMessage * bm)
     gtk_box_pack_start(GTK_BOX(hbox2), vbox, FALSE, FALSE, 0);
 
     button = gtk_button_new();
-#if GTK_CHECK_VERSION(2, 11, 0)
     gtk_widget_set_tooltip_text(button,
 			        _("Select message part to display"));
-#else                           /* GTK_CHECK_VERSION(2, 11, 0) */
-    gtk_tooltips_set_tip(tooltips, button,
-			 _("Select message part to display"), NULL);
-#endif                          /* GTK_CHECK_VERSION(2, 11, 0) */
     g_signal_connect(G_OBJECT(button), "focus_in_event",
 		     G_CALLBACK(balsa_mime_widget_limit_focus),
 		     (gpointer) bm);
@@ -918,12 +903,7 @@ tree_mult_selection_popup(BalsaMessage * bm, GdkEventButton * event,
         GtkWidget *menu_item;
         
         bm->save_all_popup = gtk_menu_new ();
-#if GLIB_CHECK_VERSION(2, 10, 0)
         g_object_ref_sink(bm->save_all_popup);
-#else                           /* GLIB_CHECK_VERSION(2, 10, 0) */
-        g_object_ref(bm->save_all_popup);
-        gtk_object_sink(GTK_OBJECT(bm->save_all_popup));
-#endif                          /* GLIB_CHECK_VERSION(2, 10, 0) */
         menu_item = 
             gtk_menu_item_new_with_label (_("Save selected as..."));
         gtk_widget_show(menu_item);
@@ -1526,12 +1506,7 @@ display_content(BalsaMessage * bm)
     if (bm->parts_popup)
 	g_object_unref(bm->parts_popup);
     bm->parts_popup = gtk_menu_new();
-#if GLIB_CHECK_VERSION(2, 10, 0)
     g_object_ref_sink(bm->parts_popup);
-#else                           /* GLIB_CHECK_VERSION(2, 10, 0) */
-    g_object_ref(bm->parts_popup);
-    gtk_object_sink(GTK_OBJECT(bm->parts_popup));
-#endif                          /* GLIB_CHECK_VERSION(2, 10, 0) */
     display_parts(bm, bm->message->body_list, NULL, NULL);
     if (bm->info_count > 1) {
  	gtk_widget_show_all(bm->parts_popup);
@@ -1587,12 +1562,7 @@ part_create_menu (BalsaPartInfo* info)
     gchar* content_type;
     
     info->popup_menu = gtk_menu_new ();
-#if GLIB_CHECK_VERSION(2, 10, 0)
     g_object_ref_sink(info->popup_menu);
-#else                           /* GLIB_CHECK_VERSION(2, 10, 0) */
-    g_object_ref(info->popup_menu);
-    gtk_object_sink(GTK_OBJECT(info->popup_menu));
-#endif                          /* GLIB_CHECK_VERSION(2, 10, 0) */
     
     content_type = libbalsa_message_body_get_mime_type (info->body);
     libbalsa_vfs_fill_menu_by_content_type(GTK_MENU(info->popup_menu),

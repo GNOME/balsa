@@ -72,7 +72,6 @@ balsa_BASE_SRCLIST =	\
 	toolbar-prefs.c		\
 	toolbar-prefs.h
 
-if BUILD_WITH_GTK_PRINT
 balsa_print_source = print-gtk.c	\
 	balsa-print-object.c		\
 	balsa-print-object.h		\
@@ -86,23 +85,6 @@ balsa_print_source = print-gtk.c	\
 	balsa-print-object-image.h	\
 	balsa-print-object-text.c	\
 	balsa-print-object-text.h
-balsa_print_extra_dist = print.c
-else
-balsa_print_source = print.c
-balsa_print_extra_dist = print-gtk.c	\
-	balsa-print-object.c		\
-	balsa-print-object.h		\
-	balsa-print-object-decor.c	\
-	balsa-print-object-decor.h	\
-	balsa-print-object-default.c	\
-	balsa-print-object-default.h	\
-	balsa-print-object-header.c	\
-	balsa-print-object-header.h	\
-	balsa-print-object-image.c	\
-	balsa-print-object-image.h	\
-	balsa-print-object-text.c	\
-	balsa-print-object-text.h
-endif
 
 if BUILD_WITH_GTKSPELL
 balsa_gtkspell_extra =
@@ -147,8 +129,7 @@ DISTCLEANFILES = $(balsa_IDL_SRCLIST)
 
 EXTRA_DIST =			\
 	$(balsa_gtkspell_extra_dist) \
-	$(balsa_bonobo_extra_dist)   \
-	$(balsa_print_extra_dist)
+	$(balsa_bonobo_extra_dist)
 
 AM_CPPFLAGS = \
 	-DGNOMELOCALEDIR=\""$(datadir)/locale"\" \

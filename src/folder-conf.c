@@ -34,12 +34,6 @@
 #include "imap-server.h"
 #include <glib/gi18n.h>
 
-#if !GTK_CHECK_VERSION(2, 14, 0)
-#ifdef HAVE_GNOME
-#include <gnome.h>
-#endif
-#endif                          /* GTK_CHECK_VERSION(2, 14, 0) */
-
 typedef struct _CommonDialogData CommonDialogData;
 typedef struct _FolderDialogData FolderDialogData;
 typedef struct _SubfolderDialogData SubfolderDialogData;
@@ -95,9 +89,7 @@ static void
 folder_conf_response(GtkDialog * dialog, int response,
                      CommonDialogData * cdd)
 {
-#if GTK_CHECK_VERSION(2, 14, 0) || HAVE_GNOME
     GError *err = NULL;
-#endif
 
     /* If mbnode's parent gets rescanned, mbnode will be finalized,
      * which triggers folder_conf_destroy_cdd, and recursively calls
@@ -107,20 +99,14 @@ folder_conf_response(GtkDialog * dialog, int response,
 	g_object_ref(cdd->mbnode);
     switch (response) {
     case GTK_RESPONSE_HELP:
-#if GTK_CHECK_VERSION(2, 14, 0) || HAVE_GNOME
-#if GTK_CHECK_VERSION(2, 14, 0)
         gtk_show_uri(NULL, "ghelp:balsa?folder-config",
                      gtk_get_current_event_time(), &err);
-#else                           /* GTK_CHECK_VERSION(2, 14, 0) */
-        gnome_help_display("balsa", "folder-config", &err);
-#endif                          /* GTK_CHECK_VERSION(2, 14, 0) */
         if (err) {
             balsa_information(LIBBALSA_INFORMATION_WARNING,
                               _("Error displaying config help: %s\n"),
                               err->message);
             g_error_free(err);
         }
-#endif
 	if (cdd->mbnode)
 	    g_object_unref(cdd->mbnode);
         return;

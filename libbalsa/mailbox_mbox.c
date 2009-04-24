@@ -394,9 +394,9 @@ static void
 lbm_mbox_save(LibBalsaMailboxMbox * mbox)
 {
     gchar *filename;
-#if GLIB_CHECK_VERSION(2, 8, 0) && !defined(__APPLE__)
+#if !defined(__APPLE__)
     GError *err = NULL;
-#endif                          /* GLIB_CHECK_VERSION(2, 8, 0) */
+#endif                          /* !defined(__APPLE__) */
 
     if (!mbox->messages_info_changed)
         return;
@@ -410,10 +410,10 @@ lbm_mbox_save(LibBalsaMailboxMbox * mbox)
             g_array_sized_new(FALSE, FALSE, sizeof(struct message_info), 
                               mbox->msgno_2_msg_info->len);
         guint msgno;
-#if !GLIB_CHECK_VERSION(2, 8, 0) || defined(__APPLE__)
+#if defined(__APPLE__)
         gchar *template;
         gint fd;
-#endif                          /* GLIB_CHECK_VERSION(2, 8, 0) */
+#endif                          /* !defined(__APPLE__) */
 
         for (msgno = 1; msgno <= mbox->msgno_2_msg_info->len; msgno++) {
             struct message_info *msg_info =
@@ -421,7 +421,7 @@ lbm_mbox_save(LibBalsaMailboxMbox * mbox)
             g_array_append_val(messages_info, *msg_info);
         }
 
-#if GLIB_CHECK_VERSION(2, 8, 0) && !defined(__APPLE__)
+#if !defined(__APPLE__)
         if (!g_file_set_contents(filename, messages_info->data,
                                  messages_info->len
                                  * sizeof(struct message_info), &err)) {
@@ -430,7 +430,7 @@ lbm_mbox_save(LibBalsaMailboxMbox * mbox)
                                  filename, err->message);
             g_error_free(err);
         }
-#else                           /* GLIB_CHECK_VERSION(2, 8, 0) */
+#else                           /* !defined(__APPLE__) */
         template = g_strconcat(filename, ":XXXXXX", NULL);
         fd = g_mkstemp(template);
         if (fd < 0 || write(fd, messages_info->data,
@@ -454,7 +454,7 @@ lbm_mbox_save(LibBalsaMailboxMbox * mbox)
                                    "New version saved as \"%s\""),
                                  filename, strerror(errno), template);
         g_free(template);
-#endif                          /* GLIB_CHECK_VERSION(2, 8, 0) */
+#endif                          /* !defined(__APPLE__) */
         g_array_free(messages_info, TRUE);
     } else if (unlink(filename) < 0)
         libbalsa_information(LIBBALSA_INFORMATION_WARNING,

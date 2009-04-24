@@ -27,10 +27,6 @@
 #include <string.h>
 #include <gtk/gtk.h>
 
-#if !GTK_CHECK_VERSION(2, 14, 0)
-#include <libgnome/gnome-url.h>
-#endif
-
 #include "balsa-app.h"
 #include "balsa-icons.h"
 #include "send.h"
@@ -294,11 +290,7 @@ extbody_call_url(GtkWidget * button, gpointer data)
     GError *err = NULL;
 
     g_return_if_fail(url);
-#if GTK_CHECK_VERSION(2, 14, 0)
     gtk_show_uri(NULL, url, gtk_get_current_event_time(), &err);
-#else
-    gnome_url_show(url, &err);
-#endif
     if (err) {
 	balsa_information(LIBBALSA_INFORMATION_WARNING,
 			  _("Error showing %s: %s\n"), url, err->message);

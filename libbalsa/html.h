@@ -60,30 +60,6 @@ void libbalsa_html_copy(GtkWidget * widget);
 guint libbalsa_html_filter(LibBalsaHTMLType html_type, gchar ** text,
 			   guint len);
 
-#if defined(HAVE_GNOME) && !defined(HAVE_GTK_PRINT)
-
-#  include <libgnomeprint/gnome-print.h>
-
-gboolean libbalsa_html_can_print(void);
-typedef void (*LibBalsaHTMLPrintCallback) (GtkWidget * widget,
-					   GnomePrintContext *
-					   print_context, gdouble x,
-					   gdouble y, gdouble width,
-					   gdouble height,
-					   gpointer user_data);
-void libbalsa_html_print(GtkWidget * widget,
-			 GnomePrintContext * print_context,
-			 gdouble header_height, gdouble footer_height,
-			 LibBalsaHTMLPrintCallback header_print,
-			 LibBalsaHTMLPrintCallback footer_print,
-			 gpointer user_data);
-gint libbalsa_html_print_get_pages_num(GtkWidget * widget,
-				       GnomePrintContext * print_context,
-				       gdouble header_height,
-				       gdouble footer_height);
-
-#endif /* defined(HAVE_GNOME) && !defined(HAVE_GTK_PRINT) */
-
 # endif				/* HAVE_GTKHTML */
 
 LibBalsaHTMLType libbalsa_html_type(const gchar * mime_type);

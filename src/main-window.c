@@ -152,9 +152,7 @@ static void bw_show_about_box(GtkAction *, gpointer data);
 /* callbacks */
 static void bw_send_outbox_messages_cb    (GtkAction *, gpointer data);
 static void bw_send_receive_messages_cb   (GtkAction *, gpointer data);
-#ifdef HAVE_GTK_PRINT
 static void bw_page_setup_cb              (GtkAction * action, gpointer data);
-#endif
 static void bw_message_print_cb           (GtkAction * action, gpointer data);
 
 static void bw_new_message_cb             (GtkAction * action, gpointer data);
@@ -352,10 +350,8 @@ static const GtkActionEntry entries[] = {
      N_("Send and _Receive Mail"), "<control>B",
      N_("Send and Receive messages"),
      G_CALLBACK(bw_send_receive_messages_cb)},
-#ifdef HAVE_GTK_PRINT
     {"PageSetup", NULL, N_("Page _Setup"), NULL,
      N_("Set up page for printing"), G_CALLBACK(bw_page_setup_cb)},
-#endif                          /* HAVE_GTK_PRINT */
     {"AddressBook", BALSA_PIXMAP_BOOK_RED, N_("_Address Book..."), "B",
      N_("Open the address book"), G_CALLBACK(bw_address_book_cb)},
     {"Quit", GTK_STOCK_QUIT, N_("_Quit"), "<control>Q", N_("Quit Balsa"),
@@ -671,9 +667,7 @@ static const char *ui_description =
 "      <menuitem action='SendQueuedMail'/>"
 "      <menuitem action='SendAndReceiveMail'/>"
 "      <separator/>"
-#ifdef HAVE_GTK_PRINT
 "      <menuitem action='PageSetup'/>"
-#endif                          /* HAVE_GTK_PRINT */
 "      <menuitem action='Print'/>"
 "      <separator/>"
 "      <menuitem action='AddressBook'/>"
@@ -808,9 +802,7 @@ static const char *ui_description =
 "        <menuitem action='MailboxEdit'/>"
 "        <separator/>"
 "      </menu>"
-#ifdef HAVE_GTK_PRINT
 "      <menuitem action='PageSetup'/>"
-#endif                          /* HAVE_GTK_PRINT */
 "      <menuitem action='Print'/>"
 "      <separator/>"
 "      <menuitem action='Quit'/>"
@@ -2897,14 +2889,12 @@ bw_send_outbox_messages_cb(GtkAction * action, gpointer data)
 			   balsa_app.debug);
 }
 
-#ifdef HAVE_GTK_PRINT
 /* Callback for `Page setup' item on the `File' menu */
 static void
 bw_page_setup_cb(GtkAction * action, gpointer data)
 {
     message_print_page_setup(GTK_WINDOW(data));
 }
-#endif
 
 /* Callback for `Print current message' item on the `File' menu, 
  * and the toolbar button. */

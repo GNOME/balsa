@@ -510,30 +510,16 @@ balsa_spell_check_init(BalsaSpellCheck * spell_check)
     vbox = gtk_vbox_new(FALSE, padding);
     change = balsa_stock_button_with_label(GTK_STOCK_REDO,
 					   "_Change");
-#if GTK_CHECK_VERSION(2, 11, 0)
     gtk_widget_set_tooltip_text(change,
                                 _("Replace the current word "
                                   "with the selected suggestion"));
-#else                           /* GTK_CHECK_VERSION(2, 11, 0) */
-    gtk_tooltips_set_tip(balsa_app.tooltips, change,
-			 _("Replace the current word "
-                           "with the selected suggestion"),
-			 NULL);
-#endif                          /* GTK_CHECK_VERSION(2, 11, 0) */
     gtk_box_pack_start(GTK_BOX(vbox), change, FALSE, FALSE, 0);
 
     change_all = balsa_stock_button_with_label(GTK_STOCK_REFRESH,
 					       "Change _All");
-#if GTK_CHECK_VERSION(2, 11, 0)
     gtk_widget_set_tooltip_text(change_all,
                                 _("Replace all occurrences of the current word "
                                   "with the selected suggestion"));
-#else                           /* GTK_CHECK_VERSION(2, 11, 0) */
-    gtk_tooltips_set_tip(balsa_app.tooltips, change_all,
-			 _("Replace all occurrences of the current word "
-                           "with the selected suggestion"),
-			 NULL);
-#endif                          /* GTK_CHECK_VERSION(2, 11, 0) */
     gtk_box_pack_start(GTK_BOX(vbox), change_all, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(spell_check)->action_area),
                        vbox, FALSE, FALSE, 0);
@@ -542,25 +528,14 @@ balsa_spell_check_init(BalsaSpellCheck * spell_check)
     ignore = balsa_stock_button_with_label(GTK_STOCK_GO_FORWARD,
                                            "_Ignore");
 
-#if GTK_CHECK_VERSION(2, 11, 0)
     gtk_widget_set_tooltip_text(ignore,
                                 _("Skip the current word"));
-#else                           /* GTK_CHECK_VERSION(2, 11, 0) */
-    gtk_tooltips_set_tip(balsa_app.tooltips, ignore,
-			 _("Skip the current word"), NULL);
-#endif                          /* GTK_CHECK_VERSION(2, 11, 0) */
     gtk_box_pack_start(GTK_BOX(vbox), ignore, FALSE, FALSE, 0);
 
     ignore_all = balsa_stock_button_with_label(GTK_STOCK_GOTO_LAST,
                                                "Ignore A_ll");
-#if GTK_CHECK_VERSION(2, 11, 0)
     gtk_widget_set_tooltip_text(ignore_all,
                                 _("Skip all occurrences of the current word"));
-#else                           /* GTK_CHECK_VERSION(2, 11, 0) */
-    gtk_tooltips_set_tip(balsa_app.tooltips, ignore_all,
-			 _("Skip all occurrences of the current word"),
-			 NULL);
-#endif                          /* GTK_CHECK_VERSION(2, 11, 0) */
     gtk_box_pack_start(GTK_BOX(vbox), ignore_all, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(spell_check)->action_area),
                        vbox, FALSE, FALSE, 0);
@@ -568,37 +543,20 @@ balsa_spell_check_init(BalsaSpellCheck * spell_check)
     vbox = gtk_vbox_new(FALSE, padding);
     learn = balsa_stock_button_with_label(BALSA_PIXMAP_BOOK_OPEN,
                                           "_Learn");
-#if GTK_CHECK_VERSION(2, 11, 0)
     gtk_widget_set_tooltip_text(learn,
                                 _("Add the current word to your personal dictionary"));
-#else                           /* GTK_CHECK_VERSION(2, 11, 0) */
-    gtk_tooltips_set_tip(balsa_app.tooltips, learn,
-			 _("Add the current word to your personal dictionary"),
-			 NULL);
-#endif                          /* GTK_CHECK_VERSION(2, 11, 0) */
     gtk_box_pack_start(GTK_BOX(vbox), learn, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(spell_check)->action_area),
                        vbox, FALSE, FALSE, 0);
 
     vbox = gtk_vbox_new(FALSE, padding);
     done = balsa_stock_button_with_label(GTK_STOCK_OK, "_Done");
-#if GTK_CHECK_VERSION(2, 11, 0)
     gtk_widget_set_tooltip_text(done, _("Finish spell checking"));
-#else                           /* GTK_CHECK_VERSION(2, 11, 0) */
-    gtk_tooltips_set_tip(balsa_app.tooltips, done,
-			 _("Finish spell checking"), NULL);
-#endif                          /* GTK_CHECK_VERSION(2, 11, 0) */
     gtk_box_pack_start(GTK_BOX(vbox), done, FALSE, FALSE, 0);
 
     cancel = gtk_button_new_from_stock(GTK_STOCK_CANCEL);
-#if GTK_CHECK_VERSION(2, 11, 0)
     gtk_widget_set_tooltip_text(learn,
                                 _("Revert all changes and finish spell checking"));
-#else                           /* GTK_CHECK_VERSION(2, 11, 0) */
-    gtk_tooltips_set_tip(balsa_app.tooltips, cancel,
-			 _("Revert all changes and finish spell checking"),
-			 NULL);
-#endif                          /* GTK_CHECK_VERSION(2, 11, 0) */
     gtk_box_pack_start(GTK_BOX(vbox), cancel, FALSE, FALSE, 0);
     gtk_box_pack_end(GTK_BOX(GTK_DIALOG(spell_check)->action_area),
                      vbox, FALSE, FALSE, 0);

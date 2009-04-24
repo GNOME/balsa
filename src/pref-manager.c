@@ -37,12 +37,6 @@
 #include "misc.h"
 #include "imap-server.h"
 
-#if !GTK_CHECK_VERSION(2, 14, 0)
-#ifdef HAVE_GNOME
-#include <gnome.h>
-#endif
-#endif                          /* GTK_CHECK_VERSION(2, 14, 0) */
-
 #if ENABLE_ESMTP
 #include <libesmtp.h>
 #include <string.h>
@@ -100,9 +94,7 @@ typedef struct _PropertyUI {
     GtkWidget *check_imap_inbox;
     GtkWidget *notify_new_mail_dialog;
     GtkWidget *notify_new_mail_sound;
-#if GTK_CHECK_VERSION(2, 10, 0)
     GtkWidget *notify_new_mail_icon;
-#endif                          /* GTK_CHECK_VERSION(2, 10, 0) */
     GtkWidget *mdn_reply_clean_menu, *mdn_reply_notclean_menu;
 
     GtkWidget *close_mailbox_auto;
@@ -647,10 +639,8 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
     g_signal_connect(G_OBJECT(pui->notify_new_mail_sound), "toggled",
                      G_CALLBACK(properties_modified_cb), property_box);
 
-#if GTK_CHECK_VERSION(2, 10, 0)
     g_signal_connect(G_OBJECT(pui->notify_new_mail_icon), "toggled",
                      G_CALLBACK(properties_modified_cb), property_box);
-#endif                          /* GTK_CHECK_VERSION(2, 10, 0) */
 
     g_signal_connect(G_OBJECT(pui->close_mailbox_auto), "toggled",
                      G_CALLBACK(mailbox_close_timer_modified_cb),
@@ -880,10 +870,8 @@ apply_prefs(GtkDialog * pbox)
         GTK_TOGGLE_BUTTON(pui->notify_new_mail_dialog)->active;
     balsa_app.notify_new_mail_sound =
         GTK_TOGGLE_BUTTON(pui->notify_new_mail_sound)->active;
-#if GTK_CHECK_VERSION(2, 10, 0)
     balsa_app.notify_new_mail_icon =
         GTK_TOGGLE_BUTTON(pui->notify_new_mail_icon)->active;
-#endif                          /* GTK_CHECK_VERSION(2, 10, 0) */
     balsa_app.mdn_reply_clean =
         pm_combo_box_get_level(pui->mdn_reply_clean_menu);
     balsa_app.mdn_reply_notclean =
@@ -1117,11 +1105,9 @@ set_prefs(void)
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
                                  (pui->notify_new_mail_sound),
                                  balsa_app.notify_new_mail_sound);
-#if GTK_CHECK_VERSION(2, 10, 0)
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
                                  (pui->notify_new_mail_icon),
                                  balsa_app.notify_new_mail_icon);
-#endif                          /* GTK_CHECK_VERSION(2, 10, 0) */
     if (!balsa_app.check_imap)
         gtk_widget_set_sensitive(GTK_WIDGET(pui->check_imap_inbox), FALSE);
 
@@ -1817,12 +1803,10 @@ checking_group(GtkWidget * page)
     gtk_box_pack_start(GTK_BOX(hbox), pui->notify_new_mail_sound,
                        FALSE, FALSE, 0);
 
-#if GTK_CHECK_VERSION(2, 10, 0)
     pui->notify_new_mail_icon =
         gtk_check_button_new_with_label(_("Show icon"));
     gtk_box_pack_start(GTK_BOX(hbox), pui->notify_new_mail_icon,
                        FALSE, FALSE, 0);
-#endif                          /* GTK_CHECK_VERSION(2, 10, 0) */
 
     gtk_table_attach(GTK_TABLE(table), hbox,
                      0, 3, row, row + 1, GTK_FILL, 0, 0, 0);
@@ -3069,12 +3053,7 @@ address_book_add_cb(void)
                                     GTK_WINDOW(property_box));
 
     gtk_widget_show_all(menu);
-#if GLIB_CHECK_VERSION(2, 10, 0)
     g_object_ref_sink(menu);
-#else                           /* GLIB_CHECK_VERSION(2, 10, 0) */
-    g_object_ref(menu);
-    gtk_object_sink(GTK_OBJECT(menu));
-#endif                          /* GLIB_CHECK_VERSION(2, 10, 0) */
     gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL, 0, 0);
     g_object_unref(menu);
 }
@@ -3135,12 +3114,7 @@ server_add_cb(void)
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
     gtk_widget_show(menuitem);
     gtk_widget_show(menu);
-#if GLIB_CHECK_VERSION(2, 10, 0)
     g_object_ref_sink(menu);
-#else                           /* GLIB_CHECK_VERSION(2, 10, 0) */
-    g_object_ref(menu);
-    gtk_object_sink(GTK_OBJECT(menu));
-#endif                          /* GLIB_CHECK_VERSION(2, 10, 0) */
     gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL, 0, 0);
     g_object_unref(menu);
 }
@@ -3361,16 +3335,13 @@ refresh_preferences_manager(void)
 static void
 balsa_help_pbox_display(void)
 {
-#if GTK_CHECK_VERSION(2, 14, 0) || HAVE_GNOME
     GtkTreeSelection *selection;
     GtkTreeModel *model;
     GtkTreeIter iter;
     gchar *text, *p;
     gchar *link_id;
     GError *err = NULL;
-#if GTK_CHECK_VERSION(2, 14, 0)
     gchar *uri;
-#endif                          /* GTK_CHECK_VERSION(2, 14, 0) */
 
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(pui->view));
     if (!gtk_tree_selection_get_selected(selection, &model, &iter))
@@ -3382,13 +3353,9 @@ balsa_help_pbox_display(void)
     link_id = g_strconcat("preferences-", text, NULL);
     g_free(text);
 
-#if GTK_CHECK_VERSION(2, 14, 0)
     uri = g_strconcat("ghelp:balsa?", link_id, NULL);
     gtk_show_uri(NULL, uri, gtk_get_current_event_time(), &err);
     g_free(uri);
-#else                           /* GTK_CHECK_VERSION(2, 14, 0) */
-    gnome_help_display("balsa", link_id, &err);
-#endif                          /* GTK_CHECK_VERSION(2, 14, 0) */
     if (err) {
         balsa_information(LIBBALSA_INFORMATION_WARNING,
 		_("Error displaying link_id %s: %s\n"),
@@ -3397,7 +3364,6 @@ balsa_help_pbox_display(void)
     }
 
     g_free(link_id);
-#endif
 }
 
 /* pm_page: methods for making the contents of a notebook page

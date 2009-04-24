@@ -439,11 +439,7 @@ libbalsa_mailbox_local_load_config(LibBalsaMailbox * mailbox,
  */
 
 typedef struct {
-#if GLIB_CHECK_VERSION(2, 8, 0)
     GArray * array;
-#else                           /* GLIB_CHECK_VERSION(2, 8, 0) */
-    int fd;
-#endif                          /* GLIB_CHECK_VERSION(2, 8, 0) */
     guint (*fileno)(LibBalsaMailboxLocal * local, guint msgno);
     LibBalsaMailboxLocal *local;
 } LibBalsaMailboxLocalSaveTreeInfo;
@@ -476,11 +472,7 @@ lbm_local_save_tree_item(guint msgno, guint a,
         info.value.parent = a;
     }
 
-#if GLIB_CHECK_VERSION(2, 8, 0)
     return g_array_append_val(save_info->array, info) == NULL;
-#else                           /* GLIB_CHECK_VERSION(2, 8, 0) */
-    return write(save_info->fd, &info, sizeof info) != sizeof info;
-#endif                          /* GLIB_CHECK_VERSION(2, 8, 0) */
 }
 
 static gboolean
@@ -514,11 +506,7 @@ lbm_local_save_tree(LibBalsaMailboxLocal * local)
     LibBalsaMailbox *mailbox = LIBBALSA_MAILBOX(local);
     gchar *filename;
     LibBalsaMailboxLocalSaveTreeInfo save_info;
-#if GLIB_CHECK_VERSION(2, 8, 0)
     GError *err = NULL;
-#else                           /* GLIB_CHECK_VERSION(2, 8, 0) */
-    gchar *template;
-#endif                          /* GLIB_CHECK_VERSION(2, 8, 0) */
 
     if (!mailbox->msg_tree || !mailbox->msg_tree_changed)
         return;
@@ -538,32 +526,16 @@ lbm_local_save_tree(LibBalsaMailboxLocal * local)
 
     save_info.fileno = LIBBALSA_MAILBOX_LOCAL_GET_CLASS(local)->fileno;
     save_info.local = local;
-#if GLIB_CHECK_VERSION(2, 8, 0)
     save_info.array =
         g_array_new(FALSE, FALSE, sizeof(LibBalsaMailboxLocalTreeInfo));
     lbm_local_save_tree_item(0, libbalsa_mailbox_get_total(mailbox),
                              &save_info);
-#else                           /* GLIB_CHECK_VERSION(2, 8, 0) */
-    template = g_strconcat(filename, ":XXXXXX", NULL);
-    save_info.fd = g_mkstemp(template);
-    if (save_info.fd < 0
-        || lbm_local_save_tree_item(0, libbalsa_mailbox_get_total(mailbox),
-                                    &save_info)) {
-        libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-                             _("Failed to create temporary file \"%s\": %s"),
-                             template, strerror(errno));
-        g_free(template);
-        g_free(filename);
-        return;
-    }
-#endif                          /* GLIB_CHECK_VERSION(2, 8, 0) */
 
     /* Pre-order is required for the file to be created correctly. */
     g_node_traverse(mailbox->msg_tree, G_PRE_ORDER, G_TRAVERSE_ALL, -1,
                     (GNodeTraverseFunc) lbm_local_save_tree_func,
                     &save_info);
 
-#if GLIB_CHECK_VERSION(2, 8, 0)
     if (!g_file_set_contents(filename, save_info.array->data,
                              save_info.array->len *
                              sizeof(LibBalsaMailboxLocalTreeInfo), &err)) {
@@ -573,17 +545,6 @@ lbm_local_save_tree(LibBalsaMailboxLocal * local)
         g_error_free(err);
     }
     g_array_free(save_info.array, TRUE);
-#else                           /* GLIB_CHECK_VERSION(2, 8, 0) */
-    if (close(save_info.fd) != 0
-        || (unlink(filename) != 0 && errno != ENOENT)
-        || libbalsa_safe_rename(template, filename) != 0)
-        libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-                             _("Failed to save cache file \"%s\": %s.  "
-                               "New version saved as \"%s\""),
-                             filename, strerror(errno), template);
-
-    g_free(template);
-#endif                          /* GLIB_CHECK_VERSION(2, 8, 0) */
     g_free(filename);
 }
 

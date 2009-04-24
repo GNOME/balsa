@@ -312,11 +312,7 @@ static void
 cond_to_string(LibBalsaCondition * cond, GString *res)
 {
     char str[80];
-#if GLIB_CHECK_VERSION(2,10,0)
     GDate date;
-#else
-    struct tm date;
-#endif
 
     if(cond->negate)
         g_string_append(res, "NOT ");
@@ -338,24 +334,14 @@ cond_to_string(LibBalsaCondition * cond, GString *res)
     case CONDITION_DATE:
         g_string_append(res, "DATE ");
 	if (cond->match.date.date_low) {
-#if GLIB_CHECK_VERSION(2,10,0)
 	    g_date_set_time_t(&date, cond->match.date.date_low);
 	    g_date_strftime(str, sizeof(str), "%Y-%m-%d", &date);
-#else
-	    localtime_r(&cond->match.date.date_low, &date);
-	    strftime(str,sizeof(str),"%Y-%m-%d", &date);
-#endif
 	} else str[0]='\0';
         append_quoted_string(res, str);
         g_string_append_c(res, ' ');
 	if (cond->match.date.date_high) {
-#if GLIB_CHECK_VERSION(2,10,0)
 	    g_date_set_time_t(&date, cond->match.date.date_high);
 	    g_date_strftime(str, sizeof(str), "%Y-%m-%d", &date);
-#else
-	    localtime_r(&cond->match.date.date_high, &date);
-	    strftime(str,sizeof(str),"%Y-%m-%d", &date);
-#endif
 	} else str[0]='\0';
         append_quoted_string(res, str);
 	break;

@@ -28,9 +28,6 @@
 # error "Include config.h before this file."
 #endif
 
-/* note: this module will be compiled only if GIO is available */
-#if HAVE_GIO
-
 #include <gio/gio.h>
 #include <gmime/gmime-stream.h>
 
@@ -67,7 +64,5 @@ GMimeStream *g_mime_stream_gio_new_with_bounds(GFile * gfile,
 					       gint64 end);
 
 G_END_DECLS
-
-#endif /* HAVE_GIO */
 
 #endif /* __GMIME_STREAM_GIO_H__ */

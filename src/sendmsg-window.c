@@ -37,12 +37,7 @@
 #else
 #define GNOME_PAD_SMALL    4
 #endif
-#if HAVE_GIO
 #include <gio/gio.h>
-#elif HAVE_GNOME_VFS
-#include <libgnomevfs/gnome-vfs.h>
-#include <libgnomevfs/gnome-vfs-mime-handlers.h>
-#endif
 #include <glib/gi18n.h>
 #include <glib/gstdio.h>
 #include <ctype.h>
@@ -112,11 +107,9 @@ static void save_message_cb    (GtkAction * action, BalsaSendmsg * bsmsg);
 static gint message_postpone(BalsaSendmsg * bsmsg);
 static void postpone_message_cb(GtkAction * action, BalsaSendmsg * bsmsg);
 
-#ifdef HAVE_GTK_PRINT
 #if !defined(ENABLE_TOUCH_UI)
 static void page_setup_cb      (GtkAction * action, BalsaSendmsg * bsmsg);
 #endif /* ENABLE_TOUCH_UI */
-#endif
 static void print_message_cb   (GtkAction * action, BalsaSendmsg * bsmsg);
 static void attach_clicked     (GtkAction * action, gpointer data);
 
@@ -345,12 +338,10 @@ static const GtkActionEntry entries[] = {
      N_("Attach selected message(s)"), G_CALLBACK(attach_message_cb)},
     {"Save", GTK_STOCK_SAVE, N_("_Save"), "<control>S",
      N_("Save this message"), G_CALLBACK(save_message_cb)},
-#ifdef HAVE_GTK_PRINT
 #if !defined(ENABLE_TOUCH_UI)
     {"PageSetup", NULL, N_("Page _Setup"), NULL,
      N_("Set up page for printing"), G_CALLBACK(page_setup_cb)},
 #endif                          /* ENABLE_TOUCH_UI */
-#endif                          /* HAVE_GTK_PRINT */
     {"Print", GTK_STOCK_PRINT, N_("_Print..."), "<control>P",
      N_("Print the edited message"), G_CALLBACK(print_message_cb)},
     {"Close", GTK_STOCK_CLOSE, N_("_Close"), "<control>W",
@@ -488,9 +479,7 @@ static const char *ui_description =
 "      <menuitem action='Postpone'/>"
 "      <menuitem action='Save'/>"
 "      <separator/>"
-#ifdef HAVE_GTK_PRINT
 "      <menuitem action='PageSetup'/>"
-#endif                          /* HAVE_GTK_PRINT */
 "      <menuitem action='Print'/>"
 "      <separator/>"
 "      <menuitem action='Close'/>"
@@ -1194,23 +1183,14 @@ edit_with_gnome(GtkAction * action, BalsaSendmsg* bsmsg)
         gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
     GtkTextIter start, end;
     gchar *p;
-#if HAVE_GIO
     GAppInfo *app;
-#elif HAVE_GNOME_VFS
-    GnomeVFSMimeApplication *app;
-#endif
     char **argv;
     int argc;
 
     strcpy(filename, TMP_PATTERN);
     tmpfd = mkstemp(filename);
-#if HAVE_GIO
     app = g_app_info_get_default_for_type("text/plain", FALSE);
-#elif HAVE_GNOME_VFS
-    app = gnome_vfs_mime_get_default_application ("text/plain");
-#endif
     if (app) {
-#if HAVE_GIO
         argc = 2;
         argv = g_new0 (char *, argc + 1);
 
@@ -1219,46 +1199,6 @@ edit_with_gnome(GtkAction * action, BalsaSendmsg* bsmsg)
                                   g_app_info_supports_uris(app) ? "file://" : "", filename);
         // FIXME: how can I detect if the called application needs the terminal???
         g_object_unref(app);
-#elif HAVE_GNOME_VFS
-#if HAVE_GNOME_VFS29
-        gboolean adduri = gnome_vfs_mime_application_supports_uris(app);
-	const gchar *exec, *pct;
-#else /* HAVE_GNOME_VFS29 */
-	gboolean adduri = (app->expects_uris ==
-                           GNOME_VFS_MIME_APPLICATION_ARGUMENT_TYPE_URIS);
-#endif /* HAVE_GNOME_VFS29 */
-        argc = 2;
-        argv = g_new0 (char *, argc+1);
-#if HAVE_GNOME_VFS29
-	exec = gnome_vfs_mime_application_get_exec(app);
-	pct = strstr(exec, " %");
-	argv[0] = pct ? g_strndup(exec, pct - exec) : g_strdup(exec);
-#else /* HAVE_GNOME_VFS29 */
-        argv[0] = g_strdup(app->command);
-#endif /* HAVE_GNOME_VFS29 */
-        argv[1] = g_strdup_printf("%s%s", adduri ? "file://" : "", filename);
-
-        /* this does not work really well with gnome-terminal
-         * that quits before the text editing application quits.
-         * Blame gnome-terminal.
-         * WORKAROUND: if the terminal is gnome-terminal, 
-         * --disable-factory option is added as well.
-         */
-        if (app->requires_terminal) {
-            gnome_prepend_terminal_to_vector(&argc, &argv);
-            if(strstr(argv[0], "gnome-terminal")) {
-                int i;
-                gchar ** new_argv = g_new(char*, ++argc+1);
-                new_argv[0] = argv[0];
-                new_argv[1] = g_strdup("--disable-factory");
-                for(i=2; i<=argc; i++)
-                    new_argv[i] = argv[i-1];
-                g_free(argv);
-                argv = new_argv;
-            }
-        }
-        gnome_vfs_mime_application_free (app);
-#endif
     } else {
         balsa_information_parented(GTK_WINDOW(bsmsg->window),
                                    LIBBALSA_INFORMATION_ERROR,
@@ -1833,11 +1773,7 @@ on_open_url_cb(GtkWidget * menu_item, BalsaAttachInfo * info)
     g_return_if_fail(uri != NULL);
 
     g_message("open URL %s", uri);
-#if GTK_CHECK_VERSION(2, 14, 0)
     gtk_show_uri(NULL, uri, gtk_get_current_event_time(), &err);
-#else
-    gnome_url_show(uri, &err);
-#endif
     if (err) {
         balsa_information(LIBBALSA_INFORMATION_WARNING,
 			  _("Error showing %s: %s\n"),
@@ -2856,17 +2792,8 @@ render_attach_size(GtkTreeViewColumn *column, GtkCellRenderer *cell,
 		       ATTACH_SIZE_COLUMN, &size, -1);
     if (mode == LIBBALSA_ATTACH_AS_EXTBODY)
         sstr = g_strdup("-");
-#if GLIB_CHECK_VERSION(2, 16, 0)
     else
         sstr = g_format_size_for_display((goffset) size);
-#else                           /* GLIB_CHECK_VERSION(2, 16, 0) */
-    else if (size > 1.2e6)
-	sstr = g_strdup_printf("%.2fMB", size / (1024 * 1024));
-    else if (size > 1.2e3)
-	sstr = g_strdup_printf("%.2fkB", size / 1024);
-    else
-	sstr = g_strdup_printf("%dB", (gint) size);
-#endif                          /* GLIB_CHECK_VERSION(2, 16, 0) */
     g_object_set(cell, "text", sstr, NULL);
     g_free(sstr);
 }
@@ -6088,7 +6015,6 @@ save_message_cb(GtkAction * action, BalsaSendmsg * bsmsg)
         bsmsg->state = SENDMSG_STATE_CLEAN;
 }
 
-#ifdef HAVE_GTK_PRINT
 #if !defined(ENABLE_TOUCH_UI)
 static void
 page_setup_cb(GtkAction * action, BalsaSendmsg * bsmsg)
@@ -6100,7 +6026,6 @@ page_setup_cb(GtkAction * action, BalsaSendmsg * bsmsg)
     g_object_unref(message);
 }
 #endif /* ENABLE_TOUCH_UI */
-#endif
 
 static void
 print_message_cb(GtkAction * action, BalsaSendmsg * bsmsg)

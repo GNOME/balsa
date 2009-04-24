@@ -376,12 +376,7 @@ bndx_instance_init(BalsaIndex * index)
     /* Initialize some other members */
     index->mailbox_node = NULL;
     index->popup_menu = bndx_popup_menu_create(index);
-#if GLIB_CHECK_VERSION(2, 10, 0)
     g_object_ref_sink(index->popup_menu);
-#else                           /* GLIB_CHECK_VERSION(2, 10, 0) */
-    g_object_ref(index->popup_menu);
-    gtk_object_sink(GTK_OBJECT(index->popup_menu));
-#endif                          /* GLIB_CHECK_VERSION(2, 10, 0) */
     
     gtk_tree_selection_set_mode(selection, GTK_SELECTION_MULTIPLE);
 
@@ -2687,14 +2682,9 @@ balsa_index_ensure_visible(BalsaIndex * index)
         /* Current message not displayed, make sure that something
            else is... */
         gtk_tree_view_get_visible_rect(tree_view, &rect);
-#if GTK_CHECK_VERSION(2, 11, 0)
         gtk_tree_view_convert_tree_to_widget_coords(tree_view,
                                                     rect.x, rect.y,
                                                     &rect.x, &rect.y);
-#else                           /* GTK_CHECK_VERSION(2, 11, 0) */
-        gtk_tree_view_tree_to_widget_coords(tree_view, rect.x, rect.y,
-                                            &rect.x, &rect.y);
-#endif                          /* GTK_CHECK_VERSION(2, 11, 0) */
 
         if (gtk_tree_view_get_path_at_pos(tree_view, rect.x, rect.y, &path,
                                           NULL, NULL, NULL)) {

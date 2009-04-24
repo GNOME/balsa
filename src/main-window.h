@@ -85,9 +85,7 @@ struct _BalsaWindow {
     GSList *activity_messages;
 
     /* New mail notification: */
-#if GTK_CHECK_VERSION(2, 10, 0)
     GtkStatusIcon *new_mail_tray;
-#endif                          /* GTK_CHECK_VERSION(2, 10, 0) */
 #ifdef HAVE_NOTIFY
     NotifyNotification *new_mail_note;
 #endif                         /* HAVE_NOTIFY */

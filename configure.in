@@ -154,14 +154,6 @@ AC_ARG_WITH([gtksourceview],
 	with_gtksourceview=no
 ])
 
-AC_ARG_WITH([gtkprint],
-        AC_HELP_STRING([--with-gtkprint],
-                [Use GtkPrint instead of libgnomeprint (default=yes for gtk+ > 2.10.0)]),[
-	with_gtkprint=$withval
-],[
-	with_gtkprint=testme
-])
-
 AC_ARG_WITH([sqlite],
         AC_HELP_STRING([--with-sqlite=DIR],
                 [Use SQLite for GPE address books (default=no)]),[
@@ -294,34 +286,11 @@ AC_DEFINE_UNQUOTED(SENDMAIL, "$ac_cv_path_SENDMAIL",
 		   [Path to sendmail program.])
 fi
 
-# GIO in glib 2.16.0 and above
-AC_MSG_CHECKING([for gio >= 2.16])
-if $PKG_CONFIG --atleast-version=2.16.0 gio-2.0 ; then
-   with_gio=yes
-   gio_extra=gio-2.0
-   AC_DEFINE(HAVE_GIO,1,[Defined when GIO can be used.])
-   giover=`$PKG_CONFIG --modversion gio-2.0`
-   AC_MSG_RESULT($giover)
-else
-   with_gio=no
-   AC_MSG_RESULT($with_gio)
-fi
-
 dnl #####################################################################
 dnl GNOME libs
 dnl #####################################################################
 if test x$with_gnome != xno; then
    gnome_extras="libgnome-2.0 libgnomeui-2.0 libbonobo-2.0 gconf-2.0"
-   if test x$with_gio != xyes ; then
-      gnome_extras="$gnome_extras gnome-vfs-2.0 >= 2.4.0 gnome-vfs-module-2.0"
-      AC_DEFINE(HAVE_GNOME_VFS,1,
-	        [Defined when gnome-vfs shall be used])
-      if $PKG_CONFIG --atleast-version=2.9.0 gnome-vfs-2.0 ; then
-         AC_DEFINE(HAVE_GNOME_VFS29,1,
-	           [Defined when gnome-vfs-2.0 version is at least 2.9.0])
-      fi
-   fi
-   gnome_print_extras="libgnomeprint-2.2 >= 2.1.4 libgnomeprintui-2.2 >= 2.1.4"
    AC_MSG_CHECKING([whether we have gnome-keyring])
    if $PKG_CONFIG --atleast-version=1.0 gnome-keyring-1; then
       gnome_extras="$gnome_extras gnome-keyring-1"
@@ -339,55 +308,19 @@ if test x$with_gnome != xno; then
    AC_DEFINE(HAVE_GNOME,1,[Defined when gnome libs are available.])
 else
    gnome_extras=""
-   gnome_print_extras=""
 fi
 AM_CONDITIONAL([BUILD_WITH_GNOME], [test $with_gnome = "yes"])
-
-dnl #####################################################################
-dnl GtkPrint
-dnl #####################################################################
-
-if test x"$with_gtkprint" = xtestme ; then
-  AC_MSG_CHECKING([for gtk+ >= 2.10])
-  if $PKG_CONFIG --atleast-version=2.10.0 gtk+-2.0 ; then
-    with_gtkprint=yes
-  else
-    with_gtkprint=no
-  fi
-  AC_MSG_RESULT($with_gtkprint)
-elif test x"$with_gtkprint" = xyes ; then
-  AC_MSG_CHECKING([whether gtk+ supports native printing])
-  if $PKG_CONFIG --atleast-version=2.10.0 gtk+-2.0 ; then
-    with_gtkprint=yes
-    AC_MSG_RESULT($with_gtkprint)
-  else
-    AC_MSG_RESULT([no])
-    AC_MSG_ERROR([gtk+ >= 2.10.0 must be installed to use native printing support])
-  fi
-else
-  with_gtkprint=no
-fi
-
-AM_CONDITIONAL([BUILD_WITH_GTK_PRINT], [test $with_gtkprint = "yes"])
-if test $with_gtkprint = yes ; then
-  AC_DEFINE(HAVE_GTK_PRINT,1,
-	    [Defined when native Gtk+-2.0 printing support is available])
-  gnome_print_extras=""
-else
-  gnome_print_extras="libgnomeprint-2.2 >= 2.1.4 libgnomeprintui-2.2 >= 2.1.4"
-fi
 
 dnl #####################################################################
 dnl 4. Libraries.
 dnl #####################################################################
 
 PKG_CHECK_MODULES(BALSA, [
-glib-2.0 >= 2.6.0
-gtk+-2.0 >= 2.6.0
+glib-2.0 >= 2.16.0
+gtk+-2.0 >= 2.14.0
 gmime-2.4
-$gio_extra
+gio-2.0
 $gnome_extras
-$gnome_print_extras
 ])
 
 PKG_CHECK_MODULES(BALSA_AB, [
@@ -923,15 +856,6 @@ dnl 7. extra functions.
 dnl #####################################################################
 AC_CHECK_FUNCS(getaddrinfo getnameinfo gai_strerror)
 
-AC_MSG_CHECKING([Whether GtkAssistant widget is available])
-if pkg-config --atleast-version=2.10 gtk+-2.0; then
-  has_assistant=yes
-else
-  has_assistant=no
-fi
-AC_MSG_RESULT($has_assistant)
-AM_CONDITIONAL([BUILD_WITH_ASSISTANT], [test x$has_assistant = xyes])
-
 # isblank()
 AC_MSG_CHECKING([for isblank])
 AC_TRY_LINK( [#include <ctype.h>], [return isblank('a');],
@@ -1027,7 +951,6 @@ echo "                Use ESMTP : $with_esmtp"
 echo " Use WebKit (experimental): $use_webkit"
 echo " Use Unique (experimental): $with_unique"
 echo "                 Use GNOME: $with_gnome"
-echo "                   Use GIO: $with_gio"
 echo "               Use GtkHTML: $use_gtkhtml"
 echo "                 Use GPGME: $gpgmecfg"
 echo "                  Use LDAP: $with_ldap"
@@ -1037,7 +960,6 @@ echo "                   Use SSL: $with_ssl"
 echo "              Use GtkSpell: $with_gtkspell"
 echo "             Use Libnotify: $with_libnotify"
 echo "         Use GtkSourceView: $with_gtksourceview"
-echo "              Use GtkPrint: $with_gtkprint"
 echo "              Use Compface: $with_compface"
 echo "  Install extra MIME icons: $install_mimeicons"
 dnl echo "                  Use SASL: $need_sasl"

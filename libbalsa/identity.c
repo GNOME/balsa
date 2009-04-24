@@ -33,12 +33,6 @@
 #include <glib/gi18n.h>
 #include "misc.h"
 
-#if !GTK_CHECK_VERSION(2, 14, 0)
-#ifdef HAVE_GNOME
-#include <gnome.h>
-#endif
-#endif                          /* GTK_CHECK_VERSION(2, 14, 0) */
-
 #if ENABLE_ESMTP
 #include <string.h>
 #include "smtp-server.h"
@@ -1666,22 +1660,16 @@ delete_ident_response(GtkWidget * confirm, gint response,
 static void
 help_ident_cb(void)
 {
-#if GTK_CHECK_VERSION(2, 14, 0) || HAVE_GNOME
     GError *err = NULL;
 
-#if GTK_CHECK_VERSION(2, 14, 0)
     gtk_show_uri(NULL, "ghelp:balsa?identities",
                  gtk_get_current_event_time(), &err);
-#else                           /* GTK_CHECK_VERSION(2, 14, 0) */
-    gnome_help_display("balsa", "identities", &err);
-#endif                          /* GTK_CHECK_VERSION(2, 14, 0) */
 
     if (err) {
         g_print(_("Error displaying help for identities: %s\n"),
                 err->message);
         g_error_free(err);
     }
-#endif
 }
 
 /* libbalsa_identity_config_dialog displays an identity management

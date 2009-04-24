@@ -36,10 +36,6 @@
 #include "balsa-mime-widget-callbacks.h"
 #include "balsa-cite-bar.h"
 
-#if !GTK_CHECK_VERSION(2, 14, 0)
-#include <libgnome/gnome-url.h>
-#endif
-
 #if HAVE_GTKSOURCEVIEW
 #include <gtksourceview/gtksourceview.h>
 #include <gtksourceview/gtksourcebuffer.h>
@@ -933,11 +929,7 @@ handle_url(const message_url_t* url)
         gtk_statusbar_push(statusbar, context_id, notice);
         SCHEDULE_BAR_REFRESH();
         g_free(notice);
-#if GTK_CHECK_VERSION(2, 14, 0)
         gtk_show_uri(NULL, url->url, gtk_get_current_event_time(), &err);
-#else
-    gnome_url_show(url->url, &err);
-#endif
         if (err) {
             balsa_information(LIBBALSA_INFORMATION_WARNING,
                     _("Error showing %s: %s\n"), url->url,
@@ -1183,12 +1175,7 @@ balsa_gtk_html_popup(GtkWidget * html, BalsaMessage * bm)
     gtk_menu_shell_append (GTK_MENU_SHELL (menu), menuitem);
 
     gtk_widget_show_all(menu);
-#if GLIB_CHECK_VERSION(2, 10, 0)
     g_object_ref_sink(menu);
-#else                           /* GLIB_CHECK_VERSION(2, 10, 0) */
-    g_object_ref(menu);
-    gtk_object_sink(GTK_OBJECT(menu));
-#endif                          /* GLIB_CHECK_VERSION(2, 10, 0) */
     gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL,
                    0, gtk_get_current_event_time());
     g_object_unref(menu);
@@ -1208,11 +1195,7 @@ bm_widget_link_clicked(const gchar *url)
 {
     GError *err = NULL;
 
-#if GTK_CHECK_VERSION(2, 14, 0)
     gtk_show_uri(NULL, url, gtk_get_current_event_time(), &err);
-#else
-    gnome_url_show(url, &err);
-#endif
     if (err) {
         balsa_information(LIBBALSA_INFORMATION_WARNING,
                 _("Error showing %s: %s\n"), url, err->message);

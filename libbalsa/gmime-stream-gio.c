@@ -26,7 +26,6 @@
 #include "gmime-stream-gio.h"
 
 /* note: this module will be compiled only if GIO is available */
-#if HAVE_GIO
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -480,6 +479,3 @@ g_mime_stream_gio_new_with_bounds(GFile * gfile, gint64 start, gint64 end)
 	
     return (GMimeStream *) gios;
 }
-
-
-#endif  /* HAVE_GIO */

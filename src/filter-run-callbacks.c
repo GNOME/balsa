@@ -37,12 +37,6 @@
 
 #include <glib/gi18n.h>	/* Must come after balsa-app.h. */
 
-#if !GTK_CHECK_VERSION(2, 14, 0)
-#ifdef HAVE_GNOME
-#include <gnome.h>
-#endif
-#endif                          /* GTK_CHECK_VERSION(2, 14, 0) */
-
 /* Global vars */
 
 extern GList * fr_dialogs_opened;
@@ -167,9 +161,7 @@ void fr_dialog_response(GtkWidget * widget, gint response,
 			gpointer throwaway)
 {
     BalsaFilterRunDialog * p;
-#if GTK_CHECK_VERSION(2, 14, 0) || HAVE_GNOME
     GError *err = NULL;
-#endif
 
     p=BALSA_FILTER_RUN_DIALOG(widget);
     switch (response) {
@@ -184,13 +176,8 @@ void fr_dialog_response(GtkWidget * widget, gint response,
 	
 	break;
     case GTK_RESPONSE_HELP:     /* Help button */
-#if GTK_CHECK_VERSION(2, 14, 0) || HAVE_GNOME
-#if GTK_CHECK_VERSION(2, 14, 0)
         gtk_show_uri(NULL, "ghelp:balsa?win-run-filters",
                      gtk_get_current_event_time(), &err);
-#else                           /* GTK_CHECK_VERSION(2, 14, 0) */
-	gnome_help_display("balsa", "win-run-filters", &err);
-#endif                          /* GTK_CHECK_VERSION(2, 14, 0) */
 	if (err) {
 	    balsa_information_parented(GTK_WINDOW(widget),
 		    LIBBALSA_INFORMATION_WARNING,
@@ -198,7 +185,6 @@ void fr_dialog_response(GtkWidget * widget, gint response,
 		    err->message);
 	    g_error_free(err);
 	}
-#endif
 	return;
 
     default:

@@ -28,17 +28,7 @@
 #include <ctype.h>
 #include <string.h>
 
-#if HAVE_GIO
 #include <gio/gio.h>
-#endif
-
-#if HAVE_GNOME
-#include <gnome.h>
-#endif
-#if HAVE_GNOME_VFS
-#include <libgnomevfs/gnome-vfs-mime-info.h>
-#include <libgnomevfs/gnome-vfs.h>
-#endif
 
 #include "misc.h"
 #include "libbalsa.h"
@@ -146,12 +136,7 @@ libbalsa_icon_finder(const char *mime_type, const LibbalsaVfs * for_file,
     GdkPixbuf *pixbuf = NULL;
     gint width, height;
     const gchar * filename = NULL;
-#if HAVE_GIO || HAVE_GNOME
     GtkIconTheme *icon_theme;
-#ifdef HAVE_GNOME_VFS
-    const gchar *icon_file;
-#endif
-#endif
 
     if (!gtk_icon_size_lookup(size, &width, &height))
 	width = height = 16;
@@ -164,7 +149,6 @@ libbalsa_icon_finder(const char *mime_type, const LibbalsaVfs * for_file,
     } else
 	content_type = g_strdup("application/octet-stream");
 
-#if HAVE_GIO
     /* ask GIO for the icon */
     if ((icon_theme = gtk_icon_theme_get_default())) {
         GIcon * icon = g_content_type_get_icon(content_type);
@@ -204,49 +188,6 @@ libbalsa_icon_finder(const char *mime_type, const LibbalsaVfs * for_file,
 	    }
         }
     }
-#elif HAVE_GNOME
-    /* gtk+ 2.4.0 and above: use the default icon theme to get the icon */
-    if ((icon_theme = gtk_icon_theme_get_default()))
-	if ((icon =
-	     gnome_icon_lookup(icon_theme, NULL, filename, NULL, NULL,
-			       content_type, 0, NULL))) {
-	    pixbuf =
-		gtk_icon_theme_load_icon(icon_theme, icon, width, 0, NULL);
-	    g_free(icon);
-	    if (pixbuf) {
-		if (used_type)
-		    *used_type = content_type;
-		else 
-		    g_free(content_type);
-		return pixbuf;
-	    }
-	}
-
-#if HAVE_GNOME_VFS
-    icon_file = gnome_vfs_mime_get_value(content_type, "icon_filename");
-    
-    /* check if the icon file is good and try harder otherwise */
-    if (icon_file && g_file_test (icon_file, G_FILE_TEST_IS_REGULAR))
-	icon = g_strdup(icon_file);
-    else {
-	gchar *gnome_icon, *p_gnome_icon, *tmp;
-  	
-	gnome_icon = g_strdup_printf ("gnome-%s.png", content_type);   
-	p_gnome_icon = strchr (gnome_icon, '/');
-	if (p_gnome_icon != NULL)
-	    *p_gnome_icon = '-';
-
-        tmp = g_strconcat("document-icons/", gnome_icon, NULL);
-        icon = gnome_vfs_icon_path_from_filename(tmp);
-        g_free(tmp);
-
-	if (icon == NULL)
-            icon = balsa_pixmap_finder_no_warn (gnome_icon);
-	
-	g_free (gnome_icon);
-    }
-#endif /* HAVE_GNOME_VFS */
-#endif /* HAVE_GNOME */
 
     /* load the pixbuf */
     if (icon == NULL)

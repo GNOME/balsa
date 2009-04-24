@@ -41,9 +41,6 @@
 typedef struct {
     GKeyFile *key_file;
     gchar *path;
-#if !GLIB_CHECK_VERSION(2, 7, 0)
-    gchar *new_path;
-#endif                          /* !GLIB_CHECK_VERSION(2, 7, 0) */
     guint changes;
     time_t mtime;
 } LibBalsaConf;
@@ -97,9 +94,6 @@ lbc_init(LibBalsaConf * conf, const gchar * filename,
     } else
         conf->key_file = g_key_file_new();
 
-#if !GLIB_CHECK_VERSION(2, 7, 0)
-    conf->new_path = g_strconcat(conf->path, ".new", NULL);
-#endif                          /* !GLIB_CHECK_VERSION(2, 7, 0) */
     libbalsa_assure_balsa_dir();
     if (!g_key_file_load_from_file
         (conf->key_file, conf->path, G_KEY_FILE_NONE, &error)) {
@@ -360,19 +354,9 @@ libbalsa_conf_get_double_with_default_(const char *path,
     GError *error = NULL;
 
     key = lbc_get_key(path, &defval);
-#if GLIB_CHECK_VERSION(2, 12, 0)
     retval =
         g_key_file_get_double(LBC_KEY_FILE(priv), lbc_groups->data, key,
 			      &error);
-#else
-    {
-	gchar *s =
-	    g_key_file_get_string(LBC_KEY_FILE(priv), lbc_groups->data, key,
-				  &error);
-	retval = atof(s);
-	g_free(s);
-    }
-#endif
     g_free(key);
     if (error) {
         g_error_free(error);
@@ -397,15 +381,8 @@ libbalsa_conf_set_int_(const char *path, int value, gboolean priv)
 void
 libbalsa_conf_set_double_(const char *path, double value, gboolean priv)
 {
-#if GLIB_CHECK_VERSION(2, 12, 0)
     g_key_file_set_double(LBC_KEY_FILE(priv), lbc_groups->data, path,
 			  value);
-#else
-    char buffer[20];
-    snprintf(buffer, sizeof(buffer), "%19g", value);
-    g_key_file_set_string(LBC_KEY_FILE(priv), lbc_groups->data, path,
-                          buffer);
-#endif
     LBC_CHANGED(priv);
 }
 
@@ -477,10 +454,6 @@ lbc_drop_all(LibBalsaConf * conf)
     conf->key_file = NULL;
     g_free(conf->path);
     conf->path = NULL;
-#if !GLIB_CHECK_VERSION(2, 7, 0)
-    g_free(conf->new_path);
-    conf->new_path = NULL;
-#endif                          /* !GLIB_CHECK_VERSION(2, 7, 0) */
     conf->changes = 0;
 }
 
@@ -500,9 +473,6 @@ lbc_sync(LibBalsaConf * conf)
     gchar *buf;
     gsize len;
     GError *error = NULL;
-#if !GLIB_CHECK_VERSION(2, 7, 0)
-    gint fd;
-#endif                          /* !GLIB_CHECK_VERSION(2, 7, 0) */
 
     if (!conf->changes)
         return;
@@ -527,7 +497,6 @@ lbc_sync(LibBalsaConf * conf)
         return;
     }
 
-#if GLIB_CHECK_VERSION(2, 7, 0)
     if (!g_file_set_contents(conf->path, buf, len, &error)) {
         if (error) {
 #if DEBUG
@@ -544,50 +513,6 @@ lbc_sync(LibBalsaConf * conf)
     }
 
     g_free(buf);
-#else                           /* GLIB_CHECK_VERSION(2, 7, 0) */
-    fd = g_open(conf->new_path, O_WRONLY | O_CREAT | O_TRUNC,
-                S_IRUSR | S_IWUSR);
-    if (fd < 0) {
-#if DEBUG
-        g_message("Failed to open temporary config file \"%s\"\n"
-                  " changes not saved", conf->new_path);
-#endif                          /* DEBUG */
-        g_free(buf);
-        return;
-    }
-
-    if (write(fd, buf, len) < (gssize) len) {
-#if DEBUG
-        g_message("Failed to write temporary config file \"%s\"\n"
-                  " changes not saved", conf->new_path);
-#endif                          /* DEBUG */
-        close(fd);
-        g_unlink(conf->new_path);
-        g_free(buf);
-        return;
-    }
-    close(fd);
-    g_free(buf);
-
-    if (g_unlink(conf->path) < 0
-        && g_file_error_from_errno(errno) != G_FILE_ERROR_NOENT) {
-#if DEBUG
-        g_message("Failed to unlink config file \"%s\"\n"
-                  " new config file saved as \"%s\"", conf->path,
-                  conf->new_path);
-        perror("Config");
-#endif                          /* DEBUG */
-        return;
-    }
-
-    if (g_rename(conf->new_path, conf->path) < 0) {
-#if DEBUG
-        g_message("Failed to rename temporary config file \"%s\"\n",
-                  conf->new_path);
-#endif                          /* DEBUG */
-        return;
-    }
-#endif                          /* GLIB_CHECK_VERSION(2, 7, 0) */
 }
 
 void

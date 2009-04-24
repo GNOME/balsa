@@ -37,12 +37,6 @@
 #include "misc.h"
 #include <glib/gi18n.h>
 
-#if !GTK_CHECK_VERSION(2, 14, 0)
-#ifdef HAVE_GNOME
-#include <gnome.h>
-#endif
-#endif                          /* GTK_CHECK_VERSION(2, 14, 0) */
-
 static LibBalsaServerClass *parent_class = NULL;
 
 struct _LibBalsaSmtpServer {
@@ -414,26 +408,18 @@ smtp_server_response(GtkDialog * dialog, gint response,
                      struct smtp_server_dialog_info *sdi)
 {
     LibBalsaServer *server = LIBBALSA_SERVER(sdi->smtp_server);
-#if GTK_CHECK_VERSION(2, 14, 0) || HAVE_GNOME
     GError *error = NULL;
-#endif                          /* GTK_CHECK_VERSION(2, 14, 0) */
 
     switch (response) {
     case GTK_RESPONSE_HELP:
-#if GTK_CHECK_VERSION(2, 14, 0) || HAVE_GNOME
-#if GTK_CHECK_VERSION(2, 14, 0)
         gtk_show_uri(NULL, "ghelp:balsa?smtp-server-config",
                      gtk_get_current_event_time(), &error);
-#else                           /* GTK_CHECK_VERSION(2, 14, 0) */
-        gnome_help_display("balsa", "smtp-server-config", &error);
-#endif                          /* GTK_CHECK_VERSION(2, 14, 0) */
         if (error) {
             libbalsa_information(LIBBALSA_INFORMATION_WARNING,
                                  _("Error displaying server help: %s\n"),
                                  error->message);
             g_error_free(error);
         }
-#endif
         return;
     case GTK_RESPONSE_OK:
         libbalsa_smtp_server_set_name(sdi->smtp_server,

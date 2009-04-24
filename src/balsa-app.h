@@ -211,9 +211,7 @@ extern struct BalsaApplication {
     gint notify_new_mail_sound;
     
     gint notify_new_mail_dialog;
-#if GTK_CHECK_VERSION(2, 10, 0)
     gint notify_new_mail_icon;
-#endif                          /* GTK_CHECK_VERSION(2, 10, 0) */
 
     /* automatically close mailboxes after XX minutes */
     gboolean close_mailbox_auto;
@@ -346,31 +344,17 @@ extern struct BalsaApplication {
     gchar *date_string;
 
     /* printing */
-#ifdef HAVE_GTK_PRINT
     GtkPageSetup *page_setup;
     GtkPrintSettings *print_settings;
     gdouble margin_left;
     gdouble margin_top;
     gdouble margin_right;
     gdouble margin_bottom;
-#else
-    gchar* paper_size; /* A4 or Letter */
-    gchar* margin_left;
-    gchar* margin_top;
-    gchar* margin_right;
-    gchar* margin_bottom;
-    gchar* print_unit;
-    gchar* print_layout;
-    gchar* paper_orientation;
-    gchar* page_orientation;
-#endif
     gchar* print_header_font;  /* font for printing headers */
     gchar* print_body_font;    /* font for printing text parts */
     gchar* print_footer_font;  /* font for printing footers */
     gboolean print_highlight_cited;
-#ifdef HAVE_GTK_PRINT
     gboolean print_highlight_phrases;
-#endif
 
     /* compose */
     gchar *compose_headers;
@@ -402,11 +386,6 @@ extern struct BalsaApplication {
     BalsaInformationShow error_message;
     BalsaInformationShow debug_message;
     BalsaInformationShow fatal_message;
-
-#if !GTK_CHECK_VERSION(2, 11, 0)
-    /* Tooltips */
-    GtkTooltips *tooltips;
-#endif                          /* !GTK_CHECK_VERSION(2, 11, 0) */
 
     /* how to act if a MDN request is received */
     BalsaMDNReply mdn_reply_clean;

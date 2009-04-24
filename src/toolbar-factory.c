@@ -454,12 +454,10 @@ tm_set_tool_item_label(GtkToolItem * tool_item, const gchar * stock_id,
 
     gtk_tool_item_set_is_important(tool_item, TRUE);
 
-#if GTK_CHECK_VERSION(2, 12, 0)
     if (strcmp(toolbar_buttons[button].pixmap_id, BALSA_PIXMAP_SEND) == 0
         && balsa_app.always_queue_sent_mail)
         gtk_tool_item_set_tooltip_text(tool_item,
                                        _("Queue this message for sending"));
-#endif                          /* GTK_CHECK_VERSION(2, 12, 0) */
 
     return button;
 }
@@ -479,19 +477,11 @@ tm_populate(BalsaToolbarModel * model, GtkUIManager * ui_manager,
 
         g_array_append_val(merge_ids, merge_id);
 
-        if (!*stock_id) {
-#if GTK_CHECK_VERSION(2, 11, 6)
+        if (!*stock_id)
             gtk_ui_manager_add_ui(ui_manager, merge_id, "/Toolbar",
                                   NULL, NULL, GTK_UI_MANAGER_SEPARATOR,
                                   FALSE);
-#else                           /* GTK_CHECK_VERSION(2, 11, 6) */
-            gchar *name = g_strdup_printf("Separator%d", merge_id);
-            gtk_ui_manager_add_ui(ui_manager, merge_id, "/Toolbar",
-                                  name, NULL, GTK_UI_MANAGER_SEPARATOR,
-                                  FALSE);
-            g_free(name);
-#endif                          /* GTK_CHECK_VERSION(2, 11, 6) */
-        } else {
+        else {
             gchar *path, *name;
             GtkWidget *tool_item;
 
@@ -787,9 +777,7 @@ tm_do_popup_menu(GtkWidget * toolbar, GdkEventButton * event,
         event_time = gtk_get_current_event_time();
     }
 
-#if GTK_CHECK_VERSION(2, 10, 0)
     gtk_menu_attach_to_widget(GTK_MENU(menu), toolbar, NULL);
-#endif                          /* GTK_CHECK_VERSION(2, 10, 0) */
     if (button)
         gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL, button,
                        event_time);

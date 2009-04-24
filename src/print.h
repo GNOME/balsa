@@ -31,9 +31,7 @@ extern "C" {
 #endif				/* __cplusplus */
 
     void message_print(LibBalsaMessage * msg, GtkWindow * parent);
-#ifdef HAVE_GTK_PRINT
     void message_print_page_setup(GtkWindow * parent);
-#endif
 
 #ifdef __cplusplus
 }

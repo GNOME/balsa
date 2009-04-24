@@ -45,12 +45,6 @@
 #include "libbalsa-conf.h"
 #include "missing.h"
 
-#if !GTK_CHECK_VERSION(2, 14, 0)
-#ifdef HAVE_GNOME
-#include <gnome.h>
-#endif
-#endif                          /* GTK_CHECK_VERSION(2, 14, 0) */
-
 /* Defined in filter-edit-dialog.c*/
 extern option_list fe_search_type[4];
 extern GList * fe_user_headers_list;
@@ -822,9 +816,7 @@ condition_dialog_response(GtkWidget * dialog, gint response,
                           gpointer throwaway)
 {
     LibBalsaCondition *new_cnd;
-#if GTK_CHECK_VERSION(2, 14, 0) || HAVE_GNOME
     GError *err = NULL;
-#endif
 
     switch (response) {
     case GTK_RESPONSE_OK:       /* OK button */
@@ -880,13 +872,8 @@ condition_dialog_response(GtkWidget * dialog, gint response,
         gtk_widget_hide(dialog);
         break;
     case GTK_RESPONSE_HELP:     /* Help button */
-#if GTK_CHECK_VERSION(2, 14, 0) || HAVE_GNOME
-#if GTK_CHECK_VERSION(2, 14, 0)
         gtk_show_uri(NULL, "ghelp:balsa?win-condition",
                      gtk_get_current_event_time(), &err);
-#else                           /* GTK_CHECK_VERSION(2, 14, 0) */
-	gnome_help_display("balsa", "win-condition", &err);
-#endif                          /* GTK_CHECK_VERSION(2, 14, 0) */
 	if (err) {
 	    balsa_information_parented(GTK_WINDOW(dialog),
 		    LIBBALSA_INFORMATION_WARNING,
@@ -894,7 +881,6 @@ condition_dialog_response(GtkWidget * dialog, gint response,
 		    err->message);
 	    g_error_free(err);
 	}
-#endif
 	break;
     }
     gtk_widget_set_sensitive(fe_window, TRUE);
@@ -1450,9 +1436,7 @@ fe_dialog_response(GtkWidget * dialog, gint response, gpointer data)
         gtk_tree_view_get_model(fe_filters_list);
     GtkTreeIter iter;
     gboolean valid;
-#if GTK_CHECK_VERSION(2, 14, 0) || HAVE_GNOME
     GError *err = NULL;
-#endif
     
     switch (response) {
     case GTK_RESPONSE_OK:       /* OK button */
@@ -1491,13 +1475,8 @@ fe_dialog_response(GtkWidget * dialog, gint response, gpointer data)
         break;
 
     case GTK_RESPONSE_HELP:     /* Help button */
-#if GTK_CHECK_VERSION(2, 14, 0) || HAVE_GNOME
-#if GTK_CHECK_VERSION(2, 14, 0)
         gtk_show_uri(NULL, "ghelp:balsa?win-filters",
                      gtk_get_current_event_time(), &err);
-#else                           /* GTK_CHECK_VERSION(2, 14, 0) */
-	gnome_help_display("balsa", "win-filters", &err);
-#endif                          /* GTK_CHECK_VERSION(2, 14, 0) */
 	if (err) {
 	    balsa_information_parented(GTK_WINDOW(dialog),
 		    LIBBALSA_INFORMATION_WARNING,
@@ -1505,7 +1484,6 @@ fe_dialog_response(GtkWidget * dialog, gint response, gpointer data)
 		    err->message);
 	    g_error_free(err);
 	}
-#endif
 	break;
 
     default:

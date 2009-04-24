@@ -64,9 +64,7 @@ static void next_message_cb            (GtkAction * action, gpointer data);
 static void previous_message_cb        (GtkAction * action, gpointer data);
 static void next_unread_cb             (GtkAction * action, gpointer);
 static void next_flagged_cb            (GtkAction * action, gpointer);
-#ifdef HAVE_GTK_PRINT
 static void page_setup_cb              (GtkAction * action, gpointer data);
-#endif
 static void print_cb                   (GtkAction * action, gpointer);
 static void trash_cb                   (GtkAction * action, gpointer);
 #ifdef HAVE_GTKHTML
@@ -237,10 +235,8 @@ static const GtkActionEntry entries[] = {
     {"ViewMenu", NULL, N_("_View")},
     {"MoveMenu", NULL, N_("M_ove")},
     {"MessageMenu", NULL, N_("_Message")},
-#ifdef HAVE_GTK_PRINT
     {"PageSetup", NULL, N_("Page _Setup"), "<control>S",
      N_("Set up page for printing"), G_CALLBACK(page_setup_cb)},
-#endif                          /* HAVE_GTK_PRINT */
     {"Print", GTK_STOCK_PRINT, N_("_Print..."), "<control>P",
      N_("Print current message"), G_CALLBACK(print_cb)},
     {"Close", GTK_STOCK_CLOSE, N_("_Close"), "<control>W",
@@ -331,9 +327,7 @@ static const char *ui_description =
 "<ui>"
 "  <menubar name='MainMenu'>"
 "    <menu action='FileMenu'>"
-#ifdef HAVE_GTK_PRINT
 "      <menuitem action='PageSetup'/>"
-#endif                          /* HAVE_GTK_PRINT */
 "      <menuitem action='Print'/>"
 "      <separator/>"
 "      <menuitem action='Close'/>"
@@ -936,7 +930,6 @@ next_flagged_cb(GtkAction * action, gpointer data)
 }
 
 
-#ifdef HAVE_GTK_PRINT
 static void
 page_setup_cb(GtkAction * action, gpointer data)
 {
@@ -944,7 +937,6 @@ page_setup_cb(GtkAction * action, gpointer data)
 
     message_print_page_setup(GTK_WINDOW(mw->window));
 }
-#endif
 
 
 static void

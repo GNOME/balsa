@@ -2869,39 +2869,8 @@ mbox_model_get_value(GtkTreeModel *tree_model,
         g_value_set_uint(value, msgno);
         return;
     }
-    /* gtk2-2.3.5 can in principle do it  but we want to be sure.
-     */
     g_return_if_fail(msgno<=libbalsa_mailbox_total_messages(lmm));
-    /* With gtk-2.8.0, we can finally use fixed-row-height model
-       without workarounds. */
-#if GTK_CHECK_VERSION(2,8,0)
     msg = lbm_get_index_entry(lmm, (GNode *) iter->user_data);
-#else 
-    { GdkRectangle a, b, c, d; 
-    /* assumed that only one view is showing the mailbox */
-    GtkTreeView *tree = g_object_get_data(G_OBJECT(tree_model), "tree-view");
-
-    if (GTK_WIDGET_REALIZED(GTK_WIDGET(tree))) {
-        GtkTreePath *path;
-        GtkTreeViewColumn *col;
-
-        path = gtk_tree_model_get_path(tree_model, iter);
-        col = gtk_tree_view_get_column(tree, ((column == LB_MBOX_WEIGHT_COL
-                                               || column == LB_MBOX_STYLE_COL)
-                                              ? LB_MBOX_FROM_COL : column));
-        gtk_tree_view_get_visible_rect(tree, &a);
-        gtk_tree_view_get_cell_area(tree, path, col, &b);
-        gtk_tree_view_widget_to_tree_coords(tree, b.x, b.y, &c.x, &c.y);
-        gtk_tree_view_widget_to_tree_coords(tree, b.x + b.width,
-                                            b.y + b.height,
-                                            &c.width, &c.height);
-        c.width -= c.x; c.height -= c.y;
-        if (gdk_rectangle_intersect(&a, &c, &d))
-            msg = lbm_get_index_entry(lmm, (GNode *) iter->user_data);
-        gtk_tree_path_free(path);
-    }
-    }
-#endif
     switch(column) {
         /* case LB_MBOX_MSGNO_COL: handled above */
     case LB_MBOX_MARKED_COL:

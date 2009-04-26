@@ -39,6 +39,8 @@
 
 #include "mime-stream-shared.h"
 
+#include <unistd.h>
+
 #include <gmime/gmime-stream.h>
 #include <gmime/gmime-stream-filter.h>
 

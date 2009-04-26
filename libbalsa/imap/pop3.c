@@ -27,6 +27,7 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #if defined(USE_TLS)
 #include <openssl/ssl.h>

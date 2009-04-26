@@ -24,6 +24,7 @@
 #include "gmime-gpgme-context.h"
 
 #include <string.h>
+#include <unistd.h>
 #include <glib.h>
 #include <gmime/gmime.h>
 #include <gpgme.h>

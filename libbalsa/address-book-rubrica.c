@@ -38,6 +38,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <string.h>
+#include <unistd.h>
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 #include "libbalsa-conf.h"

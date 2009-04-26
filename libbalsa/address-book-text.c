@@ -34,6 +34,7 @@
 
 #include <sys/stat.h>
 #include <string.h>
+#include <unistd.h>
 
 #include "abook-completion.h"
 #include "libbalsa-conf.h"

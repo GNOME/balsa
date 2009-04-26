@@ -30,7 +30,7 @@
   <maintainer>
     <foaf:Person>
       <foaf:name>Balsa Maintainer</foaf:name>
-      <foaf:mbox rdf:resource="balsa-maint@theochem.kth.se" />
+      <foaf:mbox rdf:resource="mailto:balsa-maint@theochem.kth.se" />
       <gnome:userid>pawels</gnome:userid>
     </foaf:Person>
   </maintainer>

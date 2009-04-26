@@ -622,6 +622,8 @@ create_book(AddressBookConfig * abc)
         if (load != NULL && save != NULL)
             address_book =
                 libbalsa_address_book_externq_new(name, load, save);
+        g_free(load);
+        g_free(save);
     } else if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_LDIF) {
         gchar *path =
             gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(abc->window));

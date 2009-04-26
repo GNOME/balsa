@@ -977,13 +977,12 @@ mailbox_conf_add(MailboxConfWindow * mcw)
     if ( LIBBALSA_IS_MAILBOX_LOCAL(mcw->mailbox) ) {
 	LibBalsaMailboxLocal *ml  = LIBBALSA_MAILBOX_LOCAL(mcw->mailbox);
 	gchar *path;
-	int res;
 
         path =
             gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(mcw->window));
-	res = libbalsa_mailbox_local_set_path(ml, path, TRUE);
 
-	if( res != 0) {
+        if (libbalsa_mailbox_local_set_path(ml, path, TRUE) != 0) {
+            g_free(path);
 	    g_object_unref(G_OBJECT(mcw->mailbox));
 	    mcw->mailbox = NULL;
 	    return;
@@ -994,6 +993,8 @@ mailbox_conf_add(MailboxConfWindow * mcw)
                                         balsa_app.local_mail_directory);
         printf("Save to config: %d\n", save_to_config);
 	mcw->mailbox->name = g_path_get_basename(path);
+        g_free(path);
+
 	balsa_mailbox_local_append(mcw->mailbox);
     }
     mbnode = balsa_mailbox_node_new_from_mailbox(mcw->mailbox);

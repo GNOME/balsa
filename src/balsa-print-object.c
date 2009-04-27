@@ -107,6 +107,7 @@ balsa_print_object_emb_message(GList * list, GtkPrintContext * context,
 }
 
 
+#ifdef HAVE_GPGME
 static GList *
 balsa_print_object_mp_crypto(GList * list, GtkPrintContext * context,
                                LibBalsaMessageBody * mime_body,
@@ -114,6 +115,7 @@ balsa_print_object_mp_crypto(GList * list, GtkPrintContext * context,
 {
     return balsa_print_object_header_crypto(list, context, mime_body, NULL, psetup);
 }
+#endif                          /* HAVE_GPGME */
 
 
 GList *

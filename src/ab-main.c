@@ -1153,7 +1153,7 @@ main(int argc, char *argv[])
     LIBBALSA_TYPE_ADDRESS_BOOK_RUBRICA;
 #endif /* HAVE_RUBRICA */
     libbalsa_real_information_func = (LibBalsaInformationFunc)information_real;
-    g_mime_init(0);
+    g_mime_init(GMIME_ENABLE_RFC2047_WORKAROUNDS);
 
     /* load address book data */
     libbalsa_conf_push_group("Globals");

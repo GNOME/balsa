@@ -102,7 +102,7 @@ libbalsa_init(LibBalsaInformationFunc information_callback)
 
     libbalsa_real_information_func = information_callback;
 
-    g_mime_init(0);
+    g_mime_init(GMIME_ENABLE_RFC2047_WORKAROUNDS);
 
     GMIME_TYPE_DATA_WRAPPER;
     GMIME_TYPE_FILTER;

@@ -1,3 +1,12 @@
+2009-04-29  Peter Bloomfield
+
+	* libbalsa/mailbox.h: new member sort_field_prev in
+	LibBalsaMailboxView.
+	* libbalsa/mailbox.c (libbalsa_mailbox_set_sort_field,
+	mbox_compare_func, mbox_set_sort_column_id): use it to save
+	previous sort_field, and to resolve ties wrt current
+	sort_field--work around for lack of a stable mailbox sort.
+
 2009-04-23  Peter Bloomfield
 
 	bump version to 2.4.0, and require GMime-2.4, GLib-2.16, and

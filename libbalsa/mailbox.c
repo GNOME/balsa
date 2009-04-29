@@ -2134,6 +2134,7 @@ static LibBalsaMailboxView libbalsa_mailbox_view_default = {
     0,				/* filter               */
     LB_MAILBOX_SORT_TYPE_ASC,	/* sort_type            */
     LB_MAILBOX_SORT_NO,         /* sort_field           */
+    LB_MAILBOX_SORT_NO,         /* sort_field_prev      */
     LB_MAILBOX_SHOW_UNSET,	/* show                 */
     LB_MAILBOX_SUBSCRIBE_UNSET,	/* subscribe            */
     0,				/* exposed              */
@@ -2247,6 +2248,7 @@ libbalsa_mailbox_set_sort_field(LibBalsaMailbox * mailbox,
     LibBalsaMailboxView *view = lbm_get_view(mailbox);
 
     if (!view->frozen && view->sort_field != sort_field) {
+	view->sort_field_prev = view->sort_field;
 	view->sort_field = sort_field;
 	if (mailbox)
 	    view->in_sync = 0;
@@ -3273,6 +3275,27 @@ mbox_compare_func(const SortTuple * a,
 	    retval = 0;
 	    break;
 	}
+
+        if (retval == 0) {
+            /* resolve ties using previous sort column */
+            switch (mbox->view->sort_field_prev) {
+            case LB_MAILBOX_SORT_SENDER:
+                retval = mbox_compare_from(message_a, message_b);
+                break;
+            case LB_MAILBOX_SORT_SUBJECT:
+                retval = mbox_compare_subject(message_a, message_b);
+                break;
+            case LB_MAILBOX_SORT_DATE:
+                retval = mbox_compare_date(message_a, message_b);
+                break;
+            case LB_MAILBOX_SORT_SIZE:
+                retval = mbox_compare_size(message_a, message_b);
+                break;
+            default:
+                retval = 0;
+                break;
+            }
+        }
     }
 
     if (mbox->view->sort_type == LB_MAILBOX_SORT_TYPE_DESC) {
@@ -3481,7 +3504,10 @@ mbox_set_sort_column_id(GtkTreeSortable * sortable,
     if (view->sort_field == new_field && view->sort_type == new_type)
         return;
 
-    view->sort_field = new_field;
+    if (view->sort_field != new_field) {
+        view->sort_field_prev = view->sort_field;
+        view->sort_field = new_field;
+    }
     view->sort_type = new_type;
     view->in_sync = 0;
 

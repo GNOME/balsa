@@ -174,6 +174,7 @@ struct _LibBalsaMailboxView {
     int      filter; 
     LibBalsaMailboxSortType      sort_type;
     LibBalsaMailboxSortFields    sort_field;
+    LibBalsaMailboxSortFields    sort_field_prev;
     LibBalsaMailboxShow          show;
     LibBalsaMailboxSubscribe     subscribe;
     gboolean exposed;

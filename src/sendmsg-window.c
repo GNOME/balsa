@@ -5506,7 +5506,15 @@ bsmsg2message(BalsaSendmsg * bsmsg)
     sw_buffer_set_undo(bsmsg, FALSE, FALSE);
 #endif                          /* HAVE_GTKSOURCEVIEW */
 
-    body->charset = g_strdup(sw_required_charset(bsmsg, body->buffer));
+    /* Ildar reports that, when a message contains both text/plain and
+     * text/html parts, some broken MUAs use the charset from the
+     * text/plain part to display the text/html part; the latter is
+     * encoded as UTF-8 by add_mime_body_plain (send.c), so we'll use
+     * the same encoding for the text/plain part.
+     * http://bugzilla.gnome.org/show_bug.cgi?id=580704 */
+    body->charset =
+        g_strdup(bsmsg->send_mp_alt ?
+                 "UTF-8" : sw_required_charset(bsmsg, body->buffer));
     libbalsa_message_append_part(message, body);
 
     /* add attachments */

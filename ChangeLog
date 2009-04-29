@@ -1,3 +1,8 @@
+2009-04-29  Ildar Mulyukov
+
+	* balsa.desktop.in: respect
+	http://standards.freedesktop.org/menu-spec/latest/apa.html
+
 2009-04-29  Peter Bloomfield
 
 	* libbalsa/mailbox.h: new member sort_field_prev in

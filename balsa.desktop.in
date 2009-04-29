@@ -1,5 +1,4 @@
 [Desktop Entry]
-Encoding=UTF-8
 _Name=Balsa
 _Comment=E-Mail utility
 TryExec=balsa
@@ -8,4 +7,4 @@ Icon=gnome-balsa2
 Terminal=false
 Type=Application
 StartupNotify=true
-Categories=GNOME;Application;Network;
+Categories=GNOME;Network;Email;

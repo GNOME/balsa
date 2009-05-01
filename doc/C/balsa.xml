@@ -537,6 +537,18 @@ This is version 2.721 of the Balsa manual.
 	</para>
       </listitem>
 
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <guimenu>Edit</guimenu>
+	    <guimenuitem>Preferences...</guimenuitem>
+	  </menuchoice> &mdash; 
+		  
+	  Open the <link linkend="preferences">Preferences</link>
+	  window to change the settings of &Balsa;.
+	</para>
+      </listitem>
+
     </itemizedlist>
 
   </listitem>
@@ -1090,18 +1102,6 @@ This is version 2.721 of the Balsa manual.
     <para>Menu for changing &Balsa;'s configuration.</para>
 
     <itemizedlist>
-      <listitem>
-	<para>
-	  <menuchoice>
-	    <guimenu>Settings</guimenu>
-	    <guimenuitem>Preferences...</guimenuitem>
-	  </menuchoice> &mdash; 
-		  
-	  Open the <link linkend="preferences">Preferences</link>
-	  window to change the settings of &Balsa;.
-	</para>
-      </listitem>
-
       <listitem>
 	<para>
 	  <menuchoice>
@@ -2360,7 +2360,7 @@ This is version 2.721 of the Balsa manual.
   linkend="glossary-druid">Druid</glossterm> reveals.  To access the
   Preferences window, select
   <menuchoice>
-      <guimenu>Settings</guimenu> <guimenuitem>Preferences</guimenuitem>
+      <guimenu>Edit</guimenu> <guimenuitem>Preferences</guimenuitem>
   </menuchoice>.
   In the Preferences window, options are organized into groups,
   and related groups are shown on individual pages.

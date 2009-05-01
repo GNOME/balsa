@@ -1,5 +1,9 @@
 2009-04-30  Peter Bloomfield
 
+	* C/balsa.xml: Update copyright and fix title.
+
+2009-04-30  Peter Bloomfield
+
 	* C/balsa.xml: Preferences moved from the Settings menu to the
 	Edit menu.
 

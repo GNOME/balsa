@@ -1912,7 +1912,6 @@ static gboolean
 config_filter_load(const gchar * key, const gchar * value, gpointer data)
 {
     char *endptr;
-    guint *save = data;
     LibBalsaFilter *fil;
     long int dummy;
 
@@ -1925,20 +1924,6 @@ config_filter_load(const gchar * key, const gchar * value, gpointer data)
     libbalsa_conf_push_group(key);
 
     fil = libbalsa_filter_new_from_config();
-    if (!fil->condition) {
-        /* Try pre-2.1 style: */
-        FilterOpType op = libbalsa_conf_get_int("Operation");
-        ConditionMatchType cmt =
-            op == FILTER_OP_OR ? CONDITION_OR : CONDITION_AND;
-        fil->condition = libbalsa_condition_new_2_0(key, cmt);
-        if (fil->condition) {
-            if (fil->action > FILTER_TRASH)
-                /* Some 2.0.x versions had a new action code which
-                 * changed the value of FILTER_TRASH. */
-                fil->action = FILTER_TRASH;
-            ++*save;
-        }
-    }
     if (!fil->condition) {
         g_idle_add((GSourceFunc) config_warning_idle,
                    _("Filter with no condition was omitted"));
@@ -1956,14 +1941,9 @@ config_filter_load(const gchar * key, const gchar * value, gpointer data)
 static void
 config_filters_load(void)
 {
-    guint save = 0;
-
     filter_errno = FILTER_NOERR;
     libbalsa_conf_foreach_group(FILTER_SECTION_PREFIX,
-                                config_filter_load, &save);
-
-    if (save)
-        config_filters_save();
+                                config_filter_load, NULL);
 }
 
 #define FILTER_SECTION_MAX "9999"

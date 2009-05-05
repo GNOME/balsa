@@ -208,8 +208,10 @@ fr_apply_selected_pressed_func(GtkTreeModel * model, GtkTreePath * path,
 
     gtk_tree_model_get(model, iter, DATA_COLUMN, &fil, -1);
     /* Check for move to self: */
-    if (fil->action == FILTER_RUN || fil->action == FILTER_TRASH ||
-        strcmp(fil->action_string, p->mbox->url) != 0)
+    if (fil->action == FILTER_RUN
+        || fil->action == FILTER_TRASH
+        || (fil->action == FILTER_COLOR && fil->action_string[0])
+        || strcmp(fil->action_string, p->mbox->url) != 0)
         p->filters = g_slist_append(p->filters, fil);
 }
 
@@ -266,8 +268,10 @@ fr_add_pressed_func(GtkTreeModel * model, GtkTreePath * path,
     LibBalsaFilter *fil;
 
     gtk_tree_model_get(model, iter, DATA_COLUMN, &fil, -1);
-    if (fil->action == FILTER_RUN || fil->action == FILTER_TRASH ||
-        strcmp(fil->action_string, p->mbox->url) != 0) {
+    if (fil->action == FILTER_RUN
+        || fil->action == FILTER_TRASH
+        || (fil->action == FILTER_COLOR && fil->action_string[0])
+        || strcmp(fil->action_string, p->mbox->url) != 0) {
         /* Ok we can add the filter to this mailbox, there is no recursion problem */
         LibBalsaMailboxFilter *mf = g_new(LibBalsaMailboxFilter, 1);
         GtkTreeModel *sel_model =

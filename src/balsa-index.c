@@ -291,10 +291,14 @@ bndx_instance_init(BalsaIndex * index)
     
     /* Index column */
     renderer = gtk_cell_renderer_text_new();
-    column =
-        gtk_tree_view_column_new_with_attributes("#", renderer,
-                                                 "text", LB_MBOX_MSGNO_COL,
-                                                 NULL);
+    column = gtk_tree_view_column_new_with_attributes
+        ("#", renderer,
+         "text",           LB_MBOX_MSGNO_COL,
+         "foreground",     LB_MBOX_FOREGROUND_COL,
+         "foreground-set", LB_MBOX_FOREGROUND_SET_COL,
+         "background",     LB_MBOX_BACKGROUND_COL,
+         "background-set", LB_MBOX_BACKGROUND_SET_COL,
+         NULL);
     g_object_set(renderer, "xalign", 1.0, NULL);
     set_sizing(column); gtk_tree_view_append_column(tree_view, column);
     bi_apply_other_column_settings(column, TRUE, LB_MBOX_MSGNO_COL);
@@ -302,31 +306,39 @@ bndx_instance_init(BalsaIndex * index)
     /* Status icon column */
     renderer = gtk_cell_renderer_pixbuf_new();
     gtk_cell_renderer_set_fixed_size(renderer, icon_w, icon_h);
-    column =
-        gtk_tree_view_column_new_with_attributes("S", renderer,
-                                                 "pixbuf", LB_MBOX_MARKED_COL,
-                                                 NULL);
+    column = gtk_tree_view_column_new_with_attributes
+        ("S", renderer,
+         "pixbuf",              LB_MBOX_MARKED_COL,
+         "cell-background",     LB_MBOX_BACKGROUND_COL,
+         "cell-background-set", LB_MBOX_BACKGROUND_SET_COL,
+         NULL);
     set_sizing(column); gtk_tree_view_append_column(tree_view, column);
     bi_apply_other_column_settings(column, FALSE, 0);
 
     /* Attachment icon column */
     renderer = gtk_cell_renderer_pixbuf_new();
     gtk_cell_renderer_set_fixed_size(renderer, icon_w, icon_h);
-    column =
-        gtk_tree_view_column_new_with_attributes("A", renderer,
-                                                 "pixbuf", LB_MBOX_ATTACH_COL,
-                                                 NULL);
+    column = gtk_tree_view_column_new_with_attributes
+        ("A", renderer,
+         "pixbuf",              LB_MBOX_ATTACH_COL,
+         "cell-background",     LB_MBOX_BACKGROUND_COL,
+         "cell-background-set", LB_MBOX_BACKGROUND_SET_COL,
+         NULL);
     set_sizing(column); gtk_tree_view_append_column(tree_view, column);
     bi_apply_other_column_settings(column, FALSE, 0);
 
     /* From/To column */
     renderer = gtk_cell_renderer_text_new();
-    column = 
-        gtk_tree_view_column_new_with_attributes(_("From"), renderer,
-                                                 "text", LB_MBOX_FROM_COL,
-						 "weight", LB_MBOX_WEIGHT_COL,
-						 "style", LB_MBOX_STYLE_COL,
-                                                 NULL);
+    column = gtk_tree_view_column_new_with_attributes
+        (_("From"), renderer,
+         "text",           LB_MBOX_FROM_COL,
+         "weight",         LB_MBOX_WEIGHT_COL,
+         "style",          LB_MBOX_STYLE_COL,
+         "foreground",     LB_MBOX_FOREGROUND_COL,
+         "foreground-set", LB_MBOX_FOREGROUND_SET_COL,
+         "background",     LB_MBOX_BACKGROUND_COL,
+         "background-set", LB_MBOX_BACKGROUND_SET_COL,
+         NULL);
     gtk_tree_view_column_set_resizable(column, TRUE);
     gtk_tree_view_column_set_sizing(column, GTK_TREE_VIEW_COLUMN_FIXED);
     gtk_tree_view_append_column(tree_view, column);
@@ -334,12 +346,16 @@ bndx_instance_init(BalsaIndex * index)
 
     /* Subject column--contains tree expanders */
     renderer = gtk_cell_renderer_text_new();
-    column = 
-        gtk_tree_view_column_new_with_attributes(_("Subject"), renderer,
-                                                 "text", LB_MBOX_SUBJECT_COL,
-						 "weight", LB_MBOX_WEIGHT_COL,
-						 "style", LB_MBOX_STYLE_COL,
-                                                 NULL);
+    column = gtk_tree_view_column_new_with_attributes
+        (_("Subject"), renderer,
+         "text",           LB_MBOX_SUBJECT_COL,
+         "weight",         LB_MBOX_WEIGHT_COL,
+         "style",          LB_MBOX_STYLE_COL,
+         "foreground",     LB_MBOX_FOREGROUND_COL,
+         "foreground-set", LB_MBOX_FOREGROUND_SET_COL,
+         "background",     LB_MBOX_BACKGROUND_COL,
+         "background-set", LB_MBOX_BACKGROUND_SET_COL,
+         NULL);
     gtk_tree_view_column_set_resizable(column, TRUE);
     gtk_tree_view_column_set_sizing(column, GTK_TREE_VIEW_COLUMN_FIXED);
     gtk_tree_view_append_column(tree_view, column);
@@ -348,12 +364,16 @@ bndx_instance_init(BalsaIndex * index)
 
     /* Date column */
     renderer = gtk_cell_renderer_text_new();
-    column = 
-        gtk_tree_view_column_new_with_attributes(_("Date"), renderer,
-                                                 "text", LB_MBOX_DATE_COL,
-						 "weight", LB_MBOX_WEIGHT_COL,
-						 "style", LB_MBOX_STYLE_COL,
-                                                 NULL);
+    column = gtk_tree_view_column_new_with_attributes
+        (_("Date"), renderer,
+         "text",           LB_MBOX_DATE_COL,
+         "weight",         LB_MBOX_WEIGHT_COL,
+         "style",          LB_MBOX_STYLE_COL,
+         "foreground",     LB_MBOX_FOREGROUND_COL,
+         "foreground-set", LB_MBOX_FOREGROUND_SET_COL,
+         "background",     LB_MBOX_BACKGROUND_COL,
+         "background-set", LB_MBOX_BACKGROUND_SET_COL,
+         NULL);
     gtk_tree_view_column_set_resizable(column, TRUE);
     gtk_tree_view_column_set_sizing(column, GTK_TREE_VIEW_COLUMN_FIXED);
     gtk_tree_view_append_column(tree_view, column);
@@ -365,11 +385,16 @@ bndx_instance_init(BalsaIndex * index)
     renderer = gtk_cell_renderer_text_new();
     g_object_set(renderer, "xalign", 1.0, NULL);
     gtk_tree_view_column_pack_start(column, renderer, FALSE);
-    gtk_tree_view_column_set_attributes(column, renderer,
-                                        "text", LB_MBOX_SIZE_COL,
-					"weight", LB_MBOX_WEIGHT_COL,
-					"style", LB_MBOX_STYLE_COL,
-                                        NULL);
+    gtk_tree_view_column_set_attributes
+        (column, renderer,
+         "text",           LB_MBOX_SIZE_COL,
+         "weight",         LB_MBOX_WEIGHT_COL,
+         "style",          LB_MBOX_STYLE_COL,
+         "foreground",     LB_MBOX_FOREGROUND_COL,
+         "foreground-set", LB_MBOX_FOREGROUND_SET_COL,
+         "background",     LB_MBOX_BACKGROUND_COL,
+         "background-set", LB_MBOX_BACKGROUND_SET_COL,
+         NULL);
     set_sizing(column); gtk_tree_view_append_column(tree_view, column);
     bi_apply_other_column_settings(column, TRUE, LB_MBOX_SIZE_COL);
 

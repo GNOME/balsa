@@ -356,6 +356,10 @@ lbm_index_entry_populate_from_msg(LibBalsaMailboxIndexEntry * entry,
     entry->status_icon   = libbalsa_get_icon_from_flags(msg->flags);
     entry->attach_icon   = libbalsa_message_get_attach_icon(msg);
     entry->size          = msg->length;
+    entry->foreground     = NULL;
+    entry->background     = NULL;
+    entry->foreground_set = 0;
+    entry->background_set = 0;
     entry->unseen        = LIBBALSA_MESSAGE_IS_UNREAD(msg);
 #ifdef BALSA_USE_THREADS
     entry->idle_pending  = 0;
@@ -2604,6 +2608,11 @@ mbox_model_init(GtkTreeModelIface *iface)
     mbox_model_col_type[LB_MBOX_SIZE_COL]    = G_TYPE_STRING;
     mbox_model_col_type[LB_MBOX_WEIGHT_COL]  = G_TYPE_UINT;
     mbox_model_col_type[LB_MBOX_STYLE_COL]   = G_TYPE_UINT;
+    mbox_model_col_type[LB_MBOX_FOREGROUND_COL]     = G_TYPE_STRING;
+    mbox_model_col_type[LB_MBOX_FOREGROUND_SET_COL] = G_TYPE_UINT;
+    mbox_model_col_type[LB_MBOX_BACKGROUND_COL]     = G_TYPE_STRING;
+    mbox_model_col_type[LB_MBOX_BACKGROUND_SET_COL] = G_TYPE_UINT;
+
 
     libbalsa_mbox_model_signals[ROW_CHANGED] =
         g_signal_lookup("row-changed",           GTK_TYPE_TREE_MODEL);
@@ -2918,6 +2927,24 @@ mbox_model_get_value(GtkTreeModel *tree_model,
 			 lbm_node_has_unseen_child(lmm,
 						   (GNode *) iter->user_data)
                          ? PANGO_STYLE_OBLIQUE : PANGO_STYLE_NORMAL);
+        break;
+    case LB_MBOX_FOREGROUND_COL:
+        if(msg) {
+            tmp = g_strdup(msg->foreground);
+            g_value_take_string(value, tmp);
+        }
+        break;
+    case LB_MBOX_FOREGROUND_SET_COL:
+        g_value_set_uint(value, msg && msg->foreground_set);
+        break;
+    case LB_MBOX_BACKGROUND_COL:
+        if(msg) {
+            tmp = g_strdup(msg->background);
+            g_value_take_string(value, tmp);
+        }
+        break;
+    case LB_MBOX_BACKGROUND_SET_COL:
+        g_value_set_uint(value, msg && msg->background_set);
         break;
     }
 }
@@ -4249,4 +4276,48 @@ libbalsa_mailbox_cache_message(LibBalsaMailbox * mailbox, guint msgno,
     g_return_if_fail(LIBBALSA_IS_MESSAGE(message));
 
     lbm_cache_message(mailbox, msgno, message);
+}
+
+static void
+lbm_set_color(LibBalsaMailbox * mailbox, GArray * msgnos,
+              const gchar * color, gboolean foreground)
+{
+    guint i;
+
+    for (i = 0; i < msgnos->len; i++) {
+        guint msgno = g_array_index(msgnos, guint, i);
+        LibBalsaMailboxIndexEntry *entry;
+
+        if (msgno > mailbox->mindex->len)
+            return;
+
+        entry = g_ptr_array_index(mailbox->mindex, msgno - 1);
+        if (!entry)
+            entry = g_ptr_array_index(mailbox->mindex, msgno - 1) =
+                g_new0(LibBalsaMailboxIndexEntry, 1);
+
+        if (foreground) {
+            g_free(entry->foreground);
+            entry->foreground = g_strdup(color);
+            entry->foreground_set = TRUE;
+        } else {
+            g_free(entry->background);
+            entry->background = g_strdup(color);
+            entry->background_set = TRUE;
+        }
+    }
+}
+
+void
+libbalsa_mailbox_set_foreground(LibBalsaMailbox * mailbox, GArray * msgnos,
+                                const gchar * color)
+{
+    lbm_set_color(mailbox, msgnos, color, TRUE);
+}
+
+void
+libbalsa_mailbox_set_background(LibBalsaMailbox * mailbox, GArray * msgnos,
+                                const gchar * color)
+{
+    lbm_set_color(mailbox, msgnos, color, FALSE);
 }

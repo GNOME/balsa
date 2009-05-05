@@ -121,8 +121,18 @@ extern GtkWidget *fe_popup_entry;
 /* action field */
 extern GtkWidget *fe_action_option_menu;
 
+/* action list */
+extern option_list fe_actions[];
+
 /* Mailboxes option menu */
 extern GtkWidget * fe_mailboxes;
+
+/* Colorize widgets */
+extern GtkWidget * fe_color_buttons;
+extern GtkWidget * fe_foreground_set;
+extern GtkWidget * fe_foreground;
+extern GtkWidget * fe_background_set;
+extern GtkWidget * fe_background;
 
 /* Different buttons that need to be greyed or ungreyed */
 extern GtkWidget * fe_new_button;
@@ -1502,8 +1512,15 @@ fe_action_selected(GtkWidget * widget, gpointer data)
 {
     FilterActionType type =
         (FilterActionType) fe_combo_box_get_value(widget);
-    gtk_widget_set_sensitive(GTK_WIDGET(fe_mailboxes),
-                             type != FILTER_TRASH);
+    if (type == FILTER_COLOR) {
+        gtk_widget_hide(fe_mailboxes);
+        gtk_widget_show_all(fe_color_buttons);
+    } else {
+        gtk_widget_hide(fe_color_buttons);
+        gtk_widget_show(fe_mailboxes);
+        gtk_widget_set_sensitive(GTK_WIDGET(fe_mailboxes),
+                                 type != FILTER_TRASH);
+    }
     set_button_sensitivities(TRUE);
 }                       /* end fe_action_selected() */
 
@@ -1870,7 +1887,36 @@ fe_apply_pressed(GtkWidget * widget, gpointer data)
 
     fil->action=action;
 
-    if (fil->action!=FILTER_TRASH)
+    if (fil->action == FILTER_COLOR) {
+        GdkColor color;
+        GString *string = g_string_new(NULL);
+        GtkToggleButton *toggle_button;
+        gchar *color_string;
+
+        toggle_button = (GTK_TOGGLE_BUTTON(fe_foreground_set));
+        if (gtk_toggle_button_get_active(toggle_button)) {
+            gtk_color_button_get_color(GTK_COLOR_BUTTON(fe_foreground),
+                                       &color);
+            color_string = gdk_color_to_string(&color);
+            g_string_append_printf(string, "foreground:%s", color_string);
+            g_free(color_string);
+            gtk_toggle_button_set_active(toggle_button, FALSE);
+        }
+
+        toggle_button = (GTK_TOGGLE_BUTTON(fe_background_set));
+        if (gtk_toggle_button_get_active(toggle_button)) {
+            gtk_color_button_get_color(GTK_COLOR_BUTTON(fe_background),
+                                       &color);
+            color_string = gdk_color_to_string(&color);
+            if (string->len > 0)
+                g_string_append_c(string, ';');
+            g_string_append_printf(string, "background:%s", color_string);
+            g_free(color_string);
+            gtk_toggle_button_set_active(toggle_button, FALSE);
+        }
+
+        fil->action_string = g_string_free(string, FALSE);
+    } else if (fil->action!=FILTER_TRASH)
         fil->action_string=g_strdup(balsa_mblist_mru_option_menu_get(fe_mailboxes));
     if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fe_popup_button))) {
         static gchar defstring[] = N_("Filter has matched");
@@ -1971,7 +2017,7 @@ fe_filters_list_selection_changed(GtkTreeSelection * selection,
     GtkTreeModel *model;
     GtkTreeIter iter;
     LibBalsaFilter* fil;
-    int pos;
+    int pos, i;
 
     if (!gtk_tree_selection_get_selected(selection, &model, &iter)) {
         if (gtk_tree_model_iter_n_children(model, NULL) == 0)
@@ -1994,12 +2040,36 @@ fe_filters_list_selection_changed(GtkTreeSelection * selection,
         gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(fe_sound_entry),
                                       fil->sound);
     
-    gtk_combo_box_set_active(GTK_COMBO_BOX(fe_action_option_menu),
-                             fil->action - 1);
+    for (i = 0; i < FILTER_N_TYPES - 1; i++)
+        if (((FilterActionType) fe_actions[i].value) == fil->action)
+            gtk_combo_box_set_active(GTK_COMBO_BOX(fe_action_option_menu),
+                                     i);
     pos = (fil->condition
            && fil->condition->type == CONDITION_AND) ? 1 : 0;
     gtk_combo_box_set_active(GTK_COMBO_BOX(fe_op_codes_option_menu), pos);
-    if (fil->action!=FILTER_TRASH && fil->action_string)
+    if (fil->action == FILTER_COLOR) {
+        gchar **parts, **p;
+        GdkColor color;
+
+        parts = g_strsplit(fil->action_string, ";", 2);
+        for (p = parts; *p; p++) {
+            if (g_str_has_prefix(*p, "foreground:")) {
+                gdk_color_parse((*p) + 11, &color);
+                gtk_color_button_set_color(GTK_COLOR_BUTTON(fe_foreground),
+                                           &color);
+                gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
+                                             (fe_foreground_set), TRUE);
+            }
+            if (g_str_has_prefix(*p, "background:")) {
+                gdk_color_parse((*p) + 11, &color);
+                gtk_color_button_set_color(GTK_COLOR_BUTTON(fe_background),
+                                           &color);
+                gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
+                                             (fe_background_set), TRUE);
+            }
+        }
+        g_strfreev(parts);
+    } else if (fil->action!=FILTER_TRASH && fil->action_string)
         balsa_mblist_mru_option_menu_set(fe_mailboxes,
                                          fil->action_string);
     /* We free the conditions */
@@ -2061,4 +2131,21 @@ fe_sound_response(GtkDialog * dialog, gint response)
 {
     if (response == GTK_RESPONSE_ACCEPT)
         set_button_sensitivities(TRUE);
+}
+
+/* Callback for color check-buttons' "toggled" signal */
+void
+fe_color_check_toggled(GtkToggleButton * check_button, gpointer data)
+{
+    GtkWidget *color_button = GTK_WIDGET(data);
+    gtk_widget_set_sensitive(color_button,
+                             gtk_toggle_button_get_active(check_button));
+    set_button_sensitivities(TRUE);
+}
+
+/* Callback for color buttons' "color-set" signal */
+void
+fe_color_set(GtkColorButton * color_button, gpointer data)
+{
+    set_button_sensitivities(TRUE);
 }

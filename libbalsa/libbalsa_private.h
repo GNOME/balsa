@@ -30,7 +30,7 @@
 #include <unistd.h>
 
 /* LibBalsaMailboxEntry handling code which is to be used for message
- * intex caching.  Mailbox index entry used for caching (almost) all
+ * index caching.  Mailbox index entry used for caching (almost) all
  * columns provided by GtkTreeModel interface. Size matters. */
 struct LibBalsaMailboxIndexEntry_ {
     gchar *from;
@@ -40,6 +40,10 @@ struct LibBalsaMailboxIndexEntry_ {
     unsigned short status_icon;
     unsigned short attach_icon;
     unsigned long size;
+    gchar *foreground;
+    gchar *background;
+    unsigned foreground_set:1;
+    unsigned background_set:1;
     unsigned unseen:1;
 #ifdef BALSA_USE_THREADS
     unsigned idle_pending:1;

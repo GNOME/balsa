@@ -1,3 +1,32 @@
+2009-05-04  Peter Bloomfield
+
+	Add filter for colorizing messages
+
+	* libbalsa/filter.h: add FILTER_COLOR to FilterActionType enum,
+	and FILTER_N_TYPES sentinel.
+	* libbalsa/filter.c (libbalsa_filter_mailbox_messages): act on
+	it.
+	* libbalsa/libbalsa_private.h: add color members to
+	LibBalsaMailboxIndexEntry.
+	* libbalsa/mailbox.h: new methods to set color; expand
+	LibBalsaMailboxColumn enum.
+	* libbalsa/mailbox.c (lbm_index_entry_populate_from_msg),
+	(mbox_model_init), (mbox_model_get_value), (lbm_set_color),
+	(libbalsa_mailbox_set_foreground),
+	(libbalsa_mailbox_set_background): implement them.
+	* src/balsa-index.c (bndx_instance_init): set color in all
+	columns.
+	* src/filter-edit-callbacks.c (fe_action_selected),
+	(fe_apply_pressed), (fe_filters_list_selection_changed),
+	(fe_color_check_toggled), (fe_color_set):
+	* src/filter-edit-dialog.c (fe_make_color_buttons),
+	(build_action_page): add option to choose colors.
+	* src/filter-edit.h: new callbacks.
+	* src/filter-run-callbacks.c (fr_apply_selected_pressed_func),
+	(fr_add_pressed_func): ditto.
+	* src/save-restore.c (config_filter_load),
+	(config_filters_load): scrap broken pre-2.1 compatibility code.
+
 2009-04-29  Ildar Mulyukov
 
 	* balsa.desktop.in: respect

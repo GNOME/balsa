@@ -145,7 +145,9 @@ typedef enum {
     FILTER_MOVE,
     FILTER_PRINT,
     FILTER_RUN,
-    FILTER_TRASH              /* Must be the last one */
+    FILTER_TRASH,
+    FILTER_COLOR,
+    FILTER_N_TYPES
 } FilterActionType;
 
 /*

@@ -249,6 +249,7 @@ libbalsa_filter_mailbox_messages(LibBalsaFilter * filt,
     gboolean result=FALSE;
     LibBalsaMailbox *mbox;
     GError *err = NULL;
+    gchar **parts, **p;
 
     if (msgnos->len == 0)
 	return FALSE;
@@ -301,6 +302,18 @@ libbalsa_filter_mailbox_messages(LibBalsaFilter * filt,
 	else if (mbox == filters_trash_mbox)
 	    result = TRUE;
 	break;
+    case FILTER_COLOR:
+        parts = g_strsplit(filt->action_string, ";", 2);
+        for (p = parts; *p; p++) {
+            if (g_str_has_prefix(*p, "foreground:"))
+                libbalsa_mailbox_set_foreground(mailbox, msgnos,
+                                                (*p) + 11);
+            if (g_str_has_prefix(*p, "background:"))
+                libbalsa_mailbox_set_background(mailbox, msgnos,
+                                                (*p) + 11);
+        }
+        g_strfreev(parts);
+        break;
     case FILTER_PRINT:
 	/* FIXME : to be implemented */
 	break;
@@ -308,6 +321,7 @@ libbalsa_filter_mailbox_messages(LibBalsaFilter * filt,
 	/* FIXME : to be implemented */
 	break;
     case FILTER_NOTHING:
+    case FILTER_N_TYPES:
 	/* Nothing to do */
 	break;
     }

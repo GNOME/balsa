@@ -653,6 +653,12 @@ void libbalsa_mailbox_msgno_update_attach(LibBalsaMailbox * mailbox,
 void libbalsa_mailbox_cache_message(LibBalsaMailbox * mailbox, guint msgno,
                                     LibBalsaMessage * message);
 
+/* Set the foreground and background colors of an array of messages */
+void libbalsa_mailbox_set_foreground(LibBalsaMailbox * mailbox,
+                                     GArray * msgnos, const gchar * color);
+void libbalsa_mailbox_set_background(LibBalsaMailbox * mailbox,
+                                     GArray * msgnos, const gchar * color);
+
 #if BALSA_USE_THREADS
 
 /* Lock and unlock the mail store--currently, a no-op except for mbox.
@@ -678,6 +684,10 @@ typedef enum {
     LB_MBOX_SIZE_COL,
     LB_MBOX_WEIGHT_COL,
     LB_MBOX_STYLE_COL,
+    LB_MBOX_FOREGROUND_COL,
+    LB_MBOX_FOREGROUND_SET_COL,
+    LB_MBOX_BACKGROUND_COL,
+    LB_MBOX_BACKGROUND_SET_COL,
     LB_MBOX_N_COLS
 } LibBalsaMailboxColumn;
 

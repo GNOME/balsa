@@ -77,6 +77,13 @@ GtkWidget *fe_action_option_menu;
 /* Mailboxes option menu */
 GtkWidget * fe_mailboxes;
 
+/* Select colors */
+GtkWidget * fe_color_buttons;
+GtkWidget * fe_foreground_set;
+GtkWidget * fe_foreground;
+GtkWidget * fe_background_set;
+GtkWidget * fe_background;
+
 GtkWidget* fe_right_page;
 
 /* Different buttons that need to be greyed or ungreyed */
@@ -96,6 +103,7 @@ option_list fe_search_type[] = {
 option_list fe_actions[] = {
     {N_("Copy to folder:"), FILTER_COPY},
     {N_("Move to folder:"), FILTER_MOVE},
+    {N_("Colorize"), FILTER_COLOR},
     {N_("Print on printer:"), FILTER_PRINT},
     {N_("Run program:"), FILTER_RUN},
     {N_("Send to Trash"), FILTER_TRASH}
@@ -335,6 +343,39 @@ build_match_page()
  *
  * Builds the "Action" page of the main notebook
  */
+
+static GtkWidget *
+fe_make_color_buttons(void)
+{
+    GtkWidget *table_widget = gtk_table_new(2, 2, FALSE);
+    GtkTable  *table = GTK_TABLE(table_widget);
+    GdkColor color;
+
+    fe_foreground_set = gtk_check_button_new_with_mnemonic(_("Foreground"));
+    gtk_table_attach_defaults(table, fe_foreground_set, 0, 1, 0, 1);
+    gdk_color_parse("black", &color);
+    fe_foreground = gtk_color_button_new_with_color(&color);
+    gtk_widget_set_sensitive(fe_foreground, FALSE);
+    gtk_table_attach_defaults(table, fe_foreground, 1, 2, 0, 1);
+    g_signal_connect(fe_foreground_set, "toggled",
+                     G_CALLBACK(fe_color_check_toggled), fe_foreground);
+    g_signal_connect(fe_foreground, "color-set",
+                     G_CALLBACK(fe_color_set), NULL);
+
+    fe_background_set = gtk_check_button_new_with_mnemonic(_("Background"));
+    gtk_table_attach_defaults(table, fe_background_set, 0, 1, 1, 2);
+    gdk_color_parse("white", &color);
+    fe_background = gtk_color_button_new_with_color(&color);
+    gtk_widget_set_sensitive(fe_background, FALSE);
+    gtk_table_attach_defaults(table, fe_background, 1, 2, 1, 2);
+    g_signal_connect(fe_background_set, "toggled",
+                     G_CALLBACK(fe_color_check_toggled), fe_background);
+    g_signal_connect(fe_background, "color-set",
+                     G_CALLBACK(fe_color_set), NULL);
+
+    return table_widget;
+}
+
 static GtkWidget *
 build_action_page(GtkWindow * window)
 {
@@ -430,6 +471,8 @@ build_action_page(GtkWindow * window)
                      G_CALLBACK(fe_action_changed), NULL);
     gtk_box_pack_start(GTK_BOX(box), fe_mailboxes, TRUE, FALSE, 1);
 
+    fe_color_buttons = fe_make_color_buttons();
+    gtk_box_pack_start(GTK_BOX(box), fe_color_buttons, TRUE, FALSE, 1);
     return page;
 }				/* end build_action_page() */
 

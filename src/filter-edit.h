@@ -98,4 +98,9 @@ void fe_enable_right_page(gboolean enabled);
 void fe_sound_response(GtkDialog * dialog, gint response);
 
 void fe_add_new_user_header(const gchar *);
+
+/* Callbacks for color button signals */
+void fe_color_check_toggled(GtkToggleButton * check_button, gpointer data);
+void fe_color_set(GtkColorButton * color_button, gpointer data);
+
 #endif /*__FILTER_EDIT_H__ */

@@ -2761,3 +2761,49 @@ balsa_index_count_selected_messages(BalsaIndex * bindex)
         gtk_tree_selection_count_selected_rows(gtk_tree_view_get_selection
                                                (GTK_TREE_VIEW(bindex)));
 }
+
+/* Select all messages in current thread */
+void
+balsa_index_select_thread(BalsaIndex * bindex)
+{
+    GtkTreeIter iter;
+    GtkTreeModel *model = GTK_TREE_MODEL(bindex->mailbox_node->mailbox);
+    GtkTreeIter next_iter;
+    GtkTreePath *path;
+    GtkTreeSelection *selection =
+        gtk_tree_view_get_selection(GTK_TREE_VIEW(bindex));
+    gboolean valid;
+
+    if (!bindex->current_msgno
+        || !libbalsa_mailbox_msgno_find(bindex->mailbox_node->mailbox,
+                                        bindex->current_msgno, NULL,
+                                        &iter))
+        return;
+
+    while (gtk_tree_model_iter_parent(model, &next_iter, &iter))
+        iter = next_iter;
+
+    path = gtk_tree_model_get_path(model, &iter);
+    gtk_tree_view_expand_row(GTK_TREE_VIEW(bindex), path, TRUE);
+    gtk_tree_path_free(path);
+
+    do {
+        gtk_tree_selection_select_iter(selection, &iter);
+
+        valid = gtk_tree_model_iter_children(model, &next_iter, &iter);
+        if (valid)
+            iter = next_iter;
+        else {
+            do {
+                GtkTreeIter save_iter = iter;
+
+                valid = gtk_tree_model_iter_next(model, &iter);
+                if (valid)
+                    break;
+                valid = gtk_tree_model_iter_parent(model, &iter,
+                                                   &save_iter);
+            } while (valid);
+        }
+    } while (valid
+             && gtk_tree_model_iter_parent(model, &next_iter, &iter));
+}

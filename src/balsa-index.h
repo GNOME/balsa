@@ -175,6 +175,9 @@ extern "C" {
     /* Select all without previewing any. */
     void balsa_index_select_all(BalsaIndex * bindex);
 
+    /* Select thread containing current message. */
+    void balsa_index_select_thread(BalsaIndex * bindex);
+
     /* Count of selected messages. */
     gint balsa_index_count_selected_messages(BalsaIndex * bindex);
 

@@ -166,6 +166,7 @@ static void bw_forward_message_inline_cb  (GtkAction * action, gpointer data);
 static void bw_forward_message_default_cb (GtkAction * action, gpointer data);
 #if !defined(ENABLE_TOUCH_UI)
 static void bw_pipe_message_cb            (GtkAction * action, gpointer data);
+static void bw_select_thread_cb           (GtkAction * action, gpointer data);
 #endif /* ENABLE_TOUCH_UI */
 static void bw_continue_message_cb        (GtkAction * action, gpointer data);
 
@@ -511,6 +512,9 @@ static const GtkActionEntry message_entries[] = {
     {"Pipe", BALSA_PIXMAP_FORWARD, N_("_Pipe through..."), NULL,
      N_("Pipe the message through another program"),
      G_CALLBACK(bw_pipe_message_cb)},
+    {"SelectThread", NULL, N_("Select _Thread"), NULL,
+     N_("Select all messages in current thread"),
+     G_CALLBACK(bw_select_thread_cb)},
 #endif /* ENABLE_TOUCH_UI */
 };
 
@@ -532,7 +536,7 @@ static const GtkActionEntry current_message_entries[] = {
      N_("Copy message"), G_CALLBACK(bw_message_copy_cb)},
     {"SelectText", NULL, N_("_Select Text"), NULL,
      N_("Select entire mail"), G_CALLBACK(bw_message_select_all_cb)},
-    {"FindInMessage", NULL, N_("_Find in message"), "slash",
+    {"FindInMessage", NULL, N_("Find in _Message"), "slash",
      N_("Find a string in this message"),
      G_CALLBACK(bw_find_in_message_cb)}
 #endif /* ENABLE_TOUCH_UI */
@@ -677,6 +681,7 @@ static const char *ui_description =
 "    <menu action='EditMenu'>"
 "      <menuitem action='Copy'/>"
 "      <menuitem action='SelectAll'/>"
+"      <menuitem action='SelectThread'/>"
 "      <separator/>"
 "      <menuitem action='Find'/>"
 "      <menuitem action='FindNext'/>"
@@ -3428,6 +3433,14 @@ bw_pipe_message_cb(GtkAction * action, gpointer data)
     balsa_index_pipe(BALSA_INDEX
                      (balsa_window_find_current_index
                       (BALSA_WINDOW(data))));
+}
+
+static void
+bw_select_thread_cb(GtkAction * action, gpointer data)
+{
+    balsa_index_select_thread(BALSA_INDEX
+                              (balsa_window_find_current_index
+                               (BALSA_WINDOW(data))));
 }
 #endif /* ENABLE_TOUCH_UI */
 

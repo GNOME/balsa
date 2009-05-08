@@ -1,3 +1,12 @@
+2009-05-07  Peter Bloomfield
+
+	Implement select thread
+
+	* src/balsa-index.c (balsa_index_select_thread): new method to
+	select all messages in thread containing current message.
+	* src/balsa-index.h: ditto.
+	* src/main-window.c: use it.
+
 2009-05-04  Peter Bloomfield
 
 	Add filter for colorizing messages

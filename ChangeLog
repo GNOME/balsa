@@ -1,5 +1,10 @@
 2009-05-13  Peter Bloomfield
 
+	* src/mailbox-node.c (find_dir), (balsa_mailbox_local_append):
+	parent of a top-level mailbox should be the root node.
+
+2009-05-13  Peter Bloomfield
+
 	* src/mailbox-node.c (balsa_mailbox_node_rescan): clear
 	mn->scanned, so that we append the subtree.
 

@@ -714,6 +714,14 @@ balsa_mailbox_node_save_config(BalsaMailboxNode* mn, const gchar* group)
 /* ---------------------------------------------------------------------
  * Rescanning.
  * --------------------------------------------------------------------- */
+static BalsaMailboxNode *
+find_dir(const gchar * dir)
+{
+    if (strcmp(dir, balsa_app.local_mail_directory) == 0)
+        return g_object_ref(balsa_app.root_node);
+    return balsa_find_dir(NULL, dir);
+}
+
 void
 balsa_mailbox_local_append(LibBalsaMailbox* mbx)
 {
@@ -725,7 +733,7 @@ balsa_mailbox_local_append(LibBalsaMailbox* mbx)
 
     for(dir = g_strdup(libbalsa_mailbox_local_get_path(mbx));
         strlen(dir)>1 /* i.e dir != "/" */ &&
-            !(parent = balsa_find_dir(NULL, dir));
+            !(parent = find_dir(dir));
         ) {
         gchar* tmp =  g_path_get_dirname(dir);
         g_free(dir);

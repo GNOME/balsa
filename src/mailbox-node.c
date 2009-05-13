@@ -760,8 +760,8 @@ balsa_mailbox_node_rescan(BalsaMailboxNode * mn)
     } else {
         balsa_remove_children_mailbox_nodes(mn);
         mn = balsa_app.root_node;
-        mn->scanned = FALSE;
     }
+    mn->scanned = FALSE;
     balsa_mailbox_node_append_subtree(mn);
 }
 

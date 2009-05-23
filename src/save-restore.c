@@ -778,7 +778,11 @@ config_global_load(void)
     balsa_app.show_notebook_tabs = libbalsa_conf_get_bool("ShowTabs=false");
 
     /* ... alternative layout of main window */
-    balsa_app.alternative_layout = libbalsa_conf_get_bool("AlternativeLayout=false");
+    balsa_app.layout_type = libbalsa_conf_get_int("LayoutType=0");
+    if (balsa_app.layout_type != LAYOUT_DEFAULT && 
+        balsa_app.layout_type != LAYOUT_WIDE_MSG &&
+        balsa_app.layout_type != LAYOUT_WIDE_SCREEN)
+        balsa_app.layout_type = LAYOUT_DEFAULT;
     balsa_app.view_message_on_open = libbalsa_conf_get_bool("ViewMessageOnOpen=true");
     balsa_app.pgdownmod = libbalsa_conf_get_bool("PageDownMod=false");
     balsa_app.pgdown_percent = libbalsa_conf_get_int("PageDownPercent=50");
@@ -1277,7 +1281,7 @@ config_save(void)
     libbalsa_conf_set_bool("ShowMailboxList", balsa_app.show_mblist);
     libbalsa_conf_set_bool("ShowTabs", balsa_app.show_notebook_tabs);
     libbalsa_conf_set_int("ProgressWindow", balsa_app.pwindow_option);
-    libbalsa_conf_set_bool("AlternativeLayout", balsa_app.alternative_layout);
+    libbalsa_conf_set_int("LayoutType",     balsa_app.layout_type);
     libbalsa_conf_set_bool("ViewMessageOnOpen", balsa_app.view_message_on_open);
     libbalsa_conf_set_bool("PageDownMod", balsa_app.pgdownmod);
     libbalsa_conf_set_int("PageDownPercent", balsa_app.pgdown_percent);

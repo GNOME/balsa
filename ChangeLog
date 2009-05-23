@@ -1,3 +1,11 @@
+2006-05-23  Pawel Salek
+
+	* src/balsa-index.[ch]: switch between full and narrow index views.
+	* src/main-window.[ch]: switch between ordinary and wide-screen layouts.
+	* src/save-restore.c: save the layout as an enum.
+	* src/balsa-app.[ch]: set default layout.
+	* src/pref-manager.c: main window layout type is a drop-down list now.
+	
 2009-05-13  Peter Bloomfield
 
 	* src/mailbox-node.c (find_dir), (balsa_mailbox_local_append):

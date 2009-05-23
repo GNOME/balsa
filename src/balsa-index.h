@@ -39,6 +39,9 @@ extern "C" {
 #define BALSA_IS_INDEX_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE (klass, BALSA_TYPE_INDEX))
 
 
+    typedef enum { BALSA_INDEX_WIDE, BALSA_INDEX_NARROW }
+        BalsaIndexWidthPreference;
+
     typedef struct _BalsaIndex BalsaIndex;
     typedef struct _BalsaIndexClass BalsaIndexClass;
 
@@ -71,6 +74,7 @@ extern "C" {
         gulong selection_changed_id;
 
 	LibBalsaMailboxSearchIter *search_iter;
+        BalsaIndexWidthPreference width_preference;
     };
 
     struct _BalsaIndexClass {
@@ -104,6 +108,8 @@ extern "C" {
     gboolean balsa_index_load_mailbox_node(BalsaIndex * bindex,
                                            BalsaMailboxNode * mbnode,
 					   GError **err);
+    void balsa_index_set_width_preference(BalsaIndex *bindex,
+                                          BalsaIndexWidthPreference pref);
     void balsa_index_scroll_on_open(BalsaIndex *index);
     void balsa_index_update_tree(BalsaIndex *bindex, gboolean expand);
     void balsa_index_set_threading_type(BalsaIndex * bindex, int thtype);

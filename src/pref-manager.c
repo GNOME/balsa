@@ -107,7 +107,7 @@ typedef struct _PropertyUI {
     GtkWidget *action_after_move_menu;
 
     GtkWidget *previewpane;
-    GtkWidget *alternative_layout;
+    GtkWidget *layout_type;
     GtkWidget *view_message_on_open;
     GtkWidget *pgdownmod;
     GtkWidget *pgdown_percent;
@@ -325,6 +325,7 @@ static void pm_combo_box_set_level(GtkWidget * combo_box, gint level);
 static gint pm_combo_box_get_level(GtkWidget * combo_box);
 
     /* special helpers */
+static GtkWidget *create_layout_types_menu(void);
 static GtkWidget *create_action_after_move_menu(void);
 static GtkWidget *create_information_message_menu(void);
 static GtkWidget *create_mdn_reply_menu(void);
@@ -589,7 +590,7 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
 
     g_signal_connect(G_OBJECT(pui->previewpane), "toggled",
                      G_CALLBACK(properties_modified_cb), property_box);
-    g_signal_connect(G_OBJECT(pui->alternative_layout), "toggled",
+    g_signal_connect(G_OBJECT(pui->layout_type), "changed",
                      G_CALLBACK(properties_modified_cb), property_box);
     g_signal_connect(G_OBJECT(pui->view_message_on_open), "toggled",
                      G_CALLBACK(properties_modified_cb), property_box);
@@ -806,6 +807,7 @@ apply_prefs(GtkDialog * pbox)
     gint i;
     GtkWidget *balsa_window;
     const gchar *tmp;
+    guint save_enum; /* FIXME: assumes that enums are unsigned */
     gboolean save_setting;
 
     /*
@@ -832,10 +834,10 @@ apply_prefs(GtkDialog * pbox)
     balsa_app.debug = GTK_TOGGLE_BUTTON(pui->debug)->active;
     balsa_app.previewpane = GTK_TOGGLE_BUTTON(pui->previewpane)->active;
 
-    save_setting = balsa_app.alternative_layout;
-    balsa_app.alternative_layout =
-        GTK_TOGGLE_BUTTON(pui->alternative_layout)->active;
-    if (balsa_app.alternative_layout != save_setting)
+    save_enum = balsa_app.layout_type;
+    balsa_app.layout_type =
+        pm_combo_box_get_level(pui->layout_type);
+    if (balsa_app.layout_type != save_enum)
         balsa_change_window_layout(balsa_app.main_window);
 
     balsa_app.view_message_on_open =
@@ -1067,9 +1069,7 @@ set_prefs(void)
 
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->previewpane),
                                  balsa_app.previewpane);
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
-                                 (pui->alternative_layout),
-                                 balsa_app.alternative_layout);
+    pm_combo_box_set_level(pui->layout_type, balsa_app.layout_type);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
                                  (pui->view_message_on_open),
                                  balsa_app.view_message_on_open);
@@ -2129,8 +2129,8 @@ main_window_group(GtkWidget * page)
         pm_group_add_check(group, _("Use preview pane"));
     pui->mblist_show_mb_content_info =
         pm_group_add_check(group, _("Show mailbox statistics in left pane"));
-    pui->alternative_layout =
-        pm_group_add_check(group, _("Use alternative main window layout"));
+    pui->layout_type = create_layout_types_menu();
+    pm_group_add(group, pui->layout_type, FALSE);
     pui->view_message_on_open =
         pm_group_add_check(group, _("Automatically view message "
                                     "when mailbox opened"));
@@ -3309,6 +3309,16 @@ convert_8bit_cb(GtkWidget * widget, GtkWidget * pbox)
 
     gtk_widget_set_sensitive(pui->convert_unknown_8bit_codeset,
 			     GTK_TOGGLE_BUTTON(pui->convert_unknown_8bit[1])->active);
+}
+
+static GtkWidget *
+create_layout_types_menu(void)
+{
+    GtkWidget *combo_box = pm_combo_box_new();
+    add_show_menu(_("Default layout"), NEXT_UNREAD, combo_box);
+    add_show_menu(_("Wide message layout"), NEXT, combo_box);
+    add_show_menu(_("Wide screen layout"), CLOSE, combo_box);
+    return combo_box;
 }
 
 static GtkWidget *

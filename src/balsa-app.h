@@ -291,7 +291,7 @@ extern struct BalsaApplication {
     gboolean expand_tree;
     gboolean show_mblist;
     gboolean show_notebook_tabs;
-    gboolean alternative_layout;
+    enum { LAYOUT_DEFAULT, LAYOUT_WIDE_MSG, LAYOUT_WIDE_SCREEN } layout_type;
     gboolean view_message_on_open;
     gboolean pgdownmod;
     gint pgdown_percent;

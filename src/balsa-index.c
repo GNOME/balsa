@@ -1054,6 +1054,31 @@ balsa_index_load_mailbox_node (BalsaIndex * index,
     return FALSE;
 }
 
+void
+balsa_index_set_width_preference(BalsaIndex *bindex,
+                                 BalsaIndexWidthPreference pref)
+{
+    GtkTreeView *tree_view;
+    gboolean visible;
+
+    if (pref == bindex->width_preference)
+        return;
+
+    bindex->width_preference = pref;
+    switch (pref) {
+    case BALSA_INDEX_NARROW: visible = FALSE; break;
+    default:
+    case BALSA_INDEX_WIDE:   visible = TRUE;  break;
+    }
+
+    tree_view = GTK_TREE_VIEW(bindex);
+    gtk_tree_view_column_set_visible
+        (gtk_tree_view_get_column(tree_view, LB_MBOX_MSGNO_COL), visible);
+    gtk_tree_view_column_set_visible
+        (gtk_tree_view_get_column(tree_view, LB_MBOX_ATTACH_COL), visible);
+    gtk_tree_view_column_set_visible
+        (gtk_tree_view_get_column(tree_view, LB_MBOX_SIZE_COL), visible);
+}
 
 /*
  * select message interfaces

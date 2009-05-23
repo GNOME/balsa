@@ -63,8 +63,8 @@ struct _BalsaWindow {
     GtkWidget *sos_entry;       /* SenderOrSubject filter entry */
     GtkWidget *notebook;
     GtkWidget *preview;		/* message is child */
-    GtkWidget *hpaned;
-    GtkWidget *vpaned;
+    GtkWidget *paned_master;
+    GtkWidget *paned_slave;
     GtkWidget *current_index;
     GtkWidget *filter_choice;
     GtkWidget *vbox;

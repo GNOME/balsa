@@ -328,7 +328,7 @@ balsa_app_init(void)
     balsa_app.expand_tree = FALSE;
     balsa_app.show_mblist = TRUE;
     balsa_app.show_notebook_tabs = FALSE;
-    balsa_app.alternative_layout = FALSE;
+    balsa_app.layout_type = LAYOUT_DEFAULT;
     balsa_app.view_message_on_open = TRUE;
     balsa_app.mw_action_after_move = NEXT_UNREAD;
 

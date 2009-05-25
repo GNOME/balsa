@@ -36,6 +36,7 @@ libbalsa/mailbox_pop3.c
 libbalsa/message.c
 libbalsa/mime.c
 libbalsa/misc.c
+libbalsa/rfc2445.c
 libbalsa/rfc3156.c
 libbalsa/send.c
 libbalsa/server.c
@@ -55,14 +56,6 @@ libinit_balsa/assistant_page_user.c
 libinit_balsa/assistant_page_user.c
 libinit_balsa/assistant_page_welcome.c
 libinit_balsa/assistant_page_welcome.c
-libinit_balsa/balsa-druid-page-defclient.c
-libinit_balsa/balsa-druid-page-directory.c
-libinit_balsa/balsa-druid-page-finish.c
-libinit_balsa/balsa-druid-page-user.c
-libinit_balsa/balsa-druid-page-welcome.c
-libinit_balsa/balsa-initdruid.c
-libinit_balsa/helper.c
-libinit_balsa/init_balsa.c
 sounds/balsa.soundlist.in
 src/ab-main.c
 src/ab-window.c
@@ -76,6 +69,7 @@ src/balsa-mime-widget-crypto.c
 src/balsa-mime-widget-image.c
 src/balsa-mime-widget-message.c
 src/balsa-mime-widget-text.c
+src/balsa-mime-widget-vcalendar.c
 src/balsa-mime-widget.c
 src/balsa-print-object-default.c
 src/balsa-print-object-header.c
@@ -95,7 +89,6 @@ src/main.c
 src/message-window.c
 src/pref-manager.c
 src/print-gtk.c
-src/print.c
 src/save-restore.c
 src/sendmsg-window.c
 src/spell-check.c

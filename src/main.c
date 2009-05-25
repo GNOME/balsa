@@ -65,7 +65,7 @@
 #include "information.h"
 #include "imap-server.h"
 
-#include "libinit_balsa/init_balsa.h"
+#include "libinit_balsa/assistant_init.h"
 
 #if !HAVE_UNIQUE && HAVE_GNOME
 #include "Balsa.h"

@@ -79,7 +79,7 @@
 #include "filter.h"
 #include "filter-funcs.h"
 
-#include "libinit_balsa/init_balsa.h"
+#include "libinit_balsa/assistant_init.h"
 
 #define MAILBOX_DATA "mailbox_data"
 

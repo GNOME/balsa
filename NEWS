@@ -1,3 +1,12 @@
+* Balsa-2.4.0 release. Release date 2009-05-25
+
+- GMime-2.4, GLib-2.16, and Gtk-2.14 required.
+- use libunique as an alternative to BonoboActivation, whenever available.
+- compile and run on Mac OSX.
+- VCALENDAR and VEVENT handling.
+- deprecation cleanup.
+- message threading improvements (eg. thread selection) and fixes.
+ 
 * Balsa-2.3.28 release. Release date 2009-01-18
 
 - Fix the IMAP message threading regression.

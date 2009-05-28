@@ -235,9 +235,13 @@ balsa_mime_widget_key_press_event(GtkWidget * widget, GdkEventKey * event,
         if (event->state & GDK_SHIFT_MASK) {
 	    GtkWidget *current_widget = balsa_message_current_part_widget(bm);
 
-	    if (current_widget)
-		g_signal_emit_by_name(current_widget, "popup-menu");
-	    else
+	    if (current_widget) {
+                gboolean retval;
+
+                g_signal_emit_by_name(current_widget, "popup-menu", &retval);
+
+                return retval;
+            } else
 		return FALSE;
         } else
             return FALSE;

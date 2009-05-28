@@ -1,3 +1,9 @@
+2009-05-27  Peter Bloomfield
+
+	* src/balsa-mime-widget-callbacks.c
+	(balsa_mime_widget_key_press_event): emitting "popup-menu"
+	requires the address of the return value.
+
 2006-05-23  Pawel Salek
 
 	* src/balsa-index.[ch]: switch between full and narrow index views.

@@ -30,6 +30,7 @@
 #define HANDLE_UNLOCK(h) pthread_mutex_unlock(&h->mutex)
 #else
 #define HANDLE_LOCK(h) 
+#define HANDLE_TRYLOCK(h) 0
 #define HANDLE_UNLOCK(h)
 #endif
 

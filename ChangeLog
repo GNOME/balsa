@@ -1,3 +1,20 @@
+2009-06-03  Peter Bloomfield
+
+	Build with threads disabled
+
+	* configure.in: must enable threads to use WebKit.
+	* libbalsa/imap-server.c (libbalsa_imap_server_set_username),
+	(libbalsa_imap_server_set_host), (libbalsa_imap_server_init),
+	(libbalsa_imap_server_finalize), (lb_imap_server_cleanup),
+	(get_or_create), (libbalsa_imap_server_get_handle),
+	(libbalsa_imap_server_get_handle_with_user),
+	(libbalsa_imap_server_release_handle),
+	(libbalsa_imap_server_force_disconnect),
+	(libbalsa_imap_server_close_all_connections),
+	(libbalsa_imap_server_has_free_handles): use macros to manage
+	locks.
+	* libbalsa/imap/imap_private.h: add TRYLOCK macro.
+
 2009-05-27  Peter Bloomfield
 
 	* src/balsa-mime-widget-callbacks.c

@@ -1,5 +1,11 @@
 2009-06-07  Peter Bloomfield
 
+	Build with threads disabled
+
+	* libbalsa/mailbox.c (lbm_msgno_changed): fix conditional code.
+
+2009-06-07  Peter Bloomfield
+
 	Update display in an idle callback.
 
 	* libbalsa/mailbox.h: new array of msgnos that have changed.

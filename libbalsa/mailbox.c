@@ -445,10 +445,12 @@ libbalsa_mailbox_index_set_flags(LibBalsaMailbox *mailbox,
    destroys mailbox. Must leave it in sane state.
 */
 
+#ifdef BALSA_USE_THREADS
 static void lbm_msgno_changed_expunged_cb(LibBalsaMailbox * mailbox,
                                           guint seqno);
 static void lbm_get_index_entry_expunged_cb(LibBalsaMailbox * mailbox,
                                             guint seqno);
+#endif
 
 static void
 libbalsa_mailbox_finalize(GObject * object)
@@ -1256,6 +1258,7 @@ lbm_msgno_changed(LibBalsaMailbox * mailbox, guint seqno,
                   GtkTreeIter * iter)
 {
     GtkTreePath *path;
+#ifdef BALSA_USE_THREADS
     gboolean is_main_thread = !libbalsa_am_i_subthread();
 
 #if DEBUG
@@ -1263,7 +1266,6 @@ lbm_msgno_changed(LibBalsaMailbox * mailbox, guint seqno,
         g_warning("Main thread is not holding gdk lock");
 #endif
 
-#ifdef BALSA_USE_THREADS
     if (!is_main_thread) {
         pthread_mutex_lock(&msgnos_changed_lock);
         if (!mailbox->msgnos_changed) {

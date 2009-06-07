@@ -257,6 +257,8 @@ struct _LibBalsaMailbox {
 #ifdef BALSA_USE_THREADS
     /* Array of msgnos that need to be displayed. */
     GArray *msgnos_pending;
+    /* Array of msgnos that have been changed. */
+    GArray *msgnos_changed;
 #endif                          /* BALSA_USE_THREADS */
 };
 

@@ -1,5 +1,17 @@
 2009-06-07  Peter Bloomfield
 
+	Update display in an idle callback.
+
+	* libbalsa/mailbox.h: new array of msgnos that have changed.
+	* libbalsa/mailbox.c (libbalsa_mailbox_finalize),
+	(lbm_msgno_changed_expunged_cb), (lbm_msgnos_changed_idle_cb),
+	(lbm_msgno_changed), (libbalsa_mailbox_msgno_changed),
+	(lbm_get_index_entry_real): use it to update display in an idle
+	callback, instead of in the sub-thread in which the message info
+	was set up.
+
+2009-06-07  Peter Bloomfield
+
 	* src/sendmsg-window.c (repl_identity_signature),
 	(insert_initial_sig): remember cursor position when adding or
 	changing signature.

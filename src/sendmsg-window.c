@@ -1282,7 +1282,13 @@ repl_identity_signature(BalsaSendmsg* bsmsg, LibBalsaIdentity* new_ident,
     GtkTextBuffer *buffer =
         gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
     GtkTextIter ins, end;
+    GtkTextMark *mark;
     
+    /* Save cursor */
+    gtk_text_buffer_get_iter_at_mark(buffer, &ins,
+                                     gtk_text_buffer_get_insert(buffer));
+    mark = gtk_text_buffer_create_mark(buffer, NULL, &ins, TRUE);
+
     gtk_text_buffer_get_iter_at_offset(buffer, &ins,
                                        *replace_offset);
     gtk_text_buffer_get_iter_at_offset(buffer, &end,
@@ -1293,26 +1299,30 @@ repl_identity_signature(BalsaSendmsg* bsmsg, LibBalsaIdentity* new_ident,
     
     /* check to see if this is a reply or forward and compare identity
      * settings to determine whether to add signature */
-    if ((reply_type && !new_ident->sig_whenreply) ||
-        (forward_type && !new_ident->sig_whenforward)) {
-        return;
-    } 
+    if ((reply_type && new_ident->sig_whenreply) ||
+          (forward_type && new_ident->sig_whenforward)) {
 
-    /* see if sig location is probably going to be the same */
-    if (new_ident->sig_prepend == old_ident->sig_prepend) {
-        /* account for sig length difference in replacement offset */
-        *replace_offset += newsiglen - siglen;
-    } else if (new_ident->sig_prepend) {
-        /* sig location not the same between idents, take a WAG and
-         * put it at the start of the message */
-        gtk_text_buffer_get_start_iter(buffer, &ins);
-        *replace_offset += newsiglen;
-    } else {
-        /* put it at the end of the message */
-        gtk_text_buffer_get_end_iter(buffer, &ins);
+        /* see if sig location is probably going to be the same */
+        if (new_ident->sig_prepend == old_ident->sig_prepend) {
+            /* account for sig length difference in replacement offset */
+            *replace_offset += newsiglen - siglen;
+        } else if (new_ident->sig_prepend) {
+            /* sig location not the same between idents, take a WAG and
+             * put it at the start of the message */
+            gtk_text_buffer_get_start_iter(buffer, &ins);
+            *replace_offset += newsiglen;
+        } else {
+            /* put it at the end of the message */
+            gtk_text_buffer_get_end_iter(buffer, &ins);
+        }
+        gtk_text_buffer_place_cursor(buffer, &ins);
+        gtk_text_buffer_insert_at_cursor(buffer, new_sig, -1);
     }
+
+    /* Restore cursor */
+    gtk_text_buffer_get_iter_at_mark(buffer, &ins, mark);
     gtk_text_buffer_place_cursor(buffer, &ins);
-    gtk_text_buffer_insert_at_cursor(buffer, new_sig, -1);
+    gtk_text_buffer_delete_mark(buffer, mark);
 }
 
 /*
@@ -4608,18 +4618,15 @@ insert_initial_sig(BalsaSendmsg *bsmsg)
     GtkTextIter sig_pos;
     GtkTextBuffer *buffer =
         gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
-    GtkTextMark *m;
 
     if(bsmsg->ident->sig_prepend)
         gtk_text_buffer_get_start_iter(buffer, &sig_pos);
     else
         gtk_text_buffer_get_end_iter(buffer, &sig_pos);
-    m = gtk_text_buffer_create_mark (buffer, "pos", &sig_pos, TRUE);
     gtk_text_buffer_insert(buffer, &sig_pos, "\n", 1);
     insert_signature_cb(NULL, bsmsg);
-    gtk_text_buffer_get_iter_at_mark(buffer, &sig_pos, m);
+    gtk_text_buffer_get_start_iter(buffer, &sig_pos);
     gtk_text_buffer_place_cursor(buffer, &sig_pos);
-    gtk_text_buffer_delete_mark(buffer, m);
 }
 
 BalsaSendmsg*

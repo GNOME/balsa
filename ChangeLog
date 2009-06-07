@@ -1,3 +1,9 @@
+2009-06-07  Peter Bloomfield
+
+	* src/sendmsg-window.c (repl_identity_signature),
+	(insert_initial_sig): remember cursor position when adding or
+	changing signature.
+
 2009-06-03  Peter Bloomfield
 
 	Build with threads disabled

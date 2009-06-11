@@ -549,6 +549,9 @@ mi_reconnect(ImapMboxHandle *h)
     else if(rc==IMR_SEVERED)                             \
     libbalsa_information(LIBBALSA_INFORMATION_WARNING, \
     _("IMAP connection has been severed. Reconnecting...")); \
+    else if(rc==IMR_PROTOCOL)                               \
+    libbalsa_information(LIBBALSA_INFORMATION_WARNING, \
+    _("IMAP protocol error. Try enabling bug workarounds.")); \
     else if(rc==IMR_BYE) {char *msg = imap_mbox_handle_get_last_msg(h); \
     libbalsa_information(LIBBALSA_INFORMATION_WARNING, \
     _("IMAP server has shut the connection: %s Reconnecting..."), msg); \
@@ -1854,9 +1857,12 @@ static InternetAddressList *
 internet_address_new_list_from_imap_address_list(ImapAddress *list)
 {
     InternetAddress *addr;
-    InternetAddressList *res = internet_address_list_new();
+    InternetAddressList *res;
 
-    for (; list; list = list->next) {
+    if (!list)
+        return NULL;
+
+    for (res = internet_address_list_new(); list; list = list->next) {
        addr = internet_address_new_from_imap_address(&list);
        if (addr) {
            internet_address_list_add(res, addr);

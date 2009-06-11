@@ -1,3 +1,8 @@
+2006-06-11  Pawel Salek
+
+	* libbalsa/mailbox_imap.c: do not create empty address lists.
+	This make message compose code believe that reply-to is set.
+
 2009-06-07  Peter Bloomfield
 
 	Build with threads disabled

@@ -493,7 +493,7 @@ imap_mbox_append_multi_real(ImapMboxHandle *handle,
   if(uid_sequence)
     uid_sequence->ranges = NULL;
 
-  imap_handle_idle_disable(handle);
+  if (!imap_handle_idle_disable(handle)) return IMR_SEVERED;
   for(msg_cnt=0;
       (msg_size = dump_cb(buf, sizeof(buf),
 			  IMA_STAGE_NEW_MSG, &flags, cb_arg)) >0;
@@ -863,7 +863,9 @@ imap_assure_needed_flags(ImapMboxHandle *h, ImapMsgFlag needed_flags)
       case IMSGF_RECENT:   flg = "RECENT"; break;
       default: g_free(seqno); continue;
       }
-      if(!cmd) imap_handle_idle_disable(h);
+      if(!cmd) {
+        if (!imap_handle_idle_disable(h)) { rc = IMR_SEVERED; break; }
+      }
       cmd = g_strdup_printf(cmd_format, seqno, flg);
       g_free(seqno);
       flag[issued_cmd] = fnd.flag;
@@ -1588,7 +1590,7 @@ imap_mbox_thread(ImapMboxHandle *h, const char *how, ImapSearchKey *filter)
 
     cmdno = imap_make_tag(tag);
     
-    imap_handle_idle_disable(h);
+    if (!imap_handle_idle_disable(h)) { rc = IMR_SEVERED; goto exit_cleanup; }
     sio_printf(h->sio, "%s THREAD %s UTF-8 ", tag, how);
     if(!filter)
       sio_write(h->sio, "ALL", 3);
@@ -1604,6 +1606,7 @@ imap_mbox_thread(ImapMboxHandle *h, const char *how, ImapSearchKey *filter)
     while(rc == IMR_UNTAGGED);
     imap_handle_idle_enable(h, 30);
   }
+ exit_cleanup:
   HANDLE_UNLOCK(h);
 
   return rc;
@@ -1899,7 +1902,7 @@ imap_mbox_sort_filter(ImapMboxHandle *handle, ImapSortKey key, int ascending,
 
       cmdno =  imap_make_tag(tag);
       keystr = sort_code_to_string(key);
-      imap_handle_idle_disable(handle);
+      if (!imap_handle_idle_disable(handle)) { rc = IMR_SEVERED; goto cleanup; }
       sio_printf(handle->sio, "%s SORT (%s%s) UTF-8 ", tag,
                  ascending ? "" : "REVERSE ", keystr);
 
@@ -1949,7 +1952,7 @@ imap_mbox_sort_filter(ImapMboxHandle *handle, ImapSortKey key, int ascending,
       g_node_append_data(handle->thread_root,
                          GUINT_TO_POINTER(handle->mbox_view.arr[i]));
   }
-
+ cleanup:
   HANDLE_UNLOCK(handle);
 
   return rc;

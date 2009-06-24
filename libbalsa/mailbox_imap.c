@@ -1812,49 +1812,23 @@ libbalsa_mailbox_imap_sync(LibBalsaMailbox * mailbox, gboolean expunge)
     return res;
 }
 
-static InternetAddressList
-    *internet_address_new_list_from_imap_address_list(ImapAddress * list);
-
-static InternetAddress *
-internet_address_new_from_imap_address(ImapAddress ** list)
+static InternetAddress*
+imap_address_to_gmime_mailbox(ImapAddress *addr)
 {
-    ImapAddress *addr = *list;
-    InternetAddress *address;
-
-    if (!addr || (addr->name==NULL && addr->addr_spec==NULL))
-       return NULL;
-
-    /* it will be owned by the caller */
-
-    if (addr->addr_spec) {
-        gchar *tmp = g_mime_utils_header_decode_text(addr->addr_spec);
-        address = internet_address_mailbox_new(NULL, tmp);
+    gchar *tmp = g_mime_utils_header_decode_text(addr->addr_spec);
+    InternetAddress *address = internet_address_mailbox_new(NULL, tmp);
+    g_free(tmp);
+    if (addr->name) {
+        tmp = g_mime_utils_header_decode_text(addr->name);
+        internet_address_set_name(address, tmp);
         g_free(tmp);
-        if (addr->name) {
-            tmp = g_mime_utils_header_decode_text(addr->name);
-            internet_address_set_name(address, tmp);
-            g_free(tmp);
-        }
-    } else {
-        /* Begin group */
-        gchar *tmp = g_mime_utils_header_decode_text(addr->name);
-        address = internet_address_group_new(tmp);
-        g_free(tmp);
-
-        internet_address_group_set_members
-            (INTERNET_ADDRESS_GROUP(address),
-             internet_address_new_list_from_imap_address_list(addr->next));
-        /* Skip to end of group */
-        while (addr && addr->addr_spec)
-            addr = addr->next;
-        *list = addr;
     }
-    
     return address;
 }
 
 static InternetAddressList *
-internet_address_new_list_from_imap_address_list(ImapAddress *list)
+internet_address_new_list_from_imap_address(ImapAddress *list,
+                                            ImapAddress **tail)
 {
     InternetAddress *addr;
     InternetAddressList *res;
@@ -1862,14 +1836,46 @@ internet_address_new_list_from_imap_address_list(ImapAddress *list)
     if (!list)
         return NULL;
 
-    for (res = internet_address_list_new(); list; list = list->next) {
-       addr = internet_address_new_from_imap_address(&list);
-       if (addr) {
-           internet_address_list_add(res, addr);
-	   g_object_unref(addr);
-       }
-    }
+    res = internet_address_list_new();
+    do {
+        if (list->addr_spec) {
+            addr = imap_address_to_gmime_mailbox(list);
+        } else {
+            /* Group */
+            if (list->name) {
+                /* Group head */
+                ImapAddress *tail = NULL;
+                InternetAddressList *l;
+                gchar *tmp = g_mime_utils_header_decode_text(list->name);
+                addr = internet_address_group_new(tmp);
+                g_free(tmp);
+                l = internet_address_new_list_from_imap_address(list->next,
+                                                                &tail);
+                if (l) {
+                    internet_address_group_set_members
+                        (INTERNET_ADDRESS_GROUP(addr), l);
+                    g_object_unref(l);
+                }
+                list = tail;
+            } else {
+                /* tail */
+                if (tail)
+                    *tail = list;
+                return res;
+            }
+
+        }
+        internet_address_list_add(res, addr);
+        g_object_unref(addr);
+
+    } while (list &&  (list = list->next) != NULL);
     return res;
+}
+
+static InternetAddressList *
+internet_address_new_list_from_imap_address_list(ImapAddress *list)
+{
+    return internet_address_new_list_from_imap_address(list, NULL);
 }
 
 static void

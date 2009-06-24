@@ -104,7 +104,7 @@ typedef enum {
 typedef unsigned ImapUID;
 typedef time_t ImapDate;
 
-/* ImapAddress is an anddress as seen by IMAP/RFC2822.
+/* ImapAddress is an address as seen by IMAP/RFC2822.
    ImapAddress conventions:
    - mailbox == NULL: begin group (See RFC2822, sec 3.4), name
      contains group's name.

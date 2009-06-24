@@ -6850,7 +6850,7 @@ sendmsg_window_set_title(BalsaSendmsg * bsmsg)
     to_string = internet_address_list_to_string(list, FALSE);
     g_object_unref(list);
 
-    title = g_strdup_printf(title_format, to_string,
+    title = g_strdup_printf(title_format, to_string ? to_string : "",
                             gtk_entry_get_text(GTK_ENTRY(bsmsg->subject[1])));
     g_free(to_string);
     gtk_window_set_title(GTK_WINDOW(bsmsg->window), title);

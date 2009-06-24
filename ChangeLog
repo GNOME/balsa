@@ -1,7 +1,18 @@
+2006-06-24  Pawel Salek
+
+	* libbalsa/imap/imap-{commands,handle}.c: catch errors early on
+	for more accurate error messages.
+	* libbalsa/imap/imap_search.c: ditto.
+	* libbalsa/imap/imap-handle.h: warn if idle_disable's result is ignored.
+	* libbalsa/mailbox_imap.c: correct tranformation of rfc822 groups
+	from ImapAddress to InternetAddress (together with Peter B).
+	* src/sendmsg-window.c: check that string is not-null before
+	setting window title.
+
 2006-06-11  Pawel Salek
 
 	* libbalsa/mailbox_imap.c: do not create empty address lists.
-	This make message compose code believe that reply-to is set.
+	This makes the message compose code believe that reply-to is set.
 
 2009-06-07  Peter Bloomfield
 

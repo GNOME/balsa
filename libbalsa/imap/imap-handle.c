@@ -466,7 +466,7 @@ imap_cmd_issue(ImapMboxHandle* h, const char* cmd)
     return IMR_SEVERED;
 
   /* create sequence for command */
-  imap_handle_idle_disable(h);
+  if (!imap_handle_idle_disable(h)) return IMR_SEVERED;
   if (imap_cmd_start(h, cmd, &async_cmd)<0)
     return IMR_SEVERED;  /* irrecoverable connection error. */
 
@@ -477,7 +477,8 @@ imap_cmd_issue(ImapMboxHandle* h, const char* cmd)
     h->iochannel = g_io_channel_unix_new(h->sd);
     g_io_channel_set_encoding(h->iochannel, NULL, NULL);
   }
-  h->async_watch_id = g_io_add_watch(h->iochannel, G_IO_IN, async_process, h);
+  h->async_watch_id = g_io_add_watch(h->iochannel, G_IO_IN|G_IO_HUP,
+                                     async_process, h);
   return IMR_OK /* async_cmd */;
 }
 
@@ -543,7 +544,9 @@ imap_handle_op_cancelled(ImapMboxHandle *h)
 void
 imap_handle_disconnect(ImapMboxHandle *h)
 {
-  imap_handle_idle_disable(h);
+  gboolean still_connected __attribute__ ((__unused__));
+
+  still_connected = imap_handle_idle_disable(h);
   if(h->sio) {
     sio_detach(h->sio); h->sio = NULL;
   }
@@ -2057,7 +2060,7 @@ imap_cmd_exec_cmdno(ImapMboxHandle* handle, const char* cmd,
     return IMR_SEVERED;
 
   /* create sequence for command */
-  imap_handle_idle_disable(handle);
+  if (!imap_handle_idle_disable(handle)) return IMR_SEVERED;
   if (imap_cmd_start(handle, cmd, &cmdno)<0)
     return IMR_SEVERED;  /* irrecoverable connection error. */
 

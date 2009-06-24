@@ -125,7 +125,8 @@ void imap_handle_set_usercb(ImapMboxHandle* h, ImapUserCb cb, void*);
 void imap_handle_set_flagscb(ImapMboxHandle* h, ImapFlagsCb cb, void*);
 int imap_handle_set_timeout(ImapMboxHandle *, int milliseconds);
 gboolean imap_handle_idle_enable(ImapMboxHandle *, int seconds);
-gboolean imap_handle_idle_disable(ImapMboxHandle *);
+gboolean imap_handle_idle_disable(ImapMboxHandle *)
+    __attribute__ ((warn_unused_result));
 gboolean imap_handle_op_cancelled(ImapMboxHandle *h);
 ImapResult imap_mbox_handle_connect(ImapMboxHandle* r, const char *hst, 
                                     int over_ssl);

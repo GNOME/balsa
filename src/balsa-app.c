@@ -501,8 +501,8 @@ update_timer(gboolean update, guint minutes)
  */
 
 static void
-open_mailboxes_idle_func(const gchar * url, LibBalsaMailboxView * view,
-                         GString * str)
+append_url_if_open(const gchar * url, LibBalsaMailboxView * view,
+                   GString * str)
 {
     if (view->open) {
         if (str->len)
@@ -529,7 +529,7 @@ open_mailboxes_idle_cb(gchar ** urls)
 
         str = g_string_new(NULL);
         g_hash_table_foreach(libbalsa_mailbox_view_table,
-                             (GHFunc) open_mailboxes_idle_func, str);
+                             (GHFunc) append_url_if_open, str);
         urls = g_strsplit(str->str, ";", 0);
         g_string_free(str, TRUE);
     }

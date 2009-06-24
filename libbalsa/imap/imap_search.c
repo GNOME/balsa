@@ -505,7 +505,7 @@ imap_search_exec_unlocked(ImapMboxHandle *h, gboolean uid,
   ocb  = h->search_cb;  h->search_cb  = (ImapSearchCb)cb;
   oarg = h->search_arg; h->search_arg = cb_arg;
   
-  imap_handle_idle_disable(h);
+  if (!imap_handle_idle_disable(h)) return IMR_SEVERED;
 
   split = imap_search_checks(s, IMSE_SEQUENCE);
   if(split) {

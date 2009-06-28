@@ -1,3 +1,7 @@
+2009-06-27  Peter Bloomfield
+
+	* src/spell-check.h: build --without-gtkspell.
+
 2006-06-24  Pawel Salek
 
 	* libbalsa/imap/imap-{commands,handle}.c: catch errors early on

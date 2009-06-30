@@ -330,6 +330,28 @@ PKG_CHECK_MODULES(BALSA_AB, [
    $gnome_extras
 ])
 
+AC_MSG_CHECKING(whether res_init is available)
+AC_LINK_IFELSE(AC_LANG_PROGRAM([#include <resolv.h>
+                               ],
+                               [res_init();]),
+               have_res_init=yes,
+               have_res_init=no)
+if test $have_res_init = no ; then
+    save_LIBS=$LIBS
+    LIBS="$LIBS -lresolv"
+    AC_LINK_IFELSE(AC_LANG_PROGRAM([#include <resolv.h>
+                                   ],
+                                   [res_init();]),
+                   have_res_init=yes)
+fi
+AC_MSG_RESULT([$have_res_init])
+if test $have_res_init = no ; then
+    LIBS=$save_LIBS
+else
+    AC_DEFINE(HAVE_RES_INIT,1,
+              [Defined when res_init is available.])
+fi
+
 dnl ##########################################################################
 dnl Check versions
 dnl ##########################################################################

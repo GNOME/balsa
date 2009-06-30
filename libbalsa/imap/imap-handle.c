@@ -20,6 +20,7 @@
 
 #define _POSIX_C_SOURCE 199506L
 #define _XOPEN_SOURCE 500
+#define _BSD_SOURCE     1
 
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -34,6 +35,12 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <gmime/gmime-utils.h>
+
+#if defined(HAVE_RES_INIT)
+#include <netinet/in.h>
+#include <arpa/nameser.h>
+#include <resolv.h>
+#endif                          /* defined(HAVE_RES_INIT) */
 
 #if defined(USE_TLS)
 #include <openssl/ssl.h>
@@ -687,6 +694,12 @@ imap_socket_open(const char* host, const char *def_port)
     hostname = g_strdup(host);
   }
   rc = getaddrinfo(hostname, port, &hints, &res);
+#if defined(HAVE_RES_INIT)
+  if (rc == EAI_AGAIN) {
+    res_init();
+    rc = getaddrinfo(hostname, port, &hints, &res);
+  }
+#endif                          /* defined(HAVE_RES_INIT) */
   g_free(hostname);
   if(rc)
     return -1;

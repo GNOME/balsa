@@ -1,3 +1,9 @@
+2009-06-30  Peter Bloomfield
+
+	* configure.in: test for res_init.
+	* libbalsa/imap/imap-handle.c (imap_socket_open): use it to
+	recover faster after reconnecting to the internet.
+
 2009-06-27  Peter Bloomfield
 
 	* src/spell-check.h: build --without-gtkspell.

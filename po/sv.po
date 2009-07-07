@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-06-13 09:54+0200\n"
-"PO-Revision-Date: 2009-06-13 10:01+0100\n"
+"POT-Creation-Date: 2009-07-07 12:10+0200\n"
+"PO-Revision-Date: 2009-07-07 13:35+0100\n"
 "Last-Translator: Daniel Nylander <po@danielnylander.se>\n"
 "Language-Team: Swedish <tp-sv@listor.tp-sv.se>\n"
 "MIME-Version: 1.0\n"
@@ -869,33 +869,33 @@ msgstr "Ingen sökväg hittades för postlådan \"%s\", med \"%s\""
 msgid "Cannot get IMAP handle"
 msgstr "Kan inte hämta IMAP-handtag"
 
-#: ../libbalsa/mailbox_imap.c:2343
+#: ../libbalsa/mailbox_imap.c:2349
 #, c-format
 msgid "Downloading %u kB"
 msgstr "Hämtar %u kB"
 
-#: ../libbalsa/mailbox_imap.c:2375
+#: ../libbalsa/mailbox_imap.c:2381
 #, c-format
 msgid "Error fetching message from IMAP server: %s"
 msgstr "Fel vid hämtning av meddelande från IMAP-servern: %s"
 
-#: ../libbalsa/mailbox_imap.c:2387
+#: ../libbalsa/mailbox_imap.c:2393
 #, c-format
 msgid "Cannot create temporary file"
 msgstr "Kan inte skapa temporärfil"
 
-#: ../libbalsa/mailbox_imap.c:2407
+#: ../libbalsa/mailbox_imap.c:2413
 #, c-format
 msgid "Cannot write to temporary file %s"
 msgstr "Kan inte skriva till temporärfilen %s"
 
-#: ../libbalsa/mailbox_imap.c:2636
-#: ../libbalsa/mailbox_imap.c:2755
+#: ../libbalsa/mailbox_imap.c:2642
+#: ../libbalsa/mailbox_imap.c:2761
 #, c-format
 msgid "Uploading %ld kB"
 msgstr "Skickar %ld kB"
 
-#: ../libbalsa/mailbox_imap.c:3054
+#: ../libbalsa/mailbox_imap.c:3060
 msgid "Server-side threading not supported."
 msgstr "Trådning på serversidan stöds inte."
 
@@ -1303,12 +1303,11 @@ msgstr "Svara på händelsebegäran"
 
 #: ../libbalsa/rfc2445.c:689
 msgid "Event Cancellation"
-msgstr ""
+msgstr "Avbryt händelse"
 
 #: ../libbalsa/rfc2445.c:705
-#, fuzzy
 msgid "chair"
-msgstr "thailändsk"
+msgstr "ansvarig"
 
 #: ../libbalsa/rfc2445.c:706
 msgid "required participant"

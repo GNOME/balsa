@@ -667,7 +667,7 @@ destroy_message_window(GtkWidget * widget, MessageWindow * mw)
 static void
 mw_expunged_cb(LibBalsaMailbox * mailbox, guint msgno, MessageWindow * mw)
 {
-    if ((guint) mw->message->msgno == msgno)
+    if (mw->message && (guint) mw->message->msgno == msgno)
         gtk_widget_destroy(mw->window);
 }
 

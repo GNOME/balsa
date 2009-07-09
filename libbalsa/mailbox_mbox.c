@@ -1700,10 +1700,12 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 	}
 	if (msg_info->local_info.message)
 	    msg_info->local_info.message->msgno = j + 1;
-	j++;
 
 	msg_info->status = msg_info->x_status = msg_info->mime_version = -1;
 	mime_msg = g_mime_parser_construct_message(gmime_parser);
+        if (!mime_msg)
+            /* Try to recover */
+            continue;
         msg_info->start = g_mime_parser_get_from_offset(gmime_parser);
 
 	/* Make sure we don't have offsets for any encapsulated headers. */
@@ -1715,11 +1717,16 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 	    msg_info->mime_version = -1;
 
 	from = g_mime_parser_get_from(gmime_parser);
+        if (!from) {
+            /* Try to recover */
+            g_object_unref(mime_msg);
+            continue;
+        }
+
         msg_info->from_len = strlen(from) + 1;
         g_free(from);
 	msg_info->end = g_mime_parser_tell(gmime_parser);
 	msg_info->orig_flags = REAL_FLAGS(msg_info->local_info.flags);
-	g_assert(mime_msg != NULL);
 	g_assert(mime_msg->mime_part != NULL);
 	if (!msg_info->local_info.message || !msg_info->local_info.message->mime_msg)
 	    g_object_unref(mime_msg);
@@ -1732,6 +1739,8 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 	    libbalsa_message_body_set_mime_body(msg_info->local_info.message->body_list,
 						mime_msg->mime_part);
 	}
+
+	j++;
     }
     libbalsa_mime_stream_shared_unlock(mbox_stream);
     mbox->msgno_2_msg_info->len = j;

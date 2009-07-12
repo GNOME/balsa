@@ -180,11 +180,11 @@ static void edit_with_gnome(GtkAction * action, BalsaSendmsg* bsmsg);
 #endif
 static void change_identity_dialog_cb(GtkAction * action,
                                       BalsaSendmsg * bsmsg);
-static void repl_identity_signature(BalsaSendmsg* bsmsg, 
-                                    LibBalsaIdentity* new_ident,
-                                    LibBalsaIdentity* old_ident,
-                                    gint* replace_offset, gint siglen, 
-                                    gchar* new_sig);
+static void replace_identity_signature(BalsaSendmsg* bsmsg, 
+                                       LibBalsaIdentity* new_ident,
+                                       LibBalsaIdentity* old_ident,
+                                       gint* replace_offset, gint siglen, 
+                                       const gchar* new_sig);
 static void update_bsmsg_identity(BalsaSendmsg*, LibBalsaIdentity*);
 
 static void sw_size_alloc_cb(GtkWidget * window, GtkAllocation * alloc);
@@ -1269,20 +1269,16 @@ change_identity_dialog_cb(GtkAction * action, BalsaSendmsg* bsmsg)
 
 /* NOTE: replace_offset and siglen are  utf-8 character offsets. */
 static void
-repl_identity_signature(BalsaSendmsg* bsmsg, LibBalsaIdentity* new_ident,
-                        LibBalsaIdentity* old_ident, gint* replace_offset, 
-                        gint siglen, gchar* new_sig) 
+replace_identity_signature(BalsaSendmsg* bsmsg, LibBalsaIdentity* new_ident,
+                           LibBalsaIdentity* old_ident, gint* replace_offset, 
+                           gint siglen, const gchar* new_sig) 
 {
     gint newsiglen;
-    gboolean reply_type = (bsmsg->type == SEND_REPLY || 
-                           bsmsg->type == SEND_REPLY_ALL ||
-                           bsmsg->type == SEND_REPLY_GROUP);
-    gboolean forward_type = (bsmsg->type == SEND_FORWARD_ATTACH || 
-                             bsmsg->type == SEND_FORWARD_INLINE);
     GtkTextBuffer *buffer =
         gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
     GtkTextIter ins, end;
     GtkTextMark *mark;
+    gboolean insert_signature;
     
     /* Save cursor */
     gtk_text_buffer_get_iter_at_mark(buffer, &ins,
@@ -1297,10 +1293,23 @@ repl_identity_signature(BalsaSendmsg* bsmsg, LibBalsaIdentity* new_ident,
 
     newsiglen = strlen(new_sig);
     
-    /* check to see if this is a reply or forward and compare identity
-     * settings to determine whether to add signature */
-    if ((reply_type && new_ident->sig_whenreply) ||
-          (forward_type && new_ident->sig_whenforward)) {
+    switch (bsmsg->type) {
+    case SEND_NORMAL:
+    case SEND_CONTINUE:
+    default:
+        insert_signature = TRUE;
+        break;
+    case SEND_REPLY:
+    case SEND_REPLY_ALL:
+    case SEND_REPLY_GROUP:
+        insert_signature = new_ident->sig_whenreply;
+        break;
+    case SEND_FORWARD_ATTACH:
+    case SEND_FORWARD_INLINE:
+        insert_signature = new_ident->sig_whenforward;
+        break;
+    }
+    if (insert_signature) {
 
         /* see if sig location is probably going to be the same */
         if (new_ident->sig_prepend == old_ident->sig_prepend) {
@@ -1315,6 +1324,7 @@ repl_identity_signature(BalsaSendmsg* bsmsg, LibBalsaIdentity* new_ident,
             /* put it at the end of the message */
             gtk_text_buffer_get_end_iter(buffer, &ins);
         }
+        printf("Inserting new sig\n");
         gtk_text_buffer_place_cursor(buffer, &ins);
         gtk_text_buffer_insert_at_cursor(buffer, new_sig, -1);
     }
@@ -1549,8 +1559,8 @@ update_bsmsg_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity* ident)
     if (!old_sig) {
         replace_offset = bsmsg->ident->sig_prepend 
             ? 0 : g_utf8_strlen(message_text, -1);
-        repl_identity_signature(bsmsg, ident, old_ident, &replace_offset,
-                                0, new_sig);
+        replace_identity_signature(bsmsg, ident, old_ident, &replace_offset,
+                                   0, new_sig);
     } else {
         /* split on sig separator */
         message_split = g_strsplit(message_text, "\n-- \n", 0);
@@ -1561,8 +1571,8 @@ update_bsmsg_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity* ident)
 
 	if (g_ascii_strncasecmp(old_sig, compare_str, siglen) == 0) {
 	    g_free(compare_str);
-	    repl_identity_signature(bsmsg, ident, old_ident,
-				    &replace_offset, siglen - 1, new_sig);
+	    replace_identity_signature(bsmsg, ident, old_ident,
+                                       &replace_offset, siglen - 1, new_sig);
 	    found_sig = TRUE;
 	} else {
 	    g_free(compare_str);
@@ -1572,8 +1582,9 @@ update_bsmsg_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity* ident)
 
 		/* try to find occurance of old signature */
 		if (g_ascii_strncasecmp(old_sig, compare_str, siglen) == 0) {
-		    repl_identity_signature(bsmsg, ident, old_ident,
-					    &replace_offset, siglen, new_sig);
+		    replace_identity_signature(bsmsg, ident, old_ident,
+                                               &replace_offset, siglen,
+                                               new_sig);
 		    found_sig = TRUE;
 		}
 
@@ -1596,16 +1607,18 @@ update_bsmsg_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity* ident)
 
 	    if (g_ascii_strncasecmp(old_sig, tmpstr, siglen) == 0) {
 		g_free(tmpstr);
-		repl_identity_signature(bsmsg, ident, old_ident,
-					&replace_offset, siglen - 1, new_sig);
+		replace_identity_signature(bsmsg, ident, old_ident,
+                                           &replace_offset, siglen - 1,
+                                           new_sig);
 	    } else {
 		g_free(tmpstr);
 		replace_offset++;
 		compare_str = g_utf8_next_char(compare_str);
 		while (*compare_str) {
 		    if (g_ascii_strncasecmp(old_sig, compare_str, siglen) == 0) {
-			repl_identity_signature(bsmsg, ident, old_ident,
-						&replace_offset, siglen, new_sig);
+			replace_identity_signature(bsmsg, ident, old_ident,
+                                                   &replace_offset, siglen,
+                                                   new_sig);
 		    }
 		    replace_offset++;
 		    compare_str = g_utf8_next_char(compare_str);

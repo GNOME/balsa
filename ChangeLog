@@ -1,3 +1,8 @@
+2006-07-12  Pawel Salek
+
+	* src/sendmsg-window.c: do insert new signatures on identity
+	switch (reported on balsa-list).
+
 2009-07-09  Peter Bloomfield
 
 	* src/message-window.c (mw_expunged_cb): check for NULL message.

@@ -930,7 +930,7 @@ delete_handler(BalsaSendmsg * bsmsg)
                 return TRUE;
         break;
     case GTK_RESPONSE_NO:
-        if (bsmsg->type != SEND_CONTINUE)
+        if (!bsmsg->is_continue)
             sw_delete_draft(bsmsg);
         break;
     default:
@@ -1295,7 +1295,6 @@ replace_identity_signature(BalsaSendmsg* bsmsg, LibBalsaIdentity* new_ident,
     
     switch (bsmsg->type) {
     case SEND_NORMAL:
-    case SEND_CONTINUE:
     default:
         insert_signature = TRUE;
         break;
@@ -4020,11 +4019,6 @@ set_entry_to_subject(GtkEntry* entry, LibBalsaMessageBody *part,
     case SEND_FORWARD_INLINE:
         newsubject = generate_forwarded_subject(subject, headers, ident);
 	break;
-    case SEND_CONTINUE:
-	if (subject)
-	    gtk_entry_set_text(entry, subject);
-	g_free(subject);
-	return;
     default:
 	return; /* or g_assert_never_reached() ? */
     }
@@ -4232,7 +4226,7 @@ guess_identity(BalsaSendmsg* bsmsg, LibBalsaMessage * message)
     if (!message  || !message->headers || !balsa_app.identities)
         return FALSE; /* use default */
 
-    if (bsmsg->type == SEND_CONTINUE)
+    if (bsmsg->is_continue)
         return guess_identity_from_list(bsmsg, message->headers->from,
                                         FALSE);
 
@@ -4499,6 +4493,7 @@ sendmsg_window_new()
     gtk_widget_show_all(window);
 
     bsmsg->type = SEND_NORMAL;
+    bsmsg->is_continue = FALSE;
 #if !HAVE_GTKSPELL
     bsmsg->spell_checker = NULL;
 #endif                          /* HAVE_GTKSPELL */
@@ -4940,7 +4935,7 @@ sendmsg_window_continue(LibBalsaMailbox * mailbox, guint msgno)
     GList *list, *refs = NULL;
 
     g_assert(message);
-    bsmsg->type = SEND_CONTINUE;
+    bsmsg->is_continue = TRUE;
     bsm_prepare_for_setup(message);
     bsmsg->draft_message = message;
     set_identity(bsmsg, message);
@@ -4988,6 +4983,9 @@ sendmsg_window_continue(LibBalsaMailbox * mailbox, guint msgno)
     if ((postpone_hdr =
          libbalsa_message_get_user_header(message, "X-Balsa-MP-Alt")))
         sw_set_active(bsmsg, "SendMPAlt", !strcmp(postpone_hdr, "yes"));
+    if ((postpone_hdr =
+         libbalsa_message_get_user_header(message, "X-Balsa-Send-Type")))
+        bsmsg->type = atoi(postpone_hdr);
 
     for (list = message->references; list; list = list->next)
         refs = g_list_prepend(refs, g_strdup(list->data));
@@ -5988,6 +5986,8 @@ message_postpone(BalsaSendmsg * bsmsg)
     g_ptr_array_add(headers, g_strdup(bsmsg->flow ? "Flowed" : "Fixed"));
     g_ptr_array_add(headers, g_strdup("X-Balsa-MP-Alt"));
     g_ptr_array_add(headers, g_strdup(bsmsg->send_mp_alt ? "yes" : "no"));
+    g_ptr_array_add(headers, g_strdup("X-Balsa-Send-Type"));
+    g_ptr_array_add(headers, g_strdup_printf("%d", bsmsg->type));
     g_ptr_array_add(headers, NULL);
 
     if ((bsmsg->type == SEND_REPLY || bsmsg->type == SEND_REPLY_ALL ||
@@ -6848,10 +6848,6 @@ sendmsg_window_set_title(BalsaSendmsg * bsmsg)
     case SEND_FORWARD_ATTACH:
     case SEND_FORWARD_INLINE:
         title_format = _("Forward message to %s: %s");
-        break;
-
-    case SEND_CONTINUE:
-        title_format = _("Continue message to %s: %s");
         break;
 
     default:

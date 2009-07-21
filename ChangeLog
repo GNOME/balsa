@@ -1,4 +1,15 @@
-2009-07-20  Peter Bloomfield  <peter@t43.bellsouth.net>
+2009-07-21  Peter Bloomfield
+
+	Save send type in draft message
+
+	* src/sendmsg-window.h: new member is_continue.
+	* src/sendmsg-window.c (delete_handler), (guess_identity),
+	(sendmsg_window_new), (sendmsg_window_continue),
+	(message_postpone): use it instead of SEND_CONTINUE.
+	(sendmsg_window_set_title), (set_entry_to_subject),
+	(replace_identity_signature): we no longer use SEND_CONTINUE.
+
+2009-07-20  Peter Bloomfield
 
 	* configure.in: make silent rules by default.
 

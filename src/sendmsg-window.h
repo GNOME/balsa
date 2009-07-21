@@ -72,6 +72,7 @@ extern "C" {
 	LibBalsaMessage *parent_message; /* to which we're replying     */
 	LibBalsaMessage *draft_message;  /* where the message was saved */
 	SendType type;
+        gboolean is_continue;
 	/* language selection related data */
 	const gchar *spell_check_lang;
 	GtkWidget *current_language_menu;

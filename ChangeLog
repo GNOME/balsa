@@ -1,3 +1,7 @@
+2009-07-20  Peter Bloomfield  <peter@t43.bellsouth.net>
+
+	* configure.in: make silent rules by default.
+
 2006-07-12  Pawel Salek
 
 	* src/sendmsg-window.c: do insert new signatures on identity

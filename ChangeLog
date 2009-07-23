@@ -1,3 +1,11 @@
+2009-07-23  Peter Bloomfield
+
+	Check for NULL InternetAddressList
+
+	* libbalsa/send.c (do_multipart_crypto):
+	* src/sendmsg-window.c (sw_cc_add_list):
+	* src/store-address.c (store_address_add_list):
+
 2009-07-21  Peter Bloomfield
 
 	Save send type in draft message

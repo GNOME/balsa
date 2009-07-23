@@ -4432,6 +4432,9 @@ sw_cc_add_list(InternetAddressList **new_cc, InternetAddressList * list)
 {
     int i;
     
+    if (!list)
+        return;
+
     for (i = 0; i < internet_address_list_length(list); i++) {
         InternetAddress *ia = internet_address_list_get_address (list, i);
 	GList *ident;

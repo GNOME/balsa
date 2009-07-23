@@ -2186,7 +2186,9 @@ do_multipart_crypto(LibBalsaMessage * message, GMimeObject ** mime_root,
 						message->headers->cc_list);
 		encrypt_for = g_list_append(encrypt_for,
 					    g_strdup(lb_send_from(message)));
-		if (internet_address_list_length(message->headers->bcc_list) > 0)
+                if (message->headers->bcc_list
+                    && internet_address_list_length(message->headers->
+                                                    bcc_list) > 0)
 		    libbalsa_information(LIBBALSA_INFORMATION_WARNING,
 					 _("This message will not be encrypted for the BCC: recipient(s)."));
 

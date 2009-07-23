@@ -412,6 +412,9 @@ store_address_add_list(StoreAddressInfo * info,
 {
     int i, j;
     
+    if (!list)
+        return;
+
     for (i = 0; i < internet_address_list_length (list); i++) {
         InternetAddress *ia = internet_address_list_get_address (list, i);
 	

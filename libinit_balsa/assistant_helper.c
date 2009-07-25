@@ -213,9 +213,10 @@ balsa_init_create_to_directory(const gchar * dir, gchar ** complaint)
             if (stat(sofar, &sb) < 0) {
                 if (mkdir(sofar, S_IRUSR | S_IWUSR | S_IXUSR) < 0) {
                     (*complaint) =
-                        g_strdup_printf(_
-                                        ("Couldn't create a directory: mkdir() failed on pathname \"%s\"."),
-                                        sofar);
+                        g_strdup_printf(_("Couldn't create a directory:"
+                                          " mkdir() failed on pathname \"%s\","
+                                          " with error \"%s\"."),
+                                        sofar, g_strerror(errno));
                     g_free(sofar);
                     return TRUE;
                 }

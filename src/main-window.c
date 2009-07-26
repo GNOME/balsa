@@ -62,12 +62,6 @@
 #include "toolbar-prefs.h"
 #include "toolbar-factory.h"
 
-#if !GTK_CHECK_VERSION(2, 14, 0)
-#ifdef HAVE_GNOME
-#include <gnome.h>
-#endif
-#endif                          /* GTK_CHECK_VERSION(2, 14, 0) */
-
 #if HAVE_GNOME
 #include <gnome.h> /* for gnome_triggers_do() */
 #endif
@@ -1574,13 +1568,9 @@ bw_is_active_notify(GObject * gobject, GParamSpec * pspec,
             notify_notification_show(window->new_mail_note, NULL);
         }
 #endif                          /* HAVE_NOTIFY */
-#if GTK_CHECK_VERSION(2, 10, 0)
         if (window->new_mail_tray)
             gtk_status_icon_set_visible(window->new_mail_tray, FALSE);
-#endif                          /* GTK_CHECK_VERSION(2, 10, 0) */
-#if GTK_CHECK_VERSION(2, 8, 0)
         gtk_window_set_urgency_hint(gtk_window, FALSE);
-#endif                          /* GTK_CHECK_VERSION(2, 8, 0) */
     }
 }
 
@@ -2195,9 +2185,6 @@ bw_notebook_label_new(BalsaMailboxNode * mbnode)
     GtkWidget *close_pix;
     GtkWidget *box;
     GtkWidget *but;
-#if !GTK_CHECK_VERSION(2, 11, 0)
-    GtkWidget *ev;
-#endif                          /* GTK_CHECK_VERSION(2, 11, 0) */
     GtkSettings *settings;
     gint w, h;
 
@@ -2231,19 +2218,8 @@ bw_notebook_label_new(BalsaMailboxNode * mbnode)
 
     gtk_widget_show_all(box);
 
-#if GTK_CHECK_VERSION(2, 11, 0)
     gtk_widget_set_tooltip_text(box, mbnode->mailbox->url);
     return box;
-#else                           /* GTK_CHECK_VERSION(2, 11, 0) */
-    ev = gtk_event_box_new();
-    gtk_event_box_set_visible_window(GTK_EVENT_BOX(ev), FALSE);
-    gtk_container_add(GTK_CONTAINER(ev), box);
-    gtk_tooltips_set_tip(balsa_app.tooltips,
-                         ev,
-                         mbnode->mailbox->url,
-                         mbnode->mailbox->url);
-    return ev;
-#endif                          /* GTK_CHECK_VERSION(2, 11, 0) */
 }
 
 struct bw_open_mbnode_info {
@@ -2336,10 +2312,8 @@ bw_real_open_mbnode(struct bw_open_mbnode_info * info)
     gtk_widget_show(scroll);
     gtk_notebook_append_page(GTK_NOTEBOOK(info->window->notebook),
                              scroll, label);
-#if GTK_CHECK_VERSION(2, 10, 0)
     gtk_notebook_set_tab_reorderable(GTK_NOTEBOOK(info->window->notebook),
                                      scroll, TRUE);
-#endif                          /* GTK_CHECK_VERSION(2, 10, 0) */
 
     /* change the page to the newly selected notebook item */
     page_num = gtk_notebook_page_num(GTK_NOTEBOOK
@@ -2611,20 +2585,14 @@ bw_is_open_mailbox(LibBalsaMailbox *m)
 static void
 bw_contents_cb(void)
 {
-#if GTK_CHECK_VERSION(2, 14, 0) || HAVE_GNOME
     GError *err = NULL;
 
-#if GTK_CHECK_VERSION(2, 14, 0)
     gtk_show_uri(NULL, "ghelp:balsa", gtk_get_current_event_time(), &err);
-#else                           /* GTK_CHECK_VERSION(2, 14, 0) */
-    gnome_help_display("balsa", NULL, &err);
-#endif                          /* GTK_CHECK_VERSION(2, 14, 0) */
     if (err) {
         balsa_information(LIBBALSA_INFORMATION_WARNING,
                           _("Error displaying help: %s\n"), err->message);
         g_error_free(err);
     }
-#endif
 }
 
 /*
@@ -2636,11 +2604,7 @@ bw_show_about_box_url_hook(GtkAboutDialog * about, const gchar * link,
 {
     GError *err = NULL;
 
-#if GTK_CHECK_VERSION(2, 14, 0)
     gtk_show_uri(NULL, link, gtk_get_current_event_time(), &err);
-#else                           /* GTK_CHECK_VERSION(2, 14, 0) */
-    gnome_url_show(link, &err);
-#endif                          /* GTK_CHECK_VERSION(2, 14, 0) */
 
     if (err) {
         balsa_information(LIBBALSA_INFORMATION_WARNING,
@@ -3283,12 +3247,9 @@ bw_display_new_mail_notification(int num_new, int has_new)
                           "balsa", "newmail", NULL);
 #endif
 
-#if GTK_CHECK_VERSION(2, 8, 0)
     if (!gtk_window_is_active(window))
         gtk_window_set_urgency_hint(window, TRUE);
-#endif                          /* GTK_CHECK_VERSION(2, 8, 0) */
 
-#if GTK_CHECK_VERSION(2, 10, 0)
     if (balsa_app.notify_new_mail_icon) {
         /* set up the sys tray icon when it is not yet present */
         if (!gtk_window_is_active(window)) {
@@ -3321,7 +3282,6 @@ bw_display_new_mail_notification(int num_new, int has_new)
             g_free(msg);
         }
     }
-#endif
 
     if (!balsa_app.notify_new_mail_dialog)
         return;
@@ -4162,9 +4122,7 @@ bw_find_real(BalsaWindow * window, BalsaIndex * bindex, gboolean again)
 	gtk_entry_set_activates_default(GTK_ENTRY(search_entry), TRUE);
         gtk_dialog_set_default_response(GTK_DIALOG(dia), GTK_RESPONSE_OK);
 	do {
-#if GTK_CHECK_VERSION(2, 14, 0) || HAVE_GNOME
 	    GError *err = NULL;
-#endif
 
 	    ok=gtk_dialog_run(GTK_DIALOG(dia));
             switch(ok) {
@@ -4199,20 +4157,14 @@ bw_find_real(BalsaWindow * window, BalsaIndex * bindex, gboolean again)
                     ok = GTK_RESPONSE_CANCEL; 
                 break;
 	    case GTK_RESPONSE_HELP:
-#if GTK_CHECK_VERSION(2, 14, 0) || HAVE_GNOME
-#if GTK_CHECK_VERSION(2, 14, 0)
                 gtk_show_uri(NULL, "ghelp:balsa?win-search",
                              gtk_get_current_event_time(), &err);
-#else                           /* GTK_CHECK_VERSION(2, 14, 0) */
-		gnome_help_display("balsa", "win-search", &err);
-#endif                          /* GTK_CHECK_VERSION(2, 14, 0) */
 		if (err) {
 		    balsa_information(LIBBALSA_INFORMATION_WARNING,
 				      _("Error displaying help: %s\n"),
 				      err->message);
 		    g_error_free(err);
 		}
-#endif
 		break;
             case FIND_RESPONSE_RESET:
 		bw_reset_filter_cb(NULL, window);
@@ -4605,15 +4557,9 @@ void
 balsa_change_window_layout(BalsaWindow *window)
 {
 
-#if GTK_CHECK_VERSION(2, 11, 0)
     g_object_ref(window->notebook);
     g_object_ref(window->mblist);
     g_object_ref(window->preview);
-#else                           /* GTK_CHECK_VERSION(2, 11, 0) */
-    gtk_widget_ref(window->notebook);
-    gtk_widget_ref(window->mblist);
-    gtk_widget_ref(window->preview);
-#endif                          /* GTK_CHECK_VERSION(2, 11, 0) */
  
     gtk_container_remove(GTK_CONTAINER(window->notebook->parent), window->notebook);
     gtk_container_remove(GTK_CONTAINER(window->mblist->parent),
@@ -4623,15 +4569,9 @@ balsa_change_window_layout(BalsaWindow *window)
 
     bw_set_panes(window);
 
-#if GTK_CHECK_VERSION(2, 11, 0)
     g_object_unref(window->notebook);
     g_object_unref(window->mblist);
     g_object_unref(window->preview);
-#else                           /* GTK_CHECK_VERSION(2, 11, 0) */
-    gtk_widget_unref(window->notebook);
-    gtk_widget_unref(window->mblist);
-    gtk_widget_unref(window->preview);
-#endif                          /* GTK_CHECK_VERSION(2, 11, 0) */
  
     gtk_paned_set_position(GTK_PANED(window->paned_master), 
                            balsa_app.show_mblist 

@@ -26,7 +26,6 @@
 
 /* #include <gtk/gtkfeatures.h> */
 #include <string.h>
-#include <gdk/gdkfont.h>
 
 #include "balsa-app.h"
 #include "balsa-icons.h"

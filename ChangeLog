@@ -1,5 +1,9 @@
 2009-07-26  Peter Bloomfield
 
+	* src/balsa-mblist.c: do not include gdk/gdkfont.h.
+
+2009-07-26  Peter Bloomfield
+
 	Partial fixes for bug #589764, André Klapper.
 
 	* libbalsa/imap/pop3.c (pop_authenticate): use

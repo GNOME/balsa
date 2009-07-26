@@ -97,7 +97,7 @@ allocate_quote_colors(GtkWidget * widget, GdkColor color[],
     for (i = first; i <= last; i++) {
         if (!gdk_colormap_alloc_color(balsa_app.colormap,
                                       &color[i], FALSE, TRUE)) {
-            /* gdk_color_black(balsa_app.colormap, &color[i]); */
+            /* Use black instead: */
             color[i].red = color[i].green = color[i].blue = 0;
             gdk_colormap_alloc_color(balsa_app.colormap, &color[i], FALSE,
                                      TRUE);

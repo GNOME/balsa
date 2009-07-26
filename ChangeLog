@@ -1,5 +1,14 @@
 2009-07-26  Peter Bloomfield
 
+	Partial fixes for bug #589764, André Klapper.
+
+	* libbalsa/imap/pop3.c (pop_authenticate): use
+	g_ascii_strncasecmp.
+	* src/quote-color.c (allocate_quote_colors): remove
+	"gdk_color_black" from comment.
+
+2009-07-26  Peter Bloomfield
+
 	* src/sendmsg-window.c: do not include gnome.h.
 
 2009-07-26  Peter Bloomfield

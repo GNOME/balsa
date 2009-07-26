@@ -391,7 +391,7 @@ pop_authenticate(PopHandle *pop, const char *greeting, GError **err)
   const PopAuthenticator *authenticator;
   ImapResult r;
 
-  if(g_strncasecmp(greeting, "+OK", 3) != 0) {
+  if(g_ascii_strncasecmp(greeting, "+OK", 3) != 0) {
     g_set_error(err, IMAP_ERROR, IMAP_POP_AUTH_ERROR,
                 "Server does not welcome us: %s", greeting);
     return FALSE;

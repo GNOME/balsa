@@ -1,6 +1,11 @@
 2009-07-26  Peter Bloomfield
 
-	* src/main-window.c: remove redundant gtk version checks.
+	* src/sendmsg-window.c: do not include gnome.h.
+
+2009-07-26  Peter Bloomfield
+
+	* src/main-window.c: remove redundant gtk version checks and
+	dead code.
 
 2009-07-25  Peter Bloomfield
 

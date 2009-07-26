@@ -32,11 +32,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#if HAVE_GNOME
-#include <gnome.h>
-#else
 #define GNOME_PAD_SMALL    4
-#endif
 #include <gio/gio.h>
 #include <glib/gi18n.h>
 #include <glib/gstdio.h>

@@ -372,31 +372,27 @@ lbav_add_from_list(LibBalsaAddressView * address_view,
     GtkTreeModel *model =
         gtk_tree_view_get_model(GTK_TREE_VIEW(address_view));
     GtkListStore *address_store = GTK_LIST_STORE(model);
-    InternetAddress *ia;
-    gchar *name;
     guint type;
     int i;
-    
+
     gtk_tree_model_get(model, iter, ADDRESS_TYPE_COL, &type, -1);
 
-    for (i = 0; i < internet_address_list_length (list); i++) {
-        ia = internet_address_list_get_address (list, i);;
-	name = internet_address_to_string (ia, FALSE);
-	
-	libbalsa_utf8_sanitize(&name, address_view->fallback, NULL);
-	lbav_clean_text(name);
-	
-	gtk_list_store_set(address_store, iter,
-			   ADDRESS_TYPE_COL, type,
-			   ADDRESS_TYPESTRING_COL,
-			   _(lbav_type_string(address_view, type)),
-			   ADDRESS_NAME_COL, name,
-			   ADDRESS_ICON_COL, lbav_close_icon,
-			   -1);
-	g_free(name);
-	
-	if (i + 1 < internet_address_list_length (list))
+    for (i = 0; i < internet_address_list_length(list); i++) {
+        InternetAddress *ia = internet_address_list_get_address(list, i);
+        gchar *name = internet_address_to_string(ia, FALSE);
+
+        libbalsa_utf8_sanitize(&name, address_view->fallback, NULL);
+        lbav_clean_text(name);
+
+        if (i > 0)
             gtk_list_store_insert_after(address_store, iter, iter);
+        gtk_list_store_set(address_store, iter,
+                           ADDRESS_TYPE_COL, type,
+                           ADDRESS_TYPESTRING_COL,
+                           _(lbav_type_string(address_view, type)),
+                           ADDRESS_NAME_COL, name,
+                           ADDRESS_ICON_COL, lbav_close_icon, -1);
+        g_free(name);
     }
 }
 
@@ -411,16 +407,15 @@ lbav_add_from_string(LibBalsaAddressView * address_view,
                      GtkTreeIter * iter, const gchar * string)
 {
     InternetAddressList *list = internet_address_list_parse_string(string);
+    gboolean retval = FALSE;
 
     if (list) {
-        gboolean retval = internet_address_list_length(list) > 0;
-
-        lbav_add_from_list(address_view, iter, list);
+        if ((retval = (internet_address_list_length(list) > 0)))
+            lbav_add_from_list(address_view, iter, list);
         g_object_unref(list);
+    }
 
-        return retval;
-    } else
-        return FALSE;
+    return retval;
 }
 
 /*

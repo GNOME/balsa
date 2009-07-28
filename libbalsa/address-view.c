@@ -411,12 +411,16 @@ lbav_add_from_string(LibBalsaAddressView * address_view,
                      GtkTreeIter * iter, const gchar * string)
 {
     InternetAddressList *list = internet_address_list_parse_string(string);
-    gboolean retval = internet_address_list_length(list) > 0;
 
-    lbav_add_from_list(address_view, iter, list);
-    g_object_unref(list);
+    if (list) {
+        gboolean retval = internet_address_list_length(list) > 0;
 
-    return retval;
+        lbav_add_from_list(address_view, iter, list);
+        g_object_unref(list);
+
+        return retval;
+    } else
+        return FALSE;
 }
 
 /*

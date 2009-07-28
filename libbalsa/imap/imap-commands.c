@@ -317,15 +317,18 @@ imap_mbox_subscribe(ImapMboxHandle* handle,
 ImapResponse
 imap_mbox_list(ImapMboxHandle *handle, const char* what)
 {
+  ImapResponse rc;
   IMAP_REQUIRED_STATE2(handle,IMHS_AUTHENTICATED, IMHS_SELECTED, IMR_BAD);
+  HANDLE_LOCK(handle);
   {
   gchar *mbx7 = imap_utf8_to_mailbox(what);
   gchar *cmd = g_strdup_printf("LIST \"%s\" \"%%\"", mbx7);
-  ImapResponse rc = imap_cmd_exec(handle, cmd);
+  rc = imap_cmd_exec(handle, cmd);
   g_free(cmd);
   g_free(mbx7);
-  return rc;
   }
+  HANDLE_LOCK(handle);
+  return rc;
 }
 
 
@@ -333,14 +336,17 @@ imap_mbox_list(ImapMboxHandle *handle, const char* what)
 ImapResponse
 imap_mbox_lsub(ImapMboxHandle *handle, const char* what)
 {
+  ImapResponse rc;
   IMAP_REQUIRED_STATE2(handle,IMHS_AUTHENTICATED, IMHS_SELECTED, IMR_BAD);
+  HANDLE_LOCK(handle);
   {
   gchar *mbx7 = imap_utf8_to_mailbox(what);
   gchar *cmd = g_strdup_printf("LSUB \"%s\" \"%%\"", mbx7);
-  ImapResponse rc = imap_cmd_exec(handle, cmd);
+  rc = imap_cmd_exec(handle, cmd);
   g_free(mbx7); g_free(cmd);
-  return rc;
   }
+  HANDLE_UNLOCK(handle);
+  return rc;
 }
 
 
@@ -367,13 +373,15 @@ imap_mbox_status(ImapMboxHandle *r, const char*what,
     gchar *mbx7 = imap_utf8_to_mailbox(what);
     gchar *items = g_strjoinv(" ", (gchar**)&item_arr[0]);
     gchar *cmd = g_strdup_printf("STATUS \"%s\" (%s)", mbx7, items);
+    HANDLE_LOCK(r);
     g_hash_table_insert(r->status_resps, (gpointer)what, res);
     rc = imap_cmd_exec(r, cmd);
     g_hash_table_remove(r->status_resps, what);
+    HANDLE_UNLOCK(r);
     g_free(mbx7); g_free(cmd);
     g_free(items);
   }
-  return IMR_OK; 
+  return rc; 
 }
 /* 6.3.11 APPEND Command */
 static gchar*

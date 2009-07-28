@@ -1319,7 +1319,7 @@ replace_identity_signature(BalsaSendmsg* bsmsg, LibBalsaIdentity* new_ident,
             /* put it at the end of the message */
             gtk_text_buffer_get_end_iter(buffer, &ins);
         }
-        printf("Inserting new sig\n");
+
         gtk_text_buffer_place_cursor(buffer, &ins);
         gtk_text_buffer_insert_at_cursor(buffer, new_sig, -1);
     }

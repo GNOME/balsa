@@ -327,7 +327,7 @@ imap_mbox_list(ImapMboxHandle *handle, const char* what)
   g_free(cmd);
   g_free(mbx7);
   }
-  HANDLE_LOCK(handle);
+  HANDLE_UNLOCK(handle);
   return rc;
 }
 

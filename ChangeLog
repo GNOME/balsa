@@ -1,7 +1,15 @@
+2006-07-30  Pawel Salek
+
+	* libbalsa/imap/imap-commands.c: lock LIST fixed.
 2009-07-28  Peter Bloomfield
 
 	* libbalsa/address-view.c (lbav_add_from_list),
 	(lbav_add_from_string): streamline code.
+
+2006-07-28  Pawel Salek
+
+	* libbalsa/address-view.c: protect against empty InternetAddressLists.
+	* libbalsa/imap/imap-commands.c: lock LIST, LSUB, STATUS as well.
 
 2009-07-26  Peter Bloomfield
 

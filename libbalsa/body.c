@@ -636,6 +636,15 @@ libbalsa_message_body_get_pixbuf(LibBalsaMessageBody * body, GError ** err)
 
     mime_type = libbalsa_message_body_get_mime_type(body);
     loader = gdk_pixbuf_loader_new_with_mime_type(mime_type, err);
+
+#define ENABLE_WORKAROUND_FOR_IE_NON_IANA_MIME_TYPE TRUE
+#if ENABLE_WORKAROUND_FOR_IE_NON_IANA_MIME_TYPE
+    if (!loader && g_ascii_strcasecmp(mime_type, "image/pjpeg") == 0) {
+        g_clear_error(err);
+        loader = gdk_pixbuf_loader_new_with_mime_type("image/jpeg", err);
+    }
+#endif                          /* ENABLE_WORKAROUND_FOR_IE_NON_IANA_MIME_TYPE */
+
     g_free(mime_type);
 
     if (loader) {

@@ -1,5 +1,11 @@
 2009-08-01  Peter Bloomfield
 
+	* libbalsa/body.c (libbalsa_message_body_get_pixbuf): workaround
+	for IE's use of non-IANA registered mime-type "image/pjpeg" for
+	progressive JPEG image.
+
+2009-08-01  Peter Bloomfield
+
 	* src/sendmsg-window.c (set_entry_to_subject): do not drop
 	subject when continuing a new message.
 

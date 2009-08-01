@@ -1,3 +1,8 @@
+2009-08-01  Peter Bloomfield
+
+	* src/sendmsg-window.c (set_entry_to_subject): do not drop
+	subject when continuing a new message.
+
 2006-07-30  Pawel Salek
 
 	* libbalsa/imap/imap-commands.c: lock LIST fixed.

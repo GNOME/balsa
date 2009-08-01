@@ -4016,10 +4016,10 @@ set_entry_to_subject(GtkEntry* entry, LibBalsaMessageBody *part,
         newsubject = generate_forwarded_subject(subject, headers, ident);
 	break;
     default:
-	return; /* or g_assert_never_reached() ? */
+	break;
     }
 
-    gtk_entry_set_text(entry, newsubject);
+    gtk_entry_set_text(entry, newsubject ? newsubject : subject);
     g_free(subject);
     g_free(newsubject);
 }

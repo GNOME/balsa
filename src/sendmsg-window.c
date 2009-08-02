@@ -238,8 +238,9 @@ static void insert_signature_cb(GtkAction * action, BalsaSendmsg * bsmsg);
 static void quote_messages_cb  (GtkAction * action, BalsaSendmsg * bsmsg);
 static void lang_set_cb(GtkWidget *widget, BalsaSendmsg *bsmsg);
 
-static void set_entry_to_subject(GtkEntry* entry, LibBalsaMessageBody *body,
-                                 SendType p, LibBalsaIdentity* ident);
+static void bsmsg_set_subject_from_body(BalsaSendmsg * bsmsg,
+                                        LibBalsaMessageBody * body,
+                                        LibBalsaIdentity * ident);
 
 /* the array of locale names and charset names included in the MIME
    type information.  
@@ -1503,7 +1504,7 @@ update_bsmsg_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity* ident)
      * Else, if the old reply string was empty, and the message
      *    is a reply, OR the old forward string was empty, and the
      *    message is a forward
-     *    Then call set_entry_to_subject()
+     *    Then call bsmsg_set_subject_from_body()
      * Else assume the user hand edited the subject and does
      *    not want it altered
      */
@@ -1522,10 +1523,9 @@ update_bsmsg_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity* ident)
     } else {
         if ( (replen == 0 && reply_type) ||
              (fwdlen == 0 && forward_type) ) {
-            LibBalsaMessage *msg = bsmsg->parent_message 
-            ? bsmsg->parent_message : bsmsg->draft_message;
-        set_entry_to_subject(GTK_ENTRY(bsmsg->subject[1]),
-                             msg->body_list, bsmsg->type, ident);
+            LibBalsaMessage *msg = bsmsg->parent_message ?
+                bsmsg->parent_message : bsmsg->draft_message;
+            bsmsg_set_subject_from_body(bsmsg, msg->body_list, ident);
         }
     }
 
@@ -3966,62 +3966,73 @@ generate_forwarded_subject(const char *orig_subject,
     }
     return newsubject;
 }
-/* set_entry_to_subject:
+/* bsmsg_set_subject_from_body:
    set subject entry based on given replied/forwarded/continued message
    and the compose type.
 */
 static void
-set_entry_to_subject(GtkEntry* entry, LibBalsaMessageBody *part,
-                     SendType type, LibBalsaIdentity* ident)
+bsmsg_set_subject_from_body(BalsaSendmsg * bsmsg,
+                            LibBalsaMessageBody * part,
+                            LibBalsaIdentity * ident)
 {
-    const gchar *tmp;
-    gchar *subject, *newsubject = NULL;
-    gint i;
-    LibBalsaMessageHeaders *headers;
+    gchar *subject;
 
-    if(!part) return;
+    if (!part)
+        return;
     subject = message_part_get_subject(part);
-    headers = part->embhdrs ? part->embhdrs : part->message->headers;
-    switch (type) {
-    case SEND_REPLY:
-    case SEND_REPLY_ALL:
-    case SEND_REPLY_GROUP:
-	if (!subject) {
-	    newsubject = g_strdup(ident->reply_string);
-	    break;
-	}
-	
-	tmp = subject;
-	if (g_ascii_strncasecmp(tmp, "re:", 3) == 0 || g_ascii_strncasecmp(tmp, "aw:", 3) == 0) {
-	    tmp += 3;
-	} else if (g_ascii_strncasecmp(tmp, _("Re:"), strlen(_("Re:"))) == 0) {
-	    tmp += strlen(_("Re:"));
-	} else {
-	    i = strlen(ident->reply_string);
-	    if (g_ascii_strncasecmp(tmp, ident->reply_string, i)
-		== 0) {
-		tmp += i;
-	    }
-	}
-	while( *tmp && isspace((int)*tmp) ) tmp++;
-	newsubject = g_strdup_printf("%s %s", 
-				     ident->reply_string, 
-				     tmp);
-	g_strchomp(newsubject);
-	g_strdelimit(newsubject, "\r\n", ' ');
-	break;
 
-    case SEND_FORWARD_ATTACH:
-    case SEND_FORWARD_INLINE:
-        newsubject = generate_forwarded_subject(subject, headers, ident);
-	break;
-    default:
-	break;
+    if (!bsmsg->is_continue) {
+        gchar *newsubject = NULL;
+        const gchar *tmp;
+        LibBalsaMessageHeaders *headers;
+
+        switch (bsmsg->type) {
+        case SEND_REPLY:
+        case SEND_REPLY_ALL:
+        case SEND_REPLY_GROUP:
+            if (!subject) {
+                subject = g_strdup(ident->reply_string);
+                break;
+            }
+
+            tmp = subject;
+            if (g_ascii_strncasecmp(tmp, "re:", 3) == 0 ||
+                g_ascii_strncasecmp(tmp, "aw:", 3) == 0)
+                tmp += 3;
+            else if (g_ascii_strncasecmp(tmp, _("Re:"), strlen(_("Re:")))
+                       == 0)
+                tmp += strlen(_("Re:"));
+            else {
+                gint len = strlen(ident->reply_string);
+                if (g_ascii_strncasecmp(tmp, ident->reply_string, len) == 0)
+                    tmp += len;
+            }
+            while (*tmp && isspace((int) *tmp))
+                tmp++;
+            newsubject = g_strdup_printf("%s %s", ident->reply_string, tmp);
+            g_strchomp(newsubject);
+            g_strdelimit(newsubject, "\r\n", ' ');
+            break;
+
+        case SEND_FORWARD_ATTACH:
+        case SEND_FORWARD_INLINE:
+            headers =
+                part->embhdrs ? part->embhdrs : part->message->headers;
+            newsubject =
+                generate_forwarded_subject(subject, headers, ident);
+            break;
+        default:
+            break;
+        }
+
+        if (newsubject) {
+            g_free(subject);
+            subject = newsubject;
+        }
     }
 
-    gtk_entry_set_text(entry, newsubject ? newsubject : subject);
+    gtk_entry_set_text(GTK_ENTRY(bsmsg->subject[1]), subject);
     g_free(subject);
-    g_free(newsubject);
 }
 
 #if HAVE_GTKSOURCEVIEW
@@ -4688,8 +4699,7 @@ bsm_finish_setup(BalsaSendmsg *bsmsg, LibBalsaMessageBody *part)
         libbalsa_mailbox_close(part->message->mailbox, FALSE);
     /* ...but mark it as unmodified. */
     bsmsg->state = SENDMSG_STATE_CLEAN;
-    set_entry_to_subject(GTK_ENTRY(bsmsg->subject[1]), part, bsmsg->type,
-                         bsmsg->ident);
+    bsmsg_set_subject_from_body(bsmsg, part, bsmsg->ident);
     libbalsa_message_body_unref(part->message);
 }
 
@@ -4902,8 +4912,7 @@ sendmsg_window_forward(LibBalsaMailbox *mailbox, guint msgno,
                                        _("Attaching message failed.\n"
                                          "Possible reason: not enough temporary space"));
         bsmsg->state = SENDMSG_STATE_CLEAN;
-        set_entry_to_subject(GTK_ENTRY(bsmsg->subject[1]), message->body_list,
-                             bsmsg->type, bsmsg->ident);
+        bsmsg_set_subject_from_body(bsmsg, message->body_list, bsmsg->ident);
     } else {
         bsm_prepare_for_setup(message);
         fill_body_from_message(bsmsg, message, QUOTE_NOPREFIX);

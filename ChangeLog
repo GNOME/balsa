@@ -1,3 +1,10 @@
+2009-08-02  Peter Bloomfield
+
+	* src/sendmsg-window.c (bsmsg_set_subject_from_body): use
+	existing subject for continued draft message; new name and api;
+	(update_bsmsg_identity), (bsm_finish_setup),
+	(sendmsg_window_forward): use new name and api.
+
 2009-08-01  Peter Bloomfield
 
 	* libbalsa/body.c (libbalsa_message_body_get_pixbuf): workaround

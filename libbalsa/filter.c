@@ -37,9 +37,11 @@
 #include <ctype.h>
 #include <string.h>
 
-#ifdef HAVE_GNOME
+#if HAVE_CANBERRA
+#include <canberra-gtk.h>
+#elif HAVE_GNOME
 #include <libgnome/gnome-sound.h>
-#endif
+#endif                          /* HAVE_CANBERRA */
 
 #include "libbalsa.h"
 #include "libbalsa_private.h"
@@ -254,10 +256,17 @@ libbalsa_filter_mailbox_messages(LibBalsaFilter * filt,
     if (msgnos->len == 0)
 	return FALSE;
 
-#ifdef HAVE_GNOME
+#if HAVE_CANBERRA
+    if (filt->sound) {
+        gint rc = ca_context_play(ca_gtk_context_get(), 0,
+                                  CA_PROP_MEDIA_FILENAME, filt->sound,
+                                  NULL);
+        g_message("(%s) play %s, %s", __func__, filt->sound, ca_strerror(rc));
+    }
+#elif HAVE_GNOME
     if (filt->sound)
 	gnome_sound_play(filt->sound);
-#endif /* HAVE_GNOME */
+#endif                          /* HAVE_CANBERRA */
     if (filt->popup_text)
 	libbalsa_information(LIBBALSA_INFORMATION_MESSAGE,
 			     "%s",

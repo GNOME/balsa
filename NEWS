@@ -1,3 +1,10 @@
+* Balsa-2.4.1 release. Release date 2009-08-09
+
+- Continuing cleanup work: removing obsolete library calls.
+- partial workaround for the deadlock in xcb library code.
+- experimental use of libcanberra for sound.
+- many small bugfixes.
+
 * Balsa-2.4.0 release. Release date 2009-05-25
 
 - GMime-2.4, GLib-2.16, and Gtk-2.14 required.

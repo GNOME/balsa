@@ -11,7 +11,7 @@ dnl ###########################################################################
 
 BALSA_MAJOR=2
 BALSA_REVISION=4
-BALSA_PATCHLEVEL=0
+BALSA_PATCHLEVEL=1
 BALSA_VERSION="$BALSA_MAJOR.$BALSA_REVISION.${BALSA_PATCHLEVEL}"
 
 AC_SUBST(BALSA_MAJOR)

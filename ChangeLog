@@ -1,3 +1,8 @@
+2009-08-11  Peter Bloomfield
+
+	* src/balsa-print-object-header.c (header_add_list): do not
+	print header line with NULL address string.
+
 2006-08-09  Pawel Salek
 
 	* NEWS, configure.in: release balsa-2.4.1

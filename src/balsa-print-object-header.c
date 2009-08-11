@@ -520,16 +520,17 @@ header_add_list(PangoLayout * layout, GString * header_buf,
     gchar *_value;
     gint p_width;
 
-    if (!values || balsa_app.shown_headers == HEADERS_NONE ||
+    if (balsa_app.shown_headers == HEADERS_NONE ||
 	!(balsa_app.show_all_headers ||
 	  balsa_app.shown_headers == HEADERS_ALL ||
-	  libbalsa_find_word(field_id, balsa_app.selected_headers)))
+	  libbalsa_find_word(field_id, balsa_app.selected_headers)) ||
+        !values ||
+        !(_value = internet_address_list_to_string(values, FALSE)))
 	return;
 
     p_width = p_string_width_from_layout(layout, label);
     if (p_width > *p_label_width)
 	*p_label_width = p_width;
-    _value = internet_address_list_to_string(values, FALSE);
     libbalsa_utf8_sanitize(&_value, balsa_app.convert_unknown_8bit, NULL);
     g_string_append_printf(header_buf, "%s\t%s\n", label, _value);
     g_free(_value);

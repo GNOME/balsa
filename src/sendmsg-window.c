@@ -964,6 +964,7 @@ destroy_event_cb(GtkWidget * widget, gpointer data)
 /* the balsa_sendmsg destructor; copies first the shown headers setting
    to the balsa_app structure.
 */
+#define BALSA_SENDMSG_WINDOW_KEY "balsa-sendmsg-window-key"
 static void
 balsa_sendmsg_destroy_handler(BalsaSendmsg * bsmsg)
 {
@@ -987,6 +988,8 @@ balsa_sendmsg_destroy_handler(BalsaSendmsg * bsmsg)
     }
 
     if (bsmsg->draft_message) {
+        g_object_set_data(G_OBJECT(bsmsg->draft_message),
+                          BALSA_SENDMSG_WINDOW_KEY, NULL);
 	if (bsmsg->draft_message->mailbox)
 	    libbalsa_mailbox_close(bsmsg->draft_message->mailbox,
 		    /* Respect pref setting: */
@@ -4108,6 +4111,8 @@ sw_save_draft(BalsaSendmsg * bsmsg)
     }
 
     if (bsmsg->draft_message) {
+        g_object_set_data(G_OBJECT(bsmsg->draft_message),
+                          BALSA_SENDMSG_WINDOW_KEY, NULL);
 	if (bsmsg->draft_message->mailbox)
 	    libbalsa_mailbox_close(bsmsg->draft_message->mailbox,
 		    /* Respect pref setting: */
@@ -4120,6 +4125,8 @@ sw_save_draft(BalsaSendmsg * bsmsg)
 	libbalsa_mailbox_get_message(balsa_app.draftbox,
 				     libbalsa_mailbox_total_messages
 				     (balsa_app.draftbox));
+    g_object_set_data(G_OBJECT(bsmsg->draft_message),
+                      BALSA_SENDMSG_WINDOW_KEY, bsmsg);
     balsa_information_parented(GTK_WINDOW(bsmsg->window),
                                LIBBALSA_INFORMATION_MESSAGE,
                                _("Message saved."));
@@ -4938,14 +4945,24 @@ sendmsg_window_continue(LibBalsaMailbox * mailbox, guint msgno)
 {
     LibBalsaMessage *message =
         libbalsa_mailbox_get_message(mailbox, msgno);
-    BalsaSendmsg *bsmsg = sendmsg_window_new();
+    BalsaSendmsg *bsmsg;
     const gchar *postpone_hdr;
     GList *list, *refs = NULL;
 
     g_assert(message);
+
+    if ((bsmsg = g_object_get_data(G_OBJECT(message),
+                                   BALSA_SENDMSG_WINDOW_KEY))) {
+        gtk_window_present(GTK_WINDOW(bsmsg->window));
+        return NULL;
+    }
+
+    bsmsg = sendmsg_window_new();
     bsmsg->is_continue = TRUE;
     bsm_prepare_for_setup(message);
     bsmsg->draft_message = message;
+    g_object_set_data(G_OBJECT(bsmsg->draft_message),
+                      BALSA_SENDMSG_WINDOW_KEY, bsmsg);
     set_identity(bsmsg, message);
     setup_headers_from_message(bsmsg, message);
 

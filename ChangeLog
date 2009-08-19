@@ -1,5 +1,16 @@
 2009-08-19  Peter Bloomfield
 
+	Allow only one compose window per draft message.
+
+	* src/balsa-index.c (bndx_row_activated): check for NULL return
+	from sendmsg_window_continue.
+	* src/sendmsg-window.c (balsa_sendmsg_destroy_handler,
+	sw_save_draft): clear object data.
+	(sendmsg_window_continue): present existing window if it exists
+	and return NULL, and use object data to remember window.
+
+2009-08-19  Peter Bloomfield
+
 	* src/balsa-mime-widget-message.c (bm_header_widget_new): use
 	GTK_WRAP_WORD_CHAR so that over-long words do not force
 	over-wide window.

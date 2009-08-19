@@ -642,8 +642,9 @@ bndx_row_activated(GtkTreeView * tree_view, GtkTreePath * path,
          * balsa_message_continue: */
         BalsaSendmsg *sm =
             sendmsg_window_continue(mailbox, msgno);
-        g_signal_connect(G_OBJECT(sm->window), "destroy",
-                         G_CALLBACK(sendmsg_window_destroy_cb), NULL);
+        if (sm)
+            g_signal_connect(G_OBJECT(sm->window), "destroy",
+                             G_CALLBACK(sendmsg_window_destroy_cb), NULL);
     } else
         message_window_new(mailbox, msgno);
 }

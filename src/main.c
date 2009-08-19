@@ -189,7 +189,7 @@ mw_message_received_cb(UniqueApp         *app,
         gtk_window_present(window);
         break;
     case COMMAND_CHECK_MAIL:
-        balsa_main_check_new_messages(NULL);
+        balsa_main_check_new_messages(balsa_app.main_window);
         break;
     case COMMAND_GET_STATS:
         balsa_get_stats(&unread, &unsent);
@@ -1142,7 +1142,8 @@ main(int argc, char *argv[])
     g_timeout_add(1801*1000, (GSourceFunc) periodic_expunge_cb, NULL);
 
     if (cmd_check_mail_on_startup || balsa_app.check_mail_upon_startup)
-        g_idle_add((GSourceFunc) balsa_main_check_new_messages, NULL);
+        g_idle_add((GSourceFunc) balsa_main_check_new_messages,
+                   balsa_app.main_window);
 
     accel_map_load();
     gdk_threads_enter();

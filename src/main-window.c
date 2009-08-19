@@ -102,7 +102,12 @@ GtkWidget *progress_dialog_bar = NULL;
 GSList *list = NULL;
 static int quiet_check=0;
 
-static void bw_check_messages_thread(GSList * list);
+struct check_messages_thread_info {
+    BalsaWindow *window;
+    GSList *list;
+};
+static void bw_check_messages_thread(struct check_messages_thread_info
+                                     *info);
 
 #endif
 static void bw_display_new_mail_notification(int num_new, int has_new);
@@ -1800,6 +1805,9 @@ balsa_window_new()
     g_signal_connect(window, "notify::is-active",
                      G_CALLBACK(bw_is_active_notify), NULL);
 
+    /* set initial state of Get-New-Mail button */
+    bw_set_sensitive(window, "GetNewMail", !checking_mail);
+
     gtk_widget_show(GTK_WIDGET(window));
     return GTK_WIDGET(window);
 }
@@ -2777,6 +2785,7 @@ check_new_messages_real(BalsaWindow * window, int type)
 {
     GSList *list = NULL;
 #ifdef BALSA_USE_THREADS
+    struct check_messages_thread_info *info;
     /*  Only Run once -- If already checking mail, return.  */
     pthread_mutex_lock(&mailbox_lock);
     if (checking_mail) {
@@ -2787,6 +2796,8 @@ check_new_messages_real(BalsaWindow * window, int type)
         return;
     }
     checking_mail = 1;
+    if (window)
+        bw_set_sensitive(window, "GetNewMail", FALSE);
 
     quiet_check = (type == TYPE_CALLBACK) 
         ? 0 : balsa_app.quiet_background_check;
@@ -2803,8 +2814,11 @@ check_new_messages_real(BalsaWindow * window, int type)
 			   &list);
 
     /* initiate threads */
+    info = g_new(struct check_messages_thread_info, 1);
+    info->list = list;
+    info->window = window ? g_object_ref(window) : window;
     pthread_create(&get_mail_thread,
-                   NULL, (void *) &bw_check_messages_thread, (void *) list);
+                   NULL, (void *) &bw_check_messages_thread, info);
     
     /* Detach so we don't need to pthread_join
      * This means that all resources will be
@@ -2952,7 +2966,7 @@ bw_mailbox_check(LibBalsaMailbox * mailbox)
 }
 
 static void
-bw_check_messages_thread(GSList * list)
+bw_check_messages_thread(struct check_messages_thread_info *info)
 {
     /*  
      *  It is assumed that this will always be called as a pthread,
@@ -2960,6 +2974,7 @@ bw_check_messages_thread(GSList * list)
      *  and set checking_mail to true before calling.
      */
     MailThreadMessage *threadmessage;
+    GSList *list = info->list;
     
     pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
 
@@ -2975,8 +2990,13 @@ bw_check_messages_thread(GSList * list)
     
     pthread_mutex_lock(&mailbox_lock);
     checking_mail = 0;
+    if (info->window) {
+        bw_set_sensitive(info->window, "GetNewMail", TRUE);
+        g_object_unref(info->window);
+    }
     pthread_mutex_unlock(&mailbox_lock);
     
+    g_free(info);
     pthread_exit(0);
 }
 

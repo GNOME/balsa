@@ -1,5 +1,11 @@
 2009-08-19  Peter Bloomfield
 
+	* src/main-window.c: Manage sensitivity of "Get New Mail"
+	action.
+	* src/main.c (mw_message_received_cb, main): ditto.
+
+2009-08-19  Peter Bloomfield
+
 	Allow only one compose window per draft message.
 
 	* src/balsa-index.c (bndx_row_activated): check for NULL return

@@ -230,7 +230,7 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
     gtk_text_view_set_editable(GTK_TEXT_VIEW(mw->widget), FALSE);
     gtk_text_view_set_left_margin(GTK_TEXT_VIEW(mw->widget), 2);
     gtk_text_view_set_right_margin(GTK_TEXT_VIEW(mw->widget), 15);
-    gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(mw->widget), GTK_WRAP_WORD);
+    gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(mw->widget), GTK_WRAP_WORD_CHAR);
 
     /* set the message font */
     bm_modify_font_from_string(mw->widget, balsa_app.message_font);

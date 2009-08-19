@@ -149,7 +149,7 @@ balsa_mime_widget_new_vcalendar(BalsaMessage * bm,
             gtk_text_buffer_set_text(tbuf, text, -1);                   \
             tview = gtk_text_view_new_with_buffer(tbuf);                \
             gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(tview),           \
-                                        GTK_WRAP_WORD);                 \
+                                        GTK_WRAP_WORD_CHAR);                 \
             gtk_table_attach(table, tview, 1, 2, row, row + 1,          \
                              GTK_FILL|GTK_EXPAND, GTK_FILL|GTK_EXPAND,  \
                              4, 2);                                     \

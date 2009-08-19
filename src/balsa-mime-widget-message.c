@@ -500,7 +500,7 @@ bm_header_widget_new(BalsaMessage * bm, GtkWidget * buttons)
     gtk_text_view_set_editable(view, FALSE);
     gtk_text_view_set_left_margin(view, BMW_HEADER_MARGIN_LEFT);
     gtk_text_view_set_right_margin(view, BMW_HEADER_MARGIN_RIGHT);
-    gtk_text_view_set_wrap_mode(view, GTK_WRAP_WORD);
+    gtk_text_view_set_wrap_mode(view, GTK_WRAP_WORD_CHAR);
 
 
     buffer = gtk_text_view_get_buffer(view);

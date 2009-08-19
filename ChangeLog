@@ -1,3 +1,12 @@
+2009-08-19  Peter Bloomfield
+
+	* src/balsa-mime-widget-message.c (bm_header_widget_new): use
+	GTK_WRAP_WORD_CHAR so that over-long words do not force
+	over-wide window.
+	* src/balsa-mime-widget-text.c (balsa_mime_widget_new_text):
+	ditto.
+	* src/balsa-mime-widget-vcalendar.c: ditto.
+
 2009-08-11  Peter Bloomfield
 
 	* src/balsa-print-object-header.c (header_add_list): do not

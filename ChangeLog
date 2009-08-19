@@ -1,5 +1,11 @@
 2009-08-19  Peter Bloomfield
 
+	* libbalsa/address-book-gpe.c
+	(libbalsa_address_book_gpe_open_db): show file name in error
+	message.
+
+2009-08-19  Peter Bloomfield
+
 	* src/main-window.c: Manage sensitivity of "Get New Mail"
 	action.
 	* src/main.c (mw_message_received_cb, main): ditto.

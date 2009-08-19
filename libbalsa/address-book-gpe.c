@@ -196,21 +196,21 @@ libbalsa_address_book_gpe_open_db(LibBalsaAddressBookGpe * ab)
 {
 #ifdef HAVE_SQLITE3
     gchar *dir, *name;
-    int r;
 
     dir = g_build_filename(g_get_home_dir(), ".gpe", NULL);
     mkdir(dir, S_IRUSR|S_IWUSR|S_IXUSR);
     name = g_build_filename(dir, "contacts", NULL);
     g_free(dir);
-    r = sqlite3_open(name, &ab->db);
-    g_free(name);
 
-    if (r != SQLITE_OK) {
-        printf("Cannot open: %s\n", sqlite3_errmsg(ab->db));
+    if (sqlite3_open(name, &ab->db) != SQLITE_OK) {
+        printf("Cannot open \"%s\": %s\n", name, sqlite3_errmsg(ab->db));
+        g_free(name);
         sqlite3_close(ab->db);
         ab->db = NULL;
         return 0;
     }
+    g_free(name);
+
     sqlite3_exec(ab->db, schema_str,  NULL, NULL, NULL);
     sqlite3_exec(ab->db, schema2_str, NULL, NULL, NULL);
 #else                           /* HAVE_SQLITE3 */

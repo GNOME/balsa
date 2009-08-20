@@ -1805,8 +1805,10 @@ balsa_window_new()
     g_signal_connect(window, "notify::is-active",
                      G_CALLBACK(bw_is_active_notify), NULL);
 
+#ifdef BALSA_USE_THREADS
     /* set initial state of Get-New-Mail button */
     bw_set_sensitive(window, "GetNewMail", !checking_mail);
+#endif
 
     gtk_widget_show(GTK_WIDGET(window));
     return GTK_WIDGET(window);

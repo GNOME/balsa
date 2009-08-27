@@ -1,3 +1,10 @@
+2006-08-27  Pawel Salek
+
+	* libbalsa/imap/imap-handle.c: namespace queries need to encode
+	the prefix.
+	* libbalsa/imap/imap_tst.c: test mailbox name encoding.
+	* libbalsa/imap/util.c: encode backslash and quote marks.
+	
 2009-08-26  Peter Bloomfield 
 
 	set-statusbar is a BalsaWindow method.

@@ -6,6 +6,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sys/ioctl.h>
 #include <sys/stat.h>
@@ -16,6 +17,7 @@
 #include "libimap.h"
 #include "imap-handle.h"
 #include "imap-commands.h"
+#include "util.h"
 
 struct {
   char *user;
@@ -556,6 +558,40 @@ test_mbox_delete(int argc, char *argv[])
   return rc == IMR_OK ? 0 : 1;
 }
 
+/** test mailbox name quoting. */
+static int
+test_mailbox_name_quoting()
+{
+  static const struct {
+    const char *test, *reference;
+  } test_mailbox_names[] = {
+    { "INBOX", "INBOX" },
+    { "ehlo", "ehlo" },
+    { "ångström", "&AOU-ngstr&APY-m" },
+    { "quot\"ed\"", "quot\\\"ed\\\"" },
+    { "dirty & ugly", "dirty &- ugly" },
+    { "dir\\mbox", "dir\\\\mbox" }
+  };
+  int failure_count = 0;
+  unsigned i;
+  for(i=0;
+      i<sizeof(test_mailbox_names)/sizeof(test_mailbox_names[0]);
+      ++i) {
+    char *mbx7 = imap_utf8_to_mailbox(test_mailbox_names[i].test);
+    if (!mbx7)
+      continue;
+    if (strcmp(mbx7, test_mailbox_names[i].reference) != 0) {
+      printf("Encoded name for '%s' expected '%s' found '%s'\n",
+             test_mailbox_names[i].test,
+             test_mailbox_names[i].reference,
+             mbx7);
+      ++failure_count;
+    }
+    free(mbx7);
+  }
+  return failure_count;
+}
+
 static unsigned
 process_options(int argc, char *argv[])
 {
@@ -591,6 +627,7 @@ main(int argc, char *argv[]) {
   if(argc<=1) {
     test_envelope_strings();
     test_body_strings();
+    test_mailbox_name_quoting();
   } else {
     static const struct {
       int (*func)(int argc, char *argv[]);

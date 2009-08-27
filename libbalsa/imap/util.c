@@ -385,6 +385,10 @@ imap_utf8_to_mailbox(const char *src)
         bitstogo = 0;
         utf8total= 0;
       }
+      /* encode '\' as '\\', and '"' as '\"' */
+      if (c == '\\' || c == '"') {
+        *dst++ = '\\';
+      }
       *dst++ = c;
       /* encode '&' as '&-' */
       if (c == '&') {
@@ -464,6 +468,8 @@ int main(int argc, char *argv[])
   for(i=1; i<argc; i++) {
     char *mbx = imap_utf8_to_mailbox(argv[i]);
     char *utf8 = imap_mailbox_to_utf8(mbx);
+    if (!mbx || !utf8)
+      continue;
     printf("orig='%s' mbx='%s' back='%s'\n", argv[i], mbx, utf8);
     free(mbx); free(utf8);
   }

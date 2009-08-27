@@ -939,7 +939,7 @@ imap_mbox_handle_get_delim(ImapMboxHandle* handle,
 {
   int delim;
   guint handler_id;
-  gchar * cmd;
+  gchar * cmd, *mbx7;
 
   HANDLE_LOCK(handle);
   /* FIXME: block other list response signals here? */
@@ -947,8 +947,10 @@ imap_mbox_handle_get_delim(ImapMboxHandle* handle,
 				G_CALLBACK(get_delim),
 				&delim);
 
-  cmd = g_strdup_printf("LIST \"%s\" \"\"", namespace);
-  imap_cmd_exec(handle, cmd);
+  mbx7 = imap_utf8_to_mailbox(namespace);
+  cmd = g_strdup_printf("LIST \"%s\" \"\"", mbx7);
+  g_free(mbx7);
+  imap_cmd_exec(handle, cmd); /* ignore return code.. */
   g_free(cmd);
   g_signal_handler_disconnect(G_OBJECT(handle), handler_id);
   HANDLE_UNLOCK(handle);

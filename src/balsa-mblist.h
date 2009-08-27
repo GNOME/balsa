@@ -86,7 +86,6 @@ GtkWidget *balsa_mblist_mru_option_menu(GtkWindow * window,
 void balsa_mblist_mru_option_menu_set(GtkWidget * option_menu,
                                       const gchar * url);
 const gchar *balsa_mblist_mru_option_menu_get(GtkWidget * option_menu);
-void balsa_mblist_set_status_bar(LibBalsaMailbox * mailbox);
 
 /* BalsaMailboxNode methods */
 void balsa_mblist_mailbox_node_append(BalsaMailboxNode * root,

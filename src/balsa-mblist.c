@@ -35,6 +35,10 @@
 #include "mailbox-node.h"
 #include "main-window.h"
 
+#if HAVE_MACOSX_DESKTOP
+#  include "macosx-helpers.h"
+#endif
+
 /* Column numbers (used for sort_column_id): */
 typedef enum {
     BMBL_TREE_COLUMN_NAME = 1,
@@ -1826,6 +1830,9 @@ bmbl_mru_show_tree(GtkWidget * widget, gpointer data)
         gtk_tree_view_get_selection(GTK_TREE_VIEW(mblist));
     GtkRequisition req;
 
+#if HAVE_MACOSX_DESKTOP
+    libbalsa_macosx_menu_for_parent(dialog, mru->window);
+#endif
     scroll = gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll),
                                    GTK_POLICY_AUTOMATIC,

@@ -34,6 +34,10 @@
 #include <glib/gi18n.h>
 #include "balsa-app.h"
 
+#if HAVE_MACOSX_DESKTOP
+#  include "macosx-helpers.h"
+#endif
+
 static void balsa_information_bar(GtkWindow *parent,
                                   LibBalsaInformationType type,
                                   const char *msg);
@@ -180,6 +184,9 @@ balsa_information_dialog(GtkWindow *parent, LibBalsaInformationType type,
                                GTK_DIALOG_DESTROY_WITH_PARENT,
                                message_type, GTK_BUTTONS_CLOSE,
                                "%s", msg);
+#if HAVE_MACOSX_DESKTOP
+    libbalsa_macosx_menu_for_parent(messagebox, GTK_WINDOW(parent));
+#endif
 
     gtk_dialog_run(GTK_DIALOG(messagebox));
     gtk_widget_destroy(messagebox);
@@ -228,6 +235,9 @@ balsa_information_list(GtkWindow *parent, LibBalsaInformationType type,
                                         GTK_STOCK_CLEAR, GTK_RESPONSE_APPLY,
                                         GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
                                         NULL);
+#if HAVE_MACOSX_DESKTOP
+	libbalsa_macosx_menu_for_parent(information_dialog, parent);
+#endif
 	/* Default is to close */
 	gtk_dialog_set_default_response(GTK_DIALOG(information_dialog), 
                                         GTK_RESPONSE_CLOSE);

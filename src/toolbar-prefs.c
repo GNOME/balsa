@@ -34,6 +34,10 @@
 #include "sendmsg-window.h"
 #include "toolbar-factory.h"
 
+#if HAVE_MACOSX_DESKTOP
+#  include "macosx-helpers.h"
+#endif
+
 #ifndef MAX
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #endif
@@ -136,6 +140,9 @@ customize_dialog_cb(GtkWidget * widget, gpointer data)
                                     GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
                                     GTK_STOCK_HELP,  GTK_RESPONSE_HELP,
                                     NULL);
+#if HAVE_MACOSX_DESKTOP
+    libbalsa_macosx_menu_for_parent(customize_widget, GTK_WINDOW(active_window));
+#endif
     g_object_add_weak_pointer(G_OBJECT(customize_widget),
                               (gpointer) & customize_widget);
     g_signal_connect(G_OBJECT(customize_widget), "response",

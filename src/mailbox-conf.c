@@ -59,6 +59,10 @@
 #include "libbalsa-conf.h"
 #include <glib/gi18n.h>
 
+#if HAVE_MACOSX_DESKTOP
+#  include "macosx-helpers.h"
+#endif
+
 struct _BalsaMailboxConfView {
     GtkWindow *window;
     GtkWidget *identity_combo_box;
@@ -439,6 +443,9 @@ mailbox_conf_delete(BalsaMailboxNode * mbnode)
                                NULL);
     }
     
+#if HAVE_MACOSX_DESKTOP
+    libbalsa_macosx_menu_for_parent(ask, GTK_WINDOW(balsa_app.main_window));
+#endif
     button = gtk_dialog_run(GTK_DIALOG(ask));
     gtk_widget_destroy(ask);
 
@@ -1103,6 +1110,9 @@ create_local_mailbox_dialog(MailboxConfWindow *mcw)
                                     mcw->ok_button_name, MCW_RESPONSE,
                                     GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
                                     NULL);
+#if HAVE_MACOSX_DESKTOP
+    libbalsa_macosx_menu_for_parent(dialog, GTK_WINDOW(balsa_app.main_window));
+#endif
 
     size_group = libbalsa_create_size_group(dialog);
     if (label)
@@ -1136,6 +1146,9 @@ create_generic_dialog(MailboxConfWindow * mcw)
                                     mcw->ok_button_name, MCW_RESPONSE,
                                     GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
                                     NULL);
+#if HAVE_MACOSX_DESKTOP
+    libbalsa_macosx_menu_for_parent(dialog, GTK_WINDOW(balsa_app.main_window));
+#endif
     return dialog;
 }
 

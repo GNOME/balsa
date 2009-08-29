@@ -33,6 +33,10 @@
 #include <glib/gi18n.h>
 #include "misc.h"
 
+#if HAVE_MACOSX_DESKTOP
+#  include "macosx-helpers.h"
+#endif
+
 #if ENABLE_ESMTP
 #include <string.h>
 #include "smtp-server.h"
@@ -486,6 +490,10 @@ libbalsa_identity_select_dialog(GtkWindow * parent,
                                     GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                                     GTK_STOCK_OK, GTK_RESPONSE_OK,
                                     NULL);
+#if HAVE_MACOSX_DESKTOP
+    libbalsa_macosx_menu_for_parent(dialog, parent);
+#endif
+ 
     g_signal_connect(dialog, "response",
                      G_CALLBACK(sd_response_cb), sdi);
     gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
@@ -1634,6 +1642,9 @@ delete_ident_cb(GtkTreeView * tree, GtkWidget * dialog)
                                      GTK_BUTTONS_OK_CANCEL,
                                      _("Do you really want to delete"
                                        " the selected identity?"));
+#if HAVE_MACOSX_DESKTOP
+    libbalsa_macosx_menu_for_parent(confirm, GTK_WINDOW(dialog));
+#endif
     di = g_new(IdentityDeleteInfo, 1);
     di->tree = tree;
     di->dialog = dialog;
@@ -1720,6 +1731,9 @@ libbalsa_identity_config_dialog(GtkWindow *parent, GList **identities,
                                     GTK_STOCK_REMOVE, IDENTITY_RESPONSE_REMOVE,
                                     GTK_STOCK_CLOSE, IDENTITY_RESPONSE_CLOSE,
                                     NULL);
+#if HAVE_MACOSX_DESKTOP
+    libbalsa_macosx_menu_for_parent(dialog, parent);
+#endif
 
     frame = libbalsa_identity_config_frame(identities, default_id, dialog,
                                            changed_cb, parent);

@@ -41,6 +41,10 @@
 #include "smtp-server.h"
 #include "save-restore.h"
 
+#if HAVE_MACOSX_DESKTOP
+#  include "macosx-helpers.h"
+#endif
+
 #include <glib/gi18n.h>	/* Must come after balsa-app.h. */
 
 /* Global application structure */
@@ -94,6 +98,9 @@ ask_password_real(LibBalsaServer * server, LibBalsaMailbox * mbox)
                                          GTK_STOCK_OK, GTK_RESPONSE_OK,
                                          GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                                          NULL); 
+#if HAVE_MACOSX_DESKTOP
+    libbalsa_macosx_menu_for_parent(dialog, GTK_WINDOW(balsa_app.main_window));
+#endif
     gtk_box_set_spacing(GTK_BOX(GTK_DIALOG(dialog)->vbox), HIG_PADDING);
     gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox),
                       gtk_label_new_with_mnemonic(prompt));

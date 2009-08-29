@@ -32,6 +32,7 @@
 #include "libbalsa.h"
 #include "libbalsa_private.h"
 #include "misc.h"
+#include "macosx-helpers.h"
 #include <glib/gi18n.h>
 
 static void close_cb(GtkAction * action, gpointer data);
@@ -253,6 +254,7 @@ libbalsa_show_message_source(LibBalsaMessage* msg, const gchar * font,
     GtkWidget *window;
     GtkAction *escape_action = NULL;
     LibBalsaSourceViewerInfo *lsvi;
+    GtkWidget *menubar;
 
     g_return_if_fail(msg);
     g_return_if_fail(MAILBOX_OPEN(msg->mailbox));
@@ -279,9 +281,14 @@ libbalsa_show_message_source(LibBalsaMessage* msg, const gchar * font,
     gtk_window_set_wmclass(GTK_WINDOW(window), "message-source", "Balsa");
     gtk_window_set_default_size(GTK_WINDOW(window), *width, *height);
     vbox = gtk_vbox_new(FALSE, 1);
-    gtk_box_pack_start(GTK_BOX(vbox), 
-                       lbsv_app_set_menus(GTK_WINDOW(window),
-                                          &escape_action), FALSE, TRUE, 1);
+    menubar = lbsv_app_set_menus(GTK_WINDOW(window), &escape_action);
+    
+#if HAVE_MACOSX_DESKTOP
+    libbalsa_macosx_menu(window, GTK_MENU_SHELL(menubar));
+#else
+    gtk_box_pack_start(GTK_BOX(vbox), menubar, FALSE, TRUE, 1);
+#endif
+    
     gtk_box_pack_start(GTK_BOX(vbox), interior, TRUE, TRUE, 0);
     gtk_container_add(GTK_CONTAINER(window), vbox);
 

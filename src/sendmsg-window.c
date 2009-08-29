@@ -51,11 +51,6 @@
 #include <unistd.h>
 #endif
 #include <errno.h>
- 
-#if HAVE_MACOSX_DESKTOP
-#include <ige-mac-integration.h>
-#endif
-
 #include "libbalsa.h"
 #include "misc.h"
 #include "send.h"
@@ -75,6 +70,8 @@
 #include "ab-window.h"
 #include "address-view.h"
 #include "print.h"
+#include "macosx-helpers.h"
+
 #if HAVE_GTKSPELL
 #include "gtkspell/gtkspell.h"
 #else                           /* HAVE_GTKSPELL */
@@ -913,6 +910,9 @@ delete_handler(BalsaSendmsg * bsmsg)
                                GTK_BUTTONS_YES_NO,
                                _("The message to '%s' is modified.\n"
                                  "Save message to Draftbox?"), tmp);
+#if HAVE_MACOSX_DESKTOP
+    libbalsa_macosx_menu_for_parent(d, GTK_WINDOW(bsmsg->window));
+#endif
     g_object_unref(list);
     gtk_dialog_set_default_response(GTK_DIALOG(d), GTK_RESPONSE_YES);
     gtk_dialog_add_button(GTK_DIALOG(d),
@@ -1742,6 +1742,9 @@ change_attach_mode(GtkWidget * menu_item, BalsaAttachInfo *info)
 				     "Do you really want to attach "
 				     "this file as reference?"),
 				   libbalsa_vfs_get_uri_utf8(info->file_uri));
+#if HAVE_MACOSX_DESKTOP
+	libbalsa_macosx_menu_for_parent(extbody_dialog, GTK_WINDOW(parent));
+#endif
 	gtk_window_set_title(GTK_WINDOW(extbody_dialog),
 			     _("Attach as Reference?"));
 	result = gtk_dialog_run(GTK_DIALOG(extbody_dialog));
@@ -1848,6 +1851,10 @@ sw_get_user_codeset(BalsaSendmsg * bsmsg, gboolean * change_type,
          fname);
     GtkWidget *info = gtk_label_new(msg);
     GtkWidget *charset_button = libbalsa_charset_button_new();
+
+#if HAVE_MACOSX_DESKTOP
+    libbalsa_macosx_menu_for_parent(dialog, GTK_WINDOW(bsmsg->window));
+#endif
 
     g_free(msg);
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox), info,
@@ -2293,6 +2300,9 @@ sw_attach_dialog(BalsaSendmsg * bsmsg)
                                     GTK_FILE_CHOOSER_ACTION_OPEN,
                                     GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                                     GTK_STOCK_OK, GTK_RESPONSE_OK, NULL);
+#if HAVE_MACOSX_DESKTOP
+    libbalsa_macosx_menu_for_parent(fsw, GTK_WINDOW(bsmsg->window));
+#endif
     gtk_file_chooser_set_local_only(GTK_FILE_CHOOSER(fsw),
                                     libbalsa_vfs_local_only());
     gtk_window_set_destroy_with_parent(GTK_WINDOW(fsw), TRUE);
@@ -3591,6 +3601,9 @@ quote_parts_select_dlg(GtkTreeStore *tree_store, GtkWindow * parent)
 					 GTK_DIALOG_DESTROY_WITH_PARENT,
 					 GTK_STOCK_OK, GTK_RESPONSE_OK,
 					 NULL);
+#if HAVE_MACOSX_DESKTOP
+    libbalsa_macosx_menu_for_parent(dialog, parent);
+#endif
 
     label = gtk_label_new(_("Select the parts of the message which shall be quoted in the reply"));
     gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
@@ -4548,9 +4561,8 @@ sendmsg_window_new()
     }
 
     menubar = gtk_ui_manager_get_widget(ui_manager, "/MainMenu");
-#if 0 && HAVE_MACOSX_DESKTOP
-    /* FIXME - this call destroys the main balsa menu after closing the composer... */
-    ige_mac_menu_set_menu_bar(GTK_MENU_SHELL(menubar));
+#if HAVE_MACOSX_DESKTOP
+    libbalsa_macosx_menu(window, GTK_MENU_SHELL(menubar));
 #else
     gtk_box_pack_start(GTK_BOX(main_box), menubar, FALSE, FALSE, 0);
 #endif
@@ -5197,6 +5209,9 @@ sendmsg_window_set_field(BalsaSendmsg * bsmsg, const gchar * key,
                    "a \"Blind copy\" (Bcc) address.\n"
                    "Please check that the address\n"
                    "is appropriate."));
+#if HAVE_MACOSX_DESKTOP
+            libbalsa_macosx_menu_for_parent(dialog, GTK_WINDOW(bsmsg->window));
+#endif
             g_object_set_data(G_OBJECT(bsmsg->window),
                               "balsa-sendmsg-window-url-bcc", dialog);
             g_signal_connect(G_OBJECT(dialog), "response",
@@ -5327,6 +5342,9 @@ include_file_cb(GtkAction * action, BalsaSendmsg * bsmsg)
                                     GTK_FILE_CHOOSER_ACTION_OPEN,
                                     GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                                     GTK_STOCK_OK, GTK_RESPONSE_OK, NULL);
+#if HAVE_MACOSX_DESKTOP
+    libbalsa_macosx_menu_for_parent(file_selector, GTK_WINDOW(bsmsg->window));
+#endif
     gtk_window_set_destroy_with_parent(GTK_WINDOW(file_selector), TRUE);
     /* Use the same folder as for attachments. */
     if (balsa_app.attach_dir)
@@ -5760,6 +5778,9 @@ check_suggest_encryption(BalsaSendmsg * bsmsg)
                "to protect your privacy, the message could be %s encrypted."),
              gpgme_get_protocol_name(protocol),
              gpgme_get_protocol_name(protocol));
+#if HAVE_MACOSX_DESKTOP
+        libbalsa_macosx_menu_for_parent(dialog, GTK_WINDOW(bsmsg->window));
+#endif
 
 	dialog_action_area = GTK_DIALOG(dialog)->action_area;
 	gtk_button_box_set_layout(GTK_BUTTON_BOX(dialog_action_area), GTK_BUTTONBOX_END);
@@ -5869,6 +5890,9 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
                  GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_MODAL,
                  GTK_MESSAGE_QUESTION,
                  GTK_BUTTONS_OK_CANCEL, "%s", message->str);
+#if HAVE_MACOSX_DESKTOP
+	    libbalsa_macosx_menu_for_parent(dialog, GTK_WINDOW(bsmsg->window));
+#endif
             g_string_free(message, TRUE);
             choice = gtk_dialog_run(GTK_DIALOG(dialog));
             gtk_widget_destroy(dialog);
@@ -7009,6 +7033,9 @@ bsmsg_check_format_compatibility(GtkWindow *parent, const gchar *filename)
          GTK_DIALOG_MODAL| GTK_DIALOG_DESTROY_WITH_PARENT,
          GTK_STOCK_CANCEL,                   GTK_RESPONSE_CANCEL,
          "_Attach it in the current format", GTK_RESPONSE_OK, NULL);
+#if HAVE_MACOSX_DESKTOP
+    libbalsa_macosx_menu_for_parent(GTK_WIDGET(dialog), parent);
+#endif
 
     gtk_dialog_set_default_response(dialog, GTK_RESPONSE_OK);
     str = g_strdup_printf

@@ -37,6 +37,10 @@
 #include "misc.h"
 #include <glib/gi18n.h>
 
+#if HAVE_MACOSX_DESKTOP
+#  include "macosx-helpers.h"
+#endif
+
 static LibBalsaServerClass *parent_class = NULL;
 
 struct _LibBalsaSmtpServer {
@@ -538,6 +542,9 @@ libbalsa_smtp_server_dialog(LibBalsaSmtpServer * smtp_server,
                                     GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                                     GTK_STOCK_HELP, GTK_RESPONSE_HELP,
                                     NULL);
+#if HAVE_MACOSX_DESKTOP
+    libbalsa_macosx_menu_for_parent(dialog, parent);
+#endif
     g_object_weak_ref(G_OBJECT(dialog),
 		    (GWeakNotify) smtp_server_weak_notify, sdi);
     g_signal_connect(G_OBJECT(dialog), "response",

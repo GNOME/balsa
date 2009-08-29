@@ -40,7 +40,7 @@
 #endif
 
 #if HAVE_MACOSX_DESKTOP
-#include <ige-mac-integration.h>
+#  include <ige-mac-integration.h>
 #endif
 
 #include "address-book.h"

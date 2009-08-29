@@ -37,6 +37,10 @@
 #include "misc.h"
 #include "imap-server.h"
 
+#if HAVE_MACOSX_DESKTOP
+#  include "macosx-helpers.h"
+#endif
+
 #if ENABLE_ESMTP
 #include <libesmtp.h>
 #include <string.h>
@@ -516,6 +520,9 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
                                     GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
                                     GTK_STOCK_HELP, GTK_RESPONSE_HELP,
                                     NULL);
+#if HAVE_MACOSX_DESKTOP
+    libbalsa_macosx_menu_for_parent(property_box, GTK_WINDOW(active_win));
+#endif
 
     hbox = gtk_hbox_new(FALSE, 12);
     gtk_container_add(GTK_CONTAINER(GTK_DIALOG(property_box)->vbox), hbox);

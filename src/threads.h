@@ -21,6 +21,9 @@
 
 #ifndef __THREADS_H__
 #define __THREADS_H__
+
+#include <unistd.h>
+
 /* FIXME: mailbox_lock is really an internal libbalsa mutex. */
 extern pthread_mutex_t mailbox_lock;
 

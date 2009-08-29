@@ -48,6 +48,10 @@
 #  include "misc.h"
 #endif
 
+#if HAVE_MACOSX_DESKTOP
+#  include "macosx-helpers.h"
+#endif
+
 #include "padlock-keyhole.xpm"
 #include <glib/gi18n.h>
 
@@ -1226,6 +1230,9 @@ check_gpg_child(gpointer data)
 				   GTK_MESSAGE_INFO, GTK_BUTTONS_CLOSE,
 				   _("Running %s successful:\n%s"),
 				   GPG_PATH, gpg_message);
+#if HAVE_MACOSX_DESKTOP
+    libbalsa_macosx_menu_for_parent(dialog, spawned_gpg->parent);
+#endif
     g_free(gpg_message);
     g_string_free(spawned_gpg->stderr_buf, TRUE);
     g_free(spawned_gpg);
@@ -1371,6 +1378,9 @@ select_key_from_list(const gchar * name, gboolean is_secret,
 					 GTK_STOCK_OK, GTK_RESPONSE_OK,
 					 GTK_STOCK_CANCEL,
 					 GTK_RESPONSE_CANCEL, NULL);
+#if HAVE_MACOSX_DESKTOP
+    libbalsa_macosx_menu_for_parent(dialog, parent);
+#endif
     vbox = gtk_vbox_new(FALSE, 12);
     gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox), vbox);
     gtk_container_set_border_width(GTK_CONTAINER(vbox), 12);
@@ -1525,6 +1535,9 @@ accept_low_trust_key(const gchar * name, gpgme_user_id_t uid,
 					   message1,
 					   message2,
 					   _("Use this key anyway?"));
+#if HAVE_MACOSX_DESKTOP
+    libbalsa_macosx_menu_for_parent(dialog, parent);
+#endif
 			      
     /* ask the user */
     result = gtk_dialog_run(GTK_DIALOG(dialog));
@@ -1554,6 +1567,9 @@ get_passphrase_real(GMimeGpgmeContext * ctx, const gchar * uid_hint,
 					 GTK_STOCK_OK, GTK_RESPONSE_OK,
 					 GTK_STOCK_CANCEL,
 					 GTK_RESPONSE_CANCEL, NULL);
+#if HAVE_MACOSX_DESKTOP
+    libbalsa_macosx_menu_for_parent(dialog, parent);
+#endif
     hbox = gtk_hbox_new(FALSE, 12);
     gtk_container_set_border_width(GTK_CONTAINER(hbox), 12);
     gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox), hbox);

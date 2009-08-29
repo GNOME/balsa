@@ -34,6 +34,10 @@
 #include "imap-server.h"
 #include <glib/gi18n.h>
 
+#if HAVE_MACOSX_DESKTOP
+#  include "macosx-helpers.h"
+#endif
+
 typedef struct _CommonDialogData CommonDialogData;
 typedef struct _FolderDialogData FolderDialogData;
 typedef struct _SubfolderDialogData SubfolderDialogData;
@@ -297,6 +301,9 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
                     mn ? _("_Update") : _("C_reate"), GTK_RESPONSE_OK,
                     GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                     GTK_STOCK_HELP, GTK_RESPONSE_HELP, NULL));
+#if HAVE_MACOSX_DESKTOP
+    libbalsa_macosx_menu_for_parent(GTK_WIDGET(fcw->dialog), GTK_WINDOW(balsa_app.main_window));
+#endif
     g_object_add_weak_pointer(G_OBJECT(fcw->dialog),
                               (gpointer) &fcw->dialog);
     gtk_window_set_wmclass(GTK_WINDOW(fcw->dialog), 
@@ -552,6 +559,9 @@ browse_button_cb(GtkWidget * widget, SubfolderDialogData * sdd)
                                     GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                                     GTK_STOCK_OK, GTK_RESPONSE_OK,
                                     NULL);
+#if HAVE_MACOSX_DESKTOP
+    libbalsa_macosx_menu_for_parent(dialog, GTK_WINDOW(sdd->dialog));
+#endif
     
     scroll = gtk_scrolled_window_new(NULL, NULL);
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox), scroll,
@@ -636,6 +646,9 @@ folder, parent);
                                                              _("Cancel"),
                                                              GTK_RESPONSE_CANCEL,
                                                              NULL);
+#if HAVE_MACOSX_DESKTOP
+		libbalsa_macosx_menu_for_parent(ask, GTK_WINDOW(sdd->dialog));
+#endif
                 gtk_container_add(GTK_CONTAINER(GTK_DIALOG(ask)->vbox),
                                   gtk_label_new(msg));
                 g_free(msg);
@@ -768,6 +781,9 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
                     GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, 
                     GTK_STOCK_HELP,   GTK_RESPONSE_HELP,
                     NULL));
+#if HAVE_MACOSX_DESKTOP
+    libbalsa_macosx_menu_for_parent(GTK_WIDGET(sdd->dialog), GTK_WINDOW(balsa_app.main_window));
+#endif
     g_object_add_weak_pointer(G_OBJECT(sdd->dialog),
                               (gpointer) &sdd->dialog);
     /* `Enter' key => Create: */
@@ -857,6 +873,9 @@ folder_conf_delete(BalsaMailboxNode* mbnode)
                                    "You may use \"New IMAP Folder\" "
                                    "later to add this folder again.\n"),
                                  mbnode->name);
+#if HAVE_MACOSX_DESKTOP
+    libbalsa_macosx_menu_for_parent(ask, GTK_WINDOW(balsa_app.main_window));
+#endif
     gtk_window_set_title(GTK_WINDOW(ask), _("Confirm"));
 
     response = gtk_dialog_run(GTK_DIALOG(ask));

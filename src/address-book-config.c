@@ -29,6 +29,10 @@
 #include "balsa-app.h"
 #include <glib/gi18n.h>
 
+#if HAVE_MACOSX_DESKTOP
+#  include "macosx-helpers.h"
+#endif
+
 typedef struct _AddressBookConfig AddressBookConfig;
 struct _AddressBookConfig {
     GtkWidget *window;
@@ -236,6 +240,9 @@ create_local_dialog(AddressBookConfig * abc)
                                     action, GTK_RESPONSE_APPLY,
                                     GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                                     NULL);
+#if HAVE_MACOSX_DESKTOP
+    libbalsa_macosx_menu_for_parent(dialog, abc->parent);
+#endif
     size_group = libbalsa_create_size_group(dialog);
 
     table = libbalsa_create_table(5, 2);
@@ -334,6 +341,9 @@ create_generic_dialog(AddressBookConfig * abc)
                                     action, GTK_RESPONSE_APPLY,
                                     GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                                     NULL);
+#if HAVE_MACOSX_DESKTOP
+    libbalsa_macosx_menu_for_parent(dialog, abc->parent);
+#endif
     gtk_container_set_border_width(GTK_CONTAINER(dialog), 5);
     gtk_container_set_border_width(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox),
                                    12);
@@ -596,6 +606,9 @@ bad_path(gchar * path, GtkWindow * window, gint type)
                                  GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO,
                                  _("No path found.  "
 				   "Do you want to give one?"));
+#if HAVE_MACOSX_DESKTOP
+    libbalsa_macosx_menu_for_parent(ask, window);
+#endif
     gtk_dialog_set_default_response(GTK_DIALOG(ask), GTK_RESPONSE_YES);
     clicked_button = gtk_dialog_run(GTK_DIALOG(ask));
     gtk_widget_destroy(ask);

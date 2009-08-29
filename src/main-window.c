@@ -41,7 +41,8 @@
 #include <glib/gi18n.h>
  
 #if HAVE_MACOSX_DESKTOP
-#include <ige-mac-integration.h>
+#  include <ige-mac-integration.h>
+#  include "macosx-helpers.h"
 #endif
 
 #include "ab-window.h"
@@ -311,6 +312,12 @@ bw_quit_nicely(GtkAction * action, gpointer data)
    proponents of GNOME2 dumbify approach (OK, I am bit unfair here).
 */
 
+#if HAVE_MACOSX_DESKTOP
+#define MAC_MODIFIER    "<alt>"
+#else
+#define MAC_MODIFIER
+#endif
+
 /* Actions that are always sensitive: */
 static const GtkActionEntry entries[] = {
     /* Menus */
@@ -338,7 +345,7 @@ static const GtkActionEntry entries[] = {
     /* File menu items */
     /* Not in the touchpad menu, but still available as a toolbar
      * button: */
-    {"Continue", BALSA_PIXMAP_CONTINUE, N_("_Continue"), "C",
+    {"Continue", BALSA_PIXMAP_CONTINUE, N_("_Continue"), MAC_MODIFIER "C",
      N_("Continue editing current message"),
      G_CALLBACK(bw_continue_message_cb)},
     {"GetNewMail", BALSA_PIXMAP_RECEIVE, N_("_Get New Mail"), "<control>M",
@@ -352,12 +359,12 @@ static const GtkActionEntry entries[] = {
      G_CALLBACK(bw_send_receive_messages_cb)},
     {"PageSetup", NULL, N_("Page _Setup"), NULL,
      N_("Set up page for printing"), G_CALLBACK(bw_page_setup_cb)},
-    {"AddressBook", BALSA_PIXMAP_BOOK_RED, N_("_Address Book..."), "B",
+    {"AddressBook", BALSA_PIXMAP_BOOK_RED, N_("_Address Book..."), MAC_MODIFIER "B",
      N_("Open the address book"), G_CALLBACK(bw_address_book_cb)},
     {"Quit", GTK_STOCK_QUIT, N_("_Quit"), "<control>Q", N_("Quit Balsa"),
      G_CALLBACK(bw_quit_nicely)},
     /* File:New submenu items */
-    {"NewMessage", BALSA_PIXMAP_COMPOSE, N_("_Message..."), "M",
+    {"NewMessage", BALSA_PIXMAP_COMPOSE, N_("_Message..."), MAC_MODIFIER "M",
      N_("Compose a new message"), G_CALLBACK(bw_new_message_cb)},
 #if !defined(ENABLE_TOUCH_UI)
     {"NewMbox", GTK_STOCK_ADD, N_("Local mbox mailbox..."), NULL,
@@ -439,9 +446,9 @@ static const GtkActionEntry mailbox_entries[] = {
     {"FindNext", GTK_STOCK_FIND, N_("Find Ne_xt"), "<control>G", NULL,
      G_CALLBACK(bw_find_again_cb)},
     /* Mailbox menu items */
-    {"NextMessage", BALSA_PIXMAP_NEXT, N_("Next Message"), "N",
+    {"NextMessage", BALSA_PIXMAP_NEXT, N_("Next Message"), MAC_MODIFIER "N",
      N_("Next Message"), G_CALLBACK(bw_next_message_cb)},
-    {"PreviousMessage", BALSA_PIXMAP_PREVIOUS, N_("Previous Message"), "P",
+    {"PreviousMessage", BALSA_PIXMAP_PREVIOUS, N_("Previous Message"), MAC_MODIFIER "P",
      N_("Previous Message"), G_CALLBACK(bw_previous_message_cb)},
     {"NextFlagged", BALSA_PIXMAP_NEXT_FLAGGED, N_("Next Flagged Message"),
      "<control><alt>F", N_("Next Flagged Message"),
@@ -481,14 +488,14 @@ static const GtkActionEntry mailbox_entries[] = {
  * selected: */
 static const GtkActionEntry message_entries[] = { 
     /* Message menu items */
-    {"Reply", BALSA_PIXMAP_REPLY, N_("_Reply..."), "R",
+    {"Reply", BALSA_PIXMAP_REPLY, N_("_Reply..."), MAC_MODIFIER "R",
      N_("Reply to the current message"), G_CALLBACK(bw_replyto_message_cb)},
-    {"ReplyAll", BALSA_PIXMAP_REPLY_ALL, N_("Reply to _All..."), "A",
+    {"ReplyAll", BALSA_PIXMAP_REPLY_ALL, N_("Reply to _All..."), MAC_MODIFIER "A",
      N_("Reply to all recipients of the current message"),
      G_CALLBACK(bw_replytoall_message_cb)},
-    {"ReplyGroup", BALSA_PIXMAP_REPLY_GROUP, N_("Reply to _Group..."), "G",
+    {"ReplyGroup", BALSA_PIXMAP_REPLY_GROUP, N_("Reply to _Group..."), MAC_MODIFIER "G",
      N_("Reply to mailing list"), G_CALLBACK(bw_replytogroup_message_cb)},
-    {"StoreAddress", BALSA_PIXMAP_BOOK_RED, N_("_Store Address..."), "S",
+    {"StoreAddress", BALSA_PIXMAP_BOOK_RED, N_("_Store Address..."), MAC_MODIFIER "S",
      N_("Store address of sender in addressbook"),
      G_CALLBACK(bw_store_address_cb)},
     {"ViewSource", BALSA_PIXMAP_BOOK_OPEN, N_("_View Source..."),
@@ -498,11 +505,11 @@ static const GtkActionEntry message_entries[] = {
      * stock_id; the first in this list defines the action tied to the
      * toolbar's Forward button, so "ForwardDefault" must come before
      * the others. */
-    {"ForwardDefault", BALSA_PIXMAP_FORWARD, N_("_Forward..."), "F",
+    {"ForwardDefault", BALSA_PIXMAP_FORWARD, N_("_Forward..."), MAC_MODIFIER "F",
      N_("Forward the current message"),
      G_CALLBACK(bw_forward_message_default_cb)},
 #if !defined(ENABLE_TOUCH_UI)
-    {"ForwardAttached", BALSA_PIXMAP_FORWARD, N_("_Forward attached..."), "F",
+    {"ForwardAttached", BALSA_PIXMAP_FORWARD, N_("_Forward attached..."), MAC_MODIFIER "F",
      N_("Forward the current message as attachment"),
      G_CALLBACK(bw_forward_message_attached_cb)},
     {"ForwardInline", BALSA_PIXMAP_FORWARD, N_("Forward _inline..."), NULL,
@@ -535,7 +542,7 @@ static const GtkActionEntry current_message_entries[] = {
      N_("Copy message"), G_CALLBACK(bw_message_copy_cb)},
     {"SelectText", NULL, N_("_Select Text"), NULL,
      N_("Select entire mail"), G_CALLBACK(bw_message_select_all_cb)},
-    {"FindInMessage", NULL, N_("Find in _Message"), "slash",
+    {"FindInMessage", NULL, N_("Find in _Message"), MAC_MODIFIER "slash",
      N_("Find a string in this message"),
      G_CALLBACK(bw_find_in_message_cb)}
 #endif /* ENABLE_TOUCH_UI */
@@ -546,11 +553,11 @@ static const GtkActionEntry current_message_entries[] = {
 static const GtkActionEntry modify_message_entries[] = { 
     /* Message menu items */
 #if !defined(ENABLE_TOUCH_UI)
-    {"MoveToTrash", GTK_STOCK_DELETE, N_("_Move to Trash"), "D",
+    {"MoveToTrash", GTK_STOCK_DELETE, N_("_Move to Trash"), MAC_MODIFIER "D",
      N_("Move the current message to Trash mailbox"),
      G_CALLBACK(bw_trash_message_cb)},
 #else  /* ENABLE_TOUCH_UI */
-    {"MoveToTrash", GTK_STOCK_DELETE, N_("_Delete to Trash"), "D",
+    {"MoveToTrash", GTK_STOCK_DELETE, N_("_Delete to Trash"), MAC_MODIFIER "D",
      N_("Move the current message to Trash mailbox"),
      G_CALLBACK(bw_trash_message_cb)},
     {"ToolbarToggleNew", BALSA_PIXMAP_MARKED_NEW, N_("_New"), NULL,
@@ -558,7 +565,7 @@ static const GtkActionEntry modify_message_entries[] = {
 #endif /* ENABLE_TOUCH_UI */
     {"MessageToggleFlagMenu", NULL, N_("_Toggle Flag")},
     /* Message:toggle-flag submenu items */
-    {"ToggleFlagged", BALSA_PIXMAP_INFO_FLAGGED, N_("_Flagged"), "X",
+    {"ToggleFlagged", BALSA_PIXMAP_INFO_FLAGGED, N_("_Flagged"), MAC_MODIFIER "X",
      N_("Toggle flagged"), G_CALLBACK(bw_toggle_flagged_message_cb)},
     {"ToggleDeleted", GTK_STOCK_DELETE, N_("_Deleted"), "<control>D",
      N_("Toggle deleted flag"), G_CALLBACK(bw_toggle_deleted_message_cb)},
@@ -1641,6 +1648,7 @@ balsa_window_new()
     ige_mac_menu_add_app_menu_item(group,
                                   GTK_MENU_ITEM(gtk_ui_manager_get_widget(ui_manager, "/MainMenu/EditMenu/Preferences")), 
                                    NULL);
+    libbalsa_macosx_menu(GTK_WIDGET(window), GTK_MENU_SHELL(menubar));
 #else
     gtk_box_pack_start(GTK_BOX(window->vbox), menubar, FALSE, FALSE, 0);
 #endif
@@ -2750,6 +2758,9 @@ ensure_check_mail_dialog(BalsaWindow * window)
                                     GTK_DIALOG_DESTROY_WITH_PARENT,
                                     _("_Hide"), GTK_RESPONSE_CLOSE,
                                     NULL);
+#if HAVE_MACOSX_DESKTOP
+    libbalsa_macosx_menu_for_parent(progress_dialog, GTK_WINDOW(window));
+#endif
     gtk_window_set_wmclass(GTK_WINDOW(progress_dialog), 
 			   "progress_dialog", "Balsa");
         
@@ -3518,6 +3529,9 @@ balsa_window_next_unread(BalsaWindow * window)
                                GTK_BUTTONS_YES_NO,
                                _("The next unread message is in %s"),
                                mailbox->name);
+#if HAVE_MACOSX_DESKTOP
+    libbalsa_macosx_menu_for_parent(dialog, GTK_WINDOW(window));
+#endif
     gtk_message_dialog_format_secondary_text
         (GTK_MESSAGE_DIALOG(dialog),
          _("Do you want to switch to %s?"), mailbox->name);
@@ -4036,6 +4050,9 @@ bw_find_real(BalsaWindow * window, BalsaIndex * bindex, gboolean again)
         GtkToggleButton *matching_to, *matching_cc, *matching_subject;
 	gint ok;
 	
+#if HAVE_MACOSX_DESKTOP
+	libbalsa_macosx_menu_for_parent(dia, GTK_WINDOW(window));
+#endif
         vbox = GTK_DIALOG(dia)->vbox;
 
 	page=gtk_table_new(2, 1, FALSE);

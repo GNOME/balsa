@@ -294,6 +294,7 @@ register_balsa_pixmaps(void)
     balsa_icon_table =
         g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
     gtk_icon_factory_add_default(factory);
+    gtk_icon_theme_append_search_path(icon_theme, BALSA_STD_PREFIX "/share/icons");
     gtk_icon_theme_append_search_path(icon_theme, BALSA_DATA_PREFIX);
 
     for (i = 0; i < ELEMENTS(balsa_icons); i++)

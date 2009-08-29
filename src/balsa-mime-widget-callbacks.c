@@ -33,6 +33,10 @@
 
 #include <gdk/gdkkeysyms.h>
 
+#if HAVE_MACOSX_DESKTOP
+#  include "macosx-helpers.h"
+#endif
+
 
 void
 balsa_mime_widget_ctx_menu_cb(GtkWidget * menu_item,
@@ -82,6 +86,9 @@ balsa_mime_widget_ctx_menu_save(GtkWidget * parent_widget,
 				    GTK_FILE_CHOOSER_ACTION_SAVE,
 				    GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
 				    GTK_STOCK_OK, GTK_RESPONSE_OK, NULL);
+#if HAVE_MACOSX_DESKTOP
+    libbalsa_macosx_menu_for_parent(save_dialog, balsa_get_parent_window(parent_widget));
+#endif
     gtk_dialog_set_default_response(GTK_DIALOG(save_dialog),
 				    GTK_RESPONSE_OK);
     g_free(title);
@@ -133,6 +140,9 @@ balsa_mime_widget_ctx_menu_save(GtkWidget * parent_widget,
 					 GTK_MESSAGE_QUESTION,
 					 GTK_BUTTONS_YES_NO,
 					 _("File already exists. Overwrite?"));
+#if HAVE_MACOSX_DESKTOP
+	libbalsa_macosx_menu_for_parent(confirm, GTK_WINDOW(balsa_app.main_window));
+#endif
 	do_save =
 	    (gtk_dialog_run(GTK_DIALOG(confirm)) == GTK_RESPONSE_YES);
 	gtk_widget_destroy(confirm);

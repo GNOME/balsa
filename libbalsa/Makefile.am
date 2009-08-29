@@ -88,6 +88,8 @@ libbalsa_a_SOURCES = 		\
 	libbalsa-conf.h		\
 	libbalsa-marshal.c	\
 	libbalsa-marshal.h	\
+	macosx-helpers.c	\
+	macosx-helpers.h	\
 	missing.h		\
 	missing_time.c		\
 	libbalsa.c		\

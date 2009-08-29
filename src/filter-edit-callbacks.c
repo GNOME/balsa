@@ -45,6 +45,10 @@
 #include "libbalsa-conf.h"
 #include "missing.h"
 
+#if HAVE_MACOSX_DESKTOP
+#  include "macosx-helpers.h"
+#endif
+
 /* Defined in filter-edit-dialog.c*/
 extern option_list fe_search_type[4];
 extern GList * fe_user_headers_list;
@@ -1237,6 +1241,9 @@ fe_edit_condition(GtkWidget * throwaway,gpointer is_new_cnd)
                                         GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                                         GTK_STOCK_HELP, GTK_RESPONSE_HELP,
                                         NULL);
+#if HAVE_MACOSX_DESKTOP
+	libbalsa_macosx_menu_for_parent(condition_dialog, GTK_WINDOW(fe_window));
+#endif
         g_object_add_weak_pointer(G_OBJECT(condition_dialog),
                                   (gpointer) &condition_dialog);
 

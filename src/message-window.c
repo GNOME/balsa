@@ -36,6 +36,10 @@
 #include <glib/gi18n.h>
 #include <gdk/gdkkeysyms.h>
 
+#if HAVE_MACOSX_DESKTOP
+#  include "macosx-helpers.h"
+#endif
+
 /* callbacks */
 static void destroy_message_window(GtkWidget * widget, MessageWindow * mw);
 static void mw_expunged_cb(LibBalsaMailbox * mailbox, guint msgno,
@@ -567,7 +571,11 @@ message_window_new(LibBalsaMailbox * mailbox, guint msgno)
     }
 
     menubar = gtk_ui_manager_get_widget(ui_manager, "/MainMenu");
+#if HAVE_MACOSX_DESKTOP
+    libbalsa_macosx_menu(window, GTK_MENU_SHELL(menubar));
+#else
     gtk_box_pack_start(GTK_BOX(vbox), menubar, FALSE, FALSE, 0);
+#endif
 
     toolbar = balsa_toolbar_new(model, ui_manager);
     gtk_box_pack_start(GTK_BOX(vbox), toolbar, FALSE, FALSE, 0);

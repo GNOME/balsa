@@ -1,3 +1,46 @@
+2009-08-29  Albrecht Dreß
+
+	Improve the Mac OS X integration for a native "Carbon" build
+
+	* libbalsa/Makefile.am:
+	* libbalsa/identity.c (libbalsa_identity_select_dialog),
+	(delete_ident_cb), (libbalsa_identity_config_dialog):
+	* libbalsa/rfc3156.c (check_gpg_child), (select_key_from_list),
+	(accept_low_trust_key), (get_passphrase_real):
+	* libbalsa/smtp-server.c (libbalsa_smtp_server_dialog):
+	* libbalsa/source-viewer.c (libbalsa_show_message_source):
+	* src/ab-main.c:
+	* src/address-book-config.c (create_local_dialog),
+	(create_generic_dialog), (bad_path):
+	* src/balsa-app.c (ask_password_real):
+	* src/balsa-icons.c (register_balsa_pixmaps):
+	* src/balsa-index.c (balsa_index_pipe):
+	* src/balsa-mblist.c (bmbl_mru_show_tree):
+	* src/balsa-message.c (part_context_dump_all_cb),
+	(create_mdn_dialog):
+	* src/balsa-mime-widget-callbacks.c
+	(balsa_mime_widget_ctx_menu_save):
+	* src/filter-edit-callbacks.c (fe_edit_condition):
+	* src/folder-conf.c (folder_conf_imap_node), (browse_button_cb),
+	(subfolder_conf_clicked_ok), (folder_conf_imap_sub_node),
+	(folder_conf_delete):
+	* src/information-dialog.c (balsa_information_dialog),
+	(balsa_information_list):
+	* src/mailbox-conf.c (mailbox_conf_delete),
+	(create_local_mailbox_dialog), (create_generic_dialog):
+	* src/main-window.c:
+	* src/message-window.c (message_window_new):
+	* src/pref-manager.c (open_preferences_manager):
+	* src/sendmsg-window.c (delete_handler), (change_attach_mode),
+	(sw_get_user_codeset), (sw_attach_dialog),
+	(quote_parts_select_dlg), (sendmsg_window_new),
+	(sendmsg_window_set_field), (include_file_cb),
+	(check_suggest_encryption), (send_message_handler),
+	(bsmsg_check_format_compatibility):
+	* src/store-address.c (store_address_dialog):
+	* src/threads.h:
+	* src/toolbar-prefs.c (customize_dialog_cb):
+
 2006-08-27  Pawel Salek
 
 	* libbalsa/imap/imap-handle.c: namespace queries need to encode

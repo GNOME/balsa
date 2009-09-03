@@ -390,9 +390,6 @@ if test x"$use_webkit" != xno ; then
     if test x"$use_threads" = xno ; then
         AC_MSG_ERROR([WebKit cannot be used with threads disabled.])
     fi
-    if test x"$use_gtkhtml" != xno ; then
-        AC_MSG_ERROR([Do not specify both --with-webkit and --with-gtkhtml.])
-    fi
     PKG_CHECK_MODULES(WEBKIT, [webkit-1.0])
     AC_DEFINE(HAVE_WEBKIT,1,[Defined when WebKit can be used.])
     AC_DEFINE(HAVE_GTKHTML,1,[Defined when GtkHtml can be used.])

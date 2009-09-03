@@ -1,3 +1,8 @@
+2009-09-03  Peter Bloomfield
+
+	* configure.in: do not allow configure with both webkit and
+	gtkhtml.
+
 2009-08-29  Albrecht Dreß
 
 	Improve the Mac OS X integration for a native "Carbon" build

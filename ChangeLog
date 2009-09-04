@@ -1,3 +1,9 @@
+2009-09-04  Peter Bloomfield
+
+	* libbalsa/address-book-vcard.c
+	(libbalsa_address_book_vcard_parse_address): accept
+	"email:name@host" as well as "email;type=blah:name@host".
+
 2009-09-03  Peter Bloomfield
 
 	* configure.in: oops--revert.

@@ -331,8 +331,8 @@ libbalsa_address_book_vcard_parse_address(FILE * stream,
 	/*
 	 * fetch all e-mail fields
 	 */
-	if (g_ascii_strncasecmp(string, "EMAIL;", 6) == 0) {
-	    gchar *ptr = strchr(string+6, ':');
+	if (g_ascii_strncasecmp(string, "EMAIL", 5) == 0) {
+	    gchar *ptr = strchr(string + 5, ':');
 	    if (ptr) {
 		address_list =
 		    g_list_prepend(address_list, g_strdup(ptr + 1));

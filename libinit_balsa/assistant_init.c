@@ -142,14 +142,10 @@ dismiss_the_wizard(GtkWidget *wizard)
 void
 balsa_init_begin(void)
 {
-    static const int ASSISTANT_WIDTH = 800;
-    static const int ASSISTANT_HEIGHT = 640;
     GtkWidget *assistant;
 
     assistant = gtk_assistant_new();
     gtk_window_set_title(GTK_WINDOW(assistant), _("Configure Balsa"));
-    gtk_window_set_wmclass(GTK_WINDOW(assistant), "druid", "Balsa");
-    gtk_widget_set_size_request(assistant, ASSISTANT_WIDTH, ASSISTANT_HEIGHT);
 
     balsa_initdruid(GTK_ASSISTANT(assistant));
     gtk_widget_show_all(assistant);

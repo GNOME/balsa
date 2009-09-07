@@ -1,3 +1,10 @@
+2009-09-07  Peter Bloomfield
+
+	* libinit_balsa/assistant_init.c (balsa_init_begin): minimal
+	init assistant.
+	* libinit_balsa/assistant_page_user.c
+	(balsa_druid_page_user_init): ditto.
+
 2009-09-04  Peter Bloomfield
 
 	* libbalsa/address-book-vcard.c

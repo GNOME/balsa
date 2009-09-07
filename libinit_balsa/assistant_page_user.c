@@ -142,7 +142,6 @@ balsa_druid_page_user_init(BalsaDruidPageUser * user,
                                 _("_Remember your password:"),
                                 remember_passwd, druid,
                                 &(user->remember_passwd));
-    gtk_table_set_row_spacing(table, row++, 10);
 
 #if !defined(ENABLE_TOUCH_UI)
     preset = g_strconcat(g_get_home_dir(), "/mail", NULL);

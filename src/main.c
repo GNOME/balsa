@@ -229,13 +229,17 @@ mw_message_received_cb(UniqueApp         *app,
 
         uris = unique_message_data_get_uris(message);
         text = uris[0];
-        if (g_ascii_strncasecmp(text, "mailto:", 7) == 0)
-            sendmsg_window_process_url(text + 7,
-                                       sendmsg_window_set_field, snd);
-        else
-            sendmsg_window_set_field(snd, "to", text);
-        for (p = uris + 1; *p; p++)
-            add_attachment(snd, *p, FALSE, NULL);
+        if (text) {
+            gchar *decoded = libbalsa_urldecode(text);
+            if (g_ascii_strncasecmp(decoded, "mailto:", 7) == 0)
+                sendmsg_window_process_url(decoded + 7,
+                                           sendmsg_window_set_field, snd);
+            else
+                sendmsg_window_set_field(snd, "to", decoded);
+            g_free(decoded);
+            for (p = uris + 1; *p; p++)
+                add_attachment(snd, *p, FALSE, NULL);
+        }
         g_strfreev(uris);
         snd->quit_on_close = FALSE;
         break;
@@ -322,7 +326,8 @@ balsa_handle_automation_options(UniqueApp * app)
         gint i;
 
         uris[0] =
-            g_strdup(opt_compose_email ? opt_compose_email : "mailto");
+            libbalsa_urlencode(opt_compose_email ?
+                               opt_compose_email : "mailto");
 
         for (l = opt_attach_list, i = 1; l; l = l->next, i++)
             uris[i] = g_strdup(l->data ? l->data : "");

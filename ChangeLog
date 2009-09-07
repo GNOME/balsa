@@ -1,5 +1,12 @@
 2009-09-07  Peter Bloomfield
 
+	* src/main.c (balsa_handle_automation_options): encode URI for
+	UniqueMessageData.
+	(mw_message_received_cb): decode URI received from
+	UniqueMessageData.
+
+2009-09-07  Peter Bloomfield
+
 	* libbalsa/misc.c (libbalsa_urlencode): handle 8-bit characters.
 
 2009-09-07  Peter Bloomfield

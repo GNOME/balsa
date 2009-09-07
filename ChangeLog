@@ -1,5 +1,10 @@
 2009-09-07  Peter Bloomfield
 
+	* libbalsa/libbalsa-conf.c (lbc_init): do not read config file
+	twice.
+
+2009-09-07  Peter Bloomfield
+
 	* libinit_balsa/assistant_init.c (balsa_init_begin): minimal
 	init assistant.
 	* libinit_balsa/assistant_page_user.c

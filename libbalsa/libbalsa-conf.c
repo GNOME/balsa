@@ -83,16 +83,24 @@ lbc_init(LibBalsaConf * conf, const gchar * filename,
 {
     struct stat buf;
     GError *error = NULL;
+    gint rc;
 
     if (!conf->path)
         conf->path =
             g_build_filename(g_get_home_dir(), ".balsa", filename, NULL);
+    rc = stat(conf->path, &buf);
     if (conf->key_file) {
-        if (stat(conf->path, &buf) < 0 || buf.st_mtime <= conf->mtime)
+        if (rc >= 0 && buf.st_mtime <= conf->mtime)
+            /* found the config file, and it hasn't been touched since
+             * we loaded it */
             return;
-        conf->mtime = buf.st_mtime;
-    } else
+    } else {
         conf->key_file = g_key_file_new();
+        if (rc < 0)
+            /* no config file--must be first time startup */
+            return;
+    }
+    conf->mtime = buf.st_mtime;
 
     libbalsa_assure_balsa_dir();
     if (!g_key_file_load_from_file

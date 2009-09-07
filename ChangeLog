@@ -1,5 +1,9 @@
 2009-09-07  Peter Bloomfield
 
+	* libbalsa/misc.c (libbalsa_urlencode): handle 8-bit characters.
+
+2009-09-07  Peter Bloomfield
+
 	* libbalsa/libbalsa-conf.c (lbc_init): do not read config file
 	twice.
 

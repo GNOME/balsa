@@ -152,8 +152,8 @@ libbalsa_urlencode(const gchar* str)
        } else if (!isalnum(*x) && strchr("_-.", *x) == NULL) {
            /* Allow only alnum chars and '_', '-', '.'; escape the rest */
            *x++ = '%';
-           *x++ = hexchars[*str >> 4];
-           *x = hexchars[*str & 0x0F];
+           *x++ = hexchars[(*str >> 4) & 0x0F];
+           *x = hexchars[(*str) & 0x0F];
        }
     }
     

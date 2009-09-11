@@ -1,3 +1,9 @@
+2009-09-10  Peter Bloomfield
+
+	* src/mailbox-conf.c (mailbox_conf_view_cb),
+	(mailbox_conf_view_new_with_size_group): set "Update" button
+	sensitive when a control is changed.
+
 2009-09-07  Peter Bloomfield
 
 	* src/main.c (balsa_handle_automation_options): encode URI for

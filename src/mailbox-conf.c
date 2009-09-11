@@ -1382,6 +1382,13 @@ mailbox_conf_view_free(BalsaMailboxConfView *view_info)
  * table:       the table in which to place the widgets;
  * row:         the row of the table in which to start.
  */
+static void
+mailbox_conf_view_cb(GtkWidget * widget, gpointer data)
+{
+    gtk_dialog_set_response_sensitive(GTK_DIALOG(data),
+                                      MCW_RESPONSE, TRUE);
+}
+
 static BalsaMailboxConfView *
 mailbox_conf_view_new_with_size_group(LibBalsaMailbox * mailbox,
                                       GtkWindow * window,
@@ -1405,6 +1412,8 @@ mailbox_conf_view_new_with_size_group(LibBalsaMailbox * mailbox,
         gtk_size_group_add_widget(size_group, label);
 
     view_info->identity_combo_box = widget = gtk_combo_box_new_text();
+    g_signal_connect(view_info->identity_combo_box, "changed",
+                     G_CALLBACK(mailbox_conf_view_cb), window);
     gtk_label_set_mnemonic_widget(GTK_LABEL(label), widget);
     identity_name = libbalsa_mailbox_get_identity_name(mailbox);
     for (list = balsa_app.identities, active = 0; list;
@@ -1438,6 +1447,8 @@ mailbox_conf_view_new_with_size_group(LibBalsaMailbox * mailbox,
             gtk_size_group_add_widget(size_group, label);
 
         view_info->chk_crypt = gtk_combo_box_new_text();
+        g_signal_connect(view_info->chk_crypt, "changed",
+                         G_CALLBACK(mailbox_conf_view_cb), window);
         gtk_label_set_mnemonic_widget(GTK_LABEL(label), view_info->chk_crypt);
         mailbox_conf_combo_box_make(GTK_COMBO_BOX(view_info->chk_crypt),
                                     ELEMENTS(chk_crypt_menu),
@@ -1457,6 +1468,8 @@ mailbox_conf_view_new_with_size_group(LibBalsaMailbox * mailbox,
                               table, ++row,
                               libbalsa_mailbox_get_show(mailbox) ==
                               LB_MAILBOX_SHOW_TO);
+    g_signal_connect(view_info->show_to, "toggled",
+                     G_CALLBACK(mailbox_conf_view_cb), window);
     
     /* Subscribe check button */
     view_info->subscribe =
@@ -1464,6 +1477,8 @@ mailbox_conf_view_new_with_size_group(LibBalsaMailbox * mailbox,
                               ++row,
                               libbalsa_mailbox_get_subscribe(mailbox) !=
                               LB_MAILBOX_SUBSCRIBE_NO);
+    g_signal_connect(view_info->subscribe, "toggled",
+                     G_CALLBACK(mailbox_conf_view_cb), window);
 
     return view_info;
 }

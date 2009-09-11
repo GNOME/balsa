@@ -400,7 +400,7 @@ load_mailbox_view(BalsaMailboxNode * mbnode)
     if (libbalsa_mailbox_get_frozen(mailbox)
 	&& libbalsa_mailbox_get_open(mailbox))
 	/* We are rescanning. */
-	balsa_window_open_mbnode(balsa_app.main_window, mbnode);
+	balsa_window_open_mbnode(balsa_app.main_window, mbnode, TRUE);
     libbalsa_mailbox_set_frozen(mailbox, FALSE);
 }
 

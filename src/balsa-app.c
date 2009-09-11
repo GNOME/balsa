@@ -534,7 +534,7 @@ open_mailboxes_idle_cb(gchar ** urls)
             return FALSE;
         }
 
-        str = g_string_new(NULL);
+        str = g_string_new(balsa_app.current_mailbox_url);
         g_hash_table_foreach(libbalsa_mailbox_view_table,
                              (GHFunc) append_url_if_open, str);
         urls = g_strsplit(str->str, ";", 0);
@@ -547,7 +547,9 @@ open_mailboxes_idle_cb(gchar ** urls)
 	    fprintf(stderr, "open_mailboxes_idle_cb: opening %s => %p..\n",
 		    *tmp, mbox);
 	if (mbox)
-	    balsa_mblist_open_mailbox(mbox);
+            /* The first mailbox we open will be shown; the others will
+             * have notebook pages, but will not be shown. */
+	    balsa_mblist_open_mailbox_hidden(mbox);
         else {
 	    /* Do not try to open it next time. */
 	    LibBalsaMailboxView *view =
@@ -566,9 +568,6 @@ open_mailboxes_idle_cb(gchar ** urls)
     }
     g_strfreev(urls);
 
-    if (gtk_notebook_get_current_page(GTK_NOTEBOOK(balsa_app.notebook)) >=
-        0)
-        gtk_notebook_set_current_page(GTK_NOTEBOOK(balsa_app.notebook), 0);
     gdk_threads_leave();
 
     return FALSE;

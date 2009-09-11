@@ -1060,6 +1060,8 @@ config_global_load(void)
     
     balsa_app.remember_open_mboxes =
 	libbalsa_conf_get_bool("RememberOpenMailboxes=false");
+    balsa_app.current_mailbox_url =
+	libbalsa_conf_get_string("CurrentMailboxURL");
 
     balsa_app.empty_trash_on_exit =
 	libbalsa_conf_get_bool("EmptyTrash=false");
@@ -1446,6 +1448,9 @@ config_save(void)
 
     libbalsa_conf_set_bool("RememberOpenMailboxes",
 			  balsa_app.remember_open_mboxes);
+    libbalsa_conf_set_string("CurrentMailboxURL",
+                             balsa_app.current_mailbox_url);
+
     libbalsa_conf_set_bool("EmptyTrash", balsa_app.empty_trash_on_exit);
 
     if (balsa_app.default_address_book)

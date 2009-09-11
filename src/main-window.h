@@ -94,7 +94,9 @@ struct _BalsaWindow {
 struct _BalsaWindowClass {
     GtkWindowClass parent_class;
 
-    void (*open_mbnode)  (BalsaWindow * window, BalsaMailboxNode * mbnode);
+    void (*open_mbnode)  (BalsaWindow * window,
+                          BalsaMailboxNode * mbnode,
+                          gboolean set_current);
     void (*close_mbnode) (BalsaWindow * window, BalsaMailboxNode * mbnode);
     void (*identities_changed) (BalsaWindow * window);
 };
@@ -118,7 +120,9 @@ GtkWidget *balsa_window_new(void);
 GtkWidget *balsa_window_find_current_index(BalsaWindow * window);
 void balsa_window_update_book_menus(BalsaWindow *window);
 void balsa_window_refresh(BalsaWindow * window);
-void balsa_window_open_mbnode(BalsaWindow * window, BalsaMailboxNode*mbnode);
+void balsa_window_open_mbnode(BalsaWindow * window,
+                              BalsaMailboxNode*mbnode,
+                              gboolean set_current);
 void balsa_window_close_mbnode(BalsaWindow * window, BalsaMailboxNode*mbnode);
 void balsa_identities_changed(BalsaWindow *bw);
 

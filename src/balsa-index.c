@@ -2169,8 +2169,6 @@ balsa_index_transfer(BalsaIndex *index, GArray * msgnos,
 	return;
     }
 
-    balsa_window_set_statusbar(balsa_app.main_window, from_mailbox);
-
     if (from_mailbox == balsa_app.trash && !copy)
         enable_empty_trash(balsa_app.main_window, TRASH_CHECK);
     else if (to_mailbox == balsa_app.trash)

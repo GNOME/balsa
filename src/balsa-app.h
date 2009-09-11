@@ -335,6 +335,7 @@ extern struct BalsaApplication {
 
     /* list of currently open mailboxes */
     GList *open_mailbox_list;  /* data is a pointer to the mailbox */
+    gchar *current_mailbox_url;/* remember for next session */
     
     /* font used to display messages */
     gchar *message_font;

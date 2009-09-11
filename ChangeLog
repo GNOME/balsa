@@ -1,5 +1,23 @@
 2009-09-11  Peter Bloomfield
 
+	Open most recent mailbox first on restart
+
+	* libbalsa/libbalsa-marshal.list: new marshaller.
+	* src/balsa-app.h: new member current_mailbox_url.
+	* src/save-restore.c (config_global_load), (config_save): save
+	and restore it.
+	* src/main-window.h: new api for open-mbnode class method.
+	* src/balsa-mblist.h: new method balsa_mblist_open_mailbox_hidden;
+	* src/balsa-app.c (open_mailboxes_idle_cb): use them.
+	* src/balsa-index.c (balsa_index_transfer): ditto.
+	* src/balsa-mblist.c (bmbl_open_mailbox),
+	(balsa_mblist_open_mailbox), (balsa_mblist_open_mailbox_hidden):
+	ditto.
+	* src/mailbox-node.c (load_mailbox_view): ditto.
+	* src/main-window.c: ditto.
+
+2009-09-11  Peter Bloomfield
+
 	* src/mailbox-conf.c (mailbox_conf_set_values):
 	initialize mailbox name for local mailbox;
 	(local_mailbox_dialog_cb), (create_local_mailbox_dialog):

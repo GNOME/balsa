@@ -67,6 +67,7 @@ gboolean balsa_mblist_focus_mailbox(BalsaMBList * mblist,
 
 GList *balsa_mblist_find_all_unread_mboxes(LibBalsaMailbox * mailbox);
 void balsa_mblist_open_mailbox(LibBalsaMailbox * mailbox);
+void balsa_mblist_open_mailbox_hidden(LibBalsaMailbox * mailbox);
 void balsa_mblist_close_mailbox(LibBalsaMailbox * mailbox);
 /* balsa_mblist_close_lru_peer_mbx closes least recently used mailbox
  * on the same server as the one given as the argument */

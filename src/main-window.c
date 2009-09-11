@@ -76,6 +76,8 @@
 
 #include "libinit_balsa/assistant_init.h"
 
+#include "libbalsa/libbalsa-marshal.h"
+
 #define MAILBOX_DATA "mailbox_data"
 
 enum {
@@ -116,7 +118,8 @@ static void bw_display_new_mail_notification(int num_new, int has_new);
 static void balsa_window_class_init(BalsaWindowClass * klass);
 static void balsa_window_init(BalsaWindow * window);
 static void balsa_window_real_open_mbnode(BalsaWindow *window,
-                                          BalsaMailboxNode *mbnode);
+                                          BalsaMailboxNode *mbnode,
+                                          gboolean set_current);
 static void balsa_window_real_close_mbnode(BalsaWindow *window,
 					   BalsaMailboxNode *mbnode);
 static void balsa_window_destroy(GtkObject * object);
@@ -243,8 +246,8 @@ static void bw_set_threading_menu(BalsaWindow * window, int option);
 static void bw_show_mbtree(BalsaWindow * window);
 #endif /* ENABLE_TOUCH_UI */
 static void bw_set_filter_menu(BalsaWindow * window, int gui_filter);
-static LibBalsaCondition *bw_get_view_filter(BalsaWindow * window,
-                                             gboolean flags_only);
+static LibBalsaCondition *bw_get_flag_filter(BalsaWindow * window);
+static LibBalsaCondition *bw_get_view_filter(BalsaWindow * window);
 #if defined(ENABLE_TOUCH_UI)
 static gboolean bw_open_mailbox_cb(GtkWidget *w, GdkEventKey *e, gpointer data);
 static void bw_enable_view_filter_cb(GtkToggleAction * action, gpointer data);
@@ -936,8 +939,8 @@ balsa_window_class_init(BalsaWindowClass * klass)
                      G_SIGNAL_RUN_LAST,
                      G_STRUCT_OFFSET(BalsaWindowClass, open_mbnode),
                      NULL, NULL,
-                     g_cclosure_marshal_VOID__OBJECT,
-                     G_TYPE_NONE, 1, G_TYPE_OBJECT);
+                     libbalsa_VOID__OBJECT_BOOLEAN,
+                     G_TYPE_NONE, 2, G_TYPE_OBJECT, G_TYPE_BOOLEAN);
 
     window_signals[CLOSE_MAILBOX_NODE] =
         g_signal_new("close_mailbox_node",
@@ -1051,7 +1054,7 @@ bw_set_view_filter(BalsaWindow * bw, gint filter_no, GtkWidget * entry)
     if (!index)
         return;
 
-    view_filter = bw_get_view_filter(bw, FALSE);
+    view_filter = bw_get_view_filter(bw);
     balsa_index_set_view_filter(BALSA_INDEX(index), filter_no,
                                 gtk_entry_get_text(GTK_ENTRY(entry)),
                                 view_filter);
@@ -2154,13 +2157,14 @@ bw_set_filter_menu(BalsaWindow * window, int mask)
    mailbox is already on one of them.
 */
 void
-balsa_window_open_mbnode(BalsaWindow * window, BalsaMailboxNode * mbnode)
+balsa_window_open_mbnode(BalsaWindow * window, BalsaMailboxNode * mbnode,
+                         gboolean set_current)
 {
     g_return_if_fail(window != NULL);
     g_return_if_fail(BALSA_IS_WINDOW(window));
 
     g_signal_emit(G_OBJECT(window), window_signals[OPEN_MAILBOX_NODE],
-                  0, mbnode);
+                  0, mbnode, set_current);
 }
 
 void
@@ -2243,6 +2247,7 @@ bw_notebook_label_new(BalsaMailboxNode * mbnode)
 struct bw_open_mbnode_info {
     BalsaMailboxNode * mbnode;
     BalsaWindow *window;
+    gboolean set_current;
 };
 
 static void
@@ -2255,7 +2260,6 @@ bw_real_open_mbnode(struct bw_open_mbnode_info * info)
     gboolean failurep;
     GError *err = NULL;
     gchar *message;
-    LibBalsaCondition *view_filter;
     LibBalsaMailbox *mailbox;
 
 #ifdef BALSA_USE_THREADS
@@ -2328,26 +2332,16 @@ bw_real_open_mbnode(struct bw_open_mbnode_info * info)
                                    GTK_POLICY_AUTOMATIC);
     gtk_container_add(GTK_CONTAINER(scroll), GTK_WIDGET(index));
     gtk_widget_show(scroll);
-    gtk_notebook_append_page(GTK_NOTEBOOK(info->window->notebook),
-                             scroll, label);
+    page_num =
+        gtk_notebook_append_page(GTK_NOTEBOOK(info->window->notebook),
+                                 scroll, label);
     gtk_notebook_set_tab_reorderable(GTK_NOTEBOOK(info->window->notebook),
                                      scroll, TRUE);
 
-    /* change the page to the newly selected notebook item */
-    page_num = gtk_notebook_page_num(GTK_NOTEBOOK
-                                     (info->window->notebook),
-                                     scroll);
-    gtk_notebook_set_current_page(GTK_NOTEBOOK
-                                  (info->window->notebook),
-                                  page_num);
-
-    /* bw_switch_page_cb has now set the hide-states for this mailbox, so
-     * we can set up the view-filter: */
-    view_filter = bw_get_view_filter(info->window, TRUE);
-    libbalsa_mailbox_set_view_filter(mailbox, view_filter,
-                                     FALSE);
-    libbalsa_condition_unref(view_filter);
-    libbalsa_mailbox_make_view_filter_persistent(mailbox);
+    if (info->set_current)
+        /* change the page to the newly selected notebook item */
+        gtk_notebook_set_current_page(GTK_NOTEBOOK(info->window->notebook),
+                                      page_num);
 
     bw_register_open_mailbox(mailbox);
     /* scroll may select the message and GtkTreeView does not like selecting
@@ -2365,7 +2359,9 @@ bw_real_open_mbnode(struct bw_open_mbnode_info * info)
 }
 
 static void
-balsa_window_real_open_mbnode(BalsaWindow * window, BalsaMailboxNode * mbnode)
+balsa_window_real_open_mbnode(BalsaWindow * window,
+                              BalsaMailboxNode * mbnode,
+                              gboolean set_current)
 {
     struct bw_open_mbnode_info *info;
 #ifdef BALSA_USE_THREADS
@@ -2374,6 +2370,7 @@ balsa_window_real_open_mbnode(BalsaWindow * window, BalsaMailboxNode * mbnode)
 #endif
     info = g_new(struct bw_open_mbnode_info, 1);
     info->window = window;
+    info->set_current = set_current;
     g_object_add_weak_pointer(G_OBJECT(window), (gpointer) &info->window);
     info->mbnode = mbnode;
     g_object_ref(mbnode);
@@ -2452,6 +2449,9 @@ balsa_window_real_close_mbnode(BalsaWindow * window,
 
             /* Just in case... */
             g_object_set_data(G_OBJECT(window), BALSA_INDEX_GRAB_FOCUS, NULL);
+
+            g_free(balsa_app.current_mailbox_url);
+            balsa_app.current_mailbox_url = NULL;
         }
     }
 
@@ -4225,7 +4225,7 @@ bw_find_real(BalsaWindow * window, BalsaIndex * bindex, gboolean again)
             LibBalsaMailbox *mailbox = 
                 BALSA_INDEX(bindex)->mailbox_node->mailbox;
             LibBalsaCondition *filter, *res;
-            filter = bw_get_view_filter(window, FALSE);
+            filter = bw_get_view_filter(window);
             res = libbalsa_condition_new_bool_ptr(FALSE, CONDITION_AND,
                                                   filter, cnd);
             libbalsa_condition_unref(filter);
@@ -4354,7 +4354,7 @@ bw_mailbox_tab_close_cb(GtkWidget * widget, gpointer data)
 
 
 static LibBalsaCondition*
-bw_get_view_filter(BalsaWindow *window, gboolean flags_only)
+bw_get_flag_filter(BalsaWindow *window)
 {
     static struct {
         LibBalsaMessageFlag flag;
@@ -4367,7 +4367,7 @@ bw_get_view_filter(BalsaWindow *window, gboolean flags_only)
         { LIBBALSA_MESSAGE_FLAG_REPLIED, -1, 0 }
     };
     unsigned i, j;
-    LibBalsaCondition *filter, *flag_filter;
+    LibBalsaCondition *filter;
     
     for(i=0; i<ELEMENTS(match_flags); i++)
         match_flags[i].setby = -1;
@@ -4393,25 +4393,36 @@ bw_get_view_filter(BalsaWindow *window, gboolean flags_only)
     /* match_flags contains collected information, time to create a
      * LibBalsaCondition data structure.
      */
-    flag_filter = NULL;
+    filter = NULL;
     for(j=0; j<ELEMENTS(match_flags); j++) {
         LibBalsaCondition *lbc, *res;
         if(match_flags[j].setby < 0) continue;
         lbc = libbalsa_condition_new_flag_enum(match_flags[j].state,
                                                match_flags[j].flag);
         res = libbalsa_condition_new_bool_ptr(FALSE, CONDITION_AND,
-                                              lbc, flag_filter);
+                                              lbc, filter);
         libbalsa_condition_unref(lbc);
-        libbalsa_condition_unref(flag_filter);
-        flag_filter = res;
+        libbalsa_condition_unref(filter);
+        filter = res;
     }
+
+    return filter;
+}
+
+static LibBalsaCondition*
+bw_get_view_filter(BalsaWindow *window)
+{
+    LibBalsaCondition *filter, *flag_filter;
+    gint i;
+
+    flag_filter = bw_get_flag_filter(window);
 
     /* add string filter on top of that */
 
-    i = flags_only
-        ? -1 : gtk_combo_box_get_active(GTK_COMBO_BOX(window->filter_choice));
-    if(i>=0 && i<(signed)ELEMENTS(view_filters)) {
+    i = gtk_combo_box_get_active(GTK_COMBO_BOX(window->filter_choice));
+    if (i >= 0) {
         const gchar *str = gtk_entry_get_text(GTK_ENTRY(window->sos_entry));
+        g_assert(((guint) i) < G_N_ELEMENTS(view_filters));
         filter = view_filters[i].filter(str);
     } else filter = NULL;
     /* and merge ... */
@@ -4489,12 +4500,12 @@ bw_hide_changed_cb(GtkToggleAction * toggle_action, gpointer data)
     libbalsa_mailbox_set_filter(mailbox, bw_filter_to_int(bw));
 
     /* Set the flags part of this filter as persistent: */
-    filter = bw_get_view_filter(bw, TRUE);
+    filter = bw_get_flag_filter(bw);
     libbalsa_mailbox_set_view_filter(mailbox, filter, FALSE);
     libbalsa_condition_unref(filter);
     libbalsa_mailbox_make_view_filter_persistent(mailbox);
 
-    filter = bw_get_view_filter(bw, FALSE);
+    filter = bw_get_view_filter(bw);
     /* libbalsa_mailbox_set_view_filter() will ref the
      * filter.  We need also to rethread to take into account that
      * some messages might have been removed or added to the view. */
@@ -4694,10 +4705,20 @@ bw_notebook_switch_page_cb(GtkWidget * notebook,
     bw_enable_message_menus(window, index->current_msgno);
     bw_enable_mailbox_menus(window, index);
 
+    if (!mailbox->view_filter) {
+        /* bw_enable_mailbox_menus has now set the hide-states for this
+         * mailbox, so we can set up the view-filter: */
+        LibBalsaCondition *view_filter = bw_get_flag_filter(window);
+        libbalsa_mailbox_set_view_filter(mailbox, view_filter, FALSE);
+        libbalsa_condition_unref(view_filter);
+        libbalsa_mailbox_make_view_filter_persistent(mailbox);
+    }
+
     gtk_entry_set_text(GTK_ENTRY(window->sos_entry),
                        index->filter_string ? index->filter_string : "");
     gtk_combo_box_set_active(GTK_COMBO_BOX(window->filter_choice),
                              index->filter_no);
+
     balsa_mblist_focus_mailbox(balsa_app.mblist, mailbox);
     balsa_window_set_statusbar(window, mailbox);
 
@@ -4709,6 +4730,9 @@ bw_notebook_switch_page_cb(GtkWidget * notebook,
     bw_enable_edit_menus(window, NULL);
     bw_enable_part_menu_items(window);
 #endif /*ENABLE_TOUCH_UI */
+
+    g_free(balsa_app.current_mailbox_url);
+    balsa_app.current_mailbox_url = g_strdup(mailbox->url);
 }
 
 static void

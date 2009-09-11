@@ -112,9 +112,6 @@ struct _MailboxConfWindow {
     } mb_data;
 };
 
-/* callback */
-static void check_for_blank_fields(GtkWidget *widget, MailboxConfWindow *mcw);
-
 static void mailbox_conf_update(MailboxConfWindow *conf_window);
 static void mailbox_conf_add(MailboxConfWindow *conf_window);
 
@@ -126,11 +123,12 @@ static void fill_in_imap_data(MailboxConfWindow *mcw, gchar ** name,
 static void update_imap_mailbox(MailboxConfWindow *mcw);
 
 static void update_pop_mailbox(MailboxConfWindow *mcw);
-static BalsaMailboxConfView
-    *mailbox_conf_view_new_with_size_group(LibBalsaMailbox * mailbox,
-                                           GtkWindow * window,
-                                           GtkWidget * table, gint row,
-                                           GtkSizeGroup * size_group);
+static BalsaMailboxConfView *
+    mailbox_conf_view_new_full(LibBalsaMailbox * mailbox,
+                               GtkWindow * window,
+                               GtkWidget * table, gint row,
+                               GtkSizeGroup * size_group,
+                               MailboxConfWindow * mcw);
 
 /* pages */
 static GtkWidget *create_dialog(MailboxConfWindow *mcw);
@@ -635,7 +633,10 @@ mailbox_conf_set_values(MailboxConfWindow *mcw)
             GtkFileChooser *chooser = GTK_FILE_CHOOSER(mcw->window);
 	    LibBalsaMailboxLocal *local = LIBBALSA_MAILBOX_LOCAL(mailbox);
             const gchar *path = libbalsa_mailbox_local_get_path(local);
+            gchar *basename = g_path_get_basename(path);
             gtk_file_chooser_set_filename(chooser, path);
+            gtk_file_chooser_set_current_name(chooser, basename);
+            g_free(basename);
         }
     } else if (LIBBALSA_IS_MAILBOX_POP3(mailbox)) {
 	LibBalsaMailboxPop3 *pop3;
@@ -724,7 +725,7 @@ mailbox_conf_set_values(MailboxConfWindow *mcw)
  * Checks for blank fields in the dialog.
  * Sets the sensitivity of the Update/Add button accordingly.
  * This function should be attached to a change event signal 
- * on any widget which can effect the validity of the input.
+ * on any widget which can affect the validity of the input.
  */
 static void
 check_for_blank_fields(GtkWidget *widget, MailboxConfWindow *mcw)
@@ -1078,6 +1079,35 @@ balsa_get_entry(GtkWidget * widget, GtkWidget ** entry)
                               (GtkCallback) balsa_get_entry, entry);
 }
 
+/*
+ * Callback for the file chooser's "selection-changed" signal and its
+ * entry's "changed" signal
+ *
+ * If the path has really changed, call check_for_blank_fields to set
+ * the sensitivity of the buttons appropriately.  If it hasn't, this is
+ * probably just the file chooser being initialized in an idle callback,
+ * so we don't change button sensitivity.
+ */
+static void
+local_mailbox_dialog_cb(GtkWidget * widget, MailboxConfWindow * mcw)
+{
+    gchar *filename =
+        gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(mcw->window));
+
+    if (filename) {
+        gboolean changed = TRUE;
+        if (mcw->mailbox) {
+            LibBalsaMailboxLocal *local =
+                LIBBALSA_MAILBOX_LOCAL(mcw->mailbox);
+            const gchar *path = libbalsa_mailbox_local_get_path(local);
+            changed = strcmp(filename, path);
+        }
+        g_free(filename);
+        if (changed)
+            check_for_blank_fields(widget, mcw);
+    }
+}
+
 static GtkWidget *
 create_local_mailbox_dialog(MailboxConfWindow *mcw)
 {
@@ -1122,16 +1152,15 @@ create_local_mailbox_dialog(MailboxConfWindow *mcw)
     gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dialog),
 	                                balsa_app.local_mail_directory);
     g_signal_connect(G_OBJECT(dialog), "selection-changed",
-                     G_CALLBACK(check_for_blank_fields), mcw);
+                     G_CALLBACK(local_mailbox_dialog_cb), mcw);
     balsa_get_entry(dialog, &entry);
     if (entry)
 	g_signal_connect(G_OBJECT(entry), "changed",
-                         G_CALLBACK(check_for_blank_fields), mcw);
+                         G_CALLBACK(local_mailbox_dialog_cb), mcw);
 
     mcw->view_info =
-        mailbox_conf_view_new_with_size_group(mcw->mailbox,
-                                              GTK_WINDOW(dialog),
-                                              table, ++row, size_group);
+        mailbox_conf_view_new_full(mcw->mailbox, GTK_WINDOW(dialog), table,
+                                   ++row, size_group, mcw);
 
     return dialog;
 }
@@ -1352,8 +1381,8 @@ create_imap_mailbox_dialog(MailboxConfWindow *mcw)
     gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox), notebook);
 
     mcw->view_info =
-        mailbox_conf_view_new(mcw->mailbox, GTK_WINDOW(dialog), table,
-                              ++row);
+        mailbox_conf_view_new_full(mcw->mailbox, GTK_WINDOW(dialog), table,
+                                   ++row, NULL, mcw);
 
     return dialog;
 }
@@ -1382,18 +1411,12 @@ mailbox_conf_view_free(BalsaMailboxConfView *view_info)
  * table:       the table in which to place the widgets;
  * row:         the row of the table in which to start.
  */
-static void
-mailbox_conf_view_cb(GtkWidget * widget, gpointer data)
-{
-    gtk_dialog_set_response_sensitive(GTK_DIALOG(data),
-                                      MCW_RESPONSE, TRUE);
-}
-
 static BalsaMailboxConfView *
-mailbox_conf_view_new_with_size_group(LibBalsaMailbox * mailbox,
-                                      GtkWindow * window,
-                                      GtkWidget * table, gint row,
-                                      GtkSizeGroup * size_group)
+mailbox_conf_view_new_full(LibBalsaMailbox * mailbox,
+                           GtkWindow * window,
+                           GtkWidget * table, gint row,
+                           GtkSizeGroup * size_group,
+                           MailboxConfWindow * mcw)
 {
     GtkWidget *label;
     BalsaMailboxConfView *view_info;
@@ -1412,8 +1435,9 @@ mailbox_conf_view_new_with_size_group(LibBalsaMailbox * mailbox,
         gtk_size_group_add_widget(size_group, label);
 
     view_info->identity_combo_box = widget = gtk_combo_box_new_text();
-    g_signal_connect(view_info->identity_combo_box, "changed",
-                     G_CALLBACK(mailbox_conf_view_cb), window);
+    if (mcw)
+        g_signal_connect(view_info->identity_combo_box, "changed",
+                         G_CALLBACK(check_for_blank_fields), mcw);
     gtk_label_set_mnemonic_widget(GTK_LABEL(label), widget);
     identity_name = libbalsa_mailbox_get_identity_name(mailbox);
     for (list = balsa_app.identities, active = 0; list;
@@ -1447,8 +1471,6 @@ mailbox_conf_view_new_with_size_group(LibBalsaMailbox * mailbox,
             gtk_size_group_add_widget(size_group, label);
 
         view_info->chk_crypt = gtk_combo_box_new_text();
-        g_signal_connect(view_info->chk_crypt, "changed",
-                         G_CALLBACK(mailbox_conf_view_cb), window);
         gtk_label_set_mnemonic_widget(GTK_LABEL(label), view_info->chk_crypt);
         mailbox_conf_combo_box_make(GTK_COMBO_BOX(view_info->chk_crypt),
                                     ELEMENTS(chk_crypt_menu),
@@ -1456,6 +1478,9 @@ mailbox_conf_view_new_with_size_group(LibBalsaMailbox * mailbox,
         gtk_combo_box_set_active(GTK_COMBO_BOX(view_info->chk_crypt),
                                  libbalsa_mailbox_get_crypto_mode
                                  (mailbox));
+        if (mcw)
+            g_signal_connect(view_info->chk_crypt, "changed",
+                             G_CALLBACK(check_for_blank_fields), mcw);
 	gtk_table_attach(GTK_TABLE(table), view_info->chk_crypt,
 		         1, 2, row, row + 1,
 			 GTK_EXPAND | GTK_FILL, 0, 0, 0);
@@ -1468,8 +1493,9 @@ mailbox_conf_view_new_with_size_group(LibBalsaMailbox * mailbox,
                               table, ++row,
                               libbalsa_mailbox_get_show(mailbox) ==
                               LB_MAILBOX_SHOW_TO);
-    g_signal_connect(view_info->show_to, "toggled",
-                     G_CALLBACK(mailbox_conf_view_cb), window);
+    if (mcw)
+        g_signal_connect(view_info->show_to, "toggled",
+                         G_CALLBACK(check_for_blank_fields), mcw);
     
     /* Subscribe check button */
     view_info->subscribe =
@@ -1477,8 +1503,9 @@ mailbox_conf_view_new_with_size_group(LibBalsaMailbox * mailbox,
                               ++row,
                               libbalsa_mailbox_get_subscribe(mailbox) !=
                               LB_MAILBOX_SUBSCRIBE_NO);
-    g_signal_connect(view_info->subscribe, "toggled",
-                     G_CALLBACK(mailbox_conf_view_cb), window);
+    if (mcw)
+        g_signal_connect(view_info->subscribe, "toggled",
+                         G_CALLBACK(check_for_blank_fields), mcw);
 
     return view_info;
 }
@@ -1487,8 +1514,8 @@ BalsaMailboxConfView *
 mailbox_conf_view_new(LibBalsaMailbox * mailbox,
                       GtkWindow * window, GtkWidget * table, gint row)
 {
-    return mailbox_conf_view_new_with_size_group(mailbox, window, table,
-                                                 row, NULL);
+    return mailbox_conf_view_new_full(mailbox, window, table, row,
+                                      NULL, NULL);
 }
 
 #ifdef HAVE_GPGME

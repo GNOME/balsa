@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "POT-Creation-Date: 2009-05-01 02:50+0000\n"
-"PO-Revision-Date: 2009-05-02 12:48+0100\n"
+"PO-Revision-Date: 2009-09-20 15:35+0100\n"
 "Last-Translator: Mario Blättermann <mariobl@gnome.org>\n"
 "Language-Team: German <gnome-de@gnome.org>\n"
 "MIME-Version: 1.0\n"
@@ -227,6 +227,12 @@ msgid ""
 "visiting the <ulink url=\"http://www.cs.queensu.ca/FAQs/email/\" type=\"http"
 "\">Email FAQ</ulink>."
 msgstr ""
+"Dieses Dokument will eine Einführung in <application>Balsa</application> "
+"geben, für jemanden, der mit E-Mail vertraut ist. Es will jedoch keine "
+"Anleitung sein, die E-Mail einem Unwissenden in allen Einzelheiten erklärt. "
+"Falls Sie etwas in dieser Richtung wissen wollen, wenden Sie sich "
+"vertrauensvoll an einen Freund oder lesen Sie die <ulink url=\"http://www.cs."
+"queensu.ca/FAQs/email/\" type=\"http\">E-Mail-FAQ</ulink>."
 
 #: C/balsa.xml:151(title)
 msgid "Introduction"
@@ -422,6 +428,13 @@ msgid ""
 "application> supports. See the <link linkend=\"mbox-formats\">discussion of "
 "different mailbox formats</link> and their advantages and disadvantages."
 msgstr ""
+"<menuchoice><guimenu>Datei</guimenu><guisubmenu>Neu</"
+"guisubmenu><guimenuitem>Postfach</guimenuitem></menuchoice> -- Öffnet einen "
+"Dialog zum Anlegen eines neuen Postfachs. Es kann mehrere Einträge dieser Art "
+"geben, abhängig von den Postfachtypen, die <application>Balsa</application> "
+"unterstützt. Informationen über Postfachtypen und deren Vor- und Nachteile "
+"finden Sie in der  <link linkend=\"mbox-formats\">Diskussion zu den "
+"verschiedenen Postfachformaten</link>."
 
 #: C/balsa.xml:345(para)
 msgid ""
@@ -431,6 +444,11 @@ msgid ""
 "<link linkend=\"folder-config\">IMAP folder properties</link> dialog can also "
 "be used to change the details of the account."
 msgstr ""
+"<menuchoice><guimenu>Datei</guimenu><guisubmenu>Neu</"
+"guisubmenu><guimenuitem>IMAP-Ordner im Netz</guimenuitem></menuchoice> -- "
+"Öffnet einen Dialog zum Anlegen eines Ordners für ein Konto auf einem IMAP-"
+"Server. In diesem <link linkend=\"folder-config\">IMAP-Ordnereigenschaften</"
+"link>-Dialog können Sie auch die Einzelheiten zu einem Konto ändern."
 
 #: C/balsa.xml:360(para)
 msgid ""
@@ -440,6 +458,12 @@ msgid ""
 "tree. This <link linkend=\"subfolder-config\">IMAP subfolder properties</"
 "link> dialog can also be used to rename or move a subfolder."
 msgstr ""
+"<menuchoice><guimenu>Datei</guimenu><guisubmenu>Neu</"
+"guisubmenu><guimenuitem>IMAP-Unterordner im Netz</guimenuitem></menuchoice> "
+"-- Öffnet einen Dialog zumanlegen eines neuen Unterordners zu einem "
+"existierenden IMAP-Ordner. In diesem <link linkend=\"subfolder-config\">IMAP-"
+"Unterordner-Eigenschaften</link>-Dialog können Sie den Unterordner auch "
+"umbenennen oder verschieben."
 
 #: C/balsa.xml:383(para)
 msgid ""
@@ -479,6 +503,9 @@ msgid ""
 "menuchoice> -- Print the currently selected message (displayed in the message "
 "view pane.)"
 msgstr ""
+"<menuchoice><guimenu>Datei</guimenu><guimenuitem>Drucken</guimenuitem></"
+"menuchoice> -- Druckt die gegenwärtig in der Nachrichtenanzeige geöffnete "
+"Nachricht."
 
 #: C/balsa.xml:449(para)
 msgid ""
@@ -526,12 +553,18 @@ msgid ""
 "conditions, using the <link linkend=\"win-search\">search mailbox window</"
 "link>."
 msgstr ""
+"<menuchoice><guimenu>Bearbeiten</guimenu><guimenuitem>Suchen</guimenuitem></"
+"menuchoice> -- Sucht im aktuell geöffneten Postfach gemäß den angegebenen "
+"Bedingungen, wobei das <link linkend=\"win-search\">Postfach-Suchfenster</"
+"link> benutzt wird."
 
 #: C/balsa.xml:510(para)
 msgid ""
 "<menuchoice><guimenu>Edit</guimenu><guimenuitem>Find next</guimenuitem></"
 "menuchoice> -- Find the next matching message."
 msgstr ""
+"<menuchoice><guimenu>Bearbeiten</guimenu><guimenuitem>Weitersuchen</"
+"guimenuitem></menuchoice> -- Sucht nach der nächsten passenden Nachricht."
 
 #: C/balsa.xml:520(para)
 msgid ""
@@ -539,12 +572,17 @@ msgid ""
 "menuchoice> -- Open up the <link linkend=\"win-filters\">filters window</"
 "link>."
 msgstr ""
+"<menuchoice><guimenu>Bearbeiten</guimenu><guimenuitem>Filter</guimenuitem></"
+"menuchoice> -- Öffnet das <link linkend=\"win-filters\">Filter-Fenster</link>."
 
 #: C/balsa.xml:531(para)
 msgid ""
 "<menuchoice><guimenu>Edit</guimenu><guimenuitem>Export filters</guimenuitem></"
 "menuchoice> -- Open up a window for exporting filters in the Sieve format."
 msgstr ""
+"<menuchoice><guimenu>Bearbeiten</guimenu><guimenuitem>Filter exportieren</"
+"guimenuitem></menuchoice> -- Öffnet ein Fenster zum Exportieren von Filtern "
+"im Sieve-Format."
 
 #: C/balsa.xml:541(para)
 #| msgid ""
@@ -584,6 +622,9 @@ msgid ""
 "guimenuitem></menuchoice> -- Toggle the display of tabs for all open "
 "mailboxes."
 msgstr ""
+"<menuchoice><guimenu>Ansicht</guimenu><guimenuitem>Postfach-Reiter anzeigen</"
+"guimenuitem></menuchoice> -- Schaltet die Anzeige von Reitern für alle "
+"geöffneten Postfächer ein oder aus."
 
 #: C/balsa.xml:586(para)
 msgid ""
@@ -592,6 +633,10 @@ msgid ""
 "which the message is wrapped is set in the <link linkend=\"preferences"
 "\">Preferences</link> window."
 msgstr ""
+"<menuchoice><guimenu>Ansicht</guimenu><guimenuitem>Umbrechen</guimenuitem></"
+"menuchoice> -- Schaltet in der Nachrichtenanzeige den Wortumbruch an oder "
+"aus. Die Spalte, an der der Text umgebrochen wird, können Sie im <link "
+"linkend=\"preferences\">Einstellungsfenster</link> festlegen."
 
 #: C/balsa.xml:599(para)
 msgid ""
@@ -600,6 +645,11 @@ msgid ""
 "menuchoice>, <menuchoice><guimenuitem>All Headers</guimenuitem></menuchoice> "
 "-- Select the headers to display in the message pane."
 msgstr ""
+"<menuchoice><guimenu>Ansicht</guimenu><guimenuitem>Keine Kopfzeilen</"
+"guimenuitem></menuchoice>, <menuchoice><guimenuitem>Ausgewählte Kopfzeilen</"
+"guimenuitem></menuchoice>, <menuchoice><guimenuitem>Alle Kopfzeilen</"
+"guimenuitem></menuchoice> -- Wählt die anzuzeigenden Nachrichtenkopfzeilen in "
+"der Nachrichtenansicht aus."
 
 #: C/balsa.xml:615(para)
 msgid ""
@@ -609,6 +659,11 @@ msgid ""
 "menuchoice> -- Select the type of threading used to sort the messages in the "
 "list pane."
 msgstr ""
+"<menuchoice><guimenu>Ansicht</guimenu><guimenuitem>Flacher Index</"
+"guimenuitem></menuchoice>, <menuchoice><guimenuitem>Einfache "
+"Themendarstellung</guimenuitem></menuchoice>, <menuchoice><guimenuitem>JWZ-"
+"Themendarstellung</guimenuitem></menuchoice> -- Wählt den Darstellungstyp im "
+"Listenfenster aus, der für das Sortieren der Nachrichten verwendet wird."
 
 #: C/balsa.xml:629(para)
 msgid ""
@@ -617,6 +672,10 @@ msgid ""
 "guimenuitem></menuchoice> -- Expand all threads in the currently displayed "
 "mailbox."
 msgstr ""
+"<menuchoice><shortcut><keycombo><keysym>Strg</keysym><keysym>E</keysym></"
+"keycombo></shortcut><guimenu>Bearbeiten</guimenu><guimenuitem>Alle "
+"aufklappen</guimenuitem></menuchoice> -- Klappt alle Themen im gegenwärtig "
+"angezeigten Postfach aus."
 
 #: C/balsa.xml:642(para)
 msgid ""
@@ -625,6 +684,10 @@ msgid ""
 "guimenuitem></menuchoice> -- Collapse all threads in the currently displayed "
 "mailbox."
 msgstr ""
+"<menuchoice><shortcut><keycombo><keysym>Strg</keysym><keysym>L</keysym></"
+"keycombo></shortcut><guimenu>Bearbeiten</guimenu><guimenuitem>Alle "
+"einklappen</guimenuitem></menuchoice> -- Klappt alle Themen im gegenwärtig "
+"angezeigten Postfach ein."
 
 #: C/balsa.xml:655(para)
 msgid ""
@@ -634,6 +697,12 @@ msgid ""
 "font size of HTML messages. Plain text messages will always use the font "
 "specified in the <link linkend=\"preferences\">Preferences</link> window."
 msgstr ""
+"<menuchoice><guimenu>Ansicht</guimenu><guimenuitem>Vergrößern</guimenuitem></"
+"menuchoice>, <menuchoice><guimenuitem>Verkleinern</guimenuitem></menuchoice>, "
+"<menuchoice><guimenuitem>Auf 100% vergrößern</guimenuitem></menuchoice> -- "
+"Ändert die Schriftgröße von HTML-Nachrichten. Einfacher Text wird immer mit "
+"der im <link linkend=\"preferences\">Einstellungsfenster</link> festgelegten "
+"Schrift angezeigt."
 
 #: C/balsa.xml:676(guimenu)
 msgid "Mailbox"
@@ -670,6 +739,10 @@ msgid ""
 "guimenuitem></menuchoice> -- Select the next unread message in the current "
 "mailbox."
 msgstr ""
+"<menuchoice><shortcut><keycombo><keysym>Strg</keysym><keysym>N</keysym></"
+"keycombo></shortcut><guimenu>Postfach</guimenu><guimenuitem>Nächste "
+"ungelesene</guimenuitem></menuchoice> -- Wählt die nächste ungelesene "
+"Nachricht im gegenwärtigen Postfach."
 
 #: C/balsa.xml:720(para)
 msgid ""
@@ -678,6 +751,10 @@ msgid ""
 "guimenu><guimenuitem>Next Flagged</guimenuitem></menuchoice> -- Select the "
 "next flagged message in the current mailbox."
 msgstr ""
+"<menuchoice><shortcut><keycombo><keysym>Strg</keysym><keysym>Alt</"
+"keysym><keysym>F</keysym></keycombo></shortcut><guimenu>Postfach</"
+"guimenu><guimenuitem>Nächste markierte Nachricht</guimenuitem></menuchoice> "
+"-- Wählt die nächste markierte Nachricht im gegenwärtigen Postfach."
 
 #: C/balsa.xml:736(para)
 msgid ""
@@ -725,12 +802,17 @@ msgid ""
 "<menuchoice><guimenu>Mailbox</guimenu><guimenuitem>Close</guimenuitem></"
 "menuchoice> -- Close the currently selected mailbox."
 msgstr ""
+"<menuchoice><guimenu>Postfach</guimenu><guimenuitem>Close</guimenuitem></"
+"menuchoice> -- Schließt das gegenwärtig ausgewählte Postfach."
 
 #: C/balsa.xml:816(para)
 msgid ""
 "<menuchoice><guimenu>Mailbox</guimenu><guimenuitem>Empty Trash</guimenuitem></"
 "menuchoice> -- Delete all messages from the <symbol>Trash</symbol> mailbox."
 msgstr ""
+"<menuchoice><guimenu>Postfach</guimenu><guimenuitem>Müll leeren</"
+"guimenuitem></menuchoice> -- Löscht alle Nachrichten aus dem <symbol>Müll</"
+"symbol>-Ordner."
 
 #: C/balsa.xml:827(para)
 msgid ""
@@ -757,6 +839,9 @@ msgid ""
 "guimenu><guimenuitem>Reply...</guimenuitem></menuchoice> -- Reply to the "
 "currently selected message(s)."
 msgstr ""
+"<menuchoice><shortcut><keysym>R</keysym></shortcut><guimenu>Nachricht</"
+"guimenu><guimenuitem>Antworten</guimenuitem></menuchoice> -- Antwortet auf "
+"die gegenwärtig ausgewählte(n) Nachricht(en)."
 
 #: C/balsa.xml:867(para)
 msgid ""
@@ -765,6 +850,10 @@ msgid ""
 "the currently selected message(s), sending the reply to all senders and "
 "recipients of the message."
 msgstr ""
+"<menuchoice><shortcut><keysym>A</keysym></shortcut><guimenu>Nachricht</"
+"guimenu><guimenuitem>Antwort an alle</guimenuitem></menuchoice> -- Antwortet "
+"auf die gegenwärtig ausgewählte(n) Nachricht(en), wobei die Anwort an alle "
+"Absender und Empfänger der Nachricht gesendet wird."
 
 #: C/balsa.xml:880(para)
 msgid ""
@@ -772,6 +861,10 @@ msgid ""
 "guimenu><guimenuitem>Reply to Group...</guimenuitem></menuchoice> -- Reply to "
 "a mailing list, instead of the sender to that list."
 msgstr ""
+"<menuchoice><shortcut><keysym>G</keysym></shortcut><guimenu>Nachricht</"
+"guimenu><guimenuitem>Antwort an Gruppe</guimenuitem></menuchoice> -- Anwortet "
+"an die Mailingliste anstatt an den Absender, der seine Nachricht an die "
+"Mailingliste geschickt hat."
 
 #: C/balsa.xml:892(para)
 msgid ""
@@ -779,6 +872,9 @@ msgid ""
 "guimenu><guimenuitem>Forward attached...</guimenuitem></menuchoice> -- "
 "Forward the currently selected message(s) as an attachment."
 msgstr ""
+"<menuchoice><shortcut><keysym>F</keysym></shortcut><guimenu>Nachricht</"
+"guimenu><guimenuitem>Als Anlage weiterleiten</guimenuitem></menuchoice> -- "
+"Leitet die ausgewählte(n) Nachricht(en) als Anlage weiter."
 
 #: C/balsa.xml:903(para)
 msgid ""
@@ -786,6 +882,9 @@ msgid ""
 "guimenuitem></menuchoice> -- Forward the currently selected message(s), "
 "quoted inline."
 msgstr ""
+"<menuchoice><guimenu>Nachricht</guimenu><guimenuitem>Inline weiterleiten</"
+"guimenuitem></menuchoice> -- Leitet die ausgewählte(n) Nachricht(en) als "
+"eingebettetes Zitat weiter."
 
 #: C/balsa.xml:913(para)
 msgid ""
@@ -794,6 +893,10 @@ msgid ""
 "guimenuitem></menuchoice> -- View the next part of the message (if the "
 "message is multi-part)."
 msgstr ""
+"<menuchoice><shortcut><keycombo><keysym>Strg</keysym><keysym>.</keysym></"
+"keycombo></shortcut><guimenu>Nachricht</guimenu><guimenuitem>Nächster Teil</"
+"guimenuitem></menuchoice> -- Zeigt den nächsten Teil der Nachricht an, falls "
+"die Nachricht aus mehreren Teilen besteht."
 
 #: C/balsa.xml:928(para)
 msgid ""
@@ -801,6 +904,9 @@ msgid ""
 "keycombo></shortcut><guimenu>Message</guimenu><guimenuitem>Previous Part</"
 "guimenuitem></menuchoice> -- View the previous part of the message."
 msgstr ""
+"<menuchoice><shortcut><keycombo><keysym>Strg</keysym><keysym>,</keysym></"
+"keycombo></shortcut><guimenu>Nachricht</guimenu><guimenuitem>Vorheriger Teil</"
+"guimenuitem></menuchoice> -- Zeigt den vorherigen Teil der Nachricht an."
 
 #: C/balsa.xml:942(para)
 msgid ""
@@ -809,6 +915,10 @@ msgid ""
 "Part...</guimenuitem></menuchoice> -- Save the currently selected part of the "
 "message to a file."
 msgstr ""
+"<menuchoice><shortcut><keycombo><keysym>Strg</keysym><keysym>S</keysym></"
+"keycombo></shortcut><guimenu>Nachricht</guimenu><guimenuitem>Den momentan "
+"angezeigten Teil der Nachricht speichern</guimenuitem></menuchoice> -- "
+"Speichert den gegenwärtig ausgewählten Teil der Nachricht in einer Datei."
 
 #: C/balsa.xml:956(para)
 msgid ""
@@ -817,6 +927,11 @@ msgid ""
 "guimenuitem></menuchoice> -- Opens a new window that displays the raw message "
 "as received from the <glossterm linkend=\"glossary-mta\">MTA</glossterm>."
 msgstr ""
+"<menuchoice><shortcut><keycombo><keysym>Strg</keysym><keysym>U</keysym></"
+"keycombo></shortcut><guimenu>Nachricht</guimenu><guimenuitem>Quelltext "
+"anzeigen</guimenuitem></menuchoice> -- Öffnet ein Fenster, in dem die "
+"Nachricht in der Rohfassung angezeigt wird, so wie sie vom <glossterm linkend="
+"\"glossary-mta\">MTA</glossterm> empfangen wurde."
 
 #: C/balsa.xml:971(para)
 msgid ""
@@ -824,6 +939,9 @@ msgid ""
 "menuchoice> -- Copies to the clipboard any text selected in the message view "
 "of the current message."
 msgstr ""
+"<menuchoice><guimenu>Nachricht</guimenu><guimenuitem>Kopieren</guimenuitem></"
+"menuchoice> -- Kopiert den in der Nachrichtenansicht markierten Text in die "
+"Zwischenablage."
 
 #: C/balsa.xml:983(para)
 msgid ""
@@ -831,6 +949,9 @@ msgid ""
 "menuchoice> -- Selects the entire text of the current message in the message "
 "view."
 msgstr ""
+"<menuchoice><guimenu>Nachricht</guimenu><guimenuitem>Alles auswählen</"
+"guimenuitem></menuchoice> -- Wählt den gesamten Text der gegenwärtig in der "
+"Nachrichtenansicht angezeigten Nachricht aus."
 
 #: C/balsa.xml:994(para)
 msgid ""
@@ -838,10 +959,13 @@ msgid ""
 "guimenu><guimenuitem>Move to Trash</guimenuitem></menuchoice> -- Moves the "
 "currently selected message(s) to the Trash."
 msgstr ""
+"<menuchoice><shortcut><keysym>D</keysym></shortcut><guimenu>Nachricht</"
+"guimenu><guimenuitem>In den Müll verschieben</guimenuitem></menuchoice> -- "
+"Verschiebt die gegenwärtig ausgewählte(n) Nachricht(en) in den Müll."
 
 #: C/balsa.xml:1009(guisubmenu)
 msgid "Toggle flag"
-msgstr ""
+msgstr "Markierung aktivieren/deaktivieren"
 
 #: C/balsa.xml:1014(para)
 msgid ""
@@ -1093,6 +1217,10 @@ msgid ""
 "message. Some of the menu items are not always available, depending on what "
 "state the message is currently in."
 msgstr ""
+"Dies enthält alle verfügbaren Befehle für die Arbeit mit einer Nachricht, vom "
+"Auswählen der anzuzeigenden Kopfzeilen bis hin zum Ändern des Zeichensatzes "
+"für eine Nachricht. Einige der Menüeinträge könnten nicht immer sichtbar "
+"sein, abhängig von dem Status der gegenwärtigen Nachricht."
 
 #: C/balsa.xml:1312(para)
 msgid "The file menu contains commands for manipulating the message as a whole."
@@ -1104,12 +1232,17 @@ msgid ""
 "guimenuitem></menuchoice> -- Include a text file in the body of the message; "
 "only works for plain text files."
 msgstr ""
+"<menuchoice><guimenu>Datei</guimenu><guimenuitem>Datei einfügen</"
+"guimenuitem></menuchoice> -- Fügt eine Textdatei in den Nachrichtentext ein, "
+"dies funktioniert nur mit einfachen Textdateien."
 
 #: C/balsa.xml:1331(para)
 msgid ""
 "<menuchoice><guimenu>File</guimenu><guimenuitem>Attach File...</guimenuitem></"
 "menuchoice> -- Attach any kind of file to the message."
 msgstr ""
+"<menuchoice><guimenu>Datei</guimenu><guimenuitem>Datei beilegen</"
+"guimenuitem></menuchoice> -- Legt jede Art von Datei der Nachricht bei."
 
 #: C/balsa.xml:1342(para)
 msgid ""
@@ -1124,6 +1257,9 @@ msgid ""
 "<menuchoice><guimenu>File</guimenu><guimenuitem>Queue</guimenuitem></"
 "menuchoice> -- Queue the message in the outbox for sending later."
 msgstr ""
+"<menuchoice><guimenu>Datei</guimenu><guimenuitem>Ablegen</guimenuitem></"
+"menuchoice> -- Legt die Datei in einer Warteschlange zum späteren Versenden "
+"ab."
 
 #: C/balsa.xml:1364(para)
 msgid ""
@@ -1138,6 +1274,8 @@ msgid ""
 "<menuchoice><guimenu>File</guimenu><guimenuitem>Print...</guimenuitem></"
 "menuchoice> -- Print a hard-copy of the current message."
 msgstr ""
+"<menuchoice><guimenu>Datei</guimenu><guimenuitem>Drucken</guimenuitem></"
+"menuchoice> -- Druckt eine Kopie der gegenwärtigen Nachricht."
 
 #: C/balsa.xml:1387(para)
 msgid ""
@@ -1145,6 +1283,9 @@ msgid ""
 "keycombo></shortcut><guimenu>File</guimenu><guimenuitem>Close</guimenuitem></"
 "menuchoice> -- Close and discard the current message."
 msgstr ""
+"<menuchoice><shortcut><keycombo><keysym>Strg</keysym><keysym>W</keysym></"
+"keycombo></shortcut><guimenu>Datei</guimenu><guimenuitem>Schließen</"
+"guimenuitem></menuchoice> -- Schließt und verwirft die gegenwärtige Nachricht."
 
 #: C/balsa.xml:1402(para)
 msgid ""
@@ -1168,6 +1309,10 @@ msgid ""
 "keycombo></shortcut><guimenu>Edit</guimenu><guimenuitem>Cut</guimenuitem></"
 "menuchoice> -- Cut the selected text to the clipboard."
 msgstr ""
+"<menuchoice><shortcut><keycombo><keysym>Strg</keysym><keysym>X</keysym></"
+"keycombo></shortcut><guimenu>Bearbeiten</guimenu><guimenuitem>Ausschneiden</"
+"guimenuitem></menuchoice> -- Schneidet den ausgewählten Text in die "
+"Zwischenablage aus."
 
 #: C/balsa.xml:1435(para)
 msgid ""
@@ -1175,6 +1320,10 @@ msgid ""
 "keycombo></shortcut><guimenu>Edit</guimenu><guimenuitem>Copy</guimenuitem></"
 "menuchoice> -- Copy the selected text to the clipboard"
 msgstr ""
+"<menuchoice><shortcut><keycombo><keysym>Strg</keysym><keysym>C</keysym></"
+"keycombo></shortcut><guimenu>Bearbeiten</guimenu><guimenuitem>Kopieren</"
+"guimenuitem></menuchoice> -- Kopiert den ausgewählten Text in die "
+"Zwischenablage."
 
 #: C/balsa.xml:1449(para)
 msgid ""
@@ -1183,6 +1332,10 @@ msgid ""
 "menuchoice> -- Paste the contents of the clipboard to the current position of "
 "the cursor."
 msgstr ""
+"<menuchoice><shortcut><keycombo><keysym>Strg</keysym><keysym>V</keysym></"
+"keycombo></shortcut><guimenu>Bearbeiten</guimenu><guimenuitem>Einfügen</"
+"guimenuitem></menuchoice> -- Fügt den Inhalt der Zwischenablage an der Stelle "
+"der Eingabemarke ein."
 
 #: C/balsa.xml:1467(keysym)
 msgid "Ctrl"
@@ -1228,6 +1381,10 @@ msgid ""
 "guimenu><guimenuitem>Check Spelling</guimenuitem></menuchoice> -- Start spell "
 "checking the current message."
 msgstr ""
+"<menuchoice><shortcut><keycombo><keysym>Strg</keysym><keysym>Umschalt</"
+"keysym><keysym>S</keysym></keycombo></shortcut><guimenu>Bearbeiten</"
+"guimenu><guimenuitem>Rechtschreibprüfung</guimenuitem></menuchoice> -- "
+"Beginnt mit der Rechtschreibprüfung für die gegenwärtige Nachricht."
 
 #: C/balsa.xml:1543(guimenu)
 msgid "Show"
@@ -1238,18 +1395,24 @@ msgid ""
 "The Show menu is used to control which headers are displayed in the composer "
 "window for editing."
 msgstr ""
+"Das Menü <guimenu>Anzeige</guimenu> regelt die Anzeige der bearbeitbaren "
+"Kopfzeilen im Editorfenster."
 
 #: C/balsa.xml:1552(para)
 msgid ""
 "<menuchoice><guimenu>Show</guimenu><guimenuitem>From</guimenuitem></"
 "menuchoice> -- Display the <literal>From</literal> header."
 msgstr ""
+"<menuchoice><guimenu>Anzeige</guimenu><guimenuitem>Von</guimenuitem></"
+"menuchoice> -- Zeigt die <literal>Von</literal>-Kopfzeile an."
 
 #: C/balsa.xml:1562(para)
 msgid ""
 "<menuchoice><guimenu>Show</guimenu><guimenuitem>To</guimenuitem></menuchoice> "
 "-- Display the <literal>To</literal> header."
 msgstr ""
+"<menuchoice><guimenu>Anzeige</guimenu><guimenuitem>An</guimenuitem></"
+"menuchoice> -- Zeigt die <literal>An</literal>-Kopfzeile an."
 
 #: C/balsa.xml:1572(para)
 msgid ""
@@ -1819,6 +1982,8 @@ msgid ""
 "The buttons on the left control the actions to take for each incorrect word. "
 "The buttons include:"
 msgstr ""
+"Die Knöpfe an der linken Seite regeln die Aktionen für jedes falsch "
+"geschriebene Wort. Diese Knöpfe sind:"
 
 #: C/balsa.xml:2152(guibutton)
 msgid "Change"
@@ -1829,16 +1994,20 @@ msgid ""
 "Change the incorrect word with the currently selected suggested word or the "
 "user's edited word."
 msgstr ""
+"Ersetzt das gegenwärtig falsch geschriebene Wort durch den gegenwärtig "
+"ausgewählten Vorschlag oder das vom Benutzer geänderte Wort."
 
 #: C/balsa.xml:2162(guibutton)
 msgid "Change All"
-msgstr ""
+msgstr "Alle ersetzen"
 
 #: C/balsa.xml:2164(para)
 msgid ""
 "Change all occurances of the current incorrect word with the currently "
 "selected suggestion."
 msgstr ""
+"Ersetzt alle Vorkommen des gegenwärtig falsch geschriebenen Worts durch den "
+"gegenwärtig ausgewählten Vorschlag."
 
 #: C/balsa.xml:2172(guibutton)
 msgid "Ignore"
@@ -1847,6 +2016,7 @@ msgstr "Ignorieren"
 #: C/balsa.xml:2174(para)
 msgid "Ignore the current incorrect word and continue to the next one."
 msgstr ""
+"Ignoriert das gegenwärtig falsch geschriebene Wort und springt zum nächsten."
 
 #: C/balsa.xml:2181(guibutton)
 msgid "Ignore All"
@@ -1857,6 +2027,8 @@ msgid ""
 "Ignore all occurrances of the current word, and continue to the next "
 "incorrect word."
 msgstr ""
+"Ignoriert alle Vorkommen des gegenwärtig falsch geschriebenen Worts und "
+"springt zum nächsten falsch geschriebenen Wort."
 
 #: C/balsa.xml:2191(guibutton)
 msgid "Learn"
@@ -1867,6 +2039,9 @@ msgid ""
 "Add the current incorrect word to your personal dictionary. This will cause "
 "it to be considered correct for all future spell checks."
 msgstr ""
+"Fügt das aktuell falsch geschriebene Wort zu Ihrem persönlichen Wörterbuch "
+"hinzu. Dadurch wird es für alle zukünftigen Rechtschreibprüfungen als korrekt "
+"geschrieben angenommen."
 
 #: C/balsa.xml:2202(guibutton)
 msgid "Done"
@@ -2010,6 +2185,8 @@ msgstr "Mailserver"
 #: C/balsa.xml:2390(para)
 msgid "This page lets you specify how you get POP3 mail, send mail, etc."
 msgstr ""
+"In dieser Seite können sie angeben, wie Sie POP3-Nachrichten oder solche von "
+"Sendmail erhalten wollen usw."
 
 #: C/balsa.xml:2396(guilabel)
 msgid "Remote Mailbox Servers"
@@ -2029,6 +2206,9 @@ msgid ""
 "usually 110 but you may change it if you for example use some kind of "
 "connection tunneling,"
 msgstr ""
+"Der Port, der für die Verbindung zum Server benutzt wird. Die Portnummer ist "
+"üblicherweise 110, aber Sie können Sie ändern, falls beispielsweise Ihre "
+"Verbindung in irgendeiner Weise getunnelt wird."
 
 #: C/balsa.xml:2418(para)
 msgid "The user name on the mailbox server."
@@ -2058,7 +2238,7 @@ msgstr "Der <application>procmail</application>-Befehl."
 
 #: C/balsa.xml:2433(para)
 msgid "Whether to check for new mail."
-msgstr ""
+msgstr "Ob nach neuen Nachrichten geschaut werden soll."
 
 #: C/balsa.xml:2399(para)
 msgid ""
@@ -2132,6 +2312,10 @@ msgid ""
 "on the MTA in use. For example, some systems expect a user name, others may "
 "require an email address."
 msgstr ""
+"Der Benutzername auf dem SMTP-Server. Falls der entfernte SMTP-Server "
+"Legitimierung erfordert, geben Sie hier Ihren Benutzernamen ein. Beachten "
+"Sie, dass das genaue Format von jeweils benutzten MTA abhängt. Manche Systeme "
+"erwarten einen Benutzernamen, andere wiederum eine E-Mail-Adresse."
 
 #: C/balsa.xml:2492(para)
 msgid ""
@@ -2215,7 +2399,7 @@ msgstr ""
 
 #: C/balsa.xml:2560(guilabel)
 msgid "Do background check quietly"
-msgstr ""
+msgstr "Überprüfung im Hintergrund ausführen"
 
 #: C/balsa.xml:2562(para)
 msgid ""
@@ -2225,13 +2409,15 @@ msgstr ""
 
 #: C/balsa.xml:2570(guilabel)
 msgid "Wrap Incoming Text"
-msgstr ""
+msgstr "Eingehenden Text umbrechen"
 
 #: C/balsa.xml:2572(para)
 msgid ""
 "If selected, <application>Balsa</application> will wrap text of incoming "
 "messages at the specified line length."
 msgstr ""
+"Falls ausgewählt, bricht <application>Balsa</application> den Text "
+"eingehender Nachrichten an der angegebenen Zeilenlänge um."
 
 #: C/balsa.xml:2581(guilabel)
 msgid "Reflow messages of type `text/plain;format=flowed'"
@@ -2282,7 +2468,7 @@ msgstr "Ausgehend"
 
 #: C/balsa.xml:2633(guilabel)
 msgid "Wrap Outgoing Text"
-msgstr ""
+msgstr "Ausgehenden Text umbrechen"
 
 #: C/balsa.xml:2635(para)
 msgid ""
@@ -2318,7 +2504,7 @@ msgstr ""
 
 #: C/balsa.xml:2678(guilabel)
 msgid "Automatically quote original when replying"
-msgstr ""
+msgstr "Automatisch beim Antworten das Original zitieren"
 
 #: C/balsa.xml:2681(para)
 msgid ""
@@ -2336,7 +2522,7 @@ msgstr ""
 
 #: C/balsa.xml:2694(guilabel)
 msgid "Don't include HTML parts as text when replying or forwarding mail"
-msgstr ""
+msgstr "Beim Antworten oder Weiterleiten HTML-Teile nicht als Text einfügen"
 
 #: C/balsa.xml:2700(para)
 msgid "Tell <application>Balsa</application> to be sensible."
@@ -2410,7 +2596,7 @@ msgstr ""
 
 #: C/balsa.xml:2776(guilabel)
 msgid "Show Mailbox Info"
-msgstr ""
+msgstr "Postfach-Info anzeigen"
 
 #: C/balsa.xml:2778(para)
 msgid ""
@@ -2447,7 +2633,7 @@ msgstr ""
 
 #: C/balsa.xml:2811(guilabel)
 msgid "Page Up and Page Down"
-msgstr ""
+msgstr "Bild auf und Bild ab"
 
 #: C/balsa.xml:2813(para)
 msgid ""
@@ -2458,7 +2644,7 @@ msgstr ""
 
 #: C/balsa.xml:2828(guilabel)
 msgid "Moving a Message"
-msgstr ""
+msgstr "Verschieben einer Nachricht"
 
 #: C/balsa.xml:2830(para)
 msgid ""
@@ -2532,13 +2718,15 @@ msgstr ""
 
 #: C/balsa.xml:2908(guilabel)
 msgid "Alternative Parts"
-msgstr ""
+msgstr "Alternative Teile"
 
 #: C/balsa.xml:2910(para)
 msgid ""
 "You can choose whether <application>Balsa</application> should show a text/"
 "plain part or a text/html part, when a message contains both."
 msgstr ""
+"Sie können wählen, ob <application>Balsa</application> den text/plain-Teil "
+"oder den text/html-Teil anzeigen soll, wenn eine Nachricht beides enthält."
 
 #: C/balsa.xml:2920(title)
 msgid "Colors"
@@ -2546,11 +2734,11 @@ msgstr "Farben"
 
 #: C/balsa.xml:2923(guilabel)
 msgid "Message Colors"
-msgstr ""
+msgstr "Nachrichtenfarben"
 
 #: C/balsa.xml:2925(para)
 msgid "Choose the colors for quoted text."
-msgstr ""
+msgstr "Wählen Sie die Farben für zitierten Text."
 
 #: C/balsa.xml:2931(guilabel)
 msgid "Link Color"
@@ -2584,7 +2772,7 @@ msgstr ""
 
 #: C/balsa.xml:2965(para)
 msgid "<literal>%a</literal> -- The abbreviated weekday name."
-msgstr ""
+msgstr "<literal>%a</literal> -- Der abgekürzte Name des Wochentags."
 
 #: C/balsa.xml:2970(para)
 msgid "<literal>%A</literal> -- The full weekday name."
@@ -2592,7 +2780,7 @@ msgstr "<literal>%A</literal> -- Der volle Name des Wochentags."
 
 #: C/balsa.xml:2975(para)
 msgid "<literal>%b</literal> -- The abbreviated month name."
-msgstr ""
+msgstr "<literal>%b</literal> -- Der abgekürzte Name des Monats."
 
 #: C/balsa.xml:2980(para)
 msgid "<literal>%B</literal> -- The full month name."
@@ -2604,17 +2792,19 @@ msgstr "<literal>%d</literal> -- Der Tag des Monats."
 
 #: C/balsa.xml:2990(para)
 msgid "<literal>%R</literal> -- The time using a 24-hour clock. (HH:MM)"
-msgstr ""
+msgstr "<literal>%R</literal> -- Die Zeit im 24-Stunden-Format. (HH:MM)"
 
 #: C/balsa.xml:2995(para)
 msgid "<literal>%r</literal> -- The time using a 12-hour clock (HH:MM AM/PM)."
-msgstr ""
+msgstr "<literal>%r</literal> -- Die Zeit im 12-Stunden-Format (HH:MM AM/PM)."
 
 #: C/balsa.xml:3000(para)
 msgid ""
 "<literal>%T</literal> -- The time using a 24-hour clock, with seconds (HH:MM:"
 "SS)."
 msgstr ""
+"<literal>%T</literal> -- Die Zeit im 24-Stunden-Format, mit Sekunden (HH:MM:"
+"SS)."
 
 #: C/balsa.xml:3007(para)
 msgid ""
@@ -2703,7 +2893,7 @@ msgstr ""
 
 #: C/balsa.xml:3092(guilabel)
 msgid "Pspell Module"
-msgstr ""
+msgstr "Pspell-Modul"
 
 #: C/balsa.xml:3095(para)
 msgid ""
@@ -2757,6 +2947,8 @@ msgid ""
 "The Normal mode is probably good enough for most people; it should produce "
 "the correct suggestion in the majority of cases."
 msgstr ""
+"Der Normalmodus dürfte für die meisten Benutzer ausreichen, er sollte für die "
+"allermeisten Fälle einen korrekten Vorschlag liefern."
 
 #: C/balsa.xml:3150(guilabel)
 msgid "Bad Spellers"
@@ -2770,7 +2962,7 @@ msgstr ""
 
 #: C/balsa.xml:3162(guilabel)
 msgid "Ignore Length"
-msgstr ""
+msgstr "Länge ignorieren"
 
 #: C/balsa.xml:3165(para)
 msgid ""
@@ -2816,7 +3008,7 @@ msgstr ""
 
 #: C/balsa.xml:3204(title)
 msgid "Add Address Book Dialog (Step 1)"
-msgstr ""
+msgstr "Dialog zum Hinzufügen eines Adressbuchs (Schritt 1)"
 
 #: C/balsa.xml:3214(para)
 msgid ""
@@ -2825,6 +3017,10 @@ msgid ""
 "addressbook type. Once the type of address book is selected you must specify "
 "the name and location of the address book."
 msgstr ""
+"Falls <application>Balsa</application> ohne Unterstützung für <acronym>LDAP</"
+"acronym> kompiliert wurde, können Sie <acronym>LDAP</acronym> nicht als "
+"Adressbuchtyp wählen. Sobald Sie den Typ des Adressbuchs ausgewählt haben, "
+"geben Sie den Namen und den Ort des Adressbuchs an."
 
 #: C/balsa.xml:3220(title)
 msgid "<acronym>VCARD</acronym> Address Book Dialog (Step 2)"
@@ -2836,6 +3032,9 @@ msgid ""
 "support, the dialog looks somewhat different, offering options to set the "
 "location of the directory instead of a file."
 msgstr ""
+"Mit <glossterm linkend=\"glossary-ldap\"><acronym>LDAP</acronym></glossterm>-"
+"Unterstützung sieht der Dialog etwas anders aus. Sie können dann den Ort "
+"eines Verzeichnisses anstatt einer Datei angeben."
 
 #: C/balsa.xml:3236(title)
 msgid ""
@@ -2887,7 +3086,7 @@ msgstr "Löschen"
 
 #: C/balsa.xml:3289(para)
 msgid "Delete the selected address book."
-msgstr ""
+msgstr "Entfernt das ausgewählte Adressbuch."
 
 #: C/balsa.xml:3294(guibutton)
 msgid "Set as Default"
@@ -2910,6 +3109,8 @@ msgid ""
 "If set, <application>Balsa</application> will open your system inbox upon "
 "startup."
 msgstr ""
+"Falls gesetzt, öffnet <application>Balsa</application> das Eingangspostfach "
+"des Systems beim Start."
 
 #: C/balsa.xml:3317(guilabel)
 msgid "Check Mail at Startup"
@@ -2936,7 +3137,7 @@ msgstr ""
 
 #: C/balsa.xml:3335(guilabel)
 msgid "Folder Scanning"
-msgstr ""
+msgstr "Einlesen der Ordner"
 
 #: C/balsa.xml:3337(para)
 msgid ""
@@ -2963,10 +3164,13 @@ msgid ""
 "<glossterm linkend=\"glossary-imap\"><acronym>IMAP</acronym></glossterm> "
 "trees."
 msgstr ""
+"Sie können die anfängliche Einlesetiefe getrennt für lokale und <glossterm "
+"linkend=\"glossary-imap\"><acronym>IMAP</acronym></glossterm>-Ordnerbäume "
+"festlegen."
 
 #: C/balsa.xml:3359(title)
 msgid "Miscellaneous"
-msgstr ""
+msgstr "Weitere Einstellungen"
 
 #: C/balsa.xml:3363(guilabel)
 msgid "Debug"
@@ -2988,6 +3192,8 @@ msgid ""
 "Set <application>Balsa</application> to delete all messages in the "
 "<symbol>Trash</symbol> mailbox when <application>Balsa</application> exits."
 msgstr ""
+"Weist <application>Balsa</application> an, alle Nachrichten im <symbol>Müll</"
+"symbol>-Ordner zu löschen, wenn <application>Balsa</application> beendet wird."
 
 #: C/balsa.xml:3383(guilabel)
 msgid "Automatically close mailbox"
@@ -3101,7 +3307,7 @@ msgstr ""
 
 #: C/balsa.xml:3498(title)
 msgid "Basic IMAP folder configuration"
-msgstr ""
+msgstr "Grundlegende Konfiguration von IMAP-Ordnern"
 
 #: C/balsa.xml:3500(para)
 msgid ""
@@ -3234,7 +3440,7 @@ msgstr ""
 
 #: C/balsa.xml:3609(title)
 msgid "IMAP Subfolder Properties"
-msgstr ""
+msgstr "Eigenschaften für IMAP-Unterordner"
 
 #: C/balsa.xml:3611(para)
 msgid ""
@@ -3249,12 +3455,16 @@ msgid ""
 "<guilabel>Folder name</guilabel> is how the folder is shown in the mailbox "
 "tree on the left side."
 msgstr ""
+"<guilabel>Ordnername</guilabel> legt fest, unter welchem Namen der Ordner im "
+"Postfachbaum an der linken Seite angezeigt wird."
 
 #: C/balsa.xml:3624(para)
 msgid ""
 "<guilabel>Subfolder of</guilabel> indicates the immediate parent of the "
 "folder."
 msgstr ""
+"<guilabel>Unterordner von</guilabel> gibt den unmittelbaren Eltern-Ordner des "
+"Ordners an."
 
 #: C/balsa.xml:3629(para)
 msgid ""
@@ -3351,6 +3561,9 @@ msgid ""
 "program. You might want to write comments or debug output on this line. The "
 "remaining lines should have this format:"
 msgstr ""
+"<application>Balsa</application> ignoriert die erste Zeile der Ausgabe Ihres "
+"Programm. Sie können hier Kommentare oder Informationen zur Fehlerdiagnose "
+"eintragen. Die Zeilen sollten dieses Format haben:"
 
 #: C/balsa.xml:3714(computeroutput)
 #, no-wrap
@@ -3358,6 +3571,8 @@ msgid ""
 "\n"
 "e-mail address\tfull name\tnickname\n"
 msgstr ""
+"\n"
+"E-Mail-Adresse\tVoller Name\tSpitzname\n"
 
 #: C/balsa.xml:3718(para)
 msgid ""
@@ -3415,6 +3630,8 @@ msgid ""
 "\n"
 "jelmer@nl.linux.org\tJelmer Vernooij\tjelmer\n"
 msgstr ""
+"\n"
+"jelmer@nl.linux.org\tJelmer Vernooij\tjelmer\n"
 
 #: C/balsa.xml:3738(computeroutput)
 #, no-wrap
@@ -3422,6 +3639,8 @@ msgid ""
 "\n"
 "balsa-maintainer@theochem.kth.se\tPawel Salek\tbalsa-maintainer\n"
 msgstr ""
+"\n"
+"balsa-maintainer@theochem.kth.se\tPawel Salek\tbalsa-maintainer\n"
 
 #: C/balsa.xml:3743(para)
 msgid ""
@@ -3438,6 +3657,10 @@ msgid ""
 "The first is an email address, the second a full name and the third is an "
 "alias (currently not used and replaced by 'TODO')."
 msgstr ""
+"Das Hinzufügen von Adressen ist ebenfalls möglich. Ihr Skript sollte drei "
+"Argumente empfangen: Das erste ist die E-Mail-Adresse, das zweite der volle "
+"Name und das dritte ist ein Alias. Der Alias wird gegenwärtig nicht benutzt "
+"und durch »TODO« ersetzt."
 
 #: C/balsa.xml:3755(para)
 msgid ""
@@ -3470,6 +3693,8 @@ msgid ""
 "A unique title by which this identity will be named within "
 "<application>Balsa</application>."
 msgstr ""
+"Ein eindeutiger Titel, unter dem diese Identität in <application>Balsa</"
+"application> benannt wird."
 
 #: C/balsa.xml:3785(guilabel)
 msgid "Full Name"
@@ -3549,7 +3774,7 @@ msgstr ""
 
 #: C/balsa.xml:3874(guilabel)
 msgid "Face Path"
-msgstr ""
+msgstr "Face-Pfad"
 
 #: C/balsa.xml:3876(para)
 msgid ""
@@ -3562,7 +3787,7 @@ msgstr ""
 
 #: C/balsa.xml:3890(guilabel)
 msgid "X-Face Path"
-msgstr ""
+msgstr "X-Face-Pfad"
 
 #: C/balsa.xml:3892(para)
 msgid ""
@@ -3732,6 +3957,8 @@ msgid ""
 "Before sending a message, check if valid keys are present for all recipients "
 "and show a dialog in this case."
 msgstr ""
+"Vor dem Absenden einer Nachricht wird nach gültigen Schlüsseln für alle "
+"Empfänger gesucht und in diesem Fall ein Dialog angezeigt."
 
 #: C/balsa.xml:4069(guilabel)
 msgid "Use secret key with this id for signing."
@@ -3840,10 +4067,12 @@ msgstr ""
 #: C/balsa.xml:4197(para)
 msgid "AND: all condition tests must be true to make the match."
 msgstr ""
+"AND: Alle Bedingungstests müssen wahr sein, um eine Übereinstimmung zu bilden."
 
 #: C/balsa.xml:4202(para)
 msgid "OR: one condition test must be true to make the match."
 msgstr ""
+"OR: Ein Bedingungstest muss wahr sein, um eine Übereinstimmung zu bilden."
 
 #: C/balsa.xml:4191(para)
 msgid ""
@@ -3851,6 +4080,10 @@ msgid ""
 "test to be applied to the messages. The results of these tests is then "
 "combined following the type of operation specified: <placeholder-1/>"
 msgstr ""
+"Jeder Filter wird aus einer oder mehreren Bedingungen gebildet. Jede "
+"Bedingung repräsentiert einen Test, der auf die Nachrichten angewendet wird. "
+"Die Ergebnisse dieser Tests werden dann entsprechend des Typsder angegebenen "
+"Operation kombiniert: <placeholder-1/>"
 
 #: C/balsa.xml:4214(para)
 msgid ""
@@ -4122,10 +4355,12 @@ msgid ""
 "The <guibutton>Cancel</guibutton> button: this discards any changes and "
 "closes the dialog box."
 msgstr ""
+"Der <guibutton>Abbrechen</guibutton>-Knopf verwirft alle Änderungen und "
+"schließt den Dialog."
 
 #: C/balsa.xml:4502(para)
 msgid "The <guibutton>Help</guibutton> button: opens this help window."
-msgstr ""
+msgstr "Der <guibutton>Hilfe</guibutton>-Knopf öffnet das Hilfe-Fenster."
 
 #: C/balsa.xml:4479(para)
 msgid "There are three buttons below the filters lists: <placeholder-1/>"
@@ -4411,7 +4646,7 @@ msgstr ""
 
 #: C/balsa.xml:4775(para)
 msgid "See <link linkend=\"ct-main-folder-imap\">this section</link>."
-msgstr ""
+msgstr "Siehe in <link linkend=\"ct-main-folder-imap\">diesem Abschnitt</link>."
 
 #: C/balsa.xml:4780(title)
 msgid "<application>Balsa</application>'s frozen!"
@@ -4433,6 +4668,9 @@ msgid ""
 "large mailbox. This could take a while, especially when this file is accessed "
 "via <acronym>NFS</acronym>."
 msgstr ""
+"<application>Balsa</application> lädt eine neue Nachricht oder schließt ein "
+"großes Postfach. Das kann eine Weile dauern, besonders wenn auf die Datei "
+"mittels <acronym>NFS</acronym> zugegriffen wird."
 
 #: C/balsa.xml:4792(para)
 msgid ""

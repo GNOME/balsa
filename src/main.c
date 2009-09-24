@@ -723,7 +723,7 @@ initial_open_inbox()
 
     printf("opening %s..\n", balsa_app.inbox->name);
     gdk_threads_enter();
-    balsa_mblist_open_mailbox(balsa_app.inbox);
+    balsa_mblist_open_mailbox_hidden(balsa_app.inbox);
     gdk_threads_leave();
     
     return FALSE;

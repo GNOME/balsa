@@ -2449,9 +2449,6 @@ balsa_window_real_close_mbnode(BalsaWindow * window,
 
             /* Just in case... */
             g_object_set_data(G_OBJECT(window), BALSA_INDEX_GRAB_FOCUS, NULL);
-
-            g_free(balsa_app.current_mailbox_url);
-            balsa_app.current_mailbox_url = NULL;
         }
     }
 

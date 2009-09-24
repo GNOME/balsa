@@ -518,11 +518,43 @@ append_url_if_open(const gchar * url, LibBalsaMailboxView * view,
     }
 }
 
+static void
+open_mailbox_by_url(const gchar * url)
+{
+    LibBalsaMailbox *mailbox;
+
+    if (!(url && *url))
+        return;
+
+    mailbox = balsa_find_mailbox_by_url(url);
+    if (balsa_app.debug)
+        fprintf(stderr, "open_mailboxes_idle_cb: opening %s => %p..\n",
+                url, mailbox);
+    if (mailbox)
+        /* The first mailbox we open will be shown; later mailboxes will
+         * have notebook pages, but will not be shown. */
+        balsa_mblist_open_mailbox_hidden(mailbox);
+    else {
+        /* Do not try to open it next time. */
+        LibBalsaMailboxView *view =
+            g_hash_table_lookup(libbalsa_mailbox_view_table, url);
+        /* The mailbox may have been requested to be open because its
+         * stored view might say so or the user requested it from the
+         * command line - in which case, view may or may not be present.
+         * We will be careful here. */
+        if (view) {
+            view->open = FALSE;
+            view->in_sync = FALSE;
+        }
+        balsa_information(LIBBALSA_INFORMATION_WARNING,
+                          _("Couldn't open mailbox \"%s\""), url);
+    }
+}
+
 gboolean
 open_mailboxes_idle_cb(gchar ** urls)
 {
     gchar **tmp;
-    LibBalsaMailbox *mbox;
 
     gdk_threads_enter();
 
@@ -534,38 +566,18 @@ open_mailboxes_idle_cb(gchar ** urls)
             return FALSE;
         }
 
-        str = g_string_new(balsa_app.current_mailbox_url);
+        str = g_string_new(NULL);
         g_hash_table_foreach(libbalsa_mailbox_view_table,
                              (GHFunc) append_url_if_open, str);
         urls = g_strsplit(str->str, ";", 0);
         g_string_free(str, TRUE);
     }
 
-    for (tmp = urls; *tmp; ++tmp) {
-        mbox = balsa_find_mailbox_by_url(*tmp);
-	if (balsa_app.debug)
-	    fprintf(stderr, "open_mailboxes_idle_cb: opening %s => %p..\n",
-		    *tmp, mbox);
-	if (mbox)
-            /* The first mailbox we open will be shown; the others will
-             * have notebook pages, but will not be shown. */
-	    balsa_mblist_open_mailbox_hidden(mbox);
-        else {
-	    /* Do not try to open it next time. */
-	    LibBalsaMailboxView *view =
-		g_hash_table_lookup(libbalsa_mailbox_view_table, *tmp);
-            /* The mailbox may have bee requested to be open because
-               its stored view might say so or the user requested it
-               from the command line - in which case, view may or may
-               not be present. We will be careful here. */
-            if(view) {
-                view->open = FALSE;
-                view->in_sync = FALSE;
-            }
-            balsa_information(LIBBALSA_INFORMATION_WARNING,
-                              _("Couldn't open mailbox \"%s\""), *tmp);
-	}
-    }
+    open_mailbox_by_url(balsa_app.current_mailbox_url);
+
+    for (tmp = urls; *tmp; ++tmp)
+        open_mailbox_by_url(*tmp);
+
     g_strfreev(urls);
 
     gdk_threads_leave();

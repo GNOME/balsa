@@ -1,3 +1,12 @@
+2009-09-24  Peter Bloomfield
+
+	* src/balsa-app.c (open_mailbox_by_url),
+	(open_mailboxes_idle_cb): respect current-mailbox-url when -o
+	command line option is used.
+	* src/main-window.c: do not clear current-mailbox-url when last
+	mailbox is closed, as it may get saved that way.
+	* src/main.c (initial_open_inbox): open inbox hidden.
+
 2009-09-11  Peter Bloomfield
 
 	Open most recent mailbox first on restart

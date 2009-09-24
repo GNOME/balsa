@@ -509,13 +509,10 @@ update_timer(gboolean update, guint minutes)
 
 static void
 append_url_if_open(const gchar * url, LibBalsaMailboxView * view,
-                   GString * str)
+                   GPtrArray * array)
 {
-    if (view->open) {
-        if (str->len)
-            g_string_append_c(str, ';');
-        g_string_append(str, url);
-    }
+    if (view->open)
+        g_ptr_array_add(array, g_strdup(url));
 }
 
 static void
@@ -559,28 +556,27 @@ open_mailboxes_idle_cb(gchar ** urls)
     gdk_threads_enter();
 
     if (!urls) {
-        GString *str;
+        GPtrArray *array;
 
         if (!libbalsa_mailbox_view_table) {
             gdk_threads_leave();
             return FALSE;
         }
 
-        str = g_string_new(NULL);
+        array = g_ptr_array_new();
         g_hash_table_foreach(libbalsa_mailbox_view_table,
-                             (GHFunc) append_url_if_open, str);
-        urls = g_strsplit(str->str, ";", 0);
-        g_string_free(str, TRUE);
+                             (GHFunc) append_url_if_open, array);
+        g_ptr_array_add(array, NULL);
+        urls = (gchar **) g_ptr_array_free(array, FALSE);
     }
 
-    if (urls && *urls) {
-        open_mailbox_by_url(balsa_app.current_mailbox_url);
+    if (urls) {
+        if (*urls) {
+            open_mailbox_by_url(balsa_app.current_mailbox_url);
 
-        for (tmp = urls; *tmp; ++tmp)
-{
-g_print("%s url \"%s\"\n", __func__, *tmp);
-            open_mailbox_by_url(*tmp);
-}
+            for (tmp = urls; *tmp; ++tmp)
+                open_mailbox_by_url(*tmp);
+        }
 
         g_strfreev(urls);
     }

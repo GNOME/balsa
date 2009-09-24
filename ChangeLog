@@ -1,5 +1,11 @@
 2009-09-24  Peter Bloomfield
 
+	* src/balsa-app.c (append_url_if_open): use a GPtrArray to
+	collect URLs instead of a GString;
+	(open_mailboxes_idle_cb): ditto; do not leak urls.
+
+2009-09-24  Peter Bloomfield
+
 	* src/balsa-app.c (open_mailboxes_idle_cb): do not open most
 	recent mailbox if no mailboxes were open.
 

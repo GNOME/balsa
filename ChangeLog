@@ -1,5 +1,10 @@
 2009-09-24  Peter Bloomfield
 
+	* src/balsa-app.c (open_mailboxes_idle_cb): do not open most
+	recent mailbox if no mailboxes were open.
+
+2009-09-24  Peter Bloomfield
+
 	* src/balsa-app.c (open_mailbox_by_url),
 	(open_mailboxes_idle_cb): respect current-mailbox-url when -o
 	command line option is used.

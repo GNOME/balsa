@@ -573,12 +573,17 @@ open_mailboxes_idle_cb(gchar ** urls)
         g_string_free(str, TRUE);
     }
 
-    open_mailbox_by_url(balsa_app.current_mailbox_url);
+    if (urls && *urls) {
+        open_mailbox_by_url(balsa_app.current_mailbox_url);
 
-    for (tmp = urls; *tmp; ++tmp)
-        open_mailbox_by_url(*tmp);
+        for (tmp = urls; *tmp; ++tmp)
+{
+g_print("%s url \"%s\"\n", __func__, *tmp);
+            open_mailbox_by_url(*tmp);
+}
 
-    g_strfreev(urls);
+        g_strfreev(urls);
+    }
 
     gdk_threads_leave();
 

@@ -1,3 +1,10 @@
+2009-09-25  Peter Bloomfield
+
+	* libbalsa/mailbox_mbox.c (lbm_mbox_prepare_object),
+	(lbm_mbox_armored_object): detect when g_mime_multipart_foreach
+	will recursively descend into a signed or encrypted multipart,
+	and set a counter to skip the parts that should not be changed.
+
 2009-09-24  Peter Bloomfield
 
 	* src/balsa-app.c (append_url_if_open): use a GPtrArray to

@@ -1850,51 +1850,57 @@ static void
 lbm_mbox_prepare_object(GMimeObject * parent, GMimeObject * mime_part,
                         gpointer data)
 {
+    guint *skip_count = data;
+
     g_mime_object_remove_header(mime_part, "Content-Length");
 
     if (GMIME_IS_MULTIPART(mime_part)) {
-        if (GMIME_IS_MULTIPART_SIGNED(mime_part)
-            || GMIME_IS_MULTIPART_ENCRYPTED(mime_part))
+        if (*skip_count || GMIME_IS_MULTIPART_SIGNED(mime_part)
+            || GMIME_IS_MULTIPART_ENCRYPTED(mime_part)) {
             /* Do not break crypto. */
-            return;
-
-        if (parent)
-            /* We have been called by g_mime_multipart_foreach, which
-             * recursively descends the multipart tree, so we must not
-             * start another descent. */
-            return;
-
-        g_mime_multipart_foreach((GMimeMultipart *) mime_part,
-                                 lbm_mbox_prepare_object,
-                                 NULL);
+            if (parent)
+                /* We must skip the children, which will be visited
+                 * because of the recursive descent in
+                 * g_mime_multipart_foreach. */
+                *skip_count +=
+                    g_mime_multipart_get_count(GMIME_MULTIPART(mime_part));
+        } else if (!parent)
+            g_mime_multipart_foreach((GMimeMultipart *) mime_part,
+                                     lbm_mbox_prepare_object, skip_count);
     } else if (GMIME_IS_MESSAGE_PART(mime_part))
-        lbm_mbox_prepare_object(NULL, 
+        lbm_mbox_prepare_object(NULL,
                                 GMIME_OBJECT
-                                (((GMimeMessagePart *) mime_part)->
-                                 message), NULL);
+                                (((GMimeMessagePart *)
+                                  mime_part)->message), skip_count);
     else if (GMIME_IS_MESSAGE(mime_part))
-        lbm_mbox_prepare_object(NULL, 
+        lbm_mbox_prepare_object(NULL,
                                 ((GMimeMessage *) mime_part)->mime_part,
-                                NULL);
-    else if (!GMIME_IS_MESSAGE_PARTIAL(mime_part)) {
-        GMimeContentEncoding encoding;
-        GMimeContentType *mime_type;
+                                skip_count);
+    else {
+        if (*skip_count)
+            --*skip_count;
+        else if (!GMIME_IS_MESSAGE_PARTIAL(mime_part)) {
+            GMimeContentEncoding encoding;
+            GMimeContentType *mime_type;
 
-        encoding = g_mime_part_get_content_encoding(GMIME_PART(mime_part));
-        if (encoding == GMIME_CONTENT_ENCODING_BASE64)
-            return;
-
-        mime_type = g_mime_object_get_content_type(mime_part);
-        if (g_mime_content_type_is_type(mime_type, "text", "plain")) {
-            const gchar *format =
-                g_mime_content_type_get_parameter(mime_type, "format");
-            if (format && !g_ascii_strcasecmp(format, "flowed"))
-                /* Format=Flowed text cannot contain From_ lines. */
+            encoding =
+                g_mime_part_get_content_encoding(GMIME_PART(mime_part));
+            if (encoding == GMIME_CONTENT_ENCODING_BASE64)
                 return;
-        }
 
-        g_mime_part_set_content_encoding(GMIME_PART(mime_part),
-                                 GMIME_CONTENT_ENCODING_QUOTEDPRINTABLE);
+            mime_type = g_mime_object_get_content_type(mime_part);
+            if (g_mime_content_type_is_type(mime_type, "text", "plain")) {
+                const gchar *format =
+                    g_mime_content_type_get_parameter(mime_type, "format");
+                if (format && !g_ascii_strcasecmp(format, "flowed"))
+                    /* Format=Flowed text cannot contain From_ lines. */
+                    return;
+            }
+
+            g_mime_part_set_content_encoding
+                (GMIME_PART(mime_part),
+                 GMIME_CONTENT_ENCODING_QUOTEDPRINTABLE);
+        }
     }
 }
 
@@ -1903,11 +1909,12 @@ lbm_mbox_armored_object(GMimeStream * stream)
 {
     GMimeParser *parser;
     GMimeObject *object;
+    guint skip_count = 0;
 
     parser = g_mime_parser_new_with_stream(stream);
     object = GMIME_OBJECT(g_mime_parser_construct_message(parser));
     g_object_unref(parser);
-    lbm_mbox_prepare_object(NULL, object, NULL);
+    lbm_mbox_prepare_object(NULL, object, &skip_count);
 
     return object;
 }

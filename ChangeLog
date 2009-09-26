@@ -1,3 +1,8 @@
+2009-09-26  Peter Bloomfield
+
+	* libbalsa/mailbox_mbox.c (lbm_mbox_prepare_object): count
+	GMimeMessagePart as well as GMimePart when skipping parts.
+
 2009-09-25  Peter Bloomfield
 
 	* libbalsa/mailbox_mbox.c (lbm_mbox_prepare_object),

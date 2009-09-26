@@ -1854,8 +1854,13 @@ lbm_mbox_prepare_object(GMimeObject * parent, GMimeObject * mime_part,
 
     g_mime_object_remove_header(mime_part, "Content-Length");
 
-    if (GMIME_IS_MULTIPART(mime_part)) {
-        if (*skip_count || GMIME_IS_MULTIPART_SIGNED(mime_part)
+    if (GMIME_IS_MESSAGE(mime_part))
+        lbm_mbox_prepare_object(NULL,
+                                ((GMimeMessage *) mime_part)->mime_part,
+                                skip_count);
+    else if (GMIME_IS_MULTIPART(mime_part)) {
+        if (*skip_count
+            || GMIME_IS_MULTIPART_SIGNED(mime_part)
             || GMIME_IS_MULTIPART_ENCRYPTED(mime_part)) {
             /* Do not break crypto. */
             if (parent)
@@ -1867,40 +1872,32 @@ lbm_mbox_prepare_object(GMimeObject * parent, GMimeObject * mime_part,
         } else if (!parent)
             g_mime_multipart_foreach((GMimeMultipart *) mime_part,
                                      lbm_mbox_prepare_object, skip_count);
-    } else if (GMIME_IS_MESSAGE_PART(mime_part))
-        lbm_mbox_prepare_object(NULL,
-                                GMIME_OBJECT
-                                (((GMimeMessagePart *)
-                                  mime_part)->message), skip_count);
-    else if (GMIME_IS_MESSAGE(mime_part))
-        lbm_mbox_prepare_object(NULL,
-                                ((GMimeMessage *) mime_part)->mime_part,
+    } else if (*skip_count)
+        -- * skip_count;
+    else if (GMIME_IS_MESSAGE_PART(mime_part))
+        lbm_mbox_prepare_object(NULL, GMIME_OBJECT(((GMimeMessagePart *)
+                                                    mime_part)->message),
                                 skip_count);
-    else {
-        if (*skip_count)
-            --*skip_count;
-        else if (!GMIME_IS_MESSAGE_PARTIAL(mime_part)) {
-            GMimeContentEncoding encoding;
-            GMimeContentType *mime_type;
+    else if (!GMIME_IS_MESSAGE_PARTIAL(mime_part)) {
+        GMimeContentEncoding encoding;
+        GMimeContentType *mime_type;
 
-            encoding =
-                g_mime_part_get_content_encoding(GMIME_PART(mime_part));
-            if (encoding == GMIME_CONTENT_ENCODING_BASE64)
+        encoding = g_mime_part_get_content_encoding(GMIME_PART(mime_part));
+        if (encoding == GMIME_CONTENT_ENCODING_BASE64)
+            return;
+
+        mime_type = g_mime_object_get_content_type(mime_part);
+        if (g_mime_content_type_is_type(mime_type, "text", "plain")) {
+            const gchar *format =
+                g_mime_content_type_get_parameter(mime_type, "format");
+            if (format && !g_ascii_strcasecmp(format, "flowed"))
+                /* Format=Flowed text cannot contain From_ lines. */
                 return;
-
-            mime_type = g_mime_object_get_content_type(mime_part);
-            if (g_mime_content_type_is_type(mime_type, "text", "plain")) {
-                const gchar *format =
-                    g_mime_content_type_get_parameter(mime_type, "format");
-                if (format && !g_ascii_strcasecmp(format, "flowed"))
-                    /* Format=Flowed text cannot contain From_ lines. */
-                    return;
-            }
-
-            g_mime_part_set_content_encoding
-                (GMIME_PART(mime_part),
-                 GMIME_CONTENT_ENCODING_QUOTEDPRINTABLE);
         }
+
+        g_mime_part_set_content_encoding
+            (GMIME_PART(mime_part),
+             GMIME_CONTENT_ENCODING_QUOTEDPRINTABLE);
     }
 }
 

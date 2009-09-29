@@ -509,14 +509,14 @@ balsa_spell_check_init(BalsaSpellCheck * spell_check)
     /* setup buttons to perform actions */
     vbox = gtk_vbox_new(FALSE, padding);
     change = balsa_stock_button_with_label(GTK_STOCK_REDO,
-					   "_Change");
+					   _("_Change"));
     gtk_widget_set_tooltip_text(change,
                                 _("Replace the current word "
                                   "with the selected suggestion"));
     gtk_box_pack_start(GTK_BOX(vbox), change, FALSE, FALSE, 0);
 
     change_all = balsa_stock_button_with_label(GTK_STOCK_REFRESH,
-					       "Change _All");
+					       _("Change _All"));
     gtk_widget_set_tooltip_text(change_all,
                                 _("Replace all occurrences of the current word "
                                   "with the selected suggestion"));
@@ -526,14 +526,14 @@ balsa_spell_check_init(BalsaSpellCheck * spell_check)
 
     vbox = gtk_vbox_new(FALSE, padding);
     ignore = balsa_stock_button_with_label(GTK_STOCK_GO_FORWARD,
-                                           "_Ignore");
+                                           _("_Ignore"));
 
     gtk_widget_set_tooltip_text(ignore,
                                 _("Skip the current word"));
     gtk_box_pack_start(GTK_BOX(vbox), ignore, FALSE, FALSE, 0);
 
     ignore_all = balsa_stock_button_with_label(GTK_STOCK_GOTO_LAST,
-                                               "Ignore A_ll");
+                                               _("Ignore A_ll"));
     gtk_widget_set_tooltip_text(ignore_all,
                                 _("Skip all occurrences of the current word"));
     gtk_box_pack_start(GTK_BOX(vbox), ignore_all, FALSE, FALSE, 0);
@@ -542,7 +542,7 @@ balsa_spell_check_init(BalsaSpellCheck * spell_check)
 
     vbox = gtk_vbox_new(FALSE, padding);
     learn = balsa_stock_button_with_label(BALSA_PIXMAP_BOOK_OPEN,
-                                          "_Learn");
+                                          _("_Learn"));
     gtk_widget_set_tooltip_text(learn,
                                 _("Add the current word to your personal dictionary"));
     gtk_box_pack_start(GTK_BOX(vbox), learn, FALSE, FALSE, 0);
@@ -550,12 +550,12 @@ balsa_spell_check_init(BalsaSpellCheck * spell_check)
                        vbox, FALSE, FALSE, 0);
 
     vbox = gtk_vbox_new(FALSE, padding);
-    done = balsa_stock_button_with_label(GTK_STOCK_OK, "_Done");
+    done = balsa_stock_button_with_label(GTK_STOCK_OK, _("_Done"));
     gtk_widget_set_tooltip_text(done, _("Finish spell checking"));
     gtk_box_pack_start(GTK_BOX(vbox), done, FALSE, FALSE, 0);
 
     cancel = gtk_button_new_from_stock(GTK_STOCK_CANCEL);
-    gtk_widget_set_tooltip_text(learn,
+    gtk_widget_set_tooltip_text(cancel,
                                 _("Revert all changes and finish spell checking"));
     gtk_box_pack_start(GTK_BOX(vbox), cancel, FALSE, FALSE, 0);
     gtk_box_pack_end(GTK_BOX(GTK_DIALOG(spell_check)->action_area),
@@ -864,8 +864,8 @@ balsa_spell_check_start(BalsaSpellCheck * spell_check, GtkWindow *parent_wnd)
         regfree(&quoted_rex);
     if (regcomp(&quoted_rex, balsa_app.quote_regex, REG_EXTENDED)) {
         balsa_information(LIBBALSA_INFORMATION_ERROR,
-                          "BalsaSpellCheck: Quoted text "
-                          "regular expression compilation failed\n");
+                          _("BalsaSpellCheck: Quoted text "
+                            "regular expression compilation failed\n"));
         quoted_rex_compiled = FALSE;
     } else
         quoted_rex_compiled = TRUE;
@@ -988,12 +988,13 @@ balsa_spell_check_learn(BalsaSpellCheck * spell_check,
     if (!result) {
 	if (pspell_manager_error_number(spell_check->spell_manager) != 0) {
 	    balsa_information(LIBBALSA_INFORMATION_ERROR,
-			      "BalsaSpellCheck: Learn operation failed;\n%s\n",
+			      _("BalsaSpellCheck: "
+                                "Learn operation failed;\n%s\n"),
 			      pspell_manager_error_message
 			      (spell_check->spell_manager));
 	} else {
 	    balsa_information(LIBBALSA_INFORMATION_ERROR,
-			      "BalsaSpellCheck: Learn operation failed.\n");
+			      _("BalsaSpellCheck: Learn operation failed.\n"));
 	}
     }
 
@@ -1192,8 +1193,8 @@ setup_suggestions(BalsaSpellCheck * spell_check)
 
         if (balsa_app.debug)
             balsa_information(LIBBALSA_INFORMATION_DEBUG,
-                              "BalsaSpellCheck: Suggest %s (%s)\n", new_word,
-			      cword);
+                              _("BalsaSpellCheck: Suggest %s (%s)\n"),
+                              new_word, cword);
 	if(new_word)
 	    new_word=cword;
 
@@ -1294,7 +1295,7 @@ check_pspell_errors(PspellManager * manager)
 {
     if (pspell_manager_error_number(manager) != 0) {
 	balsa_information(LIBBALSA_INFORMATION_WARNING,
-			  "BalsaSpellCheck: Pspell Error: %s\n",
+			  _("BalsaSpellCheck: Pspell Error: %s\n"),
 			  pspell_manager_error_message(manager));
 	return TRUE;
     }

@@ -631,7 +631,7 @@ This is version 2.721 of the Balsa manual.
 	    <shortcut>
 	      <keycombo><keysym>Ctrl</keysym><keysym>E</keysym></keycombo>
 	    </shortcut>
-	    <guimenu>Edit</guimenu>
+	    <guimenu>View</guimenu>
 	    <guimenuitem>Expand All</guimenuitem>
 	  </menuchoice> &mdash; 
 	  Expand all threads in the currently displayed mailbox.
@@ -644,7 +644,7 @@ This is version 2.721 of the Balsa manual.
 	    <shortcut>
 	      <keycombo><keysym>Ctrl</keysym><keysym>L</keysym></keycombo>
 	    </shortcut>
-	    <guimenu>Edit</guimenu>
+	    <guimenu>View</guimenu>
 	    <guimenuitem>Collapse All</guimenuitem>
 	  </menuchoice> &mdash; 
 	  Collapse all threads in the currently displayed mailbox.
@@ -1358,6 +1358,14 @@ This is version 2.721 of the Balsa manual.
 
           Queue the message in the outbox for sending later.
 	</para>
+
+    <note>
+      <para>
+          A message is considered valid (ready for sending or queuing)
+          if it contains at least one valid email address, and no invalid
+          addresses, in the <guilabel>Recipients</guilabel> fields.
+      </para>
+    </note>
       </listitem>
 
       <listitem>
@@ -1397,14 +1405,6 @@ This is version 2.721 of the Balsa manual.
 	</para>
       </listitem>
     </itemizedlist>
-
-    <note>
-      <para>
-         A message is considered valid (ready for sending) if it
-	 contains only legal email addresses in the
-	 <guilabel>To:</guilabel> field.
-      </para>
-    </note>
 
   </listitem>
 </varlistentry>
@@ -1562,49 +1562,10 @@ This is version 2.721 of the Balsa manual.
 	<para>
 	  <menuchoice>
 	    <guimenu>Show</guimenu>
-	    <guimenuitem>To</guimenuitem>
+	    <guimenuitem>Recipients</guimenuitem>
 	  </menuchoice>
-	  &mdash; Display the <literal>To</literal> header.
-	</para>
-      </listitem>
-
-      <listitem>
-	<para>
-	  <menuchoice>
-	    <guimenu>Show</guimenu>
-	    <guimenuitem>Subject</guimenuitem>
-	  </menuchoice>
-	  &mdash; Display the <literal>Subject</literal> header.
-	</para>
-      </listitem>
-
-      <listitem>
-	<para>
-	  <menuchoice>
-	    <guimenu>Show</guimenu>
-	    <guimenuitem>Cc</guimenuitem>
-	  </menuchoice>
-	  &mdash; Display the <literal>Cc</literal> header.
-	</para>
-      </listitem>
-
-      <listitem>
-	<para>
-	  <menuchoice>
-	    <guimenu>Show</guimenu>
-	    <guimenuitem>Bcc</guimenuitem>
-	  </menuchoice>
-	  &mdash; Display the <literal>Bcc</literal> header.
-	</para>
-      </listitem>
-
-      <listitem>
-	<para>
-	  <menuchoice>
-	    <guimenu>Show</guimenu>
-	    <guimenuitem>Fcc</guimenuitem>
-	  </menuchoice>
-	  &mdash; Display the <literal>Fcc</literal> header.
+          &mdash; Display the <literal>To:</literal>,
+          <literal>Cc:</literal>, and <literal>Bcc:</literal> addresses.
 	</para>
       </listitem>
 
@@ -1622,29 +1583,9 @@ This is version 2.721 of the Balsa manual.
 	<para>
 	  <menuchoice>
 	    <guimenu>Show</guimenu>
-	    <guimenuitem>Attachments</guimenuitem>
+	    <guimenuitem>Fcc</guimenuitem>
 	  </menuchoice>
-	  &mdash; Display the <literal>Attachments</literal> box.
-	</para>
-      </listitem>
-
-      <listitem>
-	<para>
-	  <menuchoice>
-	    <guimenu>Show</guimenu>
-	    <guimenuitem>Comments</guimenuitem>
-	  </menuchoice>
-	  &mdash; Display the <literal>Comments</literal> header.
-	</para>
-      </listitem>
-	      
-      <listitem>
-	<para>
-	  <menuchoice>
-	    <guimenu>Show</guimenu>
-	    <guimenuitem>Keywords</guimenuitem>
-	  </menuchoice>
-	  &mdash; Display the <literal>Keywords</literal> header.
+	  &mdash; Display the <literal>Fcc</literal> header.
 	</para>
       </listitem>
 
@@ -1656,11 +1597,8 @@ This is version 2.721 of the Balsa manual.
   <term><guimenu>Language</guimenu></term>
   <listitem>
     <para>
-      The Language menu allows you to set the language to use for the
-      composing the message.  Currently, &Balsa; does not support
-      multiple character sets in a single message.  The current
-      language in use is shown at the bottom of the menu, along with
-      the character set in use. 
+      The Language menu allows you to set the language to use for
+      composing and checking the spelling of the message.
     </para>
 
     <para>The available languages include:</para>
@@ -1668,29 +1606,37 @@ This is version 2.721 of the Balsa manual.
     <itemizedlist>
       <listitem><para>Brazilian</para></listitem>
       <listitem><para>Catalan</para></listitem>
-      <listitem><para>Chinese</para></listitem>
+      <listitem><para>Chinese (Simplified or Traditional)</para></listitem>
       <listitem><para>Czech</para></listitem>
       <listitem><para>Danish</para></listitem>
       <listitem><para>Dutch</para></listitem>
-      <listitem><para>English</para></listitem>
+      <listitem><para>English (American or British)</para></listitem>
+      <listitem><para>Esperanto</para></listitem>
       <listitem><para>Estonian</para></listitem>
       <listitem><para>Finnish</para></listitem>
       <listitem><para>French</para></listitem>
-      <listitem><para>German</para></listitem>
+      <listitem><para>German (including Austrian and Swiss)</para></listitem>
       <listitem><para>Greek</para></listitem>
+      <listitem><para>Hebrew</para></listitem>
       <listitem><para>Hungarian</para></listitem>
       <listitem><para>Italian</para></listitem>
       <listitem><para>Japanese</para></listitem>
+      <listitem><para>Kazakh</para></listitem>
       <listitem><para>Korean</para></listitem>
+      <listitem><para>Latvian</para></listitem>
+      <listitem><para>Lithuanian</para></listitem>
       <listitem><para>Norwegian</para></listitem>
       <listitem><para>Polish</para></listitem>
       <listitem><para>Portugese</para></listitem>
+      <listitem><para>Romanian</para></listitem>
       <listitem><para>Russian</para></listitem>
+      <listitem><para>Serbian (including Latin)</para></listitem>
       <listitem><para>Slovak</para></listitem>
       <listitem><para>Spanish</para></listitem>
       <listitem><para>Swedish</para></listitem>
+      <listitem><para>Tatar</para></listitem>
       <listitem><para>Turkish</para></listitem>
-      <listitem><para>Ukranian</para></listitem>
+      <listitem><para>Ukrainian</para></listitem>
     </itemizedlist>
     <para>and more may have been added.</para>
 
@@ -1725,7 +1671,41 @@ This is version 2.721 of the Balsa manual.
 	    <guimenuitem>Format = Flowed</guimenuitem>
 	  </menuchoice>
 
-	  &mdash;
+          &mdash; The <quote>Flowed</quote> format (RFC 3676) breaks
+          the message text into paragraphs, which you type continuously
+          using the <keysym>Enter</keysym> key only to mark the end of
+          a paragraph, and <quote>fixed</quote> lines which you mark
+          individually using the <keysym>Enter</keysym> key.  This allows
+          other mailers that recognize the format to display the text
+          appropriately for the width of the recipient's screen, and to
+          quote the text correctly when constructing a reply. The text
+          is also displayed intelligibly by a non-flowed-aware mailer.
+	</para>
+        <note>
+            <para>
+                Using <quote>Format=Flowed</quote> is strongly
+                recommended. It helps to avert the <quote>embarrassing
+                line wrap</quote> that you see when quoted text is broken
+                across lines and shown with the wrong level of quoting.
+            </para>
+        </note>
+
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <guimenu>Options</guimenu>
+	    <guimenuitem>Send as plain text and HTML</guimenuitem>
+	  </menuchoice>
+
+          &mdash; &Balsa; can send and receive messages in
+          right-to-left languages such as Arabic, Hebrew, and Persian,
+          but some other agents such as mailing lists may mangle them
+          when translating into HTML.
+          If the <quote>Send as plain text and HTML</quote>
+          option is selected, &Balsa; will generate a correct
+          HTML message part that such agents will use instead.
 	</para>
       </listitem>
 
@@ -1801,8 +1781,6 @@ This is version 2.721 of the Balsa manual.
 	</para>
       </listitem>
    </itemizedlist>
-      </listitem>
-   </itemizedlist>
 
     <note>
       <para>
@@ -1815,6 +1793,8 @@ This is version 2.721 of the Balsa manual.
                 type="http">GnuPG HOWTO</ulink>.
       </para>
     </note>
+      </listitem>
+   </itemizedlist>
 
   </listitem>
 </varlistentry>
@@ -4877,19 +4857,19 @@ the third is an alias (currently not used and replaced by 'TODO').</para>
 	
 </itemizedlist>
   To find more information about it, please visit the &Balsa; <ulink
-  url="http://www.balsa.net/" type="http">Web page</ulink>.  Please
+  url="http://balsa.gnome.org/" type="http">Web page</ulink>.  Please
   send all comments, suggestions, and bug reports to the <ulink
   url="http://bugs.gnome.org/" type="http"><acronym>GNOME</acronym>
   bug tracking database</ulink>. Instructions for submitting bug
   reports can be found on-line at <ulink
-  url="http://www.balsa.net/bugs.html" type="http">
-  http://www.balsa.net/bugs.html</ulink>. If you are using
+  url="http://balsa.gnome.org/bugs.html" type="http">
+  http://balsa.gnome.org/bugs.html</ulink>. If you are using
   <acronym>GNOME</acronym> 1.1 or later, you can also use command
   <command>bug-buddy</command> for submitting bug reports.
 </para>
 
 <para>
-  Following people contributed to this manual:
+  The following people contributed to this manual:
   <itemizedlist>
   <listitem>
   <para>Peter Bloomfield (<email>peterbloomfield@bellsouth.net</email>)</para>
@@ -4918,9 +4898,10 @@ the third is an alias (currently not used and replaced by 'TODO').</para>
   <acronym>GNOME</acronym> Documentation Project at
   <email>docs@gnome.org</email> and the &Balsa; Discussion List
   <email>balsa-list@gnome.org</email>. You can also add your comments
-  online by using <ulink url="http://www.gnome.org/gdp/doctable/"
-  type="http"><acronym>GNOME</acronym> Documentation Status
-  Table</ulink>.
+  online by using
+  <ulink
+  url="http://library.gnome.org/devel/gdp-handbook/stable/gettingstarted.html.en"
+  type="http"><acronym>GNOME</acronym> Documentation Status Table</ulink>.
   </para>
 </sect1>
 

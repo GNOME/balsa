@@ -1,3 +1,10 @@
+2009-09-28  Laurent Coudeur <laurentc iol ie>
+
+	* src/spell-check.c (balsa_spell_check_init,
+	balsa_spell_check_start, balsa_spell_check_learn,
+	setup_suggestions, check_pspell_errors): mark strings for
+	translation.
+
 2009-09-26  Peter Bloomfield
 
 	* libbalsa/mailbox_mbox.c (lbm_mbox_prepare_object): count

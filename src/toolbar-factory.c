@@ -720,6 +720,10 @@ tm_do_popup_menu(GtkWidget * toolbar, GdkEventButton * event,
     }
 
     for (i = 0; i < G_N_ELEMENTS(tm_toolbar_options); i++) {
+
+        if (!tm_toolbar_options[i].text)
+            continue;
+
         if (tm_toolbar_options[i].style == default_style) {
             gchar *option_text, *text;
             GtkWidget *item;

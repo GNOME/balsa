@@ -1,3 +1,9 @@
+2009-09-30  Peter Bloomfield
+
+	* src/toolbar-factory.c (tm_do_popup_menu): do not crash when
+	default is "text beside items"; fixes
+	http://mail.gnome.org/archives/balsa-list/2009-September/msg00045.html
+
 2009-09-28  Laurent Coudeur <laurentc iol ie>
 
 	* src/spell-check.c (balsa_spell_check_init,

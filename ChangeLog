@@ -1,3 +1,9 @@
+2009-10-01  Peter Bloomfield
+
+	* libbalsa/mailbox_mbox.c (lbm_mbox_prepare_object,
+	lbm_mbox_armored_object): use GMimeMultipart api to traverse
+	message ourselves instead of using g_mime_multipart_foreach.
+
 2009-09-30  Peter Bloomfield
 
 	* src/toolbar-factory.c (tm_do_popup_menu): do not crash when

@@ -1843,6 +1843,13 @@ static void update_message_status_headers(GMimeMessage *message,
     g_string_free(new_header, TRUE);
 }
 
+#if defined(GMIME_MAJOR_VERSION)
+# if GMIME_CHECK_VERSION(2, 6, 0)
+#  define HAVE_GMIME_2_6 TRUE
+# endif                         /* GMIME_CHECK_VERSION(2, 6, 0) */
+#endif                          /* defined(GMIME_MAJOR_VERSION) */
+
+#if !defined(HAVE_GMIME_2_6)
 /*
  * Encode text parts as quoted-printable.
  */
@@ -1892,6 +1899,7 @@ lbm_mbox_prepare_object(GMimeObject * object)
             (mime_part, GMIME_CONTENT_ENCODING_QUOTEDPRINTABLE);
     }
 }
+#endif                          /* defined(HAVE_GMIME_2_6) */
 
 static GMimeObject *
 lbm_mbox_armored_object(GMimeStream * stream)
@@ -1902,7 +1910,12 @@ lbm_mbox_armored_object(GMimeStream * stream)
     parser = g_mime_parser_new_with_stream(stream);
     object = GMIME_OBJECT(g_mime_parser_construct_message(parser));
     g_object_unref(parser);
+
+#if defined(HAVE_GMIME_2_6)
+    g_mime_object_encode(object, GMIME_ENCODING_CONSTRAINT_7BIT);
+#else                           /* defined(HAVE_GMIME_2_6) */
     lbm_mbox_prepare_object(object);
+#endif                          /* defined(HAVE_GMIME_2_6) */
 
     return object;
 }

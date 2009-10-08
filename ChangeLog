@@ -1,5 +1,10 @@
 2009-10-08  Peter Bloomfield
 
+	* libbalsa/mailbox.c (lbm_changed, libbalsa_mailbox_changed): do
+	not emit mailbox-changed signal in a sub-thread.
+
+2009-10-08  Peter Bloomfield
+
 	* libbalsa/mailbox_mbox.c (lbm_mbox_armored_object): use
 	g_mime_object_encode when available.
 

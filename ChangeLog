@@ -1,5 +1,13 @@
 2009-10-08  Peter Bloomfield
 
+	* src/address-book-config.c (create_local_dialog,
+	create_vcard_dialog, create_ldif_dialog,
+	create_generic_dialog, create_externq_dialog,
+	create_ldap_dialog, create_gpe_dialog, create_rubrica_dialog):
+	show address book type in dialog title.
+
+2009-10-08  Peter Bloomfield
+
 	* libbalsa/mailbox.c (lbm_changed, libbalsa_mailbox_changed): do
 	not emit mailbox-changed signal in a sub-thread.
 

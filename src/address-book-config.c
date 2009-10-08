@@ -68,7 +68,8 @@ struct _AddressBookConfig {
 };
 
 static GtkWidget *create_dialog_from_type(AddressBookConfig * abc);
-static GtkWidget *create_local_dialog(AddressBookConfig * abc);
+static GtkWidget *create_local_dialog(AddressBookConfig * abc,
+                                      const gchar * type);
 static GtkWidget *create_externq_dialog(AddressBookConfig * abc);
 #ifdef ENABLE_LDAP
 static GtkWidget *create_ldap_dialog(AddressBookConfig * abc);
@@ -212,10 +213,10 @@ add_radio_buttons(GtkWidget * table, gint row, AddressBookConfig * abc)
 }
 
 static GtkWidget *
-create_local_dialog(AddressBookConfig * abc)
+create_local_dialog(AddressBookConfig * abc, const gchar * type)
 {
     GtkWidget *dialog;
-    const gchar *title;
+    gchar *title;
     const gchar *action;
     const gchar *name;
     GtkWidget *table;
@@ -225,11 +226,11 @@ create_local_dialog(AddressBookConfig * abc)
 
     ab = abc->address_book;
     if (ab) {
-        title = _("Modify Address Book");
+        title = g_strdup_printf(_("Modify %s Address Book"), type);
         action = GTK_STOCK_APPLY;
         name = ab->name;
     } else {
-        title = _("Add Address Book");
+        title = g_strdup_printf(_("Add %s Address Book"), type);
         action = GTK_STOCK_ADD;
         name = NULL;
     }
@@ -241,6 +242,7 @@ create_local_dialog(AddressBookConfig * abc)
                                     action, GTK_RESPONSE_APPLY,
                                     GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                                     NULL);
+    g_free(title);
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu_for_parent(dialog, abc->parent);
 #endif
@@ -278,13 +280,13 @@ create_local_dialog(AddressBookConfig * abc)
 static GtkWidget *
 create_vcard_dialog(AddressBookConfig * abc)
 {
-    return create_local_dialog(abc);
+    return create_local_dialog(abc, "VCARD");
 }
 
 static GtkWidget *
 create_ldif_dialog(AddressBookConfig * abc)
 {
-    return create_local_dialog(abc);
+    return create_local_dialog(abc, "LDIF");
 }
 
 static GtkWidget *
@@ -316,21 +318,21 @@ create_dialog_from_type(AddressBookConfig * abc)
 }
 
 static GtkWidget *
-create_generic_dialog(AddressBookConfig * abc)
+create_generic_dialog(AddressBookConfig * abc, const gchar * type)
 {
     GtkWidget *dialog;
-    const gchar *title;
+    gchar *title;
     const gchar *action;
     const gchar *name;
     LibBalsaAddressBook *ab;
 
     ab = abc->address_book;
     if (ab) {
-        title = _("Modify Address Book");
+        title = g_strdup_printf(_("Modify %s Address Book"), type);
         action = GTK_STOCK_APPLY;
         name = ab->name;
     } else {
-        title = _("Add Address Book");
+        title = g_strdup_printf(_("Add %s Address Book"), type);
         action = GTK_STOCK_ADD;
         name = NULL;
     }
@@ -342,6 +344,7 @@ create_generic_dialog(AddressBookConfig * abc)
                                     action, GTK_RESPONSE_APPLY,
                                     GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                                     NULL);
+    g_free(title);
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu_for_parent(dialog, abc->parent);
 #endif
@@ -410,7 +413,7 @@ create_externq_dialog(AddressBookConfig * abc)
                                       ab->save);
     }
 
-    dialog = create_generic_dialog(abc);
+    dialog = create_generic_dialog(abc, "Extern");
     gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox), table);
     return dialog;
 }
@@ -475,7 +478,7 @@ create_ldap_dialog(AddressBookConfig * abc)
     g_free(name);
     g_free(host);
     
-    dialog = create_generic_dialog(abc);
+    dialog = create_generic_dialog(abc, "LDAP");
     gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox), table);
     return dialog;
 }
@@ -504,7 +507,7 @@ create_gpe_dialog(AddressBookConfig * abc)
 
     add_radio_buttons(table, 1, abc);
 
-    dialog = create_generic_dialog(abc);
+    dialog = create_generic_dialog(abc, "GPE");
     gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox), table);
     return dialog;
 }
@@ -514,7 +517,7 @@ create_gpe_dialog(AddressBookConfig * abc)
 static GtkWidget *
 create_rubrica_dialog(AddressBookConfig * abc)
 {
-    return create_local_dialog(abc);
+    return create_local_dialog(abc, "Rubrica");
 }
 #endif
 

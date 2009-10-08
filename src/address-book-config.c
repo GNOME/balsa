@@ -160,7 +160,8 @@ edit_book_response(GtkWidget * dialog, gint response,
     }
 
     gtk_widget_destroy(dialog);
-    g_object_set_data(G_OBJECT(abc->address_book), "balsa-abc", NULL);
+    if (abc->address_book)
+        g_object_set_data(G_OBJECT(abc->address_book), "balsa-abc", NULL);
     g_free(abc);
 }
 

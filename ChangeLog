@@ -1,3 +1,8 @@
+2009-10-08  Peter Bloomfield
+
+	* src/address-book-config.c (edit_book_response): check for NULL
+	address-book.
+
 2009-10-01  Peter Bloomfield
 
 	* libbalsa/mailbox_mbox.c (lbm_mbox_prepare_object,

@@ -733,15 +733,9 @@ libbalsa_mailbox_check(LibBalsaMailbox * mailbox)
 #endif
 }
 
-void
-libbalsa_mailbox_changed(LibBalsaMailbox * mailbox)
+static gboolean
+lbm_changed(LibBalsaMailbox * mailbox)
 {
-    if (!g_signal_has_handler_pending
-        (mailbox, libbalsa_mailbox_signals[CHANGED], 0, TRUE))
-        /* No one cares, so don't set any message counts--that might
-         * cause mailbox->view to be created. */
-        return;
-
     if (MAILBOX_OPEN(mailbox)) {
         /* Both counts are valid. */
         libbalsa_mailbox_set_total(mailbox,
@@ -759,6 +753,23 @@ libbalsa_mailbox_changed(LibBalsaMailbox * mailbox)
     gdk_threads_enter();
     g_signal_emit(mailbox, libbalsa_mailbox_signals[CHANGED], 0);
     gdk_threads_leave();
+
+    return FALSE;
+}
+
+void
+libbalsa_mailbox_changed(LibBalsaMailbox * mailbox)
+{
+    if (!g_signal_has_handler_pending
+        (mailbox, libbalsa_mailbox_signals[CHANGED], 0, TRUE))
+        /* No one cares, so don't set any message counts--that might
+         * cause mailbox->view to be created. */
+        return;
+
+    if (!libbalsa_am_i_subthread())
+        lbm_changed(mailbox);
+    else
+        g_idle_add((GSourceFunc) lbm_changed, mailbox);
 }
 
 /* libbalsa_mailbox_message_match:

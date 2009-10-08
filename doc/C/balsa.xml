@@ -3161,7 +3161,11 @@ This is version 2.721 of the Balsa manual.
   <glossterm linkend="glossary-vcard">VCARD</glossterm> and remote
   &LDAP; address books, both of which can be configured here.
   &GnomeCard; also uses VCARD address books, so this allows &Balsa; to
-  share address books with other GNOME applications.
+  share address books with other GNOME applications.</para>
+  <para>&Balsa; also supports LDIF address books, and
+  can be built to use GPE address books, when SQLite is
+  available, and Rubrica address books. Which types are supported
+  depends on how &Balsa; was built.
 </para>
 
 <para>
@@ -3177,28 +3181,13 @@ This is version 2.721 of the Balsa manual.
   <term><guibutton>Add</guibutton></term>
   <listitem>
     <para>Using this adds a new address book for &Balsa; to use to
-    find addresses.  It brings up a series of dialog boxes that step
-    through the process of adding a new address book.</para>
+        find addresses. If you click it, a drop-down menu of the
+        supported address book types is shown. Click one to begin the
+        process. &Balsa; pops up a dialog, which, if you choose VCARD,
+        looks like this:</para>
 
     <figure>
-      <title>Add Address Book Dialog (Step 1)</title>
-      <screenshot>
-	  <mediaobject> 
-	    <imageobject><imagedata
-		fileref="figures/address-book-start.png" format="PNG"/> 
-	    </imageobject>
-	  </mediaobject>
-      </screenshot>
-    </figure>
-
-    <para>If &Balsa; was not compiled with <acronym>LDAP</acronym>
-    support it will not let you choose <acronym>LDAP</acronym> as an
-    addressbook type.  Once the type of address book is selected you
-    must specify the name and location of the address book.</para>
-
-    <figure>
-      <title><acronym>VCARD</acronym> Address Book Dialog
-      (Step 2)</title>
+      <title><acronym>VCARD</acronym> Address Book Dialog</title>
       <screenshot>
 	  <mediaobject> 
 	    <imageobject><imagedata
@@ -3213,7 +3202,7 @@ This is version 2.721 of the Balsa manual.
     file.</para>
 
     <figure>
-      <title>&LDAP; Address Book Dialog (Step 2)</title>
+      <title>&LDAP; Address Book Dialog</title>
       <screenshot>
 	  <mediaobject> 
 	    <imageobject><imagedata

@@ -1,3 +1,8 @@
+2009-10-08  Peter Bloomfield
+
+	* C/balsa.xml: fix out-of-date address book help.
+	* C/figures/address-book-start.png: removed, obsolete.
+
 2009-09-28  Laurent Coudeur <laurentc iol ie>
 
 	* C/balsa.xml: fix errors and update.

@@ -1,3 +1,11 @@
+2009-10-09   Stanislav Brabec
+
+	Fix #596309
+
+	* configure.in: require gnome-icon-theme.
+	* src/balsa-app.c (balsa_app_init): set gnome-icon-theme as
+	fallback.
+
 2009-10-08  Peter Bloomfield
 
 	* src/address-book-config.c (create_local_dialog,

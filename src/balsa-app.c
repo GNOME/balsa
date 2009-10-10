@@ -443,6 +443,9 @@ balsa_app_init(void)
     /* Message filing */
     balsa_app.folder_mru=NULL;
     balsa_app.fcc_mru=NULL;
+
+    g_object_set (gtk_settings_get_default (),
+		  "gtk-fallback-icon-theme", "gnome", NULL);
 }
 
 void

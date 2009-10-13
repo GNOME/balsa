@@ -18,8 +18,8 @@ msgstr ""
 "Project-Id-Version: balsa master\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=balsa&component=general\n"
-"POT-Creation-Date: 2009-09-29 02:28+0000\n"
-"PO-Revision-Date: 2009-10-02 18:56+0100\n"
+"POT-Creation-Date: 2009-10-08 14:33+0000\n"
+"PO-Revision-Date: 2009-10-13 21:09+0100\n"
 "Last-Translator: Mario Blättermann <mariobl@gnome.org>\n"
 "Language-Team: German <gnome-de@gnome.org>\n"
 "MIME-Version: 1.0\n"
@@ -756,44 +756,44 @@ msgstr "Fehlerhafter Pfad »%s« zu lokalem Postfach"
 msgid "Could not create a mailbox of type %s"
 msgstr "Postfach des Typs %s konnte nicht angelegt werden"
 
-#: ../libbalsa/mailbox.c:861
+#: ../libbalsa/mailbox.c:872
 #, c-format
 msgid "Applying filter rules to %s"
 msgstr "Filterregeln auf %s anwenden"
 
-#: ../libbalsa/mailbox.c:1016
+#: ../libbalsa/mailbox.c:1027
 #, c-format
 msgid "Copying from %s to %s"
 msgstr "Von »%s« nach »%s« kopieren"
 
-#: ../libbalsa/mailbox.c:1913
+#: ../libbalsa/mailbox.c:1924
 #, c-format
 msgid "libbalsa_mailbox_get_message: mailbox %s is closed"
 msgstr "libbalsa_mailbox_get_message: Postfach %s ist geschlossen"
 
-#: ../libbalsa/mailbox.c:2123
+#: ../libbalsa/mailbox.c:2134
 #, c-format
 msgid "Removing messages from source mailbox failed"
 msgstr "Löschen von Nachrichten im Quell-Postfach ist fehlgeschlagen"
 
-#: ../libbalsa/mailbox.c:3017
+#: ../libbalsa/mailbox.c:3028
 msgid "from unknown"
 msgstr "von unbekannt"
 
-#: ../libbalsa/mailbox.c:3019
+#: ../libbalsa/mailbox.c:3030
 msgid "Loading..."
 msgstr "Ladevorgang …"
 
-#: ../libbalsa/mailbox.c:3989
+#: ../libbalsa/mailbox.c:4000
 #, c-format
 msgid "Searching %s for partial messages"
 msgstr "Durchsuchen von %s nach Teilnachrichten"
 
-#: ../libbalsa/mailbox.c:4079
+#: ../libbalsa/mailbox.c:4090
 msgid "Reconstructing message"
 msgstr "Nachricht wird wiederhergestellt"
 
-#: ../libbalsa/mailbox.c:4348
+#: ../libbalsa/mailbox.c:4359
 #, c-format
 msgid "Finding duplicate messages in source mailbox failed"
 msgstr "Finden von Nachrichtenduplikaten im Quell-Postfach ist fehlgeschlagen"
@@ -962,7 +962,7 @@ msgstr ""
 msgid "Mailbox does not exist."
 msgstr "Das Postfach existiert nicht."
 
-#: ../libbalsa/mailbox_maildir.c:932 ../libbalsa/mailbox_mbox.c:2033
+#: ../libbalsa/mailbox_maildir.c:932 ../libbalsa/mailbox_mbox.c:2037
 #: ../libbalsa/mailbox_mh.c:1110
 #, c-format
 msgid "Data copy error"
@@ -1010,17 +1010,17 @@ msgstr "Das Postfach ist nicht im mbox-Format."
 msgid "Cannot lock mailbox."
 msgstr "Postfach konnte nicht gesperrt werden"
 
-#: ../libbalsa/mailbox_mbox.c:1990
+#: ../libbalsa/mailbox_mbox.c:1994
 #, c-format
 msgid "%s: could not open %s."
 msgstr "%s: %s konnte nicht geöffnet werden"
 
-#: ../libbalsa/mailbox_mbox.c:2001
+#: ../libbalsa/mailbox_mbox.c:2005
 #, c-format
 msgid "%s: could not get new mime stream."
 msgstr "%s: Neue MIME-Daten konnten nicht empfangen werden."
 
-#: ../libbalsa/mailbox_mbox.c:2009
+#: ../libbalsa/mailbox_mbox.c:2013
 #, c-format
 msgid "%s: %s is not in mbox format."
 msgstr "%s: %s ist nicht im mbox-Format."
@@ -1598,7 +1598,7 @@ msgstr ""
 msgid "undefined"
 msgstr "nicht festgelegt"
 
-#: ../libbalsa/rfc3156.c:1262 ../src/address-book-config.c:198
+#: ../libbalsa/rfc3156.c:1262 ../src/address-book-config.c:200
 msgid "never"
 msgstr "niemals"
 
@@ -2208,24 +2208,24 @@ msgstr "_Hilfe"
 msgid "_New"
 msgstr "_Neu"
 
-#: ../src/ab-main.c:557 ../src/address-book-config.c:860
+#: ../src/ab-main.c:557 ../src/address-book-config.c:864
 msgid "VCard Address Book (GnomeCard)"
 msgstr "vCard-Adressbuch (GnomeCard)"
 
-#: ../src/ab-main.c:559 ../src/address-book-config.c:866
+#: ../src/ab-main.c:559 ../src/address-book-config.c:870
 msgid "External query (a program)"
 msgstr "Externe Anfrage (ein Programm)"
 
-#: ../src/ab-main.c:561 ../src/address-book-config.c:871
+#: ../src/ab-main.c:561 ../src/address-book-config.c:875
 msgid "LDIF Address Book"
 msgstr "LDIF-Adressbuch"
 
-#: ../src/ab-main.c:564 ../src/address-book-config.c:877
+#: ../src/ab-main.c:564 ../src/address-book-config.c:881
 msgid "LDAP Address Book"
 msgstr "LDAP-Adressbuch"
 
-#: ../src/ab-main.c:568 ../src/address-book-config.c:501
-#: ../src/address-book-config.c:884
+#: ../src/ab-main.c:568 ../src/address-book-config.c:505
+#: ../src/address-book-config.c:888
 msgid "GPE Address Book"
 msgstr "GPE-Adressbuch"
 
@@ -2349,85 +2349,89 @@ msgstr ""
 "Fehler beim Öffnen des Adressbuchs »%s«:\n"
 "%s"
 
-#: ../src/address-book-config.c:175
+#: ../src/address-book-config.c:177
 msgid "Suggest complete addresses:"
 msgstr "Adressenvervollständigung aktivieren:"
 
-#: ../src/address-book-config.c:181
+#: ../src/address-book-config.c:183
 msgid "as I type"
 msgstr "während der Eingabe"
 
-#: ../src/address-book-config.c:190
+#: ../src/address-book-config.c:192
 msgid "when I hit the Escape key"
 msgstr "beim Drücken der Esc-Taste"
 
-#: ../src/address-book-config.c:227 ../src/address-book-config.c:328
-msgid "Modify Address Book"
-msgstr "Adressbuch bearbeiten"
+#: ../src/address-book-config.c:229 ../src/address-book-config.c:331
+#, c-format
+#| msgid "Modify Address Book"
+msgid "Modify %s Address Book"
+msgstr "Adressbuch %s bearbeiten"
 
-#: ../src/address-book-config.c:231 ../src/address-book-config.c:332
-msgid "Add Address Book"
-msgstr "Adressbuch hinzufügen"
+#: ../src/address-book-config.c:233 ../src/address-book-config.c:335
+#, c-format
+#| msgid "Add Address Book"
+msgid "Add %s Address Book"
+msgstr "Adressbuch %s hinzufügen"
 
 #. mailbox name
 #. may be NULL
 #. mailbox name
-#: ../src/address-book-config.c:250 ../src/address-book-config.c:370
-#: ../src/address-book-config.c:434 ../src/address-book-config.c:499
+#: ../src/address-book-config.c:253 ../src/address-book-config.c:374
+#: ../src/address-book-config.c:438 ../src/address-book-config.c:503
 msgid "A_ddress Book Name:"
 msgstr "Name des A_dressbuchs:"
 
-#: ../src/address-book-config.c:375
+#: ../src/address-book-config.c:379
 msgid "Load program location:"
 msgstr "Ort des Programms laden:"
 
-#: ../src/address-book-config.c:381
+#: ../src/address-book-config.c:385
 msgid "Select load program for address book"
 msgstr "Programm zum Laden des Adressbuchs auswählen"
 
-#: ../src/address-book-config.c:388
+#: ../src/address-book-config.c:392
 msgid "Save program location:"
 msgstr "Ort des Programms speichern:"
 
-#: ../src/address-book-config.c:394
+#: ../src/address-book-config.c:398
 msgid "Select save program for address book"
 msgstr "Programm zum Speichern des Adressbuchs auswählen"
 
-#: ../src/address-book-config.c:439
+#: ../src/address-book-config.c:443
 msgid "_Host Name"
 msgstr "Rec_hnername"
 
-#: ../src/address-book-config.c:444
+#: ../src/address-book-config.c:448
 msgid "Base Domain _Name"
 msgstr "_Name der Basisdomäne"
 
-#: ../src/address-book-config.c:449
+#: ../src/address-book-config.c:453
 msgid "_User Name (Bind DN)"
 msgstr "_Benutzername (Bind-DN)"
 
-#: ../src/address-book-config.c:454
+#: ../src/address-book-config.c:458
 msgid "_Password"
 msgstr "_Passwort"
 
-#: ../src/address-book-config.c:460
+#: ../src/address-book-config.c:464
 msgid "_User Address Book DN"
 msgstr "_Benutzerdressbuch-DN"
 
-#: ../src/address-book-config.c:466
+#: ../src/address-book-config.c:470
 msgid "Enable _TLS"
 msgstr "_TLS aktivieren"
 
-#: ../src/address-book-config.c:530 ../src/main-window.c:2608
+#: ../src/address-book-config.c:534 ../src/main-window.c:2608
 #: ../src/main-window.c:4200
 #, c-format
 msgid "Error displaying help: %s\n"
 msgstr "Fehler beim Anzeigen der Hilfe: %s\n"
 
-#: ../src/address-book-config.c:607
+#: ../src/address-book-config.c:611
 msgid "No path found.  Do you want to give one?"
 msgstr "Es wurde kein Pfad gefunden. Möchten Sie einen angeben?"
 
-#: ../src/address-book-config.c:891
+#: ../src/address-book-config.c:895
 msgid "Rubrica2 Address Book"
 msgstr "Rubrica2-Adressbuch"
 
@@ -6796,7 +6800,6 @@ msgid "New message to %s: %s"
 msgstr "Nachricht an %s verfassen: %s"
 
 #: ../src/spell-check.c:512
-#| msgid "Change..."
 msgid "_Change"
 msgstr "_Ersetzen"
 
@@ -6805,7 +6808,6 @@ msgid "Replace the current word with the selected suggestion"
 msgstr "Das aktuelle Wort mit dem gewählten Vorschlag ersetzen"
 
 #: ../src/spell-check.c:519
-#| msgid "Change..."
 msgid "Change _All"
 msgstr "_Alle ersetzen"
 
@@ -6814,7 +6816,6 @@ msgid "Replace all occurrences of the current word with the selected suggestion"
 msgstr "Dieses Wort im gesamten Text mit dem gewählten Vorschlag ersetzen"
 
 #: ../src/spell-check.c:529
-#| msgid "_More"
 msgid "_Ignore"
 msgstr "_Ignorieren"
 
@@ -6831,7 +6832,6 @@ msgid "Skip all occurrences of the current word"
 msgstr "Dieses Wort im gesamten Text überspringen"
 
 #: ../src/spell-check.c:545
-#| msgid "C_lear"
 msgid "_Learn"
 msgstr "_Lernen"
 
@@ -6840,7 +6840,6 @@ msgid "Add the current word to your personal dictionary"
 msgstr "Das aktuelle Wort ins persönliche Wörterbuch aufnehmen"
 
 #: ../src/spell-check.c:553
-#| msgid "Down"
 msgid "_Done"
 msgstr "_Abgeschlossen"
 
@@ -7128,12 +7127,12 @@ msgstr "Nur S_ymbole"
 msgid "_Text Only"
 msgstr "Nur _Text"
 
-#: ../src/toolbar-factory.c:733
+#: ../src/toolbar-factory.c:737
 #, c-format
 msgid "Use Desktop _Default (%s)"
 msgstr "_Desktopvorgabe verwenden (%s)"
 
-#: ../src/toolbar-factory.c:759
+#: ../src/toolbar-factory.c:763
 msgid "_Customize Toolbars..."
 msgstr "_Werkzeugleisten anpassen …"
 

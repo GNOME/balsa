@@ -836,7 +836,7 @@ address_book_cb(LibBalsaAddressView * address_view,
     ab = g_object_get_data(G_OBJECT(bsmsg->window),
                            BALSA_SENDMSG_ADDRESS_BOOK_KEY);
     if (ab) {
-        gdk_window_raise(ab->window);
+        gtk_window_present(GTK_WINDOW(ab));
         return;
     }
 
@@ -6640,8 +6640,8 @@ spell_check_cb(GtkAction * action, BalsaSendmsg * bsmsg)
     BalsaSpellCheck *sc;
 
     if (bsmsg->spell_checker) {
-        if (bsmsg->spell_checker->window) {
-            gdk_window_raise(bsmsg->spell_checker->window);
+        if (gtk_widget_get_window(bsmsg->spell_checker)) {
+            gtk_window_present(GTK_WINDOW(bsmsg->spell_checker));
             return;
         } else
             /* A spell checker was created, but not shown because of

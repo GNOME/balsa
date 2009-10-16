@@ -2802,7 +2802,7 @@ check_new_messages_real(BalsaWindow * window, int type)
         pthread_mutex_unlock(&mailbox_lock);
         fprintf(stderr, "Already Checking Mail!\n");
 	if (progress_dialog)
-	    gdk_window_raise(progress_dialog->window);
+	    gtk_window_present(GTK_WINDOW(progress_dialog));
         return;
     }
     checking_mail = 1;
@@ -3346,7 +3346,7 @@ bw_display_new_mail_notification(int num_new, int has_new)
         /* the user didn't acknowledge the last info, so we'll
          * accumulate the count */
         num_total += num_new;
-        gdk_window_raise(dlg->window);
+        gtk_window_present(GTK_WINDOW(dlg));
     } else {
         num_total = num_new;
         dlg = gtk_message_dialog_new(NULL, /* NOT transient for

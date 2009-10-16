@@ -569,7 +569,7 @@ filters_edit_dialog(void)
 	return;
     }
     if (fe_already_open) {
-	gdk_window_raise(fe_window->window);
+	gtk_window_present(GTK_WINDOW(fe_window));
 	return;
     }
     

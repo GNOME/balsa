@@ -581,7 +581,7 @@ mailbox_conf_new(GType mailbox_type)
     static GtkWidget *dialog;
 
     if (dialog) {
-        gdk_window_raise(dialog->window);
+        gtk_window_present(GTK_WINDOW(dialog));
         return;
     }
 
@@ -602,7 +602,7 @@ mailbox_conf_edit(BalsaMailboxNode * mbnode)
     dialog = g_object_get_data(G_OBJECT(mbnode->mailbox),
                                BALSA_MAILBOX_CONF_DIALOG);
     if (dialog) {
-        gdk_window_raise(dialog->window);
+        gtk_window_present(GTK_WINDOW(dialog));
         return;
     }
 

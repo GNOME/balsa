@@ -2674,7 +2674,7 @@ balsa_index_pipe(BalsaIndex * index)
         g_object_get_data(G_OBJECT(index->mailbox_node->mailbox),
                           BALSA_INDEX_PIPE_INFO);
     if (info) {
-        gdk_window_raise(info->dialog->window);
+        gtk_window_present(GTK_WINDOW(info->dialog));
         return;
     }
 

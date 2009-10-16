@@ -505,7 +505,7 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
 
     /* only one preferences manager window */
     if (already_open) {
-        gdk_window_raise(GTK_WIDGET(property_box)->window);
+        gtk_window_present(GTK_WINDOW(property_box));
         return;
     }
 

@@ -522,7 +522,7 @@ libbalsa_smtp_server_dialog(LibBalsaSmtpServer * smtp_server,
     sdi = g_object_get_data(G_OBJECT(smtp_server),
                             LIBBALSA_SMTP_SERVER_DIALOG_KEY);
     if (sdi) {
-        gdk_window_raise(sdi->dialog->window);
+        gtk_window_present(GTK_WINDOW(sdi->dialog));
         return;
     }
 

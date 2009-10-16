@@ -67,7 +67,7 @@ filters_export_dialog(void)
 	return;
     }
     if (fex_already_open) {
-	gdk_window_raise(fex_window->window);
+	gtk_window_present(GTK_WINDOW(fex_window));
 	return;
     }
 

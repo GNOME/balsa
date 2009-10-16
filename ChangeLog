@@ -1,3 +1,22 @@
+2009-10-15  Peter Bloomfield
+
+	Use gtk_window_present instead of gdk_window_raise
+
+	* libbalsa/identity.c (libbalsa_identity_select_dialog):
+	* libbalsa/smtp-server.c (libbalsa_smtp_server_dialog):
+	* src/address-book-config.c (balsa_address_book_config_new):
+	* src/balsa-index.c (balsa_index_pipe):
+	* src/filter-edit-dialog.c (filters_edit_dialog):
+	* src/filter-export-dialog.c (filters_export_dialog):
+	* src/filter-run-dialog.c (filters_run_dialog):
+	* src/folder-conf.c (folder_conf_imap_node):
+	* src/mailbox-conf.c (mailbox_conf_new), (mailbox_conf_edit):
+	* src/main-window.c:
+	* src/pref-manager.c (open_preferences_manager):
+	* src/sendmsg-window.c (address_book_cb), (spell_check_cb):
+	* src/store-address.c (balsa_store_address_from_messages):
+	* src/toolbar-prefs.c (customize_dialog_cb):
+
 2009-10-09   Stanislav Brabec
 
 	Fix #596309

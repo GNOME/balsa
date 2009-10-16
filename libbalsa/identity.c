@@ -472,7 +472,7 @@ libbalsa_identity_select_dialog(GtkWindow * parent,
     sdi = g_object_get_data(G_OBJECT(parent),
                             LIBBALSA_IDENTITY_SELECT_DIALOG_KEY);
     if (sdi) {
-        gdk_window_raise(sdi->dialog->window);
+        gtk_window_present(GTK_WINDOW(sdi->dialog));
         return;
     }
 

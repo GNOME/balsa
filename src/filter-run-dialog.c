@@ -430,7 +430,7 @@ filters_run_dialog(LibBalsaMailbox *mbox)
     }
     if (lst) {
 	/* If there was yet a dialog box for this mailbox, we raise it */
-	gdk_window_raise(GTK_WIDGET(lst->data)->window);
+	gtk_window_present(GTK_WINDOW(lst->data));
 	return;
     }
 

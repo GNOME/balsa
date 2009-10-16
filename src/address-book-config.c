@@ -110,7 +110,7 @@ balsa_address_book_config_new(LibBalsaAddressBook * address_book,
     abc = g_object_get_data(G_OBJECT(address_book), "balsa-abc");
     if (abc) {
         /* Only one dialog per address book. */
-        gdk_window_raise(abc->window->window);
+        gtk_window_present(GTK_WINDOW(abc->window));
         return;
     }
 

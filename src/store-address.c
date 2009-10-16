@@ -94,7 +94,7 @@ balsa_store_address_from_messages(GList * messages)
     if (!message_list) {
         /* All messages are already showing. */
         if (info)
-            gdk_window_raise(info->dialog->window);
+            gtk_window_present(GTK_WINDOW(info->dialog));
         return;
     }
 

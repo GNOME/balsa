@@ -284,7 +284,7 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
     fcw = mn ? g_object_get_data(G_OBJECT(mn), BALSA_FOLDER_CONF_IMAP_KEY)
              : fcw_new;
     if (fcw) {
-        gdk_window_raise(GTK_WIDGET(fcw->dialog)->window);
+        gtk_window_present(GTK_WINDOW(fcw->dialog));
         return;
     }
 

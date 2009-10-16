@@ -129,7 +129,7 @@ customize_dialog_cb(GtkWidget * widget, gpointer data)
 
     /* There can only be one */
     if (customize_widget) {
-        gdk_window_raise(customize_widget->window);
+        gtk_window_present(GTK_WINDOW(customize_widget));
         return;
     }
 

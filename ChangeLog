@@ -1,5 +1,14 @@
 2009-10-15  Peter Bloomfield
 
+	Re-implement BalsaCiteBar as a GTK_NO_WINDOW widget
+
+	* src/balsa-cite-bar.h: make BalsaCiteBar opaque.
+	* src/balsa-cite-bar.c (balsa_cite_bar_class_init),
+	(balsa_cite_bar_init), (balsa_cite_bar_resize),
+	(balsa_cite_bar_size_request), (balsa_cite_bar_expose):
+
+2009-10-15  Peter Bloomfield
+
 	Use gtk_window_present instead of gdk_window_raise
 
 	* libbalsa/identity.c (libbalsa_identity_select_dialog):

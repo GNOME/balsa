@@ -22,7 +22,6 @@
 #ifndef __BALSA_CITE_BAR_H__
 #define __BALSA_CITE_BAR_H__
 
-#include <gdk/gdk.h>
 #include <gtk/gtk.h>
 
 
@@ -39,25 +38,6 @@ G_BEGIN_DECLS
 
 typedef struct _BalsaCiteBar        BalsaCiteBar;
 typedef struct _BalsaCiteBarClass   BalsaCiteBarClass;
-
-struct _BalsaCiteBar
-{
-    GtkWidget misc;
-
-    /* Dimensions of each citation bar */
-    gint width;
-    gint height;
-
-    /* bar count and spacing */
-    gint bars;
-    gint space;
-};
-
-struct _BalsaCiteBarClass
-{
-    GtkWidgetClass parent_class;
-};
-
 
 GType      balsa_cite_bar_get_type   (void) G_GNUC_CONST;
 GtkWidget* balsa_cite_bar_new        (gint height, gint bars, gint dimension);

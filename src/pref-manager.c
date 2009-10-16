@@ -3339,7 +3339,7 @@ static void imap_toggled_cb(GtkWidget * widget, GtkWidget * pbox)
 {
     properties_modified_cb(widget, pbox);
 
-    if(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pui->check_imap))) 
+    if(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pui->check_imap)))
 	gtk_widget_set_sensitive(GTK_WIDGET(pui->check_imap_inbox), TRUE);
     else {
 	gtk_toggle_button_set_active(

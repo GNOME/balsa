@@ -175,9 +175,11 @@ balsa_mime_widget_ctx_menu_save(GtkWidget * parent_widget,
 static void
 scroll_change(GtkAdjustment * adj, gint diff, BalsaMessage * bm)
 {
-    gfloat upper = adj->upper - adj->page_size;
+    gdouble upper =
+        gtk_adjustment_get_upper(adj) - gtk_adjustment_get_page_size(adj);
+    gdouble value;
 
-    if (bm && adj->value >= upper && diff > 0) {
+    if (bm && gtk_adjustment_get_value(adj) >= upper && diff > 0) {
         if (balsa_window_next_unread(balsa_app.main_window))
             /* We're changing mailboxes, and GtkNotebook will grab the
              * focus, so we want to grab it back the next time we lose
@@ -186,12 +188,10 @@ scroll_change(GtkAdjustment * adj, gint diff, BalsaMessage * bm)
         return;
     }
 
-    adj->value += diff;
+    value = gtk_adjustment_get_value(adj);
+    value += (gdouble) diff;
 
-    adj->value = MIN(adj->value, upper);
-    adj->value = MAX(adj->value, 0.0);
-
-    g_signal_emit_by_name(G_OBJECT(adj), "value_changed", 0);
+    gtk_adjustment_set_value(adj, MIN(value, upper));
 }
 
 gint
@@ -199,45 +199,38 @@ balsa_mime_widget_key_press_event(GtkWidget * widget, GdkEventKey * event,
 				  BalsaMessage * bm)
 {
     GtkViewport *viewport;
+    GtkAdjustment *adj;
     int page_adjust;
 
     viewport = GTK_VIEWPORT(bm->cont_viewport);
+    adj = gtk_viewport_get_vadjustment(viewport);
 
-    if (balsa_app.pgdownmod) {
-            page_adjust = (viewport->vadjustment->page_size *
-                 balsa_app.pgdown_percent) / 100;
-    } else {
-            page_adjust = viewport->vadjustment->page_increment;
-    }
+    page_adjust = balsa_app.pgdownmod ?
+        (gtk_adjustment_get_page_size(adj) * balsa_app.pgdown_percent) /
+        100 : gtk_adjustment_get_page_increment(adj);
 
     switch (event->keyval) {
     case GDK_Up:
-        scroll_change(viewport->vadjustment,
-                      -viewport->vadjustment->step_increment, NULL);
+        scroll_change(adj, -gtk_adjustment_get_step_increment(adj), NULL);
         break;
     case GDK_Down:
-        scroll_change(viewport->vadjustment,
-                      viewport->vadjustment->step_increment, NULL);
+        scroll_change(adj, gtk_adjustment_get_step_increment(adj), NULL);
         break;
     case GDK_Page_Up:
-        scroll_change(viewport->vadjustment,
-                      -page_adjust, NULL);
+        scroll_change(adj, -page_adjust, NULL);
         break;
     case GDK_Page_Down:
-        scroll_change(viewport->vadjustment,
-                      page_adjust, NULL);
+        scroll_change(adj, page_adjust, NULL);
         break;
     case GDK_Home:
         if (event->state & GDK_CONTROL_MASK)
-            scroll_change(viewport->vadjustment,
-                          -viewport->vadjustment->value, NULL);
+            scroll_change(adj, -gtk_adjustment_get_value(adj), NULL);
         else
             return FALSE;
         break;
     case GDK_End:
         if (event->state & GDK_CONTROL_MASK)
-            scroll_change(viewport->vadjustment,
-                          viewport->vadjustment->upper, NULL);
+            scroll_change(adj, gtk_adjustment_get_upper(adj), NULL);
         else
             return FALSE;
         break;
@@ -257,8 +250,7 @@ balsa_mime_widget_key_press_event(GtkWidget * widget, GdkEventKey * event,
             return FALSE;
         break;
     case GDK_space:
-        scroll_change(viewport->vadjustment,
-                      page_adjust, bm);
+        scroll_change(adj, page_adjust, bm);
         break;
 
     default:

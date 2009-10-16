@@ -233,7 +233,7 @@ balsa_ab_window_init(BalsaAbWindow *ab)
     g_signal_connect(G_OBJECT(ab), "response",
 		     G_CALLBACK(balsa_ab_window_response_cb), NULL);
 
-    vbox = GTK_DIALOG(ab)->vbox;
+    vbox = gtk_dialog_get_content_area(GTK_DIALOG(ab));
 
     gtk_window_set_wmclass(GTK_WINDOW(ab), "addressbook", "Balsa");
 

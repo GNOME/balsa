@@ -557,7 +557,9 @@ libbalsa_smtp_server_dialog(LibBalsaSmtpServer * smtp_server,
 #define HIG_PADDING 12
     table = libbalsa_create_table(6, 2);
     gtk_container_set_border_width(GTK_CONTAINER(table), HIG_PADDING);
-    gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox), table);
+    gtk_container_add(GTK_CONTAINER
+                      (gtk_dialog_get_content_area(GTK_DIALOG(dialog))),
+                      table);
 
     row = 0;
     smtp_server_add_widget(table, row, _("_Descriptive Name:"),

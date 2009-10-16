@@ -1,5 +1,71 @@
 2009-10-15  Peter Bloomfield
 
+	GSEAL cleanup
+
+	* configure.in: enable GSEAL if gtk version >= 2.18.
+	* libbalsa/address-view.c (lbav_entry_changed_cb):
+	* libbalsa/address.c (addrlist_drag_received_cb):
+	* libbalsa/html.c (lbh_size_request_cb):
+	* libbalsa/identity.c (libbalsa_identity_select_dialog),
+	(md_sig_path_changed_cb), (ident_dialog_get_path),
+	(libbalsa_identity_config_dialog):
+	* libbalsa/libbalsa.c (ask_cert_real):
+	* libbalsa/misc.c (lb_create_size_group_func):
+	* libbalsa/rfc3156.c (select_key_from_list), (get_passphrase_real):
+	* libbalsa/send.c (ensure_send_progress_dialog):
+	* libbalsa/smtp-server.c (libbalsa_smtp_server_dialog):
+	* libbalsa/source-viewer.c (lsv_size_allocate_cb),
+	(libbalsa_show_message_source):
+	* libinit_balsa/assistant_helper.c (entry_changed_cb):
+	* src/ab-main.c (edit_new_entry_cb), (addrlist_drag_get_cb):
+	* src/ab-window.c (balsa_ab_window_init):
+	* src/address-book-config.c (create_generic_dialog),
+	(create_externq_dialog), (create_ldap_dialog), (create_gpe_dialog):
+	* src/balsa-app.c (ask_password_real):
+	* src/balsa-index.c (bndx_drag_cb), (bndx_mailbox_changed_cb),
+	(bndx_popup_position_func), (bndx_expand_to_row),
+	(balsa_index_pipe), (balsa_index_ensure_visible):
+	* src/balsa-mblist.c (bmbl_drag_cb), (bmbl_mru_show_tree):
+	* src/balsa-message.c (bm_on_set_style), (bm_find_scroll_to_iter),
+	(bm_find_pass_to_entry), (gtk_tree_hide_func), (select_part),
+	(scroll_set), (balsa_get_parent_window),
+	(balsa_message_grab_focus):
+	* src/balsa-mime-widget-callbacks.c (scroll_change),
+	(balsa_mime_widget_key_press_event):
+	* src/balsa-mime-widget-image.c (balsa_mime_widget_new_image),
+	(img_check_size):
+	* src/balsa-mime-widget-message.c (bm_header_widget_realized):
+	* src/balsa-mime-widget-text.c (gtk_widget_destroy_insensitive),
+	(draw_cite_bar_real):
+	* src/balsa-mime-widget.c (vadj_change_cb):
+	* src/filter-edit-callbacks.c (condition_validate),
+	(fill_condition_widgets), (build_condition_dialog):
+	* src/filter-edit-dialog.c (filters_edit_dialog):
+	* src/filter-export-dialog.c (filters_export_dialog):
+	* src/filter-run-dialog.c (balsa_filter_run_dialog_init):
+	* src/folder-conf.c (folder_conf_imap_node), (browse_button_cb),
+	(subfolder_conf_clicked_ok), (folder_conf_imap_sub_node):
+	* src/information-dialog.c (balsa_information_list):
+	* src/mailbox-conf.c (create_pop_mailbox_dialog),
+	(create_imap_mailbox_dialog):
+	* src/main-window.c (bw_quit_nicely):
+	* src/message-window.c (size_alloc_cb):
+	* src/pref-manager.c (open_preferences_manager), (apply_prefs),
+	(set_prefs), (timer_modified_cb),
+	(mailbox_close_timer_modified_cb), (imap_toggled_cb),
+	(convert_8bit_cb):
+	* src/print-gtk.c (check_margins), (message_prefs_apply):
+	* src/sendmsg-window.c (sw_size_alloc_cb), (sw_get_user_codeset),
+	(attachments_add), (sw_scroll_size_request), (drag_data_quote),
+	(quote_parts_select_dlg), (subject_not_empty),
+	(check_suggest_encryption):
+	* src/spell-check.c (balsa_spell_check_init):
+	* src/store-address.c (store_address_dialog):
+	* src/toolbar-factory.c (tm_popup_position_func):
+	* src/toolbar-prefs.c (customize_dialog_cb), (wrap_toggled_cb):
+
+2009-10-15  Peter Bloomfield
+
 	Re-implement BalsaCiteBar as a GTK_NO_WINDOW widget
 
 	* src/balsa-cite-bar.h: make BalsaCiteBar opaque.

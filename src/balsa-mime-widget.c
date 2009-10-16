@@ -337,7 +337,7 @@ balsa_mime_widget_schedule_resize(GtkWidget * widget)
 static void 
 vadj_change_cb(GtkAdjustment *vadj, GtkWidget *widget)
 {
-    gdouble upper = vadj->upper;
+    gdouble upper = gtk_adjustment_get_upper(vadj);
 
     /* do nothing if it's the same widget and the height hasn't changed
      *

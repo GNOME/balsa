@@ -567,7 +567,7 @@ lbav_entry_changed_cb(GtkEntry * entry, LibBalsaAddressView * address_view)
 
     completion = gtk_entry_get_completion(entry);
 
-    if (GTK_WIDGET_REALIZED(GTK_WIDGET(entry)))
+    if (gtk_widget_get_window(GTK_WIDGET(entry)))
         lbav_entry_setup_matches(address_view, entry, completion,
                                  LIBBALSA_ADDRESS_VIEW_MATCH_FAST);
 }

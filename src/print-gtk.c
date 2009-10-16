@@ -463,10 +463,14 @@ add_margin_spinbtn(const gchar * text, gdouble min, gdouble max, gdouble dflt,
 }
 
 static void
-check_margins(GtkAdjustment *adjustment, GtkAdjustment *other)
+check_margins(GtkAdjustment * adjustment, GtkAdjustment * other)
 {
-    if (adjustment->value + other->value > adjustment->upper)
-	gtk_adjustment_set_value(adjustment, adjustment->upper - other->value);
+    if (gtk_adjustment_get_value(adjustment) +
+        gtk_adjustment_get_value(other) >
+        gtk_adjustment_get_upper(adjustment))
+        gtk_adjustment_set_value(adjustment,
+                                 gtk_adjustment_get_upper(adjustment) -
+                                 gtk_adjustment_get_value(other));
 }
 
 static GtkWidget *
@@ -641,9 +645,11 @@ message_prefs_apply(GtkPrintOperation * operation, GtkWidget * widget,
 	g_strdup(gtk_font_button_get_font_name
 		 (GTK_FONT_BUTTON(print_prefs->footer_font)));
     balsa_app.print_highlight_cited =
-	GTK_TOGGLE_BUTTON(print_prefs->highlight_cited)->active;
+	gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
+                                     (print_prefs->highlight_cited));
     balsa_app.print_highlight_phrases =
-	GTK_TOGGLE_BUTTON(print_prefs->highlight_phrases)->active;
+	gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
+                                     (print_prefs->highlight_phrases));
 
     balsa_app.margin_top =
 	gtk_spin_button_get_value(GTK_SPIN_BUTTON(print_prefs->margin_top)) * 72.0;

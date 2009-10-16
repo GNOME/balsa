@@ -72,6 +72,7 @@ static gchar *
 ask_password_real(LibBalsaServer * server, LibBalsaMailbox * mbox)
 {
     GtkWidget *dialog, *entry, *rememb;
+    GtkWidget *content_area;
     gchar *prompt, *passwd = NULL;
 #if defined(HAVE_GNOME_KEYRING)
     static const gchar *remember_password_message =
@@ -101,21 +102,22 @@ ask_password_real(LibBalsaServer * server, LibBalsaMailbox * mbox)
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu_for_parent(dialog, GTK_WINDOW(balsa_app.main_window));
 #endif
-    gtk_box_set_spacing(GTK_BOX(GTK_DIALOG(dialog)->vbox), HIG_PADDING);
-    gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox),
+    content_area = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
+    gtk_box_set_spacing(GTK_BOX(content_area), HIG_PADDING);
+    gtk_container_add(GTK_CONTAINER(content_area),
                       gtk_label_new_with_mnemonic(prompt));
     g_free(prompt);
-    gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox),
+    gtk_container_add(GTK_CONTAINER(content_area),
                       entry = gtk_entry_new());
     gtk_entry_set_width_chars(GTK_ENTRY(entry), 20);
     gtk_entry_set_visibility(GTK_ENTRY(entry), FALSE);
 
     rememb =  gtk_check_button_new_with_mnemonic(_(remember_password_message));
-    gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox), rememb);
+    gtk_container_add(GTK_CONTAINER(content_area), rememb);
     if(server->remember_passwd)
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(rememb), TRUE);
 
-    gtk_widget_show_all(GTK_WIDGET(GTK_DIALOG(dialog)->vbox));
+    gtk_widget_show_all(content_area);
     gtk_entry_set_activates_default(GTK_ENTRY(entry), TRUE);
     gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
     gtk_widget_grab_focus (entry);

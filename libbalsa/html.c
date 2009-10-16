@@ -106,8 +106,8 @@ lbh_size_request_cb(GtkWidget      * widget,
 {
     LibBalsaWebKitInfo *info = data;
 
-    requisition->width  = info->hadj->upper;
-    requisition->height = info->vadj->upper;
+    requisition->width  = gtk_adjustment_get_upper(info->hadj);
+    requisition->height = gtk_adjustment_get_upper(info->vadj);
 }
 
 static WebKitNavigationResponse
@@ -272,8 +272,13 @@ lbh_size_request_cb(GtkWidget      * widget,
                     GtkRequisition * requisition,
                     gpointer         data)
 {
-    requisition->width  = GTK_LAYOUT(widget)->hadjustment->upper;
-    requisition->height = GTK_LAYOUT(widget)->vadjustment->upper;
+    GtkLayout *layout = GTK_LAYOUT(widget);
+    GtkAdjustment *adjustment;
+
+    adjustment = gtk_layout_get_hadjustment(layout);
+    requisition->width = gtk_adjustment_get_upper(adjustment);
+    adjustment = gtk_layout_get_vadjustment(layout);
+    requisition->height = gtk_adjustment_get_upper(adjustment);
 }
 
 # ifdef HAVE_GTKHTML3

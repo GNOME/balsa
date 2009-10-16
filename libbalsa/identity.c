@@ -506,7 +506,8 @@ libbalsa_identity_select_dialog(GtkWindow * parent,
     identity_list_update_real(GTK_TREE_VIEW(tree), identities, initial_id);
 
     frame = gtk_frame_new(NULL);
-    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox),
+    gtk_box_pack_start(GTK_BOX
+                       (gtk_dialog_get_content_area(GTK_DIALOG(dialog))),
                        frame, TRUE, TRUE, 0);
     gtk_container_add(GTK_CONTAINER(frame), tree);
     gtk_container_set_border_width(GTK_CONTAINER(frame), padding);
@@ -970,7 +971,8 @@ struct {
 };
 
 #define LIBBALSA_IDENTITY_CHECK "libbalsa-identity-check"
-static void md_sig_path_changed_cb(GtkWidget *sig_button, GObject *dialog);
+static void md_sig_path_changed_cb(GtkToggleButton * sig_button,
+                                   GObject * dialog);
 
 #if ENABLE_ESMTP
 static GtkWidget*
@@ -1292,10 +1294,9 @@ md_sig_path_changed(gboolean active, GObject * dialog)
 }
 
 static void
-md_sig_path_changed_cb(GtkWidget *sig_button, GObject *dialog)
+md_sig_path_changed_cb(GtkToggleButton *sig_button, GObject *dialog)
 {
-    md_sig_path_changed(GTK_TOGGLE_BUTTON(sig_button)->active,
-                        dialog);
+    md_sig_path_changed(gtk_toggle_button_get_active(sig_button), dialog);
 }
 
 #define LIBBALSA_IDENTITY_INFO "libbalsa-identity-info"
@@ -1554,8 +1555,13 @@ ident_dialog_get_path(GObject * dialog, const gchar * key)
     GtkWidget *chooser;
 
     chooser = g_object_get_data(dialog, key);
+#if GTK_CHECK_VERSION(2, 18, 0)
+    if (!gtk_widget_get_sensitive(chooser))
+        return NULL;
+#else                           /* GTK_CHECK_VERSION(2, 18, 0) */
     if (!GTK_WIDGET_SENSITIVE(chooser))
         return NULL;
+#endif                          /* GTK_CHECK_VERSION(2, 18, 0) */
 
     return gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(chooser));
 }
@@ -1718,7 +1724,7 @@ libbalsa_identity_config_dialog(GtkWindow *parent, GList **identities,
 
     /* Show only one dialog at a time. */
     if (dialog) {
-        gdk_window_raise(dialog->window);
+        gtk_window_present(GTK_WINDOW(dialog));
         return;
     }
 
@@ -1747,7 +1753,8 @@ libbalsa_identity_config_dialog(GtkWindow *parent, GList **identities,
                                     IDENTITY_RESPONSE_CLOSE);
 
     hbox = gtk_hbox_new(FALSE, padding);
-    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox), 
+    gtk_box_pack_start(GTK_BOX
+                       (gtk_dialog_get_content_area(GTK_DIALOG(dialog))),
                        hbox, TRUE, TRUE, 0);
 
     gtk_box_pack_start(GTK_BOX(hbox), frame, FALSE, FALSE, 0);

@@ -93,7 +93,8 @@ filters_export_dialog(void)
                                  NULL, TRUE);
 
     gtk_container_add(GTK_CONTAINER(sw), GTK_WIDGET(list));
-    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(fex_window)->vbox),
+    gtk_box_pack_start(GTK_BOX
+                       (gtk_dialog_get_content_area(GTK_DIALOG(fex_window))),
                        sw, TRUE, TRUE, 2);
 
     /* Populate the list of filters */

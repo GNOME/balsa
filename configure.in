@@ -881,7 +881,10 @@ fi
 if test -d "${srcdir}/.git" ; then
 	BALSA_FROM_GIT=yes
 	BALSA_CFLAGS="$BALSA_CFLAGS -Wall -Werror"
-        BALSA_DEFS="\
+        if $PKG_CONFIG --atleast-version=2.18 gtk+-2.0; then
+            BALSA_DEFS="-DGSEAL_ENABLE"
+        fi
+        BALSA_DEFS="$BALSA_DEFS \
 -DG_DISABLE_DEPRECATED \
 -DGDK_DISABLE_DEPRECATED \
 -DGDK_PIXBUF_DISABLE_DEPRECATED \
@@ -891,7 +894,8 @@ if test -d "${srcdir}/.git" ; then
 -DGNOME_VFS_DISABLE_DEPRECATED \
 -DGTK_DISABLE_DEPRECATED \
 -DPANGO_DISABLE_DEPRECATED \
--D_FORTIFY_SOURCE=2"
+-D_FORTIFY_SOURCE=2 \
+"
 else
 	BALSA_FROM_GIT=no
 fi

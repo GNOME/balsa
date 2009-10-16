@@ -878,10 +878,12 @@ addrlist_drag_received_cb(GtkWidget * widget, GdkDragContext * context,
 
     printf("drag_received:\n");
     /* Deal with what we are given from source */
-    if((selection_data != NULL) && (selection_data-> length >= 0)) {        
+    if(selection_data
+       && gtk_selection_data_get_length(selection_data) >= 0) {
         switch (target_type) {
         case LIBBALSA_ADDRESS_TRG_ADDRESS:
-            addr = *(LibBalsaAddress**)selection_data->data;
+            addr = *(LibBalsaAddress **)
+                gtk_selection_data_get_data(selection_data);
             if(addr && addr->address_list) {
                 g_print ("string: %s\n", (gchar*)addr->address_list->data);
                 gtk_list_store_insert_with_values(GTK_LIST_STORE(model),

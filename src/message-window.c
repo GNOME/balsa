@@ -812,12 +812,14 @@ mw_header_activate_cb(GtkAction * action, gpointer data)
 static void
 size_alloc_cb(GtkWidget * window, GtkAllocation * alloc)
 {
-    if (!GTK_WIDGET_REALIZED(window))
+    GdkWindow *gdk_window;
+
+    if (!(gdk_window = gtk_widget_get_window(window)))
         return;
 
     if (!(balsa_app.message_window_maximized =
-          gdk_window_get_state(window->window)
-          & GDK_WINDOW_STATE_MAXIMIZED)) {
+          (gdk_window_get_state(gdk_window)
+           & GDK_WINDOW_STATE_MAXIMIZED))) {
         balsa_app.message_window_height = alloc->height;
         balsa_app.message_window_width  = alloc->width;
     }

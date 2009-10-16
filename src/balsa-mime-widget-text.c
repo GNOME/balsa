@@ -557,9 +557,15 @@ fix_text_widget(GtkWidget *widget, gpointer data)
 static void
 gtk_widget_destroy_insensitive(GtkWidget * widget)
 {
+#if GTK_CHECK_VERSION(2, 18, 0)
+    if (!gtk_widget_get_sensitive(widget) ||
+	GTK_IS_SEPARATOR_MENU_ITEM(widget))
+	gtk_widget_destroy(widget);
+#else                           /* GTK_CHECK_VERSION(2, 18, 0) */
     if (!GTK_WIDGET_SENSITIVE(widget) ||
 	GTK_IS_SEPARATOR_MENU_ITEM(widget))
 	gtk_widget_destroy(widget);
+#endif                          /* GTK_CHECK_VERSION(2, 18, 0) */
 }
 
 static void
@@ -1072,8 +1078,10 @@ draw_cite_bar_real(cite_bar_t * bar, cite_bar_draw_mode_t * draw_mode)
 	bar->bar = balsa_cite_bar_new(height, bar->depth, draw_mode->dimension);
 	gtk_widget_modify_fg(bar->bar, GTK_STATE_NORMAL,
 			     &balsa_app.quoted_color[(bar->depth - 1) % MAX_QUOTED_COLOR]);
-	gtk_widget_modify_bg(bar->bar, GTK_STATE_NORMAL,
-			     &GTK_WIDGET(draw_mode->view)->style->base[GTK_STATE_NORMAL]);
+        gtk_widget_modify_bg(bar->bar, GTK_STATE_NORMAL,
+                             &gtk_widget_get_style(GTK_WIDGET
+                                                   (draw_mode->view))->
+                             base[GTK_STATE_NORMAL]);
 	gtk_widget_show(bar->bar);
 	gtk_text_view_add_child_in_window(draw_mode->view, bar->bar,
 					  GTK_TEXT_WINDOW_TEXT, 0, y_pos);

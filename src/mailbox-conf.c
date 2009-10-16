@@ -1256,7 +1256,9 @@ create_pop_mailbox_dialog(MailboxConfWindow *mcw)
     gtk_widget_grab_focus(mcw->mailbox_name);
 
     dialog = create_generic_dialog(mcw);
-    gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox), notebook);
+    gtk_container_add(GTK_CONTAINER
+                      (gtk_dialog_get_content_area(GTK_DIALOG(dialog))),
+                      notebook);
     return dialog;
 }
 
@@ -1378,7 +1380,9 @@ create_imap_mailbox_dialog(MailboxConfWindow *mcw)
                           mcw->mailbox_name : mcw->mb_data.imap.bsc.server);
 
     dialog = create_generic_dialog(mcw);
-    gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox), notebook);
+    gtk_container_add(GTK_CONTAINER
+                      (gtk_dialog_get_content_area(GTK_DIALOG(dialog))),
+                      notebook);
 
     mcw->view_info =
         mailbox_conf_view_new_full(mcw->mailbox, GTK_WINDOW(dialog), table,

@@ -579,7 +579,8 @@ ask_cert_real(void *data)
     label = gtk_label_new(str->str);
     g_string_free(str, TRUE);
     gtk_label_set_use_markup(GTK_LABEL(label), TRUE);
-    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox),
+    gtk_box_pack_start(GTK_BOX
+                       (gtk_dialog_get_content_area(GTK_DIALOG(dialog))),
                        label, TRUE, TRUE, 1);
     gtk_widget_show(label);
 

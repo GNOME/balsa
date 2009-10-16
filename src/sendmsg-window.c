@@ -1644,10 +1644,12 @@ update_bsmsg_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity* ident)
 static void
 sw_size_alloc_cb(GtkWidget * window, GtkAllocation * alloc)
 {
-    if (!GTK_WIDGET_REALIZED(window))
+    GdkWindow *gdk_window;
+
+    if (!(gdk_window = gtk_widget_get_window(window)))
         return;
 
-    if (!(balsa_app.sw_maximized = gdk_window_get_state(window->window)
+    if (!(balsa_app.sw_maximized = gdk_window_get_state(gdk_window)
           & GDK_WINDOW_STATE_MAXIMIZED)) {
         balsa_app.sw_height = alloc->height;
         balsa_app.sw_width  = alloc->width;
@@ -1851,16 +1853,16 @@ sw_get_user_codeset(BalsaSendmsg * bsmsg, gboolean * change_type,
          fname);
     GtkWidget *info = gtk_label_new(msg);
     GtkWidget *charset_button = libbalsa_charset_button_new();
+    GtkBox *content_box;
 
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu_for_parent(dialog, GTK_WINDOW(bsmsg->window));
 #endif
 
     g_free(msg);
-    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox), info,
-                       FALSE, TRUE, 5);
-    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox), charset_button,
-                       TRUE, TRUE, 5);
+    content_box = GTK_BOX(gtk_dialog_get_content_area(GTK_DIALOG(dialog)));
+    gtk_box_pack_start(content_box, info, FALSE, TRUE, 5);
+    gtk_box_pack_start(content_box, charset_button, TRUE, TRUE, 5);
     gtk_widget_show(info);
     gtk_widget_show(charset_button);
     gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
@@ -1870,8 +1872,7 @@ sw_get_user_codeset(BalsaSendmsg * bsmsg, gboolean * change_type,
         GtkWidget *hbox = gtk_hbox_new(FALSE, 5);
         combo_box = gtk_combo_box_new_text();
 
-        gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox), hbox,
-                           TRUE, TRUE, 5);
+        gtk_box_pack_start(content_box, hbox, TRUE, TRUE, 5);
         gtk_box_pack_start(GTK_BOX(hbox), label, TRUE, TRUE, 0);
         gtk_combo_box_append_text(GTK_COMBO_BOX(combo_box), mime_type);
         gtk_combo_box_append_text(GTK_COMBO_BOX(combo_box),
@@ -2490,7 +2491,8 @@ attachments_add(GtkWidget * widget,
     if (balsa_app.debug)
         printf("attachments_add: info %d\n", info);
     if (info == TARGET_MESSAGES) {
-	BalsaIndex *index = *(BalsaIndex **) selection_data->data;
+	BalsaIndex *index =
+            *(BalsaIndex **) gtk_selection_data_get_data(selection_data);
 	LibBalsaMailbox *mailbox = index->mailbox_node->mailbox;
         GArray *selected = balsa_index_selected_msgnos_new(index);
 	guint i;
@@ -2511,14 +2513,18 @@ attachments_add(GtkWidget * widget,
         }
         balsa_index_selected_msgnos_free(index, selected);
     } else if (info == TARGET_URI_LIST) {
-        GSList *uri_list = uri2gslist((gchar *) selection_data->data);
+        GSList *uri_list =
+            uri2gslist((gchar *)
+                       gtk_selection_data_get_data(selection_data));
         for (; uri_list; uri_list = g_slist_next(uri_list)) {
 	    add_attachment(bsmsg, uri_list->data, FALSE, NULL);
             g_free(uri_list->data);
         }
         g_slist_free(uri_list);
     } else if( info == TARGET_STRING) {
-	gchar *url = rfc2396_uri((gchar *) selection_data->data);
+	gchar *url =
+            rfc2396_uri((gchar *)
+                        gtk_selection_data_get_data(selection_data));
 
 	if (url)
 	    add_urlref_attachment(bsmsg, url);
@@ -2624,12 +2630,13 @@ sw_scroll_size_request(GtkWidget * widget, GtkRequisition * requisition)
     gint border_width;
     GtkPolicyType type = GTK_POLICY_NEVER;
 
-    gtk_widget_size_request(GTK_BIN(widget)->child, requisition);
+    gtk_widget_size_request(gtk_bin_get_child(GTK_BIN(widget)),
+                            requisition);
     gtk_widget_style_get(widget, "focus-line-width", &focus_width,
                          "focus-padding", &focus_pad, NULL);
 
     border_width =
-        (GTK_CONTAINER(widget)->border_width + focus_width +
+        (gtk_container_get_border_width(GTK_CONTAINER(widget)) + focus_width +
          focus_pad) * 2;
     requisition->width += border_width;
     requisition->height += border_width;
@@ -3063,7 +3070,8 @@ drag_data_quote(GtkWidget * widget,
 
     switch(info) {
     case TARGET_MESSAGES:
-	index = *(BalsaIndex **) selection_data->data;
+	index =
+            *(BalsaIndex **) gtk_selection_data_get_data(selection_data);
 	mailbox = index->mailbox_node->mailbox;
         selected = balsa_index_selected_msgnos_new(index);
 	buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(widget));
@@ -3085,7 +3093,9 @@ drag_data_quote(GtkWidget * widget,
         balsa_index_selected_msgnos_free(index, selected);
         break;
     case TARGET_URI_LIST: {
-        GSList *uri_list = uri2gslist((gchar *) selection_data->data);
+        GSList *uri_list =
+            uri2gslist((gchar *)
+                       gtk_selection_data_get_data(selection_data));
         for (; uri_list; uri_list = g_slist_next(uri_list)) {
             /* Since current GtkTextView gets this signal twice for
              * every action (#150141) we need to check for duplicates,
@@ -3595,6 +3605,7 @@ quote_parts_select_dlg(GtkTreeStore *tree_store, GtkWindow * parent)
     GtkCellRenderer *renderer;
     GtkTreeIter iter;
     gboolean result;
+    GtkBox *content_box;
 
     dialog = gtk_dialog_new_with_buttons(_("Select parts for quotation"),
 					 parent,
@@ -3621,12 +3632,12 @@ quote_parts_select_dlg(GtkTreeStore *tree_store, GtkWindow * parent)
     gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(hbox), image, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(hbox), vbox, TRUE, TRUE, 0);
-    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox), hbox, TRUE,
-		       TRUE, 0);
+    content_box = GTK_BOX(gtk_dialog_get_content_area(GTK_DIALOG(dialog)));
+    gtk_box_pack_start(content_box, hbox, TRUE, TRUE, 0);
 
     gtk_container_set_border_width(GTK_CONTAINER(dialog), 5);
     gtk_container_set_border_width(GTK_CONTAINER(hbox), 5);
-    gtk_box_set_spacing(GTK_BOX(GTK_DIALOG(dialog)->vbox), 14);
+    gtk_box_set_spacing(content_box, 14);
 
     /* scrolled window for the tree view */
     scroll = gtk_scrolled_window_new(NULL, NULL);
@@ -5639,7 +5650,7 @@ subject_not_empty(BalsaSendmsg * bsmsg)
     gtk_window_set_type_hint (GTK_WINDOW (no_subj_dialog), GDK_WINDOW_TYPE_HINT_DIALOG);
     gtk_dialog_set_has_separator (GTK_DIALOG (no_subj_dialog), FALSE);
 
-    dialog_vbox = GTK_DIALOG (no_subj_dialog)->vbox;
+    dialog_vbox = gtk_dialog_get_content_area(GTK_DIALOG(no_subj_dialog));
 
     hbox = gtk_hbox_new (FALSE, 12);
     gtk_box_pack_start (GTK_BOX (dialog_vbox), hbox, TRUE, TRUE, 0);
@@ -5673,16 +5684,25 @@ subject_not_empty(BalsaSendmsg * bsmsg)
     gtk_box_pack_start (GTK_BOX (hbox), subj_entry, TRUE, TRUE, 0);
     gtk_entry_set_activates_default (GTK_ENTRY (subj_entry), TRUE);
 
-    dialog_action_area = GTK_DIALOG (no_subj_dialog)->action_area;
+    dialog_action_area =
+        gtk_dialog_get_action_area(GTK_DIALOG(no_subj_dialog));
     gtk_button_box_set_layout (GTK_BUTTON_BOX (dialog_action_area), GTK_BUTTONBOX_END);
 
     cnclbutton = gtk_button_new_from_stock (GTK_STOCK_CANCEL);
     gtk_dialog_add_action_widget (GTK_DIALOG (no_subj_dialog), cnclbutton, GTK_RESPONSE_CANCEL);
+#if GTK_CHECK_VERSION(2, 18, 0)
+    gtk_widget_set_can_default(cnclbutton, TRUE);
+#else                           /* GTK_CHECK_VERSION(2, 18, 0) */
     GTK_WIDGET_SET_FLAGS (cnclbutton, GTK_CAN_DEFAULT);
+#endif                          /* GTK_CHECK_VERSION(2, 18, 0) */
 
     okbutton = gtk_button_new ();
     gtk_dialog_add_action_widget (GTK_DIALOG (no_subj_dialog), okbutton, GTK_RESPONSE_OK);
+#if GTK_CHECK_VERSION(2, 18, 0)
+    gtk_widget_set_can_default(okbutton, TRUE);
+#else                           /* GTK_CHECK_VERSION(2, 18, 0) */
     GTK_WIDGET_SET_FLAGS (okbutton, GTK_CAN_DEFAULT);
+#endif                          /* GTK_CHECK_VERSION(2, 18, 0) */
     gtk_dialog_set_default_response(GTK_DIALOG (no_subj_dialog),
                                     GTK_RESPONSE_OK);
 
@@ -5697,8 +5717,13 @@ subject_not_empty(BalsaSendmsg * bsmsg)
 
     label = gtk_label_new_with_mnemonic (_("_Send"));
     gtk_box_pack_start (GTK_BOX (hbox), label, FALSE, FALSE, 0);
+#if GTK_CHECK_VERSION(2, 18, 0)
+    gtk_widget_set_can_focus(label, TRUE);
+    gtk_widget_set_can_default(label, TRUE);
+#else                           /* GTK_CHECK_VERSION(2, 18, 0) */
     GTK_WIDGET_SET_FLAGS (label, GTK_CAN_FOCUS);
     GTK_WIDGET_SET_FLAGS (label, GTK_CAN_DEFAULT);
+#endif                          /* GTK_CHECK_VERSION(2, 18, 0) */
 
     gtk_widget_grab_focus (subj_entry);
     gtk_editable_select_region(GTK_EDITABLE(subj_entry), 0, -1);
@@ -5782,12 +5807,16 @@ check_suggest_encryption(BalsaSendmsg * bsmsg)
         libbalsa_macosx_menu_for_parent(dialog, GTK_WINDOW(bsmsg->window));
 #endif
 
-	dialog_action_area = GTK_DIALOG(dialog)->action_area;
+	dialog_action_area = gtk_dialog_get_action_area(GTK_DIALOG(dialog));
 	gtk_button_box_set_layout(GTK_BUTTON_BOX(dialog_action_area), GTK_BUTTONBOX_END);
  
 	button = gtk_button_new();
 	gtk_dialog_add_action_widget(GTK_DIALOG(dialog), button, GTK_RESPONSE_YES);
+#if GTK_CHECK_VERSION(2, 18, 0)
+        gtk_widget_set_can_default(button, TRUE);
+#else                           /* GTK_CHECK_VERSION(2, 18, 0) */
 	GTK_WIDGET_SET_FLAGS(button, GTK_CAN_DEFAULT);
+#endif                          /* GTK_CHECK_VERSION(2, 18, 0) */
 	gtk_widget_grab_focus(button);
 	alignment = gtk_alignment_new (0.5, 0.5, 0, 0);
 	gtk_container_add(GTK_CONTAINER(button), alignment);
@@ -5802,7 +5831,11 @@ check_suggest_encryption(BalsaSendmsg * bsmsg)
 
 	button = gtk_button_new();
 	gtk_dialog_add_action_widget(GTK_DIALOG(dialog), button, GTK_RESPONSE_NO);
+#if GTK_CHECK_VERSION(2, 18, 0)
+        gtk_widget_set_can_default(button, TRUE);
+#else                           /* GTK_CHECK_VERSION(2, 18, 0) */
 	GTK_WIDGET_SET_FLAGS(button, GTK_CAN_DEFAULT);
+#endif                          /* GTK_CHECK_VERSION(2, 18, 0) */
 	alignment = gtk_alignment_new (0.5, 0.5, 0, 0);
 	gtk_container_add(GTK_CONTAINER(button), alignment);
 
@@ -5817,7 +5850,11 @@ check_suggest_encryption(BalsaSendmsg * bsmsg)
 	button = gtk_button_new_from_stock(GTK_STOCK_CANCEL);
 	gtk_widget_show(button);
 	gtk_dialog_add_action_widget(GTK_DIALOG(dialog), button, GTK_RESPONSE_CANCEL);
+#if GTK_CHECK_VERSION(2, 18, 0)
+        gtk_widget_set_can_default(button, TRUE);
+#else                           /* GTK_CHECK_VERSION(2, 18, 0) */
 	GTK_WIDGET_SET_FLAGS(button, GTK_CAN_DEFAULT);
+#endif                          /* GTK_CHECK_VERSION(2, 18, 0) */
 
 	choice = gtk_dialog_run(GTK_DIALOG(dialog));
 	gtk_widget_destroy(dialog);

@@ -497,8 +497,8 @@ edit_new_entry_cb(GtkAction * action, gpointer user_data)
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW
                                             (contacts_app.entry_list));
     gtk_tree_selection_unselect_all(selection);
-    gtk_widget_grab_focus(GTK_CONTAINER(contacts_app.edit_widget)->
-                          focus_child);
+    gtk_widget_grab_focus(gtk_container_get_focus_child
+                          (GTK_CONTAINER(contacts_app.edit_widget)));
 }
 
 static LibBalsaABErr
@@ -769,8 +769,9 @@ addrlist_drag_get_cb(GtkWidget* widget, GdkDragContext* drag_context,
             return;
         gtk_tree_model_get_value(model, &iter, LIST_COLUMN_ADDRESS, &gv);
         address = LIBBALSA_ADDRESS(g_value_get_object(&gv));
-        gtk_selection_data_set(sel_data, sel_data->target, 8,
-                               (const guchar *) &address,
+        gtk_selection_data_set(sel_data,
+                               gtk_selection_data_get_target(sel_data),
+                               8, (const guchar *) &address,
                                sizeof(LibBalsaAddress*));
         break;
     case LIBBALSA_ADDRESS_TRG_STRING:

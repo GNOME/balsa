@@ -1382,7 +1382,9 @@ select_key_from_list(const gchar * name, gboolean is_secret,
     libbalsa_macosx_menu_for_parent(dialog, parent);
 #endif
     vbox = gtk_vbox_new(FALSE, 12);
-    gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox), vbox);
+    gtk_container_add(GTK_CONTAINER
+                      (gtk_dialog_get_content_area(GTK_DIALOG(dialog))),
+                      vbox);
     gtk_container_set_border_width(GTK_CONTAINER(vbox), 12);
     if (is_secret)
 	prompt =
@@ -1491,7 +1493,7 @@ select_key_from_list(const gchar * name, gboolean is_secret,
 
     gtk_container_add(GTK_CONTAINER(scrolled_window), tree_view);
     gtk_window_set_default_size(GTK_WINDOW(dialog), 500, 300);
-    gtk_widget_show_all(GTK_DIALOG(dialog)->vbox);
+    gtk_widget_show_all(gtk_dialog_get_content_area(GTK_DIALOG(dialog)));
 
     if (gtk_dialog_run(GTK_DIALOG(dialog)) != GTK_RESPONSE_OK)
 	use_key = NULL;
@@ -1572,7 +1574,9 @@ get_passphrase_real(GMimeGpgmeContext * ctx, const gchar * uid_hint,
 #endif
     hbox = gtk_hbox_new(FALSE, 12);
     gtk_container_set_border_width(GTK_CONTAINER(hbox), 12);
-    gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox), hbox);
+    gtk_container_add(GTK_CONTAINER
+                      (gtk_dialog_get_content_area(GTK_DIALOG(dialog))),
+                      hbox);
 
     vbox = gtk_vbox_new(FALSE, 12);
     gtk_container_add(GTK_CONTAINER(hbox), vbox);
@@ -1599,7 +1603,7 @@ get_passphrase_real(GMimeGpgmeContext * ctx, const gchar * uid_hint,
     entry = gtk_entry_new();
     gtk_container_add(GTK_CONTAINER(vbox), entry);
 
-    gtk_widget_show_all(GTK_WIDGET(GTK_DIALOG(dialog)->vbox));
+    gtk_widget_show_all(gtk_dialog_get_content_area(GTK_DIALOG(dialog)));
     gtk_entry_set_width_chars(GTK_ENTRY(entry), 40);
     gtk_entry_set_visibility(GTK_ENTRY(entry), FALSE);
 

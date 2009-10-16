@@ -354,7 +354,7 @@ bm_on_set_style(GtkWidget * widget,
     GtkStyle *new_style, *text_view_style;
     int n;
 
-    new_style = gtk_style_copy(target->style);
+    new_style = gtk_style_copy(gtk_widget_get_style(target));
     text_view_style =
 	gtk_rc_get_style_by_paths(gtk_widget_get_settings(target),
 				  NULL, NULL, gtk_text_view_get_type());
@@ -424,7 +424,8 @@ bm_find_scroll_to_iter(BalsaMessage * bm,
                        GtkTextView  * text_view,
                        GtkTextIter  * iter)
 {
-    GtkAdjustment *adj = GTK_VIEWPORT(bm->cont_viewport)->vadjustment;
+    GtkAdjustment *adj =
+        gtk_viewport_get_vadjustment(GTK_VIEWPORT(bm->cont_viewport));
     GdkRectangle location;
     gdouble y;
 
@@ -595,19 +596,33 @@ bm_find_pass_to_entry(BalsaMessage * bm, GdkEventKey * event)
         bm_disable_find_entry(bm);
         return res;
     case GDK_g:
+#if GTK_CHECK_VERSION(2, 18, 0)
         if ((event->state & (GDK_SHIFT_MASK | GDK_CONTROL_MASK)) ==
-            GDK_CONTROL_MASK && GTK_WIDGET_SENSITIVE(bm->find_next)) {
+            GDK_CONTROL_MASK && gtk_widget_get_sensitive(bm->find_next)) {
             bm_find_again(bm, bm->find_forward);
             return res;
         }
+#else                           /* GTK_CHECK_VERSION(2, 18, 0) */
+        if ((event->state & (GDK_SHIFT_MASK | GDK_CONTROL_MASK)) ==
+            GDK_CONTROL_MASK && GTK_WIDGET_IS_SENSITIVE(bm->find_next)) {
+            bm_find_again(bm, bm->find_forward);
+            return res;
+        }
+#endif                          /* GTK_CHECK_VERSION(2, 18, 0) */
     default:
         break;
     }
 
     res = FALSE;
+#if GTK_CHECK_VERSION(2, 18, 0)
+    if (gtk_widget_has_focus(bm->find_entry))
+        g_signal_emit_by_name(bm->find_entry, "key-press-event", event,
+                              &res, NULL);
+#else                           /* GTK_CHECK_VERSION(2, 18, 0) */
     if (GTK_WIDGET_HAS_FOCUS(bm->find_entry))
         g_signal_emit_by_name(bm->find_entry, "key-press-event", event,
                               &res, NULL);
+#endif                          /* GTK_CHECK_VERSION(2, 18, 0) */
 
     return res;
 }
@@ -2150,12 +2165,14 @@ gtk_tree_hide_func(GtkTreeModel * model, GtkTreePath * path,
 
     gtk_tree_model_get(model, iter, PART_INFO_COLUMN, &info, -1);
     if (info) {
-        if (info->mime_widget && info->mime_widget->widget && info->mime_widget->widget->parent)
-            gtk_container_remove(GTK_CONTAINER(info->mime_widget->widget->parent),
-                                 info->mime_widget->widget);
-        g_object_unref(G_OBJECT(info));
+        GtkWidget *widget, *parent;
+
+        if (info->mime_widget && (widget = info->mime_widget->widget)
+            && (parent = gtk_widget_get_parent(widget)))
+            gtk_container_remove(GTK_CONTAINER(parent), widget);
+        g_object_unref(info);
     }
-    
+
     return FALSE;
 }
 
@@ -2202,8 +2219,10 @@ select_part(BalsaMessage * bm, BalsaPartInfo *info)
     if(bm->current_part)
         g_signal_emit(G_OBJECT(bm), balsa_message_signals[SELECT_PART], 0);
 
-    scroll_set(GTK_VIEWPORT(bm->cont_viewport)->hadjustment, 0);
-    scroll_set(GTK_VIEWPORT(bm->cont_viewport)->vadjustment, 0);
+    scroll_set(gtk_viewport_get_hadjustment
+               (GTK_VIEWPORT(bm->cont_viewport)), 0);
+    scroll_set(gtk_viewport_get_vadjustment
+               (GTK_VIEWPORT(bm->cont_viewport)), 0);
 
     gtk_widget_queue_resize(bm->cont_viewport);
 }
@@ -2211,18 +2230,14 @@ select_part(BalsaMessage * bm, BalsaPartInfo *info)
 static void
 scroll_set(GtkAdjustment * adj, gint value)
 {
-    gfloat upper;
+    gdouble upper;
 
     if (!adj)
         return;
 
-    adj->value = value;
-
-    upper = adj->upper - adj->page_size;
-    adj->value = MIN(adj->value, upper);
-    adj->value = MAX(adj->value, 0.0);
-
-    g_signal_emit_by_name(G_OBJECT(adj), "value_changed", 0);
+    upper =
+        gtk_adjustment_get_upper(adj) - gtk_adjustment_get_page_size(adj);
+    gtk_adjustment_set_value(adj, MIN((gdouble) value, upper));
 }
 
 GtkWidget *
@@ -2241,8 +2256,13 @@ balsa_get_parent_window(GtkWidget * widget)
     if (widget) {
         GtkWidget *toplevel = gtk_widget_get_toplevel(widget);
 
+#if GTK_CHECK_VERSION(2, 18, 0)
+        if (gtk_widget_is_toplevel(toplevel) && GTK_IS_WINDOW(toplevel))
+            return GTK_WINDOW(toplevel);
+#else                           /* GTK_CHECK_VERSION(2, 18, 0) */
         if (GTK_WIDGET_TOPLEVEL(toplevel) && GTK_IS_WINDOW(toplevel))
             return GTK_WINDOW(toplevel);
+#endif                          /* GTK_CHECK_VERSION(2, 18, 0) */
     }
 
     return GTK_WINDOW(balsa_app.main_window);
@@ -2274,14 +2294,21 @@ balsa_message_can_select(BalsaMessage * bmessage)
 gboolean
 balsa_message_grab_focus(BalsaMessage * bmessage)
 {
+    GtkWidget *widget;
+
     g_return_val_if_fail(bmessage != NULL, FALSE);
     g_return_val_if_fail(bmessage->current_part != NULL, FALSE);
-    g_return_val_if_fail(bmessage->current_part->mime_widget->widget != NULL,
-                         FALSE);
 
-    GTK_WIDGET_FLAGS(bmessage->current_part->mime_widget->widget)
-        |= GTK_CAN_FOCUS;
-    gtk_widget_grab_focus(bmessage->current_part->mime_widget->widget);
+    widget = bmessage->current_part->mime_widget->widget;
+    g_return_val_if_fail(widget != NULL, FALSE);
+
+#if GTK_CHECK_VERSION(2, 18, 0)
+    gtk_widget_set_can_focus(widget, TRUE);
+#else                           /* GTK_CHECK_VERSION(2, 18, 0) */
+    GTK_WIDGET_FLAGS(widget) |= GTK_CAN_FOCUS;
+#endif                          /* GTK_CHECK_VERSION(2, 18, 0) */
+    gtk_widget_grab_focus(widget);
+
     return TRUE;
 }
 

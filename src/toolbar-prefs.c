@@ -126,6 +126,7 @@ customize_dialog_cb(GtkWidget * widget, gpointer data)
     BalsaToolbarModel *model;
     BalsaToolbarType   type;
     GtkUIManager * ui_manager;
+    GtkWidget *content_area;
 
     /* There can only be one */
     if (customize_widget) {
@@ -149,8 +150,9 @@ customize_dialog_cb(GtkWidget * widget, gpointer data)
                      G_CALLBACK(tp_dialog_response_cb), NULL);
 
     notebook = gtk_notebook_new();
-    gtk_container_add(GTK_CONTAINER(GTK_DIALOG(customize_widget)->vbox),
-                      notebook);
+    content_area =
+        gtk_dialog_get_content_area(GTK_DIALOG(customize_widget));
+    gtk_container_add(GTK_CONTAINER(content_area), notebook);
 
     gtk_window_set_wmclass(GTK_WINDOW(customize_widget), "customize",
                            "Balsa");
@@ -181,8 +183,7 @@ customize_dialog_cb(GtkWidget * widget, gpointer data)
 
     option_frame = gtk_frame_new(_("Toolbar options"));
     gtk_container_set_border_width(GTK_CONTAINER(option_frame), 6);
-    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(customize_widget)->vbox),
-                       option_frame, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(content_area), option_frame, FALSE, FALSE, 0);
 
     option_box = gtk_vbox_new(FALSE, 6);
     gtk_container_set_border_width(GTK_CONTAINER(option_box), 6);
@@ -282,7 +283,8 @@ wrap_toggled_cb(GtkWidget * widget, GtkNotebook * notebook)
     GtkWidget *child;
     ToolbarPage *page;
     
-    balsa_app.toolbar_wrap_button_text = GTK_TOGGLE_BUTTON(widget)->active;
+    balsa_app.toolbar_wrap_button_text =
+        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget));
 
     for (i = 0; (child = gtk_notebook_get_nth_page(notebook, i)); i++) {
         page = g_object_get_data(G_OBJECT(child), BALSA_KEY_TOOLBAR_PAGE);

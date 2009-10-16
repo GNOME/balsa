@@ -810,8 +810,8 @@ bndx_drag_cb(GtkWidget * widget, GdkDragContext * drag_context,
 
     if (gtk_tree_selection_count_selected_rows
         (gtk_tree_view_get_selection(GTK_TREE_VIEW(index))) > 0)
-        gtk_selection_data_set(data, data->target, 8,
-                               (const guchar *) &index,
+        gtk_selection_data_set(data, gtk_selection_data_get_target(data),
+                               8, (const guchar *) &index,
                                sizeof(BalsaIndex *));
 }
 
@@ -1452,7 +1452,7 @@ bndx_mailbox_changed_cb(BalsaIndex * bindex)
     LibBalsaMailbox *mailbox = bindex->mailbox_node->mailbox;
     struct index_info *arg;
 
-    if (!GTK_WIDGET_REALIZED(GTK_WIDGET(bindex)))
+    if (!gtk_widget_get_window(GTK_WIDGET(bindex)))
         return;
 
     /* Find the next message to be shown now, not later in the idle
@@ -1949,15 +1949,23 @@ bndx_popup_position_func(GtkMenu * menu, gint * x, gint * y,
     GtkRequisition req;
     gint monitor_num;
     GdkRectangle monitor;
+#if GTK_CHECK_VERSION(2, 18, 0)
+    GtkAllocation allocation;
+#endif                          /* GTK_CHECK_VERSION(2, 18, 0) */
 
-    g_return_if_fail(GTK_WIDGET_REALIZED(bindex));
+    g_return_if_fail(gtk_widget_get_window(bindex));
 
     gdk_window_get_origin(gtk_tree_view_get_bin_window
                           (GTK_TREE_VIEW(bindex)), x, y);
 
     gtk_widget_size_request(GTK_WIDGET(menu), &req);
 
+#if GTK_CHECK_VERSION(2, 18, 0)
+    gtk_widget_get_allocation(bindex, &allocation);
+    *x += (allocation.width - req.width) / 2;
+#else                           /* GTK_CHECK_VERSION(2, 18, 0) */
     *x += (bindex->allocation.width - req.width) / 2;
+#endif                          /* GTK_CHECK_VERSION(2, 18, 0) */
 
     monitor_num = gdk_screen_get_monitor_at_point(screen, *x, *y);
     gtk_menu_set_monitor(menu, monitor_num);
@@ -2189,7 +2197,7 @@ bndx_expand_to_row(BalsaIndex * index, GtkTreePath * path)
     GtkTreePath *tmp;
     gint i, j;
 
-    if (!GTK_WIDGET_REALIZED(GTK_WIDGET(index)))
+    if (!gtk_widget_get_window(GTK_WIDGET(index)))
         return;
 
     tmp = gtk_tree_path_copy(path);
@@ -2701,7 +2709,7 @@ balsa_index_pipe(BalsaIndex * index)
     gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
     gtk_container_set_border_width(GTK_CONTAINER(dialog), 5);
 
-    vbox = GTK_DIALOG(dialog)->vbox;
+    vbox = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
     gtk_box_set_spacing(GTK_BOX(vbox), HIG_PADDING);
     gtk_container_add(GTK_CONTAINER(vbox), label =
                       gtk_label_new(_("Specify the program to run:")));
@@ -2731,7 +2739,7 @@ balsa_index_ensure_visible(BalsaIndex * index)
     GdkRectangle rect;
     GtkTreePath *path = NULL;
 
-    if (!GTK_WIDGET_REALIZED(tree_view))
+    if (!gtk_widget_get_window(GTK_WIDGET(tree_view)))
         return;
 
     if (!bndx_find_current_msgno(index, &path, NULL)) {

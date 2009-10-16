@@ -401,21 +401,21 @@ balsa_mime_widget_new_message_tl(BalsaMessage * bm, GtkWidget * tl_buttons)
 static void
 bm_header_widget_realized(GtkWidget * widget, BalsaMessage * bm)
 {
-    GtkWidget *tl_buttons = 
-	GTK_WIDGET(g_object_get_data(G_OBJECT(widget), "tl-buttons"));
+    GtkWidget *tl_buttons =
+        GTK_WIDGET(g_object_get_data(G_OBJECT(widget), "tl-buttons"));
+    GtkStyle *style = gtk_widget_get_style(GTK_WIDGET(bm));
 
     gtk_widget_modify_bg(widget, GTK_STATE_NORMAL,
-			 &GTK_WIDGET(bm)->style->dark[GTK_STATE_NORMAL]);
+                         &style->dark[GTK_STATE_NORMAL]);
     gtk_widget_modify_base(bm_header_widget_get_text_view(widget),
-			   GTK_STATE_NORMAL,
-			   &GTK_WIDGET(bm)->style->mid[GTK_STATE_NORMAL]);
+                           GTK_STATE_NORMAL,
+                           &style->mid[GTK_STATE_NORMAL]);
     if (tl_buttons) {
-	/* use a fresh style here to deal with pixmap themes correctly */
-	GtkStyle *new_style = gtk_style_new();
-	new_style->bg[GTK_STATE_NORMAL] =
-	    GTK_WIDGET(bm)->style->mid[GTK_STATE_NORMAL];
-	gtk_widget_set_style(tl_buttons, new_style);
-	g_object_unref(new_style);
+        /* use a fresh style here to deal with pixmap themes correctly */
+        GtkStyle *new_style = gtk_style_new();
+        new_style->bg[GTK_STATE_NORMAL] = style->mid[GTK_STATE_NORMAL];
+        gtk_widget_set_style(tl_buttons, new_style);
+        g_object_unref(new_style);
     }
 }
 

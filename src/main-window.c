@@ -300,7 +300,7 @@ static void
 bw_quit_nicely(GtkAction * action, gpointer data)
 {
     GdkEventAny e = { GDK_DELETE, NULL, 0 };
-    e.window = GTK_WIDGET(data)->window;
+    e.window = gtk_widget_get_window(GTK_WIDGET(data));
     libbalsa_information(LIBBALSA_INFORMATION_MESSAGE,
                          _("Balsa closes files and connections. Please wait..."));
     while(gtk_events_pending())
@@ -2746,6 +2746,8 @@ bw_progress_dialog_response_cb(GtkWidget* dialog, gint response)
 static void
 ensure_check_mail_dialog(BalsaWindow * window)
 {
+    GtkBox *content_box;
+
     if (progress_dialog && GTK_IS_WIDGET(progress_dialog))
 	gtk_widget_destroy(GTK_WIDGET(progress_dialog));
     
@@ -2766,17 +2768,19 @@ ensure_check_mail_dialog(BalsaWindow * window)
     g_signal_connect(G_OBJECT(progress_dialog), "response",
 		     G_CALLBACK(bw_progress_dialog_response_cb), NULL);
     
+    content_box =
+        GTK_BOX(gtk_dialog_get_content_area(GTK_DIALOG(progress_dialog)));
     progress_dialog_source = gtk_label_new(_("Checking Mail..."));
-    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(progress_dialog)->vbox),
-		       progress_dialog_source, FALSE, FALSE, 0);
+    gtk_box_pack_start(content_box, progress_dialog_source,
+                       FALSE, FALSE, 0);
     
     progress_dialog_message = gtk_label_new("");
-    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(progress_dialog)->vbox),
-		       progress_dialog_message, FALSE, FALSE, 0);
+    gtk_box_pack_start(content_box, progress_dialog_message,
+                       FALSE, FALSE, 0);
     
     progress_dialog_bar = gtk_progress_bar_new();
-    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(progress_dialog)->vbox),
-		       progress_dialog_bar, FALSE, FALSE, 0);
+    gtk_box_pack_start(content_box, progress_dialog_bar,
+                       FALSE, FALSE, 0);
     gtk_window_set_default_size(GTK_WINDOW(progress_dialog), 250, 100);
     gtk_widget_show_all(progress_dialog);
 }
@@ -3377,11 +3381,11 @@ bw_display_new_mail_notification(int num_new, int has_new)
         notify_notification_show(balsa_app.main_window->new_mail_note,
                                  NULL);
     } else
-        gtk_label_set_text(GTK_LABEL(GTK_MESSAGE_DIALOG(dlg)->label), msg);
+        gtk_message_dialog_set_markup(GTK_MESSAGE_DIALOG(dlg), msg);
 #else
 
     msg = bw_get_new_message_notification_string(num_new, num_total);
-    gtk_label_set_text(GTK_LABEL(GTK_MESSAGE_DIALOG(dlg)->label), msg);
+    gtk_message_dialog_set_markup(GTK_MESSAGE_DIALOG(dlg), msg);
 #endif
     g_free(msg);
 }
@@ -4050,7 +4054,7 @@ bw_find_real(BalsaWindow * window, BalsaIndex * bindex, gboolean again)
 #if HAVE_MACOSX_DESKTOP
 	libbalsa_macosx_menu_for_parent(dia, GTK_WINDOW(window));
 #endif
-        vbox = GTK_DIALOG(dia)->vbox;
+        vbox = gtk_dialog_get_content_area(GTK_DIALOG(dia));
 
 	page=gtk_table_new(2, 1, FALSE);
 	gtk_container_set_border_width(GTK_CONTAINER(page), 6);
@@ -4164,8 +4168,10 @@ bw_find_real(BalsaWindow * window, BalsaIndex * bindex, gboolean again)
             switch(ok) {
             case GTK_RESPONSE_OK:
             case FIND_RESPONSE_FILTER:
-		reverse = GTK_TOGGLE_BUTTON(reverse_button)->active;
-		wrap    = GTK_TOGGLE_BUTTON(wrap_button)->active;
+                reverse = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
+                                                       (reverse_button));
+                wrap    = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
+                                                       (wrap_button));
 		g_free(cnd->match.string.string);
 		cnd->match.string.string =
                     g_strdup(gtk_entry_get_text(GTK_ENTRY(search_entry)));
@@ -4608,11 +4614,15 @@ balsa_change_window_layout(BalsaWindow *window)
     g_object_ref(window->mblist);
     g_object_ref(window->preview);
  
-    gtk_container_remove(GTK_CONTAINER(window->notebook->parent), window->notebook);
-    gtk_container_remove(GTK_CONTAINER(window->mblist->parent),
-			 window->mblist);
-    gtk_container_remove(GTK_CONTAINER(window->preview->parent),
-			 window->preview);
+    gtk_container_remove(GTK_CONTAINER
+                         (gtk_widget_get_parent(window->notebook)),
+                         window->notebook);
+    gtk_container_remove(GTK_CONTAINER
+                         (gtk_widget_get_parent(window->mblist)),
+                         window->mblist);
+    gtk_container_remove(GTK_CONTAINER
+                         (gtk_widget_get_parent(window->preview)),
+                         window->preview);
 
     bw_set_panes(window);
 
@@ -4621,9 +4631,8 @@ balsa_change_window_layout(BalsaWindow *window)
     g_object_unref(window->preview);
  
     gtk_paned_set_position(GTK_PANED(window->paned_master), 
-                           balsa_app.show_mblist 
-                           ? balsa_app.mblist_width
-                           : 0);
+                           balsa_app.show_mblist ?
+                           balsa_app.mblist_width : 0);
     gtk_widget_show(window->paned_slave);
     gtk_widget_show(window->paned_master);
 
@@ -4850,15 +4859,38 @@ bw_notebook_find_page (GtkNotebook* notebook, gint x, gint y)
     gint label_y;
     gint label_width;
     gint label_height;
+#if GTK_CHECK_VERSION(2, 18, 0)
+    GtkAllocation allocation;
+#endif                          /* GTK_CHECK_VERSION(2, 18, 0) */
     
     /* x and y are relative to the notebook, but the label allocations
      * are relative to the main window. */
+#if GTK_CHECK_VERSION(2, 18, 0)
+    gtk_widget_get_allocation(GTK_WIDGET(notebook), &allocation);
+    x += allocation.x;
+    y += allocation.y;
+#else                           /* GTK_CHECK_VERSION(2, 18, 0) */
     x += GTK_WIDGET(notebook)->allocation.x;
     y += GTK_WIDGET(notebook)->allocation.y;
+#endif                          /* GTK_CHECK_VERSION(2, 18, 0) */
 
     while ((page = gtk_notebook_get_nth_page (notebook, page_num)) != NULL) {
         label = gtk_notebook_get_tab_label (notebook, page);
         
+#if GTK_CHECK_VERSION(2, 18, 0)
+        gtk_widget_get_allocation(label, &allocation);
+        label_x     = allocation.x;
+        label_width = allocation.width;
+
+        if (x > label_x && x < label_x + label_width) {
+            label_y      = allocation.y;
+            label_height = allocation.height;
+
+            if (y > label_y && y < label_y + label_height) {
+                return BALSA_INDEX(gtk_bin_get_child(GTK_BIN(page)));
+            }
+        }
+#else                           /* GTK_CHECK_VERSION(2, 18, 0) */
         label_x = label->allocation.x;
         label_width = label->allocation.width;
         
@@ -4870,6 +4902,7 @@ bw_notebook_find_page (GtkNotebook* notebook, gint x, gint y)
                 return BALSA_INDEX(gtk_bin_get_child(GTK_BIN(page)));
             }
         }
+#endif                          /* GTK_CHECK_VERSION(2, 18, 0) */
         ++page_num;
     }
 
@@ -4899,7 +4932,8 @@ bw_notebook_drag_received_cb(GtkWidget * widget, GdkDragContext * context,
 	/* Drag'n'drop is weird... */
 	return;
 
-    orig_index = *(BalsaIndex **) selection_data->data;
+    orig_index =
+        *(BalsaIndex **) gtk_selection_data_get_data(selection_data);
     selected = balsa_index_selected_msgnos_new(orig_index);
     if (selected->len == 0) {
         /* it is actually possible to drag from GtkTreeView when no rows

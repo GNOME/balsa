@@ -656,15 +656,24 @@ tm_popup_position_func(GtkMenu * menu, gint * x, gint * y,
     GtkRequisition req;
     gint monitor_num;
     GdkRectangle monitor;
+#if GTK_CHECK_VERSION(2, 18, 0)
+    GtkAllocation allocation;
+#endif                          /* GTK_CHECK_VERSION(2, 18, 0) */
 
-    g_return_if_fail(GTK_WIDGET_REALIZED(toolbar));
+    g_return_if_fail(gtk_widget_get_window(toolbar));
 
-    gdk_window_get_origin(toolbar->window, x, y);
+    gdk_window_get_origin(gtk_widget_get_window(toolbar), x, y);
 
     gtk_widget_size_request(GTK_WIDGET(menu), &req);
 
+#if GTK_CHECK_VERSION(2, 18, 0)
+    gtk_widget_get_allocation(toolbar, &allocation);
+    *x += (allocation.width - req.width) / 2;
+    *y += allocation.height;
+#else                           /* GTK_CHECK_VERSION(2, 18, 0) */
     *x += (toolbar->allocation.width - req.width) / 2;
     *y += toolbar->allocation.height;
+#endif                          /* GTK_CHECK_VERSION(2, 18, 0) */
 
     monitor_num = gdk_screen_get_monitor_at_point(screen, *x, *y);
     gtk_menu_set_monitor(menu, monitor_num);
@@ -752,7 +761,11 @@ tm_do_popup_menu(GtkWidget * toolbar, GdkEventButton * event,
         }
     }
 
+#if GTK_CHECK_VERSION(2, 18, 0)
+    if (gtk_widget_is_sensitive(toolbar)) {
+#else                           /* GTK_CHECK_VERSION(2, 18, 0) */
     if (GTK_WIDGET_IS_SENSITIVE(toolbar)) {
+#endif                          /* GTK_CHECK_VERSION(2, 18, 0) */
         /* This is a real toolbar, not the template from the
          * toolbar-prefs dialog. */
         GtkWidget *item;

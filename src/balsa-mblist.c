@@ -822,11 +822,12 @@ bmbl_drag_cb(GtkWidget * widget, GdkDragContext * context,
     BalsaIndex *orig_index;
     GArray *selected;
 
-    if (!selection_data || !selection_data->data)
+    if (!selection_data || !gtk_selection_data_get_data(selection_data))
 	/* Drag'n'drop is weird... */
 	return;
 
-    orig_index = *(BalsaIndex **) selection_data->data;
+    orig_index =
+        *(BalsaIndex **) gtk_selection_data_get_data(selection_data);
     selected = balsa_index_selected_msgnos_new(orig_index);
     if (selected->len == 0) {
 	/* it is actually possible to drag from GtkTreeView when no rows
@@ -1869,7 +1870,9 @@ bmbl_mru_show_tree(GtkWidget * widget, gpointer data)
     gtk_widget_set_size_request(GTK_WIDGET(mblist), req.width, req.height);
 
     gtk_container_add(GTK_CONTAINER(scroll), mblist);
-    gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox), scroll);
+    gtk_container_add(GTK_CONTAINER
+                      (gtk_dialog_get_content_area(GTK_DIALOG(dialog))),
+                      scroll);
     gtk_widget_show_all(scroll);
 
     gtk_dialog_run(GTK_DIALOG(dialog));

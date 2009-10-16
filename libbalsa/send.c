@@ -246,6 +246,8 @@ static void
 ensure_send_progress_dialog()
 {
     GtkWidget* label;
+    GtkBox *content_box;
+
     if(send_dialog) return;
 
     send_dialog = gtk_dialog_new_with_buttons(_("Sending Mail..."), 
@@ -256,16 +258,15 @@ ensure_send_progress_dialog()
                                               NULL);
     gtk_window_set_wmclass(GTK_WINDOW(send_dialog), "send_dialog", "Balsa");
     label = gtk_label_new(_("Sending Mail..."));
-    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(send_dialog)->vbox),
-		       label, FALSE, FALSE, 0);
+    content_box =
+        GTK_BOX(gtk_dialog_get_content_area(GTK_DIALOG(send_dialog)));
+    gtk_box_pack_start(content_box, label, FALSE, FALSE, 0);
 
     send_progress_message = gtk_label_new("");
-    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(send_dialog)->vbox),
-		       send_progress_message, FALSE, FALSE, 0);
+    gtk_box_pack_start(content_box, send_progress_message, FALSE, FALSE, 0);
 
     send_dialog_bar = gtk_progress_bar_new();
-    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(send_dialog)->vbox),
-		       send_dialog_bar, FALSE, FALSE, 0);
+    gtk_box_pack_start(content_box, send_dialog_bar, FALSE, FALSE, 0);
     gtk_window_set_default_size(GTK_WINDOW(send_dialog), 250, 100);
     gtk_widget_show_all(send_dialog);
     g_signal_connect(G_OBJECT(send_dialog), "response", 

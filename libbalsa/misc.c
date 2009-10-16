@@ -1161,7 +1161,7 @@ libbalsa_create_entry(GtkWidget * table, GCallback changed_func,
 static void
 lb_create_size_group_func(GtkWidget * widget, gpointer data)
 {
-    if (GTK_IS_LABEL(widget) && GTK_IS_TABLE(widget->parent))
+    if (GTK_IS_LABEL(widget) && GTK_IS_TABLE(gtk_widget_get_parent(widget)))
         gtk_size_group_add_widget(GTK_SIZE_GROUP(data), widget);
     else if (GTK_IS_CONTAINER(widget))
         gtk_container_foreach(GTK_CONTAINER(widget),

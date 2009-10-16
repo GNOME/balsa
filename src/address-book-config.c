@@ -349,8 +349,9 @@ create_generic_dialog(AddressBookConfig * abc, const gchar * type)
     libbalsa_macosx_menu_for_parent(dialog, abc->parent);
 #endif
     gtk_container_set_border_width(GTK_CONTAINER(dialog), 5);
-    gtk_container_set_border_width(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox),
-                                   12);
+    gtk_container_set_border_width(GTK_CONTAINER
+                                   (gtk_dialog_get_content_area
+                                    (GTK_DIALOG(dialog))), 12);
     g_signal_connect(G_OBJECT(dialog), "response",
                      G_CALLBACK(edit_book_response), abc);
 
@@ -414,7 +415,9 @@ create_externq_dialog(AddressBookConfig * abc)
     }
 
     dialog = create_generic_dialog(abc, "Extern");
-    gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox), table);
+    gtk_container_add(GTK_CONTAINER
+                      (gtk_dialog_get_content_area(GTK_DIALOG(dialog))),
+                      table);
     return dialog;
 }
 
@@ -479,7 +482,9 @@ create_ldap_dialog(AddressBookConfig * abc)
     g_free(host);
     
     dialog = create_generic_dialog(abc, "LDAP");
-    gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox), table);
+    gtk_container_add(GTK_CONTAINER
+                      (gtk_dialog_get_content_area(GTK_DIALOG(dialog))),
+                      table);
     return dialog;
 }
 #endif
@@ -508,7 +513,9 @@ create_gpe_dialog(AddressBookConfig * abc)
     add_radio_buttons(table, 1, abc);
 
     dialog = create_generic_dialog(abc, "GPE");
-    gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox), table);
+    gtk_container_add(GTK_CONTAINER
+                      (gtk_dialog_get_content_area(GTK_DIALOG(dialog))),
+                      table);
     return dialog;
 }
 #endif

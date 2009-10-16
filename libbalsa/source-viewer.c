@@ -235,8 +235,10 @@ static void
 lsv_size_allocate_cb(GtkWindow * window, GtkAllocation * alloc,
                      LibBalsaSourceViewerInfo * lsvi)
 {
-    if (GTK_WIDGET_REALIZED(lsvi->window)
-        && !(gdk_window_get_state(lsvi->window->window)
+    GdkWindow *gdk_window;
+
+    if ((gdk_window = gtk_widget_get_window(lsvi->window))
+        && !(gdk_window_get_state(gdk_window)
              & GDK_WINDOW_STATE_MAXIMIZED)) {
         *lsvi->width  = alloc->width;
         *lsvi->height = alloc->height;
@@ -268,8 +270,7 @@ libbalsa_show_message_source(LibBalsaMessage* msg, const gchar * font,
     gtk_text_view_set_editable(GTK_TEXT_VIEW(text), FALSE);
     gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(text), GTK_WRAP_WORD_CHAR);
 
-    interior = gtk_scrolled_window_new(GTK_TEXT_VIEW(text)->hadjustment,
-                                       GTK_TEXT_VIEW(text)->vadjustment);
+    interior = gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(interior),
                                    GTK_POLICY_AUTOMATIC,
                                    GTK_POLICY_ALWAYS);

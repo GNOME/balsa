@@ -208,7 +208,7 @@ store_address_dialog(StoreAddressInfo * info)
                                     GTK_STOCK_SAVE,  SA_RESPONSE_SAVE,
                                     GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
                                     NULL);
-    GtkWidget *vbox = GTK_DIALOG(dialog)->vbox;
+    GtkWidget *vbox = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
     GtkWidget *frame, *label;
 
 #if HAVE_MACOSX_DESKTOP

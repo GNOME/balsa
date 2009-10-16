@@ -598,8 +598,9 @@ filters_edit_dialog(void)
 
     /* main hbox */
     hbox = gtk_hbox_new(FALSE, FILTER_EDIT_PADDING);
-    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(fe_window)->vbox),
-		       hbox, TRUE, TRUE, FILTER_EDIT_PADDING);
+    gtk_box_pack_start(GTK_BOX
+                       (gtk_dialog_get_content_area(GTK_DIALOG(fe_window))),
+                       hbox, TRUE, TRUE, FILTER_EDIT_PADDING);
     gtk_box_pack_start(GTK_BOX(hbox), piece, FALSE, FALSE,
                        FILTER_EDIT_PADDING);
 

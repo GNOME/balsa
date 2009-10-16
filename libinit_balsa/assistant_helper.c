@@ -111,7 +111,7 @@ entry_changed_cb(GtkEntry * entry, EntryData * ed)
 {
     g_assert(ed != NULL);
 
-    if (entry->text_length) {
+    if (gtk_entry_get_text_length(entry)) {
         ed->master->setbits |= (1 << ed->num);
     } else {
         ed->master->setbits &= ~(1 << ed->num);
@@ -120,8 +120,13 @@ entry_changed_cb(GtkEntry * entry, EntryData * ed)
     /* The stuff below is only when we are displayed... which is not
      * always the case.
      */
+#if GTK_CHECK_VERSION(2, 18, 0)
+    if (!gtk_widget_get_visible(GTK_WIDGET(entry)))
+        return;
+#else                           /* GTK_CHECK_VERSION(2, 18, 0) */
     if (!GTK_WIDGET_VISIBLE(GTK_WIDGET(entry)))
         return;
+#endif                          /* GTK_CHECK_VERSION(2, 18, 0) */
 
     if (GTK_IS_ASSISTANT(ed->druid)) {
         /* Don't let them continue unless all entries have something. */

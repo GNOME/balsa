@@ -533,8 +533,8 @@ condition_validate(LibBalsaCondition* new_cnd)
 	    CONDITION_SETMATCH(new_cnd,CONDITION_MATCH_US_HEAD);
             str =
                 gtk_editable_get_chars(GTK_EDITABLE
-                                       (GTK_BIN(fe_user_header)->child), 0,
-                                       -1);
+                                       (gtk_bin_get_child
+                                        (GTK_BIN(fe_user_header))), 0, -1);
 	    if (!str[0]) {
                 balsa_information(LIBBALSA_INFORMATION_ERROR,
                                   _("You must specify the name of the "
@@ -616,8 +616,8 @@ condition_validate(LibBalsaCondition* new_cnd)
     if (CONDITION_CHKMATCH(new_cnd,CONDITION_MATCH_US_HEAD))
         new_cnd->match.string.user_header =
             gtk_editable_get_chars(GTK_EDITABLE
-                                   (GTK_BIN(fe_user_header)->child), 0,
-                                   -1);
+                                   (gtk_bin_get_child
+                                    (GTK_BIN(fe_user_header))), 0, -1);
     /* Set the type specific fields of the condition */
     switch (new_cnd->type) {
     case CONDITION_STRING:
@@ -765,7 +765,9 @@ fill_condition_widgets(LibBalsaCondition* cnd)
     }
     else {
 	gtk_widget_set_sensitive(fe_user_header,FALSE);
-	gtk_entry_set_text(GTK_ENTRY(GTK_BIN(fe_user_header)->child),"");
+        gtk_entry_set_text(GTK_ENTRY
+                           (gtk_bin_get_child(GTK_BIN(fe_user_header))),
+                           "");
     }	
     /* Next update type specific fields */
     switch (cnd->type) {
@@ -1172,6 +1174,7 @@ void build_condition_dialog(GtkWidget * condition_dialog)
 {
     GtkWidget *label,* box;
     GtkWidget *field_frame = get_field_frame();
+    GtkBox *content_box;
 
     /* builds the toggle buttons to specify fields concerned by the
      * conditions of the filter */
@@ -1183,14 +1186,14 @@ void build_condition_dialog(GtkWidget * condition_dialog)
                              G_CALLBACK(fe_typesmenu_cb), field_frame);
     gtk_box_pack_start(GTK_BOX(box), fe_search_option_menu, FALSE, FALSE, 5);
     gtk_label_set_mnemonic_widget(GTK_LABEL(label), fe_search_option_menu);
-    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(condition_dialog)->vbox),
-                       box, FALSE, FALSE, 2);
-    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(condition_dialog)->vbox),
-                       field_frame, FALSE, FALSE, 2);
+
+    content_box =
+        GTK_BOX(gtk_dialog_get_content_area(GTK_DIALOG(condition_dialog)));
+    gtk_box_pack_start(content_box, box, FALSE, FALSE, 2);
+    gtk_box_pack_start(content_box, field_frame, FALSE, FALSE, 2);
 
     build_type_notebook();
-    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(condition_dialog)->vbox),
-                       fe_type_notebook, FALSE, FALSE, 2);
+    gtk_box_pack_start(content_box, fe_type_notebook, FALSE, FALSE, 2);
 }
 
 /*

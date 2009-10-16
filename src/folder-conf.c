@@ -319,7 +319,7 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
     }
 
     notebook = gtk_notebook_new();
-    gtk_box_pack_start(GTK_BOX(fcw->dialog->vbox),
+    gtk_box_pack_start(GTK_BOX(gtk_dialog_get_content_area(fcw->dialog)),
                        notebook, TRUE, TRUE, 0);
     table = libbalsa_create_table(9, 2);
     gtk_container_set_border_width(GTK_CONTAINER(table), 12);
@@ -564,8 +564,9 @@ browse_button_cb(GtkWidget * widget, SubfolderDialogData * sdd)
 #endif
     
     scroll = gtk_scrolled_window_new(NULL, NULL);
-    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox), scroll,
-                       TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX
+                       (gtk_dialog_get_content_area(GTK_DIALOG(dialog))),
+                       scroll, TRUE, TRUE, 0);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll),
                                    GTK_POLICY_AUTOMATIC,
                                    GTK_POLICY_ALWAYS);
@@ -649,8 +650,9 @@ folder, parent);
 #if HAVE_MACOSX_DESKTOP
 		libbalsa_macosx_menu_for_parent(ask, GTK_WINDOW(sdd->dialog));
 #endif
-                gtk_container_add(GTK_CONTAINER(GTK_DIALOG(ask)->vbox),
-                                  gtk_label_new(msg));
+                gtk_container_add(GTK_CONTAINER
+                                  (gtk_dialog_get_content_area
+                                   (GTK_DIALOG(ask))), gtk_label_new(msg));
                 g_free(msg);
                 button = gtk_dialog_run(GTK_DIALOG(ask));
                 gtk_widget_destroy(ask);
@@ -748,7 +750,7 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
     sdd = mn ? g_object_get_data(G_OBJECT(mn), BALSA_FOLDER_CONF_IMAP_KEY)
              : sdd_new;
     if (sdd) {
-        gdk_window_raise(GTK_WIDGET(sdd->dialog)->window);
+        gtk_window_present(GTK_WINDOW(sdd->dialog));
         return;
     }
 
@@ -803,7 +805,7 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
 
     frame = gtk_frame_new(mn ? _("Rename or move subfolder") :
 			       _("Create subfolder"));
-    gtk_box_pack_start(GTK_BOX(sdd->dialog->vbox),
+    gtk_box_pack_start(GTK_BOX(gtk_dialog_get_content_area(sdd->dialog)),
                        frame, TRUE, TRUE, 0);
     table = libbalsa_create_table(3, 3);
     gtk_container_set_border_width(GTK_CONTAINER(table), 12);

@@ -153,7 +153,7 @@ This is version 2.721 of the Balsa manual.
 <graphic fileref="figures/balsa_logo.png" format="PNG" srccredit="tigert"></graphic>
 
 <para>
-  &Balsa; is a graphical mail client similar to Eudora on Windows. It
+  &Balsa; is a graphical mail client. It
   supports the standard features of any good reader and has new
   features added continually. See the abstract above for a quick
   feature rundown.
@@ -168,8 +168,8 @@ This is version 2.721 of the Balsa manual.
 
 <para>
   If you want to learn more about &Balsa;, your best bet is the
-  mailing list <email>balsa-list@gnome.org</email>, which can be
-  subscribed to by going to the website <ulink
+  mailing list <email>balsa-list@gnome.org</email>, to which you can
+  subscribe by going to the website <ulink
   url="&balsalist;">&balsalist;</ulink> or by sending a message with a
   subject of <emphasis>subscribe</emphasis> to
   <email>balsa-list-request@gnome.org</email>. Bugs can be reported
@@ -184,8 +184,7 @@ This is version 2.721 of the Balsa manual.
 
 <para>
   If you're starting &Balsa; for the first time, the first thing
-  you'll see is a <glossterm
-  linkend="glossary-druid">Druid</glossterm> that will set up
+  you'll see is an assistant that will set up
   &Balsa;'s basic settings. &Balsa; can guess most of what it needs to
   know about you. It will also create five standard local mailboxes:
   the Inbox, Outbox, Sentbox, Draftbox, and Trash. (These can be
@@ -193,7 +192,7 @@ This is version 2.721 of the Balsa manual.
 </para>
 
 <figure>
-  <title>&Balsa; Start Druid</title>
+  <title>&Balsa; Start Assistant</title>
   <screenshot>
     <mediaobject> 
       <imageobject><imagedata
@@ -252,8 +251,9 @@ This is version 2.721 of the Balsa manual.
   the <guilabel>Show Mailbox Info</guilabel> preference is set,
   two columns will also be
   displayed next to the mailbox names containing the number of unread
-  and total messages in each mailbox that has unread messages.  (The
-  other mailboxes will not have their contents probed.) Also, any
+  and total messages in each mailbox that has unread messages;
+  otherwise, the number of unread messages is shown in parentheses after
+  the mailbox name.  Also, any
   mailboxes that contain unread messages will be shown in a bold font.
 </para>
 
@@ -266,7 +266,7 @@ This is version 2.721 of the Balsa manual.
  <para>
   At the bottom-right of &Balsa;'s main window is the
   <link linkend="subwin-msgview">message view</link>.
-  This displays the message selected in the message listing. You
+  This displays the message selected in the message index. You
   can save attachments, view attachments, and read incoming email
   here.
 </para>
@@ -437,6 +437,17 @@ This is version 2.721 of the Balsa manual.
 	<para>
 	  <menuchoice>
 	    <guimenu>File</guimenu>
+	    <guimenuitem>Page Setup</guimenuitem>
+	  </menuchoice> &mdash; 
+
+	  Set print options such as paper size and print orientation.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <guimenu>File</guimenu>
 	    <guimenuitem>Print</guimenuitem>
 	  </menuchoice> &mdash; 
 
@@ -498,6 +509,17 @@ This is version 2.721 of the Balsa manual.
 	<para>
 	  <menuchoice>
 	    <guimenu>Edit</guimenu>
+	    <guimenuitem>Select Thread</guimenuitem>
+	  </menuchoice> &mdash; 
+          Select all messages in the same thread as the currently
+          displayed message.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <guimenu>Edit</guimenu>
 	    <guimenuitem>Find</guimenuitem>
 	  </menuchoice> &mdash; 
 	  Find messages in the current mailbox that match a given
@@ -510,9 +532,21 @@ This is version 2.721 of the Balsa manual.
 	<para>
 	  <menuchoice>
 	    <guimenu>Edit</guimenu>
-	    <guimenuitem>Find next</guimenuitem>
+	    <guimenuitem>Find Next</guimenuitem>
 	  </menuchoice> &mdash; 
 	  Find the next matching message.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <guimenu>Edit</guimenu>
+	    <guimenuitem>Find in Message</guimenuitem>
+	  </menuchoice> &mdash; 
+          Selecting this option opens a <quote>search bar</quote> at the
+          foot of the message preview, in which you can type text for
+          which &Balsa; will search in the current message.
 	</para>
       </listitem>
 
@@ -621,7 +655,8 @@ This is version 2.721 of the Balsa manual.
         <menuchoice><guimenuitem>JWZ threading</guimenuitem>
 	  </menuchoice> &mdash; 
 
-	  Select the type of threading used to sort the messages in the list pane.
+	  Select the type of threading used to display the messages in
+          the message index.
 	</para>
       </listitem>
 
@@ -634,12 +669,6 @@ This is version 2.721 of the Balsa manual.
 	    <guimenu>View</guimenu>
 	    <guimenuitem>Expand All</guimenuitem>
 	  </menuchoice> &mdash; 
-	  Expand all threads in the currently displayed mailbox.
-	</para>
-      </listitem>
-
-      <listitem>
-	<para>
 	  <menuchoice>
 	    <shortcut>
 	      <keycombo><keysym>Ctrl</keysym><keysym>L</keysym></keycombo>
@@ -647,7 +676,7 @@ This is version 2.721 of the Balsa manual.
 	    <guimenu>View</guimenu>
 	    <guimenuitem>Collapse All</guimenuitem>
 	  </menuchoice> &mdash; 
-	  Collapse all threads in the currently displayed mailbox.
+	  Expand or collapse all threads in the currently displayed mailbox.
 	</para>
       </listitem>
 
@@ -832,6 +861,19 @@ This is version 2.721 of the Balsa manual.
 
 	  Pop up a dialog that allows you to control which filters are
           applied to this mailbox, and optionally to apply them.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <guimenu>Mailbox</guimenu>
+	    <guimenuitem>Remove Duplicates</guimenuitem>
+	  </menuchoice> &mdash; 
+
+          Remove duplicate messages; &Balsa; locates all messages in the
+          current mailbox that have the same Message-ID header,
+          and removes all but one.
 	</para>
       </listitem>
 
@@ -1159,6 +1201,7 @@ This is version 2.721 of the Balsa manual.
 <para>
   The message index displays the messages in the current folder, and
   lets you choose which messages to view. Click on the notebook tabs,
+  if shown,
   or click on a folder in the mailbox list to bring it to the front.
 </para>
       
@@ -1168,7 +1211,10 @@ This is version 2.721 of the Balsa manual.
   will give a pop-up menu letting you reply to the message (or forward
   it, etc.) and move it to another folder (using the
   <guimenuitem>Move to</guimenuitem> menu
-  item).  Double-clicking on a message will open it in a separate
+  item).  Double-clicking on a message,
+  or pressing either the space-bar or the <keysym>Enter</keysym>
+  key while the keyboard
+  focus is in the index, will open the message in a separate
   window.  Also, it is possible to drag and drop messages from the
   index to other mailboxes in the mailbox list and open mailbox
   tabs.
@@ -1207,8 +1253,8 @@ This is version 2.721 of the Balsa manual.
 	  </menuchoice> &mdash;
 	  
      Moves the currently selected message(s) to another mailbox.
-     When this menu item is selected a list of available mailboxes
-     is displayed from which the destination should be selected. 
+     When this menu item is selected, a list of available mailboxes
+     is displayed, from which the destination may be selected. 
   </para>
 </listitem>
 </itemizedlist>
@@ -1236,16 +1282,19 @@ This is version 2.721 of the Balsa manual.
 
 <note>
   <para>
-    Currently &Balsa; only supports viewing <acronym>HTML</acronym>
-    messages when compiled with <application>gtkhtml</application>
-    support. gtkhtml support is fairly stable nowadays and will be
-    compiled in if gtkhtml-devel files is found.
+    &Balsa; supports viewing <acronym>HTML</acronym>
+    messages only when compiled with <application>gtkhtml</application>
+    or <application>WebKit</application> support.
+    Gtkhtml support will be compiled in if gtkhtml-devel files are found.
+    WebKit is currently supported only on an experimental basis,
   </para>
 </note>
 
 <para>
   You are not restricted to that pane either. Double-clicking on a
-  message in the message index will open it in a <link
+  message in the message index,
+  or touching either the space bar or the <keysym>Enter</keysym> key,
+  will open it in a <link
   linkend="win-message">separate window</link>.
 </para>
 </sect2>
@@ -1385,6 +1434,17 @@ This is version 2.721 of the Balsa manual.
 	<para>
 	  <menuchoice>
 	    <guimenu>File</guimenu>
+	    <guimenuitem>Page Setup</guimenuitem>
+	  </menuchoice> &mdash; 
+
+	  Set print options such as paper size and print orientation.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <menuchoice>
+	    <guimenu>File</guimenu>
 	    <guimenuitem>Print...</guimenuitem>
 	  </menuchoice> &mdash; 
 	  
@@ -1441,7 +1501,7 @@ This is version 2.721 of the Balsa manual.
 	    <guimenuitem>Copy</guimenuitem>
 	  </menuchoice> &mdash; 
 
-	  Copy the selected text to the clipboard
+	  Copy the selected text to the clipboard.
 	</para>
       </listitem>
 
@@ -1497,9 +1557,9 @@ This is version 2.721 of the Balsa manual.
 	    <guimenuitem>Reflow Paragraph</guimenuitem>
 	  </menuchoice> &mdash; 
 
-	  Cause all the lines in the paragraph the cursor is
-	  in to be wrapped to the specified outgoing mail wrap
-	  column.
+          Cause all
+          selected lines
+	  to be wrapped to the specified outgoing mail wrap column.
 	</para>
       </listitem>
 
@@ -1515,8 +1575,9 @@ This is version 2.721 of the Balsa manual.
 	    <guimenuitem>Reflow Message</guimenuitem>
 	  </menuchoice> &mdash; 
 
-	  Cause all the lines in the message to be wrapped to the
-	  specified outgoing mail wrap column.
+          Cause all
+          the lines in the message
+          to be wrapped to the specified outgoing mail wrap column.
         </para>
       </listitem>
 
@@ -1585,7 +1646,8 @@ This is version 2.721 of the Balsa manual.
 	    <guimenu>Show</guimenu>
 	    <guimenuitem>Fcc</guimenuitem>
 	  </menuchoice>
-	  &mdash; Display the <literal>Fcc</literal> header.
+	  &mdash; Display the <literal>Fcc</literal> header; this is the
+          folder to which your copy of the sent message will be saved.
 	</para>
       </listitem>
 
@@ -1860,9 +1922,14 @@ This is version 2.721 of the Balsa manual.
   <term><guibutton>Check Spelling</guibutton></term>
   <listitem>
     <para>
-      Start a spell check on the current message.  &Balsa; can currently
-      use either the standard <application>ispell</application> or the
-      newer <application>aspell</application> to do the
+        Start a spell check on the current message.
+        If &Balsa; is built with support for
+        <application>GtkSpell</appication>, your spelling is checked in
+        place.
+        Otherwise,
+        &Balsa; can 
+        use either <application>ispell</application> or
+        <application>aspell</application> to do the
       spell checking.  Settings for this can be found in the <link
       linkend="preferences-spelling">Preferences</link> dialog.
     </para>
@@ -2336,9 +2403,8 @@ This is version 2.721 of the Balsa manual.
 <title>The Preferences Window</title>
 
 <para>
-  &Balsa; has many more options than the initial <glossterm
-  linkend="glossary-druid">Druid</glossterm> reveals.  To access the
-  Preferences window, select
+    &Balsa; has many more options than the initial assistant reveals.
+    To access the Preferences window, select
   <menuchoice>
       <guimenu>Edit</guimenu> <guimenuitem>Preferences</guimenuitem>
   </menuchoice>.
@@ -2618,37 +2684,12 @@ This is version 2.721 of the Balsa manual.
   </varlistentry>
 
   <varlistentry>
-    <term>
-      <guilabel>
-        Send message as type `text/plain; format=flowed'
-      </guilabel>
-    </term>
-    <listitem>
-      <para>The `format' parameter distinguishes two ways of
-        representing paragraphs in messages of type `text/plain'
-        (that is, simple text). The value `flowed' indicates
-        that paragraphs have been broken into lines ended with
-        `soft' line breaks: a space is left at the end of the
-        line. A `hard' line break (one that is not preceded by a
-        space) indicates the end of a paragraph.</para>
-      <para>&Balsa; can prepare the message
-        using this convention, and a flowed-aware mailer
-        receiving it can then reflow its paragraphs to fit its display
-        without leaving misquoted line fragments. If you do not select
-        this option, &Balsa; will use
-        hard line breaks to end lines, and no receiving mailer
-        will be able to identify paragraphs.</para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
     <term><guilabel>Reply prefix</guilabel></term>
     <listitem>
-      <para>The string that &Balsa;
-        should use as a prefix when quoting a message. Note: if
-        you select `Send message as type text/plain;
-        format=flowed', &Balsa; is
-        required to use the one-character string ">".
+        <para>The string that &Balsa; should use as a prefix when
+            quoting a message. Note: When you send a message with
+            <guilabel>format=flowed</guilabel>, &Balsa; is required to
+            use the one-character string ">".
       </para>
     </listitem>
   </varlistentry>
@@ -3692,8 +3733,8 @@ kept to ensure compatibility with mutt. </para>
 search for. A space (" ") is used as the first argument when creating
 a list of all users.</para>
 
-<para>All characters are allowed, except from the tab(\t), since that
-is the field seperator. 
+<para>All characters are allowed, except the tab (\t), since that
+is the field separator.
 </para>
 
 <para>An example output could be:</para>
@@ -4292,7 +4333,7 @@ the third is an alias (currently not used and replaced by 'TODO').</para>
             boxes, so that all mails with the word <quote>Balsa</quote>
             in its subject or its
             body will match. You can also, if you're fed up with &Balsa; ;-), match
-            all mails that does NOT contain the word
+            all mails that do NOT contain the word
             <quote>Balsa</quote> in their subject and in
             their body neither. See the description of the search types to see
             how to do this.
@@ -4912,15 +4953,6 @@ the third is an alias (currently not used and replaced by 'TODO').</para>
       </glossdef>
     </glossentry>
     
-    <glossentry id="glossary-druid">
-      <glossterm>Druid</glossterm>
-      <glossdef>
-	<para>The <acronym>GNOME</acronym> equivalent to Microsoft
-	  Windows Wizards, a step by step dialog to guide the user
-	  through a setup procedure.</para>
-      </glossdef>
-    </glossentry>
-
     <glossentry id="glossary-imap">
       <glossterm>IMAP</glossterm>
       <glossdef>

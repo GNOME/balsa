@@ -1924,7 +1924,7 @@ This is version 2.721 of the Balsa manual.
     <para>
         Start a spell check on the current message.
         If &Balsa; is built with support for
-        <application>GtkSpell</appication>, your spelling is checked in
+        <application>GtkSpell</application>, your spelling is checked in
         place.
         Otherwise,
         &Balsa; can 

@@ -32,7 +32,6 @@
 #include "balsa-mblist.h"
 #include "information-dialog.h"
 #include "main-window.h"
-#include "toolbar-factory.h"
 
 /* misc.h for LibBalsaCodeset */
 #include "misc.h"

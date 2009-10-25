@@ -52,6 +52,7 @@ typedef void (*BalsaToolbarFunc) (GtkWidget *, gpointer);
 typedef struct t_button_data {
     char *pixmap_id;            /* not translatable */
     char *button_text;          /* translatable */
+    gboolean is_important;      /* whether to show beside icon */
 } button_data;
 
 extern button_data toolbar_buttons[];

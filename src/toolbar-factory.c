@@ -130,46 +130,46 @@ balsa_toolbar_model_get_type()
 
 /* The descriptions must be SHORT */
 button_data toolbar_buttons[]={
-    {"", N_("Separator")},
-    {GTK_STOCK_QUIT, N_("Quit")},
-    {BALSA_PIXMAP_RECEIVE, N_("Check")},
-    {BALSA_PIXMAP_COMPOSE, N_("Compose")},
-    {BALSA_PIXMAP_CONTINUE, N_("Continue")},
-    {BALSA_PIXMAP_REPLY, N_("Reply")},
-    {BALSA_PIXMAP_REPLY_ALL, N_("Reply\nto all")},
-    {BALSA_PIXMAP_REPLY_GROUP, N_("Reply\nto group")},
-    {BALSA_PIXMAP_FORWARD, N_("Forward")},
-    {BALSA_PIXMAP_PREVIOUS, N_("Previous")},
-    {BALSA_PIXMAP_NEXT, N_("Next")},
-    {BALSA_PIXMAP_NEXT_UNREAD, N_("Next\nunread")},
-    {BALSA_PIXMAP_NEXT_FLAGGED, N_("Next\nflagged")},
-    {BALSA_PIXMAP_PREVIOUS_PART, N_("Previous\npart")},
-    {BALSA_PIXMAP_NEXT_PART, N_("Next\npart")},
-    {GTK_STOCK_DELETE, N_("Trash /\nDelete")},
-    {BALSA_PIXMAP_POSTPONE, N_("Postpone")},
-    {GTK_STOCK_PRINT, N_("Print")},
-    {BALSA_PIXMAP_REQUEST_MDN, N_("Request\nMDN")},
-    {BALSA_PIXMAP_SEND, N_("Send")},
-    {BALSA_PIXMAP_SEND_RECEIVE, N_("Exchange")},
-    {BALSA_PIXMAP_ATTACHMENT, N_("Attach")},
-    {GTK_STOCK_SAVE, N_("Save")},
-    {BALSA_PIXMAP_IDENTITY, N_("Identity")},
-    {GTK_STOCK_SPELL_CHECK, N_("Spelling")},
-    {GTK_STOCK_CLOSE, N_("Close")},
-    {BALSA_PIXMAP_MARKED_NEW, N_("Toggle\nnew")},
-    {BALSA_PIXMAP_MARK_ALL, N_("Mark all")},
-    {BALSA_PIXMAP_SHOW_HEADERS, N_("All\nheaders")},
-    {GTK_STOCK_CANCEL, N_("Reset\nFilter")},
-    {BALSA_PIXMAP_SHOW_PREVIEW, N_("Msg Preview")},
+    {"",                         N_("Separator"),       FALSE},
+    {GTK_STOCK_QUIT,             N_("Quit"),            FALSE},
+    {BALSA_PIXMAP_RECEIVE,       N_("Check"),           TRUE},
+    {BALSA_PIXMAP_COMPOSE,       N_("Compose"),         FALSE},
+    {BALSA_PIXMAP_CONTINUE,      N_("Continue"),        FALSE},
+    {BALSA_PIXMAP_REPLY,         N_("Reply"),           TRUE},
+    {BALSA_PIXMAP_REPLY_ALL,     N_("Reply\nto all"),   FALSE},
+    {BALSA_PIXMAP_REPLY_GROUP,   N_("Reply\nto group"), FALSE},
+    {BALSA_PIXMAP_FORWARD,       N_("Forward"),         FALSE},
+    {BALSA_PIXMAP_PREVIOUS,      N_("Previous"),        FALSE},
+    {BALSA_PIXMAP_NEXT,          N_("Next"),            FALSE},
+    {BALSA_PIXMAP_NEXT_UNREAD,   N_("Next\nunread"),    TRUE},
+    {BALSA_PIXMAP_NEXT_FLAGGED,  N_("Next\nflagged"),   FALSE},
+    {BALSA_PIXMAP_PREVIOUS_PART, N_("Previous\npart"),  FALSE},
+    {BALSA_PIXMAP_NEXT_PART,     N_("Next\npart"),      FALSE},
+    {GTK_STOCK_DELETE,           N_("Trash /\nDelete"), TRUE},
+    {BALSA_PIXMAP_POSTPONE,      N_("Postpone"),        FALSE},
+    {GTK_STOCK_PRINT,            N_("Print"),           FALSE},
+    {BALSA_PIXMAP_REQUEST_MDN,   N_("Request\nMDN"),    FALSE},
+    {BALSA_PIXMAP_SEND,          N_("Send"),            TRUE},
+    {BALSA_PIXMAP_SEND_RECEIVE,  N_("Exchange"),        FALSE},
+    {BALSA_PIXMAP_ATTACHMENT,    N_("Attach"),          TRUE},
+    {GTK_STOCK_SAVE,             N_("Save"),            TRUE},
+    {BALSA_PIXMAP_IDENTITY,      N_("Identity"),        FALSE},
+    {GTK_STOCK_SPELL_CHECK,      N_("Spelling"),        TRUE},
+    {GTK_STOCK_CLOSE,            N_("Close"),           FALSE},
+    {BALSA_PIXMAP_MARKED_NEW,    N_("Toggle\nnew"),     FALSE},
+    {BALSA_PIXMAP_MARK_ALL,      N_("Mark all"),        FALSE},
+    {BALSA_PIXMAP_SHOW_HEADERS,  N_("All\nheaders"),    FALSE},
+    {GTK_STOCK_CANCEL,           N_("Reset\nFilter"),   FALSE},
+    {BALSA_PIXMAP_SHOW_PREVIEW,  N_("Msg Preview"),     FALSE},
 #ifdef HAVE_GPGME
-    {BALSA_PIXMAP_GPG_SIGN, N_("Sign")},
-    {BALSA_PIXMAP_GPG_ENCRYPT, N_("Encrypt")},
+    {BALSA_PIXMAP_GPG_SIGN,      N_("Sign"),            FALSE},
+    {BALSA_PIXMAP_GPG_ENCRYPT,   N_("Encrypt"),         FALSE},
 #endif
-    {GTK_STOCK_UNDO, N_("Undo")},
-    {GTK_STOCK_REDO, N_("Redo")},
-    {GTK_STOCK_CLEAR, N_("Expunge")},
-    {GTK_STOCK_REMOVE, N_("Empty\nTrash")},
-    {GTK_STOCK_EDIT, N_("Edit")},
+    {GTK_STOCK_UNDO,             N_("Undo"),            FALSE},
+    {GTK_STOCK_REDO,             N_("Redo"),            FALSE},
+    {GTK_STOCK_CLEAR,            N_("Expunge"),         FALSE},
+    {GTK_STOCK_REMOVE,           N_("Empty\nTrash"),    FALSE},
+    {GTK_STOCK_EDIT,             N_("Edit"),            FALSE},
 };
 
 const int toolbar_button_count =
@@ -452,7 +452,8 @@ tm_set_tool_item_label(GtkToolItem * tool_item, const gchar * stock_id,
     gtk_tool_button_set_label(GTK_TOOL_BUTTON(tool_item), label);
     g_free(label);
 
-    gtk_tool_item_set_is_important(tool_item, TRUE);
+    gtk_tool_item_set_is_important(tool_item,
+                                   toolbar_buttons[button].is_important);
 
     if (strcmp(toolbar_buttons[button].pixmap_id, BALSA_PIXMAP_SEND) == 0
         && balsa_app.always_queue_sent_mail)
@@ -515,12 +516,11 @@ static const struct {
     const gchar *config_name;
     GtkToolbarStyle style;
 } tm_toolbar_options[] = {
-    {
-    N_("Text Be_low Icons"),  "both",       GTK_TOOLBAR_BOTH},       {
-    N_("Text Be_side Icons"), "both-horiz", GTK_TOOLBAR_BOTH_HORIZ}, {
-    NULL,                     "both_horiz", GTK_TOOLBAR_BOTH_HORIZ}, {
-    N_("_Icons Only"),        "icons",      GTK_TOOLBAR_ICONS},      {
-    N_("_Text Only"),         "text",       GTK_TOOLBAR_TEXT}
+    {N_("Text Be_low Icons"),           "both",       GTK_TOOLBAR_BOTH},
+    {N_("Priority Text Be_side Icons"), "both-horiz", GTK_TOOLBAR_BOTH_HORIZ},
+    {NULL,                              "both_horiz", GTK_TOOLBAR_BOTH_HORIZ},
+    {N_("_Icons Only"),                 "icons",      GTK_TOOLBAR_ICONS},
+    {N_("_Text Only"),                  "text",       GTK_TOOLBAR_TEXT}
 };
 
 static GtkToolbarStyle

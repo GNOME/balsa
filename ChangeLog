@@ -1,11 +1,11 @@
 2009-10-24  Peter Bloomfield
 
-	* src/balsa-app.h: do not include toolbar-factory.h.
+	* src/toolbar-factory.h: new member button_data::is_important.
+	* src/toolbar-factory.c (tm_set_tool_item_label): use it.
 
 2009-10-24  Peter Bloomfield
 
-	* src/toolbar-factory.h: new member button_data::is_important.
-	* src/toolbar-factory.c (tm_set_tool_item_label): use it.
+	* src/balsa-app.h: do not include toolbar-factory.h.
 
 2009-10-15  Peter Bloomfield
 

@@ -1,0 +1,24 @@
+***************
+*** 126,136 ****
+      BalsaToolbarModel *model;
+      BalsaToolbarType   type;
+      GtkUIManager * ui_manager;
+-     GtkWidget *content_area;
+  
+      /* There can only be one */
+      if (customize_widget) {
+-         gtk_window_present(GTK_WINDOW(customize_widget));
+          return;
+      }
+  
+--- 126,135 ----
+      BalsaToolbarModel *model;
+      BalsaToolbarType   type;
+      GtkUIManager * ui_manager;
+  
+      /* There can only be one */
+      if (customize_widget) {
++         gdk_window_raise(customize_widget->window);
+          return;
+      }
+  

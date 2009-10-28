@@ -60,6 +60,10 @@ void libbalsa_html_copy(GtkWidget * widget);
 guint libbalsa_html_filter(LibBalsaHTMLType html_type, gchar ** text,
 			   guint len);
 
+gboolean libbalsa_html_can_search(GtkWidget * widget);
+gboolean libbalsa_html_search_text(GtkWidget * widget, const gchar * text,
+                                   gboolean find_forward, gboolean wrap);
+
 # endif				/* HAVE_GTKHTML */
 
 LibBalsaHTMLType libbalsa_html_type(const gchar * mime_type);

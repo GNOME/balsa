@@ -27,6 +27,7 @@
 #include <string.h>
 #include "balsa-icons.h"
 #include "mime-stream-shared.h"
+#include "html.h"
 #include <glib/gi18n.h>
 #include "balsa-mime-widget-message.h"
 #include "balsa-mime-widget-multipart.h"
@@ -199,9 +200,14 @@ balsa_mime_widget_destroy(GObject * object)
     if (mime_widget->container && mime_widget->container != mime_widget->widget)
 	gtk_widget_destroy(mime_widget->container);
     mime_widget->container = NULL;
-    if (mime_widget->widget)
+    if (mime_widget->widget) {
+        /* Work-around for webkit issue: */
+        if (libbalsa_html_can_search(mime_widget->widget))
+            g_object_set_data(G_OBJECT(mime_widget->widget),
+                              "gtk-clipboards-owned", NULL);
 	gtk_widget_destroy(mime_widget->widget);
-    mime_widget->widget = NULL;
+        mime_widget->widget = NULL;
+    }
 
     G_OBJECT_CLASS(parent_class)->finalize(object);
 }

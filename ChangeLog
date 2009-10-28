@@ -1,5 +1,16 @@
 2009-10-27  Peter Bloomfield
 
+	* libbalsa/html.h: new methods for text search, to access
+	WebKitWebView capability.
+	* libbalsa/html.c (libbalsa_html_can_search,
+	libbalsa_html_search_text): implement them.
+	* src/balsa-message.c (bm_find_entry_changed_cb,
+	bm_find_again, balsa_message_find_in_message): use them.
+	* src/balsa-mime-widget.c (balsa_mime_widget_destroy): work-around
+	weird WebKitWebView-GtkClipboard issue.
+
+2009-10-27  Peter Bloomfield
+
 	* src/toolbar-factory.c: show text for "compose" instead of
 	"trash/delete".
 

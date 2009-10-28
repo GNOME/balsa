@@ -230,6 +230,21 @@ void libbalsa_html_copy(GtkWidget * widget)
     webkit_web_view_copy_clipboard(WEBKIT_WEB_VIEW(widget));
 }
 
+gboolean
+libbalsa_html_can_search(GtkWidget * widget)
+{
+    return WEBKIT_IS_WEB_VIEW(widget);
+}
+
+gboolean
+libbalsa_html_search_text(GtkWidget * widget, const gchar * text,
+                          gboolean find_forward, gboolean wrap)
+{
+    return webkit_web_view_search_text(WEBKIT_WEB_VIEW(widget), text,
+                                       FALSE,   /* case-insensitive */
+                                       find_forward, wrap);
+}
+
 # else                          /* defined(HAVE_WEBKIT) */
 
 /* Common code for both GtkHtml widgets. */
@@ -485,6 +500,19 @@ libbalsa_html_copy(GtkWidget * widget)
     gtk_html_copy(GTK_HTML(widget));
 }
 
+gboolean
+libbalsa_html_can_search(GtkWidget * widget)
+{
+    return FALSE;
+}
+
+gboolean
+libbalsa_html_search_text(GtkWidget * widget, const gchar * text,
+                          gboolean find_forward)
+{
+    return FALSE;
+}
+
 # else				/* HAVE_GTKHTML3 */
 
 /* Code for GtkHtml-2 */
@@ -618,6 +646,19 @@ libbalsa_html_select_all(GtkWidget * widget)
 void
 libbalsa_html_copy(GtkWidget * widget)
 {
+}
+
+gboolean
+libbalsa_html_can_search(GtkWidget * widget)
+{
+    return FALSE;
+}
+
+gboolean
+libbalsa_html_search_text(GtkWidget * widget, const gchar * text,
+                          gboolean find_forward)
+{
+    return FALSE;
 }
 
 # endif				/* HAVE_GTKHTML3 */

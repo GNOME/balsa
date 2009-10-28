@@ -448,37 +448,44 @@ bm_find_entry_changed_cb(GtkEditable * editable, gpointer data)
 {
     const gchar *text = gtk_entry_get_text(GTK_ENTRY(editable));
     BalsaMessage *bm = data;
-    GtkTextView *text_view =
-        GTK_TEXT_VIEW(bm->current_part->mime_widget->widget);
-    GtkTextBuffer *buffer = gtk_text_view_get_buffer(text_view);
-    GtkTextIter match_begin, match_end;
-    gboolean found;
+    GtkWidget *widget = bm->current_part->mime_widget->widget;
+    gboolean found = FALSE;
 
-    if (bm->find_forward) {
-        found = FORWARD_SEARCH(&bm->find_iter, text,
-                               &match_begin, &match_end);
-        if (!found) {
-            /* Silently wrap to the top. */
-            gtk_text_buffer_get_start_iter(buffer, &bm->find_iter);
+    if (GTK_IS_TEXT_VIEW(widget)) {
+        GtkTextView *text_view = GTK_TEXT_VIEW(widget);
+        GtkTextBuffer *buffer = gtk_text_view_get_buffer(text_view);
+        GtkTextIter match_begin, match_end;
+
+        if (bm->find_forward) {
             found = FORWARD_SEARCH(&bm->find_iter, text,
                                    &match_begin, &match_end);
-        }
-    } else {
-        found = BACKWARD_SEARCH(&bm->find_iter, text,
-                                &match_begin, &match_end);
-        if (!found) {
-            /* Silently wrap to the bottom. */
-            gtk_text_buffer_get_end_iter(buffer, &bm->find_iter);
+            if (!found) {
+                /* Silently wrap to the top. */
+                gtk_text_buffer_get_start_iter(buffer, &bm->find_iter);
+                found = FORWARD_SEARCH(&bm->find_iter, text,
+                                       &match_begin, &match_end);
+            }
+        } else {
             found = BACKWARD_SEARCH(&bm->find_iter, text,
                                     &match_begin, &match_end);
+            if (!found) {
+                /* Silently wrap to the bottom. */
+                gtk_text_buffer_get_end_iter(buffer, &bm->find_iter);
+                found = BACKWARD_SEARCH(&bm->find_iter, text,
+                                        &match_begin, &match_end);
+            }
         }
-    }
 
-    if (found) {
-        gtk_text_buffer_select_range(buffer, &match_begin, &match_end);
-        bm_find_scroll_to_iter(bm, text_view, &match_begin);
-        bm->find_iter = match_begin;
-    }
+        if (found) {
+            gtk_text_buffer_select_range(buffer, &match_begin, &match_end);
+            bm_find_scroll_to_iter(bm, text_view, &match_begin);
+            bm->find_iter = match_begin;
+        }
+    } else if (libbalsa_html_can_search(widget))
+        found = libbalsa_html_search_text(widget, text, bm->find_forward, TRUE);
+    else
+        g_assert_not_reached();
+
     bm_find_set_status(bm, found ?
                        BM_FIND_STATUS_FOUND : BM_FIND_STATUS_NOT_FOUND);
 }
@@ -487,35 +494,46 @@ static void
 bm_find_again(BalsaMessage * bm, gboolean find_forward)
 {
     const gchar *text = gtk_entry_get_text(GTK_ENTRY(bm->find_entry));
-    GtkTextView *text_view =
-        GTK_TEXT_VIEW(bm->current_part->mime_widget->widget);
-    GtkTextBuffer *buffer = gtk_text_view_get_buffer(text_view);
-    GtkTextIter match_begin, match_end;
+    GtkWidget *widget = bm->current_part->mime_widget->widget;
     gboolean found;
 
-    if (find_forward) {
-        gtk_text_iter_forward_char(&bm->find_iter);
-        found = FORWARD_SEARCH(&bm->find_iter, text,
-                               &match_begin, &match_end);
-        if (!found) {
-            gtk_text_buffer_get_start_iter(buffer, &bm->find_iter);
-            FORWARD_SEARCH(&bm->find_iter, text, &match_begin, &match_end);
+    if (GTK_IS_TEXT_VIEW(widget)) {
+        GtkTextView *text_view = GTK_TEXT_VIEW(widget);
+        GtkTextBuffer *buffer = gtk_text_view_get_buffer(text_view);
+        GtkTextIter match_begin, match_end;
+
+        if (find_forward) {
+            gtk_text_iter_forward_char(&bm->find_iter);
+            found = FORWARD_SEARCH(&bm->find_iter, text,
+                                   &match_begin, &match_end);
+            if (!found) {
+                gtk_text_buffer_get_start_iter(buffer, &bm->find_iter);
+                FORWARD_SEARCH(&bm->find_iter, text, &match_begin,
+                               &match_end);
+            }
+        } else {
+            gtk_text_iter_backward_char(&bm->find_iter);
+            found = BACKWARD_SEARCH(&bm->find_iter, text,
+                                    &match_begin, &match_end);
+            if (!found) {
+                gtk_text_buffer_get_end_iter(buffer, &bm->find_iter);
+                BACKWARD_SEARCH(&bm->find_iter, text, &match_begin,
+                                &match_end);
+            }
         }
-    } else {
-        gtk_text_iter_backward_char(&bm->find_iter);
-        found = BACKWARD_SEARCH(&bm->find_iter, text,
-                                &match_begin, &match_end);
-        if (!found) {
-            gtk_text_buffer_get_end_iter(buffer, &bm->find_iter);
-            BACKWARD_SEARCH(&bm->find_iter, text, &match_begin, &match_end);
-        }
-    }
+
+        gtk_text_buffer_select_range(buffer, &match_begin, &match_end);
+        bm_find_scroll_to_iter(bm, text_view, &match_begin);
+        bm->find_iter = match_begin;
+    } else if (libbalsa_html_can_search(widget)) {
+        found = libbalsa_html_search_text(widget, text, find_forward, FALSE);
+        if (!found)
+            libbalsa_html_search_text(widget, text, find_forward, TRUE);
+    } else
+        g_assert_not_reached();
+
     bm_find_set_status(bm, found ?
                        BM_FIND_STATUS_FOUND : BM_FIND_STATUS_WRAPPED);
-
-    gtk_text_buffer_select_range(buffer, &match_begin, &match_end);
-    bm_find_scroll_to_iter(bm, text_view, &match_begin);
-    bm->find_iter = match_begin;
     bm->find_forward = find_forward;
 }
 
@@ -3239,12 +3257,15 @@ balsa_message_find_in_message(BalsaMessage * bm)
 
     if (bm->current_part
         && (w = bm->current_part->mime_widget->widget)
-        && GTK_IS_TEXT_VIEW(w)) {
-        GtkTextView *text_view = (GtkTextView *) w;
-        GtkTextBuffer *buffer = gtk_text_view_get_buffer(text_view);
+        && (GTK_IS_TEXT_VIEW(w) || libbalsa_html_can_search(w))) {
+        if (GTK_IS_TEXT_VIEW(w)) {
+            GtkTextView *text_view = (GtkTextView *) w;
+            GtkTextBuffer *buffer = gtk_text_view_get_buffer(text_view);
+
+            gtk_text_buffer_get_start_iter(buffer, &bm->find_iter);
+        }
 
         bm->find_forward = TRUE;
-        gtk_text_buffer_get_start_iter(buffer, &bm->find_iter);
         gtk_entry_set_text(GTK_ENTRY(bm->find_entry), "");
         g_signal_connect_swapped(gtk_widget_get_toplevel(GTK_WIDGET(bm)),
                                  "key-press-event",

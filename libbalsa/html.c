@@ -192,13 +192,20 @@ libbalsa_html_to_string(gchar ** text, size_t len)
              * it to an empty string. */
 }
 
+/*
+ * Does the widget support zoom?
+ */
 gboolean
 libbalsa_html_can_zoom(GtkWidget * widget)
 {
     return WEBKIT_IS_WEB_VIEW(widget);
 }
 
-void libbalsa_html_zoom(GtkWidget * widget, gint in_out)
+/*
+ * Zoom the widget.
+ */
+void
+libbalsa_html_zoom(GtkWidget * widget, gint in_out)
 {
     switch (in_out) {
     case +1:
@@ -215,27 +222,45 @@ void libbalsa_html_zoom(GtkWidget * widget, gint in_out)
     }
 }
 
-gboolean libbalsa_html_can_select(GtkWidget * widget)
+/*
+ * Does the widget support selecting text?
+ */
+gboolean
+libbalsa_html_can_select(GtkWidget * widget)
 {
     return WEBKIT_IS_WEB_VIEW(widget);
 }
 
-void libbalsa_html_select_all(GtkWidget * widget)
+/*
+ * Select all the text.
+ */
+void
+libbalsa_html_select_all(GtkWidget * widget)
 {
     webkit_web_view_select_all(WEBKIT_WEB_VIEW(widget));
 }
 
-void libbalsa_html_copy(GtkWidget * widget)
+/*
+ * Copy selected text to the clipboard.
+ */
+void
+libbalsa_html_copy(GtkWidget * widget)
 {
     webkit_web_view_copy_clipboard(WEBKIT_WEB_VIEW(widget));
 }
 
+/*
+ * Does the widget support searching text?
+ */
 gboolean
 libbalsa_html_can_search(GtkWidget * widget)
 {
     return WEBKIT_IS_WEB_VIEW(widget);
 }
 
+/*
+ * Search for the text.
+ */
 gboolean
 libbalsa_html_search_text(GtkWidget * widget, const gchar * text,
                           gboolean find_forward, gboolean wrap)
@@ -500,15 +525,21 @@ libbalsa_html_copy(GtkWidget * widget)
     gtk_html_copy(GTK_HTML(widget));
 }
 
+/*
+ * GtkHTML doesn't support searching text.
+ */
 gboolean
 libbalsa_html_can_search(GtkWidget * widget)
 {
     return FALSE;
 }
 
+/*
+ * GtkHTML doesn't support searching text.
+ */
 gboolean
 libbalsa_html_search_text(GtkWidget * widget, const gchar * text,
-                          gboolean find_forward)
+                          gboolean find_forward, gboolean wrap)
 {
     return FALSE;
 }
@@ -648,15 +679,21 @@ libbalsa_html_copy(GtkWidget * widget)
 {
 }
 
+/*
+ * HtmlView doesn't support searching text.
+ */
 gboolean
 libbalsa_html_can_search(GtkWidget * widget)
 {
     return FALSE;
 }
 
+/*
+ * HtmlView doesn't support searching text.
+ */
 gboolean
 libbalsa_html_search_text(GtkWidget * widget, const gchar * text,
-                          gboolean find_forward)
+                          gboolean find_forward, gboolean wrap)
 {
     return FALSE;
 }

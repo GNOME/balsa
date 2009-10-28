@@ -1,3 +1,10 @@
+2009-10-28  Peter Bloomfield
+
+	* libbalsa/html.c (libbalsa_html_zoom, libbalsa_html_can_select,
+	libbalsa_html_select_all, libbalsa_html_copy): add comments and
+	indent;
+	(libbalsa_html_search_text): build with all widgets.
+
 2009-10-27  Peter Bloomfield
 
 	* libbalsa/html.h: new methods for text search, to access

@@ -1,5 +1,10 @@
 2009-10-28  Peter Bloomfield
 
+	* src/balsa-mime-widget.c (balsa_mime_widget_destroy): unref
+	widget instead of destroying.
+
+2009-10-28  Peter Bloomfield
+
 	* libbalsa/html.c (libbalsa_html_zoom, libbalsa_html_can_select,
 	libbalsa_html_select_all, libbalsa_html_copy): add comments and
 	indent;

@@ -201,11 +201,7 @@ balsa_mime_widget_destroy(GObject * object)
 	gtk_widget_destroy(mime_widget->container);
     mime_widget->container = NULL;
     if (mime_widget->widget) {
-        /* Work-around for webkit issue: */
-        if (libbalsa_html_can_search(mime_widget->widget))
-            g_object_set_data(G_OBJECT(mime_widget->widget),
-                              "gtk-clipboards-owned", NULL);
-	gtk_widget_destroy(mime_widget->widget);
+        g_object_unref(mime_widget->widget);
         mime_widget->widget = NULL;
     }
 

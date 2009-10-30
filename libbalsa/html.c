@@ -110,20 +110,74 @@ lbh_size_request_cb(GtkWidget      * widget,
     requisition->height = gtk_adjustment_get_upper(info->vadj);
 }
 
-static WebKitNavigationResponse
-lbh_navigation_requested_cb(WebKitWebView        * web_view,
-                            WebKitWebFrame       * frame,
-                            WebKitNetworkRequest * request,
-                            gpointer               data)
+static gboolean
+lbh_navigation_policy_decision_requested_cb(WebKitWebView             * web_view,
+                                            WebKitWebFrame            * frame,
+                                            WebKitNetworkRequest      * request,
+                                            WebKitWebNavigationAction * action,
+                                            WebKitWebPolicyDecision   * decision,
+                                            gpointer                    data)
 {
     LibBalsaWebKitInfo *info = data;
     const gchar *uri = webkit_network_request_get_uri(request);
 
     g_print("%s %s\n", __func__, uri);
     (*info->clicked_cb)(uri);
+    webkit_web_policy_decision_ignore(decision);
 
-    return WEBKIT_NAVIGATION_RESPONSE_IGNORE;
+    return TRUE;
 }
+
+/*
+ * To handle a clicked link that is supposed to open in a new window
+ * (specifically, has the attribute 'target="_blank"'), we must allow
+ * WebKit to open one, but we destroy it after it has emitted the
+ * "navigation-policy-decision-requested" signal.
+ */
+
+/*
+ * Idle handler to actually unref it.
+ */
+static gboolean
+lbh_web_view_ready_idle(WebKitWebView * web_view)
+{
+    g_object_unref(g_object_ref_sink(web_view));
+
+    return FALSE;
+}
+
+/*
+ * Window is ready, now we destroy it.
+ */
+static gboolean
+lbh_web_view_ready_cb(WebKitWebView * web_view,
+                      gpointer        data)
+{
+    g_idle_add((GSourceFunc) lbh_web_view_ready_idle, web_view);
+
+    return TRUE;
+}
+
+/*
+ * WebKit wants a new window.
+ */
+static WebKitWebView *
+lbh_create_web_view_cb(WebKitWebView  * web_view,
+                       WebKitWebFrame * frame,
+                       gpointer         data)
+{
+    GtkWidget *widget;
+
+    widget = webkit_web_view_new();
+    g_signal_connect(widget, "navigation-policy-decision-requested",
+                     G_CALLBACK
+                     (lbh_navigation_policy_decision_requested_cb), data);
+    g_signal_connect(widget, "web-view-ready", G_CALLBACK(lbh_web_view_ready_cb),
+                     NULL);
+
+    return WEBKIT_WEB_VIEW(widget);
+}
+
 
 /* Create a new WebKitWebView widget:
  * text			the HTML source;
@@ -172,8 +226,11 @@ libbalsa_html_new(const gchar * text, size_t len,
                      G_CALLBACK(lbh_hovering_over_link_cb), info);
 
     info->clicked_cb = clicked_cb;
-    g_signal_connect(web_view, "navigation-requested",
-                     G_CALLBACK(lbh_navigation_requested_cb), info);
+    g_signal_connect(web_view, "navigation-policy-decision-requested",
+                     G_CALLBACK
+                     (lbh_navigation_policy_decision_requested_cb), info);
+    g_signal_connect(web_view, "create-web-view",
+                     G_CALLBACK(lbh_create_web_view_cb), info);
 
     g_signal_connect(web_view, "load-progress-changed",
                      G_CALLBACK(gtk_widget_queue_resize), NULL);

@@ -1,3 +1,10 @@
+2009-10-30  Peter Bloomfield
+
+	* libbalsa/html.c (lbh_navigation_policy_decision_requested_cb,
+	lbh_web_view_ready_idle, lbh_web_view_ready_cb,
+	lbh_create_web_view_cb, libbalsa_html_new): handle a clicked
+	link that requires a new window.
+
 2009-10-28  Peter Bloomfield
 
 	* src/balsa-mime-widget.c (balsa_mime_widget_destroy): unref

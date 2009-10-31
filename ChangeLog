@@ -1,3 +1,9 @@
+2009-10-31  Peter Bloomfield
+
+	* libbalsa/html.c (lbh_navigation_policy_decision_requested_cb):
+	check reason for request.
+	(libbalsa_html_new): do not leak GtkAdjustments.
+
 2009-10-30  Peter Bloomfield
 
 	* libbalsa/html.c (lbh_navigation_policy_decision_requested_cb,

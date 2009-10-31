@@ -83,9 +83,11 @@
 #include <webkit/webkit.h>
 
 typedef struct {
-    LibBalsaHtmlCallback hover_cb;
-    LibBalsaHtmlCallback clicked_cb;
-    GtkAdjustment *hadj, *vadj;
+    WebKitWebView        *web_view;
+    LibBalsaHtmlCallback  hover_cb;
+    LibBalsaHtmlCallback  clicked_cb;
+    GtkAdjustment        *hadj;
+    GtkAdjustment        *vadj;
 } LibBalsaWebKitInfo;
 
 static void
@@ -118,11 +120,20 @@ lbh_navigation_policy_decision_requested_cb(WebKitWebView             * web_view
                                             WebKitWebPolicyDecision   * decision,
                                             gpointer                    data)
 {
+    WebKitWebNavigationReason reason;
     LibBalsaWebKitInfo *info = data;
-    const gchar *uri = webkit_network_request_get_uri(request);
 
-    g_print("%s %s\n", __func__, uri);
-    (*info->clicked_cb)(uri);
+    g_object_get(action, "reason", &reason, NULL);
+
+    if (reason == WEBKIT_WEB_NAVIGATION_REASON_LINK_CLICKED ||
+        (web_view != info->web_view
+         && reason == WEBKIT_WEB_NAVIGATION_REASON_OTHER)) {
+        const gchar *uri = webkit_network_request_get_uri(request);
+
+        g_print("%s %s\n", __func__, uri);
+        (*info->clicked_cb) (uri);
+    }
+
     webkit_web_policy_decision_ignore(decision);
 
     return TRUE;
@@ -202,22 +213,24 @@ libbalsa_html_new(const gchar * text, size_t len,
     LibBalsaWebKitInfo *info;
 
     widget = webkit_web_view_new();
-    web_view = WEBKIT_WEB_VIEW(widget);
+
+    info = g_new(LibBalsaWebKitInfo, 1);
+    info->web_view = web_view = WEBKIT_WEB_VIEW(widget);
+    g_object_weak_ref(G_OBJECT(web_view), (GWeakNotify) g_free, info);
 
     g_object_set(webkit_web_view_get_settings(web_view),
                  "auto-load-images", FALSE,
                  "enable-scripts",   FALSE,
                  "enable-plugins",   FALSE,
                  NULL);
-     
-    info = g_new(LibBalsaWebKitInfo, 1);
-    g_object_weak_ref(G_OBJECT(web_view), (GWeakNotify) g_free, info);
 
     info->hadj =
         GTK_ADJUSTMENT(gtk_adjustment_new(0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
     info->vadj =
         GTK_ADJUSTMENT(gtk_adjustment_new(0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
     gtk_widget_set_scroll_adjustments(widget, info->hadj, info->vadj);
+    g_object_unref(g_object_ref_sink(info->hadj));
+    g_object_unref(g_object_ref_sink(info->vadj));
     g_signal_connect(web_view, "size-request",
                      G_CALLBACK(lbh_size_request_cb), info);
 

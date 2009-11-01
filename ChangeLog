@@ -1,3 +1,12 @@
+2009-11-01  Peter Bloomfield
+
+	* libbalsa/html.c (lbh_size_request_cb): only increase the
+	requisition;
+	(lbh_navigation_policy_decision_requested_cb): be silent;
+	(libbalsa_html_new): indentation.
+	* src/balsa-message.c (add_part): give the content the surplus
+	space.
+
 2009-10-31  Peter Bloomfield
 
 	* libbalsa/html.c (lbh_navigation_policy_decision_requested_cb):

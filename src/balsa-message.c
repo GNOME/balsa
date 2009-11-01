@@ -2162,7 +2162,8 @@ add_part(BalsaMessage * bm, BalsaPartInfo * info)
 	    save = bm->bm_widget->container;
 	    bm->bm_widget->container = info->mime_widget->container;
 	} else
-	    gtk_box_pack_start(GTK_BOX(bm->bm_widget->container), info->mime_widget->widget, FALSE, FALSE, 0);
+	    gtk_box_pack_start(GTK_BOX(bm->bm_widget->container),
+                               info->mime_widget->widget, TRUE, TRUE, 0);
 	g_free(content_type);
     }
 

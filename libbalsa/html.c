@@ -107,9 +107,14 @@ lbh_size_request_cb(GtkWidget      * widget,
                     gpointer         data)
 {
     LibBalsaWebKitInfo *info = data;
+    gint upper;
 
-    requisition->width  = gtk_adjustment_get_upper(info->hadj);
-    requisition->height = gtk_adjustment_get_upper(info->vadj);
+    upper = gtk_adjustment_get_upper(info->hadj);
+    if (upper > requisition->width)
+        requisition->width = upper;
+    upper = gtk_adjustment_get_upper(info->vadj);
+    if (upper > requisition->height)
+        requisition->height = upper;
 }
 
 static gboolean
@@ -130,7 +135,6 @@ lbh_navigation_policy_decision_requested_cb(WebKitWebView             * web_view
          && reason == WEBKIT_WEB_NAVIGATION_REASON_OTHER)) {
         const gchar *uri = webkit_network_request_get_uri(request);
 
-        g_print("%s %s\n", __func__, uri);
         (*info->clicked_cb) (uri);
     }
 
@@ -202,9 +206,10 @@ lbh_create_web_view_cb(WebKitWebView  * web_view,
  */
 
 GtkWidget *
-libbalsa_html_new(const gchar * text, size_t len,
-		  const gchar * charset,
-		  gpointer message,
+libbalsa_html_new(const gchar        * text,
+                  size_t               len,
+                  const gchar        * charset,
+                  gpointer             message,
                   LibBalsaHtmlCallback hover_cb,
                   LibBalsaHtmlCallback clicked_cb)
 {

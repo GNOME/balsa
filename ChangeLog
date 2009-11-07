@@ -1,5 +1,10 @@
 2009-11-07  Peter Bloomfield
 
+	* src/balsa-mime-widget-vcalendar.c (balsa_vevent_widget,
+	vevent_reply): use macros to cast enum to or from gpointer.
+
+2009-11-07  Peter Bloomfield
+
 	* libbalsa/rfc2445.c (text_2445_unescape): "\N" encodes newline.
 
 2009-11-01  Peter Bloomfield

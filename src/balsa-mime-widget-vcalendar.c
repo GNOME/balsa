@@ -237,7 +237,7 @@ balsa_vevent_widget(LibBalsaVEvent * event, gboolean may_reply,
 	g_object_set_data_full(G_OBJECT(button), "event", event,
                                (GDestroyNotify) g_object_unref);
 	g_object_set_data(G_OBJECT(button), "mode",
-			  (gpointer) VCAL_PSTAT_ACCEPTED);
+			  GINT_TO_POINTER(VCAL_PSTAT_ACCEPTED));
 	g_signal_connect(G_OBJECT(button), "clicked",
 			 G_CALLBACK(vevent_reply), bbox);
 	gtk_container_add(GTK_CONTAINER(bbox), button);
@@ -245,7 +245,7 @@ balsa_vevent_widget(LibBalsaVEvent * event, gboolean may_reply,
 	button = gtk_button_new_with_label(_("Accept tentatively"));
 	g_object_set_data(G_OBJECT(button), "event", event);
 	g_object_set_data(G_OBJECT(button), "mode",
-			  (gpointer) VCAL_PSTAT_TENTATIVE);
+			  GINT_TO_POINTER(VCAL_PSTAT_TENTATIVE));
 	g_signal_connect(G_OBJECT(button), "clicked",
 			 G_CALLBACK(vevent_reply), bbox);
 	gtk_container_add(GTK_CONTAINER(bbox), button);
@@ -253,7 +253,7 @@ balsa_vevent_widget(LibBalsaVEvent * event, gboolean may_reply,
 	button = gtk_button_new_with_label(_("Decline"));
 	g_object_set_data(G_OBJECT(button), "event", event);
 	g_object_set_data(G_OBJECT(button), "mode",
-			  (gpointer) VCAL_PSTAT_DECLINED);
+			  GINT_TO_POINTER(VCAL_PSTAT_DECLINED));
 	g_signal_connect(G_OBJECT(button), "clicked",
 			 G_CALLBACK(vevent_reply), bbox);
 	gtk_container_add(GTK_CONTAINER(bbox), button);
@@ -269,7 +269,7 @@ vevent_reply(GObject * button, GtkWidget * box)
     LibBalsaVEvent *event =
 	LIBBALSA_VEVENT(g_object_get_data(button, "event"));
     LibBalsaVCalPartStat pstat =
-	(LibBalsaVCalPartStat) g_object_get_data(button, "mode");
+	GPOINTER_TO_INT(g_object_get_data(button, "mode"));
     gchar *rcpt;
     LibBalsaMessage *message;
     LibBalsaMessageBody *body;

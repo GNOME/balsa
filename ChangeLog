@@ -1,3 +1,7 @@
+2009-11-07  Peter Bloomfield
+
+	* libbalsa/rfc2445.c (text_2445_unescape): "\N" encodes newline.
+
 2009-11-01  Peter Bloomfield
 
 	* libbalsa/html.c (lbh_size_request_cb): only increase the

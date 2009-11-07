@@ -574,7 +574,7 @@ text_2445_unescape(const gchar * text)
     retval = g_strdup(text);
     p = strchr(retval, '\\');
     while (p) {
-	if (p[1] == 'n')
+	if (p[1] == 'n' || p[1] == 'N')
 	    p[1] = '\n';
 	memmove(p, p + 1, strlen(p + 1) + 1);
 	p = strchr(retval, '\\');

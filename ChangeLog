@@ -1,3 +1,8 @@
+2009-11-08  Peter Bloomfield
+
+	* libbalsa/imap/imap-tls.c (imap_check_server_identity): openssl
+	has been constified.
+
 2009-11-07  Peter Bloomfield
 
 	* src/balsa-mime-widget-vcalendar.c (balsa_vevent_widget,

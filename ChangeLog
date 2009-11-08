@@ -1,5 +1,11 @@
 2009-11-08  Peter Bloomfield
 
+	* libbalsa/imap/imap-tls.c (imap_check_server_identity): openssl
+	has been constified--second try, should build with both latest
+	and earlier openssl.
+
+2009-11-08  Peter Bloomfield
+
 	* libbalsa/imap/imap-tls.c (imap_check_server_identity):
 	revert--it's going to take more work!
 

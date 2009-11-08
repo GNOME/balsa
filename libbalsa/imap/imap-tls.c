@@ -265,7 +265,11 @@ imap_check_server_identity(SSL *ssl, const char *host,
 #endif
       STACK_OF(CONF_VALUE) *val;
       CONF_VALUE           *nval;
+#if (OPENSSL_VERSION_NUMBER >= 0x01000000L)
+      const X509V3_EXT_METHOD *meth;
+#else
       X509V3_EXT_METHOD    *meth;
+#endif
       void *ext_str = NULL;
 
       if( !(meth = X509V3_EXT_get(ext)) )

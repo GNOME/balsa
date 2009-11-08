@@ -265,7 +265,7 @@ imap_check_server_identity(SSL *ssl, const char *host,
 #endif
       STACK_OF(CONF_VALUE) *val;
       CONF_VALUE           *nval;
-      const X509V3_EXT_METHOD *meth;
+      X509V3_EXT_METHOD    *meth;
       void *ext_str = NULL;
 
       if( !(meth = X509V3_EXT_get(ext)) )

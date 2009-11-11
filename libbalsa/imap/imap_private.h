@@ -166,7 +166,10 @@ struct _ImapMboxHandle {
 
 #define EAT_LINE(h, c) while( (c=sio_getc(h->sio)) != -1 && c != '\n')
 
-extern const char* msg_flags[6];
+extern const char* imap_msg_flags[6];
+
+ImapResponse imap_mbox_select_unlocked(ImapMboxHandle* handle, const char *mbox,
+                                       gboolean *readonly_mbox);
 
 void imap_mbox_resize_cache(ImapMboxHandle *h, unsigned new_size);
 

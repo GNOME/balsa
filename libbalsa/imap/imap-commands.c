@@ -181,19 +181,18 @@ imap_mbox_handle_noop(ImapMboxHandle *handle)
 /* 6.3.1 SELECT Command
  * readonly_mbox can be NULL. */
 ImapResponse
-imap_mbox_select(ImapMboxHandle* handle, const char *mbox,
-                 gboolean *readonly_mbox)
+imap_mbox_select_unlocked(ImapMboxHandle* handle, const char *mbox,
+                          gboolean *readonly_mbox)
 {
   gchar* cmd, *mbx7;
   ImapResponse rc;
 
   IMAP_REQUIRED_STATE3(handle, IMHS_CONNECTED, IMHS_AUTHENTICATED,
                        IMHS_SELECTED, IMR_BAD);
-  HANDLE_LOCK(handle);
+
   if (handle->state == IMHS_SELECTED && strcmp(handle->mbox, mbox) == 0) {
     if(readonly_mbox)
       *readonly_mbox = handle->readonly_mbox;
-    HANDLE_UNLOCK(handle);
     return IMR_OK;
   }
   imap_mbox_resize_cache(handle, 0);
@@ -219,10 +218,20 @@ imap_mbox_select(ImapMboxHandle* handle, const char *mbox,
     mbox_view_dispose(&handle->mbox_view);
     g_signal_emit_by_name(G_OBJECT(handle), "exists-notify");
   }
-  HANDLE_UNLOCK(handle);
+
   return rc;
 }
 
+ImapResponse
+imap_mbox_select(ImapMboxHandle* handle, const char *mbox,
+                 gboolean *readonly_mbox)
+{
+  ImapResponse rc;
+  HANDLE_LOCK(handle);
+  rc = imap_mbox_select_unlocked(handle, mbox, readonly_mbox);
+  HANDLE_UNLOCK(handle);
+  return rc;
+}
 
 /* 6.3.2 EXAMINE Command */
 ImapResponse
@@ -390,11 +399,11 @@ enum_flag_to_str(ImapMsgFlags flg)
   GString *flags_str = g_string_new("");
   unsigned idx;
 
-  for(idx=0; idx < ELEMENTS(msg_flags); idx++) {
+  for(idx=0; idx < ELEMENTS(imap_msg_flags); idx++) {
     if((flg & (1<<idx)) == 0) continue;
     if(*flags_str->str) g_string_append_c(flags_str, ' ');
     g_string_append_c(flags_str, '\\');
-    g_string_append(flags_str, msg_flags[idx]);
+    g_string_append(flags_str, imap_msg_flags[idx]);
   }
   return g_string_free(flags_str, FALSE);
 }

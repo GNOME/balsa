@@ -132,6 +132,8 @@ ImapResult imap_mbox_handle_connect(ImapMboxHandle* r, const char *hst,
                                     int over_ssl);
 ImapResult imap_mbox_handle_reconnect(ImapMboxHandle* r,
                                       gboolean *readonly);
+void imap_handle_force_disconnect(ImapMboxHandle *h);
+
 ImapTlsMode imap_handle_set_tls_mode(ImapMboxHandle *h, ImapTlsMode option);
 
 /* int below is a boolean */

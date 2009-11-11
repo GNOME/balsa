@@ -583,6 +583,8 @@ imap_mbox_handle_connect(ImapMboxHandle* ret, const char *host, int over_ssl)
   ImapResult rc;
 
   g_return_val_if_fail(imap_mbox_is_disconnected(ret), IMAP_CONNECT_FAILED);
+
+  HANDLE_LOCK(ret);
 #if !defined(USE_TLS)
   if(over_ssl) {
     imap_mbox_handle_set_msg(ret,"SSL requested but SSL support not compiled");
@@ -598,6 +600,8 @@ imap_mbox_handle_connect(ImapMboxHandle* ret, const char *host, int over_ssl)
     return rc;
 
   rc = imap_authenticate(ret);
+
+  HANDLE_UNLOCK(ret);
 
   return rc;
 }
@@ -627,23 +631,31 @@ imap_mbox_handle_reconnect(ImapMboxHandle* h, gboolean *readonly)
 {
   ImapResult rc;
   
+  HANDLE_LOCK(h);
 
-  if( (rc=imap_mbox_connect(h)) != IMAP_SUCCESS)
-    return rc;
+  if( (rc=imap_mbox_connect(h)) == IMAP_SUCCESS) {
+    if( (rc = imap_authenticate(h)) == IMAP_SUCCESS) {
+      imap_mbox_resize_cache(h, 0); /* invalidate cache */
+      mbox_view_dispose(&h->mbox_view); /* FIXME: recreate it here? */
 
-  if( (rc = imap_authenticate(h)) != IMAP_SUCCESS)
-    return rc;
-
-  imap_mbox_resize_cache(h, 0); /* invalidate cache */
-  mbox_view_dispose(&h->mbox_view); /* FIXME: recreate it here? */
-
-  if(h->mbox) {
-    switch(imap_mbox_select(h, h->mbox, readonly)) {
-    case IMR_OK: rc = IMAP_SUCCESS;       break;
-    default:     rc = IMAP_SELECT_FAILED; break;
+      if(h->mbox && 
+         imap_mbox_select_unlocked(h, h->mbox, readonly) != IMR_OK) {
+        rc = IMAP_SELECT_FAILED;
+      }
     }
   }
+  HANDLE_UNLOCK(h);
   return rc;
+}
+
+/** Drops the connection without waiting for response.  This can be
+    called when eg a signal from NetworkManager arrives. */
+void
+imap_handle_force_disconnect(ImapMboxHandle *h)
+{
+  HANDLE_LOCK(h);
+  imap_handle_disconnect(h);
+  HANDLE_UNLOCK(h);
 }
 
 ImapTlsMode
@@ -656,7 +668,7 @@ imap_handle_set_tls_mode(ImapMboxHandle* r, ImapTlsMode state)
   return res;
 }
 
-const char* msg_flags[6] = { 
+const char* imap_msg_flags[6] = { 
   "seen", "answered", "flagged", "deleted", "draft", "recent"
 };
 
@@ -745,7 +757,6 @@ imap_mbox_connect(ImapMboxHandle* handle)
   static const int SIO_BUFSZ=8192;
   ImapResponse resp;
   const char *service = "imap";
-  HANDLE_LOCK(handle);
 
   /* reset some handle status */
   handle->op_cancelled = FALSE;
@@ -763,16 +774,13 @@ imap_mbox_connect(ImapMboxHandle* handle)
 #endif
 
   handle->sd = imap_socket_open(handle->host, service);
-  if(handle->sd<0) {
-    HANDLE_UNLOCK(handle);
+  if(handle->sd<0)
     return IMAP_CONNECT_FAILED;
-  }
   
   /* Add buffering to the socket */
   handle->sio = sio_attach(handle->sd, handle->sd, SIO_BUFSZ);
   if (handle->sio == NULL) {
     close(handle->sd);
-    HANDLE_UNLOCK(handle);
     return IMAP_NOMEM;
   }
   if(handle->timeout>0) {
@@ -784,7 +792,6 @@ imap_mbox_connect(ImapMboxHandle* handle)
     SSL *ssl = imap_create_ssl();
     if(!ssl) {
       imap_mbox_handle_set_msg(handle,"SSL context could not be created");
-      HANDLE_UNLOCK(handle);
       return IMAP_UNSECURE;
     }
     if(imap_setup_ssl(handle->sio, handle->host, ssl,
@@ -793,7 +800,6 @@ imap_mbox_connect(ImapMboxHandle* handle)
     else {
       imap_mbox_handle_set_msg(handle,"SSL negotiation failed");
       imap_handle_disconnect(handle);
-      HANDLE_UNLOCK(handle);
       return IMAP_UNSECURE;
     }
   }
@@ -806,7 +812,6 @@ imap_mbox_connect(ImapMboxHandle* handle)
     g_message("imap_mbox_connect:unexpected initial response(%d):\n%s\n",
 	      resp, handle->last_msg);
     imap_handle_disconnect(handle);
-    HANDLE_UNLOCK(handle);
     return IMAP_PROTOCOL_ERROR;
   }
   handle->can_fetch_body = 
@@ -818,7 +823,6 @@ imap_mbox_connect(ImapMboxHandle* handle)
           imap_mbox_handle_can_do(handle, IMCAP_STARTTLS)) {
     if( imap_handle_starttls(handle) != IMR_OK) {
       imap_mbox_handle_set_msg(handle,"TLS negotiation failed");
-      HANDLE_UNLOCK(handle);
       return IMAP_UNSECURE; /* TLS negotiation error */
     }
     resp = IMR_OK; /* secured with TLS */
@@ -829,10 +833,9 @@ imap_mbox_connect(ImapMboxHandle* handle)
 #endif
   if(handle->tls_mode == IMAP_TLS_REQUIRED && resp != IMR_OK) {
     imap_mbox_handle_set_msg(handle,"TLS required but not available");
-    HANDLE_UNLOCK(handle);
     return IMAP_UNSECURE;
   }
-  HANDLE_UNLOCK(handle);
+
   return IMAP_SUCCESS;
 }
 
@@ -2841,8 +2844,8 @@ ir_msg_att_flags(ImapMboxHandle *h, int c, unsigned seqno)
   do {
     char buf[LONG_STRING];
     c = imap_get_flag(h->sio, buf, sizeof(buf));
-    for(i=0; i<ELEMENTS(msg_flags); i++)
-      if(buf[0] == '\\' && g_ascii_strcasecmp(msg_flags[i], buf+1) == 0) {
+    for(i=0; i<ELEMENTS(imap_msg_flags); i++)
+      if(buf[0] == '\\' && g_ascii_strcasecmp(imap_msg_flags[i], buf+1) == 0) {
         msg->flags |= 1<<i;
         break;
       }

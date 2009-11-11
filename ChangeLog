@@ -1,3 +1,16 @@
+2009-11-11  Pawel Salek
+
+	* configure.in: add NetworkManager-glib support.
+	* libbalsa/imap-server.c: Disconnect quickly if asked to.
+	* libbalsa/imap/imap-commands.c: add private unlocked select command.
+	* libbalsa/imap/imap-handle.c: locking changes.
+	* libbalsa/imap/imap-handle.h: add ..force_disconnect() prototype.
+	* libbalsa/imap/imap_private.h: add select_unlocked() prototype.
+	* libbalsa/mailbox.c: stop-gap performance fix.
+	* libbalsa/mailbox_imap.[hc]: Add force_disconnect(), reconnect(),
+	is_connected().
+	* src/main-window.c: listen to libnm events.
+
 2009-11-08  Peter Bloomfield
 
 	* libbalsa/imap/imap-tls.c (imap_check_server_identity): openssl

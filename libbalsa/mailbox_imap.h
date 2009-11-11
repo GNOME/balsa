@@ -60,6 +60,9 @@ GHashTable * libbalsa_mailbox_imap_get_matchings(LibBalsaMailboxImap* mbox,
 
 void libbalsa_mailbox_imap_noop(LibBalsaMailboxImap* mbox);
 
+void libbalsa_mailbox_imap_force_disconnect(LibBalsaMailboxImap* mimap);
+gboolean libbalsa_mailbox_imap_is_connected(LibBalsaMailboxImap* mimap);
+void libbalsa_mailbox_imap_reconnect(LibBalsaMailboxImap* mimap);
 void libbalsa_imap_close_all_connections(void);
 
 gboolean libbalsa_imap_new_subfolder(const gchar *parent, const gchar *folder,

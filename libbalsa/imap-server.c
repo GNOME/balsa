@@ -362,6 +362,7 @@ lb_imap_server_info_new(LibBalsaServer *server)
 static void
 lb_imap_server_info_free(struct handle_info *info)
 {
+    imap_handle_force_disconnect(info->handle);
     g_object_unref(info->handle);
     g_free(info);
 }
@@ -862,7 +863,8 @@ libbalsa_imap_server_has_persistent_cache(LibBalsaImapServer *srv)
  *
  * Forces a logout on all connections, used when cleaning up.
  **/
-void libbalsa_imap_server_force_disconnect(LibBalsaImapServer *imap_server)
+void
+libbalsa_imap_server_force_disconnect(LibBalsaImapServer *imap_server)
 {
     LOCK_SERVER(imap_server);
     g_list_foreach(imap_server->used_handles,

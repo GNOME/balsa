@@ -1653,6 +1653,45 @@ libbalsa_mailbox_imap_noop(LibBalsaMailboxImap* mimap)
 	    ;
 }
 
+void
+libbalsa_mailbox_imap_force_disconnect(LibBalsaMailboxImap* mimap)
+{
+    g_return_if_fail(mimap != NULL);
+
+    if (mimap->handle) {/* we do not attempt to reconnect here */
+        printf("Disconnecting %s (%u)\n", LIBBALSA_MAILBOX(mimap)->name,
+               (unsigned)time(NULL));
+        imap_handle_force_disconnect(mimap->handle);
+        printf("Disconnected %s (%u)\n", LIBBALSA_MAILBOX(mimap)->name,
+               (unsigned)time(NULL));
+    }
+}
+
+void
+libbalsa_mailbox_imap_reconnect(LibBalsaMailboxImap* mimap)
+{
+    g_return_if_fail(mimap != NULL);
+
+    if (mimap->handle &&
+        imap_mbox_is_disconnected (mimap->handle)) {
+        printf("Reconnecting %s (%u)\n",
+               LIBBALSA_MAILBOX_REMOTE_SERVER(mimap)->host,
+               (unsigned)time(NULL));
+        if (imap_mbox_handle_reconnect
+            (mimap->handle, &(LIBBALSA_MAILBOX(mimap)->readonly))
+            == IMAP_SUCCESS)
+            printf("Reconnected %s (%u)\n",
+                   LIBBALSA_MAILBOX_REMOTE_SERVER(mimap)->host,
+                   (unsigned)time(NULL));
+    }
+}
+
+gboolean
+libbalsa_mailbox_imap_is_connected(LibBalsaMailboxImap* mimap)
+{
+    return mimap->handle && !imap_mbox_is_disconnected(mimap->handle);
+}
+
 /* imap_close_all_connections:
    close all connections to leave the place cleanly.
 */

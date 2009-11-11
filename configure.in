@@ -40,13 +40,6 @@ AC_DEFINE_UNQUOTED(BALSA_VERSION, "$BALSA_VERSION",
 dnl #####################################################################
 dnl 2. Options
 dnl #####################################################################
-AC_ARG_WITH(iconv,      
-        AC_HELP_STRING([--with-iconv=DIR],
-                [Where libiconv is installed]),
-           [if test "$with_iconv" != yes -a "$with_iconv" != no ; then
-                   CPPFLAGS="-I${with_iconv}/include $CPPFLAGS"
-                   LDFLAGS="-liconv -L${with_iconv}/lib $LDFLAGS"
-            fi])
 AC_ARG_WITH([gnome],
         AC_HELP_STRING([--with-gnome],
                 [Use GNOME libraries (default=yes)]),[
@@ -89,13 +82,6 @@ if test x"$use_threads" = xyes; then
         AC_DEFINE(BALSA_USE_THREADS, 1,[Defined when balsa is to use threads.])
 fi
 
-AC_ARG_WITH([ldap],
-        AC_HELP_STRING([--with-ldap=DIR],
-                [Use OpenLDAP if available (default=no)]),[
-	with_ldap=$withval
-],[
-	with_ldap=no
-])
 
 AC_ARG_WITH([gpgme],
    AC_HELP_STRING([--with-gpgme=gpgme-config],
@@ -110,69 +96,75 @@ AC_ARG_WITH([gpg-app],
                   [use PATH as GnuPG application (default=gpg2 if >= 2.0.4, otherwise gpg 1.x)]),
 	          [ gpgapp=$withval ], [ gpgapp=no ])
 
-AC_ARG_WITH([webkit],
-              AC_HELP_STRING([--with-webkit],
-                [Use WebKit if available (default=no)]),[
-	use_webkit=$withval
-],[
-	use_webkit=no
-])
 
-AC_ARG_WITH([macosx-desktop],
-              AC_HELP_STRING([--with-macosx-desktop],
-                [Use Mac OS X Desktop Integration (default=no, extremely experimental)]),[
-	use_igemacint=$withval
-],[
-	use_igemacint=no
-])
+
+AC_ARG_WITH(canberra,
+   AC_HELP_STRING([--with-canberra],
+                  [Use libcanberra-gtk2 for filter sounds (default=no)]),
+                  [with_canberra=$withval],[with_canberra=no])
+
+AC_ARG_WITH(compface,
+   AC_HELP_STRING([--with-compface],
+                  [Enable Compface (default=no)]),
+                  [with_compface=$withval],[with_compface=no])
+
+AC_ARG_WITH(esmtp,
+   AC_HELP_STRING([--with-esmtp=DIR],
+                  [Enable libESMTP (default=yes)]),
+                  [ with_esmtp=$withval ],[ with_esmtp=yes ])
+
+AC_ARG_ENABLE([gregex], 
+   AC_HELP_STRING([--enable-gregex],
+                  [Use GRegex regular expressions if available (default=no)]),
+                  [ check_gregex=$enableval],[ check_gregex=no ])
+
+AC_ARG_WITH(gss,
+   AC_HELP_STRING([--with-gss],
+                  [Enable GSS (default=no)]),
+                  [with_gss=$withval],[with_gss=no])
 
 AC_ARG_WITH([gtkhtml],
-              AC_HELP_STRING([--with-gtkhtml],
-                             [Preferred GtkHTML version, 2 or 3 (default=3)]),[
-	use_gtkhtml=$withval
-],[
-	use_gtkhtml=3
-])
-
-AC_ARG_WITH([gtkspell],
-        AC_HELP_STRING([--with-gtkspell],
-                [Use GtkSpell if available (default=no)]),[
-	with_gtkspell=$withval
-],[
-	with_gtkspell=no
-])
-
-AC_ARG_WITH([libnotify],
-        AC_HELP_STRING([--with-libnotify],
-                [Use libnotify if available (default=yes)]),[
-	with_libnotify=$withval
-],[
-	with_libnotify=yes
-])
+   AC_HELP_STRING([--with-gtkhtml],
+                  [Preferred GtkHTML version, 2 or 3 (default=3)]),
+		  [use_gtkhtml=$withval],[use_gtkhtml=3])
 
 AC_ARG_WITH([gtksourceview],
-        AC_HELP_STRING([--with-gtksourceview],
-                [Use GtkSourceView if available (default=no, specify version 1 or 2, yes=2)]),[
-	with_gtksourceview=$withval
-],[
-	with_gtksourceview=no
-])
+   AC_HELP_STRING([--with-gtksourceview],
+                  [Use GtkSourceView if available (default=no, specify version 1 or 2, yes=2)]),
+		  [with_gtksourceview=$withval],[with_gtksourceview=no])
 
-AC_ARG_WITH([sqlite],
-        AC_HELP_STRING([--with-sqlite=DIR],
-                [Use SQLite for GPE address books (default=no)]),[
-	with_sqlite=$withval
-],[
-	with_sqlite=no
-])
+AC_ARG_WITH([gtkspell],
+   AC_HELP_STRING([--with-gtkspell],
+                  [Use GtkSpell if available (default=no)]),
+		  [with_gtkspell=$withval],[with_gtkspell=no])
 
-AC_ARG_WITH([rubrica],
-        AC_HELP_STRING([--with-rubrica],
-                [add Rubrica2 address book support (needs libxml2, default=no)]),[
-	with_rubrica=$withval
-],[
-	with_rubrica=no
-])
+AC_ARG_WITH(iconv,      
+   AC_HELP_STRING([--with-iconv=DIR],
+                  [Where libiconv is installed]),
+		  [if test "$with_iconv" != yes -a "$with_iconv" != no ; then
+                   CPPFLAGS="-I${with_iconv}/include $CPPFLAGS"
+                   LDFLAGS="-liconv -L${with_iconv}/lib $LDFLAGS"
+		   fi])
+
+AC_ARG_WITH([ldap],
+   AC_HELP_STRING([--with-ldap=DIR],
+                  [Use OpenLDAP if available (default=no)]),
+		  [with_ldap=$withval],[with_ldap=no])
+
+AC_ARG_WITH([libnotify],
+   AC_HELP_STRING([--with-libnotify],
+                  [Use libnotify if available (default=yes)]),
+		  [with_libnotify=$withval],[with_libnotify=yes])
+
+AC_ARG_WITH([macosx-desktop],
+   AC_HELP_STRING([--with-macosx-desktop],
+	          [Use Mac OS X Desktop Integration (default=no, extremely experimental)]),
+		  [use_igemacint=$withval],[use_igemacint=no])
+
+AC_ARG_WITH(nm,
+   AC_HELP_STRING([--with-nm],
+                  [Enable NetworkManager (default=yes)]),
+                  [with_nm=$withval],[with_nm=yes])
 
 AC_ARG_ENABLE([pcre], 
    AC_HELP_STRING([--enable-pcre],
@@ -180,46 +172,37 @@ AC_ARG_ENABLE([pcre],
                   [ check_pcre=$enableval],[ check_pcre=no ])
 
 
-AC_ARG_ENABLE([gregex], 
-   AC_HELP_STRING([--enable-gregex],
-                  [Use GRegex regular expressions if available (default=no)]),
-                  [ check_gregex=$enableval],[ check_gregex=no ])
+AC_ARG_WITH([rubrica],
+   AC_HELP_STRING([--with-rubrica],
+                  [add Rubrica2 address book support (needs libxml2, default=no)]),
+		  [with_rubrica=$withval],[with_rubrica=no])
 
-
-AC_ARG_WITH(esmtp,
-   AC_HELP_STRING([--with-esmtp=DIR],
-                  [Enable libESMTP (default=yes)]),
-                  [ with_esmtp=$withval ],[ with_esmtp=yes ])
+AC_ARG_WITH([sqlite],
+   AC_HELP_STRING([--with-sqlite=DIR],
+                  [Use SQLite for GPE address books (default=no)]),
+                  [with_sqlite=$withval],[with_sqlite=no])
 
 AC_ARG_WITH(ssl,
    AC_HELP_STRING([--with-ssl],
                   [Enable SSL (default=no)]),
                   [ with_ssl=$withval ],[ with_ssl=no ])
 
-AC_ARG_WITH(gss,
-   AC_HELP_STRING([--with-gss],
-                  [Enable GSS (default=no)]),
-                  [with_gss=$withval],[with_gss=no])
-
-AC_ARG_WITH(compface,
-   AC_HELP_STRING([--with-compface],
-                  [Enable Compface (default=no)]),
-                  [with_compface=$withval],[with_compface=no])
-
 AC_ARG_WITH(unique,
    AC_HELP_STRING([--with-unique],
                   [Use libUnique instead of BonoboActivation (default=no)]),
                   [with_unique=$withval],[with_unique=no])
 
-AC_ARG_WITH(canberra,
-   AC_HELP_STRING([--with-canberra],
-                  [Use libcanberra-gtk2 for filter sounds (default=no)]),
-                  [with_canberra=$withval],[with_canberra=no])
+AC_ARG_WITH([webkit],
+   AC_HELP_STRING([--with-webkit],
+                  [Use WebKit if available (default=no)]),
+		  [use_webkit=$withval],[use_webkit=no])
+
 
 AC_ARG_ENABLE(more-warnings,
    AC_HELP_STRING([--enable-more-warnings],
                   [Enable maximum compiler warnings (default=yes)]),
                   [set_more_warnings="$enableval"], [set_more_warnings=yes])
+
 
 dnl ##########################################################################
 dnl Enable touchscreen optimized UI?
@@ -743,6 +726,19 @@ if test x$with_libnotify != xno; then
     BALSA_AB_LIBS="$BALSA_AB_LIBS -lnotify"
 fi
 
+# NetworkManager
+AC_MSG_CHECKING([NetworkManager-glib-devel])
+echo withnm "'$with_nm'"
+if test "$with_nm" != no ; then
+  PKG_CHECK_MODULES(LIBNM_GLIB, [ libnm_glib ])
+  AC_DEFINE(HAVE_LIBNM_GLIB,1,[ Defined if NetworkManager-glib-devel is found.])
+  CFLAGS="$CFLAGS $LIBNM_GLIB_CFLAGS"
+  LIBS="$LIBS $LIBNM_GLIB_LIBS"
+  AC_MSG_RESULT([yes])
+else
+ AC_MSG_RESULT([no])
+fi
+
 # Compface configuration
 #
 AC_MSG_CHECKING([whether to build Compface support])
@@ -1010,6 +1006,7 @@ echo "                  Use LDAP: $with_ldap"
 echo "                   Use GSS: $with_gss"
 echo "                Use SQLite: $with_sqlite"
 echo "                   Use SSL: $with_ssl"
+echo "        Use NetworkManager: $with_nm"
 echo "              Use GtkSpell: $with_gtkspell"
 echo "             Use Libnotify: $with_libnotify"
 echo "         Use GtkSourceView: $with_gtksourceview"

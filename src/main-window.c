@@ -35,6 +35,7 @@
 #include <string.h>
 #include <gdk-pixbuf/gdk-pixbuf.h>
 
+#include "imap-server.h"
 #include "libbalsa.h"
 #include "misc.h"
 #include "html.h"
@@ -43,6 +44,10 @@
 #if HAVE_MACOSX_DESKTOP
 #  include <ige-mac-integration.h>
 #  include "macosx-helpers.h"
+#endif
+
+#if defined(HAVE_LIBNM_GLIB)
+#include <libnm_glib.h>
 #endif
 
 #include "ab-window.h"
@@ -114,6 +119,10 @@ static void bw_check_messages_thread(struct check_messages_thread_info
 
 #endif
 static void bw_display_new_mail_notification(int num_new, int has_new);
+
+#if defined(HAVE_LIBNM_GLIB)
+static void mw_change_connection_status(libnm_glib_ctx *ctx, gpointer data);
+#endif
 
 static void balsa_window_class_init(BalsaWindowClass * klass);
 static void balsa_window_init(BalsaWindow * window);
@@ -973,6 +982,19 @@ balsa_window_class_init(BalsaWindowClass * klass)
 static void
 balsa_window_init(BalsaWindow * window)
 {
+#if defined(HAVE_LIBNM_GLIB)
+    libnm_glib_ctx *ctx;
+    guint id;
+
+    ctx = libnm_glib_init ();
+    if (!ctx) {
+        fprintf (stderr, "Could not initialize libnm.\n");
+        return;
+    }
+
+    id = libnm_glib_register_callback(ctx, mw_change_connection_status,
+                                      window, NULL);
+#endif /* LIBNM_GLIB */
 }
 
 static gboolean
@@ -3389,6 +3411,94 @@ bw_display_new_mail_notification(int num_new, int has_new)
 #endif
     g_free(msg);
 }
+
+#if defined(HAVE_LIBNM_GLIB)
+/*Callback to create or disconnect an IMAP mbox. */
+static gboolean
+mw_mbox_change_connection_status(GtkTreeModel * model, GtkTreePath * path,
+                      GtkTreeIter * iter, gboolean is_connected)
+{
+    BalsaMailboxNode *mbnode;
+    LibBalsaMailbox *mailbox;
+
+    gtk_tree_model_get(model, iter, 0, &mbnode, -1);
+    g_return_val_if_fail(mbnode, FALSE);
+
+    if ((mailbox = mbnode->mailbox)) {	/* mailbox, not a folder */
+	if (LIBBALSA_IS_MAILBOX_IMAP(mailbox)) {
+            if (is_connected) {
+                libbalsa_mailbox_imap_reconnect
+                    (LIBBALSA_MAILBOX_IMAP(mailbox));
+            } else {
+                libbalsa_mailbox_imap_force_disconnect
+                    (LIBBALSA_MAILBOX_IMAP(mailbox));
+            }
+        }
+    }
+    g_object_unref(mbnode);
+
+    return FALSE;
+}
+
+#if BALSA_USE_THREADS
+static void*
+bw_change_connection_status_thread(void *arg)
+{
+    gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
+			   (GtkTreeModelForeachFunc)
+                           mw_mbox_change_connection_status,
+			   arg);
+    return NULL;
+}
+#endif /* BALSA_USE_THREADS */
+
+/** Responds to NetworkManager events and creates, alternatively
+forcefully destroys the IMAP connections. */
+static void
+mw_change_connection_status(libnm_glib_ctx *ctx, gpointer data)
+{
+    gboolean is_connected;
+    libnm_glib_state state = libnm_glib_get_network_state (ctx);
+
+    switch (state) {
+    case LIBNM_NO_DBUS:
+        fprintf(stderr, "Status: No DBUS\n");
+        return;
+    case LIBNM_NO_NETWORKMANAGER:
+        fprintf(stderr, "Status: No NetworkManager\n");
+        return;
+    case LIBNM_NO_NETWORK_CONNECTION:
+        fprintf (stderr, "Status: Inactive Connection\n");
+        is_connected = FALSE;
+        break;
+    case LIBNM_ACTIVE_NETWORK_CONNECTION:
+        fprintf (stderr, "Status: Active Connection\n");
+        is_connected = TRUE;
+        break;
+    case LIBNM_INVALID_CONTEXT:
+        fprintf (stderr, "Status: Error\n");
+        return;
+    default:
+        fprintf (stderr, "Status: unknown\n");
+        return;
+    }
+
+#if BALSA_USE_THREADS
+    {
+        pthread_t thread_id;
+        if (pthread_create(&thread_id,
+                   NULL, (void *) &bw_change_connection_status_thread,
+                           GINT_TO_POINTER(is_connected)) == 0)
+            pthread_detach(thread_id);
+    }
+#else /* BALSA_USE_THREADS */
+    gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
+			   (GtkTreeModelForeachFunc)
+                           mw_mbox_change_connection_status,
+			   GINT_TO_POINTER(is_connected));
+#endif /* BALSA_USE_THREADS */
+}
+#endif /* LIBNM_GLIB */
 
 GtkWidget *
 balsa_window_find_current_index(BalsaWindow * window)

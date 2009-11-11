@@ -1622,6 +1622,16 @@ libbalsa_mailbox_msgno_filt_check(LibBalsaMailbox * mailbox, guint seqno,
                 libbalsa_mailbox_msgno_has_flags(mailbox, seqno, 0,
                                                  LIBBALSA_MESSAGE_FLAG_SELECTED)
                 : TRUE;
+#if 1
+	    /* a hack. The whole filtering idea is bit silly since we
+	       keep checking flags (or maybe more!) on all messages so
+	       that the time spent on changing the selection grows
+	       linearly with the mailbox size!  */
+	    if (LIBBALSA_IS_MAILBOX_IMAP(mailbox) &&
+		!libbalsa_mailbox_imap_is_connected
+		(LIBBALSA_MAILBOX_IMAP(mailbox)))
+		filt_out = FALSE;
+#endif
             if (filt_out)
                 libbalsa_mailbox_msgno_filt_out(mailbox, seqno);
         }

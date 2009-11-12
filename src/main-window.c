@@ -3416,10 +3416,11 @@ bw_display_new_mail_notification(int num_new, int has_new)
 /*Callback to create or disconnect an IMAP mbox. */
 static gboolean
 mw_mbox_change_connection_status(GtkTreeModel * model, GtkTreePath * path,
-                      GtkTreeIter * iter, gboolean is_connected)
+                                 GtkTreeIter * iter, gpointer arg)
 {
     BalsaMailboxNode *mbnode;
     LibBalsaMailbox *mailbox;
+    gboolean is_connected = GPOINTER_TO_INT(arg);
 
     gtk_tree_model_get(model, iter, 0, &mbnode, -1);
     g_return_val_if_fail(mbnode, FALSE);

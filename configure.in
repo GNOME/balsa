@@ -727,15 +727,16 @@ if test x$with_libnotify != xno; then
 fi
 
 # NetworkManager
-AC_MSG_CHECKING([NetworkManager-glib-devel])
-echo withnm "'$with_nm'"
 if test "$with_nm" != no ; then
-  PKG_CHECK_MODULES(LIBNM_GLIB, [ libnm_glib ])
+  PKG_CHECK_EXISTS([libnm-glib], 
+  [ PKG_CHECK_MODULES(LIBNM_GLIB, [ libnm-glib ]) ],
+  [ PKG_CHECK_MODULES(LIBNM_GLIB, [ libnm_glib ]) ])
+
   AC_DEFINE(HAVE_LIBNM_GLIB,1,[ Defined if NetworkManager-glib-devel is found.])
   CFLAGS="$CFLAGS $LIBNM_GLIB_CFLAGS"
   LIBS="$LIBS $LIBNM_GLIB_LIBS"
-  AC_MSG_RESULT([yes])
 else
+AC_MSG_CHECKING([NetworkManager-glib-devel])
  AC_MSG_RESULT([no])
 fi
 

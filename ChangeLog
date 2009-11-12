@@ -1,3 +1,9 @@
+2009-11-12  Pawel Salek
+
+	* libbalsa/imap/imap-handle.c: fix a corner case locking problem.
+	* src/main-window.c: remove a warning.
+	* configure.in: work around lib rename.
+
 2009-11-11  Pawel Salek
 
 	* configure.in: add NetworkManager-glib support.

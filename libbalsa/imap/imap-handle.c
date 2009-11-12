@@ -588,6 +588,7 @@ imap_mbox_handle_connect(ImapMboxHandle* ret, const char *host, int over_ssl)
 #if !defined(USE_TLS)
   if(over_ssl) {
     imap_mbox_handle_set_msg(ret,"SSL requested but SSL support not compiled");
+    HANDLE_UNLOCK(ret);
     return IMAP_UNSECURE;
   }
 #else
@@ -596,10 +597,9 @@ imap_mbox_handle_connect(ImapMboxHandle* ret, const char *host, int over_ssl)
 
   g_free(ret->host);   ret->host   = g_strdup(host);
 
-  if( (rc=imap_mbox_connect(ret)) != IMAP_SUCCESS)
-    return rc;
-
-  rc = imap_authenticate(ret);
+  if( (rc=imap_mbox_connect(ret)) == IMAP_SUCCESS) {
+    rc = imap_authenticate(ret);
+  }
 
   HANDLE_UNLOCK(ret);
 

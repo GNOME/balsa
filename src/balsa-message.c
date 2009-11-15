@@ -2242,8 +2242,6 @@ select_part(BalsaMessage * bm, BalsaPartInfo *info)
                (GTK_VIEWPORT(bm->cont_viewport)), 0);
     scroll_set(gtk_viewport_get_vadjustment
                (GTK_VIEWPORT(bm->cont_viewport)), 0);
-
-    gtk_widget_queue_resize(bm->cont_viewport);
 }
 
 static void

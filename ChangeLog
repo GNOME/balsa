@@ -1,3 +1,10 @@
+2009-11-15  Peter Bloomfield
+
+	* libbalsa/html.c (lbh_size_request_cb): remove debugging aid;
+	(lbh_navigation_policy_decision_requested_cb): do not handle
+	signal unless it is a real request;
+	(libbalsa_html_new): remove debugging aids.
+
 2009-11-12  Pawel Salek
 
 	* libbalsa/imap/imap-handle.c: fix a corner case locking problem.

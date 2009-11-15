@@ -136,11 +136,13 @@ lbh_navigation_policy_decision_requested_cb(WebKitWebView             * web_view
         const gchar *uri = webkit_network_request_get_uri(request);
 
         (*info->clicked_cb) (uri);
+
+        webkit_web_policy_decision_ignore(decision);
+
+        return TRUE;
     }
 
-    webkit_web_policy_decision_ignore(decision);
-
-    return TRUE;
+    return FALSE;
 }
 
 /*
@@ -192,7 +194,6 @@ lbh_create_web_view_cb(WebKitWebView  * web_view,
 
     return WEBKIT_WEB_VIEW(widget);
 }
-
 
 /* Create a new WebKitWebView widget:
  * text			the HTML source;

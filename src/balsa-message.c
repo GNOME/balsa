@@ -3273,6 +3273,7 @@ balsa_message_find_in_message(BalsaMessage * bm)
         bm_find_set_status(bm, BM_FIND_STATUS_INIT);
 
         gtk_widget_show(bm->find_bar);
-        gtk_widget_grab_focus(bm->find_entry);
+        if (gtk_widget_get_window(bm->find_entry))
+            gtk_widget_grab_focus(bm->find_entry);
     }
 }

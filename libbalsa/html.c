@@ -65,17 +65,13 @@
  * "request-url" signal; WebKit does not have one.  We turn off its
  * "auto-load-images" setting, which seems to mean that <img src="...">
  * tags are ignored.  However, that is apparently intended to save
- * bandwidth rather than to protect privacy.  The server in a <frame
- * src="..."> is known to be contacted; whether "src=" attributes on
+ * bandwidth rather than to protect privacy.  The WebView attempts to
+ * contact the server named in <frame src="...">, but we detect it
+ * because of the new frame, and block it; whether "src=" attributes on
  * other tags are followed is unknown.
  *
  * We do disable scripts, so the server in a <script src="..."> should
  * not be contacted.
- *
- * The action taken on a <frame src="..."> tag seems buggy: it results
- * in a "navigation-requested" signal, which is otherwise emitted when
- * the user clicks on a link.  Consequently, we pass it to the Gnome
- * browser without verifying that the user wants it.
  *
  * https://bugs.webkit.org/show_bug.cgi?id=17147 discusses these issues.
  */
@@ -84,10 +80,13 @@
 
 typedef struct {
     WebKitWebView        *web_view;
+    WebKitWebFrame       *frame;
     LibBalsaHtmlCallback  hover_cb;
     LibBalsaHtmlCallback  clicked_cb;
+#if !WEBKIT_CHECK_VERSION(1, 12, 0)
     GtkAdjustment        *hadj;
     GtkAdjustment        *vadj;
+#endif                          /* !WEBKIT_CHECK_VERSION(1, 12, 0) */
 } LibBalsaWebKitInfo;
 
 static void
@@ -101,6 +100,7 @@ lbh_hovering_over_link_cb(GtkWidget   * web_view,
     (*info->hover_cb)(uri);
 }
 
+#if !WEBKIT_CHECK_VERSION(1, 12, 0)
 static void
 lbh_size_request_cb(GtkWidget      * widget,
                     GtkRequisition * requisition,
@@ -116,6 +116,7 @@ lbh_size_request_cb(GtkWidget      * widget,
     if (upper > requisition->height)
         requisition->height = upper;
 }
+#endif                          /* !WEBKIT_CHECK_VERSION(1, 12, 0) */
 
 static gboolean
 lbh_navigation_policy_decision_requested_cb(WebKitWebView             * web_view,
@@ -130,15 +131,24 @@ lbh_navigation_policy_decision_requested_cb(WebKitWebView             * web_view
 
     g_object_get(action, "reason", &reason, NULL);
 
+    /* First request is for "about:blank"; we must allow it, but first
+     * we store the main frame, so we can detect a new frame later. */
+    if (!info->frame)
+        info->frame = frame;
+    else if (web_view == info->web_view
+             && frame != info->frame
+             && reason == WEBKIT_WEB_NAVIGATION_REASON_OTHER) {
+        g_message("%s new frame ignored:\n URI=\"%s\"", __func__, 
+                  webkit_network_request_get_uri(request));
+        webkit_web_policy_decision_ignore(decision);
+        return TRUE;
+    }
+
     if (reason == WEBKIT_WEB_NAVIGATION_REASON_LINK_CLICKED ||
         (web_view != info->web_view
          && reason == WEBKIT_WEB_NAVIGATION_REASON_OTHER)) {
-        const gchar *uri = webkit_network_request_get_uri(request);
-
-        (*info->clicked_cb) (uri);
-
+        (*info->clicked_cb) (webkit_network_request_get_uri(request));
         webkit_web_policy_decision_ignore(decision);
-
         return TRUE;
     }
 
@@ -222,6 +232,7 @@ libbalsa_html_new(const gchar        * text,
 
     info = g_new(LibBalsaWebKitInfo, 1);
     info->web_view = web_view = WEBKIT_WEB_VIEW(widget);
+    info->frame = NULL;
     g_object_weak_ref(G_OBJECT(web_view), (GWeakNotify) g_free, info);
 
     g_object_set(webkit_web_view_get_settings(web_view),
@@ -230,6 +241,7 @@ libbalsa_html_new(const gchar        * text,
                  "enable-plugins",   FALSE,
                  NULL);
 
+#if !WEBKIT_CHECK_VERSION(1, 12, 0)
     info->hadj =
         GTK_ADJUSTMENT(gtk_adjustment_new(0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
     info->vadj =
@@ -240,6 +252,7 @@ libbalsa_html_new(const gchar        * text,
     g_signal_connect(web_view, "size-request",
                      G_CALLBACK(lbh_size_request_cb), info);
 
+#endif                          /* !WEBKIT_CHECK_VERSION(1, 12, 0) */
     info->hover_cb = hover_cb;
     g_signal_connect(web_view, "hovering-over-link",
                      G_CALLBACK(lbh_hovering_over_link_cb), info);
@@ -325,6 +338,8 @@ libbalsa_html_copy(GtkWidget * widget)
     webkit_web_view_copy_clipboard(WEBKIT_WEB_VIEW(widget));
 }
 
+#define WEBKIT_WEB_VIEW_CAN_MANAGE_SELECTION FALSE
+#if WEBKIT_WEB_VIEW_CAN_MANAGE_SELECTION
 /*
  * Does the widget support searching text?
  */
@@ -335,16 +350,54 @@ libbalsa_html_can_search(GtkWidget * widget)
 }
 
 /*
- * Search for the text.
+ * Search for the text; if text is empty, return TRUE (for consistency
+ * with GtkTextIter methods).
  */
 gboolean
 libbalsa_html_search_text(GtkWidget * widget, const gchar * text,
                           gboolean find_forward, gboolean wrap)
 {
+    if (!*text) {
+        webkit_web_view_clear_selection(WEBKIT_WEB_VIEW(widget));
+        return TRUE;
+    }
+
     return webkit_web_view_search_text(WEBKIT_WEB_VIEW(widget), text,
-                                       FALSE,   /* case-insensitive */
+                                       FALSE,    /* case-insensitive */
                                        find_forward, wrap);
 }
+
+/*
+ * Get the rectangle containing the currently selected text, for
+ * scrolling.
+ */
+void
+libbalsa_html_get_selection_bounds(GtkWidget    * widget,
+                                   GdkRectangle * selection_bounds)
+{
+    webkit_web_view_get_selection_bounds(WEBKIT_WEB_VIEW(widget),
+                                         selection_bounds);
+}
+#else                           /* WEBKIT_WEB_VIEW_CAN_MANAGE_SELECTION */
+gboolean
+libbalsa_html_can_search(GtkWidget * widget)
+{
+    return FALSE;
+}
+
+gboolean
+libbalsa_html_search_text(GtkWidget * widget, const gchar * text,
+                          gboolean find_forward, gboolean wrap)
+{
+    return FALSE;
+}
+
+void
+libbalsa_html_get_selection_bounds(GtkWidget    * widget,
+                                   GdkRectangle * selection_bounds)
+{
+}
+#endif                          /* WEBKIT_WEB_VIEW_CAN_MANAGE_SELECTION */
 
 # else                          /* defined(HAVE_WEBKIT) */
 
@@ -601,25 +654,6 @@ libbalsa_html_copy(GtkWidget * widget)
     gtk_html_copy(GTK_HTML(widget));
 }
 
-/*
- * GtkHTML doesn't support searching text.
- */
-gboolean
-libbalsa_html_can_search(GtkWidget * widget)
-{
-    return FALSE;
-}
-
-/*
- * GtkHTML doesn't support searching text.
- */
-gboolean
-libbalsa_html_search_text(GtkWidget * widget, const gchar * text,
-                          gboolean find_forward, gboolean wrap)
-{
-    return FALSE;
-}
-
 # else				/* HAVE_GTKHTML3 */
 
 /* Code for GtkHtml-2 */
@@ -755,25 +789,6 @@ libbalsa_html_copy(GtkWidget * widget)
 {
 }
 
-/*
- * HtmlView doesn't support searching text.
- */
-gboolean
-libbalsa_html_can_search(GtkWidget * widget)
-{
-    return FALSE;
-}
-
-/*
- * HtmlView doesn't support searching text.
- */
-gboolean
-libbalsa_html_search_text(GtkWidget * widget, const gchar * text,
-                          gboolean find_forward, gboolean wrap)
-{
-    return FALSE;
-}
-
 # endif				/* HAVE_GTKHTML3 */
 
 /* Common code for both widgets. */
@@ -810,6 +825,29 @@ libbalsa_html_url_requested(GtkWidget * html, const gchar * url,
 
     return TRUE;
 }
+
+/*
+ * Neither widget supports searching text
+ */
+gboolean
+libbalsa_html_can_search(GtkWidget * widget)
+{
+    return FALSE;
+}
+
+gboolean
+libbalsa_html_search_text(GtkWidget * widget, const gchar * text,
+                          gboolean find_forward, gboolean wrap)
+{
+    return FALSE;
+}
+
+void
+libbalsa_html_get_selection_bounds(GtkWidget    * widget,
+                                   GdkRectangle * selection_bounds)
+{
+}
+
 # endif                         /* defined(HAVE_WEBKIT) */
 
 /* Filter text/enriched or text/richtext to text/html, if we have GMime

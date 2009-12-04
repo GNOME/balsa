@@ -63,6 +63,8 @@ guint libbalsa_html_filter(LibBalsaHTMLType html_type, gchar ** text,
 gboolean libbalsa_html_can_search(GtkWidget * widget);
 gboolean libbalsa_html_search_text(GtkWidget * widget, const gchar * text,
                                    gboolean find_forward, gboolean wrap);
+void libbalsa_html_get_selection_bounds(GtkWidget * widget,
+                                        GdkRectangle * selection_bounds);
 
 # endif				/* HAVE_GTKHTML */
 

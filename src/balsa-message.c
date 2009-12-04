@@ -401,7 +401,11 @@ bm_find_set_status(BalsaMessage * bm, BalsaMessageFindStatus status)
         case BM_FIND_STATUS_INIT:
             break;
         case BM_FIND_STATUS_FOUND:
-            sensitive = TRUE;
+            /* The widget returned "found"; if it really found a string,
+             * we sensitize the "next" and "previous" buttons, but if
+             * the find-entry was empty, we desensitize them. */
+            if (gtk_entry_get_text(GTK_ENTRY(bm->find_entry))[0])
+                sensitive = TRUE;
             break;
         case BM_FIND_STATUS_WRAPPED:
             text = _("Wrapped");
@@ -420,27 +424,46 @@ bm_find_set_status(BalsaMessage * bm, BalsaMessageFindStatus status)
 }
 
 static void
-bm_find_scroll_to_iter(BalsaMessage * bm,
-                       GtkTextView  * text_view,
-                       GtkTextIter  * iter)
+bm_find_scroll_to_rectangle(BalsaMessage * bm,
+                            GtkWidget    * widget,
+                            GdkRectangle * rectangle)
 {
-    GtkAdjustment *adj =
-        gtk_viewport_get_vadjustment(GTK_VIEWPORT(bm->cont_viewport));
-    GdkRectangle location;
-    gdouble y;
+    gint x, y;
+    GtkAdjustment *adj;
 
-    gtk_text_view_get_iter_location(text_view, iter, &location);
+    gtk_widget_translate_coordinates(widget, bm->bm_widget->widget,
+                                     rectangle->x, rectangle->y,
+                                     &x, &y);
+
+    adj = gtk_viewport_get_hadjustment(GTK_VIEWPORT(bm->cont_viewport));
+    gtk_adjustment_clamp_page(adj, x, x + rectangle->width);
+
+    adj = gtk_viewport_get_vadjustment(GTK_VIEWPORT(bm->cont_viewport));
+    gtk_adjustment_clamp_page(adj, y, y + rectangle->height);
+}
+
+static void
+bm_find_scroll_to_selection(BalsaMessage * bm,
+                            GtkTextView  * text_view,
+                            GtkTextIter  * begin_iter,
+                            GtkTextIter  * end_iter)
+{
+    GdkRectangle begin_location, end_location;
+
+    gtk_text_view_get_iter_location(text_view, begin_iter,
+                                    &begin_location);
+    gtk_text_view_get_iter_location(text_view, end_iter,
+                                    &end_location);
+    end_location.width = 0;
+    gdk_rectangle_union(&begin_location, &end_location, &begin_location);
     gtk_text_view_buffer_to_window_coords(text_view,
                                           GTK_TEXT_WINDOW_WIDGET,
-                                          location.x, location.y,
-                                          NULL, &location.y);
-    gtk_widget_translate_coordinates(GTK_WIDGET(text_view),
-                                     bm->bm_widget->widget,
-                                     location.x, location.y,
-                                     NULL, &location.y);
+                                          begin_location.x,
+                                          begin_location.y,
+                                          &begin_location.x,
+                                          &begin_location.y);
 
-    y = location.y;
-    gtk_adjustment_clamp_page(adj, y, y + location.height);
+    bm_find_scroll_to_rectangle(bm, GTK_WIDGET(text_view), &begin_location);
 }
 
 static void
@@ -478,12 +501,21 @@ bm_find_entry_changed_cb(GtkEditable * editable, gpointer data)
 
         if (found) {
             gtk_text_buffer_select_range(buffer, &match_begin, &match_end);
-            bm_find_scroll_to_iter(bm, text_view, &match_begin);
+            bm_find_scroll_to_selection(bm, text_view,
+                                        &match_begin, &match_end);
             bm->find_iter = match_begin;
         }
-    } else if (libbalsa_html_can_search(widget))
-        found = libbalsa_html_search_text(widget, text, bm->find_forward, TRUE);
-    else
+    } else if (libbalsa_html_can_search(widget)) {
+        found = libbalsa_html_search_text(widget, text,
+                                          bm->find_forward, TRUE);
+        if (found && *text) {
+            GdkRectangle selection_bounds;
+
+            libbalsa_html_get_selection_bounds(widget,
+                                               &selection_bounds);
+            bm_find_scroll_to_rectangle(bm, widget, &selection_bounds);
+        }
+    } else
         g_assert_not_reached();
 
     bm_find_set_status(bm, found ?
@@ -523,12 +555,17 @@ bm_find_again(BalsaMessage * bm, gboolean find_forward)
         }
 
         gtk_text_buffer_select_range(buffer, &match_begin, &match_end);
-        bm_find_scroll_to_iter(bm, text_view, &match_begin);
+        bm_find_scroll_to_selection(bm, text_view,
+                                    &match_begin, &match_end);
         bm->find_iter = match_begin;
     } else if (libbalsa_html_can_search(widget)) {
+        GdkRectangle selection_bounds;
+
         found = libbalsa_html_search_text(widget, text, find_forward, FALSE);
         if (!found)
             libbalsa_html_search_text(widget, text, find_forward, TRUE);
+        libbalsa_html_get_selection_bounds(widget, &selection_bounds);
+        bm_find_scroll_to_rectangle(bm, widget, &selection_bounds);
     } else
         g_assert_not_reached();
 

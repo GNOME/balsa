@@ -1,3 +1,20 @@
+2009-12-03  Peter Bloomfield
+
+	* src/balsa-message.c (bm_find_set_status),
+	(bm_find_scroll_to_rectangle), (bm_find_scroll_to_selection),
+	(bm_find_entry_changed_cb), (bm_find_again): implement
+	search-text for HTML parts; desensitize find-next and
+	find-previous when find-entry is empty.
+
+2009-12-03  Peter Bloomfield
+
+	* libbalsa/html.c (lbh_navigation_policy_decision_requested_cb),
+	(libbalsa_html_new), (libbalsa_html_search_text),
+	(libbalsa_html_get_selection_bounds),
+	(libbalsa_html_can_search): implement search-text for webkit
+	backend, but only if we can scroll to the text.
+	* libbalsa/html.h: implement libbalsa_html_search_text.
+
 2009-11-16  Peter Bloomfield
 
 	* src/balsa-message.c (balsa_message_find_in_message): grab

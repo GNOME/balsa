@@ -1,3 +1,14 @@
+* Balsa-2.4.2 release. Release date 2009-12-06
+
+- searching in HTML parts.
+- improved webkit support.
+- NetworkManager events intercepted to reconnect to IMAP servers.
+- compatibility with recent openssl.
+- compatibility with  gtk version >= 2.18
+- improved Mac OS X integration.
+- bug fixes!
+- better translations!
+
 * Balsa-2.4.1 release. Release date 2009-08-09
 
 - Continuing cleanup work: removing obsolete library calls.

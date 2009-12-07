@@ -132,7 +132,8 @@ libbalsa_condition_matches(LibBalsaCondition* cond,
             }
         }
         /* do the work */
-	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_TO)) {
+	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_TO)
+            && message->headers->to_list) {
             str =
                 internet_address_list_to_string(message->headers->to_list,
                                                 FALSE);
@@ -156,7 +157,8 @@ libbalsa_condition_matches(LibBalsaCondition* cond,
                 break;
             }
 	}
-	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_CC)) {
+	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_CC)
+            && message->headers->cc_list) {
             str =
                 internet_address_list_to_string(message->headers->cc_list,
                                                 FALSE);

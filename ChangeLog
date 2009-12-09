@@ -1,3 +1,8 @@
+2009-12-08  Peter Bloomfield
+
+	* src/sendmsg-window.c (guess_identity_from_list): do not pass
+	NULL list to internet_address_list_to_string().
+
 2009-12-07  Peter Bloomfield
 
 	* libbalsa/filter.c (libbalsa_condition_matches): do not pass

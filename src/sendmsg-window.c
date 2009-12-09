@@ -4233,6 +4233,9 @@ guess_identity_from_list(BalsaSendmsg * bsmsg, InternetAddressList * list,
 {
     gint i;
 
+    if (!list)
+        return FALSE;
+
     for (i = 0; i < internet_address_list_length(list); i++) {
         InternetAddress *ia = internet_address_list_get_address(list, i);
 

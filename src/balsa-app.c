@@ -474,7 +474,7 @@ balsa_app_destroy(void)
 static gint
 check_new_messages_auto_cb(gpointer data)
 {
-    check_new_messages_real(data, TYPE_BACKGROUND);
+    check_new_messages_real(balsa_app.main_window, TYPE_BACKGROUND);
 
     if (balsa_app.debug)
         fprintf(stderr, "Auto-checked for new messages...\n");

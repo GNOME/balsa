@@ -1,3 +1,9 @@
+2009-12-10  Peter Bloomfield
+
+	* src/balsa-app.c (check_new_messages_auto_cb): pass
+	balsa_app.main_window instead of NULL to check_new_messages_real,
+	so we can manage the sensitivity of the check action.
+
 2009-12-08  Peter Bloomfield
 
 	* src/sendmsg-window.c (guess_identity_from_list): do not pass

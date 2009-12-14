@@ -733,7 +733,7 @@ if test "$with_nm" != no ; then
   [ PKG_CHECK_MODULES(LIBNM_GLIB, [ libnm_glib ]) ])
 
   AC_DEFINE(HAVE_LIBNM_GLIB,1,[ Defined if NetworkManager-glib-devel is found.])
-  CFLAGS="$CFLAGS $LIBNM_GLIB_CFLAGS"
+  BALSA_CFLAGS="$BALSA_CFLAGS $LIBNM_GLIB_CFLAGS"
   LIBS="$LIBS $LIBNM_GLIB_LIBS"
 else
 AC_MSG_CHECKING([NetworkManager-glib-devel])

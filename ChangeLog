@@ -1,3 +1,8 @@
+2009-12-16  Mario Mikocevic <mario mikocevic t-com hr>
+
+	* balsa.spec.in: for 2.4.2 to successfuly compile a rpm, following
+	small patch is needed.
+
 2009-12-14  Peter Bloomfield
 
 	* configure.in: put LIBNM_GLIB_CFLAGS in BALSA_CFLAGS instead of

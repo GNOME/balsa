@@ -1673,7 +1673,7 @@ libbalsa_message_create_mime_message(LibBalsaMessage* message, gboolean flow,
     GMimeObject *mime_root = NULL;
     GMimeMessage *mime_message;
     LibBalsaMessageBody *body;
-    InternetAddressList *recipients;
+    InternetAddressList *ia_list;
     gchar *tmp;
     GList *list;
     GtkWindow * parent;
@@ -1900,18 +1900,27 @@ libbalsa_message_create_mime_message(LibBalsaMessage* message, gboolean flow,
     g_mime_message_set_date(mime_message, message->headers->date,
                             get_tz_offset(&message->headers->date));
 
-    recipients = g_mime_message_get_recipients(mime_message,
-                                               GMIME_RECIPIENT_TYPE_TO);
-    internet_address_list_append(recipients, message->headers->to_list);
-    
-    recipients = g_mime_message_get_recipients(mime_message,
-                                               GMIME_RECIPIENT_TYPE_CC);
-    internet_address_list_append(recipients, message->headers->cc_list);
-    
-    recipients = g_mime_message_get_recipients(mime_message,
-                                               GMIME_RECIPIENT_TYPE_BCC);
-    internet_address_list_append(recipients, message->headers->bcc_list);
-    
+    if ((ia_list = message->headers->to_list)) {
+        InternetAddressList *recipients =
+            g_mime_message_get_recipients(mime_message,
+                                          GMIME_RECIPIENT_TYPE_TO);
+        internet_address_list_append(recipients, ia_list);
+    }
+
+    if ((ia_list = message->headers->cc_list)) {
+        InternetAddressList *recipients =
+            g_mime_message_get_recipients(mime_message,
+                                          GMIME_RECIPIENT_TYPE_CC);
+        internet_address_list_append(recipients, ia_list);
+    }
+
+    if ((ia_list = message->headers->bcc_list)) {
+        InternetAddressList *recipients =
+            g_mime_message_get_recipients(mime_message,
+                                          GMIME_RECIPIENT_TYPE_BCC);
+        internet_address_list_append(recipients, ia_list);
+    }
+
     if (message->headers->dispnotify_to) {
         tmp = internet_address_list_to_string(message->headers->dispnotify_to, TRUE);
 	if (tmp) {

@@ -1,7 +1,12 @@
+2009-12-16  Peter Bloomfield
+
+	* libbalsa/send.c (libbalsa_message_create_mime_message): do not
+	append NULL list in internet_address_list_append.
+
 2009-12-16  Mario Mikocevic <mario mikocevic t-com hr>
 
-	* balsa.spec.in: for 2.4.2 to successfuly compile a rpm, following
-	small patch is needed.
+	* balsa.spec.in: for 2.4.2 to successfuly compile a rpm, a small
+	patch is needed.
 
 2009-12-14  Peter Bloomfield
 

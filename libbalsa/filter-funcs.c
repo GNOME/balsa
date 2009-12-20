@@ -495,13 +495,12 @@ libbalsa_condition_compare(LibBalsaCondition *c1,LibBalsaCondition *c2)
     if (c1 == c2) 
         return TRUE;
 
-    if (c1 == NULL || c2 == NULL)
+    if (c1 == NULL || c2 == NULL || c1->type != c2->type)
         return FALSE;
 
     switch (c1->type) {
     case CONDITION_STRING:
-        res = (c2->type == CONDITION_STRING ||
-               g_ascii_strcasecmp(c1->match.string.string,
+        res = (g_ascii_strcasecmp(c1->match.string.string,
                                   c2->match.string.string) == 0);
         break;
     case CONDITION_REGEX:
@@ -512,8 +511,7 @@ libbalsa_condition_compare(LibBalsaCondition *c1,LibBalsaCondition *c2)
 #endif
         break;
     case CONDITION_DATE:
-        res = (c2->type == CONDITION_DATE &&
-               c1->match.date.date_low == c2->match.date.date_low &&
+        res = (c1->match.date.date_low == c2->match.date.date_low &&
                c1->match.date.date_high == c2->match.date.date_high);
         break;
     case CONDITION_FLAG:
@@ -522,11 +520,10 @@ libbalsa_condition_compare(LibBalsaCondition *c1,LibBalsaCondition *c2)
         break;
     case CONDITION_AND:
     case CONDITION_OR:
-        res = ((c1->type == c2->type) &&
-               libbalsa_condition_compare(c1->match.andor.left,
+        res = (libbalsa_condition_compare(c1->match.andor.left,
                                           c2->match.andor.left) &&
-               libbalsa_condition_compare(c1->match.andor.left,
-                                          c2->match.andor.left));
+               libbalsa_condition_compare(c1->match.andor.right,
+                                          c2->match.andor.right));
         break;
     case CONDITION_NONE:
         break;

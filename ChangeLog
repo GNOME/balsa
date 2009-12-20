@@ -1,3 +1,8 @@
+2009-12-19  Peter Bloomfield
+
+	* libbalsa/filter-funcs.c (libbalsa_condition_compare):
+	simplify, and fix string and boolean filter comparisons.
+
 2009-12-16  Peter Bloomfield
 
 	* libbalsa/send.c (libbalsa_message_create_mime_message): do not

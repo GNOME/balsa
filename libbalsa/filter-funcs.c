@@ -78,7 +78,7 @@ lbcond_new(ConditionMatchType type, gboolean negated)
 
     cond = g_new(LibBalsaCondition, 1);
     cond->type      = type;
-    cond->negate    = negated;
+    cond->negate    = !!negated;
     cond->ref_count = 1;
 
     return cond;
@@ -495,7 +495,8 @@ libbalsa_condition_compare(LibBalsaCondition *c1,LibBalsaCondition *c2)
     if (c1 == c2) 
         return TRUE;
 
-    if (c1 == NULL || c2 == NULL || c1->type != c2->type)
+    if (c1 == NULL || c2 == NULL
+        || c1->type != c2->type || c1->negate != c2->negate)
         return FALSE;
 
     switch (c1->type) {
@@ -515,11 +516,14 @@ libbalsa_condition_compare(LibBalsaCondition *c1,LibBalsaCondition *c2)
                c1->match.date.date_high == c2->match.date.date_high);
         break;
     case CONDITION_FLAG:
-        res = (c2->type == CONDITION_FLAG &&
-               c1->match.flags == c2->match.flags);
+        res = (c1->match.flags == c2->match.flags);
         break;
     case CONDITION_AND:
     case CONDITION_OR:
+        /* We could declare c1 and c2 equal if (c1->left == c2->right)
+         * && (c1->right == c2->left), but we don't; the boolean value
+         * would be the same, but c1 and c2 could have different side
+         * effects. */
         res = (libbalsa_condition_compare(c1->match.andor.left,
                                           c2->match.andor.left) &&
                libbalsa_condition_compare(c1->match.andor.right,

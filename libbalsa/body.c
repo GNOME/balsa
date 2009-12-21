@@ -51,6 +51,7 @@ libbalsa_message_body_new(LibBalsaMessage * message)
     body->filename = NULL;
     body->file_uri = NULL;
     body->temp_filename = NULL;
+    body->owns_dir = FALSE;
     body->charset = NULL;
 
 #ifdef HAVE_GPGME
@@ -80,8 +81,14 @@ libbalsa_message_body_free(LibBalsaMessageBody * body)
     g_free(body->filename);
     if (body->file_uri)
         g_object_unref(body->file_uri);
-    if (body->temp_filename)
+    if (body->temp_filename) {
 	unlink(body->temp_filename);
+        if (body->owns_dir) {
+            gchar *dirname = g_path_get_dirname(body->temp_filename);
+            rmdir(dirname);
+            g_free(dirname);
+        }
+    }
     g_free(body->temp_filename);
 
     g_free(body->charset);
@@ -301,7 +308,6 @@ libbalsa_message_body_save_temporary(LibBalsaMessageBody * body, GError **err)
 	do {
 	    gint fd;
 	    gchar *tmp_file_name;
-	    gchar *dotpos = NULL;
 
 	    fd = g_file_open_tmp("balsa-body-XXXXXX", &tmp_file_name,
 				 err);
@@ -309,24 +315,27 @@ libbalsa_message_body_save_temporary(LibBalsaMessageBody * body, GError **err)
 		return FALSE;
 	    if (err && *err  &&  /* We should have returned by now! */
                 (*err)->message) {
-		printf("libbalsa_message_body_save_temporary:\n %s\n",
-		       (*err)->message);
+		printf("%s:\n %s\n", __func__, (*err)->message);
 		g_clear_error(err);
 	    }
 	    close(fd);
 	    unlink(tmp_file_name);
 
 	    if (body->filename) {
-		gchar *seppos = strrchr(body->filename, G_DIR_SEPARATOR);
-		dotpos = strchr(seppos ? seppos : body->filename, '.');
+                gchar *filename;
+
+                if (mkdir(tmp_file_name, S_IRWXU)) {
+                    g_free(tmp_file_name);
+                    continue;
+                }
+                filename =
+                    g_build_filename(tmp_file_name, body->filename, NULL);
+                g_free(tmp_file_name);
+                tmp_file_name = filename;
+                body->owns_dir = TRUE;
 	    }
-	    g_free(body->temp_filename);
-	    if (dotpos) {
-		body->temp_filename =
-		    g_strdup_printf("%s%s", tmp_file_name, dotpos);
-		g_free(tmp_file_name);
-	    } else
-		body->temp_filename = tmp_file_name;
+            body->temp_filename = tmp_file_name;
+
 	    fd = open(body->temp_filename, O_WRONLY | O_EXCL | O_CREAT,
                       LIBBALSA_MESSAGE_BODY_SAFE);
 	    if (fd >= 0) {

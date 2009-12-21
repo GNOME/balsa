@@ -82,6 +82,7 @@ struct _LibBalsaMessageBody {
     LibbalsaVfs * file_uri;     /* file uri for attachments (used for sending) */
     LibBalsaAttachMode attach_mode; /* attachment mode for sending */
     gchar *temp_filename;	/* Holds the filename of a the temporary file where this part is saved */
+    gboolean owns_dir;          /* TRUE if the temporary file is in a temporary directory */
     gchar *charset;		/* the charset, used for sending, replying. */
     GMimeObject *mime_part;	/* mime body */
 

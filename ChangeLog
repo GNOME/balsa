@@ -1,5 +1,16 @@
 2009-12-20  Peter Bloomfield
 
+	* libbalsa/body.h: new member LibBalsaMessageBody::own_dir, TRUE
+	if the temporary file for the body is in its own temporary
+	directory/
+	* libbalsa/body.c (libbalsa_message_body_new),
+	(libbalsa_message_body_free),
+	(libbalsa_message_body_save_temporary): if the body has a
+	filename, save the temporary file in its own temporary
+	directory.
+
+2009-12-20  Peter Bloomfield
+
 	* libbalsa/filter-funcs.c (lbcond_new): save negated as 0 or 1,
 	to simplify later comparison.
 	(libbalsa_condition_compare): return FALSE if negate differs;

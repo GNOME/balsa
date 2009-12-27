@@ -238,6 +238,8 @@ struct _LibBalsaMessage {
 #define LIBBALSA_MESSAGE_GET_NO(m)  libbalsa_message_get_no(m)
 #endif
 
+    gchar *tempdir;     /* to hold named parts */
+
     unsigned has_all_headers:1;
 };
 
@@ -318,8 +320,12 @@ void libbalsa_message_set_user_header(LibBalsaMessage * message,
                                       const gchar * name,
                                       const gchar * value);
 
-GMimeStream *libbalsa_message_get_part_by_id(LibBalsaMessage * message,
-                                             const gchar * id);
+LibBalsaMessageBody *libbalsa_message_get_part_by_id(LibBalsaMessage *
+                                                     message,
+                                                     const gchar * id);
+guint libbalsa_message_save_parts_by_id(LibBalsaMessage * message,
+                                        GError ** err);
+gboolean libbalsa_message_has_cid_part(LibBalsaMessage * message);
 
 void libbalsa_message_set_dispnotify(LibBalsaMessage *message, 
 				     InternetAddress *ia);
@@ -359,4 +365,6 @@ gboolean libbalsa_message_copy(LibBalsaMessage * message,
 void libbalsa_message_change_flags(LibBalsaMessage * message,
                                    LibBalsaMessageFlag set,
                                    LibBalsaMessageFlag clear);
+
+const gchar *libbalsa_message_get_tempdir(LibBalsaMessage * message);
 #endif				/* __LIBBALSA_MESSAGE_H__ */

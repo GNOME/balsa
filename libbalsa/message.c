@@ -185,6 +185,13 @@ libbalsa_message_finalize(GObject * object)
     g_free(message->force_key_id);
 #endif
 
+    if (message->tempdir) {
+        if (rmdir(message->tempdir))
+            g_warning("Could not remove %s", message->tempdir);
+        g_free(message->tempdir);
+        message->tempdir = NULL;
+    }
+
     G_OBJECT_CLASS(parent_class)->finalize(object);
 }
 
@@ -531,13 +538,32 @@ libbalsa_message_user_hdrs_from_gmime(GMimeMessage * message)
    return a message part identified by Content-ID=id
    message must be referenced. (FIXME?)
 */
-GMimeStream *
+LibBalsaMessageBody *
 libbalsa_message_get_part_by_id(LibBalsaMessage* msg, const gchar* id)
 {
-    LibBalsaMessageBody* body = 
-	libbalsa_message_body_get_by_id(msg->body_list,	id);
-    if(!body) return NULL;
-    return libbalsa_message_body_get_stream(body, NULL); /*provide more info?*/
+    return libbalsa_message_body_get_by_id(msg->body_list, id);
+}
+
+/* libbalsa_message_save_parts_by_id:
+ * save all message parts that have Content-ID headers
+ */
+guint
+libbalsa_message_save_parts_by_id(LibBalsaMessage * message, GError ** err)
+{
+    guint count = 0;
+    libbalsa_message_body_save_parts_by_id(message->body_list, &count,
+                                           err);
+
+    return count;
+}
+
+/* libbalsa_message_has_cid_part:
+ * return whether the message has any part with a Content-ID header
+ */
+gboolean
+libbalsa_message_has_cid_part(LibBalsaMessage * message)
+{
+    return libbalsa_message_body_has_cid_part(message->body_list);
 }
 
 /* libbalsa_message_save:
@@ -1353,4 +1379,15 @@ libbalsa_message_set_subject_from_header(LibBalsaMessage * message,
         libbalsa_message_set_subject(message, subject);
         g_free(subject);
     }
+}
+
+const gchar *
+libbalsa_message_get_tempdir(LibBalsaMessage * message)
+{
+    if (!message->tempdir) {
+        if (!libbalsa_mktempdir(&message->tempdir))
+            g_warning("Could not make tempdir");
+    }
+
+    return message->tempdir;
 }

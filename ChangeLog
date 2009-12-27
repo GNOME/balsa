@@ -1,6 +1,15 @@
 2009-12-26  Peter Bloomfield
 
-	* libbalsa/libbalsa.h: new error codes.
+	* libbalsa/message.h: add tempdir member; new methods.
+	* libbalsa/message.c (libbalsa_message_finalize),
+	(libbalsa_message_get_part_by_id),
+	(libbalsa_message_save_parts_by_id),
+	(libbalsa_message_has_cid_part), (libbalsa_message_get_tempdir):
+	implement them.
+
+2009-12-26  Peter Bloomfield
+
+	* libbalsa/libbalsa.h: new error code.
 
 2009-12-20  Peter Bloomfield
 

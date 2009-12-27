@@ -77,6 +77,7 @@
  */
 
 #include <webkit/webkit.h>
+#include "mime-stream-shared.h"
 
 typedef struct {
     WebKitWebView        *web_view;
@@ -205,6 +206,110 @@ lbh_create_web_view_cb(WebKitWebView  * web_view,
     return WEBKIT_WEB_VIEW(widget);
 }
 
+static gchar *
+lbh_filter_src(const gchar *text, LibBalsaMessage * message)
+{
+    GString *string = g_string_sized_new(strlen(text));
+    const gchar *start, *left;
+
+    start = text;
+    while ((left = strchr(start, '<'))) {
+        const gchar *right;
+
+        if (!(right = strchr(left, '>')))
+            break;
+
+        for (left++; left < right - 5; left++)
+            if (!g_ascii_strncasecmp(left, "src=\"", 5))
+                break;
+        if (left >= right - 5) {
+            g_string_append_len(string, start, right - start);
+            start = right;
+            continue;
+        }
+        left = left + 5;
+
+        g_string_append_len(string, start, left - start);
+        start = left;
+
+        if (!g_ascii_strncasecmp(start, "cid:", 4)) {
+#ifdef WEBKITWEBVIEW_ALLOWS_FILE_URIS
+            /* replace with a file URI: */
+            g_string_append(string, "file://");
+            g_string_append(string, libbalsa_message_get_tempdir(message));
+            if (string->str[string->len - 1] != G_DIR_SEPARATOR)
+                g_string_append_c(string, G_DIR_SEPARATOR);
+            start += 4;     /* skip over "cid:" */
+#else                           /* WEBKITWEBVIEW_ALLOWS_FILE_URIS */
+            /* replace with a data URI: */
+            const gchar *dquote;
+            gchar *content_id;
+            LibBalsaMessageBody *body;
+            gchar *mime_type;
+            GMimeStream *stream;
+            GError *err = NULL;
+            GMimeStream *stream_filter;
+            GMimeFilter *filter;
+            GMimeStream *stream_mem;
+            GByteArray *byte_array;
+
+            if (!(dquote = strchr(start, '"')))
+                break;
+
+            start += 4;     /* skip over "cid:" */
+            content_id = g_strndup(start, dquote - start);
+            body = libbalsa_message_get_part_by_id(message, content_id);
+            g_free(content_id);
+            if (!body)
+                break;
+
+            mime_type = libbalsa_message_body_get_mime_type(body);
+            g_string_append_printf(string, "data:%s;base64,\n", mime_type);
+            g_free(mime_type);
+
+            stream = libbalsa_message_body_get_stream(body, &err);
+            if (err) {
+                g_message("%s: %s", __func__, err->message);
+                g_error_free(err);
+                break;
+            }
+
+            stream_filter = g_mime_stream_filter_new(stream);
+            filter = g_mime_filter_basic_new(GMIME_CONTENT_ENCODING_BASE64, TRUE);
+            g_mime_stream_filter_add(GMIME_STREAM_FILTER(stream_filter), filter);
+            g_object_unref(filter);
+
+            stream_mem = g_mime_stream_mem_new();
+            libbalsa_mime_stream_shared_lock(stream);
+            g_mime_stream_reset(stream);
+            g_mime_stream_write_to_stream(stream_filter, stream_mem);
+            libbalsa_mime_stream_shared_unlock(stream);
+            g_object_unref(stream);
+            g_object_unref(stream_filter);
+
+            byte_array = g_mime_stream_mem_get_byte_array(GMIME_STREAM_MEM(stream_mem));
+            g_mime_stream_mem_set_owner(GMIME_STREAM_MEM(stream_mem), FALSE);
+            g_object_unref(stream_mem);
+
+            g_string_append_len(string, (gchar *) byte_array->data, byte_array->len);
+#if GLIB_CHECK_VERSION(2, 22, 0)
+            g_byte_array_unref(byte_array);
+#else                           /* GLIB_CHECK_VERSION(2, 22, 0) */
+            g_byte_array_free(byte_array, TRUE);
+#endif                          /* GLIB_CHECK_VERSION(2, 22, 0) */
+
+            start = dquote;
+#endif                          /* WEBKITWEBVIEW_ALLOWS_FILE_URIS */
+        } else {
+            /* break all other URIs: */
+            g_string_append(string, "null");
+        }
+    }
+    g_string_append(string, start);
+
+    return g_string_free(string, FALSE);
+}
+
 /* Create a new WebKitWebView widget:
  * text			the HTML source;
  * len			length of text;
@@ -220,13 +325,15 @@ GtkWidget *
 libbalsa_html_new(const gchar        * text,
                   size_t               len,
                   const gchar        * charset,
-                  gpointer             message,
+                  gpointer             msg,
                   LibBalsaHtmlCallback hover_cb,
                   LibBalsaHtmlCallback clicked_cb)
 {
+    LibBalsaMessage *message = LIBBALSA_MESSAGE(msg);
     GtkWidget *widget;
     WebKitWebView *web_view;
     LibBalsaWebKitInfo *info;
+    gchar *save_me = NULL;
 
     widget = webkit_web_view_new();
 
@@ -236,9 +343,11 @@ libbalsa_html_new(const gchar        * text,
     g_object_weak_ref(G_OBJECT(web_view), (GWeakNotify) g_free, info);
 
     g_object_set(webkit_web_view_get_settings(web_view),
-                 "auto-load-images", FALSE,
                  "enable-scripts",   FALSE,
                  "enable-plugins",   FALSE,
+#ifdef WEBKITWEBVIEW_ALLOWS_FILE_URIS
+                 "enable-universal-access-from-file-uris", TRUE,
+#endif                          /* WEBKITWEBVIEW_ALLOWS_FILE_URIS */
                  NULL);
 
 #if !WEBKIT_CHECK_VERSION(1, 12, 0)
@@ -267,8 +376,24 @@ libbalsa_html_new(const gchar        * text,
     g_signal_connect(web_view, "load-progress-changed",
                      G_CALLBACK(gtk_widget_queue_resize), NULL);
 
+#ifdef WEBKITWEBVIEW_ALLOWS_FILE_URIS
+    if (libbalsa_message_save_parts_by_id(message, NULL))
+        text = save_me = lbh_filter_src(text, message);
+    else
+        g_object_set(webkit_web_view_get_settings(web_view),
+                     "auto-load-images", FALSE,
+                     NULL);
+#else                           /* WEBKITWEBVIEW_ALLOWS_FILE_URIS */
+    if (libbalsa_message_has_cid_part(message))
+        text = save_me = lbh_filter_src(text, message);
+    else
+        g_object_set(webkit_web_view_get_settings(web_view),
+                     "auto-load-images", FALSE,
+                     NULL);
+#endif                          /* WEBKITWEBVIEW_ALLOWS_FILE_URIS */
     webkit_web_view_load_string(web_view, text, "text/html", charset,
                                 NULL);
+    g_free(save_me);
 
     return widget;
 }
@@ -797,24 +922,27 @@ static gboolean
 libbalsa_html_url_requested(GtkWidget * html, const gchar * url,
 			    gpointer stream, LibBalsaMessage * msg)
 {
+    LibBalsaMessageBody *body;
     GMimeStream *mime_stream;
 
     if (strncmp(url, "cid:", 4)) {
 	/* printf("non-local URL request ignored: %s\n", url); */
 	return FALSE;
     }
-    if ((mime_stream =
+    if ((body =
          libbalsa_message_get_part_by_id(msg, url + 4)) == NULL) {
 	gchar *s = g_strconcat("<", url + 4, ">", NULL);
 
 	if (s == NULL)
 	    return FALSE;
 
-	mime_stream = libbalsa_message_get_part_by_id(msg, s);
+	body = libbalsa_message_get_part_by_id(msg, s);
 	g_free(s);
-	if (mime_stream == NULL)
+	if (body == NULL)
 	    return FALSE;
     }
+    if (!(mime_stream = libbalsa_message_body_get_stream(body, NULL)))
+        return FALSE;
 
     libbalsa_mailbox_lock_store(msg->mailbox);
     g_mime_stream_reset(mime_stream);

@@ -1,11 +1,17 @@
 2009-12-26  Peter Bloomfield
 
-	* libbalsa/message.h: add tempdir member; new methods.
+	* libbalsa/html.c (lbh_filter_src), (libbalsa_html_new),
+	(libbalsa_html_url_requested): implement two ways of handling
+	cid: URLs in WebKitwebView.
+
+2009-12-26  Peter Bloomfield
+
+	* libbalsa/message.h: add tempdir member and new methods.
 	* libbalsa/message.c (libbalsa_message_finalize),
 	(libbalsa_message_get_part_by_id),
 	(libbalsa_message_save_parts_by_id),
 	(libbalsa_message_has_cid_part), (libbalsa_message_get_tempdir):
-	implement them.
+	implement and use them.
 
 2009-12-26  Peter Bloomfield
 

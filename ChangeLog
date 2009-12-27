@@ -1,3 +1,16 @@
+2009-12-26  Peter Bloomfield
+
+	* libbalsa/body.h: new methods to save parts with Content-ID
+	headers, and to test whether a part list contains such a part;
+	remove the owns-dir member.
+	* libbalsa/body.c (libbalsa_message_body_new),
+	(libbalsa_message_body_free),
+	(libbalsa_message_body_get_content_id),
+	(libbalsa_message_body_save_temporary),
+	(libbalsa_message_body_save_parts_by_id),
+	(libbalsa_message_body_get_by_id),
+	(libbalsa_message_body_has_cid_part): implement the methods.
+
 2009-12-20  Peter Bloomfield
 
 	* libbalsa/body.h: new member LibBalsaMessageBody::own_dir, TRUE

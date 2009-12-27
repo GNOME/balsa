@@ -51,7 +51,6 @@ libbalsa_message_body_new(LibBalsaMessage * message)
     body->filename = NULL;
     body->file_uri = NULL;
     body->temp_filename = NULL;
-    body->owns_dir = FALSE;
     body->charset = NULL;
 
 #ifdef HAVE_GPGME
@@ -83,13 +82,8 @@ libbalsa_message_body_free(LibBalsaMessageBody * body)
         g_object_unref(body->file_uri);
     if (body->temp_filename) {
 	unlink(body->temp_filename);
-        if (body->owns_dir) {
-            gchar *dirname = g_path_get_dirname(body->temp_filename);
-            rmdir(dirname);
-            g_free(dirname);
-        }
+        g_free(body->temp_filename);
     }
-    g_free(body->temp_filename);
 
     g_free(body->charset);
 
@@ -285,6 +279,14 @@ libbalsa_message_body_get_parameter(LibBalsaMessageBody * body,
     return res;
 }
 
+static const gchar *
+libbalsa_message_body_get_content_id(LibBalsaMessageBody * body)
+{
+    if (body->mime_part)
+        return g_mime_object_get_content_id(body->mime_part);
+    return body->content_id;
+}
+
 /* libbalsa_message_body_save_temporary:
    check if body has already its copy in temporary file and if not,
    allocates a temporary file name and saves the body there.
@@ -299,61 +301,50 @@ libbalsa_message_body_save_temporary(LibBalsaMessageBody * body, GError **err)
     }
 
     if (body->temp_filename == NULL) {
-	gint count = 100; /* Magic number, same as in g_mkstemp. */
+        const gchar *filename;
+        gint fd = -1;
+        GMimeStream *tmp_stream;
 
-	/* We want a temporary file with a name that ends with the same
-	 * set of suffices as body->filename (for the benefit of helpers
-	 * that depend on such things); however, g_file_open_tmp() works
-	 * only with templates that end with "XXXXXX", so we fake it. */
-	do {
-	    gint fd;
-	    gchar *tmp_file_name;
+        filename = libbalsa_message_body_get_content_id(body);
+        if (!filename)
+            filename = body->filename;
 
-	    fd = g_file_open_tmp("balsa-body-XXXXXX", &tmp_file_name,
-				 err);
-	    if (fd < 0)
-		return FALSE;
-	    if (err && *err  &&  /* We should have returned by now! */
-                (*err)->message) {
-		printf("%s:\n %s\n", __func__, (*err)->message);
-		g_clear_error(err);
-	    }
-	    close(fd);
-	    unlink(tmp_file_name);
+        if (!filename)
+	    fd = g_file_open_tmp("balsa-body-XXXXXX",
+                                 &body->temp_filename, err);
+        else {
+            const gchar *tempdir =
+                libbalsa_message_get_tempdir(body->message);
 
-	    if (body->filename) {
-                gchar *filename;
-
-                if (mkdir(tmp_file_name, S_IRWXU)) {
-                    g_free(tmp_file_name);
-                    continue;
-                }
-                filename =
-                    g_build_filename(tmp_file_name, body->filename, NULL);
-                g_free(tmp_file_name);
-                tmp_file_name = filename;
-                body->owns_dir = TRUE;
-	    }
-            body->temp_filename = tmp_file_name;
-
-	    fd = open(body->temp_filename, O_WRONLY | O_EXCL | O_CREAT,
-                      LIBBALSA_MESSAGE_BODY_SAFE);
-	    if (fd >= 0) {
-                GMimeStream *tmp_stream;
-
-                if ((tmp_stream = g_mime_stream_fs_new(fd)) != NULL)
-                    return libbalsa_message_body_save_stream(body, tmp_stream, FALSE, err);
-                else {
-                    g_set_error(err, LIBBALSA_ERROR_QUARK, 1,
-                                _("Failed to create output stream"));
-                    close(fd);
-                    return FALSE;
-                }
+            if (!tempdir) {
+                g_set_error(err, LIBBALSA_MAILBOX_ERROR,
+                            LIBBALSA_MAILBOX_TEMPDIR_ERROR,
+                            "Failed to create temporary directory");
+            } else {
+                body->temp_filename =
+                    g_build_filename(tempdir, filename, NULL);
+                fd = open(body->temp_filename,
+                          O_WRONLY | O_EXCL | O_CREAT,
+                          LIBBALSA_MESSAGE_BODY_SAFE);
             }
-	} while (errno == EEXIST && --count > 0);
+        }
 
-	/* Either we hit a real error, or we used up 100 attempts. */
-	return FALSE;
+        if (fd < 0) {
+            if (err && !*err)
+                g_set_error(err, LIBBALSA_ERROR_QUARK, 1,
+                            "Failed to create temporary file");
+            return FALSE;
+        }
+
+        if ((tmp_stream = g_mime_stream_fs_new(fd)) != NULL)
+            return libbalsa_message_body_save_stream(body, tmp_stream,
+                                                     FALSE, err);
+        else {
+            g_set_error(err, LIBBALSA_ERROR_QUARK, 1,
+                        _("Failed to create output stream"));
+            close(fd);
+            return FALSE;
+        }
     } else {
 	/* the temporary name has been already allocated on previous
 	   save_temporary action. We just check if the file is still there.
@@ -417,6 +408,35 @@ libbalsa_message_body_save_vfs(LibBalsaMessageBody * body,
     return libbalsa_message_body_save_stream(body, out_stream, filter_crlf, err);
 }
 
+void
+libbalsa_message_body_save_parts_by_id(LibBalsaMessageBody * body,
+                                       guint * count,
+                                       GError ** err)
+{
+    GError *tmp_err;
+
+    if (!body)
+        return;
+
+    tmp_err = NULL;
+
+    if (libbalsa_message_body_get_content_id(body)) {
+        libbalsa_message_body_save_temporary(body, &tmp_err);
+        if (tmp_err) {
+            g_propagate_error(err, tmp_err);
+            return;
+        }
+        ++*count;
+    }
+
+    libbalsa_message_body_save_parts_by_id(body->parts, count, &tmp_err);
+    if (tmp_err) {
+        g_propagate_error(err, tmp_err);
+        return;
+    }
+
+    libbalsa_message_body_save_parts_by_id(body->next, count, err);
+}
 
 static GMimeStream *
 libbalsa_message_body_stream_add_filter(GMimeStream * stream,
@@ -817,22 +837,16 @@ libbalsa_message_body_get_by_id(LibBalsaMessageBody * body,
 				const gchar * id)
 {
     LibBalsaMessageBody *res;
+    const gchar *content_id;
 
     g_return_val_if_fail(id != NULL, NULL);
 
     if (!body)
 	return NULL;
 
-    if (body->mime_part) {
-	const gchar *bodyid =
-	    g_mime_object_get_content_id(body->mime_part);
-
-	if (bodyid && strcmp(id, bodyid) == 0)
-	    return body;
-    } else {
-        if(body->content_id && strcmp(id, body->content_id) == 0)
-            return body;
-    }
+    if ((content_id = libbalsa_message_body_get_content_id(body))
+        && !strcmp(id, content_id))
+        return body;
 
     if ((res = libbalsa_message_body_get_by_id(body->parts, id)) != NULL)
 	return res;
@@ -840,6 +854,13 @@ libbalsa_message_body_get_by_id(LibBalsaMessageBody * body,
     return libbalsa_message_body_get_by_id(body->next, id);
 }
 
+gboolean
+libbalsa_message_body_has_cid_part(LibBalsaMessageBody * body)
+{
+    return body && (libbalsa_message_body_get_content_id(body)
+                    || libbalsa_message_body_has_cid_part(body->parts)
+                    || libbalsa_message_body_has_cid_part(body->next));
+}
 
 #ifdef HAVE_GPGME
 LibBalsaMsgProtectState

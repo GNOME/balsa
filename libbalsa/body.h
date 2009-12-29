@@ -124,10 +124,6 @@ gboolean libbalsa_message_body_save_vfs(LibBalsaMessageBody * body,
                                         GError **err);
 gboolean libbalsa_message_body_save_temporary(LibBalsaMessageBody * body,
                                               GError **err);
-void libbalsa_message_body_save_parts_by_id(LibBalsaMessageBody * body,
-                                            guint * count,
-                                            GError ** err);
-gboolean libbalsa_message_body_has_cid_part(LibBalsaMessageBody * body);
 
 gchar *libbalsa_message_body_get_parameter(LibBalsaMessageBody * body,
 					   const gchar * param);

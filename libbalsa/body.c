@@ -305,9 +305,9 @@ libbalsa_message_body_save_temporary(LibBalsaMessageBody * body, GError **err)
         gint fd = -1;
         GMimeStream *tmp_stream;
 
-        filename = libbalsa_message_body_get_content_id(body);
+        filename = body->filename;
         if (!filename)
-            filename = body->filename;
+            filename = libbalsa_message_body_get_content_id(body);
 
         if (!filename)
 	    fd = g_file_open_tmp("balsa-body-XXXXXX",
@@ -406,36 +406,6 @@ libbalsa_message_body_save_vfs(LibBalsaMessageBody * body,
         return FALSE;
 
     return libbalsa_message_body_save_stream(body, out_stream, filter_crlf, err);
-}
-
-void
-libbalsa_message_body_save_parts_by_id(LibBalsaMessageBody * body,
-                                       guint * count,
-                                       GError ** err)
-{
-    GError *tmp_err;
-
-    if (!body)
-        return;
-
-    tmp_err = NULL;
-
-    if (libbalsa_message_body_get_content_id(body)) {
-        libbalsa_message_body_save_temporary(body, &tmp_err);
-        if (tmp_err) {
-            g_propagate_error(err, tmp_err);
-            return;
-        }
-        ++*count;
-    }
-
-    libbalsa_message_body_save_parts_by_id(body->parts, count, &tmp_err);
-    if (tmp_err) {
-        g_propagate_error(err, tmp_err);
-        return;
-    }
-
-    libbalsa_message_body_save_parts_by_id(body->next, count, err);
 }
 
 static GMimeStream *
@@ -852,14 +822,6 @@ libbalsa_message_body_get_by_id(LibBalsaMessageBody * body,
 	return res;
 
     return libbalsa_message_body_get_by_id(body->next, id);
-}
-
-gboolean
-libbalsa_message_body_has_cid_part(LibBalsaMessageBody * body)
-{
-    return body && (libbalsa_message_body_get_content_id(body)
-                    || libbalsa_message_body_has_cid_part(body->parts)
-                    || libbalsa_message_body_has_cid_part(body->next));
 }
 
 #ifdef HAVE_GPGME

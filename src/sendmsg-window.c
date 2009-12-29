@@ -5850,7 +5850,7 @@ check_suggest_encryption(BalsaSendmsg * bsmsg)
 	gtk_container_add(GTK_CONTAINER(alignment), hbox);
 	image = gtk_image_new_from_stock(BALSA_PIXMAP_SEND, GTK_ICON_SIZE_BUTTON);
 	gtk_box_pack_start(GTK_BOX(hbox), image, FALSE, FALSE, 0);
-	label = gtk_label_new_with_mnemonic(_("Send _plain"));
+	label = gtk_label_new_with_mnemonic(_("Send _unencrypted"));
 	gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, FALSE, 0);
 	gtk_widget_show_all(button);
 

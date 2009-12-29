@@ -1,3 +1,15 @@
+2009-12-29  Peter Bloomfield
+
+	* libbalsa/html.c (lbh_resource_request_starting_cb),
+	(libbalsa_html_new): use WebKitwebView's
+	"resource-request-starting" signal to handle cid: requests and
+	disable all others.
+	* libbalsa/body.c (libbalsa_message_body_save_temporary): use
+	body->filename in preference to content_id.
+	* libbalsa/body.h: remove now redundant functions.
+	* libbalsa/message.c: ditto.
+	* libbalsa/message.h: ditto.
+
 2009-12-26  Peter Bloomfield
 
 	* libbalsa/html.c (lbh_filter_src), (libbalsa_html_new),

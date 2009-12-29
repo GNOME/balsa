@@ -544,28 +544,6 @@ libbalsa_message_get_part_by_id(LibBalsaMessage* msg, const gchar* id)
     return libbalsa_message_body_get_by_id(msg->body_list, id);
 }
 
-/* libbalsa_message_save_parts_by_id:
- * save all message parts that have Content-ID headers
- */
-guint
-libbalsa_message_save_parts_by_id(LibBalsaMessage * message, GError ** err)
-{
-    guint count = 0;
-    libbalsa_message_body_save_parts_by_id(message->body_list, &count,
-                                           err);
-
-    return count;
-}
-
-/* libbalsa_message_has_cid_part:
- * return whether the message has any part with a Content-ID header
- */
-gboolean
-libbalsa_message_has_cid_part(LibBalsaMessage * message)
-{
-    return libbalsa_message_body_has_cid_part(message->body_list);
-}
-
 /* libbalsa_message_save:
    return TRUE on success and FALSE on failure.
 */

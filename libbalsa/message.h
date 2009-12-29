@@ -323,9 +323,6 @@ void libbalsa_message_set_user_header(LibBalsaMessage * message,
 LibBalsaMessageBody *libbalsa_message_get_part_by_id(LibBalsaMessage *
                                                      message,
                                                      const gchar * id);
-guint libbalsa_message_save_parts_by_id(LibBalsaMessage * message,
-                                        GError ** err);
-gboolean libbalsa_message_has_cid_part(LibBalsaMessage * message);
 
 void libbalsa_message_set_dispnotify(LibBalsaMessage *message, 
 				     InternetAddress *ia);

@@ -318,8 +318,11 @@ static const GtkActionEntry entries[] = {
     {"OptionsMenu", NULL, N_("_Options")},
 #if defined(ENABLE_TOUCH_UI)
     {"ToolsMenu", NULL, N_("_Tools")},
+    /* Less frequently used entries of the 'File' menu */
     {"FileMoreMenu", NULL, N_("_More")},
+    /* Less frequently used entries of the 'Edit' menu */
     {"EditMoreMenu", NULL, N_("_More")},
+    /* Less frequently used entries of the 'Tools' menu */
     {"ToolsMoreMenu", NULL, N_("_More")},
 #endif                          /* ENABLE_TOUCH_UI */
     {"IncludeFile", GTK_STOCK_OPEN, N_("_Include File..."), NULL,
@@ -421,6 +424,7 @@ static const GtkToggleActionEntry toggle_entries[] = {
      G_CALLBACK(toggle_reqdispnotify_cb), FALSE},
     {"Flowed", NULL, N_("_Format = Flowed"), NULL,
      NULL, G_CALLBACK(toggle_format_cb), FALSE},
+    /* Send as message/alternative with text/plain and text/html parts */
     {"SendMPAlt", NULL, N_("Send as plain text and _HTML"), NULL,
      NULL, G_CALLBACK(toggle_mp_alt_cb), FALSE},
 #ifdef HAVE_GPGME

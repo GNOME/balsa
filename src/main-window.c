@@ -344,10 +344,12 @@ static const GtkActionEntry entries[] = {
     {"FileNewMenu", NULL, N_("_New")},
 #else  /* ENABLE_TOUCH_UI */
     {"MailboxesMenu", NULL, N_("Mail_boxes")},
+    /* Less frequently used entries of the 'View' menu */
     {"ViewMoreMenu", NULL, N_("_More")},
     {"ShownHeadersMenu", NULL, N_("_Headers")},
     {"SortMenu", NULL, N_("_Sort Mailbox")},
     {"HideMessagesMenu", NULL, N_("H_ide messages")},
+    /* Less frequently used entries of the 'Message' menu */
     {"MessageMoreMenu", NULL, N_("_More")},
     {"ToolsMenu", NULL, N_("_Tools")},
     {"ToolsFiltersMenu", NULL, N_("_Filters")},
@@ -409,7 +411,8 @@ static const GtkActionEntry entries[] = {
      G_CALLBACK(bw_copy_cb)},
     {"Filters", GTK_STOCK_PROPERTIES, N_("F_ilters..."), NULL,
      N_("Manage filters"), G_CALLBACK(bw_filter_dlg_cb)},
-    {"ExportFilters", GTK_STOCK_PROPERTIES, N_("_Export Filters"), NULL,
+    /* Export selected filters to a text file. */
+    {"ExportFilters", GTK_STOCK_PROPERTIES, N_("_Export Filters..."), NULL,
      N_("Export filters as Sieve scripts"), G_CALLBACK(bw_filter_export_cb)},
     {"Preferences", GTK_STOCK_PREFERENCES, N_("Prefere_nces"), NULL, NULL,
      G_CALLBACK(open_preferences_manager)},

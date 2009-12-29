@@ -1027,11 +1027,11 @@ libbalsa_gpgme_sig_protocol_name(gpgme_protocol_t protocol)
     }
 }
 
-#define APPEND_TIMET(t,label)                                           \
+#define APPEND_TIMET(str,fmt,t)						\
     do {                                                                \
         if (t) {                                                        \
             gchar * _tbuf = libbalsa_date_to_utf8(&t, date_string);     \
-            g_string_append_printf(msg, "\n%s: %s", label, _tbuf);      \
+            g_string_append_printf(str, fmt, _tbuf);      \
             g_free(_tbuf);                                              \
         }                                                               \
     } while (0)
@@ -1059,7 +1059,7 @@ libbalsa_signature_info_to_gchar(GMimeGpgmeSigstat * info,
     } else if (info->sign_email && strlen(info->sign_email))
 	g_string_append_printf(msg, _("\nMail address: %s"),
 			       info->sign_email);
-    APPEND_TIMET(info->sign_time, _("Signed on"));
+    APPEND_TIMET(msg, _("\nSigned on: %s"), info->sign_time);
     g_string_append_printf(msg, _("\nUser ID validity: %s"),
 			   libbalsa_gpgme_validity_to_gchar(info->
 							    validity));
@@ -1070,8 +1070,10 @@ libbalsa_signature_info_to_gchar(GMimeGpgmeSigstat * info,
     if (info->fingerprint)
 	g_string_append_printf(msg, _("\nKey fingerprint: %s"),
 			       info->fingerprint);
-    APPEND_TIMET(info->key_created, _("Subkey created on"));
-    APPEND_TIMET(info->key_expires, _("Subkey expires on"));
+    /* Subkey creation date */
+    APPEND_TIMET(msg, _("\nSubkey created on: %s"), info->key_created);
+    /* Subkey expiration date */
+    APPEND_TIMET(msg, _("\nSubkey expires on: %s"), info->key_expires);
     if (info->key_revoked || info->key_expired || info->key_disabled ||
        info->key_invalid) {
        GString * attrs = g_string_new("");

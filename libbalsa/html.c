@@ -61,12 +61,13 @@
 typedef struct {
     WebKitWebView        *web_view;
     WebKitWebFrame       *frame;
-    LibBalsaHtmlCallback  hover_cb;
-    LibBalsaHtmlCallback  clicked_cb;
 #if !WEBKIT_CHECK_VERSION(1, 12, 0)
     GtkAdjustment        *hadj;
     GtkAdjustment        *vadj;
 #endif                          /* !WEBKIT_CHECK_VERSION(1, 12, 0) */
+    LibBalsaHtmlCallback  hover_cb;
+    LibBalsaHtmlCallback  clicked_cb;
+    LibBalsaMessage      *message;
 } LibBalsaWebKitInfo;
 
 /*
@@ -167,13 +168,15 @@ lbh_resource_request_starting_cb(WebKitWebView         * web_view,
         /* Not a "cid:" request: disable loading. */
         webkit_network_request_set_uri(request, "about:blank");
     } else {
-        LibBalsaMessage *message = data;
+        LibBalsaWebKitInfo *info = data;
         LibBalsaMessageBody *body;
 
         /* Replace "cid:" request with a "file:" request. */
-        if ((body = libbalsa_message_get_part_by_id(message, uri + 4))
+        if ((body =
+             libbalsa_message_get_part_by_id(info->message, uri + 4))
             && libbalsa_message_body_save_temporary(body, NULL)) {
-            gchar *file_uri = g_strconcat("file://", body->temp_filename, NULL);
+            gchar *file_uri =
+                g_strconcat("file://", body->temp_filename, NULL);
             webkit_network_request_set_uri(request, file_uri);
             g_free(file_uri);
         }
@@ -186,6 +189,28 @@ lbh_resource_request_starting_cb(WebKitWebView         * web_view,
  * WebKit to open one, but we destroy it after it has emitted the
  * "navigation-policy-decision-requested" signal.
  */
+
+/*
+ * Allow the new window only if it is needed because a link was clicked.
+ */
+static gboolean
+lbh_new_window_policy_decision_requested_cb(WebKitWebView             * web_view,
+                                            WebKitWebFrame            * frame,
+                                            WebKitNetworkRequest      * request,
+                                            WebKitWebNavigationAction * action,
+                                            WebKitWebPolicyDecision   * decision,
+                                            gpointer                    data)
+{
+    WebKitWebNavigationReason reason;
+
+    g_object_get(action, "reason", &reason, NULL);
+
+    if (reason == WEBKIT_WEB_NAVIGATION_REASON_LINK_CLICKED)
+        return FALSE;
+
+    webkit_web_policy_decision_ignore(decision);
+    return TRUE;
+}
 
 /*
  * Idle handler to actually unref it.
@@ -286,12 +311,15 @@ libbalsa_html_new(const gchar        * text,
     g_signal_connect(web_view, "navigation-policy-decision-requested",
                      G_CALLBACK
                      (lbh_navigation_policy_decision_requested_cb), info);
+    info->message = message;
     g_signal_connect(web_view, "resource-request-starting",
-                     G_CALLBACK(lbh_resource_request_starting_cb), message);
+                     G_CALLBACK(lbh_resource_request_starting_cb), info);
+    g_signal_connect(web_view, "new-window-policy-decision-requested",
+                     G_CALLBACK(lbh_new_window_policy_decision_requested_cb), info);
     g_signal_connect(web_view, "create-web-view",
                      G_CALLBACK(lbh_create_web_view_cb), info);
 
-    g_signal_connect(web_view, "load-progress-changed",
+    g_signal_connect(web_view, "notify::progress",
                      G_CALLBACK(gtk_widget_queue_resize), NULL);
 
     webkit_web_view_load_string(web_view, text, "text/html", charset,

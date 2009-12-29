@@ -1,5 +1,6 @@
 2009-12-29  Peter Bloomfield
 
+	* configure.in: require webkitgtk version 1.1.14 or newer.
 	* libbalsa/html.c (lbh_resource_request_starting_cb),
 	(libbalsa_html_new): use WebKitwebView's
 	"resource-request-starting" signal to handle cid: requests and

@@ -370,7 +370,11 @@ AC_SUBST(BALSA_DEFS)
 #
 AC_MSG_CHECKING(whether to use WebKit)
 if test x"$use_webkit" != xno ; then
-    AC_MSG_RESULT([yes])
+    if $PKG_CONFIG --atleast-version=1.1.14 webkit-1.0; then
+        AC_MSG_RESULT([yes])
+    else
+        AC_MSG_ERROR([WebKitGTK+ version 1.1.14 or newer is required.])
+    fi
     if test x"$use_threads" = xno ; then
         AC_MSG_ERROR([WebKit cannot be used with threads disabled.])
     fi

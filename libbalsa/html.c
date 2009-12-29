@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2003 Stuart Parmenter and others,
+ * Copyright (C) 1997-2009 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -54,30 +54,9 @@
 
 /*
  * Experimental support for WebKit.
- *
- * Issues as of WebKit 1.0.3:
- *
- * (a) no mechanism for satisfying "cid:" requests;
- * (b) no assurance that remote servers named in "src=" attributes
- *     will not be contacted.
- *
- * GtkHtml-{2,3} resolve both issues with the "url-requested" or
- * "request-url" signal; WebKit does not have one.  We turn off its
- * "auto-load-images" setting, which seems to mean that <img src="...">
- * tags are ignored.  However, that is apparently intended to save
- * bandwidth rather than to protect privacy.  The WebView attempts to
- * contact the server named in <frame src="...">, but we detect it
- * because of the new frame, and block it; whether "src=" attributes on
- * other tags are followed is unknown.
- *
- * We do disable scripts, so the server in a <script src="..."> should
- * not be contacted.
- *
- * https://bugs.webkit.org/show_bug.cgi?id=17147 discusses these issues.
  */
 
 #include <webkit/webkit.h>
-#include "mime-stream-shared.h"
 
 typedef struct {
     WebKitWebView        *web_view;
@@ -90,6 +69,11 @@ typedef struct {
 #endif                          /* !WEBKIT_CHECK_VERSION(1, 12, 0) */
 } LibBalsaWebKitInfo;
 
+/*
+ * Callback for the "hovering-over-link" signal
+ *
+ * Pass the URI to the handler set by the caller
+ */
 static void
 lbh_hovering_over_link_cb(GtkWidget   * web_view,
                           const gchar * title,
@@ -119,6 +103,13 @@ lbh_size_request_cb(GtkWidget      * widget,
 }
 #endif                          /* !WEBKIT_CHECK_VERSION(1, 12, 0) */
 
+/*
+ * Callback for the "navigation-policy-decision-requested" signal
+ *
+ * If the reason is that the user clicked on a link, pass the URI to to
+ * the handler set by the caller; slightly complicated by links that
+ * are supposed to open in their own windows.
+ */
 static gboolean
 lbh_navigation_policy_decision_requested_cb(WebKitWebView             * web_view,
                                             WebKitWebFrame            * frame,
@@ -154,6 +145,39 @@ lbh_navigation_policy_decision_requested_cb(WebKitWebView             * web_view
     }
 
     return FALSE;
+}
+
+/*
+ * Callback for the "resource-request-starting" signal
+ *
+ * Here we get to disallow all requests involving remote servers, and to
+ * handle cid: requests by replacing them with file: requests.
+ */
+static void
+lbh_resource_request_starting_cb(WebKitWebView         * web_view,
+                                 WebKitWebFrame        * frame,
+                                 WebKitWebResource     * resource,
+                                 WebKitNetworkRequest  * request,
+                                 WebKitNetworkResponse * response,
+                                 gpointer                data)
+{
+    const gchar *uri = webkit_network_request_get_uri(request);
+
+    if (g_ascii_strncasecmp(uri, "cid:", 4)) {
+        /* Not a "cid:" request: disable loading. */
+        webkit_network_request_set_uri(request, "about:blank");
+    } else {
+        LibBalsaMessage *message = data;
+        LibBalsaMessageBody *body;
+
+        /* Replace "cid:" request with a "file:" request. */
+        if ((body = libbalsa_message_get_part_by_id(message, uri + 4))
+            && libbalsa_message_body_save_temporary(body, NULL)) {
+            gchar *file_uri = g_strconcat("file://", body->temp_filename, NULL);
+            webkit_network_request_set_uri(request, file_uri);
+            g_free(file_uri);
+        }
+    }
 }
 
 /*
@@ -206,110 +230,6 @@ lbh_create_web_view_cb(WebKitWebView  * web_view,
     return WEBKIT_WEB_VIEW(widget);
 }
 
-static gchar *
-lbh_filter_src(const gchar *text, LibBalsaMessage * message)
-{
-    GString *string = g_string_sized_new(strlen(text));
-    const gchar *start, *left;
-
-    start = text;
-    while ((left = strchr(start, '<'))) {
-        const gchar *right;
-
-        if (!(right = strchr(left, '>')))
-            break;
-
-        for (left++; left < right - 5; left++)
-            if (!g_ascii_strncasecmp(left, "src=\"", 5))
-                break;
-        if (left >= right - 5) {
-            g_string_append_len(string, start, right - start);
-            start = right;
-            continue;
-        }
-        left = left + 5;
-
-        g_string_append_len(string, start, left - start);
-        start = left;
-
-        if (!g_ascii_strncasecmp(start, "cid:", 4)) {
-#ifdef WEBKITWEBVIEW_ALLOWS_FILE_URIS
-            /* replace with a file URI: */
-            g_string_append(string, "file://");
-            g_string_append(string, libbalsa_message_get_tempdir(message));
-            if (string->str[string->len - 1] != G_DIR_SEPARATOR)
-                g_string_append_c(string, G_DIR_SEPARATOR);
-            start += 4;     /* skip over "cid:" */
-#else                           /* WEBKITWEBVIEW_ALLOWS_FILE_URIS */
-            /* replace with a data URI: */
-            const gchar *dquote;
-            gchar *content_id;
-            LibBalsaMessageBody *body;
-            gchar *mime_type;
-            GMimeStream *stream;
-            GError *err = NULL;
-            GMimeStream *stream_filter;
-            GMimeFilter *filter;
-            GMimeStream *stream_mem;
-            GByteArray *byte_array;
-
-            if (!(dquote = strchr(start, '"')))
-                break;
-
-            start += 4;     /* skip over "cid:" */
-            content_id = g_strndup(start, dquote - start);
-            body = libbalsa_message_get_part_by_id(message, content_id);
-            g_free(content_id);
-            if (!body)
-                break;
-
-            mime_type = libbalsa_message_body_get_mime_type(body);
-            g_string_append_printf(string, "data:%s;base64,\n", mime_type);
-            g_free(mime_type);
-
-            stream = libbalsa_message_body_get_stream(body, &err);
-            if (err) {
-                g_message("%s: %s", __func__, err->message);
-                g_error_free(err);
-                break;
-            }
-
-            stream_filter = g_mime_stream_filter_new(stream);
-            filter = g_mime_filter_basic_new(GMIME_CONTENT_ENCODING_BASE64, TRUE);
-            g_mime_stream_filter_add(GMIME_STREAM_FILTER(stream_filter), filter);
-            g_object_unref(filter);
-
-            stream_mem = g_mime_stream_mem_new();
-            libbalsa_mime_stream_shared_lock(stream);
-            g_mime_stream_reset(stream);
-            g_mime_stream_write_to_stream(stream_filter, stream_mem);
-            libbalsa_mime_stream_shared_unlock(stream);
-            g_object_unref(stream);
-            g_object_unref(stream_filter);
-
-            byte_array = g_mime_stream_mem_get_byte_array(GMIME_STREAM_MEM(stream_mem));
-            g_mime_stream_mem_set_owner(GMIME_STREAM_MEM(stream_mem), FALSE);
-            g_object_unref(stream_mem);
-
-            g_string_append_len(string, (gchar *) byte_array->data, byte_array->len);
-#if GLIB_CHECK_VERSION(2, 22, 0)
-            g_byte_array_unref(byte_array);
-#else                           /* GLIB_CHECK_VERSION(2, 22, 0) */
-            g_byte_array_free(byte_array, TRUE);
-#endif                          /* GLIB_CHECK_VERSION(2, 22, 0) */
-
-            start = dquote;
-#endif                          /* WEBKITWEBVIEW_ALLOWS_FILE_URIS */
-        } else {
-            /* break all other URIs: */
-            g_string_append(string, "null");
-        }
-    }
-    g_string_append(string, start);
-
-    return g_string_free(string, FALSE);
-}
-
 /* Create a new WebKitWebView widget:
  * text			the HTML source;
  * len			length of text;
@@ -333,7 +253,6 @@ libbalsa_html_new(const gchar        * text,
     GtkWidget *widget;
     WebKitWebView *web_view;
     LibBalsaWebKitInfo *info;
-    gchar *save_me = NULL;
 
     widget = webkit_web_view_new();
 
@@ -345,9 +264,6 @@ libbalsa_html_new(const gchar        * text,
     g_object_set(webkit_web_view_get_settings(web_view),
                  "enable-scripts",   FALSE,
                  "enable-plugins",   FALSE,
-#ifdef WEBKITWEBVIEW_ALLOWS_FILE_URIS
-                 "enable-universal-access-from-file-uris", TRUE,
-#endif                          /* WEBKITWEBVIEW_ALLOWS_FILE_URIS */
                  NULL);
 
 #if !WEBKIT_CHECK_VERSION(1, 12, 0)
@@ -370,30 +286,16 @@ libbalsa_html_new(const gchar        * text,
     g_signal_connect(web_view, "navigation-policy-decision-requested",
                      G_CALLBACK
                      (lbh_navigation_policy_decision_requested_cb), info);
+    g_signal_connect(web_view, "resource-request-starting",
+                     G_CALLBACK(lbh_resource_request_starting_cb), message);
     g_signal_connect(web_view, "create-web-view",
                      G_CALLBACK(lbh_create_web_view_cb), info);
 
     g_signal_connect(web_view, "load-progress-changed",
                      G_CALLBACK(gtk_widget_queue_resize), NULL);
 
-#ifdef WEBKITWEBVIEW_ALLOWS_FILE_URIS
-    if (libbalsa_message_save_parts_by_id(message, NULL))
-        text = save_me = lbh_filter_src(text, message);
-    else
-        g_object_set(webkit_web_view_get_settings(web_view),
-                     "auto-load-images", FALSE,
-                     NULL);
-#else                           /* WEBKITWEBVIEW_ALLOWS_FILE_URIS */
-    if (libbalsa_message_has_cid_part(message))
-        text = save_me = lbh_filter_src(text, message);
-    else
-        g_object_set(webkit_web_view_get_settings(web_view),
-                     "auto-load-images", FALSE,
-                     NULL);
-#endif                          /* WEBKITWEBVIEW_ALLOWS_FILE_URIS */
     webkit_web_view_load_string(web_view, text, "text/html", charset,
                                 NULL);
-    g_free(save_me);
 
     return widget;
 }

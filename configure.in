@@ -135,7 +135,7 @@ AC_ARG_WITH([gtksourceview],
 
 AC_ARG_WITH([gtkspell],
    AC_HELP_STRING([--with-gtkspell],
-                  [Use GtkSpell if available (default=no)]),
+                  [Use GtkSpell/enchant if available (default=no)]),
 		  [with_gtkspell=$withval],[with_gtkspell=no])
 
 AC_ARG_WITH(iconv,      
@@ -828,7 +828,7 @@ dnl #####################################################################
 # Spell check detection.
 #
 if test x$with_gtkspell != xno; then
-    PKG_CHECK_MODULES(SPELL, [ gtkspell-2.0 ])
+    PKG_CHECK_MODULES(SPELL, [ gtkspell-2.0 enchant ])
     AC_DEFINE(HAVE_GTKSPELL,1,[Defined when GtkSpell can be used.])
     BALSA_CFLAGS="$BALSA_CFLAGS $SPELL_CFLAGS"
     BALSA_LIBS="$BALSA_LIBS $SPELL_LIBS"

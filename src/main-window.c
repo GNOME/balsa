@@ -395,7 +395,7 @@ static const GtkActionEntry entries[] = {
      G_CALLBACK(mailbox_conf_add_mbox_cb)},
     {"NewMaildir", GTK_STOCK_ADD, N_("New \"Maildir\" mailbox..."), NULL,
      N_("Add a new Maildir style mailbox"),
-     G_CALLBACK(bw_mailbox_conf_add_maildir_cb)},
+     G_CALLBACK(mailbox_conf_add_maildir_cb)},
     {"NewMH", GTK_STOCK_ADD, N_("New \"MH\" mailbox..."), NULL,
      N_("Add a new MH style mailbox"), G_CALLBACK(mailbox_conf_add_mh_cb)},
 #endif /* ENABLE_TOUCH_UI */
@@ -1627,12 +1627,14 @@ balsa_window_new()
     GtkWidget *hbox;
     static const gchar *const header_options[] =
         { "NoHeaders", "SelectedHeaders", "AllHeaders" };
+#if !defined(ENABLE_TOUCH_UI)
     static const gchar *const threading_options[] =
         { "FlatIndex", "SimpleThreading", "JWZThreading" };
-    guint i;
+#endif
 #if HAVE_MACOSX_DESKTOP
     IgeMacMenuGroup *group;
 #endif
+    guint i;
 
     /* Call to register custom balsa pixmaps with GNOME_STOCK_PIXMAPS
      * - allows for grey out */
@@ -4379,6 +4381,7 @@ bw_find_again_cb(GtkAction * action,gpointer data)
 	bw_find_real(window, BALSA_INDEX(bindex), TRUE);
 }
 
+#if !defined(ENABLE_TOUCH_UI)
 static void
 bw_find_in_message_cb(GtkAction * action,gpointer data)
 {
@@ -4386,6 +4389,7 @@ bw_find_in_message_cb(GtkAction * action,gpointer data)
     if (balsa_app.previewpane)
         balsa_message_find_in_message(BALSA_MESSAGE(window->preview));
 }
+#endif /* ENABLE_TOUCH_UI */
 
 static void
 bw_filter_dlg_cb(GtkAction * action, gpointer data)

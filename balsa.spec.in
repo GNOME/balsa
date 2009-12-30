@@ -35,6 +35,7 @@ BuildRequires: gnome-vfs2-devel
 BuildRequires: gtk2-devel
 BuildRequires: gtkhtml2-devel
 BuildRequires: gtkspell-devel
+BuildRequires: enchant-devel
 BuildRequires: intltool
 BuildRequires: libesmtp-devel >= 1.0.4
 BuildRequires: libgnome-devel

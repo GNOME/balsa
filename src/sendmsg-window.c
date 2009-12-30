@@ -7057,6 +7057,7 @@ bsmsg_check_format_compatibility(GtkWindow *parent, const gchar *filename)
         { ".gnumeric", "Gnumeric", ".xls", "Microsoft Excel" }
     };
     GtkDialog *dialog;
+    GtkBox *vbox;
     GtkWidget *label, *checkbox = NULL;
     unsigned i, fn_len = strlen(filename);
     int response;
@@ -7102,14 +7103,15 @@ bsmsg_check_format_compatibility(GtkWindow *parent, const gchar *filename)
          compatibility_table[i].other_program,
          compatibility_table[i].other_program,
          compatibility_table[i].other_extension);
-    gtk_box_set_spacing(GTK_BOX(dialog->vbox), 10);
-    gtk_box_pack_start(GTK_BOX(dialog->vbox), label = gtk_label_new(str),
+    vbox = GTK_BOX(gtk_dialog_get_content_area(dialog));
+    gtk_box_set_spacing(vbox, 10);
+    gtk_box_pack_start(vbox, label = gtk_label_new(str),
                        TRUE, TRUE, 0);
     gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
     g_free(str);
     checkbox = gtk_check_button_new_with_mnemonic
         ("_Do not show this dialog any more.");
-    gtk_box_pack_start(GTK_BOX(dialog->vbox), checkbox, TRUE, TRUE, 0);
+    gtk_box_pack_start(vbox, checkbox, TRUE, TRUE, 0);
     gtk_widget_show(checkbox);
     gtk_widget_show(label);
     response = gtk_dialog_run(dialog);

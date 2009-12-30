@@ -1,3 +1,9 @@
+2009-12-30  Pawel Salek
+
+	* configure.in: gtkspell build requires enchant now as well.\
+	* src/main-window.c:
+	* src/sendmsg-window.c: compile with --enable-touch-ui
+
 2009-12-30  Peter Bloomfield
 
 	* src/sendmsg-window.c (create_lang_menu): use

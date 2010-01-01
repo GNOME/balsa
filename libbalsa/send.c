@@ -1473,6 +1473,24 @@ balsa_send_message_real(SendMessageInfo* info)
 }
 
 #else /* ESMTP */
+static void
+sendmail_add_recipients(GPtrArray *args, InternetAddressList* recipient_list)
+{
+    const InternetAddress *ia;
+    int i;
+    
+    if (recipient_list == NULL)
+	return;
+    
+    for (i = 0; i < internet_address_list_length(recipient_list); i++) {
+        ia = internet_address_list_get_address(recipient_list, i);
+
+	if (INTERNET_ADDRESS_IS_MAILBOX(ia))
+	    g_ptr_array_add(args, INTERNET_ADDRESS_MAILBOX(ia)->addr);
+	else
+	    sendmail_add_recipients(args, INTERNET_ADDRESS_GROUP(ia)->members);
+    }
+}
 
 /* balsa_send_message_real:
    does the actual message sending. 
@@ -1503,29 +1521,36 @@ balsa_send_message_real(SendMessageInfo* info)
     }	
 #endif
 
+
     while ( (mqi = get_msg2send()) != NULL) {
 	GPtrArray *args = g_ptr_array_new();
 	LibBalsaMessage *msg = LIBBALSA_MESSAGE(mqi->orig);
-	InternetAddressList *list;
-	const gchar *mailbox;
+	InternetAddress *ia;
 	gchar *cmd;
 	FILE *sendmail;
 	GMimeStream *out;
 
 	g_ptr_array_add(args, SENDMAIL);
+
+        /* Determine the sender info */
+        if (msg->headers->from
+            && (ia=internet_address_list_get_address(msg->headers->from, 0))) {
+            while (ia && INTERNET_ADDRESS_IS_GROUP (ia))
+                ia = internet_address_list_get_address
+                    (INTERNET_ADDRESS_GROUP (ia)->members, 0);
+
+            if (ia) {
+                g_ptr_array_add(args, "-f");
+                g_ptr_array_add(args, INTERNET_ADDRESS_MAILBOX (ia)->addr);
+            }
+        } 
+
 	g_ptr_array_add(args, "--");
-	for (list = msg->headers->to_list; list; list = list->next) {
-	    mailbox = libbalsa_address_get_mailbox_from_list(list);
-	    g_ptr_array_add(args, (char*)mailbox);
-	}
-	for (list = msg->headers->cc_list; list; list = list->next) {
-	    mailbox = libbalsa_address_get_mailbox_from_list(list);
-	    g_ptr_array_add(args, (char*)mailbox);
-	}
-	for (list = msg->headers->bcc_list; list; list = list->next) {
-	    mailbox = libbalsa_address_get_mailbox_from_list(list);
-	    g_ptr_array_add(args, (char*)mailbox);
-	}
+        
+        sendmail_add_recipients(args, msg->headers->to_list);
+        sendmail_add_recipients(args, msg->headers->cc_list);
+        sendmail_add_recipients(args, msg->headers->bcc_list);
+
 	g_ptr_array_add(args, NULL);
 	cmd = g_strjoinv(" ", (gchar**)args->pdata);
 	g_ptr_array_free(args, FALSE);

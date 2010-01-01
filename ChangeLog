@@ -1,3 +1,7 @@
+2010-01-01  Pawel Salek
+
+	* libbalsa/send.c: Fix bug 605807.
+
 2009-12-30  Pawel Salek
 
 	* configure.in: gtkspell build requires enchant now as well.\

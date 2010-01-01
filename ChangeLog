@@ -1,3 +1,9 @@
+2010-01-02  Pawel Salek
+
+	* libbalsa/imap/pop3.c: Report errors occuring during downloading
+	process earlier to avoid saving corrupted messages.
+	* libbalsa/mailbox_pop3.c: do not leak file descriptors on some errors.
+
 2010-01-01  Peter Bloomfield
 
 	* src/sendmsg-window.c: Do not crash in touch-ui version.

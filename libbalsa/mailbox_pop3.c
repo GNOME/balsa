@@ -389,18 +389,18 @@ fetch_async_cb(PopReqCode prc, void *arg, ...)
 	}
 	break;
     case POP_REQ_DONE:
-            if(fd->dm->close(fd->f) != 0) {
-                if(!*fd->err)
-                    g_set_error(fd->err, IMAP_ERROR, IMAP_POP_SAVE_ERROR,
-                                _("Transferring POP message to %s failed."),
-                                fd->dest_path);
-            } else if(!fd->error_occured &&
-                      move_from_msgdrop
-                      (fd->tmp_path,
-                       LIBBALSA_MAILBOX_POP3(fd->mailbox)->inbox,
-                       fd->mailbox->name, fd->msgno) &&
-                      fd->delete_on_server)
-                pop_delete_message(fd->pop, fd->msgno, NULL, NULL, NULL);
+        if(fd->dm->close(fd->f) != 0) {
+            if(!*fd->err)
+                g_set_error(fd->err, IMAP_ERROR, IMAP_POP_SAVE_ERROR,
+                            _("Transferring POP message to %s failed."),
+                            fd->dest_path);
+        } else if(!fd->error_occured &&
+                  move_from_msgdrop
+                  (fd->tmp_path,
+                   LIBBALSA_MAILBOX_POP3(fd->mailbox)->inbox,
+                   fd->mailbox->name, fd->msgno) &&
+                  fd->delete_on_server)
+            pop_delete_message(fd->pop, fd->msgno, NULL, NULL, NULL);
 	fd->f = NULL;
 	break;
     }
@@ -410,6 +410,12 @@ fetch_async_cb(PopReqCode prc, void *arg, ...)
 static void
 async_notify(struct fetch_data *fd)
 {
+    /* We need to close the file here only when POP_REQ_ERR
+       arrived. */
+    if (fd->f) {
+        fd->dm->close(fd->f);
+        fd->f = NULL;
+    }
     g_free(fd);
 }
 
@@ -517,6 +523,7 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
         unsigned msg_size = pop_get_msg_size(pop, i);
 #if POP_SYNC
         FILE *f;
+        gboolean retval;
 #endif
         if(!m->delete_from_server) {
             const char *uid = pop_get_uid(pop, i, NULL);
@@ -546,14 +553,16 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
 			     dest_path);
             break;
         }
-        if(!pop_fetch_message_s(pop, i, dump_cb, f, &err)) 
-            break;
+        retval = pop_fetch_message_s(pop, i, dump_cb, f, &err);
+
         if(mode->close(f) != 0) {
             libbalsa_information(LIBBALSA_INFORMATION_ERROR,
 			     _("POP3 error: cannot close %s."), 
 			     dest_path);
             break;
         }
+        if (!retval)
+            break;
         if(move_from_msgdrop(tmp_path, m->inbox,
                              mailbox->name, i) &&
            m->delete_from_server)

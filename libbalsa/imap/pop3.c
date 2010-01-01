@@ -177,7 +177,7 @@ pop_check_status(PopHandle *pop, GError **err)
     pop->state = IMHS_DISCONNECTED;
     sio_detach(pop->sio); pop->sio = NULL; close(pop->sd);
     g_set_error(err, IMAP_ERROR, IMAP_POP_SEVERED_ERROR,
-                "POP3 Connection severed");
+                "POP3 connection severed");
     return FALSE;
   }
      
@@ -726,7 +726,8 @@ pop_complete_retr(PopHandle *pop, PopAsyncCb cb, void *arg)
   if(cb)
     cb(rc, arg, &err);
   if(resp) { /* same code as in fetch_message() */
-    while( sio_gets(pop->sio, line, sizeof(line)) &&
+    char * str;
+    while( (str = sio_gets(pop->sio, line, sizeof(line))) &&
            strcmp(line, ".\r\n") ) {
       char *buf = line[0] == '.' ? line+1 : line;
       unsigned len = strlen(buf);
@@ -735,8 +736,18 @@ pop_complete_retr(PopHandle *pop, PopAsyncCb cb, void *arg)
       if(cb) 
         cb(POP_REQ_DATA, arg, len, buf);
     }
-    if(cb)
-      cb(POP_REQ_DONE, arg, err);
+    if(!str) {/* Unexpected end of data */
+      pop->state = IMHS_DISCONNECTED;
+      sio_detach(pop->sio); pop->sio = NULL; close(pop->sd);
+      g_set_error(&err, IMAP_ERROR, IMAP_POP_SEVERED_ERROR,
+                "POP3 connection severed");
+      
+      if(cb)
+        cb(POP_REQ_ERR, arg, &err);
+    } else {
+      if(cb)
+        cb(POP_REQ_DONE, arg);
+    }
   }
 
   g_clear_error(&err);

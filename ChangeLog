@@ -1,5 +1,9 @@
 2010-01-01  Peter Bloomfield
 
+	* src/sendmsg-window.c: Do not crash in touch-ui version.
+
+2010-01-01  Peter Bloomfield
+
 	* configure.in: Allow configure --enable-touch-ui=no and
 	--disable-touch-ui.
 

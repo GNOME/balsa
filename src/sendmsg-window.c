@@ -121,8 +121,10 @@ static void toggle_from_cb         (GtkToggleAction * toggle_action,
                                     BalsaSendmsg * bsmsg);
 static void toggle_recipients_cb   (GtkToggleAction * toggle_action,
                                     BalsaSendmsg * bsmsg);
+#if !defined(ENABLE_TOUCH_UI)
 static void toggle_replyto_cb      (GtkToggleAction * toggle_action,
                                     BalsaSendmsg * bsmsg);
+#endif                          /* ENABLE_TOUCH_UI */
 static void toggle_fcc_cb          (GtkToggleAction * toggle_action,
                                     BalsaSendmsg * bsmsg);
 static void toggle_reqdispnotify_cb(GtkToggleAction * toggle_action,
@@ -415,8 +417,10 @@ static const GtkToggleActionEntry toggle_entries[] = {
      G_CALLBACK(toggle_from_cb), TRUE},
     {"Recipients", NULL, N_("Rec_ipients"), NULL, NULL,
      G_CALLBACK(toggle_recipients_cb), TRUE},
+#if !defined(ENABLE_TOUCH_UI)
     {"ReplyTo", NULL, N_("R_eply To"), NULL, NULL,
      G_CALLBACK(toggle_replyto_cb), TRUE},
+#endif                          /* ENABLE_TOUCH_UI */
     {"Fcc", NULL, N_("F_cc"), NULL, NULL,
      G_CALLBACK(toggle_fcc_cb), TRUE},
     {"RequestMDN", BALSA_PIXMAP_REQUEST_MDN,
@@ -571,7 +575,7 @@ static const char *ui_description =
 "    </menu>"
 "    <menu action='ShowMenu'>"
 "      <menuitem action='From'/>"
-"      <menuitem action='Addresses'/>"
+"      <menuitem action='Recipients'/>"
 "      <menuitem action='Fcc'/>"
 "    </menu>"
 "    <menu action='ToolsMenu'>"
@@ -6497,7 +6501,12 @@ check_readiness(BalsaSendmsg * bsmsg)
 }
 
 static const gchar * const header_action_names[] = {
-    "From", "Recipients", "ReplyTo", "Fcc"
+    "From",
+    "Recipients",
+#if !defined(ENABLE_TOUCH_UI)
+    "ReplyTo",
+#endif                          /* ENABLE_TOUCH_UI */
+    "Fcc"
 };
 
 /* toggle_entry:
@@ -6545,11 +6554,13 @@ toggle_recipients_cb(GtkToggleAction * action, BalsaSendmsg * bsmsg)
     toggle_entry(action, bsmsg, bsmsg->recipients);
 }
 
+#if !defined(ENABLE_TOUCH_UI)
 static void
 toggle_replyto_cb(GtkToggleAction * action, BalsaSendmsg * bsmsg)
 {
     toggle_entry(action, bsmsg, bsmsg->replyto);
 }
+#endif                          /* ENABLE_TOUCH_UI */
 
 static void
 toggle_fcc_cb(GtkToggleAction * action, BalsaSendmsg * bsmsg)

@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2010 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -82,6 +82,7 @@ static void mw_set_buttons_sensitive(MessageWindow * mw);
 
 static void mw_set_selected(MessageWindow * mw, void (*select_func)(BalsaIndex *));
 
+static void mw_show_toolbar_cb      (GtkToggleAction * action, gpointer data);
 static void wrap_message_cb         (GtkToggleAction * action, gpointer data);
 static void show_all_headers_tool_cb(GtkToggleAction * action, gpointer data);
 
@@ -95,6 +96,7 @@ struct _MessageWindow {
     GtkWidget *window;
 
     GtkWidget *bmessage;
+    GtkWidget *toolbar;
 
     LibBalsaMessage *message;
     BalsaIndex *bindex;
@@ -310,6 +312,8 @@ static const GtkActionEntry entries[] = {
 
 /* Toggle items */
 static const GtkToggleActionEntry toggle_entries[] = {
+    {"ShowToolbar", NULL, N_("Show Too_lbar"), NULL,
+     N_("Show toolbar"), G_CALLBACK(mw_show_toolbar_cb), TRUE},
     {"Wrap", NULL, N_("_Wrap"), NULL, N_("Wrap message lines"),
      G_CALLBACK(wrap_message_cb), FALSE},
     {"ShowAllHeaders", BALSA_PIXMAP_SHOW_HEADERS, NULL, NULL, 
@@ -319,7 +323,7 @@ static const GtkToggleActionEntry toggle_entries[] = {
 
 /* Radio items */
 static const GtkRadioActionEntry shown_hdrs_radio_entries[] = {
-    {"NoHeaders", NULL, N_("N_o Headers"), NULL,
+    {"NoHeaders", NULL, N_("_No Headers"), NULL,
      N_("Display no headers"), HEADERS_NONE},
     {"SelectedHeaders", NULL, N_("_Selected Headers"), NULL,
      N_("Display selected headers"), HEADERS_SELECTED},
@@ -343,6 +347,8 @@ static const char *ui_description =
 "      <menuitem action='FindInMessage'/>"
 "    </menu>"
 "    <menu action='ViewMenu'>"
+"      <menuitem action='ShowToolbar'/>"
+"      <separator/>"
 "      <menuitem action='Wrap'/>"
 "      <separator/>"
 "      <menuitem action='NoHeaders'/>"
@@ -524,7 +530,6 @@ message_window_new(LibBalsaMailbox * mailbox, guint msgno)
     GtkAccelGroup *accel_group; 
     GError *error = NULL;
     GtkWidget *menubar;
-    GtkWidget *toolbar;
     GtkWidget *move_menu, *submenu;
     GtkWidget *close_widget;
     GtkWidget *vbox;
@@ -577,8 +582,8 @@ message_window_new(LibBalsaMailbox * mailbox, guint msgno)
     gtk_box_pack_start(GTK_BOX(vbox), menubar, FALSE, FALSE, 0);
 #endif
 
-    toolbar = balsa_toolbar_new(model, ui_manager);
-    gtk_box_pack_start(GTK_BOX(vbox), toolbar, FALSE, FALSE, 0);
+    mw->toolbar = balsa_toolbar_new(model, ui_manager);
+    gtk_box_pack_start(GTK_BOX(vbox), mw->toolbar, FALSE, FALSE, 0);
 
     /* Now that we have installed the menubar and toolbar, we no longer
      * need the UIManager. */
@@ -617,6 +622,7 @@ message_window_new(LibBalsaMailbox * mailbox, guint msgno)
     mw->bmessage = balsa_message_new();
     
     gtk_box_pack_start(GTK_BOX(vbox), mw->bmessage, TRUE, TRUE, 0);
+    gtk_widget_show_all(vbox);
 
     g_signal_connect(mw->bmessage, "select-part",
 		     G_CALLBACK(mw_select_part_cb), mw);
@@ -632,6 +638,7 @@ message_window_new(LibBalsaMailbox * mailbox, guint msgno)
     }
 
     mw_set_active(mw, "Wrap", balsa_app.browse_wrap, NULL);
+    mw_set_active(mw, "ShowToolbar", balsa_app.show_message_toolbar, NULL);
 
     gtk_window_set_default_size(GTK_WINDOW(window),
                                 balsa_app.message_window_width, 
@@ -639,7 +646,7 @@ message_window_new(LibBalsaMailbox * mailbox, guint msgno)
     if (balsa_app.message_window_maximized)
         gtk_window_maximize(GTK_WINDOW(window));
 
-    gtk_widget_show_all(window);
+    gtk_widget_show(window);
     mw_set_message(mw, message);
 
     close_widget =
@@ -783,6 +790,18 @@ close_message_window_cb(GtkAction * action, gpointer data)
 {
     MessageWindow *mw = (MessageWindow *) data;
     gtk_widget_destroy(mw->window);
+}
+
+static void
+mw_show_toolbar_cb(GtkToggleAction * action, gpointer data)
+{
+    MessageWindow *mw = (MessageWindow *) data;
+
+    balsa_app.show_message_toolbar = gtk_toggle_action_get_active(action);
+    if (balsa_app.show_message_toolbar)
+        gtk_widget_show(mw->toolbar);
+    else
+        gtk_widget_hide(mw->toolbar);
 }
 
 static void

@@ -1,3 +1,17 @@
+2010-01-02  Peter Bloomfield
+
+	* src/balsa-app.h: new members to save hidden toolbars.
+	* src/save-restore.c (config_global_load), (config_save): save
+	and restore them.
+	* src/main-window.c: options to hide toolbar, SoSbar, and status
+	bar.
+	* src/main-window.h: add toolbar and sos_bar members.
+	* src/message-window.c (message_window_new),
+	(mw_show_toolbar_cb): option to hide toolbar.
+	* src/sendmsg-window.c (sendmsg_window_new),
+	(sw_show_toolbar_cb): option to hide toolbar.
+	* src/sendmsg-window.h: add toolbar member.
+
 2010-01-02  Pawel Salek
 
 	* libbalsa/imap/pop3.c: Report errors occuring during downloading

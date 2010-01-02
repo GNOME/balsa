@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2002 Stuart Parmenter and others,
+ * Copyright (C) 1997-2010 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -298,6 +298,13 @@ extern struct BalsaApplication {
     gboolean do_file_format_check; /* do file format check on attaching */
     gboolean enable_view_filter;   /* enable quick view filter */
 #endif
+
+    /* Show toolbars, status bar, and subject-or-sender search bar */
+    gboolean show_main_toolbar;
+    gboolean show_message_toolbar;
+    gboolean show_compose_toolbar;
+    gboolean show_statusbar;
+    gboolean show_sos_bar;
 
     gboolean empty_trash_on_exit;
     gboolean previewpane;

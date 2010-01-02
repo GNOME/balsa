@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2007 Stuart Parmenter and others,
+ * Copyright (C) 1997-2010 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -245,6 +245,9 @@ static void bw_set_sort_menu(BalsaWindow *window,
 #endif /* ENABLE_TOUCH_UI */
 static void bw_hide_changed_cb         (GtkToggleAction * action, gpointer data);
 static void bw_wrap_message_cb         (GtkToggleAction * action, gpointer data);
+static void bw_show_toolbar_cb         (GtkToggleAction * action, gpointer data);
+static void bw_show_statusbar_cb       (GtkToggleAction * action, gpointer data);
+static void bw_show_sos_bar_cb         (GtkToggleAction * action, gpointer data);
 static void bw_show_all_headers_tool_cb(GtkToggleAction * action, gpointer data);
 static void bw_show_preview_pane_cb    (GtkToggleAction * action, gpointer data);
 static void bw_reset_show_all_headers(BalsaWindow * window);
@@ -600,6 +603,12 @@ static const GtkToggleActionEntry toggle_entries[] = {
     {"ShowMailboxTabs", NULL, N_("Show Mailbox _Tabs"), NULL,
      N_("Toggle display of mailbox notebook tabs"),
      G_CALLBACK(bw_show_mbtabs_cb), FALSE},
+    {"ShowToolbar", NULL, N_("Show Too_lbar"), NULL,
+     NULL, G_CALLBACK(bw_show_toolbar_cb), TRUE},
+    {"ShowStatusbar", NULL, N_("Show St_atus Bar"), NULL,
+     NULL, G_CALLBACK(bw_show_statusbar_cb), TRUE},
+    {"ShowSOSbar", NULL, N_("Show \"S_ubject or Sender\" Bar"), NULL,
+     NULL, G_CALLBACK(bw_show_sos_bar_cb), TRUE},
 #else  /* ENABLE_TOUCH_UI */
     {"SortDescending", NULL, N_("_Descending"), NULL,
      N_("Sort in a descending order"),
@@ -716,6 +725,9 @@ static const char *ui_description =
 "    <menu action='ViewMenu'>"
 "      <menuitem action='ShowMailboxTree'/>"
 "      <menuitem action='ShowMailboxTabs'/>"
+"      <menuitem action='ShowToolbar'/>"
+"      <menuitem action='ShowStatusbar'/>"
+"      <menuitem action='ShowSOSbar'/>"
 "      <separator/>"
 "      <menuitem action='Wrap'/>"
 "      <separator/>"
@@ -1196,7 +1208,6 @@ static GtkWidget*
 bw_create_index_widget(BalsaWindow *bw)
 {
     GtkWidget *vbox, *button;
-    GtkWidget *hbox = gtk_hbox_new(FALSE, 5);
     unsigned i;
 
     if(!view_filters_translated) {
@@ -1205,8 +1216,10 @@ bw_create_index_widget(BalsaWindow *bw)
         view_filters_translated = TRUE;
     }
 
+    bw->sos_bar = gtk_hbox_new(FALSE, 5);
+
     bw->filter_choice = gtk_combo_box_new_text();
-    gtk_box_pack_start(GTK_BOX(hbox), bw->filter_choice,
+    gtk_box_pack_start(GTK_BOX(bw->sos_bar), bw->filter_choice,
                        FALSE, FALSE, 0);
     for(i=0; i<ELEMENTS(view_filters); i++)
         gtk_combo_box_insert_text(GTK_COMBO_BOX(bw->filter_choice),
@@ -1220,9 +1233,9 @@ bw_create_index_widget(BalsaWindow *bw)
                      G_CALLBACK(bw_enable_filter), bw);
     g_signal_connect(G_OBJECT(bw->sos_entry), "focus_out_event",
                      G_CALLBACK(bw_disable_filter), bw);
-    gtk_box_pack_start(GTK_BOX(hbox), bw->sos_entry, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(bw->sos_bar), bw->sos_entry, TRUE, TRUE, 0);
     gtk_widget_show(bw->sos_entry);
-    gtk_box_pack_start(GTK_BOX(hbox),
+    gtk_box_pack_start(GTK_BOX(bw->sos_bar),
                        button = gtk_button_new(),
                        FALSE, FALSE, 0);
     gtk_container_add(GTK_CONTAINER(button),
@@ -1246,8 +1259,8 @@ bw_create_index_widget(BalsaWindow *bw)
      * space-constrained conditions. */
     if(balsa_app.enable_view_filter)
 #endif
-        gtk_widget_show(hbox);
-    gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, FALSE, 0);
+        gtk_widget_show(bw->sos_bar);
+    gtk_box_pack_start(GTK_BOX(vbox), bw->sos_bar, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(vbox), bw->notebook, TRUE, TRUE, 0);
     gtk_container_set_focus_chain(GTK_CONTAINER(vbox),
                                   g_list_append(NULL, bw->notebook));
@@ -1623,7 +1636,6 @@ balsa_window_new()
     GtkAccelGroup *accel_group;
     GError *error = NULL;
     GtkWidget *menubar;
-    GtkWidget *toolbar;
     GtkWidget *hbox;
     static const gchar *const header_options[] =
         { "NoHeaders", "SelectedHeaders", "AllHeaders" };
@@ -1683,8 +1695,9 @@ balsa_window_new()
     gtk_box_pack_start(GTK_BOX(window->vbox), menubar, FALSE, FALSE, 0);
 #endif
 
-    toolbar = balsa_toolbar_new(model, ui_manager);
-    gtk_box_pack_start(GTK_BOX(window->vbox), toolbar, FALSE, FALSE, 0);
+    window->toolbar = balsa_toolbar_new(model, ui_manager);
+    gtk_box_pack_start(GTK_BOX(window->vbox), window->toolbar,
+                       FALSE, FALSE, 0);
 
     /* Now that we have installed the menubar and toolbar, we no longer
      * need the UIManager. */
@@ -1813,6 +1826,9 @@ balsa_window_new()
     g_signal_connect_after(G_OBJECT(window), "key_press_event",
                      G_CALLBACK(bw_open_mailbox_cb), NULL);
 #endif
+    bw_set_active(window, "ShowToolbar", balsa_app.show_main_toolbar, FALSE);
+    bw_set_active(window, "ShowStatusbar", balsa_app.show_statusbar, FALSE);
+    bw_set_active(window, "ShowSOSbar", balsa_app.show_sos_bar, FALSE);
 
     /* Disable menu items at start up */
     balsa_window_update_book_menus(window);
@@ -3972,6 +3988,37 @@ bw_wrap_message_cb(GtkToggleAction * action, gpointer data)
     refresh_preferences_manager();
 }
 
+static void
+bw_show_helper(GtkToggleAction * action, gboolean * active,
+               GtkWidget * widget)
+{
+    if ((*active = gtk_toggle_action_get_active(action)))
+        gtk_widget_show(widget);
+    else
+        gtk_widget_hide(widget);
+}
+
+static void
+bw_show_toolbar_cb(GtkToggleAction * action, gpointer data)
+{
+    bw_show_helper(action, &balsa_app.show_main_toolbar,
+                   BALSA_WINDOW(data)->toolbar);
+}
+
+static void
+bw_show_statusbar_cb(GtkToggleAction * action, gpointer data)
+{
+    bw_show_helper(action, &balsa_app.show_statusbar,
+                   BALSA_WINDOW(data)->statusbar);
+}
+
+static void
+bw_show_sos_bar_cb(GtkToggleAction * action, gpointer data)
+{
+    bw_show_helper(action, &balsa_app.show_sos_bar,
+                   BALSA_WINDOW(data)->sos_bar);
+}
+
 /*
  * Callback for the "activate" signal of the View menu's header options.
  * We use this instead of the GtkRadioAction's "changed" signal so that
@@ -5102,7 +5149,8 @@ bw_progress_timeout(BalsaWindow ** window)
 {
     gdk_threads_enter();
 
-    if (*window && (*window)->progress_type == BALSA_PROGRESS_ACTIVITY)
+    if (balsa_app.show_statusbar
+        && *window && (*window)->progress_type == BALSA_PROGRESS_ACTIVITY)
         gtk_progress_bar_pulse(GTK_PROGRESS_BAR((*window)->progress_bar));
 
     gdk_threads_leave();

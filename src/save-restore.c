@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2003 Stuart Parmenter and others,
+ * Copyright (C) 1997-2010 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -794,6 +794,17 @@ config_global_load(void)
     balsa_app.enable_view_filter = libbalsa_conf_get_bool("ViewFilter=false");
 #endif /* ENABLE_TOUCH_UI */
 
+    balsa_app.show_main_toolbar =
+        libbalsa_conf_get_bool("ShowMainWindowToolbar=true");
+    balsa_app.show_message_toolbar =
+        libbalsa_conf_get_bool("ShowMessageWindowToolbar=true");
+    balsa_app.show_compose_toolbar =
+        libbalsa_conf_get_bool("ShowComposeWindowToolbar=true");
+    balsa_app.show_statusbar =
+        libbalsa_conf_get_bool("ShowStatusbar=true");
+    balsa_app.show_sos_bar =
+        libbalsa_conf_get_bool("ShowSOSbar=true");
+
     /* ... Progress Window Dialog */
     balsa_app.pwindow_option = d_get_gint("ProgressWindow", WHILERETR);
 
@@ -1291,6 +1302,18 @@ config_save(void)
     libbalsa_conf_set_bool("FileFormatCheck", balsa_app.do_file_format_check);
     libbalsa_conf_set_bool("ViewFilter",      balsa_app.enable_view_filter);
 #endif /* ENABLE_TOUCH_UI */
+
+    libbalsa_conf_set_bool("ShowMainWindowToolbar",
+                           balsa_app.show_main_toolbar);
+    libbalsa_conf_set_bool("ShowMessageWindowToolbar",
+                           balsa_app.show_message_toolbar);
+    libbalsa_conf_set_bool("ShowComposeWindowToolbar",
+                           balsa_app.show_compose_toolbar);
+    libbalsa_conf_set_bool("ShowStatusbar",
+                           balsa_app.show_statusbar);
+    libbalsa_conf_set_bool("ShowSOSbar",
+                           balsa_app.show_sos_bar);
+
     libbalsa_conf_set_bool("HideDeleted", libbalsa_mailbox_get_filter(NULL) & 1);
     libbalsa_conf_set_bool("ExpungeOnClose", balsa_app.expunge_on_close);
     libbalsa_conf_set_bool("AutoExpunge", balsa_app.expunge_auto);

@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1998-2003 Stuart Parmenter and others, see AUTHORS file.
+ * Copyright (C) 1998-2010 Stuart Parmenter and others, see AUTHORS file.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -128,6 +128,8 @@ static void toggle_replyto_cb      (GtkToggleAction * toggle_action,
 static void toggle_fcc_cb          (GtkToggleAction * toggle_action,
                                     BalsaSendmsg * bsmsg);
 static void toggle_reqdispnotify_cb(GtkToggleAction * toggle_action,
+                                    BalsaSendmsg * bsmsg);
+static void sw_show_toolbar_cb     (GtkToggleAction * action,
                                     BalsaSendmsg * bsmsg);
 static void toggle_format_cb       (GtkToggleAction * toggle_action,
                                     BalsaSendmsg * bsmsg);
@@ -413,6 +415,8 @@ static const GtkToggleActionEntry toggle_entries[] = {
      N_("Check the spelling of the message"),
      G_CALLBACK(spell_check_menu_cb), FALSE},
 #endif                          /* HAVE_GTKSPELL */
+    {"ShowToolbar", NULL, N_("Too_lbar"), NULL, NULL,
+     G_CALLBACK(sw_show_toolbar_cb), TRUE},
     {"From", NULL, N_("F_rom"), NULL, NULL,
      G_CALLBACK(toggle_from_cb), TRUE},
     {"Recipients", NULL, N_("Rec_ipients"), NULL, NULL,
@@ -509,6 +513,8 @@ static const char *ui_description =
 "      <menuitem action='EditWithGnome'/>"
 "    </menu>"
 "    <menu action='ShowMenu'>"
+"      <menuitem action='ShowToolbar'/>"
+"      <separator/>"
 "      <menuitem action='From'/>"
 "      <menuitem action='Recipients'/>"
 "      <menuitem action='ReplyTo'/>"
@@ -4510,7 +4516,6 @@ static BalsaSendmsg*
 sendmsg_window_new()
 {
     BalsaToolbarModel *model;
-    GtkWidget *toolbar;
     GtkWidget *window;
     GtkWidget *main_box = gtk_vbox_new(FALSE, 0);
     BalsaSendmsg *bsmsg = NULL;
@@ -4594,8 +4599,9 @@ sendmsg_window_new()
     gtk_box_pack_start(GTK_BOX(main_box), menubar, FALSE, FALSE, 0);
 #endif
 
-    toolbar = balsa_toolbar_new(model, ui_manager);
-    gtk_box_pack_start(GTK_BOX(main_box), toolbar, FALSE, FALSE, 0);
+    bsmsg->toolbar = balsa_toolbar_new(model, ui_manager);
+    gtk_box_pack_start(GTK_BOX(main_box), bsmsg->toolbar,
+                       FALSE, FALSE, 0);
 
     /* Now that we have installed the menubar and toolbar, we no longer
      * need the UIManager. */
@@ -4620,6 +4626,7 @@ sendmsg_window_new()
 
     sw_set_active(bsmsg, "Flowed", bsmsg->flow);
     sw_set_active(bsmsg, "SendMPAlt", bsmsg->ident->send_mp_alternative);
+    sw_set_active(bsmsg, "ShowToolbar", balsa_app.show_compose_toolbar);
 
 #ifdef HAVE_GPGME
     bsmsg_setup_gpg_ui(bsmsg);
@@ -6573,6 +6580,16 @@ toggle_reqdispnotify_cb(GtkToggleAction * action,
                         BalsaSendmsg * bsmsg)
 {
     bsmsg->req_dispnotify = gtk_toggle_action_get_active(action);
+}
+
+static void
+sw_show_toolbar_cb(GtkToggleAction * action, BalsaSendmsg * bsmsg)
+{
+    balsa_app.show_compose_toolbar = gtk_toggle_action_get_active(action);
+    if (balsa_app.show_compose_toolbar)
+        gtk_widget_show(bsmsg->toolbar);
+    else
+        gtk_widget_hide(bsmsg->toolbar);
 }
 
 static void

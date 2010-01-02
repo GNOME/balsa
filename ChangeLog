@@ -1,5 +1,11 @@
 2010-01-02  Peter Bloomfield
 
+	* src/balsa-mime-widget-text.c (balsa_mime_widget_new_text),
+	(quote_tag): get font description from widget; scale size from
+	points to pixels; use 60% of size for width.
+
+2010-01-02  Peter Bloomfield
+
 	* src/balsa-app.h: new members to save hidden toolbars.
 	* src/save-restore.c (config_global_load), (config_save): save
 	and restore them.

@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2001 Stuart Parmenter and others,
+ * Copyright (C) 1997-2010 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -262,11 +262,19 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
 	guint cite_level;
 	guint cite_start;
 	gint margin;
-	PangoFontDescription *font;
+        gdouble char_width;
+        PangoContext *context = gtk_widget_get_pango_context(mw->widget);
+        PangoFontDescription *desc =
+            pango_context_get_font_description(context);
 
-	font = pango_font_description_from_string(balsa_app.message_font);
-	margin = pango_font_description_get_size(font) / PANGO_SCALE;
-	pango_font_description_free(font);
+        /* width of monospace characters is 3/5 of the size */
+        char_width = 0.6 * pango_font_description_get_size(desc);
+        if (!pango_font_description_get_size_is_absolute(desc))
+            char_width = char_width / PANGO_SCALE;
+
+        /* convert char_width from points to pixels */
+        margin = (char_width / 72.0) *
+            gdk_screen_get_resolution(gdk_screen_get_default());
 
 	gtk_text_buffer_create_tag(buffer, "url",
 				   "foreground-gdk",
@@ -519,7 +527,7 @@ quote_tag(GtkTextBuffer * buffer, gint level, gint margin)
             tag =
                 gtk_text_buffer_create_tag(buffer, name, "foreground-gdk",
                                            &balsa_app.quoted_color[q_level],
-					   "left-margin", margin * level,
+					   "left-margin", 2 + margin * level,
                                            NULL);
             /* Set a low priority, so we can set both quote color and
              * URL color, and URL color will take precedence. */

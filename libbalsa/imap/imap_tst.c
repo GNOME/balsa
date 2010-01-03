@@ -1,3 +1,21 @@
+/* libimap library.
+ * Copyright (C) 2003-2010 Pawel Salek.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2, or (at your option) 
+ * any later version.
+ *  
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
+ * GNU General Public License for more details.
+ *  
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  
+ * 02111-1307, USA.
+ */
 /** @file imap_tst.c tests some IMAP capabilities. It is very useful
     for stress-testing the imap part of balsa. */
 
@@ -26,7 +44,8 @@ struct {
   gboolean over_ssl;
   gboolean monitor;
   gboolean anonymous;
-} TestContext = { NULL, NULL, IMAP_TLS_ENABLED, FALSE, FALSE, FALSE };
+  gboolean compress;
+} TestContext = { NULL, NULL, IMAP_TLS_ENABLED, FALSE, FALSE, FALSE, FALSE };
 
 static void
 monitor_cb(const char *buffer, int length, int direction, void *arg)
@@ -49,8 +68,8 @@ get_user(const char* method) {
     printf("Login with method %s as user: %s\n", method, TestContext.user);
     return g_strdup(TestContext.user);
   } else {
-    printf("Login with method %s as user: ", method);
-    fflush(stdout);
+    fprintf(stderr, "Login with method %s as user: ", method);
+    fflush(stderr);
     if(!fgets(buf, sizeof(buf), stdin))
       return NULL;
 
@@ -151,6 +170,8 @@ get_handle(const char *host)
   if(TestContext.anonymous)
     imap_handle_set_option(h, IMAP_OPT_ANONYMOUS, TRUE);
 
+  if(TestContext.compress)
+    imap_handle_set_option(h, IMAP_OPT_COMPRESS, TRUE);
   if(TestContext.monitor)
     imap_handle_set_monitorcb(h, monitor_cb, NULL);
 
@@ -274,7 +295,7 @@ dump_mbox(const char *host, const char *mailbox,
   }
 
   if(imap_mbox_select(h, mailbox, &read_only) == IMR_OK) {
-    unsigned cnt = imap_mbox_handle_get_exists(h);
+    unsigned cnt =  imap_mbox_handle_get_exists(h);
     unsigned i;
 #define FETCH_AT_ONCE 300
     for(i=0; i<cnt; i+= FETCH_AT_ONCE) {
@@ -339,6 +360,7 @@ test_mbox_dumpfile(int argc, char *argv[])
 struct DumpdirState {
   const char *dst_directory;
   int error;
+  unsigned last_seqno;
 };
 
 static void
@@ -351,7 +373,8 @@ dumpdir_cb(unsigned seqno, const char *buf, size_t buflen, void *arg)
 
   g_snprintf(num, sizeof(num), "%u", seqno);
   fname = g_build_filename(dds->dst_directory, num, NULL);
-  f = fopen(fname, "wt");
+  f = fopen(fname, seqno == dds->last_seqno ? "at" : "wt");
+  dds->last_seqno = seqno;
   if(!f) {
     fprintf(stderr, "Cannot open %s for writing.\n", fname);
     dds->error = 1;
@@ -387,7 +410,7 @@ test_mbox_dumpdir(int argc, char *argv[])
     fprintf(stderr, "%s is not a directory\n", state.dst_directory);
     return 1;
   }
-
+  state.last_seqno = 0;
   return dump_mbox(argv[0], argv[1], dumpdir_cb, &state);
 }
 
@@ -613,6 +636,8 @@ process_options(int argc, char *argv[])
       TestContext.over_ssl = TRUE;
     }  else if( strcmp(argv[first_arg], "-a") == 0) {
       TestContext.anonymous = TRUE;
+    }  else if( strcmp(argv[first_arg], "-c") == 0) {
+      TestContext.compress = TRUE;
     } else {
       break; /* break the loop - non-option encountered. */
     }
@@ -651,6 +676,16 @@ main(int argc, char *argv[]) {
 	    argv[first_arg]);
     for(i=0; i<sizeof(cmds)/sizeof(cmds[0]); i++)
       fprintf(stderr, "%s %s\n", cmds[i].cmd, cmds[i].help);
+    fprintf(stderr, "Known options:\n"
+            "-u USER specify user\n"
+            "-p PASSWORD specify password\n"
+            "-m enable monitor\n"
+            "-T tls required\n"
+            "-t tls disabled\n"
+            "-s over ssl\n"
+            "-a anonymous\n"
+            "-c compress\n");
+
     return 1;
   }
 

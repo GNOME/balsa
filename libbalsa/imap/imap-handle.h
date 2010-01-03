@@ -65,19 +65,19 @@ typedef enum
   IMCAP_ACL,			/* RFC 2086: IMAP4 ACL extension */
   IMCAP_BINARY,                 /* RFC 3516 */
   IMCAP_CHILDREN,               /* RFC 3348 */
+  IMCAP_COMPRESS_DEFLATE,       /* RFC 4978 */
   IMCAP_ESEARCH,                /* RFC 4731 */
   IMCAP_IDLE,                   /* RFC 2177 */
   IMCAP_LITERAL,                /* RFC 2088 */
   IMCAP_LOGINDISABLED,		/* RFC 2595 */
   IMCAP_MULTIAPPEND,            /* RFC 3502 */
   IMCAP_NAMESPACE,              /* RFC 2342: IMAP4 Namespace */
-  IMCAP_SASLIR,                 /* imap-sasl-initial-response: SASL-IR */
+  IMCAP_SASLIR,                 /* RFC 4959 */
   IMCAP_SCAN,                   /* FIXME: RFC? */
   IMCAP_STARTTLS,		/* RFC 2595: STARTTLS */
   IMCAP_SORT,                   /* SORT and THREAD described at: */
-  IMCAP_THREAD_ORDEREDSUBJECT,
-  IMCAP_THREAD_REFERENCES,
-  /* http://www.ietf.org/internet-drafts/draft-ietf-imapext-sort-13.txt */
+  IMCAP_THREAD_ORDEREDSUBJECT,  /* RFC 5256 */
+  IMCAP_THREAD_REFERENCES,      
   IMCAP_UIDPLUS,                /* RFC 4315 */
   IMCAP_UNSELECT,               /* RFC 3691 */
   IMCAP_FETCHBODY,              /* basic imap implemented correctly by
@@ -90,7 +90,8 @@ typedef enum {
   IMAP_OPT_ANONYMOUS,   /**< try anonymous authentication */
   IMAP_OPT_CLIENT_SORT, /**< allow client-side sorting */
   IMAP_OPT_BINARY,      /**< enable binary=no-transfer-encoding msg transfer */
-  IMAP_OPT_IDLE         /**< enable IDLE */
+  IMAP_OPT_IDLE,        /**< enable IDLE */
+  IMAP_OPT_COMPRESS,    /**< enable COMPRESS */
 }  ImapOption;
 
 typedef struct _ImapMboxHandleClass ImapMboxHandleClass;

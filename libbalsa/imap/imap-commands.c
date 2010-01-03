@@ -1,5 +1,5 @@
 /* libimap library.
- * Copyright (C) 2003-2004 Pawel Salek.
+ * Copyright (C) 2003-2010 Pawel Salek.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -119,7 +119,7 @@ imap_check_capability(ImapMboxHandle* handle)
 {
   IMAP_REQUIRED_STATE3(handle, IMHS_CONNECTED, IMHS_AUTHENTICATED,
                        IMHS_SELECTED, FALSE);
-  if (imap_cmd_exec(handle, "CAPABILITY") != 0)
+  if (imap_cmd_exec(handle, "CAPABILITY") != IMR_OK)
     return FALSE;
 
   if (!(imap_mbox_handle_can_do(handle, IMCAP_IMAP4) ||

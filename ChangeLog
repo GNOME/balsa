@@ -1,3 +1,12 @@
+2010-01-03  Pawel Salek
+
+	* libbalsa/imap-server.c: enable compression by default.
+	* libbalsa/imap/Makefile.am: add imap_compress.[hc]
+	* libbalsa/imap/imap-commands.c: imap_cmd_exec returns ImapResponse.
+	* libbalsa/imap/imap-handle.c: add COMPRESS=DEFLATE capability
+	* libbalsa/imap/imap_compress.[ch]: support the extension.
+	* libbalsa/imap/imap_tst.c: allow compression testing.
+
 2010-01-02  Peter Bloomfield
 
 	* src/balsa-mime-widget-text.c (balsa_mime_widget_new_text),

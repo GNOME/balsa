@@ -21,6 +21,8 @@ libimap_a_SOURCES = \
 	imap-auth.h	\
 	imap-commands.c	\
 	imap-commands.h	\
+	imap_compress.c	\
+	imap_compress.h	\
 	imap-handle.c	\
 	imap-handle.h	\
 	imap_search.c	\

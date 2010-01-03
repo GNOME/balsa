@@ -1,5 +1,5 @@
 /* libimap library.
- * Copyright (C) 2003-2004 Pawel Salek.
+ * Copyright (C) 2003-2010 Pawel Salek.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -166,6 +166,8 @@ imap_mbox_handle_init(ImapMboxHandle *handle)
   handle->enable_binary    = 0;
   handle->enable_idle      = 1;
   mbox_view_init(&handle->mbox_view);
+
+  imap_compress_init(&handle->compress);
 #if defined(BALSA_USE_THREADS)
   pthread_mutex_init(&handle->mutex, NULL);
 #endif
@@ -234,10 +236,11 @@ void
 imap_handle_set_option(ImapMboxHandle *h, ImapOption opt, gboolean state)
 {
   switch(opt) {
-  case IMAP_OPT_ANONYMOUS: h->enable_anonymous = !!state; break;
+  case IMAP_OPT_ANONYMOUS:   h->enable_anonymous   = !!state; break;
+  case IMAP_OPT_BINARY:      h->enable_binary      = !!state; break;
   case IMAP_OPT_CLIENT_SORT: h->enable_client_sort = !!state; break;
-  case IMAP_OPT_BINARY:    h->enable_binary    = !!state; break;
-  case IMAP_OPT_IDLE:      h->enable_idle      = !!state; break;
+  case IMAP_OPT_COMPRESS:    h->enable_compress    = !!state; break;
+  case IMAP_OPT_IDLE:        h->enable_idle        = !!state; break;
   default: g_warning("imap_set_option: invalid option\n");
   }
 }
@@ -599,6 +602,11 @@ imap_mbox_handle_connect(ImapMboxHandle* ret, const char *host, int over_ssl)
 
   if( (rc=imap_mbox_connect(ret)) == IMAP_SUCCESS) {
     rc = imap_authenticate(ret);
+    if (rc == IMAP_SUCCESS) {
+      ImapResponse response = imap_compress(ret);
+      if ( !(response == IMR_NO || response == IMR_OK))
+        rc = IMAP_PROTOCOL_ERROR;
+    }
   }
 
   HANDLE_UNLOCK(ret);
@@ -635,13 +643,23 @@ imap_mbox_handle_reconnect(ImapMboxHandle* h, gboolean *readonly)
 
   if( (rc=imap_mbox_connect(h)) == IMAP_SUCCESS) {
     if( (rc = imap_authenticate(h)) == IMAP_SUCCESS) {
+      ImapResponse response;
       imap_mbox_resize_cache(h, 0); /* invalidate cache */
       mbox_view_dispose(&h->mbox_view); /* FIXME: recreate it here? */
 
-      if(h->mbox && 
-         imap_mbox_select_unlocked(h, h->mbox, readonly) != IMR_OK) {
-        rc = IMAP_SELECT_FAILED;
+      response = imap_compress(h);
+      if (response == IMR_OK || response == IMR_NO) {
+        rc = IMAP_SUCCESS;
+        if(h->mbox && 
+           imap_mbox_select_unlocked(h, h->mbox, readonly) != IMR_OK) {
+          rc = IMAP_SELECT_FAILED;
+        }
+
+      } else {
+        /* compression was apparently attempted but failed. */
+        rc = IMAP_PROTOCOL_ERROR;
       }
+
     }
   }
   HANDLE_UNLOCK(h);
@@ -1000,6 +1018,7 @@ imap_mbox_handle_finalize(GObject* gobject)
   g_free(handle->msg_cache); handle->msg_cache = NULL;
   g_array_free(handle->flag_cache, TRUE);
 
+  imap_compress_release(&handle->compress);
   HANDLE_UNLOCK(handle);
 #if defined(BALSA_USE_THREADS)
   pthread_mutex_destroy(&handle->mutex);
@@ -2285,7 +2304,9 @@ ir_capability_data(ImapMboxHandle *handle)
   static const char* capabilities[] = {
     "IMAP4", "IMAP4rev1", "STATUS",
     "AUTH=ANONYMOUS", "AUTH=CRAM-MD5", "AUTH=GSSAPI", "AUTH=PLAIN",
-    "ACL", "BINARY", "CHILDREN", "ESEARCH", "IDLE", "LITERAL+",
+    "ACL", "BINARY", "CHILDREN",
+    "COMPRESS=DEFLATE",
+    "ESEARCH", "IDLE", "LITERAL+",
     "LOGINDISABLED", "MULTIAPPEND", "NAMESPACE", "SASL-IR",
     "SCAN", "STARTTLS",
     "SORT", "THREAD=ORDEREDSUBJECT", "THREAD=REFERENCES",

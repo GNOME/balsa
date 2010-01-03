@@ -35,6 +35,7 @@
 #endif
 
 #include "imap-commands.h"
+#include "imap_compress.h"
 
 typedef enum {
   IMAP_BODY_TYPE_RFC822, /**< as fetched with RFC822 */
@@ -92,6 +93,9 @@ struct _ImapMboxHandle {
                           * processing of current line is finished. */
   GNode *thread_root; /* deprecated! */
 
+  /** Compression data */
+  struct ImapCompressContext compress;
+
   struct {
     GList* src; /**< returned by COPY */
     GList* dst; /**< returned by APPEND and COPY */
@@ -134,10 +138,11 @@ struct _ImapMboxHandle {
   unsigned can_fetch_body:1; /* set for servers that always respond
                               * correctly to FETCH x BODY[y]
                               * requests. */
-  unsigned enable_anonymous:1; /* try anonymous if possible */
+  unsigned enable_anonymous:1;   /**< try anonymous if possible */
+  unsigned enable_binary:1;      /**< enable binary extension */
   unsigned enable_client_sort:1; /**< client side sorting allowed */
-  unsigned enable_idle:1;    /**< use IDLE - no problem with firewalls */
-  unsigned enable_binary:1; /* enable binary extension */
+  unsigned enable_compress:1; /**< enable compress extension */
+  unsigned enable_idle:1;     /**< use IDLE - no problem with firewalls */
 
   /* conditional stuff at the end for the safety. */
 #ifdef USE_TLS

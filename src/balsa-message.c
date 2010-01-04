@@ -505,6 +505,7 @@ bm_find_entry_changed_cb(GtkEditable * editable, gpointer data)
                                         &match_begin, &match_end);
             bm->find_iter = match_begin;
         }
+#ifdef HAVE_GTKHTML
     } else if (libbalsa_html_can_search(widget)) {
         found = libbalsa_html_search_text(widget, text,
                                           bm->find_forward, TRUE);
@@ -515,6 +516,7 @@ bm_find_entry_changed_cb(GtkEditable * editable, gpointer data)
                                                &selection_bounds);
             bm_find_scroll_to_rectangle(bm, widget, &selection_bounds);
         }
+#endif                          /* HAVE_GTKHTML */
     } else
         g_assert_not_reached();
 
@@ -558,6 +560,7 @@ bm_find_again(BalsaMessage * bm, gboolean find_forward)
         bm_find_scroll_to_selection(bm, text_view,
                                     &match_begin, &match_end);
         bm->find_iter = match_begin;
+#ifdef HAVE_GTKHTML
     } else if (libbalsa_html_can_search(widget)) {
         GdkRectangle selection_bounds;
 
@@ -566,6 +569,7 @@ bm_find_again(BalsaMessage * bm, gboolean find_forward)
             libbalsa_html_search_text(widget, text, find_forward, TRUE);
         libbalsa_html_get_selection_bounds(widget, &selection_bounds);
         bm_find_scroll_to_rectangle(bm, widget, &selection_bounds);
+#endif                          /* HAVE_GTKHTML */
     } else
         g_assert_not_reached();
 
@@ -3293,7 +3297,11 @@ balsa_message_find_in_message(BalsaMessage * bm)
 
     if (bm->current_part
         && (w = bm->current_part->mime_widget->widget)
-        && (GTK_IS_TEXT_VIEW(w) || libbalsa_html_can_search(w))) {
+        && (GTK_IS_TEXT_VIEW(w)
+#ifdef HAVE_GTKHTML
+            || libbalsa_html_can_search(w)
+#endif                          /* HAVE_GTKHTML */
+            )) {
         if (GTK_IS_TEXT_VIEW(w)) {
             GtkTextView *text_view = (GtkTextView *) w;
             GtkTextBuffer *buffer = gtk_text_view_get_buffer(text_view);

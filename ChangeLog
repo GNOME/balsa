@@ -1,5 +1,11 @@
 2010-01-04  Peter Bloomfield
 
+	* src/balsa-message.c (bm_find_entry_changed_cb), (bm_find_again),
+	(balsa_message_find_in_message): build --without-gtkhtml
+	--without-webkit.
+
+2010-01-04  Peter Bloomfield
+
 	* libbalsa/imap/imap_compress.c: add missing includes of
 	stdlib.h, string.h.
 

@@ -18,6 +18,8 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <zlib.h>
 #include "siobuf.h"
 #include "imap-handle.h"

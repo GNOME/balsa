@@ -1,5 +1,10 @@
 2010-01-04  Peter Bloomfield
 
+	* src/save-restore.c (config_global_load): default to no message
+	wrap and prefer text/plain over text/html.
+
+2010-01-04  Peter Bloomfield
+
 	* src/balsa-message.c (bm_find_entry_changed_cb), (bm_find_again),
 	(balsa_message_find_in_message): build --without-gtkhtml
 	--without-webkit.

@@ -752,14 +752,14 @@ config_global_load(void)
 	libbalsa_conf_get_string("SubjectFont=" DEFAULT_SUBJECT_FONT);
 
     /* ... wrap words */
-    balsa_app.browse_wrap = libbalsa_conf_get_bool("WordWrap=true");
+    balsa_app.browse_wrap = libbalsa_conf_get_bool("WordWrap=false");
     balsa_app.browse_wrap_length = libbalsa_conf_get_int("WordWrapLength=79");
     if (balsa_app.browse_wrap_length < 40)
 	balsa_app.browse_wrap_length = 40;
 
     /* ... handling of Multipart/Alternative */
     balsa_app.display_alt_plain = 
-	libbalsa_conf_get_bool("DisplayAlternativeAsPlain=false");
+	libbalsa_conf_get_bool("DisplayAlternativeAsPlain=true");
 
     /* ... handling of broken mails with 8-bit chars */
     balsa_app.convert_unknown_8bit = 

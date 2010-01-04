@@ -607,7 +607,7 @@ static const GtkToggleActionEntry toggle_entries[] = {
      NULL, G_CALLBACK(bw_show_toolbar_cb), TRUE},
     {"ShowStatusbar", NULL, N_("Show St_atus Bar"), NULL,
      NULL, G_CALLBACK(bw_show_statusbar_cb), TRUE},
-    {"ShowSOSbar", NULL, N_("Show \"S_ubject or Sender\" Bar"), NULL,
+    {"ShowSOSbar", NULL, N_("Show _Index Filter"), NULL,
      NULL, G_CALLBACK(bw_show_sos_bar_cb), TRUE},
 #else  /* ENABLE_TOUCH_UI */
     {"SortDescending", NULL, N_("_Descending"), NULL,

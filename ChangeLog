@@ -1,3 +1,7 @@
+2010-01-03  Peter Bloomfield
+
+	* src/main-window.c: better menu item label (Pawel).
+
 2010-01-03  Pawel Salek
 
 	* libbalsa/imap-server.c: enable compression by default.

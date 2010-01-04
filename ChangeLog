@@ -1,5 +1,11 @@
 2010-01-04  Peter Bloomfield
 
+	* libbalsa/misc.c (libbalsa_create_entry): use
+	gtk_entry_set_text instead of gtk_editable_insert_text, to avoid
+	a bogus warning.
+
+2010-01-04  Peter Bloomfield
+
 	* src/save-restore.c (config_global_load): default to no message
 	wrap and prefer text/plain over text/html.
 

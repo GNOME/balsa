@@ -1140,11 +1140,8 @@ libbalsa_create_entry(GtkWidget * table, GCallback changed_func,
     gtk_table_attach(GTK_TABLE(table), entry, 1, 2, row, row + 1,
                      GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0);
 
-    if (initval) {
-        gint zero = 0;
-
-        gtk_editable_insert_text(GTK_EDITABLE(entry), initval, -1, &zero);
-    }
+    if (initval)
+        gtk_entry_set_text(GTK_ENTRY(entry), initval);
 
     gtk_label_set_mnemonic_widget(GTK_LABEL(hotlabel), entry);
 

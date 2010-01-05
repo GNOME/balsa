@@ -141,8 +141,6 @@ static gboolean tree_menu_popup_key_cb(GtkWidget *widget, gpointer user_data);
 static gboolean tree_button_press_cb(GtkWidget * widget, GdkEventButton * event,
                                      gpointer data);
 
-static void scroll_set(GtkAdjustment * adj, gint value);
-
 static void part_info_init(BalsaMessage * bm, BalsaPartInfo * info);
 static void part_context_save_all_cb(GtkWidget * menu_item, GList * info_list);
 static void part_context_dump_all_cb(GtkWidget * menu_item, GList * info_list);
@@ -2196,8 +2194,6 @@ add_part(BalsaMessage * bm, BalsaPartInfo * info)
     save = NULL;
 
     if (info->mime_widget->widget) {
-	gchar *content_type =
-	    libbalsa_message_body_get_mime_type(info->body);
 	if (info->mime_widget->container) {
 	    gtk_container_add(GTK_CONTAINER(bm->bm_widget->container), info->mime_widget->widget);
 	    save = bm->bm_widget->container;
@@ -2205,7 +2201,6 @@ add_part(BalsaMessage * bm, BalsaPartInfo * info)
 	} else
 	    gtk_box_pack_start(GTK_BOX(bm->bm_widget->container),
                                info->mime_widget->widget, TRUE, TRUE, 0);
-	g_free(content_type);
     }
 
     body = add_multipart(bm, info->body);
@@ -2269,6 +2264,8 @@ hide_all_parts(BalsaMessage * bm)
 static void
 select_part(BalsaMessage * bm, BalsaPartInfo *info)
 {
+    GtkViewport *viewport = GTK_VIEWPORT(bm->cont_viewport);
+
     hide_all_parts(bm);
 
     if (bm->current_part)
@@ -2279,23 +2276,8 @@ select_part(BalsaMessage * bm, BalsaPartInfo *info)
     if(bm->current_part)
         g_signal_emit(G_OBJECT(bm), balsa_message_signals[SELECT_PART], 0);
 
-    scroll_set(gtk_viewport_get_hadjustment
-               (GTK_VIEWPORT(bm->cont_viewport)), 0);
-    scroll_set(gtk_viewport_get_vadjustment
-               (GTK_VIEWPORT(bm->cont_viewport)), 0);
-}
-
-static void
-scroll_set(GtkAdjustment * adj, gint value)
-{
-    gdouble upper;
-
-    if (!adj)
-        return;
-
-    upper =
-        gtk_adjustment_get_upper(adj) - gtk_adjustment_get_page_size(adj);
-    gtk_adjustment_set_value(adj, MIN((gdouble) value, upper));
+    gtk_adjustment_set_value(gtk_viewport_get_hadjustment(viewport), 0);
+    gtk_adjustment_set_value(gtk_viewport_get_vadjustment(viewport), 0);
 }
 
 GtkWidget *

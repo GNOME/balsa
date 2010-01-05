@@ -322,6 +322,10 @@ libbalsa_html_new(const gchar        * text,
     g_signal_connect(web_view, "notify::progress",
                      G_CALLBACK(gtk_widget_queue_resize), NULL);
 
+#if WEBKIT_CHECK_VERSION(1, 1, 18)
+    webkit_set_cache_model(WEBKIT_CACHE_MODEL_DOCUMENT_VIEWER);
+#endif                          /* WEBKIT_CHECK_VERSION(1, 1, 18) */
+
     webkit_web_view_load_string(web_view, text, "text/html", charset,
                                 NULL);
 

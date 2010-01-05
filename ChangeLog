@@ -1,5 +1,10 @@
 2010-01-05  Peter Bloomfield
 
+	* libbalsa/html.c (libbalsa_html_new): put webkit in
+	document-viewer mode instead of the default browser mode.
+
+2010-01-05  Peter Bloomfield
+
 	* src/balsa-app.h: omit point size from default font names.
 	* src/pref-manager.c (open_preferences_manager),
 	(check_font_button), (apply_prefs), (font_button_check_font_size),

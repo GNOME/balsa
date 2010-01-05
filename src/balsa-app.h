@@ -87,8 +87,8 @@
 #define MESSAGEBOX_WIDTH 450
 #define MESSAGEBOX_HEIGHT 150
 
-#define DEFAULT_MESSAGE_FONT "Monospace 10"
-#define DEFAULT_SUBJECT_FONT "Monospace Bold 10"
+#define DEFAULT_MESSAGE_FONT "Monospace"
+#define DEFAULT_SUBJECT_FONT "Monospace Bold"
 #define DEFAULT_DATE_FORMAT "%x %X"
 #define DEFAULT_PAPER_SIZE "A4"
 #define DEFAULT_PRINT_HEADER_FONT "Monospace Regular 10"

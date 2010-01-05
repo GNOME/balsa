@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2002 Stuart Parmenter and others,
+ * Copyright (C) 1997-2010 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -146,6 +146,7 @@ typedef struct _PropertyUI {
 
     GtkWidget *message_font_button;     /* font used to display messages */
     GtkWidget *subject_font_button;     /* font used to display messages */
+    GtkWidget *use_default_font_size;   /* toggle button */
 
     GtkWidget *date_format;
 
@@ -373,6 +374,10 @@ static void mailbox_close_timer_modified_cb(GtkWidget * widget,
                                             GtkWidget * pbox);
 static void browse_modified_cb(GtkWidget * widget, GtkWidget * pbox);
 static void wrap_modified_cb(GtkWidget * widget, GtkWidget * pbox);
+
+static void font_modified_cb(GtkWidget * widget, GtkWidget * pbox);
+static void default_font_size_cb(GtkWidget * widget, GtkWidget * pbox);
+
 static void pgdown_modified_cb(GtkWidget * widget, GtkWidget * pbox);
 
 static void option_menu_cb(GtkItem * menuitem, gpointer data);
@@ -708,9 +713,11 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
 
     /* message font */
     g_signal_connect(G_OBJECT(pui->message_font_button), "font-set",
-                     G_CALLBACK(properties_modified_cb), property_box);
+                     G_CALLBACK(font_modified_cb), property_box);
     g_signal_connect(G_OBJECT(pui->subject_font_button), "font-set",
-                     G_CALLBACK(properties_modified_cb), property_box);
+                     G_CALLBACK(font_modified_cb), property_box);
+    g_signal_connect(G_OBJECT(pui->use_default_font_size), "toggled",
+                     G_CALLBACK(default_font_size_cb), property_box);
 
 
     g_signal_connect(G_OBJECT(pui->open_inbox_upon_startup), "toggled",
@@ -808,6 +815,30 @@ update_view_defaults(const gchar * url, LibBalsaMailboxView * view,
         view->sort_field = pui->sort_field_index;
     if (view->threading_type == libbalsa_mailbox_get_threading_type(NULL))
         view->threading_type = pui->threading_type_index;
+}
+
+static void
+check_font_button(GtkWidget * button, gchar ** font)
+{
+    if (GPOINTER_TO_INT
+        (g_object_get_data(G_OBJECT(button), "font-modified"))) {
+        GtkFontButton *font_button = GTK_FONT_BUTTON(button);
+        const gchar *font_name =
+            gtk_font_button_get_font_name(font_button);
+
+        g_free(*font);
+        if (!gtk_toggle_button_get_active
+            (GTK_TOGGLE_BUTTON(pui->use_default_font_size)))
+            *font = g_strdup(font_name);
+        else {
+            PangoFontDescription *desc =
+                pango_font_description_from_string(font_name);
+            pango_font_description_unset_fields(desc,
+                                                PANGO_FONT_MASK_SIZE);
+            *font = pango_font_description_to_string(desc);
+            pango_font_description_free(desc);
+        }
+    }
 }
 
 static void
@@ -959,14 +990,8 @@ apply_prefs(GtkDialog * pbox)
     balsa_app.quote_str =
         g_strdup(gtk_entry_get_text(GTK_ENTRY(pui->quote_str)));
 
-    g_free(balsa_app.message_font);
-    balsa_app.message_font =
-        g_strdup(gtk_font_button_get_font_name
-                 (GTK_FONT_BUTTON(pui->message_font_button)));
-    g_free(balsa_app.subject_font);
-    balsa_app.subject_font =
-        g_strdup(gtk_font_button_get_font_name
-                 (GTK_FONT_BUTTON(pui->subject_font_button)));
+    check_font_button(pui->message_font_button, &balsa_app.message_font);
+    check_font_button(pui->subject_font_button, &balsa_app.subject_font);
 
     g_free(balsa_app.quote_regex);
     tmp = gtk_entry_get_text(GTK_ENTRY(pui->quote_pattern));
@@ -2356,34 +2381,110 @@ message_subpage(void)
     return page;
 }
 
+/*
+ * Font group
+ */
+
+/*
+ * If the font button shows zero size, set it to the default size and
+ * return TRUE.
+ */
+static gboolean
+font_button_check_font_size(GtkWidget * button, GtkWidget * widget)
+{
+    GtkFontButton *font_button = GTK_FONT_BUTTON(button);
+    const gchar *font_name = gtk_font_button_get_font_name(font_button);
+    PangoFontDescription *desc;
+    gboolean retval = FALSE;
+
+    desc = pango_font_description_from_string(font_name);
+    if (pango_font_description_get_size(desc) <= 0) {
+        PangoContext *context = gtk_widget_get_pango_context(widget);
+        PangoFontDescription *desc2 =
+            pango_context_get_font_description(context);
+        gint size = pango_font_description_get_size(desc2);
+        gchar *desc_string;
+
+        pango_font_description_set_size(desc, size);
+        desc_string = pango_font_description_to_string(desc);
+        gtk_font_button_set_font_name(font_button, desc_string);
+        g_free(desc_string);
+        retval = TRUE;
+    }
+    pango_font_description_free(desc);
+
+    return retval;
+}
+
+/*
+ * Create a font button from a font string and attach it; return TRUE if
+ * the string does not specify a point size.
+ */
+static gboolean
+attach_font_button(const gchar * label, gint row, GtkWidget * table,
+                   GtkWidget * page, const gchar * font,
+                   GtkWidget ** button)
+{
+    attach_label(label, table, row, page);
+
+    *button = gtk_font_button_new_with_font(font);
+    gtk_table_attach(GTK_TABLE(table), *button,
+                     1, 2, row, row + 1,
+                     GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0);
+
+    return font_button_check_font_size(*button, page);
+}
+
+/*
+ * Create the group, with two font buttons and a check box for using
+ * the default size; if either font does not specify a point size,
+ * initially check the box.
+ *
+ * If the box is checked when the prefs are applied, both fonts will be
+ * saved with no point size specification.
+ */
 static GtkWidget *
 preview_font_group(GtkWidget * page)
 {
     GtkWidget *group;
     GtkWidget *table;
+    gboolean use_default_font_size = FALSE;
 
     group = pm_group_new(_("Fonts"));
-    table = create_table(2, 2, page);
+    table = create_table(3, 2, page);
     pm_group_add(group, table, FALSE);
 
-    attach_label(_("Message font:"), table, 0, page);
-    pui->message_font_button =
-	gtk_font_button_new_with_font(balsa_app.message_font);
-    gtk_table_attach(GTK_TABLE(table), pui->message_font_button, 
-                     1, 2, 0, 1,
-		     GTK_EXPAND | GTK_FILL,
-		     (GtkAttachOptions) (GTK_FILL), 0, 0);
+    if (attach_font_button(_("Message font:"), 0, table, page,
+                           balsa_app.message_font,
+                           &pui->message_font_button))
+        use_default_font_size = TRUE;
 
-    attach_label(_("Subject font:"), table, 1, page);
-    pui->subject_font_button =
-	gtk_font_button_new_with_font(balsa_app.subject_font);
-    gtk_table_attach(GTK_TABLE(table), pui->subject_font_button, 
-                     1, 2, 1, 2,
-		     GTK_EXPAND | GTK_FILL,
-		     (GtkAttachOptions) (GTK_FILL), 0, 0);
+    if (attach_font_button(_("Subject font:"), 1, table, page,
+                           balsa_app.subject_font,
+                           &pui->subject_font_button))
+        use_default_font_size = TRUE;
+
+    pui->use_default_font_size =
+        gtk_check_button_new_with_label(_("Use default font size"));
+    gtk_table_attach(GTK_TABLE(table), pui->use_default_font_size,
+                     0, 2, 2, 3,
+		     GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0);
+
+    if (use_default_font_size) {
+        gtk_font_button_set_show_size(GTK_FONT_BUTTON
+                                      (pui->message_font_button), FALSE);
+        gtk_font_button_set_show_size(GTK_FONT_BUTTON
+                                      (pui->subject_font_button), FALSE);
+        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
+                                     (pui->use_default_font_size), TRUE);
+    }
 
     return group;
 }
+
+/*
+ * End of font group
+ */
 
 static GtkWidget *
 format_subpage(void)
@@ -3358,6 +3459,42 @@ convert_8bit_cb(GtkWidget * widget, GtkWidget * pbox)
          gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
                                       (pui->convert_unknown_8bit[1])));
 }
+
+/*
+ * Callbacks for the font group
+ */
+
+static void
+font_modified_cb(GtkWidget * widget, GtkWidget * pbox)
+{
+    gboolean show_size =
+        !gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
+                                      (pui->use_default_font_size));
+
+    properties_modified_cb(widget, pbox);
+
+    gtk_font_button_set_show_size(GTK_FONT_BUTTON(widget), show_size);
+    g_object_set_data(G_OBJECT(widget), "font-modified",
+                      GINT_TO_POINTER(TRUE));
+}
+
+static void
+default_font_size_cb(GtkWidget * widget, GtkWidget * pbox)
+{
+    if (!gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget))) {
+        /* Changing from default font size to user-specified font size;
+         * we make sure the font size is not initially zero. */
+        font_button_check_font_size(pui->message_font_button, widget);
+        font_button_check_font_size(pui->subject_font_button, widget);
+    }
+
+    font_modified_cb(pui->message_font_button, pbox);
+    font_modified_cb(pui->subject_font_button, pbox);
+}
+
+/*
+ * End of callbacks for the font group
+ */
 
 static GtkWidget *
 create_layout_types_menu(void)

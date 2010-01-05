@@ -1,5 +1,13 @@
 2010-01-05  Peter Bloomfield
 
+	* src/balsa-app.h: omit point size from default font names.
+	* src/pref-manager.c (open_preferences_manager),
+	(check_font_button), (apply_prefs), (font_button_check_font_size),
+	(attach_font_button), (preview_font_group), (font_modified_cb),
+	(default_font_size_cb): add option to use default font sizes.
+
+2010-01-05  Peter Bloomfield
+
 	* src/balsa-mime-widget-text.c (balsa_mime_widget_new_text),
 	(quote_tag): define constants for margins.
 

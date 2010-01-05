@@ -1,5 +1,9 @@
 2010-01-05  Peter Bloomfield
 
+	* libbalsa/html.c (libbalsa_html_new): remove dead code.
+
+2010-01-05  Peter Bloomfield
+
 	* src/balsa-message.c (add_part), (select_part): remove dead or
 	redundant code.
 

@@ -61,10 +61,6 @@
 typedef struct {
     WebKitWebView        *web_view;
     WebKitWebFrame       *frame;
-#if !WEBKIT_CHECK_VERSION(1, 12, 0)
-    GtkAdjustment        *hadj;
-    GtkAdjustment        *vadj;
-#endif                          /* !WEBKIT_CHECK_VERSION(1, 12, 0) */
     LibBalsaHtmlCallback  hover_cb;
     LibBalsaHtmlCallback  clicked_cb;
     LibBalsaMessage      *message;
@@ -85,24 +81,6 @@ lbh_hovering_over_link_cb(GtkWidget   * web_view,
 
     (*info->hover_cb)(uri);
 }
-
-#if !WEBKIT_CHECK_VERSION(1, 12, 0)
-static void
-lbh_size_request_cb(GtkWidget      * widget,
-                    GtkRequisition * requisition,
-                    gpointer         data)
-{
-    LibBalsaWebKitInfo *info = data;
-    gint upper;
-
-    upper = gtk_adjustment_get_upper(info->hadj);
-    if (upper > requisition->width)
-        requisition->width = upper;
-    upper = gtk_adjustment_get_upper(info->vadj);
-    if (upper > requisition->height)
-        requisition->height = upper;
-}
-#endif                          /* !WEBKIT_CHECK_VERSION(1, 12, 0) */
 
 /*
  * Callback for the "navigation-policy-decision-requested" signal
@@ -291,18 +269,6 @@ libbalsa_html_new(const gchar        * text,
                  "enable-plugins",   FALSE,
                  NULL);
 
-#if !WEBKIT_CHECK_VERSION(1, 12, 0)
-    info->hadj =
-        GTK_ADJUSTMENT(gtk_adjustment_new(0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-    info->vadj =
-        GTK_ADJUSTMENT(gtk_adjustment_new(0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-    gtk_widget_set_scroll_adjustments(widget, info->hadj, info->vadj);
-    g_object_unref(g_object_ref_sink(info->hadj));
-    g_object_unref(g_object_ref_sink(info->vadj));
-    g_signal_connect(web_view, "size-request",
-                     G_CALLBACK(lbh_size_request_cb), info);
-
-#endif                          /* !WEBKIT_CHECK_VERSION(1, 12, 0) */
     info->hover_cb = hover_cb;
     g_signal_connect(web_view, "hovering-over-link",
                      G_CALLBACK(lbh_hovering_over_link_cb), info);

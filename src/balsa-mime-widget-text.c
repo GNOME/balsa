@@ -123,6 +123,9 @@ static gboolean draw_cite_bars(GtkWidget * widget, GdkEventExpose *event, GList 
 #define BALSA_MIME_WIDGET_NEW_TEXT_NOTIFIED \
     "balsa-mime-widget-text-new-notified"
 
+#define BALSA_LEFT_MARGIN   2
+#define BALSA_RIGHT_MARGIN 15
+
 BalsaMimeWidget *
 balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
 			   const gchar * content_type, gpointer data)
@@ -228,8 +231,8 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
 	libbalsa_wrap_string(ptr, balsa_app.browse_wrap_length);
 
     gtk_text_view_set_editable(GTK_TEXT_VIEW(mw->widget), FALSE);
-    gtk_text_view_set_left_margin(GTK_TEXT_VIEW(mw->widget), 2);
-    gtk_text_view_set_right_margin(GTK_TEXT_VIEW(mw->widget), 15);
+    gtk_text_view_set_left_margin(GTK_TEXT_VIEW(mw->widget),  BALSA_LEFT_MARGIN);
+    gtk_text_view_set_right_margin(GTK_TEXT_VIEW(mw->widget), BALSA_RIGHT_MARGIN);
     gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(mw->widget), GTK_WRAP_WORD_CHAR);
 
     /* set the message font */
@@ -527,7 +530,9 @@ quote_tag(GtkTextBuffer * buffer, gint level, gint margin)
             tag =
                 gtk_text_buffer_create_tag(buffer, name, "foreground-gdk",
                                            &balsa_app.quoted_color[q_level],
-					   "left-margin", 2 + margin * level,
+					   "left-margin",
+                                           BALSA_LEFT_MARGIN
+                                           + margin * level,
                                            NULL);
             /* Set a low priority, so we can set both quote color and
              * URL color, and URL color will take precedence. */

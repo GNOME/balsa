@@ -1,3 +1,8 @@
+2010-01-05  Peter Bloomfield
+
+	* src/balsa-mime-widget-text.c (balsa_mime_widget_new_text),
+	(quote_tag): define constants for margins.
+
 2010-01-04  Peter Bloomfield
 
 	* libbalsa/misc.c (libbalsa_create_entry): use

@@ -167,7 +167,6 @@ imap_mbox_handle_init(ImapMboxHandle *handle)
   handle->enable_idle      = 1;
   mbox_view_init(&handle->mbox_view);
 
-  imap_compress_init(&handle->compress);
 #if defined(BALSA_USE_THREADS)
   pthread_mutex_init(&handle->mutex, NULL);
 #endif
@@ -559,6 +558,7 @@ imap_handle_disconnect(ImapMboxHandle *h)
   still_connected = imap_handle_idle_disable(h);
   if(h->sio) {
     sio_detach(h->sio); h->sio = NULL;
+    imap_compress_release(&h->compress);
   }
   if(h->iochannel) {
     g_io_channel_unref(h->iochannel); h->iochannel = NULL;
@@ -782,8 +782,8 @@ imap_mbox_connect(ImapMboxHandle* handle)
   handle->can_fetch_body = TRUE;
   handle->idle_state = IDLE_INACTIVE;
   if(handle->sio) {
-    sio_detach(handle->sio);
-    handle->sio = NULL;
+    sio_detach(handle->sio); handle->sio = NULL;
+    imap_compress_release(&handle->compress);
   }
 
 #ifdef USE_TLS
@@ -801,6 +801,7 @@ imap_mbox_connect(ImapMboxHandle* handle)
     close(handle->sd);
     return IMAP_NOMEM;
   }
+  imap_compress_init(&handle->compress);
   if(handle->timeout>0) {
     sio_set_timeout(handle->sio, handle->timeout);
     sio_set_timeoutcb(handle->sio, imap_timeout_cb, handle);
@@ -1018,7 +1019,6 @@ imap_mbox_handle_finalize(GObject* gobject)
   g_free(handle->msg_cache); handle->msg_cache = NULL;
   g_array_free(handle->flag_cache, TRUE);
 
-  imap_compress_release(&handle->compress);
   HANDLE_UNLOCK(handle);
 #if defined(BALSA_USE_THREADS)
   pthread_mutex_destroy(&handle->mutex);
@@ -2563,7 +2563,10 @@ ir_bye(ImapMboxHandle *h)
     imap_mbox_handle_set_msg(h, line);
     imap_mbox_handle_set_state(h, IMHS_DISCONNECTED);
     /* we close the connection here unless we are doing logout. */
-    if(h->sio) { sio_detach(h->sio); h->sio = NULL; }
+    if(h->sio) {
+      sio_detach(h->sio); h->sio = NULL; 
+      imap_compress_release(&h->compress);
+    }
     close(h->sd);
   }
   return IMR_BYE;

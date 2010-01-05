@@ -28,8 +28,8 @@ typedef struct siobuf *siobuf_t;
 #define SIO_READ	1
 #define SIO_WRITE	2
 
-typedef void (*recodecb_t) (char **dstbuf, int *dstlen,
-			    const char *srcbuf, int srclen, void *arg);
+typedef int (*recodecb_t) (char **dstbuf, int *dstlen,
+                           const char *srcbuf, int srclen, void *arg);
 typedef void (*monitorcb_t) (const char *buffer, int length, int direction,
 			     void *arg);
 typedef int (*timeoutcb_t) (void *arg);

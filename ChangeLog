@@ -1,3 +1,12 @@
+2010-01-05  Pawel Salek
+
+	* libbalsa/imap/siobuf.[ch]: change encode interface so that
+	compression callback do not need to allocate too much memory.
+	* libbalsa/imap/imap_compress.c: modify the callbacks accordingly.
+	* libbalsa/imap/imap-handle.c: make sure we do not leave some
+	unflushed compressed data around.
+	* configure.in: zlib.h is unconditionally required.
+
 2010-01-05  Peter Bloomfield
 
 	* libbalsa/html.c (libbalsa_html_new): remove dead code.

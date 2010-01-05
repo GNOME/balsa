@@ -460,7 +460,7 @@ sio_flush (struct siobuf *sio)
   if (sio->encode_cb != NULL)
     {
       char *buf;
-      int len;
+      int len = 0;
 
       /* Rules for the encode callback.
 
@@ -470,8 +470,10 @@ sio_flush (struct siobuf *sio)
          callback must maintain its own buffer which must persist until
          the next call in the same thread.  The secarg argument may be
          used to maintain this buffer. */
-      (*sio->encode_cb) (&buf, &len, sio->write_buffer, length, sio->secarg);
-      raw_write (sio, buf, len);
+      while ((*sio->encode_cb) (&buf, &len, sio->write_buffer, 
+                                length, sio->secarg)) {
+        raw_write (sio, buf, len);
+      }
     }
   else
     raw_write (sio, sio->write_buffer, length);
@@ -557,11 +559,8 @@ sio_fill (struct siobuf *sio)
 {
   assert (sio != NULL);
 
-  sio->read_unread = raw_read (sio, sio->read_buffer, sio->buffer_size);
-  if (sio->read_unread <= 0)
-    return 0;
 
-  if (sio->decode_cb != NULL)
+  if (sio->decode_cb != NULL) {
     /* Rules for the decode callback.
 
        The output variables (here buf and len) may be set to the
@@ -569,11 +568,27 @@ sio_fill (struct siobuf *sio)
        the result is shorter than the original data.  Otherwise the
        callback must maintain its own buffer which must persist until
        the next call in the same thread.  The secarg argument may be
-       used to maintain this buffer. */
-    (*sio->decode_cb) (&sio->read_position, &sio->read_unread,
-		       sio->read_buffer, sio->read_unread, sio->secarg);
-  else
+       used to maintain this buffer.
+       
+       Decode callback gets at most twice for each buffer: first time
+       with buflen == 0 to decode whatever is in the internal decode
+       buffer. If that call returns 0, actual data read is performed
+       and decode is given the second shot, when it isupposed to
+       return nonzero.
+    */
+    while (!(*sio->decode_cb) (&sio->read_position, &sio->read_unread,
+                               sio->read_buffer, sio->read_unread,
+                               sio->secarg)) {
+      sio->read_unread = raw_read (sio, sio->read_buffer, sio->buffer_size);
+    }
+    if (sio->read_unread <= 0)
+      return 0;
+  } else {
+    sio->read_unread = raw_read (sio, sio->read_buffer, sio->buffer_size);
+    if (sio->read_unread <= 0)
+      return 0;
     sio->read_position = sio->read_buffer;
+  }
 
   if (sio->monitor_cb != NULL && sio->read_unread > 0)
     (*sio->monitor_cb) (sio->read_position, sio->read_unread,

@@ -25,10 +25,10 @@
 #include "imap-handle.h"
 #include "imap_private.h"
 
-/** Arbitrary - not really a useful one. */
-static const unsigned IMAP_COMPRESS_BUFFER_SIZE = 65536;
+/** Arbitrary. Current choice is as good as any other. */
+static const unsigned IMAP_COMPRESS_BUFFER_SIZE = 4096;
 
-static void
+static int
 imap_compress_cb(char **dstbuf, int *dstlen,
                  const char *srcbuf, int srclen, void *arg)
 {
@@ -37,33 +37,28 @@ imap_compress_cb(char **dstbuf, int *dstlen,
 
   *dstbuf = icb->out_buffer;
 
-  icb->out_stream.next_in  = (Bytef*)srcbuf;
-  icb->out_stream.avail_in = srclen;
+  if (*dstlen == 0) { /* first call */
+    icb->out_stream.next_in  = (Bytef*)srcbuf;
+    icb->out_stream.avail_in = srclen;
+    icb->out_uncompressed += srclen;
+  }
 
   icb->out_stream.next_out = (Byte*)*dstbuf;
   icb->out_stream.avail_out = IMAP_COMPRESS_BUFFER_SIZE;
 
-  do {
-    if (icb->out_stream.avail_out ==0){
-      printf("Buffer reallocation not implemented, aborting.\n");
-      /* FIXME1 */
-      break;
-    }
-    /* check sizes here */
-    err = deflate(&icb->out_stream, Z_SYNC_FLUSH);
-    if ( !(err == Z_OK || err == Z_STREAM_END || err == Z_BUF_ERROR) ) {
-      fprintf(stderr, "deflate error1 %d\n", err);
-      /* FIXME - break the connection here, no point in continuing. */
-    }
-  } while (icb->out_stream.avail_out == 0);
+  err = deflate(&icb->out_stream, Z_SYNC_FLUSH);
+  if ( !(err == Z_OK || err == Z_STREAM_END || err == Z_BUF_ERROR) ) {
+    fprintf(stderr, "deflate error1 %d\n", err);
+    /* FIXME - break the connection here, no point in continuing. */
+  }
 
   *dstlen = IMAP_COMPRESS_BUFFER_SIZE - icb->out_stream.avail_out;
   /* printf("imap_compress_cb %d bytes to %d\n", srclen, *dstlen); */
-  icb->out_uncompressed += srclen;
   icb->out_compressed += *dstlen;
+  return *dstlen;
 }
 
-static void
+static int
 imap_decompress_cb(char **dstbuf, int *dstlen,
                    const char *srcbuf, int srclen, void *arg)
 {
@@ -72,8 +67,11 @@ imap_decompress_cb(char **dstbuf, int *dstlen,
 
   *dstbuf = icb->in_buffer;
 
-  icb->in_stream.next_in  = (Bytef*)srcbuf;
-  icb->in_stream.avail_in = srclen;
+  if (srclen) {
+    icb->in_stream.next_in  = (Bytef*)srcbuf;
+    icb->in_stream.avail_in = srclen;
+    icb->in_compressed += srclen;
+  }
 
   icb->in_stream.next_out = (Byte*)*dstbuf;
   icb->in_stream.avail_out =  IMAP_COMPRESS_BUFFER_SIZE;
@@ -86,8 +84,8 @@ imap_decompress_cb(char **dstbuf, int *dstlen,
 
   *dstlen = IMAP_COMPRESS_BUFFER_SIZE - icb->in_stream.avail_out;
   /* printf("imap_decompress_cb %d bytes to %d\n", srclen, *dstlen); */
-  icb->in_compressed += srclen;
   icb->in_uncompressed += *dstlen;
+  return *dstlen;
 }
 
 /** Enables COMPRESS extension if available. Assumes that the handle

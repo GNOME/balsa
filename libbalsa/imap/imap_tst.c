@@ -626,18 +626,18 @@ process_options(int argc, char *argv[])
     } else if( strcmp(argv[first_arg], "-p") == 0 &&
 	       first_arg+1 < argc) {
       TestContext.password = argv[++first_arg];
+    } else if( strcmp(argv[first_arg], "-a") == 0) {
+      TestContext.anonymous = TRUE;
+    } else if( strcmp(argv[first_arg], "-c") == 0) {
+      TestContext.compress = TRUE;
     } else if( strcmp(argv[first_arg], "-m") == 0) {
       TestContext.monitor = TRUE;
+    } else if( strcmp(argv[first_arg], "-s") == 0) {
+      TestContext.over_ssl = TRUE;
     } else if( strcmp(argv[first_arg], "-T") == 0) {
       TestContext.tls_mode = IMAP_TLS_REQUIRED;
     } else if( strcmp(argv[first_arg], "-t") == 0) {
       TestContext.tls_mode = IMAP_TLS_DISABLED;
-    } else if( strcmp(argv[first_arg], "-s") == 0) {
-      TestContext.over_ssl = TRUE;
-    }  else if( strcmp(argv[first_arg], "-a") == 0) {
-      TestContext.anonymous = TRUE;
-    }  else if( strcmp(argv[first_arg], "-c") == 0) {
-      TestContext.compress = TRUE;
     } else {
       break; /* break the loop - non-option encountered. */
     }
@@ -679,12 +679,12 @@ main(int argc, char *argv[]) {
     fprintf(stderr, "Known options:\n"
             "-u USER specify user\n"
             "-p PASSWORD specify password\n"
-            "-m enable monitor\n"
-            "-T tls required\n"
-            "-t tls disabled\n"
-            "-s over ssl\n"
             "-a anonymous\n"
-            "-c compress\n");
+            "-c compress\n"
+            "-m enable monitor\n"
+            "-s over ssl\n"
+            "-T tls required\n"
+            "-t tls disabled\n");
 
     return 1;
   }

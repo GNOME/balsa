@@ -3,6 +3,11 @@
 	* libbalsa/imap/imap_compress.c: improve error handling.
 	* libbalsa/mailbox_imap.c: catch error conditions early.
 
+2010-01-06  Peter Bloomfield
+
+	* src/balsa-mime-widget-text.c (balsa_mime_widget_new_text): do
+	not leak HTML source.
+
 2010-01-05  Pawel Salek
 
 	* libbalsa/imap/siobuf.[ch]: change encode interface so that

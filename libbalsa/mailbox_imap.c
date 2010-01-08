@@ -1126,12 +1126,17 @@ save_to(unsigned seqno, const char *buf, size_t buflen, void* arg)
 static FILE*
 get_cache_stream(LibBalsaMailbox *mailbox, guint msgno, gboolean peek)
 {
-    unsigned uid = IMAP_MSGNO_UID(mailbox, msgno);
+    unsigned uid;
     LibBalsaMailboxImap *mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
     FILE *stream;
     gchar **pair, *path;
 
     g_assert(mimap->handle);
+    g_return_val_if_fail(msgno <=
+                         imap_mbox_handle_get_exists(mimap->handle),
+                         NULL);
+
+    uid = IMAP_MSGNO_UID(mailbox, msgno);
     pair = get_cache_name_pair(mimap, "body", uid);
     path = g_build_filename(pair[0], pair[1], NULL);
     stream = fopen(path, "rb");
@@ -1513,8 +1518,12 @@ GHashTable * libbalsa_mailbox_imap_get_matchings(LibBalsaMailboxImap* mbox,
 	for(msgs= LIBBALSA_MAILBOX(mbox)->message_list; msgs;
 	    msgs = msgs->next){
 	    LibBalsaMessage *m = LIBBALSA_MESSAGE(msgs->data);
-	    ImapUID uid = IMAP_MESSAGE_UID(m);
-	    g_hash_table_insert(cbdata->uids, GUINT_TO_POINTER(uid), m);
+
+            if (m->msgno <= imap_mbox_handle_get_exists(mbox->handle)) {
+                ImapUID uid = IMAP_MESSAGE_UID(m);
+                g_hash_table_insert(cbdata->uids, GUINT_TO_POINTER(uid), m);
+            } else
+                g_warning("Msg %d out of range\n", m->msgno);
 	}
 #else	
         g_warning("Search results ignored. Fixme!");
@@ -2087,9 +2096,11 @@ get_struct_from_cache(LibBalsaMailbox *mailbox, LibBalsaMessage *message,
         GMimeStream *stream, *fstream;
         GMimeFilter *filter;
         GMimeParser *mime_parser;
-
-        pair = get_cache_name_pair(LIBBALSA_MAILBOX_IMAP(mailbox), "body",
-                                   IMAP_MESSAGE_UID(message));
+        LibBalsaMailboxImap *mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
+        g_return_val_if_fail(message->msgno <=
+                             imap_mbox_handle_get_exists(mimap->handle),
+                             FALSE);
+        pair = get_cache_name_pair(mimap, "body", IMAP_MESSAGE_UID(message));
 
         filename = g_build_filename(pair[0], pair[1], NULL);
         g_strfreev(pair);
@@ -2352,6 +2363,10 @@ lbm_imap_get_msg_part_from_cache(LibBalsaMessage * msg,
     LibBalsaMailboxImap *mimap = LIBBALSA_MAILBOX_IMAP(msg->mailbox);
     FILE *fp;
     gchar *section;
+
+    g_return_val_if_fail(msg->msgno <=
+                         imap_mbox_handle_get_exists(mimap->handle),
+                         FALSE);
 
    /* look for a part cache */
     section = get_section_for(msg, part);

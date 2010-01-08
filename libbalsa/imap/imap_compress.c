@@ -49,12 +49,13 @@ imap_compress_cb(char **dstbuf, int *dstlen,
   err = deflate(&icb->out_stream, Z_SYNC_FLUSH);
   if ( !(err == Z_OK || err == Z_STREAM_END || err == Z_BUF_ERROR) ) {
     fprintf(stderr, "deflate error1 %d\n", err);
-    /* FIXME - break the connection here, no point in continuing. */
+    *dstlen = 0;
+  } else {
+    *dstlen = IMAP_COMPRESS_BUFFER_SIZE - icb->out_stream.avail_out;
+    /* printf("imap_compress_cb %d bytes to %d\n", srclen, *dstlen); */
+    icb->out_compressed += *dstlen;
   }
 
-  *dstlen = IMAP_COMPRESS_BUFFER_SIZE - icb->out_stream.avail_out;
-  /* printf("imap_compress_cb %d bytes to %d\n", srclen, *dstlen); */
-  icb->out_compressed += *dstlen;
   return *dstlen;
 }
 
@@ -79,12 +80,12 @@ imap_decompress_cb(char **dstbuf, int *dstlen,
   
   if (!(err == Z_OK || err == Z_BUF_ERROR || err == Z_STREAM_END)) {
     fprintf(stderr, "inflate error %d\n", err);
-    /* FIXME break the connection. */
+    *dstlen = -1;
+  } else {
+    *dstlen = IMAP_COMPRESS_BUFFER_SIZE - icb->in_stream.avail_out;
+    /* printf("imap_decompress_cb %d bytes to %d\n", srclen, *dstlen); */
+    icb->in_uncompressed += *dstlen;
   }
-
-  *dstlen = IMAP_COMPRESS_BUFFER_SIZE - icb->in_stream.avail_out;
-  /* printf("imap_decompress_cb %d bytes to %d\n", srclen, *dstlen); */
-  icb->in_uncompressed += *dstlen;
   return *dstlen;
 }
 

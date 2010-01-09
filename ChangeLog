@@ -1,5 +1,11 @@
 2010-01-09  Peter Bloomfield
 
+	* src/balsa-message.c (add_body), (add_multipart_digest),
+	(add_multipart_mixed), (add_multipart), (add_part),
+	(select_part): cleaner recursion.
+
+2010-01-09  Peter Bloomfield
+
 	* src/balsa-mime-widget-text.c (url_open_cb), (check_call_url),
 	(handle_url), (bm_widget_new_html): combine link-clicked
 	handling for text/plain and text/html parts.

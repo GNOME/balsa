@@ -131,9 +131,11 @@ static void balsa_message_destroy(GtkObject * object);
 static void display_headers(BalsaMessage * bm);
 static void display_content(BalsaMessage * bm);
 
-static LibBalsaMessageBody *add_part(BalsaMessage *bm, BalsaPartInfo *info);
+static LibBalsaMessageBody *add_part(BalsaMessage *bm, BalsaPartInfo *info,
+                                     GtkWidget * container);
 static LibBalsaMessageBody *add_multipart(BalsaMessage * bm,
-					  LibBalsaMessageBody * parent);
+                                          LibBalsaMessageBody * parent,
+                                          GtkWidget * container);
 static void select_part(BalsaMessage * bm, BalsaPartInfo *info);
 static void tree_activate_row_cb(GtkTreeView *treeview, GtkTreePath *arg1,
                                  GtkTreeViewColumn *arg2, gpointer user_data);
@@ -2082,41 +2084,44 @@ part_info_from_body(BalsaMessage *bm, const LibBalsaMessageBody *body)
 
 
 static LibBalsaMessageBody *
-add_body(BalsaMessage *bm, LibBalsaMessageBody *body)
+add_body(BalsaMessage * bm, LibBalsaMessageBody * body,
+         GtkWidget * container)
 {
     if(body) {
         BalsaPartInfo *info = part_info_from_body(bm, body);
         
         if (info) {
-	    body = add_part(bm, info);
+	    body = add_part(bm, info, container);
             g_object_unref(info);
         } else
-	    body = add_multipart(bm, body);
+	    body = add_multipart(bm, body, container);
     }
 
     return body;
 }
 
 static LibBalsaMessageBody *
-add_multipart_digest(BalsaMessage * bm, LibBalsaMessageBody * body)
+add_multipart_digest(BalsaMessage * bm, LibBalsaMessageBody * body,
+                     GtkWidget * container)
 {
     LibBalsaMessageBody *retval = NULL;
     /* Add all parts */
-    retval = add_body(bm, body);
+    retval = add_body(bm, body, container);
     for (body = body->next; body; body = body->next)
-        add_body(bm, body);
+        add_body(bm, body, container);
 
     return retval;
 }
 
 static LibBalsaMessageBody *
-add_multipart_mixed(BalsaMessage * bm, LibBalsaMessageBody * body)
+add_multipart_mixed(BalsaMessage * bm, LibBalsaMessageBody * body,
+                    GtkWidget * container)
 {
     LibBalsaMessageBody * retval = NULL;
     /* Add first (main) part + anything else with 
        Content-Disposition: inline */
     if (body) {
-        retval = add_body(bm, body);
+        retval = add_body(bm, body, container);
         for (body = body->next; body; body = body->next) {
 #ifdef HAVE_GPGME
 	    GMimeContentType *type =
@@ -2129,13 +2134,13 @@ add_multipart_mixed(BalsaMessage * bm, LibBalsaMessageBody * body)
 		(balsa_app.has_smime && 
 		 (g_mime_content_type_is_type(type, "application", "pkcs7-signature") ||
 		  g_mime_content_type_is_type(type, "application", "x-pkcs7-signature"))))
-                add_body(bm, body);
+                add_body(bm, body, container);
 	    g_object_unref(type);
 #else
             if (libbalsa_message_body_is_inline(body) ||
 		bm->force_inline ||
 		libbalsa_message_body_is_multipart(body)) 
-                add_body(bm, body);
+                add_body(bm, body, container);
 #endif
         }
     }
@@ -2144,7 +2149,8 @@ add_multipart_mixed(BalsaMessage * bm, LibBalsaMessageBody * body)
 }
 
 static LibBalsaMessageBody *
-add_multipart(BalsaMessage *bm, LibBalsaMessageBody *body)
+add_multipart(BalsaMessage *bm, LibBalsaMessageBody *body,
+              GtkWidget * container)
 /* This function handles multiparts as specified by RFC2046 5.1 and
  * message/rfc822 types. */
 {
@@ -2158,14 +2164,14 @@ add_multipart(BalsaMessage *bm, LibBalsaMessageBody *body)
     if (g_mime_content_type_is_type(type, "multipart", "related")) {
         /* FIXME: more processing required see RFC1872 */
         /* Add the first part */
-        body = add_body(bm, body->parts);
+        body = add_body(bm, body->parts, container);
     } else if (g_mime_content_type_is_type(type, "multipart", "alternative")) {
             /* Add the most suitable part. */
-        body = add_body(bm, preferred_part(body->parts));
+        body = add_body(bm, preferred_part(body->parts), container);
     } else if (g_mime_content_type_is_type(type, "multipart", "digest")) {
-	body = add_multipart_digest(bm, body->parts);
+	body = add_multipart_digest(bm, body->parts, container);
     } else { /* default to multipart/mixed */
-	body = add_multipart_mixed(bm, body->parts);
+	body = add_multipart_mixed(bm, body->parts, container);
     }
     g_object_unref(type);
 
@@ -2173,9 +2179,8 @@ add_multipart(BalsaMessage *bm, LibBalsaMessageBody *body)
 }
 
 static LibBalsaMessageBody *
-add_part(BalsaMessage * bm, BalsaPartInfo * info)
+add_part(BalsaMessage * bm, BalsaPartInfo * info, GtkWidget * container)
 {
-    GtkWidget *save;
     GtkTreeSelection *selection;
     LibBalsaMessageBody *body;
 
@@ -2191,22 +2196,14 @@ add_part(BalsaMessage * bm, BalsaPartInfo * info)
     if (info->mime_widget == NULL)
 	part_info_init(bm, info);
 
-    save = NULL;
+    if (info->mime_widget->widget)
+        gtk_box_pack_start(GTK_BOX(container), info->mime_widget->widget,
+                           TRUE, TRUE, 0);
 
-    if (info->mime_widget->widget) {
-	if (info->mime_widget->container) {
-	    gtk_container_add(GTK_CONTAINER(bm->bm_widget->container), info->mime_widget->widget);
-	    save = bm->bm_widget->container;
-	    bm->bm_widget->container = info->mime_widget->container;
-	} else
-	    gtk_box_pack_start(GTK_BOX(bm->bm_widget->container),
-                               info->mime_widget->widget, TRUE, TRUE, 0);
-    }
-
-    body = add_multipart(bm, info->body);
-
-    if (save)
-	bm->bm_widget->container = save;
+    body =
+        add_multipart(bm, info->body,
+                      info->mime_widget->container ?
+                      info->mime_widget->container : container);
 
     return body;
 }
@@ -2271,7 +2268,9 @@ select_part(BalsaMessage * bm, BalsaPartInfo *info)
     if (bm->current_part)
         g_object_unref(bm->current_part);
 
-    bm->current_part = part_info_from_body(bm, add_part(bm, info));
+    bm->current_part =
+        part_info_from_body(bm,
+                            add_part(bm, info, bm->bm_widget->container));
 
     if(bm->current_part)
         g_signal_emit(G_OBJECT(bm), balsa_message_signals[SELECT_PART], 0);

@@ -107,7 +107,7 @@ static void url_found_cb(GtkTextBuffer * buffer, GtkTextIter * iter,
                          const gchar * buf, guint len, gpointer data);
 static gboolean check_call_url(GtkWidget * widget, GdkEventButton * event, GList * url_list);
 static message_url_t * find_url(GtkWidget * widget, gint x, gint y, GList * url_list);
-static void handle_url(const message_url_t* url);
+static void handle_url(const gchar* url);
 static void free_url_list(GList * url_list);
 static void bm_widget_on_url(const gchar *url);
 static void phrase_highlight(GtkTextBuffer * buffer, const gchar * id,
@@ -630,7 +630,7 @@ url_copy_cb(GtkWidget * menu_item, message_url_t * uri)
 static void
 url_open_cb(GtkWidget * menu_item, message_url_t * uri)
 {
-    handle_url(uri);
+    handle_url(uri->url);
 }
 
 static void
@@ -885,7 +885,7 @@ check_call_url(GtkWidget * widget, GdkEventButton * event,
         && (event->state & STORED_MASK_BITS) == stored_mask) {
         url = find_url(widget, x, y, url_list);
         if (url)
-            handle_url(url);
+            handle_url(url->url);
     }
     return FALSE;
 }
@@ -933,30 +933,29 @@ statusbar_pop(gpointer data)
 #define SCHEDULE_BAR_REFRESH()  g_timeout_add(5000, statusbar_pop, NULL);
 
 static void
-handle_url(const message_url_t* url)
+handle_url(const gchar * url)
 {
-    if (!g_ascii_strncasecmp(url->url, "mailto:", 7)) {
+    if (!g_ascii_strncasecmp(url, "mailto:", 7)) {
         BalsaSendmsg *snd = sendmsg_window_compose();
-        sendmsg_window_process_url(url->url + 7,
-                                   sendmsg_window_set_field, snd);      
+        sendmsg_window_process_url(url + 7, sendmsg_window_set_field, snd);
     } else {
         GtkStatusbar *statusbar;
         guint context_id;
-
-        gchar *notice = g_strdup_printf(_("Calling URL %s..."),
-                                        url->url);
+        gchar *notice = g_strdup_printf(_("Calling URL %s..."), url);
         GError *err = NULL;
 
         statusbar = GTK_STATUSBAR(balsa_app.main_window->statusbar);
-        context_id = gtk_statusbar_get_context_id(statusbar, "BalsaMimeWidget message");
+        context_id =
+            gtk_statusbar_get_context_id(statusbar,
+                                         "BalsaMimeWidget message");
         gtk_statusbar_push(statusbar, context_id, notice);
         SCHEDULE_BAR_REFRESH();
         g_free(notice);
-        gtk_show_uri(NULL, url->url, gtk_get_current_event_time(), &err);
+        gtk_show_uri(NULL, url, gtk_get_current_event_time(), &err);
         if (err) {
             balsa_information(LIBBALSA_INFORMATION_WARNING,
-                    _("Error showing %s: %s\n"), url->url,
-                    err->message);
+                              _("Error showing %s: %s\n"),
+                              url, err->message);
             g_error_free(err);
         }
     }
@@ -1215,19 +1214,6 @@ balsa_gtk_html_button_press_cb(GtkWidget * html, GdkEventButton * event,
             ? balsa_gtk_html_popup(html, bm) : FALSE);
 }
 
-static void
-bm_widget_link_clicked(const gchar *url)
-{
-    GError *err = NULL;
-
-    gtk_show_uri(NULL, url, gtk_get_current_event_time(), &err);
-    if (err) {
-        balsa_information(LIBBALSA_INFORMATION_WARNING,
-                _("Error showing %s: %s\n"), url, err->message);
-        g_error_free(err);
-    }
-}
-
 BalsaMimeWidget *
 bm_widget_new_html(BalsaMessage * bm, LibBalsaMessageBody * mime_body, gchar * ptr, size_t len)
 {
@@ -1240,7 +1226,7 @@ bm_widget_new_html(BalsaMessage * bm, LibBalsaMessageBody * mime_body, gchar * p
                           (LibBalsaHtmlCallback)
                           bm_widget_on_url,
                           (LibBalsaHtmlCallback)
-                          bm_widget_link_clicked);
+                          handle_url);
     g_object_set_data(G_OBJECT(mw->widget), "mime-body", mime_body);
 
     g_signal_connect(G_OBJECT(mw->widget), "button-press-event",

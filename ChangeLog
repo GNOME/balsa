@@ -1,3 +1,8 @@
+2010-01-10  Albrecht Dreß
+
+	* src/pref-manager.c (word_wrap_group): increase maximum line
+	length to 998, the RFC 2822 limit.
+
 2010-01-09  Peter Bloomfield
 
 	* src/balsa-message.c (add_body), (add_multipart_digest),

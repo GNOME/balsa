@@ -2098,7 +2098,7 @@ word_wrap_group(GtkWidget * page)
     pm_page_add_to_size_group(page, pui->wordwrap);
 
     spinbutton_adj =
-        gtk_adjustment_new(1.0, 40.0, 79.0, 1.0, 5.0, 0.0);
+        gtk_adjustment_new(1.0, 40.0, 998.0, 1.0, 5.0, 0.0);
     pui->wraplength =
 	gtk_spin_button_new(GTK_ADJUSTMENT(spinbutton_adj), 1, 0);
     gtk_table_attach(GTK_TABLE(table), pui->wraplength, 1, 2, 0, 1,

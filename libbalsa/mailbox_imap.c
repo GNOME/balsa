@@ -2097,7 +2097,7 @@ get_struct_from_cache(LibBalsaMailbox *mailbox, LibBalsaMessage *message,
         GMimeFilter *filter;
         GMimeParser *mime_parser;
         LibBalsaMailboxImap *mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
-        g_return_val_if_fail(message->msgno <=
+        g_return_val_if_fail( (guint)message->msgno <=
                              imap_mbox_handle_get_exists(mimap->handle),
                              FALSE);
         pair = get_cache_name_pair(mimap, "body", IMAP_MESSAGE_UID(message));
@@ -2364,7 +2364,7 @@ lbm_imap_get_msg_part_from_cache(LibBalsaMessage * msg,
     FILE *fp;
     gchar *section;
 
-    g_return_val_if_fail(msg->msgno <=
+    g_return_val_if_fail( (guint)msg->msgno <=
                          imap_mbox_handle_get_exists(mimap->handle),
                          FALSE);
 

@@ -1,3 +1,10 @@
+2010-01-11  Peter Bloomfield
+
+	* libbalsa/html.c (lbh_js_get_global_context), (lbh_js_run_script),
+	(lbh_js_object_get_property), (libbalsa_html_search_text),
+	(libbalsa_html_get_selection_bounds): use JavaScript to locate
+	or clear selected text; enable text search.
+
 2010-01-11  Pawel Salek
 
 	* libbalsa/mailbox_imap.c: gmail anwers NO to FETCH, deal with it.

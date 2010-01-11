@@ -57,6 +57,7 @@
  */
 
 #include <webkit/webkit.h>
+#include <JavaScriptCore/JavaScript.h>
 
 typedef struct {
     WebKitWebView        *web_view;
@@ -363,8 +364,6 @@ libbalsa_html_copy(GtkWidget * widget)
     webkit_web_view_copy_clipboard(WEBKIT_WEB_VIEW(widget));
 }
 
-#define WEBKIT_WEB_VIEW_CAN_MANAGE_SELECTION FALSE
-#if WEBKIT_WEB_VIEW_CAN_MANAGE_SELECTION
 /*
  * Does the widget support searching text?
  */
@@ -375,54 +374,97 @@ libbalsa_html_can_search(GtkWidget * widget)
 }
 
 /*
+ * JavaScript-based helpers for text search
+ */
+static JSGlobalContextRef
+lbh_js_get_global_context(WebKitWebView * web_view)
+{
+    WebKitWebFrame *web_frame = webkit_web_view_get_main_frame(web_view);
+    return webkit_web_frame_get_global_context(web_frame);
+}
+
+static JSValueRef
+lbh_js_run_script(JSContextRef  ctx,
+                  const gchar * script)
+{
+    JSStringRef str;
+    JSValueRef value;
+
+    str = JSStringCreateWithUTF8CString(script);
+    value = JSEvaluateScript(ctx, str, NULL, NULL, 0, NULL);
+    JSStringRelease(str);
+
+    return value;
+}
+
+static gint
+lbh_js_object_get_property(JSContextRef  ctx,
+                           JSObjectRef   object,
+                           const gchar * property_name)
+{
+    JSStringRef str  = JSStringCreateWithUTF8CString(property_name);
+    JSValueRef value = JSObjectGetProperty(ctx, object, str, NULL);
+    JSStringRelease(str);
+
+    return (gint) JSValueToNumber(ctx, value, NULL);
+}
+
+/*
  * Search for the text; if text is empty, return TRUE (for consistency
  * with GtkTextIter methods).
  */
+
 gboolean
-libbalsa_html_search_text(GtkWidget * widget, const gchar * text,
-                          gboolean find_forward, gboolean wrap)
+libbalsa_html_search_text(GtkWidget   * widget,
+                          const gchar * text,
+                          gboolean      find_forward,
+                          gboolean      wrap)
 {
+    WebKitWebView *web_view = WEBKIT_WEB_VIEW(widget);
+
     if (!*text) {
-        webkit_web_view_clear_selection(WEBKIT_WEB_VIEW(widget));
+        lbh_js_run_script(lbh_js_get_global_context(web_view),
+                          "window.getSelection().removeAllRanges()");
         return TRUE;
     }
 
-    return webkit_web_view_search_text(WEBKIT_WEB_VIEW(widget), text,
+    return webkit_web_view_search_text(web_view, text,
                                        FALSE,    /* case-insensitive */
                                        find_forward, wrap);
+    return FALSE;
 }
 
 /*
  * Get the rectangle containing the currently selected text, for
  * scrolling.
  */
-void
-libbalsa_html_get_selection_bounds(GtkWidget    * widget,
-                                   GdkRectangle * selection_bounds)
-{
-    webkit_web_view_get_selection_bounds(WEBKIT_WEB_VIEW(widget),
-                                         selection_bounds);
-}
-#else                           /* WEBKIT_WEB_VIEW_CAN_MANAGE_SELECTION */
-gboolean
-libbalsa_html_can_search(GtkWidget * widget)
-{
-    return FALSE;
-}
-
-gboolean
-libbalsa_html_search_text(GtkWidget * widget, const gchar * text,
-                          gboolean find_forward, gboolean wrap)
-{
-    return FALSE;
-}
 
 void
 libbalsa_html_get_selection_bounds(GtkWidget    * widget,
                                    GdkRectangle * selection_bounds)
 {
+    WebKitWebView *web_view = WEBKIT_WEB_VIEW(widget);
+    JSGlobalContextRef ctx;
+    gchar script[] =
+        "window.getSelection().getRangeAt(0).getBoundingClientRect()";
+    JSValueRef value;
+
+    ctx = lbh_js_get_global_context(web_view);
+    value = lbh_js_run_script(ctx, script);
+
+    if (JSValueIsObject(ctx, value)) {
+        JSObjectRef object = JSValueToObject(ctx, value, NULL);
+
+        selection_bounds->x =
+            lbh_js_object_get_property(ctx, object, "left");
+        selection_bounds->y =
+            lbh_js_object_get_property(ctx, object, "top");
+        selection_bounds->width =
+            lbh_js_object_get_property(ctx, object, "width");
+        selection_bounds->height =
+            lbh_js_object_get_property(ctx, object, "height");
+    }
 }
-#endif                          /* WEBKIT_WEB_VIEW_CAN_MANAGE_SELECTION */
 
 # else                          /* defined(HAVE_WEBKIT) */
 

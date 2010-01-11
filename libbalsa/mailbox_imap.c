@@ -194,11 +194,6 @@ static struct message_info *message_info_from_msgno(
     return msg_info;
 }
 
-#define IMAP_MSGNO_UID(mailbox, msgno) \
-        (mi_get_imsg(LIBBALSA_MAILBOX_IMAP(mailbox), (msgno))->uid)
-#define IMAP_MESSAGE_UID(msg) \
-        IMAP_MSGNO_UID((msg)->mailbox, (msg)->msgno)
-
 #define IMAP_MAILBOX_UID_VALIDITY(mailbox) (LIBBALSA_MAILBOX_IMAP(mailbox)->uid_validity)
 
 GType
@@ -1110,33 +1105,12 @@ libbalsa_mailbox_imap_close(LibBalsaMailbox * mailbox, gboolean expunge)
     mbox->sort_field = -1;	/* Invalidate. */
 }
 
-struct SaveToData {
-    FILE *f;
-    gboolean error;
-};
-
-static void
-save_to(unsigned seqno, const char *buf, size_t buflen, void* arg)
-{
-    struct SaveToData *std  = (struct SaveToData*)arg;
-    if(fwrite(buf, 1, buflen, std->f) != buflen)
-	std->error = TRUE;
-}
-
 static FILE*
-get_cache_stream(LibBalsaMailbox *mailbox, guint msgno, gboolean peek)
+get_cache_stream(LibBalsaMailboxImap *mimap, guint uid, gboolean peek)
 {
-    unsigned uid;
-    LibBalsaMailboxImap *mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
     FILE *stream;
     gchar **pair, *path;
 
-    g_assert(mimap->handle);
-    g_return_val_if_fail(msgno <=
-                         imap_mbox_handle_get_exists(mimap->handle),
-                         NULL);
-
-    uid = IMAP_MSGNO_UID(mailbox, msgno);
     pair = get_cache_name_pair(mimap, "body", uid);
     path = g_build_filename(pair[0], pair[1], NULL);
     stream = fopen(path, "rb");
@@ -1153,14 +1127,13 @@ get_cache_stream(LibBalsaMailbox *mailbox, guint msgno, gboolean peek)
 #endif
         cache = fopen(path, "wb");
         if(cache) {
-	    struct SaveToData std;
-	    std.f = cache;
-	    std.error = FALSE;
+	    int ferr;
             II(rc,mimap->handle,
-               imap_mbox_handle_fetch_rfc822(mimap->handle, 1, &msgno,
-					     peek, save_to, &std));
+               imap_mbox_handle_fetch_rfc822_uid(mimap->handle, uid, peek,
+						 cache));
+	    ferr = ferror(cache);
             fclose(cache);
-	    if(std.error || rc != IMR_OK) {
+	    if(ferr || rc != IMR_OK) {
 		printf("Error fetching RFC822 message, removing cache.\n");
 		unlink(path);
 	    }
@@ -1182,18 +1155,23 @@ libbalsa_mailbox_imap_get_message_stream(LibBalsaMailbox * mailbox,
 					 guint msgno, gboolean peek)
 {
     FILE *stream;
+    ImapMessage *imsg;
+    LibBalsaMailboxImap *mimap;
 
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX_IMAP(mailbox), NULL);
 
     libbalsa_lock_mailbox(mailbox);
     /* this may get called when the mailbox is being opened ie,
        open_ref==0 */
-    if(!LIBBALSA_MAILBOX_IMAP(mailbox)->handle) {
+    mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
+    if (!mimap->handle) {
         libbalsa_unlock_mailbox(mailbox);
         return NULL;
     }
+    imsg = mi_get_imsg(mimap, msgno);
+    
+    stream = imsg ? get_cache_stream(mimap, imsg->uid, peek) : NULL;
 
-    stream = get_cache_stream(mailbox, msgno, peek);
     libbalsa_unlock_mailbox(mailbox);
 
     return stream ? g_mime_stream_file_new(stream) : NULL;
@@ -1518,10 +1496,10 @@ GHashTable * libbalsa_mailbox_imap_get_matchings(LibBalsaMailboxImap* mbox,
 	for(msgs= LIBBALSA_MAILBOX(mbox)->message_list; msgs;
 	    msgs = msgs->next){
 	    LibBalsaMessage *m = LIBBALSA_MESSAGE(msgs->data);
-
-            if (m->msgno <= imap_mbox_handle_get_exists(mbox->handle)) {
-                ImapUID uid = IMAP_MESSAGE_UID(m);
-                g_hash_table_insert(cbdata->uids, GUINT_TO_POINTER(uid), m);
+	    ImapMessage *imsg = mi_get_imsg(mbox, m->msgno);
+            if (imsg) {
+                g_hash_table_insert(cbdata->uids,
+				    GUINT_TO_POINTER(imsg->uid), m);
             } else
                 g_warning("Msg %d out of range\n", m->msgno);
 	}
@@ -2097,10 +2075,12 @@ get_struct_from_cache(LibBalsaMailbox *mailbox, LibBalsaMessage *message,
         GMimeFilter *filter;
         GMimeParser *mime_parser;
         LibBalsaMailboxImap *mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
-        g_return_val_if_fail( (guint)message->msgno <=
-                             imap_mbox_handle_get_exists(mimap->handle),
-                             FALSE);
-        pair = get_cache_name_pair(mimap, "body", IMAP_MESSAGE_UID(message));
+	ImapMessage *imsg = mi_get_imsg(mimap, message->msgno);
+
+	if (!imsg)
+	    return FALSE;
+
+        pair = get_cache_name_pair(mimap, "body", imsg->uid);
 
         filename = g_build_filename(pair[0], pair[1], NULL);
         g_strfreev(pair);
@@ -2363,31 +2343,33 @@ lbm_imap_get_msg_part_from_cache(LibBalsaMessage * msg,
     LibBalsaMailboxImap *mimap = LIBBALSA_MAILBOX_IMAP(msg->mailbox);
     FILE *fp;
     gchar *section;
+    ImapMessage *imsg = mi_get_imsg(mimap, msg->msgno);
 
-    g_return_val_if_fail( (guint)msg->msgno <=
-                         imap_mbox_handle_get_exists(mimap->handle),
-                         FALSE);
+    if (!imsg) {
+	g_set_error(err,
+		    LIBBALSA_MAILBOX_ERROR, LIBBALSA_MAILBOX_ACCESS_ERROR,
+		    _("Error fetching message from IMAP server: %s"), 
+		    imap_mbox_handle_get_last_msg(mimap->handle));
+	return FALSE;
+    }
 
    /* look for a part cache */
     section = get_section_for(msg, part);
-    pair = get_cache_name_pair(mimap, "part", IMAP_MESSAGE_UID(msg));
+    pair = get_cache_name_pair(mimap, "part", imsg->uid);
     part_name   = g_strconcat(pair[0], G_DIR_SEPARATOR_S,
                               pair[1], "-", section, NULL);
     fp = fopen(part_name,"rb+");
     
     if(!fp) { /* no cache element */
         struct part_data dt;
-        LibBalsaMailboxImap* mimap;
         ImapFetchBodyOptions ifbo;
-        ImapMessage *im;
         ImapResponse rc;
         LibBalsaMessageBody *parent;
 
         libbalsa_lock_mailbox(msg->mailbox);
         mimap = LIBBALSA_MAILBOX_IMAP(msg->mailbox);
-        im = mi_get_imsg(mimap, msg->msgno);
         
-        dt.body  = imap_message_get_body_from_section(im, section);
+        dt.body  = imap_message_get_body_from_section(imsg, section);
         if(!dt.body) {
             /* This may happen if we reconnect the data dropping the
                body structures but still try refetching the

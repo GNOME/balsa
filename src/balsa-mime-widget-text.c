@@ -56,8 +56,9 @@ static void text_view_populate_popup(GtkTextView *textview, GtkMenu *menu,
 				     LibBalsaMessageBody * mime_body);
 
 #ifdef HAVE_GTKHTML
-static BalsaMimeWidget * bm_widget_new_html(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
-					    gchar * ptr, size_t len);
+static BalsaMimeWidget *bm_widget_new_html(BalsaMessage * bm,
+                                           LibBalsaMessageBody *
+                                           mime_body);
 #endif
 static BalsaMimeWidget * bm_widget_new_vcard(BalsaMessage * bm,
                                              LibBalsaMessageBody * mime_body,
@@ -149,6 +150,23 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
     g_return_val_if_fail(mime_body != NULL, NULL);
     g_return_val_if_fail(content_type != NULL, NULL);
 
+    /* handle HTML if possible */
+    html_type = libbalsa_html_type(content_type);
+    if (html_type) {
+        BalsaMimeWidget *html_widget = NULL;
+
+#ifdef HAVE_GTKHTML
+	/* Force vertical scrollbar while we render the html, otherwise
+	 * the widget will make itself too wide to accept one, forcing
+	 * otherwise unnecessary horizontal scrolling. */
+        gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(bm->scroll),
+                                       GTK_POLICY_AUTOMATIC,
+                                       GTK_POLICY_ALWAYS);
+        html_widget = bm_widget_new_html(bm, mime_body);
+#endif
+        return html_widget;
+    }
+
     is_text_plain = !g_ascii_strcasecmp(content_type, "text/plain");
     alloced = libbalsa_message_body_get_content(mime_body, &ptr, &err);
     if (alloced < 0) {
@@ -159,27 +177,6 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
         return NULL;
     }
 
-    /* handle HTML if possible */
-    html_type = libbalsa_html_type(content_type);
-    if (html_type) {
-#ifdef HAVE_GTKHTML
-        BalsaMimeWidget *html_widget;
-
-	alloced = libbalsa_html_filter(html_type, &ptr, alloced);
-	/* Force vertical scrollbar while we render the html, otherwise
-	 * the widget will make itself too wide to accept one, forcing
-	 * otherwise unnecessary horizontal scrolling. */
-        gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(bm->scroll),
-                                       GTK_POLICY_AUTOMATIC,
-                                       GTK_POLICY_ALWAYS);
-        html_widget = bm_widget_new_html(bm, mime_body, ptr, alloced);
-        g_free(ptr);
-        return html_widget;
-#else
-	g_free(ptr);
-        return NULL;
-#endif
-    }
     if(g_ascii_strcasecmp(content_type, "text/x-vcard") == 0 ||
        g_ascii_strcasecmp(content_type, "text/directory") == 0) {
         mw = bm_widget_new_vcard(bm, mime_body, ptr, alloced);
@@ -1215,18 +1212,14 @@ balsa_gtk_html_button_press_cb(GtkWidget * html, GdkEventButton * event,
 }
 
 BalsaMimeWidget *
-bm_widget_new_html(BalsaMessage * bm, LibBalsaMessageBody * mime_body, gchar * ptr, size_t len)
+bm_widget_new_html(BalsaMessage * bm, LibBalsaMessageBody * mime_body)
 {
     BalsaMimeWidget *mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
 
     mw->widget =
-        libbalsa_html_new(ptr, len,
-			  libbalsa_message_body_charset(mime_body),
-			  bm->message,
-                          (LibBalsaHtmlCallback)
-                          bm_widget_on_url,
-                          (LibBalsaHtmlCallback)
-                          handle_url);
+        libbalsa_html_new(mime_body,
+                          (LibBalsaHtmlCallback) bm_widget_on_url,
+                          (LibBalsaHtmlCallback) handle_url);
     g_object_set_data(G_OBJECT(mw->widget), "mime-body", mime_body);
 
     g_signal_connect(G_OBJECT(mw->widget), "button-press-event",

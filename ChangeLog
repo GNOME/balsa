@@ -1,5 +1,21 @@
 2010-01-11  Peter Bloomfield
 
+	* libbalsa/html.h: new API for libbalsa_html_new.
+	* src/balsa-mime-widget-text.c (balsa_mime_widget_new_text),
+	(bm_widget_new_html): use it.
+	* libbalsa/html.c (lbh_get_body_content,
+	lbh_get_web_view, libbalsa_html_can_zoom,
+	libbalsa_html_zoom, libbalsa_html_can_select,
+	libbalsa_html_select_all, libbalsa_html_copy,
+	libbalsa_html_can_search, libbalsa_html_search_text,
+	libbalsa_html_get_selection_bounds): implement new API;
+	(lbh_info_bar_realize_cb, lbh_info_bar_widget,
+	lbh_resource_request_starting_cb, lbh_info_bar_response_cb,
+	libbalsa_html_new): prepend HTML message part with a GtkInfoBar
+	offering the option to download images.
+
+2010-01-11  Peter Bloomfield
+
 	* src/balsa-message.c (add_part), (balsa_message_can_select):
 	html widgets can select text.
 

@@ -33,6 +33,7 @@
 # endif
 
 #  include <gtk/gtk.h>
+#include "libbalsa.h"
 
 /* We need this enum even if we're not using GtkHtml. */
 typedef enum {
@@ -46,9 +47,7 @@ typedef enum {
 
 typedef void (*LibBalsaHtmlCallback) (const gchar * uri);
 
-GtkWidget *libbalsa_html_new(const gchar * text, size_t len,
-			     const gchar * charset,
-			     gpointer message,
+GtkWidget *libbalsa_html_new(LibBalsaMessageBody * body,
                              LibBalsaHtmlCallback hover_cb,
                              LibBalsaHtmlCallback clicked_cb);
 void libbalsa_html_to_string(gchar ** text, size_t len);

@@ -1,5 +1,12 @@
 2010-01-11  Peter Bloomfield
 
+	* libbalsa/address-book-gpe.c
+	(libbalsa_address_book_gpe_alias_complete): free error with
+	sqlite3_free() instead of free(); fixes bug #606676 (Stanislav
+	Brabec).
+
+2010-01-11  Peter Bloomfield
+
 	* libbalsa/html.h: new API for libbalsa_html_new.
 	* src/balsa-mime-widget-text.c (balsa_mime_widget_new_text),
 	(bm_widget_new_html): use it.

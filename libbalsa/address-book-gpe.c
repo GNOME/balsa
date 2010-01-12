@@ -792,7 +792,7 @@ libbalsa_address_book_gpe_alias_complete(LibBalsaAddressBook * ab,
 #endif                          /* HAVE_SQLITE3 */
     if(err) {
         printf("r=%d err=%s\n", r, err);
-        free(err);
+        sqlite3_free(err);
     }
     return gcc.res;
 }

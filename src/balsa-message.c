@@ -2182,6 +2182,7 @@ static LibBalsaMessageBody *
 add_part(BalsaMessage * bm, BalsaPartInfo * info, GtkWidget * container)
 {
     GtkTreeSelection *selection;
+    GtkWidget *widget;
     LibBalsaMessageBody *body;
 
     if (!info)
@@ -2196,9 +2197,8 @@ add_part(BalsaMessage * bm, BalsaPartInfo * info, GtkWidget * container)
     if (info->mime_widget == NULL)
 	part_info_init(bm, info);
 
-    if (info->mime_widget->widget)
-        gtk_box_pack_start(GTK_BOX(container), info->mime_widget->widget,
-                           TRUE, TRUE, 0);
+    if ((widget = info->mime_widget->widget))
+        gtk_box_pack_start(GTK_BOX(container), widget, TRUE, TRUE, 0);
 
     body =
         add_multipart(bm, info->body,
@@ -2327,7 +2327,11 @@ balsa_message_can_select(BalsaMessage * bmessage)
         || (w = bmessage->current_part->mime_widget->widget) == NULL)
         return FALSE;
 
-    return GTK_IS_EDITABLE(w) || GTK_IS_TEXT_VIEW(w);
+    return GTK_IS_EDITABLE(w) || GTK_IS_TEXT_VIEW(w)
+#ifdef    HAVE_GTKHTML
+        || libbalsa_html_can_select(w)
+#endif /* HAVE_GTKHTML */
+        ;
 }
 
 gboolean

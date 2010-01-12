@@ -1,5 +1,10 @@
 2010-01-11  Peter Bloomfield
 
+	* src/balsa-message.c (add_part), (balsa_message_can_select):
+	html widgets can select text.
+
+2010-01-11  Peter Bloomfield
+
 	* libbalsa/html.c (lbh_js_get_global_context), (lbh_js_run_script),
 	(lbh_js_object_get_property), (libbalsa_html_search_text),
 	(libbalsa_html_get_selection_bounds): use JavaScript to locate

@@ -1119,7 +1119,7 @@ libbalsa_html_get_selection_bounds(GtkWidget    * widget,
 }
 
 GtkWidget *
-libbalsa_html_popup_menu_widget(widget)
+libbalsa_html_popup_menu_widget(GtkWidget *widget)
 {
     return NULL;
 }

@@ -1,3 +1,7 @@
+2010-01-12  Pawel Salek
+
+	* libbalsa/html.c: fix libbalsa_html_popup_menu_widget() arg list.
+
 2010-01-12  Peter Bloomfield
 
 	* libbalsa/html.h: new public method to retrieve the real HTML

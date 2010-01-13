@@ -64,6 +64,7 @@ gboolean libbalsa_html_search_text(GtkWidget * widget, const gchar * text,
                                    gboolean find_forward, gboolean wrap);
 void libbalsa_html_get_selection_bounds(GtkWidget * widget,
                                         GdkRectangle * selection_bounds);
+GtkWidget *libbalsa_html_popup_menu_widget(GtkWidget * widget);
 
 # endif				/* HAVE_GTKHTML */
 

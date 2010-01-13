@@ -1,3 +1,13 @@
+2010-01-12  Peter Bloomfield
+
+	* libbalsa/html.h: new public method to retrieve the real HTML
+	widget.
+	* libbalsa/html.c (libbalsa_html_popup_menu_widget): ditto.
+	* src/balsa-mime-widget-text.c (bmwt_populate_popup_menu),
+	(balsa_gtk_html_popup), (bmwt_populate_popup_cb),
+	(bm_widget_new_html): use it to implement popup menu for
+	WebKitWebView.
+
 2010-01-11  Peter Bloomfield
 
 	* libbalsa/address-book-gpe.c

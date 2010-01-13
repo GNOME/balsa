@@ -650,6 +650,15 @@ libbalsa_html_get_selection_bounds(GtkWidget    * widget,
     }
 }
 
+GtkWidget *
+libbalsa_html_popup_menu_widget(GtkWidget * widget)
+{
+    WebKitWebView *web_view;
+
+    return lbh_get_web_view(widget, &web_view) ?
+        GTK_WIDGET(web_view) : NULL;
+}
+
 # else                          /* defined(HAVE_WEBKIT) */
 
 /* Common code for both GtkHtml widgets. */
@@ -1107,6 +1116,12 @@ void
 libbalsa_html_get_selection_bounds(GtkWidget    * widget,
                                    GdkRectangle * selection_bounds)
 {
+}
+
+GtkWidget *
+libbalsa_html_popup_menu_widget(widget)
+{
+    return NULL;
 }
 
 # endif                         /* defined(HAVE_WEBKIT) */

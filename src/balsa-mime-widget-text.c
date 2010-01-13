@@ -1160,46 +1160,60 @@ bm_zoom_reset(BalsaMessage * bm)
     balsa_message_zoom(bm, 0);
 }
 
-static gboolean
-balsa_gtk_html_popup(GtkWidget * html, BalsaMessage * bm)
+static void
+bmwt_populate_popup_menu(BalsaMessage * bm,
+                         GtkWidget    * html,
+                         GtkMenu      * menu)
 {
-    GtkWidget *menu, *menuitem;
+    GtkWidget *menuitem;
     gpointer mime_body = g_object_get_data(G_OBJECT(html), "mime-body");
-
-    menu = gtk_menu_new();
 
     menuitem = gtk_image_menu_item_new_from_stock(GTK_STOCK_ZOOM_IN, NULL);
     g_signal_connect_swapped(G_OBJECT(menuitem), "activate",
                              G_CALLBACK(bm_zoom_in), bm);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
 
-    menuitem = gtk_image_menu_item_new_from_stock(GTK_STOCK_ZOOM_OUT, NULL);
+    menuitem =
+        gtk_image_menu_item_new_from_stock(GTK_STOCK_ZOOM_OUT, NULL);
     g_signal_connect_swapped(G_OBJECT(menuitem), "activate",
                              G_CALLBACK(bm_zoom_out), bm);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
 
-    menuitem = gtk_image_menu_item_new_from_stock(GTK_STOCK_ZOOM_100, NULL);
+    menuitem =
+        gtk_image_menu_item_new_from_stock(GTK_STOCK_ZOOM_100, NULL);
     g_signal_connect_swapped(G_OBJECT(menuitem), "activate",
                              G_CALLBACK(bm_zoom_reset), bm);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
 
-    menuitem = gtk_separator_menu_item_new ();
+    menuitem = gtk_separator_menu_item_new();
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
 
     libbalsa_vfs_fill_menu_by_content_type(GTK_MENU(menu), "text/html",
-					   G_CALLBACK (balsa_mime_widget_ctx_menu_cb),
-					   mime_body);
+                                           G_CALLBACK
+                                           (balsa_mime_widget_ctx_menu_cb),
+                                           mime_body);
 
-    menuitem = gtk_menu_item_new_with_label (_("Save..."));
-    g_signal_connect (G_OBJECT (menuitem), "activate",
-                      G_CALLBACK (balsa_mime_widget_ctx_menu_save), mime_body);
-    gtk_menu_shell_append (GTK_MENU_SHELL (menu), menuitem);
+    menuitem = gtk_menu_item_new_with_label(_("Save..."));
+    g_signal_connect(G_OBJECT(menuitem), "activate",
+                     G_CALLBACK(balsa_mime_widget_ctx_menu_save),
+                     mime_body);
+    gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
+}
+
+static gboolean
+balsa_gtk_html_popup(GtkWidget * html, BalsaMessage * bm)
+{
+    GtkWidget *menu;
+
+    menu = gtk_menu_new();
+    bmwt_populate_popup_menu(bm, html, GTK_MENU(menu));
 
     gtk_widget_show_all(menu);
     g_object_ref_sink(menu);
     gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL,
                    0, gtk_get_current_event_time());
     g_object_unref(menu);
+
     return TRUE;
 }
 
@@ -1211,10 +1225,25 @@ balsa_gtk_html_button_press_cb(GtkWidget * html, GdkEventButton * event,
             ? balsa_gtk_html_popup(html, bm) : FALSE);
 }
 
+static void
+bmwt_populate_popup_cb(GtkWidget * widget, GtkMenu * menu, gpointer data)
+{
+    BalsaMessage *bm =
+        g_object_get_data(G_OBJECT(widget), "balsa-message");
+    GtkWidget *html = data;
+
+    /* Remove WebKitWebView's items--they're irrelevant and confusing */
+    gtk_container_foreach(GTK_CONTAINER(menu),
+                          (GtkCallback) gtk_widget_destroy, menu);
+    bmwt_populate_popup_menu(bm, html, menu);
+    gtk_widget_show_all(GTK_WIDGET(menu));
+}
+
 BalsaMimeWidget *
 bm_widget_new_html(BalsaMessage * bm, LibBalsaMessageBody * mime_body)
 {
     BalsaMimeWidget *mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
+    GtkWidget *widget;
 
     mw->widget =
         libbalsa_html_new(mime_body,
@@ -1222,12 +1251,18 @@ bm_widget_new_html(BalsaMessage * bm, LibBalsaMessageBody * mime_body)
                           (LibBalsaHtmlCallback) handle_url);
     g_object_set_data(G_OBJECT(mw->widget), "mime-body", mime_body);
 
-    g_signal_connect(G_OBJECT(mw->widget), "button-press-event",
-                     G_CALLBACK(balsa_gtk_html_button_press_cb), bm);
     g_signal_connect(G_OBJECT(mw->widget), "key_press_event",
                      G_CALLBACK(balsa_mime_widget_key_press_event), bm);
-    g_signal_connect(G_OBJECT(mw->widget), "popup-menu",
-                     G_CALLBACK(balsa_gtk_html_popup), bm);
+    if ((widget = libbalsa_html_popup_menu_widget(mw->widget))) {
+        g_object_set_data(G_OBJECT(widget), "balsa-message", bm);
+        g_signal_connect(widget, "populate-popup",
+                         G_CALLBACK(bmwt_populate_popup_cb), mw->widget);
+    } else {
+        g_signal_connect(mw->widget, "button-press-event",
+                         G_CALLBACK(balsa_gtk_html_button_press_cb), bm);
+        g_signal_connect(mw->widget, "popup-menu",
+                         G_CALLBACK(balsa_gtk_html_popup), bm);
+    }
 
     return mw;
 }

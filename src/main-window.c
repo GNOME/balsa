@@ -47,7 +47,7 @@
 #endif
 
 #if defined(HAVE_LIBNM_GLIB)
-#include <libnm_glib.h>
+#include <nm-client.h>
 #endif
 
 #include "ab-window.h"
@@ -121,7 +121,9 @@ static void bw_check_messages_thread(struct check_messages_thread_info
 static void bw_display_new_mail_notification(int num_new, int has_new);
 
 #if defined(HAVE_LIBNM_GLIB)
-static void mw_change_connection_status(libnm_glib_ctx *ctx, gpointer data);
+static void bw_nm_client_state_changed_cb(GObject * gobject,
+                                          GParamSpec * pspec,
+                                          gpointer data);
 #endif
 
 static void balsa_window_class_init(BalsaWindowClass * klass);
@@ -998,17 +1000,12 @@ static void
 balsa_window_init(BalsaWindow * window)
 {
 #if defined(HAVE_LIBNM_GLIB)
-    libnm_glib_ctx *ctx;
-    guint id;
-
-    ctx = libnm_glib_init ();
-    if (!ctx) {
-        fprintf (stderr, "Could not initialize libnm.\n");
-        return;
-    }
-
-    id = libnm_glib_register_callback(ctx, mw_change_connection_status,
-                                      window, NULL);
+    NMClient *client = nm_client_new();
+    if (client)
+        g_signal_connect(client, "notify::state",
+                         G_CALLBACK(bw_nm_client_state_changed_cb), NULL);
+    else
+        fprintf (stderr, "Could not get NetworkManager client.\n");
 #endif /* LIBNM_GLIB */
 }
 
@@ -3477,29 +3474,29 @@ bw_change_connection_status_thread(void *arg)
 /** Responds to NetworkManager events and creates, alternatively
 forcefully destroys the IMAP connections. */
 static void
-mw_change_connection_status(libnm_glib_ctx *ctx, gpointer data)
+bw_nm_client_state_changed_cb(GObject * gobject, GParamSpec * pspec,
+                              gpointer data)
 {
+    NMClient *client = NM_CLIENT(gobject);
+    NMState state = nm_client_get_state(client);
     gboolean is_connected;
-    libnm_glib_state state = libnm_glib_get_network_state (ctx);
 
     switch (state) {
-    case LIBNM_NO_DBUS:
-        fprintf(stderr, "Status: No DBUS\n");
+    case NM_STATE_ASLEEP:
+        fprintf(stderr, "Status: Asleep\n");
         return;
-    case LIBNM_NO_NETWORKMANAGER:
-        fprintf(stderr, "Status: No NetworkManager\n");
-        return;
-    case LIBNM_NO_NETWORK_CONNECTION:
+    case NM_STATE_DISCONNECTED:
         fprintf (stderr, "Status: Inactive Connection\n");
         is_connected = FALSE;
         break;
-    case LIBNM_ACTIVE_NETWORK_CONNECTION:
+    case NM_STATE_CONNECTING:
+        fprintf(stderr, "Status: Connecting...\n");
+        return;
+    case NM_STATE_CONNECTED:
         fprintf (stderr, "Status: Active Connection\n");
         is_connected = TRUE;
         break;
-    case LIBNM_INVALID_CONTEXT:
-        fprintf (stderr, "Status: Error\n");
-        return;
+    case NM_STATE_UNKNOWN:
     default:
         fprintf (stderr, "Status: unknown\n");
         return;

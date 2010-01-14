@@ -733,8 +733,8 @@ fi
 # NetworkManager
 if test "$with_nm" != no ; then
   PKG_CHECK_EXISTS([libnm-glib], 
-  [ PKG_CHECK_MODULES(LIBNM_GLIB, [ libnm-glib ]) ],
-  [ PKG_CHECK_MODULES(LIBNM_GLIB, [ libnm_glib ]) ])
+  [ PKG_CHECK_MODULES(LIBNM_GLIB, [ libnm-glib >= 0.7.0]) ],
+  [ PKG_CHECK_MODULES(LIBNM_GLIB, [ libnm_glib >= 0.7.0]) ])
 
   AC_DEFINE(HAVE_LIBNM_GLIB,1,[ Defined if NetworkManager-glib-devel is found.])
   BALSA_CFLAGS="$BALSA_CFLAGS $LIBNM_GLIB_CFLAGS"
@@ -905,6 +905,7 @@ if test -d "${srcdir}/.git" ; then
 -DGNOME_DISABLE_DEPRECATED_SOURCE \
 -DGNOME_VFS_DISABLE_DEPRECATED \
 -DGTK_DISABLE_DEPRECATED \
+-DNM_DISABLE_DEPRECATED \
 -DPANGO_DISABLE_DEPRECATED \
 -D_FORTIFY_SOURCE=2 \
 "

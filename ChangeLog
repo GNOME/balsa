@@ -1,3 +1,9 @@
+2010-01-14  Peter Bloomfield
+
+	* configure.in: require NetworkManager version 0.7.
+	* src/main-window.c: use GObject-based API instead of deprecated
+	older API.
+
 2010-01-12  Pawel Salek
 
 	* libbalsa/html.c: fix libbalsa_html_popup_menu_widget() arg list.

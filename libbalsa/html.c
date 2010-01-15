@@ -585,7 +585,6 @@ lbh_js_object_get_property(JSContextRef  ctx,
  * Search for the text; if text is empty, return TRUE (for consistency
  * with GtkTextIter methods).
  */
-
 gboolean
 libbalsa_html_search_text(GtkWidget   * widget,
                           const gchar * text,
@@ -614,7 +613,6 @@ libbalsa_html_search_text(GtkWidget   * widget,
  * Get the rectangle containing the currently selected text, for
  * scrolling.
  */
-
 void
 libbalsa_html_get_selection_bounds(GtkWidget    * widget,
                                    GdkRectangle * selection_bounds)
@@ -631,7 +629,7 @@ libbalsa_html_get_selection_bounds(GtkWidget    * widget,
     ctx = lbh_js_get_global_context(web_view);
     value = lbh_js_run_script(ctx, script);
 
-    if (JSValueIsObject(ctx, value)) {
+    if (value && JSValueIsObject(ctx, value)) {
         JSObjectRef object = JSValueToObject(ctx, value, NULL);
         gint x, y;
 
@@ -650,6 +648,10 @@ libbalsa_html_get_selection_bounds(GtkWidget    * widget,
     }
 }
 
+/*
+ * Get the WebKitWebView widget from the container; we need to connect
+ * to its "populate-popup" signal.
+ */
 GtkWidget *
 libbalsa_html_popup_menu_widget(GtkWidget * widget)
 {
@@ -657,6 +659,31 @@ libbalsa_html_popup_menu_widget(GtkWidget * widget)
 
     return lbh_get_web_view(widget, &web_view) ?
         GTK_WIDGET(web_view) : NULL;
+}
+
+/*
+ * Does the widget support printing?
+ */
+gboolean
+libbalsa_html_can_print(GtkWidget * widget)
+{
+    WebKitWebView *web_view;
+
+    return lbh_get_web_view(widget, &web_view);
+}
+
+/*
+ * Print the widget's content.
+ */
+void
+libbalsa_html_print(GtkWidget * widget)
+{
+    WebKitWebView *web_view;
+
+    if (lbh_get_web_view(widget, &web_view)) {
+        WebKitWebFrame *frame = webkit_web_view_get_main_frame(web_view);
+        webkit_web_frame_print(frame);
+    }
 }
 
 # else                          /* defined(HAVE_WEBKIT) */
@@ -917,6 +944,28 @@ libbalsa_html_copy(GtkWidget * widget)
     gtk_html_copy(GTK_HTML(widget));
 }
 
+/*
+ * Does the widget support printing?
+ */
+gboolean
+libbalsa_html_can_print(GtkWidget * widget)
+{
+    return GTK_IS_HTML(widget);
+}
+
+/*
+ * Print the widget's content.
+ */
+void
+libbalsa_html_print(GtkWidget * widget)
+{
+    GtkPrintOperation *operation = gtk_print_operation_new();
+    gtk_html_print_operation_run(GTK_HTML(widget), operation,
+                                 GTK_PRINT_OPERATION_ACTION_PRINT_DIALOG,
+                                 NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+    g_object_unref(operation);
+}
+
 # else				/* HAVE_GTKHTML3 */
 
 /* Code for GtkHtml-2 */
@@ -1056,6 +1105,23 @@ libbalsa_html_copy(GtkWidget * widget)
 {
 }
 
+/*
+ * HtmlView doesn't support printing.
+ */
+gboolean
+libbalsa_html_can_print(GtkWidget * widget)
+{
+    return FALSE;
+}
+
+/*
+ * Do nothing.
+ */
+void
+libbalsa_html_print(GtkWidget * widget)
+{
+}
+
 # endif				/* HAVE_GTKHTML3 */
 
 /* Common code for both widgets. */
@@ -1118,6 +1184,9 @@ libbalsa_html_get_selection_bounds(GtkWidget    * widget,
 {
 }
 
+/*
+ * Neither widget implements its own popup widget.
+ */
 GtkWidget *
 libbalsa_html_popup_menu_widget(GtkWidget *widget)
 {

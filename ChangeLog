@@ -1,5 +1,13 @@
 2010-01-14  Peter Bloomfield
 
+	* libbalsa/html.h: new methods for printing.
+	* libbalsa/html.c (libbalsa_html_can_print),
+	(libbalsa_html_print): implement them.
+	* src/balsa-mime-widget-text.c (bmwt_populate_popup_menu),
+	(bmwt_populate_popup_cb): use them.
+
+2010-01-14  Peter Bloomfield
+
 	* configure.in: require NetworkManager version 0.7.
 	* src/main-window.c: use GObject-based API instead of deprecated
 	older API.

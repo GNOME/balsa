@@ -1198,6 +1198,16 @@ bmwt_populate_popup_menu(BalsaMessage * bm,
                      G_CALLBACK(balsa_mime_widget_ctx_menu_save),
                      mime_body);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
+
+    menuitem = gtk_separator_menu_item_new();
+    gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
+
+    menuitem =
+        gtk_image_menu_item_new_from_stock(GTK_STOCK_PRINT, NULL);
+    g_signal_connect_swapped(G_OBJECT(menuitem), "activate",
+                             G_CALLBACK(libbalsa_html_print), html);
+    gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
+    gtk_widget_set_sensitive(menuitem, libbalsa_html_can_print(html));
 }
 
 static gboolean
@@ -1234,7 +1244,7 @@ bmwt_populate_popup_cb(GtkWidget * widget, GtkMenu * menu, gpointer data)
 
     /* Remove WebKitWebView's items--they're irrelevant and confusing */
     gtk_container_foreach(GTK_CONTAINER(menu),
-                          (GtkCallback) gtk_widget_destroy, menu);
+                          (GtkCallback) gtk_widget_destroy, NULL);
     bmwt_populate_popup_menu(bm, html, menu);
     gtk_widget_show_all(GTK_WIDGET(menu));
 }

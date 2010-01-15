@@ -1,3 +1,16 @@
+2010-01-15  Pawel Salek
+
+	* libbalsa/imap/imap_compress.c:
+	* libbalsa/imap/siobuf.c: complete the compression error handling.
+
+2010-01-14  Peter Bloomfield
+
+	* libbalsa/html.h: new methods for printing.
+	* libbalsa/html.c (libbalsa_html_can_print),
+	(libbalsa_html_print): implement them.
+	* src/balsa-mime-widget-text.c (bmwt_populate_popup_menu),
+	(bmwt_populate_popup_cb): use them.
+
 2010-01-14  Peter Bloomfield
 
 	* libbalsa/html.h: new methods for printing.

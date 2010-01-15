@@ -471,7 +471,7 @@ sio_flush (struct siobuf *sio)
          the next call in the same thread.  The secarg argument may be
          used to maintain this buffer. */
       while ((*sio->encode_cb) (&buf, &len, sio->write_buffer, 
-                                length, sio->secarg)) {
+                                length, sio->secarg) >0) {
         raw_write (sio, buf, len);
       }
     }
@@ -575,11 +575,14 @@ sio_fill (struct siobuf *sio)
        buffer. If that call returns 0, actual data read is performed
        and decode is given the second shot, when it isupposed to
        return nonzero.
+       length value 0 means error.
     */
-    while (!(*sio->decode_cb) (&sio->read_position, &sio->read_unread,
+    while ((*sio->decode_cb) (&sio->read_position, &sio->read_unread,
                                sio->read_buffer, sio->read_unread,
-                               sio->secarg)) {
+                               sio->secarg) == 0) {
       sio->read_unread = raw_read (sio, sio->read_buffer, sio->buffer_size);
+      if (sio->read_unread < 0)
+        break;
     }
     if (sio->read_unread <= 0)
       return 0;

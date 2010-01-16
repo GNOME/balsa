@@ -325,7 +325,7 @@ libbalsa_message_body_save_temporary(LibBalsaMessageBody * body, GError **err)
                     g_build_filename(tempdir, filename, NULL);
                 fd = open(body->temp_filename,
                           O_WRONLY | O_EXCL | O_CREAT,
-                          LIBBALSA_MESSAGE_BODY_SAFE);
+                          S_IRUSR);
             }
         }
 
@@ -356,7 +356,7 @@ libbalsa_message_body_save_temporary(LibBalsaMessageBody * body, GError **err)
 	    return TRUE;
 	else
 	    return libbalsa_message_body_save(body, body->temp_filename,
-                                              LIBBALSA_MESSAGE_BODY_SAFE,
+                                              S_IRUSR,
                                               FALSE, err);
     }
 }

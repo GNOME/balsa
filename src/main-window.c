@@ -1001,10 +1001,11 @@ balsa_window_init(BalsaWindow * window)
 {
 #if defined(HAVE_LIBNM_GLIB)
     NMClient *client = nm_client_new();
-    if (client)
+    if (client) {
+        balsa_app.nm_state = nm_client_get_state(client);
         g_signal_connect(client, "notify::state",
                          G_CALLBACK(bw_nm_client_state_changed_cb), NULL);
-    else
+    } else
         fprintf (stderr, "Could not get NetworkManager client.\n");
 #endif /* LIBNM_GLIB */
 }
@@ -3479,43 +3480,52 @@ bw_nm_client_state_changed_cb(GObject * gobject, GParamSpec * pspec,
 {
     NMClient *client = NM_CLIENT(gobject);
     NMState state = nm_client_get_state(client);
-    gboolean is_connected;
+
+    if (state == balsa_app.nm_state) {
+        /* Notify signal does not guarantee that anything really
+         * changed. */
+        return;
+    }
 
     switch (state) {
     case NM_STATE_ASLEEP:
-        fprintf(stderr, "Status: Asleep\n");
-        return;
+        fprintf(stderr, "Status: Asleep (%u)\n", (guint) time(NULL));
+        break;
     case NM_STATE_DISCONNECTED:
-        fprintf (stderr, "Status: Inactive Connection\n");
-        is_connected = FALSE;
+        fprintf(stderr, "Status: Disconnected (%u)\n", (guint) time(NULL));
         break;
     case NM_STATE_CONNECTING:
-        fprintf(stderr, "Status: Connecting...\n");
+        fprintf(stderr, "Status: Connecting... (%u)\n", (guint) time(NULL));
         return;
     case NM_STATE_CONNECTED:
-        fprintf (stderr, "Status: Active Connection\n");
-        is_connected = TRUE;
+        fprintf(stderr, "Status: Connected (%u)\n", (guint) time(NULL));
         break;
     case NM_STATE_UNKNOWN:
     default:
-        fprintf (stderr, "Status: unknown\n");
+        fprintf(stderr, "Status: unknown (%u)\n", (guint) time(NULL));
         return;
     }
 
+    if (state == NM_STATE_CONNECTED
+        || balsa_app.nm_state == NM_STATE_CONNECTED) {
+        gboolean is_connected = (state == NM_STATE_CONNECTED);
 #if BALSA_USE_THREADS
-    {
         pthread_t thread_id;
-        if (pthread_create(&thread_id,
-                   NULL, (void *) &bw_change_connection_status_thread,
+
+        if (pthread_create(&thread_id, NULL,
+                           (void *) &bw_change_connection_status_thread,
                            GINT_TO_POINTER(is_connected)) == 0)
             pthread_detach(thread_id);
-    }
 #else /* BALSA_USE_THREADS */
-    gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
-			   (GtkTreeModelForeachFunc)
-                           mw_mbox_change_connection_status,
-			   GINT_TO_POINTER(is_connected));
+
+        gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
+                               (GtkTreeModelForeachFunc)
+                               mw_mbox_change_connection_status,
+                               GINT_TO_POINTER(is_connected));
 #endif /* BALSA_USE_THREADS */
+    }
+
+    balsa_app.nm_state = state;
 }
 #endif /* LIBNM_GLIB */
 

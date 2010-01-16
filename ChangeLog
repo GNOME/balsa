@@ -1,5 +1,12 @@
 2010-01-16  Peter Bloomfield
 
+	* src/balsa-app.h: new member NMState nm_state.
+	* src/main-window.c: use it to save NetworkManager state;
+	connect or disconnect IMAP on changes to/from
+	NM_STATE_CONNECTED.
+
+2010-01-16  Peter Bloomfield
+
 	* libbalsa/body.c (libbalsa_message_body_save_temporary): make
 	temporary file read-only.
 

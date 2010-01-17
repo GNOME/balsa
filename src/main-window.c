@@ -1615,11 +1615,8 @@ bw_is_active_notify(GObject * gobject, GParamSpec * pspec,
         BalsaWindow *window = BALSA_WINDOW(gobject);
 
 #ifdef HAVE_NOTIFY
-        if (window->new_mail_note) {
-            /* Setting 0 would mean never timeout! */
-            notify_notification_set_timeout(window->new_mail_note, 1);
-            notify_notification_show(window->new_mail_note, NULL);
-        }
+        if (window->new_mail_note)
+            notify_notification_close(window->new_mail_note, NULL);
 #endif                          /* HAVE_NOTIFY */
         if (window->new_mail_tray)
             gtk_status_icon_set_visible(window->new_mail_tray, FALSE);

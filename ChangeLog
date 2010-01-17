@@ -1,3 +1,8 @@
+2010-01-17  Peter Bloomfield
+
+	* src/main-window.c: close the new-mail notification instead of
+	showing it with a 1 millisecond time-out.
+
 2010-01-16  Peter Bloomfield
 
 	* src/balsa-app.h: new member NMState nm_state.

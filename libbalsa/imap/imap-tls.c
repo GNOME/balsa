@@ -302,10 +302,16 @@ imap_check_server_identity(SSL *ssl, const char *host,
   }
   if(!ok) { /* matching by subjectAltName failed, try commonName */
     char data[256];
+    size_t name_len;
     if( (subj = X509_get_subject_name(cert)) &&
-        X509_NAME_get_text_by_NID(subj, NID_commonName, data, sizeof(data))>0){
+        (name_len = 
+         X509_NAME_get_text_by_NID(subj, NID_commonName, data, sizeof(data)))){
       data[sizeof(data)-1] = 0;
-      if(host_matches_domain(host, data, host_len))
+
+      /* Remember to check whether there was no truncation or NUL
+         characters embedded in the text. */
+      if(name_len == strlen(data) &&
+         host_matches_domain(host, data, host_len))
         ok =1;
     }
   }

@@ -247,9 +247,11 @@ static void bw_set_sort_menu(BalsaWindow *window,
 #endif /* ENABLE_TOUCH_UI */
 static void bw_hide_changed_cb         (GtkToggleAction * action, gpointer data);
 static void bw_wrap_message_cb         (GtkToggleAction * action, gpointer data);
+#if !defined(ENABLE_TOUCH_UI)
 static void bw_show_toolbar_cb         (GtkToggleAction * action, gpointer data);
 static void bw_show_statusbar_cb       (GtkToggleAction * action, gpointer data);
 static void bw_show_sos_bar_cb         (GtkToggleAction * action, gpointer data);
+#endif /* ENABLE_TOUCH_UI */
 static void bw_show_all_headers_tool_cb(GtkToggleAction * action, gpointer data);
 static void bw_show_preview_pane_cb    (GtkToggleAction * action, gpointer data);
 static void bw_reset_show_all_headers(BalsaWindow * window);
@@ -3995,6 +3997,7 @@ bw_wrap_message_cb(GtkToggleAction * action, gpointer data)
     refresh_preferences_manager();
 }
 
+#if !defined(ENABLE_TOUCH_UI) 
 static void
 bw_show_helper(GtkToggleAction * action, gboolean * active,
                GtkWidget * widget)
@@ -4025,6 +4028,7 @@ bw_show_sos_bar_cb(GtkToggleAction * action, gpointer data)
     bw_show_helper(action, &balsa_app.show_sos_bar,
                    BALSA_WINDOW(data)->sos_bar);
 }
+#endif
 
 /*
  * Callback for the "activate" signal of the View menu's header options.

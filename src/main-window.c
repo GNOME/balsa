@@ -144,7 +144,7 @@ static void bw_idle_remove(BalsaWindow * window);
 static gboolean bw_idle_cb(BalsaWindow * window);
 
 
-static void bw_check_mailbox_list(GList * list);
+static void bw_check_mailbox_list(BalsaWindow * window, GList * list);
 static gboolean bw_mailbox_check_func(GtkTreeModel * model,
                                       GtkTreePath * path,
                                       GtkTreeIter * iter,
@@ -1005,11 +1005,12 @@ balsa_window_init(BalsaWindow * window)
 #if defined(HAVE_LIBNM_GLIB)
     NMClient *client = nm_client_new();
     if (client) {
-        balsa_app.nm_state = nm_client_get_state(client);
-        bw_nm_client_state_report(balsa_app.nm_state);
+        window->nm_state = nm_client_get_state(client);
+        bw_nm_client_state_report(window->nm_state);
         g_signal_connect(client, "notify::state",
-                         G_CALLBACK(bw_nm_client_state_changed_cb), NULL);
-        balsa_app.check_mail_skipped = FALSE;
+                         G_CALLBACK(bw_nm_client_state_changed_cb),
+                         window);
+        window->check_mail_skipped = FALSE;
     } else
         fprintf (stderr, "Could not get NetworkManager client.\n");
 #endif /* LIBNM_GLIB */
@@ -2720,11 +2721,11 @@ bw_show_about_box(GtkAction * action, gpointer user_data)
  *
  */
 static void
-bw_check_mailbox_list(GList * mailbox_list)
+bw_check_mailbox_list(BalsaWindow * window, GList * mailbox_list)
 {
 #if defined(HAVE_LIBNM_GLIB)
-    if (balsa_app.nm_state != NM_STATE_CONNECTED) {
-        balsa_app.check_mail_skipped = TRUE;
+    if (window && window->nm_state != NM_STATE_CONNECTED) {
+        window->check_mail_skipped = TRUE;
         return;
     }
 #endif /* LIBNM_GLIB */
@@ -2891,7 +2892,7 @@ check_new_messages_real(BalsaWindow * window, int type)
     pthread_detach(get_mail_thread);
 #else
 
-    bw_check_mailbox_list(balsa_app.inbox_input);
+    bw_check_mailbox_list(window, balsa_app.inbox_input);
 
     gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
 			   (GtkTreeModelForeachFunc) bw_mailbox_check_func,
@@ -3048,7 +3049,7 @@ bw_check_messages_thread(struct check_messages_thread_info *info)
     pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
 
     MSGMAILTHREAD(threadmessage, LIBBALSA_NTFY_SOURCE, NULL, "POP3", 0, 0);
-    bw_check_mailbox_list(balsa_app.inbox_input);
+    bw_check_mailbox_list(info->window, balsa_app.inbox_input);
 
     g_slist_foreach(list, (GFunc) bw_mailbox_check, NULL);
     g_slist_foreach(list, (GFunc) g_object_unref, NULL);
@@ -3526,8 +3527,9 @@ bw_nm_client_state_changed_cb(GObject * gobject, GParamSpec * pspec,
                               gpointer data)
 {
     NMClient *client = NM_CLIENT(gobject);
+    BalsaWindow *window = BALSA_WINDOW(data);
     NMState new_state = nm_client_get_state(client);
-    NMState old_state = balsa_app.nm_state;
+    NMState old_state = window->nm_state;
     gboolean is_connected;
 
     if (new_state == old_state) {
@@ -3537,7 +3539,7 @@ bw_nm_client_state_changed_cb(GObject * gobject, GParamSpec * pspec,
     }
 
     bw_nm_client_state_report(new_state);
-    balsa_app.nm_state = new_state;
+    window->nm_state = new_state;
 
     is_connected = (new_state == NM_STATE_CONNECTED);
     if (is_connected || old_state == NM_STATE_CONNECTED) {
@@ -3555,10 +3557,10 @@ bw_nm_client_state_changed_cb(GObject * gobject, GParamSpec * pspec,
                                mw_mbox_change_connection_status,
                                GINT_TO_POINTER(is_connected));
 #endif /* BALSA_USE_THREADS */
-        if (is_connected && balsa_app.check_mail_skipped) {
+        if (is_connected && window->check_mail_skipped) {
             /* Check the mail now, and reset the timer */
             check_new_messages_cb(NULL, balsa_app.main_window);
-            balsa_app.check_mail_skipped = FALSE;
+            window->check_mail_skipped = FALSE;
         }
     }
 }

@@ -30,6 +30,10 @@
 #include <libnotify/notify.h>
 #endif
 
+#if defined(HAVE_LIBNM_GLIB)
+#include <nm-client.h>
+#endif
+
 #include "mailbox-node.h"
 #include "toolbar-factory.h"
 
@@ -91,6 +95,12 @@ struct _BalsaWindow {
 #ifdef HAVE_NOTIFY
     NotifyNotification *new_mail_note;
 #endif                         /* HAVE_NOTIFY */
+
+#if defined(HAVE_LIBNM_GLIB)
+    /* NetworkManager state */
+    NMState nm_state;
+    gboolean check_mail_skipped;
+#endif                          /* defined(HAVE_LIBNM_GLIB) */
 };
 
 struct _BalsaWindowClass {

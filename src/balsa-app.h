@@ -41,10 +41,6 @@
 #include <auth-client.h>		/* part of libESMTP */
 #endif
 
-#if defined(HAVE_LIBNM_GLIB)
-#include <nm-client.h>
-#endif
-
 /* Work around nonprivileged installs so we can find icons */
 #ifdef BALSA_LOCAL_INSTALL
 #define gnome_pixmap_file( s ) g_strconcat( BALSA_RESOURCE_PREFIX, "/pixmaps/", s, NULL ) 
@@ -424,12 +420,6 @@ extern struct BalsaApplication {
 
     /* use as default email client for GNOME */
     int default_client;
-
-#if defined(HAVE_LIBNM_GLIB)
-    /* NetworkManager state */
-    NMState nm_state;
-    gboolean check_mail_skipped;
-#endif                          /* defined(HAVE_LIBNM_GLIB) */
 } balsa_app;
 
 #define BALSA_IS_MAILBOX_SPECIAL(a) ((a)==balsa_app.inbox || (a)==balsa_app.trash || (a)==balsa_app.outbox||(a)==balsa_app.draftbox || (a)==balsa_app.sentbox)

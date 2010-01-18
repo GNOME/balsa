@@ -428,6 +428,7 @@ extern struct BalsaApplication {
 #if defined(HAVE_LIBNM_GLIB)
     /* NetworkManager state */
     NMState nm_state;
+    gboolean check_mail_skipped;
 #endif                          /* defined(HAVE_LIBNM_GLIB) */
 } balsa_app;
 

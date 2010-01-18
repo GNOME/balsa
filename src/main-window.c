@@ -1009,6 +1009,7 @@ balsa_window_init(BalsaWindow * window)
         bw_nm_client_state_report(balsa_app.nm_state);
         g_signal_connect(client, "notify::state",
                          G_CALLBACK(bw_nm_client_state_changed_cb), NULL);
+        balsa_app.check_mail_skipped = FALSE;
     } else
         fprintf (stderr, "Could not get NetworkManager client.\n");
 #endif /* LIBNM_GLIB */
@@ -2722,8 +2723,10 @@ static void
 bw_check_mailbox_list(GList * mailbox_list)
 {
 #if defined(HAVE_LIBNM_GLIB)
-    if (balsa_app.nm_state != NM_STATE_CONNECTED)
+    if (balsa_app.nm_state != NM_STATE_CONNECTED) {
+        balsa_app.check_mail_skipped = TRUE;
         return;
+    }
 #endif /* LIBNM_GLIB */
 
     for ( ; mailbox_list; mailbox_list = mailbox_list->next) {
@@ -2905,7 +2908,7 @@ check_new_messages_real(BalsaWindow * window, int type)
 static void
 bw_send_receive_messages_cb(GtkAction * action, gpointer data)
 {
-    check_new_messages_real(data, TYPE_CALLBACK);
+    check_new_messages_cb(action, data);
     libbalsa_process_queue(balsa_app.outbox, balsa_find_sentbox_by_url,
 #if ENABLE_ESMTP
                            balsa_app.smtp_servers,
@@ -3523,19 +3526,21 @@ bw_nm_client_state_changed_cb(GObject * gobject, GParamSpec * pspec,
                               gpointer data)
 {
     NMClient *client = NM_CLIENT(gobject);
-    NMState state = nm_client_get_state(client);
+    NMState new_state = nm_client_get_state(client);
+    NMState old_state = balsa_app.nm_state;
+    gboolean is_connected;
 
-    if (state == balsa_app.nm_state) {
+    if (new_state == old_state) {
         /* Notify signal does not guarantee that anything really
          * changed. */
         return;
     }
 
-    bw_nm_client_state_report(state);
+    bw_nm_client_state_report(new_state);
+    balsa_app.nm_state = new_state;
 
-    if (state == NM_STATE_CONNECTED
-        || balsa_app.nm_state == NM_STATE_CONNECTED) {
-        gboolean is_connected = (state == NM_STATE_CONNECTED);
+    is_connected = (new_state == NM_STATE_CONNECTED);
+    if (is_connected || old_state == NM_STATE_CONNECTED) {
 #if BALSA_USE_THREADS
         pthread_t thread_id;
 
@@ -3550,9 +3555,12 @@ bw_nm_client_state_changed_cb(GObject * gobject, GParamSpec * pspec,
                                mw_mbox_change_connection_status,
                                GINT_TO_POINTER(is_connected));
 #endif /* BALSA_USE_THREADS */
+        if (is_connected && balsa_app.check_mail_skipped) {
+            /* Check the mail now, and reset the timer */
+            check_new_messages_cb(NULL, balsa_app.main_window);
+            balsa_app.check_mail_skipped = FALSE;
+        }
     }
-
-    balsa_app.nm_state = state;
 }
 #endif /* LIBNM_GLIB */
 

@@ -1,5 +1,11 @@
 2010-01-17  Peter Bloomfield
 
+	* src/balsa-app.h: new member mail_check_skipped.
+	* src/main-window.c: use it to remember when we skipped a mail
+	check while disconnected, and to check mail on reconnection.
+
+2010-01-17  Peter Bloomfield
+
 	* src/main-window.c: restart timer after user checks mail
 	manually.
 

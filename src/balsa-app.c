@@ -487,21 +487,13 @@ check_new_messages_auto_cb(gpointer data)
 void
 update_timer(gboolean update, guint minutes)
 {
-    guint32 timeout;
-    timeout = minutes * 60 * 1000;
+    if (balsa_app.check_mail_timer_id)
+        g_source_remove(balsa_app.check_mail_timer_id);
 
-    if (update) {
-	if (balsa_app.check_mail_timer_id)
-	    g_source_remove(balsa_app.check_mail_timer_id);
-
-        balsa_app.check_mail_timer_id =
-            g_timeout_add(timeout,
-                          (GSourceFunc) check_new_messages_auto_cb, NULL);
-    } else {
-	if (balsa_app.check_mail_timer_id)
-	    g_source_remove(balsa_app.check_mail_timer_id);
-	balsa_app.check_mail_timer_id = 0;
-    }
+    balsa_app.check_mail_timer_id = update ?
+        g_timeout_add_seconds(minutes * 60,
+                              (GSourceFunc) check_new_messages_auto_cb,
+                              NULL) : 0;
 }
 
 

@@ -121,6 +121,7 @@ static void bw_check_messages_thread(struct check_messages_thread_info
 static void bw_display_new_mail_notification(int num_new, int has_new);
 
 #if defined(HAVE_LIBNM_GLIB)
+static void bw_nm_client_state_report(NMState state);
 static void bw_nm_client_state_changed_cb(GObject * gobject,
                                           GParamSpec * pspec,
                                           gpointer data);
@@ -1005,6 +1006,7 @@ balsa_window_init(BalsaWindow * window)
     NMClient *client = nm_client_new();
     if (client) {
         balsa_app.nm_state = nm_client_get_state(client);
+        bw_nm_client_state_report(balsa_app.nm_state);
         g_signal_connect(client, "notify::state",
                          G_CALLBACK(bw_nm_client_state_changed_cb), NULL);
     } else
@@ -2719,6 +2721,11 @@ bw_show_about_box(GtkAction * action, gpointer user_data)
 static void
 bw_check_mailbox_list(GList * mailbox_list)
 {
+#if defined(HAVE_LIBNM_GLIB)
+    if (balsa_app.nm_state != NM_STATE_CONNECTED)
+        return;
+#endif /* LIBNM_GLIB */
+
     for ( ; mailbox_list; mailbox_list = mailbox_list->next) {
         LibBalsaMailbox *mailbox =
             BALSA_MAILBOX_NODE(mailbox_list->data)->mailbox;
@@ -3443,14 +3450,20 @@ mw_mbox_change_connection_status(GtkTreeModel * model, GtkTreePath * path,
     gtk_tree_model_get(model, iter, 0, &mbnode, -1);
     g_return_val_if_fail(mbnode, FALSE);
 
-    if ((mailbox = mbnode->mailbox)) {	/* mailbox, not a folder */
-	if (LIBBALSA_IS_MAILBOX_IMAP(mailbox)) {
-            if (is_connected) {
-                libbalsa_mailbox_imap_reconnect
-                    (LIBBALSA_MAILBOX_IMAP(mailbox));
-            } else {
-                libbalsa_mailbox_imap_force_disconnect
-                    (LIBBALSA_MAILBOX_IMAP(mailbox));
+    if ((mailbox = mbnode->mailbox)) {  /* mailbox, not a folder */
+        if (LIBBALSA_IS_MAILBOX_IMAP(mailbox)) {
+            const gchar *host =
+                LIBBALSA_MAILBOX_REMOTE(mailbox)->server->host;
+            if (!(g_str_has_prefix(host, "localhost/")
+                  || g_str_has_prefix(host, "127.")
+                  || g_str_has_prefix(host, "::1"))) {
+                if (is_connected) {
+                    libbalsa_mailbox_imap_reconnect
+                        (LIBBALSA_MAILBOX_IMAP(mailbox));
+                } else {
+                    libbalsa_mailbox_imap_force_disconnect
+                        (LIBBALSA_MAILBOX_IMAP(mailbox));
+                }
             }
         }
     }
@@ -3471,6 +3484,33 @@ bw_change_connection_status_thread(void *arg)
 }
 #endif /* BALSA_USE_THREADS */
 
+static void
+bw_nm_client_state_report(NMState state)
+{
+    const gchar *state_string;
+
+    switch (state) {
+    default:
+    case NM_STATE_UNKNOWN:
+        state_string = "Unknown";
+        break;
+    case NM_STATE_ASLEEP:
+        state_string = "Asleep";
+        break;
+    case NM_STATE_CONNECTING:
+        state_string = "Connecting...";
+        break;
+    case NM_STATE_CONNECTED:
+        state_string = "Connected";
+        break;
+    case NM_STATE_DISCONNECTED:
+        state_string = "Disconnected";
+        break;
+    }
+
+    fprintf(stderr, "Status: %s (%u)\n", state_string, (guint) time(NULL));
+}
+
 /** Responds to NetworkManager events and creates, alternatively
 forcefully destroys the IMAP connections. */
 static void
@@ -3486,24 +3526,7 @@ bw_nm_client_state_changed_cb(GObject * gobject, GParamSpec * pspec,
         return;
     }
 
-    switch (state) {
-    case NM_STATE_ASLEEP:
-        fprintf(stderr, "Status: Asleep (%u)\n", (guint) time(NULL));
-        break;
-    case NM_STATE_DISCONNECTED:
-        fprintf(stderr, "Status: Disconnected (%u)\n", (guint) time(NULL));
-        break;
-    case NM_STATE_CONNECTING:
-        fprintf(stderr, "Status: Connecting... (%u)\n", (guint) time(NULL));
-        return;
-    case NM_STATE_CONNECTED:
-        fprintf(stderr, "Status: Connected (%u)\n", (guint) time(NULL));
-        break;
-    case NM_STATE_UNKNOWN:
-    default:
-        fprintf(stderr, "Status: unknown (%u)\n", (guint) time(NULL));
-        return;
-    }
+    bw_nm_client_state_report(state);
 
     if (state == NM_STATE_CONNECTED
         || balsa_app.nm_state == NM_STATE_CONNECTED) {

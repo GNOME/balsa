@@ -1,3 +1,9 @@
+2010-01-17  Peter Bloomfield
+
+	* src/main-window.c: report NetworkManager state on start-up;
+	skip POP3 checks when disconnected; do not disconnect local IMAP
+	server when NetworkManager is disconnected.
+
 2010-01-17  Pawel Salek
 
 	* libbalsa/imap/imap-tls.c: check also the length when matching

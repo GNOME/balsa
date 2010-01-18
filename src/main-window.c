@@ -2917,6 +2917,11 @@ void
 check_new_messages_cb(GtkAction * action, gpointer data)
 {
     check_new_messages_real(data, TYPE_CALLBACK);
+
+    if (balsa_app.check_mail_auto) {
+        /* restart the timer */
+        update_timer(TRUE, balsa_app.check_mail_timer);
+    }
 }
 
 /** Saves the number of messages as the most recent one the user is

@@ -1,5 +1,10 @@
 2010-01-17  Peter Bloomfield
 
+	* src/main-window.c: restart timer after user checks mail
+	manually.
+
+2010-01-17  Peter Bloomfield
+
 	* src/balsa-app.c (update_timer): use g_timeout_add_seconds,
 	save the world.
 

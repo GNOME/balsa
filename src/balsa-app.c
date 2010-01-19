@@ -732,8 +732,9 @@ balsa_find_url(const gchar * url)
 
     bf.data = url;
     bf.mbnode = NULL;
-    gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
-			   (GtkTreeModelForeachFunc) find_url, &bf);
+    if (balsa_app.mblist_tree_store)
+        gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
+                               (GtkTreeModelForeachFunc) find_url, &bf);
     if (is_sub_thread)
 	gdk_threads_leave();
 

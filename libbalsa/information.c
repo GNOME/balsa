@@ -126,6 +126,7 @@ libbalsa_information_varg(GtkWindow *parent, LibBalsaInformationType type,
         g_string_free(escaped, TRUE);
 
         notify_notification_set_timeout(note, 7000);    /* 7 seconds */
+        notify_notification_show(note, NULL);
         if (parent) {
             /* Close with parent if earlier. */
             g_object_weak_ref(G_OBJECT(parent),
@@ -135,7 +136,6 @@ libbalsa_information_varg(GtkWindow *parent, LibBalsaInformationType type,
                              parent);
         } else
             g_object_unref(note);
-        notify_notification_show(note, NULL);
         return;
     }
     /* Fall through to the ordinary notification scheme */

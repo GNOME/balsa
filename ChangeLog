@@ -1,5 +1,10 @@
 2010-01-19  Peter Bloomfield
 
+	* libbalsa/information.c (libbalsa_information_varg): show note
+	before unreffing it(!).
+
+2010-01-19  Peter Bloomfield
+
 	* src/main-window.c (bw_quit_nicely): use
 	libbalsa_information_parented, so that notification bubble can
 	be closed when Balsa quits;

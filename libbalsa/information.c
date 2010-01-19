@@ -41,6 +41,29 @@ static gboolean libbalsa_information_idle_handler(struct information_data*);
 
 LibBalsaInformationFunc libbalsa_real_information_func;
 
+static void lbi_notification_closed_cb(NotifyNotification * note,
+                                       gpointer data);
+
+#ifdef HAVE_NOTIFY
+static void
+lbi_notification_parent_weak_notify(gpointer data, GObject * parent)
+{
+    NotifyNotification *note = NOTIFY_NOTIFICATION(data);
+    g_signal_handlers_disconnect_by_func(note, lbi_notification_closed_cb,
+                                         parent);
+    notify_notification_close(note, NULL);
+    g_object_unref(note);
+}
+
+static void
+lbi_notification_closed_cb(NotifyNotification * note, gpointer data)
+{
+    GObject *parent = G_OBJECT(data);
+    g_object_weak_unref(parent, lbi_notification_parent_weak_notify, note);
+    g_object_unref(note);
+}
+#endif
+
 /*
  * We are adding an idle handler - we do not need to hold the gdk lock
  * for this.
@@ -103,8 +126,16 @@ libbalsa_information_varg(GtkWindow *parent, LibBalsaInformationType type,
         g_string_free(escaped, TRUE);
 
         notify_notification_set_timeout(note, 7000);    /* 7 seconds */
+        if (parent) {
+            /* Close with parent if earlier. */
+            g_object_weak_ref(G_OBJECT(parent),
+                              lbi_notification_parent_weak_notify, note);
+            g_signal_connect(note, "closed",
+                             G_CALLBACK(lbi_notification_closed_cb),
+                             parent);
+        } else
+            g_object_unref(note);
         notify_notification_show(note, NULL);
-        g_object_unref(note);
         return;
     }
     /* Fall through to the ordinary notification scheme */

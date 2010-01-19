@@ -1,5 +1,11 @@
 2010-01-18  Peter Bloomfield
 
+	* libbalsa/information.c (lbi_notification_parent_weak_notify),
+	(lbi_notification_closed_cb), (libbalsa_information_varg): close
+	notification bubble with parent.
+
+2010-01-18  Peter Bloomfield
+
 	* src/balsa-app.h: move nm_state and check_mail_skipped from
 	BalsaApplication to BalsaWindow.
 	* src/main-window.c: ditto.

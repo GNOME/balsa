@@ -1,3 +1,13 @@
+2010-01-19  Peter Bloomfield
+
+	* src/main-window.c (bw_quit_nicely): use
+	libbalsa_information_parented, so that notification bubble can
+	be closed when Balsa quits;
+	(bw_real_open_mbnode): hold gdk lock while unreffing mbnode;
+	(balsa_window_real_close_mbnode): more careful test for last
+	notebook page;
+	(empty_trash): check for NULL window.
+
 2010-01-18  Peter Bloomfield  <peter@t43.bellsouth.net>
 
 	reviewed by: <delete if not using a buddy>

@@ -318,7 +318,8 @@ bw_quit_nicely(GtkAction * action, gpointer data)
 {
     GdkEventAny e = { GDK_DELETE, NULL, 0 };
     e.window = gtk_widget_get_window(GTK_WIDGET(data));
-    libbalsa_information(LIBBALSA_INFORMATION_MESSAGE,
+    libbalsa_information_parented(GTK_WINDOW(data),
+                                  LIBBALSA_INFORMATION_MESSAGE,
                          _("Balsa closes files and connections. Please wait..."));
     while(gtk_events_pending())
         gtk_main_iteration_do(FALSE);
@@ -2394,12 +2395,14 @@ bw_real_open_mbnode(struct bw_open_mbnode_info * info)
                                    libbalsa_mailbox_get_threading_type
                                    (mailbox));
     balsa_index_scroll_on_open(index);
+
+    g_object_unref(info->mbnode);
+    g_free(info);
+
     gdk_threads_leave();    
 #ifdef BALSA_USE_THREADS
     pthread_mutex_unlock(&open_lock);
 #endif
-    g_object_unref(info->mbnode);
-    g_free(info);
 }
 
 static void
@@ -2458,18 +2461,14 @@ balsa_window_real_close_mbnode(BalsaWindow * window,
     i = balsa_find_notebook_page_num(mbnode->mailbox);
 
     if (i != -1) {
-        GtkWidget *page =
-            gtk_notebook_get_nth_page(GTK_NOTEBOOK(balsa_app.notebook), i);
-
         gtk_notebook_remove_page(GTK_NOTEBOOK(window->notebook), i);
         bw_unregister_open_mailbox(mbnode->mailbox);
 
         /* If this is the last notebook page clear the message preview
            and the status bar */
-        page =
-            gtk_notebook_get_nth_page(GTK_NOTEBOOK(balsa_app.notebook), 0);
-
-        if (page == NULL) {
+        if (balsa_app.notebook
+            && gtk_notebook_get_nth_page(GTK_NOTEBOOK(balsa_app.notebook),
+                                         0) == NULL) {
             GtkStatusbar *statusbar;
             guint context_id;
 
@@ -4760,11 +4759,14 @@ empty_trash(BalsaWindow * window)
 
     g_object_ref(balsa_app.trash);
     if(!libbalsa_mailbox_open(balsa_app.trash, &err)) {
-	balsa_information_parented(GTK_WINDOW(window),
-				   LIBBALSA_INFORMATION_WARNING,
-				   _("Could not open trash: %s"),
-				   err ? err->message : _("Unknown error"));
-	g_clear_error(&err);
+        if (window)
+            balsa_information_parented(GTK_WINDOW(window),
+                                       LIBBALSA_INFORMATION_WARNING,
+                                       _("Could not open trash: %s"),
+                                       err ?
+                                       err->message : _("Unknown error"));
+
+	g_error_free(err);
         g_object_unref(balsa_app.trash);
 	return;
     }
@@ -4781,7 +4783,8 @@ empty_trash(BalsaWindow * window)
     /* We want to expunge deleted messages: */
     libbalsa_mailbox_close(balsa_app.trash, TRUE);
     g_object_unref(balsa_app.trash);
-    enable_empty_trash(window, TRASH_EMPTY);
+    if (window)
+        enable_empty_trash(window, TRASH_EMPTY);
 }
 
 #if !defined(ENABLE_TOUCH_UI)

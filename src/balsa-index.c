@@ -202,6 +202,14 @@ bndx_class_init(BalsaIndexClass * klass)
 
 /* Object class destroy method. */
 static void
+bndx_mbnode_weak_notify(gpointer data, GObject *where_the_object_was)
+{
+    BalsaIndex *bindex = data;
+    bindex->mailbox_node = NULL;
+    gtk_widget_destroy(GTK_WIDGET(bindex));
+}
+
+static void
 bndx_destroy(GtkObject * obj)
 {
     BalsaIndex *index;
@@ -220,13 +228,15 @@ bndx_destroy(GtkObject * obj)
             gdk_threads_leave();
 	    libbalsa_mailbox_close(mailbox, balsa_app.expunge_on_close);
             gdk_threads_enter();
-
-	    libbalsa_mailbox_search_iter_free(index->search_iter);
-	    index->search_iter = NULL;
 	}
 	g_object_weak_unref(G_OBJECT(index->mailbox_node),
-			    (GWeakNotify) gtk_widget_destroy, index);
+                            (GWeakNotify) bndx_mbnode_weak_notify, index);
 	index->mailbox_node = NULL;
+    }
+
+    if (index->search_iter) {
+        libbalsa_mailbox_search_iter_free(index->search_iter);
+        index->search_iter = NULL;
     }
 
     if (index->popup_menu) {
@@ -1019,7 +1029,7 @@ balsa_index_load_mailbox_node (BalsaIndex * index,
      */
     index->mailbox_node = mbnode;
     g_object_weak_ref(G_OBJECT(mbnode),
-		      (GWeakNotify) gtk_widget_destroy, index);
+                      (GWeakNotify) bndx_mbnode_weak_notify, index);
     /*
      * rename "from" column to "to" for outgoing mail
      */

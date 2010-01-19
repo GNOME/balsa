@@ -1,3 +1,11 @@
+2010-01-18  Peter Bloomfield  <peter@t43.bellsouth.net>
+
+	reviewed by: <delete if not using a buddy>
+
+	* src/balsa-index.c (bndx_mbnode_weak_notify), (bndx_destroy),
+	(balsa_index_load_mailbox_node): clear BalsaIndex::mailbox_node
+	before destroying BalsaIndex.
+
 2010-01-18  Peter Bloomfield
 
 	* src/balsa-app.c (balsa_find_url): check for NULL

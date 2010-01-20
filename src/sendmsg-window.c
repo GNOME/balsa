@@ -4564,7 +4564,7 @@ sendmsg_window_new()
 #endif
     bsmsg->wrap_timeout_id = 0;
     bsmsg->autosave_timeout_id = /* autosave every 5 minutes */
-        g_timeout_add(1000*60*5, (GSourceFunc)sw_autosave_timeout_cb, bsmsg);
+        g_timeout_add_seconds(60*5, (GSourceFunc)sw_autosave_timeout_cb, bsmsg);
 
     bsmsg->draft_message = NULL;
     bsmsg->parent_message = NULL;

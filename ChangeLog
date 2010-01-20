@@ -1,5 +1,15 @@
 2010-01-19  Peter Bloomfield
 
+	* libbalsa/imap-server.c (libbalsa_imap_server_init):
+	use g_timeout_add_seconds, save the world.
+	* src/balsa-mime-widget-text.c: ditto.
+	* src/information-dialog.c (balsa_information_bar): ditto.
+	* src/main-window.c: ditto.
+	* src/main.c (main): ditto.
+	* src/sendmsg-window.c (sendmsg_window_new): ditto.
+
+2010-01-19  Peter Bloomfield
+
 	* libbalsa/information.c (libbalsa_information_varg): show note
 	before unreffing it(!).
 

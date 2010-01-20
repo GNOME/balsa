@@ -225,8 +225,8 @@ libbalsa_imap_server_init(LibBalsaImapServer * imap_server)
 #endif /* ENABLE_TOUCH_UI */
     imap_server->use_idle = TRUE;
     imap_server->connection_cleanup_id = 
-        g_timeout_add(CONNECTION_CLEANUP_POLL_PERIOD*1000,
-                      connection_cleanup, imap_server);
+        g_timeout_add_seconds(CONNECTION_CLEANUP_POLL_PERIOD,
+                              connection_cleanup, imap_server);
 }
 
 /* leave object in sane state (NULLified fields) */

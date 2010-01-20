@@ -996,7 +996,7 @@ balsa_window_class_init(BalsaWindowClass * klass)
     /* Signals */
     klass->identities_changed = NULL;
 
-    g_timeout_add(30000, (GSourceFunc) bw_close_mailbox_on_timer, NULL);
+    g_timeout_add_seconds(30, (GSourceFunc) bw_close_mailbox_on_timer, NULL);
 
 }
 

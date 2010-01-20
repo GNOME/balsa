@@ -348,7 +348,7 @@ balsa_information_bar(GtkWindow *parent, LibBalsaInformationType type,
     gtk_statusbar_push(statusbar, context_id, line);
     g_free(line);
 
-    bar_timeout_id = g_timeout_add(4000, status_bar_refresh, NULL);
+    bar_timeout_id = g_timeout_add_seconds(4, status_bar_refresh, NULL);
 }
 
 static void 

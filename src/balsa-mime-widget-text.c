@@ -927,7 +927,9 @@ statusbar_pop(gpointer data)
     gdk_threads_leave();
     return FALSE;
 }
-#define SCHEDULE_BAR_REFRESH()  g_timeout_add(5000, statusbar_pop, NULL);
+
+#define SCHEDULE_BAR_REFRESH() \
+    g_timeout_add_seconds(5, statusbar_pop, NULL);
 
 static void
 handle_url(const gchar * url)

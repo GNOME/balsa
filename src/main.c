@@ -1144,7 +1144,7 @@ main(int argc, char *argv[])
     gtk_widget_show(window);
 
     g_idle_add((GSourceFunc) scan_mailboxes_idle_cb, NULL);
-    g_timeout_add(1801*1000, (GSourceFunc) periodic_expunge_cb, NULL);
+    g_timeout_add_seconds(1801, (GSourceFunc) periodic_expunge_cb, NULL);
 
     if (cmd_check_mail_on_startup || balsa_app.check_mail_upon_startup)
         g_idle_add((GSourceFunc) balsa_main_check_new_messages,

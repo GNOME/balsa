@@ -167,7 +167,7 @@ libbalsa_urldecode(const gchar * str)
     gchar *retval;
     gchar *x;
 
-    retval = g_new(char, strlen(str));
+    retval = g_new(char, strlen(str)+1);
 
     for (x = retval; *str != '\0'; str++, x++) {
 	*x = *str;

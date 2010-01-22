@@ -1,3 +1,7 @@
+2010-01-22  Pawel Salek
+
+	* libbalsa/misc.c: allocate enough memory for config urls.
+
 2010-01-19  Peter Bloomfield
 
 	* libbalsa/imap-server.c (libbalsa_imap_server_init):

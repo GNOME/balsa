@@ -1,3 +1,14 @@
+* Balsa-2.4.3 release. Release date 2010-01-23
+
+- IMAP compression (COMPRESS=DEFLATE) when supported by server
+- making opening attachment easier by saving them in a directory
+- downloadable images when using Webkit html widget
+- faster opening of the compose window.
+- text searching enabled in the WebKit html viewer.
+- options to hide toolbars and other parts of the UI (useful on netbooks etc).
+- For laptop/wifi users: not trying to reach POP3 servers while
+  disconnected, and instead checking immediately on reconnection.
+
 * Balsa-2.4.2 release. Release date 2009-12-06
 
 - searching in HTML parts.

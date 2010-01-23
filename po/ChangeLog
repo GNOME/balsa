@@ -1,8 +1,12 @@
+2010-01-23  Pawel Salek pawsa0 gmail.com
+
+	* POTFILES.in: update so that "make diskcheck" succeeds.
+
 2009-07-28  Darek Jakoniuk <pipaceliny@interia.pl>
 
 	* pl.po: Updated Polish translation.
 
-2005-05-25  Pawel Salek pawsa0 gmail.com
+2009-05-25  Pawel Salek pawsa0 gmail.com
 
 	* POTFILES.in: update so that "make check" succeeds.
 

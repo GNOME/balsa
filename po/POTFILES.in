@@ -1,7 +1,6 @@
 [encoding: UTF-8]
 # List of source files containing translatable strings.
 # Please keep this list in alphabetical order.
-# src/orbit-glue.c : disabled because it is excluded from the dist file
 balsa.desktop.in
 libbalsa/address-book-extern.c
 libbalsa/address-book-ldap.c
@@ -20,6 +19,7 @@ libbalsa/gmime-application-pkcs7.c
 libbalsa/gmime-gpgme-context.c
 libbalsa/gmime-gpgme-signature.c
 libbalsa/gmime-part-rfc2440.c
+libbalsa/html.c
 libbalsa/identity.c
 libbalsa/imap-server.c
 libbalsa/libbalsa-conf.c

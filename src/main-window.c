@@ -2698,7 +2698,7 @@ bw_show_about_box(GtkAction * action, gpointer user_data)
     gtk_show_about_dialog(GTK_WINDOW(user_data),
                           "version", BALSA_VERSION,
                           "copyright",
-                          "Copyright \xc2\xa9 1997-2008 The Balsa Developers",
+                          "Copyright \xc2\xa9 1997-2010 The Balsa Developers",
                           "comments",
                           _("The Balsa email client is part of "
                             "the GNOME desktop environment."),

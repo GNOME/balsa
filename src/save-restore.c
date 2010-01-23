@@ -1703,17 +1703,12 @@ config_identities_save(void)
 {
     LibBalsaIdentity* ident;
     GList* list;
-    gchar** conf_vec, *prefix;
+    gchar *prefix;
 
-    conf_vec = g_malloc(sizeof(gchar*) * g_list_length(balsa_app.identities));
-
-    g_assert(conf_vec != NULL);
-    
     libbalsa_conf_push_group("identity");
     libbalsa_conf_set_string("CurrentIdentity", 
                             balsa_app.current_ident->identity_name);
     libbalsa_conf_pop_group();
-    g_free(conf_vec);
 
     config_remove_groups(IDENTITY_SECTION_PREFIX);
 

@@ -1,5 +1,10 @@
 2010-01-23  Peter Bloomfield
 
+	* src/save-restore.c (config_identities_save): do not allocate
+	unused array.
+
+2010-01-23  Peter Bloomfield
+
 	* src/message-window.c (destroy_message_window),
 	(mw_select_part_cb): do not crash on "select-part" signal.
 

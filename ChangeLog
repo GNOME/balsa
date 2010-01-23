@@ -1,3 +1,8 @@
+2010-01-22  Peter Bloomfield
+
+	* libbalsa/address-book-gpe.c (libbalsa_address_book_gpe_load):
+	more sqlite3_free fixes.
+
 2010-01-22  Pawel Salek
 
 	* libbalsa/misc.c: allocate enough memory for config urls.

@@ -477,22 +477,12 @@ libbalsa_conf_drop_all(void)
 static void
 lbc_sync(LibBalsaConf * conf)
 {
-    gchar **groups;
     gchar *buf;
     gsize len;
     GError *error = NULL;
 
     if (!conf->changes)
         return;
-
-    groups = g_key_file_get_groups(conf->key_file, NULL);
-    if (*groups) {
-        gchar **group;
-
-        for (group = &groups[1]; *group; group++)
-            g_key_file_set_comment(conf->key_file, *group, NULL, "", NULL);
-    }
-    g_strfreev(groups);
 
     buf = g_key_file_to_data(conf->key_file, &len, &error);
     if (error) {
@@ -505,6 +495,7 @@ lbc_sync(LibBalsaConf * conf)
         return;
     }
 
+    conf->mtime = time(NULL);
     if (!g_file_set_contents(conf->path, buf, len, &error)) {
         if (error) {
 #if DEBUG

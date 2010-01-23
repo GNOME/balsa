@@ -1,5 +1,10 @@
 2010-01-22  Peter Bloomfield
 
+	* libbalsa/libbalsa-conf.c (lbc_sync): do not insert blank
+	comments; save mtime when syncing.
+
+2010-01-22  Peter Bloomfield
+
 	* libbalsa/address-book-gpe.c (libbalsa_address_book_gpe_load):
 	more sqlite3_free fixes.
 

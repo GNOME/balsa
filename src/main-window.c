@@ -4901,10 +4901,10 @@ bw_notebook_switch_page_cb(GtkWidget * notebook,
     index = BALSA_INDEX(gtk_bin_get_child(GTK_BIN(page)));
 
     window->current_index = GTK_WIDGET(index);
-    g_object_add_weak_pointer(G_OBJECT(window->current_index),
+    g_object_add_weak_pointer(G_OBJECT(index),
 			      (gpointer) &window->current_index);
     /* Note when this mailbox was exposed, for use in auto-expunge. */
-    time(&BALSA_INDEX(window->current_index)->mailbox_node->last_use);
+    time(&index->mailbox_node->last_use);
 
     mailbox = index->mailbox_node->mailbox;
     if (mailbox->name) {
@@ -4946,10 +4946,14 @@ bw_notebook_switch_page_cb(GtkWidget * notebook,
     balsa_index_refresh_size(index);
     balsa_index_ensure_visible(index);
 
+    if (!index->current_msgno) {
+        /* If we're setting a message, the menus will be updated;
+         * otherwise, we'll reset them now. */
+        bw_enable_edit_menus(window, NULL);
 #if !defined(ENABLE_TOUCH_UI)
-    bw_enable_edit_menus(window, NULL);
-    bw_enable_part_menu_items(window);
-#endif /*ENABLE_TOUCH_UI */
+        bw_enable_part_menu_items(window);
+#endif                          /*ENABLE_TOUCH_UI */
+    }
 
     g_free(balsa_app.current_mailbox_url);
     balsa_app.current_mailbox_url = g_strdup(mailbox->url);

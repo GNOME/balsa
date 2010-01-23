@@ -1,3 +1,8 @@
+2010-01-23  Peter Bloomfield
+
+	* src/main-window.c: update menus only if they will not be
+	updated when a message is shown.
+
 2010-01-23  Pawel Salek
 
 	* src/main-window.c: update copyright date.

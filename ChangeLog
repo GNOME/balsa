@@ -24,6 +24,12 @@
 
 2010-01-23  Pawel Salek
 
+	* Makefile.am, src/Makefile.am: fix dist target when configured
+	without gnome.
+	* configure.in, NEWS: release balsa-2.4.4
+
+2010-01-23  Pawel Salek
+
 	* src/main-window.c: update copyright date.
 	* configure.in, NEWS: release 2.4.3
 

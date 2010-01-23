@@ -14,28 +14,28 @@ desktop_DATA = balsa.desktop
 @INTLTOOL_DESKTOP_RULE@
 
 balsa_extra_dist =		\
+	GNOME_Balsa.server.in	\
+	HACKING			\
+	balsa-mail-style.xml	\
+	balsa-mail.lang		\
 	balsa.1.in		\
-	balsa.spec.in		\
 	balsa.desktop.in	\
+	balsa.spec.in		\
+	bootstrap.sh		\
+	docs/mh-mail-HOWTO	\
+	docs/pine2vcard		\
+	docs/vconvert.awk	\
+	gnome-balsa2.png	\
 	intltool-extract.in	\
 	intltool-merge.in	\
 	intltool-update.in	\
-	gnome-balsa2.png	\
-	bootstrap.sh		\
-	mkinstalldirs		\
-	HACKING			\
-	docs/mh-mail-HOWTO	\
-	docs/vconvert.awk	\
-	docs/pine2vcard		\
-	balsa-mail.lang		\
-	balsa-mail-style.xml
+	mkinstalldirs
 
 if BUILD_WITH_G_D_U
 balsa_g_d_u_extra_dist = gnome-doc-utils.make
 endif
 
 if !BUILD_WITH_UNIQUE
-balsa_server_extra_dist = GNOME_Balsa.server.in
 serverdir               = $(libdir)/bonobo/servers
 server_in_files         = GNOME_Balsa.server
 server_DATA             = $(server_in_files:.server.in=.server)
@@ -47,8 +47,7 @@ endif
 
 EXTRA_DIST =			\
     $(balsa_extra_dist)		\
-    $(balsa_g_d_u_extra_dist)	\
-    $(balsa_server_extra_dist)
+    $(balsa_g_d_u_extra_dist)
 
 if BUILD_WITH_GTKSOURCEVIEW2
 gtksourceviewdir = $(BALSA_DATA_PREFIX)/gtksourceview-2.0

@@ -673,6 +673,11 @@ destroy_message_window(GtkWidget * widget, MessageWindow * mw)
                                              G_SIGNAL_MATCH_DATA, 0, 0,
                                              NULL, NULL, mw);
 
+    if (mw->bmessage)
+        g_signal_handlers_disconnect_matched(G_OBJECT(mw->bmessage),
+                                             G_SIGNAL_MATCH_DATA, 0, 0,
+                                             NULL, NULL, mw);
+
     mw_set_message(mw, NULL);
 
     g_free(mw);
@@ -1039,12 +1044,15 @@ mw_select_part_cb(BalsaMessage * bm, MessageWindow * mw)
 #endif				/* HAVE_GTKHTML */
 
     /* set window title */
-    from = 
-        internet_address_list_to_string(bm->message->headers->from, FALSE);
-    title = g_strdup_printf(_("Message from %s: %s"), from,
-                            LIBBALSA_MESSAGE_GET_SUBJECT(bm->message));
-    g_free(from);
-    gtk_window_set_title(GTK_WINDOW(mw->window), title);
-    g_free(title);
+    if (bm && bm->message) {
+        from = internet_address_list_to_string(bm->message->headers->from,
+                                               FALSE);
+        title = g_strdup_printf(_("Message from %s: %s"), from,
+                                LIBBALSA_MESSAGE_GET_SUBJECT(bm->message));
+        g_free(from);
+        gtk_window_set_title(GTK_WINDOW(mw->window), title);
+        g_free(title);
+    }
+
     mw_set_part_buttons_sensitive(mw, bm);
 }

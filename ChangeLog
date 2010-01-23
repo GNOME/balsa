@@ -1,5 +1,10 @@
 2010-01-23  Peter Bloomfield
 
+	* src/message-window.c (destroy_message_window),
+	(mw_select_part_cb): do not crash on "select-part" signal.
+
+2010-01-23  Peter Bloomfield
+
 	* src/balsa-message.c (balsa_message_set): clear tree before
 	selecting part;
 	(select_part): emit signal also for NULL part;

@@ -153,7 +153,6 @@ static gboolean bw_imap_check_test(const gchar * path);
 
 static void bw_enable_mailbox_menus(BalsaWindow * window, BalsaIndex * index);
 static void bw_enable_message_menus(BalsaWindow * window, guint msgno);
-static void bw_enable_edit_menus(BalsaWindow * window, BalsaMessage * bm);
 #ifdef HAVE_GTKHTML
 static void bw_enable_view_menus(BalsaWindow * window, BalsaMessage * bm);
 #endif				/* HAVE_GTKHTML */
@@ -1836,7 +1835,6 @@ balsa_window_new()
     balsa_window_update_book_menus(window);
     bw_enable_mailbox_menus(window, NULL);
     bw_enable_message_menus(window, 0);
-    bw_enable_edit_menus(window, NULL);
 #ifdef HAVE_GTKHTML
     bw_enable_view_menus(window, NULL);
 #endif				/* HAVE_GTKHTML */
@@ -2025,7 +2023,7 @@ bw_enable_edit_menus(BalsaWindow * window, BalsaMessage * bm)
 #if !defined(ENABLE_TOUCH_UI)
     gboolean enable = (bm && balsa_message_can_select(bm));
 
-    bw_set_sensitive(window, "Copy",        bm != NULL);
+    bw_set_sensitive(window, "Copy",        enable);
     bw_set_sensitive(window, "CopyMessage", enable);
     bw_set_sensitive(window, "SelectText",  enable);
 #endif /* ENABLE_TOUCH_UI */
@@ -2483,7 +2481,6 @@ balsa_window_real_close_mbnode(BalsaWindow * window,
             /* Disable menus */
             bw_enable_mailbox_menus(window, NULL);
             bw_enable_message_menus(window, 0);
-            bw_enable_edit_menus(window, NULL);
 	    if (window->current_index)
 		g_object_remove_weak_pointer(G_OBJECT(window->current_index),
 					     (gpointer)
@@ -3754,8 +3751,6 @@ bw_next_part_cb(GtkAction * action, gpointer data)
 {
     BalsaWindow *bw = BALSA_WINDOW(data);
     balsa_message_next_part(BALSA_MESSAGE(bw->preview));
-    bw_enable_edit_menus(bw, BALSA_MESSAGE(bw->preview));
-    bw_enable_part_menu_items(bw);
 }
 
 static void
@@ -3763,8 +3758,6 @@ bw_previous_part_cb(GtkAction * action, gpointer data)
 {
     BalsaWindow *bw = BALSA_WINDOW(data);
     balsa_message_previous_part(BALSA_MESSAGE(bw->preview));
-    bw_enable_edit_menus(bw, BALSA_MESSAGE(bw->preview));
-    bw_enable_part_menu_items(bw);
 }
 #endif /* ENABLE_TOUCH_UI */
 
@@ -4946,15 +4939,6 @@ bw_notebook_switch_page_cb(GtkWidget * notebook,
     balsa_index_refresh_size(index);
     balsa_index_ensure_visible(index);
 
-    if (!index->current_msgno) {
-        /* If we're setting a message, the menus will be updated;
-         * otherwise, we'll reset them now. */
-        bw_enable_edit_menus(window, NULL);
-#if !defined(ENABLE_TOUCH_UI)
-        bw_enable_part_menu_items(window);
-#endif                          /*ENABLE_TOUCH_UI */
-    }
-
     g_free(balsa_app.current_mailbox_url);
     balsa_app.current_mailbox_url = g_strdup(mailbox->url);
 }
@@ -4972,9 +4956,6 @@ bw_index_changed_cb(GtkWidget * widget, gpointer data)
     index = BALSA_INDEX(widget);
     bw_enable_message_menus(window, index->current_msgno);
     bw_enable_mailbox_menus(window, index);
-    if (index->current_msgno == 0) {
-        bw_enable_edit_menus(window, NULL);
-    }
 
     current_msgno = BALSA_MESSAGE(window->preview)->message ?
         BALSA_MESSAGE(window->preview)->message->msgno : 0;

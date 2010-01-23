@@ -1,5 +1,14 @@
 2010-01-23  Peter Bloomfield
 
+	* src/balsa-message.c (balsa_message_set): clear tree before
+	selecting part;
+	(select_part): emit signal also for NULL part;
+	(balsa_message_can_zoom): check for NULL widget.
+	* src/main-window.c: rely on "select-part" signal for enabling
+	menus.
+
+2010-01-23  Peter Bloomfield
+
 	* src/main-window.c: update menus only if they will not be
 	updated when a message is shown.
 

@@ -1115,13 +1115,13 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMailbox * mailbox, guint msgno)
 
     gtk_widget_hide(GTK_WIDGET(bm));
     bm_disable_find_entry(bm);
+    balsa_message_clear_tree(bm);
     select_part(bm, NULL);
     if (bm->message != NULL) {
         libbalsa_message_body_unref(bm->message);
         g_object_unref(bm->message);
         bm->message = NULL;
     }
-    balsa_message_clear_tree(bm);
 
     if (mailbox == NULL || msgno == 0) {
         gtk_notebook_set_show_tabs(GTK_NOTEBOOK(bm), FALSE);
@@ -2261,6 +2261,7 @@ hide_all_parts(BalsaMessage * bm)
 static void
 select_part(BalsaMessage * bm, BalsaPartInfo *info)
 {
+    LibBalsaMessageBody *body;
     GtkViewport *viewport = GTK_VIEWPORT(bm->cont_viewport);
 
     hide_all_parts(bm);
@@ -2268,12 +2269,10 @@ select_part(BalsaMessage * bm, BalsaPartInfo *info)
     if (bm->current_part)
         g_object_unref(bm->current_part);
 
-    bm->current_part =
-        part_info_from_body(bm,
-                            add_part(bm, info, bm->bm_widget->container));
+    body = add_part(bm, info, bm->bm_widget->container);
+    bm->current_part = part_info_from_body(bm, body);
 
-    if(bm->current_part)
-        g_signal_emit(G_OBJECT(bm), balsa_message_signals[SELECT_PART], 0);
+    g_signal_emit(G_OBJECT(bm), balsa_message_signals[SELECT_PART], 0);
 
     gtk_adjustment_set_value(gtk_viewport_get_hadjustment(viewport), 0);
     gtk_adjustment_set_value(gtk_viewport_get_vadjustment(viewport), 0);
@@ -2310,11 +2309,7 @@ balsa_get_parent_window(GtkWidget * widget)
 
 /*
  * This function informs the caller if the currently selected part 
- * supports selection/copying etc. Currently only the GtkEditable derived 
- * widgets
- * and GtkTextView
- * are supported for this (GtkHTML could be, but I don't have a 
- * working build right now)
+ * supports selection/copying etc.
  */
 gboolean
 balsa_message_can_select(BalsaMessage * bmessage)
@@ -2636,7 +2631,8 @@ mdn_dialog_response(GtkWidget * dialog, gint response, gpointer user_data)
 gboolean
 balsa_message_can_zoom(BalsaMessage * bm)
 {
-    return libbalsa_html_can_zoom(bm->current_part->mime_widget->widget);
+    return bm->current_part
+        && libbalsa_html_can_zoom(bm->current_part->mime_widget->widget);
 }
 
 /* Zoom an html item. */

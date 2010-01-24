@@ -1,3 +1,7 @@
+2010-01-24  Pawel Salek
+
+	* configure.in, NEWS: release 2.4.5
+
 2010-01-23  Peter Bloomfield
 
 	* src/save-restore.c (config_identities_save): do not allocate

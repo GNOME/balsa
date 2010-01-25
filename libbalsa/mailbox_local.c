@@ -807,7 +807,6 @@ message_match_real(LibBalsaMailbox *mailbox, guint msgno,
     LibBalsaMessage *message = NULL;
     gboolean match = FALSE;
     gboolean is_refed = FALSE;
-    gchar *str;
     LibBalsaMailboxIndexEntry *entry =
         g_ptr_array_index(mailbox->mindex, msgno-1);
     LibBalsaMailboxLocalInfo *info =
@@ -833,8 +832,9 @@ message_match_real(LibBalsaMailbox *mailbox, guint msgno,
 
     switch (cond->type) {
     case CONDITION_STRING:
-        if (CONDITION_CHKMATCH
-            (cond, (CONDITION_MATCH_CC | CONDITION_MATCH_BODY))) {
+        if (CONDITION_CHKMATCH(cond, (CONDITION_MATCH_TO |
+                                      CONDITION_MATCH_CC |
+                                      CONDITION_MATCH_BODY))) {
             if (!message)
                 message = libbalsa_mailbox_get_message(mailbox, msgno);
             if (!message)
@@ -844,23 +844,24 @@ message_match_real(LibBalsaMailbox *mailbox, guint msgno,
                 libbalsa_information(LIBBALSA_INFORMATION_ERROR,
                                      _("Unable to load message body to "
                                        "match filter"));
-                if (message)
-                    g_object_unref(message);
+                g_object_unref(message);
                 return FALSE;   /* We don't want to match if an error occurred */
             }
         }
 
         /* do the work */
 	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_TO)) {
-            if (!message)
-                message = libbalsa_mailbox_get_message(mailbox, msgno);
-            if (!message)
-                return FALSE;
-            str = internet_address_list_to_string(message->headers->to_list,
-                                                  FALSE);
-            match = libbalsa_utf8_strstr(str,cond->match.string.string);
-            g_free(str);
-            if(match) break;
+            g_assert(is_refed);
+            if (message->headers->to_list) {
+                gchar *str =
+                    internet_address_list_to_string(message->headers->
+                                                    to_list, FALSE);
+                match =
+                    libbalsa_utf8_strstr(str, cond->match.string.string);
+                g_free(str);
+                if (match)
+                    break;
+            }
 	}
         if (CONDITION_CHKMATCH(cond, CONDITION_MATCH_FROM)) {
 	    if (libbalsa_utf8_strstr(info->sender,
@@ -878,12 +879,16 @@ message_match_real(LibBalsaMailbox *mailbox, guint msgno,
 	}
 	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_CC)) {
             g_assert(is_refed);
-            str =
-                internet_address_list_to_string(message->headers->cc_list,
-                                                FALSE);
-	    match = libbalsa_utf8_strstr(str,cond->match.string.string);
-	    g_free(str);
-	    if (match) break;
+            if (message->headers->cc_list) {
+                gchar *str =
+                    internet_address_list_to_string(message->headers->
+                                                    cc_list, FALSE);
+                match =
+                    libbalsa_utf8_strstr(str, cond->match.string.string);
+                g_free(str);
+                if (match)
+                    break;
+            }
 	}
 	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_US_HEAD)) {
             if (cond->match.string.user_header) {

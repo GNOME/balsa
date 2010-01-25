@@ -487,6 +487,20 @@ compare_regexs(GSList * c1,GSList * c2)
    NULL conditions are OK, and compare equal only if both are NULL.
 */
 
+static gboolean
+lbcond_compare_string_conditions(LibBalsaCondition * c1,
+                                 LibBalsaCondition * c2)
+{
+    if (c1->match.string.fields != c2->match.string.fields
+        || (CONDITION_CHKMATCH(c1, CONDITION_MATCH_US_HEAD)
+            && g_ascii_strcasecmp(c1->match.string.user_header,
+                                  c2->match.string.user_header)))
+        return FALSE;
+
+    return (g_ascii_strcasecmp(c1->match.string.string,
+                               c2->match.string.string) == 0);
+}
+
 gboolean
 libbalsa_condition_compare(LibBalsaCondition *c1,LibBalsaCondition *c2)
 {
@@ -501,8 +515,7 @@ libbalsa_condition_compare(LibBalsaCondition *c1,LibBalsaCondition *c2)
 
     switch (c1->type) {
     case CONDITION_STRING:
-        res = (g_ascii_strcasecmp(c1->match.string.string,
-                                  c2->match.string.string) == 0);
+        res = lbcond_compare_string_conditions(c1, c2);
         break;
     case CONDITION_REGEX:
 #if 0

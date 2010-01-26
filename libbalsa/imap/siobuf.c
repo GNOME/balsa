@@ -60,6 +60,8 @@ struct siobuf
     int milliseconds;		/* Timeout in ms */
 
     char *read_buffer;		/* client read buffer */
+    const char *read_buffer_start; /* client read buffer start, for
+                                      ungetc error checking. */
     char *read_position;	/* client read buffer pointer */
     int read_unread;		/* number of bytes unread in buffer */
 
@@ -584,6 +586,7 @@ sio_fill (struct siobuf *sio)
       if (sio->read_unread < 0)
         break;
     }
+    sio->read_buffer_start = sio->read_position;
     if (sio->read_unread <= 0)
       return 0;
   } else {
@@ -591,7 +594,8 @@ sio_fill (struct siobuf *sio)
     if (sio->read_unread <= 0)
       return 0;
     sio->read_position = sio->read_buffer;
-  }
+    sio->read_buffer_start = sio->read_position;
+ }
 
   if (sio->monitor_cb != NULL && sio->read_unread > 0)
     (*sio->monitor_cb) (sio->read_position, sio->read_unread,
@@ -638,7 +642,7 @@ sio_getc(struct siobuf *sio)
 int
 sio_ungetc(struct siobuf *sio)
 {
-  if(sio->read_position>sio->read_buffer) {
+  if(sio->read_position>sio->read_buffer_start) {
     sio->read_position--;
     sio->read_unread++;
     return 0;

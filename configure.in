@@ -11,7 +11,7 @@ dnl ###########################################################################
 
 BALSA_MAJOR=2
 BALSA_REVISION=4
-BALSA_PATCHLEVEL=5
+BALSA_PATCHLEVEL=6
 BALSA_VERSION="$BALSA_MAJOR.$BALSA_REVISION.${BALSA_PATCHLEVEL}"
 
 AC_SUBST(BALSA_MAJOR)
@@ -383,7 +383,6 @@ if test x"$use_webkit" != xno ; then
     BALSA_CFLAGS="$BALSA_CFLAGS $WEBKIT_CFLAGS"
     BALSA_LIBS="$BALSA_LIBS $WEBKIT_LIBS"
     BALSA_AB_LIBS="$BALSA_AB_LIBS $WEBKIT_LIBS"
-    use_gtkhtml=no
 else
     AC_MSG_RESULT([no])
 fi
@@ -391,6 +390,9 @@ fi
 # GtkHtml library.
 #
 if test x"$use_gtkhtml" != xno ; then
+    if test x"$use_webkit" != xno ; then
+        AC_MSG_ERROR([--with-webkit and --with-gtkhtml are mutually exclusive.])
+    fi
     case "$use_gtkhtml" in
      2) check_pkgs="2.0 3.14 3.8 3.6 3.1 3.0";;
      *) check_pkgs="3.14 3.8 3.6 3.1 3.0 2.0";;
@@ -886,7 +888,7 @@ if test "$GCC" = "yes" -a "$set_more_warnings" != "no"; then
         unset option
 fi
 
-# extra warnings for Subversion.
+# extra warnings for GIT.
 #
 
 if test -d "${srcdir}/.git" ; then
@@ -912,7 +914,7 @@ else
 	BALSA_FROM_GIT=no
 fi
 
-AC_MSG_CHECKING([for Subversion information])
+AC_MSG_CHECKING([for GIT information])
 AC_MSG_RESULT($BALSA_FROM_GIT)
 
 dnl #####################################################################

@@ -26,7 +26,7 @@
 #include "imap_private.h"
 
 /** Arbitrary. Current choice is as good as any other. */
-static const unsigned IMAP_COMPRESS_BUFFER_SIZE = 4096;
+static const unsigned IMAP_COMPRESS_BUFFER_SIZE = 8192;
 
 static int
 imap_compress_cb(char **dstbuf, int *dstlen,
@@ -46,7 +46,7 @@ imap_compress_cb(char **dstbuf, int *dstlen,
   icb->out_stream.next_out = (Byte*)*dstbuf;
   icb->out_stream.avail_out = IMAP_COMPRESS_BUFFER_SIZE;
 
-  err = deflate(&icb->out_stream, Z_SYNC_FLUSH);
+  err = deflate(&icb->out_stream, srclen ? Z_NO_FLUSH : Z_SYNC_FLUSH);
   if ( !(err == Z_OK || err == Z_STREAM_END || err == Z_BUF_ERROR) ) {
     fprintf(stderr, "deflate error1 %d\n", err);
     *dstlen = -1;

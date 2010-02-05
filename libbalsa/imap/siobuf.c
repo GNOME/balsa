@@ -85,6 +85,8 @@ struct siobuf
     void *user_data;
   };
 
+static void sio_flush_buffer (struct siobuf *sio);
+
 /* Attach bi-directional buffering to the socket descriptor.
  */
 struct siobuf *
@@ -375,7 +377,7 @@ sio_write (struct siobuf *sio, const void *bufp, int buflen)
 	  buf += sio->write_available;
 	  buflen -= sio->write_available;
 	}
-      sio_flush (sio);
+      sio_flush_buffer (sio);
       assert (sio->write_available > 0);
     }
   if (buflen > 0)
@@ -385,7 +387,7 @@ sio_write (struct siobuf *sio, const void *bufp, int buflen)
       sio->write_available -= buflen;
       /* If the buffer is exactly filled, flush it */
       if (sio->write_available == 0)
-	sio_flush (sio);
+	sio_flush_buffer (sio);
     }
 }
 
@@ -442,8 +444,8 @@ raw_write (struct siobuf *sio, const char *buf, int len)
       }
 }
 
-void
-sio_flush (struct siobuf *sio)
+static void
+sio_flush_buffer (struct siobuf *sio)
 {
   int length;
 
@@ -493,6 +495,30 @@ sio_flush (struct siobuf *sio)
   sio->flush_mark = NULL;
 }
 
+void
+sio_flush (struct siobuf *sio)
+{
+  sio_flush_buffer (sio);
+  if (sio->encode_cb != NULL)
+    {
+      char *buf;
+      int len = 0;
+
+      /* Rules for the encode callback.
+
+         The output variables (here buf and len) may be set to the
+         write_buffer iff the encoding can be performed in place and
+         the result is shorter than the original data.  Otherwise the
+         callback must maintain its own buffer which must persist until
+         the next call in the same thread.  The secarg argument may be
+         used to maintain this buffer. */
+      while ((*sio->encode_cb) (&buf, &len, sio->write_buffer, 
+                                0, sio->secarg) >0) {
+        raw_write (sio, buf, len);
+      }
+    }
+}
+  
 void
 sio_mark (struct siobuf *sio)
 {
@@ -583,7 +609,7 @@ sio_fill (struct siobuf *sio)
                                sio->read_buffer, sio->read_unread,
                                sio->secarg) == 0) {
       sio->read_unread = raw_read (sio, sio->read_buffer, sio->buffer_size);
-      if (sio->read_unread < 0)
+      if (sio->read_unread <= 0)
         break;
     }
     sio->read_buffer_start = sio->read_position;

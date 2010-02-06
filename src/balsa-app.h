@@ -270,6 +270,7 @@ extern struct BalsaApplication {
     GdkColormap *colormap;
 
     /* Colour of quoted text. */
+    gboolean mark_quoted;
     gchar *quote_regex;
     GdkColor quoted_color[MAX_QUOTED_COLOR];
 

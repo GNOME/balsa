@@ -1,5 +1,16 @@
 2010-02-05  Peter Bloomfield
 
+	* src/balsa-app.h: new boolean mark_quoted.
+	* src/balsa-mime-widget-text.c (balsa_mime_widget_new_text):
+	respect it.
+	* src/pref-manager.c (open_preferences_manager), (apply_prefs),
+	(set_prefs), (quoted_group), (mark_quoted_modified_cb): manage
+	it.
+	* src/save-restore.c (config_global_load), (config_save): save
+	and restore it.
+
+2010-02-05  Peter Bloomfield
+
 	* libbalsa/mime.c (libbalsa_match_regex): do not loop
 	indefinitely when regex matches zero characters.
 

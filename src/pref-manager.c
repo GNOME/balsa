@@ -165,6 +165,7 @@ typedef struct _PropertyUI {
     gint threading_type_index;
 
     /* quote regex */
+    GtkWidget *mark_quoted;
     GtkWidget *quote_pattern;
 
     /* wrap incoming text/plain */
@@ -373,6 +374,7 @@ static void timer_modified_cb(GtkWidget * widget, GtkWidget * pbox);
 static void mailbox_close_timer_modified_cb(GtkWidget * widget,
                                             GtkWidget * pbox);
 static void browse_modified_cb(GtkWidget * widget, GtkWidget * pbox);
+static void mark_quoted_modified_cb(GtkWidget * widget, GtkWidget * pbox);
 static void wrap_modified_cb(GtkWidget * widget, GtkWidget * pbox);
 
 static void font_modified_cb(GtkWidget * widget, GtkWidget * pbox);
@@ -699,6 +701,9 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
     /* arp */
     g_signal_connect(G_OBJECT(pui->quote_str), "changed",
                      G_CALLBACK(properties_modified_cb), property_box);
+    g_signal_connect(G_OBJECT(pui->mark_quoted), "toggled",
+                     G_CALLBACK(mark_quoted_modified_cb),
+                     property_box);
     g_signal_connect(G_OBJECT(pui->quote_pattern), "changed",
                      G_CALLBACK(properties_modified_cb), property_box);
 
@@ -993,6 +998,9 @@ apply_prefs(GtkDialog * pbox)
     check_font_button(pui->message_font_button, &balsa_app.message_font);
     check_font_button(pui->subject_font_button, &balsa_app.subject_font);
 
+    balsa_app.mark_quoted =
+        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
+                                     (pui->mark_quoted));
     g_free(balsa_app.quote_regex);
     tmp = gtk_entry_get_text(GTK_ENTRY(pui->quote_pattern));
     balsa_app.quote_regex = g_strcompress(tmp);
@@ -1238,6 +1246,9 @@ set_prefs(void)
 
     /* arp */
     gtk_entry_set_text(GTK_ENTRY(pui->quote_str), balsa_app.quote_str);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->mark_quoted),
+                                 balsa_app.mark_quoted);
+    gtk_widget_set_sensitive(pui->quote_pattern, balsa_app.mark_quoted);
     tmp = g_strescape(balsa_app.quote_regex, NULL);
     gtk_entry_set_text(GTK_ENTRY(pui->quote_pattern), tmp);
     g_free(tmp);
@@ -1910,37 +1921,44 @@ quoted_group(GtkWidget * page)
     GtkWidget *table;
     GtkObject *spinbutton_adj;
     GtkWidget *label;
+    guint row = 0;
 
     /* Quoted text regular expression */
     /* and RFC2646-style flowed text  */
 
     group = pm_group_new(_("Quoted and flowed text"));
-    table = create_table(2, 3, page);
+    table = create_table(3, 3, page);
     pm_group_add(group, table, FALSE);
 
-    attach_label(_("Quoted text\n" "regular expression:"), table, 0, page);
+    pui->mark_quoted =
+        gtk_check_button_new_with_label(_("Mark quoted text"));
+    gtk_table_attach(GTK_TABLE(table), pui->mark_quoted,
+                     0, 2, row, row + 1, GTK_FILL, 0, 0, 0);
+    ++row;
+
+    attach_label(_("Quoted text\n" "regular expression:"), table, row, page);
 
     pui->quote_pattern = gtk_entry_new();
     gtk_table_attach(GTK_TABLE(table), pui->quote_pattern,
-                     1, 3, 0, 1,
+                     1, 3, row, row + 1,
                      GTK_EXPAND | GTK_FILL, 0, 0, 0);
+    ++row;
 
     pui->browse_wrap =
 	gtk_check_button_new_with_label(_("Wrap text at"));
     gtk_table_attach(GTK_TABLE(table), pui->browse_wrap,
-                     0, 1, 1, 2, GTK_FILL, 0, 0, 0);
+                     0, 1, row, row + 1, GTK_FILL, 0, 0, 0);
     pm_page_add_to_size_group(page, pui->browse_wrap);
 
     spinbutton_adj = gtk_adjustment_new(1.0, 40.0, 200.0, 1.0, 5.0, 0.0);
     pui->browse_wrap_length =
 	gtk_spin_button_new(GTK_ADJUSTMENT(spinbutton_adj), 1, 0);
     gtk_table_attach(GTK_TABLE(table), pui->browse_wrap_length,
-                     1, 2, 1, 2,
+                     1, 2, row, row + 1,
                      GTK_EXPAND | GTK_FILL, 0, 0, 0);
-    gtk_widget_set_sensitive(pui->browse_wrap_length, FALSE);
     label = gtk_label_new(_("characters"));
     gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
-    gtk_table_attach(GTK_TABLE(table), label, 2, 3, 1, 2,
+    gtk_table_attach(GTK_TABLE(table), label, 2, 3, row, row + 1,
                      GTK_FILL, 0, 0, 0);
 
     return group;
@@ -3302,6 +3320,16 @@ browse_modified_cb(GtkWidget * widget, GtkWidget * pbox)
 	gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pui->browse_wrap));
 
     gtk_widget_set_sensitive(GTK_WIDGET(pui->browse_wrap_length), newstate);
+    properties_modified_cb(widget, pbox);
+}
+
+static void
+mark_quoted_modified_cb(GtkWidget * widget, GtkWidget * pbox)
+{
+    gboolean newstate =
+	gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pui->mark_quoted));
+
+    gtk_widget_set_sensitive(GTK_WIDGET(pui->quote_pattern), newstate);
     properties_modified_cb(widget, pbox);
 }
 

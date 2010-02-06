@@ -253,9 +253,10 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
     if (!(rex = balsa_quote_regex_new()))
 	gtk_text_buffer_insert_at_cursor(buffer, ptr, -1);
 #else                           /* USE_GREGEX */
-    if (regcomp(&rex, balsa_app.quote_regex, REG_EXTENDED) != 0) {
-	g_warning
-	    ("part_info_init_mimetext: quote regex compilation failed.");
+    if (!balsa_app.mark_quoted
+        || regcomp(&rex, balsa_app.quote_regex, REG_EXTENDED)) {
+	if (balsa_app.mark_quoted)
+            g_warning("%s: quote regex compilation failed.", __func__);
 	gtk_text_buffer_insert_at_cursor(buffer, ptr, -1);
     }
 #endif                          /* USE_GREGEX */

@@ -713,6 +713,8 @@ config_global_load(void)
     }
 
     /* ... Quote colouring */
+    balsa_app.mark_quoted =
+        libbalsa_conf_get_bool_with_default("MarkQuoted=true", &def_used);
     g_free(balsa_app.quote_regex);
     balsa_app.quote_regex =
 	libbalsa_conf_get_string("QuoteRegex=" DEFAULT_QUOTE_REGEX);
@@ -1261,6 +1263,7 @@ config_save(void)
 			 libbalsa_mailbox_get_sort_field(NULL));
     libbalsa_conf_set_int("ThreadingType",
 			 libbalsa_mailbox_get_threading_type(NULL));
+    libbalsa_conf_set_bool("MarkQuoted", balsa_app.mark_quoted);
     libbalsa_conf_set_string("QuoteRegex", balsa_app.quote_regex);
     libbalsa_conf_set_string("MessageFont", balsa_app.message_font);
     libbalsa_conf_set_string("SubjectFont", balsa_app.subject_font);

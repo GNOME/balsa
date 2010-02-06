@@ -55,7 +55,7 @@ static gboolean fix_text_widget(GtkWidget *widget, gpointer data);
 static void text_view_populate_popup(GtkTextView *textview, GtkMenu *menu,
 				     LibBalsaMessageBody * mime_body);
 
-#ifdef HAVE_GTKHTML
+#ifdef HAVE_HTML_WIDGET
 static BalsaMimeWidget *bm_widget_new_html(BalsaMessage * bm,
                                            LibBalsaMessageBody *
                                            mime_body);
@@ -155,7 +155,7 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
     if (html_type) {
         BalsaMimeWidget *html_widget = NULL;
 
-#ifdef HAVE_GTKHTML
+#ifdef HAVE_HTML_WIDGET
 	/* Force vertical scrollbar while we render the html, otherwise
 	 * the widget will make itself too wide to accept one, forcing
 	 * otherwise unnecessary horizontal scrolling. */
@@ -1144,7 +1144,7 @@ bm_widget_on_url(const gchar *url)
         gtk_statusbar_pop(statusbar, context_id);
 }
 
-#ifdef HAVE_GTKHTML
+#ifdef HAVE_HTML_WIDGET
 static void
 bm_zoom_in(BalsaMessage * bm)
 {
@@ -1279,7 +1279,7 @@ bm_widget_new_html(BalsaMessage * bm, LibBalsaMessageBody * mime_body)
 
     return mw;
 }
-#endif /* defined HAVE_GTKHTML */
+#endif /* defined HAVE_HTML_WIDGET */
 
 #define TABLE_ATTACH(t,str,label) \
     if(str) { GtkWidget *lbl = gtk_label_new(label);              \

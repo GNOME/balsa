@@ -123,10 +123,11 @@ AC_ARG_WITH(gss,
                   [Enable GSS (default=no)]),
                   [with_gss=$withval],[with_gss=no])
 
-AC_ARG_WITH([gtkhtml],
-   AC_HELP_STRING([--with-gtkhtml],
-                  [Preferred GtkHTML version, 2 or 3 (default=3)]),
-		  [use_gtkhtml=$withval],[use_gtkhtml=3])
+AC_ARG_WITH(html-widget,
+            AC_HELP_STRING([--with-html-widget=(no|gtkhtml2|gtkhtml3|webkit)],
+                           [select the HTML renderer (default gtkhtml3)]),
+            [use_html_widget=$withval],
+            [use_html_widget=gtkhtml3])
 
 AC_ARG_WITH([gtksourceview],
    AC_HELP_STRING([--with-gtksourceview],
@@ -191,12 +192,6 @@ AC_ARG_WITH(unique,
    AC_HELP_STRING([--with-unique],
                   [Use libUnique instead of BonoboActivation (default=no)]),
                   [with_unique=$withval],[with_unique=no])
-
-AC_ARG_WITH([webkit],
-   AC_HELP_STRING([--with-webkit],
-                  [Use WebKit if available (default=no)]),
-		  [use_webkit=$withval],[use_webkit=no])
-
 
 AC_ARG_ENABLE(more-warnings,
    AC_HELP_STRING([--enable-more-warnings],
@@ -365,63 +360,40 @@ AC_SUBST(BALSA_LIBS)
 AC_SUBST(BALSA_AB_LIBS)
 AC_SUBST(BALSA_DEFS)
 
-# WebKit
+# HTML widget
 #
-AC_MSG_CHECKING(whether to use WebKit)
-if test x"$use_webkit" != xno ; then
-    if $PKG_CONFIG --atleast-version=1.1.14 webkit-1.0; then
-        AC_MSG_RESULT([yes])
-    else
-        AC_MSG_ERROR([WebKitGTK+ version 1.1.14 or newer is required.])
-    fi
-    if test x"$use_threads" = xno ; then
-        AC_MSG_ERROR([WebKit cannot be used with threads disabled.])
-    fi
-    PKG_CHECK_MODULES(WEBKIT, [webkit-1.0])
-    AC_DEFINE(HAVE_WEBKIT,1,[Defined when WebKit can be used.])
-    AC_DEFINE(HAVE_GTKHTML,1,[Defined when GtkHtml can be used.])
-    BALSA_CFLAGS="$BALSA_CFLAGS $WEBKIT_CFLAGS"
-    BALSA_LIBS="$BALSA_LIBS $WEBKIT_LIBS"
-    BALSA_AB_LIBS="$BALSA_AB_LIBS $WEBKIT_LIBS"
-else
-    AC_MSG_RESULT([no])
+AC_MSG_CHECKING(whether to use an HTML widget)
+case "$use_html_widget" in
+    gtkhtml2)
+        PKG_CHECK_MODULES(HTML, [ libgtkhtml-2.0 ])
+        AC_DEFINE(HAVE_GTKHTML2,1,[Defined when GtkHtml-2 can be used.])
+    ;;
+    gtkhtml3)
+        PKG_CHECK_MODULES(HTML, [ libgtkhtml-3.14 ])
+        AC_DEFINE(HAVE_GTKHTML3,1,[Defined when GtkHtml-3 can be used.])
+    ;;
+    webkit)
+        if ! $PKG_CONFIG --atleast-version=1.1.14 webkit-1.0; then
+            AC_MSG_ERROR([WebKitGTK+ version 1.1.14 or newer is required.])
+        fi
+        if test x"$use_threads" = xno ; then
+            AC_MSG_ERROR([WebKit cannot be used with threads disabled.])
+        fi
+        PKG_CHECK_MODULES(HTML, [webkit-1.0])
+        AC_DEFINE(HAVE_WEBKIT,1,[Defined when WebKit can be used.])
+    ;;
+    no) ;;
+    *) AC_MSG_ERROR([bad option]) ;;
+esac
+
+AC_MSG_RESULT([$use_html_widget])
+
+if test x"$use_html_widget" != xno ; then
+    AC_DEFINE(HAVE_HTML_WIDGET,1,[Defined when any HTML widget can be used.])
+    BALSA_CFLAGS="$BALSA_CFLAGS $HTML_CFLAGS"
+    BALSA_LIBS="$BALSA_LIBS $HTML_LIBS"
 fi
 
-# GtkHtml library.
-#
-if test x"$use_gtkhtml" != xno ; then
-    if test x"$use_webkit" != xno ; then
-        AC_MSG_ERROR([--with-webkit and --with-gtkhtml are mutually exclusive.])
-    fi
-    case "$use_gtkhtml" in
-     2) check_pkgs="2.0 3.14 3.8 3.6 3.1 3.0";;
-     *) check_pkgs="3.14 3.8 3.6 3.1 3.0 2.0";;
-    esac
-    use_gtkhtml=no
-    for i in $check_pkgs; do
-    if $PKG_CONFIG --exists libgtkhtml-$i ; then
-	PKG_CHECK_MODULES(HTML, [ libgtkhtml-$i ])
-        if test x"$i" = x2.0; then
-            AC_DEFINE(HAVE_GTKHTML2,1,[Defined when GtkHtml-2 can be used.])
-        else
-            AC_DEFINE(HAVE_GTKHTML3,1,[Defined when GtkHtml-3 can be used.])
-	    CFLAGS="$CFLAGS $HTML_CFLAGS"
-	    LIBS="$LIBS $HTML_LIBS"
-            AC_CHECK_LIB(gtkhtml-$i, gtk_html_print_page_with_header_footer,
-                         AC_DEFINE(HAVE_GTKHTML3_GTKPRINT,1,
-                                   [Defined when GtkHtml-3 supports GtkPrint.]))
-        fi
-        AC_DEFINE(HAVE_GTKHTML,1,[Defined when GtkHtml can be used.])
-        BALSA_CFLAGS="$BALSA_CFLAGS $HTML_CFLAGS"
-        BALSA_LIBS="$BALSA_LIBS $HTML_LIBS"
-        use_gtkhtml=$i
-        break
-    fi
-    done
-else
-    AC_MSG_CHECKING(whether to use GtkHTML)
-    AC_MSG_RESULT(disabled)
-fi
 
 # GPGME detection.
 # We don't use the std macro AM_PATH_GPGME here to avoid dependencies.
@@ -1014,11 +986,10 @@ echo "    Installing into prefix: $prefix"
 echo "      Using multithreading: $use_threads"
 echo "   Enable compile warnings: $set_more_warnings"
 echo "                Use ESMTP : $with_esmtp"
-echo " Use WebKit (experimental): $use_webkit"
+echo "               HTML widget: $use_html_widget"
 echo " Use Unique (experimental): $with_unique"
 echo "                 Use GNOME: $with_gnome"
 echo "              Use Canberra: $with_canberra"
-echo "               Use GtkHTML: $use_gtkhtml"
 echo "                 Use GPGME: $gpgmecfg"
 echo "                  Use LDAP: $with_ldap"
 echo "                   Use GSS: $with_gss"

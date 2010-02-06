@@ -82,12 +82,12 @@ process_mime_part(LibBalsaMessage * message, LibBalsaMessageBody * body,
 	if (!res)
 	    return NULL;
 
-#ifdef HAVE_GTKHTML
+#ifdef HAVE_HTML_WIDGET
 	if (html_type) {
 	    allocated = libbalsa_html_filter(html_type, &res, allocated);
 	    libbalsa_html_to_string(&res, allocated);
 	}
-#endif /* HAVE_GTKHTML */
+#endif /* HAVE_HTML_WIDGET */
 
         if (flow && libbalsa_message_body_is_flowed(body)) {
             /* we're making a `format=flowed' message, and the

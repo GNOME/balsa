@@ -71,11 +71,11 @@ static void next_flagged_cb            (GtkAction * action, gpointer);
 static void page_setup_cb              (GtkAction * action, gpointer data);
 static void print_cb                   (GtkAction * action, gpointer);
 static void trash_cb                   (GtkAction * action, gpointer);
-#ifdef HAVE_GTKHTML
+#ifdef HAVE_HTML_WIDGET
 static void mw_zoom_in_cb              (GtkAction * action, MessageWindow * mw);
 static void mw_zoom_out_cb             (GtkAction * action, MessageWindow * mw);
 static void mw_zoom_100_cb             (GtkAction * action, MessageWindow * mw);
-#endif                          /* HAVE_GTKHTML */
+#endif                          /* HAVE_HTML_WIDGET */
 
 static void size_alloc_cb(GtkWidget * window, GtkAllocation * alloc);
 static void mw_set_buttons_sensitive(MessageWindow * mw);
@@ -255,7 +255,7 @@ static const GtkActionEntry entries[] = {
     {"FindInMessage", NULL, N_("_Find in message"), "slash",
      N_("Find a string in this message"),
      G_CALLBACK(mw_find_in_message_cb)},
-#ifdef HAVE_GTKHTML
+#ifdef HAVE_HTML_WIDGET
     {"ZoomIn", GTK_STOCK_ZOOM_IN, N_("Zoom _In"), "<control>plus",
      N_("Increase magnification"), G_CALLBACK(mw_zoom_in_cb)},
     {"ZoomOut", GTK_STOCK_ZOOM_OUT, N_("Zoom _Out"), "<control>minus",
@@ -264,7 +264,7 @@ static const GtkActionEntry entries[] = {
     /* xgettext:no-c-format */
     {"Zoom100", GTK_STOCK_ZOOM_100, N_("Zoom _100%"), NULL,
      N_("No magnification"), G_CALLBACK(mw_zoom_100_cb)},
-#endif                          /* HAVE_GTKHTML */
+#endif                          /* HAVE_HTML_WIDGET */
     {"Reply", BALSA_PIXMAP_REPLY, N_("_Reply..."), "R",
      N_("Reply to the current message"), G_CALLBACK(replyto_message_cb)},
     {"ReplyAll", BALSA_PIXMAP_REPLY_ALL, N_("Reply to _All..."), "A",
@@ -354,12 +354,12 @@ static const char *ui_description =
 "      <menuitem action='NoHeaders'/>"
 "      <menuitem action='SelectedHeaders'/>"
 "      <menuitem action='AllHeaders'/>"
-#ifdef HAVE_GTKHTML
+#ifdef HAVE_HTML_WIDGET
 "      <separator/>"
 "      <menuitem action='ZoomIn'/>"
 "      <menuitem action='ZoomOut'/>"
 "      <menuitem action='Zoom100'/>"
-#endif                          /* HAVE_GTKHTML */
+#endif                          /* HAVE_HTML_WIDGET */
 "    </menu>"
 "    <menu action='MoveMenu'>"
 "    </menu>"
@@ -1007,7 +1007,7 @@ reset_show_all_headers(MessageWindow *mw)
     }
 }
 
-#ifdef HAVE_GTKHTML
+#ifdef HAVE_HTML_WIDGET
 static void
 mw_zoom_in_cb(GtkAction * action, MessageWindow * mw)
 {
@@ -1028,20 +1028,20 @@ mw_zoom_100_cb(GtkAction * action, MessageWindow * mw)
     GtkWidget *bm = mw->bmessage;
     balsa_message_zoom(BALSA_MESSAGE(bm), 0);
 }
-#endif				/* HAVE_GTKHTML */
+#endif				/* HAVE_HTML_WIDGET */
 
 static void
 mw_select_part_cb(BalsaMessage * bm, MessageWindow * mw)
 {
     gchar *title;
     gchar *from;
-#ifdef HAVE_GTKHTML
+#ifdef HAVE_HTML_WIDGET
     gboolean enable = bm && balsa_message_can_zoom(bm);
 
     mw_set_sensitive(mw, "ZoomIn",  enable);
     mw_set_sensitive(mw, "ZoomOut", enable);
     mw_set_sensitive(mw, "Zoom100", enable);
-#endif				/* HAVE_GTKHTML */
+#endif				/* HAVE_HTML_WIDGET */
 
     /* set window title */
     if (bm && bm->message) {

@@ -23,16 +23,18 @@
 /*
  * Support for HTML mail parts.
  *
- * Balsa supports both GtkHtml-2 and GtkHTML-3. Code in configure.in
- * defines the symbol HAVE_GTKHTML if either is detected, and
- * HAVE_GTKHTML3 if GtkHTML-3 is detected. This file contains all code
- * that depends on which widget is being used. Elsewhere, HTML support
- * code should be conditional on HAVE_GTKHTML, but neither HAVE_GTKHTML2
- * nor HAVE_GTKHTML3 should be referenced outside this file.
+ * Balsa supports three HTML engines: GtkHtml-2, GtkHTML-3, and WebKit.
+ * The symbol HAVE_HTML_WIDGET is defined if HTML support is requested at
+ * configure time, and the requested engine is available.
  *
- * As of this writing (2003-07), GtkHtml-2 has the more elegant design,
- * with separate concepts of document and view, but GtkHTML-3 has a far
- * more complete API.
+ * This file contains all code that depends on which widget is being
+ * used. Elsewhere, HTML support code should be conditional on
+ * HAVE_HTML_WIDGET, but none of HAVE_GTKHTML2, HAVE_GTKHTML3, or
+ * HAVE_WEBKIT should be referenced outside this file.
+ *
+ * As of this writing (2010-01), WebKit offers the most complete API,
+ * with string search, message part printing, and user control over
+ * downloading of images from remote servers.
  */
 
 #if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
@@ -44,7 +46,7 @@
 #include <string.h>
 #include <glib/gi18n.h>
 
-#ifdef HAVE_GTKHTML
+#ifdef HAVE_HTML_WIDGET
 
 /*
  * Used by all HTML widgets
@@ -1254,7 +1256,7 @@ libbalsa_html_type(const gchar * mime_type)
     return LIBBALSA_HTML_TYPE_NONE;
 }
 
-#else				/* HAVE_GTKHTML */
+#else				/* HAVE_HTML_WIDGET */
 
 LibBalsaHTMLType
 libbalsa_html_type(const gchar * mime_type)
@@ -1264,4 +1266,4 @@ libbalsa_html_type(const gchar * mime_type)
     return LIBBALSA_HTML_TYPE_NONE;
 }
 
-#endif				/* HAVE_GTKHTML */
+#endif				/* HAVE_HTML_WIDGET */

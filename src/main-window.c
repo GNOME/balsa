@@ -153,9 +153,9 @@ static gboolean bw_imap_check_test(const gchar * path);
 
 static void bw_enable_mailbox_menus(BalsaWindow * window, BalsaIndex * index);
 static void bw_enable_message_menus(BalsaWindow * window, guint msgno);
-#ifdef HAVE_GTKHTML
+#ifdef HAVE_HTML_WIDGET
 static void bw_enable_view_menus(BalsaWindow * window, BalsaMessage * bm);
-#endif				/* HAVE_GTKHTML */
+#endif				/* HAVE_HTML_WIDGET */
 static void bw_register_open_mailbox(LibBalsaMailbox *m);
 static void bw_unregister_open_mailbox(LibBalsaMailbox *m);
 static gboolean bw_is_open_mailbox(LibBalsaMailbox *m);
@@ -207,11 +207,11 @@ static void bw_empty_trash_cb             (GtkAction * action, gpointer data);
 static void bw_header_activate_cb         (GtkAction * action, gpointer data);
 static void bw_expand_all_cb              (GtkAction * action, gpointer data);
 static void bw_collapse_all_cb            (GtkAction * action, gpointer data);
-#ifdef HAVE_GTKHTML
+#ifdef HAVE_HTML_WIDGET
 static void bw_zoom_in_cb                 (GtkAction * action, gpointer data);
 static void bw_zoom_out_cb                (GtkAction * action, gpointer data);
 static void bw_zoom_100_cb                (GtkAction * action, gpointer data);
-#endif				/* HAVE_GTKHTML */
+#endif				/* HAVE_HTML_WIDGET */
 
 static void bw_copy_cb                    (GtkAction * action, gpointer data);
 static void bw_select_all_cb              (GtkAction * action, gpointer data);
@@ -429,7 +429,7 @@ static const GtkActionEntry entries[] = {
      N_("Expand all threads"), G_CALLBACK(bw_expand_all_cb)},
     {"CollapseAll", NULL, N_("_Collapse All"), "<control>L",
      N_("Collapse all expanded threads"), G_CALLBACK(bw_collapse_all_cb)},
-#ifdef HAVE_GTKHTML
+#ifdef HAVE_HTML_WIDGET
     {"ZoomIn", GTK_STOCK_ZOOM_IN, N_("Zoom _In"), "<control>plus",
      N_("Increase magnification"), G_CALLBACK(bw_zoom_in_cb)},
     {"ZoomOut", GTK_STOCK_ZOOM_OUT, N_("Zoom _Out"), "<control>minus",
@@ -438,7 +438,7 @@ static const GtkActionEntry entries[] = {
     /* xgettext:no-c-format */
     {"Zoom100", GTK_STOCK_ZOOM_100, N_("Zoom _100%"), NULL,
      N_("No magnification"), G_CALLBACK(bw_zoom_100_cb)},
-#endif                          /* HAVE_GTKHTML */
+#endif                          /* HAVE_HTML_WIDGET */
     /* Mailbox menu item that does not require a mailbox */
     {"NextUnread", BALSA_PIXMAP_NEXT_UNREAD, N_("Next Unread Message"),
      "<control>N", N_("Next Unread Message"),
@@ -746,12 +746,12 @@ static const char *ui_description =
 "      <separator/>"
 "      <menuitem action='ExpandAll'/>"
 "      <menuitem action='CollapseAll'/>"
-#ifdef HAVE_GTKHTML
+#ifdef HAVE_HTML_WIDGET
 "      <separator/>"
 "      <menuitem action='ZoomIn'/>"
 "      <menuitem action='ZoomOut'/>"
 "      <menuitem action='Zoom100'/>"
-#endif				/* HAVE_GTKHTML */
+#endif				/* HAVE_HTML_WIDGET */
 "    </menu>"
 "    <menu action='MailboxMenu'>"
 "      <menuitem action='NextMessage'/>"
@@ -861,12 +861,12 @@ static const char *ui_description =
 "      <menuitem action='NextUnread'/>"
 "      <menuitem action='NextMessage'/>"
 "      <menuitem action='PreviousMessage'/>"
-#ifdef HAVE_GTKHTML
+#ifdef HAVE_HTML_WIDGET
 "      <separator/>"
 "      <menuitem action='ZoomIn'/>"
 "      <menuitem action='ZoomOut'/>"
 "      <menuitem action='Zoom100'/>"
-#endif				/* HAVE_GTKHTML */
+#endif				/* HAVE_HTML_WIDGET */
 "      <separator/>"
 "      <menu action='ViewMoreMenu'>"
 "        <menuitem action='NextFlagged'/>"
@@ -1835,9 +1835,9 @@ balsa_window_new()
     balsa_window_update_book_menus(window);
     bw_enable_mailbox_menus(window, NULL);
     bw_enable_message_menus(window, 0);
-#ifdef HAVE_GTKHTML
+#ifdef HAVE_HTML_WIDGET
     bw_enable_view_menus(window, NULL);
-#endif				/* HAVE_GTKHTML */
+#endif				/* HAVE_HTML_WIDGET */
 #if !defined(ENABLE_TOUCH_UI)
     balsa_window_enable_continue(window);
 #endif /*ENABLE_TOUCH_UI */
@@ -2027,12 +2027,12 @@ bw_enable_edit_menus(BalsaWindow * window, BalsaMessage * bm)
     bw_set_sensitive(window, "CopyMessage", enable);
     bw_set_sensitive(window, "SelectText",  enable);
 #endif /* ENABLE_TOUCH_UI */
-#ifdef HAVE_GTKHTML
+#ifdef HAVE_HTML_WIDGET
     bw_enable_view_menus(window, bm);
-#endif				/* HAVE_GTKHTML */
+#endif				/* HAVE_HTML_WIDGET */
 }
 
-#ifdef HAVE_GTKHTML
+#ifdef HAVE_HTML_WIDGET
 /*
  * Enable/disable the Zoom menu items on the View menu.
  */
@@ -2045,7 +2045,7 @@ bw_enable_view_menus(BalsaWindow * window, BalsaMessage * bm)
     bw_set_sensitive(window, "ZoomOut", enable);
     bw_set_sensitive(window, "Zoom100", enable);
 }
-#endif				/* HAVE_GTKHTML */
+#endif				/* HAVE_HTML_WIDGET */
 
 /*
  * Enable/disable menu items/toolbar buttons which depend
@@ -3773,10 +3773,10 @@ bw_copy_cb(GtkAction * action, gpointer data)
                                 G_TYPE_FROM_INSTANCE(focus_widget));
     if (signal_id)
         g_signal_emit(focus_widget, signal_id, (GQuark) 0);
-#ifdef HAVE_GTKHTML
+#ifdef HAVE_HTML_WIDGET
     else if (libbalsa_html_can_select(focus_widget))
 	libbalsa_html_copy(focus_widget);
-#endif /* HAVE_GTKHTML */
+#endif /* HAVE_HTML_WIDGET */
 }
 
 static void
@@ -4130,7 +4130,7 @@ bw_collapse_all_cb(GtkAction * action, gpointer data)
     balsa_index_update_tree(BALSA_INDEX(index), FALSE);
 }
 
-#ifdef HAVE_GTKHTML
+#ifdef HAVE_HTML_WIDGET
 static void
 bw_zoom_in_cb(GtkAction * action, gpointer data)
 {
@@ -4151,7 +4151,7 @@ bw_zoom_100_cb(GtkAction * action, gpointer data)
     GtkWidget *bm = BALSA_WINDOW(data)->preview;
     balsa_message_zoom(BALSA_MESSAGE(bm), 0);
 }
-#endif				/* HAVE_GTKHTML */
+#endif				/* HAVE_HTML_WIDGET */
 
 #if defined(ENABLE_TOUCH_UI)
 static gboolean
@@ -5451,10 +5451,10 @@ balsa_window_select_all(GtkWindow * window)
                 gtk_tree_selection_select_all(selection);
             }
 	}
-#ifdef    HAVE_GTKHTML
+#ifdef    HAVE_HTML_WIDGET
     } else if (libbalsa_html_can_select(focus_widget)) {
 	libbalsa_html_select_all(focus_widget);
-#endif /* HAVE_GTKHTML */
+#endif /* HAVE_HTML_WIDGET */
     }
 }
 

@@ -505,7 +505,7 @@ bm_find_entry_changed_cb(GtkEditable * editable, gpointer data)
                                         &match_begin, &match_end);
             bm->find_iter = match_begin;
         }
-#ifdef HAVE_GTKHTML
+#ifdef HAVE_HTML_WIDGET
     } else if (libbalsa_html_can_search(widget)) {
         found = libbalsa_html_search_text(widget, text,
                                           bm->find_forward, TRUE);
@@ -516,7 +516,7 @@ bm_find_entry_changed_cb(GtkEditable * editable, gpointer data)
                                                &selection_bounds);
             bm_find_scroll_to_rectangle(bm, widget, &selection_bounds);
         }
-#endif                          /* HAVE_GTKHTML */
+#endif                          /* HAVE_HTML_WIDGET */
     } else
         g_assert_not_reached();
 
@@ -560,7 +560,7 @@ bm_find_again(BalsaMessage * bm, gboolean find_forward)
         bm_find_scroll_to_selection(bm, text_view,
                                     &match_begin, &match_end);
         bm->find_iter = match_begin;
-#ifdef HAVE_GTKHTML
+#ifdef HAVE_HTML_WIDGET
     } else if (libbalsa_html_can_search(widget)) {
         GdkRectangle selection_bounds;
 
@@ -569,7 +569,7 @@ bm_find_again(BalsaMessage * bm, gboolean find_forward)
             libbalsa_html_search_text(widget, text, find_forward, TRUE);
         libbalsa_html_get_selection_bounds(widget, &selection_bounds);
         bm_find_scroll_to_rectangle(bm, widget, &selection_bounds);
-#endif                          /* HAVE_GTKHTML */
+#endif                          /* HAVE_HTML_WIDGET */
     } else
         g_assert_not_reached();
 
@@ -1990,7 +1990,7 @@ balsa_message_has_previous_part(BalsaMessage * bmessage)
     return FALSE;
 }
 
-#ifdef HAVE_GTKHTML
+#ifdef HAVE_HTML_WIDGET
 static gboolean
 libbalsa_can_display(LibBalsaMessageBody *part)
 {
@@ -2005,7 +2005,7 @@ libbalsa_can_display(LibBalsaMessageBody *part)
     g_free(content_type);
     return res;
 }
-#endif                          /* HAVE_GTKHTML */
+#endif                          /* HAVE_HTML_WIDGET */
 
 /** Determines whether given part can be displayed. We display plain
    text, parts html/rtf parts unless it has been disabled in the
@@ -2033,10 +2033,10 @@ preferred_part(LibBalsaMessageBody *parts)
         if (g_ascii_strcasecmp(content_type, "text/plain") == 0 ||
             g_ascii_strcasecmp(content_type, "text/calendar") == 0)
             preferred = body;
-#ifdef HAVE_GTKHTML
+#ifdef HAVE_HTML_WIDGET
         else if (libbalsa_can_display(body))
             preferred = body;
-#endif                          /* HAVE_GTKHTML */
+#endif                          /* HAVE_HTML_WIDGET */
 
         g_free(content_type);
     }
@@ -2323,9 +2323,9 @@ balsa_message_can_select(BalsaMessage * bmessage)
         return FALSE;
 
     return GTK_IS_EDITABLE(w) || GTK_IS_TEXT_VIEW(w)
-#ifdef    HAVE_GTKHTML
+#ifdef    HAVE_HTML_WIDGET
         || libbalsa_html_can_select(w)
-#endif /* HAVE_GTKHTML */
+#endif /* HAVE_HTML_WIDGET */
         ;
 }
 
@@ -2626,7 +2626,7 @@ mdn_dialog_response(GtkWidget * dialog, gint response, gpointer user_data)
     gtk_widget_destroy(dialog);
 }
 
-#ifdef HAVE_GTKHTML
+#ifdef HAVE_HTML_WIDGET
 /* Does the current part support zoom? */
 gboolean
 balsa_message_can_zoom(BalsaMessage * bm)
@@ -2657,7 +2657,7 @@ balsa_message_zoom(BalsaMessage * bm, gint in_out)
      libbalsa_html_zoom(bm->current_part->mime_widget->widget, in_out);
 
 }
-#endif /* HAVE_GTKHTML */
+#endif /* HAVE_HTML_WIDGET */
 
 
 #ifdef HAVE_GPGME
@@ -3279,9 +3279,9 @@ balsa_message_find_in_message(BalsaMessage * bm)
     if (bm->current_part
         && (w = bm->current_part->mime_widget->widget)
         && (GTK_IS_TEXT_VIEW(w)
-#ifdef HAVE_GTKHTML
+#ifdef HAVE_HTML_WIDGET
             || libbalsa_html_can_search(w)
-#endif                          /* HAVE_GTKHTML */
+#endif                          /* HAVE_HTML_WIDGET */
             )) {
         if (GTK_IS_TEXT_VIEW(w)) {
             GtkTextView *text_view = (GtkTextView *) w;

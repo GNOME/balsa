@@ -43,7 +43,7 @@ typedef enum {
     LIBBALSA_HTML_TYPE_RICHTEXT
 } LibBalsaHTMLType;
 
-# ifdef HAVE_GTKHTML
+# ifdef HAVE_HTML_WIDGET
 
 typedef void (*LibBalsaHtmlCallback) (const gchar * uri);
 
@@ -70,7 +70,7 @@ GtkWidget *libbalsa_html_popup_menu_widget(GtkWidget * widget);
 gboolean libbalsa_html_can_print(GtkWidget * widget);
 void libbalsa_html_print(GtkWidget * widget);
 
-# endif				/* HAVE_GTKHTML */
+# endif				/* HAVE_HTML_WIDGET */
 
 LibBalsaHTMLType libbalsa_html_type(const gchar * mime_type);
 

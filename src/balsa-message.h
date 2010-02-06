@@ -129,11 +129,11 @@ gchar * balsa_message_sender_to_gchar(InternetAddressList * list, gint which);
 GtkWidget *balsa_message_current_part_widget(BalsaMessage * bmessage);
 GtkWindow *balsa_get_parent_window(GtkWidget *widget);
 
-#ifdef HAVE_GTKHTML
+#ifdef HAVE_HTML_WIDGET
 #define BALSA_MESSAGE_ZOOM_KEY "balsa-message-zoom"
 gboolean balsa_message_can_zoom(BalsaMessage * bm);
 void balsa_message_zoom(BalsaMessage * bm, gint in_out);
-#endif				/* HAVE_GTKHTML */
+#endif				/* HAVE_HTML_WIDGET */
 
 #ifdef HAVE_GPGME
 void balsa_message_perform_crypto(LibBalsaMessage * message,

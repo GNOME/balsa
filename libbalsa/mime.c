@@ -1325,7 +1325,8 @@ libbalsa_match_regex(const gchar * line, regex_t * rex, guint * count,
     const gchar *p;
 
     c = 0;
-    for (p = line; regexec(rex, p, 1, &rm, 0) == 0; p += rm.rm_eo)
+    for (p = line; !regexec(rex, p, 1, &rm, 0) && rm.rm_eo > 0;
+         p += rm.rm_eo)
 	c++;
     if (count)
 	*count = c;

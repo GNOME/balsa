@@ -1,3 +1,8 @@
+2010-02-09  Albrecht Dreß
+
+	* configure.in: more understandable output from html-widget
+	configuration.
+
 2010-02-05  Peter Bloomfield
 
 	* configure.in: use a case statement to configure html-widget.

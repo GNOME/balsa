@@ -365,14 +365,17 @@ AC_SUBST(BALSA_DEFS)
 AC_MSG_CHECKING(whether to use an HTML widget)
 case "$use_html_widget" in
     gtkhtml2)
+        AC_MSG_RESULT([$use_html_widget])
         PKG_CHECK_MODULES(HTML, [ libgtkhtml-2.0 ])
         AC_DEFINE(HAVE_GTKHTML2,1,[Defined when GtkHtml-2 can be used.])
     ;;
     gtkhtml3)
+        AC_MSG_RESULT([$use_html_widget])
         PKG_CHECK_MODULES(HTML, [ libgtkhtml-3.14 ])
         AC_DEFINE(HAVE_GTKHTML3,1,[Defined when GtkHtml-3 can be used.])
     ;;
     webkit)
+        AC_MSG_RESULT([$use_html_widget])
         if ! $PKG_CONFIG --atleast-version=1.1.14 webkit-1.0; then
             AC_MSG_ERROR([WebKitGTK+ version 1.1.14 or newer is required.])
         fi
@@ -382,11 +385,11 @@ case "$use_html_widget" in
         PKG_CHECK_MODULES(HTML, [webkit-1.0])
         AC_DEFINE(HAVE_WEBKIT,1,[Defined when WebKit can be used.])
     ;;
-    no) ;;
-    *) AC_MSG_ERROR([bad option]) ;;
+    no)
+        AC_MSG_RESULT([none])
+    ;;
+    *) AC_MSG_ERROR([bad option $use_html_widget]) ;;
 esac
-
-AC_MSG_RESULT([$use_html_widget])
 
 if test x"$use_html_widget" != xno ; then
     AC_DEFINE(HAVE_HTML_WIDGET,1,[Defined when any HTML widget can be used.])

@@ -1,3 +1,8 @@
+2010-02-12  Albrecht Dreß
+
+	* src/balsa-message.c (bm_previous_part_info): do not return
+	uninitialized BalsaPartInfo.
+
 2010-02-09  Albrecht Dreß
 
 	* configure.in: more understandable output from html-widget

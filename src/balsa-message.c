@@ -1939,6 +1939,7 @@ bm_previous_part_info(BalsaMessage * bmessage)
         /* return the first part if nothing is selected */
         if (!gtk_tree_model_get_iter_first(model, &sel.sel_iter))
             return NULL;
+        gtk_tree_model_get(model, &sel.sel_iter, PART_INFO_COLUMN, &info, -1);
     } else {
         GtkTreePath * path = gtk_tree_model_get_path(model, &sel.sel_iter);
 

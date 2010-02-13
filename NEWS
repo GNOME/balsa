@@ -1,3 +1,8 @@
+* Balsa-2.4.7 release. Release date 2010-02-13
+
+- infinite loop (debian #568298).
+- avoid crashes when manually verifing GPG signature.
+
 * Balsa-2.4.6 release. Release date 2010-01-27
 
 Clearly, 2.4.3 to 2.4.5 were of a release-candidate quality...

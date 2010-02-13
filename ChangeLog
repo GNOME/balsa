@@ -1,3 +1,7 @@
+2010-02-13  Pawel Salek
+
+	* configure.in, NEWS: release 2.4.7
+
 2010-02-12  Albrecht Dreß
 
 	* src/balsa-message.c (bm_previous_part_info): do not return

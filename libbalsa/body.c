@@ -279,12 +279,20 @@ libbalsa_message_body_get_parameter(LibBalsaMessageBody * body,
     return res;
 }
 
-static const gchar *
-libbalsa_message_body_get_content_id(LibBalsaMessageBody * body)
+static gchar *
+libbalsa_message_body_get_cid(LibBalsaMessageBody * body)
 {
-    if (body->mime_part)
-        return g_mime_object_get_content_id(body->mime_part);
-    return body->content_id;
+    const gchar *content_id = body->mime_part ?
+        g_mime_object_get_content_id(body->mime_part) : body->content_id;
+
+    if (content_id) {
+        if (content_id[0] == '<'
+            && content_id[strlen(content_id) - 1] == '>')
+            return g_strndup(content_id + 1, strlen(content_id) - 2);
+        return g_strdup(content_id);
+    }
+
+    return NULL;
 }
 
 /* libbalsa_message_body_save_temporary:
@@ -301,13 +309,12 @@ libbalsa_message_body_save_temporary(LibBalsaMessageBody * body, GError **err)
     }
 
     if (body->temp_filename == NULL) {
-        const gchar *filename;
+        gchar *filename;
         gint fd = -1;
         GMimeStream *tmp_stream;
 
-        filename = body->filename;
-        if (!filename)
-            filename = libbalsa_message_body_get_content_id(body);
+        filename = body->filename ?
+            g_strdup(body->filename) : libbalsa_message_body_get_cid(body);
 
         if (!filename)
 	    fd = g_file_open_tmp("balsa-body-XXXXXX",
@@ -327,6 +334,7 @@ libbalsa_message_body_save_temporary(LibBalsaMessageBody * body, GError **err)
                           O_WRONLY | O_EXCL | O_CREAT,
                           S_IRUSR);
             }
+            g_free(filename);
         }
 
         if (fd < 0) {
@@ -807,16 +815,19 @@ libbalsa_message_body_get_by_id(LibBalsaMessageBody * body,
 				const gchar * id)
 {
     LibBalsaMessageBody *res;
-    const gchar *content_id;
+    gchar *cid;
 
     g_return_val_if_fail(id != NULL, NULL);
 
     if (!body)
 	return NULL;
 
-    if ((content_id = libbalsa_message_body_get_content_id(body))
-        && !strcmp(id, content_id))
-        return body;
+    if ((cid = libbalsa_message_body_get_cid(body))) {
+        gboolean matches = !strcmp(id, cid);
+        g_free(cid);
+        if (matches)
+            return body;
+    }
 
     if ((res = libbalsa_message_body_get_by_id(body->parts, id)) != NULL)
 	return res;

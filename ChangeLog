@@ -1,3 +1,9 @@
+2010-02-16  Peter Bloomfield
+
+	* libbalsa/body.c (libbalsa_message_body_get_cid),
+	(libbalsa_message_body_save_temporary),
+	(libbalsa_message_body_get_by_id): strip "<>" from content-id.
+
 2010-02-13  Pawel Salek
 
 	* configure.in, NEWS: release 2.4.7

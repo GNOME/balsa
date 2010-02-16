@@ -1,3 +1,7 @@
+2010-02-16  Albrecht Dreß
+
+	* libbalsa/information.c: build when libnotify is not available.
+
 2010-02-16  Peter Bloomfield
 
 	* libbalsa/body.c (libbalsa_message_body_get_cid),

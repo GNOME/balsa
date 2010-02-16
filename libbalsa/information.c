@@ -41,10 +41,10 @@ static gboolean libbalsa_information_idle_handler(struct information_data*);
 
 LibBalsaInformationFunc libbalsa_real_information_func;
 
+#ifdef HAVE_NOTIFY
 static void lbi_notification_closed_cb(NotifyNotification * note,
                                        gpointer data);
 
-#ifdef HAVE_NOTIFY
 static void
 lbi_notification_parent_weak_notify(gpointer data, GObject * parent)
 {

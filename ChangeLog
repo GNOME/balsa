@@ -1,3 +1,13 @@
+2010-02-17  Albrecht Dreß
+
+	* libbalsa/imap/imap-commands.c: implement QUOTA, MYRIGHTS and GETACL
+	commands.
+	* libbalsa/imap/imap-handle.h: register QUOTA capability.
+	* libbalsa/imap/imap_private.h: add private fields and enums
+	related to these extensions.
+	* libbalsa/mailbox_imap.[ch]: interface them.
+	* src/folder-conf.c: use them.
+
 2010-02-16  Albrecht Dreß
 
 	* libbalsa/information.c: build when libnotify is not available.

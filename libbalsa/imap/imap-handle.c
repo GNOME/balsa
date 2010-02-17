@@ -165,6 +165,8 @@ imap_mbox_handle_init(ImapMboxHandle *handle)
   handle->enable_client_sort = 0;
   handle->enable_binary    = 0;
   handle->enable_idle      = 1;
+
+  handle->has_rights = 0;
   mbox_view_init(&handle->mbox_view);
 
 #if defined(BALSA_USE_THREADS)
@@ -1018,6 +1020,9 @@ imap_mbox_handle_finalize(GObject* gobject)
   imap_mbox_resize_cache(handle, 0);
   g_free(handle->msg_cache); handle->msg_cache = NULL;
   g_array_free(handle->flag_cache, TRUE);
+  g_list_foreach(handle->acls, (GFunc)imap_user_acl_free, NULL);
+  g_list_free(handle->acls);
+  g_free(handle->quota_root);
 
   HANDLE_UNLOCK(handle);
 #if defined(BALSA_USE_THREADS)
@@ -2307,7 +2312,7 @@ ir_capability_data(ImapMboxHandle *handle)
     "ACL", "BINARY", "CHILDREN",
     "COMPRESS=DEFLATE",
     "ESEARCH", "IDLE", "LITERAL+",
-    "LOGINDISABLED", "MULTIAPPEND", "NAMESPACE", "SASL-IR",
+    "LOGINDISABLED", "MULTIAPPEND", "NAMESPACE", "QUOTA", "SASL-IR",
     "SCAN", "STARTTLS",
     "SORT", "THREAD=ORDEREDSUBJECT", "THREAD=REFERENCES",
     "UIDPLUS", "UNSELECT"
@@ -2882,6 +2887,214 @@ ir_msg_att_flags(ImapMboxHandle *h, int c, unsigned seqno)
   if(h->flags_cb)
     imap_handle_add_task(h, flags_tasklet, GUINT_TO_POINTER(seqno));
   return IMR_OK;
+}
+
+/* RFC 2087, sect. 5.2: "<mailbox> [<quota root> [<quota root> ...}}" */
+static ImapResponse
+ir_quotaroot(ImapMboxHandle *h)
+{
+  int eol;
+  char *mbox;
+  ImapResponse retval = IMR_NO;
+  char *mbx7 = imap_utf8_to_mailbox(h->mbox);
+
+  free(h->quota_root);
+  h->quota_root = NULL;
+
+  /* get the mailbox and the first quota root */
+  mbox = imap_get_astring(h->sio, &eol);
+  if (mbox) {
+    if (strcmp(mbox, mbx7))
+      fprintf(stderr, "expected QUOTAROOT for %s, not for %s\n", mbx7, mbox);
+    else {
+      if (eol == ' ')
+        h->quota_root = imap_get_astring(h->sio, &eol);
+      if (eol != '\n')
+        EAT_LINE(h, eol);
+      retval = IMR_OK;
+    }
+  }
+  free(mbx7);
+  free(mbox);
+  return retval;
+}
+
+/* RFC 2087, sect. 5.1: "<mailbox> [<resource> [<resource> ...}}" */
+static ImapResponse
+ir_quota(ImapMboxHandle *h)
+{
+  int c;
+  char *root;
+  ImapResponse retval = IMR_NO;
+
+  /* get the root */
+  root = imap_get_astring(h->sio, &c);
+  h->quota_max_k = h->quota_used_k = 0;
+  if (root) {
+    if (strcmp(root, h->quota_root))
+      fprintf(stderr, "expected QUOTA for %s, not for %s\n", h->quota_root,
+              root);
+    else {
+      while ((c = sio_getc(h->sio)) != -1 && c == ' ');
+      if (c == '(') {
+        do {
+          char resource[32];
+          char usage[16];
+          char limit[16];
+          
+          c = imap_get_atom(h->sio, resource, 32);
+          if (c == ' ') {
+            imap_get_atom(h->sio, usage, 16);
+            c = imap_get_atom(h->sio, limit, 16);
+
+            /* ignore other limits than 'STORAGE' */
+            if (!strcmp(resource, "STORAGE")) {
+              char *endptr1;
+              char *endptr2;
+
+              h->quota_used_k = strtoul(usage, &endptr1, 10);
+              h->quota_max_k = strtoul(limit, &endptr2, 10);
+              if (*endptr1 != '\0' || *endptr2 != '\0') {
+                fprintf(stderr, "bad QUOTA '%s %s %s'\n", resource, usage,
+                        limit);
+                h->quota_max_k = h->quota_used_k = 0;
+                c = ')';
+              } else
+                retval = IMR_OK;
+            }
+          }
+        } while (c != ')');
+      }
+      EAT_LINE(h, c);
+    }
+  }
+
+  free(root);
+  return retval;
+}
+
+/** \brief Interpret a RFC 4314 ACL
+ *
+ * \param h IMAP mailbox handle
+ * \param eject a string containing all characters which shall terminate
+ *        scanning the ACL
+ * \param acl filled with the extracted ACL's, or IMAP_ACL_NONE on error
+ * \param eol if not NULL, filled with 1 or 0 to indicate if the end of line
+ *        has been reached
+ * \return IMAP response code
+ *
+ * Scan h's input stream for valid ACL flags (lrswipkxtea).  Note that 'c', 'd'
+ * and cr are ignored according to RFC 4314, sect. 2.1.1.
+ */
+static ImapResponse
+extract_acl(ImapMboxHandle *h, const char *eject, ImapAclType *acl, int *eol)
+{
+  static const char* rights = "lrswipkxtea";
+  static const char* ignore = "cd\r";
+  int c;
+  char* p;
+
+  *acl = IMAP_ACL_NONE;
+  while ((c = sio_getc(h->sio)) != -1 && !strchr(eject, c)) {
+    if ((p = strchr(rights, c))) {
+      *acl |= 1 << (p - rights);
+    } else if (!strchr(ignore, c)) {
+      EAT_LINE(h, c);
+      if (eol)
+        *eol = TRUE;
+      return IMR_NO;
+    }
+  }
+  if (eol)
+    *eol = (c == '\n');
+  return IMR_OK;
+}
+
+/* RFC 4314, sect. 3.8: "<mailbox> <rights>" */
+static ImapResponse
+ir_myrights(ImapMboxHandle *h)
+{
+  int eol;
+  char *mbox;
+  ImapResponse retval = IMR_NO;
+  char *mbx7 = imap_utf8_to_mailbox(h->mbox);
+
+  mbox = imap_get_astring(h->sio, &eol);
+  if (mbox && eol == ' ') {
+    if (strcmp(mbox, mbx7))
+      fprintf(stderr, "expected MYRIGHTS for %s, not for %s\n", mbx7, mbox);
+    else
+      retval = extract_acl(h, "\n", &h->rights, NULL);
+  }
+  free(mbx7);
+  free(mbox);
+  return retval;
+}
+
+/* helper: free an ImapUserAclType */
+void
+imap_user_acl_free(ImapUserAclType *acl)
+{
+  if (acl)
+    g_free(acl->uid);
+  g_free(acl);
+}
+
+/* RFC 4314, sect. 3.6: "<mailbox> [[<uid> <rights>] <uid> <rights> ...]" */
+static ImapResponse
+ir_getacl(ImapMboxHandle *h)
+{
+  char *mbox;
+  char *mbx7;
+  ImapResponse retval;
+  int eol;
+
+  g_list_foreach(h->acls, (GFunc)imap_user_acl_free, NULL);
+  g_list_free(h->acls);
+  h->acls = NULL;
+
+  mbox = imap_get_astring(h->sio, &eol);
+  if (!mbox)
+    return IMR_NO;
+
+  mbx7 = imap_utf8_to_mailbox(h->mbox);
+  if (strcmp(mbox, mbx7)) {
+    fprintf(stderr, "expected ACL for %s, not for %s\n", mbx7, mbox);
+    retval = IMR_NO;
+  } else if (eol == '\n') {
+    retval = IMR_OK;
+  } else {
+    int c;
+    GString *uid;
+
+    retval = IMR_OK;
+    do {
+      ImapAclType acl_flags;
+      ImapUserAclType *acl;
+
+      uid = g_string_new("");
+      while ((c = sio_getc(h->sio)) != -1 && c != '\n' && c != ' ')
+        uid = g_string_append_c(uid, c);
+      if (c != ' ') {
+        g_string_free(uid, TRUE);
+        EAT_LINE(h, c);
+        retval = IMR_NO;
+      } else {
+        if (extract_acl(h, " \n", &acl_flags, &eol) != IMR_OK) {
+          g_string_free(uid, TRUE);
+          retval = IMR_NO;
+        } else {
+          acl = g_new(ImapUserAclType, 1);
+          acl->uid = g_string_free(uid, FALSE);
+          acl->acl = acl_flags;
+          h->acls = g_list_append(h->acls, acl);
+        }
+      }
+    } while (retval == IMR_OK && !eol);
+  }
+  free(mbox);
+  free(mbx7);
+  return retval;
 }
 
 ImapAddress*
@@ -4064,7 +4277,11 @@ static const struct {
   { "SORT",       4, ir_sort   },
   { "THREAD",     6, ir_thread },
   { "FLAGS",      5, ir_flags  },
-  { "FETCH",      5, ir_fetch  }
+  { "FETCH",      5, ir_fetch  },
+  { "MYRIGHTS",   8, ir_myrights },
+  { "ACL",        3, ir_getacl },
+  { "QUOTAROOT",  9, ir_quotaroot },
+  { "QUOTA",      5, ir_quota }
 };
 static const struct {
   const gchar *response;

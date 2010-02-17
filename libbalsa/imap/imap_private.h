@@ -143,6 +143,14 @@ struct _ImapMboxHandle {
   unsigned enable_client_sort:1; /**< client side sorting allowed */
   unsigned enable_compress:1; /**< enable compress extension */
   unsigned enable_idle:1;     /**< use IDLE - no problem with firewalls */
+  unsigned has_rights:1;      /**< whether rights are up-to-date. */
+
+  ImapAclType rights;         /**< my rights (RFC 4314) */
+  GList *acls;                /**< acl's (RFC 4314) */
+
+  gulong quota_max_k;         /**< max. available quota in kByte */
+  gulong quota_used_k;        /**< used quota in kByte */
+  gchar *quota_root;
 
   /* conditional stuff at the end for the safety. */
 #ifdef USE_TLS
@@ -175,6 +183,8 @@ extern const char* imap_msg_flags[6];
 
 ImapResponse imap_mbox_select_unlocked(ImapMboxHandle* handle, const char *mbox,
                                        gboolean *readonly_mbox);
+
+ImapResponse imap_mbox_fetch_my_rights_unlocked(ImapMboxHandle* handle);
 
 void imap_mbox_resize_cache(ImapMboxHandle *h, unsigned new_size);
 

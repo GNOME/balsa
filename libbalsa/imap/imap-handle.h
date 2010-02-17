@@ -72,6 +72,7 @@ typedef enum
   IMCAP_LOGINDISABLED,		/* RFC 2595 */
   IMCAP_MULTIAPPEND,            /* RFC 3502 */
   IMCAP_NAMESPACE,              /* RFC 2342: IMAP4 Namespace */
+  IMCAP_QUOTA,                  /* RFC 2087 */
   IMCAP_SASLIR,                 /* RFC 4959 */
   IMCAP_SCAN,                   /* FIXME: RFC? */
   IMCAP_STARTTLS,		/* RFC 2595: STARTTLS */

@@ -160,4 +160,15 @@ ImapResponse imap_mbox_complete_msgids(ImapMboxHandle *handle,
 				       GPtrArray *msgids,
 				       unsigned first_seqno_to_fetch);
 
+/* RFC 2087: Quota */
+ImapResponse imap_mbox_get_quota(ImapMboxHandle* handle, const char* mbox,
+                                 gulong* max, gulong* used);
+
+/* RFC 4314: ACL's */
+ImapResponse imap_mbox_get_my_rights(ImapMboxHandle* handle,
+				     ImapAclType* my_rights,
+				     gboolean force_update);
+ImapResponse imap_mbox_get_acl(ImapMboxHandle* handle, const char* mbox,
+                               GList** acls);
+
 #endif /* __IMAP_COMMANDS_H__ */

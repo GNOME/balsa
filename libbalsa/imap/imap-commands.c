@@ -198,6 +198,7 @@ imap_mbox_select_unlocked(ImapMboxHandle* handle, const char *mbox,
   imap_mbox_resize_cache(handle, 0);
   mbox_view_dispose(&handle->mbox_view);
   handle->unseen = 0;
+  handle->has_rights = 0;
 
   mbx7 = imap_utf8_to_mailbox(mbox);
 
@@ -211,8 +212,14 @@ imap_mbox_select_unlocked(ImapMboxHandle* handle, const char *mbox,
       handle->mbox = g_strdup(mbox);
     }
     handle->state = IMHS_SELECTED;
-    if(readonly_mbox)
+    if(readonly_mbox) {
+      /* FIXME - issue MYRIGHTS in the same packet as SELECT */
+      ImapResponse myrights_rc =
+	imap_mbox_fetch_my_rights_unlocked(handle);
       *readonly_mbox = handle->readonly_mbox;
+      if (myrights_rc != IMR_OK && myrights_rc != IMR_NO)
+	rc = myrights_rc; /* Bad things happened, report it. */
+    }
   } else { /* remove even traces of untagged responses */
     imap_mbox_resize_cache(handle, 0);
     mbox_view_dispose(&handle->mbox_view);
@@ -248,6 +255,7 @@ imap_mbox_examine(ImapMboxHandle* handle, const char* mbox)
     g_free(handle->mbox);
     handle->mbox = g_strdup(mbox);
     handle->state = IMHS_SELECTED;
+    handle->has_rights = 0;
   } 
   return rc;
   }
@@ -699,7 +707,7 @@ imap_mbox_expunge(ImapMboxHandle *handle)
 {
   ImapResponse rc;
 
-  IMAP_REQUIRED_STATE2(handle,IMHS_AUTHENTICATED, IMHS_SELECTED, IMR_BAD);
+  IMAP_REQUIRED_STATE1(handle, IMHS_SELECTED, IMR_BAD);
   HANDLE_LOCK(handle);
   rc = imap_cmd_exec(handle, "EXPUNGE");
   HANDLE_UNLOCK(handle);
@@ -710,7 +718,7 @@ ImapResponse
 imap_mbox_expunge_a(ImapMboxHandle *handle)
 {
   ImapResponse rc;
-  IMAP_REQUIRED_STATE2(handle,IMHS_AUTHENTICATED, IMHS_SELECTED, IMR_BAD);
+  IMAP_REQUIRED_STATE1(handle, IMHS_SELECTED, IMR_BAD);
   /* extra care would be required to use this once since no other
      commands that use sequence numbers can be issued before this one
      finishes... */
@@ -2047,4 +2055,88 @@ imap_mbox_complete_msgids(ImapMboxHandle *h,
     g_free(cmd);
   }
   return rc;
+}
+
+/* RFC 2087, sect. 4.3: GETQUOTAROOT */
+ImapResponse
+imap_mbox_get_quota(ImapMboxHandle* handle, const char* mbox,
+                    gulong* max, gulong* used)
+{
+  if (!imap_mbox_handle_can_do(handle, IMCAP_QUOTA))
+    return IMR_NO;
+  IMAP_REQUIRED_STATE2(handle, IMHS_AUTHENTICATED, IMHS_SELECTED, IMR_BAD);
+  {
+  gchar *mbx7 = imap_utf8_to_mailbox(mbox);
+  gchar* cmd = g_strdup_printf("GETQUOTAROOT \"%s\"", mbx7);
+  ImapResponse rc;
+
+  HANDLE_LOCK(handle);
+  rc = imap_cmd_exec(handle, cmd);
+  g_free(mbx7); g_free(cmd);
+  *max = handle->quota_max_k;
+  *used = handle->quota_used_k;
+  HANDLE_UNLOCK(handle);
+  return rc;
+  }
+}
+
+ImapResponse
+imap_mbox_fetch_my_rights_unlocked(ImapMboxHandle* handle)
+{
+  if (imap_mbox_handle_can_do(handle, IMCAP_ACL)) {
+    gchar *mbx7 = imap_utf8_to_mailbox(handle->mbox);
+    gchar* cmd = g_strdup_printf("MYRIGHTS \"%s\"", mbx7);
+    ImapResponse rc = imap_cmd_exec(handle, cmd);
+    g_free(mbx7); g_free(cmd);
+    return rc;
+  } else {
+    return IMR_NO;
+  }
+}
+
+/** get myrights for the currently selected mailbox.
+    RFC 4314, sect. 3.5: MYRIGHTS */
+ImapResponse
+imap_mbox_get_my_rights(ImapMboxHandle* handle, ImapAclType* my_rights,
+			gboolean force_update)
+{
+  ImapResponse rc;
+
+  IMAP_REQUIRED_STATE1(handle, IMHS_SELECTED, IMR_BAD);
+
+  HANDLE_LOCK(handle);
+  if (force_update || !handle->has_rights) {
+    rc = imap_mbox_fetch_my_rights_unlocked(handle);
+  } else {
+    rc = IMR_OK;
+  }
+
+  *my_rights = handle->rights;
+  
+  HANDLE_UNLOCK(handle);
+  return rc;
+}
+
+/* RFC 4314, sect. 3.3: GETACL */
+ImapResponse
+imap_mbox_get_acl(ImapMboxHandle* handle, const char* mbox, GList** acls)
+{
+  if (!imap_mbox_handle_can_do(handle, IMCAP_ACL))
+    return IMR_NO;
+  IMAP_REQUIRED_STATE2(handle, IMHS_AUTHENTICATED, IMHS_SELECTED, IMR_BAD);
+  {
+  gchar *mbx7 = imap_utf8_to_mailbox(mbox);
+  gchar* cmd = g_strdup_printf("GETACL \"%s\"", mbx7);
+  ImapResponse rc;
+
+  HANDLE_LOCK(handle);
+  rc = imap_cmd_exec(handle, cmd);
+  g_free(mbx7); g_free(cmd);
+  g_list_foreach(*acls, (GFunc)imap_user_acl_free, NULL);
+  g_list_free(*acls);
+  *acls = handle->acls;
+  handle->acls = NULL;
+  HANDLE_UNLOCK(handle);
+  return rc;
+  }
 }

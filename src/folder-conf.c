@@ -837,11 +837,92 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
                                      G_CALLBACK(validate_sub_folder),
 				     sdd, 2, sdd->old_parent, label);
 
+    if (mn) {
+        static const char *std_acls[] = {
+            "lrs", N_("read-only"),
+            "lrswipkxte", N_("read-write"),
+            "lrswipkxtea", N_("admin"),
+            NULL, N_("special") };
+        GString *rights_str;
+        gchar * rights;
+        gchar * quotas;
 
-    if (mn)
+        label = libbalsa_create_label(_("Permissions:"), table, 3);
+
+        /* mailbox closed: no detailed permissions available */
+        if (!libbalsa_mailbox_imap_is_connected(LIBBALSA_MAILBOX_IMAP(mn->mailbox))) {
+            rights_str = g_string_new(std_acls[mn->mailbox->readonly ? 1 : 3]);
+            rights_str =
+                g_string_append(rights_str,
+                                _("\ndetailed permissions are available only for open folders"));
+        } else {
+            rights = libbalsa_imap_get_rights(LIBBALSA_MAILBOX_IMAP(mn->mailbox));
+            if (!rights) {
+                rights_str = g_string_new(std_acls[mn->mailbox->readonly ? 1 : 3]);
+                rights_str =
+                    g_string_append(rights_str,
+                                    _("\nthe server does not support ACL's"));
+            } else {
+                gint n;
+                gchar **acls;
+
+                /* my rights */
+                for (n = 0;
+                     std_acls[n] && strcmp(std_acls[n], rights);
+                     n += 2);
+                rights_str = g_string_new(_("mine: "));
+                g_string_append_printf(rights_str, "%s (%s)",
+                                       std_acls[n + 1], rights);
+
+                /* acl's - only available if I have admin privileges */
+                if ((acls =
+                     libbalsa_imap_get_acls(LIBBALSA_MAILBOX_IMAP(mn->mailbox)))) {
+                    int uid;
+
+                    for (uid = 0; acls[uid]; uid += 2) {
+                        for (n = 0;
+                             std_acls[n] && strcmp(std_acls[n], acls[uid + 1]);
+                             n += 2);
+                        g_string_append_printf(rights_str,
+                                               "\nuid '%s': %s (%s)",
+                                               acls[uid], std_acls[n + 1],
+                                               acls[uid + 1]);
+                    }
+                    g_strfreev(acls);
+                }
+                g_free(rights);
+            }
+        }
+        rights = g_string_free(rights_str, FALSE);
+        gtk_table_attach(GTK_TABLE(table), gtk_label_new(rights), 1, 2, 3, 4,
+                         GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 5);
+        g_free(rights);
+
+        label = libbalsa_create_label(_("Quota:"), table, 4);
+
+        /* mailbox closed: no quota available */
+        if (!libbalsa_mailbox_imap_is_connected(LIBBALSA_MAILBOX_IMAP(mn->mailbox)))
+            quotas = g_strdup(_("quota information available only for open folders"));
+        else {
+            gulong max, used;
+
+            if (!libbalsa_imap_get_quota(LIBBALSA_MAILBOX_IMAP(mn->mailbox), &max, &used))
+                quotas = g_strdup(_("the server does not support quotas"));
+            else if (max == 0 && used == 0)
+                quotas = g_strdup(_("no limits"));
+            else
+                quotas = g_strdup_printf(_("%lu kByte of %lu kbyte (%.1f%%) used"),
+                                         used, max,
+                                         100.0 * (float) used / (float) max);
+        }
+        gtk_table_attach(GTK_TABLE(table), gtk_label_new(quotas), 1, 2, 4, 5,
+                         GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 5);
+        g_free(quotas);
+
         sdd->mcv = mailbox_conf_view_new(mn->mailbox,
                                          GTK_WINDOW(sdd->dialog),
-                                         table, 3);
+                                         table, 5);
+    }
 
     gtk_widget_show_all(GTK_WIDGET(sdd->dialog));
 

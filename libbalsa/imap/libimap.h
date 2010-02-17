@@ -277,4 +277,30 @@ size_t imap_serialized_message_size(void *data);
 
 const char *lbi_strerror(ImapResult rc);
 
+/* RFC 4314: IMAP ACL's */
+typedef enum {
+  IMAP_ACL_NONE = 0,
+  IMAP_ACL_LOOKUP = 1<<0,   /* 'l': visible to LIST, LSUB; SUBSCRIBE mailbox*/
+  IMAP_ACL_READ = 1<<1,     /* 'r': SELECT the mailbox, perform STATUS */
+  IMAP_ACL_SEEN = 1<<2,     /* 's': keep seen/unseen across sessions */
+  IMAP_ACL_WRITE = 1<<3,    /* 'w': write */
+  IMAP_ACL_INSERT = 1<<4,   /* 'i': APPEND, COPY into mailbox */
+  IMAP_ACL_POST = 1<<5,     /* 'p': send mail to submission address */
+  IMAP_ACL_CREATE = 1<<6,   /* 'k': CREATE, RENAME */
+  IMAP_ACL_DELETE = 1<<7,   /* 'x': DELETE, RENAME */
+  IMAP_ACL_DELMSG = 1<<8,   /* 't': delete messages (\DELETED flag) */
+  IMAP_ACL_EXPUNGE = 1<<9,  /* 'e': EXPUNGE */
+  IMAP_ACL_ADMIN = 1<<10    /* 'a': administer (SETACL/DELETEACL/GETACL/LISTRIGHTS) */
+} ImapAclType;
+
+#define IMAP_ACL_CAN_WRITE  (IMAP_ACL_WRITE | IMAP_ACL_INSERT | IMAP_ACL_CREATE | \
+                             IMAP_ACL_DELETE | IMAP_ACL_DELMSG | IMAP_ACL_EXPUNGE)
+
+typedef struct {
+  gchar* uid;
+  ImapAclType acl;
+} ImapUserAclType;
+
+void imap_user_acl_free(ImapUserAclType *acl);
+
 #endif /* __IMAP_H__ */

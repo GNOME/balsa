@@ -82,6 +82,9 @@ struct _LibBalsaMailboxImap {
     guint unread_update_id;
     LibBalsaMailboxSortFields sort_field;
     unsigned opened:1;
+
+    ImapAclType rights;     /* RFC 4314 'myrights' */
+    GList *acls;            /* RFC 4314 acl's */
 };
 
 struct _LibBalsaMailboxImapClass {
@@ -329,6 +332,9 @@ libbalsa_mailbox_imap_finalize(GObject * object)
         mailbox->unread_update_id = 0;
     }
 
+    g_list_foreach(mailbox->acls, (GFunc)imap_user_acl_free, NULL);
+    g_list_free(mailbox->acls);
+
     if (G_OBJECT_CLASS(parent_class)->finalize)
 	G_OBJECT_CLASS(parent_class)->finalize(object);
 }
@@ -362,6 +368,62 @@ libbalsa_mailbox_imap_set_path(LibBalsaMailboxImap* mailbox, const gchar* path)
     g_free(mailbox->path);
     mailbox->path = g_strdup(path);
     libbalsa_mailbox_imap_update_url(mailbox);
+}
+
+gboolean
+libbalsa_imap_get_quota(LibBalsaMailboxImap * mailbox,
+                        gulong *max_kbyte, gulong *used_kbyte)
+{
+    g_return_val_if_fail(LIBBALSA_MAILBOX_IMAP(mailbox), FALSE);
+
+    return imap_mbox_get_quota(mailbox->handle, mailbox->path,
+                               max_kbyte, used_kbyte) == IMR_OK;
+}
+
+/* converts ACL's to a standard RFC 4314 acl string */
+static char *
+imap_acl_to_str(ImapAclType acl)
+{
+    GString *rights;
+    static const char * flags = "lrswipkxtea";
+    int n;
+
+    rights = g_string_new("");
+    for (n = 0; n < 11; n++)
+        if (acl & (1 << n))
+            rights = g_string_append_c(rights, flags[n]);
+    return g_string_free(rights, FALSE);
+}
+
+gchar *
+libbalsa_imap_get_rights(LibBalsaMailboxImap * mailbox)
+{
+    g_return_val_if_fail(LIBBALSA_MAILBOX_IMAP(mailbox), NULL);
+
+    if (mailbox->rights == IMAP_ACL_NONE)
+        return NULL;
+    else
+        return imap_acl_to_str(mailbox->rights);
+}
+
+gchar **
+libbalsa_imap_get_acls(LibBalsaMailboxImap * mailbox)
+{
+    gchar ** acls;
+    guint n;
+    GList *p;
+
+    g_return_val_if_fail(LIBBALSA_MAILBOX_IMAP(mailbox), NULL);
+
+    if (!mailbox->acls)
+        return NULL;
+    acls = g_new0(char *, 2 * g_list_length(mailbox->acls) + 1);
+    n = 0;
+    for (p = g_list_first(mailbox->acls); p; p = g_list_next(p), n += 2) {
+        acls[n] = g_strdup(((ImapUserAclType *)p->data)->uid);
+        acls[n + 1] = imap_acl_to_str(((ImapUserAclType *)p->data)->acl);
+    }
+    return acls;
 }
 
 const gchar*
@@ -926,6 +988,16 @@ libbalsa_mailbox_imap_get_selected_handle(LibBalsaMailboxImap *mimap,
         mimap->handle = NULL;
 	return NULL;
     }
+
+    /* check if we have RFC 4314 acl's for the selected mailbox */
+    if (imap_mbox_get_my_rights(mimap->handle, &mimap->rights, FALSE) ==
+        IMR_OK) {
+        if ((mimap->rights & IMAP_ACL_CAN_WRITE) != IMAP_ACL_CAN_WRITE)
+            LIBBALSA_MAILBOX(mimap)->readonly = TRUE;
+        if (mimap->rights & IMAP_ACL_ADMIN)
+            imap_mbox_get_acl(mimap->handle, mimap->path, &mimap->acls);
+    }
+
     /* test validity */
     uidval = imap_mbox_handle_get_validity(mimap->handle);
     if (mimap->uid_validity != uidval) {

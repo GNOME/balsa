@@ -3,6 +3,15 @@
 	* src/folder-conf.c (folder_conf_imap_sub_node): use Cyrus
 	server's standard names for rights.
 
+2010-02-20  Pawel Salek
+
+	* libbalsa/gmime-gpgme-signature.c: add missing #include config.h
+	that broke rawhide build.
+	* libbalsa/imap/imap-commands.c: issue SELECT+MYRIGHTS together
+	whenever necessary to save one RTT.
+	* libbalsa/imap/imap-handle.c: add imap_cmd_exec_cmds() helper.
+	* libbalsa/imap/imap_private.h: and its prototype.
+
 2010-02-19  Peter Bloomfield
 
 	* configure.in: option to configure GMime-2.4 or 2.6.

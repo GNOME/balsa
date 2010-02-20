@@ -1843,12 +1843,6 @@ static void update_message_status_headers(GMimeMessage *message,
     g_string_free(new_header, TRUE);
 }
 
-#if defined(GMIME_MAJOR_VERSION)
-# if GMIME_CHECK_VERSION(2, 6, 0)
-#  define HAVE_GMIME_2_6 TRUE
-# endif                         /* GMIME_CHECK_VERSION(2, 6, 0) */
-#endif                          /* defined(GMIME_MAJOR_VERSION) */
-
 #if !defined(HAVE_GMIME_2_6)
 /*
  * Encode text parts as quoted-printable.

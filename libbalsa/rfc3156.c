@@ -260,6 +260,36 @@ libbalsa_message_body_protection(LibBalsaMessageBody * body)
     return result;
 }
 
+#if defined(HAVE_GMIME_2_6)
+static gboolean
+password_request_func(GMimeCipherContext * ctx, const char *user_id,
+                      const char *prompt_ctx, gboolean reprompt,
+                      GMimeStream * response, GError ** err)
+{
+    gint fd;
+    gchar *name_used;
+    gboolean rc;
+
+    fd = g_file_open_tmp(NULL, &name_used, NULL);
+    if (fd < 0)
+        return FALSE;
+
+    rc = get_passphrase_cb(ctx, user_id, prompt_ctx, reprompt, fd)
+        == GPG_ERR_NO_ERROR;
+    if (rc) {
+        GMimeStream *stream = g_mime_stream_fs_new(fd);
+        g_mime_stream_reset(stream);
+        g_mime_stream_write_to_stream(response, stream);
+
+        g_object_unref(stream);
+    }
+
+    unlink(name_used);
+    g_free(name_used);
+
+    return rc;
+}
+#endif                          /* HAVE_GMIME_2_6 */
 
 /* === RFC 2633/ RFC 3156 crypto routines === */
 /*
@@ -275,7 +305,9 @@ libbalsa_sign_mime_object(GMimeObject ** content, const gchar * rfc822_for,
 			  gpgme_protocol_t protocol, GtkWindow * parent,
 			  GError ** error)
 {
+#if !defined(HAVE_GMIME_2_6)
     GMimeSession *session;
+#endif                          /* HAVE_GMIME_2_6 */
     GMimeGpgmeContext *ctx;
     GMimeMultipartSigned *mps;
 
@@ -290,6 +322,13 @@ libbalsa_sign_mime_object(GMimeObject ** content, const gchar * rfc822_for,
     if (protocol == GPGME_PROTOCOL_OpenPGP && gpg_updates_trustdb())
 	return FALSE;
 
+#if defined(HAVE_GMIME_2_6)
+    /* create a GMimeGpgmeContext */
+    ctx = GMIME_GPGME_CONTEXT(g_mime_gpgme_context_new
+            (password_request_func, protocol, error));
+    if (ctx == NULL)
+	return FALSE;
+#else                           /* HAVE_GMIME_2_6 */
     /* create a session and a GMimeGpgmeContext */
     session = g_object_new(g_mime_session_get_type(), NULL, NULL);
     ctx = GMIME_GPGME_CONTEXT(g_mime_gpgme_context_new(session, protocol,
@@ -298,6 +337,7 @@ libbalsa_sign_mime_object(GMimeObject ** content, const gchar * rfc822_for,
 	g_object_unref(session);
 	return FALSE;
     }
+#endif                          /* HAVE_GMIME_2_6 */
 
     /* set the callbacks for the passphrase entry and the key selection */
     if (g_getenv("GPG_AGENT_INFO"))
@@ -314,7 +354,9 @@ libbalsa_sign_mime_object(GMimeObject ** content, const gchar * rfc822_for,
     /* call gpgme to create the signature */
     if (!(mps = g_mime_multipart_signed_new())) {
 	g_object_unref(ctx);
+#if !defined(HAVE_GMIME_2_6)
 	g_object_unref(session);
+#endif                          /* HAVE_GMIME_2_6 */
 	return FALSE;
     }
 
@@ -323,7 +365,9 @@ libbalsa_sign_mime_object(GMimeObject ** content, const gchar * rfc822_for,
 	 GMIME_CIPHER_HASH_DEFAULT, error) != 0) {
 	g_object_unref(mps);
 	g_object_unref(ctx);
+#if !defined(HAVE_GMIME_2_6)
 	g_object_unref(session);
+#endif                          /* HAVE_GMIME_2_6 */
 	return FALSE;
     }
 
@@ -332,7 +376,9 @@ libbalsa_sign_mime_object(GMimeObject ** content, const gchar * rfc822_for,
     g_object_unref(G_OBJECT(*content));
     *content = GMIME_OBJECT(mps);
     g_object_unref(ctx);
+#if !defined(HAVE_GMIME_2_6)
     g_object_unref(session);
+#endif                          /* HAVE_GMIME_2_6 */
     return TRUE;
 }
 
@@ -347,7 +393,9 @@ libbalsa_encrypt_mime_object(GMimeObject ** content, GList * rfc822_for,
 			     gpgme_protocol_t protocol, gboolean always_trust,
 			     GtkWindow * parent, GError ** error)
 {
+#if !defined(HAVE_GMIME_2_6)
     GMimeSession *session;
+#endif                          /* HAVE_GMIME_2_6 */
     GMimeGpgmeContext *ctx;
     GMimeObject *encrypted_obj = NULL;
     GPtrArray *recipients;
@@ -364,6 +412,7 @@ libbalsa_encrypt_mime_object(GMimeObject ** content, GList * rfc822_for,
     if (protocol == GPGME_PROTOCOL_OpenPGP && gpg_updates_trustdb())
 	return FALSE;
 
+#if !defined(HAVE_GMIME_2_6)
     /* create a session and a GMimeGpgmeContext */
     session = g_object_new(g_mime_session_get_type(), NULL, NULL);
     ctx = GMIME_GPGME_CONTEXT(g_mime_gpgme_context_new(session, protocol,
@@ -371,7 +420,16 @@ libbalsa_encrypt_mime_object(GMimeObject ** content, GList * rfc822_for,
     if (ctx == NULL) {
 	g_object_unref(session);
 	return FALSE;
+#else                           /* HAVE_GMIME_2_6 */
+    /* create a GMimeGpgmeContext */
+    ctx = GMIME_GPGME_CONTEXT(g_mime_gpgme_context_new
+            (password_request_func, protocol, error));
+    if (ctx == NULL)
+	return FALSE;
+#endif                          /* HAVE_GMIME_2_6 */
+#if !defined(HAVE_GMIME_2_6)
     }
+#endif                          /* HAVE_GMIME_2_6 */
 
     /* set the callback for the key selection (no secret needed here) */
     ctx->key_select_cb = select_key_from_list;
@@ -417,7 +475,9 @@ libbalsa_encrypt_mime_object(GMimeObject ** content, GList * rfc822_for,
     if (result != 0) {
 	g_ptr_array_free(recipients, FALSE);
 	g_object_unref(ctx);
+#if !defined(HAVE_GMIME_2_6)
 	g_object_unref(session);
+#endif                          /* HAVE_GMIME_2_6 */
 	g_object_unref(encrypted_obj);
 	return FALSE;
     }
@@ -426,7 +486,9 @@ libbalsa_encrypt_mime_object(GMimeObject ** content, GList * rfc822_for,
     g_object_unref(G_OBJECT(*content));
     *content = GMIME_OBJECT(encrypted_obj);
     g_object_unref(ctx);
+#if !defined(HAVE_GMIME_2_6)
     g_object_unref(session);
+#endif                          /* HAVE_GMIME_2_6 */
 
     return TRUE;
 }
@@ -494,7 +556,9 @@ gboolean
 libbalsa_body_check_signature(LibBalsaMessageBody * body,
 			      gpgme_protocol_t protocol)
 {
+#if !defined(HAVE_GMIME_2_6)
     GMimeSession *session;
+#endif                          /* HAVE_GMIME_2_6 */
     GMimeCipherContext *ctx;
     GMimeSignatureValidity *valid;
     GError *error = NULL;
@@ -520,8 +584,13 @@ libbalsa_body_check_signature(LibBalsaMessageBody * body,
 	g_object_unref(G_OBJECT(body->parts->next->sig_info));
 
     /* try to create GMimeGpgMEContext */
+#if !defined(HAVE_GMIME_2_6)
     session = g_object_new(g_mime_session_get_type(), NULL, NULL);
     ctx = g_mime_gpgme_context_new(session, protocol, &error);
+#else                           /* HAVE_GMIME_2_6 */
+    ctx =
+        g_mime_gpgme_context_new(password_request_func, protocol, &error);
+#endif                          /* HAVE_GMIME_2_6 */
     if (ctx == NULL) {
 	if (error) {
 	    libbalsa_information(LIBBALSA_INFORMATION_ERROR, "%s: %s",
@@ -531,7 +600,9 @@ libbalsa_body_check_signature(LibBalsaMessageBody * body,
 	} else
 	    libbalsa_information(LIBBALSA_INFORMATION_ERROR,
 				 _("creating a gpgme context failed"));
+#if !defined(HAVE_GMIME_2_6)
 	g_object_unref(session);
+#endif                          /* HAVE_GMIME_2_6 */
 	body->parts->next->sig_info = g_mime_gpgme_sigstat_new();
 	body->parts->next->sig_info->status = GPGME_SIG_STAT_ERROR;
 	return FALSE;
@@ -571,7 +642,9 @@ libbalsa_body_check_signature(LibBalsaMessageBody * body,
     }
     g_mime_signature_validity_free(valid);
     g_object_unref(ctx);
+#if !defined(HAVE_GMIME_2_6)
     g_object_unref(session);
+#endif                          /* HAVE_GMIME_2_6 */
     return TRUE;
 }
 
@@ -585,7 +658,9 @@ LibBalsaMessageBody *
 libbalsa_body_decrypt(LibBalsaMessageBody * body,
 		      gpgme_protocol_t protocol, GtkWindow * parent)
 {
+#if !defined(HAVE_GMIME_2_6)
     GMimeSession *session;
+#endif                          /* HAVE_GMIME_2_6 */
     GMimeGpgmeContext *ctx;
     GMimeObject *mime_obj = NULL;
     GError *error = NULL;
@@ -628,10 +703,16 @@ libbalsa_body_decrypt(LibBalsaMessageBody * body,
     }
 #endif
 
+#if !defined(HAVE_GMIME_2_6)
     /* create a session and a GMimeGpgmeContext */
     session = g_object_new(g_mime_session_get_type(), NULL, NULL);
     ctx = GMIME_GPGME_CONTEXT(g_mime_gpgme_context_new(session, protocol,
 						       &error));
+#else                           /* HAVE_GMIME_2_6 */
+    /* create a GMimeGpgmeContext */
+    ctx = GMIME_GPGME_CONTEXT(g_mime_gpgme_context_new
+            (password_request_func, protocol, &error));
+#endif                          /* HAVE_GMIME_2_6 */
     if (ctx == NULL) {
 	if (error) {
 	    libbalsa_information(LIBBALSA_INFORMATION_ERROR, "%s: %s",
@@ -641,7 +722,9 @@ libbalsa_body_decrypt(LibBalsaMessageBody * body,
 	} else
 	    libbalsa_information(LIBBALSA_INFORMATION_ERROR,
 				 _("creating a gpgme context failed"));
+#if !defined(HAVE_GMIME_2_6)
 	g_object_unref(session);
+#endif                          /* HAVE_GMIME_2_6 */
 	return body;
     }
 
@@ -692,7 +775,9 @@ libbalsa_body_decrypt(LibBalsaMessageBody * body,
 	    libbalsa_information(LIBBALSA_INFORMATION_ERROR,
 				 _("decryption failed"));
 	g_object_unref(ctx);
+#if !defined(HAVE_GMIME_2_6)
 	g_object_unref(session);
+#endif                          /* HAVE_GMIME_2_6 */
 	return body;
     }
     message = body->message;
@@ -713,7 +798,9 @@ libbalsa_body_decrypt(LibBalsaMessageBody * body,
 	body->sig_info = ctx->sig_state;
     }
     g_object_unref(ctx);
+#if !defined(HAVE_GMIME_2_6)
     g_object_unref(session);
+#endif                          /* HAVE_GMIME_2_6 */
 
     return body;
 }
@@ -726,7 +813,9 @@ libbalsa_rfc2440_sign_encrypt(GMimePart * part, const gchar * sign_for,
 			      GList * encrypt_for, gboolean always_trust,
 			      GtkWindow * parent, GError ** error)
 {
+#if !defined(HAVE_GMIME_2_6)
     GMimeSession *session;
+#endif                          /* HAVE_GMIME_2_6 */
     GMimeGpgmeContext *ctx;
     GPtrArray *recipients;
     gint result;
@@ -739,6 +828,7 @@ libbalsa_rfc2440_sign_encrypt(GMimePart * part, const gchar * sign_for,
     if (gpg_updates_trustdb())
 	return FALSE;
 
+#if !defined(HAVE_GMIME_2_6)
     /* create a session and a GMimeGpgmeContext */
     session = g_object_new(g_mime_session_get_type(), NULL, NULL);
     ctx = GMIME_GPGME_CONTEXT(g_mime_gpgme_context_new(session,
@@ -746,8 +836,16 @@ libbalsa_rfc2440_sign_encrypt(GMimePart * part, const gchar * sign_for,
 						       error));
     if (ctx == NULL) {
 	g_object_unref(session);
+#else                           /* HAVE_GMIME_2_6 */
+    /* create a GMimeGpgmeContext */
+    ctx = GMIME_GPGME_CONTEXT(g_mime_gpgme_context_new
+            (password_request_func, GPGME_PROTOCOL_OpenPGP, error));
+    if (ctx == NULL)
+#endif                          /* HAVE_GMIME_2_6 */
 	return FALSE;
+#if !defined(HAVE_GMIME_2_6)
     }
+#endif                          /* HAVE_GMIME_2_6 */
 
     /* set the callback for the key selection and the passphrase */
     if (sign_for) {
@@ -784,7 +882,9 @@ libbalsa_rfc2440_sign_encrypt(GMimePart * part, const gchar * sign_for,
     if (recipients)
 	g_ptr_array_free(recipients, FALSE);
     g_object_unref(ctx);
+#if !defined(HAVE_GMIME_2_6)
     g_object_unref(session);
+#endif                          /* HAVE_GMIME_2_6 */
     return (result == 0) ? TRUE : FALSE;
 }
 
@@ -796,7 +896,9 @@ libbalsa_rfc2440_sign_encrypt(GMimePart * part, const gchar * sign_for,
 gpgme_error_t
 libbalsa_rfc2440_verify(GMimePart * part, GMimeGpgmeSigstat ** sig_info)
 {
+#if !defined(HAVE_GMIME_2_6)
     GMimeSession *session;
+#endif                          /* HAVE_GMIME_2_6 */
     GMimeGpgmeContext *ctx;
     GMimeSignatureValidity *valid;
     GError *error = NULL;
@@ -815,11 +917,17 @@ libbalsa_rfc2440_verify(GMimePart * part, GMimeGpgmeSigstat ** sig_info)
     if (gpg_updates_trustdb())
 	return GPG_ERR_TRY_AGAIN;
 
+#if !defined(HAVE_GMIME_2_6)
     /* create a session and a GMimeGpgmeContext */
     session = g_object_new(g_mime_session_get_type(), NULL, NULL);
     ctx = GMIME_GPGME_CONTEXT(g_mime_gpgme_context_new(session,
 						       GPGME_PROTOCOL_OpenPGP,
 						       &error));
+#else                           /* HAVE_GMIME_2_6 */
+    /* create a GMimeGpgmeContext */
+    ctx = GMIME_GPGME_CONTEXT(g_mime_gpgme_context_new
+            (password_request_func, GPGME_PROTOCOL_OpenPGP, &error));
+#endif                          /* HAVE_GMIME_2_6 */
     if (ctx == NULL) {
 	if (error) {
 	    libbalsa_information(LIBBALSA_INFORMATION_ERROR, "%s: %s",
@@ -829,7 +937,9 @@ libbalsa_rfc2440_verify(GMimePart * part, GMimeGpgmeSigstat ** sig_info)
 	} else
 	    libbalsa_information(LIBBALSA_INFORMATION_ERROR,
 				 _("creating a gpgme context failed"));
+#if !defined(HAVE_GMIME_2_6)
 	g_object_unref(session);
+#endif                          /* HAVE_GMIME_2_6 */
 	return FALSE;
     }
 
@@ -849,7 +959,9 @@ libbalsa_rfc2440_verify(GMimePart * part, GMimeGpgmeSigstat ** sig_info)
 	    retval = GPG_ERR_GENERAL;
 	}
 	g_object_unref(ctx);
+#if !defined(HAVE_GMIME_2_6)
 	g_object_unref(session);
+#endif                          /* HAVE_GMIME_2_6 */
 	return retval;
     }
 
@@ -863,7 +975,9 @@ libbalsa_rfc2440_verify(GMimePart * part, GMimeGpgmeSigstat ** sig_info)
     g_mime_signature_validity_free(valid);
     retval = ctx->sig_state->status;
     g_object_unref(ctx);
+#if !defined(HAVE_GMIME_2_6)
     g_object_unref(session);
+#endif                          /* HAVE_GMIME_2_6 */
     return retval;
 }
 
@@ -877,7 +991,9 @@ gpgme_error_t
 libbalsa_rfc2440_decrypt(GMimePart * part, GMimeGpgmeSigstat ** sig_info,
 			 GtkWindow * parent)
 {
+#if !defined(HAVE_GMIME_2_6)
     GMimeSession *session;
+#endif                          /* HAVE_GMIME_2_6 */
     GMimeGpgmeContext *ctx;
     GError *error = NULL;
     gpgme_error_t retval;
@@ -895,11 +1011,17 @@ libbalsa_rfc2440_decrypt(GMimePart * part, GMimeGpgmeSigstat ** sig_info,
     if (gpg_updates_trustdb())
 	return GPG_ERR_TRY_AGAIN;
 
+#if !defined(HAVE_GMIME_2_6)
     /* create a session and a GMimeGpgmeContext */
     session = g_object_new(g_mime_session_get_type(), NULL, NULL);
     ctx =
 	GMIME_GPGME_CONTEXT(g_mime_gpgme_context_new
 			    (session, GPGME_PROTOCOL_OpenPGP, &error));
+#else                           /* HAVE_GMIME_2_6 */
+    /* create a GMimeGpgmeContext */
+    ctx = GMIME_GPGME_CONTEXT(g_mime_gpgme_context_new
+            (password_request_func, GPGME_PROTOCOL_OpenPGP, &error));
+#endif                          /* HAVE_GMIME_2_6 */
     if (ctx == NULL) {
 	if (error) {
 	    libbalsa_information(LIBBALSA_INFORMATION_ERROR, "%s: %s",
@@ -909,7 +1031,9 @@ libbalsa_rfc2440_decrypt(GMimePart * part, GMimeGpgmeSigstat ** sig_info,
 	} else
 	    libbalsa_information(LIBBALSA_INFORMATION_ERROR,
 				 _("creating a gpgme context failed"));
+#if !defined(HAVE_GMIME_2_6)
 	g_object_unref(session);
+#endif                          /* HAVE_GMIME_2_6 */
 	return GPG_ERR_GENERAL;
     }
 
@@ -939,7 +1063,9 @@ libbalsa_rfc2440_decrypt(GMimePart * part, GMimeGpgmeSigstat ** sig_info,
 	    retval = GPG_ERR_GENERAL;
 	}
 	g_object_unref(ctx);
+#if !defined(HAVE_GMIME_2_6)
 	g_object_unref(session);
+#endif                          /* HAVE_GMIME_2_6 */
 	return retval;
     }
 
@@ -955,7 +1081,9 @@ libbalsa_rfc2440_decrypt(GMimePart * part, GMimeGpgmeSigstat ** sig_info,
 
     /* clean up */
     g_object_unref(ctx);
+#if !defined(HAVE_GMIME_2_6)
     g_object_unref(session);
+#endif                          /* HAVE_GMIME_2_6 */
     return retval;
 }
 

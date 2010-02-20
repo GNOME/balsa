@@ -25,6 +25,7 @@
 #include <gmime/gmime.h>
 #include <gpgme.h>
 #include "gmime-gpgme-signature.h"
+#include "config.h"
 
 
 #ifdef __cplusplus
@@ -84,9 +85,16 @@ struct _GMimeGpgmeContextClass {
 
 
 GType g_mime_gpgme_context_get_type(void);
+#if defined(HAVE_GMIME_2_6)
+GMimeCipherContext *g_mime_gpgme_context_new(GMimePasswordRequestFunc
+                                             request_passwd,
+					     gpgme_protocol_t protocol,
+					     GError ** error);
+#else                           /* HAVE_GMIME_2_6 */
 GMimeCipherContext *g_mime_gpgme_context_new(GMimeSession * session,
 					     gpgme_protocol_t protocol,
 					     GError ** error);
+#endif                          /* HAVE_GMIME_2_6 */
 
 
 #ifdef __cplusplus

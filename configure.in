@@ -193,6 +193,11 @@ AC_ARG_WITH(unique,
                   [Use libUnique instead of BonoboActivation (default=no)]),
                   [with_unique=$withval],[with_unique=no])
 
+AC_ARG_WITH(gmime,
+   AC_HELP_STRING([--with-gmime],
+                  [Version of GMime (default=2.4)]),
+                  [with_gmime=$withval],[with_gmime=2.4])
+
 AC_ARG_ENABLE(more-warnings,
    AC_HELP_STRING([--enable-more-warnings],
                   [Enable maximum compiler warnings (default=yes)]),
@@ -304,7 +309,7 @@ dnl #####################################################################
 PKG_CHECK_MODULES(BALSA, [
 glib-2.0 >= 2.16.0
 gtk+-2.0 >= 2.14.0
-gmime-2.4
+gmime-$with_gmime
 gio-2.0
 gnome-icon-theme
 $gnome_extras
@@ -313,7 +318,7 @@ $gnome_extras
 PKG_CHECK_MODULES(BALSA_AB, [
    glib-2.0 >= 2.6.0
    gtk+-2.0 >= 2.6.0
-   gmime-2.4
+   gmime-$with_gmime
    $gnome_extras
 ])
 
@@ -807,6 +812,15 @@ else
     AC_MSG_RESULT([no])
 fi
 
+# GMime configuration
+#
+case $with_gmime in
+    2.4) ;;
+    2.6) AC_DEFINE([HAVE_GMIME_2_6], [1],
+                   [Defined to build with GMime version 2.5 or 2.6]) ;;
+    *) AC_MSG_ERROR([unknown GMime version $with_gmime]) ;;
+esac
+
 dnl #####################################################################
 dnl 5. Headers.
 dnl #####################################################################
@@ -1005,6 +1019,7 @@ echo "         Use GtkSourceView: $with_gtksourceview"
 echo "              Use Compface: $with_compface"
 echo "  Install extra MIME icons: $install_mimeicons"
 echo "    Configure for Touch UI: $enable_touch_ui"
+echo "             GMime version: $with_gmime"
 dnl echo "                  Use SASL: $need_sasl"
 echo ""
 

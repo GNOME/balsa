@@ -189,7 +189,9 @@ g_mime_gpgme_context_finalize(GObject * object)
 	ctx->sig_state = NULL;
     }
 
+#if !defined(HAVE_GMIME_2_6)
     g_object_unref(GMIME_CIPHER_CONTEXT(ctx)->session);
+#endif                          /* HAVE_GMIME_2_6 */
 
     G_OBJECT_CLASS(parent_class)->finalize(object);
 }
@@ -278,6 +280,17 @@ g_mime_session_passphrase(void *HOOK, const char *UID_HINT,
 			  int FD)
 {
     GMimeCipherContext *ctx = GMIME_CIPHER_CONTEXT(HOOK);
+#if defined(HAVE_GMIME_2_6)
+    GMimeStream *stream;
+    gboolean rc;
+
+    stream = g_mime_stream_fs_new(FD);
+    rc = (*ctx->request_passwd) (ctx, UID_HINT, PASSPHRASE_INFO,
+                                 PREV_WAS_BAD, stream, NULL);
+    g_object_unref(stream);
+
+    return rc ? GPG_ERR_NO_ERROR : GPG_ERR_CANCELED;
+#else                           /* HAVE_GMIME_2_6 */
     GMimeSession *session = ctx->session;
     gchar *msg, *passphrase;
 
@@ -305,6 +318,7 @@ g_mime_session_passphrase(void *HOOK, const char *UID_HINT,
             perror(__func__);
 	return GPG_ERR_CANCELED;
     }
+#endif                          /* HAVE_GMIME_2_6 */
 }
 
 
@@ -727,15 +741,24 @@ g_mime_gpgme_decrypt(GMimeCipherContext * context, GMimeStream * istream,
  * NULL and set error.
  */
 GMimeCipherContext *
+#if defined(HAVE_GMIME_2_6)
+g_mime_gpgme_context_new(GMimePasswordRequestFunc request_passwd,
+                         gpgme_protocol_t protocol, GError ** error)
+#else                           /* HAVE_GMIME_2_6 */
 g_mime_gpgme_context_new(GMimeSession * session,
 			 gpgme_protocol_t protocol, GError ** error)
+#endif                          /* HAVE_GMIME_2_6 */
 {
     GMimeCipherContext *cipher;
     GMimeGpgmeContext *ctx;
     gpgme_error_t err;
     gpgme_ctx_t gpgme_ctx;
 
+#if defined(HAVE_GMIME_2_6)
+    g_return_val_if_fail(request_passwd, NULL);
+#else                           /* HAVE_GMIME_2_6 */
     g_return_val_if_fail(GMIME_IS_SESSION(session), NULL);
+#endif                          /* HAVE_GMIME_2_6 */
 
     /* creating the gpgme context may fail, so do this first to get the info */
     if ((err = gpgme_new(&gpgme_ctx)) != GPG_ERR_NO_ERROR) {
@@ -761,8 +784,12 @@ g_mime_gpgme_context_new(GMimeSession * session,
     }
 
     /* setup according to requested protocol */
+#if defined(HAVE_GMIME_2_6)
+    cipher->request_passwd = request_passwd;
+#else                           /* HAVE_GMIME_2_6 */
     cipher->session = session;
     g_object_ref(session);
+#endif                          /* HAVE_GMIME_2_6 */
     gpgme_set_protocol(gpgme_ctx, protocol);
     if (protocol == GPGME_PROTOCOL_OpenPGP) {
 	cipher->sign_protocol = "application/pgp-signature";

@@ -1,3 +1,17 @@
+2010-02-19  Peter Bloomfield
+
+	* configure.in: option to configure GMime-2.4 or 2.6.
+	* libbalsa/gmime-gpgme-context.c (g_mime_gpgme_context_finalize),
+	(g_mime_session_passphrase), (g_mime_gpgme_context_new):
+	* libbalsa/gmime-gpgme-context.h: use it.
+	* libbalsa/gmime-stream-gio.c: ditto.
+	* libbalsa/mailbox_mbox.c: ditto.
+	* libbalsa/rfc3156.c (password_request_func),
+	(libbalsa_sign_mime_object), (libbalsa_encrypt_mime_object),
+	(libbalsa_body_check_signature), (libbalsa_body_decrypt),
+	(libbalsa_rfc2440_sign_encrypt), (libbalsa_rfc2440_verify),
+	(libbalsa_rfc2440_decrypt): ditto.
+
 2010-02-17  Albrecht Dreß
 
 	* libbalsa/imap/imap-commands.c: implement QUOTA, MYRIGHTS and GETACL

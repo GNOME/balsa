@@ -51,7 +51,11 @@ static gint64 stream_seek(GMimeStream *stream,
 			  gint64 offset,
 			  GMimeSeekWhence whence);
 static gint64 stream_tell(GMimeStream *stream);
+#if defined(HAVE_GMIME_2_6)
+static gint64 stream_length(GMimeStream *stream);
+#else                           /* HAVE_GMIME_2_6 */
 static ssize_t stream_length(GMimeStream *stream);
+#endif                          /* HAVE_GMIME_2_6 */
 static GMimeStream *stream_substream(GMimeStream *stream,
 				     gint64 start,
 				     gint64 end);
@@ -379,7 +383,11 @@ stream_tell (GMimeStream *stream)
     return stream->position;
 }
 
+#if defined(HAVE_GMIME_2_6)
+static gint64
+#else                           /* HAVE_GMIME_2_6 */
 static ssize_t
+#endif                          /* HAVE_GMIME_2_6 */
 stream_length(GMimeStream *stream)
 {
     goffset bound_end;

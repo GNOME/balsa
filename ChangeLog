@@ -1,3 +1,8 @@
+2010-02-20  Albrecht Dreß
+
+	* src/folder-conf.c (folder_conf_imap_sub_node): use Cyrus
+	server's standard names for rights.
+
 2010-02-19  Peter Bloomfield
 
 	* configure.in: option to configure GMime-2.4 or 2.6.

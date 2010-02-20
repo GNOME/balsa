@@ -842,6 +842,9 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
             "lrs", N_("read-only"),
             "lrswipkxte", N_("read-write"),
             "lrswipkxtea", N_("admin"),
+            "lrsp", N_("post"),
+            "lrsip", N_("append"),
+            "lrxte", N_("delete"),
             NULL, N_("special") };
         GString *rights_str;
         gchar * rights;
@@ -871,8 +874,11 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
                      std_acls[n] && strcmp(std_acls[n], rights);
                      n += 2);
                 rights_str = g_string_new(_("mine: "));
-                g_string_append_printf(rights_str, "%s (%s)",
-                                       std_acls[n + 1], rights);
+                if (std_acls[n])
+                    rights_str = g_string_append(rights_str, std_acls[n + 1]);
+                else
+                    g_string_append_printf(rights_str, "%s (%s)",
+                                           std_acls[n + 1], rights);
 
                 /* acl's - only available if I have admin privileges */
                 if ((acls =
@@ -883,10 +889,15 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
                         for (n = 0;
                              std_acls[n] && strcmp(std_acls[n], acls[uid + 1]);
                              n += 2);
-                        g_string_append_printf(rights_str,
-                                               "\nuid '%s': %s (%s)",
-                                               acls[uid], std_acls[n + 1],
-                                               acls[uid + 1]);
+                        if (std_acls[n])
+                            g_string_append_printf(rights_str,
+                                                   "\nuid '%s': %s",
+                                                   acls[uid], std_acls[n + 1]);
+                        else
+                            g_string_append_printf(rights_str,
+                                                   "\nuid '%s': %s (%s)",
+                                                   acls[uid], std_acls[n + 1],
+                                                   acls[uid + 1]);
                     }
                     g_strfreev(acls);
                 }

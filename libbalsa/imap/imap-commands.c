@@ -184,8 +184,9 @@ ImapResponse
 imap_mbox_select_unlocked(ImapMboxHandle* handle, const char *mbox,
                           gboolean *readonly_mbox)
 {
-  gchar* cmd, *mbx7;
+  gchar *mbx7;
   ImapResponse rc;
+  char* cmds[3];
 
   IMAP_REQUIRED_STATE3(handle, IMHS_CONNECTED, IMHS_AUTHENTICATED,
                        IMHS_SELECTED, IMR_BAD);
@@ -202,25 +203,34 @@ imap_mbox_select_unlocked(ImapMboxHandle* handle, const char *mbox,
 
   mbx7 = imap_utf8_to_mailbox(mbox);
 
-  cmd = g_strdup_printf("SELECT \"%s\"", mbx7);
+  cmds[0] = g_strdup_printf("SELECT \"%s\"", mbx7);
+  if (imap_mbox_handle_can_do(handle, IMCAP_ACL)) {
+    cmds[1] = g_strdup_printf("MYRIGHTS \"%s\"", mbx7);
+    cmds[2] = NULL;
+  } else {
+    cmds[1] = NULL;
+  }
   g_free(mbx7);
-  rc= imap_cmd_exec(handle, cmd);
-  g_free(cmd);
+
+  if(handle->mbox != mbox) { /* we do not "reselect" */
+    g_free(handle->mbox);
+    handle->mbox = g_strdup(mbox);
+  }
+
+  rc= imap_cmd_exec_cmds(handle, (const char**)&cmds[0], 0);
+
+  g_free(cmds[0]);
+  g_free(cmds[1]);
+
   if(rc == IMR_OK) {
-    if(handle->mbox != mbox) { /* we do not "reselect" */
-      g_free(handle->mbox);
-      handle->mbox = g_strdup(mbox);
-    }
     handle->state = IMHS_SELECTED;
     if(readonly_mbox) {
-      /* FIXME - issue MYRIGHTS in the same packet as SELECT */
-      ImapResponse myrights_rc =
-	imap_mbox_fetch_my_rights_unlocked(handle);
       *readonly_mbox = handle->readonly_mbox;
-      if (myrights_rc != IMR_OK && myrights_rc != IMR_NO)
-	rc = myrights_rc; /* Bad things happened, report it. */
     }
   } else { /* remove even traces of untagged responses */
+    g_free(handle->mbox);
+    handle->mbox = NULL;
+
     imap_mbox_resize_cache(handle, 0);
     mbox_view_dispose(&handle->mbox_view);
     g_signal_emit_by_name(G_OBJECT(handle), "exists-notify");

@@ -192,6 +192,9 @@ ImapResponse imap_cmd_exec_cmdno(ImapMboxHandle* handle, const char* cmd,
 				 unsigned *cmdno);
 #define imap_cmd_exec(h, c) imap_cmd_exec_cmdno((h),(c),NULL)
 
+ImapResponse imap_cmd_exec_cmds(ImapMboxHandle* handle, const char** cmds,
+				unsigned rc_to_return);
+
 ImapResponse imap_cmd_issue(ImapMboxHandle* handle, const char* cmd);
 char* imap_mbox_gets(ImapMboxHandle *h, char* buf, size_t sz);
 

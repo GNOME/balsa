@@ -19,6 +19,10 @@
  * 02111-1307, USA.
  */
 
+#if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
+# include "config.h"
+#endif                          /* HAVE_CONFIG_H */
+
 #include <gpgme.h>
 #include <string.h>
 #include <glib.h>

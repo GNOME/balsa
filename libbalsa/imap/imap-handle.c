@@ -2121,6 +2121,67 @@ imap_cmd_exec_cmdno(ImapMboxHandle* handle, const char* cmd,
   return rc;
 }
 
+/** Executes a set of commands, and wait for the response from the
+ * server.  Handles all untagged responses that arrive in meantime.
+ * Returns ImapResponse.
+ * @param handle the IMAP connection handle
+ * @param cmds the NULL-terminated vector of IMAP commands.
+ * @param rc_to_return the 0-based number of the "important" IMAP
+ * command in the sequence that we want to have the return code for.
+ */
+ImapResponse
+imap_cmd_exec_cmds(ImapMboxHandle* handle, const char** cmds,
+		   unsigned rc_to_return)
+{
+  unsigned cmd_count;
+  ImapResponse rc = IMR_OK, ret_rc = IMR_OK;
+  unsigned *cmdnos;
+
+  g_return_val_if_fail(handle, IMR_BAD);
+  if (handle->state == IMHS_DISCONNECTED)
+    return IMR_SEVERED;
+
+  if (!imap_handle_idle_disable(handle)) return IMR_SEVERED;
+
+  for (cmd_count=0; cmds[cmd_count]; ++cmd_count)
+    ;
+  cmdnos = g_malloc(cmd_count*sizeof(unsigned));
+  
+  for (cmd_count=0; cmds[cmd_count]; ++cmd_count) {
+    if (imap_cmd_start(handle, cmds[cmd_count], &cmdnos[cmd_count])<0) {
+      rc = IMR_SEVERED;   /* irrecoverable connection error. */
+      break;
+    }
+  }
+  if (rc == IMR_OK) {
+    g_return_val_if_fail(handle->state != IMHS_DISCONNECTED && 1, IMR_BAD);
+    sio_flush(handle->sio);
+    if(handle->state == IMHS_DISCONNECTED)
+      rc = IMR_SEVERED;
+    else {
+      for (cmd_count=0; cmds[cmd_count]; ++cmd_count) {
+	do {
+	  rc = imap_cmd_step (handle, cmdnos[cmd_count]);
+	} while (rc == IMR_UNTAGGED);
+
+	if ( !(rc == IMR_OK || rc == IMR_NO || rc == IMR_BAD) ) {
+	  ret_rc = rc;
+	  break;
+	}
+
+	if (cmd_count == rc_to_return)
+	  ret_rc = rc;
+
+      }
+    }
+  }
+  g_free(cmdnos);
+      
+  imap_handle_idle_enable(handle, IDLE_TIMEOUT);
+
+  return ret_rc;
+}
+
 int
 imap_handle_write(ImapMboxHandle *conn, const char *buf, size_t len)
 {
@@ -3023,8 +3084,10 @@ ir_myrights(ImapMboxHandle *h)
   if (mbox && eol == ' ') {
     if (strcmp(mbox, mbx7))
       fprintf(stderr, "expected MYRIGHTS for %s, not for %s\n", mbx7, mbox);
-    else
+    else {
       retval = extract_acl(h, "\n", &h->rights, NULL);
+      h->has_rights = 1;
+    }
   }
   free(mbx7);
   free(mbox);

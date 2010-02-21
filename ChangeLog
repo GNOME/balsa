@@ -1,3 +1,15 @@
+2010-02-20  Peter Bloomfield
+
+	* src/folder-conf.c (set_ok_sensitive),
+	(folder_conf_imap_sub_node): clean up folder properties dialog
+	and manage Update button sensitivity.
+	* src/mailbox-conf.c (create_local_mailbox_dialog),
+	(create_imap_mailbox_dialog), (mailbox_conf_view_new_full),
+	(mailbox_conf_view_new): use callback to manage Update button
+	sensitivity.
+	* src/mailbox-conf.h: new API.
+	* src/main-window.c: change mailbox Edit to Properties.
+
 2010-02-20  Albrecht Dreß
 
 	* src/folder-conf.c (folder_conf_imap_sub_node): use Cyrus

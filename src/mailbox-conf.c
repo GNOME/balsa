@@ -128,7 +128,8 @@ static BalsaMailboxConfView *
                                GtkWindow * window,
                                GtkWidget * table, gint row,
                                GtkSizeGroup * size_group,
-                               MailboxConfWindow * mcw);
+                               MailboxConfWindow * mcw,
+                               GCallback callback);
 
 /* pages */
 static GtkWidget *create_dialog(MailboxConfWindow *mcw);
@@ -1160,7 +1161,7 @@ create_local_mailbox_dialog(MailboxConfWindow *mcw)
 
     mcw->view_info =
         mailbox_conf_view_new_full(mcw->mailbox, GTK_WINDOW(dialog), table,
-                                   ++row, size_group, mcw);
+                                   ++row, size_group, mcw, NULL);
 
     return dialog;
 }
@@ -1386,7 +1387,7 @@ create_imap_mailbox_dialog(MailboxConfWindow *mcw)
 
     mcw->view_info =
         mailbox_conf_view_new_full(mcw->mailbox, GTK_WINDOW(dialog), table,
-                                   ++row, NULL, mcw);
+                                   ++row, NULL, mcw, NULL);
 
     return dialog;
 }
@@ -1420,7 +1421,8 @@ mailbox_conf_view_new_full(LibBalsaMailbox * mailbox,
                            GtkWindow * window,
                            GtkWidget * table, gint row,
                            GtkSizeGroup * size_group,
-                           MailboxConfWindow * mcw)
+                           MailboxConfWindow * mcw,
+                           GCallback callback)
 {
     GtkWidget *label;
     BalsaMailboxConfView *view_info;
@@ -1458,6 +1460,9 @@ mailbox_conf_view_new_full(LibBalsaMailbox * mailbox,
     }
     gtk_table_attach(GTK_TABLE(table), widget, 1, 2, row, row + 1,
                      GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0);
+    if (callback)
+        g_signal_connect_swapped(view_info->identity_combo_box, "changed",
+                                 callback, window);
 
 #ifdef HAVE_GPGME
     {
@@ -1485,6 +1490,9 @@ mailbox_conf_view_new_full(LibBalsaMailbox * mailbox,
         if (mcw)
             g_signal_connect(view_info->chk_crypt, "changed",
                              G_CALLBACK(check_for_blank_fields), mcw);
+        if (callback)
+            g_signal_connect_swapped(view_info->chk_crypt, "changed",
+                                     callback, window);
 	gtk_table_attach(GTK_TABLE(table), view_info->chk_crypt,
 		         1, 2, row, row + 1,
 			 GTK_EXPAND | GTK_FILL, 0, 0, 0);
@@ -1500,6 +1508,9 @@ mailbox_conf_view_new_full(LibBalsaMailbox * mailbox,
     if (mcw)
         g_signal_connect(view_info->show_to, "toggled",
                          G_CALLBACK(check_for_blank_fields), mcw);
+    if (callback)
+        g_signal_connect_swapped(view_info->show_to, "toggled",
+                                 callback, window);
     
     /* Subscribe check button */
     view_info->subscribe =
@@ -1510,16 +1521,20 @@ mailbox_conf_view_new_full(LibBalsaMailbox * mailbox,
     if (mcw)
         g_signal_connect(view_info->subscribe, "toggled",
                          G_CALLBACK(check_for_blank_fields), mcw);
+    if (callback)
+        g_signal_connect_swapped(view_info->subscribe, "toggled",
+                                 callback, window);
 
     return view_info;
 }
 
 BalsaMailboxConfView *
 mailbox_conf_view_new(LibBalsaMailbox * mailbox,
-                      GtkWindow * window, GtkWidget * table, gint row)
+                      GtkWindow * window, GtkWidget * table, gint row,
+                      GCallback callback)
 {
     return mailbox_conf_view_new_full(mailbox, window, table, row,
-                                      NULL, NULL);
+                                      NULL, NULL, callback);
 }
 
 #ifdef HAVE_GPGME

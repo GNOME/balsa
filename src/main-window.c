@@ -482,7 +482,7 @@ static const GtkActionEntry mailbox_entries[] = {
     {"MailboxSelectAll", BALSA_PIXMAP_MARK_ALL, N_("_Select All"), NULL,
      N_("Select all messages in current mailbox"),
      G_CALLBACK(bw_mark_all_cb)},
-    {"MailboxEdit", GTK_STOCK_PREFERENCES, N_("_Edit..."), NULL,
+    {"MailboxEdit", GTK_STOCK_PREFERENCES, N_("_Properties..."), NULL,
      N_("Edit the selected mailbox"), G_CALLBACK(mailbox_conf_edit_cb)},
     {"MailboxDelete", GTK_STOCK_REMOVE, N_("_Delete..."), NULL,
      N_("Delete the selected mailbox"),

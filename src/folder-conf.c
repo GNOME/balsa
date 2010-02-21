@@ -738,12 +738,19 @@ folder, parent);
    representing a sub-folder.
    If mn is NULL, setup it with default values for folder creation.
 */
+static void
+set_ok_sensitive(GtkDialog * dialog)
+{
+    gtk_dialog_set_response_sensitive(dialog, GTK_RESPONSE_OK, TRUE);
+}
+
 void
 folder_conf_imap_sub_node(BalsaMailboxNode * mn)
 {
-    GtkWidget *frame, *table, *subtable, *button, *label;
+    GtkWidget *content, *table, *button, *label, *hbox;
     SubfolderDialogData *sdd;
     static SubfolderDialogData *sdd_new = NULL;
+    guint row;
 
     /* Allow only one dialog per mailbox node, and one with mn == NULL
      * for creating a new subfolder. */
@@ -780,7 +787,7 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
                     GTK_WINDOW(balsa_app.main_window),
                     GTK_DIALOG_DESTROY_WITH_PARENT, /* must NOT be modal */
                     mn ? _("_Update") : _("_Create"), GTK_RESPONSE_OK,
-                    GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, 
+                    GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                     GTK_STOCK_HELP,   GTK_RESPONSE_HELP,
                     NULL));
 #if HAVE_MACOSX_DESKTOP
@@ -797,47 +804,63 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
         g_object_set_data_full(G_OBJECT(sdd->mbnode),
                                BALSA_FOLDER_CONF_IMAP_KEY, sdd, 
                                (GDestroyNotify) folder_conf_destroy_cdd);
-        } else {
+    } else {
         sdd_new = sdd;
         g_object_add_weak_pointer(G_OBJECT(sdd->dialog),
                                   (gpointer) &sdd_new);
     }
 
-    frame = gtk_frame_new(mn ? _("Rename or move subfolder") :
-			       _("Create subfolder"));
-    gtk_box_pack_start(GTK_BOX(gtk_dialog_get_content_area(sdd->dialog)),
-                       frame, TRUE, TRUE, 0);
-    table = libbalsa_create_table(3, 3);
+    table = libbalsa_create_table(3, 2);
+    gtk_table_set_row_spacings(GTK_TABLE(table), 6);
+    gtk_table_set_col_spacings(GTK_TABLE(table), 12);
     gtk_container_set_border_width(GTK_CONTAINER(table), 12);
-    gtk_container_add(GTK_CONTAINER(frame), table);
+    if (mn)
+        content = table;
+    else {
+        content = gtk_frame_new(_("Create subfolder"));
+        gtk_container_add(GTK_CONTAINER(content), table);
+    }
+    gtk_box_pack_start(GTK_BOX(gtk_dialog_get_content_area(sdd->dialog)),
+                       content, TRUE, TRUE, 0);
  
+    row = 0;
     /* INPUT FIELD CREATION */
-    label= libbalsa_create_label(_("_Folder name:"), table, 0);
-    sdd->folder_name = libbalsa_create_entry(table,
-                                   G_CALLBACK(validate_sub_folder),
-				   sdd, 0, sdd->old_folder, label);
+    label= libbalsa_create_label(_("_Folder name:"), table, row);
+    sdd->folder_name =
+        libbalsa_create_entry(table, G_CALLBACK(validate_sub_folder),
+                              sdd, row, sdd->old_folder, label);
 
-    subtable = libbalsa_create_table(1, 3);
-    label = libbalsa_create_label(_("Host:"), table, 1);
+    ++row;
+    label = libbalsa_create_label(_("Host:"), table, row);
     sdd->host_label = 
         gtk_label_new(sdd->mbnode && sdd->mbnode->server
                       ? sdd->mbnode->server->host : "");
-    gtk_table_attach(GTK_TABLE(subtable), sdd->host_label, 1, 2, 0, 1,
-		     GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 5);
+    gtk_misc_set_alignment(GTK_MISC(sdd->host_label), 0.0, 0.5);
+    gtk_table_attach(GTK_TABLE(table), sdd->host_label, 1, 2, row, row + 1,
+		     GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0);
+
+    ++row;
+    label = libbalsa_create_label(_("_Subfolder of:"), table, row);
+    sdd->parent_folder = gtk_entry_new();
+    gtk_editable_set_editable(GTK_EDITABLE(sdd->parent_folder), FALSE);
+    gtk_entry_set_text(GTK_ENTRY(sdd->parent_folder), sdd->old_parent);
+    gtk_label_set_mnemonic_widget(GTK_LABEL(label), sdd->parent_folder);
+    g_signal_connect(sdd->parent_folder, "changed",
+                     G_CALLBACK(validate_sub_folder), sdd);
+
     button = gtk_button_new_with_mnemonic(_("_Browse..."));
     g_signal_connect(G_OBJECT(button), "clicked",
 		     G_CALLBACK(browse_button_cb), (gpointer) sdd);
-    gtk_table_attach(GTK_TABLE(subtable), button, 2, 3, 0, 1,
-	GTK_FILL, GTK_FILL, 5, 5);
-    gtk_table_attach(GTK_TABLE(table), subtable, 1, 2, 1, 2,
-	GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 5);
 
-    label = libbalsa_create_label(_("_Subfolder of:"), table, 2);
-    sdd->parent_folder = libbalsa_create_entry(table,
-                                     G_CALLBACK(validate_sub_folder),
-				     sdd, 2, sdd->old_parent, label);
+    hbox = gtk_hbox_new(FALSE, 12);
+    gtk_box_pack_start(GTK_BOX(hbox), sdd->parent_folder, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, FALSE, 0);
+    gtk_table_attach(GTK_TABLE(table), hbox, 1, 2, row, row + 1,
+                     GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0);
 
-    if (mn) {
+    if (!mn)
+        validate_sub_folder(NULL, sdd);
+    else {
         static const char *std_acls[] = {
             "lrs", N_("read-only"),
             "lrswipkxte", N_("read-write"),
@@ -850,7 +873,8 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
         gchar * rights;
         gchar * quotas;
 
-        label = libbalsa_create_label(_("Permissions:"), table, 3);
+        ++row;
+        label = libbalsa_create_label(_("Permissions:"), table, row);
 
         /* mailbox closed: no detailed permissions available */
         if (!libbalsa_mailbox_imap_is_connected(LIBBALSA_MAILBOX_IMAP(mn->mailbox))) {
@@ -905,11 +929,14 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
             }
         }
         rights = g_string_free(rights_str, FALSE);
-        gtk_table_attach(GTK_TABLE(table), gtk_label_new(rights), 1, 2, 3, 4,
-                         GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 5);
+        label = gtk_label_new(rights);
+        gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.5);
+        gtk_table_attach(GTK_TABLE(table), label, 1, 2, row, row + 1,
+                         GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0);
         g_free(rights);
 
-        label = libbalsa_create_label(_("Quota:"), table, 4);
+        ++row;
+        label = libbalsa_create_label(_("Quota:"), table, row);
 
         /* mailbox closed: no quota available */
         if (!libbalsa_mailbox_imap_is_connected(LIBBALSA_MAILBOX_IMAP(mn->mailbox)))
@@ -922,26 +949,30 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
             else if (max == 0 && used == 0)
                 quotas = g_strdup(_("no limits"));
             else
-                quotas = g_strdup_printf(_("%lu kByte of %lu kbyte (%.1f%%) used"),
+                quotas = g_strdup_printf(_("%lu kB of %lu kB (%.1f%%) used"),
                                          used, max,
                                          100.0 * (float) used / (float) max);
         }
-        gtk_table_attach(GTK_TABLE(table), gtk_label_new(quotas), 1, 2, 4, 5,
-                         GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 5);
+        label = gtk_label_new(quotas);
+        gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.5);
+        gtk_table_attach(GTK_TABLE(table), label, 1, 2, row, row + 1,
+                         GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0);
         g_free(quotas);
 
         sdd->mcv = mailbox_conf_view_new(mn->mailbox,
                                          GTK_WINDOW(sdd->dialog),
-                                         table, 5);
+                                         table, 5,
+                                         G_CALLBACK(set_ok_sensitive));
     }
 
     gtk_widget_show_all(GTK_WIDGET(sdd->dialog));
 
-    validate_sub_folder(NULL, sdd);
     gtk_widget_grab_focus(sdd->folder_name);
 
     g_signal_connect(G_OBJECT(sdd->dialog), "response",
                      G_CALLBACK(folder_conf_response), sdd);
+    gtk_dialog_set_response_sensitive(GTK_DIALOG(sdd->dialog),
+                                      GTK_RESPONSE_OK, FALSE);
     gtk_widget_show_all(GTK_WIDGET(sdd->dialog));
 }
 

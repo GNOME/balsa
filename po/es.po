@@ -13,8 +13,8 @@ msgstr ""
 "Project-Id-Version: balsa.HEAD\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=balsa&component=general\n"
-"POT-Creation-Date: 2010-02-17 23:04+0000\n"
-"PO-Revision-Date: 2010-02-18 18:16+0100\n"
+"POT-Creation-Date: 2010-02-21 05:00+0000\n"
+"PO-Revision-Date: 2010-02-22 21:01+0100\n"
 "Last-Translator: Jorge González <jorgegonz@svn.gnome.org>\n"
 "Language-Team: Español <gnome-es-list@gnome.org>\n"
 "MIME-Version: 1.0\n"
@@ -278,7 +278,7 @@ msgstr "Ha ocurrido un error durante el movimiento de mensajes: %s"
 msgid "Failed to decrypt MIME part: parse error"
 msgstr "Fallo al descifrar la parte MIME: error de parseo"
 
-#: ../libbalsa/gmime-gpgme-context.c:287 ../libbalsa/rfc3156.c:1596
+#: ../libbalsa/gmime-gpgme-context.c:300 ../libbalsa/rfc3156.c:1724
 #, c-format
 msgid ""
 "The passphrase for this key was bad, please try again!\n"
@@ -289,7 +289,7 @@ msgstr ""
 "\n"
 "Clave: %s"
 
-#: ../libbalsa/gmime-gpgme-context.c:292 ../libbalsa/rfc3156.c:1601
+#: ../libbalsa/gmime-gpgme-context.c:305 ../libbalsa/rfc3156.c:1729
 #, c-format
 msgid ""
 "Please enter the passphrase for the secret key!\n"
@@ -302,78 +302,78 @@ msgstr ""
 
 # src/balsa-message.c:1316
 # src/balsa-message.c:1474
-#: ../libbalsa/gmime-gpgme-context.c:410 ../libbalsa/gmime-gpgme-context.c:483
-#: ../libbalsa/gmime-gpgme-context.c:491 ../libbalsa/gmime-gpgme-context.c:600
-#: ../libbalsa/gmime-gpgme-context.c:680
+#: ../libbalsa/gmime-gpgme-context.c:424 ../libbalsa/gmime-gpgme-context.c:497
+#: ../libbalsa/gmime-gpgme-context.c:505 ../libbalsa/gmime-gpgme-context.c:614
+#: ../libbalsa/gmime-gpgme-context.c:694
 msgid "could not get data from stream"
 msgstr "no se pudo obtener datos del flujo"
 
 # src/balsa-message.c:1316
 # src/balsa-message.c:1474
-#: ../libbalsa/gmime-gpgme-context.c:415 ../libbalsa/gmime-gpgme-context.c:606
-#: ../libbalsa/gmime-gpgme-context.c:685
+#: ../libbalsa/gmime-gpgme-context.c:429 ../libbalsa/gmime-gpgme-context.c:620
+#: ../libbalsa/gmime-gpgme-context.c:699
 msgid "could not create new data object"
 msgstr "no se pudo crear el objeto de datos nuevo"
 
 # libmutt/imap/auth.c:373
 # libmutt/imap/auth.c:373
-#: ../libbalsa/gmime-gpgme-context.c:422
+#: ../libbalsa/gmime-gpgme-context.c:436
 msgid "signing failed"
 msgstr "la firma ha fallado"
 
-#: ../libbalsa/gmime-gpgme-context.c:502 ../libbalsa/rfc3156.c:561
-#: ../libbalsa/rfc3156.c:566 ../libbalsa/rfc3156.c:842
-#: ../libbalsa/rfc3156.c:848
+#: ../libbalsa/gmime-gpgme-context.c:516 ../libbalsa/rfc3156.c:632
+#: ../libbalsa/rfc3156.c:637 ../libbalsa/rfc3156.c:952
+#: ../libbalsa/rfc3156.c:958
 msgid "signature verification failed"
 msgstr "la verificación de la firma ha fallado"
 
-#: ../libbalsa/gmime-gpgme-context.c:566
+#: ../libbalsa/gmime-gpgme-context.c:580
 #, c-format
 msgid "combined signing and encryption is defined only for RFC 2440"
 msgstr "la firma y el cifrado combinado sólo están definidos para el RFC 2440"
 
-#: ../libbalsa/gmime-gpgme-context.c:629
+#: ../libbalsa/gmime-gpgme-context.c:643
 msgid "signing and encryption failed"
 msgstr "han fallado la firma y el descifrado"
 
-#: ../libbalsa/gmime-gpgme-context.c:631
+#: ../libbalsa/gmime-gpgme-context.c:645
 msgid "encryption failed"
 msgstr "el cifrado ha fallado"
 
-#: ../libbalsa/gmime-gpgme-context.c:694 ../libbalsa/rfc3156.c:688
-#: ../libbalsa/rfc3156.c:693
+#: ../libbalsa/gmime-gpgme-context.c:708 ../libbalsa/rfc3156.c:771
+#: ../libbalsa/rfc3156.c:776
 msgid "decryption failed"
 msgstr "falló el descifrado"
 
 # src/balsa-message.c:1316
 # src/balsa-message.c:1474
-#: ../libbalsa/gmime-gpgme-context.c:742
+#: ../libbalsa/gmime-gpgme-context.c:765
 msgid "could not create context"
 msgstr "no se pudo crear contexto"
 
-#: ../libbalsa/gmime-gpgme-context.c:797
+#: ../libbalsa/gmime-gpgme-context.c:824
 #, c-format
 msgid "the crypto engine for protocol OpenPGP is not available"
 msgstr "el motor de cifrado para el protocolo OpenPGP no está disponible"
 
-#: ../libbalsa/gmime-gpgme-context.c:807
+#: ../libbalsa/gmime-gpgme-context.c:834
 #, c-format
 msgid "the crypto engine for protocol CMS is not available"
 msgstr "el motor de cifrado para el protocolo CMS no está disponible"
 
-#: ../libbalsa/gmime-gpgme-context.c:814
+#: ../libbalsa/gmime-gpgme-context.c:841
 #, c-format
 msgid "invalid crypto engine %d"
 msgstr "motor de cifrado inválido %d"
 
 # src/balsa-message.c:301
 # src/balsa-message.c:331
-#: ../libbalsa/gmime-gpgme-context.c:845 ../libbalsa/gmime-gpgme-context.c:872
+#: ../libbalsa/gmime-gpgme-context.c:872 ../libbalsa/gmime-gpgme-context.c:899
 #, c-format
 msgid "could not list keys for \"%s\""
 msgstr "no se pudo listar las claves para «%s»"
 
-#: ../libbalsa/gmime-gpgme-context.c:888
+#: ../libbalsa/gmime-gpgme-context.c:915
 #, c-format
 msgid ""
 "%s: a key for %s is present, but it is expired, disabled, revoked or invalid"
@@ -383,12 +383,12 @@ msgstr ""
 
 # src/balsa-message.c:301
 # src/balsa-message.c:331
-#: ../libbalsa/gmime-gpgme-context.c:892
+#: ../libbalsa/gmime-gpgme-context.c:919
 #, c-format
 msgid "%s: could not find a key for %s"
 msgstr "%s: no pudo encontrar una clave para %s"
 
-#: ../libbalsa/gmime-gpgme-context.c:897
+#: ../libbalsa/gmime-gpgme-context.c:924
 #, c-format
 msgid ""
 "%s: a key with id %s is present, but it is expired, disabled, revoked or "
@@ -399,19 +399,19 @@ msgstr ""
 
 # src/balsa-message.c:301
 # src/balsa-message.c:331
-#: ../libbalsa/gmime-gpgme-context.c:901
+#: ../libbalsa/gmime-gpgme-context.c:928
 #, c-format
 msgid "%s: could not find a key with id %s"
 msgstr "%s: no se pudo encontrar una clave con ID %s"
 
 # src/balsa-message.c:301
 # src/balsa-message.c:331
-#: ../libbalsa/gmime-gpgme-context.c:915
+#: ../libbalsa/gmime-gpgme-context.c:942
 #, c-format
 msgid "%s: multiple keys for %s"
 msgstr "%s: claves múltiples para %s"
 
-#: ../libbalsa/gmime-gpgme-context.c:960
+#: ../libbalsa/gmime-gpgme-context.c:987
 #, c-format
 msgid "%s: insufficient validity for uid %s"
 msgstr "%s: validez insuficiente para el uid %s"
@@ -1174,7 +1174,7 @@ msgstr ""
 msgid "Mailbox does not exist."
 msgstr "El buzón no existe."
 
-#: ../libbalsa/mailbox_maildir.c:932 ../libbalsa/mailbox_mbox.c:2037
+#: ../libbalsa/mailbox_maildir.c:932 ../libbalsa/mailbox_mbox.c:2031
 #: ../libbalsa/mailbox_mh.c:1110
 #, c-format
 msgid "Data copy error"
@@ -1238,21 +1238,21 @@ msgstr "No se puede bloquear el buzón."
 
 # src/sendmsg-window.c:1403
 # src/sendmsg-window.c:1454
-#: ../libbalsa/mailbox_mbox.c:1994
+#: ../libbalsa/mailbox_mbox.c:1988
 #, c-format
 msgid "%s: could not open %s."
 msgstr "%s: no se pudo abrir  %s."
 
 # src/balsa-message.c:301
 # src/balsa-message.c:331
-#: ../libbalsa/mailbox_mbox.c:2005
+#: ../libbalsa/mailbox_mbox.c:1999
 #, c-format
 msgid "%s: could not get new mime stream."
 msgstr "%s: no se pudo obtener el flujo mime nuevo."
 
 # libmutt/mx.c:459 libmutt/mx.c:605
 # libmutt/mx.c:459 libmutt/mx.c:605
-#: ../libbalsa/mailbox_mbox.c:2013
+#: ../libbalsa/mailbox_mbox.c:2007
 #, c-format
 msgid "%s: %s is not in mbox format."
 msgstr "%s: %s no está en formato mbox."
@@ -1487,7 +1487,7 @@ msgstr "Directorio LDAP para %s"
 # libmutt/imap/imap_ssl.c:254
 # libmutt/imap/imap_ssl.c:254
 #: ../libbalsa/rfc2445.c:90 ../libbalsa/rfc2445.c:685
-#: ../libbalsa/rfc2445.c:704 ../libbalsa/rfc3156.c:1260
+#: ../libbalsa/rfc2445.c:704 ../libbalsa/rfc3156.c:1388
 msgid "unknown"
 msgstr "desconocido"
 
@@ -1599,45 +1599,45 @@ msgstr ""
 "\n"
 "Desactivar soporte para el protocolo %s."
 
-#: ../libbalsa/rfc3156.c:309 ../libbalsa/rfc3156.c:760
+#: ../libbalsa/rfc3156.c:349 ../libbalsa/rfc3156.c:858
 msgid "Enter passphrase to unlock the secret key for signing"
 msgstr ""
 "Introduzca la frase de paso para desbloquear la clave secreta para firmar"
 
 # src/balsa-message.c:1316
 # src/balsa-message.c:1474
-#: ../libbalsa/rfc3156.c:528 ../libbalsa/rfc3156.c:533
-#: ../libbalsa/rfc3156.c:638 ../libbalsa/rfc3156.c:643
-#: ../libbalsa/rfc3156.c:826 ../libbalsa/rfc3156.c:831
-#: ../libbalsa/rfc3156.c:906 ../libbalsa/rfc3156.c:911
+#: ../libbalsa/rfc3156.c:597 ../libbalsa/rfc3156.c:602
+#: ../libbalsa/rfc3156.c:719 ../libbalsa/rfc3156.c:724
+#: ../libbalsa/rfc3156.c:934 ../libbalsa/rfc3156.c:939
+#: ../libbalsa/rfc3156.c:1028 ../libbalsa/rfc3156.c:1033
 msgid "creating a gpgme context failed"
 msgstr "la creación de un contexto gpgme ha fallado"
 
-#: ../libbalsa/rfc3156.c:655 ../libbalsa/rfc3156.c:922
+#: ../libbalsa/rfc3156.c:738 ../libbalsa/rfc3156.c:1046
 msgid "Enter passphrase to decrypt message"
 msgstr "Introduzca la frase de paso para descifrar el mensaje"
 
-#: ../libbalsa/rfc3156.c:931 ../libbalsa/rfc3156.c:938
+#: ../libbalsa/rfc3156.c:1055 ../libbalsa/rfc3156.c:1062
 msgid "decryption and signature verification failed"
 msgstr "la verificación de la firma y el descifrado han fallado"
 
 # libmutt/imap/imap_ssl.c:472
 # libmutt/imap/imap_ssl.c:472
-#: ../libbalsa/rfc3156.c:969
+#: ../libbalsa/rfc3156.c:1097
 msgid "The signature is valid."
 msgstr "La firma es válida."
 
-#: ../libbalsa/rfc3156.c:971
+#: ../libbalsa/rfc3156.c:1099
 msgid "The signature is valid but expired."
 msgstr "La firma es válida pero caducó."
 
-#: ../libbalsa/rfc3156.c:974
+#: ../libbalsa/rfc3156.c:1102
 msgid ""
 "The signature is valid but the key used to verify the signature has expired."
 msgstr ""
 "La firma es válida pero la clave usada para verificar la firma ha caducado."
 
-#: ../libbalsa/rfc3156.c:977
+#: ../libbalsa/rfc3156.c:1105
 msgid ""
 "The signature is valid but the key used to verify the signature has been "
 "revoked."
@@ -1647,78 +1647,78 @@ msgstr ""
 
 # libmutt/imap/imap_ssl.c:472
 # libmutt/imap/imap_ssl.c:472
-#: ../libbalsa/rfc3156.c:980
+#: ../libbalsa/rfc3156.c:1108
 msgid "The signature is invalid."
 msgstr "La firma es inválida."
 
-#: ../libbalsa/rfc3156.c:983
+#: ../libbalsa/rfc3156.c:1111
 msgid "The signature could not be verified due to a missing key."
 msgstr "La firma no pudo ser verificada debido a una clave perdida."
 
-#: ../libbalsa/rfc3156.c:985
+#: ../libbalsa/rfc3156.c:1113
 msgid "This part is not a real PGP signature."
 msgstr "Esta parte no es una firma PGP real."
 
-#: ../libbalsa/rfc3156.c:988
+#: ../libbalsa/rfc3156.c:1116
 msgid "The signature could not be verified due to an invalid crypto engine."
 msgstr ""
 "La firma no pudo ser verificada debido a un motor criptográfico inválido."
 
-#: ../libbalsa/rfc3156.c:991 ../libbalsa/rfc3156.c:1757
+#: ../libbalsa/rfc3156.c:1119 ../libbalsa/rfc3156.c:1885
 msgid "GnuPG is rebuilding the trust database and is currently unavailable."
 msgstr ""
 "GnuPG está reconstruyendo la base de datos de confianza y actualmente no "
 "está disponible."
 
-#: ../libbalsa/rfc3156.c:994
+#: ../libbalsa/rfc3156.c:1122
 msgid "An error prevented the signature verification."
 msgstr "Un error impidió la verificación de la firma."
 
-#: ../libbalsa/rfc3156.c:1002
+#: ../libbalsa/rfc3156.c:1130
 msgid "The user ID is of unknown validity."
 msgstr "El ID de usuario es de validez desconocida."
 
-#: ../libbalsa/rfc3156.c:1004
+#: ../libbalsa/rfc3156.c:1132
 msgid "The validity of the user ID is undefined."
 msgstr "La validez del ID de usuario está indefinida."
 
-#: ../libbalsa/rfc3156.c:1006
+#: ../libbalsa/rfc3156.c:1134
 msgid "The user ID is never valid."
 msgstr "El ID de usuario no es válido."
 
-#: ../libbalsa/rfc3156.c:1008
+#: ../libbalsa/rfc3156.c:1136
 msgid "The user ID is marginally valid."
 msgstr "El ID de usuario es marginalmente válido."
 
-#: ../libbalsa/rfc3156.c:1010
+#: ../libbalsa/rfc3156.c:1138
 msgid "The user ID is fully valid."
 msgstr "El ID de usuario es completamente válido."
 
-#: ../libbalsa/rfc3156.c:1012
+#: ../libbalsa/rfc3156.c:1140
 msgid "The user ID is ultimately valid."
 msgstr "El ID de usuario es en todo caso válido."
 
-#: ../libbalsa/rfc3156.c:1014 ../libbalsa/rfc3156.c:1272
+#: ../libbalsa/rfc3156.c:1142 ../libbalsa/rfc3156.c:1400
 msgid "bad validity"
 msgstr "mala validez"
 
 # src/pref-manager.c:237 src/pref-manager.c:949 src/pref-manager.c:1027
 # src/pref-manager.c:1838
-#: ../libbalsa/rfc3156.c:1022
+#: ../libbalsa/rfc3156.c:1150
 msgid "PGP signature: "
 msgstr "Firma PGP: "
 
 # src/pref-manager.c:237 src/pref-manager.c:949 src/pref-manager.c:1027
 # src/pref-manager.c:1838
-#: ../libbalsa/rfc3156.c:1024
+#: ../libbalsa/rfc3156.c:1152
 msgid "S/MIME signature: "
 msgstr "Firma S/MIME: "
 
-#: ../libbalsa/rfc3156.c:1026
+#: ../libbalsa/rfc3156.c:1154
 msgid "(unknown protocol) "
 msgstr "(protocolo desconocido)"
 
-#: ../libbalsa/rfc3156.c:1053
+#: ../libbalsa/rfc3156.c:1181
 #, c-format
 msgid ""
 "\n"
@@ -1727,7 +1727,7 @@ msgstr ""
 "\n"
 "ID de usuario: %s"
 
-#: ../libbalsa/rfc3156.c:1056
+#: ../libbalsa/rfc3156.c:1184
 #, c-format
 msgid ""
 "\n"
@@ -1738,7 +1738,7 @@ msgstr ""
 
 # libinit_balsa/balsa-druid-page-user.gob:87
 # libinit_balsa/balsa-druid-page-user.gob:87
-#: ../libbalsa/rfc3156.c:1060
+#: ../libbalsa/rfc3156.c:1188
 #, c-format
 msgid ""
 "\n"
@@ -1747,7 +1747,7 @@ msgstr ""
 "\n"
 "Dirección de correo: %s"
 
-#: ../libbalsa/rfc3156.c:1062
+#: ../libbalsa/rfc3156.c:1190
 #, c-format
 msgid ""
 "\n"
@@ -1756,7 +1756,7 @@ msgstr ""
 "\n"
 "Firmado el: %s"
 
-#: ../libbalsa/rfc3156.c:1063
+#: ../libbalsa/rfc3156.c:1191
 #, c-format
 msgid ""
 "\n"
@@ -1765,7 +1765,7 @@ msgstr ""
 "\n"
 "Validez del ID de usuario: %s"
 
-#: ../libbalsa/rfc3156.c:1067
+#: ../libbalsa/rfc3156.c:1195
 #, c-format
 msgid ""
 "\n"
@@ -1776,7 +1776,7 @@ msgstr ""
 
 # libmutt/imap/imap_ssl.c:481
 # libmutt/imap/imap_ssl.c:481
-#: ../libbalsa/rfc3156.c:1071
+#: ../libbalsa/rfc3156.c:1199
 #, c-format
 msgid ""
 "\n"
@@ -1786,7 +1786,7 @@ msgstr ""
 "Huella de la clave: %s"
 
 #. Subkey creation date
-#: ../libbalsa/rfc3156.c:1074
+#: ../libbalsa/rfc3156.c:1202
 #, c-format
 msgid ""
 "\n"
@@ -1796,7 +1796,7 @@ msgstr ""
 "Subclave creada el: %s"
 
 #. Subkey expiration date
-#: ../libbalsa/rfc3156.c:1076
+#: ../libbalsa/rfc3156.c:1204
 #, c-format
 msgid ""
 "\n"
@@ -1805,29 +1805,29 @@ msgstr ""
 "\n"
 "La subclave caduca el: %s"
 
-#: ../libbalsa/rfc3156.c:1084
+#: ../libbalsa/rfc3156.c:1212
 msgid " revoked"
 msgstr "revocada"
 
 # src/main-window.c:448
 # src/main-window.c:455
-#: ../libbalsa/rfc3156.c:1089
+#: ../libbalsa/rfc3156.c:1217
 msgid " expired"
 msgstr "caducada"
 
-#: ../libbalsa/rfc3156.c:1094
+#: ../libbalsa/rfc3156.c:1222
 msgid " disabled"
 msgstr "desactivada"
 
 # libmutt/imap/imap_ssl.c:297
 # libmutt/imap/imap_ssl.c:297
-#: ../libbalsa/rfc3156.c:1099
+#: ../libbalsa/rfc3156.c:1227
 msgid " invalid"
 msgstr "inválida"
 
 #. ngettext: string begins with a single space, so no space after
 #. * the colon is correct punctuation (in English).
-#: ../libbalsa/rfc3156.c:1103
+#: ../libbalsa/rfc3156.c:1231
 #, c-format
 msgid ""
 "\n"
@@ -1844,7 +1844,7 @@ msgstr[1] ""
 
 # src/balsa-message.c:718
 # src/balsa-message.c:780
-#: ../libbalsa/rfc3156.c:1112
+#: ../libbalsa/rfc3156.c:1240
 #, c-format
 msgid ""
 "\n"
@@ -1853,7 +1853,7 @@ msgstr ""
 "\n"
 "Nombre del emisor: %s"
 
-#: ../libbalsa/rfc3156.c:1116
+#: ../libbalsa/rfc3156.c:1244
 #, c-format
 msgid ""
 "\n"
@@ -1862,7 +1862,7 @@ msgstr ""
 "\n"
 "Número de serie del emisor: %s"
 
-#: ../libbalsa/rfc3156.c:1119
+#: ../libbalsa/rfc3156.c:1247
 #, c-format
 msgid ""
 "\n"
@@ -1873,12 +1873,12 @@ msgstr ""
 
 # libbalsa/send.c:788
 # libbalsa/send.c:794
-#: ../libbalsa/rfc3156.c:1176
+#: ../libbalsa/rfc3156.c:1304
 #, c-format
 msgid "Could not launch %s to query the public key %s."
 msgstr "No se pudo lanzar %s para obtener la clave pública %s."
 
-#: ../libbalsa/rfc3156.c:1226
+#: ../libbalsa/rfc3156.c:1354
 #, c-format
 msgid ""
 "Running %s failed with return value %d:\n"
@@ -1887,7 +1887,7 @@ msgstr ""
 "La ejecución de %s falló con valor de retorno %d:\n"
 "%s"
 
-#: ../libbalsa/rfc3156.c:1233
+#: ../libbalsa/rfc3156.c:1361
 #, c-format
 msgid ""
 "Running %s successful:\n"
@@ -1896,82 +1896,82 @@ msgstr ""
 "Ejecución de %s exitosa:\n"
 "%s"
 
-#: ../libbalsa/rfc3156.c:1262
+#: ../libbalsa/rfc3156.c:1390
 msgid "undefined"
 msgstr "indefinida"
 
 # src/pref-manager.c:194
 # src/pref-manager.c:193
-#: ../libbalsa/rfc3156.c:1264 ../src/address-book-config.c:200
+#: ../libbalsa/rfc3156.c:1392 ../src/address-book-config.c:200
 msgid "never"
 msgstr "nunca"
 
-#: ../libbalsa/rfc3156.c:1266
+#: ../libbalsa/rfc3156.c:1394
 msgid "marginal"
 msgstr "marginal"
 
-#: ../libbalsa/rfc3156.c:1268
+#: ../libbalsa/rfc3156.c:1396
 msgid "full"
 msgstr "total"
 
-#: ../libbalsa/rfc3156.c:1270
+#: ../libbalsa/rfc3156.c:1398
 msgid "ultimate"
 msgstr "última"
 
-#: ../libbalsa/rfc3156.c:1333
+#: ../libbalsa/rfc3156.c:1461
 msgid "User ID"
 msgstr "ID del usuario"
 
-#: ../libbalsa/rfc3156.c:1333
+#: ../libbalsa/rfc3156.c:1461
 msgid "Key ID"
 msgstr "ID de clave"
 
-#: ../libbalsa/rfc3156.c:1333
+#: ../libbalsa/rfc3156.c:1461
 msgid "Length"
 msgstr "Longitud"
 
 # src/main-window.c:259
 # src/main-window.c:262
-#: ../libbalsa/rfc3156.c:1333
+#: ../libbalsa/rfc3156.c:1461
 msgid "Validity"
 msgstr "Validez"
 
 # src/sendmsg-window.c:191
 # src/sendmsg-window.c:196
 #. FIXME: create dialog according to the Gnome HIG
-#: ../libbalsa/rfc3156.c:1377
+#: ../libbalsa/rfc3156.c:1505
 msgid "Select key"
 msgstr "Seleccione clave"
 
 # src/sendmsg-window.c:166
 # src/sendmsg-window.c:172
-#: ../libbalsa/rfc3156.c:1393
+#: ../libbalsa/rfc3156.c:1521
 #, c-format
 msgid "Select the private key for the signer %s"
 msgstr "Seleccione la clave privada para el firmante %s"
 
 # src/balsa-message.c:1316
 # src/balsa-message.c:1474
-#: ../libbalsa/rfc3156.c:1397
+#: ../libbalsa/rfc3156.c:1525
 #, c-format
 msgid "Select the public key for the recipient %s"
 msgstr "Seleccione la clave pública para el destinatario %s"
 
-#: ../libbalsa/rfc3156.c:1528
+#: ../libbalsa/rfc3156.c:1656
 #, c-format
 msgid "Insufficient trust for recipient %s"
 msgstr "No hay suficiente confianza en el destinatario %s"
 
-#: ../libbalsa/rfc3156.c:1530
+#: ../libbalsa/rfc3156.c:1658
 #, c-format
 msgid "The validity of the key with user ID \"%s\" is \"%s\"."
 msgstr "La validez de la clave con ID de usuario «%s» es «%s»."
 
-#: ../libbalsa/rfc3156.c:1541
+#: ../libbalsa/rfc3156.c:1669
 msgid "Use this key anyway?"
 msgstr "¿Desea usar esta clave de todos modos?"
 
-#: ../libbalsa/rfc3156.c:1758
+#: ../libbalsa/rfc3156.c:1886
 msgid "Try again later."
 msgstr "Inténtelo más tarde."
 
@@ -2128,20 +2128,20 @@ msgstr "Iniciando sesión en %s usando %s"
 
 # src/pref-manager.c:194
 # src/pref-manager.c:193
-#: ../libbalsa/smtp-server.c:388 ../src/mailbox-conf.c:204
-#: ../src/mailbox-conf.c:1466 ../src/pref-manager.c:403
+#: ../libbalsa/smtp-server.c:388 ../src/mailbox-conf.c:205
+#: ../src/mailbox-conf.c:1471 ../src/pref-manager.c:403
 #: ../src/pref-manager.c:3414
 msgid "Never"
 msgstr "Nunca"
 
-#: ../libbalsa/smtp-server.c:389 ../src/mailbox-conf.c:205
-#: ../src/mailbox-conf.c:1467
+#: ../libbalsa/smtp-server.c:389 ../src/mailbox-conf.c:206
+#: ../src/mailbox-conf.c:1472
 msgid "If Possible"
 msgstr "Si es posible"
 
 # src/main-window.c:448
 # src/main-window.c:455
-#: ../libbalsa/smtp-server.c:390 ../src/mailbox-conf.c:206
+#: ../libbalsa/smtp-server.c:390 ../src/mailbox-conf.c:207
 msgid "Required"
 msgstr "Requerido"
 
@@ -2165,7 +2165,7 @@ msgstr "Nombre _descriptivo:"
 #. pop server
 #. imap server
 #: ../libbalsa/smtp-server.c:572 ../src/folder-conf.c:377
-#: ../src/mailbox-conf.c:1202 ../src/mailbox-conf.c:1315
+#: ../src/mailbox-conf.c:1203 ../src/mailbox-conf.c:1316
 msgid "_Server:"
 msgstr "_Servidor:"
 
@@ -2179,7 +2179,7 @@ msgstr " _Usuario:"
 msgid "_Pass Phrase:"
 msgstr "Frase de _paso:"
 
-#: ../libbalsa/smtp-server.c:595 ../src/mailbox-conf.c:225
+#: ../libbalsa/smtp-server.c:595 ../src/mailbox-conf.c:226
 msgid "Use _TLS:"
 msgstr "Usar _TLS:"
 
@@ -2911,11 +2911,11 @@ msgstr "No se ha encontrado una ruta.  ¿Quiere especificar una?"
 msgid "Rubrica2 Address Book"
 msgstr "Libreta de direcciones de Rubrica2"
 
-#: ../src/balsa-app.c:79 ../src/folder-conf.c:276 ../src/mailbox-conf.c:1296
+#: ../src/balsa-app.c:79 ../src/folder-conf.c:276 ../src/mailbox-conf.c:1297
 msgid "_Remember password in keyring"
 msgstr "_Recordar la contraseña en el depósito de claves"
 
-#: ../src/balsa-app.c:82 ../src/folder-conf.c:279 ../src/mailbox-conf.c:1299
+#: ../src/balsa-app.c:82 ../src/folder-conf.c:279 ../src/mailbox-conf.c:1300
 msgid "_Remember password"
 msgstr "_Recordar  contraseña"
 
@@ -4442,7 +4442,7 @@ msgstr "Carpeta IMAP remota"
 # src/address-book-config.c:134 src/mailbox-conf.c:287
 # src/mailbox-conf.c:1000
 #. must NOT be modal
-#: ../src/folder-conf.c:301 ../src/folder-conf.c:782 ../src/mailbox-conf.c:548
+#: ../src/folder-conf.c:301 ../src/folder-conf.c:789 ../src/mailbox-conf.c:549
 msgid "_Update"
 msgstr "Act_ualizar"
 
@@ -4452,8 +4452,8 @@ msgstr "_Crear"
 
 # src/sendmsg-window.c:228
 # src/sendmsg-window.c:232
-#: ../src/folder-conf.c:327 ../src/mailbox-conf.c:1194
-#: ../src/mailbox-conf.c:1306
+#: ../src/folder-conf.c:327 ../src/mailbox-conf.c:1195
+#: ../src/mailbox-conf.c:1307
 msgid "_Basic"
 msgstr "_Básico"
 
@@ -4461,7 +4461,7 @@ msgstr "_Básico"
 msgid "_Max number of connections:"
 msgstr "Número _máximo de conexiones:"
 
-#: ../src/folder-conf.c:339 ../src/mailbox-conf.c:1369
+#: ../src/folder-conf.c:339 ../src/mailbox-conf.c:1370
 msgid "Enable _persistent cache"
 msgstr "Activar caché _persistente"
 
@@ -4469,7 +4469,7 @@ msgstr "Activar caché _persistente"
 msgid "Use IDLE command"
 msgstr "Usar el comando IDLE"
 
-#: ../src/folder-conf.c:354 ../src/mailbox-conf.c:1373
+#: ../src/folder-conf.c:354 ../src/mailbox-conf.c:1374
 msgid "Enable _bug workarounds"
 msgstr "Activar arreglos de _bugs"
 
@@ -4483,8 +4483,8 @@ msgstr "Usar STATUS para la comprobación de buzones"
 # src/address-book-config.c:459 src/filter-edit-dialog.c:379
 # src/mailbox-conf.c:279 src/mailbox-conf.c:1004 src/pref-manager.c:1230
 # src/pref-manager.c:2241
-#: ../src/folder-conf.c:367 ../src/mailbox-conf.c:1248
-#: ../src/mailbox-conf.c:1375
+#: ../src/folder-conf.c:367 ../src/mailbox-conf.c:1249
+#: ../src/mailbox-conf.c:1376
 msgid "_Advanced"
 msgstr "_Avanzado"
 
@@ -4496,7 +4496,7 @@ msgstr "_Nombre descriptivo:"
 # src/mailbox-conf.c:822 src/mailbox-conf.c:882
 # src/mailbox-conf.c:899 src/mailbox-conf.c:957
 #. username
-#: ../src/folder-conf.c:385 ../src/mailbox-conf.c:1210
+#: ../src/folder-conf.c:385 ../src/mailbox-conf.c:1211
 msgid "Use_r name:"
 msgstr "Nombre de _usuario:"
 
@@ -4506,7 +4506,7 @@ msgstr "Nombre de _usuario:"
 msgid "_Password:"
 msgstr "_Contraseña:"
 
-#: ../src/folder-conf.c:396 ../src/mailbox-conf.c:1331
+#: ../src/folder-conf.c:396 ../src/mailbox-conf.c:1332
 msgid "_Anonymous access"
 msgstr "Acceso _anónimo"
 
@@ -4570,7 +4570,7 @@ msgstr "Hubo un fallo al renombrar la carpeta con motivo: %s"
 msgid "Folder creation failed. Reason: %s"
 msgstr "Hubo un fallo al crear la carpeta con motivo: %s"
 
-#: ../src/folder-conf.c:764
+#: ../src/folder-conf.c:771
 msgid ""
 "An IMAP folder that is not a mailbox\n"
 "has no properties that can be changed."
@@ -4579,64 +4579,81 @@ msgstr ""
 "no tiene propiedades que puedan ser cambiadas."
 
 # libmutt/mbox.c:1066
-#: ../src/folder-conf.c:779
+#: ../src/folder-conf.c:786
 msgid "Remote IMAP subfolder"
 msgstr "Subcarpeta IMAP remota"
 
-#: ../src/folder-conf.c:782
+#: ../src/folder-conf.c:789
 msgid "_Create"
 msgstr "_Crear"
 
-#: ../src/folder-conf.c:806
-msgid "Rename or move subfolder"
-msgstr "Renombrar o mover subcarpeta"
-
-#: ../src/folder-conf.c:807
+#: ../src/folder-conf.c:820
 msgid "Create subfolder"
 msgstr "Crear subcarpeta"
 
 # src/filter-edit-dialog.c:490
 # src/filter-edit-dialog.c:436
 #. INPUT FIELD CREATION
-#: ../src/folder-conf.c:815
+#: ../src/folder-conf.c:828
 msgid "_Folder name:"
 msgstr "_Nombre de la carpeta:"
 
-#: ../src/folder-conf.c:821
+#: ../src/folder-conf.c:834
 msgid "Host:"
 msgstr "Anfitrión:"
 
-# src/pref-manager.c:1825
-# src/pref-manager.c:1995 src/pref-manager.c:2044
-#: ../src/folder-conf.c:827
-msgid "_Browse..."
-msgstr "_Buscar…"
-
-#: ../src/folder-conf.c:835
+#: ../src/folder-conf.c:843
 msgid "_Subfolder of:"
 msgstr "_Subcarpeta de:"
 
-#: ../src/folder-conf.c:842
+# src/pref-manager.c:1825
+# src/pref-manager.c:1995 src/pref-manager.c:2044
+#: ../src/folder-conf.c:851
+msgid "_Browse..."
+msgstr "_Buscar…"
+
+#: ../src/folder-conf.c:865
 msgid "read-only"
 msgstr "sólo lectura"
 
-#: ../src/folder-conf.c:843
+#: ../src/folder-conf.c:866
 msgid "read-write"
 msgstr "lectura y escritura"
 
-#: ../src/folder-conf.c:844
+#: ../src/folder-conf.c:867
 msgid "admin"
 msgstr "administrador"
 
-#: ../src/folder-conf.c:845
+#: ../src/folder-conf.c:868
+#| msgid "Host:"
+msgid "post"
+msgstr "publicar"
+
+#: ../src/folder-conf.c:869
+#| msgid "Wrapped"
+msgid "append"
+msgstr "añadir"
+
+# src/balsa-index-page.c:492 src/filter-edit-dialog.c:228
+# src/main-window.c:435 src/mblist-window.c:452 src/pref-manager.c:1112
+# src/pref-manager.c:2027
+# src/balsa-index-page.c:542 src/filter-edit-dialog.c:224
+# src/main-window.c:442 src/mblist-window.c:475 src/pref-manager.c:1243
+# src/pref-manager.c:2253
+#: ../src/folder-conf.c:870
+#| msgid "delegated"
+msgid "delete"
+msgstr "eliminar"
+
+#: ../src/folder-conf.c:871
 msgid "special"
 msgstr "especial"
 
-#: ../src/folder-conf.c:850
+#: ../src/folder-conf.c:877
 msgid "Permissions:"
 msgstr "Permisos:"
 
-#: ../src/folder-conf.c:857
+#: ../src/folder-conf.c:884
 msgid ""
 "\n"
 "detailed permissions are available only for open folders"
@@ -4644,7 +4661,7 @@ msgstr ""
 "\n"
 "los permisos detallados sólo están disponibles para carpetas abiertas"
 
-#: ../src/folder-conf.c:864
+#: ../src/folder-conf.c:891
 msgid ""
 "\n"
 "the server does not support ACL's"
@@ -4654,34 +4671,33 @@ msgstr ""
 
 # src/pref-manager.c:1235
 # src/pref-manager.c:1376
-#: ../src/folder-conf.c:873
-#| msgid "minutes"
+#: ../src/folder-conf.c:900
 msgid "mine: "
 msgstr "mios: "
 
-#: ../src/folder-conf.c:901
-#| msgid "Quit"
+#: ../src/folder-conf.c:939
 msgid "Quota:"
 msgstr "Cuota:"
 
-#: ../src/folder-conf.c:905
+#: ../src/folder-conf.c:943
 msgid "quota information available only for open folders"
 msgstr "la información de cuota sólo está disponible para carpetas abiertas"
 
-#: ../src/folder-conf.c:910
+#: ../src/folder-conf.c:948
 msgid "the server does not support quotas"
 msgstr "el servidor no soporta cuotas"
 
-#: ../src/folder-conf.c:912
+#: ../src/folder-conf.c:950
 msgid "no limits"
 msgstr "sin límites"
 
-#: ../src/folder-conf.c:914
+#: ../src/folder-conf.c:952
 #, c-format
-msgid "%lu kByte of %lu kbyte (%.1f%%) used"
-msgstr "%lu kByte de %lu kbyte (%.1f%%) usado"
+#| msgid "%lu kByte of %lu kbyte (%.1f%%) used"
+msgid "%lu kB of %lu kB (%.1f%%) used"
+msgstr "%lu kB de %lu kB (%.1f%%) usado"
 
-#: ../src/folder-conf.c:945
+#: ../src/folder-conf.c:987
 msgid ""
 "This folder is not stored in configuration. I do not yet know how to remove "
 "it from remote server."
@@ -4691,7 +4707,7 @@ msgstr ""
 
 # src/mailbox-conf.c:157
 # src/mailbox-conf.c:157
-#: ../src/folder-conf.c:954
+#: ../src/folder-conf.c:996
 #, c-format
 msgid ""
 "This will remove the folder \"%s\" from the list.\n"
@@ -4701,7 +4717,7 @@ msgstr ""
 "Podrá usar más tarde «Carpeta IMAP nueva» para agregar esta carpeta "
 "nuevamente.\n"
 
-#: ../src/folder-conf.c:962
+#: ../src/folder-conf.c:1004
 msgid "Confirm"
 msgstr "Confirmar"
 
@@ -4726,7 +4742,7 @@ msgstr "ERROR: "
 msgid "FATAL: "
 msgstr "FATAL: "
 
-#: ../src/mailbox-conf.c:221
+#: ../src/mailbox-conf.c:222
 msgid "Use _SSL"
 msgstr "Usar _SSL"
 
@@ -4734,11 +4750,11 @@ msgstr "Usar _SSL"
 # src/mblist-window.c:528
 # src/mblist-window.c:501 src/mblist-window.c:517 src/mblist-window.c:536
 # src/mblist-window.c:551
-#: ../src/mailbox-conf.c:349
+#: ../src/mailbox-conf.c:350
 msgid "No mailbox selected."
 msgstr "Ningún buzón seleccionado."
 
-#: ../src/mailbox-conf.c:379
+#: ../src/mailbox-conf.c:380
 #, c-format
 msgid ""
 "Mailbox \"%s\" is used by Balsa and I cannot remove it.\n"
@@ -4750,7 +4766,7 @@ msgstr ""
 
 # src/mailbox-conf.c:157
 # src/mailbox-conf.c:157
-#: ../src/mailbox-conf.c:389
+#: ../src/mailbox-conf.c:390
 #, c-format
 msgid ""
 "This will remove the mailbox \"%s\" from the list of mailboxes.  You may "
@@ -4768,15 +4784,15 @@ msgstr ""
 
 # src/pref-manager.c:1058
 # src/pref-manager.c:1188
-#: ../src/mailbox-conf.c:401
+#: ../src/mailbox-conf.c:402
 msgid "Remove from _list"
 msgstr "Quitar de la _lista"
 
-#: ../src/mailbox-conf.c:402
+#: ../src/mailbox-conf.c:403
 msgid "Remove from list and _disk"
 msgstr "Borrar el buzón de la lista y el _disco"
 
-#: ../src/mailbox-conf.c:410
+#: ../src/mailbox-conf.c:411
 #, c-format
 msgid ""
 "This will remove the mailbox \"%s\" and all its messages from your IMAP "
@@ -4793,13 +4809,13 @@ msgstr ""
 
 # src/pref-manager.c:1058
 # src/pref-manager.c:1188
-#: ../src/mailbox-conf.c:423
+#: ../src/mailbox-conf.c:424
 msgid "_Remove from server"
 msgstr "_Eliminar del servidor"
 
 # src/mailbox-conf.c:157
 # src/mailbox-conf.c:157
-#: ../src/mailbox-conf.c:430
+#: ../src/mailbox-conf.c:431
 #, c-format
 msgid ""
 "This will remove the mailbox \"%s\" from the list of mailboxes.\n"
@@ -4812,11 +4828,11 @@ msgstr ""
 
 # src/pref-manager.c:1058
 # src/pref-manager.c:1188
-#: ../src/mailbox-conf.c:439
+#: ../src/mailbox-conf.c:440
 msgid "_Remove from list"
 msgstr "_Eliminar de la lista"
 
-#: ../src/mailbox-conf.c:483
+#: ../src/mailbox-conf.c:484
 #, c-format
 msgid "Folder deletion failed. Reason: %s"
 msgstr "Hubo un fallo al borrar la carpeta debido a: %s"
@@ -4827,20 +4843,20 @@ msgstr "Hubo un fallo al borrar la carpeta debido a: %s"
 # src/address-book-config.c:459 src/filter-edit-dialog.c:379
 # src/mailbox-conf.c:279 src/mailbox-conf.c:1004 src/pref-manager.c:1230
 # src/pref-manager.c:2241
-#: ../src/mailbox-conf.c:552 ../src/pref-manager.c:1703
+#: ../src/mailbox-conf.c:553 ../src/pref-manager.c:1703
 #: ../src/pref-manager.c:1775 ../src/pref-manager.c:2950
 msgid "_Add"
 msgstr "_Añadir"
 
 # src/mailbox-conf.c:485
 # src/mailbox-conf.c:490
-#: ../src/mailbox-conf.c:775
+#: ../src/mailbox-conf.c:776
 #, c-format
 msgid "%s on %s"
 msgstr "%s en %s"
 
 # src/mailbox-conf.c:581
-#: ../src/mailbox-conf.c:917
+#: ../src/mailbox-conf.c:918
 #, c-format
 msgid ""
 "Rename of %s to %s failed:\n"
@@ -4851,84 +4867,84 @@ msgstr ""
 
 # src/mailbox-conf.c:786 src/mailbox-conf.c:810 src/mailbox-conf.c:870
 # src/mailbox-conf.c:862 src/mailbox-conf.c:887 src/mailbox-conf.c:945
-#: ../src/mailbox-conf.c:1126
+#: ../src/mailbox-conf.c:1127
 msgid "_Mailbox Name:"
 msgstr "_Nombre del buzón:"
 
 # src/mailbox-conf.c:239
 # src/mailbox-conf.c:233
-#: ../src/mailbox-conf.c:1137
+#: ../src/mailbox-conf.c:1138
 msgid "Local Mailbox Configurator"
 msgstr "Configurador de buzón local"
 
 # src/mailbox-conf.c:239
 # src/mailbox-conf.c:233
-#: ../src/mailbox-conf.c:1172
+#: ../src/mailbox-conf.c:1173
 msgid "Remote Mailbox Configurator"
 msgstr "Configurador de buzón remoto"
 
 # src/mailbox-conf.c:786 src/mailbox-conf.c:810 src/mailbox-conf.c:870
 # src/mailbox-conf.c:862 src/mailbox-conf.c:887 src/mailbox-conf.c:945
 #. mailbox name
-#: ../src/mailbox-conf.c:1197 ../src/mailbox-conf.c:1309
+#: ../src/mailbox-conf.c:1198 ../src/mailbox-conf.c:1310
 msgid "Mailbox _name:"
 msgstr "_Nombre del buzón:"
 
 # src/mailbox-conf.c:827 src/mailbox-conf.c:886
 # src/mailbox-conf.c:904 src/mailbox-conf.c:961
 #. password field
-#: ../src/mailbox-conf.c:1216 ../src/mailbox-conf.c:1343
+#: ../src/mailbox-conf.c:1217 ../src/mailbox-conf.c:1344
 msgid "Pass_word:"
 msgstr "_Contraseña:"
 
 # src/main-window.c:403
 # src/main-window.c:406
-#: ../src/mailbox-conf.c:1224
+#: ../src/mailbox-conf.c:1225
 msgid "_Delete messages from server after download"
 msgstr "_Borrar los mensajes del servidor después de descargarlos"
 
-#: ../src/mailbox-conf.c:1229
+#: ../src/mailbox-conf.c:1230
 msgid "_Enable check for new mail"
 msgstr "_Activar búsqueda de correo nuevo "
 
-#: ../src/mailbox-conf.c:1234
+#: ../src/mailbox-conf.c:1235
 msgid "_Filter messages through procmail"
 msgstr "_Filtrar mensajes a través de procmail"
 
 # src/filter-edit-dialog.c:490
 # src/filter-edit-dialog.c:436
-#: ../src/mailbox-conf.c:1238
+#: ../src/mailbox-conf.c:1239
 msgid "Fi_lter Command:"
 msgstr "Comando del fi_ltro:"
 
-#: ../src/mailbox-conf.c:1252
+#: ../src/mailbox-conf.c:1253
 msgid "Disable _APOP"
 msgstr "Desactivar _APOP"
 
 # src/mailbox-conf.c:822 src/mailbox-conf.c:882
 # src/mailbox-conf.c:899 src/mailbox-conf.c:957
 #. username
-#: ../src/mailbox-conf.c:1323
+#: ../src/mailbox-conf.c:1324
 msgid "_Username:"
 msgstr "Nombre de _usuario:"
 
 # src/mailbox-conf.c:890
 # src/mailbox-conf.c:965
-#: ../src/mailbox-conf.c:1348
+#: ../src/mailbox-conf.c:1349
 msgid "F_older path:"
 msgstr "Ruta de la _carpeta:"
 
 # src/pref-manager.c:234 src/pref-manager.c:867
 # src/pref-manager.c:236 src/pref-manager.c:992
-#: ../src/mailbox-conf.c:1437
+#: ../src/mailbox-conf.c:1439
 msgid "_Identity:"
 msgstr "_Identidad:"
 
-#: ../src/mailbox-conf.c:1468 ../src/pref-manager.c:3416
+#: ../src/mailbox-conf.c:1473 ../src/pref-manager.c:3416
 msgid "Always"
 msgstr "Siempre"
 
-#: ../src/mailbox-conf.c:1472
+#: ../src/mailbox-conf.c:1477
 msgid ""
 "_Decrypt and check\n"
 "signatures automatically:"
@@ -4936,11 +4952,11 @@ msgstr ""
 "_Descifrar y comprobar\n"
 "firmas automáticamente:"
 
-#: ../src/mailbox-conf.c:1496
+#: ../src/mailbox-conf.c:1504
 msgid "Show _Recipient column instead of Sender"
 msgstr "Mostrar columna del _destinatario en vez del remitente"
 
-#: ../src/mailbox-conf.c:1506
+#: ../src/mailbox-conf.c:1517
 msgid "_Subscribe for new mail check"
 msgstr "_Suscribirse para comprobación de correo"
 
@@ -5009,7 +5025,7 @@ msgstr "_Revisar"
 
 # src/mblist-window.c:450
 # src/mblist-window.c:473
-#: ../src/mailbox-node.c:1078
+#: ../src/mailbox-node.c:1078 ../src/main-window.c:485
 msgid "_Properties..."
 msgstr "_Propiedades…"
 
@@ -5495,12 +5511,6 @@ msgstr "Seleccionar _todo"
 #: ../src/main-window.c:483
 msgid "Select all messages in current mailbox"
 msgstr "Seleccionar todos los mensajes en el buzón actual"
-
-# src/main-window.c:389
-# src/main-window.c:386
-#: ../src/main-window.c:485
-msgid "_Edit..."
-msgstr "_Editar…"
 
 #: ../src/main-window.c:486
 msgid "Edit the selected mailbox"
@@ -8628,6 +8638,14 @@ msgstr "Subir"
 #: ../src/toolbar-prefs.c:551
 msgid "Down"
 msgstr "Bajar"
+
+#~ msgid "Rename or move subfolder"
+#~ msgstr "Renombrar o mover subcarpeta"
+
+# src/main-window.c:389
+# src/main-window.c:386
+#~ msgid "_Edit..."
+#~ msgstr "_Editar…"
 
 #~ msgid "Signed on"
 #~ msgstr "Firmado en"

@@ -1,3 +1,8 @@
+2010-02-28  Peter Bloomfield
+
+	* src/folder-conf.c (folder_conf_imap_sub_node): remove mnemonic
+	from subfolder-of label.
+
 2010-02-20  Peter Bloomfield
 
 	* src/folder-conf.c (set_ok_sensitive),

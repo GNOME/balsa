@@ -840,13 +840,10 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
 		     GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0);
 
     ++row;
-    label = libbalsa_create_label(_("_Subfolder of:"), table, row);
+    label = libbalsa_create_label(_("Subfolder of:"), table, row);
     sdd->parent_folder = gtk_entry_new();
     gtk_editable_set_editable(GTK_EDITABLE(sdd->parent_folder), FALSE);
     gtk_entry_set_text(GTK_ENTRY(sdd->parent_folder), sdd->old_parent);
-    gtk_label_set_mnemonic_widget(GTK_LABEL(label), sdd->parent_folder);
-    g_signal_connect(sdd->parent_folder, "changed",
-                     G_CALLBACK(validate_sub_folder), sdd);
 
     button = gtk_button_new_with_mnemonic(_("_Browse..."));
     g_signal_connect(G_OBJECT(button), "clicked",

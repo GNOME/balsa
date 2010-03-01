@@ -18,8 +18,8 @@ msgstr ""
 "Project-Id-Version: balsa master\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=balsa&component=general\n"
-"POT-Creation-Date: 2010-02-21 05:00+0000\n"
-"PO-Revision-Date: 2010-02-21 13:21+0100\n"
+"POT-Creation-Date: 2010-02-28 17:12+0000\n"
+"PO-Revision-Date: 2010-03-01 09:30+0100\n"
 "Last-Translator: Mario Blättermann <mariobl@gnome.org>\n"
 "Language-Team: German <gnome-de@gnome.org>\n"
 "MIME-Version: 1.0\n"
@@ -226,8 +226,8 @@ msgid ""
 "\n"
 "Key: %s"
 msgstr ""
-"Das Passwort für diesen Schlüssel war fehlerhaft, bitte versuchen Sie es noch "
-"einmal!\n"
+"Das Passwort für diesen Schlüssel war fehlerhaft, bitte versuchen Sie es "
+"noch einmal!\n"
 "\n"
 "Schlüssel: %s"
 
@@ -329,8 +329,8 @@ msgid ""
 "%s: a key with id %s is present, but it is expired, disabled, revoked or "
 "invalid"
 msgstr ""
-"%s: Ein Schlüssel mit der Kennung %s ist verfügbar, aber entweder abgelaufen, "
-"deaktiviert, widerrufen oder ungültig"
+"%s: Ein Schlüssel mit der Kennung %s ist verfügbar, aber entweder "
+"abgelaufen, deaktiviert, widerrufen oder ungültig"
 
 #: ../libbalsa/gmime-gpgme-context.c:928
 #, c-format
@@ -1006,8 +1006,8 @@ msgstr "Temporärdatei »%s« konnte nicht angelegt werden: %s"
 #, c-format
 msgid "Failed to save cache file \"%s\": %s.  New version saved as \"%s\""
 msgstr ""
-"Pufferdatei »%s« konnte nicht gespeichert werden: %s. Neue Version wurde als »%"
-"s« gespeichert."
+"Pufferdatei »%s« konnte nicht gespeichert werden: %s. Neue Version wurde als "
+"»%s« gespeichert."
 
 #: ../libbalsa/mailbox_mbox.c:461
 #, c-format
@@ -1245,8 +1245,8 @@ msgstr "Warten auf flock-Versuch... %d"
 msgid "LDAP Directory for %s"
 msgstr "LDAP-Verzeichnis für %s"
 
-#: ../libbalsa/rfc2445.c:90 ../libbalsa/rfc2445.c:685 ../libbalsa/rfc2445.c:704
-#: ../libbalsa/rfc3156.c:1388
+#: ../libbalsa/rfc2445.c:90 ../libbalsa/rfc2445.c:685
+#: ../libbalsa/rfc2445.c:704 ../libbalsa/rfc3156.c:1388
 msgid "unknown"
 msgstr "unbekannt"
 
@@ -1323,7 +1323,8 @@ msgstr "Die Verschlüsselungsmethode %s ist nicht richtig installiert."
 #: ../libbalsa/rfc3156.c:105
 #, c-format
 msgid ""
-"Crypto engine %s version %s is installed, but at least version %s is required."
+"Crypto engine %s version %s is installed, but at least version %s is "
+"required."
 msgstr ""
 "Die Verschlüsselungsmethode %s ist in Version %s installiert, es wird aber "
 "mindestens die Version %s benötigt."
@@ -1337,8 +1338,8 @@ msgstr "Unbekanntes Problem bei der Verschlüsselungsmethode für Protokoll %s."
 #, c-format
 msgid "%s: could not retrieve crypto engine information: %s."
 msgstr ""
-"%s: Informationen zur Verschlüsselungsmethode konnten nicht empfangen werden: "
-"%s"
+"%s: Informationen zur Verschlüsselungsmethode konnten nicht empfangen "
+"werden: %s"
 
 #: ../libbalsa/rfc3156.c:121
 #, c-format
@@ -1382,16 +1383,16 @@ msgstr "Die Signatur ist gültig, jedoch abgelaufen."
 msgid ""
 "The signature is valid but the key used to verify the signature has expired."
 msgstr ""
-"Die Signatur ist gültig, der zum Überprüfen der Signatur verwendete Schlüssel "
-"ist jedoch abgelaufen."
+"Die Signatur ist gültig, der zum Überprüfen der Signatur verwendete "
+"Schlüssel ist jedoch abgelaufen."
 
 #: ../libbalsa/rfc3156.c:1105
 msgid ""
 "The signature is valid but the key used to verify the signature has been "
 "revoked."
 msgstr ""
-"Die Signatur ist gültig, der zum Überprüfen der Signatur verwendete Schlüssel "
-"ist jedoch nicht mehr gültig."
+"Die Signatur ist gültig, der zum Überprüfen der Signatur verwendete "
+"Schlüssel ist jedoch nicht mehr gültig."
 
 #: ../libbalsa/rfc3156.c:1108
 msgid "The signature is invalid."
@@ -1410,8 +1411,8 @@ msgstr "Dieser Teil ist keine gültige PGP-Signatur."
 #: ../libbalsa/rfc3156.c:1116
 msgid "The signature could not be verified due to an invalid crypto engine."
 msgstr ""
-"Die Signatur konnte aufgrund einer fehlerhaften Verschlüsselungsmethode nicht "
-"überprüft werden."
+"Die Signatur konnte aufgrund einer fehlerhaften Verschlüsselungsmethode "
+"nicht überprüft werden."
 
 #: ../libbalsa/rfc3156.c:1119 ../libbalsa/rfc3156.c:1885
 msgid "GnuPG is rebuilding the trust database and is currently unavailable."
@@ -1794,8 +1795,8 @@ msgstr ""
 #: ../libbalsa/send.c:1437
 msgid "Message left in Outbox (try again later)"
 msgstr ""
-"Einige Nachrichten befinden sich noch im Postausgang - bitte versuchen Sie es "
-"später noch einmal"
+"Einige Nachrichten befinden sich noch im Postausgang - bitte versuchen Sie "
+"es später noch einmal"
 
 #: ../libbalsa/send.c:1441
 #, c-format
@@ -1820,8 +1821,8 @@ msgstr "»%s« ist nicht lesbar"
 #, c-format
 msgid "Cannot determine charset for text file `%s'; sending as mime type `%s'"
 msgstr ""
-"Der Zeichensatz für die Textdatei »%s« konnte nicht ermittelt werden, sie wird "
-"als MIME-Typ »%s« gesendet"
+"Der Zeichensatz für die Textdatei »%s« konnte nicht ermittelt werden, sie "
+"wird als MIME-Typ »%s« gesendet"
 
 #: ../libbalsa/send.c:2140
 msgid "This message will not be encrypted for the BCC: recipient."
@@ -1903,8 +1904,9 @@ msgstr "MB"
 
 #. Top level
 #. Menus
-#: ../libbalsa/source-viewer.c:46 ../src/ab-main.c:553 ../src/main-window.c:344
-#: ../src/message-window.c:239 ../src/sendmsg-window.c:319
+#: ../libbalsa/source-viewer.c:46 ../src/ab-main.c:553
+#: ../src/main-window.c:344 ../src/message-window.c:239
+#: ../src/sendmsg-window.c:319
 msgid "_File"
 msgstr "_Datei"
 
@@ -1980,8 +1982,8 @@ msgstr ""
 #: ../libinit_balsa/assistant_helper.c:221
 #, c-format
 msgid ""
-"Couldn't create a directory: mkdir() failed on pathname \"%s\", with error \"%"
-"s\"."
+"Couldn't create a directory: mkdir() failed on pathname \"%s\", with error "
+"\"%s\"."
 msgstr ""
 "Ordner konnte nicht angelegt werden: mkdir() ist mit dem Pfadnamen »%s« "
 "fehlgeschlagen, Fehlermeldung war »%s«."
@@ -2059,7 +2061,8 @@ msgstr "_Müll:"
 #: ../libinit_balsa/assistant_page_directory.c:95
 #, c-format
 msgid ""
-"The pathname \"%s\" must be specified canonically -- it must start with a '/'."
+"The pathname \"%s\" must be specified canonically -- it must start with a "
+"'/'."
 msgstr "»%s« muss ein absoluter Pfad sein -- er muss mit einem `/' beginnen."
 
 #: ../libinit_balsa/assistant_page_directory.c:159
@@ -2113,9 +2116,9 @@ msgstr ""
 
 #: ../libinit_balsa/assistant_page_user.c:63
 msgid ""
-" Whoever provides your email account should be able to give you the following "
-"information (if you have a Network Administrator, they may already have set "
-"this up for you):"
+" Whoever provides your email account should be able to give you the "
+"following information (if you have a Network Administrator, they may already "
+"have set this up for you):"
 msgstr ""
 "Die folgenden Informationen erhalten Sie von Ihrem E-Mail-Dienstleister. "
 "Falls Sie Zugang zu einem Netzwerkadministrator haben, sollte auch dieser "
@@ -2199,8 +2202,8 @@ msgid ""
 "provided by an Internet Service Provider, and you should have made that "
 "Internet connection on your computer\n"
 "\n"
-"-- or your Network Administrator at your place of work/study/similar may have "
-"set up your computer to connect to the network."
+"-- or your Network Administrator at your place of work/study/similar may "
+"have set up your computer to connect to the network."
 msgstr ""
 "Bevor Sie Nachrichten versenden und empfangen können:\n"
 "\n"
@@ -2239,8 +2242,8 @@ msgstr "_Hilfe"
 
 #. new button
 #: ../src/ab-main.c:556 ../src/filter-edit-dialog.c:226
-#: ../src/mailbox-node.c:1061 ../src/main-window.c:352 ../src/main-window.c:586
-#: ../src/main-window.c:595
+#: ../src/mailbox-node.c:1061 ../src/main-window.c:352
+#: ../src/main-window.c:586 ../src/main-window.c:595
 msgid "_New"
 msgstr "_Neu"
 
@@ -2854,8 +2857,8 @@ msgstr ""
 #: ../src/balsa-message.c:2838
 #, c-format
 msgid ""
-"The message sent by %s with subject \"%s\" contains a PGP encrypted part, but "
-"this crypto protocol is not available."
+"The message sent by %s with subject \"%s\" contains a PGP encrypted part, "
+"but this crypto protocol is not available."
 msgstr ""
 "Die von %s verschickte Nachricht mit Betreff »%s« enthält einen mit PGP "
 "verschlüsselten Teil, jedoch ist dieses Verschlüsselungsprotokoll nicht "
@@ -2954,8 +2957,8 @@ msgstr ""
 #: ../src/balsa-message.c:3052
 msgid "Please close the other instances of this message and try again."
 msgstr ""
-"Bitte schließen Sie alle anderen Ansichten dieser Nachricht und versuchen Sie "
-"es dann erneut."
+"Bitte schließen Sie alle anderen Ansichten dieser Nachricht und versuchen "
+"Sie es dann erneut."
 
 #: ../src/balsa-mime-widget-callbacks.c:54 ../src/sendmsg-window.c:1799
 #, c-format
@@ -3445,7 +3448,8 @@ msgstr "Eines _passt/Keins passt"
 
 #: ../src/filter-edit-callbacks.c:1086
 msgid "Filtering using regular expressions is not yet implemented."
-msgstr "Die Filterung mittels regulärer Ausdrücke ist noch nicht implementiert."
+msgstr ""
+"Die Filterung mittels regulärer Ausdrücke ist noch nicht implementiert."
 
 #: ../src/filter-edit-callbacks.c:1096
 msgid "Match when message date is in the interval:"
@@ -3634,7 +3638,8 @@ msgstr "Filter %s konnte nicht exportiert werden: Es trat ein Fehler auf."
 
 #: ../src/filter-export-dialog.c:65
 msgid ""
-"There are opened filter run dialogs, close them before you can modify filters."
+"There are opened filter run dialogs, close them before you can modify "
+"filters."
 msgstr ""
 "Es gibt offene Filterstart-Dialoge, schließen Sie diese bevor sie Filter "
 "ändern können."
@@ -3672,8 +3677,8 @@ msgstr ""
 msgid ""
 "The filter \"%s\" is not compatible with the mailbox type of \"%s\".\n"
 "This happens for example when you use regular expressions match with IMAP "
-"mailboxes, it is done by a very slow method; if possible, use substring match "
-"instead."
+"mailboxes, it is done by a very slow method; if possible, use substring "
+"match instead."
 msgstr ""
 "Der Filter »%s« ist nicht mit dem Postfachtyp von »%s« kompatibel.\n"
 "Dies ist beispielsweise der Fall, wenn Sie eine Abfrage mit regulären "
@@ -3868,49 +3873,46 @@ msgid "Host:"
 msgstr "Rechner:"
 
 #: ../src/folder-conf.c:843
-msgid "_Subfolder of:"
-msgstr "_Unterordner von:"
+msgid "Subfolder of:"
+msgstr "Unterordner von:"
 
-#: ../src/folder-conf.c:851
+#: ../src/folder-conf.c:848
 msgid "_Browse..."
 msgstr "_Auswählen …"
 
-#: ../src/folder-conf.c:865
+#: ../src/folder-conf.c:862
 msgid "read-only"
 msgstr "read-only"
 
-#: ../src/folder-conf.c:866
+#: ../src/folder-conf.c:863
 msgid "read-write"
 msgstr "read-write"
 
-#: ../src/folder-conf.c:867
+#: ../src/folder-conf.c:864
 msgid "admin"
 msgstr "admin"
 
-#: ../src/folder-conf.c:868
-#| msgid "Host:"
+#: ../src/folder-conf.c:865
 msgid "post"
 msgstr "Abschicken"
 
-#: ../src/folder-conf.c:869
-#| msgid "Wrapped"
+#: ../src/folder-conf.c:866
 msgid "append"
 msgstr "Anhängen"
 
-#: ../src/folder-conf.c:870
-#| msgid "delegated"
+#: ../src/folder-conf.c:867
 msgid "delete"
 msgstr "Löschen"
 
-#: ../src/folder-conf.c:871
+#: ../src/folder-conf.c:868
 msgid "special"
 msgstr "special"
 
-#: ../src/folder-conf.c:877
+#: ../src/folder-conf.c:874
 msgid "Permissions:"
 msgstr "Zugriffsrechte:"
 
-#: ../src/folder-conf.c:884
+#: ../src/folder-conf.c:881
 msgid ""
 "\n"
 "detailed permissions are available only for open folders"
@@ -3918,7 +3920,7 @@ msgstr ""
 "\n"
 "detaillierte Zugriffsrechte sind nur für geöffnete Ordner verfügbar"
 
-#: ../src/folder-conf.c:891
+#: ../src/folder-conf.c:888
 msgid ""
 "\n"
 "the server does not support ACL's"
@@ -3926,35 +3928,33 @@ msgstr ""
 "\n"
 "Der Server unterstützt keine ACLs"
 
-#: ../src/folder-conf.c:900
-#| msgid "minutes"
+#: ../src/folder-conf.c:897
 msgid "mine: "
 msgstr "Eigene:"
 
-#: ../src/folder-conf.c:939
-#| msgid "Quit"
+#: ../src/folder-conf.c:936
 msgid "Quota:"
 msgstr "Speicherverbrauch:"
 
-#: ../src/folder-conf.c:943
+#: ../src/folder-conf.c:940
 msgid "quota information available only for open folders"
 msgstr ""
 "Informationen zum Speicherverbrauch sind nur für geöffnete Ordner verfügbar"
 
-#: ../src/folder-conf.c:948
+#: ../src/folder-conf.c:945
 msgid "the server does not support quotas"
 msgstr "Der Server unterstützt die Zuordnung von Speicherverbrauch nicht"
 
-#: ../src/folder-conf.c:950
+#: ../src/folder-conf.c:947
 msgid "no limits"
 msgstr "unbegrenzt"
 
-#: ../src/folder-conf.c:952
+#: ../src/folder-conf.c:949
 #, c-format
 msgid "%lu kB of %lu kB (%.1f%%) used"
 msgstr "%lu kB von %lu kB (%.1f%%) genutzt"
 
-#: ../src/folder-conf.c:987
+#: ../src/folder-conf.c:984
 msgid ""
 "This folder is not stored in configuration. I do not yet know how to remove "
 "it from remote server."
@@ -3962,7 +3962,7 @@ msgstr ""
 "Der Ordner ist nicht in der Konfiguration gespeichert. Es ist daher noch "
 "nicht möglich, ihn von dem entfernten Server zu löschen."
 
-#: ../src/folder-conf.c:996
+#: ../src/folder-conf.c:993
 #, c-format
 msgid ""
 "This will remove the folder \"%s\" from the list.\n"
@@ -3972,7 +3972,7 @@ msgstr ""
 "Sie können später »Neuer IMAP-Ordner« verwenden, um den Ordner wieder "
 "hinzuzufügen.\n"
 
-#: ../src/folder-conf.c:1004
+#: ../src/folder-conf.c:1001
 msgid "Confirm"
 msgstr "Bestätigen"
 
@@ -4018,8 +4018,8 @@ msgstr ""
 #: ../src/mailbox-conf.c:390
 #, c-format
 msgid ""
-"This will remove the mailbox \"%s\" from the list of mailboxes.  You may also "
-"delete the disk file or files associated with this mailbox.\n"
+"This will remove the mailbox \"%s\" from the list of mailboxes.  You may "
+"also delete the disk file or files associated with this mailbox.\n"
 "If you do not remove the file on disk you may \"Add  Mailbox\" to access the "
 "mailbox again.\n"
 "What would you like to do?"
@@ -4653,8 +4653,8 @@ msgstr "_Filter auswählen"
 #: ../src/main-window.c:501
 msgid "Select filters to be applied automatically to current mailbox"
 msgstr ""
-"Bitte wählen Sie die Filter aus, welche automatisch auf das aktuelle Postfach "
-"angewendet werden sollen"
+"Bitte wählen Sie die Filter aus, welche automatisch auf das aktuelle "
+"Postfach angewendet werden sollen"
 
 #: ../src/main-window.c:504
 msgid "_Remove Duplicates"
@@ -6060,8 +6060,8 @@ msgid ""
 "The option not to send \"format=flowed\" text is now on the Options menu of "
 "the compose window."
 msgstr ""
-"Die Möglichkeit, Nachrichten mit »format=flowed« zu verschicken, befindet sich "
-"nun im Einstellungsmenü des Editorfensters."
+"Die Möglichkeit, Nachrichten mit »format=flowed« zu verschicken, befindet "
+"sich nun im Einstellungsmenü des Editorfensters."
 
 #: ../src/save-restore.c:1039
 msgid ""
@@ -6536,8 +6536,9 @@ msgid ""
 "Do you really want to attach this file as reference?"
 msgstr ""
 "Wenn Sie »ja« sagen, wird nicht die Datei »%s« selbst, sondern eine MIME-"
-"Nachricht/externe Rumpf-Referenz verschickt. Beachten Sie, dass der Empfänger "
-"die entsprechenden Rechte haben muss, um die 'echte' Datei zu sehen.\n"
+"Nachricht/externe Rumpf-Referenz verschickt. Beachten Sie, dass der "
+"Empfänger die entsprechenden Rechte haben muss, um die 'echte' Datei zu "
+"sehen.\n"
 "\n"
 "Wollen Sie diese Datei wirklich als Referenz beilegen?"
 
@@ -6812,8 +6813,8 @@ msgid ""
 "could be %s encrypted."
 msgstr ""
 "Sie haben für diese Nachricht keine Verschlüsselung ausgewählt, obwohl %s "
-"öffentliche Schlüssel für alle empfänger verfügbar sind. Um Ihre Privatsphäre "
-"zu schützen, könnte die Nachricht %s verschlüsselt werden."
+"öffentliche Schlüssel für alle empfänger verfügbar sind. Um Ihre "
+"Privatsphäre zu schützen, könnte die Nachricht %s verschlüsselt werden."
 
 #: ../src/sendmsg-window.c:5851
 msgid "Send _encrypted"
@@ -6836,10 +6837,11 @@ msgstr ""
 "gesendet, aber nur der einfache Text kann signiert werden.\n"
 
 #: ../src/sendmsg-window.c:5942
-msgid "The message contains attachments, which cannot be signed or encrypted.\n"
+msgid ""
+"The message contains attachments, which cannot be signed or encrypted.\n"
 msgstr ""
-"Diese Nachricht enthält Anhänge, die nicht signiert oder verschlüsselt werden "
-"können.\n"
+"Diese Nachricht enthält Anhänge, die nicht signiert oder verschlüsselt "
+"werden können.\n"
 
 #: ../src/sendmsg-window.c:5946
 msgid ""
@@ -6947,7 +6949,8 @@ msgid "Change _All"
 msgstr "_Alle ersetzen"
 
 #: ../src/spell-check.c:522
-msgid "Replace all occurrences of the current word with the selected suggestion"
+msgid ""
+"Replace all occurrences of the current word with the selected suggestion"
 msgstr "Dieses Wort im gesamten Text mit dem gewählten Vorschlag ersetzen"
 
 #: ../src/spell-check.c:531
@@ -7368,7 +7371,8 @@ msgstr "Runter"
 #~ "Preparing an HTML part, which must start on a new page.\n"
 #~ "Print this part?"
 #~ msgstr ""
-#~ "Es wird ein HTML-Teil aufbereitet, welcher auf einer neuen Seite startet.\n"
+#~ "Es wird ein HTML-Teil aufbereitet, welcher auf einer neuen Seite "
+#~ "startet.\n"
 #~ "Soll die aktuelle Seite jetzt gedruckt werden?"
 
 #~ msgid "Font available for printing"

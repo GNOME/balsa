@@ -608,6 +608,10 @@ libbalsa_message_change_flags(LibBalsaMessage * message,
                               LibBalsaMessageFlag set,
                               LibBalsaMessageFlag clear)
 {
+    g_return_if_fail(LIBBALSA_IS_MESSAGE(message));
+    g_return_if_fail(LIBBALSA_IS_MAILBOX(message->mailbox));
+    g_return_if_fail(message->msgno > 0);
+
     if (message->mailbox->readonly) {
         libbalsa_information(LIBBALSA_INFORMATION_WARNING,
                              _("Mailbox (%s) is readonly: "

@@ -983,7 +983,7 @@ handle_successful_send(smtp_message_t message, void *be_verbose)
             const gchar *fccurl =
                 libbalsa_message_get_user_header(mqi->orig, "X-Balsa-Fcc");
 
-	    if (mqi->orig->mailbox && fccurl) {
+	    if (fccurl) {
                 LibBalsaMailbox *fccbox = mqi->finder(fccurl);
                 GError *err = NULL;
                 libbalsa_message_change_flags(mqi->orig, 0,
@@ -1014,9 +1014,10 @@ handle_successful_send(smtp_message_t message, void *be_verbose)
          *   - flagged, so it will not be sent again until the error
          *     is fixed and the user manually clears the flag;
          *   - undeleted, in case it was already deleted. */
-        libbalsa_message_change_flags(mqi->orig,
-                                      LIBBALSA_MESSAGE_FLAG_FLAGGED,
-                                      LIBBALSA_MESSAGE_FLAG_DELETED);
+        if (mqi->orig && mqi->orig->mailbox)
+            libbalsa_message_change_flags(mqi->orig,
+                                          LIBBALSA_MESSAGE_FLAG_FLAGGED,
+                                          LIBBALSA_MESSAGE_FLAG_DELETED);
 	/* Check whether it was a problem with transfer. */
         if(*(gboolean*)be_verbose) {
             int cnt = 0;

@@ -1,5 +1,12 @@
 2010-03-03  Peter Bloomfield
 
+	* libbalsa/message.c (libbalsa_message_change_flags): check
+	argument validity.
+	* libbalsa/send.c (handle_successful_send): check that the
+	message still belongs to a mailbox.
+
+2010-03-03  Peter Bloomfield
+
 	* libbalsa/address-view.c (libbalsa_address_view_get_list): do
 	not append NULL list in internet_address_list_append.
 

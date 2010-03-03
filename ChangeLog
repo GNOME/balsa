@@ -1,3 +1,8 @@
+2010-03-03  Peter Bloomfield
+
+	* libbalsa/address-view.c (libbalsa_address_view_get_list): do
+	not append NULL list in internet_address_list_append.
+
 2010-02-28  Peter Bloomfield
 
 	* src/folder-conf.c (folder_conf_imap_sub_node): remove mnemonic

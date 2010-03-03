@@ -1243,11 +1243,13 @@ libbalsa_address_view_get_list(LibBalsaAddressView * address_view,
                            ADDRESS_TYPE_COL, &this_type,
                            ADDRESS_NAME_COL, &name, -1);
 
-        if (this_type == type && name && *name) {
+        if (this_type == type) {
             InternetAddressList *tmp_list =
                 internet_address_list_parse_string(name);
-            internet_address_list_append(address_list, tmp_list);
-            g_object_unref(tmp_list);
+            if (tmp_list) {
+                internet_address_list_append(address_list, tmp_list);
+                g_object_unref(tmp_list);
+            }
         }
         g_free(name);
     }

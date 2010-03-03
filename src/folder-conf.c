@@ -945,10 +945,15 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
                 quotas = g_strdup(_("the server does not support quotas"));
             else if (max == 0 && used == 0)
                 quotas = g_strdup(_("no limits"));
-            else
-                quotas = g_strdup_printf(_("%lu kB of %lu kB (%.1f%%) used"),
-                                         used, max,
+            else {
+                gchar *use_str = libbalsa_size_to_gchar(used * G_GUINT64_CONSTANT(1024));
+                gchar *max_str = libbalsa_size_to_gchar(max * G_GUINT64_CONSTANT(1024));
+
+                quotas = g_strdup_printf(_("%s of %s (%.1f%%) used"), use_str, max_str,
                                          100.0 * (float) used / (float) max);
+                g_free(use_str);
+                g_free(max_str);
+            }
         }
         label = gtk_label_new(quotas);
         gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.5);

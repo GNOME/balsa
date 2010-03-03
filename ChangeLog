@@ -1,3 +1,9 @@
+2010-03-03  Albrecht Dreß
+
+	* libbalsa/misc.[hc]:
+	* libbalsa/mailbox.c: make libbalsa_size_to_gchar() a common function.
+	* src/folder-conf.c: use it for displaying IMAP quota.
+
 2010-03-03  Peter Bloomfield
 
 	* libbalsa/message.c (libbalsa_message_change_flags): check

@@ -1311,3 +1311,31 @@ libbalsa_path_is_below_dir(const gchar * path, const gchar * dir)
 
     return dir[len - 1] == G_DIR_SEPARATOR || path[len] == G_DIR_SEPARATOR;
 }
+
+gchar *
+libbalsa_size_to_gchar(guint64 length)
+{
+    gchar retsize[32];
+
+    /* length is long */
+    if (length <= 32768) {
+        g_snprintf (retsize, sizeof(retsize), "%" G_GUINT64_FORMAT, length);
+    } else if (length <= 100*1024) {
+        float tmp = (float)length/1024.0;
+        g_snprintf (retsize, sizeof(retsize), "%.1fK", tmp);
+    } else if (length <= (1024*1024)) {
+        g_snprintf (retsize, sizeof(retsize),
+                    "%" G_GUINT64_FORMAT "K", length/1024);
+    } else if (length <= (100*1024*1024)) {
+        float tmp = (float)length/(1024.0*1024.0);
+        g_snprintf (retsize, sizeof(retsize), "%.1fM", tmp);
+    } else if (length <= (1024*1024*1024)) {
+        g_snprintf (retsize, sizeof(retsize),
+                    "%" G_GUINT64_FORMAT "M", length/(1024*1024));
+    } else {
+        float tmp = (float)length/(1024.0*1024.0*1024.0);
+        g_snprintf (retsize, sizeof(retsize), "%.1fG", tmp);
+    }
+
+    return g_strdup(retsize);
+}

@@ -2866,27 +2866,6 @@ mbox_model_get_path(GtkTreeModel * tree_model, GtkTreeIter * iter)
 static GdkPixbuf *status_icons[LIBBALSA_MESSAGE_STATUS_ICONS_NUM];
 static GdkPixbuf *attach_icons[LIBBALSA_MESSAGE_ATTACH_ICONS_NUM];
 
-static gchar *
-libbalsa_size_to_gchar(glong length)
-{
-    gchar retsize[32];
-
-    /* length is long */
-    if (length <= 32768) {
-        g_snprintf (retsize, sizeof(retsize), "%ld", length);
-    } else if (length <= (100*1024)) {
-        float tmp = (float)length/1024.0;
-        g_snprintf (retsize, sizeof(retsize), "%.1fK", tmp);
-    } else if (length <= (1024*1024)) {
-        g_snprintf (retsize, sizeof(retsize), "%ldK", length/1024);
-    } else {
-        float tmp = (float)length/(1024.0*1024.0);
-        g_snprintf (retsize, sizeof(retsize), "%.1fM", tmp);
-    }
-
-    return g_strdup(retsize);
-}
-
 #ifdef BALSA_USE_THREADS
 /* Protects access to mailbox->msgnos_pending; may be locked 
  * with or without the gdk lock, so WE MUST NOT GRAB THE GDK LOCK WHILE

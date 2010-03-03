@@ -13,8 +13,8 @@ msgstr ""
 "Project-Id-Version: balsa.HEAD\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=balsa&component=general\n"
-"POT-Creation-Date: 2010-02-21 05:00+0000\n"
-"PO-Revision-Date: 2010-02-22 21:01+0100\n"
+"POT-Creation-Date: 2010-02-28 17:12+0000\n"
+"PO-Revision-Date: 2010-03-03 18:36+0100\n"
 "Last-Translator: Jorge González <jorgegonz@svn.gnome.org>\n"
 "Language-Team: Español <gnome-es-list@gnome.org>\n"
 "MIME-Version: 1.0\n"
@@ -4603,34 +4603,33 @@ msgid "Host:"
 msgstr "Anfitrión:"
 
 #: ../src/folder-conf.c:843
-msgid "_Subfolder of:"
-msgstr "_Subcarpeta de:"
+#| msgid "_Subfolder of:"
+msgid "Subfolder of:"
+msgstr "Subcarpeta de:"
 
 # src/pref-manager.c:1825
 # src/pref-manager.c:1995 src/pref-manager.c:2044
-#: ../src/folder-conf.c:851
+#: ../src/folder-conf.c:848
 msgid "_Browse..."
 msgstr "_Buscar…"
 
-#: ../src/folder-conf.c:865
+#: ../src/folder-conf.c:862
 msgid "read-only"
 msgstr "sólo lectura"
 
-#: ../src/folder-conf.c:866
+#: ../src/folder-conf.c:863
 msgid "read-write"
 msgstr "lectura y escritura"
 
-#: ../src/folder-conf.c:867
+#: ../src/folder-conf.c:864
 msgid "admin"
 msgstr "administrador"
 
-#: ../src/folder-conf.c:868
-#| msgid "Host:"
+#: ../src/folder-conf.c:865
 msgid "post"
 msgstr "publicar"
 
-#: ../src/folder-conf.c:869
-#| msgid "Wrapped"
+#: ../src/folder-conf.c:866
 msgid "append"
 msgstr "añadir"
 
@@ -4640,20 +4639,19 @@ msgstr "añadir"
 # src/balsa-index-page.c:542 src/filter-edit-dialog.c:224
 # src/main-window.c:442 src/mblist-window.c:475 src/pref-manager.c:1243
 # src/pref-manager.c:2253
-#: ../src/folder-conf.c:870
-#| msgid "delegated"
+#: ../src/folder-conf.c:867
 msgid "delete"
 msgstr "eliminar"
 
-#: ../src/folder-conf.c:871
+#: ../src/folder-conf.c:868
 msgid "special"
 msgstr "especial"
 
-#: ../src/folder-conf.c:877
+#: ../src/folder-conf.c:874
 msgid "Permissions:"
 msgstr "Permisos:"
 
-#: ../src/folder-conf.c:884
+#: ../src/folder-conf.c:881
 msgid ""
 "\n"
 "detailed permissions are available only for open folders"
@@ -4661,7 +4659,7 @@ msgstr ""
 "\n"
 "los permisos detallados sólo están disponibles para carpetas abiertas"
 
-#: ../src/folder-conf.c:891
+#: ../src/folder-conf.c:888
 msgid ""
 "\n"
 "the server does not support ACL's"
@@ -4671,33 +4669,32 @@ msgstr ""
 
 # src/pref-manager.c:1235
 # src/pref-manager.c:1376
-#: ../src/folder-conf.c:900
+#: ../src/folder-conf.c:897
 msgid "mine: "
 msgstr "mios: "
 
-#: ../src/folder-conf.c:939
+#: ../src/folder-conf.c:936
 msgid "Quota:"
 msgstr "Cuota:"
 
-#: ../src/folder-conf.c:943
+#: ../src/folder-conf.c:940
 msgid "quota information available only for open folders"
 msgstr "la información de cuota sólo está disponible para carpetas abiertas"
 
-#: ../src/folder-conf.c:948
+#: ../src/folder-conf.c:945
 msgid "the server does not support quotas"
 msgstr "el servidor no soporta cuotas"
 
-#: ../src/folder-conf.c:950
+#: ../src/folder-conf.c:947
 msgid "no limits"
 msgstr "sin límites"
 
-#: ../src/folder-conf.c:952
+#: ../src/folder-conf.c:949
 #, c-format
-#| msgid "%lu kByte of %lu kbyte (%.1f%%) used"
 msgid "%lu kB of %lu kB (%.1f%%) used"
 msgstr "%lu kB de %lu kB (%.1f%%) usado"
 
-#: ../src/folder-conf.c:987
+#: ../src/folder-conf.c:984
 msgid ""
 "This folder is not stored in configuration. I do not yet know how to remove "
 "it from remote server."
@@ -4707,7 +4704,7 @@ msgstr ""
 
 # src/mailbox-conf.c:157
 # src/mailbox-conf.c:157
-#: ../src/folder-conf.c:996
+#: ../src/folder-conf.c:993
 #, c-format
 msgid ""
 "This will remove the folder \"%s\" from the list.\n"
@@ -4717,7 +4714,7 @@ msgstr ""
 "Podrá usar más tarde «Carpeta IMAP nueva» para agregar esta carpeta "
 "nuevamente.\n"
 
-#: ../src/folder-conf.c:1004
+#: ../src/folder-conf.c:1001
 msgid "Confirm"
 msgstr "Confirmar"
 

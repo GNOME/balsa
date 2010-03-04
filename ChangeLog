@@ -1,3 +1,7 @@
+2010-03-04  Pawel Salek
+
+	* src/balsa-mime-widget-crypto.c: set the parent right.
+
 2010-03-03  Albrecht Dreß
 
 	* libbalsa/misc.[hc]:

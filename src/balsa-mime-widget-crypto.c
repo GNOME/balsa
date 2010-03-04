@@ -174,7 +174,8 @@ on_gpg_key_button(GtkButton * button, const gchar * fingerprint)
     gpg_keyserver_action_t action =
         GPOINTER_TO_INT(g_object_get_data(G_OBJECT(button), "gpg-keyserver-op"));
 
-    gpg_keyserver_op(fingerprint, action, GTK_WINDOW(balsa_app.main_window));
+    gpg_keyserver_op(fingerprint, action,
+                     balsa_get_parent_window(GTK_WIDGET(button)));
 }
 #endif /* HAVE_GPG */
 

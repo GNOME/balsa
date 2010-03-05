@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?product=balsa&component=general\n"
 "POT-Creation-Date: 2010-02-21 12:23+0000\n"
-"PO-Revision-Date: 2010-03-05 21:36+0100\n"
+"PO-Revision-Date: 2010-03-05 21:37+0100\n"
 "Last-Translator: Matej Urbančič <mateju@svn.gnome.org>\n"
 "Language-Team: Slovenian GNOME Translation Team <gnome-si@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -3957,16 +3957,18 @@ msgid "mine: "
 msgstr "lastno:"
 
 #: ../src/folder-conf.c:939
+#, fuzzy
 msgid "Quota:"
-msgstr "Omejitev uporabe:"
+msgstr "Omejitev uporabe (%s):"
 
 #: ../src/folder-conf.c:943
 msgid "quota information available only for open folders"
-msgstr "podrobnosti omejitve uporabe so razpoložljive le za odprte mape"
+msgstr ""
 
 #: ../src/folder-conf.c:948
+#, fuzzy
 msgid "the server does not support quotas"
-msgstr "strežnik ne podpira omejitve porabe"
+msgstr "Shramba ne podpira mape INBOX"
 
 #: ../src/folder-conf.c:950
 msgid "no limits"
@@ -5079,8 +5081,9 @@ msgid "By message size"
 msgstr "Po velikosti sporočila"
 
 #: ../src/main-window.c:682
+#, fuzzy
 msgid "_Threaded"
-msgstr "_Nitena sporočila"
+msgstr "_Strukturirano"
 
 #: ../src/main-window.c:683
 msgid "Use message threading"
@@ -5136,7 +5139,7 @@ msgstr ""
 msgid "translator-credits"
 msgstr ""
 "Matej Urbančič <mateju@svn.gnome.org>\n"
-"Andrej Žnidaršič <andrej.znidarsic@gmail.com>\n"
+"Andrej Žnidaršič <andrej.znidarsic@gmail.com>"
 
 #: ../src/main-window.c:2700
 msgid "The Balsa email client is part of the GNOME desktop environment."
@@ -5725,8 +5728,9 @@ msgid "Layout"
 msgstr "Razporeditev"
 
 #: ../src/pref-manager.c:2180
+#, fuzzy
 msgid "Sort and thread"
-msgstr "Razvrsti in postavi v niten način"
+msgstr "Zloži in strukturiraj"
 
 #: ../src/pref-manager.c:2182
 #: ../src/print-gtk.c:489

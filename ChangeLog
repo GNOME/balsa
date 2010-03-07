@@ -1,3 +1,8 @@
+2010-03-07  Albrecht Dreß
+
+	* src/balsa-mime-widget-text.c: do not mangle quotation characters
+	when copying text.
+
 2010-03-04  Pawel Salek
 
 	* src/balsa-mime-widget-crypto.c: set the parent right.

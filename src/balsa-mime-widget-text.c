@@ -116,6 +116,9 @@ static void phrase_highlight(GtkTextBuffer * buffer, const gchar * id,
 			     gint value);
 static void destroy_cite_bars(GList * cite_bars);
 static gboolean draw_cite_bars(GtkWidget * widget, GdkEventExpose *event, GList * cite_bars);
+static gchar *check_text_encoding(BalsaMessage * bm, gchar *text_buf);
+static GList *fill_text_buf_cited(GtkWidget *widget, const gchar *text_body,
+                                  gboolean is_flowed, gboolean is_plain);
 
 
 #define PHRASE_HIGHLIGHT_ON    1
@@ -136,13 +139,7 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
     ssize_t alloced;
     BalsaMimeWidget *mw;
     GtkTextBuffer *buffer;
-#if USE_GREGEX
-    GRegex *rex;
-#else                           /* USE_GREGEX */
-    regex_t rex;
-#endif                          /* USE_GREGEX */
     GList *url_list = NULL;
-    const gchar *target_cs;
     GError *err = NULL;
     gboolean is_text_plain;
 
@@ -188,37 +185,21 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
          * show it as if it were text/plain. */
     }
 
-    /* prepare a text part */
-    if (!libbalsa_utf8_sanitize(&ptr, balsa_app.convert_unknown_8bit,
-				&target_cs)
-        && !g_object_get_data(G_OBJECT(bm->message), 
-                              BALSA_MIME_WIDGET_NEW_TEXT_NOTIFIED)) {
-	gchar *from =
-	    balsa_message_sender_to_gchar(bm->message->headers->from, 0);
-	gchar *subject =
-	    g_strdup(LIBBALSA_MESSAGE_GET_SUBJECT(bm->message));
-        
-	libbalsa_utf8_sanitize(&from,    balsa_app.convert_unknown_8bit, 
-			       NULL);
-	libbalsa_utf8_sanitize(&subject, balsa_app.convert_unknown_8bit, 
-			       NULL);
-	libbalsa_information
-	    (LIBBALSA_INFORMATION_MESSAGE,
-	     _("The message sent by %s with subject \"%s\" contains 8-bit "
-	       "characters, but no header describing the used codeset "
-	       "(converted to %s)"),
-	     from, subject,
-	     target_cs ? target_cs : "\"?\"");
-	g_free(subject);
-	g_free(from);
-        /* Avoid multiple notifications: */
-        g_object_set_data(G_OBJECT(bm->message),
-                          BALSA_MIME_WIDGET_NEW_TEXT_NOTIFIED, 
-                          GUINT_TO_POINTER(TRUE));
-    }
+    /* verify/fix text encoding */
+    ptr = check_text_encoding(bm, ptr);
 
+    /* create the mime object and the text/source view widget */
     mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
     mw->widget = create_text_widget(content_type);
+
+    /* configure text or source view */
+    gtk_text_view_set_editable(GTK_TEXT_VIEW(mw->widget), FALSE);
+    gtk_text_view_set_left_margin(GTK_TEXT_VIEW(mw->widget),  BALSA_LEFT_MARGIN);
+    gtk_text_view_set_right_margin(GTK_TEXT_VIEW(mw->widget), BALSA_RIGHT_MARGIN);
+    gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(mw->widget), GTK_WRAP_WORD_CHAR);
+
+    /* set the message font */
+    bm_modify_font_from_string(mw->widget, balsa_app.message_font);
 
     if (libbalsa_message_body_is_flowed(mime_body)) {
 	/* Parse, but don't wrap. */
@@ -231,14 +212,6 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
 	       )
 	libbalsa_wrap_string(ptr, balsa_app.browse_wrap_length);
 
-    gtk_text_view_set_editable(GTK_TEXT_VIEW(mw->widget), FALSE);
-    gtk_text_view_set_left_margin(GTK_TEXT_VIEW(mw->widget),  BALSA_LEFT_MARGIN);
-    gtk_text_view_set_right_margin(GTK_TEXT_VIEW(mw->widget), BALSA_RIGHT_MARGIN);
-    gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(mw->widget), GTK_WRAP_WORD_CHAR);
-
-    /* set the message font */
-    bm_modify_font_from_string(mw->widget, balsa_app.message_font);
-
     g_signal_connect(G_OBJECT(mw->widget), "key_press_event",
 		     G_CALLBACK(balsa_mime_widget_key_press_event),
 		     (gpointer) bm);
@@ -249,136 +222,10 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
     buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(mw->widget));
     allocate_quote_colors(GTK_WIDGET(bm), balsa_app.quoted_color,
 			  0, MAX_QUOTED_COLOR - 1);
-#if USE_GREGEX
-    if (!(rex = balsa_quote_regex_new()))
-	gtk_text_buffer_insert_at_cursor(buffer, ptr, -1);
-#else                           /* USE_GREGEX */
-    if (!balsa_app.mark_quoted
-        || regcomp(&rex, balsa_app.quote_regex, REG_EXTENDED)) {
-	if (balsa_app.mark_quoted)
-            g_warning("%s: quote regex compilation failed.", __func__);
-	gtk_text_buffer_insert_at_cursor(buffer, ptr, -1);
-    }
-#endif                          /* USE_GREGEX */
-    else {
-	const gchar *line_start;
-	LibBalsaUrlInsertInfo url_info;
-	GList * cite_bars_list;
-	guint cite_level;
-	guint cite_start;
-	gint margin;
-        gdouble char_width;
-        PangoContext *context = gtk_widget_get_pango_context(mw->widget);
-        PangoFontDescription *desc =
-            pango_context_get_font_description(context);
 
-        /* width of monospace characters is 3/5 of the size */
-        char_width = 0.6 * pango_font_description_get_size(desc);
-        if (!pango_font_description_get_size_is_absolute(desc))
-            char_width = char_width / PANGO_SCALE;
-
-        /* convert char_width from points to pixels */
-        margin = (char_width / 72.0) *
-            gdk_screen_get_resolution(gdk_screen_get_default());
-
-	gtk_text_buffer_create_tag(buffer, "url",
-				   "foreground-gdk",
-				   &balsa_app.url_color, NULL);
-	gtk_text_buffer_create_tag(buffer, "emphasize", 
-				   "foreground", "red",
-				   "underline", PANGO_UNDERLINE_SINGLE,
-				   NULL);
-	url_info.callback = url_found_cb;
-	url_info.callback_data = &url_list;
-	url_info.buffer_is_flowed = libbalsa_message_body_is_flowed(mime_body);
-	url_info.ml_url_buffer = NULL;
-
-	line_start = ptr;
-	cite_bars_list = NULL;
-	cite_level = 0;
-	cite_start = 0;
-	while (*line_start) {
-	    const gchar *line_end;
-	    GtkTextTag *tag = NULL;
-	    int len;
-
-	    if (!(line_end = strchr(line_start, '\n')))
-                line_end = line_start + strlen(line_start);
-
-	    if (is_text_plain) {
-		guint quote_level;
-		guint cite_idx;
-
-		/* get the cite level only for text/plain parts */
-#if USE_GREGEX
-		libbalsa_match_regex(line_start, rex, &quote_level,
-                                     &cite_idx);
-#else                           /* USE_GREGEX */
-		libbalsa_match_regex(line_start, &rex, &quote_level,
-                                     &cite_idx);
-#endif                          /* USE_GREGEX */
-	    
-		/* check if the citation level changed */
-		if (cite_level != quote_level) {
-		    if (cite_level > 0) {
-			cite_bar_t * cite_bar = g_new0(cite_bar_t, 1);
-		    
-			cite_bar->start_offs = cite_start;
-			cite_bar->end_offs = gtk_text_buffer_get_char_count(buffer);
-			cite_bar->depth = cite_level;
-			cite_bars_list = g_list_append(cite_bars_list, cite_bar);
-		    }
-		    if (quote_level > 0)
-			cite_start = gtk_text_buffer_get_char_count(buffer);
-		    cite_level = quote_level;
-		}
-
-		/* skip the citation prefix */
-		if (quote_level) {
-		    line_start += cite_idx;
-                    if (line_start < line_end
-                        && g_unichar_isspace(g_utf8_get_char(line_start)))
-                        line_start = g_utf8_next_char(line_start);
-		}
-		tag = quote_tag(buffer, quote_level, margin);
-	    }
-
-            len = line_end - line_start;
-	    if (len > 0 && line_start[len - 1] == '\r')
-                --len;
-	    /* tag is NULL if the line isn't quoted, but it causes
-	     * no harm */
-	    if (!libbalsa_insert_with_url(buffer, line_start, len,
-					  tag, &url_info))
-		gtk_text_buffer_insert_at_cursor(buffer, "\n", 1);
-	    
-	    line_start = *line_end ? line_end + 1 : line_end;
-	}
-
-	/* add any pending cited part */
-	if (cite_level > 0) {
-	    cite_bar_t * cite_bar = g_new0(cite_bar_t, 1);
-		    
-	    cite_bar->start_offs = cite_start;
-	    cite_bar->end_offs = gtk_text_buffer_get_char_count(buffer);
-	    cite_bar->depth = cite_level;
-	    cite_bars_list = g_list_append(cite_bars_list, cite_bar);
-	}
-
-	/* add list of citation bars (if any) */
-	if (cite_bars_list) {
-	    g_object_set_data_full(G_OBJECT(mw->widget), "cite-bars", cite_bars_list,
-				   (GDestroyNotify) destroy_cite_bars);
-	    g_object_set_data(G_OBJECT(mw->widget), "cite-margin", GINT_TO_POINTER(margin));
-	    g_signal_connect_after(G_OBJECT(mw->widget), "expose-event",
-				   G_CALLBACK(draw_cite_bars), cite_bars_list);
-	}
-#if USE_GREGEX
-	g_regex_unref(rex);
-#else                           /* USE_GREGEX */
-	regfree(&rex);
-#endif                          /* USE_GREGEX */
-    }
+    url_list = fill_text_buf_cited(mw->widget, ptr,
+                                   libbalsa_message_body_is_flowed(mime_body),
+                                  is_text_plain);
 
     prepare_url_offsets(buffer, url_list);
     g_signal_connect_after(G_OBJECT(mw->widget), "realize",
@@ -1332,4 +1179,208 @@ bm_widget_new_vcard(BalsaMessage *bm, LibBalsaMessageBody *mime_body,
     g_object_set_data(G_OBJECT(mw->widget), "mime-body", mime_body);
     gtk_widget_show_all(mw->widget);
     return mw;
+}
+
+/* check for a proper text encoding, fix and notify the user if necessary */
+static gchar *
+check_text_encoding(BalsaMessage * bm, gchar *text_buf)
+{
+    const gchar *target_cs;
+
+    if (!libbalsa_utf8_sanitize(&text_buf, balsa_app.convert_unknown_8bit,
+                                &target_cs)
+        && !g_object_get_data(G_OBJECT(bm->message),
+                              BALSA_MIME_WIDGET_NEW_TEXT_NOTIFIED)) {
+        gchar *from =
+            balsa_message_sender_to_gchar(bm->message->headers->from, 0);
+        gchar *subject =
+            g_strdup(LIBBALSA_MESSAGE_GET_SUBJECT(bm->message));
+
+        libbalsa_utf8_sanitize(&from,    balsa_app.convert_unknown_8bit,
+                               NULL);
+        libbalsa_utf8_sanitize(&subject, balsa_app.convert_unknown_8bit,
+                               NULL);
+        libbalsa_information
+            (LIBBALSA_INFORMATION_MESSAGE,
+             _("The message sent by %s with subject \"%s\" contains 8-bit "
+               "characters, but no header describing the used codeset "
+               "(converted to %s)"),
+             from, subject,
+             target_cs ? target_cs : "\"?\"");
+        g_free(subject);
+        g_free(from);
+        /* Avoid multiple notifications: */
+        g_object_set_data(G_OBJECT(bm->message),
+                          BALSA_MIME_WIDGET_NEW_TEXT_NOTIFIED,
+                          GUINT_TO_POINTER(TRUE));
+    }
+
+    return text_buf;
+}
+
+
+static GList *
+fill_text_buf_cited(GtkWidget *widget, const gchar *text_body,
+                    gboolean is_flowed, gboolean is_plain)
+{
+    LibBalsaUrlInsertInfo url_info;
+    GList * cite_bars_list;
+    guint cite_level;
+    guint cite_start;
+    gint margin;
+    gdouble char_width;
+    GtkTextTag *invisible;
+    GList *url_list = NULL;
+    PangoContext *context = gtk_widget_get_pango_context(widget);
+    PangoFontDescription *desc = pango_context_get_font_description(context);
+    GtkTextBuffer *buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(widget));
+#if USE_GREGEX
+    GRegex *rex = NULL;
+#else                           /* USE_GREGEX */
+    regex_t rex;
+#endif                          /* USE_GREGEX */
+    gboolean have_regex;
+
+    /* prepare citation regular expression for plain bodies */
+    if (is_plain) {
+#if USE_GREGEX
+        rex = balsa_quote_regex_new();
+        have_regex = rex ? TRUE : FALSE;
+#else                           /* USE_GREGEX */
+        if (!balsa_app.mark_quoted
+            || regcomp(&rex, balsa_app.quote_regex, REG_EXTENDED))
+            have_regex = FALSE;
+        else
+            have_regex = TRUE;
+#endif                          /* USE_GREGEX */
+    } else
+        have_regex = FALSE;
+
+    /* width of monospace characters is 3/5 of the size */
+    char_width = 0.6 * pango_font_description_get_size(desc);
+    if (!pango_font_description_get_size_is_absolute(desc))
+        char_width = char_width / PANGO_SCALE;
+
+    /* convert char_width from points to pixels */
+    margin = (char_width / 72.0) *
+        gdk_screen_get_resolution(gdk_screen_get_default());
+
+    gtk_text_buffer_create_tag(buffer, "url",
+                               "foreground-gdk",
+                               &balsa_app.url_color, NULL);
+    gtk_text_buffer_create_tag(buffer, "emphasize",
+                               "foreground", "red",
+                               "underline", PANGO_UNDERLINE_SINGLE,
+                               NULL);
+    if (have_regex)
+        invisible = gtk_text_buffer_create_tag(buffer, "hide-cite",
+                                               "size-points", (gdouble) 0.01,
+                                               NULL);
+    else
+        invisible = NULL;
+
+    url_info.callback = url_found_cb;
+    url_info.callback_data = &url_list;
+    url_info.buffer_is_flowed = is_flowed;
+    url_info.ml_url_buffer = NULL;
+
+    cite_bars_list = NULL;
+    cite_level = 0;
+    cite_start = 0;
+    while (*text_body) {
+        const gchar *line_end;
+        GtkTextTag *tag = NULL;
+        int len;
+
+        if (!(line_end = strchr(text_body, '\n')))
+            line_end = text_body + strlen(text_body);
+
+        if (have_regex) {
+            guint quote_level;
+            guint cite_idx;
+
+            /* get the cite level only for text/plain parts */
+#if USE_GREGEX
+            libbalsa_match_regex(text_body, rex, &quote_level,
+                                 &cite_idx);
+#else                           /* USE_GREGEX */
+            libbalsa_match_regex(text_body, &rex, &quote_level,
+                                 &cite_idx);
+#endif                          /* USE_GREGEX */
+
+            /* check if the citation level changed */
+            if (cite_level != quote_level) {
+                if (cite_level > 0) {
+                    cite_bar_t * cite_bar = g_new0(cite_bar_t, 1);
+
+                    cite_bar->start_offs = cite_start;
+                    cite_bar->end_offs = gtk_text_buffer_get_char_count(buffer);
+                    cite_bar->depth = cite_level;
+                    cite_bars_list = g_list_append(cite_bars_list, cite_bar);
+                }
+                if (quote_level > 0)
+                    cite_start = gtk_text_buffer_get_char_count(buffer);
+                cite_level = quote_level;
+            }
+
+            /* skip the citation prefix */
+            tag = quote_tag(buffer, quote_level, margin);
+            if (quote_level) {
+                GtkTextIter cite_iter;
+
+                gtk_text_buffer_get_iter_at_mark(buffer, &cite_iter,
+                                                 gtk_text_buffer_get_insert(buffer));
+                gtk_text_buffer_insert_with_tags(buffer, &cite_iter,
+                                                 text_body,
+                                                 cite_idx,
+                                                 tag, invisible, NULL);
+                text_body += cite_idx;
+
+                /* append a zero-width space if the remainder of the line is
+                 * empty, as otherwise the line is not visible (i.e.
+                 * completely 0.01 pts high)... */
+                if (text_body == line_end || *text_body == '\r')
+                    gtk_text_buffer_insert_at_cursor(buffer, "\xE2\x80\x8B", 3);
+            }
+        }
+
+        len = line_end - text_body;
+        if (len > 0 && text_body[len - 1] == '\r')
+            --len;
+        /* tag is NULL if the line isn't quoted, but it causes
+         * no harm */
+        if (!libbalsa_insert_with_url(buffer, text_body, len,
+                                      tag, &url_info))
+            gtk_text_buffer_insert_at_cursor(buffer, "\n", 1);
+
+        text_body = *line_end ? line_end + 1 : line_end;
+    }
+
+    /* add any pending cited part */
+    if (cite_level > 0) {
+        cite_bar_t * cite_bar = g_new0(cite_bar_t, 1);
+
+        cite_bar->start_offs = cite_start;
+        cite_bar->end_offs = gtk_text_buffer_get_char_count(buffer);
+        cite_bar->depth = cite_level;
+        cite_bars_list = g_list_append(cite_bars_list, cite_bar);
+    }
+
+    /* add list of citation bars (if any) */
+    if (cite_bars_list) {
+        g_object_set_data_full(G_OBJECT(widget), "cite-bars", cite_bars_list,
+                               (GDestroyNotify) destroy_cite_bars);
+        g_object_set_data(G_OBJECT(widget), "cite-margin", GINT_TO_POINTER(margin));
+        g_signal_connect_after(G_OBJECT(widget), "expose-event",
+                               G_CALLBACK(draw_cite_bars), cite_bars_list);
+    }
+
+    if (have_regex)
+#if USE_GREGEX
+        g_regex_unref(rex);
+#else                           /* USE_GREGEX */
+        regfree(&rex);
+#endif                          /* USE_GREGEX */
+
+    return url_list;
 }

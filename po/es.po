@@ -13,8 +13,8 @@ msgstr ""
 "Project-Id-Version: balsa.HEAD\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=balsa&component=general\n"
-"POT-Creation-Date: 2010-02-28 17:12+0000\n"
-"PO-Revision-Date: 2010-03-03 18:36+0100\n"
+"POT-Creation-Date: 2010-03-04 17:16+0000\n"
+"PO-Revision-Date: 2010-03-07 14:47+0100\n"
 "Last-Translator: Jorge González <jorgegonz@svn.gnome.org>\n"
 "Language-Team: Español <gnome-es-list@gnome.org>\n"
 "MIME-Version: 1.0\n"
@@ -193,7 +193,7 @@ msgstr "A_ñadir"
 # src/balsa-index.c:304 src/filter-edit-dialog.c:349
 # src/balsa-index.c:297 src/filter-edit-dialog.c:326
 #: ../libbalsa/body.c:123 ../libbalsa/mailbox_local.c:1765
-#: ../libbalsa/message.c:841
+#: ../libbalsa/message.c:845
 msgid "(No subject)"
 msgstr "(Sin asunto)"
 
@@ -958,30 +958,30 @@ msgstr "Ha fallado la eliminación de los mensajes del buzón de origen"
 
 # libmutt/imap/imap_ssl.c:254
 # libmutt/imap/imap_ssl.c:254
-#: ../libbalsa/mailbox.c:3038
+#: ../libbalsa/mailbox.c:3017
 msgid "from unknown"
 msgstr "desde desconocido"
 
 # src/main-window.c:177
 # src/main-window.c:184
-#: ../libbalsa/mailbox.c:3040
+#: ../libbalsa/mailbox.c:3019
 msgid "Loading..."
 msgstr "Cargando…"
 
-#: ../libbalsa/mailbox.c:4010
+#: ../libbalsa/mailbox.c:3989
 #, c-format
 msgid "Searching %s for partial messages"
 msgstr "Buscando %s para mensajes parciales"
 
 # libmutt/mx.c:1375
 # libmutt/mx.c:1375
-#: ../libbalsa/mailbox.c:4100
+#: ../libbalsa/mailbox.c:4079
 msgid "Reconstructing message"
 msgstr "Reconstruyendo el mensaje"
 
 # src/main-window.c:403
 # src/main-window.c:406
-#: ../libbalsa/mailbox.c:4369
+#: ../libbalsa/mailbox.c:4348
 #, c-format
 msgid "Finding duplicate messages in source mailbox failed"
 msgstr "Ha fallado la búsqueda de mensajes duplicados en el buzón de origen"
@@ -1364,7 +1364,7 @@ msgstr "Error POP3: no se puede cerrar %s."
 msgid "POP3 error: %s."
 msgstr "Error POP3: %s."
 
-#: ../libbalsa/message.c:613
+#: ../libbalsa/message.c:617
 #, c-format
 msgid "Mailbox (%s) is readonly: cannot change flags."
 msgstr ""
@@ -2003,7 +2003,7 @@ msgstr ""
 msgid "Saving sent message to %s failed: %s"
 msgstr "Ha fallado al guardar el mensaje %s: %s"
 
-#: ../libbalsa/send.c:1026 ../libbalsa/send.c:1038
+#: ../libbalsa/send.c:1027 ../libbalsa/send.c:1039
 #, c-format
 msgid ""
 "Relaying refused:\n"
@@ -2014,7 +2014,7 @@ msgstr ""
 "%d: %s\n"
 "El mensaje se ha dejado en la bandeja de salida.\n"
 
-#: ../libbalsa/send.c:1045
+#: ../libbalsa/send.c:1046
 msgid ""
 "Message submission problem, placing it into your outbox.\n"
 "System will attempt to resubmit the message until you delete it."
@@ -2024,12 +2024,12 @@ msgstr ""
 
 # libmutt/imap/imap_ssl.c:229
 # libmutt/imap/imap_ssl.c:229
-#: ../libbalsa/send.c:1075
+#: ../libbalsa/send.c:1076
 msgid "Connected to MTA"
 msgstr "Conectado a MTA"
 
 #. status code, mailbox
-#: ../libbalsa/send.c:1084
+#: ../libbalsa/send.c:1085
 #, c-format
 msgid "From: %d <%s>"
 msgstr "De: %d <%s>"
@@ -2037,13 +2037,13 @@ msgstr "De: %d <%s>"
 # src/mailbox-conf.c:485
 # src/mailbox-conf.c:490
 #. mailbox, status code, status text
-#: ../libbalsa/send.c:1088
+#: ../libbalsa/send.c:1089
 #, c-format
 msgid "From %s: %d %s"
 msgstr "De %s: %d %s"
 
 #. status code, mailbox
-#: ../libbalsa/send.c:1099
+#: ../libbalsa/send.c:1100
 #, c-format
 msgid "To: %d <%s>"
 msgstr "Para: %d <%s>"
@@ -2051,16 +2051,16 @@ msgstr "Para: %d <%s>"
 # src/mailbox-conf.c:485
 # src/mailbox-conf.c:490
 #. mailbox, status code, status text
-#: ../libbalsa/send.c:1103
+#: ../libbalsa/send.c:1104
 #, c-format
 msgid "To %s: %d %s"
 msgstr "Para: %s: %d %s"
 
-#: ../libbalsa/send.c:1141
+#: ../libbalsa/send.c:1142
 msgid "Disconnected"
 msgstr "Desconectado"
 
-#: ../libbalsa/send.c:1423
+#: ../libbalsa/send.c:1424
 msgid ""
 "SMTP server refused connection.\n"
 "Check your internet connection."
@@ -2068,7 +2068,7 @@ msgstr ""
 "El servidor SMTP rechazó la conexión.\n"
 "Compruebe su conexión a Internet."
 
-#: ../libbalsa/send.c:1428
+#: ../libbalsa/send.c:1429
 msgid ""
 "SMTP server cannot be reached.\n"
 "Check your internet connection."
@@ -2076,11 +2076,11 @@ msgstr ""
 "El servidor SMTP no se ha podido alcanzar.\n"
 "Compruebe su conexión de Internet."
 
-#: ../libbalsa/send.c:1437
+#: ../libbalsa/send.c:1438
 msgid "Message left in Outbox (try again later)"
 msgstr "El mensaje se dejó en la bandeja de salida (intente más tarde)"
 
-#: ../libbalsa/send.c:1441
+#: ../libbalsa/send.c:1442
 #, c-format
 msgid ""
 "SMTP server problem (%d): %s\n"
@@ -2091,32 +2091,32 @@ msgstr ""
 
 # libmutt/mx.c:1375
 # libmutt/mx.c:1375
-#: ../libbalsa/send.c:1755 ../libbalsa/send.c:1824
+#: ../libbalsa/send.c:1756 ../libbalsa/send.c:1825
 #, c-format
 msgid "Cannot read %s: %s"
 msgstr "No se puede leer %s: %s"
 
 # libmutt/mx.c:1375
 # libmutt/mx.c:1375
-#: ../libbalsa/send.c:1758 ../libbalsa/send.c:1827
+#: ../libbalsa/send.c:1759 ../libbalsa/send.c:1828
 #, c-format
 msgid "Cannot read %s"
 msgstr "No se puede leer %s"
 
-#: ../libbalsa/send.c:1788
+#: ../libbalsa/send.c:1789
 #, c-format
 msgid "Cannot determine charset for text file `%s'; sending as mime type `%s'"
 msgstr ""
 "No puedo determinar el conjunto de caracteres para el archivo de texto «%s»; "
 "enviando como tipo mime «%s»"
 
-#: ../libbalsa/send.c:2140
+#: ../libbalsa/send.c:2141
 msgid "This message will not be encrypted for the BCC: recipient."
 msgid_plural "This message will not be encrypted for the BCC: recipients."
 msgstr[0] "Este mensaje no se cifrará para el destinatario Cco:"
 msgstr[1] "Este mensaje no se cifrará para los destinatarios Cco:"
 
-#: ../libbalsa/send.c:2228
+#: ../libbalsa/send.c:2229
 msgid "This message will not be encrypted for the BCC: recipient(s)."
 msgstr "Este mensaje no será cifrado para los destinatarios Cco:"
 
@@ -4603,7 +4603,6 @@ msgid "Host:"
 msgstr "Anfitrión:"
 
 #: ../src/folder-conf.c:843
-#| msgid "_Subfolder of:"
 msgid "Subfolder of:"
 msgstr "Subcarpeta de:"
 
@@ -4689,12 +4688,13 @@ msgstr "el servidor no soporta cuotas"
 msgid "no limits"
 msgstr "sin límites"
 
-#: ../src/folder-conf.c:949
+#: ../src/folder-conf.c:952
 #, c-format
-msgid "%lu kB of %lu kB (%.1f%%) used"
-msgstr "%lu kB de %lu kB (%.1f%%) usado"
+#| msgid "%lu kB of %lu kB (%.1f%%) used"
+msgid "%s of %s (%.1f%%) used"
+msgstr "%s de %s (%.1f%%) usado"
 
-#: ../src/folder-conf.c:984
+#: ../src/folder-conf.c:989
 msgid ""
 "This folder is not stored in configuration. I do not yet know how to remove "
 "it from remote server."
@@ -4704,7 +4704,7 @@ msgstr ""
 
 # src/mailbox-conf.c:157
 # src/mailbox-conf.c:157
-#: ../src/folder-conf.c:993
+#: ../src/folder-conf.c:998
 #, c-format
 msgid ""
 "This will remove the folder \"%s\" from the list.\n"
@@ -4714,7 +4714,7 @@ msgstr ""
 "Podrá usar más tarde «Carpeta IMAP nueva» para agregar esta carpeta "
 "nuevamente.\n"
 
-#: ../src/folder-conf.c:1001
+#: ../src/folder-conf.c:1006
 msgid "Confirm"
 msgstr "Confirmar"
 

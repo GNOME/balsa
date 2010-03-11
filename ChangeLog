@@ -1,3 +1,8 @@
+2010-03-11  Peter Bloomfield
+
+	* libbalsa/files.c (libbalsa_icon_finder): allocate string only
+	if needed.
+
 2010-03-07  Albrecht Dreß
 
 	* src/balsa-mime-widget-text.c: do not mangle quotation characters

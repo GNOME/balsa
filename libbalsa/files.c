@@ -131,7 +131,7 @@ GdkPixbuf *
 libbalsa_icon_finder(const char *mime_type, const LibbalsaVfs * for_file, 
                      gchar** used_type, GtkIconSize size)
 {
-    char *content_type;
+    const gchar *content_type;
     gchar *icon = NULL;
     GdkPixbuf *pixbuf = NULL;
     gint width, height;
@@ -142,12 +142,12 @@ libbalsa_icon_finder(const char *mime_type, const LibbalsaVfs * for_file,
 	width = height = 16;
     
     if (mime_type)
-        content_type = g_strdup(mime_type);
+        content_type = mime_type;
     else if (for_file) {
-        content_type = g_strdup(libbalsa_vfs_get_mime_type(for_file));
+        content_type = libbalsa_vfs_get_mime_type(for_file);
         filename = libbalsa_vfs_get_uri(for_file);
     } else
-	content_type = g_strdup("application/octet-stream");
+	content_type = "application/octet-stream";
 
     /* ask GIO for the icon */
     if ((icon_theme = gtk_icon_theme_get_default())) {
@@ -181,9 +181,7 @@ libbalsa_icon_finder(const char *mime_type, const LibbalsaVfs * for_file,
             /* return if we found a proper pixbuf */
 	    if (pixbuf) {
 		if (used_type)
-		    *used_type = content_type;
-		else 
-		    g_free(content_type);
+		    *used_type = g_strdup(content_type);
 		return pixbuf;
 	    }
         }
@@ -204,8 +202,8 @@ libbalsa_icon_finder(const char *mime_type, const LibbalsaVfs * for_file,
 	g_free(icon);
     }
     
-    if(used_type) *used_type = content_type;
-    else g_free(content_type);
+    if (used_type)
+        *used_type = g_strdup(content_type);
     
     return pixbuf;
 }

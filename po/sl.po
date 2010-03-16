@@ -12,7 +12,7 @@ msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?product=balsa&component=general\n"
 "POT-Creation-Date: 2010-02-21 12:23+0000\n"
-"PO-Revision-Date: 2010-03-15 08:06+0100\n"
+"PO-Revision-Date: 2010-03-16 21:43+0100\n"
 "Last-Translator: Matej Urbančič <mateju@svn.gnome.org>\n"
 "Language-Team: Slovenian GNOME Translation Team <gnome-si@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -2668,12 +2668,12 @@ msgstr "Sporočila ni mogoče obdelati: %s"
 #: ../src/balsa-index.c:2519
 #, c-format
 msgid "Cannot access message %u to pass to %s"
-msgstr "Ni mogoč dostop do sporočila %s za prenos v %s"
+msgstr "Ni mogoč dostop do sporočila %u za prenos v %s"
 
 #: ../src/balsa-index.c:2546
 #, c-format
 msgid "Cannot read message %u to pass to %s"
-msgstr "Ni mogoče prebrati sporočila %s za prenos v %s"
+msgstr "Ni mogoče prebrati sporočila %u za prenos v %s"
 
 #: ../src/balsa-index.c:2710
 msgid "Pipe message through a program"

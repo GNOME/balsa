@@ -1111,7 +1111,8 @@ bm_widget_new_html(BalsaMessage * bm, LibBalsaMessageBody * mime_body)
                           (LibBalsaHtmlCallback) handle_url);
     g_object_set_data(G_OBJECT(mw->widget), "mime-body", mime_body);
 
-    g_signal_connect(G_OBJECT(mw->widget), "key_press_event",
+    g_signal_connect(libbalsa_html_get_view_widget(mw->widget),
+                     "key_press_event",
                      G_CALLBACK(balsa_mime_widget_key_press_event), bm);
     if ((widget = libbalsa_html_popup_menu_widget(mw->widget))) {
         g_object_set_data(G_OBJECT(widget), "balsa-message", bm);

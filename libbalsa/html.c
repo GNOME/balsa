@@ -663,6 +663,12 @@ libbalsa_html_popup_menu_widget(GtkWidget * widget)
         GTK_WIDGET(web_view) : NULL;
 }
 
+GtkWidget *
+libbalsa_html_get_view_widget(GtkWidget * widget)
+{
+    return libbalsa_html_popup_menu_widget(widget);
+}
+
 /*
  * Does the widget support printing?
  */
@@ -1193,6 +1199,15 @@ GtkWidget *
 libbalsa_html_popup_menu_widget(GtkWidget *widget)
 {
     return NULL;
+}
+
+/*
+ * Each widget is its own view widget.
+ */
+GtkWidget *
+libbalsa_html_get_view_widget(GtkWidget * widget)
+{
+    return widget;
 }
 
 # endif                         /* defined(HAVE_WEBKIT) */

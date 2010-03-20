@@ -66,6 +66,7 @@ void libbalsa_html_get_selection_bounds(GtkWidget * widget,
                                         GdkRectangle * selection_bounds);
 
 GtkWidget *libbalsa_html_popup_menu_widget(GtkWidget * widget);
+GtkWidget *libbalsa_html_get_view_widget(GtkWidget * widget);
 
 gboolean libbalsa_html_can_print(GtkWidget * widget);
 void libbalsa_html_print(GtkWidget * widget);

@@ -1,3 +1,11 @@
+2010-03-20  Peter Bloomfield
+
+	* libbalsa/html.c (libbalsa_html_get_view_widget): new method to
+	get the actual view widget.
+	* libbalsa/html.h: ditto.
+	* src/balsa-mime-widget-text.c (bm_widget_new_html): connect to
+	key-press-event on the actual view widget.
+
 2010-03-11  Peter Bloomfield
 
 	* libbalsa/files.c (libbalsa_icon_finder): allocate string only

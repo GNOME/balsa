@@ -1,5 +1,9 @@
 2010-03-23  Peter Bloomfield
 
+	* src/main.c: missing include.
+
+2010-03-23  Peter Bloomfield
+
 	* configure.in: use single-includes.
 
 2010-03-20  Peter Bloomfield

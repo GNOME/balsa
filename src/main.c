@@ -38,6 +38,7 @@
 
 #include <signal.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #ifdef BALSA_USE_THREADS
 #include <pthread.h>

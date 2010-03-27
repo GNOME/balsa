@@ -898,11 +898,15 @@ if test -d "${srcdir}/.git" ; then
 -DNM_DISABLE_DEPRECATED \
 -DPANGO_DISABLE_DEPRECATED \
 -D_FORTIFY_SOURCE=2 \
--DGDK_PIXBUF_DISABLE_SINGLE_INCLUDES \
 "
     if $PKG_CONFIG --atleast-version=2.9.9 gtksourceview-2.0; then
         BALSA_DEFS="$BALSA_DEFS \
         -DGTK_DISABLE_SINGLE_INCLUDES -DG_DISABLE_SINGLE_INCLUDES"
+    fi
+
+    if test x"$use_html_widget" != xgtkhtml2 ; then
+        BALSA_DEFS="$BALSA_DEFS \
+        -DGDK_PIXBUF_DISABLE_SINGLE_INCLUDES"
     fi
 else
 	BALSA_FROM_GIT=no

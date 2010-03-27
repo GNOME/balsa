@@ -513,7 +513,7 @@ append_url_if_open(const gchar * url, LibBalsaMailboxView * view,
 }
 
 static void
-open_mailbox_by_url(const gchar * url)
+open_mailbox_by_url(const gchar * url, gboolean hidden)
 {
     LibBalsaMailbox *mailbox;
 
@@ -524,11 +524,12 @@ open_mailbox_by_url(const gchar * url)
     if (balsa_app.debug)
         fprintf(stderr, "open_mailboxes_idle_cb: opening %s => %p..\n",
                 url, mailbox);
-    if (mailbox)
-        /* The first mailbox we open will be shown; later mailboxes will
-         * have notebook pages, but will not be shown. */
-        balsa_mblist_open_mailbox_hidden(mailbox);
-    else {
+    if (mailbox) {
+        if (hidden)
+            balsa_mblist_open_mailbox_hidden(mailbox);
+        else
+            balsa_mblist_open_mailbox(mailbox);
+    } else {
         /* Do not try to open it next time. */
         LibBalsaMailboxView *view =
             g_hash_table_lookup(libbalsa_mailbox_view_table, url);
@@ -569,10 +570,12 @@ open_mailboxes_idle_cb(gchar ** urls)
 
     if (urls) {
         if (*urls) {
-            open_mailbox_by_url(balsa_app.current_mailbox_url);
+            open_mailbox_by_url(balsa_app.current_mailbox_url, FALSE);
 
             for (tmp = urls; *tmp; ++tmp)
-                open_mailbox_by_url(*tmp);
+                if (!balsa_app.current_mailbox_url
+                    || strcmp(*tmp, balsa_app.current_mailbox_url))
+                    open_mailbox_by_url(*tmp, TRUE);
         }
 
         g_strfreev(urls);

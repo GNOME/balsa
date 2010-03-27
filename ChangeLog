@@ -1,5 +1,11 @@
 2010-03-27  Peter Bloomfield
 
+	* src/balsa-app.c (open_mailbox_by_url),
+	(open_mailboxes_idle_cb): open first mailbox not hidden, open
+	the remainder hidden.
+
+2010-03-27  Peter Bloomfield
+
 	* src/balsa-index.c (bndx_destroy): recheck index->mailbox_node
 	after dropping the gdk lock.
 

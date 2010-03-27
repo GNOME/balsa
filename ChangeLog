@@ -1,5 +1,9 @@
 2010-03-27  Peter Bloomfield
 
+	* src/main-window.c: do not crash on early exit.
+
+2010-03-27  Peter Bloomfield
+
 	* configure.in: build with gtkhtml2.
 
 2010-03-27  Peter Bloomfield

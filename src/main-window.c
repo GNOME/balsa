@@ -2239,8 +2239,9 @@ bw_mailbox_changed(LibBalsaMailbox * mailbox, GtkLabel * lab)
 static void
 bw_notebook_label_notify(LibBalsaMailbox * mailbox, GtkLabel * lab)
 {
-    g_signal_handlers_disconnect_by_func(mailbox, bw_mailbox_changed,
-					 lab);
+    if (LIBBALSA_IS_MAILBOX(mailbox))
+        g_signal_handlers_disconnect_by_func(mailbox, bw_mailbox_changed,
+                                             lab);
 }
 
 static GtkWidget *
@@ -2392,15 +2393,17 @@ bw_real_open_mbnode_thread(GPtrArray *info_array)
 
         pthread_mutex_unlock(&open_lock);
         gdk_threads_enter();
+
         bw_real_open_mbnode(info->window, info->mbnode, info->set_current);
-        gdk_threads_leave();
-        pthread_mutex_lock(&open_lock);
 
 	if (info->window)
             g_object_remove_weak_pointer(G_OBJECT(info->window),
                                          (gpointer) &info->window);
         g_object_unref(info->mbnode);
+
+        gdk_threads_leave();
         g_free(info);
+        pthread_mutex_lock(&open_lock);
     }
 
     info_array->len = 0;

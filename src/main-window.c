@@ -2287,14 +2287,10 @@ bw_notebook_label_new(BalsaMailboxNode * mbnode)
     return box;
 }
 
-struct bw_open_mbnode_info {
-    BalsaMailboxNode * mbnode;
-    BalsaWindow *window;
-    gboolean set_current;
-};
-
+/* Called with the gdk lock held (when threads are enabled). */
 static void
-bw_real_open_mbnode(struct bw_open_mbnode_info * info)
+bw_real_open_mbnode(BalsaWindow *window, BalsaMailboxNode * mbnode,
+                    gboolean set_current)
 {
     BalsaIndex * index;
     GtkWidget *label;
@@ -2305,22 +2301,9 @@ bw_real_open_mbnode(struct bw_open_mbnode_info * info)
     gchar *message;
     LibBalsaMailbox *mailbox;
 
-#ifdef BALSA_USE_THREADS
-    static pthread_mutex_t open_lock = PTHREAD_MUTEX_INITIALIZER;
-    pthread_mutex_lock(&open_lock);
-    pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
-#endif
     /* FIXME: the check is not needed in non-MT-mode */
-    gdk_threads_enter();
-    if (!info->window || bw_is_open_mailbox(mailbox = info->mbnode->mailbox)) {
-	gdk_threads_leave();
-#ifdef BALSA_USE_THREADS
-        pthread_mutex_unlock(&open_lock);
-#endif
-	g_object_unref(info->mbnode);
-	g_free(info);
+    if (!window || bw_is_open_mailbox(mailbox = mbnode->mailbox))
         return;
-    }
 
     index = BALSA_INDEX(balsa_index_new());
     balsa_index_set_width_preference
@@ -2328,45 +2311,37 @@ bw_real_open_mbnode(struct bw_open_mbnode_info * info)
          (balsa_app.layout_type == LAYOUT_WIDE_SCREEN)
          ? BALSA_INDEX_NARROW : BALSA_INDEX_WIDE);
 
+    g_object_add_weak_pointer(G_OBJECT(window), (gpointer) &window);
     message = g_strdup_printf(_("Opening %s"), mailbox->name);
-    balsa_window_increase_activity(info->window, message);
+    balsa_window_increase_activity(window, message);
 
     /* Call balsa_index_load_mailbox_node NOT holding the gdk lock. */
     gdk_threads_leave();
-    failurep = balsa_index_load_mailbox_node(BALSA_INDEX (index),
-                                             info->mbnode, &err);
+    failurep = balsa_index_load_mailbox_node(index, mbnode, &err);
     gdk_threads_enter();
 
-    if (info->window) {
-	balsa_window_decrease_activity(info->window, message);
-	g_object_remove_weak_pointer(G_OBJECT(info->window),
-				     (gpointer) &info->window);
+    if (window) {
+        balsa_window_decrease_activity(window, message);
+        g_object_remove_weak_pointer(G_OBJECT(window), (gpointer) &window);
     }
     g_free(message);
 
-    if (!info->window || failurep) {
+    if (!window || failurep) {
         libbalsa_information(
             LIBBALSA_INFORMATION_ERROR,
             _("Unable to Open Mailbox!\n%s."), 
 	    err ? err->message : _("Unknown error"));
 	g_clear_error(&err);
-        gtk_object_destroy(GTK_OBJECT(index));
-        gdk_threads_leave();
-#ifdef BALSA_USE_THREADS
-        pthread_mutex_unlock(&open_lock);
-#endif
-	g_object_unref(info->mbnode);
-	g_free(info);
+        g_object_unref(g_object_ref_sink(index));
         return;
     }
     g_assert(index->mailbox_node);
     g_signal_connect(G_OBJECT (index), "index-changed",
-                     G_CALLBACK (bw_index_changed_cb),
-                     info->window);
+                     G_CALLBACK (bw_index_changed_cb), window);
 
     /* if(config_short_label) label = gtk_label_new(mbnode->mailbox->name);
        else */
-    label = bw_notebook_label_new(info->mbnode);
+    label = bw_notebook_label_new(mbnode);
 
     /* store for easy access */
     scroll = gtk_scrolled_window_new(NULL, NULL);
@@ -2375,15 +2350,14 @@ bw_real_open_mbnode(struct bw_open_mbnode_info * info)
                                    GTK_POLICY_AUTOMATIC);
     gtk_container_add(GTK_CONTAINER(scroll), GTK_WIDGET(index));
     gtk_widget_show(scroll);
-    page_num =
-        gtk_notebook_append_page(GTK_NOTEBOOK(info->window->notebook),
-                                 scroll, label);
-    gtk_notebook_set_tab_reorderable(GTK_NOTEBOOK(info->window->notebook),
+    page_num = gtk_notebook_append_page(GTK_NOTEBOOK(window->notebook),
+                                        scroll, label);
+    gtk_notebook_set_tab_reorderable(GTK_NOTEBOOK(window->notebook),
                                      scroll, TRUE);
 
-    if (info->set_current)
+    if (set_current)
         /* change the page to the newly selected notebook item */
-        gtk_notebook_set_current_page(GTK_NOTEBOOK(info->window->notebook),
+        gtk_notebook_set_current_page(GTK_NOTEBOOK(window->notebook),
                                       page_num);
 
     bw_register_open_mailbox(mailbox);
@@ -2393,38 +2367,78 @@ bw_real_open_mbnode(struct bw_open_mbnode_info * info)
                                    libbalsa_mailbox_get_threading_type
                                    (mailbox));
     balsa_index_scroll_on_open(index);
-
-    g_object_unref(info->mbnode);
-    g_free(info);
-
-    gdk_threads_leave();    
-#ifdef BALSA_USE_THREADS
-    pthread_mutex_unlock(&open_lock);
-#endif
 }
+
+#ifdef BALSA_USE_THREADS
+static pthread_mutex_t open_lock = PTHREAD_MUTEX_INITIALIZER;
+
+struct bw_open_mbnode_info {
+    BalsaWindow *window;
+    BalsaMailboxNode * mbnode;
+    gboolean set_current;
+};
+
+static void
+bw_real_open_mbnode_thread(GPtrArray *info_array)
+{
+    guint i;
+
+    pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
+    pthread_mutex_lock(&open_lock);
+
+    for (i = 0; i < info_array->len; i++) {
+        struct bw_open_mbnode_info *info =
+            g_ptr_array_index(info_array, i);
+
+        pthread_mutex_unlock(&open_lock);
+        gdk_threads_enter();
+        bw_real_open_mbnode(info->window, info->mbnode, info->set_current);
+        gdk_threads_leave();
+        pthread_mutex_lock(&open_lock);
+
+	if (info->window)
+            g_object_remove_weak_pointer(G_OBJECT(info->window),
+                                         (gpointer) &info->window);
+        g_object_unref(info->mbnode);
+        g_free(info);
+    }
+
+    info_array->len = 0;
+    pthread_mutex_unlock(&open_lock);
+}
+#endif
 
 static void
 balsa_window_real_open_mbnode(BalsaWindow * window,
                               BalsaMailboxNode * mbnode,
                               gboolean set_current)
 {
-    struct bw_open_mbnode_info *info;
 #ifdef BALSA_USE_THREADS
-    pthread_t open_thread;
+    struct bw_open_mbnode_info *info;
+    static GPtrArray *info_array;
 
-#endif
     info = g_new(struct bw_open_mbnode_info, 1);
     info->window = window;
-    info->set_current = set_current;
     g_object_add_weak_pointer(G_OBJECT(window), (gpointer) &info->window);
-    info->mbnode = mbnode;
-    g_object_ref(mbnode);
-#ifdef BALSA_USE_THREADS
-    pthread_create(&open_thread, NULL, (void*(*)(void*))bw_real_open_mbnode, 
-                   info);
-    pthread_detach(open_thread);
+    info->mbnode = g_object_ref(mbnode);
+    info->set_current = set_current;
+
+    pthread_mutex_lock(&open_lock);
+
+    if (!info_array)
+        info_array = g_ptr_array_new();
+    if (!info_array->len) {
+        pthread_t open_thread;
+        pthread_create(&open_thread, NULL,
+                       (void*(*)(void*))bw_real_open_mbnode_thread,
+                       info_array);
+        pthread_detach(open_thread);
+    }
+
+    g_ptr_array_add(info_array, info);
+    pthread_mutex_unlock(&open_lock);
 #else
-    bw_real_open_mbnode(info);
+    bw_real_open_mbnode(window, mbnode, set_current);
 #endif
 }
 

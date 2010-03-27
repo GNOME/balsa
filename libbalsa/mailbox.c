@@ -643,6 +643,7 @@ libbalsa_mailbox_close(LibBalsaMailbox * mailbox, gboolean expunge)
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
     g_return_if_fail(MAILBOX_OPEN(mailbox));
 
+    g_object_ref(mailbox);
     libbalsa_lock_mailbox(mailbox);
 
     if (--mailbox->open_ref == 0) {
@@ -662,6 +663,7 @@ libbalsa_mailbox_close(LibBalsaMailbox * mailbox, gboolean expunge)
     }
 
     libbalsa_unlock_mailbox(mailbox);
+    g_object_unref(mailbox);
 }
 
 void

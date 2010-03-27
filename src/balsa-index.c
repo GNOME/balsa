@@ -229,9 +229,13 @@ bndx_destroy(GtkObject * obj)
 	    libbalsa_mailbox_close(mailbox, balsa_app.expunge_on_close);
             gdk_threads_enter();
 	}
-	g_object_weak_unref(G_OBJECT(index->mailbox_node),
-                            (GWeakNotify) bndx_mbnode_weak_notify, index);
-	index->mailbox_node = NULL;
+
+	if (index->mailbox_node) {
+            g_object_weak_unref(G_OBJECT(index->mailbox_node),
+                                (GWeakNotify) bndx_mbnode_weak_notify,
+                                index);
+            index->mailbox_node = NULL;
+        }
     }
 
     if (index->search_iter) {

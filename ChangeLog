@@ -1,5 +1,10 @@
 2010-03-27  Peter Bloomfield
 
+	* src/balsa-index.c (bndx_destroy): recheck index->mailbox_node
+	after dropping the gdk lock.
+
+2010-03-27  Peter Bloomfield
+
 	* libbalsa/mailbox.c (libbalsa_mailbox_close): increase mailbox
 	ref count while closing it.
 

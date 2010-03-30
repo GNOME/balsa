@@ -2,7 +2,8 @@
 
 	* src/balsa-index.c (bndx_instance_init),
 	(balsa_index_set_column_widths): set the renderer width for the
-	"Size" column instead of the column width--works reliably.
+	"Size" column instead of the column width--works reliably; fixes
+	bug #579479 (Jonathan North Washington).
 
 2010-03-27  Peter Bloomfield
 

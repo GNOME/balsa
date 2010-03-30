@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: eu\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-03-17 16:15+0100\n"
-"PO-Revision-Date: 2010-03-17 16:30+0100\n"
+"PO-Revision-Date: 2010-03-30 20:05+0200\n"
 "Last-Translator: Iñaki Larrañaga Murgoitio <dooteo@euskalgnu.org>\n"
 "Language-Team: Basque <itzulpena@euskalgnu.org>\n"
 "MIME-Version: 1.0\n"
@@ -1848,7 +1848,7 @@ msgstr "_Pasaesaldia:"
 
 #: ../libbalsa/smtp-server.c:595 ../src/mailbox-conf.c:226
 msgid "Use _TLS:"
-msgstr "Erabili_TLS:"
+msgstr "Erabili _TLS:"
 
 #: ../libbalsa/smtp-server.c:600
 msgid "C_ertificate Pass Phrase:"
@@ -2772,7 +2772,7 @@ msgid ""
 "a Message Disposition Notification(MDN) to be returned to `%s'.\n"
 "Do you want to send this notification?"
 msgstr ""
-"Mezu hori bidali duenak (%s) eskatu du nmezuen banaketa-jakinarazpena (MDN) "
+"Mezu hori bidali duenak (%s) eskatu du mezuen banaketa-jakinarazpena (MDN) "
 "bidaltzeko honi: '%s'.\n"
 "Jakinarazpena bidali nahi diozu?"
 
@@ -3492,7 +3492,7 @@ msgstr "Exekutatu programa:"
 
 #: ../src/filter-edit-dialog.c:109
 msgid "Send to Trash"
-msgstr "Bidali zakarrontzira"
+msgstr "Bota zakarrontzira"
 
 #: ../src/filter-edit-dialog.c:113
 msgid "OR"
@@ -7168,7 +7168,7 @@ msgstr "Testua ikonoen _azpian"
 
 #: ../src/toolbar-factory.c:520
 msgid "Priority Text Be_side Icons"
-msgstr "Lehenetasuna textua ikonoen _ondoan"
+msgstr "Lehentasuna testua ikonoen _ondoan"
 
 #: ../src/toolbar-factory.c:522
 msgid "_Icons Only"

@@ -1,3 +1,9 @@
+2010-03-29  Peter Bloomfield
+
+	* src/balsa-index.c (bndx_instance_init),
+	(balsa_index_set_column_widths): set the renderer width for the
+	"Size" column instead of the column width--works reliably.
+
 2010-03-27  Peter Bloomfield
 
 	* src/main-window.c: do not crash on early exit.

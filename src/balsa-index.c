@@ -287,26 +287,11 @@ bndx_instance_init(BalsaIndex * index)
     GtkTreeSelection *selection = gtk_tree_view_get_selection(tree_view);
     GtkCellRenderer *renderer;
     GtkTreeViewColumn *column;
-    gint icon_w, icon_h;
 
 #if defined(TREE_VIEW_FIXED_HEIGHT)
-    {
-        GValue val = {0};
-        g_value_init (&val, G_TYPE_BOOLEAN);
-        g_value_set_boolean(&val, TRUE);
-        g_object_set_property(G_OBJECT(index), "fixed_height_mode",
-                              &val);
-        g_value_unset(&val);
-    }
-#define set_sizing(col) \
-      gtk_tree_view_column_set_sizing(col, GTK_TREE_VIEW_COLUMN_FIXED)
-#else
-#define set_sizing(col)
+    gtk_tree_view_set_fixed_height_mode(tree_view, TRUE);
 #endif
 
-    /* get the size of the icons */
-    gtk_icon_size_lookup(GTK_ICON_SIZE_MENU, &icon_w, &icon_h);
-    
     /* Index column */
     renderer = gtk_cell_renderer_text_new();
     column = gtk_tree_view_column_new_with_attributes
@@ -318,32 +303,30 @@ bndx_instance_init(BalsaIndex * index)
          "background-set", LB_MBOX_BACKGROUND_SET_COL,
          NULL);
     g_object_set(renderer, "xalign", 1.0, NULL);
-    set_sizing(column); gtk_tree_view_append_column(tree_view, column);
     bi_apply_other_column_settings(column, TRUE, LB_MBOX_MSGNO_COL);
+    gtk_tree_view_append_column(tree_view, column);
 
     /* Status icon column */
     renderer = gtk_cell_renderer_pixbuf_new();
-    gtk_cell_renderer_set_fixed_size(renderer, icon_w, icon_h);
     column = gtk_tree_view_column_new_with_attributes
         ("S", renderer,
          "pixbuf",              LB_MBOX_MARKED_COL,
          "cell-background",     LB_MBOX_BACKGROUND_COL,
          "cell-background-set", LB_MBOX_BACKGROUND_SET_COL,
          NULL);
-    set_sizing(column); gtk_tree_view_append_column(tree_view, column);
     bi_apply_other_column_settings(column, FALSE, 0);
+    gtk_tree_view_append_column(tree_view, column);
 
     /* Attachment icon column */
     renderer = gtk_cell_renderer_pixbuf_new();
-    gtk_cell_renderer_set_fixed_size(renderer, icon_w, icon_h);
     column = gtk_tree_view_column_new_with_attributes
         ("A", renderer,
          "pixbuf",              LB_MBOX_ATTACH_COL,
          "cell-background",     LB_MBOX_BACKGROUND_COL,
          "cell-background-set", LB_MBOX_BACKGROUND_SET_COL,
          NULL);
-    set_sizing(column); gtk_tree_view_append_column(tree_view, column);
     bi_apply_other_column_settings(column, FALSE, 0);
+    gtk_tree_view_append_column(tree_view, column);
 
     /* From/To column */
     renderer = gtk_cell_renderer_text_new();
@@ -358,9 +341,8 @@ bndx_instance_init(BalsaIndex * index)
          "background-set", LB_MBOX_BACKGROUND_SET_COL,
          NULL);
     gtk_tree_view_column_set_resizable(column, TRUE);
-    gtk_tree_view_column_set_sizing(column, GTK_TREE_VIEW_COLUMN_FIXED);
-    gtk_tree_view_append_column(tree_view, column);
     bi_apply_other_column_settings(column, TRUE, LB_MBOX_FROM_COL);
+    gtk_tree_view_append_column(tree_view, column);
 
     /* Subject column--contains tree expanders */
     renderer = gtk_cell_renderer_text_new();
@@ -375,9 +357,8 @@ bndx_instance_init(BalsaIndex * index)
          "background-set", LB_MBOX_BACKGROUND_SET_COL,
          NULL);
     gtk_tree_view_column_set_resizable(column, TRUE);
-    gtk_tree_view_column_set_sizing(column, GTK_TREE_VIEW_COLUMN_FIXED);
-    gtk_tree_view_append_column(tree_view, column);
     bi_apply_other_column_settings(column, TRUE, LB_MBOX_SUBJECT_COL);
+    gtk_tree_view_append_column(tree_view, column);
     gtk_tree_view_set_expander_column(tree_view, column);
 
     /* Date column */
@@ -393,15 +374,16 @@ bndx_instance_init(BalsaIndex * index)
          "background-set", LB_MBOX_BACKGROUND_SET_COL,
          NULL);
     gtk_tree_view_column_set_resizable(column, TRUE);
-    gtk_tree_view_column_set_sizing(column, GTK_TREE_VIEW_COLUMN_FIXED);
-    gtk_tree_view_append_column(tree_view, column);
     bi_apply_other_column_settings(column, TRUE, LB_MBOX_DATE_COL);
+    gtk_tree_view_append_column(tree_view, column);
 
     /* Size column */
     column = gtk_tree_view_column_new();
     gtk_tree_view_column_set_title(column, _("Size"));
     renderer = gtk_cell_renderer_text_new();
     g_object_set(renderer, "xalign", 1.0, NULL);
+    /* get a better guess: */
+    gtk_cell_renderer_set_fixed_size(renderer, 50, -1);
     gtk_tree_view_column_pack_start(column, renderer, FALSE);
     gtk_tree_view_column_set_attributes
         (column, renderer,
@@ -413,8 +395,8 @@ bndx_instance_init(BalsaIndex * index)
          "background",     LB_MBOX_BACKGROUND_COL,
          "background-set", LB_MBOX_BACKGROUND_SET_COL,
          NULL);
-    set_sizing(column); gtk_tree_view_append_column(tree_view, column);
     bi_apply_other_column_settings(column, TRUE, LB_MBOX_SIZE_COL);
+    gtk_tree_view_append_column(tree_view, column);
 
     /* Initialize some other members */
     index->mailbox_node = NULL;
@@ -1377,20 +1359,17 @@ void
 balsa_index_set_column_widths(BalsaIndex * index)
 {
     GtkTreeView *tree_view = GTK_TREE_VIEW(index);
-    gint icon_w, icon_h;
+    gint icon_w;
 
 #if defined(TREE_VIEW_FIXED_HEIGHT)
     /* so that fixed width works properly */
     gtk_tree_view_column_set_fixed_width(gtk_tree_view_get_column
                                          (tree_view, LB_MBOX_MSGNO_COL),
-                                         50); /* get a better guess */ 
-    gtk_tree_view_column_set_fixed_width(gtk_tree_view_get_column
-                                         (tree_view, LB_MBOX_SIZE_COL),
-                                         50); /* get a better guess */ 
+                                         50); /* get a better guess */
 #endif
     /* I have no idea why we must add 5 pixels to the icon width - otherwise,
        the icon will be clipped... */
-    gtk_icon_size_lookup(GTK_ICON_SIZE_MENU, &icon_w, &icon_h);
+    gtk_icon_size_lookup(GTK_ICON_SIZE_MENU, &icon_w, NULL);
     gtk_tree_view_column_set_fixed_width(gtk_tree_view_get_column
                                          (tree_view, LB_MBOX_MARKED_COL),
                                          icon_w + 5); 

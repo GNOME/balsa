@@ -1,3 +1,8 @@
+2010-04-05  Pawel Salek
+
+	* libbalsa/mailbox.c: Mailbox::add_messages would leak a file descriptor
+	each time it was called.
+
 2010-03-29  Peter Bloomfield
 
 	* src/balsa-index.c (bndx_instance_init),

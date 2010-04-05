@@ -1781,7 +1781,7 @@ msg_iterator(LibBalsaMessageFlag *flg, GMimeStream **stream, void *arg)
     *flg = amd->flags;
     *stream = amd->stream;
  /* Make sure ::add_messages does not destroy the stream. */
-    g_object_ref(amd->stream);
+    if (!res) g_object_ref(amd->stream);
     return res;
 }
 

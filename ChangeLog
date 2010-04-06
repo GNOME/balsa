@@ -1,5 +1,11 @@
 2010-04-05  Peter Bloomfield
 
+	* src/balsa-index.c (bndx_string_width), (bndx_instance_init),
+	(balsa_index_set_column_widths): get column width as actual
+	string width.
+
+2010-04-05  Peter Bloomfield
+
 	* libbalsa/misc.c (libbalsa_size_to_gchar): more compact string
 	representation of a size.
 

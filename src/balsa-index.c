@@ -278,6 +278,34 @@ bi_apply_other_column_settings(GtkTreeViewColumn *column,
 #endif
 }
 
+/* Width of a string in pixels for the default font. */
+#if GTK_CHECK_VERSION(2, 20, 0)
+static gint
+bndx_string_width(const gchar * text)
+{
+    GtkWidget *label;
+    GtkWidget *window;
+    GdkPixbuf *pixbuf;
+    gint width;
+
+    label = gtk_label_new(NULL);
+    gtk_label_set_markup((GtkLabel *) label, text);
+
+    window = gtk_offscreen_window_new();
+    gtk_container_add(GTK_CONTAINER(window), label);
+    gtk_widget_show_all(window);
+
+    pixbuf = gtk_offscreen_window_get_pixbuf((GtkOffscreenWindow *) window);
+    width = gdk_pixbuf_get_width(pixbuf);
+
+    gtk_widget_destroy(window);
+
+    return width;
+}
+#else
+#define bndx_string_width(text) 50
+#endif
+
 /* BalsaIndex instance init method; no tree store is set on the tree
  * view--that's handled later, when the view is populated. */
 static void
@@ -383,7 +411,9 @@ bndx_instance_init(BalsaIndex * index)
     renderer = gtk_cell_renderer_text_new();
     g_object_set(renderer, "xalign", 1.0, NULL);
     /* get a better guess: */
-    gtk_cell_renderer_set_fixed_size(renderer, 50, -1);
+    gtk_cell_renderer_set_fixed_size(renderer,
+                                     bndx_string_width("<b>99.9M</b>"),
+                                     -1);
     gtk_tree_view_column_pack_start(column, renderer, FALSE);
     gtk_tree_view_column_set_attributes
         (column, renderer,
@@ -1365,7 +1395,7 @@ balsa_index_set_column_widths(BalsaIndex * index)
     /* so that fixed width works properly */
     gtk_tree_view_column_set_fixed_width(gtk_tree_view_get_column
                                          (tree_view, LB_MBOX_MSGNO_COL),
-                                         50); /* get a better guess */
+                                         bndx_string_width("00000"));
 #endif
     /* I have no idea why we must add 5 pixels to the icon width - otherwise,
        the icon will be clipped... */

@@ -1776,13 +1776,13 @@ static gboolean
 msg_iterator(LibBalsaMessageFlag *flg, GMimeStream **stream, void *arg)
 {
     struct AddMessageData * amd = (struct AddMessageData*)arg;
-    gboolean res = !amd->processed;
+    if (amd->processed)
+        return FALSE;
     amd->processed = TRUE;
     *flg = amd->flags;
-    *stream = amd->stream;
  /* Make sure ::add_messages does not destroy the stream. */
-    if (!res) g_object_ref(amd->stream);
-    return res;
+    *stream = g_object_ref(amd->stream);
+    return TRUE;
 }
 
 gboolean

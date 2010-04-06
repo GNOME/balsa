@@ -1,3 +1,8 @@
+2010-04-06  Peter Bloomfield
+
+	* libbalsa/mailbox.c (msg_iterator): object-ref the stream if
+	the caller will unref it.
+
 2010-04-05  Peter Bloomfield
 
 	* libbalsa/mailbox_imap.c (multi_append_cb): round size in

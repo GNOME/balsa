@@ -1,7 +1,7 @@
 2010-04-05  Peter Bloomfield
 
 	* libbalsa/mailbox_imap.c (multi_append_cb): round size in
-	kibitytes, for consistency with libbalsa_size_to_gchar.
+	kibibytes, for consistency with libbalsa_size_to_gchar.
 
 2010-04-05  Peter Bloomfield
 

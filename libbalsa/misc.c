@@ -1312,30 +1312,28 @@ libbalsa_path_is_below_dir(const gchar * path, const gchar * dir)
     return dir[len - 1] == G_DIR_SEPARATOR || path[len] == G_DIR_SEPARATOR;
 }
 
-gchar *
-libbalsa_size_to_gchar(guint64 length)
-{
-    gchar retsize[32];
+#define LIBBALSA_RADIX 1024.0
+#define MAX_WITHOUT_SUFFIX 9999
 
-    /* length is long */
-    if (length <= 32768) {
-        g_snprintf (retsize, sizeof(retsize), "%" G_GUINT64_FORMAT, length);
-    } else if (length <= 100*1024) {
-        float tmp = (float)length/1024.0;
-        g_snprintf (retsize, sizeof(retsize), "%.1fK", tmp);
-    } else if (length <= (1024*1024)) {
-        g_snprintf (retsize, sizeof(retsize),
-                    "%" G_GUINT64_FORMAT "K", length/1024);
-    } else if (length <= (100*1024*1024)) {
-        float tmp = (float)length/(1024.0*1024.0);
-        g_snprintf (retsize, sizeof(retsize), "%.1fM", tmp);
-    } else if (length <= (1024*1024*1024)) {
-        g_snprintf (retsize, sizeof(retsize),
-                    "%" G_GUINT64_FORMAT "M", length/(1024*1024));
-    } else {
-        float tmp = (float)length/(1024.0*1024.0*1024.0);
-        g_snprintf (retsize, sizeof(retsize), "%.1fG", tmp);
+gchar *
+libbalsa_size_to_gchar(guint64 size)
+{
+    if (size > MAX_WITHOUT_SUFFIX) {
+        gdouble displayed_size = (gdouble) size;
+        gchar *s, suffix[] = "KMGT";
+
+        for (s = suffix; /* *s != '\0' */; s++) {
+            displayed_size /= LIBBALSA_RADIX;
+            if (displayed_size < 9.995)
+                return g_strdup_printf("%.2f%c", displayed_size, *s);
+            if (displayed_size < 99.95)
+                return g_strdup_printf("%.1f%c", displayed_size, *s);
+            if (displayed_size < LIBBALSA_RADIX - 0.5 || !s[1])
+                return g_strdup_printf("%" G_GUINT64_FORMAT "%c",
+                                       ((guint64) (displayed_size + 0.5)),
+                                       *s);
+        }
     }
 
-    return g_strdup(retsize);
+    return g_strdup_printf("%" G_GUINT64_FORMAT, size);
 }

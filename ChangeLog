@@ -1,3 +1,8 @@
+2010-04-05  Peter Bloomfield
+
+	* libbalsa/misc.c (libbalsa_size_to_gchar): more compact string
+	representation of a size.
+
 2010-04-05  Pawel Salek
 
 	* libbalsa/mailbox.c: Mailbox::add_messages would leak a file descriptor

@@ -2814,7 +2814,7 @@ multi_append_cb(char * buf, size_t buflen,
 	GMimeFilter *crlffilter;
 	gint outfd;
 	GMimeStream *stream = NULL;
-	gssize len;
+	gint64 len;
 	LibBalsaMessageFlag flags;
 	GError**err = macd->err;
 	gchar *outf = NULL;
@@ -2866,7 +2866,8 @@ multi_append_cb(char * buf, size_t buflen,
 
 	if (len > (signed) SizeMsgThreshold)
 	    libbalsa_information(LIBBALSA_INFORMATION_MESSAGE,
-				 _("Uploading %ld kB"), (long) len / 1024);
+                                 _("Uploading %" G_GINT64_FORMAT " kB"),
+                                 (len + 512) / 1024);
 
 	*return_flags = imap_flags;
 	macd->copied++;

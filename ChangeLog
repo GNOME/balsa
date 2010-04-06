@@ -1,5 +1,10 @@
 2010-04-05  Peter Bloomfield
 
+	* libbalsa/mailbox_imap.c (multi_append_cb): round size in
+	kibitytes, for consistency with libbalsa_size_to_gchar.
+
+2010-04-05  Peter Bloomfield
+
 	* src/balsa-index.c (bndx_string_width), (bndx_instance_init),
 	(balsa_index_set_column_widths): get column width as actual
 	string width.

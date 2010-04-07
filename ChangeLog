@@ -1,3 +1,8 @@
+2010-04-07  Peter Bloomfield
+
+	* src/balsa-index.c (bndx_string_width): use allocation width
+	instead of pixbuf width.
+
 2010-04-06  Peter Bloomfield
 
 	* libbalsa/mailbox.c (msg_iterator): object-ref the stream if

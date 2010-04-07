@@ -285,8 +285,7 @@ bndx_string_width(const gchar * text)
 {
     GtkWidget *label;
     GtkWidget *window;
-    GdkPixbuf *pixbuf;
-    gint width;
+    GtkAllocation allocation;
 
     label = gtk_label_new(NULL);
     gtk_label_set_markup((GtkLabel *) label, text);
@@ -295,12 +294,10 @@ bndx_string_width(const gchar * text)
     gtk_container_add(GTK_CONTAINER(window), label);
     gtk_widget_show_all(window);
 
-    pixbuf = gtk_offscreen_window_get_pixbuf((GtkOffscreenWindow *) window);
-    width = gdk_pixbuf_get_width(pixbuf);
-
+    gtk_widget_get_allocation(window, &allocation);
     gtk_widget_destroy(window);
 
-    return width;
+    return allocation.width;
 }
 #else
 #define bndx_string_width(text) 50

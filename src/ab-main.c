@@ -1201,7 +1201,7 @@ main(int argc, char *argv[])
 static void
 bab_cleanup(void)
 {
-#if HAVE_GNOME
+#if (defined(HAVE_GNOME) && !defined(GNOME_DISABLE_DEPRECATED))
     gnome_sound_shutdown();
 #endif
     gtk_main_quit();

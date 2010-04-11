@@ -1,3 +1,10 @@
+2010-04-11  Albrecht Dreß
+
+	* libbalsa/filter.c (libbalsa_filter_mailbox_messages): build on
+	Lucid β.
+	* src/ab-main.c: ditto.
+	* src/main.c (balsa_cleanup): ditto.
+
 2010-04-07  Peter Bloomfield
 
 	* src/balsa-index.c (bndx_string_width): use allocation width

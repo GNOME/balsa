@@ -265,7 +265,7 @@ libbalsa_filter_mailbox_messages(LibBalsaFilter * filt,
                                   NULL);
         g_message("(%s) play %s, %s", __func__, filt->sound, ca_strerror(rc));
     }
-#elif HAVE_GNOME
+#elif (defined(HAVE_GNOME) && !defined(GNOME_DISABLE_DEPRECATED))
     if (filt->sound)
 	gnome_sound_play(filt->sound);
 #endif                          /* HAVE_CANBERRA */

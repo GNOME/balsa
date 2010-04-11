@@ -1211,7 +1211,7 @@ balsa_cleanup(void)
     g_hash_table_destroy(libbalsa_mailbox_view_table);
     libbalsa_mailbox_view_table = NULL;
 
-#if HAVE_GNOME
+#if (defined(HAVE_GNOME) && !defined(GNOME_DISABLE_DEPRECATED))
     gnome_sound_shutdown();
 #endif
 }

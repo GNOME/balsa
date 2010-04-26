@@ -94,12 +94,18 @@ libbalsa_check_crypto_engine(gpgme_protocol_t protocol)
 				       _
 				       ("Gpgme has been compiled without support for protocol %s."),
 				       gpgme_get_protocol_name(protocol));
-	    else if (info->file_name && !info->version)
+	    else if (info->file_name && !info->version) {
 		g_string_append_printf(message,
 				       _
 				       ("Crypto engine %s is not installed properly."),
 				       info->file_name);
-	    else if (info->file_name && info->version && info->req_version)
+                if (protocol == GPGME_PROTOCOL_OpenPGP)
+                    g_string_append_printf(message,
+                                           _(" Hint: check the `gnupg2' (preferred) or `gnupg' package."));
+                else if (protocol == GPGME_PROTOCOL_CMS)
+                    g_string_append_printf(message,
+                                           _(" Hint: check the `gpgsm' package."));
+	    } else if (info->file_name && info->version && info->req_version)
 		g_string_append_printf(message,
 				       _
 				       ("Crypto engine %s version %s is installed, but at least version %s is required."),

@@ -107,7 +107,7 @@ typedef struct {
 } SendThreadMessage;
 
 #define  MSGSENDTHREAD(t_message, type, string, s_msg, s_mbox, messof) \
-  t_message = malloc( sizeof( SendThreadMessage )); \
+  t_message = g_new(SendThreadMessage, 1); \
   t_message->message_type = type; \
   strncpy(t_message->message_string, string, sizeof(t_message->message_string)); \
   t_message->msg = s_msg; \

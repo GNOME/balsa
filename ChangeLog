@@ -1,3 +1,8 @@
+2010-04-27  Peter Bloomfield
+
+	* libbalsa/send.h: allocate message with g_new instead of
+	malloc, since we g_free it.
+
 2010-04-26  Albrecht Dreß
 
 	* libbalsa/rfc3156.c (libbalsa_check_crypto_engine): add hint

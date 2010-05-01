@@ -1130,11 +1130,16 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMailbox * mailbox, guint msgno)
     }
 
     bm->message = message = libbalsa_mailbox_get_message(mailbox, msgno);
+    /* We must not use msgno from now on: an asynchronous expunge may
+       arrive (in particular between the body_ref() and set_flags()
+       actions) and change the message numbering. Asynchronous
+       expunges will update the LibBalsaMailbox::message data but no
+       message numbers stored in random integer variables. */
     if (!message) {
 	balsa_information(LIBBALSA_INFORMATION_WARNING,
                           _("Could not access message %u "
                             "in mailbox \"%s\"."),
-			  (unsigned int) msgno, mailbox->name);
+			  (unsigned int) message->msgno, mailbox->name);
         return FALSE;
     }
 
@@ -1146,7 +1151,7 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMailbox * mailbox, guint msgno)
 	balsa_information(LIBBALSA_INFORMATION_WARNING,
                           _("Could not access message %u "
                             "in mailbox \"%s\"."),
-			  (unsigned int) msgno, mailbox->name);
+			  (unsigned int) message->msgno, mailbox->name);
         return FALSE;
     }
 
@@ -1165,7 +1170,7 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMailbox * mailbox, guint msgno)
 #endif
 
     /* may update the icon */           
-    libbalsa_mailbox_msgno_update_attach(mailbox, msgno, message);
+    libbalsa_mailbox_msgno_update_attach(mailbox, message->msgno, message);
 
     display_headers(bm);
     display_content(bm);
@@ -1204,7 +1209,7 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMailbox * mailbox, guint msgno)
      * emit read message
      */
     if (is_new && !mailbox->readonly)
-        libbalsa_mailbox_msgno_change_flags(mailbox, msgno, 0,
+        libbalsa_mailbox_msgno_change_flags(mailbox, message->msgno, 0,
                                             LIBBALSA_MESSAGE_FLAG_NEW);
 
     /* restore keyboard focus to the content, if it was there before */

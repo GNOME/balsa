@@ -1,3 +1,8 @@
+2010-05-01  Pawel Salek
+
+	* src/balsa-message.c: handle expunge events arriving between
+	fetch and flag set operations.
+
 2010-04-27  Peter Bloomfield
 
 	* libbalsa/send.h: allocate message with g_new instead of

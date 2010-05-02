@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?product=balsa&component=general\n"
-"POT-Creation-Date: 2010-04-10 10:49+0000\n"
-"PO-Revision-Date: 2010-04-11 09:36+0100\n"
+"POT-Creation-Date: 2010-04-29 12:43+0000\n"
+"PO-Revision-Date: 2010-05-01 09:27+0100\n"
 "Last-Translator: Andrej Žnidaršič <andrej.znidarsic@gmail.com>\n"
 "Language-Team: Slovenian GNOME Translation Team <gnome-si@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -236,7 +236,7 @@ msgid "Failed to decrypt MIME part: parse error"
 msgstr "Napaka med dešifriranjem MIME dela: napaka razčlenitve"
 
 #: ../libbalsa/gmime-gpgme-context.c:300
-#: ../libbalsa/rfc3156.c:1724
+#: ../libbalsa/rfc3156.c:1730
 #, c-format
 msgid ""
 "The passphrase for this key was bad, please try again!\n"
@@ -248,7 +248,7 @@ msgstr ""
 "Ključ: %s"
 
 #: ../libbalsa/gmime-gpgme-context.c:305
-#: ../libbalsa/rfc3156.c:1729
+#: ../libbalsa/rfc3156.c:1735
 #, c-format
 msgid ""
 "Please enter the passphrase for the secret key!\n"
@@ -278,10 +278,10 @@ msgid "signing failed"
 msgstr "podpisovanje je spodletelo"
 
 #: ../libbalsa/gmime-gpgme-context.c:516
-#: ../libbalsa/rfc3156.c:632
-#: ../libbalsa/rfc3156.c:637
-#: ../libbalsa/rfc3156.c:952
+#: ../libbalsa/rfc3156.c:638
+#: ../libbalsa/rfc3156.c:643
 #: ../libbalsa/rfc3156.c:958
+#: ../libbalsa/rfc3156.c:964
 msgid "signature verification failed"
 msgstr "preverjanje podpisa je spodelelo"
 
@@ -299,8 +299,8 @@ msgid "encryption failed"
 msgstr "šifriranje je spodletelo"
 
 #: ../libbalsa/gmime-gpgme-context.c:708
-#: ../libbalsa/rfc3156.c:771
-#: ../libbalsa/rfc3156.c:776
+#: ../libbalsa/rfc3156.c:777
+#: ../libbalsa/rfc3156.c:782
 msgid "decryption failed"
 msgstr "dešifriranje je spodletelo"
 
@@ -1278,7 +1278,7 @@ msgstr "Mapa LDAP za %s"
 #: ../libbalsa/rfc2445.c:90
 #: ../libbalsa/rfc2445.c:685
 #: ../libbalsa/rfc2445.c:704
-#: ../libbalsa/rfc3156.c:1388
+#: ../libbalsa/rfc3156.c:1394
 msgid "unknown"
 msgstr "neznan"
 
@@ -1352,22 +1352,32 @@ msgstr "Gpgme je bil preveden brez podpore za protokol %s."
 msgid "Crypto engine %s is not installed properly."
 msgstr "Šifrirni programnik %s ni pravilno nameščen."
 
-#: ../libbalsa/rfc3156.c:105
+#: ../libbalsa/rfc3156.c:104
+#, c-format
+msgid " Hint: check the `gnupg2' (preferred) or `gnupg' package."
+msgstr " Namig: preverite paket `gpgsm' (prednostno) ali `gnupg'."
+
+#: ../libbalsa/rfc3156.c:107
+#, c-format
+msgid " Hint: check the `gpgsm' package."
+msgstr " Namig: preverite paket `gpgsm'."
+
+#: ../libbalsa/rfc3156.c:111
 #, c-format
 msgid "Crypto engine %s version %s is installed, but at least version %s is required."
 msgstr "Šifrirni programnik %s, različice %s. je nameščeno, toda za delovanje mora biti naložena vsaj različica %s."
 
-#: ../libbalsa/rfc3156.c:112
+#: ../libbalsa/rfc3156.c:118
 #, c-format
 msgid "Unknown problem with engine for protocol %s."
 msgstr "Neznana težava s programnikom za protokol %s."
 
-#: ../libbalsa/rfc3156.c:117
+#: ../libbalsa/rfc3156.c:123
 #, c-format
 msgid "%s: could not retrieve crypto engine information: %s."
 msgstr "%s: ni mogoče pridobiti podrobnosti šifrirnega programnika: %s."
 
-#: ../libbalsa/rfc3156.c:121
+#: ../libbalsa/rfc3156.c:127
 #, c-format
 msgid ""
 "\n"
@@ -1376,115 +1386,115 @@ msgstr ""
 "\n"
 "Onemogoči podporo protokola %s."
 
-#: ../libbalsa/rfc3156.c:349
-#: ../libbalsa/rfc3156.c:858
+#: ../libbalsa/rfc3156.c:355
+#: ../libbalsa/rfc3156.c:864
 msgid "Enter passphrase to unlock the secret key for signing"
 msgstr "Vnesite geslo za odklepanje skritega ključa za podpisovanje"
 
-#: ../libbalsa/rfc3156.c:597
-#: ../libbalsa/rfc3156.c:602
-#: ../libbalsa/rfc3156.c:719
-#: ../libbalsa/rfc3156.c:724
-#: ../libbalsa/rfc3156.c:934
-#: ../libbalsa/rfc3156.c:939
-#: ../libbalsa/rfc3156.c:1028
-#: ../libbalsa/rfc3156.c:1033
+#: ../libbalsa/rfc3156.c:603
+#: ../libbalsa/rfc3156.c:608
+#: ../libbalsa/rfc3156.c:725
+#: ../libbalsa/rfc3156.c:730
+#: ../libbalsa/rfc3156.c:940
+#: ../libbalsa/rfc3156.c:945
+#: ../libbalsa/rfc3156.c:1034
+#: ../libbalsa/rfc3156.c:1039
 msgid "creating a gpgme context failed"
 msgstr "ustvarjanje gpgme vsebine je spodletelo"
 
-#: ../libbalsa/rfc3156.c:738
-#: ../libbalsa/rfc3156.c:1046
+#: ../libbalsa/rfc3156.c:744
+#: ../libbalsa/rfc3156.c:1052
 msgid "Enter passphrase to decrypt message"
 msgstr "Vnesite geslo za dešifriranje sporočila"
 
-#: ../libbalsa/rfc3156.c:1055
-#: ../libbalsa/rfc3156.c:1062
+#: ../libbalsa/rfc3156.c:1061
+#: ../libbalsa/rfc3156.c:1068
 msgid "decryption and signature verification failed"
 msgstr "dešifriranje in podpisovanje ni uspelo"
 
-#: ../libbalsa/rfc3156.c:1097
+#: ../libbalsa/rfc3156.c:1103
 msgid "The signature is valid."
 msgstr "Podpis je veljaven."
 
-#: ../libbalsa/rfc3156.c:1099
+#: ../libbalsa/rfc3156.c:1105
 msgid "The signature is valid but expired."
 msgstr "Podpisu je veljaven toda potekel."
 
-#: ../libbalsa/rfc3156.c:1102
+#: ../libbalsa/rfc3156.c:1108
 msgid "The signature is valid but the key used to verify the signature has expired."
 msgstr "Podpis je veljaven ključ za preverjanje veljavnosti potekel."
 
-#: ../libbalsa/rfc3156.c:1105
+#: ../libbalsa/rfc3156.c:1111
 msgid "The signature is valid but the key used to verify the signature has been revoked."
 msgstr "Podpis je veljaven, vendar je bil ključ za preverjanje veljavnosti preklican."
 
-#: ../libbalsa/rfc3156.c:1108
+#: ../libbalsa/rfc3156.c:1114
 msgid "The signature is invalid."
 msgstr "Podpis je neveljaven."
 
-#: ../libbalsa/rfc3156.c:1111
+#: ../libbalsa/rfc3156.c:1117
 msgid "The signature could not be verified due to a missing key."
 msgstr "Podpisa ni mogoče preveriti zaradi manjkajočega ključa."
 
-#: ../libbalsa/rfc3156.c:1113
+#: ../libbalsa/rfc3156.c:1119
 msgid "This part is not a real PGP signature."
 msgstr "Ta del ni pravi PGP podpis."
 
-#: ../libbalsa/rfc3156.c:1116
+#: ../libbalsa/rfc3156.c:1122
 msgid "The signature could not be verified due to an invalid crypto engine."
 msgstr "Podpisa ni mogoče preveriti zaradi neveljavnega šifrirnega programnika."
 
-#: ../libbalsa/rfc3156.c:1119
-#: ../libbalsa/rfc3156.c:1885
+#: ../libbalsa/rfc3156.c:1125
+#: ../libbalsa/rfc3156.c:1891
 msgid "GnuPG is rebuilding the trust database and is currently unavailable."
 msgstr "GnuPG ponovno izgrajuje zbirko podatkov in je trenutno nedostopen."
 
-#: ../libbalsa/rfc3156.c:1122
+#: ../libbalsa/rfc3156.c:1128
 msgid "An error prevented the signature verification."
 msgstr "Napaka je preprečila preverjanje podpisa."
 
-#: ../libbalsa/rfc3156.c:1130
+#: ../libbalsa/rfc3156.c:1136
 msgid "The user ID is of unknown validity."
 msgstr "Veljavnost uporabnikovega ID ni znana."
 
-#: ../libbalsa/rfc3156.c:1132
+#: ../libbalsa/rfc3156.c:1138
 msgid "The validity of the user ID is undefined."
 msgstr "Veljavnost uporabniškega ID je nedoločena."
 
-#: ../libbalsa/rfc3156.c:1134
+#: ../libbalsa/rfc3156.c:1140
 msgid "The user ID is never valid."
 msgstr "Uporabniški ID ni nikoli veljaven."
 
-#: ../libbalsa/rfc3156.c:1136
+#: ../libbalsa/rfc3156.c:1142
 msgid "The user ID is marginally valid."
 msgstr "Uporabniški ID je delno veljaven."
 
-#: ../libbalsa/rfc3156.c:1138
+#: ../libbalsa/rfc3156.c:1144
 msgid "The user ID is fully valid."
 msgstr "Uporabniški ID je polno veljaven."
 
-#: ../libbalsa/rfc3156.c:1140
+#: ../libbalsa/rfc3156.c:1146
 msgid "The user ID is ultimately valid."
 msgstr "Uporabniški ID je popolno veljaven."
 
-#: ../libbalsa/rfc3156.c:1142
-#: ../libbalsa/rfc3156.c:1400
+#: ../libbalsa/rfc3156.c:1148
+#: ../libbalsa/rfc3156.c:1406
 msgid "bad validity"
 msgstr "slaba veljavnost"
 
-#: ../libbalsa/rfc3156.c:1150
+#: ../libbalsa/rfc3156.c:1156
 msgid "PGP signature: "
 msgstr "PGP podpis: "
 
-#: ../libbalsa/rfc3156.c:1152
+#: ../libbalsa/rfc3156.c:1158
 msgid "S/MIME signature: "
 msgstr "S/MIME podpis: "
 
-#: ../libbalsa/rfc3156.c:1154
+#: ../libbalsa/rfc3156.c:1160
 msgid "(unknown protocol) "
 msgstr "(neznan protokol)"
 
-#: ../libbalsa/rfc3156.c:1181
+#: ../libbalsa/rfc3156.c:1187
 #, c-format
 msgid ""
 "\n"
@@ -1493,7 +1503,7 @@ msgstr ""
 "\n"
 "ID uporabnika: %s"
 
-#: ../libbalsa/rfc3156.c:1184
+#: ../libbalsa/rfc3156.c:1190
 #, c-format
 msgid ""
 "\n"
@@ -1502,7 +1512,7 @@ msgstr ""
 "\n"
 "Podpisnik: %s"
 
-#: ../libbalsa/rfc3156.c:1188
+#: ../libbalsa/rfc3156.c:1194
 #, c-format
 msgid ""
 "\n"
@@ -1511,7 +1521,7 @@ msgstr ""
 "\n"
 "Poštni naslov: %s"
 
-#: ../libbalsa/rfc3156.c:1190
+#: ../libbalsa/rfc3156.c:1196
 #, c-format
 msgid ""
 "\n"
@@ -1520,7 +1530,7 @@ msgstr ""
 "\n"
 "Podpisano ob: %s"
 
-#: ../libbalsa/rfc3156.c:1191
+#: ../libbalsa/rfc3156.c:1197
 #, c-format
 msgid ""
 "\n"
@@ -1529,7 +1539,7 @@ msgstr ""
 "\n"
 "Veljavnost uporabniškega ID: %s"
 
-#: ../libbalsa/rfc3156.c:1195
+#: ../libbalsa/rfc3156.c:1201
 #, c-format
 msgid ""
 "\n"
@@ -1538,7 +1548,7 @@ msgstr ""
 "\n"
 "Zaupanje lastniku ključa: %s"
 
-#: ../libbalsa/rfc3156.c:1199
+#: ../libbalsa/rfc3156.c:1205
 #, c-format
 msgid ""
 "\n"
@@ -1548,7 +1558,7 @@ msgstr ""
 "Prstni odtis ključa: %s"
 
 #. Subkey creation date
-#: ../libbalsa/rfc3156.c:1202
+#: ../libbalsa/rfc3156.c:1208
 #, c-format
 msgid ""
 "\n"
@@ -1558,7 +1568,7 @@ msgstr ""
 "Podključ ustvarjen na: %s"
 
 #. Subkey expiration date
-#: ../libbalsa/rfc3156.c:1204
+#: ../libbalsa/rfc3156.c:1210
 #, c-format
 msgid ""
 "\n"
@@ -1567,25 +1577,25 @@ msgstr ""
 "\n"
 "Podključ poteče na: %s"
 
-#: ../libbalsa/rfc3156.c:1212
+#: ../libbalsa/rfc3156.c:1218
 msgid " revoked"
 msgstr " preklicano"
 
-#: ../libbalsa/rfc3156.c:1217
+#: ../libbalsa/rfc3156.c:1223
 msgid " expired"
 msgstr " pretečeno"
 
-#: ../libbalsa/rfc3156.c:1222
+#: ../libbalsa/rfc3156.c:1228
 msgid " disabled"
 msgstr " onemogočen"
 
-#: ../libbalsa/rfc3156.c:1227
+#: ../libbalsa/rfc3156.c:1233
 msgid " invalid"
 msgstr " neveljaven"
 
 #. ngettext: string begins with a single space, so no space after
 #. * the colon is correct punctuation (in English).
-#: ../libbalsa/rfc3156.c:1231
+#: ../libbalsa/rfc3156.c:1237
 #, c-format
 msgid ""
 "\n"
@@ -1606,7 +1616,7 @@ msgstr[3] ""
 "\n"
 "Določila podključa:%s"
 
-#: ../libbalsa/rfc3156.c:1240
+#: ../libbalsa/rfc3156.c:1246
 #, c-format
 msgid ""
 "\n"
@@ -1615,7 +1625,7 @@ msgstr ""
 "\n"
 "Ime izdajatelja: %s"
 
-#: ../libbalsa/rfc3156.c:1244
+#: ../libbalsa/rfc3156.c:1250
 #, c-format
 msgid ""
 "\n"
@@ -1624,7 +1634,7 @@ msgstr ""
 "\n"
 "Zaporedna številka izdajatelja: %s"
 
-#: ../libbalsa/rfc3156.c:1247
+#: ../libbalsa/rfc3156.c:1253
 #, c-format
 msgid ""
 "\n"
@@ -1633,12 +1643,12 @@ msgstr ""
 "\n"
 "ID verige: %s"
 
-#: ../libbalsa/rfc3156.c:1304
+#: ../libbalsa/rfc3156.c:1310
 #, c-format
 msgid "Could not launch %s to query the public key %s."
 msgstr "Ni mogoče zagnati %s za poizvedbo javnega ključa %s."
 
-#: ../libbalsa/rfc3156.c:1354
+#: ../libbalsa/rfc3156.c:1360
 #, c-format
 msgid ""
 "Running %s failed with return value %d:\n"
@@ -1647,7 +1657,7 @@ msgstr ""
 "Zaganjanje %s je spodletelo z odzivom %d:\n"
 "%s"
 
-#: ../libbalsa/rfc3156.c:1361
+#: ../libbalsa/rfc3156.c:1367
 #, c-format
 msgid ""
 "Running %s successful:\n"
@@ -1656,73 +1666,73 @@ msgstr ""
 "Zaganjanje %s je uspešno:\n"
 "%s"
 
-#: ../libbalsa/rfc3156.c:1390
+#: ../libbalsa/rfc3156.c:1396
 msgid "undefined"
 msgstr "nedoločen"
 
-#: ../libbalsa/rfc3156.c:1392
+#: ../libbalsa/rfc3156.c:1398
 #: ../src/address-book-config.c:200
 msgid "never"
 msgstr "nikoli"
 
-#: ../libbalsa/rfc3156.c:1394
+#: ../libbalsa/rfc3156.c:1400
 msgid "marginal"
 msgstr "delno"
 
-#: ../libbalsa/rfc3156.c:1396
+#: ../libbalsa/rfc3156.c:1402
 msgid "full"
 msgstr "polno"
 
-#: ../libbalsa/rfc3156.c:1398
+#: ../libbalsa/rfc3156.c:1404
 msgid "ultimate"
 msgstr "popolno"
 
-#: ../libbalsa/rfc3156.c:1461
+#: ../libbalsa/rfc3156.c:1467
 msgid "User ID"
 msgstr "Uporabnikov ID"
 
-#: ../libbalsa/rfc3156.c:1461
+#: ../libbalsa/rfc3156.c:1467
 msgid "Key ID"
 msgstr "ID Ključa"
 
-#: ../libbalsa/rfc3156.c:1461
+#: ../libbalsa/rfc3156.c:1467
 msgid "Length"
 msgstr "Dolžina"
 
-#: ../libbalsa/rfc3156.c:1461
+#: ../libbalsa/rfc3156.c:1467
 msgid "Validity"
 msgstr "Veljavnost"
 
 #. FIXME: create dialog according to the Gnome HIG
-#: ../libbalsa/rfc3156.c:1505
+#: ../libbalsa/rfc3156.c:1511
 msgid "Select key"
 msgstr "Izberi ključ"
 
-#: ../libbalsa/rfc3156.c:1521
+#: ../libbalsa/rfc3156.c:1527
 #, c-format
 msgid "Select the private key for the signer %s"
 msgstr "Izberite osebni ključ za podpisnika %s"
 
-#: ../libbalsa/rfc3156.c:1525
+#: ../libbalsa/rfc3156.c:1531
 #, c-format
 msgid "Select the public key for the recipient %s"
 msgstr "Izberite javni ključ za sprejemnika %s"
 
-#: ../libbalsa/rfc3156.c:1656
+#: ../libbalsa/rfc3156.c:1662
 #, c-format
 msgid "Insufficient trust for recipient %s"
 msgstr "Nezadostno zaupanje prejemniku %s"
 
-#: ../libbalsa/rfc3156.c:1658
+#: ../libbalsa/rfc3156.c:1664
 #, c-format
 msgid "The validity of the key with user ID \"%s\" is \"%s\"."
 msgstr "Veljavnost ključa z uporabniškim ID \"%s\" je \"%s\"."
 
-#: ../libbalsa/rfc3156.c:1669
+#: ../libbalsa/rfc3156.c:1675
 msgid "Use this key anyway?"
 msgstr "Vseeno uporabi ključ?"
 
-#: ../libbalsa/rfc3156.c:1886
+#: ../libbalsa/rfc3156.c:1892
 msgid "Try again later."
 msgstr "Poskusite ponovno kasneje."
 

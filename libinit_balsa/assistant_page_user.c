@@ -172,6 +172,7 @@ balsa_druid_page_user(GtkAssistant * druid, GdkPixbuf * default_logo)
     g_signal_connect(G_OBJECT(druid), "prepare",
                      G_CALLBACK(balsa_druid_page_user_prepare),
                      user);
+    g_object_weak_ref(G_OBJECT(druid), (GWeakNotify)g_free, user);
 }
 
 static void
@@ -288,6 +289,7 @@ balsa_druid_page_user_next(GtkAssistant * druid, GtkWidget * page,
         ident = LIBBALSA_IDENTITY(libbalsa_identity_new_with_name
 				  (_("Default Identity")));
         balsa_app.identities = g_list_append(NULL, ident);
+        balsa_app.current_ident = ident;
 	if(domain)
 	    libbalsa_identity_set_domain(ident, domain+1);
     } else {

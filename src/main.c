@@ -65,6 +65,7 @@
 #include "sendmsg-window.h"
 #include "information.h"
 #include "imap-server.h"
+#include "libbalsa-conf.h"
 
 #include "libinit_balsa/assistant_init.h"
 
@@ -1214,6 +1215,7 @@ balsa_cleanup(void)
 #if (defined(HAVE_GNOME) && !defined(GNOME_DISABLE_DEPRECATED))
     gnome_sound_shutdown();
 #endif
+    libbalsa_conf_drop_all();
 }
 
 #if HAVE_GNOME

@@ -954,7 +954,7 @@ config_global_load(void)
 	/* Transition code */
 	LibBalsaSmtpServer *smtp_server;
 	LibBalsaServer *server;
-	gchar *passphrase;
+	gchar *passphrase, *hostname;
 
 	smtp_server = libbalsa_smtp_server_new();
 	libbalsa_smtp_server_set_name(smtp_server,
@@ -963,11 +963,11 @@ config_global_load(void)
 	    g_slist_prepend(NULL, smtp_server);
 	server = LIBBALSA_SERVER(smtp_server);
 
-	libbalsa_server_set_host
-	(server,
-	 libbalsa_conf_get_string_with_default("ESMTPServer=localhost:25", 
-					     &def_used),
-	 FALSE);
+        hostname = 
+            libbalsa_conf_get_string_with_default("ESMTPServer=localhost:25", 
+                                                  &def_used);
+	libbalsa_server_set_host(server, hostname, FALSE);
+        g_free(hostname);
 	libbalsa_server_set_username(server,
 		libbalsa_conf_get_string("ESMTPUser"));
 

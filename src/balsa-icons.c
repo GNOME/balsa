@@ -160,7 +160,7 @@ load_balsa_pixmap(GtkIconTheme *icon_theme, GtkIconFactory *factory,
 }
 
 void
-register_balsa_pixmaps(void)
+balsa_register_pixmaps(void)
 {
     const balsa_pixmap_t balsa_icons[] = {
 	/* icons for buttons and menus (24x24 and 16x16) */
@@ -302,7 +302,16 @@ register_balsa_pixmaps(void)
 }
 
 void
-register_balsa_pixbufs(GtkWidget * widget)
+balsa_unregister_pixmaps(void)
+{
+    if (balsa_icon_table) {
+        g_hash_table_destroy(balsa_icon_table);
+        balsa_icon_table = NULL;
+    }
+}
+
+void
+balsa_register_pixbufs(GtkWidget * widget)
 {
     static struct {
 	void (*set_icon) (GdkPixbuf *);

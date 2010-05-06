@@ -104,6 +104,7 @@ balsa_druid_page_defclient(GtkAssistant *druid, GdkPixbuf *default_logo)
     balsa_druid_page_defclient_init(defclient, page, druid);
     /* This one is ready to pass through. */
     gtk_assistant_set_page_complete(druid, page, TRUE);
+    g_object_weak_ref(G_OBJECT(druid), (GWeakNotify)g_free, defclient);
 }
 
 static void

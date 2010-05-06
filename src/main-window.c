@@ -1651,7 +1651,7 @@ balsa_window_new()
 
     /* Call to register custom balsa pixmaps with GNOME_STOCK_PIXMAPS
      * - allows for grey out */
-    register_balsa_pixmaps();
+    balsa_register_pixmaps();
 
     window = g_object_new(BALSA_TYPE_WINDOW, NULL);
     window->vbox = gtk_vbox_new(FALSE, 0);
@@ -1659,7 +1659,7 @@ balsa_window_new()
     gtk_container_add(GTK_CONTAINER(window), window->vbox);
 
     gtk_window_set_title(GTK_WINDOW(window), "Balsa");
-    register_balsa_pixbufs(GTK_WIDGET(window));
+    balsa_register_pixbufs(GTK_WIDGET(window));
 
     model = balsa_window_get_toolbar_model();
     ui_manager = balsa_window_ui_manager_new(window);
@@ -2581,6 +2581,7 @@ balsa_window_destroy(GtkObject * object)
     if (GTK_OBJECT_CLASS(balsa_window_parent_class)->destroy)
         GTK_OBJECT_CLASS(balsa_window_parent_class)->
             destroy(GTK_OBJECT(object));
+    balsa_unregister_pixmaps();
 }
 
 

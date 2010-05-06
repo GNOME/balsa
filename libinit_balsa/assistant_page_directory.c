@@ -81,7 +81,7 @@ unconditional_mailbox(const gchar * path, const gchar * prettyname,
     gchar *index;
     char tmp[32] = "/tmp/balsa.XXXXXX";
     ciss_url_t url;
-    gboolean ssl = FALSE;
+    gboolean ssl = FALSE, is_remote = FALSE;
 
     if ((*error) != NULL)
         return;
@@ -118,11 +118,13 @@ unconditional_mailbox(const gchar * path, const gchar * prettyname,
         *box = (LibBalsaMailbox *) libbalsa_mailbox_imap_new();
         libbalsa_mailbox_imap_set_path((LibBalsaMailboxImap *) * box,
                                        url.path);
+        is_remote = TRUE;
         break;
     case U_POPS:
         ssl = TRUE;
     case U_POP:
         *box = (LibBalsaMailbox *) libbalsa_mailbox_pop3_new();
+        is_remote = TRUE;
         break;
     case U_FILE:
         *box =
@@ -132,7 +134,7 @@ unconditional_mailbox(const gchar * path, const gchar * prettyname,
         *box = (LibBalsaMailbox *) libbalsa_mailbox_local_new(path, TRUE);
     }
 
-    if (url.host && LIBBALSA_IS_MAILBOX_REMOTE(*box)) {
+    if (is_remote) {
         libbalsa_server_set_host(LIBBALSA_MAILBOX_REMOTE_SERVER(*box),
                                  url.host, ssl);
         libbalsa_server_set_username(LIBBALSA_MAILBOX_REMOTE_SERVER(*box),
@@ -264,6 +266,7 @@ balsa_druid_page_directory(GtkAssistant * druid, GdkPixbuf * default_logo)
     gtk_assistant_set_page_title(druid, dir->page, _("Mail Files"));
     gtk_assistant_set_page_header_image(druid, dir->page, default_logo);
     balsa_druid_page_directory_init(dir, dir->page, druid);
+    g_object_weak_ref(G_OBJECT(druid), (GWeakNotify)g_free, dir);
 }
 
 static void

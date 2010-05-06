@@ -1,3 +1,13 @@
+2010-05-06  Pawel Salek
+
+	* libinit_balsa/assistant_page_defclient.c: free memory.
+	* libinit_balsa/assistant_page_{directory,user}.c: ditto.
+	* src/balsa-app.c: free memory on exit.
+	* src/balsa-icons.[hc]: ditto by providing "unregister" functions.
+	* src/main-window.c: unregister the pixmaps.
+	* src/main.c: free configuration on exit.
+	* src/save-restore.c: do not leak memory.
+
 2010-05-01  Pawel Salek
 
 	* src/balsa-message.c: handle expunge events arriving between

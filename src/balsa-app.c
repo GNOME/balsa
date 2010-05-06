@@ -466,7 +466,12 @@ balsa_app_destroy(void)
     g_slist_free(balsa_app.filters);
     balsa_app.filters = NULL;
 
-    /* g_slist_free(opt_attach_list); */
+
+    g_list_foreach(balsa_app.identities, (GFunc)g_object_unref, NULL);
+    g_list_free(balsa_app.identities);
+    balsa_app.identities = NULL;
+
+
     g_object_unref(balsa_app.colormap);
     if(balsa_app.debug) g_print("balsa_app: Finished cleaning up.\n");
 }

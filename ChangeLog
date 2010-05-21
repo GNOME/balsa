@@ -1,3 +1,9 @@
+2010-05-20  Peter Bloomfield
+
+	* configure.in: add dependency on gthread-2.0; fixes bug
+	#618979 (Kacper Kowalik); also add -lz to $LIBS, to build
+	without openssl.
+
 2010-05-06  Pawel Salek
 
 	* libinit_balsa/assistant_page_defclient.c: free memory.

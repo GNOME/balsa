@@ -1,5 +1,10 @@
 2010-05-20  Peter Bloomfield
 
+	* src/save-restore.c (config_global_load): do not wrap outgoing
+	message by default, as it disables format=flowed.
+
+2010-05-20  Peter Bloomfield
+
 	* configure.in: add dependency on gthread-2.0; fixes bug
 	#618979 (Kacper Kowalik); also add -lz to $LIBS, to build
 	without openssl.

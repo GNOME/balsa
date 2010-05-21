@@ -994,7 +994,7 @@ config_global_load(void)
     }
 #endif                          /* ENABLE_ESMTP */
     /* ... outgoing mail */
-    balsa_app.wordwrap = libbalsa_conf_get_bool("WordWrap=true");
+    balsa_app.wordwrap = libbalsa_conf_get_bool("WordWrap=false");
     balsa_app.wraplength = libbalsa_conf_get_int("WrapLength=72");
     if (balsa_app.wraplength < 40)
 	balsa_app.wraplength = 40;

@@ -18,7 +18,16 @@ extra_appicons_IMGS = \
 	balsa-signature-notrust.png	\
 	balsa-signature-unknown.png	\
 	balsa-sign.png	\
-	balsa-trash-empty.png
+	balsa-trash-empty.png	\
+	stock_mail-receive.png	\
+	stock_contact.png	\
+	stock_mail.png		\
+	stock_book_red.png	\
+	stock_book_yellow.png	\
+	stock_book_green.png	\
+	stock_book_blue.png	\
+	stock_book_open.png	\
+	stock_view-fields.png
 
 
 EXTRA_DIST = $(extra_appicons_IMGS)

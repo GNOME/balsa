@@ -1,3 +1,18 @@
+2010-06-04  Peter Bloomfield
+
+	Drop legacy icon names.
+
+	* images/16x16/Makefile.am: rename stock_inbox and stock_outbox.
+	* images/16x16/mail-inbox.png: new name.
+	* images/16x16/mail-outbox.png: ditto.
+	* images/16x16/stock_inbox.png: old name.
+	* images/16x16/stock_outbox.png: ditto.
+	* src/balsa-icons.c (load_balsa_pixmap),
+	(balsa_register_pixmaps): use new names.
+	* src/balsa-print-object-text.c
+	(balsa_print_object_text_calendar): ditto.
+	* src/main-window.c: ditto.
+
 2010-06-01  Peter Bloomfield
 
 	Copy icons removed from gnome-icon-theme-2.30 from an earlier

@@ -629,7 +629,7 @@ balsa_print_object_text_calendar(GList * list,
     /* get the stock calendar icon or the mime type icon on fail */
     pod->pixbuf =
 	gtk_icon_theme_load_icon(gtk_icon_theme_get_default(),
-				 "stock_calendar", 48,
+				 "x-office-calendar", 48,
 				 GTK_ICON_LOOKUP_USE_BUILTIN, NULL);
     if (!pod->pixbuf) {
 	gchar *conttype = libbalsa_message_body_get_mime_type(body);

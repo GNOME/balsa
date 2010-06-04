@@ -3359,7 +3359,7 @@ bw_display_new_mail_notification(int num_new, int has_new)
         if (!gtk_window_is_active(window)) {
 	    if (!balsa_app.main_window->new_mail_tray) {
 		balsa_app.main_window->new_mail_tray =
-		    gtk_status_icon_new_from_icon_name("stock_mail-compose");
+		    gtk_status_icon_new_from_icon_name("mail-message-new");
                 g_signal_connect_swapped(balsa_app.main_window->
                                          new_mail_tray, "activate",
                                          G_CALLBACK(gtk_window_present),

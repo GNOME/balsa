@@ -24,7 +24,7 @@ extra_appicons_IMGS = \
 	stock_book_red.png	\
 	stock_book_open.png	\
 	stock_inbox.png		\
-	stock_outbox.png 
+	stock_outbox.png
 
 
 EXTRA_DIST = $(extra_appicons_IMGS)

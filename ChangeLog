@@ -1,3 +1,27 @@
+2010-06-01  Peter Bloomfield
+
+	Copy icons removed from gnome-icon-theme-2.30 from an earlier
+	version.
+
+	* images/16x16/Makefile.am:
+	* images/16x16/stock_book_open.png:
+	* images/16x16/stock_book_red.png:
+	* images/16x16/stock_contact.png:
+	* images/16x16/stock_inbox.png:
+	* images/16x16/stock_mail-receive.png:
+	* images/16x16/stock_mail.png:
+	* images/16x16/stock_outbox.png:
+	* images/24x24/Makefile.am:
+	* images/24x24/stock_book_blue.png:
+	* images/24x24/stock_book_green.png:
+	* images/24x24/stock_book_open.png:
+	* images/24x24/stock_book_red.png:
+	* images/24x24/stock_book_yellow.png:
+	* images/24x24/stock_contact.png:
+	* images/24x24/stock_mail-receive.png:
+	* images/24x24/stock_mail.png:
+	* images/24x24/stock_view-fields.png:
+
 2010-05-20  Peter Bloomfield
 
 	* src/save-restore.c (config_global_load): do not wrap outgoing

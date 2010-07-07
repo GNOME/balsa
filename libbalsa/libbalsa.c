@@ -271,6 +271,10 @@ libbalsa_date_to_utf8(const time_t *date, const gchar *date_string)
     g_return_val_if_fail(date != NULL, NULL);
     g_return_val_if_fail(date_string != NULL, NULL);
 
+    if (!*date)
+        /* Missing "Date:" field?  It is required by RFC 2822. */
+        return NULL;
+
     localtime_r(date, &footime);
 
     strftime(rettime, sizeof(rettime), date_string, &footime);

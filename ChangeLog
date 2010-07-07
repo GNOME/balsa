@@ -1,3 +1,8 @@
+2010-07-07  Peter Bloomfield
+
+	* libbalsa/libbalsa.c (libbalsa_date_to_utf8): return NULL when
+	date is zero; fixes bug #623740 (Helmut Jarausch).
+
 2010-06-04  Peter Bloomfield
 
 	Drop legacy icon names.

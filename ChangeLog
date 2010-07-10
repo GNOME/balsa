@@ -1,7 +1,7 @@
 2010-07-10  Peter Bloomfield
 
 	Support IMAP server that complies with RFC 2086 but not with
-	RFC 4013.
+	RFC 4013; fixes bug #623910 (Helmut Jarausch).
 
 	* libbalsa/imap/imap-handle.c
 	(ir_capability_data): check for "RIGHTS=" capability to

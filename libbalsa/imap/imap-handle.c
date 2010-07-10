@@ -2370,7 +2370,7 @@ ir_capability_data(ImapMboxHandle *handle)
   static const char* capabilities[] = {
     "IMAP4", "IMAP4rev1", "STATUS",
     "AUTH=ANONYMOUS", "AUTH=CRAM-MD5", "AUTH=GSSAPI", "AUTH=PLAIN",
-    "ACL", "BINARY", "CHILDREN",
+    "ACL", "RIGHTS=", "BINARY", "CHILDREN",
     "COMPRESS=DEFLATE",
     "ESEARCH", "IDLE", "LITERAL+",
     "LOGINDISABLED", "MULTIAPPEND", "NAMESPACE", "QUOTA", "SASL-IR",
@@ -2387,7 +2387,8 @@ ir_capability_data(ImapMboxHandle *handle)
   do {
     c = imap_get_atom(handle->sio, atom, sizeof(atom));
     for (x=0; x<ELEMENTS(capabilities); x++)
-      if (g_ascii_strcasecmp(atom, capabilities[x]) == 0) {
+      if (g_ascii_strncasecmp(atom, capabilities[x],
+                              strlen(capabilities[x])) == 0) {
 	handle->capabilities[x] = 1;
 	break;
       }
@@ -3046,6 +3047,9 @@ ir_quota(ImapMboxHandle *h)
  *
  * Scan h's input stream for valid ACL flags (lrswipkxtea).  Note that 'c', 'd'
  * and cr are ignored according to RFC 4314, sect. 2.1.1.
+ * But note also that a server that complies with the older RFC 2086 and not
+ * with RFC 4314 uses 'c' and 'd'; we can distinguish this case because it
+ * does not advertise "RIGHTS=" capability.
  */
 static ImapResponse
 extract_acl(ImapMboxHandle *h, const char *eject, ImapAclType *acl, int *eol)
@@ -3055,6 +3059,10 @@ extract_acl(ImapMboxHandle *h, const char *eject, ImapAclType *acl, int *eol)
   int c;
   char* p;
 
+  if (!imap_mbox_handle_can_do(h, IMCAP_RIGHTS)) {
+    /* workaround for RFC 2086- but not RFC 4314-compliant server */
+    rights = "lrswipkxteacd";
+  }
   *acl = IMAP_ACL_NONE;
   while ((c = sio_getc(h->sio)) != -1 && !strchr(eject, c)) {
     if ((p = strchr(rights, c))) {

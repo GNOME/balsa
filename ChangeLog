@@ -1,3 +1,24 @@
+2010-07-10  Peter Bloomfield
+
+	Support IMAP server that complies with RFC 2086 but not with
+	RFC 4013.
+
+	* libbalsa/imap/imap-handle.c
+	(ir_capability_data): check for "RIGHTS=" capability to
+	distinguish RFC-4013-compliant server;
+	(extract_acl): check for "cd" rights when server does not comply with
+	RFC 4013.
+	* libbalsa/imap/imap-handle.h: add IMCAP_RIGHTS to ImapCapability
+	enum.
+	* libbalsa/imap/libimap.h: add IMAP_ACL_OBS_CREATE and
+	IMAP_ACL_OBS_DELETE to ImapAclType enum, and define
+	IMAP_RIGHTS_CAN_WRITE(rights) macro.
+	* libbalsa/mailbox_imap.c
+	(imap_acl_to_str): show "cd" rights when server does not comply with
+	RFC 4013;
+	(libbalsa_mailbox_imap_get_selected_handle): use
+	IMAP_RIGHTS_CAN_WRITE(rights) macro.
+
 2010-07-07  Peter Bloomfield
 
 	* libbalsa/libbalsa.c (libbalsa_date_to_utf8): return NULL when

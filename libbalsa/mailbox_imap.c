@@ -385,11 +385,12 @@ static char *
 imap_acl_to_str(ImapAclType acl)
 {
     GString *rights;
-    static const char * flags = "lrswipkxtea";
-    int n;
+    /* include "cd" for RFC 2086 support: */
+    static const char * flags = "lrswipkxteacd";
+    unsigned n;
 
     rights = g_string_new("");
-    for (n = 0; n < 11; n++)
+    for (n = 0; n < strlen(flags); n++)
         if (acl & (1 << n))
             rights = g_string_append_c(rights, flags[n]);
     return g_string_free(rights, FALSE);
@@ -992,7 +993,7 @@ libbalsa_mailbox_imap_get_selected_handle(LibBalsaMailboxImap *mimap,
     /* check if we have RFC 4314 acl's for the selected mailbox */
     if (imap_mbox_get_my_rights(mimap->handle, &mimap->rights, FALSE) ==
         IMR_OK) {
-        if ((mimap->rights & IMAP_ACL_CAN_WRITE) != IMAP_ACL_CAN_WRITE)
+        if (!IMAP_RIGHTS_CAN_WRITE(mimap->rights))
             LIBBALSA_MAILBOX(mimap)->readonly = TRUE;
         if (mimap->rights & IMAP_ACL_ADMIN)
             imap_mbox_get_acl(mimap->handle, mimap->path, &mimap->acls);

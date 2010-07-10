@@ -290,11 +290,19 @@ typedef enum {
   IMAP_ACL_DELETE = 1<<7,   /* 'x': DELETE, RENAME */
   IMAP_ACL_DELMSG = 1<<8,   /* 't': delete messages (\DELETED flag) */
   IMAP_ACL_EXPUNGE = 1<<9,  /* 'e': EXPUNGE */
-  IMAP_ACL_ADMIN = 1<<10    /* 'a': administer (SETACL/DELETEACL/GETACL/LISTRIGHTS) */
+  IMAP_ACL_ADMIN = 1<<10,   /* 'a': administer (SETACL/DELETEACL/GETACL/LISTRIGHTS) */
+  IMAP_ACL_OBS_CREATE = 1<<11,  /* 'c': RFC 2086 "create" */
+  IMAP_ACL_OBS_DELETE = 1<<12   /* 'd': RFC 2086 "delete" */
 } ImapAclType;
 
 #define IMAP_ACL_CAN_WRITE  (IMAP_ACL_WRITE | IMAP_ACL_INSERT | IMAP_ACL_CREATE | \
                              IMAP_ACL_DELETE | IMAP_ACL_DELMSG | IMAP_ACL_EXPUNGE)
+#define IMAP_ACL_OBS_CAN_WRITE (IMAP_ACL_WRITE | IMAP_ACL_INSERT | \
+                                IMAP_ACL_OBS_CREATE | IMAP_ACL_OBS_DELETE)
+#define IMAP_RIGHTS_CAN_WRITE(rights) (((rights) & IMAP_ACL_CAN_WRITE) \
+                                       == IMAP_ACL_CAN_WRITE \
+                                       || ((rights) & IMAP_ACL_OBS_CAN_WRITE) \
+                                       == IMAP_ACL_OBS_CAN_WRITE)
 
 typedef struct {
   gchar* uid;

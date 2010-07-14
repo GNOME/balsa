@@ -293,6 +293,7 @@ extern struct BalsaApplication {
     gboolean show_notebook_tabs;
     enum { LAYOUT_DEFAULT, LAYOUT_WIDE_MSG, LAYOUT_WIDE_SCREEN } layout_type;
     gboolean view_message_on_open;
+    gboolean ask_before_select;
     gboolean pgdownmod;
     gint pgdown_percent;
 #if defined(ENABLE_TOUCH_UI)

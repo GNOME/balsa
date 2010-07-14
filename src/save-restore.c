@@ -786,6 +786,7 @@ config_global_load(void)
         balsa_app.layout_type != LAYOUT_WIDE_SCREEN)
         balsa_app.layout_type = LAYOUT_DEFAULT;
     balsa_app.view_message_on_open = libbalsa_conf_get_bool("ViewMessageOnOpen=true");
+    balsa_app.ask_before_select = libbalsa_conf_get_bool("AskBeforeSelect=false");
     balsa_app.pgdownmod = libbalsa_conf_get_bool("PageDownMod=false");
     balsa_app.pgdown_percent = libbalsa_conf_get_int("PageDownPercent=50");
     if (balsa_app.pgdown_percent < 10)
@@ -1299,6 +1300,7 @@ config_save(void)
     libbalsa_conf_set_int("ProgressWindow", balsa_app.pwindow_option);
     libbalsa_conf_set_int("LayoutType",     balsa_app.layout_type);
     libbalsa_conf_set_bool("ViewMessageOnOpen", balsa_app.view_message_on_open);
+    libbalsa_conf_set_bool("AskBeforeSelect", balsa_app.ask_before_select);
     libbalsa_conf_set_bool("PageDownMod", balsa_app.pgdownmod);
     libbalsa_conf_set_int("PageDownPercent", balsa_app.pgdown_percent);
 #if defined(ENABLE_TOUCH_UI)

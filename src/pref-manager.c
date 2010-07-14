@@ -113,6 +113,7 @@ typedef struct _PropertyUI {
     GtkWidget *previewpane;
     GtkWidget *layout_type;
     GtkWidget *view_message_on_open;
+    GtkWidget *ask_before_select;
     GtkWidget *pgdownmod;
     GtkWidget *pgdown_percent;
     GtkWidget *view_allheaders;
@@ -610,6 +611,8 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
                      G_CALLBACK(properties_modified_cb), property_box);
     g_signal_connect(G_OBJECT(pui->view_message_on_open), "toggled",
                      G_CALLBACK(properties_modified_cb), property_box);
+    g_signal_connect(G_OBJECT(pui->ask_before_select), "toggled",
+                     G_CALLBACK(properties_modified_cb), property_box);
     g_signal_connect(G_OBJECT(pui->pgdownmod), "toggled",
                      G_CALLBACK(pgdown_modified_cb), property_box);
     g_signal_connect(G_OBJECT(pui->pgdown_percent), "changed",
@@ -891,6 +894,9 @@ apply_prefs(GtkDialog * pbox)
     balsa_app.view_message_on_open =
         gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
                                      (pui->view_message_on_open));
+    balsa_app.ask_before_select =
+        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
+                                     (pui->ask_before_select));
     balsa_app.pgdownmod =
         gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pui->pgdownmod));
     balsa_app.pgdown_percent =
@@ -1147,6 +1153,9 @@ set_prefs(void)
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
                                  (pui->view_message_on_open),
                                  balsa_app.view_message_on_open);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
+                                 (pui->ask_before_select),
+                                 balsa_app.ask_before_select);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->pgdownmod),
                                  balsa_app.pgdownmod);
     gtk_spin_button_set_value(GTK_SPIN_BUTTON(pui->pgdown_percent),
@@ -2221,6 +2230,9 @@ main_window_group(GtkWidget * page)
     pui->view_message_on_open =
         pm_group_add_check(group, _("Automatically view message "
                                     "when mailbox opened"));
+    pui->ask_before_select =
+        pm_group_add_check(group, _("Ask me before selecting a different "
+                                    "mailbox to show an unread message"));
 
     table = create_table(1, 3, page);
     pm_group_add(group, table, FALSE);

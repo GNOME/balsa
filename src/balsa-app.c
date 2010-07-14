@@ -339,6 +339,7 @@ balsa_app_init(void)
     balsa_app.show_notebook_tabs = FALSE;
     balsa_app.layout_type = LAYOUT_DEFAULT;
     balsa_app.view_message_on_open = TRUE;
+    balsa_app.ask_before_select = FALSE;
     balsa_app.mw_action_after_move = NEXT_UNREAD;
 
     balsa_app.index_num_width = NUM_DEFAULT_WIDTH;

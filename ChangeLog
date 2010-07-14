@@ -1,3 +1,18 @@
+2010-07-14  Peter Bloomfield
+
+	Install dialog to ask the user before selecting a different
+	mailbox, and an option to not use it; fixes bug #620221
+	(ghisha email it).
+
+	* src/balsa-app.h: new member ask_before_select.
+	* src/balsa-app.c (balsa_app_init): initialize it FALSE.
+	* src/main-window.c: uncomment dialog and make it conditional on
+	balsa_app.ask_before_select.
+	* src/pref-manager.c (open_preferences_manager), (apply_prefs),
+	(set_prefs), (main_window_group): manage it.
+	* src/save-restore.c (config_global_load), (config_save): save
+	and restore it, default FALSE.
+
 2010-07-10  Peter Bloomfield
 
 	Support IMAP server that complies with RFC 2086 but not with

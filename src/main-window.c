@@ -3694,10 +3694,6 @@ balsa_window_next_unread(BalsaWindow * window)
     BalsaIndex *index =
         BALSA_INDEX(balsa_window_find_current_index(window));
     LibBalsaMailbox *mailbox = index ? index->mailbox_node->mailbox : NULL;
-#if WE_REALLY_WANT_TO_GET_IN_THE_USERS_FACE
-    GtkWidget *dialog;
-    gint response;
-#endif                          /* WE_REALLY_WANT_TO_GET_IN_THE_USERS_FACE */
 
     if (libbalsa_mailbox_get_unread(mailbox) > 0) {
         if (!balsa_index_select_next_unread(index)) {
@@ -3713,28 +3709,33 @@ balsa_window_next_unread(BalsaWindow * window)
     if (!mailbox || libbalsa_mailbox_get_unread(mailbox) == 0)
         return FALSE;
 
-#if WE_REALLY_WANT_TO_GET_IN_THE_USERS_FACE
-    dialog =
-        gtk_message_dialog_new(GTK_WINDOW(window), 0,
-                               GTK_MESSAGE_QUESTION,
-                               GTK_BUTTONS_YES_NO,
-                               _("The next unread message is in %s"),
-                               mailbox->name);
+    if (balsa_app.ask_before_select) {
+        GtkWidget *dialog;
+        gint response;
+
+        dialog =
+            gtk_message_dialog_new(GTK_WINDOW(window), 0,
+                                   GTK_MESSAGE_QUESTION,
+                                   GTK_BUTTONS_YES_NO,
+                                   _("The next unread message is in %s"),
+                                   mailbox->name);
 #if HAVE_MACOSX_DESKTOP
-    libbalsa_macosx_menu_for_parent(dialog, GTK_WINDOW(window));
+        libbalsa_macosx_menu_for_parent(dialog, GTK_WINDOW(window));
 #endif
-    gtk_message_dialog_format_secondary_text
-        (GTK_MESSAGE_DIALOG(dialog),
-         _("Do you want to switch to %s?"), mailbox->name);
-    gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_YES);
-    response = gtk_dialog_run(GTK_DIALOG(dialog));
-    gtk_widget_destroy(dialog);
-    if (response != GTK_RESPONSE_YES)
-        return FALSE;
-#endif                          /* WE_REALLY_WANT_TO_GET_IN_THE_USERS_FACE */
+        gtk_message_dialog_format_secondary_text
+            (GTK_MESSAGE_DIALOG(dialog),
+             _("Do you want to select %s?"), mailbox->name);
+        gtk_dialog_set_default_response(GTK_DIALOG(dialog),
+                                        GTK_RESPONSE_YES);
+        response = gtk_dialog_run(GTK_DIALOG(dialog));
+        gtk_widget_destroy(dialog);
+        if (response != GTK_RESPONSE_YES)
+            return FALSE;
+    }
 
     balsa_mblist_open_mailbox(mailbox);
     index = balsa_find_index_by_mailbox(mailbox);
+    g_print("%s next unread is in \"%s\", index is %s\n", __func__, mailbox->name, index ? "nonNULL" : "NULL");
     if (index)
         balsa_index_select_next_unread(index);
     else

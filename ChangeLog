@@ -1,3 +1,10 @@
+2010-07-25  Pawel Salek
+
+	* libbalsa/imap/imap-handle.c: work around buggy Gmail.
+	* libbalsa/imap/imap-tls.c: change openssl api used for cert checks.
+	* src/balsa-mime-widget-message.c: warn the user when no embedded
+	message info available.
+
 2010-07-14  Peter Bloomfield
 
 	Install dialog to ask the user before selecting a different

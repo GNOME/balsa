@@ -3329,7 +3329,23 @@ ir_envelope(struct siobuf *sio, ImapEnvelope *env)
   int c;
   char *date, *str;
 
-  if( (c=sio_getc(sio)) != '(') return IMR_PROTOCOL;
+  c=sio_getc(sio);
+
+#define GMAIL_BUG_20100725 1
+#if GMAIL_BUG_20100725 == 1
+  /* GMAIL returns sometimes NIL instead of the envelope. */
+  if (c == 'N') {
+      printf("GMail message/rfc822 bug detected.\n");      
+      env = NULL;
+      if (sio_getc(sio) == 'I' &&
+          sio_getc(sio) == 'L') return IMR_PARSE;
+  }
+#endif /* GMAIL_BUG_20100725 */
+  if( c != '(') {
+      printf("envelope's ( expected but got '%c'\n", c);
+      return IMR_PROTOCOL;
+  }
+
   date = imap_get_nstring(sio);
   if(date) {
     if(env) env->date = g_mime_utils_header_decode_date(date, NULL);
@@ -3707,7 +3723,8 @@ ir_body_extension (struct siobuf *sio, ImapBody * body)
 
 enum _ImapBodyExtensibility {
     IMB_NON_EXTENSIBLE,
-    IMB_EXTENSIBLE
+    IMB_EXTENSIBLE,
+    IMB_EXTENSIBLE_BUGGY_GMAIL
 };
 typedef enum _ImapBodyExtensibility ImapBodyExtensibility;
 
@@ -3805,8 +3822,8 @@ ir_body_ext_1part (struct siobuf *sio, ImapBody * body,
 
   if (type == IMB_NON_EXTENSIBLE)
     return IMR_PROTOCOL;
-#define GMAIL_BUG_20080601
-#ifdef GMAIL_BUG_20080601
+#define GMAIL_BUG_20080601 1
+#if GMAIL_BUG_20080601
   /* GMail sends number of lines on some parts like application/pgp-signature */
   { int c = sio_getc(sio);
     if(c == -1)
@@ -3823,19 +3840,22 @@ ir_body_ext_1part (struct siobuf *sio, ImapBody * body,
   }
 #endif
   /* body_fld_md5 = nstring */
-  str = imap_get_nstring (sio);
-  if (body && str)
-    body->ext.onepart.md5 = str;
-  else
-    g_free (str);
+  if (type == IMB_EXTENSIBLE_BUGGY_GMAIL)
+    str = NULL;
+  else {
+    str = imap_get_nstring (sio);
+    if (body && str)
+        body->ext.onepart.md5 = str;
+    else
+        g_free (str);
 
-  /* [SP */
-  if (sio_getc (sio) != ' ')
-    {
-      sio_ungetc (sio);
-      return IMR_OK;
-    }
-
+    /* [SP */
+    if (sio_getc(sio) != ' ')
+      {
+        sio_ungetc (sio);
+        return IMR_OK;
+     }
+  }
   /* body_fld_dsp */
   rc = ir_body_fld_dsp (sio, body);
   if (rc != IMR_OK)
@@ -3974,6 +3994,10 @@ ir_body_type_1part (struct siobuf *sio, ImapBody * body,
 	return IMR_PROTOCOL;
       env = body ? imap_envelope_new () : NULL;
       rc = ir_envelope (sio, env);
+#if GMAIL_BUG_20100725
+      if (rc == IMR_PARSE)
+          break;
+#endif /* GMAIL_BUG_20100725 */
       if (rc != IMR_OK)
 	{
 	  if (env)
@@ -3981,7 +4005,7 @@ ir_body_type_1part (struct siobuf *sio, ImapBody * body,
 	  return rc;
 	}
       if (sio_getc (sio) != ' ')
-	return IMR_PROTOCOL;
+        return IMR_PROTOCOL;
       if (body)
 	{
 	  b = imap_body_new ();
@@ -4014,7 +4038,12 @@ ir_body_type_1part (struct siobuf *sio, ImapBody * body,
     }
 
   /* body-ext-1part] */
+#if GMAIL_BUG_20100725
+  rc = ir_body_ext_1part (sio, body,
+                          (rc == IMR_PARSE ? IMB_EXTENSIBLE_BUGGY_GMAIL : type));
+#else  /* GMAIL_BUG_20100725 */
   rc = ir_body_ext_1part (sio, body, type);
+#endif /* GMAIL_BUG_20100725 */
   if (rc != IMR_OK)
     return rc;
 

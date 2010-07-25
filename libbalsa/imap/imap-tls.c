@@ -237,9 +237,11 @@ imap_check_server_identity(SSL *ssl, const char *host,
   long vfy_result;
   X509 *cert;
   X509_NAME *subj;
-  int ok, extcount, i, j, stack_len, host_len;
+  int ok, i, host_len;
   gchar *colon;
-  
+  int has_extension_with_dns_name = 0;
+  STACK_OF(GENERAL_NAME) *altnames;
+
   if(!host)
     return 0;
   /* Check whether the certificate matches the server. */
@@ -250,71 +252,50 @@ imap_check_server_identity(SSL *ssl, const char *host,
   colon = strchr(host, ':');
   host_len = colon ? colon - host : (int)strlen(host);
   ok = 0;
-  extcount = X509_get_ext_count(cert);
-  for(i=0; i<extcount; i++) {
-    const char *extstr;
-    X509_EXTENSION *ext = X509_get_ext(cert, i);
 
-    extstr = OBJ_nid2sn(OBJ_obj2nid(X509_EXTENSION_get_object(ext)));
+  altnames = X509_get_ext_d2i(cert, NID_subject_alt_name, NULL, NULL);
 
-    if(strcmp(extstr, "subjectAltName") == 0) {
-#if (OPENSSL_VERSION_NUMBER > 0x00908000L)
-      const unsigned char *data;
-#else
-      unsigned char *data;
-#endif
-      STACK_OF(CONF_VALUE) *val;
-      CONF_VALUE           *nval;
-#if (OPENSSL_VERSION_NUMBER >= 0x01000000L)
-      const X509V3_EXT_METHOD *meth;
-#else
-      X509V3_EXT_METHOD    *meth;
-#endif
-      void *ext_str = NULL;
+  if (altnames) {
+    for (i=0; i< sk_GENERAL_NAME_num(altnames); i++) {
+      const GENERAL_NAME *name = sk_GENERAL_NAME_value(altnames, i);
 
-      if( !(meth = X509V3_EXT_get(ext)) )
-        break;
-      data = ext->value->data;
+      /* We handle only GEN_DNS. GEN_IP (certificates for IP numbers)
+         are too weird to be real in IMAP case. */
+      if (name->type == GEN_DNS) {
+        const ASN1_IA5STRING *ia5 = name->d.ia5;
+        const char *name = (const char*)ia5->data;
+        has_extension_with_dns_name = 1;
 
-#if (OPENSSL_VERSION_NUMBER > 0x00907000L)
-      if (meth->it)
-        ext_str = ASN1_item_d2i (NULL, &data, ext->value->length,
-                                 ASN1_ITEM_ptr (meth->it));
-      else
-        ext_str = meth->d2i (NULL, &data, ext->value->length);
-#else
-      ext_str = meth->d2i(NULL, &data, ext->value->length);
-#endif
-      val = meth->i2v(meth, ext_str, NULL);
-
-      stack_len = sk_CONF_VALUE_num(val);
-      for(j=0; j<stack_len; j++) {
-        nval = sk_CONF_VALUE_value(val, j);
-        if(strcmp(nval->name, "DNS") == 0 &&
-           host_matches_domain(host, nval->value, host_len)) {
+        if (strlen(name) == (size_t)ia5->length &&
+            host_matches_domain(host, name, host_len)) {
+          /* printf("verified name using extension\n"); */
           ok = 1;
           break;
         }
       }
     }
-    if(ok)
-      break;
+    sk_GENERAL_NAME_pop_free(altnames, GENERAL_NAME_free);
   }
-  if(!ok) { /* matching by subjectAltName failed, try commonName */
+
+  if (!has_extension_with_dns_name) {
     char data[256];
     size_t name_len;
     if( (subj = X509_get_subject_name(cert)) &&
         (name_len = 
-         X509_NAME_get_text_by_NID(subj, NID_commonName, data, sizeof(data)))){
+         X509_NAME_get_text_by_NID(subj, NID_commonName,
+                                   data, sizeof(data)))){
       data[sizeof(data)-1] = 0;
 
       /* Remember to check whether there was no truncation or NUL
          characters embedded in the text. */
       if(name_len == strlen(data) &&
-         host_matches_domain(host, data, host_len))
+         host_matches_domain(host, data, host_len)) {
         ok =1;
+        /* printf("verified name using common name\n"); */
+      }
     }
   }
+
   X509_free(cert);
   if(ok)
     vfy_result = SSL_get_verify_result(ssl);
@@ -323,8 +304,8 @@ imap_check_server_identity(SSL *ssl, const char *host,
 
   if(vfy_result == X509_V_OK)
     return 1;
-  /* There was a problem with the verification, one has to leave it up to the
-   * application what to do with this.
+  /* There was a problem with the verification, one has to leave it up
+   * to the application what to do with this.
    */
   ok = 0;
   if(user_cb)

@@ -643,7 +643,9 @@ balsa_mime_widget_message_set_headers(BalsaMessage * bm, BalsaMimeWidget *mw,
     GtkTextView *view;
 
     balsa_mime_widget_message_set_headers_d(bm, mw, part->embhdrs, part->parts,
-                                            part->embhdrs->subject);
+                                            part->embhdrs
+                                            ? part->embhdrs->subject
+                                            : NULL );
     if (!(widget = mw->header_widget))
 	return;
     view = bm_header_widget_get_text_view(widget);
@@ -698,7 +700,12 @@ balsa_mime_widget_message_set_headers_d(BalsaMessage * bm,
     bmwm_buffer_set_prefs(buffer);
 
     gtk_text_buffer_set_text(buffer, "", 0);
-    g_return_if_fail(headers);
+    if (!headers) {
+        /* Gmail sometimes fails to do that. */
+        add_header_gchar(bm, view, "subject", _("Error:"),
+                         _("IMAP server did not report message structure"));
+        return;
+    }
 
     if (bm->shown_headers == HEADERS_NONE) {
 	gtk_widget_hide(widget);

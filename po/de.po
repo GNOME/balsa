@@ -18,8 +18,8 @@ msgstr ""
 "Project-Id-Version: balsa master\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=balsa&component=general\n"
-"POT-Creation-Date: 2010-07-14 21:41+0000\n"
-"PO-Revision-Date: 2010-07-15 21:24+0100\n"
+"POT-Creation-Date: 2010-07-25 20:33+0000\n"
+"PO-Revision-Date: 2010-07-26 00:41+0100\n"
 "Last-Translator: Mario Blättermann <mariobl@gnome.org>\n"
 "Language-Team: German <gnome-de@gnome.org>\n"
 "MIME-Version: 1.0\n"
@@ -96,19 +96,19 @@ msgstr "Die Adresse konnte nicht im Adressbuch gefunden werden"
 msgid "Unknown error"
 msgstr "Unbekannter Fehler"
 
-#: ../libbalsa/address-view.c:129 ../src/balsa-mime-widget-message.c:731
+#: ../libbalsa/address-view.c:129 ../src/balsa-mime-widget-message.c:738
 #: ../src/balsa-print-object-header.c:170 ../src/sendmsg-window.c:1106
 #: ../src/sendmsg-window.c:3810 ../src/store-address.c:332
 msgid "To:"
 msgstr "An:"
 
-#: ../libbalsa/address-view.c:130 ../src/balsa-mime-widget-message.c:732
+#: ../libbalsa/address-view.c:130 ../src/balsa-mime-widget-message.c:739
 #: ../src/balsa-print-object-header.c:172 ../src/sendmsg-window.c:1106
 #: ../src/sendmsg-window.c:3818 ../src/store-address.c:333
 msgid "Cc:"
 msgstr "Kopie an:"
 
-#: ../libbalsa/address-view.c:131 ../src/balsa-mime-widget-message.c:733
+#: ../libbalsa/address-view.c:131 ../src/balsa-mime-widget-message.c:740
 #: ../src/balsa-print-object-header.c:174 ../src/sendmsg-window.c:1106
 #: ../src/store-address.c:334
 msgid "Bcc:"
@@ -3109,35 +3109,44 @@ msgstr "Antworten …"
 msgid "... [truncated]"
 msgstr "... [gekürzt]"
 
-#: ../src/balsa-mime-widget-message.c:711
+#. Gmail sometimes fails to do that.
+#: ../src/balsa-mime-widget-message.c:705
+msgid "Error:"
+msgstr "Fehler:"
+
+#: ../src/balsa-mime-widget-message.c:706
+msgid "IMAP server did not report message structure"
+msgstr "IMAP-Server lieferte keine Information zur Nachrichtenstruktur"
+
+#: ../src/balsa-mime-widget-message.c:718
 #: ../src/balsa-print-object-header.c:155 ../src/sendmsg-window.c:1138
 #: ../src/sendmsg-window.c:1140 ../src/sendmsg-window.c:1231
 #: ../src/sendmsg-window.c:3795 ../src/sendmsg-window.c:5702
 msgid "Subject:"
 msgstr "Betreff:"
 
-#: ../src/balsa-mime-widget-message.c:715
+#: ../src/balsa-mime-widget-message.c:722
 #: ../src/balsa-print-object-header.c:163 ../src/sendmsg-window.c:3791
 msgid "Date:"
 msgstr "Datum:"
 
 #. addresses
-#: ../src/balsa-mime-widget-message.c:721
+#: ../src/balsa-mime-widget-message.c:728
 #: ../src/balsa-print-object-header.c:168 ../src/sendmsg-window.c:3802
 #: ../src/store-address.c:331
 msgid "From:"
 msgstr "Von:"
 
-#: ../src/balsa-mime-widget-message.c:728
+#: ../src/balsa-mime-widget-message.c:735
 msgid "Reply-To:"
 msgstr "Antwort an:"
 
-#: ../src/balsa-mime-widget-message.c:737
+#: ../src/balsa-mime-widget-message.c:744
 #: ../src/balsa-print-object-header.c:176
 msgid "Fcc:"
 msgstr "Durchschlag in:"
 
-#: ../src/balsa-mime-widget-message.c:744
+#: ../src/balsa-mime-widget-message.c:751
 #: ../src/balsa-print-object-header.c:179
 msgid "Disposition-Notification-To:"
 msgstr "Empfangsbestätigung an:"

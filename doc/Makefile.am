@@ -7,7 +7,6 @@ DOC_INCLUDES =
 DOC_FIGURES = figures/address-book-ldap.png			\
 	      figures/address-book-modify.png			\
 	      figures/address-book.png				\
-	      figures/address-book-start.png			\
 	      figures/address-book-vcard.png			\
 	      figures/balsa_logo.png				\
 	      figures/druid-start.png				\

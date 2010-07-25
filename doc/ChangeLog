@@ -1,3 +1,8 @@
+2010-07-25 Stanislav Brabec
+
+	* Makefile.am: remove reference to unused address-book-start.png
+	(bug 624690).
+
 2009-10-19  Peter Bloomfield
 
 	* C/balsa.xml: fix typo.

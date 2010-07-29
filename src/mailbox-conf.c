@@ -207,14 +207,22 @@ balsa_server_conf_get_advanced_widget(BalsaServerConf *bsc, LibBalsaServer *s,
         { N_("Required"),    LIBBALSA_TLS_REQUIRED }
     };
     GtkWidget *label;
-    GtkWidget *hbox;
+    GtkWidget *box;
     gboolean use_ssl = s && s->use_ssl;
 
-    hbox = gtk_hbox_new(FALSE, 0);
+    box = gtk_vbox_new(FALSE, 0);
+
+#if !defined(USE_SSL)
+    gtk_box_pack_start(GTK_BOX(box),
+                       gtk_label_new
+                       (_("Balsa was built without SSL support.\n"
+                          "Neither SSL nor TLS can be used.")),
+                       FALSE, FALSE, 0);
+#endif                          /* !defined(USE_SSL) */
 
     bsc->table = GTK_TABLE(libbalsa_create_table(3 + extra_rows, 2));
     gtk_container_set_border_width(GTK_CONTAINER(bsc->table), 12);
-    gtk_box_pack_start(GTK_BOX(hbox), GTK_WIDGET(bsc->table),
+    gtk_box_pack_start(GTK_BOX(box), GTK_WIDGET(bsc->table),
                        FALSE, FALSE, 0);
 
     bsc->used_rows = 0;
@@ -222,6 +230,9 @@ balsa_server_conf_get_advanced_widget(BalsaServerConf *bsc, LibBalsaServer *s,
     bsc->use_ssl = balsa_server_conf_add_checkbox(bsc, _("Use _SSL"));
     if(use_ssl)
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(bsc->use_ssl), TRUE);
+#if !defined(USE_SSL)
+    gtk_widget_set_sensitive(bsc->use_ssl, FALSE);
+#endif                          /* !defined(USE_SSL) */
 
     label = libbalsa_create_label(_("Use _TLS:"), GTK_WIDGET(bsc->table), 1);
 
@@ -239,8 +250,12 @@ balsa_server_conf_get_advanced_widget(BalsaServerConf *bsc, LibBalsaServer *s,
     gtk_widget_show_all(GTK_WIDGET(bsc->table));
     bsc->used_rows = 2;
     gtk_widget_set_sensitive(bsc->tls_option, !use_ssl);
+#if !defined(USE_TLS)
+    gtk_widget_set_sensitive(label, FALSE);
+    gtk_widget_set_sensitive(bsc->tls_option, FALSE);
+#endif                          /* !defined(USE_TLS) */
 
-    return hbox;
+    return box;
 }
 
 GtkWidget*

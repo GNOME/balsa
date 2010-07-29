@@ -80,14 +80,12 @@ extern "C"
         gchar *x_face;
 	gboolean request_mdn;
 
-#ifdef HAVE_GPGME
 	gboolean gpg_sign;
 	gboolean gpg_encrypt;
 	gboolean always_trust;
 	gboolean warn_send_plain;
 	gint crypt_protocol;
         gchar *force_key_id;
-#endif
 #if ENABLE_ESMTP
 	LibBalsaSmtpServer *smtp_server;
 #endif                          /* ENABLE_ESMTP */
@@ -126,11 +124,9 @@ extern "C"
                                            smtp_server);
 #endif                          /* ENABLE_ESMTP */
 
-#ifdef HAVE_GPGME
     void libbalsa_identity_set_gpg_sign(LibBalsaIdentity*, gboolean);
     void libbalsa_identity_set_gpg_encrypt(LibBalsaIdentity*, gboolean);
     void libbalsa_identity_set_crypt_protocol(LibBalsaIdentity* ident, gint);
-#endif
 
     void libbalsa_identity_config_dialog(GtkWindow * parent,
                                          GList ** identities,

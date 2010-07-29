@@ -1,5 +1,16 @@
 2010-07-28  Peter Bloomfield
 
+	* libbalsa/identity.c (libbalsa_identity_init),
+	(libbalsa_identity_finalize), (ident_dialog_update),
+	(display_frame_update), (libbalsa_identity_new_config),
+	(libbalsa_identity_save), (display_frame_set_gpg_mode),
+	(ident_dialog_get_value): do not forget gpgme-related settings
+	when running --without-gpgme.
+	* libbalsa/identity.h: ditto.
+	* libbalsa/rfc3156.h: ditto.
+
+2010-07-28  Peter Bloomfield
+
 	* src/mailbox-conf.c (balsa_server_conf_get_advanced_widget):
 	disable SSL and TLS widgets when building --without-ssl.
 

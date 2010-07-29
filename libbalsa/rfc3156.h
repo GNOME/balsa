@@ -26,6 +26,12 @@
 # error "Include config.h before this file."
 #endif
 
+/* bits to define the protection method; needed even when we don't
+ * HAVE_GPGME */
+#define LIBBALSA_PROTECT_OPENPGP       (1 << 2)	/* RFC 2440 (OpenPGP) */
+#define LIBBALSA_PROTECT_SMIMEV3       (1 << 3)	/* RFC 2633 (S/MIME v3) */
+#define LIBBALSA_PROTECT_RFC3156       (1 << 4)	/* RFC 3156 (PGP/MIME) */
+
 #ifdef HAVE_GPGME
 
 #include <gpgme.h>
@@ -40,9 +46,6 @@
 #define LIBBALSA_PROTECT_MODE          (3 << 0)
 
 /* bits to define the protection method */
-#define LIBBALSA_PROTECT_OPENPGP       (1 << 2)	/* RFC 2440 (OpenPGP) */
-#define LIBBALSA_PROTECT_SMIMEV3       (1 << 3)	/* RFC 2633 (S/MIME v3) */
-#define LIBBALSA_PROTECT_RFC3156       (1 << 4)	/* RFC 3156 (PGP/MIME) */
 #define LIBBALSA_PROTECT_PROTOCOL      (7 << 2)
 
 /* indicate broken structure */

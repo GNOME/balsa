@@ -24,9 +24,7 @@
 #endif                          /* HAVE_CONFIG_H */
 #include "identity.h"
 
-#ifdef HAVE_GPGME
-#  include "rfc3156.h"
-#endif
+#include "rfc3156.h"
 #include "libbalsa.h"
 #include "information.h"
 #include "libbalsa-conf.h"
@@ -112,14 +110,12 @@ libbalsa_identity_init(LibBalsaIdentity* ident)
     ident->sig_whenreply = TRUE;
     ident->sig_separator = TRUE;
     ident->sig_prepend = FALSE;
-#ifdef HAVE_GPGME
     ident->gpg_sign = FALSE;
     ident->gpg_encrypt = FALSE;
     ident->always_trust = FALSE;
     ident->warn_send_plain = TRUE;
     ident->crypt_protocol = LIBBALSA_PROTECT_OPENPGP;
     ident->force_key_id = NULL;
-#endif
     ident->request_mdn = FALSE;
     /*
     ident->face = NULL;
@@ -150,9 +146,7 @@ libbalsa_identity_finalize(GObject * object)
 #endif                          /* ENABLE_ESMTP */
     g_free(ident->face);
     g_free(ident->x_face);
-#ifdef HAVE_GPGME
     g_free(ident->force_key_id);
-#endif
 
     G_OBJECT_CLASS(parent_class)->finalize(object);
 }
@@ -655,10 +649,8 @@ static void add_show_menu(const char *label, gpointer data,
                           GtkWidget * menu);
 static void ident_dialog_free_values(GPtrArray * values);
 
-#ifdef HAVE_GPGME
 static void display_frame_set_gpg_mode(GObject * dialog,
                                        const gchar * key, gint * value);
-#endif /* HAVE_GPGME */
 
 #if ENABLE_ESMTP
 static void ident_dialog_add_smtp_menu(GtkWidget * table, gint row,
@@ -671,10 +663,8 @@ static void display_frame_set_server(GObject * dialog,
                                      LibBalsaSmtpServer * smtp_server);
 #endif /* ENABLE_ESMTP */
 
-#if defined(HAVE_GPGME) || ENABLE_ESMTP
 static gpointer ident_dialog_get_value(GObject * dialog,
                                        const gchar * key);
-#endif                          /* defined(HAVE_GPGME) || ENABLE_ESMTP */
 
 /* Callback for the "toggled" signal of the "Default" column. */
 static void
@@ -1497,7 +1487,6 @@ ident_dialog_update(GObject * dlg)
     id->x_face          = ident_dialog_get_path(dlg, "identity-xfacepath");
     id->request_mdn     = ident_dialog_get_bool(dlg, "identity-requestmdn");
 
-#ifdef HAVE_GPGME
     id->gpg_sign        = ident_dialog_get_bool(dlg, "identity-gpgsign");
     id->gpg_encrypt     = ident_dialog_get_bool(dlg, "identity-gpgencrypt");
     id->always_trust    = ident_dialog_get_bool(dlg, "identity-trust-always");
@@ -1506,7 +1495,6 @@ ident_dialog_update(GObject * dlg)
                                           (dlg, "identity-crypt-protocol"));
     g_free(id->force_key_id);
     id->force_key_id    = g_strstrip(ident_dialog_get_text(dlg, "identity-keyid"));
-#endif
    
     return TRUE;
 }
@@ -1886,7 +1874,6 @@ display_frame_update(GObject * dialog, LibBalsaIdentity* ident)
     display_frame_set_boolean(dialog, "identity-requestmdn", 
                               ident->request_mdn);    
 
-#ifdef HAVE_GPGME
     display_frame_set_boolean(dialog, "identity-gpgsign", 
                               ident->gpg_sign);    
     display_frame_set_boolean(dialog, "identity-gpgencrypt", 
@@ -1898,7 +1885,6 @@ display_frame_update(GObject * dialog, LibBalsaIdentity* ident)
     display_frame_set_gpg_mode(dialog, "identity-crypt-protocol",
 			   &ident->crypt_protocol);
     display_frame_set_field(dialog, "identity-keyid", ident->force_key_id);
-#endif
 }
 
 
@@ -1993,14 +1979,12 @@ libbalsa_identity_new_config(const gchar* name)
     ident->x_face = libbalsa_conf_get_string("XFacePath");
     ident->request_mdn = libbalsa_conf_get_bool("RequestMDN");
 
-#ifdef HAVE_GPGME
     ident->gpg_sign = libbalsa_conf_get_bool("GpgSign");
     ident->gpg_encrypt = libbalsa_conf_get_bool("GpgEncrypt");
     ident->always_trust = libbalsa_conf_get_bool("GpgTrustAlways");
     ident->warn_send_plain = libbalsa_conf_get_bool("GpgWarnSendPlain=true");
     ident->crypt_protocol = libbalsa_conf_get_int("CryptProtocol=16");
     ident->force_key_id = libbalsa_conf_get_string("ForceKeyID");
-#endif
 
     return ident;
 }
@@ -2041,20 +2025,17 @@ libbalsa_identity_save(LibBalsaIdentity* ident, const gchar* group)
         libbalsa_conf_set_string("XFacePath", ident->x_face);
     libbalsa_conf_set_bool("RequestMDN", ident->request_mdn);
 
-#ifdef HAVE_GPGME
     libbalsa_conf_set_bool("GpgSign", ident->gpg_sign);
     libbalsa_conf_set_bool("GpgEncrypt", ident->gpg_encrypt);
     libbalsa_conf_set_bool("GpgTrustAlways", ident->always_trust);
     libbalsa_conf_set_bool("GpgWarnSendPlain", ident->warn_send_plain);
     libbalsa_conf_set_int("CryptProtocol", ident->crypt_protocol);
     libbalsa_conf_set_string("ForceKeyID", ident->force_key_id);
-#endif
 
     libbalsa_conf_pop_group();
 }
 
 
-#ifdef HAVE_GPGME
 /* collected helper stuff for GPGME support */
 
 void
@@ -2103,7 +2084,6 @@ display_frame_set_gpg_mode(GObject * dialog, const gchar* key, gint * value)
             *value = LIBBALSA_PROTECT_RFC3156;
         }
 }
-#endif  /* HAVE_GPGME */
 
 /*
  * Add an option menu to the given dialog with a label next to it
@@ -2111,11 +2091,6 @@ display_frame_set_gpg_mode(GObject * dialog, const gchar* key, gint * value)
  * object data attached to the dialog with the given key.
  */
 
-#ifndef HAVE_GPGME
-/* So we can build a dummy Security page: */
-#define LIBBALSA_PROTECT_RFC3156 0
-#define LIBBALSA_PROTECT_OPENPGP 0
-#endif
 static void
 ident_dialog_add_gpg_menu(GtkWidget * table, gint row, GtkDialog * dialog,
                           const gchar * label_name, const gchar * menu_key)
@@ -2212,7 +2187,6 @@ display_frame_set_server(GObject * dialog, const gchar * key,
 
 #endif                          /* ENABLE_ESMTP */
 
-#if defined(HAVE_GPGME) || ENABLE_ESMTP
 /*
  * Get the value of the active option menu item
  */
@@ -2229,5 +2203,3 @@ ident_dialog_get_value(GObject * dialog, const gchar * key)
     
     return g_ptr_array_index(values, value);
 }
-#endif /* defined(HAVE_GPGME) || ENABLE_ESMTP */
-

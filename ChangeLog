@@ -1,3 +1,13 @@
+2010-08-05  Peter Bloomfield
+
+	* libbalsa/mailbox_imap.c
+	(message_info_from_msgno): return NULL if msgno out of range;
+	(imap_flags_cb), (imap_exists_idle), (imap_expunge_cb),
+	(libbalsa_mailbox_imap_message_match),
+	(libbalsa_mailbox_imap_get_message), (lbm_imap_change_user_flags),
+	(libbalsa_mailbox_imap_msgno_has_flags): test for NULL return
+	from message_info_from_msgno.
+
 2010-07-28  Peter Bloomfield
 
 	* libbalsa/identity.c (libbalsa_identity_init),

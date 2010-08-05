@@ -192,8 +192,18 @@ static struct message_info *message_info_from_msgno(
 						  LibBalsaMailboxImap * mimap,
 						  guint msgno)
 {
-    struct message_info *msg_info = 
-	&g_array_index(mimap->messages_info, struct message_info, msgno - 1);
+    struct message_info *msg_info;
+
+    if (msgno > mimap->messages_info->len) {
+        printf("%s %s msgno %d > messages_info len %d\n", __func__,
+               LIBBALSA_MAILBOX(mimap)->name, msgno,
+               mimap->messages_info->len);
+        msg_info = NULL;
+    } else
+        msg_info =
+            &g_array_index(mimap->messages_info, struct message_info,
+                           msgno - 1);
+
     return msg_info;
 }
 
@@ -789,7 +799,7 @@ imap_flags_cb(unsigned cnt, const unsigned seqno[], LibBalsaMailboxImap *mimap)
     for(i=0; i<cnt; i++) {
         struct message_info *msg_info = 
             message_info_from_msgno(mimap, seqno[i]);
-        if(msg_info->message) {
+        if(msg_info && msg_info->message) {
             LibBalsaMessageFlag flags;
             /* since we are talking here about updating just received,
                usually unsolicited flags from the server, we do not
@@ -846,6 +856,8 @@ imap_exists_idle(gpointer data)
                 gchar *msgid;
                 struct message_info *msg_info =
                     message_info_from_msgno(mimap, i+1);
+                if(!msg_info)
+                    continue;
                 if(msg_info->message)
                     g_object_unref(msg_info->message);
                 msg_info->message = NULL;
@@ -900,7 +912,7 @@ imap_expunge_cb(ImapMboxHandle *handle, unsigned seqno,
     gchar *msgid;
 
     LibBalsaMailbox *mailbox = LIBBALSA_MAILBOX(mimap);
-    struct message_info *msg_info = message_info_from_msgno(mimap, seqno);
+    struct message_info *msg_info;
 
     libbalsa_lock_mailbox(mailbox);
 
@@ -920,9 +932,12 @@ imap_expunge_cb(ImapMboxHandle *handle, unsigned seqno,
         g_strfreev(pair);
     }
 
-    if(msg_info->message)
-        g_object_unref(msg_info->message);
-    g_array_remove_index(mimap->messages_info, seqno-1);
+    msg_info = message_info_from_msgno(mimap, seqno);
+    if (msg_info) {
+        if (msg_info->message)
+            g_object_unref(msg_info->message);
+        g_array_remove_index(mimap->messages_info, seqno-1);
+    }
     msgid = g_ptr_array_index(mimap->msgids, seqno-1);
     if(msgid) g_free(msgid);
     g_ptr_array_remove_index(mimap->msgids, seqno-1);
@@ -1341,6 +1356,8 @@ libbalsa_mailbox_imap_message_match(LibBalsaMailbox* mailbox, guint msgno,
 
     mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
     msg_info = message_info_from_msgno(mimap, msgno);
+    if (!msg_info)
+        return FALSE;
 
     if (msg_info->message)
         g_object_ref(msg_info->message);
@@ -2046,6 +2063,10 @@ libbalsa_mailbox_imap_get_message(LibBalsaMailbox * mailbox, guint msgno)
 
     libbalsa_lock_mailbox(mailbox);
     msg_info = message_info_from_msgno(mimap, msgno);
+    if (!msg_info) {
+        libbalsa_unlock_mailbox(mailbox);
+        return NULL;
+    }
 
     if (!msg_info->message) {
         LibBalsaMessage *msg = libbalsa_message_new();
@@ -3036,8 +3057,10 @@ lbm_imap_change_user_flags(LibBalsaMailbox * mailbox, GArray * seqno,
 	guint msgno = g_array_index(seqno, guint, i);
         struct message_info *msg_info = 
             message_info_from_msgno(mimap, msgno);
-	msg_info->user_flags |= set;
-	msg_info->user_flags &= ~clear;
+        if (msg_info) {
+            msg_info->user_flags |= set;
+            msg_info->user_flags &= ~clear;
+        }
     }
 }
 
@@ -3091,7 +3114,8 @@ libbalsa_mailbox_imap_msgno_has_flags(LibBalsaMailbox * m, unsigned msgno,
     if (user_set || user_unset) {
         struct message_info *msg_info =
             message_info_from_msgno(mimap, msgno);
-        if ((msg_info->user_flags & user_set) != user_set ||
+        if (!msg_info ||
+            (msg_info->user_flags & user_set) != user_set ||
             (msg_info->user_flags & user_unset) != 0)
             return FALSE;
     }

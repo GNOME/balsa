@@ -1,11 +1,11 @@
 # German translation of the balsa manual.
-# Mario Blättermann <mariobl@gnome.org>, 2008, 2009.
+# Mario Blättermann <mariobl@gnome.org>, 2008-2010.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: \n"
+"Project-Id-Version: balsa help master\n"
 "POT-Creation-Date: 2009-10-19 18:10+0000\n"
-"PO-Revision-Date: 2009-10-19 20:50+0100\n"
+"PO-Revision-Date: 2010-08-05 21:58+0100\n"
 "Last-Translator: Mario Blättermann <mariobl@gnome.org>\n"
 "Language-Team: German <gnome-de@gnome.org>\n"
 "MIME-Version: 1.0\n"
@@ -135,6 +135,9 @@ msgid ""
 "provided the copyright notice and this permission notice are preserved on all "
 "copies."
 msgstr ""
+"Es ist Ihnen gestattet, wortwörtliche Kopien dieses Handbuchs zu erstellen "
+"und zu verteilen, welche den Urheberrechtshinweis sowie einen Hinweis auf "
+"diese Erlaubnis in allen Kopien enthalten."
 
 #: C/balsa.xml:78(para)
 msgid ""
@@ -206,6 +209,16 @@ msgid ""
 "mail folders; automatic mail checking; mail printing; inline attachment "
 "viewing; and the proverbial much, much more."
 msgstr ""
+"<application>Balsa</application> ist ein grafisches E-Mail-Programm. Während "
+"es aktiv entwickelt wird, verfügt <application>Balsa</application> bereits "
+"über zahlreiche Funktionsmerkmale wie: Unterstützung für <glossterm linkend="
+"\"glossary-imap\"><acronym>IMAP</acronym></glossterm> und <glossterm linkend="
+"\"glossary-pop\"><acronym>POP3</acronym></glossterm>; Versand mit Sendmail "
+"oder direkt über <glossterm linkend=\"glossary-smtp\"><acronym>SMTP</"
+"acronym></glossterm>; optionaler Empfang und Versand von Nachrichten über "
+"mehrere Konten; Unterstützung für sämtliche Konfigurationen lokaler Mail-"
+"Ordner; automatische Überprüfung auf eingegangene Nachrichten; Drucken; "
+"eingebettete Anzeige von Anhängen und noch viel mehr."
 
 #: C/balsa.xml:136(para)
 msgid ""
@@ -227,11 +240,6 @@ msgid "Introduction"
 msgstr "Einführung"
 
 #: C/balsa.xml:155(para)
-#| msgid ""
-#| "<application>Balsa</application> is a graphical mail client similar to "
-#| "Eudora on Windows. It supports the standard features of any good reader "
-#| "and has new features added continually. See the abstract above for a quick "
-#| "feature rundown."
 msgid ""
 "<application>Balsa</application> is a graphical mail client. It supports the "
 "standard features of any good reader and has new features added continually. "
@@ -249,6 +257,12 @@ msgid ""
 "combination of GMime for handling Mime messages, and its own drivers for "
 "local and remote mailstores."
 msgstr ""
+"<application>Balsa</application> wird auf der Basis von <acronym>GTK+</"
+"acronym> und <acronym>GNOME</acronym> entwickelt. Original basierend auf "
+"libmutt, dem Backend-Code von <application>Mutt</application>, verwendet "
+"<application>Balsa</application> nun eine Kombination aus GMime für die "
+"Verarbeitung von MIME-Meldungen sowie eigene Treiber für lokale und ferne "
+"Postfächer."
 
 #: C/balsa.xml:169(para)
 msgid ""
@@ -261,6 +275,15 @@ msgid ""
 "reported via <application>bug-buddy</application>, <application>gnome-bug </"
 "application> or to <email>submit@bugs.gnome.org</email>."
 msgstr ""
+"Wenn Sie mehr über <application>Balsa</application> erfahren wollen, sollten "
+"Sie sich die Balsa-Mailingliste <email>balsa-list@gnome.org</email> "
+"anschauen. Diese können Sie auf der Balsa-Webseite <ulink url=\"http://mail."
+"gnome.org/mailman/listinfo/balsa-list\">http://mail.gnome.org/mailman/"
+"listinfo/balsa-list</ulink> abonnieren, oder durch Senden einer E-Mail mit "
+"dem Betreff <emphasis>subscribe</emphasis> an <email>balsa-list-request@gnome."
+"org</email>. Fehler können Sie über das Fehlererfassungssystem "
+"<application>bug-buddy</application> melden oder durch Senden einer Nachricht "
+"an <email>submit@bugs.gnome.org</email>."
 
 #: C/balsa.xml:183(title)
 msgid "Getting Started with <application>Balsa</application>"
@@ -276,13 +299,21 @@ msgid ""
 "be changed to be <glossterm linkend=\"glossary-imap\"><acronym>IMAP</"
 "acronym></glossterm> mailboxes later.)"
 msgstr ""
+"Wenn Sie <application>Balsa</application> zum ersten Mal starten, dann wird "
+"zunächst ein Assistent geöffnet, der Ihnen beim Einrichten der "
+"Grundeinstellungen von <application>Balsa</application> hilft. "
+"<application>Balsa</application> versucht dabei zu die meisten notwendigen "
+"Eingaben zu »erraten«. Es werden fünf lokale Standard-Postfächer "
+"eingerichtet: Eingang, Ausgang, Verschickt, Entwürfe und Müll. Diese können "
+"später in <glossterm linkend=\"glossary-imap\"><acronym>IMAP</acronym></"
+"glossterm>-Postfächer umgewandelt werden."
 
 #: C/balsa.xml:195(title)
-#| msgid "<application>Balsa</application> Start Druid"
 msgid "<application>Balsa</application> Start Assistant"
 msgstr "<application>Balsa</application>-Start-Assistent"
 
 #: C/balsa.xml:205(para)
+#, fuzzy
 msgid ""
 "Don't worry. <application>Balsa</application> cooperates with other "
 "<glossterm linkend=\"glossary-mua\"><acronym>MUA</acronym></glossterm>'s very "
@@ -292,6 +323,12 @@ msgid ""
 "detect new folders as they are created. So if you have to telnet in to your "
 "mail machine, you won't be stuck."
 msgstr ""
+"Keine Angst. <application>Balsa</application> arbeitet mit anderen <glossterm "
+"linkend=\"glossary-mua\"><acronym>MUA</acronym></glossterm>s sehr gut "
+"zusammen. Es wird die gleiche ? für Postfächer verwendet. Falls "
+"<application>Balsa</application> den gleichen Mailordner wie "
+"<application>pine</application> oder <application>Mutt</application> "
+"verwendet, dann werden neue Ordner erkannt, sobald sie erstellt wurden. ?"
 
 #: C/balsa.xml:215(para)
 msgid ""
@@ -320,19 +357,6 @@ msgid "Main Window"
 msgstr "Hauptfenster"
 
 #: C/balsa.xml:244(para)
-#| msgid ""
-#| "<application>Balsa</application>'s main window has three major areas. To "
-#| "the left is the <link linkend=\"subwin-mblist\">mailbox list</link>. This "
-#| "displays all the mailboxes <application>Balsa</application> knows about; "
-#| "it will scan for ones in your local mail directory. (This means "
-#| "<application>Balsa</application> works well with <application>procmail</"
-#| "application>.) It will also list <glossterm linkend=\"glossary-imap"
-#| "\"><acronym>IMAP</acronym></glossterm> mailboxes that you have configured. "
-#| "If the <guilabel>Show Mailbox Info</guilabel> preference is set, two "
-#| "columns will also be displayed next to the mailbox names containing the "
-#| "number of unread and total messages in each mailbox that has unread "
-#| "messages. (The other mailboxes will not have their contents probed.) Also, "
-#| "any mailboxes that contain unread messages will be shown in a bold font."
 msgid ""
 "<application>Balsa</application>'s main window has three major areas. To the "
 "left is the <link linkend=\"subwin-mblist\">mailbox list</link>. This "
@@ -374,11 +398,6 @@ msgstr ""
 "hier Ihre Mails durchstöbern und sie bearbeiten."
 
 #: C/balsa.xml:266(para)
-#| msgid ""
-#| "At the bottom-right of <application>Balsa</application>'s main window is "
-#| "the <link linkend=\"subwin-msgview\">message view</link>. This displays "
-#| "the message selected in the message listing. You can save attachments, "
-#| "view attachments, and read incoming email here."
 msgid ""
 "At the bottom-right of <application>Balsa</application>'s main window is the "
 "<link linkend=\"subwin-msgview\">message view</link>. This displays the "
@@ -482,6 +501,9 @@ msgid ""
 "guimenu><guimenuitem>Continue</guimenuitem></menuchoice> -- Continue a "
 "postponed message."
 msgstr ""
+"<menuchoice><shortcut><keysym>C</keysym></shortcut><guimenu>Datei</"
+"guimenu><guimenuitem>Fortsetzen</guimenuitem></menuchoice> -- Die Bearbeitung "
+"einer begonnenen Nachricht fortsetzen."
 
 #: C/balsa.xml:395(para)
 msgid ""
@@ -491,6 +513,11 @@ msgid ""
 "attempt to retrieve any new messages from the <glossterm linkend=\"glossary-"
 "pop\"><acronym>POP3</acronym></glossterm> server."
 msgstr ""
+"<menuchoice><shortcut><keycombo><keysym>Strg</keysym><keysym>M</keysym></"
+"keycombo></shortcut><guimenu>Datei</guimenu><guimenuitem>Neue Mails abholen</"
+"guimenuitem></menuchoice> -- Dadurch wird <application>Balsa</application> "
+"angewiesen, eventuell vorhandene neue Nachrichten vom <glossterm linkend="
+"\"glossary-pop\"><acronym>POP3</acronym></glossterm>-Server abzuholen."
 
 #: C/balsa.xml:409(para)
 msgid ""
@@ -499,6 +526,10 @@ msgid ""
 "guimenuitem></menuchoice> -- Send all mail waiting in the Outbox mailbox to "
 "the mail server now."
 msgstr ""
+"<menuchoice><shortcut><keycombo><keysym>Strg</keysym><keysym>T</keysym></"
+"keycombo></shortcut><guimenu>Datei</guimenu><guimenuitem>Wartende Mails "
+"verschicken</guimenuitem></menuchoice> -- Sämtliche im Ausgangsordner "
+"befindliche Nachrichten verschicken."
 
 #: C/balsa.xml:423(para)
 msgid ""
@@ -507,11 +538,13 @@ msgid ""
 "Mail</guimenuitem></menuchoice> -- Send all mail waiting in the Outbox "
 "mailbox to the mail server now and retrieve any new messages."
 msgstr ""
+"<menuchoice><shortcut><keycombo><keysym>Strg</keysym><keysym>B</keysym></"
+"keycombo></shortcut><guimenu>Datei</guimenu><guimenuitem>Verschicken / "
+"Empfangen</guimenuitem></menuchoice> -- Sämtliche im Ausgangsordner "
+"befindliche Nachrichten verschicken sowie eventuell vorhandene neue "
+"Nachrichten abholen."
 
 #: C/balsa.xml:437(para) C/balsa.xml:1434(para)
-#| msgid ""
-#| "<menuchoice><guimenu>File</guimenu><guimenuitem>Exit</guimenuitem></"
-#| "menuchoice> -- Exit the program."
 msgid ""
 "<menuchoice><guimenu>File</guimenu><guimenuitem>Page Setup</guimenuitem></"
 "menuchoice> -- Set print options such as paper size and print orientation."
@@ -570,9 +603,6 @@ msgstr ""
 "angezeigten Nachricht aus."
 
 #: C/balsa.xml:509(para)
-#| msgid ""
-#| "<menuchoice><guimenu>Edit</guimenu><guimenuitem>Select All</guimenuitem></"
-#| "menuchoice> -- Select all text in the currently displayed message."
 msgid ""
 "<menuchoice><guimenu>Edit</guimenu><guimenuitem>Select Thread</guimenuitem></"
 "menuchoice> -- Select all messages in the same thread as the currently "
@@ -595,9 +625,6 @@ msgstr ""
 "link> benutzt wird."
 
 #: C/balsa.xml:532(para)
-#| msgid ""
-#| "<menuchoice><guimenu>Edit</guimenu><guimenuitem>Find next</guimenuitem></"
-#| "menuchoice> -- Find the next matching message."
 msgid ""
 "<menuchoice><guimenu>Edit</guimenu><guimenuitem>Find Next</guimenuitem></"
 "menuchoice> -- Find the next matching message."
@@ -606,17 +633,17 @@ msgstr ""
 "guimenuitem></menuchoice> -- Sucht nach der nächsten passenden Nachricht."
 
 #: C/balsa.xml:542(para)
-#| msgid ""
-#| "<menuchoice><guimenu>Edit</guimenu><guimenuitem>Preferences...</"
-#| "guimenuitem></menuchoice> -- Open the <link linkend=\"preferences"
-#| "\">Preferences</link> window to change the settings of <application>Balsa</"
-#| "application>."
 msgid ""
 "<menuchoice><guimenu>Edit</guimenu><guimenuitem>Find in Message</"
 "guimenuitem></menuchoice> -- Selecting this option opens a <quote>search bar</"
 "quote> at the foot of the message preview, in which you can type text for "
 "which <application>Balsa</application> will search in the current message."
 msgstr ""
+"<menuchoice><guimenu>Bearbeiten</guimenu><guimenuitem>In Nachricht suchen</"
+"guimenuitem></menuchoice> -- Durch Auswahl dieses Eintrages wird eine "
+"»Suchleiste« am unteren Rand der Nachrichtenvorschau geöffnet, in der Sie "
+"Text eingeben können, nach welchem <application>Balsa</application> in der "
+"aktuellen Nachricht suchen soll."
 
 #: C/balsa.xml:554(para)
 msgid ""
@@ -701,12 +728,6 @@ msgstr ""
 "der Nachrichtenansicht aus."
 
 #: C/balsa.xml:649(para)
-#| msgid ""
-#| "<menuchoice><guimenu>View</guimenu><guimenuitem>Flat index</guimenuitem></"
-#| "menuchoice>, <menuchoice><guimenuitem>Simple threading</guimenuitem></"
-#| "menuchoice>, <menuchoice><guimenuitem>JWZ threading</guimenuitem></"
-#| "menuchoice> -- Select the type of threading used to sort the messages in "
-#| "the list pane."
 msgid ""
 "<menuchoice><guimenu>View</guimenu><guimenuitem>Flat index</guimenuitem></"
 "menuchoice>, <menuchoice><guimenuitem>Simple threading</guimenuitem></"
@@ -721,11 +742,6 @@ msgstr ""
 "Listenfenster aus, der für das Sortieren der Nachrichten verwendet wird."
 
 #: C/balsa.xml:664(para)
-#| msgid ""
-#| "<menuchoice><shortcut><keycombo><keysym>Ctrl</keysym><keysym>L</keysym></"
-#| "keycombo></shortcut><guimenu>View</guimenu><guimenuitem>Collapse All</"
-#| "guimenuitem></menuchoice> -- Collapse all threads in the currently "
-#| "displayed mailbox."
 msgid ""
 "<menuchoice><shortcut><keycombo><keysym>Ctrl</keysym><keysym>E</keysym></"
 "keycombo></shortcut><guimenu>View</guimenu><guimenuitem>Expand All</"
@@ -815,6 +831,11 @@ msgid ""
 "may be hidden and unhidden in the current mailbox. Types in the submenu are "
 "toggled when selected. A Checkmark indicates it is currently hidden."
 msgstr ""
+"<menuchoice><guimenu>Postfach</guimenu><guimenuitem>Nachrichten verbergen</"
+"guimenuitem></menuchoice> -- Ein Untermenü listet alle Nachrichtentypen auf, "
+"die im aktuellen Postfach angezeigt oder verborgen werden sollen. Die Typen "
+"im Untermenü werden beim Auswählen ein- und ausgeschaltet. Ein aktiviertes "
+"Ankreuzfeld bedeutet, dass der jeweilige Typ derzeit verborgen wird."
 
 #: C/balsa.xml:778(para)
 msgid ""
@@ -846,6 +867,8 @@ msgid ""
 "<menuchoice><guimenu>Mailbox</guimenu><guimenuitem>Delete...</guimenuitem></"
 "menuchoice> -- Delete the currently selected mailbox."
 msgstr ""
+"<menuchoice><guimenu>Postfach</guimenu><guimenuitem>Löschen</guimenuitem></"
+"menuchoice> -- Löscht das aktuell ausgewählte Postfach."
 
 #: C/balsa.xml:822(para)
 msgid ""
@@ -853,6 +876,9 @@ msgid ""
 "guimenuitem></menuchoice> -- Physically remove from the backing mailstore all "
 "messages marked as deleted."
 msgstr ""
+"<menuchoice><guimenu>Postfach</guimenu><guimenuitem>Gelöschte Nachrichten "
+"entfernen</guimenuitem></menuchoice> -- Löscht alle Nachrichten physikalisch "
+"aus dem Nachrichtenspeicher, die als gelöscht markiert worden sind."
 
 #: C/balsa.xml:834(para)
 msgid ""
@@ -877,18 +903,23 @@ msgid ""
 "guimenuitem></menuchoice> -- Pop up a dialog that allows you to control which "
 "filters are applied to this mailbox, and optionally to apply them."
 msgstr ""
+"<menuchoice><guimenu>Postfach</guimenu><guimenuitem>Filter auswählen</"
+"guimenuitem></menuchoice> -- In einem Dialog können Sie festlegen, welche "
+"Filter auf dieses Postfach bereits angewendet werden, und welche noch "
+"optional angewendet werden sollen."
 
 #: C/balsa.xml:868(para)
-#| msgid ""
-#| "<menuchoice><guimenu>Message</guimenu><guimenuitem>Select Text</"
-#| "guimenuitem></menuchoice> -- Selects the entire text of the current "
-#| "message in the message view."
 msgid ""
 "<menuchoice><guimenu>Mailbox</guimenu><guimenuitem>Remove Duplicates</"
 "guimenuitem></menuchoice> -- Remove duplicate messages; <application>Balsa</"
 "application> locates all messages in the current mailbox that have the same "
 "Message-ID header, and removes all but one."
 msgstr ""
+"<menuchoice><guimenu>Postfach</guimenu><guimenuitem>Duplikate entfernen</"
+"guimenuitem></menuchoice> -- Mehrfach vorhandene Nachrichten entfernen. "
+"<application>Balsa</application> sucht nach allen Nachrichten im aktuellen "
+"Postfach, welche die gleiche »Message-ID«-Kopfzeile haben. Diese Nachrichten "
+"werden bis auf eine gelöscht."
 
 #: C/balsa.xml:888(title)
 msgid "Message Menu"
@@ -1037,12 +1068,18 @@ msgid "Toggle flag"
 msgstr "Markierung aktivieren/deaktivieren"
 
 #: C/balsa.xml:1056(para)
+#, fuzzy
 msgid ""
 "<menuchoice><shortcut><keysym>X</keysym></shortcut><guimenu>Message</"
 "guimenu><guisubmenu>Toggle flag</guisubmenu><guimenuitem>Flagged</"
 "guimenuitem></menuchoice> -- Toggle the flag on the currently selected message"
 "(s). This is shown as an exclamation mark next in the message index."
 msgstr ""
+"<menuchoice><shortcut><keysym>X</keysym></shortcut><guimenu>Nachricht</"
+"guimenu><guisubmenu>Markierung aktivieren/deaktivieren</"
+"guisubmenu><guimenuitem>Markiert</guimenuitem></menuchoice> -- Die Markierung "
+"der ausgewählten Nachricht(en) umschalten. Dies wird als ? neben dem "
+"Nachrichtenindex angezeigt."
 
 #: C/balsa.xml:1070(para)
 msgid ""
@@ -1054,6 +1091,13 @@ msgid ""
 "specified in the <link linkend=\"preferences\">Preferences</link>. The icon "
 "is a small trash can."
 msgstr ""
+"<menuchoice><shortcut><keycombo><keysym>Strg</keysym><keysym>D</keysym></"
+"keycombo></shortcut><guimenu>Nachricht</guimenu><guisubmenu>Markierung "
+"umschalten</guisubmenu><guimenuitem>Gelöscht</guimenuitem></menuchoice> -- "
+"Markiert die Nachricht als zum Löschen vorgesehen. Die Nachricht wird erst "
+"durch »Säubern« aus dem Nachrichtenspeicher entfernt. Dies geschieht entweder "
+"manuell oder wie in den <link linkend=\"preferences\">Einstellungen</link> "
+"definiert. Das Symbol ist ein kleiner Mülleimer."
 
 #: C/balsa.xml:1089(para)
 msgid ""
@@ -1063,6 +1107,12 @@ msgid ""
 "that has been read as new, and vice-versa. The message will display the "
 "standard icon and font for a new message."
 msgstr ""
+"<menuchoice><shortcut><keycombo><keysym>Strg</keysym><keysym>R</keysym></"
+"keycombo></shortcut><guimenu>Nachricht</guimenu><guisubmenu>Markierung "
+"umschalten</guisubmenu><guimenuitem>Neu</guimenuitem></menuchoice> -- "
+"Markiert eine bereits gelesene Nachricht als neu (und im umgekehrten Fall "
+"eine ungelesene Nachricht als gelesen). Die Nachricht wird in der Schriftart "
+"und mit dem Symbol einer ungelesenen Nachricht angezeigt."
 
 #: C/balsa.xml:1106(para)
 msgid ""
@@ -1070,6 +1120,9 @@ msgid ""
 "guisubmenu><guimenuitem>Answered</guimenuitem></menuchoice> -- Toggles the "
 "reply icon for a message."
 msgstr ""
+"<menuchoice><guimenu>Nachricht</guimenu><guisubmenu>Markierung umschalten</"
+"guisubmenu><guimenuitem>Beantwortet</guimenuitem></menuchoice> -- Schaltet "
+"das Beantwortet-Symbol einer Nachricht ein oder aus."
 
 #: C/balsa.xml:1121(para)
 msgid ""
@@ -1077,6 +1130,9 @@ msgid ""
 "guimenu><guimenuitem>Store Address...</guimenuitem></menuchoice> -- Add the "
 "sender of the currently selected message to your address book."
 msgstr ""
+"<menuchoice><shortcut><keysym>S</keysym></shortcut><guimenu>Nachricht</"
+"guimenu><guimenuitem>Adresse speichern</guimenuitem></menuchoice> -- Den "
+"Absender der aktuellen Nachricht zum Adressbuch hinzufügen."
 
 #: C/balsa.xml:1141(guimenu)
 msgid "Settings"
@@ -1106,6 +1162,10 @@ msgid ""
 "\">Identities</link> window to customize how you present yourself to the rest "
 "of the world."
 msgstr ""
+"<menuchoice><guimenu>Einstellungen</guimenu><guimenuitem>Identitäten</"
+"guimenuitem></menuchoice> -- Öffnet das <link linkend=\"identities"
+"\">Identitäten</link>-Fenster, in welchem Sie festlegen können, wie Sie sich "
+"selbst dem Rest der Welt darstellen wollen."
 
 #: C/balsa.xml:1178(title)
 msgid "The Mailbox List"
@@ -1120,6 +1180,12 @@ msgid ""
 "<application>pine</application> and <application>procmail</application> "
 "without causing problems."
 msgstr ""
+"Die Postfachliste im Hauptfenster listet alle Ihre Postfächer auf. "
+"<application>Balsa</application> erkennt alle Postfächer in Ihrem lokalen "
+"Mail-Ordner automatisch, beispielsweise in ~/mail. Dadurch wird ermöglicht, "
+"dass <application>Balsa</application> unabhängig und problemlos neben anderen "
+"Programmen wie <application>pine</application> und <application>procmail</"
+"application> nutzbar ist."
 
 #: C/balsa.xml:1188(para)
 msgid ""
@@ -1130,6 +1196,13 @@ msgid ""
 "level of the tree. <glossterm linkend=\"glossary-pop\"><acronym>POP3</"
 "acronym></glossterm> mailboxes are not displayed."
 msgstr ""
+"Ihre Postfächer werden in einer Baumansicht dargestellt. Die Postfächer in "
+"den Unterordnern Ihres lokalen Mail-Ordners werden dabei zunächst verborgen "
+"dargestellt. Durch Ausklappen des Baums werden sie sichtbar. <glossterm "
+"linkend=\"glossary-imap\"><acronym>IMAP</acronym></glossterm>-Postfächer "
+"werden in der obersten Ebene der Baumansicht dargestellt. <glossterm linkend="
+"\"glossary-pop\"><acronym>POP3</acronym></glossterm>-Postfächer werden nicht "
+"angezeigt. "
 
 #: C/balsa.xml:1199(title)
 msgid "The Message Index"
@@ -1141,6 +1214,10 @@ msgid ""
 "choose which messages to view. Click on the notebook tabs, if shown, or click "
 "on a folder in the mailbox list to bring it to the front."
 msgstr ""
+"Der Nachrichtenindex zeigt die Nachrichten im aktuellen Ordner an. Sie können "
+"wählen, welche Nachricht angezeigt werden soll. Klicken Sie wie dargestellt "
+"auf die einzelnen Reiter der Reitermappe oder klicken Sie auf einen Ordner in "
+"der Postfachliste, um ihn in den Vordergrund zu bringen."
 
 #: C/balsa.xml:1208(para)
 msgid ""
@@ -1211,11 +1288,6 @@ msgid ""
 msgstr ""
 
 #: C/balsa.xml:1284(para)
-#| msgid ""
-#| "Currently <application>Balsa</application> only supports viewing "
-#| "<acronym>HTML</acronym> messages when compiled with <application>gtkhtml</"
-#| "application> support. gtkhtml support is fairly stable nowadays and will "
-#| "be compiled in if gtkhtml-devel files is found."
 msgid ""
 "<application>Balsa</application> supports viewing <acronym>HTML</acronym> "
 "messages only when compiled with <application>gtkhtml</application> or "
@@ -1405,10 +1477,6 @@ msgstr ""
 "Zwischenablage aus."
 
 #: C/balsa.xml:1495(para)
-#| msgid ""
-#| "<menuchoice><shortcut><keycombo><keysym>Ctrl</keysym><keysym>C</keysym></"
-#| "keycombo></shortcut><guimenu>Edit</guimenu><guimenuitem>Copy</"
-#| "guimenuitem></menuchoice> -- Copy the selected text to the clipboard"
 msgid ""
 "<menuchoice><shortcut><keycombo><keysym>Ctrl</keysym><keysym>C</keysym></"
 "keycombo></shortcut><guimenu>Edit</guimenu><guimenuitem>Copy</guimenuitem></"
@@ -1452,10 +1520,6 @@ msgid ""
 msgstr ""
 
 #: C/balsa.xml:1551(para)
-#| msgid ""
-#| "<menuchoice><shortcut><keycombo><keysym>Ctrl</keysym><keysym>X</keysym></"
-#| "keycombo></shortcut><guimenu>Edit</guimenu><guimenuitem>Cut</guimenuitem></"
-#| "menuchoice> -- Cut the selected text to the clipboard."
 msgid ""
 "<menuchoice><shortcut><keycombo><keysym>Ctrl</keysym><keysym>R</keysym></"
 "keycombo></shortcut><guimenu>Edit</guimenu><guimenuitem>Reflow Paragraph</"
@@ -1526,9 +1590,6 @@ msgid ""
 msgstr ""
 
 #: C/balsa.xml:1644(para)
-#| msgid ""
-#| "<menuchoice><guimenu>Show</guimenu><guimenuitem>From</guimenuitem></"
-#| "menuchoice> -- Display the <literal>From</literal> header."
 msgid ""
 "<menuchoice><guimenu>Show</guimenu><guimenuitem>Fcc</guimenuitem></"
 "menuchoice> -- Display the <literal>Fcc</literal> header; this is the folder "
@@ -1715,11 +1776,15 @@ msgid ""
 msgstr ""
 
 #: C/balsa.xml:1747(para)
+#, fuzzy
 msgid ""
 "Using <quote>Format=Flowed</quote> is strongly recommended. It helps to avert "
 "the <quote>embarrassing line wrap</quote> that you see when quoted text is "
 "broken across lines and shown with the wrong level of quoting."
 msgstr ""
+"Die Verwendung von »Format=Flowed« wird ausdrücklich empfohlen. Dies hilft "
+"Ihnen, den »? Zeilenumbruch« zu vermeiden, der in zitiertem Text auftritt. "
+"Die Zitierebene wird dabei inkorrekt dargestellt."
 
 #: C/balsa.xml:1758(para)
 msgid ""
@@ -1845,12 +1910,6 @@ msgid "Check Spelling"
 msgstr "Rechtschreibung prüfen"
 
 #: C/balsa.xml:1924(para)
-#| msgid ""
-#| "Start a spell check on the current message. <application>Balsa</"
-#| "application> can currently use either the standard <application>ispell</"
-#| "application> or the newer <application>aspell</application> to do the "
-#| "spell checking. Settings for this can be found in the <link linkend="
-#| "\"preferences-spelling\">Preferences</link> dialog."
 msgid ""
 "Start a spell check on the current message. If <application>Balsa</"
 "application> is built with support for <application>GtkSpell</application>, "
@@ -2004,6 +2063,9 @@ msgid ""
 "information about the content of the message in the email, to allow for "
 "easier searching or filtering at a later date."
 msgstr ""
+"Wiederum eine seltener genutzte Kopfzeile. Sie kann zum Einbetten allgemeiner "
+"Informationen zum Inhalt der Nachricht verwendet werden, um später die Suche "
+"oder Filterung zu erleichtern."
 
 #: C/balsa.xml:2074(title)
 msgid "Specifying Addresses"
@@ -2052,6 +2114,9 @@ msgid ""
 "Below the headers may be a large box displaying a list of attachments; this "
 "view can be toggled in the <guimenu>Show</guimenu> menu."
 msgstr ""
+"Unterhalb der Kopfzeilen kann sich ein größerer Bereich befinden, in welchem "
+"die Anhänge angezeigt werden. Diese Ansicht können Sie im Menü "
+"<guimenu>Anzeige</guimenu> aus- und einschalten."
 
 #: C/balsa.xml:2123(para)
 msgid ""
@@ -2084,6 +2149,10 @@ msgid ""
 "displayed in the body text widget, with the prefix specified in the <link "
 "linkend=\"preferences-outgoing\">Preferences</link> dialog."
 msgstr ""
+"Falls es sich bei der Nachricht um eine Antwort oder Weiterleitung handelt, "
+"wird die Ursprungsnachricht im Nachrichtenrumpf angezeigt, mit dem im <link "
+"linkend=\"preferences-outgoing\">Einstellungsdialog</link> festgelegten "
+"Hinweistext."
 
 #: C/balsa.xml:2158(title)
 msgid "Spell Checker"
@@ -2208,6 +2277,10 @@ msgid ""
 "application> address book. It helps you to select recipients for your "
 "messages quickly and easily."
 msgstr ""
+"Wenn Sie beim Verfassen einer Nachricht auf eines der farbigen Buch-Symbole "
+"neben den Adressfeldern (An, Kopie an, Blindkopie an) klicken, wird das "
+"Adressbuch von <application>Balsa</application> geöffnet. Es hilft Ihnen bei "
+"der schnellen und einfachen Auswahl der Empfänger."
 
 #: C/balsa.xml:2283(title)
 msgid "Address Book Window"
@@ -2332,7 +2405,7 @@ msgstr "Entfernte Postfachserver"
 
 #: C/balsa.xml:2453(para)
 msgid "mailbox name that will identify the mailbox"
-msgstr ""
+msgstr "Postfachname, der das Postfach identifiziert"
 
 #: C/balsa.xml:2456(para)
 msgid "The server you have the POP mailbox on."
@@ -2529,6 +2602,9 @@ msgid ""
 "Checking IMAP mailboxes can take some time; these options give you extra "
 "control over how long the mailbox check will take."
 msgstr ""
+"Die Überprüfung von IMAP-Postfächern kann eine Zeit dauern. Mit diesen "
+"Optionen erhalten Sie weitere Möglichkeiten, die Dauer dieses Vorgangs zu "
+"beeinflussen."
 
 #: C/balsa.xml:2597(guilabel)
 msgid "Display message if new mail has arrived"
@@ -2551,6 +2627,9 @@ msgid ""
 "If selected, <application>Balsa</application> will give you no indication "
 "that a background mail check is in progress."
 msgstr ""
+"Falls ausgewählt, gibt <application>Balsa</application> keine "
+"Benachrichtigung darüber aus, dass im Hintergrund eine Überprüfung auf neue "
+"Nachrichten abläuft."
 
 #: C/balsa.xml:2616(guilabel)
 msgid "Wrap Incoming Text"
@@ -2606,6 +2685,10 @@ msgid ""
 "that you have received or seen the message. You can specify how "
 "<application>Balsa</application> responds to these requests."
 msgstr ""
+"Gelegentlich werden Sie Nachrichten empfangen, in denen der Absender um eine "
+"Bestätigung bittet, dass Sie die Nachricht empfangen oder gelesen haben. Sie "
+"können festlegen, wie <application>Balsa</application> auf solche Anfragen "
+"antworten soll."
 
 #: C/balsa.xml:2675(title)
 msgid "Outgoing"
@@ -2661,7 +2744,7 @@ msgstr ""
 
 #: C/balsa.xml:2727(guilabel)
 msgid "Forward a mail as attachment instead of quoting it"
-msgstr ""
+msgstr "Mail als Anlage weiterleiten anstatt sie zu zitieren"
 
 #: C/balsa.xml:2732(para)
 msgid ""
@@ -2679,7 +2762,7 @@ msgstr ""
 
 #: C/balsa.xml:2746(guilabel)
 msgid "Send button always queues outgoing mail in outbox"
-msgstr ""
+msgstr "Verschicken-Knopf stellt Mails immer in die Warteschlange"
 
 #: C/balsa.xml:2751(para)
 msgid ""
@@ -2962,7 +3045,7 @@ msgstr ""
 
 #: C/balsa.xml:3045(guilabel)
 msgid "Fallback codeset"
-msgstr ""
+msgstr "Rückfall-Zeichensatz"
 
 #: C/balsa.xml:3047(para)
 msgid ""
@@ -3153,7 +3236,6 @@ msgid ""
 msgstr ""
 
 #: C/balsa.xml:3231(title)
-#| msgid "<acronym>VCARD</acronym> Address Book Dialog (Step 2)"
 msgid "<acronym>VCARD</acronym> Address Book Dialog"
 msgstr "<acronym>VCARD</acronym>-Adressbuch-Dialog"
 
@@ -3265,6 +3347,9 @@ msgid ""
 "When marked, <application>Balsa</application> will remember and reopen "
 "mailboxes that were open when <application>Balsa</application> was last quit."
 msgstr ""
+"Wenn markiert, dann speichert <application>Balsa</application> die beim "
+"letzten Beenden geöffneten Postfächer und öffnet sie beim nächsten Start "
+"erneut."
 
 #: C/balsa.xml:3345(guilabel)
 msgid "Folder Scanning"
@@ -3735,9 +3820,6 @@ msgstr ""
 "Liste aller Benutzer erstellt wird."
 
 #: C/balsa.xml:3736(para)
-#| msgid ""
-#| "All characters are allowed, except from the tab(\\t), since that is the "
-#| "field seperator."
 msgid ""
 "All characters are allowed, except the tab (\\t), since that is the field "
 "separator."
@@ -3789,6 +3871,8 @@ msgstr ""
 msgid ""
 "Your script/program should write it's output to stdout and not to stderr!"
 msgstr ""
+"Ihr Skript oder Programm sollte seine Ausgaben nach stdout und nicht nach "
+"stderr ausgeben!"
 
 #: C/balsa.xml:3759(title)
 msgid "Writing your own save scripts"
@@ -4129,10 +4213,13 @@ msgid ""
 "These security options are available only if <application>Balsa</application> "
 "is built with <application>GnuPG</application> support."
 msgstr ""
+"Diese Sicherheitsoptionen sind nur verfügbar, wenn <application>Balsa</"
+"application> mit Unterstützung für <application>GnuPG</application> erstellt "
+"wurde."
 
 #: C/balsa.xml:4105(title)
 msgid "The Search Mailbox Window"
-msgstr ""
+msgstr "Das Postfach-durchsuchen-Fenster"
 
 #: C/balsa.xml:4106(para)
 msgid ""
@@ -4206,10 +4293,12 @@ msgid ""
 "The <guibutton>Remove</guibutton> button: removes the currently selected "
 "filter."
 msgstr ""
+"Der <guibutton>Entfernen</guibutton>-Knopf: entfernt den aktuell ausgewählten "
+"Filter."
 
 #: C/balsa.xml:4174(para)
 msgid "There are two buttons under the filters list: <placeholder-1/>"
-msgstr ""
+msgstr "Unter den Filterlisten befinden sich zwei Knöpfe: <placeholder-1/>"
 
 #: C/balsa.xml:4199(title)
 msgid "The match page"
@@ -4289,7 +4378,7 @@ msgstr ""
 
 #: C/balsa.xml:4274(title)
 msgid "The action page"
-msgstr ""
+msgstr "Die Aktionen-Seite"
 
 #: C/balsa.xml:4276(para)
 msgid ""
@@ -4535,6 +4624,9 @@ msgid ""
 "courier-mta.org/mbox-vs-maildir/\">http://www.courier-mta.org/mbox-vs-maildir/"
 "</ulink>"
 msgstr ""
+"Leistungsvergleich mbox gegen maildir <ulink type=\"http\" url=\"http://www."
+"courier-mta.org/mbox-vs-maildir/\">http://www.courier-mta.org/mbox-vs-maildir/"
+"</ulink>"
 
 #: C/balsa.xml:4541(para)
 msgid ""
@@ -4572,8 +4664,8 @@ msgstr ""
 
 #: C/balsa.xml:4529(para)
 msgid ""
-"The further information can be found in the following documents: <placeholder-"
-"1/>"
+"The further information can be found in the following documents: "
+"<placeholder-1/>"
 msgstr ""
 "Weitere Informationen finden Sie in den folgenden Dokumenten: <placeholder-1/>"
 
@@ -5004,6 +5096,9 @@ msgid ""
 "The library based on Mutt's code and used by previous versions of "
 "<application>Balsa</application> to handle local mail and IMAP servers."
 msgstr ""
+"Die auf dem Code von <application>Mutt</application> basierende Bibliothek, "
+"die von früheren <application>Balsa</application>-Versionen für den Umgang "
+"mit lokalen Mail-Servern sowie IMAP-Servern genutzt wurde."
 
 #: C/balsa.xml:4986(glossterm)
 msgid "mailbox list"
@@ -5014,6 +5109,8 @@ msgid ""
 "The list of mailboxes found in <application>Balsa</application>'s left hand "
 "pane."
 msgstr ""
+"Die Liste der gefundenen Postfächer in der linken Leiste von "
+"<application>Balsa</application>."
 
 #: C/balsa.xml:4992(glossterm)
 msgid "message index"
@@ -5024,6 +5121,8 @@ msgid ""
 "The list of messages in <application>Balsa</application>'s upper-right hand "
 "pane."
 msgstr ""
+"Die Liste der Nachrichten im rechten oberen Teilfenster von "
+"<application>Balsa</application>."
 
 #: C/balsa.xml:4998(glossterm)
 msgid "message view"
@@ -5033,7 +5132,9 @@ msgstr "Nachrichtenansicht"
 msgid ""
 "The message display in <application>Balsa</application>'s lower-right hand "
 "pane."
-msgstr "M"
+msgstr ""
+"Die Nachrichtenansicht im unteren rechten Teilfenster von <application>Balsa</"
+"application>."
 
 #: C/balsa.xml:5004(glossterm)
 msgid "MDA"
@@ -5120,4 +5221,4 @@ msgstr ""
 #. Put one translator per line, in the form of NAME <EMAIL>, YEAR1, YEAR2
 #: C/balsa.xml:0(None)
 msgid "translator-credits"
-msgstr "Mario Blättermann <mariobl@gnome.org>, 2008"
+msgstr "Mario Blättermann <mariobl@gnome.org>, 2008, 2010"

@@ -1139,7 +1139,7 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMailbox * mailbox, guint msgno)
 	balsa_information(LIBBALSA_INFORMATION_WARNING,
                           _("Could not access message %u "
                             "in mailbox \"%s\"."),
-			  (unsigned int) message->msgno, mailbox->name);
+			  msgno, mailbox->name);
         return FALSE;
     }
 

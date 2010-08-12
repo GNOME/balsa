@@ -1,3 +1,8 @@
+2010-08-12  Peter Bloomfield
+
+	* src/balsa-message.c (balsa_message_set): do not crash when
+	message == NULL.
+
 2010-08-05  Peter Bloomfield
 
 	* libbalsa/mailbox_imap.c

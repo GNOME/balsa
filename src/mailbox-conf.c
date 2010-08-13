@@ -1134,6 +1134,8 @@ create_local_mailbox_dialog(MailboxConfWindow *mcw)
     GtkFileChooserAction action;
     GtkWidget *entry = NULL;
     GtkSizeGroup *size_group;
+    const gchar *type;
+    gchar *title;
 
     table = libbalsa_create_table(3, 2);
 
@@ -1146,16 +1148,22 @@ create_local_mailbox_dialog(MailboxConfWindow *mcw)
                          mcw, row, NULL, label);
     } else mcw->mailbox_name = NULL;
 
+    type = g_type_name(mcw->mailbox_type) + 15;
+    title = g_strdup_printf(mcw->mailbox ?
+                            _("Local %s Mailbox Properties") :
+                            _("New Local %s Mailbox"), type);
+
     action = mcw->mailbox_type == LIBBALSA_TYPE_MAILBOX_MBOX ?
         GTK_FILE_CHOOSER_ACTION_SAVE :
         GTK_FILE_CHOOSER_ACTION_CREATE_FOLDER;
     dialog =
-        gtk_file_chooser_dialog_new(_("Local Mailbox Configurator"),
+        gtk_file_chooser_dialog_new(title,
                                     GTK_WINDOW(balsa_app.main_window),
                                     action,
                                     mcw->ok_button_name, MCW_RESPONSE,
                                     GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
                                     NULL);
+    g_free(title);
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu_for_parent(dialog, GTK_WINDOW(balsa_app.main_window));
 #endif

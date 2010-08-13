@@ -1,3 +1,8 @@
+2010-08-13  Peter Bloomfield
+
+	* src/mailbox-conf.c (create_local_mailbox_dialog): use window
+	title to show mailbox type; fixes bgo #625695 (Jack Ostroff).
+
 2010-08-12  Peter Bloomfield
 
 	* src/balsa-message.c (balsa_message_set): do not crash when

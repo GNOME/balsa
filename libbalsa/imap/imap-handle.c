@@ -446,10 +446,10 @@ idle_start(gpointer data)
 
   /* The test below can probably be weaker since it is ok for the
      channel to get disconnected before IDLE gets activated */
+  HANDLE_LOCK(h);
   IMAP_REQUIRED_STATE3(h, IMHS_CONNECTED, IMHS_AUTHENTICATED,
                        IMHS_SELECTED, FALSE);
 
-  HANDLE_LOCK(h);
   asyncno = imap_make_tag(tag); sio_write(h->sio, tag, strlen(tag));
   sio_write(h->sio, " IDLE\r\n", 7); sio_flush(h->sio);
   cmdi_add_handler(&h->cmd_info, asyncno, cmdi_empty, NULL);
@@ -1066,7 +1066,7 @@ imap_handle_process_tasks(ImapMboxHandle* handle)
 }
     
 ImapResponse
-imap_mbox_handle_fetch(ImapMboxHandle* handle, const gchar *seq, 
+imap_mbox_handle_fetch_unlocked(ImapMboxHandle* handle, const gchar *seq, 
                        const gchar* headers[])
 {
   char* cmd;
@@ -1074,7 +1074,7 @@ imap_mbox_handle_fetch(ImapMboxHandle* handle, const gchar *seq,
   GString* hdr;
   ImapResponse rc;
   
-  IMAP_REQUIRED_STATE1(handle, IMHS_SELECTED, IMR_BAD);
+  IMAP_REQUIRED_STATE1_U(handle, IMHS_SELECTED, IMR_BAD);
   hdr = g_string_new(headers[0]);
   for(i=1; headers[i]; i++) {
     if (hdr->str[hdr->len - 1] != '(' && headers[i][0] != ')')
@@ -1094,7 +1094,7 @@ imap_mbox_handle_fetch_env(ImapMboxHandle* handle, const gchar *seq)
   char* cmd;
   ImapResponse rc;
   
-  IMAP_REQUIRED_STATE1(handle, IMHS_SELECTED, IMR_BAD);
+  IMAP_REQUIRED_STATE1_U(handle, IMHS_SELECTED, IMR_BAD);
   cmd = g_strdup_printf("FETCH %s (ENVELOPE FLAGS UID)", seq);
   rc = imap_cmd_exec(handle, cmd);
   g_free(cmd);
@@ -2443,7 +2443,7 @@ imap_get_sequence(ImapMboxHandle *h, ImapUidRangeCb seq_cb, void *seq_arg)
 
     } /* End of if(search_cb) */
 
-  }  while (isdigit(c)|| offset);
+  }  while (isdigit(c)|| c == ':' || c == ',' || offset);
 
   if(c != EOF)
     sio_ungetc(h->sio);

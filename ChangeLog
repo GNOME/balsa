@@ -1,3 +1,10 @@
+2010-08-13  Pawel Salek
+
+	* libbalsa/imap/imap-commands.c: check state after locking the handle.
+	* libbalsa/imap/imap-handle.c: ditto.
+	* libbalsa/imap/imap-handle.h: modify state checking macros accordingly.
+	* libbalsa/imap/siobuf.c: set sio->ssl to null after SSL_free().
+
 2010-08-13  Peter Bloomfield
 
 	* src/mailbox-conf.c (create_local_mailbox_dialog): use window

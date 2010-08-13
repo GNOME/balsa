@@ -165,14 +165,23 @@ struct _ImapMboxHandle {
 #define IMAP_MBOX_IS_AUTHENTICATED(h) ((h)->state == IMHS_AUTHENTICATED)
 #define IMAP_MBOX_IS_SELECTED(h)      ((h)->state == IMHS_SELECTED)
 
-#define IMAP_REQUIRED_STATE1(h, state1, ret) \
-        do{if(!(h) || h->state != (state1)) return (ret);}while(0);
-#define IMAP_REQUIRED_STATE2(h, state1, state2, ret) \
-        do{if(!(h) || !(h->state == (state1) || h->state == (state2)))\
-        return (ret);}while(0);
-#define IMAP_REQUIRED_STATE3(h, state1, state2, state3, ret) \
-        do{if(!(h) || !(h->state == (state1) || h->state == (state2)|| \
-              h->state == (state3))) return (ret);}while(0);
+#define IMAP_REQUIRED_STATE1(h, state1, ret)            \
+    do{if(!(h) || h->state != (state1))                 \
+            { HANDLE_UNLOCK(h);return (ret);}}while(0);
+#define IMAP_REQUIRED_STATE1_U(h, state1, ret)                  \
+    do{if(!(h) || h->state != (state1)) return (ret);}while(0);
+
+#define IMAP_REQUIRED_STATE2(h, state1, state2, ret)                    \
+    do{if(!(h) || !(h->state == (state1) || h->state == (state2)))      \
+            {HANDLE_UNLOCK(h); return (ret);}}while(0);
+#define IMAP_REQUIRED_STATE3(h, state1, state2, state3, ret)           \
+    do{if(!(h) || !(h->state == (state1) || h->state == (state2)||     \
+                    h->state == (state3)))                             \
+            {HANDLE_UNLOCK(h);return (ret);}}while(0);
+#define IMAP_REQUIRED_STATE3_U(h, state1, state2, state3, ret)           \
+    do{if(!(h) || !(h->state == (state1) || h->state == (state2)||     \
+                    h->state == (state3)))                             \
+            {return (ret);}}while(0);
 
 
 #define IS_ATOM_CHAR(c) (strchr("(){ %*\"\\]",(c))==NULL&&(c)>0x1f&&(c)!=0x7f)

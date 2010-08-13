@@ -153,6 +153,7 @@ sio_detach (struct siobuf *sio)
         if (sio_sslpoll (sio, ret) <= 0)
 	  break;
       SSL_free (sio->ssl);
+      sio->ssl = NULL;
     }
 #endif
   free (sio->read_buffer);

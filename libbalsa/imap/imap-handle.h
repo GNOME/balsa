@@ -154,8 +154,9 @@ void imap_mbox_handle_connect_notify(ImapMboxHandle* handle,
 
 void imap_mbox_handle_destroy(ImapMboxHandle* handle);
 
-ImapResponse imap_mbox_handle_fetch(ImapMboxHandle* handle, const gchar *seq, 
-                                    const gchar* headers[]);
+ImapResponse imap_mbox_handle_fetch_unlocked(ImapMboxHandle* handle,
+                                             const gchar *seq, 
+                                             const gchar* headers[]);
 ImapResponse imap_mbox_handle_fetch_env(ImapMboxHandle* handle,
                                         const gchar *seq);
 

@@ -1,3 +1,9 @@
+* Balsa-2.4.8 release. Release date 2010-08-21
+
+- QUOTA and MYRIGHTS IMAP extension support.
+- bug fixes: #625695, #620221, #623910, #623740, #618979, #579479, #613998
+- various memory leaks plugged.
+
 * Balsa-2.4.7 release. Release date 2010-02-13
 
 - infinite loop (debian #568298).

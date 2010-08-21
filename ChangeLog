@@ -1,3 +1,7 @@
+2010-08-21  Pawel Salek
+
+	* configure.in, NEWS: release 2.4.8
+
 2010-08-13  Pawel Salek
 
 	* libbalsa/imap/imap-commands.c: check state after locking the handle.

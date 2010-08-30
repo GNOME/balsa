@@ -963,7 +963,6 @@ mailbox_conf_update(MailboxConfWindow *mcw)
             g_free(mailbox->name);
 	    mailbox->name = name;
 	    balsa_mblist_mailbox_node_redraw(mbnode);
-	    balsa_window_update_tab(mbnode);
 	} else
 	    g_free(name);
 

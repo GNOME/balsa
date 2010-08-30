@@ -1,3 +1,15 @@
+2010-08-30  Peter Bloomfield
+
+	* src/balsa-mblist.c (balsa_mblist_mailbox_node_redraw): update
+	notebook tab when redrawing.
+	* src/mailbox-conf.c (mailbox_conf_update): ...so we do not need
+	to here.
+	* src/save-restore.c (sr_special_notify,
+	config_mailbox_set_as_special): use weak refs consistently; set
+	names of new special mailboxes to the standard names, and names
+	of previously special mailboxes to what they will be in the
+	next session.
+
 2010-08-21  Pawel Salek
 
 	* configure.in, NEWS: release 2.4.8

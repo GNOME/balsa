@@ -168,13 +168,25 @@ load_toolbars(void)
 #endif /* ENABLE_TOUCH_UI */
 #define TRASH_NAME "Trash"
 
+static void
+sr_special_notify(gpointer data, GObject * mailbox)
+{
+    LibBalsaMailbox **special = data;
+
+    if (special == &balsa_app.trash && !balsa_app.mblist_tree_store
+        && balsa_app.empty_trash_on_exit)
+        empty_trash(balsa_app.main_window);
+
+    *special = NULL;
+}
+
 static gchar *specialNames[] = {
     INBOX_NAME, SENTBOX_NAME, TRASH_NAME, DRAFTS_NAME, OUTBOX_NAME
 };
 void
 config_mailbox_set_as_special(LibBalsaMailbox * mailbox, specialType which)
 {
-    LibBalsaMailbox **special;
+    LibBalsaMailbox **special, *old_mailbox;
     BalsaMailboxNode *mbnode;
 
     g_return_if_fail(mailbox != NULL);
@@ -195,26 +207,35 @@ config_mailbox_set_as_special(LibBalsaMailbox * mailbox, specialType which)
     default:
 	return;
     }
-    if (*special) {
-	g_free((*special)->config_prefix); 
-	(*special)->config_prefix = NULL;
-        if (!LIBBALSA_IS_MAILBOX_LOCAL(*special)
-            || !libbalsa_path_is_below_dir(libbalsa_mailbox_local_get_path
-                                           (*special),
-                                           balsa_app.local_mail_directory))
-            config_mailbox_add(*special, NULL);
-	g_object_remove_weak_pointer(G_OBJECT(*special), (gpointer) special);
+    if ((old_mailbox = *special)) {
+        *special = NULL;
+        g_free(old_mailbox->config_prefix);
+        old_mailbox->config_prefix = NULL;
 
-	mbnode = balsa_find_mailbox(*special);
-	*special = NULL;
+        g_free(old_mailbox->name);
+        old_mailbox->name = g_path_get_basename(old_mailbox->url);
+
+        if (!LIBBALSA_IS_MAILBOX_LOCAL(old_mailbox)
+            || !libbalsa_path_is_below_dir(libbalsa_mailbox_local_get_path
+                                           (old_mailbox),
+                                           balsa_app.local_mail_directory))
+            config_mailbox_add(old_mailbox, NULL);
+
+        g_object_weak_unref(G_OBJECT(old_mailbox),
+                            (GWeakNotify) sr_special_notify, special);
+
+        mbnode = balsa_find_mailbox(old_mailbox);
 	balsa_mblist_mailbox_node_redraw(mbnode);
 	g_object_unref(mbnode);
     }
     config_mailbox_delete(mailbox);
+    g_free(mailbox->name);
+    mailbox->name = g_strdup(specialNames[which]);
     config_mailbox_add(mailbox, specialNames[which]);
 
     *special = mailbox;
-    g_object_add_weak_pointer(G_OBJECT(*special), (gpointer) special);
+    g_object_weak_ref(G_OBJECT(mailbox), (GWeakNotify) sr_special_notify,
+                      special);
 
     mbnode = balsa_find_mailbox(mailbox);
     balsa_mblist_mailbox_node_redraw(mbnode);
@@ -392,18 +413,6 @@ pop3_progress_notify(LibBalsaMailbox* mailbox, int msg_type, int prog, int tot,
 
 /* Initialize the specified mailbox, creating the internal data
    structures which represent the mailbox. */
-static void
-sr_special_notify(gpointer data, GObject * mailbox)
-{
-    LibBalsaMailbox **special = data;
-
-    if (special == &balsa_app.trash && !balsa_app.mblist_tree_store
-        && balsa_app.empty_trash_on_exit)
-        empty_trash(balsa_app.main_window);
-
-    *special = NULL;
-}
-
 static gint
 config_mailbox_init(const gchar * prefix)
 {

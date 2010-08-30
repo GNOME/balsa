@@ -2279,4 +2279,5 @@ balsa_mblist_mailbox_node_redraw(BalsaMailboxNode * mbnode)
     GtkTreeIter iter;
     if (balsa_find_iter_by_data(&iter, mbnode))
 	bmbl_store_redraw_mbnode(&iter, mbnode);
+    balsa_window_update_tab(mbnode);
 }

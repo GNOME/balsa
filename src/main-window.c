@@ -3735,7 +3735,6 @@ balsa_window_next_unread(BalsaWindow * window)
 
     balsa_mblist_open_mailbox(mailbox);
     index = balsa_find_index_by_mailbox(mailbox);
-    g_print("%s next unread is in \"%s\", index is %s\n", __func__, mailbox->name, index ? "nonNULL" : "NULL");
     if (index)
         balsa_index_select_next_unread(index);
     else

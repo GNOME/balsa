@@ -1,3 +1,7 @@
+2010-08-31  Peter Bloomfield
+
+	* src/main-window.c: remove unintended debug spew.
+
 2010-08-30  Peter Bloomfield
 
 	* src/balsa-mblist.c (balsa_mblist_mailbox_node_redraw): update

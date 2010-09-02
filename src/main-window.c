@@ -3075,8 +3075,10 @@ bw_check_messages_thread(struct check_messages_thread_info *info)
     pthread_mutex_lock(&mailbox_lock);
     checking_mail = 0;
     if (info->window) {
+        gdk_threads_enter();
         bw_set_sensitive(info->window, "GetNewMail", TRUE);
         g_object_unref(info->window);
+        gdk_threads_leave();
     }
     pthread_mutex_unlock(&mailbox_lock);
     

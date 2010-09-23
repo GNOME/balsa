@@ -7,12 +7,12 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: balsa HEAD\n"
+"Project-Id-Version: balsa master\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=balsa&component=general\n"
-"POT-Creation-Date: 2010-09-15 17:36+0000\n"
-"PO-Revision-Date: 2003-06-05 22:55+0900\n"
-"Last-Translator: Yukihiro Nakai <nakai@gnome.gr.jp>\n"
+"POT-Creation-Date: 2010-09-20 13:49+0000\n"
+"PO-Revision-Date: 2010-09-24 01:20+0900\n"
+"Last-Translator: Takayuki KUSANO <AE5T-KSN@asahi-net.or.jp>\n"
 "Language-Team: Japanese <gnome-translation@gnome.gr.jp>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -43,17 +43,15 @@ msgstr "名前なし"
 
 #: ../libbalsa/address-book-ldap.c:284
 msgid "SASL Interaction\n"
-msgstr ""
+msgstr "SASL のインタラクション\n"
 
 #: ../libbalsa/address-book-ldap.c:331
-#, fuzzy
 msgid "TLS requested but not compiled in"
-msgstr "TLS が必要ですが、Balsa が TLS サポートでビルドされていません。"
+msgstr "TLS が要求されましたが、コンパイルされて組み込まれてません\""
 
 #: ../libbalsa/address-book-ldap.c:611
-#, fuzzy
 msgid "Undefined location of user address book"
-msgstr "アドレス帳を読み込むプログラムの選択"
+msgstr "ユーザのアドレス帳の場所が未定義"
 
 #: ../libbalsa/address-book.c:316 ../libbalsa/filter-error.c:47
 msgid "No error"
@@ -68,7 +66,6 @@ msgid "Cannot write to address book"
 msgstr "アドレス帳に書き込めません"
 
 #: ../libbalsa/address-book.c:319
-#, fuzzy
 msgid "Cannot connect to the server"
 msgstr "サーバに接続できません"
 
@@ -81,9 +78,8 @@ msgid "Cannot add duplicate entry"
 msgstr "重複するエントリを追加することはできません"
 
 #: ../libbalsa/address-book.c:324
-#, fuzzy
 msgid "Cannot find address in address book"
-msgstr "アドレス帳から検索できません"
+msgstr "アドレス帳からアドレスを検索できません"
 
 #: ../libbalsa/address-book.c:325 ../src/main-window.c:2334
 #: ../src/main-window.c:4780 ../src/sendmsg-window.c:4147
@@ -113,9 +109,8 @@ msgid "Reply To:"
 msgstr "返信先:"
 
 #: ../libbalsa/address.c:949
-#, fuzzy
 msgid "D_isplayed Name:"
-msgstr "名前の表示(_D):"
+msgstr "表示名(_I):"
 
 #: ../libbalsa/address.c:950
 msgid "_First Name:"
@@ -154,9 +149,9 @@ msgid "Failed to create output stream"
 msgstr ""
 
 #: ../libbalsa/body.c:543
-#, fuzzy, c-format
+#, c-format
 msgid "Could not read embedded message"
-msgstr "メッセージを書き込めません"
+msgstr "埋め込みのメッセージを読めませんでした"
 
 #: ../libbalsa/filter-error.c:48
 msgid "Syntax error in the filter configuration file"
@@ -194,19 +189,19 @@ msgid "Bad mailbox name for filter: %s"
 msgstr "フィルタのメールボックス名が正しくありません: %s"
 
 #: ../libbalsa/filter.c:288
-#, fuzzy, c-format
+#, c-format
 msgid "Error when copying messages: %s"
-msgstr "メッセージのコピー中にエラーが発生しました"
+msgstr "メッセージのコピー中にエラー: %s"
 
 #: ../libbalsa/filter.c:298
-#, fuzzy, c-format
+#, c-format
 msgid "Error when trashing messages: %s"
-msgstr "メッセージをゴミ箱に移動中にエラーが発生しました"
+msgstr "メッセージのゴミ箱への移動中にエラー: %s"
 
 #: ../libbalsa/filter.c:311
-#, fuzzy, c-format
+#, c-format
 msgid "Error when moving messages: %s"
-msgstr "メッセージの移動中にエラーが発生しました"
+msgstr "メッセージの移動中にエラー: %s"
 
 #: ../libbalsa/gmime-application-pkcs7.c:237
 #: ../libbalsa/gmime-application-pkcs7.c:380
@@ -239,68 +234,60 @@ msgstr ""
 #: ../libbalsa/gmime-gpgme-context.c:424 ../libbalsa/gmime-gpgme-context.c:497
 #: ../libbalsa/gmime-gpgme-context.c:505 ../libbalsa/gmime-gpgme-context.c:614
 #: ../libbalsa/gmime-gpgme-context.c:694
-#, fuzzy
 msgid "could not get data from stream"
-msgstr "gpgme はファイルからデータを取得できませんでした: %s"
+msgstr "ストリームからデータを取得できませんでした"
 
 #: ../libbalsa/gmime-gpgme-context.c:429 ../libbalsa/gmime-gpgme-context.c:620
 #: ../libbalsa/gmime-gpgme-context.c:699
-#, fuzzy
 msgid "could not create new data object"
-msgstr "gpgme は新しいデータ・オブジェクトを生成できませんでした: %s"
+msgstr "新しいデータオブジェクトを作成できませんでした"
 
 #: ../libbalsa/gmime-gpgme-context.c:436
-#, fuzzy
 msgid "signing failed"
-msgstr "ログインに失敗しました。"
+msgstr "署名に失敗しました"
 
 #: ../libbalsa/gmime-gpgme-context.c:516 ../libbalsa/rfc3156.c:638
 #: ../libbalsa/rfc3156.c:643 ../libbalsa/rfc3156.c:958
 #: ../libbalsa/rfc3156.c:964
-#, fuzzy
 msgid "signature verification failed"
-msgstr "gpgme 署名の検証に失敗: %s"
+msgstr "署名の検証に失敗しました"
 
 #: ../libbalsa/gmime-gpgme-context.c:580
-#, fuzzy, c-format
+#, c-format
 msgid "combined signing and encryption is defined only for RFC 2440"
-msgstr "gpgme 署名と暗号化に失敗: %s"
+msgstr "署名と暗号化は RFC 2440 のためだけに定義されています"
 
 #: ../libbalsa/gmime-gpgme-context.c:643
-#, fuzzy
 msgid "signing and encryption failed"
-msgstr "gpgme 署名と暗号化に失敗: %s"
+msgstr "署名と暗号化に失敗しました"
 
 #: ../libbalsa/gmime-gpgme-context.c:645
-#, fuzzy
 msgid "encryption failed"
-msgstr "gpgme 暗号化に失敗: %s"
+msgstr "暗号化に失敗しました"
 
 #: ../libbalsa/gmime-gpgme-context.c:708 ../libbalsa/rfc3156.c:777
 #: ../libbalsa/rfc3156.c:782
-#, fuzzy
 msgid "decryption failed"
-msgstr "gpgme 解読に失敗: %s"
+msgstr "復号化に失敗しました"
 
 #: ../libbalsa/gmime-gpgme-context.c:765
-#, fuzzy
 msgid "could not create context"
-msgstr "gpgme コンテキストを生成できませんでした: %s"
+msgstr "コンテキストを生成できませんでした"
 
 #: ../libbalsa/gmime-gpgme-context.c:824
 #, c-format
 msgid "the crypto engine for protocol OpenPGP is not available"
-msgstr ""
+msgstr "OpenPGP プロトコルのための暗号エンジンが利用できません"
 
 #: ../libbalsa/gmime-gpgme-context.c:834
 #, c-format
 msgid "the crypto engine for protocol CMS is not available"
-msgstr ""
+msgstr "CMS プロトコルのための暗号エンジンが利用できません"
 
 #: ../libbalsa/gmime-gpgme-context.c:841
 #, c-format
 msgid "invalid crypto engine %d"
-msgstr ""
+msgstr "無効な暗号エンジン %d"
 
 #: ../libbalsa/gmime-gpgme-context.c:872 ../libbalsa/gmime-gpgme-context.c:899
 #, fuzzy, c-format
@@ -1229,7 +1216,7 @@ msgstr "%s を開けませんでした"
 #: ../libbalsa/misc.c:815
 #, c-format
 msgid "Cannot open %s: is a symbolic link"
-msgstr ""
+msgstr "%s を開けません: シンボリックリンクです"
 
 #: ../libbalsa/misc.c:942
 msgid "Timeout exceeded while attempting fcntl lock!"
@@ -5142,6 +5129,11 @@ msgstr "メールボックスをロックできません!"
 #: ../src/main-window.c:2706
 msgid "translator-credits"
 msgstr ""
+"Yukihiro Nakai <nakai@gnome.gr.jp>\n"
+"Takeshi Aihana <aihana@gnome.gr.jp>\n"
+"KAMAGASAKO Masatoshi <emerald@gnome.gr.jp>\n"
+"草野 貴之 <AE5T-KSN@asahi-net.or.jp>\n"
+"日本GNOMEユーザ会 <http://www.gnome.gr.jp/>"
 
 #: ../src/main-window.c:2718
 msgid "The Balsa email client is part of the GNOME desktop environment."
@@ -5152,14 +5144,14 @@ msgid "Checking Mail..."
 msgstr "着信メールの確認中..."
 
 #: ../src/main-window.c:3041
-#, fuzzy, c-format
+#, c-format
 msgid "IMAP mailbox: %s"
-msgstr "ローカル MH メールボックス..."
+msgstr "IMAP メールボックス: %s"
 
 #: ../src/main-window.c:3045
-#, fuzzy, c-format
+#, c-format
 msgid "Local mailbox: %s"
-msgstr "ローカル MH メールボックス..."
+msgstr "ローカル・メールボックス: %s"
 
 #: ../src/main-window.c:3200
 msgid "Finished Checking."
@@ -5177,24 +5169,22 @@ msgid_plural "You have received %d new messages."
 msgstr[0] "新着メールが %d通あります。"
 
 #: ../src/main-window.c:3333
-#, fuzzy
 msgid "You have new mail."
-msgstr "新着メールが 1通あります。"
+msgstr "新着メールがあります。"
 
 #: ../src/main-window.c:3374
-#, fuzzy, c-format
+#, c-format
 msgid "Balsa: you have received %d new message."
 msgid_plural "Balsa: you have received %d new messages."
-msgstr[0] "新着メールが %d通あります。"
+msgstr[0] "Balsa: 新着メールが %d通あります。"
 
 #: ../src/main-window.c:3378
-#, fuzzy
 msgid "Balsa: you have new mail."
-msgstr "新着メールが 1通あります。"
+msgstr "新着メールがあります。"
 
 #: ../src/main-window.c:3433
 msgid "Balsa: New mail"
-msgstr "Balsa: 新しいメール"
+msgstr "Balsa: 新着メール"
 
 #: ../src/main-window.c:3722
 #, fuzzy, c-format

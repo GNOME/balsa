@@ -1861,7 +1861,12 @@ balsa_window_new()
 
 #ifdef BALSA_USE_THREADS
     /* set initial state of Get-New-Mail button */
-    bw_set_sensitive(window, "GetNewMail", !checking_mail);
+    if (pthread_mutex_trylock(&checking_mail_lock))
+        bw_set_sensitive(window, "GetNewMail", FALSE);
+    else {
+        bw_set_sensitive(window, "GetNewMail", TRUE);
+        pthread_mutex_unlock(&checking_mail_lock);
+    }
 #endif
 
     gtk_widget_show(GTK_WIDGET(window));
@@ -2866,22 +2871,17 @@ check_new_messages_real(BalsaWindow * window, int type)
 #ifdef BALSA_USE_THREADS
     struct check_messages_thread_info *info;
     /*  Only Run once -- If already checking mail, return.  */
-    pthread_mutex_lock(&mailbox_lock);
-    if (checking_mail) {
-        pthread_mutex_unlock(&mailbox_lock);
+    if (pthread_mutex_trylock(&checking_mail_lock)) {
         fprintf(stderr, "Already Checking Mail!\n");
 	if (progress_dialog)
 	    gtk_window_present(GTK_WINDOW(progress_dialog));
         return;
     }
-    checking_mail = 1;
     if (window)
         bw_set_sensitive(window, "GetNewMail", FALSE);
 
     quiet_check = (type == TYPE_CALLBACK) 
         ? 0 : balsa_app.quiet_background_check;
-
-    pthread_mutex_unlock(&mailbox_lock);
 
     if (type == TYPE_CALLBACK && 
         (balsa_app.pwindow_option == WHILERETR ||
@@ -3055,7 +3055,6 @@ bw_check_messages_thread(struct check_messages_thread_info *info)
     /*  
      *  It is assumed that this will always be called as a pthread,
      *  and that the calling procedure will check for an existing lock
-     *  and set checking_mail to true before calling.
      */
     MailThreadMessage *threadmessage;
     GSList *list = info->list;
@@ -3072,15 +3071,14 @@ bw_check_messages_thread(struct check_messages_thread_info *info)
     MSGMAILTHREAD(threadmessage, LIBBALSA_NTFY_FINISHED, NULL, "Finished",
                   0, 0);
     
-    pthread_mutex_lock(&mailbox_lock);
-    checking_mail = 0;
+    pthread_mutex_unlock(&checking_mail_lock);
+
     if (info->window) {
         gdk_threads_enter();
         bw_set_sensitive(info->window, "GetNewMail", TRUE);
         g_object_unref(info->window);
         gdk_threads_leave();
     }
-    pthread_mutex_unlock(&mailbox_lock);
     
     g_free(info);
     pthread_exit(0);

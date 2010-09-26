@@ -52,7 +52,6 @@ struct LibBalsaMailboxIndexEntry_ {
 
 #ifdef BALSA_USE_THREADS
 #include <pthread.h>
-extern pthread_mutex_t mailbox_lock;
 void libbalsa_lock_mailbox(LibBalsaMailbox * mailbox);
 void libbalsa_unlock_mailbox(LibBalsaMailbox * mailbox);
 #else

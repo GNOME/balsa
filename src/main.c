@@ -88,7 +88,6 @@
 pthread_t get_mail_thread;
 pthread_t send_mail;
 pthread_mutex_t send_messages_lock;
-int checking_mail;
 int mail_thread_pipes[2];
 int send_thread_pipes[2];
 GIOChannel *mail_thread_msg_send;
@@ -641,24 +640,17 @@ mailboxes_init(gboolean check_only)
 
 #ifdef BALSA_USE_THREADS
 
+pthread_mutex_t checking_mail_lock = PTHREAD_MUTEX_INITIALIZER;
+
 static void
 threads_init(void)
 {
-    int status;
-    pthread_mutexattr_t attr;
     g_thread_init(NULL);
     
-    if( (status=pthread_mutexattr_init(&attr)) )
-        g_warning("pthread_mutexattr_init failed with %d\n", status);
-    pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
-    pthread_mutex_init(&mailbox_lock, &attr);
-
     libbalsa_threads_init();
     gdk_threads_init();
 
-    pthread_mutexattr_destroy(&attr);
     pthread_mutex_init(&send_messages_lock, NULL);
-    checking_mail = 0;
     if (pipe(mail_thread_pipes) < 0) {
 	g_log("BALSA Init", G_LOG_LEVEL_DEBUG,
 	      "Error opening pipes.\n");
@@ -685,7 +677,7 @@ threads_init(void)
 static void
 threads_destroy(void)
 {
-    pthread_mutex_destroy(&mailbox_lock);
+    pthread_mutex_destroy(&checking_mail_lock);
     pthread_mutex_destroy(&send_messages_lock);
     libbalsa_threads_destroy();
 }
@@ -1194,8 +1186,7 @@ balsa_cleanup(void)
        There are actually many things to do, e.g. threads should not
        be started after this point.
     */
-    pthread_mutex_lock(&mailbox_lock);
-    if(checking_mail) {
+    if (pthread_mutex_trylock(&checking_mail_lock)) {
         /* We want to quit but there is a checking thread active.
            The alternatives are to:
            a. wait for the checking thread to finish - but it could be
@@ -1205,8 +1196,8 @@ balsa_cleanup(void)
         pthread_cancel(get_mail_thread);
         printf("Mail check thread cancelled. I know it is rough.\n");
         sleep(1);
-    }
-    pthread_mutex_unlock(&mailbox_lock);
+    } else
+        pthread_mutex_unlock(&checking_mail_lock);
 #endif
     balsa_app_destroy();
     g_hash_table_destroy(libbalsa_mailbox_view_table);

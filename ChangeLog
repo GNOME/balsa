@@ -1,3 +1,14 @@
+2010-09-26  Peter Bloomfield
+
+	Use separate mutexes for mailbox locking and checking mail
+
+	* libbalsa/libbalsa.c (libbalsa_lock_mailbox),
+	(libbalsa_unlock_mailbox): make the mutex static.
+	* libbalsa/libbalsa_private.h: ditto.
+	* src/main-window.c: use checking_mail_lock.
+	* src/main.c (threads_init), (threads_destroy), (balsa_cleanup):
+	* src/threads.h: ditto.
+
 2010-09-01  Peter Bloomfield
 
 	* src/main-window.c: hold gdk lock while updating UI.

@@ -909,7 +909,6 @@ imap_expunge_cb(ImapMboxHandle *handle, unsigned seqno,
 {
     ImapMessage *imsg;
     guint i;
-    gchar *msgid;
 
     LibBalsaMailbox *mailbox = LIBBALSA_MAILBOX(mimap);
     struct message_info *msg_info;
@@ -938,9 +937,14 @@ imap_expunge_cb(ImapMboxHandle *handle, unsigned seqno,
             g_object_unref(msg_info->message);
         g_array_remove_index(mimap->messages_info, seqno-1);
     }
-    msgid = g_ptr_array_index(mimap->msgids, seqno-1);
-    if(msgid) g_free(msgid);
-    g_ptr_array_remove_index(mimap->msgids, seqno-1);
+
+    if (seqno <= mimap->msgids->len) {
+        gchar *msgid;
+
+        msgid = g_ptr_array_index(mimap->msgids, seqno - 1);
+        g_free(msgid);
+        g_ptr_array_remove_index(mimap->msgids, seqno - 1);
+    }
 
     for (i = seqno - 1; i < mimap->messages_info->len; i++) {
 	struct message_info *msg_info =

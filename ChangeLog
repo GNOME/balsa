@@ -1,3 +1,8 @@
+2010-10-14  Peter Bloomfield
+
+	* libbalsa/mailbox_imap.c (imap_expunge_cb): do not remove
+	invalid array element.
+
 2010-09-26  Peter Bloomfield
 
 	Use separate mutexes for mailbox locking and checking mail

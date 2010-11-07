@@ -80,8 +80,7 @@ libbalsa_address_book_text_load_config(LibBalsaAddressBook * ab,
                                        const gchar * prefix);
 static GList *
 libbalsa_address_book_text_alias_complete(LibBalsaAddressBook * ab,
-                                          const gchar * prefix,
-                                          gchar ** new_prefix);
+                                          const gchar * prefix);
 
 /* GObject class stuff */
 
@@ -150,8 +149,9 @@ libbalsa_address_book_text_init(LibBalsaAddressBookText * ab_text)
     ab_text->mtime = 0;
 
     ab_text->name_complete =
-        g_completion_new((GCompletionFunc) completion_data_extract);
-    g_completion_set_compare(ab_text->name_complete, strncmp_word);
+        libbalsa_completion_new((LibBalsaCompletionFunc)
+                                completion_data_extract);
+    libbalsa_completion_set_compare(ab_text->name_complete, strncmp_word);
 }
 
 typedef struct {
@@ -192,7 +192,7 @@ libbalsa_address_book_text_finalize(GObject * object)
 
     g_list_foreach(ab_text->name_complete->items,
                    (GFunc) completion_data_free, NULL);
-    g_completion_free(ab_text->name_complete);
+    libbalsa_completion_free(ab_text->name_complete);
 
     G_OBJECT_CLASS(parent_class)->finalize(object);
 }
@@ -312,7 +312,7 @@ lbab_text_load_file(LibBalsaAddressBookText * ab_text, FILE * stream)
 
     g_list_foreach(ab_text->name_complete->items,
                    (GFunc) completion_data_free, NULL);
-    g_completion_clear_items(ab_text->name_complete);
+    libbalsa_completion_clear_items(ab_text->name_complete);
 
     parse_address =
         LIBBALSA_ADDRESS_BOOK_TEXT_GET_CLASS(ab_text)->parse_address;
@@ -409,7 +409,7 @@ lbab_text_load_file(LibBalsaAddressBookText * ab_text, FILE * stream)
 #endif                          /* MAKE_GROUP_BY_ORGANIZATION */
 
     completion_list = g_list_reverse(completion_list);
-    g_completion_add_items(ab_text->name_complete, completion_list);
+    libbalsa_completion_add_items(ab_text->name_complete, completion_list);
     g_list_free(completion_list);
 
     return TRUE;
@@ -702,8 +702,7 @@ libbalsa_address_book_text_load_config(LibBalsaAddressBook * ab,
 /* Alias complete method */
 static GList *
 libbalsa_address_book_text_alias_complete(LibBalsaAddressBook * ab,
-                                          const gchar * prefix,
-                                          char **new_prefix)
+                                          const gchar * prefix)
 {
     LibBalsaAddressBookText *ab_text = LIBBALSA_ADDRESS_BOOK_TEXT(ab);
     FILE *stream;
@@ -728,8 +727,9 @@ libbalsa_address_book_text_alias_complete(LibBalsaAddressBook * ab,
     fclose(stream);
 
     for (list =
-         g_completion_complete(ab_text->name_complete, (gchar *) prefix,
-                               new_prefix); list; list = list->next) {
+         libbalsa_completion_complete(ab_text->name_complete,
+                                      (gchar *) prefix);
+         list; list = list->next) {
         InternetAddress *ia = ((CompletionData *) list->data)->ia;
         g_object_ref(ia);
         res = g_list_prepend(res, ia);

@@ -239,7 +239,9 @@ balsa_ab_window_init(BalsaAbWindow *ab)
 
     /* hig defaults */
     gtk_container_set_border_width(GTK_CONTAINER(ab), 6);
+#if !GTK_CHECK_VERSION(2,22,0)
     gtk_dialog_set_has_separator(GTK_DIALOG(ab), FALSE);
+#endif
     gtk_box_set_spacing(GTK_BOX(vbox), 12);
     
 

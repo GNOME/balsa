@@ -33,6 +33,7 @@
 #include <time.h>
 #include <stdio.h>
 #include "address-book.h"
+#include "completion.h"
 
 #define LIBBALSA_TYPE_ADDRESS_BOOK_TEXT	                               \
     (libbalsa_address_book_text_get_type())
@@ -59,7 +60,7 @@ struct _LibBalsaAddressBookText {
 
     time_t mtime;
 
-    GCompletion *name_complete;
+    LibBalsaCompletion *name_complete;
 };
 
 struct _LibBalsaAddressBookTextClass {

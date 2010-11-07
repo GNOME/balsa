@@ -892,8 +892,8 @@ imap_get_flag(struct siobuf *sio, char* flag, size_t len)
   if(i<len-1) {
     if (c < 0)
       return c;
-    flag[i] = '\0';
-  } else flag[i+1] = '\0'; /* too long tag?  */
+  }
+  flag[i] = '\0';
   return c;
 }
 
@@ -912,8 +912,8 @@ imap_cmd_get_tag(struct siobuf *sio, char* tag, size_t len)
   if(i<len-1) {
     if (c < 0)
       return c;
-    tag[i] = '\0';
-  } else tag[i+1] = '\0'; /* too long tag?  */
+  }
+  tag[i] = '\0';
   return c;
 }
 

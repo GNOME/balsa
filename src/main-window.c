@@ -287,7 +287,7 @@ static void bw_notebook_size_allocate_cb(GtkWidget * notebook,
 static void bw_size_allocate_cb(GtkWidget * window, GtkAllocation * alloc);
 
 static void bw_notebook_switch_page_cb(GtkWidget * notebook,
-                                       GtkNotebookPage * page,
+                                       void * page,
                                        guint page_num,
                                        gpointer data);
 #if !defined(ENABLE_TOUCH_UI)
@@ -4887,7 +4887,7 @@ bw_size_allocate_cb(GtkWidget * window, GtkAllocation * alloc)
  */
 static void
 bw_notebook_switch_page_cb(GtkWidget * notebook,
-                        GtkNotebookPage * notebookpage, guint page_num,
+                        void * notebookpage, guint page_num,
                         gpointer data)
 {
     BalsaWindow *window = BALSA_WINDOW(data);
@@ -5169,8 +5169,13 @@ bw_notebook_drag_received_cb(GtkWidget * widget, GdkDragContext * context,
     mailbox = index->mailbox_node->mailbox;
 
     if (mailbox != NULL && mailbox != orig_mailbox)
+#if GTK_CHECK_VERSION(2,22,0)
+        balsa_index_transfer(orig_index, selected, mailbox,
+                             gdk_drag_context_get_selected_action(context) != GDK_ACTION_MOVE);
+#else
         balsa_index_transfer(orig_index, selected, mailbox,
                              context->action != GDK_ACTION_MOVE);
+#endif
     balsa_index_selected_msgnos_free(orig_index, selected);
 }
 
@@ -5179,10 +5184,17 @@ static gboolean bw_notebook_drag_motion_cb(GtkWidget * widget,
                                            gint x, gint y, guint time,
                                            gpointer user_data)
 {
+#if GTK_CHECK_VERSION(2,22,0)
+    gdk_drag_status(context,
+                    (gdk_drag_context_get_actions(context) ==
+                     GDK_ACTION_COPY) ? GDK_ACTION_COPY :
+                    GDK_ACTION_MOVE, time);
+#else
     gdk_drag_status(context,
                     (context->actions ==
                      GDK_ACTION_COPY) ? GDK_ACTION_COPY :
                     GDK_ACTION_MOVE, time);
+#endif
 
     return FALSE;
 }

@@ -168,7 +168,7 @@ enum {
 
 static UniqueResponse
 mw_message_received_cb(UniqueApp         *app,
-                       UniqueCommand      command,
+                       gint               command,
                        UniqueMessageData *message,
                        guint              message_time,
                        gpointer           user_data)
@@ -182,7 +182,7 @@ mw_message_received_cb(UniqueApp         *app,
     gchar **uris, **p;
     BalsaSendmsg *snd;
 
-    switch (command) {
+    switch ((gint) command) {
     case UNIQUE_ACTIVATE:
         /* move the main window to the screen that sent us the command */
         gtk_window_set_screen(window,

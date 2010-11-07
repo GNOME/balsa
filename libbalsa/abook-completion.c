@@ -86,7 +86,7 @@ completion_data_free(CompletionData * data)
 }
 
 /*
- * The GCompletionFunc
+ * The LibBalsaCompletionFunc
  */
 gchar *
 completion_data_extract(CompletionData * data)
@@ -104,8 +104,8 @@ address_compare(LibBalsaAddress *a, LibBalsaAddress *b)
 }
 
 /*
- * A GCompletionStrncmpFunc for matching words instead of the whole
- * string.
+ * A LibBalsaCompletionStrncmpFunc for matching words instead of the
+ * whole string.
  *
  * s1 is the user input, s2 is the target.
  */

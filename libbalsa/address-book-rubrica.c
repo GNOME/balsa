@@ -63,8 +63,7 @@ static LibBalsaABErr libbalsa_address_book_rubrica_load(LibBalsaAddressBook
 							gpointer data);
 static GList
     *libbalsa_address_book_rubrica_alias_complete(LibBalsaAddressBook * ab,
-						  const gchar * prefix,
-						  char **new_prefix);
+						  const gchar * prefix);
 static LibBalsaABErr
 libbalsa_address_book_rubrica_add_address(LibBalsaAddressBook * ab,
 					  LibBalsaAddress * new_address);
@@ -131,8 +130,9 @@ libbalsa_address_book_rubrica_init(LibBalsaAddressBookRubrica * ab_rubrica)
     ab_text->mtime = 0;
 
     ab_text->name_complete =
-	g_completion_new((GCompletionFunc) completion_data_extract);
-    g_completion_set_compare(ab_text->name_complete, strncmp_word);
+        libbalsa_completion_new((LibBalsaCompletionFunc)
+                                completion_data_extract);
+    libbalsa_completion_set_compare(ab_text->name_complete, strncmp_word);
 }
 
 static void
@@ -220,26 +220,26 @@ libbalsa_address_book_rubrica_load(LibBalsaAddressBook * ab,
 /* Alias complete method */
 static GList *
 libbalsa_address_book_rubrica_alias_complete(LibBalsaAddressBook * ab,
-					     const gchar * prefix,
-					     char **new_prefix)
+					     const gchar * prefix)
 {
     LibBalsaAddressBookRubrica *ab_rubrica =
-	LIBBALSA_ADDRESS_BOOK_RUBRICA(ab);
+        LIBBALSA_ADDRESS_BOOK_RUBRICA(ab);
     LibBalsaAddressBookText *ab_text = LIBBALSA_ADDRESS_BOOK_TEXT(ab);
     GList *list;
     GList *res = NULL;
 
     if (ab->expand_aliases == FALSE)
-	return NULL;
+        return NULL;
 
     if (lbab_rubrica_load_xml(ab_rubrica, NULL) != LBABERR_OK)
-	return NULL;
+        return NULL;
 
     for (list =
-	 g_completion_complete(ab_text->name_complete, (gchar *) prefix,
-			       new_prefix); list; list = list->next) {
-	InternetAddress *ia = ((CompletionData *) list->data)->ia;
-	res = g_list_prepend(res, g_object_ref(ia));
+         libbalsa_completion_complete(ab_text->name_complete,
+                                      (gchar *) prefix);
+         list; list = list->next) {
+        InternetAddress *ia = ((CompletionData *) list->data)->ia;
+        res = g_list_prepend(res, g_object_ref(ia));
     }
 
     return g_list_reverse(res);
@@ -429,7 +429,7 @@ lbab_rubrica_load_xml(LibBalsaAddressBookRubrica * ab_rubrica,
 
     g_list_foreach(ab_text->name_complete->items,
 		   (GFunc) completion_data_free, NULL);
-    g_completion_clear_items(ab_text->name_complete);
+    libbalsa_completion_clear_items(ab_text->name_complete);
 
 
     /* try to read the address book */
@@ -499,7 +499,7 @@ lbab_rubrica_load_xml(LibBalsaAddressBookRubrica * ab_rubrica,
     }
 
     completion_list = g_list_reverse(completion_list);
-    g_completion_add_items(ab_text->name_complete, completion_list);
+    libbalsa_completion_add_items(ab_text->name_complete, completion_list);
     g_list_free(completion_list);
 
     return LBABERR_OK;

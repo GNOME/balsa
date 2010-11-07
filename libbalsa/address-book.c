@@ -244,13 +244,11 @@ libbalsa_address_book_load_config(LibBalsaAddressBook * ab,
 
 GList *
 libbalsa_address_book_alias_complete(LibBalsaAddressBook * ab,
-                                     const gchar * prefix,
-                                     gchar ** new_prefix)
+                                     const gchar * prefix)
 {
     g_return_val_if_fail(LIBBALSA_IS_ADDRESS_BOOK(ab), NULL);
 
-    return LIBBALSA_ADDRESS_BOOK_GET_CLASS(ab)->alias_complete(ab, prefix,
-                                                               new_prefix);
+    return LIBBALSA_ADDRESS_BOOK_GET_CLASS(ab)->alias_complete(ab, prefix);
 }
 
 

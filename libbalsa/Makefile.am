@@ -62,6 +62,8 @@ libbalsa_a_SOURCES = 		\
 	body.h			\
 	cell-renderer-button.c  \
 	cell-renderer-button.h  \
+	completion.c            \
+	completion.h            \
 	files.c			\
 	files.h			\
 	filter-error.c		\

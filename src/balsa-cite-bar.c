@@ -118,7 +118,8 @@ balsa_cite_bar_expose(GtkWidget * widget, GdkEventExpose * event)
     if (!event->count) {
         BalsaCiteBar *cite_bar = BALSA_CITE_BAR(widget);
         GdkWindow *window = gtk_widget_get_window(widget);
-        GdkGC *gc = gtk_widget_get_style(widget)->fg_gc[GTK_STATE_NORMAL];
+        cairo_t *cr = gdk_cairo_create(window);
+        GtkStyle *style = gtk_widget_get_style(widget);
         GtkAllocation allocation;
         int n;
 
@@ -128,12 +129,14 @@ balsa_cite_bar_expose(GtkWidget * widget, GdkEventExpose * event)
         allocation.x = widget->allocation.x;
         allocation.y = widget->allocation.y;
 #endif                          /* GTK_CHECK_VERSION(2, 18, 0) */ 
+        gdk_cairo_set_source_color(cr, &style->fg[GTK_STATE_NORMAL]);
         for (n = 0; n < cite_bar->bars; n++) {
-            gdk_draw_rectangle(window, gc, TRUE,
-                               allocation.x, allocation.y,
-                               cite_bar->width, cite_bar->height);
+            cairo_rectangle(cr, allocation.x, allocation.y,
+                            cite_bar->width, cite_bar->height);
+            cairo_fill(cr);
             allocation.x += cite_bar->width + cite_bar->space;
         }
+        cairo_destroy(cr);
     }
 
     return FALSE;

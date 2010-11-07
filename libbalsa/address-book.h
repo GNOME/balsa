@@ -92,8 +92,7 @@ struct _LibBalsaAddressBookClass {
     void (*save_config) (LibBalsaAddressBook * ab, const gchar * prefix);
     void (*load_config) (LibBalsaAddressBook * ab, const gchar * prefix);
 
-    GList* (*alias_complete) (LibBalsaAddressBook * ab, const gchar *prefix,
-                              gchar ** new_prefix);
+    GList* (*alias_complete) (LibBalsaAddressBook * ab, const gchar *prefix);
 };
 
 GType libbalsa_address_book_get_type(void);
@@ -141,8 +140,7 @@ const gchar* libbalsa_address_book_strerror(LibBalsaAddressBook * ab,
 
 */
 GList *libbalsa_address_book_alias_complete(LibBalsaAddressBook * ab, 
-					    const gchar *prefix,
-					    gchar **new_prefix);
+					    const gchar *prefix);
 gboolean libbalsa_address_is_dist_list(const LibBalsaAddressBook *ab,
 				       const LibBalsaAddress *address);
 

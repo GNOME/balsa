@@ -55,15 +55,6 @@ typedef struct {
     const gchar * def_id;
     const gchar * fb_id;
 } pixmap_fallback_t;
-    
-
-void
-balsa_icon_create(const gchar ** data, GdkPixmap ** pmap, GdkBitmap ** bmap)
-{
-    /* Is there any reason to use gdkpixbuf here? */
-    *pmap = gdk_pixmap_create_from_xpm_d(gdk_get_default_root_window(),
-                                         bmap, 0, (gchar **) data);
-}
 
 static GHashTable *balsa_icon_table;
 

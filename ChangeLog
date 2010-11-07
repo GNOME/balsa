@@ -1,3 +1,48 @@
+2010-10-16  Peter Bloomfield
+
+	Implement LibBalsaCompletion as a copy of (deprecated)
+	GCompletion
+
+	* libbalsa/completion.c: new file.
+	* libbalsa/completion.h: new file.
+	* libbalsa/Makefile.am: build them.
+	* libbalsa/abook-completion.c: use LibBalsaCompletion.
+	* libbalsa/address-book-extern.c
+	(libbalsa_address_book_externq_alias_complete): ditto.
+	* libbalsa/address-book-gpe.c: ditto.
+	* libbalsa/address-book-ldap.c
+	(libbalsa_address_book_ldap_alias_complete): ditto.
+	* libbalsa/address-book-rubrica.c
+	(libbalsa_address_book_rubrica_init),
+	(libbalsa_address_book_rubrica_alias_complete),
+	(lbab_rubrica_load_xml): ditto.
+	* libbalsa/address-book-text.c (libbalsa_address_book_text_init),
+	(libbalsa_address_book_text_finalize), (lbab_text_load_file),
+	(libbalsa_address_book_text_alias_complete): ditto.
+	* libbalsa/address-book-text.h:  ditto.
+	* libbalsa/address-book.c
+	(libbalsa_address_book_alias_complete): ditto.
+	* libbalsa/address-book.h: ditto.
+	* libbalsa/address-view.c (lbav_get_matching_addresses): ditto.
+
+2010-10-16  Albrecht Dreß
+
+	Gtk3 deprecation cleanup
+
+	* libbalsa/address.c (addrlist_drag_drop_cb):
+	* libbalsa/imap/imap-handle.c (imap_get_flag), (imap_cmd_get_tag):
+	* libbalsa/mailbox_imap.c (libbalsa_mailbox_imap_message_match),
+	(libbalsa_mailbox_imap_get_matchings),
+	(libbalsa_mailbox_imap_subscribe),
+	(libbalsa_imap_rename_subfolder), (libbalsa_imap_new_subfolder):
+	* src/ab-window.c (balsa_ab_window_init):
+	* src/balsa-cite-bar.c (balsa_cite_bar_expose):
+	* src/balsa-icons.c:
+	* src/balsa-icons.h:
+	* src/balsa-mblist.c (bmbl_drag_motion), (bmbl_drag_cb):
+	* src/main-window.c:
+	* src/sendmsg-window.c (drag_data_quote), (subject_not_empty):
+
 2010-10-14  Peter Bloomfield
 
 	* libbalsa/mailbox_imap.c (imap_expunge_cb): do not remove

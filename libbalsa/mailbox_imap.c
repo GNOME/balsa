@@ -1391,7 +1391,7 @@ libbalsa_mailbox_imap_message_match(LibBalsaMailbox* mailbox, guint msgno,
     matchings = search_iter->user_data;
     if (!matchings) {
 	ImapSearchKey* query;
-	ImapResult rc;
+	ImapResponse rc;
 
 	matchings = g_hash_table_new(NULL, NULL);
 	query = lbmi_build_imap_query(search_iter->condition, NULL);
@@ -1576,7 +1576,7 @@ GHashTable * libbalsa_mailbox_imap_get_matchings(LibBalsaMailboxImap* mbox,
 						 gboolean * err)
 {
     ImapSearchKey* query;
-    ImapResult rc = IMR_NO;
+    ImapResponse rc = IMR_NO;
     ImapSearchData * cbdata;
 
     *err = FALSE;
@@ -1699,7 +1699,7 @@ gboolean
 libbalsa_mailbox_imap_subscribe(LibBalsaMailboxImap * mailbox, 
 				     gboolean subscribe)
 {
-    ImapResult rc;
+    ImapResponse rc;
     ImapMboxHandle* handle;
 
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX_IMAP(mailbox), FALSE);
@@ -1792,7 +1792,7 @@ libbalsa_imap_rename_subfolder(LibBalsaMailboxImap* imap,
                                gboolean subscribe,
                                GError **err)
 {
-    ImapResult rc;
+    ImapResponse rc;
     ImapMboxHandle* handle;
     gchar *new_path;
     char delim[2];
@@ -1831,7 +1831,7 @@ libbalsa_imap_new_subfolder(const gchar *parent, const gchar *folder,
 			    gboolean subscribe, LibBalsaServer *server,
                             GError **err)
 {
-    ImapResult rc;
+    ImapResponse rc;
     ImapMboxHandle* handle;
     gchar *new_path;
 

@@ -913,15 +913,21 @@ addrlist_drag_drop_cb(GtkWidget *widget, GdkDragContext *context,
 {
   gboolean        is_valid_drop_site;
   GdkAtom         target_type;
+  GList          *targets;
         
   /* Check to see if (x,y) is a valid drop site within widget */
   is_valid_drop_site = TRUE;
         
   /* If the source offers a target */
-  if (context-> targets) {
+#if GTK_CHECK_VERSION(2,22,0)
+  targets = gdk_drag_context_list_targets(context);
+#else
+  targets = context->targets;
+#endif
+  if (targets) {
       /* Choose the best target type */
       target_type = GDK_POINTER_TO_ATOM 
-        (g_list_nth_data (context-> targets, LIBBALSA_ADDRESS_TRG_ADDRESS));
+        (g_list_nth_data (targets, LIBBALSA_ADDRESS_TRG_ADDRESS));
                 
       /* Request the data from the source. */
       printf("drag_drop requests target=%p\n", target_type);

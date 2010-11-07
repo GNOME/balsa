@@ -88,8 +88,7 @@ static gboolean parse_externq_file(LibBalsaAddressBookExtern *addr_externq,
                                    void *data);
 
 static GList *libbalsa_address_book_externq_alias_complete(LibBalsaAddressBook *ab, 
-                                                           const gchar * prefix,
-                                                           gchar ** new_prefix);
+                                                           const gchar * prefix);
 
 GType libbalsa_address_book_externq_get_type(void)
 {
@@ -376,12 +375,10 @@ lbe_expand_cb(const gchar *email, const gchar *name, void *d)
 
 static GList*
 libbalsa_address_book_externq_alias_complete(LibBalsaAddressBook * ab,
-                                             const gchar * prefix, 
-                                             gchar ** new_prefix)
+                                             const gchar * prefix)
 {
     LibBalsaAddressBookExtern *ex;
     GList *res = NULL;
-    if(new_prefix) *new_prefix = NULL;
 
     g_return_val_if_fail(LIBBALSA_IS_ADDRESS_BOOK_EXTERN(ab), NULL);
 
@@ -394,9 +391,6 @@ libbalsa_address_book_externq_alias_complete(LibBalsaAddressBook * ab,
         return NULL;
 	
     res = g_list_reverse(res);
-
-    if(res != NULL && new_prefix)
-        *new_prefix = internet_address_to_string(res->data, FALSE);
 
     return res;
 }

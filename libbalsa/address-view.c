@@ -167,8 +167,7 @@ lbav_get_matching_addresses(LibBalsaAddressView * address_view,
         match =
             g_list_concat(match,
                           libbalsa_address_book_alias_complete(ab,
-                                                               prefix_f,
-                                                               NULL));
+                                                               prefix_f));
     }
     g_free(prefix_f);
 

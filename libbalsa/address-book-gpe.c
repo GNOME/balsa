@@ -77,8 +77,7 @@ libbalsa_address_book_gpe_modify_address(LibBalsaAddressBook *ab,
 
 
 static GList *libbalsa_address_book_gpe_alias_complete(LibBalsaAddressBook *ab,
-                                                       const gchar *prefix, 
-                                                       gchar **new_prefix);
+                                                       const gchar *prefix);
 
 GType libbalsa_address_book_gpe_get_type(void)
 {
@@ -710,7 +709,6 @@ struct gpe_completion_closure {
     sqlite *db;
 #endif                          /* HAVE_SQLITE3 */
     const gchar *prefix;
-    gchar **new_prefix;
     GList *res;
 };
 
@@ -747,16 +745,13 @@ gpe_read_completion(void *arg, int argc, char **argv, char **names)
         ia = internet_address_mailbox_new(a->full_name, l->data);
         gc->res = g_list_prepend(gc->res, ia);
     }
-    if(gc->new_prefix && !*gc->new_prefix)
-        *gc->new_prefix = libbalsa_address_to_gchar(a, 0);
     g_object_unref(G_OBJECT(a));
     return 0;
 }
 
 static GList *
 libbalsa_address_book_gpe_alias_complete(LibBalsaAddressBook * ab,
-					  const gchar * prefix, 
-					  gchar ** new_prefix)
+					  const gchar * prefix)
 {
     static const char *query = 
         "select distinct urn from contacts where "
@@ -779,10 +774,8 @@ libbalsa_address_book_gpe_alias_complete(LibBalsaAddressBook * ab,
 	    return NULL;
     }
 
-    if(new_prefix) *new_prefix = NULL;
     gcc.db = gpe_ab->db;
     gcc.prefix = prefix;
-    gcc.new_prefix = new_prefix;
     gcc.res = NULL;
 #ifdef HAVE_SQLITE3
     if (prefix) {

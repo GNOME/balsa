@@ -329,10 +329,17 @@ bmbl_drag_motion(GtkWidget * mblist, GdkDragContext * context, gint x,
                                     GTK_TREE_VIEW_DROP_INTO_OR_BEFORE);
     gtk_tree_path_free(path);
 
+#if GTK_CHECK_VERSION(2,22,0)
+    gdk_drag_status(context,
+                    (gdk_drag_context_get_actions(context) ==
+                     GDK_ACTION_COPY) ? GDK_ACTION_COPY :
+                    GDK_ACTION_MOVE, time);
+#else
     gdk_drag_status(context,
                     (context->actions ==
                      GDK_ACTION_COPY) ? GDK_ACTION_COPY :
                     GDK_ACTION_MOVE, time);
+#endif
 
     return (ret_val && can_drop);
 }
@@ -855,8 +862,13 @@ bmbl_drag_cb(GtkWidget * widget, GdkDragContext * context,
 
         /* cannot transfer to the originating mailbox */
         if (mailbox != NULL && mailbox != orig_mailbox)
+#if GTK_CHECK_VERSION(2,22,0)
+            balsa_index_transfer(orig_index, selected, mailbox,
+                                 gdk_drag_context_get_selected_action(context) != GDK_ACTION_MOVE);
+#else
             balsa_index_transfer(orig_index, selected, mailbox,
                                  context->action != GDK_ACTION_MOVE);
+#endif
         gtk_tree_path_free(path);
     }
     balsa_index_selected_msgnos_free(orig_index, selected);

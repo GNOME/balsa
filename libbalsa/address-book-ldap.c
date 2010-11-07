@@ -114,8 +114,7 @@ static void libbalsa_address_book_ldap_load_config(LibBalsaAddressBook *ab,
 						   const gchar * prefix);
 
 static GList *libbalsa_address_book_ldap_alias_complete(LibBalsaAddressBook * ab,
-							 const gchar * prefix, 
-							 gchar ** new_prefix);
+							 const gchar * prefix);
 
 static LibBalsaAddress*
 libbalsa_address_book_ldap_get_address(LibBalsaAddressBook * ab,
@@ -951,8 +950,7 @@ rfc_2254_escape(const gchar *raw)
 
 static GList *
 libbalsa_address_book_ldap_alias_complete(LibBalsaAddressBook * ab,
-					  const gchar * prefix, 
-					  gchar ** new_prefix)
+					  const gchar * prefix)
 {
     static struct timeval timeout = { 15, 0 }; /* 15 sec timeout */
     LibBalsaAddressBookLdap *ldap_ab;
@@ -978,7 +976,6 @@ libbalsa_address_book_ldap_alias_complete(LibBalsaAddressBook * ab,
      * Attempt to search for e-mail addresses.  It returns success
      * or failure, but not all the matches.
      */
-    if(new_prefix) *new_prefix = NULL;
     ldap = rfc_2254_escape(prefix);
 
     filter = g_strdup_printf("(&(objectClass=organizationalPerson)(mail=*)"
@@ -1001,8 +998,6 @@ libbalsa_address_book_ldap_alias_complete(LibBalsaAddressBook * ab,
 	    for(e = ldap_first_entry(ldap_ab->directory, result);
 		e != NULL; e = ldap_next_entry(ldap_ab->directory, e)) {
 		addr = lbabl_get_internet_address(ldap_ab->directory, e);
-		if(new_prefix && !*new_prefix) 
-		    *new_prefix = internet_address_to_string(addr, FALSE);
 		res = g_list_prepend(res, addr);
 	    }
     case LDAP_SIZELIMIT_EXCEEDED:

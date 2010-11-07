@@ -1,4 +1,4 @@
-2010-10-16  Peter Bloomfield
+2010-11-07  Peter Bloomfield
 
 	Implement LibBalsaCompletion as a copy of (deprecated)
 	GCompletion
@@ -25,7 +25,7 @@
 	* libbalsa/address-book.h: ditto.
 	* libbalsa/address-view.c (lbav_get_matching_addresses): ditto.
 
-2010-10-16  Albrecht Dreß
+2010-11-07  Albrecht Dreß
 
 	Gtk3 deprecation cleanup
 

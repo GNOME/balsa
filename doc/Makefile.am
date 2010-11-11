@@ -21,7 +21,7 @@ DOC_FIGURES = figures/address-book-ldap.png			\
 	      figures/newmsg-window-toolbar.png			\
 	      figures/preferences-window.png			\
 	      figures/spell-check.png
-DOC_LINGUAS = de es sl
+DOC_LINGUAS = de es fr sl
 else
 # gnome-doc-utils is not obligatory but the old documentation style
 # is not supported any more.

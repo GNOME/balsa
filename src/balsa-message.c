@@ -1880,16 +1880,24 @@ bm_next_part_info(BalsaMessage * bmessage)
         if (!gtk_tree_model_get_iter_first(model, &sel.sel_iter))
             return NULL;
     } else {
-        GtkTreeIter child;
+        GtkTreeIter iter;
 
-        /* If the first selected iter has a child, select it, otherwise take
-           next on the same level. If there is no next, return NULL */
-        if (gtk_tree_model_iter_children (model, &child, &sel.sel_iter))
-	    sel.sel_iter = child;
-        else if (!gtk_tree_model_iter_next (model, &sel.sel_iter))
-            return NULL;
+        /* If the first selected iter has a child, select it, otherwise
+         * take next on the same or higher level.  If there is no next,
+         * return NULL */
+        if (!gtk_tree_model_iter_children (model, &iter, &sel.sel_iter)) {
+            GtkTreeIter tmp_iter;
+
+            tmp_iter = iter = sel.sel_iter;
+            while (!gtk_tree_model_iter_next (model, &iter)) {
+                if (!gtk_tree_model_iter_parent(model, &iter, &tmp_iter))
+                    return NULL;
+	        tmp_iter = iter;
+            }
+        }
+        sel.sel_iter = iter;
     }
-    
+
     return tree_next_valid_part_info(model, &sel.sel_iter);
 }
 

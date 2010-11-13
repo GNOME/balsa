@@ -1,3 +1,8 @@
+2010-11-12  Peter Bloomfield
+
+	* src/balsa-message.c (bm_next_part_info): look for next part
+	above current part, if necessary.
+
 2010-11-07  Peter Bloomfield
 
 	Implement LibBalsaCompletion as a copy of (deprecated)

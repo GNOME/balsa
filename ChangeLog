@@ -1,7 +1,8 @@
 2010-11-12  Peter Bloomfield
 
 	* src/balsa-message.c (bm_next_part_info): look for next part
-	above current part, if necessary.
+	above current part, if necessary; fixes
+	http://mail.gnome.org/archives/balsa-list/2010-November/msg00003.html
 
 2010-11-07  Peter Bloomfield
 

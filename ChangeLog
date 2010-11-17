@@ -1,5 +1,10 @@
 2010-11-16  Peter Bloomfield
 
+	* libbalsa/mailbox_imap.c (multi_append_cb): cast quotient, not
+	numerator.
+
+2010-11-16  Peter Bloomfield
+
 	* libbalsa/mailbox_imap.c (multi_append_cb): do not break
 	gettext with concatenated string.
 

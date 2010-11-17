@@ -2893,7 +2893,7 @@ multi_append_cb(char * buf, size_t buflen,
 	if (len > (signed) SizeMsgThreshold)
 	    libbalsa_information(LIBBALSA_INFORMATION_MESSAGE,
                                  _("Uploading %ld kB"),
-                                 (long int) (len + 512) / 1024);
+                                 (long int) ((len + 512) / 1024));
 
 	*return_flags = imap_flags;
 	macd->copied++;

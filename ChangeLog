@@ -1,3 +1,8 @@
+2010-11-16  Peter Bloomfield
+
+	* libbalsa/mailbox_imap.c (multi_append_cb): do not break
+	gettext with concatenated string.
+
 2010-11-12  Peter Bloomfield
 
 	* src/balsa-message.c (bm_next_part_info): look for next part

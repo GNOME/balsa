@@ -1,3 +1,7 @@
+* Balsa-2.4.9 release. Release date 2010-11-19
+
+- compile against new GTK, libnotify libs.
+
 * Balsa-2.4.8 release. Release date 2010-08-21
 
 - QUOTA and MYRIGHTS IMAP extension support.

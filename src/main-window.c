@@ -3405,8 +3405,13 @@ bw_display_new_mail_notification(int num_new, int has_new)
             num_total += num_new;
         } else {
             num_total = num_new;
+#if HAVE_NOTIFY >=7
+            balsa_app.main_window->new_mail_note =
+                notify_notification_new("Balsa", NULL, NULL);
+#else
             balsa_app.main_window->new_mail_note =
                 notify_notification_new("Balsa", NULL, NULL, NULL);
+#endif
             g_object_add_weak_pointer(G_OBJECT(balsa_app.main_window->
                                                new_mail_note),
                                       (gpointer) & balsa_app.main_window->

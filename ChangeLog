@@ -1,3 +1,9 @@
+2010-11-19  Pawel Salek
+
+	* src/main-window.c:
+	* libbalsa/information.c: compile against libnotify-0.7.0
+	* configure.in, NEWS: release 2.4.9
+
 2010-11-16  Peter Bloomfield
 
 	* libbalsa/mailbox_imap.c (multi_append_cb): cast quotient, not

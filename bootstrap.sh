@@ -24,3 +24,5 @@ echo "Running automake..."
 automake --gnu --add-missing --copy || exit 1
 echo "Running configure $* ..."
 ./configure "$@"
+gnome-doc-tool -V > /dev/null 2>&1 || echo "gnome-doc-utils required to make dist"
+

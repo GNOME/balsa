@@ -121,8 +121,13 @@ libbalsa_information_varg(GtkWindow *parent, LibBalsaInformationType type,
         g_string_append(escaped, p);
         g_free(msg);
 
-        note =
-            notify_notification_new("Balsa", escaped->str, icon_str, NULL);
+#if HAVE_NOTIFY >= 7
+        note = notify_notification_new("Balsa", escaped->str, icon_str);
+#else
+        /* prior to 0.7.0 */
+        note = notify_notification_new("Balsa", escaped->str, icon_str, NULL);
+#endif
+
         g_string_free(escaped, TRUE);
 
         notify_notification_set_timeout(note, 7000);    /* 7 seconds */

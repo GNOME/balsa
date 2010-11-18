@@ -11,7 +11,7 @@ dnl ###########################################################################
 
 BALSA_MAJOR=2
 BALSA_REVISION=4
-BALSA_PATCHLEVEL=8
+BALSA_PATCHLEVEL=9
 BALSA_VERSION="$BALSA_MAJOR.$BALSA_REVISION.${BALSA_PATCHLEVEL}"
 
 AC_SUBST(BALSA_MAJOR)
@@ -245,6 +245,8 @@ AM_CONDITIONAL([BUILD_WITH_G_D_U], [test $with_g_d_u = "yes"])
 
 if test $with_g_d_u = yes ; then
 GNOME_DOC_INIT
+AM_CONDITIONAL([HAVE_GNOME_DOC_UTILS],[true])
+AM_CONDITIONAL([ENABLE_SK],[true])
 else
 AM_CONDITIONAL([HAVE_GNOME_DOC_UTILS],[false])
 AM_CONDITIONAL([ENABLE_SK],[false])
@@ -709,10 +711,14 @@ fi
 
 # Libnotify configuration
 if test x$with_libnotify != xno; then
-    PKG_CHECK_MODULES(NOTIFY, [ libnotify ])
-    AC_DEFINE(HAVE_NOTIFY,1,[Defined when libnotify can be used.])
-    BALSA_LIBS="$BALSA_LIBS -lnotify"
-    BALSA_AB_LIBS="$BALSA_AB_LIBS -lnotify"
+    PKG_CHECK_MODULES(NOTIFY, [ libnotify >= 0.7.0 ], [notifyver=7],
+      PKG_CHECK_MODULES(NOTIFY, [ libnotify >= 0.5.0 ], [notifyver=5],
+        [AC_MSG_ERROR([*** You enabled notify but the library is not found.])]))
+    AC_DEFINE_UNQUOTED(HAVE_NOTIFY,$notifyver,
+                       [Defined when libnotify can be used.])
+    BALSA_LIBS="$BALSA_LIBS $NOTIFY_LIBS"
+    BALSA_AB_LIBS="$BALSA_AB_LIBS $NOTIFY_LIBS"
+    with_libnotify=0.$notifyver
 fi
 
 # NetworkManager

@@ -463,13 +463,21 @@ tm_set_tool_item_label(GtkToolItem * tool_item, const gchar * stock_id,
     return button;
 }
 
+static GtkToolbarStyle tm_default_style(void);
+
 static void
 tm_populate(BalsaToolbarModel * model, GtkUIManager * ui_manager,
             GArray * merge_ids)
 {
-    gboolean make_two_line = model->style != GTK_TOOLBAR_BOTH_HORIZ
-        && tm_has_second_line(model);
+    gboolean style_is_both_horiz;
+    gboolean make_two_line;
     GSList *list;
+
+    style_is_both_horiz = (model->style == GTK_TOOLBAR_BOTH_HORIZ
+                           || (model->style == (GtkToolbarStyle) -1
+                               && tm_default_style() ==
+                               GTK_TOOLBAR_BOTH_HORIZ));
+    make_two_line = !style_is_both_horiz && tm_has_second_line(model);
 
     for (list = balsa_toolbar_model_get_current(model); list;
          list = list->next) {

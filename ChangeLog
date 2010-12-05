@@ -1,3 +1,10 @@
+2010-12-05  Peter Bloomfield
+
+	* src/toolbar-factory.c (tm_populate): do not make 2-line
+	toolbar button text if we are using the desktop default and it
+	is GTK_TOOLBAR_BOTH_HORIZ; fixes a strange vertical alignment
+	issue when using the default and it is GTK_TOOLBAR_BOTH_HORIZ.
+
 2010-11-19  Pawel Salek
 
 	* Configure.in: compile against libnotify-0.4.x as well.

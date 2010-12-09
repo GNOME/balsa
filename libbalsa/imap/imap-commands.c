@@ -1302,7 +1302,6 @@ pass_header_text_ordered(unsigned seqno, ImapFetchBodyType body_type,
     phto->cb(seqno, str, len, phto->arg);
     phto->wrote_header = TRUE;
     if(phto->body) {
-    printf("Writing saved body\n");
       phto->cb(seqno, phto->body, phto->length, phto->arg);
       g_free(phto->body); phto->body = NULL;
     }
@@ -1312,7 +1311,6 @@ pass_header_text_ordered(unsigned seqno, ImapFetchBodyType body_type,
     if(phto->wrote_header) {
       phto->cb(seqno, str, len, phto->arg);
     } else {
-      printf("saving body\n");
       phto->body = g_malloc(len);
       phto->length = len;
       memcpy(phto->body, str, len);

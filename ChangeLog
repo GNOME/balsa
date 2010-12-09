@@ -1,3 +1,7 @@
+2010-12-09  Pawel Salek
+
+	* configure.in: make detection more automatic; fix gnome bz #636805.
+
 2010-12-05  Peter Bloomfield
 
 	* src/toolbar-factory.c (tm_populate): do not make 2-line

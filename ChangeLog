@@ -1,3 +1,7 @@
+2010-12-09  Peter Bloomfield
+
+	* balsa.1.in: do not use macro URL; fixes gnome bz #636801.
+
 2010-12-09  Pawel Salek
 
 	* configure.in: make detection more automatic; fix gnome bz #636805.

@@ -144,7 +144,7 @@ This feature is useful for debugging IMAP problems.
 .RE
 .SH WEBSITE
 Balsa's website is \fI
-.URL http://balsa.gnome.org
+.UR http://balsa.gnome.org
 http://balsa.gnome.org\fR
 
 .SH SUGGESTIONS AND BUG REPORTS
@@ -157,7 +157,7 @@ See http://balsa.gnome.org/bugs.html for more information on reporting Balsa bug
 
 Before reporting bugs, please check to see if the bug is mentioned 
 in the FAQ's or the mailing list archive \fI
-.URL http://mail.gnome.org/mailman/listinfo/balsa-list
+.UR http://mail.gnome.org/mailman/listinfo/balsa-list
 http://mail.gnome.org/mailman/listinfo/balsa-list\fR
 
 When reporting Balsa bugs, it is important to include

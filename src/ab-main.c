@@ -5,17 +5,17 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option) 
+ * the Free Software Foundation; either version 2, or (at your option)
  * any later version.
- *  
+ *
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 
@@ -27,9 +27,6 @@
 #include <string.h>
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
-#if HAVE_GNOME
-#include <gnome.h>
-#endif
 #ifdef GTKHTML_HAVE_GCONF
 # include <gconf/gconf.h>
 #endif
@@ -78,17 +75,9 @@ struct ABMainWindow {
     GtkActionGroup *action_group;
     GtkUIManager *ui_manager;
 } contacts_app;
-    
+
 
 static void bab_cleanup(void);
-
-#if HAVE_GNOME
-static gint bab_save_session(GnomeClient * client, gint phase,
-                             GnomeSaveStyle save_style, gint is_shutdown,
-                             GnomeInteractStyle interact_style, gint is_fast,
-                             gpointer client_data);
-static gint bab_kill_session(GnomeClient * client, gpointer client_data);
-#endif
 
 static void ab_set_edit_widget(LibBalsaAddress * address,
                                gboolean can_remove);
@@ -182,7 +171,7 @@ bab_set_address_book(LibBalsaAddressBook *ab, GtkWidget* list,
 {
     LibBalsaABErr ab_err;
     GtkTreeModel* model = gtk_tree_view_get_model(GTK_TREE_VIEW(list));
-    
+
     g_return_val_if_fail(ab, FALSE);
     contacts_app.address_book = ab;
 
@@ -192,7 +181,7 @@ bab_set_address_book(LibBalsaAddressBook *ab, GtkWidget* list,
                                            (LibBalsaAddressBookLoadFunc)
                                            bab_load_cb, model))
         != LBABERR_OK) {
-        printf("error loading address book from %s: %d\n", 
+        printf("error loading address book from %s: %d\n",
                ab->name, ab_err);
     }
 
@@ -522,7 +511,7 @@ ab_remove_address(LibBalsaAddress* address)
 	    ab_clear_edit_widget();
 	    contacts_app.displayed_address = NULL;
 	}
-    } else 
+    } else
         ab_warning("Cannot remove: %s\n",
                    libbalsa_address_book_strerror(contacts_app.address_book,
                                                   err));
@@ -653,14 +642,14 @@ get_main_menu(GtkWidget * window, GtkWidget ** menubar,
 
     for (ab = address_books; ab; ab = ab->next)
         add_address_book(LIBBALSA_ADDRESS_BOOK(ab->data));
-    
+
 #if HAVE_MACOSX_DESKTOP
     ige_mac_menu_set_menu_bar(GTK_MENU_SHELL(gtk_ui_manager_get_widget(ui_manager, "/MainMenu")));
     ige_mac_menu_set_quit_menu_item(GTK_MENU_ITEM(gtk_ui_manager_get_widget(ui_manager, "/MainMenu/FileMenu/Quit")));
 
     group = ige_mac_menu_add_app_menu_group();
     ige_mac_menu_add_app_menu_item(group,
-				   GTK_MENU_ITEM(gtk_ui_manager_get_widget(ui_manager, "/MainMenu/HelpMenu/About")), 
+				   GTK_MENU_ITEM(gtk_ui_manager_get_widget(ui_manager, "/MainMenu/HelpMenu/About")),
                                    NULL);
 #endif
 
@@ -747,11 +736,11 @@ list_row_activated_cb(GtkTreeView *tree, gpointer data)
     contacts_app.displayed_address = address;
 }
 
-static void 
-addrlist_drag_get_cb(GtkWidget* widget, GdkDragContext* drag_context, 
+static void
+addrlist_drag_get_cb(GtkWidget* widget, GdkDragContext* drag_context,
                      GtkSelectionData* sel_data, guint target_type,
                      guint time, gpointer user_data)
-{ 
+{
     GtkTreeView *addrlist;
     GtkTreeModel *model;
     GtkTreeSelection *selection;
@@ -807,9 +796,9 @@ bab_window_list_new(gpointer cb_data)
     g_object_unref(store);
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree));
     gtk_tree_selection_set_mode(selection, GTK_SELECTION_SINGLE);
-    g_signal_connect(G_OBJECT(selection), "changed", 
+    g_signal_connect(G_OBJECT(selection), "changed",
                      G_CALLBACK(list_selection_changed_cb), cb_data);
-    g_signal_connect(G_OBJECT(tree), "row-activated", 
+    g_signal_connect(G_OBJECT(tree), "row-activated",
                      G_CALLBACK(list_row_activated_cb), cb_data);
 
     renderer = gtk_cell_renderer_text_new();
@@ -821,7 +810,7 @@ bab_window_list_new(gpointer cb_data)
     gtk_tree_view_append_column(GTK_TREE_VIEW(tree), column);
 
 
-    gtk_drag_source_set(GTK_WIDGET(tree), 
+    gtk_drag_source_set(GTK_WIDGET(tree),
                         GDK_BUTTON1_MASK,
                         libbalsa_address_target_list, 2,
                         GDK_ACTION_COPY);
@@ -890,8 +879,8 @@ apply_button_cb(GtkWidget * w, gpointer data)
         if (!gtk_tree_selection_get_selected(selection, NULL, NULL))
             ab_clear_edit_widget();
 	gtk_notebook_set_current_page(GTK_NOTEBOOK(contacts_app.notebook), 0);
-	
-    } else 
+
+    } else
         ab_warning(contacts_app.displayed_address ?
                    "Cannot modify: %s\n" : "Cannot add: %s\n",
                    libbalsa_address_book_strerror(contacts_app.address_book,
@@ -917,7 +906,7 @@ bab_get_edit_button_box(struct ABMainWindow *abmw)
     GtkWidget *box;
     box = gtk_hbutton_box_new();
     gtk_container_add(GTK_CONTAINER(box),
-                      abmw->apply_button = 
+                      abmw->apply_button =
                       gtk_button_new_from_stock(GTK_STOCK_APPLY));
     g_signal_connect(G_OBJECT(abmw->apply_button), "clicked",
                      G_CALLBACK(apply_button_cb), (gpointer) NULL);
@@ -927,7 +916,7 @@ bab_get_edit_button_box(struct ABMainWindow *abmw)
     g_signal_connect(G_OBJECT(abmw->remove_button), "clicked",
                      G_CALLBACK(remove_button_cb), (gpointer) NULL);
     gtk_container_add(GTK_CONTAINER(box),
-                      abmw->cancel_button = 
+                      abmw->cancel_button =
                       gtk_button_new_from_stock(GTK_STOCK_CANCEL));
     g_signal_connect(G_OBJECT(abmw->cancel_button), "clicked",
                      G_CALLBACK(cancel_button_cb), abmw);
@@ -1019,13 +1008,13 @@ bab_window_new()
     /* Entry widget for finding an address */
     gtk_box_pack_start(GTK_BOX(browse_widget),
                        bab_get_filter_box(), FALSE, FALSE, 1);
- 
+
     scroll = gtk_scrolled_window_new(NULL, NULL);
     gtk_widget_show(scroll);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll),
 				   GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
     gtk_box_pack_start(GTK_BOX(browse_widget), scroll, TRUE, TRUE, 1);
-    
+
     contacts_app.entry_list = bab_window_list_new(&contacts_app);
     gtk_container_add(GTK_CONTAINER(scroll), contacts_app.entry_list);
 
@@ -1033,7 +1022,7 @@ bab_window_new()
 			     gtk_label_new("Browse"));
 
     edit_widget = gtk_vbox_new(FALSE, 1);
-    contacts_app.edit_widget = 
+    contacts_app.edit_widget =
         libbalsa_address_get_edit_widget(NULL, contacts_app.entries,
                                          G_CALLBACK(address_changed_cb),
                                          &contacts_app);
@@ -1109,10 +1098,6 @@ information_real(void)
 int
 main(int argc, char *argv[])
 {
-#if HAVE_GNOME
-    GnomeClient *client;
-#endif
-
 #ifdef ENABLE_NLS
     /* Initialize the i18n stuff */
     bindtextdomain(PACKAGE, GNOMELOCALEDIR);
@@ -1123,18 +1108,6 @@ main(int argc, char *argv[])
 
     /* FIXME: do we need to allow a non-GUI mode? */
     gtk_init_check(&argc, &argv);
-#if HAVE_GNOME
-    gnome_program_init(PACKAGE, VERSION, LIBGNOMEUI_MODULE, argc, argv,
-#ifndef GNOME_PARAM_GOPTION_CONTEXT
-                       GNOME_PARAM_POPT_TABLE, NULL,
-                       GNOME_PARAM_APP_PREFIX,  BALSA_STD_PREFIX,
-                       GNOME_PARAM_APP_DATADIR, BALSA_STD_PREFIX "/share",
-                       NULL);
-#else
-                       GNOME_PARAM_GOPTION_CONTEXT, NULL,
-                       GNOME_PARAM_NONE);
-#endif
-#endif
 
 #ifdef GTKHTML_HAVE_GCONF
     gconf_init(argc, argv, NULL);
@@ -1172,13 +1145,6 @@ main(int argc, char *argv[])
                      G_CALLBACK(bab_delete_ok), NULL);
 
     /* session management */
-#if HAVE_GNOME
-    client = gnome_master_client();
-    g_signal_connect(G_OBJECT(client), "save_yourself",
-		     G_CALLBACK(bab_save_session), argv[0]);
-    g_signal_connect(G_OBJECT(client), "die",
-		     G_CALLBACK(bab_kill_session), NULL);
-#endif
 
     gtk_widget_show_all(ab_window);
     gtk_widget_hide(contacts_app.edit_widget);
@@ -1189,7 +1155,7 @@ main(int argc, char *argv[])
     gdk_threads_enter();
     gtk_main();
     gdk_threads_leave();
-  
+
     /* Proper shutdown here */
     g_list_foreach(contacts_app.address_book_list, (GFunc)g_object_unref, NULL);
     g_list_free(contacts_app.address_book_list);
@@ -1197,44 +1163,8 @@ main(int argc, char *argv[])
     return 0;
 }
 
-
 static void
 bab_cleanup(void)
 {
-#if (defined(HAVE_GNOME) && !defined(GNOME_DISABLE_DEPRECATED))
-    gnome_sound_shutdown();
-#endif
     gtk_main_quit();
 }
-
-#if HAVE_GNOME
-static gint
-bab_kill_session(GnomeClient * client, gpointer client_data)
-{
-    /* save data here */
-    gtk_main_quit(); 
-    return TRUE;
-}
-
-
-static gint
-bab_save_session(GnomeClient * client, gint phase,
-                 GnomeSaveStyle save_style, gint is_shutdown,
-                 GnomeInteractStyle interact_style, gint is_fast,
-                 gpointer client_data)
-{
-    gchar **argv;
-    guint argc;
-
-    /* allocate 0-filled so it will be NULL terminated */
-    argv = g_malloc0(sizeof(gchar *) * 2);
-
-    argc = 1;
-    argv[0] = client_data;
-
-    gnome_client_set_clone_command(client, argc, argv);
-    gnome_client_set_restart_command(client, argc, argv);
-
-    return TRUE;
-}
-#endif /* HAVE_GNOME */

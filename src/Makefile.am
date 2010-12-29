@@ -98,38 +98,15 @@ balsa_gtkspell_extra =		\
 		spell-check.h
 endif
 
-if BUILD_WITH_UNIQUE
-balsa_bonobo_extra_dist = balsa-bonobo.c balsa-bonobo.h Balsa.idl
-else
-if BUILD_WITH_GNOME
-balsa_bonobo_extra = balsa-bonobo.c balsa-bonobo.h
-balsa_bonobo_extra_dist = Balsa.idl
-balsa_IDL_SRCLIST = Balsa-common.c Balsa-skels.c Balsa-stubs.c Balsa.h
-balsa_IDL_OBJS    = Balsa-common.o Balsa-skels.o Balsa-stubs.o
-# see http://sources.redhat.com/automake/dependencies.html
-BUILT_SOURCES     = Balsa.h
-
-#auto* *SHOULD* figure this out *grr*
-$(srcdir)/balsa-bonobo.c: Balsa.h
-
-idldir = $(datadir)/idl
-idl_DATA = Balsa.idl
-
-endif
-endif
-
 balsa_SOURCES =			\
 	$(balsa_BASE_SRCLIST)	\
 	$(balsa_gtkspell_extra) \
-	$(balsa_bonobo_extra)   \
 	$(balsa_print_source)
 
 
 DISTCLEANFILES = $(balsa_IDL_SRCLIST)
 
-EXTRA_DIST =			\
-	$(balsa_gtkspell_extra_dist) \
-	$(balsa_bonobo_extra_dist)
+EXTRA_DIST = $(balsa_gtkspell_extra_dist)
 
 AM_CPPFLAGS = \
 	-DGNOMELOCALEDIR=\""$(datadir)/locale"\" \

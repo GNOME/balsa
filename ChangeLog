@@ -1,5 +1,12 @@
 2010-12-28  Peter Bloomfield
 
+	Do not support BonoboActivation
+
+	* src/balsa-bonobo.c: deleted.
+	* src/balsa-bonobo.h: ditto.
+
+2010-12-28  Peter Bloomfield
+
 	Initial commit for gtk3 development branch
 
 	* configure.in:

@@ -5,17 +5,17 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option) 
+ * the Free Software Foundation; either version 2, or (at your option)
  * any later version.
- *  
+ *
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 
@@ -40,13 +40,6 @@
 
 #ifndef MAX
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
-#endif
-
-#ifdef HAVE_GNOME
-#define OLD_BALSA_COMPATIBILITY_TRANSLATION
-#endif
-#ifdef OLD_BALSA_COMPATIBILITY_TRANSLATION
-#include <gnome.h> /* for GNOME_STOCK_* pixmaps */
 #endif
 
 /* Enumeration for GtkTreeModel columns. */
@@ -188,7 +181,7 @@ customize_dialog_cb(GtkWidget * widget, gpointer data)
     option_box = gtk_vbox_new(FALSE, 6);
     gtk_container_set_border_width(GTK_CONTAINER(option_box), 6);
     gtk_container_add(GTK_CONTAINER(option_frame), option_box);
-    
+
     wrap_button =
         gtk_check_button_new_with_mnemonic(_("_Wrap button labels"));
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(wrap_button),
@@ -214,37 +207,6 @@ customize_dialog_cb(GtkWidget * widget, gpointer data)
 int
 get_toolbar_button_index(const char *id)
 {
-#ifdef OLD_BALSA_COMPATIBILITY_TRANSLATION
-    static const struct {
-        gchar *new;
-        gchar *old;
-    } button_converter[] = {
-        { BALSA_PIXMAP_ATTACHMENT,   GNOME_STOCK_ATTACH },
-        { BALSA_PIXMAP_COMPOSE,      GNOME_STOCK_MAIL_NEW },
-        { BALSA_PIXMAP_CONTINUE,     GNOME_STOCK_MAIL },
-        { BALSA_PIXMAP_RECEIVE,      GNOME_STOCK_MAIL_RCV },
-        { BALSA_PIXMAP_REPLY,        GNOME_STOCK_MAIL_RPL },
-        { BALSA_PIXMAP_REPLY_ALL,    "reply_to_all" },
-        { BALSA_PIXMAP_REPLY_GROUP,  "reply_to_group" },
-        { BALSA_PIXMAP_FORWARD,      GNOME_STOCK_MAIL_FWD },
-        { BALSA_PIXMAP_NEXT,         GTK_STOCK_GO_FORWARD },
-        { BALSA_PIXMAP_PREVIOUS,     GTK_STOCK_GO_BACK },
-	{ GTK_STOCK_PRINT,           BALSA_OLD_PIXMAP_PRINT },
-	{ GTK_STOCK_SAVE,            BALSA_OLD_PIXMAP_SAVE },
-        { BALSA_PIXMAP_SEND,         GNOME_STOCK_MAIL_SND },
-	{ GTK_STOCK_DELETE,          BALSA_OLD_PIXMAP_TRASH },
-        { BALSA_PIXMAP_TRASH_EMPTY,  "empty_trash" },
-        { BALSA_PIXMAP_NEXT_UNREAD,  "next_unread" },
-        { BALSA_PIXMAP_NEXT_FLAGGED, "next_flagged" },
-        { BALSA_PIXMAP_SHOW_HEADERS, "show_all_headers" },
-        { BALSA_PIXMAP_SHOW_PREVIEW, "show_preview" },
-        { BALSA_PIXMAP_MARKED_NEW,   "flag_unread" },
-        { BALSA_PIXMAP_MARK_ALL,     "mark_all" },
-        { BALSA_PIXMAP_IDENTITY,     "identity" },
-	{ GTK_STOCK_CANCEL,          BALSA_OLD_PIXMAP_CLOSE_MBOX },
-        { NULL, NULL }
-    };
-#endif
     int i;
 
     g_return_val_if_fail(id, -1);
@@ -253,21 +215,6 @@ get_toolbar_button_index(const char *id)
 	if(!strcmp(id, toolbar_buttons[i].pixmap_id))
 	    return i;
     }
-#ifdef OLD_BALSA_COMPATIBILITY_TRANSLATION
-    /* you have got a second chance.... */
-    
-    for(i=0; button_converter[i].new; i++) {
-        if(!strcmp(id, button_converter[i].old)) {
-            int j;
-            for(j=0; j<toolbar_button_count; j++) {
-                if(!strcmp(button_converter[i].new,
-                           toolbar_buttons[j].pixmap_id))
-                    return j;
-            }
-            return -1;
-        }
-    }
-#endif
     return -1;
 }
 
@@ -282,7 +229,7 @@ wrap_toggled_cb(GtkWidget * widget, GtkNotebook * notebook)
     gint i;
     GtkWidget *child;
     ToolbarPage *page;
-    
+
     balsa_app.toolbar_wrap_button_text =
         gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget));
 
@@ -486,7 +433,7 @@ create_toolbar_page(BalsaToolbarModel * model, GtkUIManager * ui_manager)
     gtk_container_add(GTK_CONTAINER(button_box), style_button);
 
     /* Done with preview */
-	
+
     /* Box for lower half of window */
     lower_ctlbox=gtk_hbox_new(FALSE, 5);
     gtk_container_set_border_width(GTK_CONTAINER(lower_ctlbox), 5);
@@ -514,7 +461,7 @@ create_toolbar_page(BalsaToolbarModel * model, GtkUIManager * ui_manager)
 
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(destination_scroll),
 				   GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
-	
+
     destination_frame=gtk_frame_new(_("Current toolbar"));
     page->current = tp_list_new();
 
@@ -673,7 +620,7 @@ tp_page_refresh_current(ToolbarPage * page)
         tp_store_set(GTK_LIST_STORE(model), &iter, item);
     }
 
-    if (gtk_tree_model_get_iter(model, &iter, path) 
+    if (gtk_tree_model_get_iter(model, &iter, path)
         || gtk_tree_path_prev(path)) {
         gtk_tree_selection_select_path(selection, path);
         gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(page->current),
@@ -691,7 +638,7 @@ tp_page_refresh_preview(ToolbarPage * page)
         gtk_tree_view_get_model(GTK_TREE_VIEW(page->current));
     GtkTreeIter iter;
     gboolean valid;
-    
+
     balsa_toolbar_model_clear(page->model);
     for (valid = gtk_tree_model_get_iter_first(model, &iter);
          valid;
@@ -700,7 +647,7 @@ tp_page_refresh_preview(ToolbarPage * page)
 
         gtk_tree_model_get(model, &iter, TP_ITEM_COLUMN, &item, -1);
         if (item >= 0 && item < toolbar_button_count)
-            balsa_toolbar_model_insert_icon(page->model, 
+            balsa_toolbar_model_insert_icon(page->model,
                                             toolbar_buttons[item].pixmap_id,
                                             -1);
     }
@@ -743,7 +690,7 @@ tp_list_new(void)
 
 /* Test whether the iter addresses the first row.
  */
-static gboolean 
+static gboolean
 tp_list_iter_is_first(GtkWidget * list, GtkTreeIter * iter)
 {
     GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(list));
@@ -755,7 +702,7 @@ tp_list_iter_is_first(GtkWidget * list, GtkTreeIter * iter)
 
 /* Test whether the iter addresses the last row.
  */
-static gboolean 
+static gboolean
 tp_list_iter_is_last(GtkWidget * list, GtkTreeIter * iter)
 {
     GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(list));
@@ -813,7 +760,7 @@ tp_page_swap_rows(ToolbarPage * page, gboolean forward)
 }
 
 /* Add an item to a GtkTreeView's GtkListStore.
- */ 
+ */
 static void
 tp_store_set(GtkListStore * store, GtkTreeIter * iter, gint item)
 {
@@ -858,13 +805,13 @@ tp_page_add_selected(ToolbarPage * page)
     selection =
         gtk_tree_view_get_selection(GTK_TREE_VIEW(page->current));
     if (gtk_tree_selection_get_selected(selection, &model, &sibling))
-        gtk_list_store_insert_before(GTK_LIST_STORE(model), &iter, 
+        gtk_list_store_insert_before(GTK_LIST_STORE(model), &iter,
                                      &sibling);
     else
         gtk_list_store_append(GTK_LIST_STORE(model), &iter);
 
     tp_store_set(GTK_LIST_STORE(model), &iter, item);
-	
+
     path = gtk_tree_model_get_path(model, &iter);
     gtk_tree_selection_select_path(selection, path);
     gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(page->current), path, NULL,
@@ -887,14 +834,14 @@ tp_page_remove_selected(ToolbarPage * page)
     GtkTreeModel *model;
     GtkTreeIter iter;
     GtkTreePath *path;
-    
+
     if (!gtk_tree_selection_get_selected(selection, &model, &iter))
         return;
     path = gtk_tree_model_get_path(model, &iter);
 
     gtk_list_store_remove(GTK_LIST_STORE(model), &iter);
 
-    if (gtk_tree_model_get_iter(model, &iter, path) 
+    if (gtk_tree_model_get_iter(model, &iter, path)
         || gtk_tree_path_prev(path)) {
         gtk_tree_selection_select_path(selection, path);
         gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(page->current),

@@ -190,7 +190,7 @@ AC_ARG_WITH(ssl,
 
 AC_ARG_WITH(unique,
    AC_HELP_STRING([--with-unique],
-                  [Use libUnique instead of BonoboActivation (default=no)]),
+                  [Use libUnique (default=no)]),
                   [with_unique=$withval],[with_unique=no])
 
 AC_ARG_WITH(gmime,
@@ -280,13 +280,6 @@ fi
 dnl #####################################################################
 dnl GNOME libs
 dnl #####################################################################
-if test x$with_gnome != xno; then
-   gnome_extras="libgnome-2.0 libgnomeui-2.0 libbonobo-2.0 gconf-2.0"
-   AC_DEFINE(HAVE_GNOME,1,[Defined when gnome libs are available.])
-else
-   gnome_extras=""
-fi
-AM_CONDITIONAL([BUILD_WITH_GNOME], [test $with_gnome = "yes"])
 
 AC_MSG_CHECKING([whether we have gnome-keyring])
 if $PKG_CONFIG --atleast-version=1.0 gnome-keyring-1; then

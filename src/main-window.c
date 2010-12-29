@@ -5,17 +5,17 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option) 
+ * the Free Software Foundation; either version 2, or (at your option)
  * any later version.
- *  
+ *
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 
@@ -40,7 +40,7 @@
 #include "misc.h"
 #include "html.h"
 #include <glib/gi18n.h>
- 
+
 #if HAVE_MACOSX_DESKTOP
 #  include <ige-mac-integration.h>
 #  include "macosx-helpers.h"
@@ -291,11 +291,11 @@ static void bw_send_msg_window_destroy_cb(GtkWidget * widget, gpointer data);
 #endif /*ENABLE_TOUCH_UI */
 static BalsaIndex *bw_notebook_find_page(GtkNotebook * notebook,
                                          gint x, gint y);
-static void bw_notebook_drag_received_cb(GtkWidget* widget, 
-                                         GdkDragContext* context, 
-                                         gint x, gint y, 
-                                         GtkSelectionData* selection_data, 
-                                         guint info, guint32 time, 
+static void bw_notebook_drag_received_cb(GtkWidget* widget,
+                                         GdkDragContext* context,
+                                         gint x, gint y,
+                                         GtkSelectionData* selection_data,
+                                         guint info, guint32 time,
                                          gpointer data);
 static gboolean bw_notebook_drag_motion_cb(GtkWidget* widget,
                                            GdkDragContext* context,
@@ -456,7 +456,7 @@ static const GtkActionEntry entries[] = {
 };
 
 /* Actions that are sensitive only when a mailbox is selected: */
-static const GtkActionEntry mailbox_entries[] = { 
+static const GtkActionEntry mailbox_entries[] = {
     /* Edit menu items */
     {"SelectAll", NULL, N_("Select _All"), "<control>A", NULL,
      G_CALLBACK(bw_select_all_cb)},
@@ -505,7 +505,7 @@ static const GtkActionEntry mailbox_entries[] = {
 
 /* Actions that are sensitive only when one or more messages are
  * selected: */
-static const GtkActionEntry message_entries[] = { 
+static const GtkActionEntry message_entries[] = {
     /* Message menu items */
     {"Reply", BALSA_PIXMAP_REPLY, N_("_Reply..."), MAC_MODIFIER "R",
      N_("Reply to the current message"), G_CALLBACK(bw_replyto_message_cb)},
@@ -569,7 +569,7 @@ static const GtkActionEntry current_message_entries[] = {
 
 /* Actions that are sensitive only when a message is selected and
  * can be modified: */
-static const GtkActionEntry modify_message_entries[] = { 
+static const GtkActionEntry modify_message_entries[] = {
     /* Message menu items */
 #if !defined(ENABLE_TOUCH_UI)
     {"MoveToTrash", GTK_STOCK_DELETE, N_("_Move to Trash"), MAC_MODIFIER "D",
@@ -1020,7 +1020,7 @@ bw_delete_cb(GtkWidget* main_window)
      * (for example) could refuse to get deleted and we would be left
      * with disabled main window. */
     if(libbalsa_is_sending_mail()) {
-        GtkWidget* d = 
+        GtkWidget* d =
             gtk_message_dialog_new(GTK_WINDOW(main_window),
                                    GTK_DIALOG_MODAL,
                                    GTK_MESSAGE_QUESTION,
@@ -1032,7 +1032,7 @@ bw_delete_cb(GtkWidget* main_window)
          * but we must know their ids. */
         gtk_widget_destroy(d);
         return retval != GTK_RESPONSE_YES; /* keep running unless OK */
-    }                                          
+    }
 #endif
     return FALSE; /* allow delete */
 }
@@ -1679,15 +1679,15 @@ balsa_window_new()
 #if HAVE_MACOSX_DESKTOP
     ige_mac_menu_set_menu_bar(GTK_MENU_SHELL(menubar));
     ige_mac_menu_set_quit_menu_item(GTK_MENU_ITEM(gtk_ui_manager_get_widget(ui_manager, "/MainMenu/FileMenu/Quit")));
- 
+
     group = ige_mac_menu_add_app_menu_group();
     ige_mac_menu_add_app_menu_item(group,
-                                  GTK_MENU_ITEM(gtk_ui_manager_get_widget(ui_manager, "/MainMenu/HelpMenu/About")), 
+                                  GTK_MENU_ITEM(gtk_ui_manager_get_widget(ui_manager, "/MainMenu/HelpMenu/About")),
                                    NULL);
-				   
+
     group = ige_mac_menu_add_app_menu_group();
     ige_mac_menu_add_app_menu_item(group,
-                                  GTK_MENU_ITEM(gtk_ui_manager_get_widget(ui_manager, "/MainMenu/EditMenu/Preferences")), 
+                                  GTK_MENU_ITEM(gtk_ui_manager_get_widget(ui_manager, "/MainMenu/EditMenu/Preferences")),
                                    NULL);
     libbalsa_macosx_menu(GTK_WIDGET(window), GTK_MENU_SHELL(menubar));
 #else
@@ -1764,7 +1764,7 @@ balsa_window_new()
                  "vadjustment", &vadj, NULL);
     window->mblist = gtk_scrolled_window_new(hadj, vadj);
 
-    gtk_container_add(GTK_CONTAINER(window->mblist), 
+    gtk_container_add(GTK_CONTAINER(window->mblist),
                       GTK_WIDGET(balsa_app.mblist));
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(window->mblist),
                                    GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
@@ -1782,8 +1782,8 @@ balsa_window_new()
     bw_set_active(window, "ShowMailboxTree", balsa_app.show_mblist, FALSE);
 #endif                          /* !defined(ENABLE_TOUCH_UI) */
 
-    gtk_paned_set_position(GTK_PANED(window->paned_master), 
-                           balsa_app.show_mblist 
+    gtk_paned_set_position(GTK_PANED(window->paned_master),
+                           balsa_app.show_mblist
                            ? balsa_app.mblist_width
                            : 0);
 
@@ -1806,14 +1806,14 @@ balsa_window_new()
         GtkAction *action = bw_get_action(window, header_options[i]);
         if (i == balsa_app.shown_headers)
             gtk_toggle_action_set_active(GTK_TOGGLE_ACTION(action), TRUE);
-        g_signal_connect(action, "activate", 
+        g_signal_connect(action, "activate",
                          G_CALLBACK(bw_header_activate_cb), window);
     }
 
 #if !defined(ENABLE_TOUCH_UI)
     for (i = 0; i < G_N_ELEMENTS(threading_options); i++) {
         GtkAction *action = bw_get_action(window, threading_options[i]);
-        g_signal_connect(action, "activate", 
+        g_signal_connect(action, "activate",
                          G_CALLBACK(bw_threading_activate_cb), window);
     }
 
@@ -1872,8 +1872,8 @@ balsa_window_new()
 }
 
 /*
- * Enable or disable menu items/toolbar buttons which depend 
- * on whether there is a mailbox open. 
+ * Enable or disable menu items/toolbar buttons which depend
+ * on whether there is a mailbox open.
  */
 static void
 bw_enable_expand_collapse(BalsaWindow * window, LibBalsaMailbox * mailbox)
@@ -1987,8 +1987,8 @@ balsa_window_update_book_menus(BalsaWindow * window)
 }
 
 /*
- * Enable or disable menu items/toolbar buttons which depend 
- * on if there is a message selected. 
+ * Enable or disable menu items/toolbar buttons which depend
+ * on if there is a message selected.
  */
 static void
 bw_enable_message_menus(BalsaWindow * window, guint msgno)
@@ -2068,7 +2068,7 @@ enable_empty_trash(BalsaWindow * window, TrashState status)
     } else {
         switch(status) {
         case TRASH_CHECK:
-            /* Check msg count in trash; this may be expensive... 
+            /* Check msg count in trash; this may be expensive...
              * lets just enable empty trash to be on the safe side */
 #if CAN_DO_MAILBOX_OPENING_VERY_VERY_FAST
             if (balsa_app.trash) {
@@ -2106,7 +2106,7 @@ balsa_window_enable_continue(BalsaWindow * window)
         /* This is commented out because it causes long delays and
          * flickering of the mailbox list if large numbers of messages
          * are selected.  Checking the has_unread_messages flag works
-         * almost as well. 
+         * almost as well.
          * */
 /*      libbalsa_mailbox_open(balsa_app.draftbox, FALSE); */
 /*      if (libbalsa_mailbox_total_messages(balsa_app.draftbox) > 0) { */
@@ -2197,7 +2197,7 @@ bw_set_filter_menu(BalsaWindow * window, int mask)
     }
 }
 
-/* balsa_window_open_mbnode: 
+/* balsa_window_open_mbnode:
    opens mailbox, creates message index. mblist_open_mailbox() is what
    you want most of the time because it can switch between pages if a
    mailbox is already on one of them.
@@ -2333,7 +2333,7 @@ bw_real_open_mbnode(BalsaWindow *window, BalsaMailboxNode * mbnode,
     if (!window || failurep) {
         libbalsa_information(
             LIBBALSA_INFORMATION_ERROR,
-            _("Unable to Open Mailbox!\n%s."), 
+            _("Unable to Open Mailbox!\n%s."),
 	    err ? err->message : _("Unknown error"));
 	g_clear_error(&err);
         g_object_unref(g_object_ref_sink(index));
@@ -2627,7 +2627,7 @@ static pthread_mutex_t open_list_lock = PTHREAD_MUTEX_INITIALIZER;
 #define LOCK_OPEN_LIST pthread_mutex_lock(&open_list_lock)
 #define UNLOCK_OPEN_LIST pthread_mutex_unlock(&open_list_lock)
 #else
-#define LOCK_OPEN_LIST 
+#define LOCK_OPEN_LIST
 #define UNLOCK_OPEN_LIST
 #endif
 static void
@@ -2693,7 +2693,7 @@ bw_show_about_box(GtkAction * action, gpointer user_data)
 
     const gchar *translator_credits = _("translator-credits");
     /* FIXME: do we need error handling for this? */
-    GdkPixbuf *balsa_logo = 
+    GdkPixbuf *balsa_logo =
         gdk_pixbuf_new_from_file(BALSA_DATA_PREFIX
                                  "/pixmaps/balsa_logo.png", NULL);
 
@@ -2802,7 +2802,7 @@ ensure_check_mail_dialog(BalsaWindow * window)
 
     if (progress_dialog && GTK_IS_WIDGET(progress_dialog))
 	gtk_widget_destroy(GTK_WIDGET(progress_dialog));
-    
+
     progress_dialog =
 	gtk_dialog_new_with_buttons(_("Checking Mail..."),
                                     GTK_WINDOW(window),
@@ -2812,24 +2812,24 @@ ensure_check_mail_dialog(BalsaWindow * window)
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu_for_parent(progress_dialog, GTK_WINDOW(window));
 #endif
-    gtk_window_set_wmclass(GTK_WINDOW(progress_dialog), 
+    gtk_window_set_wmclass(GTK_WINDOW(progress_dialog),
 			   "progress_dialog", "Balsa");
-        
+
     g_signal_connect(G_OBJECT(progress_dialog), "destroy",
 		     G_CALLBACK(bw_progress_dialog_destroy_cb), NULL);
     g_signal_connect(G_OBJECT(progress_dialog), "response",
 		     G_CALLBACK(bw_progress_dialog_response_cb), NULL);
-    
+
     content_box =
         GTK_BOX(gtk_dialog_get_content_area(GTK_DIALOG(progress_dialog)));
     progress_dialog_source = gtk_label_new(_("Checking Mail..."));
     gtk_box_pack_start(content_box, progress_dialog_source,
                        FALSE, FALSE, 0);
-    
+
     progress_dialog_message = gtk_label_new("");
     gtk_box_pack_start(content_box, progress_dialog_message,
                        FALSE, FALSE, 0);
-    
+
     progress_dialog_bar = gtk_progress_bar_new();
     gtk_box_pack_start(content_box, progress_dialog_bar,
                        FALSE, FALSE, 0);
@@ -2862,10 +2862,10 @@ check_new_messages_real(BalsaWindow * window, int type)
     if (window)
         bw_set_sensitive(window, "GetNewMail", FALSE);
 
-    quiet_check = (type == TYPE_CALLBACK) 
+    quiet_check = (type == TYPE_CALLBACK)
         ? 0 : balsa_app.quiet_background_check;
 
-    if (type == TYPE_CALLBACK && 
+    if (type == TYPE_CALLBACK &&
         (balsa_app.pwindow_option == WHILERETR ||
          (balsa_app.pwindow_option == UNTILCLOSED && progress_dialog)))
 	ensure_check_mail_dialog(window);
@@ -2880,7 +2880,7 @@ check_new_messages_real(BalsaWindow * window, int type)
     info->window = window ? g_object_ref(window) : window;
     pthread_create(&get_mail_thread,
                    NULL, (void *) &bw_check_messages_thread, info);
-    
+
     /* Detach so we don't need to pthread_join
      * This means that all resources will be
      * reclaimed as soon as the thread exits
@@ -2982,7 +2982,7 @@ bw_page_setup_cb(GtkAction * action, gpointer data)
     message_print_page_setup(GTK_WINDOW(data));
 }
 
-/* Callback for `Print current message' item on the `File' menu, 
+/* Callback for `Print current message' item on the `File' menu,
  * and the toolbar button. */
 static void
 bw_message_print_cb(GtkAction * action, gpointer data)
@@ -3034,13 +3034,13 @@ bw_mailbox_check(LibBalsaMailbox * mailbox)
 static void
 bw_check_messages_thread(struct check_messages_thread_info *info)
 {
-    /*  
+    /*
      *  It is assumed that this will always be called as a pthread,
      *  and that the calling procedure will check for an existing lock
      */
     MailThreadMessage *threadmessage;
     GSList *list = info->list;
-    
+
     pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
 
     MSGMAILTHREAD(threadmessage, LIBBALSA_NTFY_SOURCE, NULL, "POP3", 0, 0);
@@ -3052,7 +3052,7 @@ bw_check_messages_thread(struct check_messages_thread_info *info)
 
     MSGMAILTHREAD(threadmessage, LIBBALSA_NTFY_FINISHED, NULL, "Finished",
                   0, 0);
-    
+
     pthread_mutex_unlock(&checking_mail_lock);
 
     if (info->window) {
@@ -3061,7 +3061,7 @@ bw_check_messages_thread(struct check_messages_thread_info *info)
         g_object_unref(info->window);
         gdk_threads_leave();
     }
-    
+
     g_free(info);
     pthread_exit(0);
 }
@@ -3105,7 +3105,7 @@ mail_progress_notify_cb(GIOChannel * source, GIOCondition condition,
         g_free(msgbuffer);
         return TRUE;
     }
-    
+
     gdk_threads_enter();
 
     statusbar = GTK_STATUSBAR((*window)->statusbar);
@@ -3293,7 +3293,7 @@ send_progress_notify_cb(GIOChannel * source, GIOCondition condition,
 
     return TRUE;
 }
- 
+
 #endif
 
 /** Returns properly formatted string informing the user about the
@@ -3358,13 +3358,8 @@ bw_display_new_mail_notification(int num_new, int has_new)
                       num_new + num_total), num_new + num_total);
             else
                 msg = g_strdup(_("Balsa: you have new mail."));
-#if GTK_CHECK_VERSION(2, 15, 0)
             gtk_status_icon_set_tooltip_text(balsa_app.main_window->
                                              new_mail_tray, msg);
-#else                           /* GTK_CHECK_VERSION(2, 16, 0) */
-            gtk_status_icon_set_tooltip(balsa_app.main_window->
-                                        new_mail_tray, msg);
-#endif                          /* GTK_CHECK_VERSION(2, 16, 0) */
             gtk_status_icon_set_visible(balsa_app.main_window->
                                         new_mail_tray, TRUE);
             g_free(msg);
@@ -3675,7 +3670,7 @@ bw_next_message_cb(GtkAction * action, gpointer data)
         BALSA_INDEX(balsa_window_find_current_index(BALSA_WINDOW(data))));
 }
 
-/* Select next unread message, changing mailboxes if necessary; 
+/* Select next unread message, changing mailboxes if necessary;
  * returns TRUE if mailbox was changed. */
 gboolean
 balsa_window_next_unread(BalsaWindow * window)
@@ -3852,7 +3847,7 @@ bw_trash_message_cb(GtkAction * action, gpointer data)
 static void
 bw_toggle_deleted_message_cb(GtkAction * action, gpointer data)
 {
-    LibBalsaMessageFlag f = LIBBALSA_MESSAGE_FLAG_DELETED; 
+    LibBalsaMessageFlag f = LIBBALSA_MESSAGE_FLAG_DELETED;
     balsa_index_toggle_flag
         (BALSA_INDEX(balsa_window_find_current_index(BALSA_WINDOW(data))),
          f);
@@ -3943,7 +3938,7 @@ bw_set_sort_menu(BalsaWindow *window,
 }
 
 static void
-bw_sort_change_cb(GtkRadioAction *action, GtkRadioAction *current, gpointer data) 
+bw_sort_change_cb(GtkRadioAction *action, GtkRadioAction *current, gpointer data)
 {
     BalsaWindow *window = BALSA_WINDOW(data);
     LibBalsaMailboxSortFields key;
@@ -3980,7 +3975,7 @@ bw_sort_change_cb(GtkRadioAction *action, GtkRadioAction *current, gpointer data
                                        LB_MAILBOX_THREADING_FLAT);
     order = libbalsa_mailbox_get_sort_type(mailbox);
     gtk_tree_sortable_set_sort_column_id(GTK_TREE_SORTABLE(mailbox),
-                                         col, 
+                                         col,
                                          order == LB_MAILBOX_SORT_TYPE_ASC
                                          ? GTK_SORT_ASCENDING
                                          : GTK_SORT_DESCENDING);
@@ -4012,7 +4007,7 @@ bw_toggle_order_cb(GtkToggleAction * action, gpointer data)
         g_warning("This should not be possible"); return;
     }
     gtk_tree_sortable_set_sort_column_id(GTK_TREE_SORTABLE(mailbox),
-                                         col, 
+                                         col,
                                          order == LB_MAILBOX_SORT_TYPE_ASC
                                          ? GTK_SORT_ASCENDING
                                          : GTK_SORT_DESCENDING);
@@ -4031,7 +4026,7 @@ bw_wrap_message_cb(GtkToggleAction * action, gpointer data)
     refresh_preferences_manager();
 }
 
-#if !defined(ENABLE_TOUCH_UI) 
+#if !defined(ENABLE_TOUCH_UI)
 static void
 bw_show_helper(GtkToggleAction * action, gboolean * active,
                GtkWidget * widget)
@@ -4226,7 +4221,7 @@ bw_find_button_clicked(GtkWidget * widget, gpointer data)
     gtk_dialog_response(GTK_DIALOG(dialog), GPOINTER_TO_INT(data));
 }
 
-static void 
+static void
 bw_find_real(BalsaWindow * window, BalsaIndex * bindex, gboolean again)
 {
     /* Condition set up for the search, it will be of type
@@ -4258,7 +4253,7 @@ bw_find_real(BalsaWindow * window, BalsaIndex * bindex, gboolean again)
 	GtkToggleButton *matching_body, *matching_from;
         GtkToggleButton *matching_to, *matching_cc, *matching_subject;
 	gint ok;
-	
+
 #if HAVE_MACOSX_DESKTOP
 	libbalsa_macosx_menu_for_parent(dia, GTK_WINDOW(window));
 #endif
@@ -4278,14 +4273,14 @@ bw_find_real(BalsaWindow * window, BalsaIndex * bindex, gboolean again)
 
 	/* builds the toggle buttons to specify fields concerned by
          * the search. */
-    
+
 	frame = gtk_frame_new(_("In:"));
 	gtk_frame_set_label_align(GTK_FRAME(frame),
 				  GTK_POS_LEFT, GTK_POS_TOP);
 	gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_ETCHED_IN);
 	gtk_container_set_border_width(GTK_CONTAINER(frame), 6);
 	gtk_box_pack_start(GTK_BOX(vbox), frame, FALSE, FALSE, 2);
-    
+
 	table = gtk_table_new(2, 3, TRUE);
 	matching_body    = bw_add_check_button(table, _("_Body"),    0, 0);
 	matching_to      = bw_add_check_button(table, _("_To:"),     1, 0);
@@ -4305,12 +4300,12 @@ bw_find_real(BalsaWindow * window, BalsaIndex * bindex, gboolean again)
 	gtk_container_set_border_width(GTK_CONTAINER(box), 6);
 	button = gtk_button_new_from_stock(GTK_STOCK_APPLY);
 	g_signal_connect(G_OBJECT(button), "clicked",
-			 G_CALLBACK(bw_find_button_clicked), 
+			 G_CALLBACK(bw_find_button_clicked),
 			 GINT_TO_POINTER(FIND_RESPONSE_FILTER));
 	gtk_container_add(GTK_CONTAINER(box), button);
 	button = gtk_button_new_from_stock(GTK_STOCK_CLEAR);
 	g_signal_connect(G_OBJECT(button), "clicked",
-			 G_CALLBACK(bw_find_button_clicked), 
+			 G_CALLBACK(bw_find_button_clicked),
 			 GINT_TO_POINTER(FIND_RESPONSE_RESET));
 	gtk_container_add(GTK_CONTAINER(box), button);
 	gtk_container_add(GTK_CONTAINER(frame), box);
@@ -4326,12 +4321,12 @@ bw_find_real(BalsaWindow * window, BalsaIndex * bindex, gboolean again)
 	gtk_container_add(GTK_CONTAINER(frame), box);
 	w = gtk_vbox_new(TRUE, 2);
 	gtk_container_set_border_width(GTK_CONTAINER(w), 6);
-	reverse_button = 
+	reverse_button =
             gtk_check_button_new_with_mnemonic(_("_Reverse search"));
 	gtk_box_pack_start(GTK_BOX(w), reverse_button, TRUE, TRUE, 0);
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(reverse_button),
                                      reverse);
-	wrap_button = 
+	wrap_button =
             gtk_check_button_new_with_mnemonic(_("_Wrap around"));
 	gtk_box_pack_start(GTK_BOX(w), wrap_button, TRUE, TRUE, 0);
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(wrap_button),
@@ -4343,7 +4338,7 @@ bw_find_real(BalsaWindow * window, BalsaIndex * bindex, gboolean again)
 	gtk_container_set_border_width(GTK_CONTAINER(w), 6);
 	button = gtk_button_new_from_stock(GTK_STOCK_OK);
 	g_signal_connect(G_OBJECT(button), "clicked",
-			 G_CALLBACK(bw_find_button_clicked), 
+			 G_CALLBACK(bw_find_button_clicked),
 			 GINT_TO_POINTER(GTK_RESPONSE_OK));
 	gtk_container_add(GTK_CONTAINER(w), button);
 	gtk_box_pack_start(GTK_BOX(box), w, TRUE, TRUE, 0);
@@ -4384,7 +4379,7 @@ bw_find_real(BalsaWindow * window, BalsaIndex * bindex, gboolean again)
 		cnd->match.string.string =
                     g_strdup(gtk_entry_get_text(GTK_ENTRY(search_entry)));
 		cnd->match.string.fields=CONDITION_EMPTY;
-                
+
 		if (gtk_toggle_button_get_active(matching_body))
 		    CONDITION_SETMATCH(cnd,CONDITION_MATCH_BODY);
 		if (gtk_toggle_button_get_active(matching_to))
@@ -4397,14 +4392,14 @@ bw_find_real(BalsaWindow * window, BalsaIndex * bindex, gboolean again)
 		    CONDITION_SETMATCH(cnd,CONDITION_MATCH_CC);
 		if (!(cnd->match.string.fields!=CONDITION_EMPTY &&
                     cnd->match.string.string[0]))
-                    
+
 		    /* FIXME : We should print error messages, but for
 		     * that we should first make find dialog non-modal
 		     * balsa_information(LIBBALSA_INFORMATION_ERROR,_("You
 		     * must specify at least one field to look in"));
 		     * *balsa_information(LIBBALSA_INFORMATION_ERROR,_("You
 		     * must provide a non-empty string")); */
-                    ok = GTK_RESPONSE_CANCEL; 
+                    ok = GTK_RESPONSE_CANCEL;
                 break;
 	    case GTK_RESPONSE_HELP:
                 gtk_show_uri(NULL, "ghelp:balsa?win-search",
@@ -4420,7 +4415,7 @@ bw_find_real(BalsaWindow * window, BalsaIndex * bindex, gboolean again)
 		bw_reset_filter_cb(NULL, window);
 		/* fall through */
             default:
-		ok = GTK_RESPONSE_CANCEL; 
+		ok = GTK_RESPONSE_CANCEL;
 		break;/* cancel or just close */
             } /* end of switch */
 	} while (ok==GTK_RESPONSE_HELP);
@@ -4433,7 +4428,7 @@ bw_find_real(BalsaWindow * window, BalsaIndex * bindex, gboolean again)
 	search_iter = NULL;
 
         if(ok == FIND_RESPONSE_FILTER) {
-            LibBalsaMailbox *mailbox = 
+            LibBalsaMailbox *mailbox =
                 BALSA_INDEX(bindex)->mailbox_node->mailbox;
             LibBalsaCondition *filter, *res;
             filter = bw_get_view_filter(window);
@@ -4506,7 +4501,7 @@ bw_filter_run_cb(GtkAction * action, gpointer data)
 	/* FIXME : Perhaps should we be able to apply filters on folders (ie recurse on all mailboxes in it),
 	   but there are problems of infinite recursion (when one mailbox being filtered is also the destination
 	   of the filter action (eg a copy)). So let's see that later :) */
-	balsa_information(LIBBALSA_INFORMATION_WARNING, 
+	balsa_information(LIBBALSA_INFORMATION_WARNING,
                           _("You can apply filters only on mailbox\n"));
 }
 
@@ -4581,7 +4576,7 @@ bw_get_flag_filter(BalsaWindow *window)
     };
     unsigned i, j;
     LibBalsaCondition *filter;
-    
+
     for(i=0; i<ELEMENTS(match_flags); i++)
         match_flags[i].setby = -1;
 
@@ -4602,7 +4597,7 @@ bw_get_flag_filter(BalsaWindow *window)
                 break;
             }
     }
-    
+
     /* match_flags contains collected information, time to create a
      * LibBalsaCondition data structure.
      */
@@ -4672,7 +4667,7 @@ bw_hide_changed_cb(GtkToggleAction * toggle_action, gpointer data)
     BalsaWindow *bw = BALSA_WINDOW(data);
     GtkWidget *index = balsa_window_find_current_index(bw);
     LibBalsaCondition *filter;
-    
+
     /* PART 1: assure menu consistency */
     if (gtk_toggle_action_get_active(toggle_action)) {
         /* we may need to deactivate coupled negated flag. */
@@ -4827,7 +4822,7 @@ balsa_change_window_layout(BalsaWindow *window)
     g_object_ref(window->notebook);
     g_object_ref(window->mblist);
     g_object_ref(window->preview);
- 
+
     gtk_container_remove(GTK_CONTAINER
                          (gtk_widget_get_parent(window->notebook)),
                          window->notebook);
@@ -4843,8 +4838,8 @@ balsa_change_window_layout(BalsaWindow *window)
     g_object_unref(window->notebook);
     g_object_unref(window->mblist);
     g_object_unref(window->preview);
- 
-    gtk_paned_set_position(GTK_PANED(window->paned_master), 
+
+    gtk_paned_set_position(GTK_PANED(window->paned_master),
                            balsa_app.show_mblist ?
                            balsa_app.mblist_width : 0);
     gtk_widget_show(window->paned_slave);
@@ -4871,7 +4866,7 @@ bw_size_allocate_cb(GtkWidget * window, GtkAllocation * alloc)
     }
 }
 
-/* When page is switched we change the preview window and the selected 
+/* When page is switched we change the preview window and the selected
    mailbox in the mailbox tree.
  */
 static void
@@ -5051,7 +5046,7 @@ bw_send_msg_window_destroy_cb(GtkWidget * widget, gpointer data)
 
 
 /* notebook_find_page
- * 
+ *
  * Description: Finds the page from which notebook page tab the
  * coordinates are over.
  **/
@@ -5065,25 +5060,17 @@ bw_notebook_find_page (GtkNotebook* notebook, gint x, gint y)
     gint label_y;
     gint label_width;
     gint label_height;
-#if GTK_CHECK_VERSION(2, 18, 0)
     GtkAllocation allocation;
-#endif                          /* GTK_CHECK_VERSION(2, 18, 0) */
-    
+
     /* x and y are relative to the notebook, but the label allocations
      * are relative to the main window. */
-#if GTK_CHECK_VERSION(2, 18, 0)
     gtk_widget_get_allocation(GTK_WIDGET(notebook), &allocation);
     x += allocation.x;
     y += allocation.y;
-#else                           /* GTK_CHECK_VERSION(2, 18, 0) */
-    x += GTK_WIDGET(notebook)->allocation.x;
-    y += GTK_WIDGET(notebook)->allocation.y;
-#endif                          /* GTK_CHECK_VERSION(2, 18, 0) */
 
     while ((page = gtk_notebook_get_nth_page (notebook, page_num)) != NULL) {
         label = gtk_notebook_get_tab_label (notebook, page);
-        
-#if GTK_CHECK_VERSION(2, 18, 0)
+
         gtk_widget_get_allocation(label, &allocation);
         label_x     = allocation.x;
         label_width = allocation.width;
@@ -5096,19 +5083,6 @@ bw_notebook_find_page (GtkNotebook* notebook, gint x, gint y)
                 return BALSA_INDEX(gtk_bin_get_child(GTK_BIN(page)));
             }
         }
-#else                           /* GTK_CHECK_VERSION(2, 18, 0) */
-        label_x = label->allocation.x;
-        label_width = label->allocation.width;
-        
-        if (x > label_x && x < label_x + label_width) {
-            label_y = label->allocation.y;
-            label_height = label->allocation.height;
-            
-            if (y > label_y && y < label_y + label_height) {
-                return BALSA_INDEX(gtk_bin_get_child(GTK_BIN(page)));
-            }
-        }
-#endif                          /* GTK_CHECK_VERSION(2, 18, 0) */
         ++page_num;
     }
 
@@ -5117,7 +5091,7 @@ bw_notebook_find_page (GtkNotebook* notebook, gint x, gint y)
 
 
 /* bw_notebook_drag_received_cb
- * 
+ *
  * Description: Signal handler for the drag-data-received signal from
  * the GtkNotebook widget.  Finds the tab the messages were dragged
  * over, then transfers them.
@@ -5154,17 +5128,12 @@ bw_notebook_drag_received_cb(GtkWidget * widget, GdkDragContext * context,
 
     if (index == NULL)
         return;
-    
+
     mailbox = index->mailbox_node->mailbox;
 
     if (mailbox != NULL && mailbox != orig_mailbox)
-#if GTK_CHECK_VERSION(2,22,0)
         balsa_index_transfer(orig_index, selected, mailbox,
                              gdk_drag_context_get_selected_action(context) != GDK_ACTION_MOVE);
-#else
-        balsa_index_transfer(orig_index, selected, mailbox,
-                             context->action != GDK_ACTION_MOVE);
-#endif
     balsa_index_selected_msgnos_free(orig_index, selected);
 }
 
@@ -5173,26 +5142,19 @@ static gboolean bw_notebook_drag_motion_cb(GtkWidget * widget,
                                            gint x, gint y, guint time,
                                            gpointer user_data)
 {
-#if GTK_CHECK_VERSION(2,22,0)
     gdk_drag_status(context,
                     (gdk_drag_context_get_actions(context) ==
                      GDK_ACTION_COPY) ? GDK_ACTION_COPY :
                     GDK_ACTION_MOVE, time);
-#else
-    gdk_drag_status(context,
-                    (context->actions ==
-                     GDK_ACTION_COPY) ? GDK_ACTION_COPY :
-                    GDK_ACTION_MOVE, time);
-#endif
 
     return FALSE;
 }
 
 /* bw_progress_timeout
- * 
+ *
  * This function is called at a preset interval to cause the progress
- * bar to move in activity mode.  
- * this routine is called from g_timeout_dispatch() and needs to take care 
+ * bar to move in activity mode.
+ * this routine is called from g_timeout_dispatch() and needs to take care
  * of GDK locking itself using gdk_threads_{enter,leave}
  *
  * Use of the progress bar to show a fraction of a task takes priority.
@@ -5214,7 +5176,7 @@ bw_progress_timeout(BalsaWindow ** window)
 
 
 /* balsa_window_increase_activity
- * 
+ *
  * Calling this causes this to the progress bar of the window to
  * switch into activity mode if it's not already going.  Otherwise it
  * simply increments the counter (so that multiple threads can
@@ -5251,7 +5213,7 @@ balsa_window_increase_activity(BalsaWindow * window, const gchar * message)
 
 
 /* balsa_window_decrease_activity
- * 
+ *
  * When called, decreases the reference counter of the progress
  * activity bar, if it goes to zero the progress bar is stopped and
  * cleared.
@@ -5261,7 +5223,7 @@ balsa_window_decrease_activity(BalsaWindow * window, const gchar * message)
 {
     GSList *link;
     GtkProgressBar *progress_bar;
-    
+
     link = g_slist_find_custom(window->activity_messages, message,
                                (GCompareFunc) strcmp);
     g_free(link->data);
@@ -5288,14 +5250,14 @@ balsa_window_decrease_activity(BalsaWindow * window, const gchar * message)
 
 
 /* balsa_window_setup_progress
- * 
- * window: BalsaWindow that contains the progressbar 
+ *
+ * window: BalsaWindow that contains the progressbar
  * text:   to appear superimposed on the progress bar,
  *         or NULL to clear and release the progress bar.
- * 
+ *
  * returns: true if initialization is successful, otherwise returns
  * false.
- * 
+ *
  * Initializes the progress bar for incremental operation with a range
  * from 0 to 1.  If the bar is already in activity mode, the function
  * returns false; if the initialization is successful it returns true.
@@ -5304,10 +5266,10 @@ gboolean
 balsa_window_setup_progress(BalsaWindow * window, const gchar * text)
 {
     GtkProgressBar *progress_bar;
-    
+
     if (text) {
         /* make sure the progress bar is currently unused */
-        if (window->progress_type == BALSA_PROGRESS_INCREMENT) 
+        if (window->progress_type == BALSA_PROGRESS_INCREMENT)
             return FALSE;
         window->progress_type = BALSA_PROGRESS_INCREMENT;
     } else
@@ -5326,7 +5288,7 @@ balsa_window_setup_progress(BalsaWindow * window, const gchar * text)
  * balsa_window_setup_progress, this function increments the
  * adjustment by one and executes any pending gtk events.  So the
  * progress bar will be shown as updated even if called within a loop.
- * 
+ *
  * NOTE: This does not work with threads because a thread cannot
  * process events by itself and it holds the GDK lock preventing the
  * main thread from processing events.

@@ -5,17 +5,17 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option) 
+ * the Free Software Foundation; either version 2, or (at your option)
  * any later version.
- *  
+ *
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 
@@ -44,8 +44,8 @@ static void balsa_ab_window_init(BalsaAbWindow *ab);
 static void balsa_ab_window_class_init(BalsaAbWindowClass *klass);
 
 /* Loading ... */
-static void balsa_ab_window_load_cb(LibBalsaAddressBook *libbalsa_ab, 
-				       LibBalsaAddress *address, 
+static void balsa_ab_window_load_cb(LibBalsaAddressBook *libbalsa_ab,
+				       LibBalsaAddress *address,
 				       BalsaAbWindow *ab);
 static void balsa_ab_window_load(BalsaAbWindow *ab);
 static void balsa_ab_window_reload(GtkWidget *w, BalsaAbWindow *av);
@@ -53,7 +53,7 @@ static void balsa_ab_window_reload(GtkWidget *w, BalsaAbWindow *av);
 /* Callbacks ... */
 static void balsa_ab_window_dist_mode_toggled(GtkWidget * w,
 						 BalsaAbWindow *ab);
-static void balsa_ab_window_menu_changed(GtkWidget * widget, 
+static void balsa_ab_window_menu_changed(GtkWidget * widget,
 					    BalsaAbWindow *ab);
 static void balsa_ab_window_run_editor(GtkWidget * widget, gpointer data);
 static void balsa_ab_window_response_cb(BalsaAbWindow *ab, gint resp);
@@ -73,7 +73,7 @@ static void balsa_ab_window_select_recipient(GtkTreeView * view,
                                                 gpointer data);
 static void balsa_ab_window_move_to_recipient_list(GtkWidget *widget,
 						      BalsaAbWindow *ab);
-static void balsa_ab_window_remove_from_recipient_list(GtkWidget *widget, 
+static void balsa_ab_window_remove_from_recipient_list(GtkWidget *widget,
 							  BalsaAbWindow *ab);
 
 /* Utility ... */
@@ -122,8 +122,8 @@ balsa_ab_window_new(gboolean composing, GtkWindow* parent)
 
     BALSA_AB_WINDOW(ret)->composing = composing;
 
-    if ( composing ) { 
-	gtk_dialog_add_buttons(GTK_DIALOG(ret), 
+    if ( composing ) {
+	gtk_dialog_add_buttons(GTK_DIALOG(ret),
                                GTK_STOCK_OK,     GTK_RESPONSE_OK,
                                GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                                NULL);
@@ -239,18 +239,15 @@ balsa_ab_window_init(BalsaAbWindow *ab)
 
     /* hig defaults */
     gtk_container_set_border_width(GTK_CONTAINER(ab), 6);
-#if !GTK_CHECK_VERSION(2,22,0)
-    gtk_dialog_set_has_separator(GTK_DIALOG(ab), FALSE);
-#endif
     gtk_box_set_spacing(GTK_BOX(vbox), 12);
-    
+
 
     /* The main address list */
     ab->address_list =
         balsa_ab_window_list(ab,
                                 G_CALLBACK
                                 (balsa_ab_window_activate_address));
-    
+
     /* The clist for selected addresses in compose mode */
     ab->recipient_list =
         balsa_ab_window_list(ab,
@@ -277,7 +274,7 @@ balsa_ab_window_init(BalsaAbWindow *ab)
     gtk_table_set_row_spacings(GTK_TABLE(table), 6);
     gtk_box_pack_start(GTK_BOX(vbox), table, TRUE, TRUE, 0);
     gtk_widget_show(table);
-    
+
     /* -- table column 1 -- */
     /* Entry widget for finding an address */
     find_label = gtk_label_new_with_mnemonic(_("_Search for Name:"));
@@ -321,7 +318,7 @@ balsa_ab_window_init(BalsaAbWindow *ab)
     gtk_container_add(GTK_CONTAINER(hbox), w);
     gtk_widget_show(GTK_WIDGET(w));
 
-    w = balsa_stock_button_with_label(GTK_STOCK_ADD, 
+    w = balsa_stock_button_with_label(GTK_STOCK_ADD,
                                       _("_Re-Import"));
     g_signal_connect(G_OBJECT(w), "clicked",
                      G_CALLBACK(balsa_ab_window_reload),
@@ -337,28 +334,28 @@ balsa_ab_window_init(BalsaAbWindow *ab)
     gtk_table_attach(GTK_TABLE(table), ab->arrow_box, 1, 2, 1, 2,
 		     GTK_FILL, GTK_EXPAND | GTK_FILL, 6, 0);
     gtk_widget_show(ab->arrow_box);
-    
+
     w = balsa_stock_button_with_label(GTK_STOCK_GO_FORWARD, "");
     gtk_box_pack_start(GTK_BOX(ab->arrow_box), w, TRUE, FALSE, 0);
     gtk_widget_show(w);
     g_signal_connect(G_OBJECT(w), "clicked",
 		     G_CALLBACK(balsa_ab_window_move_to_recipient_list),
 		       ab);
-    
+
     w = balsa_stock_button_with_label(GTK_STOCK_GO_BACK, "");
     gtk_box_pack_start(GTK_BOX(ab->arrow_box), w, TRUE, FALSE, 0);
     gtk_widget_show(w);
     g_signal_connect(G_OBJECT(w), "clicked",
 		     G_CALLBACK(balsa_ab_window_remove_from_recipient_list),
 		       ab);
-    
+
     /* -- table column 3 -- */
     /* label for selected addresses in compose mode */
     ab->send_to_label = gtk_label_new(_("Send-To"));
     gtk_widget_show(ab->send_to_label);
     gtk_table_attach(GTK_TABLE(table), ab->send_to_label, 2, 3, 0, 1,
 		     GTK_FILL, GTK_FILL, 0, 0);
-    
+
     /* list for selected addresses in compose mode */
     ab->send_to_list = gtk_scrolled_window_new(NULL, NULL);
     gtk_widget_show(ab->send_to_list);
@@ -394,13 +391,13 @@ balsa_ab_window_init(BalsaAbWindow *ab)
     /* Pack them into a box  */
     box2 = gtk_vbox_new(TRUE, 1);
     gtk_container_add(GTK_CONTAINER(frame), box2);
-    gtk_box_pack_start(GTK_BOX(box2), ab->single_address_mode_radio, 
+    gtk_box_pack_start(GTK_BOX(box2), ab->single_address_mode_radio,
 		       FALSE, FALSE, 1);
-    gtk_box_pack_start(GTK_BOX(box2), ab->dist_address_mode_radio, 
+    gtk_box_pack_start(GTK_BOX(box2), ab->dist_address_mode_radio,
 		       FALSE, FALSE, 1);
     gtk_widget_show(box2);
     gtk_box_pack_start(GTK_BOX(vbox), frame, FALSE, FALSE, 1);
-    
+
     gtk_widget_grab_focus(ab->filter_entry);
 }
 
@@ -468,11 +465,11 @@ balsa_ab_window_get_recipients(BalsaAbWindow * ab)
   Moves an entry between two CLists.
 */
 /*
-  FIXME: Need to only move it back if it belongs in current address book?? 
+  FIXME: Need to only move it back if it belongs in current address book??
 */
 /*
  * balsa_ab_window_swap_list_entry is the method.
- * 
+ *
  * balsa_ab_window_swap_make_gslist, balsa_ab_window_swap_real,
  * and balsa_ab_window_swap_do_swap are callbacks/helpers.
  */
@@ -532,7 +529,7 @@ balsa_ab_window_swap_do_swap(gpointer data, gpointer user_data)
     GtkTreePath *path = gtk_tree_row_reference_get_path(reference);
 
     if (path) {
-        GtkTreeView *tree_view = 
+        GtkTreeView *tree_view =
             g_object_get_data(G_OBJECT(user_data), BALSA_TREE_VIEW);
         GtkTreeModel *model = gtk_tree_view_get_model(tree_view);
         GtkTreeModel *dst_model = gtk_tree_view_get_model(user_data);
@@ -634,7 +631,7 @@ balsa_ab_window_move_to_recipient_list(GtkWidget *widget, BalsaAbWindow *ab)
     g_return_if_fail( BALSA_IS_AB_WINDOW(ab) );
     g_return_if_fail( ab->composing );
 
-    balsa_ab_window_swap_list_entry(GTK_TREE_VIEW(ab->address_list), 
+    balsa_ab_window_swap_list_entry(GTK_TREE_VIEW(ab->address_list),
 				       GTK_TREE_VIEW(ab->recipient_list));
 }
 
@@ -647,7 +644,7 @@ balsa_ab_window_remove_from_recipient_list(GtkWidget *widget, BalsaAbWindow *ab)
     g_return_if_fail( BALSA_IS_AB_WINDOW(ab) );
     g_return_if_fail( ab->composing );
 
-    balsa_ab_window_swap_list_entry(GTK_TREE_VIEW(ab->recipient_list), 
+    balsa_ab_window_swap_list_entry(GTK_TREE_VIEW(ab->recipient_list),
 				       GTK_TREE_VIEW(ab->address_list));
 }
 
@@ -866,15 +863,15 @@ balsa_ab_window_menu_changed(GtkWidget * widget, BalsaAbWindow *ab)
 
     ab->current_address_book = addr;
 
-    g_signal_handler_block(G_OBJECT(ab->single_address_mode_radio), 
+    g_signal_handler_block(G_OBJECT(ab->single_address_mode_radio),
 			   ab->toggle_handler_id);
     if ( ab->current_address_book->dist_list_mode )
 	gtk_toggle_button_set_active(
 	    GTK_TOGGLE_BUTTON(ab->dist_address_mode_radio), TRUE);
-    else 
+    else
 	gtk_toggle_button_set_active(
 	    GTK_TOGGLE_BUTTON(ab->single_address_mode_radio), TRUE);
-    g_signal_handler_unblock(G_OBJECT(ab->single_address_mode_radio), 
+    g_signal_handler_unblock(G_OBJECT(ab->single_address_mode_radio),
 			     ab->toggle_handler_id);
 
     balsa_ab_window_load(ab);

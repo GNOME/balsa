@@ -5,17 +5,17 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option) 
+ * the Free Software Foundation; either version 2, or (at your option)
  * any later version.
- *  
+ *
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 
@@ -100,7 +100,7 @@ balsa_init_add_table_entry(GtkTable * table, guint num, const gchar * ltext,
         ed->page = page;
         if (etext && etext[0] != '\0')
             ed->master->setbits |= (1 << num);
-        
+
         ed->master->donemask = (ed->master->donemask << 1) | 1;
     }
     gtk_entry_set_text(GTK_ENTRY(e), etext);
@@ -120,13 +120,8 @@ entry_changed_cb(GtkEntry * entry, EntryData * ed)
     /* The stuff below is only when we are displayed... which is not
      * always the case.
      */
-#if GTK_CHECK_VERSION(2, 18, 0)
     if (!gtk_widget_get_visible(GTK_WIDGET(entry)))
         return;
-#else                           /* GTK_CHECK_VERSION(2, 18, 0) */
-    if (!GTK_WIDGET_VISIBLE(GTK_WIDGET(entry)))
-        return;
-#endif                          /* GTK_CHECK_VERSION(2, 18, 0) */
 
     if (GTK_IS_ASSISTANT(ed->druid)) {
         /* Don't let them continue unless all entries have something. */

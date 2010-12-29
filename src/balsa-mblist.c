@@ -5,17 +5,17 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option) 
+ * the Free Software Foundation; either version 2, or (at your option)
  * any later version.
- *  
+ *
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 
@@ -327,17 +327,10 @@ bmbl_drag_motion(GtkWidget * mblist, GdkDragContext * context, gint x,
                                     GTK_TREE_VIEW_DROP_INTO_OR_BEFORE);
     gtk_tree_path_free(path);
 
-#if GTK_CHECK_VERSION(2,22,0)
     gdk_drag_status(context,
                     (gdk_drag_context_get_actions(context) ==
                      GDK_ACTION_COPY) ? GDK_ACTION_COPY :
                     GDK_ACTION_MOVE, time);
-#else
-    gdk_drag_status(context,
-                    (context->actions ==
-                     GDK_ACTION_COPY) ? GDK_ACTION_COPY :
-                    GDK_ACTION_MOVE, time);
-#endif
 
     return (ret_val && can_drop);
 }
@@ -503,7 +496,7 @@ balsa_mblist_get_store(void)
     return balsa_app.mblist_tree_store;
 }
 
-/* 
+/*
  * bmbl_selection_func
  *
  * Used to filter whether or not a row may be selected.
@@ -534,7 +527,7 @@ balsa_mblist_new()
     BalsaMBList *new;
 
     new = g_object_new(balsa_mblist_get_type(), NULL);
-    
+
     return GTK_WIDGET(new);
 }
 
@@ -627,7 +620,7 @@ bmbl_tree_collapse(GtkTreeView * tree_view, GtkTreeIter * iter,
 
     if (!mbnode->mailbox)
         gtk_tree_store_set(GTK_TREE_STORE(model), iter,
-                           ICON_COLUMN, 
+                           ICON_COLUMN,
                            balsa_icon_id(BALSA_PIXMAP_MBOX_DIR_CLOSED),
                            -1);
     g_object_unref(mbnode);
@@ -636,7 +629,7 @@ bmbl_tree_collapse(GtkTreeView * tree_view, GtkTreeIter * iter,
 }
 
 /* bmbl_row_compare
- * 
+ *
  * This function determines the sorting order of the list, depending
  * on what column is selected.  The first column sorts by name, with
  * exception given to the five "core" mailboxes (Inbox, Draftbox,
@@ -804,7 +797,7 @@ bmbl_column_resize(GtkWidget * widget,
 }
 
 /* bmbl_drag_cb
- * 
+ *
  * Description: This is the drag_data_recieved signal handler for the
  * BalsaMBList.  It retrieves the source BalsaIndex and transfers the
  * index's selected messages to the target
@@ -838,7 +831,7 @@ bmbl_drag_cb(GtkWidget * widget, GdkDragContext * context,
 	/* it is actually possible to drag from GtkTreeView when no rows
 	 * are selected: Disable preview for that. */
         balsa_index_selected_msgnos_free(orig_index, selected);
-        return; 
+        return;
     }
 
     orig_mailbox = orig_index->mailbox_node->mailbox;
@@ -860,13 +853,9 @@ bmbl_drag_cb(GtkWidget * widget, GdkDragContext * context,
 
         /* cannot transfer to the originating mailbox */
         if (mailbox != NULL && mailbox != orig_mailbox)
-#if GTK_CHECK_VERSION(2,22,0)
             balsa_index_transfer(orig_index, selected, mailbox,
-                                 gdk_drag_context_get_selected_action(context) != GDK_ACTION_MOVE);
-#else
-            balsa_index_transfer(orig_index, selected, mailbox,
-                                 context->action != GDK_ACTION_MOVE);
-#endif
+                                 gdk_drag_context_get_selected_action
+                                 (context) != GDK_ACTION_MOVE);
         gtk_tree_path_free(path);
     }
     balsa_index_selected_msgnos_free(orig_index, selected);
@@ -936,7 +925,7 @@ bmbl_select_mailbox(GtkTreeSelection * selection, gpointer data)
         gdk_event_free(event);
         return;
     }
-    
+
     if (gtk_tree_selection_path_is_selected(selection, path)) {
         BalsaMailboxNode *mbnode;
 
@@ -1125,7 +1114,7 @@ balsa_mblist_find_all_unread_mboxes(LibBalsaMailbox * mailbox)
 }
 
 /* mblist_open_mailbox
- * 
+ *
  * Description: This checks to see if the mailbox is already on a different
  * mailbox page, or if a new page needs to be created and the mailbox
  * parsed.
@@ -1149,7 +1138,7 @@ bmbl_open_mailbox(LibBalsaMailbox * mailbox, gboolean set_current)
     if (index) {
 	time(&BALSA_INDEX(index)->mailbox_node->last_use);
     }
-    
+
     i = balsa_find_notebook_page_num(mailbox);
     if (i != -1) {
         if (set_current) {
@@ -1186,7 +1175,7 @@ void
 balsa_mblist_close_mailbox(LibBalsaMailbox * mailbox)
 {
     BalsaMailboxNode *mbnode;
-    
+
     mbnode = balsa_find_mailbox(mailbox);
     if (!mbnode)  {
         g_warning(_("Failed to find mailbox"));
@@ -1220,7 +1209,7 @@ get_lru_descendant(GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter,
     {
         if (dt->mbnode)
             g_object_unref(dt->mbnode);
-        dt->mbnode = mbnode; 
+        dt->mbnode = mbnode;
     }
 
     else g_object_unref(mbnode);
@@ -1300,7 +1289,7 @@ bmbl_real_disconnect_mbnode_signals(BalsaMailboxNode * mbnode,
 }
 
 /* bmbl_store_redraw_mbnode
- * 
+ *
  * adds BalsaMailboxNodes to the mailbox list, choosing proper icon for them.
  * returns FALSE on failure (wrong parameters passed).
  * */
@@ -1409,10 +1398,10 @@ bmbl_store_redraw_mbnode(GtkTreeIter * iter, BalsaMailboxNode * mbnode)
 }
 
 /* balsa_mblist_update_mailbox [MBG]
- * 
+ *
  * mblist: the mailbox list that contains the mailbox
  * mbnode:  the mailbox node that you wish to update
- * 
+ *
  * Description: the function looks for the mailbox in the mblist, if
  * it's there it changes the style (and fills the info columns)
  * depending on the mailbox variables unread_messages and
@@ -1447,7 +1436,7 @@ balsa_mblist_update_mailbox(GtkTreeStore * store,
 }
 
 /* bmbl_node_style [MBG]
- * 
+ *
  * model:  The model containing the mailbox
  * iter : the iterator pointing on the mailbox node
  * Description: A function to actually do the changing of the style,
@@ -1567,11 +1556,11 @@ bmbl_node_style(GtkTreeModel * model, GtkTreeIter * iter)
 }
 
 /* bmbl_core_mailbox
- * 
+ *
  * Simple function, if the mailbox is one of the five "core" mailboxes
  * (i.e. Inbox, Sentbox...) it returns an integer representing it's
  * place in the desired heirarchy in the mblist.  If the mailbox is
- * not a core mailbox it returns zero. 
+ * not a core mailbox it returns zero.
  * */
 static gint
 bmbl_core_mailbox(LibBalsaMailbox* mailbox)
@@ -1593,14 +1582,14 @@ bmbl_core_mailbox(LibBalsaMailbox* mailbox)
 #endif /* defined(ENABLE_TOUCH_UI) */
     };
     gint i = 0;
-    
+
     for (i = 0; i < num_core_mailboxes; ++i) {
         if (mailbox == core_mailbox[i]) {
             /* we want to return as if from a base-1 array */
             return num_core_mailboxes - i + 1;
         }
     }
-    
+
     /* if we couldn't find the mailbox, return 0 */
     return 0;
 }
@@ -2233,7 +2222,7 @@ bmbl_sort_idle(gpointer data)
     return FALSE;
 }
 
-void 
+void
 balsa_mblist_mailbox_node_append(BalsaMailboxNode * root,
 				 BalsaMailboxNode * mbnode)
 {

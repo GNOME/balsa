@@ -6,17 +6,17 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option) 
+ * the Free Software Foundation; either version 2, or (at your option)
  * any later version.
- *  
+ *
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 
@@ -578,7 +578,7 @@ rfc2822_group(const gchar *full_name, GList *addr_list)
     return res;
 }
 
-/* 
+/*
    Get a string version of this address.
 
    If n == -1 then return all addresses, else return the n'th one.
@@ -617,7 +617,7 @@ lba_get_name_or_mailbox(InternetAddressList * address_list,
     const gchar *retval = NULL;
     InternetAddress *ia;
     gint i, len;
-    
+
     if (address_list == NULL)
 	return NULL;
 
@@ -730,7 +730,7 @@ libbalsa_address_set_edit_entries(const LibBalsaAddress * address,
 		;
 
 	    /* get first name */
-	    first_name = g_strdup(address->first_name 
+	    first_name = g_strdup(address->first_name
                                   ? address->first_name : names[0]);
 
 	    /* get last name */
@@ -794,7 +794,7 @@ libbalsa_address_set_edit_entries(const LibBalsaAddress * address,
 
 /** libbalsa_address_get_edit_widget() returns an widget adapted
     for a LibBalsaAddress edition, with initial values set if address
-    is provided. The edit entries are set in entries array 
+    is provided. The edit entries are set in entries array
     and enumerated with LibBalsaAddressField constants
 */
 static void
@@ -900,10 +900,10 @@ addrlist_drag_received_cb(GtkWidget * widget, GdkDragContext * context,
         default: g_print ("nothing good");
         }
     }
-    
+
     if (!dnd_success)
         g_print ("DnD data transfer failed!\n");
-        
+
     gtk_drag_finish(context, dnd_success, FALSE, time);
 }
 
@@ -914,24 +914,20 @@ addrlist_drag_drop_cb(GtkWidget *widget, GdkDragContext *context,
   gboolean        is_valid_drop_site;
   GdkAtom         target_type;
   GList          *targets;
-        
+
   /* Check to see if (x,y) is a valid drop site within widget */
   is_valid_drop_site = TRUE;
-        
+
   /* If the source offers a target */
-#if GTK_CHECK_VERSION(2,22,0)
   targets = gdk_drag_context_list_targets(context);
-#else
-  targets = context->targets;
-#endif
   if (targets) {
       /* Choose the best target type */
-      target_type = GDK_POINTER_TO_ATOM 
+      target_type = GDK_POINTER_TO_ATOM
         (g_list_nth_data (targets, LIBBALSA_ADDRESS_TRG_ADDRESS));
-                
+
       /* Request the data from the source. */
       printf("drag_drop requests target=%p\n", target_type);
-      gtk_drag_get_data 
+      gtk_drag_get_data
         (
          widget,         /* will receive 'drag-data-received' signal */
          context,        /* represents the current state of the DnD */
@@ -941,7 +937,7 @@ addrlist_drag_drop_cb(GtkWidget *widget, GdkDragContext *context,
   } else {
       is_valid_drop_site = FALSE;
   }
-     
+
   return  is_valid_drop_site;
 }
 
@@ -987,7 +983,7 @@ libbalsa_address_get_edit_widget(const LibBalsaAddress *address,
              gtk_drag_dest_set(entries[cnt],
                                GTK_DEST_DEFAULT_MOTION |
                                GTK_DEST_DEFAULT_HIGHLIGHT,
-                               libbalsa_address_target_list,            
+                               libbalsa_address_target_list,
                                2,              /* size of list */
                                GDK_ACTION_COPY);
             g_signal_connect(G_OBJECT(entries[cnt]), "drag-data-received",

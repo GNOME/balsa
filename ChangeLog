@@ -1,5 +1,24 @@
 2010-12-28  Peter Bloomfield
 
+	Clean up dead code and trailing white space
+
+	* libbalsa/address.c (addrlist_drag_drop_cb):
+	* libbalsa/identity.c (ident_dialog_get_path):
+	* libinit_balsa/assistant_helper.c (entry_changed_cb):
+	* src/ab-window.c (balsa_ab_window_init):
+	* src/balsa-index.c (bndx_string_width),
+	(bndx_popup_position_func):
+	* src/balsa-mblist.c (bmbl_drag_motion), (bmbl_drag_cb):
+	* src/balsa-message.c (bm_find_pass_to_entry),
+	(balsa_get_parent_window), (balsa_message_grab_focus):
+	* src/main-window.c:
+	* src/sendmsg-window.c (drag_data_quote), (subject_not_empty),
+	(check_suggest_encryption):
+	* src/toolbar-factory.c (tm_popup_position_func),
+	(tm_do_popup_menu):
+
+2010-12-28  Peter Bloomfield
+
 	Do not support BonoboActivation
 
 	* src/balsa-bonobo.c: deleted.

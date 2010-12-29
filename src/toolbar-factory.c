@@ -5,17 +5,17 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option) 
+ * the Free Software Foundation; either version 2, or (at your option)
  * any later version.
- *  
+ *
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 
@@ -122,7 +122,7 @@ balsa_toolbar_model_get_type()
                                    "BalsaToolbarModel",
                                    &balsa_toolbar_model_info, 0);
     }
-    
+
     return balsa_toolbar_model_type;
 }
 
@@ -201,7 +201,7 @@ void
 balsa_toolbar_remove_all(GtkWidget * widget)
 {
     GList *child, *children;
-    
+
     children = gtk_container_get_children(GTK_CONTAINER(widget));
     for (child = children; child; child = child->next)
         gtk_widget_destroy(child->data);
@@ -664,9 +664,7 @@ tm_popup_position_func(GtkMenu * menu, gint * x, gint * y,
     GtkRequisition req;
     gint monitor_num;
     GdkRectangle monitor;
-#if GTK_CHECK_VERSION(2, 18, 0)
     GtkAllocation allocation;
-#endif                          /* GTK_CHECK_VERSION(2, 18, 0) */
 
     g_return_if_fail(gtk_widget_get_window(toolbar));
 
@@ -674,14 +672,9 @@ tm_popup_position_func(GtkMenu * menu, gint * x, gint * y,
 
     gtk_widget_get_preferred_size(GTK_WIDGET(menu), NULL, &req);
 
-#if GTK_CHECK_VERSION(2, 18, 0)
     gtk_widget_get_allocation(toolbar, &allocation);
     *x += (allocation.width - req.width) / 2;
     *y += allocation.height;
-#else                           /* GTK_CHECK_VERSION(2, 18, 0) */
-    *x += (toolbar->allocation.width - req.width) / 2;
-    *y += toolbar->allocation.height;
-#endif                          /* GTK_CHECK_VERSION(2, 18, 0) */
 
     monitor_num = gdk_screen_get_monitor_at_point(screen, *x, *y);
     gtk_menu_set_monitor(menu, monitor_num);
@@ -769,11 +762,7 @@ tm_do_popup_menu(GtkWidget * toolbar, GdkEventButton * event,
         }
     }
 
-#if GTK_CHECK_VERSION(2, 18, 0)
     if (gtk_widget_is_sensitive(toolbar)) {
-#else                           /* GTK_CHECK_VERSION(2, 18, 0) */
-    if (GTK_WIDGET_IS_SENSITIVE(toolbar)) {
-#endif                          /* GTK_CHECK_VERSION(2, 18, 0) */
         /* This is a real toolbar, not the template from the
          * toolbar-prefs dialog. */
         GtkWidget *item;

@@ -5,17 +5,17 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option) 
+ * the Free Software Foundation; either version 2, or (at your option)
  * any later version.
- *  
+ *
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 
@@ -74,7 +74,7 @@ libbalsa_identity_get_type()
                                    "LibBalsaIdentity",
                                    &libbalsa_identity_info, 0);
     }
-    
+
     return libbalsa_identity_type;
 }
 
@@ -89,7 +89,7 @@ libbalsa_identity_class_init(LibBalsaIdentityClass* klass)
     object_class->finalize = libbalsa_identity_finalize;
 }
 
-/* 
+/*
  * Instance inititialization function: set defaults for new objects.
  */
 static void
@@ -123,7 +123,7 @@ libbalsa_identity_init(LibBalsaIdentity* ident)
     */
 }
 
-/* 
+/*
  * Destroy the object, freeing all the values in the process.
  */
 static void
@@ -155,12 +155,12 @@ libbalsa_identity_finalize(GObject * object)
  * Public methods.
  */
 
-/* 
+/*
  * Create a new object with the default identity name.  Does not add
  * it to the list of identities for the application.
  */
-GObject* 
-libbalsa_identity_new(void) 
+GObject*
+libbalsa_identity_new(void)
 {
     return libbalsa_identity_new_with_name(_("New Identity"));
 }
@@ -174,7 +174,7 @@ GObject*
 libbalsa_identity_new_with_name(const gchar* ident_name)
 {
     LibBalsaIdentity* ident;
-    
+
     ident = g_object_new(LIBBALSA_TYPE_IDENTITY, NULL);
     libbalsa_identity_set_identity_name(ident, ident_name);
 
@@ -186,7 +186,7 @@ void
 libbalsa_identity_set_identity_name(LibBalsaIdentity* ident, const gchar* name)
 {
     g_return_if_fail(ident != NULL);
-    
+
     g_free(ident->identity_name);
     ident->identity_name = g_strdup(name);
 }
@@ -208,7 +208,7 @@ void
 libbalsa_identity_set_replyto(LibBalsaIdentity* ident, const gchar* address)
 {
     g_return_if_fail(ident != NULL);
-    
+
     g_free(ident->replyto);
     ident->replyto = g_strdup(address);
 }
@@ -218,23 +218,23 @@ void
 libbalsa_identity_set_domain(LibBalsaIdentity* ident, const gchar* dom)
 {
     g_return_if_fail(ident != NULL);
-    
+
     g_free(ident->domain);
     ident->domain = g_strdup(dom);
 }
 
 
-void 
+void
 libbalsa_identity_set_bcc(LibBalsaIdentity* ident, const gchar* bcc)
 {
     g_return_if_fail(ident != NULL);
-    
+
     g_free(ident->bcc);
     ident->bcc = g_strdup(bcc);
 }
 
 
-void 
+void
 libbalsa_identity_set_reply_string(LibBalsaIdentity* ident, const gchar* reply)
 {
     g_return_if_fail(ident != NULL);
@@ -244,11 +244,11 @@ libbalsa_identity_set_reply_string(LibBalsaIdentity* ident, const gchar* reply)
 }
 
 
-void 
+void
 libbalsa_identity_set_forward_string(LibBalsaIdentity* ident, const gchar* forward)
 {
     g_return_if_fail(ident != NULL);
-    
+
     g_free(ident->forward_string);
     ident->forward_string = g_strdup(forward);
 }
@@ -266,7 +266,7 @@ void
 libbalsa_identity_set_signature_path(LibBalsaIdentity* ident, const gchar* path)
 {
     g_return_if_fail(ident != NULL);
-    
+
     g_free(ident->signature_path);
     ident->signature_path = g_strdup(path);
 }
@@ -296,7 +296,7 @@ libbalsa_identity_set_sig_whenforward(LibBalsaIdentity* ident, gboolean forward)
 }
 
 
-void 
+void
 libbalsa_identity_set_sig_whenreply(LibBalsaIdentity* ident, gboolean reply)
 {
     g_return_if_fail(ident != NULL);
@@ -312,7 +312,7 @@ libbalsa_identity_set_sig_separator(LibBalsaIdentity* ident, gboolean separator)
 }
 
 
-void 
+void
 libbalsa_identity_set_sig_prepend(LibBalsaIdentity* ident, gboolean prepend)
 {
     g_return_if_fail(ident != NULL);
@@ -445,7 +445,7 @@ enum {
     N_COLUMNS
 };
 
-/* 
+/*
  * Public method: create and show the dialog.
  */
 #define LIBBALSA_IDENTITY_SELECT_DIALOG_KEY "libbalsa-identity-select-dialog"
@@ -487,7 +487,7 @@ libbalsa_identity_select_dialog(GtkWindow * parent,
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu_for_parent(dialog, parent);
 #endif
- 
+
     g_signal_connect(dialog, "response",
                      G_CALLBACK(sd_response_cb), sdi);
     gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
@@ -622,9 +622,9 @@ static void config_dialog_select(GtkTreeSelection * selection,
                                  GtkDialog * dialog);
 
 static void display_frame_update(GObject * dialog, LibBalsaIdentity* ident);
-static void display_frame_set_field(GObject * dialog, const gchar* key, 
+static void display_frame_set_field(GObject * dialog, const gchar* key,
                                     const gchar* value);
-static void display_frame_set_boolean(GObject * dialog, const gchar* key, 
+static void display_frame_set_boolean(GObject * dialog, const gchar* key,
                                       gboolean value);
 static void display_frame_set_path(GObject * dialog, const gchar * key,
                                    const gchar * value, gboolean use_chooser);
@@ -737,7 +737,7 @@ libbalsa_identity_tree(GCallback toggled_cb, gpointer toggled_data,
  * the application and a number of buttons to edit, create, and delete
  * identities.  Also provides a way to set the default identity.
  */
-static GtkWidget* 
+static GtkWidget*
 libbalsa_identity_config_frame(GList** identities,
 			       LibBalsaIdentity** defid, GtkWidget * dialog,
                                void (*cb)(gpointer), gpointer data)
@@ -746,7 +746,7 @@ libbalsa_identity_config_frame(GList** identities,
     GtkWidget *tree;
 
     gtk_container_set_border_width(GTK_CONTAINER(config_frame), 0);
-    
+
     tree = libbalsa_identity_tree(G_CALLBACK(toggle_cb), dialog,
                                   _("Default"));
     g_signal_connect(tree, "row-activated",
@@ -797,7 +797,7 @@ identity_list_update_real(GtkTreeView * tree,
     current = get_selected_identity(tree);
 
     gtk_list_store_clear(store);
-    
+
     sorted = g_list_sort(g_list_copy(identities),
                          (GCompareFunc) compare_identities);
     for (list = sorted; list; list = g_list_next(list)) {
@@ -821,12 +821,12 @@ select_identity(GtkTreeView * tree, LibBalsaIdentity * identity)
     GtkTreeModel *model = gtk_tree_view_get_model(tree);
     GtkTreeIter iter;
     gboolean valid;
-    
+
     for (valid = gtk_tree_model_get_iter_first(model, &iter);
          valid;
          valid = gtk_tree_model_iter_next(model, &iter)) {
         LibBalsaIdentity *tmp;
-        
+
         gtk_tree_model_get(model, &iter, IDENT_COLUMN, &tmp, -1);
         if (identity == tmp) {
             GtkTreePath *path = gtk_tree_model_get_path(model, &iter);
@@ -860,7 +860,7 @@ enum {
     IDENTITY_RESPONSE_NEW,
     IDENTITY_RESPONSE_REMOVE
 };
-    
+
 /* callback for the "changed" signal */
 static void
 config_frame_button_select_cb(GtkTreeSelection * selection,
@@ -930,7 +930,7 @@ append_ident_notebook_page(GtkNotebook *notebook, guint rows,
         gtk_box_pack_start(GTK_BOX(vbox), gtk_label_new(footnote),
                            FALSE, FALSE, 0);
     gtk_notebook_append_page(notebook, vbox, gtk_label_new(tab_label));
-    
+
     return table;
 }
 
@@ -983,30 +983,30 @@ setup_ident_frame(GtkDialog * dialog, gboolean createp, gpointer tree)
     /* create the "General" tab */
     table = append_ident_notebook_page(notebook, 5, _("General"), NULL);
     row = 0;
-    ident_dialog_add_entry(table, row++, dialog, _("_Identity name:"), 
+    ident_dialog_add_entry(table, row++, dialog, _("_Identity name:"),
 		           "identity-name");
-    ident_dialog_add_entry(table, row++, dialog, _("_Full name:"), 
+    ident_dialog_add_entry(table, row++, dialog, _("_Full name:"),
                            "identity-fullname");
-    ident_dialog_add_entry(table, row++, dialog, _("_Mailing address:"), 
+    ident_dialog_add_entry(table, row++, dialog, _("_Mailing address:"),
                            "identity-address");
-    ident_dialog_add_entry(table, row++, dialog, _("Reply _to:"), 
+    ident_dialog_add_entry(table, row++, dialog, _("Reply _to:"),
                            "identity-replyto");
-    ident_dialog_add_entry(table, row++, dialog, _("_Domain:"), 
+    ident_dialog_add_entry(table, row++, dialog, _("_Domain:"),
                            "identity-domain");
 
     /* create the "Messages" tab */
     table = append_ident_notebook_page(notebook, 9, _("Messages"), NULL);
     row = 0;
-    ident_dialog_add_entry(table, row++, dialog, _("_Bcc:"), 
+    ident_dialog_add_entry(table, row++, dialog, _("_Bcc:"),
                            "identity-bcc");
-    ident_dialog_add_entry(table, row++, dialog, _("Reply _string:"), 
+    ident_dialog_add_entry(table, row++, dialog, _("Reply _string:"),
                            "identity-replystring");
-    ident_dialog_add_entry(table, row++, dialog, _("F_orward string:"), 
+    ident_dialog_add_entry(table, row++, dialog, _("F_orward string:"),
                            "identity-forwardstring");
-    ident_dialog_add_checkbutton(table, row++, dialog, 
+    ident_dialog_add_checkbutton(table, row++, dialog,
                                  _("send messages in both plain text and _HTML format"),
                                  "identity-sendmpalternative", TRUE);
-    ident_dialog_add_checkbutton(table, row++, dialog, 
+    ident_dialog_add_checkbutton(table, row++, dialog,
                                  _("request _Message Disposition Notification by default"),
                                  "identity-requestmdn", TRUE);
     ident_dialog_add_file_chooser_button(table, row++, dialog,
@@ -1031,15 +1031,15 @@ setup_ident_frame(GtkDialog * dialog, gboolean createp, gpointer tree)
                                 _("_Execute signature"),
 				 "identity-sigexecutable", FALSE);
     ident_dialog_add_checkbutton(table, row++, dialog,
-                                 _("Incl_ude signature"), 
+                                 _("Incl_ude signature"),
                                  "identity-sigappend", FALSE);
-    ident_dialog_add_checkbutton(table, row++, dialog, 
+    ident_dialog_add_checkbutton(table, row++, dialog,
                                  _("Include signature when for_warding"),
                                  "identity-whenforward", FALSE);
     ident_dialog_add_checkbutton(table, row++, dialog,
                                  _("Include signature when rep_lying"),
                                  "identity-whenreply", FALSE);
-    ident_dialog_add_checkbutton(table, row++, dialog, 
+    ident_dialog_add_checkbutton(table, row++, dialog,
                                  _("_Add signature separator"),
                                  "identity-sigseparator", FALSE);
     ident_dialog_add_checkbutton(table, row++, dialog,
@@ -1056,7 +1056,7 @@ setup_ident_frame(GtkDialog * dialog, gboolean createp, gpointer tree)
     table =
         append_ident_notebook_page(notebook, 5, _("Security"), footnote);
     row = 0;
-    ident_dialog_add_checkbutton(table, row++, dialog, 
+    ident_dialog_add_checkbutton(table, row++, dialog,
                                  _("sign messages by default"),
                                  "identity-gpgsign", TRUE);
     ident_dialog_add_checkbutton(table, row++, dialog,
@@ -1072,7 +1072,7 @@ setup_ident_frame(GtkDialog * dialog, gboolean createp, gpointer tree)
                                  _("remind me if messages can be encrypted"),
                                  "identity-warn-send-plain", TRUE);
     ident_dialog_add_entry(table, row++, dialog,
-                           _("use secret key with this id for signing\n(leave empty for automatic selection)"), 
+                           _("use secret key with this id for signing\n(leave empty for automatic selection)"),
                            "identity-keyid");
 #ifndef HAVE_GPGME
     gtk_widget_set_sensitive(table, FALSE);
@@ -1398,7 +1398,7 @@ set_identity_name_in_tree(GtkTreeView * tree, LibBalsaIdentity * identity,
     }
 }
 
-/* 
+/*
  * Update the identity object associated with the edit/new dialog,
  * validating along the way.  Correct validation results in a true
  * return value, otherwise it returns false.
@@ -1413,7 +1413,7 @@ ident_dialog_update(GObject * dlg)
     GtkWidget *tree;
     GList **identities, *list;
     gchar* text;
-    
+
     id = g_object_get_data(dlg, "identity");
     if (!id)
         return TRUE;
@@ -1431,7 +1431,7 @@ ident_dialog_update(GObject * dlg)
 
     for (list = *identities; list; list = g_list_next(list)) {
         exist_ident = list->data;
-        
+
         if (g_ascii_strcasecmp(exist_ident->identity_name, text) == 0
             && id != exist_ident) {
             libbalsa_information(LIBBALSA_INFORMATION_ERROR,
@@ -1457,7 +1457,7 @@ ident_dialog_update(GObject * dlg)
     g_free(id->replyto);
     id->replyto         = ident_dialog_get_text(dlg, "identity-replyto");
     g_free(id->domain);
-    id->domain          = ident_dialog_get_text(dlg, "identity-domain");    
+    id->domain          = ident_dialog_get_text(dlg, "identity-domain");
     g_free(id->bcc);
     id->bcc             = ident_dialog_get_text(dlg, "identity-bcc");
     g_free(id->reply_string);
@@ -1473,14 +1473,14 @@ ident_dialog_update(GObject * dlg)
 
     g_free(id->signature_path);
     id->signature_path  = ident_dialog_get_text(dlg, "identity-sigpath");
-    
+
     id->sig_executable  = ident_dialog_get_bool(dlg, "identity-sigexecutable");
     id->sig_sending     = ident_dialog_get_bool(dlg, "identity-sigappend");
     id->sig_whenforward = ident_dialog_get_bool(dlg, "identity-whenforward");
     id->sig_whenreply   = ident_dialog_get_bool(dlg, "identity-whenreply");
     id->sig_separator   = ident_dialog_get_bool(dlg, "identity-sigseparator");
     id->sig_prepend     = ident_dialog_get_bool(dlg, "identity-sigprepend");
-   
+
     g_free(id->face);
     id->face            = ident_dialog_get_path(dlg, "identity-facepath");
     g_free(id->x_face);
@@ -1495,12 +1495,12 @@ ident_dialog_update(GObject * dlg)
                                           (dlg, "identity-crypt-protocol"));
     g_free(id->force_key_id);
     id->force_key_id    = g_strstrip(ident_dialog_get_text(dlg, "identity-keyid"));
-   
+
     return TRUE;
 }
 
 
-/* 
+/*
  * Get the text from an entry in the editing/creation dialog.  The
  * given key accesses the entry using object data.
  */
@@ -1509,7 +1509,7 @@ ident_dialog_get_text(GObject * dialog, const gchar * key)
 {
     GtkEditable *entry;
     GtkToggleButton *check;
-    
+
     entry = g_object_get_data(dialog, key);
     check = g_object_get_data(G_OBJECT(entry), LIBBALSA_IDENTITY_CHECK);
     if (check && !gtk_toggle_button_get_active(check))
@@ -1527,13 +1527,13 @@ static gboolean
 ident_dialog_get_bool(GObject* dialog, const gchar* key)
 {
     GtkToggleButton *button;
-    
+
     button = g_object_get_data(dialog, key);
     return gtk_toggle_button_get_active(button);
 }
 
 
-/* 
+/*
  * Get the path from a file chooser in the editing/creation dialog.  The
  * given key accesses the file chooser using object data.
  */
@@ -1543,19 +1543,14 @@ ident_dialog_get_path(GObject * dialog, const gchar * key)
     GtkWidget *chooser;
 
     chooser = g_object_get_data(dialog, key);
-#if GTK_CHECK_VERSION(2, 18, 0)
     if (!gtk_widget_get_sensitive(chooser))
         return NULL;
-#else                           /* GTK_CHECK_VERSION(2, 18, 0) */
-    if (!GTK_WIDGET_SENSITIVE(chooser))
-        return NULL;
-#endif                          /* GTK_CHECK_VERSION(2, 18, 0) */
 
     return gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(chooser));
 }
 
 
-/* 
+/*
  * Set the default identity to the currently selected.
  */
 static void
@@ -1613,8 +1608,8 @@ identity_delete_selected(GtkTreeView * tree, GtkWidget * dialog)
     cb(data);
 }
 
-/* 
- * Delete the currently selected identity after confirming. 
+/*
+ * Delete the currently selected identity after confirming.
  */
 struct _IdentityDeleteInfo {
     GtkTreeView *tree;
@@ -1626,7 +1621,7 @@ delete_ident_cb(GtkTreeView * tree, GtkWidget * dialog)
     LibBalsaIdentity* ident, **default_id;
     GtkWidget* confirm;
     IdentityDeleteInfo *di;
-    
+
     ident = get_selected_identity(tree);
     default_id = g_object_get_data(G_OBJECT(tree), "default-id");
     g_return_if_fail(ident != *default_id);
@@ -1649,7 +1644,7 @@ delete_ident_cb(GtkTreeView * tree, GtkWidget * dialog)
     gtk_widget_show_all(confirm);
 }
 
-static void 
+static void
 delete_ident_response(GtkWidget * confirm, gint response,
                       IdentityDeleteInfo * di)
 {
@@ -1815,7 +1810,7 @@ config_dialog_select(GtkTreeSelection * selection, GtkDialog * dialog)
     g_object_set_data(G_OBJECT(dialog), "identity", ident);
 }
 
-static void 
+static void
 display_frame_update(GObject * dialog, LibBalsaIdentity* ident)
 {
     GtkWidget *face_box;
@@ -1827,17 +1822,17 @@ display_frame_update(GObject * dialog, LibBalsaIdentity* ident)
     display_frame_set_field(dialog, "identity-name", ident->identity_name);
     display_frame_set_field(dialog, "identity-fullname", ident->ia ? ident->ia->name : NULL);
     if (ident->ia && INTERNET_ADDRESS_IS_MAILBOX (ident->ia))
-        display_frame_set_field(dialog, "identity-address", 
+        display_frame_set_field(dialog, "identity-address",
                                 INTERNET_ADDRESS_MAILBOX(ident->ia)->addr);
     else
         display_frame_set_field(dialog, "identity-address", NULL);
-    
+
     display_frame_set_field(dialog, "identity-replyto", ident->replyto);
     display_frame_set_field(dialog, "identity-domain", ident->domain);
     display_frame_set_field(dialog, "identity-bcc", ident->bcc);
-    display_frame_set_field(dialog, "identity-replystring", 
+    display_frame_set_field(dialog, "identity-replystring",
                             ident->reply_string);
-    display_frame_set_field(dialog, "identity-forwardstring", 
+    display_frame_set_field(dialog, "identity-forwardstring",
                             ident->forward_string);
     display_frame_set_boolean(dialog, "identity-sendmpalternative",
                               ident->send_mp_alternative);
@@ -1846,19 +1841,19 @@ display_frame_update(GObject * dialog, LibBalsaIdentity* ident)
                              ident->smtp_server);
 #endif /* ENABLE_ESMTP */
 
-    display_frame_set_path(dialog, "identity-sigpath", 
+    display_frame_set_path(dialog, "identity-sigpath",
                            ident->signature_path, FALSE);
     display_frame_set_boolean(dialog, "identity-sigexecutable", ident->sig_executable);
 
     display_frame_set_boolean(dialog, "identity-sigappend", ident->sig_sending);
-    display_frame_set_boolean(dialog, "identity-whenforward", 
+    display_frame_set_boolean(dialog, "identity-whenforward",
                               ident->sig_whenforward);
-    display_frame_set_boolean(dialog, "identity-whenreply", 
+    display_frame_set_boolean(dialog, "identity-whenreply",
                               ident->sig_whenreply);
-    display_frame_set_boolean(dialog, "identity-sigseparator", 
-                              ident->sig_separator);    
-    display_frame_set_boolean(dialog, "identity-sigprepend", 
-                              ident->sig_prepend);    
+    display_frame_set_boolean(dialog, "identity-sigseparator",
+                              ident->sig_separator);
+    display_frame_set_boolean(dialog, "identity-sigprepend",
+                              ident->sig_prepend);
 
     face_box = g_object_get_data(G_OBJECT(dialog),
                                  path_info[LBI_PATH_TYPE_FACE].box_key);
@@ -1871,17 +1866,17 @@ display_frame_update(GObject * dialog, LibBalsaIdentity* ident)
     gtk_widget_hide(face_box);
     display_frame_set_path(dialog, path_info[LBI_PATH_TYPE_XFACE].path_key,
                            ident->x_face, TRUE);
-    display_frame_set_boolean(dialog, "identity-requestmdn", 
-                              ident->request_mdn);    
+    display_frame_set_boolean(dialog, "identity-requestmdn",
+                              ident->request_mdn);
 
-    display_frame_set_boolean(dialog, "identity-gpgsign", 
-                              ident->gpg_sign);    
-    display_frame_set_boolean(dialog, "identity-gpgencrypt", 
-                              ident->gpg_encrypt);    
-    display_frame_set_boolean(dialog, "identity-trust-always", 
-                              ident->always_trust);    
-    display_frame_set_boolean(dialog, "identity-warn-send-plain", 
-                              ident->warn_send_plain);    
+    display_frame_set_boolean(dialog, "identity-gpgsign",
+                              ident->gpg_sign);
+    display_frame_set_boolean(dialog, "identity-gpgencrypt",
+                              ident->gpg_encrypt);
+    display_frame_set_boolean(dialog, "identity-trust-always",
+                              ident->always_trust);
+    display_frame_set_boolean(dialog, "identity-warn-send-plain",
+                              ident->warn_send_plain);
     display_frame_set_gpg_mode(dialog, "identity-crypt-protocol",
 			   &ident->crypt_protocol);
     display_frame_set_field(dialog, "identity-keyid", ident->force_key_id);
@@ -1894,7 +1889,7 @@ display_frame_set_field(GObject * dialog,
                         const gchar* value)
 {
     GtkEntry *entry = g_object_get_data(dialog, key);
-    
+
     gtk_entry_set_text(entry, value ? value : "");
 }
 
@@ -1904,7 +1899,7 @@ display_frame_set_boolean(GObject * dialog,
                           gboolean value)
 {
     GtkToggleButton *check = g_object_get_data(dialog, key);
-    
+
     gtk_toggle_button_set_active(check, value);
 }
 
@@ -1917,7 +1912,7 @@ display_frame_set_path(GObject * dialog,
     GtkWidget *chooser = g_object_get_data(dialog, key);
     GtkToggleButton *check =
         g_object_get_data(G_OBJECT(chooser), LIBBALSA_IDENTITY_CHECK);
-    
+
     if (set) {
         if(use_chooser)
             gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(chooser), value);
@@ -1939,10 +1934,10 @@ libbalsa_identity_new_config(const gchar* name)
     LibBalsaIdentity* ident;
     gchar *fname, *email;
     gchar* tmpstr;
-    
+
     fname = libbalsa_conf_get_string("FullName");
     email = libbalsa_conf_get_string("Address");
-    
+
     ident = LIBBALSA_IDENTITY(libbalsa_identity_new_with_name(name));
     ident->ia = internet_address_mailbox_new (fname, email);
     g_free(fname);
@@ -1952,22 +1947,22 @@ libbalsa_identity_new_config(const gchar* name)
     ident->domain = libbalsa_conf_get_string("Domain");
     ident->bcc = libbalsa_conf_get_string("Bcc");
 
-    /* 
+    /*
      * these two have defaults, so we need to use the appropriate
-     * functions to manage the memory. 
+     * functions to manage the memory.
      */
     if ((tmpstr = libbalsa_conf_get_string("ReplyString"))) {
         g_free(ident->reply_string);
         ident->reply_string = tmpstr;
     }
-    
+
     if ((tmpstr = libbalsa_conf_get_string("ForwardString"))) {
         g_free(ident->forward_string);
         ident->forward_string = tmpstr;
     }
     ident->send_mp_alternative =
         libbalsa_conf_get_bool("SendMultipartAlternative");
-    
+
     ident->signature_path = libbalsa_conf_get_string("SignaturePath");
     ident->sig_executable = libbalsa_conf_get_bool("SigExecutable");
     ident->sig_sending = libbalsa_conf_get_bool("SigSending");
@@ -1989,14 +1984,14 @@ libbalsa_identity_new_config(const gchar* name)
     return ident;
 }
 
-void 
+void
 libbalsa_identity_save(LibBalsaIdentity* ident, const gchar* group)
 {
     g_return_if_fail(ident);
 
     libbalsa_conf_push_group(group);
     libbalsa_conf_set_string("FullName", ident->ia ? ident->ia->name : NULL);
-    
+
     if (ident->ia && INTERNET_ADDRESS_IS_MAILBOX (ident->ia))
         libbalsa_conf_set_string("Address", INTERNET_ADDRESS_MAILBOX(ident->ia)->addr);
 
@@ -2067,7 +2062,7 @@ static void
 display_frame_set_gpg_mode(GObject * dialog, const gchar* key, gint * value)
 {
     GtkComboBox *opt_menu = g_object_get_data(G_OBJECT(dialog), key);
- 
+
     switch (*value)
         {
         case LIBBALSA_PROTECT_OPENPGP:
@@ -2200,6 +2195,6 @@ ident_dialog_get_value(GObject * dialog, const gchar * key)
     menu = g_object_get_data(dialog, key);
     value = gtk_combo_box_get_active(GTK_COMBO_BOX(menu));
     values = g_object_get_data(G_OBJECT(menu), "identity-value");
-    
+
     return g_ptr_array_index(values, value);
 }

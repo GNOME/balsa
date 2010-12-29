@@ -586,7 +586,7 @@ browse_button_cb(GtkWidget * widget, SubfolderDialogData * sdd)
                      G_CALLBACK(browse_button_row_activated), bbd);
 
     /* Force the mailbox list to be a reasonable size. */
-    gtk_widget_size_request(tree_view, &req);
+    gtk_widget_get_preferred_size(tree_view, NULL, &req);
     /* don't mess with the width, it gets saved! */
     if (req.height > balsa_app.mw_height)
         req.height = balsa_app.mw_height;

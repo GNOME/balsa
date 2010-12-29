@@ -361,14 +361,6 @@ balsa_app_init(void)
     balsa_app.mblist_newmsg_width = NEWMSGCOUNT_DEFAULT_WIDTH;
     balsa_app.mblist_totalmsg_width = TOTALMSGCOUNT_DEFAULT_WIDTH;
 
-    /* Allocate the best colormap we can get */
-    balsa_app.visual = gdk_visual_get_best();
-    if (!(balsa_app.colormap = gdk_colormap_new(balsa_app.visual, TRUE))) {
-	balsa_app.visual = gdk_visual_get_system();
-	balsa_app.colormap = gdk_colormap_get_system();
-    }
-    g_assert(balsa_app.colormap);
-    
     /* arp */
     balsa_app.quote_str = NULL;
 
@@ -473,7 +465,6 @@ balsa_app_destroy(void)
     balsa_app.identities = NULL;
 
 
-    g_object_unref(balsa_app.colormap);
     if(balsa_app.debug) g_print("balsa_app: Finished cleaning up.\n");
 }
 

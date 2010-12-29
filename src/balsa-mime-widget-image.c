@@ -74,6 +74,8 @@ balsa_mime_widget_new_image(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
     g_signal_connect(G_OBJECT(mw->widget), "button-press-event",
                      G_CALLBACK(balsa_image_button_press_cb), data);
 
+    gtk_widget_show(image);
+
     return mw;
 }
 
@@ -119,9 +121,7 @@ img_check_size(GtkImage ** widget_p)
     gint orig_width;
     LibBalsaMessageBody * mime_body;
     gint curr_w, dst_w;
-#if GTK_CHECK_VERSION(2, 18, 0)
     GtkAllocation allocation;
-#endif                          /* GTK_CHECK_VERSION(2, 18, 0) */
 
     gdk_threads_enter();
 
@@ -147,7 +147,6 @@ img_check_size(GtkImage ** widget_p)
 	curr_w = gdk_pixbuf_get_width(gtk_image_get_pixbuf(widget));
     else
 	curr_w = 0;
-#if GTK_CHECK_VERSION(2, 18, 0)
     gtk_widget_get_allocation(viewport, &allocation);
     dst_w = allocation.width;
     gtk_widget_get_allocation(gtk_bin_get_child(GTK_BIN(viewport)),
@@ -156,12 +155,7 @@ img_check_size(GtkImage ** widget_p)
     gtk_widget_get_allocation(gtk_widget_get_parent(GTK_WIDGET(widget)),
                               &allocation);
     dst_w += allocation.width;
-    dst_w -= 4;
-#else                           /* GTK_CHECK_VERSION(2, 18, 0) */
-    dst_w = viewport->allocation.width - 
-	(gtk_bin_get_child(GTK_BIN(viewport))->allocation.width - 
-	 GTK_WIDGET(widget)->parent->allocation.width) - 4;
-#endif                          /* GTK_CHECK_VERSION(2, 18, 0) */
+    dst_w -= 16;                /* Magic number? */
     if (dst_w < 32)
 	dst_w = 32;
     if (dst_w > orig_width)
@@ -189,7 +183,6 @@ img_check_size(GtkImage ** widget_p)
 	g_object_unref(pixbuf);
 	gtk_image_set_from_pixbuf(widget, scaled_pixbuf);
 	g_object_unref(scaled_pixbuf);
-	
     }
 
     gdk_threads_leave();

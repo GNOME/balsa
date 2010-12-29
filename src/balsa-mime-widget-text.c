@@ -419,15 +419,9 @@ fix_text_widget(GtkWidget *widget, gpointer data)
 static void
 gtk_widget_destroy_insensitive(GtkWidget * widget)
 {
-#if GTK_CHECK_VERSION(2, 18, 0)
     if (!gtk_widget_get_sensitive(widget) ||
 	GTK_IS_SEPARATOR_MENU_ITEM(widget))
 	gtk_widget_destroy(widget);
-#else                           /* GTK_CHECK_VERSION(2, 18, 0) */
-    if (!GTK_WIDGET_SENSITIVE(widget) ||
-	GTK_IS_SEPARATOR_MENU_ITEM(widget))
-	gtk_widget_destroy(widget);
-#endif                          /* GTK_CHECK_VERSION(2, 18, 0) */
 }
 
 static void
@@ -539,7 +533,9 @@ text_view_populate_popup(GtkTextView *textview, GtkMenu *menu,
     GtkWidget *menu_item;
     gint phrase_hl;
 
-    gtk_widget_hide_all(GTK_WIDGET(menu));
+    gtk_widget_hide(GTK_WIDGET(menu));
+    gtk_container_foreach(GTK_CONTAINER(menu),
+                          (GtkCallback) gtk_widget_hide, NULL);
     if (text_view_url_popup(textview, menu))
 	return;
 
@@ -1099,7 +1095,7 @@ bmwt_populate_popup_cb(GtkWidget * widget, GtkMenu * menu, gpointer data)
     gtk_widget_show_all(GTK_WIDGET(menu));
 }
 
-BalsaMimeWidget *
+static BalsaMimeWidget *
 bm_widget_new_html(BalsaMessage * bm, LibBalsaMessageBody * mime_body)
 {
     BalsaMimeWidget *mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
@@ -1372,7 +1368,7 @@ fill_text_buf_cited(GtkWidget *widget, const gchar *text_body,
         g_object_set_data_full(G_OBJECT(widget), "cite-bars", cite_bars_list,
                                (GDestroyNotify) destroy_cite_bars);
         g_object_set_data(G_OBJECT(widget), "cite-margin", GINT_TO_POINTER(margin));
-        g_signal_connect_after(G_OBJECT(widget), "expose-event",
+        g_signal_connect_after(G_OBJECT(widget), "draw",
                                G_CALLBACK(draw_cite_bars), cite_bars_list);
     }
 

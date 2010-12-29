@@ -63,7 +63,7 @@ enum {
     LAST_SIGNAL
 };
 
-static GtkObjectClass* parent_class;
+static GObjectClass* parent_class;
 static guint model_signals[LAST_SIGNAL] = { 0 };
 
 static void
@@ -672,7 +672,7 @@ tm_popup_position_func(GtkMenu * menu, gint * x, gint * y,
 
     gdk_window_get_origin(gtk_widget_get_window(toolbar), x, y);
 
-    gtk_widget_size_request(GTK_WIDGET(menu), &req);
+    gtk_widget_get_preferred_size(GTK_WIDGET(menu), NULL, &req);
 
 #if GTK_CHECK_VERSION(2, 18, 0)
     gtk_widget_get_allocation(toolbar, &allocation);

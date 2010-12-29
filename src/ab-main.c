@@ -984,7 +984,7 @@ bab_get_filter_box(void)
 static gboolean
 ew_key_pressed(GtkEntry * entry, GdkEventKey * event, struct ABMainWindow *abmw)
 {
-    if (event->keyval != GDK_Escape)
+    if (event->keyval != GDK_KEY_Escape)
 	return FALSE;
     gtk_button_clicked(GTK_BUTTON(abmw->cancel_button));
     return TRUE;

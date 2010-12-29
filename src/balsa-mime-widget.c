@@ -178,16 +178,20 @@ balsa_mime_widget_new(BalsaMessage * bm, LibBalsaMessageBody * mime_body, gpoint
 #endif
             g_object_ref_sink(mw->widget);
 
-	    if (GTK_IS_LAYOUT(mw->widget)) 
-		g_signal_connect(G_OBJECT(gtk_layout_get_vadjustment(GTK_LAYOUT(mw->widget))),
-				 "changed",
+	    if (GTK_IS_LAYOUT(mw->widget)) {
+                GtkAdjustment *vadj;
+
+                g_object_get(G_OBJECT(mw->widget), "vadjustment", &vadj,
+                             NULL);
+		g_signal_connect(vadj, "changed",
 				 G_CALLBACK(vadj_change_cb), mw->widget);
+            }
+
+            gtk_widget_show(mw->widget);
 	}
     }
     g_free(content_type);
     
-    gtk_widget_show_all(mw->widget);
-
     return mw;
 }
 
@@ -302,6 +306,8 @@ balsa_mime_widget_new_unknown(BalsaMessage * bm,
 		     (gpointer) mime_body);
 
     gtk_box_pack_start(GTK_BOX(mw->widget), hbox, FALSE, FALSE, 0);
+
+    gtk_widget_show_all(mw->widget);
 
     return mw;
 }

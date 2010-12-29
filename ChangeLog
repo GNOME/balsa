@@ -1,3 +1,70 @@
+2010-12-28  Peter Bloomfield
+
+	Initial commit for gtk3 development branch
+
+	* configure.in:
+	* libbalsa/address-view.c (lbav_key_pressed_cb):
+	* libbalsa/body.c (libbalsa_message_body_get_pixbuf):
+	* libbalsa/cell-renderer-button.c
+	(libbalsa_cell_renderer_button_activate):
+	* libbalsa/html.c (lbh_resource_request_starting_cb),
+	(lbh_info_bar_widget), (libbalsa_html_new):
+	* libbalsa/identity.c (ident_dialog_add_gpg_menu), (add_show_menu),
+	(ident_dialog_add_smtp_menu):
+	* libbalsa/misc.c (libbalsa_charset_button_new):
+	* libbalsa/smtp-server.c (smtp_server_tls_widget):
+	* libinit_balsa/assistant_helper.c (balsa_init_add_table_option):
+	* src/ab-main.c (ew_key_pressed):
+	* src/ab-window.c (balsa_ab_window_load_books),
+	(balsa_ab_window_init):
+	* src/address-book-config.c (create_generic_dialog):
+	* src/balsa-app.c (balsa_app_init), (balsa_app_destroy):
+	* src/balsa-app.h:
+	* src/balsa-cite-bar.c (balsa_cite_bar_class_init),
+	(balsa_cite_bar_init), (balsa_cite_bar_get_preferred_width),
+	(balsa_cite_bar_get_preferred_height), (balsa_cite_bar_draw):
+	* src/balsa-index.c (bndx_class_init), (bndx_destroy),
+	(bndx_popup_position_func), (bndx_pipe_response),
+	(balsa_index_pipe):
+	* src/balsa-mblist.c (bmbl_class_init), (bmbl_mru_show_tree):
+	* src/balsa-message.c (balsa_message_class_init),
+	(bm_find_scroll_to_rectangle), (bm_find_pass_to_entry),
+	(balsa_message_destroy), (select_part):
+	* src/balsa-mime-widget-callbacks.c
+	(balsa_mime_widget_key_press_event):
+	* src/balsa-mime-widget-crypto.c
+	(balsa_mime_widget_signature_widget),
+	(balsa_mime_widget_crypto_frame):
+	* src/balsa-mime-widget-image.c (balsa_mime_widget_new_image),
+	(img_check_size):
+	* src/balsa-mime-widget-text.c (gtk_widget_destroy_insensitive),
+	(text_view_populate_popup), (fill_text_buf_cited):
+	* src/balsa-mime-widget.c (balsa_mime_widget_new),
+	(balsa_mime_widget_new_unknown):
+	* src/filter-edit-callbacks.c (fe_user_header_add),
+	(get_field_frame):
+	* src/filter-edit-dialog.c (fe_build_option_menu):
+	* src/folder-conf.c (browse_button_cb):
+	* src/mailbox-conf.c (mailbox_conf_combo_box_make),
+	(balsa_server_conf_get_advanced_widget),
+	(mailbox_conf_view_new_full):
+	* src/mailbox-node.c (balsa_mailbox_node_get_context_menu):
+	* src/main-window.c:
+	* src/message-window.c (message_window_new):
+	* src/pref-manager.c (apply_prefs), (checking_group),
+	(quoted_group), (word_wrap_group), (main_window_group),
+	(pspell_settings_group), (misc_group), (deleting_messages_group),
+	(folder_scanning_group), (option_menu_cb), (add_show_menu),
+	(pm_combo_box_new):
+	* src/quote-color.c (allocate_quote_colors):
+	* src/sendmsg-window.c (sw_get_user_codeset),
+	(sw_scroll_size_request), (create_email_entry), (create_info_pane),
+	(create_text_area):
+	* src/spell-check.c (balsa_spell_check_class_init),
+	(balsa_spell_check_destroy):
+	* src/store-address.c (store_address_book_frame):
+	* src/toolbar-factory.c (tm_popup_position_func):
+
 2010-12-09  Peter Bloomfield
 
 	* balsa.1.in: do not use macro URL; fixes gnome bz #636801.

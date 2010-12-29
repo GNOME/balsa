@@ -100,7 +100,7 @@ AC_ARG_WITH([gpg-app],
 
 AC_ARG_WITH(canberra,
    AC_HELP_STRING([--with-canberra],
-                  [Use libcanberra-gtk2 for filter sounds (default=no)]),
+                  [Use libcanberra-gtk3 for filter sounds (default=no)]),
                   [with_canberra=$withval],[with_canberra=no])
 
 AC_ARG_WITH(compface,
@@ -282,25 +282,26 @@ dnl GNOME libs
 dnl #####################################################################
 if test x$with_gnome != xno; then
    gnome_extras="libgnome-2.0 libgnomeui-2.0 libbonobo-2.0 gconf-2.0"
-   AC_MSG_CHECKING([whether we have gnome-keyring])
-   if $PKG_CONFIG --atleast-version=1.0 gnome-keyring-1; then
-      gnome_extras="$gnome_extras gnome-keyring-1"
-      AC_DEFINE(HAVE_GNOME_KEYRING,1,[Defined when gnome-keyring is there.])
-      # Work around http://bugzilla.gnome.org/show_bug.cgi?id=556530
-      if $PKG_CONFIG --atleast-version=2.24.1 gnome-keyring-1; then
-         AC_DEFINE(HAVE_GNOME_KEYRING_24,1,
-                   [Defined with gnome-keyring-2.24 or newer.])
-      fi
-      with_gnome_keyring=yes
-   else
-      with_gnome_keyring=no
-   fi
-   AC_MSG_RESULT($with_gnome_keyring)
    AC_DEFINE(HAVE_GNOME,1,[Defined when gnome libs are available.])
 else
    gnome_extras=""
 fi
 AM_CONDITIONAL([BUILD_WITH_GNOME], [test $with_gnome = "yes"])
+
+AC_MSG_CHECKING([whether we have gnome-keyring])
+if $PKG_CONFIG --atleast-version=1.0 gnome-keyring-1; then
+   gnome_extras="$gnome_extras gnome-keyring-1"
+   AC_DEFINE(HAVE_GNOME_KEYRING,1,[Defined when gnome-keyring is there.])
+   # Work around http://bugzilla.gnome.org/show_bug.cgi?id=556530
+   if $PKG_CONFIG --atleast-version=2.24.1 gnome-keyring-1; then
+      AC_DEFINE(HAVE_GNOME_KEYRING_24,1,
+                [Defined with gnome-keyring-2.24 or newer.])
+   fi
+   with_gnome_keyring=yes
+else
+   with_gnome_keyring=no
+fi
+AC_MSG_RESULT($with_gnome_keyring)
 
 # GMime configuration
 #
@@ -333,18 +334,18 @@ dnl Make sure ld finds zlib:
 LIBS="$LIBS -lz"
 
 PKG_CHECK_MODULES(BALSA, [
-glib-2.0 >= 2.16.0
-gtk+-2.0 >= 2.14.0
+glib-2.0 >= 2.27.0
+gtk+-3.0
 gmime-$with_gmime
-gio-2.0
+gio-2.0 >= 2.27.0
 gthread-2.0
 gnome-icon-theme
 $gnome_extras
 ])
 
 PKG_CHECK_MODULES(BALSA_AB, [
-   glib-2.0 >= 2.6.0
-   gtk+-2.0 >= 2.6.0
+   glib-2.0 >= 2.27.0
+   gtk+-3.0
    gmime-$with_gmime
    $gnome_extras
 ])
@@ -408,13 +409,10 @@ case "$use_html_widget" in
     ;;
     webkit)
         AC_MSG_RESULT([$use_html_widget])
-        if ! $PKG_CONFIG --atleast-version=1.1.14 webkit-1.0; then
-            AC_MSG_ERROR([WebKitGTK+ version 1.1.14 or newer is required.])
-        fi
         if test x"$use_threads" = xno ; then
             AC_MSG_ERROR([WebKit cannot be used with threads disabled.])
         fi
-        PKG_CHECK_MODULES(HTML, [webkit-1.0])
+        PKG_CHECK_MODULES(HTML, [webkitgtk-3.0])
         AC_DEFINE(HAVE_WEBKIT,1,[Defined when WebKit can be used.])
     ;;
     no)
@@ -774,27 +772,21 @@ fi
 # GtkSourceView configuration
 #
 if test x$with_gtksourceview != xno; then
-    if test x$with_gtksourceview = x1 || ! $PKG_CONFIG --exists gtksourceview-2.0 ; then
-	PKG_CHECK_MODULES(GTKSOURCEVIEW, [ gtksourceview-1.0 ])
-    	AC_DEFINE(HAVE_GTKSOURCEVIEW,1,[Defined when GtkSourceView can be used.])
-	AC_MSG_NOTICE([Note: using GtkSourceview Version 1])
-    else
-	PKG_CHECK_MODULES(GTKSOURCEVIEW, [ gtksourceview-2.0 ])
-    	AC_DEFINE(HAVE_GTKSOURCEVIEW,2,[Defined when GtkSourceView can be used.])
-	AC_MSG_NOTICE([Note: using GtkSourceview Version 2])
-	with_gtksourceview=2
-    fi
+    PKG_CHECK_MODULES(GTKSOURCEVIEW, [ gtksourceview-3.0 ])
+    AC_DEFINE(HAVE_GTKSOURCEVIEW,3,[Defined when GtkSourceView can be used.])
+    AC_MSG_NOTICE([Note: using GtkSourceview Version 3])
+    with_gtksourceview=3
     BALSA_CFLAGS="$BALSA_CFLAGS $GTKSOURCEVIEW_CFLAGS"
     BALSA_LIBS="$BALSA_LIBS $GTKSOURCEVIEW_LIBS"
 fi
-AM_CONDITIONAL([BUILD_WITH_GTKSOURCEVIEW2], [test x$with_gtksourceview = x2 ])
+AM_CONDITIONAL([BUILD_WITH_GTKSOURCEVIEW2], [test x$with_gtksourceview = x3 ])
 
 # libUnique configuration
 #
 AC_MSG_CHECKING([whether to build with libUnique])
 if test x$with_unique != xno; then
     AC_MSG_RESULT([yes])
-    PKG_CHECK_MODULES(UNIQUE, [ unique-1.0 ])
+    PKG_CHECK_MODULES(UNIQUE, [ unique-3.0 ])
     AC_DEFINE(HAVE_UNIQUE,1,[Defined when libUnique can be used.])
     BALSA_CFLAGS="$BALSA_CFLAGS $UNIQUE_CFLAGS"
     BALSA_LIBS="$BALSA_LIBS $UNIQUE_LIBS"
@@ -808,7 +800,7 @@ AM_CONDITIONAL([BUILD_WITH_UNIQUE], [test $with_unique = "yes" ])
 AC_MSG_CHECKING([whether to build with canberra])
 if test x$with_canberra != xno; then
     AC_MSG_RESULT([yes])
-    PKG_CHECK_MODULES(CANBERRA, [ libcanberra-gtk ])
+    PKG_CHECK_MODULES(CANBERRA, [ libcanberra-gtk3 ])
     AC_DEFINE(HAVE_CANBERRA,1,[Defined when canberra can be used.])
     BALSA_CFLAGS="$BALSA_CFLAGS $CANBERRA_CFLAGS"
     BALSA_LIBS="$BALSA_LIBS $CANBERRA_LIBS"

@@ -652,7 +652,7 @@ message_window_new(LibBalsaMailbox * mailbox, guint msgno)
     close_widget =
         gtk_ui_manager_get_widget(ui_manager, "/MainMenu/FileMenu/Close");
     gtk_widget_add_accelerator(close_widget, "activate", accel_group,
-                               GDK_Escape, (GdkModifierType) 0,
+                               GDK_KEY_Escape, (GdkModifierType) 0,
                                (GtkAccelFlags) 0);
 }
 

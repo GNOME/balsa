@@ -68,10 +68,6 @@
 #include "toolbar-prefs.h"
 #include "toolbar-factory.h"
 
-#if HAVE_GNOME
-#include <gnome.h> /* for gnome_triggers_do() */
-#endif
-
 #ifdef BALSA_USE_THREADS
 #include "threads.h"
 #endif
@@ -134,7 +130,7 @@ static void balsa_window_real_open_mbnode(BalsaWindow *window,
                                           gboolean set_current);
 static void balsa_window_real_close_mbnode(BalsaWindow *window,
 					   BalsaMailboxNode *mbnode);
-static void balsa_window_destroy(GtkObject * object);
+static void balsa_window_destroy(GObject * object);
 
 static gboolean bw_close_mailbox_on_timer(void);
 
@@ -950,7 +946,7 @@ static guint window_signals[LAST_SIGNAL] = { 0 };
 static void
 balsa_window_class_init(BalsaWindowClass * klass)
 {
-    GtkObjectClass *object_class = (GtkObjectClass *) klass;
+    GObjectClass *object_class = (GObjectClass *) klass;
 
     gtk_rc_parse_string("style \"balsa-notebook-tab-button-style\"\n"
                         "{\n"
@@ -987,7 +983,7 @@ balsa_window_class_init(BalsaWindowClass * klass)
                      NULL, NULL,
                      g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
 
-    object_class->destroy = balsa_window_destroy;
+    object_class->dispose = balsa_window_destroy;
 
     klass->open_mbnode  = balsa_window_real_open_mbnode;
     klass->close_mbnode = balsa_window_real_close_mbnode;
@@ -1222,12 +1218,12 @@ bw_create_index_widget(BalsaWindow *bw)
 
     bw->sos_bar = gtk_hbox_new(FALSE, 5);
 
-    bw->filter_choice = gtk_combo_box_new_text();
+    bw->filter_choice = gtk_combo_box_text_new();
     gtk_box_pack_start(GTK_BOX(bw->sos_bar), bw->filter_choice,
                        FALSE, FALSE, 0);
     for(i=0; i<ELEMENTS(view_filters); i++)
-        gtk_combo_box_insert_text(GTK_COMBO_BOX(bw->filter_choice),
-                                  i, view_filters[i].str);
+        gtk_combo_box_text_insert_text(GTK_COMBO_BOX_TEXT(bw->filter_choice),
+                                       i, view_filters[i].str);
     gtk_combo_box_set_active(GTK_COMBO_BOX(bw->filter_choice), 0);
     gtk_widget_show(bw->filter_choice);
     bw->sos_entry = gtk_entry_new();
@@ -1604,7 +1600,8 @@ bw_window_state_event_cb(BalsaWindow * window,
     balsa_app.mw_maximized =
         event->new_window_state & GDK_WINDOW_STATE_MAXIMIZED;
 
-    gtk_statusbar_set_has_resize_grip(statusbar, !balsa_app.mw_maximized);
+    gtk_window_set_has_resize_grip(GTK_WINDOW(window),
+                                   !balsa_app.mw_maximized);
 
     return FALSE;
 }
@@ -1648,6 +1645,7 @@ balsa_window_new()
     IgeMacMenuGroup *group;
 #endif
     guint i;
+    GtkAdjustment *hadj, *vadj;
 
     /* Call to register custom balsa pixmaps with GNOME_STOCK_PIXMAPS
      * - allows for grey out */
@@ -1761,11 +1759,11 @@ balsa_window_new()
 
     /* XXX */
     balsa_app.mblist =  BALSA_MBLIST(balsa_mblist_new());
-    window->mblist =
-        gtk_scrolled_window_new(gtk_tree_view_get_hadjustment
-                                (GTK_TREE_VIEW(balsa_app.mblist)),
-                                gtk_tree_view_get_vadjustment
-                                (GTK_TREE_VIEW(balsa_app.mblist)));
+
+    g_object_get(G_OBJECT(balsa_app.mblist), "hadjustment", &hadj,
+                 "vadjustment", &vadj, NULL);
+    window->mblist = gtk_scrolled_window_new(hadj, vadj);
+
     gtk_container_add(GTK_CONTAINER(window->mblist), 
                       GTK_WIDGET(balsa_app.mblist));
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(window->mblist),
@@ -2579,13 +2577,13 @@ bw_close_mailbox_on_timer(void)
 }
 
 static void
-balsa_window_destroy(GtkObject * object)
+balsa_window_destroy(GObject * object)
 {
     bw_idle_remove(BALSA_WINDOW(object));
 
-    if (GTK_OBJECT_CLASS(balsa_window_parent_class)->destroy)
-        GTK_OBJECT_CLASS(balsa_window_parent_class)->
-            destroy(GTK_OBJECT(object));
+    if (G_OBJECT_CLASS(balsa_window_parent_class)->dispose)
+        G_OBJECT_CLASS(balsa_window_parent_class)->dispose(object);
+
     balsa_unregister_pixmaps();
 }
 
@@ -2677,21 +2675,6 @@ bw_contents_cb(void)
  * show the about box for Balsa
  */
 static void
-bw_show_about_box_url_hook(GtkAboutDialog * about, const gchar * link,
-                           gpointer data)
-{
-    GError *err = NULL;
-
-    gtk_show_uri(NULL, link, gtk_get_current_event_time(), &err);
-
-    if (err) {
-        balsa_information(LIBBALSA_INFORMATION_WARNING,
-                          _("Error showing %s: %s\n"), link, err->message);
-        g_error_free(err);
-    }
-}
-
-static void
 bw_show_about_box(GtkAction * action, gpointer user_data)
 {
     const gchar *authors[] = {
@@ -2714,7 +2697,6 @@ bw_show_about_box(GtkAction * action, gpointer user_data)
         gdk_pixbuf_new_from_file(BALSA_DATA_PREFIX
                                  "/pixmaps/balsa_logo.png", NULL);
 
-    gtk_about_dialog_set_url_hook(bw_show_about_box_url_hook, NULL, NULL);
     gtk_show_about_dialog(GTK_WINDOW(user_data),
                           "version", BALSA_VERSION,
                           "copyright",
@@ -3345,10 +3327,12 @@ bw_display_new_mail_notification(int num_new, int has_new)
     if (num_new <= 0 && has_new <= 0)
         return;
 
+#if 0
 #if HAVE_GNOME
     if (balsa_app.notify_new_mail_sound)
         gnome_triggers_do("New mail has arrived", "email",
                           "balsa", "newmail", NULL);
+#endif
 #endif
 
     if (!gtk_window_is_active(window))

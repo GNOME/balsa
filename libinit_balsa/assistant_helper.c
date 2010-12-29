@@ -152,9 +152,9 @@ balsa_init_add_table_option(GtkTable *table, guint num,
     gtk_table_attach(table, l, 0, 1, num + 1, num + 2,
                      GTK_FILL, GTK_FILL, 5, 2);
 
-    *dest = om = gtk_combo_box_new_text();
+    *dest = om = gtk_combo_box_text_new();
     for(i=0; optns[i]; i++)
-        gtk_combo_box_append_text(GTK_COMBO_BOX(om), _(optns[i]));
+        gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(om), _(optns[i]));
     gtk_label_set_mnemonic_widget(GTK_LABEL(l), om);
     gtk_combo_box_set_active(GTK_COMBO_BOX(om), 0);
     gtk_table_attach(table, om, 1, 2, num + 1, num + 2,

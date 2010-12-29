@@ -338,8 +338,7 @@ create_generic_dialog(AddressBookConfig * abc, const gchar * type)
     }
 
     dialog =
-        gtk_dialog_new_with_buttons(title, abc->parent,
-                                    GTK_DIALOG_NO_SEPARATOR,
+        gtk_dialog_new_with_buttons(title, abc->parent, 0,
                                     GTK_STOCK_HELP, GTK_RESPONSE_HELP,
                                     action, GTK_RESPONSE_APPLY,
                                     GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,

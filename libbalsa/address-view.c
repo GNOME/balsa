@@ -581,7 +581,7 @@ lbav_key_pressed_cb(GtkEntry * entry,
 {
     GtkEntryCompletion *completion;
 
-    if (event->keyval != GDK_Escape)
+    if (event->keyval != GDK_KEY_Escape)
         return FALSE;
 
     if (address_view->last_was_escape) {

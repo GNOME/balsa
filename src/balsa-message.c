@@ -59,23 +59,12 @@
 #  include "gmime-part-rfc2440.h"
 #endif
 
-#if HAVE_GTKSOURCEVIEW
-/* Use GtkSourceIter's case-insensitive search functions. */
-#  include <gtksourceview/gtksourceiter.h>
-#  define FORWARD_SEARCH(iter, text, match_begin, match_end)            \
-    gtk_source_iter_forward_search((iter), (text),                      \
-    GTK_SOURCE_SEARCH_CASE_INSENSITIVE, (match_begin), (match_end), NULL)
-#  define BACKWARD_SEARCH(iter, text, match_begin, match_end)           \
-    gtk_source_iter_backward_search((iter), (text),                     \
-    GTK_SOURCE_SEARCH_CASE_INSENSITIVE, (match_begin), (match_end), NULL)
-#else                           /* HAVE_GTKSOURCEVIEW */
 #  define FORWARD_SEARCH(iter, text, match_begin, match_end)            \
     gtk_text_iter_forward_search((iter), (text),                        \
-    0, (match_begin), (match_end), NULL)
+    GTK_TEXT_SEARCH_CASE_INSENSITIVE, (match_begin), (match_end), NULL)
 #  define BACKWARD_SEARCH(iter, text, match_begin, match_end)           \
     gtk_text_iter_backward_search((iter), (text),                       \
-    0, (match_begin), (match_end), NULL)
-#endif                          /* HAVE_GTKSOURCEVIEW */
+    GTK_TEXT_SEARCH_CASE_INSENSITIVE, (match_begin), (match_end), NULL)
 
 enum {
     SELECT_PART,
@@ -126,7 +115,7 @@ static gint balsa_message_signals[LAST_SIGNAL];
 static void balsa_message_class_init(BalsaMessageClass * klass);
 static void balsa_message_init(BalsaMessage * bm);
 
-static void balsa_message_destroy(GtkObject * object);
+static void balsa_message_destroy(GObject * object);
 
 static void display_headers(BalsaMessage * bm);
 static void display_content(BalsaMessage * bm);
@@ -239,9 +228,9 @@ balsa_message_get_type()
 static void
 balsa_message_class_init(BalsaMessageClass * klass)
 {
-    GtkObjectClass *object_class;
+    GObjectClass *object_class;
 
-    object_class = GTK_OBJECT_CLASS(klass);
+    object_class = G_OBJECT_CLASS(klass);
 
     balsa_message_signals[SELECT_PART] =
         g_signal_new("select-part",
@@ -252,7 +241,7 @@ balsa_message_class_init(BalsaMessageClass * klass)
                      g_cclosure_marshal_VOID__VOID,
                      G_TYPE_NONE, 0);
 
-    object_class->destroy = balsa_message_destroy;
+    object_class->dispose = balsa_message_destroy;
 
     parent_class = g_type_class_peek_parent(klass);
 
@@ -429,17 +418,16 @@ bm_find_scroll_to_rectangle(BalsaMessage * bm,
                             GdkRectangle * rectangle)
 {
     gint x, y;
-    GtkAdjustment *adj;
+    GtkAdjustment *hadj, *vadj;
 
     gtk_widget_translate_coordinates(widget, bm->bm_widget->widget,
                                      rectangle->x, rectangle->y,
                                      &x, &y);
 
-    adj = gtk_viewport_get_hadjustment(GTK_VIEWPORT(bm->cont_viewport));
-    gtk_adjustment_clamp_page(adj, x, x + rectangle->width);
-
-    adj = gtk_viewport_get_vadjustment(GTK_VIEWPORT(bm->cont_viewport));
-    gtk_adjustment_clamp_page(adj, y, y + rectangle->height);
+    g_object_get(G_OBJECT(bm->cont_viewport), "hadjustment", &hadj,
+                                              "vadjustment", &vadj, NULL);
+    gtk_adjustment_clamp_page(hadj, x, x + rectangle->width);
+    gtk_adjustment_clamp_page(vadj, y, y + rectangle->height);
 }
 
 static void
@@ -649,12 +637,12 @@ bm_find_pass_to_entry(BalsaMessage * bm, GdkEventKey * event)
     gboolean res = TRUE;
 
     switch (event->keyval) {
-    case GDK_Escape:
-    case GDK_Return:
-    case GDK_KP_Enter:
+    case GDK_KEY_Escape:
+    case GDK_KEY_Return:
+    case GDK_KEY_KP_Enter:
         bm_disable_find_entry(bm);
         return res;
-    case GDK_g:
+    case GDK_KEY_g:
 #if GTK_CHECK_VERSION(2, 18, 0)
         if ((event->state & (GDK_SHIFT_MASK | GDK_CONTROL_MASK)) ==
             GDK_CONTROL_MASK && gtk_widget_get_sensitive(bm->find_next)) {
@@ -825,7 +813,7 @@ balsa_message_init(BalsaMessage * bm)
 }
 
 static void
-balsa_message_destroy(GtkObject * object)
+balsa_message_destroy(GObject * object)
 {
     BalsaMessage* bm = BALSA_MESSAGE(object);
 
@@ -848,8 +836,8 @@ balsa_message_destroy(GtkObject * object)
 	bm->parts_popup = NULL;
     }
 
-    if (GTK_OBJECT_CLASS(parent_class)->destroy)
-        (*GTK_OBJECT_CLASS(parent_class)->destroy) (GTK_OBJECT(object));
+    if (G_OBJECT_CLASS(parent_class)->dispose)
+        (*G_OBJECT_CLASS(parent_class)->dispose) (object);
 }
 
 GtkWidget *
@@ -2276,7 +2264,7 @@ static void
 select_part(BalsaMessage * bm, BalsaPartInfo *info)
 {
     LibBalsaMessageBody *body;
-    GtkViewport *viewport = GTK_VIEWPORT(bm->cont_viewport);
+    GtkAdjustment *hadj, *vadj;
 
     hide_all_parts(bm);
 
@@ -2288,8 +2276,10 @@ select_part(BalsaMessage * bm, BalsaPartInfo *info)
 
     g_signal_emit(G_OBJECT(bm), balsa_message_signals[SELECT_PART], 0);
 
-    gtk_adjustment_set_value(gtk_viewport_get_hadjustment(viewport), 0);
-    gtk_adjustment_set_value(gtk_viewport_get_vadjustment(viewport), 0);
+    g_object_get(G_OBJECT(bm->cont_viewport), "hadjustment", &hadj,
+                                              "vadjustment", &vadj, NULL);
+    gtk_adjustment_set_value(hadj, 0);
+    gtk_adjustment_set_value(vadj, 0);
 }
 
 GtkWidget *

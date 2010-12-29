@@ -92,10 +92,8 @@ typedef struct {
     LibBalsaHtmlCallback  hover_cb;
     LibBalsaHtmlCallback  clicked_cb;
     WebKitWebFrame       *frame;
-#if GTK_CHECK_VERSION(2, 18, 0)
     gboolean              download_images;
     GtkWidget            *info_bar_widget;
-#endif /* GTK_CHECK_VERSION(2, 18, 0) */
     WebKitWebView        *web_view;
 } LibBalsaWebKitInfo;
 
@@ -181,7 +179,6 @@ lbh_resource_request_starting_cb(WebKitWebView         * web_view,
 
     if (g_ascii_strncasecmp(uri, "cid:", 4)) {
         /* Not a "cid:" request: disable loading. */
-#if GTK_CHECK_VERSION(2, 18, 0)
         static GHashTable *cache = NULL;
 
         if (!cache)
@@ -200,9 +197,6 @@ lbh_resource_request_starting_cb(WebKitWebView         * web_view,
                                                   GTK_RESPONSE_CLOSE);
             }
         }
-#else  /* GTK_CHECK_VERSION(2, 18, 0) */
-        webkit_network_request_set_uri(request, "about:blank");
-#endif /* GTK_CHECK_VERSION(2, 18, 0) */
     } else {
         LibBalsaMessageBody *body;
 
@@ -290,7 +284,6 @@ lbh_create_web_view_cb(WebKitWebView  * web_view,
     return WEBKIT_WEB_VIEW(widget);
 }
 
-#if GTK_CHECK_VERSION(2, 18, 0)
 /*
  * Make the GtkInfoBar for asking about downloading images
  */
@@ -317,25 +310,12 @@ lbh_info_bar_response_cb(GtkInfoBar * info_bar,
     gtk_widget_destroy(GTK_WIDGET(info_bar));
 }
 
-static void
-lbh_info_bar_realize_cb(GtkWidget * info_bar,
-                        GtkWidget * text_view)
-{
-    GtkStyle *style = gtk_style_copy(gtk_widget_get_style(info_bar));
-
-    style->base[GTK_STATE_NORMAL] = style->bg[GTK_STATE_NORMAL];
-    gtk_widget_set_style(text_view, style);
-    g_object_unref(style);
-    gtk_widget_hide(info_bar);
-}
-
 static GtkWidget *
 lbh_info_bar_widget(GtkWidget * widget, LibBalsaWebKitInfo * info)
 {
     GtkWidget *info_bar_widget;
     GtkInfoBar *info_bar;
-    GtkWidget *text_view_widget;
-    GtkTextView *text_view;
+    GtkWidget *label;
     GtkWidget *content_area;
     gchar *text = _("This message part contains images "
                     "from a remote server. "
@@ -354,22 +334,14 @@ lbh_info_bar_widget(GtkWidget * widget, LibBalsaWebKitInfo * info)
     g_signal_connect(info_bar, "response",
                      G_CALLBACK(lbh_info_bar_response_cb), info);
 
-    text_view_widget = gtk_text_view_new();
-    g_signal_connect(info_bar_widget, "realize",
-                     G_CALLBACK(lbh_info_bar_realize_cb), text_view_widget);
+    label = gtk_label_new(text);
+    gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
 
     content_area = gtk_info_bar_get_content_area(info_bar);
-    gtk_container_add(GTK_CONTAINER(content_area), text_view_widget);
-
-    text_view = GTK_TEXT_VIEW(text_view_widget);
-    gtk_text_view_set_wrap_mode(text_view, GTK_WRAP_WORD_CHAR);
-    gtk_text_view_set_editable(text_view, FALSE);
-    gtk_text_buffer_set_text(gtk_text_view_get_buffer(text_view),
-                             text, -1);
+    gtk_container_add(GTK_CONTAINER(content_area), label);
 
     return info_bar_widget;
 }
-#endif /* GTK_CHECK_VERSION(2, 18, 0) */
 
 /* Create a new WebKitWebView widget:
  * text			the HTML source;
@@ -406,13 +378,11 @@ libbalsa_html_new(LibBalsaMessageBody * body,
     info->hover_cb        = hover_cb;
     info->clicked_cb      = clicked_cb;
     info->frame           = NULL;
-#if GTK_CHECK_VERSION(2, 18, 0)
     info->download_images = FALSE;
     info->info_bar_widget = lbh_info_bar_widget(widget, info);
 
     gtk_box_pack_start(GTK_BOX(vbox), info->info_bar_widget,
                        FALSE, FALSE, 0);
-#endif /* GTK_CHECK_VERSION(2, 18, 0) */
     gtk_box_pack_start(GTK_BOX(vbox), widget, TRUE, TRUE, 0);
 
     info->web_view = web_view = WEBKIT_WEB_VIEW(widget);
@@ -444,6 +414,8 @@ libbalsa_html_new(LibBalsaMessageBody * body,
     webkit_web_view_load_string(web_view, text, "text/html",
                                 libbalsa_message_body_charset(body), NULL);
     g_free(text);
+
+    gtk_widget_show(widget);
 
     return vbox;
 }

@@ -383,7 +383,7 @@ static void default_font_size_cb(GtkWidget * widget, GtkWidget * pbox);
 
 static void pgdown_modified_cb(GtkWidget * widget, GtkWidget * pbox);
 
-static void option_menu_cb(GtkItem * menuitem, gpointer data);
+static void option_menu_cb(GtkMenuItem * menuitem, gpointer data);
 static void imap_toggled_cb(GtkWidget * widget, GtkWidget * pbox);
 
 static void convert_8bit_cb(GtkWidget * widget, GtkWidget * pbox);
@@ -1070,24 +1070,15 @@ apply_prefs(GtkDialog * pbox)
 
     /* quoted text color */
     for (i = 0; i < MAX_QUOTED_COLOR; i++) {
-        gdk_colormap_free_colors(gdk_drawable_get_colormap
-                                 (gtk_widget_get_window(GTK_WIDGET(pbox))),
-                                 &balsa_app.quoted_color[i], 1);
         gtk_color_button_get_color(GTK_COLOR_BUTTON(pui->quoted_color[i]),
                                    &balsa_app.quoted_color[i]);
     }
 
     /* url color */
-    gdk_colormap_free_colors(gdk_drawable_get_colormap
-                             (gtk_widget_get_window(GTK_WIDGET(pbox))),
-                             &balsa_app.url_color, 1);
     gtk_color_button_get_color(GTK_COLOR_BUTTON(pui->url_color),
                                &balsa_app.url_color);
 
     /* bad address color */
-    gdk_colormap_free_colors(gdk_drawable_get_colormap
-                             (gtk_widget_get_window(GTK_WIDGET(pbox))),
-                             &balsa_app.bad_address_color, 1);
     gtk_color_button_get_color(GTK_COLOR_BUTTON(pui->bad_address_color),
                                &balsa_app.bad_address_color);
 
@@ -1837,7 +1828,7 @@ checking_group(GtkWidget * page)
     GtkWidget *group;
     GtkWidget *table;
     guint row;
-    GtkObject *spinbutton_adj;
+    GtkAdjustment *spinbutton_adj;
     GtkWidget *label;
     GtkWidget *hbox;
 
@@ -1853,8 +1844,7 @@ checking_group(GtkWidget * page)
     pm_page_add_to_size_group(page, pui->check_mail_auto);
 
     spinbutton_adj = gtk_adjustment_new(10, 1, 100, 1, 10, 0);
-    pui->check_mail_minutes =
-	gtk_spin_button_new(GTK_ADJUSTMENT(spinbutton_adj), 1, 0);
+    pui->check_mail_minutes = gtk_spin_button_new(spinbutton_adj, 1, 0);
     gtk_table_attach(GTK_TABLE(table), pui->check_mail_minutes,
                      1, 2, row, row + 1, GTK_EXPAND | GTK_FILL, 0, 0, 0);
 
@@ -1928,7 +1918,7 @@ quoted_group(GtkWidget * page)
 {
     GtkWidget *group;
     GtkWidget *table;
-    GtkObject *spinbutton_adj;
+    GtkAdjustment *spinbutton_adj;
     GtkWidget *label;
     guint row = 0;
 
@@ -1960,8 +1950,7 @@ quoted_group(GtkWidget * page)
     pm_page_add_to_size_group(page, pui->browse_wrap);
 
     spinbutton_adj = gtk_adjustment_new(1.0, 40.0, 200.0, 1.0, 5.0, 0.0);
-    pui->browse_wrap_length =
-	gtk_spin_button_new(GTK_ADJUSTMENT(spinbutton_adj), 1, 0);
+    pui->browse_wrap_length = gtk_spin_button_new(spinbutton_adj, 1, 0);
     gtk_table_attach(GTK_TABLE(table), pui->browse_wrap_length,
                      1, 2, row, row + 1,
                      GTK_EXPAND | GTK_FILL, 0, 0, 0);
@@ -2110,7 +2099,7 @@ word_wrap_group(GtkWidget * page)
 {
     GtkWidget *group;
     GtkWidget *table;
-    GtkObject *spinbutton_adj;
+    GtkAdjustment *spinbutton_adj;
     GtkWidget *label;
 
     group = pm_group_new(_("Word wrap"));
@@ -2124,10 +2113,8 @@ word_wrap_group(GtkWidget * page)
 		     (GtkAttachOptions) (0), 0, 0);
     pm_page_add_to_size_group(page, pui->wordwrap);
 
-    spinbutton_adj =
-        gtk_adjustment_new(1.0, 40.0, 998.0, 1.0, 5.0, 0.0);
-    pui->wraplength =
-	gtk_spin_button_new(GTK_ADJUSTMENT(spinbutton_adj), 1, 0);
+    spinbutton_adj = gtk_adjustment_new(1.0, 40.0, 998.0, 1.0, 5.0, 0.0);
+    pui->wraplength = gtk_spin_button_new(spinbutton_adj, 1, 0);
     gtk_table_attach(GTK_TABLE(table), pui->wraplength, 1, 2, 0, 1,
 		     GTK_EXPAND | GTK_FILL, (GtkAttachOptions) (0), 0, 0);
     gtk_widget_set_sensitive(pui->wraplength, FALSE);
@@ -2216,7 +2203,7 @@ main_window_group(GtkWidget * page)
 {
     GtkWidget *group;
     GtkWidget *table;
-    GtkObject *scroll_adj;
+    GtkAdjustment *scroll_adj;
     GtkWidget *label;
 
     group = pm_group_new(_("Main window"));
@@ -2243,8 +2230,7 @@ main_window_group(GtkWidget * page)
 		     (GtkAttachOptions) (GTK_FILL),
 		     (GtkAttachOptions) (0), 0, 0);
     scroll_adj = gtk_adjustment_new(50.0, 10.0, 100.0, 5.0, 10.0, 0.0);
-    pui->pgdown_percent =
-	 gtk_spin_button_new(GTK_ADJUSTMENT(scroll_adj), 1, 0);
+    pui->pgdown_percent = gtk_spin_button_new(scroll_adj, 1, 0);
     gtk_widget_set_sensitive(pui->pgdown_percent, FALSE);
     gtk_table_attach(GTK_TABLE(table), pui->pgdown_percent, 1, 2, 0, 1,
 		     GTK_EXPAND | GTK_FILL, (GtkAttachOptions) (0), 0, 0);
@@ -2627,7 +2613,7 @@ static GtkWidget *
 pspell_settings_group(GtkWidget * page)
 {
     GtkWidget *group;
-    GtkObject *ignore_adj;
+    GtkAdjustment *ignore_adj;
     GtkWidget *table;
     GtkWidget *hbox;
 
@@ -2650,8 +2636,7 @@ pspell_settings_group(GtkWidget * page)
     /* do the ignore length */
     attach_label(_("Ignore words shorter than"), table, 2, NULL);
     ignore_adj = gtk_adjustment_new(0.0, 0.0, 99.0, 1.0, 5.0, 0.0);
-    pui->ignore_length =
-        gtk_spin_button_new(GTK_ADJUSTMENT(ignore_adj), 1, 0);
+    pui->ignore_length = gtk_spin_button_new(ignore_adj, 1, 0);
 
     hbox = gtk_hbox_new(FALSE, 0);
     gtk_box_pack_start(GTK_BOX(hbox), pui->ignore_length, FALSE, FALSE, 0);
@@ -2692,7 +2677,7 @@ misc_group(GtkWidget * page)
     GtkWidget *group;
     GtkWidget *label;
     GtkWidget *hbox;
-    GtkObject *close_spinbutton_adj;
+    GtkAdjustment *close_spinbutton_adj;
 
     group = pm_group_new(_("Miscellaneous"));
 
@@ -2711,7 +2696,7 @@ misc_group(GtkWidget * page)
 
     close_spinbutton_adj = gtk_adjustment_new(10, 1, 100, 1, 10, 0);
     pui->close_mailbox_minutes =
-	gtk_spin_button_new(GTK_ADJUSTMENT(close_spinbutton_adj), 1, 0);
+	gtk_spin_button_new(close_spinbutton_adj, 1, 0);
     gtk_widget_show(pui->close_mailbox_minutes);
     gtk_widget_set_sensitive(pui->close_mailbox_minutes, FALSE);
     gtk_box_pack_start(GTK_BOX(hbox), pui->close_mailbox_minutes,
@@ -2730,7 +2715,7 @@ deleting_messages_group(GtkWidget * page)
     gchar *text;
     GtkWidget *label;
     GtkWidget *hbox;
-    GtkObject *expunge_spinbutton_adj;
+    GtkAdjustment *expunge_spinbutton_adj;
 
     group = pm_group_new(_("Deleting messages"));
 
@@ -2770,8 +2755,7 @@ deleting_messages_group(GtkWidget * page)
     pm_page_add_to_size_group(page, pui->expunge_auto);
 
     expunge_spinbutton_adj = gtk_adjustment_new(120, 1, 1440, 1, 10, 0);
-    pui->expunge_minutes =
-	gtk_spin_button_new(GTK_ADJUSTMENT(expunge_spinbutton_adj), 1, 0);
+    pui->expunge_minutes = gtk_spin_button_new(expunge_spinbutton_adj, 1, 0);
     gtk_widget_show(pui->expunge_minutes);
     gtk_widget_set_sensitive(pui->expunge_minutes, FALSE);
     gtk_box_pack_start(GTK_BOX(hbox), pui->expunge_minutes,
@@ -2842,7 +2826,7 @@ folder_scanning_group(GtkWidget * page)
     GtkWidget *group;
     GtkWidget *label;
     GtkWidget *hbox;
-    GtkObject *scan_adj;
+    GtkAdjustment *scan_adj;
 
     group = pm_group_new(_("Folder scanning"));
 
@@ -2863,8 +2847,7 @@ folder_scanning_group(GtkWidget * page)
     gtk_box_pack_start(GTK_BOX(hbox), label,
                        FALSE, FALSE, 0);
     scan_adj = gtk_adjustment_new(1.0, 1.0, 99.0, 1.0, 5.0, 0.0);
-    pui->local_scan_depth =
-        gtk_spin_button_new(GTK_ADJUSTMENT(scan_adj), 1, 0);
+    pui->local_scan_depth = gtk_spin_button_new(scan_adj, 1, 0);
     gtk_box_pack_start(GTK_BOX(hbox), pui->local_scan_depth,
                        TRUE, TRUE, 0);
 
@@ -2876,8 +2859,7 @@ folder_scanning_group(GtkWidget * page)
     gtk_box_pack_start(GTK_BOX(hbox), label,
                        FALSE, FALSE, 0);
     scan_adj = gtk_adjustment_new(1.0, 1.0, 99.0, 1.0, 5.0, 0.0);
-    pui->imap_scan_depth =
-        gtk_spin_button_new(GTK_ADJUSTMENT(scan_adj), 1, 0);
+    pui->imap_scan_depth = gtk_spin_button_new(scan_adj, 1, 0);
     gtk_box_pack_start(GTK_BOX(hbox), pui->imap_scan_depth,
                        TRUE, TRUE, 0);
 
@@ -3366,7 +3348,7 @@ pgdown_modified_cb(GtkWidget * widget, GtkWidget * pbox)
 }
 
 static void
-option_menu_cb(GtkItem * widget, gpointer data)
+option_menu_cb(GtkMenuItem * widget, gpointer data)
 {
     /* update the index number */
     gint *index = (gint *) data;
@@ -3396,7 +3378,7 @@ add_show_menu(const char* label, gint level, GtkWidget* menu)
     struct pm_combo_box_info *info =
         g_object_get_data(G_OBJECT(menu), PM_COMBO_BOX_INFO);
 
-    gtk_combo_box_append_text(GTK_COMBO_BOX(menu), label);
+    gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(menu), label);
     info->levels = g_slist_append(info->levels, GINT_TO_POINTER(level));
 }
 
@@ -3730,7 +3712,7 @@ pm_combo_box_info_free(struct pm_combo_box_info * info)
 static GtkWidget *
 pm_combo_box_new(void)
 {
-    GtkWidget *combo_box = gtk_combo_box_new_text();
+    GtkWidget *combo_box = gtk_combo_box_text_new();
     struct pm_combo_box_info *info = g_new0(struct pm_combo_box_info, 1);
 
     g_object_set_data_full(G_OBJECT(combo_box), PM_COMBO_BOX_INFO, info,

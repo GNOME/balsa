@@ -203,7 +203,7 @@ balsa_ab_window_load_books(BalsaAbWindow * ab)
          ab_list = ab_list->next, ++offset) {
         LibBalsaAddressBook *address_book = ab_list->data;
 
-        gtk_combo_box_append_text(GTK_COMBO_BOX(ab->combo_box),
+        gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(ab->combo_box),
                                   address_book->name);
 
         if (ab->current_address_book == NULL)
@@ -258,7 +258,7 @@ balsa_ab_window_init(BalsaAbWindow *ab)
                                 (balsa_ab_window_select_recipient));
 
     /* The address book selection menu */
-    ab->combo_box = gtk_combo_box_new_text();
+    ab->combo_box = gtk_combo_box_text_new();
 
     ab->current_address_book = balsa_app.default_address_book;
 

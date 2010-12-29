@@ -174,14 +174,12 @@ balsa_mblist_get_type(void)
 static void
 bmbl_class_init(BalsaMBListClass * klass)
 {
-    GObjectClass *o_class;
-    GtkObjectClass *object_class;
+    GObjectClass *object_class;
     GtkWidgetClass *widget_class;
 
     parent_class = g_type_class_peek_parent(klass);
 
-    o_class = (GObjectClass *) klass;
-    object_class = (GtkObjectClass *) klass;
+    object_class = (GObjectClass *) klass;
     widget_class = (GtkWidgetClass *) klass;
 
     /* HAS_UNREAD_MAILBOX is emitted when the number of mailboxes with
@@ -197,8 +195,8 @@ bmbl_class_init(BalsaMBListClass * klass)
                      1, G_TYPE_INT);
 
     /* GObject signals */
-    o_class->set_property = bmbl_set_property;
-    o_class->get_property = bmbl_get_property;
+    object_class->set_property = bmbl_set_property;
+    object_class->get_property = bmbl_get_property;
 
     /* GtkWidget signals */
     widget_class->drag_motion = bmbl_drag_motion;
@@ -208,7 +206,7 @@ bmbl_class_init(BalsaMBListClass * klass)
     klass->has_unread_mailbox = NULL;
 
     /* Properties */
-    g_object_class_install_property(o_class, PROP_SHOW_CONTENT_INFO,
+    g_object_class_install_property(object_class, PROP_SHOW_CONTENT_INFO,
                                     g_param_spec_boolean
                                     ("show_content_info", NULL, NULL,
                                      FALSE, G_PARAM_READWRITE));
@@ -1871,7 +1869,7 @@ bmbl_mru_show_tree(GtkWidget * widget, gpointer data)
                      G_CALLBACK(bmbl_mru_activated_cb), data);
 
     /* Force the mailbox list to be a reasonable size. */
-    gtk_widget_size_request(mblist, &req);
+    gtk_widget_get_preferred_size(mblist, NULL, &req);
     if (req.height > balsa_app.mw_height)
         req.height = balsa_app.mw_height;
     /* For the mailbox list width, we use the one used on the main
@@ -1879,7 +1877,7 @@ bmbl_mru_show_tree(GtkWidget * widget, gpointer data)
      * because the mblist widget saves the size in
      * balsa_app.mblist_width */
     req.width = balsa_app.mblist_width> 200 ? balsa_app.mblist_width : 200;
-    gtk_widget_set_size_request(GTK_WIDGET(mblist), req.width, req.height);
+    if (FALSE) gtk_widget_set_size_request(GTK_WIDGET(mblist), req.width, req.height);
 
     gtk_container_add(GTK_CONTAINER(scroll), mblist);
     gtk_container_add(GTK_CONTAINER

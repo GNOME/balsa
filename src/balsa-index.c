@@ -64,7 +64,7 @@
 /* gtk widget */
 static void bndx_class_init(BalsaIndexClass * klass);
 static void bndx_instance_init(BalsaIndex * index);
-static void bndx_destroy(GtkObject * obj);
+static void bndx_destroy(GObject * obj);
 static gboolean bndx_popup_menu(GtkWidget * widget);
 
 /* statics */
@@ -177,10 +177,10 @@ balsa_index_get_type(void)
 static void
 bndx_class_init(BalsaIndexClass * klass)
 {
-    GtkObjectClass *object_class;
+    GObjectClass *object_class;
     GtkWidgetClass *widget_class;
 
-    object_class = (GtkObjectClass *) klass;
+    object_class = (GObjectClass *) klass;
     widget_class = (GtkWidgetClass *) klass;
 
     parent_class = g_type_class_peek_parent(klass);
@@ -195,7 +195,7 @@ bndx_class_init(BalsaIndexClass * klass)
 		     g_cclosure_marshal_VOID__VOID,
                      G_TYPE_NONE, 0);
 
-    object_class->destroy = bndx_destroy;
+    object_class->dispose = bndx_destroy;
     widget_class->popup_menu = bndx_popup_menu;
     klass->index_changed = NULL;
 }
@@ -210,7 +210,7 @@ bndx_mbnode_weak_notify(gpointer data, GObject *where_the_object_was)
 }
 
 static void
-bndx_destroy(GtkObject * obj)
+bndx_destroy(GObject * obj)
 {
     BalsaIndex *index;
 
@@ -250,8 +250,8 @@ bndx_destroy(GtkObject * obj)
 
     g_free(index->filter_string); index->filter_string = NULL;
 
-    if (GTK_OBJECT_CLASS(parent_class)->destroy)
-        (*GTK_OBJECT_CLASS(parent_class)->destroy) (obj);
+    if (G_OBJECT_CLASS(parent_class)->dispose)
+        (*G_OBJECT_CLASS(parent_class)->dispose) (obj);
 }
 
 /* Widget class popup menu method. */
@@ -1978,7 +1978,7 @@ bndx_popup_position_func(GtkMenu * menu, gint * x, gint * y,
     gdk_window_get_origin(gtk_tree_view_get_bin_window
                           (GTK_TREE_VIEW(bindex)), x, y);
 
-    gtk_widget_size_request(GTK_WIDGET(menu), &req);
+    gtk_widget_get_preferred_size(GTK_WIDGET(menu), NULL, &req);
 
 #if GTK_CHECK_VERSION(2, 18, 0)
     gtk_widget_get_allocation(bindex, &allocation);
@@ -2657,7 +2657,8 @@ bndx_pipe_response(GtkWidget * dialog, gint response,
         GList *active_cmd;
 
         pipe_cmd =
-            gtk_combo_box_get_active_text(GTK_COMBO_BOX(info->entry));
+            gtk_combo_box_text_get_active_text(GTK_COMBO_BOX_TEXT
+                                               (info->entry));
         active_cmd =
             g_list_find_custom(balsa_app.pipe_cmds, pipe_cmd,
                                (GCompareFunc) strcmp);
@@ -2734,9 +2735,10 @@ balsa_index_pipe(BalsaIndex * index)
     gtk_container_add(GTK_CONTAINER(vbox), label =
                       gtk_label_new(_("Specify the program to run:")));
 
-    info->entry = entry = gtk_combo_box_entry_new_text();
+    info->entry = entry = gtk_combo_box_text_new_with_entry();
     for (list = balsa_app.pipe_cmds; list; list = list->next)
-        gtk_combo_box_append_text(GTK_COMBO_BOX(entry), list->data);
+        gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(entry),
+                                       list->data);
     gtk_combo_box_set_active(GTK_COMBO_BOX(entry), 0);
     gtk_container_add(GTK_CONTAINER(vbox), entry);
 

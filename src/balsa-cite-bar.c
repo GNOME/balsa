@@ -37,10 +37,14 @@ struct _BalsaCiteBarClass {
     GtkWidgetClass parent_class;
 };
 
-static void balsa_cite_bar_size_request(GtkWidget      * widget,
-                                        GtkRequisition * requisition);
-static gboolean balsa_cite_bar_expose  (GtkWidget      * widget,
-                                        GdkEventExpose * event);
+static void balsa_cite_bar_get_preferred_width (GtkWidget * widget,
+                                                gint      * minimum_width,
+                                                gint      * natural_width);
+static void balsa_cite_bar_get_preferred_height(GtkWidget * widget,
+                                                gint      * minimum_height,
+                                                gint      * natural_height);
+static gboolean balsa_cite_bar_draw            (GtkWidget * widget,
+                                                cairo_t   * cr);
 
 G_DEFINE_TYPE(BalsaCiteBar, balsa_cite_bar, GTK_TYPE_WIDGET)
 
@@ -55,18 +59,15 @@ balsa_cite_bar_class_init(BalsaCiteBarClass * class)
 
     parent_class = g_type_class_peek_parent(class);
 
-    widget_class->expose_event = balsa_cite_bar_expose;
-    widget_class->size_request = balsa_cite_bar_size_request;
+    widget_class->get_preferred_width  = balsa_cite_bar_get_preferred_width;
+    widget_class->get_preferred_height = balsa_cite_bar_get_preferred_height;
+    widget_class->draw                 = balsa_cite_bar_draw;
 }
 
 static void
 balsa_cite_bar_init(BalsaCiteBar * cite_bar)
 {
-#if GTK_CHECK_VERSION(2, 18, 0)
     gtk_widget_set_has_window(GTK_WIDGET(cite_bar), FALSE);
-#else                           /* GTK_CHECK_VERSION(2, 18, 0) */
-    GTK_WIDGET_SET_FLAGS(GTK_WIDGET(cite_bar), GTK_NO_WINDOW);
-#endif                          /* GTK_CHECK_VERSION(2, 18, 0) */ 
 }
 
 GtkWidget *
@@ -101,42 +102,44 @@ balsa_cite_bar_resize(BalsaCiteBar * cite_bar, gint height)
 }
 
 static void
-balsa_cite_bar_size_request(GtkWidget * widget,
-                            GtkRequisition * requisition)
+balsa_cite_bar_get_preferred_width(GtkWidget * widget,
+                                   gint      * minimum_width,
+                                   gint      * natural_width)
 {
-    BalsaCiteBar *cite_bar = BALSA_CITE_BAR(widget);
+    BalsaCiteBar *cite_bar;
 
-    requisition->width =
+    cite_bar = BALSA_CITE_BAR(widget);
+    *minimum_width = *natural_width =
         cite_bar->bars * (cite_bar->width + cite_bar->space) -
         cite_bar->space;
-    requisition->height = cite_bar->height;
+}
+
+static void
+balsa_cite_bar_get_preferred_height(GtkWidget * widget,
+                                    gint      * minimum_height,
+                                    gint      * natural_height)
+{
+    BalsaCiteBar *cite_bar;
+
+    cite_bar = BALSA_CITE_BAR(widget);
+    *minimum_height = *natural_height = cite_bar->height;
 }
 
 static gboolean
-balsa_cite_bar_expose(GtkWidget * widget, GdkEventExpose * event)
+balsa_cite_bar_draw(GtkWidget * widget, cairo_t * cr)
 {
-    if (!event->count) {
-        BalsaCiteBar *cite_bar = BALSA_CITE_BAR(widget);
-        GdkWindow *window = gtk_widget_get_window(widget);
-        cairo_t *cr = gdk_cairo_create(window);
-        GtkStyle *style = gtk_widget_get_style(widget);
-        GtkAllocation allocation;
-        int n;
+    GtkStyle *style;
+    BalsaCiteBar *cite_bar;
+    int n, x;
 
-#if GTK_CHECK_VERSION(2, 18, 0)
-        gtk_widget_get_allocation(widget, &allocation);
-#else                           /* GTK_CHECK_VERSION(2, 18, 0) */
-        allocation.x = widget->allocation.x;
-        allocation.y = widget->allocation.y;
-#endif                          /* GTK_CHECK_VERSION(2, 18, 0) */ 
-        gdk_cairo_set_source_color(cr, &style->fg[GTK_STATE_NORMAL]);
-        for (n = 0; n < cite_bar->bars; n++) {
-            cairo_rectangle(cr, allocation.x, allocation.y,
-                            cite_bar->width, cite_bar->height);
-            cairo_fill(cr);
-            allocation.x += cite_bar->width + cite_bar->space;
-        }
-        cairo_destroy(cr);
+    style = gtk_widget_get_style(widget);
+    gdk_cairo_set_source_color(cr, &style->fg[GTK_STATE_NORMAL]);
+
+    cite_bar = BALSA_CITE_BAR(widget);
+    for (n = x = 0; n < cite_bar->bars; n++) {
+        cairo_rectangle(cr, x, 0, cite_bar->width, cite_bar->height);
+        cairo_fill(cr);
+        x += cite_bar->width + cite_bar->space;
     }
 
     return FALSE;

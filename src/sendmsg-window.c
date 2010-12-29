@@ -1885,13 +1885,14 @@ sw_get_user_codeset(BalsaSendmsg * bsmsg, gboolean * change_type,
     if (change_type) {
         GtkWidget *label = gtk_label_new(_("Attach as MIME type:"));
         GtkWidget *hbox = gtk_hbox_new(FALSE, 5);
-        combo_box = gtk_combo_box_new_text();
+        combo_box = gtk_combo_box_text_new();
 
         gtk_box_pack_start(content_box, hbox, TRUE, TRUE, 5);
         gtk_box_pack_start(GTK_BOX(hbox), label, TRUE, TRUE, 0);
-        gtk_combo_box_append_text(GTK_COMBO_BOX(combo_box), mime_type);
-        gtk_combo_box_append_text(GTK_COMBO_BOX(combo_box),
-                                  "application/octet-stream");
+        gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(combo_box),
+                                       mime_type);
+        gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(combo_box),
+                                       "application/octet-stream");
         gtk_combo_box_set_active(GTK_COMBO_BOX(combo_box), 0);
         g_signal_connect(G_OBJECT(combo_box), "changed",
                          G_CALLBACK(sw_charset_combo_box_changed),
@@ -2637,6 +2638,7 @@ create_string_entry(GtkWidget * table, const gchar * label, int y_pos,
  * On return, bsmsg->address_view and bsmsg->addresses[1] have been set.
  */
 
+#if 0
 static void
 sw_scroll_size_request(GtkWidget * widget, GtkRequisition * requisition)
 {
@@ -2645,8 +2647,8 @@ sw_scroll_size_request(GtkWidget * widget, GtkRequisition * requisition)
     gint border_width;
     GtkPolicyType type = GTK_POLICY_NEVER;
 
-    gtk_widget_size_request(gtk_bin_get_child(GTK_BIN(widget)),
-                            requisition);
+    gtk_widget_get_preferred_size(gtk_bin_get_child(GTK_BIN(widget)),
+                                  NULL, requisition);
     gtk_widget_style_get(widget, "focus-line-width", &focus_width,
                          "focus-padding", &focus_pad, NULL);
 
@@ -2667,6 +2669,7 @@ sw_scroll_size_request(GtkWidget * widget, GtkRequisition * requisition)
     }
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(widget), type, type);
 }
+#endif
 
 static void
 create_email_entry(GtkWidget * table, int y_pos, BalsaSendmsg * bsmsg,
@@ -2684,8 +2687,10 @@ create_email_entry(GtkWidget * table, int y_pos, BalsaSendmsg * bsmsg,
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll),
 				   GTK_POLICY_AUTOMATIC,
 				   GTK_POLICY_AUTOMATIC);
+#if 0
     g_signal_connect(scroll, "size-request",
                      G_CALLBACK(sw_scroll_size_request), NULL);
+#endif
     gtk_container_add(GTK_CONTAINER(scroll), GTK_WIDGET(*view));
 
     widget[1] = gtk_frame_new(NULL);
@@ -2945,8 +2950,10 @@ create_info_pane(BalsaSendmsg * bsmsg)
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(sw),
 				   GTK_POLICY_AUTOMATIC,
 				   GTK_POLICY_AUTOMATIC);
+#if 0
     g_signal_connect(sw, "size-request",
                      G_CALLBACK(sw_scroll_size_request), NULL);
+#endif
 
     store = gtk_list_store_new(ATTACH_NUM_COLUMNS,
 			       TYPE_BALSA_ATTACH_INFO,
@@ -3156,7 +3163,7 @@ sw_can_redo_cb(GtkSourceBuffer * source_buffer, gboolean can_redo,
     sw_set_sensitive(bsmsg, "Redo", can_redo);
 }
 
-#elif (HAVE_GTKSOURCEVIEW == 2)
+#elif (HAVE_GTKSOURCEVIEW >= 2)
 
 static void
 sw_can_undo_cb(GtkSourceBuffer * source_buffer, GParamSpec *arg1,
@@ -3190,6 +3197,8 @@ create_text_area(BalsaSendmsg * bsmsg)
 
 #if HAVE_GTKSOURCEVIEW
     bsmsg->text = libbalsa_source_view_new(TRUE, balsa_app.quoted_color);
+    gtk_source_view_set_show_line_numbers(GTK_SOURCE_VIEW(bsmsg->text),
+                                          FALSE);
 #else                           /* HAVE_GTKSOURCEVIEW */
     bsmsg->text = gtk_text_view_new();
 #endif                          /* HAVE_GTKSOURCEVIEW */
@@ -3208,7 +3217,7 @@ create_text_area(BalsaSendmsg * bsmsg)
                      G_CALLBACK(sw_can_undo_cb), bsmsg);
     g_signal_connect(buffer, "can-redo",
                      G_CALLBACK(sw_can_redo_cb), bsmsg);
-#elif (HAVE_GTKSOURCEVIEW == 2)
+#elif (HAVE_GTKSOURCEVIEW)
     g_signal_connect(G_OBJECT(buffer), "notify::can-undo",
                      G_CALLBACK(sw_can_undo_cb), bsmsg);
     g_signal_connect(G_OBJECT(buffer), "notify::can-redo",

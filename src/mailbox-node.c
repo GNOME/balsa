@@ -1040,7 +1040,7 @@ balsa_mailbox_node_get_context_menu(BalsaMailboxNode * mbnode)
     menu = gtk_menu_new();
     /* it's a single-use menu, so we must destroy it when we're done */
     g_signal_connect(G_OBJECT(menu), "selection-done",
-                     G_CALLBACK(gtk_object_destroy), NULL);
+                     G_CALLBACK(gtk_widget_destroy), NULL);
 
     submenu = gtk_menu_new();
     add_menu_entry(submenu, _("Local _mbox mailbox..."),  

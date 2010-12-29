@@ -42,8 +42,8 @@ libbalsa_cell_renderer_button_activate(GtkCellRenderer    * cell,
                                        GdkEvent           * event,
                                        GtkWidget          * widget,
                                        const gchar        * path,
-                                       GdkRectangle       * background_area,
-                                       GdkRectangle       * cell_area,
+                                       const GdkRectangle * background_area,
+                                       const GdkRectangle * cell_area,
                                        GtkCellRendererState flags)
 {
     g_signal_emit(cell, cell_button_signals[ACTIVATED], 0, path);

@@ -154,13 +154,13 @@ fe_build_option_menu(option_list options[], gint num, GCallback func,
     if (num < 1)
 	return (NULL);
 
-    combo_box = gtk_combo_box_new_text();
+    combo_box = gtk_combo_box_text_new();
     info = g_new(struct fe_combo_box_info, 1);
     info->values = NULL;
 
     for (i = 0; i < num; i++) {
-	gtk_combo_box_append_text(GTK_COMBO_BOX(combo_box),
-                                  _(options[i].text));
+	gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(combo_box),
+                                       _(options[i].text));
 	info->values =
 	    g_slist_append(info->values, GINT_TO_POINTER(options[i].value));
     }

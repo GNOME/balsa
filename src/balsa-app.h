@@ -265,10 +265,6 @@ extern struct BalsaApplication {
     gint mblist_newmsg_width;
     gint mblist_totalmsg_width;
 
-    /* Colour of mailboxes with unread messages in mailbox list */
-    GdkVisual *visual;
-    GdkColormap *colormap;
-
     /* Colour of quoted text. */
     gboolean mark_quoted;
     gchar *quote_regex;

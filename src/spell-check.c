@@ -121,7 +121,7 @@ static void spch_set_property(GObject * object, guint prop_id,
                               const GValue * value, GParamSpec * pspec);
 static void spch_get_property(GObject * object, guint prop_id,
                               GValue * value, GParamSpec * pspec);
-static void balsa_spell_check_destroy(GtkObject * object);
+static void balsa_spell_check_destroy(GObject * object);
 
 
 /* signal callbacks */
@@ -191,49 +191,47 @@ balsa_spell_check_get_type()
 static void
 balsa_spell_check_class_init(BalsaSpellCheckClass * klass)
 {
-    GtkObjectClass *object_class;
-    GObjectClass *o_class;
+    GObjectClass *object_class;
     GtkWidgetClass *widget_class;
     GtkContainerClass *container_class;
 
-    object_class = (GtkObjectClass *) klass;
-    o_class = (GObjectClass *) klass;
+    object_class = (GObjectClass *) klass;
     widget_class = (GtkWidgetClass *) klass;
     container_class = (GtkContainerClass *) klass;
 
     parent_class = g_type_class_peek_parent(klass);
 
     /* GObject signals */
-    o_class->set_property = spch_set_property;
-    o_class->get_property = spch_get_property;
+    object_class->set_property = spch_set_property;
+    object_class->get_property = spch_get_property;
 
-    g_object_class_install_property(o_class, PROP_MODULE,
+    g_object_class_install_property(object_class, PROP_MODULE,
                                     g_param_spec_string("spell-module",
                                                         NULL, NULL,
                                                         NULL,
                                                         G_PARAM_READWRITE));
-    g_object_class_install_property(o_class, PROP_SUGGEST,
+    g_object_class_install_property(object_class, PROP_SUGGEST,
                                     g_param_spec_string("suggest-mode",
                                                         NULL, NULL,
                                                         NULL,
                                                         G_PARAM_READWRITE));
-    g_object_class_install_property(o_class, PROP_IGNORE,
+    g_object_class_install_property(object_class, PROP_IGNORE,
                                     g_param_spec_uint("ignore-length",
                                                       NULL, NULL,
                                                       0, -1, 0,
                                                       G_PARAM_READWRITE));
-    g_object_class_install_property(o_class, PROP_LANGUAGE,
+    g_object_class_install_property(object_class, PROP_LANGUAGE,
                                     g_param_spec_string("language-tag",
                                                         NULL, NULL,
                                                         NULL,
                                                         G_PARAM_READWRITE));
-    g_object_class_install_property(o_class, PROP_CHARSET,
+    g_object_class_install_property(object_class, PROP_CHARSET,
                                     g_param_spec_string("character-set",
                                                         NULL, NULL,
                                                         NULL,
                                                         G_PARAM_READWRITE));
 
-    object_class->destroy = balsa_spell_check_destroy;
+    object_class->dispose = balsa_spell_check_destroy;
 
     klass->done_spell_check = NULL;
 }
@@ -1069,11 +1067,11 @@ balsa_spell_check_fix(BalsaSpellCheck * spell_check, gboolean fix_all)
 
 
 /* balsa_spell_check_destroy ()
- * 
+ *
  * Clean up variables if the widget is destroyed.
  * */
 static void
-balsa_spell_check_destroy(GtkObject * object)
+balsa_spell_check_destroy(GObject * object)
 {
     BalsaSpellCheck *spell_check;
 
@@ -1111,8 +1109,8 @@ balsa_spell_check_destroy(GtkObject * object)
         quoted_rex_compiled = FALSE;
     }
 
-    if (GTK_OBJECT_CLASS(parent_class)->destroy)
-	(*GTK_OBJECT_CLASS(parent_class)->destroy) (object);
+    if (G_OBJECT_CLASS(parent_class)->dispose)
+	(*G_OBJECT_CLASS(parent_class)->dispose) (object);
 }
 
 

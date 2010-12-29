@@ -383,11 +383,14 @@ GtkWidget *
 smtp_server_tls_widget(LibBalsaSmtpServer * smtp_server)
 {
     LibBalsaServer *server = LIBBALSA_SERVER(smtp_server);
-    GtkWidget *combo_box = gtk_combo_box_new_text();
+    GtkWidget *combo_box = gtk_combo_box_text_new();
 
-    gtk_combo_box_append_text(GTK_COMBO_BOX(combo_box), _("Never"));
-    gtk_combo_box_append_text(GTK_COMBO_BOX(combo_box), _("If Possible"));
-    gtk_combo_box_append_text(GTK_COMBO_BOX(combo_box), _("Required"));
+    gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(combo_box),
+                                   _("Never"));
+    gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(combo_box),
+                                   _("If Possible"));
+    gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(combo_box),
+                                   _("Required"));
 
     switch (server->tls_mode) {
     case Starttls_DISABLED:

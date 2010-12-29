@@ -95,6 +95,7 @@ allocate_quote_colors(GtkWidget * widget, GdkColor color[],
     gint i;
 
     for (i = first; i <= last; i++) {
+#if 0
         if (!gdk_colormap_alloc_color(balsa_app.colormap,
                                       &color[i], FALSE, TRUE)) {
             /* Use black instead: */
@@ -102,6 +103,7 @@ allocate_quote_colors(GtkWidget * widget, GdkColor color[],
             gdk_colormap_alloc_color(balsa_app.colormap, &color[i], FALSE,
                                      TRUE);
         }
+#endif
     }
 }
 

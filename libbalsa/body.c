@@ -646,7 +646,9 @@ libbalsa_message_body_get_pixbuf(LibBalsaMessageBody * body, GError ** err)
 
 #define ENABLE_WORKAROUND_FOR_IE_NON_IANA_MIME_TYPE TRUE
 #if ENABLE_WORKAROUND_FOR_IE_NON_IANA_MIME_TYPE
-    if (!loader && g_ascii_strcasecmp(mime_type, "image/pjpeg") == 0) {
+    if (!loader
+        && (!g_ascii_strcasecmp(mime_type, "image/pjpeg")
+            || !g_ascii_strcasecmp(mime_type, "image/jpg"))) {
         g_clear_error(err);
         loader = gdk_pixbuf_loader_new_with_mime_type("image/jpeg", err);
     }

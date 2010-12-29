@@ -44,7 +44,7 @@
  * The class.
  */
 
-static GtkObjectClass* parent_class;
+static GObjectClass* parent_class;
 
 /* Forward references. */
 static void libbalsa_identity_class_init(LibBalsaIdentityClass* klass);
@@ -2103,7 +2103,7 @@ ident_dialog_add_gpg_menu(GtkWidget * table, gint row, GtkDialog * dialog,
     gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
     gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, row, row + 1);
 
-    opt_menu = gtk_combo_box_new_text();
+    opt_menu = gtk_combo_box_text_new();
     values = g_ptr_array_sized_new(3);
     g_object_set_data_full(G_OBJECT(opt_menu), "identity-value", values,
                            (GDestroyNotify) ident_dialog_free_values);
@@ -2127,7 +2127,7 @@ add_show_menu(const char *label, gpointer data, GtkWidget * menu)
     GPtrArray *values =
         g_object_get_data(G_OBJECT(menu), "identity-value");
 
-    gtk_combo_box_append_text(GTK_COMBO_BOX(menu), label);
+    gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(menu), label);
     g_ptr_array_add(values, data);
 }
 
@@ -2153,7 +2153,7 @@ ident_dialog_add_smtp_menu(GtkWidget * table, gint row, GtkDialog * dialog,
     gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
     gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, row, row + 1);
 
-    combo_box = gtk_combo_box_new_text();
+    combo_box = gtk_combo_box_text_new();
     gtk_label_set_mnemonic_widget(GTK_LABEL(label), combo_box);
     values = g_ptr_array_sized_new(g_slist_length(smtp_servers));
     g_object_set_data_full(G_OBJECT(combo_box), "identity-value", values,

@@ -1,5 +1,10 @@
 2010-12-28  Peter Bloomfield
 
+	* libbalsa/filter.c (libbalsa_filter_mailbox_messages): do not
+	use GnomeSound.
+
+2010-12-28  Peter Bloomfield
+
 	Clean up dead code and trailing white space
 
 	* libbalsa/address.c (addrlist_drag_drop_cb):

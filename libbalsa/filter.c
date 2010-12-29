@@ -6,22 +6,22 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option) 
+ * the Free Software Foundation; either version 2, or (at your option)
  * any later version.
- *  
+ *
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
 /*
  * filter.c
- * 
+ *
  * The mail filtering porting of balsa
  *
  * Mostly skeletonic
@@ -39,8 +39,6 @@
 
 #if HAVE_CANBERRA
 #include <canberra-gtk.h>
-#elif HAVE_GNOME
-#include <libgnome/gnome-sound.h>
 #endif                          /* HAVE_CANBERRA */
 
 #include "libbalsa.h"
@@ -101,7 +99,7 @@ libbalsa_condition_prepend_regex(LibBalsaCondition* cond,
 #if 0
   cond->match.regexs =
       g_slist_prepend(cond->match.regexs, new_reg);
-#endif  
+#endif
 }
 
 gboolean
@@ -113,8 +111,8 @@ libbalsa_condition_matches(LibBalsaCondition* cond,
     GString * body;
     gboolean will_ref;
 
-    g_return_val_if_fail(cond, FALSE); 
-    g_return_val_if_fail(message->headers != NULL, FALSE); 
+    g_return_val_if_fail(cond, FALSE);
+    g_return_val_if_fail(message->headers != NULL, FALSE);
 
     switch (cond->type) {
     case CONDITION_STRING:
@@ -152,7 +150,7 @@ libbalsa_condition_matches(LibBalsaCondition* cond,
 	}
 	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_SUBJECT)) {
 	    if (libbalsa_utf8_strstr(LIBBALSA_MESSAGE_GET_SUBJECT(message),
-                                     cond->match.string.string)) { 
+                                     cond->match.string.string)) {
                 match = TRUE;
                 break;
             }
@@ -197,8 +195,8 @@ libbalsa_condition_matches(LibBalsaCondition* cond,
     case CONDITION_REGEX:
         break;
     case CONDITION_DATE:
-        match = message->headers->date>=cond->match.date.date_low 
-	       && (cond->match.date.date_high==0 || 
+        match = message->headers->date>=cond->match.date.date_low
+	       && (cond->match.date.date_high==0 ||
                    message->headers->date<=cond->match.date.date_high);
         break;
     case CONDITION_FLAG:
@@ -265,9 +263,6 @@ libbalsa_filter_mailbox_messages(LibBalsaFilter * filt,
                                   NULL);
         g_message("(%s) play %s, %s", __func__, filt->sound, ca_strerror(rc));
     }
-#elif (defined(HAVE_GNOME) && !defined(GNOME_DISABLE_DEPRECATED))
-    if (filt->sound)
-	gnome_sound_play(filt->sound);
 #endif                          /* HAVE_CANBERRA */
     if (filt->popup_text)
 	libbalsa_information(LIBBALSA_INFORMATION_MESSAGE,

@@ -1,5 +1,10 @@
 2010-12-28  Peter Bloomfield
 
+	* src/balsa-mime-widget-image.c (img_check_size): use parent
+	width.
+
+2010-12-28  Peter Bloomfield
+
 	* libbalsa/filter.c (libbalsa_filter_mailbox_messages): do not
 	use GnomeSound.
 

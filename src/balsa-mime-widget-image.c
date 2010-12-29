@@ -148,9 +148,15 @@ img_check_size(GtkImage ** widget_p)
     else
 	curr_w = 0;
 
+    gtk_widget_get_allocation(viewport, &allocation);
+    dst_w = allocation.width;
+    gtk_widget_get_allocation(gtk_bin_get_child(GTK_BIN(viewport)),
+                              &allocation);
+    dst_w -= allocation.width;
     gtk_widget_get_allocation(gtk_widget_get_parent(GTK_WIDGET(widget)),
                               &allocation);
-    dst_w = allocation.width;
+    dst_w += allocation.width;
+    dst_w -= 16;                /* Magic number? */
 
     if (dst_w < 32)
 	dst_w = 32;

@@ -1,5 +1,10 @@
 2011-01-08  Peter Bloomfield
 
+	* src/pref-manager.c (quoted_group), (mdn_group): let GtkLabel
+	wrap text.
+
+2011-01-08  Peter Bloomfield
+
 	* src/balsa-mblist.c (bmbl_mru_show_tree): make the mailbox tree
 	dialog a reasonable size.
 

@@ -1935,7 +1935,7 @@ quoted_group(GtkWidget * page)
                      0, 2, row, row + 1, GTK_FILL, 0, 0, 0);
     ++row;
 
-    attach_label(_("Quoted text\n" "regular expression:"), table, row, page);
+    attach_label(_("Quoted text regular expression:"), table, row, page);
 
     pui->quote_pattern = gtk_entry_new();
     gtk_table_attach(GTK_TABLE(table), pui->quote_pattern,
@@ -2048,8 +2048,8 @@ mdn_group(GtkWidget * page)
     table = create_table(2, 2, page);
     pm_group_add(group, table, FALSE);
 
-    label = gtk_label_new(_("The message header looks clean\n"
-                            "(the notify-to address is the return path,\n"
+    label = gtk_label_new(_("The message header looks clean "
+                            "(the notify-to address is the return path, "
                             "and I am in the \"To:\" or \"Cc:\" list)."));
     gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
     gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);

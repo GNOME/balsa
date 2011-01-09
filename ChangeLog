@@ -1,3 +1,8 @@
+2011-01-08  Peter Bloomfield
+
+	* src/balsa-mblist.c (bmbl_mru_show_tree): make the mailbox tree
+	dialog a reasonable size.
+
 2010-12-29  Peter Bloomfield
 
 	* src/balsa-mime-widget-image.c (img_check_size): revert; use

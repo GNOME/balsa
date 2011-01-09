@@ -1831,48 +1831,50 @@ static void
 bmbl_mru_show_tree(GtkWidget * widget, gpointer data)
 {
     BalsaMBListMRUEntry *mru = data;
-    GtkWidget *dialog =
+    GtkWidget *dialog;
+    GtkWidget *scroll;
+    GtkWidget *mblist;
+    GtkTreeSelection *selection;
+    GtkRequisition req;
+
+    mblist = balsa_mblist_new();
+    g_signal_connect(mblist, "row-activated",
+                     G_CALLBACK(bmbl_mru_activated_cb), data);
+
+    selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(mblist));
+    g_signal_connect(selection, "changed",
+                     G_CALLBACK(bmbl_mru_selected_cb), data);
+
+    scroll = gtk_scrolled_window_new(NULL, NULL);
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll),
+                                   GTK_POLICY_AUTOMATIC,
+                                   GTK_POLICY_AUTOMATIC);
+    gtk_container_add(GTK_CONTAINER(scroll), mblist);
+    gtk_widget_show_all(scroll);
+
+    dialog =
         gtk_dialog_new_with_buttons(_("Choose destination folder"),
                                     mru->window,
                                     GTK_DIALOG_MODAL,
                                     GTK_STOCK_CANCEL,
                                     GTK_RESPONSE_CANCEL,
                                     NULL);
-    GtkWidget *scroll;
-    GtkWidget *mblist = balsa_mblist_new();
-    GtkTreeSelection *selection =
-        gtk_tree_view_get_selection(GTK_TREE_VIEW(mblist));
-    GtkRequisition req;
-
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu_for_parent(dialog, mru->window);
 #endif
-    scroll = gtk_scrolled_window_new(NULL, NULL);
-    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll),
-                                   GTK_POLICY_AUTOMATIC,
-                                   GTK_POLICY_AUTOMATIC);
-
-    g_signal_connect(selection, "changed",
-                     G_CALLBACK(bmbl_mru_selected_cb), data);
-    g_signal_connect(mblist, "row-activated",
-                     G_CALLBACK(bmbl_mru_activated_cb), data);
+    gtk_box_pack_start(GTK_BOX
+                      (gtk_dialog_get_content_area(GTK_DIALOG(dialog))),
+                      scroll, TRUE, TRUE, 0);
 
     /* Force the mailbox list to be a reasonable size. */
     gtk_widget_get_preferred_size(mblist, NULL, &req);
+    /* FIXME: Magic numbers to avoid showing scrollbars;
+     * probably theme-dependent: */
+    req.width += 25;
+    req.height += 50;
     if (req.height > balsa_app.mw_height)
         req.height = balsa_app.mw_height;
-    /* For the mailbox list width, we use the one used on the main
-     * window enhanced somewhat. This is the user choice and required
-     * because the mblist widget saves the size in
-     * balsa_app.mblist_width */
-    req.width = balsa_app.mblist_width> 200 ? balsa_app.mblist_width : 200;
-    if (FALSE) gtk_widget_set_size_request(GTK_WIDGET(mblist), req.width, req.height);
-
-    gtk_container_add(GTK_CONTAINER(scroll), mblist);
-    gtk_container_add(GTK_CONTAINER
-                      (gtk_dialog_get_content_area(GTK_DIALOG(dialog))),
-                      scroll);
-    gtk_widget_show_all(scroll);
+    gtk_window_set_default_size(GTK_WINDOW(dialog), req.width, req.height);
 
     gtk_dialog_run(GTK_DIALOG(dialog));
     gtk_widget_destroy(dialog);

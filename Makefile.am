@@ -49,7 +49,7 @@ EXTRA_DIST =			\
     $(balsa_extra_dist)		\
     $(balsa_g_d_u_extra_dist)
 
-if BUILD_WITH_GTKSOURCEVIEW2
+if BUILD_WITH_GTKSOURCEVIEW
 gtksourceviewdir = $(BALSA_DATA_PREFIX)/gtksourceview-2.0
 gtksourceview_DATA = balsa-mail.lang		\
 	balsa-mail-style.xml

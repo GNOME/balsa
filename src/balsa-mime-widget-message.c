@@ -119,6 +119,8 @@ balsa_mime_widget_new_message(BalsaMessage * bm,
 	    break;
 	}
 	g_free(access_type);
+        if (mw)
+            gtk_widget_show_all(mw->widget);
     } else if (!g_ascii_strcasecmp("message/rfc822", content_type)) {
 	GtkWidget *emb_hdrs;
 
@@ -130,10 +132,11 @@ balsa_mime_widget_new_message(BalsaMessage * bm,
 	gtk_container_set_border_width(GTK_CONTAINER(mw->container),
 				       BMW_MESSAGE_PADDING);
 	gtk_container_add(GTK_CONTAINER(mw->widget), mw->container);
+        gtk_widget_show(mw->container);
 
         mw->header_widget = emb_hdrs = bm_header_widget_new(bm, NULL);
 	gtk_box_pack_start(GTK_BOX(mw->container), emb_hdrs, FALSE, FALSE, 0);
-	
+
 	balsa_mime_widget_message_set_headers(bm, mw, mime_body);
     }
 

@@ -1,3 +1,8 @@
+2011-01-11  Peter Bloomfield
+
+	* src/balsa-mime-widget-message.c
+	(balsa_mime_widget_new_message): show the message.
+
 2011-01-09  Peter Bloomfield
 
 	* configure.in: do not configure Bonobo/Corba; do not check

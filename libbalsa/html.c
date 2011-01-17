@@ -333,6 +333,8 @@ lbh_info_bar_widget(GtkWidget * widget, LibBalsaWebKitInfo * info)
     gtk_info_bar_set_message_type(info_bar, GTK_MESSAGE_QUESTION);
     g_signal_connect(info_bar, "response",
                      G_CALLBACK(lbh_info_bar_response_cb), info);
+    g_signal_connect(info_bar, "realize",
+                     G_CALLBACK(gtk_widget_hide), NULL);
 
     label = gtk_label_new(text);
     gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
@@ -414,8 +416,6 @@ libbalsa_html_new(LibBalsaMessageBody * body,
     webkit_web_view_load_string(web_view, text, "text/html",
                                 libbalsa_message_body_charset(body), NULL);
     g_free(text);
-
-    gtk_widget_show(widget);
 
     return vbox;
 }

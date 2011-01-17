@@ -769,12 +769,12 @@ tp_store_set(GtkListStore * store, GtkTreeIter * iter, gint item)
 
     text = g_strdup(balsa_toolbar_button_text(item));
     replace_nl_with_space(text);
-    pixbuf = (item > 0
-              ? gtk_widget_render_icon(customize_widget,
-                                       toolbar_buttons[item].pixmap_id,
-                                       GTK_ICON_SIZE_LARGE_TOOLBAR,
-                                       "Balsa")
-              : NULL);
+    pixbuf =
+        (item > 0 ? gtk_widget_render_icon_pixbuf(customize_widget,
+                                                  toolbar_buttons[item].
+                                                  pixmap_id,
+                                                  GTK_ICON_SIZE_LARGE_TOOLBAR)
+         : NULL);
     gtk_list_store_set(store, iter,
                        TP_TEXT_COLUMN, text,
                        TP_ICON_COLUMN, pixbuf,

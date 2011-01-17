@@ -169,7 +169,7 @@ balsa_mime_widget_new(BalsaMessage * bm, LibBalsaMessageBody * mime_body, gpoint
 		g_ascii_strcasecmp("application/pgp-signature", content_type) &&
 		g_ascii_strcasecmp("application/pkcs7-signature", content_type) &&
 		g_ascii_strcasecmp("application/x-pkcs7-signature", content_type)) {
-		GtkWidget * signature = 
+		GtkWidget * signature =
 		    balsa_mime_widget_signature_widget(mime_body, content_type);
 		mw->widget = balsa_mime_widget_crypto_frame(mime_body, mw->widget,
 							    mime_body->was_encrypted,
@@ -187,11 +187,11 @@ balsa_mime_widget_new(BalsaMessage * bm, LibBalsaMessageBody * mime_body, gpoint
 				 G_CALLBACK(vadj_change_cb), mw->widget);
             }
 
-            gtk_widget_show(mw->widget);
+            gtk_widget_show_all(mw->widget);
 	}
     }
     g_free(content_type);
-    
+
     return mw;
 }
 
@@ -306,8 +306,6 @@ balsa_mime_widget_new_unknown(BalsaMessage * bm,
 		     (gpointer) mime_body);
 
     gtk_box_pack_start(GTK_BOX(mw->widget), hbox, FALSE, FALSE, 0);
-
-    gtk_widget_show_all(mw->widget);
 
     return mw;
 }

@@ -329,10 +329,8 @@ balsa_register_pixbufs(GtkWidget * widget)
     guint i;
 
     for (i = 0; i < ELEMENTS(icons); i++)
-	icons[i].set_icon(gtk_widget_render_icon(widget,
-						 icons[i].icon,
-						 GTK_ICON_SIZE_MENU,
-						 NULL));
+        icons[i].set_icon(gtk_widget_render_icon_pixbuf
+                          (widget, icons[i].icon, GTK_ICON_SIZE_MENU));
 }
 
 const gchar *

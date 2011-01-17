@@ -1,5 +1,13 @@
 2011-01-17  Peter Bloomfield
 
+	* src/balsa-icons.c (balsa_register_pixbufs): new icon-render
+	API.
+	* src/balsa-mime-widget.c (balsa_mime_widget_new),
+	(balsa_mime_widget_new_unknown): ditto.
+	* src/toolbar-prefs.c (tp_store_set): ditto.
+
+2011-01-17  Peter Bloomfield
+
 	* src/balsa-app.h: port from GdkColor to GdkRGBA.
 	* src/balsa-cite-bar.c (balsa_cite_bar_draw): ditto, and from
 	GtkStyle to GtkStyleContext.
@@ -17,7 +25,7 @@
 	(bm_modify_font_from_string), (quote_tag), (draw_cite_bar_real),
 	(bm_widget_new_vcard), (fill_text_buf_cited): ditto, and drop
 	allocate_quote_colors.
-	* src/balsa-mime-widget-vcalendar.c
+	* src/balsa-mime-widget-vcalendar.c: reorganize widget-showing.
 	* src/balsa-print-object-text.c (balsa_print_object_text_draw):
 	port from GdkColor to GdkRGBA.
 	* src/main-window.c: port from GtkStyle to GtkStyleContext.

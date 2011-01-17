@@ -1,5 +1,10 @@
 2011-01-17  Peter Bloomfield
 
+	* libbalsa/source-viewer.c (libbalsa_show_message_source): new
+	override font API.
+
+2011-01-17  Peter Bloomfield
+
 	* libbalsa/libbalsa.c (libbalsa_source_view_new): drop support
 	for GtkSourceView-1.
 	* libbalsa/libbalsa.h: ditto.

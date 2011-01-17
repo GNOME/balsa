@@ -264,7 +264,7 @@ libbalsa_show_message_source(LibBalsaMessage* msg, const gchar * font,
     text = gtk_text_view_new();
 
     desc = pango_font_description_from_string(font);
-    gtk_widget_modify_font(text, desc);
+    gtk_widget_override_font(text, desc);
     pango_font_description_free(desc);
 
     gtk_text_view_set_editable(GTK_TEXT_VIEW(text), FALSE);

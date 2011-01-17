@@ -205,7 +205,7 @@ enum LibBalsaImageError {
 };
 
 #if HAVE_GTKSOURCEVIEW
-GtkWidget *libbalsa_source_view_new(gboolean highlight_phrases, GdkColor *q_colour);
+GtkWidget *libbalsa_source_view_new(gboolean highlight_phrases);
 #endif                          /* HAVE_GTKSOURCEVIEW */
 
 #endif                          /* __LIBBALSA_H__ */

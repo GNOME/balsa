@@ -958,90 +958,11 @@ libbalsa_get_image_from_x_face_header(const gchar * content, GError ** err)
 
 #if HAVE_GTKSOURCEVIEW
 GtkWidget *
-libbalsa_source_view_new(gboolean highlight_phrases, GdkColor *q_colour)
+libbalsa_source_view_new(gboolean highlight_phrases)
 {
     GtkSourceBuffer *sbuffer;
     GtkWidget *sview;
 
-#if (HAVE_GTKSOURCEVIEW == 1)
-
-    GtkTextTag * text_tag;
-    GtkSourceTagStyle *tag_style;
-    GtkSourceTagTable *tag_table;
-    GSList *tag_list;
-
-    /* create the tag table */
-    tag_list = NULL;
-    tag_table = gtk_source_tag_table_new();
-
-    /* add highlighting for quoted text if requested */
-    if (q_colour) {
-	int k;
-
-	for (k = 1; k <= 9; k++) {
-	    gchar * tag_id;
-	    const gchar * pattern;
-            gchar *tmp = NULL;
-
-	    tag_id = g_strdup_printf("Quote-%d", k);
-	    if (k == 1)
-		pattern = "^> *($|[^ |>:}#\n])";
-	    else
-		pattern = tmp =
-                    g_strdup_printf("^(> *){%d}($|[^ |>:}#\n])", k);
-	    text_tag = gtk_line_comment_tag_new(tag_id, tag_id, pattern);
-	    g_free(tmp);
-	    g_free(tag_id);
-	    tag_style = gtk_source_tag_style_new();
-	    tag_style->mask = GTK_SOURCE_TAG_STYLE_USE_FOREGROUND;
-	    tag_style->foreground = q_colour[(k - 1) & 1];
-	    gtk_source_tag_set_style(GTK_SOURCE_TAG(text_tag), tag_style);
-	    gtk_source_tag_style_free(tag_style);
-	    tag_list = g_slist_prepend(tag_list, text_tag);
-	}
-    }
-
-    /* if requested create the patterns for bold, italic and underline */
-    if (highlight_phrases) {
-	text_tag = gtk_pattern_tag_new("Bold", "Bold",
-				       "(^|[[:space:]])\\*[[:alnum:]][^*\n]*[[:alnum:]]\\*");
-	tag_style = gtk_source_tag_style_new();
-	tag_style->bold = TRUE;
-	gtk_source_tag_set_style(GTK_SOURCE_TAG(text_tag), tag_style);
-	gtk_source_tag_style_free(tag_style);
-	tag_list = g_slist_prepend(tag_list, text_tag);
-
-	text_tag = gtk_pattern_tag_new("Italic", "Italic",
-				       "(^|[[:space:]])/[[:alnum:]][^/\n]*[[:alnum:]]/");
-	tag_style = gtk_source_tag_style_new();
-	tag_style->italic = TRUE;
-	gtk_source_tag_set_style(GTK_SOURCE_TAG(text_tag), tag_style);
-	gtk_source_tag_style_free(tag_style);
-	tag_list = g_slist_prepend(tag_list, text_tag);
-
-	text_tag = gtk_pattern_tag_new("Underline", "Underline",
-				       "(^|[[:space:]])_[[:alnum:]][^_\n]*[[:alnum:]]_");
-	tag_style = gtk_source_tag_style_new();
-	tag_style->underline = TRUE;
-	gtk_source_tag_set_style(GTK_SOURCE_TAG(text_tag), tag_style);
-	gtk_source_tag_style_free(tag_style);
-	tag_list = g_slist_prepend(tag_list, text_tag);
-    }
-
-    /* add tags to the table if present */
-    if (tag_list) {
-	gtk_source_tag_table_add_tags(tag_table, tag_list);
-	g_slist_foreach(tag_list, (GFunc)g_object_unref, NULL);
-	g_slist_free(tag_list);
-    }
-
-    /* create the source buffer */
-    sbuffer = gtk_source_buffer_new(tag_table);
-    g_object_unref(tag_table);
-    gtk_source_buffer_set_highlight(sbuffer, highlight_phrases || q_colour);
-    gtk_source_buffer_set_check_brackets(sbuffer, FALSE);
-
-#else /* (HAVE_GTKSOURCEVIEW == 1) */
 
     static GtkSourceLanguageManager * lm = NULL;
     static GtkSourceStyleScheme * scheme = NULL;
@@ -1091,8 +1012,6 @@ libbalsa_source_view_new(gboolean highlight_phrases, GdkColor *q_colour)
 	gtk_source_buffer_set_style_scheme(sbuffer, scheme);
     gtk_source_buffer_set_highlight_syntax(sbuffer, TRUE);
     gtk_source_buffer_set_highlight_matching_brackets(sbuffer, FALSE);
-
-#endif /* (HAVE_GTKSOURCEVIEW == 1) */
 
     /* create & return the source view */
     sview = gtk_source_view_new_with_buffer(sbuffer);

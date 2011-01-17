@@ -803,9 +803,9 @@ balsa_print_object_text_draw(BalsaPrintObject * self,
 	    gint k = (po->cite_level - 1) % MAX_QUOTED_COLOR;
 
 	    cairo_set_source_rgb(cairo_ctx,
-				 (gdouble) balsa_app.quoted_color[k].red / 65536.0,
-				 (gdouble) balsa_app.quoted_color[k].green / 65536.0,
-				 (gdouble) balsa_app.quoted_color[k].blue / 65536.0);
+				 balsa_app.quoted_color[k].red,
+				 balsa_app.quoted_color[k].green,
+				 balsa_app.quoted_color[k].blue);
 	}
     }
     cairo_move_to(cairo_ctx, self->c_at_x + po->cite_level * C_LABEL_SEP,

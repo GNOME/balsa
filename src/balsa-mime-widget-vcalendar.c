@@ -96,7 +96,6 @@ balsa_mime_widget_new_vcalendar(BalsaMessage * bm,
 	gtk_container_add(GTK_CONTAINER(mw->widget), event);
     }
 
-    gtk_widget_show_all(mw->widget);
     g_object_unref(vcal_obj);
 
     return mw;

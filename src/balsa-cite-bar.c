@@ -128,12 +128,14 @@ balsa_cite_bar_get_preferred_height(GtkWidget * widget,
 static gboolean
 balsa_cite_bar_draw(GtkWidget * widget, cairo_t * cr)
 {
-    GtkStyle *style;
+    GtkStyleContext *context;
+    GdkRGBA rgba;
     BalsaCiteBar *cite_bar;
     int n, x;
 
-    style = gtk_widget_get_style(widget);
-    gdk_cairo_set_source_color(cr, &style->fg[GTK_STATE_NORMAL]);
+    context = gtk_widget_get_style_context(widget);
+    gtk_style_context_get_color(context, GTK_STATE_FLAG_NORMAL, &rgba);
+    gdk_cairo_set_source_rgba(cr, &rgba);
 
     cite_bar = BALSA_CITE_BAR(widget);
     for (n = x = 0; n < cite_bar->bars; n++) {

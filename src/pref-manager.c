@@ -1070,17 +1070,17 @@ apply_prefs(GtkDialog * pbox)
 
     /* quoted text color */
     for (i = 0; i < MAX_QUOTED_COLOR; i++) {
-        gtk_color_button_get_color(GTK_COLOR_BUTTON(pui->quoted_color[i]),
-                                   &balsa_app.quoted_color[i]);
+        gtk_color_button_get_rgba(GTK_COLOR_BUTTON(pui->quoted_color[i]),
+                                  &balsa_app.quoted_color[i]);
     }
 
     /* url color */
-    gtk_color_button_get_color(GTK_COLOR_BUTTON(pui->url_color),
-                               &balsa_app.url_color);
+    gtk_color_button_get_rgba(GTK_COLOR_BUTTON(pui->url_color),
+                              &balsa_app.url_color);
 
     /* bad address color */
-    gtk_color_button_get_color(GTK_COLOR_BUTTON(pui->bad_address_color),
-                               &balsa_app.bad_address_color);
+    gtk_color_button_get_rgba(GTK_COLOR_BUTTON(pui->bad_address_color),
+                              &balsa_app.bad_address_color);
 
     /* sorting and threading */
     libbalsa_mailbox_set_sort_field(NULL, pui->sort_field_index);
@@ -1320,12 +1320,12 @@ set_prefs(void)
 
     /* Colour */
     for (i = 0; i < MAX_QUOTED_COLOR; i++)
-        gtk_color_button_set_color(GTK_COLOR_BUTTON(pui->quoted_color[i]),
-                                   &balsa_app.quoted_color[i]);
-    gtk_color_button_set_color(GTK_COLOR_BUTTON(pui->url_color),
-                               &balsa_app.url_color);
-    gtk_color_button_set_color(GTK_COLOR_BUTTON(pui->bad_address_color),
-                               &balsa_app.bad_address_color);
+        gtk_color_button_set_rgba(GTK_COLOR_BUTTON(pui->quoted_color[i]),
+                                  &balsa_app.quoted_color[i]);
+    gtk_color_button_set_rgba(GTK_COLOR_BUTTON(pui->url_color),
+                              &balsa_app.url_color);
+    gtk_color_button_set_rgba(GTK_COLOR_BUTTON(pui->bad_address_color),
+                              &balsa_app.bad_address_color);
 
     /* Information Message */
     pm_combo_box_set_level(pui->information_message_menu,

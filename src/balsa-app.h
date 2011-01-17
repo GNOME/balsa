@@ -268,13 +268,13 @@ extern struct BalsaApplication {
     /* Colour of quoted text. */
     gboolean mark_quoted;
     gchar *quote_regex;
-    GdkColor quoted_color[MAX_QUOTED_COLOR];
+    GdkRGBA quoted_color[MAX_QUOTED_COLOR];
 
     /* text color of URL's */
-    GdkColor url_color;
+    GdkRGBA url_color;
 
     /* label color of bad addresses */
-    GdkColor bad_address_color;
+    GdkRGBA bad_address_color;
 
     guint pwindow_option;
     gboolean wordwrap;

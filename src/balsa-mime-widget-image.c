@@ -67,14 +67,14 @@ balsa_mime_widget_new_image(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
     g_object_set_data(G_OBJECT(image), "mime-body", mime_body);
     g_object_unref(pixbuf);
     gtk_container_add(GTK_CONTAINER(mw->widget), image);
+#if 0
     gtk_widget_modify_bg(mw->widget, GTK_STATE_NORMAL,
                          &gtk_widget_get_style(GTK_WIDGET(bm))->
                          light[GTK_STATE_NORMAL]);
+#endif
 
     g_signal_connect(G_OBJECT(mw->widget), "button-press-event",
                      G_CALLBACK(balsa_image_button_press_cb), data);
-
-    gtk_widget_show(image);
 
     return mw;
 }

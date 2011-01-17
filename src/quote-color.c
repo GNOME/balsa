@@ -80,32 +80,3 @@ is_a_quote(const gchar * str, regex_t * rex)
 
     return cnt;
 }
-
-
-/*
- * void allocate_quote_colors.
- *
- * Allocate a color for each of the gradients from the correct
- * colormap.
- */
-void
-allocate_quote_colors(GtkWidget * widget, GdkColor color[],
-                      gint first, gint last)
-{
-    gint i;
-
-    for (i = first; i <= last; i++) {
-#if 0
-        if (!gdk_colormap_alloc_color(balsa_app.colormap,
-                                      &color[i], FALSE, TRUE)) {
-            /* Use black instead: */
-            color[i].red = color[i].green = color[i].blue = 0;
-            gdk_colormap_alloc_color(balsa_app.colormap, &color[i], FALSE,
-                                     TRUE);
-        }
-#endif
-    }
-}
-
-
-

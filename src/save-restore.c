@@ -62,8 +62,8 @@ static gint config_folder_init(const gchar * group);
 static gint config_mailbox_init(const gchar * group);
 static gchar *config_get_unused_group(const gchar * group);
 
-static void save_color(gchar * key, GdkColor * color);
-static void load_color(gchar * key, GdkColor * color);
+static void save_color(gchar * key, GdkRGBA * rgba);
+static void load_color(gchar * key, GdkRGBA * rgba);
 static void save_mru(GList  *mru, const gchar * group);
 static void load_mru(GList **mru, const gchar * group);
 
@@ -1939,12 +1939,11 @@ config_view_remove(const gchar * url)
 }
 
 static void
-save_color(gchar * key, GdkColor * color)
+save_color(gchar * key, GdkRGBA * rgba)
 {
     gchar *str;
 
-    str = g_strdup_printf("#%04x%04x%04x", color->red, color->green,
-                          color->blue);
+    str = gdk_rgba_to_string(rgba);
     libbalsa_conf_set_string(key, str);
     g_free(str);
 }
@@ -2054,15 +2053,12 @@ config_mailbox_filters_save(LibBalsaMailbox * mbox)
 }
 
 static void
-load_color(gchar * key, GdkColor * color)
+load_color(gchar * key, GdkRGBA * rgba)
 {
     gchar *str;
 
     str = libbalsa_conf_get_string(key);
-    if (g_ascii_strncasecmp(str, "rgb:", 4)
-        || sscanf(str + 4, "%4hx/%4hx/%4hx", &color->red, &color->green,
-                  &color->blue) != 3)
-        gdk_color_parse(str, color);
+    gdk_rgba_parse(rgba, str);
     g_free(str);
 }
 

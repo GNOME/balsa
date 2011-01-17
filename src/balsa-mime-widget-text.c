@@ -220,8 +220,6 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
 		     (gpointer)mime_body);
 
     buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(mw->widget));
-    allocate_quote_colors(GTK_WIDGET(bm), balsa_app.quoted_color,
-			  0, MAX_QUOTED_COLOR - 1);
 
     url_list = fill_text_buf_cited(mw->widget, ptr,
                                    libbalsa_message_body_is_flowed(mime_body),
@@ -346,7 +344,7 @@ bm_modify_font_from_string(GtkWidget * widget, const char *font)
 {
     PangoFontDescription *desc =
         pango_font_description_from_string(balsa_app.message_font);
-    gtk_widget_modify_font(widget, desc);
+    gtk_widget_override_font(widget, desc);
     pango_font_description_free(desc);
 }
 
@@ -376,11 +374,20 @@ quote_tag(GtkTextBuffer * buffer, gint level, gint margin)
         tag = gtk_text_tag_table_lookup(table, name);
 
         if (!tag) {
+            GdkRGBA *rgba;
+            GdkColor color;
+
+            rgba = &balsa_app.quoted_color[q_level];
+            /* As of now, GtkTextTag has no "foreground-rgba" property :( */
+            color.red   = G_MAXUINT16 * rgba->red;
+            color.green = G_MAXUINT16 * rgba->green;
+            color.blue  = G_MAXUINT16 * rgba->blue;
+            color.pixel = 0;
+
             tag =
-                gtk_text_buffer_create_tag(buffer, name, "foreground-gdk",
-                                           &balsa_app.quoted_color[q_level],
-					   "left-margin",
-                                           BALSA_LEFT_MARGIN
+                gtk_text_buffer_create_tag(buffer, name,
+                                           "foreground-gdk", &color,
+					   "left-margin", BALSA_LEFT_MARGIN
                                            + margin * level,
                                            NULL);
             /* Set a low priority, so we can set both quote color and
@@ -915,39 +922,44 @@ draw_cite_bar_real(cite_bar_t * bar, cite_bar_draw_mode_t * draw_mode)
 
     /* initialise iters if we don't have the widget yet */
     if (!bar->bar) {
-	gtk_text_buffer_get_iter_at_offset(draw_mode->buffer, &bar->start_iter,
-					   bar->start_offs);
-	gtk_text_buffer_get_iter_at_offset(draw_mode->buffer, &bar->end_iter,
-					   bar->end_offs);
+        gtk_text_buffer_get_iter_at_offset(draw_mode->buffer,
+                                           &bar->start_iter,
+                                           bar->start_offs);
+        gtk_text_buffer_get_iter_at_offset(draw_mode->buffer,
+                                           &bar->end_iter,
+                                           bar->end_offs);
     }
 
     /* get the locations */
-    gtk_text_view_get_iter_location(draw_mode->view, &bar->start_iter, &location);
-    gtk_text_view_buffer_to_window_coords(draw_mode->view, GTK_TEXT_WINDOW_TEXT,
-					  location.x, location.y,
-					  &x_pos, &y_pos);
-    gtk_text_view_get_iter_location(draw_mode->view, &bar->end_iter, &location);
-    gtk_text_view_buffer_to_window_coords(draw_mode->view, GTK_TEXT_WINDOW_TEXT,
-					  location.x, location.y,
-					  &x_pos, &height);
+    gtk_text_view_get_iter_location(draw_mode->view, &bar->start_iter,
+                                    &location);
+    gtk_text_view_buffer_to_window_coords(draw_mode->view,
+                                          GTK_TEXT_WINDOW_TEXT, location.x,
+                                          location.y, &x_pos, &y_pos);
+    gtk_text_view_get_iter_location(draw_mode->view, &bar->end_iter,
+                                    &location);
+    gtk_text_view_buffer_to_window_coords(draw_mode->view,
+                                          GTK_TEXT_WINDOW_TEXT, location.x,
+                                          location.y, &x_pos, &height);
     height -= y_pos;
 
     /* add a new widget if necessary */
-    if (bar->bar == NULL) {
-	bar->bar = balsa_cite_bar_new(height, bar->depth, draw_mode->dimension);
-	gtk_widget_modify_fg(bar->bar, GTK_STATE_NORMAL,
-			     &balsa_app.quoted_color[(bar->depth - 1) % MAX_QUOTED_COLOR]);
-        gtk_widget_modify_bg(bar->bar, GTK_STATE_NORMAL,
-                             &gtk_widget_get_style(GTK_WIDGET
-                                                   (draw_mode->view))->
-                             base[GTK_STATE_NORMAL]);
-	gtk_widget_show(bar->bar);
-	gtk_text_view_add_child_in_window(draw_mode->view, bar->bar,
-					  GTK_TEXT_WINDOW_TEXT, 0, y_pos);
+    if (!bar->bar) {
+        bar->bar =
+            balsa_cite_bar_new(height, bar->depth, draw_mode->dimension);
+
+        gtk_widget_override_color(bar->bar, GTK_STATE_FLAG_NORMAL,
+                                  &balsa_app.
+                                  quoted_color[(bar->depth -
+                                                1) % MAX_QUOTED_COLOR]);
+
+        gtk_widget_show(bar->bar);
+        gtk_text_view_add_child_in_window(draw_mode->view, bar->bar,
+                                          GTK_TEXT_WINDOW_TEXT, 0, y_pos);
     } else if (bar->y_pos != y_pos || bar->height != height) {
-	/* shift/resize existing widget */
-	balsa_cite_bar_resize(BALSA_CITE_BAR(bar->bar), height);
-	gtk_text_view_move_child(draw_mode->view, bar->bar, 0, y_pos);
+        /* shift/resize existing widget */
+        balsa_cite_bar_resize(BALSA_CITE_BAR(bar->bar), height);
+        gtk_text_view_move_child(draw_mode->view, bar->bar, 0, y_pos);
     }
 
     /* remember current values */
@@ -1174,7 +1186,6 @@ bm_widget_new_vcard(BalsaMessage *bm, LibBalsaMessageBody *mime_body,
     }
         
     g_object_set_data(G_OBJECT(mw->widget), "mime-body", mime_body);
-    gtk_widget_show_all(mw->widget);
     return mw;
 }
 
@@ -1237,6 +1248,7 @@ fill_text_buf_cited(GtkWidget *widget, const gchar *text_body,
     regex_t rex;
 #endif                          /* USE_GREGEX */
     gboolean have_regex;
+    GdkColor color;
 
     /* prepare citation regular expression for plain bodies */
     if (is_plain) {
@@ -1262,9 +1274,12 @@ fill_text_buf_cited(GtkWidget *widget, const gchar *text_body,
     margin = (char_width / 72.0) *
         gdk_screen_get_resolution(gdk_screen_get_default());
 
+    color.red   = G_MAXUINT16 * balsa_app.url_color.red;
+    color.green = G_MAXUINT16 * balsa_app.url_color.green;
+    color.blue  = G_MAXUINT16 * balsa_app.url_color.blue;
+    color.pixel = 0;
     gtk_text_buffer_create_tag(buffer, "url",
-                               "foreground-gdk",
-                               &balsa_app.url_color, NULL);
+                               "foreground-gdk", &color, NULL);
     gtk_text_buffer_create_tag(buffer, "emphasize",
                                "foreground", "red",
                                "underline", PANGO_UNDERLINE_SINGLE,

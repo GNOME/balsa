@@ -2211,9 +2211,10 @@ add_urlref_attachment(BalsaSendmsg * bsmsg, gchar *url)
 	fprintf(stderr, "Trying to attach '%s'\n", url);
 
     /* get the pixbuf for the attachment's content type */
-    pixbuf = gtk_widget_render_icon(GTK_WIDGET(balsa_app.main_window),
-				    GTK_STOCK_JUMP_TO,
-				    GTK_ICON_SIZE_MENU, NULL);
+    pixbuf =
+        gtk_widget_render_icon_pixbuf(GTK_WIDGET(balsa_app.main_window),
+                                      GTK_STOCK_JUMP_TO,
+                                      GTK_ICON_SIZE_MENU);
 
     /* create a new attachment info block */
     attach_data = balsa_attach_info_new(bsmsg);
@@ -2597,7 +2598,9 @@ create_email_or_string_entry(GtkWidget * table, const gchar * label,
 		     GTK_FILL, GTK_FILL | GTK_SHRINK, 0, 0);
 
     desc = pango_font_description_from_string(balsa_app.message_font);
+#if 0
     gtk_widget_modify_font(arr[1], desc);
+#endif
     pango_font_description_free(desc);
 
     gtk_table_attach(GTK_TABLE(table), arr[1], 1, 2, y_pos, y_pos + 1,
@@ -3191,9 +3194,7 @@ create_text_area(BalsaSendmsg * bsmsg)
     GtkWidget *table;
 
 #if HAVE_GTKSOURCEVIEW
-    bsmsg->text = libbalsa_source_view_new(TRUE, balsa_app.quoted_color);
-    gtk_source_view_set_show_line_numbers(GTK_SOURCE_VIEW(bsmsg->text),
-                                          FALSE);
+    bsmsg->text = libbalsa_source_view_new(TRUE);
 #else                           /* HAVE_GTKSOURCEVIEW */
     bsmsg->text = gtk_text_view_new();
 #endif                          /* HAVE_GTKSOURCEVIEW */
@@ -3203,7 +3204,7 @@ create_text_area(BalsaSendmsg * bsmsg)
 
     /* set the message font */
     desc = pango_font_description_from_string(balsa_app.message_font);
-    gtk_widget_modify_font(bsmsg->text, desc);
+    gtk_widget_override_font(bsmsg->text, desc);
     pango_font_description_free(desc);
 
     buffer = gtk_text_view_get_buffer(text_view);

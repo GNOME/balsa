@@ -948,16 +948,6 @@ balsa_window_class_init(BalsaWindowClass * klass)
 {
     GObjectClass *object_class = (GObjectClass *) klass;
 
-    gtk_rc_parse_string("style \"balsa-notebook-tab-button-style\"\n"
-                        "{\n"
-                          "GtkWidget::focus-padding = 0\n"
-                          "GtkWidget::focus-line-width = 0\n"
-                          "xthickness = 0\n"
-                          "ythickness = 0\n"
-                        "}\n"
-                        "widget \"*.balsa-notebook-tab-button\"\n"
-                        "style    \"balsa-notebook-tab-button-style\"");
-
     window_signals[OPEN_MAILBOX_NODE] =
         g_signal_new("open_mailbox_node",
                      G_TYPE_FROM_CLASS(object_class),
@@ -2256,6 +2246,7 @@ bw_notebook_label_new(BalsaMailboxNode * mbnode)
     GtkWidget *but;
     GtkSettings *settings;
     gint w, h;
+    GtkCssProvider *css_provider;
 
     box = gtk_hbox_new(FALSE, 4);
 
@@ -2272,6 +2263,25 @@ bw_notebook_label_new(BalsaMailboxNode * mbnode)
     gtk_button_set_focus_on_click(GTK_BUTTON(but), FALSE);
     gtk_button_set_relief(GTK_BUTTON(but), GTK_RELIEF_NONE);
     gtk_widget_set_name(but, "balsa-notebook-tab-button");
+
+    /* Try to make small close buttons: */
+    css_provider = gtk_css_provider_new();
+    if (!gtk_css_provider_load_from_data(css_provider,
+                                         "#balsa-notebook-tab-button"
+                                         "{"
+                                           "-GtkWidget-focus-padding: 0;"
+                                           "-GtkWidget-focus-line-width: 0;"
+                                           "border-width: 0;"
+                                           "padding: 0;"
+                                           "margin: 0;"
+                                         "}",
+                                         -1, NULL))
+        g_print("Could not load CSS data.\n");
+
+    gtk_style_context_add_provider(gtk_widget_get_style_context(but) ,
+                                   GTK_STYLE_PROVIDER(css_provider),
+                                   GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+    g_object_unref(css_provider);
 
     settings = gtk_widget_get_settings(GTK_WIDGET(lab));
     gtk_icon_size_lookup_for_settings(settings, GTK_ICON_SIZE_MENU, &w, &h);

@@ -51,8 +51,6 @@ extern "C" {
 #else                           /* USE_GREGEX */
     extern guint is_a_quote(const gchar *, regex_t * rex);
 #endif                          /* USE_GREGEX */
-    extern void allocate_quote_colors(GtkWidget *, GdkColor color[], gint, gint);
-
 
 #ifdef __cplusplus
 }

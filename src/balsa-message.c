@@ -332,33 +332,20 @@ bm_header_tl_buttons(BalsaMessage * bm)
 }
 
 
-/* Callback for the "style-set" signal; set the message background to
- * match the base color of any content in a text-view. */
+/* Callback for the "style-updated" signal; set the message background to
+ * match the base color of the content in the tree-view. */
 static void
 bm_on_set_style(GtkWidget * widget,
-	        GtkStyle * previous_style,
 	        BalsaMessage * bm)
 {
-    GtkWidget *target = bm->cont_viewport;
-    GtkStyle *new_style, *text_view_style;
-    int n;
+    GtkStyleContext *context;
+    GdkRGBA rgba;
 
-    new_style = gtk_style_copy(gtk_widget_get_style(target));
-    text_view_style =
-	gtk_rc_get_style_by_paths(gtk_widget_get_settings(target),
-				  NULL, NULL, gtk_text_view_get_type());
-    if (text_view_style)
-	for (n = GTK_STATE_NORMAL; n <= GTK_STATE_INSENSITIVE; n++)
-	    new_style->bg[n] = text_view_style->base[n];
-    else {
-	GdkColor color;
-
-	gdk_color_parse("White", &color);
-	for (n = GTK_STATE_NORMAL; n <= GTK_STATE_INSENSITIVE; n++)
-	    new_style->bg[n] = color;
-    }
-    gtk_widget_set_style(target, new_style);
-    g_object_unref(G_OBJECT(new_style));
+    context = gtk_widget_get_style_context(bm->treeview);
+    gtk_style_context_get_background_color(context, GTK_STATE_FLAG_NORMAL,
+                                           &rgba);
+    gtk_widget_override_background_color(bm->cont_viewport,
+                                         GTK_STATE_FLAG_NORMAL, &rgba);
 }
 
 static void
@@ -701,7 +688,7 @@ balsa_message_init(BalsaMessage * bm)
     bm->cont_viewport = gtk_viewport_new(NULL, NULL);
     gtk_container_add(GTK_CONTAINER(scroll), bm->cont_viewport);
     gtk_widget_show_all(scroll);
-    g_signal_connect_after(bm, "style-set",
+    g_signal_connect_after(bm, "style-updated",
 			   G_CALLBACK(bm_on_set_style), bm);
     g_signal_connect(bm->cont_viewport, "size-allocate",
 		     G_CALLBACK(on_content_size_alloc), NULL);
@@ -781,7 +768,6 @@ balsa_message_init(BalsaMessage * bm)
     label = gtk_label_new(_("Message parts"));
     gtk_notebook_append_page(GTK_NOTEBOOK(bm), scroll, label);
     gtk_container_add(GTK_CONTAINER(scroll), bm->treeview);
-    gtk_widget_show_all(scroll);
     gtk_notebook_set_show_tabs(GTK_NOTEBOOK(bm), FALSE);
 
     bm->current_part = NULL;
@@ -2704,8 +2690,10 @@ get_crypto_content_icon(LibBalsaMessageBody * body, const gchar * content_type,
     icon_name = balsa_mime_widget_signature_icon_name(libbalsa_message_body_protect_state(body));
     if (!icon_name)
         return NULL;
-    icon = gtk_widget_render_icon(GTK_WIDGET(balsa_app.main_window), icon_name,
-                                  GTK_ICON_SIZE_LARGE_TOOLBAR, NULL);
+    icon =
+        gtk_widget_render_icon_pixbuf(GTK_WIDGET(balsa_app.main_window),
+                                      icon_name,
+                                      GTK_ICON_SIZE_LARGE_TOOLBAR);
     if (!icon_title)
         return icon;
 

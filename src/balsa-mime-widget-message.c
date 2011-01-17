@@ -119,8 +119,6 @@ balsa_mime_widget_new_message(BalsaMessage * bm,
 	    break;
 	}
 	g_free(access_type);
-        if (mw)
-            gtk_widget_show_all(mw->widget);
     } else if (!g_ascii_strcasecmp("message/rfc822", content_type)) {
 	GtkWidget *emb_hdrs;
 
@@ -132,7 +130,6 @@ balsa_mime_widget_new_message(BalsaMessage * bm,
 	gtk_container_set_border_width(GTK_CONTAINER(mw->container),
 				       BMW_MESSAGE_PADDING);
 	gtk_container_add(GTK_CONTAINER(mw->widget), mw->container);
-        gtk_widget_show(mw->container);
 
         mw->header_widget = emb_hdrs = bm_header_widget_new(bm, NULL);
 	gtk_box_pack_start(GTK_BOX(mw->container), emb_hdrs, FALSE, FALSE, 0);
@@ -379,7 +376,7 @@ balsa_mime_widget_new_message_tl(BalsaMessage * bm, GtkWidget * tl_buttons)
     BalsaMimeWidget *mw;
 
     mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
-    
+
     mw->widget = gtk_vbox_new(FALSE, BMW_MESSAGE_PADDING);
     gtk_container_set_border_width(GTK_CONTAINER(mw->widget), BMW_MESSAGE_PADDING);
 
@@ -389,7 +386,6 @@ balsa_mime_widget_new_message_tl(BalsaMessage * bm, GtkWidget * tl_buttons)
     mw->container = gtk_vbox_new(FALSE, BMW_MESSAGE_PADDING);
     gtk_box_pack_start(GTK_BOX(mw->widget), mw->container, TRUE, TRUE,
 		       BMW_CONTAINER_BORDER - BMW_MESSAGE_PADDING);
-    gtk_widget_show_all(mw->widget);
 
     return mw;
 }
@@ -404,29 +400,33 @@ balsa_mime_widget_new_message_tl(BalsaMessage * bm, GtkWidget * tl_buttons)
 static void
 bm_header_widget_realized(GtkWidget * widget, BalsaMessage * bm)
 {
-    GtkWidget *tl_buttons =
-        GTK_WIDGET(g_object_get_data(G_OBJECT(widget), "tl-buttons"));
-    GtkStyle *style = gtk_widget_get_style(GTK_WIDGET(bm));
+    GtkStyleContext *context;
+    GdkRGBA rgba;
+    GtkWidget *tl_buttons;
 
-    gtk_widget_modify_bg(widget, GTK_STATE_NORMAL,
-                         &style->dark[GTK_STATE_NORMAL]);
-    gtk_widget_modify_base(bm_header_widget_get_text_view(widget),
-                           GTK_STATE_NORMAL,
-                           &style->mid[GTK_STATE_NORMAL]);
+    context = gtk_widget_get_style_context(GTK_WIDGET(bm));
+    gtk_style_context_get_background_color(context, GTK_STATE_FLAG_NORMAL,
+                                           &rgba);
+    gtk_widget_override_background_color(bm_header_widget_get_text_view
+                                         (widget), GTK_STATE_FLAG_NORMAL,
+                                         &rgba);
+
+    tl_buttons =
+        GTK_WIDGET(g_object_get_data(G_OBJECT(widget), "tl-buttons"));
     if (tl_buttons) {
-        /* use a fresh style here to deal with pixmap themes correctly */
-        GtkStyle *new_style = gtk_style_new();
-        new_style->bg[GTK_STATE_NORMAL] = style->mid[GTK_STATE_NORMAL];
-        gtk_widget_set_style(tl_buttons, new_style);
-        g_object_unref(new_style);
+        gtk_widget_override_background_color(tl_buttons,
+                                             GTK_STATE_FLAG_NORMAL, &rgba);
     }
+
+    gtk_style_context_get_color(context, GTK_STATE_FLAG_NORMAL, &rgba);
+    gtk_widget_override_color(bm_header_widget_get_text_view(widget),
+                              GTK_STATE_FLAG_NORMAL, &rgba);
 }
 
 /* Callback for the "style-set" signal; reset colors when theme is
  * changed. */
 static void
-bm_header_widget_set_style(GtkWidget * widget, GtkStyle * previous_style,
-			   BalsaMessage * bm)
+bm_header_widget_set_style(GtkWidget * widget, BalsaMessage * bm)
 {
     g_signal_handlers_block_by_func(widget, bm_header_widget_set_style,
 				    bm);
@@ -486,7 +486,7 @@ bm_header_widget_new(BalsaMessage * bm, GtkWidget * buttons)
     g_object_set_data(G_OBJECT(widget), "tl-buttons", buttons);
     g_signal_connect_after(widget, "realize",
 			   G_CALLBACK(bm_header_widget_realized), bm);
-    g_signal_connect_after(widget, "style-set",
+    g_signal_connect_after(widget, "style-updated",
 			   G_CALLBACK(bm_header_widget_set_style), bm);
 
     hbox = gtk_hbox_new(FALSE, 0);
@@ -671,6 +671,7 @@ bmwm_buffer_set_prefs(GtkTextBuffer * buffer)
 {
     GtkTextTagTable *table = gtk_text_buffer_get_tag_table(buffer);
     GtkTextTag *tag;
+    GdkColor color;
 
     tag = gtk_text_tag_table_lookup(table, "subject-font");
     g_object_set(tag, "font", balsa_app.subject_font, NULL);
@@ -678,8 +679,12 @@ bmwm_buffer_set_prefs(GtkTextBuffer * buffer)
     tag = gtk_text_tag_table_lookup(table, "message-font");
     g_object_set(tag, "font", balsa_app.message_font, NULL);
 
+    color.red   = G_MAXUINT16 * balsa_app.url_color.red;
+    color.green = G_MAXUINT16 * balsa_app.url_color.green;
+    color.blue  = G_MAXUINT16 * balsa_app.url_color.blue;
+    color.pixel = 0;
     tag = gtk_text_tag_table_lookup(table, "url");
-    g_object_set(tag, "foreground-gdk", &balsa_app.url_color, NULL);
+    g_object_set(tag, "foreground-gdk", &color, NULL);
 }
 
 void
@@ -711,10 +716,10 @@ balsa_mime_widget_message_set_headers_d(BalsaMessage * bm,
     }
 
     if (bm->shown_headers == HEADERS_NONE) {
-	gtk_widget_hide(widget);
+        g_signal_connect(G_OBJECT(widget), "realize",
+                         G_CALLBACK(gtk_widget_hide), NULL);
 	return;
-    } else
-	gtk_widget_show_all(widget);
+    }
 
     bm->tab_position = 0;
 

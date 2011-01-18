@@ -2598,9 +2598,7 @@ create_email_or_string_entry(GtkWidget * table, const gchar * label,
 		     GTK_FILL, GTK_FILL | GTK_SHRINK, 0, 0);
 
     desc = pango_font_description_from_string(balsa_app.message_font);
-#if 0
-    gtk_widget_modify_font(arr[1], desc);
-#endif
+    gtk_widget_override_font(arr[1], desc);
     pango_font_description_free(desc);
 
     gtk_table_attach(GTK_TABLE(table), arr[1], 1, 2, y_pos, y_pos + 1,

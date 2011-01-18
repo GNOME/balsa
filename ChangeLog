@@ -1,5 +1,10 @@
 2011-01-17  Peter Bloomfield
 
+	* src/sendmsg-window.c (create_email_or_string_entry): new
+	override font API.
+
+2011-01-17  Peter Bloomfield
+
 	* src/balsa-mime-widget-image.c (bmwi_context_changed_cb),
 	(balsa_mime_widget_new_image): set background color from
 	viewport.

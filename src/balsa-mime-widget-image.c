@@ -34,15 +34,27 @@ static gboolean balsa_image_button_press_cb(GtkWidget * widget, GdkEventButton *
 					    GtkMenu * menu);
 static gboolean img_check_size(GtkImage ** widget_p);
 
+static void
+bmwi_context_changed_cb(GtkStyleContext * context, BalsaMimeWidget * mw)
+{
+    GdkRGBA rgba;
+
+    gtk_style_context_get_background_color(context,
+                                           GTK_STATE_FLAG_NORMAL, &rgba);
+    gtk_widget_override_background_color(mw->widget,
+                                         GTK_STATE_FLAG_NORMAL, &rgba);
+}
 
 BalsaMimeWidget *
-balsa_mime_widget_new_image(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
+balsa_mime_widget_new_image(BalsaMessage * bm,
+                            LibBalsaMessageBody * mime_body,
 			    const gchar * content_type, gpointer data)
 {
     GdkPixbuf *pixbuf;
     GtkWidget *image;
     GError * load_err = NULL;
     BalsaMimeWidget *mw;
+    GtkStyleContext *context;
 
     g_return_val_if_fail(mime_body != NULL, NULL);
     g_return_val_if_fail(content_type != NULL, NULL);
@@ -59,7 +71,16 @@ balsa_mime_widget_new_image(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
     }
 
     mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
+
     mw->widget = gtk_event_box_new();
+    g_signal_connect(G_OBJECT(mw->widget), "button-press-event",
+                     G_CALLBACK(balsa_image_button_press_cb), data);
+
+    context = gtk_widget_get_style_context(GTK_WIDGET(bm->cont_viewport));
+    bmwi_context_changed_cb(context, mw);
+    g_signal_connect(context, "changed",
+                     G_CALLBACK(bmwi_context_changed_cb), mw);
+
     image = gtk_image_new_from_stock(GTK_STOCK_MISSING_IMAGE,
                                      GTK_ICON_SIZE_BUTTON);
     g_object_set_data(G_OBJECT(image), "orig-width",
@@ -67,14 +88,6 @@ balsa_mime_widget_new_image(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
     g_object_set_data(G_OBJECT(image), "mime-body", mime_body);
     g_object_unref(pixbuf);
     gtk_container_add(GTK_CONTAINER(mw->widget), image);
-#if 0
-    gtk_widget_modify_bg(mw->widget, GTK_STATE_NORMAL,
-                         &gtk_widget_get_style(GTK_WIDGET(bm))->
-                         light[GTK_STATE_NORMAL]);
-#endif
-
-    g_signal_connect(G_OBJECT(mw->widget), "button-press-event",
-                     G_CALLBACK(balsa_image_button_press_cb), data);
 
     return mw;
 }

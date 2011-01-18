@@ -1,5 +1,11 @@
 2011-01-17  Peter Bloomfield
 
+	* src/balsa-mime-widget-crypto.c
+	(balsa_mime_widget_signature_widget),
+	(balsa_mime_widget_crypto_frame): reorganize window-showing.
+
+2011-01-17  Peter Bloomfield
+
 	* src/balsa-icons.c (balsa_register_pixbufs): new icon-render
 	API.
 	* src/balsa-mime-widget.c (balsa_mime_widget_new),

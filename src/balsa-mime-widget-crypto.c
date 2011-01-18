@@ -104,8 +104,6 @@ balsa_mime_widget_signature_widget(LibBalsaMessageBody * mime_body,
     }
 #endif /* HAVE_GPG */
 
-    gtk_widget_show_all(vbox);
-
     return vbox;
 }
 
@@ -119,7 +117,7 @@ balsa_mime_widget_crypto_frame(LibBalsaMessageBody * mime_body, GtkWidget * chil
     GtkWidget * icon_box;
     const gchar * icon_name;
 
-    frame = gtk_frame_new(NULL);       
+    frame = gtk_frame_new(NULL);
     vbox = gtk_vbox_new(FALSE, BMW_VBOX_SPACE);
     gtk_container_add(GTK_CONTAINER(frame), vbox);
     icon_box = gtk_hbox_new(FALSE, BMW_VBOX_SPACE);
@@ -136,14 +134,11 @@ balsa_mime_widget_crypto_frame(LibBalsaMessageBody * mime_body, GtkWidget * chil
 		       FALSE, FALSE, 0);
     gtk_frame_set_label_widget(GTK_FRAME(frame), icon_box);
     gtk_container_set_border_width(GTK_CONTAINER(vbox), BMW_MESSAGE_PADDING);
-    gtk_widget_show_all(frame);
 
     gtk_box_pack_start(GTK_BOX(vbox), child, FALSE, FALSE, 0);
-    gtk_widget_show(child);
 
     if (signature) {
 	gtk_box_pack_end(GTK_BOX(vbox), signature, FALSE, FALSE, 0);
-        gtk_widget_show(signature);
     }
 
     return frame;

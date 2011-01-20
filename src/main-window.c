@@ -2673,7 +2673,8 @@ bw_contents_cb(void)
 {
     GError *err = NULL;
 
-    gtk_show_uri(NULL, "ghelp:balsa", gtk_get_current_event_time(), &err);
+    gtk_show_uri(gdk_screen_get_default(), "ghelp:balsa",
+                 gtk_get_current_event_time(), &err);
     if (err) {
         balsa_information(LIBBALSA_INFORMATION_WARNING,
                           _("Error displaying help: %s\n"), err->message);
@@ -4412,7 +4413,8 @@ bw_find_real(BalsaWindow * window, BalsaIndex * bindex, gboolean again)
                     ok = GTK_RESPONSE_CANCEL;
                 break;
 	    case GTK_RESPONSE_HELP:
-                gtk_show_uri(NULL, "ghelp:balsa?win-search",
+                gtk_show_uri(gdk_screen_get_default(),
+                             "ghelp:balsa?win-search",
                              gtk_get_current_event_time(), &err);
 		if (err) {
 		    balsa_information(LIBBALSA_INFORMATION_WARNING,

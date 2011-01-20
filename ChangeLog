@@ -1,3 +1,22 @@
+2011-01-19  Peter Bloomfield
+
+	Pass default screen instead of NULL to gtk_show_uri
+
+	* libbalsa/identity.c (help_ident_cb):
+	* libbalsa/smtp-server.c (smtp_server_response):
+	* src/address-book-config.c (help_button_cb):
+	* src/balsa-mime-widget-message.c (extbody_call_url):
+	* src/balsa-mime-widget-text.c (store_button_coords),
+	(check_over_url), (handle_url):
+	* src/filter-edit-callbacks.c (condition_dialog_response),
+	(fe_dialog_response):
+	* src/filter-run-callbacks.c (fr_dialog_response):
+	* src/folder-conf.c (folder_conf_response):
+	* src/main-window.c:
+	* src/pref-manager.c (balsa_help_pbox_display):
+	* src/sendmsg-window.c (on_open_url_cb):
+	* src/toolbar-prefs.c (tp_dialog_response_cb):
+
 2011-01-17  Peter Bloomfield
 
 	* src/sendmsg-window.c (create_email_or_string_entry): new

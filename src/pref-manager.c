@@ -3571,7 +3571,8 @@ balsa_help_pbox_display(void)
     g_free(text);
 
     uri = g_strconcat("ghelp:balsa?", link_id, NULL);
-    gtk_show_uri(NULL, uri, gtk_get_current_event_time(), &err);
+    gtk_show_uri(gdk_screen_get_default(), uri,
+                 gtk_get_current_event_time(), &err);
     g_free(uri);
     if (err) {
         balsa_information(LIBBALSA_INFORMATION_WARNING,

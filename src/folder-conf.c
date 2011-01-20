@@ -103,7 +103,8 @@ folder_conf_response(GtkDialog * dialog, int response,
 	g_object_ref(cdd->mbnode);
     switch (response) {
     case GTK_RESPONSE_HELP:
-        gtk_show_uri(NULL, "ghelp:balsa?folder-config",
+        gtk_show_uri(gdk_screen_get_default(),
+                     "ghelp:balsa?folder-config",
                      gtk_get_current_event_time(), &err);
         if (err) {
             balsa_information(LIBBALSA_INFORMATION_WARNING,

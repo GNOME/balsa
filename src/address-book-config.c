@@ -532,7 +532,8 @@ help_button_cb(AddressBookConfig * abc)
 {
     GError *err = NULL;
 
-    gtk_show_uri(NULL, "ghelp:balsa?preferences-address-books",
+    gtk_show_uri(gdk_screen_get_default(),
+                 "ghelp:balsa?preferences-address-books",
                  gtk_get_current_event_time(), &err);
 
     if (err) {

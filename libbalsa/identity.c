@@ -1662,7 +1662,7 @@ help_ident_cb(void)
 {
     GError *err = NULL;
 
-    gtk_show_uri(NULL, "ghelp:balsa?identities",
+    gtk_show_uri(gdk_screen_get_default(), "ghelp:balsa?identities",
                  gtk_get_current_event_time(), &err);
 
     if (err) {

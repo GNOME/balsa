@@ -889,7 +889,8 @@ condition_dialog_response(GtkWidget * dialog, gint response,
         gtk_widget_hide(dialog);
         break;
     case GTK_RESPONSE_HELP:     /* Help button */
-        gtk_show_uri(NULL, "ghelp:balsa?win-condition",
+        gtk_show_uri(gdk_screen_get_default(),
+                     "ghelp:balsa?win-condition",
                      gtk_get_current_event_time(), &err);
 	if (err) {
 	    balsa_information_parented(GTK_WINDOW(dialog),
@@ -1496,7 +1497,8 @@ fe_dialog_response(GtkWidget * dialog, gint response, gpointer data)
         break;
 
     case GTK_RESPONSE_HELP:     /* Help button */
-        gtk_show_uri(NULL, "ghelp:balsa?win-filters",
+        gtk_show_uri(gdk_screen_get_default(),
+                     "ghelp:balsa?win-filters",
                      gtk_get_current_event_time(), &err);
 	if (err) {
 	    balsa_information_parented(GTK_WINDOW(dialog),

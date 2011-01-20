@@ -290,7 +290,8 @@ extbody_call_url(GtkWidget * button, gpointer data)
     GError *err = NULL;
 
     g_return_if_fail(url);
-    gtk_show_uri(NULL, url, gtk_get_current_event_time(), &err);
+    gtk_show_uri(gdk_screen_get_default(), url,
+                 gtk_get_current_event_time(), &err);
     if (err) {
 	balsa_information(LIBBALSA_INFORMATION_WARNING,
 			  _("Error showing %s: %s\n"), url, err->message);

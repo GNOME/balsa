@@ -584,11 +584,9 @@ store_button_coords(GtkWidget * widget, GdkEventButton * event,
                     gpointer data)
 {
     if (event->type == GDK_BUTTON_PRESS && event->button == 1) {
-        GdkWindow *window =
-            gtk_text_view_get_window(GTK_TEXT_VIEW(widget),
-                                     GTK_TEXT_WINDOW_TEXT);
-
-        gdk_window_get_pointer(window, &stored_x, &stored_y, &stored_mask);
+        stored_x = event->x;
+        stored_y = event->y;
+        stored_mask = event->state;
 
         /* compare only shift, ctrl, and mod1-mod5 */
         stored_mask &= STORED_MASK_BITS;
@@ -611,15 +609,7 @@ check_over_url(GtkWidget * widget, GdkEventMotion * event,
     if (event->type == GDK_LEAVE_NOTIFY)
         url = NULL;
     else {
-	gint x, y;
-	GdkModifierType mask;
-
-        /* FIXME: why can't we just use
-         * x = event->x;
-         * y = event->y;
-         * ??? */
-        gdk_window_get_pointer(window, &x, &y, &mask);
-        url = find_url(widget, x, y, url_list);
+        url = find_url(widget, (gint) event->x, (gint) event->y, url_list);
     }
 
     if (url) {
@@ -801,7 +791,8 @@ handle_url(const gchar * url)
         gtk_statusbar_push(statusbar, context_id, notice);
         SCHEDULE_BAR_REFRESH();
         g_free(notice);
-        gtk_show_uri(NULL, url, gtk_get_current_event_time(), &err);
+        gtk_show_uri(gdk_screen_get_default(), url,
+                     gtk_get_current_event_time(), &err);
         if (err) {
             balsa_information(LIBBALSA_INFORMATION_WARNING,
                               _("Error showing %s: %s\n"),

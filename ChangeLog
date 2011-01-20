@@ -1,5 +1,10 @@
 2011-01-19  Peter Bloomfield
 
+	* src/save-restore.c (config_global_load), (save_color),
+	(load_color): save rgba() colors with "RGBA" suffix.
+
+2011-01-19  Peter Bloomfield
+
 	Pass default screen instead of NULL to gtk_show_uri
 
 	* libbalsa/identity.c (help_ident_cb):

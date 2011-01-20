@@ -62,8 +62,10 @@ static gint config_folder_init(const gchar * group);
 static gint config_mailbox_init(const gchar * group);
 static gchar *config_get_unused_group(const gchar * group);
 
-static void save_color(gchar * key, GdkRGBA * rgba);
-static void load_color(gchar * key, GdkRGBA * rgba);
+static void save_color(const gchar * key, GdkRGBA * rgba);
+static void load_color(const gchar * name,
+                       const gchar * def_val,
+                       GdkRGBA     * rgba);
 static void save_mru(GList  *mru, const gchar * group);
 static void load_mru(GList **mru, const gchar * group);
 
@@ -740,18 +742,22 @@ config_global_load(void)
 	int i;
 	gchar *default_quoted_color[MAX_QUOTED_COLOR] = {"#088", "#800"};
 	for(i=0;i<MAX_QUOTED_COLOR;i++) {
-	    gchar *text = g_strdup_printf("QuotedColor%d=%s", i, i<6 ?
-			  default_quoted_color[i] : DEFAULT_QUOTED_COLOR);
-	    load_color(text, &balsa_app.quoted_color[i]);
-	    g_free(text);
+            gchar *key;
+            const gchar *def_val;
+
+            key = g_strdup_printf("QuotedColor%d", i);
+            def_val =
+                i < 6 ? default_quoted_color[i] : DEFAULT_QUOTED_COLOR;
+            load_color(key, def_val, &balsa_app.quoted_color[i]);
+            g_free(key);
 	}
     }
 
     /* URL coloring */
-    load_color("UrlColor=" DEFAULT_URL_COLOR, &balsa_app.url_color);
+    load_color("UrlColor", DEFAULT_URL_COLOR, &balsa_app.url_color);
 
     /* bad address coloring */
-    load_color("BadAddressColor=" DEFAULT_BAD_ADDRESS_COLOR,
+    load_color("BadAddressColor", DEFAULT_BAD_ADDRESS_COLOR,
                &balsa_app.bad_address_color);
 
     /* ... font used to display messages */
@@ -1939,13 +1945,16 @@ config_view_remove(const gchar * url)
 }
 
 static void
-save_color(gchar * key, GdkRGBA * rgba)
+save_color(const gchar * key, GdkRGBA * rgba)
 {
+    gchar *full_key;
     gchar *str;
 
+    full_key = g_strconcat(key, "RGBA", NULL);
     str = gdk_rgba_to_string(rgba);
-    libbalsa_conf_set_string(key, str);
+    libbalsa_conf_set_string(full_key, str);
     g_free(str);
+    g_free(full_key);
 }
 
 static gboolean
@@ -2053,11 +2062,20 @@ config_mailbox_filters_save(LibBalsaMailbox * mbox)
 }
 
 static void
-load_color(gchar * key, GdkRGBA * rgba)
+load_color(const gchar * key, const gchar * def_val, GdkRGBA * rgba)
 {
+    gchar *full_key;
     gchar *str;
+    gboolean def_used;
 
-    str = libbalsa_conf_get_string(key);
+    full_key = g_strdup_printf("%sRGBA", key);
+    str = libbalsa_conf_get_string(full_key);
+    if (!str) {
+        g_free(full_key);
+        full_key = g_strdup_printf("%s=%s", key, def_val);
+        str = libbalsa_conf_get_string_with_default(full_key, &def_used);
+    }
+    g_free(full_key);
     gdk_rgba_parse(rgba, str);
     g_free(str);
 }

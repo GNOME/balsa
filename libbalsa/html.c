@@ -93,7 +93,7 @@ typedef struct {
     LibBalsaHtmlCallback  clicked_cb;
     WebKitWebFrame       *frame;
     gboolean              download_images;
-    GtkWidget            *info_bar_box;
+    GtkWidget            *vbox;
     gboolean              has_info_bar;
     WebKitWebView        *web_view;
 } LibBalsaWebKitInfo;
@@ -206,7 +206,8 @@ lbh_show_info_bar(LibBalsaWebKitInfo * info)
                                      GTK_RESPONSE_OK,
                                      GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
                                      NULL);
-    gtk_container_add(GTK_CONTAINER(info->info_bar_box), info_bar_widget);
+    gtk_box_pack_start(GTK_BOX(info->vbox), info_bar_widget,
+                       FALSE, FALSE, 0);
 
     info_bar = GTK_INFO_BAR(info_bar_widget);
 
@@ -376,21 +377,17 @@ libbalsa_html_new(LibBalsaMessageBody * body,
     if (len < 0)
         return NULL;
 
-    vbox = gtk_vbox_new(FALSE, 0);
-
-    widget = webkit_web_view_new();
-
     info = g_new(LibBalsaWebKitInfo, 1);
     info->body            = body;
     info->hover_cb        = hover_cb;
     info->clicked_cb      = clicked_cb;
     info->frame           = NULL;
     info->download_images = FALSE;
-    info->info_bar_box    = gtk_event_box_new();
     info->has_info_bar    = FALSE;
+    info->vbox = vbox     = gtk_vbox_new(FALSE, 0);
 
-    gtk_box_pack_start(GTK_BOX(vbox), info->info_bar_box, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(vbox), widget, TRUE, TRUE, 0);
+    widget = webkit_web_view_new();
+    gtk_box_pack_end(GTK_BOX(vbox), widget, TRUE, TRUE, 0);
 
     info->web_view = web_view = WEBKIT_WEB_VIEW(widget);
     g_object_set_data(G_OBJECT(vbox), "libbalsa-html-web-view", web_view);

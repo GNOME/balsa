@@ -1,5 +1,10 @@
 2011-01-21  Peter Bloomfield
 
+	* libbalsa/html.c (lbh_show_info_bar), (libbalsa_html_new): use
+	GtkBox packing instead of the event-box.
+
+2011-01-21  Peter Bloomfield
+
 	* libbalsa/html.c (lbh_info_bar_response_cb), (lbh_show_info_bar),
 	(lbh_resource_request_starting_cb), (libbalsa_html_new): put
 	info-bar in an event-box, and only when needed.

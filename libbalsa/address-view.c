@@ -43,6 +43,38 @@
 #include "cell-renderer-button.h"
 #include "misc.h"
 
+struct _LibBalsaAddressView {
+    GtkTreeView parent;
+
+    /*
+     * Permanent data
+     */
+    const gchar *const *types;
+    guint n_types;
+    gboolean fallback;
+    GList *address_book_list;
+
+    gchar *domain;
+
+    GtkTreeViewColumn *type_column;
+    GtkTreeViewColumn *focus_column;
+
+    /*
+     * Ephemera
+     */
+    gboolean last_was_escape;   /* keystroke    */
+
+    GtkTreeRowReference *focus_row;     /* set cursor   */
+    guint focus_idle_id;        /* ditto        */
+
+    GtkCellEditable *editable;  /* cell editing */
+    gchar *path_string;         /* ditto        */
+};
+
+struct _LibBalsaAddressViewClass {
+    GtkTreeViewClass parent_class;
+};
+
 /*
  *     GObject class boilerplate
  */
@@ -253,10 +285,8 @@ lbav_ensure_blank_line_idle_cb(LibBalsaAddressView * address_view)
      *   gtk_widget_grab_focus(tree_view) in order to give keyboard
      *   focus to the widget."
      * but in fact, that leaves the entry /not/ open for editing. */
-    gtk_tree_view_set_cursor_on_cell(GTK_TREE_VIEW(address_view),
-                                     focus_path,
-                                     address_view->focus_column,
-                                     address_view->focus_cell, TRUE);
+    gtk_tree_view_set_cursor(GTK_TREE_VIEW(address_view), focus_path,
+                             address_view->focus_column, TRUE);
     gtk_tree_path_free(focus_path);
 
     address_view->focus_idle_id = 0;
@@ -1049,11 +1079,11 @@ libbalsa_address_view_new(const gchar * const *types,
         gtk_tree_view_append_column(tree_view, column);
     }
 
-    /* Column for the entry widget and the address-book/remove button. */
+    /* Column for the entry widget. */
     address_view->focus_column = column = gtk_tree_view_column_new();
 
     /* The address entry: */
-    address_view->focus_cell = renderer = gtk_cell_renderer_text_new();
+    renderer = gtk_cell_renderer_text_new();
     g_object_set(renderer, "editable", TRUE, NULL);
     g_signal_connect(renderer, "editing-started",
                      G_CALLBACK(lbav_row_editing_cb), address_view);

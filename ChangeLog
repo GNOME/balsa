@@ -1,5 +1,12 @@
 2011-01-23  Peter Bloomfield
 
+	* libbalsa/address-view.c (lbav_ensure_blank_line_idle_cb),
+	(libbalsa_address_view_new): clean up, and make
+	LibBalsaAddressView opaque.
+	* libbalsa/address-view.h: ditto.
+
+2011-01-23  Peter Bloomfield
+
 	* configure.in: change html-widget default to "webkit", and warn
 	if it is not chosen; change gtkspell default to "no", and warn
 	if it is not chosen; clarify GtkSourceView option.

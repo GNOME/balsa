@@ -51,39 +51,6 @@ G_BEGIN_DECLS
 typedef struct _LibBalsaAddressView LibBalsaAddressView;
 typedef struct _LibBalsaAddressViewClass LibBalsaAddressViewClass;
 
-struct _LibBalsaAddressView {
-    GtkTreeView parent;
-
-    /*
-     * Permanent data
-     */
-    const gchar *const *types;
-    guint n_types;
-    gboolean fallback;
-    GList *address_book_list;
-
-    gchar *domain;
-
-    GtkTreeViewColumn *type_column;
-    GtkTreeViewColumn *focus_column;
-    GtkCellRenderer   *focus_cell;
-
-    /*
-     * Ephemera
-     */
-    gboolean last_was_escape;   /* keystroke    */
-
-    GtkTreeRowReference *focus_row;     /* set cursor   */
-    guint focus_idle_id;        /* ditto        */
-
-    GtkCellEditable *editable;  /* cell editing */
-    gchar *path_string;         /* ditto        */
-};
-
-struct _LibBalsaAddressViewClass {
-    GtkTreeViewClass parent_class;
-};
-
 GType libbalsa_address_view_get_type(void) G_GNUC_CONST;
 
 LibBalsaAddressView *libbalsa_address_view_new(const gchar * const *types,

@@ -494,17 +494,23 @@ text_view_url_popup(GtkTextView *textview, GtkMenu *menu)
     GList *url_list = g_object_get_data(G_OBJECT(textview), "url-list");
     message_url_t *url;
     gint x, y;
-    GdkModifierType mask;
     GdkWindow *window;
+    GdkDisplay *display;
+    GdkDeviceManager *manager;
+    GdkDevice *device;
     GtkWidget *menu_item;
-    
+
     /* no url list: no check... */
     if (!url_list)
 	return FALSE;
 
     /* check if we are over an url */
     window = gtk_text_view_get_window(textview, GTK_TEXT_WINDOW_TEXT);
-    gdk_window_get_pointer(window, &x, &y, &mask);
+    display = gdk_window_get_display(window);
+    manager = gdk_display_get_device_manager(display);
+    device = gdk_device_manager_get_client_pointer(manager);
+    gdk_window_get_device_position(window, device, &x, &y, NULL);
+
     url = find_url(GTK_WIDGET(textview), x, y, url_list);
     if (!url)
 	return FALSE;

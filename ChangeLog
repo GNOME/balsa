@@ -1,5 +1,10 @@
 2011-01-23  Peter Bloomfield
 
+	* src/balsa-mime-widget-text.c (text_view_url_popup):
+	deprecation cleanup.
+
+2011-01-23  Peter Bloomfield
+
 	* libbalsa/address-view.c (lbav_ensure_blank_line_idle_cb),
 	(libbalsa_address_view_new): clean up, and make
 	LibBalsaAddressView opaque.

@@ -125,19 +125,19 @@ AC_ARG_WITH(gss,
 
 AC_ARG_WITH(html-widget,
             AC_HELP_STRING([--with-html-widget=(no|gtkhtml2|gtkhtml3|webkit)],
-                           [select the HTML renderer (default gtkhtml3)]),
+                           [select the HTML renderer (default webkit)]),
             [use_html_widget=$withval],
-            [use_html_widget=gtkhtml3])
+            [use_html_widget=webkit])
 
 AC_ARG_WITH([gtksourceview],
    AC_HELP_STRING([--with-gtksourceview],
-                  [Use GtkSourceView if available (default=no, specify version 1 or 2, yes=2)]),
+                  [Use GtkSourceView-3 if available (default=no)]),
 		  [with_gtksourceview=$withval],[with_gtksourceview=no])
 
 AC_ARG_WITH([gtkspell],
    AC_HELP_STRING([--with-gtkspell],
-                  [Use GtkSpell/enchant if available (default=yes)]),
-		  [with_gtkspell=$withval],[with_gtkspell=yes])
+                  [Use GtkSpell/enchant if available (default=no)]),
+		  [with_gtkspell=$withval],[with_gtkspell=no])
 
 AC_ARG_WITH(iconv,      
    AC_HELP_STRING([--with-iconv=DIR],
@@ -754,7 +754,7 @@ fi
 #
 if test x$with_gtksourceview != xno; then
     PKG_CHECK_MODULES(GTKSOURCEVIEW, [ gtksourceview-3.0 ])
-    AC_DEFINE(HAVE_GTKSOURCEVIEW,3,[Defined when GtkSourceView can be used.])
+    AC_DEFINE(HAVE_GTKSOURCEVIEW,3,[Defined when GtkSourceView-3 can be used.])
     AC_MSG_NOTICE([Note: using GtkSourceview Version 3])
     with_gtksourceview=3
     BALSA_CFLAGS="$BALSA_CFLAGS $GTKSOURCEVIEW_CFLAGS"
@@ -886,6 +886,7 @@ if test -d "${srcdir}/.git" ; then
 -DG_DISABLE_SINGLE_INCLUDES \
 -DGDK_DISABLE_DEPRECATED \
 -DGDK_PIXBUF_DISABLE_DEPRECATED \
+-DGDK_MULTIDEVICE_SAFE \
 -DGMIME_DISABLE_DEPRECATED \
 -DGNOME_DISABLE_DEPRECATED \
 -DGNOME_DISABLE_DEPRECATED_SOURCE \
@@ -1032,4 +1033,11 @@ if test x"$BALSA_FROM_GIT" = xyes ; then
 	echo "or just plain not work. Use it at your own risk. You have been warned."
 	echo "======================================================================"
 	echo ""
+fi
+
+if test x$with_gtkspell != xno; then
+    echo "WARNING! linking with current GtkSpell may cause Balsa not to run!"
+fi
+if test x$use_html_widget != xwebkit; then
+    echo "WARNING! linking with $use_html_widget may cause Balsa not to run!"
 fi

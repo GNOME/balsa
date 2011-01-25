@@ -258,9 +258,12 @@ libbalsa_filter_mailbox_messages(LibBalsaFilter * filt,
 
 #if HAVE_CANBERRA
     if (filt->sound) {
-        gint rc = ca_context_play(ca_gtk_context_get(), 0,
-                                  CA_PROP_MEDIA_FILENAME, filt->sound,
-                                  NULL);
+        GdkScreen *screen;
+        gint rc;
+
+        screen = gdk_screen_get_default();
+        rc = ca_context_play(ca_gtk_context_get_for_screen(screen), 0,
+                             CA_PROP_MEDIA_FILENAME, filt->sound, NULL);
         g_message("(%s) play %s, %s", __func__, filt->sound, ca_strerror(rc));
     }
 #endif                          /* HAVE_CANBERRA */

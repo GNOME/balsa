@@ -135,7 +135,8 @@ balsa_print_object_default(GList * list,
     /* get a pixbuf according to the mime type */
     conttype = libbalsa_message_body_get_mime_type(body);
     pod->pixbuf =
-	libbalsa_icon_finder(conttype, NULL, NULL, GTK_ICON_SIZE_DND);
+	libbalsa_icon_finder(NULL, conttype, NULL, NULL,
+                             GTK_ICON_SIZE_DND);
     pod->c_image_width = gdk_pixbuf_get_width(pod->pixbuf);
     pod->c_image_height = gdk_pixbuf_get_height(pod->pixbuf);
 

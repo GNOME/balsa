@@ -1448,7 +1448,8 @@ display_part(BalsaMessage * bm, LibBalsaMessageBody * body,
 #endif
         if (!content_icon)
 	    content_icon =
-		libbalsa_icon_finder(content_type, NULL, NULL,
+		libbalsa_icon_finder(GTK_WIDGET(bm),
+                                     content_type, NULL, NULL,
 				     GTK_ICON_SIZE_LARGE_TOOLBAR);
         gtk_tree_store_set (GTK_TREE_STORE(model), iter,
                             PART_INFO_COLUMN, info,
@@ -1460,7 +1461,8 @@ display_part(BalsaMessage * bm, LibBalsaMessageBody * body,
         g_free(icon_title);
     } else {
 	content_icon =
-	    libbalsa_icon_finder(content_type, NULL, NULL,
+	    libbalsa_icon_finder(GTK_WIDGET(bm),
+                                 content_type, NULL, NULL,
 				 GTK_ICON_SIZE_LARGE_TOOLBAR);
         gtk_tree_store_set (GTK_TREE_STORE(model), iter,
                             PART_INFO_COLUMN, NULL,

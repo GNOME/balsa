@@ -1,3 +1,37 @@
+2011-01-24  Peter Bloomfield
+
+	* configure.in: new deprecation tests GDK_MULTIHEAD_SAFE,
+	GDK_MULTIDEVICE_SAFE.
+	* libbalsa/files.c (libbalsa_icon_finder): add widget argument
+	so we can find settings.
+	* libbalsa/files.h: ditto.
+	* libbalsa/filter.c (libbalsa_filter_mailbox_messages):
+	deprecation cleanup.
+	* libbalsa/identity.c (help_ident_cb), (md_response_cb): ditto.
+	* libbalsa/smtp-server.c (smtp_server_response): ditto.
+	* libbalsa/source-viewer.c (copy_cb): ditto.
+	* src/address-book-config.c (help_button_cb): ditto.
+	* src/balsa-app.c (balsa_app_init): ditto.
+	* src/balsa-icons.c (load_balsa_pixmap): ditto.
+	* src/balsa-index.c (balsa_index_set_column_widths): ditto.
+	* src/balsa-message.c (display_part): ditto.
+	* src/balsa-mime-widget-message.c (extbody_call_url): ditto.
+	* src/balsa-mime-widget-text.c (fix_text_widget), (url_copy_cb),
+	(check_over_url), (handle_url), (fill_text_buf_cited): ditto.
+	* src/balsa-print-object-default.c (balsa_print_object_default):
+	ditto.
+	* src/balsa-print-object-text.c (balsa_print_object_text_vcard),
+	(balsa_print_object_text_calendar): ditto.
+	* src/filter-edit-callbacks.c (condition_dialog_response),
+	(fe_dialog_response): ditto.
+	* src/filter-run-callbacks.c (fr_dialog_response): ditto.
+	* src/folder-conf.c (folder_conf_response): ditto.
+	* src/main-window.c: ditto.
+	* src/pref-manager.c (balsa_help_pbox_display): ditto.
+	* src/sendmsg-window.c (on_open_url_cb), (add_attachment):
+	ditto.
+	* src/toolbar-prefs.c (tp_dialog_response_cb): ditto.
+
 2011-01-23  Peter Bloomfield
 
 	* src/balsa-mime-widget-text.c (text_view_url_popup):

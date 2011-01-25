@@ -44,7 +44,10 @@ gchar *balsa_file_finder(const gchar * filename, const gchar * splice,
 #define balsa_pixmap_finder_no_warn(filename) \
     (balsa_file_finder((filename), "pixmaps", NULL, FALSE))
 
-GdkPixbuf *libbalsa_icon_finder(const char *mime_type, const LibbalsaVfs * for_file,
-				gchar** used_type, GtkIconSize size);
+GdkPixbuf *libbalsa_icon_finder(GtkWidget         * widget,
+                                const char        * mime_type,
+                                const LibbalsaVfs * for_file,
+                                gchar            ** used_type,
+                                GtkIconSize         size);
 
 #endif

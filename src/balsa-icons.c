@@ -77,6 +77,7 @@ load_balsa_pixmap(GtkIconTheme *icon_theme, GtkIconFactory *factory,
         { "folder-drag-accept", GTK_STOCK_OPEN},
         { "folder", GTK_STOCK_DIRECTORY},
 	{ NULL, NULL } };
+    GtkSettings *settings;
 
     BICONS_LOG("loading icon %s (stock id %s)", bpixmap->name,
 	       bpixmap->stock_id);
@@ -98,16 +99,18 @@ load_balsa_pixmap(GtkIconTheme *icon_theme, GtkIconFactory *factory,
     } else
 	use_id = bpixmap->stock_id;
 
-    g_hash_table_insert(balsa_icon_table, g_strdup(bpixmap->name), 
+    g_hash_table_insert(balsa_icon_table, g_strdup(bpixmap->name),
                         g_strdup(use_id));
 
-    if (!gtk_icon_size_lookup(bpixmap->sizes[0], &width, &height)) {
+    settings = gtk_settings_get_for_screen(gdk_screen_get_default());
+    if (!gtk_icon_size_lookup_for_settings(settings, bpixmap->sizes[0],
+                                           &width, &height)) {
 	BICONS_ERR("failed: could not look up default icon size %d",
 		   bpixmap->sizes[0]);
 	return;
     }
 
-    pixbuf = 
+    pixbuf =
 	gtk_icon_theme_load_icon(icon_theme, use_id, width,
 				 GTK_ICON_LOOKUP_USE_BUILTIN, &error);
     if (!pixbuf) {
@@ -119,11 +122,12 @@ load_balsa_pixmap(GtkIconTheme *icon_theme, GtkIconFactory *factory,
     icon_set = gtk_icon_set_new_from_pixbuf(pixbuf);
     g_object_unref(pixbuf);
 
-    for (n = 1; 
+    for (n = 1;
 	 n < BALSA_PIXMAP_SIZES && bpixmap->sizes[n] > GTK_ICON_SIZE_INVALID;
 	 n++) {
-	if (gtk_icon_size_lookup(bpixmap->sizes[n], &width, &height)) {
-	    pixbuf = 
+	if (gtk_icon_size_lookup_for_settings(settings, bpixmap->sizes[n],
+                                              &width, &height)) {
+	    pixbuf =
 		gtk_icon_theme_load_icon(icon_theme, use_id, width,
 					 GTK_ICON_LOOKUP_USE_BUILTIN, &error);
 	    if (!pixbuf) {

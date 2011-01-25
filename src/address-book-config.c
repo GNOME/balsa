@@ -530,10 +530,11 @@ create_rubrica_dialog(AddressBookConfig * abc)
 static void
 help_button_cb(AddressBookConfig * abc)
 {
+    GdkScreen *screen;
     GError *err = NULL;
 
-    gtk_show_uri(gdk_screen_get_default(),
-                 "ghelp:balsa?preferences-address-books",
+    screen = gtk_widget_get_screen(abc->window);
+    gtk_show_uri(screen, "ghelp:balsa?preferences-address-books",
                  gtk_get_current_event_time(), &err);
 
     if (err) {

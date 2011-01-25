@@ -287,11 +287,12 @@ static void
 extbody_call_url(GtkWidget * button, gpointer data)
 {
     gchar *url = g_object_get_data(G_OBJECT(button), "call_url");
+    GdkScreen *screen;
     GError *err = NULL;
 
     g_return_if_fail(url);
-    gtk_show_uri(gdk_screen_get_default(), url,
-                 gtk_get_current_event_time(), &err);
+    screen = gtk_widget_get_screen(button);
+    gtk_show_uri(screen, url, gtk_get_current_event_time(), &err);
     if (err) {
 	balsa_information(LIBBALSA_INFORMATION_WARNING,
 			  _("Error showing %s: %s\n"), url, err->message);

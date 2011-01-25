@@ -96,7 +96,11 @@ copy_cb(GtkAction * action, gpointer data)
 {
     GtkTextView *text = g_object_get_data(G_OBJECT(data), "text");
     GtkTextBuffer *buffer = gtk_text_view_get_buffer(text);
-    GtkClipboard *clipboard = gtk_clipboard_get(GDK_NONE);
+    GdkDisplay *display;
+    GtkClipboard *clipboard;
+
+    display = gtk_widget_get_display(GTK_WIDGET(text));
+    clipboard = gtk_clipboard_get_for_display(display, GDK_NONE);
 
     gtk_text_buffer_copy_clipboard(buffer, clipboard);
 }

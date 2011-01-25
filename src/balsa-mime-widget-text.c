@@ -408,15 +408,20 @@ fix_text_widget(GtkWidget *widget, gpointer data)
     GdkWindow *w =
         gtk_text_view_get_window(GTK_TEXT_VIEW(widget),
                                  GTK_TEXT_WINDOW_TEXT);
-    
+
     if (data)
         gdk_window_set_events(w,
                               gdk_window_get_events(w) |
                               GDK_POINTER_MOTION_MASK |
                               GDK_LEAVE_NOTIFY_MASK);
     if (!url_cursor_normal || !url_cursor_over_url) {
-        url_cursor_normal = gdk_cursor_new(GDK_XTERM);
-        url_cursor_over_url = gdk_cursor_new(GDK_HAND2);
+        GdkDisplay *display;
+
+        display = gdk_window_get_display(w);
+        url_cursor_normal =
+            gdk_cursor_new_for_display(display, GDK_XTERM);
+        url_cursor_over_url =
+            gdk_cursor_new_for_display(display, GDK_HAND2);
     }
     gdk_window_set_cursor(w, url_cursor_normal);
 
@@ -432,7 +437,7 @@ gtk_widget_destroy_insensitive(GtkWidget * widget)
 }
 
 static void
-structured_phrases_toggle(GtkCheckMenuItem *checkmenuitem, 
+structured_phrases_toggle(GtkCheckMenuItem *checkmenuitem,
 			  GtkTextView *textview)
 {
     GtkTextTagTable * table;
@@ -469,8 +474,13 @@ structured_phrases_toggle(GtkCheckMenuItem *checkmenuitem,
 static void
 url_copy_cb(GtkWidget * menu_item, message_url_t * uri)
 {
-    gtk_clipboard_set_text(gtk_clipboard_get(GDK_SELECTION_PRIMARY),
-			   uri->url, -1);
+    GdkDisplay *display;
+    GtkClipboard *clipboard;
+
+    display = gtk_widget_get_display(menu_item);
+    clipboard =
+        gtk_clipboard_get_for_display(display, GDK_SELECTION_PRIMARY);
+    gtk_clipboard_set_text(clipboard, uri->url, -1);
 }
 
 static void
@@ -620,8 +630,13 @@ check_over_url(GtkWidget * widget, GdkEventMotion * event,
 
     if (url) {
         if (!url_cursor_normal || !url_cursor_over_url) {
-            url_cursor_normal = gdk_cursor_new(GDK_LEFT_PTR);
-            url_cursor_over_url = gdk_cursor_new(GDK_HAND2);
+            GdkDisplay *display;
+
+            display = gdk_window_get_display(window);
+            url_cursor_normal =
+                gdk_cursor_new_for_display(display, GDK_LEFT_PTR);
+            url_cursor_over_url =
+                gdk_cursor_new_for_display(display, GDK_HAND2);
         }
         if (!was_over_url) {
             gdk_window_set_cursor(window, url_cursor_over_url);
@@ -788,6 +803,7 @@ handle_url(const gchar * url)
         GtkStatusbar *statusbar;
         guint context_id;
         gchar *notice = g_strdup_printf(_("Calling URL %s..."), url);
+        GdkScreen *screen;
         GError *err = NULL;
 
         statusbar = GTK_STATUSBAR(balsa_app.main_window->statusbar);
@@ -797,8 +813,8 @@ handle_url(const gchar * url)
         gtk_statusbar_push(statusbar, context_id, notice);
         SCHEDULE_BAR_REFRESH();
         g_free(notice);
-        gtk_show_uri(gdk_screen_get_default(), url,
-                     gtk_get_current_event_time(), &err);
+        screen = gtk_widget_get_screen(GTK_WIDGET(balsa_app.main_window));
+        gtk_show_uri(screen, url, gtk_get_current_event_time(), &err);
         if (err) {
             balsa_information(LIBBALSA_INFORMATION_WARNING,
                               _("Error showing %s: %s\n"),
@@ -1231,6 +1247,7 @@ fill_text_buf_cited(GtkWidget *widget, const gchar *text_body,
     LibBalsaUrlInsertInfo url_info;
     GList * cite_bars_list;
     guint cite_level;
+    GdkScreen *screen;
     guint cite_start;
     gint margin;
     gdouble char_width;
@@ -1268,8 +1285,8 @@ fill_text_buf_cited(GtkWidget *widget, const gchar *text_body,
         char_width = char_width / PANGO_SCALE;
 
     /* convert char_width from points to pixels */
-    margin = (char_width / 72.0) *
-        gdk_screen_get_resolution(gdk_screen_get_default());
+    screen = gtk_widget_get_screen(widget);
+    margin = (char_width / 72.0) * gdk_screen_get_resolution(screen);
 
     color.red   = G_MAXUINT16 * balsa_app.url_color.red;
     color.green = G_MAXUINT16 * balsa_app.url_color.green;

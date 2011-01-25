@@ -120,7 +120,7 @@ libbalsa_default_attachment_pixbuf(gint size)
 }
 
 
-/* balsa_icon_finder:
+/* libbalsa_icon_finder:
  *   locate a suitable icon (pixmap graphic) based on 'mime-type' and/or
  *   'filename', either of which can be NULL.  If both arguments are
  *   non-NULL, 'mime-type' has priority.  If both are NULL, the default
@@ -128,8 +128,11 @@ libbalsa_default_attachment_pixbuf(gint size)
  *   return the complete path to the icon file.
  */
 GdkPixbuf *
-libbalsa_icon_finder(const char *mime_type, const LibbalsaVfs * for_file, 
-                     gchar** used_type, GtkIconSize size)
+libbalsa_icon_finder(GtkWidget         * widget,
+                     const char        * mime_type,
+                     const LibbalsaVfs * for_file,
+                     gchar            ** used_type,
+                     GtkIconSize         size)
 {
     const gchar *content_type;
     gchar *icon = NULL;
@@ -137,10 +140,14 @@ libbalsa_icon_finder(const char *mime_type, const LibbalsaVfs * for_file,
     gint width, height;
     const gchar * filename = NULL;
     GtkIconTheme *icon_theme;
+    GtkSettings *settings;
 
-    if (!gtk_icon_size_lookup(size, &width, &height))
-	width = height = 16;
-    
+    settings = widget ? gtk_widget_get_settings(widget) : NULL;
+    if (!settings
+        || !gtk_icon_size_lookup_for_settings(settings, size,
+                                              &width, &height))
+        width = height = 16;
+
     if (mime_type)
         content_type = mime_type;
     else if (for_file) {

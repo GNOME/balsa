@@ -340,6 +340,7 @@ current_selection_changed_cb(GtkTreeSelection * selection, ToolbarPage * page)
 static void
 tp_dialog_response_cb(GtkDialog * dialog, gint response, gpointer data)
 {
+    GdkScreen *screen;
     GError *err = NULL;
 
     switch (response) {
@@ -348,8 +349,8 @@ tp_dialog_response_cb(GtkDialog * dialog, gint response, gpointer data)
         gtk_widget_destroy(GTK_WIDGET(dialog));
         break;
     case GTK_RESPONSE_HELP:
-        gtk_show_uri(gdk_screen_get_default(),
-                     "ghelp:balsa?toolbar-prefs",
+        screen = gtk_widget_get_screen(GTK_WIDGET(dialog));
+        gtk_show_uri(screen, "ghelp:balsa?toolbar-prefs",
                      gtk_get_current_event_time(), &err);
         if (err) {
             balsa_information(LIBBALSA_INFORMATION_WARNING,

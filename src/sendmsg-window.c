@@ -1806,6 +1806,7 @@ attachment_menu_vfs_cb(GtkWidget * menu_item, BalsaAttachInfo * info)
 static void
 on_open_url_cb(GtkWidget * menu_item, BalsaAttachInfo * info)
 {
+    GdkScreen *screen;
     GError *err = NULL;
     const gchar * uri;
 
@@ -1814,8 +1815,8 @@ on_open_url_cb(GtkWidget * menu_item, BalsaAttachInfo * info)
     g_return_if_fail(uri != NULL);
 
     g_message("open URL %s", uri);
-    gtk_show_uri(gdk_screen_get_default(), uri,
-                 gtk_get_current_event_time(), &err);
+    screen = gtk_widget_get_screen(menu_item);
+    gtk_show_uri(screen, uri, gtk_get_current_event_time(), &err);
     if (err) {
         balsa_information(LIBBALSA_INFORMATION_WARNING,
 			  _("Error showing %s: %s\n"),
@@ -2050,8 +2051,8 @@ add_attachment(BalsaSendmsg * bsmsg, const gchar *filename,
     if (is_fwd_message)
 	content_type = g_strdup(forced_mime_type);
     pixbuf =
-	libbalsa_icon_finder(forced_mime_type, file_uri, &content_type,
-			     GTK_ICON_SIZE_LARGE_TOOLBAR);
+	libbalsa_icon_finder(GTK_WIDGET(bsmsg), forced_mime_type, file_uri,
+                             &content_type, GTK_ICON_SIZE_LARGE_TOOLBAR);
     if (!content_type)
 	/* Last ditch. */
 	content_type = g_strdup("application/octet-stream");

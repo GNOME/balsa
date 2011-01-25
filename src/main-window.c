@@ -306,7 +306,7 @@ static gboolean bw_notebook_drag_motion_cb(GtkWidget* widget,
 static GtkWidget *bw_notebook_label_new (BalsaMailboxNode* mbnode);
 static void bw_ident_manage_dialog_cb(GtkAction * action, gpointer user_data);
 
-static void bw_contents_cb(void);
+static void bw_contents_cb(GtkAction * action, gpointer user_data);
 
 static void
 bw_quit_nicely(GtkAction * action, gpointer data)
@@ -2669,12 +2669,14 @@ bw_is_open_mailbox(LibBalsaMailbox *m)
 }
 
 static void
-bw_contents_cb(void)
+bw_contents_cb(GtkAction * action, gpointer user_data)
 {
+    GdkScreen *screen;
     GError *err = NULL;
 
-    gtk_show_uri(gdk_screen_get_default(), "ghelp:balsa",
-                 gtk_get_current_event_time(), &err);
+    screen = gtk_window_get_screen(user_data);
+    gtk_show_uri(screen, "ghelp:balsa", gtk_get_current_event_time(),
+                 &err);
     if (err) {
         balsa_information(LIBBALSA_INFORMATION_WARNING,
                           _("Error displaying help: %s\n"), err->message);
@@ -4264,6 +4266,7 @@ bw_find_real(BalsaWindow * window, BalsaIndex * bindex, gboolean again)
 	GtkToggleButton *matching_body, *matching_from;
         GtkToggleButton *matching_to, *matching_cc, *matching_subject;
 	gint ok;
+        GdkScreen *screen;
 
 #if HAVE_MACOSX_DESKTOP
 	libbalsa_macosx_menu_for_parent(dia, GTK_WINDOW(window));
@@ -4413,8 +4416,8 @@ bw_find_real(BalsaWindow * window, BalsaIndex * bindex, gboolean again)
                     ok = GTK_RESPONSE_CANCEL;
                 break;
 	    case GTK_RESPONSE_HELP:
-                gtk_show_uri(gdk_screen_get_default(),
-                             "ghelp:balsa?win-search",
+                screen = gtk_widget_get_screen(GTK_WIDGET(window));
+                gtk_show_uri(screen, "ghelp:balsa?win-search",
                              gtk_get_current_event_time(), &err);
 		if (err) {
 		    balsa_information(LIBBALSA_INFORMATION_WARNING,

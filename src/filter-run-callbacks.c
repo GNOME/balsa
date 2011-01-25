@@ -161,6 +161,7 @@ void fr_dialog_response(GtkWidget * widget, gint response,
 			gpointer throwaway)
 {
     BalsaFilterRunDialog * p;
+    GdkScreen *screen;
     GError *err = NULL;
 
     p=BALSA_FILTER_RUN_DIALOG(widget);
@@ -173,11 +174,11 @@ void fr_dialog_response(GtkWidget * widget, gint response,
     case GTK_RESPONSE_NONE:     /* Close window */
 	/* We free the mailbox_filter datas, they are useless now */
 	fr_clean_associated_mailbox_filters(p->selected_filters);
-	
+
 	break;
     case GTK_RESPONSE_HELP:     /* Help button */
-        gtk_show_uri(gdk_screen_get_default(),
-                     "ghelp:balsa?win-run-filters",
+        screen = gtk_widget_get_screen(widget);
+        gtk_show_uri(screen, "ghelp:balsa?win-run-filters",
                      gtk_get_current_event_time(), &err);
 	if (err) {
 	    balsa_information_parented(GTK_WINDOW(widget),
@@ -196,7 +197,7 @@ void fr_dialog_response(GtkWidget * widget, gint response,
 }
 
 
-/* 
+/*
  *Callbacks for apply/left/right buttons
  */
 

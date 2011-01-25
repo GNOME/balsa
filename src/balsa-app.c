@@ -439,8 +439,8 @@ balsa_app_init(void)
     balsa_app.folder_mru=NULL;
     balsa_app.fcc_mru=NULL;
 
-    g_object_set (gtk_settings_get_default (),
-		  "gtk-fallback-icon-theme", "gnome", NULL);
+    g_object_set(gtk_settings_get_for_screen(gdk_screen_get_default()),
+                 "gtk-fallback-icon-theme", "gnome", NULL);
 }
 
 void

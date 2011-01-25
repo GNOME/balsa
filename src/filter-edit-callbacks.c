@@ -834,6 +834,7 @@ condition_dialog_response(GtkWidget * dialog, gint response,
 {
     LibBalsaCondition *new_cnd;
     GError *err = NULL;
+    GdkScreen *screen;
 
     switch (response) {
     case GTK_RESPONSE_OK:       /* OK button */
@@ -889,8 +890,8 @@ condition_dialog_response(GtkWidget * dialog, gint response,
         gtk_widget_hide(dialog);
         break;
     case GTK_RESPONSE_HELP:     /* Help button */
-        gtk_show_uri(gdk_screen_get_default(),
-                     "ghelp:balsa?win-condition",
+        screen = gtk_widget_get_screen(dialog);
+        gtk_show_uri(screen, "ghelp:balsa?win-condition",
                      gtk_get_current_event_time(), &err);
 	if (err) {
 	    balsa_information_parented(GTK_WINDOW(dialog),
@@ -1448,7 +1449,7 @@ void fe_destroy_window_cb(GtkWidget * widget,gpointer throwaway)
 /*
  * fe_dialog_response()
  *
- * Handles the clicking of the main buttons at the 
+ * Handles the clicking of the main buttons at the
  * bottom of the dialog.  wooo.
  */
 void
@@ -1459,13 +1460,14 @@ fe_dialog_response(GtkWidget * dialog, gint response, gpointer data)
     GtkTreeIter iter;
     gboolean valid;
     GError *err = NULL;
-    
+    GdkScreen *screen;
+
     switch (response) {
     case GTK_RESPONSE_OK:       /* OK button */
         /* We clear the old filters */
         libbalsa_filter_clear_filters(balsa_app.filters,TRUE);
         balsa_app.filters=NULL;
-        
+
         /* We put the modified filters */
     for (valid = gtk_tree_model_get_iter_first(model, &iter); valid;
          valid = gtk_tree_model_iter_next(model, &iter)) {
@@ -1497,8 +1499,8 @@ fe_dialog_response(GtkWidget * dialog, gint response, gpointer data)
         break;
 
     case GTK_RESPONSE_HELP:     /* Help button */
-        gtk_show_uri(gdk_screen_get_default(),
-                     "ghelp:balsa?win-filters",
+        screen = gtk_widget_get_screen(dialog);
+        gtk_show_uri(screen, "ghelp:balsa?win-filters",
                      gtk_get_current_event_time(), &err);
 	if (err) {
 	    balsa_information_parented(GTK_WINDOW(dialog),

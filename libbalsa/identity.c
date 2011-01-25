@@ -585,7 +585,7 @@ static void new_ident_cb(GtkTreeView * tree, GObject * dialog);
 static void delete_ident_cb(GtkTreeView * tree, GtkWidget * dialog);
 static void delete_ident_response(GtkWidget * confirm, gint response,
                                   IdentityDeleteInfo * di);
-static void help_ident_cb(void);
+static void help_ident_cb(GtkWidget * widget);
 
 static void set_default_ident_cb(GtkTreeView * tree, GtkTreePath * path,
                                  GtkTreeViewColumn * column,
@@ -1658,11 +1658,13 @@ delete_ident_response(GtkWidget * confirm, gint response,
  * Show the help file.
  */
 static void
-help_ident_cb(void)
+help_ident_cb(GtkWidget * widget)
 {
+    GdkScreen *screen;
     GError *err = NULL;
 
-    gtk_show_uri(gdk_screen_get_default(), "ghelp:balsa?identities",
+    screen = gtk_widget_get_screen(widget);
+    gtk_show_uri(screen, "ghelp:balsa?identities",
                  gtk_get_current_event_time(), &err);
 
     if (err) {
@@ -1782,7 +1784,7 @@ md_response_cb(GtkWidget * dialog, gint response, GtkTreeView * tree)
         delete_ident_cb(tree, dialog);
         return;
     case IDENTITY_RESPONSE_HELP:
-        help_ident_cb();
+        help_ident_cb(dialog);
         return;
     default:
         break;

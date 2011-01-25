@@ -3559,6 +3559,7 @@ balsa_help_pbox_display(void)
     gchar *link_id;
     GError *err = NULL;
     gchar *uri;
+    GdkScreen *screen;
 
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(pui->view));
     if (!gtk_tree_selection_get_selected(selection, &model, &iter))
@@ -3571,8 +3572,8 @@ balsa_help_pbox_display(void)
     g_free(text);
 
     uri = g_strconcat("ghelp:balsa?", link_id, NULL);
-    gtk_show_uri(gdk_screen_get_default(), uri,
-                 gtk_get_current_event_time(), &err);
+    screen = gtk_widget_get_screen(pui->view);
+    gtk_show_uri(screen, uri, gtk_get_current_event_time(), &err);
     g_free(uri);
     if (err) {
         balsa_information(LIBBALSA_INFORMATION_WARNING,

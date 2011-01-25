@@ -414,13 +414,14 @@ static void
 smtp_server_response(GtkDialog * dialog, gint response,
                      struct smtp_server_dialog_info *sdi)
 {
+    GdkScreen *screen;
     LibBalsaServer *server = LIBBALSA_SERVER(sdi->smtp_server);
     GError *error = NULL;
 
     switch (response) {
     case GTK_RESPONSE_HELP:
-        gtk_show_uri(gdk_screen_get_default(),
-                     "ghelp:balsa?smtp-server-config",
+        screen = gtk_widget_get_screen(GTK_WIDGET(dialog));
+        gtk_show_uri(screen, "ghelp:balsa?smtp-server-config",
                      gtk_get_current_event_time(), &error);
         if (error) {
             libbalsa_information(LIBBALSA_INFORMATION_WARNING,

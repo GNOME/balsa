@@ -385,7 +385,9 @@ case "$use_html_widget" in
     ;;
     gtkhtml3)
         AC_MSG_RESULT([$use_html_widget])
-        PKG_CHECK_MODULES(HTML, [ libgtkhtml-3.14 ])
+        PKG_CHECK_MODULES(HTML, [ libgtkhtml-3.14 ], [],
+          [PKG_CHECK_MODULES(HTML, [ libgtkhtml-3.15 ],[],
+             [AC_MSG_ERROR([*** You enabled gtkhtml3 but none of 3.14 or 3.15 libversions were found.])])])
         AC_DEFINE(HAVE_GTKHTML3,1,[Defined when GtkHtml-3 can be used.])
     ;;
     webkit)

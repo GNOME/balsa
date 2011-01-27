@@ -1019,10 +1019,10 @@ imap_mbox_handle_finalize(GObject* gobject)
   mbox_view_dispose(&handle->mbox_view);
   imap_mbox_resize_cache(handle, 0);
   g_free(handle->msg_cache); handle->msg_cache = NULL;
-  g_array_free(handle->flag_cache, TRUE);
+  g_array_free(handle->flag_cache, TRUE); handle->flag_cache = NULL;
   g_list_foreach(handle->acls, (GFunc)imap_user_acl_free, NULL);
-  g_list_free(handle->acls);
-  g_free(handle->quota_root);
+  g_list_free(handle->acls); handle->acls = NULL;
+  g_free(handle->quota_root); handle->quota_root = NULL;
 
   HANDLE_UNLOCK(handle);
 #if defined(BALSA_USE_THREADS)

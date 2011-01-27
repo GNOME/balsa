@@ -87,7 +87,7 @@ balsa_druid_page_user_init(BalsaDruidPageUser * user,
 #endif
     label = GTK_LABEL(gtk_label_new(_(header2)));
     gtk_label_set_line_wrap(label, TRUE);
-    gtk_box_pack_start(GTK_BOX(page), GTK_WIDGET(label), TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(page), GTK_WIDGET(label), FALSE, TRUE, 0);
 
     table = GTK_TABLE(gtk_table_new(10, 2, FALSE));
 
@@ -151,8 +151,7 @@ balsa_druid_page_user_init(BalsaDruidPageUser * user,
                                &(user->localmaildir));
     g_free(preset);
 #endif
-    gtk_box_pack_start(GTK_BOX(page), GTK_WIDGET(table), TRUE, TRUE,
-                       8);
+    gtk_box_pack_start(GTK_BOX(page), GTK_WIDGET(table), FALSE, FALSE, 8);
 
     user->need_set = FALSE;
 }

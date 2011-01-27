@@ -153,6 +153,17 @@
 	for GtkSourceView-1.
 	* libbalsa/libbalsa.h: ditto.
 
+2011-01-15  Pawel Salek
+
+	* autogen.sh: port fixes from bootstrap.sh (inspired by pancake).
+	* configure.in: support libgtkhtml-3.15 lib version.
+
+	* libbalsa/imap-server.c: libbalsa_imap_server_get_handle() check
+	if the parameter passed is non-null (credit to pancake).
+	* libbalsa/imap/imap-handle.c: zeroize released pointers (pancake).
+	* libinit_balsa/assistant_page_user.c: fix widget packing (pancake).
+	* src/balsa-index.c: return FALSE on failure (pancake).
+
 2011-01-11  Peter Bloomfield
 
 	* src/balsa-mime-widget-message.c
@@ -299,7 +310,7 @@
 
 2010-11-19  Pawel Salek
 
-	* Configure.in: compile against libnotify-0.4.x as well.
+	* Configure.in: compile against libnotify-0.4.x as well. 
 
 2010-11-19  Pawel Salek
 

@@ -661,7 +661,7 @@ libbalsa_imap_server_get_handle(LibBalsaImapServer *imap_server, GError **err)
     struct handle_info *info = NULL;
     ImapResult rc;
 
-    if (imap_server->offline_mode)
+    if (!imap_server || imap_server->offline_mode)
         return NULL;
 
     LOCK_SERVER(imap_server);

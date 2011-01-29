@@ -52,6 +52,7 @@ struct BalsaToolbarModel_ {
     GSList          *current;
     BalsaToolbarType type;
     GtkToolbarStyle  style;
+    GSettings       *settings;
 };
 
 enum {
@@ -67,6 +68,7 @@ balsa_toolbar_model_finalize(GObject * object)
 {
     BalsaToolbarModel *model = BALSA_TOOLBAR_MODEL(object);
     g_hash_table_destroy(model->legal);
+    g_object_unref(model->settings);
     G_OBJECT_CLASS(parent_class)->finalize(object);
 }
 
@@ -272,7 +274,7 @@ tm_gsettings_change_cb(GSettings   * settings,
 {
     BalsaToolbarModel *model = user_data;
 
-    if (!strcmp(key, "toolbar_style") &&
+    if (!strcmp(key, "toolbar-style") &&
         model->style == (GtkToolbarStyle) (-1))
         balsa_toolbar_model_changed(model);
 }
@@ -284,16 +286,14 @@ balsa_toolbar_model_new(BalsaToolbarType type, GSList * standard)
 {
     BalsaToolbarModel *model =
         g_object_new(BALSA_TYPE_TOOLBAR_MODEL, NULL);
-    GSettings *settings;
 
     model->type = type;
     model->standard = standard;
     tm_load_model(model);
 
-    settings = g_settings_new("org.gnome.desktop.interface");
-    g_signal_connect(G_OBJECT(settings), "changed",
+    model->settings = g_settings_new("org.gnome.desktop.interface");
+    g_signal_connect(model->settings, "changed",
                      G_CALLBACK(tm_gsettings_change_cb), model);
-    g_object_unref(settings);
 
     return model;
 }
@@ -541,6 +541,7 @@ tm_default_style(void)
             }
         g_free(str);
     }
+    g_object_unref(settings);
 
     return default_style;
 }

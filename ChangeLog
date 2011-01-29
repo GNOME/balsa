@@ -1,3 +1,10 @@
+2011-01-29  Peter Bloomfield
+
+	* src/toolbar-factory.c (balsa_toolbar_model_finalize),
+	(tm_gsettings_change_cb), (balsa_toolbar_model_new),
+	(tm_default_style): really use the desktop default when so
+	configured.
+
 2011-01-28  Peter Bloomfield
 
 	Migrate from GConf to GSettings

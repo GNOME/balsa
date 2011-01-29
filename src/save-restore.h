@@ -43,9 +43,7 @@ void config_mailbox_set_as_special(LibBalsaMailbox * mailbox,
 gint config_load(void);
 void config_load_sections(void);
 gint config_save(void);
-#if HAVE_GNOME
 void config_defclient_save(void);
-#endif
 
 gchar *mailbox_get_pkey(const LibBalsaMailbox * mbox);
 gint config_mailbox_add(LibBalsaMailbox * mailbox, const char *key_arg);

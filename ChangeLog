@@ -1,5 +1,18 @@
 2011-01-28  Peter Bloomfield
 
+	Migrate from GConf to GSettings
+
+	* libinit_balsa/assistant_page_defclient.c
+	(balsa_druid_page_defclient):
+	* src/ab-main.c (main):
+	* src/main.c (config_init), (mailboxes_init), (main):
+	* src/save-restore.c (config_global_load), (config_defclient_save):
+	* src/save-restore.h:
+	* src/toolbar-factory.c (tm_gsettings_change_cb),
+	(balsa_toolbar_model_new), (tm_default_style):
+
+2011-01-28  Peter Bloomfield
+
 	* src/balsa-index.c (balsa_index_load_mailbox_node): fix failed
 	assertion.
 

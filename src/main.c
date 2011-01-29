@@ -28,10 +28,6 @@
 #include <unique/unique.h>
 #endif                          /* HAVE_UNIQUE */
 
-#ifdef GTKHTML_HAVE_GCONF
-# include <gconf/gconf.h>
-#endif
-
 #include <signal.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -436,9 +432,7 @@ config_init(gboolean check_only)
 {
     while(!config_load() && !check_only) {
 	balsa_init_begin();
-#if HAVE_GNOME
         config_defclient_save();
-#endif
     }
 }
 
@@ -449,9 +443,7 @@ mailboxes_init(gboolean check_only)
     if (!balsa_app.inbox && !check_only) {
 	g_warning("*** error loading mailboxes\n");
 	balsa_init_begin();
-#if HAVE_GNOME
         config_defclient_save();
-#endif
 	return;
     }
 }
@@ -844,10 +836,6 @@ main(int argc, char *argv[])
 		e = e->next;
 	    }
     }
-#endif
-
-#ifdef GTKHTML_HAVE_GCONF
-    gconf_init(argc, argv, NULL);
 #endif
 
     balsa_app_init();

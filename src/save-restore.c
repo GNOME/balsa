@@ -26,9 +26,6 @@
 
 #include <stdlib.h>
 #include <string.h>
-#if HAVE_GNOME
-#include <gconf/gconf-client.h>
-#endif
 #include <glib/gi18n.h>
 #include "balsa-app.h"
 #include "server.h"
@@ -71,8 +68,6 @@ static void load_mru(GList **mru, const gchar * group);
 
 static void config_address_books_save(void);
 static void config_identities_load(void);
-
-static void check_for_old_sigs(GList * id_list_tmp);
 
 static void config_filters_load(void);
 
@@ -615,9 +610,6 @@ config_global_load(void)
 			       "Filters may not be correct."),
  			     filter_strerror(filter_errno));
     }
-
-    /* find and convert old-style signature entries */
-    check_for_old_sigs(balsa_app.identities);
 
     /* Section for the balsa_information() settings... */
     libbalsa_conf_push_group("InformationMessages");
@@ -2118,88 +2110,33 @@ save_mru(GList * mru, const gchar * group)
     libbalsa_conf_pop_group();
 }
 
-/* check_for_old_sigs:
-   function for old style signature conversion (executable sigs prefixed
-   with '|') to new style (filename and a checkbox).
-   this function just strips the leading '|'.
-*/
-static void 
-check_for_old_sigs(GList * id_list_tmp)
-{
-    /* strip pipes and spaces,set executable flag if warranted */
-    /* FIXME remove after a few stable releases.*/
-    
-    LibBalsaIdentity* id_tmp = NULL;
-    
-    for (id_list_tmp = balsa_app.identities; id_list_tmp; 
-         id_list_tmp = id_list_tmp->next) {
-       
-        id_tmp = LIBBALSA_IDENTITY(id_list_tmp->data);
-        if(!id_tmp->signature_path) continue;
-
-        id_tmp->signature_path = g_strstrip(id_tmp->signature_path);
-        if(*id_tmp->signature_path == '|'){
-            printf("Found old style signature for identity: %s\n"\
-                   "Converting: %s --> ", id_tmp->identity_name, 
-                   id_tmp->signature_path);
-            id_tmp->signature_path = g_strchug(id_tmp->signature_path+1);
-            printf("%s \n", id_tmp->signature_path);
-            
-            /* set new-style executable var*/
-            id_tmp->sig_executable=TRUE;
-            printf("Setting converted signature as executable.\n");
-        }
-    }
-}
-
-#if HAVE_GNOME
 void
 config_defclient_save(void)
 {
     static struct {
         const char *key, *val;
-    } gconf_string[] = {
-        {"/desktop/gnome/url-handlers/mailto/command",     "balsa -m \"%s\""},
-        {"/desktop/gnome/url-handlers/mailto/description", "Email" }};
+    } settings_string[] = { {
+    "command", "balsa -m \"%s\""}, {
+    "description", "Email"}};
     static struct {
-        const char *key; gboolean val;
-    } gconf_bool[] = {
-        {"/desktop/gnome/url-handlers/mailto/need-terminal", FALSE},
-        {"/desktop/gnome/url-handlers/mailto/enabled",       TRUE}};
+        const char *key;
+        gboolean val;
+    } settings_bool[] = { {
+    "need-terminal", FALSE}, {
+    "-handlers/mailto/enabled", TRUE}};
 
     if (balsa_app.default_client) {
-        GError *err = NULL;
-        GConfClient *gc;
+        GSettings *settings;
         unsigned i;
-        gc = gconf_client_get_default(); /* FIXME: error handling */
-        if (gc == NULL) {
-            balsa_information(LIBBALSA_INFORMATION_WARNING,
-                              _("Error opening GConf database\n"));
-            return;
+
+        settings = g_settings_new("desktop.gnome.url-handlers.mailto");
+        for (i = 0; i < G_N_ELEMENTS(settings_string); i++) {
+            g_settings_set_string(settings, settings_string[i].key,
+                                  settings_string[i].val);
         }
-        for(i=0; i<ELEMENTS(gconf_string); i++) {
-            gconf_client_set_string(gc, gconf_string[i].key, 
-                                    gconf_string[i].val, &err);
-            if (err) {
-                balsa_information(LIBBALSA_INFORMATION_WARNING,
-                                  _("Error setting GConf field: %s\n"),
-                                  err->message);
-                g_error_free(err);
-                return;
-            }
-        }
-        for(i=0; i<ELEMENTS(gconf_bool); i++) {
-            gconf_client_set_bool(gc, gconf_bool[i].key,
-                                  gconf_bool[i].val, &err);
-            if (err) {
-                balsa_information(LIBBALSA_INFORMATION_WARNING,
-                                  _("Error setting GConf field: %s\n"),
-                                  err->message);
-                g_error_free(err);
-                return;
-            }
-            g_object_unref(gc);
+        for (i = 0; i < G_N_ELEMENTS(settings_bool); i++) {
+            g_settings_set_boolean(settings, settings_bool[i].key,
+                                   settings_bool[i].val);
         }
     }
 }
-#endif /* HAVE_GNOME */

@@ -31,7 +31,6 @@
 #include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <gconf/gconf-client.h>
 
 #include <glib/gi18n.h>
 #include "balsa-app.h"
@@ -80,22 +79,18 @@ balsa_druid_page_defclient(GtkAssistant *druid, GdkPixbuf *default_logo)
 {
     BalsaDruidPageDefclient *defclient;
     GtkWidget *page;
-    GConfClient *gc;
+    GSettings *settings;
 
-    gc = gconf_client_get_default(); /* FIXME: error handling */
-    if(gc) {
-        GError *err = NULL;
-        gchar *cmd;
-        gboolean set_to_balsa_already;
-        cmd = 
-            gconf_client_get_string
-            (gc, "/desktop/gnome/url-handlers/mailto/command", &err);
-        set_to_balsa_already = !err && cmd && strncmp(cmd,"balsa",5)==0;
-        if(err) g_error_free(err);
-        g_free(cmd);
-        if(set_to_balsa_already)
-            return;
-    }
+    gchar *cmd;
+    gboolean set_to_balsa_already;
+
+    settings = g_settings_new("org.gnome.url-handlers.mailto");
+    cmd = g_settings_get_string(settings, "command");
+    set_to_balsa_already = cmd && !strncmp(cmd, "balsa", 5);
+    g_free(cmd);
+    if (set_to_balsa_already)
+        return;
+
     defclient = g_new0(BalsaDruidPageDefclient, 1);
     page = gtk_vbox_new(FALSE, FALSE);
     gtk_assistant_append_page(druid, page);

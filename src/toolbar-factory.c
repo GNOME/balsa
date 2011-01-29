@@ -25,10 +25,6 @@
 #include "toolbar-factory.h"
 
 #include <string.h>
-#if HAVE_GNOME
-#include <gconf/gconf-client.h>
-#endif
-
 #include <glib/gi18n.h>
 
 #include "balsa-app.h"
@@ -267,17 +263,19 @@ tm_save_model(BalsaToolbarModel * model)
     libbalsa_conf_pop_group();
 }
 
-#if HAVE_GNOME
-/* GConfClientNotifyFunc
+/* GSettings change_cb
  */
 static void
-tm_gconf_notify(GConfClient * client, guint cnxn_id, GConfEntry * entry,
-                BalsaToolbarModel * model)
+tm_gsettings_change_cb(GSettings   * settings,
+                       const gchar * key,
+                       gpointer      user_data)
 {
-    if (model->style == (GtkToolbarStyle) (-1))
+    BalsaToolbarModel *model = user_data;
+
+    if (!strcmp(key, "toolbar_style") &&
+        model->style == (GtkToolbarStyle) (-1))
         balsa_toolbar_model_changed(model);
 }
-#endif /* HAVE_GNOME */
 
 /* Create a BalsaToolbarModel structure.
  */
@@ -286,24 +284,16 @@ balsa_toolbar_model_new(BalsaToolbarType type, GSList * standard)
 {
     BalsaToolbarModel *model =
         g_object_new(BALSA_TYPE_TOOLBAR_MODEL, NULL);
-#if HAVE_GNOME
-    GConfClient *conf;
-    guint notify_id;
-#endif
+    GSettings *settings;
 
     model->type = type;
     model->standard = standard;
     tm_load_model(model);
 
-#if HAVE_GNOME
-    conf = gconf_client_get_default();
-    /* We never destroy a model, so we do nothing with the notify-id: */
-    notify_id =
-        gconf_client_notify_add(conf,
-                                "/desktop/gnome/interface/toolbar_style",
-                                (GConfClientNotifyFunc) tm_gconf_notify,
-                                model, NULL, NULL);
-#endif /* HAVE_GNOME */
+    settings = g_settings_new("org.gnome.desktop.interface");
+    g_signal_connect(G_OBJECT(settings), "changed",
+                     G_CALLBACK(tm_gsettings_change_cb), model);
+    g_object_unref(settings);
 
     return model;
 }
@@ -535,15 +525,12 @@ static GtkToolbarStyle
 tm_default_style(void)
 {
     GtkToolbarStyle default_style = GTK_TOOLBAR_BOTH;
-#if HAVE_GNOME
-    GConfClient *conf;
+    GSettings *settings;
     gchar *str;
 
     /* Get global setting */
-    conf = gconf_client_get_default();
-    str  = gconf_client_get_string(conf,
-                                   "/desktop/gnome/interface/toolbar_style",
-                                   NULL);
+    settings = g_settings_new("org.gnome.desktop.interface");
+    str  = g_settings_get_string(settings, "toolbar-style");
     if (str) {
         guint i;
 
@@ -554,7 +541,6 @@ tm_default_style(void)
             }
         g_free(str);
     }
-#endif /* HAVE_GNOME */
 
     return default_style;
 }

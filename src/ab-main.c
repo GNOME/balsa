@@ -27,10 +27,6 @@
 #include <string.h>
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
-#ifdef GTKHTML_HAVE_GCONF
-# include <gconf/gconf.h>
-#endif
-
 
 #ifdef HAVE_LOCALE_H
 #include <locale.h>
@@ -1108,10 +1104,6 @@ main(int argc, char *argv[])
 
     /* FIXME: do we need to allow a non-GUI mode? */
     gtk_init_check(&argc, &argv);
-
-#ifdef GTKHTML_HAVE_GCONF
-    gconf_init(argc, argv, NULL);
-#endif
 
     bab_init();
     LIBBALSA_TYPE_ADDRESS_BOOK_VCARD;

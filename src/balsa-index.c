@@ -1031,7 +1031,7 @@ balsa_index_load_mailbox_node (BalsaIndex * index,
     } while(try_cnt++<3);
 
     if (!successp)
-	return FALSE;
+	return TRUE;
 
     /*
      * set the new mailbox

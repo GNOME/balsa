@@ -1,5 +1,13 @@
 2011-01-30  Peter Bloomfield
 
+	* src/toolbar-factory.c (balsa_toolbar_model_finalize),
+	(balsa_toolbar_model_new): do not refer to "org.gnome.*" when
+	not HAVE_GNOME;
+	(tm_populate), (tm_default_style): add empty second line only
+	for GTK_TOOLBAR_BOTH.
+
+2011-01-30  Peter Bloomfield
+
 	* configure.in: restore HAVE_GNOME to wrap reference to
 	"org.gnome.*".
 

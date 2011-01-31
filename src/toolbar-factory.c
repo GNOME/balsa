@@ -52,7 +52,9 @@ struct BalsaToolbarModel_ {
     GSList          *current;
     BalsaToolbarType type;
     GtkToolbarStyle  style;
+#if HAVE_GNOME
     GSettings       *settings;
+#endif /* HAVE_GNOME */
 };
 
 enum {
@@ -68,7 +70,9 @@ balsa_toolbar_model_finalize(GObject * object)
 {
     BalsaToolbarModel *model = BALSA_TOOLBAR_MODEL(object);
     g_hash_table_destroy(model->legal);
+#if HAVE_GNOME
     g_object_unref(model->settings);
+#endif /* HAVE_GNOME */
     G_OBJECT_CLASS(parent_class)->finalize(object);
 }
 
@@ -265,6 +269,7 @@ tm_save_model(BalsaToolbarModel * model)
     libbalsa_conf_pop_group();
 }
 
+#if HAVE_GNOME
 /* GSettings change_cb
  */
 static void
@@ -278,6 +283,7 @@ tm_gsettings_change_cb(GSettings   * settings,
         model->style == (GtkToolbarStyle) (-1))
         balsa_toolbar_model_changed(model);
 }
+#endif /* HAVE_GNOME */
 
 /* Create a BalsaToolbarModel structure.
  */
@@ -291,9 +297,11 @@ balsa_toolbar_model_new(BalsaToolbarType type, GSList * standard)
     model->standard = standard;
     tm_load_model(model);
 
+#if HAVE_GNOME
     model->settings = g_settings_new("org.gnome.desktop.interface");
     g_signal_connect(model->settings, "changed",
                      G_CALLBACK(tm_gsettings_change_cb), model);
+#endif /* HAVE_GNOME */
 
     return model;
 }
@@ -459,15 +467,14 @@ static void
 tm_populate(BalsaToolbarModel * model, GtkUIManager * ui_manager,
             GArray * merge_ids)
 {
-    gboolean style_is_both_horiz;
+    gboolean style_is_both;
     gboolean make_two_line;
     GSList *list;
 
-    style_is_both_horiz = (model->style == GTK_TOOLBAR_BOTH_HORIZ
-                           || (model->style == (GtkToolbarStyle) -1
-                               && tm_default_style() ==
-                               GTK_TOOLBAR_BOTH_HORIZ));
-    make_two_line = !style_is_both_horiz && tm_has_second_line(model);
+    style_is_both = (model->style == GTK_TOOLBAR_BOTH
+                     || (model->style == (GtkToolbarStyle) -1
+                         && tm_default_style() == GTK_TOOLBAR_BOTH));
+    make_two_line = style_is_both && tm_has_second_line(model);
 
     for (list = balsa_toolbar_model_get_current(model); list;
          list = list->next) {
@@ -525,6 +532,7 @@ static GtkToolbarStyle
 tm_default_style(void)
 {
     GtkToolbarStyle default_style = GTK_TOOLBAR_BOTH;
+#if HAVE_GNOME
     GSettings *settings;
     gchar *str;
 
@@ -542,6 +550,7 @@ tm_default_style(void)
         g_free(str);
     }
     g_object_unref(settings);
+#endif /* HAVE_GNOME */
 
     return default_style;
 }

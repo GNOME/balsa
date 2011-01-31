@@ -1,3 +1,7 @@
+2011-01-30  Peter Bloomfield
+
+	* balsa.desktop.in: add MimeType=x-scheme-handler/mailto.
+
 2011-01-29  Peter Bloomfield
 
 	* src/toolbar-factory.c (balsa_toolbar_model_finalize),

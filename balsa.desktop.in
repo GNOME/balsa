@@ -8,3 +8,4 @@ Terminal=false
 Type=Application
 StartupNotify=true
 Categories=GNOME;Network;Email;
+MimeType=x-scheme-handler/mailto

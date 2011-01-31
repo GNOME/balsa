@@ -26,6 +26,9 @@
 
 #include <stdlib.h>
 #include <string.h>
+#if HAVE_GNOME
+#include <gconf/gconf-client.h>
+#endif
 #include <glib/gi18n.h>
 #include "balsa-app.h"
 #include "server.h"
@@ -2122,27 +2125,48 @@ config_defclient_save(void)
 {
     static struct {
         const char *key, *val;
-    } settings_string[] = { {
-    "command", "balsa -m \"%s\""}, {
-    "description", "Email"}};
+    } gconf_string[] = {
+        {"/desktop/gnome/url-handlers/mailto/command",     "balsa -m \"%s\""},
+        {"/desktop/gnome/url-handlers/mailto/description", "Email" }};
+    static struct {
+        const char *key; gboolean val;
+    } gconf_bool[] = {
+        {"/desktop/gnome/url-handlers/mailto/need-terminal", FALSE},
+        {"/desktop/gnome/url-handlers/mailto/enabled",       TRUE}};
 
     if (balsa_app.default_client) {
-        GSettings *settings;
+        GError *err = NULL;
+        GConfClient *gc;
         unsigned i;
-
-        settings = g_settings_new("org.gnome.desktop.url-handlers.mailto");
-        for (i = 0; i < G_N_ELEMENTS(settings_string); i++) {
-            g_settings_set_string(settings, settings_string[i].key,
-                                  settings_string[i].val);
+        gc = gconf_client_get_default(); /* FIXME: error handling */
+        if (gc == NULL) {
+            balsa_information(LIBBALSA_INFORMATION_WARNING,
+                              _("Error opening GConf database\n"));
+            return;
         }
-        g_settings_set_boolean(settings, "need-terminal", FALSE);
-        g_object_unref(settings);
-
-        settings =
-            g_settings_new
-            ("org.gnome.desktop.url-handlers.mailto-handlers.mailto");
-        g_settings_set_boolean(settings, "enabled", TRUE);
-        g_object_unref(settings);
+        for(i=0; i<ELEMENTS(gconf_string); i++) {
+            gconf_client_set_string(gc, gconf_string[i].key, 
+                                    gconf_string[i].val, &err);
+            if (err) {
+                balsa_information(LIBBALSA_INFORMATION_WARNING,
+                                  _("Error setting GConf field: %s\n"),
+                                  err->message);
+                g_error_free(err);
+                return;
+            }
+        }
+        for(i=0; i<ELEMENTS(gconf_bool); i++) {
+            gconf_client_set_bool(gc, gconf_bool[i].key,
+                                  gconf_bool[i].val, &err);
+            if (err) {
+                balsa_information(LIBBALSA_INFORMATION_WARNING,
+                                  _("Error setting GConf field: %s\n"),
+                                  err->message);
+                g_error_free(err);
+                return;
+            }
+            g_object_unref(gc);
+        }
     }
 }
-#endif                          /* HAVE_GNOME */
+#endif /* HAVE_GNOME */

@@ -1,5 +1,14 @@
 2011-01-30  Peter Bloomfield
 
+	Revert from GSettings to GConf for default client stuff
+
+	* configure.in:
+	* libinit_balsa/assistant_page_defclient.c
+	(balsa_druid_page_defclient):
+	* src/save-restore.c (config_defclient_save):
+
+2011-01-30  Peter Bloomfield
+
 	Silence whining from gcc-4.6
 
 	* libbalsa/files.c (libbalsa_icon_finder):

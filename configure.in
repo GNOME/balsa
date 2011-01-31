@@ -281,24 +281,27 @@ dnl #####################################################################
 dnl GNOME libs
 dnl #####################################################################
 
-AC_MSG_CHECKING([whether we have gnome-keyring])
-if $PKG_CONFIG --atleast-version=1.0 gnome-keyring-1; then
-   gnome_extras="$gnome_extras gnome-keyring-1"
-   AC_DEFINE(HAVE_GNOME_KEYRING,1,[Defined when gnome-keyring is there.])
-   # Work around http://bugzilla.gnome.org/show_bug.cgi?id=556530
-   if $PKG_CONFIG --atleast-version=2.24.1 gnome-keyring-1; then
-      AC_DEFINE(HAVE_GNOME_KEYRING_24,1,
-                [Defined with gnome-keyring-2.24 or newer.])
-   fi
-   with_gnome_keyring=yes
-else
-   with_gnome_keyring=no
-fi
-AC_MSG_RESULT($with_gnome_keyring)
-
 if test x$with_gnome != xno; then
-  AC_DEFINE(HAVE_GNOME,1,[Defined when configured for Gnome.])
+   gnome_extras="gconf-2.0"
+   AC_MSG_CHECKING([whether we have gnome-keyring])
+   if $PKG_CONFIG --atleast-version=1.0 gnome-keyring-1; then
+      gnome_extras="$gnome_extras gnome-keyring-1"
+      AC_DEFINE(HAVE_GNOME_KEYRING,1,[Defined when gnome-keyring is there.])
+      # Work around http://bugzilla.gnome.org/show_bug.cgi?id=556530
+      if $PKG_CONFIG --atleast-version=2.24.1 gnome-keyring-1; then
+         AC_DEFINE(HAVE_GNOME_KEYRING_24,1,
+                   [Defined with gnome-keyring-2.24 or newer.])
+      fi
+      with_gnome_keyring=yes
+   else
+      with_gnome_keyring=no
+   fi
+   AC_MSG_RESULT($with_gnome_keyring)
+   AC_DEFINE(HAVE_GNOME,1,[Defined when gnome libs are available.])
+else
+   gnome_extras=""
 fi
+AM_CONDITIONAL([BUILD_WITH_GNOME], [test $with_gnome = "yes"])
 
 # GMime configuration
 #

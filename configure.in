@@ -296,6 +296,10 @@ else
 fi
 AC_MSG_RESULT($with_gnome_keyring)
 
+if test x$with_gnome != xno; then
+  AC_DEFINE(HAVE_GNOME,1,[Defined when configured for Gnome.])
+fi
+
 # GMime configuration
 #
 if test "$with_gmime" = detect; then

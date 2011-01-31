@@ -1,5 +1,10 @@
 2011-01-30  Peter Bloomfield
 
+	* configure.in: restore HAVE_GNOME to wrap reference to
+	"org.gnome.*".
+
+2011-01-30  Peter Bloomfield
+
 	* balsa.desktop.in: add MimeType=x-scheme-handler/mailto.
 
 2011-01-29  Peter Bloomfield

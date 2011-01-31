@@ -1,5 +1,30 @@
 2011-01-30  Peter Bloomfield
 
+	Silence whining from gcc-4.6
+
+	* libbalsa/files.c (libbalsa_icon_finder):
+	* libbalsa/filter-funcs.c (libbalsa_filter_export_sieve):
+	* libbalsa/identity.c (libbalsa_identity_get_signature):
+	* libbalsa/imap-server.c (libbalsa_imap_server_finalize):
+	* libbalsa/imap/imap-handle.c (ir_esearch):
+	* libbalsa/mailbox_imap.c (libbalsa_mailbox_imap_open):
+	* libbalsa/mailbox_local.c (libbalsa_mailbox_local_load_config):
+	* libbalsa/mailbox_maildir.c
+	(libbalsa_mailbox_maildir_add_message):
+	* libbalsa/rfc2445.c (date_time_2445_to_time_t):
+	* libbalsa/rfc3156.c (get_passphrase_cb):
+	* libbalsa/server.c (libbalsa_server_user_cb):
+	* libbalsa/smtp-server.c (libbalsa_smtp_server_finalize),
+	(libbalsa_smtp_server_class_init):
+	* src/address-book-config.c (create_generic_dialog):
+	* src/main.c (config_init), (mailboxes_init):
+	* src/save-restore.c (config_filter_load), (config_filters_save),
+	(config_defclient_save):
+	* src/sendmsg-window.c (edit_with_gnome_check):
+	* src/spell-check.c (balsa_spell_check_class_init):
+
+2011-01-30  Peter Bloomfield
+
 	* src/toolbar-factory.c (balsa_toolbar_model_finalize),
 	(balsa_toolbar_model_new): do not refer to "org.gnome.*" when
 	not HAVE_GNOME;

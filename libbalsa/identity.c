@@ -325,7 +325,6 @@ gchar*
 libbalsa_identity_get_signature(LibBalsaIdentity* identity, GtkWindow *parent)
 {
     FILE *fp = NULL;
-    size_t len = 0;
     gchar *ret = NULL, *path;
 
     if (identity->signature_path == NULL ||
@@ -337,7 +336,7 @@ libbalsa_identity_get_signature(LibBalsaIdentity* identity, GtkWindow *parent)
         /* signature is executable */
 	fp = popen(path,"r");
         if (fp) {
-            len = libbalsa_readfile_nostat(fp, &ret);
+            libbalsa_readfile_nostat(fp, &ret);
             pclose(fp);
         } else
             libbalsa_information_parented
@@ -348,7 +347,7 @@ libbalsa_identity_get_signature(LibBalsaIdentity* identity, GtkWindow *parent)
         /* sign is normal file */
         fp = fopen(path, "r");
         if (fp) {
-            len = libbalsa_readfile_nostat(fp, &ret);
+            libbalsa_readfile_nostat(fp, &ret);
             fclose(fp);
         } else
             libbalsa_information_parented(parent, LIBBALSA_INFORMATION_ERROR,

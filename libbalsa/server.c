@@ -435,8 +435,7 @@ libbalsa_server_user_cb(ImapUserEventType ue, void *arg, ...)
     }
     case IME_GET_USER:  { /* for eg kerberos */
         gchar **user;
-        gchar *dummy;
-        dummy = va_arg(alist, gchar*); /* Ignore the method */
+        va_arg(alist, gchar*); /* Ignore the method */
         user = va_arg(alist, gchar**);
         ok = va_arg(alist, int*);
         *ok = 1; /* consider popping up a dialog window here */
@@ -448,10 +447,9 @@ libbalsa_server_user_cb(ImapUserEventType ue, void *arg, ...)
         long vfy_result;
         SSL *ssl;
         X509 *cert;
-        const char *reason;
         ok = va_arg(alist, int*);
         vfy_result = va_arg(alist, long);
-        reason =  X509_verify_cert_error_string(vfy_result);
+        X509_verify_cert_error_string(vfy_result);
 #if 0
         printf("IMAP:TLS: failed cert verification: %ld : %s.\n",
                vfy_result, reason);

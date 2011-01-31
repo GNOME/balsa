@@ -233,18 +233,16 @@ libbalsa_imap_server_init(LibBalsaImapServer * imap_server)
 static void
 libbalsa_imap_server_finalize(GObject * object)
 {
-    LibBalsaServer *server;
     LibBalsaImapServer *imap_server;
 
     g_return_if_fail(LIBBALSA_IS_IMAP_SERVER(object));
 
-    server = LIBBALSA_SERVER(object);
     imap_server = LIBBALSA_IMAP_SERVER(object);
 
     LOCK_SERVERS();
     g_hash_table_remove(imap_servers, imap_server->key);
     UNLOCK_SERVERS();
-    
+
     g_source_remove(imap_server->connection_cleanup_id);
 
 #if 0

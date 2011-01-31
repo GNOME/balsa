@@ -65,12 +65,10 @@ typedef struct _LibBalsaSmtpServerClass {
 static void
 libbalsa_smtp_server_finalize(GObject * object)
 {
-    LibBalsaServer *server;
     LibBalsaSmtpServer *smtp_server;
 
     g_return_if_fail(LIBBALSA_IS_SMTP_SERVER(object));
 
-    server = LIBBALSA_SERVER(object);
     smtp_server = LIBBALSA_SMTP_SERVER(object);
 
     auth_destroy_context(smtp_server->authctx);
@@ -86,10 +84,8 @@ static void
 libbalsa_smtp_server_class_init(LibBalsaSmtpServerClass * klass)
 {
     GObjectClass *object_class;
-    LibBalsaServerClass *server_class;
 
     object_class = G_OBJECT_CLASS(klass);
-    server_class = LIBBALSA_SERVER_CLASS(klass);
 
     parent_class = g_type_class_peek_parent(klass);
 

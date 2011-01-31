@@ -1113,7 +1113,6 @@ edit_with_gnome_check(gpointer data) {
     GtkTextBuffer *buffer;
 
     pid_t pid;
-    gint curposition;
     gchar line[81]; /* FIXME:All lines should wrap at this line */
     /* Editor not ready */
     pid = waitpid (data_real->pid_editor, NULL, WNOHANG);
@@ -1160,7 +1159,6 @@ edit_with_gnome_check(gpointer data) {
 #endif                          /* HAVE_GTKSOURCEVIEW */
     sw_buffer_signals_block(data_real->bsmsg, buffer);
     gtk_text_buffer_set_text(buffer, "", 0);
-    curposition = 0;
     while(fgets(line, sizeof(line), tmp))
         gtk_text_buffer_insert_at_cursor(buffer, line, -1);
     sw_buffer_signals_unblock(data_real->bsmsg, buffer);

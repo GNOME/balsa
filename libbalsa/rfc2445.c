@@ -502,7 +502,6 @@ date_time_2445_to_time_t(const gchar * date_time)
     gint len;
     struct tm tm_buf;
     char strbuf[17];
-    gboolean is_utc;
     time_t the_time;
     struct tm utc_tm;
     time_t utc_time;
@@ -519,7 +518,6 @@ date_time_2445_to_time_t(const gchar * date_time)
     /* fill for conversion... */
     strcpy(strbuf, date_time);	/* safe, due to checks above */
     if (len == 16) {
-	is_utc = TRUE;
 	strbuf[15] = '\0';
     }
     FILL_TM(tm_buf.tm_sec, strbuf, 13);

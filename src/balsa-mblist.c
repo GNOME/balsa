@@ -396,7 +396,6 @@ bmbl_init(BalsaMBList * mblist)
     gtk_tree_view_column_set_fixed_width(column,
                                          balsa_app.mblist_newmsg_width);
     gtk_tree_view_column_set_resizable(column, TRUE);
-    gtk_tree_view_column_set_visible(column, mblist->display_info);
     gtk_tree_view_append_column(tree_view, column);
 #ifdef SORTING_MAILBOX_LIST_IS_USEFUL
     gtk_tree_view_column_set_sort_column_id(column,
@@ -421,7 +420,6 @@ bmbl_init(BalsaMBList * mblist)
     gtk_tree_view_column_set_fixed_width(column,
                                          balsa_app.mblist_totalmsg_width);
     gtk_tree_view_column_set_resizable(column, TRUE);
-    gtk_tree_view_column_set_visible(column, mblist->display_info);
     gtk_tree_view_append_column(tree_view, column);
 #ifdef SORTING_MAILBOX_LIST_IS_USEFUL
     gtk_tree_view_column_set_sort_column_id(column,

@@ -1,11 +1,16 @@
 2011-02-05  Peter Bloomfield
 
+	* src/balsa-message.c (hide_all_parts): just destroy the
+	children, no need to recurse deeper.
+
+2011-02-05  Peter Bloomfield
+
 	* src/balsa-mblist.c (bmbl_init): remove redundant and crashing
 	column-set-visible.
 
 2011-02-05  Peter Bloomfield
 
-	* configure.in: GtkHTML-4 is the new GtkHtml-3.
+	* configure.in: GtkHtml-4 is the new GtkHtml-3.
 	* libbalsa/html.c (libbalsa_html_new), (lbh_size_request_cb):
 	ditto; do not connect to "size-request" signal.
 

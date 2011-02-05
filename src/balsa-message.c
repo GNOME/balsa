@@ -2205,15 +2205,6 @@ gtk_tree_hide_func(GtkTreeModel * model, GtkTreePath * path,
 }
 
 static void
-bm_hide_all_helper(GtkWidget * widget, gpointer data)
-{
-    if (GTK_IS_CONTAINER(widget))
-	gtk_container_foreach(GTK_CONTAINER(widget), bm_hide_all_helper,
-			      NULL);
-    gtk_widget_destroy(widget);
-}
-
-static void
 hide_all_parts(BalsaMessage * bm)
 {
     if (bm->current_part) {
@@ -2227,7 +2218,7 @@ hide_all_parts(BalsaMessage * bm)
     }
 
     gtk_container_foreach(GTK_CONTAINER(bm->bm_widget->container),
-			  bm_hide_all_helper, NULL);
+                          (GtkCallback) gtk_widget_destroy, NULL);
 }
 
 /*

@@ -23,13 +23,13 @@
 /*
  * Support for HTML mail parts.
  *
- * Balsa supports three HTML engines: GtkHtml-2, GtkHTML-3, and WebKit.
+ * Balsa supports three HTML engines: GtkHtml-2, GtkHTML-4, and WebKit.
  * The symbol HAVE_HTML_WIDGET is defined if HTML support is requested at
  * configure time, and the requested engine is available.
  *
  * This file contains all code that depends on which widget is being
  * used. Elsewhere, HTML support code should be conditional on
- * HAVE_HTML_WIDGET, but none of HAVE_GTKHTML2, HAVE_GTKHTML3, or
+ * HAVE_HTML_WIDGET, but none of HAVE_GTKHTML2, HAVE_GTKHTML4, or
  * HAVE_WEBKIT should be referenced outside this file.
  *
  * As of this writing (2010-01), WebKit offers the most complete API,
@@ -705,23 +705,9 @@ lbh_hovering_over_link_cb(GtkWidget   * widget,
         (*info->hover_cb) (uri);
 }
 
-static void
-lbh_size_request_cb(GtkWidget      * widget,
-                    GtkRequisition * requisition,
-                    gpointer         data)
-{
-    GtkLayout *layout = GTK_LAYOUT(widget);
-    GtkAdjustment *adjustment;
+# ifdef HAVE_GTKHTML4
 
-    adjustment = gtk_layout_get_hadjustment(layout);
-    requisition->width = gtk_adjustment_get_upper(adjustment);
-    adjustment = gtk_layout_get_vadjustment(layout);
-    requisition->height = gtk_adjustment_get_upper(adjustment);
-}
-
-# ifdef HAVE_GTKHTML3
-
-/* Code for GtkHTML-3 */
+/* Code for GtkHTML-4 */
 
 #  include <gtkhtml/gtkhtml.h>
 #  include <gtkhtml/gtkhtml-stream.h>
@@ -844,9 +830,6 @@ libbalsa_html_new(LibBalsaMessageBody * body,
                      G_CALLBACK(libbalsa_html_url_requested),
                      body->message);
 
-    g_signal_connect(widget, "size-request",
-                     G_CALLBACK(lbh_size_request_cb), info);
-
     return widget;
 }
 
@@ -948,7 +931,7 @@ libbalsa_html_print(GtkWidget * widget)
     g_object_unref(operation);
 }
 
-# else				/* HAVE_GTKHTML3 */
+# else				/* HAVE_GTKHTML4 */
 
 /* Code for GtkHtml-2 */
 
@@ -965,6 +948,19 @@ libbalsa_html_write_mime_stream(HtmlStream * stream,
     while ((i = g_mime_stream_read(mime_stream, buf, sizeof(buf))) > 0)
 	html_stream_write(stream, buf, i);
     html_stream_close(stream);
+}
+
+static void
+lbh_size_request_cb(GtkWidget      * widget,
+                    GtkRequisition * requisition,
+                    gpointer         data)
+{
+    GtkAdjustment *hadjustment, *vadjustment;
+
+    g_object_get(G_OBJECT(widget), "hadjustment", &hadjustment,
+                                   "vadjustment", &vadjustment, NULL);
+    requisition->width  = gtk_adjustment_get_upper(hadjustment);
+    requisition->height = gtk_adjustment_get_upper(vadjustment);
 }
 
 /* Create a new HtmlView widget:
@@ -1104,7 +1100,7 @@ libbalsa_html_print(GtkWidget * widget)
 {
 }
 
-# endif				/* HAVE_GTKHTML3 */
+# endif				/* HAVE_GTKHTML4 */
 
 /* Common code for both widgets. */
 

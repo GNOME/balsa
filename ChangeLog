@@ -1,3 +1,9 @@
+2011-02-05  Peter Bloomfield
+
+	* configure.in: GtkHTML-4 is the new GtkHtml-3.
+	* libbalsa/html.c (libbalsa_html_new), (lbh_size_request_cb):
+	ditto; do not connect to "size-request" signal.
+
 2011-01-30  Peter Bloomfield
 
 	Revert from GSettings to GConf for default client stuff

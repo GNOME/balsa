@@ -124,7 +124,7 @@ AC_ARG_WITH(gss,
                   [with_gss=$withval],[with_gss=no])
 
 AC_ARG_WITH(html-widget,
-            AC_HELP_STRING([--with-html-widget=(no|gtkhtml2|gtkhtml3|webkit)],
+            AC_HELP_STRING([--with-html-widget=(no|gtkhtml2|gtkhtml4|webkit)],
                            [select the HTML renderer (default webkit)]),
             [use_html_widget=$withval],
             [use_html_widget=webkit])
@@ -390,12 +390,12 @@ case "$use_html_widget" in
         PKG_CHECK_MODULES(HTML, [ libgtkhtml-2.0 ])
         AC_DEFINE(HAVE_GTKHTML2,1,[Defined when GtkHtml-2 can be used.])
     ;;
-    gtkhtml3)
+    gtkhtml4)
         AC_MSG_RESULT([$use_html_widget])
-        PKG_CHECK_MODULES(HTML, [ libgtkhtml-3.14 ], [],
-          [PKG_CHECK_MODULES(HTML, [ libgtkhtml-3.15 ],[],
-             [AC_MSG_ERROR([*** You enabled gtkhtml3 but none of 3.14 or 3.15 libversions were found.])])])
-        AC_DEFINE(HAVE_GTKHTML3,1,[Defined when GtkHtml-3 can be used.])
+        PKG_CHECK_MODULES(HTML, [ libgtkhtml-4.0 ], [],
+          [PKG_CHECK_MODULES(HTML, [ libgtkhtml-4.0 ],[],
+             [AC_MSG_ERROR([*** You enabled gtkhtml4 but it was not found.])])])
+        AC_DEFINE(HAVE_GTKHTML4,1,[Defined when GtkHtml-4 can be used.])
     ;;
     webkit)
         AC_MSG_RESULT([$use_html_widget])

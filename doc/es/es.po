@@ -1,11 +1,14 @@
 # translation of balsa-help.HEAD.po to Español
 # Jorge González <jorgegonz@svn.gnome.org>, 2008, 2010.
+# Joaquín Ignacio Aramendía <samsagax@gmail.com>, 2011.
+# Daniel Mustieles <daniel.mustieles@gmail.com>, 2011.
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa-help.HEAD\n"
-"POT-Creation-Date: 2009-10-19 18:10+0000\n"
-"PO-Revision-Date: 2010-02-16 18:59+0100\n"
-"Last-Translator: Jorge González <jorgegonz@svn.gnome.org>\n"
+"POT-Creation-Date: 2011-01-15 10:52+0000\n"
+"PO-Revision-Date: 2011-02-17 18:19+0100\n"
+"Last-Translator: Daniel Mustieles <daniel.mustieles@gmail.com>\n"
 "Language-Team: Español <gnome-es-list@gnome.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -145,7 +148,6 @@ msgid "Salek"
 msgstr "Salek"
 
 #: C/balsa.xml:66(year)
-#| msgid "1997-2006"
 msgid "1997-2009"
 msgstr "1997-2009"
 
@@ -226,8 +228,10 @@ msgstr "26 de febrero de 2006"
 
 #: C/balsa.xml:116(para)
 msgid "This document is the extensive balsa manual."
-msgstr "Este documento es el manual extenso de Balsa."
+msgstr "Este documento es el manual general de Balsa."
 
+# Siempre la disyuntiva:
+# El anglicismo "interface" o "interfase", ambas tienen significados distintos.
 #: C/balsa.xml:125(para)
 msgid ""
 "<application>Balsa</application> is a graphical mail client. While it is in "
@@ -240,7 +244,19 @@ msgid ""
 "mail folders; automatic mail checking; mail printing; inline attachment "
 "viewing; and the proverbial much, much more."
 msgstr ""
+"<application>Balsa</application> es un cliente de correos con interfaz "
+"gráfica. Aunque actualmente está en desarrollo, <application>Balsa</"
+"application> posee muchas características como: soporte para <glossterm "
+"linkend=\"glossary-imap\"><acronym>IMAP</acronym></glossterm> y <glossterm "
+"linkend=\"glossary-pop\"><acronym>POP3</acronym></glossterm>; soporte para "
+"sendmail o <glossterm linkend=\"glossary-smtp\"><acronym>SMTP</acronym></"
+"glossterm> directo; envío y recepción de mensajes multi-hilo opcional; "
+"soporte para configuración de todas las carpetas locales de correo; revisión "
+"de correo automática; impresión de correo; visor de adjuntos en línea; y el "
+"proverbial mucho, mucho más..."
 
+# Un poco traído por los pelos, pero a ver si queda en contexto.
+# Revisar el link por si existe una versión castellana de Un FAQ similar.
 #: C/balsa.xml:136(para)
 msgid ""
 "This document will introduce a person who understands mail to using "
@@ -249,6 +265,12 @@ msgid ""
 "visiting the <ulink url=\"http://www.cs.queensu.ca/FAQs/email/\" type=\"http"
 "\">Email FAQ</ulink>."
 msgstr ""
+"Este documento explicará como usar <application>Balsa</application> a una "
+"persona que conoce el correo electrónico. Sin embargo no explicará el correo "
+"electrónico a una persona que no lo conozca. Para entender el correo "
+"electrónico, intente preguntar a un amigo o visite las <ulink url=\"http://"
+"www.cs.queensu.ca/FAQs/email/\" type=\"http\">Preguntas frecuentes sobre el "
+"corre-e</ulink> (en inglés)."
 
 #: C/balsa.xml:151(title)
 msgid "Introduction"
@@ -260,7 +282,13 @@ msgid ""
 "standard features of any good reader and has new features added continually. "
 "See the abstract above for a quick feature rundown."
 msgstr ""
+"<application>Balsa</application> es un cliente de correo electrónico con "
+"interfaz gráfica. Posee soporte para las características usuales de "
+"cualquier buen visor de correo electrónico y además agrega nuevas "
+"características continuamente. El resumen arriba le dará un vistazo rápido "
+"de las características incluidas."
 
+# "back end" traducido como "back-end" a falta de una mejor aproximación
 #: C/balsa.xml:162(para)
 msgid ""
 "<application>Balsa</application> is written using <acronym>GTK+</acronym> "
@@ -269,6 +297,11 @@ msgid ""
 "uses a combination of GMime for handling Mime messages, and its own drivers "
 "for local and remote mailstores."
 msgstr ""
+"<application>Balsa</application> está escrito usando <acronym>GTK+</acronym> "
+"y <acronym>GNOME</acronym>. Basado originalmente  en el código de libmutt, "
+"el código «backend» de <application>Mutt</application>, <application>Balsa</"
+"application> usa una combinación de GMime para manejar mensajes Mime, y su "
+"propio controlador para almacenes de correo locales y remotos."
 
 #: C/balsa.xml:169(para)
 msgid ""
@@ -281,11 +314,22 @@ msgid ""
 "reported via <application>bug-buddy</application>, <application>gnome-bug </"
 "application> or to <email>submit@bugs.gnome.org</email>."
 msgstr ""
+"Si quiere aprender más sobre <application>Balsa</application>, su mejor "
+"opción es la lista de correos <email>balsa-list@gnome.org</email>, a la que "
+"se puede suscribir visitando su sitio web <ulink url=\"http://mail.gnome.org/"
+"mailman/listinfo/balsa-list\">http://mail.gnome.org/mailman/listinfo/balsa-"
+"list</ulink> o enviando un mensaje con el asunto <emphasis>subscribe</"
+"emphasis> a <email>balsa-list-request@gnome.org</email>. Puede informar de "
+"errores y problemas con <application>bug-buddy</application>, "
+"<application>gnome-bug </application> o a <email>submit@bugs.gnome.org</"
+"email>."
 
+# Corrección de estilo. La segunda mayúscula en "Primeros Pasos"
 #: C/balsa.xml:183(title)
 msgid "Getting Started with <application>Balsa</application>"
-msgstr ""
+msgstr "Primeros pasos con <application>Balsa</application>"
 
+# "Inbox, Outbox, Sentbox, Draftbox, y Trash." Están traducidas en la IU?
 #: C/balsa.xml:185(para)
 msgid ""
 "If you're starting <application>Balsa</application> for the first time, the "
@@ -296,10 +340,18 @@ msgid ""
 "be changed to be <glossterm linkend=\"glossary-imap\"><acronym>IMAP</"
 "acronym></glossterm> mailboxes later.)"
 msgstr ""
+"Si está iniciando <application>Balsa</application> por primera vez, lo "
+"primero que verá es el asistente de configuración básica de "
+"<application>Balsa</application>. <application>Balsa</application> puede "
+"averiguar la mayoría de lo que debe saber sobre usted. También creará cinco "
+"buzones locales de manera predeterminada: «Bandeja de entrada», «Bandeja de "
+"salida», «Correo enviado», «Borradores», y «Papelera». (Pueden cambiarse para "
+"que sean buzones <glossterm linkend=\"glossary-imap\"><acronym>IMAP</"
+"acronym></glossterm> posteriormente.)"
 
 #: C/balsa.xml:195(title)
 msgid "<application>Balsa</application> Start Assistant"
-msgstr ""
+msgstr "Asistente de inicio de <application>Balsa</application>"
 
 #: C/balsa.xml:205(para)
 msgid ""
@@ -311,6 +363,13 @@ msgid ""
 "detect new folders as they are created. So if you have to telnet in to your "
 "mail machine, you won't be stuck."
 msgstr ""
+"No se preocupe. <application>Balsa</application> coopera con otros "
+"<glossterm linkend=\"glossary-mua\"><acronym>MUA</acronym></glossterm> muy "
+"bien. Comparten la misma semántica de bloqueo para buzones. Si "
+"<application>Balsa</application> comparte el mismo directorio de correo que "
+"<application>pine</application> o <application>Mutt</application>, detectará "
+"carpetas nuevas a medida que se creens. De manera que si posee una conexión "
+"telnet a su máquina de correo, no quedará atrapado."
 
 #: C/balsa.xml:215(para)
 msgid ""
@@ -318,12 +377,17 @@ msgid ""
 "linkend=\"preferences\">preferences window</link>, but most of them do not "
 "need to be changed."
 msgstr ""
+"Existen muchas más opciones en la <link linkend=\"preferences\">ventana de "
+"preferencias</link> de <application>Balsa</application>, pero la mayoría no "
+"necesitan ningún cambio."
 
 #: C/balsa.xml:221(para)
 msgid ""
 "Once <application>Balsa</application> is configured, you will proceed on to "
 "the <link linkend=\"win-main\">main window</link>."
 msgstr ""
+"Una vez que <application>Balsa</application> esté configurado, proceda a la "
+"<link linkend=\"win-main\">ventana principal</link>."
 
 #: C/balsa.xml:231(title)
 msgid "The Main Window"
@@ -333,6 +397,7 @@ msgstr "La ventana principal"
 msgid "Main Window"
 msgstr "Ventana principal"
 
+# "Show Mailbox Info" Revisar en la traducción de la IU
 #: C/balsa.xml:244(para)
 msgid ""
 "<application>Balsa</application>'s main window has three major areas. To the "
@@ -349,6 +414,20 @@ msgid ""
 "mailbox name. Also, any mailboxes that contain unread messages will be shown "
 "in a bold font."
 msgstr ""
+"La ventana principal de <application>Balsa</application> tiene tres áreas "
+"importantes. A la izquierda está la <link linkend=\"subwin-mblist\">lista de "
+"buzones</link>. Aquí se muestran todos los buzones que <application>Balsa</"
+"application> conoce; los buscará en su carpeta local de correo. (Quiere "
+"decir que <application>Balsa</application> funciona bien con "
+"<application>procmail</application>.) También se muestran en la lista los "
+"buzones <glossterm linkend=\"glossary-imap\"><acronym>IMAP</acronym></"
+"glossterm> que haya configurado. Si estableció la opción <guilabel>Ver "
+"información del buzón</guilabel>, se mostrarán dos columnas adicionales "
+"junto al nombre del buzón que contiene el número de mensajes sin leer y el "
+"número de mensajes totales en cada buzón con mensajes sin leer; si no, el "
+"número de mensajes sin leer se muestra entre paréntesis al lado del nombre "
+"del buzón. Además, cualquier buzón que contenga mensajes sin leer se "
+"mostrará en negrita."
 
 #: C/balsa.xml:260(para)
 msgid ""
@@ -356,6 +435,9 @@ msgid ""
 "linkend=\"subwin-msgindex\">message index</link>. You can browse messages "
 "and manipulate them here."
 msgstr ""
+"Arriba a la derecha está la vista del buzón actual, llamado <link linkend="
+"\"subwin-msgindex\">índice de mensajes</link>. Aquí puede navegar y "
+"manipular sus mensajes."
 
 #: C/balsa.xml:266(para)
 msgid ""
@@ -364,6 +446,10 @@ msgid ""
 "message selected in the message index. You can save attachments, view "
 "attachments, and read incoming email here."
 msgstr ""
+"Abajo a la derecha de la ventana principal de <application>Balsa</"
+"application> está la <link linkend=\"subwin-msgview\">vista de mensaje</"
+"link>. Aquí se muestra el mensaje seleccionado en el índice de mensajes. "
+"Puede ver adjuntos, guardarlos y leer el correo entrante."
 
 #: C/balsa.xml:276(title)
 msgid "Menu &amp; Toolbar"
@@ -378,6 +464,8 @@ msgid ""
 "The menu bar, located at the top of the Main Window, provides the following "
 "commands:"
 msgstr ""
+"La barra de menú, ubicada en la parte superior de la ventana principal, "
+"proporciona de los siguientes comandos:"
 
 #: C/balsa.xml:296(guimenu) C/balsa.xml:308(guimenu) C/balsa.xml:1359(guimenu)
 msgid "File"
@@ -1351,7 +1439,6 @@ msgid "Portugese"
 msgstr "Portugués"
 
 #: C/balsa.xml:1693(para)
-#| msgid "Estonian"
 msgid "Romanian"
 msgstr "Rumano"
 

@@ -1,14 +1,15 @@
-# translation of balsa-help.HEAD.po to Español
-# Jorge González <jorgegonz@svn.gnome.org>, 2008, 2010.
+# translation of balsa-help.master.po to Español
+#
 # Joaquín Ignacio Aramendía <samsagax@gmail.com>, 2011.
 # Daniel Mustieles <daniel.mustieles@gmail.com>, 2011.
+# Jorge González <jorgegonz@svn.gnome.org>, 2008, 2010, 2011.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: balsa-help.HEAD\n"
-"POT-Creation-Date: 2011-01-15 10:52+0000\n"
-"PO-Revision-Date: 2011-02-17 18:19+0100\n"
-"Last-Translator: Daniel Mustieles <daniel.mustieles@gmail.com>\n"
+"Project-Id-Version: balsa-help.master\n"
+"POT-Creation-Date: 2011-02-19 13:04+0000\n"
+"PO-Revision-Date: 2011-02-27 12:12+0100\n"
+"Last-Translator: Jorge González <jorgegonz@svn.gnome.org>\n"
 "Language-Team: Español <gnome-es-list@gnome.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -345,8 +346,8 @@ msgstr ""
 "<application>Balsa</application>. <application>Balsa</application> puede "
 "averiguar la mayoría de lo que debe saber sobre usted. También creará cinco "
 "buzones locales de manera predeterminada: «Bandeja de entrada», «Bandeja de "
-"salida», «Correo enviado», «Borradores», y «Papelera». (Pueden cambiarse para "
-"que sean buzones <glossterm linkend=\"glossary-imap\"><acronym>IMAP</"
+"salida», «Correo enviado», «Borradores», y «Papelera». (Pueden cambiarse "
+"para que sean buzones <glossterm linkend=\"glossary-imap\"><acronym>IMAP</"
 "acronym></glossterm> posteriormente.)"
 
 #: C/balsa.xml:195(title)
@@ -1899,7 +1900,7 @@ msgstr ""
 
 #: C/balsa.xml:2228(guibutton)
 msgid "Ignore All"
-msgstr ""
+msgstr "Ignorar todo"
 
 #: C/balsa.xml:2230(para)
 msgid ""
@@ -1909,7 +1910,7 @@ msgstr ""
 
 #: C/balsa.xml:2238(guibutton)
 msgid "Learn"
-msgstr ""
+msgstr "Aprender"
 
 #: C/balsa.xml:2240(para)
 msgid ""
@@ -2017,7 +2018,7 @@ msgstr ""
 
 #: C/balsa.xml:2369(title)
 msgid "Selecting a Message Part"
-msgstr ""
+msgstr "Seleccionar una parte del mensaje"
 
 #: C/balsa.xml:2379(para)
 msgid ""
@@ -2904,7 +2905,7 @@ msgstr ""
 
 #: C/balsa.xml:3304(guibutton)
 msgid "Set as Default"
-msgstr ""
+msgstr "Establecer como predeterminada"
 
 #: C/balsa.xml:3306(para)
 msgid "Set the selected address book as default."
@@ -4183,7 +4184,7 @@ msgstr ""
 
 #: C/balsa.xml:4587(link)
 msgid "Moving messages around"
-msgstr ""
+msgstr "Mover mensajes"
 
 #: C/balsa.xml:4592(link)
 msgid "Making one of the main folders IMAP-based"
@@ -4195,11 +4196,11 @@ msgstr ""
 
 #: C/balsa.xml:4602(link) C/balsa.xml:4720(title)
 msgid "Setting up LDAP address books"
-msgstr ""
+msgstr "Establecer libretas de direcciones LDAP"
 
 #: C/balsa.xml:4607(title)
 msgid "Creating New Mailboxes"
-msgstr ""
+msgstr "Crear buzones de correo nuevos"
 
 #: C/balsa.xml:4609(para)
 msgid ""
@@ -4226,7 +4227,7 @@ msgstr ""
 
 #: C/balsa.xml:4634(title)
 msgid "Moving Messages"
-msgstr ""
+msgstr "Mover mensajes"
 
 #: C/balsa.xml:4636(para)
 msgid ""
@@ -4259,7 +4260,7 @@ msgstr ""
 
 #: C/balsa.xml:4665(title) C/balsa.xml:4770(link)
 msgid "I want one of the main folders to be IMAP"
-msgstr ""
+msgstr "Quiero que una de las carpetas principales sea IMAP"
 
 #: C/balsa.xml:4667(para)
 msgid ""
@@ -4270,7 +4271,7 @@ msgstr ""
 
 #: C/balsa.xml:4673(title)
 msgid "I want Balsa to guess my friends"
-msgstr ""
+msgstr "Quiero que Balsa adivine mis amigos"
 
 #: C/balsa.xml:4675(para)
 msgid ""
@@ -4290,13 +4291,13 @@ msgstr ""
 
 #. This is best demonstrated
 #.   with the following picture:</para>
-#.  
+#.
 #.   <figure>
 #.     <title>Expanding Aliases</title>
 #.     <screenshot>
-#. 	  <mediaobject> 
+#. 	  <mediaobject>
 #. 	    <imageobject><imagedata
-#. 		fileref="figures/example-alias.png" format="PNG"/> 
+#. 		fileref="figures/example-alias.png" format="PNG"/>
 #. 	    </imageobject>
 #. 	  </mediaobject>
 #.     </screenshot>
@@ -4324,7 +4325,7 @@ msgstr ""
 
 #: C/balsa.xml:4729(para)
 msgid "Install the LDAP server software."
-msgstr ""
+msgstr "Instalar el software del servidor LDAP."
 
 #: C/balsa.xml:4731(para)
 msgid ""
@@ -4355,7 +4356,7 @@ msgstr ""
 
 #: C/balsa.xml:4762(title)
 msgid "It's not Working!!!"
-msgstr ""
+msgstr "No funciona."
 
 #: C/balsa.xml:4764(para)
 msgid ""
@@ -4371,7 +4372,7 @@ msgstr "Balsa"
 
 #: C/balsa.xml:4773(link)
 msgid "<placeholder-1/>'s frozen!"
-msgstr ""
+msgstr "<placeholder-1/> está congelado."
 
 #: C/balsa.xml:4777(link) C/balsa.xml:4810(title)
 msgid "What's that window that flashed on the screen?"
@@ -4383,15 +4384,15 @@ msgstr ""
 
 #: C/balsa.xml:4785(title)
 msgid "I want a basic mailbox to use IMAP"
-msgstr ""
+msgstr "Quiero un buzón de correo básico para usar IMAP"
 
 #: C/balsa.xml:4785(para)
 msgid "See <link linkend=\"ct-main-folder-imap\">this section</link>."
-msgstr ""
+msgstr "Consulte <link linkend=\"ct-main-folder-imap\">esta sección</link>."
 
 #: C/balsa.xml:4790(title)
 msgid "<application>Balsa</application>'s frozen!"
-msgstr ""
+msgstr "<application>Balsa</application> está congelado."
 
 #: C/balsa.xml:4791(para)
 msgid "Odds are it isn't. Watch out for:"
@@ -4459,6 +4460,8 @@ msgid ""
 "<application>Balsa</application> is currently developed by (in alphabetical "
 "order): <placeholder-1/>"
 msgstr ""
+"Actualmente <application>Balsa</application> lo desarrollan, en orden "
+"alfabético: <placeholder-1/>"
 
 #: C/balsa.xml:4861(para)
 msgid "Hector Garcia Alvarez (<email>hector@scouts-es.org</email>)"
@@ -4576,7 +4579,7 @@ msgstr ""
 
 #: C/balsa.xml:4980(glossterm)
 msgid "libmutt"
-msgstr ""
+msgstr "libmutt"
 
 #: C/balsa.xml:4980(para)
 msgid ""
@@ -4596,7 +4599,7 @@ msgstr ""
 
 #: C/balsa.xml:4992(glossterm)
 msgid "message index"
-msgstr ""
+msgstr "índice de mensajes"
 
 #: C/balsa.xml:4992(para)
 msgid ""
@@ -4606,7 +4609,7 @@ msgstr ""
 
 #: C/balsa.xml:4998(glossterm)
 msgid "message view"
-msgstr ""
+msgstr "vista de mensaje"
 
 #: C/balsa.xml:4998(para)
 msgid ""
@@ -4697,19 +4700,3 @@ msgstr ""
 #: C/balsa.xml:0(None)
 msgid "translator-credits"
 msgstr "Jorge González <jorgegonz@svn.gnome.org>, 2008"
-
-#~ msgid ""
-#~ "@@image: 'figures/address-book-start.png'; "
-#~ "md5=d349c5b662257e2ce075ec4273d455b2"
-#~ msgstr ""
-#~ "@@image: 'figures/address-book-start.png'; "
-#~ "md5=d349c5b662257e2ce075ec4273d455b2"
-
-#~ msgid "Chinese"
-#~ msgstr "Chino"
-
-#~ msgid "English"
-#~ msgstr "Inglés"
-
-#~ msgid "German"
-#~ msgstr "Alemán"

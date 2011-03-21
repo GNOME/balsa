@@ -1,15 +1,15 @@
 # translation of balsa-help.master.po to Español
 #
+# Jorge González <jorgegonz@svn.gnome.org>, 2008, 2010, 2011.
 # Joaquín Ignacio Aramendía <samsagax@gmail.com>, 2011.
 # Daniel Mustieles <daniel.mustieles@gmail.com>, 2011.
-# Jorge González <jorgegonz@svn.gnome.org>, 2008, 2010, 2011.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa-help.master\n"
-"POT-Creation-Date: 2011-02-19 13:04+0000\n"
-"PO-Revision-Date: 2011-02-27 12:12+0100\n"
-"Last-Translator: Jorge González <jorgegonz@svn.gnome.org>\n"
+"POT-Creation-Date: 2011-02-27 17:43+0000\n"
+"PO-Revision-Date: 2011-03-09 10:15+0100\n"
+"Last-Translator: Daniel Mustieles <daniel.mustieles@gmail.com>\n"
 "Language-Team: Español <gnome-es-list@gnome.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -346,8 +346,8 @@ msgstr ""
 "<application>Balsa</application>. <application>Balsa</application> puede "
 "averiguar la mayoría de lo que debe saber sobre usted. También creará cinco "
 "buzones locales de manera predeterminada: «Bandeja de entrada», «Bandeja de "
-"salida», «Correo enviado», «Borradores», y «Papelera». (Pueden cambiarse "
-"para que sean buzones <glossterm linkend=\"glossary-imap\"><acronym>IMAP</"
+"salida», «Correo enviado», «Borradores», y «Papelera». (Pueden cambiarse para "
+"que sean buzones <glossterm linkend=\"glossary-imap\"><acronym>IMAP</"
 "acronym></glossterm> posteriormente.)"
 
 #: C/balsa.xml:195(title)
@@ -816,7 +816,7 @@ msgstr ""
 
 #: C/balsa.xml:888(title)
 msgid "Message Menu"
-msgstr "Menú Mensaje"
+msgstr "Menú «Mensaje»"
 
 #: C/balsa.xml:892(guimenu) C/balsa.xml:1051(guimenu) C/balsa.xml:2896(title)
 msgid "Message"
@@ -824,7 +824,7 @@ msgstr "Mensaje"
 
 #: C/balsa.xml:895(para)
 msgid "This menu has commands for manipulating messages."
-msgstr ""
+msgstr "Éste menú contiene comandos para manipular mensajes."
 
 #: C/balsa.xml:898(para)
 msgid ""
@@ -915,9 +915,10 @@ msgid ""
 "currently selected message(s) to the Trash."
 msgstr ""
 
+# Traducción pobre. Revisar el contexto.
 #: C/balsa.xml:1051(guisubmenu)
 msgid "Toggle flag"
-msgstr ""
+msgstr "Conmutar opción"
 
 #: C/balsa.xml:1056(para)
 msgid ""
@@ -987,7 +988,7 @@ msgstr ""
 
 #: C/balsa.xml:1178(title)
 msgid "The Mailbox List"
-msgstr ""
+msgstr "La lista de buzones"
 
 #: C/balsa.xml:1180(para)
 msgid ""
@@ -998,6 +999,11 @@ msgid ""
 "<application>pine</application> and <application>procmail</application> "
 "without causing problems."
 msgstr ""
+"La lista de buzones en la ventana principal muestra una lista de todos sus "
+"buzones. <application>Balsa</application> detectará automáticamente buzones "
+"locales buscando en su carpeta local de correo (probablemente ~/mail). Ésto "
+"permite a <application>Balsa</application> coexistir con <application>pine</"
+"application> y <application>procmail</application> sin causar problemas."
 
 #: C/balsa.xml:1188(para)
 msgid ""
@@ -1011,7 +1017,7 @@ msgstr ""
 
 #: C/balsa.xml:1199(title)
 msgid "The Message Index"
-msgstr ""
+msgstr "El índice de mensajes"
 
 #: C/balsa.xml:1201(para)
 msgid ""
@@ -2901,7 +2907,7 @@ msgstr "Borrar"
 
 #: C/balsa.xml:3299(para)
 msgid "Delete the selected address book."
-msgstr ""
+msgstr "Borrar la libreta de direcciones seleccionada."
 
 #: C/balsa.xml:3304(guibutton)
 msgid "Set as Default"
@@ -2909,7 +2915,7 @@ msgstr "Establecer como predeterminada"
 
 #: C/balsa.xml:3306(para)
 msgid "Set the selected address book as default."
-msgstr ""
+msgstr "Establecer la libreta de direcciones seleccionada como predeterminada."
 
 #: C/balsa.xml:3316(title)
 msgid "Startup"
@@ -2917,7 +2923,7 @@ msgstr "Inicio"
 
 #: C/balsa.xml:3320(guilabel)
 msgid "Open Inbox upon Startup"
-msgstr ""
+msgstr "Abrir bandeja de entrada al inicio"
 
 #: C/balsa.xml:3322(para)
 msgid ""
@@ -2927,7 +2933,7 @@ msgstr ""
 
 #: C/balsa.xml:3327(guilabel)
 msgid "Check Mail at Startup"
-msgstr ""
+msgstr "Comprobar correo al inicio"
 
 #: C/balsa.xml:3329(para)
 msgid ""
@@ -2940,7 +2946,7 @@ msgstr ""
 
 #: C/balsa.xml:3336(guilabel)
 msgid "Remember Open Mailboxes Between Sessions"
-msgstr ""
+msgstr "Recordar buzones abiertos entre sesiones"
 
 #: C/balsa.xml:3339(para)
 msgid ""
@@ -2950,7 +2956,7 @@ msgstr ""
 
 #: C/balsa.xml:3345(guilabel)
 msgid "Folder Scanning"
-msgstr ""
+msgstr "Exploración de carpetas"
 
 #: C/balsa.xml:3347(para)
 msgid ""
@@ -2992,7 +2998,7 @@ msgstr ""
 
 #: C/balsa.xml:3385(guilabel)
 msgid "Empty Trash on Exit"
-msgstr ""
+msgstr "Vaciar papelera al salir"
 
 #: C/balsa.xml:3387(para)
 msgid ""
@@ -3002,7 +3008,7 @@ msgstr ""
 
 #: C/balsa.xml:3393(guilabel)
 msgid "Automatically close mailbox"
-msgstr ""
+msgstr "Cerrar buzón automáticamente"
 
 #: C/balsa.xml:3395(para)
 msgid ""
@@ -3048,7 +3054,7 @@ msgstr ""
 
 #: C/balsa.xml:3448(title)
 msgid "Customizing Toolbars"
-msgstr ""
+msgstr "Personalizar barras de herramientas"
 
 #: C/balsa.xml:3450(para)
 msgid ""
@@ -3099,7 +3105,7 @@ msgstr ""
 
 #: C/balsa.xml:3499(title)
 msgid "IMAP Folder configuration"
-msgstr ""
+msgstr "Configuración de carpetas IMAP"
 
 #: C/balsa.xml:3501(para)
 msgid ""
@@ -3110,7 +3116,7 @@ msgstr ""
 
 #: C/balsa.xml:3508(title)
 msgid "Basic IMAP folder configuration"
-msgstr ""
+msgstr "Configuración básica de carpetas IMAP"
 
 #: C/balsa.xml:3510(para)
 msgid ""
@@ -3238,7 +3244,7 @@ msgstr ""
 
 #: C/balsa.xml:3619(title)
 msgid "IMAP Subfolder Properties"
-msgstr ""
+msgstr "Propiedades de subcarpetas IMAP"
 
 #: C/balsa.xml:3621(para)
 msgid ""
@@ -3289,23 +3295,23 @@ msgstr ""
 
 #: C/balsa.xml:3675(title)
 msgid "Address book configuration"
-msgstr ""
+msgstr "Configuración de libreta de direcciones"
 
 #: C/balsa.xml:3676(para)
 msgid "This is to be filled in."
-msgstr ""
+msgstr "Esto se debe rellenar."
 
 #: C/balsa.xml:3679(title)
 msgid "Address book type"
-msgstr ""
+msgstr "Tipo de libreta de direcciones"
 
 #: C/balsa.xml:3680(para)
 msgid "You can choose among several address book types."
-msgstr ""
+msgstr "Puede elegir entre varios tipos libretas de direcciones."
 
 #: C/balsa.xml:3684(title)
 msgid "External address book"
-msgstr ""
+msgstr "Libreta de direcciones externa"
 
 #. By Jelmer Vernooij <jelmer@nl.linux.org>
 #: C/balsa.xml:3688(para)
@@ -3318,7 +3324,7 @@ msgstr ""
 
 #: C/balsa.xml:3695(title)
 msgid "Existing programs"
-msgstr ""
+msgstr "Programas existentes"
 
 #: C/balsa.xml:3697(para)
 msgid ""
@@ -3344,7 +3350,7 @@ msgstr ""
 
 #: C/balsa.xml:3719(title)
 msgid "Writing your own load scripts"
-msgstr ""
+msgstr "Escribir sus propias rutinas de carga"
 
 #: C/balsa.xml:3721(para)
 msgid ""
@@ -3359,6 +3365,8 @@ msgid ""
 "\n"
 "e-mail address\tfull name\tnickname\n"
 msgstr ""
+"\n"
+"dirección de correo electrónico\tnombre completo\tapodo\n"
 
 #: C/balsa.xml:3728(para)
 msgid ""
@@ -3382,7 +3390,7 @@ msgstr ""
 
 #: C/balsa.xml:3740(para)
 msgid "An example output could be:"
-msgstr ""
+msgstr "Un ejemplo de salida es:"
 
 #: C/balsa.xml:3741(computeroutput)
 #, no-wrap
@@ -3436,11 +3444,11 @@ msgstr ""
 
 #: C/balsa.xml:3767(para)
 msgid "Comments are welcome: <email>jelmer@nl.linux.org</email>"
-msgstr ""
+msgstr "Los comentarios son bienvenidos: <email>jelmer@nl.linux.org</email>"
 
 #: C/balsa.xml:3776(title)
 msgid "Identities"
-msgstr ""
+msgstr "Identidades"
 
 #: C/balsa.xml:3778(para)
 msgid ""
@@ -3478,7 +3486,7 @@ msgstr ""
 
 #: C/balsa.xml:3815(guilabel)
 msgid "Reply-To address"
-msgstr ""
+msgstr "Responder a la dirección"
 
 #: C/balsa.xml:3817(para)
 msgid ""
@@ -3488,7 +3496,7 @@ msgstr ""
 
 #: C/balsa.xml:3825(guilabel)
 msgid "Default Domain"
-msgstr ""
+msgstr "Dominio predeterminado"
 
 #: C/balsa.xml:3827(para)
 msgid ""
@@ -3503,6 +3511,8 @@ msgid ""
 "The <quote>Messages</quote> page shows various initial settings for the new "
 "message:"
 msgstr ""
+"La página de <quote>Mensajes</quote> muestra varias configuraciones "
+"iniciales para el nuevo mensaje:"
 
 #: C/balsa.xml:3848(para)
 msgid ""
@@ -3512,7 +3522,7 @@ msgstr ""
 
 #: C/balsa.xml:3857(guilabel)
 msgid "Reply String"
-msgstr ""
+msgstr "Cadena de respuesta"
 
 #: C/balsa.xml:3859(para)
 msgid "The prefix for the subject line when replying to a message."
@@ -3560,7 +3570,7 @@ msgstr ""
 
 #: C/balsa.xml:3910(guilabel)
 msgid "SMTP server"
-msgstr ""
+msgstr "Servidor SMTP"
 
 #: C/balsa.xml:3912(para)
 msgid ""
@@ -3606,11 +3616,11 @@ msgstr ""
 
 #: C/balsa.xml:3958(quote)
 msgid "|/home/user/dynsig.pl"
-msgstr ""
+msgstr "|/home/usuario/dynsig.pl"
 
 #: C/balsa.xml:3965(guilabel)
 msgid "Execute Signature"
-msgstr ""
+msgstr "Ejecutar firma"
 
 #: C/balsa.xml:3967(para)
 msgid ""
@@ -3621,7 +3631,7 @@ msgstr ""
 
 #: C/balsa.xml:3977(guilabel)
 msgid "Include Signature"
-msgstr ""
+msgstr "Incluir firma"
 
 #: C/balsa.xml:3979(para)
 msgid "Append the signature to the end of all outgoing mail."
@@ -3629,15 +3639,15 @@ msgstr ""
 
 #: C/balsa.xml:3986(guilabel)
 msgid "Include Signature When Forwarding"
-msgstr ""
+msgstr "Incluir firma cuando se reenvíe"
 
 #: C/balsa.xml:3988(para)
 msgid "Add the signature when forwarding an existing mail."
-msgstr ""
+msgstr "Agregar firma al reenviar un mensaje existente."
 
 #: C/balsa.xml:3995(guilabel)
 msgid "Include Signature When Replying"
-msgstr ""
+msgstr "Incluir firma cuando se conteste"
 
 #: C/balsa.xml:3997(para)
 msgid "Add the signature when replying to a existing message."
@@ -3645,7 +3655,7 @@ msgstr ""
 
 #: C/balsa.xml:4004(guilabel)
 msgid "Add Signature Separator"
-msgstr ""
+msgstr "Agregar separador de firma"
 
 #: C/balsa.xml:4006(para)
 msgid ""
@@ -3655,7 +3665,7 @@ msgstr ""
 
 #: C/balsa.xml:4014(guilabel)
 msgid "Prepend Signature"
-msgstr ""
+msgstr "Anteponer firma"
 
 #: C/balsa.xml:4016(para)
 msgid "Add the signature before the message text, rather than after it."
@@ -3667,7 +3677,7 @@ msgstr ""
 
 #: C/balsa.xml:4028(guilabel)
 msgid "Sign messages by default."
-msgstr ""
+msgstr "Firmar mensajes por omisión."
 
 #: C/balsa.xml:4030(para)
 msgid ""
@@ -3677,7 +3687,7 @@ msgstr ""
 
 #: C/balsa.xml:4039(guilabel)
 msgid "Encrypt messages by default."
-msgstr ""
+msgstr "Cifrar mensajes por omisión."
 
 #: C/balsa.xml:4041(para)
 msgid ""
@@ -3687,7 +3697,7 @@ msgstr ""
 
 #: C/balsa.xml:4049(guilabel)
 msgid "Default protocol."
-msgstr ""
+msgstr "Protocolo predeterminado."
 
 #: C/balsa.xml:4051(para)
 msgid ""
@@ -3697,7 +3707,7 @@ msgstr ""
 
 #: C/balsa.xml:4059(guilabel)
 msgid "Always trust GnuPG keys when encrypting."
-msgstr ""
+msgstr "Confiar siempre en claves GnuPG al cifrar."
 
 #: C/balsa.xml:4061(para)
 msgid ""
@@ -3707,7 +3717,7 @@ msgstr ""
 
 #: C/balsa.xml:4069(guilabel)
 msgid "Remind me if messages can be encrypted."
-msgstr ""
+msgstr "Recordarme si se pueden cifrar los mensajes"
 
 #: C/balsa.xml:4071(para)
 msgid ""
@@ -3781,7 +3791,7 @@ msgstr ""
 
 #: C/balsa.xml:4165(title)
 msgid "The Filters Window"
-msgstr ""
+msgstr "La ventana de filtros"
 
 #: C/balsa.xml:4166(para)
 msgid ""
@@ -3815,7 +3825,7 @@ msgstr ""
 
 #: C/balsa.xml:4199(title)
 msgid "The match page"
-msgstr ""
+msgstr "La página de coincidencia"
 
 #: C/balsa.xml:4207(para)
 msgid "AND: all condition tests must be true to make the match."
@@ -3885,7 +3895,7 @@ msgstr ""
 
 #: C/balsa.xml:4274(title)
 msgid "The action page"
-msgstr ""
+msgstr "La página de acción"
 
 #: C/balsa.xml:4276(para)
 msgid ""
@@ -3900,7 +3910,7 @@ msgstr ""
 
 #: C/balsa.xml:4287(title)
 msgid "The condition window"
-msgstr ""
+msgstr "La ventana de condición"
 
 #: C/balsa.xml:4288(para)
 msgid ""
@@ -4170,7 +4180,7 @@ msgstr ""
 
 #: C/balsa.xml:4573(title)
 msgid "Common Tasks with <application>Balsa</application>"
-msgstr ""
+msgstr "Tareas comunes con <application>Balsa</application>"
 
 #: C/balsa.xml:4575(para)
 msgid ""
@@ -4188,7 +4198,7 @@ msgstr "Mover mensajes"
 
 #: C/balsa.xml:4592(link)
 msgid "Making one of the main folders IMAP-based"
-msgstr ""
+msgstr "Hacer que una de las carpetas principales esté basada en IMAP"
 
 #: C/balsa.xml:4597(link)
 msgid "Expanding e-mail addresses automatically"
@@ -4291,13 +4301,13 @@ msgstr ""
 
 #. This is best demonstrated
 #.   with the following picture:</para>
-#.
+#.  
 #.   <figure>
 #.     <title>Expanding Aliases</title>
 #.     <screenshot>
-#. 	  <mediaobject>
+#. 	  <mediaobject> 
 #. 	    <imageobject><imagedata
-#. 		fileref="figures/example-alias.png" format="PNG"/>
+#. 		fileref="figures/example-alias.png" format="PNG"/> 
 #. 	    </imageobject>
 #. 	  </mediaobject>
 #.     </screenshot>
@@ -4365,6 +4375,10 @@ msgid ""
 "figure out how to do something but <application>Balsa</application> lets you "
 "do it, that's a bug. Report it."
 msgstr ""
+"Ésta es una lista de P+F para cuando <application>Balsa</application> parece "
+"bloquearse u otras cosas que piensa que deben estar pasando no suceden. Si "
+"no puede descubrir cómo hacer algo pero <application>Balsa</application> se "
+"lo permite, eso es un error. Informe de este error."
 
 #: C/balsa.xml:0(application)
 msgid "Balsa"
@@ -4376,11 +4390,11 @@ msgstr "<placeholder-1/> está congelado."
 
 #: C/balsa.xml:4777(link) C/balsa.xml:4810(title)
 msgid "What's that window that flashed on the screen?"
-msgstr ""
+msgstr "¿Qué es esa ventana que parpadea en la pantalla?"
 
 #: C/balsa.xml:4780(link) C/balsa.xml:4821(title)
 msgid "The address book doesn't import my addresses."
-msgstr ""
+msgstr "La libreta de direcciones no importa mis direcciones."
 
 #: C/balsa.xml:4785(title)
 msgid "I want a basic mailbox to use IMAP"
@@ -4428,12 +4442,17 @@ msgid ""
 "this window in preferences."
 msgstr ""
 
+# symlink == enlace simbólico (?)
 #: C/balsa.xml:4823(para)
 msgid ""
 "<application>Balsa</application> attempts to open the file <filename>~/."
 "gnome/GnomeCard.gcrd</filename>. If you're not using this file, you may need "
 "to create a symlink so that <application>Balsa</application> can open it."
 msgstr ""
+"<application>Balsa</application> trata de abrir el archivo <filename>~/."
+"gnome/GnomeCard.gcrd</filename>. Si no está usando éste archivo, puede que "
+"necesite crear un enlace simbólico para que <application>Balsa</application> "
+"pueda abrirlo."
 
 #: C/balsa.xml:4828(para)
 msgid ""
@@ -4442,6 +4461,11 @@ msgid ""
 "is known to work with at least <application>GnomeCard</application> version "
 "1.0.10 and probably most other releases."
 msgstr ""
+"Ha habido pequeños cambios en el formato de archivos de "
+"<application>GnomeCard</application> y sus versiones. Se sabe que "
+"<application>Balsa</application> funciona por lo menos con "
+"<application>GnomeCard</application> versión 1.0.10 y probablemente la "
+"mayoría de sus lanzamientos."
 
 #: C/balsa.xml:4840(title)
 msgid "Authors"
@@ -4643,6 +4667,12 @@ msgid ""
 "<application>sendmail</application>, <application>qmail</application>, and "
 "<application>postfix</application>."
 msgstr ""
+"Un acrónimo para \"Mail Transfer Agent\" (Agente de transferencia de "
+"correo), ésta clase de programa es responsable de mover el correo entre "
+"personas, sea en la misma computadora o en redes completamente separadas. "
+"Ejemplos de éste tipo de programa incluyen <application>sendmail</"
+"application>, <application>qmail</application> y <application>postfix</"
+"application>."
 
 #: C/balsa.xml:5032(glossterm)
 msgid "MUA"
@@ -4658,6 +4688,14 @@ msgid ""
 "is primarily an MUA, but it also functions as an MDA/MTA when retrieving "
 "mail from a remote server."
 msgstr ""
+"Un acrónimo para \"Mail User Agent\" (Agente de usuario de correo), es el "
+"programa que un usuario utilizaría para leer correo existente y crear nuevos "
+"mensajes. MUAs son uno de los tres tipos de programas que permiten el "
+"funcionamiento del correo electrónico. Los otros dos tipos de programas son "
+"<glossterm linkend=\"glossary-mta\">MTA</glossterm>s y <glossterm linkend="
+"\"glossary-mda\">MDA</glossterm>s. <application>Balsa</application> es "
+"principalmente un MUA, pero también funciona como un MDA/MTA cuando recoge "
+"el correo de un servidor remoto."
 
 #: C/balsa.xml:5047(glossterm)
 msgid "Regular Expression"
@@ -4671,6 +4709,11 @@ msgid ""
 "understand and construct regular expressions the best source is the grep "
 "manual or info page."
 msgstr ""
+"Habitualmente abreviado como <abbrev>regexp</abbrev>, es un método para "
+"especificar un patrón para buscar texto. Patrones simples y complejos pueden "
+"ser encontrados usando éste método. Para informarse cómo entender y "
+"construir expresiones regulares la mejor documentación se encuentra en el "
+"manual de grep o en su página de información."
 
 #: C/balsa.xml:5059(glossterm)
 msgid "SMTP"
@@ -4683,6 +4726,11 @@ msgid ""
 "between computers on a network. It is used by most, if not all, mail "
 "programs to transfer mail."
 msgstr ""
+"Un acrónimo para \"Simple Mail Transfer Protocol\" (Protocolo de "
+"Transferencia Simple de Correos), es exactamente eso. Un estándar que define "
+"una forma simple y confiable de transferencia de mensajes entre computadoras "
+"en una red. Es usado por la mayoría, si no todos, los programas para "
+"transferir correo."
 
 #: C/balsa.xml:5070(glossterm)
 msgid "VCARD"
@@ -4695,8 +4743,14 @@ msgid ""
 "addressbooks, as does GnomeCard and Evolution. Many other programs are "
 "capable of exporting their contact lists in VCARD format as well."
 msgstr ""
+"VCARD es un método estándar de almacenamiento de información de contactos "
+"para intercambio sencillo entre programas. <application>Balsa</application> "
+"soporta agendas VCARD, como GnomeCard y Evolution. También muchos otros "
+"programas son capaces de exportar sus listas de contactos en formato VCARD."
 
 #. Put one translator per line, in the form of NAME <EMAIL>, YEAR1, YEAR2
 #: C/balsa.xml:0(None)
 msgid "translator-credits"
-msgstr "Jorge González <jorgegonz@svn.gnome.org>, 2008"
+msgstr ""
+"Joaquín Ignacio Aramendía <samsagax@gmail.com>, 2011\n"
+"Jorge González <jorgegonz@svn.gnome.org>, 2008"

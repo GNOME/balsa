@@ -281,6 +281,7 @@ dnl #####################################################################
 dnl GNOME libs
 dnl #####################################################################
 if test x$with_gnome != xno; then
+   TOOLKIT_CATEGORIES="GNOME;GTK;"
    gnome_extras="libgnome-2.0 libgnomeui-2.0 libbonobo-2.0 gconf-2.0"
    AC_MSG_CHECKING([whether we have gnome-keyring])
    if $PKG_CONFIG --atleast-version=1.0 gnome-keyring-1; then
@@ -298,9 +299,11 @@ if test x$with_gnome != xno; then
    AC_MSG_RESULT($with_gnome_keyring)
    AC_DEFINE(HAVE_GNOME,1,[Defined when gnome libs are available.])
 else
+   TOOLKIT_CATEGORIES="GTK;"
    gnome_extras=""
 fi
 AM_CONDITIONAL([BUILD_WITH_GNOME], [test $with_gnome = "yes"])
+AC_SUBST(TOOLKIT_CATEGORIES)
 
 # GMime configuration
 #
@@ -1013,6 +1016,8 @@ AC_OUTPUT([
 Makefile
 balsa.1
 balsa.spec
+balsa.desktop.in
+balsa-mailto-handler.desktop.in
 po/Makefile.in
 sounds/Makefile
 images/Makefile

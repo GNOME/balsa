@@ -1,3 +1,13 @@
+2011-03-21  Pawel Salek
+
+	* src/balsa-index.c: revert last change, it was wrong.
+	* Makefile.am: merge patch from bug 645444.
+	* configure.in: ditto.
+	* balsa.desktop.in: ditto.
+	* po/POTFILES.{skip,in}: add balsa-mailto-handler.desktop file.
+	* src/Makefile.am: fix dist target when configured without gnome
+	or unique.
+
 2011-01-15  Pawel Salek
 
 	* autogen.sh: port fixes from bootstrap.sh (inspired by pancake).

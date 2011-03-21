@@ -98,9 +98,6 @@ balsa_gtkspell_extra =		\
 		spell-check.h
 endif
 
-if BUILD_WITH_UNIQUE
-balsa_bonobo_extra_dist = balsa-bonobo.c balsa-bonobo.h Balsa.idl
-else
 if BUILD_WITH_GNOME
 balsa_bonobo_extra = balsa-bonobo.c balsa-bonobo.h
 balsa_bonobo_extra_dist = Balsa.idl
@@ -115,7 +112,8 @@ $(srcdir)/balsa-bonobo.c: Balsa.h
 idldir = $(datadir)/idl
 idl_DATA = Balsa.idl
 
-endif
+else
+balsa_bonobo_extra_dist = balsa-bonobo.c balsa-bonobo.h Balsa.idl
 endif
 
 balsa_SOURCES =			\

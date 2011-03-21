@@ -2,3 +2,5 @@
 # Please keep this list in alphabetical order.
 balsa-mail.lang
 balsa-mail-style.xml
+balsa-mailto-handler.desktop.in
+balsa.desktop.in

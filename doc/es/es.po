@@ -7,8 +7,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa-help.master\n"
-"POT-Creation-Date: 2011-02-27 17:43+0000\n"
-"PO-Revision-Date: 2011-03-09 10:15+0100\n"
+"POT-Creation-Date: 2011-03-21 21:21+0000\n"
+"PO-Revision-Date: 2011-03-23 18:26+0100\n"
 "Last-Translator: Daniel Mustieles <daniel.mustieles@gmail.com>\n"
 "Language-Team: Español <gnome-es-list@gnome.org>\n"
 "MIME-Version: 1.0\n"
@@ -969,6 +969,7 @@ msgstr "Configuración"
 #: C/balsa.xml:1144(para)
 msgid "Menu for changing <application>Balsa</application>'s configuration."
 msgstr ""
+"Menú para cambiar la configuración de <application>Balsa</application>."
 
 #: C/balsa.xml:1148(para)
 msgid ""
@@ -1134,7 +1135,7 @@ msgstr ""
 
 #: C/balsa.xml:1338(para)
 msgid "The menu bar"
-msgstr ""
+msgstr "La barra de menú"
 
 #: C/balsa.xml:1339(para) C/balsa.xml:1868(title) C/balsa.xml:1878(title)
 msgid "Toolbar"
@@ -1150,7 +1151,7 @@ msgstr ""
 
 #: C/balsa.xml:1342(para)
 msgid "The message body"
-msgstr ""
+msgstr "El cuerpo del mensaje"
 
 #: C/balsa.xml:1345(para)
 msgid "These will each be covered in depth below:"
@@ -1231,6 +1232,7 @@ msgid ""
 "The Edit menu contains commands which are used to modify the body of the "
 "message."
 msgstr ""
+"El menú «Editar» contiene comandos para modificar el cuerpo del mensaje."
 
 #: C/balsa.xml:1481(para)
 msgid ""
@@ -1238,6 +1240,9 @@ msgid ""
 "keycombo></shortcut><guimenu>Edit</guimenu><guimenuitem>Cut</guimenuitem></"
 "menuchoice> -- Cut the selected text to the clipboard."
 msgstr ""
+"<menuchoice><shortcut><keycombo><keysym>Ctrl</keysym><keysym>X</keysym></"
+"keycombo></shortcut><guimenu>Edit</guimenu><guimenuitem>Cut</guimenuitem></"
+"menuchoice>: cortar el texto seleccionado al portapapeles."
 
 #: C/balsa.xml:1495(para)
 msgid ""
@@ -1245,6 +1250,9 @@ msgid ""
 "keycombo></shortcut><guimenu>Edit</guimenu><guimenuitem>Copy</guimenuitem></"
 "menuchoice> -- Copy the selected text to the clipboard."
 msgstr ""
+"<menuchoice><shortcut><keycombo><keysym>Ctrl</keysym><keysym>X</keysym></"
+"keycombo></shortcut><guimenu>Edit</guimenu><guimenuitem>Cut</guimenuitem></"
+"menuchoice>: copiar el texto seleccionado al portapapeles."
 
 #: C/balsa.xml:1509(para)
 msgid ""
@@ -1253,6 +1261,10 @@ msgid ""
 "menuchoice> -- Paste the contents of the clipboard to the current position "
 "of the cursor."
 msgstr ""
+"<menuchoice><shortcut><keycombo><keysym>Ctrl</keysym><keysym>V</keysym></"
+"keycombo></shortcut><guimenu>Edit</guimenu><guimenuitem>Paste</guimenuitem></"
+"menuchoice>: pega el conteido del portapapeles en la posición actual del "
+"cursor."
 
 #: C/balsa.xml:1527(keysym)
 msgid "Ctrl"
@@ -1800,7 +1812,7 @@ msgstr "Adjuntos"
 
 #: C/balsa.xml:2107(title)
 msgid "List of Attachments"
-msgstr ""
+msgstr "Lista de adjuntos"
 
 #: C/balsa.xml:2117(para)
 msgid ""
@@ -1888,7 +1900,7 @@ msgstr ""
 
 #: C/balsa.xml:2209(guibutton)
 msgid "Change All"
-msgstr ""
+msgstr "Cambiar todas"
 
 #: C/balsa.xml:2211(para)
 msgid ""
@@ -1954,7 +1966,7 @@ msgstr ""
 
 #: C/balsa.xml:2283(title)
 msgid "Address Book Window"
-msgstr ""
+msgstr "Ventana de la libreta de direcciones"
 
 #: C/balsa.xml:2293(para)
 msgid ""
@@ -1982,7 +1994,7 @@ msgstr ""
 
 #: C/balsa.xml:2322(title)
 msgid "The Message Window"
-msgstr ""
+msgstr "La ventana «Mensaje»"
 
 #: C/balsa.xml:2324(para)
 msgid ""
@@ -2137,7 +2149,7 @@ msgstr ""
 
 #: C/balsa.xml:2495(guilabel)
 msgid "Outgoing Mail Servers"
-msgstr ""
+msgstr "Servidores de correo saliente"
 
 #: C/balsa.xml:2499(para)
 msgid ""
@@ -2169,7 +2181,7 @@ msgstr ""
 
 #: C/balsa.xml:2528(para)
 msgid "The domain name and port"
-msgstr ""
+msgstr "El nombre del dominio y el puerto"
 
 #: C/balsa.xml:2531(para)
 msgid ""
@@ -2193,7 +2205,7 @@ msgstr ""
 
 #: C/balsa.xml:2547(para)
 msgid "The TLS certificate pass phrase."
-msgstr ""
+msgstr "La contraseña del certificado TLS."
 
 #: C/balsa.xml:2549(para)
 msgid "Whether to split large messages, and the threshhold size."
@@ -2205,7 +2217,7 @@ msgstr ""
 
 #: C/balsa.xml:2563(title)
 msgid "Incoming and Outgoing Mail"
-msgstr ""
+msgstr "Correo entrante y saliente"
 
 #: C/balsa.xml:2565(para)
 msgid ""
@@ -2219,7 +2231,7 @@ msgstr "Entrante"
 
 #: C/balsa.xml:2575(guilabel)
 msgid "Check Mail Automatically"
-msgstr ""
+msgstr "Comprobar correo automáticamente"
 
 #: C/balsa.xml:2577(para)
 msgid ""
@@ -2230,7 +2242,7 @@ msgstr ""
 
 #: C/balsa.xml:2583(guilabel)
 msgid "Check IMAP mailboxes"
-msgstr ""
+msgstr "Comprobar buzones IMAP"
 
 #: C/balsa.xml:2585(para)
 msgid ""
@@ -2334,7 +2346,7 @@ msgstr ""
 
 #: C/balsa.xml:2687(guilabel)
 msgid "Reply prefix"
-msgstr ""
+msgstr "Prefijo de respuesta"
 
 #: C/balsa.xml:2689(para)
 msgid ""
@@ -2428,7 +2440,7 @@ msgstr ""
 
 #: C/balsa.xml:2789(guilabel)
 msgid "Use Preview Pane"
-msgstr ""
+msgstr "Usar panel de vista previa"
 
 #: C/balsa.xml:2791(para)
 msgid ""
@@ -2486,7 +2498,7 @@ msgstr ""
 
 #: C/balsa.xml:2849(guilabel)
 msgid "Moving a Message"
-msgstr ""
+msgstr "Mover un mensaje"
 
 #: C/balsa.xml:2851(para)
 msgid ""
@@ -2611,37 +2623,40 @@ msgstr ""
 
 #: C/balsa.xml:2986(para)
 msgid "<literal>%a</literal> -- The abbreviated weekday name."
-msgstr ""
+msgstr "<literal>%a</literal>: el nombre abreviado del día de la semana."
 
 #: C/balsa.xml:2991(para)
 msgid "<literal>%A</literal> -- The full weekday name."
-msgstr ""
+msgstr "<literal>%A</literal>: el nombre completo del día de la semana."
 
 #: C/balsa.xml:2996(para)
 msgid "<literal>%b</literal> -- The abbreviated month name."
-msgstr ""
+msgstr "<literal>%b</literal>: el nombre abreviado del mes."
 
 #: C/balsa.xml:3001(para)
 msgid "<literal>%B</literal> -- The full month name."
-msgstr ""
+msgstr "<literal>%B</literal>: el nombre completo del mes."
 
 #: C/balsa.xml:3006(para)
 msgid "<literal>%d</literal> -- The day of the month."
-msgstr ""
+msgstr "<literal>%d</literal>: el día del mes."
 
 #: C/balsa.xml:3011(para)
 msgid "<literal>%R</literal> -- The time using a 24-hour clock. (HH:MM)"
-msgstr ""
+msgstr "<literal>%R</literal>: la hora usando un reloj de 24 horas. (HH:MM)."
 
 #: C/balsa.xml:3016(para)
 msgid "<literal>%r</literal> -- The time using a 12-hour clock (HH:MM AM/PM)."
 msgstr ""
+"<literal>%r</literal>: la hora usando un reloj de 12 horas. (HH:MM AM/PM)."
 
 #: C/balsa.xml:3021(para)
 msgid ""
 "<literal>%T</literal> -- The time using a 24-hour clock, with seconds (HH:MM:"
 "SS)."
 msgstr ""
+"<literal>%T</literal> : la hora usando un reloj de 24 horas ,con segundos "
+"(HH:MM:SS.)"
 
 #: C/balsa.xml:3028(para)
 msgid ""
@@ -2658,7 +2673,7 @@ msgstr ""
 
 #: C/balsa.xml:3037(guilabel)
 msgid "Selected Headers"
-msgstr ""
+msgstr "Cabeceras seleccionadas"
 
 #: C/balsa.xml:3039(para)
 msgid "A space-separated list of the headers to display in the message window."
@@ -2678,7 +2693,7 @@ msgstr ""
 
 #: C/balsa.xml:3060(title)
 msgid "Status Messages"
-msgstr ""
+msgstr "Mensajes de estado"
 
 #: C/balsa.xml:3063(guilabel)
 msgid "Information Messages"
@@ -2731,7 +2746,7 @@ msgstr ""
 
 #: C/balsa.xml:3113(guilabel)
 msgid "Pspell Module"
-msgstr ""
+msgstr "Módulo Pspell"
 
 #: C/balsa.xml:3116(para)
 msgid ""
@@ -2809,7 +2824,7 @@ msgstr ""
 
 #: C/balsa.xml:3198(title)
 msgid "Address Books"
-msgstr ""
+msgstr "Libretas de direcciones"
 
 #: C/balsa.xml:3200(para)
 msgid ""
@@ -2892,7 +2907,7 @@ msgstr ""
 
 #: C/balsa.xml:3279(title)
 msgid "Modify an Address Book"
-msgstr ""
+msgstr "Modificar una libreta de direcciones"
 
 #: C/balsa.xml:3289(para)
 msgid ""
@@ -3164,7 +3179,7 @@ msgstr ""
 
 #: C/balsa.xml:3544(title)
 msgid "Advanced IMAP folder configuration"
-msgstr ""
+msgstr "Configuración avanzada de carpetas IMAP"
 
 #: C/balsa.xml:3546(para)
 msgid ""
@@ -3390,7 +3405,7 @@ msgstr ""
 
 #: C/balsa.xml:3740(para)
 msgid "An example output could be:"
-msgstr "Un ejemplo de salida es:"
+msgstr "Un ejemplo de salida podría ser:"
 
 #: C/balsa.xml:3741(computeroutput)
 #, no-wrap
@@ -3398,6 +3413,8 @@ msgid ""
 "\n"
 "lbdbq: 3 matches\n"
 msgstr ""
+"\n"
+"lbdbq: 3 coincidencias\n"
 
 #: C/balsa.xml:3744(computeroutput)
 #, no-wrap
@@ -3405,6 +3422,8 @@ msgid ""
 "\n"
 "balsa-list@gnome.org\tBalsa List\tbalsa-list\n"
 msgstr ""
+"\n"
+"balsa-list@gnome.org\tBalsa List\tbalsa-list\n"
 
 #: C/balsa.xml:3746(computeroutput)
 #, no-wrap
@@ -3412,6 +3431,8 @@ msgid ""
 "\n"
 "jelmer@nl.linux.org\tJelmer Vernooij\tjelmer\n"
 msgstr ""
+"\n"
+"jelmer@nl.linux.org\tJelmer Vernooij\tjelmer\n"
 
 #: C/balsa.xml:3748(computeroutput)
 #, no-wrap
@@ -3419,6 +3440,8 @@ msgid ""
 "\n"
 "balsa-maintainer@theochem.kth.se\tPawel Salek\tbalsa-maintainer\n"
 msgstr ""
+"\n"
+"balsa-maintainer@theochem.kth.se\tPawel Salek\tbalsa-maintainer\n"
 
 #: C/balsa.xml:3753(para)
 msgid ""
@@ -3458,7 +3481,7 @@ msgstr ""
 
 #: C/balsa.xml:3786(guilabel)
 msgid "Identity Name"
-msgstr ""
+msgstr "Nombre de la identidad"
 
 #: C/balsa.xml:3788(para)
 msgid ""
@@ -3677,7 +3700,7 @@ msgstr ""
 
 #: C/balsa.xml:4028(guilabel)
 msgid "Sign messages by default."
-msgstr "Firmar mensajes por omisión."
+msgstr "Firmar mensajes de manera predeterminada."
 
 #: C/balsa.xml:4030(para)
 msgid ""
@@ -3687,7 +3710,7 @@ msgstr ""
 
 #: C/balsa.xml:4039(guilabel)
 msgid "Encrypt messages by default."
-msgstr "Cifrar mensajes por omisión."
+msgstr "Cifrar mensajes de manera predeterminada."
 
 #: C/balsa.xml:4041(para)
 msgid ""
@@ -4190,7 +4213,7 @@ msgstr ""
 
 #: C/balsa.xml:4582(link)
 msgid "Creating new mailboxes"
-msgstr ""
+msgstr "Crear buzones nuevos"
 
 #: C/balsa.xml:4587(link)
 msgid "Moving messages around"
@@ -4202,7 +4225,7 @@ msgstr "Hacer que una de las carpetas principales esté basada en IMAP"
 
 #: C/balsa.xml:4597(link)
 msgid "Expanding e-mail addresses automatically"
-msgstr ""
+msgstr "Expandir direcciones de correo-e automáticamente"
 
 #: C/balsa.xml:4602(link) C/balsa.xml:4720(title)
 msgid "Setting up LDAP address books"
@@ -4752,5 +4775,6 @@ msgstr ""
 #: C/balsa.xml:0(None)
 msgid "translator-credits"
 msgstr ""
+"Daniel Mustieles <daniel.mustieles@gmail.com>, 2011\n"
 "Joaquín Ignacio Aramendía <samsagax@gmail.com>, 2011\n"
 "Jorge González <jorgegonz@svn.gnome.org>, 2008"

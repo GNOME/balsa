@@ -7,8 +7,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa-help.master\n"
-"POT-Creation-Date: 2011-03-21 21:21+0000\n"
-"PO-Revision-Date: 2011-03-23 18:26+0100\n"
+"POT-Creation-Date: 2011-03-27 16:01+0000\n"
+"PO-Revision-Date: 2011-03-28 13:23+0200\n"
 "Last-Translator: Daniel Mustieles <daniel.mustieles@gmail.com>\n"
 "Language-Team: Español <gnome-es-list@gnome.org>\n"
 "MIME-Version: 1.0\n"
@@ -1015,6 +1015,12 @@ msgid ""
 "level of the tree. <glossterm linkend=\"glossary-pop\"><acronym>POP3</"
 "acronym></glossterm> mailboxes are not displayed."
 msgstr ""
+"Sus buzones se mostrarán en una vista de árbol, con buzones en subcarpetas "
+"de su carpeta de correo local, inicialmente oculta pero accesible "
+"expandiendo el árbol. En el nivel superior del árbol se mostrarán los "
+"buzones <glossterm linkend=\"glossary-imap\"><acronym>IMAP</acronym></"
+"glossterm>. Los buzones <glossterm linkend=\"glossary-pop\"><acronym>POP3</"
+"acronym></glossterm> no se muestran."
 
 #: C/balsa.xml:1199(title)
 msgid "The Message Index"
@@ -1042,7 +1048,7 @@ msgstr ""
 
 #: C/balsa.xml:1223(para)
 msgid "The pop-up (context) menu contains the following items:"
-msgstr ""
+msgstr "El menú emergente (contextual) contiene los siguientes elementos:"
 
 #: C/balsa.xml:1227(para)
 msgid ""
@@ -1073,7 +1079,7 @@ msgstr ""
 
 #: C/balsa.xml:1265(title)
 msgid "The Message View"
-msgstr ""
+msgstr "La vista de mensaje"
 
 #: C/balsa.xml:1267(para)
 msgid ""
@@ -1110,11 +1116,11 @@ msgstr ""
 
 #: C/balsa.xml:1307(title)
 msgid "The Message Composer"
-msgstr ""
+msgstr "El editor de mensajes"
 
 #: C/balsa.xml:1310(title)
 msgid "Message Composition Window"
-msgstr ""
+msgstr "Ventana de edición del mensaje"
 
 #: C/balsa.xml:1320(para)
 msgid ""
@@ -1143,11 +1149,11 @@ msgstr "Barra de herramientas"
 
 #: C/balsa.xml:1340(para)
 msgid "Mail headers"
-msgstr ""
+msgstr "Cabeceras del mensaje"
 
 #: C/balsa.xml:1341(para)
 msgid "The attachment box"
-msgstr ""
+msgstr "El recuadro de adjuntos"
 
 #: C/balsa.xml:1342(para)
 msgid "The message body"
@@ -1155,7 +1161,7 @@ msgstr "El cuerpo del mensaje"
 
 #: C/balsa.xml:1345(para)
 msgid "These will each be covered in depth below:"
-msgstr ""
+msgstr "A continuación se detalla cada una de ellas en profundidad:"
 
 #: C/balsa.xml:1348(title)
 msgid "Menu Bar"
@@ -1624,7 +1630,7 @@ msgstr "Adjuntar"
 
 #: C/balsa.xml:1905(para)
 msgid "Open a dialog to attach a file to the current message."
-msgstr ""
+msgstr "Abrir un diálogo para adjuntar un archivo al mensaje actual."
 
 #: C/balsa.xml:1912(guibutton)
 msgid "Postpone"
@@ -1655,7 +1661,7 @@ msgstr "Imprimir"
 
 #: C/balsa.xml:1942(para)
 msgid "Print out the draft of the message."
-msgstr ""
+msgstr "Imprimir el borrador del mensaje."
 
 #: C/balsa.xml:1947(guibutton) C/balsa.xml:2260(guibutton)
 msgid "Cancel"
@@ -1778,7 +1784,7 @@ msgstr ""
 
 #: C/balsa.xml:2074(title)
 msgid "Specifying Addresses"
-msgstr ""
+msgstr "Especificar direcciones"
 
 #: C/balsa.xml:2076(para)
 msgid ""
@@ -1867,7 +1873,7 @@ msgstr ""
 
 #: C/balsa.xml:2169(title)
 msgid "Spell Checking Panel"
-msgstr ""
+msgstr "Panel de revisión ortográfica"
 
 #: C/balsa.xml:2179(para)
 msgid ""
@@ -1890,7 +1896,7 @@ msgstr ""
 
 #: C/balsa.xml:2199(guibutton)
 msgid "Change"
-msgstr "Cambio"
+msgstr "Cambiar"
 
 #: C/balsa.xml:2201(para)
 msgid ""
@@ -2078,18 +2084,20 @@ msgstr "Servidores de correo"
 #: C/balsa.xml:2436(para)
 msgid "This page lets you specify how you get POP3 mail, send mail, etc."
 msgstr ""
+"Esta página le permite especificar cómo obtener correo POP3, enviar correo "
+"etc."
 
 #: C/balsa.xml:2442(guilabel)
 msgid "Remote Mailbox Servers"
-msgstr ""
+msgstr "Servidores de buzones remotos"
 
 #: C/balsa.xml:2453(para)
 msgid "mailbox name that will identify the mailbox"
-msgstr ""
+msgstr "nombre del buzón que lo identificará"
 
 #: C/balsa.xml:2456(para)
 msgid "The server you have the POP mailbox on."
-msgstr ""
+msgstr "El servidor en el que tiene el buzón POP."
 
 #: C/balsa.xml:2459(para)
 msgid ""
@@ -2100,11 +2108,11 @@ msgstr ""
 
 #: C/balsa.xml:2464(para)
 msgid "The user name on the mailbox server."
-msgstr ""
+msgstr "El nombre de usuario en el servidor de buzones."
 
 #: C/balsa.xml:2467(para)
 msgid "Corresponding password."
-msgstr ""
+msgstr "Contraseña correspondiente."
 
 #: C/balsa.xml:2469(para)
 msgid ""
@@ -2120,11 +2128,11 @@ msgstr ""
 
 #: C/balsa.xml:2476(para)
 msgid "The <application>procmail</application> command."
-msgstr ""
+msgstr "El comando <application>procmail</application>."
 
 #: C/balsa.xml:2479(para)
 msgid "Whether to check for new mail."
-msgstr ""
+msgstr "Indica si se debe comprobar si hay correo nuevo."
 
 #: C/balsa.xml:2445(para)
 msgid ""
@@ -2139,7 +2147,7 @@ msgstr ""
 
 #: C/balsa.xml:2487(guilabel)
 msgid "Local Mail Directory"
-msgstr ""
+msgstr "Carpeta local de correo"
 
 #: C/balsa.xml:2489(para)
 msgid ""
@@ -2177,7 +2185,7 @@ msgstr ""
 
 #: C/balsa.xml:2525(para)
 msgid "A descriptive name that will identify the server"
-msgstr ""
+msgstr "Un nombre descriptivo que identificará al servidor"
 
 #: C/balsa.xml:2528(para)
 msgid "The domain name and port"
@@ -2201,7 +2209,7 @@ msgstr ""
 
 #: C/balsa.xml:2545(para)
 msgid "When you want <application>Balsa</application> to use TLS."
-msgstr ""
+msgstr "Cuando quiera que <application>Balsa</application> use TLS."
 
 #: C/balsa.xml:2547(para)
 msgid "The TLS certificate pass phrase."
@@ -2209,11 +2217,11 @@ msgstr "La contraseña del certificado TLS."
 
 #: C/balsa.xml:2549(para)
 msgid "Whether to split large messages, and the threshhold size."
-msgstr ""
+msgstr "Indica si se deben dividir los mensajes largos y el tamaño del umbral."
 
 #: C/balsa.xml:2522(para)
 msgid "You will be asked to give: <placeholder-1/>"
-msgstr ""
+msgstr "Se le pedirá: <placeholder-1/>"
 
 #: C/balsa.xml:2563(title)
 msgid "Incoming and Outgoing Mail"
@@ -2259,7 +2267,7 @@ msgstr ""
 
 #: C/balsa.xml:2597(guilabel)
 msgid "Display message if new mail has arrived"
-msgstr ""
+msgstr "Mostrar un mensaje si se recibe correo nuevo"
 
 #: C/balsa.xml:2600(para)
 msgid ""
@@ -2269,7 +2277,7 @@ msgstr ""
 
 #: C/balsa.xml:2606(guilabel)
 msgid "Do background check quietly"
-msgstr ""
+msgstr "Comprobar en segundo plano silenciosamente"
 
 #: C/balsa.xml:2608(para)
 msgid ""
@@ -2279,7 +2287,7 @@ msgstr ""
 
 #: C/balsa.xml:2616(guilabel)
 msgid "Wrap Incoming Text"
-msgstr ""
+msgstr "Ajustar texto entrante"
 
 #: C/balsa.xml:2618(para)
 msgid ""
@@ -2289,7 +2297,7 @@ msgstr ""
 
 #: C/balsa.xml:2627(guilabel)
 msgid "Reflow messages of type `text/plain;format=flowed'"
-msgstr ""
+msgstr "Refluir mensaje de tipo `text/plain;format=flowed'"
 
 #: C/balsa.xml:2632(para)
 msgid ""
@@ -2321,7 +2329,7 @@ msgstr ""
 
 #: C/balsa.xml:2658(guilabel)
 msgid "Message Disposition Notification request"
-msgstr ""
+msgstr "Solicitud de notificación de entrega del mensaje"
 
 #: C/balsa.xml:2661(para)
 msgid ""
@@ -2336,7 +2344,7 @@ msgstr "Saliente"
 
 #: C/balsa.xml:2679(guilabel)
 msgid "Wrap Outgoing Text"
-msgstr ""
+msgstr "Ajustar texto saliente"
 
 #: C/balsa.xml:2681(para)
 msgid ""
@@ -2380,7 +2388,7 @@ msgstr ""
 
 #: C/balsa.xml:2721(para)
 msgid "Tell <application>Balsa</application> to be sensible."
-msgstr ""
+msgstr "Hacer que <application>Balsa</application> sea sensible."
 
 #: C/balsa.xml:2727(guilabel)
 msgid "Forward a mail as attachment instead of quoting it"
@@ -2432,7 +2440,7 @@ msgstr ""
 
 #: C/balsa.xml:2781(title)
 msgid "Display Options"
-msgstr ""
+msgstr "Opciones de disposición"
 
 #: C/balsa.xml:2783(para)
 msgid "This page controls how <application>Balsa</application> appears to you."
@@ -2450,7 +2458,7 @@ msgstr ""
 
 #: C/balsa.xml:2797(guilabel)
 msgid "Show Mailbox Info"
-msgstr ""
+msgstr "Mostrar información del buzón"
 
 #: C/balsa.xml:2799(para)
 msgid ""
@@ -2463,7 +2471,7 @@ msgstr ""
 
 #: C/balsa.xml:2808(guilabel)
 msgid "Alternative Layout"
-msgstr ""
+msgstr "Disposición alternativa"
 
 #: C/balsa.xml:2810(para)
 msgid ""
@@ -2476,7 +2484,7 @@ msgstr ""
 
 #: C/balsa.xml:2821(guilabel)
 msgid "Automatic View"
-msgstr ""
+msgstr "Vista automática"
 
 #: C/balsa.xml:2823(para)
 msgid ""
@@ -2487,7 +2495,7 @@ msgstr ""
 
 #: C/balsa.xml:2832(guilabel)
 msgid "Page Up and Page Down"
-msgstr ""
+msgstr "AvPág y RePág"
 
 #: C/balsa.xml:2834(para)
 msgid ""
@@ -2495,6 +2503,9 @@ msgid ""
 "scroll the message by whole pages. Use this option to choose a different "
 "amount."
 msgstr ""
+"De manera predeterminada, las teclas <keysym>RePág</keysym> y <keysym>AvPág</"
+"keysym> desplazan el páginas enteras del mensaje. Use ésta opción para "
+"seleccionar una cantidad diferente."
 
 #: C/balsa.xml:2849(guilabel)
 msgid "Moving a Message"
@@ -2510,11 +2521,11 @@ msgstr ""
 
 #: C/balsa.xml:2863(title)
 msgid "Sort and Thread"
-msgstr ""
+msgstr "Orden y conversación"
 
 #: C/balsa.xml:2866(guilabel)
 msgid "Default sort column"
-msgstr ""
+msgstr "Columna de ordenación predeterminada"
 
 #: C/balsa.xml:2868(para)
 msgid "Choose the column by which you would like a new mailbox to be sorted."
@@ -2522,7 +2533,7 @@ msgstr ""
 
 #: C/balsa.xml:2875(guilabel)
 msgid "Default threading style"
-msgstr ""
+msgstr "Estilo de conversación predeterminado"
 
 #: C/balsa.xml:2877(para)
 msgid "Choose the default threading style for a new mailbox."
@@ -2530,7 +2541,7 @@ msgstr ""
 
 #: C/balsa.xml:2883(guilabel)
 msgid "Expand threads"
-msgstr ""
+msgstr "Expandir conversaciones"
 
 #: C/balsa.xml:2885(para)
 msgid ""
@@ -2586,7 +2597,7 @@ msgstr "Colores"
 
 #: C/balsa.xml:2944(guilabel)
 msgid "Message Colors"
-msgstr ""
+msgstr "Colores del mensaje"
 
 #: C/balsa.xml:2946(para)
 msgid "Choose the colors for quoted text."
@@ -2594,7 +2605,7 @@ msgstr ""
 
 #: C/balsa.xml:2952(guilabel)
 msgid "Link Color"
-msgstr ""
+msgstr "Color del enlace"
 
 #: C/balsa.xml:2954(para)
 msgid ""
@@ -2604,7 +2615,7 @@ msgstr ""
 
 #: C/balsa.xml:2960(guilabel)
 msgid "Composition Window"
-msgstr ""
+msgstr "Ventana de edición"
 
 #: C/balsa.xml:2962(para)
 msgid ""
@@ -2619,7 +2630,7 @@ msgstr "Formato"
 
 #: C/balsa.xml:2976(guilabel)
 msgid "Date Encoding"
-msgstr ""
+msgstr "Codificación de fechas"
 
 #: C/balsa.xml:2986(para)
 msgid "<literal>%a</literal> -- The abbreviated weekday name."
@@ -2681,7 +2692,7 @@ msgstr ""
 
 #: C/balsa.xml:3045(guilabel)
 msgid "Fallback codeset"
-msgstr ""
+msgstr "Codificación alternativa"
 
 #: C/balsa.xml:3047(para)
 msgid ""
@@ -2697,7 +2708,7 @@ msgstr "Mensajes de estado"
 
 #: C/balsa.xml:3063(guilabel)
 msgid "Information Messages"
-msgstr ""
+msgstr "Mensajes de información"
 
 #: C/balsa.xml:3065(para)
 msgid ""
@@ -2708,7 +2719,7 @@ msgstr ""
 
 #: C/balsa.xml:3073(guilabel)
 msgid "Display Progress"
-msgstr ""
+msgstr "Mostrar progreso"
 
 #: C/balsa.xml:3075(para)
 msgid ""
@@ -2773,7 +2784,7 @@ msgstr ""
 
 #: C/balsa.xml:3143(guilabel)
 msgid "Suggestion Mode"
-msgstr ""
+msgstr "Modo «Sugerencia»"
 
 #: C/balsa.xml:3146(para)
 msgid ""
@@ -2803,7 +2814,7 @@ msgstr ""
 
 #: C/balsa.xml:3171(guilabel)
 msgid "Bad Spellers"
-msgstr ""
+msgstr "Ortografía incorrecta"
 
 #: C/balsa.xml:3173(para)
 msgid ""
@@ -2813,7 +2824,7 @@ msgstr ""
 
 #: C/balsa.xml:3183(guilabel)
 msgid "Ignore Length"
-msgstr ""
+msgstr "Ignorar longitud"
 
 #: C/balsa.xml:3186(para)
 msgid ""
@@ -3055,7 +3066,7 @@ msgstr ""
 
 #: C/balsa.xml:3425(guilabel)
 msgid "Expunge deleted messages on close"
-msgstr ""
+msgstr "Purgar los mensajes borrados al salir"
 
 #: C/balsa.xml:3427(para)
 msgid ""
@@ -3148,6 +3159,7 @@ msgstr ""
 #: C/balsa.xml:3520(para)
 msgid "Server is the host name or IP number of the IMAP server."
 msgstr ""
+"El servidor es el nombre del equipo o la dirección IP del servidor IMAP."
 
 #: C/balsa.xml:3523(para)
 msgid "User name is the name used for authorization on the IMAP server."
@@ -3179,7 +3191,7 @@ msgstr ""
 
 #: C/balsa.xml:3544(title)
 msgid "Advanced IMAP folder configuration"
-msgstr "Configuración avanzada de carpetas IMAP"
+msgstr "Configuración avanzada de carpetas IMAP"
 
 #: C/balsa.xml:3546(para)
 msgid ""
@@ -3365,7 +3377,7 @@ msgstr ""
 
 #: C/balsa.xml:3719(title)
 msgid "Writing your own load scripts"
-msgstr "Escribir sus propias rutinas de carga"
+msgstr "Escribir sus propios scripts de carga"
 
 #: C/balsa.xml:3721(para)
 msgid ""
@@ -3450,7 +3462,7 @@ msgstr ""
 
 #: C/balsa.xml:3759(title)
 msgid "Writing your own save scripts"
-msgstr ""
+msgstr "Escribir sus propios scripts de guardado"
 
 #: C/balsa.xml:3761(para)
 msgid ""
@@ -3553,7 +3565,7 @@ msgstr ""
 
 #: C/balsa.xml:3866(guilabel)
 msgid "Forward String"
-msgstr ""
+msgstr "Cadena de reenvío"
 
 #: C/balsa.xml:3868(para)
 msgid "The prefix for the subject line when forwarding a message."
@@ -3609,7 +3621,7 @@ msgstr ""
 
 #: C/balsa.xml:3928(guilabel)
 msgid "Signature Path"
-msgstr ""
+msgstr "Ruta de la firma"
 
 #: C/balsa.xml:3930(para)
 msgid ""
@@ -3769,7 +3781,7 @@ msgstr ""
 
 #: C/balsa.xml:4105(title)
 msgid "The Search Mailbox Window"
-msgstr ""
+msgstr "La ventana «Buscar buzón»"
 
 #: C/balsa.xml:4106(para)
 msgid ""
@@ -3852,11 +3864,11 @@ msgstr "La página de coincidencia"
 
 #: C/balsa.xml:4207(para)
 msgid "AND: all condition tests must be true to make the match."
-msgstr ""
+msgstr "AND: todas las condiciones deben ser ciertas para que coincida."
 
 #: C/balsa.xml:4212(para)
 msgid "OR: one condition test must be true to make the match."
-msgstr ""
+msgstr "OR: una condición debe ser cierta para que coincida."
 
 #: C/balsa.xml:4201(para)
 msgid ""
@@ -4146,7 +4158,7 @@ msgstr ""
 
 #: C/balsa.xml:4525(title)
 msgid "Available mailbox formats"
-msgstr ""
+msgstr "Formatos de buzones disponibles"
 
 #: C/balsa.xml:4526(para)
 msgid ""

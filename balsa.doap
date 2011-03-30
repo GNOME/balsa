@@ -6,6 +6,10 @@
 
   <name xml:lang="en">balsa</name>
   <shortdesc xml:lang="en">Mail client</shortdesc>
+  <description>
+Balsa is an e-mail reader.  This client is part of the GNOME
+desktop environment.  It supports local mailboxes, POP3 and IMAP.
+  </description>
   <homepage rdf:resource="http://balsa.gnome.org/" />
   <mailing-list rdf:resource="http://mail.gnome.org/mailman/listinfo/balsa-list" />
   <download-page rdf:resource="http://balsa.gnome.org/download/" />

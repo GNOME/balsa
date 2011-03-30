@@ -1,3 +1,8 @@
+2011-03-29  Peter Bloomfield
+
+	* src/main-window.c: implement alt-n to switch to mailbox at
+	n-th tab.
+
 2011-03-21  Pawel Salek
 
 	* src/balsa-index.c: revert last change, it was wrong.

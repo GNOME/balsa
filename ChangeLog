@@ -1,3 +1,8 @@
+2011-04-05  Peter Bloomfield
+
+	* src/balsa-mime-widget-text.c (balsa_mime_widget_new_text): new
+	GtkSourceView macro.
+
 2011-02-05  Peter Bloomfield
 
 	* src/balsa-message.c (hide_all_parts): just destroy the

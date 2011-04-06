@@ -207,7 +207,7 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
 	ptr = libbalsa_wrap_rfc2646(ptr, G_MAXINT, FALSE, TRUE, delsp);
     } else if (bm->wrap_text
 #if HAVE_GTKSOURCEVIEW
-	       && !GTK_IS_SOURCE_VIEW(mw->widget)
+	       && !GTK_SOURCE_IS_VIEW(mw->widget)
 #endif
 	       )
 	libbalsa_wrap_string(ptr, balsa_app.browse_wrap_length);

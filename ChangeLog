@@ -1,3 +1,8 @@
+2011-04-06  Peter Bloomfield
+
+	* balsa.desktop.in: declare Balsa to be
+	MimeType=x-scheme-handler/mailto.
+
 2011-04-05  Peter Bloomfield
 
 	* src/balsa-mime-widget-text.c (balsa_mime_widget_new_text): new

@@ -33,6 +33,7 @@
 #include "main-window.h"
 
 #include <string.h>
+#include <gdk/gdkkeysyms.h>
 #include <gdk-pixbuf/gdk-pixbuf.h>
 
 #include "imap-server.h"
@@ -307,6 +308,7 @@ static GtkWidget *bw_notebook_label_new (BalsaMailboxNode* mbnode);
 static void bw_ident_manage_dialog_cb(GtkAction * action, gpointer user_data);
 
 static void bw_contents_cb(GtkAction * action, gpointer user_data);
+static void bw_mailbox_tab_n_cb(GtkAction * action, gpointer data);
 
 static void
 bw_quit_nicely(GtkAction * action, gpointer data)
@@ -346,6 +348,7 @@ static const GtkActionEntry entries[] = {
     {"HelpMenu", NULL, N_("_Help")},
 #if !defined(ENABLE_TOUCH_UI)
     {"FileNewMenu", NULL, N_("_New")},
+    {"MailboxTabMenu", NULL, NULL},
 #else  /* ENABLE_TOUCH_UI */
     {"MailboxesMenu", NULL, N_("Mail_boxes")},
     /* Less frequently used entries of the 'View' menu */
@@ -451,6 +454,26 @@ static const GtkActionEntry entries[] = {
     /* Help menu items */
     {"TableOfContents", GTK_STOCK_HELP, N_("_Contents"), "F1",
      N_("Table of Contents"), G_CALLBACK(bw_contents_cb)},
+    {"MailboxTab1", NULL, NULL, "<alt>1", NULL,
+     G_CALLBACK(bw_mailbox_tab_n_cb)},
+    {"MailboxTab2", NULL, NULL, "<alt>2", NULL,
+     G_CALLBACK(bw_mailbox_tab_n_cb)},
+    {"MailboxTab3", NULL, NULL, "<alt>3", NULL,
+     G_CALLBACK(bw_mailbox_tab_n_cb)},
+    {"MailboxTab4", NULL, NULL, "<alt>4", NULL,
+     G_CALLBACK(bw_mailbox_tab_n_cb)},
+    {"MailboxTab5", NULL, NULL, "<alt>5", NULL,
+     G_CALLBACK(bw_mailbox_tab_n_cb)},
+    {"MailboxTab6", NULL, NULL, "<alt>6", NULL,
+     G_CALLBACK(bw_mailbox_tab_n_cb)},
+    {"MailboxTab7", NULL, NULL, "<alt>7", NULL,
+     G_CALLBACK(bw_mailbox_tab_n_cb)},
+    {"MailboxTab8", NULL, NULL, "<alt>8", NULL,
+     G_CALLBACK(bw_mailbox_tab_n_cb)},
+    {"MailboxTab9", NULL, NULL, "<alt>9", NULL,
+     G_CALLBACK(bw_mailbox_tab_n_cb)},
+    {"MailboxTab0", NULL, NULL, "<alt>0", NULL,
+     G_CALLBACK(bw_mailbox_tab_n_cb)},
     {"About", GTK_STOCK_ABOUT, N_("_About"), NULL, N_("About Balsa"),
      G_CALLBACK(bw_show_about_box)}
 };
@@ -706,6 +729,18 @@ static const char *ui_description =
 "      <menuitem action='Print'/>"
 "      <separator/>"
 "      <menuitem action='AddressBook'/>"
+"      <menu action='MailboxTabMenu'>"
+"        <menuitem action='MailboxTab1'/>"
+"        <menuitem action='MailboxTab2'/>"
+"        <menuitem action='MailboxTab3'/>"
+"        <menuitem action='MailboxTab4'/>"
+"        <menuitem action='MailboxTab5'/>"
+"        <menuitem action='MailboxTab6'/>"
+"        <menuitem action='MailboxTab7'/>"
+"        <menuitem action='MailboxTab8'/>"
+"        <menuitem action='MailboxTab9'/>"
+"        <menuitem action='MailboxTab0'/>"
+"      </menu>"
 "      <separator/>"
 "      <menuitem action='Quit'/>"
 "    </menu>"
@@ -1401,6 +1436,16 @@ bw_get_active(BalsaWindow * window, const gchar * action_name)
     return gtk_toggle_action_get_active(GTK_TOGGLE_ACTION(action));
 }
 
+/* Set the visibility of a GtkAction.
+ */
+static void
+bw_set_visible(BalsaWindow * window, const gchar * action_name,
+               gboolean visible)
+{
+    GtkAction *action = bw_get_action(window, action_name);
+    gtk_action_set_visible(action, visible);
+}
+
 /*
  * end of GtkAction helpers
  */
@@ -1856,6 +1901,8 @@ balsa_window_new()
         pthread_mutex_unlock(&checking_mail_lock);
     }
 #endif
+
+    bw_set_visible(window, "MailboxTabMenu", FALSE);
 
     gtk_widget_show(GTK_WIDGET(window));
     return GTK_WIDGET(window);
@@ -2682,6 +2729,20 @@ bw_contents_cb(GtkAction * action, gpointer user_data)
                           _("Error displaying help: %s\n"), err->message);
         g_error_free(err);
     }
+}
+
+static void
+bw_mailbox_tab_n_cb(GtkAction * action, gpointer data)
+{
+    GdkEvent *event;
+
+    event = gtk_get_current_event();
+    if (event->type == GDK_KEY_PRESS) {
+        gtk_notebook_set_current_page(GTK_NOTEBOOK
+                                      (BALSA_WINDOW(data)->notebook),
+                                      event->key.keyval - GDK_KEY_1);
+    }
+    gdk_event_free(event);
 }
 
 /*

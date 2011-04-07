@@ -1,5 +1,9 @@
 2011-04-06  Peter Bloomfield
 
+	* src/main-window.c: implement alt-n to switch to mailbox n.
+
+2011-04-06  Peter Bloomfield
+
 	* balsa.desktop.in: declare Balsa to be
 	MimeType=x-scheme-handler/mailto.
 

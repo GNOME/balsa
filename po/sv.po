@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-27 18:36+0100\n"
-"PO-Revision-Date: 2011-02-27 18:42+0100\n"
+"POT-Creation-Date: 2011-04-09 10:14+0200\n"
+"PO-Revision-Date: 2011-04-09 10:14+0100\n"
 "Last-Translator: Daniel Nylander <po@danielnylander.se>\n"
 "Language-Team: Swedish <tp-sv@listor.tp-sv.se>\n"
 "Language: sv\n"
@@ -21,13 +21,20 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../balsa.desktop.in.h:1
+#: ../balsa-mailto-handler.desktop.in.in.h:1
+#: ../balsa.desktop.in.in.h:1
 msgid "Balsa"
 msgstr "Balsa"
 
-#: ../balsa.desktop.in.h:2
+#: ../balsa-mailto-handler.desktop.in.in.h:2
+#: ../balsa.desktop.in.in.h:2
 msgid "E-Mail utility"
 msgstr "E-postverktyg"
+
+#: ../balsa-mailto-handler.desktop.in.in.h:3
+#: ../balsa.desktop.in.in.h:3
+msgid "Mail Client"
+msgstr "E-postklient"
 
 #. The externq database doesn't support Id's, sorry!
 #: ../libbalsa/address-book-extern.c:210
@@ -91,8 +98,8 @@ msgid "Cannot find address in address book"
 msgstr "Kan inte hitta adressen i adressboken"
 
 #: ../libbalsa/address-book.c:323
-#: ../src/main-window.c:2339
-#: ../src/main-window.c:4783
+#: ../src/main-window.c:2386
+#: ../src/main-window.c:4844
 #: ../src/sendmsg-window.c:4149
 msgid "Unknown error"
 msgstr "Okänt fel"
@@ -1730,7 +1737,7 @@ msgid "Sending Mail..."
 msgstr "Skickar post..."
 
 #: ../libbalsa/send.c:256
-#: ../src/main-window.c:2828
+#: ../src/main-window.c:2889
 msgid "_Hide"
 msgstr "_Dölj"
 
@@ -1936,7 +1943,7 @@ msgstr "MB"
 #. Menus
 #: ../libbalsa/source-viewer.c:46
 #: ../src/ab-main.c:553
-#: ../src/main-window.c:344
+#: ../src/main-window.c:346
 #: ../src/message-window.c:239
 #: ../src/sendmsg-window.c:319
 msgid "_File"
@@ -1944,14 +1951,14 @@ msgstr "_Arkiv"
 
 #: ../libbalsa/source-viewer.c:47
 #: ../src/filter-edit-dialog.c:321
-#: ../src/main-window.c:345
+#: ../src/main-window.c:347
 #: ../src/message-window.c:240
 #: ../src/sendmsg-window.c:320
 msgid "_Edit"
 msgstr "_Redigera"
 
 #: ../libbalsa/source-viewer.c:48
-#: ../src/main-window.c:346
+#: ../src/main-window.c:348
 #: ../src/message-window.c:241
 msgid "_View"
 msgstr "_Visa"
@@ -1959,7 +1966,7 @@ msgstr "_Visa"
 #. Items
 #: ../libbalsa/source-viewer.c:50
 #: ../src/mailbox-node.c:1096
-#: ../src/main-window.c:498
+#: ../src/main-window.c:521
 #: ../src/message-window.c:248
 #: ../src/sendmsg-window.c:349
 msgid "_Close"
@@ -1971,8 +1978,8 @@ msgstr "Stäng fönstret"
 
 #. Edit menu items
 #: ../libbalsa/source-viewer.c:52
-#: ../src/main-window.c:418
-#: ../src/main-window.c:564
+#: ../src/main-window.c:421
+#: ../src/main-window.c:587
 #: ../src/message-window.c:251
 #: ../src/sendmsg-window.c:357
 msgid "_Copy"
@@ -1983,12 +1990,12 @@ msgid "Copy text"
 msgstr "Kopiera text"
 
 #: ../libbalsa/source-viewer.c:54
-#: ../src/main-window.c:566
+#: ../src/main-window.c:589
 msgid "_Select Text"
 msgstr "_Markera text"
 
 #: ../libbalsa/source-viewer.c:55
-#: ../src/main-window.c:567
+#: ../src/main-window.c:590
 msgid "Select entire mail"
 msgstr "Markera hela meddelandet"
 
@@ -2250,7 +2257,7 @@ msgid "_Entry"
 msgstr "_Post"
 
 #: ../src/ab-main.c:555
-#: ../src/main-window.c:350
+#: ../src/main-window.c:352
 msgid "_Help"
 msgstr "_Hjälp"
 
@@ -2258,9 +2265,9 @@ msgstr "_Hjälp"
 #: ../src/ab-main.c:556
 #: ../src/filter-edit-dialog.c:226
 #: ../src/mailbox-node.c:1061
-#: ../src/main-window.c:352
-#: ../src/main-window.c:586
-#: ../src/main-window.c:595
+#: ../src/main-window.c:354
+#: ../src/main-window.c:609
+#: ../src/main-window.c:618
 msgid "_New"
 msgstr "_Nytt"
 
@@ -2318,7 +2325,7 @@ msgid "Delete address book"
 msgstr "Ta bort adressbok"
 
 #: ../src/ab-main.c:579
-#: ../src/main-window.c:386
+#: ../src/main-window.c:389
 msgid "_Quit"
 msgstr "A_vsluta"
 
@@ -2343,7 +2350,7 @@ msgid "Delete entry"
 msgstr "Ta bort post"
 
 #: ../src/ab-main.c:585
-#: ../src/main-window.c:458
+#: ../src/main-window.c:481
 msgid "_About"
 msgstr "_Om"
 
@@ -2493,8 +2500,8 @@ msgid "Enable _TLS"
 msgstr "Aktivera _TLS"
 
 #: ../src/address-book-config.c:541
-#: ../src/main-window.c:2671
-#: ../src/main-window.c:4430
+#: ../src/main-window.c:2718
+#: ../src/main-window.c:4491
 #, c-format
 msgid "Error displaying help: %s\n"
 msgstr "Fel vid visning av hjälp: %s\n"
@@ -2574,7 +2581,7 @@ msgstr "Flyttning till papperskorg misslyckades: %s"
 
 #. Message menu items
 #: ../src/balsa-index.c:1884
-#: ../src/main-window.c:514
+#: ../src/main-window.c:537
 #: ../src/message-window.c:268
 msgid "_Reply..."
 msgstr "_Svara..."
@@ -2596,12 +2603,12 @@ msgid "Forward _Inline..."
 msgstr "Vidarebefordra _inuti..."
 
 #: ../src/balsa-index.c:1894
-#: ../src/main-window.c:541
+#: ../src/main-window.c:564
 msgid "_Pipe through..."
 msgstr "Kör genom _rör..."
 
 #: ../src/balsa-index.c:1896
-#: ../src/main-window.c:521
+#: ../src/main-window.c:544
 msgid "_Store Address..."
 msgstr "_Lagra adress..."
 
@@ -2619,8 +2626,8 @@ msgstr "Vä_xla"
 
 #. Message:toggle-flag submenu items
 #: ../src/balsa-index.c:1929
-#: ../src/main-window.c:591
-#: ../src/main-window.c:636
+#: ../src/main-window.c:614
+#: ../src/main-window.c:659
 msgid "_Flagged"
 msgstr "_Flaggad"
 
@@ -3089,7 +3096,7 @@ msgstr "Skicka _meddelande för att få tag i denna del"
 
 #: ../src/balsa-mime-widget-message.c:296
 #: ../src/balsa-mime-widget-text.c:804
-#: ../src/main-window.c:2689
+#: ../src/main-window.c:2750
 #: ../src/sendmsg-window.c:1820
 #, c-format
 msgid "Error showing %s: %s\n"
@@ -3418,17 +3425,17 @@ msgid "C_lear"
 msgstr "T_öm"
 
 #: ../src/filter-edit-callbacks.c:950
-#: ../src/main-window.c:4306
+#: ../src/main-window.c:4367
 msgid "_Body"
 msgstr "_Meddelandetext"
 
 #: ../src/filter-edit-callbacks.c:951
-#: ../src/main-window.c:4307
+#: ../src/main-window.c:4368
 msgid "_To:"
 msgstr "_Till:"
 
 #: ../src/filter-edit-callbacks.c:952
-#: ../src/main-window.c:4308
+#: ../src/main-window.c:4369
 msgid "_From:"
 msgstr "_Från:"
 
@@ -3437,7 +3444,7 @@ msgid "_Subject"
 msgstr "_Ärende"
 
 #: ../src/filter-edit-callbacks.c:954
-#: ../src/main-window.c:4310
+#: ../src/main-window.c:4371
 msgid "_Cc:"
 msgstr "_Kopia:"
 
@@ -4266,7 +4273,7 @@ msgid "_Rescan"
 msgstr "_Läs om"
 
 #: ../src/mailbox-node.c:1078
-#: ../src/main-window.c:485
+#: ../src/main-window.c:508
 msgid "_Properties..."
 msgstr "_Egenskaper..."
 
@@ -4321,24 +4328,24 @@ msgstr "Lokala postlådan %s inläst som: %s\n"
 msgid "Local folder %s\n"
 msgstr "Lokal mapp %s\n"
 
-#: ../src/main-window.c:322
+#: ../src/main-window.c:324
 msgid "Balsa closes files and connections. Please wait..."
 msgstr "Balsa stänger filer och anslutningar. Var god vänta..."
 
-#: ../src/main-window.c:347
+#: ../src/main-window.c:349
 msgid "Mail_box"
 msgstr "_Postlåda"
 
-#: ../src/main-window.c:348
+#: ../src/main-window.c:350
 #: ../src/message-window.c:243
 msgid "_Message"
 msgstr "_Meddelande"
 
-#: ../src/main-window.c:349
+#: ../src/main-window.c:351
 msgid "_Settings"
 msgstr "_Inställningar"
 
-#: ../src/main-window.c:354
+#: ../src/main-window.c:357
 msgid "Mail_boxes"
 msgstr "_Postlådor"
 
@@ -4347,425 +4354,425 @@ msgstr "_Postlådor"
 #. Less frequently used entries of the 'File' menu
 #. Less frequently used entries of the 'Edit' menu
 #. Less frequently used entries of the 'Tools' menu
-#: ../src/main-window.c:356
-#: ../src/main-window.c:361
+#: ../src/main-window.c:359
+#: ../src/main-window.c:364
 #: ../src/sendmsg-window.c:327
 #: ../src/sendmsg-window.c:329
 #: ../src/sendmsg-window.c:331
 msgid "_More"
 msgstr "_Mer"
 
-#: ../src/main-window.c:357
+#: ../src/main-window.c:360
 msgid "_Headers"
 msgstr "_Rubriker"
 
-#: ../src/main-window.c:358
+#: ../src/main-window.c:361
 msgid "_Sort Mailbox"
 msgstr "_Sortera postlåda"
 
-#: ../src/main-window.c:359
+#: ../src/main-window.c:362
 msgid "H_ide messages"
 msgstr "_Dölj meddelanden"
 
-#: ../src/main-window.c:362
+#: ../src/main-window.c:365
 #: ../src/sendmsg-window.c:325
 msgid "_Tools"
 msgstr "_Verktyg..."
 
-#: ../src/main-window.c:363
+#: ../src/main-window.c:366
 msgid "_Filters"
 msgstr "_Filter..."
 
-#: ../src/main-window.c:364
+#: ../src/main-window.c:367
 msgid "F_ilters"
 msgstr "F_ilter"
 
-#: ../src/main-window.c:365
-#: ../src/main-window.c:421
+#: ../src/main-window.c:368
+#: ../src/main-window.c:424
 msgid "Manage filters"
 msgstr "Hantera filter"
 
 #. File menu items
 #. Not in the touchpad menu, but still available as a toolbar
 #. * button:
-#: ../src/main-window.c:370
+#: ../src/main-window.c:373
 msgid "_Continue"
 msgstr "_Fortsätt"
 
-#: ../src/main-window.c:371
+#: ../src/main-window.c:374
 msgid "Continue editing current message"
 msgstr "Fortsätt redigera aktuellt meddelande"
 
-#: ../src/main-window.c:373
+#: ../src/main-window.c:376
 msgid "_Get New Mail"
 msgstr "_Hämta ny post"
 
-#: ../src/main-window.c:374
+#: ../src/main-window.c:377
 msgid "Fetch new incoming mail"
 msgstr "Hämta ny inkommande post"
 
-#: ../src/main-window.c:375
+#: ../src/main-window.c:378
 msgid "_Send Queued Mail"
 msgstr "_Skicka kölagd post"
 
-#: ../src/main-window.c:376
+#: ../src/main-window.c:379
 msgid "Send messages from the outbox"
 msgstr "Skicka meddelanden från utkorgen"
 
-#: ../src/main-window.c:379
+#: ../src/main-window.c:382
 msgid "Send and _Receive Mail"
 msgstr "Skicka och ta _emot post"
 
-#: ../src/main-window.c:380
+#: ../src/main-window.c:383
 msgid "Send and Receive messages"
 msgstr "Skicka och ta emot meddelanden"
 
-#: ../src/main-window.c:382
+#: ../src/main-window.c:385
 #: ../src/message-window.c:244
 #: ../src/sendmsg-window.c:344
 msgid "Page _Setup"
 msgstr "Sid_konfiguration"
 
-#: ../src/main-window.c:383
+#: ../src/main-window.c:386
 #: ../src/message-window.c:245
 #: ../src/sendmsg-window.c:345
 msgid "Set up page for printing"
 msgstr "Konfigurera sida för utskrift"
 
-#: ../src/main-window.c:384
+#: ../src/main-window.c:387
 msgid "_Address Book..."
 msgstr "_Adressbok..."
 
-#: ../src/main-window.c:385
+#: ../src/main-window.c:388
 msgid "Open the address book"
 msgstr "Öppna adressboken"
 
-#: ../src/main-window.c:386
+#: ../src/main-window.c:389
 msgid "Quit Balsa"
 msgstr "Avsluta Balsa"
 
 #. File:New submenu items
-#: ../src/main-window.c:389
+#: ../src/main-window.c:392
 msgid "_Message..."
 msgstr "_Meddelande..."
 
-#: ../src/main-window.c:390
+#: ../src/main-window.c:393
 msgid "Compose a new message"
 msgstr "Skriv ett nytt meddelande"
 
-#: ../src/main-window.c:392
+#: ../src/main-window.c:395
 msgid "Local mbox mailbox..."
 msgstr "Lokal mbox-postlåda..."
 
-#: ../src/main-window.c:393
-#: ../src/main-window.c:402
+#: ../src/main-window.c:396
+#: ../src/main-window.c:405
 msgid "Add a new mbox style mailbox"
 msgstr "Lägg till en ny postlåda av mbox-typ"
 
-#: ../src/main-window.c:395
+#: ../src/main-window.c:398
 msgid "Local Maildir mailbox..."
 msgstr "Lokal Maildir-postlåda..."
 
-#: ../src/main-window.c:396
-#: ../src/main-window.c:405
+#: ../src/main-window.c:399
+#: ../src/main-window.c:408
 msgid "Add a new Maildir style mailbox"
 msgstr "Lägg till en ny postlåda av Maildir-typ"
 
-#: ../src/main-window.c:398
+#: ../src/main-window.c:401
 msgid "Local MH mailbox..."
 msgstr "Lokal MH-postlåda..."
 
-#: ../src/main-window.c:399
-#: ../src/main-window.c:408
+#: ../src/main-window.c:402
+#: ../src/main-window.c:411
 msgid "Add a new MH style mailbox"
 msgstr "Lägg till en ny postlåda av MH-typ"
 
-#: ../src/main-window.c:401
+#: ../src/main-window.c:404
 msgid "New mailbox..."
 msgstr "Ny postlåda..."
 
-#: ../src/main-window.c:404
+#: ../src/main-window.c:407
 msgid "New \"Maildir\" mailbox..."
 msgstr "Ny \"Maildir\"-postlåda..."
 
-#: ../src/main-window.c:407
+#: ../src/main-window.c:410
 msgid "New \"MH\" mailbox..."
 msgstr "Ny \"MH\"-postlåda..."
 
-#: ../src/main-window.c:410
+#: ../src/main-window.c:413
 #: ../src/pref-manager.c:3281
 msgid "Remote IMAP mailbox..."
 msgstr "IMAP-fjärrpostlåda..."
 
-#: ../src/main-window.c:411
+#: ../src/main-window.c:414
 msgid "Add a new IMAP mailbox"
 msgstr "Lägg till en ny IMAP-postlåda"
 
-#: ../src/main-window.c:412
+#: ../src/main-window.c:415
 #: ../src/pref-manager.c:3286
 msgid "Remote IMAP folder..."
 msgstr "IMAP-fjärrmapp..."
 
-#: ../src/main-window.c:413
+#: ../src/main-window.c:416
 msgid "Add a new IMAP folder"
 msgstr "Lägg till en ny IMAP-mapp"
 
-#: ../src/main-window.c:414
+#: ../src/main-window.c:417
 msgid "Remote IMAP subfolder..."
 msgstr "IMAP-fjärrundermapp..."
 
-#: ../src/main-window.c:415
+#: ../src/main-window.c:418
 msgid "Add a new IMAP subfolder"
 msgstr "Lägg till en ny IMAP-undermapp"
 
-#: ../src/main-window.c:420
+#: ../src/main-window.c:423
 msgid "F_ilters..."
 msgstr "_Filter..."
 
 #. Export selected filters to a text file.
-#: ../src/main-window.c:423
+#: ../src/main-window.c:426
 msgid "_Export Filters..."
 msgstr "_Exportera filter..."
 
-#: ../src/main-window.c:424
+#: ../src/main-window.c:427
 msgid "Export filters as Sieve scripts"
 msgstr "Exportera filter som Sieve-skript"
 
-#: ../src/main-window.c:425
+#: ../src/main-window.c:428
 msgid "Prefere_nces"
 msgstr "I_nställningar"
 
 #. View menu items
-#: ../src/main-window.c:428
+#: ../src/main-window.c:431
 msgid "E_xpand All"
 msgstr "E_xpandera alla"
 
-#: ../src/main-window.c:429
+#: ../src/main-window.c:432
 msgid "Expand all threads"
 msgstr "Expandera alla trådar"
 
-#: ../src/main-window.c:430
+#: ../src/main-window.c:433
 msgid "_Collapse All"
 msgstr "_Fäll ihop alla"
 
-#: ../src/main-window.c:431
+#: ../src/main-window.c:434
 msgid "Collapse all expanded threads"
 msgstr "Fäll ihop alla expanderade trådar"
 
-#: ../src/main-window.c:433
+#: ../src/main-window.c:436
 #: ../src/message-window.c:259
 msgid "Zoom _In"
 msgstr "Zooma _in"
 
-#: ../src/main-window.c:434
+#: ../src/main-window.c:437
 #: ../src/message-window.c:260
 msgid "Increase magnification"
 msgstr "Öka förstoringen"
 
-#: ../src/main-window.c:435
+#: ../src/main-window.c:438
 #: ../src/message-window.c:261
 msgid "Zoom _Out"
 msgstr "Zooma _ut"
 
-#: ../src/main-window.c:436
+#: ../src/main-window.c:439
 #: ../src/message-window.c:262
 msgid "Decrease magnification"
 msgstr "Minska förstoringen"
 
 #. To warn msgfmt that the % sign isn't a format specifier:
-#: ../src/main-window.c:439
+#: ../src/main-window.c:442
 #: ../src/message-window.c:265
 #, no-c-format
 msgid "Zoom _100%"
 msgstr "Zooma till _100%"
 
-#: ../src/main-window.c:440
+#: ../src/main-window.c:443
 #: ../src/message-window.c:266
 msgid "No magnification"
 msgstr "Ingen förstoring"
 
 #. Mailbox menu item that does not require a mailbox
-#: ../src/main-window.c:443
-#: ../src/main-window.c:444
+#: ../src/main-window.c:446
+#: ../src/main-window.c:447
 #: ../src/message-window.c:300
 #: ../src/message-window.c:301
 msgid "Next Unread Message"
 msgstr "Nästa olästa meddelande"
 
-#: ../src/main-window.c:446
+#: ../src/main-window.c:449
 msgid "Empty _Trash"
 msgstr "_Töm papperskorgen"
 
-#: ../src/main-window.c:447
+#: ../src/main-window.c:450
 msgid "Delete messages from the Trash mailbox"
 msgstr "Ta bort meddelanden från papperskorgen"
 
 #. Settings menu items
-#: ../src/main-window.c:450
+#: ../src/main-window.c:453
 msgid "_Toolbars..."
 msgstr "_Verktygsrader..."
 
-#: ../src/main-window.c:451
+#: ../src/main-window.c:454
 msgid "Customize toolbars"
 msgstr "Anpassa verktygsrader"
 
-#: ../src/main-window.c:452
+#: ../src/main-window.c:455
 msgid "_Identities..."
 msgstr "_Identiteter..."
 
-#: ../src/main-window.c:453
+#: ../src/main-window.c:456
 msgid "Create and set current identities"
 msgstr "Skapa och ställ in aktuella identiteter"
 
 #. Help menu items
-#: ../src/main-window.c:456
+#: ../src/main-window.c:459
 msgid "_Contents"
 msgstr "_Innehåll"
 
-#: ../src/main-window.c:457
+#: ../src/main-window.c:460
 msgid "Table of Contents"
 msgstr "Innehållsförteckning"
 
 #. license ?
-#: ../src/main-window.c:458
-#: ../src/main-window.c:2728
+#: ../src/main-window.c:481
+#: ../src/main-window.c:2789
 msgid "About Balsa"
 msgstr "Om Balsa"
 
 #. Edit menu items
-#: ../src/main-window.c:465
+#: ../src/main-window.c:488
 #: ../src/message-window.c:253
 #: ../src/sendmsg-window.c:361
 msgid "Select _All"
 msgstr "Markera _alla"
 
-#: ../src/main-window.c:467
+#: ../src/main-window.c:490
 msgid "_Find"
 msgstr "_Sök"
 
-#: ../src/main-window.c:469
+#: ../src/main-window.c:492
 msgid "Find Ne_xt"
 msgstr "Sök n_ästa"
 
 #. Mailbox menu items
-#: ../src/main-window.c:472
-#: ../src/main-window.c:473
+#: ../src/main-window.c:495
+#: ../src/main-window.c:496
 #: ../src/message-window.c:298
 #: ../src/message-window.c:299
 msgid "Next Message"
 msgstr "Nästa meddelande"
 
-#: ../src/main-window.c:474
-#: ../src/main-window.c:475
+#: ../src/main-window.c:497
+#: ../src/main-window.c:498
 #: ../src/message-window.c:303
 #: ../src/message-window.c:304
 msgid "Previous Message"
 msgstr "Föregående meddelande"
 
-#: ../src/main-window.c:476
-#: ../src/main-window.c:477
+#: ../src/main-window.c:499
+#: ../src/main-window.c:500
 #: ../src/message-window.c:305
 #: ../src/message-window.c:306
 msgid "Next Flagged Message"
 msgstr "Nästa flaggade meddelande"
 
-#: ../src/main-window.c:479
+#: ../src/main-window.c:502
 msgid "_Hide Messages"
 msgstr "_Dölj meddelanden"
 
-#: ../src/main-window.c:480
+#: ../src/main-window.c:503
 msgid "_Reset Filter"
 msgstr "Åte_rställ filter"
 
-#: ../src/main-window.c:481
+#: ../src/main-window.c:504
 msgid "Reset mailbox filter"
 msgstr "Återställ postlådefilter"
 
-#: ../src/main-window.c:482
+#: ../src/main-window.c:505
 msgid "_Select All"
 msgstr "Markera _alla"
 
-#: ../src/main-window.c:483
+#: ../src/main-window.c:506
 msgid "Select all messages in current mailbox"
 msgstr "Markera alla meddelanden i aktuell postlåda"
 
-#: ../src/main-window.c:486
+#: ../src/main-window.c:509
 msgid "Edit the selected mailbox"
 msgstr "Redigera den valda postlådan"
 
-#: ../src/main-window.c:487
+#: ../src/main-window.c:510
 msgid "_Delete..."
 msgstr "Ta _bort..."
 
-#: ../src/main-window.c:488
+#: ../src/main-window.c:511
 msgid "Delete the selected mailbox"
 msgstr "Ta bort den valda postlådan"
 
-#: ../src/main-window.c:491
-#: ../src/main-window.c:494
+#: ../src/main-window.c:514
+#: ../src/main-window.c:517
 msgid "E_xpunge Deleted Messages"
 msgstr "Rensa _bort borttagna meddelanden"
 
-#: ../src/main-window.c:492
-#: ../src/main-window.c:495
+#: ../src/main-window.c:515
+#: ../src/main-window.c:518
 msgid "Expunge messages marked as deleted in the current mailbox"
 msgstr "Rensa bort meddelanden markerade som borttagna i den aktuella postlådan"
 
-#: ../src/main-window.c:498
+#: ../src/main-window.c:521
 msgid "Close mailbox"
 msgstr "Stäng postlåda"
 
-#: ../src/main-window.c:500
+#: ../src/main-window.c:523
 msgid "Select _Filters"
 msgstr "Välj _filter"
 
-#: ../src/main-window.c:501
+#: ../src/main-window.c:524
 msgid "Select filters to be applied automatically to current mailbox"
 msgstr "Välj filter som ska aktiveras automatiskt på aktuell postlåda"
 
-#: ../src/main-window.c:504
+#: ../src/main-window.c:527
 msgid "_Remove Duplicates"
 msgstr "_Ta bort dubbletter"
 
-#: ../src/main-window.c:505
+#: ../src/main-window.c:528
 msgid "Remove duplicated messages from the current mailbox"
 msgstr "Ta bort dubblerade meddelanden från den aktuella postlådan"
 
-#: ../src/main-window.c:515
+#: ../src/main-window.c:538
 #: ../src/message-window.c:269
 msgid "Reply to the current message"
 msgstr "Svara på aktuellt meddelande"
 
-#: ../src/main-window.c:516
+#: ../src/main-window.c:539
 #: ../src/message-window.c:270
 msgid "Reply to _All..."
 msgstr "Svara till _alla..."
 
-#: ../src/main-window.c:517
+#: ../src/main-window.c:540
 #: ../src/message-window.c:271
 msgid "Reply to all recipients of the current message"
 msgstr "Svara till alla mottagare av aktuellt meddelande"
 
-#: ../src/main-window.c:519
+#: ../src/main-window.c:542
 #: ../src/message-window.c:273
 msgid "Reply to _Group..."
 msgstr "Svara till _grupp..."
 
-#: ../src/main-window.c:520
+#: ../src/main-window.c:543
 #: ../src/message-window.c:274
 msgid "Reply to mailing list"
 msgstr "Svara till sändlista"
 
-#: ../src/main-window.c:522
+#: ../src/main-window.c:545
 msgid "Store address of sender in addressbook"
 msgstr "Lagra avsändaradressen i adressboken"
 
-#: ../src/main-window.c:524
+#: ../src/main-window.c:547
 #: ../src/message-window.c:278
 msgid "_View Source..."
 msgstr "_Visa källa..."
 
-#: ../src/main-window.c:525
+#: ../src/main-window.c:548
 #: ../src/message-window.c:279
 msgid "View source form of the message"
 msgstr "Visa meddelandet på källkodsform"
@@ -4774,226 +4781,226 @@ msgstr "Visa meddelandet på källkodsform"
 #. * stock_id; the first in this list defines the action tied to the
 #. * toolbar's Forward button, so "ForwardDefault" must come before
 #. * the others.
-#: ../src/main-window.c:531
+#: ../src/main-window.c:554
 msgid "_Forward..."
 msgstr "_Vidarebefordra..."
 
-#: ../src/main-window.c:532
+#: ../src/main-window.c:555
 #: ../src/message-window.c:285
 msgid "Forward the current message"
 msgstr "Vidarebefordra aktuellt meddelande"
 
-#: ../src/main-window.c:535
+#: ../src/main-window.c:558
 #: ../src/message-window.c:287
 msgid "_Forward attached..."
 msgstr "_Vidarebefordra bifogad..."
 
-#: ../src/main-window.c:536
+#: ../src/main-window.c:559
 #: ../src/message-window.c:288
 msgid "Forward the current message as attachment"
 msgstr "Vidarebefordra det aktuella meddelandet som bilaga"
 
-#: ../src/main-window.c:538
+#: ../src/main-window.c:561
 #: ../src/message-window.c:290
 msgid "Forward _inline..."
 msgstr "Vidarebefordra _inuti..."
 
-#: ../src/main-window.c:539
+#: ../src/main-window.c:562
 #: ../src/message-window.c:291
 msgid "Forward the current message inline"
 msgstr "Vidarebefordra det aktuella meddelandet inuti"
 
-#: ../src/main-window.c:542
+#: ../src/main-window.c:565
 msgid "Pipe the message through another program"
 msgstr "_Kör meddelandet genom ett annat program"
 
-#: ../src/main-window.c:544
+#: ../src/main-window.c:567
 msgid "Select _Thread"
 msgstr "Välj _tråd"
 
-#: ../src/main-window.c:545
+#: ../src/main-window.c:568
 msgid "Select all messages in current thread"
 msgstr "Markera alla meddelanden i aktuell tråd"
 
 #. File menu item
-#: ../src/main-window.c:553
+#: ../src/main-window.c:576
 #: ../src/message-window.c:246
 #: ../src/sendmsg-window.c:347
 msgid "_Print..."
 msgstr "Skriv _ut..."
 
-#: ../src/main-window.c:554
+#: ../src/main-window.c:577
 #: ../src/message-window.c:247
 msgid "Print current message"
 msgstr "Skriv ut aktuellt meddelande"
 
-#: ../src/main-window.c:555
+#: ../src/main-window.c:578
 #: ../src/message-window.c:275
 msgid "Save Current Part..."
 msgstr "Spara aktuell del..."
 
-#: ../src/main-window.c:556
+#: ../src/main-window.c:579
 #: ../src/message-window.c:276
 msgid "Save currently displayed part of message"
 msgstr "Spara för närvarande visad del av meddelande"
 
-#: ../src/main-window.c:559
+#: ../src/main-window.c:582
 #: ../src/message-window.c:293
 msgid "_Next Part"
 msgstr "_Nästa del"
 
-#: ../src/main-window.c:560
+#: ../src/main-window.c:583
 #: ../src/message-window.c:294
 msgid "Next part in message"
 msgstr "Nästa del i meddelande"
 
-#: ../src/main-window.c:561
+#: ../src/main-window.c:584
 #: ../src/message-window.c:295
 msgid "_Previous Part"
 msgstr "_Föregående del"
 
-#: ../src/main-window.c:562
+#: ../src/main-window.c:585
 #: ../src/message-window.c:296
 msgid "Previous part in message"
 msgstr "Föregående del i meddelande"
 
-#: ../src/main-window.c:565
+#: ../src/main-window.c:588
 msgid "Copy message"
 msgstr "Kopiera meddelande"
 
-#: ../src/main-window.c:568
+#: ../src/main-window.c:591
 msgid "Find in _Message"
 msgstr "Sök i _meddelande"
 
-#: ../src/main-window.c:569
+#: ../src/main-window.c:592
 #: ../src/message-window.c:256
 msgid "Find a string in this message"
 msgstr "Sök en sträng i detta meddelande"
 
-#: ../src/main-window.c:579
+#: ../src/main-window.c:602
 #: ../src/message-window.c:308
 msgid "_Move to Trash"
 msgstr "_Flytta till papperskorgen"
 
-#: ../src/main-window.c:580
-#: ../src/main-window.c:584
+#: ../src/main-window.c:603
+#: ../src/main-window.c:607
 msgid "Move the current message to Trash mailbox"
 msgstr "Flytta det aktuella meddelandet till papperskorgen"
 
-#: ../src/main-window.c:583
+#: ../src/main-window.c:606
 msgid "_Delete to Trash"
 msgstr "_Flytta till papperskorgen"
 
-#: ../src/main-window.c:587
-#: ../src/main-window.c:596
+#: ../src/main-window.c:610
+#: ../src/main-window.c:619
 msgid "Toggle New"
 msgstr "Ny av/på"
 
-#: ../src/main-window.c:589
+#: ../src/main-window.c:612
 msgid "_Toggle Flag"
 msgstr "_Växla flagga"
 
-#: ../src/main-window.c:592
+#: ../src/main-window.c:615
 msgid "Toggle flagged"
 msgstr "Flagga av/på"
 
 #. Hide messages menu items
-#: ../src/main-window.c:593
-#: ../src/main-window.c:628
+#: ../src/main-window.c:616
+#: ../src/main-window.c:651
 msgid "_Deleted"
 msgstr "_Borttaget"
 
-#: ../src/main-window.c:594
+#: ../src/main-window.c:617
 msgid "Toggle deleted flag"
 msgstr "Växla borttagetflaggan"
 
-#: ../src/main-window.c:597
-#: ../src/main-window.c:640
+#: ../src/main-window.c:620
+#: ../src/main-window.c:663
 msgid "_Answered"
 msgstr "Be_svarat"
 
-#: ../src/main-window.c:598
+#: ../src/main-window.c:621
 msgid "Toggle Answered"
 msgstr "Växla besvarat"
 
-#: ../src/main-window.c:605
+#: ../src/main-window.c:628
 msgid "_Show Mailbox Tree"
 msgstr "_Visa postlådeträd"
 
-#: ../src/main-window.c:606
+#: ../src/main-window.c:629
 msgid "Toggle display of mailbox and folder tree"
 msgstr "Växla visning av postlåde- och mappträd"
 
-#: ../src/main-window.c:608
+#: ../src/main-window.c:631
 msgid "Show Mailbox _Tabs"
 msgstr "Visa postlåde_flikar"
 
-#: ../src/main-window.c:609
+#: ../src/main-window.c:632
 msgid "Toggle display of mailbox notebook tabs"
 msgstr "Växla visning av postlådeflikar"
 
-#: ../src/main-window.c:611
+#: ../src/main-window.c:634
 #: ../src/message-window.c:315
 msgid "Show Too_lbar"
 msgstr "Visa ver_ktygsrad"
 
-#: ../src/main-window.c:613
+#: ../src/main-window.c:636
 msgid "Show St_atus Bar"
 msgstr "Visa st_atusrad"
 
-#: ../src/main-window.c:615
+#: ../src/main-window.c:638
 msgid "Show _Index Filter"
 msgstr "Visa _indexfilter"
 
-#: ../src/main-window.c:618
+#: ../src/main-window.c:641
 msgid "_Descending"
 msgstr "_Fallande"
 
-#: ../src/main-window.c:619
+#: ../src/main-window.c:642
 msgid "Sort in a descending order"
 msgstr "Sortera i fallande ordning"
 
-#: ../src/main-window.c:621
+#: ../src/main-window.c:644
 msgid "_View filter"
 msgstr "_Visa filter"
 
-#: ../src/main-window.c:622
+#: ../src/main-window.c:645
 msgid "Enable quick message index filter"
 msgstr "Aktivera snabbt filter för meddelandeindex"
 
-#: ../src/main-window.c:625
+#: ../src/main-window.c:648
 #: ../src/message-window.c:317
 msgid "_Wrap"
 msgstr "_Radbryt"
 
-#: ../src/main-window.c:625
+#: ../src/main-window.c:648
 #: ../src/message-window.c:317
 #: ../src/sendmsg-window.c:364
 msgid "Wrap message lines"
 msgstr "Bryt rader i meddelandetexten"
 
-#: ../src/main-window.c:630
+#: ../src/main-window.c:653
 msgid "Un_Deleted"
 msgstr "_Återställt"
 
-#: ../src/main-window.c:632
+#: ../src/main-window.c:655
 msgid "_Read"
 msgstr "_Läst"
 
-#: ../src/main-window.c:634
+#: ../src/main-window.c:657
 msgid "Un_read"
 msgstr "O_läst"
 
-#: ../src/main-window.c:638
+#: ../src/main-window.c:661
 msgid "Un_flagged"
 msgstr "O_flaggat"
 
-#: ../src/main-window.c:642
+#: ../src/main-window.c:665
 msgid "Un_answered"
 msgstr "O_besvarat"
 
 #. Toolbar items not on any menu
-#: ../src/main-window.c:645
+#: ../src/main-window.c:668
 #: ../src/toolbar-factory.c:161
 msgid ""
 "All\n"
@@ -5002,114 +5009,114 @@ msgstr ""
 "Alla\n"
 "huvuden"
 
-#: ../src/main-window.c:646
+#: ../src/main-window.c:669
 #: ../src/message-window.c:320
 msgid "Show all headers"
 msgstr "Visa alla huvuden"
 
-#: ../src/main-window.c:648
+#: ../src/main-window.c:671
 #: ../src/toolbar-factory.c:163
 msgid "Msg Preview"
 msgstr "Förhandsgranska"
 
-#: ../src/main-window.c:649
+#: ../src/main-window.c:672
 msgid "Show preview pane"
 msgstr "Visa förhandsgranskningspanel"
 
-#: ../src/main-window.c:655
+#: ../src/main-window.c:678
 #: ../src/message-window.c:326
 msgid "_No Headers"
 msgstr "_Inga rubriker"
 
-#: ../src/main-window.c:656
+#: ../src/main-window.c:679
 #: ../src/message-window.c:327
 msgid "Display no headers"
 msgstr "Visa inte rubriker"
 
-#: ../src/main-window.c:657
+#: ../src/main-window.c:680
 msgid "S_elected Headers"
 msgstr "Valda rubrik_er"
 
-#: ../src/main-window.c:658
+#: ../src/main-window.c:681
 #: ../src/message-window.c:329
 msgid "Display selected headers"
 msgstr "Visa valda rubriker"
 
-#: ../src/main-window.c:659
+#: ../src/main-window.c:682
 #: ../src/message-window.c:330
 msgid "All _Headers"
 msgstr "Alla _rubriker"
 
-#: ../src/main-window.c:660
+#: ../src/main-window.c:683
 #: ../src/message-window.c:331
 msgid "Display all headers"
 msgstr "Visa alla rubriker"
 
-#: ../src/main-window.c:664
+#: ../src/main-window.c:687
 msgid "_Flat index"
 msgstr "_Platt index"
 
-#: ../src/main-window.c:665
+#: ../src/main-window.c:688
 msgid "No threading at all"
 msgstr "Ingen trådning alls"
 
-#: ../src/main-window.c:666
+#: ../src/main-window.c:689
 msgid "Si_mple threading"
 msgstr "E_nkel trådning"
 
-#: ../src/main-window.c:667
+#: ../src/main-window.c:690
 msgid "Simple threading algorithm"
 msgstr "Enkel algoritm för trådning"
 
-#: ../src/main-window.c:668
+#: ../src/main-window.c:691
 msgid "_JWZ threading"
 msgstr "_JWZ-trådning"
 
-#: ../src/main-window.c:669
+#: ../src/main-window.c:692
 msgid "Elaborate JWZ threading"
 msgstr "Utförlig JWZ-trådning"
 
-#: ../src/main-window.c:674
+#: ../src/main-window.c:697
 msgid "By _Arrival"
 msgstr "Efter _ankomst"
 
-#: ../src/main-window.c:675
+#: ../src/main-window.c:698
 msgid "Arrival order"
 msgstr "Ankomstordning"
 
-#: ../src/main-window.c:676
+#: ../src/main-window.c:699
 msgid "By _Sender"
 msgstr "Efter a_vsändare"
 
-#: ../src/main-window.c:677
+#: ../src/main-window.c:700
 msgid "Sender order"
 msgstr "Avsändarordning"
 
-#: ../src/main-window.c:678
+#: ../src/main-window.c:701
 msgid "By S_ubject"
 msgstr "Efter ä_mne"
 
-#: ../src/main-window.c:679
+#: ../src/main-window.c:702
 msgid "Subject order"
 msgstr "Ämnesordning"
 
-#: ../src/main-window.c:680
+#: ../src/main-window.c:703
 msgid "By Si_ze"
 msgstr "Efter _storlek"
 
-#: ../src/main-window.c:681
+#: ../src/main-window.c:704
 msgid "By message size"
 msgstr "Efter meddelandestorlek"
 
-#: ../src/main-window.c:682
+#: ../src/main-window.c:705
 msgid "_Threaded"
 msgstr "_Trådad"
 
-#: ../src/main-window.c:683
+#: ../src/main-window.c:706
 msgid "Use message threading"
 msgstr "Använd trådning av meddelanden"
 
-#: ../src/main-window.c:1032
+#: ../src/main-window.c:1067
 msgid ""
 "Balsa is sending a mail now.\n"
 "Abort sending?"
@@ -5117,36 +5124,36 @@ msgstr ""
 "Balsa skickar ett meddelande nu.\n"
 "Avbryt skickande?"
 
-#: ../src/main-window.c:1202
+#: ../src/main-window.c:1237
 msgid "Subject or Sender Contains:"
 msgstr "Ämne eller Avsändare innehåller:"
 
-#: ../src/main-window.c:1203
+#: ../src/main-window.c:1238
 msgid "Subject or Recipient Contains:"
 msgstr "Ämne eller Mottagare innehåller:"
 
-#: ../src/main-window.c:1204
+#: ../src/main-window.c:1239
 msgid "Subject Contains:"
 msgstr "Ämne innehåller:"
 
-#: ../src/main-window.c:1205
+#: ../src/main-window.c:1240
 msgid "Body Contains:"
 msgstr "Meddelandetexten innehåller:"
 
-#: ../src/main-window.c:1206
+#: ../src/main-window.c:1241
 msgid "Older than (days):"
 msgstr "Äldre än (dagar):"
 
-#: ../src/main-window.c:1207
+#: ../src/main-window.c:1242
 msgid "Old at most (days):"
 msgstr "Som äldst (dagar):"
 
-#: ../src/main-window.c:2321
+#: ../src/main-window.c:2368
 #, c-format
 msgid "Opening %s"
 msgstr "Öppnar %s"
 
-#: ../src/main-window.c:2338
+#: ../src/main-window.c:2385
 #, c-format
 msgid ""
 "Unable to Open Mailbox!\n"
@@ -5155,7 +5162,7 @@ msgstr ""
 "Kunde inte öppna postlådan!\n"
 "%s."
 
-#: ../src/main-window.c:2711
+#: ../src/main-window.c:2772
 msgid "translator-credits"
 msgstr ""
 "Daniel Nylander <po@danielnylander.se>\n"
@@ -5168,163 +5175,163 @@ msgstr ""
 "Skicka synpunkter på översättningen till\n"
 "<tp-sv@listor.tp-sv.se>."
 
-#: ../src/main-window.c:2723
+#: ../src/main-window.c:2784
 msgid "The Balsa email client is part of the GNOME desktop environment."
 msgstr "E-postklienten Balsa är en del av skrivbordsmiljön GNOME."
 
-#: ../src/main-window.c:2825
-#: ../src/main-window.c:2843
+#: ../src/main-window.c:2886
+#: ../src/main-window.c:2904
 msgid "Checking Mail..."
 msgstr "Kontrollerar e-post..."
 
-#: ../src/main-window.c:3041
+#: ../src/main-window.c:3102
 #, c-format
 msgid "IMAP mailbox: %s"
 msgstr "IMAP-postlåda: %s"
 
-#: ../src/main-window.c:3045
+#: ../src/main-window.c:3106
 #, c-format
 msgid "Local mailbox: %s"
 msgstr "Lokal postlåda: %s"
 
-#: ../src/main-window.c:3198
+#: ../src/main-window.c:3259
 msgid "Finished Checking."
 msgstr "Slutförde kontroll."
 
-#: ../src/main-window.c:3263
+#: ../src/main-window.c:3324
 #, c-format
 msgid "Sending error: %s"
 msgstr "Fel vid sänding: %s"
 
-#: ../src/main-window.c:3328
+#: ../src/main-window.c:3389
 #, c-format
 msgid "You have received %d new message."
 msgid_plural "You have received %d new messages."
 msgstr[0] "Du har fått %d nytt meddelande."
 msgstr[1] "Du har fått %d nya meddelanden."
 
-#: ../src/main-window.c:3331
+#: ../src/main-window.c:3392
 msgid "You have new mail."
 msgstr "Du har ny e-post."
 
-#: ../src/main-window.c:3372
+#: ../src/main-window.c:3433
 #, c-format
 msgid "Balsa: you have received %d new message."
 msgid_plural "Balsa: you have received %d new messages."
 msgstr[0] "Balsa: Du har fått %d nytt meddelande."
 msgstr[1] "Balsa: Du har fått %d nya meddelanden."
 
-#: ../src/main-window.c:3376
+#: ../src/main-window.c:3437
 msgid "Balsa: you have new mail."
 msgstr "Balsa: Du har fått ny e-post."
 
-#: ../src/main-window.c:3436
+#: ../src/main-window.c:3497
 msgid "Balsa: New mail"
 msgstr "Balsa: Ny post"
 
-#: ../src/main-window.c:3725
+#: ../src/main-window.c:3786
 #, c-format
 msgid "The next unread message is in %s"
 msgstr "Nästa olästa meddelande finns i %s"
 
-#: ../src/main-window.c:3732
+#: ../src/main-window.c:3793
 #, c-format
 msgid "Do you want to select %s?"
 msgstr "Vill du välja %s?"
 
-#: ../src/main-window.c:4265
+#: ../src/main-window.c:4326
 msgid "Search mailbox"
 msgstr "Sök i postlåda"
 
-#: ../src/main-window.c:4285
+#: ../src/main-window.c:4346
 msgid "_Search for:"
 msgstr "_Sök efter:"
 
 #. builds the toggle buttons to specify fields concerned by
 #. * the search.
-#: ../src/main-window.c:4298
+#: ../src/main-window.c:4359
 msgid "In:"
 msgstr "I:"
 
-#: ../src/main-window.c:4309
+#: ../src/main-window.c:4370
 msgid "S_ubject"
 msgstr "_Ämne"
 
 #. Frame with Apply and Clear buttons
-#: ../src/main-window.c:4314
+#: ../src/main-window.c:4375
 msgid "Show only matching messages"
 msgstr "Visa endast matchande meddelanden"
 
 #. Frame with OK button
-#: ../src/main-window.c:4335
+#: ../src/main-window.c:4396
 msgid "Open next matching message"
 msgstr "Öppna nästa matchande meddelande"
 
-#: ../src/main-window.c:4346
+#: ../src/main-window.c:4407
 msgid "_Reverse search"
 msgstr "_Omvänd sökning"
 
-#: ../src/main-window.c:4351
+#: ../src/main-window.c:4412
 msgid "_Wrap around"
 msgstr "_Radbryt"
 
-#: ../src/main-window.c:4526
+#: ../src/main-window.c:4587
 msgid "You can apply filters only on mailbox\n"
 msgstr "Du kan endast tillämpa filter på postlåda\n"
 
-#: ../src/main-window.c:4541
+#: ../src/main-window.c:4602
 #, c-format
 msgid "Removing duplicates failed: %s"
 msgstr "Borttagning av dubbletter misslyckades: %s"
 
-#: ../src/main-window.c:4547
+#: ../src/main-window.c:4608
 #, c-format
 msgid "Removed %d duplicate"
 msgid_plural "Removed %d duplicates"
 msgstr[0] "Tog bort %d dubblett"
 msgstr[1] "Tog bort %d dubbletter"
 
-#: ../src/main-window.c:4552
+#: ../src/main-window.c:4613
 msgid "No duplicates found"
 msgstr "Inga dubbletter hittades"
 
-#: ../src/main-window.c:4781
+#: ../src/main-window.c:4842
 #, c-format
 msgid "Could not open trash: %s"
 msgstr "Kunde inte öppna papperskorg: %s"
 
-#: ../src/main-window.c:4929
+#: ../src/main-window.c:4990
 #, c-format
 msgid "Balsa: %s (readonly)"
 msgstr "Balsa: %s (skrivskyddad)"
 
-#: ../src/main-window.c:4931
+#: ../src/main-window.c:4992
 #, c-format
 msgid "Balsa: %s"
 msgstr "Balsa: %s"
 
 #. xgettext: this is the first part of the message
 #. * "Shown mailbox: %s with %d messages, %d new, %d hidden".
-#: ../src/main-window.c:5512
+#: ../src/main-window.c:5573
 #, c-format
 msgid "Shown mailbox: %s "
 msgstr "Visad postlåda: %s "
 
-#: ../src/main-window.c:5517
+#: ../src/main-window.c:5578
 #, c-format
 msgid "with %d message"
 msgid_plural "with %d messages"
 msgstr[0] "med %d meddelande"
 msgstr[1] "med %d meddelanden"
 
-#: ../src/main-window.c:5524
+#: ../src/main-window.c:5585
 #, c-format
 msgid ", %d new"
 msgid_plural ", %d new"
 msgstr[0] ", %d nytt"
 msgstr[1] ", %d nya"
 
-#: ../src/main-window.c:5531
+#: ../src/main-window.c:5592
 #, c-format
 msgid ", %d hidden"
 msgid_plural ", %d hidden"

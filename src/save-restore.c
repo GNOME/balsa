@@ -2131,7 +2131,7 @@ config_defclient_save(void)
 
     err = NULL;
     info = g_app_info_create_from_commandline
-        ("balsa -m \"%s\"", "Balsa",
+        ("balsa -m", "Balsa",
          G_APP_INFO_CREATE_SUPPORTS_URIS |
          G_APP_INFO_CREATE_SUPPORTS_STARTUP_NOTIFICATION, &err);
     if (!info) {

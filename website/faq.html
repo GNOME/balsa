@@ -265,18 +265,8 @@ is correct to select it.  See RFC 2046.</dd>
 <a name="faq20"></a>
 <dl>
 <dt>Is there any way to change the default browser that Balsa calls?</dt>
-<dd>Yes, there is.  Start by checking settings in your Gnome Control Center. 
-If your version of <tt>gnomecc</tt> does provide option to change the default 
-browser, you will need to create a file named gnome-moz-remote in your .gnome 
-directory. It should contain the following:
-<pre>[Mozilla]
-filename=/path/to/your/browser
-</pre>
-One has to use the gconf editor to set the browser with more recent GNOME versions that use GConf. Run:
-<pre>gconftool-2 -t string -s /desktop/gnome/url-handlers/http/command 'mozilla "%s"'
-</pre>
-By the way, you can similarly set balsa as the <tt>mailto</tt> handler:
-<pre>gconftool-2 -t string -s /desktop/gnome/url-handlers/mailto/command 'balsa -m "%s"'
+<dd>Yes, there is, using Gnome Control Center. It may be accessed using the
+<tt>System Settings</tt> menu; go to <tt>System Info</tt>, then <tt>Default Applications</tt>. You can also set <tt>Balsa</tt> to be the default mailer in the same way.
 </pre>
 </dd>
 </dl>

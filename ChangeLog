@@ -1,3 +1,16 @@
+2011-04-13  Peter Bloomfield
+
+	Migrate from GConf
+
+	* configure.in: do not check gconf-2.0.
+	* libinit_balsa/assistant_page_defclient.c
+	(balsa_druid_page_defclient_init), (balsa_druid_page_defclient),
+	(balsa_druid_page_defclient_toggle): use GAppInfo to check
+	default mailer.
+	* src/save-restore.c (config_defclient_save): use GAppInfo to
+	set default mailer.
+	* website/faq.html: update.
+
 2011-04-06  Peter Bloomfield
 
 	* src/main-window.c: implement alt-n to switch to mailbox n.

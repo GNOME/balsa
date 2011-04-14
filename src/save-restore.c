@@ -27,7 +27,7 @@
 #include <stdlib.h>
 #include <string.h>
 #if HAVE_GNOME
-#include <gconf/gconf-client.h>
+#include <gio/gio.h>
 #endif
 #include <glib/gi18n.h>
 #include "balsa-app.h"
@@ -2123,50 +2123,30 @@ save_mru(GList * mru, const gchar * group)
 void
 config_defclient_save(void)
 {
-    static struct {
-        const char *key, *val;
-    } gconf_string[] = {
-        {"/desktop/gnome/url-handlers/mailto/command",     "balsa -m \"%s\""},
-        {"/desktop/gnome/url-handlers/mailto/description", "Email" }};
-    static struct {
-        const char *key; gboolean val;
-    } gconf_bool[] = {
-        {"/desktop/gnome/url-handlers/mailto/need-terminal", FALSE},
-        {"/desktop/gnome/url-handlers/mailto/enabled",       TRUE}};
+    GAppInfo *info;
+    GError *err;
 
-    if (balsa_app.default_client) {
-        GError *err = NULL;
-        GConfClient *gc;
-        unsigned i;
-        gc = gconf_client_get_default(); /* FIXME: error handling */
-        if (gc == NULL) {
-            balsa_information(LIBBALSA_INFORMATION_WARNING,
-                              _("Error opening GConf database\n"));
-            return;
-        }
-        for(i=0; i<ELEMENTS(gconf_string); i++) {
-            gconf_client_set_string(gc, gconf_string[i].key, 
-                                    gconf_string[i].val, &err);
-            if (err) {
-                balsa_information(LIBBALSA_INFORMATION_WARNING,
-                                  _("Error setting GConf field: %s\n"),
-                                  err->message);
-                g_error_free(err);
-                return;
-            }
-        }
-        for(i=0; i<ELEMENTS(gconf_bool); i++) {
-            gconf_client_set_bool(gc, gconf_bool[i].key,
-                                  gconf_bool[i].val, &err);
-            if (err) {
-                balsa_information(LIBBALSA_INFORMATION_WARNING,
-                                  _("Error setting GConf field: %s\n"),
-                                  err->message);
-                g_error_free(err);
-                return;
-            }
-            g_object_unref(gc);
-        }
+    if (!balsa_app.default_client)
+        return;
+
+    err = NULL;
+    info = g_app_info_create_from_commandline
+        ("balsa -m \"%s\"", "Balsa",
+         G_APP_INFO_CREATE_SUPPORTS_URIS |
+         G_APP_INFO_CREATE_SUPPORTS_STARTUP_NOTIFICATION, &err);
+    if (!info) {
+        g_warning("Failed to create default application for Balsa "
+                  "for \"mailto\": %s", err->message);
+        g_error_free(err);
+        return;
     }
+
+    if (!g_app_info_set_as_default_for_type
+        (info, "x-scheme-handler/mailto", &err)) {
+        g_warning("Failed to set Balsa as the default application "
+                  "for \"mailto\": %s", err->message);
+        g_error_free(err);
+    }
+    g_object_unref(info);
 }
 #endif /* HAVE_GNOME */

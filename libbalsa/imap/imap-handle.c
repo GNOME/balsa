@@ -2779,7 +2779,6 @@ static ImapResponse
 ir_esearch(ImapMboxHandle *h)
 {
   char atom[LONG_STRING];
-  int uid_data = 0;
   int c = sio_getc(h->sio);
   if(c == '(') { /* search correlator */
     gchar *str;
@@ -2806,7 +2805,6 @@ ir_esearch(ImapMboxHandle *h)
   c = imap_get_atom(h->sio, atom, sizeof(atom));
 
   if(g_ascii_strcasecmp(atom, "UID") == 0) {
-    uid_data = 1;
     c = imap_get_atom(h->sio, atom, sizeof(atom));
   }
   if(c == EOF) return IMR_SEVERED;

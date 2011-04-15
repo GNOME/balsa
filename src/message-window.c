@@ -622,7 +622,7 @@ message_window_new(LibBalsaMailbox * mailbox, guint msgno)
     mw->bmessage = balsa_message_new();
     
     gtk_box_pack_start(GTK_BOX(vbox), mw->bmessage, TRUE, TRUE, 0);
-    gtk_widget_show_all(vbox);
+    gtk_widget_show(vbox);
 
     g_signal_connect(mw->bmessage, "select-part",
 		     G_CALLBACK(mw_select_part_cb), mw);

@@ -1,3 +1,9 @@
+2011-04-15  Pawel Salek
+
+	* src/balsa-message.c:
+	* src/message-window.c: fix bug 647695.
+	* libbalsa/imap/imap-handle.c: remove unused variable.
+
 2011-03-29  Peter Bloomfield
 
 	* src/main-window.c: implement alt-n to switch to mailbox at

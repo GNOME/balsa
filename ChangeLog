@@ -1,3 +1,12 @@
+2011-04-16  Peter Bloomfield
+
+	Use GDesktopAppInfo instead of GAppInfo
+
+	* configure.in: add gio-unix-2.0 to gnome-extras so we can use
+	GDesktopAppInfo.
+	* src/save-restore.c (config_defclient_save): use GDesktopAppInfo
+	instead of GAppInfo to set Balsa as default client.
+
 2011-04-15  Peter Bloomfield
 
 	Fix bz #647695; Pawel's patch for master, with one change.

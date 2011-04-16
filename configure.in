@@ -282,6 +282,7 @@ dnl GNOME libs
 dnl #####################################################################
 
 if test x$with_gnome != xno; then
+   gnome_extras="$gnome_extras gio-unix-2.0"
    AC_MSG_CHECKING([whether we have gnome-keyring])
    if $PKG_CONFIG --atleast-version=1.0 gnome-keyring-1; then
       gnome_extras="$gnome_extras gnome-keyring-1"

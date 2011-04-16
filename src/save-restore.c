@@ -28,6 +28,7 @@
 #include <string.h>
 #if HAVE_GNOME
 #include <gio/gio.h>
+#include <gio/gdesktopappinfo.h>
 #endif
 #include <glib/gi18n.h>
 #include "balsa-app.h"
@@ -2123,26 +2124,22 @@ save_mru(GList * mru, const gchar * group)
 void
 config_defclient_save(void)
 {
-    GAppInfo *info;
+    GDesktopAppInfo *info;
     GError *err;
 
     if (!balsa_app.default_client)
         return;
 
-    err = NULL;
-    info = g_app_info_create_from_commandline
-        ("balsa -m", "Balsa",
-         G_APP_INFO_CREATE_SUPPORTS_URIS |
-         G_APP_INFO_CREATE_SUPPORTS_STARTUP_NOTIFICATION, &err);
+    info = g_desktop_app_info_new("balsa.desktop");
     if (!info) {
         g_warning("Failed to create default application for Balsa "
                   "for \"mailto\": %s", err->message);
-        g_error_free(err);
         return;
     }
 
+    err = NULL;
     if (!g_app_info_set_as_default_for_type
-        (info, "x-scheme-handler/mailto", &err)) {
+        (G_APP_INFO(info), "x-scheme-handler/mailto", &err)) {
         g_warning("Failed to set Balsa as the default application "
                   "for \"mailto\": %s", err->message);
         g_error_free(err);

@@ -611,8 +611,6 @@ bm_find_bar_new(BalsaMessage * bm)
     gtk_container_add(GTK_CONTAINER(tool_item), bm->find_label);
     gtk_toolbar_insert(GTK_TOOLBAR(toolbar), tool_item, -1);
 
-    gtk_widget_hide(toolbar);
-
     return toolbar;
 }
 
@@ -687,15 +685,10 @@ balsa_message_init(BalsaMessage * bm)
     gtk_box_pack_start(GTK_BOX(vbox), scroll, TRUE, TRUE, 0);
     bm->cont_viewport = gtk_viewport_new(NULL, NULL);
     gtk_container_add(GTK_CONTAINER(scroll), bm->cont_viewport);
-    gtk_widget_show_all(scroll);
     g_signal_connect_after(bm, "style-updated",
 			   G_CALLBACK(bm_on_set_style), bm);
     g_signal_connect(bm->cont_viewport, "size-allocate",
 		     G_CALLBACK(on_content_size_alloc), NULL);
-
-    /* Find-in-message toolbar */
-    bm->find_bar = bm_find_bar_new(bm);
-    gtk_box_pack_start(GTK_BOX(vbox), bm->find_bar, FALSE, FALSE, 0);
 
     /* Widget to hold headers */
     bm->bm_widget = balsa_mime_widget_new_message_tl(bm, bm_header_tl_buttons(bm));
@@ -781,7 +774,10 @@ balsa_message_init(BalsaMessage * bm)
     bm->close_with_msg = FALSE;
 
     gtk_widget_show_all(GTK_WIDGET(bm));
-    gtk_widget_hide(bm->find_bar);
+
+    /* Find-in-message toolbar that is hidden by default. */
+    bm->find_bar = bm_find_bar_new(bm);
+    gtk_box_pack_start(GTK_BOX(vbox), bm->find_bar, FALSE, FALSE, 0);
 }
 
 static void
@@ -3260,7 +3256,7 @@ balsa_message_find_in_message(BalsaMessage * bm)
 
         bm_find_set_status(bm, BM_FIND_STATUS_INIT);
 
-        gtk_widget_show(bm->find_bar);
+        gtk_widget_show_all(bm->find_bar);
         if (gtk_widget_get_window(bm->find_entry))
             gtk_widget_grab_focus(bm->find_entry);
     }

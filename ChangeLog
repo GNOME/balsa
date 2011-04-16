@@ -1,3 +1,13 @@
+2011-04-15  Peter Bloomfield
+
+	Fix bz #647695; Pawel's patch for master, with one change.
+
+	* src/balsa-message.c (bm_find_bar_new), (balsa_message_init),
+	(balsa_message_find_in_message): show all of the widget before
+	adding the find bar.
+	* src/message-window.c (message_window_new): show the widget,
+	not show all.
+
 2011-04-14  Peter Bloomfield
 
 	* src/save-restore.c (config_defclient_save): fix launch

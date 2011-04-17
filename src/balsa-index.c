@@ -2656,8 +2656,13 @@ bndx_pipe_response(GtkWidget * dialog, gint response,
         gchar *pipe_cmd;
         GList *active_cmd;
 
+#if GTK_CHECK_VERSION(2, 24, 0)
+        pipe_cmd = gtk_combo_box_text_get_active_text
+                   (GTK_COMBO_BOX_TEXT(info->entry));
+#else                           /* GTK_CHECK_VERSION(2, 24, 0) */
         pipe_cmd =
             gtk_combo_box_get_active_text(GTK_COMBO_BOX(info->entry));
+#endif                          /* GTK_CHECK_VERSION(2, 24, 0) */
         active_cmd =
             g_list_find_custom(balsa_app.pipe_cmds, pipe_cmd,
                                (GCompareFunc) strcmp);
@@ -2734,9 +2739,16 @@ balsa_index_pipe(BalsaIndex * index)
     gtk_container_add(GTK_CONTAINER(vbox), label =
                       gtk_label_new(_("Specify the program to run:")));
 
+#if GTK_CHECK_VERSION(2, 24, 0)
+    info->entry = entry = gtk_combo_box_text_new_with_entry();
+    for (list = balsa_app.pipe_cmds; list; list = list->next)
+        gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(entry),
+                                       list->data);
+#else                           /* GTK_CHECK_VERSION(2, 24, 0) */
     info->entry = entry = gtk_combo_box_entry_new_text();
     for (list = balsa_app.pipe_cmds; list; list = list->next)
         gtk_combo_box_append_text(GTK_COMBO_BOX(entry), list->data);
+#endif                          /* GTK_CHECK_VERSION(2, 24, 0) */
     gtk_combo_box_set_active(GTK_COMBO_BOX(entry), 0);
     gtk_container_add(GTK_CONTAINER(vbox), entry);
 

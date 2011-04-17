@@ -323,18 +323,15 @@ create_generic_dialog(AddressBookConfig * abc, const gchar * type)
     GtkWidget *dialog;
     gchar *title;
     const gchar *action;
-    const gchar *name;
     LibBalsaAddressBook *ab;
 
     ab = abc->address_book;
     if (ab) {
         title = g_strdup_printf(_("Modify %s Address Book"), type);
         action = GTK_STOCK_APPLY;
-        name = ab->name;
     } else {
         title = g_strdup_printf(_("Add %s Address Book"), type);
         action = GTK_STOCK_ADD;
-        name = NULL;
     }
 
     dialog =

@@ -418,11 +418,8 @@ static void
 libbalsa_mailbox_local_load_config(LibBalsaMailbox * mailbox,
 				   const gchar * prefix)
 {
-    LibBalsaMailboxLocal *local;
     gchar* path;
     g_return_if_fail(LIBBALSA_IS_MAILBOX_LOCAL(mailbox));
-
-    local = LIBBALSA_MAILBOX_LOCAL(mailbox);
 
     g_free(mailbox->url);
 
@@ -434,7 +431,7 @@ libbalsa_mailbox_local_load_config(LibBalsaMailbox * mailbox,
 	LIBBALSA_MAILBOX_CLASS(parent_class)->load_config(mailbox, prefix);
 }
 
-/* 
+/*
  * Save and restore the message tree.
  */
 

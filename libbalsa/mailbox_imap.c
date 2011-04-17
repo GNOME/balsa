@@ -1073,7 +1073,6 @@ static gboolean
 libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox, GError **err)
 {
     LibBalsaMailboxImap *mimap;
-    LibBalsaServer *server;
     unsigned i;
     guint total_messages;
     struct ImapCacheManager *icm;
@@ -1082,7 +1081,6 @@ libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox, GError **err)
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX_IMAP(mailbox), FALSE);
 
     mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
-    server = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
 
     mimap->handle = libbalsa_mailbox_imap_get_selected_handle(mimap, err);
     if (!mimap->handle) {
@@ -1094,7 +1092,7 @@ libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox, GError **err)
     mimap->opened         = TRUE;
     mailbox->disconnected = FALSE;
     total_messages = imap_mbox_handle_get_exists(mimap->handle);
-    mimap->messages_info = g_array_sized_new(FALSE, TRUE, 
+    mimap->messages_info = g_array_sized_new(FALSE, TRUE,
 					     sizeof(struct message_info),
 					     total_messages);
     mimap->msgids = g_ptr_array_sized_new(total_messages);

@@ -154,9 +154,19 @@ fe_build_option_menu(option_list options[], gint num, GCallback func,
     if (num < 1)
 	return (NULL);
 
-    combo_box = gtk_combo_box_new_text();
     info = g_new(struct fe_combo_box_info, 1);
     info->values = NULL;
+#if GTK_CHECK_VERSION(2, 24, 0)
+    combo_box = gtk_combo_box_text_new();
+
+    for (i = 0; i < num; i++) {
+	gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(combo_box),
+                                       _(options[i].text));
+	info->values =
+	    g_slist_append(info->values, GINT_TO_POINTER(options[i].value));
+    }
+#else                           /* GTK_CHECK_VERSION(2, 24, 0) */
+    combo_box = gtk_combo_box_new_text();
 
     for (i = 0; i < num; i++) {
 	gtk_combo_box_append_text(GTK_COMBO_BOX(combo_box),
@@ -164,6 +174,7 @@ fe_build_option_menu(option_list options[], gint num, GCallback func,
 	info->values =
 	    g_slist_append(info->values, GINT_TO_POINTER(options[i].value));
     }
+#endif                          /* GTK_CHECK_VERSION(2, 24, 0) */
     gtk_combo_box_set_active(GTK_COMBO_BOX(combo_box), 0);
     if (func)
 	g_signal_connect(G_OBJECT(combo_box), "changed", func, cb_data);

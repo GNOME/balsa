@@ -539,7 +539,11 @@ text_view_populate_popup(GtkTextView *textview, GtkMenu *menu,
     GtkWidget *menu_item;
     gint phrase_hl;
 
+#if GTK_CHECK_VERSION(2, 24, 0)
+    gtk_widget_hide(GTK_WIDGET(menu));
+#else                           /* GTK_CHECK_VERSION(2, 24, 0) */
     gtk_widget_hide_all(GTK_WIDGET(menu));
+#endif                          /* GTK_CHECK_VERSION(2, 24, 0) */
     if (text_view_url_popup(textview, menu))
 	return;
 

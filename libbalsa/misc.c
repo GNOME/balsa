@@ -673,13 +673,21 @@ libbalsa_charset_button_new(void)
     LibBalsaCodeset n, active = WEST_EUROPE;
     const gchar *locale_charset;
 
+#if GTK_CHECK_VERSION(2, 24, 0)
+    combo_box = gtk_combo_box_text_new();
+#else                           /* GTK_CHECK_VERSION(2, 24, 0) */
     combo_box = gtk_combo_box_new_text();
+#endif                          /* GTK_CHECK_VERSION(2, 24, 0) */
     locale_charset = g_mime_locale_charset();
 
     for (n = 0; n < LIBBALSA_NUM_CODESETS; n++) {
         LibBalsaCodesetInfo *info = &libbalsa_codeset_info[n];
         gchar *tmp = g_strdup_printf("%s (%s)", _(info->label), info->std);
+#if GTK_CHECK_VERSION(2, 24, 0)
+        gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(combo_box), tmp);
+#else                           /* GTK_CHECK_VERSION(2, 24, 0) */
         gtk_combo_box_append_text(GTK_COMBO_BOX(combo_box), tmp);
+#endif                          /* GTK_CHECK_VERSION(2, 24, 0) */
         g_free(tmp);
 
 	if (!g_ascii_strcasecmp(info->std, locale_charset))

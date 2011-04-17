@@ -282,7 +282,11 @@ store_address_book_frame(StoreAddressInfo * info)
     LibBalsaAddressBook *address_book;
     guint default_ab_offset = 0, off;
 
+#if GTK_CHECK_VERSION(2, 24, 0)
+    combo_box = gtk_combo_box_text_new();
+#else                           /* GTK_CHECK_VERSION(2, 24, 0) */
     combo_box = gtk_combo_box_new_text();
+#endif                          /* GTK_CHECK_VERSION(2, 24, 0) */
     g_signal_connect(combo_box, "changed",
                      G_CALLBACK(store_address_book_menu_cb), info);
     if (balsa_app.address_book_list) {
@@ -298,8 +302,13 @@ store_address_book_frame(StoreAddressInfo * info)
 	    if (info->current_address_book == NULL)
 		info->current_address_book = address_book;
 
+#if GTK_CHECK_VERSION(2, 24, 0)
+            gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(combo_box),
+                                           address_book->name);
+#else                           /* GTK_CHECK_VERSION(2, 24, 0) */
 	    gtk_combo_box_append_text(GTK_COMBO_BOX(combo_box),
                                       address_book->name);
+#endif                          /* GTK_CHECK_VERSION(2, 24, 0) */
 	    if (address_book == balsa_app.default_address_book)
                 default_ab_offset = off;
 	}

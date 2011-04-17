@@ -901,7 +901,6 @@ libbalsa_mailbox_maildir_add_message(LibBalsaMailbox * mailbox,
     char *new_filename;
     struct message_info *msg_info;
     gint retval;
-    LibBalsaMailboxMaildir *mdir;
     time_t mtime;
 
     /* open tempfile */
@@ -947,7 +946,6 @@ libbalsa_mailbox_maildir_add_message(LibBalsaMailbox * mailbox,
     free_message_info(msg_info);
     g_free(tmp);
 
-    mdir = (LibBalsaMailboxMaildir *) mailbox;
     if ((mtime = libbalsa_mailbox_get_mtime(mailbox)) != 0)
 	/* If we checked or synced the mailbox less than 1 second ago,
 	 * the cached modification time could be the same as the new

@@ -1257,13 +1257,21 @@ bw_create_index_widget(BalsaWindow *bw)
 
     bw->sos_bar = gtk_hbox_new(FALSE, 5);
 
+#if GTK_CHECK_VERSION(2, 24, 0)
+    bw->filter_choice = gtk_combo_box_text_new();
+    for(i=0; i<ELEMENTS(view_filters); i++)
+        gtk_combo_box_text_insert_text(GTK_COMBO_BOX_TEXT
+                                       (bw->filter_choice), i,
+                                       view_filters[i].str);
+#else                           /* GTK_CHECK_VERSION(2, 24, 0) */
     bw->filter_choice = gtk_combo_box_new_text();
-    gtk_box_pack_start(GTK_BOX(bw->sos_bar), bw->filter_choice,
-                       FALSE, FALSE, 0);
     for(i=0; i<ELEMENTS(view_filters); i++)
         gtk_combo_box_insert_text(GTK_COMBO_BOX(bw->filter_choice),
                                   i, view_filters[i].str);
+#endif                          /* GTK_CHECK_VERSION(2, 24, 0) */
     gtk_combo_box_set_active(GTK_COMBO_BOX(bw->filter_choice), 0);
+    gtk_box_pack_start(GTK_BOX(bw->sos_bar), bw->filter_choice,
+                       FALSE, FALSE, 0);
     gtk_widget_show(bw->filter_choice);
     bw->sos_entry = gtk_entry_new();
     /* gtk_label_set_mnemonic_widget(GTK_LABEL(bw->filter_choice),
@@ -2738,21 +2746,6 @@ bw_mailbox_tab_n_cb(GtkAction * action, gpointer data)
  * show the about box for Balsa
  */
 static void
-bw_show_about_box_url_hook(GtkAboutDialog * about, const gchar * link,
-                           gpointer data)
-{
-    GError *err = NULL;
-
-    gtk_show_uri(NULL, link, gtk_get_current_event_time(), &err);
-
-    if (err) {
-        balsa_information(LIBBALSA_INFORMATION_WARNING,
-                          _("Error showing %s: %s\n"), link, err->message);
-        g_error_free(err);
-    }
-}
-
-static void
 bw_show_about_box(GtkAction * action, gpointer user_data)
 {
     const gchar *authors[] = {
@@ -2775,7 +2768,6 @@ bw_show_about_box(GtkAction * action, gpointer user_data)
         gdk_pixbuf_new_from_file(BALSA_DATA_PREFIX
                                  "/pixmaps/balsa_logo.png", NULL);
 
-    gtk_about_dialog_set_url_hook(bw_show_about_box_url_hook, NULL, NULL);
     gtk_show_about_dialog(GTK_WINDOW(user_data),
                           "version", BALSA_VERSION,
                           "copyright",

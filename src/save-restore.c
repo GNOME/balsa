@@ -1957,6 +1957,8 @@ config_filter_load(const gchar * key, const gchar * value, gpointer data)
     long int dummy;
 
     dummy = strtol(value, &endptr, 10);
+    if (dummy == LONG_MIN || dummy == LONG_MAX)
+        g_message("Value is too large");
     if (*endptr) {              /* Bad format. */
         libbalsa_conf_remove_group(key);
         return FALSE;
@@ -2006,6 +2008,8 @@ config_filters_save(void)
     for(list = balsa_app.filters; list; list = list->next) {
 	fil = (LibBalsaFilter*)(list->data);
 	i=snprintf(tmp,tmp_len,"%d",nb++);
+        if (i >= tmp_len)
+            g_message("Group name was truncated");
 	libbalsa_conf_push_group(buffer);
 	libbalsa_filter_save_config(fil);
 	libbalsa_conf_pop_group();
@@ -2014,6 +2018,8 @@ config_filters_save(void)
     /* This loop takes care of cleaning up old filter sections */
     while (TRUE) {
 	i=snprintf(tmp,tmp_len,"%d",nb++);
+        if (i >= tmp_len)
+            g_message("Group name was truncated");
 	if (libbalsa_conf_has_group(buffer)) {
 	    libbalsa_conf_remove_group(buffer);
 	}

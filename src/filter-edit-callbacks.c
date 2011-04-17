@@ -478,14 +478,24 @@ fe_user_header_add(const gchar * user_header)
 
         /* First clear the combo box... */
         for (lst = fe_user_headers_list; lst; lst = lst->next)
+#if GTK_CHECK_VERSION(2, 24, 0)
+            gtk_combo_box_text_remove(GTK_COMBO_BOX_TEXT(fe_user_header),
+                                      0);
+#else                           /* GTK_CHECK_VERSION(2, 24, 0) */
             gtk_combo_box_remove_text(GTK_COMBO_BOX(fe_user_header), 0);
+#endif                          /* GTK_CHECK_VERSION(2, 24, 0) */
 
         fe_add_new_user_header(user_header);
 
         /* ...then remake it with the new string... */
         for (lst = fe_user_headers_list; lst; lst = lst->next)
+#if GTK_CHECK_VERSION(2, 24, 0)
+            gtk_combo_box_text_append_text
+                (GTK_COMBO_BOX_TEXT(fe_user_header), lst->data);
+#else                           /* GTK_CHECK_VERSION(2, 24, 0) */
             gtk_combo_box_append_text(GTK_COMBO_BOX(fe_user_header),
                                       lst->data);
+#endif                          /* GTK_CHECK_VERSION(2, 24, 0) */
 
         fe_user_header_set_active(user_header);
     }
@@ -961,10 +971,17 @@ get_field_frame(void)
     g_signal_connect(G_OBJECT(fe_matching_fields_us_head), "toggled",
                      G_CALLBACK(fe_match_field_user_header_cb), NULL);
 
+#if GTK_CHECK_VERSION(2, 24, 0)
+    fe_user_header = gtk_combo_box_text_new_with_entry();
+    for (list = fe_user_headers_list; list; list = list->next)
+        gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(fe_user_header),
+                                       list->data);
+#else                           /* GTK_CHECK_VERSION(2, 24, 0) */
     fe_user_header = gtk_combo_box_entry_new_text();
     for (list = fe_user_headers_list; list; list = list->next)
         gtk_combo_box_append_text(GTK_COMBO_BOX(fe_user_header),
                                   list->data);
+#endif                          /* GTK_CHECK_VERSION(2, 24, 0) */
     g_signal_connect(G_OBJECT(fe_user_header), "changed",
                      G_CALLBACK(fe_condition_changed_cb), NULL);
     gtk_table_attach(GTK_TABLE(table),

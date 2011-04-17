@@ -165,7 +165,12 @@ mailbox_conf_combo_box_make(GtkComboBox * combo_box, unsigned cnt,
 
     info->tags = NULL;
     for (i = cnt; --i >= 0;) {
+#if GTK_CHECK_VERSION(2, 24, 0)
+        gtk_combo_box_text_prepend_text(GTK_COMBO_BOX_TEXT(combo_box),
+                                        _(data[i].label));
+#else                           /* GTK_CHECK_VERSION(2, 24, 0) */
         gtk_combo_box_prepend_text(combo_box, _(data[i].label));
+#endif                          /* GTK_CHECK_VERSION(2, 24, 0) */
         info->tags =
             g_slist_prepend(info->tags, GINT_TO_POINTER(data[i].tag));
     }
@@ -236,7 +241,11 @@ balsa_server_conf_get_advanced_widget(BalsaServerConf *bsc, LibBalsaServer *s,
 
     label = libbalsa_create_label(_("Use _TLS:"), GTK_WIDGET(bsc->table), 1);
 
+#if GTK_CHECK_VERSION(2, 24, 0)
+    bsc->tls_option = gtk_combo_box_text_new();
+#else                           /* GTK_CHECK_VERSION(2, 24, 0) */
     bsc->tls_option = gtk_combo_box_new_text();
+#endif                          /* GTK_CHECK_VERSION(2, 24, 0) */
     mailbox_conf_combo_box_make(GTK_COMBO_BOX(bsc->tls_option),
                                 ELEMENTS(tls_menu), tls_menu);
     gtk_combo_box_set_active(GTK_COMBO_BOX(bsc->tls_option),
@@ -1462,7 +1471,11 @@ mailbox_conf_view_new_full(LibBalsaMailbox * mailbox,
     if (size_group)
         gtk_size_group_add_widget(size_group, label);
 
+#if GTK_CHECK_VERSION(2, 24, 0)
+    view_info->identity_combo_box = widget = gtk_combo_box_text_new();
+#else                           /* GTK_CHECK_VERSION(2, 24, 0) */
     view_info->identity_combo_box = widget = gtk_combo_box_new_text();
+#endif                          /* GTK_CHECK_VERSION(2, 24, 0) */
     if (mcw)
         g_signal_connect(view_info->identity_combo_box, "changed",
                          G_CALLBACK(check_for_blank_fields), mcw);
@@ -1474,7 +1487,11 @@ mailbox_conf_view_new_full(LibBalsaMailbox * mailbox,
         gchar *name;
 
         name = internet_address_to_string(ident->ia, FALSE);
+#if GTK_CHECK_VERSION(2, 24, 0)
+        gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(widget), name);
+#else                           /* GTK_CHECK_VERSION(2, 24, 0) */
         gtk_combo_box_append_text(GTK_COMBO_BOX(widget), name);
+#endif                          /* GTK_CHECK_VERSION(2, 24, 0) */
         g_free(name);
         if (identity_name
             && strcmp(identity_name, ident->identity_name) == 0)
@@ -1501,7 +1518,11 @@ mailbox_conf_view_new_full(LibBalsaMailbox * mailbox,
         if (size_group)
             gtk_size_group_add_widget(size_group, label);
 
+#if GTK_CHECK_VERSION(2, 24, 0)
+        view_info->chk_crypt = gtk_combo_box_text_new();
+#else                           /* GTK_CHECK_VERSION(2, 24, 0) */
         view_info->chk_crypt = gtk_combo_box_new_text();
+#endif                          /* GTK_CHECK_VERSION(2, 24, 0) */
         gtk_label_set_mnemonic_widget(GTK_LABEL(label), view_info->chk_crypt);
         mailbox_conf_combo_box_make(GTK_COMBO_BOX(view_info->chk_crypt),
                                     ELEMENTS(chk_crypt_menu),

@@ -1803,11 +1803,11 @@ get_passphrase_cb(void *opaque, const char *uid_hint,
 {
     GMimeGpgmeContext *context;
     gchar *passwd = NULL;
-    int foo;
+    int foo, bar;
 
     if (!opaque || !GMIME_IS_GPGME_CONTEXT(opaque)) {
 	foo = write(fd, "\n", 1);
-	return GPG_ERR_USER_1;
+	return foo > 0 ? GPG_ERR_USER_1 : GPG_ERR_EIO;
     }
     context = GMIME_GPGME_CONTEXT(opaque);
 
@@ -1818,10 +1818,10 @@ get_passphrase_cb(void *opaque, const char *uid_hint,
     /* check if we have the passphrase already cached... */
     if ((passwd = check_cache(pcache, uid_hint, prev_was_bad))) {
 	foo = write(fd, passwd, strlen(passwd));
-	foo = write(fd, "\n", 1);
+	bar = write(fd, "\n", 1);
 	wipe_string(passwd);
 	g_free(passwd);
-	return GPG_ERR_NO_ERROR;
+	return foo > 0 && bar > 0 ? GPG_ERR_NO_ERROR : GPG_ERR_EIO;
     }
 #endif
 
@@ -1857,15 +1857,15 @@ get_passphrase_cb(void *opaque, const char *uid_hint,
 
     if (!passwd) {
 	foo = write(fd, "\n", 1);
-	return GPG_ERR_CANCELED;
+	return foo > 0 ? GPG_ERR_CANCELED : GPG_ERR_EIO;
     }
 
     /* send the passphrase and erase the string */
     foo = write(fd, passwd, strlen(passwd));
     wipe_string(passwd);
     g_free(passwd);
-    foo = write(fd, "\n", 1);
-    return GPG_ERR_NO_ERROR;
+    bar = write(fd, "\n", 1);
+    return foo > 0 && bar > 0 ? GPG_ERR_NO_ERROR : GPG_ERR_EIO;
 }
 
 

@@ -3396,7 +3396,11 @@ add_show_menu(const char* label, gint level, GtkWidget* menu)
     struct pm_combo_box_info *info =
         g_object_get_data(G_OBJECT(menu), PM_COMBO_BOX_INFO);
 
+#if GTK_CHECK_VERSION(2, 24, 0)
+    gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(menu), label);
+#else                           /* GTK_CHECK_VERSION(2, 24, 0) */
     gtk_combo_box_append_text(GTK_COMBO_BOX(menu), label);
+#endif                          /* GTK_CHECK_VERSION(2, 24, 0) */
     info->levels = g_slist_append(info->levels, GINT_TO_POINTER(level));
 }
 
@@ -3730,7 +3734,11 @@ pm_combo_box_info_free(struct pm_combo_box_info * info)
 static GtkWidget *
 pm_combo_box_new(void)
 {
+#if GTK_CHECK_VERSION(2, 24, 0)
+    GtkWidget *combo_box = gtk_combo_box_text_new();
+#else                           /* GTK_CHECK_VERSION(2, 24, 0) */
     GtkWidget *combo_box = gtk_combo_box_new_text();
+#endif                          /* GTK_CHECK_VERSION(2, 24, 0) */
     struct pm_combo_box_info *info = g_new0(struct pm_combo_box_info, 1);
 
     g_object_set_data_full(G_OBJECT(combo_box), PM_COMBO_BOX_INFO, info,

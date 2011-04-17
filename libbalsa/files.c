@@ -135,7 +135,6 @@ libbalsa_icon_finder(const char *mime_type, const LibbalsaVfs * for_file,
     gchar *icon = NULL;
     GdkPixbuf *pixbuf = NULL;
     gint width, height;
-    const gchar * filename = NULL;
     GtkIconTheme *icon_theme;
 
     if (!gtk_icon_size_lookup(size, &width, &height))
@@ -145,7 +144,6 @@ libbalsa_icon_finder(const char *mime_type, const LibbalsaVfs * for_file,
         content_type = mime_type;
     else if (for_file) {
         content_type = libbalsa_vfs_get_mime_type(for_file);
-        filename = libbalsa_vfs_get_uri(for_file);
     } else
 	content_type = "application/octet-stream";
 
@@ -165,7 +163,7 @@ libbalsa_icon_finder(const char *mime_type, const LibbalsaVfs * for_file,
             }
             g_strfreev(icon_names);
             g_object_unref(icon);
-            
+
             /* last resort: try gnome-mime-<base mime type> */
             if (!pixbuf) {
                 gchar * base_type_icon = g_strdup_printf("gnome-mime-%s", content_type);

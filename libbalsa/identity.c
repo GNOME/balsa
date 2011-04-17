@@ -325,7 +325,6 @@ gchar*
 libbalsa_identity_get_signature(LibBalsaIdentity* identity, GtkWindow *parent)
 {
     FILE *fp = NULL;
-    size_t len = 0;
     gchar *ret = NULL, *path;
 
     if (identity->signature_path == NULL ||
@@ -337,7 +336,7 @@ libbalsa_identity_get_signature(LibBalsaIdentity* identity, GtkWindow *parent)
         /* signature is executable */
 	fp = popen(path,"r");
         if (fp) {
-            len = libbalsa_readfile_nostat(fp, &ret);
+            libbalsa_readfile_nostat(fp, &ret);
             pclose(fp);
         } else
             libbalsa_information_parented
@@ -348,7 +347,7 @@ libbalsa_identity_get_signature(LibBalsaIdentity* identity, GtkWindow *parent)
         /* sign is normal file */
         fp = fopen(path, "r");
         if (fp) {
-            len = libbalsa_readfile_nostat(fp, &ret);
+            libbalsa_readfile_nostat(fp, &ret);
             fclose(fp);
         } else
             libbalsa_information_parented(parent, LIBBALSA_INFORMATION_ERROR,
@@ -2103,7 +2102,11 @@ ident_dialog_add_gpg_menu(GtkWidget * table, gint row, GtkDialog * dialog,
     gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
     gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, row, row + 1);
 
+#if GTK_CHECK_VERSION(2, 24, 0)
+    opt_menu = gtk_combo_box_text_new();
+#else                           /* GTK_CHECK_VERSION(2, 24, 0) */
     opt_menu = gtk_combo_box_new_text();
+#endif                          /* GTK_CHECK_VERSION(2, 24, 0) */
     values = g_ptr_array_sized_new(3);
     g_object_set_data_full(G_OBJECT(opt_menu), "identity-value", values,
                            (GDestroyNotify) ident_dialog_free_values);
@@ -2127,7 +2130,11 @@ add_show_menu(const char *label, gpointer data, GtkWidget * menu)
     GPtrArray *values =
         g_object_get_data(G_OBJECT(menu), "identity-value");
 
+#if GTK_CHECK_VERSION(2, 24, 0)
+    gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(menu), label);
+#else                           /* GTK_CHECK_VERSION(2, 24, 0) */
     gtk_combo_box_append_text(GTK_COMBO_BOX(menu), label);
+#endif                          /* GTK_CHECK_VERSION(2, 24, 0) */
     g_ptr_array_add(values, data);
 }
 
@@ -2153,7 +2160,11 @@ ident_dialog_add_smtp_menu(GtkWidget * table, gint row, GtkDialog * dialog,
     gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
     gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, row, row + 1);
 
+#if GTK_CHECK_VERSION(2, 24, 0)
+    combo_box = gtk_combo_box_text_new();
+#else                           /* GTK_CHECK_VERSION(2, 24, 0) */
     combo_box = gtk_combo_box_new_text();
+#endif                          /* GTK_CHECK_VERSION(2, 24, 0) */
     gtk_label_set_mnemonic_widget(GTK_LABEL(label), combo_box);
     values = g_ptr_array_sized_new(g_slist_length(smtp_servers));
     g_object_set_data_full(G_OBJECT(combo_box), "identity-value", values,

@@ -1,3 +1,42 @@
+2011-04-16  Peter Bloomfield
+
+	Deprecation cleanup and fix gcc issues
+
+	* libbalsa/files.c (libbalsa_icon_finder):
+	* libbalsa/filter-funcs.c (libbalsa_filter_export_sieve):
+	* libbalsa/identity.c (libbalsa_identity_get_signature),
+	(ident_dialog_add_gpg_menu), (add_show_menu),
+	(ident_dialog_add_smtp_menu):
+	* libbalsa/imap-server.c (libbalsa_imap_server_finalize):
+	* libbalsa/mailbox_imap.c (libbalsa_mailbox_imap_open):
+	* libbalsa/mailbox_local.c (libbalsa_mailbox_local_load_config):
+	* libbalsa/mailbox_maildir.c
+	(libbalsa_mailbox_maildir_add_message):
+	* libbalsa/misc.c (libbalsa_charset_button_new):
+	* libbalsa/rfc2445.c (date_time_2445_to_time_t):
+	* libbalsa/rfc3156.c (get_passphrase_cb):
+	* libbalsa/server.c (libbalsa_server_user_cb):
+	* libbalsa/smtp-server.c (libbalsa_smtp_server_finalize),
+	(libbalsa_smtp_server_class_init), (smtp_server_tls_widget):
+	* libinit_balsa/assistant_helper.c (balsa_init_add_table_option):
+	* src/ab-window.c (balsa_ab_window_load_books),
+	(balsa_ab_window_init):
+	* src/address-book-config.c (create_generic_dialog):
+	* src/balsa-index.c (bndx_pipe_response), (balsa_index_pipe):
+	* src/balsa-mime-widget-text.c (text_view_populate_popup):
+	* src/filter-edit-callbacks.c (fe_user_header_add),
+	(get_field_frame):
+	* src/filter-edit-dialog.c (fe_build_option_menu):
+	* src/mailbox-conf.c (mailbox_conf_combo_box_make),
+	(balsa_server_conf_get_advanced_widget),
+	(mailbox_conf_view_new_full):
+	* src/main-window.c:
+	* src/pref-manager.c (add_show_menu), (pm_combo_box_new):
+	* src/save-restore.c (config_filter_load), (config_filters_save):
+	* src/sendmsg-window.c (edit_with_gnome_check),
+	(sw_get_user_codeset):
+	* src/store-address.c (store_address_book_frame):
+
 2011-04-15  Pawel Salek
 
 	* src/balsa-message.c:

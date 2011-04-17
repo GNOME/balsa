@@ -65,12 +65,10 @@ typedef struct _LibBalsaSmtpServerClass {
 static void
 libbalsa_smtp_server_finalize(GObject * object)
 {
-    LibBalsaServer *server;
     LibBalsaSmtpServer *smtp_server;
 
     g_return_if_fail(LIBBALSA_IS_SMTP_SERVER(object));
 
-    server = LIBBALSA_SERVER(object);
     smtp_server = LIBBALSA_SMTP_SERVER(object);
 
     auth_destroy_context(smtp_server->authctx);
@@ -86,10 +84,8 @@ static void
 libbalsa_smtp_server_class_init(LibBalsaSmtpServerClass * klass)
 {
     GObjectClass *object_class;
-    LibBalsaServerClass *server_class;
 
     object_class = G_OBJECT_CLASS(klass);
-    server_class = LIBBALSA_SERVER_CLASS(klass);
 
     parent_class = g_type_class_peek_parent(klass);
 
@@ -383,11 +379,22 @@ GtkWidget *
 smtp_server_tls_widget(LibBalsaSmtpServer * smtp_server)
 {
     LibBalsaServer *server = LIBBALSA_SERVER(smtp_server);
+#if GTK_CHECK_VERSION(2, 24, 0)
+    GtkWidget *combo_box = gtk_combo_box_text_new();
+
+    gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(combo_box),
+                                   _("Never"));
+    gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(combo_box),
+                                   _("If Possible"));
+    gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(combo_box),
+                                   _("Required"));
+#else                           /* GTK_CHECK_VERSION(2, 24, 0) */
     GtkWidget *combo_box = gtk_combo_box_new_text();
 
     gtk_combo_box_append_text(GTK_COMBO_BOX(combo_box), _("Never"));
     gtk_combo_box_append_text(GTK_COMBO_BOX(combo_box), _("If Possible"));
     gtk_combo_box_append_text(GTK_COMBO_BOX(combo_box), _("Required"));
+#endif                          /* GTK_CHECK_VERSION(2, 24, 0) */
 
     switch (server->tls_mode) {
     case Starttls_DISABLED:

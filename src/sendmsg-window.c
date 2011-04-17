@@ -1113,7 +1113,6 @@ edit_with_gnome_check(gpointer data) {
     GtkTextBuffer *buffer;
 
     pid_t pid;
-    gint curposition;
     gchar line[81]; /* FIXME:All lines should wrap at this line */
     /* Editor not ready */
     pid = waitpid (data_real->pid_editor, NULL, WNOHANG);
@@ -1160,7 +1159,6 @@ edit_with_gnome_check(gpointer data) {
 #endif                          /* HAVE_GTKSOURCEVIEW */
     sw_buffer_signals_block(data_real->bsmsg, buffer);
     gtk_text_buffer_set_text(buffer, "", 0);
-    curposition = 0;
     while(fgets(line, sizeof(line), tmp))
         gtk_text_buffer_insert_at_cursor(buffer, line, -1);
     sw_buffer_signals_unblock(data_real->bsmsg, buffer);
@@ -1885,13 +1883,22 @@ sw_get_user_codeset(BalsaSendmsg * bsmsg, gboolean * change_type,
     if (change_type) {
         GtkWidget *label = gtk_label_new(_("Attach as MIME type:"));
         GtkWidget *hbox = gtk_hbox_new(FALSE, 5);
-        combo_box = gtk_combo_box_new_text();
 
         gtk_box_pack_start(content_box, hbox, TRUE, TRUE, 5);
         gtk_box_pack_start(GTK_BOX(hbox), label, TRUE, TRUE, 0);
+#if GTK_CHECK_VERSION(2, 24, 0)
+        combo_box = gtk_combo_box_text_new();
+        gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(combo_box),
+                                       mime_type);
+        gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(combo_box),
+                                       "application/octet-stream");
+#else                           /* GTK_CHECK_VERSION(2, 24, 0) */
+        combo_box = gtk_combo_box_new_text();
         gtk_combo_box_append_text(GTK_COMBO_BOX(combo_box), mime_type);
         gtk_combo_box_append_text(GTK_COMBO_BOX(combo_box),
                                   "application/octet-stream");
+#endif                          /* GTK_CHECK_VERSION(2, 24, 0) */
+
         gtk_combo_box_set_active(GTK_COMBO_BOX(combo_box), 0);
         g_signal_connect(G_OBJECT(combo_box), "changed",
                          G_CALLBACK(sw_charset_combo_box_changed),

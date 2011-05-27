@@ -51,7 +51,6 @@ process_mime_part(LibBalsaMessage * message, LibBalsaMessageBody * body,
                   gboolean flow)
 {
     gchar *res = NULL;
-    size_t allocated;
     GString *reply = NULL;
     gchar *mime_type;
     LibBalsaHTMLType html_type;
@@ -78,13 +77,13 @@ process_mime_part(LibBalsaMessage * message, LibBalsaMessageBody * body,
 	if (ignore_html && html_type)
 	    break;
 
-	allocated = libbalsa_message_body_get_content(body, &res, NULL);
+	/*allocated =*/ libbalsa_message_body_get_content(body, &res, NULL);
 	if (!res)
 	    return NULL;
 
 #ifdef HAVE_HTML_WIDGET
 	if (html_type) {
-	    allocated = libbalsa_html_filter(html_type, &res, allocated);
+	    size_t allocated = libbalsa_html_filter(html_type, &res, allocated);
 	    libbalsa_html_to_string(&res, allocated);
 	}
 #endif /* HAVE_HTML_WIDGET */

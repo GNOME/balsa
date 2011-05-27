@@ -1,3 +1,8 @@
+2011-05-28  Pawel Salek
+
+	* libbalsa/mime.c: Correct the conditional compilation regression
+	* configure.in: add gtkhtml-4.0 support.
+
 2011-05-27  Pawel Salek
 
 	* libbalsa/mime.c:

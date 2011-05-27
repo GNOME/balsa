@@ -1702,13 +1702,14 @@ libbalsa_message_create_mime_message(LibBalsaMessage* message, gboolean flow,
     InternetAddressList *ia_list;
     gchar *tmp;
     GList *list;
-    GtkWindow * parent;
+#ifdef HAVE_GPGME
+    GtkWindow * parent = g_object_get_data(G_OBJECT(message), "parent-window");
+#endif
 
     body = message->body_list;
     if (body && body->next)
 	mime_root=GMIME_OBJECT(g_mime_multipart_new_with_subtype(message->subtype));
 
-    parent = g_object_get_data(G_OBJECT(message), "parent-window");
     while (body) {
 	GMimeObject *mime_part;
 	mime_part=NULL;

@@ -230,7 +230,7 @@ balsa_handle_automation_options(UniqueApp * app)
 {
     printf("Another Balsa found. Talking to it...\n");
 
-    if (!(opt_compose_email || opt_attach_list))
+    if (!(opt_compose_email || opt_attach_list || cmd_get_stats))
         /* Move the main window to the request's screen */
         unique_app_send_message(app, UNIQUE_ACTIVATE, NULL);
 

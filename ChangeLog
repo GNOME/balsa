@@ -1,3 +1,9 @@
+2011-05-28  Peter Bloomfield
+
+	* src/main.c (balsa_handle_automation_options): do not send
+	ACTIVATE when asked for status; see
+	http://mail.gnome.org/archives/balsa-list/2011-May/msg00015.html
+
 2011-04-16  Peter Bloomfield
 
 	Use GDesktopAppInfo instead of GAppInfo

@@ -24,6 +24,7 @@
 #endif                          /* HAVE_CONFIG_H */
 
 #if HAVE_UNIQUE
+#include <gdk/gdkx.h>
 #include <gtk/gtk.h>
 #include <unique/unique.h>
 #endif                          /* HAVE_UNIQUE */
@@ -200,7 +201,6 @@ mw_message_received_cb(UniqueApp         *app,
     case COMMAND_COMPOSE:
         gdk_threads_enter();
         snd = sendmsg_window_compose();
-        gdk_threads_leave();
 
         uris = unique_message_data_get_uris(message);
         text = uris[0];
@@ -217,6 +217,13 @@ mw_message_received_cb(UniqueApp         *app,
         }
         g_strfreev(uris);
         snd->quit_on_close = FALSE;
+
+        window = GTK_WINDOW(snd->window);
+        gtk_window_set_screen(window,
+                              unique_message_data_get_screen(message));
+        gtk_window_present(window);
+        gdk_threads_leave();
+
         break;
     default:
         break;
@@ -764,6 +771,8 @@ main(int argc, char *argv[])
     GtkWidget *window;
     gchar *default_icon;
 #if HAVE_UNIQUE
+    GdkDisplay *display;
+    gchar *startup_id;
     UniqueApp *app;
 #endif                          /* HAVE_UNIQUE */
 
@@ -794,7 +803,11 @@ main(int argc, char *argv[])
      * we requested ("org.mydomain.MyApplication", in the example) or we
      * don't because there already is an application using the same name
      */
-    app = unique_app_new_with_commands("org.desktop.Balsa", NULL,
+    display = gdk_display_get_default();
+    startup_id =
+        g_strdup_printf("%s%u_TIME%lu", g_get_host_name(), (guint) getpid(),
+                        (gulong) gdk_x11_display_get_user_time(display));
+    app = unique_app_new_with_commands("org.desktop.Balsa", startup_id,
                                        "check-mail",   COMMAND_CHECK_MAIL,
                                        "get-stats",    COMMAND_GET_STATS,
                                        "open-unread",  COMMAND_OPEN_UNREAD,
@@ -802,6 +815,7 @@ main(int argc, char *argv[])
                                        "open-mailbox", COMMAND_OPEN_MAILBOX,
                                        "compose",      COMMAND_COMPOSE,
                                        NULL);
+    g_free(startup_id);
 
     /* if there already is an instance running, this will return TRUE; there
      * is no race condition because the check is already performed at

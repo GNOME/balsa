@@ -1,3 +1,10 @@
+2011-05-31  Peter Bloomfield
+
+	* src/main.c (mw_message_received_cb): present compose window;
+	(main): give unique_app_new_with_commands a non-NULL startup-id,
+	because when NULL it creates a fake timestamp, which results in
+	the running window being presented.
+
 2011-05-28  Peter Bloomfield
 
 	* src/main.c (balsa_handle_automation_options): do not send

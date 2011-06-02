@@ -4202,12 +4202,21 @@ setup_headers_from_message(BalsaSendmsg* bsmsg, LibBalsaMessage *message)
 {
     g_return_if_fail(message->headers);
 
+    /* Try to make the blank line in the address view useful;
+     * - never make it a Bcc: line;
+     * - if Cc: is non-empty, make it a Cc: line;
+     * - if Cc: is empty, make it a To: line
+     * Note that if set-from-list is given an empty list, the blank line
+     * will be a To: line */
     libbalsa_address_view_set_from_list(bsmsg->recipient_view,
-                                        "To:", message->headers->to_list);
+                                        "Bcc:",
+                                        message->headers->bcc_list);
     libbalsa_address_view_set_from_list(bsmsg->recipient_view,
-                                        "Cc:", message->headers->cc_list);
+                                        "To:",
+                                        message->headers->to_list);
     libbalsa_address_view_set_from_list(bsmsg->recipient_view,
-                                        "Bcc:", message->headers->bcc_list);
+                                        "Cc:",
+                                        message->headers->cc_list);
 }
 
 
@@ -4322,6 +4331,10 @@ setup_headers_from_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity *ident)
         libbalsa_address_view_set_from_string(bsmsg->recipient_view,
                                               "Bcc:",
                                               ident->bcc);
+
+    /* Make sure the blank line is "To:" */
+    libbalsa_address_view_add_from_string(bsmsg->recipient_view,
+                                          "To:", NULL);
 }
 
 static int

@@ -193,13 +193,9 @@ balsa_spell_check_class_init(BalsaSpellCheckClass * klass)
 {
     GtkObjectClass *object_class;
     GObjectClass *o_class;
-    GtkWidgetClass *widget_class;
-    GtkContainerClass *container_class;
 
     object_class = (GtkObjectClass *) klass;
     o_class = (GObjectClass *) klass;
-    widget_class = (GtkWidgetClass *) klass;
-    container_class = (GtkContainerClass *) klass;
 
     parent_class = g_type_class_peek_parent(klass);
 

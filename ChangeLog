@@ -1,3 +1,11 @@
+2011-06-01  Peter Bloomfield
+
+	* src/sendmsg-window.c (setup_headers_from_message): make the
+	blank line in the recipient widget not a Bcc: line;
+	(setup_headers_from_identity): ditto.
+	* src/spell-check.c (balsa_spell_check_class_init): silence
+	gcc-4.6.
+
 2011-05-31  Peter Bloomfield
 
 	* src/main.c (mw_message_received_cb): present compose window;

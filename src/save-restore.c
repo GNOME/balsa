@@ -1693,6 +1693,7 @@ config_identities_load()
     libbalsa_conf_foreach_group(IDENTITY_SECTION_PREFIX,
                                 config_identity_load,
                                 default_ident);
+    balsa_app.identities = g_list_reverse(balsa_app.identities);
 
     if (!balsa_app.identities) {
 	libbalsa_conf_push_group("identity-default");

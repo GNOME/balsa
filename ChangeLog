@@ -1,3 +1,14 @@
+2011-06-05  Peter Bloomfield
+
+	* src/save-restore.c (config_identities_load): load identities
+	in the order in which they were saved.
+	* src/sendmsg-window.c (balsa_sendmsg_destroy_handler),
+	(sw_combo_box_changed), (create_from_entry): move selected
+	identity to the front of
+	balsa_app.identities; see
+	<URL:http://mail.gnome.org/archives/balsa-list/2011-May/msg00025.html>
+	(Carlos Franke).
+
 2011-06-01  Peter Bloomfield
 
 	* src/sendmsg-window.c (setup_headers_from_message): make the

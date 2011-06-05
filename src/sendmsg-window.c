@@ -1044,6 +1044,12 @@ balsa_sendmsg_destroy_handler(BalsaSendmsg * bsmsg)
     g_object_unref(bsmsg->buffer2);
 #endif                          /* HAVE_GTKSOURCEVIEW */
 
+    /* Move the current identity to the start of the list */
+    balsa_app.identities = g_list_remove(balsa_app.identities,
+                                         bsmsg->ident);
+    balsa_app.identities = g_list_prepend(balsa_app.identities,
+                                          bsmsg->ident);
+
     g_free(bsmsg);
 
     if (quit_on_close) {
@@ -2722,11 +2728,16 @@ create_email_entry(GtkWidget * table, int y_pos, BalsaSendmsg * bsmsg,
 static void
 sw_combo_box_changed(GtkComboBox * combo_box, BalsaSendmsg * bsmsg)
 {
-    gint active = gtk_combo_box_get_active(combo_box);
-    LibBalsaIdentity *ident =
-        g_list_nth_data(balsa_app.identities, active);
+    GtkTreeIter iter;
 
-    update_bsmsg_identity(bsmsg, ident);
+    if (gtk_combo_box_get_active_iter(combo_box, &iter)) {
+        LibBalsaIdentity *ident;
+
+        gtk_tree_model_get(gtk_combo_box_get_model(combo_box), &iter,
+                           2, &ident, -1);
+        update_bsmsg_identity(bsmsg, ident);
+        g_object_unref(ident);
+    }
 }
 
 static void
@@ -2736,15 +2747,31 @@ create_from_entry(GtkWidget * table, BalsaSendmsg * bsmsg)
     GtkListStore *store;
     GtkCellRenderer *renderer;
 
-    store = gtk_list_store_new(2, G_TYPE_STRING, G_TYPE_STRING);
+    /* For each identity, store the address, the identity name, and a
+     * ref to the identity in a combo-box.
+     * Note: we can't depend on balsa_app.identities staying in the same
+     * order while the compose window is open, so we need a ref to the
+     * actual identity. */
+    store = gtk_list_store_new(3,
+                               G_TYPE_STRING,
+                               G_TYPE_STRING,
+                               G_TYPE_OBJECT);
     for (list = balsa_app.identities; list; list = list->next) {
-        LibBalsaIdentity *ident = list->data;
-        gchar *from = internet_address_to_string(ident->ia, FALSE);
-	gchar *name = g_strconcat("(", ident->identity_name, ")", NULL);
+        LibBalsaIdentity *ident;
+        gchar *from, *name;
         GtkTreeIter iter;
 
+        ident = list->data;
+        from = internet_address_to_string(ident->ia, FALSE);
+	name = g_strconcat("(", ident->identity_name, ")", NULL);
+
         gtk_list_store_append(store, &iter);
-        gtk_list_store_set(store, &iter, 0, from, 1, name, -1);
+        gtk_list_store_set(store, &iter,
+                           0, from,
+                           1, name,
+                           2, ident,
+                           -1);
+
         g_free(from);
         g_free(name);
     }

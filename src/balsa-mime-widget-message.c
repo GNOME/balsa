@@ -407,14 +407,14 @@ bm_header_widget_realized(GtkWidget * widget, BalsaMessage * bm)
     GtkWidget *tl_buttons;
 
     context = gtk_widget_get_style_context(GTK_WIDGET(bm));
+    tl_buttons = g_object_get_data(G_OBJECT(widget), "tl-buttons");
+
     gtk_style_context_get_background_color(context, GTK_STATE_FLAG_NORMAL,
                                            &rgba);
     gtk_widget_override_background_color(bm_header_widget_get_text_view
                                          (widget), GTK_STATE_FLAG_NORMAL,
                                          &rgba);
 
-    tl_buttons =
-        GTK_WIDGET(g_object_get_data(G_OBJECT(widget), "tl-buttons"));
     if (tl_buttons) {
         gtk_widget_override_background_color(tl_buttons,
                                              GTK_STATE_FLAG_NORMAL, &rgba);
@@ -423,6 +423,21 @@ bm_header_widget_realized(GtkWidget * widget, BalsaMessage * bm)
     gtk_style_context_get_color(context, GTK_STATE_FLAG_NORMAL, &rgba);
     gtk_widget_override_color(bm_header_widget_get_text_view(widget),
                               GTK_STATE_FLAG_NORMAL, &rgba);
+
+    gtk_style_context_get_background_color(context, GTK_STATE_FLAG_SELECTED,
+                                           &rgba);
+    gtk_widget_override_background_color(bm_header_widget_get_text_view
+                                         (widget), GTK_STATE_FLAG_SELECTED,
+                                         &rgba);
+
+    if (tl_buttons) {
+        gtk_widget_override_background_color(tl_buttons,
+                                             GTK_STATE_FLAG_SELECTED, &rgba);
+    }
+
+    gtk_style_context_get_color(context, GTK_STATE_FLAG_SELECTED, &rgba);
+    gtk_widget_override_color(bm_header_widget_get_text_view(widget),
+                              GTK_STATE_FLAG_SELECTED, &rgba);
 }
 
 /* Callback for the "style-set" signal; reset colors when theme is

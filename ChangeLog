@@ -1,3 +1,9 @@
+2011-06-10  Peter Bloomfield
+
+	* src/balsa-mime-widget-message.c (bm_header_widget_realized):
+	set the foreground and background colors for SELECTED state as
+	well as for NORMAL, so that selected text is distinguished.
+
 2011-06-05  Peter Bloomfield
 
 	* src/save-restore.c (config_identities_load): load identities

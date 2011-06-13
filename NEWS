@@ -1,3 +1,10 @@
+* Balsa-2.4.10 release. Release date 2011-06-13
+
+- preserve identity order.
+- trivial gtkhtml-3.15 support.
+- improve interaction with unique.
+- bugs fixed #636801, #636805, #647695.
+
 * Balsa-2.4.9 release. Release date 2010-11-19
 
 - compile against new GTK, libnotify libs.

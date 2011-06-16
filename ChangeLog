@@ -1,3 +1,8 @@
+2011-06-15  Peter Bloomfield
+
+	* src/main-window.c: use GDK_1 instead of new GDK_KEY_1 in alt-n
+	code.
+
 2011-06-13  Pawel Salek
 
 	* configure.in: gtkhtml-4.0 does not work with gtk-2.0

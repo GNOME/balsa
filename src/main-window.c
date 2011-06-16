@@ -2737,7 +2737,7 @@ bw_mailbox_tab_n_cb(GtkAction * action, gpointer data)
     if (event->type == GDK_KEY_PRESS) {
         gtk_notebook_set_current_page(GTK_NOTEBOOK
                                       (BALSA_WINDOW(data)->notebook),
-                                      event->key.keyval - GDK_KEY_1);
+                                      event->key.keyval - GDK_1);
     }
     gdk_event_free(event);
 }

@@ -156,7 +156,6 @@ typedef struct _PropertyUI {
     /* colours */
     GtkWidget *quoted_color[MAX_QUOTED_COLOR];
     GtkWidget *url_color;
-    GtkWidget *bad_address_color;
 
     /* sorting and threading prefs */
     GtkWidget *tree_expand_check;
@@ -246,7 +245,6 @@ static GtkWidget *colors_subpage(void);
 
 static GtkWidget *message_colors_group(GtkWidget * page);
 static GtkWidget *link_color_group(GtkWidget * page);
-static GtkWidget *composition_window_group(GtkWidget * page);
 
 static GtkWidget *format_subpage(void);
 
@@ -764,9 +762,6 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
     g_signal_connect(G_OBJECT(pui->url_color), "released",
                      G_CALLBACK(properties_modified_cb), property_box);
 
-    g_signal_connect(G_OBJECT(pui->bad_address_color), "released",
-                     G_CALLBACK(properties_modified_cb), property_box);
-
     /* handling of message parts with 8-bit chars without codeset headers */
     for (i = 0; i < NUM_CONVERT_8BIT_MODES; i++)
         g_signal_connect(G_OBJECT(pui->convert_unknown_8bit[i]), "toggled",
@@ -1078,10 +1073,6 @@ apply_prefs(GtkDialog * pbox)
     gtk_color_button_get_rgba(GTK_COLOR_BUTTON(pui->url_color),
                               &balsa_app.url_color);
 
-    /* bad address color */
-    gtk_color_button_get_rgba(GTK_COLOR_BUTTON(pui->bad_address_color),
-                              &balsa_app.bad_address_color);
-
     /* sorting and threading */
     libbalsa_mailbox_set_sort_field(NULL, pui->sort_field_index);
     libbalsa_mailbox_set_threading_type(NULL, pui->threading_type_index);
@@ -1324,8 +1315,6 @@ set_prefs(void)
                                   &balsa_app.quoted_color[i]);
     gtk_color_button_set_rgba(GTK_COLOR_BUTTON(pui->url_color),
                               &balsa_app.url_color);
-    gtk_color_button_set_rgba(GTK_COLOR_BUTTON(pui->bad_address_color),
-                              &balsa_app.bad_address_color);
 
     /* Information Message */
     pm_combo_box_set_level(pui->information_message_menu,
@@ -2333,7 +2322,6 @@ colors_subpage(void)
 
     pm_page_add(page, message_colors_group(page), FALSE);
     pm_page_add(page, link_color_group(page), FALSE);
-    pm_page_add(page, composition_window_group(page), FALSE);
 
     return page;
 }
@@ -2366,21 +2354,6 @@ link_color_group(GtkWidget * page)
     group = pm_group_new(_("Link color"));
     pui->url_color =
         color_box(GTK_BOX(pm_group_get_vbox(group)), _("Hyperlink color"));
-
-    return group;
-}
-
-static GtkWidget *
-composition_window_group(GtkWidget * page)
-{
-    GtkWidget *group;
-    GtkWidget *vbox;
-
-    group = pm_group_new(_("Composition window"));
-    vbox = pm_group_get_vbox(group);
-    pui->bad_address_color =
-        color_box(GTK_BOX(vbox),
-                  _("Invalid or incomplete address label color"));
 
     return group;
 }

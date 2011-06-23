@@ -102,9 +102,6 @@ extern "C" {
 	gboolean req_dispnotify; /* send a MDN */ 
 	gboolean quit_on_close; /* quit balsa after the compose window */
 	                        /* is closed.                          */
-        /* style for changing the color of address labels when the
-         * address isn't valid: */
-        GtkStyle *bad_address_style;  
 #ifdef HAVE_GPGME
 	guint gpg_mode;
 #endif

@@ -752,10 +752,6 @@ config_global_load(void)
     /* URL coloring */
     load_color("UrlColor", DEFAULT_URL_COLOR, &balsa_app.url_color);
 
-    /* bad address coloring */
-    load_color("BadAddressColor", DEFAULT_BAD_ADDRESS_COLOR,
-               &balsa_app.bad_address_color);
-
     /* ... font used to display messages */
     g_free(balsa_app.message_font);
     balsa_app.message_font =
@@ -1289,7 +1285,6 @@ config_save(void)
     }
 
     save_color("UrlColor", &balsa_app.url_color);
-    save_color("BadAddressColor", &balsa_app.bad_address_color);
 
     /* ... handling of Multipart/Alternative */
     libbalsa_conf_set_bool("DisplayAlternativeAsPlain",

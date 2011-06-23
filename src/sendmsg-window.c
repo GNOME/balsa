@@ -1016,8 +1016,6 @@ balsa_sendmsg_destroy_handler(BalsaSendmsg * bsmsg)
     if (balsa_app.debug)
 	printf("balsa_sendmsg_destroy_handler: Freeing bsmsg\n");
     gtk_widget_destroy(bsmsg->window);
-    if (bsmsg->bad_address_style)
-        g_object_unref(G_OBJECT(bsmsg->bad_address_style));
     quit_on_close = bsmsg->quit_on_close;
     g_free(bsmsg->fcc_url);
     g_free(bsmsg->in_reply_to);
@@ -2906,9 +2904,6 @@ create_info_pane(BalsaSendmsg * bsmsg)
     gtk_table_set_row_spacings(GTK_TABLE(table), 6);
     gtk_table_set_col_spacings(GTK_TABLE(table), 6);
     gtk_container_set_border_width(GTK_CONTAINER(table), 6);
-
-    /* bsmsg->bad_address_style will be set in create_email_entry: */
-    bsmsg->bad_address_style = NULL;
 
     /* From: */
     create_from_entry(table, bsmsg);

@@ -273,9 +273,6 @@ extern struct BalsaApplication {
     /* text color of URL's */
     GdkRGBA url_color;
 
-    /* label color of bad addresses */
-    GdkRGBA bad_address_color;
-
     guint pwindow_option;
     gboolean wordwrap;
     gint wraplength;

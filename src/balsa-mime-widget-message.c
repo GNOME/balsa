@@ -835,9 +835,7 @@ add_header_sigstate(GtkTextView * view, GMimeGpgmeSigstat * siginfo)
 						PANGO_STYLE_ITALIC,
 						"weight",
 						PANGO_WEIGHT_BOLD,
-						"foreground-gdk",
-						&balsa_app.
-						bad_address_color, NULL);
+                                                NULL);
     msg =
 	g_strdup_printf("%s%s",
 			libbalsa_gpgme_sig_protocol_name(siginfo->

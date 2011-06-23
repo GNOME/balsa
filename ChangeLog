@@ -1,5 +1,18 @@
 2011-06-22  Peter Bloomfield
 
+	Drop bad-address-color
+
+	* src/balsa-app.h:
+	* src/balsa-mime-widget-message.c (add_header_sigstate):
+	* src/pref-manager.c (open_preferences_manager), (apply_prefs),
+	(set_prefs), (colors_subpage):
+	* src/save-restore.c (config_global_load), (config_save):
+	* src/sendmsg-window.c (balsa_sendmsg_destroy_handler),
+	(create_info_pane):
+	* src/sendmsg-window.h:
+
+2011-06-22  Peter Bloomfield
+
 	* src/sendmsg-window.c (add_attachment): do not cast non-widget
 	to GtkWidget*.
 

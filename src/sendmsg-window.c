@@ -2055,8 +2055,9 @@ add_attachment(BalsaSendmsg * bsmsg, const gchar *filename,
     if (is_fwd_message)
 	content_type = g_strdup(forced_mime_type);
     pixbuf =
-	libbalsa_icon_finder(GTK_WIDGET(bsmsg), forced_mime_type, file_uri,
-                             &content_type, GTK_ICON_SIZE_LARGE_TOOLBAR);
+        libbalsa_icon_finder(GTK_WIDGET(bsmsg->window), forced_mime_type,
+                             file_uri, &content_type,
+                             GTK_ICON_SIZE_LARGE_TOOLBAR);
     if (!content_type)
 	/* Last ditch. */
 	content_type = g_strdup("application/octet-stream");

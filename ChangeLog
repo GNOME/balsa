@@ -1,3 +1,8 @@
+2011-06-22  Peter Bloomfield
+
+	* src/sendmsg-window.c (add_attachment): do not cast non-widget
+	to GtkWidget*.
+
 2011-06-10  Peter Bloomfield
 
 	* src/balsa-mime-widget-message.c (bm_header_widget_realized):

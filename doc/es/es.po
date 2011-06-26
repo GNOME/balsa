@@ -8,8 +8,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa-help.master\n"
-"POT-Creation-Date: 2011-06-16 02:37+0000\n"
-"PO-Revision-Date: 2011-06-23 18:11+0200\n"
+"POT-Creation-Date: 2011-06-23 16:16+0000\n"
+"PO-Revision-Date: 2011-06-26 12:59+0200\n"
 "Last-Translator: Daniel Mustieles <daniel.mustieles@gmail.com>\n"
 "Language-Team: Español <gnome-es-list@gnome.org>\n"
 "MIME-Version: 1.0\n"
@@ -843,6 +843,9 @@ msgid ""
 "guimenu><guimenuitem>Previous</guimenuitem></menuchoice> -- Select the "
 "previous message in the current mailbox."
 msgstr ""
+"<menuchoice><shortcut><keysym>P</keysym></shortcut><guimenu>Buzón</"
+"guimenu><guimenuitem>Mensaje anterior</guimenuitem></menuchoice>: "
+"seleccionar el mensaje anterior en el buzón actual."
 
 #: C/balsa.xml:735(para)
 msgid ""
@@ -851,6 +854,10 @@ msgid ""
 "guimenuitem></menuchoice> -- Select the next unread message in the current "
 "mailbox."
 msgstr ""
+"<menuchoice><shortcut><keycombo><keysym>Ctrl</keysym><keysym>N</keysym></"
+"keycombo></shortcut><guimenu>Buzón</guimenu><guimenuitem>Siguiente mensaje "
+"no leído</guimenuitem></menuchoice>: siguiente mensaje no leído en el buzón "
+"actual."
 
 #: C/balsa.xml:749(para)
 msgid ""
@@ -859,6 +866,10 @@ msgid ""
 "guimenu><guimenuitem>Next Flagged</guimenuitem></menuchoice> -- Select the "
 "next flagged message in the current mailbox."
 msgstr ""
+"<menuchoice><shortcut><keycombo><keysym>Ctrl</keysym><keysym>Alt</"
+"keysym><keysym>F</keysym></keycombo></shortcut><guimenu>Buzón</"
+"guimenu><guimenuitem>Siguiente mensaje marcado</guimenuitem></menuchoice>: "
+"seleccionar el siguiente mensaje marcado en el buzón actual."
 
 #: C/balsa.xml:765(para)
 msgid ""
@@ -867,30 +878,43 @@ msgid ""
 "that may be hidden and unhidden in the current mailbox. Types in the submenu "
 "are toggled when selected. A Checkmark indicates it is currently hidden."
 msgstr ""
+"<menuchoice><guimenu>Buzón</guimenu><guimenuitem>Ocultar mensajes</"
+"guimenuitem></menuchoice>: un submenú que lista todos los tipos de mensajes "
+"que se pueden ocultar o no en el buzón actual. Cuando se selecciona un tipo "
+"de mensaje del submenú, se alterna entre oculto y no oculto. La marca de "
+"verificación indica que actualmente está oculto."
 
 #: C/balsa.xml:778(para)
 msgid ""
 "<menuchoice><guimenu>Mailbox</guimenu><guimenuitem>Reset Filter</"
 "guimenuitem></menuchoice> -- Resets to the mailbox filter."
 msgstr ""
+"<menuchoice><guimenu>Buzón</guimenu><guimenuitem>Restablecer filtro</"
+"guimenuitem></menuchoice>: restablecer los filtros del buzón."
 
 #: C/balsa.xml:789(para)
 msgid ""
 "<menuchoice><guimenu>Mailbox</guimenu><guimenuitem>Select All</guimenuitem></"
 "menuchoice> -- Selects all messages in the current mailbox."
 msgstr ""
+"<menuchoice><guimenu>Buzón</guimenu><guimenuitem>Seleccionar todo</"
+"guimenuitem></menuchoice>: seleccionar todos los mensajes del buzón actual."
 
 #: C/balsa.xml:800(para)
 msgid ""
 "<menuchoice><guimenu>Mailbox</guimenu><guimenuitem>Edit...</guimenuitem></"
 "menuchoice> -- Edit mailbox properties."
 msgstr ""
+"<menuchoice><guimenu>Buzón</guimenu><guimenuitem>Editar...</guimenuitem></"
+"menuchoice>: editar las propiedades del buzón."
 
 #: C/balsa.xml:811(para)
 msgid ""
 "<menuchoice><guimenu>Mailbox</guimenu><guimenuitem>Delete...</guimenuitem></"
 "menuchoice> -- Delete the currently selected mailbox."
 msgstr ""
+"<menuchoice><guimenu>Buzón</guimenu><guimenuitem>Borrar...</guimenuitem></"
+"menuchoice>: borrar el buzón actualmente seleccionado."
 
 #: C/balsa.xml:822(para)
 msgid ""
@@ -898,12 +922,17 @@ msgid ""
 "guimenuitem></menuchoice> -- Physically remove from the backing mailstore "
 "all messages marked as deleted."
 msgstr ""
+"<menuchoice><guimenu>Buzón</guimenu><guimenuitem>Purgar los mensajes "
+"borrados</guimenuitem></menuchoice>: quitar físicamente del sistema de "
+"respaldo todos los mensajes marcados como eliminados."
 
 #: C/balsa.xml:834(para)
 msgid ""
 "<menuchoice><guimenu>Mailbox</guimenu><guimenuitem>Close</guimenuitem></"
 "menuchoice> -- Close the currently selected mailbox."
 msgstr ""
+"<menuchoice><guimenu>Buzón</guimenu><guimenuitem>Cerrar</guimenuitem></"
+"menuchoice>: cerrar el buzón actualmente seleccionado."
 
 #: C/balsa.xml:845(para)
 msgid ""
@@ -911,6 +940,9 @@ msgid ""
 "guimenuitem></menuchoice> -- Delete all messages from the <symbol>Trash</"
 "symbol> mailbox."
 msgstr ""
+"<menuchoice><guimenu>Buzón</guimenu><guimenuitem>Vaciar la papelera</"
+"guimenuitem></menuchoice>: eliminar todos los mensajes de la "
+"<symbol>papelera</symbol>."
 
 #: C/balsa.xml:856(para)
 msgid ""
@@ -918,6 +950,9 @@ msgid ""
 "guimenuitem></menuchoice> -- Pop up a dialog that allows you to control "
 "which filters are applied to this mailbox, and optionally to apply them."
 msgstr ""
+"<menuchoice><guimenu>Buzón</guimenu><guimenuitem>Seleccionar filtros</"
+"guimenuitem></menuchoice>: se abre un cuadro de diálogo que le permite "
+"controlar los filtros aplicados a este buzón y, opcionalmente, aplicarlos."
 
 #: C/balsa.xml:868(para)
 msgid ""
@@ -926,6 +961,11 @@ msgid ""
 "application> locates all messages in the current mailbox that have the same "
 "Message-ID header, and removes all but one."
 msgstr ""
+"<menuchoice><guimenu>Buzón</guimenu><guimenuitem>Eliminar duplicados</"
+"guimenuitem></menuchoice>: eliminar los mensajes duplicados; "
+"<application>Balsa</application> identifica todos los mensajes del buzón "
+"actual que tienen la misma cabecera de identificación del mensaje, y elimina "
+"todos excepto uno."
 
 #: C/balsa.xml:888(title)
 msgid "Message Menu"
@@ -945,6 +985,9 @@ msgid ""
 "guimenu><guimenuitem>Reply...</guimenuitem></menuchoice> -- Reply to the "
 "currently selected message(s)."
 msgstr ""
+"<menuchoice><shortcut><keysym>R</keysym></shortcut><guimenu>Mensaje</"
+"guimenu><guimenuitem>Responder...</guimenuitem></menuchoice>: responder a "
+"los mensajes seleccionados actualmente."
 
 #: C/balsa.xml:909(para)
 msgid ""
@@ -953,6 +996,10 @@ msgid ""
 "the currently selected message(s), sending the reply to all senders and "
 "recipients of the message."
 msgstr ""
+"<menuchoice><shortcut><keysym>A</keysym></shortcut><guimenu>Mensaje</"
+"guimenu><guimenuitem>Responder a todos...</guimenuitem></menuchoice>: "
+"responder a los mensajes seleccionados actualmente, enviando la respuesta a "
+"todos los remitentes y destinatarios de los mensajes."
 
 #: C/balsa.xml:922(para)
 msgid ""
@@ -960,6 +1007,9 @@ msgid ""
 "guimenu><guimenuitem>Reply to Group...</guimenuitem></menuchoice> -- Reply "
 "to a mailing list, instead of the sender to that list."
 msgstr ""
+"<menuchoice><shortcut><keysym>G</keysym></shortcut><guimenu>Mensaje</"
+"guimenu><guimenuitem>Responder al grupo...</guimenuitem></menuchoice>: "
+"responder a una lista de correo, en lugar de al remitente de esa lista."
 
 #: C/balsa.xml:934(para)
 msgid ""
@@ -967,6 +1017,9 @@ msgid ""
 "guimenu><guimenuitem>Forward attached...</guimenuitem></menuchoice> -- "
 "Forward the currently selected message(s) as an attachment."
 msgstr ""
+"<menuchoice><shortcut><keysym>F</keysym></shortcut><guimenu>Mensaje</"
+"guimenu><guimenuitem>Reenviar adjunto...</guimenuitem></menuchoice>: "
+"reenviar los mensajes seleccionados actualmente como un archivo adjunto."
 
 #: C/balsa.xml:945(para)
 msgid ""
@@ -974,6 +1027,9 @@ msgid ""
 "guimenuitem></menuchoice> -- Forward the currently selected message(s), "
 "quoted inline."
 msgstr ""
+"<menuchoice><guimenu>Mensaje</guimenu><guimenuitem>Reenviar en línea...</"
+"guimenuitem></menuchoice>: reenviar los mensajes seleccionados actualmente, "
+"citados en línea."
 
 #: C/balsa.xml:955(para)
 msgid ""
@@ -982,6 +1038,10 @@ msgid ""
 "guimenuitem></menuchoice> -- View the next part of the message (if the "
 "message is multi-part)."
 msgstr ""
+"<menuchoice><shortcut><keycombo><keysym>Ctrl</keysym><keysym>.</keysym></"
+"keycombo></shortcut><guimenu>Mensaje</guimenu><guimenuitem>Siguiente parte</"
+"guimenuitem></menuchoice>: ver la siguiente parte del mensaje (si el mensaje "
+"está en múltiples partes)."
 
 #: C/balsa.xml:970(para)
 msgid ""
@@ -989,6 +1049,9 @@ msgid ""
 "keycombo></shortcut><guimenu>Message</guimenu><guimenuitem>Previous Part</"
 "guimenuitem></menuchoice> -- View the previous part of the message."
 msgstr ""
+"<menuchoice><shortcut><keycombo><keysym>Ctrl</keysym><keysym>,</keysym></"
+"keycombo></shortcut><guimenu>Mensaje</guimenu><guimenuitem>Anterior parte</"
+"guimenuitem></menuchoice>: ver la parte anterior del mensaje."
 
 #: C/balsa.xml:984(para)
 msgid ""
@@ -997,6 +1060,10 @@ msgid ""
 "Part...</guimenuitem></menuchoice> -- Save the currently selected part of "
 "the message to a file."
 msgstr ""
+"<menuchoice><shortcut><keycombo><keysym>Ctrl</keysym><keysym>S</keysym></"
+"keycombo></shortcut><guimenu>Mensaje</guimenu><guimenuitem>Guardar parte "
+"actual...</guimenuitem></menuchoice>: guardar la parte del mensaje "
+"seleccionada actualmente en un archivo."
 
 #: C/balsa.xml:998(para)
 msgid ""
@@ -1006,6 +1073,11 @@ msgid ""
 "message as received from the <glossterm linkend=\"glossary-mta\">MTA</"
 "glossterm>."
 msgstr ""
+"<menuchoice><shortcut><keycombo><keysym>Ctrl</keysym><keysym>U</keysym></"
+"keycombo></shortcut><guimenu>Mensaje</guimenu><guimenuitem>Ver fuente...</"
+"guimenuitem></menuchoice>: abre una ventana nueva que muestra el mensaje "
+"crudo tal como se recibió de la <glossterm linkend=\"glossary-mta\">MTA</"
+"glossterm>."
 
 #: C/balsa.xml:1013(para)
 msgid ""
@@ -1013,6 +1085,9 @@ msgid ""
 "menuchoice> -- Copies to the clipboard any text selected in the message view "
 "of the current message."
 msgstr ""
+"<menuchoice><guimenu>Mensaje</guimenu><guimenuitem>Copiar</guimenuitem></"
+"menuchoice>: copiar al portapapeles cualquier texto seleccionado del mensaje "
+"actual en la vista de mensaje."
 
 #: C/balsa.xml:1025(para)
 msgid ""
@@ -1020,6 +1095,9 @@ msgid ""
 "guimenuitem></menuchoice> -- Selects the entire text of the current message "
 "in the message view."
 msgstr ""
+"<menuchoice><guimenu>Mensaje</guimenu><guimenuitem>Seleccionar texto</"
+"guimenuitem></menuchoice>: seleccionar el texto completo del mensaje actual "
+"en la vista de mensaje."
 
 #: C/balsa.xml:1036(para)
 msgid ""
@@ -1027,11 +1105,15 @@ msgid ""
 "guimenu><guimenuitem>Move to Trash</guimenuitem></menuchoice> -- Moves the "
 "currently selected message(s) to the Trash."
 msgstr ""
+"<menuchoice><shortcut><keysym>D</keysym></shortcut><guimenu>Mensaje</"
+"guimenu><guimenuitem>Mover a la papelera</guimenuitem></menuchoice>: mover "
+"los mensajes seleccionados actualmente a la papelera."
 
 # Traducción pobre. Revisar el contexto.
+# Revisión: actualmente el GUI tiene esta traducción 'Conmutar marca'.
 #: C/balsa.xml:1051(guisubmenu)
 msgid "Toggle flag"
-msgstr "Conmutar opción"
+msgstr "Conmutar marca"
 
 #: C/balsa.xml:1056(para)
 msgid ""
@@ -1040,6 +1122,11 @@ msgid ""
 "guimenuitem></menuchoice> -- Toggle the flag on the currently selected "
 "message(s). This is shown as an exclamation mark next in the message index."
 msgstr ""
+"<menuchoice><shortcut><keysym>X</keysym></shortcut><guimenu>Mensaje</"
+"guimenu><guisubmenu>Conmutar marca</guisubmenu><guimenuitem>Marcado</"
+"guimenuitem></menuchoice>: conmutar la marca en los mensajes seleccionados "
+"actualmente. Ésta se muestra como un signo de admiración junto al índice del "
+"mensaje."
 
 #: C/balsa.xml:1070(para)
 msgid ""
@@ -1051,6 +1138,13 @@ msgid ""
 "specified in the <link linkend=\"preferences\">Preferences</link>. The icon "
 "is a small trash can."
 msgstr ""
+"<menuchoice><shortcut><keycombo><keysym>Ctrl</keysym><keysym>D</keysym></"
+"keycombo></shortcut><guimenu>Mensaje</guimenu><guisubmenu>Conmutar marca</"
+"guisubmenu><guimenuitem>Borrado</guimenuitem></menuchoice>: marcar el "
+"mensaje como listo para su eliminación. El mensaje se eliminará realmente "
+"del sistema de respaldo cuando es borrado manualmente, o según sea "
+"especificado en las «Preferencias de Balsa». El icono es un bote de basura "
+"pequeño."
 
 #: C/balsa.xml:1089(para)
 msgid ""

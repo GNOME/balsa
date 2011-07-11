@@ -1,15 +1,16 @@
 # translation of balsa-help.master.po to Español
-#
+# 
 # Jorge González <jorgegonz@svn.gnome.org>, 2008, 2010, 2011.
 # Joaquín Ignacio Aramendía <samsagax@gmail.com>, 2011.
 # Juan Matías Olmos <colonizare@yahoo.com.ar>, 2011.
-# Daniel Mustieles <daniel.mustieles@gmail.com>, 2011.
+# 
+# Daniel Mustieles <daniel.mustieles@gmail.com>, 2011., 2011.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa-help.master\n"
-"POT-Creation-Date: 2011-07-01 08:03+0000\n"
-"PO-Revision-Date: 2011-07-05 15:42+0200\n"
+"POT-Creation-Date: 2011-07-06 07:40+0000\n"
+"PO-Revision-Date: 2011-07-11 19:21+0200\n"
 "Last-Translator: Daniel Mustieles <daniel.mustieles@gmail.com>\n"
 "Language-Team: Español <gnome-es-list@gnome.org>\n"
 "MIME-Version: 1.0\n"
@@ -17,6 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Lokalize 1.2\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: es\n"
 
 #. When image changes, this message will be marked fuzzy or untranslated for you.
 #. It doesn't matter what you translate it to: it's not used at all.
@@ -347,8 +349,8 @@ msgstr ""
 "<application>Balsa</application>. <application>Balsa</application> puede "
 "averiguar la mayoría de lo que debe saber sobre usted. También creará cinco "
 "buzones locales de manera predeterminada: «Bandeja de entrada», «Bandeja de "
-"salida», «Correo enviado», «Borradores», y «Papelera». (Pueden cambiarse para "
-"que sean buzones <glossterm linkend=\"glossary-imap\"><acronym>IMAP</"
+"salida», «Correo enviado», «Borradores», y «Papelera». (Pueden cambiarse "
+"para que sean buzones <glossterm linkend=\"glossary-imap\"><acronym>IMAP</"
 "acronym></glossterm> posteriormente.)"
 
 #: C/balsa.xml:195(title)
@@ -812,12 +814,12 @@ msgid ""
 "font size of HTML messages. Plain text messages will always use the font "
 "specified in the <link linkend=\"preferences\">Preferences</link> window."
 msgstr ""
-"<menuchoice><guimenu>View</guimenu><guimenuitem>Zoom In</guimenuitem></"
-"menuchoice>, <menuchoice><guimenuitem>Zoom Out</guimenuitem></menuchoice>, "
-"<menuchoice><guimenuitem>Zoom 100%</guimenuitem></menuchoice>: cambiar el "
-"tamaño de la fuente de los mensajes HTML. Los mensajes de texto plano usarán "
-"siempre la fuente indicada en la ventana <link linkend=\"preferences"
-"\">Preferencias de Balsa</link>."
+"<menuchoice><guimenu>Ver</guimenu><guimenuitem>Acercar</guimenuitem></"
+"menuchoice>, <menuchoice><guimenuitem>Alejar</guimenuitem></menuchoice>, "
+"<menuchoice><guimenuitem>Aumento al 100%</guimenuitem></menuchoice>: cambiar "
+"el tamaño de la tipografía de los mensajes HTML. Los mensajes de texto plano "
+"usarán siempre la tipografía indicada en la ventana <link linkend="
+"\"preferences\">Preferencias de Balsa</link>."
 
 #: C/balsa.xml:705(guimenu)
 msgid "Mailbox"
@@ -2016,9 +2018,9 @@ msgid ""
 "sent."
 msgstr ""
 "La barra de herramientas contiene los botones de las funciones usadas "
-"habitualmente al enviar mensajes, incluyendo «Enviar», «Adjuntar» y «Guardar». "
-"Al igual que en la barra de menú, algunos botones se desactivan si el "
-"mensaje no se configura correctamente para enviarse."
+"habitualmente al enviar mensajes, incluyendo «Enviar», «Adjuntar» y "
+"«Guardar». Al igual que en la barra de menú, algunos botones se desactivan "
+"si el mensaje no se configura correctamente para enviarse."
 
 #: C/balsa.xml:1890(guibutton)
 msgid "Send"
@@ -2120,6 +2122,10 @@ msgid ""
 "have entered your name and email address in the <link linkend=\"identities"
 "\">identities</link> window."
 msgstr ""
+"<literal>De</literal> se utiliza para indicar el origen del mensaje, "
+"<application>Balsa</application> completa esto automáticamente en el caso "
+"que haya introducido su nombre y su dirección de correo en la ventana <link "
+"linkend=\"identities\">identidades</link>."
 
 #: C/balsa.xml:1985(guilabel)
 msgid "To"
@@ -2131,6 +2137,9 @@ msgid ""
 "of the message; <application>Balsa</application> automatically fills this in "
 "for you if you are replying to a message."
 msgstr ""
+"La cabecera <literal>Para</literal> se utiliza para indicar el destinatario "
+"del mensaje; <application>Balsa</application> completa esto automáticamente "
+"si se responde a un mensaje."
 
 #: C/balsa.xml:1996(guilabel)
 msgid "Subject"
@@ -2141,6 +2150,8 @@ msgid ""
 "The <literal>Subject</literal> header is used to summarize the topic of the "
 "message."
 msgstr ""
+"La cabecera <literal>Asunto</literal> se utiliza para resumir el tema del "
+"mensaje."
 
 #: C/balsa.xml:2006(guilabel)
 msgid "Cc"
@@ -2151,6 +2162,8 @@ msgid ""
 "The \"Carbon Copy\" header. A comma separated list of recipients other than "
 "the main recipient should go here."
 msgstr ""
+"La cabecera «copia carbón» (o bien, «con copia»). Aquí se puede introducir "
+"una lista de destinatarios aparte del principal y separados por comas."
 
 #: C/balsa.xml:2016(guilabel) C/balsa.xml:3846(guilabel)
 msgid "Bcc"
@@ -2163,10 +2176,14 @@ msgid ""
 "as recipients to readers of the message. Also known as a \"silent\" carbon "
 "copy."
 msgstr ""
+"La cabecera <literal>Cco</ literal>, o «copia carbón oculta». Es similar a "
+"la cabecera «Cc», con la excepción de que las direcciones de correo "
+"colocadas en esta cabecera no aparecen como destinatarios a los lectores del "
+"mensaje. También conocida como «con copia silenciosa»."
 
 #: C/balsa.xml:2028(guilabel)
 msgid "Fcc"
-msgstr ""
+msgstr "Rcc"
 
 #: C/balsa.xml:2030(para)
 msgid ""
@@ -2175,6 +2192,10 @@ msgid ""
 "being sent. It is presented as a drop-down combo box with a list of all "
 "available mailboxes, simply select the destination."
 msgstr ""
+"La cabecera <literal>Fcc</literal> significa «carpeta de copia carbón», y se "
+"utiliza para indicar una carpeta donde se copiará el mensaje después de "
+"enviarlo. Se presenta como una caja combinada desplegable con una lista de "
+"todos los buzones disponibles; simplemente seleccione el destino."
 
 #: C/balsa.xml:2042(guilabel)
 msgid "Reply-To"
@@ -2185,6 +2206,8 @@ msgid ""
 "The <literal>Reply-To</literal> header is for specifying what email address "
 "you want any replies to go to."
 msgstr ""
+"La cabecera <literal>Responder a</literal> indica la dirección de correo "
+"donde se enviarán las respuestas."
 
 #: C/balsa.xml:2051(guilabel)
 msgid "Comments"
@@ -2195,6 +2218,8 @@ msgid ""
 "Although not widely used, the <literal>Comments</literal> header can be used "
 "to specify short comments for email's."
 msgstr ""
+"Aunque no se utiliza ampliamente, la cabecera <literal>Comentarios</literal> "
+"se puede usar para indicar comentarios cortos sobre el correo."
 
 #: C/balsa.xml:2061(guilabel)
 msgid "Keywords"
@@ -2206,6 +2231,10 @@ msgid ""
 "information about the content of the message in the email, to allow for "
 "easier searching or filtering at a later date."
 msgstr ""
+"Nuevamente, una cabecera que no se utiliza ampliamente, se puede utilizar "
+"para introducir información general sobre el contenido del mensaje del "
+"correo electrónico, para permitir que se hagan más fáciles las búsquedas o "
+"filtrado de mensajes después de un tiempo."
 
 #: C/balsa.xml:2074(title)
 msgid "Specifying Addresses"
@@ -2218,6 +2247,10 @@ msgid ""
 "a small colored book to the right of them that will open up "
 "<application>Balsa</application>'s address book."
 msgstr ""
+"<application>Balsa</application> es compatible con muchos métodos diferentes "
+"de selección de direcciones de correo-e. Todos los encabezados que pueden "
+"contener direcciones tienen un pequeño libro coloreade a la derecha que "
+"abrirán la libreta de direcciones de <application>Balsa</application>."
 
 #: C/balsa.xml:2083(para)
 msgid ""
@@ -2225,6 +2258,10 @@ msgid ""
 "the headers should contain depending on what context the composition window "
 "is opened in, so it may not be neccessary to fill them in most of the time."
 msgstr ""
+"Sin embargo, <application>Balsa</ application> también tratará de predecir "
+"lo que las cabeceras deberían contener, dependiendo del contexto en el que "
+"se abre la ventana de composición, así que puede que no sea necesario "
+"completarlas la mayor parte de las veces."
 
 #: C/balsa.xml:2091(para)
 msgid ""
@@ -2236,6 +2273,13 @@ msgid ""
 "and-drop of addresses from the <application>GnomeCard</application> "
 "application."
 msgstr ""
+"Además, <application>Balsa</application> soporta expansión de alias. A "
+"medida que escriba un nombre, <application>Balsa</application> predecirá la "
+"dirección de correo electrónico de todas las cargadas en la aplicación "
+"<application>GnomeCard</application>. Para activar esta función, lea la "
+"sección sobre la <link linkend=\"ct-alias-expansion\">expansión de alias</"
+"link>​​. Además, la ventana de composición soporta arrastrar y soltar para las "
+"direcciones de la aplicación <application>GnomeCard</application>."
 
 #: C/balsa.xml:2104(title)
 msgid "Attachments"
@@ -2250,6 +2294,9 @@ msgid ""
 "Below the headers may be a large box displaying a list of attachments; this "
 "view can be toggled in the <guimenu>Show</guimenu> menu."
 msgstr ""
+"Debajo de las cabeceras, se puede ver una caja grande que muestra una lista "
+"de archivos adjuntos, esta vista se puede cambiar en el menú "
+"<guimenu>Mostrar</guimenu>."
 
 #: C/balsa.xml:2123(para)
 msgid ""
@@ -2263,6 +2310,15 @@ msgid ""
 "guimenuitem>, and any available <guimenuitem>Open with</guimenuitem> options "
 "are also available."
 msgstr ""
+"Cuando se muestran archivos adjuntos, se puede hacer pulsar con el botón "
+"derecho en uno de ellos para acceder a un menú de opciones. <guimenuitem>En "
+"línea</guimenuitem> y <guimenuitem>Adjunto</guimenuitem> son opciones "
+"mutuamente excluyentes que se mostrarán al destinatario, ya sea el archivo "
+"adjunto en línea con el resto del mensaje, o bien por separado como un "
+"archivo adjunto. Al seleccionar <guimenuitem>Referencia</guimenuitem> se "
+"enviará una referencia MIME de parte externa (un tipo de enlace) en lugar "
+"del archivo real. La opción <guimenuitem>Eliminar</guimenuitem>, y cualquier "
+"opción <guimenuitem>Abrir con<guimenuitem> también están disponibles."
 
 #: C/balsa.xml:2140(title)
 msgid "Message Body"
@@ -2275,6 +2331,11 @@ msgid ""
 "basic, but it supports cut, copy, and paste so it is possible to write a "
 "message in your favorite editor and simply paste it in."
 msgstr ""
+"Finalmente, debajo de la lista de los archivos adjuntos se encuentra el área "
+"principal de la ventana, donde se muestra el texto del mensaje. Las "
+"capacidades de edición de texto son básicas, pero se soporta cortar, copiar "
+"y pegar. Por tanto, puede escribir un mensaje en su editor favorito y luego, "
+"simplemente, pegarlo aquí."
 
 #: C/balsa.xml:2150(para)
 msgid ""
@@ -2282,6 +2343,10 @@ msgid ""
 "displayed in the body text widget, with the prefix specified in the <link "
 "linkend=\"preferences-outgoing\">Preferences</link> dialog."
 msgstr ""
+"Si el mensaje es una respuesta o reenvío, el mensaje de referencia se "
+"mostrará en el widget del cuerpo del texto, con el prefijo especificado en "
+"el cuadro de diálogo <link linkend=\"preferences-outgoing\">Preferencias de "
+"Balsa</link>."
 
 #: C/balsa.xml:2158(title)
 msgid "Spell Checker"
@@ -2295,6 +2360,11 @@ msgid ""
 "will be highlighted and a panel will be shown that offers a number of "
 "suggestions and available courses of action."
 msgstr ""
+"Una vez que se inicia el corrector ortográfico, se tomará un momento para "
+"cargar el texto y el módulo de corrección ortográfica, y luego "
+"automáticamente se iniciará la comprobación del mensaje. Si se encuentra "
+"alguna palabra incorrecta, se resaltará y se mostrará un panel que ofrece "
+"una serie de sugerencias y las acciones disponibles."
 
 #: C/balsa.xml:2169(title)
 msgid "Spell Checking Panel"
@@ -2312,12 +2382,24 @@ msgid ""
 "used to replace the current word, and usually reflects the current selection "
 "in the list, but can be edited by hand if you wish to make manual changes."
 msgstr ""
+"Como se puede observar arriba, el panel se compone de una serie de dos "
+"paneles, el de la izquierda contiene una lista de sugerencias y un cuadro de "
+"entrada, mientras que el de la derecha contiene varios botones para elegir "
+"una acción. La lista de la izquierda se vuelve a generar por cada palabra "
+"incorrecta, con todas las sugerencias del corrector ortográfico.Puede elegir "
+"qué programa desea utilizar mediante la carga de módulos, que se puede "
+"seleccionar en la ventana de <link linkend=\"preferences-spelling"
+"\">Preferencias de Balsa</link>. El cuadro de entrada ubicado sobre la lista "
+"se usa para reemplazar la palabra actual y, por lo general, refleja la "
+"selección actual en la lista, pero se puede modificar manualmente si quiere."
 
 #: C/balsa.xml:2192(para)
 msgid ""
 "The buttons on the left control the actions to take for each incorrect word. "
 "The buttons include:"
 msgstr ""
+"Los botones de la izquierda manejan las acciones a tomar para cada palabra "
+"incorrecta. Estos botones son:"
 
 #: C/balsa.xml:2199(guibutton)
 msgid "Change"

@@ -887,9 +887,6 @@ fi
 if test -d "${srcdir}/.git" ; then
 	BALSA_FROM_GIT=yes
 	BALSA_CFLAGS="$BALSA_CFLAGS -Wall -Werror"
-        if $PKG_CONFIG --atleast-version=2.18 gtk+-2.0; then
-            BALSA_DEFS="-DGSEAL_ENABLE"
-        fi
         BALSA_DEFS="$BALSA_DEFS \
 -DG_DISABLE_DEPRECATED \
 -DG_DISABLE_SINGLE_INCLUDES \
@@ -979,7 +976,7 @@ AC_ARG_ENABLE(extra-mimeicons,
 	install_mimeicons=yes
 ])
 AM_CONDITIONAL([INSTALL_MIME_ICONS], [test $install_mimeicons = "yes"])
-HICOLOR_ICON_DIR=`$PKG_CONFIG --variable=prefix gtk+-2.0`/share/icons/hicolor
+HICOLOR_ICON_DIR=`$PKG_CONFIG --variable=prefix gtk+-3.0`/share/icons/hicolor
 AC_SUBST(HICOLOR_ICON_DIR)
 dnl however, we do not mess with the icon caches - it messes up more
 dnl things that it fixes, for eg. user installs, package builds etc.

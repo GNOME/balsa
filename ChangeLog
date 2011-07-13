@@ -1,3 +1,7 @@
+2011-07-13  Peter Bloomfield
+
+	* configure.in: remove references to gtk+-2.0.
+
 2011-06-22  Peter Bloomfield
 
 	Drop bad-address-color

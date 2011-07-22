@@ -85,7 +85,7 @@ struct siobuf
     void *user_data;
   };
 
-static void sio_flush_buffer (struct siobuf *sio);
+static int sio_flush_buffer (struct siobuf *sio);
 
 /* Attach bi-directional buffering to the socket descriptor.
  */
@@ -392,10 +392,10 @@ sio_write (struct siobuf *sio, const void *bufp, int buflen)
     }
 }
 
-static void
+static int
 raw_write (struct siobuf *sio, const char *buf, int len)
 {
-  int n, total, status;
+  int n = 0, total, status;
   struct pollfd pollfd;
 
   assert (sio != NULL && buf != NULL);
@@ -410,7 +410,7 @@ raw_write (struct siobuf *sio, const char *buf, int len)
 	   propagating up through OpenSSL. */
 	while ((n = SSL_write (sio->ssl, buf, len)) <= 0)
 	  if (sio_sslpoll (sio, n) <= 0)
-	    return;
+	    return n;
       }
     else
 #endif
@@ -427,25 +427,26 @@ raw_write (struct siobuf *sio, const char *buf, int len)
 	    if (errno == EINTR)
 	      continue;
 	    if (errno != EAGAIN)
-	      return;
+	      return n;
 
 	    pollfd.revents = 0;
 	    while ((status = poll (&pollfd, 1, sio->milliseconds)) < 0)
 	      if (errno != EINTR)
-		return;
+		return -1;
 	    if (status == 0)
 	      {
 	        errno = ETIMEDOUT;
-		return;
+		return -1;
 	      }
 	    if (!(pollfd.revents & POLLOUT))
-	      return;
+	      return -1;
 	    errno = 0;
 	  }
       }
+  return n;
 }
 
-static void
+static int
 sio_flush_buffer (struct siobuf *sio)
 {
   int length;
@@ -457,7 +458,7 @@ sio_flush_buffer (struct siobuf *sio)
   else
     length = sio->write_position - sio->write_buffer;
   if (length <= 0)
-    return;
+    return 0;
 
   if (sio->monitor_cb != NULL)
     (*sio->monitor_cb) (sio->write_buffer, length, 1, sio->cbarg);
@@ -477,11 +478,13 @@ sio_flush_buffer (struct siobuf *sio)
          used to maintain this buffer. */
       while ((*sio->encode_cb) (&buf, &len, sio->write_buffer, 
                                 length, sio->secarg) >0) {
-        raw_write (sio, buf, len);
+        if (raw_write (sio, buf, len) < 0)
+            return -1;
       }
     }
   else
-    raw_write (sio, sio->write_buffer, length);
+    if (raw_write (sio, sio->write_buffer, length) < 0)
+        return -1;
 
   if (sio->flush_mark != NULL && sio->flush_mark > sio->write_buffer)
     {
@@ -494,13 +497,14 @@ sio_flush_buffer (struct siobuf *sio)
   sio->write_available = sio->buffer_size - length;
   sio->write_position = sio->write_buffer + length;
   sio->flush_mark = NULL;
+
+  return 0;
 }
 
 void
 sio_flush (struct siobuf *sio)
 {
-  sio_flush_buffer (sio);
-  if (sio->encode_cb != NULL)
+  if (sio_flush_buffer (sio) >= 0 && sio->encode_cb != NULL)
     {
       char *buf;
       int len = 0;
@@ -515,7 +519,8 @@ sio_flush (struct siobuf *sio)
          used to maintain this buffer. */
       while ((*sio->encode_cb) (&buf, &len, sio->write_buffer, 
                                 0, sio->secarg) >0) {
-        raw_write (sio, buf, len);
+        if (raw_write (sio, buf, len) < 0)
+            break;
       }
     }
 }

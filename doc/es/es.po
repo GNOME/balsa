@@ -4,14 +4,13 @@
 # Joaquín Ignacio Aramendía <samsagax@gmail.com>, 2011.
 # Juan Matías Olmos <colonizare@yahoo.com.ar>, 2011.
 # 
-# 
 # Daniel Mustieles <daniel.mustieles@gmail.com>, 2011., 2011.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa-help.master\n"
-"POT-Creation-Date: 2011-07-11 17:23+0000\n"
-"PO-Revision-Date: 2011-07-19 12:08+0200\n"
+"POT-Creation-Date: 2011-07-20 20:19+0000\n"
+"PO-Revision-Date: 2011-07-26 18:09+0200\n"
 "Last-Translator: Daniel Mustieles <daniel.mustieles@gmail.com>\n"
 "Language-Team: Español <gnome-es-list@gnome.org>\n"
 "MIME-Version: 1.0\n"
@@ -2686,6 +2685,9 @@ msgid ""
 "usually 110 but you may change it if you for example use some kind of "
 "connection tunneling,"
 msgstr ""
+"El puerto que se usará para conectar con el servidor. Normalmente, el número "
+"del puerto es 110, pero se puede cambiar si, por ejemplo, se utiliza algún "
+"tipo de túnel de conexión,"
 
 #: C/balsa.xml:2464(para)
 msgid "The user name on the mailbox server."
@@ -2700,12 +2702,16 @@ msgid ""
 "You can select the 'delete from server' button to remove the downoladed "
 "messages from the server."
 msgstr ""
+"Puede seleccionar el botón «eliminar del servidor» para eliminar los mensajes "
+"descargados del servidor."
 
 #: C/balsa.xml:2473(para)
 msgid ""
 "You can choose to have messages filtered through <application>procmail</"
 "application>."
 msgstr ""
+"Puede elegir que los mensajes se filtren a través de <application>procmail</"
+"application>."
 
 #: C/balsa.xml:2476(para)
 msgid "The <application>procmail</application> command."
@@ -2725,6 +2731,13 @@ msgid ""
 "mailbox list. You can specify multiple servers, when adding a server you "
 "will be asked to give: <placeholder-1/>"
 msgstr ""
+"Estos son los servidores <glossterm linkend=\"glossary-imap\"><acronym>IMAP</"
+"acronym></glossterm> y <glossterm linkend=\"glossary-pop\"><acronym>POP3</"
+"acronym></glossterm> de los que recibe los correos. Hay tres botones que "
+"permiten crear, modificar y borrar registros. Los buzones <glossterm linkend="
+"\"glossary-pop\"><acronym>POP3</acronym></glossterm> no se mostrarán en la "
+"lista de buzones. Se pueden configurar múltiples servidores; cuando se "
+"agregue un servidor, se le pedirá: <placeholder-1/>"
 
 #: C/balsa.xml:2487(guilabel)
 msgid "Local Mail Directory"
@@ -2735,6 +2748,8 @@ msgid ""
 "This is the directory that <application>Balsa</application> will scan "
 "looking for mail folders."
 msgstr ""
+"Éste es la carpeta que <application>Balsa</application> explorará en busca "
+"de las carpetas de correo."
 
 #: C/balsa.xml:2495(guilabel)
 msgid "Outgoing Mail Servers"
@@ -2747,6 +2762,11 @@ msgid ""
 "as you need. The server used for a particular message is controlled by the "
 "<link linkend=\"identities\">identity</link> you choose for the message."
 msgstr ""
+"La mayoría de los usuarios sólo necesitan un servidor de correo saliente, "
+"pero puede que tengan que utilizar más de uno. <application>Balsa</"
+"application> le permite configurar tantos como sea necesario. El servidor "
+"utilizado en un mensaje en particular se controla con la <link linkend="
+"\"identities\">identidad</link> que elija para el mensaje."
 
 #: C/balsa.xml:2506(para)
 msgid ""
@@ -2763,6 +2783,20 @@ msgid ""
 "any RFC 2046-compliant mailer. This dialog allows you to set this option, "
 "and the size above which a message should be split."
 msgstr ""
+"Para ver o cambiar los detalles de un servidor, selecciónelo y pulse en "
+"<guibutton>Modificar</guibutton>. Para crear un nuevo servidor, pulse en "
+"<guibutton>Agregar</guibutton>. Se abrirá una ventana que muestra las "
+"propiedades del servidor seleccionado. Especifique el nombre de dominio y, "
+"opcionalmente, el puerto para el servidor SMTP que utiliza para enviar "
+"correo. Tenga en cuenta que el número de puerto predeterminado es 587. La "
+"sintaxis es el «nombre_de_host[:puerto]». El puerto puede ser un número "
+"decimal o el nombre del servicio tal como se especifica en <filename>/etc/"
+"services</filename>. Normalmente, sólo puede configurarlo en «localhost:"
+"smtp». <application>Balsa</application> también puede dividir un mensaje de "
+"gran tamaño en fragmentos, que se puede se puede reensamblar en "
+"<application>Balsa</application> o en cualquier aplicación de correo "
+"compatible con RFC 2046. Este diálogo le permite establecer esta opción, y "
+"el tamaño por encima del cuál se debería dividir un mensaje."
 
 #: C/balsa.xml:2525(para)
 msgid "A descriptive name that will identify the server"
@@ -2779,6 +2813,11 @@ msgid ""
 "depends on the MTA in use. For example, some systems expect a user name, "
 "others may require an email address."
 msgstr ""
+"El nombre de usuario en el servidor SMTP. Si el servidor SMTP remoto "
+"requiere autenticación, introduzca su nombre de usuario aquí. Tenga en "
+"cuenta que el formato exacto depende de la MTA en uso. Por ejemplo, en "
+"algunos sistemas se espera un nombre de usuario, otros pueden requerir una "
+"dirección de correo electrónico."
 
 #: C/balsa.xml:2538(para)
 msgid ""
@@ -2787,6 +2826,10 @@ msgid ""
 "phrase as a password. Limitations on the length of the pass phrase depend on "
 "the SMTP server."
 msgstr ""
+"Frase de paso correspondiente. Si el servidor SMTP remoto requiere "
+"autenticación, introduzca su frase de paso aquí. Algunos sistemas se "
+"refieren a la frase de paso como una contraseña. Las limitaciones en la "
+"longitud de la frase de paso dependen del servidor SMTP."
 
 #: C/balsa.xml:2545(para)
 msgid "When you want <application>Balsa</application> to use TLS."
@@ -2813,6 +2856,8 @@ msgid ""
 "Use this page to set the <application>Balsa</application>'s behaviour "
 "regarding incoming and outgoing messages."
 msgstr ""
+"Utilice esta página para configurar el comportamiento de <application>Balsa</"
+"application> con respecto a los mensajes entrantes y salientes."
 
 #: C/balsa.xml:2571(title)
 msgid "Incoming"
@@ -2828,6 +2873,9 @@ msgid ""
 "<glossterm linkend=\"glossary-pop\"><acronym>POP3</acronym></glossterm> "
 "servers at the given interval and check for mail."
 msgstr ""
+"Si se selecciona, <application>Balsa</application> se conectará con su "
+"servidor <glossterm linkend=\"glossary-pop\"><acronym>POP3</acronym></"
+"glossterm> en el intervalo indicado y revisará el correo electrónico."
 
 #: C/balsa.xml:2583(guilabel)
 msgid "Check IMAP mailboxes"
@@ -2839,12 +2887,19 @@ msgid ""
 "<acronym>IMAP</acronym> mailboxes when checking for mail. You can also "
 "specify that INBOX is the only mailbox to be checked."
 msgstr ""
+"Si se selecciona, <application>Balsa</application> incluirá sus buzones de "
+"correo <acronym>IMAP</acronym> en la comprobación de correo electrónico. "
+"También se puede especificar una única bandeja de entrada para la que se "
+"revisará el buzón de correo."
 
 #: C/balsa.xml:2589(para)
 msgid ""
 "Checking IMAP mailboxes can take some time; these options give you extra "
 "control over how long the mailbox check will take."
 msgstr ""
+"La comprobación de buzones de correo IMAP puede tardar algún tiempo; estas "
+"opciones le proporcionan un control adicional sobre la duración que tendrá "
+"la comprobación del buzón."
 
 #: C/balsa.xml:2597(guilabel)
 msgid "Display message if new mail has arrived"
@@ -2855,6 +2910,8 @@ msgid ""
 "If selected, <application>Balsa</application> will alert you when mail has "
 "arrived."
 msgstr ""
+"Si se selecciona, <application>Balsa</application> le avisará cuando reciba "
+"un correo electrónico."
 
 #: C/balsa.xml:2606(guilabel)
 msgid "Do background check quietly"
@@ -2865,6 +2922,9 @@ msgid ""
 "If selected, <application>Balsa</application> will give you no indication "
 "that a background mail check is in progress."
 msgstr ""
+"Si se selecciona, <application>Balsa</application> no le dará ninguna "
+"indicación de que está en curso una comprobación de correo electrónico en "
+"segundo plano"
 
 #: C/balsa.xml:2616(guilabel)
 msgid "Wrap Incoming Text"
@@ -2875,6 +2935,8 @@ msgid ""
 "If selected, <application>Balsa</application> will wrap text of incoming "
 "messages at the specified line length."
 msgstr ""
+"Si se selecciona, <application>Balsa</application> ajustará el texto del "
+"mensaje entrante a la longitud indicada."
 
 #: C/balsa.xml:2627(guilabel)
 msgid "Reflow messages of type `text/plain;format=flowed'"
@@ -2888,6 +2950,11 @@ msgid ""
 "breaks: a space is left at the end of the line. A `hard' line break (one "
 "that is not preceded by a space) indicates the end of a paragraph."
 msgstr ""
+"El parámetro «formato» distingue dos formas de representar los párrafos en "
+"los mensajes de tipo «text/plain» (es decir, texto simple). El valor «fluido» "
+"indica que los párrafos se han dividido con saltos de línea «blandos»: se "
+"deja un espacio al final de la línea. Un salto de línea «duro» (que no está "
+"precedido por un espacio) indica el final de un párrafo."
 
 #: C/balsa.xml:2639(para)
 msgid ""
@@ -2896,6 +2963,10 @@ msgid ""
 "fragments that are left when text is first wrapped at one length and then "
 "rewrapped to a shorter length, which are often misquoted."
 msgstr ""
+"<application>Balsa</application> puede reajustar los párrafos, citas y demás "
+"en un mensaje de este tipo. Al reajustar se eliminar los fragmentos de "
+"líneas que quedan cuando el texto se ajustó la primera vez y luego se "
+"reajustó a una longitud menor, lo que se malinterpreta con frecuencia."
 
 #: C/balsa.xml:2644(para)
 msgid ""

@@ -9,8 +9,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa-help.master\n"
-"POT-Creation-Date: 2011-07-20 20:19+0000\n"
-"PO-Revision-Date: 2011-07-26 18:09+0200\n"
+"POT-Creation-Date: 2011-07-26 20:37+0000\n"
+"PO-Revision-Date: 2011-08-01 10:31+0200\n"
 "Last-Translator: Daniel Mustieles <daniel.mustieles@gmail.com>\n"
 "Language-Team: Español <gnome-es-list@gnome.org>\n"
 "MIME-Version: 1.0\n"
@@ -2793,10 +2793,10 @@ msgstr ""
 "decimal o el nombre del servicio tal como se especifica en <filename>/etc/"
 "services</filename>. Normalmente, sólo puede configurarlo en «localhost:"
 "smtp». <application>Balsa</application> también puede dividir un mensaje de "
-"gran tamaño en fragmentos, que se puede se puede reensamblar en "
-"<application>Balsa</application> o en cualquier aplicación de correo "
-"compatible con RFC 2046. Este diálogo le permite establecer esta opción, y "
-"el tamaño por encima del cuál se debería dividir un mensaje."
+"gran tamaño en fragmentos, que se puede reensamblar en <application>Balsa</"
+"application> o en cualquier aplicación de correo compatible con RFC 2046. "
+"Este diálogo le permite establecer esta opción, y el tamaño por encima del "
+"cuál se debería dividir un mensaje."
 
 #: C/balsa.xml:2525(para)
 msgid "A descriptive name that will identify the server"
@@ -2940,7 +2940,7 @@ msgstr ""
 
 #: C/balsa.xml:2627(guilabel)
 msgid "Reflow messages of type `text/plain;format=flowed'"
-msgstr "Refluir mensaje de tipo `text/plain;format=flowed'"
+msgstr "Refluir mensajes de tipo `text/plain;format=flowed'"
 
 #: C/balsa.xml:2632(para)
 msgid ""
@@ -2978,6 +2978,14 @@ msgid ""
 "wrapped, if the `Wrap Incoming Messages' option is selected, but this will "
 "usually leave unquoted line fragments."
 msgstr ""
+"El único otro valor de «formato» es «fijo», que es el valor asumido de manera "
+"predeterminada cuando no se especifica ninguno, al igual que con "
+"aplicaciones de correo anteriores. En este caso, se deben respetar todos los "
+"saltos de línea. Si no se selecciona la opción «Refluir...», "
+"<application>Balsa</application> tratará todos los mensajes de tipo «text/"
+"plain» como si fueran «format/plain». Las líneas largas todavía se "
+"reajustarán, si se selecciona la opción «Ajustar mensajes entrantes», pero "
+"esto, por lo general, deja fragmentos de línea sin comillas."
 
 #: C/balsa.xml:2658(guilabel)
 msgid "Message Disposition Notification request"
@@ -2989,6 +2997,9 @@ msgid ""
 "that you have received or seen the message. You can specify how "
 "<application>Balsa</application> responds to these requests."
 msgstr ""
+"A veces recibirá mensajes cuyo remitente ha pedido una notificación de que "
+"usted ha recibido o visto el mensaje. Se puede indicar la forma en que "
+"<application>Balsa</application> responde a estas peticiones."
 
 #: C/balsa.xml:2675(title)
 msgid "Outgoing"
@@ -3003,6 +3014,8 @@ msgid ""
 "Have <application>Balsa</application> wrap all outgoing mail at the "
 "specified column."
 msgstr ""
+"<application>Balsa</application> tiene que ajustar todos los mensajes "
+"salientes a la longitud indicada."
 
 #: C/balsa.xml:2687(guilabel)
 msgid "Reply prefix"
@@ -3015,6 +3028,10 @@ msgid ""
 "<guilabel>format=flowed</guilabel>, <application>Balsa</application> is "
 "required to use the one-character string \"&gt;\"."
 msgstr ""
+"La cadena que <application>Balsa</application> debe usar como prefijo al "
+"citar un mensaje. Nota: cuando se envía un mensaje con "
+"<guilabel>format=flowed</guilabel>, se requiere que <application>Balsa</"
+"application> use la cadena de un sólo carácter «&gt;»."
 
 #: C/balsa.xml:2699(guilabel)
 msgid "Automatically quote original when replying"
@@ -3025,6 +3042,8 @@ msgid ""
 "Have <application>Balsa</application> include the text of a message in the "
 "reply. The text will be prefixed as shown above."
 msgstr ""
+"<application>Balsa</application> tiene que incluir el texto del mensaje en "
+"la respuesta. El texto se prefijará como se muestra arriba."
 
 #: C/balsa.xml:2705(para)
 msgid ""
@@ -3033,10 +3052,14 @@ msgid ""
 "of the reply. If you prefer to include text this way, do not select the "
 "`Automatically quote...' option."
 msgstr ""
+"En su lugar, puede incluir el mensaje original con una opción del menú "
+"«Editar», o arrastrando el mensaje desde el índice hasta el área del texto de "
+"la respuesta. Si prefiere incluir el texto de esta manera, no se debe "
+"seleccionar la opción «Citar automáticamente el original al responder...»."
 
 #: C/balsa.xml:2715(guilabel)
 msgid "Don't include HTML parts as text when replying or forwarding mail"
-msgstr ""
+msgstr "No incluir partes HTML como texto al responder o reenviar un correo-e."
 
 #: C/balsa.xml:2721(para)
 msgid "Tell <application>Balsa</application> to be sensible."
@@ -3052,6 +3075,9 @@ msgid ""
 "actually be attached unmodified, instead of included in the text of the "
 "reply, prefixed by the reply string."
 msgstr ""
+"Si se selecciona esta opción, los mensajes que se «citan automáticamente» en "
+"realidad se adjuntarán sin modificar, en lugar de incluirse en el texto de "
+"la respuesta, con la cadena de respuesta como prefijo."
 
 #: C/balsa.xml:2736(para)
 msgid ""
@@ -3059,6 +3085,10 @@ msgid ""
 "message index into the attachment area of the new message (or, in fact, any "
 "part of the new message window except the text area or the address lines)."
 msgstr ""
+"También se puede adjuntar cualquier mensaje en uno nuevo arrastrándolo desde "
+"el índice hasta la zona de adjunto del mensaje nuevo (o, en realidad, "
+"cualquier parte de la ventana del mensaje excepto el área de texto o las "
+"líneas de direcciones)."
 
 #: C/balsa.xml:2746(guilabel)
 msgid "Send button always queues outgoing mail in outbox"
@@ -3069,6 +3099,8 @@ msgid ""
 "This option gives you control over when <application>Balsa</application> "
 "connects to a server to send messages."
 msgstr ""
+"Esta opción le brinda control sobre cuándo <application>Balsa</application> "
+"se conecta a un servidor para enviar mensajes."
 
 #: C/balsa.xml:2758(guilabel)
 msgid "Copy outgoing messages to sentbox"
@@ -3079,6 +3111,8 @@ msgid ""
 "Have <application>Balsa</application> save a copy of each message you send "
 "in the mailbox marked as the `Sentbox'."
 msgstr ""
+"<application>Balsa</application> tiene que guardar una copia de cada mensaje "
+"enviado en el buzón marcado como «Correo enviado»."
 
 #: C/balsa.xml:2766(guilabel)
 msgid "Encoding"
@@ -3089,6 +3123,8 @@ msgid ""
 "Set the character encoding method to either 7 bit, 8 bit, or what the quoted "
 "message is using."
 msgstr ""
+"Establecer el método de codificación de caracteres a 7 u 8 bits, o al que se "
+"use en el mensaje citado."
 
 #: C/balsa.xml:2781(title)
 msgid "Display Options"
@@ -3097,6 +3133,8 @@ msgstr "Opciones de disposición"
 #: C/balsa.xml:2783(para)
 msgid "This page controls how <application>Balsa</application> appears to you."
 msgstr ""
+"Esta página controla la forma en que <application>Balsa</application> se "
+"presenta."
 
 #: C/balsa.xml:2789(guilabel)
 msgid "Use Preview Pane"
@@ -3107,6 +3145,8 @@ msgid ""
 "Set whether to use the preview pane to display messages, or rely on the "
 "separate mail viewing window."
 msgstr ""
+"Establecer si se debe utilizar el panel de vista previa para visualizar los "
+"mensajes, o confiar en la ventana de vista de correo independiente."
 
 #: C/balsa.xml:2797(guilabel)
 msgid "Show Mailbox Info"
@@ -3120,6 +3160,12 @@ msgid ""
 "them, <application>Balsa</application> will then show the number of unread "
 "messages (in parentheses) after the mailbox name."
 msgstr ""
+"Esto permitirá que se muestre el número de mensajes totales y no leídos en "
+"cada buzón del panel izquierdo de la ventana principal de "
+"<application>Balsa</application>. Se puede ahorrar espacio al no mostrarlos. "
+"Si usted decide no mostrarlos, entonces<application>Balsa</application> "
+"mostrará el número de mensajes no leídos (entre paréntesis) después del "
+"nombre del buzón."
 
 #: C/balsa.xml:2808(guilabel)
 msgid "Alternative Layout"
@@ -3133,6 +3179,12 @@ msgid ""
 "message list occupy the upper part of the window, and the preview pane is "
 "full-width below them."
 msgstr ""
+"La distribución predeterminada de <application>Balsa</application> tiene una "
+"lista de buzones de altura completa a la izquierda, y la lista de mensajes "
+"sobre el panel de vista previa a la derecha. Se puede elegir una "
+"distribución alternativa donde la lista de buzones y la lista de mensajes "
+"ocupan la parte superior de la ventana, y el panel de vista previa se ubica "
+"debajo de ellas con el ancho completo."
 
 #: C/balsa.xml:2821(guilabel)
 msgid "Automatic View"

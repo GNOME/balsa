@@ -9,8 +9,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa-help.master\n"
-"POT-Creation-Date: 2011-07-26 20:37+0000\n"
-"PO-Revision-Date: 2011-08-01 10:31+0200\n"
+"POT-Creation-Date: 2011-08-02 08:30+0000\n"
+"PO-Revision-Date: 2011-08-08 10:09+0200\n"
 "Last-Translator: Daniel Mustieles <daniel.mustieles@gmail.com>\n"
 "Language-Team: Español <gnome-es-list@gnome.org>\n"
 "MIME-Version: 1.0\n"
@@ -3196,6 +3196,10 @@ msgid ""
 "first unread message when you open a mailbox. If no message is unread, "
 "<application>Balsa</application> opens the most recent message."
 msgstr ""
+"Seleccione esta opción si quiere que <application>Balsa</application> abra "
+"el primer mensaje sin leer cuando se abre un buzón de correo. Si no hay un "
+"mensaje sin leer, <application>Balsa</application> abrirá el mensaje más "
+"reciente."
 
 #: C/balsa.xml:2832(guilabel)
 msgid "Page Up and Page Down"
@@ -3222,6 +3226,10 @@ msgid ""
 "the next unread message or the next message in the same mailbox, or simply "
 "close the window."
 msgstr ""
+"Si está leyendo un mensaje en su propia ventana y lo mueve (a la papelera o "
+"a otro buzón), <application>Balsa</application> puede ir al siguiente "
+"mensaje sin leer o al mensaje siguiente en el mismo buzón, o simplemente "
+"cerrar la ventana."
 
 #: C/balsa.xml:2863(title)
 msgid "Sort and Thread"
@@ -3233,7 +3241,7 @@ msgstr "Columna de ordenación predeterminada"
 
 #: C/balsa.xml:2868(para)
 msgid "Choose the column by which you would like a new mailbox to be sorted."
-msgstr ""
+msgstr "Elija una columna por la que prefiere que se ordene un buzón nuevo."
 
 #: C/balsa.xml:2875(guilabel)
 msgid "Default threading style"
@@ -3241,7 +3249,7 @@ msgstr "Estilo de conversación predeterminado"
 
 #: C/balsa.xml:2877(para)
 msgid "Choose the default threading style for a new mailbox."
-msgstr ""
+msgstr "Elija el estilo de conversación predeterminado para un buzón nuevo."
 
 #: C/balsa.xml:2883(guilabel)
 msgid "Expand threads"
@@ -3252,6 +3260,8 @@ msgid ""
 "If you choose a threaded view of a mailbox, you can decide whether the "
 "threads should be expanded or collapsed when the mailbox is opened."
 msgstr ""
+"Si elige una vista de conversaciones de un buzón, puede decidir si las "
+"conversaciones se deberán expandir o contraer cuando se abra el buzón."
 
 #: C/balsa.xml:2899(guilabel)
 msgid "Fonts"
@@ -3262,6 +3272,8 @@ msgid ""
 "Choose the fonts that you want to be used to display a message. You can "
 "choose a distinct font for the message's subject line."
 msgstr ""
+"Elija la tipografía usada para mostrar un mensaje. Se puede elegir una "
+"tipografía diferente para la línea de asunto del mensaje."
 
 #: C/balsa.xml:2909(guilabel)
 msgid "Quoted Text Regular Expression"
@@ -3277,6 +3289,14 @@ msgid ""
 "quoting and alter the quoted text colors appropriately. A default "
 "<abbrev>regexp</abbrev> is provided that should work in most situations."
 msgstr ""
+"El cuadro de entrada permite establecer una <glossterm linkend=\"glossary-"
+"regular-expression\">expresión regular</glossterm> que se utilizará para "
+"identificar un texto que se debe considerar como citado en los mensajes "
+"entrantes. La expresión regular debe coincidir con el inicio de la línea del "
+"texto citado en un solo nivel de profundidad, el programa utilizará esto "
+"para calcular la profundidad y alterar los colores del texto citado "
+"adecuadamente. Se proporciona una <abbrev>expresión regular</abbrev> "
+"predeterminada que debería funcionar en la mayoría de las situaciones."
 
 #: C/balsa.xml:2922(para)
 msgid ""
@@ -3284,16 +3304,22 @@ msgid ""
 "extended regular expression set. For more information see the <command>grep</"
 "command>(1) manual or info page."
 msgstr ""
+"Esta expresión regular afecta tanto al coloreado como a la corrección "
+"ortográfica, y utiliza el conjunto extendido de expresiones regulares. Para "
+"más información, consulte la página del manual o de información de "
+"<command>grep</command>(1)."
 
 #: C/balsa.xml:2929(guilabel)
 msgid "Alternative Parts"
-msgstr ""
+msgstr "Partes alternativas"
 
 #: C/balsa.xml:2931(para)
 msgid ""
 "You can choose whether <application>Balsa</application> should show a text/"
 "plain part or a text/html part, when a message contains both."
 msgstr ""
+"Se puede elegir si <application>Balsa</application> debería mostrar una "
+"parte como «text/plain» o como «text/html», cuando un mensaje contiene ambas."
 
 #: C/balsa.xml:2941(title)
 msgid "Colors"
@@ -3305,7 +3331,7 @@ msgstr "Colores del mensaje"
 
 #: C/balsa.xml:2946(para)
 msgid "Choose the colors for quoted text."
-msgstr ""
+msgstr "Elegir el color para el texto citado."
 
 #: C/balsa.xml:2952(guilabel)
 msgid "Link Color"
@@ -3316,6 +3342,8 @@ msgid ""
 "<application>Balsa</application> uses this color to highlight a hyperlink in "
 "a message."
 msgstr ""
+"<application>Balsa</application> utiliza este color para pintar un "
+"hiperenlace en un mensaje."
 
 #: C/balsa.xml:2960(guilabel)
 msgid "Composition Window"
@@ -3327,6 +3355,9 @@ msgid ""
 "color to show when one of the address fields is incomplete. Choose that "
 "color here."
 msgstr ""
+"Al redactar un mensaje, <application>Balsa</application> utiliza un color "
+"para mostrar cuando uno de los campos de direcciones está incompleto. Elija "
+"aquí ese color."
 
 #: C/balsa.xml:2973(title)
 msgid "Format"
@@ -3378,6 +3409,8 @@ msgid ""
 "See the <function>strftime</function> manual page for a full listing of "
 "conversion specifiers."
 msgstr ""
+"Consulte la página de manual de <function>strftime</function> para obtener "
+"una lista completa de los especificadores de conversión."
 
 #: C/balsa.xml:2978(para)
 msgid ""
@@ -3385,6 +3418,10 @@ msgid ""
 "This uses the same format string as <function>strftime</function>, a summary "
 "which is provided below: <placeholder-1/><placeholder-2/>"
 msgstr ""
+"Establezca el formato utilizado para mostrar fechas en <application>Balsa</"
+"application>. Se utiliza la misma cadena de formato de <function>strftime</"
+"function>. A continuación se proporciona un resumen: <placeholder-1/"
+"><placeholder-2/>"
 
 #: C/balsa.xml:3037(guilabel)
 msgid "Selected Headers"
@@ -3393,6 +3430,8 @@ msgstr "Cabeceras seleccionadas"
 #: C/balsa.xml:3039(para)
 msgid "A space-separated list of the headers to display in the message window."
 msgstr ""
+"Una lista de las cabeceras separada por espacios que se mostrará en la "
+"ventana del mensaje."
 
 #: C/balsa.xml:3045(guilabel)
 msgid "Fallback codeset"
@@ -3405,6 +3444,10 @@ msgid ""
 "such characters as '?', or tries a specific character set to display such "
 "messages."
 msgstr ""
+"Algunos mensajes contienen caracteres nacionales sin especificar cómo se "
+"codifican. Se puede elegir si <application>Balsa</application> mostrará "
+"tales caracteres como «?» o si probará un determinado conjunto de caracteres "
+"para mostrar dichos mensajes."
 
 #: C/balsa.xml:3060(title)
 msgid "Status Messages"
@@ -3420,6 +3463,9 @@ msgid ""
 "different levels of messages. You can specify how you want all five levels "
 "to be presented to you."
 msgstr ""
+"<application>Balsa</application> muestra la información en cinco niveles "
+"diferentes de mensajes. Se puede especificar cómo se presentarán esos cinco "
+"niveles."
 
 #: C/balsa.xml:3073(guilabel)
 msgid "Display Progress"
@@ -4163,6 +4209,7 @@ msgstr ""
 msgid ""
 "Your script/program should write it's output to stdout and not to stderr!"
 msgstr ""
+"Su script/programa debería mostrar la salida en «stdout» y no en «stderror»."
 
 #: C/balsa.xml:3759(title)
 msgid "Writing your own save scripts"
@@ -5491,7 +5538,7 @@ msgstr ""
 #: C/balsa.xml:0(None)
 msgid "translator-credits"
 msgstr ""
-"Juan Matías Olmos «colonizare@yahoo.com.ar»\n"
+"Juan Matías Olmos «colonizare@yahoo.com.ar», 2011\n"
 "Daniel Mustieles <daniel.mustieles@gmail.com>, 2011\n"
 "Joaquín Ignacio Aramendía <samsagax@gmail.com>, 2011\n"
 "Jorge González <jorgegonz@svn.gnome.org>, 2008"

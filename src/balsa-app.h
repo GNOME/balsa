@@ -99,9 +99,6 @@
 #define DEFAULT_ENCODING ENC8BIT
 #define DEFAULT_LINESIZE 78
 
-#define DEFAULT_PSPELL_MODULE SPELL_CHECK_MODULE_ISPELL
-#define DEFAULT_PSPELL_SUGGEST_MODE SPELL_CHECK_SUGGEST_NORMAL
-#define DEFAULT_PSPELL_IGNORE_SIZE 0
 #define DEFAULT_CHECK_SIG FALSE
 #define DEFAULT_CHECK_QUOTED FALSE
 
@@ -121,32 +118,6 @@ enum _ShownHeaders {
     HEADERS_SELECTED,
     HEADERS_ALL
 };
-
-
-#if !HAVE_GTKSPELL
-/* The different spell modules available to the program. */
-#define NUM_PSPELL_MODULES 2
-typedef enum _SpellCheckModule SpellCheckModule;
-enum _SpellCheckModule {
-    SPELL_CHECK_MODULE_ISPELL,
-    SPELL_CHECK_MODULE_ASPELL
-};
-const gchar **spell_check_modules_name;
-
-
-/* The suggestion modes available to spell.  If this is changed,
- * don't forget to also update the array in pref-manager.c containing
- * the labels used in the preferences dialog. 
- * */
-#define NUM_SUGGEST_MODES 3
-typedef enum _SpellCheckSuggestMode SpellCheckSuggestMode;
-enum _SpellCheckSuggestMode {
-    SPELL_CHECK_SUGGEST_FAST,
-    SPELL_CHECK_SUGGEST_NORMAL,
-    SPELL_CHECK_SUGGEST_BAD_SPELLERS
-};
-const gchar **spell_check_suggest_mode_name;
-#endif                          /* HAVE_GTKSPELL */
 
 
 typedef enum _BalsaMDNReply BalsaMDNReply;
@@ -375,9 +346,6 @@ extern struct BalsaApplication {
     gchar   *spell_check_lang;
     gboolean spell_check_active;
 #else                           /* HAVE_GTKSPELL */
-    SpellCheckModule module;
-    SpellCheckSuggestMode suggestion_mode;
-    guint ignore_size;
     gboolean check_sig;
     gboolean check_quoted;
 #endif                          /* HAVE_GTKSPELL */

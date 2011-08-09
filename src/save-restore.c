@@ -896,11 +896,6 @@ config_global_load(void)
     if (def_used)
         balsa_app.spell_check_active = balsa_app.spell_check_lang != NULL;
 #else                           /* HAVE_GTKSPELL */
-    balsa_app.module = d_get_gint("PspellModule", DEFAULT_PSPELL_MODULE);
-    balsa_app.suggestion_mode =
-	d_get_gint("PspellSuggestMode", DEFAULT_PSPELL_SUGGEST_MODE);
-    balsa_app.ignore_size =
-	d_get_gint("PspellIgnoreSize", DEFAULT_PSPELL_IGNORE_SIZE);
     balsa_app.check_sig =
 	d_get_gint("SpellCheckSignature", DEFAULT_CHECK_SIG);
     balsa_app.check_quoted =
@@ -1380,9 +1375,6 @@ config_save(void)
     libbalsa_conf_set_bool("SpellCheckActive", 
                            balsa_app.spell_check_active);
 #else                           /* HAVE_GTKSPELL */
-    libbalsa_conf_set_int("PspellModule", balsa_app.module);
-    libbalsa_conf_set_int("PspellSuggestMode", balsa_app.suggestion_mode);
-    libbalsa_conf_set_int("PspellIgnoreSize", balsa_app.ignore_size);
     libbalsa_conf_set_int("SpellCheckSignature", balsa_app.check_sig);
     libbalsa_conf_set_int("SpellCheckQuoted", balsa_app.check_quoted);
 #endif                          /* HAVE_GTKSPELL */

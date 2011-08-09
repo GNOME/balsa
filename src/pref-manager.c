@@ -181,11 +181,6 @@ typedef struct _PropertyUI {
 
 #if !HAVE_GTKSPELL
     /* spell checking */
-    GtkWidget *module;
-    gint module_index;
-    GtkWidget *suggestion_mode;
-    gint suggestion_mode_index;
-    GtkWidget *ignore_length;
     GtkWidget *spell_check_sig;
     GtkWidget *spell_check_quoted;
 #endif                          /* HAVE_GTKSPELL */
@@ -280,7 +275,6 @@ static GtkWidget *deleting_messages_group(GtkWidget * page);
 #if !HAVE_GTKSPELL
     /* Spelling page */
 static GtkWidget *create_spelling_page(GtkTreeStore * store);
-static GtkWidget *pspell_settings_group(GtkWidget * page);
 static GtkWidget *misc_spelling_group(GtkWidget * page);
 #endif                          /* HAVE_GTKSPELL */
 
@@ -290,11 +284,6 @@ static GtkWidget *add_pref_menu(const gchar * label, const gchar * names[],
                                 gint size, gint * index, GtkBox * parent,
                                 gint padding, GtkWidget * page);
 static void add_show_menu(const char *label, gint level, GtkWidget * menu);
-#if !HAVE_GTKSPELL
-static GtkWidget *attach_pref_menu(const gchar * label, gint row,
-                                   GtkTable * table, const gchar * names[],
-                                   gint size, gint * index);
-#endif                          /* HAVE_GTKSPELL */
 static GtkWidget *attach_entry(const gchar * label, gint row,
                                GtkWidget * table);
 static GtkWidget *attach_entry_full(const gchar * label, gint row,
@@ -401,14 +390,6 @@ gchar *pwindow_type_label[NUM_PWINDOW_MODES] = {
     N_("Until closed"),
     N_("Never")
 };
-
-#if !HAVE_GTKSPELL
-const gchar *spell_check_suggest_mode_label[NUM_SUGGEST_MODES] = {
-    N_("Fast"),
-    N_("Normal"),
-    N_("Bad spellers")
-};
-#endif                          /* HAVE_GTKSPELL */
 
     /* These labels must match the LibBalsaMailboxSortFields enum. */
 const gchar *sort_field_label[] = {
@@ -621,8 +602,6 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
     g_signal_connect(G_OBJECT(pui->mblist_show_mb_content_info), "toggled",
                      G_CALLBACK(properties_modified_cb), property_box);
 #if !HAVE_GTKSPELL
-    g_signal_connect(G_OBJECT(pui->ignore_length), "changed",
-                     G_CALLBACK(properties_modified_cb), property_box);
     g_signal_connect(G_OBJECT(pui->spell_check_sig), "toggled",
                      G_CALLBACK(properties_modified_cb), property_box);
     g_signal_connect(G_OBJECT(pui->spell_check_quoted), "toggled",
@@ -1039,11 +1018,6 @@ apply_prefs(GtkDialog * pbox)
 
 #if !HAVE_GTKSPELL
     /* spell checking */
-    balsa_app.module = pui->module_index;
-    balsa_app.suggestion_mode = pui->suggestion_mode_index;
-    balsa_app.ignore_size =
-        gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON
-                                         (pui->ignore_length));
     balsa_app.check_sig =
         gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
                                      (pui->spell_check_sig));
@@ -1284,13 +1258,6 @@ set_prefs(void)
 
 #if !HAVE_GTKSPELL
     /* spelling */
-    pui->module_index = balsa_app.module;
-    pm_combo_box_set_level(pui->module, balsa_app.module);
-    pui->suggestion_mode_index = balsa_app.suggestion_mode;
-    pm_combo_box_set_level(pui->suggestion_mode,
-                           balsa_app.suggestion_mode);
-    gtk_spin_button_set_value(GTK_SPIN_BUTTON(pui->ignore_length),
-                              balsa_app.ignore_size);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->spell_check_sig),
                                  balsa_app.check_sig);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
@@ -2554,69 +2521,13 @@ create_table(gint rows, gint cols, GtkWidget * page)
 
 #if !HAVE_GTKSPELL
 static GtkWidget *
-attach_pref_menu(const gchar * label, gint row, GtkTable * table,
-                 const gchar * names[], gint size, gint * index)
-{
-    GtkWidget *w, *omenu;
-
-    w = gtk_label_new(label);
-    gtk_misc_set_alignment(GTK_MISC(w), 0, 0.5);
-    gtk_table_attach(GTK_TABLE(table), w, 0, 1, row, row + 1,
-                     GTK_FILL, 0, 0, 0);
-
-    omenu = create_pref_option_menu(names, size, index);
-    gtk_table_attach(GTK_TABLE(table), omenu, 1, 2, row, row + 1,
-                     GTK_FILL, 0, 0, 0);
-
-    return omenu;
-}
-
-static GtkWidget *
 create_spelling_page(GtkTreeStore * store)
 {
     GtkWidget *page = pm_page_new();
 
-    pm_page_add(page, pspell_settings_group(page), FALSE);
     pm_page_add(page, misc_spelling_group(page), FALSE);
 
     return page;
-}
-
-static GtkWidget *
-pspell_settings_group(GtkWidget * page)
-{
-    GtkWidget *group;
-    GtkAdjustment *ignore_adj;
-    GtkWidget *table;
-    GtkWidget *hbox;
-
-    group = pm_group_new(_("Pspell settings"));
-    table = create_table(3, 2, page);
-    pm_group_add(group, table, FALSE);
-
-    /* do the module menu */
-    pui->module =
-        attach_pref_menu(_("Spell check module"), 0, GTK_TABLE(table),
-                         spell_check_modules_name, NUM_PSPELL_MODULES,
-                         &pui->module_index);
-
-    /* do the suggestion modes menu */
-    pui->suggestion_mode =
-        attach_pref_menu(_("Suggestion level"), 1, GTK_TABLE(table),
-                         spell_check_suggest_mode_label, NUM_SUGGEST_MODES,
-                         &pui->suggestion_mode_index);
-
-    /* do the ignore length */
-    attach_label(_("Ignore words shorter than"), table, 2, NULL);
-    ignore_adj = gtk_adjustment_new(0.0, 0.0, 99.0, 1.0, 5.0, 0.0);
-    pui->ignore_length = gtk_spin_button_new(ignore_adj, 1, 0);
-
-    hbox = gtk_hbox_new(FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(hbox), pui->ignore_length, FALSE, FALSE, 0);
-    gtk_table_attach(GTK_TABLE(table), hbox, 1, 2, 2, 3,
-                     GTK_FILL, 0, 0, 0);
-
-    return group;
 }
 
 static GtkWidget *

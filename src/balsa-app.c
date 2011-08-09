@@ -50,19 +50,6 @@
 /* Global application structure */
 struct BalsaApplication balsa_app;
 
-#if !HAVE_GTKSPELL
-const gchar *pspell_modules[] = {
-    "ispell",
-    "aspell"
-};
-
-const gchar *pspell_suggest_modes[] = {
-    "fast",
-    "normal",
-    "bad-spellers"
-};
-#endif                          /* HAVE_GTKSPELL */
-
 #define HIG_PADDING 12
 
 /* ask_password:
@@ -404,13 +391,8 @@ balsa_app_init(void)
     balsa_app.spell_check_lang = NULL;
     balsa_app.spell_check_active = FALSE;
 #else                           /* HAVE_GTKSPELL */
-    balsa_app.module = SPELL_CHECK_MODULE_ASPELL;
-    balsa_app.suggestion_mode = SPELL_CHECK_SUGGEST_NORMAL;
-    balsa_app.ignore_size = 0;
     balsa_app.check_sig = DEFAULT_CHECK_SIG;
-
-    spell_check_modules_name = pspell_modules;
-    spell_check_suggest_mode_name = pspell_suggest_modes;
+    balsa_app.check_quoted = DEFAULT_CHECK_QUOTED;
 #endif                          /* HAVE_GTKSPELL */
 
     /* Information messages */

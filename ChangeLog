@@ -1,3 +1,28 @@
+2011-08-09  Peter Bloomfield
+
+	Migrate spell-checker from PSpell to Enchant
+
+	* configure.in: change tests.
+	* src/balsa-app.c (balsa_app_init): remove all PSpell options.
+	* src/balsa-app.h: ditto
+	* src/pref-manager.c (open_preferences_manager), (apply_prefs),
+	(set_prefs), (create_spelling_page): ditto.
+	* src/save-restore.c (config_global_load), (config_save):
+	* src/sendmsg-window.c (spell_check_cb): ditto.
+	* src/spell-check.c (balsa_spell_check_class_init),
+	(spch_set_property), (spch_get_property), (balsa_spell_check_new),
+	(balsa_spell_check_new_with_text), (balsa_spell_check_set_text),
+	(balsa_spell_check_set_language), (balsa_spell_check_init),
+	(ignore_cb), (ignore_all_cb), (change_cb), (change_all_cb),
+	(learn_cb), (cancel_cb), (done_cb), (balsa_spell_check_start),
+	(balsa_spell_check_next), (highlight_idle),
+	(balsa_spell_check_learn), (balsa_spell_check_fix),
+	(balsa_spell_check_destroy), (spch_finish), (setup_suggestions),
+	(check_word), (finish_check), (check_error), (next_word),
+	(switch_word), (spch_save_word_iters), (spch_restore_word_iters):
+	migrate.
+	* src/spell-check.h: remove PSpell options.
+
 2011-07-21  Peter Bloomfield
 
 	* libbalsa/imap/siobuf.c (raw_write), (sio_flush_buffer),

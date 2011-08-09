@@ -6751,19 +6751,11 @@ spell_check_cb(GtkAction * action, BalsaSendmsg * bsmsg)
     balsa_spell_check_set_text(sc, text_view);
     balsa_spell_check_set_language(sc, bsmsg->spell_check_lang);
 
-    balsa_spell_check_set_character_set(sc, "UTF-8");
-    balsa_spell_check_set_module(sc,
-				 spell_check_modules_name
-				 [balsa_app.module]);
-    balsa_spell_check_set_suggest_mode(sc,
-				       spell_check_suggest_mode_name
-				       [balsa_app.suggestion_mode]);
-    balsa_spell_check_set_ignore_length(sc, balsa_app.ignore_size);
     g_signal_connect(G_OBJECT(sc), "response",
                      G_CALLBACK(sw_spell_check_response), bsmsg);
     gtk_text_view_set_editable(text_view, FALSE);
 
-    balsa_spell_check_start(sc, GTK_WINDOW(bsmsg->window));
+    balsa_spell_check_start(sc);
 }
 
 static void

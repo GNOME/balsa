@@ -2,15 +2,15 @@
 # 
 # Jorge González <jorgegonz@svn.gnome.org>, 2008, 2010, 2011.
 # Joaquín Ignacio Aramendía <samsagax@gmail.com>, 2011.
-# Juan Matías Olmos <colonizare@yahoo.com.ar>, 2011.
 # 
+# Juan Matías Olmos <colonizare@yahoo.com.ar>, 2011., 2011.
 # Daniel Mustieles <daniel.mustieles@gmail.com>, 2011., 2011.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa-help.master\n"
-"POT-Creation-Date: 2011-08-02 08:30+0000\n"
-"PO-Revision-Date: 2011-08-08 10:09+0200\n"
+"POT-Creation-Date: 2011-08-08 17:31+0000\n"
+"PO-Revision-Date: 2011-08-09 10:32+0200\n"
 "Last-Translator: Daniel Mustieles <daniel.mustieles@gmail.com>\n"
 "Language-Team: Español <gnome-es-list@gnome.org>\n"
 "MIME-Version: 1.0\n"
@@ -3481,6 +3481,14 @@ msgid ""
 "active until manually closed. Finally, the dialog can not be displayed at "
 "all."
 msgstr ""
+"Esto establece el comportamiento del cuadro de diálogo que se muestra cuando "
+"<application>Balsa</application> recupera los mensajes desde los servidores "
+"<glossterm linkend=\"glossary-pop\"><acronym>POP3</acronym></glossterm> "
+"especificados. El diálogo sólo se puede mostrar mientras se están "
+"recuperando, y se cierra automáticamente después de que <application>Balsa</"
+"application> haya terminado. O se puede configurar para permanecer activo "
+"hasta que se cierre manualmente. Por último, el diálogo no se puede mostrar "
+"en absoluto."
 
 #: C/balsa.xml:3094(title)
 msgid "Spelling"
@@ -3492,6 +3500,9 @@ msgid ""
 "have your spelling checked as you type. <application>Balsa</application> "
 "uses GtkSpell's default settings."
 msgstr ""
+"Si <application>Balsa</application> utiliza GtkSpell, puede elegir tener el "
+"corrector ortográfico activo mientras escribe. <application>Balsa</"
+"application> utiliza la configuración predeterminada de GtkSpell."
 
 #: C/balsa.xml:3100(para)
 msgid ""
@@ -3504,6 +3515,15 @@ msgid ""
 "website. For more information visit the <application>Balsa</application> "
 "homepage."
 msgstr ""
+"Si <application>Balsa</application> no está utilizando GtkSpell, se puede "
+"utilizar este panel para configurar las opciones de la corrección "
+"ortográfica de <application>Balsa</application>. <application>Balsa</"
+"application> utiliza el corrector ortográfico de la biblioteca portable "
+"(<ulink url=\"http://pspell.sourceforge.net\">pspell</ulink>) para "
+"proporcionar una interfaz para el programa de corrección ortográfica de su "
+"elección. En la actualidad, hay módulos para ispell o aspell, que se pueden "
+"encontrar en la página web de pspell. Para más información, por favor "
+"consulte la página web de <application>Balsa</application>."
 
 #: C/balsa.xml:3113(guilabel)
 msgid "Pspell Module"
@@ -3515,6 +3535,10 @@ msgid ""
 "prefer, though the use of loadable modules. Currently Pspell has support for "
 "two modules, the traditional ispell, and the newer and more advanced aspell."
 msgstr ""
+"La biblioteca Pspell permite utilizar cualquier motor de corrección que "
+"prefiera, a través de módulos que se pueden cargar. Actualmente Pspell tiene "
+"soporte para dos módulos, el tradicional ispell y el más nuevo y avanzado "
+"aspell."
 
 #: C/balsa.xml:3123(para)
 msgid ""
@@ -3524,6 +3548,12 @@ msgid ""
 "learn how you tend to misspell words. More information is available at the "
 "<ulink url=\"http://aspell.sourceforge.net\">Aspell website</ulink>."
 msgstr ""
+"<application>Ispell</application> es más probable que se encuentre "
+"disponible en su sistema, ya que es un estándar de Unix; pero "
+"<application>Aspell</application> es más avanzado, ya que utiliza un motor "
+"de fonética avanzado y técnicas de adaptación para aprender cómo tiende "
+"usted a escribir mal las palabras. Hay más información disponible en la "
+"<ulink url=\"http://aspell.sourceforge.net\">página web de Aspell</ulink>."
 
 #: C/balsa.xml:3134(para)
 msgid ""
@@ -3531,6 +3561,9 @@ msgid ""
 "specify here, however if the module is not installed it will not work and "
 "generate an error."
 msgstr ""
+"<application>Balsa</application> intentará utilizar cualquier módulo que "
+"especifique aquí, sin embargo, si el módulo no está instalado no funcionará "
+"y generará un error."
 
 #: C/balsa.xml:3143(guilabel)
 msgid "Suggestion Mode"
@@ -3541,6 +3574,8 @@ msgid ""
 "The suggestion mode determines how hard the computer will search for "
 "suggestions for misspelled words. There are three options:"
 msgstr ""
+"El modo de sugerencia determina la intensidad con la que la computadora "
+"buscará sugerencias para palabras mal escritas. Hay tres opciones:"
 
 #: C/balsa.xml:3152(guilabel)
 msgid "Fast"
@@ -3551,6 +3586,9 @@ msgid ""
 "This mode quickly scans for replacements, which means it might be used by a "
 "good speller who occasionally makes typographical errors."
 msgstr ""
+"Este modo busca rápidamente los reemplazos, lo que significa que se puede "
+"utilizar si se tiene una buena ortografía y se cometen errores tipográficos "
+"pocas veces."
 
 #: C/balsa.xml:3162(guilabel)
 msgid "Normal"
@@ -3561,6 +3599,9 @@ msgid ""
 "The Normal mode is probably good enough for most people; it should produce "
 "the correct suggestion in the majority of cases."
 msgstr ""
+"El modo «normal» es, probablemente, lo suficientemente bueno para la mayoría "
+"de las personas; producirá las sugerencias correctas en la mayoría de los "
+"casos."
 
 #: C/balsa.xml:3171(guilabel)
 msgid "Bad Spellers"
@@ -3571,6 +3612,8 @@ msgid ""
 "The Bad Spellers mode is the most thorough and accurate mode; however, it "
 "also takes the longest to find a list of suggestions."
 msgstr ""
+"El modo «ortografía incorrecta» es el modo más completo y exacto; sin "
+"embargo, también es el que tarda más en encontrar una lista de sugerencias."
 
 #: C/balsa.xml:3183(guilabel)
 msgid "Ignore Length"
@@ -3582,6 +3625,9 @@ msgid ""
 "may be useful to automatically skip short acronyms that are normally flagged "
 "as incorrect."
 msgstr ""
+"Esto ofrece la posibilidad de ignorar las palabras más cortas que una "
+"determinada longitud. Puede ser útil para saltar automáticamente siglas "
+"cortas que normalmente se marcan como incorrectas."
 
 #: C/balsa.xml:3198(title)
 msgid "Address Books"
@@ -3597,6 +3643,14 @@ msgid ""
 "allows <application>Balsa</application> to share address books with other "
 "GNOME applications."
 msgstr ""
+"<application>Balsa</application> soporta el uso de libretas de direcciones "
+"múltiples, tanto la libreta de direcciones <glossterm linkend=\"glossary-"
+"vcard\">VCARD</glossterm> local como la libreta de direcciones <glossterm "
+"linkend=\"glossary-ldap\"><acronym>LDAP</acronym></glossterm>, que se pueden "
+"configurar aquí. <application>GnomeCard</application> también utiliza las "
+"libretas de direcciones VCARD, por lo que esto permite a <application>Balsa</"
+"application> compartir la libreta de direcciones con otras aplicaciones de "
+"GNOME."
 
 #: C/balsa.xml:3206(para)
 msgid ""
@@ -3605,6 +3659,11 @@ msgid ""
 "address books. Which types are supported depends on how <application>Balsa</"
 "application> was built."
 msgstr ""
+"<application>Balsa</application> también es compatible con la libreta de "
+"direcciones LDIF, se puede construir para utilizar la libreta de direcciones "
+"GPE cuando se dispone de SQLite y la libreta de direcciones Rubrica. Los "
+"tipos soportados dependen de la forma en que se construyó "
+"<application>Balsa</application>."
 
 #: C/balsa.xml:3212(para)
 msgid ""
@@ -3614,6 +3673,11 @@ msgid ""
 "expansion when typing new messages. There are also several buttons that "
 "manipulate the list of address books:"
 msgstr ""
+"La parte principal de la página de preferencias se cubre con la lista de "
+"libretas de direcciones actuales para <application>Balsa</application>. La "
+"lista muestra el tipo de libreta, el nombre y si se incluye automáticamente "
+"en la expansión del alias al escribir mensajes nuevos. También hay varios "
+"botones para manipular la lista de libretas de direcciones:"
 
 #: C/balsa.xml:3222(guibutton)
 msgid "Add"
@@ -3627,10 +3691,15 @@ msgid ""
 "<application>Balsa</application> pops up a dialog, which, if you choose "
 "VCARD, looks like this:"
 msgstr ""
+"Al usar esto, se añade una nueva libreta de direcciones a "
+"<application>Balsa</application> para gestionar direcciones. Si lo pulsa, se "
+"mostrará un menú desplegable con los tipos de libretas soportados. Pulse uno "
+"para iniciar el proceso. <application>Balsa</application> muestra un cuadro "
+"de diálogo, que, si usted elige VCARD, se parece a esto:"
 
 #: C/balsa.xml:3231(title)
 msgid "<acronym>VCARD</acronym> Address Book Dialog"
-msgstr ""
+msgstr "Diálogo de libreta de direcciones <acronym>VCARD</acronym>"
 
 #: C/balsa.xml:3241(para)
 msgid ""
@@ -3638,12 +3707,17 @@ msgid ""
 "glossterm> support, the dialog looks somewhat different, offering options to "
 "set the location of the directory instead of a file."
 msgstr ""
+"Con soporte <glossterm linkend=\"glossary-ldap\"><acronym>LDAP</acronym></"
+"glossterm>, el diálogo aparece un poco diferente, ofrece opciones para "
+"establecer la ubicación de la carpeta en lugar de un archivo."
 
 #: C/balsa.xml:3246(title)
 msgid ""
 "<glossterm linkend=\"glossary-ldap\"><acronym>LDAP</acronym></glossterm> "
 "Address Book Dialog"
 msgstr ""
+"Diálogo de libreta de direcciones <glossterm linkend=\"glossary-ldap"
+"\"><acronym>LDAP</acronym></glossterm>."
 
 #: C/balsa.xml:3256(para)
 msgid ""
@@ -3665,6 +3739,8 @@ msgstr "Modificar"
 #: C/balsa.xml:3275(para)
 msgid "This enables you to change the properties of the selected address book."
 msgstr ""
+"Esto le permite cambiar las propiedades de la libreta de direcciones "
+"seleccionada."
 
 #: C/balsa.xml:3279(title)
 msgid "Modify an Address Book"
@@ -3706,6 +3782,8 @@ msgid ""
 "If set, <application>Balsa</application> will open your system inbox upon "
 "startup."
 msgstr ""
+"Si está marcada, <application>Balsa</application> abrirá el sistema de buzón "
+"de entrada en el inicio."
 
 #: C/balsa.xml:3327(guilabel)
 msgid "Check Mail at Startup"
@@ -3719,6 +3797,11 @@ msgid ""
 "on an <glossterm linkend=\"glossary-imap\"><acronym>IMAP</acronym></"
 "glossterm> server."
 msgstr ""
+"Si está marcada, automáticamente <application>Balsa</application> intentará "
+"descargar el correo desde el servidor de correo <glossterm linkend="
+"\"glossary-pop\"><acronym>POP3</acronym></glossterm> en el inicio, y "
+"revisará el correo nuevo en un servidor <glossterm linkend=\"glossary-imap"
+"\"><acronym>IMAP</acronym></glossterm>."
 
 #: C/balsa.xml:3336(guilabel)
 msgid "Remember Open Mailboxes Between Sessions"

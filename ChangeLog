@@ -1,3 +1,8 @@
+2011-08-15  Peter Bloomfield
+
+	* configure.in: when building with-gtkspell, check for
+	gtkspell-3.0; do not warn about gtkspell or html widget.
+
 2011-08-09  Peter Bloomfield
 
 	Migrate spell-checker from PSpell to Enchant

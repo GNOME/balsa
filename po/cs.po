@@ -16,7 +16,7 @@ msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=balsa&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2011-04-22 17:55+0000\n"
+"POT-Creation-Date: 2011-04-24 10:01+0000\n"
 "PO-Revision-Date: 2011-04-24 12:00+0200\n"
 "Last-Translator: Marek Černocký <marek@manet.cz>\n"
 "Language-Team: Czech <gnome-cs-list@gnome.org>\n"
@@ -31,15 +31,15 @@ msgstr ""
 msgid "Balsa"
 msgstr "Balsa"
 
-#: ../balsa-mailto-handler.desktop.in.in.h:2
+#: ../balsa-mailto-handler.desktop.in.in.h:2 ../balsa.desktop.in.in.h:2
 msgid "Balsa Mail Client"
 msgstr "Poštovní klient Balsa"
 
-#: ../balsa-mailto-handler.desktop.in.in.h:3 ../balsa.desktop.in.in.h:2
+#: ../balsa-mailto-handler.desktop.in.in.h:3 ../balsa.desktop.in.in.h:3
 msgid "E-Mail utility"
 msgstr "Nástroj pro e-mail"
 
-#: ../balsa-mailto-handler.desktop.in.in.h:4 ../balsa.desktop.in.in.h:3
+#: ../balsa-mailto-handler.desktop.in.in.h:4 ../balsa.desktop.in.in.h:4
 msgid "Mail Client"
 msgstr "Poštovní klient"
 
@@ -1223,7 +1223,7 @@ msgstr "Časový interval vypršel při pokusu vytvořit zámek fcntl!"
 #: ../libbalsa/misc.c:957
 #, c-format
 msgid "Waiting for fcntl lock... %d"
-msgstr "Čekám na zámek fcntl… %d"
+msgstr "Čeká se na zámek fcntl… %d"
 
 #: ../libbalsa/misc.c:985
 msgid "Timeout exceeded while attempting flock lock!"
@@ -1812,8 +1812,8 @@ msgstr "Nelze číst %s"
 #, c-format
 msgid "Cannot determine charset for text file `%s'; sending as mime type `%s'"
 msgstr ""
-"Nelze určit znakovou sadu textového souboru „%s“; odesílá se jako typ mime "
-"„%s“"
+"Nelze určit znakovou sadu textového souboru „%s“; odesílá se jako typ mime „%"
+"s“"
 
 #: ../libbalsa/send.c:2141
 msgid "This message will not be encrypted for the BCC: recipient."
@@ -3994,7 +3994,7 @@ msgid ""
 "If you really want to remove it, assign its function\n"
 "to some other mailbox."
 msgstr ""
-"Poštovní schránku „%s“ používá Balsa a nemohu ji odstranit.\n"
+"Poštovní schránku „%s“ používá Balsa a není možné ji odstranit.\n"
 "Pokud ji opravdu chcete odstranit, přiřaďte její funkci jiné poštovní\n"
 "schránce."
 

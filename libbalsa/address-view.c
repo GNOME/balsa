@@ -275,6 +275,11 @@ lbav_ensure_blank_line_idle_cb(LibBalsaAddressView * address_view)
 
     gdk_threads_enter();
 
+    if (g_source_is_destroyed(g_main_current_source())) {
+        gdk_threads_leave();
+        return FALSE;
+    }
+
     focus_path = gtk_tree_row_reference_get_path(address_view->focus_row);
     gtk_tree_row_reference_free(address_view->focus_row);
     address_view->focus_row = NULL;
@@ -501,8 +506,7 @@ lbav_set_or_add(LibBalsaAddressView * address_view, guint type,
  * Parse new text and set it in the address store.
  */
 static void
-lbav_set_text_at_path(LibBalsaAddressView * address_view,
-                      const gchar * text, const gchar * path_string)
+lbav_set_text(LibBalsaAddressView * address_view, const gchar * text)
 {
     GtkTreeView *tree_view = GTK_TREE_VIEW(address_view);
     GtkTreeModel *model = gtk_tree_view_get_model(tree_view);
@@ -514,7 +518,7 @@ lbav_set_text_at_path(LibBalsaAddressView * address_view,
     gboolean valid;
     guint count;
 
-    path = gtk_tree_path_new_from_string(path_string);
+    path = gtk_tree_path_new_from_string(address_view->path_string);
     valid = gtk_tree_model_get_iter(model, &iter, path);
     gtk_tree_path_free(path);
     if (!valid)
@@ -745,6 +749,19 @@ lbav_combo_edited_cb(GtkCellRendererText * renderer,
     gtk_widget_grab_focus(GTK_WIDGET(address_view));
 }
 
+/*
+ *     Callback for the cell-editable's "editing-done" signal
+ *     Store the new text.
+ */
+static void
+lbav_editing_done(GtkCellEditable * cell_editable,
+                  LibBalsaAddressView * address_view)
+{
+    const gchar *text = gtk_entry_get_text(GTK_ENTRY(cell_editable));
+
+    lbav_set_text(address_view, text);
+}
+
 
 /*
  * Focus Out callback
@@ -824,6 +841,8 @@ lbav_row_editing_cb(GtkCellRenderer * renderer,
                      G_CALLBACK(lbav_key_pressed_cb), address_view);
     g_signal_connect(editable, "insert-text",
                      G_CALLBACK(lbav_insert_text_cb), address_view);
+    g_signal_connect(editable, "editing-done",
+                     G_CALLBACK(lbav_editing_done), address_view);
     g_signal_connect_after(GTK_ENTRY(editable), "focus-out-event",
 			   G_CALLBACK(lbav_focus_out_cb), address_view);
     gtk_entry_set_completion(GTK_ENTRY(editable), completion);
@@ -833,33 +852,6 @@ lbav_row_editing_cb(GtkCellRenderer * renderer,
     address_view->editable = editable;
     g_free(address_view->path_string);
     address_view->path_string = g_strdup(path_string);
-}
-
-/*
- *     Callback for the tree-view's "edited" signal
- */
-static void
-lbav_row_edited_cb(GtkCellRendererText * renderer,
-                   const gchar * path_string,
-                   const gchar * new_text,
-                   LibBalsaAddressView * address_view)
-{
-    lbav_set_text_at_path(address_view, new_text, path_string);
-}
-
-/*
- *     Callback for the tree-view's "editing-canceled" signal
- *     NOTE: We treat this the same as "edited", to avoid a lot of user
- *     surprises.
- */
-static void
-lbav_row_editing_canceled_cb(GtkCellRendererText * renderer,
-                             LibBalsaAddressView * address_view)
-{
-    const gchar *text =
-        gtk_entry_get_text(GTK_ENTRY(address_view->editable));
-
-    lbav_set_text_at_path(address_view, text, address_view->path_string);
 }
 
 /*
@@ -1087,11 +1079,6 @@ libbalsa_address_view_new(const gchar * const *types,
     g_object_set(renderer, "editable", TRUE, NULL);
     g_signal_connect(renderer, "editing-started",
                      G_CALLBACK(lbav_row_editing_cb), address_view);
-    g_signal_connect(renderer, "edited",
-                     G_CALLBACK(lbav_row_edited_cb), address_view);
-    g_signal_connect(renderer, "editing-canceled",
-                     G_CALLBACK(lbav_row_editing_canceled_cb),
-                     address_view);
     gtk_tree_view_column_pack_start(column, renderer, TRUE);
     gtk_tree_view_column_set_attributes(column, renderer,
                                         "text", ADDRESS_NAME_COL, NULL);

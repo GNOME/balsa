@@ -63,6 +63,7 @@ struct _BalsaWindow {
 
     GtkWidget *toolbar;
     GtkWidget *sos_bar;
+    GtkWidget *bottom_bar;
     GtkWidget *progress_bar;
     GtkWidget *statusbar;
     GtkWidget *mblist;

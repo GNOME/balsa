@@ -1737,7 +1737,7 @@ balsa_window_new()
      * need the UIManager. */
     g_object_unref(ui_manager);
 
-    hbox = gtk_hbox_new(FALSE, 6);
+    window->bottom_bar = hbox = gtk_hbox_new(FALSE, 6);
     gtk_box_pack_end(GTK_BOX(window->vbox), hbox, FALSE, FALSE, 0);
 
     window->progress_bar = gtk_progress_bar_new();
@@ -4122,7 +4122,7 @@ static void
 bw_show_statusbar_cb(GtkToggleAction * action, gpointer data)
 {
     bw_show_helper(action, &balsa_app.show_statusbar,
-                   BALSA_WINDOW(data)->statusbar);
+                   BALSA_WINDOW(data)->bottom_bar);
 }
 
 static void

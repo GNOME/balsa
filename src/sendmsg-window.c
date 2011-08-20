@@ -72,9 +72,9 @@
 #include "print.h"
 #include "macosx-helpers.h"
 
+#include <enchant/enchant.h>
 #if HAVE_GTKSPELL
 #include "gtkspell/gtkspell.h"
-#include <enchant/enchant.h>
 #else                           /* HAVE_GTKSPELL */
 #include "spell-check.h"
 #endif                          /* HAVE_GTKSPELL */
@@ -4376,9 +4376,7 @@ create_lang_menu(GtkWidget * parent, BalsaSendmsg * bsmsg)
     GtkWidget *langs = gtk_menu_new();
     static gboolean locales_sorted = FALSE;
     GSList *group = NULL;
-#if HAVE_GTKSPELL
     EnchantBroker *broker;
-#endif                          /* HAVE_GTKSPELL */
 
     if (!locales_sorted) {
         for (i = 0; i < ELEMENTS(locales); i++)
@@ -4398,12 +4396,9 @@ create_lang_menu(GtkWidget * parent, BalsaSendmsg * bsmsg)
     selected_pos = find_locale_index_by_locale(setlocale(LC_CTYPE, NULL));
 #endif                          /* HAVE_GTKSPELL */
 
-#if HAVE_GTKSPELL
     broker = enchant_broker_init();
-#endif                          /* HAVE_GTKSPELL */
 
     for (i = 0; i < ELEMENTS(locales); i++) {
-#if HAVE_GTKSPELL
         if (locales[i].locale == NULL || locales[i].locale[0] == '\0')
             /* GtkSpell handles NULL lang, but complains about empty
              * lang; in either case, it does not go in the langs menu. */
@@ -4431,25 +4426,9 @@ create_lang_menu(GtkWidget * parent, BalsaSendmsg * bsmsg)
             gtk_widget_show(w);
             gtk_menu_shell_append(GTK_MENU_SHELL(langs), w);
         }
-#else                           /* HAVE_GTKSPELL */
-        GtkWidget *w =
-            gtk_radio_menu_item_new_with_mnemonic(group,
-                                                  locales[i].lang_name);
-        group = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(w));
-        if (i == (unsigned) selected_pos)
-            gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(w), TRUE);
-
-        g_signal_connect(G_OBJECT(w), "activate",
-                         G_CALLBACK(lang_set_cb), bsmsg);
-        g_object_set_data(G_OBJECT(w), BALSA_LANGUAGE_MENU_POS,
-                          GINT_TO_POINTER(i));
-        gtk_widget_show(w);
-        gtk_menu_shell_append(GTK_MENU_SHELL(langs), w);
-#endif                          /* HAVE_GTKSPELL */
     }
-#if HAVE_GTKSPELL
     enchant_broker_free(broker);
-#endif                          /* HAVE_GTKSPELL */
+
     if (selected_pos >= 0)
         set_locale(bsmsg, selected_pos);
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(parent), langs);

@@ -1,5 +1,12 @@
 2011-08-20  Peter Bloomfield
 
+	(lbav_ensure_blank_line): use gdk_threads_add_idle() for
+	convenience;
+	* libbalsa/address-view.c (lbav_ensure_blank_line_idle_cb): no
+	need to check GSource removal.
+
+2011-08-20  Peter Bloomfield
+
 	* src/sendmsg-window.c (create_lang_menu): use
 	enchant_broker_dict_exists() to check languages for Balsa's
 	spell-checker.

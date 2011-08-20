@@ -267,18 +267,14 @@ lbav_entry_setup_matches(LibBalsaAddressView * address_view,
 
 /*
  *     Idle callback to set the GtkTreeView's cursor.
+ *
+ *     Scheduled with gdk_threads_add_idle, so it already holds the GDK
+ *     lock, and its GSource has not been removed.
  */
 static gboolean
 lbav_ensure_blank_line_idle_cb(LibBalsaAddressView * address_view)
 {
     GtkTreePath *focus_path;
-
-    gdk_threads_enter();
-
-    if (g_source_is_destroyed(g_main_current_source())) {
-        gdk_threads_leave();
-        return FALSE;
-    }
 
     focus_path = gtk_tree_row_reference_get_path(address_view->focus_row);
     gtk_tree_row_reference_free(address_view->focus_row);
@@ -295,8 +291,6 @@ lbav_ensure_blank_line_idle_cb(LibBalsaAddressView * address_view)
     gtk_tree_path_free(focus_path);
 
     address_view->focus_idle_id = 0;
-
-    gdk_threads_leave();
 
     return FALSE;
 }
@@ -363,8 +357,9 @@ lbav_ensure_blank_line(LibBalsaAddressView * address_view,
 
     if (!address_view->focus_idle_id)
         address_view->focus_idle_id =
-            g_idle_add((GSourceFunc) lbav_ensure_blank_line_idle_cb,
-                       address_view);
+            gdk_threads_add_idle((GSourceFunc)
+                                 lbav_ensure_blank_line_idle_cb,
+                                 address_view);
 }
 
 /*

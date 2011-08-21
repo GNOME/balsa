@@ -280,12 +280,7 @@ lbav_ensure_blank_line_idle_cb(LibBalsaAddressView * address_view)
     gtk_tree_row_reference_free(address_view->focus_row);
     address_view->focus_row = NULL;
 
-    /* This will open the entry for editing;
-     * NOTE: the GtkTreeView documentation states that:
-     *  "This function is often followed by
-     *   gtk_widget_grab_focus(tree_view) in order to give keyboard
-     *   focus to the widget."
-     * but in fact, that leaves the entry /not/ open for editing. */
+    /* This will open the entry for editing */
     gtk_tree_view_set_cursor(GTK_TREE_VIEW(address_view), focus_path,
                              address_view->focus_column, TRUE);
     gtk_tree_path_free(focus_path);

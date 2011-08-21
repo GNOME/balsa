@@ -2908,6 +2908,14 @@ create_info_pane(BalsaSendmsg * bsmsg)
     /* From: */
     create_from_entry(table, bsmsg);
 
+#if !defined(ENABLE_TOUCH_UI)
+    /* Create the 'Reply To:' entry before the regular recipients, to
+     * get the initial focus in the regular recipients*/
+#define REPLY_TO_ROW 3
+    create_email_entry(table, REPLY_TO_ROW, bsmsg, &bsmsg->replyto_view,
+                       bsmsg->replyto, "R_eply To:", NULL, 0);
+#endif
+
     /* To:, Cc:, and Bcc: */
     create_email_entry(table, ++row, bsmsg, &bsmsg->recipient_view,
                        bsmsg->recipients, "Rec_ipients", address_types,
@@ -2928,8 +2936,9 @@ create_info_pane(BalsaSendmsg * bsmsg)
 
 #if !defined(ENABLE_TOUCH_UI)
     /* Reply To: */
-    create_email_entry(table, ++row, bsmsg, &bsmsg->replyto_view,
-                       bsmsg->replyto, "R_eply To:", NULL, 0);
+    /* We already created it, so just increment row: */
+    g_assert(++row == REPLY_TO_ROW);
+#undef REPLY_TO_ROW
 #endif
 
     /* fcc: mailbox folder where the message copy will be written to */

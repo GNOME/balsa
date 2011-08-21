@@ -71,7 +71,7 @@ const gchar * libbalsa_vfs_get_basename_utf8(const LibbalsaVfs * file);
 const gchar * libbalsa_vfs_get_mime_type(const LibbalsaVfs * file);
 const gchar * libbalsa_vfs_get_charset(const LibbalsaVfs * file);
 LibBalsaTextAttribute libbalsa_vfs_get_text_attr(const LibbalsaVfs * file);
-gsize libbalsa_vfs_get_size(const LibbalsaVfs * file);
+guint64 libbalsa_vfs_get_size(const LibbalsaVfs * file);
 GMimeStream * libbalsa_vfs_create_stream(const LibbalsaVfs * file,
                                          mode_t mode, 
                                          gboolean rdwr,

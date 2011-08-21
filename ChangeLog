@@ -1,5 +1,15 @@
 2011-08-21  Peter Bloomfield
 
+	* libbalsa/libbalsa-vfs.c (libbalsa_vfs_get_size): get size as
+	guint64.
+	* libbalsa/libbalsa-vfs.h: ditto.
+	* src/sendmsg-window.c (add_attachment), (add_urlref_attachment),
+	(create_info_pane): ditto;
+	(render_attach_size): use g_format_size() instead of deprecated
+	g_format_size_for_display().
+
+2011-08-21  Peter Bloomfield
+
 	* libbalsa/address-view.c (lbav_ensure_blank_line_idle_cb):
 	remove irrelevant comment.
 	* src/sendmsg-window.c (create_info_pane): create "Reply-To:"

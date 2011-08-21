@@ -2185,7 +2185,7 @@ add_attachment(BalsaSendmsg * bsmsg, const gchar *filename,
 		       ATTACH_ICON_COLUMN, pixbuf,
 		       ATTACH_TYPE_COLUMN, content_desc,
 		       ATTACH_MODE_COLUMN, attach_data->mode,
-		       ATTACH_SIZE_COLUMN, (gfloat) libbalsa_vfs_get_size(file_uri),
+		       ATTACH_SIZE_COLUMN, libbalsa_vfs_get_size(file_uri),
 		       ATTACH_DESC_COLUMN, utf8name,
 		       -1);
     g_object_unref(attach_data);
@@ -2262,7 +2262,7 @@ add_urlref_attachment(BalsaSendmsg * bsmsg, gchar *url)
 		       ATTACH_ICON_COLUMN, pixbuf,
 		       ATTACH_TYPE_COLUMN, _("(URL)"),
 		       ATTACH_MODE_COLUMN, attach_data->mode,
-		       ATTACH_SIZE_COLUMN, (gfloat) 0.0,
+		       ATTACH_SIZE_COLUMN, 0,
 		       ATTACH_DESC_COLUMN, url,
 		       -1);
     g_object_unref(attach_data);
@@ -2870,7 +2870,7 @@ render_attach_size(GtkTreeViewColumn *column, GtkCellRenderer *cell,
 		   GtkTreeModel *model, GtkTreeIter *iter, gpointer data)
 {
     gint mode;
-    gfloat size;
+    guint64 size;
     gchar *sstr;
 
     gtk_tree_model_get(model, iter, ATTACH_MODE_COLUMN, &mode,
@@ -2878,7 +2878,11 @@ render_attach_size(GtkTreeViewColumn *column, GtkCellRenderer *cell,
     if (mode == LIBBALSA_ATTACH_AS_EXTBODY)
         sstr = g_strdup("-");
     else
+#if GLIB_CHECK_VERSION(2, 30, 0)
+        sstr = g_format_size(size);
+#else                           /* GLIB_CHECK_VERSION(2, 30, 0) */
         sstr = g_format_size_for_display((goffset) size);
+#endif                          /* GLIB_CHECK_VERSION(2, 30, 0) */
     g_object_set(cell, "text", sstr, NULL);
     g_free(sstr);
 }
@@ -2993,7 +2997,7 @@ create_info_pane(BalsaSendmsg * bsmsg)
 			       GDK_TYPE_PIXBUF,
 			       G_TYPE_STRING,
 			       G_TYPE_INT,
-			       G_TYPE_FLOAT,
+			       G_TYPE_UINT64,
 			       G_TYPE_STRING);
 
     bsmsg->attachments[1] = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));

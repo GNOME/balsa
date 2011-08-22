@@ -7,17 +7,17 @@
 # Héctor García Álvarez <hector@scouts-es.org>, 1999-2000.
 # Francisco Javier F. Serrador <serrador@cvs.gnome.org>, 2003, 2004, 2005, 2006.
 # Jorge Bernal <koke@amedias.org>, 2004, 2005.
-# Daniel Mustieles <daniel.mustieles@gmail.com>, 2011.
 # Jorge González <jorgegonz@svn.gnome.org>, 2007, 2008, 2009, 2010, 2011.
+# Daniel Mustieles <daniel.mustieles@gmail.com>, 2011.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa.HEAD\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=balsa&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2011-04-22 17:55+0000\n"
-"PO-Revision-Date: 2011-04-24 11:09+0200\n"
-"Last-Translator: Jorge González <jorgegonz@svn.gnome.org>\n"
+"POT-Creation-Date: 2011-04-24 09:15+0000\n"
+"PO-Revision-Date: 2011-08-22 17:01+0200\n"
+"Last-Translator: Daniel Mustieles <daniel.mustieles@gmail.com>\n"
 "Language-Team: Español <gnome-es-list@gnome.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -31,18 +31,17 @@ msgstr ""
 msgid "Balsa"
 msgstr "Balsa"
 
-#: ../balsa-mailto-handler.desktop.in.in.h:2
-#| msgid "The Balsa E-Mail Client"
+#: ../balsa-mailto-handler.desktop.in.in.h:2 ../balsa.desktop.in.in.h:2
 msgid "Balsa Mail Client"
 msgstr "Cliente de correo-e Balsa"
 
-#: ../balsa-mailto-handler.desktop.in.in.h:3 ../balsa.desktop.in.in.h:2
+#: ../balsa-mailto-handler.desktop.in.in.h:3 ../balsa.desktop.in.in.h:3
 msgid "E-Mail utility"
 msgstr "Utilidad de correo-e"
 
 # src/pref-manager.c:1333
 # src/pref-manager.c:1476
-#: ../balsa-mailto-handler.desktop.in.in.h:4 ../balsa.desktop.in.in.h:3
+#: ../balsa-mailto-handler.desktop.in.in.h:4 ../balsa.desktop.in.in.h:4
 msgid "Mail Client"
 msgstr "Cliente de correo-e"
 
@@ -1218,8 +1217,8 @@ msgstr "no se pudo crear el archivo temporal «%s»: %s"
 #, c-format
 msgid "Failed to save cache file \"%s\": %s.  New version saved as \"%s\""
 msgstr ""
-"Falló al guardar el archivo de caché «%s»: %s. La nueva versión guadada como "
-"«%s»"
+"Falló al guardar el archivo de caché «%s»: %s. La nueva versión guadada como «%"
+"s»"
 
 # src/balsa-message.c:301
 # src/balsa-message.c:331
@@ -2330,8 +2329,8 @@ msgid ""
 "Couldn't create a directory: mkdir() failed on pathname \"%s\", with error "
 "\"%s\"."
 msgstr ""
-"No se pudo crear un directorio: mkdir() falló en la ruta «%s», con el error "
-"«%s»."
+"No se pudo crear un directorio: mkdir() falló en la ruta «%s», con el error «%"
+"s»."
 
 # libinit_balsa/helper.c:159 libinit_balsa/helper.c:176
 # libinit_balsa/helper.c:159 libinit_balsa/helper.c:176
@@ -3417,8 +3416,8 @@ msgid ""
 "The message sent by %s with subject \"%s\" contains an encrypted part, but "
 "it's structure is invalid."
 msgstr ""
-"El mensaje enviado por %s con el asunto «%s» contiene una parte cifrada, "
-"pero la estructura es inválida."
+"El mensaje enviado por %s con el asunto «%s» contiene una parte cifrada, pero "
+"la estructura es inválida."
 
 #: ../src/balsa-message.c:2848
 #, c-format
@@ -3426,8 +3425,8 @@ msgid ""
 "The message sent by %s with subject \"%s\" contains a PGP encrypted part, "
 "but this crypto protocol is not available."
 msgstr ""
-"El mensaje enviado por %s con el asunto «%s» contiene una parte cifrada, "
-"pero este protocolo criptográfico no está disponible."
+"El mensaje enviado por %s con el asunto «%s» contiene una parte cifrada, pero "
+"este protocolo criptográfico no está disponible."
 
 #: ../src/balsa-message.c:2861
 #, c-format
@@ -3444,8 +3443,8 @@ msgid ""
 "The message sent by %s with subject \"%s\" contains a signed part, but its "
 "structure is invalid. The signature, if there is any, cannot be checked."
 msgstr ""
-"El mensaje enviado por %s con el asunto «%s» contiene una parte firmada, "
-"pero su estructura es inválida. La firma, si es que hay alguna, no se puede "
+"El mensaje enviado por %s con el asunto «%s» contiene una parte firmada, pero "
+"su estructura es inválida. La firma, si es que hay alguna, no se puede "
 "comprobar."
 
 #: ../src/balsa-message.c:2941
@@ -3454,8 +3453,8 @@ msgid ""
 "The message sent by %s with subject \"%s\" contains a %s signed part, but "
 "this crypto protocol is not available."
 msgstr ""
-"El mensaje enviado por %s con el asunto «%s» contiene una parte %s, pero "
-"este protocolo criptográfico no está disponible."
+"El mensaje enviado por %s con el asunto «%s» contiene una parte %s, pero este "
+"protocolo criptográfico no está disponible."
 
 #: ../src/balsa-message.c:2944
 msgid "PGP"
@@ -4504,7 +4503,7 @@ msgstr "Usar el comando IDLE"
 
 #: ../src/folder-conf.c:354 ../src/mailbox-conf.c:1405
 msgid "Enable _bug workarounds"
-msgstr "Activar arreglos de _bugs"
+msgstr "Acti_var las soluciones de errores alternativas"
 
 #: ../src/folder-conf.c:361
 msgid "Use STATUS for mailbox checking"
@@ -8095,8 +8094,8 @@ msgid ""
 "available for all recipients. In order to protect your privacy, the message "
 "could be %s encrypted."
 msgstr ""
-"No seleccionó ningún cifrado para este mensaje, aunque las claves públicas "
-"%s están disponibles para todos los destinatarios. Para proteger su "
+"No seleccionó ningún cifrado para este mensaje, aunque las claves públicas %"
+"s están disponibles para todos los destinatarios. Para proteger su "
 "privacidad el mensaje se podría cifrar con %s."
 
 #: ../src/sendmsg-window.c:5862
@@ -8800,8 +8799,7 @@ msgstr "Bajar"
 #~ "Use the \"Fonts\" page on the \"Print message\" dialog to change it."
 #~ msgstr ""
 #~ "Balsa no pudo encontrar tipografía «%s».\n"
-#~ "Usa la página «Tipografías» en el diálogo «Imprimir mensaje» para "
-#~ "cambiarlo."
+#~ "Usa la página «Tipografías» en el diálogo «Imprimir mensaje» para cambiarlo."
 
 #~ msgid "Balsa: message print preview"
 #~ msgstr "Balsa: vista previa de impresión del mensaje"

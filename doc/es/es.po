@@ -9,8 +9,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa-help.master\n"
-"POT-Creation-Date: 2011-08-19 06:12+0000\n"
-"PO-Revision-Date: 2011-08-22 17:00+0200\n"
+"POT-Creation-Date: 2011-08-22 18:30+0000\n"
+"PO-Revision-Date: 2011-08-25 13:09+0200\n"
 "Last-Translator: Daniel Mustieles <daniel.mustieles@gmail.com>\n"
 "Language-Team: Español <gnome-es-list@gnome.org>\n"
 "MIME-Version: 1.0\n"
@@ -4267,18 +4267,26 @@ msgid ""
 "<emphasis>rename</emphasis> an existing subfolder, or <emphasis>move</"
 "emphasis> a subfolder within the folder tree."
 msgstr ""
+"El diálogo de propiedades de subcarpetas permite gestionar las carpetas del "
+"servidor IMAP remoto. Especialmente, se puede <emphasis>crear</emphasis> una "
+"subcarpeta, <emphasis>renombrar</emphasis> una existente o "
+"<emphasis>moverla</emphasis> dentro del árbol de carpetas."
 
 #: C/balsa.xml:3631(para)
 msgid ""
 "<guilabel>Folder name</guilabel> is how the folder is shown in the mailbox "
 "tree on the left side."
 msgstr ""
+"El <guilabel>Nombre de la carpeta</guilabel> es el que se muestra en el "
+"árbol de buzones del lado izquierdo."
 
 #: C/balsa.xml:3634(para)
 msgid ""
 "<guilabel>Subfolder of</guilabel> indicates the immediate parent of the "
 "folder."
 msgstr ""
+"<guilabel>Subcarpeta de</guilabel> indica el nivel superior inmediato de la "
+"carpeta."
 
 #: C/balsa.xml:3639(para)
 msgid ""
@@ -4289,14 +4297,21 @@ msgid ""
 "IMAP tree, only that tree is shown for browsing; otherwise, all IMAP trees "
 "will be shown."
 msgstr ""
+"Cuando se abre la ventana de diálogo desde <menuchoice><guimenu>Archivo</"
+"guimenu><guisubmenu>Nuevo</guisubmenu><guimenuitem>Subcarpeta IMAP remota</"
+"guimenuitem></menuchoice>, se puede escribir el nombre de la carpeta y "
+"navegar por el árbol IMAP para encontrar la carpeta superior. Si se tiene "
+"seleccionado un buzón del árbol IMAP, sólo se podrá navegar en ése árbol; de "
+"lo contrario, se mostrarán todos los árboles IMAP."
 
 #: C/balsa.xml:3664(para)
 msgid "Renamed, by editing the folder name;"
-msgstr ""
+msgstr "Renombrado, al editar el nombre de la carpeta;"
 
 #: C/balsa.xml:3665(para)
 msgid "Moved, by browsing for a different parent folder in the same tree."
 msgstr ""
+"Movido, al navegar por una carpeta superior diferente dentro del mismo árbol."
 
 #: C/balsa.xml:3652(para)
 msgid ""
@@ -4306,6 +4321,11 @@ msgid ""
 "<guimenuitem>Properties...</guimenuitem>, the mailbox may be: <placeholder-1/"
 ">"
 msgstr ""
+"Cuando la ventana de diáologo de abre desde <menuchoice><guimenu>Buzón</"
+"guimenu><guimenuitem>Editar</guimenuitem></menuchoice> con una carpeta IMAP "
+"seleccionada, o al pulsar el botón derecho del ratón sobre un buzón IMAP y "
+"seleccionar <guimenuitem>Propiedades...</guimenuitem>, el buzón puede ser: "
+"<placeholder-1/>"
 
 #: C/balsa.xml:3675(title)
 msgid "Address book configuration"
@@ -4335,6 +4355,11 @@ msgid ""
 "mailer (<ulink url=\"http://www.mutt.org/\">www.mutt.org</ulink>) uses an "
 "identical system to retrieve addresses from programs."
 msgstr ""
+"La libreta de direcciones de Balsa soporta el ingreso desde otros programas. "
+"Por lo tanto, se puede utilizar (¡sin necesidad de importar!), por ejemplo, "
+"la libreta de direcciones pine o mutt. El cliente mutt (<ulink url=\"http://"
+"www.mutt.org/\">www.mutt.org</ulink>) utiliza un sistema idéntico para "
+"recuperar las direcciones de los programas."
 
 #: C/balsa.xml:3695(title)
 msgid "Existing programs"
@@ -4345,6 +4370,8 @@ msgid ""
 "The following programs are compatible with the mutt mail reader and /should/ "
 "be with balsa. Submit links to more programs."
 msgstr ""
+"Los siguientes programas son compatibles con el lector de correos mutt y "
+"deberían serlo con Balsa. Envíe enlaces a más programas."
 
 #: C/balsa.xml:3701(para)
 msgid ""
@@ -4354,6 +4381,12 @@ msgid ""
 "NIS, fido, the abook program, mutt addressbook, pine addressbook, palm "
 "addressbook, gnomecard addressbook, big brother database, ldap database."
 msgstr ""
+"<ulink url=\"http://www.spinnaker.de/lbdb/\" type=\"http\">http://www."
+"spinnaker.de/lbdb/</ulink>: la base de datos Little Brother. Lee direcciones "
+"de correo y nombres de: finger, /etc/passwd, email procmail entrante, NIS, "
+"fido, el programa abook, libreta de direcciones mutt, libreta de direcciones "
+"pine, libreta de direcciones palm, libreta de direcciones gnomecard, base de "
+"datos big brother, base de datos ldap."
 
 #: C/balsa.xml:3710(para)
 msgid ""
@@ -4361,6 +4394,9 @@ msgid ""
 "\">http://www.fiction.net/blong/programs/mutt/</ulink> - palm address "
 "database, ldapsearch wrapper, ph/qi server, UIUC, ph,"
 msgstr ""
+"<ulink url=\"http://www.fiction.net/blong/programs/mutt/\" type=\"http"
+"\">http://www.fiction.net/blong/programs/mutt/</ulink>: base de datos de "
+"direcciones palm, contenedor ldapsearch, servidor ph/qi, UIUC, ph."
 
 #: C/balsa.xml:3719(title)
 msgid "Writing your own load scripts"
@@ -4372,6 +4408,9 @@ msgid ""
 "program. You might want to write comments or debug output on this line. The "
 "remaining lines should have this format:"
 msgstr ""
+"<application>Balsa</application> ignora la primer línea de la salida de su "
+"programa. Se puede escribir un comentario o salida del depurador en esta "
+"línea. Las líneas restantes deberán tener este formato:"
 
 #: C/balsa.xml:3724(computeroutput)
 #, no-wrap
@@ -4388,6 +4427,9 @@ msgid ""
 "not used by balsa, but might be in the future. It is also kept to ensure "
 "compatibility with mutt."
 msgstr ""
+"Se deberán separar los tres campos con tabuladores. Actualmente, Balsa no "
+"utiliza el tercer campo, pero podría hacerlo en el futuro. También se "
+"mantiene para asegurar la compatibilidad con mutt."
 
 #: C/balsa.xml:3732(para)
 msgid ""
@@ -4395,12 +4437,17 @@ msgid ""
 "pattern to search for. A space (\" \") is used as the first argument when "
 "creating a list of all users."
 msgstr ""
+"<application>Balsa</application> ejecuta el script con un argumento: el "
+"patrón que buscar. Se utiliza un espacio (« ») como primer argumento para "
+"crear una lista de todos los usuarios."
 
 #: C/balsa.xml:3736(para)
 msgid ""
 "All characters are allowed, except the tab (\\t), since that is the field "
 "separator."
 msgstr ""
+"Se permiten todos los caracteres, excepto el tabulador (\\t), ya que es el "
+"separador de campo."
 
 #: C/balsa.xml:3740(para)
 msgid "An example output could be:"
@@ -4458,12 +4505,18 @@ msgid ""
 "The first is an email address, the second a full name and the third is an "
 "alias (currently not used and replaced by 'TODO')."
 msgstr ""
+"También es posible agregar direcciones. Su script deberá recibir 3 "
+"argumentos. El primero es una dirección de correo electrónico, el segundo es "
+"un nombre completo y el tercero es un apodo (actualmente no se utiliza y se "
+"reemplaza por «TODO»)."
 
 #: C/balsa.xml:3765(para)
 msgid ""
 "Note that mutt does not have support for adding addresses and there is thus "
 "no compatibility in this case."
 msgstr ""
+"Tenga en cuenta que mutt no tiene soporte para agregar direcciones y, por "
+"consiguiente, no se cumple la compatibilidad en este caso."
 
 #: C/balsa.xml:3767(para)
 msgid "Comments are welcome: <email>jelmer@nl.linux.org</email>"
@@ -4478,6 +4531,9 @@ msgid ""
 "This dialog window lets you specify how you present yourself to the rest of "
 "the world through your email. The first page has your general information:"
 msgstr ""
+"Esta ventana de diálogo le permite indicar la forma en que se presenta al "
+"resto del munto a través de su correo. La primera página contiene su "
+"información general:"
 
 #: C/balsa.xml:3786(guilabel)
 msgid "Identity Name"
@@ -4488,6 +4544,8 @@ msgid ""
 "A unique title by which this identity will be named within "
 "<application>Balsa</application>."
 msgstr ""
+"Un título único con el cual se nombra esta entidad de <application>Balsa</"
+"application>."
 
 #: C/balsa.xml:3795(guilabel)
 msgid "Full Name"
@@ -4498,6 +4556,8 @@ msgid ""
 "This doesn't <emphasis>have</emphasis> to be your name, I guess. But it's "
 "the word prefixing your email address in mail you send."
 msgstr ""
+"Éste no <emphasis>tiene</emphasis> que ser su nombre, supongo. Pero es la "
+"palabra que se antepone su dirección de correo en los mensajes que envíe."
 
 #: C/balsa.xml:3806(guilabel)
 msgid "Mailing Address"
@@ -4505,7 +4565,7 @@ msgstr "Dirección de correo"
 
 #: C/balsa.xml:3808(para)
 msgid "As you wish it to appear in your \"From\" header."
-msgstr ""
+msgstr "Cómo prefiere aparecer en la cabecera «De»."
 
 #: C/balsa.xml:3815(guilabel)
 msgid "Reply-To address"
@@ -4516,6 +4576,8 @@ msgid ""
 "The address that you wish people to reply to your email with (if you have a "
 "home and a work address, for instance)."
 msgstr ""
+"La dirección donde quiere que la gente responda su correo (por ejemplo, si "
+"tiene una dirección para el hogar y una para el trabajo)."
 
 #: C/balsa.xml:3825(guilabel)
 msgid "Default Domain"
@@ -4528,6 +4590,10 @@ msgid ""
 "enable <link linkend=\"preferences-address-books\">Alias Expansion</link> "
 "for this to work."
 msgstr ""
+"El dominio que quiera asignar a todas las entradas de correo a las que no se "
+"especificó el dominio. Normalmente, se utiliza el dominio local. Necesita "
+"activar <link linkend=\"preferences-address-books\">Expansión de alias</"
+"link> para trabajar con esto."
 
 #: C/balsa.xml:3838(para)
 msgid ""
@@ -4542,6 +4608,9 @@ msgid ""
 "The default value for the blind-carbon-copy field when using this identity. "
 "Useful if you want to always send a copy of outgoing mail to another account."
 msgstr ""
+"El valor predeterminado para el campo «copia carbón oculta» cuando se utiliza "
+"esta identidad. Es útil si desea enviar siempre una copia del correo "
+"saliente a otra cuenta."
 
 #: C/balsa.xml:3857(guilabel)
 msgid "Reply String"
@@ -4549,7 +4618,7 @@ msgstr "Cadena de respuesta"
 
 #: C/balsa.xml:3859(para)
 msgid "The prefix for the subject line when replying to a message."
-msgstr ""
+msgstr "El prefijo para la línea del asunto cuando responde un mensaje."
 
 #: C/balsa.xml:3866(guilabel)
 msgid "Forward String"
@@ -4557,7 +4626,7 @@ msgstr "Cadena de reenvío"
 
 #: C/balsa.xml:3868(para)
 msgid "The prefix for the subject line when forwarding a message."
-msgstr ""
+msgstr "El prefijo para la línea del asunto cuando reenvía un mensaje."
 
 #: C/balsa.xml:3875(guilabel)
 msgid "Request Message Disposition Notification"
@@ -4567,10 +4636,12 @@ msgstr "Solicitar notificación de entrega"
 msgid ""
 "Whether Message Disposition Notification should be requested by default."
 msgstr ""
+"Si se debe solicitar una notificación de disposición del mensaje de forma "
+"predeterminada."
 
 #: C/balsa.xml:3884(guilabel)
 msgid "Face Path"
-msgstr ""
+msgstr "Ruta de Face"
 
 #: C/balsa.xml:3886(para)
 msgid ""
@@ -4580,16 +4651,24 @@ msgid ""
 "\">a description of Face and X-Face</ulink> headers for more details as well "
 "as the list of mail programs supporting this feature."
 msgstr ""
+"Si se debería adjuntar a un programa una cabecera «Face». La ruta indicada "
+"apunta a un archivo que contiene una representación textual del icono «face». "
+"Consulte en <ulink url=\"http://quimby.gnus.org/circus/face/\" type=\"http"
+"\"> una descripción de las cabeceras Face y X-Face</ulink> para obtener más "
+"detalles, así como una lista de los clientes de correo que soportan esta "
+"característica."
 
 #: C/balsa.xml:3900(guilabel)
 msgid "X-Face Path"
-msgstr ""
+msgstr "Ruta de X-Face"
 
 #: C/balsa.xml:3902(para)
 msgid ""
 "Whether a \"Face\" header should be attached to a program. Specified path "
 "points out to a file containing a textual representation of the face icon."
 msgstr ""
+"Si se debería adjuntar a un programa una cabecera «Face». La ruta indicada "
+"apunta a un archivo que contiene una representación textual del icono face."
 
 #: C/balsa.xml:3910(guilabel)
 msgid "SMTP server"
@@ -4600,12 +4679,16 @@ msgid ""
 "The <link linkend=\"smtp-server-config\">SMTP server</link> to be used for "
 "this identity."
 msgstr ""
+"El <link linkend=\"smtp-server-config\">servidor SMTP</link> que se "
+"utilizará para esta entidad."
 
 #: C/balsa.xml:3921(para)
 msgid ""
 "You control the signature that <application>Balsa</application> appends to "
 "your messages on the <quote>Signature</quote> page:"
 msgstr ""
+"La firma que agrega <application>Balsa</application> a los mensajes se "
+"gestiona en la página «Firma»:"
 
 #: C/balsa.xml:3928(guilabel)
 msgid "Signature Path"

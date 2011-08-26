@@ -1,3 +1,13 @@
+2011-08-26  Peter Bloomfield
+
+	Make BalsaMimeWidgetImage a subclass of BalsaMimeWidget
+
+	* src/balsa-mime-widget-image.h: subclass boilerplate.
+	* src/balsa-mime-widget-image.c (balsa_mime_widget_image_init),
+	(balsa_mime_widget_image_class_init): ditto.
+	(balsa_mime_widget_image_dispose): disconnect signal handler.
+	(balsa_mime_widget_new_image): store signal handler id.
+
 2011-08-21  Peter Bloomfield
 
 	* libbalsa/libbalsa-vfs.c (libbalsa_vfs_get_size): get size as

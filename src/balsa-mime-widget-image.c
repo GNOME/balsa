@@ -7,28 +7,75 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2, or (at your option)
  * any later version.
- *  
+ *
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *  
+ *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  
- * 02111-1307, USA.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
 # include "config.h"
 #endif                          /* HAVE_CONFIG_H */
+
 #include "balsa-mime-widget-image.h"
 
 #include "balsa-app.h"
-#include <glib/gi18n.h>
 #include "balsa-mime-widget.h"
 #include "balsa-mime-widget-callbacks.h"
+#include <glib/gi18n.h>
 
+/*
+ * GObject class definitions
+ */
+struct _BalsaMimeWidgetImage {
+    BalsaMimeWidget  parent;
+
+    GtkStyleContext *context;
+    gulong           context_changed_handler_id;
+};
+
+struct _BalsaMimeWidgetImageClass {
+    BalsaMimeWidgetClass parent;
+};
+
+G_DEFINE_TYPE(BalsaMimeWidgetImage,
+              balsa_mime_widget_image,
+              BALSA_TYPE_MIME_WIDGET);
+
+static void
+balsa_mime_widget_image_init(BalsaMimeWidgetImage * mwi)
+{
+}
+
+static void
+balsa_mime_widget_image_dispose(GObject * obj)
+{
+    BalsaMimeWidgetImage *mwi = BALSA_MIME_WIDGET_IMAGE(obj);
+
+    if (mwi->context_changed_handler_id) {
+        g_signal_handler_disconnect(mwi->context,
+                                    mwi->context_changed_handler_id);
+        mwi->context_changed_handler_id = 0;
+    }
+
+    (*G_OBJECT_CLASS(balsa_mime_widget_image_parent_class)->
+          dispose) (obj);
+}
+
+static void
+balsa_mime_widget_image_class_init(BalsaMimeWidgetImageClass * klass)
+{
+    GObjectClass *object_class = G_OBJECT_CLASS(klass);
+
+    object_class->dispose = balsa_mime_widget_image_dispose;
+}
+/*
+ * End of GObject class definitions
+ */
 
 static gboolean balsa_image_button_press_cb(GtkWidget * widget, GdkEventButton * event,
 					    GtkMenu * menu);
@@ -53,8 +100,8 @@ balsa_mime_widget_new_image(BalsaMessage * bm,
     GdkPixbuf *pixbuf;
     GtkWidget *image;
     GError * load_err = NULL;
+    BalsaMimeWidgetImage *mwi;
     BalsaMimeWidget *mw;
-    GtkStyleContext *context;
 
     g_return_val_if_fail(mime_body != NULL, NULL);
     g_return_val_if_fail(content_type != NULL, NULL);
@@ -70,16 +117,19 @@ balsa_mime_widget_new_image(BalsaMessage * bm,
 	return NULL;
     }
 
-    mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
+    mwi = g_object_new(BALSA_TYPE_MIME_WIDGET_IMAGE, NULL);
+    mw = (BalsaMimeWidget *) mwi;
 
     mw->widget = gtk_event_box_new();
     g_signal_connect(G_OBJECT(mw->widget), "button-press-event",
                      G_CALLBACK(balsa_image_button_press_cb), data);
 
-    context = gtk_widget_get_style_context(GTK_WIDGET(bm->cont_viewport));
-    bmwi_context_changed_cb(context, mw);
-    g_signal_connect(context, "changed",
-                     G_CALLBACK(bmwi_context_changed_cb), mw);
+    mwi->context =
+        gtk_widget_get_style_context(GTK_WIDGET(bm->cont_viewport));
+    bmwi_context_changed_cb(mwi->context, mw);
+    mwi->context_changed_handler_id =
+        g_signal_connect(mwi->context, "changed",
+                         G_CALLBACK(bmwi_context_changed_cb), mw);
 
     image = gtk_image_new_from_stock(GTK_STOCK_MISSING_IMAGE,
                                      GTK_ICON_SIZE_BUTTON);

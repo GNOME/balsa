@@ -27,7 +27,8 @@
 #if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
 # include "config.h"
 #endif                          /* HAVE_CONFIG_H */
-#include "filter-funcs.h"
+
+#include <glib/gi18n.h>
 
 #include <ctype.h>
 #include <stdlib.h>
@@ -35,6 +36,7 @@
 #include <time.h>
 #include "missing.h"
 
+#include "filter-funcs.h"
 #include "filter-private.h"
 
 /* Conditions */
@@ -368,6 +370,112 @@ libbalsa_condition_to_string(LibBalsaCondition *cond)
 
     res = g_string_new("");
     cond_to_string(cond, res);
+    return g_string_free(res, FALSE);
+}
+
+static void
+append_header_names(LibBalsaCondition *cond, GString *res)
+{
+    static const struct {
+        unsigned header;
+        const gchar *header_name;
+    } header_name_map[] = {
+        { CONDITION_MATCH_TO, N_("To") },
+        { CONDITION_MATCH_FROM, N_("From") },
+        { CONDITION_MATCH_SUBJECT, N_("Subject") },
+        { CONDITION_MATCH_CC, N_("Cc") },
+        { CONDITION_MATCH_BODY, N_("Body") }
+    };
+
+    unsigned i;
+    if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_US_HEAD)) {
+        g_string_append_printf(res, _("Header:%s"),
+                               cond->match.string.user_header);
+    }
+    for (i=0; i<ELEMENTS(header_name_map); ++i) {
+        if (CONDITION_CHKMATCH(cond, header_name_map[i].header)) {
+            if (res->len>0) {
+                g_string_append_printf(res, _(",%s"),
+                                       _(header_name_map[i].header_name));
+            } else {
+                res = g_string_append(res, _(header_name_map[i].header_name));
+            }
+        }
+    }
+}
+
+static void
+append_flag_names(LibBalsaCondition *cond, GString *res)
+{
+    static const struct {
+        LibBalsaMessageFlag flag;
+        const gchar *flag_name;
+    } flag_name_map[] = {
+        { LIBBALSA_MESSAGE_FLAG_NEW, N_("New") },
+        { LIBBALSA_MESSAGE_FLAG_DELETED, N_("Deleted") },
+        { LIBBALSA_MESSAGE_FLAG_REPLIED, N_("Replied") },
+        { LIBBALSA_MESSAGE_FLAG_FLAGGED, N_("Flagged") },
+    };
+    unsigned i;
+    gsize len = res->len;
+    for (i=0; i<ELEMENTS(flag_name_map); ++i) {
+        if (cond->match.flags & flag_name_map[i].flag) {
+            if (res->len == len) {
+                res = g_string_append(res, _(flag_name_map[i].flag_name));
+            } else {
+                g_string_printf(res, _(",%s"),
+                                _(flag_name_map[i].flag_name));
+            }
+        }
+    }
+}
+
+gchar*
+libbalsa_condition_to_string_user(LibBalsaCondition *cond)
+{
+    GDate date;
+    char str[80];
+    GString *res = g_string_new("");
+
+    if(cond->negate)
+        g_string_append(res, _("Not "));
+
+    switch(cond->type) {
+    case CONDITION_STRING:
+        append_header_names(cond, res);
+        g_string_append_c(res, ' ');
+        append_quoted_string(res, cond->match.string.string);
+	break;
+    case CONDITION_REGEX:
+#if 0
+        /* FIXME! */
+#endif        
+	break;
+    case CONDITION_DATE:
+	if (cond->match.date.date_low) {
+	    g_date_set_time_t(&date, cond->match.date.date_low);
+	    g_date_strftime(str, sizeof(str), _("From %Y-%m-%d"), &date);
+	} else str[0]='\0';
+        append_quoted_string(res, str);
+        g_string_append_c(res, ' ');
+	if (cond->match.date.date_high) {
+	    g_date_set_time_t(&date, cond->match.date.date_high);
+	    g_date_strftime(str, sizeof(str), _("To %Y-%m-%d"), &date);
+	} else str[0]='\0';
+        append_quoted_string(res, str);
+	break;
+    case CONDITION_FLAG:
+        append_flag_names(cond, res);
+        break;
+    case CONDITION_AND:
+        g_string_append(res, _("And"));
+        break;
+    case CONDITION_OR:
+        g_string_append(res, _("Or"));
+	break;
+    case CONDITION_NONE:
+        break;
+    }
     return g_string_free(res, FALSE);
 }
 

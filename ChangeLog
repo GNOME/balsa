@@ -1,3 +1,10 @@
+2011-08-29  Pawel Salek
+
+	* libbalsa/filter-funcs.c: implement libbalsa_condition_to_string_user
+	* libbalsa/filter.h: add libbalsa_condition_to_string_user() proto.
+	* src/filter-edit-callbacks.c: use it to provide more user-friendly
+	filter view.
+
 2011-06-15  Peter Bloomfield
 
 	* src/main-window.c: use GDK_1 instead of new GDK_KEY_1 in alt-n

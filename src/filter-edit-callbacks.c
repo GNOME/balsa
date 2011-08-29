@@ -362,13 +362,17 @@ update_condition_list_label(void)
     GtkTreeModel *model;
     GtkTreeIter iter;
     LibBalsaCondition *cond;
+    gchar *filter_description;
 
     if (!gtk_tree_selection_get_selected(selection, &model, &iter))
         return;
 
     gtk_tree_model_get(model, &iter, 1, &cond, -1);
+
+    filter_description = libbalsa_condition_to_string_user(cond);
     gtk_list_store_set(GTK_LIST_STORE(model), &iter,
-                       0, _(fe_search_type[cond->type - 1].text), -1);
+                       0, filter_description, -1);
+    g_free(filter_description);
 }                      /* end fe_update_condition_list_label */
 
 static ConditionMatchType
@@ -2003,7 +2007,9 @@ static void
 fill_condition_list(GtkTreeModel *model, LibBalsaCondition *condition,
 		    ConditionMatchType type)
 {
+    gchar *filter_description;
     GtkTreeIter iter;
+
     if (!condition)
 	return;
     if (condition->type == CONDITION_OR
@@ -2019,10 +2025,12 @@ fill_condition_list(GtkTreeModel *model, LibBalsaCondition *condition,
     }
 
     gtk_list_store_prepend(GTK_LIST_STORE(model), &iter);
+    filter_description = libbalsa_condition_to_string_user(condition);
     gtk_list_store_set(GTK_LIST_STORE(model), &iter,
-                       0, _(fe_search_type[condition->type-1].text),
+                       0, filter_description,
                        1, libbalsa_condition_ref(condition),
                        -1);
+    g_free(filter_description);
 }
 
 void

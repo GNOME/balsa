@@ -107,6 +107,7 @@ struct _LibBalsaCondition {
 
 LibBalsaCondition* libbalsa_condition_new_from_string(gchar **string);
 gchar*             libbalsa_condition_to_string(LibBalsaCondition *cond);
+gchar*             libbalsa_condition_to_string_user(LibBalsaCondition *cond);
 
 LibBalsaCondition* libbalsa_condition_new_flag_enum(gboolean negated,
                                                     LibBalsaMessageFlag flgs);

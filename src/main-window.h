@@ -100,7 +100,7 @@ struct _BalsaWindow {
 #if defined(HAVE_LIBNM_GLIB)
     /* NetworkManager state */
     NMState nm_state;
-    gboolean check_mail_skipped;
+    time_t last_check_time;
 #endif                          /* defined(HAVE_LIBNM_GLIB) */
 };
 

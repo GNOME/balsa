@@ -1,5 +1,12 @@
 2011-08-28  Peter Bloomfield
 
+	* src/main-window.c: when network connection is reestablished,
+	check mail if elapsed time since last check exceeds mail check
+	interval.
+	* src/main-window.h: new member last_check_time.
+
+2011-08-28  Peter Bloomfield
+
 	* libbalsa/body.c (libbalsa_message_body_get_pixbuf): check for
 	error before closing loader.
 	* src/balsa-print-object-image.c (balsa_print_object_image): use

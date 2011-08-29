@@ -1031,7 +1031,7 @@ balsa_window_init(BalsaWindow * window)
         g_signal_connect(client, "notify::state",
                          G_CALLBACK(bw_nm_client_state_changed_cb),
                          window);
-        window->check_mail_skipped = FALSE;
+        window->last_check_time = 0;
     } else
         fprintf (stderr, "Could not get NetworkManager client.\n");
 #endif /* LIBNM_GLIB */
@@ -2798,13 +2798,6 @@ bw_show_about_box(GtkAction * action, gpointer user_data)
 static void
 bw_check_mailbox_list(BalsaWindow * window, GList * mailbox_list)
 {
-#if defined(HAVE_LIBNM_GLIB)
-    if (window && window->nm_state != NM_STATE_CONNECTED) {
-        window->check_mail_skipped = TRUE;
-        return;
-    }
-#endif /* LIBNM_GLIB */
-
     for ( ; mailbox_list; mailbox_list = mailbox_list->next) {
         LibBalsaMailbox *mailbox =
             BALSA_MAILBOX_NODE(mailbox_list->data)->mailbox;
@@ -2923,9 +2916,19 @@ ensure_check_mail_dialog(BalsaWindow * window)
 void
 check_new_messages_real(BalsaWindow * window, int type)
 {
-    GSList *list = NULL;
+    GSList *list;
 #ifdef BALSA_USE_THREADS
     struct check_messages_thread_info *info;
+#endif
+
+#if defined(HAVE_LIBNM_GLIB)
+    if (window && window->nm_state != NM_STATE_CONNECTED) {
+        return;
+    }
+#endif /* LIBNM_GLIB */
+
+    list = NULL;
+#ifdef BALSA_USE_THREADS
     /*  Only Run once -- If already checking mail, return.  */
     if (pthread_mutex_trylock(&checking_mail_lock)) {
         fprintf(stderr, "Already Checking Mail!\n");
@@ -2970,6 +2973,8 @@ check_new_messages_real(BalsaWindow * window, int type)
     g_slist_foreach(list, (GFunc) libbalsa_mailbox_check, NULL);
     g_slist_foreach(list, (GFunc) g_object_unref, NULL);
     g_slist_free(list);
+
+    time(&window->last_check_time);
 #endif
 }
 
@@ -3132,6 +3137,7 @@ bw_check_messages_thread(struct check_messages_thread_info *info)
     if (info->window) {
         gdk_threads_enter();
         bw_set_sensitive(info->window, "GetNewMail", TRUE);
+        time(&info->window->last_check_time);
         g_object_unref(info->window);
         gdk_threads_leave();
     }
@@ -3629,10 +3635,15 @@ bw_nm_client_state_changed_cb(GObject * gobject, GParamSpec * pspec,
                                mw_mbox_change_connection_status,
                                GINT_TO_POINTER(is_connected));
 #endif /* BALSA_USE_THREADS */
-        if (is_connected && window->check_mail_skipped) {
+        /* GLib timeouts are now triggered by g_get_monotonic_time(),
+         * which doesn't increment while we're suspended, so we must
+         * check for ourselves whether a scheduled mail check was
+         * missed. */
+        if (is_connected &&
+            difftime(time(NULL), window->last_check_time) >
+            balsa_app.check_mail_timer * 60) {
             /* Check the mail now, and reset the timer */
             check_new_messages_cb(NULL, balsa_app.main_window);
-            window->check_mail_skipped = FALSE;
         }
     }
 }

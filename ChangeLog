@@ -1,3 +1,10 @@
+2011-08-28  Peter Bloomfield
+
+	* libbalsa/body.c (libbalsa_message_body_get_pixbuf): check for
+	error before closing loader.
+	* src/balsa-print-object-image.c (balsa_print_object_image): use
+	g_message instead of g_warning for image format error.
+
 2011-08-26  Peter Bloomfield
 
 	Make BalsaMimeWidgetImage a subclass of BalsaMimeWidget

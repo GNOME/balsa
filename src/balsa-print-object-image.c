@@ -117,7 +117,7 @@ balsa_print_object_image(GList * list, GtkPrintContext *context,
     /* check if we can handle the image */
     pixbuf = libbalsa_message_body_get_pixbuf(body, &err);
     if (err) {
-	g_warning("Error loading image from file: %s", err->message);
+	g_message("Error loading image from file: %s", err->message);
 	g_error_free(err);
     }
 

@@ -664,7 +664,7 @@ libbalsa_message_body_get_pixbuf(LibBalsaMessageBody * body, GError ** err)
             if (!gdk_pixbuf_loader_write(loader, (guchar *) buf, count, err))
                 break;
 
-        if (gdk_pixbuf_loader_close(loader, *err ? NULL : err))
+        if (!*err && gdk_pixbuf_loader_close(loader, err))
             pixbuf = g_object_ref(gdk_pixbuf_loader_get_pixbuf(loader));
 
         g_object_unref(loader);

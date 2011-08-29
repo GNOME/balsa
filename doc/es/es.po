@@ -4,13 +4,14 @@
 # Joaquín Ignacio Aramendía <samsagax@gmail.com>, 2011.
 # 
 # 
+# 
 # Daniel Mustieles <daniel.mustieles@gmail.com>, 2011.# Juan Matías Olmos <colonizare@yahoo.com.ar>, 2011.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa-help.master\n"
-"POT-Creation-Date: 2011-08-22 18:30+0000\n"
-"PO-Revision-Date: 2011-08-25 13:09+0200\n"
+"POT-Creation-Date: 2011-08-25 17:56+0000\n"
+"PO-Revision-Date: 2011-08-29 14:01+0200\n"
 "Last-Translator: Daniel Mustieles <daniel.mustieles@gmail.com>\n"
 "Language-Team: Español <gnome-es-list@gnome.org>\n"
 "MIME-Version: 1.0\n"
@@ -4699,12 +4700,16 @@ msgid ""
 "The file containing the signature to append to all your messages. This can "
 "be generated in one of three ways:"
 msgstr ""
+"El archivo que contiene la firma que se agregará a todos los mensajes. Esta "
+"se puede generar de tres formas:"
 
 #: C/balsa.xml:3936(para)
 msgid ""
 "From a regular file. List the path to any regular file, and the text from "
 "that file will be appended to your messages."
 msgstr ""
+"Desde un archivo normal. Liste la ruta de cualquier archivo normal, y su "
+"texto se agregará a los mensajes."
 
 #: C/balsa.xml:3944(para)
 msgid ""
@@ -4712,6 +4717,10 @@ msgid ""
 "file looks normal, but in reality, it is a pipe to a program that is "
 "generating the content. List the path to the pipe."
 msgstr ""
+"Una tubería con nombre, o FIFO. En este caso, para <application>Balsa</"
+"application>, el archivo parece normal, pero en realidad, es una tubería "
+"hacia un programa que está generando el contenido. Liste la ruta de la "
+"tubería."
 
 #: C/balsa.xml:3952(para)
 msgid ""
@@ -4719,6 +4728,9 @@ msgid ""
 "program and read its output, appending that text to the message. List the "
 "path to the program with a <quote>|</quote> prepended to it. For example:"
 msgstr ""
+"Un programa ejecutable. <application>Balsa</application> ejecutará el "
+"programa y leerá su salida, agregando ese texto al mensaje. Liste la ruta "
+"del programa anteponiendo una barra vertical «|». Por ejemplo:"
 
 #: C/balsa.xml:3958(quote)
 msgid "|/home/user/dynsig.pl"
@@ -4734,6 +4746,10 @@ msgid ""
 "signature to append to outgoing mail. Select this when generating the "
 "signature from an executable program as outlined above in Signature Path."
 msgstr ""
+"Ejecutar las instrucciones en el archivo de firmas y utilizar los resultados "
+"como la firma para agregar al correo saliente. Seleccione esta opción para "
+"generar la firma desde un programa ejecutable como se describe anteriormente "
+"en la ruta de la firma."
 
 #: C/balsa.xml:3977(guilabel)
 msgid "Include Signature"
@@ -4741,11 +4757,11 @@ msgstr "Incluir firma"
 
 #: C/balsa.xml:3979(para)
 msgid "Append the signature to the end of all outgoing mail."
-msgstr ""
+msgstr "Agregar la firma al final de todo el correo saliente."
 
 #: C/balsa.xml:3986(guilabel)
 msgid "Include Signature When Forwarding"
-msgstr "Incluir firma cuando se reenvíe"
+msgstr "Incluir firma al reenviar"
 
 #: C/balsa.xml:3988(para)
 msgid "Add the signature when forwarding an existing mail."
@@ -4757,7 +4773,7 @@ msgstr "Incluir firma cuando se conteste"
 
 #: C/balsa.xml:3997(para)
 msgid "Add the signature when replying to a existing message."
-msgstr ""
+msgstr "Agregar la firma al responder un mensaje existente."
 
 #: C/balsa.xml:4004(guilabel)
 msgid "Add Signature Separator"
@@ -4768,6 +4784,8 @@ msgid ""
 "When checked, this has <application>Balsa</application> insert the standard "
 "signature separator before your signature."
 msgstr ""
+"Cuando está marcada, se indica a <application>Balsa</application> que "
+"inserte el separador de firma estándar antes de la firma."
 
 #: C/balsa.xml:4014(guilabel)
 msgid "Prepend Signature"
@@ -4775,11 +4793,11 @@ msgstr "Anteponer firma"
 
 #: C/balsa.xml:4016(para)
 msgid "Add the signature before the message text, rather than after it."
-msgstr ""
+msgstr "Agrega la firma antes del texto del mensaje, en lugar de después."
 
 #: C/balsa.xml:4023(para)
 msgid "Security settings are on the fourth page:"
-msgstr ""
+msgstr "La configuración de seguridad se encuentra en la cuarta página:"
 
 #: C/balsa.xml:4028(guilabel)
 msgid "Sign messages by default."
@@ -4790,6 +4808,9 @@ msgid ""
 "By default enable the cryptographic signature for every new message. The "
 "default protocol is determined by the <quote>Default protocol</quote> option."
 msgstr ""
+"Activar la firma cifrada para cada mensaje nuevo de manera predeterminada. "
+"El protocolo predeterminado es el establecido en la opción <quote>protocolo "
+"predeterminado</quote>."
 
 #: C/balsa.xml:4039(guilabel)
 msgid "Encrypt messages by default."
@@ -4800,6 +4821,9 @@ msgid ""
 "By default encrypt every new message. The default protocol is determined by "
 "the <quote>Default protocol</quote> option."
 msgstr ""
+"Cifrar cada mensaje nuevo de manera predeterminada. El protocola "
+"predeterminado es el establecido en la opción <quote>protocolo "
+"predeterminado</quote>."
 
 #: C/balsa.xml:4049(guilabel)
 msgid "Default protocol."
@@ -4810,6 +4834,8 @@ msgid ""
 "Choose the default protocol for the cryptographic signature and message "
 "encryption."
 msgstr ""
+"Elegir el protocolo predeterminado para la firma criptográfica y el cifrado "
+"de mensajes."
 
 #: C/balsa.xml:4059(guilabel)
 msgid "Always trust GnuPG keys when encrypting."
@@ -4820,6 +4846,8 @@ msgid ""
 "Do not ask for confirmation when encrypting for a recipient whose GnuPG key "
 "is not fully trusted."
 msgstr ""
+"No pedir confirmación al cifrar para un destinatario cuya clave GnuPG no es "
+"de plena confianza."
 
 #: C/balsa.xml:4069(guilabel)
 msgid "Remind me if messages can be encrypted."
@@ -4830,10 +4858,12 @@ msgid ""
 "Before sending a message, check if valid keys are present for all recipients "
 "and show a dialog in this case."
 msgstr ""
+"Antes de enviar un mensaje, comprobar que estén presentes las claves válidas "
+"para todos los destinatarios y mostrar un cuadro de diálogo en tal caso."
 
 #: C/balsa.xml:4079(guilabel)
 msgid "Use secret key with this id for signing."
-msgstr ""
+msgstr "Usar clave secreta con este identificador para firmar."
 
 #: C/balsa.xml:4081(para)
 msgid ""
@@ -4843,12 +4873,21 @@ msgid ""
 "using a specific secret key for cryptographic signatures, enter the key id "
 "here. You can get the key id by running the command 'gpg --list-secret-keys'."
 msgstr ""
+"Usualmente, <application>Balsa</application> selecciona automáticamente una "
+"clave secreta apropiada para las firmas criptográficas tomando la dirección "
+"de correo de la identidad. Por eso, la mayoría de los usuario podrán dejar "
+"en blanco esta entrada. Si quiere forzar el uso de una clave secreta "
+"específica, escriba aquí el identificador de clave. Se puede obtener el "
+"identificador de clave ejecutando el comando «gpg --list-secret-keys»."
 
 #: C/balsa.xml:4094(para)
 msgid ""
 "These security options are available only if <application>Balsa</"
 "application> is built with <application>GnuPG</application> support."
 msgstr ""
+"Estas opciones de seguridad sólo estarán disponibles si se construyó "
+"<application>Balsa</application> con soporte de <application>GnuPG</"
+"application>."
 
 #: C/balsa.xml:4105(title)
 msgid "The Search Mailbox Window"
@@ -4861,6 +4900,10 @@ msgid ""
 "window allows you to specify the string for which you want to search and "
 "where <application>Balsa</application> should look."
 msgstr ""
+"Se pueden buscar y mostrar mensajes de un buzón que contengan un texto "
+"determinado en las cabeceras «Para», «De», «Asunto», «Cc» o en el cuerpo del "
+"mensaje. Esta ventana permite indicar la cadena de texto que se quiere "
+"buscar y dónde debería buscar <application>Balsa</application>."
 
 #: C/balsa.xml:4117(guilabel)
 msgid "Show only matching messages"
@@ -4875,6 +4918,12 @@ msgid ""
 "<menuchoice><guimenu>Mailbox</guimenu><guimenuitem>Reset Filter</"
 "guimenuitem></menuchoice> to restore the view."
 msgstr ""
+"Si se pulsa el botón <guibutton>Aplicar</guibutton>, la vista del buzón se "
+"filtrará para mostrar solo los mensajes que coincidan con las condiciones. "
+"Si se pulsa el botón <guibutton>Limpiar</guibutton>, se limpiará el filtro, "
+"y la vista del buzón volverá a mostrar todos los mensajes. También se puede "
+"utilizar <menuchoice><guimenu>Buzón</guimenu><guimenuitem>Restablecer "
+"filtro</guimenuitem></menuchoice> para restaurar la vista."
 
 #: C/balsa.xml:4137(guilabel)
 msgid "Open next matching message"
@@ -4890,10 +4939,19 @@ msgid ""
 "keycombo></shortcut><guimenu>Edit</guimenu><guimenuitem>Find Next</"
 "guimenuitem></menuchoice> to step through the matching messages."
 msgstr ""
+"Alternativamente, se puede saltar entre los mensajes coincidentes tanto "
+"hacia adelante como hacia atrás y, opcionalmente, reiniciar la búsqueda si "
+"se llegó al final del buzón. Pulse el botón <guibutton>Aceptar</guibutton> "
+"para ver el primer mensaje coincidente adelante (o atrás) del mensaje "
+"actual. Se puede usar <menuchoice><shortcut><keycombo><keysym>Ctrl</"
+"keysym><keysym>G</keysym></keycombo></shortcut><guimenu>Editar</"
+"guimenu><guimenuitem>Buscar siguiente</guimenuitem></menuchoice> para pasar "
+"a los siguientes mensajes coincidentes."
 
 #: C/balsa.xml:4113(para)
 msgid "You can view the matching messages in two ways: <placeholder-1/>"
 msgstr ""
+"Se pueden ver los mensajes coincidentes de dos formas: <placeholder-1/>"
 
 #: C/balsa.xml:4165(title)
 msgid "The Filters Window"
@@ -5858,7 +5916,7 @@ msgstr ""
 #: C/balsa.xml:0(None)
 msgid "translator-credits"
 msgstr ""
-"Juan Matías Olmos «colonizare@yahoo.com.ar», 2011\n"
+"Juan Matías Olmos <colonizare@yahoo.com.ar>, 2011\n"
 "Daniel Mustieles <daniel.mustieles@gmail.com>, 2011\n"
 "Joaquín Ignacio Aramendía <samsagax@gmail.com>, 2011\n"
 "Jorge González <jorgegonz@svn.gnome.org>, 2008"

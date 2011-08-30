@@ -1,3 +1,8 @@
+2011-08-30  Peter Bloomfield
+
+	* configure.in: webkit can be used with threads disabled if glib
+	version is 2.24 or later.
+
 2011-08-29  Pawel Salek
 
 	* libbalsa/filter-funcs.c: implement libbalsa_condition_to_string_user

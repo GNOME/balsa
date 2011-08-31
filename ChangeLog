@@ -1,3 +1,8 @@
+2011-08-31  Peter Bloomfield
+
+	* libbalsa/misc.c (libbalsa_text_attr_file): use GFile methods.
+	* src/sendmsg-window.c (sw_set_charset): check for error return.
+
 2011-08-30  Peter Bloomfield
 
 	* src/main-window.c: call gtk_container_resize_children after

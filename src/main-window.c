@@ -2413,6 +2413,9 @@ bw_real_open_mbnode(BalsaWindow *window, BalsaMailboxNode * mbnode,
                                         scroll, label);
     gtk_notebook_set_tab_reorderable(GTK_NOTEBOOK(window->notebook),
                                      scroll, TRUE);
+    /* This seems to be necessary to avoid critical messages when the
+     * notebook is first drawn: */
+    gtk_container_resize_children(GTK_CONTAINER(window->notebook));
 
     if (set_current)
         /* change the page to the newly selected notebook item */

@@ -1,3 +1,8 @@
+2011-08-31  Peter Bloomfield
+
+	* libbalsa/misc.c (libbalsa_text_attr_file): use GFile methods.
+	* src/sendmsg-window.c (sw_set_charset): check for error return.
+
 2011-08-29  Pawel Salek
 
 	* libbalsa/filter-funcs.c: implement libbalsa_condition_to_string_user

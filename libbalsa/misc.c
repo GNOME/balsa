@@ -1,23 +1,21 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2003 Stuart Parmenter and others,
+ * Copyright (C) 1997-2011 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option) 
+ * the Free Software Foundation; either version 2, or (at your option)
  * any later version.
- *  
+ *
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *  
+ *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  
- * 02111-1307, USA.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* The routines that go here should depend only on common libraries - so that
@@ -744,12 +742,16 @@ libbalsa_text_attr_string(const gchar * string)
     return attr;
 }
 
-/* Return text attributes of the contents of a file. */
+/* Return text attributes of the contents of a file;
+ * filename is in URI form;
+ * returns -1 on error. */
 LibBalsaTextAttribute
 libbalsa_text_attr_file(const gchar * filename)
 {
+    GFile *file;
+    GFileInputStream *stream;
+    gssize bytes;
     LibBalsaTextAttribute attr;
-    FILE *fp;
     gchar buf[80];
     gchar *new_chars = buf;
     gboolean has_esc = FALSE;
@@ -757,15 +759,22 @@ libbalsa_text_attr_file(const gchar * filename)
     gboolean has_hi_ctrl = FALSE;
     gboolean is_utf8 = TRUE;
 
-    fp = fopen(filename, "r");
-    if (!fp)
-        return 0;
+    file = g_file_new_for_uri(filename);
+    stream = g_file_read(file, NULL, NULL);
+    g_object_unref(file);
+    if (!stream)
+        return -1;
 
-    while (fgets(new_chars, (sizeof buf) - (new_chars - buf), fp)) {
-	gboolean test_bits = !has_esc || !has_hi_bit || !has_hi_ctrl;
+    while ((bytes = g_input_stream_read(G_INPUT_STREAM(stream), new_chars,
+                               (sizeof buf) - (new_chars - buf), NULL,
+                               NULL)) > 0) {
+	gboolean test_bits;
 
+	test_bits = !has_esc || !has_hi_bit || !has_hi_ctrl;
 	if (!test_bits && !is_utf8)
 	    break;
+
+        new_chars[bytes] = 0;
 
         if (test_bits)
             lb_text_attr(new_chars, &has_esc, &has_hi_bit, &has_hi_ctrl);
@@ -786,7 +795,10 @@ libbalsa_text_attr_file(const gchar * filename)
         }
     }
 
-    fclose(fp);
+    g_object_unref(stream);
+
+    if (bytes < 0)
+        return -1;
 
     attr = 0;
     if (has_esc)

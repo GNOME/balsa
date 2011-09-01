@@ -1,3 +1,10 @@
+2011-09-01  Peter Bloomfield
+
+	* libbalsa/misc.c (lb_text_attr): add gssize len argument;
+	(libbalsa_text_attr_string): pass -1;
+	(libbalsa_text_attr_file): pass len; avoid stack buffer
+	overflow.
+
 2011-08-31  Peter Bloomfield
 
 	* libbalsa/misc.c (libbalsa_text_attr_file): use GFile methods.

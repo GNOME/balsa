@@ -701,10 +701,13 @@ libbalsa_charset_button_new(void)
 
 /* Helper */
 static void
-lb_text_attr(const gchar * text, gboolean * has_esc, gboolean * has_hi_bit,
-             gboolean * has_hi_ctrl)
+lb_text_attr(const gchar * text, gssize len, gboolean * has_esc,
+             gboolean * has_hi_bit, gboolean * has_hi_ctrl)
 {
-    for (; *text; text++) {
+    if (len < 0)
+        len = strlen(text);
+
+    for (; --len >= 0; text++) {
 	guchar c = *text;
         if (c == 0x1b)
             *has_esc = TRUE;
@@ -726,7 +729,7 @@ libbalsa_text_attr_string(const gchar * string)
     gboolean has_hi_ctrl = FALSE;
     gboolean is_utf8 = TRUE;
 
-    lb_text_attr(string, &has_esc, &has_hi_bit, &has_hi_ctrl);
+    lb_text_attr(string, -1, &has_esc, &has_hi_bit, &has_hi_ctrl);
     is_utf8 = g_utf8_validate(string, -1, NULL);
 
     attr = 0;
@@ -774,23 +777,25 @@ libbalsa_text_attr_file(const gchar * filename)
 	if (!test_bits && !is_utf8)
 	    break;
 
-        new_chars[bytes] = 0;
-
         if (test_bits)
-            lb_text_attr(new_chars, &has_esc, &has_hi_bit, &has_hi_ctrl);
+            lb_text_attr(new_chars, bytes, &has_esc, &has_hi_bit,
+                         &has_hi_ctrl);
 
         if (is_utf8) {
             const gchar *end;
 
+            bytes += new_chars - buf;
             new_chars = buf;
-            if (!g_utf8_validate(buf, -1, &end)) {
-                if (g_utf8_get_char_validated(end, -1) == (gunichar) (-1))
+            if (!g_utf8_validate(buf, bytes, &end)) {
+                bytes -= (end - buf);
+                if (g_utf8_get_char_validated(end, bytes) ==
+                    (gunichar) (-1)) {
                     is_utf8 = FALSE;
-                else
-                    /* copy any remaining bytes, including the
-                     * terminating '\0', to start of buffer */
-                    while ((*new_chars = *end++) != '\0')
-                        new_chars++;
+                } else {
+                    /* copy remaining bytes to start of buffer */
+                    memmove(buf, end, bytes);
+                    new_chars += bytes;
+                }
             }
         }
     }

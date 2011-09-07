@@ -1868,10 +1868,8 @@ bmbl_mru_show_tree(GtkWidget * widget, gpointer data)
     gtk_widget_get_preferred_size(mblist, NULL, &req);
     /* FIXME: Magic numbers to avoid showing scrollbars;
      * probably theme-dependent: */
-    req.width += 25;
-    req.height += 50;
-    if (req.height > balsa_app.mw_height)
-        req.height = balsa_app.mw_height;
+    req.width = MIN(req.width + 25, balsa_app.mblist_width);
+    req.height = MIN(req.height + 50, balsa_app.mw_height);
     gtk_window_set_default_size(GTK_WINDOW(dialog), req.width, req.height);
 
     gtk_dialog_run(GTK_DIALOG(dialog));

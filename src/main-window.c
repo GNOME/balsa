@@ -2413,8 +2413,10 @@ bw_real_open_mbnode(BalsaWindow *window, BalsaMailboxNode * mbnode,
                                         scroll, label);
     gtk_notebook_set_tab_reorderable(GTK_NOTEBOOK(window->notebook),
                                      scroll, TRUE);
-    /* This seems to be necessary to avoid critical messages when the
-     * notebook is first drawn: */
+    /* This seems to be necessary to avoid critical messages when a new
+     * page is added; see
+     * https://bugzilla.gnome.org/show_bug.cgi?id=658513
+     */
     gtk_container_resize_children(GTK_CONTAINER(window->notebook));
 
     if (set_current)
@@ -4954,6 +4956,24 @@ bw_size_allocate_cb(GtkWidget * window, GtkAllocation * alloc)
     }
 }
 
+static gboolean
+bw_view_filter_idle(BalsaWindow * window)
+{
+    BalsaIndex *index;
+    LibBalsaMailbox *mailbox;
+    LibBalsaCondition *view_filter;
+
+    index = (BalsaIndex *) window->current_index;
+    mailbox = index->mailbox_node->mailbox;
+    view_filter = bw_get_flag_filter(window);
+    libbalsa_mailbox_set_view_filter(mailbox, view_filter, FALSE);
+    libbalsa_condition_unref(view_filter);
+    libbalsa_mailbox_make_view_filter_persistent(mailbox);
+    g_object_unref(window);
+
+    return FALSE;
+}
+
 /* When page is switched we change the preview window and the selected
    mailbox in the mailbox tree.
  */
@@ -5009,12 +5029,12 @@ bw_notebook_switch_page_cb(GtkWidget * notebook,
     bw_enable_mailbox_menus(window, index);
 
     if (!mailbox->view_filter) {
-        /* bw_enable_mailbox_menus has now set the hide-states for this
-         * mailbox, so we can set up the view-filter: */
-        LibBalsaCondition *view_filter = bw_get_flag_filter(window);
-        libbalsa_mailbox_set_view_filter(mailbox, view_filter, FALSE);
-        libbalsa_condition_unref(view_filter);
-        libbalsa_mailbox_make_view_filter_persistent(mailbox);
+        /* Set the view filter in an idle callback; it locks the
+         * mailbox, which means temporarily dropping the gdk lock, and
+         * if we do that in the signal handler it can lead to reentrant
+         * gtk_widget_get_width, which is frowned upon. */
+        gdk_threads_add_idle((GSourceFunc) bw_view_filter_idle,
+                              g_object_ref(window));
     }
 
     gtk_entry_set_text(GTK_ENTRY(window->sos_entry),

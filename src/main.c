@@ -74,6 +74,7 @@
 pthread_t get_mail_thread;
 pthread_t send_mail;
 pthread_mutex_t send_messages_lock;
+int checking_mail;
 int mail_thread_pipes[2];
 int send_thread_pipes[2];
 GIOChannel *mail_thread_msg_send;
@@ -979,7 +980,8 @@ balsa_cleanup(void)
        There are actually many things to do, e.g. threads should not
        be started after this point.
     */
-    if (pthread_mutex_trylock(&checking_mail_lock)) {
+    pthread_mutex_lock(&checking_mail_lock);
+    if(checking_mail) {
         /* We want to quit but there is a checking thread active.
            The alternatives are to:
            a. wait for the checking thread to finish - but it could be
@@ -989,8 +991,8 @@ balsa_cleanup(void)
         pthread_cancel(get_mail_thread);
         printf("Mail check thread cancelled. I know it is rough.\n");
         sleep(1);
-    } else
-        pthread_mutex_unlock(&checking_mail_lock);
+    }
+    pthread_mutex_unlock(&checking_mail_lock);
 #endif
     balsa_app_destroy();
     g_hash_table_destroy(libbalsa_mailbox_view_table);

@@ -343,7 +343,11 @@ draw_page(GtkPrintOperation * operation, GtkPrintContext * context,
     /* emit a warning if we try to print a non-existing page */
     if (page_nr >= print_data->setup.page_count) {
 	balsa_information(LIBBALSA_INFORMATION_WARNING,
-			  _("Cannot print page %d because the document has only %d pages."),
+			  ngettext("Cannot print page %d because "
+                                   "the document has only %d page.",
+			           "Cannot print page %d because "
+                                   "the document has only %d pages.",
+                                   print_data->setup.page_count),
 			  page_nr + 1, print_data->setup.page_count);
 	return;
     }

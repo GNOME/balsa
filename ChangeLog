@@ -1,3 +1,8 @@
+2011-09-18  Peter Bloomfield
+
+	* src/print-gtk.c (draw_page): use ngettext for plural; fixes
+	bgo #659390.
+
 2011-09-09  Peter Bloomfield  <peter@t43.bellsouth.net>
 
 	* src/main-window.c: use checking_mail_lock to protect access to

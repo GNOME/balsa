@@ -402,7 +402,11 @@ case "$use_html_widget" in
         if test x"$use_threads" = xno ; then
             AC_MSG_ERROR([WebKit cannot be used with threads disabled.])
         fi
-        PKG_CHECK_MODULES(HTML, [webkit-1.0])
+        if $PKG_CONFIG --atleast-version=1.5.1 webkit-1.0; then
+            PKG_CHECK_MODULES(HTML, [webkit-1.0 javascriptcoregtk-1.0])
+        else
+            PKG_CHECK_MODULES(HTML, [webkit-1.0])
+        fi
         AC_DEFINE(HAVE_WEBKIT,1,[Defined when WebKit can be used.])
     ;;
     no)

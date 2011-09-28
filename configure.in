@@ -404,7 +404,11 @@ case "$use_html_widget" in
                 AC_MSG_ERROR([WebKit cannot be used with threads disabled and glib older than version 2.24.])
             fi
         fi
-        PKG_CHECK_MODULES(HTML, [webkitgtk-3.0])
+        if $PKG_CONFIG --atleast-version=1.5.1 webkitgtk-3.0 ; then
+            PKG_CHECK_MODULES(HTML, [webkitgtk-3.0 javascriptcoregtk-3.0])
+        else
+            PKG_CHECK_MODULES(HTML, [webkitgtk-3.0])
+        fi
         AC_DEFINE(HAVE_WEBKIT,1,[Defined when WebKit can be used.])
     ;;
     no)

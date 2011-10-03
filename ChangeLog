@@ -1,3 +1,9 @@
+2011-10-03  Peter Bloomfield
+
+	* src/pref-manager.c (remote_mailbox_servers_group),
+	(address_books_group), (address_book_add_cb), (server_add_cb),
+	(server_add_menu_widget): do not leak menus.
+
 2011-10-02  Peter Bloomfield
 
 	* src/pref-manager.c (address_book_add_cb), (server_add_cb): do

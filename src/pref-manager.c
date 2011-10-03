@@ -343,7 +343,7 @@ static void properties_modified_cb(GtkWidget * widget, GtkWidget * pbox);
 
 static void server_edit_cb(GtkTreeView * tree_view);
 static void pop3_add_cb(void);
-static void server_add_cb(void);
+static void server_add_cb(GtkWidget * menu);
 static void server_del_cb(GtkTreeView * tree_view);
 
 #if ENABLE_ESMTP
@@ -355,7 +355,7 @@ static void smtp_server_changed (GtkTreeSelection * selection,
 #endif                          /* ENABLE_ESMTP */
 
 static void address_book_edit_cb(GtkTreeView * tree_view);
-static void address_book_add_cb(void);
+static void address_book_add_cb(GtkWidget * menu);
 static void address_book_delete_cb(GtkTreeView * tree_view);
 static void address_book_set_default_cb(GtkTreeView * tree_view);
 static void timer_modified_cb(GtkWidget * widget, GtkWidget * pbox);
@@ -1603,6 +1603,8 @@ mailserver_subpage()
     return page;
 }
 
+static GtkWidget * server_add_menu_widget(void);
+
 static GtkWidget *
 remote_mailbox_servers_group(GtkWidget * page)
 {
@@ -1614,6 +1616,7 @@ remote_mailbox_servers_group(GtkWidget * page)
     GtkListStore *store;
     GtkCellRenderer *renderer;
     GtkTreeViewColumn *column;
+    GtkWidget *server_add_menu;
 
     group = pm_group_new(_("Remote mailbox servers"));
     hbox = gtk_hbox_new(FALSE, COL_SPACING);
@@ -1656,8 +1659,14 @@ remote_mailbox_servers_group(GtkWidget * page)
                      G_CALLBACK(server_edit_cb), NULL);
 
     vbox = vbox_in_container(hbox);
+
+    server_add_menu = server_add_menu_widget();
+    g_object_weak_ref(G_OBJECT(vbox), (GWeakNotify) g_object_unref,
+                      server_add_menu);
+    g_object_ref_sink(server_add_menu);
     add_button_to_box(_("_Add"), G_CALLBACK(server_add_cb),
-                      NULL, vbox);
+                      server_add_menu, vbox);
+
     add_button_to_box(_("_Modify"), G_CALLBACK(server_edit_cb),
                       tree_view, vbox);
     add_button_to_box(_("_Delete"), G_CALLBACK(server_del_cb),
@@ -2760,6 +2769,9 @@ create_address_book_page(GtkTreeStore * store)
     return page;
 }
 
+static void address_book_change(LibBalsaAddressBook * address_book,
+                                gboolean append);
+
 static GtkWidget *
 address_books_group(GtkWidget * page)
 {
@@ -2771,6 +2783,7 @@ address_books_group(GtkWidget * page)
     GtkWidget *hbox;
     GtkWidget *scrolledwindow;
     GtkWidget *vbox;
+    GtkWidget *address_book_add_menu;
 
     group = pm_group_new(_("Address books"));
     hbox = gtk_hbox_new(FALSE, COL_SPACING);
@@ -2825,13 +2838,21 @@ address_books_group(GtkWidget * page)
     gtk_container_add(GTK_CONTAINER(scrolledwindow), tree_view);
 
     vbox = vbox_in_container(hbox);
+
+    address_book_add_menu =
+        balsa_address_book_add_menu(address_book_change,
+                                    GTK_WINDOW(property_box));
+    g_object_weak_ref(G_OBJECT(vbox), (GWeakNotify) g_object_unref,
+                      address_book_add_menu);
+    g_object_ref_sink(address_book_add_menu);
     add_button_to_box(_("_Add"),
                       G_CALLBACK(address_book_add_cb),
-                      NULL, vbox);
+                      address_book_add_menu, vbox);
+
     add_button_to_box(_("_Modify"),
                       G_CALLBACK(address_book_edit_cb),
                       tree_view, vbox);
-    add_button_to_box(_("_Delete"),         
+    add_button_to_box(_("_Delete"),
                       G_CALLBACK(address_book_delete_cb),
                       tree_view, vbox);
     add_button_to_box(_("_Set as default"), 
@@ -3086,13 +3107,8 @@ address_book_set_default_cb(GtkTreeView * tree_view)
 }
 
 static void
-address_book_add_cb(void)
+address_book_add_cb(GtkWidget * menu)
 {
-
-    GtkWidget *menu =
-        balsa_address_book_add_menu(address_book_change,
-                                    GTK_WINDOW(property_box));
-
     gtk_widget_show_all(menu);
     gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL, 0,
                    gtk_get_current_event_time());
@@ -3132,7 +3148,15 @@ pop3_add_cb(void)
 }
 
 static void
-server_add_cb(void)
+server_add_cb(GtkWidget * menu)
+{
+    gtk_widget_show_all(menu);
+    gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL, 0,
+                   gtk_get_current_event_time());
+}
+
+static GtkWidget *
+server_add_menu_widget(void)
 {
     GtkWidget *menu;
     GtkWidget *menuitem;
@@ -3142,19 +3166,16 @@ server_add_cb(void)
     g_signal_connect(G_OBJECT(menuitem), "activate",
                      G_CALLBACK(pop3_add_cb), NULL);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
-    gtk_widget_show(menuitem);
     menuitem = gtk_menu_item_new_with_label(_("Remote IMAP mailbox..."));
     g_signal_connect(G_OBJECT(menuitem), "activate",
 		     G_CALLBACK(mailbox_conf_add_imap_cb), NULL);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
-    gtk_widget_show(menuitem);
     menuitem = gtk_menu_item_new_with_label(_("Remote IMAP folder..."));
     g_signal_connect(G_OBJECT(menuitem), "activate",
 		     G_CALLBACK(folder_conf_add_imap_cb), NULL);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
-    gtk_widget_show(menuitem);
-    gtk_widget_show(menu);
-    gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL, 0, 0);
+
+    return menu;
 }
 
 static void

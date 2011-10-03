@@ -2121,7 +2121,7 @@ config_defclient_save(void)
     info = g_desktop_app_info_new("balsa.desktop");
     if (!info) {
         g_warning("Failed to create default application for Balsa "
-                  "for \"mailto\": %s", err->message);
+                  "for \"mailto\"");
         return;
     }
 

@@ -1,3 +1,8 @@
+2011-10-02  Peter Bloomfield
+
+	* src/save-restore.c (config_defclient_save): do not use
+	uninitialized GError.
+
 2011-09-28  Peter Bloomfield
 
 	* configure.in: check for javascriptcoregtk with recent webkit;

@@ -3094,9 +3094,8 @@ address_book_add_cb(void)
                                     GTK_WINDOW(property_box));
 
     gtk_widget_show_all(menu);
-    g_object_ref_sink(menu);
-    gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL, 0, 0);
-    g_object_unref(menu);
+    gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL, 0,
+                   gtk_get_current_event_time());
 }
 
 static void
@@ -3155,9 +3154,7 @@ server_add_cb(void)
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
     gtk_widget_show(menuitem);
     gtk_widget_show(menu);
-    g_object_ref_sink(menu);
     gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL, 0, 0);
-    g_object_unref(menu);
 }
 
 static void

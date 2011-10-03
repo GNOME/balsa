@@ -1,5 +1,10 @@
 2011-10-02  Peter Bloomfield
 
+	* src/pref-manager.c (address_book_add_cb), (server_add_cb): do
+	not ref-sink and unref popup menus.
+
+2011-10-02  Peter Bloomfield
+
 	* src/save-restore.c (config_defclient_save): do not use
 	uninitialized GError.
 

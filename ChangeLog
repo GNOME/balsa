@@ -1,5 +1,13 @@
 2011-10-03  Peter Bloomfield
 
+	* libbalsa/misc.c (libbalsa_create_grid),
+	(libbalsa_create_grid_label), (libbalsa_create_grid_check),
+	(libbalsa_create_grid_entry), (lb_create_size_group_func):
+	new GtkGrid helpers.
+	* libbalsa/misc.h: export them.
+
+2011-10-03  Peter Bloomfield
+
 	* src/pref-manager.c (remote_mailbox_servers_group),
 	(address_books_group), (address_book_add_cb), (server_add_cb),
 	(server_add_menu_widget): do not leak menus.

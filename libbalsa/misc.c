@@ -1105,6 +1105,19 @@ libbalsa_create_table(guint rows, guint columns)
     return table;
 }
 
+GtkWidget *
+libbalsa_create_grid(void)
+{
+    GtkWidget *grid;
+
+    grid = gtk_grid_new();
+
+    gtk_grid_set_row_spacing(GTK_GRID(grid), LB_PADDING);
+    gtk_grid_set_column_spacing(GTK_GRID(grid), LB_PADDING);
+
+    return grid;
+}
+
 /* create_label:
    Create a label and add it to a table in the first column of given row,
    setting the keyval to found accelerator value, that can be later used 
@@ -1123,6 +1136,20 @@ libbalsa_create_label(const gchar * text, GtkWidget * table, gint row)
     return label;
 }
 
+GtkWidget *
+libbalsa_create_grid_label(const gchar * text, GtkWidget * grid, gint row)
+{
+    GtkWidget *label;
+
+    label = gtk_label_new_with_mnemonic(text);
+    gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
+    gtk_widget_set_halign(label, GTK_ALIGN_START);
+
+    gtk_grid_attach(GTK_GRID(grid), label, 0, row, 1, 1);
+
+    return label;
+}
+
 /* create_check:
    creates a checkbox with a given label and places them in given array.
 */
@@ -1136,6 +1163,23 @@ libbalsa_create_check(const gchar * text, GtkWidget * table, gint row,
 
     gtk_table_attach(GTK_TABLE(table), check_button, 0, 2, row, row + 1,
                      GTK_FILL, 0, 0, 0);
+
+    if (initval)
+        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button),
+                                     TRUE);
+
+    return check_button;
+}
+
+GtkWidget *
+libbalsa_create_grid_check(const gchar * text, GtkWidget * grid, gint row,
+                           gboolean initval)
+{
+    GtkWidget *check_button;
+
+    check_button = gtk_check_button_new_with_mnemonic(text);
+
+    gtk_grid_attach(GTK_GRID(grid), check_button, 0, row, 2, 1);
 
     if (initval)
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button),
@@ -1169,13 +1213,38 @@ libbalsa_create_entry(GtkWidget * table, GCallback changed_func,
     return entry;
 }
 
-/* Create a GtkSizeGroup and add to it any GtkLabel packed in a GtkTable
+GtkWidget *
+libbalsa_create_grid_entry(GtkWidget * grid, GCallback changed_func,
+                           gpointer data, gint row, const gchar * initval,
+                           GtkWidget * hotlabel)
+{
+    GtkWidget *entry;
+
+    entry = gtk_entry_new();
+
+    gtk_grid_attach(GTK_GRID(grid), entry, 1, row, 1, 1);
+
+    if (initval)
+        gtk_entry_set_text(GTK_ENTRY(entry), initval);
+
+    gtk_label_set_mnemonic_widget(GTK_LABEL(hotlabel), entry);
+
+    /* Watch for changes... */
+    if (changed_func)
+        g_signal_connect(entry, "changed", changed_func, data);
+
+    return entry;
+}
+
+/* Create a GtkSizeGroup and add to it any GtkLabel packed in a GtkGrid
  * inside the chooser widget; size_group will be unreffed when the
  * chooser widget is finalized. */
 static void
 lb_create_size_group_func(GtkWidget * widget, gpointer data)
 {
-    if (GTK_IS_LABEL(widget) && GTK_IS_TABLE(gtk_widget_get_parent(widget)))
+    if (GTK_IS_LABEL(widget) &&
+        (GTK_IS_TABLE(gtk_widget_get_parent(widget)) ||
+         GTK_IS_GRID(gtk_widget_get_parent(widget))))
         gtk_size_group_add_widget(GTK_SIZE_GROUP(data), widget);
     else if (GTK_IS_CONTAINER(widget))
         gtk_container_foreach(GTK_CONTAINER(widget),

@@ -1,5 +1,10 @@
 2011-10-03  Peter Bloomfield
 
+	* libbalsa/address.c (libbalsa_address_get_edit_widget): migrate
+	from GtkTable to GtkGrid.
+
+2011-10-03  Peter Bloomfield
+
 	* libbalsa/misc.c (libbalsa_create_grid),
 	(libbalsa_create_grid_label), (libbalsa_create_grid_check),
 	(libbalsa_create_grid_entry), (lb_create_size_group_func):

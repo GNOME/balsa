@@ -956,14 +956,14 @@ libbalsa_address_get_edit_widget(const LibBalsaAddress *address,
         N_("_Email Address:")
     };
 
-    GtkWidget *table, *label, *lhs;
+    GtkWidget *grid, *label, *lhs;
     gint cnt;
 
-    table = gtk_table_new(NUM_FIELDS, 2, FALSE);
+    grid = gtk_grid_new();
 #define HIG_PADDING 6
-    gtk_table_set_row_spacings(GTK_TABLE(table), HIG_PADDING);
-    gtk_table_set_col_spacings(GTK_TABLE(table), HIG_PADDING);
-    gtk_container_set_border_width(GTK_CONTAINER(table), HIG_PADDING);
+    gtk_grid_set_row_spacing(GTK_GRID(grid), HIG_PADDING);
+    gtk_grid_set_column_spacing(GTK_GRID(grid), HIG_PADDING);
+    gtk_container_set_border_width(GTK_CONTAINER(grid), HIG_PADDING);
 
     for (cnt = 0; cnt < NUM_FIELDS; cnt++) {
         if (!labels[cnt])
@@ -999,14 +999,13 @@ libbalsa_address_get_edit_widget(const LibBalsaAddress *address,
         }
 	gtk_label_set_mnemonic_widget(GTK_LABEL(label), entries[cnt]);
 
-	gtk_table_attach(GTK_TABLE(table), lhs, 0, 1, cnt + 1, cnt + 2,
-			 GTK_FILL, GTK_FILL, 4, 4);
+	gtk_grid_attach(GTK_GRID(grid), lhs, 0, cnt + 1, 1, 1);
 
 	gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
 
-	gtk_table_attach(GTK_TABLE(table), entries[cnt], 1, 2, cnt + 1,
-			 cnt + 2, GTK_FILL | GTK_EXPAND,
-			 GTK_FILL | GTK_EXPAND, 2, 2);
+        gtk_widget_set_hexpand(entries[cnt], TRUE);
+        gtk_widget_set_vexpand(entries[cnt], TRUE);
+	gtk_grid_attach(GTK_GRID(grid), entries[cnt], 1, cnt + 1, 1, 1);
     }
     g_signal_connect(entries[FIRST_NAME], "changed",
                      G_CALLBACK(lba_entry_changed), entries);
@@ -1025,7 +1024,7 @@ libbalsa_address_get_edit_widget(const LibBalsaAddress *address,
         g_signal_connect_swapped(G_OBJECT(model), "row-deleted",
                                  changed_cb, changed_data);
     }
-    return table;
+    return grid;
 }
 
 LibBalsaAddress *

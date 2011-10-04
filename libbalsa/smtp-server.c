@@ -364,12 +364,11 @@ smtp_server_weak_notify(struct smtp_server_dialog_info *sdi, GObject *dialog)
 }
 
 static void
-smtp_server_add_widget(GtkWidget * table, gint row, const gchar * text,
+smtp_server_add_widget(GtkWidget * grid, gint row, const gchar * text,
                        GtkWidget * widget)
 {
-    GtkWidget *label = libbalsa_create_label(text, table, row);
-    gtk_table_attach_defaults(GTK_TABLE(table), widget,
-                              1, 2, row, row + 1);
+    GtkWidget *label = libbalsa_create_grid_label(text, grid, row);
+    gtk_grid_attach(GTK_GRID(grid), widget, 1, row, 1, 1);
     gtk_label_set_mnemonic_widget(GTK_LABEL(label), widget);
 }
 
@@ -515,7 +514,7 @@ libbalsa_smtp_server_dialog(LibBalsaSmtpServer * smtp_server,
     LibBalsaServer *server = LIBBALSA_SERVER(smtp_server);
     struct smtp_server_dialog_info *sdi;
     GtkWidget *dialog;
-    GtkWidget *table;
+    GtkWidget *grid;
     gint row;
     GtkWidget *label, *hbox;
 
@@ -556,35 +555,35 @@ libbalsa_smtp_server_dialog(LibBalsaSmtpServer * smtp_server,
                                       FALSE);
 
 #define HIG_PADDING 12
-    table = libbalsa_create_table(6, 2);
-    gtk_container_set_border_width(GTK_CONTAINER(table), HIG_PADDING);
+    grid = libbalsa_create_grid();
+    gtk_container_set_border_width(GTK_CONTAINER(grid), HIG_PADDING);
     gtk_container_add(GTK_CONTAINER
                       (gtk_dialog_get_content_area(GTK_DIALOG(dialog))),
-                      table);
+                      grid);
 
     row = 0;
-    smtp_server_add_widget(table, row, _("_Descriptive Name:"),
+    smtp_server_add_widget(grid, row, _("_Descriptive Name:"),
                            sdi->name = gtk_entry_new());
     if (smtp_server->name)
         gtk_entry_set_text(GTK_ENTRY(sdi->name), smtp_server->name);
     g_signal_connect(sdi->name, "changed", G_CALLBACK(smtp_server_changed),
                      sdi);
 
-    smtp_server_add_widget(table, ++row, _("_Server:"),
+    smtp_server_add_widget(grid, ++row, _("_Server:"),
                            sdi->host = gtk_entry_new());
     if (server->host)
         gtk_entry_set_text(GTK_ENTRY(sdi->host), server->host);
     g_signal_connect(sdi->host, "changed", G_CALLBACK(smtp_server_changed),
                      sdi);
 
-    smtp_server_add_widget(table, ++row, _("_User Name:"),
+    smtp_server_add_widget(grid, ++row, _("_User Name:"),
                            sdi->user = gtk_entry_new());
     if (server->user)
         gtk_entry_set_text(GTK_ENTRY(sdi->user), server->user);
     g_signal_connect(sdi->user, "changed", G_CALLBACK(smtp_server_changed),
                      sdi);
 
-    smtp_server_add_widget(table, ++row, _("_Pass Phrase:"),
+    smtp_server_add_widget(grid, ++row, _("_Pass Phrase:"),
                            sdi->pass = gtk_entry_new());
     gtk_entry_set_visibility(GTK_ENTRY(sdi->pass), FALSE);
     if (server->passwd)
@@ -593,12 +592,12 @@ libbalsa_smtp_server_dialog(LibBalsaSmtpServer * smtp_server,
                      sdi);
 
 #if HAVE_SMTP_TLS_CLIENT_CERTIFICATE
-    smtp_server_add_widget(table, ++row, _("Use _TLS:"), sdi->tlsm =
+    smtp_server_add_widget(grid, ++row, _("Use _TLS:"), sdi->tlsm =
                            smtp_server_tls_widget(smtp_server));
     g_signal_connect(sdi->tlsm, "changed", G_CALLBACK(smtp_server_changed),
                      sdi);
 
-    smtp_server_add_widget(table, ++row, _("C_ertificate Pass Phrase:"),
+    smtp_server_add_widget(grid, ++row, _("C_ertificate Pass Phrase:"),
                            sdi->cert = gtk_entry_new());
     gtk_entry_set_visibility(GTK_ENTRY(sdi->cert), FALSE);
     if (smtp_server->cert_passphrase)
@@ -611,8 +610,7 @@ libbalsa_smtp_server_dialog(LibBalsaSmtpServer * smtp_server,
     ++row;
     sdi->split_button =
         gtk_check_button_new_with_mnemonic(_("Sp_lit message larger than"));
-    gtk_table_attach_defaults(GTK_TABLE(table), sdi->split_button,
-                              0, 1, row, row + 1);
+    gtk_grid_attach(GTK_GRID(grid), sdi->split_button, 0, row, 1, 1);
     hbox = gtk_hbox_new(FALSE, 6);
     sdi->big_message = gtk_spin_button_new_with_range(0.1, 100, 0.1);
     gtk_box_pack_start(GTK_BOX(hbox), sdi->big_message, TRUE, TRUE, 0);
@@ -635,7 +633,7 @@ libbalsa_smtp_server_dialog(LibBalsaSmtpServer * smtp_server,
                      G_CALLBACK(smtp_server_split_button_changed), sdi);
     g_signal_connect(sdi->big_message, "changed",
                      G_CALLBACK(smtp_server_changed), sdi);
-    gtk_table_attach_defaults(GTK_TABLE(table), hbox, 1, 2, row, row + 1);
+    gtk_grid_attach(GTK_GRID(grid), hbox, 1, row, 1, 1);
 
     gtk_widget_show_all(dialog);
 }

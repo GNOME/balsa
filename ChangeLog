@@ -1,5 +1,10 @@
 2011-10-03  Peter Bloomfield
 
+	* libbalsa/smtp-server.c (smtp_server_add_widget),
+	(libbalsa_smtp_server_dialog): migrate from GtkTable to GtkGrid.
+
+2011-10-03  Peter Bloomfield
+
 	* libbalsa/identity.c (append_ident_notebook_page),
 	(setup_ident_frame), (ident_dialog_add_checkbutton),
 	(ident_dialog_add_check_and_entry), (ident_dialog_add_entry),

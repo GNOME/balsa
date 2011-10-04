@@ -603,12 +603,12 @@ typedef enum LibBalsaIdentityPathType_ {
     LBI_PATH_TYPE_FACE,
     LBI_PATH_TYPE_XFACE
 } LibBalsaIdentityPathType;
-static void ident_dialog_add_file_chooser_button(GtkWidget * table,
+static void ident_dialog_add_file_chooser_button(GtkWidget * grid,
                                                  gint row,
                                                  GtkDialog * dialog,
                                                  LibBalsaIdentityPathType
                                                  type);
-static void ident_dialog_add_boxes(GtkWidget * table, gint row,
+static void ident_dialog_add_boxes(GtkWidget * grid, gint row,
                                    GtkDialog * dialog, const gchar * key1,
                                    const gchar * key2);
 #if ENABLE_ESMTP
@@ -640,7 +640,7 @@ static void md_response_cb(GtkWidget * dialog, gint response,
                            GtkTreeView * tree);
 static void md_name_changed(GtkEntry * name, GtkTreeView * tree);
 
-static void ident_dialog_add_gpg_menu(GtkWidget * table, gint row,
+static void ident_dialog_add_gpg_menu(GtkWidget * grid, gint row,
                                       GtkDialog * dialog,
                                       const gchar * label_name,
                                       const gchar * menu_key);
@@ -652,7 +652,7 @@ static void display_frame_set_gpg_mode(GObject * dialog,
                                        const gchar * key, gint * value);
 
 #if ENABLE_ESMTP
-static void ident_dialog_add_smtp_menu(GtkWidget * table, gint row,
+static void ident_dialog_add_smtp_menu(GtkWidget * grid, gint row,
                                        GtkDialog * dialog,
                                        const gchar * label_name,
                                        const gchar * menu_key,
@@ -919,18 +919,22 @@ append_ident_notebook_page(GtkNotebook *notebook, guint rows,
                            const gchar * footnote)
 {
     GtkWidget *vbox;
-    GtkWidget *table;
+    GtkWidget *grid;
 
     vbox = gtk_vbox_new(FALSE, 0);
-    table = libbalsa_create_table(rows, 2);
-    gtk_container_set_border_width(GTK_CONTAINER(table), padding);
-    gtk_box_pack_start(GTK_BOX(vbox), table, FALSE, FALSE, 0);
-    if (footnote)
-        gtk_box_pack_start(GTK_BOX(vbox), gtk_label_new(footnote),
-                           FALSE, FALSE, 0);
+    grid = libbalsa_create_grid();
+    gtk_container_set_border_width(GTK_CONTAINER(grid), padding);
+    gtk_box_pack_start(GTK_BOX(vbox), grid, FALSE, FALSE, 0);
+    if (footnote) {
+	GtkWidget *label;
+
+	label = gtk_label_new(footnote);
+	gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
+        gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 0);
+    }
     gtk_notebook_append_page(notebook, vbox, gtk_label_new(tab_label));
 
-    return table;
+    return grid;
 }
 
 
@@ -973,108 +977,109 @@ setup_ident_frame(GtkDialog * dialog, gboolean createp, gpointer tree)
 #endif                          /* ENABLE_ESMTP */
 {
     GtkNotebook *notebook = GTK_NOTEBOOK(gtk_notebook_new());
-    GtkWidget *table;
+    GtkWidget *grid;
     gint row;
     GObject *name;
     gpointer path;
     gchar *footnote;
 
     /* create the "General" tab */
-    table = append_ident_notebook_page(notebook, 5, _("General"), NULL);
+    grid = append_ident_notebook_page(notebook, 5, _("General"), NULL);
     row = 0;
-    ident_dialog_add_entry(table, row++, dialog, _("_Identity name:"),
+    ident_dialog_add_entry(grid, row++, dialog, _("_Identity name:"),
 		           "identity-name");
-    ident_dialog_add_entry(table, row++, dialog, _("_Full name:"),
+    ident_dialog_add_entry(grid, row++, dialog, _("_Full name:"),
                            "identity-fullname");
-    ident_dialog_add_entry(table, row++, dialog, _("_Mailing address:"),
+    ident_dialog_add_entry(grid, row++, dialog, _("_Mailing address:"),
                            "identity-address");
-    ident_dialog_add_entry(table, row++, dialog, _("Reply _to:"),
+    ident_dialog_add_entry(grid, row++, dialog, _("Reply _to:"),
                            "identity-replyto");
-    ident_dialog_add_entry(table, row++, dialog, _("_Domain:"),
+    ident_dialog_add_entry(grid, row++, dialog, _("_Domain:"),
                            "identity-domain");
 
     /* create the "Messages" tab */
-    table = append_ident_notebook_page(notebook, 9, _("Messages"), NULL);
+    grid = append_ident_notebook_page(notebook, 9, _("Messages"), NULL);
     row = 0;
-    ident_dialog_add_entry(table, row++, dialog, _("_Bcc:"),
+    ident_dialog_add_entry(grid, row++, dialog, _("_Bcc:"),
                            "identity-bcc");
-    ident_dialog_add_entry(table, row++, dialog, _("Reply _string:"),
+    ident_dialog_add_entry(grid, row++, dialog, _("Reply _string:"),
                            "identity-replystring");
-    ident_dialog_add_entry(table, row++, dialog, _("F_orward string:"),
+    ident_dialog_add_entry(grid, row++, dialog, _("F_orward string:"),
                            "identity-forwardstring");
-    ident_dialog_add_checkbutton(table, row++, dialog,
+    ident_dialog_add_checkbutton(grid, row++, dialog,
                                  _("send messages in both plain text and _HTML format"),
                                  "identity-sendmpalternative", TRUE);
-    ident_dialog_add_checkbutton(table, row++, dialog,
+    ident_dialog_add_checkbutton(grid, row++, dialog,
                                  _("request _Message Disposition Notification by default"),
                                  "identity-requestmdn", TRUE);
-    ident_dialog_add_file_chooser_button(table, row++, dialog,
+    ident_dialog_add_file_chooser_button(grid, row++, dialog,
                                          LBI_PATH_TYPE_FACE);
-    ident_dialog_add_file_chooser_button(table, row++, dialog,
+    ident_dialog_add_file_chooser_button(grid, row++, dialog,
                                          LBI_PATH_TYPE_XFACE);
-    ident_dialog_add_boxes(table, row++, dialog,
+    ident_dialog_add_boxes(grid, row++, dialog,
                            path_info[LBI_PATH_TYPE_FACE].box_key,
                            path_info[LBI_PATH_TYPE_XFACE].box_key);
 #if ENABLE_ESMTP
-    ident_dialog_add_smtp_menu(table, row++, dialog, _("SMT_P server:"),
+    ident_dialog_add_smtp_menu(grid, row++, dialog, _("SMT_P server:"),
                                "identity-smtp-server", smtp_servers);
 #endif /* ENABLE_ESMTP */
 
     /* create the "Signature" tab */
-    table = append_ident_notebook_page(notebook, 7, _("Signature"), NULL);
+    grid = append_ident_notebook_page(notebook, 7, _("Signature"), NULL);
     row = 0;
-    ident_dialog_add_check_and_entry(table, row++, dialog,
+    ident_dialog_add_check_and_entry(grid, row++, dialog,
                                      _("Signature _path"),
                                      "identity-sigpath");
-    ident_dialog_add_checkbutton(table, row++, dialog,
+    ident_dialog_add_checkbutton(grid, row++, dialog,
                                 _("_Execute signature"),
 				 "identity-sigexecutable", FALSE);
-    ident_dialog_add_checkbutton(table, row++, dialog,
+    ident_dialog_add_checkbutton(grid, row++, dialog,
                                  _("Incl_ude signature"),
                                  "identity-sigappend", FALSE);
-    ident_dialog_add_checkbutton(table, row++, dialog,
+    ident_dialog_add_checkbutton(grid, row++, dialog,
                                  _("Include signature when for_warding"),
                                  "identity-whenforward", FALSE);
-    ident_dialog_add_checkbutton(table, row++, dialog,
+    ident_dialog_add_checkbutton(grid, row++, dialog,
                                  _("Include signature when rep_lying"),
                                  "identity-whenreply", FALSE);
-    ident_dialog_add_checkbutton(table, row++, dialog,
+    ident_dialog_add_checkbutton(grid, row++, dialog,
                                  _("_Add signature separator"),
                                  "identity-sigseparator", FALSE);
-    ident_dialog_add_checkbutton(table, row++, dialog,
+    ident_dialog_add_checkbutton(grid, row++, dialog,
                                  _("Prepend si_gnature"),
                                  "identity-sigprepend", FALSE);
 
 #ifdef HAVE_GPGME
     footnote = NULL;
 #else
-    footnote = _("Signing and encrypting messages are possible\n"
+    footnote = _("Signing and encrypting messages are possible "
                  "only if Balsa is built with cryptographic support.");
 #endif
     /* create the "Security" tab */
-    table =
+    grid =
         append_ident_notebook_page(notebook, 5, _("Security"), footnote);
     row = 0;
-    ident_dialog_add_checkbutton(table, row++, dialog,
+    ident_dialog_add_checkbutton(grid, row++, dialog,
                                  _("sign messages by default"),
                                  "identity-gpgsign", TRUE);
-    ident_dialog_add_checkbutton(table, row++, dialog,
+    ident_dialog_add_checkbutton(grid, row++, dialog,
                                  _("encrypt messages by default"),
                                  "identity-gpgencrypt", TRUE);
-    ident_dialog_add_gpg_menu(table, row++, dialog,
+    ident_dialog_add_gpg_menu(grid, row++, dialog,
 				 _("default protocol"),
 				 "identity-crypt-protocol");
-    ident_dialog_add_checkbutton(table, row++, dialog,
+    ident_dialog_add_checkbutton(grid, row++, dialog,
                                  _("always trust GnuPG keys when encrypting"),
                                  "identity-trust-always", TRUE);
-    ident_dialog_add_checkbutton(table, row++, dialog,
+    ident_dialog_add_checkbutton(grid, row++, dialog,
                                  _("remind me if messages can be encrypted"),
                                  "identity-warn-send-plain", TRUE);
-    ident_dialog_add_entry(table, row++, dialog,
-                           _("use secret key with this id for signing\n(leave empty for automatic selection)"),
+    ident_dialog_add_entry(grid, row++, dialog,
+                           _("use secret key with this id for signing "
+                             "(leave empty for automatic selection)"),
                            "identity-keyid");
 #ifndef HAVE_GPGME
-    gtk_widget_set_sensitive(table, FALSE);
+    gtk_widget_set_sensitive(grid, FALSE);
 #endif
 
     name = g_object_get_data(G_OBJECT(dialog), "identity-name");
@@ -1107,13 +1112,13 @@ md_name_changed(GtkEntry * name, GtkTreeView * tree)
  * button is initialized to the given value.
  */
 static void
-ident_dialog_add_checkbutton(GtkWidget * table, gint row,
+ident_dialog_add_checkbutton(GtkWidget * grid, gint row,
                              GtkDialog * dialog, const gchar * check_label,
                              const gchar * check_key, gboolean sensitive)
 {
     GtkWidget *check;
 
-    check = libbalsa_create_check(check_label, table, row, FALSE);
+    check = libbalsa_create_grid_check(check_label, grid, row, FALSE);
     g_object_set_data(G_OBJECT(dialog), check_key, check);
     gtk_widget_set_sensitive(check, sensitive);
 }
@@ -1125,7 +1130,7 @@ ident_dialog_add_checkbutton(GtkWidget * table, gint row,
  * given value.
  */
 static void
-ident_dialog_add_check_and_entry(GtkWidget * table, gint row,
+ident_dialog_add_check_and_entry(GtkWidget * grid, gint row,
                                  GtkDialog * dialog, const gchar * check_label,
                                  const gchar * entry_key)
 {
@@ -1135,10 +1140,9 @@ ident_dialog_add_check_and_entry(GtkWidget * table, gint row,
     entry = gtk_entry_new();
 
 
-    gtk_table_attach(GTK_TABLE(table), check, 0, 1, row, row + 1,
-                     GTK_FILL, 0, 0, 0);
-    gtk_table_attach(GTK_TABLE(table), entry, 1, 2, row, row + 1,
-                     GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0);
+    gtk_grid_attach(GTK_GRID(grid), check, 0, row, 1, 1);
+    gtk_widget_set_hexpand(entry, TRUE);
+    gtk_grid_attach(GTK_GRID(grid), entry, 1, row, 1, 1);
 
     g_object_set_data(G_OBJECT(dialog), entry_key, entry);
     g_object_set_data(G_OBJECT(entry), LIBBALSA_IDENTITY_CHECK, check);
@@ -1152,15 +1156,15 @@ ident_dialog_add_check_and_entry(GtkWidget * table, gint row,
  * is initialized to the init_value given.
  */
 static void
-ident_dialog_add_entry(GtkWidget * table, gint row, GtkDialog * dialog,
+ident_dialog_add_entry(GtkWidget * grid, gint row, GtkDialog * dialog,
                        const gchar * label_name, const gchar * entry_key)
 {
     GtkWidget *label;
     GtkWidget *entry;
 
-    label = libbalsa_create_label(label_name, table, row);
+    label = libbalsa_create_grid_label(label_name, grid, row);
 
-    entry = libbalsa_create_entry(table, NULL, NULL, row, NULL, label);
+    entry = libbalsa_create_grid_entry(grid, NULL, NULL, row, NULL, label);
 
     g_object_set_data(G_OBJECT(dialog), entry_key, entry);
     if (row == 0)
@@ -1318,7 +1322,7 @@ file_chooser_cb(GtkWidget * chooser, gpointer data)
 }
 
 static void
-ident_dialog_add_file_chooser_button(GtkWidget * table, gint row,
+ident_dialog_add_file_chooser_button(GtkWidget * grid, gint row,
                                      GtkDialog * dialog,
                                      LibBalsaIdentityPathType type)
 {
@@ -1329,8 +1333,7 @@ ident_dialog_add_file_chooser_button(GtkWidget * table, gint row,
 
     check =
         gtk_check_button_new_with_mnemonic(_(path_info[type].mnemonic));
-    gtk_table_attach(GTK_TABLE(table), check, 0, 1, row, row + 1, GTK_FILL,
-                     GTK_FILL, 0, 0);
+    gtk_grid_attach(GTK_GRID(grid), check, 0, row, 1, 1);
 
     filename =
         g_build_filename(g_get_home_dir(), path_info[type].basename, NULL);
@@ -1342,8 +1345,9 @@ ident_dialog_add_file_chooser_button(GtkWidget * table, gint row,
     gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(button), filename);
     g_free(filename);
 
-    gtk_table_attach(GTK_TABLE(table), button, 1, 2, row, row + 1,
-                     GTK_EXPAND | GTK_FILL, GTK_EXPAND | GTK_FILL, 0, 0);
+    gtk_widget_set_hexpand(button, TRUE);
+    gtk_widget_set_vexpand(button, TRUE);
+    gtk_grid_attach(GTK_GRID(grid), button, 1, row, 1, 1);
 
     g_object_set_data(G_OBJECT(dialog), path_info[type].path_key, button);
     g_object_set_data(G_OBJECT(button), LIBBALSA_IDENTITY_CHECK, check);
@@ -1356,13 +1360,13 @@ ident_dialog_add_file_chooser_button(GtkWidget * table, gint row,
 }
 
 static void
-ident_dialog_add_boxes(GtkWidget * table, gint row, GtkDialog * dialog,
+ident_dialog_add_boxes(GtkWidget * grid, gint row, GtkDialog * dialog,
                        const gchar * key1, const gchar *key2)
 {
     GtkWidget *hbox, *vbox;
 
     hbox = gtk_hbox_new(FALSE, 12);
-    gtk_table_attach_defaults(GTK_TABLE(table), hbox, 1, 2, row, row + 1);
+    gtk_grid_attach(GTK_GRID(grid), hbox, 1, row, 1, 1);
     vbox = gtk_vbox_new(FALSE, 0);
     g_object_set_data(G_OBJECT(dialog), key1, vbox);
     gtk_container_add(GTK_CONTAINER(hbox), vbox);
@@ -2088,7 +2092,7 @@ display_frame_set_gpg_mode(GObject * dialog, const gchar* key, gint * value)
  */
 
 static void
-ident_dialog_add_gpg_menu(GtkWidget * table, gint row, GtkDialog * dialog,
+ident_dialog_add_gpg_menu(GtkWidget * grid, gint row, GtkDialog * dialog,
                           const gchar * label_name, const gchar * menu_key)
 {
     GtkWidget *label;
@@ -2096,14 +2100,14 @@ ident_dialog_add_gpg_menu(GtkWidget * table, gint row, GtkDialog * dialog,
     GPtrArray *values;
 
     label = gtk_label_new_with_mnemonic(label_name);
-    gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
-    gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, row, row + 1);
+    gtk_widget_set_halign(label, GTK_ALIGN_START);
+    gtk_grid_attach(GTK_GRID(grid), label, 0, row, 1, 1);
 
     opt_menu = gtk_combo_box_text_new();
     values = g_ptr_array_sized_new(3);
     g_object_set_data_full(G_OBJECT(opt_menu), "identity-value", values,
                            (GDestroyNotify) ident_dialog_free_values);
-    gtk_table_attach_defaults(GTK_TABLE(table), opt_menu, 1, 2, row, row + 1);
+    gtk_grid_attach(GTK_GRID(grid), opt_menu, 1, row, 1, 1);
     g_object_set_data(G_OBJECT(dialog), menu_key, opt_menu);
 
     add_show_menu(_("GnuPG MIME mode"),
@@ -2136,7 +2140,7 @@ ident_dialog_free_values(GPtrArray * values)
 
 #if ENABLE_ESMTP
 static void
-ident_dialog_add_smtp_menu(GtkWidget * table, gint row, GtkDialog * dialog,
+ident_dialog_add_smtp_menu(GtkWidget * grid, gint row, GtkDialog * dialog,
                            const gchar * label_name,
                            const gchar * menu_key, GSList * smtp_servers)
 {
@@ -2146,16 +2150,15 @@ ident_dialog_add_smtp_menu(GtkWidget * table, gint row, GtkDialog * dialog,
     GPtrArray *values;
 
     label = gtk_label_new_with_mnemonic(label_name);
-    gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
-    gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, row, row + 1);
+    gtk_widget_set_halign(label, GTK_ALIGN_START);
+    gtk_grid_attach(GTK_GRID(grid), label, 0, row, 1, 1);
 
     combo_box = gtk_combo_box_text_new();
     gtk_label_set_mnemonic_widget(GTK_LABEL(label), combo_box);
     values = g_ptr_array_sized_new(g_slist_length(smtp_servers));
     g_object_set_data_full(G_OBJECT(combo_box), "identity-value", values,
                            (GDestroyNotify) ident_dialog_free_values);
-    gtk_table_attach_defaults(GTK_TABLE(table), combo_box, 1, 2, row,
-                              row + 1);
+    gtk_grid_attach(GTK_GRID(grid), combo_box, 1, row, 1, 1);
     g_object_set_data(G_OBJECT(dialog), menu_key, combo_box);
 
     for (list = smtp_servers; list; list = list->next) {

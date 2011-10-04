@@ -1,5 +1,14 @@
 2011-10-03  Peter Bloomfield
 
+	* libbalsa/identity.c (append_ident_notebook_page),
+	(setup_ident_frame), (ident_dialog_add_checkbutton),
+	(ident_dialog_add_check_and_entry), (ident_dialog_add_entry),
+	(ident_dialog_add_file_chooser_button), (ident_dialog_add_boxes),
+	(ident_dialog_add_gpg_menu), (ident_dialog_add_smtp_menu):
+	migrate from GtkTable to GtkGrid.
+
+2011-10-03  Peter Bloomfield
+
 	* libbalsa/address.c (libbalsa_address_get_edit_widget): migrate
 	from GtkTable to GtkGrid.
 

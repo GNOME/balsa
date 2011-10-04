@@ -74,23 +74,23 @@ balsa_init_get_png(const gchar * fname)
 }
 
 void
-balsa_init_add_table_entry(GtkTable * table, guint num, const gchar * ltext,
-                           const gchar * etext, EntryData * ed,
-                           GtkAssistant * druid, GtkWidget *page,
-                           GtkWidget ** dest)
+balsa_init_add_grid_entry(GtkGrid * grid, guint num, const gchar * ltext,
+                          const gchar * etext, EntryData * ed,
+                          GtkAssistant * druid, GtkWidget *page,
+                          GtkWidget ** dest)
 {
     GtkWidget *l, *e;
 
     l = gtk_label_new_with_mnemonic(ltext);
     gtk_label_set_justify(GTK_LABEL(l), GTK_JUSTIFY_RIGHT);
-    gtk_misc_set_alignment(GTK_MISC(l), 1.0, 0.5);
-    gtk_table_attach(table, GTK_WIDGET(l), 0, 1, num + 1, num + 2,
-                     GTK_FILL, GTK_FILL, 5, 2);
+    gtk_widget_set_halign(l, GTK_ALIGN_END);
+    gtk_grid_attach(grid, l, 0, num + 1, 1, 1);
 
     e = gtk_entry_new();
     gtk_label_set_mnemonic_widget(GTK_LABEL(l), e);
-    gtk_table_attach(table, GTK_WIDGET(e), 1, 2, num + 1, num + 2,
-                     GTK_EXPAND | GTK_FILL, GTK_EXPAND | GTK_FILL, 5, 2);
+    gtk_widget_set_hexpand(e, TRUE);
+    gtk_widget_set_vexpand(e, TRUE);
+    gtk_grid_attach(grid, e, 1, num + 1, 1, 1);
     (*dest) = e;
     if(ed) {
         g_signal_connect(G_OBJECT(e), "changed",
@@ -135,7 +135,7 @@ entry_changed_cb(GtkEntry * entry, EntryData * ed)
 
 
 void
-balsa_init_add_table_option(GtkTable *table, guint num,
+balsa_init_add_grid_option(GtkGrid *grid, guint num,
                             const gchar *ltext, const gchar **optns,
                             GtkAssistant *druid, GtkWidget **dest)
 {
@@ -143,17 +143,17 @@ balsa_init_add_table_option(GtkTable *table, guint num,
     int i;
     l = gtk_label_new_with_mnemonic(ltext);
     gtk_label_set_justify(GTK_LABEL(l), GTK_JUSTIFY_RIGHT);
-    gtk_misc_set_alignment(GTK_MISC(l), 1.0, 0.5);
-    gtk_table_attach(table, l, 0, 1, num + 1, num + 2,
-                     GTK_FILL, GTK_FILL, 5, 2);
+    gtk_widget_set_halign(l, GTK_ALIGN_END);
+    gtk_grid_attach(grid, l, 0, num + 1, 1, 1);
 
     *dest = om = gtk_combo_box_text_new();
     for(i=0; optns[i]; i++)
         gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(om), _(optns[i]));
     gtk_label_set_mnemonic_widget(GTK_LABEL(l), om);
     gtk_combo_box_set_active(GTK_COMBO_BOX(om), 0);
-    gtk_table_attach(table, om, 1, 2, num + 1, num + 2,
-                     GTK_EXPAND | GTK_FILL, GTK_EXPAND | GTK_FILL, 5, 2);
+    gtk_widget_set_hexpand(om, TRUE);
+    gtk_widget_set_vexpand(om, TRUE);
+    gtk_grid_attach(grid, om, 1, num + 1, 1, 1);
 }
 
 gint
@@ -163,21 +163,19 @@ balsa_option_get_active(GtkWidget *option_widget)
 }
 
 void
-balsa_init_add_table_checkbox(GtkTable *table, guint num,
-                              const gchar *ltext, gboolean defval,
-                              GtkAssistant *druid, GtkWidget **dest)
+balsa_init_add_grid_checkbox(GtkGrid *grid, guint num,
+                             const gchar *ltext, gboolean defval,
+                             GtkAssistant *druid, GtkWidget **dest)
 {
     GtkWidget *l;
 
     l = gtk_label_new_with_mnemonic(ltext);
     gtk_label_set_justify(GTK_LABEL(l), GTK_JUSTIFY_RIGHT);
-    gtk_misc_set_alignment(GTK_MISC(l), 1.0, 0.5);
-    gtk_table_attach(table, l, 0, 1, num + 1, num + 2,
-                     GTK_FILL, GTK_FILL, 5, 2);
+    gtk_widget_set_halign(l, GTK_ALIGN_END);
+    gtk_grid_attach(grid, l, 0, num + 1, 1, 1);
 
     *dest = gtk_check_button_new();
-    gtk_table_attach(table, *dest, 1, 2, num + 1, num + 2,
-                     GTK_FILL, GTK_FILL, 5, 2);
+    gtk_grid_attach(grid, *dest, 1, num + 1, 1, 1);
     if(defval)
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(*dest), TRUE);
     gtk_label_set_mnemonic_widget(GTK_LABEL(l), *dest);

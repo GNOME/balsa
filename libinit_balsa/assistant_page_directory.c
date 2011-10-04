@@ -183,7 +183,8 @@ balsa_druid_page_directory_init(BalsaDruidPageDirectory * dir,
                                 GtkWidget * page,
                                 GtkAssistant * druid)
 {
-    GtkTable *table;
+    GtkGrid *grid;
+    GtkWidget *label_widget;
     GtkLabel *label;
     int i;
     GtkWidget **init_widgets[NUM_EDs];
@@ -196,18 +197,19 @@ balsa_druid_page_directory_init(BalsaDruidPageDirectory * dir,
     dir->emaster.numentries = 0;
     dir->emaster.donemask = 0;
 
-    table = GTK_TABLE(gtk_table_new(NUM_EDs + 1, 2, FALSE));
+    grid = GTK_GRID(gtk_grid_new());
+    gtk_grid_set_column_spacing(grid, 6);
 
-    label =
-        GTK_LABEL(gtk_label_new
-                  (_
-                   ("Please verify the locations of your default mail files.\n"
-                    "These will be created if necessary.")));
+    label_widget = gtk_label_new(_("Please verify the locations "
+                                   "of your default mail files. "
+                                   "These will be created if necessary."));
+    label = GTK_LABEL(label_widget);
     gtk_label_set_justify(label, GTK_JUSTIFY_RIGHT);
     gtk_label_set_line_wrap(label, TRUE);
+    gtk_widget_set_hexpand(label_widget, TRUE);
+    gtk_widget_set_vexpand(label_widget, TRUE);
 
-    gtk_table_attach(table, GTK_WIDGET(label), 0, 2, 0, 1,
-                     GTK_EXPAND | GTK_FILL, GTK_EXPAND | GTK_FILL, 8, 4);
+    gtk_grid_attach(grid, GTK_WIDGET(label), 0, 0, 2, 1);
 
     if (0 /* FIXME: libbalsa_mailbox_exists(imap_inbox) */ )
         init_presets[INBOX] = imap_inbox;
@@ -233,19 +235,19 @@ balsa_druid_page_directory_init(BalsaDruidPageDirectory * dir,
             preset = g_strdup("[Dummy value]");
 
 #if defined(ENABLE_TOUCH_UI)
-        balsa_init_add_table_entry(table, i, init_mbnames[i], preset,
+        balsa_init_add_grid_entry(grid, i, init_mbnames[i], preset,
                                    &(dir->ed[i]), druid, page, init_widgets[i]);
 #else
-        balsa_init_add_table_entry(table, i, _(init_mbnames[i]), preset,
+        balsa_init_add_grid_entry(grid, i, _(init_mbnames[i]), preset,
                                    &(dir->ed[i]), druid, page, init_widgets[i]);
 #endif
 
         g_free(preset);
     }
 
-    gtk_box_pack_start(GTK_BOX(page), GTK_WIDGET(table), FALSE, TRUE,
+    gtk_box_pack_start(GTK_BOX(page), GTK_WIDGET(grid), FALSE, TRUE,
                        8);
-    gtk_widget_show_all(GTK_WIDGET(table));
+    gtk_widget_show_all(GTK_WIDGET(grid));
 
     g_signal_connect(G_OBJECT(druid), "prepare",
                      G_CALLBACK(balsa_druid_page_directory_prepare),

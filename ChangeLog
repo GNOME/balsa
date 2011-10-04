@@ -1,5 +1,16 @@
 2011-10-03  Peter Bloomfield
 
+	Migrate from GtkTable to GtkGrid
+
+	* libinit_balsa/assistant_helper.c (balsa_init_add_grid_entry),
+	(balsa_init_add_grid_option), (balsa_init_add_grid_checkbox):
+	* libinit_balsa/assistant_helper.h:
+	* libinit_balsa/assistant_page_directory.c
+	(balsa_druid_page_directory_init):
+	* libinit_balsa/assistant_page_user.c (balsa_druid_page_user_init):
+
+2011-10-03  Peter Bloomfield
+
 	* libbalsa/smtp-server.c (smtp_server_add_widget),
 	(libbalsa_smtp_server_dialog): migrate from GtkTable to GtkGrid.
 

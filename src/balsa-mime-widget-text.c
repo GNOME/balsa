@@ -1150,14 +1150,15 @@ bm_widget_new_html(BalsaMessage * bm, LibBalsaMessageBody * mime_body)
 }
 #endif /* defined HAVE_HTML_WIDGET */
 
-#define TABLE_ATTACH(t,str,label) \
-    if(str) { GtkWidget *lbl = gtk_label_new(label);              \
-        gtk_table_attach(t, lbl, 0, 1, row, row+1,                \
-                         GTK_FILL, GTK_FILL, 4, 2);               \
-        gtk_misc_set_alignment(GTK_MISC(lbl), 1.0, 0.0); \
-        gtk_table_attach(table, lbl=gtk_label_new(str), 1, 2, row, row+1, \
-                         GTK_FILL|GTK_EXPAND, GTK_FILL|GTK_EXPAND, 4, 2); \
-        gtk_misc_set_alignment(GTK_MISC(lbl), 0.0, 0.0); \
+#define GRID_ATTACH(g,str,label)                                  \
+    if(str) { GtkWidget *lbl;                                     \
+        lbl = gtk_label_new(label);                               \
+        gtk_widget_set_halign(lbl, GTK_ALIGN_END);                \
+        gtk_grid_attach(g, lbl, 0, row, 1, 1);                    \
+        lbl = gtk_label_new(str);                                 \
+        gtk_label_set_line_wrap(GTK_LABEL(lbl), TRUE);            \
+        gtk_widget_set_halign(lbl, GTK_ALIGN_START);              \
+        gtk_grid_attach(g, lbl, 1, row, 1, 1);                    \
         row++;                                                    \
     }
 
@@ -1166,38 +1167,45 @@ bm_widget_new_vcard(BalsaMessage *bm, LibBalsaMessageBody *mime_body,
                     gchar *ptr, size_t len)
 {
     BalsaMimeWidget *mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
-    LibBalsaAddress * addr =
-	libbalsa_address_new_from_vcard(ptr, mime_body->charset ? mime_body->charset : "us-ascii");
-    GtkTable *table;
+    LibBalsaAddress *addr;
+    GtkGrid *grid;
     GtkWidget *w;
     int row = 1;
 
+    addr =
+        libbalsa_address_new_from_vcard(ptr, mime_body->charset ?
+                                        mime_body-> charset : "us-ascii");
     if (!addr)
         return NULL;
 
-    mw->widget = gtk_table_new(10, 2, FALSE);
-    table = (GtkTable*)mw->widget;
-        
-    gtk_table_attach_defaults(table, w=gtk_label_new(_("Address")),
-                              0, 1, 0, 1);
-    gtk_misc_set_alignment(GTK_MISC(w), 1.0, 0.0);
+    mw->widget = gtk_grid_new();
+    grid = (GtkGrid*)mw->widget;
+#if GTK_CHECK_VERSION(3, 2, 0)
+    gtk_grid_set_row_spacing(grid, 6);
+    gtk_grid_set_column_spacing(grid, 12);
+#else                           /* GTK_CHECK_VERSION(3, 2, 0) */
+    gtk_grid_set_row_spacing(grid, 12);
+    gtk_grid_set_column_spacing(grid, 6);
+#endif                          /* GTK_CHECK_VERSION(3, 2, 0) */
+
+    gtk_grid_attach(grid, w=gtk_label_new(_("Address:")), 0, 0, 1, 1);
+    gtk_widget_set_halign(w, GTK_ALIGN_END);
     w = gtk_button_new_with_mnemonic(_("S_tore"));
-    /* FIXME: Connect signal */
-    gtk_table_attach(table, w, 1, 2, 0, 1, 0,0,  2, 2);
+    gtk_grid_attach(grid, w, 1, 0, 1, 1);
     g_signal_connect_swapped(w, "clicked",
                              G_CALLBACK(balsa_store_address), addr);
     g_object_weak_ref(G_OBJECT(mw), (GWeakNotify)g_object_unref, addr);
- 
 
-    TABLE_ATTACH(table, addr->full_name,    _("Full Name"));
-    TABLE_ATTACH(table, addr->nick_name,    _("Nick Name"));
-    TABLE_ATTACH(table, addr->first_name,   _("First Name"));
-    TABLE_ATTACH(table, addr->last_name,    _("Last Name"));
-    TABLE_ATTACH(table, addr->organization, _("Organization"));
+
+    GRID_ATTACH(grid, addr->full_name,    _("Full Name:"));
+    GRID_ATTACH(grid, addr->nick_name,    _("Nick Name:"));
+    GRID_ATTACH(grid, addr->first_name,   _("First Name:"));
+    GRID_ATTACH(grid, addr->last_name,    _("Last Name:"));
+    GRID_ATTACH(grid, addr->organization, _("Organization:"));
     if(addr->address_list) {
-        TABLE_ATTACH(table, addr->address_list->data, _("Email Address"));
+        GRID_ATTACH(grid, addr->address_list->data, _("Email Address:"));
     }
-        
+
     g_object_set_data(G_OBJECT(mw->widget), "mime-body", mime_body);
     return mw;
 }

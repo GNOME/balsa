@@ -1,3 +1,8 @@
+2011-10-04  Peter Bloomfield
+
+	* src/ab-window.c (balsa_ab_window_init): migrate from GtkTable
+	to GtkGrid.
+
 2011-10-03  Peter Bloomfield
 
 	Migrate from GtkTable to GtkGrid

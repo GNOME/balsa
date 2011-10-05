@@ -1153,7 +1153,7 @@ bm_widget_new_html(BalsaMessage * bm, LibBalsaMessageBody * mime_body)
 #define GRID_ATTACH(g,str,label)                                  \
     if(str) { GtkWidget *lbl;                                     \
         lbl = gtk_label_new(label);                               \
-        gtk_widget_set_halign(lbl, GTK_ALIGN_END);                \
+        gtk_widget_set_halign(lbl, GTK_ALIGN_START);                \
         gtk_grid_attach(g, lbl, 0, row, 1, 1);                    \
         lbl = gtk_label_new(str);                                 \
         gtk_label_set_line_wrap(GTK_LABEL(lbl), TRUE);            \
@@ -1188,10 +1188,8 @@ bm_widget_new_vcard(BalsaMessage *bm, LibBalsaMessageBody *mime_body,
     gtk_grid_set_column_spacing(grid, 6);
 #endif                          /* GTK_CHECK_VERSION(3, 2, 0) */
 
-    gtk_grid_attach(grid, w=gtk_label_new(_("Address:")), 0, 0, 1, 1);
-    gtk_widget_set_halign(w, GTK_ALIGN_END);
-    w = gtk_button_new_with_mnemonic(_("S_tore"));
-    gtk_grid_attach(grid, w, 1, 0, 1, 1);
+    w = gtk_button_new_with_mnemonic(_("S_tore Address"));
+    gtk_grid_attach(grid, w, 0, 0, 2, 1);
     g_signal_connect_swapped(w, "clicked",
                              G_CALLBACK(balsa_store_address), addr);
     g_object_weak_ref(G_OBJECT(mw), (GWeakNotify)g_object_unref, addr);

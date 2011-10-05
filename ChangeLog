@@ -1,3 +1,8 @@
+2011-10-05  Peter Bloomfield
+
+	* src/balsa-mime-widget-text.c (bm_widget_new_vcard): make
+	button span two columns, and left-align labels instead of right.
+
 2011-10-04  Peter Bloomfield
 
 	* src/balsa-mime-widget-text.c (bm_widget_new_vcard): migrate

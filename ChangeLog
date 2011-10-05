@@ -1,5 +1,12 @@
 2011-10-04  Peter Bloomfield
 
+	* src/address-book-config.c (add_radio_buttons),
+	(create_local_dialog), (create_externq_dialog),
+	(create_ldap_dialog), (create_gpe_dialog): migrate from GtkTable
+	to GtkGrid.
+
+2011-10-04  Peter Bloomfield
+
 	* src/ab-window.c (balsa_ab_window_init): migrate from GtkTable
 	to GtkGrid.
 

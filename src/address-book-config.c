@@ -168,7 +168,7 @@ edit_book_response(GtkWidget * dialog, gint response,
 
 /* Radio buttons */
 static void
-add_radio_buttons(GtkWidget * table, gint row, AddressBookConfig * abc)
+add_radio_buttons(GtkWidget * grid, gint row, AddressBookConfig * abc)
 {
     GtkWidget *label;
     GSList *radio_group;
@@ -176,16 +176,14 @@ add_radio_buttons(GtkWidget * table, gint row, AddressBookConfig * abc)
 
     label = gtk_label_new(_("Suggest complete addresses:"));
     gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
-    gtk_table_attach(GTK_TABLE(table), label,
-                     0, 2, row, row + 1, GTK_FILL, 0, 0, 0);
+    gtk_grid_attach(GTK_GRID(grid), label, 0, row, 2, 1);
 
     abc->as_i_type =
         gtk_radio_button_new_with_label(NULL, _("as I type"));
     radio_group =
         gtk_radio_button_get_group(GTK_RADIO_BUTTON(abc->as_i_type));
     ++row;
-    gtk_table_attach(GTK_TABLE(table), abc->as_i_type,
-                     0, 2, row, row + 1, GTK_FILL, 0, 0, 0);
+    gtk_grid_attach(GTK_GRID(grid), abc->as_i_type, 0, row, 2, 1);
 
     abc->on_request =
         gtk_radio_button_new_with_label(radio_group,
@@ -193,14 +191,12 @@ add_radio_buttons(GtkWidget * table, gint row, AddressBookConfig * abc)
     radio_group =
         gtk_radio_button_get_group(GTK_RADIO_BUTTON(abc->on_request));
     ++row;
-    gtk_table_attach(GTK_TABLE(table), abc->on_request,
-                     0, 2, row, row + 1, GTK_FILL, 0, 0, 0);
+    gtk_grid_attach(GTK_GRID(grid), abc->on_request, 0, row, 2, 1);
 
     abc->never =
         gtk_radio_button_new_with_label(radio_group, _("never"));
     ++row;
-    gtk_table_attach(GTK_TABLE(table), abc->never,
-                     0, 2, row, row + 1, GTK_FILL, 0, 0, 0);
+    gtk_grid_attach(GTK_GRID(grid), abc->never, 0, row, 2, 1);
 
     button = abc->as_i_type;
     if (abc->address_book) {
@@ -219,7 +215,7 @@ create_local_dialog(AddressBookConfig * abc, const gchar * type)
     gchar *title;
     const gchar *action;
     const gchar *name;
-    GtkWidget *table;
+    GtkWidget *grid;
     GtkWidget *label;
     LibBalsaAddressBook *ab;
     GtkSizeGroup *size_group;
@@ -248,14 +244,14 @@ create_local_dialog(AddressBookConfig * abc, const gchar * type)
 #endif
     size_group = libbalsa_create_size_group(dialog);
 
-    table = libbalsa_create_table(5, 2);
-    gtk_file_chooser_set_extra_widget(GTK_FILE_CHOOSER(dialog), table);
-    label = libbalsa_create_label(_("A_ddress Book Name:"), table, 0);
+    grid = libbalsa_create_grid();
+    gtk_file_chooser_set_extra_widget(GTK_FILE_CHOOSER(dialog), grid);
+    label = libbalsa_create_grid_label(_("A_ddress Book Name:"), grid, 0);
     gtk_size_group_add_widget(size_group, label);
     abc->name_entry =
-        libbalsa_create_entry(table, NULL, NULL, 0, name, label);
+        libbalsa_create_grid_entry(grid, NULL, NULL, 0, name, label);
 
-    add_radio_buttons(table, 1, abc);
+    add_radio_buttons(grid, 1, abc);
 
     if (ab) {
         const gchar *path = LIBBALSA_ADDRESS_BOOK_TEXT(ab)->path;
@@ -358,48 +354,48 @@ static GtkWidget *
 create_externq_dialog(AddressBookConfig * abc)
 {
     GtkWidget *dialog;
-    GtkWidget *table;
+    GtkWidget *grid;
     GtkWidget *label;
     LibBalsaAddressBookExtern* ab;
 
     ab = (LibBalsaAddressBookExtern*)abc->address_book; /* may be NULL */
-    table = libbalsa_create_table(5, 2);
-    gtk_container_set_border_width(GTK_CONTAINER(table), 5);
+    grid = libbalsa_create_grid();
+    gtk_container_set_border_width(GTK_CONTAINER(grid), 5);
 
     /* mailbox name */
 
-    label = libbalsa_create_label(_("A_ddress Book Name:"), table, 0);
-    abc->name_entry = libbalsa_create_entry(table, NULL, NULL, 0, 
+    label = libbalsa_create_grid_label(_("A_ddress Book Name:"), grid, 0);
+    abc->name_entry = libbalsa_create_grid_entry(grid, NULL, NULL, 0, 
 				   ab ? abc->address_book->name : NULL, 
 				   label);
 
     label = gtk_label_new(_("Load program location:"));
     gtk_misc_set_alignment(GTK_MISC(label), 1.0, 0.5);
-    gtk_table_attach(GTK_TABLE(table), label, 0, 1, 1, 2,
-		     GTK_FILL, GTK_FILL, 0, 0);
+    gtk_grid_attach(GTK_GRID(grid), label, 0, 1, 1, 1);
     abc->ab_specific.externq.load =
         gtk_file_chooser_button_new
         (_("Select load program for address book"),
          GTK_FILE_CHOOSER_ACTION_OPEN);
-    gtk_table_attach(GTK_TABLE(table), abc->ab_specific.externq.load, 1, 2,
-		     1, 2, GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0);
-    gtk_label_set_mnemonic_widget(GTK_LABEL(label), 
+    gtk_widget_set_hexpand(abc->ab_specific.externq.load, TRUE);
+    gtk_grid_attach(GTK_GRID(grid), abc->ab_specific.externq.load,
+                    1, 1, 1, 1);
+    gtk_label_set_mnemonic_widget(GTK_LABEL(label),
                                   abc->ab_specific.externq.load);
 
     label = gtk_label_new(_("Save program location:"));
     gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
-    gtk_table_attach(GTK_TABLE(table), label, 0, 1, 2, 3,
-		     GTK_FILL, GTK_FILL, 0, 0);
+    gtk_grid_attach(GTK_GRID(grid), label, 0, 2, 1, 1);
     abc->ab_specific.externq.save =
         gtk_file_chooser_button_new
         (_("Select save program for address book"),
          GTK_FILE_CHOOSER_ACTION_OPEN);
-    gtk_table_attach(GTK_TABLE(table), abc->ab_specific.externq.save, 1, 2,
-		     2, 3, GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0);
-    gtk_label_set_mnemonic_widget(GTK_LABEL(label), 
+    gtk_widget_set_hexpand(abc->ab_specific.externq.save, TRUE);
+    gtk_grid_attach(GTK_GRID(grid), abc->ab_specific.externq.save,
+                    1, 2, 1, 1);
+    gtk_label_set_mnemonic_widget(GTK_LABEL(label),
                                   abc->ab_specific.externq.save);
-    
-    add_radio_buttons(table, 3, abc);
+
+    add_radio_buttons(grid, 3, abc);
 
     if (ab) {
         gtk_file_chooser_set_filename(GTK_FILE_CHOOSER
@@ -413,7 +409,7 @@ create_externq_dialog(AddressBookConfig * abc)
     dialog = create_generic_dialog(abc, "Extern");
     gtk_container_add(GTK_CONTAINER
                       (gtk_dialog_get_content_area(GTK_DIALOG(dialog))),
-                      table);
+                      grid);
     return dialog;
 }
 
@@ -422,7 +418,7 @@ static GtkWidget *
 create_ldap_dialog(AddressBookConfig * abc)
 {
     GtkWidget *dialog;
-    GtkWidget *table = libbalsa_create_table(2, 2);
+    GtkWidget *grid = libbalsa_create_grid();
 
     LibBalsaAddressBookLdap* ab;
     GtkWidget* label;
@@ -434,44 +430,44 @@ create_ldap_dialog(AddressBookConfig * abc)
 
     /* mailbox name */
 
-    label = libbalsa_create_label(_("A_ddress Book Name:"), table, 0);
-    abc->name_entry = libbalsa_create_entry(table, NULL, NULL, 0, 
+    label = libbalsa_create_grid_label(_("A_ddress Book Name:"), grid, 0);
+    abc->name_entry = libbalsa_create_grid_entry(grid, NULL, NULL, 0, 
 				   ab ? abc->address_book->name : name, 
 				   label);
 
-    label = libbalsa_create_label(_("_Host Name"), table, 1);
+    label = libbalsa_create_grid_label(_("_Host Name"), grid, 1);
     abc->ab_specific.ldap.host_name = 
-	libbalsa_create_entry(table, NULL, NULL, 1, 
+	libbalsa_create_grid_entry(grid, NULL, NULL, 1, 
 		     ab ? ab->host : host, label);
 
-    label = libbalsa_create_label(_("Base Domain _Name"), table, 2);
+    label = libbalsa_create_grid_label(_("Base Domain _Name"), grid, 2);
     abc->ab_specific.ldap.base_dn = 
-	libbalsa_create_entry(table, NULL, NULL, 2, 
+	libbalsa_create_grid_entry(grid, NULL, NULL, 2, 
 		     ab ? ab->base_dn : base, label);
 
-    label = libbalsa_create_label(_("_User Name (Bind DN)"), table, 3);
+    label = libbalsa_create_grid_label(_("_User Name (Bind DN)"), grid, 3);
     abc->ab_specific.ldap.bind_dn = 
-	libbalsa_create_entry(table, NULL, NULL, 3, 
+	libbalsa_create_grid_entry(grid, NULL, NULL, 3, 
 		     ab ? ab->bind_dn : "", label);
 
-    label = libbalsa_create_label(_("_Password"), table, 4);
+    label = libbalsa_create_grid_label(_("_Password"), grid, 4);
     abc->ab_specific.ldap.passwd = 
-	libbalsa_create_entry(table, NULL, NULL, 4, 
+	libbalsa_create_grid_entry(grid, NULL, NULL, 4, 
 		     ab ? ab->passwd : "", label);
     gtk_entry_set_visibility(GTK_ENTRY(abc->ab_specific.ldap.passwd), FALSE);
 
-    label = libbalsa_create_label(_("_User Address Book DN"), table, 5);
+    label = libbalsa_create_grid_label(_("_User Address Book DN"), grid, 5);
     abc->ab_specific.ldap.book_dn = 
-	libbalsa_create_entry(table, NULL, NULL, 5,
+	libbalsa_create_grid_entry(grid, NULL, NULL, 5,
 		     ab ? ab->priv_book_dn : "", label);
 
     abc->ab_specific.ldap.enable_tls =
-	libbalsa_create_check(_("Enable _TLS"), table, 6,
+	libbalsa_create_grid_check(_("Enable _TLS"), grid, 6,
 		     ab ? ab->enable_tls : FALSE);
 
-    add_radio_buttons(table, 7, abc);
+    add_radio_buttons(grid, 7, abc);
 
-    gtk_widget_show(table);
+    gtk_widget_show(grid);
 
     g_free(base);
     g_free(name);
@@ -480,7 +476,7 @@ create_ldap_dialog(AddressBookConfig * abc)
     dialog = create_generic_dialog(abc, "LDAP");
     gtk_container_add(GTK_CONTAINER
                       (gtk_dialog_get_content_area(GTK_DIALOG(dialog))),
-                      table);
+                      grid);
     return dialog;
 }
 #endif
@@ -490,28 +486,28 @@ static GtkWidget *
 create_gpe_dialog(AddressBookConfig * abc)
 {
     GtkWidget *dialog;
-    GtkWidget *table = libbalsa_create_table(3, 2);
+    GtkWidget *grid = libbalsa_create_grid(3, 2);
 
     LibBalsaAddressBook* ab;
     GtkWidget* label;
 
-    gtk_container_set_border_width(GTK_CONTAINER(table), 5);
+    gtk_container_set_border_width(GTK_CONTAINER(grid), 5);
 
     ab = (LibBalsaAddressBook*)abc->address_book; /* may be NULL */
 
     /* mailbox name */
 
-    label = libbalsa_create_label(_("A_ddress Book Name:"), table, 0);
-    abc->name_entry = libbalsa_create_entry(table, NULL, NULL, 0, 
+    label = libbalsa_create_grid_label(_("A_ddress Book Name:"), grid, 0);
+    abc->name_entry = libbalsa_create_grid_entry(grid, NULL, NULL, 0, 
 				   ab ? ab->name : _("GPE Address Book"), 
 				   label);
 
-    add_radio_buttons(table, 1, abc);
+    add_radio_buttons(grid, 1, abc);
 
     dialog = create_generic_dialog(abc, "GPE");
     gtk_container_add(GTK_CONTAINER
                       (gtk_dialog_get_content_area(GTK_DIALOG(dialog))),
-                      table);
+                      grid);
     return dialog;
 }
 #endif

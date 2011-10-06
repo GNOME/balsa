@@ -1,5 +1,10 @@
 2011-10-05  Peter Bloomfield
 
+	* src/balsa-mime-widget-vcalendar.c (balsa_vevent_widget):
+	migrate from GtkTable to GtkGrid.
+
+2011-10-05  Peter Bloomfield
+
 	* src/address-book-config.c (create_gpe_dialog): build with GPE
 	address book.
 

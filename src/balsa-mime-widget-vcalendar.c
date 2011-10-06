@@ -101,57 +101,59 @@ balsa_mime_widget_new_vcalendar(BalsaMessage * bm,
     return mw;
 }
 
-#define TABLE_ATTACH(t,str,label)                                       \
+#define GRID_ATTACH(g,str,label)                                        \
     do {                                                                \
         if (str) {                                                      \
             GtkWidget *lbl = gtk_label_new(label);                      \
-            gtk_table_attach(t, lbl, 0, 1, row, row+1,                  \
-                             GTK_FILL, GTK_FILL, 4, 2);                 \
-            gtk_misc_set_alignment(GTK_MISC(lbl), 1.0, 0.0);            \
-            gtk_table_attach(table, lbl = gtk_label_new(str),           \
-                             1, 2, row, row + 1,                        \
-                             GTK_FILL|GTK_EXPAND, GTK_FILL|GTK_EXPAND,  \
-                             4, 2);                                     \
-            gtk_misc_set_alignment(GTK_MISC(lbl), 0.0, 0.0);            \
+            gtk_widget_set_halign(lbl, GTK_ALIGN_START);                \
+            gtk_widget_set_valign(lbl, GTK_ALIGN_START);                \
+            gtk_grid_attach(g, lbl, 0, row, 1, 1);                      \
+            lbl = gtk_label_new(str);                                   \
+            gtk_label_set_line_wrap(GTK_LABEL(lbl), TRUE);              \
+            gtk_widget_set_halign(lbl, GTK_ALIGN_START);                \
+            gtk_widget_set_valign(lbl, GTK_ALIGN_START);                \
+            gtk_widget_set_hexpand(lbl, TRUE);                          \
+            gtk_widget_set_vexpand(lbl, TRUE);                          \
+            gtk_grid_attach(g, lbl, 1, row, 1, 1);                      \
             row++;                                                      \
         }                                                               \
     } while (0)
 
-#define TABLE_ATTACH_DATE(t,date,label)                                 \
+#define GRID_ATTACH_DATE(g,date,label)                                  \
     do {                                                                \
         if (date != (time_t) -1) {                                      \
             gchar * _dstr =                                             \
                 libbalsa_date_to_utf8(&date, balsa_app.date_string);    \
-            TABLE_ATTACH(table, _dstr, label);                          \
+            GRID_ATTACH(g, _dstr, label);                               \
             g_free(_dstr);                                              \
         }                                                               \
     } while (0)
 
-#define TABLE_ATTACH_ADDRESS(t,addr,label)                              \
+#define GRID_ATTACH_ADDRESS(g,addr,label)                               \
     do {                                                                \
         if (addr) {                                                     \
             gchar * _astr = libbalsa_vcal_attendee_to_str(addr);        \
-            TABLE_ATTACH(table, _astr, label);                          \
+            GRID_ATTACH(g, _astr, label);                               \
             g_free(_astr);                                              \
         }                                                               \
     } while (0)
 
-#define TABLE_ATTACH_TEXT(t,text,label)                                 \
+#define GRID_ATTACH_TEXT(g,text,label)                                  \
     do {                                                                \
         if (text) {                                                     \
             GtkWidget *lbl = gtk_label_new(label);                      \
             GtkTextBuffer *tbuf = gtk_text_buffer_new(NULL);            \
             GtkWidget *tview;                                           \
-            gtk_table_attach(t, lbl, 0, 1, row, row+1,                  \
-                             GTK_FILL, GTK_FILL, 4, 2);                 \
-            gtk_misc_set_alignment(GTK_MISC(lbl), 1.0, 0.0);            \
+            gtk_widget_set_halign(lbl, GTK_ALIGN_START);                \
+            gtk_widget_set_valign(lbl, GTK_ALIGN_START);                \
+            gtk_grid_attach(g, lbl, 0, row, 1, 1);                      \
             gtk_text_buffer_set_text(tbuf, text, -1);                   \
             tview = gtk_text_view_new_with_buffer(tbuf);                \
             gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(tview),           \
-                                        GTK_WRAP_WORD_CHAR);                 \
-            gtk_table_attach(table, tview, 1, 2, row, row + 1,          \
-                             GTK_FILL|GTK_EXPAND, GTK_FILL|GTK_EXPAND,  \
-                             4, 2);                                     \
+                                        GTK_WRAP_WORD_CHAR);            \
+            gtk_widget_set_hexpand(tview, TRUE);                        \
+            gtk_widget_set_vexpand(tview, TRUE);                        \
+            gtk_grid_attach(g, tview, 1, row, 1, 1);                    \
             row++;                                                      \
         }                                                               \
     } while (0)
@@ -160,21 +162,28 @@ static GtkWidget *
 balsa_vevent_widget(LibBalsaVEvent * event, gboolean may_reply,
 		    InternetAddress * sender)
 {
-    GtkTable *table;
+    GtkGrid *grid;
     int row = 0;
     LibBalsaIdentity *vevent_ident = NULL;
 
-    table = GTK_TABLE(gtk_table_new(7, 2, FALSE));
-    TABLE_ATTACH(table, event->summary, _("Summary"));
-    TABLE_ATTACH_ADDRESS(table, event->organizer, _("Organizer"));
-    TABLE_ATTACH_DATE(table, event->start, _("Start"));
-    TABLE_ATTACH_DATE(table, event->end, _("End"));
-    TABLE_ATTACH(table, event->location, _("Location"));
+    grid = GTK_GRID(gtk_grid_new());
+#if GTK_CHECK_VERSION(3, 2, 0)
+    gtk_grid_set_row_spacing(grid, 6);
+    gtk_grid_set_column_spacing(grid, 12);
+#else                           /* GTK_CHECK_VERSION(3, 2, 0) */
+    gtk_grid_set_row_spacing(grid, 12);
+    gtk_grid_set_column_spacing(grid, 6);
+#endif                          /* GTK_CHECK_VERSION(3, 2, 0) */
+    GRID_ATTACH(grid, event->summary, _("Summary:"));
+    GRID_ATTACH_ADDRESS(grid, event->organizer, _("Organizer:"));
+    GRID_ATTACH_DATE(grid, event->start, _("Start:"));
+    GRID_ATTACH_DATE(grid, event->end, _("End:"));
+    GRID_ATTACH(grid, event->location, _("Location:"));
     if (event->attendee) {
 	GList *att;
 	GString *all_atts = NULL;
 
-	for (att = event->attendee; att; att = g_list_next(att)) {
+	for (att = event->attendee; att; att = att->next) {
 	    LibBalsaAddress *lba = LIBBALSA_ADDRESS(att->data);
 	    gchar *this_att = libbalsa_vcal_attendee_to_str(lba);
 
@@ -200,11 +209,12 @@ balsa_vevent_widget(LibBalsaVEvent * event, gboolean may_reply,
 		g_object_unref(ia);
 	    }
 	}
-	TABLE_ATTACH(table, all_atts->str,
-		     event->attendee->next ? _("Attendees") : _("Attendee"));
+	GRID_ATTACH(grid, all_atts->str,
+                    ngettext("Attendee:", "Attendees:",
+                             g_list_length(event->attendee)));
 	g_string_free(all_atts, TRUE);
     }
-    TABLE_ATTACH_TEXT(table, event->description, _("Description"));
+    GRID_ATTACH_TEXT(grid, event->description, _("Description:"));
 
     if (sender && vevent_ident) {
 	GtkWidget *box = gtk_vbox_new(FALSE, 6);
@@ -223,7 +233,7 @@ balsa_vevent_widget(LibBalsaVEvent * event, gboolean may_reply,
 			       (GDestroyNotify) g_object_unref);
 
 	/* pack everything into a box */
-	gtk_container_add(GTK_CONTAINER(box), GTK_WIDGET(table));
+	gtk_container_add(GTK_CONTAINER(box), GTK_WIDGET(grid));
 	label =
 	    gtk_label_new(_("The sender asks you for a reply to this request:"));
 	gtk_container_add(GTK_CONTAINER(box), label);
@@ -259,7 +269,7 @@ balsa_vevent_widget(LibBalsaVEvent * event, gboolean may_reply,
 
 	return box;
     } else
-	return GTK_WIDGET(table);
+	return GTK_WIDGET(grid);
 }
 
 static void

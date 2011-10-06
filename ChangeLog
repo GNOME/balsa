@@ -1,5 +1,10 @@
 2011-10-06  Peter Bloomfield
 
+	* src/filter-edit-callbacks.c (build_type_notebook): add a
+	margin to notebook pages.
+
+2011-10-06  Peter Bloomfield
+
 	* src/filter-edit-callbacks.c (add_button), (add_check),
 	(get_field_frame), (build_type_notebook): migrate from GtkTable
 	to GtkGrid.

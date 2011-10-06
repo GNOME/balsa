@@ -1,5 +1,11 @@
 2011-10-06  Peter Bloomfield
 
+	* src/filter-edit-dialog.c (build_match_page),
+	(fe_make_color_buttons), (build_action_page),
+	(build_right_side): migrate from GtkTable to GtkGrid.
+
+2011-10-06  Peter Bloomfield
+
 	* src/filter-edit-callbacks.c (build_type_notebook): add a
 	margin to notebook pages.
 

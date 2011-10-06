@@ -486,7 +486,7 @@ static GtkWidget *
 create_gpe_dialog(AddressBookConfig * abc)
 {
     GtkWidget *dialog;
-    GtkWidget *grid = libbalsa_create_grid(3, 2);
+    GtkWidget *grid = libbalsa_create_grid();
 
     LibBalsaAddressBook* ab;
     GtkWidget* label;

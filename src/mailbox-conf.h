@@ -43,7 +43,7 @@ void mailbox_conf_edit_cb(GtkWidget * widget, gpointer data);
 /* Helpers for dialogs. */
 BalsaMailboxConfView *mailbox_conf_view_new(LibBalsaMailbox * mailbox,
                                             GtkWindow * window,
-                                            GtkWidget * table, gint row,
+                                            GtkWidget * grid, gint row,
                                             GCallback callback);
 void mailbox_conf_view_check(BalsaMailboxConfView * mcc,
                              LibBalsaMailbox * mailbox);
@@ -52,7 +52,7 @@ void mailbox_conf_view_check(BalsaMailboxConfView * mcc,
 typedef struct {
     GtkWidget *use_ssl;
     GtkWidget *tls_mode;
-    GtkTable  *table;      /* internal */
+    GtkGrid   *grid;       /* internal */
     GtkWidget *tls_option; /* internal */
     GtkWidget *server;     /* internal */
     const gchar *default_ports;

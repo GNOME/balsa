@@ -1,5 +1,14 @@
 2011-10-06  Peter Bloomfield
 
+	* src/mailbox-conf.c (balsa_server_conf_get_advanced_widget),
+	(balsa_server_conf_add_checkbox), (balsa_server_conf_add_spinner),
+	(create_local_mailbox_dialog), (create_pop_mailbox_dialog),
+	(create_imap_mailbox_dialog), (mailbox_conf_view_new_full),
+	(mailbox_conf_view_new): migrate from GtkTable to GtkGrid.
+	* src/mailbox-conf.h: ditto.
+
+2011-10-06  Peter Bloomfield
+
 	* src/folder-conf.c (folder_conf_imap_node),
 	(folder_conf_imap_sub_node): migrate from GtkTable to GtkGrid.
 

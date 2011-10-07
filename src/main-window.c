@@ -4290,13 +4290,11 @@ bw_address_book_cb(GtkWindow *widget, gpointer data)
 }
 
 static GtkToggleButton*
-bw_add_check_button(GtkWidget* table, const gchar* label, gint x, gint y)
+bw_add_check_button(GtkWidget* grid, const gchar* label, gint x, gint y)
 {
     GtkWidget* res = gtk_check_button_new_with_mnemonic(label);
-    gtk_table_attach(GTK_TABLE(table),
-                     res,
-                     x, x+1, y, y+1,
-                     GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 2, 2);
+    gtk_widget_set_hexpand(res, TRUE);
+    gtk_grid_attach(GTK_GRID(grid), res, x, y, 1, 1);
     return GTK_TOGGLE_BUTTON(res);
 }
 
@@ -4339,7 +4337,7 @@ bw_find_real(BalsaWindow * window, BalsaIndex * bindex, gboolean again)
                                         GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                                         NULL);
 	GtkWidget *reverse_button, *wrap_button;
-	GtkWidget *search_entry, *w, *page, *table;
+	GtkWidget *search_entry, *w, *page, *grid;
 	GtkWidget *frame, *box, *button;
 	GtkToggleButton *matching_body, *matching_from;
         GtkToggleButton *matching_to, *matching_cc, *matching_subject;
@@ -4351,15 +4349,17 @@ bw_find_real(BalsaWindow * window, BalsaIndex * bindex, gboolean again)
 #endif
         vbox = gtk_dialog_get_content_area(GTK_DIALOG(dia));
 
-	page=gtk_table_new(2, 1, FALSE);
+	page=gtk_grid_new();
+        gtk_grid_set_row_spacing(GTK_GRID(page), 2);
+        gtk_grid_set_column_spacing(GTK_GRID(page), 2);
 	gtk_container_set_border_width(GTK_CONTAINER(page), 6);
 	w = gtk_label_new_with_mnemonic(_("_Search for:"));
-	gtk_table_attach(GTK_TABLE(page),w,0, 1, 0, 1,
-			 GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 2, 2);
+        gtk_widget_set_hexpand(w, TRUE);
+	gtk_grid_attach(GTK_GRID(page), w, 0, 0, 1, 1);
 	search_entry = gtk_entry_new();
         gtk_entry_set_max_length(GTK_ENTRY(search_entry), 30);
-	gtk_table_attach(GTK_TABLE(page),search_entry,1, 2, 0, 1,
-			 GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 2, 2);
+        gtk_widget_set_hexpand(search_entry, TRUE);
+	gtk_grid_attach(GTK_GRID(page),search_entry,1, 0, 1, 1);
 	gtk_label_set_mnemonic_widget(GTK_LABEL(w), search_entry);
 	gtk_box_pack_start(GTK_BOX(vbox), page, FALSE, FALSE, 2);
 
@@ -4373,13 +4373,14 @@ bw_find_real(BalsaWindow * window, BalsaIndex * bindex, gboolean again)
 	gtk_container_set_border_width(GTK_CONTAINER(frame), 6);
 	gtk_box_pack_start(GTK_BOX(vbox), frame, FALSE, FALSE, 2);
 
-	table = gtk_table_new(2, 3, TRUE);
-	matching_body    = bw_add_check_button(table, _("_Body"),    0, 0);
-	matching_to      = bw_add_check_button(table, _("_To:"),     1, 0);
-	matching_from    = bw_add_check_button(table, _("_From:"),   1, 1);
-        matching_subject = bw_add_check_button(table, _("S_ubject"), 2, 0);
-	matching_cc      = bw_add_check_button(table, _("_Cc:"),     2, 1);
-	gtk_container_add(GTK_CONTAINER(frame), table);
+	grid = gtk_grid_new();
+        gtk_grid_set_column_homogeneous(GTK_GRID(grid), TRUE);
+	matching_body    = bw_add_check_button(grid, _("_Body"),    0, 0);
+	matching_to      = bw_add_check_button(grid, _("_To:"),     1, 0);
+	matching_from    = bw_add_check_button(grid, _("_From:"),   1, 1);
+        matching_subject = bw_add_check_button(grid, _("S_ubject"), 2, 0);
+	matching_cc      = bw_add_check_button(grid, _("_Cc:"),     2, 1);
+	gtk_container_add(GTK_CONTAINER(frame), grid);
 
 	/* Frame with Apply and Clear buttons */
 	frame = gtk_frame_new(_("Show only matching messages"));
@@ -4425,15 +4426,12 @@ bw_find_real(BalsaWindow * window, BalsaIndex * bindex, gboolean again)
                                      wrap);
 	gtk_box_pack_start(GTK_BOX(box), w, TRUE, TRUE, 0);
 
-	/* Button box */
-	w = gtk_hbutton_box_new();
-	gtk_container_set_border_width(GTK_CONTAINER(w), 6);
 	button = gtk_button_new_from_stock(GTK_STOCK_OK);
 	g_signal_connect(G_OBJECT(button), "clicked",
 			 G_CALLBACK(bw_find_button_clicked),
 			 GINT_TO_POINTER(GTK_RESPONSE_OK));
-	gtk_container_add(GTK_CONTAINER(w), button);
-	gtk_box_pack_start(GTK_BOX(box), w, TRUE, TRUE, 0);
+        gtk_widget_set_valign(button, GTK_ALIGN_CENTER);
+	gtk_box_pack_start(GTK_BOX(box), button, TRUE, TRUE, 0);
 
 	gtk_widget_show_all(vbox);
 

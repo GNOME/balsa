@@ -1,5 +1,9 @@
 2011-10-06  Peter Bloomfield
 
+	* src/main-window.c: migrate from GtkTable to GtkGrid.
+
+2011-10-06  Peter Bloomfield
+
 	* src/mailbox-conf.c (balsa_server_conf_get_advanced_widget),
 	(balsa_server_conf_add_checkbox), (balsa_server_conf_add_spinner),
 	(create_local_mailbox_dialog), (create_pop_mailbox_dialog),

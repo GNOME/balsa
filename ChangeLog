@@ -1,3 +1,13 @@
+2011-10-13  Peter Bloomfield
+
+	* src/pref-manager.c (attach_entry), (attach_entry_full),
+	(attach_information_menu), (attach_label), (checking_group),
+	(quoted_group), (broken_8bit_codeset_group), (mdn_group),
+	(word_wrap_group), (other_options_group), (main_window_group),
+	(display_formats_group), (information_messages_group),
+	(attach_font_button), (preview_font_group), (create_grid),
+	(message_window_group): migrate from GtkTable to GtkGrid.
+
 2011-10-06  Peter Bloomfield
 
 	* src/main-window.c: migrate from GtkTable to GtkGrid.

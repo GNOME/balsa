@@ -1,5 +1,11 @@
 2011-10-13  Peter Bloomfield
 
+	* src/print-gtk.c (begin_print), (add_font_button),
+	(add_margin_spinbtn), (message_prefs_widget): migrate from
+	GtkTable to GtkGrid.
+
+2011-10-13  Peter Bloomfield
+
 	* src/pref-manager.c (attach_entry), (attach_entry_full),
 	(attach_information_menu), (attach_label), (checking_group),
 	(quoted_group), (broken_8bit_codeset_group), (mdn_group),

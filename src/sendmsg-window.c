@@ -2579,15 +2579,15 @@ to_add(GtkWidget * widget,
  *
  * Creates a gtk_label()/entry pair.
  *
- * Input: GtkWidget* table       - Table to attach to.
+ * Input: GtkWidget* grid       - Grid to attach to.
  *        const gchar* label     - Label string.
- *        int y_pos              - position in the table.
+ *        int y_pos              - position in the grid.
  *        arr                    - arr[1] is the entry widget.
  *
  * Output: GtkWidget* arr[] - arr[0] will be the label widget.
  */
 static void
-create_email_or_string_entry(GtkWidget * table, const gchar * label,
+create_email_or_string_entry(GtkWidget * grid, const gchar * label,
                              int y_pos, GtkWidget * arr[])
 {
     PangoFontDescription *desc;
@@ -2601,15 +2601,14 @@ create_email_or_string_entry(GtkWidget * table, const gchar * label,
     gtk_misc_set_alignment(GTK_MISC(arr[0]), 0.0, 0.5);
     gtk_misc_set_padding(GTK_MISC(arr[0]), GNOME_PAD_SMALL,
 			 GNOME_PAD_SMALL);
-    gtk_table_attach(GTK_TABLE(table), arr[0], 0, 1, y_pos, y_pos + 1,
-		     GTK_FILL, GTK_FILL | GTK_SHRINK, 0, 0);
+    gtk_grid_attach(GTK_GRID(grid), arr[0], 0, y_pos, 1, 1);
 
     desc = pango_font_description_from_string(balsa_app.message_font);
     gtk_widget_override_font(arr[1], desc);
     pango_font_description_free(desc);
 
-    gtk_table_attach(GTK_TABLE(table), arr[1], 1, 2, y_pos, y_pos + 1,
-		     GTK_FILL | GTK_EXPAND, GTK_FILL | GTK_SHRINK, 0, 0);
+    gtk_widget_set_hexpand(arr[1], TRUE);
+    gtk_grid_attach(GTK_GRID(grid), arr[1], 1, y_pos, 1, 1);
 }
 
 
@@ -2618,30 +2617,30 @@ create_email_or_string_entry(GtkWidget * table, const gchar * label,
  *
  * Creates a gtk_label()/gtk_entry() pair.
  *
- * Input: GtkWidget* table       - Table to attach to.
+ * Input: GtkWidget* grid       - Grid to attach to.
  *        const gchar* label     - Label string.
- *        int y_pos              - position in the table.
+ *        int y_pos              - position in the grid.
  *
  * Output: GtkWidget* arr[] - arr[0] will be the label widget.
  *                          - arr[1] will be the entry widget.
  */
 static void
-create_string_entry(GtkWidget * table, const gchar * label, int y_pos,
+create_string_entry(GtkWidget * grid, const gchar * label, int y_pos,
                     GtkWidget * arr[])
 {
     arr[1] = gtk_entry_new();
     gtk_entry_set_max_length(GTK_ENTRY(arr[1]), 2048);
-    create_email_or_string_entry(table, label, y_pos, arr);
+    create_email_or_string_entry(grid, label, y_pos, arr);
 }
 
 /*
  * static void create_email_entry()
  *
- * Creates a gtk_label()/libbalsa_address_view() and button in a table for
+ * Creates a gtk_label()/libbalsa_address_view() and button in a grid for
  * e-mail entries, eg. To:.  It also sets up some callbacks in gtk.
  *
- * Input:  GtkWidget *table   - table to insert the widgets into.
- *         int y_pos          - How far down in the table to put label.
+ * Input:  GtkWidget *grid   - grid to insert the widgets into.
+ *         int y_pos          - How far down in the grid to put label.
  *         BalsaSendmsg *bsmsg  - The send message window
  * On return, bsmsg->address_view and bsmsg->addresses[1] have been set.
  */
@@ -2680,7 +2679,7 @@ sw_scroll_size_request(GtkWidget * widget, GtkRequisition * requisition)
 #endif
 
 static void
-create_email_entry(GtkWidget * table, int y_pos, BalsaSendmsg * bsmsg,
+create_email_entry(GtkWidget * grid, int y_pos, BalsaSendmsg * bsmsg,
                    LibBalsaAddressView ** view, GtkWidget ** widget,
                    const gchar * label, const gchar * const *types,
                    guint n_types)
@@ -2705,7 +2704,7 @@ create_email_entry(GtkWidget * table, int y_pos, BalsaSendmsg * bsmsg,
     gtk_frame_set_shadow_type(GTK_FRAME(widget[1]), GTK_SHADOW_IN);
     gtk_container_add(GTK_CONTAINER(widget[1]), scroll);
 
-    create_email_or_string_entry(table, _(label), y_pos, widget);
+    create_email_or_string_entry(grid, _(label), y_pos, widget);
 
     g_signal_connect(*view, "drag_data_received",
                      G_CALLBACK(to_add), NULL);
@@ -2741,7 +2740,7 @@ sw_combo_box_changed(GtkComboBox * combo_box, BalsaSendmsg * bsmsg)
 }
 
 static void
-create_from_entry(GtkWidget * table, BalsaSendmsg * bsmsg)
+create_from_entry(GtkWidget * grid, BalsaSendmsg * bsmsg)
 {
     GList *list;
     GtkListStore *store;
@@ -2789,7 +2788,7 @@ create_from_entry(GtkWidget * table, BalsaSendmsg * bsmsg)
     g_object_unref(store);
     g_signal_connect(bsmsg->from[1], "changed",
                      G_CALLBACK(sw_combo_box_changed), bsmsg);
-    create_email_or_string_entry(table, _("F_rom:"), 0, bsmsg->from);
+    create_email_or_string_entry(grid, _("F_rom:"), 0, bsmsg->from);
 }
 
 static gboolean
@@ -2899,31 +2898,31 @@ create_info_pane(BalsaSendmsg * bsmsg)
 {
     guint row = 0;
     GtkWidget *sw;
-    GtkWidget *table;
+    GtkWidget *grid;
     GtkWidget *frame;
     GtkListStore *store;
     GtkCellRenderer *renderer;
     GtkTreeView *view;
     GtkTreeViewColumn *column;
 
-    bsmsg->header_table = table = gtk_table_new(5, 2, FALSE);
-    gtk_table_set_row_spacings(GTK_TABLE(table), 6);
-    gtk_table_set_col_spacings(GTK_TABLE(table), 6);
-    gtk_container_set_border_width(GTK_CONTAINER(table), 6);
+    grid = gtk_grid_new();
+    gtk_grid_set_row_spacing(GTK_GRID(grid), 6);
+    gtk_grid_set_column_spacing(GTK_GRID(grid), 6);
+    gtk_container_set_border_width(GTK_CONTAINER(grid), 6);
 
     /* From: */
-    create_from_entry(table, bsmsg);
+    create_from_entry(grid, bsmsg);
 
 #if !defined(ENABLE_TOUCH_UI)
     /* Create the 'Reply To:' entry before the regular recipients, to
      * get the initial focus in the regular recipients*/
 #define REPLY_TO_ROW 3
-    create_email_entry(table, REPLY_TO_ROW, bsmsg, &bsmsg->replyto_view,
+    create_email_entry(grid, REPLY_TO_ROW, bsmsg, &bsmsg->replyto_view,
                        bsmsg->replyto, "R_eply To:", NULL, 0);
 #endif
 
     /* To:, Cc:, and Bcc: */
-    create_email_entry(table, ++row, bsmsg, &bsmsg->recipient_view,
+    create_email_entry(grid, ++row, bsmsg, &bsmsg->recipient_view,
                        bsmsg->recipients, "Rec_ipients", address_types,
                        G_N_ELEMENTS(address_types));
     g_signal_connect_swapped(gtk_tree_view_get_model
@@ -2936,7 +2935,7 @@ create_info_pane(BalsaSendmsg * bsmsg)
                              G_CALLBACK(sendmsg_window_set_title), bsmsg);
 
     /* Subject: */
-    create_string_entry(table, _("S_ubject:"), ++row, bsmsg->subject);
+    create_string_entry(grid, _("S_ubject:"), ++row, bsmsg->subject);
     g_signal_connect_swapped(G_OBJECT(bsmsg->subject[1]), "changed",
                              G_CALLBACK(sendmsg_window_set_title), bsmsg);
 
@@ -2953,8 +2952,7 @@ create_info_pane(BalsaSendmsg * bsmsg)
     gtk_misc_set_padding(GTK_MISC(bsmsg->fcc[0]), GNOME_PAD_SMALL,
 			 GNOME_PAD_SMALL);
     ++row;
-    gtk_table_attach(GTK_TABLE(table), bsmsg->fcc[0], 0, 1, row, row + 1,
-                     GTK_FILL, GTK_FILL | GTK_SHRINK, 0, 0);
+    gtk_grid_attach(GTK_GRID(grid), bsmsg->fcc[0], 0, row, 1, 1);
 
     if (!balsa_app.fcc_mru)
         balsa_mblist_mru_add(&balsa_app.fcc_mru, balsa_app.sentbox->url);
@@ -2973,8 +2971,7 @@ create_info_pane(BalsaSendmsg * bsmsg)
         balsa_mblist_mru_option_menu(GTK_WINDOW(bsmsg->window),
                                      &balsa_app.fcc_mru);
     gtk_label_set_mnemonic_widget(GTK_LABEL(bsmsg->fcc[0]), bsmsg->fcc[1]);
-    gtk_table_attach(GTK_TABLE(table), bsmsg->fcc[1] , 1, 2, row, row + 1,
-		     GTK_FILL, GTK_FILL, 0, 0);
+    gtk_grid_attach(GTK_GRID(grid), bsmsg->fcc[1] , 1, row, 1, 1);
 
     /* Attachment list */
     bsmsg->attachments[0] = gtk_label_new_with_mnemonic(_("_Attachments:"));
@@ -2982,8 +2979,7 @@ create_info_pane(BalsaSendmsg * bsmsg)
     gtk_misc_set_padding(GTK_MISC(bsmsg->attachments[0]), GNOME_PAD_SMALL,
 			 GNOME_PAD_SMALL);
     ++row;
-    gtk_table_attach(GTK_TABLE(table), bsmsg->attachments[0], 0, 1, row, row + 1,
-		     GTK_FILL, GTK_FILL | GTK_SHRINK, 0, 0);
+    gtk_grid_attach(GTK_GRID(grid), bsmsg->attachments[0], 0, row, 1, 1);
 
     sw = gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(sw),
@@ -3075,16 +3071,16 @@ create_info_pane(BalsaSendmsg * bsmsg)
     gtk_container_add(GTK_CONTAINER(sw), bsmsg->attachments[1]);
     gtk_container_add(GTK_CONTAINER(frame), sw);
 
-    gtk_table_attach(GTK_TABLE(table), frame, 1, 2, row, row + 1,
-		     GTK_FILL | GTK_EXPAND,
-		     GTK_FILL | GTK_EXPAND | GTK_SHRINK, 0, 0);
+    gtk_widget_set_hexpand(frame, TRUE);
+    gtk_widget_set_vexpand(frame, TRUE);
+    gtk_grid_attach(GTK_GRID(grid), frame, 1, row, 1, 1);
 
     bsmsg->attachments[2] = sw;
     bsmsg->attachments[3] = frame;
 
-    gtk_widget_show_all(table);
+    gtk_widget_show_all(grid);
     hide_attachment_widget(bsmsg);
-    return table;
+    return grid;
 }
 
 typedef struct {
@@ -3227,7 +3223,7 @@ create_text_area(BalsaSendmsg * bsmsg)
     GtkTextView *text_view;
     PangoFontDescription *desc;
     GtkTextBuffer *buffer;
-    GtkWidget *table;
+    GtkWidget *grid;
 
 #if HAVE_GTKSOURCEVIEW
     bsmsg->text = libbalsa_source_view_new(TRUE);
@@ -3256,16 +3252,16 @@ create_text_area(BalsaSendmsg * bsmsg)
                      G_CALLBACK(sw_can_redo_cb), bsmsg);
 #else                           /* HAVE_GTKSOURCEVIEW */
     bsmsg->buffer2 =
-         gtk_text_buffer_new(gtk_text_buffer_get_tag_table(buffer));
+         gtk_text_buffer_new(gtk_text_buffer_get_tag_grid(buffer));
 #endif                          /* HAVE_GTKSOURCEVIEW */
     gtk_text_buffer_create_tag(buffer, "url", NULL, NULL);
     gtk_text_view_set_editable(text_view, TRUE);
     gtk_text_view_set_wrap_mode(text_view, GTK_WRAP_WORD_CHAR);
 
-    table = gtk_scrolled_window_new(NULL, NULL);
-    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(table),
+    grid = gtk_scrolled_window_new(NULL, NULL);
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(grid),
     				   GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
-    gtk_container_add(GTK_CONTAINER(table), bsmsg->text);
+    gtk_container_add(GTK_CONTAINER(grid), bsmsg->text);
     g_signal_connect(G_OBJECT(bsmsg->text), "drag_data_received",
 		     G_CALLBACK(drag_data_quote), bsmsg);
     /* GTK_DEST_DEFAULT_ALL in drag_set would trigger bug 150141 */
@@ -3273,9 +3269,9 @@ create_text_area(BalsaSendmsg * bsmsg)
 		      drop_types, ELEMENTS(drop_types),
 		      GDK_ACTION_COPY | GDK_ACTION_MOVE | GDK_ACTION_LINK);
 
-    gtk_widget_show_all(GTK_WIDGET(table));
+    gtk_widget_show_all(GTK_WIDGET(grid));
 
-    return table;
+    return grid;
 }
 
 /* Check whether the string can be converted. */

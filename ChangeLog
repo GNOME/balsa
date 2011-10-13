@@ -1,5 +1,13 @@
 2011-10-13  Peter Bloomfield
 
+	* src/sendmsg-window.h: remove redundant member header_table.
+	* src/sendmsg-window.c (create_email_or_string_entry),
+	(create_string_entry), (create_email_entry), (create_from_entry),
+	(create_info_pane), (create_text_area): ditto; migrate from
+	GtkTable to GtkGrid.
+
+2011-10-13  Peter Bloomfield
+
 	* src/print-gtk.c (begin_print), (add_font_button),
 	(add_margin_spinbtn), (message_prefs_widget): migrate from
 	GtkTable to GtkGrid.

@@ -105,7 +105,6 @@ extern "C" {
 #ifdef HAVE_GPGME
 	guint gpg_mode;
 #endif
-        GtkWidget *header_table;
 
 #if !HAVE_GTKSOURCEVIEW
         GtkTextBuffer *buffer2;       /* Undo buffer. */

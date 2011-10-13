@@ -937,7 +937,7 @@ bab_filter_entry_changed(GtkWidget *entry, GtkWidget *button)
 static GtkWidget*
 bab_get_filter_box(void)
 {
-    GtkWidget *search_hbox = gtk_hbox_new(FALSE, 1);
+    GtkWidget *search_hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 1);
     GtkWidget *find_label, *find_entry, *button;
 
     gtk_widget_show(search_hbox);
@@ -985,7 +985,7 @@ bab_window_new()
     gtk_window_set_title(GTK_WINDOW(wnd), "Contacts");
 
     /* main vbox */
-    main_vbox = gtk_vbox_new(FALSE, 1);
+    main_vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 1);
     gtk_container_add(GTK_CONTAINER(wnd), main_vbox);
 
     get_main_menu(GTK_WIDGET(wnd), &menubar, contacts_app.address_book_list);
@@ -999,7 +999,7 @@ bab_window_new()
     gtk_box_pack_start(GTK_BOX(main_vbox),
 		       contacts_app.notebook, TRUE, TRUE, 1);
 
-    browse_widget = gtk_vbox_new(FALSE, 1);
+    browse_widget = gtk_box_new(GTK_ORIENTATION_VERTICAL, 1);
 
     /* Entry widget for finding an address */
     gtk_box_pack_start(GTK_BOX(browse_widget),
@@ -1017,7 +1017,7 @@ bab_window_new()
     gtk_notebook_append_page(GTK_NOTEBOOK(contacts_app.notebook), browse_widget,
 			     gtk_label_new("Browse"));
 
-    edit_widget = gtk_vbox_new(FALSE, 1);
+    edit_widget = gtk_box_new(GTK_ORIENTATION_VERTICAL, 1);
     contacts_app.edit_widget =
         libbalsa_address_get_edit_widget(NULL, contacts_app.entries,
                                          G_CALLBACK(address_changed_cb),

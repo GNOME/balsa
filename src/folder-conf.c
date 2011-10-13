@@ -862,7 +862,7 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
     g_signal_connect(G_OBJECT(button), "clicked",
 		     G_CALLBACK(browse_button_cb), (gpointer) sdd);
 
-    hbox = gtk_hbox_new(FALSE, 12);
+    hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 12);
     gtk_widget_set_hexpand(hbox, TRUE);
     gtk_box_pack_start(GTK_BOX(hbox), sdd->parent_folder, TRUE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, FALSE, 0);

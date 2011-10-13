@@ -77,7 +77,7 @@ balsa_mime_widget_signature_widget(LibBalsaMessageBody * mime_body,
 	infostr = labelstr;
     }
     
-    vbox = gtk_vbox_new(FALSE, BMW_VBOX_SPACE);
+    vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, BMW_VBOX_SPACE);
     gtk_container_set_border_width(GTK_CONTAINER(vbox), BMW_CONTAINER_BORDER);
     label = gtk_label_new(infostr);
     gtk_label_set_selectable(GTK_LABEL(label), TRUE);
@@ -118,9 +118,9 @@ balsa_mime_widget_crypto_frame(LibBalsaMessageBody * mime_body, GtkWidget * chil
     const gchar * icon_name;
 
     frame = gtk_frame_new(NULL);
-    vbox = gtk_vbox_new(FALSE, BMW_VBOX_SPACE);
+    vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, BMW_VBOX_SPACE);
     gtk_container_add(GTK_CONTAINER(frame), vbox);
-    icon_box = gtk_hbox_new(FALSE, BMW_VBOX_SPACE);
+    icon_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, BMW_VBOX_SPACE);
     if (was_encrypted)
 	gtk_box_pack_start(GTK_BOX(icon_box),
 			   gtk_image_new_from_stock(BALSA_PIXMAP_ENCR, GTK_ICON_SIZE_MENU),

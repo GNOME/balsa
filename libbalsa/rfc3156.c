@@ -1517,7 +1517,7 @@ select_key_from_list(const gchar * name, gboolean is_secret,
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu_for_parent(dialog, parent);
 #endif
-    vbox = gtk_vbox_new(FALSE, 12);
+    vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 12);
     gtk_container_add(GTK_CONTAINER
                       (gtk_dialog_get_content_area(GTK_DIALOG(dialog))),
                       vbox);
@@ -1708,13 +1708,13 @@ get_passphrase_real(GMimeGpgmeContext * ctx, const gchar * uid_hint,
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu_for_parent(dialog, parent);
 #endif
-    hbox = gtk_hbox_new(FALSE, 12);
+    hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 12);
     gtk_container_set_border_width(GTK_CONTAINER(hbox), 12);
     gtk_container_add(GTK_CONTAINER
                       (gtk_dialog_get_content_area(GTK_DIALOG(dialog))),
                       hbox);
 
-    vbox = gtk_vbox_new(FALSE, 12);
+    vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 12);
     gtk_container_add(GTK_CONTAINER(hbox), vbox);
     if (!padlock_keyhole)
 	padlock_keyhole =
@@ -1722,7 +1722,7 @@ get_passphrase_real(GMimeGpgmeContext * ctx, const gchar * uid_hint,
     gtk_box_pack_start(GTK_BOX(vbox),
 		       gtk_image_new_from_pixbuf(padlock_keyhole), FALSE,
 		       FALSE, 0);
-    vbox = gtk_vbox_new(FALSE, 12);
+    vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 12);
     gtk_container_add(GTK_CONTAINER(hbox), vbox);
     if (prev_was_bad)
 	prompt =

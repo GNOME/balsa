@@ -288,7 +288,7 @@ balsa_ab_window_init(BalsaAbWindow *ab)
 		     G_CALLBACK(balsa_ab_window_find), ab);
 
     /* Pack the find stuff into the grid */
-    box2 = gtk_hbox_new(FALSE, 1);
+    box2 = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 1);
     gtk_grid_attach(GTK_GRID(grid), box2, 0, 0, 1, 1);
     gtk_box_pack_start(GTK_BOX(box2), find_label, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(box2), ab->filter_entry, TRUE, TRUE, 0);
@@ -330,7 +330,7 @@ balsa_ab_window_init(BalsaAbWindow *ab)
 
     /* -- grid column 2 -- */
     /* Column for arrows in compose mode */
-    ab->arrow_box = gtk_vbox_new(FALSE, 5);
+    ab->arrow_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
     gtk_widget_set_vexpand(ab->arrow_box, TRUE);
     gtk_grid_attach(GTK_GRID(grid), ab->arrow_box, 1, 1, 1, 1);
     gtk_widget_show(ab->arrow_box);
@@ -388,7 +388,8 @@ balsa_ab_window_init(BalsaAbWindow *ab)
 	    ab->current_address_book->dist_list_mode);
 
     /* Pack them into a box  */
-    box2 = gtk_vbox_new(TRUE, 1);
+    box2 = gtk_box_new(GTK_ORIENTATION_VERTICAL, 1);
+    gtk_box_set_homogeneous(GTK_BOX(box2), TRUE);
     gtk_container_add(GTK_CONTAINER(frame), box2);
     gtk_box_pack_start(GTK_BOX(box2), ab->single_address_mode_radio,
 		       FALSE, FALSE, 1);

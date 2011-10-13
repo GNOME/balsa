@@ -263,7 +263,7 @@ balsa_druid_page_directory(GtkAssistant * druid, GdkPixbuf * default_logo)
     BalsaDruidPageDirectory *dir;
 
     dir = g_new0(BalsaDruidPageDirectory, 1);
-    dir->page = gtk_vbox_new(FALSE, FALSE);
+    dir->page = gtk_box_new(GTK_ORIENTATION_VERTICAL, FALSE);
     gtk_assistant_append_page(druid, dir->page);
     gtk_assistant_set_page_title(druid, dir->page, _("Mail Files"));
     gtk_assistant_set_page_header_image(druid, dir->page, default_logo);

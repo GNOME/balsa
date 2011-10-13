@@ -1239,7 +1239,7 @@ bw_create_index_widget(BalsaWindow *bw)
         view_filters_translated = TRUE;
     }
 
-    bw->sos_bar = gtk_hbox_new(FALSE, 5);
+    bw->sos_bar = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
 
     bw->filter_choice = gtk_combo_box_text_new();
     gtk_box_pack_start(GTK_BOX(bw->sos_bar), bw->filter_choice,
@@ -1276,7 +1276,7 @@ bw_create_index_widget(BalsaWindow *bw)
     g_signal_connect(G_OBJECT(bw->filter_choice), "changed",
                      G_CALLBACK(bw_filter_entry_changed), button);
     gtk_widget_show_all(button);
-    vbox = gtk_vbox_new(FALSE, 0);
+    vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 #if defined(ENABLE_TOUCH_UI)
     /* Usually we want to show the widget unless we operate in
      * space-constrained conditions. */
@@ -1685,7 +1685,7 @@ balsa_window_new()
     balsa_register_pixmaps();
 
     window = g_object_new(BALSA_TYPE_WINDOW, NULL);
-    window->vbox = gtk_vbox_new(FALSE, 0);
+    window->vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     gtk_widget_show(window->vbox);
     gtk_container_add(GTK_CONTAINER(window), window->vbox);
 
@@ -1735,7 +1735,7 @@ balsa_window_new()
      * need the UIManager. */
     g_object_unref(ui_manager);
 
-    window->bottom_bar = hbox = gtk_hbox_new(FALSE, 6);
+    window->bottom_bar = hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 6);
     gtk_box_pack_end(GTK_BOX(window->vbox), hbox, FALSE, FALSE, 0);
 
     window->progress_bar = gtk_progress_bar_new();
@@ -2288,7 +2288,7 @@ bw_notebook_label_new(BalsaMailboxNode * mbnode)
     gint w, h;
     GtkCssProvider *css_provider;
 
-    box = gtk_hbox_new(FALSE, 4);
+    box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 4);
 
     lab = gtk_label_new(mbnode->mailbox->name);
     bw_notebook_label_style(GTK_LABEL(lab),
@@ -4410,9 +4410,10 @@ bw_find_real(BalsaWindow * window, BalsaIndex * bindex, gboolean again)
 	gtk_box_pack_start(GTK_BOX(vbox), frame, FALSE, FALSE, 2);
 
 	/* Reverse and Wrap checkboxes */
-	box = gtk_hbox_new(FALSE, 6);
+	box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 6);
 	gtk_container_add(GTK_CONTAINER(frame), box);
-	w = gtk_vbox_new(TRUE, 2);
+	w = gtk_box_new(GTK_ORIENTATION_VERTICAL, 2);
+        gtk_box_set_homogeneous(GTK_BOX(w), TRUE);
 	gtk_container_set_border_width(GTK_CONTAINER(w), 6);
 	reverse_button =
             gtk_check_button_new_with_mnemonic(_("_Reverse search"));

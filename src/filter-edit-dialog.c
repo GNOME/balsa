@@ -197,7 +197,7 @@ build_left_side(void)
        | -- --  |
        \--------/
      */
-    vbox = gtk_vbox_new(FALSE, 2);
+    vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 2);
 
     /* the list */
     sw = gtk_scrolled_window_new(NULL, NULL);
@@ -276,7 +276,7 @@ build_match_page()
     gtk_widget_set_halign(label, GTK_ALIGN_START);
     gtk_grid_attach(GTK_GRID(page), label, 0, 1, 1, 1);
 
-    box = gtk_vbox_new(FALSE, 2);
+    box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 2);
     gtk_widget_set_hexpand(box, TRUE);
     gtk_grid_attach(GTK_GRID(page), box, 1, 1, 1, 1);
 
@@ -378,7 +378,8 @@ build_action_page(GtkWindow * window)
     GtkWidget *box;
     GtkWidget *dialog;
 
-    page = gtk_vbox_new(TRUE, 5);
+    page = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
+    gtk_box_set_homogeneous(GTK_BOX(page), TRUE);
 
     /* The notification area */
 
@@ -442,7 +443,8 @@ build_action_page(GtkWindow * window)
     gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_ETCHED_IN);
     gtk_box_pack_start(GTK_BOX(page), frame, FALSE, FALSE, 0);
 
-    box = gtk_vbox_new(TRUE, 2);
+    box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 2);
+    gtk_box_set_homogeneous(GTK_BOX(box), TRUE);
     gtk_container_set_border_width(GTK_CONTAINER(frame), 3);
     gtk_container_add(GTK_CONTAINER(frame), box);
 
@@ -481,7 +483,7 @@ build_right_side(GtkWindow * window)
     GtkWidget *notebook, *page;
     GtkWidget *bbox;
 
-    rightside = gtk_vbox_new(FALSE, 5);
+    rightside = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
 
     /* the main notebook */
     notebook = gtk_notebook_new();
@@ -589,7 +591,7 @@ filters_edit_dialog(void)
                                       GTK_RESPONSE_OK, FALSE);
 
     /* main hbox */
-    hbox = gtk_hbox_new(FALSE, FILTER_EDIT_PADDING);
+    hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, FILTER_EDIT_PADDING);
     gtk_box_pack_start(GTK_BOX
                        (gtk_dialog_get_content_area(GTK_DIALOG(fe_window))),
                        hbox, TRUE, TRUE, FILTER_EDIT_PADDING);

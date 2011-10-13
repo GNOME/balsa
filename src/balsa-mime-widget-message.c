@@ -126,7 +126,7 @@ balsa_mime_widget_new_message(BalsaMessage * bm,
 
 	mw->widget = gtk_frame_new(NULL);
 
-	mw->container = gtk_vbox_new(FALSE, BMW_MESSAGE_PADDING);
+	mw->container = gtk_box_new(GTK_ORIENTATION_VERTICAL, BMW_MESSAGE_PADDING);
 	gtk_container_set_border_width(GTK_CONTAINER(mw->container),
 				       BMW_MESSAGE_PADDING);
 	gtk_container_add(GTK_CONTAINER(mw->widget), mw->container);
@@ -215,7 +215,7 @@ bmw_message_extbody_url(LibBalsaMessageBody * mime_body,
     /* now create & return the widget... */
     mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
     
-    mw->widget = gtk_vbox_new(FALSE, BMW_VBOX_SPACE);
+    mw->widget = gtk_box_new(GTK_ORIENTATION_VERTICAL, BMW_VBOX_SPACE);
     gtk_container_set_border_width(GTK_CONTAINER(mw->widget),
 				   BMW_CONTAINER_BORDER);
 
@@ -262,7 +262,7 @@ bmw_message_extbody_mail(LibBalsaMessageBody * mime_body)
     /* now create & return the widget... */
     mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
     
-    mw->widget = gtk_vbox_new(FALSE, BMW_VBOX_SPACE);
+    mw->widget = gtk_box_new(GTK_ORIENTATION_VERTICAL, BMW_VBOX_SPACE);
     gtk_container_set_border_width(GTK_CONTAINER(mw->widget),
 				   BMW_CONTAINER_BORDER);
 
@@ -379,13 +379,13 @@ balsa_mime_widget_new_message_tl(BalsaMessage * bm, GtkWidget * tl_buttons)
 
     mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
 
-    mw->widget = gtk_vbox_new(FALSE, BMW_MESSAGE_PADDING);
+    mw->widget = gtk_box_new(GTK_ORIENTATION_VERTICAL, BMW_MESSAGE_PADDING);
     gtk_container_set_border_width(GTK_CONTAINER(mw->widget), BMW_MESSAGE_PADDING);
 
     mw->header_widget = headers = bm_header_widget_new(bm, tl_buttons);
     gtk_box_pack_start(GTK_BOX(mw->widget), headers, FALSE, FALSE, 0);
 
-    mw->container = gtk_vbox_new(FALSE, BMW_MESSAGE_PADDING);
+    mw->container = gtk_box_new(GTK_ORIENTATION_VERTICAL, BMW_MESSAGE_PADDING);
     gtk_box_pack_start(GTK_BOX(mw->widget), mw->container, TRUE, TRUE,
 		       BMW_CONTAINER_BORDER - BMW_MESSAGE_PADDING);
 
@@ -506,7 +506,7 @@ bm_header_widget_new(BalsaMessage * bm, GtkWidget * buttons)
     g_signal_connect_after(widget, "style-updated",
 			   G_CALLBACK(bm_header_widget_set_style), bm);
 
-    hbox = gtk_hbox_new(FALSE, 0);
+    hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
     gtk_container_add(GTK_CONTAINER(widget), hbox);
 
     text_view = gtk_text_view_new();

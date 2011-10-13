@@ -178,7 +178,7 @@ customize_dialog_cb(GtkWidget * widget, gpointer data)
     gtk_container_set_border_width(GTK_CONTAINER(option_frame), 6);
     gtk_box_pack_start(GTK_BOX(content_area), option_frame, FALSE, FALSE, 0);
 
-    option_box = gtk_vbox_new(FALSE, 6);
+    option_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 6);
     gtk_container_set_border_width(GTK_CONTAINER(option_box), 6);
     gtk_container_add(GTK_CONTAINER(option_frame), option_box);
 
@@ -385,7 +385,7 @@ create_toolbar_page(BalsaToolbarModel * model, GtkUIManager * ui_manager)
     page->model = model;
 
     /* The "window itself" */
-    outer_box=gtk_vbox_new(FALSE, 0);
+    outer_box=gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     g_object_set_data_full(G_OBJECT(outer_box), BALSA_KEY_TOOLBAR_PAGE,
                            page, g_free);
 
@@ -394,7 +394,7 @@ create_toolbar_page(BalsaToolbarModel * model, GtkUIManager * ui_manager)
     gtk_container_set_border_width(GTK_CONTAINER(toolbar_frame), 5);
     gtk_box_pack_start(GTK_BOX(outer_box), toolbar_frame, FALSE, FALSE, 0);
 
-    toolbar_ctlbox=gtk_vbox_new(FALSE, 5);
+    toolbar_ctlbox=gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
     gtk_container_add(GTK_CONTAINER(toolbar_frame), toolbar_ctlbox);
     gtk_container_set_border_width(GTK_CONTAINER(toolbar_ctlbox), 5);
 
@@ -437,7 +437,7 @@ create_toolbar_page(BalsaToolbarModel * model, GtkUIManager * ui_manager)
     /* Done with preview */
 
     /* Box for lower half of window */
-    lower_ctlbox=gtk_hbox_new(FALSE, 5);
+    lower_ctlbox=gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
     gtk_container_set_border_width(GTK_CONTAINER(lower_ctlbox), 5);
 
     gtk_box_pack_start(GTK_BOX(outer_box), lower_ctlbox, TRUE, TRUE, 0);
@@ -470,9 +470,10 @@ create_toolbar_page(BalsaToolbarModel * model, GtkUIManager * ui_manager)
     /* Done with destination list */
 
     /* Button box */
-    center_button_box=gtk_vbox_new(TRUE, 0);
+    center_button_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+    gtk_box_set_homogeneous(GTK_BOX(center_button_box), TRUE);
 
-    button_box=gtk_vbox_new(FALSE, 0);
+    button_box=gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 
     gtk_box_pack_start(GTK_BOX(lower_ctlbox), center_button_box,
 		       FALSE, FALSE, 0);
@@ -484,7 +485,7 @@ create_toolbar_page(BalsaToolbarModel * model, GtkUIManager * ui_manager)
         balsa_stock_button_with_label(GTK_STOCK_GO_UP, _("Up"));
     gtk_box_pack_start(GTK_BOX(button_box), page->back_button, FALSE, FALSE, 0);
 
-    move_button_box=gtk_hbox_new(FALSE, 0);
+    move_button_box=gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
     gtk_box_pack_start(GTK_BOX(button_box), move_button_box, FALSE, FALSE, 0);
 
     page->remove_button =

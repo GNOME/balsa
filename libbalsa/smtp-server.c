@@ -611,7 +611,7 @@ libbalsa_smtp_server_dialog(LibBalsaSmtpServer * smtp_server,
     sdi->split_button =
         gtk_check_button_new_with_mnemonic(_("Sp_lit message larger than"));
     gtk_grid_attach(GTK_GRID(grid), sdi->split_button, 0, row, 1, 1);
-    hbox = gtk_hbox_new(FALSE, 6);
+    hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 6);
     sdi->big_message = gtk_spin_button_new_with_range(0.1, 100, 0.1);
     gtk_box_pack_start(GTK_BOX(hbox), sdi->big_message, TRUE, TRUE, 0);
     label = gtk_label_new(_("MB"));

@@ -571,7 +571,7 @@ balsa_stock_button_with_label(const char *icon, const char *text)
     GtkWidget *button;
     GtkWidget *pixmap = gtk_image_new_from_stock(icon, GTK_ICON_SIZE_BUTTON);
     GtkWidget *align = gtk_alignment_new(0.5, 0.5, 0, 0);
-    GtkWidget *hbox = gtk_hbox_new(FALSE, 0);
+    GtkWidget *hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
 
     button = gtk_button_new();
     gtk_container_add(GTK_CONTAINER(button), align);

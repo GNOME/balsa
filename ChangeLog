@@ -1,5 +1,59 @@
 2011-10-13  Peter Bloomfield
 
+	Gtk{HV}Box is deprecated.
+
+	* libbalsa/address.c (libbalsa_address_get_edit_widget):
+	* libbalsa/html.c (libbalsa_html_new):
+	* libbalsa/identity.c (append_ident_notebook_page),
+	(ident_dialog_add_boxes), (libbalsa_identity_config_dialog):
+	* libbalsa/rfc3156.c (select_key_from_list), (get_passphrase_real):
+	* libbalsa/smtp-server.c (libbalsa_smtp_server_dialog):
+	* libbalsa/source-viewer.c (libbalsa_show_message_source):
+	* libinit_balsa/assistant_page_defclient.c
+	(balsa_druid_page_defclient):
+	* libinit_balsa/assistant_page_directory.c
+	(balsa_druid_page_directory):
+	* libinit_balsa/assistant_page_user.c (balsa_druid_page_user):
+	* src/ab-main.c (bab_get_filter_box), (bab_window_new):
+	* src/ab-window.c (balsa_ab_window_init):
+	* src/balsa-app.c (balsa_stock_button_with_label):
+	* src/balsa-message.c (bm_header_tl_buttons), (bm_find_bar_new),
+	(balsa_message_init):
+	* src/balsa-mime-widget-crypto.c
+	(balsa_mime_widget_signature_widget),
+	(balsa_mime_widget_crypto_frame):
+	* src/balsa-mime-widget-message.c (balsa_mime_widget_new_message),
+	(bmw_message_extbody_url), (bmw_message_extbody_mail),
+	(balsa_mime_widget_new_message_tl), (bm_header_widget_new):
+	* src/balsa-mime-widget-multipart.c
+	(balsa_mime_widget_new_multipart):
+	* src/balsa-mime-widget-vcalendar.c
+	(balsa_mime_widget_new_vcalendar), (balsa_vevent_widget):
+	* src/balsa-mime-widget.c (balsa_mime_widget_new_unknown):
+	* src/filter-edit-callbacks.c (build_type_notebook),
+	(build_condition_dialog):
+	* src/filter-edit-dialog.c (build_left_side), (build_match_page),
+	(build_action_page), (build_right_side), (filters_edit_dialog):
+	* src/filter-run-dialog.c (balsa_filter_run_dialog_init):
+	* src/folder-conf.c (folder_conf_imap_sub_node):
+	* src/mailbox-conf.c (balsa_server_conf_get_advanced_widget):
+	* src/main-window.c:
+	* src/message-window.c (message_window_new):
+	* src/pref-manager.c (open_preferences_manager),
+	(vbox_in_container), (color_box), (remote_mailbox_servers_group),
+	(outgoing_mail_group), (checking_group), (message_colors_group),
+	(add_pref_menu), (misc_group), (deleting_messages_group),
+	(folder_scanning_group), (address_books_group), (pm_page_new),
+	(pm_group_new):
+	* src/print-gtk.c (message_prefs_widget):
+	* src/sendmsg-window.c (sw_get_user_codeset),
+	(quote_parts_select_dlg), (sendmsg_window_new),
+	(subject_not_empty), (check_suggest_encryption):
+	* src/toolbar-prefs.c (customize_dialog_cb),
+	(create_toolbar_page): deprecation cleanup.
+
+2011-10-13  Peter Bloomfield
+
 	* src/sendmsg-window.h: remove redundant member header_table.
 	* src/sendmsg-window.c (create_email_or_string_entry),
 	(create_string_entry), (create_email_entry), (create_from_entry),

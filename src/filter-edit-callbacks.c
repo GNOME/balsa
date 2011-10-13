@@ -1006,7 +1006,7 @@ build_type_notebook()
     gtk_grid_set_row_spacing(GTK_GRID(grid), 5);
     gtk_grid_set_column_spacing(GTK_GRID(grid), 5);
 
-    box = gtk_vbox_new(FALSE, 5);
+    box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
     g_object_set(box, "margin", 5, NULL);
     gtk_box_pack_start(GTK_BOX(box), grid, TRUE, TRUE, 0);
 
@@ -1031,7 +1031,7 @@ build_type_notebook()
     gtk_notebook_append_page(GTK_NOTEBOOK(fe_type_notebook), box, NULL);
     
     /* The regex page of the type notebook */
-    box = gtk_vbox_new(FALSE, 5);
+    box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
     g_object_set(box, "margin", 5, NULL);
 
     gtk_notebook_append_page(GTK_NOTEBOOK(fe_type_notebook), box, NULL);
@@ -1063,7 +1063,8 @@ build_type_notebook()
 
     gtk_container_add(GTK_CONTAINER(scroll), GTK_WIDGET(fe_type_regex_list));
 
-    box = gtk_hbox_new(TRUE, 5);
+    box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
+    gtk_box_set_homogeneous(GTK_BOX(box), TRUE);
     gtk_table_attach(GTK_TABLE(page),
                      box,
                      0, 5, 4, 5,
@@ -1174,7 +1175,7 @@ void build_condition_dialog(GtkWidget * condition_dialog)
 
     /* builds the toggle buttons to specify fields concerned by the
      * conditions of the filter */
-    box = gtk_hbox_new(FALSE, 5);
+    box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
     label = gtk_label_new_with_mnemonic(_("Search T_ype:"));
     gtk_box_pack_start(GTK_BOX(box), label, FALSE, FALSE, 5);
     fe_search_option_menu = 

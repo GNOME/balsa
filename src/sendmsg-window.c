@@ -1886,7 +1886,7 @@ sw_get_user_codeset(BalsaSendmsg * bsmsg, gboolean * change_type,
 
     if (change_type) {
         GtkWidget *label = gtk_label_new(_("Attach as MIME type:"));
-        GtkWidget *hbox = gtk_hbox_new(FALSE, 5);
+        GtkWidget *hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
         combo_box = gtk_combo_box_text_new();
 
         gtk_box_pack_start(content_box, hbox, TRUE, TRUE, 5);
@@ -3680,8 +3680,8 @@ quote_parts_select_dlg(GtkTreeStore *tree_store, GtkWindow * parent)
     gtk_misc_set_alignment(GTK_MISC(image), 0.5, 0.0);
 
     /* stolen form gtk/gtkmessagedialog.c */
-    hbox = gtk_hbox_new (FALSE, 12);
-    vbox = gtk_vbox_new (FALSE, 12);
+    hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 12);
+    vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 12);
 
     gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(hbox), image, FALSE, FALSE, 0);
@@ -4548,7 +4548,7 @@ sendmsg_window_new()
 {
     BalsaToolbarModel *model;
     GtkWidget *window;
-    GtkWidget *main_box = gtk_vbox_new(FALSE, 0);
+    GtkWidget *main_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     BalsaSendmsg *bsmsg = NULL;
 #if HAVE_GTKSOURCEVIEW
     GtkSourceBuffer *source_buffer;
@@ -5705,7 +5705,7 @@ subject_not_empty(BalsaSendmsg * bsmsg)
 
     dialog_vbox = gtk_dialog_get_content_area(GTK_DIALOG(no_subj_dialog));
 
-    hbox = gtk_hbox_new (FALSE, 12);
+    hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 12);
     gtk_box_pack_start (GTK_BOX (dialog_vbox), hbox, TRUE, TRUE, 0);
     gtk_container_set_border_width (GTK_CONTAINER (hbox), 6);
 
@@ -5713,7 +5713,7 @@ subject_not_empty(BalsaSendmsg * bsmsg)
     gtk_box_pack_start (GTK_BOX (hbox), image, FALSE, FALSE, 0);
     gtk_misc_set_alignment (GTK_MISC (image), 0.5, 0);
 
-    vbox = gtk_vbox_new (FALSE, 12);
+    vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 12);
     gtk_box_pack_start (GTK_BOX (hbox), vbox, TRUE, TRUE, 0);
 
     text_str = g_strdup_printf("<span weight=\"bold\" size=\"larger\">%s</span>\n\n%s",
@@ -5726,7 +5726,7 @@ subject_not_empty(BalsaSendmsg * bsmsg)
     gtk_label_set_line_wrap (GTK_LABEL (label), TRUE);
     gtk_misc_set_alignment (GTK_MISC (label), 0, 0);
 
-    hbox = gtk_hbox_new (FALSE, 6);
+    hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 6);
     gtk_box_pack_start (GTK_BOX (vbox), hbox, FALSE, FALSE, 0);
 
     label = gtk_label_new (_("Subject:"));
@@ -5754,7 +5754,7 @@ subject_not_empty(BalsaSendmsg * bsmsg)
     alignment = gtk_alignment_new (0.5, 0.5, 0, 0);
     gtk_container_add (GTK_CONTAINER (okbutton), alignment);
 
-    hbox = gtk_hbox_new (FALSE, 2);
+    hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 2);
     gtk_container_add (GTK_CONTAINER (alignment), hbox);
 
     image = gtk_image_new_from_stock (BALSA_PIXMAP_SEND, GTK_ICON_SIZE_BUTTON);
@@ -5857,7 +5857,7 @@ check_suggest_encryption(BalsaSendmsg * bsmsg)
 	alignment = gtk_alignment_new (0.5, 0.5, 0, 0);
 	gtk_container_add(GTK_CONTAINER(button), alignment);
 
-	hbox = gtk_hbox_new(FALSE, 2);
+	hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 2);
 	gtk_container_add(GTK_CONTAINER(alignment), hbox);
 	image = gtk_image_new_from_stock(BALSA_PIXMAP_GPG_ENCRYPT, GTK_ICON_SIZE_BUTTON);
 	gtk_box_pack_start(GTK_BOX(hbox), image, FALSE, FALSE, 0);
@@ -5871,7 +5871,7 @@ check_suggest_encryption(BalsaSendmsg * bsmsg)
 	alignment = gtk_alignment_new (0.5, 0.5, 0, 0);
 	gtk_container_add(GTK_CONTAINER(button), alignment);
 
-	hbox = gtk_hbox_new(FALSE, 2);
+	hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 2);
 	gtk_container_add(GTK_CONTAINER(alignment), hbox);
 	image = gtk_image_new_from_stock(BALSA_PIXMAP_SEND, GTK_ICON_SIZE_BUTTON);
 	gtk_box_pack_start(GTK_BOX(hbox), image, FALSE, FALSE, 0);

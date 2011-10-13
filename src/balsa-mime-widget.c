@@ -229,7 +229,7 @@ balsa_mime_widget_new_unknown(BalsaMessage * bm,
     g_return_val_if_fail(mime_body, NULL);
     mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
 
-    mw->widget = gtk_vbox_new(FALSE, BMW_VBOX_SPACE);
+    mw->widget = gtk_box_new(GTK_ORIENTATION_VERTICAL, BMW_VBOX_SPACE);
     gtk_container_set_border_width(GTK_CONTAINER(mw->widget),
 				   BMW_CONTAINER_BORDER);
 
@@ -287,7 +287,8 @@ balsa_mime_widget_new_unknown(BalsaMessage * bm,
     gtk_label_set_ellipsize(GTK_LABEL(msg_label), PANGO_ELLIPSIZE_END);
     gtk_box_pack_start(GTK_BOX(mw->widget), msg_label, FALSE, FALSE, 0);
 
-    hbox = gtk_hbox_new(TRUE, BMW_HBOX_SPACE);
+    hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, BMW_HBOX_SPACE);
+    gtk_box_set_homogeneous(GTK_BOX(hbox), TRUE);
     if ((button = libbalsa_vfs_mime_button(mime_body, use_content_type,
                                            G_CALLBACK(balsa_mime_widget_ctx_menu_cb),
                                            (gpointer) mime_body)))

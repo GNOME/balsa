@@ -95,7 +95,7 @@ balsa_druid_page_defclient(GtkAssistant *druid, GdkPixbuf *default_logo)
     }
 
     defclient = g_new0(BalsaDruidPageDefclient, 1);
-    page = gtk_vbox_new(FALSE, FALSE);
+    page = gtk_box_new(GTK_ORIENTATION_VERTICAL, FALSE);
     gtk_assistant_append_page(druid, page);
     gtk_assistant_set_page_title(druid, page, _("Default Client"));
     gtk_assistant_set_page_header_image(druid, page, default_logo);

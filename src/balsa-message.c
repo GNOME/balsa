@@ -275,16 +275,16 @@ bm_header_tl_buttons(BalsaMessage * bm)
 
     ebox = gtk_event_box_new();
 
-    hbox2 = gtk_hbox_new(FALSE, 6);
+    hbox2 = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 6);
     gtk_container_set_border_width(GTK_CONTAINER(hbox2), 6);
     gtk_container_add(GTK_CONTAINER(ebox), hbox2);
 
-    vbox = gtk_vbox_new(FALSE, 0);
+    vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     gtk_box_pack_start(GTK_BOX(hbox2), vbox, FALSE, FALSE, 0);
     g_object_set_data(G_OBJECT(bm), BALSA_MESSAGE_FACE_BOX, vbox);
 
 #ifdef HAVE_GPGME
-    vbox = gtk_vbox_new(FALSE, 0);
+    vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     gtk_box_pack_start(GTK_BOX(hbox2), vbox, FALSE, FALSE, 0);
 
     button = gtk_button_new();
@@ -305,7 +305,7 @@ bm_header_tl_buttons(BalsaMessage * bm)
 		     G_CALLBACK(message_recheck_crypto_cb), bm);
 #endif
 
-    vbox = gtk_vbox_new(FALSE, 0);
+    vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     gtk_box_pack_start(GTK_BOX(hbox2), vbox, FALSE, FALSE, 0);
 
     button = gtk_button_new();
@@ -575,7 +575,7 @@ bm_find_bar_new(BalsaMessage * bm)
     toolbar = gtk_toolbar_new();
     gtk_toolbar_set_style(GTK_TOOLBAR(toolbar), GTK_TOOLBAR_BOTH_HORIZ);
 
-    hbox = gtk_hbox_new(FALSE, 6);
+    hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 6);
     gtk_box_pack_start(GTK_BOX(hbox), gtk_label_new(_("Find:")),
                        FALSE, FALSE, 0);
     bm->find_entry = gtk_entry_new();
@@ -671,7 +671,7 @@ balsa_message_init(BalsaMessage * bm)
     gtk_notebook_set_show_border(GTK_NOTEBOOK(bm), FALSE);
 
     /* Box to hold the scrolled window and the find bar */
-    vbox = gtk_vbox_new(FALSE, 0);
+    vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     label = gtk_label_new(_("Content"));
     gtk_notebook_append_page(GTK_NOTEBOOK(bm), vbox, label);
 

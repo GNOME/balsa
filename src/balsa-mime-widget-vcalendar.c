@@ -62,7 +62,7 @@ balsa_mime_widget_new_vcalendar(BalsaMessage * bm,
 	return NULL;
 
     mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
-    mw->widget = gtk_vbox_new(FALSE, 12);
+    mw->widget = gtk_box_new(GTK_ORIENTATION_VERTICAL, 12);
 
     text = g_strdup_printf(_("This is an iTIP calendar \"%s\" message."),
 			   libbalsa_vcal_method_to_str(vcal_obj->method));
@@ -217,7 +217,7 @@ balsa_vevent_widget(LibBalsaVEvent * event, gboolean may_reply,
     GRID_ATTACH_TEXT(grid, event->description, _("Description:"));
 
     if (sender && vevent_ident) {
-	GtkWidget *box = gtk_vbox_new(FALSE, 6);
+	GtkWidget *box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 6);
 	GtkWidget *label;
 	GtkWidget *bbox;
 	GtkWidget *button;

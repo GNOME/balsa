@@ -41,7 +41,7 @@ balsa_mime_widget_new_multipart(BalsaMessage * bm,
     g_return_val_if_fail(content_type != NULL, NULL);
 
     mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
-    mw->widget = mw->container = gtk_vbox_new(FALSE, BMW_MESSAGE_PADDING);
+    mw->widget = mw->container = gtk_box_new(GTK_ORIENTATION_VERTICAL, BMW_MESSAGE_PADDING);
 
 #ifdef HAVE_GPGME
     if (!g_ascii_strcasecmp("multipart/signed", content_type) &&

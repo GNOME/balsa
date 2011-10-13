@@ -285,7 +285,7 @@ libbalsa_show_message_source(LibBalsaMessage* msg, const gchar * font,
     g_object_set_data(G_OBJECT(window), "text", text);
     gtk_window_set_wmclass(GTK_WINDOW(window), "message-source", "Balsa");
     gtk_window_set_default_size(GTK_WINDOW(window), *width, *height);
-    vbox = gtk_vbox_new(FALSE, 1);
+    vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 1);
     menubar = lbsv_app_set_menus(GTK_WINDOW(window), &escape_action);
     
 #if HAVE_MACOSX_DESKTOP

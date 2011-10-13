@@ -971,7 +971,7 @@ libbalsa_address_get_edit_widget(const LibBalsaAddress *address,
 	label = gtk_label_new_with_mnemonic(_(labels[cnt]));
 	gtk_misc_set_alignment(GTK_MISC(label), 1.0, 0.0);
         if (cnt == EMAIL_ADDRESS) {
-            GtkWidget *box = gtk_vbox_new(FALSE, 0);
+            GtkWidget *box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
             GtkWidget *but = gtk_button_new_with_mnemonic(_("A_dd"));
             entries[cnt] = lba_address_list_widget(changed_cb,
                                                    changed_data);

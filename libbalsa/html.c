@@ -384,7 +384,7 @@ libbalsa_html_new(LibBalsaMessageBody * body,
     info->frame           = NULL;
     info->download_images = FALSE;
     info->has_info_bar    = FALSE;
-    info->vbox = vbox     = gtk_vbox_new(FALSE, 0);
+    info->vbox = vbox     = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 
     widget = webkit_web_view_new();
     gtk_box_pack_end(GTK_BOX(vbox), widget, TRUE, TRUE, 0);

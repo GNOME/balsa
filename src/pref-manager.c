@@ -511,7 +511,7 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
     libbalsa_macosx_menu_for_parent(property_box, GTK_WINDOW(active_win));
 #endif
 
-    hbox = gtk_hbox_new(FALSE, 12);
+    hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 12);
     gtk_container_add(GTK_CONTAINER
                       (gtk_dialog_get_content_area
                        (GTK_DIALOG(property_box))), hbox);
@@ -1560,7 +1560,7 @@ add_button_to_box(const gchar * label, GCallback cb, gpointer cb_data,
 static GtkWidget *
 vbox_in_container(GtkWidget * container)
 {
-    GtkWidget *res = gtk_vbox_new(FALSE, ROW_SPACING);
+    GtkWidget *res = gtk_box_new(GTK_ORIENTATION_VERTICAL, ROW_SPACING);
     gtk_container_add(GTK_CONTAINER(container), res);
     return res;
 }
@@ -1569,7 +1569,7 @@ static GtkWidget *
 color_box(GtkBox * parent, const gchar * title)
 {
     GtkWidget *box, *picker;
-    box = gtk_hbox_new(FALSE, COL_SPACING);
+    box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, COL_SPACING);
     gtk_box_pack_start(parent, box, FALSE, FALSE, 0);
 
     picker = gtk_color_button_new();
@@ -1611,7 +1611,7 @@ remote_mailbox_servers_group(GtkWidget * page)
     GtkWidget *server_add_menu;
 
     group = pm_group_new(_("Remote mailbox servers"));
-    hbox = gtk_hbox_new(FALSE, COL_SPACING);
+    hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, COL_SPACING);
     pm_group_add(group, hbox, TRUE);
 
     scrolledwindow = gtk_scrolled_window_new(NULL, NULL);
@@ -1697,7 +1697,7 @@ outgoing_mail_group(GtkWidget * page)
     GtkWidget *vbox;
 
     group = pm_group_new(_("Outgoing mail servers"));
-    hbox = gtk_hbox_new(FALSE, COL_SPACING);
+    hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, COL_SPACING);
     pm_group_add(group, hbox, TRUE);
 
     scrolled_window = gtk_scrolled_window_new(NULL, NULL);
@@ -1819,7 +1819,7 @@ checking_group(GtkWidget * page)
     gtk_grid_attach(grid, pui->check_imap_inbox, 1, row, 2, 1);
 
     ++row;
-    hbox = gtk_hbox_new(FALSE, COL_SPACING);
+    hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, COL_SPACING);
 
     label = gtk_label_new(_("When mail arrives:"));
     gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
@@ -2269,9 +2269,10 @@ message_colors_group(GtkWidget * page)
     GtkWidget *group;
     GtkWidget *vbox;
     gint i;
-    
+
     group = pm_group_new(_("Message colors"));
-    vbox = gtk_vbox_new(TRUE, HIG_PADDING);
+    vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, HIG_PADDING);
+    gtk_box_set_homogeneous(GTK_BOX(vbox), TRUE);
     pm_group_add(group, vbox, FALSE);
 
     for(i = 0; i < MAX_QUOTED_COLOR; i++) {
@@ -2465,7 +2466,7 @@ add_pref_menu(const gchar* label, const gchar *names[], gint size,
 
     omenu = create_pref_option_menu(names, size, index);
 
-    hbox = gtk_hbox_new(FALSE, padding);
+    hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, padding);
     lbw = gtk_label_new(label);
     gtk_misc_set_alignment(GTK_MISC(lbw), 0, 0.5);
     pm_page_add_to_size_group(page, lbw);
@@ -2537,7 +2538,7 @@ misc_group(GtkWidget * page)
     pui->debug = pm_group_add_check(group, _("Debug"));
     pui->empty_trash = pm_group_add_check(group, _("Empty trash on exit"));
 
-    hbox = gtk_hbox_new(FALSE, COL_SPACING);
+    hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, COL_SPACING);
     pm_group_add(group, hbox, FALSE);
 
     pui->close_mailbox_auto =
@@ -2598,7 +2599,7 @@ deleting_messages_group(GtkWidget * page)
         pm_group_add_check(group, _("Expunge deleted messages "
 				    "when mailbox is closed"));
 
-    hbox = gtk_hbox_new(FALSE, COL_SPACING);
+    hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, COL_SPACING);
     pm_group_add(group, hbox, FALSE);
 
     pui->expunge_auto =
@@ -2690,7 +2691,7 @@ folder_scanning_group(GtkWidget * page)
     gtk_misc_set_alignment(GTK_MISC(label), 0, 0);
     pm_group_add(group, label, FALSE);
 
-    hbox = gtk_hbox_new(FALSE, COL_SPACING);
+    hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, COL_SPACING);
     pm_group_add(group, hbox, FALSE);
     label = gtk_label_new(_("Scan local folders to depth"));
     gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
@@ -2702,7 +2703,7 @@ folder_scanning_group(GtkWidget * page)
     gtk_box_pack_start(GTK_BOX(hbox), pui->local_scan_depth,
                        TRUE, TRUE, 0);
 
-    hbox = gtk_hbox_new(FALSE, COL_SPACING);
+    hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, COL_SPACING);
     pm_group_add(group, hbox, FALSE);
     label = gtk_label_new(_("Scan IMAP folders to depth"));
     gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
@@ -2744,7 +2745,7 @@ address_books_group(GtkWidget * page)
     GtkWidget *address_book_add_menu;
 
     group = pm_group_new(_("Address books"));
-    hbox = gtk_hbox_new(FALSE, COL_SPACING);
+    hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, COL_SPACING);
     pm_group_add(group, hbox, TRUE);
 
     scrolledwindow = gtk_scrolled_window_new(NULL, NULL);
@@ -3465,7 +3466,7 @@ pm_page_new(void)
     GtkWidget *page;
     GtkSizeGroup *size_group;
 
-    page = gtk_vbox_new(FALSE, GROUP_SPACING);
+    page = gtk_box_new(GTK_ORIENTATION_VERTICAL, GROUP_SPACING);
     gtk_container_set_border_width(GTK_CONTAINER(page), BORDER_WIDTH);
 
     size_group = gtk_size_group_new(GTK_SIZE_GROUP_HORIZONTAL);
@@ -3521,7 +3522,7 @@ pm_group_new(const gchar * text)
     GtkWidget *hbox;
     GtkWidget *vbox;
 
-    group = gtk_vbox_new(FALSE, HEADER_SPACING);
+    group = gtk_box_new(GTK_ORIENTATION_VERTICAL, HEADER_SPACING);
 
     label = gtk_label_new(NULL);
     markup = g_strdup_printf("<b>%s</b>", text);
@@ -3531,11 +3532,11 @@ pm_group_new(const gchar * text)
     gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
     gtk_box_pack_start(GTK_BOX(group), label, FALSE, FALSE, 0);
 
-    hbox = gtk_hbox_new(FALSE, 0);
+    hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
     gtk_box_pack_start(GTK_BOX(group), hbox, TRUE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(hbox), gtk_label_new("    "),
                        FALSE, FALSE, 0);
-    vbox = gtk_vbox_new(FALSE, ROW_SPACING);
+    vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, ROW_SPACING);
     gtk_box_pack_start(GTK_BOX(hbox), vbox, TRUE, TRUE, 0);
     g_object_set_data(G_OBJECT(group), BALSA_GROUP_VBOX_KEY, vbox);
 

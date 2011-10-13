@@ -210,7 +210,7 @@ balsa_server_conf_get_advanced_widget(BalsaServerConf *bsc, LibBalsaServer *s,
     GtkWidget *box;
     gboolean use_ssl = s && s->use_ssl;
 
-    box = gtk_vbox_new(FALSE, 0);
+    box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 
 #if !defined(USE_SSL)
     gtk_box_pack_start(GTK_BOX(box),

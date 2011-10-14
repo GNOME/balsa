@@ -1301,8 +1301,8 @@ bw_set_panes(BalsaWindow * window)
 
     switch (balsa_app.layout_type) {
     case LAYOUT_WIDE_MSG:
-	window->paned_master = gtk_vpaned_new();
-	window->paned_slave  = gtk_hpaned_new();
+	window->paned_master = gtk_paned_new(GTK_ORIENTATION_VERTICAL);
+	window->paned_slave  = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
         if (window->content)
             gtk_container_remove(GTK_CONTAINER(window->vbox),
                                  window->content);
@@ -1320,8 +1320,8 @@ bw_set_panes(BalsaWindow * window)
         width_preference = BALSA_INDEX_WIDE;
 	break;
     case LAYOUT_WIDE_SCREEN:
-	window->paned_master = gtk_hpaned_new();
-	window->paned_slave  = gtk_hpaned_new();
+	window->paned_master = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
+	window->paned_slave  = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
         if (window->content)
             gtk_container_remove(GTK_CONTAINER(window->vbox),
                                  window->content);
@@ -1340,8 +1340,8 @@ bw_set_panes(BalsaWindow * window)
 	break;
     case LAYOUT_DEFAULT:
     default:
-	window->paned_master = gtk_hpaned_new();
-	window->paned_slave  = gtk_vpaned_new();
+	window->paned_master = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
+	window->paned_slave  = gtk_paned_new(GTK_ORIENTATION_VERTICAL);
         if (window->content)
             gtk_container_remove(GTK_CONTAINER(window->vbox),
                                  window->content);
@@ -4879,8 +4879,12 @@ static void
 bw_show_mbtree(BalsaWindow * bw)
 {
     GtkWidget *parent;
-    parent = gtk_widget_get_ancestor(bw->mblist, GTK_TYPE_HPANED);
-    g_assert(parent != NULL);
+
+    parent = gtk_widget_get_ancestor(bw->mblist, GTK_TYPE_PANED);
+    while (gtk_orientable_get_orientation(GTK_ORIENTABLE(parent)) !=
+           GTK_ORIENTATION_HORIZONTAL) {
+        parent = gtk_widget_get_ancestor(parent, GTK_TYPE_PANED);
+    }
 
     if (balsa_app.show_mblist) {
         gtk_widget_show(bw->mblist);

@@ -1,5 +1,11 @@
 2011-10-14  Peter Bloomfield
 
+	Gtk{HV}Paned is deprecated.
+
+	* src/main-window.c: deprecation cleanup.
+
+2011-10-14  Peter Bloomfield
+
 	Gtk{HV}Separator is deprecated.
 
 	* src/filter-edit-dialog.c (filters_edit_dialog): deprecation

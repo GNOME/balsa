@@ -77,7 +77,7 @@ balsa_druid_page_defclient_init(BalsaDruidPageDefclient * defclient,
 }
 
 void
-balsa_druid_page_defclient(GtkAssistant *druid, GdkPixbuf *default_logo)
+balsa_druid_page_defclient(GtkAssistant *druid)
 {
     GAppInfo *info;
     BalsaDruidPageDefclient *defclient;
@@ -95,10 +95,9 @@ balsa_druid_page_defclient(GtkAssistant *druid, GdkPixbuf *default_logo)
     }
 
     defclient = g_new0(BalsaDruidPageDefclient, 1);
-    page = gtk_box_new(GTK_ORIENTATION_VERTICAL, FALSE);
+    page = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     gtk_assistant_append_page(druid, page);
     gtk_assistant_set_page_title(druid, page, _("Default Client"));
-    gtk_assistant_set_page_header_image(druid, page, default_logo);
     balsa_druid_page_defclient_init(defclient, page, druid);
     /* This one is ready to pass through. */
     gtk_assistant_set_page_complete(druid, page, TRUE);

@@ -8,9 +8,7 @@ endif
 # balsa-logo.png used by the init-druid
 balsa_IMGS = \
 	attachment.png		\
-	balsa-logo.png		\
 	balsa-top.png		\
-	balsa-watermark.png	\
 	balsa_icon.png		\
 	balsa_logo.png
 

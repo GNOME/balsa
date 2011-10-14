@@ -33,8 +33,7 @@ extern "C" {
 /*
  * Public methods
  */
-    void balsa_druid_page_welcome(GtkAssistant * druid,
-                                  GdkPixbuf * default_logo);
+    void balsa_druid_page_welcome(GtkAssistant * druid);
 
 #ifdef __cplusplus
 }

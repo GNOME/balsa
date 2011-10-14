@@ -35,8 +35,7 @@ extern "C" {
 /*
  * Public methods
  */
-    void balsa_druid_page_finish(GtkAssistant * druid,
-                                 GdkPixbuf * default_logo);
+    void balsa_druid_page_finish(GtkAssistant * druid);
 
 #ifdef __cplusplus
 }

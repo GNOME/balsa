@@ -38,7 +38,7 @@ static void balsa_druid_page_finish_finish(GtkWidget * page,
 #endif
 
 void
-balsa_druid_page_finish(GtkAssistant * druid, GdkPixbuf * default_logo)
+balsa_druid_page_finish(GtkAssistant * druid)
 {
     static const gchar bye[] =
         N_("You've successfully set up Balsa. Have fun!\n"
@@ -47,7 +47,6 @@ balsa_druid_page_finish(GtkAssistant * druid, GdkPixbuf * default_logo)
 
     gtk_assistant_append_page(druid, page);
     gtk_assistant_set_page_title(druid, page, _("All Done!"));
-    gtk_assistant_set_page_header_image(druid, page, default_logo);
     gtk_assistant_set_page_type(druid, page, GTK_ASSISTANT_PAGE_SUMMARY);
 }
 

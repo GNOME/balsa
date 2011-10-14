@@ -54,8 +54,7 @@ extern "C" {
 /*
  * Public methods
  */
-    void balsa_druid_page_defclient(GtkAssistant * druid, 
-                                    GdkPixbuf * default_logo);
+    void balsa_druid_page_defclient(GtkAssistant * druid);
     void balsa_druid_page_defclient_save(BalsaDruidPageDefclient * defclient);
 
 #endif /* HAVE_GNOME */

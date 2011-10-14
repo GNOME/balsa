@@ -165,15 +165,14 @@ balsa_druid_page_user_init(BalsaDruidPageUser * user,
 }
 
 void
-balsa_druid_page_user(GtkAssistant * druid, GdkPixbuf * default_logo)
+balsa_druid_page_user(GtkAssistant * druid)
 {
     BalsaDruidPageUser *user;
 
     user = g_new0(BalsaDruidPageUser, 1);
-    user->page = gtk_box_new(GTK_ORIENTATION_VERTICAL, FALSE);
+    user->page = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     gtk_assistant_append_page(druid, user->page);
     gtk_assistant_set_page_title(druid, user->page, _("User Settings"));
-    gtk_assistant_set_page_header_image(druid, user->page, default_logo);
     balsa_druid_page_user_init(user, user->page, druid);
 
     g_signal_connect(G_OBJECT(druid), "prepare",

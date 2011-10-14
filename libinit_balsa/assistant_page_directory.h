@@ -65,8 +65,7 @@ extern "C" {
 /*
  * Public methods
  */
-    void balsa_druid_page_directory(GtkAssistant * druid,
-                                    GdkPixbuf * default_logo);
+    void balsa_druid_page_directory(GtkAssistant * druid);
     void balsa_druid_page_directory_later(GtkWidget *druid);
 
 

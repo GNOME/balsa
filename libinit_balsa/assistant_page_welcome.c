@@ -23,7 +23,7 @@
 #include <glib/gi18n.h>
 
 void
-balsa_druid_page_welcome(GtkAssistant * druid, GdkPixbuf * default_logo)
+balsa_druid_page_welcome(GtkAssistant * druid)
 {
     GtkWidget *page;
     static const gchar title[] = N_("Welcome to Balsa!");
@@ -43,9 +43,6 @@ balsa_druid_page_welcome(GtkAssistant * druid, GdkPixbuf * default_logo)
     
     gtk_assistant_append_page(druid, page);
     gtk_assistant_set_page_title(druid, page, _(title));
-    gtk_assistant_set_page_header_image(druid, page, default_logo);
-    gtk_assistant_set_page_side_image(druid, page,
-                                      balsa_init_get_png("balsa-watermark.png"));
     gtk_assistant_set_page_type(druid, page, GTK_ASSISTANT_PAGE_INTRO);
     gtk_assistant_set_page_complete(druid, page, TRUE);
 }

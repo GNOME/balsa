@@ -258,15 +258,14 @@ balsa_druid_page_directory_init(BalsaDruidPageDirectory * dir,
 
 
 void
-balsa_druid_page_directory(GtkAssistant * druid, GdkPixbuf * default_logo)
+balsa_druid_page_directory(GtkAssistant * druid)
 {
     BalsaDruidPageDirectory *dir;
 
     dir = g_new0(BalsaDruidPageDirectory, 1);
-    dir->page = gtk_box_new(GTK_ORIENTATION_VERTICAL, FALSE);
+    dir->page = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     gtk_assistant_append_page(druid, dir->page);
     gtk_assistant_set_page_title(druid, dir->page, _("Mail Files"));
-    gtk_assistant_set_page_header_image(druid, dir->page, default_logo);
     balsa_druid_page_directory_init(dir, dir->page, druid);
     g_object_weak_ref(G_OBJECT(druid), (GWeakNotify)g_free, dir);
 }

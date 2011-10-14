@@ -1,5 +1,27 @@
 2011-10-14  Peter Bloomfield
 
+	gtk_assistant_set_page_header_image and
+	gtk_assistant_set_page_side_image are deprecated.
+
+	* images/Makefile.am: no need for balsa-logo.png and
+	balsa-watermark.png.
+	* libinit_balsa/assistant_init.c (balsa_initdruid):
+	* libinit_balsa/assistant_page_defclient.c
+	(balsa_druid_page_defclient):
+	* libinit_balsa/assistant_page_defclient.h:
+	* libinit_balsa/assistant_page_directory.c
+	(balsa_druid_page_directory):
+	* libinit_balsa/assistant_page_directory.h:
+	* libinit_balsa/assistant_page_finish.c (balsa_druid_page_finish):
+	* libinit_balsa/assistant_page_finish.h:
+	* libinit_balsa/assistant_page_user.c (balsa_druid_page_user):
+	* libinit_balsa/assistant_page_user.h:
+	* libinit_balsa/assistant_page_welcome.c
+	(balsa_druid_page_welcome):
+	* libinit_balsa/assistant_page_welcome.h: deprecation cleanup.
+
+2011-10-14  Peter Bloomfield
+
 	Gtk{HV}Paned is deprecated.
 
 	* src/main-window.c: deprecation cleanup.

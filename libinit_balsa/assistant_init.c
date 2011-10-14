@@ -109,8 +109,6 @@ balsa_initdruid_apply(GtkAssistant * druid)
 void
 balsa_initdruid(GtkAssistant * assistant)
 {
-    GdkPixbuf *default_logo = balsa_init_get_png("balsa-logo.png");
-
     g_return_if_fail(assistant != NULL);
     g_return_if_fail(GTK_IS_ASSISTANT(assistant));
 
@@ -119,15 +117,15 @@ balsa_initdruid(GtkAssistant * assistant)
     g_signal_connect(G_OBJECT(assistant), "close",
                      G_CALLBACK(balsa_initdruid_apply), NULL);
 
-    balsa_druid_page_welcome(assistant, default_logo);
-    balsa_druid_page_user(assistant, default_logo);
+    balsa_druid_page_welcome(assistant);
+    balsa_druid_page_user(assistant);
 #if !defined(ENABLE_TOUCH_UI)
-    balsa_druid_page_directory(assistant, default_logo);
+    balsa_druid_page_directory(assistant);
 #if HAVE_GNOME
-    balsa_druid_page_defclient(assistant, default_logo);
+    balsa_druid_page_defclient(assistant);
 #endif
 #endif
-    balsa_druid_page_finish(assistant, default_logo);
+    balsa_druid_page_finish(assistant);
 }
 
 

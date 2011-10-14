@@ -1,5 +1,12 @@
 2011-10-14  Peter Bloomfield
 
+	Gtk{HV}Separator is deprecated.
+
+	* src/filter-edit-dialog.c (filters_edit_dialog): deprecation
+	cleanup.
+
+2011-10-14  Peter Bloomfield
+
 	Gtk{HV}ButtonBox is deprecated.
 
 	* src/ab-main.c (bab_get_edit_button_box):

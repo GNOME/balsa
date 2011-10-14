@@ -598,7 +598,8 @@ filters_edit_dialog(void)
     gtk_box_pack_start(GTK_BOX(hbox), piece, FALSE, FALSE,
                        FILTER_EDIT_PADDING);
 
-    gtk_box_pack_start(GTK_BOX(hbox), gtk_vseparator_new(),
+    gtk_box_pack_start(GTK_BOX(hbox),
+                       gtk_separator_new(GTK_ORIENTATION_VERTICAL),
                        FALSE, FALSE, 0);
 
     fe_right_page = build_right_side(GTK_WINDOW(fe_window));

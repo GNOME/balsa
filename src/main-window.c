@@ -4389,7 +4389,7 @@ bw_find_real(BalsaWindow * window, BalsaIndex * bindex, gboolean again)
 	gtk_box_pack_start(GTK_BOX(vbox), frame, FALSE, FALSE, 2);
 
 	/* Button box */
-	box = gtk_hbutton_box_new();
+	box = gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL);
 	gtk_container_set_border_width(GTK_CONTAINER(box), 6);
 	button = gtk_button_new_from_stock(GTK_STOCK_APPLY);
 	g_signal_connect(G_OBJECT(button), "clicked",

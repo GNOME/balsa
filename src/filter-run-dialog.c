@@ -308,7 +308,7 @@ void balsa_filter_run_dialog_init(BalsaFilterRunDialog * p)
     gtk_box_pack_start(GTK_BOX(vbox), sw, TRUE, TRUE, 0);
 
     /* To keep a consistent look, make a button box for a single button. */
-    bbox = gtk_hbutton_box_new();
+    bbox = gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL);
     gtk_box_set_spacing(GTK_BOX(bbox), 2);
     gtk_button_box_set_layout(GTK_BUTTON_BOX(bbox), GTK_BUTTONBOX_SPREAD);
     gtk_box_pack_start(GTK_BOX(vbox), bbox, FALSE, FALSE, 2);
@@ -319,9 +319,9 @@ void balsa_filter_run_dialog_init(BalsaFilterRunDialog * p)
     g_signal_connect_swapped(G_OBJECT(button), "clicked",
                              G_CALLBACK(fr_apply_selected_pressed), p);
     gtk_container_add(GTK_CONTAINER(bbox), button);
- 
+
     /* Buttons between the 2 lists */
-    bbox = gtk_vbutton_box_new();
+    bbox = gtk_button_box_new(GTK_ORIENTATION_VERTICAL);
     gtk_box_set_spacing(GTK_BOX(bbox), 2);
     gtk_button_box_set_layout(GTK_BUTTON_BOX(bbox), GTK_BUTTONBOX_SPREAD);
 
@@ -356,7 +356,7 @@ void balsa_filter_run_dialog_init(BalsaFilterRunDialog * p)
     gtk_box_pack_start(GTK_BOX(vbox),sw, TRUE, TRUE, 0);
 
     /* up down arrow buttons */
-    bbox = gtk_hbutton_box_new();
+    bbox = gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL);
     gtk_box_set_spacing(GTK_BOX(bbox), 2);
     gtk_button_box_set_layout(GTK_BUTTON_BOX(bbox), GTK_BUTTONBOX_SPREAD);
 

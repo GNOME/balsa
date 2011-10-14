@@ -216,7 +216,7 @@ build_left_side(void)
     gtk_box_pack_start(GTK_BOX(vbox), sw, TRUE, TRUE, 2);
 
     /* new and delete buttons */
-    bbox = gtk_hbutton_box_new();
+    bbox = gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL);
     gtk_box_set_spacing(GTK_BOX(bbox), 2);
     gtk_button_box_set_layout(GTK_BUTTON_BOX(bbox), GTK_BUTTONBOX_SPREAD);
 
@@ -498,7 +498,7 @@ build_right_side(GtkWindow * window)
 			     page, gtk_label_new(_("Action")));
 
     /* button box */
-    bbox = gtk_hbutton_box_new();
+    bbox = gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL);
     gtk_box_pack_start(GTK_BOX(rightside), bbox, FALSE, FALSE, 0);
 
     fe_apply_button = gtk_button_new_from_stock(GTK_STOCK_APPLY);

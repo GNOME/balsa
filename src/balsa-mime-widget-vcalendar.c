@@ -237,7 +237,7 @@ balsa_vevent_widget(LibBalsaVEvent * event, gboolean may_reply,
 	label =
 	    gtk_label_new(_("The sender asks you for a reply to this request:"));
 	gtk_container_add(GTK_CONTAINER(box), label);
-	bbox = gtk_hbutton_box_new();
+	bbox = gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL);
 	gtk_button_box_set_layout(GTK_BUTTON_BOX(bbox),
 				  GTK_BUTTONBOX_SPREAD);
 	gtk_container_add(GTK_CONTAINER(box), bbox);

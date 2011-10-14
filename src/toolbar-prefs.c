@@ -422,7 +422,7 @@ create_toolbar_page(BalsaToolbarModel * model, GtkUIManager * ui_manager)
                                           page->toolbar);
 
     /* Button box */
-    button_box = gtk_hbutton_box_new();
+    button_box = gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL);
     gtk_box_pack_start(GTK_BOX(toolbar_ctlbox), button_box, FALSE, FALSE, 0);
 
     /* Standard button */

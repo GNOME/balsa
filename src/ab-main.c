@@ -900,7 +900,7 @@ static GtkWidget*
 bab_get_edit_button_box(struct ABMainWindow *abmw)
 {
     GtkWidget *box;
-    box = gtk_hbutton_box_new();
+    box = gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL);
     gtk_container_add(GTK_CONTAINER(box),
                       abmw->apply_button =
                       gtk_button_new_from_stock(GTK_STOCK_APPLY));

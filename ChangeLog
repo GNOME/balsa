@@ -1,3 +1,17 @@
+2011-10-14  Peter Bloomfield
+
+	Gtk{HV}ButtonBox is deprecated.
+
+	* src/ab-main.c (bab_get_edit_button_box):
+	* src/ab-window.c (balsa_ab_window_init):
+	* src/balsa-mime-widget-vcalendar.c (balsa_vevent_widget):
+	* src/filter-edit-dialog.c (build_left_side), (build_right_side):
+	* src/filter-run-dialog.c (balsa_filter_run_dialog_init):
+	* src/main-window.c:
+	* src/toolbar-prefs.c (create_toolbar_page): deprecation
+	cleanup.
+
+
 2011-10-13  Peter Bloomfield
 
 	Gtk{HV}Box is deprecated.

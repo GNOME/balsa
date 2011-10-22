@@ -1,3 +1,9 @@
+2011-10-22  Peter Bloomfield
+
+	* src/balsa-app.c (open_mailboxes_idle_cb): select first
+	command-line mailbox; see discussion at
+	http://mail.gnome.org/archives/balsa-list/2011-October/msg00010.html
+
 2011-09-28  Peter Bloomfield
 
 	* configure.in: check for javascriptcoregtk with recent webkit;

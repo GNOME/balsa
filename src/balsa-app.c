@@ -559,34 +559,38 @@ open_mailboxes_idle_cb(gchar ** urls)
 
     gdk_threads_enter();
 
-    if (!urls) {
-        GPtrArray *array;
+    if (urls) {
+        gboolean hidden;
 
-        if (!libbalsa_mailbox_view_table) {
-            gdk_threads_leave();
-            return FALSE;
+        hidden = FALSE;
+        for (tmp = urls; *tmp; ++tmp) {
+            open_mailbox_by_url(*tmp, hidden);
+            hidden = TRUE;
         }
+    } else if (libbalsa_mailbox_view_table) {
+        GPtrArray *array;
 
         array = g_ptr_array_new();
         g_hash_table_foreach(libbalsa_mailbox_view_table,
                              (GHFunc) append_url_if_open, array);
         g_ptr_array_add(array, NULL);
         urls = (gchar **) g_ptr_array_free(array, FALSE);
-    }
 
-    if (urls) {
-        if (*urls) {
-            open_mailbox_by_url(balsa_app.current_mailbox_url, FALSE);
+        if (urls) {
+            if (*urls) {
+                open_mailbox_by_url(balsa_app.current_mailbox_url, TRUE);
 
-            for (tmp = urls; *tmp; ++tmp)
-                if (!balsa_app.current_mailbox_url
-                    || strcmp(*tmp, balsa_app.current_mailbox_url))
-                    open_mailbox_by_url(*tmp, TRUE);
+                for (tmp = urls; *tmp; ++tmp) {
+                    if (!balsa_app.current_mailbox_url
+                        || strcmp(*tmp, balsa_app.current_mailbox_url)) {
+                        open_mailbox_by_url(*tmp, TRUE);
+                    }
+                }
+            }
         }
-
-        g_strfreev(urls);
     }
 
+    g_strfreev(urls);
     gdk_threads_leave();
 
     return FALSE;

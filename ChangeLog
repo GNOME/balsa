@@ -1,3 +1,8 @@
+2011-10-21  Peter Bloomfield
+
+	* src/main-window.c: when network is connected, check mail in
+	the subthread, so that the signal handler can return.
+
 2011-10-14  Peter Bloomfield
 
 	gtk_assistant_set_page_header_image and

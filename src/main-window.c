@@ -3569,10 +3569,24 @@ mw_mbox_change_connection_status(GtkTreeModel * model, GtkTreePath * path,
 static void*
 bw_change_connection_status_thread(void *arg)
 {
+    gboolean is_connected = GPOINTER_TO_INT(arg);
+
     gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
 			   (GtkTreeModelForeachFunc)
                            mw_mbox_change_connection_status,
 			   arg);
+
+    /* GLib timeouts are now triggered by g_get_monotonic_time(),
+     * which doesn't increment while we're suspended, so we must
+     * check for ourselves whether a scheduled mail check was
+     * missed. */
+    if (is_connected &&
+        difftime(time(NULL), balsa_app.main_window->last_check_time) >
+        balsa_app.check_mail_timer * 60) {
+        /* Check the mail now, and reset the timer */
+        check_new_messages_cb(NULL, balsa_app.main_window);
+    }
+
     return NULL;
 }
 #endif /* BALSA_USE_THREADS */
@@ -3641,16 +3655,6 @@ bw_nm_client_state_changed_cb(GObject * gobject, GParamSpec * pspec,
                                mw_mbox_change_connection_status,
                                GINT_TO_POINTER(is_connected));
 #endif /* BALSA_USE_THREADS */
-        /* GLib timeouts are now triggered by g_get_monotonic_time(),
-         * which doesn't increment while we're suspended, so we must
-         * check for ourselves whether a scheduled mail check was
-         * missed. */
-        if (is_connected &&
-            difftime(time(NULL), window->last_check_time) >
-            balsa_app.check_mail_timer * 60) {
-            /* Check the mail now, and reset the timer */
-            check_new_messages_cb(NULL, balsa_app.main_window);
-        }
     }
 }
 #endif /* LIBNM_GLIB */

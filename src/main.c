@@ -120,7 +120,7 @@ gboolean initial_open_inbox(void);
    mail because such selection cannot be stored in balsa_app and later 
    saved to the configuration file.
 */
-static gchar *cmd_line_open_mailboxes;
+static gchar **cmd_line_open_mailboxes;
 static gboolean cmd_check_mail_on_startup,
     cmd_open_unread_mailbox, cmd_open_inbox, cmd_get_stats;
 
@@ -322,8 +322,14 @@ balsa_handle_automation_options(UniqueApp * app)
         unique_app_send_message(app, COMMAND_OPEN_INBOX, NULL);
 
     if (cmd_line_open_mailboxes) {
-        UniqueMessageData *message = unique_message_data_new();
-        unique_message_data_set_text(message, cmd_line_open_mailboxes, -1);
+        gchar *join;
+        UniqueMessageData *message;
+
+        join = g_strjoinv(";", cmd_line_open_mailboxes);
+        g_strfreev(cmd_line_open_mailboxes);
+
+        message = unique_message_data_new();
+        unique_message_data_set_text(message, join, -1);
         unique_app_send_message(app, COMMAND_OPEN_MAILBOX, message);
         unique_message_data_free(message);
     }
@@ -504,7 +510,7 @@ balsa_init(int argc, char **argv)
 	 N_("Compose a new email to EMAIL@ADDRESS"), "EMAIL@ADDRESS"},
 	{"attach", 'a', 0, G_OPTION_ARG_FILENAME_ARRAY, &(attach_vect),
 	 N_("Attach file at URI"), "URI"},
-	{"open-mailbox", 'o', 0, G_OPTION_ARG_STRING,
+	{"open-mailbox", 'o', 0, G_OPTION_ARG_STRING_ARRAY,
          &(cmd_line_open_mailboxes),
 	 N_("Opens MAILBOXNAME"), N_("MAILBOXNAME")},
 	{"open-unread-mailbox", 'u', 0, G_OPTION_ARG_NONE,
@@ -780,7 +786,13 @@ scan_mailboxes_idle_cb()
 	g_idle_add((GSourceFunc) initial_open_unread_mailboxes, NULL);
 
     if (cmd_line_open_mailboxes) {
-	gchar **urls = g_strsplit(cmd_line_open_mailboxes, ";", 20);
+        gchar *join;
+	gchar **urls;
+
+        join = g_strjoinv(";", cmd_line_open_mailboxes);
+        g_strfreev(cmd_line_open_mailboxes);
+	urls = g_strsplit(join, ";", 20);
+        g_free(join);
 	g_idle_add((GSourceFunc) open_mailboxes_idle_cb, urls);
     }
 

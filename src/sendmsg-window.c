@@ -3072,7 +3072,6 @@ create_info_pane(BalsaSendmsg * bsmsg)
     gtk_container_add(GTK_CONTAINER(frame), sw);
 
     gtk_widget_set_hexpand(frame, TRUE);
-    gtk_widget_set_vexpand(frame, TRUE);
     gtk_grid_attach(GTK_GRID(grid), frame, 1, row, 1, 1);
 
     bsmsg->attachments[2] = sw;

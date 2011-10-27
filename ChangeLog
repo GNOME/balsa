@@ -1,5 +1,11 @@
 2011-10-26  Peter Bloomfield
 
+	* src/sendmsg-window.c (create_info_pane): do not set vertical
+	expand flag on attachment frame, it causes weird vertical
+	spacing when the attachments are shown.
+
+2011-10-26  Peter Bloomfield
+
 	* src/main.c (threads_init): use g_type_init, which is required,
 	not g_threads_init, which is redundant.
 

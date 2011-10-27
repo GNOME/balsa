@@ -473,7 +473,7 @@ pthread_mutex_t checking_mail_lock = PTHREAD_MUTEX_INITIALIZER;
 static void
 threads_init(void)
 {
-    g_thread_init(NULL);
+    g_type_init();
 
     libbalsa_threads_init();
     gdk_threads_init();

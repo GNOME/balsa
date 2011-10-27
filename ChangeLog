@@ -1,3 +1,8 @@
+2011-10-26  Peter Bloomfield
+
+	* src/main.c (threads_init): use g_type_init, which is required,
+	not g_threads_init, which is redundant.
+
 2011-10-24  Peter Bloomfield  <peter@t43.bellsouth.net>
 
 	* src/main.c (balsa_handle_automation_options), (balsa_init),

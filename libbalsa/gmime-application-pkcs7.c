@@ -96,8 +96,14 @@ g_mime_application_pkcs7_sign (GMimePart *pkcs7, GMimeObject *content,
     GMimeFilter *crlf_filter, *from_filter;
 	
     g_return_val_if_fail (GMIME_IS_PART (pkcs7), -1);
+#ifndef HAVE_GMIME_2_5_7
     g_return_val_if_fail (GMIME_IS_CIPHER_CONTEXT (ctx), -1);
     g_return_val_if_fail (ctx->sign_protocol != NULL, -1);
+#else /* HAVE_GMIME_2_5_7 */
+    g_return_val_if_fail (GMIME_IS_CRYPTO_CONTEXT (ctx), -1);
+    g_return_val_if_fail(g_mime_crypto_context_get_signature_protocol(ctx)
+                         != NULL, -1);
+#endif /* HAVE_GMIME_2_5_7 */
     g_return_val_if_fail (GMIME_IS_OBJECT (content), -1);
 	
     /* Prepare all the parts for signing... */
@@ -127,7 +133,14 @@ g_mime_application_pkcs7_sign (GMimePart *pkcs7, GMimeObject *content,
     sig_data_stream = g_mime_stream_mem_new ();
 	
     /* get the signed content */
-    if (g_mime_cipher_context_sign (ctx, userid, GMIME_CIPHER_HASH_DEFAULT, filtered_stream, sig_data_stream, err) == -1) {
+#ifndef HAVE_GMIME_2_5_7
+    if (g_mime_cipher_context_sign (ctx, userid, GMIME_CIPHER_HASH_DEFAULT, filtered_stream, sig_data_stream, err) == -1)
+#else /* HAVE_GMIME_2_5_7 */
+    if (g_mime_crypto_context_sign
+        (ctx, userid, GMIME_CIPHER_HASH_DEFAULT, filtered_stream,
+         sig_data_stream, err) == -1)
+#endif /* HAVE_GMIME_2_5_7 */
+    {
 	g_object_unref (filtered_stream);
 	g_object_unref (sig_data_stream);
 	g_object_unref (stream);
@@ -168,9 +181,15 @@ g_mime_application_pkcs7_sign (GMimePart *pkcs7, GMimeObject *content,
  * decrypting it again. In this case, validity is undefined.
  */
 GMimeObject *
+#ifndef HAVE_GMIME_2_5_7
 g_mime_application_pkcs7_verify(GMimePart * pkcs7,
 				GMimeSignatureValidity ** validity,
 				GMimeCipherContext * ctx, GError ** err)
+#else /* HAVE_GMIME_2_5_7 */
+g_mime_application_pkcs7_verify(GMimePart * pkcs7,
+                                GMimeSignatureList ** list,
+                                GMimeCryptoContext * ctx, GError ** err)
+#endif /* HAVE_GMIME_2_5_7 */
 {
     GMimeObject *decrypted;
     GMimeDataWrapper *wrapper;
@@ -181,8 +200,14 @@ g_mime_application_pkcs7_verify(GMimePart * pkcs7,
     const char *smime_type;
 
     g_return_val_if_fail(GMIME_IS_PART(pkcs7), NULL);
+#ifndef HAVE_GMIME_2_5_7
     g_return_val_if_fail(GMIME_IS_CIPHER_CONTEXT(ctx), NULL);
     g_return_val_if_fail(ctx->encrypt_protocol != NULL, NULL);
+#else /* HAVE_GMIME_2_5_7 */
+    g_return_val_if_fail(GMIME_IS_CRYPTO_CONTEXT(ctx), NULL);
+    g_return_val_if_fail(g_mime_crypto_context_get_encryption_protocol(ctx)
+                         != NULL, NULL);
+#endif /* HAVE_GMIME_2_5_7 */
 
     /* some sanity checks */
     smime_type =
@@ -208,9 +233,16 @@ g_mime_application_pkcs7_verify(GMimePart * pkcs7,
     g_object_unref(crlf_filter);
 
     /* get the cleartext */
+#ifndef HAVE_GMIME_2_5_7
     *validity = g_mime_cipher_context_verify(ctx, GMIME_CIPHER_HASH_DEFAULT,
 				     ciphertext, filtered_stream, err);
-    if (!*validity) {
+    if (!*validity)
+#else /* HAVE_GMIME_2_5_7 */
+    *list = g_mime_crypto_context_verify(ctx, GMIME_CIPHER_ALGO_DEFAULT,
+                                         ciphertext, filtered_stream, err);
+    if (!*list)
+#endif /* HAVE_GMIME_2_5_7 */
+    {
 	g_object_unref(filtered_stream);
 	g_object_unref(ciphertext);
 	g_object_unref(stream);
@@ -248,7 +280,12 @@ g_mime_application_pkcs7_verify(GMimePart * pkcs7,
  */
 int
 g_mime_application_pkcs7_encrypt (GMimePart *pkcs7, GMimeObject *content,
+#ifndef HAVE_GMIME_2_5_7
 				  GMimeCipherContext *ctx, GPtrArray *recipients,
+#else /* HAVE_GMIME_2_5_7 */
+				  GMimeCryptoContext *ctx,
+                                  GPtrArray *recipients,
+#endif /* HAVE_GMIME_2_5_7 */
 				  GError **err)
 {
     GMimeDataWrapper *wrapper;
@@ -257,8 +294,14 @@ g_mime_application_pkcs7_encrypt (GMimePart *pkcs7, GMimeObject *content,
     GMimeFilter *crlf_filter;
 	
     g_return_val_if_fail (GMIME_IS_PART (pkcs7), -1);
+#ifndef HAVE_GMIME_2_5_7
     g_return_val_if_fail (GMIME_IS_CIPHER_CONTEXT (ctx), -1);
     g_return_val_if_fail (ctx->encrypt_protocol != NULL, -1);
+#else /* HAVE_GMIME_2_5_7 */
+    g_return_val_if_fail (GMIME_IS_CRYPTO_CONTEXT (ctx), -1);
+    g_return_val_if_fail(g_mime_crypto_context_get_encryption_protocol(ctx)
+                         != NULL, -1);
+#endif /* HAVE_GMIME_2_5_7 */
     g_return_val_if_fail (GMIME_IS_OBJECT (content), -1);
 	
     /* get the cleartext */
@@ -279,7 +322,15 @@ g_mime_application_pkcs7_encrypt (GMimePart *pkcs7, GMimeObject *content,
 	
     /* encrypt the content stream */
     ciphertext = g_mime_stream_mem_new ();
-    if (g_mime_cipher_context_encrypt (ctx, FALSE, NULL, recipients, stream, ciphertext, err) == -1) {
+#ifndef HAVE_GMIME_2_5_7
+    if (g_mime_cipher_context_encrypt (ctx, FALSE, NULL, recipients, stream, ciphertext, err) == -1)
+#else /* HAVE_GMIME_2_5_7 */
+    if (g_mime_crypto_context_encrypt
+        (ctx, FALSE, NULL,
+         GMIME_CIPHER_ALGO_DEFAULT,
+         recipients, stream, ciphertext, err) == -1)
+#endif /* HAVE_GMIME_2_5_7 */
+    {
 	g_object_unref (ciphertext);
 	g_object_unref (stream);
 	return -1;
@@ -313,8 +364,14 @@ g_mime_application_pkcs7_encrypt (GMimePart *pkcs7, GMimeObject *content,
  * err with more information about the reason.
  */
 GMimeObject *
+#ifndef HAVE_GMIME_2_5_7
 g_mime_application_pkcs7_decrypt (GMimePart *pkcs7, GMimeCipherContext *ctx,
 				  GError **err)
+#else /* HAVE_GMIME_2_5_7 */
+g_mime_application_pkcs7_decrypt (GMimePart *pkcs7,
+                                  GMimeCryptoContext *ctx,
+				  GError **err)
+#endif /* HAVE_GMIME_2_5_7 */
 {
     GMimeObject *decrypted;
     GMimeDataWrapper *wrapper;
@@ -325,8 +382,14 @@ g_mime_application_pkcs7_decrypt (GMimePart *pkcs7, GMimeCipherContext *ctx,
     const char *smime_type;
 
     g_return_val_if_fail(GMIME_IS_PART(pkcs7), NULL);
+#ifndef HAVE_GMIME_2_5_7
     g_return_val_if_fail(GMIME_IS_CIPHER_CONTEXT(ctx), NULL);
     g_return_val_if_fail(ctx->encrypt_protocol != NULL, NULL);
+#else /* HAVE_GMIME_2_5_7 */
+    g_return_val_if_fail(GMIME_IS_CRYPTO_CONTEXT(ctx), NULL);
+    g_return_val_if_fail(g_mime_crypto_context_get_encryption_protocol(ctx)
+                         != NULL, NULL);
+#endif /* HAVE_GMIME_2_5_7 */
 
     /* some sanity checks */
     smime_type =
@@ -353,7 +416,13 @@ g_mime_application_pkcs7_decrypt (GMimePart *pkcs7, GMimeCipherContext *ctx,
     g_object_unref(crlf_filter);
 
     /* get the cleartext */
-    if (g_mime_cipher_context_decrypt(ctx, ciphertext, filtered_stream, err) == NULL) {
+#ifndef HAVE_GMIME_2_5_7
+    if (g_mime_cipher_context_decrypt(ctx, ciphertext, filtered_stream, err) == NULL)
+#else /* HAVE_GMIME_2_5_7 */
+    if (g_mime_crypto_context_decrypt
+        (ctx, ciphertext, filtered_stream, err) == NULL)
+#endif /* HAVE_GMIME_2_5_7 */
+    {
 	g_object_unref(filtered_stream);
 	g_object_unref(ciphertext);
 	g_object_unref(stream);

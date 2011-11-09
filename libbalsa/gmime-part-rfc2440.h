@@ -53,12 +53,21 @@ int g_mime_part_rfc2440_sign_encrypt(GMimePart * part,
 				     GPtrArray * recipients,
 				     const char *sign_userid,
 				     GError ** err);
+#ifndef HAVE_GMIME_2_5_7
 GMimeSignatureValidity *g_mime_part_rfc2440_verify(GMimePart * part,
 						   GMimeGpgmeContext * ctx,
 						   GError ** err);
 GMimeSignatureValidity *g_mime_part_rfc2440_decrypt(GMimePart * part,
                                                     GMimeGpgmeContext *
                                                     ctx, GError ** err);
+#else /* HAVE_GMIME_2_5_7 */
+GMimeSignatureList *g_mime_part_rfc2440_verify(GMimePart * part,
+                                               GMimeGpgmeContext * ctx,
+                                               GError ** err);
+GMimeDecryptResult *g_mime_part_rfc2440_decrypt(GMimePart * part,
+                                                GMimeGpgmeContext * ctx,
+                                                GError ** err);
+#endif /* HAVE_GMIME_2_5_7 */
 
 #ifdef __cplusplus
 }

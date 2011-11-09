@@ -322,7 +322,12 @@ fi
 case "$with_gmime" in
     2.4) ;;
     2.6) AC_DEFINE([HAVE_GMIME_2_6], [1],
-                   [Defined to build with GMime version 2.5 or 2.6]) ;;
+                   [Defined to build with GMime version 2.5 or 2.6])
+         if $PKG_CONFIG --atleast-version=2.5.7 gmime-2.6; then
+             AC_DEFINE([HAVE_GMIME_2_5_7], [1],
+                       [Defined when GMime version is at least 2.5.7])
+         fi
+         ;;
     *) AC_MSG_ERROR([unknown GMime version $with_gmime]) ;;
 esac
 

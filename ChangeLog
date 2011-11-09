@@ -1,3 +1,25 @@
+2011-11-09  Peter Bloomfield
+
+	Build with GMime version >= 2.5.7
+
+	* configure.in: check GMime version.
+	* libbalsa/gmime-application-pkcs7.c
+	(g_mime_application_pkcs7_sign), (g_mime_application_pkcs7_verify),
+	(g_mime_application_pkcs7_encrypt),
+	(g_mime_application_pkcs7_decrypt): build with GMime version >=
+	2.5.7.
+	* libbalsa/gmime-application-pkcs7.h: ditto.
+	* libbalsa/gmime-gpgme-context.c (g_mime_gpgme_context_get_type),
+	(g_mime_gpgme_context_class_init), (g_mime_gpgme_context_finalize),
+	(g_mime_gpgme_digest_id): ditto.
+	* libbalsa/gmime-gpgme-context.h: ditto.
+	* libbalsa/gmime-part-rfc2440.c (g_mime_part_rfc2440_sign_encrypt),
+	(g_mime_part_rfc2440_verify), (g_mime_part_rfc2440_decrypt):
+	* libbalsa/gmime-part-rfc2440.h: ditto.
+	* libbalsa/rfc3156.c (password_request_func),
+	(libbalsa_sign_mime_object), (libbalsa_encrypt_mime_object),
+	(libbalsa_body_check_signature), (libbalsa_body_decrypt): ditto.
+
 2011-10-26  Peter Bloomfield
 
 	* src/sendmsg-window.c (create_info_pane): do not set vertical
@@ -9,7 +31,7 @@
 	* src/main.c (threads_init): use g_type_init, which is required,
 	not g_threads_init, which is redundant.
 
-2011-10-24  Peter Bloomfield  <peter@t43.bellsouth.net>
+2011-10-24  Peter Bloomfield
 
 	* src/main.c (balsa_handle_automation_options), (balsa_init),
 	(scan_mailboxes_idle_cb): handle multiple -o options.
@@ -283,16 +305,14 @@
 	* src/print-gtk.c (draw_page): use ngettext for plural; fixes
 	bgo #659390.
 
-2011-09-09  Peter Bloomfield  <peter@t43.bellsouth.net>
+2011-09-09  Peter Bloomfield
 
 	* src/main-window.c: use checking_mail_lock to protect access to
 	checking_mail.
 	* src/main.c (balsa_cleanup): ditto.
 	* src/threads.h: declare checking_mail.
 
-2011-09-08  Peter Bloomfield  <peter@t43.bellsouth.net>
-
-	reviewed by: <delete if not using a buddy>
+2011-09-08  Peter Bloomfield
 
 	* src/main-window.c: set view-filter in an idle callback.
 
@@ -1559,9 +1579,7 @@
 	notebook page;
 	(empty_trash): check for NULL window.
 
-2010-01-18  Peter Bloomfield  <peter@t43.bellsouth.net>
-
-	reviewed by: <delete if not using a buddy>
+2010-01-18  Peter Bloomfield
 
 	* src/balsa-index.c (bndx_mbnode_weak_notify), (bndx_destroy),
 	(balsa_index_load_mailbox_node): clear BalsaIndex::mailbox_node

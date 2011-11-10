@@ -11,9 +11,9 @@ msgstr ""
 "Project-Id-Version: balsa master\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=balsa&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2011-11-05 14:49+0000\n"
-"PO-Revision-Date: 2011-11-11 02:14+0900\n"
-"Last-Translator: OKANO Takayoshi <kano@na.rim.or.jp>\n"
+"POT-Creation-Date: 2011-11-10 17:27+0000\n"
+"PO-Revision-Date: 2011-11-11 02:35+0900\n"
+"Last-Translator: Jiro Matsuzawa <jmatsuzawa@src.gnome.org>\n"
 "Language-Team: Japanese <gnome-translation@gnome.gr.jp>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -4254,7 +4254,7 @@ msgid ""
 "signatures automatically:"
 msgstr ""
 "自動的に署名\n"
-"を復号して検証する:"
+"を復号して検証する(_D):"
 
 #: ../src/mailbox-conf.c:1547
 msgid "Show _Recipient column instead of Sender"
@@ -4666,7 +4666,7 @@ msgstr "新規に IMAP 形式のサブフォルダを追加します"
 
 #: ../src/main-window.c:423
 msgid "F_ilters..."
-msgstr "フィルタ(_F)..."
+msgstr "フィルタ(_I)..."
 
 #. Export selected filters to a text file.
 #: ../src/main-window.c:426

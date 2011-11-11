@@ -646,7 +646,6 @@ libbalsa_body_check_signature(LibBalsaMessageBody * body,
 	return FALSE;
     }
 
-#ifndef HAVE_GMIME_2_5_7
     /* S/MIME uses the protocol application/pkcs7-signature, but some ancient
        mailers, not yet knowing RFC 2633, use application/x-pkcs7-signature,
        so tweak the context if necessary... */
@@ -655,10 +654,13 @@ libbalsa_body_check_signature(LibBalsaMessageBody * body,
 	    g_mime_object_get_content_type_parameter(GMIME_OBJECT (body->mime_part),
 						     "protocol");
 	if (!g_ascii_strcasecmp(cms_protocol, "application/x-pkcs7-signature"))
+#ifndef HAVE_GMIME_2_5_7
 	    ctx->sign_protocol = cms_protocol;
+#else /* HAVE_GMIME_2_5_7 */
+	    GMIME_GPGME_CONTEXT(ctx)->sign_protocol = cms_protocol;
+#endif /* HAVE_GMIME_2_5_7 */
     }
 
-#endif /* ! HAVE_GMIME_2_5_7 */
     /* verify the signature */
 
     libbalsa_mailbox_lock_store(body->message->mailbox);

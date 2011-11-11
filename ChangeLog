@@ -1,3 +1,8 @@
+2011-11-10  Peter Bloomfield
+
+	* libbalsa/rfc3156.c (libbalsa_body_check_signature): restore
+	handling of application/x-pkcs7-signature.
+
 2011-11-09  Peter Bloomfield
 
 	Build with GMime version >= 2.5.7

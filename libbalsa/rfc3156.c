@@ -593,12 +593,13 @@ libbalsa_body_check_signature(LibBalsaMessageBody * body,
     GMimeSession *session;
 #endif                          /* HAVE_GMIME_2_6 */
 #ifndef HAVE_GMIME_2_5_7
-    GMimeCipherContext *ctx;
+    GMimeCipherContext *g_mime_ctx;
     GMimeSignatureValidity *valid;
 #else /* HAVE_GMIME_2_5_7 */
-    GMimeCryptoContext *ctx;
+    GMimeCryptoContext *g_mime_ctx;
     GMimeSignatureList *valid;
 #endif /* HAVE_GMIME_2_5_7 */
+    GMimeGpgmeContext *ctx;
     GError *error = NULL;
 
     /* paranoia checks */
@@ -624,12 +625,12 @@ libbalsa_body_check_signature(LibBalsaMessageBody * body,
     /* try to create GMimeGpgMEContext */
 #if !defined(HAVE_GMIME_2_6)
     session = g_object_new(g_mime_session_get_type(), NULL, NULL);
-    ctx = g_mime_gpgme_context_new(session, protocol, &error);
+    g_mime_ctx = g_mime_gpgme_context_new(session, protocol, &error);
 #else                           /* HAVE_GMIME_2_6 */
-    ctx =
+    g_mime_ctx =
         g_mime_gpgme_context_new(password_request_func, protocol, &error);
 #endif                          /* HAVE_GMIME_2_6 */
-    if (ctx == NULL) {
+    if (g_mime_ctx == NULL) {
 	if (error) {
 	    libbalsa_information(LIBBALSA_INFORMATION_ERROR, "%s: %s",
 				 _("creating a gpgme context failed"),
@@ -645,6 +646,7 @@ libbalsa_body_check_signature(LibBalsaMessageBody * body,
 	body->parts->next->sig_info->status = GPGME_SIG_STAT_ERROR;
 	return FALSE;
     }
+    ctx = GMIME_GPGME_CONTEXT(g_mime_ctx);
 
     /* S/MIME uses the protocol application/pkcs7-signature, but some ancient
        mailers, not yet knowing RFC 2633, use application/x-pkcs7-signature,
@@ -655,9 +657,9 @@ libbalsa_body_check_signature(LibBalsaMessageBody * body,
 						     "protocol");
 	if (!g_ascii_strcasecmp(cms_protocol, "application/x-pkcs7-signature"))
 #ifndef HAVE_GMIME_2_5_7
-	    ctx->sign_protocol = cms_protocol;
+	    g_mime_ctx->sign_protocol = cms_protocol;
 #else /* HAVE_GMIME_2_5_7 */
-	    GMIME_GPGME_CONTEXT(ctx)->sign_protocol = cms_protocol;
+	    ctx->sign_protocol = cms_protocol;
 #endif /* HAVE_GMIME_2_5_7 */
     }
 
@@ -665,7 +667,8 @@ libbalsa_body_check_signature(LibBalsaMessageBody * body,
 
     libbalsa_mailbox_lock_store(body->message->mailbox);
     valid = g_mime_multipart_signed_verify(GMIME_MULTIPART_SIGNED
-					   (body->mime_part), ctx, &error);
+					   (body->mime_part), g_mime_ctx,
+                                           &error);
     libbalsa_mailbox_unlock_store(body->message->mailbox);
 
     if (valid == NULL) {
@@ -678,8 +681,8 @@ libbalsa_body_check_signature(LibBalsaMessageBody * body,
 	    libbalsa_information(LIBBALSA_INFORMATION_ERROR,
 				 _("signature verification failed"));
     }
-    if (GMIME_GPGME_CONTEXT(ctx)->sig_state) {
-	body->parts->next->sig_info = GMIME_GPGME_CONTEXT(ctx)->sig_state;
+    if (ctx->sig_state) {
+	body->parts->next->sig_info = ctx->sig_state;
 	g_object_ref(G_OBJECT(body->parts->next->sig_info));
     }
 #ifndef HAVE_GMIME_2_5_7
@@ -687,7 +690,7 @@ libbalsa_body_check_signature(LibBalsaMessageBody * body,
 #else /* HAVE_GMIME_2_5_7 */
     g_object_unref(valid);
 #endif /* HAVE_GMIME_2_5_7 */
-    g_object_unref(ctx);
+    g_object_unref(g_mime_ctx);
 #if !defined(HAVE_GMIME_2_6)
     g_object_unref(session);
 #endif                          /* HAVE_GMIME_2_6 */

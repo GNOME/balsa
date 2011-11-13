@@ -1,3 +1,8 @@
+2011-11-12  Peter Bloomfield
+
+	* libbalsa/rfc3156.c (libbalsa_body_check_signature): use only
+	one dynamic cast.
+
 2011-11-10  Peter Bloomfield
 
 	* libbalsa/rfc3156.c (libbalsa_body_check_signature): restore

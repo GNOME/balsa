@@ -28,7 +28,11 @@ extern "C" {
 #endif				/* __cplusplus */
 
 #include <gmime/gmime-part.h>
+#ifndef HAVE_GMIME_2_5_7
 #include <gmime/gmime-cipher-context.h>
+#else /* HAVE_GMIME_2_5_7 */
+#include <gmime/gmime-crypto-context.h>
+#endif /* HAVE_GMIME_2_5_7 */
 
 #undef HAS_APPLICATION_PKCS7_MIME_SIGNED_SUPPORT
 
@@ -39,21 +43,40 @@ extern "C" {
  * Balsa always encodes S/MIME signed stuff as multipart/signed. */
 int g_mime_application_pkcs7_sign(GMimePart * pkcs7,
 				  GMimeObject * content,
+#ifndef HAVE_GMIME_2_5_7
 				  GMimeCipherContext * ctx,
+#else /* HAVE_GMIME_2_5_7 */
+				  GMimeCryptoContext * ctx,
+#endif /* HAVE_GMIME_2_5_7 */
 				  const char *userid, GError ** err);
 #endif
 
+#ifndef HAVE_GMIME_2_5_7
 GMimeObject *g_mime_application_pkcs7_verify(GMimePart * pkcs7,
 					     GMimeSignatureValidity ** validity,
 					     GMimeCipherContext * ctx, GError ** err);
+#else /* HAVE_GMIME_2_5_7 */
+GMimeObject *g_mime_application_pkcs7_verify(GMimePart * pkcs7,
+					     GMimeSignatureList ** validity,
+					     GMimeCryptoContext * ctx, GError ** err);
+#endif /* HAVE_GMIME_2_5_7 */
 
 int g_mime_application_pkcs7_encrypt(GMimePart * pkcs7,
 				     GMimeObject * content,
+#ifndef HAVE_GMIME_2_5_7
 				     GMimeCipherContext * ctx,
+#else /* HAVE_GMIME_2_5_7 */
+				     GMimeCryptoContext * ctx,
+#endif /* HAVE_GMIME_2_5_7 */
 				     GPtrArray * recipients, GError ** err);
 
+#ifndef HAVE_GMIME_2_5_7
 GMimeObject *g_mime_application_pkcs7_decrypt(GMimePart * pkcs7,
 					      GMimeCipherContext * ctx, GError ** err);
+#else /* HAVE_GMIME_2_5_7 */
+GMimeObject *g_mime_application_pkcs7_decrypt(GMimePart * pkcs7,
+					      GMimeCryptoContext * ctx, GError ** err);
+#endif /* HAVE_GMIME_2_5_7 */
 
 #ifdef __cplusplus
 }

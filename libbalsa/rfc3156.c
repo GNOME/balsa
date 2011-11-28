@@ -268,9 +268,15 @@ libbalsa_message_body_protection(LibBalsaMessageBody * body)
 
 #if defined(HAVE_GMIME_2_6)
 static gboolean
+#ifndef HAVE_GMIME_2_5_7
 password_request_func(GMimeCipherContext * ctx, const char *user_id,
                       const char *prompt_ctx, gboolean reprompt,
                       GMimeStream * response, GError ** err)
+#else /* HAVE_GMIME_2_5_7 */
+password_request_func(GMimeCryptoContext * ctx, const char *user_id,
+                      const char *prompt_ctx, gboolean reprompt,
+                      GMimeStream * response, GError ** err)
+#endif /* HAVE_GMIME_2_5_7 */
 {
     gint fd;
     gchar *name_used;
@@ -366,9 +372,16 @@ libbalsa_sign_mime_object(GMimeObject ** content, const gchar * rfc822_for,
 	return FALSE;
     }
 
+#ifndef HAVE_GMIME_2_5_7
     if (g_mime_multipart_signed_sign
 	(mps, *content, GMIME_CIPHER_CONTEXT(ctx), rfc822_for,
-	 GMIME_CIPHER_HASH_DEFAULT, error) != 0) {
+	 GMIME_CIPHER_HASH_DEFAULT, error) != 0)
+#else /* HAVE_GMIME_2_5_7 */
+    if (g_mime_multipart_signed_sign
+	(mps, *content, GMIME_CRYPTO_CONTEXT(ctx), rfc822_for,
+	 GMIME_DIGEST_ALGO_DEFAULT, error) != 0)
+#endif /* HAVE_GMIME_2_5_7 */
+    {
 	g_object_unref(mps);
 	g_object_unref(ctx);
 #if !defined(HAVE_GMIME_2_6)
@@ -458,10 +471,18 @@ libbalsa_encrypt_mime_object(GMimeObject ** content, GList * rfc822_for,
 
 	encrypted_obj = GMIME_OBJECT(mpe);
 	result = 
+#ifndef HAVE_GMIME_2_5_7
 	    g_mime_multipart_encrypted_encrypt(mpe, *content,
 					       GMIME_CIPHER_CONTEXT(ctx),
                                                FALSE, NULL,
 					       recipients, error);
+#else /* HAVE_GMIME_2_5_7 */
+	    g_mime_multipart_encrypted_encrypt(mpe, *content,
+					       GMIME_CRYPTO_CONTEXT(ctx),
+                                               FALSE, NULL,
+                                               GMIME_DIGEST_ALGO_DEFAULT,
+					       recipients, error);
+#endif /* HAVE_GMIME_2_5_7 */
     }
 #ifdef HAVE_SMIME
     else {
@@ -471,9 +492,15 @@ libbalsa_encrypt_mime_object(GMimeObject ** content, GList * rfc822_for,
 	encrypted_obj = GMIME_OBJECT(pkcs7);
 	ctx->singlepart_mode = TRUE;
 	result = 
+#ifndef HAVE_GMIME_2_5_7
 	    g_mime_application_pkcs7_encrypt(pkcs7, *content,
 					     GMIME_CIPHER_CONTEXT(ctx),
 					     recipients, error);
+#else /* HAVE_GMIME_2_5_7 */
+	    g_mime_application_pkcs7_encrypt(pkcs7, *content,
+					     GMIME_CRYPTO_CONTEXT(ctx),
+					     recipients, error);
+#endif /* HAVE_GMIME_2_5_7 */
     }
 #endif
 
@@ -565,8 +592,14 @@ libbalsa_body_check_signature(LibBalsaMessageBody * body,
 #if !defined(HAVE_GMIME_2_6)
     GMimeSession *session;
 #endif                          /* HAVE_GMIME_2_6 */
-    GMimeCipherContext *ctx;
+#ifndef HAVE_GMIME_2_5_7
+    GMimeCipherContext *g_mime_ctx;
     GMimeSignatureValidity *valid;
+#else /* HAVE_GMIME_2_5_7 */
+    GMimeCryptoContext *g_mime_ctx;
+    GMimeSignatureList *valid;
+#endif /* HAVE_GMIME_2_5_7 */
+    GMimeGpgmeContext *ctx;
     GError *error = NULL;
 
     /* paranoia checks */
@@ -592,12 +625,12 @@ libbalsa_body_check_signature(LibBalsaMessageBody * body,
     /* try to create GMimeGpgMEContext */
 #if !defined(HAVE_GMIME_2_6)
     session = g_object_new(g_mime_session_get_type(), NULL, NULL);
-    ctx = g_mime_gpgme_context_new(session, protocol, &error);
+    g_mime_ctx = g_mime_gpgme_context_new(session, protocol, &error);
 #else                           /* HAVE_GMIME_2_6 */
-    ctx =
+    g_mime_ctx =
         g_mime_gpgme_context_new(password_request_func, protocol, &error);
 #endif                          /* HAVE_GMIME_2_6 */
-    if (ctx == NULL) {
+    if (g_mime_ctx == NULL) {
 	if (error) {
 	    libbalsa_information(LIBBALSA_INFORMATION_ERROR, "%s: %s",
 				 _("creating a gpgme context failed"),
@@ -613,6 +646,7 @@ libbalsa_body_check_signature(LibBalsaMessageBody * body,
 	body->parts->next->sig_info->status = GPGME_SIG_STAT_ERROR;
 	return FALSE;
     }
+    ctx = GMIME_GPGME_CONTEXT(g_mime_ctx);
 
     /* S/MIME uses the protocol application/pkcs7-signature, but some ancient
        mailers, not yet knowing RFC 2633, use application/x-pkcs7-signature,
@@ -622,14 +656,19 @@ libbalsa_body_check_signature(LibBalsaMessageBody * body,
 	    g_mime_object_get_content_type_parameter(GMIME_OBJECT (body->mime_part),
 						     "protocol");
 	if (!g_ascii_strcasecmp(cms_protocol, "application/x-pkcs7-signature"))
+#ifndef HAVE_GMIME_2_5_7
+	    g_mime_ctx->sign_protocol = cms_protocol;
+#else /* HAVE_GMIME_2_5_7 */
 	    ctx->sign_protocol = cms_protocol;
+#endif /* HAVE_GMIME_2_5_7 */
     }
 
     /* verify the signature */
 
     libbalsa_mailbox_lock_store(body->message->mailbox);
     valid = g_mime_multipart_signed_verify(GMIME_MULTIPART_SIGNED
-					   (body->mime_part), ctx, &error);
+					   (body->mime_part), g_mime_ctx,
+                                           &error);
     libbalsa_mailbox_unlock_store(body->message->mailbox);
 
     if (valid == NULL) {
@@ -642,12 +681,16 @@ libbalsa_body_check_signature(LibBalsaMessageBody * body,
 	    libbalsa_information(LIBBALSA_INFORMATION_ERROR,
 				 _("signature verification failed"));
     }
-    if (GMIME_GPGME_CONTEXT(ctx)->sig_state) {
-	body->parts->next->sig_info = GMIME_GPGME_CONTEXT(ctx)->sig_state;
+    if (ctx->sig_state) {
+	body->parts->next->sig_info = ctx->sig_state;
 	g_object_ref(G_OBJECT(body->parts->next->sig_info));
     }
+#ifndef HAVE_GMIME_2_5_7
     g_mime_signature_validity_free(valid);
-    g_object_unref(ctx);
+#else /* HAVE_GMIME_2_5_7 */
+    g_object_unref(valid);
+#endif /* HAVE_GMIME_2_5_7 */
+    g_object_unref(g_mime_ctx);
 #if !defined(HAVE_GMIME_2_6)
     g_object_unref(session);
 #endif                          /* HAVE_GMIME_2_6 */
@@ -747,14 +790,26 @@ libbalsa_body_decrypt(LibBalsaMessageBody * body,
     libbalsa_mailbox_lock_store(body->message->mailbox);
     if (protocol == GPGME_PROTOCOL_OpenPGP)
 	mime_obj =
+#ifndef HAVE_GMIME_2_5_7
 	    g_mime_multipart_encrypted_decrypt(GMIME_MULTIPART_ENCRYPTED(body->mime_part),
 					       GMIME_CIPHER_CONTEXT(ctx),
 					       &error);
+#else /* HAVE_GMIME_2_5_7 */
+	    g_mime_multipart_encrypted_decrypt(GMIME_MULTIPART_ENCRYPTED(body->mime_part),
+					       GMIME_CRYPTO_CONTEXT(ctx),
+                                               NULL,
+					       &error);
+#endif /* HAVE_GMIME_2_5_7 */
 #ifdef HAVE_SMIME
     else if (smime_signed) {
+#ifndef HAVE_GMIME_2_5_7
 	GMimeSignatureValidity *valid;
+#else /* HAVE_GMIME_2_5_7 */
+	GMimeSignatureList *valid;
+#endif /* HAVE_GMIME_2_5_7 */
 
 	ctx->singlepart_mode = TRUE;
+#ifndef HAVE_GMIME_2_5_7
 	mime_obj =
 	    g_mime_application_pkcs7_verify(GMIME_PART(body->mime_part),
 					    &valid,
@@ -766,6 +821,19 @@ libbalsa_body_decrypt(LibBalsaMessageBody * body,
 	    g_mime_application_pkcs7_decrypt(GMIME_PART(body->mime_part),
 					       GMIME_CIPHER_CONTEXT(ctx),
 					       &error);
+#else /* HAVE_GMIME_2_5_7 */
+	mime_obj =
+	    g_mime_application_pkcs7_verify(GMIME_PART(body->mime_part),
+					    &valid,
+					    GMIME_CRYPTO_CONTEXT(ctx),
+					    &error);
+	g_object_unref(valid);
+    } else
+	mime_obj =
+	    g_mime_application_pkcs7_decrypt(GMIME_PART(body->mime_part),
+					       GMIME_CRYPTO_CONTEXT(ctx),
+					       &error);
+#endif /* HAVE_GMIME_2_5_7 */
 #endif
     libbalsa_mailbox_unlock_store(body->message->mailbox);
 
@@ -906,7 +974,11 @@ libbalsa_rfc2440_verify(GMimePart * part, GMimeGpgmeSigstat ** sig_info)
     GMimeSession *session;
 #endif                          /* HAVE_GMIME_2_6 */
     GMimeGpgmeContext *ctx;
+#ifndef HAVE_GMIME_2_5_7
     GMimeSignatureValidity *valid;
+#else /* HAVE_GMIME_2_5_7 */
+    GMimeSignatureList *valid;
+#endif /* HAVE_GMIME_2_5_7 */
     GError *error = NULL;
     gpgme_error_t retval;
 
@@ -978,7 +1050,11 @@ libbalsa_rfc2440_verify(GMimePart * part, GMimeGpgmeSigstat ** sig_info)
     }
 
     /* clean up */
+#ifndef HAVE_GMIME_2_5_7
     g_mime_signature_validity_free(valid);
+#else /* HAVE_GMIME_2_5_7 */
+    g_object_unref(valid);
+#endif /* HAVE_GMIME_2_5_7 */
     retval = ctx->sig_state->status;
     g_object_unref(ctx);
 #if !defined(HAVE_GMIME_2_6)

@@ -27,6 +27,9 @@
 #include <unistd.h>
 #include <glib.h>
 #include <gmime/gmime.h>
+#ifdef HAVE_GMIME_2_5_7
+#include <gmime/gmime-certificate.h>
+#endif /* HAVE_GMIME_2_5_7 */
 #include <gpgme.h>
 #include <time.h>
 #include <glib/gi18n.h>
@@ -44,6 +47,7 @@ static gboolean g_mime_gpgme_context_check_protocol(GMimeGpgmeContextClass
 						    protocol,
 						    GError ** error);
 
+#ifndef HAVE_GMIME_2_5_7
 static GMimeCipherHash g_mime_gpgme_hash_id(GMimeCipherContext * ctx,
 					    const char *hash);
 
@@ -70,6 +74,46 @@ static GMimeSignatureValidity *g_mime_gpgme_decrypt(GMimeCipherContext *
                                                     GMimeStream * istream,
                                                     GMimeStream * ostream,
                                                     GError ** err);
+#else /* HAVE_GMIME_2_5_7 */
+static GMimeDigestAlgo g_mime_gpgme_digest_id(GMimeCryptoContext * ctx,
+                                              const char *hash);
+
+static const char *g_mime_gpgme_digest_name(GMimeCryptoContext * ctx,
+                                            GMimeDigestAlgo hash);
+
+static const char
+    *g_mime_gpgme_get_signature_protocol(GMimeCryptoContext * context);
+static const char
+    *g_mime_gpgme_get_encryption_protocol(GMimeCryptoContext * context);
+static const char
+    *g_mime_gpgme_get_key_exchange_protocol(GMimeCryptoContext * context);
+
+static int g_mime_gpgme_sign(GMimeCryptoContext * ctx,
+                             const char * userid,
+			     GMimeDigestAlgo hash,
+                             GMimeStream * istream,
+			     GMimeStream * ostream,
+                             GError ** err);
+
+static GMimeSignatureList *g_mime_gpgme_verify(GMimeCryptoContext * ctx,
+                                               GMimeDigestAlgo hash,
+                                               GMimeStream * istream,
+                                               GMimeStream * sigstream,
+                                               GError ** err);
+
+static int g_mime_gpgme_encrypt(GMimeCryptoContext * ctx,
+                                gboolean sign,
+				const char *userid,
+                                GMimeDigestAlgo digest,
+                                GPtrArray * recipients,
+				GMimeStream * istream,
+				GMimeStream * ostream, GError ** err);
+
+static GMimeDecryptResult *g_mime_gpgme_decrypt(GMimeCryptoContext * ctx,
+                                                GMimeStream * istream,
+                                                GMimeStream * ostream,
+                                                GError ** err);
+#endif /* HAVE_GMIME_2_5_7 */
 
 
 /* internal passphrase callback */
@@ -102,7 +146,11 @@ static void g_set_error_from_gpgme(GError ** error, gpgme_error_t gpgme_err,
 				   const gchar * message);
 
 
+#ifndef HAVE_GMIME_2_5_7
 static GMimeCipherContextClass *parent_class = NULL;
+#else /* HAVE_GMIME_2_5_7 */
+static GMimeCryptoContextClass *parent_class = NULL;
+#endif /* HAVE_GMIME_2_5_7 */
 
 
 GType
@@ -124,8 +172,13 @@ g_mime_gpgme_context_get_type(void)
 	};
 
 	type =
+#ifndef HAVE_GMIME_2_5_7
 	    g_type_register_static(GMIME_TYPE_CIPHER_CONTEXT,
 				   "GMimeGpgmeContext", &info, 0);
+#else /* HAVE_GMIME_2_5_7 */
+	    g_type_register_static(GMIME_TYPE_CRYPTO_CONTEXT,
+				   "GMimeGpgmeContext", &info, 0);
+#endif /* HAVE_GMIME_2_5_7 */
     }
 
     return type;
@@ -136,19 +189,39 @@ static void
 g_mime_gpgme_context_class_init(GMimeGpgmeContextClass * klass)
 {
     GObjectClass *object_class = G_OBJECT_CLASS(klass);
+#ifndef HAVE_GMIME_2_5_7
     GMimeCipherContextClass *cipher_class =
 	GMIME_CIPHER_CONTEXT_CLASS(klass);
+#else /* HAVE_GMIME_2_5_7 */
+    GMimeCryptoContextClass *crypto_class =
+	GMIME_CRYPTO_CONTEXT_CLASS(klass);
+#endif /* HAVE_GMIME_2_5_7 */
 
     parent_class = g_type_class_ref(G_TYPE_OBJECT);
 
     object_class->finalize = g_mime_gpgme_context_finalize;
 
+#ifndef HAVE_GMIME_2_5_7
     cipher_class->hash_id = g_mime_gpgme_hash_id;
     cipher_class->hash_name = g_mime_gpgme_hash_name;
     cipher_class->sign = g_mime_gpgme_sign;
     cipher_class->verify = g_mime_gpgme_verify;
     cipher_class->encrypt = g_mime_gpgme_encrypt;
     cipher_class->decrypt = g_mime_gpgme_decrypt;
+#else /* HAVE_GMIME_2_5_7 */
+    crypto_class->digest_id = g_mime_gpgme_digest_id;
+    crypto_class->digest_name = g_mime_gpgme_digest_name;
+    crypto_class->get_signature_protocol =
+        g_mime_gpgme_get_signature_protocol;
+    crypto_class->get_encryption_protocol =
+        g_mime_gpgme_get_encryption_protocol;
+    crypto_class->get_key_exchange_protocol =
+        g_mime_gpgme_get_key_exchange_protocol;
+    crypto_class->sign = g_mime_gpgme_sign;
+    crypto_class->verify = g_mime_gpgme_verify;
+    crypto_class->encrypt = g_mime_gpgme_encrypt;
+    crypto_class->decrypt = g_mime_gpgme_decrypt;
+#endif /* HAVE_GMIME_2_5_7 */
 
     if (gpgme_engine_check_version(GPGME_PROTOCOL_OpenPGP) ==
 	GPG_ERR_NO_ERROR)
@@ -190,7 +263,11 @@ g_mime_gpgme_context_finalize(GObject * object)
     }
 
 #if !defined(HAVE_GMIME_2_6)
+#ifndef HAVE_GMIME_2_5_7
     g_object_unref(GMIME_CIPHER_CONTEXT(ctx)->session);
+#else /* HAVE_GMIME_2_5_7 */
+    g_object_unref(GMIME_CRYPTO_CONTEXT(ctx)->session);
+#endif /* HAVE_GMIME_2_5_7 */
 #endif                          /* HAVE_GMIME_2_6 */
 
     G_OBJECT_CLASS(parent_class)->finalize(object);
@@ -200,15 +277,26 @@ g_mime_gpgme_context_finalize(GObject * object)
 /*
  * Convert a hash algorithm name to a number
  */
+#ifndef HAVE_GMIME_2_5_7
 static GMimeCipherHash
 g_mime_gpgme_hash_id(GMimeCipherContext * ctx, const char *hash)
+#else /* HAVE_GMIME_2_5_7 */
+static GMimeDigestAlgo
+g_mime_gpgme_digest_id(GMimeCryptoContext * ctx, const char *hash)
+#endif /* HAVE_GMIME_2_5_7 */
 {
+#ifndef HAVE_GMIME_2_5_7
     if (hash == NULL)
 	return GMIME_CIPHER_HASH_DEFAULT;
+#else /* HAVE_GMIME_2_5_7 */
+    if (hash == NULL)
+	return GMIME_DIGEST_ALGO_DEFAULT;
+#endif /* HAVE_GMIME_2_5_7 */
 
     if (!g_ascii_strcasecmp(hash, "pgp-"))
 	hash += 4;
 
+#ifndef HAVE_GMIME_2_5_7
     if (!g_ascii_strcasecmp(hash, "md2"))
 	return GMIME_CIPHER_HASH_MD2;
     else if (!g_ascii_strcasecmp(hash, "md5"))
@@ -223,6 +311,22 @@ g_mime_gpgme_hash_id(GMimeCipherContext * ctx, const char *hash)
 	return GMIME_CIPHER_HASH_HAVAL5160;
 
     return GMIME_CIPHER_HASH_DEFAULT;
+#else /* HAVE_GMIME_2_5_7 */
+    if (!g_ascii_strcasecmp(hash, "md2"))
+	return GMIME_DIGEST_ALGO_MD2;
+    else if (!g_ascii_strcasecmp(hash, "md5"))
+	return GMIME_DIGEST_ALGO_MD5;
+    else if (!g_ascii_strcasecmp(hash, "sha1"))
+	return GMIME_DIGEST_ALGO_SHA1;
+    else if (!g_ascii_strcasecmp(hash, "ripemd160"))
+	return GMIME_DIGEST_ALGO_RIPEMD160;
+    else if (!g_ascii_strcasecmp(hash, "tiger192"))
+	return GMIME_DIGEST_ALGO_TIGER192;
+    else if (!g_ascii_strcasecmp(hash, "haval-5-160"))
+	return GMIME_DIGEST_ALGO_HAVAL5160;
+
+    return GMIME_DIGEST_ALGO_DEFAULT;
+#endif /* HAVE_GMIME_2_5_7 */
 }
 
 
@@ -230,7 +334,11 @@ g_mime_gpgme_hash_id(GMimeCipherContext * ctx, const char *hash)
  * Convert a hash algorithm number to a string
  */
 static const char *
+#ifndef HAVE_GMIME_2_5_7
 g_mime_gpgme_hash_name(GMimeCipherContext * context, GMimeCipherHash hash)
+#else /* HAVE_GMIME_2_5_7 */
+g_mime_gpgme_digest_name(GMimeCryptoContext * context, GMimeDigestAlgo hash)
+#endif /* HAVE_GMIME_2_5_7 */
 {
     GMimeGpgmeContext *ctx = GMIME_GPGME_CONTEXT(context);
     char *p;
@@ -239,6 +347,7 @@ g_mime_gpgme_hash_name(GMimeCipherContext * context, GMimeCipherHash hash)
     g_return_val_if_fail(ctx->gpgme_ctx, NULL);
 
     /* note: this is only a subset of the hash algorithms gpg(me) supports */
+#ifndef HAVE_GMIME_2_5_7
     switch (hash) {
     case GMIME_CIPHER_HASH_MD2:
 	p = "pgp-md2";
@@ -258,6 +367,27 @@ g_mime_gpgme_hash_name(GMimeCipherContext * context, GMimeCipherHash hash)
     case GMIME_CIPHER_HASH_HAVAL5160:
 	p = "pgp-haval-5-160";
 	break;
+#else /* HAVE_GMIME_2_5_7 */
+    switch (hash) {
+    case GMIME_DIGEST_ALGO_MD2:
+	p = "pgp-md2";
+	break;
+    case GMIME_DIGEST_ALGO_MD5:
+	p = "pgp-md5";
+	break;
+    case GMIME_DIGEST_ALGO_SHA1:
+	p = "pgp-sha1";
+	break;
+    case GMIME_DIGEST_ALGO_RIPEMD160:
+	p = "pgp-ripemd160";
+	break;
+    case GMIME_DIGEST_ALGO_TIGER192:
+	p = "pgp-tiger192";
+	break;
+    case GMIME_DIGEST_ALGO_HAVAL5160:
+	p = "pgp-haval-5-160";
+	break;
+#endif /* HAVE_GMIME_2_5_7 */
     default:
 	if (!(p = ctx->micalg))
 	    return p;
@@ -270,6 +400,29 @@ g_mime_gpgme_hash_name(GMimeCipherContext * context, GMimeCipherHash hash)
     return p;
 }
 
+#ifdef HAVE_GMIME_2_5_7
+static const char *
+g_mime_gpgme_get_signature_protocol(GMimeCryptoContext * context)
+{
+    GMimeGpgmeContext *ctx = GMIME_GPGME_CONTEXT(context);
+    return ctx->sign_protocol;
+}
+
+static const char *
+g_mime_gpgme_get_encryption_protocol(GMimeCryptoContext * context)
+{
+    GMimeGpgmeContext *ctx = GMIME_GPGME_CONTEXT(context);
+    return ctx->encrypt_protocol;
+}
+
+static const char *
+g_mime_gpgme_get_key_exchange_protocol(GMimeCryptoContext * context)
+{
+    GMimeGpgmeContext *ctx = GMIME_GPGME_CONTEXT(context);
+    return ctx->key_protocol;
+}
+
+#endif /* HAVE_GMIME_2_5_7 */
 
 /*
  * Wrapper to convert the passphrase returned from the gmime session to gpgme.
@@ -279,7 +432,11 @@ g_mime_session_passphrase(void *HOOK, const char *UID_HINT,
 			  const char *PASSPHRASE_INFO, int PREV_WAS_BAD,
 			  int FD)
 {
+#ifndef HAVE_GMIME_2_5_7
     GMimeCipherContext *ctx = GMIME_CIPHER_CONTEXT(HOOK);
+#else /* HAVE_GMIME_2_5_7 */
+    GMimeCryptoContext *ctx = GMIME_CRYPTO_CONTEXT(HOOK);
+#endif /* HAVE_GMIME_2_5_7 */
 #if defined(HAVE_GMIME_2_6)
     GMimeStream *stream;
     gboolean rc;
@@ -366,9 +523,15 @@ cb_data_release(void *handle)
  * arg, but set the value in the context.
  */
 static int
+#ifndef HAVE_GMIME_2_5_7
 g_mime_gpgme_sign(GMimeCipherContext * context, const char *userid,
 		  GMimeCipherHash hash, GMimeStream * istream,
 		  GMimeStream * ostream, GError ** error)
+#else /* HAVE_GMIME_2_5_7 */
+g_mime_gpgme_sign(GMimeCryptoContext * context, const char *userid,
+		  GMimeDigestAlgo hash, GMimeStream * istream,
+		  GMimeStream * ostream, GError ** error)
+#endif /* HAVE_GMIME_2_5_7 */
 {
     GMimeGpgmeContext *ctx = (GMimeGpgmeContext *) context;
     gpgme_sig_mode_t sig_mode;
@@ -460,6 +623,7 @@ g_mime_gpgme_sign(GMimeCipherContext * context, const char *userid,
 }
 
 
+#ifndef HAVE_GMIME_2_5_7
 /*
  * In standard mode, verify that sigstream contains a detached signature for
  * istream. In single-part mode (RFC 2440, RFC 2633 application/pkcs7-mime),
@@ -471,13 +635,33 @@ static GMimeSignatureValidity *
 g_mime_gpgme_verify(GMimeCipherContext * context, GMimeCipherHash hash,
 		    GMimeStream * istream, GMimeStream * sigstream,
 		    GError ** error)
+#else /* HAVE_GMIME_2_5_7 */
+/*
+ * In standard mode, verify that sigstream contains a detached signature for
+ * istream. In single-part mode (RFC 2440, RFC 2633 application/pkcs7-mime),
+ * istream contains clearsigned data, and sigstream will be filled with the
+ * verified plaintext. The routine returns a GMimeSignatureList object.
+ * More information is saved in the context's signature object.
+ * On error error is set accordingly.
+ */
+static GMimeSignatureList *
+g_mime_gpgme_verify(GMimeCryptoContext * context, GMimeDigestAlgo hash,
+		    GMimeStream * istream, GMimeStream * sigstream,
+		    GError ** error)
+#endif /* HAVE_GMIME_2_5_7 */
 {
     GMimeGpgmeContext *ctx = (GMimeGpgmeContext *) context;
     gpgme_ctx_t gpgme_ctx;
     gpgme_protocol_t protocol;
     gpgme_error_t err;
     gpgme_data_t msg, sig;
+#ifndef HAVE_GMIME_2_5_7
     GMimeSignatureValidity *validity;
+#else /* HAVE_GMIME_2_5_7 */
+    GMimeSignatureList *list;
+    GMimeSignature *signature;
+
+#endif /* HAVE_GMIME_2_5_7 */
     struct gpgme_data_cbs cbs = {
 	(gpgme_data_read_cb_t) g_mime_gpgme_stream_rd,	/* read method */
 	(gpgme_data_write_cb_t) g_mime_gpgme_stream_wr,	/* write method */
@@ -521,6 +705,7 @@ g_mime_gpgme_verify(GMimeCipherContext * context, GMimeCipherHash hash,
 	ctx->sig_state =
 	    g_mime_gpgme_sigstat_new_from_gpgme_ctx(gpgme_ctx);
 
+#ifndef HAVE_GMIME_2_5_7
     validity = g_mime_signature_validity_new();
     if (ctx->sig_state) {
 	switch (ctx->sig_state->status)
@@ -536,12 +721,44 @@ g_mime_gpgme_verify(GMimeCipherContext * context, GMimeCipherHash hash,
 	    }
     } else
 	g_mime_signature_validity_set_status(validity, GMIME_SIGNATURE_STATUS_UNKNOWN);
+#else /* HAVE_GMIME_2_5_7 */
+    list = g_mime_signature_list_new();
+    signature = g_mime_signature_new();
+    g_mime_signature_list_add(list, signature);
+
+    if (ctx->sig_state) {
+	switch (ctx->sig_state->status)
+	    {
+	    case GPG_ERR_NO_ERROR:
+		g_mime_signature_set_status(signature,
+                                            GMIME_SIGNATURE_STATUS_GOOD);
+		break;
+	    case GPG_ERR_NOT_SIGNED:
+		g_mime_signature_set_status(signature,
+                                            GMIME_SIGNATURE_STATUS_ERROR);
+		g_mime_signature_set_errors(signature,
+                                            GMIME_SIGNATURE_ERROR_NONE);
+		break;
+	    default:
+		g_mime_signature_set_status(signature,
+                                            GMIME_SIGNATURE_STATUS_BAD);
+	    }
+    } else {
+	g_mime_signature_set_status(signature,
+                                    GMIME_SIGNATURE_STATUS_ERROR);
+        g_mime_signature_set_errors(signature, GMIME_SIGNATURE_ERROR_NONE);
+    }
+#endif /* HAVE_GMIME_2_5_7 */
 
     /* release gmgme data buffers */
     gpgme_data_release(msg);
     gpgme_data_release(sig);
 
+#ifndef HAVE_GMIME_2_5_7
     return validity;
+#else /* HAVE_GMIME_2_5_7 */
+    return list;
+#endif /* HAVE_GMIME_2_5_7 */
 }
 
 
@@ -549,10 +766,19 @@ g_mime_gpgme_verify(GMimeCipherContext * context, GMimeCipherHash hash,
  * Encrypt istream to ostream for recipients. If sign is set, sign by userid.
  */
 static int
+#ifndef HAVE_GMIME_2_5_7
 g_mime_gpgme_encrypt(GMimeCipherContext * context, gboolean sign,
 		     const char *userid, GPtrArray * recipients,
 		     GMimeStream * istream, GMimeStream * ostream,
 		     GError ** error)
+#else /* HAVE_GMIME_2_5_7 */
+g_mime_gpgme_encrypt(GMimeCryptoContext * context, gboolean sign,
+		     const char *userid,
+                     GMimeDigestAlgo digest,
+                     GPtrArray * recipients,
+		     GMimeStream * istream, GMimeStream * ostream,
+		     GError ** error)
+#endif /* HAVE_GMIME_2_5_7 */
 {
     GMimeGpgmeContext *ctx = (GMimeGpgmeContext *) context;
     gpgme_ctx_t gpgme_ctx;
@@ -653,9 +879,15 @@ g_mime_gpgme_encrypt(GMimeCipherContext * context, gboolean sign,
  * Decrypt istream to ostream. In RFC 2440 mode, also try to check an included
  * signature (if any).
  */
+#ifndef HAVE_GMIME_2_5_7
 static GMimeSignatureValidity *
 g_mime_gpgme_decrypt(GMimeCipherContext * context, GMimeStream * istream,
 		     GMimeStream * ostream, GError ** error)
+#else /* HAVE_GMIME_2_5_7 */
+static GMimeDecryptResult *
+g_mime_gpgme_decrypt(GMimeCryptoContext * context, GMimeStream * istream,
+		     GMimeStream * ostream, GError ** error)
+#endif /* HAVE_GMIME_2_5_7 */
 {
     GMimeGpgmeContext *ctx = (GMimeGpgmeContext *) context;
     gpgme_ctx_t gpgme_ctx;
@@ -668,7 +900,13 @@ g_mime_gpgme_decrypt(GMimeCipherContext * context, GMimeStream * istream,
 	NULL,			/* seek method */
 	cb_data_release		/* release method */
     };
+#ifndef HAVE_GMIME_2_5_7
     GMimeSignatureValidity *validity;
+#else /* HAVE_GMIME_2_5_7 */
+    GMimeDecryptResult *result;
+    GMimeSignatureList *list;
+    GMimeSignature *signature;
+#endif /* HAVE_GMIME_2_5_7 */
 
     /* some paranoia checks */
     g_return_val_if_fail(ctx, NULL);
@@ -716,6 +954,7 @@ g_mime_gpgme_decrypt(GMimeCipherContext * context, GMimeStream * istream,
     /* try to get information about the signature (if any) */
     ctx->sig_state = g_mime_gpgme_sigstat_new_from_gpgme_ctx(gpgme_ctx);
 
+#ifndef HAVE_GMIME_2_5_7
     validity = g_mime_signature_validity_new();
     if (ctx->sig_state) {
 	switch (ctx->sig_state->status)
@@ -733,14 +972,57 @@ g_mime_gpgme_decrypt(GMimeCipherContext * context, GMimeStream * istream,
 	g_mime_signature_validity_set_status(validity, GMIME_SIGNATURE_STATUS_UNKNOWN);
 
     return validity;
+#else /* HAVE_GMIME_2_5_7 */
+    list = g_mime_signature_list_new();
+    signature = g_mime_signature_new();
+    g_mime_signature_list_add(list, signature);
+    result = g_mime_decrypt_result_new();
+    g_mime_decrypt_result_set_signatures(result, list);
+
+    if (ctx->sig_state) {
+	switch (ctx->sig_state->status)
+	    {
+	    case GPG_ERR_NO_ERROR:
+		g_mime_signature_set_status(signature,
+                                            GMIME_SIGNATURE_STATUS_GOOD);
+		break;
+	    case GPG_ERR_NOT_SIGNED:
+		g_mime_signature_set_status(signature,
+                                            GMIME_SIGNATURE_STATUS_ERROR);
+		g_mime_signature_set_errors(signature,
+                                            GMIME_SIGNATURE_ERROR_NONE);
+		break;
+	    default:
+		g_mime_signature_set_status(signature,
+                                            GMIME_SIGNATURE_STATUS_BAD);
+	    }
+    } else {
+	g_mime_signature_set_status(signature,
+                                    GMIME_SIGNATURE_STATUS_ERROR);
+        g_mime_signature_set_errors(signature, GMIME_SIGNATURE_ERROR_NONE);
+    }
+
+    return result;
+#endif /* HAVE_GMIME_2_5_7 */
 }
 
 
+#ifndef HAVE_GMIME_2_5_7
 /*
  * Create a new gpgme cipher context with protocol. If anything fails, return
  * NULL and set error.
  */
+#else /* HAVE_GMIME_2_5_7 */
+/*
+ * Create a new gpgme crypto context with protocol. If anything fails, return
+ * NULL and set error.
+ */
+#endif /* HAVE_GMIME_2_5_7 */
+#ifndef HAVE_GMIME_2_5_7
 GMimeCipherContext *
+#else /* HAVE_GMIME_2_5_7 */
+GMimeCryptoContext *
+#endif /* HAVE_GMIME_2_5_7 */
 #if defined(HAVE_GMIME_2_6)
 g_mime_gpgme_context_new(GMimePasswordRequestFunc request_passwd,
                          gpgme_protocol_t protocol, GError ** error)
@@ -749,7 +1031,11 @@ g_mime_gpgme_context_new(GMimeSession * session,
 			 gpgme_protocol_t protocol, GError ** error)
 #endif                          /* HAVE_GMIME_2_6 */
 {
+#ifndef HAVE_GMIME_2_5_7
     GMimeCipherContext *cipher;
+#else /* HAVE_GMIME_2_5_7 */
+    GMimeCryptoContext *crypto;
+#endif /* HAVE_GMIME_2_5_7 */
     GMimeGpgmeContext *ctx;
     gpgme_error_t err;
     gpgme_ctx_t gpgme_ctx;
@@ -766,14 +1052,22 @@ g_mime_gpgme_context_new(GMimeSession * session,
 	return NULL;
     }
 
+#ifndef HAVE_GMIME_2_5_7
     /* create the cipher context */
+#else /* HAVE_GMIME_2_5_7 */
+    /* create the crypto context */
+#endif /* HAVE_GMIME_2_5_7 */
     ctx = g_object_new(GMIME_TYPE_GPGME_CONTEXT, NULL, NULL);
     if (!ctx) {
 	gpgme_release(gpgme_ctx);
 	return NULL;
     } else
 	ctx->gpgme_ctx = gpgme_ctx;
+#ifndef HAVE_GMIME_2_5_7
     cipher = (GMimeCipherContext *) ctx;
+#else /* HAVE_GMIME_2_5_7 */
+    crypto = (GMimeCryptoContext *) ctx;
+#endif /* HAVE_GMIME_2_5_7 */
 
     /* check if the requested protocol is available */
     if (!g_mime_gpgme_context_check_protocol
@@ -785,23 +1079,47 @@ g_mime_gpgme_context_new(GMimeSession * session,
 
     /* setup according to requested protocol */
 #if defined(HAVE_GMIME_2_6)
+#ifndef HAVE_GMIME_2_5_7
     cipher->request_passwd = request_passwd;
+#else /* HAVE_GMIME_2_5_7 */
+    crypto->request_passwd = request_passwd;
+#endif /* HAVE_GMIME_2_5_7 */
 #else                           /* HAVE_GMIME_2_6 */
+#ifndef HAVE_GMIME_2_5_7
     cipher->session = session;
+#else /* HAVE_GMIME_2_5_7 */
+    crypto->session = session;
+#endif /* HAVE_GMIME_2_5_7 */
     g_object_ref(session);
 #endif                          /* HAVE_GMIME_2_6 */
     gpgme_set_protocol(gpgme_ctx, protocol);
     if (protocol == GPGME_PROTOCOL_OpenPGP) {
+#ifndef HAVE_GMIME_2_5_7
 	cipher->sign_protocol = "application/pgp-signature";
 	cipher->encrypt_protocol = "application/pgp-encrypted";
 	cipher->key_protocol = NULL;	/* FIXME */
+#else /* HAVE_GMIME_2_5_7 */
+	ctx->sign_protocol = "application/pgp-signature";
+	ctx->encrypt_protocol = "application/pgp-encrypted";
+	ctx->key_protocol = NULL;	/* FIXME */
+#endif /* HAVE_GMIME_2_5_7 */
     } else {
+#ifndef HAVE_GMIME_2_5_7
 	cipher->sign_protocol = "application/pkcs7-signature";
 	cipher->encrypt_protocol = "application/pkcs7-mime";
 	cipher->key_protocol = NULL;	/* FIXME */
+#else /* HAVE_GMIME_2_5_7 */
+	ctx->sign_protocol = "application/pkcs7-signature";
+	ctx->encrypt_protocol = "application/pkcs7-mime";
+	ctx->key_protocol = NULL;	/* FIXME */
+#endif /* HAVE_GMIME_2_5_7 */
     }
 
+#ifndef HAVE_GMIME_2_5_7
     return cipher;
+#else /* HAVE_GMIME_2_5_7 */
+    return crypto;
+#endif /* HAVE_GMIME_2_5_7 */
 }
 
 

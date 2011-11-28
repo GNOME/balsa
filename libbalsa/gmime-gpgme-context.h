@@ -63,7 +63,11 @@ typedef gboolean(*GMimeGpgmeKeyTrustCB) (const gchar * name,
 					 GMimeGpgmeContext * ctx);
 
 struct _GMimeGpgmeContext {
+#ifndef HAVE_GMIME_2_5_7
     GMimeCipherContext parent_object;
+#else /* HAVE_GMIME_2_5_7 */
+    GMimeCryptoContext parent_object;
+#endif /* HAVE_GMIME_2_5_7 */
 
     gpgme_ctx_t gpgme_ctx;	/* gpgme context */
     gboolean singlepart_mode;	/* set context to single-part mode (RFC 2440, 2633) */
@@ -73,11 +77,21 @@ struct _GMimeGpgmeContext {
     GMimeGpgmeKeySelectCB key_select_cb;	/* key selection callback */
     GMimeGpgmeKeyTrustCB key_trust_cb;          /* low trust key cb */
     gpgme_passphrase_cb_t passphrase_cb;	/* passphrase callback */
+#ifdef HAVE_GMIME_2_5_7
+
+    const gchar *sign_protocol;
+    const gchar *encrypt_protocol;
+    const gchar *key_protocol;
+#endif /* HAVE_GMIME_2_5_7 */
 };
 
 
 struct _GMimeGpgmeContextClass {
+#ifndef HAVE_GMIME_2_5_7
     GMimeCipherContextClass parent_class;
+#else /* HAVE_GMIME_2_5_7 */
+    GMimeCryptoContextClass parent_class;
+#endif /* HAVE_GMIME_2_5_7 */
 
     gboolean has_proto_openpgp;
     gboolean has_proto_cms;
@@ -86,10 +100,17 @@ struct _GMimeGpgmeContextClass {
 
 GType g_mime_gpgme_context_get_type(void);
 #if defined(HAVE_GMIME_2_6)
+#ifndef HAVE_GMIME_2_5_7
 GMimeCipherContext *g_mime_gpgme_context_new(GMimePasswordRequestFunc
                                              request_passwd,
 					     gpgme_protocol_t protocol,
 					     GError ** error);
+#else /* HAVE_GMIME_2_5_7 */
+GMimeCryptoContext *g_mime_gpgme_context_new(GMimePasswordRequestFunc
+                                             request_passwd,
+					     gpgme_protocol_t protocol,
+					     GError ** error);
+#endif /* HAVE_GMIME_2_5_7 */
 #else                           /* HAVE_GMIME_2_6 */
 GMimeCipherContext *g_mime_gpgme_context_new(GMimeSession * session,
 					     gpgme_protocol_t protocol,

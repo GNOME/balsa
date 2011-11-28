@@ -112,8 +112,13 @@ g_mime_part_rfc2440_sign_encrypt(GMimePart * part,
 
     g_return_val_if_fail(GMIME_IS_PART(part), -1);
     g_return_val_if_fail(GMIME_IS_GPGME_CONTEXT(ctx), -1);
+#ifndef HAVE_GMIME_2_5_7
     g_return_val_if_fail(GMIME_CIPHER_CONTEXT(ctx)->sign_protocol != NULL,
 			 -1);
+#else /* HAVE_GMIME_2_5_7 */
+    g_return_val_if_fail(g_mime_crypto_context_get_signature_protocol
+                         (GMIME_CRYPTO_CONTEXT(ctx)) != NULL, -1);
+#endif /* HAVE_GMIME_2_5_7 */
     g_return_val_if_fail(recipients != NULL || sign_userid != NULL, -1);
 
     /* get the raw content */
@@ -131,14 +136,27 @@ g_mime_part_rfc2440_sign_encrypt(GMimePart * part,
     ctx->singlepart_mode = TRUE;
     if (recipients == NULL)
 	result =
+#ifndef HAVE_GMIME_2_5_7
 	    g_mime_cipher_context_sign(GMIME_CIPHER_CONTEXT(ctx), sign_userid,
 			       GMIME_CIPHER_HASH_DEFAULT, stream,
 			       cipherstream, err);
+#else /* HAVE_GMIME_2_5_7 */
+	    g_mime_crypto_context_sign(GMIME_CRYPTO_CONTEXT(ctx), sign_userid,
+			       GMIME_CIPHER_ALGO_DEFAULT, stream,
+			       cipherstream, err);
+#endif /* HAVE_GMIME_2_5_7 */
     else
 	result =
+#ifndef HAVE_GMIME_2_5_7
 	    g_mime_cipher_context_encrypt(GMIME_CIPHER_CONTEXT(ctx),
 				  sign_userid != NULL, sign_userid,
 				  recipients, stream, cipherstream, err);
+#else /* HAVE_GMIME_2_5_7 */
+	    g_mime_crypto_context_encrypt(GMIME_CRYPTO_CONTEXT(ctx),
+				  sign_userid != NULL, sign_userid,
+                                  GMIME_CIPHER_ALGO_DEFAULT,
+				  recipients, stream, cipherstream, err);
+#endif /* HAVE_GMIME_2_5_7 */
     if (result == -1) {
 	g_object_unref(cipherstream);
 	return -1;
@@ -202,18 +220,31 @@ g_mime_part_rfc2440_sign_encrypt(GMimePart * part,
  * set on err to provide more information. Upon success, the content
  * of part is replaced by the verified output of the crypto engine.
  */
+#ifndef HAVE_GMIME_2_5_7
 GMimeSignatureValidity *
+#else /* HAVE_GMIME_2_5_7 */
+GMimeSignatureList *
+#endif /* HAVE_GMIME_2_5_7 */
 g_mime_part_rfc2440_verify(GMimePart * part,
 			   GMimeGpgmeContext * ctx, GError ** err)
 {
     GMimeStream *stream, *plainstream;
     GMimeDataWrapper * wrapper;
+#ifndef HAVE_GMIME_2_5_7
     GMimeSignatureValidity *valid;
+#else /* HAVE_GMIME_2_5_7 */
+    GMimeSignatureList *list;
+#endif /* HAVE_GMIME_2_5_7 */
 
     g_return_val_if_fail(GMIME_IS_PART(part), NULL);
     g_return_val_if_fail(GMIME_IS_GPGME_CONTEXT(ctx), NULL);
+#ifndef HAVE_GMIME_2_5_7
     g_return_val_if_fail(GMIME_CIPHER_CONTEXT(ctx)->sign_protocol != NULL,
 			 NULL);
+#else /* HAVE_GMIME_2_5_7 */
+    g_return_val_if_fail(g_mime_crypto_context_get_signature_protocol
+                         (GMIME_CRYPTO_CONTEXT(ctx)) != NULL, NULL);
+#endif /* HAVE_GMIME_2_5_7 */
 
     /* get the raw content */
     wrapper = g_mime_part_get_content_object(GMIME_PART(part));
@@ -227,13 +258,25 @@ g_mime_part_rfc2440_verify(GMimePart * part,
 
     /* verify the signature */
     ctx->singlepart_mode = TRUE;
+#ifndef HAVE_GMIME_2_5_7
     valid =
 	g_mime_cipher_context_verify(GMIME_CIPHER_CONTEXT(ctx),
 			     GMIME_CIPHER_HASH_DEFAULT, stream,
 			     plainstream, err);
+#else /* HAVE_GMIME_2_5_7 */
+    list =
+	g_mime_crypto_context_verify(GMIME_CRYPTO_CONTEXT(ctx),
+			     GMIME_CIPHER_ALGO_DEFAULT, stream,
+			     plainstream, err);
+#endif /* HAVE_GMIME_2_5_7 */
 
     /* upon success, replace the signed content by the checked one */
-    if (valid) {
+#ifndef HAVE_GMIME_2_5_7
+    if (valid)
+#else /* HAVE_GMIME_2_5_7 */
+    if (list)
+#endif /* HAVE_GMIME_2_5_7 */
+    {
 	GMimeDataWrapper *wrapper = g_mime_data_wrapper_new();
 
 	g_mime_data_wrapper_set_stream(wrapper, plainstream);
@@ -242,7 +285,11 @@ g_mime_part_rfc2440_verify(GMimePart * part,
     }
     g_object_unref(plainstream);
 
+#ifndef HAVE_GMIME_2_5_7
     return valid;
+#else /* HAVE_GMIME_2_5_7 */
+    return list;
+#endif /* HAVE_GMIME_2_5_7 */
 }
 
 
@@ -255,19 +302,32 @@ g_mime_part_rfc2440_verify(GMimePart * part,
  * verified and the result is placed in ctx by the underlying gpgme
  * context.
  */
+#ifndef HAVE_GMIME_2_5_7
 GMimeSignatureValidity *
+#else /* HAVE_GMIME_2_5_7 */
+GMimeDecryptResult *
+#endif /* HAVE_GMIME_2_5_7 */
 g_mime_part_rfc2440_decrypt(GMimePart * part,
 			    GMimeGpgmeContext * ctx, GError ** err)
 {
     GMimeStream *stream, *plainstream;
     GMimeDataWrapper * wrapper;
+#ifndef HAVE_GMIME_2_5_7
     GMimeSignatureValidity *result;
+#else /* HAVE_GMIME_2_5_7 */
+    GMimeDecryptResult *result;
+#endif /* HAVE_GMIME_2_5_7 */
     gchar *headbuf = g_malloc0(1024);
 
     g_return_val_if_fail(GMIME_IS_PART(part), NULL);
     g_return_val_if_fail(GMIME_IS_GPGME_CONTEXT(ctx), NULL);
+#ifndef HAVE_GMIME_2_5_7
     g_return_val_if_fail(GMIME_CIPHER_CONTEXT(ctx)->encrypt_protocol !=
 			 NULL, NULL);
+#else /* HAVE_GMIME_2_5_7 */
+    g_return_val_if_fail(g_mime_crypto_context_get_encryption_protocol
+                         (GMIME_CRYPTO_CONTEXT(ctx)) != NULL, NULL);
+#endif /* HAVE_GMIME_2_5_7 */
 
     /* get the raw content */
     wrapper = g_mime_part_get_content_object(part);
@@ -284,8 +344,13 @@ g_mime_part_rfc2440_decrypt(GMimePart * part,
 
     /* decrypt and (if possible) verify the input */
     result =
+#ifndef HAVE_GMIME_2_5_7
 	g_mime_cipher_context_decrypt(GMIME_CIPHER_CONTEXT(ctx), stream,
 			      plainstream, err);
+#else /* HAVE_GMIME_2_5_7 */
+	g_mime_crypto_context_decrypt(GMIME_CRYPTO_CONTEXT(ctx), stream,
+                                      plainstream, err);
+#endif /* HAVE_GMIME_2_5_7 */
 
     if (result != NULL) {
 	GMimeStream *filter_stream;

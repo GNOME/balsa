@@ -9,8 +9,8 @@ pixmapdir = $(datadir)/pixmaps
 pixmap_DATA = gnome-balsa2.png
 
 desktopdir = $(datadir)/applications
-desktop_in_files = balsa.desktop.in
-desktop_DATA = balsa.desktop
+desktop_in_files = balsa.desktop.in balsa-mailto-handler.desktop.in
+desktop_DATA = balsa.desktop balsa-mailto-handler.desktop
 @INTLTOOL_DESKTOP_RULE@
 
 balsa_extra_dist =		\
@@ -19,12 +19,12 @@ balsa_extra_dist =		\
 	balsa-mail-style.xml	\
 	balsa-mail.lang		\
 	balsa.1.in		\
-	balsa.desktop.in	\
 	balsa.spec.in		\
 	bootstrap.sh		\
 	docs/mh-mail-HOWTO	\
 	docs/pine2vcard		\
 	docs/vconvert.awk	\
+	$(desktop_in_files)	\
 	gnome-balsa2.png	\
 	intltool-extract.in	\
 	intltool-merge.in	\

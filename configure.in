@@ -995,6 +995,8 @@ AC_OUTPUT([
 Makefile
 balsa.1
 balsa.spec
+balsa.desktop.in
+balsa-mailto-handler.desktop.in
 po/Makefile.in
 sounds/Makefile
 images/Makefile

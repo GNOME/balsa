@@ -1,3 +1,10 @@
+2011-12-02  Peter Bloomfield
+
+	Add mailto-handler desktop file
+
+	* balsa-mailto-handler.desktop.in.in: new file.
+	* balsa.desktop.in.in: do not use -m.
+
 2011-11-12  Peter Bloomfield
 
 	* libbalsa/rfc3156.c (libbalsa_body_check_signature): use only

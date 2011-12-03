@@ -1,5 +1,10 @@
 2011-12-03  Peter Bloomfield
 
+	* src/sendmsg-window.c (create_text_area): remove redundant
+	dynamic cast; use more appropriate identifier.
+
+2011-12-03  Peter Bloomfield
+
 	* src/sendmsg-window.c (create_text_area): build without
 	GtkSourceView.
 

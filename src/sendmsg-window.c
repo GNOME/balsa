@@ -3222,7 +3222,7 @@ create_text_area(BalsaSendmsg * bsmsg)
     GtkTextView *text_view;
     PangoFontDescription *desc;
     GtkTextBuffer *buffer;
-    GtkWidget *grid;
+    GtkWidget *scroll;
 
 #if HAVE_GTKSOURCEVIEW
     bsmsg->text = libbalsa_source_view_new(TRUE);
@@ -3257,10 +3257,10 @@ create_text_area(BalsaSendmsg * bsmsg)
     gtk_text_view_set_editable(text_view, TRUE);
     gtk_text_view_set_wrap_mode(text_view, GTK_WRAP_WORD_CHAR);
 
-    grid = gtk_scrolled_window_new(NULL, NULL);
-    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(grid),
+    scroll = gtk_scrolled_window_new(NULL, NULL);
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll),
     				   GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
-    gtk_container_add(GTK_CONTAINER(grid), bsmsg->text);
+    gtk_container_add(GTK_CONTAINER(scroll), bsmsg->text);
     g_signal_connect(G_OBJECT(bsmsg->text), "drag_data_received",
 		     G_CALLBACK(drag_data_quote), bsmsg);
     /* GTK_DEST_DEFAULT_ALL in drag_set would trigger bug 150141 */
@@ -3268,9 +3268,9 @@ create_text_area(BalsaSendmsg * bsmsg)
 		      drop_types, ELEMENTS(drop_types),
 		      GDK_ACTION_COPY | GDK_ACTION_MOVE | GDK_ACTION_LINK);
 
-    gtk_widget_show_all(GTK_WIDGET(grid));
+    gtk_widget_show_all(scroll);
 
-    return grid;
+    return scroll;
 }
 
 /* Check whether the string can be converted. */

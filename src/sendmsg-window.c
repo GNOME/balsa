@@ -3251,7 +3251,7 @@ create_text_area(BalsaSendmsg * bsmsg)
                      G_CALLBACK(sw_can_redo_cb), bsmsg);
 #else                           /* HAVE_GTKSOURCEVIEW */
     bsmsg->buffer2 =
-         gtk_text_buffer_new(gtk_text_buffer_get_tag_grid(buffer));
+         gtk_text_buffer_new(gtk_text_buffer_get_tag_table(buffer));
 #endif                          /* HAVE_GTKSOURCEVIEW */
     gtk_text_buffer_create_tag(buffer, "url", NULL, NULL);
     gtk_text_view_set_editable(text_view, TRUE);

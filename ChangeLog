@@ -1,3 +1,8 @@
+2011-12-03  Peter Bloomfield
+
+	* src/sendmsg-window.c (create_text_area): build without
+	GtkSourceView.
+
 2011-12-02  Peter Bloomfield
 
 	Add mailto-handler desktop file

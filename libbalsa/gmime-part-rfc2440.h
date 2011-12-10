@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /*
- * gmime/gpgme glue layer library
- * Copyright (C) 2004 Albrecht Dreﬂ <albrecht.dress@arcor.de>
+ * gmime/gpgme implementation for RFC2440 parts
+ * Copyright (C) 2004-2011 Albrecht Dre√ü <albrecht.dress@arcor.de>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,19 +23,18 @@
 #define __GMIME_PART_RFC2440_H__
 
 
+#include <glib.h>
+#include <gtk/gtk.h>
 #include <gmime/gmime.h>
-#include "gmime-gpgme-context.h"
 
 
 #ifdef __cplusplus
 extern "C" {
 
-#  ifdef MAKE_EMACS_HAPPY
+#ifdef MAKE_EMACS_HAPPY
 }
-#  endif
+#endif
 #endif				/* __cplusplus */
-
-
 typedef enum _GMimePartRfc2440Mode GMimePartRfc2440Mode;
 enum _GMimePartRfc2440Mode { 
     GMIME_PART_RFC2440_NONE,
@@ -49,25 +48,15 @@ GMimePartRfc2440Mode g_mime_part_check_rfc2440(GMimePart * part);
 
 /* crypto routines */
 int g_mime_part_rfc2440_sign_encrypt(GMimePart * part,
-				     GMimeGpgmeContext * ctx,
-				     GPtrArray * recipients,
 				     const char *sign_userid,
+				     GPtrArray * recipients,
+				     gboolean trust_all,
+				     GtkWindow * parent, GError ** err);
+GMimeGpgmeSigstat *g_mime_part_rfc2440_verify(GMimePart * part,
 				     GError ** err);
-#ifndef HAVE_GMIME_2_5_7
-GMimeSignatureValidity *g_mime_part_rfc2440_verify(GMimePart * part,
-						   GMimeGpgmeContext * ctx,
-						   GError ** err);
-GMimeSignatureValidity *g_mime_part_rfc2440_decrypt(GMimePart * part,
-                                                    GMimeGpgmeContext *
-                                                    ctx, GError ** err);
-#else /* HAVE_GMIME_2_5_7 */
-GMimeSignatureList *g_mime_part_rfc2440_verify(GMimePart * part,
-                                               GMimeGpgmeContext * ctx,
-                                               GError ** err);
-GMimeDecryptResult *g_mime_part_rfc2440_decrypt(GMimePart * part,
-                                                GMimeGpgmeContext * ctx,
+GMimeGpgmeSigstat *g_mime_part_rfc2440_decrypt(GMimePart * part,
+					       GtkWindow * parent,
                                                 GError ** err);
-#endif /* HAVE_GMIME_2_5_7 */
 
 #ifdef __cplusplus
 }

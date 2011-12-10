@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /*
  * S/MIME application/pkcs7-mime support for gmime/balsa
- * Copyright (C) 2004 Albrecht Dreﬂ <albrecht.dress@arcor.de>
+ * Copyright (C) 2004 Albrecht Dre√ü <albrecht.dress@arcor.de>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,142 +35,12 @@
 #include <gmime/gmime-multipart.h>
 #include <gmime/gmime-multipart-signed.h>
 #include <gmime/gmime-multipart-encrypted.h>
+#include "libbalsa-gpgme.h"
 #include "gmime-application-pkcs7.h"
 #include <glib/gi18n.h>
 
 
 #define GMIME_PKCS7_ERR_QUARK (g_quark_from_static_string ("gmime-app-pkcs7"))
-
-
-#ifdef HAS_APPLICATION_PKCS7_MIME_SIGNED_SUPPORT
-
-/*
- * Note: this code has been shamelessly stolen from Jeff's multipart-signed implementation
- */
-static void
-sign_prepare (GMimeObject *mime_part)
-{
-    GMimeContentEncoding encoding;
-    GMimeObject *subpart;
-	
-    if (GMIME_IS_MULTIPART (mime_part)) {
-	GList *lpart;
-		
-	if (GMIME_IS_MULTIPART_SIGNED (mime_part) || GMIME_IS_MULTIPART_ENCRYPTED (mime_part)) {
-	    /* must not modify these parts as they must be treated as opaque */
-	    return;
-	}
-		
-	lpart = GMIME_MULTIPART (mime_part)->subparts;
-	while (lpart) {
-	    subpart = GMIME_OBJECT (lpart->data);
-	    sign_prepare (subpart);
-	    lpart = lpart->next;
-	}
-    } else if (GMIME_IS_MESSAGE_PART (mime_part)) {
-	subpart = GMIME_MESSAGE_PART (mime_part)->message->mime_part;
-	sign_prepare (subpart);
-    } else {
-	encoding = g_mime_part_get_content_encoding (GMIME_PART (mime_part));
-		
-	if (encoding != GMIME_CONTENT_ENCODING_BASE64)
-	    g_mime_part_set_content_encoding (GMIME_PART (mime_part),
-				      GMIME_CONTENT_ENCODING_QUOTEDPRINTABLE);
-    }
-}
-
-
-/*
- * Sign content using the context ctx for userid and write the signed
- * application/pkcs7-mime object to pkcs7. Return 0 on success and -1 on error.
- * In the latter case, fill err with more information about the reason.
- */
-int
-g_mime_application_pkcs7_sign (GMimePart *pkcs7, GMimeObject *content,
-			       GMimeCipherContext *ctx, const char *userid,
-			       GError **err)
-{
-    GMimeDataWrapper *wrapper;
-    GMimeStream *filtered_stream;
-    GMimeStream *stream, *sig_data_stream;
-    GMimeFilter *crlf_filter, *from_filter;
-	
-    g_return_val_if_fail (GMIME_IS_PART (pkcs7), -1);
-#ifndef HAVE_GMIME_2_5_7
-    g_return_val_if_fail (GMIME_IS_CIPHER_CONTEXT (ctx), -1);
-    g_return_val_if_fail (ctx->sign_protocol != NULL, -1);
-#else /* HAVE_GMIME_2_5_7 */
-    g_return_val_if_fail (GMIME_IS_CRYPTO_CONTEXT (ctx), -1);
-    g_return_val_if_fail(g_mime_crypto_context_get_signature_protocol(ctx)
-                         != NULL, -1);
-#endif /* HAVE_GMIME_2_5_7 */
-    g_return_val_if_fail (GMIME_IS_OBJECT (content), -1);
-	
-    /* Prepare all the parts for signing... */
-    sign_prepare (content);
-	
-    /* get the cleartext */
-    stream = g_mime_stream_mem_new ();
-    filtered_stream = g_mime_stream_filter_new (stream);
-	
-    /* See RFC 2633, Sect. 3.1- the following op's are "SHOULD", so we do it */
-    from_filter = g_mime_filter_from_new (GMIME_FILTER_FROM_MODE_ARMOR);
-    g_mime_stream_filter_add (GMIME_STREAM_FILTER (filtered_stream), from_filter);
-    g_object_unref (from_filter);
-	
-    g_mime_object_write_to_stream (content, filtered_stream);
-    g_mime_stream_flush (filtered_stream);
-    g_object_unref (filtered_stream);
-    g_mime_stream_reset (stream);
-	
-    filtered_stream = g_mime_stream_filter_new (stream);
-    crlf_filter = g_mime_filter_crlf_new (TRUE,
-					  FALSE);
-    g_mime_stream_filter_add (GMIME_STREAM_FILTER (filtered_stream), crlf_filter);
-    g_object_unref (crlf_filter);
-	
-    /* construct the signed data stream */
-    sig_data_stream = g_mime_stream_mem_new ();
-	
-    /* get the signed content */
-#ifndef HAVE_GMIME_2_5_7
-    if (g_mime_cipher_context_sign (ctx, userid, GMIME_CIPHER_HASH_DEFAULT, filtered_stream, sig_data_stream, err) == -1)
-#else /* HAVE_GMIME_2_5_7 */
-    if (g_mime_crypto_context_sign
-        (ctx, userid, GMIME_CIPHER_HASH_DEFAULT, filtered_stream,
-         sig_data_stream, err) == -1)
-#endif /* HAVE_GMIME_2_5_7 */
-    {
-	g_object_unref (filtered_stream);
-	g_object_unref (sig_data_stream);
-	g_object_unref (stream);
-	return -1;
-    }
-	
-    g_object_unref (filtered_stream);
-    g_object_unref (stream);
-    g_mime_stream_reset (sig_data_stream);
-	
-    /* set the pkcs7 mime part as content of the pkcs7 object */
-    wrapper = g_mime_data_wrapper_new();
-    g_mime_data_wrapper_set_stream(wrapper, sig_data_stream);
-    g_object_unref(sig_data_stream);
-    g_mime_part_set_content_object(GMIME_PART(pkcs7), wrapper);
-    g_mime_part_set_filename(GMIME_PART(pkcs7), "smime.p7m");
-    g_mime_part_set_content_encoding(GMIME_PART(pkcs7),
-			     GMIME_CONTENT_ENCODING_BASE64);
-    g_object_unref(wrapper);
-
-    /* set the content-type params for this part */
-    g_mime_object_set_content_type_parameter(GMIME_OBJECT(pkcs7),
-					     "smime-type", "signed-data");
-    g_mime_object_set_content_type_parameter(GMIME_OBJECT(pkcs7), "name",
-					     "smime.p7m");
-	
-    return 0;
-}
-#endif /* HAS_APPLICATION_PKCS7_MIME_SIGNED_SUPPORT */
-
 
 
 /*
@@ -181,15 +51,9 @@ g_mime_application_pkcs7_sign (GMimePart *pkcs7, GMimeObject *content,
  * decrypting it again. In this case, validity is undefined.
  */
 GMimeObject *
-#ifndef HAVE_GMIME_2_5_7
-g_mime_application_pkcs7_verify(GMimePart * pkcs7,
-				GMimeSignatureValidity ** validity,
-				GMimeCipherContext * ctx, GError ** err)
-#else /* HAVE_GMIME_2_5_7 */
-g_mime_application_pkcs7_verify(GMimePart * pkcs7,
-                                GMimeSignatureList ** list,
-                                GMimeCryptoContext * ctx, GError ** err)
-#endif /* HAVE_GMIME_2_5_7 */
+g_mime_application_pkcs7_decrypt_verify(GMimePart * pkcs7,
+					GMimeGpgmeSigstat ** signature,
+					GtkWindow * parent, GError ** err)
 {
     GMimeObject *decrypted;
     GMimeDataWrapper *wrapper;
@@ -200,49 +64,41 @@ g_mime_application_pkcs7_verify(GMimePart * pkcs7,
     const char *smime_type;
 
     g_return_val_if_fail(GMIME_IS_PART(pkcs7), NULL);
-#ifndef HAVE_GMIME_2_5_7
-    g_return_val_if_fail(GMIME_IS_CIPHER_CONTEXT(ctx), NULL);
-    g_return_val_if_fail(ctx->encrypt_protocol != NULL, NULL);
-#else /* HAVE_GMIME_2_5_7 */
-    g_return_val_if_fail(GMIME_IS_CRYPTO_CONTEXT(ctx), NULL);
-    g_return_val_if_fail(g_mime_crypto_context_get_encryption_protocol(ctx)
-                         != NULL, NULL);
-#endif /* HAVE_GMIME_2_5_7 */
 
-    /* some sanity checks */
+    /* get the smime type */
     smime_type =
 	g_mime_object_get_content_type_parameter(GMIME_OBJECT(pkcs7),
 						 "smime-type");
-    if (g_ascii_strcasecmp(smime_type, "signed-data")) {
+    if (!smime_type
+	|| (g_ascii_strcasecmp(smime_type, "enveloped-data")
+	    && g_ascii_strcasecmp(smime_type, "signed-data"))) {
 	return NULL;
     }
 
     /* get the ciphertext stream */
     wrapper = g_mime_part_get_content_object(GMIME_PART(pkcs7));
     g_return_val_if_fail(wrapper, NULL); /* Incomplete part. */
-    ciphertext = g_mime_stream_mem_new ();
-    g_mime_data_wrapper_write_to_stream (wrapper, ciphertext);
+    ciphertext = g_mime_stream_mem_new();
+    g_mime_data_wrapper_write_to_stream(wrapper, ciphertext);
     g_mime_stream_reset(ciphertext);
 
     stream = g_mime_stream_mem_new();
     filtered_stream = g_mime_stream_filter_new(stream);
-    crlf_filter = g_mime_filter_crlf_new(FALSE,
-					 FALSE);
+    crlf_filter = g_mime_filter_crlf_new(FALSE, FALSE);
     g_mime_stream_filter_add(GMIME_STREAM_FILTER(filtered_stream),
 			     crlf_filter);
     g_object_unref(crlf_filter);
 
     /* get the cleartext */
-#ifndef HAVE_GMIME_2_5_7
-    *validity = g_mime_cipher_context_verify(ctx, GMIME_CIPHER_HASH_DEFAULT,
-				     ciphertext, filtered_stream, err);
-    if (!*validity)
-#else /* HAVE_GMIME_2_5_7 */
-    *list = g_mime_crypto_context_verify(ctx, GMIME_CIPHER_ALGO_DEFAULT,
-                                         ciphertext, filtered_stream, err);
-    if (!*list)
-#endif /* HAVE_GMIME_2_5_7 */
-    {
+    if (g_ascii_strcasecmp(smime_type, "enveloped-data") == 0)
+	*signature =
+	    libbalsa_gpgme_decrypt(ciphertext, filtered_stream,
+				   GPGME_PROTOCOL_CMS, parent, err);
+    else
+	*signature =
+	    libbalsa_gpgme_verify(ciphertext, filtered_stream,
+				  GPGME_PROTOCOL_CMS, TRUE, err);
+    if (!*signature) {
 	g_object_unref(filtered_stream);
 	g_object_unref(ciphertext);
 	g_object_unref(stream);
@@ -279,65 +135,47 @@ g_mime_application_pkcs7_verify(GMimePart * pkcs7,
  * about the reason.
  */
 int
-g_mime_application_pkcs7_encrypt (GMimePart *pkcs7, GMimeObject *content,
-#ifndef HAVE_GMIME_2_5_7
-				  GMimeCipherContext *ctx, GPtrArray *recipients,
-#else /* HAVE_GMIME_2_5_7 */
-				  GMimeCryptoContext *ctx,
-                                  GPtrArray *recipients,
-#endif /* HAVE_GMIME_2_5_7 */
-				  GError **err)
+g_mime_application_pkcs7_encrypt(GMimePart * pkcs7, GMimeObject * content,
+				 GPtrArray * recipients,
+				 gboolean trust_all, GtkWindow * parent,
+				 GError ** err)
 {
     GMimeDataWrapper *wrapper;
     GMimeStream *filtered_stream;
     GMimeStream *stream, *ciphertext;
     GMimeFilter *crlf_filter;
 	
-    g_return_val_if_fail (GMIME_IS_PART (pkcs7), -1);
-#ifndef HAVE_GMIME_2_5_7
-    g_return_val_if_fail (GMIME_IS_CIPHER_CONTEXT (ctx), -1);
-    g_return_val_if_fail (ctx->encrypt_protocol != NULL, -1);
-#else /* HAVE_GMIME_2_5_7 */
-    g_return_val_if_fail (GMIME_IS_CRYPTO_CONTEXT (ctx), -1);
-    g_return_val_if_fail(g_mime_crypto_context_get_encryption_protocol(ctx)
-                         != NULL, -1);
-#endif /* HAVE_GMIME_2_5_7 */
-    g_return_val_if_fail (GMIME_IS_OBJECT (content), -1);
+    g_return_val_if_fail(GMIME_IS_PART(pkcs7), -1);
+    g_return_val_if_fail(GMIME_IS_OBJECT(content), -1);
 	
     /* get the cleartext */
-    stream = g_mime_stream_mem_new ();
-    filtered_stream = g_mime_stream_filter_new (stream);
+    stream = g_mime_stream_mem_new();
+    filtered_stream = g_mime_stream_filter_new(stream);
 	
-    crlf_filter = g_mime_filter_crlf_new (TRUE,
-					  FALSE);
-    g_mime_stream_filter_add (GMIME_STREAM_FILTER (filtered_stream), crlf_filter);
-    g_object_unref (crlf_filter);
+    crlf_filter = g_mime_filter_crlf_new(TRUE, FALSE);
+    g_mime_stream_filter_add(GMIME_STREAM_FILTER(filtered_stream),
+			     crlf_filter);
+    g_object_unref(crlf_filter);
 	
-    g_mime_object_write_to_stream (content, filtered_stream);
-    g_mime_stream_flush (filtered_stream);
-    g_object_unref (filtered_stream);
+    g_mime_object_write_to_stream(content, filtered_stream);
+    g_mime_stream_flush(filtered_stream);
+    g_object_unref(filtered_stream);
 	
     /* reset the content stream */
-    g_mime_stream_reset (stream);
+    g_mime_stream_reset(stream);
 	
     /* encrypt the content stream */
-    ciphertext = g_mime_stream_mem_new ();
-#ifndef HAVE_GMIME_2_5_7
-    if (g_mime_cipher_context_encrypt (ctx, FALSE, NULL, recipients, stream, ciphertext, err) == -1)
-#else /* HAVE_GMIME_2_5_7 */
-    if (g_mime_crypto_context_encrypt
-        (ctx, FALSE, NULL,
-         GMIME_CIPHER_ALGO_DEFAULT,
-         recipients, stream, ciphertext, err) == -1)
-#endif /* HAVE_GMIME_2_5_7 */
-    {
-	g_object_unref (ciphertext);
-	g_object_unref (stream);
+    ciphertext = g_mime_stream_mem_new();
+    if (libbalsa_gpgme_encrypt
+	(recipients, NULL, stream, ciphertext, GPGME_PROTOCOL_CMS, TRUE,
+	 trust_all, parent, err) == -1) {
+	g_object_unref(ciphertext);
+	g_object_unref(stream);
 	return -1;
     }
 	
-    g_object_unref (stream);
-    g_mime_stream_reset (ciphertext);
+    g_object_unref(stream);
+    g_mime_stream_reset(ciphertext);
 	
     /* set the encrypted mime part as content of the pkcs7 object */
     wrapper = g_mime_data_wrapper_new();
@@ -345,109 +183,16 @@ g_mime_application_pkcs7_encrypt (GMimePart *pkcs7, GMimeObject *content,
     g_object_unref(ciphertext);
     g_mime_part_set_content_object(GMIME_PART(pkcs7), wrapper);
     g_mime_part_set_filename(GMIME_PART(pkcs7), "smime.p7m");
-    g_mime_part_set_content_encoding(GMIME_PART(pkcs7), GMIME_CONTENT_ENCODING_BASE64);
+    g_mime_part_set_content_encoding(GMIME_PART(pkcs7),
+				     GMIME_CONTENT_ENCODING_BASE64);
     g_object_unref(wrapper);
 
     /* set the content-type params for this part */
     g_mime_object_set_content_type_parameter(GMIME_OBJECT(pkcs7),
-					     "smime-type", "enveloped-data");
+					     "smime-type",
+					     "enveloped-data");
     g_mime_object_set_content_type_parameter(GMIME_OBJECT(pkcs7), "name",
 					     "smime.p7m");
 	
     return 0;
 }
-
-
-/*
- * Decrypt the application/pkcs7-mime part pkcs7 unsing the context ctx and
- * return the decrypted gmime object or NULL on error. In the latter case, fill
- * err with more information about the reason.
- */
-GMimeObject *
-#ifndef HAVE_GMIME_2_5_7
-g_mime_application_pkcs7_decrypt (GMimePart *pkcs7, GMimeCipherContext *ctx,
-				  GError **err)
-#else /* HAVE_GMIME_2_5_7 */
-g_mime_application_pkcs7_decrypt (GMimePart *pkcs7,
-                                  GMimeCryptoContext *ctx,
-				  GError **err)
-#endif /* HAVE_GMIME_2_5_7 */
-{
-    GMimeObject *decrypted;
-    GMimeDataWrapper *wrapper;
-    GMimeStream *stream, *ciphertext;
-    GMimeStream *filtered_stream;
-    GMimeFilter *crlf_filter;
-    GMimeParser *parser;
-    const char *smime_type;
-
-    g_return_val_if_fail(GMIME_IS_PART(pkcs7), NULL);
-#ifndef HAVE_GMIME_2_5_7
-    g_return_val_if_fail(GMIME_IS_CIPHER_CONTEXT(ctx), NULL);
-    g_return_val_if_fail(ctx->encrypt_protocol != NULL, NULL);
-#else /* HAVE_GMIME_2_5_7 */
-    g_return_val_if_fail(GMIME_IS_CRYPTO_CONTEXT(ctx), NULL);
-    g_return_val_if_fail(g_mime_crypto_context_get_encryption_protocol(ctx)
-                         != NULL, NULL);
-#endif /* HAVE_GMIME_2_5_7 */
-
-    /* some sanity checks */
-    smime_type =
-	g_mime_object_get_content_type_parameter(GMIME_OBJECT(pkcs7),
-						 "smime-type");
-    if (!smime_type || (g_ascii_strcasecmp(smime_type, "enveloped-data") &&
-			g_ascii_strcasecmp(smime_type, "signed-data"))) {
-	return NULL;
-    }
-
-    /* get the ciphertext stream */
-    wrapper = g_mime_part_get_content_object(GMIME_PART(pkcs7));
-    g_return_val_if_fail(wrapper, NULL); /* Incomplete part. */
-    ciphertext = g_mime_stream_mem_new();
-    g_mime_data_wrapper_write_to_stream (wrapper, ciphertext);
-    g_mime_stream_reset(ciphertext);
-
-    stream = g_mime_stream_mem_new();
-    filtered_stream = g_mime_stream_filter_new(stream);
-    crlf_filter = g_mime_filter_crlf_new(FALSE,
-					 FALSE);
-    g_mime_stream_filter_add(GMIME_STREAM_FILTER(filtered_stream),
-			     crlf_filter);
-    g_object_unref(crlf_filter);
-
-    /* get the cleartext */
-#ifndef HAVE_GMIME_2_5_7
-    if (g_mime_cipher_context_decrypt(ctx, ciphertext, filtered_stream, err) == NULL)
-#else /* HAVE_GMIME_2_5_7 */
-    if (g_mime_crypto_context_decrypt
-        (ctx, ciphertext, filtered_stream, err) == NULL)
-#endif /* HAVE_GMIME_2_5_7 */
-    {
-	g_object_unref(filtered_stream);
-	g_object_unref(ciphertext);
-	g_object_unref(stream);
-
-	return NULL;
-    }
-
-    g_mime_stream_flush(filtered_stream);
-    g_object_unref(filtered_stream);
-    g_object_unref(ciphertext);
-
-    g_mime_stream_reset (stream);
-    parser = g_mime_parser_new();
-    g_mime_parser_init_with_stream(parser, stream);
-    g_object_unref(stream);
-
-    decrypted = g_mime_parser_construct_part(parser);
-    g_object_unref(parser);
-
-    if (decrypted)
-	g_object_ref(decrypted);
-    else
-	g_set_error(err, GMIME_PKCS7_ERR_QUARK, 42,
-		    _("Failed to decrypt MIME part: parse error"));
-
-    return decrypted;
-}
-

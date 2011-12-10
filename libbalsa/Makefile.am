@@ -5,8 +5,12 @@ noinst_LIBRARIES = libbalsa.a
 
 if BUILD_WITH_GPGME
 libbalsa_gpgme_extra = 		\
-	gmime-gpgme-context.h	\
-	gmime-gpgme-context.c	\
+	libbalsa-gpgme.h		\
+	libbalsa-gpgme.c		\
+	libbalsa-gpgme-cb.h		\
+	libbalsa-gpgme-cb.c		\
+	gmime-multipart-crypt.h	\
+	gmime-multipart-crypt.c	\
 	gmime-part-rfc2440.h	\
 	gmime-part-rfc2440.c	\
 	gmime-gpgme-signature.h	\
@@ -15,8 +19,12 @@ libbalsa_gpgme_extra_dist =
 else
 libbalsa_gpgme_extra =
 libbalsa_gpgme_extra_dist =	\
-	gmime-gpgme-context.h	\
-	gmime-gpgme-context.c	\
+	libbalsa-gpgme.h		\
+	libbalsa-gpgme.c		\
+	libbalsa-gpgme-cb.h		\
+	libbalsa-gpgme-cb.c		\
+	gmime-multipart-crypt.h	\
+	gmime-multipart-crypt.c	\
 	gmime-part-rfc2440.h	\
 	gmime-part-rfc2440.c	\
 	gmime-gpgme-signature.h	\

@@ -35,7 +35,7 @@
 #include "libbalsa.h"
 #include "libbalsa_private.h"
 
-#include "gmime-gpgme-context.h"
+#include "gmime-multipart-crypt.h"
 #include "gmime-gpgme-signature.h"
 #include "gmime-part-rfc2440.h"
 
@@ -52,88 +52,16 @@
 #  include "macosx-helpers.h"
 #endif
 
-#include "padlock-keyhole.xpm"
 #include <glib/gi18n.h>
 
 
 /* local prototypes */
-static const gchar *libbalsa_gpgme_validity_to_gchar_short(gpgme_validity_t
-							   validity);
-static gpgme_error_t get_passphrase_cb(void *opaque, const char *uid_hint,
-				       const char *passph_info,
-				       int prev_wasbad, int fd);
-static gpgme_key_t select_key_from_list(const gchar * name,
-					gboolean is_secret,
-					GMimeGpgmeContext * ctx,
-					GList * keys);
-static gboolean accept_low_trust_key(const gchar * name,
-				     gpgme_user_id_t uid,
-				     GMimeGpgmeContext * ctx);
 static gboolean gpg_updates_trustdb(void);
-static gchar *fix_EMail_info(gchar * str);
 static gboolean have_pub_key_for(gpgme_ctx_t gpgme_ctx,
 				 InternetAddressList * recipients);
 
 
 /* ==== public functions =================================================== */
-gboolean
-libbalsa_check_crypto_engine(gpgme_protocol_t protocol)
-{
-    gpgme_error_t err;
-
-    err = gpgme_engine_check_version(protocol);
-    if (gpgme_err_code(err) != GPG_ERR_NO_ERROR) {
-	gpgme_engine_info_t info;
-	GString *message = g_string_new("");
-	err = gpgme_get_engine_info(&info);
-	if (err == GPG_ERR_NO_ERROR) {
-	    while (info && info->protocol != protocol)
-		info = info->next;
-	    if (!info)
-		g_string_append_printf(message,
-				       _
-				       ("Gpgme has been compiled without support for protocol %s."),
-				       gpgme_get_protocol_name(protocol));
-	    else if (info->file_name && !info->version) {
-		g_string_append_printf(message,
-				       _
-				       ("Crypto engine %s is not installed properly."),
-				       info->file_name);
-                if (protocol == GPGME_PROTOCOL_OpenPGP)
-                    g_string_append_printf(message,
-                                           _(" Hint: check the `gnupg2' (preferred) or `gnupg' package."));
-                else if (protocol == GPGME_PROTOCOL_CMS)
-                    g_string_append_printf(message,
-                                           _(" Hint: check the `gpgsm' package."));
-	    } else if (info->file_name && info->version && info->req_version)
-		g_string_append_printf(message,
-				       _
-				       ("Crypto engine %s version %s is installed, but at least version %s is required."),
-				       info->file_name, info->version,
-				       info->req_version);
-
-	    else
-		g_string_append_printf(message,
-				       _
-				       ("Unknown problem with engine for protocol %s."),
-				       gpgme_get_protocol_name(protocol));
-	} else
-	    g_string_append_printf(message,
-				   _
-				   ("%s: could not retrieve crypto engine information: %s."),
-				   gpgme_strsource(err),
-				   gpgme_strerror(err));
-	g_string_append_printf(message,
-			       _("\nDisable support for protocol %s."),
-			       gpgme_get_protocol_name(protocol));
-	libbalsa_information(LIBBALSA_INFORMATION_ERROR, "%s", message->str);
-	g_string_free(message, TRUE);
-	return FALSE;
-    } else
-	return TRUE;
-}
-
-
 static gboolean
 body_is_type(LibBalsaMessageBody * body, const gchar * type,
 	     const gchar * sub_type)
@@ -266,42 +194,6 @@ libbalsa_message_body_protection(LibBalsaMessageBody * body)
     return result;
 }
 
-#if defined(HAVE_GMIME_2_6)
-static gboolean
-#ifndef HAVE_GMIME_2_5_7
-password_request_func(GMimeCipherContext * ctx, const char *user_id,
-                      const char *prompt_ctx, gboolean reprompt,
-                      GMimeStream * response, GError ** err)
-#else /* HAVE_GMIME_2_5_7 */
-password_request_func(GMimeCryptoContext * ctx, const char *user_id,
-                      const char *prompt_ctx, gboolean reprompt,
-                      GMimeStream * response, GError ** err)
-#endif /* HAVE_GMIME_2_5_7 */
-{
-    gint fd;
-    gchar *name_used;
-    gboolean rc;
-
-    fd = g_file_open_tmp(NULL, &name_used, NULL);
-    if (fd < 0)
-        return FALSE;
-
-    rc = get_passphrase_cb(ctx, user_id, prompt_ctx, reprompt, fd)
-        == GPG_ERR_NO_ERROR;
-    if (rc) {
-        GMimeStream *stream = g_mime_stream_fs_new(fd);
-        g_mime_stream_reset(stream);
-        g_mime_stream_write_to_stream(response, stream);
-
-        g_object_unref(stream);
-    }
-
-    unlink(name_used);
-    g_free(name_used);
-
-    return rc;
-}
-#endif                          /* HAVE_GMIME_2_6 */
 
 /* === RFC 2633/ RFC 3156 crypto routines === */
 /*
@@ -317,10 +209,6 @@ libbalsa_sign_mime_object(GMimeObject ** content, const gchar * rfc822_for,
 			  gpgme_protocol_t protocol, GtkWindow * parent,
 			  GError ** error)
 {
-#if !defined(HAVE_GMIME_2_6)
-    GMimeSession *session;
-#endif                          /* HAVE_GMIME_2_6 */
-    GMimeGpgmeContext *ctx;
     GMimeMultipartSigned *mps;
 
     /* paranoia checks */
@@ -334,70 +222,18 @@ libbalsa_sign_mime_object(GMimeObject ** content, const gchar * rfc822_for,
     if (protocol == GPGME_PROTOCOL_OpenPGP && gpg_updates_trustdb())
 	return FALSE;
 
-#if defined(HAVE_GMIME_2_6)
-    /* create a GMimeGpgmeContext */
-    ctx = GMIME_GPGME_CONTEXT(g_mime_gpgme_context_new
-            (password_request_func, protocol, error));
-    if (ctx == NULL)
-	return FALSE;
-#else                           /* HAVE_GMIME_2_6 */
-    /* create a session and a GMimeGpgmeContext */
-    session = g_object_new(g_mime_session_get_type(), NULL, NULL);
-    ctx = GMIME_GPGME_CONTEXT(g_mime_gpgme_context_new(session, protocol,
-						       error));
-    if (ctx == NULL) {
-	g_object_unref(session);
-	return FALSE;
-    }
-#endif                          /* HAVE_GMIME_2_6 */
-
-    /* set the callbacks for the passphrase entry and the key selection */
-    if (g_getenv("GPG_AGENT_INFO"))
-	ctx->passphrase_cb = NULL;  /* use gpg-agent */
-    else {
-	ctx->passphrase_cb = get_passphrase_cb;
-	g_object_set_data(G_OBJECT(ctx), "passphrase-info",
-			  _
-			  ("Enter passphrase to unlock the secret key for signing"));
-    }
-    ctx->key_select_cb = select_key_from_list;
-    g_object_set_data(G_OBJECT(ctx), "parent-window", parent);
-
     /* call gpgme to create the signature */
     if (!(mps = g_mime_multipart_signed_new())) {
-	g_object_unref(ctx);
-#if !defined(HAVE_GMIME_2_6)
-	g_object_unref(session);
-#endif                          /* HAVE_GMIME_2_6 */
 	return FALSE;
     }
 
-#ifndef HAVE_GMIME_2_5_7
-    if (g_mime_multipart_signed_sign
-	(mps, *content, GMIME_CIPHER_CONTEXT(ctx), rfc822_for,
-	 GMIME_CIPHER_HASH_DEFAULT, error) != 0)
-#else /* HAVE_GMIME_2_5_7 */
-    if (g_mime_multipart_signed_sign
-	(mps, *content, GMIME_CRYPTO_CONTEXT(ctx), rfc822_for,
-	 GMIME_DIGEST_ALGO_DEFAULT, error) != 0)
-#endif /* HAVE_GMIME_2_5_7 */
-    {
+    if (g_mime_gpgme_mps_sign(mps, *content, rfc822_for, protocol, parent, error) != 0) {
 	g_object_unref(mps);
-	g_object_unref(ctx);
-#if !defined(HAVE_GMIME_2_6)
-	g_object_unref(session);
-#endif                          /* HAVE_GMIME_2_6 */
 	return FALSE;
     }
 
-    g_mime_object_set_content_type_parameter(GMIME_OBJECT(mps),
-					     "micalg", ctx->micalg);
     g_object_unref(G_OBJECT(*content));
     *content = GMIME_OBJECT(mps);
-    g_object_unref(ctx);
-#if !defined(HAVE_GMIME_2_6)
-    g_object_unref(session);
-#endif                          /* HAVE_GMIME_2_6 */
     return TRUE;
 }
 
@@ -412,10 +248,6 @@ libbalsa_encrypt_mime_object(GMimeObject ** content, GList * rfc822_for,
 			     gpgme_protocol_t protocol, gboolean always_trust,
 			     GtkWindow * parent, GError ** error)
 {
-#if !defined(HAVE_GMIME_2_6)
-    GMimeSession *session;
-#endif                          /* HAVE_GMIME_2_6 */
-    GMimeGpgmeContext *ctx;
     GMimeObject *encrypted_obj = NULL;
     GPtrArray *recipients;
     int result = -1;
@@ -431,32 +263,6 @@ libbalsa_encrypt_mime_object(GMimeObject ** content, GList * rfc822_for,
     if (protocol == GPGME_PROTOCOL_OpenPGP && gpg_updates_trustdb())
 	return FALSE;
 
-#if !defined(HAVE_GMIME_2_6)
-    /* create a session and a GMimeGpgmeContext */
-    session = g_object_new(g_mime_session_get_type(), NULL, NULL);
-    ctx = GMIME_GPGME_CONTEXT(g_mime_gpgme_context_new(session, protocol,
-						       error));
-    if (ctx == NULL) {
-	g_object_unref(session);
-	return FALSE;
-#else                           /* HAVE_GMIME_2_6 */
-    /* create a GMimeGpgmeContext */
-    ctx = GMIME_GPGME_CONTEXT(g_mime_gpgme_context_new
-            (password_request_func, protocol, error));
-    if (ctx == NULL)
-	return FALSE;
-#endif                          /* HAVE_GMIME_2_6 */
-#if !defined(HAVE_GMIME_2_6)
-    }
-#endif                          /* HAVE_GMIME_2_6 */
-
-    /* set the callback for the key selection (no secret needed here) */
-    ctx->key_select_cb = select_key_from_list;
-    if (!always_trust)
-	ctx->key_trust_cb = accept_low_trust_key;
-    ctx->always_trust_uid = always_trust;
-    g_object_set_data(G_OBJECT(ctx), "parent-window", parent);
-
     /* convert the key list to a GPtrArray */
     recipients = g_ptr_array_new();
     while (rfc822_for) {
@@ -470,60 +276,27 @@ libbalsa_encrypt_mime_object(GMimeObject ** content, GList * rfc822_for,
 	GMimeMultipartEncrypted *mpe = g_mime_multipart_encrypted_new();
 
 	encrypted_obj = GMIME_OBJECT(mpe);
-	result = 
-#ifndef HAVE_GMIME_2_5_7
-	    g_mime_multipart_encrypted_encrypt(mpe, *content,
-					       GMIME_CIPHER_CONTEXT(ctx),
-                                               FALSE, NULL,
-					       recipients, error);
-#else /* HAVE_GMIME_2_5_7 */
-	    g_mime_multipart_encrypted_encrypt(mpe, *content,
-					       GMIME_CRYPTO_CONTEXT(ctx),
-                                               FALSE, NULL,
-                                               GMIME_DIGEST_ALGO_DEFAULT,
-					       recipients, error);
-#endif /* HAVE_GMIME_2_5_7 */
+	result = g_mime_gpgme_mpe_encrypt(mpe, *content, recipients, always_trust, parent, error);
     }
 #ifdef HAVE_SMIME
     else {
 	GMimePart *pkcs7 =
 	    g_mime_part_new_with_type("application", "pkcs7-mime");
 
-	encrypted_obj = GMIME_OBJECT(pkcs7);
-	ctx->singlepart_mode = TRUE;
-	result = 
-#ifndef HAVE_GMIME_2_5_7
-	    g_mime_application_pkcs7_encrypt(pkcs7, *content,
-					     GMIME_CIPHER_CONTEXT(ctx),
-					     recipients, error);
-#else /* HAVE_GMIME_2_5_7 */
-	    g_mime_application_pkcs7_encrypt(pkcs7, *content,
-					     GMIME_CRYPTO_CONTEXT(ctx),
-					     recipients, error);
-#endif /* HAVE_GMIME_2_5_7 */
+	result = g_mime_application_pkcs7_encrypt(pkcs7, *content, recipients, always_trust, parent, error);
     }
 #endif
+    g_ptr_array_free(recipients, FALSE);
 
     /* error checking */
     if (result != 0) {
-	g_ptr_array_free(recipients, FALSE);
-	g_object_unref(ctx);
-#if !defined(HAVE_GMIME_2_6)
-	g_object_unref(session);
-#endif                          /* HAVE_GMIME_2_6 */
 	g_object_unref(encrypted_obj);
 	return FALSE;
-    }
-
-    g_ptr_array_free(recipients, FALSE);
+    } else {
     g_object_unref(G_OBJECT(*content));
     *content = GMIME_OBJECT(encrypted_obj);
-    g_object_unref(ctx);
-#if !defined(HAVE_GMIME_2_6)
-    g_object_unref(session);
-#endif                          /* HAVE_GMIME_2_6 */
-
     return TRUE;
+    }
 }
 
 
@@ -589,18 +362,8 @@ gboolean
 libbalsa_body_check_signature(LibBalsaMessageBody * body,
 			      gpgme_protocol_t protocol)
 {
-#if !defined(HAVE_GMIME_2_6)
-    GMimeSession *session;
-#endif                          /* HAVE_GMIME_2_6 */
-#ifndef HAVE_GMIME_2_5_7
-    GMimeCipherContext *g_mime_ctx;
-    GMimeSignatureValidity *valid;
-#else /* HAVE_GMIME_2_5_7 */
-    GMimeCryptoContext *g_mime_ctx;
-    GMimeSignatureList *valid;
-#endif /* HAVE_GMIME_2_5_7 */
-    GMimeGpgmeContext *ctx;
     GError *error = NULL;
+    GMimeGpgmeSigstat *result;
 
     /* paranoia checks */
     g_return_val_if_fail(body, FALSE);
@@ -622,56 +385,10 @@ libbalsa_body_check_signature(LibBalsaMessageBody * body,
     if (body->parts->next->sig_info)
 	g_object_unref(G_OBJECT(body->parts->next->sig_info));
 
-    /* try to create GMimeGpgMEContext */
-#if !defined(HAVE_GMIME_2_6)
-    session = g_object_new(g_mime_session_get_type(), NULL, NULL);
-    g_mime_ctx = g_mime_gpgme_context_new(session, protocol, &error);
-#else                           /* HAVE_GMIME_2_6 */
-    g_mime_ctx =
-        g_mime_gpgme_context_new(password_request_func, protocol, &error);
-#endif                          /* HAVE_GMIME_2_6 */
-    if (g_mime_ctx == NULL) {
-	if (error) {
-	    libbalsa_information(LIBBALSA_INFORMATION_ERROR, "%s: %s",
-				 _("creating a gpgme context failed"),
-				 error->message);
-	    g_error_free(error);
-	} else
-	    libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-				 _("creating a gpgme context failed"));
-#if !defined(HAVE_GMIME_2_6)
-	g_object_unref(session);
-#endif                          /* HAVE_GMIME_2_6 */
-	body->parts->next->sig_info = g_mime_gpgme_sigstat_new();
-	body->parts->next->sig_info->status = GPGME_SIG_STAT_ERROR;
-	return FALSE;
-    }
-    ctx = GMIME_GPGME_CONTEXT(g_mime_ctx);
-
-    /* S/MIME uses the protocol application/pkcs7-signature, but some ancient
-       mailers, not yet knowing RFC 2633, use application/x-pkcs7-signature,
-       so tweak the context if necessary... */
-    if (protocol == GPGME_PROTOCOL_CMS) {
-	const char * cms_protocol = 
-	    g_mime_object_get_content_type_parameter(GMIME_OBJECT (body->mime_part),
-						     "protocol");
-	if (!g_ascii_strcasecmp(cms_protocol, "application/x-pkcs7-signature"))
-#ifndef HAVE_GMIME_2_5_7
-	    g_mime_ctx->sign_protocol = cms_protocol;
-#else /* HAVE_GMIME_2_5_7 */
-	    ctx->sign_protocol = cms_protocol;
-#endif /* HAVE_GMIME_2_5_7 */
-    }
-
     /* verify the signature */
-
     libbalsa_mailbox_lock_store(body->message->mailbox);
-    valid = g_mime_multipart_signed_verify(GMIME_MULTIPART_SIGNED
-					   (body->mime_part), g_mime_ctx,
-                                           &error);
-    libbalsa_mailbox_unlock_store(body->message->mailbox);
-
-    if (valid == NULL) {
+    result = g_mime_gpgme_mps_verify(GMIME_MULTIPART_SIGNED(body->mime_part), &error);
+    if (!result || result->status != GPG_ERR_NO_ERROR) {
 	if (error) {
 	    libbalsa_information(LIBBALSA_INFORMATION_ERROR, "%s: %s",
 				 _("signature verification failed"),
@@ -681,19 +398,9 @@ libbalsa_body_check_signature(LibBalsaMessageBody * body,
 	    libbalsa_information(LIBBALSA_INFORMATION_ERROR,
 				 _("signature verification failed"));
     }
-    if (ctx->sig_state) {
-	body->parts->next->sig_info = ctx->sig_state;
-	g_object_ref(G_OBJECT(body->parts->next->sig_info));
-    }
-#ifndef HAVE_GMIME_2_5_7
-    g_mime_signature_validity_free(valid);
-#else /* HAVE_GMIME_2_5_7 */
-    g_object_unref(valid);
-#endif /* HAVE_GMIME_2_5_7 */
-    g_object_unref(g_mime_ctx);
-#if !defined(HAVE_GMIME_2_6)
-    g_object_unref(session);
-#endif                          /* HAVE_GMIME_2_6 */
+
+    body->parts->next->sig_info = result;
+    libbalsa_mailbox_unlock_store(body->message->mailbox);
     return TRUE;
 }
 
@@ -704,18 +411,14 @@ libbalsa_body_check_signature(LibBalsaMessageBody * body,
  * decrypted bodies. Otherwise, the original body is returned.
  */
 LibBalsaMessageBody *
-libbalsa_body_decrypt(LibBalsaMessageBody * body,
-		      gpgme_protocol_t protocol, GtkWindow * parent)
+libbalsa_body_decrypt(LibBalsaMessageBody *body, gpgme_protocol_t protocol, GtkWindow *parent)
 {
-#if !defined(HAVE_GMIME_2_6)
-    GMimeSession *session;
-#endif                          /* HAVE_GMIME_2_6 */
-    GMimeGpgmeContext *ctx;
     GMimeObject *mime_obj = NULL;
     GError *error = NULL;
     LibBalsaMessage *message;
+    GMimeGpgmeSigstat *sig_state = NULL;
 #ifdef HAVE_SMIME
-    gboolean smime_signed = FALSE;
+    gboolean smime_encrypted = FALSE;
 #endif
 
     /* paranoia checks */
@@ -743,97 +446,17 @@ libbalsa_body_decrypt(LibBalsaMessageBody * body,
 
 	if (!smime_type || !GMIME_IS_PART(body->mime_part))
 	    return body;
-	if (!g_ascii_strcasecmp(smime_type, "signed-data"))
-	    smime_signed = TRUE;
-	else if (!g_ascii_strcasecmp(smime_type, "enveloped-data"))
-	    smime_signed = FALSE;
-	else
-	    return body;
+	if (!g_ascii_strcasecmp(smime_type, "enveloped-data"))
+	    smime_encrypted = FALSE;
     }
 #endif
 
-#if !defined(HAVE_GMIME_2_6)
-    /* create a session and a GMimeGpgmeContext */
-    session = g_object_new(g_mime_session_get_type(), NULL, NULL);
-    ctx = GMIME_GPGME_CONTEXT(g_mime_gpgme_context_new(session, protocol,
-						       &error));
-#else                           /* HAVE_GMIME_2_6 */
-    /* create a GMimeGpgmeContext */
-    ctx = GMIME_GPGME_CONTEXT(g_mime_gpgme_context_new
-            (password_request_func, protocol, &error));
-#endif                          /* HAVE_GMIME_2_6 */
-    if (ctx == NULL) {
-	if (error) {
-	    libbalsa_information(LIBBALSA_INFORMATION_ERROR, "%s: %s",
-				 _("creating a gpgme context failed"),
-				 error->message);
-	    g_error_free(error);
-	} else
-	    libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-				 _("creating a gpgme context failed"));
-#if !defined(HAVE_GMIME_2_6)
-	g_object_unref(session);
-#endif                          /* HAVE_GMIME_2_6 */
-	return body;
-    }
-
-    /* set the callback for the passphrase entry */
-    if (g_getenv("GPG_AGENT_INFO"))
-	ctx->passphrase_cb = NULL;  /* use gpg-agent */
-    else {
-	ctx->passphrase_cb = get_passphrase_cb;
-	g_object_set_data(G_OBJECT(ctx), "parent-window", parent);
-	g_object_set_data(G_OBJECT(ctx), "passphrase-info",
-			  _("Enter passphrase to decrypt message"));
-    }
-
     libbalsa_mailbox_lock_store(body->message->mailbox);
     if (protocol == GPGME_PROTOCOL_OpenPGP)
-	mime_obj =
-#ifndef HAVE_GMIME_2_5_7
-	    g_mime_multipart_encrypted_decrypt(GMIME_MULTIPART_ENCRYPTED(body->mime_part),
-					       GMIME_CIPHER_CONTEXT(ctx),
-					       &error);
-#else /* HAVE_GMIME_2_5_7 */
-	    g_mime_multipart_encrypted_decrypt(GMIME_MULTIPART_ENCRYPTED(body->mime_part),
-					       GMIME_CRYPTO_CONTEXT(ctx),
-                                               NULL,
-					       &error);
-#endif /* HAVE_GMIME_2_5_7 */
+	mime_obj = g_mime_gpgme_mpe_decrypt(GMIME_MULTIPART_ENCRYPTED(body->mime_part), &sig_state, parent, &error);
 #ifdef HAVE_SMIME
-    else if (smime_signed) {
-#ifndef HAVE_GMIME_2_5_7
-	GMimeSignatureValidity *valid;
-#else /* HAVE_GMIME_2_5_7 */
-	GMimeSignatureList *valid;
-#endif /* HAVE_GMIME_2_5_7 */
-
-	ctx->singlepart_mode = TRUE;
-#ifndef HAVE_GMIME_2_5_7
-	mime_obj =
-	    g_mime_application_pkcs7_verify(GMIME_PART(body->mime_part),
-					    &valid,
-					    GMIME_CIPHER_CONTEXT(ctx),
-					    &error);
-	g_mime_signature_validity_free(valid);
-    } else
-	mime_obj =
-	    g_mime_application_pkcs7_decrypt(GMIME_PART(body->mime_part),
-					       GMIME_CIPHER_CONTEXT(ctx),
-					       &error);
-#else /* HAVE_GMIME_2_5_7 */
-	mime_obj =
-	    g_mime_application_pkcs7_verify(GMIME_PART(body->mime_part),
-					    &valid,
-					    GMIME_CRYPTO_CONTEXT(ctx),
-					    &error);
-	g_object_unref(valid);
-    } else
-	mime_obj =
-	    g_mime_application_pkcs7_decrypt(GMIME_PART(body->mime_part),
-					       GMIME_CRYPTO_CONTEXT(ctx),
-					       &error);
-#endif /* HAVE_GMIME_2_5_7 */
+    else
+	mime_obj = g_mime_application_pkcs7_decrypt_verify(GMIME_PART(body->mime_part), &sig_state, parent, &error);
 #endif
     libbalsa_mailbox_unlock_store(body->message->mailbox);
 
@@ -848,10 +471,6 @@ libbalsa_body_decrypt(LibBalsaMessageBody * body,
 	} else
 	    libbalsa_information(LIBBALSA_INFORMATION_ERROR,
 				 _("decryption failed"));
-	g_object_unref(ctx);
-#if !defined(HAVE_GMIME_2_6)
-	g_object_unref(session);
-#endif                          /* HAVE_GMIME_2_6 */
 	return body;
     }
     message = body->message;
@@ -863,18 +482,14 @@ libbalsa_body_decrypt(LibBalsaMessageBody * body,
 	body->was_encrypted = TRUE;
 #ifdef HAVE_SMIME
     else
-	body->was_encrypted = !smime_signed;
+	body->was_encrypted = smime_encrypted;
 #endif
 
     libbalsa_message_body_set_mime_body(body, mime_obj);
-    if (ctx->sig_state && ctx->sig_state->status != GPG_ERR_NOT_SIGNED) {
-	g_object_ref(ctx->sig_state);
-	body->sig_info = ctx->sig_state;
-    }
-    g_object_unref(ctx);
-#if !defined(HAVE_GMIME_2_6)
-    g_object_unref(session);
-#endif                          /* HAVE_GMIME_2_6 */
+    if (sig_state && sig_state->status != GPG_ERR_NOT_SIGNED)
+	body->sig_info = sig_state;
+    else
+	g_object_unref(G_OBJECT(sig_state));
 
     return body;
 }
@@ -883,14 +498,9 @@ libbalsa_body_decrypt(LibBalsaMessageBody * body,
 
 /* routines dealing with RFC2440 */
 gboolean
-libbalsa_rfc2440_sign_encrypt(GMimePart * part, const gchar * sign_for,
-			      GList * encrypt_for, gboolean always_trust,
-			      GtkWindow * parent, GError ** error)
+libbalsa_rfc2440_sign_encrypt(GMimePart *part, const gchar *sign_for, GList *encrypt_for, gboolean always_trust,
+			      GtkWindow *parent, GError **error)
 {
-#if !defined(HAVE_GMIME_2_6)
-    GMimeSession *session;
-#endif                          /* HAVE_GMIME_2_6 */
-    GMimeGpgmeContext *ctx;
     GPtrArray *recipients;
     gint result;
 
@@ -901,42 +511,6 @@ libbalsa_rfc2440_sign_encrypt(GMimePart * part, const gchar * sign_for,
     /* check if gpg is currently available */
     if (gpg_updates_trustdb())
 	return FALSE;
-
-#if !defined(HAVE_GMIME_2_6)
-    /* create a session and a GMimeGpgmeContext */
-    session = g_object_new(g_mime_session_get_type(), NULL, NULL);
-    ctx = GMIME_GPGME_CONTEXT(g_mime_gpgme_context_new(session,
-						       GPGME_PROTOCOL_OpenPGP,
-						       error));
-    if (ctx == NULL) {
-	g_object_unref(session);
-#else                           /* HAVE_GMIME_2_6 */
-    /* create a GMimeGpgmeContext */
-    ctx = GMIME_GPGME_CONTEXT(g_mime_gpgme_context_new
-            (password_request_func, GPGME_PROTOCOL_OpenPGP, error));
-    if (ctx == NULL)
-#endif                          /* HAVE_GMIME_2_6 */
-	return FALSE;
-#if !defined(HAVE_GMIME_2_6)
-    }
-#endif                          /* HAVE_GMIME_2_6 */
-
-    /* set the callback for the key selection and the passphrase */
-    if (sign_for) {
-	if (g_getenv("GPG_AGENT_INFO"))
-	    ctx->passphrase_cb = NULL;  /* use gpg-agent */
-	else {
-	    ctx->passphrase_cb = get_passphrase_cb;
-	    g_object_set_data(G_OBJECT(ctx), "passphrase-info",
-			      _
-			      ("Enter passphrase to unlock the secret key for signing"));
-	}
-    }
-    ctx->key_select_cb = select_key_from_list;
-    if (!always_trust)
-	ctx->key_trust_cb = accept_low_trust_key;
-    ctx->always_trust_uid = always_trust;
-    g_object_set_data(G_OBJECT(ctx), "parent-window", parent);
 
     /* convert the key list to a GPtrArray */
     if (encrypt_for) {
@@ -949,16 +523,10 @@ libbalsa_rfc2440_sign_encrypt(GMimePart * part, const gchar * sign_for,
 	recipients = NULL;
 
     /* sign and/or encrypt */
-    result =
-	g_mime_part_rfc2440_sign_encrypt(part, ctx, recipients, sign_for,
-					 error);
+    result = g_mime_part_rfc2440_sign_encrypt(part, sign_for, recipients, always_trust, parent, error);
     /* clean up */
     if (recipients)
 	g_ptr_array_free(recipients, FALSE);
-    g_object_unref(ctx);
-#if !defined(HAVE_GMIME_2_6)
-    g_object_unref(session);
-#endif                          /* HAVE_GMIME_2_6 */
     return (result == 0) ? TRUE : FALSE;
 }
 
@@ -970,15 +538,7 @@ libbalsa_rfc2440_sign_encrypt(GMimePart * part, const gchar * sign_for,
 gpgme_error_t
 libbalsa_rfc2440_verify(GMimePart * part, GMimeGpgmeSigstat ** sig_info)
 {
-#if !defined(HAVE_GMIME_2_6)
-    GMimeSession *session;
-#endif                          /* HAVE_GMIME_2_6 */
-    GMimeGpgmeContext *ctx;
-#ifndef HAVE_GMIME_2_5_7
-    GMimeSignatureValidity *valid;
-#else /* HAVE_GMIME_2_5_7 */
-    GMimeSignatureList *valid;
-#endif /* HAVE_GMIME_2_5_7 */
+    GMimeGpgmeSigstat *result;
     GError *error = NULL;
     gpgme_error_t retval;
 
@@ -995,36 +555,9 @@ libbalsa_rfc2440_verify(GMimePart * part, GMimeGpgmeSigstat ** sig_info)
     if (gpg_updates_trustdb())
 	return GPG_ERR_TRY_AGAIN;
 
-#if !defined(HAVE_GMIME_2_6)
-    /* create a session and a GMimeGpgmeContext */
-    session = g_object_new(g_mime_session_get_type(), NULL, NULL);
-    ctx = GMIME_GPGME_CONTEXT(g_mime_gpgme_context_new(session,
-						       GPGME_PROTOCOL_OpenPGP,
-						       &error));
-#else                           /* HAVE_GMIME_2_6 */
-    /* create a GMimeGpgmeContext */
-    ctx = GMIME_GPGME_CONTEXT(g_mime_gpgme_context_new
-            (password_request_func, GPGME_PROTOCOL_OpenPGP, &error));
-#endif                          /* HAVE_GMIME_2_6 */
-    if (ctx == NULL) {
-	if (error) {
-	    libbalsa_information(LIBBALSA_INFORMATION_ERROR, "%s: %s",
-				 _("creating a gpgme context failed"),
-				 error->message);
-	    g_error_free(error);
-	} else
-	    libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-				 _("creating a gpgme context failed"));
-#if !defined(HAVE_GMIME_2_6)
-	g_object_unref(session);
-#endif                          /* HAVE_GMIME_2_6 */
-	return FALSE;
-    }
-
     /* verify */
-    valid = g_mime_part_rfc2440_verify(part, ctx, &error);
-
-    if (valid == NULL) {
+    result = g_mime_part_rfc2440_verify(part, &error);
+    if (!result || result->status != GPG_ERR_NO_ERROR) {
 	if (error) {
 	    libbalsa_information(LIBBALSA_INFORMATION_ERROR, "%s: %s",
 				 _("signature verification failed"),
@@ -1036,30 +569,16 @@ libbalsa_rfc2440_verify(GMimePart * part, GMimeGpgmeSigstat ** sig_info)
 				 _("signature verification failed"));
 	    retval = GPG_ERR_GENERAL;
 	}
-	g_object_unref(ctx);
-#if !defined(HAVE_GMIME_2_6)
-	g_object_unref(session);
-#endif                          /* HAVE_GMIME_2_6 */
-	return retval;
-    }
+    } else
+	retval = result->status;
 
     /* return the signature info if requested */
-    if (sig_info) {
-	g_object_ref(ctx->sig_state);
-	*sig_info = ctx->sig_state;
+    if (result) {
+	if (sig_info)
+	    *sig_info = result;
+	else
+	    g_object_unref(G_OBJECT(result));
     }
-
-    /* clean up */
-#ifndef HAVE_GMIME_2_5_7
-    g_mime_signature_validity_free(valid);
-#else /* HAVE_GMIME_2_5_7 */
-    g_object_unref(valid);
-#endif /* HAVE_GMIME_2_5_7 */
-    retval = ctx->sig_state->status;
-    g_object_unref(ctx);
-#if !defined(HAVE_GMIME_2_6)
-    g_object_unref(session);
-#endif                          /* HAVE_GMIME_2_6 */
     return retval;
 }
 
@@ -1073,11 +592,8 @@ gpgme_error_t
 libbalsa_rfc2440_decrypt(GMimePart * part, GMimeGpgmeSigstat ** sig_info,
 			 GtkWindow * parent)
 {
-#if !defined(HAVE_GMIME_2_6)
-    GMimeSession *session;
-#endif                          /* HAVE_GMIME_2_6 */
-    GMimeGpgmeContext *ctx;
     GError *error = NULL;
+    GMimeGpgmeSigstat *result;
     gpgme_error_t retval;
 
     /* paranoia checks */
@@ -1093,44 +609,11 @@ libbalsa_rfc2440_decrypt(GMimePart * part, GMimeGpgmeSigstat ** sig_info,
     if (gpg_updates_trustdb())
 	return GPG_ERR_TRY_AGAIN;
 
-#if !defined(HAVE_GMIME_2_6)
-    /* create a session and a GMimeGpgmeContext */
-    session = g_object_new(g_mime_session_get_type(), NULL, NULL);
-    ctx =
-	GMIME_GPGME_CONTEXT(g_mime_gpgme_context_new
-			    (session, GPGME_PROTOCOL_OpenPGP, &error));
-#else                           /* HAVE_GMIME_2_6 */
-    /* create a GMimeGpgmeContext */
-    ctx = GMIME_GPGME_CONTEXT(g_mime_gpgme_context_new
-            (password_request_func, GPGME_PROTOCOL_OpenPGP, &error));
-#endif                          /* HAVE_GMIME_2_6 */
-    if (ctx == NULL) {
-	if (error) {
-	    libbalsa_information(LIBBALSA_INFORMATION_ERROR, "%s: %s",
-				 _("creating a gpgme context failed"),
-				 error->message);
-	    g_error_free(error);
-	} else
-	    libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-				 _("creating a gpgme context failed"));
-#if !defined(HAVE_GMIME_2_6)
-	g_object_unref(session);
-#endif                          /* HAVE_GMIME_2_6 */
-	return GPG_ERR_GENERAL;
-    }
-
-    /* set the callback for the passphrase */
-    if (g_getenv("GPG_AGENT_INFO"))
-	ctx->passphrase_cb = NULL;  /* use gpg-agent */
-    else {
-	ctx->passphrase_cb = get_passphrase_cb;
-	g_object_set_data(G_OBJECT(ctx), "passphrase-info",
-			  _("Enter passphrase to decrypt message"));
-	g_object_set_data(G_OBJECT(ctx), "parent-window", parent);
-    }
+    // g_object_set_data(G_OBJECT(ctx), "parent-window", parent); FIXME - pass downstream
 
     /* decrypt */
-    if (g_mime_part_rfc2440_decrypt(part, ctx, &error) == NULL) {
+    result = g_mime_part_rfc2440_decrypt(part, parent, &error);
+    if (result == NULL) {
 	if (error) {
 	    if (error->code != GPG_ERR_CANCELED)
 		libbalsa_information(LIBBALSA_INFORMATION_ERROR, "%s: %s",
@@ -1144,28 +627,18 @@ libbalsa_rfc2440_decrypt(GMimePart * part, GMimeGpgmeSigstat ** sig_info,
 				 ("decryption and signature verification failed"));
 	    retval = GPG_ERR_GENERAL;
 	}
-	g_object_unref(ctx);
-#if !defined(HAVE_GMIME_2_6)
-	g_object_unref(session);
-#endif                          /* HAVE_GMIME_2_6 */
 	return retval;
+    } else
+	retval = result->status;
+
+    /* return the signature info if requested */
+    if (result) {
+	if (sig_info && result->status != GPG_ERR_NOT_SIGNED)
+	    *sig_info = result;
+	else
+	    g_object_unref(G_OBJECT(result));
     }
 
-    retval = GPG_ERR_NO_ERROR;
-    if (ctx->sig_state) {
-	retval = ctx->sig_state->status;
-	/* return the signature info if requested & available */
-	if (sig_info && ctx->sig_state->status != GPG_ERR_NOT_SIGNED) {
-	    g_object_ref(ctx->sig_state);
-	    *sig_info = ctx->sig_state;
-	}
-    }
-
-    /* clean up */
-    g_object_unref(ctx);
-#if !defined(HAVE_GMIME_2_6)
-    g_object_unref(session);
-#endif                          /* HAVE_GMIME_2_6 */
     return retval;
 }
 
@@ -1204,6 +677,8 @@ libbalsa_gpgme_sig_stat_to_gchar(gpgme_error_t stat)
 	return _("An error prevented the signature verification.");
     }
 }
+
+
 const gchar *
 libbalsa_gpgme_validity_to_gchar(gpgme_validity_t validity)
 {
@@ -1224,6 +699,30 @@ libbalsa_gpgme_validity_to_gchar(gpgme_validity_t validity)
 	return _("bad validity");
     }
 }
+
+
+const gchar *
+libbalsa_gpgme_validity_to_gchar_short(gpgme_validity_t validity)
+{
+    switch (validity) {
+    case GPGME_VALIDITY_UNKNOWN:
+	return _("unknown");
+    case GPGME_VALIDITY_UNDEFINED:
+	return _("undefined");
+    case GPGME_VALIDITY_NEVER:
+	return _("never");
+    case GPGME_VALIDITY_MARGINAL:
+	return _("marginal");
+    case GPGME_VALIDITY_FULL:
+	return _("full");
+    case GPGME_VALIDITY_ULTIMATE:
+	return _("ultimate");
+    default:
+	return _("bad validity");
+    }
+}
+
+
 const gchar *
 libbalsa_gpgme_sig_protocol_name(gpgme_protocol_t protocol)
 {
@@ -1237,14 +736,18 @@ libbalsa_gpgme_sig_protocol_name(gpgme_protocol_t protocol)
     }
 }
 
-#define APPEND_TIMET(str,fmt,t)						\
-    do {                                                                \
-        if (t) {                                                        \
-            gchar * _tbuf = libbalsa_date_to_utf8(&t, date_string);     \
-            g_string_append_printf(str, fmt, _tbuf);      \
-            g_free(_tbuf);                                              \
-        }                                                               \
-    } while (0)
+static inline void
+append_time_t(GString *str, const gchar *format, time_t *when,
+              const gchar * date_string)
+{
+    if (*when != (time_t) 0) {
+        gchar *tbuf = libbalsa_date_to_utf8(when, date_string);
+        g_string_append_printf(str, format, tbuf);
+        g_free(tbuf);
+    } else {
+        g_string_append_printf(str, format, _("never"));
+    }
+}
 
 gchar *
 libbalsa_signature_info_to_gchar(GMimeGpgmeSigstat * info,
@@ -1259,74 +762,124 @@ libbalsa_signature_info_to_gchar(GMimeGpgmeSigstat * info,
     msg =
 	g_string_append(msg,
 			libbalsa_gpgme_sig_stat_to_gchar(info->status));
-    if (info->sign_uid && strlen(info->sign_uid))
-	g_string_append_printf(msg, _("\nUser ID: %s"), info->sign_uid);
-
-    else if (info->sign_name && strlen(info->sign_name)) {
-	g_string_append_printf(msg, _("\nSigned by: %s"), info->sign_name);
-	if (info->sign_email && strlen(info->sign_email))
-	    g_string_append_printf(msg, " <%s>", info->sign_email);
-    } else if (info->sign_email && strlen(info->sign_email))
-	g_string_append_printf(msg, _("\nMail address: %s"),
-			       info->sign_email);
-    APPEND_TIMET(msg, _("\nSigned on: %s"), info->sign_time);
-    g_string_append_printf(msg, _("\nUser ID validity: %s"),
+    g_string_append_printf(msg, _("\nSignature validity: %s"),
 			   libbalsa_gpgme_validity_to_gchar(info->
 							    validity));
-    if (info->protocol == GPGME_PROTOCOL_OpenPGP)
+    append_time_t(msg, _("\nSigned on: %s"), &info->sign_time, date_string);
+    if (info->protocol == GPGME_PROTOCOL_OpenPGP && info->key)
 	g_string_append_printf(msg, _("\nKey owner trust: %s"),
 			       libbalsa_gpgme_validity_to_gchar_short
-			       (info->trust));
+			       (info->key->owner_trust));
     if (info->fingerprint)
 	g_string_append_printf(msg, _("\nKey fingerprint: %s"),
 			       info->fingerprint);
-    /* Subkey creation date */
-    APPEND_TIMET(msg, _("\nSubkey created on: %s"), info->key_created);
-    /* Subkey expiration date */
-    APPEND_TIMET(msg, _("\nSubkey expires on: %s"), info->key_expires);
-    if (info->key_revoked || info->key_expired || info->key_disabled ||
-       info->key_invalid) {
+
+    /* add key information */
+    if (info->key) {
+        gpgme_user_id_t uid;
+        gpgme_subkey_t subkey;
+
+        /* user ID's */
+        if ((uid = info->key->uids)) {
+            gchar *lead_text;
+
+            uid = info->key->uids;
+            if (uid->next) {
+        	msg = g_string_append(msg, _("\nUser ID's:"));
+        	lead_text = "\n\342\200\242";
+            } else {
+        	msg = g_string_append(msg, _("\nUser ID:"));
+        	lead_text = "";
+            }
+
+            /* Note: there is no way to determine which user id has been used
+             * to create the signature.  A broken client may even use an
+             * invalid and/or revoked one.  We therefore add all to the
+             * result. */
+            while (uid) {
+        	msg = g_string_append(msg, lead_text);
+        	if (uid->revoked)
+        	    msg = g_string_append(msg, _(" [Revoked]"));
+        	if (uid->invalid)
+        	    msg = g_string_append(msg, _(" [Invalid]"));
+
+        	if (uid->uid && *(uid->uid)) {
+        	    gchar *uid_readable =
+        	    	libbalsa_cert_subject_readable(uid->uid);
+        	    g_string_append_printf(msg, " %s", uid_readable);
+        	    g_free(uid_readable);
+        	} else {
+        	    if (uid->name && *(uid->name))
+        		g_string_append_printf(msg, " %s", uid->name);
+        	    if (uid->email && *(uid->email))
+        		g_string_append_printf(msg, " <%s>", uid->email);
+        	    if (uid->comment && *(uid->comment))
+        		g_string_append_printf(msg, " (%s)", uid->comment);
+        	}
+
+        	uid = uid->next;
+            }
+        }
+
+        /* subkey */
+        if ((subkey = info->key->subkeys)) {
+            /* find the one which can sign */
+            while (subkey && !subkey->can_sign)
+        	subkey = subkey->next;
+
+            if (subkey) {
+        	append_time_t(msg, _("\nSubkey created on: %s"),
+        		      &subkey->timestamp, date_string);
+        	append_time_t(msg, _("\nSubkey expires on: %s"),
+        		      &subkey->expires, date_string);
+        	if (subkey->revoked || subkey->expired || subkey->disabled ||
+        	    subkey->invalid) {
        GString * attrs = g_string_new("");
        int count = 0;
 
-       if (info->key_revoked) {
+        	    if (subkey->revoked) {
            count++;
            attrs = g_string_append(attrs, _(" revoked"));
        }
-       if (info->key_expired) {
+        	    if (subkey->expired) {
            if (count++)
                attrs = g_string_append_c(attrs, ',');
            attrs = g_string_append(attrs, _(" expired"));
        }
-       if (info->key_disabled) {
+        	    if (subkey->disabled) {
            if (count)
                attrs = g_string_append_c(attrs, ',');
            attrs = g_string_append(attrs, _(" disabled"));
        }
-       if (info->key_invalid) {
+        	    if (subkey->invalid) {
            if (count)
                attrs = g_string_append_c(attrs, ',');
            attrs = g_string_append(attrs, _(" invalid"));
        }
-       /* ngettext: string begins with a single space, so no space after
-        * the colon is correct punctuation (in English). */
+        	    /* ngettext: string begins with a single space, so no space
+        	     * after the colon is correct punctuation (in English). */
        g_string_append_printf(msg, ngettext("\nSubkey attribute:%s",
                                             "\nSubkey attributes:%s",
                                             count),
                               attrs->str);
        g_string_free(attrs, TRUE);
     }
-    if (info->issuer_name) {
-	gchar * issuer = fix_EMail_info(g_strdup(info->issuer_name));
+            }
+        }
 
-	g_string_append_printf(msg, _("\nIssuer name: %s"), issuer);
-	g_free(issuer);
+        if (info->key->issuer_name) {
+            gchar *issuer_name =
+        	libbalsa_cert_subject_readable(info->key->issuer_name);
+            g_string_append_printf(msg, _("\nIssuer name: %s"), issuer_name);
+            g_free(issuer_name);
     }
-    if (info->issuer_serial)
+        if (info->key->issuer_serial)
 	g_string_append_printf(msg, _("\nIssuer serial number: %s"),
-			       info->issuer_serial);
-    if (info->chain_id)
-	g_string_append_printf(msg, _("\nChain ID: %s"), info->chain_id);
+				   info->key->issuer_serial);
+        if (info->key->chain_id)
+            g_string_append_printf(msg, _("\nChain ID: %s"), info->key->chain_id);
+    }
+
     retval = msg->str;
     g_string_free(msg, FALSE);
     return retval;
@@ -1460,489 +1013,6 @@ check_gpg_child(gpointer data)
 
 
 /* ==== local stuff ======================================================== */
-
-
-static const gchar *
-libbalsa_gpgme_validity_to_gchar_short(gpgme_validity_t validity)
-{
-    switch (validity) {
-    case GPGME_VALIDITY_UNKNOWN:
-	return _("unknown");
-    case GPGME_VALIDITY_UNDEFINED:
-	return _("undefined");
-    case GPGME_VALIDITY_NEVER:
-	return _("never");
-    case GPGME_VALIDITY_MARGINAL:
-	return _("marginal");
-    case GPGME_VALIDITY_FULL:
-	return _("full");
-    case GPGME_VALIDITY_ULTIMATE:
-	return _("ultimate");
-    default:
-	return _("bad validity");
-    }
-}
-
-
-#define OID_EMAIL       "1.2.840.113549.1.9.1=#"
-#define OID_EMAIL_LEN   22
-static gchar *
-fix_EMail_info(gchar * str)
-{
-    gchar *p;
-    GString *result;
-
-    /* check for any EMail info */
-    p = strstr(str, OID_EMAIL);
-    if (!p)
-	return str;
-
-    *p = '\0';
-    p += OID_EMAIL_LEN;
-    result = g_string_new(str);
-    while (p) {
-	gchar *next;
-
-	result = g_string_append(result, "EMail=");
-	/* convert the info from hex until we reach some other char */
-	while (g_ascii_isxdigit(*p)) {
-	    gchar c = g_ascii_xdigit_value(*p++) << 4;
-
-	    if (g_ascii_isxdigit(*p))
-		result =
-		    g_string_append_c(result, c + g_ascii_xdigit_value(*p++));
-	}
-	
-	/* find more */
-	next = strstr(p, OID_EMAIL);
-	if (next) {
-	    *next = '\0';
-	    next += OID_EMAIL_LEN;
-	}
-	result = g_string_append(result, p);
-	p = next;
-    }
-    g_free(str);
-    p = result->str;
-    g_string_free(result, FALSE);
-    return p;
-}
-
-
-/* stuff to get a key fingerprint from a selection list */
-enum {
-    GPG_KEY_USER_ID_COLUMN = 0,
-    GPG_KEY_ID_COLUMN,
-    GPG_KEY_LENGTH_COLUMN,
-    GPG_KEY_VALIDITY_COLUMN,
-    GPG_KEY_PTR_COLUMN,
-    GPG_KEY_NUM_COLUMNS
-};
-
-static gchar *col_titles[] =
-    { N_("User ID"), N_("Key ID"), N_("Length"), N_("Validity") };
-
-/* callback function if a new row is selected in the list */
-static void
-key_selection_changed_cb(GtkTreeSelection * selection, gpgme_key_t * key)
-{
-    GtkTreeIter iter;
-    GtkTreeModel *model;
-
-    if (gtk_tree_selection_get_selected(selection, &model, &iter))
-	gtk_tree_model_get(model, &iter, GPG_KEY_PTR_COLUMN, key, -1);
-}
-
-
-/*
- * Select a key for the mail address for_address from the gpgme_key_t's in keys
- * and return either the selected key or NULL if the dialog was cancelled.
- * secret_only controls the dialog message.
- */
-static gpgme_key_t
-select_key_from_list(const gchar * name, gboolean is_secret,
-		     GMimeGpgmeContext * ctx, GList * keys)
-{
-    GtkWidget *dialog;
-    GtkWidget *vbox;
-    GtkWidget *label;
-    GtkWidget *scrolled_window;
-    GtkWidget *tree_view;
-    GtkTreeStore *model;
-    GtkTreeSelection *selection;
-    GtkTreeIter iter;
-    gint i, last_col;
-    gchar *prompt;
-    gchar *upcase_name;
-    gpgme_protocol_t protocol;
-    GtkWindow *parent;
-    gpgme_key_t use_key = NULL;
-
-    g_return_val_if_fail(ctx != NULL, NULL);
-    g_return_val_if_fail(keys != NULL, NULL);
-    protocol = gpgme_get_protocol(ctx->gpgme_ctx);
-    parent = GTK_WINDOW(g_object_get_data(G_OBJECT(ctx), "parent-window"));
-
-    /* FIXME: create dialog according to the Gnome HIG */
-    dialog = gtk_dialog_new_with_buttons(_("Select key"),
-					 parent,
-					 GTK_DIALOG_DESTROY_WITH_PARENT,
-					 GTK_STOCK_OK, GTK_RESPONSE_OK,
-					 GTK_STOCK_CANCEL,
-					 GTK_RESPONSE_CANCEL, NULL);
-#if HAVE_MACOSX_DESKTOP
-    libbalsa_macosx_menu_for_parent(dialog, parent);
-#endif
-    vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 12);
-    gtk_container_add(GTK_CONTAINER
-                      (gtk_dialog_get_content_area(GTK_DIALOG(dialog))),
-                      vbox);
-    gtk_container_set_border_width(GTK_CONTAINER(vbox), 12);
-    if (is_secret)
-	prompt =
-	    g_strdup_printf(_("Select the private key for the signer %s"),
-			    name);
-    else
-	prompt = g_strdup_printf(_
-				 ("Select the public key for the recipient %s"),
-				 name);
-    label = gtk_label_new(prompt);
-    gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.5);
-    g_free(prompt);
-    gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, TRUE, 0);
-
-    scrolled_window = gtk_scrolled_window_new(NULL, NULL);
-    gtk_scrolled_window_set_shadow_type(GTK_SCROLLED_WINDOW
-					(scrolled_window),
-					GTK_SHADOW_ETCHED_IN);
-    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolled_window),
-				   GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
-    gtk_box_pack_start(GTK_BOX(vbox), scrolled_window, TRUE, TRUE, 0);
-
-    model =
-	gtk_tree_store_new(GPG_KEY_NUM_COLUMNS,
-			   G_TYPE_STRING,   /* user ID */
-			   G_TYPE_STRING,   /* key ID */
-			   G_TYPE_INT,      /* length */
-			   G_TYPE_STRING,   /* validity (gpg encrypt only) */
-			   G_TYPE_POINTER); /* key */
-
-    tree_view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(model));
-    selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree_view));
-    gtk_tree_selection_set_mode(selection, GTK_SELECTION_SINGLE);
-    g_signal_connect(G_OBJECT(selection), "changed",
-		     G_CALLBACK(key_selection_changed_cb), &use_key);
-
-    /* add the keys */
-    upcase_name = g_ascii_strup(name, -1);
-    while (keys) {
-	gpgme_key_t key = (gpgme_key_t) keys->data;
-	gpgme_subkey_t subkey = key->subkeys;
-	gpgme_user_id_t uid = key->uids;
-	gchar *uid_info = NULL;
-	gboolean uid_found;
-
-	/* find the relevant subkey */
-	while (subkey && ((is_secret && !subkey->can_sign) ||
-			  (!is_secret && !subkey->can_encrypt)))
-	    subkey = subkey->next;
-
-	/* find the relevant uid */
-	uid_found = FALSE;
-	while (uid && !uid_found) {
-	    g_free(uid_info);
-	    uid_info = fix_EMail_info(g_strdup(uid->uid));
-
-	    /* check the email field which may or may not be present */
-	    if (uid->email && !g_ascii_strcasecmp(uid->email, name))
-		uid_found = TRUE;
-	    else {
-		/* no email or no match, check the uid */
-		gchar * upcase_uid = g_ascii_strup(uid_info, -1);
-		
-		if (strstr(upcase_uid, upcase_name))
-		    uid_found = TRUE;
-		else
-		    uid = uid->next;
-		g_free(upcase_uid);
-	    }
-	}
-
-	/* append the element */
-	if (subkey && uid) {
-	    gtk_tree_store_append(GTK_TREE_STORE(model), &iter, NULL);
-	    gtk_tree_store_set(GTK_TREE_STORE(model), &iter,
-			       GPG_KEY_USER_ID_COLUMN, uid_info,
-			       GPG_KEY_ID_COLUMN, subkey->keyid,
-			       GPG_KEY_LENGTH_COLUMN, subkey->length,
-			       GPG_KEY_VALIDITY_COLUMN,
-			       libbalsa_gpgme_validity_to_gchar_short
-			       (uid->validity),
-			       GPG_KEY_PTR_COLUMN, key,
-			       -1);
-	}
-	g_free(uid_info);
-	keys = g_list_next(keys);
-    }
-    g_free(upcase_name);
-
-    g_object_unref(G_OBJECT(model));
-    /* show the validity only if we are asking for a gpg public key */
-    last_col = (protocol == GPGME_PROTOCOL_CMS || is_secret) ?
-	GPG_KEY_LENGTH_COLUMN :	GPG_KEY_VALIDITY_COLUMN;
-    for (i = 0; i <= last_col; i++) {
-	GtkCellRenderer *renderer;
-	GtkTreeViewColumn *column;
-
-	renderer = gtk_cell_renderer_text_new();
-	column =
-	    gtk_tree_view_column_new_with_attributes(_(col_titles[i]),
-						     renderer, "text", i,
-						     NULL);
-	gtk_tree_view_append_column(GTK_TREE_VIEW(tree_view), column);
-	gtk_tree_view_column_set_resizable(column, TRUE);
-    }
-
-    gtk_container_add(GTK_CONTAINER(scrolled_window), tree_view);
-    gtk_window_set_default_size(GTK_WINDOW(dialog), 500, 300);
-    gtk_widget_show_all(gtk_dialog_get_content_area(GTK_DIALOG(dialog)));
-
-    if (gtk_dialog_run(GTK_DIALOG(dialog)) != GTK_RESPONSE_OK)
-	use_key = NULL;
-    gtk_widget_destroy(dialog);
-
-    return use_key;
-}
-
-
-/*
- * Display a dialog to select whether a key with a low trust level shall be accepted
- */
-static gboolean
-accept_low_trust_key(const gchar * name, gpgme_user_id_t uid,
-		     GMimeGpgmeContext * ctx)
-{
-    GtkWidget *dialog;
-    GtkWindow *parent;
-    gint result;
-    gchar *message1;
-    gchar *message2;
-
-    /* paranoia checks */
-    g_return_val_if_fail(ctx != NULL, FALSE);
-    g_return_val_if_fail(uid != NULL, FALSE);
-    parent = GTK_WINDOW(g_object_get_data(G_OBJECT(ctx), "parent-window"));
-    
-    /* build the message */
-    message1 =
-	g_strdup_printf(_("Insufficient trust for recipient %s"), name);
-    message2 =
-	g_strdup_printf(_("The validity of the key with user ID \"%s\" is \"%s\"."),
-			uid->uid,
-			libbalsa_gpgme_validity_to_gchar_short(uid->validity));
-    dialog = 
-	gtk_message_dialog_new_with_markup(parent,
-					   GTK_DIALOG_DESTROY_WITH_PARENT,
-					   GTK_MESSAGE_WARNING,
-					   GTK_BUTTONS_YES_NO,
-					   "<b>%s</b>\n\n%s\n%s",
-					   message1,
-					   message2,
-					   _("Use this key anyway?"));
-#if HAVE_MACOSX_DESKTOP
-    libbalsa_macosx_menu_for_parent(dialog, parent);
-#endif
-			      
-    /* ask the user */
-    result = gtk_dialog_run(GTK_DIALOG(dialog));
-    gtk_widget_destroy(dialog);
-
-    return result == GTK_RESPONSE_YES;
-}
-
-
-/*
- * display a dialog to read the passphrase
- */
-static gchar *
-get_passphrase_real(GMimeGpgmeContext * ctx, const gchar * uid_hint,
-		    int prev_was_bad)
-{
-    static GdkPixbuf *padlock_keyhole = NULL;
-    GtkWidget *dialog, *entry, *vbox, *hbox;
-    gchar *prompt, *passwd;
-    const gchar *title =
-	g_object_get_data(G_OBJECT(ctx), "passphrase-title");
-    GtkWindow *parent = g_object_get_data(G_OBJECT(ctx), "parent-window");
-
-    /* FIXME: create dialog according to the Gnome HIG */
-    dialog = gtk_dialog_new_with_buttons(title, parent,
-					 GTK_DIALOG_DESTROY_WITH_PARENT,
-					 GTK_STOCK_OK, GTK_RESPONSE_OK,
-					 GTK_STOCK_CANCEL,
-					 GTK_RESPONSE_CANCEL, NULL);
-#if HAVE_MACOSX_DESKTOP
-    libbalsa_macosx_menu_for_parent(dialog, parent);
-#endif
-    hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 12);
-    gtk_container_set_border_width(GTK_CONTAINER(hbox), 12);
-    gtk_container_add(GTK_CONTAINER
-                      (gtk_dialog_get_content_area(GTK_DIALOG(dialog))),
-                      hbox);
-
-    vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 12);
-    gtk_container_add(GTK_CONTAINER(hbox), vbox);
-    if (!padlock_keyhole)
-	padlock_keyhole =
-	    gdk_pixbuf_new_from_xpm_data(padlock_keyhole_xpm);
-    gtk_box_pack_start(GTK_BOX(vbox),
-		       gtk_image_new_from_pixbuf(padlock_keyhole), FALSE,
-		       FALSE, 0);
-    vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 12);
-    gtk_container_add(GTK_CONTAINER(hbox), vbox);
-    if (prev_was_bad)
-	prompt =
-	    g_strdup_printf(_
-			    ("The passphrase for this key was bad, please try again!\n\nKey: %s"),
-			    uid_hint);
-    else
-	prompt =
-	    g_strdup_printf(_
-			    ("Please enter the passphrase for the secret key!\n\nKey: %s"),
-			    uid_hint);
-    gtk_container_add(GTK_CONTAINER(vbox), gtk_label_new(prompt));
-    g_free(prompt);
-    entry = gtk_entry_new();
-    gtk_container_add(GTK_CONTAINER(vbox), entry);
-
-    gtk_widget_show_all(gtk_dialog_get_content_area(GTK_DIALOG(dialog)));
-    gtk_entry_set_width_chars(GTK_ENTRY(entry), 40);
-    gtk_entry_set_visibility(GTK_ENTRY(entry), FALSE);
-
-    gtk_entry_set_activates_default(GTK_ENTRY(entry), TRUE);
-    gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
-    gtk_widget_grab_focus(entry);
-    if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_OK)
-	passwd = g_strdup(gtk_entry_get_text(GTK_ENTRY(entry)));
-    else
-	passwd = NULL;
-
-    gtk_widget_destroy(dialog);
-
-    return passwd;
-}
-
-
-#ifdef BALSA_USE_THREADS
-/* FIXME: is this really necessary? */
-typedef struct {
-    pthread_cond_t cond;
-    GMimeGpgmeContext *ctx;
-    const gchar *desc;
-    gint was_bad;
-    gchar *res;
-} AskPassphraseData;
-
-/* get_passphrase_idle:
-   called in MT mode by the main thread.
- */
-static gboolean
-get_passphrase_idle(gpointer data)
-{
-    AskPassphraseData *apd = (AskPassphraseData *) data;
-    gdk_threads_enter();
-    apd->res = get_passphrase_real(apd->ctx, apd->desc, apd->was_bad);
-    gdk_threads_leave();
-    pthread_cond_signal(&apd->cond);
-    return FALSE;
-}
-#endif
-
-
-/*
- * Helper function: overwrite a sting in memory with random data
- */
-static inline void
-wipe_string(gchar * password)
-{
-    while (*password)
-	*password++ = random();
-}
-
-
-/*
- * Called by gpgme to get the passphrase for a key.
- */
-static gpgme_error_t
-get_passphrase_cb(void *opaque, const char *uid_hint,
-		  const char *passph_info, int prev_was_bad, int fd)
-{
-    GMimeGpgmeContext *context;
-    gchar *passwd = NULL;
-    int foo, bar;
-
-    if (!opaque || !GMIME_IS_GPGME_CONTEXT(opaque)) {
-	foo = write(fd, "\n", 1);
-	return foo > 0 ? GPG_ERR_USER_1 : GPG_ERR_EIO;
-    }
-    context = GMIME_GPGME_CONTEXT(opaque);
-
-#ifdef ENABLE_PCACHE
-    if (!pcache)
-	pcache = init_pcache();
-
-    /* check if we have the passphrase already cached... */
-    if ((passwd = check_cache(pcache, uid_hint, prev_was_bad))) {
-	foo = write(fd, passwd, strlen(passwd));
-	bar = write(fd, "\n", 1);
-	wipe_string(passwd);
-	g_free(passwd);
-	return foo > 0 && bar > 0 ? GPG_ERR_NO_ERROR : GPG_ERR_EIO;
-    }
-#endif
-
-#ifdef BALSA_USE_THREADS
-    if (!libbalsa_am_i_subthread())
-#ifdef ENABLE_PCACHE
-	passwd =
-	    get_passphrase_real(context, uid_hint, prev_was_bad, pcache);
-
-#else
-	passwd = get_passphrase_real(context, uid_hint, prev_was_bad);
-#endif
-    else {
-	static pthread_mutex_t get_passphrase_lock =
-	    PTHREAD_MUTEX_INITIALIZER;
-	AskPassphraseData apd;
-
-	pthread_mutex_lock(&get_passphrase_lock);
-	pthread_cond_init(&apd.cond, NULL);
-	apd.ctx = context;
-	apd.desc = uid_hint;
-	apd.was_bad = prev_was_bad;
-	g_idle_add(get_passphrase_idle, &apd);
-	pthread_cond_wait(&apd.cond, &get_passphrase_lock);
-
-	pthread_cond_destroy(&apd.cond);
-	pthread_mutex_unlock(&get_passphrase_lock);
-	passwd = apd.res;
-    }
-#else
-    passwd = get_passphrase_real(context, uid_hint, prev_was_bad);
-#endif				/* BALSA_USE_THREADS */
-
-    if (!passwd) {
-	foo = write(fd, "\n", 1);
-	return foo > 0 ? GPG_ERR_CANCELED : GPG_ERR_EIO;
-    }
-
-    /* send the passphrase and erase the string */
-    foo = write(fd, passwd, strlen(passwd));
-    wipe_string(passwd);
-    g_free(passwd);
-    bar = write(fd, "\n", 1);
-    return foo > 0 && bar > 0 ? GPG_ERR_NO_ERROR : GPG_ERR_EIO;
-}
 
 
 /*

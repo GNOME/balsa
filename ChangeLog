@@ -1,3 +1,36 @@
+2011-12-10  Albrecht Dreß
+
+	New crypto implementation
+
+	* libbalsa/Makefile.am: new files.
+	* libbalsa/body.c (libbalsa_message_body_protect_state): use new
+	implementation.
+	* libbalsa/gmime-application-pkcs7.c
+	(g_mime_application_pkcs7_decrypt_verify),
+	(g_mime_application_pkcs7_encrypt): ditto.
+	* libbalsa/gmime-application-pkcs7.h: ditto.
+	* libbalsa/gmime-gpgme-context.c: new file.
+	* libbalsa/gmime-gpgme-context.h: ditto.
+	* libbalsa/gmime-gpgme-signature.c
+	(g_mime_gpgme_sigstat_new_from_gpgme_ctx),
+	(g_mime_gpgme_sigstat_finalize), (hex_decode),
+	(libbalsa_cert_subject_readable), (g_mime_gpgme_sigstat_init):
+	ditto.
+	* libbalsa/gmime-gpgme-signature.h: ditto.
+	* libbalsa/gmime-part-rfc2440.c (g_mime_part_check_rfc2440),
+	(g_mime_part_rfc2440_sign_encrypt), (g_mime_part_rfc2440_verify),
+	(g_mime_part_rfc2440_decrypt): use new implementation.
+	* libbalsa/gmime-part-rfc2440.h: ditto.
+	* libbalsa/rfc3156.c (libbalsa_sign_mime_object),
+	(libbalsa_encrypt_mime_object), (libbalsa_body_check_signature),
+	(libbalsa_body_decrypt), (libbalsa_rfc2440_sign_encrypt),
+	(libbalsa_rfc2440_verify), (libbalsa_rfc2440_decrypt),
+	(libbalsa_gpgme_validity_to_gchar_short), (append_time_t),
+	(libbalsa_signature_info_to_gchar): ditto.
+	* libbalsa/rfc3156.h: ditto.
+	* src/balsa-message.c (libbalsa_msg_part_2440): ditto.
+	* src/main.c (main): ditto.
+
 2011-12-03  Peter Bloomfield
 
 	* src/sendmsg-window.c (create_text_area): remove redundant

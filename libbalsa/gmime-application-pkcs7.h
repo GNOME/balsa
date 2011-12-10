@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /*
  * S/MIME application/pkcs7-mime support for gmime/balsa
- * Copyright (C) 2004 Albrecht Dreﬂ <albrecht.dress@arcor.de>
+ * Copyright (C) 2004 Albrecht Dre√ü <albrecht.dress@arcor.de>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,56 +27,21 @@ extern "C" {
 #pragma }
 #endif				/* __cplusplus */
 
-#include <gmime/gmime-part.h>
-#ifndef HAVE_GMIME_2_5_7
-#include <gmime/gmime-cipher-context.h>
-#else /* HAVE_GMIME_2_5_7 */
-#include <gmime/gmime-crypto-context.h>
-#endif /* HAVE_GMIME_2_5_7 */
-
-#undef HAS_APPLICATION_PKCS7_MIME_SIGNED_SUPPORT
+#include <gmime/gmime.h>
 
 
-#ifdef HAS_APPLICATION_PKCS7_MIME_SIGNED_SUPPORT
-/* Note: application/pkcs7-mime signed parts are not used within balsa, as
- * they can not be viewed by mMUA's without S/MIME support. Therefore,
- * Balsa always encodes S/MIME signed stuff as multipart/signed. */
-int g_mime_application_pkcs7_sign(GMimePart * pkcs7,
+    GMimeObject *g_mime_application_pkcs7_decrypt_verify(GMimePart * pkcs7,
+							 GMimeGpgmeSigstat
+							 ** signature,
+							 GtkWindow *
+							 parent,
+							 GError ** err);
+    int g_mime_application_pkcs7_encrypt(GMimePart * pkcs7,
 				  GMimeObject * content,
-#ifndef HAVE_GMIME_2_5_7
-				  GMimeCipherContext * ctx,
-#else /* HAVE_GMIME_2_5_7 */
-				  GMimeCryptoContext * ctx,
-#endif /* HAVE_GMIME_2_5_7 */
-				  const char *userid, GError ** err);
-#endif
-
-#ifndef HAVE_GMIME_2_5_7
-GMimeObject *g_mime_application_pkcs7_verify(GMimePart * pkcs7,
-					     GMimeSignatureValidity ** validity,
-					     GMimeCipherContext * ctx, GError ** err);
-#else /* HAVE_GMIME_2_5_7 */
-GMimeObject *g_mime_application_pkcs7_verify(GMimePart * pkcs7,
-					     GMimeSignatureList ** validity,
-					     GMimeCryptoContext * ctx, GError ** err);
-#endif /* HAVE_GMIME_2_5_7 */
-
-int g_mime_application_pkcs7_encrypt(GMimePart * pkcs7,
-				     GMimeObject * content,
-#ifndef HAVE_GMIME_2_5_7
-				     GMimeCipherContext * ctx,
-#else /* HAVE_GMIME_2_5_7 */
-				     GMimeCryptoContext * ctx,
-#endif /* HAVE_GMIME_2_5_7 */
-				     GPtrArray * recipients, GError ** err);
-
-#ifndef HAVE_GMIME_2_5_7
-GMimeObject *g_mime_application_pkcs7_decrypt(GMimePart * pkcs7,
-					      GMimeCipherContext * ctx, GError ** err);
-#else /* HAVE_GMIME_2_5_7 */
-GMimeObject *g_mime_application_pkcs7_decrypt(GMimePart * pkcs7,
-					      GMimeCryptoContext * ctx, GError ** err);
-#endif /* HAVE_GMIME_2_5_7 */
+					 GPtrArray * recipients,
+					 gboolean trust_all,
+					 GtkWindow * parent,
+					 GError ** err);
 
 #ifdef __cplusplus
 }

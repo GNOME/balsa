@@ -851,7 +851,7 @@ libbalsa_message_body_protect_state(LibBalsaMessageBody *body)
 	   at least marginal */
 	if (body->sig_info->validity >= GPGME_VALIDITY_MARGINAL &&
 	    (body->sig_info->protocol == GPGME_PROTOCOL_CMS ||
-	     body->sig_info->trust >= GPGME_VALIDITY_MARGINAL))
+	     body->sig_info->key->owner_trust >= GPGME_VALIDITY_MARGINAL))
 	    return LIBBALSA_MSG_PROTECT_SIGN_GOOD;
 	else
 	    return LIBBALSA_MSG_PROTECT_SIGN_NOTRUST;

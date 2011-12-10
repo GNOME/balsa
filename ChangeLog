@@ -1,3 +1,7 @@
+2011-12-10  Peter Bloomfield
+
+	* libbalsa/libbalsa-gpgme-cb.c: include stdlib.h directly.
+
 2011-12-10  Albrecht Dreß
 
 	New crypto implementation

@@ -41,6 +41,7 @@
 #include <glib.h>
 #include <glib/gi18n.h>
 #include <gtk/gtk.h>
+#include <stdlib.h>
 #include "rfc3156.h"
 #include "libbalsa-gpgme-cb.h"
 

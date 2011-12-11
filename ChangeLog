@@ -1,5 +1,9 @@
 2011-12-11  Peter Bloomfield
 
+	* libbalsa/libbalsa-gpgme-cb.c: include stdlib.h directly
+
+2011-12-11  Peter Bloomfield
+
 	Define G_CONST_RETURN as const and use g_format_size(),
 	to avoid deprecation breakage
 

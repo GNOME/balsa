@@ -1,3 +1,14 @@
+2011-12-11  Albrecht Dreß
+
+	New files needed for previous commit (Peter's oops)
+
+	* libbalsa/gmime-multipart-crypt.c
+	* libbalsa/gmime-multipart-crypt.h
+	* libbalsa/libbalsa-gpgme-cb.c
+	* libbalsa/libbalsa-gpgme-cb.h
+	* libbalsa/libbalsa-gpgme.c
+	* libbalsa/libbalsa-gpgme.h
+
 2011-12-10  Albrecht Dreß
 
 	New crypto implementation

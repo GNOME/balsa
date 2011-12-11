@@ -18,7 +18,6 @@ libbalsa/filter-file.c
 libbalsa/filter-funcs.c
 libbalsa/folder-scanners.c
 libbalsa/gmime-application-pkcs7.c
-libbalsa/gmime-gpgme-context.c
 libbalsa/gmime-gpgme-signature.c
 libbalsa/gmime-part-rfc2440.c
 libbalsa/html.c

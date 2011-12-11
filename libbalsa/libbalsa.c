@@ -47,6 +47,9 @@
 #endif                          /* HAVE_COMPFACE */
 
 #if HAVE_GTKSOURCEVIEW
+#ifndef G_CONST_RETURN
+#  define G_CONST_RETURN const
+#endif
 #include <gtksourceview/gtksourceview.h>
 #include <gtksourceview/gtksourcebuffer.h>
 /* note GtkSourceview 1 and 2 have a slightly different API */

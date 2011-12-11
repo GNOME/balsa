@@ -24,6 +24,9 @@
 #endif                          /* HAVE_CONFIG_H */
 
 #if HAVE_UNIQUE
+#ifndef G_CONST_RETURN
+#  define G_CONST_RETURN const
+#endif
 #include <gdk/gdkx.h>
 #include <gtk/gtk.h>
 #include <unique/unique.h>

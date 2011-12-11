@@ -77,6 +77,9 @@
 #include "spell-check.h"
 #endif                          /* HAVE_GTKSPELL */
 #if HAVE_GTKSOURCEVIEW
+#ifndef G_CONST_RETURN
+#  define G_CONST_RETURN const
+#endif
 #include <gtksourceview/gtksourceview.h>
 #endif                          /* HAVE_GTKSOURCEVIEW */
 
@@ -2882,7 +2885,11 @@ render_attach_size(GtkTreeViewColumn *column, GtkCellRenderer *cell,
     if (mode == LIBBALSA_ATTACH_AS_EXTBODY)
         sstr = g_strdup("-");
     else
+#if GLIB_CHECK_VERSION(2,30,0)
+	sstr = g_format_size((goffset) size);
+#else
         sstr = g_format_size_for_display((goffset) size);
+#endif
     g_object_set(cell, "text", sstr, NULL);
     g_free(sstr);
 }

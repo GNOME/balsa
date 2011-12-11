@@ -1,3 +1,14 @@
+2011-12-11  Peter Bloomfield
+
+	Define G_CONST_RETURN as const and use g_format_size(),
+	to avoid deprecation breakage
+
+	* libbalsa/libbalsa.c: define G_CONST_RETURN as const.
+	* src/balsa-mime-widget-text.c: ditto.
+	* src/main.c: ditto.
+	* src/sendmsg-window.c (render_attach_size): use
+	g_format_size().
+
 2011-12-11  Albrecht Dreß
 
 	New files needed for previous commit (Peter's oops)

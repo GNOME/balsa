@@ -37,6 +37,9 @@
 #include "balsa-cite-bar.h"
 
 #if HAVE_GTKSOURCEVIEW
+#ifndef G_CONST_RETURN
+#  define G_CONST_RETURN const
+#endif
 #include <gtksourceview/gtksourceview.h>
 #include <gtksourceview/gtksourcebuffer.h>
 #include <gtksourceview/gtksourcelanguage.h>

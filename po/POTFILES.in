@@ -19,12 +19,15 @@ libbalsa/filter-funcs.c
 libbalsa/folder-scanners.c
 libbalsa/gmime-application-pkcs7.c
 libbalsa/gmime-gpgme-signature.c
+libbalsa/gmime-multipart-crypt.c
 libbalsa/gmime-part-rfc2440.c
 libbalsa/html.c
 libbalsa/identity.c
 libbalsa/imap-server.c
 libbalsa/libbalsa.c
 libbalsa/libbalsa-conf.c
+libbalsa/libbalsa-gpgme.c
+libbalsa/libbalsa-gpgme-cb.c
 libbalsa/libbalsa_private.h
 libbalsa/libbalsa-vfs.c
 libbalsa/mailbox.c

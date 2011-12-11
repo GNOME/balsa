@@ -3090,7 +3090,7 @@ libbalsa_msg_part_2440(LibBalsaMessage * message, LibBalsaMessageBody * body,
         
     if (sig_res == GPG_ERR_NO_ERROR) {
         if (body->sig_info->validity >= GPGME_VALIDITY_MARGINAL &&
-            body->sig_info->trust >= GPGME_VALIDITY_MARGINAL)
+            body->sig_info->key->owner_trust >= GPGME_VALIDITY_MARGINAL)
             libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
                                  _("Detected a good signature"));
         else

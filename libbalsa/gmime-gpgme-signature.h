@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /*
  * gmime/gpgme glue layer library
- * Copyright (C) 2004 Albrecht Dreﬂ <albrecht.dress@arcor.de>
+ * Copyright (C) 2004-2011 Albrecht Dre√ü <albrecht.dress@arcor.de>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 #define __GMIME_GPGME_SIGNATURE_H__
 
 #include <gpgme.h>
-#include <glib-object.h>
+#include <glib.h>
 
 
 #ifdef __cplusplus
@@ -43,30 +43,20 @@ extern "C" {
 
 typedef struct _GMimeGpgmeSigstat GMimeGpgmeSigstat;
 typedef struct _GMimeGpgmeSigstatClass GMimeGpgmeSigstatClass;
-
+typedef struct _sig_uid_t sig_uid_t;
 
 struct _GMimeGpgmeSigstat {
     GObject parent;
 
-    /* various data gathered by gpgme's verify */
+    /* results form gpgme's verify operation */
     gpgme_protocol_t protocol;
     gpgme_error_t status;
     gpgme_validity_t validity;
-    gpgme_validity_t trust;
-    gchar *sign_name;
-    gchar *sign_email;
     gchar *fingerprint;
-    gchar *sign_uid;
-    gchar *issuer_serial;
-    gchar *issuer_name;
-    gchar *chain_id;
-    time_t key_created;
-    time_t key_expires;
-    gboolean key_revoked;
-    gboolean key_expired;
-    gboolean key_disabled;
-    gboolean key_invalid;
     time_t sign_time;
+
+    /* information about the key used to create the signature */
+    gpgme_key_t key;
 };
 
 struct _GMimeGpgmeSigstatClass {
@@ -78,6 +68,9 @@ GType g_mime_gpgme_sigstat_get_type(void);
 GMimeGpgmeSigstat *g_mime_gpgme_sigstat_new(void);
 GMimeGpgmeSigstat *g_mime_gpgme_sigstat_new_from_gpgme_ctx(gpgme_ctx_t
 							   ctx);
+
+gchar *libbalsa_cert_subject_readable(const gchar *subject);
+
 
 #ifdef __cplusplus
 }

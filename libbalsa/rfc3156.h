@@ -37,7 +37,7 @@
 #include <gpgme.h>
 #include "libbalsa.h"
 #include "misc.h"
-#include "gmime-gpgme-context.h"
+#include "gmime-gpgme-signature.h"
 
 
 /* bits to define the protection mode: signed or encrypted */
@@ -59,8 +59,6 @@
 #define GPG_ERR_TRY_AGAIN          GPG_ERR_USER_15
 #define GPG_ERR_NOT_SIGNED         GPG_ERR_USER_16
 
-
-gboolean libbalsa_check_crypto_engine(gpgme_protocol_t protocol);
 
 gint libbalsa_message_body_protection(LibBalsaMessageBody * body);
 gboolean libbalsa_can_encrypt_for_all(InternetAddressList * recipients,
@@ -108,6 +106,7 @@ gpgme_error_t libbalsa_rfc2440_decrypt(GMimePart * part,
 const gchar *libbalsa_gpgme_sig_protocol_name(gpgme_protocol_t protocol);
 const gchar *libbalsa_gpgme_sig_stat_to_gchar(gpgme_error_t stat);
 const gchar *libbalsa_gpgme_validity_to_gchar(gpgme_validity_t validity);
+const gchar *libbalsa_gpgme_validity_to_gchar_short(gpgme_validity_t validity);
 gchar *libbalsa_signature_info_to_gchar(GMimeGpgmeSigstat * info,
 					const gchar * date_string);
 

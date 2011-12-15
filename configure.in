@@ -188,11 +188,6 @@ AC_ARG_WITH(ssl,
                   [Enable SSL (default=no)]),
                   [ with_ssl=$withval ],[ with_ssl=no ])
 
-AC_ARG_WITH(unique,
-   AC_HELP_STRING([--with-unique],
-                  [Use libUnique (default=no)]),
-                  [with_unique=$withval],[with_unique=no])
-
 AC_ARG_WITH(gmime,
    AC_HELP_STRING([--with-gmime],
                   [Version of GMime 2.4, or 2.6 (default=detect)]),
@@ -339,7 +334,7 @@ dnl Make sure ld finds zlib:
 LIBS="$LIBS -lz"
 
 PKG_CHECK_MODULES(BALSA, [
-glib-2.0 >= 2.27.0
+glib-2.0 >= 2.28.0
 gtk+-3.0
 gmime-$with_gmime
 gio-2.0 >= 2.27.0
@@ -782,20 +777,6 @@ if test x$with_gtksourceview != xno; then
 fi
 AM_CONDITIONAL([BUILD_WITH_GTKSOURCEVIEW], [test x$with_gtksourceview = x3 ])
 
-# libUnique configuration
-#
-AC_MSG_CHECKING([whether to build with libUnique])
-if test x$with_unique != xno; then
-    AC_MSG_RESULT([yes])
-    PKG_CHECK_MODULES(UNIQUE, [ unique-3.0 ])
-    AC_DEFINE(HAVE_UNIQUE,1,[Defined when libUnique can be used.])
-    BALSA_CFLAGS="$BALSA_CFLAGS $UNIQUE_CFLAGS"
-    BALSA_LIBS="$BALSA_LIBS $UNIQUE_LIBS"
-else
-    AC_MSG_RESULT([no])
-fi
-AM_CONDITIONAL([BUILD_WITH_UNIQUE], [test $with_unique = "yes" ])
-
 # libcanberra configuration
 #
 AC_MSG_CHECKING([whether to build with canberra])
@@ -1021,7 +1002,6 @@ echo "      Using multithreading: $use_threads"
 echo "   Enable compile warnings: $set_more_warnings"
 echo "                Use ESMTP : $with_esmtp"
 echo "               HTML widget: $use_html_widget"
-echo " Use Unique (experimental): $with_unique"
 echo "                 Use GNOME: $with_gnome"
 echo "              Use Canberra: $with_canberra"
 echo "                 Use GPGME: $gpgmecfg"

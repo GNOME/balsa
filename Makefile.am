@@ -35,16 +35,6 @@ if BUILD_WITH_G_D_U
 balsa_g_d_u_extra_dist = gnome-doc-utils.make
 endif
 
-if !BUILD_WITH_UNIQUE
-serverdir               = $(libdir)/bonobo/servers
-server_in_files         = GNOME_Balsa.server
-server_DATA             = $(server_in_files:.server.in=.server)
-
-$(server_in_files): $(server_in_files).in
-	sed -e "s|\@bindir\@|$(bindir)|" $< > $@
-
-endif
-
 EXTRA_DIST =			\
     $(balsa_extra_dist)		\
     $(balsa_g_d_u_extra_dist)

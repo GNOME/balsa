@@ -1,3 +1,15 @@
+2011-12-15  Peter Bloomfield
+
+	Migrate to GApplication
+
+	* GNOME_Balsa.server.in: remove obsolete file.
+	* Makefile.am: remove reference to obsolete file.
+	* configure.in: remove libUnique configuration, and bump glib
+	requirement to 2.28.
+	* src/main.c (balsa_init), (scan_mailboxes_idle_cb), (real_main),
+	(balsa_cleanup), (handle_remote), (command_line_cb), (main):
+	migrate to GApplication.
+
 2011-12-10  Peter Bloomfield
 
 	* libbalsa/libbalsa-gpgme-cb.c: include stdlib.h directly.

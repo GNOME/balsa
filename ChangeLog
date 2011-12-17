@@ -1,3 +1,8 @@
+2011-12-16  Peter Bloomfield
+
+	* src/sendmsg-window.c: drop ctrl-Q accelerator for
+	file:queue-for-sending.
+
 2011-12-15  Peter Bloomfield
 
 	Migrate to GApplication

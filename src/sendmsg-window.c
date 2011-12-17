@@ -392,7 +392,7 @@ static const GtkActionEntry ready_entries[] = {
     {"Send", BALSA_PIXMAP_SEND, N_("Sen_d"), "<control>Return",
      N_("Send this message"), G_CALLBACK(send_message_cb)},
 #if !defined(ENABLE_TOUCH_UI)
-    {"Queue", BALSA_PIXMAP_SEND, N_("_Queue"), "<control>Q",
+    {"Queue", BALSA_PIXMAP_SEND, N_("_Queue"), NULL,
      N_("Queue this message in Outbox for sending"),
      G_CALLBACK(queue_message_cb)},
     {"Postpone", BALSA_PIXMAP_POSTPONE, N_("_Postpone"), NULL,

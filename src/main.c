@@ -393,6 +393,9 @@ scan_mailboxes_idle_cb()
 	gchar **urls;
 
         join = g_strjoinv(";", cmd_line_open_mailboxes);
+        g_strfreev(cmd_line_open_mailboxes);
+        cmd_line_open_mailboxes = NULL;
+
 	urls = g_strsplit(join, ";", 20);
         g_free(join);
 	g_idle_add((GSourceFunc) open_mailboxes_idle_cb, urls);
@@ -642,10 +645,15 @@ real_main(int argc, char *argv[])
                 sendmsg_window_process_url(opt_compose_email+7,
                         sendmsg_window_set_field, snd);
             else sendmsg_window_set_field(snd,"to", opt_compose_email);
+            g_free(opt_compose_email);
+            opt_compose_email = NULL;
         }
-        if (opt_attach_list)
+        if (opt_attach_list) {
             for (attach = opt_attach_list; *attach; ++attach)
                 add_attachment(snd, *attach, FALSE, NULL);
+            g_strfreev(opt_attach_list);
+            opt_attach_list = NULL;
+        }
 	snd->quit_on_close = FALSE;
     }
     gtk_widget_show(window);
@@ -727,15 +735,6 @@ handle_remote(int argc, char **argv,
     cmd_open_unread_mailbox = FALSE;
     cmd_open_inbox = FALSE;
 
-    g_free(opt_compose_email);
-    opt_compose_email = NULL;
-
-    g_strfreev(opt_attach_list);
-    opt_attach_list = NULL;
-
-    g_strfreev(cmd_line_open_mailboxes);
-    cmd_line_open_mailboxes = NULL;
-
     if (!g_option_context_parse(context, &argc, &argv, &error)) {
         g_application_command_line_printerr(command_line, "%s\n",
                                             error->message);
@@ -745,24 +744,19 @@ handle_remote(int argc, char **argv,
         text = g_option_context_get_help(context, FALSE, NULL);
         g_application_command_line_print(command_line, "%s", text);
         g_free(text);
+    } else if (cmd_get_stats) {
+        glong unread, unsent;
+
+        balsa_get_stats(&unread, &unsent);
+        text =
+            g_strdup_printf("Unread: %ld Unsent: %ld\n", unread, unsent);
+        g_application_command_line_print(command_line, text);
+        g_free(text);
     } else {
-        if (!(opt_compose_email || opt_attach_list || cmd_get_stats))
-            /* Move the main window to the request's screen */
-            gtk_window_present(GTK_WINDOW(balsa_app.main_window));
+        gdk_threads_enter();
 
         if (cmd_check_mail_on_startup)
             balsa_main_check_new_messages(balsa_app.main_window);
-
-        if (cmd_get_stats) {
-            glong unread, unsent;
-
-            balsa_get_stats(&unread, &unsent);
-            text =
-                g_strdup_printf("Unread: %ld Unsent: %ld\n", unread,
-                                unsent);
-            g_application_command_line_print(command_line, text);
-            g_free(text);
-        }
 
         if (cmd_open_unread_mailbox)
             initial_open_unread_mailboxes();
@@ -775,6 +769,9 @@ handle_remote(int argc, char **argv,
             gchar **urls;
 
             join = g_strjoinv(";", cmd_line_open_mailboxes);
+            g_strfreev(cmd_line_open_mailboxes);
+            cmd_line_open_mailboxes = NULL;
+
             urls = g_strsplit(join, ";", 20);
             g_free(join);
             g_idle_add((GSourceFunc) open_mailboxes_idle_cb, urls);
@@ -783,8 +780,6 @@ handle_remote(int argc, char **argv,
         if (opt_compose_email || opt_attach_list) {
             BalsaSendmsg *snd;
             gchar **attach;
-
-            gdk_threads_enter();
 
             snd = sendmsg_window_compose();
 
@@ -803,10 +798,14 @@ handle_remote(int argc, char **argv,
                     add_attachment(snd, *attach, FALSE, NULL);
 
             snd->quit_on_close = FALSE;
-
-            gdk_threads_leave();
+        } else {
+            /* Move the main window to the request's screen */
+            gtk_window_present(GTK_WINDOW(balsa_app.main_window));
         }
+
+        gdk_threads_leave();
     }
+
     g_option_context_free(context);
 
     return status;
@@ -821,12 +820,21 @@ command_line_cb(GApplication * application,
     int status;
 
     args = g_application_command_line_get_arguments(command_line, &argc);
+    /* We have to make an extra copy of the array, since
+     * g_option_context_parse() assumes that it can remove strings from
+     * the array without freeing them. */
     argv = g_memdup(args, (argc + 1) * sizeof(gchar *));
 
-    if (g_application_command_line_get_is_remote(command_line))
+    /* The signal is emitted when the GApplication is run, but is always
+     * handled by the primary instance of Balsa. */
+    if (g_application_command_line_get_is_remote(command_line)) {
+        /* A remote instance caused the emission; skip start-up, just
+         * handle the command line. */
         status = handle_remote(argc, argv, command_line);
-    else
+    } else {
+        /* This is the primary instance; start up as usual. */
         status = real_main(argc, argv);
+    }
 
     g_free(argv);
     g_strfreev(args);

@@ -1,3 +1,11 @@
+2011-12-17  Peter Bloomfield
+
+	* src/main.c (scan_mailboxes_idle_cb), (real_main),
+	(handle_remote), (command_line_cb): free option-handling resources
+	when no longer needed, instead of later; ignore other options
+	when --get-stats is requested by a second instance, as in the
+	primary instance; add comments to document logic.
+
 2011-12-16  Peter Bloomfield
 
 	* src/main.c: do not leak option-context; use opt-attach-list as

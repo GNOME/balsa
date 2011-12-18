@@ -1,5 +1,10 @@
 2011-12-17  Peter Bloomfield
 
+	* src/main-window.c: build --without-nm; thanks to Jack
+	<URL:http://mail.gnome.org/archives/balsa-list/2011-December/msg00013.html>.
+
+2011-12-17  Peter Bloomfield
+
 	* src/main.c (handle_remote): use the capabilities of
 	g_application_command_line_print.
 

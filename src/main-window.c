@@ -2977,7 +2977,9 @@ check_new_messages_real(BalsaWindow * window, int type)
     g_slist_foreach(list, (GFunc) g_object_unref, NULL);
     g_slist_free(list);
 
+#if defined(HAVE_LIBNM_GLIB)
     time(&window->last_check_time);
+#endif                          /* defined(HAVE_LIBNM_GLIB) */
 #endif
 }
 
@@ -3142,7 +3144,9 @@ bw_check_messages_thread(struct check_messages_thread_info *info)
     if (info->window) {
         gdk_threads_enter();
         bw_set_sensitive(info->window, "GetNewMail", TRUE);
+#if defined(HAVE_LIBNM_GLIB)
         time(&info->window->last_check_time);
+#endif                          /* defined(HAVE_LIBNM_GLIB) */
         g_object_unref(info->window);
         gdk_threads_leave();
     }
@@ -3576,6 +3580,7 @@ bw_change_connection_status_thread(void *arg)
                            mw_mbox_change_connection_status,
 			   arg);
 
+#if defined(HAVE_LIBNM_GLIB)
     /* GLib timeouts are now triggered by g_get_monotonic_time(),
      * which doesn't increment while we're suspended, so we must
      * check for ourselves whether a scheduled mail check was
@@ -3586,6 +3591,7 @@ bw_change_connection_status_thread(void *arg)
         /* Check the mail now, and reset the timer */
         check_new_messages_cb(NULL, balsa_app.main_window);
     }
+#endif                          /* defined(HAVE_LIBNM_GLIB) */
 
     return NULL;
 }

@@ -721,11 +721,14 @@ handle_remote(int argc, char **argv,
     };
     GError *error;
     gint status = 0;
-    gchar *text;
 
     context = g_option_context_new(NULL);
-    g_option_context_set_help_enabled(context, FALSE);
     g_option_context_add_main_entries(context, option_entries, NULL);
+
+    /* Disable the built-in help-handling of GOptionContext, since it
+     * calls exit() after printing help, which is not what we want to
+     * happen in the primary instance. */
+    g_option_context_set_help_enabled(context, FALSE);
     g_option_context_add_main_entries(context, help_entries, NULL);
 
     error = NULL;
@@ -741,6 +744,8 @@ handle_remote(int argc, char **argv,
         g_error_free(error);
         status = 1;
     } else if (help) {
+        gchar *text;
+
         text = g_option_context_get_help(context, FALSE, NULL);
         g_application_command_line_print(command_line, "%s", text);
         g_free(text);
@@ -748,10 +753,9 @@ handle_remote(int argc, char **argv,
         glong unread, unsent;
 
         balsa_get_stats(&unread, &unsent);
-        text =
-            g_strdup_printf("Unread: %ld Unsent: %ld\n", unread, unsent);
-        g_application_command_line_print(command_line, text);
-        g_free(text);
+        g_application_command_line_print(command_line,
+                                         "Unread: %ld Unsent: %ld\n",
+                                         unread, unsent);
     } else {
         gdk_threads_enter();
 

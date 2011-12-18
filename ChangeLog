@@ -1,3 +1,8 @@
+2011-12-18  Peter Bloomfield
+
+	* .cvsignore: delete.
+	* .gitignore: add.
+
 2011-12-17  Peter Bloomfield
 
 	* src/main.c (handle_remote): do not leak option-handling

@@ -1,3 +1,8 @@
+2011-12-18  Peter Bloomfield
+
+	* .cvsignore: delete.
+	* .gitignore: add.
+
 2011-12-11  Peter Bloomfield
 
 	* libbalsa/libbalsa-gpgme-cb.c: include stdlib.h directly

@@ -795,11 +795,16 @@ handle_remote(int argc, char **argv,
                                                snd);
                 else
                     sendmsg_window_set_field(snd, "to", opt_compose_email);
+                g_free(opt_compose_email);
+                opt_compose_email = NULL;
             }
 
-            if (opt_attach_list)
+            if (opt_attach_list) {
                 for (attach = opt_attach_list; *attach; ++attach)
                     add_attachment(snd, *attach, FALSE, NULL);
+                g_strfreev(opt_attach_list);
+                opt_attach_list = NULL;
+            }
 
             snd->quit_on_close = FALSE;
         } else {

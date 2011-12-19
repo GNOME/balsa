@@ -359,6 +359,23 @@ balsa_get_stats(long *unread, long *unsent)
     } else *unsent = -1;
 }
 
+static void
+balsa_check_open_mailboxes(void)
+{
+    if (cmd_line_open_mailboxes) {
+        gchar *join;
+        gchar **urls;
+
+        join = g_strjoinv(";", cmd_line_open_mailboxes);
+        g_strfreev(cmd_line_open_mailboxes);
+        cmd_line_open_mailboxes = NULL;
+
+        urls = g_strsplit(join, ";", 20);
+        g_free(join);
+        g_idle_add((GSourceFunc) open_mailboxes_idle_cb, urls);
+    }
+}
+
 /* scan_mailboxes:
    this is an idle handler. Expands subtrees.
 */
@@ -388,18 +405,7 @@ scan_mailboxes_idle_cb()
     if (cmd_open_unread_mailbox || balsa_app.open_unread_mailbox)
 	g_idle_add((GSourceFunc) initial_open_unread_mailboxes, NULL);
 
-    if (cmd_line_open_mailboxes) {
-        gchar *join;
-	gchar **urls;
-
-        join = g_strjoinv(";", cmd_line_open_mailboxes);
-        g_strfreev(cmd_line_open_mailboxes);
-        cmd_line_open_mailboxes = NULL;
-
-	urls = g_strsplit(join, ";", 20);
-        g_free(join);
-	g_idle_add((GSourceFunc) open_mailboxes_idle_cb, urls);
-    }
+    balsa_check_open_mailboxes();
 
     if (balsa_app.remember_open_mboxes)
 	g_idle_add((GSourceFunc) open_mailboxes_idle_cb, NULL);
@@ -548,6 +554,39 @@ balsa_progress_set_activity(gboolean set, const gchar * text)
     gdk_threads_leave();
 }
 
+static gboolean
+balsa_check_open_compose_window(void)
+{
+    if (opt_compose_email || opt_attach_list) {
+        BalsaSendmsg *snd;
+        gchar **attach;
+
+        snd = sendmsg_window_compose();
+        snd->quit_on_close = FALSE;
+
+        if (opt_compose_email) {
+            if (g_ascii_strncasecmp(opt_compose_email, "mailto:", 7) == 0)
+                sendmsg_window_process_url(opt_compose_email + 7,
+                                           sendmsg_window_set_field, snd);
+            else
+                sendmsg_window_set_field(snd, "to", opt_compose_email);
+            g_free(opt_compose_email);
+            opt_compose_email = NULL;
+        }
+
+        if (opt_attach_list) {
+            for (attach = opt_attach_list; *attach; ++attach)
+                add_attachment(snd, *attach, FALSE, NULL);
+            g_strfreev(opt_attach_list);
+            opt_attach_list = NULL;
+        }
+
+        return TRUE;
+    }
+
+    return FALSE;
+}
+
 /* -------------------------- main --------------------------------- */
 static int
 real_main(int argc, char *argv[])
@@ -634,28 +673,8 @@ real_main(int argc, char *argv[])
         libbalsa_gpgme_check_crypto_engine(GPGME_PROTOCOL_CMS);
 #endif /* HAVE_GPGME */
 
-    if (opt_compose_email || opt_attach_list) {
-        BalsaSendmsg *snd;
-        gchar **attach;
-        gdk_threads_enter();
-        snd = sendmsg_window_compose();
-        gdk_threads_leave();
-        if(opt_compose_email) {
-            if(g_ascii_strncasecmp(opt_compose_email, "mailto:", 7) == 0)
-                sendmsg_window_process_url(opt_compose_email+7,
-                        sendmsg_window_set_field, snd);
-            else sendmsg_window_set_field(snd,"to", opt_compose_email);
-            g_free(opt_compose_email);
-            opt_compose_email = NULL;
-        }
-        if (opt_attach_list) {
-            for (attach = opt_attach_list; *attach; ++attach)
-                add_attachment(snd, *attach, FALSE, NULL);
-            g_strfreev(opt_attach_list);
-            opt_attach_list = NULL;
-        }
-	snd->quit_on_close = FALSE;
-    }
+    balsa_check_open_compose_window();
+
     gtk_widget_show(window);
 
     g_idle_add((GSourceFunc) scan_mailboxes_idle_cb, NULL);
@@ -768,46 +787,9 @@ handle_remote(int argc, char **argv,
         if (cmd_open_inbox)
             initial_open_inbox();
 
-        if (cmd_line_open_mailboxes) {
-            gchar *join;
-            gchar **urls;
+        balsa_check_open_mailboxes();
 
-            join = g_strjoinv(";", cmd_line_open_mailboxes);
-            g_strfreev(cmd_line_open_mailboxes);
-            cmd_line_open_mailboxes = NULL;
-
-            urls = g_strsplit(join, ";", 20);
-            g_free(join);
-            g_idle_add((GSourceFunc) open_mailboxes_idle_cb, urls);
-        }
-
-        if (opt_compose_email || opt_attach_list) {
-            BalsaSendmsg *snd;
-            gchar **attach;
-
-            snd = sendmsg_window_compose();
-
-            if (opt_compose_email) {
-                if (g_ascii_strncasecmp(opt_compose_email, "mailto:", 7) ==
-                    0)
-                    sendmsg_window_process_url(opt_compose_email + 7,
-                                               sendmsg_window_set_field,
-                                               snd);
-                else
-                    sendmsg_window_set_field(snd, "to", opt_compose_email);
-                g_free(opt_compose_email);
-                opt_compose_email = NULL;
-            }
-
-            if (opt_attach_list) {
-                for (attach = opt_attach_list; *attach; ++attach)
-                    add_attachment(snd, *attach, FALSE, NULL);
-                g_strfreev(opt_attach_list);
-                opt_attach_list = NULL;
-            }
-
-            snd->quit_on_close = FALSE;
-        } else {
+        if (!balsa_check_open_compose_window()) {
             /* Move the main window to the request's screen */
             gtk_window_present(GTK_WINDOW(balsa_app.main_window));
         }

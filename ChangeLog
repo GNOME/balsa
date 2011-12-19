@@ -1,5 +1,11 @@
 2011-12-18  Peter Bloomfield
 
+	* src/main.c (balsa_check_open_mailboxes),
+	(scan_mailboxes_idle_cb), (balsa_check_open_compose_window),
+	(real_main), (handle_remote): reuse identical code.
+
+2011-12-18  Peter Bloomfield
+
 	* .cvsignore: delete.
 	* .gitignore: add.
 

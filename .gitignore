@@ -9,6 +9,7 @@ doc/*/*.mo
 doc/*/*.xml
 
 .deps
+.libs
 Makefile
 Makefile.in
 

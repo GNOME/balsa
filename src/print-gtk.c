@@ -122,7 +122,7 @@ scan_body(GList *bpo_list, GtkPrintContext * context, BalsaPrintSetup * psetup,
 {
 #ifdef HAVE_GPGME
     gboolean add_signature;
-    gboolean is_multipart_signed;
+    gboolean have_crypto_frame;
 #endif				/* HAVE_GPGME */
 
     while (body) {
@@ -137,7 +137,7 @@ scan_body(GList *bpo_list, GtkPrintContext * context, BalsaPrintSetup * psetup,
 	if (!g_ascii_strcasecmp("multipart/signed", conttype) &&
 	    body->parts && body->parts->next
 	    && body->parts->next->sig_info) {
-	    is_multipart_signed = TRUE;
+	    have_crypto_frame = TRUE;
 	    bpo_list = balsa_print_object_separator(bpo_list, psetup);
 	    no_first_sep = TRUE;
 	    if (body->was_encrypted)
@@ -148,15 +148,22 @@ scan_body(GList *bpo_list, GtkPrintContext * context, BalsaPrintSetup * psetup,
 		bpo_list = balsa_print_object_frame_begin(bpo_list,
 							  _("Signed matter"),
 							  psetup);
+	} else if (!add_signature && body->was_encrypted) {
+	    have_crypto_frame = TRUE;
+	    bpo_list = balsa_print_object_separator(bpo_list, psetup);
+	    no_first_sep = TRUE;
+	    bpo_list = balsa_print_object_frame_begin(bpo_list,
+						      _("Encrypted matter"),
+						      psetup);
 	} else
-	    is_multipart_signed = FALSE;
+	    have_crypto_frame = FALSE;
 #endif				/* HAVE_GPGME */
 
 	if (g_ascii_strncasecmp(conttype, "multipart/", 10)) {
 	    if (no_first_sep)
 		no_first_sep = FALSE;
 	    else
-		 bpo_list = balsa_print_object_separator(bpo_list, psetup);
+		bpo_list = balsa_print_object_separator(bpo_list, psetup);
 #ifdef HAVE_GPGME
 	    if (add_signature) {
 		if (body->was_encrypted)
@@ -178,10 +185,10 @@ scan_body(GList *bpo_list, GtkPrintContext * context, BalsaPrintSetup * psetup,
 	    no_first_sep = FALSE;
 	}
 
-	/* end the frame for an embedded message */
+	/* end the frame for an embedded message or encrypted stuff */
 	if (!g_ascii_strcasecmp(conttype, "message/rfc822")
 #ifdef HAVE_GPGME
-	    || is_multipart_signed
+	    || have_crypto_frame
 #endif
 	    )
 	    bpo_list = balsa_print_object_frame_end(bpo_list, psetup);
@@ -192,6 +199,7 @@ scan_body(GList *bpo_list, GtkPrintContext * context, BalsaPrintSetup * psetup,
 		g_strdup_printf(_("This is an inline %s signed %s message part:"),
 				body->sig_info->protocol == GPGME_PROTOCOL_OpenPGP ?
 				_("OpenPGP") : _("S/MIME"), conttype);
+	    bpo_list = balsa_print_object_separator(bpo_list, psetup);
 	    bpo_list = balsa_print_object_header_crypto(bpo_list, context, body, header, psetup);
 	    g_free(header);
 	    bpo_list = balsa_print_object_frame_end(bpo_list, psetup);

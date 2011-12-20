@@ -1,5 +1,9 @@
 2011-12-20  Peter Bloomfield
 
+	* Makefile.am: drop GNOME_Balsa.server.in from balsa_extra_dist.
+
+2011-12-20  Peter Bloomfield
+
 	* .gitignore: add .libs.
 
 2011-12-20  Albrecht Dreß

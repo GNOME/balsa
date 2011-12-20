@@ -14,7 +14,6 @@ desktop_DATA = balsa.desktop balsa-mailto-handler.desktop
 @INTLTOOL_DESKTOP_RULE@
 
 balsa_extra_dist =		\
-	GNOME_Balsa.server.in	\
 	HACKING			\
 	balsa-mail-style.xml	\
 	balsa-mail.lang		\

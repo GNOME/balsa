@@ -1,3 +1,17 @@
+2011-12-20  Albrecht Dreß
+
+	* libbalsa/rfc3156.c: suppress GLib warning when the message is
+	only encrypted; return 'no error' for encrypted-only RFC 2440
+	messages; re-wrap a few over-long lines
+	* src/balsa-message.c: properly pick up return values from
+	libbalsa
+	* src/balsa-mime-widget-crypto.[hc]: changes needed for drawing
+	encrypted-only frame
+	* src/balsa-mime-widget-multipart.c: use new crypto frame api
+	* src/balsa-mime-widget.c: draw frame around encrypted-only rfc
+	2440 part
+	* src/print-gtk.c: encrypted-only frame print implementation
+
 2011-12-18  Peter Bloomfield
 
 	* src/main.c (balsa_check_open_mailboxes),

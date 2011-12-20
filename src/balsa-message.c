@@ -3035,7 +3035,7 @@ libbalsa_msg_part_2440(LibBalsaMessage * message, LibBalsaMessageBody * body,
     }
     libbalsa_mailbox_unlock_store(body->message->mailbox);
 
-    if (sig_res == GPG_ERR_NO_ERROR) {
+    if (body->sig_info && sig_res == GPG_ERR_NO_ERROR) {
         if (body->sig_info->validity >= GPGME_VALIDITY_MARGINAL &&
             body->sig_info->key->owner_trust >= GPGME_VALIDITY_MARGINAL)
             libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
@@ -3045,7 +3045,7 @@ libbalsa_msg_part_2440(LibBalsaMessage * message, LibBalsaMessageBody * body,
 		(LIBBALSA_INFORMATION_MESSAGE,
 		 _("Detected a good signature with insufficient "
 		   "validity/trust"));
-    } else if (sig_res != GPG_ERR_NOT_SIGNED && sig_res != GPG_ERR_CANCELED)
+    } else if (sig_res != GPG_ERR_NO_ERROR && sig_res != GPG_ERR_CANCELED)
 	libbalsa_information
 	    (chk_crypto->chk_mode == LB_MAILBOX_CHK_CRYPT_ALWAYS ?
 	     LIBBALSA_INFORMATION_ERROR : LIBBALSA_INFORMATION_MESSAGE,

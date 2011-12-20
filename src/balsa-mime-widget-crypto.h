@@ -43,7 +43,8 @@ BalsaMimeWidget *balsa_mime_widget_new_signature(BalsaMessage * bm,
 GtkWidget * balsa_mime_widget_signature_widget(LibBalsaMessageBody * mime_body,
 					       const gchar * content_type);
 GtkWidget * balsa_mime_widget_crypto_frame(LibBalsaMessageBody * mime_body, GtkWidget * child,
-					   gboolean was_encrypted, GtkWidget * signature);
+					   gboolean was_encrypted, gboolean no_signature,
+					   GtkWidget * signature);
 const gchar *balsa_mime_widget_signature_icon_name(LibBalsaMsgProtectState protect_state);
 
 

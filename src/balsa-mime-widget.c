@@ -173,7 +173,11 @@ balsa_mime_widget_new(BalsaMessage * bm, LibBalsaMessageBody * mime_body, gpoint
 		    balsa_mime_widget_signature_widget(mime_body, content_type);
 		mw->widget = balsa_mime_widget_crypto_frame(mime_body, mw->widget,
 							    mime_body->was_encrypted,
-							    signature);
+							    FALSE, signature);
+	    } else if (mime_body->was_encrypted &&
+		       g_ascii_strcasecmp("multipart/signed", content_type)) {
+		mw->widget = balsa_mime_widget_crypto_frame(mime_body, mw->widget,
+							    TRUE, TRUE, NULL);
 	    }
 #endif
             g_object_ref_sink(mw->widget);

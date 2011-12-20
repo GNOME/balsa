@@ -61,6 +61,10 @@ balsa_mime_widget_signature_widget(LibBalsaMessageBody * mime_body,
 {
     gchar *infostr;
     GtkWidget *vbox, *label;
+
+    if (!mime_body->sig_info ||
+	mime_body->sig_info->status == GPG_ERR_NOT_SIGNED)
+	return NULL;
 				   
     infostr =
         libbalsa_signature_info_to_gchar(mime_body->sig_info,
@@ -110,12 +114,12 @@ balsa_mime_widget_signature_widget(LibBalsaMessageBody * mime_body,
 
 GtkWidget *
 balsa_mime_widget_crypto_frame(LibBalsaMessageBody * mime_body, GtkWidget * child,
-			       gboolean was_encrypted, GtkWidget * signature)
+			       gboolean was_encrypted, gboolean no_signature,
+			       GtkWidget * signature)
 {
     GtkWidget * frame;
     GtkWidget * vbox;
     GtkWidget * icon_box;
-    const gchar * icon_name;
 
     frame = gtk_frame_new(NULL);
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, BMW_VBOX_SPACE);
@@ -125,13 +129,15 @@ balsa_mime_widget_crypto_frame(LibBalsaMessageBody * mime_body, GtkWidget * chil
 	gtk_box_pack_start(GTK_BOX(icon_box),
 			   gtk_image_new_from_stock(BALSA_PIXMAP_ENCR, GTK_ICON_SIZE_MENU),
 			   FALSE, FALSE, 0);
-    icon_name =
-	balsa_mime_widget_signature_icon_name(libbalsa_message_body_protect_state(mime_body));
-    if (!icon_name)
-	icon_name = BALSA_PIXMAP_SIGN;
-    gtk_box_pack_start(GTK_BOX(icon_box),
-		       gtk_image_new_from_stock(icon_name, GTK_ICON_SIZE_MENU),
-		       FALSE, FALSE, 0);
+    if (!no_signature) {
+	const gchar * icon_name =
+	    balsa_mime_widget_signature_icon_name(libbalsa_message_body_protect_state(mime_body));
+	if (!icon_name)
+	    icon_name = BALSA_PIXMAP_SIGN;
+	gtk_box_pack_start(GTK_BOX(icon_box),
+			   gtk_image_new_from_stock(icon_name, GTK_ICON_SIZE_MENU),
+			   FALSE, FALSE, 0);
+    }
     gtk_frame_set_label_widget(GTK_FRAME(frame), icon_box);
     gtk_container_set_border_width(GTK_CONTAINER(vbox), BMW_MESSAGE_PADDING);
 

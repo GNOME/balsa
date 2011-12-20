@@ -453,10 +453,14 @@ libbalsa_body_decrypt(LibBalsaMessageBody *body, gpgme_protocol_t protocol, GtkW
 
     libbalsa_mailbox_lock_store(body->message->mailbox);
     if (protocol == GPGME_PROTOCOL_OpenPGP)
-	mime_obj = g_mime_gpgme_mpe_decrypt(GMIME_MULTIPART_ENCRYPTED(body->mime_part), &sig_state, parent, &error);
+	mime_obj =
+	    g_mime_gpgme_mpe_decrypt(GMIME_MULTIPART_ENCRYPTED(body->mime_part),
+				     &sig_state, parent, &error);
 #ifdef HAVE_SMIME
     else
-	mime_obj = g_mime_application_pkcs7_decrypt_verify(GMIME_PART(body->mime_part), &sig_state, parent, &error);
+	mime_obj =
+	    g_mime_application_pkcs7_decrypt_verify(GMIME_PART(body->mime_part),
+						    &sig_state, parent, &error);
 #endif
     libbalsa_mailbox_unlock_store(body->message->mailbox);
 
@@ -486,10 +490,12 @@ libbalsa_body_decrypt(LibBalsaMessageBody *body, gpgme_protocol_t protocol, GtkW
 #endif
 
     libbalsa_message_body_set_mime_body(body, mime_obj);
-    if (sig_state && sig_state->status != GPG_ERR_NOT_SIGNED)
-	body->sig_info = sig_state;
-    else
-	g_object_unref(G_OBJECT(sig_state));
+    if (sig_state) {
+	if (sig_state->status != GPG_ERR_NOT_SIGNED)
+	    body->sig_info = sig_state;
+	else
+	    g_object_unref(G_OBJECT(sig_state));
+    }
 
     return body;
 }
@@ -498,7 +504,8 @@ libbalsa_body_decrypt(LibBalsaMessageBody *body, gpgme_protocol_t protocol, GtkW
 
 /* routines dealing with RFC2440 */
 gboolean
-libbalsa_rfc2440_sign_encrypt(GMimePart *part, const gchar *sign_for, GList *encrypt_for, gboolean always_trust,
+libbalsa_rfc2440_sign_encrypt(GMimePart *part, const gchar *sign_for,
+			      GList *encrypt_for, gboolean always_trust,
 			      GtkWindow *parent, GError **error)
 {
     GPtrArray *recipients;
@@ -523,7 +530,8 @@ libbalsa_rfc2440_sign_encrypt(GMimePart *part, const gchar *sign_for, GList *enc
 	recipients = NULL;
 
     /* sign and/or encrypt */
-    result = g_mime_part_rfc2440_sign_encrypt(part, sign_for, recipients, always_trust, parent, error);
+    result = g_mime_part_rfc2440_sign_encrypt(part, sign_for, recipients,
+					      always_trust, parent, error);
     /* clean up */
     if (recipients)
 	g_ptr_array_free(recipients, FALSE);
@@ -609,8 +617,6 @@ libbalsa_rfc2440_decrypt(GMimePart * part, GMimeGpgmeSigstat ** sig_info,
     if (gpg_updates_trustdb())
 	return GPG_ERR_TRY_AGAIN;
 
-    // g_object_set_data(G_OBJECT(ctx), "parent-window", parent); FIXME - pass downstream
-
     /* decrypt */
     result = g_mime_part_rfc2440_decrypt(part, parent, &error);
     if (result == NULL) {
@@ -627,12 +633,13 @@ libbalsa_rfc2440_decrypt(GMimePart * part, GMimeGpgmeSigstat ** sig_info,
 				 ("decryption and signature verification failed"));
 	    retval = GPG_ERR_GENERAL;
 	}
-	return retval;
-    } else
-	retval = result->status;
+    } else {
+	if (result->status == GPG_ERR_NOT_SIGNED)
+	    retval = GPG_ERR_NO_ERROR;
+	else
+	    retval = result->status;
 
-    /* return the signature info if requested */
-    if (result) {
+	/* return the signature info if requested */
 	if (sig_info && result->status != GPG_ERR_NOT_SIGNED)
 	    *sig_info = result;
 	else

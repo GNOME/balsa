@@ -49,7 +49,7 @@ balsa_mime_widget_new_multipart(BalsaMessage * bm,
 	mime_body->parts->next->sig_info)
 	mw->widget = 
 	    balsa_mime_widget_crypto_frame(mime_body->parts->next, mw->widget,
-					   mime_body->was_encrypted, NULL);
+					   mime_body->was_encrypted, FALSE, NULL);
 #endif
 
     return mw;

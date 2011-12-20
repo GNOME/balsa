@@ -3,23 +3,18 @@ dnl follow section 5.3 of Autoconf, Automake book.
 dnl
 dnl 1. Boilerplate.
 dnl
-AC_PREREQ(2.53)
-AC_INIT(src/balsa-app.h)
+AC_PREREQ(2.59)
 dnl ###########################################################################
 dnl Boilerplace and versioning
 dnl ###########################################################################
 
-BALSA_MAJOR=2
-BALSA_REVISION=4
-BALSA_PATCHLEVEL=9
-BALSA_VERSION="$BALSA_MAJOR.$BALSA_REVISION.${BALSA_PATCHLEVEL}"
+# if autoconf is used not in a git source tree, use version=2.4.90
+AC_INIT([balsa],
+        m4_esyscmd_s([test -d .git && git describe --tags || echo 2.4.90]),
+        [])
 
-AC_SUBST(BALSA_MAJOR)
-AC_SUBST(BALSA_REVISION)
-AC_SUBST(BALSA_PATCHLEVEL)
-AC_SUBST(BALSA_VERSION)
-
-AM_INIT_AUTOMAKE(balsa, "$BALSA_MAJOR.$BALSA_REVISION.${BALSA_PATCHLEVEL}")
+AM_INIT_AUTOMAKE
+AC_LANG([C])
 # Automake-1.11 option for less verbose output
 # configure --disable-silent-rules to restore verbose
 m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])])
@@ -27,15 +22,7 @@ m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])])
 AC_CONFIG_SRCDIR([src/main.c])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADERS([config.h])
-
-AC_DEFINE_UNQUOTED(BALSA_MAJOR, $BALSA_MAJOR,
-                   [Define to the Balsa major version])
-AC_DEFINE_UNQUOTED(BALSA_REVISION, $BALSA_REVISION,
-                   [Define to the Balsa revision])
-AC_DEFINE_UNQUOTED(BALSA_PATCHLEVEL, $BALSA_PATCHLEVEL,
-                   [Define to the Balsa patch level])
-AC_DEFINE_UNQUOTED(BALSA_VERSION, "$BALSA_VERSION",
-                   [Define to the Balsa version])
+AC_DEFINE_UNQUOTED(BALSA_VERSION, "AC_PACKAGE_VERSION",[Defines the Balsa version])
 
 dnl #####################################################################
 dnl 2. Options

@@ -16,8 +16,8 @@ msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=balsa&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2011-12-11 19:45+0000\n"
-"PO-Revision-Date: 2011-12-14 11:02+0100\n"
+"POT-Creation-Date: 2011-12-23 16:21+0000\n"
+"PO-Revision-Date: 2011-12-25 07:43+0100\n"
 "Last-Translator: Marek Černocký <marek@manet.cz>\n"
 "Language-Team: Czech <gnome-cs-list@gnome.org>\n"
 "MIME-Version: 1.0\n"
@@ -298,9 +298,6 @@ msgstr "Nelze ověřit část multipart/signed, protože schází její dílčí
 
 #: ../libbalsa/gmime-multipart-crypt.c:251
 #, c-format
-#| msgid ""
-#| "\n"
-#| "Disable support for protocol %s."
 msgid "unsupported protocol '%s'"
 msgstr "nepodporovaný protokol „%s“"
 
@@ -322,7 +319,6 @@ msgstr ""
 "„%s“."
 
 #: ../libbalsa/gmime-multipart-crypt.c:488
-#| msgid "(No name)"
 msgid "(none)"
 msgstr "(žádný)"
 
@@ -736,8 +732,8 @@ msgid "could not get data from stream"
 msgstr "nepodařilo se získat data z proudu"
 
 #: ../libbalsa/libbalsa-gpgme.c:269 ../libbalsa/rfc3156.c:394
-#: ../libbalsa/rfc3156.c:399 ../libbalsa/rfc3156.c:563
-#: ../libbalsa/rfc3156.c:569
+#: ../libbalsa/rfc3156.c:399 ../libbalsa/rfc3156.c:571
+#: ../libbalsa/rfc3156.c:577
 msgid "signature verification failed"
 msgstr "ověřování podpisu selhalo"
 
@@ -763,8 +759,8 @@ msgstr "podepisování a šifrování selhalo"
 msgid "encryption failed"
 msgstr "šifrování selhalo"
 
-#: ../libbalsa/libbalsa-gpgme.c:592 ../libbalsa/rfc3156.c:468
-#: ../libbalsa/rfc3156.c:473
+#: ../libbalsa/libbalsa-gpgme.c:592 ../libbalsa/rfc3156.c:472
+#: ../libbalsa/rfc3156.c:477
 msgid "decryption failed"
 msgstr "dešifrování selhalo"
 
@@ -774,7 +770,6 @@ msgstr "nepodařilo se vytvořit kontext"
 
 #: ../libbalsa/libbalsa-gpgme.c:697
 #, c-format
-#| msgid "Could not get a part: %s"
 msgid "could not set protocol '%s'"
 msgstr "nelze nastavit protokol „%s“"
 
@@ -867,16 +862,11 @@ msgstr "Přesto tento klíč použít?"
 
 #. FIXME: create dialog according to the Gnome HIG
 #: ../libbalsa/libbalsa-gpgme-cb.c:343
-#| msgid "_Pass Phrase:"
 msgid "Enter Passphrase"
 msgstr "Zadání hesla"
 
 #: ../libbalsa/libbalsa-gpgme-cb.c:370
 #, c-format
-#| msgid ""
-#| "The passphrase for this key was bad, please try again!\n"
-#| "\n"
-#| "Key: %s"
 msgid ""
 "%s\n"
 "The passphrase for this key was bad, please try again!\n"
@@ -890,10 +880,6 @@ msgstr ""
 
 #: ../libbalsa/libbalsa-gpgme-cb.c:375
 #, c-format
-#| msgid ""
-#| "Please enter the passphrase for the secret key!\n"
-#| "\n"
-#| "Key: %s"
 msgid ""
 "%s\n"
 "Please enter the passphrase for the secret key!\n"
@@ -1413,7 +1399,7 @@ msgid "LDAP Directory for %s"
 msgstr "Adresář LDAP pro %s"
 
 #: ../libbalsa/rfc2445.c:90 ../libbalsa/rfc2445.c:683
-#: ../libbalsa/rfc2445.c:702 ../libbalsa/rfc3156.c:709
+#: ../libbalsa/rfc2445.c:702 ../libbalsa/rfc3156.c:716
 msgid "unknown"
 msgstr "neznámý"
 
@@ -1477,119 +1463,116 @@ msgstr "volitelný účastník"
 msgid "non-participant, information only"
 msgstr "bez účastníka, pouze informace"
 
-#: ../libbalsa/rfc3156.c:620 ../libbalsa/rfc3156.c:627
+#: ../libbalsa/rfc3156.c:626 ../libbalsa/rfc3156.c:633
 msgid "decryption and signature verification failed"
 msgstr "dešifrování a ověřování podpisu selhalo"
 
-#: ../libbalsa/rfc3156.c:652
+#: ../libbalsa/rfc3156.c:659
 msgid "The signature is valid."
 msgstr "Podpis je platný."
 
-#: ../libbalsa/rfc3156.c:654
+#: ../libbalsa/rfc3156.c:661
 msgid "The signature is valid but expired."
 msgstr "Podpis je platný, ale vypršel."
 
-#: ../libbalsa/rfc3156.c:657
+#: ../libbalsa/rfc3156.c:664
 msgid ""
 "The signature is valid but the key used to verify the signature has expired."
 msgstr "Podpis je platný, ale klíč použitý k ověření podpisu vypršel."
 
-#: ../libbalsa/rfc3156.c:660
+#: ../libbalsa/rfc3156.c:667
 msgid ""
 "The signature is valid but the key used to verify the signature has been "
 "revoked."
 msgstr "Podpis je platný, ale klíč použitý k ověření podpisu byl odvolán."
 
-#: ../libbalsa/rfc3156.c:663
+#: ../libbalsa/rfc3156.c:670
 msgid "The signature is invalid."
 msgstr "Podpis není platný."
 
-#: ../libbalsa/rfc3156.c:666
+#: ../libbalsa/rfc3156.c:673
 msgid "The signature could not be verified due to a missing key."
 msgstr "Podpis nemohl být ověřen kvůli chybějícímu klíči."
 
-#: ../libbalsa/rfc3156.c:668
+#: ../libbalsa/rfc3156.c:675
 msgid "This part is not a real PGP signature."
 msgstr "Tato část není opravdový podpis PGP."
 
-#: ../libbalsa/rfc3156.c:671
+#: ../libbalsa/rfc3156.c:678
 msgid "The signature could not be verified due to an invalid crypto engine."
 msgstr "Podpis nemohl být ověřen kvůli neplatnému šifrovacímu engine."
 
-#: ../libbalsa/rfc3156.c:674 ../libbalsa/rfc3156.c:1037
+#: ../libbalsa/rfc3156.c:681 ../libbalsa/rfc3156.c:1044
 msgid "GnuPG is rebuilding the trust database and is currently unavailable."
 msgstr "GnuPG znovu sestavuje databázi důvěry a momentálně není k dispozici."
 
-#: ../libbalsa/rfc3156.c:677
+#: ../libbalsa/rfc3156.c:684
 msgid "An error prevented the signature verification."
 msgstr "Ověření podpisu zabránila chyba."
 
-#: ../libbalsa/rfc3156.c:687
+#: ../libbalsa/rfc3156.c:694
 msgid "The user ID is of unknown validity."
 msgstr "ID uživatele má neznámou platnost."
 
-#: ../libbalsa/rfc3156.c:689
+#: ../libbalsa/rfc3156.c:696
 msgid "The validity of the user ID is undefined."
 msgstr "Platnost ID uživatele je nedefinovaná."
 
-#: ../libbalsa/rfc3156.c:691
+#: ../libbalsa/rfc3156.c:698
 msgid "The user ID is never valid."
 msgstr "ID uživatele není nikdy platné."
 
-#: ../libbalsa/rfc3156.c:693
+#: ../libbalsa/rfc3156.c:700
 msgid "The user ID is marginally valid."
 msgstr "ID uživatele je okrajově platné."
 
-#: ../libbalsa/rfc3156.c:695
+#: ../libbalsa/rfc3156.c:702
 msgid "The user ID is fully valid."
 msgstr "ID uživatele je plně platné."
 
-#: ../libbalsa/rfc3156.c:697
+#: ../libbalsa/rfc3156.c:704
 msgid "The user ID is ultimately valid."
 msgstr "ID uživatele je dokonale platné."
 
-#: ../libbalsa/rfc3156.c:699 ../libbalsa/rfc3156.c:721
+#: ../libbalsa/rfc3156.c:706 ../libbalsa/rfc3156.c:728
 msgid "bad validity"
 msgstr "špatná platnost"
 
-#: ../libbalsa/rfc3156.c:711
+#: ../libbalsa/rfc3156.c:718
 msgid "undefined"
 msgstr "nedefinovaná"
 
-#: ../libbalsa/rfc3156.c:713 ../libbalsa/rfc3156.c:748
+#: ../libbalsa/rfc3156.c:720 ../libbalsa/rfc3156.c:755
 #: ../src/address-book-config.c:200
 msgid "never"
 msgstr "nikdy"
 
-#: ../libbalsa/rfc3156.c:715
+#: ../libbalsa/rfc3156.c:722
 msgid "marginal"
 msgstr "okrajová"
 
-#: ../libbalsa/rfc3156.c:717
+#: ../libbalsa/rfc3156.c:724
 msgid "full"
 msgstr "plná"
 
-#: ../libbalsa/rfc3156.c:719
+#: ../libbalsa/rfc3156.c:726
 msgid "ultimate"
 msgstr "dokonalá"
 
-#: ../libbalsa/rfc3156.c:731
+#: ../libbalsa/rfc3156.c:738
 msgid "PGP signature: "
 msgstr "Podpis PGP: "
 
-#: ../libbalsa/rfc3156.c:733
+#: ../libbalsa/rfc3156.c:740
 msgid "S/MIME signature: "
 msgstr "Podpis S/MIME: "
 
-#: ../libbalsa/rfc3156.c:735
+#: ../libbalsa/rfc3156.c:742
 msgid "(unknown protocol) "
 msgstr "(neznámý protokol) "
 
-#: ../libbalsa/rfc3156.c:765
+#: ../libbalsa/rfc3156.c:772
 #, c-format
-#| msgid ""
-#| "\n"
-#| "User ID validity: %s"
 msgid ""
 "\n"
 "Signature validity: %s"
@@ -1597,7 +1580,7 @@ msgstr ""
 "\n"
 "Platnost podpisu: %s"
 
-#: ../libbalsa/rfc3156.c:768
+#: ../libbalsa/rfc3156.c:775
 #, c-format
 msgid ""
 "\n"
@@ -1606,7 +1589,7 @@ msgstr ""
 "\n"
 "Podepsáno: %s"
 
-#: ../libbalsa/rfc3156.c:770
+#: ../libbalsa/rfc3156.c:777
 #, c-format
 msgid ""
 "\n"
@@ -1615,7 +1598,7 @@ msgstr ""
 "\n"
 "Důvěra vlastníkovi klíče: %s"
 
-#: ../libbalsa/rfc3156.c:774
+#: ../libbalsa/rfc3156.c:781
 #, c-format
 msgid ""
 "\n"
@@ -1624,10 +1607,7 @@ msgstr ""
 "\n"
 "Otisk klíče: %s"
 
-#: ../libbalsa/rfc3156.c:788
-#| msgid ""
-#| "\n"
-#| "User ID: %s"
+#: ../libbalsa/rfc3156.c:795
 msgid ""
 "\n"
 "User ID's:"
@@ -1635,8 +1615,7 @@ msgstr ""
 "\n"
 "ID uživatele:"
 
-#: ../libbalsa/rfc3156.c:791
-#| msgid "User ID"
+#: ../libbalsa/rfc3156.c:798
 msgid ""
 "\n"
 "User ID:"
@@ -1644,17 +1623,15 @@ msgstr ""
 "\n"
 "ID uživatele:"
 
-#: ../libbalsa/rfc3156.c:802
-#| msgid " revoked"
+#: ../libbalsa/rfc3156.c:809
 msgid " [Revoked]"
 msgstr " [odvolán]"
 
-#: ../libbalsa/rfc3156.c:804
-#| msgid " invalid"
+#: ../libbalsa/rfc3156.c:811
 msgid " [Invalid]"
 msgstr " [neplatný]"
 
-#: ../libbalsa/rfc3156.c:831
+#: ../libbalsa/rfc3156.c:838
 #, c-format
 msgid ""
 "\n"
@@ -1663,7 +1640,7 @@ msgstr ""
 "\n"
 "Podklíč vytvořen: %s"
 
-#: ../libbalsa/rfc3156.c:833
+#: ../libbalsa/rfc3156.c:840
 #, c-format
 msgid ""
 "\n"
@@ -1672,25 +1649,25 @@ msgstr ""
 "\n"
 "Podklíč vyprší: %s"
 
-#: ../libbalsa/rfc3156.c:842
+#: ../libbalsa/rfc3156.c:849
 msgid " revoked"
 msgstr " odvolán"
 
-#: ../libbalsa/rfc3156.c:847
+#: ../libbalsa/rfc3156.c:854
 msgid " expired"
 msgstr " vypršel"
 
-#: ../libbalsa/rfc3156.c:852
+#: ../libbalsa/rfc3156.c:859
 msgid " disabled"
 msgstr " zakázán"
 
-#: ../libbalsa/rfc3156.c:857
+#: ../libbalsa/rfc3156.c:864
 msgid " invalid"
 msgstr " neplatný"
 
 #. ngettext: string begins with a single space, so no space
 #. * after the colon is correct punctuation (in English).
-#: ../libbalsa/rfc3156.c:861
+#: ../libbalsa/rfc3156.c:868
 #, c-format
 msgid ""
 "\n"
@@ -1708,7 +1685,7 @@ msgstr[2] ""
 "\n"
 "Atributy podklíče:%s"
 
-#: ../libbalsa/rfc3156.c:873
+#: ../libbalsa/rfc3156.c:880
 #, c-format
 msgid ""
 "\n"
@@ -1717,7 +1694,7 @@ msgstr ""
 "\n"
 "Název vydavatele: %s"
 
-#: ../libbalsa/rfc3156.c:877
+#: ../libbalsa/rfc3156.c:884
 #, c-format
 msgid ""
 "\n"
@@ -1726,7 +1703,7 @@ msgstr ""
 "\n"
 "Sériové číslo vydavatele: %s"
 
-#: ../libbalsa/rfc3156.c:880
+#: ../libbalsa/rfc3156.c:887
 #, c-format
 msgid ""
 "\n"
@@ -1735,12 +1712,12 @@ msgstr ""
 "\n"
 "ID řetězce: %s"
 
-#: ../libbalsa/rfc3156.c:939
+#: ../libbalsa/rfc3156.c:946
 #, c-format
 msgid "Could not launch %s to query the public key %s."
 msgstr "Nelze spustit %s pro získání veřejného klíče %s."
 
-#: ../libbalsa/rfc3156.c:989
+#: ../libbalsa/rfc3156.c:996
 #, c-format
 msgid ""
 "Running %s failed with return value %d:\n"
@@ -1749,7 +1726,7 @@ msgstr ""
 "Spuštění %s selhalo s návratovou hodnotou %d:\n"
 "%s"
 
-#: ../libbalsa/rfc3156.c:996
+#: ../libbalsa/rfc3156.c:1003
 #, c-format
 msgid ""
 "Running %s successful:\n"
@@ -1758,7 +1735,7 @@ msgstr ""
 "Spuštění %s úspěšné:\n"
 "%s"
 
-#: ../libbalsa/rfc3156.c:1038
+#: ../libbalsa/rfc3156.c:1045
 msgid "Try again later."
 msgstr "Zkuste to později znovu."
 
@@ -2938,8 +2915,8 @@ msgstr ""
 msgid "PGP"
 msgstr "PGP"
 
-#: ../src/balsa-message.c:2944 ../src/balsa-mime-widget-crypto.c:74
-#: ../src/print-gtk.c:194
+#: ../src/balsa-message.c:2944 ../src/balsa-mime-widget-crypto.c:78
+#: ../src/print-gtk.c:201
 msgid "S/MIME"
 msgstr "S/MIME"
 
@@ -2992,33 +2969,33 @@ msgstr ""
 msgid "Please close the other instances of this message and try again."
 msgstr "Zavřete prosím ostatní instance této zprávy a zkuste to znovu."
 
-#: ../src/balsa-mime-widget.c:233 ../src/balsa-mime-widget-message.c:163
+#: ../src/balsa-mime-widget.c:237 ../src/balsa-mime-widget-message.c:163
 #: ../src/balsa-mime-widget-message.c:209
 #, c-format
 msgid "File name: %s"
 msgstr "Název souboru: %s"
 
-#: ../src/balsa-mime-widget.c:252
+#: ../src/balsa-mime-widget.c:256
 #, c-format
 msgid "Error reading message part: %s"
 msgstr "Chyba při čtení části zprávy: %s"
 
-#: ../src/balsa-mime-widget.c:276
+#: ../src/balsa-mime-widget.c:280
 #, c-format
 msgid "Type: %s (%s)"
 msgstr "Typ: %s (%s)"
 
-#: ../src/balsa-mime-widget.c:280
+#: ../src/balsa-mime-widget.c:284
 #, c-format
 msgid "Content Type: %s"
 msgstr "Typ obsahu: %s"
 
-#: ../src/balsa-mime-widget.c:293
+#: ../src/balsa-mime-widget.c:297
 msgid "No open or view action defined for this content type"
 msgstr ""
 "Pro tento typ obsahu není definovaná žádná akce pro otevření či zobrazení"
 
-#: ../src/balsa-mime-widget.c:298
+#: ../src/balsa-mime-widget.c:302
 msgid "S_ave part"
 msgstr "_Uložit část"
 
@@ -3046,7 +3023,7 @@ msgstr "Soubor již existuje. Přepsat?"
 msgid "Unlink %s: %s"
 msgstr "Smazat %s: %s"
 
-#: ../src/balsa-mime-widget-crypto.c:72
+#: ../src/balsa-mime-widget-crypto.c:76
 #, c-format
 msgid ""
 "This is an inline %s signed %s message part:\n"
@@ -3055,15 +3032,15 @@ msgstr ""
 "Toto je vnitřní část zprávy podepsaná %2$s pomocí %1$s:\n"
 "%3$s"
 
-#: ../src/balsa-mime-widget-crypto.c:74 ../src/print-gtk.c:194
+#: ../src/balsa-mime-widget-crypto.c:78 ../src/print-gtk.c:201
 msgid "OpenPGP"
 msgstr "OpenPGP"
 
-#: ../src/balsa-mime-widget-crypto.c:92
+#: ../src/balsa-mime-widget-crypto.c:96
 msgid "_Run GnuPG to import this key"
 msgstr "_Spusťte GnuPG pro import tohoto klíče"
 
-#: ../src/balsa-mime-widget-crypto.c:96
+#: ../src/balsa-mime-widget-crypto.c:100
 msgid "_Run GnuPG to check for an update of this key"
 msgstr "_Spusťte GnuPG pro získání aktualizace tohoto klíče"
 
@@ -5677,7 +5654,7 @@ msgstr "Rozložení"
 msgid "Sort and thread"
 msgstr "Řazení a vlákna"
 
-#: ../src/pref-manager.c:2191 ../src/print-gtk.c:493
+#: ../src/pref-manager.c:2191 ../src/print-gtk.c:501
 msgid "Message"
 msgstr "Zpráva"
 
@@ -5782,7 +5759,7 @@ msgstr "Okno úprav"
 msgid "Invalid or incomplete address label color"
 msgstr "Barva neplatné nebo nekompletní adresy"
 
-#: ../src/pref-manager.c:2483 ../src/print-gtk.c:502
+#: ../src/pref-manager.c:2483 ../src/print-gtk.c:510
 msgid "Fonts"
 msgstr "Písma"
 
@@ -6003,25 +5980,30 @@ msgstr "Zavřít okno se zprávou"
 msgid "Error displaying link_id %s: %s\n"
 msgstr "Chyba při zobrazování link_id %s: %s\n"
 
-#: ../src/print-gtk.c:91 ../src/print-gtk.c:242
+#: ../src/print-gtk.c:91 ../src/print-gtk.c:250
 #, c-format
 msgid "Page %d of %d"
 msgstr "Strana %d z %d"
 
-#: ../src/print-gtk.c:145 ../src/print-gtk.c:164
+#: ../src/print-gtk.c:145 ../src/print-gtk.c:171
 msgid "Signed and encrypted matter"
 msgstr "Podepsané a šifrované"
 
-#: ../src/print-gtk.c:149 ../src/print-gtk.c:168
+#: ../src/print-gtk.c:149 ../src/print-gtk.c:175
 msgid "Signed matter"
 msgstr "Podepsané"
 
-#: ../src/print-gtk.c:192
+#: ../src/print-gtk.c:156
+#| msgid "encrypted parts"
+msgid "Encrypted matter"
+msgstr "Zašifrované"
+
+#: ../src/print-gtk.c:199
 #, c-format
 msgid "This is an inline %s signed %s message part:"
-msgstr "Toto je vnitřní část zprávy podepsaná %2$s pomocí %1$s:"
+msgstr "Toto je vnitřní část zprávy %2$s podepsaná pomocí %1$s:"
 
-#: ../src/print-gtk.c:346
+#: ../src/print-gtk.c:354
 #, c-format
 msgid "Cannot print page %d because the document has only %d page."
 msgid_plural "Cannot print page %d because the document has only %d pages."
@@ -6035,63 +6017,63 @@ msgstr[2] "Nelze vytisknout stránku %d, protože dokument má jen %d stránek."
 #. * Do *not* translate it to "predefinito:mm", if it
 #. * it isn't default:mm or default:inch it will not work
 #.
-#: ../src/print-gtk.c:384
+#: ../src/print-gtk.c:392
 msgid "default:mm"
 msgstr "výchozí:mm"
 
-#: ../src/print-gtk.c:441
+#: ../src/print-gtk.c:449
 msgid "inch"
 msgstr "palec"
 
-#: ../src/print-gtk.c:448
+#: ../src/print-gtk.c:456
 msgid "mm"
 msgstr "mm"
 
-#: ../src/print-gtk.c:523
+#: ../src/print-gtk.c:531
 msgid "_Header Font:"
 msgstr "Písmo _hlavičky:"
 
-#: ../src/print-gtk.c:526
+#: ../src/print-gtk.c:534
 msgid "B_ody Font:"
 msgstr "Písm_o těla:"
 
-#: ../src/print-gtk.c:529
+#: ../src/print-gtk.c:537
 msgid "_Footer Font:"
 msgstr "Písmo _patičky:"
 
-#: ../src/print-gtk.c:536
+#: ../src/print-gtk.c:544
 msgid "Highlighting"
 msgstr "Zvýrazňování"
 
-#: ../src/print-gtk.c:551
+#: ../src/print-gtk.c:559
 msgid "Highlight _cited text"
 msgstr "Zvýraznit _citovaný text"
 
-#: ../src/print-gtk.c:560
+#: ../src/print-gtk.c:568
 msgid "Highlight _structured phrases"
 msgstr "Zvýraznit _strukturované fráze"
 
-#: ../src/print-gtk.c:571
+#: ../src/print-gtk.c:579
 msgid "Margins"
 msgstr "Okraje"
 
-#: ../src/print-gtk.c:593
+#: ../src/print-gtk.c:601
 msgid "_Top"
 msgstr "_Nahoře"
 
-#: ../src/print-gtk.c:599
+#: ../src/print-gtk.c:607
 msgid "_Bottom"
 msgstr "_Dole"
 
-#: ../src/print-gtk.c:611
+#: ../src/print-gtk.c:619
 msgid "_Left"
 msgstr "V_levo"
 
-#: ../src/print-gtk.c:617
+#: ../src/print-gtk.c:625
 msgid "_Right"
 msgstr "Vp_ravo"
 
-#: ../src/print-gtk.c:743
+#: ../src/print-gtk.c:751
 #, c-format
 msgid "Error printing message: %s"
 msgstr "Chyba při tisku zprávy: %s"

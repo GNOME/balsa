@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?product=balsa&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2011-12-14 10:04+0000\n"
-"PO-Revision-Date: 2011-12-17 18:07+0100\n"
+"POT-Creation-Date: 2011-12-25 06:44+0000\n"
+"PO-Revision-Date: 2011-12-26 17:45+0100\n"
 "Last-Translator: Matej Urbančič <mateju@svn.gnome.org>\n"
 "Language-Team: Slovenščina <gnome-si@googlegroups.com>\n"
 "Language: \n"
@@ -757,8 +757,8 @@ msgstr "ni mogoče dobiti podatkov iz pretoka"
 #: ../libbalsa/libbalsa-gpgme.c:269
 #: ../libbalsa/rfc3156.c:394
 #: ../libbalsa/rfc3156.c:399
-#: ../libbalsa/rfc3156.c:563
-#: ../libbalsa/rfc3156.c:569
+#: ../libbalsa/rfc3156.c:571
+#: ../libbalsa/rfc3156.c:577
 msgid "signature verification failed"
 msgstr "preverjanje podpisa je spodelelo"
 
@@ -786,8 +786,8 @@ msgid "encryption failed"
 msgstr "šifriranje je spodletelo"
 
 #: ../libbalsa/libbalsa-gpgme.c:592
-#: ../libbalsa/rfc3156.c:468
-#: ../libbalsa/rfc3156.c:473
+#: ../libbalsa/rfc3156.c:472
+#: ../libbalsa/rfc3156.c:477
 msgid "decryption failed"
 msgstr "dešifriranje je spodletelo"
 
@@ -1437,7 +1437,7 @@ msgstr "Mapa LDAP za %s"
 #: ../libbalsa/rfc2445.c:90
 #: ../libbalsa/rfc2445.c:683
 #: ../libbalsa/rfc2445.c:702
-#: ../libbalsa/rfc3156.c:709
+#: ../libbalsa/rfc3156.c:716
 msgid "unknown"
 msgstr "neznan"
 
@@ -1501,116 +1501,116 @@ msgstr "izbirni udeleženci"
 msgid "non-participant, information only"
 msgstr "ne-udeleženci, le podatki"
 
-#: ../libbalsa/rfc3156.c:620
-#: ../libbalsa/rfc3156.c:627
+#: ../libbalsa/rfc3156.c:626
+#: ../libbalsa/rfc3156.c:633
 msgid "decryption and signature verification failed"
 msgstr "dešifriranje in podpisovanje ni uspelo"
 
-#: ../libbalsa/rfc3156.c:652
+#: ../libbalsa/rfc3156.c:659
 msgid "The signature is valid."
 msgstr "Podpis je veljaven."
 
-#: ../libbalsa/rfc3156.c:654
+#: ../libbalsa/rfc3156.c:661
 msgid "The signature is valid but expired."
 msgstr "Podpis je veljaven, toda potekel."
 
-#: ../libbalsa/rfc3156.c:657
+#: ../libbalsa/rfc3156.c:664
 msgid "The signature is valid but the key used to verify the signature has expired."
 msgstr "Podpis je veljaven, toda ključ za preverjanje veljavnosti potekel."
 
-#: ../libbalsa/rfc3156.c:660
+#: ../libbalsa/rfc3156.c:667
 msgid "The signature is valid but the key used to verify the signature has been revoked."
 msgstr "Podpis je veljaven, vendar je bil ključ za preverjanje veljavnosti preklican."
 
-#: ../libbalsa/rfc3156.c:663
+#: ../libbalsa/rfc3156.c:670
 msgid "The signature is invalid."
 msgstr "Podpis je neveljaven."
 
-#: ../libbalsa/rfc3156.c:666
+#: ../libbalsa/rfc3156.c:673
 msgid "The signature could not be verified due to a missing key."
 msgstr "Podpisa ni mogoče preveriti zaradi manjkajočega ključa."
 
-#: ../libbalsa/rfc3156.c:668
+#: ../libbalsa/rfc3156.c:675
 msgid "This part is not a real PGP signature."
 msgstr "Ta del ni pravi podpis PGP."
 
-#: ../libbalsa/rfc3156.c:671
+#: ../libbalsa/rfc3156.c:678
 msgid "The signature could not be verified due to an invalid crypto engine."
 msgstr "Podpisa ni mogoče preveriti zaradi neveljavnega šifrirnega programnika."
 
-#: ../libbalsa/rfc3156.c:674
-#: ../libbalsa/rfc3156.c:1037
+#: ../libbalsa/rfc3156.c:681
+#: ../libbalsa/rfc3156.c:1044
 msgid "GnuPG is rebuilding the trust database and is currently unavailable."
 msgstr "GnuPG ponovno izgrajuje zbirko podatkov in je trenutno nedostopen."
 
-#: ../libbalsa/rfc3156.c:677
+#: ../libbalsa/rfc3156.c:684
 msgid "An error prevented the signature verification."
 msgstr "Napaka je preprečila preverjanje podpisa."
 
-#: ../libbalsa/rfc3156.c:687
+#: ../libbalsa/rfc3156.c:694
 msgid "The user ID is of unknown validity."
 msgstr "Veljavnost uporabnikovega ID ni znana."
 
-#: ../libbalsa/rfc3156.c:689
+#: ../libbalsa/rfc3156.c:696
 msgid "The validity of the user ID is undefined."
 msgstr "Veljavnost uporabnikovega ID je nedoločena."
 
-#: ../libbalsa/rfc3156.c:691
+#: ../libbalsa/rfc3156.c:698
 msgid "The user ID is never valid."
 msgstr "Uporabniški ID ni nikoli veljaven."
 
-#: ../libbalsa/rfc3156.c:693
+#: ../libbalsa/rfc3156.c:700
 msgid "The user ID is marginally valid."
 msgstr "Uporabniški ID je delno veljaven."
 
-#: ../libbalsa/rfc3156.c:695
+#: ../libbalsa/rfc3156.c:702
 msgid "The user ID is fully valid."
 msgstr "Uporabniški ID je polno veljaven."
 
-#: ../libbalsa/rfc3156.c:697
+#: ../libbalsa/rfc3156.c:704
 msgid "The user ID is ultimately valid."
 msgstr "Uporabniški ID je popolno veljaven."
 
-#: ../libbalsa/rfc3156.c:699
-#: ../libbalsa/rfc3156.c:721
+#: ../libbalsa/rfc3156.c:706
+#: ../libbalsa/rfc3156.c:728
 msgid "bad validity"
 msgstr "slaba veljavnost"
 
-#: ../libbalsa/rfc3156.c:711
+#: ../libbalsa/rfc3156.c:718
 msgid "undefined"
 msgstr "nedoločeno"
 
-#: ../libbalsa/rfc3156.c:713
-#: ../libbalsa/rfc3156.c:748
+#: ../libbalsa/rfc3156.c:720
+#: ../libbalsa/rfc3156.c:755
 #: ../src/address-book-config.c:200
 msgid "never"
 msgstr "nikoli"
 
-#: ../libbalsa/rfc3156.c:715
+#: ../libbalsa/rfc3156.c:722
 msgid "marginal"
 msgstr "delno"
 
-#: ../libbalsa/rfc3156.c:717
+#: ../libbalsa/rfc3156.c:724
 msgid "full"
 msgstr "polno"
 
-#: ../libbalsa/rfc3156.c:719
+#: ../libbalsa/rfc3156.c:726
 msgid "ultimate"
 msgstr "popolno"
 
-#: ../libbalsa/rfc3156.c:731
+#: ../libbalsa/rfc3156.c:738
 msgid "PGP signature: "
 msgstr "Podpis PGP: "
 
-#: ../libbalsa/rfc3156.c:733
+#: ../libbalsa/rfc3156.c:740
 msgid "S/MIME signature: "
 msgstr "Podpis S/MIME: "
 
-#: ../libbalsa/rfc3156.c:735
+#: ../libbalsa/rfc3156.c:742
 msgid "(unknown protocol) "
 msgstr "(neznan protokol)"
 
-#: ../libbalsa/rfc3156.c:765
+#: ../libbalsa/rfc3156.c:772
 #, c-format
 msgid ""
 "\n"
@@ -1619,7 +1619,7 @@ msgstr ""
 "\n"
 "Veljavnost podpisa: %s"
 
-#: ../libbalsa/rfc3156.c:768
+#: ../libbalsa/rfc3156.c:775
 #, c-format
 msgid ""
 "\n"
@@ -1628,7 +1628,7 @@ msgstr ""
 "\n"
 "Podpisano ob: %s"
 
-#: ../libbalsa/rfc3156.c:770
+#: ../libbalsa/rfc3156.c:777
 #, c-format
 msgid ""
 "\n"
@@ -1637,7 +1637,7 @@ msgstr ""
 "\n"
 "Zaupanje lastniku ključa: %s"
 
-#: ../libbalsa/rfc3156.c:774
+#: ../libbalsa/rfc3156.c:781
 #, c-format
 msgid ""
 "\n"
@@ -1646,7 +1646,7 @@ msgstr ""
 "\n"
 "Prstni odtis ključa: %s"
 
-#: ../libbalsa/rfc3156.c:788
+#: ../libbalsa/rfc3156.c:795
 msgid ""
 "\n"
 "User ID's:"
@@ -1654,7 +1654,7 @@ msgstr ""
 "\n"
 "ID vrednosti uporabnika:"
 
-#: ../libbalsa/rfc3156.c:791
+#: ../libbalsa/rfc3156.c:798
 msgid ""
 "\n"
 "User ID:"
@@ -1662,15 +1662,15 @@ msgstr ""
 "\n"
 "ID uporabnika:"
 
-#: ../libbalsa/rfc3156.c:802
+#: ../libbalsa/rfc3156.c:809
 msgid " [Revoked]"
 msgstr "[Preklicano]"
 
-#: ../libbalsa/rfc3156.c:804
+#: ../libbalsa/rfc3156.c:811
 msgid " [Invalid]"
 msgstr "[Neveljavno]"
 
-#: ../libbalsa/rfc3156.c:831
+#: ../libbalsa/rfc3156.c:838
 #, c-format
 msgid ""
 "\n"
@@ -1679,7 +1679,7 @@ msgstr ""
 "\n"
 "Podključ je bil ustvarjen ob: %s"
 
-#: ../libbalsa/rfc3156.c:833
+#: ../libbalsa/rfc3156.c:840
 #, c-format
 msgid ""
 "\n"
@@ -1688,25 +1688,25 @@ msgstr ""
 "\n"
 "Podključ poteče ob: %s"
 
-#: ../libbalsa/rfc3156.c:842
+#: ../libbalsa/rfc3156.c:849
 msgid " revoked"
 msgstr " preklicano"
 
-#: ../libbalsa/rfc3156.c:847
+#: ../libbalsa/rfc3156.c:854
 msgid " expired"
 msgstr " pretečeno"
 
-#: ../libbalsa/rfc3156.c:852
+#: ../libbalsa/rfc3156.c:859
 msgid " disabled"
 msgstr " onemogočeno"
 
-#: ../libbalsa/rfc3156.c:857
+#: ../libbalsa/rfc3156.c:864
 msgid " invalid"
 msgstr " neveljavno"
 
 #. ngettext: string begins with a single space, so no space
 #. * after the colon is correct punctuation (in English).
-#: ../libbalsa/rfc3156.c:861
+#: ../libbalsa/rfc3156.c:868
 #, c-format
 msgid ""
 "\n"
@@ -1727,7 +1727,7 @@ msgstr[3] ""
 "\n"
 "Atributi podključa:%s"
 
-#: ../libbalsa/rfc3156.c:873
+#: ../libbalsa/rfc3156.c:880
 #, c-format
 msgid ""
 "\n"
@@ -1736,7 +1736,7 @@ msgstr ""
 "\n"
 "Ime izdajatelja: %s"
 
-#: ../libbalsa/rfc3156.c:877
+#: ../libbalsa/rfc3156.c:884
 #, c-format
 msgid ""
 "\n"
@@ -1745,7 +1745,7 @@ msgstr ""
 "\n"
 "Zaporedna številka izdajatelja: %s"
 
-#: ../libbalsa/rfc3156.c:880
+#: ../libbalsa/rfc3156.c:887
 #, c-format
 msgid ""
 "\n"
@@ -1754,12 +1754,12 @@ msgstr ""
 "\n"
 "ID verige: %s"
 
-#: ../libbalsa/rfc3156.c:939
+#: ../libbalsa/rfc3156.c:946
 #, c-format
 msgid "Could not launch %s to query the public key %s."
 msgstr "Ni mogoče zagnati %s za poizvedbo javnega ključa %s."
 
-#: ../libbalsa/rfc3156.c:989
+#: ../libbalsa/rfc3156.c:996
 #, c-format
 msgid ""
 "Running %s failed with return value %d:\n"
@@ -1768,7 +1768,7 @@ msgstr ""
 "Zaganjanje %s je spodletelo z vrednostjo %d:\n"
 "%s"
 
-#: ../libbalsa/rfc3156.c:996
+#: ../libbalsa/rfc3156.c:1003
 #, c-format
 msgid ""
 "Running %s successful:\n"
@@ -1777,7 +1777,7 @@ msgstr ""
 "Zaganjanje %s je bilo uspešno:\n"
 "%s"
 
-#: ../libbalsa/rfc3156.c:1038
+#: ../libbalsa/rfc3156.c:1045
 msgid "Try again later."
 msgstr "Poskusite znova kasneje."
 
@@ -2974,8 +2974,8 @@ msgid "PGP"
 msgstr "PGP"
 
 #: ../src/balsa-message.c:2944
-#: ../src/balsa-mime-widget-crypto.c:74
-#: ../src/print-gtk.c:194
+#: ../src/balsa-mime-widget-crypto.c:78
+#: ../src/print-gtk.c:201
 msgid "S/MIME"
 msgstr "S/MIME"
 
@@ -3020,33 +3020,33 @@ msgstr "Ni mogoče preveriti podpisa in odstraniti oklepa OpenPGP, ker je to spo
 msgid "Please close the other instances of this message and try again."
 msgstr "Zaprite druge odprte primerke tega sporočila in poskusite znova."
 
-#: ../src/balsa-mime-widget.c:233
+#: ../src/balsa-mime-widget.c:237
 #: ../src/balsa-mime-widget-message.c:163
 #: ../src/balsa-mime-widget-message.c:209
 #, c-format
 msgid "File name: %s"
 msgstr "Ime datoteke: %s"
 
-#: ../src/balsa-mime-widget.c:252
+#: ../src/balsa-mime-widget.c:256
 #, c-format
 msgid "Error reading message part: %s"
 msgstr "Napaka med branjem dela sporočila: %s"
 
-#: ../src/balsa-mime-widget.c:276
+#: ../src/balsa-mime-widget.c:280
 #, c-format
 msgid "Type: %s (%s)"
 msgstr "Vrsta: %s (%s)"
 
-#: ../src/balsa-mime-widget.c:280
+#: ../src/balsa-mime-widget.c:284
 #, c-format
 msgid "Content Type: %s"
 msgstr "Vrsta vsebine: %s"
 
-#: ../src/balsa-mime-widget.c:293
+#: ../src/balsa-mime-widget.c:297
 msgid "No open or view action defined for this content type"
 msgstr "Za to vrsto vsebine ni določeno dejanje odpiranja ali ogleda"
 
-#: ../src/balsa-mime-widget.c:298
+#: ../src/balsa-mime-widget.c:302
 msgid "S_ave part"
 msgstr "_Shrani del"
 
@@ -3075,7 +3075,7 @@ msgstr "Datoteka že obstaja. Ali naj bo prepisana?"
 msgid "Unlink %s: %s"
 msgstr "Razveži %s: %s"
 
-#: ../src/balsa-mime-widget-crypto.c:72
+#: ../src/balsa-mime-widget-crypto.c:76
 #, c-format
 msgid ""
 "This is an inline %s signed %s message part:\n"
@@ -3084,16 +3084,16 @@ msgstr ""
 "Medvrstični %s podpisan %s del besedila:\n"
 "%s"
 
-#: ../src/balsa-mime-widget-crypto.c:74
-#: ../src/print-gtk.c:194
+#: ../src/balsa-mime-widget-crypto.c:78
+#: ../src/print-gtk.c:201
 msgid "OpenPGP"
 msgstr "OpenPGP"
 
-#: ../src/balsa-mime-widget-crypto.c:92
+#: ../src/balsa-mime-widget-crypto.c:96
 msgid "_Run GnuPG to import this key"
 msgstr "_Zaženi GnuPG za uvoz tega ključa"
 
-#: ../src/balsa-mime-widget-crypto.c:96
+#: ../src/balsa-mime-widget-crypto.c:100
 msgid "_Run GnuPG to check for an update of this key"
 msgstr "_Zaženi GnuPG za preverjanje, če obstaja posodobitev tega ključa"
 
@@ -5783,7 +5783,7 @@ msgid "Sort and thread"
 msgstr "Razvrsti in ustvari niten seznam"
 
 #: ../src/pref-manager.c:2191
-#: ../src/print-gtk.c:493
+#: ../src/print-gtk.c:501
 msgid "Message"
 msgstr "Sporočilo"
 
@@ -5891,7 +5891,7 @@ msgid "Invalid or incomplete address label color"
 msgstr "Neveljavna ali nepopolna barva oznake naslova"
 
 #: ../src/pref-manager.c:2483
-#: ../src/print-gtk.c:502
+#: ../src/print-gtk.c:510
 msgid "Fonts"
 msgstr "Pisave"
 
@@ -6103,27 +6103,31 @@ msgid "Error displaying link_id %s: %s\n"
 msgstr "Napaka med prikazom link_id %s: %s\n"
 
 #: ../src/print-gtk.c:91
-#: ../src/print-gtk.c:242
+#: ../src/print-gtk.c:250
 #, c-format
 msgid "Page %d of %d"
 msgstr "Stran %d od %d"
 
 #: ../src/print-gtk.c:145
-#: ../src/print-gtk.c:164
+#: ../src/print-gtk.c:171
 msgid "Signed and encrypted matter"
 msgstr "Šifrirana in podpisana zadeva"
 
 #: ../src/print-gtk.c:149
-#: ../src/print-gtk.c:168
+#: ../src/print-gtk.c:175
 msgid "Signed matter"
 msgstr "Podpisana zadeva"
 
-#: ../src/print-gtk.c:192
+#: ../src/print-gtk.c:156
+msgid "Encrypted matter"
+msgstr "Šifrirana zadeva"
+
+#: ../src/print-gtk.c:199
 #, c-format
 msgid "This is an inline %s signed %s message part:"
 msgstr "Medvrstični %s podpisani %s del besedila:"
 
-#: ../src/print-gtk.c:346
+#: ../src/print-gtk.c:354
 #, c-format
 msgid "Cannot print page %d because the document has only %d page."
 msgid_plural "Cannot print page %d because the document has only %d pages."
@@ -6138,63 +6142,63 @@ msgstr[3] "Strani %d ni mogoče natisniti, ker ima dokument samo %d strani."
 #. * Do *not* translate it to "predefinito:mm", if it
 #. * it isn't default:mm or default:inch it will not work
 #.
-#: ../src/print-gtk.c:384
+#: ../src/print-gtk.c:392
 msgid "default:mm"
 msgstr "privzeto:mm"
 
-#: ../src/print-gtk.c:441
+#: ../src/print-gtk.c:449
 msgid "inch"
 msgstr "palec"
 
-#: ../src/print-gtk.c:448
+#: ../src/print-gtk.c:456
 msgid "mm"
 msgstr "mm"
 
-#: ../src/print-gtk.c:523
+#: ../src/print-gtk.c:531
 msgid "_Header Font:"
 msgstr "Pisava _glave:"
 
-#: ../src/print-gtk.c:526
+#: ../src/print-gtk.c:534
 msgid "B_ody Font:"
 msgstr "Pisava _telesa:"
 
-#: ../src/print-gtk.c:529
+#: ../src/print-gtk.c:537
 msgid "_Footer Font:"
 msgstr "Pisava _noge:"
 
-#: ../src/print-gtk.c:536
+#: ../src/print-gtk.c:544
 msgid "Highlighting"
 msgstr "Poudarjanje"
 
-#: ../src/print-gtk.c:551
+#: ../src/print-gtk.c:559
 msgid "Highlight _cited text"
 msgstr "Poudari _navedeno besedilo"
 
-#: ../src/print-gtk.c:560
+#: ../src/print-gtk.c:568
 msgid "Highlight _structured phrases"
 msgstr "Poudari _oblikovana rekla"
 
-#: ../src/print-gtk.c:571
+#: ../src/print-gtk.c:579
 msgid "Margins"
 msgstr "Robovi"
 
-#: ../src/print-gtk.c:593
+#: ../src/print-gtk.c:601
 msgid "_Top"
 msgstr "_Zgoraj"
 
-#: ../src/print-gtk.c:599
+#: ../src/print-gtk.c:607
 msgid "_Bottom"
 msgstr "_Spodaj"
 
-#: ../src/print-gtk.c:611
+#: ../src/print-gtk.c:619
 msgid "_Left"
 msgstr "_Levo"
 
-#: ../src/print-gtk.c:617
+#: ../src/print-gtk.c:625
 msgid "_Right"
 msgstr "_Desno"
 
-#: ../src/print-gtk.c:743
+#: ../src/print-gtk.c:751
 #, c-format
 msgid "Error printing message: %s"
 msgstr "Napaka med tiskanjem sporočila: %s"

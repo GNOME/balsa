@@ -1,3 +1,7 @@
+2012-02-03  Peter Bloomfield
+
+	* configure.in: remove obsolete BUILD_WITH_GNOME.
+
 2011-12-20  Peter Bloomfield
 
 	* configure.in: use git tag to set version.

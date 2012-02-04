@@ -283,7 +283,6 @@ if test x$with_gnome != xno; then
 else
    gnome_extras=""
 fi
-AM_CONDITIONAL([BUILD_WITH_GNOME], [test $with_gnome = "yes"])
 
 # GMime configuration
 #

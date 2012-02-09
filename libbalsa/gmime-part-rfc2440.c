@@ -259,7 +259,7 @@ g_mime_part_rfc2440_verify(GMimePart * part, GError ** err)
 			      TRUE, err);
 
     /* upon success, replace the signed content by the checked one */
-    if (result) {
+    if (result && g_mime_stream_length(plainstream) > 0) {
 	GMimeDataWrapper *wrapper = g_mime_data_wrapper_new();
 
 	g_mime_data_wrapper_set_stream(wrapper, plainstream);

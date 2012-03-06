@@ -118,7 +118,9 @@ lb_gpgme_passphrase(void *hook, const gchar * uid_hint,
 	passwd = apd.res;
     }
 #else
-    passwd = get_passphrase_real(context, uid_hint, prev_was_bad);
+    passwd =
+        get_passphrase_real(uid_hint, passphrase_info, prev_was_bad,
+                            parent);
 #endif				/* BALSA_USE_THREADS */
 
     if (!passwd) {

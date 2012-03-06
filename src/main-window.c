@@ -2996,7 +2996,8 @@ check_new_messages_real(BalsaWindow * window, int type)
     g_slist_free(list);
 
 #if defined(HAVE_LIBNM_GLIB)
-    time(&window->last_check_time);
+    if (window->nm_state == NM_STATE_CONNECTED)
+        time(&window->last_check_time);
 #endif                          /* defined(HAVE_LIBNM_GLIB) */
 #endif
 }
@@ -3169,7 +3170,8 @@ bw_check_messages_thread(struct check_messages_thread_info *info)
         gdk_threads_enter();
         bw_set_sensitive(info->window, "GetNewMail", TRUE);
 #if defined(HAVE_LIBNM_GLIB)
-        time(&info->window->last_check_time);
+        if (info->window->nm_state == NM_STATE_CONNECTED)
+            time(&info->window->last_check_time);
 #endif                          /* defined(HAVE_LIBNM_GLIB) */
         g_object_unref(info->window);
         gdk_threads_leave();

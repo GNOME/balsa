@@ -1,5 +1,9 @@
 2012-03-06  Peter Bloomfield
 
+	* src/main-window.c: update last-check-time only if connected.
+
+2012-03-06  Peter Bloomfield
+
 	* src/main-window.c: check local mailboxes even when network is
 	not connected.
 

@@ -1,17 +1,16 @@
 # Romanian translation of Balsa
-# Copyright (C) 2000 - 2012 Free Software Foundation, Inc.
+# Copyright (C) 2000-2012 Free Software Foundation, Inc.
 # Dan Damian <dand@gnome.ro>, 2001.
-# Mișu Moldovan <dumol@gnome.org>, 2000 - 2005, 2012.
+# Mișu Moldovan <dumol@gnome.org>, 2000-2005, 2012.
 # Spoiala Marian <spoiala.marian@yahoo.com>, 2011.
-# Florentina Musat  <kuchiki14@yahoo.com >, 2011.
+# Florentina Musat <kuchiki14@yahoo.com >, 2011.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Balsa 2.4.11\n"
-"Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?product=balsa&"
-"keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2012-02-09 03:25+0000\n"
-"PO-Revision-Date: 2012-02-17 13:30+0200\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-03-06 21:23+0200\n"
+"PO-Revision-Date: 2012-03-06 21:23+0200\n"
 "Last-Translator: Mișu Moldovan <dumol@gnome.org>\n"
 "Language-Team: Romanian <gnomero-list@lists.sourceforge.net>\n"
 "Language: ro\n"
@@ -231,18 +230,15 @@ msgid "Subject"
 msgstr "Subiect"
 
 #: ../libbalsa/filter-funcs.c:386
-#| msgid "Cc:"
 msgid "Cc"
 msgstr "Alții"
 
 #: ../libbalsa/filter-funcs.c:387
-#| msgid "_Body"
 msgid "Body"
 msgstr "Corp"
 
 #: ../libbalsa/filter-funcs.c:392
 #, c-format
-#| msgid "_Headers"
 msgid "Header:%s"
 msgstr "Antet:%s"
 
@@ -252,7 +248,6 @@ msgid ",%s"
 msgstr ",%s"
 
 #: ../libbalsa/filter-funcs.c:414
-#| msgid "_New"
 msgid "New"
 msgstr "Nou"
 
@@ -269,7 +264,6 @@ msgid "Flagged"
 msgstr "Important"
 
 #: ../libbalsa/filter-funcs.c:441
-#| msgid "Not found"
 msgid "Not "
 msgstr "Nu "
 
@@ -282,7 +276,6 @@ msgid "To %Y-%m-%d"
 msgstr "La %Y-%m-%d"
 
 #: ../libbalsa/filter-funcs.c:471
-#| msgid "End"
 msgid "And"
 msgstr "Și"
 
@@ -302,9 +295,6 @@ msgstr ""
 
 #: ../libbalsa/gmime-multipart-crypt.c:251
 #, c-format
-#| msgid ""
-#| "\n"
-#| "Disable support for protocol %s."
 msgid "unsupported protocol '%s'"
 msgstr "nu există suport pentru protocolul „%s”"
 
@@ -319,14 +309,13 @@ msgstr ""
 #: ../libbalsa/gmime-multipart-crypt.c:487
 #, c-format
 msgid ""
-"Cannot decrypt multipart/encrypted part: unsupported encryption protocol '%"
-"s'."
+"Cannot decrypt multipart/encrypted part: unsupported encryption protocol "
+"'%s'."
 msgstr ""
 "Nu s-a putut decripta partea multipart/encrypted: nu există suport pentru "
 "protocolul „%s”."
 
 #: ../libbalsa/gmime-multipart-crypt.c:488
-#| msgid "(No name)"
 msgid "(none)"
 msgstr "(nimic)"
 
@@ -780,7 +769,6 @@ msgstr "nu s-a putut crea contextul"
 
 #: ../libbalsa/libbalsa-gpgme.c:697
 #, c-format
-#| msgid "Could not get part: %s"
 msgid "could not set protocol '%s'"
 msgstr "nu s-a putut impune protocolul „%s”"
 
@@ -850,7 +838,7 @@ msgstr "Selectați cheia"
 #: ../libbalsa/libbalsa-gpgme-cb.c:175
 #, c-format
 msgid "Select the private key for the signer %s"
-msgstr "Alegeți o cheie privată pentru semnatarul %s"
+msgstr "Selectați cheia privată pentru semnatarul %s"
 
 #: ../libbalsa/libbalsa-gpgme-cb.c:179
 #, c-format
@@ -869,20 +857,15 @@ msgstr "Validitatea cheii cu ID utilizator „%s” este „%s”."
 
 #: ../libbalsa/libbalsa-gpgme-cb.c:317
 msgid "Use this key anyway?"
-msgstr "Să fie utilizată cheia în aceste condiții?"
+msgstr "Utilizați cheia în aceste condiții?"
 
 #. FIXME: create dialog according to the Gnome HIG
 #: ../libbalsa/libbalsa-gpgme-cb.c:343
-#| msgid "_Pass Phrase:"
 msgid "Enter Passphrase"
 msgstr "Introduceți fraza-parolă"
 
 #: ../libbalsa/libbalsa-gpgme-cb.c:370
 #, c-format
-#| msgid ""
-#| "The passphrase for this key was bad, please try again!\n"
-#| "\n"
-#| "Key: %s"
 msgid ""
 "%s\n"
 "The passphrase for this key was bad, please try again!\n"
@@ -896,10 +879,6 @@ msgstr ""
 
 #: ../libbalsa/libbalsa-gpgme-cb.c:375
 #, c-format
-#| msgid ""
-#| "Please enter the passphrase for the secret key!\n"
-#| "\n"
-#| "Key: %s"
 msgid ""
 "%s\n"
 "Please enter the passphrase for the secret key!\n"
@@ -1076,7 +1055,7 @@ msgstr "Sortarea discuțiilor nu e suportată de server."
 #: ../libbalsa/mailbox_local.c:540
 #, c-format
 msgid "Failed to save cache file \"%s\": %s."
-msgstr "A eșuat salvarea fișierul cache „%s”: %s."
+msgstr "Salvarea fișierului cache „%s” a eșuat: %s."
 
 #: ../libbalsa/mailbox_local.c:572
 #, c-format
@@ -1086,7 +1065,7 @@ msgstr "Va fi creat fișierul cache pentru căsuța de mail %s"
 #: ../libbalsa/mailbox_local.c:581
 #, c-format
 msgid "Failed to read cache file %s: %s"
-msgstr "A eșuat citirea fișierului cache %s: %s"
+msgstr "Citirea fișierului cache %s a eșuat: %s"
 
 #: ../libbalsa/mailbox_local.c:599 ../libbalsa/mailbox_local.c:616
 #: ../libbalsa/mailbox_local.c:640
@@ -1174,14 +1153,14 @@ msgstr "Nu s-a putut scrie fișierul %s: %s"
 #: ../libbalsa/mailbox_mbox.c:441
 #, c-format
 msgid "Failed to create temporary file \"%s\": %s"
-msgstr "A eșuat crearea fișierului temporar „%s”: %s"
+msgstr "Crearea fișierului temporar „%s” a eșuat: %s"
 
 #: ../libbalsa/mailbox_mbox.c:453
 #, c-format
 msgid "Failed to save cache file \"%s\": %s.  New version saved as \"%s\""
 msgstr ""
-"A eșuat salvarea fișierului cache „%s”: %s.  Noua versiune este salvată ca „"
-"%s”"
+"Salvarea fișierului cache „%s” a eșuat: %s. Noua versiune este salvată ca "
+"„%s”"
 
 #: ../libbalsa/mailbox_mbox.c:461
 #, c-format
@@ -1396,7 +1375,7 @@ msgstr "Nu se poate deschide %s: e o legătură simbolică"
 
 #: ../libbalsa/misc.c:967
 msgid "Timeout exceeded while attempting fcntl lock!"
-msgstr "Timeout depășit încercând fcntl lock!"
+msgstr "Time-out depășit încercând fcntl lock!"
 
 #: ../libbalsa/misc.c:974
 #, c-format
@@ -1405,7 +1384,7 @@ msgstr "Se așteaptă terminarea fntcl lock... %d"
 
 #: ../libbalsa/misc.c:1002
 msgid "Timeout exceeded while attempting flock lock!"
-msgstr "Timeout depășit încercând flock lock!"
+msgstr "Time-out depășit încercând flock lock!"
 
 #: ../libbalsa/misc.c:1009
 #, c-format
@@ -1492,26 +1471,22 @@ msgstr "Semnătura este validă."
 
 #: ../libbalsa/rfc3156.c:661
 msgid "The signature is valid but expired."
-msgstr "Această semnătură este validă, dar a expirat."
+msgstr "Semnătura este validă, dar a expirat."
 
 #: ../libbalsa/rfc3156.c:664
 msgid ""
 "The signature is valid but the key used to verify the signature has expired."
-msgstr ""
-"Această semnătură este validă, dar cheia de verificare a semnăturii a "
-"expirat."
+msgstr "Semnătura este validă, dar cheia sa verificare a expirat."
 
 #: ../libbalsa/rfc3156.c:667
 msgid ""
 "The signature is valid but the key used to verify the signature has been "
 "revoked."
-msgstr ""
-"Această semnătură este validă, dar cheia de verificare a semnăturii a fost "
-"revocată."
+msgstr "Semnătura este validă, dar cheia sa de verificare a fost revocată."
 
 #: ../libbalsa/rfc3156.c:670
 msgid "The signature is invalid."
-msgstr "Această semnătură este invalidă."
+msgstr "Semnătura este invalidă."
 
 #: ../libbalsa/rfc3156.c:673
 msgid "The signature could not be verified due to a missing key."
@@ -1598,9 +1573,6 @@ msgstr "(protocol necunoscut)"
 
 #: ../libbalsa/rfc3156.c:772
 #, c-format
-#| msgid ""
-#| "\n"
-#| "User ID validity: %s"
 msgid ""
 "\n"
 "Signature validity: %s"
@@ -1636,9 +1608,6 @@ msgstr ""
 "Amprenta cheii: %s"
 
 #: ../libbalsa/rfc3156.c:795
-#| msgid ""
-#| "\n"
-#| "User ID: %s"
 msgid ""
 "\n"
 "User ID's:"
@@ -1647,7 +1616,6 @@ msgstr ""
 "ID-ul utilizatorului:"
 
 #: ../libbalsa/rfc3156.c:798
-#| msgid "User ID"
 msgid ""
 "\n"
 "User ID:"
@@ -1656,12 +1624,10 @@ msgstr ""
 "ID utilizator:"
 
 #: ../libbalsa/rfc3156.c:809
-#| msgid " revoked"
 msgid " [Revoked]"
 msgstr " [Revocată]"
 
 #: ../libbalsa/rfc3156.c:811
-#| msgid " invalid"
 msgid " [Invalid]"
 msgstr " [Invalidă]"
 
@@ -1681,7 +1647,7 @@ msgid ""
 "Subkey expires on: %s"
 msgstr ""
 "\n"
-"Cheia secundară expiră în: %s"
+"Cheia secundară expiră la: %s"
 
 #: ../libbalsa/rfc3156.c:849
 msgid " revoked"
@@ -2141,7 +2107,7 @@ msgid ""
 "Please verify the locations of your default mail files.\n"
 "These will be created if necessary."
 msgstr ""
-"Verificați locațiile  căsuțelor de mail implicite.\n"
+"Verificați locațiile căsuțelor de mail implicite.\n"
 "Dacă nu există, ele vor fi create."
 
 #: ../libinit_balsa/assistant_page_directory.c:266
@@ -2187,7 +2153,7 @@ msgid ""
 msgstr ""
 "De la furnizorul de Internet sau al contului de mail ar trebui să aveți "
 "următoarele detalii (dacă aveți un administrator de rețea, ar trebui să vă "
-"ofere aceste informații:"
+"ofere aceste informații):"
 
 #: ../libinit_balsa/assistant_page_user.c:70
 msgid "Yes, remember it"
@@ -2867,7 +2833,7 @@ msgstr ""
 
 #: ../src/balsa-message.c:2593
 msgid "Reply to MDN?"
-msgstr "Dați curs cererii notificare?"
+msgstr "Dați curs cererii de notificare?"
 
 #: ../src/balsa-message.c:2804
 msgid ""
@@ -3999,7 +3965,8 @@ msgstr ""
 msgid ""
 "This will remove the folder \"%s\" from the list.\n"
 "You may use \"New IMAP Folder\" later to add this folder again.\n"
-msgstr "Sunteți pe cale să ștergeți dosarul „%s” din listă.\n"
+msgstr ""
+"Sunteți pe cale să ștergeți dosarul „%s” din listă.\n"
 " Utilizați „Nou dosar IMAP...” pentru a-l readăuga.\n"
 
 #: ../src/folder-conf.c:1006
@@ -4062,9 +4029,10 @@ msgid ""
 "What would you like to do?"
 msgstr ""
 "Sunteți pe cale să ștergeți căsuța de mail „%s” din lista căsuțelor cu mail. "
-"Puteți de asemenea să ștergeți fișierul de pe disc asociat cu această "
-"căsuță de mail. Dacă nu ștergeți acest fișier de pe disc veți putea folosi "
-"„Adaugă căsuță de mail” pentru a o accesa din nou.\n\n"
+"Puteți de asemenea să ștergeți fișierul de pe disc asociat cu această căsuță "
+"de mail. Dacă nu ștergeți acest fișier de pe disc veți putea folosi „Adaugă "
+"căsuță de mail” pentru a o accesa din nou.\n"
+"\n"
 "Sigur doriți să ștergeți această căsuță?"
 
 #: ../src/mailbox-conf.c:426
@@ -4087,7 +4055,8 @@ msgstr ""
 "Sunteți pe cale să ștergeți căsuța „%s” și toate mesajele sale de pe "
 "serverul IMAP. Dacă „%s” are dosare secundare va apărea în continuare ca un "
 "nod în arborele de dosare. Veți putea folosi „Nou dosar IMAP...” pentru a "
-"adăuga o căsuță de mail cu acest nume.\n\n"
+"adăuga o căsuță de mail cu acest nume.\n"
+"\n"
 "Ce doriți să faceți?"
 
 #: ../src/mailbox-conf.c:448
@@ -4103,7 +4072,8 @@ msgid ""
 msgstr ""
 "Sunteți pe cale să ștergeți căsuța de mail „%s” din lista căsuțelor de mail. "
 "Veți putea folosi „Adaugă căsuță de mail” pentru a accesa din nou această "
-"căsuță de mail.\n\n"
+"căsuță de mail.\n"
+"\n"
 "Ce doriți să faceți?"
 
 #: ../src/mailbox-conf.c:464
@@ -4378,7 +4348,8 @@ msgstr "Atașează fișierul de la URI"
 #: ../src/main.c:556
 #, c-format
 msgid "Run '%s --help' to see a full list of available command line options.\n"
-msgstr "Încercați „%s --help” pentru a vedea o listă întreagă de opțiuni disponibile "
+msgstr ""
+"Încercați „%s --help” pentru a vedea o listă întreagă de opțiuni disponibile "
 "în linie de comandă.\n"
 
 #: ../src/main.c:603 ../src/main.c:608 ../src/main.c:614 ../src/main.c:620
@@ -4769,7 +4740,8 @@ msgstr "Debarasea_ză mesajele șterse"
 
 #: ../src/main-window.c:515 ../src/main-window.c:518
 msgid "Expunge messages marked as deleted in the current mailbox"
-msgstr "Șterge fizic mesajele marcate pentru ștergere în căsuța de mail curentă"
+msgstr ""
+"Șterge fizic mesajele marcate pentru ștergere în căsuța de mail curentă"
 
 #: ../src/main-window.c:521
 msgid "Close mailbox"
@@ -5851,8 +5823,8 @@ msgid ""
 "The following setting is global, but may be overridden for the selected "
 "mailbox using Mailbox %s Hide messages:"
 msgstr ""
-"Următoarea opțiune e globală, dar poate fi schimbată pentru căsuța "
-"selectată folosind Căsuță de mail %s Ascunde mesajele:"
+"Următoarea opțiune e globală, dar poate fi schimbată pentru căsuța selectată "
+"folosind Căsuță de mail %s Ascunde mesajele:"
 
 #: ../src/pref-manager.c:2752
 msgid "Hide messages marked as deleted"
@@ -5998,7 +5970,6 @@ msgid "Signed matter"
 msgstr "Parte semnată"
 
 #: ../src/print-gtk.c:156
-#| msgid "encrypted parts"
 msgid "Encrypted matter"
 msgstr "Parte criptată"
 
@@ -6009,12 +5980,13 @@ msgstr "Aceasta este o parte inclusă semnată %s a mesajului %s:"
 
 #: ../src/print-gtk.c:354
 #, c-format
-#| msgid "Cannot print page %d because the document has only %d pages."
 msgid "Cannot print page %d because the document has only %d page."
 msgid_plural "Cannot print page %d because the document has only %d pages."
 msgstr[0] "Nu se poate tipări pagina %d deoarece documentul are doar o pagină."
-msgstr[1] "Nu se poate tipări pagina %d deoarece documentul are doar %d pagini."
-msgstr[2] "Nu se poate tipări pagina %d deoarece documentul are doar %d de pagini."
+msgstr[1] ""
+"Nu se poate tipări pagina %d deoarece documentul are doar %d pagini."
+msgstr[2] ""
+"Nu se poate tipări pagina %d deoarece documentul are doar %d de pagini."
 
 #. Translate to the default units to use for presenting
 #. * lengths to the user. Translate to default:inch if you
@@ -6853,8 +6825,8 @@ msgid ""
 "available for all recipients. In order to protect your privacy, the message "
 "could be %s encrypted."
 msgstr ""
-"Nu ați selectat o criptare pentru acest mesaj, chiar dacă cheile publice „%"
-"s” sunt disponibile pentru toți destinatarii. Pentru a proteja intimitatea "
+"Nu ați selectat o criptare pentru acest mesaj, chiar dacă cheile publice "
+"„%s” sunt disponibile pentru toți destinatarii. Pentru a proteja intimitatea "
 "dumneavoastră, mesajul poate fi criptat %s."
 
 #: ../src/sendmsg-window.c:5911
@@ -6873,13 +6845,15 @@ msgstr "Ați ales criptarea OpenPGP pentru acest mesaj.\n"
 msgid ""
 "The message text will be sent as plain text and as HTML, but only the plain "
 "part can be signed.\n"
-msgstr "Textul mesajului va fi trimis ca text simplu și HTML, dar numai prima din "
+msgstr ""
+"Textul mesajului va fi trimis ca text simplu și HTML, dar numai prima din "
 "cele două părți poate fi semnată.\n"
 
 #: ../src/sendmsg-window.c:6002
 msgid ""
 "The message contains attachments, which cannot be signed or encrypted.\n"
-msgstr "Mesajul conține atașamente, iar acestea nu vor putea fi semnate sau "
+msgstr ""
+"Mesajul conține atașamente, iar acestea nu vor putea fi semnate sau "
 "criptate.\n"
 
 #: ../src/sendmsg-window.c:6006
@@ -7034,7 +7008,8 @@ msgstr "Verificare ortografică"
 
 #: ../src/spell-check.c:862
 msgid "BalsaSpellCheck: Quoted text regular expression compilation failed\n"
-msgstr "BalsaSpellCheck: Compilarea regexp pentru identificarea textului citat a "
+msgstr ""
+"BalsaSpellCheck: Compilarea regexp pentru identificarea textului citat a "
 "eșuat\n"
 
 #: ../src/spell-check.c:986
@@ -7348,5 +7323,3 @@ msgstr "Sus"
 #: ../src/toolbar-prefs.c:551
 msgid "Down"
 msgstr "Jos"
-
-

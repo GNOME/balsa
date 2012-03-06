@@ -2796,6 +2796,12 @@ bw_show_about_box(GtkAction * action, gpointer user_data)
 static void
 bw_check_mailbox_list(BalsaWindow * window, GList * mailbox_list)
 {
+#if defined(HAVE_LIBNM_GLIB)
+    if (window && window->nm_state != NM_STATE_CONNECTED) {
+        return;
+    }
+#endif /* LIBNM_GLIB */
+
     for ( ; mailbox_list; mailbox_list = mailbox_list->next) {
         LibBalsaMailbox *mailbox =
             BALSA_MAILBOX_NODE(mailbox_list->data)->mailbox;
@@ -2901,7 +2907,25 @@ ensure_check_mail_dialog(BalsaWindow * window)
     gtk_window_set_default_size(GTK_WINDOW(progress_dialog), 250, 100);
     gtk_widget_show_all(progress_dialog);
 }
-#endif
+
+#else /* BALSA_USE_THREADS */
+static void
+bw_mailbox_check(LibBalsaMailbox * mailbox, BalsaWindow * window)
+{
+    if (libbalsa_mailbox_get_subscribe(mailbox) == LB_MAILBOX_SUBSCRIBE_NO)
+        return;
+
+#if defined(HAVE_LIBNM_GLIB)
+    if (LIBBALSA_IS_MAILBOX_IMAP(mailbox)) {
+            if (window && window->nm_state != NM_STATE_CONNECTED) {
+                return;
+        }
+    }
+#endif /* LIBNM_GLIB */
+
+    libbalsa_mailbox_check(mailbox);
+}
+#endif /* BALSA_USE_THREADS */
 
 /*
  * Callbacks
@@ -2918,12 +2942,6 @@ check_new_messages_real(BalsaWindow * window, int type)
 #ifdef BALSA_USE_THREADS
     struct check_messages_thread_info *info;
 #endif
-
-#if defined(HAVE_LIBNM_GLIB)
-    if (window && window->nm_state != NM_STATE_CONNECTED) {
-        return;
-    }
-#endif /* LIBNM_GLIB */
 
     list = NULL;
 #ifdef BALSA_USE_THREADS
@@ -2973,7 +2991,7 @@ check_new_messages_real(BalsaWindow * window, int type)
     gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
 			   (GtkTreeModelForeachFunc) bw_mailbox_check_func,
 			   &list);
-    g_slist_foreach(list, (GFunc) libbalsa_mailbox_check, NULL);
+    g_slist_foreach(list, (GFunc) bw_mailbox_check, window);
     g_slist_foreach(list, (GFunc) g_object_unref, NULL);
     g_slist_free(list);
 
@@ -3095,7 +3113,7 @@ bw_message_print_cb(GtkAction * action, gpointer data)
 /* this one is called only in the threaded code */
 #ifdef BALSA_USE_THREADS
 static void
-bw_mailbox_check(LibBalsaMailbox * mailbox)
+bw_mailbox_check(LibBalsaMailbox * mailbox, BalsaWindow * window)
 {
     MailThreadMessage *threadmessage;
     gchar *string = NULL;
@@ -3104,6 +3122,12 @@ bw_mailbox_check(LibBalsaMailbox * mailbox)
         return;
 
     if (LIBBALSA_IS_MAILBOX_IMAP(mailbox)) {
+#if defined(HAVE_LIBNM_GLIB)
+            if (window && window->nm_state != NM_STATE_CONNECTED) {
+                return;
+        }
+#endif /* LIBNM_GLIB */
+
 	string = g_strdup_printf(_("IMAP mailbox: %s"), mailbox->url);
         if (balsa_app.debug)
             fprintf(stderr, "%s\n", string);
@@ -3131,7 +3155,7 @@ bw_check_messages_thread(struct check_messages_thread_info *info)
     MSGMAILTHREAD(threadmessage, LIBBALSA_NTFY_SOURCE, NULL, "POP3", 0, 0);
     bw_check_mailbox_list(info->window, balsa_app.inbox_input);
 
-    g_slist_foreach(list, (GFunc) bw_mailbox_check, NULL);
+    g_slist_foreach(list, (GFunc) bw_mailbox_check, info->window);
     g_slist_foreach(list, (GFunc) g_object_unref, NULL);
     g_slist_free(list);
 
@@ -3384,7 +3408,7 @@ send_progress_notify_cb(GIOChannel * source, GIOCondition condition,
     return TRUE;
 }
 
-#endif
+#endif /* BALSA_USE_THREADS */
 
 /** Returns properly formatted string informing the user about the
     amount of the new mail.

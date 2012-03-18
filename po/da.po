@@ -1,14 +1,15 @@
 # Danish translation of balsa.
-# Copyright (C) 2009 Free Software Foundation, Inc.
+# Copyright (C) 2012 Free Software Foundation, Inc.
 # Birger Langkjer <birger.langkjer@image.dk>, 1999.
 # Kenneth Christiansen - kenneth@ripen.dk
 # Keld Simonsen <keld@dkuug.dk>, 2000-2002.
-# Joe Hansen <joedalton2@yahoo.dk>, 2009, 2010, 2011.
+# Joe Hansen <joedalton2@yahoo.dk>, 2009, 2010, 2011, 2012.
 #
 # built -> bygget (måske kompileret?)
 # clipboard -> udklipsholder
 # compose window -> skrivevindue
 # connect -> forbinde (alternativ tilslutte)
+# decrypt -> dekryptere
 # draftbox -> kladder
 # entry -> post
 # expunge -> fjern
@@ -23,6 +24,8 @@
 # message part -> omskriv til del af en besked (er vist ikke noget der hedder
 #                 beskeddel eller beskedsdel.
 # Message Disposition Notification -> underretning om beskeddisposition
+# multipart/encrypted -> multipart/encrypted (rfc-udtryk)
+# multipart/signed -> multipart/signed (rfc-udtryk)
 # node -> knude
 # options -> indstillinger
 # outbox -> udbakke (udgående boks, udboks, sendtkasse, udkasse med flere). Se sentbox
@@ -33,12 +36,16 @@
 # toolbar -> værktøjslinje
 # validity -> gyldighed
 #
+# Anbefaler at bevare "multipart/..." jf. klids ordliste, da det er
+# rfc-udtryk som normalt ikke oversættes. Den tyske har tilsvarende bevaret rfc-udtrykkene:
+# http://git.gnome.org/browse/balsa/commit/?id=3f5e994fdcbb2a2fad1534cfa4d5c9d86298cf35
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-09-18 23:58+0200\n"
-"PO-Revision-Date: 2011-09-18 17:30+01:00\n"
+"POT-Creation-Date: 2012-03-18 18:27+0100\n"
+"PO-Revision-Date: 2012-03-16 17:30+01:00\n"
 "Last-Translator: Joe Hansen <joedalton2@yahoo.dk>\n"
 "Language-Team: Danish <dansk@dansk-gruppen.dk>\n"
 "Language: da\n"
@@ -92,7 +99,7 @@ msgid "Cannot find address in address book"
 msgstr "Kan ikke finde adresse i adressebog"
 
 #: ../libbalsa/address-book.c:323 ../src/main-window.c:2389
-#: ../src/main-window.c:4839 ../src/sendmsg-window.c:4185
+#: ../src/main-window.c:4839 ../src/sendmsg-window.c:4192
 msgid "Unknown error"
 msgstr "Ukendt fejl"
 
@@ -153,19 +160,19 @@ msgid "A_dd"
 msgstr "_Tilføj"
 
 #: ../libbalsa/address-view.c:129 ../src/balsa-mime-widget-message.c:738
-#: ../src/balsa-print-object-header.c:170 ../src/sendmsg-window.c:1110
-#: ../src/sendmsg-window.c:3848 ../src/store-address.c:341
+#: ../src/balsa-print-object-header.c:170 ../src/sendmsg-window.c:1113
+#: ../src/sendmsg-window.c:3855 ../src/store-address.c:341
 msgid "To:"
 msgstr "Til:"
 
 #: ../libbalsa/address-view.c:130 ../src/balsa-mime-widget-message.c:739
-#: ../src/balsa-print-object-header.c:172 ../src/sendmsg-window.c:1110
-#: ../src/sendmsg-window.c:3856 ../src/store-address.c:342
+#: ../src/balsa-print-object-header.c:172 ../src/sendmsg-window.c:1113
+#: ../src/sendmsg-window.c:3863 ../src/store-address.c:342
 msgid "Cc:"
 msgstr "Cc:"
 
 #: ../libbalsa/address-view.c:131 ../src/balsa-mime-widget-message.c:740
-#: ../src/balsa-print-object-header.c:174 ../src/sendmsg-window.c:1110
+#: ../src/balsa-print-object-header.c:174 ../src/sendmsg-window.c:1113
 #: ../src/store-address.c:343
 msgid "Bcc:"
 msgstr "Bcc:"
@@ -307,136 +314,61 @@ msgstr "Og"
 msgid "Or"
 msgstr "Eller"
 
-#: ../libbalsa/gmime-application-pkcs7.c:237
-#: ../libbalsa/gmime-application-pkcs7.c:380
+#: ../libbalsa/gmime-application-pkcs7.c:125
 #, c-format
 msgid "Failed to decrypt MIME part: parse error"
 msgstr "Kunne ikke dekryptere MIME-del: fortolkningsfejl"
 
-#: ../libbalsa/gmime-gpgme-context.c:300 ../libbalsa/rfc3156.c:1730
+#: ../libbalsa/gmime-multipart-crypt.c:225
+msgid "Cannot verify multipart/signed part due to missing subparts."
+msgstr ""
+"Kan ikke verificere multipart/signed dele på grund af manglende underdele."
+
+#: ../libbalsa/gmime-multipart-crypt.c:251
+#, c-format
+msgid "unsupported protocol '%s'"
+msgstr "protokol \"%s\" er ikke understøttet"
+
+#: ../libbalsa/gmime-multipart-crypt.c:264
+msgid ""
+"Cannot verify multipart/signed part: signature content-type does not match "
+"protocol."
+msgstr ""
+"Kan ikke verificere multipart/signed del: Underskrifts indholdstype matcher "
+"ikke protokol."
+
+#: ../libbalsa/gmime-multipart-crypt.c:487
 #, c-format
 msgid ""
-"The passphrase for this key was bad, please try again!\n"
-"\n"
-"Key: %s"
+"Cannot decrypt multipart/encrypted part: unsupported encryption protocol "
+"'%s'."
 msgstr ""
-"Adgangsfrasen for denne nøgle var ugyldig, forsøg venligst igen!\n"
-"\n"
-"Nøgle: %s"
+"Kan ikke dekryptere multipart/encrypted del: Krypteringsprotokol \"%s\" er "
+"ikke understøttet."
 
-#: ../libbalsa/gmime-gpgme-context.c:305 ../libbalsa/rfc3156.c:1735
-#, c-format
+# eller intet?  hænger nok på dele.
+#: ../libbalsa/gmime-multipart-crypt.c:488
+msgid "(none)"
+msgstr "(ingen)"
+
+#: ../libbalsa/gmime-multipart-crypt.c:501
 msgid ""
-"Please enter the passphrase for the secret key!\n"
-"\n"
-"Key: %s"
+"Cannot decrypt multipart/encrypted part: content-type does not match "
+"protocol."
 msgstr ""
-"Indtast venligst adgangsfrasen for den hemmelige nøgle!\n"
-"\n"
-"Nøgle: %s"
+"Kan ikke dekryptere multipart/encrypted del: Indholdstype matcher ikke "
+"protokol."
 
-#: ../libbalsa/gmime-gpgme-context.c:424 ../libbalsa/gmime-gpgme-context.c:497
-#: ../libbalsa/gmime-gpgme-context.c:505 ../libbalsa/gmime-gpgme-context.c:614
-#: ../libbalsa/gmime-gpgme-context.c:694
-msgid "could not get data from stream"
-msgstr "kunne ikke læse data fra strøm"
+#: ../libbalsa/gmime-multipart-crypt.c:516
+msgid "Cannot decrypt multipart/encrypted part: unexpected content type"
+msgstr "Kan ikke dekryptere multipart/encrypted del: Uventet indholdstype"
 
-#: ../libbalsa/gmime-gpgme-context.c:429 ../libbalsa/gmime-gpgme-context.c:620
-#: ../libbalsa/gmime-gpgme-context.c:699
-msgid "could not create new data object"
-msgstr "kunne ikke oprette nyt dataobjekt"
-
-# (det er nok digital underskrift)
-# Kodereferencen indeholder 'gpg', som er relateret til kryptering, så
-# jeg er ret sikker på, at det er rigtigt.
-#: ../libbalsa/gmime-gpgme-context.c:436
-msgid "signing failed"
-msgstr "underskrift mislykkedes"
-
-#: ../libbalsa/gmime-gpgme-context.c:516 ../libbalsa/rfc3156.c:638
-#: ../libbalsa/rfc3156.c:643 ../libbalsa/rfc3156.c:958
-#: ../libbalsa/rfc3156.c:964
-msgid "signature verification failed"
-msgstr "underskriftverificering mislykkedes"
-
-#: ../libbalsa/gmime-gpgme-context.c:580
-#, c-format
-msgid "combined signing and encryption is defined only for RFC 2440"
-msgstr "kombineret underskrift og kryptering er kun defineret for RFC 2440"
-
-#: ../libbalsa/gmime-gpgme-context.c:643
-msgid "signing and encryption failed"
-msgstr "underskrift og kryptering mislykkedes"
-
-#: ../libbalsa/gmime-gpgme-context.c:645
-msgid "encryption failed"
-msgstr "kryptering mislykkedes"
-
-#: ../libbalsa/gmime-gpgme-context.c:708 ../libbalsa/rfc3156.c:777
-#: ../libbalsa/rfc3156.c:782
-msgid "decryption failed"
-msgstr "dekryptering mislykkedes"
-
-#: ../libbalsa/gmime-gpgme-context.c:765
-msgid "could not create context"
-msgstr "kunne ikke oprette kontekst"
-
-#: ../libbalsa/gmime-gpgme-context.c:824
-#, c-format
-msgid "the crypto engine for protocol OpenPGP is not available"
-msgstr "kryptomotoren til protokol OpenPGP er ikke tilgængelig"
-
-#: ../libbalsa/gmime-gpgme-context.c:834
-#, c-format
-msgid "the crypto engine for protocol CMS is not available"
-msgstr "kryptomotoren til protokol CMS er ikke tilgængelig"
-
-#: ../libbalsa/gmime-gpgme-context.c:841
-#, c-format
-msgid "invalid crypto engine %d"
-msgstr "ugyldig kryptomotor %d"
-
-#: ../libbalsa/gmime-gpgme-context.c:872 ../libbalsa/gmime-gpgme-context.c:899
-#, c-format
-msgid "could not list keys for \"%s\""
-msgstr "kunne ikke vise nøgler til \"%s\""
-
-#: ../libbalsa/gmime-gpgme-context.c:915
-#, c-format
+#: ../libbalsa/gmime-multipart-crypt.c:558
 msgid ""
-"%s: a key for %s is present, but it is expired, disabled, revoked or invalid"
+"Cannot decrypt multipart/encrypted part: failed to parse decrypted content"
 msgstr ""
-"%s: En nøgle til %s er til stede, men den er udløbet, slået fra, kaldt "
-"tilbage eller ugyldig"
-
-#: ../libbalsa/gmime-gpgme-context.c:919
-#, c-format
-msgid "%s: could not find a key for %s"
-msgstr "%s: Kunne ikke finde en nøgle til %s"
-
-#: ../libbalsa/gmime-gpgme-context.c:924
-#, c-format
-msgid ""
-"%s: a key with id %s is present, but it is expired, disabled, revoked or "
-"invalid"
-msgstr ""
-"%s: En nøgle med id %s er til stede, men den er udløbet, slået fra, kaldt "
-"tilbage eller ugyldig"
-
-#: ../libbalsa/gmime-gpgme-context.c:928
-#, c-format
-msgid "%s: could not find a key with id %s"
-msgstr "%s: Kunne ikke finde en nøgle med id %s"
-
-#: ../libbalsa/gmime-gpgme-context.c:942
-#, c-format
-msgid "%s: multiple keys for %s"
-msgstr "%s: Flere nøgler til %s"
-
-#: ../libbalsa/gmime-gpgme-context.c:987
-#, c-format
-msgid "%s: insufficient validity for uid %s"
-msgstr "%s: Utilstrækkelig gyldighed for uid %s"
+"Kan ikke dekryptere multipart/encrypted del: Kunne ikke fortolke dekrypteret "
+"indhold."
 
 #: ../libbalsa/html.c:68
 #, c-format
@@ -459,13 +391,13 @@ msgstr "_Hent billeder"
 
 #. should "re" be localized ?
 #: ../libbalsa/identity.c:103 ../libbalsa/mailbox_local.c:1881
-#: ../libbalsa/mailbox_local.c:1883 ../src/sendmsg-window.c:4082
-#: ../src/sendmsg-window.c:4084
+#: ../libbalsa/mailbox_local.c:1883 ../src/sendmsg-window.c:4089
+#: ../src/sendmsg-window.c:4091
 msgid "Re:"
 msgstr "Ang:"
 
-#: ../libbalsa/identity.c:104 ../src/sendmsg-window.c:4022
-#: ../src/sendmsg-window.c:4023 ../src/sendmsg-window.c:4024
+#: ../libbalsa/identity.c:104 ../src/sendmsg-window.c:4029
+#: ../src/sendmsg-window.c:4030 ../src/sendmsg-window.c:4031
 msgid "Fwd:"
 msgstr "Videresend:"
 
@@ -740,16 +672,16 @@ msgstr "Kan ikke forbinde til server: %s"
 msgid "Exceeded the number of connections per server %s"
 msgstr "Gik over antallet af forbindelser per server %s"
 
-#: ../libbalsa/libbalsa.c:382
+#: ../libbalsa/libbalsa.c:385
 msgid "Invalid date"
 msgstr "Ugyldig dato"
 
-#: ../libbalsa/libbalsa.c:398 ../src/pref-manager.c:1408
+#: ../libbalsa/libbalsa.c:401 ../src/pref-manager.c:1408
 #: ../src/pref-manager.c:1504
 msgid "Unknown"
 msgstr "Ukendt"
 
-#: ../libbalsa/libbalsa.c:544
+#: ../libbalsa/libbalsa.c:547
 #, c-format
 msgid ""
 "Authenticity of this certificate could not be verified.\n"
@@ -760,7 +692,7 @@ msgstr ""
 "<b>Årsag:</b> %s\n"
 "<b>Dette certifikat tilhører:</b>\n"
 
-#: ../libbalsa/libbalsa.c:556
+#: ../libbalsa/libbalsa.c:559
 msgid ""
 "\n"
 "<b>This certificate was issued by:</b>\n"
@@ -768,7 +700,7 @@ msgstr ""
 "\n"
 "<b>Dette certifikat blev udstedt af:</b>\n"
 
-#: ../libbalsa/libbalsa.c:567
+#: ../libbalsa/libbalsa.c:570
 #, c-format
 msgid ""
 "<b>This certificate is valid</b>\n"
@@ -781,44 +713,44 @@ msgstr ""
 "til %s\n"
 "<b>Fingeraftryk:</b> %s"
 
-#: ../libbalsa/libbalsa.c:576
+#: ../libbalsa/libbalsa.c:579
 msgid "SSL/TLS certificate"
 msgstr "SSL/TLS-certifikat"
 
-#: ../libbalsa/libbalsa.c:578
+#: ../libbalsa/libbalsa.c:581
 msgid "_Accept Once"
 msgstr "_Accepter en gang"
 
-#: ../libbalsa/libbalsa.c:579
+#: ../libbalsa/libbalsa.c:582
 msgid "Accept&_Save"
 msgstr "Accepter&_Gem"
 
-#: ../libbalsa/libbalsa.c:580
+#: ../libbalsa/libbalsa.c:583
 msgid "_Reject"
 msgstr "_Afvis"
 
-#: ../libbalsa/libbalsa.c:626
+#: ../libbalsa/libbalsa.c:629
 #, c-format
 msgid "Connection to %s timed out. Abort?"
 msgstr "Forbindelsen til %s er udløbet. Abryd?"
 
-#: ../libbalsa/libbalsa.c:872
+#: ../libbalsa/libbalsa.c:875
 #, c-format
 msgid "No image data"
 msgstr "Ingen billeddata"
 
-#: ../libbalsa/libbalsa.c:916
+#: ../libbalsa/libbalsa.c:919
 #, c-format
 msgid "Invalid input format"
 msgstr "Ugyldigt inddataformat"
 
-#: ../libbalsa/libbalsa.c:920
+#: ../libbalsa/libbalsa.c:923
 #, c-format
 msgid "Internal buffer overrun"
 msgstr "Internt bufferlageroverløb"
 
 #. Translators: please do not translate Face.
-#: ../libbalsa/libbalsa.c:937
+#: ../libbalsa/libbalsa.c:940
 #, c-format
 msgid "Bad X-Face data"
 msgstr "Ugyldige X-Face data"
@@ -827,7 +759,176 @@ msgstr "Ugyldige X-Face data"
 msgid "Your Balsa configuration is now stored in \"~/.balsa/config\"."
 msgstr "Din Balsakonfiguration er nu gemt i \"~/.balsa/config\"."
 
-#: ../libbalsa/libbalsa-vfs.c:558 ../src/sendmsg-window.c:5219
+#: ../libbalsa/libbalsa-gpgme.c:245 ../libbalsa/libbalsa-gpgme.c:256
+#: ../libbalsa/libbalsa-gpgme.c:358 ../libbalsa/libbalsa-gpgme.c:481
+#: ../libbalsa/libbalsa-gpgme.c:574
+msgid "could not get data from stream"
+msgstr "kunne ikke læse data fra strøm"
+
+#: ../libbalsa/libbalsa-gpgme.c:269 ../libbalsa/rfc3156.c:394
+#: ../libbalsa/rfc3156.c:399 ../libbalsa/rfc3156.c:571
+#: ../libbalsa/rfc3156.c:577
+msgid "signature verification failed"
+msgstr "underskriftverificering mislykkedes"
+
+#: ../libbalsa/libbalsa-gpgme.c:366 ../libbalsa/libbalsa-gpgme.c:490
+#: ../libbalsa/libbalsa-gpgme.c:582
+msgid "could not create new data object"
+msgstr "kunne ikke oprette nyt dataobjekt"
+
+# (det er nok digital underskrift)
+# Kodereferencen indeholder 'gpg', som er relateret til kryptering, så
+# jeg er ret sikker på, at det er rigtigt.
+#: ../libbalsa/libbalsa-gpgme.c:375
+msgid "signing failed"
+msgstr "underskrift mislykkedes"
+
+#: ../libbalsa/libbalsa-gpgme.c:449
+#, c-format
+msgid "combined signing and encryption is defined only for RFC 2440"
+msgstr "kombineret underskrift og kryptering er kun defineret for RFC 2440"
+
+#: ../libbalsa/libbalsa-gpgme.c:517
+msgid "signing and encryption failed"
+msgstr "underskrift og kryptering mislykkedes"
+
+#: ../libbalsa/libbalsa-gpgme.c:519
+msgid "encryption failed"
+msgstr "kryptering mislykkedes"
+
+#: ../libbalsa/libbalsa-gpgme.c:592 ../libbalsa/rfc3156.c:472
+#: ../libbalsa/rfc3156.c:477
+msgid "decryption failed"
+msgstr "dekryptering mislykkedes"
+
+#: ../libbalsa/libbalsa-gpgme.c:693
+msgid "could not create context"
+msgstr "kunne ikke oprette kontekst"
+
+#: ../libbalsa/libbalsa-gpgme.c:697
+#, c-format
+msgid "could not set protocol '%s'"
+msgstr "kunne ikke angive protokol \"%s\""
+
+#: ../libbalsa/libbalsa-gpgme.c:736 ../libbalsa/libbalsa-gpgme.c:764
+#, c-format
+msgid "could not list keys for \"%s\""
+msgstr "kunne ikke vise nøgler til \"%s\""
+
+#: ../libbalsa/libbalsa-gpgme.c:782
+#, c-format
+msgid ""
+"%s: a key for %s is present, but it is expired, disabled, revoked or invalid"
+msgstr ""
+"%s: En nøgle til %s er til stede, men den er udløbet, slået fra, kaldt "
+"tilbage eller ugyldig"
+
+#: ../libbalsa/libbalsa-gpgme.c:787
+#, c-format
+msgid "%s: could not find a key for %s"
+msgstr "%s: Kunne ikke finde en nøgle til %s"
+
+#: ../libbalsa/libbalsa-gpgme.c:794
+#, c-format
+msgid ""
+"%s: a key with id %s is present, but it is expired, disabled, revoked or "
+"invalid"
+msgstr ""
+"%s: En nøgle med id %s er til stede, men den er udløbet, slået fra, kaldt "
+"tilbage eller ugyldig"
+
+#: ../libbalsa/libbalsa-gpgme.c:799
+#, c-format
+msgid "%s: could not find a key with id %s"
+msgstr "%s: Kunne ikke finde en nøgle med id %s"
+
+#: ../libbalsa/libbalsa-gpgme.c:816
+#, c-format
+msgid "%s: multiple keys for %s"
+msgstr "%s: Flere nøgler til %s"
+
+#: ../libbalsa/libbalsa-gpgme.c:862
+#, c-format
+msgid "%s: insufficient validity for uid %s"
+msgstr "%s: Utilstrækkelig gyldighed for uid %s"
+
+#: ../libbalsa/libbalsa-gpgme-cb.c:144
+msgid "User ID"
+msgstr "Bruger-id"
+
+#: ../libbalsa/libbalsa-gpgme-cb.c:144
+msgid "Key ID"
+msgstr "Nøgle-id"
+
+#: ../libbalsa/libbalsa-gpgme-cb.c:144
+msgid "Length"
+msgstr "Længde"
+
+#: ../libbalsa/libbalsa-gpgme-cb.c:144
+msgid "Validity"
+msgstr "Gyldighed"
+
+#. FIXME: create dialog according to the Gnome HIG
+#: ../libbalsa/libbalsa-gpgme-cb.c:159
+msgid "Select key"
+msgstr "Vælg nøgle"
+
+#: ../libbalsa/libbalsa-gpgme-cb.c:175
+#, c-format
+msgid "Select the private key for the signer %s"
+msgstr "Vælg den private nøgle for underskriftsindehaveren %s"
+
+#: ../libbalsa/libbalsa-gpgme-cb.c:179
+#, c-format
+msgid "Select the public key for the recipient %s"
+msgstr "Vælg den offentlige nøgle for modtageren %s"
+
+#: ../libbalsa/libbalsa-gpgme-cb.c:302
+#, c-format
+msgid "Insufficient trust for recipient %s"
+msgstr "Utilstrækkelig med tillid til modtager %s"
+
+#: ../libbalsa/libbalsa-gpgme-cb.c:306
+#, c-format
+msgid "The validity of the key with user ID \"%s\" is \"%s\"."
+msgstr "Gyldigheden på nøglen med bruger-id \"%s\" er \"%s\"."
+
+#: ../libbalsa/libbalsa-gpgme-cb.c:317
+msgid "Use this key anyway?"
+msgstr "Brug denne nøgle alligevel?"
+
+#. FIXME: create dialog according to the Gnome HIG
+#: ../libbalsa/libbalsa-gpgme-cb.c:343
+msgid "Enter Passphrase"
+msgstr "Indtast adgangsfrase"
+
+#: ../libbalsa/libbalsa-gpgme-cb.c:370
+#, c-format
+msgid ""
+"%s\n"
+"The passphrase for this key was bad, please try again!\n"
+"\n"
+"Key: %s"
+msgstr ""
+"%s\n"
+"Adgangsfrasen for denne nøgle var ugyldig, forsøg venligst igen!\n"
+"\n"
+"Nøgle: %s"
+
+#: ../libbalsa/libbalsa-gpgme-cb.c:375
+#, c-format
+msgid ""
+"%s\n"
+"Please enter the passphrase for the secret key!\n"
+"\n"
+"Key: %s"
+msgstr ""
+"%s\n"
+"Indtast venligst adgangsfrasen for den hemmelige nøgle!\n"
+"\n"
+"Nøgle: %s"
+
+#: ../libbalsa/libbalsa-vfs.c:558 ../src/sendmsg-window.c:5226
 #, c-format
 msgid "not a regular file"
 msgstr "ikke en almindelig fil"
@@ -1339,7 +1440,7 @@ msgid "LDAP Directory for %s"
 msgstr "LDAP-katalog for %s"
 
 #: ../libbalsa/rfc2445.c:90 ../libbalsa/rfc2445.c:683
-#: ../libbalsa/rfc2445.c:702 ../libbalsa/rfc3156.c:1394
+#: ../libbalsa/rfc2445.c:702 ../libbalsa/rfc3156.c:716
 msgid "unknown"
 msgstr "ukendt"
 
@@ -1403,89 +1504,25 @@ msgstr "frivillig deltager"
 msgid "non-participant, information only"
 msgstr "ikkedeltager, kun information"
 
-#: ../libbalsa/rfc3156.c:95
-#, c-format
-msgid "Gpgme has been compiled without support for protocol %s."
-msgstr "Gpgme er blev kompileret uden understøttelse for protokol %s."
-
-#: ../libbalsa/rfc3156.c:100
-#, c-format
-msgid "Crypto engine %s is not installed properly."
-msgstr "Kryptomotor %s er ikke korrekt installeret."
-
-#: ../libbalsa/rfc3156.c:104
-#, c-format
-msgid " Hint: check the `gnupg2' (preferred) or `gnupg' package."
-msgstr " Fif: Tjek pakken 'gnupg2' (foretrukket) eller 'gnupg'."
-
-#: ../libbalsa/rfc3156.c:107
-#, c-format
-msgid " Hint: check the `gpgsm' package."
-msgstr " Fif: Tjek pakken 'gpgsm'."
-
-#: ../libbalsa/rfc3156.c:111
-#, c-format
-msgid ""
-"Crypto engine %s version %s is installed, but at least version %s is "
-"required."
-msgstr ""
-"Kryptomotor %s version %s er installeret, men den laveste version krævet er "
-"%s."
-
-#: ../libbalsa/rfc3156.c:118
-#, c-format
-msgid "Unknown problem with engine for protocol %s."
-msgstr "Ukendt problem med motor for protokol %s."
-
-#: ../libbalsa/rfc3156.c:123
-#, c-format
-msgid "%s: could not retrieve crypto engine information: %s."
-msgstr "%s: Kunne ikke hente kryptomotorinformation: %s."
-
-#: ../libbalsa/rfc3156.c:127
-#, c-format
-msgid ""
-"\n"
-"Disable support for protocol %s."
-msgstr ""
-"\n"
-"Slå understøttelse for protokol %s fra."
-
-#: ../libbalsa/rfc3156.c:355 ../libbalsa/rfc3156.c:864
-msgid "Enter passphrase to unlock the secret key for signing"
-msgstr ""
-"Indtast adgangsfrase for at låse den hemmelige nøgle til underskrift op"
-
-#: ../libbalsa/rfc3156.c:603 ../libbalsa/rfc3156.c:608
-#: ../libbalsa/rfc3156.c:725 ../libbalsa/rfc3156.c:730
-#: ../libbalsa/rfc3156.c:940 ../libbalsa/rfc3156.c:945
-#: ../libbalsa/rfc3156.c:1034 ../libbalsa/rfc3156.c:1039
-msgid "creating a gpgme context failed"
-msgstr "kunne ikke oprette en gpgme-kontekst"
-
-#: ../libbalsa/rfc3156.c:744 ../libbalsa/rfc3156.c:1052
-msgid "Enter passphrase to decrypt message"
-msgstr "Indtast adgangsfrase for at dekryptere besked"
-
-#: ../libbalsa/rfc3156.c:1061 ../libbalsa/rfc3156.c:1068
+#: ../libbalsa/rfc3156.c:626 ../libbalsa/rfc3156.c:633
 msgid "decryption and signature verification failed"
 msgstr "dekryptering og underskriftsbekræftelse mislykkedes"
 
-#: ../libbalsa/rfc3156.c:1103
+#: ../libbalsa/rfc3156.c:659
 msgid "The signature is valid."
 msgstr "Underskriften er gyldig."
 
-#: ../libbalsa/rfc3156.c:1105
+#: ../libbalsa/rfc3156.c:661
 msgid "The signature is valid but expired."
 msgstr "Underskriften er gyldig men udløbet."
 
-#: ../libbalsa/rfc3156.c:1108
+#: ../libbalsa/rfc3156.c:664
 msgid ""
 "The signature is valid but the key used to verify the signature has expired."
 msgstr ""
 "Underskriften er gyldig men nøglen til at bekræfte underskriften er udløbet."
 
-#: ../libbalsa/rfc3156.c:1111
+#: ../libbalsa/rfc3156.c:667
 msgid ""
 "The signature is valid but the key used to verify the signature has been "
 "revoked."
@@ -1493,99 +1530,102 @@ msgstr ""
 "Underskriften er gyldig men nøglen til at bekræfte underskriften er kaldt "
 "tilbage."
 
-#: ../libbalsa/rfc3156.c:1114
+#: ../libbalsa/rfc3156.c:670
 msgid "The signature is invalid."
 msgstr "Underskriften er ugyldig."
 
-#: ../libbalsa/rfc3156.c:1117
+#: ../libbalsa/rfc3156.c:673
 msgid "The signature could not be verified due to a missing key."
 msgstr "Underskriften kunne ikke bekræftes på grund af en manglende nøgle."
 
-#: ../libbalsa/rfc3156.c:1119
+#: ../libbalsa/rfc3156.c:675
 msgid "This part is not a real PGP signature."
 msgstr "Denne del er ikke en reel PGP-underskrift."
 
-#: ../libbalsa/rfc3156.c:1122
+#: ../libbalsa/rfc3156.c:678
 msgid "The signature could not be verified due to an invalid crypto engine."
 msgstr "Underskriften kunne ikke bekræftes på grund af en ugyldig kryptomotor."
 
-#: ../libbalsa/rfc3156.c:1125 ../libbalsa/rfc3156.c:1891
+#: ../libbalsa/rfc3156.c:681 ../libbalsa/rfc3156.c:1044
 msgid "GnuPG is rebuilding the trust database and is currently unavailable."
 msgstr ""
 "GnuPG genopbygger pålidelighedsdatabasen og er i øjeblikket utilgængelig."
 
-#: ../libbalsa/rfc3156.c:1128
+#: ../libbalsa/rfc3156.c:684
 msgid "An error prevented the signature verification."
 msgstr "En fejl forhindrede underskriftsbekræftelsen."
 
-#: ../libbalsa/rfc3156.c:1136
+#: ../libbalsa/rfc3156.c:694
 msgid "The user ID is of unknown validity."
 msgstr "Bruger-id'et er af ukendt gyldighed."
 
-#: ../libbalsa/rfc3156.c:1138
+#: ../libbalsa/rfc3156.c:696
 msgid "The validity of the user ID is undefined."
 msgstr "Gyldigheden på bruger-id'et er udefineret."
 
-#: ../libbalsa/rfc3156.c:1140
+#: ../libbalsa/rfc3156.c:698
 msgid "The user ID is never valid."
 msgstr "Bruger-id'et er aldrig gyldigt."
 
-#: ../libbalsa/rfc3156.c:1142
+#: ../libbalsa/rfc3156.c:700
 msgid "The user ID is marginally valid."
 msgstr "Bruger-id'et er marginalt gyldigt."
 
-#: ../libbalsa/rfc3156.c:1144
+#: ../libbalsa/rfc3156.c:702
 msgid "The user ID is fully valid."
 msgstr "Bruger-id'et er fuldt gyldigt."
 
-#: ../libbalsa/rfc3156.c:1146
+#: ../libbalsa/rfc3156.c:704
 msgid "The user ID is ultimately valid."
 msgstr "Bruger-id'et er ultimativt gyldigt."
 
-#: ../libbalsa/rfc3156.c:1148 ../libbalsa/rfc3156.c:1406
+#: ../libbalsa/rfc3156.c:706 ../libbalsa/rfc3156.c:728
 msgid "bad validity"
 msgstr "ukorrekt gyldighed"
 
-#: ../libbalsa/rfc3156.c:1156
+#: ../libbalsa/rfc3156.c:718
+msgid "undefined"
+msgstr "udefineret"
+
+#: ../libbalsa/rfc3156.c:720 ../libbalsa/rfc3156.c:755
+#: ../src/address-book-config.c:200
+msgid "never"
+msgstr "aldrig"
+
+#: ../libbalsa/rfc3156.c:722
+msgid "marginal"
+msgstr "marginal"
+
+#: ../libbalsa/rfc3156.c:724
+msgid "full"
+msgstr "fuld"
+
+#: ../libbalsa/rfc3156.c:726
+msgid "ultimate"
+msgstr "ultimativ"
+
+#: ../libbalsa/rfc3156.c:738
 msgid "PGP signature: "
 msgstr "PGP-underskrift: "
 
-#: ../libbalsa/rfc3156.c:1158
+#: ../libbalsa/rfc3156.c:740
 msgid "S/MIME signature: "
 msgstr "S/MIME-underskrift: "
 
-#: ../libbalsa/rfc3156.c:1160
+#: ../libbalsa/rfc3156.c:742
 msgid "(unknown protocol) "
 msgstr "(ukendt protokol) "
 
-#: ../libbalsa/rfc3156.c:1187
+#: ../libbalsa/rfc3156.c:772
 #, c-format
 msgid ""
 "\n"
-"User ID: %s"
+"Signature validity: %s"
 msgstr ""
 "\n"
-"Bruger-id: %s"
+"Gyldighed af underskrift: %s"
 
-#: ../libbalsa/rfc3156.c:1190
-#, c-format
-msgid ""
-"\n"
-"Signed by: %s"
-msgstr ""
-"\n"
-"Underskrevet af: %s"
-
-#: ../libbalsa/rfc3156.c:1194
-#, c-format
-msgid ""
-"\n"
-"Mail address: %s"
-msgstr ""
-"\n"
-"E-post-adresse: %s"
-
-#: ../libbalsa/rfc3156.c:1196
+#: ../libbalsa/rfc3156.c:775
 #, c-format
 msgid ""
 "\n"
@@ -1594,16 +1634,7 @@ msgstr ""
 "\n"
 "Underskrevet: %s"
 
-#: ../libbalsa/rfc3156.c:1197
-#, c-format
-msgid ""
-"\n"
-"User ID validity: %s"
-msgstr ""
-"\n"
-"Gyldighed af bruger-id: %s"
-
-#: ../libbalsa/rfc3156.c:1201
+#: ../libbalsa/rfc3156.c:777
 #, c-format
 msgid ""
 "\n"
@@ -1612,7 +1643,7 @@ msgstr ""
 "\n"
 "Tillid til nøgleejer: %s"
 
-#: ../libbalsa/rfc3156.c:1205
+#: ../libbalsa/rfc3156.c:781
 #, c-format
 msgid ""
 "\n"
@@ -1621,8 +1652,31 @@ msgstr ""
 "\n"
 "Fingeraftryk for nøgle: %s"
 
-#. Subkey creation date
-#: ../libbalsa/rfc3156.c:1208
+#: ../libbalsa/rfc3156.c:795
+msgid ""
+"\n"
+"User ID's:"
+msgstr ""
+"\n"
+"Bruger-id'er:"
+
+#: ../libbalsa/rfc3156.c:798
+msgid ""
+"\n"
+"User ID:"
+msgstr ""
+"\n"
+"Bruger-id:"
+
+#: ../libbalsa/rfc3156.c:809
+msgid " [Revoked]"
+msgstr " [Kaldt tilbage]"
+
+#: ../libbalsa/rfc3156.c:811
+msgid " [Invalid]"
+msgstr " [Ugyldig]"
+
+#: ../libbalsa/rfc3156.c:838
 #, c-format
 msgid ""
 "\n"
@@ -1631,8 +1685,7 @@ msgstr ""
 "\n"
 "Undernøgle skabt: %s"
 
-#. Subkey expiration date
-#: ../libbalsa/rfc3156.c:1210
+#: ../libbalsa/rfc3156.c:840
 #, c-format
 msgid ""
 "\n"
@@ -1641,25 +1694,25 @@ msgstr ""
 "\n"
 "Undernøgle udløber: %s"
 
-#: ../libbalsa/rfc3156.c:1218
+#: ../libbalsa/rfc3156.c:849
 msgid " revoked"
 msgstr " kaldt tilbage"
 
-#: ../libbalsa/rfc3156.c:1223
+#: ../libbalsa/rfc3156.c:854
 msgid " expired"
 msgstr " udløbet"
 
-#: ../libbalsa/rfc3156.c:1228
+#: ../libbalsa/rfc3156.c:859
 msgid " disabled"
 msgstr " slået fra"
 
-#: ../libbalsa/rfc3156.c:1233
+#: ../libbalsa/rfc3156.c:864
 msgid " invalid"
 msgstr " ugyldig"
 
-#. ngettext: string begins with a single space, so no space after
-#. * the colon is correct punctuation (in English).
-#: ../libbalsa/rfc3156.c:1237
+#. ngettext: string begins with a single space, so no space
+#. * after the colon is correct punctuation (in English).
+#: ../libbalsa/rfc3156.c:868
 #, c-format
 msgid ""
 "\n"
@@ -1674,7 +1727,7 @@ msgstr[1] ""
 "\n"
 "Attributter for undernøgle:%s"
 
-#: ../libbalsa/rfc3156.c:1246
+#: ../libbalsa/rfc3156.c:880
 #, c-format
 msgid ""
 "\n"
@@ -1683,7 +1736,7 @@ msgstr ""
 "\n"
 "Udstedernavn: %s"
 
-#: ../libbalsa/rfc3156.c:1250
+#: ../libbalsa/rfc3156.c:884
 #, c-format
 msgid ""
 "\n"
@@ -1692,7 +1745,7 @@ msgstr ""
 "\n"
 "Serienummer for udsteder: %s"
 
-#: ../libbalsa/rfc3156.c:1253
+#: ../libbalsa/rfc3156.c:887
 #, c-format
 msgid ""
 "\n"
@@ -1701,12 +1754,12 @@ msgstr ""
 "\n"
 "Kæde-id: %s"
 
-#: ../libbalsa/rfc3156.c:1310
+#: ../libbalsa/rfc3156.c:946
 #, c-format
 msgid "Could not launch %s to query the public key %s."
 msgstr "Kunne ikke starte %s for at forespørge den offentlige nøgle %s."
 
-#: ../libbalsa/rfc3156.c:1360
+#: ../libbalsa/rfc3156.c:996
 #, c-format
 msgid ""
 "Running %s failed with return value %d:\n"
@@ -1715,7 +1768,7 @@ msgstr ""
 "Kørsel af %s mislykkedes med returværdien %d:\n"
 "%s"
 
-#: ../libbalsa/rfc3156.c:1367
+#: ../libbalsa/rfc3156.c:1003
 #, c-format
 msgid ""
 "Running %s successful:\n"
@@ -1724,72 +1777,7 @@ msgstr ""
 "Kørte med succes %s:\n"
 "%s"
 
-#: ../libbalsa/rfc3156.c:1396
-msgid "undefined"
-msgstr "udefineret"
-
-#: ../libbalsa/rfc3156.c:1398 ../src/address-book-config.c:200
-msgid "never"
-msgstr "aldrig"
-
-#: ../libbalsa/rfc3156.c:1400
-msgid "marginal"
-msgstr "marginal"
-
-#: ../libbalsa/rfc3156.c:1402
-msgid "full"
-msgstr "fuld"
-
-#: ../libbalsa/rfc3156.c:1404
-msgid "ultimate"
-msgstr "ultimativ"
-
-#: ../libbalsa/rfc3156.c:1467
-msgid "User ID"
-msgstr "Bruger-id"
-
-#: ../libbalsa/rfc3156.c:1467
-msgid "Key ID"
-msgstr "Nøgle-id"
-
-#: ../libbalsa/rfc3156.c:1467
-msgid "Length"
-msgstr "Længde"
-
-#: ../libbalsa/rfc3156.c:1467
-msgid "Validity"
-msgstr "Gyldighed"
-
-#. FIXME: create dialog according to the Gnome HIG
-#: ../libbalsa/rfc3156.c:1511
-msgid "Select key"
-msgstr "Vælg nøgle"
-
-#: ../libbalsa/rfc3156.c:1527
-#, c-format
-msgid "Select the private key for the signer %s"
-msgstr "Vælg den private nøgle for underskriftsindehaveren %s"
-
-#: ../libbalsa/rfc3156.c:1531
-#, c-format
-msgid "Select the public key for the recipient %s"
-msgstr "Vælg den offentlige nøgle for modtageren %s"
-
-#: ../libbalsa/rfc3156.c:1662
-#, c-format
-msgid "Insufficient trust for recipient %s"
-msgstr "Utilstrækkelig med tillid til modtager %s"
-
-#: ../libbalsa/rfc3156.c:1664
-#, c-format
-msgid "The validity of the key with user ID \"%s\" is \"%s\"."
-msgstr "Gyldigheden på nøglen med bruger-id \"%s\" er \"%s\"."
-
-#: ../libbalsa/rfc3156.c:1675
-msgid "Use this key anyway?"
-msgstr "Brug denne nøgle alligevel?"
-
-#: ../libbalsa/rfc3156.c:1892
+#: ../libbalsa/rfc3156.c:1045
 msgid "Try again later."
 msgstr "Forsøg igen senere."
 
@@ -1992,13 +1980,13 @@ msgstr "MB"
 #. Menus
 #: ../libbalsa/source-viewer.c:46 ../src/ab-main.c:553
 #: ../src/main-window.c:346 ../src/message-window.c:239
-#: ../src/sendmsg-window.c:317
+#: ../src/sendmsg-window.c:320
 msgid "_File"
 msgstr "_Fil"
 
 #: ../libbalsa/source-viewer.c:47 ../src/filter-edit-dialog.c:332
 #: ../src/main-window.c:347 ../src/message-window.c:240
-#: ../src/sendmsg-window.c:318
+#: ../src/sendmsg-window.c:321
 msgid "_Edit"
 msgstr "R_edigér"
 
@@ -2010,7 +1998,7 @@ msgstr "_Vis"
 #. Items
 #: ../libbalsa/source-viewer.c:50 ../src/mailbox-node.c:1096
 #: ../src/main-window.c:521 ../src/message-window.c:248
-#: ../src/sendmsg-window.c:347
+#: ../src/sendmsg-window.c:350
 msgid "_Close"
 msgstr "_Luk"
 
@@ -2021,7 +2009,7 @@ msgstr "Luk vinduet"
 #. Edit menu items
 #: ../libbalsa/source-viewer.c:52 ../src/main-window.c:421
 #: ../src/main-window.c:587 ../src/message-window.c:251
-#: ../src/sendmsg-window.c:355
+#: ../src/sendmsg-window.c:358
 msgid "_Copy"
 msgstr "_Kopier"
 
@@ -2594,7 +2582,7 @@ msgid "Date"
 msgstr "Dato"
 
 #: ../src/balsa-index.c:407 ../src/pref-manager.c:420
-#: ../src/sendmsg-window.c:3032
+#: ../src/sendmsg-window.c:3039
 msgid "Size"
 msgstr "Størrelse"
 
@@ -2900,7 +2888,7 @@ msgid ""
 "than once.\n"
 "Please close the other instances of this message and try again."
 msgstr ""
-"Afkrypteringen kunne ikke udføres, fordi denne besked er vist mere end en "
+"Dekrypteringen kunne ikke udføres, fordi denne besked er vist mere end en "
 "gang.\n"
 "Luk venligst andre instanser af denne besked og forsøg igen."
 
@@ -2964,8 +2952,8 @@ msgstr ""
 msgid "PGP"
 msgstr "PGP"
 
-#: ../src/balsa-message.c:2944 ../src/balsa-mime-widget-crypto.c:74
-#: ../src/print-gtk.c:194
+#: ../src/balsa-message.c:2944 ../src/balsa-mime-widget-crypto.c:78
+#: ../src/print-gtk.c:201
 msgid "S/MIME"
 msgstr "S/MIME"
 
@@ -3020,36 +3008,36 @@ msgstr ""
 msgid "Please close the other instances of this message and try again."
 msgstr "Luk venligst de andre instanser af denne besked og forsøg igen."
 
-#: ../src/balsa-mime-widget.c:233 ../src/balsa-mime-widget-message.c:163
+#: ../src/balsa-mime-widget.c:237 ../src/balsa-mime-widget-message.c:163
 #: ../src/balsa-mime-widget-message.c:209
 #, c-format
 msgid "File name: %s"
 msgstr "Filnavn: %s"
 
-#: ../src/balsa-mime-widget.c:252
+#: ../src/balsa-mime-widget.c:256
 #, c-format
 msgid "Error reading message part: %s"
 msgstr "Fejl ved læsning af del af en besked: %s"
 
-#: ../src/balsa-mime-widget.c:276
+#: ../src/balsa-mime-widget.c:280
 #, c-format
 msgid "Type: %s (%s)"
 msgstr "Type: %s (%s)"
 
-#: ../src/balsa-mime-widget.c:280
+#: ../src/balsa-mime-widget.c:284
 #, c-format
 msgid "Content Type: %s"
 msgstr "Indholdstype: %s"
 
-#: ../src/balsa-mime-widget.c:293
+#: ../src/balsa-mime-widget.c:297
 msgid "No open or view action defined for this content type"
 msgstr "Ingen åbnings- eller visningshandling defineret for denne indholdstype"
 
-#: ../src/balsa-mime-widget.c:298
+#: ../src/balsa-mime-widget.c:302
 msgid "S_ave part"
 msgstr "_Gem del"
 
-#: ../src/balsa-mime-widget-callbacks.c:54 ../src/sendmsg-window.c:1801
+#: ../src/balsa-mime-widget-callbacks.c:54 ../src/sendmsg-window.c:1804
 #, c-format
 msgid "Could not launch application: %s"
 msgstr "Kunne ikke starte program: %s"
@@ -3073,7 +3061,7 @@ msgstr "Fil eksisterer allerede. Overskriv?"
 msgid "Unlink %s: %s"
 msgstr "Fjern henvisning %s: %s"
 
-#: ../src/balsa-mime-widget-crypto.c:72
+#: ../src/balsa-mime-widget-crypto.c:76
 #, c-format
 msgid ""
 "This is an inline %s signed %s message part:\n"
@@ -3082,15 +3070,15 @@ msgstr ""
 "Dette er en inkluderet %s underskrevet %s del af en besked:\n"
 "%s"
 
-#: ../src/balsa-mime-widget-crypto.c:74 ../src/print-gtk.c:194
+#: ../src/balsa-mime-widget-crypto.c:78 ../src/print-gtk.c:201
 msgid "OpenPGP"
 msgstr "OpenPGP"
 
-#: ../src/balsa-mime-widget-crypto.c:92
+#: ../src/balsa-mime-widget-crypto.c:96
 msgid "_Run GnuPG to import this key"
 msgstr "_Kør GnuPG for at importere denne nøgle"
 
-#: ../src/balsa-mime-widget-crypto.c:96
+#: ../src/balsa-mime-widget-crypto.c:100
 msgid "_Run GnuPG to check for an update of this key"
 msgstr "_Kør GnuPG for at lede efter en opdatering af denne nøgle"
 
@@ -3154,8 +3142,8 @@ msgstr "Emne: %s\n"
 msgid "Se_nd message to obtain this part"
 msgstr "Se_nd besked for at få denne del"
 
-#: ../src/balsa-mime-widget-message.c:296 ../src/balsa-mime-widget-text.c:808
-#: ../src/sendmsg-window.c:1822
+#: ../src/balsa-mime-widget-message.c:296 ../src/balsa-mime-widget-text.c:811
+#: ../src/sendmsg-window.c:1825
 #, c-format
 msgid "Error showing %s: %s\n"
 msgstr "Fejl ved visning af %s: %s\n"
@@ -3188,20 +3176,20 @@ msgid "IMAP server did not report message structure"
 msgstr "IMAP-server rapporterede ikke beskedstruktur"
 
 #: ../src/balsa-mime-widget-message.c:718
-#: ../src/balsa-print-object-header.c:155 ../src/sendmsg-window.c:1141
-#: ../src/sendmsg-window.c:1143 ../src/sendmsg-window.c:1233
-#: ../src/sendmsg-window.c:3833 ../src/sendmsg-window.c:5755
+#: ../src/balsa-print-object-header.c:155 ../src/sendmsg-window.c:1144
+#: ../src/sendmsg-window.c:1146 ../src/sendmsg-window.c:1236
+#: ../src/sendmsg-window.c:3840 ../src/sendmsg-window.c:5762
 msgid "Subject:"
 msgstr "Emne:"
 
 #: ../src/balsa-mime-widget-message.c:722
-#: ../src/balsa-print-object-header.c:163 ../src/sendmsg-window.c:3829
+#: ../src/balsa-print-object-header.c:163 ../src/sendmsg-window.c:3836
 msgid "Date:"
 msgstr "Dato:"
 
 #. addresses
 #: ../src/balsa-mime-widget-message.c:728
-#: ../src/balsa-print-object-header.c:168 ../src/sendmsg-window.c:3840
+#: ../src/balsa-print-object-header.c:168 ../src/sendmsg-window.c:3847
 #: ../src/store-address.c:340
 msgid "From:"
 msgstr "Fra:"
@@ -3220,69 +3208,69 @@ msgstr "Fcc:"
 msgid "Disposition-Notification-To:"
 msgstr "Disposition-Notification-To:"
 
-#: ../src/balsa-mime-widget-text.c:171
+#: ../src/balsa-mime-widget-text.c:174
 #, c-format
 msgid "Could not save a text part: %s"
 msgstr "Kunne ikke gemme en tekstdel: %s"
 
-#: ../src/balsa-mime-widget-text.c:515
+#: ../src/balsa-mime-widget-text.c:518
 msgid "Copy link"
 msgstr "Kopier henvisning"
 
-#: ../src/balsa-mime-widget-text.c:520
+#: ../src/balsa-mime-widget-text.c:523
 msgid "Open link"
 msgstr "Åbn henvisning"
 
-#: ../src/balsa-mime-widget-text.c:525
+#: ../src/balsa-mime-widget-text.c:528
 msgid "Send link..."
 msgstr "Send henvisning..."
 
-#: ../src/balsa-mime-widget-text.c:558 ../src/balsa-mime-widget-text.c:1050
+#: ../src/balsa-mime-widget-text.c:561 ../src/balsa-mime-widget-text.c:1053
 msgid "Save..."
 msgstr "Gem..."
 
-#: ../src/balsa-mime-widget-text.c:568
+#: ../src/balsa-mime-widget-text.c:571
 msgid "Highlight structured phrases"
 msgstr "Fremhæv strukturerede fraser"
 
-#: ../src/balsa-mime-widget-text.c:795
+#: ../src/balsa-mime-widget-text.c:798
 #, c-format
 msgid "Calling URL %s..."
 msgstr "Henter URL %s..."
 
-#: ../src/balsa-mime-widget-text.c:1164
+#: ../src/balsa-mime-widget-text.c:1167
 msgid "Address"
 msgstr "Adresse"
 
-#: ../src/balsa-mime-widget-text.c:1167
+#: ../src/balsa-mime-widget-text.c:1170
 msgid "S_tore"
 msgstr "_Gem"
 
-#: ../src/balsa-mime-widget-text.c:1175 ../src/balsa-print-object-text.c:508
+#: ../src/balsa-mime-widget-text.c:1178 ../src/balsa-print-object-text.c:508
 msgid "Full Name"
 msgstr "Fulde navn"
 
-#: ../src/balsa-mime-widget-text.c:1176 ../src/balsa-print-object-text.c:510
+#: ../src/balsa-mime-widget-text.c:1179 ../src/balsa-print-object-text.c:510
 msgid "Nick Name"
 msgstr "Kaldenavn"
 
-#: ../src/balsa-mime-widget-text.c:1177 ../src/balsa-print-object-text.c:512
+#: ../src/balsa-mime-widget-text.c:1180 ../src/balsa-print-object-text.c:512
 msgid "First Name"
 msgstr "Fornavn"
 
-#: ../src/balsa-mime-widget-text.c:1178 ../src/balsa-print-object-text.c:514
+#: ../src/balsa-mime-widget-text.c:1181 ../src/balsa-print-object-text.c:514
 msgid "Last Name"
 msgstr "Efternavn"
 
-#: ../src/balsa-mime-widget-text.c:1179 ../src/balsa-print-object-text.c:516
+#: ../src/balsa-mime-widget-text.c:1182 ../src/balsa-print-object-text.c:516
 msgid "Organization"
 msgstr "Organisation"
 
-#: ../src/balsa-mime-widget-text.c:1181 ../src/balsa-print-object-text.c:519
+#: ../src/balsa-mime-widget-text.c:1184 ../src/balsa-print-object-text.c:519
 msgid "Email Address"
 msgstr "E-post-adresse"
 
-#: ../src/balsa-mime-widget-text.c:1210
+#: ../src/balsa-mime-widget-text.c:1213
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains 8-bit characters, but no "
@@ -3332,7 +3320,7 @@ msgid "Attendee"
 msgstr "Deltager"
 
 #: ../src/balsa-mime-widget-vcalendar.c:208
-#: ../src/balsa-print-object-text.c:696 ../src/sendmsg-window.c:3044
+#: ../src/balsa-print-object-text.c:696 ../src/sendmsg-window.c:3051
 msgid "Description"
 msgstr "Beskrivelse"
 
@@ -4347,56 +4335,56 @@ msgstr "Lokal postkasse %s indlæst som: %s\n"
 msgid "Local folder %s\n"
 msgstr "Lokal mappe %s\n"
 
-#: ../src/main.c:209
+#: ../src/main.c:212
 #, c-format
 msgid "Could not write to %s: %s"
 msgstr "Kunne ikke skrive til %s: %s"
 
-#: ../src/main.c:453 ../src/main.c:502
+#: ../src/main.c:462 ../src/main.c:511
 msgid "Get new mail on startup"
 msgstr "Hent ny post ved opstart"
 
-#: ../src/main.c:455 ../src/main.c:504
+#: ../src/main.c:464 ../src/main.c:513
 msgid "Compose a new email to EMAIL@ADDRESS"
 msgstr "Skriv et nyt brev til EMAIL@ADRESSE"
 
-#: ../src/main.c:457
+#: ../src/main.c:466
 msgid "Attach file at PATH"
 msgstr "Vedlæg fil i STI"
 
-#: ../src/main.c:459 ../src/main.c:509
+#: ../src/main.c:468 ../src/main.c:518
 msgid "Opens MAILBOXNAME"
 msgstr "Åbner MAILBOKSNAVN"
 
-#: ../src/main.c:459 ../src/main.c:509
+#: ../src/main.c:468 ../src/main.c:518
 msgid "MAILBOXNAME"
 msgstr "MAILBOKSNAVN"
 
-#: ../src/main.c:462 ../src/main.c:512
+#: ../src/main.c:471 ../src/main.c:521
 msgid "Opens first unread mailbox"
 msgstr "Åbner første ulæste postkasse"
 
-#: ../src/main.c:465 ../src/main.c:515
+#: ../src/main.c:474 ../src/main.c:524
 msgid "Opens default Inbox on startup"
 msgstr "Åbner forvalgt indbakke ved opstart"
 
-#: ../src/main.c:468 ../src/main.c:518
+#: ../src/main.c:477 ../src/main.c:527
 msgid "Prints number unread and unsent messages"
 msgstr "Udskriver antal ulæste og usendte beskeder"
 
-#: ../src/main.c:470 ../src/main.c:520
+#: ../src/main.c:479 ../src/main.c:529
 msgid "Debug POP3 connection"
 msgstr "Fejlsøg POP3-forbindelse"
 
-#: ../src/main.c:472 ../src/main.c:522
+#: ../src/main.c:481 ../src/main.c:531
 msgid "Debug IMAP connection"
 msgstr "Fejlsøg IMAP-forbindelse"
 
-#: ../src/main.c:494
+#: ../src/main.c:503
 msgid "The Balsa E-Mail Client"
 msgstr "E-post-klienten Balsa"
 
-#: ../src/main.c:506
+#: ../src/main.c:515
 msgid "Attach file at URI"
 msgstr "Vedlæg fil i URI"
 
@@ -4405,38 +4393,38 @@ msgstr "Vedlæg fil i URI"
 # Denne linje: "Kør '%s --help' for at se den fulde liste over 
 # kommandolinjetilvalg. passer ind i en 80-tegn bred terminal (hvor 
 # strengen nok vil blive udskrevet)
-#: ../src/main.c:547
+#: ../src/main.c:556
 #, c-format
 msgid "Run '%s --help' to see a full list of available command line options.\n"
 msgstr "Kør '%s --help' for at se den fulde liste over kommandolinjetilvalg\n"
 
-#: ../src/main.c:594 ../src/main.c:599 ../src/main.c:605 ../src/main.c:611
-#: ../src/main.c:617
+#: ../src/main.c:603 ../src/main.c:608 ../src/main.c:614 ../src/main.c:620
+#: ../src/main.c:626
 #, c-format
 msgid "Balsa cannot open your \"%s\" mailbox."
 msgstr "Balsa kan ikke åbne din '%s' postbakke."
 
-#: ../src/main.c:594
+#: ../src/main.c:603
 msgid "Inbox"
 msgstr "Indbakke"
 
-#: ../src/main.c:600
+#: ../src/main.c:609
 msgid "Outbox"
 msgstr "Udbakke"
 
-#: ../src/main.c:606
+#: ../src/main.c:615
 msgid "Sentbox"
 msgstr "Sendt"
 
-#: ../src/main.c:612
+#: ../src/main.c:621
 msgid "Draftbox"
 msgstr "Kladder"
 
-#: ../src/main.c:617
+#: ../src/main.c:626
 msgid "Trash"
 msgstr "Papirkurv"
 
-#: ../src/main.c:832
+#: ../src/main.c:847
 msgid "Compressing mail folders..."
 msgstr "Pakker postmapper..."
 
@@ -4466,8 +4454,8 @@ msgstr "_Postkasser"
 #. Less frequently used entries of the 'Edit' menu
 #. Less frequently used entries of the 'Tools' menu
 #: ../src/main-window.c:359 ../src/main-window.c:364
-#: ../src/sendmsg-window.c:325 ../src/sendmsg-window.c:327
-#: ../src/sendmsg-window.c:329
+#: ../src/sendmsg-window.c:328 ../src/sendmsg-window.c:330
+#: ../src/sendmsg-window.c:332
 msgid "_More"
 msgstr "_Flere"
 
@@ -4483,7 +4471,7 @@ msgstr "_Sorter postkasse"
 msgid "H_ide messages"
 msgstr "Skj_ul beskeder"
 
-#: ../src/main-window.c:365 ../src/sendmsg-window.c:323
+#: ../src/main-window.c:365 ../src/sendmsg-window.c:326
 msgid "_Tools"
 msgstr "_Værktøjslinjer"
 
@@ -4535,12 +4523,12 @@ msgid "Send and Receive messages"
 msgstr "Afsend og modtag beskeder"
 
 #: ../src/main-window.c:385 ../src/message-window.c:244
-#: ../src/sendmsg-window.c:342
+#: ../src/sendmsg-window.c:345
 msgid "Page _Setup"
 msgstr "Sideop_sætning"
 
 #: ../src/main-window.c:386 ../src/message-window.c:245
-#: ../src/sendmsg-window.c:343
+#: ../src/sendmsg-window.c:346
 msgid "Set up page for printing"
 msgstr "Opsæt side til udskrivning"
 
@@ -4734,7 +4722,7 @@ msgstr "Om Balsa"
 
 #. Edit menu items
 #: ../src/main-window.c:488 ../src/message-window.c:253
-#: ../src/sendmsg-window.c:359
+#: ../src/sendmsg-window.c:362
 msgid "Select _All"
 msgstr "Vælg _alle"
 
@@ -4896,7 +4884,7 @@ msgstr "Vælg alle beskeder i aktuelle tråd"
 
 #. File menu item
 #: ../src/main-window.c:576 ../src/message-window.c:246
-#: ../src/sendmsg-window.c:345
+#: ../src/sendmsg-window.c:348
 msgid "_Print..."
 msgstr "_Skriv ud..."
 
@@ -5031,7 +5019,7 @@ msgid "_Wrap"
 msgstr "_Ombryd"
 
 #: ../src/main-window.c:648 ../src/message-window.c:317
-#: ../src/sendmsg-window.c:362
+#: ../src/sendmsg-window.c:365
 msgid "Wrap message lines"
 msgstr "Ombryd linier i brevet"
 
@@ -5493,7 +5481,7 @@ msgid "Remote mailbox servers"
 msgstr "Eksterne postkasseservere"
 
 #: ../src/pref-manager.c:1692 ../src/pref-manager.c:2930
-#: ../src/sendmsg-window.c:3014
+#: ../src/sendmsg-window.c:3021
 msgid "Type"
 msgstr "Type"
 
@@ -5705,7 +5693,7 @@ msgstr "Layout"
 msgid "Sort and thread"
 msgstr "Sorter og organiser i tråde"
 
-#: ../src/pref-manager.c:2191 ../src/print-gtk.c:489
+#: ../src/pref-manager.c:2191 ../src/print-gtk.c:501
 msgid "Message"
 msgstr "Besked"
 
@@ -5810,7 +5798,7 @@ msgstr "Skrivevindue"
 msgid "Invalid or incomplete address label color"
 msgstr "Ugyldig eller ukomplet farve for adresseetiket"
 
-#: ../src/pref-manager.c:2483 ../src/print-gtk.c:498
+#: ../src/pref-manager.c:2483 ../src/print-gtk.c:510
 msgid "Fonts"
 msgstr "Skrifttyper"
 
@@ -6028,28 +6016,34 @@ msgstr "Luk beskedvindue"
 msgid "Error displaying link_id %s: %s\n"
 msgstr "Fejl under visning af henvisnings_id (link_id) %s: %s\n"
 
-#: ../src/print-gtk.c:91 ../src/print-gtk.c:242
+#: ../src/print-gtk.c:91 ../src/print-gtk.c:250
 #, c-format
 msgid "Page %d of %d"
 msgstr "Side %d af %d"
 
-#: ../src/print-gtk.c:145 ../src/print-gtk.c:164
+#: ../src/print-gtk.c:145 ../src/print-gtk.c:171
 msgid "Signed and encrypted matter"
 msgstr "Underskrevet og krypteret indhold"
 
-#: ../src/print-gtk.c:149 ../src/print-gtk.c:168
+#: ../src/print-gtk.c:149 ../src/print-gtk.c:175
 msgid "Signed matter"
 msgstr "Underskrevet indhold"
 
-#: ../src/print-gtk.c:192
+#: ../src/print-gtk.c:156
+msgid "Encrypted matter"
+msgstr "Krypteret indhold"
+
+#: ../src/print-gtk.c:199
 #, c-format
 msgid "This is an inline %s signed %s message part:"
 msgstr "Dette er en inkluderet %s underskrevet %s del af en besked:"
 
-#: ../src/print-gtk.c:346
+#: ../src/print-gtk.c:354
 #, c-format
-msgid "Cannot print page %d because the document has only %d pages."
-msgstr "Kan ikke udskrive side %d da dokumentet kun har %d sider."
+msgid "Cannot print page %d because the document has only %d page."
+msgid_plural "Cannot print page %d because the document has only %d pages."
+msgstr[0] "Kan ikke udskrive side %d, da dokumentet kun har %d side."
+msgstr[1] "Kan ikke udskrive side %d, da dokumentet kun har %d sider."
 
 #. Translate to the default units to use for presenting
 #. * lengths to the user. Translate to default:inch if you
@@ -6057,63 +6051,63 @@ msgstr "Kan ikke udskrive side %d da dokumentet kun har %d sider."
 #. * Do *not* translate it to "predefinito:mm", if it
 #. * it isn't default:mm or default:inch it will not work
 #.
-#: ../src/print-gtk.c:380
+#: ../src/print-gtk.c:392
 msgid "default:mm"
 msgstr "default:mm"
 
-#: ../src/print-gtk.c:437
+#: ../src/print-gtk.c:449
 msgid "inch"
 msgstr "tomme"
 
-#: ../src/print-gtk.c:444
+#: ../src/print-gtk.c:456
 msgid "mm"
 msgstr "mm"
 
-#: ../src/print-gtk.c:519
+#: ../src/print-gtk.c:531
 msgid "_Header Font:"
 msgstr "_Skrifttype for hovede:"
 
-#: ../src/print-gtk.c:522
+#: ../src/print-gtk.c:534
 msgid "B_ody Font:"
 msgstr "Skrifttype for _krop:"
 
-#: ../src/print-gtk.c:525
+#: ../src/print-gtk.c:537
 msgid "_Footer Font:"
 msgstr "_Skrifttype for fodnote:"
 
-#: ../src/print-gtk.c:532
+#: ../src/print-gtk.c:544
 msgid "Highlighting"
 msgstr "Markering"
 
-#: ../src/print-gtk.c:547
+#: ../src/print-gtk.c:559
 msgid "Highlight _cited text"
 msgstr "Marker _citeret tekst"
 
-#: ../src/print-gtk.c:556
+#: ../src/print-gtk.c:568
 msgid "Highlight _structured phrases"
 msgstr "Marker _strukturerede fraser"
 
-#: ../src/print-gtk.c:567
+#: ../src/print-gtk.c:579
 msgid "Margins"
 msgstr "Margener"
 
-#: ../src/print-gtk.c:589
+#: ../src/print-gtk.c:601
 msgid "_Top"
 msgstr "_Øverst"
 
-#: ../src/print-gtk.c:595
+#: ../src/print-gtk.c:607
 msgid "_Bottom"
 msgstr "_Nederst"
 
-#: ../src/print-gtk.c:607
+#: ../src/print-gtk.c:619
 msgid "_Left"
 msgstr "_Venstre"
 
-#: ../src/print-gtk.c:613
+#: ../src/print-gtk.c:625
 msgid "_Right"
 msgstr "_Højre"
 
-#: ../src/print-gtk.c:739
+#: ../src/print-gtk.c:751
 #, c-format
 msgid "Error printing message: %s"
 msgstr "Fejl ved udskrivning af besked: %s"
@@ -6171,291 +6165,291 @@ msgstr "Fejl ved angivelse af GConf-felt: %s\n"
 #. Translators: please use the initial letter of each language as
 #. * its accelerator; this is a long list, and unique accelerators
 #. * cannot be found.
-#: ../src/sendmsg-window.c:255
+#: ../src/sendmsg-window.c:258
 msgid "_Brazilian Portuguese"
 msgstr "_Brasiliansk-portugesisk"
 
-#: ../src/sendmsg-window.c:256
+#: ../src/sendmsg-window.c:259
 msgid "_Catalan"
 msgstr "_Katalansk"
 
-#: ../src/sendmsg-window.c:257
+#: ../src/sendmsg-window.c:260
 msgid "_Chinese Simplified"
 msgstr "_Simplificeret kinesisk"
 
-#: ../src/sendmsg-window.c:258
+#: ../src/sendmsg-window.c:261
 msgid "_Chinese Traditional"
 msgstr "_Traditionel kinesisk"
 
-#: ../src/sendmsg-window.c:259
+#: ../src/sendmsg-window.c:262
 msgid "_Czech"
 msgstr "_Tjekkisk"
 
-#: ../src/sendmsg-window.c:260
+#: ../src/sendmsg-window.c:263
 msgid "_Danish"
 msgstr "_Dansk"
 
-#: ../src/sendmsg-window.c:261
+#: ../src/sendmsg-window.c:264
 msgid "_Dutch"
 msgstr "_Nederlandsk"
 
-#: ../src/sendmsg-window.c:262
+#: ../src/sendmsg-window.c:265
 msgid "_English (American)"
 msgstr "_Engelsk (amerikansk)"
 
-#: ../src/sendmsg-window.c:263
+#: ../src/sendmsg-window.c:266
 msgid "_English (British)"
 msgstr "_Engelsk (britisk)"
 
-#: ../src/sendmsg-window.c:264
+#: ../src/sendmsg-window.c:267
 msgid "_Esperanto"
 msgstr "_Esperanto"
 
-#: ../src/sendmsg-window.c:265
+#: ../src/sendmsg-window.c:268
 msgid "_Estonian"
 msgstr "_Estisk"
 
-#: ../src/sendmsg-window.c:266
+#: ../src/sendmsg-window.c:269
 msgid "_Finnish"
 msgstr "_Finsk"
 
-#: ../src/sendmsg-window.c:267
+#: ../src/sendmsg-window.c:270
 msgid "_French"
 msgstr "_Fransk"
 
-#: ../src/sendmsg-window.c:268
+#: ../src/sendmsg-window.c:271
 msgid "_German"
 msgstr "_Tysk"
 
-#: ../src/sendmsg-window.c:269
+#: ../src/sendmsg-window.c:272
 msgid "_German (Austrian)"
 msgstr "_Tysk (østrigsk)"
 
-#: ../src/sendmsg-window.c:270
+#: ../src/sendmsg-window.c:273
 msgid "_German (Swiss)"
 msgstr "_Tysk (schweizisk)"
 
-#: ../src/sendmsg-window.c:271
+#: ../src/sendmsg-window.c:274
 msgid "_Greek"
 msgstr "_Græsk"
 
-#: ../src/sendmsg-window.c:272
+#: ../src/sendmsg-window.c:275
 msgid "_Hebrew"
 msgstr "_Hebraisk"
 
-#: ../src/sendmsg-window.c:273
+#: ../src/sendmsg-window.c:276
 msgid "_Hungarian"
 msgstr "_Ungarsk"
 
-#: ../src/sendmsg-window.c:274
+#: ../src/sendmsg-window.c:277
 msgid "_Italian"
 msgstr "_Italiensk"
 
-#: ../src/sendmsg-window.c:275
+#: ../src/sendmsg-window.c:278
 msgid "_Japanese (JIS)"
 msgstr "_Japansk (JIS)"
 
-#: ../src/sendmsg-window.c:276
+#: ../src/sendmsg-window.c:279
 msgid "_Kazakh"
 msgstr "_Kasakhisk"
 
-#: ../src/sendmsg-window.c:277
+#: ../src/sendmsg-window.c:280
 msgid "_Korean"
 msgstr "_Koreansk"
 
-#: ../src/sendmsg-window.c:278
+#: ../src/sendmsg-window.c:281
 msgid "_Latvian"
 msgstr "_Lettisk"
 
-#: ../src/sendmsg-window.c:279
+#: ../src/sendmsg-window.c:282
 msgid "_Lithuanian"
 msgstr "_Litauisk"
 
-#: ../src/sendmsg-window.c:280
+#: ../src/sendmsg-window.c:283
 msgid "_Norwegian"
 msgstr "_Norsk"
 
-#: ../src/sendmsg-window.c:281
+#: ../src/sendmsg-window.c:284
 msgid "_Polish"
 msgstr "_Polsk"
 
-#: ../src/sendmsg-window.c:282
+#: ../src/sendmsg-window.c:285
 msgid "_Portugese"
 msgstr "_Portugisisk"
 
-#: ../src/sendmsg-window.c:283
+#: ../src/sendmsg-window.c:286
 msgid "_Romanian"
 msgstr "_Rumænsk"
 
-#: ../src/sendmsg-window.c:284
+#: ../src/sendmsg-window.c:287
 msgid "_Russian"
 msgstr "_Russisk"
 
-#: ../src/sendmsg-window.c:285
+#: ../src/sendmsg-window.c:288
 msgid "_Serbian"
 msgstr "_Serbisk"
 
-#: ../src/sendmsg-window.c:286
+#: ../src/sendmsg-window.c:289
 msgid "_Serbian (Latin)"
 msgstr "_Serbisk (Latin)"
 
-#: ../src/sendmsg-window.c:287
+#: ../src/sendmsg-window.c:290
 msgid "_Slovak"
 msgstr "_Slovakisk"
 
-#: ../src/sendmsg-window.c:288
+#: ../src/sendmsg-window.c:291
 msgid "_Spanish"
 msgstr "_Spansk"
 
-#: ../src/sendmsg-window.c:289
+#: ../src/sendmsg-window.c:292
 msgid "_Swedish"
 msgstr "_Svensk"
 
-#: ../src/sendmsg-window.c:290
+#: ../src/sendmsg-window.c:293
 msgid "_Tatar"
 msgstr "_Tatarisk"
 
-#: ../src/sendmsg-window.c:291
+#: ../src/sendmsg-window.c:294
 msgid "_Turkish"
 msgstr "_Tyrkisk"
 
-#: ../src/sendmsg-window.c:292
+#: ../src/sendmsg-window.c:295
 msgid "_Ukrainian"
 msgstr "_Ukrainsk"
 
-#: ../src/sendmsg-window.c:293
+#: ../src/sendmsg-window.c:296
 msgid "_Generic UTF-8"
 msgstr "_Generisk UTF-8"
 
-#: ../src/sendmsg-window.c:319
+#: ../src/sendmsg-window.c:322
 msgid "_Show"
 msgstr "_Vis"
 
-#: ../src/sendmsg-window.c:320
+#: ../src/sendmsg-window.c:323
 msgid "_Language"
 msgstr "_Sprog"
 
-#: ../src/sendmsg-window.c:321
+#: ../src/sendmsg-window.c:324
 msgid "_Options"
 msgstr "_Indstillinger"
 
-#: ../src/sendmsg-window.c:331
+#: ../src/sendmsg-window.c:334
 msgid "_Include File..."
 msgstr "_Inkludér fil..."
 
-#: ../src/sendmsg-window.c:332
+#: ../src/sendmsg-window.c:335
 msgid "Include a file"
 msgstr "Inkludér en fil"
 
-#: ../src/sendmsg-window.c:333
+#: ../src/sendmsg-window.c:336
 msgid "_Attach File..."
 msgstr "_Vedhæft bilag..."
 
-#: ../src/sendmsg-window.c:334
+#: ../src/sendmsg-window.c:337
 msgid "Attach a file"
 msgstr "Vedhæft et bilag"
 
-#: ../src/sendmsg-window.c:335
+#: ../src/sendmsg-window.c:338
 msgid "I_nclude Message(s)"
 msgstr "_Inkludér besked(er)"
 
-#: ../src/sendmsg-window.c:336
+#: ../src/sendmsg-window.c:339
 msgid "Include selected message(s)"
 msgstr "Inkludér valgte besked(er)"
 
-#: ../src/sendmsg-window.c:337
+#: ../src/sendmsg-window.c:340
 msgid "Attach _Message(s)"
 msgstr "_Vedlæg besked(er)"
 
-#: ../src/sendmsg-window.c:338
+#: ../src/sendmsg-window.c:341
 msgid "Attach selected message(s)"
 msgstr "Vedlæg valgte besked(er)"
 
-#: ../src/sendmsg-window.c:339
+#: ../src/sendmsg-window.c:342
 msgid "_Save"
 msgstr "_Gem"
 
-#: ../src/sendmsg-window.c:340
+#: ../src/sendmsg-window.c:343
 msgid "Save this message"
 msgstr "Gem denne besked"
 
-#: ../src/sendmsg-window.c:346
+#: ../src/sendmsg-window.c:349
 msgid "Print the edited message"
 msgstr "Udskriv det redigerede brev"
 
-#: ../src/sendmsg-window.c:349
+#: ../src/sendmsg-window.c:352
 msgid "_Undo"
 msgstr "_Fortryd"
 
-#: ../src/sendmsg-window.c:350
+#: ../src/sendmsg-window.c:353
 msgid "Undo most recent change"
 msgstr "Fortryd seneste ændringer"
 
-#: ../src/sendmsg-window.c:351
+#: ../src/sendmsg-window.c:354
 msgid "_Redo"
 msgstr "_Omgør"
 
-#: ../src/sendmsg-window.c:352
+#: ../src/sendmsg-window.c:355
 msgid "Redo most recent change"
 msgstr "Omgør seneste ændringer"
 
-#: ../src/sendmsg-window.c:353
+#: ../src/sendmsg-window.c:356
 msgid "Cu_t"
 msgstr "_Klip"
 
-#: ../src/sendmsg-window.c:354
+#: ../src/sendmsg-window.c:357
 msgid "Cut the selected text"
 msgstr "Klip den valgte tekst"
 
-#: ../src/sendmsg-window.c:356
+#: ../src/sendmsg-window.c:359
 msgid "Copy to the clipboard"
 msgstr "Kopier til udklipsholder"
 
-#: ../src/sendmsg-window.c:357
+#: ../src/sendmsg-window.c:360
 msgid "_Paste"
 msgstr "_Indsæt"
 
-#: ../src/sendmsg-window.c:358
+#: ../src/sendmsg-window.c:361
 msgid "Paste from the clipboard"
 msgstr "Indsæt fra udklipsholder"
 
-#: ../src/sendmsg-window.c:361
+#: ../src/sendmsg-window.c:364
 msgid "_Wrap Body"
 msgstr "_Ombryd tekst"
 
-#: ../src/sendmsg-window.c:363
+#: ../src/sendmsg-window.c:366
 msgid "_Reflow Selected Text"
 msgstr "_Løb markeret tekst igennem igen"
 
-#: ../src/sendmsg-window.c:365
+#: ../src/sendmsg-window.c:368
 msgid "Insert Si_gnature"
 msgstr "Indsæt _underskrift"
 
-#: ../src/sendmsg-window.c:367
+#: ../src/sendmsg-window.c:370
 msgid "_Quote Message(s)"
 msgstr "_Citér besked(er)"
 
-#: ../src/sendmsg-window.c:370 ../src/sendmsg-window.c:412
+#: ../src/sendmsg-window.c:373 ../src/sendmsg-window.c:415
 msgid "C_heck Spelling"
 msgstr "_Stavekontrol"
 
-#: ../src/sendmsg-window.c:371 ../src/sendmsg-window.c:413
+#: ../src/sendmsg-window.c:374 ../src/sendmsg-window.c:416
 msgid "Check the spelling of the message"
 msgstr "Tjek stavning i beskeden"
 
-#: ../src/sendmsg-window.c:374
+#: ../src/sendmsg-window.c:377
 msgid "Select _Identity..."
 msgstr "Vælg _identitet..."
 
-#: ../src/sendmsg-window.c:375
+#: ../src/sendmsg-window.c:378
 msgid "Select the Identity to use for the message"
 msgstr "Vælg identitet som skal bruges for beskeden"
 
-#: ../src/sendmsg-window.c:378
+#: ../src/sendmsg-window.c:381
 msgid "_Edit with Gnome-Editor"
 msgstr "_Redigér med Gnome-Editor"
 
-#: ../src/sendmsg-window.c:379
+#: ../src/sendmsg-window.c:382
 msgid "Edit the current message with the default Gnome editor"
 msgstr "Redigér den aktuelle besked med standard Gnome redigering"
 
@@ -6463,128 +6457,128 @@ msgstr "Redigér den aktuelle besked med standard Gnome redigering"
 #. * stock_id; the first in this list defines the action tied to the
 #. * toolbar's "Send" button, so "ToolbarSend" must come before
 #. * the others.
-#: ../src/sendmsg-window.c:390 ../src/sendmsg-window.c:392
+#: ../src/sendmsg-window.c:393 ../src/sendmsg-window.c:395
 msgid "Sen_d"
 msgstr "Sen_d"
 
-#: ../src/sendmsg-window.c:391 ../src/sendmsg-window.c:393
+#: ../src/sendmsg-window.c:394 ../src/sendmsg-window.c:396
 msgid "Send this message"
 msgstr "Send dette brev"
 
-#: ../src/sendmsg-window.c:395
+#: ../src/sendmsg-window.c:398
 msgid "_Queue"
 msgstr "_Kø"
 
-#: ../src/sendmsg-window.c:396 ../src/sendmsg-window.c:402
+#: ../src/sendmsg-window.c:399 ../src/sendmsg-window.c:405
 msgid "Queue this message in Outbox for sending"
 msgstr "Sæt denne besked i kø i udbakke til afsendelse"
 
-#: ../src/sendmsg-window.c:398
+#: ../src/sendmsg-window.c:401
 msgid "_Postpone"
 msgstr "_Udsæt"
 
-#: ../src/sendmsg-window.c:399
+#: ../src/sendmsg-window.c:402
 msgid "Save this message and close"
 msgstr "Gem denne besked og luk"
 
-#: ../src/sendmsg-window.c:401
+#: ../src/sendmsg-window.c:404
 msgid "Send _Later"
 msgstr "Send _senere"
 
-#: ../src/sendmsg-window.c:404
+#: ../src/sendmsg-window.c:407
 msgid "Sa_ve and Close"
 msgstr "Ge_m og luk"
 
-#: ../src/sendmsg-window.c:416
+#: ../src/sendmsg-window.c:419
 msgid "Too_lbar"
 msgstr "_Værktøjsbjælke"
 
-#: ../src/sendmsg-window.c:418
+#: ../src/sendmsg-window.c:421
 msgid "F_rom"
 msgstr "F_ra"
 
-#: ../src/sendmsg-window.c:420
+#: ../src/sendmsg-window.c:423
 msgid "Rec_ipients"
 msgstr "_Modtagere"
 
-#: ../src/sendmsg-window.c:423
+#: ../src/sendmsg-window.c:426
 msgid "R_eply To"
 msgstr "_Svar til"
 
-#: ../src/sendmsg-window.c:426
+#: ../src/sendmsg-window.c:429
 msgid "F_cc"
 msgstr "F_cc"
 
-#: ../src/sendmsg-window.c:429
+#: ../src/sendmsg-window.c:432
 msgid "_Request Disposition Notification"
 msgstr "_Bed om underretning om disposition"
 
-#: ../src/sendmsg-window.c:430
+#: ../src/sendmsg-window.c:433
 msgid "Request Message Disposition Notification"
 msgstr "Bed om underretning om beskeddisposition"
 
-#: ../src/sendmsg-window.c:432
+#: ../src/sendmsg-window.c:435
 msgid "_Format = Flowed"
 msgstr "_Format = Gennemløbet"
 
 #. Send as message/alternative with text/plain and text/html parts
-#: ../src/sendmsg-window.c:435
+#: ../src/sendmsg-window.c:438
 msgid "Send as plain text and _HTML"
 msgstr "Send uden kryptering og _HTML"
 
-#: ../src/sendmsg-window.c:439 ../src/sendmsg-window.c:445
+#: ../src/sendmsg-window.c:442 ../src/sendmsg-window.c:448
 msgid "_Sign Message"
 msgstr "_Underskriv besked"
 
-#: ../src/sendmsg-window.c:440
+#: ../src/sendmsg-window.c:443
 msgid "Sign message using GPG"
 msgstr "Underskriv besked med brug af GPG"
 
-#: ../src/sendmsg-window.c:441 ../src/sendmsg-window.c:448
+#: ../src/sendmsg-window.c:444 ../src/sendmsg-window.c:451
 msgid "_Encrypt Message"
 msgstr "_Krypter besked"
 
-#: ../src/sendmsg-window.c:442
+#: ../src/sendmsg-window.c:445
 msgid "Encrypt message using GPG"
 msgstr "Krypter besked med GPG"
 
-#: ../src/sendmsg-window.c:446
+#: ../src/sendmsg-window.c:449
 msgid "signs the message using GnuPG"
 msgstr "underskriver beskeden med GnuPG"
 
-#: ../src/sendmsg-window.c:450
+#: ../src/sendmsg-window.c:453
 msgid "signs the message using GnuPG for all To: and CC: recipients"
 msgstr "underskriver beskeden med GnuPG for alle modtagere i Til: og CC:"
 
-#: ../src/sendmsg-window.c:460
+#: ../src/sendmsg-window.c:463
 msgid "_GnuPG uses MIME mode"
 msgstr "_GnuPG anvender MIME-tilstand"
 
-#: ../src/sendmsg-window.c:462
+#: ../src/sendmsg-window.c:465
 msgid "_GnuPG uses old OpenPGP mode"
 msgstr "_GnuPG anvender gammel OpenPGP-tilstand"
 
-#: ../src/sendmsg-window.c:465
+#: ../src/sendmsg-window.c:468
 msgid "_S/MIME mode (GpgSM)"
 msgstr "_S/MIME-tilstand (GpgSM)"
 
-#: ../src/sendmsg-window.c:677
+#: ../src/sendmsg-window.c:680
 msgid "Attachment"
 msgstr "Bilag"
 
-#: ../src/sendmsg-window.c:677
+#: ../src/sendmsg-window.c:680
 msgid "Inline"
 msgstr "Inkluderet"
 
-#: ../src/sendmsg-window.c:677
+#: ../src/sendmsg-window.c:680
 msgid "Reference"
 msgstr "Reference"
 
-#: ../src/sendmsg-window.c:918
+#: ../src/sendmsg-window.c:921
 msgid "(No name)"
 msgstr "(Intet navn)"
 
-#: ../src/sendmsg-window.c:924
+#: ../src/sendmsg-window.c:927
 #, c-format
 msgid ""
 "The message to '%s' is modified.\n"
@@ -6593,15 +6587,15 @@ msgstr ""
 "Beskeden til '%s' er ændret.\n"
 "Gem besked i kladder?"
 
-#: ../src/sendmsg-window.c:1222
+#: ../src/sendmsg-window.c:1225
 msgid "Gnome editor is not defined in your preferred applications."
 msgstr "Gnomeredigering er ikke defineret i dine foretrukne programmer."
 
-#: ../src/sendmsg-window.c:1278
+#: ../src/sendmsg-window.c:1281
 msgid "Select Identity"
 msgstr "Vælg identitet"
 
-#: ../src/sendmsg-window.c:1755
+#: ../src/sendmsg-window.c:1758
 #, c-format
 msgid ""
 "Saying yes will not send the file `%s' itself, but just a MIME message/"
@@ -6616,15 +6610,15 @@ msgstr ""
 "\n"
 "Ønsker du virkelig at vedlægge denne fil som en reference?"
 
-#: ../src/sendmsg-window.c:1768
+#: ../src/sendmsg-window.c:1771
 msgid "Attach as Reference?"
 msgstr "Vedlæg som reference?"
 
-#: ../src/sendmsg-window.c:1861
+#: ../src/sendmsg-window.c:1864
 msgid "Choose charset"
 msgstr "Vælg tegnsæt"
 
-#: ../src/sendmsg-window.c:1868
+#: ../src/sendmsg-window.c:1871
 #, c-format
 msgid ""
 "File\n"
@@ -6637,55 +6631,55 @@ msgstr ""
 "er ikke kodet i US-ASCII eller UTF-8.\n"
 "Vælg venligst tegnsættet der er brugt som filkodning."
 
-#: ../src/sendmsg-window.c:1888
+#: ../src/sendmsg-window.c:1891
 msgid "Attach as MIME type:"
 msgstr "Vedlæg som MIME-type:"
 
-#: ../src/sendmsg-window.c:1957
+#: ../src/sendmsg-window.c:1960
 #, c-format
 msgid "Character set for file %s changed from \"%s\" to \"%s\"."
 msgstr "Tegnsæt for fil %s blev ændret fra \"%s\" til \"%s\"."
 
-#: ../src/sendmsg-window.c:2000 ../src/sendmsg-window.c:5759
+#: ../src/sendmsg-window.c:2003 ../src/sendmsg-window.c:5766
 msgid "(no subject)"
 msgstr "(intet emne)"
 
-#: ../src/sendmsg-window.c:2038
+#: ../src/sendmsg-window.c:2041
 #, c-format
 msgid "Cannot create file URI object for %s"
 msgstr "Kan ikke oprette fil URI-objekt for %s"
 
-#: ../src/sendmsg-window.c:2046
+#: ../src/sendmsg-window.c:2049
 msgid "unknown error"
 msgstr "ukendt fejl"
 
-#: ../src/sendmsg-window.c:2093
+#: ../src/sendmsg-window.c:2096
 msgid "forwarded message"
 msgstr "videresendt besked"
 
-#: ../src/sendmsg-window.c:2098
+#: ../src/sendmsg-window.c:2101
 #, c-format
 msgid "Message from %s, subject: \"%s\""
 msgstr "Beskeds fra %s, emne: \"%s\""
 
-#: ../src/sendmsg-window.c:2174 ../src/sendmsg-window.c:2247
+#: ../src/sendmsg-window.c:2177 ../src/sendmsg-window.c:2250
 msgid "Remove"
 msgstr "Fjern"
 
-#: ../src/sendmsg-window.c:2259
+#: ../src/sendmsg-window.c:2262
 msgid "Open..."
 msgstr "Åbn..."
 
-#: ../src/sendmsg-window.c:2271
+#: ../src/sendmsg-window.c:2274
 msgid "(URL)"
 msgstr "(URL)"
 
-#: ../src/sendmsg-window.c:2329
+#: ../src/sendmsg-window.c:2332
 msgid "Attach file"
 msgstr "Vedhæft bilag"
 
-#: ../src/sendmsg-window.c:2430 ../src/sendmsg-window.c:2540
-#: ../src/sendmsg-window.c:5016
+#: ../src/sendmsg-window.c:2433 ../src/sendmsg-window.c:2543
+#: ../src/sendmsg-window.c:5023
 msgid ""
 "Attaching message failed.\n"
 "Possible reason: not enough temporary space"
@@ -6693,148 +6687,148 @@ msgstr ""
 "Vedlæggelse af besked mislykkedes.\n"
 "Mulig grund: ikke nok midlertidig plads"
 
-#: ../src/sendmsg-window.c:2794
+#: ../src/sendmsg-window.c:2797
 msgid "F_rom:"
 msgstr "F_ra:"
 
 #. Subject:
-#: ../src/sendmsg-window.c:2932
+#: ../src/sendmsg-window.c:2939
 msgid "S_ubject:"
 msgstr "E_mne:"
 
 #. fcc: mailbox folder where the message copy will be written to
-#: ../src/sendmsg-window.c:2943
+#: ../src/sendmsg-window.c:2950
 msgid "F_cc:"
 msgstr "F_cc:"
 
 #. Attachment list
-#: ../src/sendmsg-window.c:2972
+#: ../src/sendmsg-window.c:2979
 msgid "_Attachments:"
 msgstr "Bil_ag:"
 
-#: ../src/sendmsg-window.c:3021
+#: ../src/sendmsg-window.c:3028
 msgid "Mode"
 msgstr "Tilstand"
 
-#: ../src/sendmsg-window.c:3368
+#: ../src/sendmsg-window.c:3375
 #, c-format
 msgid "Could not save attachment: %s"
 msgstr "Kunne ikke gemme bilag: %s"
 
-#: ../src/sendmsg-window.c:3392
+#: ../src/sendmsg-window.c:3399
 msgid "No subject"
 msgstr "Intet emne"
 
-#: ../src/sendmsg-window.c:3425
+#: ../src/sendmsg-window.c:3432
 #, c-format
 msgid "inlined file \"%s\" (%s)"
 msgstr "inkluderet fil \"%s\" (%s)"
 
-#: ../src/sendmsg-window.c:3428
+#: ../src/sendmsg-window.c:3435
 #, c-format
 msgid "attached file \"%s\" (%s)"
 msgstr "vedlagt fil \"%s\" (%s)"
 
-#: ../src/sendmsg-window.c:3432
+#: ../src/sendmsg-window.c:3439
 #, c-format
 msgid "inlined %s part"
 msgstr "inkluderet %s del"
 
-#: ../src/sendmsg-window.c:3434
+#: ../src/sendmsg-window.c:3441
 #, c-format
 msgid "attached %s part"
 msgstr "vedlagt %s del"
 
-#: ../src/sendmsg-window.c:3502
+#: ../src/sendmsg-window.c:3509
 #, c-format
 msgid "message from %s, subject \"%s\""
 msgstr "besked fra %s, emne \"%s\""
 
-#: ../src/sendmsg-window.c:3629
+#: ../src/sendmsg-window.c:3636
 msgid "quoted"
 msgstr "citeret"
 
-#: ../src/sendmsg-window.c:3634 ../src/sendmsg-window.c:3637
+#: ../src/sendmsg-window.c:3641 ../src/sendmsg-window.c:3644
 msgid "quoted attachment"
 msgstr "citeret bilag"
 
-#: ../src/sendmsg-window.c:3663
+#: ../src/sendmsg-window.c:3670
 msgid "Select parts for quotation"
 msgstr "Vælg dele til citering"
 
-#: ../src/sendmsg-window.c:3672
+#: ../src/sendmsg-window.c:3679
 msgid "Select the parts of the message which shall be quoted in the reply"
 msgstr "Vælg de dele af beskeden som skal citeres i svaret"
 
-#: ../src/sendmsg-window.c:3814
+#: ../src/sendmsg-window.c:3821
 msgid "you"
 msgstr "dig"
 
-#: ../src/sendmsg-window.c:3823
+#: ../src/sendmsg-window.c:3830
 #, c-format
 msgid "------forwarded message from %s------\n"
 msgstr "------videresendt besked fra %s------\n"
 
-#: ../src/sendmsg-window.c:3860
+#: ../src/sendmsg-window.c:3867
 #, c-format
 msgid "Message-ID: %s\n"
 msgstr "Beskeds-id: %s\n"
 
-#: ../src/sendmsg-window.c:3866
+#: ../src/sendmsg-window.c:3873
 msgid "References:"
 msgstr "Referencer:"
 
-#: ../src/sendmsg-window.c:3877
+#: ../src/sendmsg-window.c:3884
 #, c-format
 msgid "On %s, %s wrote:\n"
 msgstr "Den %s, skrev %s:\n"
 
-#: ../src/sendmsg-window.c:3879
+#: ../src/sendmsg-window.c:3886
 #, c-format
 msgid "%s wrote:\n"
 msgstr "%s skrev:\n"
 
-#: ../src/sendmsg-window.c:3989
+#: ../src/sendmsg-window.c:3996
 msgid "No signature found!"
 msgstr "Ingen underskrift fundet!"
 
-#: ../src/sendmsg-window.c:4177
+#: ../src/sendmsg-window.c:4184
 msgid "Could not save message."
 msgstr "Kunne ikke gemme besked."
 
-#: ../src/sendmsg-window.c:4184
+#: ../src/sendmsg-window.c:4191
 #, c-format
 msgid "Could not open draftbox: %s"
 msgstr "Kunne ikke åbne kladder: %s"
 
-#: ../src/sendmsg-window.c:4209
+#: ../src/sendmsg-window.c:4216
 msgid "Message saved."
 msgstr "Besked gemt."
 
-#: ../src/sendmsg-window.c:5196 ../src/sendmsg-window.c:5204
-#: ../src/sendmsg-window.c:5211 ../src/sendmsg-window.c:5218
-#: ../src/sendmsg-window.c:5242
+#: ../src/sendmsg-window.c:5203 ../src/sendmsg-window.c:5211
+#: ../src/sendmsg-window.c:5218 ../src/sendmsg-window.c:5225
+#: ../src/sendmsg-window.c:5249
 #, c-format
 msgid "Could not attach the file %s: %s."
 msgstr "Kunne ikke vedlægge filen %s: %s."
 
-#: ../src/sendmsg-window.c:5197
+#: ../src/sendmsg-window.c:5204
 msgid "not an absolute path"
 msgstr "ikke en absolut sti"
 
-#: ../src/sendmsg-window.c:5205
+#: ../src/sendmsg-window.c:5212
 msgid "not in your directory"
 msgstr "ikke i din mappe"
 
-#: ../src/sendmsg-window.c:5212
+#: ../src/sendmsg-window.c:5219
 msgid "does not exist"
 msgstr "eksisterer ikke"
 
-#: ../src/sendmsg-window.c:5243
+#: ../src/sendmsg-window.c:5250
 msgid "not in current directory"
 msgstr "ikke i aktuel mappe"
 
-#: ../src/sendmsg-window.c:5293
+#: ../src/sendmsg-window.c:5300
 msgid ""
 "The link that you selected created\n"
 "a \"Blind copy\" (Bcc) address.\n"
@@ -6846,40 +6840,40 @@ msgstr ""
 "Undersøg venligst om adressen\n"
 "passer."
 
-#: ../src/sendmsg-window.c:5377
+#: ../src/sendmsg-window.c:5384
 #, c-format
 msgid "Could not open the file %s.\n"
 msgstr "Kunne ikke åbne filen %s.\n"
 
-#: ../src/sendmsg-window.c:5425
+#: ../src/sendmsg-window.c:5432
 msgid "Include file"
 msgstr "Inkludér fil"
 
 #. Translators: please do not translate Face.
-#: ../src/sendmsg-window.c:5611
+#: ../src/sendmsg-window.c:5618
 #, c-format
 msgid "Could not load Face header file %s: %s"
 msgstr "Kunne ikke oprette brevhovedfil %s for Face: %s"
 
 #. Translators: please do not translate Face.
-#: ../src/sendmsg-window.c:5614
+#: ../src/sendmsg-window.c:5621
 #, c-format
 msgid "Could not load X-Face header file %s: %s"
 msgstr "Kunne ikke indlæse brevhovedfil %s for X-Face: %s"
 
-#: ../src/sendmsg-window.c:5743
+#: ../src/sendmsg-window.c:5750
 msgid "You did not specify a subject for this message"
 msgstr "Du angav ikke et emne for denne besked"
 
-#: ../src/sendmsg-window.c:5744
+#: ../src/sendmsg-window.c:5751
 msgid "If you would like to provide one, enter it below."
 msgstr "Hvis du ønsker at angive et, så indtast det nedenfor."
 
-#: ../src/sendmsg-window.c:5794
+#: ../src/sendmsg-window.c:5801
 msgid "_Send"
 msgstr "_Send"
 
-#: ../src/sendmsg-window.c:5877
+#: ../src/sendmsg-window.c:5884
 #, c-format
 msgid ""
 "You did not select encryption for this message, although %s public keys are "
@@ -6890,19 +6884,19 @@ msgstr ""
 "tilgængelige for alle modtagere. For at beskytte dit privatliv, kan beskeden "
 "%s krypteres."
 
-#: ../src/sendmsg-window.c:5904
+#: ../src/sendmsg-window.c:5911
 msgid "Send _encrypted"
 msgstr "Send krypt_eret"
 
-#: ../src/sendmsg-window.c:5922
+#: ../src/sendmsg-window.c:5929
 msgid "Send _unencrypted"
 msgstr "Send _ukrypteret"
 
-#: ../src/sendmsg-window.c:5985
+#: ../src/sendmsg-window.c:5992
 msgid "You selected OpenPGP security for this message.\n"
 msgstr "Du valgte OpenPGP-sikkerhed til denne besked.\n"
 
-#: ../src/sendmsg-window.c:5990
+#: ../src/sendmsg-window.c:5997
 msgid ""
 "The message text will be sent as plain text and as HTML, but only the plain "
 "part can be signed.\n"
@@ -6910,14 +6904,14 @@ msgstr ""
 "Beskedteksten vil blive sendt uden kryptering og som HTML, men kun teksten "
 "uden kryptering kan underskrives.\n"
 
-#: ../src/sendmsg-window.c:5995
+#: ../src/sendmsg-window.c:6002
 msgid ""
 "The message contains attachments, which cannot be signed or encrypted.\n"
 msgstr ""
 "Denne besked indeholder bilag, som hverken kan underskrives eller "
 "krypteres.\n"
 
-#: ../src/sendmsg-window.c:5999
+#: ../src/sendmsg-window.c:6006
 msgid ""
 "You should select MIME mode if the complete message shall be protected. Do "
 "you really want to proceed?"
@@ -6925,85 +6919,85 @@ msgstr ""
 "Du bør vælge MIME-tilstand hvis den fuldstændige besked skal beskyttes. "
 "Ønsker du at fortsætte?"
 
-#: ../src/sendmsg-window.c:6024
+#: ../src/sendmsg-window.c:6031
 #, c-format
 msgid "sending message with gpg mode %d"
 msgstr "sender besked med gpg-tilstand %d"
 
-#: ../src/sendmsg-window.c:6061
+#: ../src/sendmsg-window.c:6068
 msgid "Message could not be created"
 msgstr "Besked kunne ikke oprettes"
 
-#: ../src/sendmsg-window.c:6063
+#: ../src/sendmsg-window.c:6070
 msgid "Message could not be queued in outbox"
 msgstr "Besked kunne ikke sættes i kø i udbakken"
 
-#: ../src/sendmsg-window.c:6065
+#: ../src/sendmsg-window.c:6072
 msgid "Message could not be saved in sentbox"
 msgstr "Besked kunne ikke gemmes i sendt"
 
-#: ../src/sendmsg-window.c:6067
+#: ../src/sendmsg-window.c:6074
 msgid "Message could not be sent"
 msgstr "Besked kunne ikke sendes"
 
-#: ../src/sendmsg-window.c:6070
+#: ../src/sendmsg-window.c:6077
 msgid "Message could not be signed"
 msgstr "Besked kunne ikke underskrives"
 
-#: ../src/sendmsg-window.c:6072
+#: ../src/sendmsg-window.c:6079
 msgid "Message could not be encrypted"
 msgstr "Besked kunne ikke krypteres"
 
-#: ../src/sendmsg-window.c:6078
+#: ../src/sendmsg-window.c:6085
 #, c-format
 msgid ""
 "Send failed: %s\n"
 "%s"
 msgstr "Afsending mislykkedes: %s%s"
 
-#: ../src/sendmsg-window.c:6083
+#: ../src/sendmsg-window.c:6090
 #, c-format
 msgid "Send failed: %s"
 msgstr "Kunne ikke sende: %s"
 
-#: ../src/sendmsg-window.c:6174
+#: ../src/sendmsg-window.c:6181
 #, c-format
 msgid "Could not postpone message: %s"
 msgstr "Kunne ikke udsætte besked: %s"
 
-#: ../src/sendmsg-window.c:6191
+#: ../src/sendmsg-window.c:6198
 msgid "Message postponed."
 msgstr "Besked udsat."
 
-#: ../src/sendmsg-window.c:6196
+#: ../src/sendmsg-window.c:6203
 msgid "Could not postpone message."
 msgstr "Kunne ikke udsætte besked."
 
-#: ../src/sendmsg-window.c:6349
+#: ../src/sendmsg-window.c:6356
 #, c-format
 msgid "Error starting spell checker: %s"
 msgstr "Fejl ved opstart af stavekontrol: %s"
 
-#: ../src/sendmsg-window.c:6516
+#: ../src/sendmsg-window.c:6523
 #, c-format
 msgid "Could not compile %s"
 msgstr "Kunne ikke kompilere %s"
 
-#: ../src/sendmsg-window.c:6517
+#: ../src/sendmsg-window.c:6524
 msgid "Quoted Text Regular Expression"
 msgstr "Regulært udtryk for citeret tekst"
 
-#: ../src/sendmsg-window.c:7024
+#: ../src/sendmsg-window.c:7031
 #, c-format
 msgid "Reply to %s: %s"
 msgstr "Svar til %s: %s"
 
-#: ../src/sendmsg-window.c:7029
+#: ../src/sendmsg-window.c:7036
 #, c-format
 msgid "Forward message to %s: %s"
 msgstr "Videresend besked til %s: %s"
 
-#: ../src/sendmsg-window.c:7033
+#: ../src/sendmsg-window.c:7040
 #, c-format
 msgid "New message to %s: %s"
 msgstr "Ny besked til %s: %s"
@@ -7399,6 +7393,64 @@ msgstr "Op"
 #: ../src/toolbar-prefs.c:551
 msgid "Down"
 msgstr "Ned"
+
+#~ msgid "the crypto engine for protocol OpenPGP is not available"
+#~ msgstr "kryptomotoren til protokol OpenPGP er ikke tilgængelig"
+
+#~ msgid "the crypto engine for protocol CMS is not available"
+#~ msgstr "kryptomotoren til protokol CMS er ikke tilgængelig"
+
+#~ msgid "invalid crypto engine %d"
+#~ msgstr "ugyldig kryptomotor %d"
+
+#~ msgid "Gpgme has been compiled without support for protocol %s."
+#~ msgstr "Gpgme er blev kompileret uden understøttelse for protokol %s."
+
+#~ msgid "Crypto engine %s is not installed properly."
+#~ msgstr "Kryptomotor %s er ikke korrekt installeret."
+
+#~ msgid " Hint: check the `gnupg2' (preferred) or `gnupg' package."
+#~ msgstr " Fif: Tjek pakken 'gnupg2' (foretrukket) eller 'gnupg'."
+
+#~ msgid " Hint: check the `gpgsm' package."
+#~ msgstr " Fif: Tjek pakken 'gpgsm'."
+
+#~ msgid ""
+#~ "Crypto engine %s version %s is installed, but at least version %s is "
+#~ "required."
+#~ msgstr ""
+#~ "Kryptomotor %s version %s er installeret, men den laveste version krævet "
+#~ "er %s."
+
+#~ msgid "Unknown problem with engine for protocol %s."
+#~ msgstr "Ukendt problem med motor for protokol %s."
+
+#~ msgid "%s: could not retrieve crypto engine information: %s."
+#~ msgstr "%s: Kunne ikke hente kryptomotorinformation: %s."
+
+#~ msgid "Enter passphrase to unlock the secret key for signing"
+#~ msgstr ""
+#~ "Indtast adgangsfrase for at låse den hemmelige nøgle til underskrift op"
+
+#~ msgid "creating a gpgme context failed"
+#~ msgstr "kunne ikke oprette en gpgme-kontekst"
+
+#~ msgid "Enter passphrase to decrypt message"
+#~ msgstr "Indtast adgangsfrase for at dekryptere besked"
+
+#~ msgid ""
+#~ "\n"
+#~ "Signed by: %s"
+#~ msgstr ""
+#~ "\n"
+#~ "Underskrevet af: %s"
+
+#~ msgid ""
+#~ "\n"
+#~ "Mail address: %s"
+#~ msgstr ""
+#~ "\n"
+#~ "E-post-adresse: %s"
 
 #~ msgid "Uploading %"
 #~ msgstr "Sender %"

@@ -10,7 +10,7 @@ dnl ###########################################################################
 
 # if autoconf is used not in a git source tree, use version=2.4.90
 AC_INIT([balsa],
-        m4_esyscmd_s([test -d .git && git describe --tags || echo 2.4.90]),
+        m4_esyscmd([test -d .git && echo -n `git describe --tags` || echo -n 2.4.90]),
         [])
 
 AM_INIT_AUTOMAKE

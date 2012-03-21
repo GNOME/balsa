@@ -1,3 +1,7 @@
+2012-03-20  Peter Bloomfield
+
+	* POTFILES.in: add balsa-mailto-handler.desktop.in.in.
+
 2010-01-23  Pawel Salek pawsa0 gmail.com
 
 	* POTFILES.in: update so that "make diskcheck" succeeds.

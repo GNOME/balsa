@@ -1,3 +1,11 @@
+2012-03-21  Peter Bloomfield
+
+	Move generated *.in files from POTFILES.in to
+	POTFILES.skip.
+
+	* POTFILES.in:
+	* POTFILES.skip:
+
 2012-03-20  Peter Bloomfield
 
 	* POTFILES.in: add balsa-mailto-handler.desktop.in.in.

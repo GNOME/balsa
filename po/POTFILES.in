@@ -1,9 +1,7 @@
 [encoding: UTF-8]
 # List of source files containing translatable strings.
 # Please keep this list in alphabetical order.
-balsa.desktop.in
 balsa.desktop.in.in
-balsa-mailto-handler.desktop.in
 balsa-mailto-handler.desktop.in.in
 libbalsa/address-book-extern.c
 libbalsa/address-book-ldap.c

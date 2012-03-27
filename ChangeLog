@@ -1,5 +1,17 @@
 2012-03-27  Peter Bloomfield
 
+	Use a single MRU folder list
+
+	* src/balsa-app.h: drop separate Fcc list.
+	* src/balsa-app.c (balsa_app_init): ditto.
+	* src/save-restore.c (config_mailbox_set_as_special): use
+	combined list;
+	(config_global_load), (config_save): do not save and restore
+	separate Fcc list.
+	* src/sendmsg-window.c (create_info_pane): use combined list.
+
+2012-03-27  Peter Bloomfield
+
 	Remember geometry of MRU mailbox tree
 
 	* src/balsa-app.h: new members mru_tree_{width,height}

@@ -2954,22 +2954,22 @@ create_info_pane(BalsaSendmsg * bsmsg)
     ++row;
     gtk_grid_attach(GTK_GRID(grid), bsmsg->fcc[0], 0, row, 1, 1);
 
-    if (!balsa_app.fcc_mru)
-        balsa_mblist_mru_add(&balsa_app.fcc_mru, balsa_app.sentbox->url);
-    balsa_mblist_mru_add(&balsa_app.fcc_mru, "");
+    if (!balsa_app.folder_mru)
+        balsa_mblist_mru_add(&balsa_app.folder_mru, balsa_app.sentbox->url);
+    balsa_mblist_mru_add(&balsa_app.folder_mru, "");
     if (balsa_app.copy_to_sentbox) {
         /* move the NULL option to the bottom */
-        balsa_app.fcc_mru = g_list_reverse(balsa_app.fcc_mru);
-        balsa_mblist_mru_add(&balsa_app.fcc_mru, "");
-        balsa_app.fcc_mru = g_list_reverse(balsa_app.fcc_mru);
+        balsa_app.folder_mru = g_list_reverse(balsa_app.folder_mru);
+        balsa_mblist_mru_add(&balsa_app.folder_mru, "");
+        balsa_app.folder_mru = g_list_reverse(balsa_app.folder_mru);
     }
     if (bsmsg->draft_message && bsmsg->draft_message->headers &&
 	bsmsg->draft_message->headers->fcc_url)
-        balsa_mblist_mru_add(&balsa_app.fcc_mru,
+        balsa_mblist_mru_add(&balsa_app.folder_mru,
                              bsmsg->draft_message->headers->fcc_url);
     bsmsg->fcc[1] =
         balsa_mblist_mru_option_menu(GTK_WINDOW(bsmsg->window),
-                                     &balsa_app.fcc_mru);
+                                     &balsa_app.folder_mru);
     gtk_label_set_mnemonic_widget(GTK_LABEL(bsmsg->fcc[0]), bsmsg->fcc[1]);
     gtk_grid_attach(GTK_GRID(grid), bsmsg->fcc[1] , 1, row, 1, 1);
 

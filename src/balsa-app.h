@@ -281,6 +281,10 @@ extern struct BalsaApplication {
     gint source_width;
     gint source_height;
 
+    /* MRU mailbox tree */
+    gint mru_tree_width;
+    gint mru_tree_height;
+
     /* what to do with message window after moving the message */
     MwActionAfterMove mw_action_after_move;
 

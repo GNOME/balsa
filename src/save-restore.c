@@ -849,6 +849,12 @@ config_global_load(void)
     balsa_app.source_height = libbalsa_conf_get_int("Height=400");
     libbalsa_conf_pop_group();
 
+    /* MRU mailbox tree ... */
+    libbalsa_conf_push_group("MruTree");
+    balsa_app.mru_tree_width  = libbalsa_conf_get_int("Width=150");
+    balsa_app.mru_tree_height = libbalsa_conf_get_int("Height=300");
+    libbalsa_conf_pop_group();
+
     /* Printing options ... */
     libbalsa_conf_push_group("Printing");
 
@@ -1336,6 +1342,12 @@ config_save(void)
                           balsa_app.source_escape_specials);
     libbalsa_conf_set_int("Width",  balsa_app.source_width);
     libbalsa_conf_set_int("Height", balsa_app.source_height);
+    libbalsa_conf_pop_group();
+
+    /* MRU mailbox tree ... */
+    libbalsa_conf_push_group("MruTree");
+    libbalsa_conf_set_int("Width",  balsa_app.mru_tree_width);
+    libbalsa_conf_set_int("Height", balsa_app.mru_tree_height);
     libbalsa_conf_pop_group();
 
     /* Printing options ... */

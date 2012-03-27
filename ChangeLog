@@ -1,3 +1,14 @@
+2012-03-27  Peter Bloomfield
+
+	Remember geometry of MRU mailbox tree
+
+	* src/balsa-app.h: new members mru_tree_{width,height}
+	* src/balsa-mblist.c (bmbl_mru_size_allocate_cb): save them when
+	the dialog's size is changed;
+	(bmbl_mru_show_tree): use the saved values.
+	* src/save-restore.c (config_global_load), (config_save): save
+	and restore them.
+
 2012-03-20  Peter Bloomfield
 
 	* configure.in: work around "intltool-update -m" bug: it knows

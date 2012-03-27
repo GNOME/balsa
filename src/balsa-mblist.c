@@ -1825,6 +1825,28 @@ bmbl_mru_activate_cb(GtkWidget * item, gpointer data)
  * Callback for the "activate" signal of the last menu item.
  * Pops up a GtkDialog with a BalsaMBList.
  */
+
+/*
+ * bmbl_mru_size_allocate_cb:
+ *
+ * Callback for the dialog's "size-allocate" signal.
+ * Remember the width and height.
+ */
+static void
+bmbl_mru_size_allocate_cb(GtkWidget * widget, GdkRectangle * allocation,
+                          gpointer user_data)
+{
+    GdkWindow *gdk_window;
+
+    /* Maximizing a GtkDialog may not be possible, but we check anyway. */
+    if ((gdk_window = gtk_widget_get_window(widget))
+        && !(gdk_window_get_state(gdk_window)
+             & GDK_WINDOW_STATE_MAXIMIZED)) {
+        balsa_app.mru_tree_width  = allocation->width;
+        balsa_app.mru_tree_height = allocation->height;
+    }
+}
+
 static void
 bmbl_mru_show_tree(GtkWidget * widget, gpointer data)
 {
@@ -1833,7 +1855,6 @@ bmbl_mru_show_tree(GtkWidget * widget, gpointer data)
     GtkWidget *scroll;
     GtkWidget *mblist;
     GtkTreeSelection *selection;
-    GtkRequisition req;
 
     mblist = balsa_mblist_new();
     g_signal_connect(mblist, "row-activated",
@@ -1864,13 +1885,11 @@ bmbl_mru_show_tree(GtkWidget * widget, gpointer data)
                       (gtk_dialog_get_content_area(GTK_DIALOG(dialog))),
                       scroll, TRUE, TRUE, 0);
 
-    /* Force the mailbox list to be a reasonable size. */
-    gtk_widget_get_preferred_size(mblist, NULL, &req);
-    /* FIXME: Magic numbers to avoid showing scrollbars;
-     * probably theme-dependent: */
-    req.width = MIN(req.width + 25, balsa_app.mblist_width);
-    req.height = MIN(req.height + 50, balsa_app.mw_height);
-    gtk_window_set_default_size(GTK_WINDOW(dialog), req.width, req.height);
+    g_signal_connect(dialog, "size-allocate",
+                     G_CALLBACK(bmbl_mru_size_allocate_cb), NULL);
+    gtk_window_set_default_size(GTK_WINDOW(dialog),
+                                balsa_app.mru_tree_width,
+                                balsa_app.mru_tree_height);
 
     gtk_dialog_run(GTK_DIALOG(dialog));
     gtk_widget_destroy(dialog);

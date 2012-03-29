@@ -15,7 +15,7 @@ msgstr ""
 "Project-Id-Version: balsa.HEAD\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=balsa&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2011-12-20 17:03+0000\n"
+"POT-Creation-Date: 2012-03-24 00:10+0000\n"
 "PO-Revision-Date: 2011-12-23 17:19+0100\n"
 "Last-Translator: Daniel Mustieles <daniel.mustieles@gmail.com>\n"
 "Language-Team: Español <gnome-es-list@gnome.org>\n"
@@ -32,18 +32,18 @@ msgid "Balsa"
 msgstr "Balsa"
 
 #: ../balsa.desktop.in.in.h:2 ../balsa-mailto-handler.desktop.in.in.h:2
-msgid "Balsa Mail Client"
-msgstr "Cliente de correo-e Balsa"
-
-#: ../balsa.desktop.in.in.h:3 ../balsa-mailto-handler.desktop.in.in.h:3
 msgid "E-Mail utility"
 msgstr "Utilidad de correo-e"
 
 # src/pref-manager.c:1333
 # src/pref-manager.c:1476
-#: ../balsa.desktop.in.in.h:4 ../balsa-mailto-handler.desktop.in.in.h:4
+#: ../balsa.desktop.in.in.h:3 ../balsa-mailto-handler.desktop.in.in.h:3
 msgid "Mail Client"
 msgstr "Cliente de correo-e"
+
+#: ../balsa.desktop.in.in.h:4 ../balsa-mailto-handler.desktop.in.in.h:4
+msgid "Balsa Mail Client"
+msgstr "Cliente de correo-e Balsa"
 
 #: ../libbalsa/address-book.c:314 ../libbalsa/filter-error.c:47
 msgid "No error"
@@ -1235,7 +1235,7 @@ msgstr "%s: Abriendo %s Conteo de ref: %d\n"
 #: ../libbalsa/mailbox_imap.c:1215
 #, c-format
 msgid "Downloading %ld kB"
-msgstr "Descargando %ld KiB"
+msgstr "Descargando %ld KB"
 
 #: ../libbalsa/mailbox_imap.c:1614
 #, c-format
@@ -1264,7 +1264,7 @@ msgstr "Error al bajar un mensaje del servidor IMAP: %s"
 #: ../libbalsa/mailbox_imap.c:2481
 #, c-format
 msgid "Downloading %u kB"
-msgstr "Descargando %u KiB"
+msgstr "Descargando %u KB"
 
 # src/balsa-message.c:1316
 # src/balsa-message.c:1474
@@ -1283,7 +1283,7 @@ msgstr "No se pudo escribir en el archivo temporal %s"
 #: ../libbalsa/mailbox_imap.c:2774 ../libbalsa/mailbox_imap.c:2893
 #, c-format
 msgid "Uploading %ld kB"
-msgstr "Subiendo %ld KiB"
+msgstr "Subiendo %ld KB"
 
 #: ../libbalsa/mailbox_imap.c:3196
 msgid "Server-side threading not supported."
@@ -1529,7 +1529,7 @@ msgstr "Descargando mensaje %d de %d"
 #: ../libbalsa/mailbox_pop3.c:371
 #, c-format
 msgid "Received %ld kB of %ld"
-msgstr "Se han recibido %ld KiB de %ld"
+msgstr "Se han recibido %ld KB de %ld"
 
 # libmutt/mx.c:848
 # libmutt/mx.c:848
@@ -1560,7 +1560,7 @@ msgstr "Error al acceder al buzón POP3 %s:%s\n"
 #: ../libbalsa/mailbox_pop3.c:540
 #, c-format
 msgid "POP3 message %d oversized: %d kB - skipped."
-msgstr "El mensaje POP3 %d sobrepasa el tamaño: %d KiB - se salta."
+msgstr "El mensaje POP3 %d sobrepasa el tamaño: %d KB - se salta."
 
 #: ../libbalsa/mailbox_pop3.c:552
 #, c-format
@@ -2296,7 +2296,7 @@ msgstr "_Partir el mensaje si es mayor de"
 
 #: ../libbalsa/smtp-server.c:625 ../src/pref-manager.c:1918
 msgid "MB"
-msgstr "MiB"
+msgstr "MB"
 
 # src/main-window.c:259
 # src/main-window.c:262
@@ -2694,12 +2694,12 @@ msgid "Balsa E-mail reader"
 msgstr "Lector de correo Balsa"
 
 #: ../sounds/balsa.soundlist.in.h:2
-msgid "New mail notification"
-msgstr "Llegada de un nuevo mensaje"
-
-#: ../sounds/balsa.soundlist.in.h:3
 msgid "Program startup"
 msgstr "Inicio del programa"
+
+#: ../sounds/balsa.soundlist.in.h:3
+msgid "New mail notification"
+msgstr "Llegada de un nuevo mensaje"
 
 # src/address-book.c:369
 # src/address-book.c:394
@@ -7169,7 +7169,6 @@ msgid "Signed matter"
 msgstr "Impreso firmado"
 
 #: ../src/print-gtk.c:156
-#| msgid "encrypted parts"
 msgid "Encrypted matter"
 msgstr "Asunto cifrado"
 

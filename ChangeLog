@@ -1,3 +1,13 @@
+2012-04-16  Peter Bloomfield
+
+	Revert previous commit
+
+	* src/balsa-app.c (balsa_app_init):
+	* src/balsa-app.h:
+	* src/save-restore.c (config_mailbox_set_as_special),
+	(config_global_load), (config_save):
+	* src/sendmsg-window.c (create_info_pane):
+
 2012-03-27  Peter Bloomfield
 
 	Use a single MRU folder list

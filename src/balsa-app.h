@@ -380,6 +380,7 @@ extern struct BalsaApplication {
 
     /* Most recently used lists */
     GList *folder_mru;
+    GList *fcc_mru;
     GList *pipe_cmds;
 
     gboolean expunge_on_close;

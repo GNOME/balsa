@@ -244,7 +244,7 @@ config_mailbox_set_as_special(LibBalsaMailbox * mailbox, specialType which)
 
     switch(which) {
     case SPECIAL_SENT: 
-	balsa_mblist_mru_add(&balsa_app.folder_mru, mailbox->url); break;
+	balsa_mblist_mru_add(&balsa_app.fcc_mru, mailbox->url); break;
     case SPECIAL_TRASH:
         libbalsa_filters_set_trash(balsa_app.trash); break;
     default: break;
@@ -1107,6 +1107,9 @@ config_global_load(void)
 	/* Folder MRU */
     load_mru(&balsa_app.folder_mru, "FolderMRU");
 
+	/* FCC MRU */
+    load_mru(&balsa_app.fcc_mru, "FccMRU");
+
     /* Pipe commands */
     load_mru(&balsa_app.pipe_cmds, "PipeCommands");
     if (!balsa_app.pipe_cmds)
@@ -1508,6 +1511,7 @@ config_save(void)
     libbalsa_conf_pop_group();
 
     save_mru(balsa_app.folder_mru, "FolderMRU");
+    save_mru(balsa_app.fcc_mru,    "FccMRU");
     save_mru(balsa_app.pipe_cmds,  "PipeCommands");
 
     libbalsa_conf_sync();

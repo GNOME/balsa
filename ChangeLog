@@ -1,6 +1,13 @@
 2012-04-16  Peter Bloomfield
 
-	Revert previous commit
+	* src/balsa-mblist.c (balsa_mblist_mru_add): add folder to the
+	MRU folder list as well as to the given list, if different.
+
+2012-04-16  Peter Bloomfield
+
+	Revert previous commit; fixes
+	<URL:http://mail.gnome.org/archives/balsa-list/2012-April/msg00003.html>
+	from Ildar Mulyukov
 
 	* src/balsa-app.c (balsa_app_init):
 	* src/balsa-app.h:

@@ -1998,6 +1998,11 @@ balsa_mblist_mru_add(GList ** list, const gchar * url)
         *list = g_list_delete_link(*list, tmp);
     }
     *list = g_list_prepend(*list, g_strdup(url));
+
+    if (list != &balsa_app.folder_mru) {
+        /* Update the folder MRU list as well */
+        balsa_mblist_mru_add(&balsa_app.folder_mru, url);
+    }
 }
 
 void

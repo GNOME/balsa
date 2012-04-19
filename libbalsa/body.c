@@ -664,8 +664,10 @@ libbalsa_message_body_get_pixbuf(LibBalsaMessageBody * body, GError ** err)
             if (!gdk_pixbuf_loader_write(loader, (guchar *) buf, count, err))
                 break;
 
-        if (!*err && gdk_pixbuf_loader_close(loader, err))
-            pixbuf = g_object_ref(gdk_pixbuf_loader_get_pixbuf(loader));
+        if (!*err && gdk_pixbuf_loader_close(loader, err)) {
+            pixbuf = gdk_pixbuf_loader_get_pixbuf(loader);
+            pixbuf = gdk_pixbuf_apply_embedded_orientation(pixbuf);
+        }
 
         g_object_unref(loader);
     }

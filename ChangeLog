@@ -1,3 +1,8 @@
+2012-04-19  Peter Bloomfield
+
+	* libbalsa/body.c (libbalsa_message_body_get_pixbuf): apply
+	embedded orientation to pixbuf.
+
 2012-04-16  Peter Bloomfield
 
 	* src/balsa-mblist.c (balsa_mblist_mru_add): add folder to the

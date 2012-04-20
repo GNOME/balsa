@@ -5122,7 +5122,9 @@ bw_idle_replace(BalsaWindow * window, BalsaIndex * bindex)
     if (balsa_app.previewpane) {
         bw_idle_remove(window);
         window->set_message_id =
-            g_idle_add((GSourceFunc) bw_idle_cb, window);
+            gdk_threads_add_idle((GSourceFunc) bw_idle_cb, window);
+        if (BALSA_MESSAGE(window->preview)->message)
+            gtk_widget_hide(window->preview);
     }
 }
 
@@ -5143,14 +5145,10 @@ bw_idle_cb(BalsaWindow * window)
 {
     BalsaIndex *index;
 
-    gdk_threads_enter();
-
     if (window->set_message_id == 0) {
-        gdk_threads_leave();
         return FALSE;
     }
     if (bw_idle_cb_active) {
-        gdk_threads_leave();
 	return TRUE;
     }
     bw_idle_cb_active = TRUE;
@@ -5171,7 +5169,6 @@ bw_idle_cb(BalsaWindow * window)
         g_object_set_data(G_OBJECT(window), BALSA_INDEX_GRAB_FOCUS, NULL);
     }
 
-    gdk_threads_leave();
     bw_idle_cb_active = FALSE;
 
     return FALSE;

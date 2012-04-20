@@ -1,3 +1,11 @@
+2012-04-20  Peter Bloomfield
+
+	* src/main-window.c: hide current message immediately, instead
+	of in the idle callback; use gdk_threads_add_idle convenience
+	function.
+	* src/balsa-message.c (balsa_message_set): message is already
+	hidden.
+
 2012-04-19  Peter Bloomfield
 
 	* libbalsa/body.c (libbalsa_message_body_get_pixbuf): apply

@@ -1069,7 +1069,6 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMailbox * mailbox, guint msgno)
 
     g_return_val_if_fail(bm != NULL, FALSE);
 
-    gtk_widget_hide(GTK_WIDGET(bm));
     bm_disable_find_entry(bm);
     balsa_message_clear_tree(bm);
     select_part(bm, NULL);

@@ -1,5 +1,7 @@
-<<<<<<< HEAD
-=======
+2012-04-21  Pawel Salek
+
+	* NEWS, configure.in: release balsa-2.4.12
+
 2012-02-08  Albrecht Dreß
 
 	* libbalsa/gmime-part-rfc2440.c (g_mime_part_rfc2440_verify):
@@ -21,7 +23,6 @@
 
 	* .gitignore: add .libs.
 
->>>>>>> 971d850... Check for empty return from GpgME
 2011-12-20  Albrecht Dreß
 
 	* libbalsa/rfc3156.c: suppress GLib warning when the message is

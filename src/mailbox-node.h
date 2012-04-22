@@ -74,10 +74,6 @@ struct _BalsaMailboxNode {
     char delim; /* IMAP delimiter so that we do not need to check it
 		 * too often. */
 
-
-    unsigned remote:1;/* is dirname or server field used in data union.
-		       * If there is a need for more types, make a subclass. */
-
     unsigned subscribed:1;     /* Used only by remote */
     unsigned list_inbox:1;     /* Used only by remote */
     unsigned scanned:1;        /* IMAP flag */

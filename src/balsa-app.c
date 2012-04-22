@@ -441,10 +441,18 @@ balsa_app_destroy(void)
     g_slist_free(balsa_app.filters);
     balsa_app.filters = NULL;
 
-
     g_list_foreach(balsa_app.identities, (GFunc)g_object_unref, NULL);
     g_list_free(balsa_app.identities);
     balsa_app.identities = NULL;
+
+
+    g_list_foreach(balsa_app.folder_mru, (GFunc)g_free, NULL);
+    g_list_free(balsa_app.folder_mru);
+    balsa_app.folder_mru = NULL;
+
+    g_list_foreach(balsa_app.fcc_mru, (GFunc)g_free, NULL);
+    g_list_free(balsa_app.fcc_mru);
+    balsa_app.fcc_mru = NULL;
 
 
     if(balsa_app.debug) g_print("balsa_app: Finished cleaning up.\n");
@@ -749,6 +757,22 @@ balsa_find_sentbox_by_url(const gchar *url)
 {
     LibBalsaMailbox *res = balsa_find_mailbox_by_url(url);
     return res ? res : balsa_app.sentbox;
+}
+
+gchar*
+balsa_get_short_mailbox_name(const gchar *url)
+{
+    BalsaMailboxNode *mbnode;
+
+    if ((mbnode = balsa_find_url(url)) && mbnode->mailbox) {
+        if (mbnode->server) {
+            return g_strconcat(mbnode->server->host, ":",
+                               mbnode->mailbox->name, NULL);
+        } else {
+            return g_strdup(mbnode->mailbox->name);
+        }
+    }
+    return g_strdup(url);
 }
 
 struct balsa_find_iter_by_data_info {

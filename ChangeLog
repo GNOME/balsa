@@ -1,3 +1,10 @@
+2012-04-22  Pawel Salek
+
+	* src/balsa-app.{c,h}: free mem on exit. Longer 'short' mailbox names.
+	* src/balsa-mblist.c: use them.
+	* src/mailbox-node.h: remove unused bit field.
+	* src/main-window.c: check_mailboxes must be called from main thread.
+
 2012-04-20  Peter Bloomfield
 
 	* src/main-window.c: hide current message immediately, instead

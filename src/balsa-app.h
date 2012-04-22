@@ -406,6 +406,11 @@ BalsaMailboxNode *balsa_find_dir(LibBalsaServer *server, const gchar * path);
 BalsaMailboxNode *balsa_find_url(const gchar * url);
 LibBalsaMailbox *balsa_find_mailbox_by_url(const gchar * url);
 LibBalsaMailbox *balsa_find_sentbox_by_url(const gchar * url);
+
+/** Returns a short mailbox name that identifies the host. This is
+    longer than LibBalsaMailbox::name which contains only filename
+    without information about mailbox's location in the hierarchy. */
+gchar *balsa_get_short_mailbox_name(const gchar * url);
 gboolean balsa_find_iter_by_data(GtkTreeIter * iter, gpointer data);
 BalsaIndex* balsa_find_index_by_mailbox(LibBalsaMailbox* mailbox);
 

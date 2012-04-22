@@ -2051,15 +2051,14 @@ bmbl_mru_combo_box_setup(GtkComboBox * combo_box)
 
     for (list = *mro->url_list; list; list = list->next) {
         const gchar *url = list->data;
-        LibBalsaMailbox *mailbox;
-
-        if ((mailbox = balsa_find_mailbox_by_url(url)) || !*url) {
-	    gtk_list_store_append(store, &iter);
-	    gtk_list_store_set(store, &iter,
-                               0, mailbox ? mailbox->name : "",
-                               1, FALSE, -1);
-            mro->real_urls = g_slist_append(mro->real_urls, g_strdup(url));
-        }
+        
+        gchar * short_name = balsa_get_short_mailbox_name(url);
+        gtk_list_store_append(store, &iter);
+        gtk_list_store_set(store, &iter,
+                           0, short_name,
+                           1, FALSE, -1);
+        g_free(short_name);
+        mro->real_urls = g_slist_append(mro->real_urls, g_strdup(url));
     }
 
     /* Separator: */

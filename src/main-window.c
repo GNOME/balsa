@@ -3596,6 +3596,13 @@ mw_mbox_change_connection_status(GtkTreeModel * model, GtkTreePath * path,
 }
 
 #if BALSA_USE_THREADS
+static gboolean
+check_new_messages_idle(gpointer user_data)
+{
+    check_new_messages_cb(NULL, balsa_app.main_window);
+    return FALSE;
+}
+
 static void*
 bw_change_connection_status_thread(void *arg)
 {
@@ -3614,8 +3621,9 @@ bw_change_connection_status_thread(void *arg)
     if (is_connected &&
         difftime(time(NULL), balsa_app.main_window->last_check_time) >
         balsa_app.check_mail_timer * 60) {
-        /* Check the mail now, and reset the timer */
-        check_new_messages_cb(NULL, balsa_app.main_window);
+        /* Check the mail now, and reset the timer, remembering it
+           must be called from a main thread. */
+        g_idle_add(check_new_messages_idle, NULL);
     }
 #endif                          /* defined(HAVE_LIBNM_GLIB) */
 

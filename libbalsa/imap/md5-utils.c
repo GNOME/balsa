@@ -180,8 +180,11 @@ md5_final (MD5Context *ctx, unsigned char digest[16])
 		_byte_reverse (ctx->in, 14);
 	
 	/* Append length in bits and transform */
-	((guint32 *) ctx->in)[14] = ctx->bits[0];
-	((guint32 *) ctx->in)[15] = ctx->bits[1];
+        { /* scope */
+                guint32 *q = (guint32 *) ctx->in;
+                q[14] = ctx->bits[0];
+                q[15] = ctx->bits[1];
+        }
 	
 	md5_transform (ctx->buf, (guint32 *) ctx->in);
 	if (ctx->doByteReverse)

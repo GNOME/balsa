@@ -1,3 +1,7 @@
+2012-05-21  Peter Bloomfield
+
+	* libbalsa/imap/md5-utils.c (md5_final): avoid gcc whining.
+
 2012-04-22  Pawel Salek
 
 	* src/balsa-app.{c,h}: free mem on exit. Longer 'short' mailbox names.

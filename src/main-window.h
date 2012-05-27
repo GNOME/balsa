@@ -40,6 +40,9 @@
 #define BALSA_WINDOW_CLASS(klass)	       (G_TYPE_CHECK_CLASS_CAST (klass, BALSA_TYPE_WINDOW, BalsaWindowClass))
 #define BALSA_IS_WINDOW(obj)		       (G_TYPE_CHECK_INSTANCE_TYPE (obj, BALSA_TYPE_WINDOW))
 #define BALSA_IS_WINDOW_CLASS(klass)	       (G_TYPE_CHECK_CLASS_TYPE (klass, BALSA_TYPE_WINDOW))
+#define BALSA_WINDOW_GET_CLASS(window)                       \
+    (G_TYPE_INSTANCE_GET_CLASS ((window), BALSA_TYPE_WINDOW, \
+				BalsaWindowClass))
 
 /* Type values for mailbox checking */
 enum MailboxCheckType {

@@ -1,3 +1,9 @@
+2012-05-27  Peter Bloomfield
+
+	* src/main-window.c: use class methods instead of emitting
+	signals.
+	* src/main-window.h: define class getter.
+
 2012-05-21  Peter Bloomfield
 
 	* libbalsa/imap/md5-utils.c (md5_final): avoid gcc whining.

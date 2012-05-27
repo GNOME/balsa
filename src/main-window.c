@@ -81,13 +81,6 @@
 #define MAILBOX_DATA "mailbox_data"
 
 enum {
-    OPEN_MAILBOX_NODE,
-    CLOSE_MAILBOX_NODE,
-    IDENTITIES_CHANGED,
-    LAST_SIGNAL
-};
-
-enum {
     TARGET_MESSAGES
 };
 
@@ -974,37 +967,10 @@ static const char *ui_description =
 
 G_DEFINE_TYPE (BalsaWindow, balsa_window, GTK_TYPE_WINDOW)
 
-static guint window_signals[LAST_SIGNAL] = { 0 };
-
 static void
 balsa_window_class_init(BalsaWindowClass * klass)
 {
     GObjectClass *object_class = (GObjectClass *) klass;
-
-    window_signals[OPEN_MAILBOX_NODE] =
-        g_signal_new("open_mailbox_node",
-                     G_TYPE_FROM_CLASS(object_class),
-                     G_SIGNAL_RUN_LAST,
-                     G_STRUCT_OFFSET(BalsaWindowClass, open_mbnode),
-                     NULL, NULL,
-                     libbalsa_VOID__OBJECT_BOOLEAN,
-                     G_TYPE_NONE, 2, G_TYPE_OBJECT, G_TYPE_BOOLEAN);
-
-    window_signals[CLOSE_MAILBOX_NODE] =
-        g_signal_new("close_mailbox_node",
-                     G_TYPE_FROM_CLASS(object_class),
-                     G_SIGNAL_RUN_LAST,
-                     G_STRUCT_OFFSET(BalsaWindowClass, close_mbnode),
-                     NULL, NULL,
-                     g_cclosure_marshal_VOID__OBJECT,
-                     G_TYPE_NONE, 1, G_TYPE_OBJECT);
-    window_signals[IDENTITIES_CHANGED] =
-        g_signal_new("identities-changed",
-                     G_TYPE_FROM_CLASS(object_class),
-                     G_SIGNAL_RUN_FIRST,
-                     G_STRUCT_OFFSET(BalsaWindowClass, identities_changed),
-                     NULL, NULL,
-                     g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
 
     object_class->dispose = balsa_window_destroy;
 
@@ -2236,21 +2202,18 @@ void
 balsa_window_open_mbnode(BalsaWindow * window, BalsaMailboxNode * mbnode,
                          gboolean set_current)
 {
-    g_return_if_fail(window != NULL);
     g_return_if_fail(BALSA_IS_WINDOW(window));
 
-    g_signal_emit(G_OBJECT(window), window_signals[OPEN_MAILBOX_NODE],
-                  0, mbnode, set_current);
+    BALSA_WINDOW_GET_CLASS(window)->open_mbnode(window, mbnode,
+                                                      set_current);
 }
 
 void
 balsa_window_close_mbnode(BalsaWindow * window, BalsaMailboxNode * mbnode)
 {
-    g_return_if_fail(window != NULL);
     g_return_if_fail(BALSA_IS_WINDOW(window));
 
-    g_signal_emit(G_OBJECT(window), window_signals[CLOSE_MAILBOX_NODE],
-                  0, mbnode);
+    BALSA_WINDOW_GET_CLASS(window)->close_mbnode(window, mbnode);
 }
 
 static void
@@ -2582,10 +2545,9 @@ balsa_window_real_close_mbnode(BalsaWindow * window,
 void
 balsa_identities_changed(BalsaWindow *bw)
 {
-    g_return_if_fail(bw != NULL);
     g_return_if_fail(BALSA_IS_WINDOW(bw));
 
-    g_signal_emit(G_OBJECT(bw), window_signals[IDENTITIES_CHANGED], 0);
+    BALSA_WINDOW_GET_CLASS(bw)->identities_changed(bw);
 }
 
 static gboolean

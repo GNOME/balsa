@@ -1758,6 +1758,7 @@ balsa_window_new()
 
     /* XXX */
     balsa_app.mblist =  BALSA_MBLIST(balsa_mblist_new());
+    gtk_widget_show(GTK_WIDGET(balsa_app.mblist));
 
     g_object_get(G_OBJECT(balsa_app.mblist), "hadjustment", &hadj,
                  "vadjustment", &vadj, NULL);
@@ -1772,7 +1773,6 @@ balsa_window_new()
     g_signal_connect_swapped(balsa_app.mblist, "has-unread-mailbox",
 		             G_CALLBACK(bw_enable_next_unread), window);
     balsa_mblist_default_signal_bindings(balsa_app.mblist);
-    gtk_widget_show_all(window->mblist);
 
     bw_set_panes(window);
 
@@ -1781,10 +1781,13 @@ balsa_window_new()
     bw_set_active(window, "ShowMailboxTree", balsa_app.show_mblist, FALSE);
 #endif                          /* !defined(ENABLE_TOUCH_UI) */
 
-    gtk_paned_set_position(GTK_PANED(window->paned_master),
-                           balsa_app.show_mblist
-                           ? balsa_app.mblist_width
-                           : 0);
+    if (balsa_app.show_mblist) {
+        gtk_widget_show(window->mblist);
+        gtk_paned_set_position(GTK_PANED(window->paned_master),
+                               balsa_app.mblist_width);
+    } else {
+        gtk_paned_set_position(GTK_PANED(window->paned_master), 0);
+    }
 
     /*PKGW: do it this way, without the usizes. */
     if (balsa_app.previewpane)

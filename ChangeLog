@@ -1,3 +1,10 @@
+2012-05-28  Peter Bloomfield
+
+	* src/main-window.c: show mailbox list on startup only if
+	necessary; fixes point 1 of
+	<URL:https://mail.gnome.org/archives/balsa-list/2012-May/
+	msg00011.html> (Carlos Franke).
+
 2012-05-27  Peter Bloomfield
 
 	* src/main-window.c: use class methods instead of emitting

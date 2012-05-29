@@ -81,6 +81,11 @@
 #define MAILBOX_DATA "mailbox_data"
 
 enum {
+    IDENTITIES_CHANGED,
+    LAST_SIGNAL
+};
+
+enum {
     TARGET_MESSAGES
 };
 
@@ -967,10 +972,20 @@ static const char *ui_description =
 
 G_DEFINE_TYPE (BalsaWindow, balsa_window, GTK_TYPE_WINDOW)
 
+static guint window_signals[LAST_SIGNAL] = { 0 };
+
 static void
 balsa_window_class_init(BalsaWindowClass * klass)
 {
     GObjectClass *object_class = (GObjectClass *) klass;
+
+    window_signals[IDENTITIES_CHANGED] =
+        g_signal_new("identities-changed",
+                     G_TYPE_FROM_CLASS(object_class),
+                     G_SIGNAL_RUN_FIRST,
+                     G_STRUCT_OFFSET(BalsaWindowClass, identities_changed),
+                     NULL, NULL,
+                     g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
 
     object_class->dispose = balsa_window_destroy;
 

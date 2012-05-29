@@ -1,5 +1,11 @@
 2012-05-28  Peter Bloomfield
 
+	* src/balsa-index.c (bi_view_on_open,
+	balsa_index_scroll_on_open): set the cursor on the most recent
+	message, even when not selecting it.
+
+2012-05-28  Peter Bloomfield
+
 	* src/main-window.c: restore "identities-changed" signal.
 
 2012-05-28  Peter Bloomfield

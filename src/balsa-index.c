@@ -854,18 +854,34 @@ balsa_index_new(void)
 struct view_on_open_data {
     BalsaIndex *bindex;
     GtkTreePath *path;
+    gboolean select;
 };
 static gboolean
 bi_view_on_open(struct view_on_open_data *data)
 {
-    gdk_threads_enter();
-    if(gtk_tree_view_get_model(GTK_TREE_VIEW(data->bindex))) {
-        bndx_select_row(data->bindex, data->path);
-        gtk_tree_path_free(data->path);
+    GtkTreeView *tree_view;
+
+    tree_view = GTK_TREE_VIEW(data->bindex);
+    if (gtk_tree_view_get_model(tree_view)) {
+        if (data->select)
+            bndx_select_row(data->bindex, data->path);
+        else {
+            GtkTreeSelection *selection;
+
+            selection = gtk_tree_view_get_selection(tree_view);
+            g_signal_handler_block(selection,
+                                   data->bindex->selection_changed_id);
+            gtk_tree_view_set_cursor(GTK_TREE_VIEW(data->bindex),
+                                     data->path, NULL, FALSE);
+            gtk_tree_selection_unselect_all(selection);
+            g_signal_handler_unblock(selection,
+                                     data->bindex->selection_changed_id);
+        }
     }
+    gtk_tree_path_free(data->path);
     g_object_unref(data->bindex);
     g_free(data);
-    gdk_threads_leave();
+
     return FALSE;
 }
 
@@ -873,15 +889,15 @@ void
 balsa_index_scroll_on_open(BalsaIndex *index)
 {
     LibBalsaMailbox *mailbox = index->mailbox_node->mailbox;
-    GtkTreeIter iter;
     GtkTreePath *path = NULL;
     gpointer view_on_open;
+    struct view_on_open_data *data;
 
     balsa_index_update_tree(index, balsa_app.expand_tree);
     if (mailbox->first_unread) {
 	unsigned msgno = mailbox->first_unread;
 	mailbox->first_unread = 0;
-        if(!libbalsa_mailbox_msgno_find(mailbox, msgno, &path, &iter))
+        if(!libbalsa_mailbox_msgno_find(mailbox, msgno, &path, NULL))
             return; /* Oops! */
     } else {
         /* we want to scroll to the last one in current order. The
@@ -892,9 +908,7 @@ balsa_index_scroll_on_open(BalsaIndex *index)
             (GTK_TREE_MODEL(mailbox), NULL);
         if(total == 0)
             return;
-        gtk_tree_model_iter_nth_child (GTK_TREE_MODEL(mailbox), &iter, NULL,
-                                       total - 1);
-        path = gtk_tree_model_get_path(GTK_TREE_MODEL(mailbox), &iter);
+        path = gtk_tree_path_new_from_indices(total - 1, -1);
     }
 
     bndx_expand_to_row(index, path);
@@ -908,14 +922,12 @@ balsa_index_scroll_on_open(BalsaIndex *index)
     g_object_set_data(G_OBJECT(mailbox),
                       BALSA_INDEX_VIEW_ON_OPEN,
                       GINT_TO_POINTER(FALSE));
-    if ((view_on_open && GPOINTER_TO_INT(view_on_open))
-        || balsa_app.view_message_on_open) {
-        struct view_on_open_data *data = g_new(struct view_on_open_data,1);
-        data->bindex = index;
-        data->path = path;
-        g_object_ref(data->bindex);
-        g_idle_add((GSourceFunc)bi_view_on_open, data);
-    } else gtk_tree_path_free(path);
+    data = g_new(struct view_on_open_data,1);
+    data->bindex = g_object_ref(index);
+    data->path = path;
+    data->select = (view_on_open && GPOINTER_TO_INT(view_on_open))
+        || balsa_app.view_message_on_open;
+    gdk_threads_add_idle((GSourceFunc)bi_view_on_open, data);
 }
 
 static LibBalsaCondition *cond_undeleted;

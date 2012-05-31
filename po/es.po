@@ -15,7 +15,7 @@ msgstr ""
 "Project-Id-Version: balsa.HEAD\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=balsa&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2012-03-24 00:10+0000\n"
+"POT-Creation-Date: 2012-05-21 23:07+0000\n"
 "PO-Revision-Date: 2011-12-23 17:19+0100\n"
 "Last-Translator: Daniel Mustieles <daniel.mustieles@gmail.com>\n"
 "Language-Team: Español <gnome-es-list@gnome.org>\n"
@@ -282,7 +282,7 @@ msgstr "Se intentó aplicar un filtro no válido"
 #: ../libbalsa/filter-file.c:141
 #, c-format
 msgid "Invalid filters %s for mailbox %s"
-msgstr "Filtros inválidos %s para el buzón %s"
+msgstr "Filtros no válidos %s para el buzón %s"
 
 # src/balsa-index.c:428
 # src/balsa-index.c:417
@@ -807,7 +807,7 @@ msgstr "Se sobrepasó el número de conexiones por servidor %s"
 # libmutt/imap/imap_ssl.c:297
 #: ../libbalsa/libbalsa.c:385
 msgid "Invalid date"
-msgstr "Fecha inválida"
+msgstr "Fecha no válida"
 
 # libmutt/imap/imap_ssl.c:254
 # libmutt/imap/imap_ssl.c:254
@@ -883,7 +883,7 @@ msgstr "Sin datos de imagen"
 #: ../libbalsa/libbalsa.c:919
 #, c-format
 msgid "Invalid input format"
-msgstr "Formato de entrada inválido"
+msgstr "Formato de entrada no válido"
 
 #: ../libbalsa/libbalsa.c:923
 #, c-format
@@ -971,7 +971,7 @@ msgid ""
 "%s: a key for %s is present, but it is expired, disabled, revoked or invalid"
 msgstr ""
 "%s: hay presente una clave para %s, pero ha caducado, está desactivada, ha "
-"sido revocada o es inválida"
+"sido revocada o no es válida"
 
 # src/balsa-message.c:301
 # src/balsa-message.c:331
@@ -987,7 +987,7 @@ msgid ""
 "invalid"
 msgstr ""
 "%s: hay presente una clave con ID %s, pero ha caducado, está desactivada, ha "
-"sido revocada o es inválida"
+"sido revocada o no es válida"
 
 # src/balsa-message.c:301
 # src/balsa-message.c:331
@@ -1806,11 +1806,11 @@ msgstr ""
 # libmutt/imap/imap_ssl.c:472
 #: ../libbalsa/rfc3156.c:670
 msgid "The signature is invalid."
-msgstr "La firma es inválida."
+msgstr "La firma no es válida."
 
 #: ../libbalsa/rfc3156.c:673
 msgid "The signature could not be verified due to a missing key."
-msgstr "La firma no pudo ser verificada debido a una clave perdida."
+msgstr "La firma no se pudo verificar debido a una clave perdida."
 
 #: ../libbalsa/rfc3156.c:675
 msgid "This part is not a real PGP signature."
@@ -1819,7 +1819,7 @@ msgstr "Esta parte no es una firma PGP real."
 #: ../libbalsa/rfc3156.c:678
 msgid "The signature could not be verified due to an invalid crypto engine."
 msgstr ""
-"La firma no pudo ser verificada debido a un motor criptográfico inválido."
+"La firma no se pudo verificar debido a un motor criptográfico no válido."
 
 #: ../libbalsa/rfc3156.c:681 ../libbalsa/rfc3156.c:1044
 msgid "GnuPG is rebuilding the trust database and is currently unavailable."
@@ -1998,7 +1998,7 @@ msgstr "desactivada"
 # libmutt/imap/imap_ssl.c:297
 #: ../libbalsa/rfc3156.c:864
 msgid " invalid"
-msgstr "inválida"
+msgstr "no válida"
 
 #. ngettext: string begins with a single space, so no space
 #. * after the colon is correct punctuation (in English).
@@ -3475,7 +3475,7 @@ msgid ""
 "it's structure is invalid."
 msgstr ""
 "El mensaje enviado por %s con el asunto «%s» contiene una parte cifrada, pero "
-"la estructura es inválida."
+"la estructura no es válida."
 
 #: ../src/balsa-message.c:2848
 #, c-format
@@ -3502,7 +3502,7 @@ msgid ""
 "structure is invalid. The signature, if there is any, cannot be checked."
 msgstr ""
 "El mensaje enviado por %s con el asunto «%s» contiene una parte firmada, pero "
-"su estructura es inválida. La firma, si es que hay alguna, no se puede "
+"su estructura no es válida. La firma, si es que hay alguna, no se puede "
 "comprobar."
 
 #: ../src/balsa-message.c:2941

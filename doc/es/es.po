@@ -8,7 +8,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa-help.master\n"
-"POT-Creation-Date: 2011-09-06 08:46+0000\n"
+"POT-Creation-Date: 2012-05-31 11:14+0000\n"
 "PO-Revision-Date: 2011-08-29 23:41Hora e\n"
 "Last-Translator: Juan Matías Olmos <colonizare@yahoo.com.ar>\n"
 "Language-Team: Español <gnome-es-list@gnome.org>\n"
@@ -2586,7 +2586,7 @@ msgstr ""
 "sobre con un candado y una marca de verificación. Al pulsar el icono, se "
 "comprobará la clave utilizada para firmar el mensaje. El cuerpo del mensaje "
 "contendrá un icono y un texto descriptivo indicando si la clave de firma es "
-"válida, inválida o sin marcar."
+"válida, no válida o sin marcar."
 
 #: C/balsa.xml:2360(para)
 msgid ""

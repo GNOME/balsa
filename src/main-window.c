@@ -3022,6 +3022,15 @@ bw_mailbox_check(LibBalsaMailbox * mailbox, BalsaWindow * window)
     libbalsa_mailbox_check(mailbox);
 }
 
+static gboolean
+bw_check_messages_thread_idle(BalsaWindow * window)
+{
+    bw_set_sensitive(window, "GetNewMail", TRUE);
+    g_object_unref(window);
+
+    return FALSE;
+}
+
 static void
 bw_check_messages_thread(struct check_messages_thread_info *info)
 {
@@ -3049,14 +3058,12 @@ bw_check_messages_thread(struct check_messages_thread_info *info)
     checking_mail = 0;
 
     if (info->window) {
-        gdk_threads_enter();
-        bw_set_sensitive(info->window, "GetNewMail", TRUE);
+        gdk_threads_add_idle((GSourceFunc) bw_check_messages_thread_idle,
+                             info->window);
 #if defined(HAVE_LIBNM_GLIB)
         if (info->window->nm_state == NM_STATE_CONNECTED)
             time(&info->window->last_check_time);
 #endif                          /* defined(HAVE_LIBNM_GLIB) */
-        g_object_unref(info->window);
-        gdk_threads_leave();
     }
     pthread_mutex_unlock(&checking_mail_lock);
 

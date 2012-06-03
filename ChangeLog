@@ -1,5 +1,10 @@
 2012-06-03  Peter Bloomfield
 
+	* src/main-window.c: change sensitivity of mail-check button in
+	the main thread, in an idle callback.
+
+2012-06-03  Peter Bloomfield
+
 	Call Gtk from only the main thread when opening a mailbox
 
 	* libbalsa/mailbox.c (lbm_cache_message): avoid infinite

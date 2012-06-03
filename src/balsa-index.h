@@ -105,12 +105,10 @@ extern "C" {
 
 /* sets the mail stream; if it's a new stream, then it's 
  * contents is loaded into the index */
-    gboolean balsa_index_load_mailbox_node(BalsaIndex * bindex,
-                                           BalsaMailboxNode * mbnode,
-					   GError **err);
+    void balsa_index_load_mailbox_node(BalsaIndex * bindex,
+                                       BalsaMailboxNode * mbnode);
     void balsa_index_set_width_preference(BalsaIndex *bindex,
                                           BalsaIndexWidthPreference pref);
-    void balsa_index_scroll_on_open(BalsaIndex *index);
     void balsa_index_update_tree(BalsaIndex *bindex, gboolean expand);
     void balsa_index_set_threading_type(BalsaIndex * bindex, int thtype);
     void balsa_index_set_view_filter(BalsaIndex *bindex,

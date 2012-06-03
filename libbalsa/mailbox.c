@@ -367,14 +367,6 @@ lbm_index_entry_populate_from_msg(LibBalsaMailboxIndexEntry * entry,
     libbalsa_mailbox_msgno_changed(msg->mailbox, msg->msgno);
 }
 
-LibBalsaMailboxIndexEntry*
-libbalsa_mailbox_index_entry_new_from_msg(LibBalsaMessage *msg)
-{
-    LibBalsaMailboxIndexEntry *entry = g_new(LibBalsaMailboxIndexEntry,1);
-    lbm_index_entry_populate_from_msg(entry, msg);
-    return entry;
-}
-
 #ifdef BALSA_USE_THREADS
 static LibBalsaMailboxIndexEntry*
 lbm_index_entry_new_pending(void)
@@ -1913,13 +1905,18 @@ lbm_cache_message(LibBalsaMailbox * mailbox, guint msgno,
 
     entry = g_ptr_array_index(mailbox->mindex, msgno - 1);
 
-    if (!entry)
+    if (!entry) {
+        /* Assign pointer in mailbox->mindex before populating the
+         * entry, because we may recursively enter lbm_cache_message
+         * while populating it. */
         g_ptr_array_index(mailbox->mindex, msgno - 1) =
-            libbalsa_mailbox_index_entry_new_from_msg(message);
+            entry = g_new0(LibBalsaMailboxIndexEntry, 1);
+        lbm_index_entry_populate_from_msg(entry, message);
 #if BALSA_USE_THREADS
-    else if (entry->idle_pending)
+    } else if (entry->idle_pending) {
         lbm_index_entry_populate_from_msg(entry, message);
 #endif                          /* BALSA_USE_THREADS */
+    }
 }
 
 LibBalsaMessage *

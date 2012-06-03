@@ -1,3 +1,17 @@
+2012-06-03  Peter Bloomfield
+
+	Call Gtk from only the main thread when opening a mailbox
+
+	* libbalsa/mailbox.c (lbm_cache_message): avoid infinite
+	recursion.
+	* libbalsa/mailbox.h: do not export
+	libbalsa_mailbox_index_entry_new_from_msg.
+	* src/balsa-index.c (bndx_set_mailbox), (bndx_open_mailbox),
+	(balsa_index_load_mailbox_node): open mailbox in a subthread.
+	* src/balsa-index.h: do not export balsa_index_load_mailbox_node
+	and balsa_index_scroll_on_open.
+	* src/main-window.c: start opening mailbox in the main thread.
+
 2012-05-28  Peter Bloomfield
 
 	* src/balsa-index.c (bi_view_on_open,

@@ -1,3 +1,14 @@
+2012-06-05  Peter Bloomfield
+
+	Deprecation cleanup; fixes bgo #677381
+
+	* libbalsa/imap-server.c (libbalsa_imap_server_init),
+	(libbalsa_imap_server_finalize): deprecation cleanup.
+	* libbalsa/libbalsa-conf.c (lbc_lock), (lbc_unlock): ditto.
+	* libbalsa/mime-stream-shared.c (lbmss_stream_class_init),
+	(libbalsa_mime_stream_shared_lock),
+	(libbalsa_mime_stream_shared_unlock): ditto.
+
 2012-06-03  Peter Bloomfield
 
 	* src/main-window.c: change sensitivity of mail-check button in

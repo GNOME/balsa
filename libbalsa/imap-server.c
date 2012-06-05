@@ -65,7 +65,7 @@ struct LibBalsaImapServer_ {
     gboolean offline_mode;
     
 #if defined(BALSA_USE_THREADS)
-    GMutex *lock; /* protects the following members */
+    GMutex lock; /* protects the following members */
 #endif
     guint used_connections;
     GList *used_handles;
@@ -102,9 +102,9 @@ static gboolean connection_cleanup(gpointer ptr);
 static pthread_mutex_t imap_servers_lock = PTHREAD_MUTEX_INITIALIZER;
 #define LOCK_SERVERS()   pthread_mutex_lock(&imap_servers_lock)
 #define UNLOCK_SERVERS() pthread_mutex_unlock(&imap_servers_lock)
-#define LOCK_SERVER(server)    g_mutex_lock((server)->lock)
-#define TRYLOCK_SERVER(server) g_mutex_trylock((server)->lock)
-#define UNLOCK_SERVER(server)  g_mutex_unlock((server)->lock)
+#define LOCK_SERVER(server)    g_mutex_lock(&((server)->lock))
+#define TRYLOCK_SERVER(server) g_mutex_trylock(&((server)->lock))
+#define UNLOCK_SERVER(server)  g_mutex_unlock(&((server)->lock))
 #else
 #define LOCK_SERVERS()
 #define UNLOCK_SERVERS()
@@ -212,7 +212,7 @@ libbalsa_imap_server_init(LibBalsaImapServer * imap_server)
     LIBBALSA_SERVER(imap_server)->protocol = "imap";
     imap_server->key = NULL;
 #if defined(BALSA_USE_THREADS)
-    imap_server->lock = g_mutex_new();
+    g_mutex_init(&imap_server->lock);
 #endif
     imap_server->max_connections = MAX_CONNECTIONS_PER_SERVER;
     imap_server->used_connections = 0;
@@ -250,7 +250,7 @@ libbalsa_imap_server_finalize(GObject * object)
 #endif
     libbalsa_imap_server_force_disconnect(imap_server);
 #if defined(BALSA_USE_THREADS)
-    g_mutex_free(imap_server->lock);
+    g_mutex_clear(&imap_server->lock);
 #endif
     g_free(imap_server->key); imap_server->key = NULL;
 

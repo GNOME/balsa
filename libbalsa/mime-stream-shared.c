@@ -71,8 +71,8 @@ static GMimeStream *lbmss_stream_substream(GMimeStream * stream,
                                            gint64 start, gint64 end);
 
 static GMimeStreamFsClass *parent_class = NULL;
-static GMutex *lbmss_mutex;
-static GCond *lbmss_cond;
+static GMutex lbmss_mutex;
+static GCond lbmss_cond;
 
 GType
 libbalsa_mime_stream_shared_get_type(void)
@@ -107,8 +107,6 @@ lbmss_stream_class_init(LibBalsaMimeStreamSharedClass * klass)
     GObjectClass *object_class = G_OBJECT_CLASS(klass);
 
     parent_class = g_type_class_ref(GMIME_TYPE_STREAM_FS);
-    lbmss_mutex  = g_mutex_new();
-    lbmss_cond   = g_cond_new();
 
     object_class->finalize  = lbmss_finalize;
 
@@ -282,12 +280,12 @@ libbalsa_mime_stream_shared_lock(GMimeStream * stream)
     lock = stream_shared->lock;
     thread_self = g_thread_self();
 
-    g_mutex_lock(lbmss_mutex);
+    g_mutex_lock(&lbmss_mutex);
     while (lock->count > 0 && lock->thread != thread_self)
-        g_cond_wait(lbmss_cond, lbmss_mutex);
+        g_cond_wait(&lbmss_cond, &lbmss_mutex);
     ++lock->count;
     lock->thread = thread_self;
-    g_mutex_unlock(lbmss_mutex);
+    g_mutex_unlock(&lbmss_mutex);
 }
 
 /**
@@ -314,10 +312,10 @@ libbalsa_mime_stream_shared_unlock(GMimeStream * stream)
     lock = stream_shared->lock;
     g_return_if_fail(lock->count > 0);
 
-    g_mutex_lock(lbmss_mutex);
+    g_mutex_lock(&lbmss_mutex);
     if (--lock->count == 0)
-        g_cond_signal(lbmss_cond);
-    g_mutex_unlock(lbmss_mutex);
+        g_cond_signal(&lbmss_cond);
+    g_mutex_unlock(&lbmss_mutex);
 }
 
 #endif                          /* BALSA_USE_THREADS */

@@ -147,12 +147,12 @@ lbc_init(LibBalsaConf * conf, const gchar * filename,
 }
 
 #ifdef BALSA_USE_THREADS
-static GStaticRecMutex lbc_mutex = G_STATIC_REC_MUTEX_INIT;
+static GRecMutex lbc_mutex;
 
 static void
 lbc_lock(void)
 {
-    g_static_rec_mutex_lock(&lbc_mutex);
+    g_rec_mutex_lock(&lbc_mutex);
     lbc_init(&lbc_conf, "config", ".gnome2");
     lbc_init(&lbc_conf_priv, "config-private", ".gnome2_private");
 }
@@ -160,7 +160,7 @@ lbc_lock(void)
 static void
 lbc_unlock(void)
 {
-    g_static_rec_mutex_unlock(&lbc_mutex);
+    g_rec_mutex_unlock(&lbc_mutex);
 }
 #else                           /* BALSA_USE_THREADS */
 static void

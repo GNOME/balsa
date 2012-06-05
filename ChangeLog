@@ -5,7 +5,7 @@
 
 	* libbalsa/imap-server.c (libbalsa_imap_server_init),
 	(libbalsa_imap_server_finalize): make previous changes
-	conditional.
+	conditional on glib version at least 2.32.
 	* libbalsa/libbalsa-conf.c (lbc_lock), (lbc_unlock): ditto.
 	* libbalsa/mime-stream-shared.c (lbmss_stream_class_init),
 	(libbalsa_mime_stream_shared_lock),

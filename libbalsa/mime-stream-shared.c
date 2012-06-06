@@ -299,7 +299,7 @@ libbalsa_mime_stream_shared_lock(GMimeStream * stream)
 #else                           /* GLIB_CHECK_VERSION(2, 32, 0) */
     g_mutex_lock(lbmss_mutex);
     while (lock->count > 0 && lock->thread != thread_self)
-        g_cond_wait(&lbmss_cond, lbmss_mutex);
+        g_cond_wait(lbmss_cond, lbmss_mutex);
     ++lock->count;
     lock->thread = thread_self;
     g_mutex_unlock(lbmss_mutex);

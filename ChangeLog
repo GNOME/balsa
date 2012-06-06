@@ -1,3 +1,8 @@
+2012-06-06  Peter Bloomfield
+
+	* libbalsa/mime-stream-shared.c
+	(libbalsa_mime_stream_shared_lock): build with glib < 2.32.
+
 2012-06-05  Peter Bloomfield
 
 	Make changes in previous commit conditional on glib version

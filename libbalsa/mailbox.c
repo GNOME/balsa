@@ -643,12 +643,10 @@ libbalsa_mailbox_close(LibBalsaMailbox * mailbox, gboolean expunge)
         /* do not try expunging read-only mailboxes, it's a waste of time */
         expunge = expunge && !mailbox->readonly;
         LIBBALSA_MAILBOX_GET_CLASS(mailbox)->close_mailbox(mailbox, expunge);
-        gdk_threads_enter();
         if(mailbox->msg_tree) {
             g_node_destroy(mailbox->msg_tree);
             mailbox->msg_tree = NULL;
         }
-        gdk_threads_leave();
         libbalsa_mailbox_free_mindex(mailbox);
         mailbox->stamp++;
 	mailbox->state = LB_MAILBOX_STATE_CLOSED;
@@ -1427,8 +1425,8 @@ decrease_post(GNode *node, gpointer data)
     return FALSE;
 }
 
-void
-libbalsa_mailbox_msgno_removed(LibBalsaMailbox * mailbox, guint seqno)
+static void
+lbm_msgno_removed(LibBalsaMailbox * mailbox, guint seqno)
 {
     GtkTreeIter iter;
     GtkTreePath *path;
@@ -1514,6 +1512,40 @@ libbalsa_mailbox_msgno_removed(LibBalsaMailbox * mailbox, guint seqno)
     mailbox->stamp++;
 
     gdk_threads_leave();
+}
+
+#ifdef BALSA_USE_THREADS
+typedef struct {
+    LibBalsaMailbox *mailbox;
+    guint seqno;
+} LbmMsgnoRemovedInfo;
+
+static gboolean
+lbm_msgno_removed_idle_cb(LbmMsgnoRemovedInfo * info)
+{
+    lbm_msgno_removed(info->mailbox, info->seqno);
+    g_object_unref(info->mailbox);
+    g_free(info);
+    return FALSE;
+}
+#endif                          /* BALSA_USE_THREADS */
+
+void
+libbalsa_mailbox_msgno_removed(LibBalsaMailbox * mailbox, guint seqno)
+{
+#ifdef BALSA_USE_THREADS
+    if (libbalsa_am_i_subthread()) {
+        LbmMsgnoRemovedInfo *info = g_new(LbmMsgnoRemovedInfo, 1);
+        info->mailbox = g_object_ref(mailbox);
+        info->seqno = seqno;
+        gdk_threads_add_idle((GSourceFunc) lbm_msgno_removed_idle_cb,
+                             info);
+    } else {
+        lbm_msgno_removed(mailbox, seqno);
+    }
+#else                           /* BALSA_USE_THREADS */
+    lbm_msgno_removed(mailbox, seqno);
+#endif                          /* BALSA_USE_THREADS */
 }
 
 void

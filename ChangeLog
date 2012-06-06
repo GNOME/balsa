@@ -1,5 +1,11 @@
 2012-06-06  Peter Bloomfield
 
+	* src/balsa-app.c (find_url_func), (find_url), (find_url_idle_cb),
+	(balsa_find_url): block the subthread and use an idle callback
+	to find the BalsaMailboxNode for the URL.
+
+2012-06-06  Peter Bloomfield
+
 	* libbalsa/mime-stream-shared.c
 	(libbalsa_mime_stream_shared_lock): build with glib < 2.32.
 

@@ -1240,7 +1240,7 @@ bndx_find_root(BalsaIndex * index, GtkTreeIter * iter)
     GtkTreeView *tree_view = GTK_TREE_VIEW(index);
     GtkTreeModel *model = gtk_tree_view_get_model(tree_view);
 
-    if (!gtk_tree_model_get_iter_first(model, iter))
+    if (!model || !gtk_tree_model_get_iter_first(model, iter))
 	return FALSE;
 
     iter->user_data = NULL;

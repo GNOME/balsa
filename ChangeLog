@@ -1,5 +1,9 @@
 2012-06-07  Peter Bloomfield
 
+	* src/balsa-index.c (bndx_find_root): check for NULL tree model.
+
+2012-06-07  Peter Bloomfield
+
 	* src/main-window.c: check for NULL focus widget.
 
 2012-06-06  Peter Bloomfield

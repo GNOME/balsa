@@ -1,3 +1,7 @@
+2012-06-07  Peter Bloomfield
+
+	* src/main-window.c: check for NULL focus widget.
+
 2012-06-06  Peter Bloomfield
 
 	* libbalsa/mailbox.c (libbalsa_mailbox_close), (lbm_msgno_removed),

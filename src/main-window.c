@@ -3795,6 +3795,9 @@ bw_copy_cb(GtkAction * action, gpointer data)
     guint signal_id;
     GtkWidget *focus_widget = gtk_window_get_focus(GTK_WINDOW(bw));
 
+    if (!focus_widget)
+	return;
+
     signal_id = g_signal_lookup("copy-clipboard",
                                 G_TYPE_FROM_INSTANCE(focus_widget));
     if (signal_id)

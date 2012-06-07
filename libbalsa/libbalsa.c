@@ -758,6 +758,9 @@ libbalsa_threads_enter(void)
 
     self = pthread_self();
 
+    if (libbalsa_am_i_subthread())
+        g_warning("Locking a subthread");
+
     if (self != libbalsa_threads_id) {
         pthread_mutex_lock(&libbalsa_threads_mutex);
         libbalsa_threads_id = self;

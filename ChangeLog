@@ -1,5 +1,10 @@
 2012-06-07  Peter Bloomfield
 
+	* libbalsa/libbalsa.c (libbalsa_threads_enter): warn when
+	locking a subthread, to help find bad code paths.
+
+2012-06-07  Peter Bloomfield
+
 	* src/main-window.c: check for NULL index.
 
 2012-06-07  Peter Bloomfield

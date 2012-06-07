@@ -4906,6 +4906,10 @@ bw_view_filter_idle(BalsaWindow * window)
     LibBalsaCondition *view_filter;
 
     index = (BalsaIndex *) window->current_index;
+
+    if (!index)
+        return FALSE;
+
     mailbox = index->mailbox_node->mailbox;
     view_filter = bw_get_flag_filter(window);
     libbalsa_mailbox_set_view_filter(mailbox, view_filter, FALSE);

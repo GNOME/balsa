@@ -1,3 +1,13 @@
+2012-06-08  Peter Bloomfield
+
+	* libbalsa/mailbox.c (lbm_check_and_sort),
+	(lbm_set_threading_idle_cb), (lbm_set_threading): sort in an
+	idle callback instead of subthread.
+	* libbalsa/mailbox_local.c (lbml_set_threading),
+	(lbml_set_threading_idle_cb),
+	(libbalsa_mailbox_local_set_threading): set threading type in an
+	idle callback instead of subthread.
+
 2012-06-07  Peter Bloomfield
 
 	* src/main.c (progress_set_text), (progress_set_text_idle_cb),

@@ -2342,6 +2342,26 @@ libbalsa_mailbox_can_do(LibBalsaMailbox *mailbox,
 
 
 static void lbm_sort(LibBalsaMailbox * mbox, GNode * parent);
+
+static void
+lbm_check_and_sort(LibBalsaMailbox * mailbox)
+{
+    if (mailbox->msg_tree)
+        lbm_sort(mailbox, mailbox->msg_tree);
+
+    libbalsa_mailbox_changed(mailbox);
+}
+
+#ifdef BALSA_USE_THREADS
+static gboolean
+lbm_set_threading_idle_cb(LibBalsaMailbox * mailbox)
+{
+    lbm_check_and_sort(mailbox);
+    g_object_unref(mailbox);
+    return FALSE;
+}
+#endif                          /* BALSA_USE_THREADS */
+
 static gboolean
 lbm_set_threading(LibBalsaMailbox * mailbox,
                   LibBalsaMailboxThreadingType thread_type)
@@ -2351,12 +2371,18 @@ lbm_set_threading(LibBalsaMailbox * mailbox,
 
     LIBBALSA_MAILBOX_GET_CLASS(mailbox)->set_threading(mailbox,
                                                        thread_type);
-    gdk_threads_enter();
-    if (mailbox->msg_tree)
-        lbm_sort(mailbox, mailbox->msg_tree);
-
-    libbalsa_mailbox_changed(mailbox);
-    gdk_threads_leave();
+#ifdef BALSA_USE_THREADS
+    if (libbalsa_am_i_subthread()) {
+        gdk_threads_add_idle((GSourceFunc) lbm_set_threading_idle_cb,
+                             g_object_ref(mailbox));
+    } else {
+        gdk_threads_enter();
+        lbm_check_and_sort(mailbox);
+        gdk_threads_leave();
+    }
+#else                           /* BALSA_USE_THREADS */
+    lbm_check_and_sort(mailbox);
+#endif                          /* BALSA_USE_THREADS */
 
     return TRUE;
 }

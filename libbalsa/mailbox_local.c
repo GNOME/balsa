@@ -1067,6 +1067,37 @@ libbalsa_mailbox_local_set_threading_info(LibBalsaMailboxLocal * local)
 }
 
 static void
+lbml_set_threading(LibBalsaMailbox * mailbox,
+                   LibBalsaMailboxThreadingType thread_type)
+{
+    switch (thread_type) {
+    case LB_MAILBOX_THREADING_JWZ:
+        lbml_threading_jwz(mailbox);
+        break;
+    case LB_MAILBOX_THREADING_FLAT:
+    case LB_MAILBOX_THREADING_SIMPLE:
+        lbml_threading_simple(mailbox, thread_type);
+        break;
+    }
+}
+
+#ifdef BALSA_USE_THREADS
+typedef struct {
+    LibBalsaMailbox *mailbox;
+    LibBalsaMailboxThreadingType thread_type;
+} LbmlSetThreadingInfo;
+
+static gboolean
+lbml_set_threading_idle_cb(LbmlSetThreadingInfo * info)
+{
+    lbml_set_threading(info->mailbox, info->thread_type);
+    g_object_unref(info->mailbox);
+    g_slice_free(LbmlSetThreadingInfo, info);
+    return FALSE;
+}
+#endif                          /* BALSA_USE_THREADS */
+
+static void
 libbalsa_mailbox_local_set_threading(LibBalsaMailbox * mailbox,
                                      LibBalsaMailboxThreadingType
                                      thread_type)
@@ -1108,17 +1139,22 @@ libbalsa_mailbox_local_set_threading(LibBalsaMailbox * mailbox,
             return;
     }
 
-    gdk_threads_enter();
-    switch (thread_type) {
-    case LB_MAILBOX_THREADING_JWZ:
-        lbml_threading_jwz(mailbox);
-        break;
-    case LB_MAILBOX_THREADING_FLAT:
-    case LB_MAILBOX_THREADING_SIMPLE:
-        lbml_threading_simple(mailbox, thread_type);
-        break;
+#ifdef BALSA_USE_THREADS
+    if (libbalsa_am_i_subthread()) {
+        LbmlSetThreadingInfo *info;
+
+        info = g_slice_new(LbmlSetThreadingInfo);
+        info->mailbox = g_object_ref(mailbox);
+        info->thread_type = thread_type;
+        gdk_threads_add_idle((GSourceFunc) lbml_set_threading_idle_cb, info);
+    } else {
+        gdk_threads_enter();
+        lbml_set_threading(mailbox, thread_type);
+        gdk_threads_leave();
     }
-    gdk_threads_leave();
+#else                           /* BALSA_USE_THREADS */
+    lbml_set_threading(mailbox, thread_type);
+#endif                          /* BALSA_USE_THREADS */
 #if defined(DEBUG_LOADING_AND_THREADING)
     printf("after threading time=%lu\n", (unsigned long) time(NULL));
 #endif

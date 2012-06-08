@@ -1338,18 +1338,21 @@ libbalsa_mailbox_msgno_changed(LibBalsaMailbox * mailbox, guint seqno)
         gdk_threads_leave();
 }
 
-void
-libbalsa_mailbox_msgno_inserted(LibBalsaMailbox *mailbox, guint seqno,
-                                GNode * parent, GNode ** sibling)
+static void
+lbm_msgno_inserted(LibBalsaMailbox *mailbox, guint seqno, GNode * parent,
+                   GNode ** sibling)
 {
     GtkTreeIter iter;
     GtkTreePath *path;
     GSList **unthreaded;
 
-    if (!libbalsa_threads_has_lock())
-        g_warning("Thread is not holding gdk lock");
-    if (!mailbox->msg_tree)
+    gdk_threads_enter();
+
+    if (!mailbox->msg_tree) {
+        gdk_threads_leave();
         return;
+    }
+
 #undef SANITY_CHECK
 #ifdef SANITY_CHECK
     g_return_if_fail(!g_node_find(mailbox->msg_tree,
@@ -1378,6 +1381,83 @@ libbalsa_mailbox_msgno_inserted(LibBalsaMailbox *mailbox, guint seqno,
             g_slist_prepend(*unthreaded, GUINT_TO_POINTER(seqno));
 
     mailbox->msg_tree_changed = TRUE;
+
+    gdk_threads_leave();
+}
+
+#ifdef BALSA_USE_THREADS
+typedef struct {
+#if GLIB_CHECK_VERSION(2, 32, 0)
+    GMutex mutex;
+    GCond cond;
+#else                           /* GLIB_CHECK_VERSION(2, 32, 0) */
+    GMutex *mutex;
+    GCond *cond;
+#endif                          /* GLIB_CHECK_VERSION(2, 32, 0) */
+    LibBalsaMailbox *mailbox;
+    guint seqno;
+    GNode *parent;
+    GNode **sibling;
+    gboolean wait;
+} LbmMsgnoInsertedInfo;
+
+static gboolean
+lbm_msgno_inserted_idle_cb(LbmMsgnoInsertedInfo * info)
+{
+    lbm_msgno_inserted(info->mailbox, info->seqno, info->parent,
+                       info->sibling);
+    info->wait = FALSE;
+
+#if GLIB_CHECK_VERSION(2, 32, 0)
+    g_cond_signal(&info->cond);
+#else                           /* GLIB_CHECK_VERSION(2, 32, 0) */
+    g_cond_signal(info->cond);
+#endif                          /* GLIB_CHECK_VERSION(2, 32, 0) */
+
+    return FALSE;
+}
+#endif                          /* BALSA_USE_THREADS */
+
+void
+libbalsa_mailbox_msgno_inserted(LibBalsaMailbox *mailbox, guint seqno,
+                                GNode * parent, GNode ** sibling)
+{
+#ifdef BALSA_USE_THREADS
+    if (libbalsa_am_i_subthread()) {
+        LbmMsgnoInsertedInfo info;
+
+        info.mailbox = g_object_ref(mailbox);
+        info.seqno = seqno;
+        info.parent = parent;
+        info.sibling = sibling;
+        info.wait = TRUE;
+#if GLIB_CHECK_VERSION(2, 32, 0)
+        g_mutex_init(&info.mutex);
+        g_cond_init(&info.cond);
+        g_mutex_lock(&info.mutex);
+        g_idle_add((GSourceFunc) lbm_msgno_inserted_idle_cb, &info);
+        while (info.wait)
+            g_cond_wait(&info.cond, &info.mutex);
+        g_mutex_unlock(&info.mutex);
+        g_mutex_clear(&info.mutex);
+        g_cond_clear(&info.cond);
+#else                           /* GLIB_CHECK_VERSION(2, 32, 0) */
+        info.mutex = g_mutex_new();
+        info.cond = g_cond_new();
+        g_mutex_lock(info.mutex);
+        g_idle_add((GSourceFunc) lbm_msgno_inserted_idle_cb, &info);
+        while (info.wait)
+            g_cond_wait(info.cond, info.mutex);
+        g_mutex_unlock(info.mutex);
+        g_mutex_free(info.mutex);
+        g_cond_free(info.cond);
+#endif                          /* GLIB_CHECK_VERSION(2, 32, 0) */
+        g_object_unref(mailbox);
+    } else
+        lbm_msgno_inserted(mailbox, seqno, parent, sibling);
+#else                           /* BALSA_USE_THREADS */
+    lbm_msgno_inserted(mailbox, seqno, parent, sibling);
+#endif                          /* BALSA_USE_THREADS */
 }
 
 void

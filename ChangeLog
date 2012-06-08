@@ -1,5 +1,14 @@
 2012-06-07  Peter Bloomfield
 
+	* libbalsa/mailbox.c (lbm_msgno_inserted),
+	(lbm_msgno_inserted_idle_cb), (libbalsa_mailbox_msgno_inserted):
+	block subthread and use an idle callback to insert message in
+	main thread.
+	* libbalsa/mailbox_local.c
+	(libbalsa_mailbox_local_load_messages): do not grab GDK lock.
+
+2012-06-07  Peter Bloomfield
+
 	* libbalsa/libbalsa.c (libbalsa_threads_enter): warn when
 	locking a subthread, to help find bad code paths.
 

@@ -1605,7 +1605,7 @@ lbm_msgno_removed_idle_cb(LbmMsgnoRemovedInfo * info)
 {
     lbm_msgno_removed(info->mailbox, info->seqno);
     g_object_unref(info->mailbox);
-    g_free(info);
+    g_slice_free(LbmMsgnoRemovedInfo, info);
     return FALSE;
 }
 #endif                          /* BALSA_USE_THREADS */
@@ -1615,10 +1615,10 @@ libbalsa_mailbox_msgno_removed(LibBalsaMailbox * mailbox, guint seqno)
 {
 #ifdef BALSA_USE_THREADS
     if (libbalsa_am_i_subthread()) {
-        LbmMsgnoRemovedInfo *info = g_new(LbmMsgnoRemovedInfo, 1);
+        LbmMsgnoRemovedInfo *info = g_slice_new(LbmMsgnoRemovedInfo);
         info->mailbox = g_object_ref(mailbox);
         info->seqno = seqno;
-        gdk_threads_add_idle((GSourceFunc) lbm_msgno_removed_idle_cb,
+        g_idle_add((GSourceFunc) lbm_msgno_removed_idle_cb,
                              info);
     } else {
         lbm_msgno_removed(mailbox, seqno);

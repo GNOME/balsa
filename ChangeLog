@@ -1,5 +1,12 @@
 2012-06-07  Peter Bloomfield
 
+	* src/main.c (progress_set_text), (progress_set_text_idle_cb),
+	(balsa_progress_set_text), (progress_set_fraction),
+	(progress_set_fraction_idle_cb), (balsa_progress_set_fraction):
+	call Gtk in idle callbacks instead of subthreads.
+
+2012-06-07  Peter Bloomfield
+
 	* libbalsa/mailbox.c (lbm_msgno_inserted),
 	(lbm_msgno_inserted_idle_cb), (libbalsa_mailbox_msgno_inserted):
 	block subthread and use an idle callback to insert message in

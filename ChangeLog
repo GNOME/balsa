@@ -1,5 +1,11 @@
 2012-06-09  Peter Bloomfield
 
+	* libbalsa/mailbox.h: do not export
+	libbalsa_mailbox_msgno_filt_{in,out}.
+	* libbalsa/mailbox.c: declare them static.
+
+2012-06-09  Peter Bloomfield
+
 	* libbalsa/mailbox.c (lbm_msgno_filt_check),
 	(lbm_msgno_filt_check_idle_cb),
 	(libbalsa_mailbox_msgno_filt_check): check whether message

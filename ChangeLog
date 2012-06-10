@@ -1,5 +1,12 @@
 2012-06-10  Peter Bloomfield
 
+	* libbalsa/libbalsa.c (libbalsa_scanner_error_quark),
+	(libbalsa_mailbox_error_quark), (libbalsa_image_error_quark):
+	GQuarks for GError.
+	* libbalsa/libbalsa.h: export them.
+
+2012-06-10  Peter Bloomfield
+
 	* libbalsa/imap/pop3.c (pop_imap_error_quark): a GQuark for use
 	in g_set_error.
 	* libbalsa/imap/pop3.h: export it.

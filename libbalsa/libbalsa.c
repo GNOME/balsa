@@ -890,16 +890,6 @@ libbalsa_get_image_from_face_header(const gchar * content, GError ** err)
     return image;
 }
 
-
-GQuark
-libbalsa_image_error_quark(void)
-{
-    static GQuark quark = 0;
-    if (quark == 0)
-        quark = g_quark_from_static_string("libbalsa-image-error-quark");
-    return quark;
-}
-
 #if HAVE_COMPFACE
 GtkWidget *
 libbalsa_get_image_from_x_face_header(const gchar * content, GError ** err)
@@ -1024,3 +1014,33 @@ libbalsa_source_view_new(gboolean highlight_phrases)
 }
 #endif  /* HAVE_GTKSOURCEVIEW */
 
+/*
+ * Error domains for GError:
+ */
+
+GQuark
+libbalsa_scanner_error_quark(void)
+{
+    static GQuark quark = 0;
+    if (quark == 0)
+        quark = g_quark_from_static_string("libbalsa-scanner-error-quark");
+    return quark;
+}
+
+GQuark
+libbalsa_mailbox_error_quark(void)
+{
+    static GQuark quark = 0;
+    if (quark == 0)
+        quark = g_quark_from_static_string("libbalsa-mailbox-error-quark");
+    return quark;
+}
+
+GQuark
+libbalsa_image_error_quark(void)
+{
+    static GQuark quark = 0;
+    if (quark == 0)
+        quark = g_quark_from_static_string("libbalsa-image-error-quark");
+    return quark;
+}

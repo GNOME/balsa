@@ -78,10 +78,10 @@ typedef struct _LibbalsaVfs LibbalsaVfs;
 /*
  * Error domains for GError:
  */
-enum {
-    LIBBALSA_SCANNER_ERROR,
-    LIBBALSA_MAILBOX_ERROR
-};
+GQuark libbalsa_scanner_error_quark(void);
+#define LIBBALSA_SCANNER_ERROR libbalsa_scanner_error_quark()
+GQuark libbalsa_mailbox_error_quark(void);
+#define LIBBALSA_MAILBOX_ERROR libbalsa_mailbox_error_quark()
 
 /*
  * Error codes for GError:

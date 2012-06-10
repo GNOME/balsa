@@ -1,3 +1,9 @@
+2012-06-10  Peter Bloomfield
+
+	* libbalsa/imap/pop3.c (pop_imap_error_quark): a GQuark for use
+	in g_set_error.
+	* libbalsa/imap/pop3.h: export it.
+
 2012-06-09  Peter Bloomfield
 
 	* libbalsa/mailbox.h: do not export

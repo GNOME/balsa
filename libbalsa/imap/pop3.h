@@ -35,10 +35,9 @@
  * Error domains for GError: only one for now, more to come.
  */
 
-enum {
-    IMAP_ERROR
-};
- 
+#define IMAP_ERROR pop_imap_error_quark()
+GQuark pop_imap_error_quark(void);
+
 /*
  * Error codes for GError: only one for now, more to come.
  */

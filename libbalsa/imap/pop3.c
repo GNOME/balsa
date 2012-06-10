@@ -111,6 +111,20 @@ struct PopHandle_ {
 };
 #define pop_can_do(pop, cap) ((pop)->capabilities[cap])
 
+/*
+ * IMAP_ERROR domain for g_set_error()
+ */
+GQuark
+pop_imap_error_quark(void)
+{
+    static GQuark quark;
+
+    if (!quark)
+        quark = g_quark_from_static_string("imap-pop3-error-quark");
+
+    return quark;
+}
+
 PopHandle *
 pop_new(void)
 {

@@ -1703,14 +1703,12 @@ libbalsa_mailbox_msgno_filt_out(LibBalsaMailbox * mailbox, guint seqno)
  *   messages;
  * - if it isn't in the view and it matches the condition, filter it in.
  */
-void
-libbalsa_mailbox_msgno_filt_check(LibBalsaMailbox * mailbox, guint seqno,
-                                  LibBalsaMailboxSearchIter * search_iter,
-                                  gboolean hold_selected)
+static void
+lbm_msgno_filt_check(LibBalsaMailbox * mailbox, guint seqno,
+                     LibBalsaMailboxSearchIter * search_iter,
+                     gboolean hold_selected)
 {
     gboolean match;
-
-    g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
 
     gdk_threads_enter();
 
@@ -1747,6 +1745,49 @@ libbalsa_mailbox_msgno_filt_check(LibBalsaMailbox * mailbox, guint seqno,
     }
 
     gdk_threads_leave();
+}
+
+#ifdef BALSA_USE_THREADS
+typedef struct {
+    LibBalsaMailbox *mailbox;
+    guint seqno;
+    LibBalsaMailboxSearchIter *search_iter;
+    gboolean hold_selected;
+} LbmMsgnoFiltCheckInfo;
+
+static gboolean
+lbm_msgno_filt_check_idle_cb(LbmMsgnoFiltCheckInfo * info)
+{
+    lbm_msgno_filt_check(info->mailbox, info->seqno, info->search_iter,
+                         info->hold_selected);
+    g_object_unref(info->mailbox);
+    g_slice_free(LbmMsgnoFiltCheckInfo, info);
+    return FALSE;
+}
+#endif                          /* BALSA_USE_THREADS */
+
+void
+libbalsa_mailbox_msgno_filt_check(LibBalsaMailbox * mailbox, guint seqno,
+                                  LibBalsaMailboxSearchIter * search_iter,
+                                  gboolean hold_selected)
+{
+    g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
+
+#ifdef BALSA_USE_THREADS
+    if (libbalsa_am_i_subthread()) {
+        LbmMsgnoFiltCheckInfo *info;
+
+        info = g_slice_new(LbmMsgnoFiltCheckInfo);
+        info->mailbox = g_object_ref(mailbox);
+        info->seqno = seqno;
+        info->search_iter = search_iter;
+        info->hold_selected = hold_selected;
+        g_idle_add((GSourceFunc) lbm_msgno_filt_check_idle_cb, info);
+    } else
+        lbm_msgno_filt_check(mailbox, seqno, search_iter, hold_selected);
+#else                           /* BALSA_USE_THREADS */
+    lbm_msgno_filt_check(mailbox, seqno, search_iter, hold_selected);
+#endif                          /* BALSA_USE_THREADS */
 }
 
 /* Search iters */

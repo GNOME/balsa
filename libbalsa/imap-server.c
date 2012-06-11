@@ -111,9 +111,9 @@ static pthread_mutex_t imap_servers_lock = PTHREAD_MUTEX_INITIALIZER;
 #define TRYLOCK_SERVER(server) g_mutex_trylock(&((server)->lock))
 #define UNLOCK_SERVER(server)  g_mutex_unlock(&((server)->lock))
 #else                           /* GLIB_CHECK_VERSION(2, 32, 0) */
-#define LOCK_SERVER(server)    g_mutex_lock(((server)->lock))
-#define TRYLOCK_SERVER(server) g_mutex_trylock(((server)->lock))
-#define UNLOCK_SERVER(server)  g_mutex_unlock(((server)->lock))
+#define LOCK_SERVER(server)    g_mutex_lock((server)->lock)
+#define TRYLOCK_SERVER(server) g_mutex_trylock((server)->lock)
+#define UNLOCK_SERVER(server)  g_mutex_unlock((server)->lock)
 #endif                          /* GLIB_CHECK_VERSION(2, 32, 0) */
 #else
 #define LOCK_SERVERS()

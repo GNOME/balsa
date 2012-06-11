@@ -1,5 +1,9 @@
 2012-06-11  Peter Bloomfield
 
+	* libbalsa/imap-server.c: remove redundant parentheses.
+
+2012-06-11  Peter Bloomfield
+
 	Ref count LibBalsaMailboxSearchIter
 
 	* libbalsa/mailbox.c (libbalsa_mailbox_run_filters_on_reception),

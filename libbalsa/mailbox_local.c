@@ -1208,7 +1208,7 @@ lbm_local_update_view_filter(LibBalsaMailbox * mailbox,
                                        ((gdouble) total));
     }
     libbalsa_progress_set_text(&progress, NULL, 0);
-    libbalsa_mailbox_search_iter_free(iter_view);
+    libbalsa_mailbox_search_iter_unref(iter_view);
 
     /* If this is not a flags-only filter, the new mailbox tree is
      * temporary, so we don't want to save it. */

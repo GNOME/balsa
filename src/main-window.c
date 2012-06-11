@@ -4452,7 +4452,7 @@ bw_find_real(BalsaWindow * window, BalsaIndex * bindex, gboolean again)
 	    return;
 	cnd->type = CONDITION_STRING;
 
-	libbalsa_mailbox_search_iter_free(search_iter);
+	libbalsa_mailbox_search_iter_unref(search_iter);
 	search_iter = NULL;
 
         if(ok == FIND_RESPONSE_FILTER) {

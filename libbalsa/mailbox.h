@@ -264,9 +264,10 @@ struct _LibBalsaMailbox {
 
 /* Search iter */
 struct _LibBalsaMailboxSearchIter {
-    LibBalsaMailbox *mailbox;
+    gint ref_count;
     gint stamp;
-    LibBalsaCondition *condition;	
+    LibBalsaMailbox *mailbox;
+    LibBalsaCondition *condition;
     gpointer user_data;		/* private backend info */
 };
 
@@ -443,17 +444,19 @@ gboolean libbalsa_mailbox_message_match(LibBalsaMailbox  *mailbox,
 					LibBalsaMailboxSearchIter *search_iter);
 
 /* Search iter */
-LibBalsaMailboxSearchIter *libbalsa_mailbox_search_iter_new(LibBalsaCondition
-							    * condition);
-LibBalsaMailboxSearchIter *libbalsa_mailbox_search_iter_view(LibBalsaMailbox
-							     * mailbox);
+LibBalsaMailboxSearchIter
+    *libbalsa_mailbox_search_iter_new(LibBalsaCondition * condition);
+LibBalsaMailboxSearchIter
+    *libbalsa_mailbox_search_iter_view(LibBalsaMailbox * mailbox);
+LibBalsaMailboxSearchIter
+    *libbalsa_mailbox_search_iter_ref(LibBalsaMailboxSearchIter * iter);
+void libbalsa_mailbox_search_iter_unref(LibBalsaMailboxSearchIter * iter);
 gboolean libbalsa_mailbox_search_iter_step(LibBalsaMailbox * mailbox,
 					   LibBalsaMailboxSearchIter 
 					   * search_iter,
 					   GtkTreeIter * iter,
 					   gboolean forward,
 					   guint stop_msgno);
-void libbalsa_mailbox_search_iter_free(LibBalsaMailboxSearchIter * iter);
 
 /* Default filtering function (on reception)
    It is ONLY FOR INTERNAL USE

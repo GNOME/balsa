@@ -239,7 +239,7 @@ bndx_destroy(GObject * obj)
     }
 
     if (index->search_iter) {
-        libbalsa_mailbox_search_iter_free(index->search_iter);
+        libbalsa_mailbox_search_iter_unref(index->search_iter);
         index->search_iter = NULL;
     }
 
@@ -1398,7 +1398,7 @@ bndx_select_next_with_flag(BalsaIndex * index, LibBalsaMessageFlag flag)
                                          BNDX_SEARCH_START_ANY,
                                          BNDX_SEARCH_WRAP_YES);
 
-    libbalsa_mailbox_search_iter_free(search_iter);
+    libbalsa_mailbox_search_iter_unref(search_iter);
 
     return retval;
 }

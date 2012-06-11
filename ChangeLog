@@ -1,3 +1,22 @@
+2012-06-11  Peter Bloomfield
+
+	Ref count LibBalsaMailboxSearchIter
+
+	* libbalsa/mailbox.c (libbalsa_mailbox_run_filters_on_reception),
+	(libbalsa_mailbox_msgno_filt_check),
+	(libbalsa_mailbox_search_iter_new),
+	(libbalsa_mailbox_search_iter_ref),
+	(libbalsa_mailbox_search_iter_unref),
+	(libbalsa_mailbox_messages_change_flags): ref count
+	LibBalsaMailboxSearchIter, and unref it instead of free.
+	* libbalsa/mailbox.h: new member ref_count.
+	* libbalsa/mailbox_local.c (lbm_local_update_view_filter): unref
+	LibBalsaMailboxSearchIter instead of free.
+	* src/balsa-index.c (bndx_destroy),
+	(bndx_select_next_with_flag): ditto.
+	* src/filter-run-callbacks.c (run_filters_on_mailbox): ditto.
+	* src/main-window.c: ditto.
+
 2012-06-10  Peter Bloomfield
 
 	* libbalsa/libbalsa.c (libbalsa_scanner_error_quark),

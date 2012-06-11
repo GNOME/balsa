@@ -898,7 +898,7 @@ libbalsa_mailbox_run_filters_on_reception(LibBalsaMailbox * mailbox)
                                                /
                                                ((gdouble) progress_total));
         }
-        libbalsa_mailbox_search_iter_free(search_iter);
+        libbalsa_mailbox_search_iter_unref(search_iter);
 
         libbalsa_mailbox_register_msgnos(mailbox, msgnos);
         libbalsa_filter_mailbox_messages(filter, mailbox, msgnos);
@@ -1780,7 +1780,7 @@ libbalsa_mailbox_msgno_filt_check(LibBalsaMailbox * mailbox, guint seqno,
         info = g_slice_new(LbmMsgnoFiltCheckInfo);
         info->mailbox = g_object_ref(mailbox);
         info->seqno = seqno;
-        info->search_iter = search_iter;
+        info->search_iter = libbalsa_mailbox_search_iter_ref(search_iter);
         info->hold_selected = hold_selected;
         g_idle_add((GSourceFunc) lbm_msgno_filt_check_idle_cb, info);
     } else
@@ -1799,11 +1799,12 @@ libbalsa_mailbox_search_iter_new(LibBalsaCondition * condition)
     if (!condition)
         return NULL;
 
-    iter = g_new(LibBalsaMailboxSearchIter, 1);
+    iter = g_slice_new(LibBalsaMailboxSearchIter);
     iter->mailbox = NULL;
     iter->stamp = 0;
     iter->condition = libbalsa_condition_ref(condition);
     iter->user_data = NULL;
+    iter->ref_count = 1;
 
     return iter;
 }
@@ -1817,12 +1818,27 @@ libbalsa_mailbox_search_iter_view(LibBalsaMailbox * mailbox)
     return libbalsa_mailbox_search_iter_new(mailbox->view_filter);
 }
 
+/* Increment reference count of a LibBalsaMailboxSearchIter, if it is
+ * valid */
+LibBalsaMailboxSearchIter *
+libbalsa_mailbox_search_iter_ref(LibBalsaMailboxSearchIter * search_iter)
+{
+    g_return_val_if_fail(search_iter != NULL, NULL);
+    g_return_val_if_fail(search_iter->ref_count > 0, NULL);
+
+    ++search_iter->ref_count;
+
+    return search_iter;
+}
+
+/* Decrement reference count of a LibBalsaMailboxSearchIter, if it is
+ * non-NULL and validi, and free it if it goes to zero */
 void
-libbalsa_mailbox_search_iter_free(LibBalsaMailboxSearchIter * search_iter)
+libbalsa_mailbox_search_iter_unref(LibBalsaMailboxSearchIter * search_iter)
 {
     LibBalsaMailbox *mailbox;
 
-    if (!search_iter)
+    if (!search_iter || --search_iter->ref_count > 0)
         return;
 
     mailbox = search_iter->mailbox;
@@ -1830,7 +1846,7 @@ libbalsa_mailbox_search_iter_free(LibBalsaMailboxSearchIter * search_iter)
         LIBBALSA_MAILBOX_GET_CLASS(mailbox)->search_iter_free(search_iter);
 
     libbalsa_condition_unref(search_iter->condition);
-    g_free(search_iter);
+    g_slice_free(LibBalsaMailboxSearchIter, search_iter);
 }
 
 /* GNode iterators; they return the root node when they run out of nodes,
@@ -2224,7 +2240,7 @@ libbalsa_mailbox_messages_change_flags(LibBalsaMailbox * mailbox,
             libbalsa_mailbox_msgno_filt_check(mailbox, msgno, iter_view,
                                               TRUE);
         }
-        libbalsa_mailbox_search_iter_free(iter_view);
+        libbalsa_mailbox_search_iter_unref(iter_view);
     }
 
     if (real_flag)

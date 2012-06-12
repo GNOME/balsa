@@ -1,5 +1,10 @@
 2012-06-11  Peter Bloomfield
 
+	* libbalsa/mailbox.c (lbm_msgno_filt_check_idle_cb): unref the
+	LibBalsaMailboxSearchIter.
+
+2012-06-11  Peter Bloomfield
+
 	* libbalsa/imap-server.c: remove redundant parentheses.
 
 2012-06-11  Peter Bloomfield

@@ -1761,6 +1761,7 @@ lbm_msgno_filt_check_idle_cb(LbmMsgnoFiltCheckInfo * info)
     lbm_msgno_filt_check(info->mailbox, info->seqno, info->search_iter,
                          info->hold_selected);
     g_object_unref(info->mailbox);
+    libbalsa_mailbox_search_iter_unref(info->search_iter);
     g_slice_free(LbmMsgnoFiltCheckInfo, info);
     return FALSE;
 }

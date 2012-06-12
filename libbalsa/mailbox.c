@@ -1488,6 +1488,26 @@ libbalsa_mailbox_msgno_filt_in(LibBalsaMailbox *mailbox, guint seqno)
     gdk_threads_leave();
 }
 
+#ifdef BALSA_USE_THREADS
+/*
+ * Handler for "message-expunged" signal
+ *
+ * Adjust msgno; it will be invalid (zero) if msgno was expunged.
+ */
+static void
+lbm_message_expunged_cb(LibBalsaMailbox * mailbox, guint expunged_msgno,
+                        guint * msgno)
+{
+    if (*msgno > expunged_msgno)
+        --*msgno;
+    else if (*msgno == expunged_msgno)
+        *msgno = 0;
+}
+#endif                          /* BALSA_USE_THREADS */
+
+/*
+ * libbalsa_mailbox_msgno_removed and helpers
+ */
 struct remove_data {LibBalsaMailbox *mailbox; unsigned seqno; GNode *node; };
 static gboolean
 decrease_post(GNode *node, gpointer data)
@@ -1598,12 +1618,16 @@ lbm_msgno_removed(LibBalsaMailbox * mailbox, guint seqno)
 typedef struct {
     LibBalsaMailbox *mailbox;
     guint seqno;
+    gulong expunged_cb_handler_id;
 } LbmMsgnoRemovedInfo;
 
 static gboolean
 lbm_msgno_removed_idle_cb(LbmMsgnoRemovedInfo * info)
 {
-    lbm_msgno_removed(info->mailbox, info->seqno);
+    g_signal_handler_disconnect(info->mailbox,
+                                info->expunged_cb_handler_id);
+    if (info->seqno)
+        lbm_msgno_removed(info->mailbox, info->seqno);
     g_object_unref(info->mailbox);
     g_slice_free(LbmMsgnoRemovedInfo, info);
     return FALSE;
@@ -1615,9 +1639,15 @@ libbalsa_mailbox_msgno_removed(LibBalsaMailbox * mailbox, guint seqno)
 {
 #ifdef BALSA_USE_THREADS
     if (libbalsa_am_i_subthread()) {
-        LbmMsgnoRemovedInfo *info = g_slice_new(LbmMsgnoRemovedInfo);
+        LbmMsgnoRemovedInfo *info;
+
+        info = g_slice_new(LbmMsgnoRemovedInfo);
         info->mailbox = g_object_ref(mailbox);
         info->seqno = seqno;
+        info->expunged_cb_handler_id =
+            g_signal_connect(mailbox, "message-expunged",
+                             G_CALLBACK(lbm_message_expunged_cb),
+                             &info->seqno);
         g_idle_add((GSourceFunc) lbm_msgno_removed_idle_cb,
                              info);
     } else {
@@ -1753,13 +1783,17 @@ typedef struct {
     guint seqno;
     LibBalsaMailboxSearchIter *search_iter;
     gboolean hold_selected;
+    gulong expunged_cb_handler_id;
 } LbmMsgnoFiltCheckInfo;
 
 static gboolean
 lbm_msgno_filt_check_idle_cb(LbmMsgnoFiltCheckInfo * info)
 {
-    lbm_msgno_filt_check(info->mailbox, info->seqno, info->search_iter,
-                         info->hold_selected);
+    g_signal_handler_disconnect(info->mailbox,
+                                info->expunged_cb_handler_id);
+    if (info->seqno)
+        lbm_msgno_filt_check(info->mailbox, info->seqno, info->search_iter,
+                             info->hold_selected);
     g_object_unref(info->mailbox);
     libbalsa_mailbox_search_iter_unref(info->search_iter);
     g_slice_free(LbmMsgnoFiltCheckInfo, info);
@@ -1781,6 +1815,10 @@ libbalsa_mailbox_msgno_filt_check(LibBalsaMailbox * mailbox, guint seqno,
         info = g_slice_new(LbmMsgnoFiltCheckInfo);
         info->mailbox = g_object_ref(mailbox);
         info->seqno = seqno;
+        info->expunged_cb_handler_id =
+            g_signal_connect(mailbox, "message-expunged",
+                             G_CALLBACK(lbm_message_expunged_cb),
+                             &info->seqno);
         info->search_iter = libbalsa_mailbox_search_iter_ref(search_iter);
         info->hold_selected = hold_selected;
         g_idle_add((GSourceFunc) lbm_msgno_filt_check_idle_cb, info);

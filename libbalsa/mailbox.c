@@ -1404,14 +1404,22 @@ typedef struct {
 static gboolean
 lbm_msgno_inserted_idle_cb(LbmMsgnoInsertedInfo * info)
 {
+#if GLIB_CHECK_VERSION(2, 32, 0)
+    g_mutex_lock(&info->mutex);
+#else                           /* GLIB_CHECK_VERSION(2, 32, 0) */
+    g_mutex_lock(info->mutex);
+#endif                          /* GLIB_CHECK_VERSION(2, 32, 0) */
+
     lbm_msgno_inserted(info->mailbox, info->seqno, info->parent,
                        info->sibling);
     info->wait = FALSE;
 
 #if GLIB_CHECK_VERSION(2, 32, 0)
     g_cond_signal(&info->cond);
+    g_mutex_unlock(&info->mutex);
 #else                           /* GLIB_CHECK_VERSION(2, 32, 0) */
     g_cond_signal(info->cond);
+    g_mutex_unlock(info->mutex);
 #endif                          /* GLIB_CHECK_VERSION(2, 32, 0) */
 
     return FALSE;

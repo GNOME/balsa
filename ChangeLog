@@ -1,5 +1,10 @@
 2012-06-13  Peter Bloomfield
 
+	* libbalsa/mailbox.c (lbm_msgno_inserted_idle_cb): lock mutex
+	before signalling cond.
+
+2012-06-13  Peter Bloomfield
+
 	* src/balsa-app.c (find_url_idle_cb): lock mutex before
 	signalling cond.
 

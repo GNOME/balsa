@@ -751,13 +751,22 @@ typedef struct {
 static gboolean
 find_url_idle_cb(BalsaFindUrlInfo * info)
 {
+#if GLIB_CHECK_VERSION(2, 32, 0)
+    g_mutex_lock(&info->mutex);
+
     info->mbnode = find_url(info->url);
     info->wait = FALSE;
 
-#if GLIB_CHECK_VERSION(2, 32, 0)
     g_cond_signal(&info->cond);
+    g_mutex_unlock(&info->mutex);
 #else                           /* GLIB_CHECK_VERSION(2, 32, 0) */
+    g_mutex_lock(info->mutex);
+
+    info->mbnode = find_url(info->url);
+    info->wait = FALSE;
+
     g_cond_signal(info->cond);
+    g_mutex_unlock(info->mutex);
 #endif                          /* GLIB_CHECK_VERSION(2, 32, 0) */
 
     return FALSE;

@@ -1,3 +1,9 @@
+2012-06-19  Peter Bloomfield
+
+	* libbalsa/mailbox.c (lbm_node_has_unseen_child),
+	(lbm_get_index_entry), (mbox_model_get_value): get index entry
+	by message number instead of by GNode.
+
 2012-06-13  Peter Bloomfield
 
 	* libbalsa/mailbox.c (lbm_msgno_inserted_idle_cb): lock mutex

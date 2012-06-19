@@ -1167,7 +1167,7 @@ libbalsa_mailbox_type_from_path(const gchar * path)
  */
 
 static LibBalsaMailboxIndexEntry *lbm_get_index_entry(LibBalsaMailbox *
-						      lmm, GNode * node);
+						      lmm, guint msgno);
 /* Does the node (non-NULL) have unseen children? */
 static gboolean
 lbm_node_has_unseen_child(LibBalsaMailbox * lmm, GNode * node)
@@ -1175,7 +1175,7 @@ lbm_node_has_unseen_child(LibBalsaMailbox * lmm, GNode * node)
     for (node = node->children; node; node = node->next) {
 	LibBalsaMailboxIndexEntry *entry =
 	    /* g_ptr_array_index(lmm->mindex, msgno - 1); ?? */
-	    lbm_get_index_entry(lmm, node);
+	    lbm_get_index_entry(lmm, GPOINTER_TO_UINT(node->data));
 	if ((entry && entry->unseen) || lbm_node_has_unseen_child(lmm, node))
 	    return TRUE;
     }
@@ -3161,9 +3161,8 @@ lbm_get_index_entry_real(LibBalsaMailbox * mailbox)
 #endif                          /*BALSA_USE_THREADS */
 
 static LibBalsaMailboxIndexEntry *
-lbm_get_index_entry(LibBalsaMailbox * lmm, GNode * node)
+lbm_get_index_entry(LibBalsaMailbox * lmm, guint msgno)
 {
-    guint msgno = GPOINTER_TO_UINT(node->data);
     LibBalsaMailboxIndexEntry *entry;
 
     if (!lmm->mindex)
@@ -3239,7 +3238,7 @@ mbox_model_get_value(GtkTreeModel *tree_model,
         return;
     }
     g_return_if_fail(msgno<=libbalsa_mailbox_total_messages(lmm));
-    msg = lbm_get_index_entry(lmm, (GNode *) iter->user_data);
+    msg = lbm_get_index_entry(lmm, msgno);
     switch(column) {
         /* case LB_MBOX_MSGNO_COL: handled above */
     case LB_MBOX_MARKED_COL:

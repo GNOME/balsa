@@ -1667,22 +1667,14 @@ libbalsa_mailbox_msgno_removed(LibBalsaMailbox * mailbox, guint seqno)
 }
 
 static void
-libbalsa_mailbox_msgno_filt_out(LibBalsaMailbox * mailbox, guint seqno)
+libbalsa_mailbox_msgno_filt_out(LibBalsaMailbox * mailbox, GNode * node)
 {
     GtkTreeIter iter;
     GtkTreePath *path;
-    GNode *child, *parent, *node;
+    GNode *child, *parent;
 
     gdk_threads_enter();
     if (!mailbox->msg_tree) {
-        gdk_threads_leave();
-        return;
-    }
-
-    node = g_node_find(mailbox->msg_tree, G_PRE_ORDER, G_TRAVERSE_ALL, 
-                       GUINT_TO_POINTER(seqno));
-    if (!node) {
-        g_warning("filt_out: msgno %d not found", seqno);
         gdk_threads_leave();
         return;
     }
@@ -1747,6 +1739,7 @@ lbm_msgno_filt_check(LibBalsaMailbox * mailbox, guint seqno,
                      gboolean hold_selected)
 {
     gboolean match;
+    GNode *node;
 
     gdk_threads_enter();
 
@@ -1757,8 +1750,9 @@ lbm_msgno_filt_check(LibBalsaMailbox * mailbox, guint seqno,
 
     match = search_iter ?
         libbalsa_mailbox_message_match(mailbox, seqno, search_iter) : TRUE;
-    if (g_node_find(mailbox->msg_tree, G_PRE_ORDER, G_TRAVERSE_ALL,
-                    GUINT_TO_POINTER(seqno))) {
+    node = g_node_find(mailbox->msg_tree, G_PRE_ORDER, G_TRAVERSE_ALL,
+                    GUINT_TO_POINTER(seqno));
+    if (node) {
         if (!match) {
             gboolean filt_out = hold_selected ?
                 libbalsa_mailbox_msgno_has_flags(mailbox, seqno, 0,
@@ -1775,7 +1769,7 @@ lbm_msgno_filt_check(LibBalsaMailbox * mailbox, guint seqno,
 		filt_out = FALSE;
 #endif
             if (filt_out)
-                libbalsa_mailbox_msgno_filt_out(mailbox, seqno);
+                libbalsa_mailbox_msgno_filt_out(mailbox, node);
         }
     } else {
         if (match)

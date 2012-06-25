@@ -1,3 +1,8 @@
+2012-06-25  Peter Bloomfield
+
+	* libbalsa/mailbox.c (libbalsa_mailbox_msgno_filt_out),
+	(lbm_msgno_filt_check): find node once, not twice.
+
 2012-06-19  Peter Bloomfield
 
 	* libbalsa/mailbox.c (lbm_node_has_unseen_child),

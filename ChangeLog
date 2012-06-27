@@ -1,3 +1,10 @@
+2012-06-27  Peter Bloomfield
+
+	* src/save-restore.c (config_load_sections), (config_mailbox_init),
+	(config_address_book_load), (config_address_books_load),
+	(config_identities_load), (load_mru): prepend to GList and
+	reverse it, instead of appending; use g_list_free_full().
+
 2012-06-25  Peter Bloomfield
 
 	* libbalsa/mailbox.c (libbalsa_mailbox_msgno_filt_out),

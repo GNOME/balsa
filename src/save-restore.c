@@ -114,6 +114,7 @@ config_load_sections(void)
     libbalsa_conf_foreach_group(MAILBOX_SECTION_PREFIX,
                                 config_load_section,
                                 config_mailbox_init);
+    balsa_app.inbox_input = g_list_reverse(balsa_app.inbox_input);
     libbalsa_conf_foreach_group(FOLDER_SECTION_PREFIX,
                                 config_load_section,
                                 config_folder_init);
@@ -439,8 +440,8 @@ config_mailbox_init(const gchar * prefix)
                          "progress-notify", G_CALLBACK(pop3_progress_notify),
                          mailbox);
 	balsa_app.inbox_input =
-	    g_list_append(balsa_app.inbox_input, 
-			  balsa_mailbox_node_new_from_mailbox(mailbox));
+            g_list_prepend(balsa_app.inbox_input,
+                           balsa_mailbox_node_new_from_mailbox(mailbox));
     } else {
         LibBalsaMailbox **special = NULL;
 	BalsaMailboxNode *mbnode;
@@ -1584,7 +1585,7 @@ config_address_book_load(const gchar * key, const gchar * value,
 
     if (address_book) {
         balsa_app.address_book_list =
-            g_list_append(balsa_app.address_book_list, address_book);
+            g_list_prepend(balsa_app.address_book_list, address_book);
 
         if (default_address_book_prefix
             && strcmp(key, default_address_book_prefix) == 0) {
@@ -1606,14 +1607,15 @@ config_address_books_load(void)
     libbalsa_conf_pop_group();
 
     /* Free old data in case address books were set by eg. config druid. */
-    g_list_foreach(balsa_app.address_book_list, (GFunc) g_object_unref,
-                   NULL);
-    g_list_free(balsa_app.address_book_list);
+    g_list_free_full(balsa_app.address_book_list, g_object_unref);
     balsa_app.address_book_list = NULL;
 
     libbalsa_conf_foreach_group(ADDRESS_BOOK_SECTION_PREFIX,
                                 config_address_book_load,
                                 default_address_book_prefix);
+
+    balsa_app.address_book_list =
+        g_list_reverse(balsa_app.address_book_list);
 
     g_free(default_address_book_prefix);
 }
@@ -1681,8 +1683,7 @@ config_identities_load()
     gchar *default_ident;
 
     /* Free old data in case identities were set by eg. config druid. */
-    g_list_foreach(balsa_app.identities, (GFunc) g_object_unref, NULL);
-    g_list_free(balsa_app.identities);
+    g_list_free_full(balsa_app.identities, g_object_unref);
     balsa_app.identities = NULL;
 
     libbalsa_conf_push_group("identity");
@@ -2096,8 +2097,9 @@ load_mru(GList **mru, const gchar * group)
         gchar *val;
 	snprintf(tmpkey, sizeof tmpkey - 1, "MRU%d", i + 1);
         if( (val = libbalsa_conf_get_string(tmpkey)) != NULL )
-            (*mru)=g_list_append((*mru), val);
+            (*mru)=g_list_prepend((*mru), val);
     }
+    *mru = g_list_reverse(*mru);
     libbalsa_conf_pop_group();
 }
 

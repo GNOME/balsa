@@ -2868,6 +2868,9 @@ check_new_messages_real(BalsaWindow * window, int type)
     pthread_detach(get_mail_thread);
 #else
 
+    if (window)
+        bw_set_sensitive(window, "GetNewMail", FALSE);
+
     bw_check_mailbox_list(window, balsa_app.inbox_input);
 
     gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
@@ -2876,6 +2879,9 @@ check_new_messages_real(BalsaWindow * window, int type)
     g_slist_foreach(list, (GFunc) bw_mailbox_check, window);
     g_slist_foreach(list, (GFunc) g_object_unref, NULL);
     g_slist_free(list);
+
+    if (window)
+        bw_set_sensitive(window, "GetNewMail", TRUE);
 
 #if defined(HAVE_LIBNM_GLIB)
     if (window->nm_state == NM_STATE_CONNECTED)

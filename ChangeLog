@@ -1,3 +1,8 @@
+2012-07-13  Peter Bloomfield
+
+	* libbalsa/mime.c (process_mime_part): build
+	--with-html-widget=no; fixes bgo #679869 (Aljosha).
+
 2012-07-04  Peter Bloomfield
 
 	* src/main-window.c: manage sensitivity of check mail button in

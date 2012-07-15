@@ -1,5 +1,10 @@
 2012-07-15  Albrecht Dreß
 
+	* libbalsa/mailbox_imap.c (imap_cache_manager_new_from_file): do
+	not leak open file on error.
+
+2012-07-15  Albrecht Dreß
+
 	* libbalsa/filter-funcs.c (libbalsa_filter_export_sieve): do not
 	leak open file.
 

@@ -3477,6 +3477,7 @@ imap_cache_manager_new_from_file(const char *header_cache_path)
     }
     if(fread(&i, sizeof(i), 1, f) != 1) {
 	printf("Could not read cache table size.\n");
+        fclose(f);
 	return NULL;
     }
     

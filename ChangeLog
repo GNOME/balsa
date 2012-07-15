@@ -1,5 +1,10 @@
 2012-07-15  Albrecht Dreß
 
+	* src/balsa-index.c (bndx_start_pipe_messages_array): fix mem
+	leak on error.
+
+2012-07-15  Albrecht Dreß
+
 	* libbalsa/mailbox_mbox.c (libbalsa_mailbox_mbox_add_message):
 	fix mem leak on error.
 

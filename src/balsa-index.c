@@ -2676,16 +2676,18 @@ bndx_start_pipe_messages_array(LibBalsaMailbox *mailbox,
 			       const char *pipe_cmd)
 {
     guint i;
-    struct BndxPipeQueue *queue = g_new(struct BndxPipeQueue, 1);
-    queue->mailbox = mailbox;
+    struct BndxPipeQueue *queue;
+
     if(!libbalsa_mailbox_open(mailbox, NULL))
 	return FALSE;
+
+    queue = g_new(struct BndxPipeQueue, 1);
+    queue->mailbox = mailbox;
     queue->msgnos = g_array_sized_new(FALSE, FALSE, sizeof(guint), msgnos->len);
     queue->pipe_cmd = g_strdup(pipe_cmd);
     for(i=0; i<msgnos->len; i++)
 	g_array_append_val(queue->msgnos,
 			   g_array_index(msgnos, guint, msgnos->len-i-1));
-	    ;
     libbalsa_mailbox_register_msgnos(mailbox, queue->msgnos);
 
     bndx_pipe_queue_last(queue);

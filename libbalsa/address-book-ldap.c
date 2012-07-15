@@ -492,9 +492,8 @@ libbalsa_address_book_ldap_get_address(LibBalsaAddressBook * ab,
     g_return_val_if_fail(email != NULL, NULL);
 
     address = libbalsa_address_new();
-    address->nick_name = cn ? cn : g_strdup(_("No-Id"));
-    if (cn) 
-	address->full_name = g_strdup(cn);
+    if (cn)
+	address->full_name = cn;
     else {
 	address->full_name = create_name(first, last);
         if(!address->full_name)
@@ -798,8 +797,11 @@ libbalsa_address_book_ldap_modify_address(LibBalsaAddressBook *ab,
     }
     mods[cnt] = NULL;
 
-    if(cnt == 0) /* nothing to modify */
-        return LBABERR_OK; 
+    if(cnt == 0) {
+        /* nothing to modify */
+        g_free(dn);
+        return LBABERR_OK;
+    }
     cnt = 0;
     do {
         rc = ldap_modify_ext_s(ldap_ab->directory, dn, mods, NULL, NULL);

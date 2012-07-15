@@ -1,3 +1,8 @@
+2012-07-15  Peter Bloomfield
+
+	* libbalsa/address-book-extern.c (parse_externq_file): pipe
+	stream must be closed with pclose, not fclose.
+
 2012-07-13  Peter Bloomfield
 
 	* libbalsa/mime.c (process_mime_part): build

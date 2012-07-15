@@ -280,7 +280,7 @@ parse_externq_file(LibBalsaAddressBookExtern *addr_externq,
 #endif
         cb(email, name, data);
     }
-    fclose(gc);
+    pclose(gc);
     
     return TRUE;
 }

@@ -1,5 +1,10 @@
 2012-07-15  Albrecht Dreß
 
+	* src/folder-conf.c (folder_conf_imap_sub_node): fix mem leak
+	on error.
+
+2012-07-15  Albrecht Dreß
+
 	* src/balsa-index.c (bndx_start_pipe_messages_array): fix mem
 	leak on error.
 

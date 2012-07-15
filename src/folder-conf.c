@@ -778,6 +778,7 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
             balsa_information(LIBBALSA_INFORMATION_ERROR,
                               _("An IMAP folder that is not a mailbox\n"
                                 "has no properties that can be changed."));
+            g_free(sdd);
 	    return;
 	}
 	sdd->parent = mn->parent;

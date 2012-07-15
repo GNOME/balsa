@@ -1986,6 +1986,7 @@ libbalsa_mailbox_mbox_add_message(LibBalsaMailbox * mailbox,
         g_set_error(err, LIBBALSA_MAILBOX_ERROR,
                     LIBBALSA_MAILBOX_APPEND_ERROR,
                     _("%s: could not open %s."), "MBOX", path);
+        g_free(from);
         return FALSE;
     }
     

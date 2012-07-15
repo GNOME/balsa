@@ -1030,8 +1030,8 @@ libbalsa_filter_export_sieve(LibBalsaFilter* fil, gchar* filename)
     }
     nb=fwrite(buffer->str,buffer->len,1,fp);
     g_string_free(buffer,TRUE);
-    if (fclose(fp)!=0) nb=0;
 #endif
+    if (fclose(fp)!=0) nb=0;
     return nb==1 ? TRUE : FALSE;
 }             /* end of filter_export_sieve */
 

@@ -1,11 +1,16 @@
-2012-07-15  Peter Bloomfield
+2012-07-15  Albrecht Dreß
+
+	* libbalsa/filter-funcs.c (libbalsa_filter_export_sieve): do not
+	leak open file.
+
+2012-07-15  Albrecht Dreß
 
 	* libbalsa/address-book-ldap.c
 	(libbalsa_address_book_ldap_get_address): drop useless
 	assignment to nick_name, fix mem leak;
 	(libbalsa_address_book_ldap_modify_address): fix mem leak.
 
-2012-07-15  Peter Bloomfield
+2012-07-15  Albrecht Dreß
 
 	* libbalsa/address-book-extern.c (parse_externq_file): pipe
 	stream must be closed with pclose, not fclose.

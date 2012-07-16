@@ -3487,6 +3487,7 @@ imap_cache_manager_new_from_file(const char *header_cache_path)
        fread(&icm->exists,      sizeof(uint32_t), 1, f) != 1) {
 	imap_cache_manager_free(icm);
 	printf("Couldn't read cache - aborting...\n");
+        fclose(f);
 	return NULL;
     }
 

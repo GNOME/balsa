@@ -1250,6 +1250,7 @@ edit_with_gnome(GtkAction * action, BalsaSendmsg* bsmsg)
     fclose(tmp);
     if ((pid = fork()) < 0) {
         perror ("fork");
+        g_strfreev(argv);
         return;
     }
     if (pid == 0) {

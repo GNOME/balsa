@@ -1,5 +1,9 @@
 2012-07-15  Peter Bloomfield
 
+	* src/sendmsg-window.c (edit_with_gnome): plug mem leak.
+
+2012-07-15  Peter Bloomfield
+
 	* libbalsa/address.c (libbalsa_address_extract_name): plug mem
 	leak.
 

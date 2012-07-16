@@ -197,8 +197,10 @@ pop_check_status(PopHandle *pop, GError **err)
      
   if(strncmp(buf, "+OK", 3) == 0)
     res = TRUE;
+  /*
   else if(strncmp(buf, "-ERR", 4) == 0)
     res = FALSE;
+    */
   else
     res = FALSE;
 

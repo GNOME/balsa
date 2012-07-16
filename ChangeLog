@@ -1,5 +1,10 @@
 2012-07-15  Peter Bloomfield
 
+	* libbalsa/imap/pop3.c (pop_check_status): remove redundant else
+	clause.
+
+2012-07-15  Peter Bloomfield
+
 	* libbalsa/identity.h: typo.
 
 2012-07-15  Peter Bloomfield

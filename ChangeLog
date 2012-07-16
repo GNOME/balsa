@@ -1,5 +1,10 @@
 2012-07-15  Albrecht Dreß
 
+	* src/information-dialog.c (balsa_information_real): fix mem
+	leak on NULL main widget.
+
+2012-07-15  Albrecht Dreß
+
 	* src/folder-conf.c (folder_conf_imap_sub_node): fix mem leak
 	on error.
 

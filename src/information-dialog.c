@@ -70,11 +70,12 @@ balsa_information_real(GtkWindow *parent, LibBalsaInformationType type,
                        const char *msg)
 {
     BalsaInformationShow show;
-    gchar * show_msg = g_strdup(msg);
+    gchar *show_msg;
 
     if (!balsa_app.main_window)
         return;
 
+    show_msg = g_strdup(msg);
     libbalsa_utf8_sanitize(&show_msg, balsa_app.convert_unknown_8bit, NULL);
     switch (type) {
     case LIBBALSA_INFORMATION_MESSAGE:

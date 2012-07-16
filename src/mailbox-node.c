@@ -725,16 +725,15 @@ find_dir(const gchar * dir)
 void
 balsa_mailbox_local_append(LibBalsaMailbox* mbx)
 {
-    gchar *dir; 
+    gchar *dir;
     BalsaMailboxNode *mbnode;
     BalsaMailboxNode *parent = NULL;
 
     g_return_if_fail(LIBBALSA_IS_MAILBOX_LOCAL(mbx));
 
-    for(dir = g_strdup(libbalsa_mailbox_local_get_path(mbx));
-        strlen(dir)>1 /* i.e dir != "/" */ &&
-            !(parent = find_dir(dir));
-        ) {
+    dir = g_strdup(libbalsa_mailbox_local_get_path(mbx));
+    while (dir[1] /* i.e. dir != "/" */
+           && !(parent = find_dir(dir))) {
         gchar* tmp =  g_path_get_dirname(dir);
         g_free(dir);
         dir = tmp;

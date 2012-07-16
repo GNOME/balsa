@@ -1,5 +1,9 @@
 2012-07-15  Peter Bloomfield
 
+	* src/mailbox-node.c (balsa_mailbox_local_append): simplify.
+
+2012-07-15  Peter Bloomfield
+
 	* libbalsa/mailbox_imap.c (imap_cache_manager_new_from_file): do
 	not leak FILE on error.
 

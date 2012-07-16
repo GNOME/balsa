@@ -588,8 +588,10 @@ libbalsa_address_book_ldif_save_address(FILE * stream,
                                         LibBalsaAddress * address)
 {
     if (fseek(stream, -2, SEEK_END) == 0
-        && (fgetc(stream) != '\n' || fgetc(stream) != '\n'))
+        && (fgetc(stream) != '\n' || fgetc(stream) != '\n')) {
+        fseek(stream, 0, SEEK_END);
         fputc('\n', stream);
+    }
 
     lbab_ldif_write_dn(stream, address);
     lbab_ldif_write_givenname(stream, address);

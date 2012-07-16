@@ -1,5 +1,11 @@
 2012-07-15  Peter Bloomfield
 
+	* libbalsa/address-book-ldif.c
+	(libbalsa_address_book_ldif_save_address): fseek before writing
+	to stream.
+
+2012-07-15  Peter Bloomfield
+
 	* libbalsa/imap/imap_compress.c (imap_compress_init): memset
 	size of struct, not size of pointer to struct.
 

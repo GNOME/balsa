@@ -32,7 +32,7 @@
 
 #include "libbalsa.h"
 
-#ifdef __cpluscplus
+#ifdef __cplusplus
 extern "C" 
 {
 #endif /* __cplusplus */

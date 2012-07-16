@@ -1,5 +1,9 @@
 2012-07-15  Peter Bloomfield
 
+	* libbalsa/identity.h: typo.
+
+2012-07-15  Peter Bloomfield
+
 	* libbalsa/identity.c (libbalsa_identity_get_signature): limit
 	scope of fp.
 

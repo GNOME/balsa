@@ -1,5 +1,10 @@
 2012-07-15  Peter Bloomfield
 
+	* libbalsa/imap/imap_compress.c (imap_compress_init): memset
+	size of struct, not size of pointer to struct.
+
+2012-07-15  Peter Bloomfield
+
 	* src/balsa-mime-widget-text.c (structured_phrases_toggle):
 	typo.
 

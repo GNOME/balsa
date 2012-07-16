@@ -1,3 +1,7 @@
+2012-07-15  Peter Bloomfield
+
+	* libbalsa/imap/imap_search.c (imap_write_key_string): typo.
+
 2012-07-15  Albrecht Dreß
 
 	* src/sendmsg-window.c (edit_with_gnome): fix mem leak on error.

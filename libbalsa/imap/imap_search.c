@@ -338,7 +338,7 @@ imap_write_key_string(ImapMboxHandle *handle, ImapSearchKey *k,
       sio_write(handle->sio, "\"", 1);
       for(s=k->d.string.s; *s; s++) {
         if(*s == '"') sio_write(handle->sio, "\\\"", 2);
-        else if(*s == '"') sio_write(handle->sio, "\\\\", 2);
+        else if(*s == '\\') sio_write(handle->sio, "\\\\", 2);
         else sio_write(handle->sio, s, 1);
       }
       sio_write(handle->sio, "\"", 1);

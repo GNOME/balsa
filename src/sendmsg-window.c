@@ -1189,32 +1189,19 @@ edit_with_gnome(GtkAction * action, BalsaSendmsg* bsmsg)
 {
     static const char TMP_PATTERN[] = "/tmp/balsa-edit-XXXXXX";
     gchar filename[sizeof(TMP_PATTERN)];
-    balsa_edit_with_gnome_data *data =
-        g_malloc(sizeof(balsa_edit_with_gnome_data));
+    balsa_edit_with_gnome_data *data;
     pid_t pid;
     FILE *tmp;
     int tmpfd;
-    GtkTextBuffer *buffer =
-        gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
+    GtkTextBuffer *buffer;
     GtkTextIter start, end;
     gchar *p;
     GAppInfo *app;
     char **argv;
     int argc;
 
-    strcpy(filename, TMP_PATTERN);
-    tmpfd = mkstemp(filename);
     app = g_app_info_get_default_for_type("text/plain", FALSE);
-    if (app) {
-        argc = 2;
-        argv = g_new0 (char *, argc + 1);
-
-        argv[0] = g_strdup(g_app_info_get_executable(app));
-        argv[1] = g_strdup_printf("%s%s",
-                                  g_app_info_supports_uris(app) ? "file://" : "", filename);
-        // FIXME: how can I detect if the called application needs the terminal???
-        g_object_unref(app);
-    } else {
+    if (!app) {
         balsa_information_parented(GTK_WINDOW(bsmsg->window),
                                    LIBBALSA_INFORMATION_ERROR,
                                    _("Gnome editor is not defined"
@@ -1222,7 +1209,19 @@ edit_with_gnome(GtkAction * action, BalsaSendmsg* bsmsg)
         return;
     }
 
+    argc = 2;
+    argv = g_new0 (char *, argc + 1);
+    argv[0] = g_strdup(g_app_info_get_executable(app));
+    strcpy(filename, TMP_PATTERN);
+    argv[1] =
+        g_strdup_printf("%s%s",
+                        g_app_info_supports_uris(app) ? "file://" : "",
+                        filename);
+    /* FIXME: how can I detect if the called application needs the
+     * terminal??? */
+    g_object_unref(app);
 
+    tmpfd = mkstemp(filename);
     tmp = fdopen(tmpfd, "w+");
 
     if(balsa_app.edit_headers) {
@@ -1243,6 +1242,7 @@ edit_with_gnome(GtkAction * action, BalsaSendmsg* bsmsg)
     }
 
     gtk_widget_set_sensitive(GTK_WIDGET(bsmsg->text), FALSE);
+    buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
     gtk_text_buffer_get_bounds(buffer, &start, &end);
     p = gtk_text_iter_get_text(&start, &end);
     fputs(p, tmp);
@@ -1261,6 +1261,7 @@ edit_with_gnome(GtkAction * action, BalsaSendmsg* bsmsg)
     }
     g_strfreev (argv);
     /* Return immediately. We don't want balsa to 'hang' */
+    data = g_malloc(sizeof(balsa_edit_with_gnome_data));
     data->pid_editor = pid;
     data->filename = g_strdup(filename);
     data->bsmsg = bsmsg;

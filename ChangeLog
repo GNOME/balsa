@@ -1,6 +1,10 @@
 2012-07-15  Albrecht Dreß
 
-	* src/mailbox-conf.c (mailbox_conf_delete):fix mem leak on
+	* src/sendmsg-window.c (edit_with_gnome): fix mem leak on error.
+
+2012-07-15  Albrecht Dreß
+
+	* src/mailbox-conf.c (mailbox_conf_delete): fix mem leak on
 	error.
 
 2012-07-15  Albrecht Dreß

@@ -499,6 +499,7 @@ mailbox_conf_delete(BalsaMailboxNode * mbnode)
                               _("Folder deletion failed. Reason: %s"),
                               err ? err->message : "unknown");
             g_clear_error(&err);
+            g_free(url);
         }
 	return;
     }

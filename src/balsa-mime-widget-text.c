@@ -450,7 +450,7 @@ structured_phrases_toggle(GtkCheckMenuItem *checkmenuitem,
     table = gtk_text_buffer_get_tag_table(gtk_text_view_get_buffer(textview));
     if (!table || phrase_hl == 0 ||
 	(phrase_hl == PHRASE_HIGHLIGHT_ON && new_hl) ||
-	(!phrase_hl == PHRASE_HIGHLIGHT_OFF && !new_hl))
+	(phrase_hl == PHRASE_HIGHLIGHT_OFF && !new_hl))
 	return;
 
     if ((tag = gtk_text_tag_table_lookup(table, "hp-bold")))

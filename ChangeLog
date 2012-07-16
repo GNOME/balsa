@@ -1,5 +1,10 @@
 2012-07-15  Peter Bloomfield
 
+	* src/balsa-mime-widget-text.c (structured_phrases_toggle):
+	typo.
+
+2012-07-15  Peter Bloomfield
+
 	* libbalsa/imap/imap_search.c (imap_write_key_string): typo.
 
 2012-07-15  Albrecht Dreß

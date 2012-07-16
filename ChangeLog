@@ -1,5 +1,10 @@
 2012-07-15  Peter Bloomfield
 
+	* libbalsa/address.c (libbalsa_address_extract_name): plug mem
+	leak.
+
+2012-07-15  Peter Bloomfield
+
 	* libbalsa/address-book-ldif.c
 	(libbalsa_address_book_ldif_save_address): fseek before writing
 	to stream.

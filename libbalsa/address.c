@@ -138,8 +138,11 @@ libbalsa_address_extract_name(const gchar * string, gchar ** last_name,
     while (fld[cpt] != NULL)
 	cpt++;
 
-    if (cpt == 0)		/* insane empty name */
-	return NULL;
+    if (cpt == 0) {
+        /* insane empty name */
+        g_strfreev(fld);
+        return NULL;
+    }
 
     if (fld[LAST] && *fld[LAST])
         *last_name = g_strdup(fld[LAST]);

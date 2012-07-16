@@ -1,5 +1,10 @@
 2012-07-15  Peter Bloomfield
 
+	* libbalsa/identity.c (libbalsa_identity_get_signature): limit
+	scope of fp.
+
+2012-07-15  Peter Bloomfield
+
 	* src/sendmsg-window.c (edit_with_gnome): plug mem leak.
 
 2012-07-15  Peter Bloomfield

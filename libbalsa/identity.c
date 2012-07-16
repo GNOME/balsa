@@ -324,7 +324,6 @@ libbalsa_identity_set_sig_prepend(LibBalsaIdentity* ident, gboolean prepend)
 gchar*
 libbalsa_identity_get_signature(LibBalsaIdentity* identity, GtkWindow *parent)
 {
-    FILE *fp = NULL;
     gchar *ret = NULL, *path;
 
     if (identity->signature_path == NULL ||
@@ -333,6 +332,8 @@ libbalsa_identity_get_signature(LibBalsaIdentity* identity, GtkWindow *parent)
 
     path = libbalsa_expand_path(identity->signature_path);
     if(identity->sig_executable){
+        FILE *fp;
+
         /* signature is executable */
 	fp = popen(path,"r");
         if (fp) {
@@ -344,6 +345,8 @@ libbalsa_identity_get_signature(LibBalsaIdentity* identity, GtkWindow *parent)
                  _("Error executing signature generator %s"),
                  identity->signature_path);
     } else {
+        FILE *fp;
+
         /* sign is normal file */
         fp = fopen(path, "r");
         if (fp) {

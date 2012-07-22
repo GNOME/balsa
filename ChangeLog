@@ -1,5 +1,10 @@
 2012-07-22  Peter Bloomfield
 
+	* libbalsa/message.c (prepend_header_misc): check loop index
+	value before using it.
+
+2012-07-22  Peter Bloomfield
+
 	* libbalsa/mailbox_pop3.c (mp_load_uids): reduce scope of
 	variable.
 

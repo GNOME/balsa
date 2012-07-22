@@ -446,7 +446,7 @@ prepend_header_misc(const char *name, const char *value,
 	/* Empty header */
 	return;
     /* Standard Headers*/
-    for(i=0; name[i] && i<sizeof(lcname)-1; i++)
+    for(i=0; i<sizeof(lcname)-1 && name[i]; i++)
         lcname[i] = tolower(name[i]);
     if (i < sizeof(lcname)) {
 	/* short enough to be on the ignored-headers list */

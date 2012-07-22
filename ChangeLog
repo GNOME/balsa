@@ -1,5 +1,11 @@
 2012-07-22  Peter Bloomfield
 
+	* libbalsa/mailbox_mh.c (lbm_mh_parse_mailbox),
+	(lbm_mh_handle_seq_line), (lbm_mh_check): use sscanf field
+	limits.
+
+2012-07-22  Peter Bloomfield
+
 	* libbalsa/mailbox_mbox.c (lbm_mbox_stream_seek_to_message):
 	avoid unread variable error.
 

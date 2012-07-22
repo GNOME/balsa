@@ -103,16 +103,17 @@ imap_search_key_new_string(unsigned negated, ImapSearchHeader hdr,
                            const char *string, const char *user_hdr)
 {
   ImapSearchKey *s = g_new(ImapSearchKey,1);
-  int i;
   s->next = NULL;
   s->type = IMSE_STRING;
   s->negated = negated;
   s->d.string.hdr = hdr;
   s->d.string.usr = (user_hdr && *user_hdr) ? g_strdup(user_hdr) : NULL;
   s->d.string.s = g_strdup(string);
-  if(s->d.string.usr)
+  if(s->d.string.usr) {
+    int i;
     for(i=strlen(s->d.string.usr)-1; i>=0; i--)
       if(!IS_ATOM_CHAR(s->d.string.usr[i])) s->d.string.usr[i] = '_';
+  }
   return s;
 }
 
@@ -470,9 +471,6 @@ ImapResponse
 imap_search_exec_unlocked(ImapMboxHandle *h, gboolean uid, 
 			  ImapSearchKey *s, ImapSearchCb cb, void *cb_arg)
 {
-  static const unsigned BODY_TO_SEARCH_AT_ONCE   = 500000;
-  static const unsigned HEADER_TO_SEARCH_AT_ONCE = 2000;
-  static const unsigned UIDS_TO_SEARCH_AT_ONCE   = 100000;
   int can_do_literals =
     imap_mbox_handle_can_do(h, IMCAP_LITERAL);
 
@@ -485,7 +483,7 @@ imap_search_exec_unlocked(ImapMboxHandle *h, gboolean uid,
   ImapCmdTag tag;
   ImapSearchCb ocb;
   void *oarg;
-  unsigned cmdno, lo, delta;
+  unsigned cmdno;
   const gchar *cmd_string;
   gboolean split;
 
@@ -509,11 +507,16 @@ imap_search_exec_unlocked(ImapMboxHandle *h, gboolean uid,
 
   split = imap_search_checks(s, IMSE_SEQUENCE);
   if(split) {
+    unsigned delta, lo;
+
     if(imap_search_checks_body(s)) {
+      static const unsigned BODY_TO_SEARCH_AT_ONCE   = 500000;
       delta = BODY_TO_SEARCH_AT_ONCE;
     } else if(imap_search_checks(s, IMSE_STRING)) {
+      static const unsigned HEADER_TO_SEARCH_AT_ONCE = 2000;
       delta = HEADER_TO_SEARCH_AT_ONCE;
     } else {
+      static const unsigned UIDS_TO_SEARCH_AT_ONCE   = 100000;
       delta = UIDS_TO_SEARCH_AT_ONCE;
     }
 

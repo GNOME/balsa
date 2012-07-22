@@ -214,7 +214,6 @@ libbalsa_guess_email_address(void)
 gchar *
 libbalsa_guess_mail_spool(void)
 {
-    int i;
     gchar *env;
     gchar *spool;
     static const gchar *guesses[] = {
@@ -229,6 +228,8 @@ libbalsa_guess_mail_spool(void)
 	return g_strdup(env);
 
     if ((env = getenv("USER")) != NULL) {
+        int i;
+
 	for (i = 0; guesses[i] != NULL; i++) {
 	    spool = g_strconcat(guesses[i], env, NULL);
 
@@ -377,11 +378,11 @@ static char*
 asn1time_to_string(ASN1_UTCTIME *tm)
 {
     char buf[64];
-    int cnt;
     BIO *bio  = BIO_new(BIO_s_mem());
     strncpy(buf, _("Invalid date"), sizeof(buf)); buf[sizeof(buf)-1]='\0';
 
     if(ASN1_TIME_print(bio, tm)) {
+        int cnt;
         cnt = BIO_read(bio, buf, sizeof(buf)-1);
         buf[cnt] = '\0';
     }
@@ -393,12 +394,14 @@ static char*
 x509_get_part (char *line, const char *ndx)
 {
     static char ret[256];
-    char *c, *c2;
-    
+    char *c;
+
     strncpy (ret, _("Unknown"), sizeof (ret)); ret[sizeof(ret)-1]='\0';
-    
+
     c = strstr(line, ndx);
     if (c) {
+        char *c2;
+
         c += strlen (ndx);
         c2 = strchr (c, '/');
         if (c2)
@@ -407,7 +410,7 @@ x509_get_part (char *line, const char *ndx)
         if (c2)
             *c2 = '/';
     }
-    
+
     return ret;
 }
 static void
@@ -923,7 +926,7 @@ libbalsa_get_image_from_x_face_header(const gchar * content, GError ** err)
         gint j, k;
         guchar *q;
 
-        if (sscanf(p, "%x,%x,%x,", &x[0], &x[1], &x[2]) != 3) {
+        if (sscanf(p, "%8x,%8x,%8x,", &x[0], &x[1], &x[2]) != 3) {
             g_set_error(err, LIBBALSA_IMAGE_ERROR,
                         LIBBALSA_IMAGE_ERROR_BAD_DATA,
                         /* Translators: please do not translate Face. */

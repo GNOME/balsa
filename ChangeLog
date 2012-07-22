@@ -1,5 +1,12 @@
 2012-07-22  Peter Bloomfield
 
+	* libbalsa/libbalsa.c (libbalsa_guess_mail_spool),
+	(asn1time_to_string), (x509_get_part): reduce scope of
+	variables;
+	(libbalsa_get_image_from_x_face_header): use sscanf field limit.
+
+2012-07-22  Peter Bloomfield
+
 	* libbalsa/imap/siobuf.c (sio_set_tlsclient_ssl),
 	(sio_set_tlsserver_ssl), (raw_read): reduce scope of variables.
 

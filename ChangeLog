@@ -1,5 +1,10 @@
 2012-07-22  Peter Bloomfield
 
+	* libbalsa/send.c (balsa_send_message_real): suppress memory
+	leak warning.
+
+2012-07-22  Peter Bloomfield
+
 	* libbalsa/message.c (prepend_header_misc): check loop index
 	value before using it.
 

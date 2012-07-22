@@ -1470,6 +1470,8 @@ balsa_send_message_real(SendMessageInfo* info)
         
     smtp_destroy_session (info->session);
     send_message_info_destroy(info);	
+    /* threadmsg is not leaked: */
+    /* cppcheck-suppress memleak */
     return TRUE;
 }
 

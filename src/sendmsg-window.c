@@ -1469,7 +1469,6 @@ update_bsmsg_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity* ident)
 
     if (bsmsg->ident->bcc) {
         InternetAddressList *bcc_list, *ident_list;
-	int i, j;
 
         bcc_list =
             libbalsa_address_view_get_list(bsmsg->recipient_view, "Bcc:");
@@ -1479,10 +1478,12 @@ update_bsmsg_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity* ident)
             /* Remove any Bcc addresses that came from the old identity
              * from the list. */
             gint ident_list_len = internet_address_list_length(ident_list);
+            gint i;
 
             for (i = 0; i < internet_address_list_length(bcc_list); i++) {
                 InternetAddress *ia =
                     internet_address_list_get_address (bcc_list, i);
+                gint j;
 
                 for (j = 0; j < ident_list_len; j++) {
                     InternetAddress *ia2 =
@@ -3420,6 +3421,7 @@ tree_add_quote_body(LibBalsaMessageBody * body, GtkTreeStore * store, GtkTreeIte
 	disp_type = g_mime_object_get_disposition(body->mime_part);
     else
 	disp_type = NULL;
+    /* cppcheck-suppress nullPointer */
     preselect = !disp_type || *disp_type == '\0' ||
 	!g_ascii_strcasecmp(disp_type, "inline");
     if (body->filename && *body->filename) {

@@ -1,5 +1,11 @@
 2012-07-22  Peter Bloomfield
 
+	* src/sendmsg-window.c (update_bsmsg_identity): reduce scope of
+	variables;
+	(tree_add_quote_body): suppress null pointer warning.
+
+2012-07-22  Peter Bloomfield
+
 	* src/save-restore.c (pop3_progress_notify): suppress memory
 	leak warning.
 

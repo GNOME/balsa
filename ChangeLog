@@ -1,5 +1,13 @@
 2012-07-22  Peter Bloomfield
 
+	* libbalsa/imap/imap-handle.c (imap_handle_disconnect),
+	(imap_cmd_step), (imap_get_sequence), (ir_get_append_copy_uids),
+	(ir_status), (ir_quota), (ir_body_extension),
+	(ir_handle_response): suppress unread-variable error, use sscanf
+	field limits, reduce scope.
+
+2012-07-22  Peter Bloomfield
+
 	* libbalsa/imap/imap-commands.c (imap_assure_needed_flags),
 	(imap_mbox_sort_msgno_srv), (imap_mbox_sort_filter): reduce
 	scope of variables.

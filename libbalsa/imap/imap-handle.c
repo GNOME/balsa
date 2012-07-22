@@ -555,6 +555,7 @@ imap_handle_op_cancelled(ImapMboxHandle *h)
 void
 imap_handle_disconnect(ImapMboxHandle *h)
 {
+  /* cppcheck-suppress unreadVariable */
   gboolean still_connected __attribute__ ((__unused__));
 
   still_connected = imap_handle_idle_disable(h);
@@ -2047,8 +2048,8 @@ imap_cmd_step(ImapMboxHandle* handle, unsigned lastcmd)
     return IMR_RESPOND;
 
   /* tagged completion code is the only alternative. */
-  /* our command tags are hexadecimal numbers */
-  if(sscanf(tag, "%x", &cmdno) != 1) {
+  /* our command tags are hexadecimal numbers, at most 7 chars */
+  if(sscanf(tag, "%7x", &cmdno) != 1) {
     printf("scanning '%s' for tag number failed. Cannot recover.\n", tag);
     imap_handle_disconnect(handle);
     return IMR_BAD;
@@ -2420,12 +2421,12 @@ imap_get_sequence(ImapMboxHandle *h, ImapUidRangeCb seq_cb, void *seq_arg)
       for(p=value; *p &&
 	    (unsigned)(p-value) <=
 	    sizeof(value)-(2*LENGTH_OF_LARGEST_UNSIGNED+1); ) {
-	if(sscanf(p, "%u", &seq.lo) != 1)
+	if(sscanf(p, "%30u", &seq.lo) != 1)
 	  return IMR_PROTOCOL;
 	while(*p && isdigit(*p)) p++;
 	if( *p == ':') {
 	  p++;
-	  if(sscanf(p, "%u", &seq.hi) != 1)
+	  if(sscanf(p, "%30u", &seq.hi) != 1)
 	    return c;
 	} else seq.hi = seq.lo;
 
@@ -2465,7 +2466,6 @@ ir_get_append_copy_uids(ImapMboxHandle *h, gboolean append_only)
 {
   int c;
   char buf[12];
-  ImapResponse rc;
 
   if( (c=imap_get_atom(h->sio, buf, sizeof(buf))) == EOF)
     return IMR_PROTOCOL;
@@ -2475,6 +2475,8 @@ ir_get_append_copy_uids(ImapMboxHandle *h, gboolean append_only)
     return IMR_PROTOCOL;
 
   if(!append_only) {
+    ImapResponse rc;
+
     if( (rc = imap_get_sequence(h, NULL, NULL)) != IMR_OK)
       return rc;
     if( (c=sio_getc(h->sio)) != ' ') {
@@ -2750,7 +2752,7 @@ ir_status(ImapMboxHandle *h)
           break;
       for(i= 0; resp[i].item != IMSTAT_NONE; i++) {
         if(resp[i].item == idx) {
-          if (sscanf(count, "%u", &resp[i].result) != 1) {
+          if (sscanf(count, "%13u", &resp[i].result) != 1) {
             g_free(name);
             return IMR_PROTOCOL;
           }
@@ -2999,11 +3001,12 @@ ir_quota(ImapMboxHandle *h)
       if (c == '(') {
         do {
           char resource[32];
-          char usage[16];
-          char limit[16];
           
           c = imap_get_atom(h->sio, resource, 32);
           if (c == ' ') {
+            char usage[16];
+            char limit[16];
+
             imap_get_atom(h->sio, usage, 16);
             c = imap_get_atom(h->sio, limit, 16);
 
@@ -3687,7 +3690,6 @@ ir_body_fld_lang (struct siobuf *sio, ImapBody * body)
 static ImapResponse
 ir_body_extension (struct siobuf *sio, ImapBody * body)
 {
-  ImapResponse rc;
   int c;
 
   c = sio_getc (sio);
@@ -3696,6 +3698,8 @@ ir_body_extension (struct siobuf *sio, ImapBody * body)
       /* "(" body-extension *(SP body-extension) ")" */
       do
 	{
+          ImapResponse rc;
+
 	  rc = ir_body_extension (sio, body);
 	  if (rc != IMR_OK)
 	    return rc;
@@ -4398,11 +4402,12 @@ ir_handle_response(ImapMboxHandle *h)
 {
   int c;
   char atom[LONG_STRING];
-  unsigned i, seqno;
   ImapResponse rc = IMR_BAD; /* unknown response is really an error */
 
   c = imap_get_atom(h->sio, atom, sizeof(atom));
   if( isdigit(atom[0]) ) {
+    unsigned i, seqno;
+
     if (c != ' ')
       return IMR_PROTOCOL;
     seqno = strtol(atom, NULL, 10);
@@ -4417,6 +4422,8 @@ ir_handle_response(ImapMboxHandle *h)
       }
     }
   } else {
+    unsigned i;
+
     if (c == 0x0d)
       sio_ungetc(h->sio);
     for(i=0; i<ELEMENTS(ResponseHandlers); i++) {

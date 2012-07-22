@@ -906,8 +906,8 @@ imap_assure_needed_flags(ImapMboxHandle *h, ImapMsgFlag needed_flags)
 
   fnd.handle = h;
   for(shift=0; needed_flags>>shift; shift++) {
-    const char *flg;
     if((needed_flags>>shift) & 1) {
+      const char *flg;
       fnd.flag = 1<<shift;
       if(fnd.flag & IMSGF_SEEN)
         for(i=0; i<h->flag_cache->len; i++) {
@@ -1733,7 +1733,6 @@ imap_mbox_sort_msgno_srv(ImapMboxHandle *handle, ImapSortKey key,
   ImapResponse rc;
   const char *keystr;
   char *seq, *cmd, *cmd1;
-  unsigned i;
 
   /* IMAP_REQUIRED_STATE1(handle, IMHS_SELECTED, IMR_BAD); */
   if(!imap_mbox_handle_can_do(handle, IMCAP_SORT)) 
@@ -1756,6 +1755,7 @@ imap_mbox_sort_msgno_srv(ImapMboxHandle *handle, ImapSortKey key,
   g_free(cmd1);
 
   if(rc == IMR_OK) {
+    unsigned i;
   /* one version of dovecot (which?) returned insufficient number of
    * numbers, we need to work around it. */
     if(handle->mbox_view.entries == cnt)
@@ -1950,7 +1950,6 @@ imap_mbox_sort_filter(ImapMboxHandle *handle, ImapSortKey key, int ascending,
                       ImapSearchKey *filter)
 {
   ImapResponse rc;
-  const char *keystr;
   unsigned i;
 
 
@@ -1980,6 +1979,7 @@ imap_mbox_sort_filter(ImapMboxHandle *handle, ImapSortKey key, int ascending,
   } else { 
     if(imap_mbox_handle_can_do(handle, IMCAP_SORT)) { /* CASE 2a */
       unsigned cmdno;
+      const char *keystr;
       int can_do_literals =
         imap_mbox_handle_can_do(handle, IMCAP_LITERAL);
       ImapCmdTag tag;

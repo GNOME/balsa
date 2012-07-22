@@ -1,5 +1,11 @@
 2012-07-22  Peter Bloomfield
 
+	* libbalsa/imap/imap-commands.c (imap_assure_needed_flags),
+	(imap_mbox_sort_msgno_srv), (imap_mbox_sort_filter): reduce
+	scope of variables.
+
+2012-07-22  Peter Bloomfield
+
 	* libbalsa/imap-server.c (libbalsa_imap_server_get_handle,
 	libbalsa_imap_server_get_handle_with_user): reduce scope of
 	variables; suppress incorrect null pointer error.

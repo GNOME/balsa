@@ -1177,7 +1177,7 @@ static LibBalsaCondition *
 bw_filter_old(const char *str)
 {
     int days;
-    if(str && sscanf(str, "%d", &days) == 1) {
+    if(str && sscanf(str, "%10d", &days) == 1) {
         time_t upperbound = time(NULL)-(days-1)*24*3600;
         return libbalsa_condition_new_date(FALSE, NULL, &upperbound);
     } else return NULL;
@@ -1187,7 +1187,7 @@ static LibBalsaCondition *
 bw_filter_recent(const char *str)
 {
     int days;
-    if(str && sscanf(str, "%d", &days) == 1) {
+    if(str && sscanf(str, "%10d", &days) == 1) {
         time_t lowerbound = time(NULL)-(days-1)*24*3600;
         return libbalsa_condition_new_date(FALSE, &lowerbound, NULL);
     } else return NULL;
@@ -1938,6 +1938,7 @@ bw_enable_mailbox_menus(BalsaWindow * window, BalsaIndex * index)
         mbnode = index->mailbox_node;
         mailbox = mbnode->mailbox;
     }
+    /* cppcheck-suppress nullPointer */
     bw_set_sensitive(window, "Expunge", mailbox && !mailbox->readonly);
 #if defined(ENABLE_TOUCH_UI)
     {gboolean can_sort, can_thread; guint i;

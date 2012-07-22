@@ -1,5 +1,10 @@
 2012-07-22  Peter Bloomfield
 
+	* libbalsa/imap/pop3.c (parse_list_response): use sscanf field
+	limits.
+
+2012-07-22  Peter Bloomfield
+
 	* libbalsa/imap/imap_tst.c (get_user), (user_cb): reduce scope
 	of variables.
 

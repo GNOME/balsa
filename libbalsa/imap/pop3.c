@@ -475,7 +475,7 @@ parse_list_response(PopHandle *pop, char *line, ssize_t sz, GError **err)
       }
       if(line[0]=='.' && (line[1] == '\r' || line[1] == '\n'))
         break;
-      if( sscanf(line, "%u%u", &msg, &msg_size) < 2 ) {
+      if( sscanf(line, "%10u%10u", &msg, &msg_size) < 2 ) {
         g_set_error(err, IMAP_ERROR, IMAP_POP_PROTOCOL_ERROR,
                     "Server %s did not response correctly to LIST: %s",
                     pop->host, line);

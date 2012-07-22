@@ -675,7 +675,6 @@ libbalsa_imap_server_get_handle(LibBalsaImapServer *imap_server, GError **err)
 {
     LibBalsaServer *server = LIBBALSA_SERVER(imap_server);
     struct handle_info *info = NULL;
-    ImapResult rc;
 
     if (!imap_server || imap_server->offline_mode)
         return NULL;
@@ -710,6 +709,8 @@ libbalsa_imap_server_get_handle(LibBalsaImapServer *imap_server, GError **err)
     }
     if (info) {
         if(imap_mbox_is_disconnected(info->handle)) {
+            ImapResult rc;
+
             rc=imap_mbox_handle_connect(info->handle, server->host,
                                         REQ_SSL(server));
             if(rc != IMAP_SUCCESS) {
@@ -725,6 +726,7 @@ libbalsa_imap_server_get_handle(LibBalsaImapServer *imap_server, GError **err)
     }
     UNLOCK_SERVER(imap_server);
 
+    /* cppcheck-suppress nullPointer */
     return info ? info->handle : NULL;
 }
 
@@ -748,7 +750,6 @@ libbalsa_imap_server_get_handle_with_user(LibBalsaImapServer *imap_server,
 {
     LibBalsaServer *server = LIBBALSA_SERVER(imap_server);
     struct handle_info *info = NULL;
-    ImapResult rc;
 
     if (imap_server->offline_mode)
         return NULL;
@@ -806,6 +807,8 @@ libbalsa_imap_server_get_handle_with_user(LibBalsaImapServer *imap_server,
     }
 
     if (imap_mbox_is_disconnected(info->handle)) {
+        ImapResult rc;
+
         rc=imap_mbox_handle_connect(info->handle, server->host,
                                     REQ_SSL(server));
         if(rc != IMAP_SUCCESS) {

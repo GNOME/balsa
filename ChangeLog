@@ -1,5 +1,9 @@
 2012-07-22  Peter Bloomfield
 
+	* libbalsa/gmime-multipart-crypt.c (sign_prepare): reduce scope.
+
+2012-07-22  Peter Bloomfield
+
 	* libbalsa/gmime-gpgme-signature.h: suppress cppcheck syntax
 	error.
 

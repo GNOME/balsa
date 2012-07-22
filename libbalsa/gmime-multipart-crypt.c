@@ -50,11 +50,12 @@ static void
 sign_prepare(GMimeObject * mime_part)
 {
     GMimeContentEncoding encoding;
-    GMimeMultipart *multipart;
     GMimeObject *subpart;
-    int i, n;
 
     if (GMIME_IS_MULTIPART(mime_part)) {
+        GMimeMultipart *multipart;
+        int i, n;
+
 	multipart = (GMimeMultipart *) mime_part;
 
 	if (GMIME_IS_MULTIPART_SIGNED(multipart) ||

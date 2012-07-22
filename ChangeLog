@@ -1,5 +1,10 @@
 2012-07-22  Peter Bloomfield
 
+	* libbalsa/mailbox_imap.c (is_child_of), (create_cache_copy),
+	(libbalsa_mailbox_imap_sort): reduce scope of variables.
+
+2012-07-22  Peter Bloomfield
+
 	* libbalsa/mailbox.c (libbalsa_mailbox_type_from_path): reduce
 	scope of variable.
 

@@ -1103,7 +1103,6 @@ libbalsa_mailbox_type_from_path(const gchar * path)
  */
 {
     struct stat st;
-    char tmp[_POSIX_PATH_MAX];
 
     if(strncmp(path, "imap://", 7) == 0)
         return LIBBALSA_TYPE_MAILBOX_IMAP;
@@ -1112,6 +1111,8 @@ libbalsa_mailbox_type_from_path(const gchar * path)
         return G_TYPE_OBJECT;
     
     if (S_ISDIR (st.st_mode)) {
+        char tmp[_POSIX_PATH_MAX];
+
         /* check for maildir-style mailbox */
         snprintf (tmp, sizeof (tmp), "%s/cur", path);
         if (stat (tmp, &st) == 0 && S_ISDIR (st.st_mode))

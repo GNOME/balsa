@@ -1,5 +1,9 @@
 2012-07-22  Peter Bloomfield
 
+	* src/balsa-index.c (pipe_out_watch): reduce scope of variable.
+
+2012-07-22  Peter Bloomfield
+
 	* libinit_balsa/assistant_page_directory.c
 	(unconditional_mailbox): reduce scope of variable.
 

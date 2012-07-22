@@ -2510,13 +2510,14 @@ static gboolean
 pipe_out_watch(GIOChannel *channel, GIOCondition condition, gpointer data)
 {
     struct PipeData *pipe = (struct PipeData*)data;
-    char buf[2048];
     gsize bytes_read;
     GIOStatus status;
     GError *error = NULL;
     gchar *s;
 
     if ( (condition & G_IO_IN) == G_IO_IN) {
+        char buf[2048];
+
 	status =
 	    g_io_channel_read_chars(channel, buf, sizeof(buf), &bytes_read,
 				    &error);

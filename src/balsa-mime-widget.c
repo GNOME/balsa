@@ -250,9 +250,7 @@ balsa_mime_widget_new_unknown(BalsaMessage * bm,
 	 g_ascii_strcasecmp(content_type, "application/octet-stream") == 0)
 	&& LIBBALSA_IS_MAILBOX_LOCAL(mime_body->message->mailbox)) {
         GError *err = NULL;
-	ssize_t length = 1024 /* g_mime_stream_length(stream) */ ;
 	gpointer buffer;
-	ssize_t size;
 	GMimeStream *stream = 
             libbalsa_message_body_get_stream(mime_body, &err);
         if(!stream) {
@@ -262,6 +260,9 @@ balsa_mime_widget_new_unknown(BalsaMessage * bm,
             g_clear_error(&err);
             use_content_type = g_strdup(content_type);
         } else {
+            ssize_t length = 1024 /* g_mime_stream_length(stream) */ ;
+            ssize_t size;
+
             buffer = g_malloc(length);
             libbalsa_mime_stream_shared_lock(stream);
             size = g_mime_stream_read(stream, buffer, length);

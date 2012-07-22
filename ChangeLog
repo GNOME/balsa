@@ -1,5 +1,10 @@
 2012-07-22  Peter Bloomfield
 
+	* src/balsa-mime-widget.c (balsa_mime_widget_new_unknown):
+	reduce scope of variables.
+
+2012-07-22  Peter Bloomfield
+
 	* src/balsa-index.c (pipe_out_watch): reduce scope of variable.
 
 2012-07-22  Peter Bloomfield

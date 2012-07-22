@@ -201,7 +201,6 @@ move_from_msgdrop(const gchar *tmp_path, LibBalsaMailbox *dest,
 static GHashTable*
 mp_load_uids(void)
 {
-    char line[1024]; /* arbitrary limit of uid len */
     GHashTable *res = g_hash_table_new_full(g_str_hash, g_str_equal,
                                             g_free, NULL);
     gchar *fname = g_strconcat(g_get_home_dir(), "/.balsa/pop-uids", NULL);
@@ -209,6 +208,7 @@ mp_load_uids(void)
     g_free(fname);
     if(f) {
         struct flock lck;
+        char line[1024]; /* arbitrary limit of uid len */
         memset (&lck, 0, sizeof(struct flock));
         lck.l_type = F_RDLCK; lck.l_whence = SEEK_SET;
         fcntl(fileno(f), F_SETLK, &lck);

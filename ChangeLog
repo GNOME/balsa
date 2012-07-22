@@ -1,5 +1,10 @@
 2012-07-22  Peter Bloomfield
 
+	* libbalsa/mailbox_pop3.c (mp_load_uids): reduce scope of
+	variable.
+
+2012-07-22  Peter Bloomfield
+
 	* libbalsa/mailbox_mh.c (lbm_mh_parse_mailbox),
 	(lbm_mh_handle_seq_line), (lbm_mh_check): use sscanf field
 	limits.

@@ -1,5 +1,10 @@
 2012-07-22  Peter Bloomfield
 
+	* src/mailbox-conf.c (mailbox_conf_update): reduce scope of
+	variable.
+
+2012-07-22  Peter Bloomfield
+
 	* src/balsa-mime-widget.c (balsa_mime_widget_new_unknown):
 	reduce scope of variables.
 

@@ -909,7 +909,6 @@ static void
 mailbox_conf_update(MailboxConfWindow *mcw)
 {
     LibBalsaMailbox *mailbox = LIBBALSA_MAILBOX(mcw->mailbox);
-    int i;
 
     mailbox_conf_view_check(mcw->view_info, mailbox);
 
@@ -925,6 +924,7 @@ mailbox_conf_update(MailboxConfWindow *mcw)
 	path = g_strdup(libbalsa_mailbox_local_get_path(mailbox));
         if (strcmp(filename, path)) {
             /* rename */
+            int i;
 	    gchar *file_dir, *path_dir;
 
             i = libbalsa_mailbox_local_set_path(LIBBALSA_MAILBOX_LOCAL

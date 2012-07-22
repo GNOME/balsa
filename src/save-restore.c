@@ -411,6 +411,7 @@ pop3_progress_notify(LibBalsaMailbox* mailbox, int msg_type, int prog, int tot,
     while(gtk_events_pending())
         gtk_main_iteration_do(FALSE);
 #endif
+    /* cppcheck-suppress memleak */
 }
 
 /* Initialize the specified mailbox, creating the internal data

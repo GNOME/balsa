@@ -1,5 +1,10 @@
 2012-07-22  Peter Bloomfield
 
+	* src/save-restore.c (pop3_progress_notify): suppress memory
+	leak warning.
+
+2012-07-22  Peter Bloomfield
+
 	* src/main-window.c: use sscanf field limits; suppress null
 	pointer warning.
 

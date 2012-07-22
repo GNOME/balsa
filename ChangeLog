@@ -1,5 +1,10 @@
 2012-07-22  Peter Bloomfield
 
+	* libbalsa/imap/imap-tls.c (imap_check_server_identity): reduce
+	scope of variable.
+
+2012-07-22  Peter Bloomfield
+
 	* libbalsa/imap/imap-handle.c (imap_handle_disconnect),
 	(imap_cmd_step), (imap_get_sequence), (ir_get_append_copy_uids),
 	(ir_status), (ir_quota), (ir_body_extension),

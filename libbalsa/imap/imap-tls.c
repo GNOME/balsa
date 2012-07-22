@@ -237,7 +237,7 @@ imap_check_server_identity(SSL *ssl, const char *host,
   long vfy_result;
   X509 *cert;
   X509_NAME *subj;
-  int ok, i, host_len;
+  int ok, host_len;
   gchar *colon;
   int has_extension_with_dns_name = 0;
   STACK_OF(GENERAL_NAME) *altnames;
@@ -256,6 +256,8 @@ imap_check_server_identity(SSL *ssl, const char *host,
   altnames = X509_get_ext_d2i(cert, NID_subject_alt_name, NULL, NULL);
 
   if (altnames) {
+    int i;
+
     for (i=0; i< sk_GENERAL_NAME_num(altnames); i++) {
       const GENERAL_NAME *name = sk_GENERAL_NAME_value(altnames, i);
 

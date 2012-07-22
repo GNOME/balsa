@@ -1,5 +1,10 @@
 2012-07-22  Peter Bloomfield
 
+	* src/store-address.c (store_address_book_frame): reduce scope
+	of variables.
+
+2012-07-22  Peter Bloomfield
+
 	* src/sendmsg-window.c (update_bsmsg_identity): reduce scope of
 	variables;
 	(tree_add_quote_body): suppress null pointer warning.

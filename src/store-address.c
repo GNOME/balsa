@@ -276,24 +276,26 @@ store_address_from_entries(GtkWindow *window, StoreAddressInfo * info,
 static GtkWidget *
 store_address_book_frame(StoreAddressInfo * info)
 {
-    GList *ab_list;
-    GtkWidget *frame = gtk_frame_new(_("Choose Address Book"));
+    GtkWidget *frame;
     GtkWidget *combo_box;
-    LibBalsaAddressBook *address_book;
-    guint default_ab_offset = 0, off;
 
     combo_box = gtk_combo_box_text_new();
     g_signal_connect(combo_box, "changed",
                      G_CALLBACK(store_address_book_menu_cb), info);
     if (balsa_app.address_book_list) {
+        guint default_ab_offset = 0, off;
+        GList *ab_list;
+
 	info->current_address_book = balsa_app.default_address_book;
 
 	/* NOTE: we have to store the default address book index and
            call set_active() after all books are added to the list or
            gtk-2.10.4 will lose the setting. */
 	for(off=0, ab_list = balsa_app.address_book_list;
-            ab_list; 
-            off++, ab_list = g_list_next(ab_list)) {
+            ab_list;
+            off++, ab_list = ab_list->next) {
+            LibBalsaAddressBook *address_book;
+
 	    address_book = LIBBALSA_ADDRESS_BOOK(ab_list->data);
 	    if (info->current_address_book == NULL)
 		info->current_address_book = address_book;
@@ -306,6 +308,8 @@ store_address_book_frame(StoreAddressInfo * info)
         gtk_combo_box_set_active(GTK_COMBO_BOX(combo_box),
                                  default_ab_offset);
     }
+
+    frame = gtk_frame_new(_("Choose Address Book"));
     gtk_container_add(GTK_CONTAINER(frame), combo_box);
 
     return frame;

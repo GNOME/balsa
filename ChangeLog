@@ -1,5 +1,10 @@
 2012-07-22  Peter Bloomfield
 
+	* libbalsa/imap/siobuf.c (sio_set_tlsclient_ssl),
+	(sio_set_tlsserver_ssl), (raw_read): reduce scope of variables.
+
+2012-07-22  Peter Bloomfield
+
 	* libbalsa/imap/pop3.c (parse_list_response): use sscanf field
 	limits.
 

@@ -204,12 +204,12 @@ sio_set_timeout (struct siobuf *sio, int milliseconds)
 int
 sio_set_tlsclient_ssl (struct siobuf *sio, SSL *ssl)
 {
-  int ret;
-
   assert (sio != NULL);
 
   if (ssl != NULL)
     {
+      int ret;
+
       sio->ssl = ssl;
       SSL_set_rfd (sio->ssl, sio->sdr);
       SSL_set_wfd (sio->ssl, sio->sdw);
@@ -228,12 +228,12 @@ sio_set_tlsclient_ssl (struct siobuf *sio, SSL *ssl)
 int
 sio_set_tlsserver_ssl (struct siobuf *sio, SSL *ssl)
 {
-  int ret;
-
   assert (sio != NULL);
 
   if (ssl != NULL)
     {
+      int ret;
+
       sio->ssl = ssl;
       SSL_set_rfd (sio->ssl, sio->sdr);
       SSL_set_wfd (sio->ssl, sio->sdw);
@@ -540,7 +540,7 @@ sio_mark (struct siobuf *sio)
 static int
 raw_read (struct siobuf *sio, char *buf, int len)
 {
-  int n, status;
+  int n;
   struct pollfd pollfd;
 
   assert (sio != NULL && buf != NULL && len > 0);
@@ -566,6 +566,8 @@ raw_read (struct siobuf *sio, char *buf, int len)
       errno = 0;
       while ((n = read (sio->sdr, buf, len)) < 0)
 	{
+          int status;
+
 	  if (errno == EINTR)
 	    continue;
 	  if (errno != EAGAIN)

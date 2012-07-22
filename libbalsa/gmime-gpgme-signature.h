@@ -73,6 +73,7 @@ gchar *libbalsa_cert_subject_readable(const gchar *subject);
 
 
 #ifdef __cplusplus
+/* cppcheck-suppress syntaxError */
 }
 #endif				/* __cplusplus */
 

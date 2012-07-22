@@ -259,15 +259,15 @@ lbm_mbox_stream_seek_to_message(GMimeStream * stream, off_t offset)
         && (nread = g_mime_stream_read(stream, buffer, sizeof buffer))
         == sizeof buffer
         && strncmp("From ", buffer, 5) == 0;
-#if DEBUG_SEEK
     if (!retval) {
         if (nread == sizeof buffer)
             --nread;
         buffer[nread] = 0;
+#if DEBUG_SEEK
         g_print("%s at %ld failed: read %ld chars, saw \"%s\"\n", __func__,
                 (long) offset, (long) nread, buffer);
-    }
 #endif
+    }
 
     g_mime_stream_seek(stream, offset, GMIME_STREAM_SEEK_SET);
 

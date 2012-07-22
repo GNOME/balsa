@@ -1,5 +1,10 @@
 2012-07-22  Peter Bloomfield
 
+	* libbalsa/mailbox_mbox.c (lbm_mbox_stream_seek_to_message):
+	avoid unread variable error.
+
+2012-07-22  Peter Bloomfield
+
 	* libbalsa/mailbox_imap.c (is_child_of), (create_cache_copy),
 	(libbalsa_mailbox_imap_sort): reduce scope of variables.
 

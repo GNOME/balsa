@@ -1,3 +1,8 @@
+2012-07-22  Peter Bloomfield
+
+	* libbalsa/address-book-extern.c (parse_externq_file): use
+	*scanf field limits to satisfy cppcheck.
+
 2012-07-15  Peter Bloomfield
 
 	* src/mailbox-node.c (balsa_mailbox_local_append): simplify.

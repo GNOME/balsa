@@ -55,6 +55,7 @@
 
 /* FIXME: Arbitrary constant */
 #define LINE_LEN 256
+#define LINE_LEN_STR "256"
 
 static LibBalsaAddressBookClass *parent_class = NULL;
 
@@ -270,7 +271,10 @@ parse_externq_file(LibBalsaAddressBookExtern *addr_externq,
     }  /* FIXME check error */
 	
     while (fgets(string, sizeof(string), gc)) {
-        int i=sscanf(string, "%[^\t]\t%[^\t]%[^\n]", email, name, tmp);
+        int i=sscanf(string, "%" LINE_LEN_STR "[^\t]\t"
+                             "%" LINE_LEN_STR "[^\t]"
+                             "%" LINE_LEN_STR "[^\n]",
+                             email, name, tmp);
 #ifdef DEBUG
         printf("%s =>%i\n", string, i);
 #endif

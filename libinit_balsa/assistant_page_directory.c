@@ -79,7 +79,6 @@ unconditional_mailbox(const gchar * path, const gchar * prettyname,
 {
     gchar *dup;
     gchar *index;
-    char tmp[32] = "/tmp/balsa.XXXXXX";
     ciss_url_t url;
     gboolean ssl = FALSE, is_remote = FALSE;
 
@@ -145,6 +144,7 @@ unconditional_mailbox(const gchar * path, const gchar * prettyname,
 
     if (*box == NULL) {
         if (strcmp("/var/spool/mail/", path)) {
+            char tmp[32] = "/tmp/balsa.XXXXXX";
 	    /* Don't fail if you can't create the spool mailbox. */
 	    close(mkstemp(tmp));
 		*box = (LibBalsaMailbox*)libbalsa_mailbox_local_new(tmp, FALSE);

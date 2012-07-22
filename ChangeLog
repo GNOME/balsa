@@ -1,5 +1,10 @@
 2012-07-22  Peter Bloomfield
 
+	* libinit_balsa/assistant_page_directory.c
+	(unconditional_mailbox): reduce scope of variable.
+
+2012-07-22  Peter Bloomfield
+
 	* libbalsa/send.c (balsa_send_message_real): suppress memory
 	leak warning.
 

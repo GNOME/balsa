@@ -1,5 +1,10 @@
 2012-07-22  Peter Bloomfield
 
+	* libbalsa/imap/imap_tst.c (get_user), (user_cb): reduce scope
+	of variables.
+
+2012-07-22  Peter Bloomfield
+
 	* libbalsa/imap/imap_search.c (imap_search_key_new_string),
 	(imap_search_exec_unlocked): reduce scope of variables.
 

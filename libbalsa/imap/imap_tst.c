@@ -61,13 +61,14 @@ monitor_cb(const char *buffer, int length, int direction, void *arg)
 
 static gchar*
 get_user(const char* method) {
-  char buf[256];
-  size_t len;
 
   if(TestContext.user) {
     printf("Login with method %s as user: %s\n", method, TestContext.user);
     return g_strdup(TestContext.user);
   } else {
+    char buf[256];
+    size_t len;
+
     fprintf(stderr, "Login with method %s as user: ", method);
     fflush(stderr);
     if(!fgets(buf, sizeof(buf), stdin))
@@ -115,9 +116,9 @@ static void
 user_cb(ImapUserEventType ue, void *arg, ...)
 {
     va_list alist;
-    int *ok;
     va_start(alist, arg);
     switch(ue) {
+        int *ok;
     case IME_GET_USER_PASS: {
         gchar *method = va_arg(alist, gchar*);
         gchar **user = va_arg(alist, gchar**);

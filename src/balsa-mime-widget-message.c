@@ -406,7 +406,7 @@ bm_header_widget_realized(GtkWidget * widget, BalsaMessage * bm)
     GdkRGBA rgba;
     GtkWidget *tl_buttons;
 
-    context = gtk_widget_get_style_context(GTK_WIDGET(bm));
+    context = gtk_widget_get_style_context(bm->scroll);
     tl_buttons = g_object_get_data(G_OBJECT(widget), "tl-buttons");
 
     gtk_style_context_get_background_color(context, GTK_STATE_FLAG_NORMAL,

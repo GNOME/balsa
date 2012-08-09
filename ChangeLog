@@ -1,3 +1,9 @@
+2012-08-09  Peter Bloomfield
+
+	* src/balsa-mime-widget-message.c (bm_header_widget_realized):
+	use BalsaMessage::scroll as the context for header widget
+	colors.
+
 2012-07-22  Peter Bloomfield
 
 	* src/store-address.c (store_address_book_frame): reduce scope

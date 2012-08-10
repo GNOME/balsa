@@ -458,21 +458,9 @@ libbalsa_message_body_get_part_stream(LibBalsaMessageBody * body,
 
     switch (encoding) {
     case GMIME_CONTENT_ENCODING_BASE64:
-        filter =
-            g_mime_filter_basic_new(GMIME_CONTENT_ENCODING_BASE64,
-                                    FALSE);
-        stream = libbalsa_message_body_stream_add_filter(stream, filter);
-        break;
     case GMIME_CONTENT_ENCODING_QUOTEDPRINTABLE:
-        filter =
-            g_mime_filter_basic_new(GMIME_CONTENT_ENCODING_QUOTEDPRINTABLE,
-                                    FALSE);
-        stream = libbalsa_message_body_stream_add_filter(stream, filter);
-        break;
     case GMIME_CONTENT_ENCODING_UUENCODE:
-        filter =
-            g_mime_filter_basic_new(GMIME_CONTENT_ENCODING_UUENCODE,
-                                    FALSE);
+        filter = g_mime_filter_basic_new(encoding, FALSE);
         stream = libbalsa_message_body_stream_add_filter(stream, filter);
         break;
     default:

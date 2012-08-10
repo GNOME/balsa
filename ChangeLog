@@ -1,3 +1,8 @@
+2012-08-10  Peter Bloomfield
+
+	* libbalsa/body.c (libbalsa_message_body_get_part_stream):
+	simplify filter selection switch.
+
 2012-08-09  Peter Bloomfield
 
 	* src/balsa-mime-widget-message.c (bm_header_widget_realized):

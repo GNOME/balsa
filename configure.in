@@ -247,9 +247,21 @@ AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE, "$GETTEXT_PACKAGE",
 
 AC_PROG_INTLTOOL
 AM_GLIB_GNU_GETTEXT
-AC_CHECK_HEADER([langinfo.h],
-                [AC_DEFINE([HAVE_LANGINFO],1,[Defined for langinfo.])],
-                [])
+
+# _NL_MEASUREMENT_MEASUREMENT is an enum and not a define
+AC_MSG_CHECKING([for _NL_MEASUREMENT_MEASUREMENT])
+AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <langinfo.h>]],
+                                [[char c;
+                                  c = *((unsigned char *)
+                                  nl_langinfo
+                                  (_NL_MEASUREMENT_MEASUREMENT));]])],
+               [have__nl_measurement_measurement=yes],
+               [have__nl_measurement_measurement=no])
+AC_MSG_RESULT($have__nl_measurement_measurement)
+if test "$have__nl_measurement_measurement" = "yes"; then
+  AC_DEFINE([HAVE__NL_MEASUREMENT_MEASUREMENT], [1],
+	    [Define if _NL_MEASUREMENT_MEASUREMENT is available])
+fi
 
 # sendmail
 #

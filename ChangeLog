@@ -1,3 +1,10 @@
+2012-09-08  Peter Bloomfield
+
+	* configure.in:  _NL_MEASUREMENT_MEASUREMENT is an enum and not
+	a define.
+	* src/print-gtk.c (get_default_user_units): use
+	HAVE__NL_MEASUREMENT_MEASUREMENT.
+
 2012-08-10  Peter Bloomfield
 
 	* libbalsa/body.c (libbalsa_message_body_get_part_stream):

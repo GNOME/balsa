@@ -35,9 +35,9 @@
 #include "balsa-print-object-decor.h"
 #include "balsa-print-object-header.h"
 
-#ifdef HAVE_LANGINFO
+#if HAVE__NL_MEASUREMENT_MEASUREMENT
 #include <langinfo.h>
-#endif
+#endif                          /* HAVE__NL_MEASUREMENT_MEASUREMENT */
 
 typedef struct {
     GtkWidget *header_font;
@@ -391,7 +391,7 @@ get_default_user_units(void)
      */
     gchar *e = _("default:mm");
   
-#if (HAVE_LANGINFO && defined(_NL_MEASUREMENT_MEASUREMENT))
+#if HAVE__NL_MEASUREMENT_MEASUREMENT
     gchar *imperial = NULL;
   
     imperial = nl_langinfo(_NL_MEASUREMENT_MEASUREMENT);
@@ -399,7 +399,7 @@ get_default_user_units(void)
 	return GTK_UNIT_INCH;  /* imperial */
     if (imperial && imperial[0] == 1 )
 	return GTK_UNIT_MM;  /* metric */
-#endif
+#endif                          /* HAVE__NL_MEASUREMENT_MEASUREMENT */
   
     if (strcmp(e, "default:inch")==0)
 	return GTK_UNIT_INCH;

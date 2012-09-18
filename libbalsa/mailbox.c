@@ -367,6 +367,14 @@ lbm_index_entry_populate_from_msg(LibBalsaMailboxIndexEntry * entry,
     libbalsa_mailbox_msgno_changed(msg->mailbox, msg->msgno);
 }
 
+static LibBalsaMailboxIndexEntry*
+lbm_index_entry_new_from_msg(LibBalsaMessage *msg)
+{
+    LibBalsaMailboxIndexEntry *entry = g_new(LibBalsaMailboxIndexEntry,1);
+    lbm_index_entry_populate_from_msg(entry, msg);
+    return entry;
+}
+
 #ifdef BALSA_USE_THREADS
 static LibBalsaMailboxIndexEntry*
 lbm_index_entry_new_pending(void)
@@ -643,10 +651,12 @@ libbalsa_mailbox_close(LibBalsaMailbox * mailbox, gboolean expunge)
         /* do not try expunging read-only mailboxes, it's a waste of time */
         expunge = expunge && !mailbox->readonly;
         LIBBALSA_MAILBOX_GET_CLASS(mailbox)->close_mailbox(mailbox, expunge);
+        gdk_threads_enter();
         if(mailbox->msg_tree) {
             g_node_destroy(mailbox->msg_tree);
             mailbox->msg_tree = NULL;
         }
+        gdk_threads_leave();
         libbalsa_mailbox_free_mindex(mailbox);
         mailbox->stamp++;
 	mailbox->state = LB_MAILBOX_STATE_CLOSED;
@@ -1339,21 +1349,18 @@ libbalsa_mailbox_msgno_changed(LibBalsaMailbox * mailbox, guint seqno)
         gdk_threads_leave();
 }
 
-static void
-lbm_msgno_inserted(LibBalsaMailbox *mailbox, guint seqno, GNode * parent,
-                   GNode ** sibling)
+void
+libbalsa_mailbox_msgno_inserted(LibBalsaMailbox *mailbox, guint seqno,
+                                GNode * parent, GNode ** sibling)
 {
     GtkTreeIter iter;
     GtkTreePath *path;
     GSList **unthreaded;
 
-    gdk_threads_enter();
-
-    if (!mailbox->msg_tree) {
-        gdk_threads_leave();
+    if (!libbalsa_threads_has_lock())
+        g_warning("Thread is not holding gdk lock");
+    if (!mailbox->msg_tree)
         return;
-    }
-
 #undef SANITY_CHECK
 #ifdef SANITY_CHECK
     g_return_if_fail(!g_node_find(mailbox->msg_tree,
@@ -1382,91 +1389,6 @@ lbm_msgno_inserted(LibBalsaMailbox *mailbox, guint seqno, GNode * parent,
             g_slist_prepend(*unthreaded, GUINT_TO_POINTER(seqno));
 
     mailbox->msg_tree_changed = TRUE;
-
-    gdk_threads_leave();
-}
-
-#ifdef BALSA_USE_THREADS
-typedef struct {
-#if GLIB_CHECK_VERSION(2, 32, 0)
-    GMutex mutex;
-    GCond cond;
-#else                           /* GLIB_CHECK_VERSION(2, 32, 0) */
-    GMutex *mutex;
-    GCond *cond;
-#endif                          /* GLIB_CHECK_VERSION(2, 32, 0) */
-    LibBalsaMailbox *mailbox;
-    guint seqno;
-    GNode *parent;
-    GNode **sibling;
-    gboolean wait;
-} LbmMsgnoInsertedInfo;
-
-static gboolean
-lbm_msgno_inserted_idle_cb(LbmMsgnoInsertedInfo * info)
-{
-#if GLIB_CHECK_VERSION(2, 32, 0)
-    g_mutex_lock(&info->mutex);
-#else                           /* GLIB_CHECK_VERSION(2, 32, 0) */
-    g_mutex_lock(info->mutex);
-#endif                          /* GLIB_CHECK_VERSION(2, 32, 0) */
-
-    lbm_msgno_inserted(info->mailbox, info->seqno, info->parent,
-                       info->sibling);
-    info->wait = FALSE;
-
-#if GLIB_CHECK_VERSION(2, 32, 0)
-    g_cond_signal(&info->cond);
-    g_mutex_unlock(&info->mutex);
-#else                           /* GLIB_CHECK_VERSION(2, 32, 0) */
-    g_cond_signal(info->cond);
-    g_mutex_unlock(info->mutex);
-#endif                          /* GLIB_CHECK_VERSION(2, 32, 0) */
-
-    return FALSE;
-}
-#endif                          /* BALSA_USE_THREADS */
-
-void
-libbalsa_mailbox_msgno_inserted(LibBalsaMailbox *mailbox, guint seqno,
-                                GNode * parent, GNode ** sibling)
-{
-#ifdef BALSA_USE_THREADS
-    if (libbalsa_am_i_subthread()) {
-        LbmMsgnoInsertedInfo info;
-
-        info.mailbox = g_object_ref(mailbox);
-        info.seqno = seqno;
-        info.parent = parent;
-        info.sibling = sibling;
-        info.wait = TRUE;
-#if GLIB_CHECK_VERSION(2, 32, 0)
-        g_mutex_init(&info.mutex);
-        g_cond_init(&info.cond);
-        g_mutex_lock(&info.mutex);
-        g_idle_add((GSourceFunc) lbm_msgno_inserted_idle_cb, &info);
-        while (info.wait)
-            g_cond_wait(&info.cond, &info.mutex);
-        g_mutex_unlock(&info.mutex);
-        g_mutex_clear(&info.mutex);
-        g_cond_clear(&info.cond);
-#else                           /* GLIB_CHECK_VERSION(2, 32, 0) */
-        info.mutex = g_mutex_new();
-        info.cond = g_cond_new();
-        g_mutex_lock(info.mutex);
-        g_idle_add((GSourceFunc) lbm_msgno_inserted_idle_cb, &info);
-        while (info.wait)
-            g_cond_wait(info.cond, info.mutex);
-        g_mutex_unlock(info.mutex);
-        g_mutex_free(info.mutex);
-        g_cond_free(info.cond);
-#endif                          /* GLIB_CHECK_VERSION(2, 32, 0) */
-        g_object_unref(mailbox);
-    } else
-        lbm_msgno_inserted(mailbox, seqno, parent, sibling);
-#else                           /* BALSA_USE_THREADS */
-    lbm_msgno_inserted(mailbox, seqno, parent, sibling);
-#endif                          /* BALSA_USE_THREADS */
 }
 
 static void
@@ -1497,23 +1419,6 @@ libbalsa_mailbox_msgno_filt_in(LibBalsaMailbox *mailbox, guint seqno)
     gdk_threads_leave();
 }
 
-#ifdef BALSA_USE_THREADS
-/*
- * Handler for "message-expunged" signal
- *
- * Adjust msgno; it will be invalid (zero) if msgno was expunged.
- */
-static void
-lbm_message_expunged_cb(LibBalsaMailbox * mailbox, guint expunged_msgno,
-                        guint * msgno)
-{
-    if (*msgno > expunged_msgno)
-        --*msgno;
-    else if (*msgno == expunged_msgno)
-        *msgno = 0;
-}
-#endif                          /* BALSA_USE_THREADS */
-
 /*
  * libbalsa_mailbox_msgno_removed and helpers
  */
@@ -1534,8 +1439,8 @@ decrease_post(GNode *node, gpointer data)
     return FALSE;
 }
 
-static void
-lbm_msgno_removed(LibBalsaMailbox * mailbox, guint seqno)
+void
+libbalsa_mailbox_msgno_removed(LibBalsaMailbox * mailbox, guint seqno)
 {
     GtkTreeIter iter;
     GtkTreePath *path;
@@ -1623,50 +1528,6 @@ lbm_msgno_removed(LibBalsaMailbox * mailbox, guint seqno)
     gdk_threads_leave();
 }
 
-#ifdef BALSA_USE_THREADS
-typedef struct {
-    LibBalsaMailbox *mailbox;
-    guint seqno;
-    gulong expunged_cb_handler_id;
-} LbmMsgnoRemovedInfo;
-
-static gboolean
-lbm_msgno_removed_idle_cb(LbmMsgnoRemovedInfo * info)
-{
-    g_signal_handler_disconnect(info->mailbox,
-                                info->expunged_cb_handler_id);
-    if (info->seqno)
-        lbm_msgno_removed(info->mailbox, info->seqno);
-    g_object_unref(info->mailbox);
-    g_slice_free(LbmMsgnoRemovedInfo, info);
-    return FALSE;
-}
-#endif                          /* BALSA_USE_THREADS */
-
-void
-libbalsa_mailbox_msgno_removed(LibBalsaMailbox * mailbox, guint seqno)
-{
-#ifdef BALSA_USE_THREADS
-    if (libbalsa_am_i_subthread()) {
-        LbmMsgnoRemovedInfo *info;
-
-        info = g_slice_new(LbmMsgnoRemovedInfo);
-        info->mailbox = g_object_ref(mailbox);
-        info->seqno = seqno;
-        info->expunged_cb_handler_id =
-            g_signal_connect(mailbox, "message-expunged",
-                             G_CALLBACK(lbm_message_expunged_cb),
-                             &info->seqno);
-        g_idle_add((GSourceFunc) lbm_msgno_removed_idle_cb,
-                             info);
-    } else {
-        lbm_msgno_removed(mailbox, seqno);
-    }
-#else                           /* BALSA_USE_THREADS */
-    lbm_msgno_removed(mailbox, seqno);
-#endif                          /* BALSA_USE_THREADS */
-}
-
 static void
 libbalsa_mailbox_msgno_filt_out(LibBalsaMailbox * mailbox, GNode * node)
 {
@@ -1734,13 +1595,15 @@ libbalsa_mailbox_msgno_filt_out(LibBalsaMailbox * mailbox, GNode * node)
  *   messages;
  * - if it isn't in the view and it matches the condition, filter it in.
  */
-static void
-lbm_msgno_filt_check(LibBalsaMailbox * mailbox, guint seqno,
-                     LibBalsaMailboxSearchIter * search_iter,
-                     gboolean hold_selected)
+void
+libbalsa_mailbox_msgno_filt_check(LibBalsaMailbox * mailbox, guint seqno,
+                                  LibBalsaMailboxSearchIter * search_iter,
+                                  gboolean hold_selected)
 {
     gboolean match;
     GNode *node;
+
+    g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
 
     gdk_threads_enter();
 
@@ -1778,58 +1641,6 @@ lbm_msgno_filt_check(LibBalsaMailbox * mailbox, guint seqno,
     }
 
     gdk_threads_leave();
-}
-
-#ifdef BALSA_USE_THREADS
-typedef struct {
-    LibBalsaMailbox *mailbox;
-    guint seqno;
-    LibBalsaMailboxSearchIter *search_iter;
-    gboolean hold_selected;
-    gulong expunged_cb_handler_id;
-} LbmMsgnoFiltCheckInfo;
-
-static gboolean
-lbm_msgno_filt_check_idle_cb(LbmMsgnoFiltCheckInfo * info)
-{
-    g_signal_handler_disconnect(info->mailbox,
-                                info->expunged_cb_handler_id);
-    if (info->seqno)
-        lbm_msgno_filt_check(info->mailbox, info->seqno, info->search_iter,
-                             info->hold_selected);
-    g_object_unref(info->mailbox);
-    libbalsa_mailbox_search_iter_unref(info->search_iter);
-    g_slice_free(LbmMsgnoFiltCheckInfo, info);
-    return FALSE;
-}
-#endif                          /* BALSA_USE_THREADS */
-
-void
-libbalsa_mailbox_msgno_filt_check(LibBalsaMailbox * mailbox, guint seqno,
-                                  LibBalsaMailboxSearchIter * search_iter,
-                                  gboolean hold_selected)
-{
-    g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
-
-#ifdef BALSA_USE_THREADS
-    if (libbalsa_am_i_subthread()) {
-        LbmMsgnoFiltCheckInfo *info;
-
-        info = g_slice_new(LbmMsgnoFiltCheckInfo);
-        info->mailbox = g_object_ref(mailbox);
-        info->seqno = seqno;
-        info->expunged_cb_handler_id =
-            g_signal_connect(mailbox, "message-expunged",
-                             G_CALLBACK(lbm_message_expunged_cb),
-                             &info->seqno);
-        info->search_iter = libbalsa_mailbox_search_iter_ref(search_iter);
-        info->hold_selected = hold_selected;
-        g_idle_add((GSourceFunc) lbm_msgno_filt_check_idle_cb, info);
-    } else
-        lbm_msgno_filt_check(mailbox, seqno, search_iter, hold_selected);
-#else                           /* BALSA_USE_THREADS */
-    lbm_msgno_filt_check(mailbox, seqno, search_iter, hold_selected);
-#endif                          /* BALSA_USE_THREADS */
 }
 
 /* Search iters */
@@ -2116,18 +1927,13 @@ lbm_cache_message(LibBalsaMailbox * mailbox, guint msgno,
 
     entry = g_ptr_array_index(mailbox->mindex, msgno - 1);
 
-    if (!entry) {
-        /* Assign pointer in mailbox->mindex before populating the
-         * entry, because we may recursively enter lbm_cache_message
-         * while populating it. */
+    if (!entry)
         g_ptr_array_index(mailbox->mindex, msgno - 1) =
-            entry = g_new0(LibBalsaMailboxIndexEntry, 1);
-        lbm_index_entry_populate_from_msg(entry, message);
+            lbm_index_entry_new_from_msg(message);
 #if BALSA_USE_THREADS
-    } else if (entry->idle_pending) {
+    else if (entry->idle_pending)
         lbm_index_entry_populate_from_msg(entry, message);
 #endif                          /* BALSA_USE_THREADS */
-    }
 }
 
 LibBalsaMessage *

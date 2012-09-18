@@ -694,8 +694,8 @@ balsa_find_dir(LibBalsaServer *server, const gchar * path)
 }
 
 static gint
-find_url_func(GtkTreeModel * model, GtkTreePath * path, GtkTreeIter * iter,
-              BalsaFind * bf)
+find_url(GtkTreeModel * model, GtkTreePath * path, GtkTreeIter * iter,
+	 BalsaFind * bf)
 {
     BalsaMailboxNode *mbnode;
     LibBalsaMailbox *mailbox;
@@ -715,8 +715,8 @@ find_url_func(GtkTreeModel * model, GtkTreePath * path, GtkTreeIter * iter,
  * returns NULL on failure; caller must unref mbnode when non-NULL.
  */
 
-static BalsaMailboxNode *
-find_url(const gchar * url)
+BalsaMailboxNode *
+balsa_find_url(const gchar * url)
 {
     BalsaFind bf;
 
@@ -726,89 +726,12 @@ find_url(const gchar * url)
     bf.mbnode = NULL;
     if (balsa_app.mblist_tree_store)
         gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
-                               (GtkTreeModelForeachFunc) find_url_func,
+                               (GtkTreeModelForeachFunc) find_url,
                                &bf);
 
     gdk_threads_leave();
 
     return bf.mbnode;
-}
-
-#ifdef BALSA_USE_THREADS
-typedef struct {
-    const gchar * url;
-#if GLIB_CHECK_VERSION(2, 32, 0)
-    GMutex mutex;
-    GCond cond;
-#else                           /* GLIB_CHECK_VERSION(2, 32, 0) */
-    GMutex *mutex;
-    GCond *cond;
-#endif                          /* GLIB_CHECK_VERSION(2, 32, 0) */
-    gboolean wait;
-    BalsaMailboxNode *mbnode;
-} BalsaFindUrlInfo;
-
-static gboolean
-find_url_idle_cb(BalsaFindUrlInfo * info)
-{
-#if GLIB_CHECK_VERSION(2, 32, 0)
-    g_mutex_lock(&info->mutex);
-
-    info->mbnode = find_url(info->url);
-    info->wait = FALSE;
-
-    g_cond_signal(&info->cond);
-    g_mutex_unlock(&info->mutex);
-#else                           /* GLIB_CHECK_VERSION(2, 32, 0) */
-    g_mutex_lock(info->mutex);
-
-    info->mbnode = find_url(info->url);
-    info->wait = FALSE;
-
-    g_cond_signal(info->cond);
-    g_mutex_unlock(info->mutex);
-#endif                          /* GLIB_CHECK_VERSION(2, 32, 0) */
-
-    return FALSE;
-}
-#endif                          /* BALSA_USE_THREADS */
-
-BalsaMailboxNode *
-balsa_find_url(const gchar * url)
-{
-#ifdef BALSA_USE_THREADS
-    if (libbalsa_am_i_subthread()) {
-        BalsaFindUrlInfo info;
-
-        info.url = url;
-        info.wait = TRUE;
-#if GLIB_CHECK_VERSION(2, 32, 0)
-        g_mutex_init(&info.mutex);
-        g_cond_init(&info.cond);
-        g_mutex_lock(&info.mutex);
-        g_idle_add((GSourceFunc) find_url_idle_cb, &info);
-        while (info.wait)
-            g_cond_wait(&info.cond, &info.mutex);
-        g_mutex_unlock(&info.mutex);
-        g_mutex_clear(&info.mutex);
-        g_cond_clear(&info.cond);
-#else                           /* GLIB_CHECK_VERSION(2, 32, 0) */
-        info.mutex = g_mutex_new();
-        info.cond = g_cond_new();
-        g_mutex_lock(info.mutex);
-        g_idle_add((GSourceFunc) find_url_idle_cb, &info);
-        while (info.wait)
-            g_cond_wait(info.cond, info.mutex);
-        g_mutex_unlock(info.mutex);
-        g_mutex_free(info.mutex);
-        g_cond_free(info.cond);
-#endif                          /* GLIB_CHECK_VERSION(2, 32, 0) */
-        return info.mbnode;
-    } else
-        return find_url(url);
-#else                           /* BALSA_USE_THREADS */
-    return find_url(url);
-#endif                          /* BALSA_USE_THREADS */
 }
 
 /* balsa_find_mailbox_by_url:

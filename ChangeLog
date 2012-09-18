@@ -1,3 +1,21 @@
+2012-09-17  Peter Bloomfield
+
+	Revert all changes moving Gtk access from subthreads to main
+	thread.
+
+	* libbalsa/libbalsa.c (libbalsa_threads_enter):
+	* libbalsa/mailbox.c (lbm_index_entry_new_from_msg),
+	(libbalsa_mailbox_close), (libbalsa_mailbox_msgno_inserted),
+	(libbalsa_mailbox_msgno_removed),
+	(libbalsa_mailbox_msgno_filt_check), (lbm_cache_message):
+	* libbalsa/mailbox_local.c (libbalsa_mailbox_local_load_messages):
+	* src/balsa-app.c (find_url), (balsa_find_url):
+	* src/balsa-index.c (balsa_index_load_mailbox_node):
+	* src/balsa-index.h:
+	* src/main-window.c:
+	* src/main.c (balsa_progress_set_text),
+	(balsa_progress_set_fraction):
+
 2012-09-08  Peter Bloomfield
 
 	* configure.in:  _NL_MEASUREMENT_MEASUREMENT is an enum and not

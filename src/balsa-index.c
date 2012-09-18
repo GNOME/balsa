@@ -885,7 +885,7 @@ bi_view_on_open(struct view_on_open_data *data)
     return FALSE;
 }
 
-static void
+void
 balsa_index_scroll_on_open(BalsaIndex *index)
 {
     LibBalsaMailbox *mailbox = index->mailbox_node->mailbox;
@@ -1006,149 +1006,88 @@ bndx_mailbox_message_expunged_cb(LibBalsaMailbox * mailbox, guint msgno,
         --bindex->next_msgno;
 }
 
-/*
- * balsa_index_load_mailbox_node:
- */
+/* balsa_index_load_mailbox_node:
+   open mailbox_node, the opening is done in thread to keep UI alive.
 
-typedef struct {
-    BalsaIndex *index;
-    BalsaMailboxNode *mbnode;
-    GError *err;
-    gboolean successp;
-} bndx_open_mailbox_info;
+   Called NOT holding the gdk lock, so we must wrap gtk calls in
+   gdk_threads_{enter,leave}.
+*/
 
-/* Idle callback to complete opening a mailbox */
-
-static gboolean
-bndx_set_mailbox(bndx_open_mailbox_info * info)
+gboolean
+balsa_index_load_mailbox_node(BalsaIndex * index,
+                              BalsaMailboxNode* mbnode, GError **err)
 {
     GtkTreeView *tree_view;
     LibBalsaMailbox *mailbox;
+    gboolean successp;
+    gint try_cnt;
 
-    if (!info->successp) {
-        libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-                             _("Unable to Open Mailbox!\n%s."),
-                             info->err ?
-                             info->err->message : _("Unknown error"));
-        g_error_free(info->err);
-        g_object_unref(g_object_ref_sink(info->index));
-        g_free(info);
+    g_return_val_if_fail(BALSA_IS_INDEX(index), TRUE);
+    g_return_val_if_fail(index->mailbox_node == NULL, TRUE);
+    g_return_val_if_fail(BALSA_IS_MAILBOX_NODE(mbnode), TRUE);
+    g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mbnode->mailbox), TRUE);
 
-        return FALSE;
-    }
+    mailbox = mbnode->mailbox;
+
+    try_cnt = 0;
+    do {
+        g_clear_error(err);
+        successp = libbalsa_mailbox_open(mailbox, err);
+        if (!balsa_app.main_window)
+            return FALSE;
+
+        if(successp) break;
+        if(*err && (*err)->code != LIBBALSA_MAILBOX_TOOMANYOPEN_ERROR)
+            break;
+        balsa_mblist_close_lru_peer_mbx(balsa_app.mblist, mailbox);
+    } while(try_cnt++<3);
+
+    if (!successp)
+	return TRUE;
 
     /*
      * set the new mailbox
      */
-    info->index->mailbox_node = info->mbnode;
-    g_object_weak_ref(G_OBJECT(info->mbnode),
-                      (GWeakNotify) bndx_mbnode_weak_notify, info->index);
+    index->mailbox_node = mbnode;
+    g_object_weak_ref(G_OBJECT(mbnode),
+                      (GWeakNotify) bndx_mbnode_weak_notify, index);
     /*
      * rename "from" column to "to" for outgoing mail
      */
-    tree_view = GTK_TREE_VIEW(info->index);
-    mailbox = info->mbnode->mailbox;
+    gdk_threads_enter();
+    tree_view = GTK_TREE_VIEW(index);
     if (libbalsa_mailbox_get_show(mailbox) == LB_MAILBOX_SHOW_TO) {
         GtkTreeViewColumn *column =
-            gtk_tree_view_get_column(tree_view, LB_MBOX_FROM_COL);
-        info->index->filter_no = 1;     /* FIXME: this is hack! */
+	    gtk_tree_view_get_column(tree_view, LB_MBOX_FROM_COL);
+        index->filter_no = 1; /* FIXME: this is hack! */
         gtk_tree_view_column_set_title(column, _("To"));
     }
 
     g_signal_connect_swapped(G_OBJECT(mailbox), "changed",
-                             G_CALLBACK(bndx_mailbox_changed_cb),
-                             info->index);
+			     G_CALLBACK(bndx_mailbox_changed_cb),
+			     (gpointer) index);
     g_signal_connect(mailbox, "row-inserted",
-                     G_CALLBACK(bndx_mailbox_row_inserted_cb),
-                     info->index);
+                     G_CALLBACK(bndx_mailbox_row_inserted_cb), index);
     g_signal_connect(mailbox, "message-expunged",
-                     G_CALLBACK(bndx_mailbox_message_expunged_cb),
-                     info->index);
+                     G_CALLBACK(bndx_mailbox_message_expunged_cb), index);
 
     /* Set the tree store */
 #ifndef GTK2_FETCHES_ONLY_VISIBLE_CELLS
     g_object_set_data(G_OBJECT(mailbox), "tree-view", tree_view);
 #endif
     gtk_tree_view_set_model(tree_view, GTK_TREE_MODEL(mailbox));
+    gdk_threads_leave();
 
     /* Create a search-iter for SEARCH UNDELETED. */
     if (!cond_undeleted)
         cond_undeleted =
             libbalsa_condition_new_flag_enum(TRUE,
                                              LIBBALSA_MESSAGE_FLAG_DELETED);
-    info->index->search_iter =
-        libbalsa_mailbox_search_iter_new(cond_undeleted);
+    index->search_iter = libbalsa_mailbox_search_iter_new(cond_undeleted);
     /* Note when this mailbox was opened, for use in auto-closing. */
-    time(&info->index->mailbox_node->last_use);
-
-    balsa_index_scroll_on_open(info->index);
-
-    g_free(info);
+    time(&index->mailbox_node->last_use);
 
     return FALSE;
-}
-
-/*
- * Subthread to do the actual opening
- */
-static void
-bndx_open_mailbox(bndx_open_mailbox_info * info)
-{
-    gint try_cnt;
-    LibBalsaMailbox *mailbox;
-
-    mailbox = info->mbnode->mailbox;
-
-    info->err = NULL;
-    try_cnt = 0;
-    do {
-        g_clear_error(&info->err);
-        info->successp = libbalsa_mailbox_open(mailbox, &info->err);
-        if (!balsa_app.main_window)
-            return;
-
-        if (info->successp)
-            break;
-        if (info->err &&
-            info->err->code != LIBBALSA_MAILBOX_TOOMANYOPEN_ERROR)
-            break;
-        balsa_mblist_close_lru_peer_mbx(balsa_app.mblist, mailbox);
-    } while (try_cnt++ < 3);
-
-#ifdef BALSA_USE_THREADS
-    gdk_threads_add_idle((GSourceFunc) bndx_set_mailbox, info);
-
-    pthread_exit(0);
-#else                           /* BALSA_USE_THREADS */
-    bndx_set_mailbox(info);
-#endif                          /* BALSA_USE_THREADS */
-}
-
-void
-balsa_index_load_mailbox_node (BalsaIndex * index,
-                               BalsaMailboxNode* mbnode)
-{
-    bndx_open_mailbox_info *info;
-#ifdef BALSA_USE_THREADS
-    pthread_t open_thread;
-#endif                          /* BALSA_USE_THREADS */
-
-    g_return_if_fail(BALSA_IS_INDEX(index));
-    g_return_if_fail(index->mailbox_node == NULL);
-    g_return_if_fail(BALSA_IS_MAILBOX_NODE(mbnode));
-    g_return_if_fail(LIBBALSA_IS_MAILBOX(mbnode->mailbox));
-
-    info = g_new(bndx_open_mailbox_info, 1);
-    info->index = index;
-    info->mbnode = mbnode;
-
-#ifdef BALSA_USE_THREADS
-    pthread_create(&open_thread, NULL,
-                   (void*(*)(void*))bndx_open_mailbox, info);
-    pthread_detach(open_thread);
-#else                           /* BALSA_USE_THREADS */
-    bndx_open_mailbox(info);
-#endif                          /* BALSA_USE_THREADS */
 }
 
 void

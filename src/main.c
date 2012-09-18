@@ -486,8 +486,8 @@ periodic_expunge_cb(void)
 static GTimeVal prev_time_val;
 static gdouble  min_fraction;
 static void
-progress_set_text(LibBalsaProgress * progress, const gchar * text,
-                  guint total)
+balsa_progress_set_text(LibBalsaProgress * progress, const gchar * text,
+                        guint total)
 {
     gboolean rc = FALSE;
 
@@ -508,53 +508,12 @@ progress_set_text(LibBalsaProgress * progress, const gchar * text,
         LIBBALSA_PROGRESS_YES : LIBBALSA_PROGRESS_NO;
 }
 
-#ifdef BALSA_USE_THREADS
-typedef struct {
-    LibBalsaProgress *progress;
-    const gchar *text;
-    guint total;
-    gdouble fraction;
-} BalsaProgressSetTextInfo;
-
-static gboolean
-progress_set_text_idle_cb(BalsaProgressSetTextInfo * info)
-{
-    progress_set_text(info->progress, info->text, info->total);
-
-    g_free(info);
-
-    return FALSE;
-}
-#endif                          /* BALSA_USE_THREADS */
-
-static void
-balsa_progress_set_text(LibBalsaProgress * progress, const gchar * text,
-                        guint total)
-{
-#ifdef BALSA_USE_THREADS
-    if (libbalsa_am_i_subthread()) {
-        BalsaProgressSetTextInfo *info;
-
-        info = g_new(BalsaProgressSetTextInfo, 1);
-        info->progress = progress;
-        info->text = text;
-        info->total = total;
-
-        gdk_threads_add_idle((GSourceFunc) progress_set_text_idle_cb,
-                             info);
-    } else
-        progress_set_text(progress, text, total);
-#else                           /* BALSA_USE_THREADS */
-    progress_set_text(progress, text, total);
-#endif                          /* BALSA_USE_THREADS */
-}
-
 /*
  * Set the fraction in the progress bar.
  */
 
 static void
-progress_set_fraction(LibBalsaProgress * progress, gdouble fraction)
+balsa_progress_set_fraction(LibBalsaProgress * progress, gdouble fraction)
 {
     GTimeVal time_val;
     guint elapsed;
@@ -580,38 +539,6 @@ progress_set_fraction(LibBalsaProgress * progress, gdouble fraction)
         balsa_window_increment_progress(balsa_app.main_window, fraction,
                                         !libbalsa_am_i_subthread());
     gdk_threads_leave();
-}
-
-#ifdef BALSA_USE_THREADS
-static gboolean
-progress_set_fraction_idle_cb(BalsaProgressSetTextInfo * info)
-{
-    progress_set_fraction(info->progress, info->fraction);
-
-    g_free(info);
-
-    return FALSE;
-}
-#endif                          /* BALSA_USE_THREADS */
-
-static void
-balsa_progress_set_fraction(LibBalsaProgress * progress, gdouble fraction)
-{
-#ifdef BALSA_USE_THREADS
-    if (libbalsa_am_i_subthread()) {
-        BalsaProgressSetTextInfo *info;
-
-        info = g_new(BalsaProgressSetTextInfo, 1);
-        info->progress = progress;
-        info->fraction = fraction;
-
-        gdk_threads_add_idle((GSourceFunc) progress_set_fraction_idle_cb,
-                             info);
-    } else
-        progress_set_fraction(progress, fraction);
-#else                           /* BALSA_USE_THREADS */
-    progress_set_fraction(progress, fraction);
-#endif                          /* BALSA_USE_THREADS */
 }
 
 static void

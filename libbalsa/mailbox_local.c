@@ -1023,8 +1023,11 @@ libbalsa_mailbox_local_load_messages(LibBalsaMailbox *mailbox,
 
     g_return_if_fail(LIBBALSA_IS_MAILBOX_LOCAL(mailbox));
 
+    gdk_threads_enter();
+
     if (!mailbox->msg_tree) {
 	/* Mailbox is closed, or no view has been created. */
+        gdk_threads_leave();
 	return;
     }
 
@@ -1042,6 +1045,8 @@ libbalsa_mailbox_local_load_messages(LibBalsaMailbox *mailbox,
             libbalsa_mailbox_local_cache_message(local, msgno,
                                                  msg_info->message);
     }
+
+    gdk_threads_leave();
 
     if (new_messages) {
 	libbalsa_mailbox_run_filters_on_reception(mailbox);

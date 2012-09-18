@@ -1,3 +1,7 @@
+2012-09-17  Ildar Mulyukov <ildar@altlinux.ru>
+
+	* balsa.desktop.in.in: fix desktop categories.
+
 2012-09-17  Peter Bloomfield
 
 	Revert all changes moving Gtk access from subthreads to main

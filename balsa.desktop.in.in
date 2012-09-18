@@ -9,4 +9,4 @@ Icon=gnome-balsa2
 Terminal=false
 Type=Application
 StartupNotify=true
-Categories=@TOOLKIT_CATEGORIES@Network;Email;
+Categories=GNOME;GTK;Office;Email;

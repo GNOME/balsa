@@ -1,3 +1,14 @@
+2012-09-17  Peter Bloomfield
+
+	Fix bgo #684124
+
+	* libinit_balsa/assistant_page_defclient.c
+	(balsa_druid_page_defclient_init): capitalize "Balsa".
+	* src/balsa-mime-widget-callbacks.c
+	(balsa_mime_widget_ctx_menu_save): capitalize "URI".
+	* src/filter-edit-dialog.c (filters_edit_dialog): space after
+	".".
+
 2012-05-21  Peter Bloomfield
 
 	* libbalsa/imap/md5-utils.c (md5_final): avoid gcc whining.

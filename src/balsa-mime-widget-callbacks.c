@@ -120,7 +120,7 @@ balsa_mime_widget_ctx_menu_save(GtkWidget * parent_widget,
     gtk_widget_destroy(save_dialog);
     if (!(save_file = libbalsa_vfs_new_from_uri(file_uri))) {
         balsa_information(LIBBALSA_INFORMATION_ERROR,
-                          _("Could not construct uri from %s"),
+                          _("Could not construct URI from %s"),
                           file_uri);
         g_free(file_uri);
 	return;

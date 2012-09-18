@@ -558,7 +558,7 @@ filters_edit_dialog(void)
 
     if (fr_dialogs_opened) {
 	balsa_information(LIBBALSA_INFORMATION_ERROR,
-                          _("A filter run dialog is open."
+                          _("A filter run dialog is open. "
                             "Close it before you can modify filters."));
 	return;
     }

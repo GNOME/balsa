@@ -57,7 +57,7 @@ balsa_druid_page_defclient_init(BalsaDruidPageDefclient * defclient,
 
     label =
         GTK_LABEL(gtk_label_new
-                  (_("Use balsa as default email client?")));
+                  (_("Use Balsa as default email client?")));
     gtk_label_set_justify(label, GTK_JUSTIFY_CENTER);
     gtk_label_set_line_wrap(label, TRUE);
 

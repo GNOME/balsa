@@ -4,16 +4,15 @@
 #
 # Andraž Tori <andraz.tori1@guest.arnes.si>, 2002.
 # Tadej Janež <tadej_janez@email.si>, 2003.
-# Matej Urbančič <mateju@svn.gnome.org>, 2006 - 2009.
-#
 # Andrej Žnidaršič <andrej.znidarsic@gmail.com>, 2010.
+# Matej Urbančič <mateju@svn.gnome.org>, 2006 - 2012.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: balsa\n"
+"Project-Id-Version: balsa master\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?product=balsa&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2011-12-25 06:44+0000\n"
-"PO-Revision-Date: 2011-12-26 17:45+0100\n"
+"POT-Creation-Date: 2012-09-18 01:07+0000\n"
+"PO-Revision-Date: 2012-09-18 08:44+0100\n"
 "Last-Translator: Matej Urbančič <mateju@svn.gnome.org>\n"
 "Language-Team: Slovenščina <gnome-si@googlegroups.com>\n"
 "Language: \n"
@@ -32,18 +31,18 @@ msgstr "Balsa"
 
 #: ../balsa.desktop.in.in.h:2
 #: ../balsa-mailto-handler.desktop.in.in.h:2
-msgid "Balsa Mail Client"
-msgstr "Balsa e-poštni odjemalec"
+msgid "E-Mail utility"
+msgstr "Odjemalec elektronske pošte"
 
 #: ../balsa.desktop.in.in.h:3
 #: ../balsa-mailto-handler.desktop.in.in.h:3
-msgid "E-Mail utility"
-msgstr "Pripomoček elektronske pošte"
+msgid "Mail Client"
+msgstr "Odjemalec elektronske pošte"
 
 #: ../balsa.desktop.in.in.h:4
 #: ../balsa-mailto-handler.desktop.in.in.h:4
-msgid "Mail Client"
-msgstr "Poštni odjemalec"
+msgid "Balsa Mail Client"
+msgstr "Odjemalec elektronske pošte Balsa"
 
 #: ../libbalsa/address-book.c:314
 #: ../libbalsa/filter-error.c:47
@@ -86,7 +85,7 @@ msgstr "Neznana napaka"
 #: ../libbalsa/address-book-ldap.c:495
 #: ../libbalsa/address-book-ldif.c:332
 msgid "No-Id"
-msgstr "Brez-IDja"
+msgstr "Brez-ID"
 
 #: ../libbalsa/address-book-extern.c:215
 #: ../libbalsa/address-book-extern.c:370
@@ -107,7 +106,7 @@ msgstr "Delovanje SASL\n"
 
 #: ../libbalsa/address-book-ldap.c:330
 msgid "TLS requested but not compiled in"
-msgstr "TLS je bil zahtevan, vendar ni preveden"
+msgstr "TLS je bil zahtevan, vendar ni kodno preveden"
 
 #: ../libbalsa/address-book-ldap.c:610
 msgid "Undefined location of user address book"
@@ -135,7 +134,7 @@ msgstr "_Organizacija:"
 
 #: ../libbalsa/address.c:960
 msgid "_Email Address:"
-msgstr "_E-poštni naslov:"
+msgstr "_Elektronski naslov:"
 
 #. Right/Add button
 #: ../libbalsa/address.c:979
@@ -215,7 +214,7 @@ msgstr "Napaka med kopiranjem sporočil: %s"
 #: ../libbalsa/filter.c:298
 #, c-format
 msgid "Error when trashing messages: %s"
-msgstr "Napaka med metanjem sporočil v smeti: %s"
+msgstr "Napaka med premikanjem sporočil v smeti: %s"
 
 #: ../libbalsa/filter.c:311
 #, c-format
@@ -2118,8 +2117,8 @@ msgid "Configure Balsa"
 msgstr "Nastavi Balso"
 
 #: ../libinit_balsa/assistant_page_defclient.c:59
-msgid "Use balsa as default email client?"
-msgstr "Ali naj bo Balsa privzet poštni odjemalec?"
+msgid "Use Balsa as default email client?"
+msgstr "Ali naj bo program Balsa privzet poštni odjemalec?"
 
 #: ../libinit_balsa/assistant_page_defclient.c:63
 msgid "_Yes"
@@ -2191,7 +2190,7 @@ msgid ""
 "   -- The Balsa development team"
 msgstr ""
 "Program Balsa je uspešno nastavljen!\n"
-"   -- Razvojna ekipa Balse"
+"   -- Razvojna skupina Balse"
 
 #: ../libinit_balsa/assistant_page_finish.c:49
 msgid "All Done!"
@@ -2211,7 +2210,7 @@ msgstr "Da, zapomni si"
 
 #: ../libinit_balsa/assistant_page_user.c:70
 msgid "No, type it in every time"
-msgstr "Ne, vsakokratno vnašanje gesla"
+msgstr "Ne, vsakokrat opomni za geslo"
 
 #: ../libinit_balsa/assistant_page_user.c:103
 msgid "Name of mail server for incoming _mail:"
@@ -2294,12 +2293,12 @@ msgid "Balsa E-mail reader"
 msgstr "Balsa poštni bralnik"
 
 #: ../sounds/balsa.soundlist.in.h:2
-msgid "New mail notification"
-msgstr "Obvestilo o prispeli pošti"
-
-#: ../sounds/balsa.soundlist.in.h:3
 msgid "Program startup"
 msgstr "Zagon programa"
+
+#: ../sounds/balsa.soundlist.in.h:3
+msgid "New mail notification"
+msgstr "Obvestilo o prispeli pošti"
 
 #: ../src/ab-main.c:228
 #: ../src/ab-window.c:702
@@ -2889,7 +2888,7 @@ msgstr "Izbor mape za shranjevanje izbranih delov"
 #: ../src/balsa-message.c:1769
 #, c-format
 msgid "Could not create URI for %s"
-msgstr "Ni mogoče ustvariti URI-ja za %s"
+msgstr "Ni mogoče ustvariti naslova URI za %s"
 
 #: ../src/balsa-message.c:1794
 #, c-format
@@ -3063,8 +3062,8 @@ msgstr "Shrani %s MIME del"
 
 #: ../src/balsa-mime-widget-callbacks.c:123
 #, c-format
-msgid "Could not construct uri from %s"
-msgstr "Uri-ja ni mogoče izgraditi iz %s "
+msgid "Could not construct URI from %s"
+msgstr "Naslova URI ni mogoče izgraditi iz %s "
 
 #: ../src/balsa-mime-widget-callbacks.c:142
 msgid "File already exists. Overwrite?"
@@ -3690,7 +3689,7 @@ msgid "Revert"
 msgstr "Povrni"
 
 #: ../src/filter-edit-dialog.c:578
-msgid "A filter run dialog is open.Close it before you can modify filters."
+msgid "A filter run dialog is open. Close it before you can modify filters."
 msgstr "Pogovorno okno uporabe filtra je odprto. Pred spreminjanjem filtrov ga je treba zapreti."
 
 #: ../src/filter-edit-dialog.c:591
@@ -3993,7 +3992,7 @@ msgid ""
 "the server does not support ACL's"
 msgstr ""
 "\n"
-"strežnik ne podpira ACL-jev"
+"strežnik ne podpira seznamov nadzora dostopa ACL"
 
 #: ../src/folder-conf.c:897
 msgid "mine: "
@@ -6731,7 +6730,7 @@ msgstr "(brez zadeve)"
 #: ../src/sendmsg-window.c:2041
 #, c-format
 msgid "Cannot create file URI object for %s"
-msgstr "Ni mogoče ustvariti predmeta URI-ja datoteke za %s"
+msgstr "Ni mogoče ustvariti predmeta URI datoteke za %s"
 
 #: ../src/sendmsg-window.c:2049
 msgid "unknown error"

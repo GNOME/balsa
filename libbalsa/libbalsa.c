@@ -576,6 +576,16 @@ ask_cert_real(void *data)
     g_string_append(str, c); g_free(c);
     g_free(valid_from); g_free(valid_until);
 
+    /* This string uses markup, so we must replace "&" with "&amp;" */
+    c = str->str;
+    while ((c = strchr(c, '&'))) {
+        gssize pos;
+
+        pos = (c - str->str) + 1;
+        g_string_insert(str, pos, "amp;");
+        c = str->str + pos;
+    }
+
     dialog = gtk_dialog_new_with_buttons(_("SSL/TLS certificate"), NULL,
                                          GTK_DIALOG_MODAL,
                                          _("_Accept Once"), 0,

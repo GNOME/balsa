@@ -1,3 +1,8 @@
+2012-09-30  Peter Bloomfield
+
+	* libbalsa/libbalsa.c (ask_cert_real): replace "&" by "&amp;" in
+	marked-up string.
+
 2012-09-17  Peter Bloomfield
 
 	Fix bgo #684124

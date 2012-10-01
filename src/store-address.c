@@ -376,7 +376,28 @@ store_address_add_address(StoreAddressInfo * info,
     address = libbalsa_address_new();
     address->full_name =
         g_strdup(ia->name ? ia->name : group ? group->name : NULL);
-    address->address_list = g_list_prepend(NULL, g_strdup(INTERNET_ADDRESS_MAILBOX (ia)->addr));
+    if (INTERNET_ADDRESS_IS_GROUP(ia)) {
+        InternetAddressList *members;
+        int j;
+
+        address->address_list = NULL;
+        members = INTERNET_ADDRESS_GROUP(ia)->members;
+
+        for (j = 0; j < internet_address_list_length(members); j++) {
+            InternetAddress *member_address =
+                internet_address_list_get_address(members, j);
+            if (INTERNET_ADDRESS_IS_MAILBOX(member_address))
+                address->address_list =
+                    g_list_prepend(address->address_list,
+                                   g_strdup(INTERNET_ADDRESS_MAILBOX
+                                            (member_address)->addr));
+        }
+        address->address_list = g_list_reverse(address->address_list);
+    } else {
+        address->address_list =
+            g_list_prepend(NULL,
+                           g_strdup(INTERNET_ADDRESS_MAILBOX(ia)->addr));
+    }
     ew = libbalsa_address_get_edit_widget(address, entries, NULL, NULL);
     g_object_unref(address);
 
@@ -417,27 +438,31 @@ store_address_add_lbaddress(StoreAddressInfo * info,
  * take a list of addresses and pass them one at a time to
  * store_address_add_address */
 static void
-store_address_add_list(StoreAddressInfo * info,
-                       const gchar * label,
+store_address_add_list(StoreAddressInfo    * info,
+                       const gchar         * label,
                        InternetAddressList * list)
 {
     int i, j;
-    
+
     if (!list)
         return;
 
-    for (i = 0; i < internet_address_list_length (list); i++) {
-        InternetAddress *ia = internet_address_list_get_address (list, i);
-	
-        if (INTERNET_ADDRESS_IS_MAILBOX (ia))
+    for (i = 0; i < internet_address_list_length(list); i++) {
+        InternetAddress *ia = internet_address_list_get_address(list, i);
+
+        if (INTERNET_ADDRESS_IS_MAILBOX(ia)) {
             store_address_add_address(info, label, ia, NULL);
-        else {
-            InternetAddressList *members = INTERNET_ADDRESS_GROUP (ia)->members;
+        } else if (info->current_address_book->dist_list_mode) {
+            store_address_add_address(info, label, ia, ia);
+        } else {
+            InternetAddressList *members =
+                INTERNET_ADDRESS_GROUP(ia)->members;
 
-            for (j = 0; j < internet_address_list_length (members); j++) {
-                InternetAddress *member_address = internet_address_list_get_address (members, j);
+            for (j = 0; j < internet_address_list_length(members); j++) {
+                InternetAddress *member_address =
+                    internet_address_list_get_address(members, j);
 
-                if (INTERNET_ADDRESS_IS_MAILBOX (member_address))
+                if (INTERNET_ADDRESS_IS_MAILBOX(member_address))
                     store_address_add_address(info, label, member_address,
                                               ia);
             }

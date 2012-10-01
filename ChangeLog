@@ -1,5 +1,11 @@
 2012-09-30  Peter Bloomfield
 
+	* src/store-address.c (store_address_add_address),
+	(store_address_add_list): store a group as a distribution list,
+	if the address book implements lists.
+
+2012-09-30  Peter Bloomfield
+
 	* libbalsa/libbalsa.c (ask_cert_real): replace "&" by "&amp;" in
 	marked-up string.
 

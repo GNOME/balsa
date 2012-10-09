@@ -9,21 +9,21 @@
 # Miloslav Trmac <mitr@volny.cz>, 2003, 2004, 2005.
 # Lucas Lommer <llommer@svn.gnome.org>, 2008, 2009.
 # Petr Kovar <pknbe@volny.cz>, 2008.
-# Marek Černocký <marek@manet.cz>, 2009, 2010, 2011.
+# Marek Černocký <marek@manet.cz>, 2009, 2010, 2011, 2012.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=balsa&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2011-12-23 16:21+0000\n"
-"PO-Revision-Date: 2011-12-25 07:43+0100\n"
+"POT-Creation-Date: 2012-10-04 10:05+0000\n"
+"PO-Revision-Date: 2012-10-09 07:57+0200\n"
 "Last-Translator: Marek Černocký <marek@manet.cz>\n"
 "Language-Team: Czech <gnome-cs-list@gnome.org>\n"
+"Language: cs\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: cs\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: KBabel 1.11.4\n"
 
@@ -32,16 +32,16 @@ msgid "Balsa"
 msgstr "Balsa"
 
 #: ../balsa.desktop.in.in.h:2 ../balsa-mailto-handler.desktop.in.in.h:2
-msgid "Balsa Mail Client"
-msgstr "Poštovní klient Balsa"
-
-#: ../balsa.desktop.in.in.h:3 ../balsa-mailto-handler.desktop.in.in.h:3
 msgid "E-Mail utility"
 msgstr "Nástroj pro e-mail"
 
-#: ../balsa.desktop.in.in.h:4 ../balsa-mailto-handler.desktop.in.in.h:4
+#: ../balsa.desktop.in.in.h:3 ../balsa-mailto-handler.desktop.in.in.h:3
 msgid "Mail Client"
 msgstr "Poštovní klient"
+
+#: ../balsa.desktop.in.in.h:4 ../balsa-mailto-handler.desktop.in.in.h:4
+msgid "Balsa Mail Client"
+msgstr "Poštovní klient Balsa"
 
 #: ../libbalsa/address-book.c:314 ../libbalsa/filter-error.c:47
 msgid "No error"
@@ -723,7 +723,7 @@ msgstr "Špatná data X-Face"
 
 #: ../libbalsa/libbalsa-conf.c:143
 msgid "Your Balsa configuration is now stored in \"~/.balsa/config\"."
-msgstr "Vaše nastavení Balsy je nyní uloženo v „~/.balsa/config“."
+msgstr "Vaše nastavení Balsa je nyní uloženo v „~/.balsa/config“."
 
 #: ../libbalsa/libbalsa-gpgme.c:245 ../libbalsa/libbalsa-gpgme.c:256
 #: ../libbalsa/libbalsa-gpgme.c:358 ../libbalsa/libbalsa-gpgme.c:481
@@ -2055,11 +2055,11 @@ msgstr "Adresář"
 
 #: ../libinit_balsa/assistant_init.c:148
 msgid "Configure Balsa"
-msgstr "Nastavení Balsy"
+msgstr "Nastavení Balsa"
 
 #: ../libinit_balsa/assistant_page_defclient.c:59
-msgid "Use balsa as default email client?"
-msgstr "Používat balsu jako výchozího klienta elektronické pošty?"
+msgid "Use Balsa as default email client?"
+msgstr "Používat Balsa jako výchozího klienta elektronické pošty?"
 
 #: ../libinit_balsa/assistant_page_defclient.c:63
 msgid "_Yes"
@@ -2134,8 +2134,8 @@ msgid ""
 "You've successfully set up Balsa. Have fun!\n"
 "   -- The Balsa development team"
 msgstr ""
-"Úspěšně jste nastavili parametry Balsy. Gratulujeme!\n"
-"   -- Vývojový tým Balsy"
+"Úspěšně jste nastavili parametry Balsa. Gratulujeme!\n"
+"   -- Vývojový tým Balsa"
 
 #: ../libinit_balsa/assistant_page_finish.c:49
 msgid "All Done!"
@@ -2256,12 +2256,12 @@ msgid "Balsa E-mail reader"
 msgstr "Poštovní klient Balsa"
 
 #: ../sounds/balsa.soundlist.in.h:2
-msgid "New mail notification"
-msgstr "Upozornění na novou poštu"
-
-#: ../sounds/balsa.soundlist.in.h:3
 msgid "Program startup"
 msgstr "Spouštění programu"
+
+#: ../sounds/balsa.soundlist.in.h:3
+msgid "New mail notification"
+msgstr "Upozornění na novou poštu"
 
 #: ../src/ab-main.c:228 ../src/ab-window.c:702
 msgid " address book: "
@@ -3011,7 +3011,7 @@ msgstr "Uložit část MIME %s"
 
 #: ../src/balsa-mime-widget-callbacks.c:123
 #, c-format
-msgid "Could not construct uri from %s"
+msgid "Could not construct URI from %s"
 msgstr "Nelze sestavit URI z %s"
 
 #: ../src/balsa-mime-widget-callbacks.c:142
@@ -3619,13 +3619,14 @@ msgid "Revert"
 msgstr "Vrátit"
 
 #: ../src/filter-edit-dialog.c:578
-msgid "A filter run dialog is open.Close it before you can modify filters."
+msgid "A filter run dialog is open. Close it before you can modify filters."
 msgstr ""
-"Dialog s běžícím filtrem je otevřen. Před úpravou filtrů jej prosím zavřete."
+"Je otevřeno dialogové okno s běžícím filtrem. Před úpravou filtrů jej prosím "
+"zavřete."
 
 #: ../src/filter-edit-dialog.c:591
 msgid "Balsa Filters"
-msgstr "Filtry Balsy"
+msgstr "Filtry Balsa"
 
 #: ../src/filter-edit-dialog.c:660
 #, c-format
@@ -3647,7 +3648,7 @@ msgstr ""
 
 #: ../src/filter-export-dialog.c:77
 msgid "Balsa Filters Export"
-msgstr "Export filtrů Balsy"
+msgstr "Export filtrů Balsa"
 
 #: ../src/filter-run-callbacks.c:184
 #, c-format
@@ -5410,7 +5411,7 @@ msgstr "JWZ"
 #. must NOT be modal
 #: ../src/pref-manager.c:523
 msgid "Balsa Preferences"
-msgstr "Nastavení Balsy"
+msgstr "Předvolby Balsa"
 
 #: ../src/pref-manager.c:577
 msgid "Mail options"
@@ -5994,7 +5995,6 @@ msgid "Signed matter"
 msgstr "Podepsané"
 
 #: ../src/print-gtk.c:156
-#| msgid "encrypted parts"
 msgid "Encrypted matter"
 msgstr "Zašifrované"
 

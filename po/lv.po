@@ -5,16 +5,15 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
-"Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
-"product=balsa&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2011-12-20 17:03+0000\n"
-"PO-Revision-Date: 2012-05-16 14:54+0300\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-10-13 00:09+0300\n"
+"PO-Revision-Date: 2012-10-13 00:17+0300\n"
 "Last-Translator: Rūdolfs Mazurs <rudolfs.mazurs@gmail.com>\n"
 "Language-Team: Latvian <lata-l10n@googlegroups.com>\n"
+"Language: lv\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: lv\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n != 0 ? 1 : "
 "2);\n"
 "X-Generator: Lokalize 1.4\n"
@@ -24,16 +23,16 @@ msgid "Balsa"
 msgstr "Balsa"
 
 #: ../balsa.desktop.in.in.h:2 ../balsa-mailto-handler.desktop.in.in.h:2
-msgid "Balsa Mail Client"
-msgstr "Balsa e-pasta klients"
-
-#: ../balsa.desktop.in.in.h:3 ../balsa-mailto-handler.desktop.in.in.h:3
 msgid "E-Mail utility"
 msgstr "E-pasta utilītprogramma"
 
-#: ../balsa.desktop.in.in.h:4 ../balsa-mailto-handler.desktop.in.in.h:4
+#: ../balsa.desktop.in.in.h:3 ../balsa-mailto-handler.desktop.in.in.h:3
 msgid "Mail Client"
 msgstr "E-pasta klients"
+
+#: ../balsa.desktop.in.in.h:4 ../balsa-mailto-handler.desktop.in.in.h:4
+msgid "Balsa Mail Client"
+msgstr "Balsa e-pasta klients"
 
 #: ../libbalsa/address-book.c:314 ../libbalsa/filter-error.c:47
 msgid "No error"
@@ -91,12 +90,10 @@ msgid "TLS requested but not compiled in"
 msgstr "TLS nepieciešams, bet nav iekompilēts."
 
 #: ../libbalsa/address-book-ldap.c:610
-#| msgid "Select load program for address book"
 msgid "Undefined location of user address book"
 msgstr "Nezināma vieta lietotāja adrešu grāmatai"
 
 #: ../libbalsa/address.c:955
-#| msgid "_Displayed Name:"
 msgid "D_isplayed Name:"
 msgstr "_Parādītais vārds:"
 
@@ -145,7 +142,6 @@ msgid "Bcc:"
 msgstr "Bcc:"
 
 #: ../libbalsa/address-view.c:133
-#| msgid "Reply _To:"
 msgid "Reply To:"
 msgstr "Atbildēt uz:"
 
@@ -195,7 +191,7 @@ msgstr "Kļūda, pārvietojot vēstules — %s"
 
 #: ../libbalsa/filter-error.c:48
 msgid "Syntax error in the filter configuration file"
-msgstr "Sintakses kļūda filtra konfigurācijas failā"
+msgstr "Sintakses kļūda filtra konfigurācijas datnē"
 
 #: ../libbalsa/filter-error.c:49
 msgid "Unable to allocate memory"
@@ -229,12 +225,10 @@ msgid "Subject"
 msgstr "Temats"
 
 #: ../libbalsa/filter-funcs.c:386
-#| msgid "Cc:"
 msgid "Cc"
 msgstr "Cc"
 
 #: ../libbalsa/filter-funcs.c:387
-#| msgid "_Body"
 msgid "Body"
 msgstr "Pamatteksts"
 
@@ -295,7 +289,6 @@ msgstr "Nevar pārbaudīt vairāku daļu / parakstīto daļu, jo trūkst apakšd
 
 #: ../libbalsa/gmime-multipart-crypt.c:251
 #, c-format
-#| msgid "unspecified protocol error"
 msgid "unsupported protocol '%s'"
 msgstr "neatbalstīts protokols “%s”"
 
@@ -310,8 +303,8 @@ msgstr ""
 #: ../libbalsa/gmime-multipart-crypt.c:487
 #, c-format
 msgid ""
-"Cannot decrypt multipart/encrypted part: unsupported encryption protocol '%"
-"s'."
+"Cannot decrypt multipart/encrypted part: unsupported encryption protocol "
+"'%s'."
 msgstr ""
 "Nevar atšifrēt vairāku daļu / parakstīto daļu — neatbalstīts šifrēšanas "
 "protokols “%s”"
@@ -325,7 +318,8 @@ msgid ""
 "Cannot decrypt multipart/encrypted part: content-type does not match "
 "protocol."
 msgstr ""
-"Nevar atšifrēt vairāku daļu / šifrēto daļu — satura tips neatbilst protokolam."
+"Nevar atšifrēt vairāku daļu / šifrēto daļu — satura tips neatbilst "
+"protokolam."
 
 #: ../libbalsa/gmime-multipart-crypt.c:516
 msgid "Cannot decrypt multipart/encrypted part: unexpected content type"
@@ -335,7 +329,8 @@ msgstr "Nevar atšifrēt vairāku daļu / šifrēto daļu — negaidīts satura 
 msgid ""
 "Cannot decrypt multipart/encrypted part: failed to parse decrypted content"
 msgstr ""
-"Nevar atšifrēt vairāku daļu / šifrēto daļu — neizdevās parsēt atšifrēto saturu"
+"Nevar atšifrēt vairāku daļu / šifrēto daļu — neizdevās parsēt atšifrēto "
+"saturu"
 
 #: ../libbalsa/html.c:68
 #, c-format
@@ -380,7 +375,7 @@ msgstr "Kļūda, izpildot paraksta ģeneratoru %s"
 #: ../libbalsa/identity.c:354
 #, c-format
 msgid "Cannot open signature file '%s' for reading"
-msgstr "Nevar atvērt paraksta failu “%s” lasīšanai"
+msgstr "Nevar atvērt paraksta datni “%s” lasīšanai"
 
 #: ../libbalsa/identity.c:360
 #, c-format
@@ -402,7 +397,6 @@ msgstr "Noklusējuma"
 
 #. Translators: please do not translate Face.
 #: ../libbalsa/identity.c:949
-#| msgid "F_older Path:"
 msgid "_Face Path"
 msgstr "_Face ceļš"
 
@@ -417,22 +411,18 @@ msgid "General"
 msgstr "Vispārīgi"
 
 #: ../libbalsa/identity.c:985
-#| msgid "_Identity Name:"
 msgid "_Identity name:"
 msgstr "_Identitātes nosaukums:"
 
 #: ../libbalsa/identity.c:987
-#| msgid "_Full Name:"
 msgid "_Full name:"
 msgstr "_Pilns vārds:"
 
 #: ../libbalsa/identity.c:989
-#| msgid "_Mailing Address:"
 msgid "_Mailing address:"
 msgstr "_Pasta adrese:"
 
 #: ../libbalsa/identity.c:991
-#| msgid "Reply _To:"
 msgid "Reply _to:"
 msgstr "Atbildē_t uz:"
 
@@ -442,7 +432,6 @@ msgstr "_Domēns:"
 
 #. create the "Messages" tab
 #: ../libbalsa/identity.c:997
-#| msgid "Message"
 msgid "Messages"
 msgstr "Vēstules"
 
@@ -451,12 +440,10 @@ msgid "_Bcc:"
 msgstr "_Bcc:"
 
 #: ../libbalsa/identity.c:1001
-#| msgid "Reply _String:"
 msgid "Reply _string:"
 msgstr "Atbilde_s virkne:"
 
 #: ../libbalsa/identity.c:1003
-#| msgid "F_orward String:"
 msgid "F_orward string:"
 msgstr "Pā_rsūtīšanas virkne:"
 
@@ -465,7 +452,6 @@ msgid "send messages in both plain text and _HTML format"
 msgstr "sūtīt vēstules gan vienkāršā, gan _HTML formātā"
 
 #: ../libbalsa/identity.c:1009
-#| msgid "Message Disposition Notification Requests"
 msgid "request _Message Disposition Notification by default"
 msgstr "pēc noklusējuma pieprasīt _vēstules saņemšanas paziņošanu"
 
@@ -479,37 +465,30 @@ msgid "Signature"
 msgstr "Paraksts"
 
 #: ../libbalsa/identity.c:1027
-#| msgid "Signature _Path:"
 msgid "Signature _path"
 msgstr "_Paraksta ceļš:"
 
 #: ../libbalsa/identity.c:1030
-#| msgid "_Execute Signature"
 msgid "_Execute signature"
 msgstr "_Izpildīt parakstu"
 
 #: ../libbalsa/identity.c:1033
-#| msgid "Incl_ude Signature"
 msgid "Incl_ude signature"
 msgstr "Iekļa_ut parakstu"
 
 #: ../libbalsa/identity.c:1036
-#| msgid "Include Signature When For_warding"
 msgid "Include signature when for_warding"
 msgstr "Pārsūt_ot iekļaut parakstu"
 
 #: ../libbalsa/identity.c:1039
-#| msgid "Include Signature When Rep_lying"
 msgid "Include signature when rep_lying"
 msgstr "Atbi_ldot iekļaut parakstu"
 
 #: ../libbalsa/identity.c:1042
-#| msgid "_Add Signature Separator"
 msgid "_Add signature separator"
 msgstr "Pievienot p_araksta atdalītāju"
 
 #: ../libbalsa/identity.c:1045
-#| msgid "Prepend Si_gnature"
 msgid "Prepend si_gnature"
 msgstr "_Likt parakstu sākuma"
 
@@ -555,26 +534,24 @@ msgstr ""
 
 #: ../libbalsa/identity.c:1208
 #, c-format
-#| msgid "Error loading %s: %s\n"
 msgid "Error reading file %s: %s"
-msgstr "Kļūda, nolasot failu %s — %s"
+msgstr "Kļūda, nolasot datni %s — %s"
 
 #. Translators: please do not translate Face.
 #: ../libbalsa/identity.c:1218
 #, c-format
 msgid "Face header file %s is too long (%lu bytes)."
-msgstr "Face galvenes fails %s ir pārāk liels (%lu baiti)."
+msgstr "Face galvenes datne %s ir pārāk liela (%lu baiti)."
 
 #. Translators: please do not translate Face.
 #: ../libbalsa/identity.c:1228
 #, c-format
 msgid "Face header file %s contains binary data."
-msgstr "Face galvenes fails %s satur binārus datus."
+msgstr "Face galvenes datne %s satur binārus datus."
 
 #. Translators: please do not translate Face.
 #: ../libbalsa/identity.c:1248 ../src/balsa-message.c:1573
 #, c-format
-#| msgid "Error loading %s: %s\n"
 msgid "Error loading Face: %s"
 msgstr "Kļūda, ielādējot Face: %s"
 
@@ -640,7 +617,6 @@ msgstr "Balsa paroles"
 
 #: ../libbalsa/imap-server.c:626
 #, c-format
-#| msgid "Cannot connect to server"
 msgid "Cannot connect to %s"
 msgstr "Nevar savienoties ar %s"
 
@@ -713,7 +689,6 @@ msgstr "_Noraidīt"
 
 #: ../libbalsa/libbalsa.c:629
 #, c-format
-#| msgid "Connection to %s closed"
 msgid "Connection to %s timed out. Abort?"
 msgstr "Savienojumam ar %s iestājās noildze. Pārtraukt?"
 
@@ -800,8 +775,8 @@ msgstr "nevarēja uzskaitīt “%s” atslēgas"
 msgid ""
 "%s: a key for %s is present, but it is expired, disabled, revoked or invalid"
 msgstr ""
-"%s — %s atslēga ir, bet tā ir deaktivēta, atsaukta, nederīga vai tās derīguma "
-"termiņš ir beidzies"
+"%s — %s atslēga ir, bet tā ir deaktivēta, atsaukta, nederīga vai tās "
+"derīguma termiņš ir beidzies"
 
 #: ../libbalsa/libbalsa-gpgme.c:787
 #, c-format
@@ -910,9 +885,8 @@ msgstr ""
 
 #: ../libbalsa/libbalsa-vfs.c:558 ../src/sendmsg-window.c:5226
 #, c-format
-#| msgid "%s isn't a regular file."
 msgid "not a regular file"
-msgstr "nav parasts fails"
+msgstr "nav parasta datne"
 
 #: ../libbalsa/libbalsa-vfs.c:610
 #, c-format
@@ -956,7 +930,6 @@ msgstr "Attiecina filtra kārtulas uz %s"
 
 #: ../libbalsa/mailbox.c:1029
 #, c-format
-#| msgid "Copying %d messages to %s..."
 msgid "Copying from %s to %s"
 msgstr "Kopē no %s uz %s"
 
@@ -967,7 +940,6 @@ msgstr "libbalsa_mailbox_get_message: pastkaste %s ir aizvērta"
 
 #: ../libbalsa/mailbox.c:2146
 #, c-format
-#| msgid "Remove duplicated messages from the selected mailbox"
 msgid "Removing messages from source mailbox failed"
 msgstr "Vēstuļu izņemšana no avota pastkastes neizdevās"
 
@@ -976,18 +948,15 @@ msgid "from unknown"
 msgstr "no nezināma"
 
 #: ../libbalsa/mailbox.c:3021
-#| msgid "Logging in..."
 msgid "Loading..."
 msgstr "Ielādē..."
 
 #: ../libbalsa/mailbox.c:3991
 #, c-format
-#| msgid "Set identity to use for this message"
 msgid "Searching %s for partial messages"
 msgstr "%s meklē daļējas vēstules"
 
 #: ../libbalsa/mailbox.c:4081
-#| msgid "Continue message"
 msgid "Reconstructing message"
 msgstr "Rekonstruē vēstuli"
 
@@ -1060,12 +1029,12 @@ msgstr "Lejupielādē %u kB"
 #: ../libbalsa/mailbox_imap.c:2525
 #, c-format
 msgid "Cannot create temporary file"
-msgstr "Nevar izveidot pagaidu failu"
+msgstr "Nevar izveidot pagaidu datnes"
 
 #: ../libbalsa/mailbox_imap.c:2545
 #, c-format
 msgid "Cannot write to temporary file %s"
-msgstr "Nevar rakstīt pagaidu failā %s"
+msgstr "Nevar rakstīt pagaidu datnē %s"
 
 #: ../libbalsa/mailbox_imap.c:2774 ../libbalsa/mailbox_imap.c:2893
 #, c-format
@@ -1079,23 +1048,23 @@ msgstr "Servera puses pavedienu veidošana nav atbalstīta."
 #: ../libbalsa/mailbox_local.c:540
 #, c-format
 msgid "Failed to save cache file \"%s\": %s."
-msgstr "Neizdevās saglabāt kešatmiņas failu “%s” — %s."
+msgstr "Neizdevās saglabāt kešatmiņas datni “%s” — %s."
 
 #: ../libbalsa/mailbox_local.c:572
 #, c-format
 msgid "Cache file for mailbox %s will be created"
-msgstr "Tiks izveidots kešatmiņas fails pastkastei %s"
+msgstr "Tiks izveidota kešatmiņas datne pastkastei %s"
 
 #: ../libbalsa/mailbox_local.c:581
 #, c-format
 msgid "Failed to read cache file %s: %s"
-msgstr "Neizdevās nolasīt kešatmiņas failu “%s” — %s"
+msgstr "Neizdevās nolasīt kešatmiņas datni “%s” — %s"
 
 #: ../libbalsa/mailbox_local.c:599 ../libbalsa/mailbox_local.c:616
 #: ../libbalsa/mailbox_local.c:640
 #, c-format
 msgid "Cache file for mailbox %s will be repaired"
-msgstr "Tiks salabots kešatmiņas fails pastkastei %s"
+msgstr "Tiks salabota kešatmiņas datne pastkastei %s"
 
 #: ../libbalsa/mailbox_local.c:1166
 #, c-format
@@ -1104,7 +1073,6 @@ msgstr "Filtrē %s"
 
 #: ../libbalsa/mailbox_local.c:1254
 #, c-format
-#| msgid "Reading %s..."
 msgid "Preparing %s"
 msgstr "Sagatavo %s"
 
@@ -1172,28 +1140,25 @@ msgstr "Neizskatās, ka pastkaste %s būtu Mbox pastkaste."
 
 #: ../libbalsa/mailbox_mbox.c:429
 #, c-format
-#| msgid ""
-#| "Could not remove %s:\n"
-#| "%s"
 msgid "Could not write file %s: %s"
-msgstr "Nevarēja ierakstīt failā %s — %s"
+msgstr "Nevarēja ierakstīt datnē %s — %s"
 
 #: ../libbalsa/mailbox_mbox.c:441
 #, c-format
 msgid "Failed to create temporary file \"%s\": %s"
-msgstr "Neizdevās izveidot pagaidu failu “%s” — %s"
+msgstr "Neizdevās izveidot pagaidu datni “%s” — %s"
 
 #: ../libbalsa/mailbox_mbox.c:453
 #, c-format
 msgid "Failed to save cache file \"%s\": %s.  New version saved as \"%s\""
 msgstr ""
-"Neizdevās saglabāt kešatmiņas failu “%s” — %s. Jaunā versija saglabāta ka “%s”"
+"Neizdevās saglabāt kešatmiņas datni “%s” — %s. Jaunā versija saglabāta ka "
+"“%s”"
 
 #: ../libbalsa/mailbox_mbox.c:461
 #, c-format
-#| msgid "Could not save %s: %s"
 msgid "Could not unlink file %s: %s"
-msgstr "Nevarēja atsaistīt failu %s — %s"
+msgstr "Nevarēja atsaistīt datni %s — %s"
 
 #: ../libbalsa/mailbox_mbox.c:702
 #, c-format
@@ -1286,7 +1251,7 @@ msgid ""
 "POP3 mailbox %s temp file error:\n"
 "%s"
 msgstr ""
-"POP3 pastkastes %s pagaidu faila kļūda:\n"
+"POP3 pastkastes %s pagaidu datnes kļūda:\n"
 "%s"
 
 #: ../libbalsa/mailbox_pop3.c:502
@@ -1434,7 +1399,6 @@ msgid "needs action"
 msgstr "vajag darbību"
 
 #: ../libbalsa/rfc2445.c:92
-#| msgid "_Accept Once"
 msgid "accepted"
 msgstr "pieņemts"
 
@@ -1447,7 +1411,6 @@ msgid "tentatively accepted"
 msgstr "pagaidām pieņemts"
 
 #: ../libbalsa/rfc2445.c:95
-#| msgid "Deleted"
 msgid "delegated"
 msgstr "deleģēts"
 
@@ -1460,7 +1423,6 @@ msgid "in process"
 msgstr "notiek"
 
 #: ../libbalsa/rfc2445.c:684
-#| msgid "Notification:"
 msgid "Event Notification"
 msgstr "Notikuma paziņojums"
 
@@ -1469,7 +1431,6 @@ msgid "Event Request"
 msgstr "Notikumam pieprasījums"
 
 #: ../libbalsa/rfc2445.c:686
-#| msgid "Reply to mailing list"
 msgid "Reply to Event Request"
 msgstr "Atbildēt notikuma pieprasījumam"
 
@@ -1702,9 +1663,6 @@ msgstr " nederīga"
 #. * after the colon is correct punctuation (in English).
 #: ../libbalsa/rfc3156.c:868
 #, c-format
-#| msgid ""
-#| "\n"
-#| "Subkey attribute:%s"
 msgid ""
 "\n"
 "Subkey attribute:%s"
@@ -1892,7 +1850,7 @@ msgstr "Nevar nolasīt %s"
 #: ../libbalsa/send.c:1790
 #, c-format
 msgid "Cannot determine charset for text file `%s'; sending as mime type `%s'"
-msgstr "Failam “%s” nevar noteikt rakstzīmju kopu — sūta kā mime tipu “%s”"
+msgstr "Datnei “%s” nevar noteikt rakstzīmju kopu — sūta kā mime tipu “%s”"
 
 #: ../libbalsa/send.c:2142
 msgid "This message will not be encrypted for the BCC: recipient."
@@ -1977,7 +1935,7 @@ msgstr "MB"
 #: ../src/main-window.c:346 ../src/message-window.c:239
 #: ../src/sendmsg-window.c:320
 msgid "_File"
-msgstr "_Fails"
+msgstr "_Datne"
 
 #: ../libbalsa/source-viewer.c:47 ../src/filter-edit-dialog.c:332
 #: ../src/main-window.c:347 ../src/message-window.c:240
@@ -1987,7 +1945,6 @@ msgstr "R_ediģēt"
 
 #: ../libbalsa/source-viewer.c:48 ../src/main-window.c:348
 #: ../src/message-window.c:241
-#| msgid "_New"
 msgid "_View"
 msgstr "_Skats"
 
@@ -2046,11 +2003,10 @@ msgstr "Kļūda, ielādējot %s — %s\n"
 #, c-format
 msgid "The path %s must be relative to the filesystem root (start with /)."
 msgstr ""
-"Ceļam %s jābūt relatīvam attiecībā pret failsistēmas sakni (jāsākas ar /)."
+"Ceļam %s jābūt relatīvam attiecībā pret datņu sistēmas sakni (jāsākas ar /)."
 
 #: ../libinit_balsa/assistant_helper.c:228
 #, c-format
-#| msgid "Couldn't create a directory: mkdir() failed on pathname \"%s\"."
 msgid ""
 "Couldn't create a directory: mkdir() failed on pathname \"%s\", with error "
 "\"%s\"."
@@ -2062,7 +2018,7 @@ msgstr ""
 #: ../libinit_balsa/assistant_helper.c:263
 #, c-format
 msgid "The file with pathname \"%s\" is not a directory."
-msgstr "Fails ar ceļu “%s” nav direktorija."
+msgstr "Datne ar ceļu “%s” nav direktorija."
 
 #: ../libinit_balsa/assistant_helper.c:254
 #, c-format
@@ -2091,8 +2047,8 @@ msgid "Configure Balsa"
 msgstr "Konfigurēt Balsa"
 
 #: ../libinit_balsa/assistant_page_defclient.c:59
-msgid "Use balsa as default email client?"
-msgstr "Lietot balsa kā noklusējuma e-pasta klientu?"
+msgid "Use Balsa as default email client?"
+msgstr "Lietot Balsa kā noklusējuma e-pasta klientu?"
 
 #: ../libinit_balsa/assistant_page_defclient.c:63
 msgid "_Yes"
@@ -2143,12 +2099,12 @@ msgid ""
 "Please verify the locations of your default mail files.\n"
 "These will be created if necessary."
 msgstr ""
-"Lūdzu, pārbaudiet savu noklusējuma pasta failu atrašanās vietas.\n"
+"Lūdzu, pārbaudiet savu noklusējuma pasta datnes atrašanās vietas.\n"
 "Tās tiks izveidotas pēc vajadzības."
 
 #: ../libinit_balsa/assistant_page_directory.c:266
 msgid "Mail Files"
-msgstr "Pasta faili"
+msgstr "Pasta datnes"
 
 #: ../libinit_balsa/assistant_page_directory.c:362
 #: ../libinit_balsa/assistant_page_directory.c:396
@@ -2244,7 +2200,6 @@ msgid "User Settings"
 msgstr "Lietotāja iestatījumi"
 
 #: ../libinit_balsa/assistant_page_user.c:289
-#| msgid "Select Identity"
 msgid "Default Identity"
 msgstr "Noklusējuma identitāte"
 
@@ -2286,12 +2241,12 @@ msgid "Balsa E-mail reader"
 msgstr "Balsa e-pasta programma"
 
 #: ../sounds/balsa.soundlist.in.h:2
-msgid "New mail notification"
-msgstr "Jauna pasta paziņošana"
-
-#: ../sounds/balsa.soundlist.in.h:3
 msgid "Program startup"
 msgstr "Programmas palaišana"
+
+#: ../sounds/balsa.soundlist.in.h:3
+msgid "New mail notification"
+msgstr "Jauna pasta paziņošana"
 
 #: ../src/ab-main.c:228 ../src/ab-window.c:702
 msgid " address book: "
@@ -2302,7 +2257,6 @@ msgid "_Entry"
 msgstr "I_eraksts"
 
 #: ../src/ab-main.c:555 ../src/main-window.c:352
-#| msgid "Help"
 msgid "_Help"
 msgstr "_Palīdzība"
 
@@ -2335,12 +2289,10 @@ msgid "GPE Address Book"
 msgstr "GPE adrešu grāmata"
 
 #: ../src/ab-main.c:572
-#| msgid "Address Book"
 msgid "Rubrica Address Book"
 msgstr "Rubrica adrešu grāmata"
 
 #: ../src/ab-main.c:575
-#| msgid "_Properties..."
 msgid "_Properties"
 msgstr "Ī_pašības"
 
@@ -2356,22 +2308,18 @@ msgid "_Delete"
 msgstr "_Dzēst"
 
 #: ../src/ab-main.c:578
-#| msgid "Open the address book"
 msgid "Delete address book"
 msgstr "Dzēst adrešu grāmatu"
 
 #: ../src/ab-main.c:579 ../src/main-window.c:389
-#| msgid "_Edit"
 msgid "_Quit"
 msgstr "_Iziet"
 
 #: ../src/ab-main.c:579
-#| msgid "External query (a program)"
 msgid "Exit the program"
 msgstr "Iziet no programmas"
 
 #: ../src/ab-main.c:581
-#| msgid "New Identity"
 msgid "_New Entry"
 msgstr "Jau_ns ieraksts"
 
@@ -2380,12 +2328,10 @@ msgid "Add new entry"
 msgstr "Pievienot jaunu ierakstu"
 
 #: ../src/ab-main.c:583
-#| msgid "_Delete"
 msgid "_Delete Entry"
 msgstr "_Dzēst ierakstu"
 
 #: ../src/ab-main.c:584
-#| msgid "Select Identity"
 msgid "Delete entry"
 msgstr "Dzēst ierakstu"
 
@@ -2394,12 +2340,10 @@ msgid "_About"
 msgstr "P_ar"
 
 #: ../src/ab-main.c:817
-#| msgid "_Name:"
 msgid "_Name"
 msgstr "_Vārds:"
 
 #: ../src/ab-main.c:833
-#| msgid "Address Book"
 msgid "_Address"
 msgstr "_Adrese"
 
@@ -2452,7 +2396,6 @@ msgstr "izplatīšanas saraksts"
 
 #: ../src/ab-window.c:433
 #, c-format
-#| msgid "Could not save %s: %s"
 msgid "Could not launch %s: %s"
 msgstr "Nevarēja palaist %s — %s"
 
@@ -2466,7 +2409,6 @@ msgstr ""
 "%s"
 
 #: ../src/address-book-config.c:177
-#| msgid "Treat multiple addresses as:"
 msgid "Suggest complete addresses:"
 msgstr "Ieteikt pabeigt adreses:"
 
@@ -2480,13 +2422,11 @@ msgstr "kad piespiežu Escape taustiņu"
 
 #: ../src/address-book-config.c:229 ../src/address-book-config.c:330
 #, c-format
-#| msgid "Modify Address Book"
 msgid "Modify %s Address Book"
 msgstr "Modificēt %s adrešu grāmatu"
 
 #: ../src/address-book-config.c:233 ../src/address-book-config.c:333
 #, c-format
-#| msgid "Add Address Book"
 msgid "Add %s Address Book"
 msgstr "Pievienot %s adrešu grāmatu"
 
@@ -2495,12 +2435,10 @@ msgstr "Pievienot %s adrešu grāmatu"
 #. mailbox name
 #: ../src/address-book-config.c:253 ../src/address-book-config.c:372
 #: ../src/address-book-config.c:438 ../src/address-book-config.c:505
-#| msgid "A_ddress Book Name"
 msgid "A_ddress Book Name:"
 msgstr "A_drešu grāmatas nosaukums:"
 
 #: ../src/address-book-config.c:377
-#| msgid "Load program location"
 msgid "Load program location:"
 msgstr "Ielādēšanas programmas atrašanās vieta:"
 
@@ -2509,7 +2447,6 @@ msgid "Select load program for address book"
 msgstr "Izvēlieties adrešu grāmatas ielādes programmu"
 
 #: ../src/address-book-config.c:390
-#| msgid "Save program location"
 msgid "Save program location:"
 msgstr "Saglabāšanas programmas atrašanās vieta:"
 
@@ -2552,12 +2489,10 @@ msgid "No path found.  Do you want to give one?"
 msgstr "Nav atrasta ceļa. Vai vēlaties to norādīt?"
 
 #: ../src/address-book-config.c:899
-#| msgid "Address Book"
 msgid "Rubrica2 Address Book"
 msgstr "Rubrica2 adrešu grāmata"
 
 #: ../src/balsa-app.c:79 ../src/folder-conf.c:276 ../src/mailbox-conf.c:1328
-#| msgid "_Remember password"
 msgid "_Remember password in keyring"
 msgstr "Atce_rēties paroli atslēgu saišķī"
 
@@ -2686,13 +2621,11 @@ msgstr "Neizdevās pastkastes %s apstiprināšana."
 
 #: ../src/balsa-index.c:2406
 #, c-format
-#| msgid "Cannot access the message's body\n"
 msgid "Cannot process the message: %s"
 msgstr "Nevar apstrādāt vēstuli — %s"
 
 #: ../src/balsa-index.c:2529
 #, c-format
-#| msgid "Cannot access the message's body\n"
 msgid "Cannot access message %u to pass to %s"
 msgstr "Nevar piekļūt vēstulei %u, lai padotu uz %s"
 
@@ -2742,17 +2675,14 @@ msgid "Select message part to display"
 msgstr "Izvēlieties vēstules daļu, ko parādīt"
 
 #: ../src/balsa-message.c:411
-#| msgid "_Wrap"
 msgid "Wrapped"
 msgstr "Aplauzts"
 
 #: ../src/balsa-message.c:415
-#| msgid "Host not found"
 msgid "Not found"
 msgstr "Nav atrasts"
 
 #: ../src/balsa-message.c:604
-#| msgid "Fwd:"
 msgid "Find:"
 msgstr "Meklēt:"
 
@@ -2830,7 +2760,7 @@ msgstr "visa vēstule"
 #: ../src/balsa-message.c:1453
 #, c-format
 msgid "part %s: %s (file %s)"
-msgstr "daļa %s — %s (fails %s)"
+msgstr "daļa %s — %s (datne %s)"
 
 #: ../src/balsa-message.c:1464
 #, c-format
@@ -2852,12 +2782,10 @@ msgid "Appending message to %s failed: %s"
 msgstr "Vēstules pievienošana pie %s neizdevās — %s"
 
 #: ../src/balsa-message.c:1653
-#| msgid "Save..."
 msgid "_Save..."
 msgstr "_Saglabāt..."
 
 #: ../src/balsa-message.c:1662 ../src/balsa-mime-widget-message.c:458
-#| msgid "Copy to folder:"
 msgid "_Copy to folder..."
 msgstr "_Kopēt uz mapi..."
 
@@ -2882,7 +2810,6 @@ msgstr "Neizdevās saglabāt %s — %s"
 
 #: ../src/balsa-message.c:2486 ../src/balsa-message.c:2630
 #, c-format
-#| msgid "Message Disposition Notification Requests"
 msgid "Sending the disposition notification failed: %s"
 msgstr "Neizdevās nosūtīt paziņojumu par saņemšanu — %s"
 
@@ -3003,7 +2930,8 @@ msgid ""
 "Checking the signature of the message sent by %s with subject \"%s\" failed "
 "with an error!"
 msgstr ""
-"%s sūtītas vēstules ar tematu “%s” paraksta pārbaude neizdevās, gadījās kļūda!"
+"%s sūtītas vēstules ar tematu “%s” paraksta pārbaude neizdevās, gadījās "
+"kļūda!"
 
 #: ../src/balsa-message.c:3057
 msgid ""
@@ -3028,7 +2956,7 @@ msgstr "Lūdzu, izvēlieties citu šīs vēstules instanci un mēģiniet vēlrei
 #: ../src/balsa-mime-widget-message.c:209
 #, c-format
 msgid "File name: %s"
-msgstr "Faila nosaukums — %s"
+msgstr "Datnes nosaukums — %s"
 
 #: ../src/balsa-mime-widget.c:256
 #, c-format
@@ -3046,7 +2974,6 @@ msgid "Content Type: %s"
 msgstr "Satura tips — %s"
 
 #: ../src/balsa-mime-widget.c:297
-#| msgid "No open or view action defined in GNOME MIME for this content type"
 msgid "No open or view action defined for this content type"
 msgstr "Šim satura tipam nav noteikta atvēršanas vai skatīšanās darbība"
 
@@ -3066,13 +2993,12 @@ msgstr "Saglabāt %s MIME daļu"
 
 #: ../src/balsa-mime-widget-callbacks.c:123
 #, c-format
-#| msgid "Could not connect to %s (%s)."
-msgid "Could not construct uri from %s"
-msgstr "Nevarēja izveidot uri no %s"
+msgid "Could not construct URI from %s"
+msgstr "Nevarēja izveidot URI no %s"
 
 #: ../src/balsa-mime-widget-callbacks.c:142
 msgid "File already exists. Overwrite?"
-msgstr "Fails jau eksistē. Pārrakstīt?"
+msgstr "Datne jau eksistē. Pārrakstīt?"
 
 #: ../src/balsa-mime-widget-callbacks.c:152
 #, c-format
@@ -3115,7 +3041,7 @@ msgstr "Satura tips — ārējais pamatteksts\n"
 #: ../src/balsa-mime-widget-message.c:162
 #, c-format
 msgid "Access type: local-file\n"
-msgstr "Piekļuves tips — lokāls fails\n"
+msgstr "Piekļuves tips — lokāla datne\n"
 
 #: ../src/balsa-mime-widget-message.c:174
 #, c-format
@@ -3177,7 +3103,6 @@ msgid "Sending the external body request failed: %s"
 msgstr "Ārējā pamatteksta sūtīšanas pieprasījums neizdevās — %s"
 
 #: ../src/balsa-mime-widget-message.c:450
-#| msgid "_Reply..."
 msgid "Reply..."
 msgstr "Atbildēt..."
 
@@ -3237,12 +3162,10 @@ msgid "Copy link"
 msgstr "Kopēt saiti"
 
 #: ../src/balsa-mime-widget-text.c:523
-#| msgid "Open next"
 msgid "Open link"
 msgstr "Atvērt saiti"
 
 #: ../src/balsa-mime-widget-text.c:528
-#| msgid "Sending Mail..."
 msgid "Send link..."
 msgstr "Sūtīt saiti..."
 
@@ -3251,7 +3174,6 @@ msgid "Save..."
 msgstr "Saglabāt..."
 
 #: ../src/balsa-mime-widget-text.c:571
-#| msgid "Highlight cited text"
 msgid "Highlight structured phrases"
 msgstr "Izcelt strukturētās frāzes"
 
@@ -3261,7 +3183,6 @@ msgid "Calling URL %s..."
 msgstr "Izsauc URL %s..."
 
 #: ../src/balsa-mime-widget-text.c:1167
-#| msgid "Address Book"
 msgid "Address"
 msgstr "Adrese"
 
@@ -3270,32 +3191,26 @@ msgid "S_tore"
 msgstr "Pieglabā_t"
 
 #: ../src/balsa-mime-widget-text.c:1178 ../src/balsa-print-object-text.c:508
-#| msgid "_Full Name:"
 msgid "Full Name"
 msgstr "Pilns vārds"
 
 #: ../src/balsa-mime-widget-text.c:1179 ../src/balsa-print-object-text.c:510
-#| msgid "_Nickname:"
 msgid "Nick Name"
 msgstr "Segvārds"
 
 #: ../src/balsa-mime-widget-text.c:1180 ../src/balsa-print-object-text.c:512
-#| msgid "_First Name:"
 msgid "First Name"
 msgstr "Vārds"
 
 #: ../src/balsa-mime-widget-text.c:1181 ../src/balsa-print-object-text.c:514
-#| msgid "_Last Name:"
 msgid "Last Name"
 msgstr "Uzvārds"
 
 #: ../src/balsa-mime-widget-text.c:1182 ../src/balsa-print-object-text.c:516
-#| msgid "O_rganization:"
 msgid "Organization"
 msgstr "Organizācija"
 
 #: ../src/balsa-mime-widget-text.c:1184 ../src/balsa-print-object-text.c:519
-#| msgid "_Email Address:"
 msgid "Email Address"
 msgstr "E-pasta adrese"
 
@@ -3305,8 +3220,8 @@ msgid ""
 "The message sent by %s with subject \"%s\" contains 8-bit characters, but no "
 "header describing the used codeset (converted to %s)"
 msgstr ""
-"%s sūtītā vēstule ar tematu “%s” satur 8 bitu rakstzīmes, bet neviena galvene "
-"nenorāda izmantoto kodējumu (konvertē uz %s)"
+"%s sūtītā vēstule ar tematu “%s” satur 8 bitu rakstzīmes, bet neviena "
+"galvene nenorāda izmantoto kodējumu (konvertē uz %s)"
 
 #: ../src/balsa-mime-widget-vcalendar.c:67
 #, c-format
@@ -3320,13 +3235,11 @@ msgstr "Kopsavilkums"
 
 #: ../src/balsa-mime-widget-vcalendar.c:170
 #: ../src/balsa-print-object-text.c:667
-#| msgid "O_rganization:"
 msgid "Organizer"
 msgstr "Organizētājs"
 
 #: ../src/balsa-mime-widget-vcalendar.c:171
 #: ../src/balsa-print-object-text.c:669
-#| msgid "Startup"
 msgid "Start"
 msgstr "Sākums"
 
@@ -3337,7 +3250,6 @@ msgstr "Beigas"
 
 #: ../src/balsa-mime-widget-vcalendar.c:173
 #: ../src/balsa-print-object-text.c:673
-#| msgid "Action"
 msgid "Location"
 msgstr "Vieta"
 
@@ -3361,12 +3273,10 @@ msgid "The sender asks you for a reply to this request:"
 msgstr "Sūtītājs lūdz jums atbildēt uz šo pieprasījumu:"
 
 #: ../src/balsa-mime-widget-vcalendar.c:236
-#| msgid "_Accept Once"
 msgid "Accept"
 msgstr "Pieņemt"
 
 #: ../src/balsa-mime-widget-vcalendar.c:245
-#| msgid "_Accept Once"
 msgid "Accept tentatively"
 msgstr "Pagaidām pieņemt"
 
@@ -3392,7 +3302,7 @@ msgstr "Tips:"
 #: ../src/balsa-print-object-default.c:163
 #: ../src/balsa-print-object-default.c:167
 msgid "File name:"
-msgstr "Faila nosaukums:"
+msgstr "Datnes nosaukums:"
 
 #: ../src/filter-edit-callbacks.c:337
 msgid "One of the specified fields contains:"
@@ -3522,7 +3432,6 @@ msgid "One _Matches/None Matches"
 msgstr "Viens _atbilst / neviens neatbilst"
 
 #: ../src/filter-edit-callbacks.c:1107
-#| msgid "Error in regular expression syntax"
 msgid "Filtering using regular expressions is not yet implemented."
 msgstr "Filtrēšana, izmantojot regulārās izteiksmes, vēl nav ieviesta."
 
@@ -3610,7 +3519,6 @@ msgid "Move to folder:"
 msgstr "Pārvietot uz mapi:"
 
 #: ../src/filter-edit-dialog.c:106
-#| msgid "Colors"
 msgid "Colorize"
 msgstr "Izkrāsot"
 
@@ -3692,9 +3600,10 @@ msgid "Revert"
 msgstr "Atgriezt"
 
 #: ../src/filter-edit-dialog.c:578
-msgid "A filter run dialog is open.Close it before you can modify filters."
+msgid "A filter run dialog is open. Close it before you can modify filters."
 msgstr ""
-"Filtra palaišanas dialogs ir atvērts. Aizveriet to pirms modificējat filtrus."
+"Filtra palaišanas dialoglodziņš ir atvērts. Aizveriet to pirms modificējat "
+"filtrus."
 
 #: ../src/filter-edit-dialog.c:591
 msgid "Balsa Filters"
@@ -3715,9 +3624,8 @@ msgid ""
 "There are opened filter run dialogs, close them before you can modify "
 "filters."
 msgstr ""
-"Ir atvērti filtra modificēšanas dialoglodziņi, tos vajag aizvērt, pirms varat "
-"modificēt "
-"filtrus."
+"Ir atvērti filtra modificēšanas dialoglodziņi, tos vajag aizvērt, pirms "
+"varat modificēt filtrus."
 
 #: ../src/filter-export-dialog.c:77
 msgid "Balsa Filters Export"
@@ -3794,8 +3702,8 @@ msgid ""
 "The filters dialog is opened, close it before you can run filters on any "
 "mailbox"
 msgstr ""
-"Filtru dialogs ir atvērts, pirms varat palaist filtrus uz "
-"jebkuras no pastkastēm, aizveriet to."
+"Filtru dialogs ir atvērts, pirms varat palaist filtrus uz jebkuras no "
+"pastkastēm, aizveriet to."
 
 #: ../src/folder-conf.c:110
 #, c-format
@@ -3847,7 +3755,6 @@ msgstr "P_aplašināti"
 
 #. INPUT FIELD CREATION
 #: ../src/folder-conf.c:370
-#| msgid "Descriptive _Name:"
 msgid "Descriptive _name:"
 msgstr "Aprakstošais _nosaukums:"
 
@@ -3873,7 +3780,6 @@ msgid "Always show _INBOX"
 msgstr "Vienmēr rādīt _INBOX"
 
 #: ../src/folder-conf.c:410
-#| msgid "Pr_efix"
 msgid "Pr_efix:"
 msgstr "Pri_edēklis:"
 
@@ -3948,7 +3854,6 @@ msgid "Host:"
 msgstr "Saimnieks:"
 
 #: ../src/folder-conf.c:843
-#| msgid "_Subfolder of:"
 msgid "Subfolder of:"
 msgstr "Apakšmape:"
 
@@ -3957,7 +3862,6 @@ msgid "_Browse..."
 msgstr "_Pārlūkot..."
 
 #: ../src/folder-conf.c:862
-#| msgid "Mailbox is read-only."
 msgid "read-only"
 msgstr "tikai lasāms"
 
@@ -3974,12 +3878,10 @@ msgid "post"
 msgstr "sūtīt"
 
 #: ../src/folder-conf.c:866
-#| msgid "Send"
 msgid "append"
 msgstr "pievienot"
 
 #: ../src/folder-conf.c:867
-#| msgid "_Undelete"
 msgid "delete"
 msgstr "dzēst"
 
@@ -4008,12 +3910,10 @@ msgstr ""
 "serveris neatbalsta ACL"
 
 #: ../src/folder-conf.c:897
-#| msgid "minutes"
 msgid "mine: "
 msgstr "mans:"
 
 #: ../src/folder-conf.c:936
-#| msgid "Quoted"
 msgid "Quota:"
 msgstr "Kvota:"
 
@@ -4110,10 +4010,10 @@ msgid ""
 "mailbox again.\n"
 "What would you like to do?"
 msgstr ""
-"Tas izņems pastkasti “%s” no pastkastu saraksta.  Jūs varat arī "
-"izdzēst diska failu vai failus, kas asociēti ar šo pastkasti.\n"
-"Ja jūs neizņemsiet failu no diska, jūs varēsiet “Pievienot pastkasti”, "
-"lai no jauna piekļūtu pastkastei.\n"
+"Tas izņems pastkasti “%s” no pastkastu saraksta.  Jūs varat arī izdzēst "
+"diska datni vai datnes, kas asociēti ar šo pastkasti.\n"
+"Ja jūs neizņemsiet datni no diska, jūs varēsiet “Pievienot pastkasti”, lai "
+"no jauna piekļūtu pastkastei.\n"
 "Ko jūs vēlētos darīt?"
 
 #: ../src/mailbox-conf.c:426
@@ -4133,10 +4033,10 @@ msgid ""
 "You may use \"New IMAP subfolder\" later to add a mailbox with this name.\n"
 "What would you like to do?"
 msgstr ""
-"Tas izņems pastkasti “%s” un visas tās vēstules no IMAP servera.  Ja %s "
-"ir apakšmapes, tās joprojām parādīsies kā mezgls mapju kokā.\n"
-"Jūs varat vēlāk lietot “Jauna IMAP apakšmape”, lai pievienotu pastkastīt "
-"ar šādu nosaukumu.\n"
+"Tas izņems pastkasti “%s” un visas tās vēstules no IMAP servera.  Ja %s ir "
+"apakšmapes, tās joprojām parādīsies kā mezgls mapju kokā.\n"
+"Jūs varat vēlāk lietot “Jauna IMAP apakšmape”, lai pievienotu pastkastīt ar "
+"šādu nosaukumu.\n"
 "Ko jūs vēlētos darīt?"
 
 #: ../src/mailbox-conf.c:448
@@ -4184,21 +4084,16 @@ msgstr ""
 "%s"
 
 #: ../src/mailbox-conf.c:1152
-#| msgid "Mailbox _Name:"
 msgid "_Mailbox Name:"
 msgstr "Pastkastes nosauku_ms:"
 
 #: ../src/mailbox-conf.c:1161
 #, c-format
-#| msgid ""
-#| "Local Mail Problem\n"
-#| "%s"
 msgid "Local %s Mailbox Properties"
 msgstr "Lokālās %s pastkastes īpašības"
 
 #: ../src/mailbox-conf.c:1162
 #, c-format
-#| msgid "Local MH mailbox..."
 msgid "New Local %s Mailbox"
 msgstr "Jauna lokālā %s pastkaste"
 
@@ -4208,7 +4103,6 @@ msgstr "Attālinātās pastkastes konfigurētājs"
 
 #. mailbox name
 #: ../src/mailbox-conf.c:1229 ../src/mailbox-conf.c:1341
-#| msgid "Mailbox _Name:"
 msgid "Mailbox _name:"
 msgstr "Pastkastes _nosaukums:"
 
@@ -4243,7 +4137,6 @@ msgid "_Username:"
 msgstr "_Lietotājvārds:"
 
 #: ../src/mailbox-conf.c:1380
-#| msgid "F_older Path:"
 msgid "F_older path:"
 msgstr "_Mapes ceļš:"
 
@@ -4268,7 +4161,6 @@ msgid "Show _Recipient column instead of Sender"
 msgstr "_Rādīt saņēmēja kolonnu, nevis sūtītāja"
 
 #: ../src/mailbox-conf.c:1560
-#| msgid "_Enable check for new mail"
 msgid "_Subscribe for new mail check"
 msgstr "Abonēt jauna pa_sta pārbaudīšanu"
 
@@ -4381,9 +4273,6 @@ msgstr "Lokālā mape %s\n"
 
 #: ../src/main.c:212
 #, c-format
-#| msgid ""
-#| "Could not remove %s:\n"
-#| "%s"
 msgid "Could not write to %s: %s"
 msgstr "Nevarēja ierakstīt %s — %s"
 
@@ -4397,7 +4286,7 @@ msgstr "Uzrakstīt jaunu vēstuli uz EPASTS@ADRESE"
 
 #: ../src/main.c:466
 msgid "Attach file at PATH"
-msgstr "Pievienot failu no CEĻŠ"
+msgstr "Pievienot datni no CEĻŠ"
 
 #: ../src/main.c:468 ../src/main.c:518
 msgid "Opens MAILBOXNAME"
@@ -4432,9 +4321,8 @@ msgid "The Balsa E-Mail Client"
 msgstr "Balsa e-pasta klients"
 
 #: ../src/main.c:515
-#| msgid "Attach file at PATH"
 msgid "Attach file at URI"
-msgstr "Pievienot failu no URI"
+msgstr "Pievienot datni no URI"
 
 #: ../src/main.c:556
 #, c-format
@@ -4475,7 +4363,7 @@ msgstr "Saspiež pasta mapes..."
 
 #: ../src/main-window.c:324
 msgid "Balsa closes files and connections. Please wait..."
-msgstr "Balsa aizver failus un savienojumus. Lūdzu, uzgaidiet..."
+msgstr "Balsa aizver datnes un savienojumus. Lūdzu, uzgaidiet..."
 
 #: ../src/main-window.c:349
 msgid "Mail_box"
@@ -4486,7 +4374,6 @@ msgid "_Message"
 msgstr "_Vēstule"
 
 #: ../src/main-window.c:351
-#| msgid "User Settings"
 msgid "_Settings"
 msgstr "Ie_statījumi"
 
@@ -4575,7 +4462,6 @@ msgstr "Lapas ie_statījumi"
 
 #: ../src/main-window.c:386 ../src/message-window.c:245
 #: ../src/sendmsg-window.c:346
-#| msgid "Font available for printing"
 msgid "Set up page for printing"
 msgstr "Iestatīt lapas drukāšanai"
 
@@ -4666,7 +4552,6 @@ msgstr "F_iltri..."
 
 #. Export selected filters to a text file.
 #: ../src/main-window.c:426
-#| msgid "_Export Filters"
 msgid "_Export Filters..."
 msgstr "_Eksportēt filtrus..."
 
@@ -4675,7 +4560,6 @@ msgid "Export filters as Sieve scripts"
 msgstr "Eksportēt filtrus kā Sieve skriptus"
 
 #: ../src/main-window.c:428
-#| msgid "References:"
 msgid "Prefere_nces"
 msgstr "Ies_tatījumi"
 
@@ -4774,7 +4658,6 @@ msgid "Select _All"
 msgstr "Izvēlēties _visu"
 
 #: ../src/main-window.c:490
-#| msgid "_Flat index"
 msgid "_Find"
 msgstr "_Meklēt"
 
@@ -4855,7 +4738,6 @@ msgid "_Remove Duplicates"
 msgstr "_Izņemt dublikātus"
 
 #: ../src/main-window.c:528
-#| msgid "Remove duplicated messages from the selected mailbox"
 msgid "Remove duplicated messages from the current mailbox"
 msgstr "Izņemt dublējošās vēstules no izvēlētās pastkastes"
 
@@ -4924,12 +4806,10 @@ msgid "Pipe the message through another program"
 msgstr "Sūtīt vēstuli caur citu programmu pa konveijeri"
 
 #: ../src/main-window.c:567
-#| msgid "Selected headers:"
 msgid "Select _Thread"
 msgstr "Izvēlē_ties pavedienu"
 
 #: ../src/main-window.c:568
-#| msgid "Select all messages in current mailbox"
 msgid "Select all messages in current thread"
 msgstr "Izvēlēties visas vēstules pašreizējā pavedienā"
 
@@ -4968,7 +4848,6 @@ msgid "Previous part in message"
 msgstr "Iepriekšējā vēstules daļa"
 
 #: ../src/main-window.c:588
-#| msgid "Compose message"
 msgid "Copy message"
 msgstr "Kopēt vēstuli"
 
@@ -4977,7 +4856,6 @@ msgid "Find in _Message"
 msgstr "_Meklēt vēstulē"
 
 #: ../src/main-window.c:592 ../src/message-window.c:256
-#| msgid "Send this message"
 msgid "Find a string in this message"
 msgstr "Atrast virkni šajā vēstulē"
 
@@ -5047,7 +4925,6 @@ msgid "Show St_atus Bar"
 msgstr "Rādīt st_atusa joslu"
 
 #: ../src/main-window.c:638
-#| msgid "Show in list"
 msgid "Show _Index Filter"
 msgstr "Rādīt _indeksa filtru"
 
@@ -5222,12 +5099,10 @@ msgid "Subject or Recipient Contains:"
 msgstr "Tēma vai saņēmējs satur:"
 
 #: ../src/main-window.c:1239
-#| msgid "Subject:"
 msgid "Subject Contains:"
 msgstr "Tēma satur:"
 
 #: ../src/main-window.c:1240
-#| msgid "Body font"
 msgid "Body Contains:"
 msgstr "Pamatteksts satur:"
 
@@ -5241,7 +5116,6 @@ msgstr "Ne vecākas kā (dienas):"
 
 #: ../src/main-window.c:2371
 #, c-format
-#| msgid "Open with %s"
 msgid "Opening %s"
 msgstr "Atver %s"
 
@@ -5320,7 +5194,6 @@ msgstr "Nākamā nelasītā vēstule atrodas %s"
 
 #: ../src/main-window.c:3788
 #, c-format
-#| msgid "Do you want to correct the path?"
 msgid "Do you want to select %s?"
 msgstr "Vai vēlaties izvēlēties %s?"
 
@@ -5371,7 +5244,6 @@ msgstr "Neizdevās izņemt dublikātus — %s"
 
 #: ../src/main-window.c:4603
 #, c-format
-#| msgid "_Remove Duplicates"
 msgid "Removed %d duplicate"
 msgid_plural "Removed %d duplicates"
 msgstr[0] "Izņemts %d dublikāts"
@@ -5406,7 +5278,6 @@ msgstr "Rādīt pastkasti — %s "
 
 #: ../src/main-window.c:5573
 #, c-format
-#| msgid "Print message"
 msgid "with %d message"
 msgid_plural "with %d messages"
 msgstr[0] "ar %d vēstuli"
@@ -5446,7 +5317,6 @@ msgid "Move the message to Trash mailbox"
 msgstr "Pārvietot vēstuli uz miskastes pastkasti"
 
 #: ../src/message-window.c:316
-#| msgid "Customize toolbars"
 msgid "Show toolbar"
 msgstr "Rādīt rīkjoslu"
 
@@ -5460,12 +5330,10 @@ msgid "Message from %s: %s"
 msgstr "Vēstule no %s — %s"
 
 #: ../src/pref-manager.c:402
-#| msgid "While Retrieving Messages"
 msgid "While retrieving messages"
 msgstr "Kamēr saņem vēstules"
 
 #: ../src/pref-manager.c:403
-#| msgid "Until Closed"
 msgid "Until closed"
 msgstr "Līdz aizvērts"
 
@@ -5478,7 +5346,6 @@ msgid "Normal"
 msgstr "Normāls"
 
 #: ../src/pref-manager.c:411
-#| msgid "Bad Spellers"
 msgid "Bad spellers"
 msgstr "Sliktas vārdnīcas"
 
@@ -5504,17 +5371,14 @@ msgid "Balsa Preferences"
 msgstr "Balsa iestatījumi"
 
 #: ../src/pref-manager.c:577
-#| msgid "Mail Options"
 msgid "Mail options"
 msgstr "Pasta opcijas"
 
 #: ../src/pref-manager.c:579
-#| msgid "Mail Options"
 msgid "Display options"
 msgstr "Attēlošanas opcijas"
 
 #: ../src/pref-manager.c:581 ../src/pref-manager.c:2909
-#| msgid "Address Books"
 msgid "Address books"
 msgstr "Adrešu grāmatas"
 
@@ -5536,7 +5400,6 @@ msgid "%s (default)"
 msgstr "%s (noklusējuma)"
 
 #: ../src/pref-manager.c:1671
-#| msgid "Remote Mailbox Servers"
 msgid "Remote mailbox servers"
 msgstr "Attālinātie pastkastu serveri"
 
@@ -5546,7 +5409,6 @@ msgid "Type"
 msgstr "Tips"
 
 #: ../src/pref-manager.c:1700
-#| msgid "Mailbox Name"
 msgid "Mailbox name"
 msgstr "Pastkastes nosaukums"
 
@@ -5572,7 +5434,6 @@ msgid "Server name"
 msgstr "Servera nosaukums"
 
 #: ../src/pref-manager.c:1813
-#| msgid "Mail Servers"
 msgid "Mail servers"
 msgstr "Pasta serveri"
 
@@ -5589,7 +5450,6 @@ msgid "Checking"
 msgstr "Pārbauda"
 
 #: ../src/pref-manager.c:1850
-#| msgid "_Check mail automatically every:"
 msgid "_Check mail automatically every"
 msgstr "_Pārbaudīt pastu automātiski katras"
 
@@ -5611,17 +5471,14 @@ msgid "When mail arrives:"
 msgstr "Kad pienāk pasts:"
 
 #: ../src/pref-manager.c:1886
-#| msgid "Display Progress Dialog"
 msgid "Display message"
 msgstr "Parādīt vēstuli"
 
 #: ../src/pref-manager.c:1891
-#| msgid "Play sound:"
 msgid "Play sound"
 msgstr "Atskaņot skaņu"
 
 #: ../src/pref-manager.c:1896
-#| msgid "Show dialog"
 msgid "Show icon"
 msgstr "Parādīt ikonu"
 
@@ -5636,7 +5493,6 @@ msgstr "_POP vēstules izmēra limits:"
 #. Quoted text regular expression
 #. and RFC2646-style flowed text
 #: ../src/pref-manager.c:1938
-#| msgid "Quoted and Flowed Text"
 msgid "Quoted and flowed text"
 msgstr "Citēts un plūstošais teksts"
 
@@ -5645,7 +5501,6 @@ msgid "Mark quoted text"
 msgstr "Atzīmēt citēto tekstu"
 
 #: ../src/pref-manager.c:1948
-#| msgid "Quoted Text Regular Expression"
 msgid ""
 "Quoted text\n"
 "regular expression:"
@@ -5654,7 +5509,6 @@ msgstr ""
 "regulāra Izteiksme:"
 
 #: ../src/pref-manager.c:1957
-#| msgid "Wrap Outgoing Text at:"
 msgid "Wrap text at"
 msgstr "Aplauzt tekstu pie"
 
@@ -5664,12 +5518,10 @@ msgstr "rakstzīmes"
 
 #. handling of multipart/alternative
 #: ../src/pref-manager.c:1983
-#| msgid "Display of Multipart/Alternative Parts"
 msgid "Display of multipart/alternative parts"
 msgstr "Parādīt vairāku daļu/alternatīvās daļas"
 
 #: ../src/pref-manager.c:1986
-#| msgid "prefer text/plain over html"
 msgid "Prefer text/plain over html"
 msgstr "Priekšroka vienkāršam tekstam pār html"
 
@@ -5687,14 +5539,10 @@ msgstr "rādīt kodējumā"
 
 #. How to handle received MDN requests
 #: ../src/pref-manager.c:2048
-#| msgid "Message Disposition Notification Requests"
 msgid "Message disposition notification requests"
 msgstr "Vēstules saņemšanas paziņošanas pieprasījumi"
 
 #: ../src/pref-manager.c:2050
-#| msgid ""
-#| "When I receive a message and its sender requested to return a\n"
-#| "Message Disposition Notification (MDN), send it in the following cases:"
 msgid ""
 "When I receive a message whose sender requested a Message Disposition "
 "Notification (MDN), send it if:"
@@ -5703,10 +5551,6 @@ msgstr ""
 "vēstules saņemšanas paziņojumu (MDN), sūtīt to sekojošajos gadījumos:"
 
 #: ../src/pref-manager.c:2062
-#| msgid ""
-#| "The message header looks clean\n"
-#| "(the notify-to address is equal to the return path,\n"
-#| "I am in the \"To:\" or \"Cc:\" list)."
 msgid ""
 "The message header looks clean\n"
 "(the notify-to address is the return path,\n"
@@ -5721,22 +5565,18 @@ msgid "The message header looks suspicious."
 msgstr "Vēstules galvene izskatās aizdomīga."
 
 #: ../src/pref-manager.c:2116
-#| msgid "Word Wrap"
 msgid "Word wrap"
 msgstr "Vārdu aplaušana"
 
 #: ../src/pref-manager.c:2121
-#| msgid "Wrap Outgoing Text at:"
 msgid "Wrap outgoing text at"
 msgstr "Aplauzt izejošo tekstu pie"
 
 #: ../src/pref-manager.c:2149
-#| msgid "Other Options"
 msgid "Other options"
 msgstr "Citas opcijas"
 
 #: ../src/pref-manager.c:2154
-#| msgid "Reply Prefix:"
 msgid "Reply prefix:"
 msgstr "Atbildes priedēklis:"
 
@@ -5761,12 +5601,10 @@ msgid "Edit headers in external editor"
 msgstr "Rediģēt galvenes ārējā redaktorā"
 
 #: ../src/pref-manager.c:2170
-#| msgid "Don't include HTML parts as text when replying or forwarding mail"
 msgid "Include HTML parts as text when replying or forwarding"
 msgstr "Iekļaut HTML daļas kā tekstu, kad atbild vai pārsūta pastu"
 
 #: ../src/pref-manager.c:2187
-#| msgid "you"
 msgid "Layout"
 msgstr "Izkārtojums"
 
@@ -5783,12 +5621,10 @@ msgid "Colors"
 msgstr "Krāsas"
 
 #: ../src/pref-manager.c:2195 ../src/pref-manager.c:2286
-#| msgid "Normal"
 msgid "Format"
 msgstr "Formāts"
 
 #: ../src/pref-manager.c:2197
-#| msgid "Status Messages"
 msgid "Status messages"
 msgstr "Statusa vēstules"
 
@@ -5814,7 +5650,6 @@ msgstr ""
 "Prasīt man pirms izvēlēties citu pastkasti, lai parādītu neizlasītu vēstuli"
 
 #: ../src/pref-manager.c:2240
-#| msgid "PageUp/PageDown keys scroll message by:"
 msgid "PageUp/PageDown keys scroll text by"
 msgstr "PageUp/PageDown taustiņi ritina vēstules pa"
 
@@ -5823,7 +5658,6 @@ msgid "percent"
 msgstr "procentiem"
 
 #: ../src/pref-manager.c:2266
-#| msgid "Display Progress Dialog"
 msgid "Display progress dialog"
 msgstr "Parādīt procesa dialogu"
 
@@ -5836,37 +5670,30 @@ msgid "Selected headers:"
 msgstr "Izvēlētās galvenes:"
 
 #: ../src/pref-manager.c:2315
-#| msgid "Information Messages"
 msgid "Information messages"
 msgstr "Informācijas ziņojumi"
 
 #: ../src/pref-manager.c:2320
-#| msgid "Information Messages"
 msgid "Information messages:"
 msgstr "Informācijas ziņojumi:"
 
 #: ../src/pref-manager.c:2324
-#| msgid "Warning Messages"
 msgid "Warning messages:"
 msgstr "Brīdinājuma ziņojumi:"
 
 #: ../src/pref-manager.c:2328
-#| msgid "Error Messages"
 msgid "Error messages:"
 msgstr "Kļūdu ziņojumi:"
 
 #: ../src/pref-manager.c:2332
-#| msgid "Fatal Error Messages"
 msgid "Fatal error messages:"
 msgstr "Fatālu kļūdu ziņojumi:"
 
 #: ../src/pref-manager.c:2336
-#| msgid "Debug Messages"
 msgid "Debug messages:"
 msgstr "Atkļūdošanas ziņojumi:"
 
 #: ../src/pref-manager.c:2362
-#| msgid "Message Colors"
 msgid "Message colors"
 msgstr "Ziņojumu krāsas"
 
@@ -5876,7 +5703,6 @@ msgid "Quote level %d color"
 msgstr "Citēšanas līmeņa %d krāsa"
 
 #: ../src/pref-manager.c:2380
-#| msgid "Link Color"
 msgid "Link color"
 msgstr "Saites krāsa"
 
@@ -5885,7 +5711,6 @@ msgid "Hyperlink color"
 msgstr "Hipersaites krāsa"
 
 #: ../src/pref-manager.c:2393
-#| msgid "Composition Window"
 msgid "Composition window"
 msgstr "Rakstīšanas logs"
 
@@ -5898,12 +5723,10 @@ msgid "Fonts"
 msgstr "Fonti"
 
 #: ../src/pref-manager.c:2487
-#| msgid "Message Font"
 msgid "Message font:"
 msgstr "Vēstules fonts:"
 
 #: ../src/pref-manager.c:2492
-#| msgid "Subject:"
 msgid "Subject font:"
 msgstr "Temata fonts:"
 
@@ -5920,7 +5743,6 @@ msgid "Default sort column:"
 msgstr "Noklusējuma kārtošanas kolonna:"
 
 #: ../src/pref-manager.c:2554
-#| msgid "Default threading style"
 msgid "Default threading style:"
 msgstr "Noklusējuma pavedienu stils:"
 
@@ -5929,17 +5751,14 @@ msgid "Expand threads on open"
 msgstr "Izvērst pavedienus atverot"
 
 #: ../src/pref-manager.c:2634
-#| msgid "Pspell Settings"
 msgid "Pspell settings"
 msgstr "Pspell iestatījumi"
 
 #: ../src/pref-manager.c:2640
-#| msgid "Spell Check Module"
 msgid "Spell check module"
 msgstr "Pareizrakstības pārbaudes modulis"
 
 #: ../src/pref-manager.c:2646
-#| msgid "Suggestion Level"
 msgid "Suggestion level"
 msgstr "Ieteikumu līmenis"
 
@@ -5949,7 +5768,6 @@ msgid "Ignore words shorter than"
 msgstr "Ignorēt vārdus īsākus par"
 
 #: ../src/pref-manager.c:2669
-#| msgid "Miscellaneous Spelling Settings"
 msgid "Miscellaneous spelling settings"
 msgstr "Dažādi pareizrakstības iestatījumi"
 
@@ -5966,17 +5784,14 @@ msgid "Debug"
 msgstr "Atkļūdot"
 
 #: ../src/pref-manager.c:2700
-#| msgid "Empty Trash on exit"
 msgid "Empty trash on exit"
 msgstr "Iztukšot miskasti izejot"
 
 #: ../src/pref-manager.c:2707
-#| msgid "Automatically close mailbox if unused more than"
 msgid "Close mailbox if unused more than"
 msgstr "Aizvērt pastkasti, ja nav lietota ilgāk kā"
 
 #: ../src/pref-manager.c:2735
-#| msgid "Deleting Messages"
 msgid "Deleting messages"
 msgstr "Vēstuļu dzēšana"
 
@@ -6017,7 +5832,6 @@ msgid "After moving a message:"
 msgstr "Pēc vēstules pārvietošanas:"
 
 #: ../src/pref-manager.c:2826
-#| msgid "Toolbar options"
 msgid "Startup options"
 msgstr "Palaišanas opcijas"
 
@@ -6038,9 +5852,6 @@ msgid "Folder scanning"
 msgstr "Mapes skenēšana"
 
 #: ../src/pref-manager.c:2849
-#| msgid ""
-#| "Choose depth 1 for fast startup; this defers scanning some folders.\n"
-#| "To see more of the tree at startup, choose a greater depth."
 msgid ""
 "Choose depth 1 for fast startup; this defers scanning some folders.  To see "
 "more of the tree at startup, choose a greater depth."
@@ -6057,7 +5868,6 @@ msgid "Scan IMAP folders to depth"
 msgstr "Skenēt IMAP mapes dziļumā"
 
 #: ../src/pref-manager.c:2938
-#| msgid "Address Book Name"
 msgid "Address book name"
 msgstr "Adrešu grāmatas nosaukums"
 
@@ -6128,7 +5938,6 @@ msgstr "Kļūda, parādot link_id %s — %s\n"
 
 #: ../src/print-gtk.c:91 ../src/print-gtk.c:250
 #, c-format
-#| msgid "Retrieving Message %d of %d"
 msgid "Page %d of %d"
 msgstr "Lapa %d no %d"
 
@@ -6164,7 +5973,6 @@ msgstr[2] "Nevar izdrukāt lapu %d, jo dokumentā ir tikai %d lapu."
 #. * it isn't default:mm or default:inch it will not work
 #.
 #: ../src/print-gtk.c:392
-#| msgid "Default"
 msgid "default:mm"
 msgstr "default:mm"
 
@@ -6177,32 +5985,26 @@ msgid "mm"
 msgstr "mm"
 
 #: ../src/print-gtk.c:531
-#| msgid "Header font"
 msgid "_Header Font:"
 msgstr "_Galvenes fonts:"
 
 #: ../src/print-gtk.c:534
-#| msgid "Body font"
 msgid "B_ody Font:"
 msgstr "Pamatteksta f_onts"
 
 #: ../src/print-gtk.c:537
-#| msgid "Footer font"
 msgid "_Footer Font:"
 msgstr "Kājenes _fonts:"
 
 #: ../src/print-gtk.c:544
-#| msgid "Highlight cited text"
 msgid "Highlighting"
 msgstr "Izcelšana"
 
 #: ../src/print-gtk.c:559
-#| msgid "Highlight cited text"
 msgid "Highlight _cited text"
 msgstr "Izcelt _citēto tekstu"
 
 #: ../src/print-gtk.c:568
-#| msgid "Highlight cited text"
 msgid "Highlight _structured phrases"
 msgstr "Izcelt _strukturētās frāzes"
 
@@ -6211,7 +6013,6 @@ msgid "Margins"
 msgstr "Apmales"
 
 #: ../src/print-gtk.c:601
-#| msgid "_To"
 msgid "_Top"
 msgstr "_Augšā"
 
@@ -6250,9 +6051,6 @@ msgid "The option not to recognize \"format=flowed\" text has been removed."
 msgstr "Opcija, lai neatpazītu \"format=flowed\" tekstu, ir izņemta."
 
 #: ../src/save-restore.c:1017
-#| msgid ""
-#| "The option not to send \"format=flowed\" is now on the Options menu of "
-#| "the compose window."
 msgid ""
 "The option not to send \"format=flowed\" text is now on the Options menu of "
 "the compose window."
@@ -6455,21 +6253,19 @@ msgstr "_Opcijas"
 
 #: ../src/sendmsg-window.c:334
 msgid "_Include File..."
-msgstr "_Iekļaut failu..."
+msgstr "_Iekļaut datni..."
 
 #: ../src/sendmsg-window.c:335
-#| msgid "Include file"
 msgid "Include a file"
-msgstr "Iekļaut failu"
+msgstr "Iekļaut datni"
 
 #: ../src/sendmsg-window.c:336
 msgid "_Attach File..."
-msgstr "_Piesaistīt failu..."
+msgstr "_Piesaistīt datni..."
 
 #: ../src/sendmsg-window.c:337
-#| msgid "Attach file"
 msgid "Attach a file"
-msgstr "Piesaistīt failu"
+msgstr "Piesaistīt datni"
 
 #: ../src/sendmsg-window.c:338
 msgid "I_nclude Message(s)"
@@ -6484,7 +6280,6 @@ msgid "Attach _Message(s)"
 msgstr "Piesaistīt _vēstuli(-es)"
 
 #: ../src/sendmsg-window.c:341
-#| msgid "Attach _Message(s)"
 msgid "Attach selected message(s)"
 msgstr "Piesaistīt izvēlēto(-ās) vēstuli(-es)"
 
@@ -6521,7 +6316,6 @@ msgid "Cu_t"
 msgstr "Izgriez_t"
 
 #: ../src/sendmsg-window.c:357
-#| msgid "Edit the selected mailbox"
 msgid "Cut the selected text"
 msgstr "Izgriezt izvēlēto tekstu"
 
@@ -6530,7 +6324,6 @@ msgid "Copy to the clipboard"
 msgstr "Kopēt uz starpliktuvi"
 
 #: ../src/sendmsg-window.c:360
-#| msgid "_Postpone"
 msgid "_Paste"
 msgstr "_Ielīmēt"
 
@@ -6603,7 +6396,6 @@ msgid "_Postpone"
 msgstr "_Atlikt"
 
 #: ../src/sendmsg-window.c:402
-#| msgid "Save this message"
 msgid "Save this message and close"
 msgstr "Saglabāt šo vēstuli un aizvērt"
 
@@ -6616,12 +6408,10 @@ msgid "Sa_ve and Close"
 msgstr "Saglabāt un aiz_vērt"
 
 #: ../src/sendmsg-window.c:419
-#| msgid "_Toolbars..."
 msgid "Too_lbar"
 msgstr "Rīkjos_la"
 
 #: ../src/sendmsg-window.c:421
-#| msgid "F_rom:"
 msgid "F_rom"
 msgstr "N_o"
 
@@ -6630,12 +6420,10 @@ msgid "Rec_ipients"
 msgstr "Adresāt_i"
 
 #: ../src/sendmsg-window.c:426
-#| msgid "_Reply To"
 msgid "R_eply To"
 msgstr "At_bildēt uz"
 
 #: ../src/sendmsg-window.c:429
-#| msgid "F_cc:"
 msgid "F_cc"
 msgstr "F_cc"
 
@@ -6644,7 +6432,6 @@ msgid "_Request Disposition Notification"
 msgstr "Piep_rasīt saņemšanas paziņojumu"
 
 #: ../src/sendmsg-window.c:433
-#| msgid "_Request Disposition Notification"
 msgid "Request Message Disposition Notification"
 msgstr "Pieprasīt vēstules saņemšanas paziņojumu"
 
@@ -6735,11 +6522,11 @@ msgid ""
 "\n"
 "Do you really want to attach this file as reference?"
 msgstr ""
-"Sakot jā neaizsūtīs pašu “%s” failu, bet tikai MIME vēstules/ārējā "
+"Sakot jā neaizsūtīs pašu “%s” datni, bet tikai MIME vēstules/ārējā "
 "pamatteksta atsauci.  Atceries, ka saņēmējiem jābūt attiecīgajām atļaujām, "
-"lai redzētu “īsto” failu.\n"
+"lai redzētu “īsto” datni.\n"
 "\n"
-"Vai tiešām vēlaties piesaistīt šo failu kā atsauci?"
+"Vai tiešām vēlaties piesaistīt šo datni kā atsauci?"
 
 #: ../src/sendmsg-window.c:1771
 msgid "Attach as Reference?"
@@ -6757,10 +6544,10 @@ msgid ""
 "is not encoded in US-ASCII or UTF-8.\n"
 "Please choose the charset used to encode the file."
 msgstr ""
-"Fails\n"
+"Datne\n"
 "%s\n"
-"nav kodēts, izmantojot US-ASCII vai UTF-8.\n"
-"Lūdzu, izvēlieties kodējumu, ar ko kodēt šo failu."
+"nav kodēta, izmantojot US-ASCII vai UTF-8.\n"
+"Lūdzu, izvēlieties kodējumu, ar ko kodēt šo datni."
 
 #: ../src/sendmsg-window.c:1891
 msgid "Attach as MIME type:"
@@ -6769,7 +6556,7 @@ msgstr "Piesaistīt kā MIME tipu:"
 #: ../src/sendmsg-window.c:1960
 #, c-format
 msgid "Character set for file %s changed from \"%s\" to \"%s\"."
-msgstr "Rakstzīmju kopa failam %s ir mainīta no “%s” uz “%s“."
+msgstr "Rakstzīmju kopa datnei %s ir mainīta no “%s” uz “%s“."
 
 #: ../src/sendmsg-window.c:2003 ../src/sendmsg-window.c:5766
 msgid "(no subject)"
@@ -6777,12 +6564,10 @@ msgstr "(bez temata)"
 
 #: ../src/sendmsg-window.c:2041
 #, c-format
-#| msgid "Can't create filter"
 msgid "Cannot create file URI object for %s"
-msgstr "Nevar izveidot faila URI objektu priekš %s"
+msgstr "Nevar izveidot %s datnes URI objektu"
 
 #: ../src/sendmsg-window.c:2049
-#| msgid "Unknown error"
 msgid "unknown error"
 msgstr "nezināma kļūda"
 
@@ -6809,7 +6594,7 @@ msgstr "(URL)"
 
 #: ../src/sendmsg-window.c:2332
 msgid "Attach file"
-msgstr "Piesaistīt failu"
+msgstr "Piesaistīt datni"
 
 #: ../src/sendmsg-window.c:2433 ../src/sendmsg-window.c:2543
 #: ../src/sendmsg-window.c:5023
@@ -6854,14 +6639,13 @@ msgstr "Bez temata"
 
 #: ../src/sendmsg-window.c:3432
 #, c-format
-#| msgid "Invalid filter: %s"
 msgid "inlined file \"%s\" (%s)"
-msgstr "iekļauts fails “%s” (%s)"
+msgstr "iekļauta datne “%s” (%s)"
 
 #: ../src/sendmsg-window.c:3435
 #, c-format
 msgid "attached file \"%s\" (%s)"
-msgstr "piesaistīts fails “%s” (%s)"
+msgstr "piesaistīta datne “%s” (%s)"
 
 #: ../src/sendmsg-window.c:3439
 #, c-format
@@ -6870,7 +6654,6 @@ msgstr "iekļauta %s daļa"
 
 #: ../src/sendmsg-window.c:3441
 #, c-format
-#| msgid "attach as file"
 msgid "attached %s part"
 msgstr "piesaistīta %s daļa"
 
@@ -6880,7 +6663,6 @@ msgid "message from %s, subject \"%s\""
 msgstr "vēstule no %s, temats “%s”"
 
 #: ../src/sendmsg-window.c:3636
-#| msgid "Quoted"
 msgid "quoted"
 msgstr "citēts"
 
@@ -6889,7 +6671,6 @@ msgid "quoted attachment"
 msgstr "citēts pielikums"
 
 #: ../src/sendmsg-window.c:3670
-#| msgid "Select parent folder"
 msgid "Select parts for quotation"
 msgstr "Izvēlieties daļas, ko citēt"
 
@@ -6946,9 +6727,8 @@ msgstr "Vēstule saglabāta."
 #: ../src/sendmsg-window.c:5218 ../src/sendmsg-window.c:5225
 #: ../src/sendmsg-window.c:5249
 #, c-format
-#| msgid "Could not open the file %s.\n"
 msgid "Could not attach the file %s: %s."
-msgstr "Nevarēja piesaistīt failu %s — %s."
+msgstr "Nevarēja piesaistīt datni %s — %s."
 
 #: ../src/sendmsg-window.c:5204
 msgid "not an absolute path"
@@ -6981,26 +6761,25 @@ msgstr ""
 #: ../src/sendmsg-window.c:5384
 #, c-format
 msgid "Could not open the file %s.\n"
-msgstr "Nevarēja atvērt failu %s.\n"
+msgstr "Nevarēja atvērt datni %s.\n"
 
 #: ../src/sendmsg-window.c:5432
 msgid "Include file"
-msgstr "Iekļaut failu"
+msgstr "Iekļaut datni"
 
 #. Translators: please do not translate Face.
 #: ../src/sendmsg-window.c:5618
 #, c-format
 msgid "Could not load Face header file %s: %s"
-msgstr "Nevarēja ielādēt Face galvenes failu %s — %s"
+msgstr "Nevarēja ielādēt Face galvenes datni %s — %s"
 
 #. Translators: please do not translate Face.
 #: ../src/sendmsg-window.c:5621
 #, c-format
 msgid "Could not load X-Face header file %s: %s"
-msgstr "Nevarēja ielādēt X-Face galvenes failu %s — %s"
+msgstr "Nevarēja ielādēt X-Face galvenes datni %s — %s"
 
 #: ../src/sendmsg-window.c:5750
-#| msgid "Set identity to use for this message"
 msgid "You did not specify a subject for this message"
 msgstr "Jūs nenorādījāt tematu šai vēstulei"
 
@@ -7009,7 +6788,6 @@ msgid "If you would like to provide one, enter it below."
 msgstr "Ja vēlaties tomēr norādīt, lūdzu, ievadiet to tagad."
 
 #: ../src/sendmsg-window.c:5801
-#| msgid "Send"
 msgid "_Send"
 msgstr "_Sūtīt"
 
@@ -7033,7 +6811,6 @@ msgid "Send _unencrypted"
 msgstr "Sūtīt nešifrēt_u"
 
 #: ../src/sendmsg-window.c:5992
-#| msgid "Select the Identity to use for the message"
 msgid "You selected OpenPGP security for this message.\n"
 msgstr "Jūs izvēlējāties OpenPGP drošību šai vēstulei.\n"
 
@@ -7144,7 +6921,6 @@ msgid "New message to %s: %s"
 msgstr "Jauna vēstule uz %s — %s"
 
 #: ../src/spell-check.c:509
-#| msgid "Change..."
 msgid "_Change"
 msgstr "_Mainīt"
 
@@ -7153,13 +6929,10 @@ msgid "Replace the current word with the selected suggestion"
 msgstr "Aizstāt pašreizējo vārdu ar izvēlēto ieteikumu"
 
 #: ../src/spell-check.c:516
-#| msgid "Change..."
 msgid "Change _All"
 msgstr "M_ainīt visus"
 
 #: ../src/spell-check.c:518
-#| msgid ""
-#| "Replace all occurences of the current word with the selected suggestion"
 msgid ""
 "Replace all occurrences of the current word with the selected suggestion"
 msgstr "Aizvietot visas pašreizējā vārda atbilstības ar izvēlēto ieteikumu"
@@ -7181,7 +6954,6 @@ msgid "Skip all occurrences of the current word"
 msgstr "Izlaist visas pašreizējā vārda sastopamības"
 
 #: ../src/spell-check.c:542
-#| msgid "C_lear"
 msgid "_Learn"
 msgstr "_Iemācīties"
 
@@ -7190,7 +6962,6 @@ msgid "Add the current word to your personal dictionary"
 msgstr "Pievienot pašreizējo vārdu jūsu personīgajai vārdnīcai"
 
 #: ../src/spell-check.c:549
-#| msgid "Down"
 msgid "_Done"
 msgstr "_Darīts"
 
@@ -7279,7 +7050,6 @@ msgid "Separator"
 msgstr "Atdalītājs"
 
 #: ../src/toolbar-factory.c:134
-#| msgid "Quoted"
 msgid "Quit"
 msgstr "Iziet"
 
@@ -7436,12 +7206,10 @@ msgid "Redo"
 msgstr "Atatsaukt"
 
 #: ../src/toolbar-factory.c:170
-#| msgid "Exchange"
 msgid "Expunge"
 msgstr "Iztīrīt"
 
 #: ../src/toolbar-factory.c:171
-#| msgid "Empty Trash"
 msgid ""
 "Empty\n"
 "Trash"
@@ -7450,7 +7218,6 @@ msgstr ""
 "Miskasti"
 
 #: ../src/toolbar-factory.c:172
-#| msgid "_Edit"
 msgid "Edit"
 msgstr "Rediģēt"
 
@@ -7524,7 +7291,6 @@ msgstr "_Atgriezt rīkjoslu uz standarta pogām"
 
 #. Style button
 #: ../src/toolbar-prefs.c:485
-#| msgid "_Toolbars..."
 msgid "Toolbar _style..."
 msgstr "Rīkjoslas _stils..."
 

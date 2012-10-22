@@ -650,10 +650,14 @@ pop_fetch_message_s(PopHandle *pop, unsigned msgno,
   resp = pop_check_status(pop, err);
   /* do here the fetch */
   if(resp) {
+    /* whether next line will be a continuation line. */
+    gboolean continuation_line = FALSE;
     while( sio_gets(pop->sio, line, sizeof(line)) &&
-           strcmp(line, ".\r\n") ) {
+           (continuation_line || strcmp(line, ".\r\n")) ) {
       char *arg = line[0] == '.' ? line+1 : line;
       unsigned len = strlen(arg);
+      continuation_line = (len >= POP_LINE_LEN-1);
+      printf("Line '%s'\n", line);
       if(pop->filter_cr && len>=2 && arg[len-2] == '\r') 
         arg[(--len)-1] = '\n';
       if(resp) 
@@ -663,6 +667,7 @@ pop_fetch_message_s(PopHandle *pop, unsigned msgno,
           resp = FALSE;
         }
     }
+    printf("LAST Line is '%s'\n", line);
   }
   return resp;
 }
@@ -743,10 +748,13 @@ pop_complete_retr(PopHandle *pop, PopAsyncCb cb, void *arg)
     cb(rc, arg, &err);
   if(resp) { /* same code as in fetch_message() */
     char * str;
+    /* whether next line will be a continuation line. */
+    gboolean continuation_line = FALSE;
     while( (str = sio_gets(pop->sio, line, sizeof(line))) &&
-           strcmp(line, ".\r\n") ) {
+           (continuation_line || strcmp(line, ".\r\n")) ) {
       char *buf = line[0] == '.' ? line+1 : line;
       unsigned len = strlen(buf);
+      continuation_line = (len >= POP_LINE_LEN-1);
       if(pop->filter_cr && len>=2 && buf[len-2] == '\r') 
         buf[(--len)-1] = '\n';
       if(cb) 

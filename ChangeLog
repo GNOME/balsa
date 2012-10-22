@@ -1,3 +1,7 @@
+2012-10-22  Pawel Salek
+
+	* libbalsa/imap/pop3.c: fix long-line POP3 bug reported by Rob Landley.
+
 2012-09-30  Peter Bloomfield
 
 	* src/store-address.c (store_address_add_address),

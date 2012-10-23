@@ -657,7 +657,6 @@ pop_fetch_message_s(PopHandle *pop, unsigned msgno,
       char *arg = line[0] == '.' ? line+1 : line;
       unsigned len = strlen(arg);
       continuation_line = (len >= POP_LINE_LEN-1);
-      printf("Line '%s'\n", line);
       if(pop->filter_cr && len>=2 && arg[len-2] == '\r') 
         arg[(--len)-1] = '\n';
       if(resp) 
@@ -667,7 +666,6 @@ pop_fetch_message_s(PopHandle *pop, unsigned msgno,
           resp = FALSE;
         }
     }
-    printf("LAST Line is '%s'\n", line);
   }
   return resp;
 }

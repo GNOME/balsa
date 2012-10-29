@@ -1,3 +1,13 @@
+* Balsa-2.4.12 release. Release date 2012-10-29
+
+- fix long-line POP3 bug.
+- fix bugs 684124,
+
+* Balsa-2.4.11 release. Release date 2012-04-21
+
+- GPGME fixes.
+- building GPG with gmime-2.6.0
+
 * Balsa-2.4.10 release. Release date 2011-06-13
 
 - preserve identity order.

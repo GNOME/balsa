@@ -1,3 +1,7 @@
+2012-10-29
+	
+	* configure.in, NEWS: release 2.4.91
+
 2012-10-22  Pawel Salek
 
 	* libbalsa/imap/pop3.c: fix long-line POP3 bug reported by Rob Landley.

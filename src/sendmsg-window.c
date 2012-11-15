@@ -6292,12 +6292,12 @@ sw_buffer_set_undo(BalsaSendmsg * bsmsg, gboolean undo, gboolean redo)
 static void
 sw_spell_attach(BalsaSendmsg * bsmsg)
 {
-    GtkSpell *spell;
+    GtkSpellChecker *spell;
     GError *err = NULL;
 
-    spell = gtkspell_new_attach(GTK_TEXT_VIEW(bsmsg->text),
-                                bsmsg->spell_check_lang, &err);
-    if (!spell) {
+    spell = gtk_spell_checker_new();
+    gtk_spell_checker_set_language(spell, bsmsg->spell_check_lang, &err);
+    if (err) {
         /* Should not happen, since we now check the language. */
         balsa_information_parented(GTK_WINDOW(bsmsg->window),
                                    LIBBALSA_INFORMATION_WARNING,
@@ -6307,17 +6307,18 @@ sw_spell_attach(BalsaSendmsg * bsmsg)
 
         /* No spell checker, so deactivate the button. */
         sw_set_active(bsmsg, "CheckSpelling", FALSE);
-    }
+    } else
+        gtk_spell_checker_attach(spell, GTK_TEXT_VIEW(bsmsg->text));
 }
 
 static gboolean
 sw_spell_detach(BalsaSendmsg * bsmsg)
 {
-    GtkSpell *spell;
+    GtkSpellChecker *spell;
 
-    spell = gtkspell_get_from_text_view(GTK_TEXT_VIEW(bsmsg->text));
+    spell = gtk_spell_checker_get_from_text_view(GTK_TEXT_VIEW(bsmsg->text));
     if (spell)
-        gtkspell_detach(spell);
+        gtk_spell_checker_detach(spell);
 
     return spell != NULL;
 }

@@ -1,5 +1,13 @@
+2012-11-14  Peter Bloomfield
+
+	Port to newly released Gtkspell 3.0
+
+	* configure.in: renamed pkg-config file.
+	* src/sendmsg-window.c (sw_spell_attach), (sw_spell_detach): new
+	API.
+
 2012-10-29
-	
+
 	* configure.in, NEWS: release 2.4.91
 
 2012-10-22  Pawel Salek

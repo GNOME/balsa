@@ -12,7 +12,7 @@
 # Hendrik Brandt <heb@gnome-de.org>, 2004-2005.
 # Hendrik Richter <hendrikr@gnome.org>, 2005.
 # Jens Seidel <jseidel@cvs.gnome.org>, 2005.
-# Mario Blättermann <mario.blaettermann@gmail.com>, 2008-2011.
+# Mario Blättermann <mario.blaettermann@gmail.com>, 2008-2012.
 # Christian Kirbach <Christian.Kirbach@googlemail.com>, 2011.
 #
 msgid ""
@@ -20,10 +20,11 @@ msgstr ""
 "Project-Id-Version: balsa master\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=balsa&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2012-03-06 19:29+0000\n"
-"PO-Revision-Date: 2012-03-12 20:19+0100\n"
+"POT-Creation-Date: 2012-10-29 22:25+0000\n"
+"PO-Revision-Date: 2012-11-18 11:47+0100\n"
 "Last-Translator: Mario Blättermann <mario.blaettermann@gmail.com>\n"
 "Language-Team: German <gnome-de@gnome.org>\n"
+"Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -2087,8 +2088,8 @@ msgid "Configure Balsa"
 msgstr "Balsa konfigurieren"
 
 #: ../libinit_balsa/assistant_page_defclient.c:59
-msgid "Use balsa as default email client?"
-msgstr "Möchten Sie Balsa als Ihr Standard-E-Mail-Programm verwenden?"
+msgid "Use Balsa as default email client?"
+msgstr "Balsa als Standard-E-Mail-Programm verwenden?"
 
 #: ../libinit_balsa/assistant_page_defclient.c:63
 msgid "_Yes"
@@ -2120,7 +2121,7 @@ msgstr "E_ntwürfe:"
 
 #: ../libinit_balsa/assistant_page_directory.c:61
 msgid "_Trash:"
-msgstr "_Müll:"
+msgstr "_Papierkorb:"
 
 #: ../libinit_balsa/assistant_page_directory.c:95
 #, c-format
@@ -2578,7 +2579,7 @@ msgstr "Größe"
 #: ../src/balsa-index.c:1726
 #, c-format
 msgid "Move to Trash failed: %s"
-msgstr "Verschieben in den Müll ist fehlgeschlagen: %s"
+msgstr "Verschieben in den Papierkorb ist fehlgeschlagen: %s"
 
 #. Message menu items
 #: ../src/balsa-index.c:1884 ../src/main-window.c:537
@@ -2616,7 +2617,7 @@ msgstr "_Wiederherstellen"
 
 #: ../src/balsa-index.c:1921
 msgid "Move To _Trash"
-msgstr "In den _Müll verschieben"
+msgstr "In den _Papierkorb verschieben"
 
 #: ../src/balsa-index.c:1925
 msgid "T_oggle"
@@ -3052,7 +3053,7 @@ msgstr "MIME-Teil von %s speichern"
 
 #: ../src/balsa-mime-widget-callbacks.c:123
 #, c-format
-msgid "Could not construct uri from %s"
+msgid "Could not construct URI from %s"
 msgstr "URI konnte nicht aus %s erzeugt werden"
 
 #: ../src/balsa-mime-widget-callbacks.c:142
@@ -3595,7 +3596,7 @@ msgstr "Programm starten:"
 
 #: ../src/filter-edit-dialog.c:109
 msgid "Send to Trash"
-msgstr "In den Müll verschieben"
+msgstr "In den Papierkorb verschieben"
 
 #: ../src/filter-edit-dialog.c:113
 msgid "OR"
@@ -3663,7 +3664,7 @@ msgid "Revert"
 msgstr "Rückgängig"
 
 #: ../src/filter-edit-dialog.c:578
-msgid "A filter run dialog is open.Close it before you can modify filters."
+msgid "A filter run dialog is open. Close it before you can modify filters."
 msgstr ""
 "Ein Filter-Ausführen-Dialog ist geöffnet. Schließen Sie ihn, um Filter zu "
 "ändern."
@@ -3686,7 +3687,7 @@ msgstr "Filter %s konnte nicht exportiert werden: Es trat ein Fehler auf."
 msgid ""
 "There are opened filter run dialogs, close them before you can modify filters."
 msgstr ""
-"Es gibt offene Filterstart-Dialoge, schließen Sie diese bevor sie Filter "
+"Es gibt offene Filterstart-Dialoge, schließen Sie diese, bevor Sie Filter "
 "ändern können."
 
 #: ../src/filter-export-dialog.c:77
@@ -3766,8 +3767,8 @@ msgid ""
 "The filters dialog is opened, close it before you can run filters on any "
 "mailbox"
 msgstr ""
-"Der Filter-Dialog ist geöffnet. Schließen Sie ihn, um Filter auf eine "
-"beliebige Mailbox anwenden zu können"
+"Der Filter-Dialog ist geöffnet. Schließen Sie ihn, um Filter auf ein "
+"beliebiges Postfach anwenden zu können"
 
 #: ../src/folder-conf.c:110
 #, c-format
@@ -4077,7 +4078,7 @@ msgid ""
 "mailbox again.\n"
 "What would you like to do?"
 msgstr ""
-"Dies wird das Postfach %s aus der Liste der Postfächer entfernen. Sie können "
+"Dies wird das Postfach »%s« aus der Liste der Postfächer entfernen. Sie können "
 "auch die Datei(en), die auf der Platte mit diesem Postfach verknüpft ist/"
 "sind, entfernen.\n"
 "Falls Sie die Datei(en) auf der Platte nicht entfernen, können Sie das "
@@ -4118,7 +4119,7 @@ msgid ""
 "You may use \"Add Mailbox\" later to access this mailbox again.\n"
 "What would you like to do?"
 msgstr ""
-"Dies wird das Postfach %s aus der Liste der Postfächer entfernen.\n"
+"Dies wird das Postfach »%s« aus der Liste der Postfächer entfernen.\n"
 "Sie können später »Postfach hinzufügen« verwenden, um wieder darauf "
 "zuzugreifen.\n"
 "Was wollen Sie tun?"
@@ -4185,7 +4186,7 @@ msgstr "Nachrichten nach dem Herunterladen vom Server _löschen"
 
 #: ../src/mailbox-conf.c:1261
 msgid "_Enable check for new mail"
-msgstr "Dieses Postfach auf neue Mail über_prüfen"
+msgstr "Dieses Postfach auf neue Nachrichten über_prüfen"
 
 #: ../src/mailbox-conf.c:1266
 msgid "_Filter messages through procmail"
@@ -4230,7 +4231,7 @@ msgstr "Spalte »Empfänge_r« anstelle von »Absender« anzeigen"
 
 #: ../src/mailbox-conf.c:1560
 msgid "_Subscribe for new mail check"
-msgstr "_Automatisch nach neuen E-Mails sehen"
+msgstr "_Automatisch nach neuen Nachrichten sehen"
 
 #: ../src/mailbox-node.c:316
 msgid "The folder edition to be written."
@@ -4310,7 +4311,7 @@ msgstr "Als _Verschickt verwenden"
 
 #: ../src/mailbox-node.c:1120
 msgid "Mark as _Trash"
-msgstr "Als _Müll verwenden"
+msgstr "Als _Papierkorb verwenden"
 
 #: ../src/mailbox-node.c:1122
 msgid "Mark as D_raftbox"
@@ -4318,7 +4319,7 @@ msgstr "Als _Entwürfe verwenden"
 
 #: ../src/mailbox-node.c:1125
 msgid "_Empty trash"
-msgstr "Müll _leeren"
+msgstr "Papierkorb _leeren"
 
 #: ../src/mailbox-node.c:1130
 msgid "_Edit/Apply filters"
@@ -4346,7 +4347,7 @@ msgstr "Nach %s konnte nicht geschrieben werden: %s"
 
 #: ../src/main.c:462 ../src/main.c:511
 msgid "Get new mail on startup"
-msgstr "Beim Start neue Mails abholen"
+msgstr "Beim Start neue Nachrichten abholen"
 
 #: ../src/main.c:464 ../src/main.c:513
 msgid "Compose a new email to EMAIL@ADDRESS"
@@ -4374,7 +4375,7 @@ msgstr "Öffnet das voreingestellte Eingangs-Postfach beim Start"
 
 #: ../src/main.c:477 ../src/main.c:527
 msgid "Prints number unread and unsent messages"
-msgstr "Druckt die Anzahl an ungelesenen und ungesendeten Nachrichten"
+msgstr "Gibt die Anzahl an ungelesenen und ungesendeten Nachrichten aus"
 
 #: ../src/main.c:479 ../src/main.c:529
 msgid "Debug POP3 connection"
@@ -4423,7 +4424,7 @@ msgstr "Entwürfe"
 
 #: ../src/main.c:626
 msgid "Trash"
-msgstr "Müll"
+msgstr "Papierkorb"
 
 #: ../src/main.c:847
 msgid "Compressing mail folders..."
@@ -4501,15 +4502,15 @@ msgstr "Bearbeiten der aktuellen Nachricht fortsetzen"
 
 #: ../src/main-window.c:376
 msgid "_Get New Mail"
-msgstr "Neue Mails _abholen"
+msgstr "Neue Nachrichten _abholen"
 
 #: ../src/main-window.c:377
 msgid "Fetch new incoming mail"
-msgstr "Neueintreffende Mails abholen"
+msgstr "Neu eintreffende Nachrichten abholen"
 
 #: ../src/main-window.c:378
 msgid "_Send Queued Mail"
-msgstr "Wartende Mails ver_schicken"
+msgstr "Wartende Nachrichten ver_schicken"
 
 #: ../src/main-window.c:379
 msgid "Send messages from the outbox"
@@ -4682,11 +4683,11 @@ msgstr "Nächste ungelesene Nachricht"
 
 #: ../src/main-window.c:449
 msgid "Empty _Trash"
-msgstr "_Müll leeren"
+msgstr "_Papierkorb leeren"
 
 #: ../src/main-window.c:450
 msgid "Delete messages from the Trash mailbox"
-msgstr "Nachrichten aus dem Müll-Postfach löschen"
+msgstr "Nachrichten aus dem Papierkorb-Postfach löschen"
 
 #. Settings menu items
 #: ../src/main-window.c:453
@@ -4933,15 +4934,15 @@ msgstr "Nach einer Zeichenkette in dieser Nachricht suchen"
 
 #: ../src/main-window.c:602 ../src/message-window.c:308
 msgid "_Move to Trash"
-msgstr "In den _Müll verschieben"
+msgstr "In den _Papierkorb verschieben"
 
 #: ../src/main-window.c:603 ../src/main-window.c:607
 msgid "Move the current message to Trash mailbox"
-msgstr "Die ausgewählte Nachricht in das Müll-Postfach verschieben"
+msgstr "Die ausgewählte Nachricht in das Papierkorb-Postfach verschieben"
 
 #: ../src/main-window.c:606
 msgid "_Delete to Trash"
-msgstr "In den _Müll verschieben"
+msgstr "In den _Papierkorb verschieben"
 
 #: ../src/main-window.c:610 ../src/main-window.c:619
 msgid "Toggle New"
@@ -5330,7 +5331,7 @@ msgstr "Keine Duplikate gefunden"
 #: ../src/main-window.c:4837
 #, c-format
 msgid "Could not open trash: %s"
-msgstr "Müll konnte nicht geöffnet werden: %s"
+msgstr "Papierkorb konnte nicht geöffnet werden: %s"
 
 #: ../src/main-window.c:4985
 #, c-format
@@ -5384,7 +5385,7 @@ msgstr "In Nachricht _suchen"
 
 #: ../src/message-window.c:309
 msgid "Move the message to Trash mailbox"
-msgstr "Die Nachricht in das Müll-Postfach verschieben"
+msgstr "Die Nachricht in das Papierkorb-Postfach verschieben"
 
 #: ../src/message-window.c:316
 msgid "Show toolbar"
@@ -5859,7 +5860,7 @@ msgstr "Fehlerdiagnose"
 
 #: ../src/pref-manager.c:2700
 msgid "Empty trash on exit"
-msgstr "Müll beim Beenden leeren"
+msgstr "Papierkorb beim Beenden leeren"
 
 #: ../src/pref-manager.c:2707
 msgid "Close mailbox if unused more than"
@@ -7299,7 +7300,7 @@ msgid ""
 "Empty\n"
 "Trash"
 msgstr ""
-"Müll\n"
+"Papierkorb\n"
 "leeren"
 
 #: ../src/toolbar-factory.c:172

@@ -1039,12 +1039,12 @@ apply_prefs(GtkDialog * pbox)
 
     /* quoted text color */
     for (i = 0; i < MAX_QUOTED_COLOR; i++) {
-        gtk_color_button_get_rgba(GTK_COLOR_BUTTON(pui->quoted_color[i]),
+        gtk_color_chooser_get_rgba(GTK_COLOR_CHOOSER(pui->quoted_color[i]),
                                   &balsa_app.quoted_color[i]);
     }
 
     /* url color */
-    gtk_color_button_get_rgba(GTK_COLOR_BUTTON(pui->url_color),
+    gtk_color_chooser_get_rgba(GTK_COLOR_CHOOSER(pui->url_color),
                               &balsa_app.url_color);
 
     /* sorting and threading */
@@ -1278,9 +1278,9 @@ set_prefs(void)
 
     /* Colour */
     for (i = 0; i < MAX_QUOTED_COLOR; i++)
-        gtk_color_button_set_rgba(GTK_COLOR_BUTTON(pui->quoted_color[i]),
+        gtk_color_chooser_set_rgba(GTK_COLOR_CHOOSER(pui->quoted_color[i]),
                                   &balsa_app.quoted_color[i]);
-    gtk_color_button_set_rgba(GTK_COLOR_BUTTON(pui->url_color),
+    gtk_color_chooser_set_rgba(GTK_COLOR_CHOOSER(pui->url_color),
                               &balsa_app.url_color);
 
     /* Information Message */

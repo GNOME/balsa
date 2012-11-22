@@ -1897,16 +1897,26 @@ fe_apply_pressed(GtkWidget * widget, gpointer data)
     fil->action=action;
 
     if (fil->action == FILTER_COLOR) {
+#if GTK_CHECK_VERSION(3, 4, 0)
+        GdkRGBA rgba;
+#else                           /* GTK_CHECK_VERSION(3, 4, 0) */
         GdkColor color;
+#endif                          /* GTK_CHECK_VERSION(3, 4, 0) */
         GString *string = g_string_new(NULL);
         GtkToggleButton *toggle_button;
         gchar *color_string;
 
         toggle_button = (GTK_TOGGLE_BUTTON(fe_foreground_set));
         if (gtk_toggle_button_get_active(toggle_button)) {
+#if GTK_CHECK_VERSION(3, 4, 0)
+            gtk_color_chooser_get_rgba(GTK_COLOR_CHOOSER(fe_foreground),
+                                       &rgba);
+            color_string = gdk_rgba_to_string(&rgba);
+#else                           /* GTK_CHECK_VERSION(3, 4, 0) */
             gtk_color_button_get_color(GTK_COLOR_BUTTON(fe_foreground),
                                        &color);
             color_string = gdk_color_to_string(&color);
+#endif                          /* GTK_CHECK_VERSION(3, 4, 0) */
             g_string_append_printf(string, "foreground:%s", color_string);
             g_free(color_string);
             gtk_toggle_button_set_active(toggle_button, FALSE);
@@ -1914,9 +1924,15 @@ fe_apply_pressed(GtkWidget * widget, gpointer data)
 
         toggle_button = (GTK_TOGGLE_BUTTON(fe_background_set));
         if (gtk_toggle_button_get_active(toggle_button)) {
+#if GTK_CHECK_VERSION(3, 4, 0)
+            gtk_color_chooser_get_rgba(GTK_COLOR_CHOOSER(fe_background),
+                                       &rgba);
+            color_string = gdk_rgba_to_string(&rgba);
+#else                           /* GTK_CHECK_VERSION(3, 4, 0) */
             gtk_color_button_get_color(GTK_COLOR_BUTTON(fe_background),
                                        &color);
             color_string = gdk_color_to_string(&color);
+#endif                          /* GTK_CHECK_VERSION(3, 4, 0) */
             if (string->len > 0)
                 g_string_append_c(string, ';');
             g_string_append_printf(string, "background:%s", color_string);
@@ -2062,21 +2078,37 @@ fe_filters_list_selection_changed(GtkTreeSelection * selection,
     gtk_combo_box_set_active(GTK_COMBO_BOX(fe_op_codes_option_menu), pos);
     if (fil->action == FILTER_COLOR) {
         gchar **parts, **p;
+#if GTK_CHECK_VERSION(3, 4, 0)
+        GdkRGBA rgba;
+#else                           /* GTK_CHECK_VERSION(3, 4, 0) */
         GdkColor color;
+#endif                          /* GTK_CHECK_VERSION(3, 4, 0) */
 
         parts = g_strsplit(fil->action_string, ";", 2);
         for (p = parts; *p; p++) {
             if (g_str_has_prefix(*p, "foreground:")) {
+#if GTK_CHECK_VERSION(3, 4, 0)
+                gdk_rgba_parse(&rgba, (*p) + 11);
+                gtk_color_chooser_set_rgba(GTK_COLOR_CHOOSER(fe_foreground),
+                                           &rgba);
+#else                           /* GTK_CHECK_VERSION(3, 4, 0) */
                 gdk_color_parse((*p) + 11, &color);
                 gtk_color_button_set_color(GTK_COLOR_BUTTON(fe_foreground),
                                            &color);
+#endif                          /* GTK_CHECK_VERSION(3, 4, 0) */
                 gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
                                              (fe_foreground_set), TRUE);
             }
             if (g_str_has_prefix(*p, "background:")) {
+#if GTK_CHECK_VERSION(3, 4, 0)
+                gdk_rgba_parse(&rgba, (*p) + 11);
+                gtk_color_chooser_set_rgba(GTK_COLOR_CHOOSER(fe_background),
+                                           &rgba);
+#else                           /* GTK_CHECK_VERSION(3, 4, 0) */
                 gdk_color_parse((*p) + 11, &color);
                 gtk_color_button_set_color(GTK_COLOR_BUTTON(fe_background),
                                            &color);
+#endif                          /* GTK_CHECK_VERSION(3, 4, 0) */
                 gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
                                              (fe_background_set), TRUE);
             }

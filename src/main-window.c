@@ -2291,11 +2291,11 @@ bw_notebook_label_new(BalsaMailboxNode * mbnode)
     if (!gtk_css_provider_load_from_data(css_provider,
                                          "#balsa-notebook-tab-button"
                                          "{"
-                                           "-GtkWidget-focus-padding: 0;"
-                                           "-GtkWidget-focus-line-width: 0;"
-                                           "border-width: 0;"
-                                           "padding: 0;"
-                                           "margin: 0;"
+                                           "-GtkWidget-focus-padding: 0px;"
+                                           "-GtkWidget-focus-line-width: 0px;"
+                                           "border-width: 0px;"
+                                           "padding: 0px;"
+                                           "margin: 0px;"
                                          "}",
                                          -1, NULL))
         g_print("Could not load CSS data.\n");

@@ -203,8 +203,11 @@ img_check_size(GtkImage ** widget_p)
 
     g_object_set_data(G_OBJECT(widget), "check_size_sched",
                       GINT_TO_POINTER(FALSE));
-    g_return_val_if_fail(viewport && mime_body && orig_width > 0,
-                         (gdk_threads_leave(), FALSE));
+    g_warn_if_fail(viewport && mime_body && orig_width > 0);
+    if (!(viewport && mime_body && orig_width > 0)) {
+        gdk_threads_leave();
+        return FALSE;
+    }
 
     if (gtk_image_get_storage_type(widget) == GTK_IMAGE_PIXBUF)
 	curr_w = gdk_pixbuf_get_width(gtk_image_get_pixbuf(widget));

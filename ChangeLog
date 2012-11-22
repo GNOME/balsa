@@ -1,3 +1,23 @@
+2012-11-21  Peter Bloomfield
+
+	Build with gtk 3.6, at least without threads
+
+	* libbalsa/information.c: include libbalsa.h.
+	* libbalsa/libbalsa.h: when not threaded, define
+	gdk_threads_{enter,leave} to nothing.
+	* libbalsa/mailbox.c (lbm_cache_message): when not threaded,
+	avoid recursive signal call.
+	* libbalsa/misc.c: remove deprecated GtkTable code.
+	* libbalsa/misc.h: ditto.
+	* src/balsa-mime-widget-image.c (img_check_size): build with
+	gdk_threads_{enter,leave} defined to nothing.
+	* src/filter-edit-callbacks.c (fe_apply_pressed),
+	(fe_filters_list_selection_changed): deprecation cleanup.
+	* src/filter-edit-dialog.c (fe_make_color_buttons): ditto.
+	* src/main-window.c: CSS cleanup.
+	* src/pref-manager.c (apply_prefs), (set_prefs): deprecation
+	cleanup.
+
 2012-11-14  Peter Bloomfield
 
 	Port to newly released Gtkspell 3.0

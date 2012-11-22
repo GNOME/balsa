@@ -1093,19 +1093,6 @@ libbalsa_ia_rfc2821_equal(const InternetAddress * a,
 #define LB_PADDING 12           /* per HIG */
 
 GtkWidget *
-libbalsa_create_table(guint rows, guint columns)
-{
-    GtkWidget *table;
-
-    table = gtk_table_new(rows, columns, FALSE);
-
-    gtk_table_set_row_spacings(GTK_TABLE(table), LB_PADDING);
-    gtk_table_set_col_spacings(GTK_TABLE(table), LB_PADDING);
-
-    return table;
-}
-
-GtkWidget *
 libbalsa_create_grid(void)
 {
     GtkWidget *grid;
@@ -1124,19 +1111,6 @@ libbalsa_create_grid(void)
    in create_entry.
 */
 GtkWidget *
-libbalsa_create_label(const gchar * text, GtkWidget * table, gint row)
-{
-    GtkWidget *label = gtk_label_new_with_mnemonic(text);
-
-    gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.5);
-
-    gtk_table_attach(GTK_TABLE(table), label, 0, 1, row, row + 1,
-                     GTK_FILL, GTK_FILL, 0, 0);
-
-    return label;
-}
-
-GtkWidget *
 libbalsa_create_grid_label(const gchar * text, GtkWidget * grid, gint row)
 {
     GtkWidget *label;
@@ -1153,24 +1127,6 @@ libbalsa_create_grid_label(const gchar * text, GtkWidget * grid, gint row)
 /* create_check:
    creates a checkbox with a given label and places them in given array.
 */
-GtkWidget *
-libbalsa_create_check(const gchar * text, GtkWidget * table, gint row,
-                      gboolean initval)
-{
-    GtkWidget *check_button;
-
-    check_button = gtk_check_button_new_with_mnemonic(text);
-
-    gtk_table_attach(GTK_TABLE(table), check_button, 0, 2, row, row + 1,
-                     GTK_FILL, 0, 0, 0);
-
-    if (initval)
-        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button),
-                                     TRUE);
-
-    return check_button;
-}
-
 GtkWidget *
 libbalsa_create_grid_check(const gchar * text, GtkWidget * grid, gint row,
                            gboolean initval)
@@ -1189,30 +1145,6 @@ libbalsa_create_grid_check(const gchar * text, GtkWidget * grid, gint row,
 }
 
 /* Create a text entry and add it to the table */
-GtkWidget *
-libbalsa_create_entry(GtkWidget * table, GCallback changed_func,
-                      gpointer data, gint row, const gchar * initval,
-                      GtkWidget * hotlabel)
-{
-    GtkWidget *entry;
-
-    entry = gtk_entry_new();
-
-    gtk_table_attach(GTK_TABLE(table), entry, 1, 2, row, row + 1,
-                     GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0);
-
-    if (initval)
-        gtk_entry_set_text(GTK_ENTRY(entry), initval);
-
-    gtk_label_set_mnemonic_widget(GTK_LABEL(hotlabel), entry);
-
-    /* Watch for changes... */
-    if (changed_func)
-        g_signal_connect(entry, "changed", changed_func, data);
-
-    return entry;
-}
-
 GtkWidget *
 libbalsa_create_grid_entry(GtkWidget * grid, GCallback changed_func,
                            gpointer data, gint row, const gchar * initval,

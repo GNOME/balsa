@@ -163,23 +163,13 @@ int libbalsa_safe_rename (const char *src, const char *target);
 gboolean libbalsa_ia_rfc2821_equal(const InternetAddress * a,
 				   const InternetAddress * b);
 
-
-GtkWidget *libbalsa_create_table(guint rows, guint columns);
 GtkWidget *libbalsa_create_grid(void);
-GtkWidget *libbalsa_create_label(const gchar * label, GtkWidget * table,
-                                 gint row);
 GtkWidget *libbalsa_create_grid_label(const gchar * label, GtkWidget * grid,
                                       gint row);
-GtkWidget *libbalsa_create_entry(GtkWidget * table, GCallback func,
-                                 gpointer data, gint row,
-                                 const gchar * initval,
-                                 GtkWidget * hotlabel);
 GtkWidget *libbalsa_create_grid_entry(GtkWidget * grid, GCallback func,
                                       gpointer data, gint row,
                                       const gchar * initval,
                                       GtkWidget * hotlabel);
-GtkWidget *libbalsa_create_check(const gchar * label, GtkWidget * table,
-                                 gint row, gboolean initval);
 GtkWidget *libbalsa_create_grid_check(const gchar * label, GtkWidget * grid,
                                       gint row, gboolean initval);
 GtkSizeGroup *libbalsa_create_size_group(GtkWidget * chooser);

@@ -339,7 +339,11 @@ fe_make_color_buttons(void)
 {
     GtkWidget *grid_widget;
     GtkGrid *grid;
+#if GTK_CHECK_VERSION(3, 4, 0)
+    GdkRGBA rgba;
+#else                           /* GTK_CHECK_VERSION(3, 4, 0) */
     GdkColor color;
+#endif                          /* GTK_CHECK_VERSION(3, 4, 0) */
 
     grid_widget = gtk_grid_new();
     grid = GTK_GRID(grid_widget);
@@ -348,8 +352,13 @@ fe_make_color_buttons(void)
 
     fe_foreground_set = gtk_check_button_new_with_mnemonic(_("Foreground"));
     gtk_grid_attach(grid, fe_foreground_set, 0, 0, 1, 1);
+#if GTK_CHECK_VERSION(3, 4, 0)
+    gdk_rgba_parse(&rgba, "black");
+    fe_foreground = gtk_color_button_new_with_rgba(&rgba);
+#else                           /* GTK_CHECK_VERSION(3, 4, 0) */
     gdk_color_parse("black", &color);
     fe_foreground = gtk_color_button_new_with_color(&color);
+#endif                          /* GTK_CHECK_VERSION(3, 4, 0) */
     gtk_widget_set_sensitive(fe_foreground, FALSE);
     gtk_grid_attach(grid, fe_foreground, 1, 0, 1, 1);
     g_signal_connect(fe_foreground_set, "toggled",
@@ -359,8 +368,13 @@ fe_make_color_buttons(void)
 
     fe_background_set = gtk_check_button_new_with_mnemonic(_("Background"));
     gtk_grid_attach(grid, fe_background_set, 0, 1, 1, 1);
+#if GTK_CHECK_VERSION(3, 4, 0)
+    gdk_rgba_parse(&rgba, "white");
+    fe_background = gtk_color_button_new_with_rgba(&rgba);
+#else                           /* GTK_CHECK_VERSION(3, 4, 0) */
     gdk_color_parse("white", &color);
     fe_background = gtk_color_button_new_with_color(&color);
+#endif                          /* GTK_CHECK_VERSION(3, 4, 0) */
     gtk_widget_set_sensitive(fe_background, FALSE);
     gtk_grid_attach(grid, fe_background, 1, 1, 1, 1);
     g_signal_connect(fe_background_set, "toggled",

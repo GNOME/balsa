@@ -24,6 +24,7 @@
 # include "config.h"
 #endif                          /* HAVE_CONFIG_H */
 #include "information.h"
+#include "libbalsa.h"
 
 #ifdef HAVE_NOTIFY
 #include <libnotify/notify.h>

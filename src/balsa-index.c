@@ -927,7 +927,10 @@ balsa_index_scroll_on_open(BalsaIndex *index)
     data->path = path;
     data->select = (view_on_open && GPOINTER_TO_INT(view_on_open))
         || balsa_app.view_message_on_open;
-    gdk_threads_add_idle((GSourceFunc)bi_view_on_open, data);
+    if (libbalsa_am_i_subthread())
+        gdk_threads_add_idle((GSourceFunc)bi_view_on_open, data);
+    else
+        bi_view_on_open(data);
 }
 
 static LibBalsaCondition *cond_undeleted;

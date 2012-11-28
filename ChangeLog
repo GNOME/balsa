@@ -1,3 +1,8 @@
+2012-11-27  Peter Bloomfield
+
+	* src/balsa-index.c (balsa_index_scroll_on_open): use idle
+	callback only from a subthread.
+
 2012-11-21  Peter Bloomfield
 
 	Build with gtk 3.6, at least without threads

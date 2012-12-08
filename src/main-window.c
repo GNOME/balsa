@@ -3582,7 +3582,6 @@ mw_mbox_change_connection_status(GtkTreeModel * model, GtkTreePath * path,
     return FALSE;
 }
 
-#if BALSA_USE_THREADS
 static gboolean
 check_new_messages_idle(gpointer user_data)
 {
@@ -3600,7 +3599,6 @@ bw_change_connection_status_thread(void *arg)
                            mw_mbox_change_connection_status,
 			   arg);
 
-#if defined(HAVE_LIBNM_GLIB)
     /* GLib timeouts are now triggered by g_get_monotonic_time(),
      * which doesn't increment while we're suspended, so we must
      * check for ourselves whether a scheduled mail check was
@@ -3612,9 +3610,15 @@ bw_change_connection_status_thread(void *arg)
            must be called from a main thread. */
         g_idle_add(check_new_messages_idle, NULL);
     }
-#endif                          /* defined(HAVE_LIBNM_GLIB) */
 
     return NULL;
+}
+
+#ifndef BALSA_USE_THREADS
+static gboolean
+bw_change_connection_status_idle(gpointer data)
+{
+    return GPOINTER_TO_INT(bw_change_connection_status_thread(data));
 }
 #endif /* BALSA_USE_THREADS */
 
@@ -3676,11 +3680,8 @@ bw_nm_client_state_changed_cb(GObject * gobject, GParamSpec * pspec,
                            GINT_TO_POINTER(is_connected)) == 0)
             pthread_detach(thread_id);
 #else /* BALSA_USE_THREADS */
-
-        gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
-                               (GtkTreeModelForeachFunc)
-                               mw_mbox_change_connection_status,
-                               GINT_TO_POINTER(is_connected));
+        g_idle_add(bw_change_connection_status_idle,
+                   GINT_TO_POINTER(is_connected));
 #endif /* BALSA_USE_THREADS */
     }
 }

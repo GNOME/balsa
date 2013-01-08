@@ -1,3 +1,7 @@
+2013-01-08  Peter Bloomfield
+
+	* src/main-window.c: mailbox index cannot shrink.
+
 2012-12-08  Peter Bloomfield
 
 	* src/main-window.c: use idle callback to check mail when not

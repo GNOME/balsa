@@ -1314,7 +1314,7 @@ bw_set_panes(BalsaWindow * window)
         gtk_paned_pack2(GTK_PANED(window->paned_master), window->paned_slave,
                         TRUE, TRUE);
         gtk_paned_pack1(GTK_PANED(window->paned_slave),
-                        bw_frame(index_widget), TRUE, TRUE);
+                        bw_frame(index_widget), TRUE, FALSE);
 	gtk_paned_pack2(GTK_PANED(window->paned_slave),
                         bw_frame(window->preview), TRUE, TRUE);
         width_preference = BALSA_INDEX_NARROW;

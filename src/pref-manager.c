@@ -3383,9 +3383,9 @@ static GtkWidget *
 create_layout_types_menu(void)
 {
     GtkWidget *combo_box = pm_combo_box_new();
-    add_show_menu(_("Default layout"), NEXT_UNREAD, combo_box);
-    add_show_menu(_("Wide message layout"), NEXT, combo_box);
-    add_show_menu(_("Wide screen layout"), CLOSE, combo_box);
+    add_show_menu(_("Default layout"), LAYOUT_DEFAULT, combo_box);
+    add_show_menu(_("Wide message layout"), LAYOUT_WIDE_MSG, combo_box);
+    add_show_menu(_("Wide screen layout"), LAYOUT_WIDE_SCREEN, combo_box);
     return combo_box;
 }
 

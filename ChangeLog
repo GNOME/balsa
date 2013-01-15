@@ -1,3 +1,8 @@
+2013-01-15  Peter Bloomfield
+
+	* src/main-window.c: emit signal instead of calling NULL class
+	method.
+
 2013-01-08  Peter Bloomfield
 
 	* src/pref-manager.c (create_layout_types_menu): use relevant

@@ -2566,7 +2566,7 @@ balsa_identities_changed(BalsaWindow *bw)
 {
     g_return_if_fail(BALSA_IS_WINDOW(bw));
 
-    BALSA_WINDOW_GET_CLASS(bw)->identities_changed(bw);
+    g_signal_emit(bw, window_signals[IDENTITIES_CHANGED], (GQuark) 0);
 }
 
 static gboolean

@@ -1,3 +1,11 @@
+2013-02-14  Pawel Salek
+
+	* NEWS, configure.in: release balsa-2.4.14 buildable on fedora rawhide.
+	* libbalsa/imap-server.c:
+	* libbalsa/libbalsa-conf.c: replace deprecacted gthreads API.
+	* libbalsa/mime-stream-shared.c: 
+	* src/main.c: ditto.
+
 2012-10-29  Pawel Salek
 
 	* NEWS, configure.in: release balsa-2.4.13

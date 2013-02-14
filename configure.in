@@ -8,7 +8,7 @@ dnl ###########################################################################
 dnl Boilerplace and versioning
 dnl ###########################################################################
 
-AC_INIT([balsa], [2.4.13], [])
+AC_INIT([balsa], [2.4.14], [])
 AM_INIT_AUTOMAKE
 AC_LANG([C])
 # Automake-1.11 option for less verbose output
@@ -329,7 +329,6 @@ gtk+-2.0 >= 2.14.0
 gmime-$with_gmime
 gio-2.0
 gthread-2.0
-gnome-icon-theme
 $gnome_extras
 ])
 

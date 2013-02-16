@@ -148,17 +148,18 @@ lbc_init(LibBalsaConf * conf, const gchar * filename,
 
 #ifdef BALSA_USE_THREADS
 static GRecMutex lbc_mutex;
-static gsize lbc_mutex_initialized = 0;
 
 static void
 lbc_lock(void)
 {
-    if (g_once_init_enter(&lbc_mutex_initialized)) {
-        g_rec_mutex_lock(&lbc_mutex);
-        g_once_init_leave(&lbc_mutex_initialized, 42);
+    static gboolean initialized = FALSE;
+
+    g_rec_mutex_lock(&lbc_mutex);
+    if (!initialized) {
+        lbc_init(&lbc_conf, "config", ".gnome2");
+        lbc_init(&lbc_conf_priv, "config-private", ".gnome2_private");
+        initialized = TRUE;
     }
-    lbc_init(&lbc_conf, "config", ".gnome2");
-    lbc_init(&lbc_conf_priv, "config-private", ".gnome2_private");
 }
 
 static void
@@ -170,8 +171,12 @@ lbc_unlock(void)
 static void
 lbc_lock(void)
 {
-    lbc_init(&lbc_conf, "config", ".gnome2");
-    lbc_init(&lbc_conf_priv, "config-private", ".gnome2_private");
+    static gboolean initialized = FALSE;
+    if (!initialized) {
+        lbc_init(&lbc_conf, "config", ".gnome2");
+        lbc_init(&lbc_conf_priv, "config-private", ".gnome2_private");
+        initialized = TRUE;
+    }
 }
 
 #define lbc_unlock()

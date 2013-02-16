@@ -1,3 +1,8 @@
+2013-02-16  Peter Bloomfield
+
+	* libbalsa/libbalsa-conf.c (lbc_lock), (lbc_unlock): call
+	lbc_init() only once.
+
 2013-01-15  Peter Bloomfield
 
 	* src/main-window.c: emit signal instead of calling NULL class

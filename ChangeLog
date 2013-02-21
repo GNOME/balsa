@@ -1,5 +1,10 @@
 2013-02-21  Peter Bloomfield
 
+	* libbalsa/mailbox.c (libbalsa_mailbox_finalize): build without
+	threads.
+
+2013-02-21  Peter Bloomfield
+
 	* src/main-window.c: do not leave progress bar crawling.
 
 2013-02-21  Peter Bloomfield

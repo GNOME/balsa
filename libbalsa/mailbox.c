@@ -437,7 +437,7 @@ libbalsa_mailbox_index_set_flags(LibBalsaMailbox *mailbox,
    destroys mailbox. Must leave it in sane state.
 */
 
-#ifdef BALSA_USE_THREADS
+#if 0 && defined(BALSA_USE_THREADS)
 static void lbm_msgno_changed_expunged_cb(LibBalsaMailbox * mailbox,
                                           guint seqno);
 static void lbm_get_index_entry_expunged_cb(LibBalsaMailbox * mailbox,
@@ -473,7 +473,7 @@ libbalsa_mailbox_finalize(GObject * object)
     mailbox->filters = NULL;
     mailbox->filters_loaded = FALSE;
 
-#ifdef BALSA_USE_THREADS
+#if 0 && defined(BALSA_USE_THREADS)
     if (mailbox->msgnos_pending) {
         g_signal_handlers_disconnect_by_func(mailbox,
                                              lbm_get_index_entry_expunged_cb,
@@ -2902,6 +2902,7 @@ mbox_model_get_path(GtkTreeModel * tree_model, GtkTreeIter * iter)
 static GdkPixbuf *status_icons[LIBBALSA_MESSAGE_STATUS_ICONS_NUM];
 static GdkPixbuf *attach_icons[LIBBALSA_MESSAGE_ATTACH_ICONS_NUM];
 
+#if 0 && defined(BALSA_USE_THREADS)
 /* Protects access to mailbox->msgnos_pending; may be locked 
  * with or without the gdk lock, so WE MUST NOT GRAB THE GDK LOCK WHILE
  * HOLDING IT. */
@@ -2915,7 +2916,6 @@ lbm_get_index_entry_expunged_cb(LibBalsaMailbox * mailbox, guint seqno)
     pthread_mutex_unlock(&get_index_entry_lock);
 }
 
-#if 0 && defined(BALSA_USE_THREADS)
 static void
 lbm_get_index_entry_real(LibBalsaMailbox * mailbox)
 {

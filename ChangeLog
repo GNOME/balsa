@@ -1,5 +1,10 @@
 2013-02-20  Peter Bloomfield
 
+	* libbalsa/libbalsa-gpgme.c (libbalsa_gpgme_init): use g_message
+	instead of g_warning.
+
+2013-02-20  Peter Bloomfield
+
 	* configure.in: new option --enable-debug-threads.
 	* libbalsa/libbalsa.h: use it to define gdk_threads_enter() to
 	detect a sub-thread.

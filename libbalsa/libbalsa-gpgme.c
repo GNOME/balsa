@@ -148,7 +148,7 @@ libbalsa_gpgme_init(gpgme_passphrase_cb_t get_passphrase,
 	g_message("OpenPGP protocol supported");
 	has_proto_openpgp = TRUE;
     } else {
-	g_warning
+	g_message
 	    ("OpenPGP protocol not supported, basic crypto will not work!");
 	has_proto_openpgp = FALSE;
     }
@@ -159,7 +159,7 @@ libbalsa_gpgme_init(gpgme_passphrase_cb_t get_passphrase,
 	g_message("CMS (aka S/MIME) protocol supported");
 	has_proto_cms = TRUE;
     } else {
-	g_warning("CMS protocol not supported, S/MIME will not work!");
+	g_message("CMS protocol not supported, S/MIME will not work!");
 	has_proto_cms = FALSE;
     }
 #else

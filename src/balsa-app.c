@@ -720,16 +720,21 @@ balsa_find_url(const gchar * url)
 {
     BalsaFind bf;
 
-    gdk_threads_enter();
-
     bf.data = url;
     bf.mbnode = NULL;
+
     if (balsa_app.mblist_tree_store)
+        g_object_ref(balsa_app.mblist_tree_store);
+    /*
+     * Check again, in case the main thread managed to finalize
+     * balsa_app.mblist_tree_store between the check and the object-ref.
+     */
+    if (balsa_app.mblist_tree_store) {
         gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
                                (GtkTreeModelForeachFunc) find_url,
                                &bf);
-
-    gdk_threads_leave();
+        g_object_unref(balsa_app.mblist_tree_store);
+    }
 
     return bf.mbnode;
 }

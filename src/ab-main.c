@@ -1144,9 +1144,7 @@ main(int argc, char *argv[])
     if (contacts_app.first_radio_action)
         gtk_action_activate(GTK_ACTION(contacts_app.first_radio_action));
 
-    gdk_threads_enter();
     gtk_main();
-    gdk_threads_leave();
 
     /* Proper shutdown here */
     g_list_foreach(contacts_app.address_book_list, (GFunc)g_object_unref, NULL);

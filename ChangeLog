@@ -1,5 +1,9 @@
 2013-02-21  Peter Bloomfield
 
+	* src/ab-main.c (main): deprecation cleanup.
+
+2013-02-21  Peter Bloomfield
+
 	* libbalsa/mailbox.c (libbalsa_mailbox_finalize): build without
 	threads.
 

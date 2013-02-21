@@ -5427,10 +5427,29 @@ balsa_window_decrease_activity(BalsaWindow * window, const gchar * message)
  * from 0 to 1.  If the bar is already in activity mode, the function
  * returns false; if the initialization is successful it returns true.
  **/
+
+typedef struct {
+    GtkProgressBar *progress_bar;
+    gchar          *text;
+} BalsaWindowSetupProgressInfo;
+
+static gboolean
+bw_setup_progress_idle_cb(BalsaWindowSetupProgressInfo * info)
+{
+    gtk_progress_bar_set_text(info->progress_bar, info->text);
+    gtk_progress_bar_set_fraction(info->progress_bar, 0);
+
+    g_object_unref(info->progress_bar);
+    g_free(info->text);
+    g_free(info);
+
+    return FALSE;
+}
+
 gboolean
 balsa_window_setup_progress(BalsaWindow * window, const gchar * text)
 {
-    GtkProgressBar *progress_bar;
+    BalsaWindowSetupProgressInfo *info;
 
     if (text) {
         /* make sure the progress bar is currently unused */
@@ -5440,9 +5459,12 @@ balsa_window_setup_progress(BalsaWindow * window, const gchar * text)
     } else
         window->progress_type = BALSA_PROGRESS_NONE;
 
-    progress_bar = GTK_PROGRESS_BAR(window->progress_bar);
-    gtk_progress_bar_set_text(progress_bar, text);
-    gtk_progress_bar_set_fraction(progress_bar, 0);
+    /* Update the display in an idle callback, in case we were called in
+     * a sub-thread.*/
+    info = g_new(BalsaWindowSetupProgressInfo, 1);
+    info->progress_bar = g_object_ref(window->progress_bar);
+    info->text = g_strdup(text);
+    g_idle_add((GSourceFunc) bw_setup_progress_idle_cb, info);
 
     return TRUE;
 }

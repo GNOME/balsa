@@ -367,7 +367,7 @@ lbm_index_entry_populate_from_msg(LibBalsaMailboxIndexEntry * entry,
     libbalsa_mailbox_msgno_changed(msg->mailbox, msg->msgno);
 }
 
-#if 0 && defined(BALSA_USE_THREADS)
+#ifdef BALSA_USE_THREADS
 static LibBalsaMailboxIndexEntry*
 lbm_index_entry_new_pending(void)
 {
@@ -437,7 +437,7 @@ libbalsa_mailbox_index_set_flags(LibBalsaMailbox *mailbox,
    destroys mailbox. Must leave it in sane state.
 */
 
-#if 0 && defined(BALSA_USE_THREADS)
+#ifdef BALSA_USE_THREADS
 static void lbm_msgno_changed_expunged_cb(LibBalsaMailbox * mailbox,
                                           guint seqno);
 static void lbm_get_index_entry_expunged_cb(LibBalsaMailbox * mailbox,
@@ -473,7 +473,7 @@ libbalsa_mailbox_finalize(GObject * object)
     mailbox->filters = NULL;
     mailbox->filters_loaded = FALSE;
 
-#if 0 && defined(BALSA_USE_THREADS)
+#ifdef BALSA_USE_THREADS
     if (mailbox->msgnos_pending) {
         g_signal_handlers_disconnect_by_func(mailbox,
                                              lbm_get_index_entry_expunged_cb,
@@ -1203,6 +1203,26 @@ lbm_msgno_changed_expunged_cb(LibBalsaMailbox * mailbox, guint seqno)
     pthread_mutex_unlock(&msgnos_changed_lock);
 }
 
+static void
+lbm_msgno_row_changed(LibBalsaMailbox * mailbox, guint msgno,
+                      GtkTreeIter * iter)
+{
+    if (!iter->user_data)
+        iter->user_data =
+            g_node_find(mailbox->msg_tree, G_PRE_ORDER, G_TRAVERSE_ALL,
+                        GUINT_TO_POINTER(msgno));
+
+    if (iter->user_data) {
+        GtkTreePath *path;
+
+        iter->stamp = mailbox->stamp;
+        path = gtk_tree_model_get_path(GTK_TREE_MODEL(mailbox), iter);
+        g_signal_emit(mailbox, libbalsa_mbox_model_signals[ROW_CHANGED], 0,
+                      path, iter);
+        gtk_tree_path_free(path);
+    }
+}
+
 static gboolean
 lbm_msgnos_changed_idle_cb(LibBalsaMailbox * mailbox)
 {
@@ -1229,21 +1249,8 @@ lbm_msgnos_changed_idle_cb(LibBalsaMailbox * mailbox)
         g_print("%s %s msgno %d\n", __func__, mailbox->name, msgno);
 #endif
         pthread_mutex_unlock(&msgnos_changed_lock);
-        gdk_threads_enter();
-        iter.user_data =
-            g_node_find(mailbox->msg_tree, G_PRE_ORDER, G_TRAVERSE_ALL,
-                        GUINT_TO_POINTER(msgno));
-        if (iter.user_data) {
-            GtkTreePath *path;
-
-            iter.stamp = mailbox->stamp;
-            path = gtk_tree_model_get_path(GTK_TREE_MODEL(mailbox), &iter);
-            g_signal_emit(mailbox,
-                          libbalsa_mbox_model_signals[ROW_CHANGED], 0,
-                          path, &iter);
-            gtk_tree_path_free(path);
-        }
-        gdk_threads_leave();
+        iter.user_data = NULL;
+        lbm_msgno_row_changed(mailbox, msgno, &iter);
         pthread_mutex_lock(&msgnos_changed_lock);
     }
 
@@ -1263,16 +1270,8 @@ static void
 lbm_msgno_changed(LibBalsaMailbox * mailbox, guint seqno,
                   GtkTreeIter * iter)
 {
-    GtkTreePath *path;
 #ifdef BALSA_USE_THREADS
-    gboolean is_main_thread = !libbalsa_am_i_subthread();
-
-#if DEBUG
-    if (is_main_thread && !libbalsa_threads_has_lock())
-        g_warning("Main thread is not holding gdk lock");
-#endif
-
-    if (!is_main_thread) {
+    if (libbalsa_am_i_subthread()) {
         pthread_mutex_lock(&msgnos_changed_lock);
         if (!mailbox->msgnos_changed) {
             mailbox->msgnos_changed =
@@ -1294,21 +1293,7 @@ lbm_msgno_changed(LibBalsaMailbox * mailbox, guint seqno,
     if (!mailbox->msg_tree)
         return;
 
-    if (iter->user_data == NULL)
-        iter->user_data =
-            g_node_find(mailbox->msg_tree, G_PRE_ORDER, G_TRAVERSE_ALL,
-                        GUINT_TO_POINTER(seqno));
-    /* trying to modify seqno that is not in the tree?  Possible for
-     * filtered views... Perhaps there is nothing to worry about.
-     */
-    if (iter->user_data == NULL)
-	return;
-
-    iter->stamp = mailbox->stamp;
-    path = gtk_tree_model_get_path(GTK_TREE_MODEL(mailbox), iter);
-    g_signal_emit(mailbox, libbalsa_mbox_model_signals[ROW_CHANGED], 0,
-                  path, iter);
-    gtk_tree_path_free(path);
+    lbm_msgno_row_changed(mailbox, seqno, iter);
 }
 
 void
@@ -2902,10 +2887,8 @@ mbox_model_get_path(GtkTreeModel * tree_model, GtkTreeIter * iter)
 static GdkPixbuf *status_icons[LIBBALSA_MESSAGE_STATUS_ICONS_NUM];
 static GdkPixbuf *attach_icons[LIBBALSA_MESSAGE_ATTACH_ICONS_NUM];
 
-#if 0 && defined(BALSA_USE_THREADS)
-/* Protects access to mailbox->msgnos_pending; may be locked 
- * with or without the gdk lock, so WE MUST NOT GRAB THE GDK LOCK WHILE
- * HOLDING IT. */
+#ifdef BALSA_USE_THREADS
+/* Protects access to mailbox->msgnos_pending; */
 static pthread_mutex_t get_index_entry_lock = PTHREAD_MUTEX_INITIALIZER;
 
 static void
@@ -2967,7 +2950,7 @@ lbm_get_index_entry(LibBalsaMailbox * lmm, guint msgno)
         g_ptr_array_set_size(lmm->mindex, msgno);
 
     entry = g_ptr_array_index(lmm->mindex, msgno - 1);
-#if 0 && defined(BALSA_USE_THREADS)
+#ifdef BALSA_USE_THREADS
     if (entry)
         return entry->idle_pending ? NULL : entry;
 

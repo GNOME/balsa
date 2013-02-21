@@ -1,5 +1,12 @@
 2013-02-21  Peter Bloomfield
 
+	* libbalsa/mailbox.c (libbalsa_mailbox_finalize),
+	(lbm_msgno_row_changed), (lbm_msgnos_changed_idle_cb),
+	(lbm_msgno_changed), (lbm_get_index_entry): restore threaded
+	versions of get_index_entry and msgno_changed.
+
+2013-02-21  Peter Bloomfield
+
 	* src/ab-main.c (main): deprecation cleanup.
 
 2013-02-21  Peter Bloomfield

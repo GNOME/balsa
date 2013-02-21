@@ -1,5 +1,10 @@
 2013-02-20  Peter Bloomfield
 
+	* src/main-window.c: change button sensitivity in an idle
+	callback.
+
+2013-02-20  Peter Bloomfield
+
 	* src/balsa-app.c (balsa_find_iter_by_data): check for
 	sub-thread.
 

@@ -490,18 +490,16 @@ balsa_progress_set_text(LibBalsaProgress * progress, const gchar * text,
 {
     gboolean rc = FALSE;
 
-    gdk_threads_enter();
-
     if (!balsa_app.main_window) {
-        gdk_threads_leave();
         return;
     }
 
+    /* balsa_window_setup_progress is thread-safe, so we do not check
+     * for a subthread */
     if (!text || total >= LIBBALSA_PROGRESS_MIN_COUNT)
         rc = balsa_window_setup_progress(balsa_app.main_window, text);
     g_get_current_time(&prev_time_val);
     min_fraction = LIBBALSA_PROGRESS_MIN_UPDATE_STEP;
-    gdk_threads_leave();
 
     *progress = (text && rc) ?
         LIBBALSA_PROGRESS_YES : LIBBALSA_PROGRESS_NO;

@@ -1,5 +1,11 @@
 2013-02-20  Peter Bloomfield
 
+	* configure.in: new option --enable-debug-threads.
+	* libbalsa/libbalsa.h: use it to define gdk_threads_enter() to
+	detect a sub-thread.
+
+2013-02-20  Peter Bloomfield
+
 	Build with enable-threads; check POP3 mail and send messages in
 	threads.
 

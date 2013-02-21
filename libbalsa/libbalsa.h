@@ -150,7 +150,14 @@ gboolean libbalsa_threads_has_lock(void);
 #define libbalsa_am_i_subthread() FALSE
 #define libbalsa_threads_has_lock() TRUE
 #endif /* BALSA_USE_THREADS */
+#if defined(BALSA_DEBUG_THREADS)
+#define gdk_threads_enter()                       \
+    do if (libbalsa_am_i_subthread())             \
+        g_warning("%s: sub-thread!\n", __func__); \
+    while (0)
+#else
 #define gdk_threads_enter()
+#endif
 #define gdk_threads_leave()
 void libbalsa_message(const char *fmt, ...)
 #ifdef __GNUC__

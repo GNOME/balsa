@@ -685,7 +685,7 @@ lbm_local_save_tree_real(LibBalsaMailboxLocal * local)
 static gboolean
 lbm_local_save_tree_idle(LibBalsaMailboxLocal * local)
 {
-#ifdef BALSA_USE_THREADS
+#if 0 && defined(BALSA_USE_THREADS)
     pthread_t save_tree_thread;
 
     pthread_create(&save_tree_thread, NULL,
@@ -2117,7 +2117,7 @@ lbm_local_sync_real(LibBalsaMailboxLocal * local)
 static gboolean
 lbm_local_sync_idle(LibBalsaMailboxLocal * local)
 {
-#ifdef BALSA_USE_THREADS
+#if 0 && defined(BALSA_USE_THREADS)
     pthread_t sync_thread;
 
     pthread_create(&sync_thread, NULL, (void *) lbm_local_sync_real, local);

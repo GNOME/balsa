@@ -1,3 +1,23 @@
+2013-02-20  Peter Bloomfield
+
+	Build with enable-threads; check POP3 mail and send messages in
+	threads.
+
+	* libbalsa/libbalsa.c (libbalsa_lock_mailbox),
+	(libbalsa_threads_init), (libbalsa_threads_has_lock): rip out
+	gdk_threads-related code.
+	* libbalsa/libbalsa.h: ditto.
+	* src/main.c (threads_init): ditto.
+	* libbalsa/imap-server.c (connection_cleanup): not ready for
+	threads.
+	* libbalsa/mailbox.c (libbalsa_mailbox_class_init),
+	(lbm_get_index_entry), (lbm_check_idle): ditto.
+	* libbalsa/mailbox_local.c (lbm_local_save_tree_idle): ditto
+	* libbalsa/mailbox_pop3.c: use a thread.
+	* libbalsa/mailbox_pop3.h: ditto.
+	* libbalsa/send.c (lbs_process_queue), (libbalsa_process_queue):
+	* src/main-window.c: ditto.
+
 2013-02-16  Peter Bloomfield
 
 	* libbalsa/libbalsa-conf.c (lbc_lock), (lbc_unlock): call

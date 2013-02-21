@@ -138,10 +138,10 @@ static gboolean bw_idle_cb(BalsaWindow * window);
 
 
 static void bw_check_mailbox_list(BalsaWindow * window, GList * list);
-static gboolean bw_mailbox_check_func(GtkTreeModel * model,
-                                      GtkTreePath * path,
-                                      GtkTreeIter * iter,
-                                      GSList ** list);
+static gboolean bw_add_mbox_to_checklist(GtkTreeModel * model,
+                                         GtkTreePath * path,
+                                         GtkTreeIter * iter,
+                                         GSList ** list);
 static gboolean bw_imap_check_test(const gchar * path);
 
 static void bw_enable_mailbox_menus(BalsaWindow * window, BalsaIndex * index);
@@ -2410,7 +2410,7 @@ bw_real_open_mbnode(BalsaWindow *window, BalsaMailboxNode * mbnode,
     balsa_index_scroll_on_open(index);
 }
 
-#ifdef BALSA_USE_THREADS
+#if 0 && defined(BALSA_USE_THREADS)
 static pthread_mutex_t open_lock = PTHREAD_MUTEX_INITIALIZER;
 
 struct bw_open_mbnode_info {
@@ -2456,7 +2456,7 @@ balsa_window_real_open_mbnode(BalsaWindow * window,
                               BalsaMailboxNode * mbnode,
                               gboolean set_current)
 {
-#ifdef BALSA_USE_THREADS
+#if 0 && defined(BALSA_USE_THREADS)
     struct bw_open_mbnode_info *info;
     static GPtrArray *info_array;
 
@@ -2795,8 +2795,8 @@ bw_check_mailbox_list(BalsaWindow * window, GList * mailbox_list)
 
 /*Callback to check a mailbox in a balsa-mblist */
 static gboolean
-bw_mailbox_check_func(GtkTreeModel * model, GtkTreePath * path,
-		   GtkTreeIter * iter, GSList ** list)
+bw_add_mbox_to_checklist(GtkTreeModel * model, GtkTreePath * path,
+                         GtkTreeIter * iter, GSList ** list)
 {
     BalsaMailboxNode *mbnode;
     LibBalsaMailbox *mailbox;
@@ -2828,6 +2828,9 @@ bw_imap_check_test(const gchar * path)
 }
 
 #if BALSA_USE_THREADS
+static void
+bw_mailbox_check(LibBalsaMailbox * mailbox, BalsaWindow * window);
+
 static void
 bw_progress_dialog_destroy_cb(GtkWidget * widget, gpointer data)
 {
@@ -2920,12 +2923,12 @@ void
 check_new_messages_real(BalsaWindow * window, int type)
 {
     GSList *list;
-#ifdef BALSA_USE_THREADS
+#if defined(BALSA_USE_THREADS)
     struct check_messages_thread_info *info;
 #endif
 
     list = NULL;
-#ifdef BALSA_USE_THREADS
+#if defined(BALSA_USE_THREADS)
     /*  Only Run once -- If already checking mail, return.  */
     pthread_mutex_lock(&checking_mail_lock);
     if (checking_mail) {
@@ -2949,9 +2952,6 @@ check_new_messages_real(BalsaWindow * window, int type)
          (balsa_app.pwindow_option == UNTILCLOSED && progress_dialog)))
 	ensure_check_mail_dialog(window);
 
-    gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
-			   (GtkTreeModelForeachFunc) bw_mailbox_check_func,
-			   &list);
 
     /* initiate threads */
     info = g_new(struct check_messages_thread_info, 1);
@@ -2965,6 +2965,13 @@ check_new_messages_real(BalsaWindow * window, int type)
      * reclaimed as soon as the thread exits
      */
     pthread_detach(get_mail_thread);
+
+    gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
+			   (GtkTreeModelForeachFunc) bw_add_mbox_to_checklist,
+			   &list);
+    g_slist_foreach(list, (GFunc) bw_mailbox_check, window);
+    g_slist_foreach(list, (GFunc) g_object_unref, NULL);
+    g_slist_free(list);
 #else
 
     if (window)
@@ -2973,7 +2980,7 @@ check_new_messages_real(BalsaWindow * window, int type)
     bw_check_mailbox_list(window, balsa_app.inbox_input);
 
     gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
-			   (GtkTreeModelForeachFunc) bw_mailbox_check_func,
+			   (GtkTreeModelForeachFunc) bw_add_mbox_to_checklist,
 			   &list);
     g_slist_foreach(list, (GFunc) bw_mailbox_check, window);
     g_slist_foreach(list, (GFunc) g_object_unref, NULL);
@@ -3099,7 +3106,7 @@ bw_message_print_cb(GtkAction * action, gpointer data)
 }
 
 /* this one is called only in the threaded code */
-#ifdef BALSA_USE_THREADS
+#if defined(BALSA_USE_THREADS)
 static void
 bw_mailbox_check(LibBalsaMailbox * mailbox, BalsaWindow * window)
 {
@@ -3614,7 +3621,7 @@ bw_change_connection_status_thread(void *arg)
     return NULL;
 }
 
-#ifndef BALSA_USE_THREADS
+#if !(0 && defined(BALSA_USE_THREADS))
 static gboolean
 bw_change_connection_status_idle(gpointer data)
 {
@@ -3672,7 +3679,7 @@ bw_nm_client_state_changed_cb(GObject * gobject, GParamSpec * pspec,
 
     is_connected = (new_state == NM_STATE_CONNECTED);
     if (is_connected || old_state == NM_STATE_CONNECTED) {
-#if BALSA_USE_THREADS
+#if 0 && defined(BALSA_USE_THREADS)
         pthread_t thread_id;
 
         if (pthread_create(&thread_id, NULL,

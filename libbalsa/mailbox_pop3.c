@@ -51,6 +51,12 @@ enum {
 };
 static LibBalsaMailboxClass *parent_class = NULL;
 
+struct _LibBalsaMailboxPop3Class {
+    LibBalsaMailboxRemoteClass klass;
+
+    void (*config_changed) (LibBalsaMailboxPop3* mailbox);
+};
+
 static void libbalsa_mailbox_pop3_finalize(GObject * object);
 static void libbalsa_mailbox_pop3_class_init(LibBalsaMailboxPop3Class *
 					     klass);

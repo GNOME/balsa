@@ -54,12 +54,6 @@ struct _LibBalsaMailboxPop3 {
                               * they do not. */
 };
 
-struct _LibBalsaMailboxPop3Class {
-    LibBalsaMailboxRemoteClass klass;
-
-    void (*config_changed) (LibBalsaMailboxPop3* mailbox);
-};
-
 LibBalsaMailboxPop3 *libbalsa_mailbox_pop3_new(void);
 void libbalsa_mailbox_pop3_set_inbox(LibBalsaMailbox *mailbox,
                                      LibBalsaMailbox *inbox);

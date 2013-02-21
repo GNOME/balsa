@@ -702,18 +702,11 @@ libbalsa_lock_mailbox(LibBalsaMailbox * mailbox)
         /* We already have both locks, so we'll just hold on to both of
          * them. */
         ++mailbox->lock;
-#if LIBBALSA_DEBUG_THREADS
-        g_message("Avoided temporary gdk_threads_leave!!!");
-#endif                          /* LIBBALSA_DEBUG_THREADS */
         return;
     }
 
     while (thread_id == libbalsa_threads_id) {
         ++count;
-#if LIBBALSA_DEBUG_THREADS
-        g_message("Temporary gdk_threads_leave!!!");
-#endif                          /* LIBBALSA_DEBUG_THREADS */
-        gdk_threads_leave();
     }
 
     pthread_mutex_lock(&mailbox_mutex);
@@ -728,13 +721,6 @@ libbalsa_lock_mailbox(LibBalsaMailbox * mailbox)
     mailbox->thread_id = thread_id;
 
     pthread_mutex_unlock(&mailbox_mutex);
-
-    while (--count >= 0) {
-        gdk_threads_enter();
-#if LIBBALSA_DEBUG_THREADS
-        g_message("...and gdk_threads_enter!!!");
-#endif                          /* LIBBALSA_DEBUG_THREADS */
-    }
 }
 
 void
@@ -764,46 +750,11 @@ libbalsa_unlock_mailbox(LibBalsaMailbox * mailbox)
 static pthread_mutex_t libbalsa_threads_mutex;
 static guint libbalsa_threads_lock;
 
-static void
-libbalsa_threads_enter(void)
-{
-    pthread_t self;
-
-    self = pthread_self();
-
-    if (self != libbalsa_threads_id) {
-        pthread_mutex_lock(&libbalsa_threads_mutex);
-        libbalsa_threads_id = self;
-    }
-    ++libbalsa_threads_lock;
-}
-
-static void
-libbalsa_threads_leave(void)
-{
-    pthread_t self;
-
-    self = pthread_self();
-
-    if (libbalsa_threads_lock == 0 || self != libbalsa_threads_id) {
-        g_warning("%s: Not holding gdk lock!!!", __func__);
-	return;
-    }
-
-    if (--libbalsa_threads_lock == 0) {
-	if (self != main_thread_id)
-	    gdk_display_flush(gdk_display_get_default());
-        libbalsa_threads_id = 0;
-        pthread_mutex_unlock(&libbalsa_threads_mutex);
-    }
-}
 
 void
 libbalsa_threads_init(void)
 {
     pthread_mutex_init(&libbalsa_threads_mutex, NULL);
-    gdk_threads_set_lock_functions(G_CALLBACK(libbalsa_threads_enter),
-                                   G_CALLBACK(libbalsa_threads_leave));
 }
 
 void
@@ -815,8 +766,8 @@ libbalsa_threads_destroy(void)
 gboolean
 libbalsa_threads_has_lock(void)
 {
-    return libbalsa_threads_lock > 0
-        && libbalsa_threads_id == pthread_self();
+    return TRUE || (libbalsa_threads_lock > 0
+                    && libbalsa_threads_id == pthread_self());
 }
 
 #endif				/* BALSA_USE_THREADS */

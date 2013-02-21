@@ -265,7 +265,6 @@ threads_init(void)
     g_type_init();
 
     libbalsa_threads_init();
-    gdk_threads_init();
 
     pthread_mutex_init(&send_messages_lock, NULL);
     if (pipe(mail_thread_pipes) < 0) {

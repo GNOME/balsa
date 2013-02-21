@@ -149,9 +149,9 @@ gboolean libbalsa_threads_has_lock(void);
 #else
 #define libbalsa_am_i_subthread() FALSE
 #define libbalsa_threads_has_lock() TRUE
+#endif /* BALSA_USE_THREADS */
 #define gdk_threads_enter()
 #define gdk_threads_leave()
-#endif /* BALSA_USE_THREADS */
 void libbalsa_message(const char *fmt, ...)
 #ifdef __GNUC__
     __attribute__ ((format (printf, 1, 2)))

@@ -456,7 +456,7 @@ lb_imap_server_cleanup(LibBalsaImapServer * imap_server)
 
 static gboolean connection_cleanup(gpointer ptr)
 {
-#ifdef BALSA_USE_THREADS
+#if 0 && defined(BALSA_USE_THREADS)
     pthread_t cleanup_thread;
 #endif                          /*BALSA_USE_THREADS */
     LibBalsaImapServer *imap_server;
@@ -464,7 +464,7 @@ static gboolean connection_cleanup(gpointer ptr)
     g_return_val_if_fail(LIBBALSA_IS_IMAP_SERVER(ptr), FALSE);
 
     imap_server = LIBBALSA_IMAP_SERVER(ptr);
-#ifdef BALSA_USE_THREADS
+#if 0 && defined(BALSA_USE_THREADS)
     pthread_create(&cleanup_thread, NULL,
                    (void *) lb_imap_server_cleanup, imap_server);
     pthread_detach(cleanup_thread);

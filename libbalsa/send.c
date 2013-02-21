@@ -907,7 +907,7 @@ lbs_process_queue(LibBalsaMailbox * outbox, LibBalsaFccboxFinder finder,
 
     send_message_info=send_message_info_new(outbox, session, debug);
 
-#ifdef BALSA_USE_THREADS
+#if defined(BALSA_USE_THREADS)
     sending_threads++;
     pthread_create(&send_mail, NULL,
 		   (void *) &balsa_send_message_real, send_message_info);
@@ -1294,7 +1294,7 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, LibBalsaFccboxFinder finder,
 
     send_message_info=send_message_info_new(outbox, finder, debug);
     
-#ifdef BALSA_USE_THREADS
+#if 0 && defined(BALSA_USE_THREADS)
     
     pthread_create(&send_mail, NULL,
 		   (void *) &balsa_send_message_real, send_message_info);

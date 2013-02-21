@@ -64,7 +64,7 @@ static void libbalsa_mailbox_real_load_config(LibBalsaMailbox * mailbox,
                                               const gchar * group);
 static gboolean libbalsa_mailbox_real_close_backend (LibBalsaMailbox *
                                                      mailbox);
-#if BALSA_USE_THREADS
+#ifdef BALSA_USE_THREADS
 static void libbalsa_mailbox_real_lock_store(LibBalsaMailbox * mailbox,
                                              gboolean lock);
 #endif                          /* BALSA_USE_THREADS */
@@ -233,7 +233,7 @@ libbalsa_mailbox_class_init(LibBalsaMailboxClass * klass)
     klass->close_backend  = libbalsa_mailbox_real_close_backend;
     klass->total_messages = NULL;
     klass->duplicate_msgnos = NULL;
-#if BALSA_USE_THREADS
+#ifdef BALSA_USE_THREADS
     klass->lock_store  = libbalsa_mailbox_real_lock_store;
 #endif                          /* BALSA_USE_THREADS */
 }
@@ -367,7 +367,7 @@ lbm_index_entry_populate_from_msg(LibBalsaMailboxIndexEntry * entry,
     libbalsa_mailbox_msgno_changed(msg->mailbox, msg->msgno);
 }
 
-#ifdef BALSA_USE_THREADS
+#if 0 && defined(BALSA_USE_THREADS)
 static LibBalsaMailboxIndexEntry*
 lbm_index_entry_new_pending(void)
 {
@@ -2902,7 +2902,6 @@ mbox_model_get_path(GtkTreeModel * tree_model, GtkTreeIter * iter)
 static GdkPixbuf *status_icons[LIBBALSA_MESSAGE_STATUS_ICONS_NUM];
 static GdkPixbuf *attach_icons[LIBBALSA_MESSAGE_ATTACH_ICONS_NUM];
 
-#ifdef BALSA_USE_THREADS
 /* Protects access to mailbox->msgnos_pending; may be locked 
  * with or without the gdk lock, so WE MUST NOT GRAB THE GDK LOCK WHILE
  * HOLDING IT. */
@@ -2916,6 +2915,7 @@ lbm_get_index_entry_expunged_cb(LibBalsaMailbox * mailbox, guint seqno)
     pthread_mutex_unlock(&get_index_entry_lock);
 }
 
+#if 0 && defined(BALSA_USE_THREADS)
 static void
 lbm_get_index_entry_real(LibBalsaMailbox * mailbox)
 {
@@ -2967,7 +2967,7 @@ lbm_get_index_entry(LibBalsaMailbox * lmm, guint msgno)
         g_ptr_array_set_size(lmm->mindex, msgno);
 
     entry = g_ptr_array_index(lmm->mindex, msgno - 1);
-#ifdef BALSA_USE_THREADS
+#if 0 && defined(BALSA_USE_THREADS)
     if (entry)
         return entry->idle_pending ? NULL : entry;
 
@@ -4274,7 +4274,7 @@ lbm_check_real(LibBalsaMailbox * mailbox)
 static gboolean
 lbm_check_idle(LibBalsaMailbox * mailbox)
 {
-#ifdef BALSA_USE_THREADS
+#if 0 && defined(BALSA_USE_THREADS)
     pthread_t check_thread;
 
     pthread_create(&check_thread, NULL, (void *) lbm_check_real, mailbox);

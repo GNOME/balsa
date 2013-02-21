@@ -1,5 +1,10 @@
 2013-02-20  Peter Bloomfield
 
+	* libbalsa/send.c (balsa_send_message_real_idle_cb),
+	(balsa_send_message_real): close outbox in an idle callback.
+
+2013-02-20  Peter Bloomfield
+
 	* libbalsa/libbalsa-gpgme.c (libbalsa_gpgme_init): use g_message
 	instead of g_warning.
 

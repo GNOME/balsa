@@ -1391,6 +1391,16 @@ monitor_cb (const char *buf, int buflen, int writing, void *arg)
 
 /* [BCS] radically different since it uses the libESMTP interface.
  */
+
+static gboolean
+balsa_send_message_real_idle_cb(LibBalsaMailbox * outbox)
+{
+    libbalsa_mailbox_close(outbox, TRUE);
+    g_object_unref(outbox);
+
+    return FALSE;
+}
+
 static guint
 balsa_send_message_real(SendMessageInfo* info)
 {
@@ -1455,7 +1465,9 @@ balsa_send_message_real(SendMessageInfo* info)
     smtp_enumerate_messages (info->session, handle_successful_send, 
                              &session_started);
 
-    libbalsa_mailbox_close(info->outbox, TRUE);
+    /* close outbox in an idle callback, as it might affect the display */
+    g_idle_add((GSourceFunc) balsa_send_message_real_idle_cb,
+               g_object_ref(info->outbox));
     /*
      * gdk_flush();
      * gdk_threads_leave();

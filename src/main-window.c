@@ -2346,19 +2346,19 @@ bw_real_open_mbnode_idle_cb(BalsaWindowRealOpenMbnodeInfo * info)
     GtkWidget        *scroll;
     gint              page_num;
 
-    if (balsa_find_notebook_page_num(mailbox) >= 0) {
-        g_free(info);
-        return FALSE;
-    }
-
-    balsa_index_load_mailbox_node(index, mbnode);
-
     if (window) {
         balsa_window_decrease_activity(window, info->message);
         g_object_remove_weak_pointer(G_OBJECT(window),
                                      (gpointer) &info->window);
     }
     g_free(info->message);
+
+    if (balsa_find_notebook_page_num(mailbox) >= 0) {
+        g_free(info);
+        return FALSE;
+    }
+
+    balsa_index_load_mailbox_node(index, mbnode);
 
     g_signal_connect(index, "index-changed",
                      G_CALLBACK(bw_index_changed_cb), window);

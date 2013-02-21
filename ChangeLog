@@ -1,5 +1,12 @@
 2013-02-21  Peter Bloomfield
 
+	* src/balsa-index.c (balsa_index_load_mailbox_node): move
+	libbalsa_mailbox_open call to balsa_window_real_open_mbnode.
+	* src/balsa-index.h: drop unused argument.
+	* src/main-window.c: open mailbox in a thread.
+
+2013-02-21  Peter Bloomfield
+
 	* src/main.c (balsa_progress_set_text): do not check for
 	subthread, as balsa_window_setup_progress is thread-safe.
 

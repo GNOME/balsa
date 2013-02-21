@@ -1010,20 +1010,16 @@ bndx_mailbox_message_expunged_cb(LibBalsaMailbox * mailbox, guint msgno,
 }
 
 /* balsa_index_load_mailbox_node:
-   open mailbox_node, the opening is done in thread to keep UI alive.
-
-   Called NOT holding the gdk lock, so we must wrap gtk calls in
-   gdk_threads_{enter,leave}.
-*/
+ *
+ * mbnode->mailbox is already open
+ */
 
 gboolean
 balsa_index_load_mailbox_node(BalsaIndex * index,
-                              BalsaMailboxNode* mbnode, GError **err)
+                              BalsaMailboxNode* mbnode)
 {
     GtkTreeView *tree_view;
     LibBalsaMailbox *mailbox;
-    gboolean successp;
-    gint try_cnt;
 
     g_return_val_if_fail(BALSA_IS_INDEX(index), TRUE);
     g_return_val_if_fail(index->mailbox_node == NULL, TRUE);
@@ -1031,22 +1027,6 @@ balsa_index_load_mailbox_node(BalsaIndex * index,
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mbnode->mailbox), TRUE);
 
     mailbox = mbnode->mailbox;
-
-    try_cnt = 0;
-    do {
-        g_clear_error(err);
-        successp = libbalsa_mailbox_open(mailbox, err);
-        if (!balsa_app.main_window)
-            return FALSE;
-
-        if(successp) break;
-        if(*err && (*err)->code != LIBBALSA_MAILBOX_TOOMANYOPEN_ERROR)
-            break;
-        balsa_mblist_close_lru_peer_mbx(balsa_app.mblist, mailbox);
-    } while(try_cnt++<3);
-
-    if (!successp)
-	return TRUE;
 
     /*
      * set the new mailbox

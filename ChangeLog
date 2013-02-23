@@ -1,5 +1,9 @@
 2013-02-23  Peter Bloomfield
 
+	* update all copyrights to 2013.
+
+2013-02-23  Peter Bloomfield
+
 	* src/main.c (handle_remote): handle -h option.
 
 2013-02-23  Peter Bloomfield

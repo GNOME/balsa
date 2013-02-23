@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2001 Stuart Parmenter and others
+ * Copyright (C) 1997-2013 Stuart Parmenter and others
  * Written by (C) Albrecht Dreﬂ <albrecht.dress@arcor.de> 2007
  *
  * This program is free software; you can redistribute it and/or modify

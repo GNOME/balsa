@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2011 Stuart Parmenter and others,
+ * Copyright (C) 1997-2013 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -2757,7 +2757,7 @@ bw_show_about_box(GtkAction * action, gpointer user_data)
     gtk_show_about_dialog(GTK_WINDOW(user_data),
                           "version", BALSA_VERSION,
                           "copyright",
-                          "Copyright \xc2\xa9 1997-2010 The Balsa Developers",
+                          "Copyright \xc2\xa9 1997-2013 The Balsa Developers",
                           "comments",
                           _("The Balsa email client is part of "
                             "the GNOME desktop environment."),

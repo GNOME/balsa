@@ -1,7 +1,7 @@
 #ifndef __MBOX_HANDLE_H__
 #define __MBOX_HANDLE_H__
 /* libimap library.
- * Copyright (C) 2003-2004 Pawel Salek.
+ * Copyright (C) 2003-2013 Pawel Salek.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

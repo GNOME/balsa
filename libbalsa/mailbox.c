@@ -1286,12 +1286,16 @@ lbm_msgno_changed(LibBalsaMailbox * mailbox, guint seqno,
 
         g_array_append_val(mailbox->msgnos_changed, seqno);
         pthread_mutex_unlock(&msgnos_changed_lock);
+
+        /* Not calling lbm_msgno_row_changed, so we must make sure
+         * iter->user_data is set: */
+        if (!iter->user_data)
+            iter->user_data =
+                g_node_find(mailbox->msg_tree, G_PRE_ORDER, G_TRAVERSE_ALL,
+                            GUINT_TO_POINTER(seqno));
         return;
     }
 #endif
-
-    if (!mailbox->msg_tree)
-        return;
 
     lbm_msgno_row_changed(mailbox, seqno, iter);
 }
@@ -1300,13 +1304,8 @@ void
 libbalsa_mailbox_msgno_changed(LibBalsaMailbox * mailbox, guint seqno)
 {
     GtkTreeIter iter;
-    gboolean is_main_thread = !libbalsa_am_i_subthread();
 
-    if (is_main_thread)
-        gdk_threads_enter();
     if (!mailbox->msg_tree) {
-        if (is_main_thread)
-            gdk_threads_leave();
         return;
     }
 
@@ -1321,9 +1320,6 @@ libbalsa_mailbox_msgno_changed(LibBalsaMailbox * mailbox, guint seqno)
         if (parent && (seqno = GPOINTER_TO_UINT(parent->data)) > 0)
             lbm_msgno_changed(mailbox, seqno, &iter);
     }
-
-    if (is_main_thread)
-        gdk_threads_leave();
 }
 
 void

@@ -1,5 +1,11 @@
 2013-02-23  Peter Bloomfield
 
+	* libbalsa/mailbox.c (lbm_msgno_changed),
+	(libbalsa_mailbox_msgno_changed): make sure parent message is
+	checked.
+
+2013-02-23  Peter Bloomfield
+
 	* libbalsa/mailbox.c (lbm_msgno_filt_check),
 	(libbalsa_mailbox_msgno_filt_check): use an idle callback to
 	check whether to filter a message in or out.

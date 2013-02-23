@@ -735,6 +735,7 @@ handle_remote(int argc, char **argv,
         {"help", '?', 0, G_OPTION_ARG_NONE, &help, NULL, NULL},
         {NULL}
     };
+    gboolean rc;
     GError *error;
     gint status = 0;
 
@@ -754,7 +755,18 @@ handle_remote(int argc, char **argv,
     cmd_open_unread_mailbox = FALSE;
     cmd_open_inbox = FALSE;
 
-    if (!g_option_context_parse(context, &argc, &argv, &error)) {
+    rc = g_option_context_parse(context, &argc, &argv, &error);
+    /* We offer --help and -? as help options;
+     * GOptionContext promises --help and -h, but -h causes an error.
+     * If we got an error, we check to see if it was caused by -h,
+     * and if so, honor it: */
+    if (!rc && strcmp(*++argv, "-h") == 0) {
+        rc = help = TRUE;
+        g_error_free(error);
+    }
+
+    if (!rc) {
+        /* Some other bad option */
         g_application_command_line_printerr(command_line, "%s\n",
                                             error->message);
         g_error_free(error);

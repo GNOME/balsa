@@ -840,8 +840,8 @@ AC_MSG_CHECKING([whether to configure for libsecret])
 if test x$with_libsecret != xno; then
     AC_MSG_RESULT([yes])
     PKG_CHECK_MODULES(LIBSECRET, [ libsecret-1 ], [],
-                      [You asked to link to libsecret, but the
-                       development tool is not installed])
+                      AC_MSG_ERROR([[You asked to link to libsecret, but
+                                    the development tool is not installed]]))
     AC_DEFINE(HAVE_LIBSECRET,1,[Defined when libsecret can be used.])
     BALSA_CFLAGS="$BALSA_CFLAGS $LIBSECRET_CFLAGS"
     BALSA_LIBS="$BALSA_LIBS $LIBSECRET_LIBS"

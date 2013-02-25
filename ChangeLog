@@ -1,3 +1,8 @@
+2013-02-25  Peter Bloomfield
+
+	* configure.in: actually error out if libsecret devel is not
+	installed.
+
 2013-02-24  Peter Bloomfield
 
 	Port from GnomeKeyring to libsecret.

@@ -1587,6 +1587,13 @@ lbm_msgno_filt_check(LibBalsaMailboxMsgnoFiltCheckInfo * info)
     gboolean match;
     GNode *node;
 
+    if (!MAILBOX_OPEN(mailbox)) {
+        g_object_unref(mailbox);
+        libbalsa_mailbox_search_iter_unref(search_iter);
+        g_free(info);
+        return FALSE;
+    }
+
     match = search_iter ?
         libbalsa_mailbox_message_match(mailbox, seqno, search_iter) : TRUE;
     node = g_node_find(mailbox->msg_tree, G_PRE_ORDER, G_TRAVERSE_ALL,

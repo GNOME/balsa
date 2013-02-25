@@ -192,6 +192,11 @@ AC_ARG_WITH(gmime,
                   [Version of GMime 2.4, or 2.6 (default=detect)]),
                   [with_gmime=$withval],[with_gmime=detect])
 
+AC_ARG_WITH(libsecret,
+   AC_HELP_STRING([--with-libsecret],
+                  [Link to libsecret instead of gnome-keyring (default=no)]),
+                  [with_libsecret=$withval],[with_libsecret=no])
+
 AC_ARG_ENABLE(more-warnings,
    AC_HELP_STRING([--enable-more-warnings],
                   [Enable maximum compiler warnings (default=yes)]),
@@ -289,21 +294,23 @@ dnl #####################################################################
 
 if test x$with_gnome != xno; then
    gnome_extras="$gnome_extras gio-unix-2.0"
-   AC_MSG_CHECKING([whether we have gnome-keyring])
-   if $PKG_CONFIG --atleast-version=1.0 gnome-keyring-1; then
-      gnome_extras="$gnome_extras gnome-keyring-1"
-      AC_DEFINE(HAVE_GNOME_KEYRING,1,[Defined when gnome-keyring is there.])
-      # Work around http://bugzilla.gnome.org/show_bug.cgi?id=556530
-      if $PKG_CONFIG --atleast-version=2.24.1 gnome-keyring-1; then
-         AC_DEFINE(HAVE_GNOME_KEYRING_24,1,
-                   [Defined with gnome-keyring-2.24 or newer.])
-      fi
-      with_gnome_keyring=yes
-   else
-      with_gnome_keyring=no
+   if test x$with_libsecret == xno; then
+     AC_MSG_CHECKING([whether we have gnome-keyring])
+     if $PKG_CONFIG --atleast-version=1.0 gnome-keyring-1; then
+        gnome_extras="$gnome_extras gnome-keyring-1"
+        AC_DEFINE(HAVE_GNOME_KEYRING,1,[Defined when gnome-keyring is there.])
+        # Work around http://bugzilla.gnome.org/show_bug.cgi?id=556530
+        if $PKG_CONFIG --atleast-version=2.24.1 gnome-keyring-1; then
+           AC_DEFINE(HAVE_GNOME_KEYRING_24,1,
+                     [Defined with gnome-keyring-2.24 or newer.])
+        fi
+        with_gnome_keyring=yes
+     else
+        with_gnome_keyring=no
+     fi
+     AC_MSG_RESULT($with_gnome_keyring)
+     AC_DEFINE(HAVE_GNOME,1,[Defined when gnome libs are available.])
    fi
-   AC_MSG_RESULT($with_gnome_keyring)
-   AC_DEFINE(HAVE_GNOME,1,[Defined when gnome libs are available.])
 else
    gnome_extras=""
 fi
@@ -827,6 +834,21 @@ else
     AC_MSG_RESULT([no])
 fi
 
+# Libsecret configuration
+#
+AC_MSG_CHECKING([whether to configure for libsecret])
+if test x$with_libsecret != xno; then
+    AC_MSG_RESULT([yes])
+    PKG_CHECK_MODULES(LIBSECRET, [ libsecret-1 ], [],
+                      [You asked to link to libsecret, but the
+                       development tool is not installed])
+    AC_DEFINE(HAVE_LIBSECRET,1,[Defined when libsecret can be used.])
+    BALSA_CFLAGS="$BALSA_CFLAGS $LIBSECRET_CFLAGS"
+    BALSA_LIBS="$BALSA_LIBS $LIBSECRET_LIBS"
+else
+    AC_MSG_RESULT([no])
+fi
+
 dnl #####################################################################
 dnl 5. Headers.
 dnl #####################################################################
@@ -1027,6 +1049,7 @@ echo "              Use Compface: $with_compface"
 echo "  Install extra MIME icons: $install_mimeicons"
 echo "    Configure for Touch UI: $enable_touch_ui"
 echo "             GMime version: $with_gmime"
+echo "             Use libsecret: $with_libsecret"
 dnl echo "                  Use SASL: $need_sasl"
 echo ""
 

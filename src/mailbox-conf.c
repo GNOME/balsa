@@ -1314,13 +1314,16 @@ create_imap_mailbox_dialog(MailboxConfWindow *mcw)
     GtkWidget *entry;
     gint row = -1;
 
-#if defined(HAVE_GNOME_KEYRING)
+#if defined(HAVE_LIBSECRET)
+    static const gchar *remember_password_message =
+        N_("_Remember password in Secret Service");
+#elif defined (HAVE_GNOME_KEYRING)
     static const gchar *remember_password_message =
         N_("_Remember password in keyring");
 #else
     static const gchar *remember_password_message =
         N_("_Remember password");
-#endif
+#endif                          /* defined(HAVE_LIBSECRET) */
 
     notebook = gtk_notebook_new();
     grid = libbalsa_create_grid();

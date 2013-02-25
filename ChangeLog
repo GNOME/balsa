@@ -1,3 +1,19 @@
+2013-02-24  Peter Bloomfield
+
+	Port from GnomeKeyring to libsecret.
+
+	* configure.in: implement --with-libsecret as an alternative to
+	GnomeSecret.
+	* libbalsa/imap-server.c (libbalsa_imap_server_new_from_config):
+	use libsecret if configured.
+	* libbalsa/server.c (libbalsa_server_load_config),
+	(libbalsa_server_save_config): ditto.
+	* libbalsa/server.h: ditto.
+	* src/balsa-app.c (ask_password_real): new string to request
+	saving in secret service.
+	* src/folder-conf.c (folder_conf_imap_node): ditto.
+	* src/mailbox-conf.c (create_imap_mailbox_dialog): ditto.
+
 2013-02-23  Peter Bloomfield
 
 	* update all copyrights to 2013.

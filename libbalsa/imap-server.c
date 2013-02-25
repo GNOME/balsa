@@ -33,9 +33,11 @@
 #include <stdlib.h>
 #include <pthread.h>
 
-#if defined(HAVE_GNOME_KEYRING)
+#if defined(HAVE_LIBSECRET)
+#include <libsecret/secret.h>
+#elif defined(HAVE_GNOME_KEYRING)
 #include <gnome-keyring.h>
-#endif
+#endif                          /* defined(HAVE_LIBSECRET) */
 
 #include "libbalsa.h"
 #include "libbalsa-conf.h"
@@ -569,7 +571,47 @@ libbalsa_imap_server_new_from_config(void)
     if (!server->passwd) {
         server->remember_passwd = libbalsa_conf_get_bool("RememberPasswd=false");
         if(server->remember_passwd) {
-#if defined (HAVE_GNOME_KEYRING)
+#if defined(HAVE_LIBSECRET)
+            GError *err = NULL;
+
+            server->passwd =
+                secret_password_lookup_sync(LIBBALSA_SERVER_SECRET_SCHEMA,
+                                            NULL, &err,
+                                            "protocol", server->protocol,
+                                            "server",   server->host,
+                                            "user",     server->user,
+                                            NULL);
+            if (err) {
+                libbalsa_free_password(server->passwd);
+                server->passwd = NULL;
+                printf(_("Error looking up password for %s@%s: %s\n"),
+                       server->user, server->host, err->message);
+                printf(_("Falling back\n"));
+                g_clear_error(&err);
+                server->passwd =
+                    libbalsa_conf_private_get_string("Password");
+                if (server->passwd != NULL) {
+                    gchar *buff = libbalsa_rot(server->passwd);
+                    libbalsa_free_password(server->passwd);
+                    server->passwd = buff;
+                    secret_password_store_sync
+                        (LIBBALSA_SERVER_SECRET_SCHEMA, NULL,
+                         _("Balsa passwords"), server->passwd, NULL, &err,
+                         "protocol", server->protocol,
+                         "server",   server->host,
+                         "user",     server->user,
+                         NULL);
+                    /* We could in principle clear the password in the
+                     * config file here but we do not for the backward
+                     * compatibility. */
+                    if (err) {
+                        printf(_("Error storing password for %s@%s: %s\n"),
+                               server->user, server->host, err->message);
+                        g_error_free(err);
+                    }
+                }
+            }
+#elif defined (HAVE_GNOME_KEYRING)
 	    GnomeKeyringResult r;
 	    server->passwd = NULL;
 	    r = gnome_keyring_find_password_sync(LIBBALSA_SERVER_KEYRING_SCHEMA,
@@ -607,7 +649,7 @@ libbalsa_imap_server_new_from_config(void)
 		libbalsa_free_password(server->passwd);
 		server->passwd = buff;
 	    }
-#endif
+#endif                          /* defined(HAVE_LIBSECRET) */
 	}
         if(server->passwd && server->passwd[0] == '\0') {
             libbalsa_free_password(server->passwd);

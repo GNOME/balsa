@@ -30,7 +30,11 @@
 #include "imap/libimap.h"
 #include "libbalsa.h"
 
-#if defined (HAVE_GNOME_KEYRING)
+#if defined(HAVE_LIBSECRET)
+#include <libsecret/secret.h>
+extern const SecretSchema *LIBBALSA_SERVER_SECRET_SCHEMA;
+#define libbalsa_free_password secret_password_free
+#elif defined (HAVE_GNOME_KEYRING)
 #include <gnome-keyring.h>
 
 #if defined(HAVE_GNOME_KEYRING_24)
@@ -42,7 +46,7 @@ extern const GnomeKeyringPasswordSchema* LIBBALSA_SERVER_KEYRING_SCHEMA;
 #define libbalsa_free_password gnome_keyring_free_password
 #else
 #define libbalsa_free_password g_free
-#endif /* HAVE_GNOME_KEYRING */
+#endif                          /* defined(HAVE_LIBSECRET) */
 
 #define LIBBALSA_TYPE_SERVER \
     (libbalsa_server_get_type())

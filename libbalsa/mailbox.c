@@ -1677,16 +1677,14 @@ libbalsa_mailbox_search_iter_view(LibBalsaMailbox * mailbox)
 LibBalsaMailboxSearchIter *
 libbalsa_mailbox_search_iter_ref(LibBalsaMailboxSearchIter * search_iter)
 {
-    g_return_val_if_fail(search_iter != NULL, NULL);
-    g_return_val_if_fail(search_iter->ref_count > 0, NULL);
-
-    ++search_iter->ref_count;
+    if (search_iter)
+        ++search_iter->ref_count;
 
     return search_iter;
 }
 
 /* Decrement reference count of a LibBalsaMailboxSearchIter, if it is
- * non-NULL and validi, and free it if it goes to zero */
+ * non-NULL and valid, and free it if it goes to zero */
 void
 libbalsa_mailbox_search_iter_unref(LibBalsaMailboxSearchIter * search_iter)
 {

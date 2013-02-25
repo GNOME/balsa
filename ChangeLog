@@ -1,5 +1,10 @@
 2013-02-25  Peter Bloomfield
 
+	* libbalsa/mailbox.c (libbalsa_mailbox_search_iter_ref): allow
+	NULL iter.
+
+2013-02-25  Peter Bloomfield
+
 	* configure.in: actually error out if libsecret devel is not
 	installed.
 

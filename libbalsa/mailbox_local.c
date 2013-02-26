@@ -672,14 +672,16 @@ lbm_local_restore_tree(LibBalsaMailboxLocal * local, guint * total)
 static void
 lbm_local_save_tree_real(LibBalsaMailboxLocal * local)
 {
-    libbalsa_lock_mailbox(LIBBALSA_MAILBOX(local));
+    LibBalsaMailbox *mailbox = LIBBALSA_MAILBOX(local);
 
-    if (MAILBOX_OPEN(LIBBALSA_MAILBOX(local)))
+    libbalsa_lock_mailbox(mailbox);
+
+    if (MAILBOX_OPEN(mailbox) && mailbox->msg_tree_changed)
         lbm_local_save_tree(local);
     local->save_tree_id = 0;
     g_object_unref(local);
 
-    libbalsa_unlock_mailbox(LIBBALSA_MAILBOX(local));
+    libbalsa_unlock_mailbox(mailbox);
 }
 
 static gboolean
@@ -701,12 +703,10 @@ lbm_local_save_tree_idle(LibBalsaMailboxLocal * local)
 static void
 lbm_local_queue_save_tree(LibBalsaMailboxLocal * local)
 {
-    if (LIBBALSA_MAILBOX(local)->msg_tree_changed
-        && !local->save_tree_id) {
-        g_object_ref(local);
+    if (!local->save_tree_id)
         local->save_tree_id =
-            g_idle_add((GSourceFunc) lbm_local_save_tree_idle, local);
-    }
+            g_idle_add((GSourceFunc) lbm_local_save_tree_idle,
+                       g_object_ref(local));
 }
 
 /* 

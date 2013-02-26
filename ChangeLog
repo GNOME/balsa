@@ -1,5 +1,11 @@
 2013-02-26  Peter Bloomfield
 
+	* libbalsa/mailbox_local.c (lbm_local_save_tree_real),
+	(lbm_local_queue_save_tree): check that the message tree has
+	changed in the idle handler, instead of in the scheduler.
+
+2013-02-26  Peter Bloomfield
+
 	* src/balsa-app.c (append_url_if_open): in_sync is gboolean.
 
 2013-02-26  Peter Bloomfield

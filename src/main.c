@@ -406,8 +406,7 @@ scan_mailboxes_idle_cb()
 
     balsa_check_open_mailboxes();
 
-    if (balsa_app.remember_open_mboxes)
-	g_idle_add((GSourceFunc) open_mailboxes_idle_cb, NULL);
+    g_idle_add((GSourceFunc) open_mailboxes_idle_cb, NULL);
 
     if (cmd_open_inbox || balsa_app.open_inbox_upon_startup)
 	g_idle_add((GSourceFunc) initial_open_inbox, NULL);

@@ -1,3 +1,11 @@
+2013-02-26  Peter Bloomfield
+
+	* src/balsa-app.c (append_url_if_open),
+	(open_mailboxes_idle_cb): if we are not remembering open
+	mailboxes, forget them.
+	* src/main.c (scan_mailboxes_idle_cb): always call
+	open_mailboxes_idle_cb so we can forget them.
+
 2013-02-25  Peter Bloomfield
 
 	* src/sendmsg-window.c (balsa_sendmsg_destroy_handler),

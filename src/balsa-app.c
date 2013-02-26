@@ -498,8 +498,13 @@ static void
 append_url_if_open(const gchar * url, LibBalsaMailboxView * view,
                    GPtrArray * array)
 {
-    if (view->open)
-        g_ptr_array_add(array, g_strdup(url));
+    if (balsa_app.remember_open_mboxes) {
+        if (view->open)
+            g_ptr_array_add(array, g_strdup(url));
+    } else {
+        view->open = FALSE;
+        view->in_sync = 0;
+    }
 }
 
 static void
@@ -560,15 +565,13 @@ open_mailboxes_idle_cb(gchar ** urls)
         g_ptr_array_add(array, NULL);
         urls = (gchar **) g_ptr_array_free(array, FALSE);
 
-        if (urls) {
-            if (*urls) {
-                open_mailbox_by_url(balsa_app.current_mailbox_url, TRUE);
+        if (*urls) {
+            open_mailbox_by_url(balsa_app.current_mailbox_url, TRUE);
 
-                for (tmp = urls; *tmp; ++tmp) {
-                    if (!balsa_app.current_mailbox_url
-                        || strcmp(*tmp, balsa_app.current_mailbox_url)) {
-                        open_mailbox_by_url(*tmp, TRUE);
-                    }
+            for (tmp = urls; *tmp; ++tmp) {
+                if (!balsa_app.current_mailbox_url
+                    || strcmp(*tmp, balsa_app.current_mailbox_url)) {
+                    open_mailbox_by_url(*tmp, TRUE);
                 }
             }
         }

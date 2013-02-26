@@ -1027,10 +1027,6 @@ balsa_sendmsg_destroy_handler(BalsaSendmsg * bsmsg)
     if (bsmsg->spell_checker)
         gtk_widget_destroy(bsmsg->spell_checker);
 #endif                          /* HAVE_GTKSPELL */
-    if (bsmsg->wrap_timeout_id) {
-        g_source_remove(bsmsg->wrap_timeout_id);
-        bsmsg->wrap_timeout_id = 0;
-    }
     if (bsmsg->autosave_timeout_id) {
         g_source_remove(bsmsg->autosave_timeout_id);
         bsmsg->autosave_timeout_id = 0;
@@ -4119,57 +4115,6 @@ bsmsg_set_subject_from_body(BalsaSendmsg * bsmsg,
     g_free(subject);
 }
 
-#if HAVE_GTKSOURCEVIEW
-#define BALSA_FIRST_WRAP "balsa-first-wrap"
-#endif                          /* HAVE_GTKSOURCEVIEW */
-
-static gboolean
-sw_wrap_timeout_cb(BalsaSendmsg * bsmsg)
-{
-    GtkTextView *text_view;
-    GtkTextBuffer *buffer;
-#if HAVE_GTKSOURCEVIEW
-    GtkSourceBuffer *source_buffer;
-    gboolean first_wrap;
-#endif                          /* HAVE_GTKSOURCEVIEW */
-    GtkTextIter now;
-
-    gdk_threads_enter();
-
-    text_view = GTK_TEXT_VIEW(bsmsg->text);
-    buffer = gtk_text_view_get_buffer(text_view);
-    gtk_text_buffer_get_iter_at_mark(buffer, &now,
-                                     gtk_text_buffer_get_insert(buffer));
-
-    bsmsg->wrap_timeout_id = 0;
-    sw_buffer_signals_block(bsmsg, buffer);
-
-#if HAVE_GTKSOURCEVIEW
-    first_wrap = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(buffer),
-                                                   BALSA_FIRST_WRAP));
-    source_buffer = GTK_SOURCE_BUFFER(buffer);
-    if (first_wrap)
-        gtk_source_buffer_begin_not_undoable_action(source_buffer);
-#endif                          /* HAVE_GTKSOURCEVIEW */
-    libbalsa_unwrap_buffer(buffer, &now, 1);
-    libbalsa_wrap_view(text_view, balsa_app.wraplength);
-#if HAVE_GTKSOURCEVIEW
-    if (first_wrap) {
-        gtk_source_buffer_end_not_undoable_action(source_buffer);
-        g_object_set_data(G_OBJECT(buffer), BALSA_FIRST_WRAP,
-                          GINT_TO_POINTER(FALSE));
-    }
-#endif                          /* HAVE_GTKSOURCEVIEW */
-    sw_buffer_signals_unblock(bsmsg, buffer);
-    gtk_text_view_scroll_to_mark(text_view,
-                                 gtk_text_buffer_get_insert(buffer),
-                                 0, FALSE, 0, 0);
-
-    gdk_threads_leave();
-
-    return FALSE;
-}
-
 static gboolean
 sw_save_draft(BalsaSendmsg * bsmsg)
 {
@@ -4596,7 +4541,6 @@ sendmsg_window_new()
 #ifdef HAVE_GPGME
     bsmsg->gpg_mode = LIBBALSA_PROTECT_RFC3156;
 #endif
-    bsmsg->wrap_timeout_id = 0;
     bsmsg->autosave_timeout_id = /* autosave every 5 minutes */
         g_timeout_add_seconds(60*5, (GSourceFunc)sw_autosave_timeout_cb, bsmsg);
 
@@ -4684,8 +4628,6 @@ sendmsg_window_new()
 #if HAVE_GTKSOURCEVIEW
     source_buffer = GTK_SOURCE_BUFFER(gtk_text_view_get_buffer
                                       (GTK_TEXT_VIEW(bsmsg->text)));
-    g_object_set_data(G_OBJECT(source_buffer), BALSA_FIRST_WRAP,
-                      GINT_TO_POINTER(TRUE));
     gtk_source_buffer_begin_not_undoable_action(source_buffer);
     gtk_source_buffer_end_not_undoable_action(source_buffer);
     sw_set_sensitive(bsmsg, "Undo", FALSE);
@@ -5553,9 +5495,8 @@ bsmsg2message(BalsaSendmsg * bsmsg)
     gchar *tmp;
     GtkTextIter start, end;
     LibBalsaIdentity *ident = bsmsg->ident;
-#if HAVE_GTKSOURCEVIEW
     GtkTextBuffer *buffer;
-#endif                          /* HAVE_GTKSOURCEVIEW */
+    GtkTextBuffer *new_buffer = NULL;
 
     message = libbalsa_message_new();
 
@@ -5605,22 +5546,31 @@ bsmsg2message(BalsaSendmsg * bsmsg)
 
     body = libbalsa_message_body_new(message);
 
-    /* Get the text from the buffer. First make sure it's wrapped. */
-    /* Note: if bmsmg->flow, sw_wrap_body just uses
-     * libbalsa_unwrap_buffer to unwrap each paragraph, removing
-     * spaces before any hard newline, and does not really wrap the
-     * buffer. */
-    sw_wrap_body(bsmsg);
-    /* Copy it to buffer2, so we can change it without changing the
-     * display. */
-#if HAVE_GTKSOURCEVIEW
     buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
     gtk_text_buffer_get_bounds(buffer, &start, &end);
-#else                           /* HAVE_GTKSOURCEVIEW */
-    sw_buffer_save(bsmsg);
-    gtk_text_buffer_get_bounds(bsmsg->buffer2, &start, &end);
-#endif                          /* HAVE_GTKSOURCEVIEW */
+
+    if (bsmsg->flow) {
+        /* Copy the message text to a new buffer: */
+        GtkTextTagTable *table;
+
+        table = gtk_text_buffer_get_tag_table(buffer);
+        new_buffer = gtk_text_buffer_new(table);
+
+        tmp = gtk_text_iter_get_text(&start, &end);
+        gtk_text_buffer_set_text(new_buffer, tmp, -1);
+        g_free(tmp);
+
+        /* Remove spaces before a newline: */
+        gtk_text_buffer_get_bounds(new_buffer, &start, &end);
+        libbalsa_unwrap_buffer(new_buffer, &start, -1);
+        gtk_text_buffer_get_bounds(new_buffer, &start, &end);
+    }
+
+    /* Copy the buffer text to the message: */
     body->buffer = gtk_text_iter_get_text(&start, &end);
+    if (new_buffer)
+        g_object_unref(new_buffer);
+
     if (bsmsg->send_mp_alt)
         body->html_buffer =
             libbalsa_text_to_html(message->subj, body->buffer,
@@ -5629,11 +5579,6 @@ bsmsg2message(BalsaSendmsg * bsmsg)
 	body->buffer =
 	    libbalsa_wrap_rfc2646(body->buffer, balsa_app.wraplength,
                                   TRUE, FALSE, TRUE);
-
-#if !HAVE_GTKSOURCEVIEW
-    /* Disable undo and redo, because buffer2 was changed. */
-    sw_buffer_set_undo(bsmsg, FALSE, FALSE);
-#endif                          /* HAVE_GTKSOURCEVIEW */
 
     /* Ildar reports that, when a message contains both text/plain and
      * text/html parts, some broken MUAs use the charset from the
@@ -6212,13 +6157,6 @@ sw_buffer_insert_text(GtkTextBuffer * buffer, GtkTextIter * iter,
 static void
 sw_buffer_changed(GtkTextBuffer * buffer, BalsaSendmsg * bsmsg)
 {
-    if (!bsmsg->flow) {
-        if (bsmsg->wrap_timeout_id)
-            g_source_remove(bsmsg->wrap_timeout_id);
-        bsmsg->wrap_timeout_id =
-            g_timeout_add(500, (GSourceFunc) sw_wrap_timeout_cb, bsmsg);
-    }
-
     if (bsmsg->insert_mark) {
         GtkTextIter iter;
 

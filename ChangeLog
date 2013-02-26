@@ -1,5 +1,13 @@
 2013-02-25  Peter Bloomfield
 
+	* src/sendmsg-window.c (balsa_sendmsg_destroy_handler),
+	(sendmsg_window_new), (bsmsg2message), (sw_buffer_changed):
+	remove annoying wrap timeout, and carry out autosave timeout
+	without disturbing the compose window.
+	* src/sendmsg-window.h: remove timeout id.
+
+2013-02-25  Peter Bloomfield
+
 	* libbalsa/mailbox.c (lbm_msgno_filt_check): check that mailbox
 	is still open.
 

@@ -93,7 +93,6 @@ extern "C" {
         gulong delete_range_sig_id;
 #endif                          /* HAVE_GTKSOURCEVIEW */
         gulong insert_text_sig_id;
-        guint wrap_timeout_id;
         guint autosave_timeout_id;
         SendmsgState state;
         gulong identities_changed_id;

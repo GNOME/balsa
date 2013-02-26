@@ -1,5 +1,9 @@
 2013-02-26  Peter Bloomfield
 
+	* src/balsa-app.c (append_url_if_open): in_sync is gboolean.
+
+2013-02-26  Peter Bloomfield
+
 	* src/balsa-app.c (append_url_if_open): mark view out-of-sync
 	only if it really is.
 

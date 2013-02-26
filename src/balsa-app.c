@@ -504,7 +504,7 @@ append_url_if_open(const gchar * url, LibBalsaMailboxView * view,
         } else {
             /* Forget that it was open */
             view->open = FALSE;
-            view->in_sync = 0;
+            view->in_sync = FALSE;
         }
     }
 }

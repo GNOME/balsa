@@ -1,5 +1,10 @@
 2013-02-26  Peter Bloomfield
 
+	* src/balsa-app.c (ask_password): use a mutex to make sure that
+	only one dialog pops up at a time.
+
+2013-02-26  Peter Bloomfield
+
 	* libbalsa/mailbox_local.c (lbm_local_save_tree_real),
 	(lbm_local_queue_save_tree): check that the message tree has
 	changed in the idle handler, instead of in the scheduler.

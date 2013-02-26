@@ -228,15 +228,9 @@ ask_password(LibBalsaServer *server, LibBalsaMailbox *mbox)
     
     password = NULL;
     if (mbox) {
-	gboolean is_sub_thread = libbalsa_am_i_subthread();
-
-	if (is_sub_thread)
-	    gdk_threads_enter();
 	gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
 			       (GtkTreeModelForeachFunc)
 			       set_passwd_from_matching_server, server);
-	if (is_sub_thread)
-	    gdk_threads_leave();
 
 	if (server->passwd != NULL) {
 	    password = server->passwd;
@@ -246,8 +240,15 @@ ask_password(LibBalsaServer *server, LibBalsaMailbox *mbox)
 
     if (!password)
 #ifdef BALSA_USE_THREADS
-	return (pthread_self() == libbalsa_get_main_thread()) ?
+    {
+        G_LOCK_DEFINE_STATIC(ask_password);
+
+        G_LOCK(ask_password);
+	password = (pthread_self() == libbalsa_get_main_thread()) ?
             ask_password_real(server, mbox) : ask_password_mt(server, mbox);
+        G_UNLOCK(ask_password);
+	return password;
+    }
 #else
 	return ask_password_real(server, mbox);
 #endif

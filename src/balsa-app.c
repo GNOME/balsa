@@ -499,15 +499,8 @@ static void
 append_url_if_open(const gchar * url, LibBalsaMailboxView * view,
                    GPtrArray * array)
 {
-    if (view->open) {
-        if (balsa_app.remember_open_mboxes) {
-            g_ptr_array_add(array, g_strdup(url));
-        } else {
-            /* Forget that it was open */
-            view->open = FALSE;
-            view->in_sync = FALSE;
-        }
-    }
+    if (view->open)
+        g_ptr_array_add(array, g_strdup(url));
 }
 
 static void

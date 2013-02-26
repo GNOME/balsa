@@ -1,5 +1,15 @@
 2013-02-26  Peter Bloomfield
 
+	Instead of forgetting open mailboxes, do not remember them in
+	the first place.
+
+	* src/balsa-app.c (append_url_if_open): revert.
+	* src/main.c (scan_mailboxes_idle_cb): ditto.
+	* src/save-restore.c (save_view): remember open mailbox only if
+	balsa_app.remember_open_mboxes.
+
+2013-02-26  Peter Bloomfield
+
 	* src/balsa-app.c (ask_password): use a mutex to make sure that
 	only one dialog pops up at a time.
 

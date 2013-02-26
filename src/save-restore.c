@@ -1899,7 +1899,8 @@ save_view(const gchar * url, LibBalsaMailboxView * view)
 	libbalsa_conf_set_int("Subscribe",   view->subscribe);
     if (view->exposed        != libbalsa_mailbox_get_exposed(NULL))
 	libbalsa_conf_set_bool("Exposed",    view->exposed);
-    if (view->open           != libbalsa_mailbox_get_open(NULL))
+    if (balsa_app.remember_open_mboxes &&
+        view->open           != libbalsa_mailbox_get_open(NULL))
 	libbalsa_conf_set_bool("Open",       view->open);
 #ifdef HAVE_GPGME
     if (view->gpg_chk_mode   != libbalsa_mailbox_get_crypto_mode(NULL))

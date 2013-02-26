@@ -1,5 +1,10 @@
 2013-02-26  Peter Bloomfield
 
+	* src/main-window.c: do not use another idle handler to set the
+	mailbox view-filter.
+
+2013-02-26  Peter Bloomfield
+
 	Instead of forgetting open mailboxes, do not remember them in
 	the first place.
 

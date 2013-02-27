@@ -1,3 +1,9 @@
+2013-02-27  Peter Bloomfield
+
+	* libbalsa/mailbox.c (lbm_run_filters_on_reception_idle_cb),
+	(libbalsa_mailbox_run_filters_on_reception): run filters in an
+	idle callback.
+
 2013-02-26  Peter Bloomfield
 
 	* src/main-window.c: do not use another idle handler to set the

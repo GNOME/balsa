@@ -813,8 +813,8 @@ libbalsa_mailbox_can_match(LibBalsaMailbox * mailbox,
 
 /* Helper function to run the "on reception" filters on a mailbox */
 
-void
-libbalsa_mailbox_run_filters_on_reception(LibBalsaMailbox * mailbox)
+static gboolean
+lbm_run_filters_on_reception_idle_cb(LibBalsaMailbox * mailbox)
 {
     GSList *filters;
     guint progress_count;
@@ -825,7 +825,11 @@ libbalsa_mailbox_run_filters_on_reception(LibBalsaMailbox * mailbox)
     guint progress_total;
     LibBalsaProgress progress;
 
-    g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
+    g_object_add_weak_pointer(G_OBJECT(mailbox), (gpointer) &mailbox);
+    g_object_unref(mailbox);
+    if (!mailbox)
+        return FALSE;
+    g_object_remove_weak_pointer(G_OBJECT(mailbox), (gpointer) &mailbox);
 
     if (!mailbox->filters_loaded) {
         config_mailbox_filters_load(mailbox);
@@ -836,10 +840,10 @@ libbalsa_mailbox_run_filters_on_reception(LibBalsaMailbox * mailbox)
                                             FILTER_WHEN_INCOMING);
 
     if (!filters)
-        return;
+        return FALSE;
     if (!filters_prepare_to_run(filters)) {
         g_slist_free(filters);
-        return;
+        return FALSE;
     }
 
     progress_count = 0;
@@ -866,7 +870,7 @@ libbalsa_mailbox_run_filters_on_reception(LibBalsaMailbox * mailbox)
     text = g_strdup_printf(_("Applying filter rules to %s"), mailbox->name);
     total = libbalsa_mailbox_total_messages(mailbox);
     progress_total = progress_count * total;
-        libbalsa_progress_set_text(&progress, text, progress_total);
+    libbalsa_progress_set_text(&progress, text, progress_total);
     g_free(text);
 
     progress_count = 0;
@@ -911,6 +915,16 @@ libbalsa_mailbox_run_filters_on_reception(LibBalsaMailbox * mailbox)
     libbalsa_unlock_mailbox(mailbox);
 
     g_slist_free(filters);
+    return FALSE;
+}
+
+void
+libbalsa_mailbox_run_filters_on_reception(LibBalsaMailbox * mailbox)
+{
+    g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
+
+    g_idle_add((GSourceFunc) lbm_run_filters_on_reception_idle_cb,
+               g_object_ref(mailbox));
 }
 
 void

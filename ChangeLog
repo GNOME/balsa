@@ -1,5 +1,9 @@
 2013-02-28  Peter Bloomfield
 
+	* src/main-window.c: survive torture test.
+
+2013-02-28  Peter Bloomfield
+
 	* libbalsa/mailbox.c (lbm_msgno_filt_check),
 	(lbm_msgno_filt_check_idle_cb),
 	(libbalsa_mailbox_msgno_filt_check): check message against view

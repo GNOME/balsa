@@ -2346,11 +2346,15 @@ bw_real_open_mbnode_idle_cb(BalsaWindowRealOpenMbnodeInfo * info)
     GtkWidget        *scroll;
     gint              page_num;
 
-    if (window) {
-        balsa_window_decrease_activity(window, info->message);
-        g_object_remove_weak_pointer(G_OBJECT(window),
-                                     (gpointer) &info->window);
+    if (!window) {
+        g_free(info->message);
+        g_free(info);
+        return FALSE;
     }
+
+    balsa_window_decrease_activity(window, info->message);
+    g_object_remove_weak_pointer(G_OBJECT(window),
+                                 (gpointer) &info->window);
     g_free(info->message);
 
     if (balsa_find_notebook_page_num(mailbox) >= 0) {
@@ -2931,6 +2935,9 @@ check_new_messages_real(BalsaWindow * window, int type)
     struct check_messages_thread_info *info;
 #endif
 
+    if (window && !BALSA_IS_WINDOW(window))
+        return;
+
     list = NULL;
 #if defined(BALSA_USE_THREADS)
     /*  Only Run once -- If already checking mail, return.  */
@@ -2983,6 +2990,8 @@ check_new_messages_real(BalsaWindow * window, int type)
 
     bw_check_mailbox_list(window, balsa_app.inbox_input);
 
+    if (!balsa_app.mblist_tree_store)
+        return;
     gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
 			   (GtkTreeModelForeachFunc) bw_add_mbox_to_checklist,
 			   &list);
@@ -3675,10 +3684,16 @@ bw_nm_client_state_changed_cb(GObject * gobject, GParamSpec * pspec,
                               gpointer data)
 {
     NMClient *client = NM_CLIENT(gobject);
-    BalsaWindow *window = BALSA_WINDOW(data);
+    BalsaWindow *window;
     NMState new_state = nm_client_get_state(client);
-    NMState old_state = window->nm_state;
+    NMState old_state;
     gboolean is_connected;
+
+    if (!BALSA_IS_WINDOW(data))
+        return;
+
+    window = BALSA_WINDOW(data);
+    old_state = window->nm_state;
 
     if (new_state == old_state) {
         /* Notify signal does not guarantee that anything really

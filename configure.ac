@@ -356,7 +356,6 @@ gtk+-3.0
 gmime-$with_gmime
 gio-2.0 >= 2.27.0
 gthread-2.0
-gnome-icon-theme
 $gnome_extras
 ])
 

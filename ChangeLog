@@ -1,5 +1,6 @@
 2013-02-28  Pawel Salek
 
+	* configure.ac: remove dependency on legacy gnome-icon-scheme pkg.
 	* NEWS, configure.ac: release balsa-2.5.0
 
 2013-02-28  Peter Bloomfield

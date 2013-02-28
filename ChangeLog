@@ -1,3 +1,7 @@
+2013-02-28  Peter Bloomfield
+
+	* libbalsa/mailbox.c: build with threads disabled.
+
 2013-02-27  Peter Bloomfield
 
 	* libbalsa/mailbox.c (lbm_run_filters_on_reception_idle_cb),

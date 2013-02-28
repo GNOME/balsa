@@ -1216,6 +1216,7 @@ lbm_msgno_changed_expunged_cb(LibBalsaMailbox * mailbox, guint seqno)
     lbm_update_msgnos(mailbox, seqno, mailbox->msgnos_changed);
     pthread_mutex_unlock(&msgnos_changed_lock);
 }
+#endif /* BALSA_USE_THREADS */
 
 static void
 lbm_msgno_row_changed(LibBalsaMailbox * mailbox, guint msgno,
@@ -1237,6 +1238,7 @@ lbm_msgno_row_changed(LibBalsaMailbox * mailbox, guint msgno,
     }
 }
 
+#ifdef BALSA_USE_THREADS
 static gboolean
 lbm_msgnos_changed_idle_cb(LibBalsaMailbox * mailbox)
 {

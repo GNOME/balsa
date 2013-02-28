@@ -1,3 +1,10 @@
+2013-02-28  Peter Bloomfield
+
+	* libbalsa/mailbox.c (lbm_msgno_filt_check),
+	(lbm_msgno_filt_check_idle_cb),
+	(libbalsa_mailbox_msgno_filt_check): check message against view
+	filter synchronously when in the main thread.
+
 2013-02-28  Pawel Salek
 
 	* configure.ac: remove dependency on legacy gnome-icon-scheme pkg.

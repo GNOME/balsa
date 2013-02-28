@@ -1585,35 +1585,18 @@ libbalsa_mailbox_msgno_filt_out(LibBalsaMailbox * mailbox, GNode * node)
  * - if it isn't in the view and it matches the condition, filter it in.
  */
 
-typedef struct {
-    LibBalsaMailbox           *mailbox;
-    guint                      seqno;
-    LibBalsaMailboxSearchIter *search_iter;
-    gboolean                   hold_selected;
-} LibBalsaMailboxMsgnoFiltCheckInfo;
-
-static gboolean
-lbm_msgno_filt_check(LibBalsaMailboxMsgnoFiltCheckInfo * info)
-
+static void
+lbm_msgno_filt_check(LibBalsaMailbox * mailbox, guint seqno,
+                     LibBalsaMailboxSearchIter * search_iter,
+                     gboolean hold_selected)
 {
-    LibBalsaMailbox           *mailbox       = info->mailbox;
-    guint                      seqno         = info->seqno;
-    LibBalsaMailboxSearchIter *search_iter   = info->search_iter;
-    gboolean                   hold_selected = info->hold_selected;
     gboolean match;
     GNode *node;
-
-    if (!MAILBOX_OPEN(mailbox)) {
-        g_object_unref(mailbox);
-        libbalsa_mailbox_search_iter_unref(search_iter);
-        g_free(info);
-        return FALSE;
-    }
 
     match = search_iter ?
         libbalsa_mailbox_message_match(mailbox, seqno, search_iter) : TRUE;
     node = g_node_find(mailbox->msg_tree, G_PRE_ORDER, G_TRAVERSE_ALL,
-                    GUINT_TO_POINTER(seqno));
+                       GUINT_TO_POINTER(seqno));
     if (node) {
         if (!match) {
             gboolean filt_out = hold_selected ?
@@ -1637,34 +1620,58 @@ lbm_msgno_filt_check(LibBalsaMailboxMsgnoFiltCheckInfo * info)
         if (match)
             libbalsa_mailbox_msgno_filt_in(mailbox, seqno);
     }
+}
 
-    g_object_unref(mailbox);
-    libbalsa_mailbox_search_iter_unref(search_iter);
+#ifdef BALSA_USE_THREADS
+typedef struct {
+    LibBalsaMailbox           *mailbox;
+    guint                      seqno;
+    LibBalsaMailboxSearchIter *search_iter;
+    gboolean                   hold_selected;
+} LibBalsaMailboxMsgnoFiltCheckInfo;
+
+static gboolean
+lbm_msgno_filt_check_idle_cb(LibBalsaMailboxMsgnoFiltCheckInfo * info)
+{
+    if (MAILBOX_OPEN(info->mailbox))
+        lbm_msgno_filt_check(info->mailbox, info->seqno, info->search_iter,
+                             info->hold_selected);
+
+    g_object_unref(info->mailbox);
+    libbalsa_mailbox_search_iter_unref(info->search_iter);
     g_free(info);
 
     return FALSE;
 }
+#endif                          /* BALSA_USE_THREADS */
 
 void
 libbalsa_mailbox_msgno_filt_check(LibBalsaMailbox * mailbox, guint seqno,
                                   LibBalsaMailboxSearchIter * search_iter,
                                   gboolean hold_selected)
 {
-    LibBalsaMailboxMsgnoFiltCheckInfo *info;
-
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
 
     if (!mailbox->msg_tree) {
         return;
     }
 
-    info = g_new(LibBalsaMailboxMsgnoFiltCheckInfo, 1);
-    info->mailbox = g_object_ref(mailbox);
-    info->seqno = seqno;
-    info->search_iter = libbalsa_mailbox_search_iter_ref(search_iter);
-    info->hold_selected = hold_selected;
+#ifdef BALSA_USE_THREADS
+    if (!libbalsa_am_i_subthread()) {
+        lbm_msgno_filt_check(mailbox, seqno, search_iter, hold_selected);
+    } else {
+        LibBalsaMailboxMsgnoFiltCheckInfo *info;
 
-    g_idle_add((GSourceFunc) lbm_msgno_filt_check, info);
+        info = g_new(LibBalsaMailboxMsgnoFiltCheckInfo, 1);
+        info->mailbox = g_object_ref(mailbox);
+        info->seqno = seqno;
+        info->search_iter = libbalsa_mailbox_search_iter_ref(search_iter);
+        info->hold_selected = hold_selected;
+        g_idle_add((GSourceFunc) lbm_msgno_filt_check_idle_cb, info);
+    }
+#else                           /* BALSA_USE_THREADS */
+    lbm_msgno_filt_check(mailbox, seqno, search_iter, hold_selected);
+#endif                          /* BALSA_USE_THREADS */
 }
 
 /* Search iters */

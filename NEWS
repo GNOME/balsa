@@ -1,3 +1,7 @@
+* Balsa-2.5.0 release. Release date 2013-02-28
+
+- making gtk3 build the official one.
+
 * Balsa-2.4.9 release. Release date 2010-11-19
 
 - compile against new GTK, libnotify libs.

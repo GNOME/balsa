@@ -1,3 +1,7 @@
+2013-02-28  Pawel Salek
+
+	* NEWS, configure.ac: release balsa-2.5.0
+
 2013-02-28  Peter Bloomfield
 
 	* libbalsa/mailbox.c: build with threads disabled.

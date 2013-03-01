@@ -469,6 +469,24 @@ bndx_instance_init(BalsaIndex * index)
     gtk_widget_show_all (GTK_WIDGET(index));
 }
 
+/*
+ * Remove a GObject reference; if it was the last reference (and the
+ * GObject has now been finalized), clear the location and return TRUE.
+ */
+static gboolean
+bndx_clear_if_last_ref(gpointer data)
+{
+    GObject **object = data;
+
+    g_object_add_weak_pointer(G_OBJECT(*object), data);
+    g_object_unref(*object);
+    if (*object) {
+        g_object_remove_weak_pointer(*object, data);
+        return FALSE;
+    }
+    return TRUE;
+}
+
 /* Callbacks used by bndx_instance_init. */
 
 /*
@@ -480,21 +498,33 @@ bndx_instance_init(BalsaIndex * index)
  * otherwise, display the last (in tree order) selected message.
  */
 
-/* First some helpers. */
-/* called from idle callback: */
-static void
-bndx_selection_changed_real(BalsaIndex * index)
+/* idle callback: */
+static gboolean
+bndx_selection_changed_idle(BalsaIndex * index)
 {
-    LibBalsaMailbox *mailbox = index->mailbox_node->mailbox;
+    LibBalsaMailbox *mailbox;
     guint msgno;
+    GtkTreeSelection *selection;
+
+    if (bndx_clear_if_last_ref(&index))
+        return FALSE;
+    index->has_selection_changed_idle = FALSE;
+
+    if (!index->mailbox_node)
+        return FALSE;
+    mailbox = index->mailbox_node->mailbox;
+    selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(index));
 
     /* Save next_msgno, because changing flags may zero it. */
     msgno = index->next_msgno;
-    if (index->current_msgno)
+    if (index->current_msgno) {
         /* The current message has been deselected. */
+        g_signal_handler_block(selection, index->selection_changed_id);
         libbalsa_mailbox_msgno_change_flags(mailbox, index->current_msgno,
                                             0,
                                             LIBBALSA_MESSAGE_FLAG_SELECTED);
+        g_signal_handler_unblock(selection, index->selection_changed_id);
+    }
 
     if (msgno) {
         GtkTreePath *path;
@@ -502,9 +532,6 @@ bndx_selection_changed_real(BalsaIndex * index)
         if (!libbalsa_mailbox_msgno_find(mailbox, msgno, &path, NULL))
             msgno = 0;
         else {
-            GtkTreeSelection *selection =
-                gtk_tree_view_get_selection(GTK_TREE_VIEW(index));
-
             if (!gtk_tree_selection_path_is_selected(selection, path)) {
                 bndx_expand_to_row(index, path);
                 bndx_select_row(index, path);
@@ -523,27 +550,7 @@ bndx_selection_changed_real(BalsaIndex * index)
 
     index->current_msgno = msgno;
     bndx_changed_find_row(index);
-}
 
-struct index_info {
-    BalsaIndex * bindex;
-};
-
-/* idle callback: */
-static gboolean
-bndx_selection_changed_idle(struct index_info *arg)
-{
-    gdk_threads_enter();
-
-    if (arg->bindex) {
-        g_object_remove_weak_pointer(G_OBJECT(arg->bindex),
-                                     (gpointer) & arg->bindex);
-        bndx_selection_changed_real(arg->bindex);
-        arg->bindex->has_selection_changed_idle = FALSE;
-    }
-    g_free(arg);
-
-    gdk_threads_leave();
     return FALSE;
 }
 
@@ -598,12 +605,9 @@ bndx_selection_changed(GtkTreeSelection * selection, BalsaIndex * index)
     }
 
     if (!index->has_selection_changed_idle) {
-        struct index_info *arg = g_new(struct index_info, 1);
-        arg->bindex = index;
-        g_object_add_weak_pointer(G_OBJECT(index),
-                                  (gpointer) & arg->bindex);
         index->has_selection_changed_idle = TRUE;
-        g_idle_add((GSourceFunc) bndx_selection_changed_idle, arg);
+        g_idle_add((GSourceFunc) bndx_selection_changed_idle,
+                   g_object_ref(index));
     }
 }
 
@@ -672,55 +676,6 @@ bndx_row_activated(GtkTreeView * tree_view, GtkTreePath * path,
         message_window_new(mailbox, msgno);
 }
 
-/*
- * Scroll in an idle handler, otherwise it gets ignored.
- */
-#define BALSA_INDEX_ROW_REF_KEY "balsa-index-row-ref-key"
-static gboolean
-bndx_scroll_idle(BalsaIndex * index)
-{
-    GtkTreeRowReference *row_ref;
-    GtkTreePath *path;
-
-    gdk_threads_enter();
-    /* The index might have been destroyed since the idle function was
-       registered. Check whether we still exist... */
-    if(gtk_tree_view_get_model(GTK_TREE_VIEW(index))) {
-        row_ref = g_object_get_data(G_OBJECT(index), BALSA_INDEX_ROW_REF_KEY);
-        if (row_ref && (path = gtk_tree_row_reference_get_path(row_ref))) {
-            gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(index), path, NULL,
-                                         FALSE, 0, 0);
-            gtk_tree_path_free(path);
-        }
-    }
-    g_object_set_data(G_OBJECT(index), BALSA_INDEX_ROW_REF_KEY, NULL);
-    g_object_unref(index);
-
-    gdk_threads_leave();
-
-    return FALSE;
-}
-
-static void
-bndx_scroll_to_row(BalsaIndex * index, GtkTreePath * path)
-{
-    GtkTreeRowReference *row_ref;
-
-    row_ref = g_object_get_data(G_OBJECT(index), BALSA_INDEX_ROW_REF_KEY);
-    if (!row_ref) {
-        g_object_ref(index);
-        g_idle_add_full(G_PRIORITY_LOW, (GSourceFunc) bndx_scroll_idle,
-                        index, NULL);
-    }
-
-    row_ref =
-        gtk_tree_row_reference_new(gtk_tree_view_get_model
-                                   (GTK_TREE_VIEW(index)), path);
-    g_object_set_data_full(G_OBJECT(index), BALSA_INDEX_ROW_REF_KEY,
-                           row_ref,
-                           (GDestroyNotify) gtk_tree_row_reference_free);
-}
-
 static gboolean
 bndx_find_current_msgno(BalsaIndex * bindex,
                         GtkTreePath ** path , GtkTreeIter * iter)
@@ -748,7 +703,8 @@ bndx_tree_expand_cb(GtkTreeView * tree_view, GtkTreeIter * iter,
             && bndx_row_is_viewable(index, current_path)) {
             gtk_tree_selection_select_path(selection, current_path);
             gtk_tree_view_set_cursor(tree_view, current_path, NULL, FALSE);
-            bndx_scroll_to_row(index, current_path);
+            gtk_tree_view_scroll_to_cell(tree_view, current_path,
+                                         NULL, FALSE, 0, 0);
         }
         gtk_tree_path_free(current_path);
     }
@@ -853,32 +809,35 @@ balsa_index_new(void)
  */
 struct view_on_open_data {
     BalsaIndex *bindex;
-    GtkTreePath *path;
+    GtkTreeRowReference *reference;
     gboolean select;
 };
+
 static gboolean
 bi_view_on_open(struct view_on_open_data *data)
 {
     GtkTreeView *tree_view;
+    GtkTreePath *path;
 
     tree_view = GTK_TREE_VIEW(data->bindex);
+    path = gtk_tree_row_reference_get_path(data->reference);
+    gtk_tree_row_reference_free(data->reference);
+
     if (gtk_tree_view_get_model(tree_view)) {
         if (data->select)
-            bndx_select_row(data->bindex, data->path);
+            bndx_select_row(data->bindex, path);
         else {
             GtkTreeSelection *selection;
+            gulong changed_id = data->bindex->selection_changed_id;
 
             selection = gtk_tree_view_get_selection(tree_view);
-            g_signal_handler_block(selection,
-                                   data->bindex->selection_changed_id);
-            gtk_tree_view_set_cursor(GTK_TREE_VIEW(data->bindex),
-                                     data->path, NULL, FALSE);
+            g_signal_handler_block(selection, changed_id);
+            gtk_tree_view_set_cursor(tree_view, path, NULL, FALSE);
             gtk_tree_selection_unselect_all(selection);
-            g_signal_handler_unblock(selection,
-                                     data->bindex->selection_changed_id);
+            g_signal_handler_unblock(selection, changed_id);
         }
     }
-    gtk_tree_path_free(data->path);
+    gtk_tree_path_free(path);
     g_object_unref(data->bindex);
     g_free(data);
 
@@ -889,6 +848,7 @@ void
 balsa_index_scroll_on_open(BalsaIndex *index)
 {
     LibBalsaMailbox *mailbox = index->mailbox_node->mailbox;
+    GtkTreeView *tree_view = GTK_TREE_VIEW(index);
     GtkTreePath *path = NULL;
     gpointer view_on_open;
     struct view_on_open_data *data;
@@ -914,8 +874,7 @@ balsa_index_scroll_on_open(BalsaIndex *index)
     bndx_expand_to_row(index, path);
     /* Scroll now, not in the idle handler, to make sure the initial
      * view is correct. */
-    gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(index), path, NULL,
-                                 FALSE, 0, 0);
+    gtk_tree_view_scroll_to_cell(tree_view, path, NULL, FALSE, 0, 0);
 
     view_on_open =
         g_object_get_data(G_OBJECT(mailbox), BALSA_INDEX_VIEW_ON_OPEN);
@@ -924,7 +883,9 @@ balsa_index_scroll_on_open(BalsaIndex *index)
                       GINT_TO_POINTER(FALSE));
     data = g_new(struct view_on_open_data,1);
     data->bindex = g_object_ref(index);
-    data->path = path;
+    data->reference =
+        gtk_tree_row_reference_new(GTK_TREE_MODEL(mailbox), path);
+    gtk_tree_path_free(path);
     data->select = (view_on_open && GPOINTER_TO_INT(view_on_open))
         || balsa_app.view_message_on_open;
     if (libbalsa_am_i_subthread())
@@ -1416,13 +1377,23 @@ balsa_index_set_column_widths(BalsaIndex * index)
    is emitted by the mailbox when new messages has been retrieved (either
    after opening the mailbox, or after "check new messages").
 */
-/* Helper of the callback */
-static void
-bndx_mailbox_changed_func(BalsaIndex * bindex)
+
+/* bndx_mailbox_changed_cb:
+   may be called from a thread. Use idle callback to update the view.
+*/
+
+static gboolean
+bndx_mailbox_changed_idle(BalsaIndex * bindex)
 {
-    LibBalsaMailbox *mailbox = bindex->mailbox_node->mailbox;
+    LibBalsaMailbox *mailbox;
     GtkTreePath *path;
 
+    if (bndx_clear_if_last_ref(&bindex))
+        return FALSE;
+
+    bindex->has_mailbox_changed_idle = FALSE;
+
+    mailbox = bindex->mailbox_node->mailbox;
     if (mailbox->first_unread
         && libbalsa_mailbox_msgno_find(mailbox, mailbox->first_unread,
                                        &path, NULL)) {
@@ -1439,26 +1410,7 @@ bndx_mailbox_changed_func(BalsaIndex * bindex)
     }
 
     bndx_changed_find_row(bindex);
-}
 
-/* bndx_mailbox_changed_cb:
-   may be called from a thread. Use idle callback to update the view.
-*/
-
-static gboolean
-bndx_mailbox_changed_idle(struct index_info* arg)
-{
-    gdk_threads_enter();
-
-    if(arg->bindex) {
-        g_object_remove_weak_pointer(G_OBJECT(arg->bindex),
-                                     (gpointer) &arg->bindex);
-	bndx_mailbox_changed_func(arg->bindex);
-        arg->bindex->has_mailbox_changed_idle = FALSE;
-    }
-    g_free(arg);
-
-    gdk_threads_leave();
     return FALSE;
 }
 
@@ -1466,7 +1418,6 @@ static void
 bndx_mailbox_changed_cb(BalsaIndex * bindex)
 {
     LibBalsaMailbox *mailbox = bindex->mailbox_node->mailbox;
-    struct index_info *arg;
 
     if (!gtk_widget_get_window(GTK_WIDGET(bindex)))
         return;
@@ -1485,11 +1436,9 @@ bndx_mailbox_changed_cb(BalsaIndex * bindex)
     if (bindex->has_mailbox_changed_idle)
         return;
 
-    arg = g_new(struct index_info,1);
-    arg->bindex = bindex;
-    g_object_add_weak_pointer(G_OBJECT(bindex), (gpointer) &arg->bindex);
     bindex->has_mailbox_changed_idle = TRUE;
-    g_idle_add((GSourceFunc) bndx_mailbox_changed_idle, arg);
+    g_idle_add((GSourceFunc) bndx_mailbox_changed_idle,
+               g_object_ref(bindex));
 }
 
 static void
@@ -2257,8 +2206,10 @@ bndx_changed_find_row(BalsaIndex * index)
 static void
 bndx_select_row(BalsaIndex * index, GtkTreePath * path)
 {
-    gtk_tree_view_set_cursor(GTK_TREE_VIEW(index), path, NULL, FALSE);
-    bndx_scroll_to_row(index, path);
+    GtkTreeView *tree_view = GTK_TREE_VIEW(index);
+
+    gtk_tree_view_set_cursor(tree_view, path, NULL, FALSE);
+    gtk_tree_view_scroll_to_cell(tree_view, path, NULL, FALSE, 0, 0);
 }
 
 /* Check that all parents are expanded. */
@@ -2788,7 +2739,7 @@ balsa_index_ensure_visible(BalsaIndex * index)
     }
 
     if (path) {
-        bndx_scroll_to_row(index, path);
+        gtk_tree_view_scroll_to_cell(tree_view, path, NULL, FALSE, 0, 0);
         gtk_tree_path_free(path);
     }
 }

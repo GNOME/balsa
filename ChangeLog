@@ -1,5 +1,9 @@
 2013-02-28  Peter Bloomfield
 
+	* src/balsa-index.c: refactor and simplify.
+
+2013-02-28  Peter Bloomfield
+
 	* src/main-window.c: survive torture test.
 
 2013-02-28  Peter Bloomfield

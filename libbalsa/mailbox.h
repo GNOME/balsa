@@ -260,6 +260,8 @@ struct _LibBalsaMailbox {
     /* Array of msgnos that have been changed. */
     GArray *msgnos_changed;
 #endif                          /* BALSA_USE_THREADS */
+    gulong changed_idle_id;
+    gulong queue_check_idle_id;
 };
 
 /* Search iter */

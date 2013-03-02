@@ -494,6 +494,16 @@ libbalsa_mailbox_finalize(GObject * object)
     /* The LibBalsaMailboxView is owned by balsa_app.mailbox_views. */
     mailbox->view = NULL;
 
+    if (mailbox->changed_idle_id) {
+        g_source_remove(mailbox->changed_idle_id);
+        mailbox->changed_idle_id = 0;
+    }
+
+    if (mailbox->queue_check_idle_id) {
+        g_source_remove(mailbox->queue_check_idle_id);
+        mailbox->queue_check_idle_id = 0;
+    }
+
     G_OBJECT_CLASS(parent_class)->finalize(object);
 }
 
@@ -684,12 +694,9 @@ libbalsa_mailbox_progress_notify(LibBalsaMailbox * mailbox,
                   0, type, prog, tot, msg);
 }
 
-#define LB_MAILBOX_CHECK_ID_KEY "libbalsa-mailbox-check-id"
-
 void
 libbalsa_mailbox_check(LibBalsaMailbox * mailbox)
 {
-    guint id;
     GSList *unthreaded;
 
     g_return_if_fail(mailbox != NULL);
@@ -697,13 +704,10 @@ libbalsa_mailbox_check(LibBalsaMailbox * mailbox)
 
     libbalsa_lock_mailbox(mailbox);
 
-    id = GPOINTER_TO_UINT(g_object_get_data(G_OBJECT(mailbox),
-                                            LB_MAILBOX_CHECK_ID_KEY));
-    if (id) {
+    if (mailbox->queue_check_idle_id) {
 	/* Remove scheduled idle callback. */
-	g_source_remove(id);
-	g_object_set_data(G_OBJECT(mailbox), LB_MAILBOX_CHECK_ID_KEY,
-			  GUINT_TO_POINTER(0));
+        g_source_remove(mailbox->queue_check_idle_id);
+        mailbox->queue_check_idle_id = 0;
     }
 
     unthreaded = NULL;
@@ -728,8 +732,31 @@ libbalsa_mailbox_check(LibBalsaMailbox * mailbox)
 }
 
 static gboolean
-lbm_changed(LibBalsaMailbox * mailbox)
+lbm_changed_idle_cb(LibBalsaMailbox * mailbox)
 {
+    g_signal_emit(mailbox, libbalsa_mailbox_signals[CHANGED], 0);
+    mailbox->changed_idle_id = 0;
+    return FALSE;
+}
+
+static void
+lbm_changed_schedule_idle(LibBalsaMailbox * mailbox)
+{
+    mailbox->msg_tree_changed = TRUE;
+    if (!mailbox->changed_idle_id)
+        mailbox->changed_idle_id =
+            g_idle_add((GSourceFunc) lbm_changed_idle_cb, mailbox);
+}
+
+void
+libbalsa_mailbox_changed(LibBalsaMailbox * mailbox)
+{
+    if (!g_signal_has_handler_pending
+        (mailbox, libbalsa_mailbox_signals[CHANGED], 0, TRUE))
+        /* No one cares, so don't set any message counts--that might
+         * cause mailbox->view to be created. */
+        return;
+
     if (MAILBOX_OPEN(mailbox)) {
         /* Both counts are valid. */
         libbalsa_mailbox_set_total(mailbox,
@@ -744,26 +771,7 @@ lbm_changed(LibBalsaMailbox * mailbox)
         libbalsa_mailbox_set_unread(mailbox, 1);
     }
 
-    gdk_threads_enter();
-    g_signal_emit(mailbox, libbalsa_mailbox_signals[CHANGED], 0);
-    gdk_threads_leave();
-
-    return FALSE;
-}
-
-void
-libbalsa_mailbox_changed(LibBalsaMailbox * mailbox)
-{
-    if (!g_signal_has_handler_pending
-        (mailbox, libbalsa_mailbox_signals[CHANGED], 0, TRUE))
-        /* No one cares, so don't set any message counts--that might
-         * cause mailbox->view to be created. */
-        return;
-
-    if (!libbalsa_am_i_subthread())
-        lbm_changed(mailbox);
-    else
-        g_idle_add((GSourceFunc) lbm_changed, mailbox);
+    lbm_changed_schedule_idle(mailbox);
 }
 
 /* libbalsa_mailbox_message_match:
@@ -1402,8 +1410,7 @@ libbalsa_mailbox_msgno_filt_in(LibBalsaMailbox *mailbox, guint seqno)
                   path, &iter);
     gtk_tree_path_free(path);
 
-    mailbox->msg_tree_changed = TRUE;
-    g_signal_emit(mailbox, libbalsa_mailbox_signals[CHANGED], 0);
+    lbm_changed_schedule_idle(mailbox);
 
     gdk_threads_leave();
 }
@@ -1571,8 +1578,7 @@ libbalsa_mailbox_msgno_filt_out(LibBalsaMailbox * mailbox, GNode * node)
     gtk_tree_path_free(path);
     mailbox->stamp++;
 
-    mailbox->msg_tree_changed = TRUE;
-    g_signal_emit(mailbox, libbalsa_mailbox_signals[CHANGED], 0);
+    lbm_changed_schedule_idle(mailbox);
 
     gdk_threads_leave();
 }
@@ -4299,8 +4305,6 @@ static void
 lbm_check_real(LibBalsaMailbox * mailbox)
 {
     libbalsa_lock_mailbox(mailbox);
-    g_object_set_data(G_OBJECT(mailbox), LB_MAILBOX_CHECK_ID_KEY,
-                      GUINT_TO_POINTER(0));
     libbalsa_mailbox_check(mailbox);
     libbalsa_unlock_mailbox(mailbox);
     g_object_unref(mailbox);
@@ -4324,17 +4328,10 @@ lbm_check_idle(LibBalsaMailbox * mailbox)
 static void
 lbm_queue_check(LibBalsaMailbox * mailbox)
 {
-    guint id;
-
-    if (GPOINTER_TO_UINT(g_object_get_data(G_OBJECT(mailbox),
-                                           LB_MAILBOX_CHECK_ID_KEY)))
-	/* Idle callback already scheduled. */
-        return;
-
-    g_object_ref(mailbox);
-    id = g_idle_add((GSourceFunc) lbm_check_idle, mailbox);
-    g_object_set_data(G_OBJECT(mailbox), LB_MAILBOX_CHECK_ID_KEY,
-                      GUINT_TO_POINTER(id));
+    if (!mailbox->queue_check_idle_id)
+        mailbox->queue_check_idle_id =
+            g_idle_add((GSourceFunc) lbm_check_idle,
+                       g_object_ref(mailbox));
 }
 
 /* Search mailbox for a message matching the condition in search_iter,

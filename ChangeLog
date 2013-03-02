@@ -1,5 +1,9 @@
 2013-03-01  Peter Bloomfield
 
+	* libbalsa/mailbox.h: idle id is guint, not gulong.
+
+2013-03-01  Peter Bloomfield
+
 	* libbalsa/mailbox.h: new LibBalsaMailbox members
 	changed_idle_id and queue_check_idle_id.
 	* libbalsa/mailbox.c (libbalsa_mailbox_finalize),

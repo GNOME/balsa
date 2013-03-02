@@ -1,5 +1,10 @@
 2013-03-02  Peter Bloomfield
 
+	* libbalsa/server.c (libbalsa_server_save_config): report
+	error saving password.
+
+2013-03-02  Peter Bloomfield
+
 	Re-enable mailbox check in a subthread
 
 	* libbalsa/mailbox.c (libbalsa_mailbox_progress_notify),

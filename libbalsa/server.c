@@ -448,6 +448,11 @@ libbalsa_server_save_config(LibBalsaServer * server)
                                    "server",   server->host,
                                    "user",     server->user,
                                    NULL);
+        if (err) {
+            printf(_("Error storing password for %s@%s: %s\n"),
+                   server->user, server->host, err->message);
+            g_error_free(err);
+        }
 #elif defined (HAVE_GNOME_KEYRING)
 	gnome_keyring_store_password_sync(LIBBALSA_SERVER_KEYRING_SCHEMA,
 				     NULL,

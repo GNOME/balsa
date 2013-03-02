@@ -70,6 +70,7 @@ struct _LibBalsaMailboxLocal {
                      * average the syncing time for mailbox. */
     guint thread_id;    /* id of the idle mailbox thread job */
     guint save_tree_id; /* id of the idle mailbox save-tree job */
+    guint load_messages_id; /* id of the idle load-messages job */
     GPtrArray *threading_info;
     LibBalsaMailboxLocalPool message_pool[LBML_POOL_SIZE];
     guint pool_seqno;

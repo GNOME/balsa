@@ -394,6 +394,11 @@ libbalsa_mailbox_local_finalize(GObject * object)
 	ml->threading_info = NULL;
     }
 
+    if (ml->load_messages_id) {
+        g_source_remove(ml->load_messages_id);
+        ml->load_messages_id = 0;
+    }
+
     if (G_OBJECT_CLASS(parent_class)->finalize)
 	G_OBJECT_CLASS(parent_class)->finalize(object);
 }
@@ -1010,10 +1015,16 @@ libbalsa_mailbox_local_cache_message(LibBalsaMailboxLocal * local,
         info->sender = g_strdup("");
 }
 
-void
-libbalsa_mailbox_local_load_messages(LibBalsaMailbox *mailbox,
-                                     guint msgno)
+typedef struct {
+    LibBalsaMailbox *mailbox;
+    guint msgno;
+} LbmlLoadMessagesInfo;
+
+static gboolean
+lbml_load_messages_idle_cb(LbmlLoadMessagesInfo * info)
 {
+    LibBalsaMailbox *mailbox = info->mailbox;
+    guint msgno              = info->msgno;
     guint new_messages;
     LibBalsaMailboxLocal *local;
     guint lastno;
@@ -1021,14 +1032,12 @@ libbalsa_mailbox_local_load_messages(LibBalsaMailbox *mailbox,
     LibBalsaMailboxLocalMessageInfo *(*get_info) (LibBalsaMailboxLocal *,
                                                   guint);
 
-    g_return_if_fail(LIBBALSA_IS_MAILBOX_LOCAL(mailbox));
-
     gdk_threads_enter();
 
     if (!mailbox->msg_tree) {
 	/* Mailbox is closed, or no view has been created. */
         gdk_threads_leave();
-	return;
+	return FALSE;
     }
 
     local = (LibBalsaMailboxLocal *) mailbox;
@@ -1054,6 +1063,30 @@ libbalsa_mailbox_local_load_messages(LibBalsaMailbox *mailbox,
 						  mailbox->
 						  unread_messages > 0);
     }
+
+    local->load_messages_id = 0;
+    return FALSE;
+}
+
+void
+libbalsa_mailbox_local_load_messages(LibBalsaMailbox *mailbox,
+                                     guint msgno)
+{
+    LbmlLoadMessagesInfo *info;
+    LibBalsaMailboxLocal *local;
+
+    g_return_if_fail(LIBBALSA_IS_MAILBOX_LOCAL(mailbox));
+    local = (LibBalsaMailboxLocal *) mailbox;
+    if (local->load_messages_id)
+        return;
+
+    info = g_new(LbmlLoadMessagesInfo, 1);
+    info->mailbox = mailbox;
+    info->msgno   = msgno;
+    local->load_messages_id =
+        g_idle_add_full(G_PRIORITY_DEFAULT_IDLE,
+                        (GSourceFunc) lbml_load_messages_idle_cb, info,
+                        g_free);
 }
 
 /*

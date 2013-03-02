@@ -1,3 +1,20 @@
+2013-03-02  Peter Bloomfield
+
+	Re-enable mailbox check in a subthread
+
+	* libbalsa/mailbox.c (libbalsa_mailbox_progress_notify),
+	(libbalsa_mailbox_msgno_inserted),
+	(libbalsa_mailbox_msgno_removed),
+	(libbalsa_mailbox_unlink_and_prepend), (lbm_set_msg_tree):
+	insert subthread warnings.
+	(lbm_check_idle): check mailbox in a subthread.
+	* libbalsa/mailbox_local.c (lbml_load_messages_idle_cb),
+	(libbalsa_mailbox_local_load_messages): load messages in the
+	main thread, in an idle callback;
+	(libbalsa_mailbox_local_finalize): remove any pending idle call.
+	* libbalsa/mailbox_local.h: new member of LibBalsaMailboxLocal
+	for the idle id.
+
 2013-03-01  Peter Bloomfield
 
 	* libbalsa/mailbox.h: idle id is guint, not gulong.

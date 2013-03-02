@@ -743,7 +743,6 @@ lbm_changed_idle_cb(LibBalsaMailbox * mailbox)
 static void
 lbm_changed_schedule_idle(LibBalsaMailbox * mailbox)
 {
-    mailbox->msg_tree_changed = TRUE;
     if (!mailbox->changed_idle_id)
         mailbox->changed_idle_id =
             g_idle_add((GSourceFunc) lbm_changed_idle_cb, mailbox);
@@ -1411,6 +1410,7 @@ libbalsa_mailbox_msgno_filt_in(LibBalsaMailbox *mailbox, guint seqno)
                   path, &iter);
     gtk_tree_path_free(path);
 
+    mailbox->msg_tree_changed = TRUE;
     lbm_changed_schedule_idle(mailbox);
 
     gdk_threads_leave();
@@ -1579,6 +1579,7 @@ libbalsa_mailbox_msgno_filt_out(LibBalsaMailbox * mailbox, GNode * node)
     gtk_tree_path_free(path);
     mailbox->stamp++;
 
+    mailbox->msg_tree_changed = TRUE;
     lbm_changed_schedule_idle(mailbox);
 
     gdk_threads_leave();

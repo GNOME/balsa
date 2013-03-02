@@ -45,6 +45,7 @@ static void libbalsa_mailbox_local_class_init(LibBalsaMailboxLocalClass *klass);
 static void libbalsa_mailbox_local_init(LibBalsaMailboxLocal * mailbox);
 static void libbalsa_mailbox_local_finalize(GObject * object);
 
+static void libbalsa_mailbox_local_changed(LibBalsaMailbox * mailbox);
 static void libbalsa_mailbox_local_save_config(LibBalsaMailbox * mailbox,
 					       const gchar * prefix);
 static void libbalsa_mailbox_local_load_config(LibBalsaMailbox * mailbox,
@@ -142,6 +143,8 @@ libbalsa_mailbox_local_class_init(LibBalsaMailboxLocalClass * klass)
 
     object_class->finalize = libbalsa_mailbox_local_finalize;
 
+    libbalsa_mailbox_class->changed =
+	libbalsa_mailbox_local_changed;
     libbalsa_mailbox_class->save_config =
 	libbalsa_mailbox_local_save_config;
     libbalsa_mailbox_class->load_config =
@@ -401,6 +404,14 @@ libbalsa_mailbox_local_finalize(GObject * object)
 
     if (G_OBJECT_CLASS(parent_class)->finalize)
 	G_OBJECT_CLASS(parent_class)->finalize(object);
+}
+
+static void lbm_local_queue_save_tree(LibBalsaMailboxLocal * local);
+
+static void
+libbalsa_mailbox_local_changed(LibBalsaMailbox * mailbox)
+{
+    lbm_local_queue_save_tree(LIBBALSA_MAILBOX_LOCAL(mailbox));
 }
 
 static void
@@ -684,7 +695,6 @@ lbm_local_save_tree_real(LibBalsaMailboxLocal * local)
     if (MAILBOX_OPEN(mailbox) && mailbox->msg_tree_changed)
         lbm_local_save_tree(local);
     local->save_tree_id = 0;
-    g_object_unref(local);
 
     libbalsa_unlock_mailbox(mailbox);
 }
@@ -710,8 +720,7 @@ lbm_local_queue_save_tree(LibBalsaMailboxLocal * local)
 {
     if (!local->save_tree_id)
         local->save_tree_id =
-            g_idle_add((GSourceFunc) lbm_local_save_tree_idle,
-                       g_object_ref(local));
+            g_idle_add((GSourceFunc) lbm_local_save_tree_idle, local);
 }
 
 /* 
@@ -1015,16 +1024,10 @@ libbalsa_mailbox_local_cache_message(LibBalsaMailboxLocal * local,
         info->sender = g_strdup("");
 }
 
-typedef struct {
-    LibBalsaMailbox *mailbox;
-    guint msgno;
-} LbmlLoadMessagesInfo;
-
 static gboolean
-lbml_load_messages_idle_cb(LbmlLoadMessagesInfo * info)
+lbml_load_messages_idle_cb(LibBalsaMailbox * mailbox)
 {
-    LibBalsaMailbox *mailbox = info->mailbox;
-    guint msgno              = info->msgno;
+    guint msgno;
     guint new_messages;
     LibBalsaMailboxLocal *local;
     guint lastno;
@@ -1042,6 +1045,7 @@ lbml_load_messages_idle_cb(LbmlLoadMessagesInfo * info)
 
     local = (LibBalsaMailboxLocal *) mailbox;
     lastno = libbalsa_mailbox_total_messages(mailbox);
+    msgno = local->msgno;
     new_messages = lastno - msgno;
     lastn = g_node_last_child(mailbox->msg_tree);
     get_info = LIBBALSA_MAILBOX_LOCAL_GET_CLASS(local)->get_info;
@@ -1072,21 +1076,16 @@ void
 libbalsa_mailbox_local_load_messages(LibBalsaMailbox *mailbox,
                                      guint msgno)
 {
-    LbmlLoadMessagesInfo *info;
     LibBalsaMailboxLocal *local;
 
     g_return_if_fail(LIBBALSA_IS_MAILBOX_LOCAL(mailbox));
-    local = (LibBalsaMailboxLocal *) mailbox;
-    if (local->load_messages_id)
-        return;
 
-    info = g_new(LbmlLoadMessagesInfo, 1);
-    info->mailbox = mailbox;
-    info->msgno   = msgno;
-    local->load_messages_id =
-        g_idle_add_full(G_PRIORITY_DEFAULT_IDLE,
-                        (GSourceFunc) lbml_load_messages_idle_cb, info,
-                        g_free);
+    local = (LibBalsaMailboxLocal *) mailbox;
+    if (!local->load_messages_id) {
+        local->msgno = msgno;
+        local->load_messages_id =
+            g_idle_add((GSourceFunc) lbml_load_messages_idle_cb, mailbox);
+    }
 }
 
 /*

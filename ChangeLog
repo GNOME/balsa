@@ -1,5 +1,19 @@
 2013-03-02  Peter Bloomfield
 
+	* libbalsa/mailbox.c (lbm_changed_schedule_idle),
+	(libbalsa_mailbox_msgno_filt_in),
+	(libbalsa_mailbox_msgno_filt_out): set mailbox_changed only when
+	it really has changed.
+	* libbalsa/mailbox_local.c (libbalsa_mailbox_local_class_init),
+	(libbalsa_mailbox_local_changed), (lbm_local_save_tree_real),
+	(lbm_local_queue_save_tree), (lbml_load_messages_idle_cb),
+	(libbalsa_mailbox_local_load_messages): implement the "changed"
+	vfunc, and use it to schedule saving the message tree structure.
+	* libbalsa/mailbox_local.h: new member to temporarily hold the
+	current last msgno.
+
+2013-03-02  Peter Bloomfield
+
 	* libbalsa/server.c (libbalsa_server_save_config): report
 	error saving password.
 

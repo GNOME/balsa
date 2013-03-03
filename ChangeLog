@@ -1,3 +1,8 @@
+2013-03-03  Peter Bloomfield
+
+	* src/balsa-index.c (balsa_index_scroll_on_open): always use an
+	idle callback to select a message or set the tree-view's cursor.
+
 2013-03-02  Peter Bloomfield
 
 	* libbalsa/mailbox.c (lbm_changed_schedule_idle),

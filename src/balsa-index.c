@@ -888,10 +888,7 @@ balsa_index_scroll_on_open(BalsaIndex *index)
     gtk_tree_path_free(path);
     data->select = (view_on_open && GPOINTER_TO_INT(view_on_open))
         || balsa_app.view_message_on_open;
-    if (libbalsa_am_i_subthread())
-        gdk_threads_add_idle((GSourceFunc)bi_view_on_open, data);
-    else
-        bi_view_on_open(data);
+    g_idle_add((GSourceFunc)bi_view_on_open, data);
 }
 
 static LibBalsaCondition *cond_undeleted;

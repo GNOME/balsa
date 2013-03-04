@@ -305,6 +305,7 @@ extern struct BalsaApplication {
 
     /* command line options */
     gint open_inbox_upon_startup;
+    gboolean inbox_has_extra_open_ref;
     gint check_mail_upon_startup;
     gint remember_open_mboxes;
     gint open_unread_mailbox;

@@ -336,6 +336,8 @@ initial_open_inbox()
     balsa_mblist_open_mailbox_hidden(balsa_app.inbox);
     gdk_threads_leave();
 
+    balsa_app.inbox_has_extra_open_ref = TRUE;
+
     return FALSE;
 }
 
@@ -718,6 +720,9 @@ balsa_cleanup(void)
     }
     pthread_mutex_unlock(&checking_mail_lock);
 #endif
+    if (balsa_app.inbox_has_extra_open_ref)
+        libbalsa_mailbox_close(balsa_app.inbox,
+                               balsa_app.expunge_on_close);
     balsa_app_destroy();
     g_hash_table_destroy(libbalsa_mailbox_view_table);
     libbalsa_mailbox_view_table = NULL;

@@ -1,3 +1,9 @@
+2013-03-06  Peter Bloomfield
+
+	* src/balsa-index.c (bndx_queue_draw_idle_cb),
+	(bndx_mailbox_changed_idle): queue redrawing the message index
+	each time anything changes, to try to fix mis-rendering.
+
 2013-03-04  Peter Bloomfield
 
 	* src/main.c (initial_open_inbox), (balsa_cleanup): remember

@@ -1380,6 +1380,15 @@ balsa_index_set_column_widths(BalsaIndex * index)
 */
 
 static gboolean
+bndx_queue_draw_idle_cb(gpointer bindex)
+{
+    if (!bndx_clear_if_last_ref(&bindex))
+        gtk_widget_queue_draw(bindex);
+
+    return FALSE;
+}
+
+static gboolean
 bndx_mailbox_changed_idle(BalsaIndex * bindex)
 {
     LibBalsaMailbox *mailbox;
@@ -1407,6 +1416,9 @@ bndx_mailbox_changed_idle(BalsaIndex * bindex)
     }
 
     bndx_changed_find_row(bindex);
+
+    g_idle_add((GSourceFunc) bndx_queue_draw_idle_cb,
+               g_object_ref(bindex));
 
     return FALSE;
 }

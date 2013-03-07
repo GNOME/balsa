@@ -1,5 +1,10 @@
 2013-03-06  Peter Bloomfield
 
+	* src/main.c (scan_mailboxes_idle_cb): do not pass unowned
+	string.
+
+2013-03-06  Peter Bloomfield
+
 	Combine all mailboxes to be opened at startup into a single
 	array.
 

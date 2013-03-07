@@ -428,7 +428,8 @@ scan_mailboxes_idle_cb()
 
     if (balsa_app.remember_open_mboxes) {
         if (balsa_app.current_mailbox_url)
-            g_ptr_array_add(url_array, balsa_app.current_mailbox_url);
+            g_ptr_array_add(url_array,
+                            g_strdup(balsa_app.current_mailbox_url));
         balsa_add_open_mailbox_urls(url_array);
     }
 

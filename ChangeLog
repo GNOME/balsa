@@ -1,5 +1,18 @@
 2013-03-06  Peter Bloomfield
 
+	Combine all mailboxes to be opened at startup into a single
+	array.
+
+	* src/balsa-app.c (open_mailboxes_idle_cb),
+	(balsa_add_open_mailbox_urls):
+	* src/balsa-app.h: new method balsa_add_open_mailbox_urls; drop
+	hacky extra-open-ref.
+	* src/main.c (initial_open_inbox), (balsa_check_open_mailboxes),
+	(scan_mailboxes_idle_cb), (balsa_cleanup), (handle_remote):
+	collect mailbox URLs in an array.
+
+2013-03-06  Peter Bloomfield
+
 	* src/balsa-index.c (bndx_queue_draw_idle_cb),
 	(bndx_mailbox_changed_idle): queue redrawing the message index
 	each time anything changes, to try to fix mis-rendering.

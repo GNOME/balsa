@@ -305,7 +305,6 @@ extern struct BalsaApplication {
 
     /* command line options */
     gint open_inbox_upon_startup;
-    gboolean inbox_has_extra_open_ref;
     gint check_mail_upon_startup;
     gint remember_open_mboxes;
     gint open_unread_mailbox;
@@ -407,6 +406,7 @@ BalsaMailboxNode *balsa_find_dir(LibBalsaServer *server, const gchar * path);
 BalsaMailboxNode *balsa_find_url(const gchar * url);
 LibBalsaMailbox *balsa_find_mailbox_by_url(const gchar * url);
 LibBalsaMailbox *balsa_find_sentbox_by_url(const gchar * url);
+void balsa_add_open_mailbox_urls(GPtrArray * url_array);
 
 /** Returns a short mailbox name that identifies the host. This is
     longer than LibBalsaMailbox::name which contains only filename

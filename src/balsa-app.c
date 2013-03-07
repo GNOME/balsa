@@ -544,15 +544,7 @@ open_mailboxes_idle_cb(gchar ** urls)
 
     gdk_threads_enter();
 
-    if (urls) {
-        gboolean hidden;
-
-        hidden = FALSE;
-        for (tmp = urls; *tmp; ++tmp) {
-            open_mailbox_by_url(*tmp, hidden);
-            hidden = TRUE;
-        }
-    } else if (libbalsa_mailbox_view_table) {
+    if (!urls && libbalsa_mailbox_view_table) {
         GPtrArray *array;
 
         array = g_ptr_array_new();
@@ -560,16 +552,18 @@ open_mailboxes_idle_cb(gchar ** urls)
                              (GHFunc) append_url_if_open, array);
         g_ptr_array_add(array, NULL);
         urls = (gchar **) g_ptr_array_free(array, FALSE);
+    }
 
-        if (*urls) {
-            open_mailbox_by_url(balsa_app.current_mailbox_url, TRUE);
+    if (urls) {
+        for (tmp = urls; *tmp; ++tmp) {
+            gchar **p;
 
-            for (tmp = urls; *tmp; ++tmp) {
-                if (!balsa_app.current_mailbox_url
-                    || strcmp(*tmp, balsa_app.current_mailbox_url)) {
-                    open_mailbox_by_url(*tmp, TRUE);
-                }
-            }
+            /* Have we already seen this URL? */
+            for (p = urls; p < tmp; ++p)
+                if (!strcmp(*p, *tmp))
+                    break;
+            if (p == tmp)
+                open_mailbox_by_url(*tmp, TRUE);
         }
     }
 
@@ -577,6 +571,13 @@ open_mailboxes_idle_cb(gchar ** urls)
     gdk_threads_leave();
 
     return FALSE;
+}
+
+void
+balsa_add_open_mailbox_urls(GPtrArray * url_array)
+{
+    g_hash_table_foreach(libbalsa_mailbox_view_table,
+                         (GHFunc) append_url_if_open, url_array);
 }
 
 GtkWidget *

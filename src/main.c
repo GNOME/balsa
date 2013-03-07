@@ -84,9 +84,6 @@ static gboolean balsa_init(int argc, char **argv);
 static void config_init(gboolean check_only);
 static void mailboxes_init(gboolean check_only);
 static void balsa_cleanup(void);
-gboolean initial_open_unread_mailboxes(void);
-/* yes void is there cause gcc is tha suck */
-gboolean initial_open_inbox(void);
 
 /* We need separate variable for storing command line requests to check the
    mail because such selection cannot be stored in balsa_app and later
@@ -304,7 +301,7 @@ threads_destroy(void)
    open mailboxes on startup if requested so.
    This is an idle handler. Be sure to use gdk_threads_{enter/leave}
  */
-gboolean
+static gboolean
 initial_open_unread_mailboxes()
 {
     GList *l, *gl;
@@ -325,7 +322,7 @@ initial_open_unread_mailboxes()
 }
 
 
-gboolean
+static gboolean
 initial_open_inbox()
 {
     if (!balsa_app.inbox)
@@ -335,8 +332,6 @@ initial_open_inbox()
     gdk_threads_enter();
     balsa_mblist_open_mailbox_hidden(balsa_app.inbox);
     gdk_threads_leave();
-
-    balsa_app.inbox_has_extra_open_ref = TRUE;
 
     return FALSE;
 }
@@ -363,18 +358,16 @@ balsa_get_stats(long *unread, long *unsent)
 static void
 balsa_check_open_mailboxes(void)
 {
-    if (cmd_line_open_mailboxes) {
-        gchar *join;
-        gchar **urls;
+    gchar *join;
+    gchar **urls;
 
-        join = g_strjoinv(";", cmd_line_open_mailboxes);
-        g_strfreev(cmd_line_open_mailboxes);
-        cmd_line_open_mailboxes = NULL;
+    join = g_strjoinv(";", cmd_line_open_mailboxes);
+    g_strfreev(cmd_line_open_mailboxes);
+    cmd_line_open_mailboxes = NULL;
 
-        urls = g_strsplit(join, ";", 20);
-        g_free(join);
-        g_idle_add((GSourceFunc) open_mailboxes_idle_cb, urls);
-    }
+    urls = g_strsplit(join, ";", 20);
+    g_free(join);
+    g_idle_add((GSourceFunc) open_mailboxes_idle_cb, urls);
 }
 
 /* scan_mailboxes:
@@ -386,6 +379,7 @@ scan_mailboxes_idle_cb()
     gboolean valid;
     GtkTreeModel *model;
     GtkTreeIter iter;
+    GPtrArray *url_array;
 
     gdk_threads_enter();
     model = GTK_TREE_MODEL(balsa_app.mblist_tree_store);
@@ -403,16 +397,50 @@ scan_mailboxes_idle_cb()
     balsa_mailbox_node_append_subtree(balsa_app.root_node);
     gdk_threads_leave();
 
-    if (cmd_open_unread_mailbox || balsa_app.open_unread_mailbox)
-	g_idle_add((GSourceFunc) initial_open_unread_mailboxes, NULL);
+    url_array = g_ptr_array_new();
+    if (cmd_open_unread_mailbox || balsa_app.open_unread_mailbox){
+        GList *l, *gl;
 
-    balsa_check_open_mailboxes();
+        gl = balsa_mblist_find_all_unread_mboxes(NULL);
+        for (l = gl; l; l = l->next) {
+            LibBalsaMailbox *mailbox = l->data;
+            g_ptr_array_add(url_array, g_strdup(mailbox->url));
+        }
+        g_list_free(gl);
+    }
 
-    if (balsa_app.remember_open_mboxes)
-	g_idle_add((GSourceFunc) open_mailboxes_idle_cb, NULL);
+    if (cmd_line_open_mailboxes) {
+        gchar *join;
+        gchar **urls;
+        gchar **p;
 
-    if (cmd_open_inbox || balsa_app.open_inbox_upon_startup)
-	g_idle_add((GSourceFunc) initial_open_inbox, NULL);
+        join = g_strjoinv(";", cmd_line_open_mailboxes);
+        g_strfreev(cmd_line_open_mailboxes);
+        cmd_line_open_mailboxes = NULL;
+
+        urls = g_strsplit(join, ";", 20);
+        g_free(join);
+
+        for (p = urls; *p; p++)
+            g_ptr_array_add(url_array, *p);
+        g_free(urls); /* not g_strfreev */
+    }
+
+    if (balsa_app.remember_open_mboxes) {
+        if (balsa_app.current_mailbox_url)
+            g_ptr_array_add(url_array, balsa_app.current_mailbox_url);
+        balsa_add_open_mailbox_urls(url_array);
+    }
+
+    if (cmd_open_inbox || balsa_app.open_inbox_upon_startup) {
+        g_ptr_array_add(url_array, g_strdup(balsa_app.inbox->url));
+    }
+
+    if (url_array->len) {
+        g_ptr_array_add(url_array, NULL);
+        open_mailboxes_idle_cb((gchar **) g_ptr_array_free(url_array,
+                                                           FALSE));
+    }
 
     if(cmd_get_stats) {
         long unread, unsent;
@@ -720,9 +748,6 @@ balsa_cleanup(void)
     }
     pthread_mutex_unlock(&checking_mail_lock);
 #endif
-    if (balsa_app.inbox_has_extra_open_ref)
-        libbalsa_mailbox_close(balsa_app.inbox,
-                               balsa_app.expunge_on_close);
     balsa_app_destroy();
     g_hash_table_destroy(libbalsa_mailbox_view_table);
     libbalsa_mailbox_view_table = NULL;
@@ -801,7 +826,8 @@ handle_remote(int argc, char **argv,
         if (cmd_open_inbox)
             initial_open_inbox();
 
-        balsa_check_open_mailboxes();
+        if (cmd_line_open_mailboxes)
+            balsa_check_open_mailboxes();
 
         if (!balsa_check_open_compose_window()) {
             /* Move the main window to the request's screen */

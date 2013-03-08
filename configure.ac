@@ -309,8 +309,8 @@ if test x$with_gnome != xno; then
         with_gnome_keyring=no
      fi
      AC_MSG_RESULT($with_gnome_keyring)
-     AC_DEFINE(HAVE_GNOME,1,[Defined when gnome libs are available.])
    fi
+   AC_DEFINE(HAVE_GNOME,1,[Defined when building for GNOME.])
 else
    gnome_extras=""
 fi

@@ -26,10 +26,8 @@
 
 #include <stdlib.h>
 #include <string.h>
-#if HAVE_GNOME
 #include <gio/gio.h>
 #include <gio/gdesktopappinfo.h>
-#endif
 #include <glib/gi18n.h>
 #include "balsa-app.h"
 #include "server.h"
@@ -2124,7 +2122,6 @@ save_mru(GList * mru, const gchar * group)
     libbalsa_conf_pop_group();
 }
 
-#if HAVE_GNOME
 void
 config_defclient_save(void)
 {
@@ -2150,4 +2147,3 @@ config_defclient_save(void)
     }
     g_object_unref(info);
 }
-#endif /* HAVE_GNOME */

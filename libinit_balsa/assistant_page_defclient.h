@@ -32,10 +32,6 @@
 extern "C" {
 #endif                          /* __cplusplus */
 
-#if HAVE_GNOME
-/* setting the default Gnome mail client doesn't make sense if we don't build
- for Gnome */
-
 #include "assistant_helper.h"
 #include "assistant_init.h"
 
@@ -56,8 +52,6 @@ extern "C" {
  */
     void balsa_druid_page_defclient(GtkAssistant * druid);
     void balsa_druid_page_defclient_save(BalsaDruidPageDefclient * defclient);
-
-#endif /* HAVE_GNOME */
 
 #ifdef __cplusplus
 }

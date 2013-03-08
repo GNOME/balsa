@@ -3458,14 +3458,6 @@ bw_display_new_mail_notification(int num_new, int has_new)
     if (num_new <= 0 && has_new <= 0)
         return;
 
-#if 0
-#if HAVE_GNOME
-    if (balsa_app.notify_new_mail_sound)
-        gnome_triggers_do("New mail has arrived", "email",
-                          "balsa", "newmail", NULL);
-#endif
-#endif
-
     if (!gtk_window_is_active(window))
         gtk_window_set_urgency_hint(window, TRUE);
 

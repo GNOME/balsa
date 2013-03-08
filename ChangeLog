@@ -1,3 +1,17 @@
+2013-03-07  Peter Bloomfield
+
+	Use --with-gnome more carefully
+
+	* configure.ac: set HAVE_GNOME when configuring --with-gnome.
+	* libinit_balsa/assistant_init.c (balsa_initdruid):
+	default-client makes sense on non-GNOME builds.
+	* libinit_balsa/assistant_page_defclient.c
+	(balsa_druid_page_defclient_toggle): ditto.
+	* libinit_balsa/assistant_page_defclient.h: ditto.
+	* src/main.c (config_init), (mailboxes_init): ditto.
+	* src/save-restore.c (config_defclient_save): ditto.
+	* src/main-window.c: gnome-triggers code is totally dead.
+
 2013-03-06  Peter Bloomfield
 
 	* src/main.c (scan_mailboxes_idle_cb): do not pass unowned

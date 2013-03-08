@@ -232,9 +232,7 @@ config_init(gboolean check_only)
 {
     while(!config_load() && !check_only) {
 	balsa_init_begin();
-#if HAVE_GNOME
         config_defclient_save();
-#endif /* HAVE_GNOME */
     }
 }
 
@@ -245,9 +243,7 @@ mailboxes_init(gboolean check_only)
     if (!balsa_app.inbox && !check_only) {
 	g_warning("*** error loading mailboxes\n");
 	balsa_init_begin();
-#if HAVE_GNOME
         config_defclient_save();
-#endif /* HAVE_GNOME */
 	return;
     }
 }

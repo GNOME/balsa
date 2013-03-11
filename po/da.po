@@ -1,9 +1,9 @@
 # Danish translation of balsa.
-# Copyright (C) 2012 Free Software Foundation, Inc.
+# Copyright (C) 2013 Free Software Foundation, Inc.
 # Birger Langkjer <birger.langkjer@image.dk>, 1999.
 # Kenneth Christiansen - kenneth@ripen.dk
 # Keld Simonsen <keld@dkuug.dk>, 2000-2002.
-# Joe Hansen <joedalton2@yahoo.dk>, 2009, 2010, 2011, 2012.
+# Joe Hansen <joedalton2@yahoo.dk>, 2009, 2010, 2011, 2012, 2013.
 #
 # built -> bygget (måske kompileret?)
 # clipboard -> udklipsholder
@@ -44,8 +44,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-18 18:27+0100\n"
-"PO-Revision-Date: 2012-03-16 17:30+01:00\n"
+"POT-Creation-Date: 2013-03-11 23:19+0100\n"
+"PO-Revision-Date: 2013-03-10 17:30+01:00\n"
 "Last-Translator: Joe Hansen <joedalton2@yahoo.dk>\n"
 "Language-Team: Danish <dansk@dansk-gruppen.dk>\n"
 "Language: da\n"
@@ -59,16 +59,16 @@ msgid "Balsa"
 msgstr "Balsa"
 
 #: ../balsa.desktop.in.in.h:2 ../balsa-mailto-handler.desktop.in.in.h:2
-msgid "Balsa Mail Client"
-msgstr "E-post-klienten Balsa"
-
-#: ../balsa.desktop.in.in.h:3 ../balsa-mailto-handler.desktop.in.in.h:3
 msgid "E-Mail utility"
 msgstr "E-post-redskab"
 
-#: ../balsa.desktop.in.in.h:4 ../balsa-mailto-handler.desktop.in.in.h:4
+#: ../balsa.desktop.in.in.h:3 ../balsa-mailto-handler.desktop.in.in.h:3
 msgid "Mail Client"
 msgstr "Postklient"
+
+#: ../balsa.desktop.in.in.h:4 ../balsa-mailto-handler.desktop.in.in.h:4
+msgid "Balsa Mail Client"
+msgstr "E-post-klienten Balsa"
 
 #: ../libbalsa/address-book.c:314 ../libbalsa/filter-error.c:47
 msgid "No error"
@@ -852,57 +852,57 @@ msgstr "%s: Flere nøgler til %s"
 msgid "%s: insufficient validity for uid %s"
 msgstr "%s: Utilstrækkelig gyldighed for uid %s"
 
-#: ../libbalsa/libbalsa-gpgme-cb.c:144
+#: ../libbalsa/libbalsa-gpgme-cb.c:145
 msgid "User ID"
 msgstr "Bruger-id"
 
-#: ../libbalsa/libbalsa-gpgme-cb.c:144
+#: ../libbalsa/libbalsa-gpgme-cb.c:145
 msgid "Key ID"
 msgstr "Nøgle-id"
 
-#: ../libbalsa/libbalsa-gpgme-cb.c:144
+#: ../libbalsa/libbalsa-gpgme-cb.c:145
 msgid "Length"
 msgstr "Længde"
 
-#: ../libbalsa/libbalsa-gpgme-cb.c:144
+#: ../libbalsa/libbalsa-gpgme-cb.c:145
 msgid "Validity"
 msgstr "Gyldighed"
 
 #. FIXME: create dialog according to the Gnome HIG
-#: ../libbalsa/libbalsa-gpgme-cb.c:159
+#: ../libbalsa/libbalsa-gpgme-cb.c:160
 msgid "Select key"
 msgstr "Vælg nøgle"
 
-#: ../libbalsa/libbalsa-gpgme-cb.c:175
+#: ../libbalsa/libbalsa-gpgme-cb.c:176
 #, c-format
 msgid "Select the private key for the signer %s"
 msgstr "Vælg den private nøgle for underskriftsindehaveren %s"
 
-#: ../libbalsa/libbalsa-gpgme-cb.c:179
+#: ../libbalsa/libbalsa-gpgme-cb.c:180
 #, c-format
 msgid "Select the public key for the recipient %s"
 msgstr "Vælg den offentlige nøgle for modtageren %s"
 
-#: ../libbalsa/libbalsa-gpgme-cb.c:302
+#: ../libbalsa/libbalsa-gpgme-cb.c:303
 #, c-format
 msgid "Insufficient trust for recipient %s"
 msgstr "Utilstrækkelig med tillid til modtager %s"
 
-#: ../libbalsa/libbalsa-gpgme-cb.c:306
+#: ../libbalsa/libbalsa-gpgme-cb.c:307
 #, c-format
 msgid "The validity of the key with user ID \"%s\" is \"%s\"."
 msgstr "Gyldigheden på nøglen med bruger-id \"%s\" er \"%s\"."
 
-#: ../libbalsa/libbalsa-gpgme-cb.c:317
+#: ../libbalsa/libbalsa-gpgme-cb.c:318
 msgid "Use this key anyway?"
 msgstr "Brug denne nøgle alligevel?"
 
 #. FIXME: create dialog according to the Gnome HIG
-#: ../libbalsa/libbalsa-gpgme-cb.c:343
+#: ../libbalsa/libbalsa-gpgme-cb.c:344
 msgid "Enter Passphrase"
 msgstr "Indtast adgangsfrase"
 
-#: ../libbalsa/libbalsa-gpgme-cb.c:370
+#: ../libbalsa/libbalsa-gpgme-cb.c:371
 #, c-format
 msgid ""
 "%s\n"
@@ -915,7 +915,7 @@ msgstr ""
 "\n"
 "Nøgle: %s"
 
-#: ../libbalsa/libbalsa-gpgme-cb.c:375
+#: ../libbalsa/libbalsa-gpgme-cb.c:376
 #, c-format
 msgid ""
 "%s\n"
@@ -2092,9 +2092,8 @@ msgstr "Adressebog"
 msgid "Configure Balsa"
 msgstr "Indstil Balsa"
 
-# engelsk fejl stort B?
 #: ../libinit_balsa/assistant_page_defclient.c:59
-msgid "Use balsa as default email client?"
+msgid "Use Balsa as default email client?"
 msgstr "Brug Balsa som standard for e-post-klient?"
 
 #: ../libinit_balsa/assistant_page_defclient.c:63
@@ -2293,12 +2292,12 @@ msgid "Balsa E-mail reader"
 msgstr "E-post-programmet Balsa"
 
 #: ../sounds/balsa.soundlist.in.h:2
-msgid "New mail notification"
-msgstr "Besked om nye meddelelser"
-
-#: ../sounds/balsa.soundlist.in.h:3
 msgid "Program startup"
 msgstr "Opstart af program"
+
+#: ../sounds/balsa.soundlist.in.h:3
+msgid "New mail notification"
+msgstr "Besked om nye meddelelser"
 
 #: ../src/ab-main.c:228 ../src/ab-window.c:702
 msgid " address book: "
@@ -3049,8 +3048,8 @@ msgstr "Gem %s MIME-del"
 
 #: ../src/balsa-mime-widget-callbacks.c:123
 #, c-format
-msgid "Could not construct uri from %s"
-msgstr "Kunne ikke konstruere uri fra %s"
+msgid "Could not construct URI from %s"
+msgstr "Kunne ikke konstruere URI fra %s"
 
 #: ../src/balsa-mime-widget-callbacks.c:142
 msgid "File already exists. Overwrite?"
@@ -3657,10 +3656,10 @@ msgid "Revert"
 msgstr "Forkast ændringer"
 
 #: ../src/filter-edit-dialog.c:578
-msgid "A filter run dialog is open.Close it before you can modify filters."
+msgid "A filter run dialog is open. Close it before you can modify filters."
 msgstr ""
-"Der findes en åben dialog for kørsel af filtre. Luk det før du kan ændre på "
-"filtre."
+"Der findes en åben dialog for kørsel af filtre. Luk den for at kunne ændre "
+"på filtre."
 
 #: ../src/filter-edit-dialog.c:591
 msgid "Balsa Filters"
@@ -4424,7 +4423,7 @@ msgstr "Kladder"
 msgid "Trash"
 msgstr "Papirkurv"
 
-#: ../src/main.c:847
+#: ../src/main.c:845
 msgid "Compressing mail folders..."
 msgstr "Pakker postmapper..."
 

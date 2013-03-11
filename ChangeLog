@@ -1,3 +1,17 @@
+2013-03-11  Peter Bloomfield
+
+	Lock mailbox to avoid race
+
+	* libbalsa/mailbox.c (lbm_changed_idle_cb),
+	(lbm_changed_schedule_idle), (libbalsa_mailbox_changed),
+	(lbm_check_idle), (lbm_queue_check): lock the mailbox while
+	storing the id of an idle call, to avoid a race with the main
+	thread callback.
+	* libbalsa/mailbox_local.c (lbm_local_queue_save_tree),
+	(lbml_load_messages_idle_cb),
+	(libbalsa_mailbox_local_load_messages),
+	(libbalsa_mailbox_local_prepare_threading): ditto.
+
 2013-03-07  Peter Bloomfield
 
 	Use --with-gnome more carefully

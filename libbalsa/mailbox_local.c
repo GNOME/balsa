@@ -718,9 +718,13 @@ lbm_local_save_tree_idle(LibBalsaMailboxLocal * local)
 static void
 lbm_local_queue_save_tree(LibBalsaMailboxLocal * local)
 {
+    LibBalsaMailbox *mailbox = (LibBalsaMailbox *) local;
+
+    libbalsa_lock_mailbox(mailbox);
     if (!local->save_tree_id)
         local->save_tree_id =
             g_idle_add((GSourceFunc) lbm_local_save_tree_idle, local);
+    libbalsa_unlock_mailbox(mailbox);
 }
 
 /* 
@@ -1035,11 +1039,13 @@ lbml_load_messages_idle_cb(LibBalsaMailbox * mailbox)
     LibBalsaMailboxLocalMessageInfo *(*get_info) (LibBalsaMailboxLocal *,
                                                   guint);
 
+    libbalsa_lock_mailbox(mailbox);
     gdk_threads_enter();
 
     if (!mailbox->msg_tree) {
 	/* Mailbox is closed, or no view has been created. */
         gdk_threads_leave();
+        libbalsa_unlock_mailbox(mailbox);
 	return FALSE;
     }
 
@@ -1069,6 +1075,7 @@ lbml_load_messages_idle_cb(LibBalsaMailbox * mailbox)
     }
 
     local->load_messages_id = 0;
+    libbalsa_unlock_mailbox(mailbox);
     return FALSE;
 }
 
@@ -1081,11 +1088,13 @@ libbalsa_mailbox_local_load_messages(LibBalsaMailbox *mailbox,
     g_return_if_fail(LIBBALSA_IS_MAILBOX_LOCAL(mailbox));
 
     local = (LibBalsaMailboxLocal *) mailbox;
+    libbalsa_lock_mailbox(mailbox);
     if (!local->load_messages_id) {
         local->msgno = msgno;
         local->load_messages_id =
             g_idle_add((GSourceFunc) lbml_load_messages_idle_cb, mailbox);
     }
+    libbalsa_unlock_mailbox(mailbox);
 }
 
 /*
@@ -1317,6 +1326,7 @@ libbalsa_mailbox_local_prepare_threading(LibBalsaMailbox * mailbox,
     LibBalsaProgress progress = LIBBALSA_PROGRESS_INIT;
     gboolean retval = TRUE;
 
+    libbalsa_lock_mailbox(mailbox);
     libbalsa_mailbox_local_set_threading_info(local);
 
     text = g_strdup_printf(_("Preparing %s"), mailbox->name);
@@ -1352,6 +1362,7 @@ libbalsa_mailbox_local_prepare_threading(LibBalsaMailbox * mailbox,
                 g_idle_add((GSourceFunc) lbm_local_thread_idle, local);
         }
     }
+    libbalsa_unlock_mailbox(mailbox);
 
     return retval;
 }

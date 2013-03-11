@@ -735,27 +735,34 @@ libbalsa_mailbox_check(LibBalsaMailbox * mailbox)
 static gboolean
 lbm_changed_idle_cb(LibBalsaMailbox * mailbox)
 {
+    libbalsa_lock_mailbox(mailbox);
     g_signal_emit(mailbox, libbalsa_mailbox_signals[CHANGED], 0);
     mailbox->changed_idle_id = 0;
+    libbalsa_unlock_mailbox(mailbox);
     return FALSE;
 }
 
 static void
 lbm_changed_schedule_idle(LibBalsaMailbox * mailbox)
 {
+    libbalsa_lock_mailbox(mailbox);
     if (!mailbox->changed_idle_id)
         mailbox->changed_idle_id =
             g_idle_add((GSourceFunc) lbm_changed_idle_cb, mailbox);
+    libbalsa_unlock_mailbox(mailbox);
 }
 
 void
 libbalsa_mailbox_changed(LibBalsaMailbox * mailbox)
 {
+    libbalsa_lock_mailbox(mailbox);
     if (!g_signal_has_handler_pending
-        (mailbox, libbalsa_mailbox_signals[CHANGED], 0, TRUE))
+        (mailbox, libbalsa_mailbox_signals[CHANGED], 0, TRUE)) {
         /* No one cares, so don't set any message counts--that might
          * cause mailbox->view to be created. */
+        libbalsa_unlock_mailbox(mailbox);
         return;
+    }
 
     if (MAILBOX_OPEN(mailbox)) {
         /* Both counts are valid. */
@@ -772,6 +779,7 @@ libbalsa_mailbox_changed(LibBalsaMailbox * mailbox)
     }
 
     lbm_changed_schedule_idle(mailbox);
+    libbalsa_unlock_mailbox(mailbox);
 }
 
 /* libbalsa_mailbox_message_match:
@@ -4323,16 +4331,22 @@ lbm_check_idle(LibBalsaMailbox * mailbox)
     lbm_check_real(mailbox);
 #endif                          /*BALSA_USE_THREADS */
 
+    libbalsa_lock_mailbox(mailbox);
+    mailbox->queue_check_idle_id = 0;
+    libbalsa_unlock_mailbox(mailbox);
+
     return FALSE;
 }
 
 static void
 lbm_queue_check(LibBalsaMailbox * mailbox)
 {
+    libbalsa_lock_mailbox(mailbox);
     if (!mailbox->queue_check_idle_id)
         mailbox->queue_check_idle_id =
             g_idle_add((GSourceFunc) lbm_check_idle,
                        g_object_ref(mailbox));
+    libbalsa_unlock_mailbox(mailbox);
 }
 
 /* Search mailbox for a message matching the condition in search_iter,

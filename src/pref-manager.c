@@ -785,18 +785,35 @@ destroy_pref_window_cb(void)
     already_open = FALSE;
 }
 
-    /* GHFunc callback; update any view that is using the current default
+    /* LibBalsaConfForeachFunc callback;
+     * update any view that is using the current default
      * value to the new default value. */
-static void
-update_view_defaults(const gchar * url, LibBalsaMailboxView * view,
+static gboolean
+update_view_defaults(const gchar * group, const gchar * url,
                      gpointer data)
 {
+    LibBalsaMailbox *mailbox;
+    LibBalsaMailboxView *view;
+
+    mailbox = balsa_find_mailbox_by_url(url);
+    view = mailbox ? mailbox->view : config_load_mailbox_view(url);
+
+    if (!view)
+        return FALSE;
+
     if (view->filter == libbalsa_mailbox_get_filter(NULL))
         view->filter = pui->filter;
     if (view->sort_field == libbalsa_mailbox_get_sort_field(NULL))
         view->sort_field = pui->sort_field_index;
     if (view->threading_type == libbalsa_mailbox_get_threading_type(NULL))
         view->threading_type = pui->threading_type_index;
+
+    if (!mailbox) {
+        config_save_mailbox_view(url, view);
+        libbalsa_mailbox_view_free(view);
+    }
+
+    return FALSE;
 }
 
 static void
@@ -836,8 +853,10 @@ apply_prefs(GtkDialog * pbox)
      * Before changing the default mailbox view, update any current
      * views that have default values.
      */
-    g_hash_table_foreach(libbalsa_mailbox_view_table,
-                         (GHFunc) update_view_defaults, NULL);
+    libbalsa_conf_foreach_group(VIEW_BY_URL_SECTION_PREFIX,
+                                (LibBalsaConfForeachFunc)
+                                update_view_defaults, NULL);
+
 
     g_free(balsa_app.local_mail_directory);
     balsa_app.local_mail_directory =

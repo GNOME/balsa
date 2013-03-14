@@ -53,7 +53,6 @@
 #define ADDRESS_BOOK_SECTION_PREFIX "address-book-"
 #define IDENTITY_SECTION_PREFIX "identity-"
 #define VIEW_SECTION_PREFIX "view-"
-#define VIEW_BY_URL_SECTION_PREFIX "viewByUrl-"
 #define SMTP_SERVER_SECTION_PREFIX "smtp-server-"
 
 static gint config_global_load(void);
@@ -1738,107 +1737,6 @@ config_identities_save(void)
     }
 }
 
-static gboolean
-config_view_load(const gchar * key, const gchar * value, gpointer data)
-{
-    gboolean compat = GPOINTER_TO_INT(data);
-    gchar *url;
-    gint def;
-
-    libbalsa_conf_push_group(key);
-
-    url = compat ? libbalsa_conf_get_string_with_default("URL", &def) :
-        libbalsa_urldecode(value);
-
-    if (!compat || !def) {
-        LibBalsaMailboxView *view;
-        gint tmp;
-        gchar *address;
-
-        view = libbalsa_mailbox_view_new();
-        /* In compatibility mode, mark as not in sync, to force
-         * the view to be saved in the config file. */
-        view->in_sync = !compat;
-        g_hash_table_insert(libbalsa_mailbox_view_table, g_strdup(url),
-                            view);
-
-        address =
-            libbalsa_conf_get_string_with_default("MailingListAddress",
-                                                  &def);
-        view->mailing_list_address =
-            def ? NULL : internet_address_list_parse_string(address);
-        g_free(address);
-
-        view->identity_name = libbalsa_conf_get_string("Identity");
-
-        tmp = libbalsa_conf_get_int_with_default("Threading", &def);
-        if (!def)
-            view->threading_type = tmp;
-
-        tmp = libbalsa_conf_get_int_with_default("GUIFilter", &def);
-        if (!def)
-            view->filter = tmp;
-
-        tmp = libbalsa_conf_get_int_with_default("SortType", &def);
-        if (!def)
-            view->sort_type = tmp;
-
-        tmp = libbalsa_conf_get_int_with_default("SortField", &def);
-        if (!def)
-            view->sort_field = tmp;
-
-        tmp = libbalsa_conf_get_int_with_default("Show", &def);
-        if (!def)
-            view->show = tmp;
-
-        tmp = libbalsa_conf_get_int_with_default("Subscribe", &def);
-        if (!def)
-            view->subscribe = tmp;
-
-        tmp = libbalsa_conf_get_bool_with_default("Exposed", &def);
-        if (!def)
-            view->exposed = tmp;
-
-        tmp = libbalsa_conf_get_bool_with_default("Open", &def);
-        if (!def)
-            view->open = tmp;
-#ifdef HAVE_GPGME
-        tmp = libbalsa_conf_get_int_with_default("CryptoMode", &def);
-        if (!def)
-            view->gpg_chk_mode = tmp;
-#endif
-
-        tmp = libbalsa_conf_get_int_with_default("Total", &def);
-        if (!def)
-            view->total = tmp;
-
-        tmp = libbalsa_conf_get_int_with_default("Unread", &def);
-        if (!def)
-            view->unread = tmp;
-
-        tmp = libbalsa_conf_get_int_with_default("ModTime", &def);
-        if (!def)
-            view->mtime = tmp;
-    }
-
-    libbalsa_conf_pop_group();
-    g_free(url);
-
-    return FALSE;
-}
-
-void
-config_views_load(void)
-{
-    /* Load old-style config sections in compatibility mode. */
-    libbalsa_conf_foreach_group(VIEW_SECTION_PREFIX,
-                                config_view_load,
-                                GINT_TO_POINTER(TRUE));
-    libbalsa_conf_foreach_group(VIEW_BY_URL_SECTION_PREFIX,
-                                config_view_load,
-                                GINT_TO_POINTER(FALSE));
-}
-
 /* Get viewByUrl prefix */
 static gchar *
 view_by_url_prefix(const gchar * url)
@@ -1853,11 +1751,83 @@ view_by_url_prefix(const gchar * url)
     return prefix;
 }
 
-/* config_views_save:
-   iterates over all mailbox views.
-*/
-static void
-save_view(const gchar * url, LibBalsaMailboxView * view)
+
+LibBalsaMailboxView *
+config_load_mailbox_view(const gchar * url)
+{
+    gchar *prefix;
+    LibBalsaMailboxView *view;
+
+    if (!url)
+        return NULL;
+
+    prefix = view_by_url_prefix(url);
+    if (!libbalsa_conf_has_group(prefix)) {
+        g_free(prefix);
+        return NULL;
+    }
+
+    libbalsa_conf_push_group(prefix);
+
+    view = libbalsa_mailbox_view_new();
+
+    if (libbalsa_conf_has_key("MailingListAddress")) {
+        gchar *address;
+
+        address = libbalsa_conf_get_string("MailingListAddress");
+        view->mailing_list_address =
+            internet_address_list_parse_string(address);
+        g_free(address);
+    }
+
+    view->identity_name = libbalsa_conf_get_string("Identity");
+
+    if (libbalsa_conf_has_key("Threading"))
+        view->threading_type = libbalsa_conf_get_int("Threading");
+
+    if (libbalsa_conf_has_key("GUIFilter"))
+        view->filter = libbalsa_conf_get_int("GUIFilter");
+
+    if (libbalsa_conf_has_key("SortType"))
+        view->sort_type = libbalsa_conf_get_int("SortType");
+
+    if (libbalsa_conf_has_key("SortField"))
+        view->sort_field = libbalsa_conf_get_int("SortField");
+
+    if (libbalsa_conf_has_key("Show"))
+        view->show = libbalsa_conf_get_int("Show");
+
+    if (libbalsa_conf_has_key("Subscribe"))
+        view->subscribe = libbalsa_conf_get_int("Subscribe");
+
+    if (libbalsa_conf_has_key("Exposed"))
+        view->exposed = libbalsa_conf_get_bool("Exposed");
+
+    if (libbalsa_conf_has_key("Open"))
+        view->open = libbalsa_conf_get_bool("Open");
+
+#ifdef HAVE_GPGME
+    if (libbalsa_conf_has_key("CryptoMode"))
+        view->gpg_chk_mode = libbalsa_conf_get_int("CryptoMode");
+#endif
+
+    if (libbalsa_conf_has_key("Total"))
+        view->total = libbalsa_conf_get_int("Total");
+
+    if (libbalsa_conf_has_key("Unread"))
+        view->unread = libbalsa_conf_get_int("Unread");
+
+    if (libbalsa_conf_has_key("ModTime"))
+        view->mtime = libbalsa_conf_get_int("ModTime");
+
+    libbalsa_conf_pop_group();
+    g_free(prefix);
+
+    return view;
+}
+
+void
+config_save_mailbox_view(const gchar * url, LibBalsaMailboxView * view)
 {
     gchar *prefix;
 
@@ -1924,21 +1894,11 @@ save_view(const gchar * url, LibBalsaMailboxView * view)
 }
 
 void
-config_views_save(void)
-{
-    config_remove_groups(VIEW_SECTION_PREFIX);
-    /* save current */
-    g_hash_table_foreach(libbalsa_mailbox_view_table, (GHFunc) save_view,
-			 NULL);
-}
-
-void
 config_view_remove(const gchar * url)
 {
     gchar *prefix = view_by_url_prefix(url);
     libbalsa_conf_remove_group(prefix);
     g_free(prefix);
-    g_hash_table_remove(libbalsa_mailbox_view_table, url);
 }
 
 static void
@@ -2146,4 +2106,39 @@ config_defclient_save(void)
         g_error_free(err);
     }
     g_object_unref(info);
+}
+
+static gboolean
+config_mailbox_had_property(const gchar * url, const gchar * key)
+{
+    gchar *prefix;
+    gboolean retval = FALSE;
+
+    prefix = view_by_url_prefix(url);
+    if (!libbalsa_conf_has_group(prefix)) {
+        g_free(prefix);
+        return retval;
+    }
+
+    libbalsa_conf_push_group(prefix);
+
+    if (libbalsa_conf_has_key(key))
+        retval = libbalsa_conf_get_bool(key);
+
+    libbalsa_conf_pop_group();
+    g_free(prefix);
+
+    return retval;
+}
+
+gboolean
+config_mailbox_was_open(const gchar * url)
+{
+    return config_mailbox_had_property(url, "Open");
+}
+
+gboolean
+config_mailbox_was_exposed(const gchar * url)
+{
+    return config_mailbox_had_property(url, "Exposed");
 }

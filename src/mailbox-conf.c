@@ -1035,37 +1035,12 @@ mailbox_conf_add(MailboxConfWindow * mcw)
 	g_assert_not_reached();
     }
 
-    if (!LIBBALSA_IS_MAILBOX_POP3(mcw->mailbox)) {
-	/* Mailbox must have an URL by now... */
-	g_assert(mcw->mailbox->url != NULL);
-	/* ...and a view... */
-	g_assert(mcw->mailbox->view != NULL);
-	/* ...and if it's not already in the table, insert it. */
-	if (mcw->mailbox->view !=
-	    g_hash_table_lookup(libbalsa_mailbox_view_table,
-				mcw->mailbox->url))
-	    g_hash_table_insert(libbalsa_mailbox_view_table,
-				g_strdup(mcw->mailbox->url),
-				mcw->mailbox->view);
-    }
-
     if(save_to_config)
 	config_mailbox_add(mcw->mailbox, NULL);
 
     if (LIBBALSA_IS_MAILBOX_POP3(mcw->mailbox))
 	/* redraw the pop3 server list */
 	update_mail_servers();
-    else {/* redraw the main mailbox list */
-	/* If the new mailbox is in the local mail tree, its view will
-	 * already be in the mailbox-views, in which case inserting it
-	 * again would cause the view to be freed, so we'd better
-	 * check... */
-	if (!g_hash_table_lookup(libbalsa_mailbox_view_table,
-				 mcw->mailbox->url))
-	    g_hash_table_insert(libbalsa_mailbox_view_table,
-				g_strdup(mcw->mailbox->url),
-				mcw->mailbox->view);
-    }
 }
 
 /* Create a page for the type of mailbox... */
@@ -1595,10 +1570,13 @@ mailbox_conf_view_check(BalsaMailboxConfView * view_info,
 
     changed = FALSE;
 
-    if (!mailbox->view)
-	/* The mailbox may not have its URL yet, so we can't insert it
-	 * into libbalsa_mailbox_view_table yet. */
+    g_warn_if_fail(mailbox->view == NULL);
+    g_print("%s set view on %s\n", __func__, mailbox->name);
+    mailbox->view = config_load_mailbox_view(mailbox->url);
+    if (!mailbox->view) {
+	/* The mailbox may not have its URL yet */
 	mailbox->view = libbalsa_mailbox_view_new();
+    }
 
     active =
         gtk_combo_box_get_active(GTK_COMBO_BOX

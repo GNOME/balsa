@@ -1,5 +1,41 @@
 2013-03-14  Peter Bloomfield
 
+	Streamline handling of LibBalsaMailboxView
+
+	* libbalsa/mailbox.c (libbalsa_mailbox_finalize): free the view;
+	(libbalsa_mailbox_view_free), (lbm_get_view): check for NULL
+	view;
+	(libbalsa_mailbox_set_identity_name),
+	(libbalsa_mailbox_set_threading_type),
+	(libbalsa_mailbox_set_sort_type),
+	(libbalsa_mailbox_set_sort_field), (libbalsa_mailbox_set_show),
+	(libbalsa_mailbox_set_subscribe), (libbalsa_mailbox_set_exposed),
+	(libbalsa_mailbox_set_open), (libbalsa_mailbox_set_filter),
+	(libbalsa_mailbox_set_unread), (libbalsa_mailbox_set_total),
+	(libbalsa_mailbox_set_mtime), (libbalsa_mailbox_get_filter):
+	drop LibBalsaMailboxView::frozen and the hash table.
+	* libbalsa/mailbox.h: ditto.
+	* src/balsa-app.c (balsa_app_destroy), (append_url_if_open),
+	(open_mailbox_by_url), (open_mailboxes_idle_cb),
+	(balsa_add_open_mailbox_urls): traverse views in the config
+	instead of in the hash table.
+	* src/mailbox-conf.c (mailbox_conf_add),
+	(mailbox_conf_view_check): ditto.
+	* src/mailbox-node.c (balsa_mailbox_node_dispose),
+	(check_url_func), (check_local_path), (load_mailbox_view),
+	(check_imap_path): ditto.
+	* src/pref-manager.c (update_view_defaults), (apply_prefs):
+	ditto.
+	* src/main.c (real_main), (balsa_cleanup): no hash table.
+	* src/save-restore.c (config_view_remove),
+	(config_defclient_save): no hash table.
+	(config_mailbox_had_property), (config_mailbox_was_open),
+	(config_mailbox_was_exposed), (config_load_mailbox_view),
+	(config_save_mailbox_view): new methods.
+	* src/save-restore.h: ditto.
+
+2013-03-14  Peter Bloomfield
+
 	* libbalsa/libbalsa-conf.c (libbalsa_conf_has_key): new
 	function.
 	* libbalsa/libbalsa-conf.h: ditto.

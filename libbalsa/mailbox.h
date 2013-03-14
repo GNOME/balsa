@@ -180,7 +180,6 @@ struct _LibBalsaMailboxView {
     gboolean exposed;
     gboolean open;
     gboolean in_sync;		/* view is in sync with config */
-    gboolean frozen;		/* don't update view if set    */
     gboolean used;		/* keep track of usage         */
 
 #ifdef HAVE_GPGME
@@ -538,8 +537,6 @@ void libbalsa_mailbox_unlink_and_prepend(LibBalsaMailbox * mailbox,
 					 GNode * node, GNode * parent);
 
 /* Mailbox views. */
-extern GHashTable *libbalsa_mailbox_view_table;
-
 LibBalsaMailboxView *libbalsa_mailbox_view_new(void);
 void libbalsa_mailbox_view_free(LibBalsaMailboxView * view);
 gboolean libbalsa_mailbox_set_identity_name(LibBalsaMailbox * mailbox,
@@ -560,7 +557,6 @@ void libbalsa_mailbox_set_exposed(LibBalsaMailbox * mailbox,
 				  gboolean exposed);
 void libbalsa_mailbox_set_open(LibBalsaMailbox * mailbox, gboolean open);
 void libbalsa_mailbox_set_filter(LibBalsaMailbox * mailbox, gint filter);
-void libbalsa_mailbox_set_frozen(LibBalsaMailbox * mailbox, gboolean frozen);
 #ifdef HAVE_GPGME
 gboolean libbalsa_mailbox_set_crypto_mode(LibBalsaMailbox * mailbox,
 					  LibBalsaChkCryptoMode gpg_chk_mode);
@@ -584,7 +580,6 @@ LibBalsaMailboxSubscribe libbalsa_mailbox_get_subscribe(LibBalsaMailbox *
 gboolean libbalsa_mailbox_get_exposed(LibBalsaMailbox * mailbox);
 gboolean libbalsa_mailbox_get_open(LibBalsaMailbox * mailbox);
 gint libbalsa_mailbox_get_filter(LibBalsaMailbox * mailbox);
-gboolean libbalsa_mailbox_get_frozen(LibBalsaMailbox * mailbox);
 #ifdef HAVE_GPGME
 LibBalsaChkCryptoMode libbalsa_mailbox_get_crypto_mode(LibBalsaMailbox * mailbox);
 #endif

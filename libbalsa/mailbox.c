@@ -491,7 +491,7 @@ libbalsa_mailbox_finalize(GObject * object)
     }
 #endif                          /*BALSA_USE_THREADS */
 
-    /* The LibBalsaMailboxView is owned by balsa_app.mailbox_views. */
+    libbalsa_mailbox_view_free(mailbox->view);
     mailbox->view = NULL;
 
     if (mailbox->changed_idle_id) {
@@ -2355,7 +2355,6 @@ libbalsa_mailbox_set_threading(LibBalsaMailbox *mailbox,
  * Mailbox view methods                                                *
  * =================================================================== */
 
-GHashTable *libbalsa_mailbox_view_table;
 static LibBalsaMailboxView libbalsa_mailbox_view_default = {
     NULL,			/* mailing_list_address */
     NULL,			/* identity_name        */
@@ -2369,7 +2368,6 @@ static LibBalsaMailboxView libbalsa_mailbox_view_default = {
     0,				/* exposed              */
     0,				/* open                 */
     1,				/* in_sync              */
-    0,				/* frozen		*/
     0,				/* used 		*/
 #ifdef HAVE_GPGME
     LB_MAILBOX_CHK_CRYPT_MAYBE, /* gpg_chk_mode         */
@@ -2393,6 +2391,9 @@ libbalsa_mailbox_view_new(void)
 void
 libbalsa_mailbox_view_free(LibBalsaMailboxView * view)
 {
+    if (!view)
+        return;
+
     if (view->mailing_list_address)
         g_object_unref(view->mailing_list_address);
     g_free(view->identity_name);
@@ -2403,24 +2404,13 @@ libbalsa_mailbox_view_free(LibBalsaMailboxView * view)
 static LibBalsaMailboxView *
 lbm_get_view(LibBalsaMailbox * mailbox)
 {
-    LibBalsaMailboxView *view;
-
     if (!mailbox)
 	return &libbalsa_mailbox_view_default;
 
-    view = mailbox->view;
-    if (!view) {
-        view =
-            g_hash_table_lookup(libbalsa_mailbox_view_table, mailbox->url);
-        if (!view) {
-            view = libbalsa_mailbox_view_new();
-            g_hash_table_insert(libbalsa_mailbox_view_table,
-                                g_strdup(mailbox->url), view);
-        }
-        mailbox->view = view;
-    }
+    if (!mailbox->view)
+        mailbox->view = libbalsa_mailbox_view_new();
 
-    return view;
+    return mailbox->view;
 }
 
 /* Set methods; NULL mailbox is valid, and changes the default value. */
@@ -2431,9 +2421,7 @@ libbalsa_mailbox_set_identity_name(LibBalsaMailbox * mailbox,
 {
     LibBalsaMailboxView *view = lbm_get_view(mailbox);
 
-    if (!view->frozen
-	&& (!view->identity_name
-	    || strcmp(view->identity_name, identity_name))) {
+    if (!view->identity_name || strcmp(view->identity_name, identity_name)) {
 	g_free(view->identity_name);
 	view->identity_name = g_strdup(identity_name);
 	if (mailbox)
@@ -2450,7 +2438,7 @@ libbalsa_mailbox_set_threading_type(LibBalsaMailbox * mailbox,
 {
     LibBalsaMailboxView *view = lbm_get_view(mailbox);
 
-    if (!view->frozen && view->threading_type != threading_type) {
+    if (view->threading_type != threading_type) {
 	view->threading_type = threading_type;
 	if (mailbox)
 	    view->in_sync = 0;
@@ -2463,7 +2451,7 @@ libbalsa_mailbox_set_sort_type(LibBalsaMailbox * mailbox,
 {
     LibBalsaMailboxView *view = lbm_get_view(mailbox);
 
-    if (!view->frozen && view->sort_type != sort_type) {
+    if (view->sort_type != sort_type) {
 	view->sort_type = sort_type;
 	if (mailbox)
 	    view->in_sync = 0;
@@ -2476,7 +2464,7 @@ libbalsa_mailbox_set_sort_field(LibBalsaMailbox * mailbox,
 {
     LibBalsaMailboxView *view = lbm_get_view(mailbox);
 
-    if (!view->frozen && view->sort_field != sort_field) {
+    if (view->sort_field != sort_field) {
 	view->sort_field_prev = view->sort_field;
 	view->sort_field = sort_field;
 	if (mailbox)
@@ -2489,7 +2477,7 @@ libbalsa_mailbox_set_show(LibBalsaMailbox * mailbox, LibBalsaMailboxShow show)
 {
     LibBalsaMailboxView *view = lbm_get_view(mailbox);
 
-    if (!view->frozen && view->show != show) {
+    if (view->show != show) {
 	/* Don't set not in sync if we're just replacing UNSET with the
 	 * default. */
 	if (mailbox && view->show != LB_MAILBOX_SHOW_UNSET)
@@ -2506,7 +2494,7 @@ libbalsa_mailbox_set_subscribe(LibBalsaMailbox * mailbox,
 {
     LibBalsaMailboxView *view = lbm_get_view(mailbox);
 
-    if (!view->frozen && view->subscribe != subscribe) {
+    if (view->subscribe != subscribe) {
 	/* Don't set not in sync if we're just replacing UNSET with the
 	 * default. */
 	if (mailbox && view->subscribe != LB_MAILBOX_SUBSCRIBE_UNSET)
@@ -2522,7 +2510,7 @@ libbalsa_mailbox_set_exposed(LibBalsaMailbox * mailbox, gboolean exposed)
 {
     LibBalsaMailboxView *view = lbm_get_view(mailbox);
 
-    if (!view->frozen && view->exposed != exposed) {
+    if (view->exposed != exposed) {
 	view->exposed = exposed ? 1 : 0;
 	if (mailbox)
 	    view->in_sync = 0;
@@ -2534,7 +2522,7 @@ libbalsa_mailbox_set_open(LibBalsaMailbox * mailbox, gboolean open)
 {
     LibBalsaMailboxView *view = lbm_get_view(mailbox);
 
-    if (!view->frozen && view->open != open) {
+    if (view->open != open) {
 	view->open = open ? 1 : 0;
 	if (mailbox)
 	    view->in_sync = 0;
@@ -2546,27 +2534,11 @@ libbalsa_mailbox_set_filter(LibBalsaMailbox * mailbox, gint filter)
 {
     LibBalsaMailboxView *view = lbm_get_view(mailbox);
 
-    if (!view->frozen && view->filter != filter) {
+    if (view->filter != filter) {
 	view->filter = filter;
 	if (mailbox)
 	    view->in_sync = 0;
     }
-}
-
-/* Freeze or unfreeze the view: no changes are made while the view is
- * frozen;
- * - changing the default is not allowed;
- * - no action needed if the view is NULL. */
-void
-libbalsa_mailbox_set_frozen(LibBalsaMailbox * mailbox, gboolean frozen)
-{
-    LibBalsaMailboxView *view;
-
-    g_return_if_fail(mailbox != NULL);
-
-    view = mailbox->view;
-    if (view)
-	view->frozen = frozen ? 1 : 0;
 }
 
 #ifdef HAVE_GPGME
@@ -2598,7 +2570,7 @@ libbalsa_mailbox_set_unread(LibBalsaMailbox * mailbox, gint unread)
     view = lbm_get_view(mailbox);
     view->used = 1;
 
-    if (!view->frozen && view->unread != unread) {
+    if (view->unread != unread) {
 	view->unread = unread;
         view->in_sync = 0;
     }
@@ -2614,7 +2586,7 @@ libbalsa_mailbox_set_total(LibBalsaMailbox * mailbox, gint total)
 
     view = lbm_get_view(mailbox);
 
-    if (!view->frozen && view->total != total) {
+    if (view->total != total) {
 	view->total = total;
         view->in_sync = 0;
     }
@@ -2630,7 +2602,7 @@ libbalsa_mailbox_set_mtime(LibBalsaMailbox * mailbox, time_t mtime)
 
     view = lbm_get_view(mailbox);
 
-    if (!view->frozen && view->mtime != mtime) {
+    if (view->mtime != mtime) {
 	view->mtime = mtime;
         view->in_sync = 0;
     }
@@ -2713,13 +2685,6 @@ libbalsa_mailbox_get_filter(LibBalsaMailbox * mailbox)
 {
     return (mailbox && mailbox->view) ?
 	mailbox->view->filter : libbalsa_mailbox_view_default.filter;
-}
-
-gboolean
-libbalsa_mailbox_get_frozen(LibBalsaMailbox * mailbox)
-{
-    return (mailbox && mailbox->view) ?
-	mailbox->view->frozen : FALSE;
 }
 
 #ifdef HAVE_GPGME

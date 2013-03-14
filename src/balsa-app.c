@@ -36,6 +36,7 @@
 #include <fcntl.h>
 
 #include "filter-funcs.h"
+#include "libbalsa-conf.h"
 #include "misc.h"
 #include "server.h"
 #include "smtp-server.h"
@@ -432,7 +433,6 @@ balsa_app_init(void)
 void
 balsa_app_destroy(void)
 {
-    config_views_save();
     config_save();
 
     g_list_foreach(balsa_app.address_book_list, (GFunc)g_object_unref, NULL);
@@ -495,12 +495,14 @@ update_timer(gboolean update, guint minutes)
    Release the passed argument when done.
  */
 
-static void
-append_url_if_open(const gchar * url, LibBalsaMailboxView * view,
+static gboolean
+append_url_if_open(const gchar * group, const gchar * url,
                    GPtrArray * array)
 {
-    if (view->open)
+    if (config_mailbox_was_open(url))
         g_ptr_array_add(array, g_strdup(url));
+
+    return FALSE;
 }
 
 static void
@@ -522,8 +524,7 @@ open_mailbox_by_url(const gchar * url, gboolean hidden)
             balsa_mblist_open_mailbox(mailbox);
     } else {
         /* Do not try to open it next time. */
-        LibBalsaMailboxView *view =
-            g_hash_table_lookup(libbalsa_mailbox_view_table, url);
+        LibBalsaMailboxView *view = config_load_mailbox_view(url);
         /* The mailbox may have been requested to be open because its
          * stored view might say so or the user requested it from the
          * command line - in which case, view may or may not be present.
@@ -531,6 +532,8 @@ open_mailbox_by_url(const gchar * url, gboolean hidden)
         if (view) {
             view->open = FALSE;
             view->in_sync = FALSE;
+            config_save_mailbox_view(url, view);
+            libbalsa_mailbox_view_free(view);
         }
         balsa_information(LIBBALSA_INFORMATION_WARNING,
                           _("Couldn't open mailbox \"%s\""), url);
@@ -544,12 +547,13 @@ open_mailboxes_idle_cb(gchar ** urls)
 
     gdk_threads_enter();
 
-    if (!urls && libbalsa_mailbox_view_table) {
+    if (!urls) {
         GPtrArray *array;
 
         array = g_ptr_array_new();
-        g_hash_table_foreach(libbalsa_mailbox_view_table,
-                             (GHFunc) append_url_if_open, array);
+        libbalsa_conf_foreach_group(VIEW_BY_URL_SECTION_PREFIX,
+                                    (LibBalsaConfForeachFunc)
+                                    append_url_if_open, array);
         g_ptr_array_add(array, NULL);
         urls = (gchar **) g_ptr_array_free(array, FALSE);
     }
@@ -576,8 +580,9 @@ open_mailboxes_idle_cb(gchar ** urls)
 void
 balsa_add_open_mailbox_urls(GPtrArray * url_array)
 {
-    g_hash_table_foreach(libbalsa_mailbox_view_table,
-                         (GHFunc) append_url_if_open, url_array);
+    libbalsa_conf_foreach_group(VIEW_BY_URL_SECTION_PREFIX,
+                                (LibBalsaConfForeachFunc)
+                                append_url_if_open, url_array);
 }
 
 GtkWidget *

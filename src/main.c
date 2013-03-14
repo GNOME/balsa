@@ -660,12 +660,6 @@ real_main(int argc, char *argv[])
     /* checking for valid config files */
     config_init(cmd_get_stats);
 
-    libbalsa_mailbox_view_table =
-	g_hash_table_new_full(g_str_hash, g_str_equal,
-			      (GDestroyNotify) g_free,
-			      (GDestroyNotify) libbalsa_mailbox_view_free);
-    config_views_load();
-
     default_icon = balsa_pixmap_finder("balsa_icon.png");
     if(default_icon) { /* may be NULL for developer installations */
         gtk_window_set_default_icon_from_file(default_icon, NULL);
@@ -746,8 +740,6 @@ balsa_cleanup(void)
     pthread_mutex_unlock(&checking_mail_lock);
 #endif
     balsa_app_destroy();
-    g_hash_table_destroy(libbalsa_mailbox_view_table);
-    libbalsa_mailbox_view_table = NULL;
 
     libbalsa_conf_drop_all();
 }

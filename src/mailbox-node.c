@@ -192,12 +192,13 @@ static void
 balsa_mailbox_node_dispose(GObject * object)
 {
     BalsaMailboxNode *mn = BALSA_MAILBOX_NODE(object);
+    LibBalsaMailbox *mailbox = mn->mailbox;
 
-    if(mn->mailbox) {
-	libbalsa_mailbox_set_frozen(mn->mailbox, TRUE);
+    if (mailbox) {
+        config_save_mailbox_view(mailbox->url, mailbox->view);
 	if (balsa_app.main_window)
 	    balsa_window_close_mbnode(balsa_app.main_window, mn);
-	g_object_unref(mn->mailbox);
+	g_object_unref(mailbox);
 	mn->mailbox = NULL;
     }
 
@@ -324,13 +325,17 @@ struct _CheckPathInfo {
     gboolean must_scan;
 };
 
-static void
-check_url_func(const gchar * url, LibBalsaMailboxView * view,
-	       CheckPathInfo * cpi)
+static gboolean
+check_url_func(const gchar * group, const gchar * url, CheckPathInfo * cpi)
 {
-    if ((view->exposed || view->open) && !cpi->must_scan
-	&& strncmp(url, cpi->url, strlen(cpi->url)) == 0)
-	cpi->must_scan = TRUE;
+    if (!cpi->must_scan && g_str_has_prefix(url, cpi->url)
+        && (config_mailbox_was_exposed(url)
+            || (balsa_app.remember_open_mboxes
+                && config_mailbox_was_open(url)))
+        )
+        cpi->must_scan = TRUE;
+
+    return FALSE;
 }
 
 static gboolean
@@ -348,13 +353,11 @@ check_local_path(const gchar * path, guint depth)
 	/* Top level folder. */
 	return TRUE;
 
-    if (!libbalsa_mailbox_view_table)
-        return FALSE;
-
     cpi.url = g_strconcat("file://", path, NULL);
     cpi.must_scan = FALSE;
-    g_hash_table_foreach(libbalsa_mailbox_view_table,
-                         (GHFunc) check_url_func, &cpi);
+    libbalsa_conf_foreach_group(VIEW_BY_URL_SECTION_PREFIX,
+                                (LibBalsaConfForeachFunc) check_url_func,
+                                &cpi);
     if(balsa_app.debug) 
 	printf("check_local_path: path \"%s\" must_scan %d.\n",
                cpi.url, cpi.must_scan);
@@ -392,16 +395,8 @@ load_mailbox_view(BalsaMailboxNode * mbnode)
 {
     LibBalsaMailbox *mailbox = mbnode->mailbox;
 
-    if (!mailbox->url)
-	return;
-
-    mailbox->view =
-	g_hash_table_lookup(libbalsa_mailbox_view_table, mailbox->url);
-    if (libbalsa_mailbox_get_frozen(mailbox)
-	&& libbalsa_mailbox_get_open(mailbox))
-	/* We are rescanning. */
-	balsa_window_open_mbnode(balsa_app.main_window, mbnode, TRUE);
-    libbalsa_mailbox_set_frozen(mailbox, FALSE);
+    if (!mailbox->view)
+        mailbox->view = config_load_mailbox_view(mailbox->url);
 }
 
 static gboolean
@@ -1406,13 +1401,11 @@ check_imap_path(const gchar *fn, LibBalsaServer * server, guint depth)
     if (depth < balsa_app.imap_scan_depth)
         return TRUE;
 
-    if (!libbalsa_mailbox_view_table)
-        return FALSE;
-
     cpi.url = libbalsa_imap_url(server, fn);
     cpi.must_scan = FALSE;
-    g_hash_table_foreach(libbalsa_mailbox_view_table,
-                         (GHFunc) check_url_func, &cpi);
+    libbalsa_conf_foreach_group(VIEW_BY_URL_SECTION_PREFIX,
+                                (LibBalsaConfForeachFunc) check_url_func,
+                                &cpi);
     if(balsa_app.debug) 
 	printf("check_imap_path: path \"%s\" must_scan %d.\n",
                cpi.url, cpi.must_scan);

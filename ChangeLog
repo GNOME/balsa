@@ -1,3 +1,9 @@
+2013-03-14  Peter Bloomfield
+
+	* libbalsa/libbalsa-conf.c (libbalsa_conf_has_key): new
+	function.
+	* libbalsa/libbalsa-conf.h: ditto.
+
 2013-03-11  Peter Bloomfield
 
 	Lock mailbox to avoid race

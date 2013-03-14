@@ -33,6 +33,7 @@ void libbalsa_conf_remove_group_(const char *group, gboolean priv);
         (libbalsa_conf_remove_group_((group),TRUE))
 
 gboolean libbalsa_conf_has_group(const char *group);
+gboolean libbalsa_conf_has_key(const gchar *key);
 
 /* Wrapper for iterating over groups. */
 typedef gboolean (*LibBalsaConfForeachFunc)(const gchar * key,

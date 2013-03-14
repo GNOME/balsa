@@ -269,6 +269,16 @@ libbalsa_conf_has_group(const char *group)
             g_key_file_has_group(lbc_conf_priv.key_file, group));
 }
 
+gboolean
+libbalsa_conf_has_key(const gchar * key)
+{
+    /* g_key_file_has_key returns FALSE on error, but that is OK */
+    return (g_key_file_has_key(lbc_conf.key_file, lbc_groups->data,
+                               key, NULL) ||
+            g_key_file_has_key(lbc_conf_priv.key_file, lbc_groups->data,
+                                  key, NULL));
+}
+
 static void
 lbc_remove_key(LibBalsaConf * conf, const char *key)
 {

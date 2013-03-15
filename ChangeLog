@@ -1,3 +1,9 @@
+2013-03-15  Peter Bloomfield
+
+	* src/balsa-app.c (append_url_if_open): libbalsa_conf_foreach
+	passes an encoded URL.
+	* src/mailbox-node.c (check_url_func): ditto.
+
 2013-03-14  Peter Bloomfield
 
 	Streamline handling of LibBalsaMailboxView

@@ -326,16 +326,24 @@ struct _CheckPathInfo {
 };
 
 static gboolean
-check_url_func(const gchar * group, const gchar * url, CheckPathInfo * cpi)
+check_url_func(const gchar * group, const gchar * encoded_url,
+               CheckPathInfo * cpi)
 {
-    if (!cpi->must_scan && g_str_has_prefix(url, cpi->url)
+    gchar *url;
+
+    url = libbalsa_urldecode(encoded_url);
+
+    if (g_str_has_prefix(url, cpi->url)
         && (config_mailbox_was_exposed(url)
             || (balsa_app.remember_open_mboxes
                 && config_mailbox_was_open(url)))
         )
         cpi->must_scan = TRUE;
 
-    return FALSE;
+    g_free(url);
+
+    /* stop checking if we already know we must scan deeper */
+    return cpi->must_scan;
 }
 
 static gboolean

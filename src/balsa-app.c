@@ -496,11 +496,17 @@ update_timer(gboolean update, guint minutes)
  */
 
 static gboolean
-append_url_if_open(const gchar * group, const gchar * url,
+append_url_if_open(const gchar * group, const gchar * encoded_url,
                    GPtrArray * array)
 {
+    gchar *url;
+
+    url = libbalsa_urldecode(encoded_url);
+
     if (config_mailbox_was_open(url))
-        g_ptr_array_add(array, g_strdup(url));
+        g_ptr_array_add(array, url);
+    else
+        g_free(url);
 
     return FALSE;
 }

@@ -195,6 +195,8 @@ balsa_mailbox_node_dispose(GObject * object)
     LibBalsaMailbox *mailbox = mn->mailbox;
 
     if (mailbox) {
+        libbalsa_mailbox_set_open(mailbox,
+                                  libbalsa_mailbox_is_open(mailbox));
         config_save_mailbox_view(mailbox->url, mailbox->view);
 	if (balsa_app.main_window)
 	    balsa_window_close_mbnode(balsa_app.main_window, mn);

@@ -1,3 +1,8 @@
+2013-03-16  Peter Bloomfield
+
+	* src/mailbox-node.c (balsa_mailbox_node_dispose): make sure
+	LibBalsaMailboxView::open is correct before saving the view.
+
 2013-03-15  Peter Bloomfield
 
 	* src/balsa-app.c (append_url_if_open): libbalsa_conf_foreach

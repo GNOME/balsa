@@ -260,7 +260,7 @@ config_address_book_save(LibBalsaAddressBook * ab)
 
     g_free(group);
 
-    libbalsa_conf_sync();
+    libbalsa_conf_queue_sync();
 }
 
 void
@@ -269,7 +269,7 @@ config_address_book_delete(LibBalsaAddressBook * ab)
     if (ab->config_prefix) {
 	libbalsa_conf_remove_group(ab->config_prefix);
 	libbalsa_conf_private_remove_group(ab->config_prefix);
-	libbalsa_conf_sync();
+	libbalsa_conf_queue_sync();
     }
 }
 
@@ -293,7 +293,7 @@ gint config_mailbox_add(LibBalsaMailbox * mailbox, const char *key_arg)
     libbalsa_conf_pop_group();
     g_free(tmp);
 
-    libbalsa_conf_sync();
+    libbalsa_conf_queue_sync();
     return TRUE;
 }				/* config_mailbox_add */
 
@@ -316,7 +316,7 @@ gint config_folder_add(BalsaMailboxNode * mbnode, const char *key_arg)
     libbalsa_conf_pop_group();
     g_free(tmp);
 
-    libbalsa_conf_sync();
+    libbalsa_conf_queue_sync();
     return TRUE;
 }				/* config_mailbox_add */
 
@@ -328,7 +328,7 @@ gint config_mailbox_delete(const LibBalsaMailbox * mailbox)
     tmp = mailbox_section_path(mailbox);
     res = libbalsa_conf_has_group(tmp);
     libbalsa_conf_remove_group(tmp);
-    libbalsa_conf_sync();
+    libbalsa_conf_queue_sync();
     g_free(tmp);
     return res;
 }				/* config_mailbox_delete */
@@ -341,7 +341,7 @@ config_folder_delete(const BalsaMailboxNode * mbnode)
     tmp = folder_section_path(mbnode);
     res = libbalsa_conf_has_group(tmp);
     libbalsa_conf_remove_group(tmp);
-    libbalsa_conf_sync();
+    libbalsa_conf_queue_sync();
     g_free(tmp);
     return res;
 }				/* config_folder_delete */
@@ -360,7 +360,7 @@ gint config_mailbox_update(LibBalsaMailbox * mailbox)
     libbalsa_mailbox_save_config(mailbox, key);
     g_free(key);
     libbalsa_conf_pop_group();
-    libbalsa_conf_sync();
+    libbalsa_conf_queue_sync();
     return res;
 }				/* config_mailbox_update */
 
@@ -378,7 +378,7 @@ gint config_folder_update(BalsaMailboxNode * mbnode)
     balsa_mailbox_node_save_config(mbnode, key);
     g_free(key);
     libbalsa_conf_pop_group();
-    libbalsa_conf_sync();
+    libbalsa_conf_queue_sync();
     return res;
 }				/* config_folder_update */
 
@@ -1979,7 +1979,7 @@ config_filters_save(void)
 	libbalsa_filter_save_config(fil);
 	libbalsa_conf_pop_group();
     }
-    libbalsa_conf_sync();
+    libbalsa_conf_queue_sync();
     /* This loop takes care of cleaning up old filter sections */
     while (TRUE) {
 	i=snprintf(tmp,tmp_len,"%d",nb++);
@@ -1990,7 +1990,7 @@ config_filters_save(void)
 	}
 	else break;
     }
-    libbalsa_conf_sync();
+    libbalsa_conf_queue_sync();
     g_free(buffer);
 }
 
@@ -2021,7 +2021,7 @@ config_mailbox_filters_save(LibBalsaMailbox * mbox)
     }
     libbalsa_mailbox_filters_save_config(mbox);
     libbalsa_conf_pop_group();
-    libbalsa_conf_sync();
+    libbalsa_conf_queue_sync();
 }
 
 static void

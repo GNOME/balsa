@@ -347,7 +347,7 @@ address_book_change(LibBalsaAddressBook * address_book, gboolean append)
     libbalsa_address_book_save_config(address_book, group);
     g_free(group);
 
-    libbalsa_conf_sync();
+    libbalsa_conf_queue_sync();
 }
 
 static void
@@ -436,7 +436,7 @@ file_delete_cb(GtkAction * action, gpointer user_data)
     if (address_book->config_prefix) {
         libbalsa_conf_remove_group(address_book->config_prefix);
         libbalsa_conf_private_remove_group(address_book->config_prefix);
-        libbalsa_conf_sync();
+        libbalsa_conf_queue_sync();
     }
 
     merge_id = GPOINTER_TO_UINT(g_object_get_data(G_OBJECT(address_book),

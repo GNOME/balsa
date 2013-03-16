@@ -121,5 +121,6 @@ void libbalsa_conf_get_vector_with_default   (const char *path,
 
 void libbalsa_conf_drop_all                  (void);
 void libbalsa_conf_sync                      (void);
+void libbalsa_conf_queue_sync                (void);
 
 #endif                          /* __LIBCONFIG_H__ */

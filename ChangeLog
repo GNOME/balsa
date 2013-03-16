@@ -1,5 +1,21 @@
 2013-03-16  Peter Bloomfield
 
+	Queue config syncs instead of syncing immediately, except on
+	exit cleanup
+
+	* libbalsa/libbalsa-conf.c (libbalsa_conf_sync_idle_cb),
+	(libbalsa_conf_queue_sync): new API libbalsa_conf_queue_sync.
+	* libbalsa/libbalsa-conf.h: ditto.
+	* src/ab-main.c (address_book_change), (file_delete_cb): use it.
+	* src/save-restore.c (config_address_book_save),
+	(config_address_book_delete), (config_mailbox_add),
+	(config_folder_add), (config_mailbox_delete),
+	(config_folder_delete), (config_mailbox_update),
+	(config_folder_update), (config_filters_save),
+	(config_mailbox_filters_save): ditto.
+
+2013-03-16  Peter Bloomfield
+
 	* src/main-window.c: do not leak object refs on error.
 
 2013-03-16  Peter Bloomfield

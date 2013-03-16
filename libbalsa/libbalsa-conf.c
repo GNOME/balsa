@@ -546,12 +546,16 @@ libbalsa_conf_sync(void)
 }
 
 static guint lbc_sync_idle_id;
+#ifdef BALSA_USE_THREADS
 G_LOCK_DEFINE_STATIC(lbc_sync_idle_id);
+#endif                          /* BALSA_USE_THREADS */
 
 static gboolean
 libbalsa_conf_sync_idle_cb(gpointer data)
 {
+#ifdef BALSA_USE_THREADS
     G_LOCK(lbc_sync_idle_id);
+#endif                          /* BALSA_USE_THREADS */
 #if DEBUG
     g_print("%s id %d, will be cleared\n", __func__, lbc_sync_idle_id);
 #endif                          /* DEBUG */
@@ -559,14 +563,20 @@ libbalsa_conf_sync_idle_cb(gpointer data)
         g_source_remove(lbc_sync_idle_id);
         lbc_sync_idle_id = 0;
     }
+#ifdef BALSA_USE_THREADS
     G_UNLOCK(lbc_sync_idle_id);
+#endif                          /* BALSA_USE_THREADS */
     libbalsa_conf_sync();
+
+    return FALSE;
 }
 
 void
 libbalsa_conf_queue_sync(void)
 {
+#ifdef BALSA_USE_THREADS
     G_LOCK(lbc_sync_idle_id);
+#endif                          /* BALSA_USE_THREADS */
 #if DEBUG
     g_print("%s id %d, will be set if zero\n", __func__, lbc_sync_idle_id);
 #endif                          /* DEBUG */
@@ -576,5 +586,7 @@ libbalsa_conf_queue_sync(void)
 #if DEBUG
     g_print("%s id now %d\n", __func__, lbc_sync_idle_id);
 #endif                          /* DEBUG */
+#ifdef BALSA_USE_THREADS
     G_UNLOCK(lbc_sync_idle_id);
+#endif                          /* BALSA_USE_THREADS */
 }

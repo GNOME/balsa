@@ -2348,6 +2348,8 @@ bw_real_open_mbnode_idle_cb(BalsaWindowRealOpenMbnodeInfo * info)
 
     if (!window) {
         g_free(info->message);
+        g_object_unref(g_object_ref_sink(index));
+        g_object_unref(mbnode);
         g_free(info);
         return FALSE;
     }
@@ -2358,6 +2360,8 @@ bw_real_open_mbnode_idle_cb(BalsaWindowRealOpenMbnodeInfo * info)
     g_free(info->message);
 
     if (balsa_find_notebook_page_num(mailbox) >= 0) {
+        g_object_unref(g_object_ref_sink(index));
+        g_object_unref(mbnode);
         g_free(info);
         return FALSE;
     }

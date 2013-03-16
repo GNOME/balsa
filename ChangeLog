@@ -1,5 +1,9 @@
 2013-03-16  Peter Bloomfield
 
+	* src/main-window.c: do not leak object refs on error.
+
+2013-03-16  Peter Bloomfield
+
 	* src/mailbox-node.c (balsa_mailbox_node_dispose): make sure
 	LibBalsaMailboxView::open is correct before saving the view.
 

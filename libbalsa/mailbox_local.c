@@ -718,13 +718,11 @@ lbm_local_save_tree_idle(LibBalsaMailboxLocal * local)
 static void
 lbm_local_queue_save_tree(LibBalsaMailboxLocal * local)
 {
-    LibBalsaMailbox *mailbox = (LibBalsaMailbox *) local;
-
-    libbalsa_lock_mailbox(mailbox);
+    libbalsa_lock_mailbox((LibBalsaMailbox *) local);
     if (!local->save_tree_id)
         local->save_tree_id =
             g_idle_add((GSourceFunc) lbm_local_save_tree_idle, local);
-    libbalsa_unlock_mailbox(mailbox);
+    libbalsa_unlock_mailbox((LibBalsaMailbox *) local);
 }
 
 /* 

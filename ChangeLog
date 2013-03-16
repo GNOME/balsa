@@ -1,5 +1,10 @@
 2013-03-16  Peter Bloomfield
 
+	* libbalsa/mailbox_local.c (lbm_local_queue_save_tree): build
+	with threads disabled.
+
+2013-03-16  Peter Bloomfield
+
 	* libbalsa/libbalsa-conf.c (libbalsa_conf_sync_idle_cb),
 	(libbalsa_conf_queue_sync): fix error and use lock only when
 	using threads.

@@ -1,5 +1,14 @@
 2013-03-17  Peter Bloomfield
 
+	Reopen mailboxes after rescanning
+
+	* src/mailbox-node.c (imap_dir_cb): do not unref mbnode;
+	(imap_scan_create_mbnode): do not ref mbnode; protect view
+	during rescanning;
+	(balsa_mailbox_node_rescan): reopen mailboxes after scanning.
+
+2013-03-17  Peter Bloomfield
+
 	* libbalsa/libbalsa-conf.c (libbalsa_conf_sync),
 	(libbalsa_conf_sync_idle_cb): remove source in public method.
 

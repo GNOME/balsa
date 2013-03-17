@@ -537,8 +537,6 @@ imap_dir_cb(BalsaMailboxNode* mb)
 	    balsa_mblist_mailbox_node_redraw(n);
         if(item->marked)
             libbalsa_mailbox_set_unread_messages_flag(n->mailbox, TRUE);
-	g_object_unref(n);
-        
     }
     imap_scan_destroy_tree(&imap_tree);
 
@@ -775,6 +773,9 @@ balsa_mailbox_node_rescan(BalsaMailboxNode * mn)
     }
     mn->scanned = FALSE;
     balsa_mailbox_node_append_subtree(mn);
+
+    /* Reopen mailboxes */
+    open_mailboxes_idle_cb(NULL);
 }
 
 void
@@ -1301,6 +1302,7 @@ imap_scan_create_mbnode(BalsaMailboxNode * root, imap_scan_item * isi,
     mbnode = balsa_find_url(url);
     if (mbnode) {
 	/* A mailbox with this url is already in the tree... */
+	LibBalsaMailboxView *view;
 	BalsaMailboxNode *special =
 	    remove_special_mailbox_by_url(url, &isi->special);
 	if (special) {
@@ -1310,7 +1312,14 @@ imap_scan_create_mbnode(BalsaMailboxNode * root, imap_scan_item * isi,
 	} else {
             balsa_mblist_mailbox_node_remove(mbnode);
         }
+        /* Unreffing mbnode may finalize it, which would push the
+         * mailbox view to the config; to save the open state, we
+         * retrieve the view from the config, and restore it after
+         * unreffing. */
+        view = config_load_mailbox_view(url);
 	g_object_unref(mbnode);
+        config_save_mailbox_view(url, view);
+        libbalsa_mailbox_view_free(view);
     }
     g_free(url);
 
@@ -1335,7 +1344,6 @@ imap_scan_create_mbnode(BalsaMailboxNode * root, imap_scan_item * isi,
     mbnode->subscribed = parent->subscribed;
     mbnode->scanned = isi->scanned;
 
-    g_object_ref(mbnode);
     balsa_mblist_mailbox_node_append(mbnode->parent, mbnode);
     g_object_unref(parent);
     

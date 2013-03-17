@@ -1,5 +1,13 @@
 2013-03-17  Peter Bloomfield
 
+	* src/mailbox-node.c (mb_rescan_cb): reopen mailboxes in the UI
+	callback,
+	(balsa_mailbox_node_rescan): not in the recursive function
+	* src/balsa-app.c (balsa_open_mailbox_list): make sure first
+	mailbox in the list is not hidden.
+
+2013-03-17  Peter Bloomfield
+
 	* src/balsa-app.c (open_mailbox_by_url),
 	(balsa_open_mailbox_list): change gboolean
 	open_mailboxes_idle_cb() to void balsa_open_mailbox_list().

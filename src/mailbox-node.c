@@ -773,9 +773,6 @@ balsa_mailbox_node_rescan(BalsaMailboxNode * mn)
     }
     mn->scanned = FALSE;
     balsa_mailbox_node_append_subtree(mn);
-
-    /* Reopen mailboxes */
-    balsa_open_mailbox_list(NULL);
 }
 
 void
@@ -1009,7 +1006,19 @@ mb_unsubscribe_cb(GtkWidget * widget, BalsaMailboxNode * mbnode)
 static void
 mb_rescan_cb(GtkWidget * widget, BalsaMailboxNode * mbnode)
 {
+    gchar *current_mailbox_url;
+    GPtrArray *url_array;
+
+    current_mailbox_url = g_strdup(balsa_app.current_mailbox_url);
     balsa_mailbox_node_rescan(mbnode);
+
+    /* Reopen mailboxes */
+    url_array = g_ptr_array_new();
+    if (current_mailbox_url)
+        g_ptr_array_add(url_array, current_mailbox_url);
+    balsa_add_open_mailbox_urls(url_array);
+    g_ptr_array_add(url_array, NULL);
+    balsa_open_mailbox_list((gchar **) g_ptr_array_free(url_array, FALSE));
 }
 
 static void

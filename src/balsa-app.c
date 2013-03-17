@@ -546,20 +546,12 @@ open_mailbox_by_url(const gchar * url, gboolean hidden)
 void
 balsa_open_mailbox_list(gchar ** urls)
 {
+    gboolean hidden = FALSE;
     gchar **tmp;
 
+    g_return_if_fail(urls != NULL);
+
     gdk_threads_enter();
-
-    if (!urls) {
-        GPtrArray *array;
-
-        array = g_ptr_array_new();
-        libbalsa_conf_foreach_group(VIEW_BY_URL_SECTION_PREFIX,
-                                    (LibBalsaConfForeachFunc)
-                                    append_url_if_open, array);
-        g_ptr_array_add(array, NULL);
-        urls = (gchar **) g_ptr_array_free(array, FALSE);
-    }
 
     for (tmp = urls; *tmp; ++tmp) {
         gchar **p;
@@ -568,8 +560,10 @@ balsa_open_mailbox_list(gchar ** urls)
         for (p = urls; p < tmp; ++p)
             if (!strcmp(*p, *tmp))
                 break;
-        if (p == tmp)
-            open_mailbox_by_url(*tmp, TRUE);
+        if (p == tmp) {
+            open_mailbox_by_url(*tmp, hidden);
+            hidden = TRUE;
+        }
     }
 
     g_strfreev(urls);

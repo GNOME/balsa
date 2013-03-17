@@ -398,7 +398,7 @@ void update_timer(gboolean update, guint minutes);
 gchar *ask_password(LibBalsaServer * server, LibBalsaMailbox * mbox);
 GtkWidget *balsa_stock_button_with_label(const char *icon,
 					 const char *label);
-gboolean open_mailboxes_idle_cb(gchar * names[]);
+void balsa_open_mailbox_list(gchar ** urls);
 
 /* Search functions */
 BalsaMailboxNode *balsa_find_mailbox(LibBalsaMailbox * mailbox);

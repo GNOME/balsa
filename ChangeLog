@@ -1,5 +1,15 @@
 2013-03-17  Peter Bloomfield
 
+	* src/balsa-app.c (open_mailbox_by_url),
+	(balsa_open_mailbox_list): change gboolean
+	open_mailboxes_idle_cb() to void balsa_open_mailbox_list().
+	* src/balsa-app.h: ditto.
+	* src/mailbox-node.c (balsa_mailbox_node_rescan): ditto.
+	* src/main.c (open_mailboxes_idle_cb), (scan_mailboxes_idle_cb):
+	open_mailboxes_idle_cb is now just the idle callback.
+
+2013-03-17  Peter Bloomfield
+
 	Reopen mailboxes after rescanning
 
 	* src/mailbox-node.c (imap_dir_cb): do not unref mbnode;

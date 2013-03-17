@@ -775,7 +775,7 @@ balsa_mailbox_node_rescan(BalsaMailboxNode * mn)
     balsa_mailbox_node_append_subtree(mn);
 
     /* Reopen mailboxes */
-    open_mailboxes_idle_cb(NULL);
+    balsa_open_mailbox_list(NULL);
 }
 
 void

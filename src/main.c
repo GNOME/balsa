@@ -351,6 +351,13 @@ balsa_get_stats(long *unread, long *unsent)
     } else *unsent = -1;
 }
 
+static gboolean
+open_mailboxes_idle_cb(gchar ** urls)
+{
+    balsa_open_mailbox_list(urls);
+    return FALSE;
+}
+
 static void
 balsa_check_open_mailboxes(void)
 {
@@ -435,8 +442,8 @@ scan_mailboxes_idle_cb()
 
     if (url_array->len) {
         g_ptr_array_add(url_array, NULL);
-        open_mailboxes_idle_cb((gchar **) g_ptr_array_free(url_array,
-                                                           FALSE));
+        balsa_open_mailbox_list((gchar **) g_ptr_array_free(url_array,
+                                                            FALSE));
     }
 
     if(cmd_get_stats) {

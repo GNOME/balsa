@@ -488,11 +488,11 @@ update_timer(gboolean update, guint minutes)
 }
 
 
-
-/* open_mailboxes_idle_cb:
-   open mailboxes on startup if requested so.
-   This is an idle handler. Be sure to use gdk_threads_{enter/leave}
-   Release the passed argument when done.
+/*
+ * balsa_open_mailbox_list:
+ * Called on startup if remember_open_mboxes is set, and also after
+ * rescanning.
+ * Frees the passed argument when done.
  */
 
 static gboolean
@@ -516,12 +516,9 @@ open_mailbox_by_url(const gchar * url, gboolean hidden)
 {
     LibBalsaMailbox *mailbox;
 
-    if (!(url && *url))
-        return;
-
     mailbox = balsa_find_mailbox_by_url(url);
     if (balsa_app.debug)
-        fprintf(stderr, "open_mailboxes_idle_cb: opening %s => %p..\n",
+        fprintf(stderr, "balsa_open_mailbox_list: opening %s => %p..\n",
                 url, mailbox);
     if (mailbox) {
         if (hidden)
@@ -546,8 +543,8 @@ open_mailbox_by_url(const gchar * url, gboolean hidden)
     }
 }
 
-gboolean
-open_mailboxes_idle_cb(gchar ** urls)
+void
+balsa_open_mailbox_list(gchar ** urls)
 {
     gchar **tmp;
 
@@ -564,23 +561,20 @@ open_mailboxes_idle_cb(gchar ** urls)
         urls = (gchar **) g_ptr_array_free(array, FALSE);
     }
 
-    if (urls) {
-        for (tmp = urls; *tmp; ++tmp) {
-            gchar **p;
+    for (tmp = urls; *tmp; ++tmp) {
+        gchar **p;
 
-            /* Have we already seen this URL? */
-            for (p = urls; p < tmp; ++p)
-                if (!strcmp(*p, *tmp))
-                    break;
-            if (p == tmp)
-                open_mailbox_by_url(*tmp, TRUE);
-        }
+        /* Have we already seen this URL? */
+        for (p = urls; p < tmp; ++p)
+            if (!strcmp(*p, *tmp))
+                break;
+        if (p == tmp)
+            open_mailbox_by_url(*tmp, TRUE);
     }
 
     g_strfreev(urls);
-    gdk_threads_leave();
 
-    return FALSE;
+    gdk_threads_leave();
 }
 
 void

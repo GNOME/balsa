@@ -536,22 +536,13 @@ lbc_sync(LibBalsaConf * conf)
     g_free(buf);
 }
 
-void
-libbalsa_conf_sync(void)
-{
-    lbc_lock();
-    lbc_sync(&lbc_conf);
-    lbc_sync(&lbc_conf_priv);
-    lbc_unlock();
-}
-
 static guint lbc_sync_idle_id;
 #ifdef BALSA_USE_THREADS
 G_LOCK_DEFINE_STATIC(lbc_sync_idle_id);
 #endif                          /* BALSA_USE_THREADS */
 
-static gboolean
-libbalsa_conf_sync_idle_cb(gpointer data)
+void
+libbalsa_conf_sync(void)
 {
 #ifdef BALSA_USE_THREADS
     G_LOCK(lbc_sync_idle_id);
@@ -566,6 +557,15 @@ libbalsa_conf_sync_idle_cb(gpointer data)
 #ifdef BALSA_USE_THREADS
     G_UNLOCK(lbc_sync_idle_id);
 #endif                          /* BALSA_USE_THREADS */
+    lbc_lock();
+    lbc_sync(&lbc_conf);
+    lbc_sync(&lbc_conf_priv);
+    lbc_unlock();
+}
+
+static gboolean
+libbalsa_conf_sync_idle_cb(gpointer data)
+{
     libbalsa_conf_sync();
 
     return FALSE;

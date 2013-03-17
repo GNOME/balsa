@@ -1,3 +1,8 @@
+2013-03-17  Peter Bloomfield
+
+	* libbalsa/libbalsa-conf.c (libbalsa_conf_sync),
+	(libbalsa_conf_sync_idle_cb): remove source in public method.
+
 2013-03-16  Peter Bloomfield
 
 	* libbalsa/mailbox_local.c (lbm_local_queue_save_tree): build

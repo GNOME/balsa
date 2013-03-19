@@ -2967,6 +2967,9 @@ check_new_messages_real(BalsaWindow * window, int type)
          (balsa_app.pwindow_option == UNTILCLOSED && progress_dialog)))
 	ensure_check_mail_dialog(window);
 
+    gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
+			   (GtkTreeModelForeachFunc) bw_add_mbox_to_checklist,
+			   &list);
 
     /* initiate threads */
     info = g_new(struct check_messages_thread_info, 1);
@@ -2980,13 +2983,6 @@ check_new_messages_real(BalsaWindow * window, int type)
      * reclaimed as soon as the thread exits
      */
     pthread_detach(get_mail_thread);
-
-    gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
-			   (GtkTreeModelForeachFunc) bw_add_mbox_to_checklist,
-			   &list);
-    g_slist_foreach(list, (GFunc) bw_mailbox_check, window);
-    g_slist_foreach(list, (GFunc) g_object_unref, NULL);
-    g_slist_free(list);
 #else
 
     if (window)

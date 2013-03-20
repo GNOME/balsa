@@ -1804,8 +1804,6 @@ libbalsa_mailbox_msgno_find(LibBalsaMailbox * mailbox, guint seqno,
 {
     GtkTreeIter tmp_iter;
 
-    if (!libbalsa_threads_has_lock())
-        g_warning("Thread is not holding gdk lock");
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
     g_return_val_if_fail(seqno > 0, FALSE);
 
@@ -2894,8 +2892,6 @@ mbox_model_get_path(GtkTreeModel * tree_model, GtkTreeIter * iter)
     GNode *parent_node;
 #endif
 
-    if (!libbalsa_threads_has_lock())
-        g_warning("Thread is not holding gdk lock");
     g_return_val_if_fail(VALID_ITER(iter, tree_model), NULL);
 
     node = iter->user_data;
@@ -4333,9 +4329,6 @@ libbalsa_mailbox_search_iter_step(LibBalsaMailbox * mailbox,
     GNode *node;
     gboolean retval = FALSE;
     gint total;
-
-    if (!libbalsa_threads_has_lock())
-        g_warning("Thread is not holding gdk lock");
 
     node = iter->user_data;
     if (!node)

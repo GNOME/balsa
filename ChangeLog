@@ -1,5 +1,17 @@
 2013-03-19  Peter Bloomfield
 
+	GdkThreads deprecation cleanup
+
+	* libbalsa/libbalsa.c (libbalsa_lock_mailbox),
+	(libbalsa_unlock_mailbox): strip out GdkThreads-related code.
+	* libbalsa/libbalsa.h: ditto.
+	* libbalsa/mailbox.c (libbalsa_mailbox_msgno_find),
+	(mbox_model_get_path), (libbalsa_mailbox_search_iter_step):
+	ditto.
+	* src/main.c (threads_init), (threads_destroy): ditto.
+
+2013-03-19  Peter Bloomfield
+
 	* src/main-window.c: use thread to check for new mail.
 
 2013-03-17  Peter Bloomfield

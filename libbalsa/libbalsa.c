@@ -67,7 +67,6 @@
 
 #ifdef BALSA_USE_THREADS
 static pthread_t main_thread_id;
-static pthread_t libbalsa_threads_id;
 #endif
 
 
@@ -694,25 +693,12 @@ void
 libbalsa_lock_mailbox(LibBalsaMailbox * mailbox)
 {
     pthread_t thread_id = pthread_self();
-    gint count = 0;
-
-    if (thread_id == libbalsa_threads_id
-        && thread_id == mailbox->thread_id
-        && mailbox->lock > 0) {
-        /* We already have both locks, so we'll just hold on to both of
-         * them. */
-        ++mailbox->lock;
-        return;
-    }
-
-    while (thread_id == libbalsa_threads_id) {
-        ++count;
-    }
 
     pthread_mutex_lock(&mailbox_mutex);
 
-    while (mailbox->lock && mailbox->thread_id != thread_id)
-        pthread_cond_wait(&mailbox_cond, &mailbox_mutex);
+    if (mailbox->thread_id && mailbox->thread_id != thread_id)
+        while (mailbox->lock)
+            pthread_cond_wait(&mailbox_cond, &mailbox_mutex);
 
     /* We'll assume that no-one would destroy a mailbox while we've been
      * trying to lock it. If they have, we have larger problems than
@@ -739,35 +725,11 @@ libbalsa_unlock_mailbox(LibBalsaMailbox * mailbox)
     }
 
     if(--mailbox->lock == 0) {
-        pthread_cond_broadcast(&mailbox_cond);
         mailbox->thread_id = 0;
+        pthread_cond_broadcast(&mailbox_cond);
     }
 
     pthread_mutex_unlock(&mailbox_mutex);
-}
-
-/* Recursive mutex for gdk_threads_{enter,leave}. */
-static pthread_mutex_t libbalsa_threads_mutex;
-static guint libbalsa_threads_lock;
-
-
-void
-libbalsa_threads_init(void)
-{
-    pthread_mutex_init(&libbalsa_threads_mutex, NULL);
-}
-
-void
-libbalsa_threads_destroy(void)
-{
-    pthread_mutex_destroy(&libbalsa_threads_mutex);
-}
-
-gboolean
-libbalsa_threads_has_lock(void)
-{
-    return TRUE || (libbalsa_threads_lock > 0
-                    && libbalsa_threads_id == pthread_self());
 }
 
 #endif				/* BALSA_USE_THREADS */

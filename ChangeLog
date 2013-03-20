@@ -1,5 +1,10 @@
 2013-03-19  Peter Bloomfield
 
+	* src/balsa-index.c (balsa_index_load_mailbox_node),
+	(bndx_mailbox_changed_cb): connect signal not swapped.
+
+2013-03-19  Peter Bloomfield
+
 	GdkThreads deprecation cleanup
 
 	* libbalsa/libbalsa.c (libbalsa_lock_mailbox),

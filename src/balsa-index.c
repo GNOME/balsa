@@ -77,7 +77,8 @@ static void bndx_expand_to_row_and_select(BalsaIndex * index,
 static void bndx_changed_find_row(BalsaIndex * index);
 
 /* mailbox callbacks */
-static void bndx_mailbox_changed_cb(BalsaIndex * index);
+static void bndx_mailbox_changed_cb(LibBalsaMailbox * mailbox,
+                                    BalsaIndex      * bindex);
 
 /* GtkTree* callbacks */
 static void bndx_selection_changed(GtkTreeSelection * selection,
@@ -1004,9 +1005,8 @@ balsa_index_load_mailbox_node(BalsaIndex * index,
         gtk_tree_view_column_set_title(column, _("To"));
     }
 
-    g_signal_connect_swapped(G_OBJECT(mailbox), "changed",
-			     G_CALLBACK(bndx_mailbox_changed_cb),
-			     (gpointer) index);
+    g_signal_connect(mailbox, "changed",
+                     G_CALLBACK(bndx_mailbox_changed_cb), index);
     g_signal_connect(mailbox, "row-inserted",
                      G_CALLBACK(bndx_mailbox_row_inserted_cb), index);
     g_signal_connect(mailbox, "message-expunged",
@@ -1424,10 +1424,8 @@ bndx_mailbox_changed_idle(BalsaIndex * bindex)
 }
 
 static void
-bndx_mailbox_changed_cb(BalsaIndex * bindex)
+bndx_mailbox_changed_cb(LibBalsaMailbox * mailbox, BalsaIndex * bindex)
 {
-    LibBalsaMailbox *mailbox = bindex->mailbox_node->mailbox;
-
     if (!gtk_widget_get_window(GTK_WIDGET(bindex)))
         return;
 

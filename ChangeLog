@@ -1,3 +1,8 @@
+2013-03-21  Peter Bloomfield
+
+	* src/main-window.c: set mailbox view filter on opening, not on
+	notebook page change.
+
 2013-03-19  Peter Bloomfield
 
 	* src/balsa-index.c (balsa_index_load_mailbox_node),

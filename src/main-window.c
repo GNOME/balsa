@@ -255,7 +255,6 @@ static void bw_set_threading_menu(BalsaWindow * window, int option);
 static void bw_show_mbtree(BalsaWindow * window);
 #endif /* ENABLE_TOUCH_UI */
 static void bw_set_filter_menu(BalsaWindow * window, int gui_filter);
-static LibBalsaCondition *bw_get_flag_filter(BalsaWindow * window);
 static LibBalsaCondition *bw_get_view_filter(BalsaWindow * window);
 #if defined(ENABLE_TOUCH_UI)
 static gboolean bw_open_mailbox_cb(GtkWidget *w, GdkEventKey *e, gpointer data);
@@ -2212,6 +2211,48 @@ bw_set_filter_menu(BalsaWindow * window, int mask)
     }
 }
 
+/*
+ * bw_filter_to_int() returns an integer mask representing the view
+ * filter, as determined by the check-box widgets.
+ */
+static int
+bw_filter_to_int(BalsaWindow * window)
+{
+    unsigned i;
+    int res = 0;
+    for (i = 0; i < G_N_ELEMENTS(hide_states); i++)
+        if (bw_get_active(window, hide_states[i].action_name))
+            res |= 1 << hide_states[i].states_index;
+    return res;
+}
+
+/*
+ * bw_get_condition_from_int() returns the LibBalsaCondition corresponding
+ * to the filter mask.
+ */
+static LibBalsaCondition *
+bw_get_condition_from_int(gint mask)
+{
+    LibBalsaCondition *filter = NULL;
+    guint i;
+
+    for (i = 0; i < G_N_ELEMENTS(hide_states); i++) {
+        if (((mask >> hide_states[i].states_index) & 1)) {
+            LibBalsaCondition *lbc, *res;
+
+            lbc = libbalsa_condition_new_flag_enum(hide_states[i].set,
+                                                   hide_states[i].flag);
+            res = libbalsa_condition_new_bool_ptr(FALSE, CONDITION_AND,
+                                                  lbc, filter);
+            libbalsa_condition_unref(lbc);
+            libbalsa_condition_unref(filter);
+            filter = res;
+        }
+    }
+
+    return filter;
+}
+
 /* balsa_window_open_mbnode:
    opens mailbox, creates message index. mblist_open_mailbox() is what
    you want most of the time because it can switch between pages if a
@@ -2345,6 +2386,7 @@ bw_real_open_mbnode_idle_cb(BalsaWindowRealOpenMbnodeInfo * info)
     GtkWidget        *label;
     GtkWidget        *scroll;
     gint              page_num;
+    LibBalsaCondition *filter;
 
     if (!window) {
         g_free(info->message);
@@ -2395,6 +2437,12 @@ bw_real_open_mbnode_idle_cb(BalsaWindowRealOpenMbnodeInfo * info)
     libbalsa_mailbox_set_threading(mailbox,
                                    libbalsa_mailbox_get_threading_type
                                    (mailbox));
+
+    filter =
+        bw_get_condition_from_int(libbalsa_mailbox_get_filter(mailbox));
+    libbalsa_mailbox_set_view_filter(mailbox, filter, FALSE);
+    libbalsa_condition_unref(filter);
+
     /* scroll may select the message and GtkTreeView does not like selecting
      * without being shown first. */
     balsa_index_scroll_on_open(index);
@@ -4713,70 +4761,13 @@ bw_mailbox_tab_close_cb(GtkWidget * widget, gpointer data)
 				   BALSA_MAILBOX_NODE(data));
 }
 
-
-static LibBalsaCondition*
-bw_get_flag_filter(BalsaWindow *window)
-{
-    static struct {
-        LibBalsaMessageFlag flag;
-        short setby;
-        unsigned state:1;
-    } match_flags[] = {
-        { LIBBALSA_MESSAGE_FLAG_DELETED, -1, 0 },
-        { LIBBALSA_MESSAGE_FLAG_NEW,     -1, 0 },
-        { LIBBALSA_MESSAGE_FLAG_FLAGGED, -1, 0 },
-        { LIBBALSA_MESSAGE_FLAG_REPLIED, -1, 0 }
-    };
-    unsigned i, j;
-    LibBalsaCondition *filter;
-
-    for(i=0; i<ELEMENTS(match_flags); i++)
-        match_flags[i].setby = -1;
-
-    for (i = 0; i < G_N_ELEMENTS(hide_states); i++) {
-        LibBalsaMessageFlag flag;
-        gboolean set;
-        gint states_index = hide_states[i].states_index;
-
-        if (!bw_get_active(window, hide_states[i].action_name))
-            continue;
-
-        flag = hide_states[states_index].flag;
-        set  = hide_states[states_index].set;
-        for(j=0; j<ELEMENTS(match_flags); j++)
-            if(match_flags[j].flag == flag) {
-                match_flags[j].setby = i;
-                match_flags[j].state = set;
-                break;
-            }
-    }
-
-    /* match_flags contains collected information, time to create a
-     * LibBalsaCondition data structure.
-     */
-    filter = NULL;
-    for(j=0; j<ELEMENTS(match_flags); j++) {
-        LibBalsaCondition *lbc, *res;
-        if(match_flags[j].setby < 0) continue;
-        lbc = libbalsa_condition_new_flag_enum(match_flags[j].state,
-                                               match_flags[j].flag);
-        res = libbalsa_condition_new_bool_ptr(FALSE, CONDITION_AND,
-                                              lbc, filter);
-        libbalsa_condition_unref(lbc);
-        libbalsa_condition_unref(filter);
-        filter = res;
-    }
-
-    return filter;
-}
-
 static LibBalsaCondition*
 bw_get_view_filter(BalsaWindow *window)
 {
     LibBalsaCondition *filter, *flag_filter;
     gint i;
 
-    flag_filter = bw_get_flag_filter(window);
+    flag_filter = bw_get_condition_from_int(bw_filter_to_int(window));
 
     /* add string filter on top of that */
 
@@ -4799,20 +4790,6 @@ bw_get_view_filter(BalsaWindow *window)
     return filter;
 }
 
-/**bw_filter_to_int() returns an integer representing the
-   view filter.
-*/
-static int
-bw_filter_to_int(BalsaWindow * window)
-{
-    unsigned i;
-    int res = 0;
-    for (i = 0; i < G_N_ELEMENTS(hide_states); i++)
-        if (bw_get_active(window, hide_states[i].action_name))
-            res |= 1 << hide_states[i].states_index;
-    return res;
-}
-
 static void
 bw_hide_changed_cb(GtkToggleAction * toggle_action, gpointer data)
 {
@@ -4820,6 +4797,7 @@ bw_hide_changed_cb(GtkToggleAction * toggle_action, gpointer data)
     BalsaWindow *bw = BALSA_WINDOW(data);
     GtkWidget *index = balsa_window_find_current_index(bw);
     LibBalsaCondition *filter;
+    gint mask;
 
     /* PART 1: assure menu consistency */
     if (gtk_toggle_action_get_active(toggle_action)) {
@@ -4858,10 +4836,11 @@ bw_hide_changed_cb(GtkToggleAction * toggle_action, gpointer data)
      * view filter; rethreading triggers bw_set_filter_menu,
      * which retrieves the mask from the mailbox view, and we want it to
      * be the new one. */
-    libbalsa_mailbox_set_filter(mailbox, bw_filter_to_int(bw));
+    mask = bw_filter_to_int(bw);
+    libbalsa_mailbox_set_filter(mailbox, mask);
 
     /* Set the flags part of this filter as persistent: */
-    filter = bw_get_flag_filter(bw);
+    filter = bw_get_condition_from_int(mask);
     libbalsa_mailbox_set_view_filter(mailbox, filter, FALSE);
     libbalsa_condition_unref(filter);
     libbalsa_mailbox_make_view_filter_persistent(mailbox);
@@ -5076,15 +5055,6 @@ bw_notebook_switch_page_cb(GtkWidget * notebook,
     bw_idle_replace(window, index);
     bw_enable_message_menus(window, index->current_msgno);
     bw_enable_mailbox_menus(window, index);
-
-    if (!mailbox->view_filter) {
-        LibBalsaCondition *view_filter;
-
-        view_filter = bw_get_flag_filter(window);
-        libbalsa_mailbox_set_view_filter(mailbox, view_filter, FALSE);
-        libbalsa_condition_unref(view_filter);
-        libbalsa_mailbox_make_view_filter_persistent(mailbox);
-    }
 
     gtk_entry_set_text(GTK_ENTRY(window->sos_entry),
                        index->filter_string ? index->filter_string : "");

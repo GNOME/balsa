@@ -413,17 +413,26 @@ case "$use_html_widget" in
              [AC_MSG_ERROR([*** You enabled gtkhtml4 but it was not found.])])])
         AC_DEFINE(HAVE_GTKHTML4,1,[Defined when GtkHtml-4 can be used.])
     ;;
-    webkit)
+    webkit | webkit2)
         AC_MSG_RESULT([$use_html_widget])
         if test x"$use_threads" = xno ; then
             if ! $PKG_CONFIG --atleast-version=2.24.0 glib-2.0; then
                 AC_MSG_ERROR([WebKit cannot be used with threads disabled and glib older than version 2.24.])
             fi
         fi
-        if $PKG_CONFIG --atleast-version=1.5.1 webkitgtk-3.0 ; then
-            PKG_CHECK_MODULES(HTML, [webkitgtk-3.0 javascriptcoregtk-3.0])
+        if test $use_html_widget = webkit2 ; then
+            if $PKG_CONFIG --atleast-version=1.11.92 webkitgtk-3.0 ; then
+                PKG_CHECK_MODULES(HTML, [webkit2gtk-3.0 javascriptcoregtk-3.0])
+                AC_DEFINE(USE_WEBKIT2,1,[Defined when WebKit2 is requested.])
+            else
+                AC_MSG_ERROR([Webkit2 requires version at least 1.11.92])
+            fi
         else
-            PKG_CHECK_MODULES(HTML, [webkitgtk-3.0])
+            if $PKG_CONFIG --atleast-version=1.5.1 webkitgtk-3.0 ; then
+                PKG_CHECK_MODULES(HTML, [webkitgtk-3.0 javascriptcoregtk-3.0])
+            else
+                PKG_CHECK_MODULES(HTML, [webkitgtk-3.0])
+            fi
         fi
         AC_DEFINE(HAVE_WEBKIT,1,[Defined when WebKit can be used.])
     ;;

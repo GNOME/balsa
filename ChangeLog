@@ -1,3 +1,25 @@
+2013-03-24  Peter Bloomfield
+
+	Initial check in support for WebKitGtk2
+
+	* configure.ac: add webkit2 as an html-engine option; default is
+	still webkit.
+	* libbalsa/html.c (lbh_get_body_content_utf8),
+	(lbh_webkit_info_free), (lbh_mouse_target_changed_cb),
+	(lbh_navigation_policy_decision), (lbh_new_window_policy_decision),
+	(lbh_response_policy_decision), (lbh_decide_policy_cb),
+	(lbh_info_bar_response_cb), (lbh_show_info_bar),
+	(lbh_resource_load_started_cb), (lbh_web_process_crashed_cb),
+	(libbalsa_html_new), (libbalsa_html_to_string), (lbh_get_web_view),
+	(libbalsa_html_can_zoom), (libbalsa_html_zoom),
+	(libbalsa_html_can_select), (libbalsa_html_select_all),
+	(libbalsa_html_copy), (libbalsa_html_can_search),
+	(lbh_js_run_script), (lbh_js_object_get_property),
+	(libbalsa_html_search_text), (libbalsa_html_get_selection_bounds),
+	(libbalsa_html_popup_menu_widget), (libbalsa_html_get_view_widget),
+	(libbalsa_html_can_print), (libbalsa_html_print): support
+	webkit2 option.
+
 2013-03-21  Peter Bloomfield
 
 	* libbalsa/mailbox.c (libbalsa_mailbox_set_view_filter): clean

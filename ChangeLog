@@ -1,5 +1,9 @@
 2013-03-27  Peter Bloomfield
 
+	* libbalsa/html.c: reduce zoom factor to +/- 20%.
+
+2013-03-27  Peter Bloomfield
+
 	* libbalsa/html.c (lbh_info_bar_response_cb),
 	(lbh_info_bar_realize_cb), (lbh_show_info_bar),
 	(lbh_resource_load_started_cb), (libbalsa_html_new):

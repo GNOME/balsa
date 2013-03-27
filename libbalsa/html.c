@@ -495,7 +495,7 @@ libbalsa_html_can_zoom(GtkWidget * widget)
 /*
  * Zoom the widget.
  */
-#define LIBBALSA_HTML_ZOOM_FACTOR 1.25
+#define LIBBALSA_HTML_ZOOM_FACTOR 1.2
 void
 libbalsa_html_zoom(GtkWidget * widget, gint in_out)
 {

@@ -1,3 +1,11 @@
+2013-03-27  Peter Bloomfield
+
+	* libbalsa/html.c (lbh_info_bar_response_cb),
+	(lbh_info_bar_realize_cb), (lbh_show_info_bar),
+	(lbh_resource_load_started_cb), (libbalsa_html_new):
+	Use regex scan of HTML text to detect downloads, because Webkit2
+	does not alert us in time to control them.
+
 2013-03-24  Peter Bloomfield
 
 	Initial check in support for WebKitGtk2

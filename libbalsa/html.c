@@ -92,9 +92,8 @@ typedef struct {
     LibBalsaMessageBody  *body;
     LibBalsaHtmlCallback  hover_cb;
     LibBalsaHtmlCallback  clicked_cb;
-    gboolean              download_images;
     GtkWidget            *vbox;
-    gboolean              has_info_bar;
+    GtkInfoBar           *info_bar;
     WebKitWebView        *web_view;
     gchar                *uri;
 } LibBalsaWebKitInfo;
@@ -257,6 +256,8 @@ lbh_decide_policy_cb(WebKitWebView           * web_view,
 
 /*
  * Show the GtkInfoBar for asking about downloading images
+ *
+ * First two signal callbacks
  */
 
 static void
@@ -269,14 +270,24 @@ lbh_info_bar_response_cb(GtkInfoBar * info_bar,
         gchar *text;
 
         if (lbh_get_body_content_utf8(info->body, &text) >= 0) {
-            info->download_images = TRUE;
-            webkit_web_view_reload_bypass_cache(info->web_view);
+            WebKitSettings *settings;
+
+            settings = webkit_web_view_get_settings(info->web_view);
+            webkit_settings_set_auto_load_images(settings, TRUE);
+            webkit_web_view_reload(info->web_view);
             webkit_web_view_load_html(info->web_view, text, NULL);
             g_free(text);
         }
     }
 
     gtk_widget_destroy(GTK_WIDGET(info_bar));
+    info->info_bar = NULL;
+}
+
+static void
+lbh_info_bar_realize_cb(GtkInfoBar * info_bar)
+{
+    gtk_info_bar_set_default_response(info_bar, GTK_RESPONSE_CLOSE);
 }
 
 static void
@@ -293,7 +304,7 @@ lbh_show_info_bar(LibBalsaWebKitInfo * info)
                     "You may choose to download them "
                     "if you trust the server.");
 
-    if (info->has_info_bar)
+    if (info->info_bar)
         return;
 
     info_bar_widget =
@@ -312,13 +323,13 @@ lbh_show_info_bar(LibBalsaWebKitInfo * info)
     content_area = gtk_info_bar_get_content_area(info_bar);
     gtk_container_add(GTK_CONTAINER(content_area), label);
 
+    g_signal_connect(info_bar, "realize",
+                     G_CALLBACK(lbh_info_bar_realize_cb), info);
     g_signal_connect(info_bar, "response",
                      G_CALLBACK(lbh_info_bar_response_cb), info);
-    gtk_info_bar_set_default_response(info_bar, GTK_RESPONSE_CLOSE);
     gtk_info_bar_set_message_type(info_bar, GTK_MESSAGE_QUESTION);
 
-    info->has_info_bar = TRUE;
-    gtk_widget_show_all(info_bar_widget);
+    info->info_bar = info_bar;
 }
 
 /*
@@ -338,7 +349,8 @@ lbh_resource_load_started_cb(WebKitWebView     * web_view,
         return;
 
     if (g_ascii_strncasecmp(uri, "cid:", 4)) {
-        /* Not a "cid:" request: disable loading. */
+        /* Loading a remote source.  Either the user OK'd downloading,
+         * or WebKit cached the image and is showing it from its cache. */
         static GHashTable *cache = NULL;
 
         if (!cache)
@@ -346,14 +358,16 @@ lbh_resource_load_started_cb(WebKitWebView     * web_view,
                                           g_free, NULL);
 
         if (!g_hash_table_lookup(cache, uri)) {
-            if (info->download_images) {
-                g_hash_table_insert(cache, g_strdup(uri),
-                                    GINT_TO_POINTER(TRUE));
-            } else {
-                webkit_uri_request_set_uri(request, "about:blank");
-                lbh_show_info_bar(info);
-            }
+            /* New image, so we remember that it was downloaded. */
+            g_hash_table_insert(cache, g_strdup(uri),
+                                GINT_TO_POINTER(TRUE));
+        } else if (info->info_bar) {
+            /* We have seen this image before, so if the info bar is
+             * showing we destroy it. */
+            gtk_widget_destroy(GTK_WIDGET(info->info_bar));
+            info->info_bar = NULL;
         }
+#if 0 /* FIXME: handle cid: images */
     } else {
         LibBalsaMessageBody *body;
 
@@ -366,6 +380,7 @@ lbh_resource_load_started_cb(WebKitWebView     * web_view,
             webkit_uri_request_set_uri(request, file_uri);
             g_free(file_uri);
         }
+#endif
     }
 }
 
@@ -400,6 +415,8 @@ libbalsa_html_new(LibBalsaMessageBody * body,
     WebKitWebView *web_view;
     LibBalsaWebKitInfo *info;
     WebKitSettings *settings;
+    static gchar src_regex[] =
+        "<[^>]*src\\s*=\\s*['\"]\\s*[^c][^i][^d][^:]";
 
     len = lbh_get_body_content_utf8(body, &text);
     if (len < 0)
@@ -409,12 +426,14 @@ libbalsa_html_new(LibBalsaMessageBody * body,
     info->body            = body;
     info->hover_cb        = hover_cb;
     info->clicked_cb      = clicked_cb;
-    info->download_images = FALSE;
-    info->has_info_bar    = FALSE;
+    info->info_bar        = NULL;
     info->vbox = vbox     = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     info->uri             = NULL;
 
     widget = webkit_web_view_new();
+    /* WebkitWebView is uncontrollably scrollable, so if we don't set a
+     * minimum size it may be just a few pixels high. */
+    gtk_widget_set_size_request(widget, -1, 200);
     gtk_box_pack_end(GTK_BOX(vbox), widget, TRUE, TRUE, 0);
 
     info->web_view = web_view = WEBKIT_WEB_VIEW(widget);
@@ -434,6 +453,10 @@ libbalsa_html_new(LibBalsaMessageBody * body,
                      G_CALLBACK(lbh_resource_load_started_cb), info);
     g_signal_connect(web_view, "web-process-crashed",
                      G_CALLBACK(lbh_web_process_crashed_cb), info);
+
+    /* Simple check for possible resource requests: */
+    if (g_regex_match_simple(src_regex, text, G_REGEX_CASELESS, 0))
+        lbh_show_info_bar(info);
 
     webkit_web_view_load_html(web_view, text, NULL);
     g_free(text);

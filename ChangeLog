@@ -1,3 +1,10 @@
+2013-03-28  Peter Bloomfield
+
+	* libbalsa/html.c (lbh_navigation_policy_decision),
+	(lbh_new_window_policy_decision), (lbh_response_policy_decision):
+	Clicking a link may cause a new window policy decision, instead
+	of a navigation policy decision; we handle both cases.
+
 2013-03-27  Peter Bloomfield
 
 	* libbalsa/html.c: reduce zoom factor to +/- 20%.

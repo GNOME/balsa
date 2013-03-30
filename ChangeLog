@@ -1,3 +1,22 @@
+2013-03-30  Peter Bloomfield
+
+	Refactor HTML search code to work with asynchronous search in
+	Webkit2.
+
+	* libbalsa/html.c (lbh_web_process_crashed_cb): spew message
+	only when debugging;
+	(lbh_search_failed_to_find_text_cb), (lbh_search_found_text_cb),
+	(lbh_search_init), (lbh_search_continue),
+	(libbalsa_html_search): work with asynchronous search;
+	(libbalsa_html_get_selection_bounds): is now gboolean, return
+	FALSE in Webkit2 version.
+	* libbalsa/html.h: new protoypes.
+	* src/balsa-message.c (bm_find_cb), (bm_find_entry_changed_cb),
+	(bm_find_again), (balsa_message_destroy): work with asynchronous
+	search.
+	* src/balsa-message.h: add gpointer member to store HTML search
+	info.
+
 2013-03-28  Peter Bloomfield
 
 	* libbalsa/html.c (lbh_navigation_policy_decision),

@@ -59,11 +59,19 @@ void libbalsa_html_copy(GtkWidget * widget);
 guint libbalsa_html_filter(LibBalsaHTMLType html_type, gchar ** text,
 			   guint len);
 
+typedef void (*LibBalsaHtmlSearchCallback)(const gchar * text,
+                                           gboolean      found,
+                                           gpointer      data);
 gboolean libbalsa_html_can_search(GtkWidget * widget);
-gboolean libbalsa_html_search_text(GtkWidget * widget, const gchar * text,
-                                   gboolean find_forward, gboolean wrap);
-void libbalsa_html_get_selection_bounds(GtkWidget * widget,
-                                        GdkRectangle * selection_bounds);
+void libbalsa_html_search(GtkWidget                * widget,
+                          const gchar              * text,
+                          gboolean                   find_forward,
+                          gboolean                   wrap,
+                          LibBalsaHtmlSearchCallback search_cb,
+                          gpointer                   cb_data);
+gboolean libbalsa_html_get_selection_bounds(GtkWidget * widget,
+                                            GdkRectangle *
+                                            selection_bounds);
 
 GtkWidget *libbalsa_html_popup_menu_widget(GtkWidget * widget);
 GtkWidget *libbalsa_html_get_view_widget(GtkWidget * widget);

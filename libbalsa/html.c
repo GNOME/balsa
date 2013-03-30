@@ -417,7 +417,7 @@ static gboolean
 lbh_web_process_crashed_cb(WebKitWebView * web_view,
                            gpointer        data)
 {
-    g_print("%s\n", __func__);
+    d(g_print("%s\n", __func__));
     return FALSE;
 }
 
@@ -599,60 +599,78 @@ libbalsa_html_can_search(GtkWidget * widget)
 }
 
 /*
- * JavaScript-based helpers for text search
+ * Search for the text; if text is empty, call the callback with TRUE
+ * (for consistency with GtkTextIter methods).
  */
-static JSValueRef
-lbh_js_run_script(JSContextRef  ctx,
-                  const gchar * script)
+
+typedef struct {
+    LibBalsaHtmlSearchCallback search_cb;
+    gpointer                   cb_data;
+    gchar                    * text;
+} LibBalsaHtmlSearchInfo;
+
+#define LIBBALSA_HTML_SEARCH_INFO "LibBalsaHtmlSearchInfo"
+
+static void
+lbh_search_failed_to_find_text_cb(WebKitFindController * controller,
+                                  gpointer               data)
 {
-    JSStringRef str;
-    JSValueRef value;
+    LibBalsaHtmlSearchInfo *info = data;
 
-    str = JSStringCreateWithUTF8CString(script);
-    value = JSEvaluateScript(ctx, str, NULL, NULL, 0, NULL);
-    JSStringRelease(str);
-
-    return value;
+    (*info->search_cb)(info->text, FALSE, info->cb_data);
 }
 
-static gint
-lbh_js_object_get_property(JSContextRef  ctx,
-                           JSObjectRef   object,
-                           const gchar * property_name)
+static void
+lbh_search_found_text_cb(WebKitFindController *controller,
+                         guint                 match_count,
+                         gpointer              data)
 {
-    JSStringRef str  = JSStringCreateWithUTF8CString(property_name);
-    JSValueRef value = JSObjectGetProperty(ctx, object, str, NULL);
-    JSStringRelease(str);
+    LibBalsaHtmlSearchInfo *info = data;
 
-    return (gint) JSValueToNumber(ctx, value, NULL);
+    (*info->search_cb)(info->text, TRUE, info->cb_data);
 }
 
-/*
- * Search for the text; if text is empty, return TRUE (for consistency
- * with GtkTextIter methods).
- */
-gboolean
-libbalsa_html_search_text(GtkWidget   * widget,
-                          const gchar * text,
-                          gboolean      find_forward,
-                          gboolean      wrap)
+static void
+lbh_search_init(WebKitFindController     * controller,
+                const gchar              * text,
+                gboolean                   find_forward,
+                gboolean                   wrap,
+                LibBalsaHtmlSearchCallback search_cb,
+                gpointer                   cb_data)
 {
-    WebKitWebView *web_view;
-    WebKitFindController *find_controller;
-    guint find_options;
+    LibBalsaHtmlSearchInfo *info;
+    guint32 find_options;
 
-    if (!lbh_get_web_view(widget, &web_view))
-        return FALSE;
+    info = g_object_get_data(G_OBJECT(controller),
+                             LIBBALSA_HTML_SEARCH_INFO);
 
     if (!*text) {
-        JSGlobalContextRef ctx;
-        gchar script[] = "window.getSelection().removeAllRanges()";
-
-        ctx = webkit_web_view_get_javascript_global_context(web_view);
-        lbh_js_run_script(ctx, script);
-
-        return TRUE;
+        webkit_find_controller_search_finish(controller);
+        (*search_cb)(text, TRUE, cb_data);
+        if (info) {
+            g_free(info->text);
+            info->text = NULL;
+        }
+        return;
     }
+
+    if (!info) {
+        info = g_new(LibBalsaHtmlSearchInfo, 1);
+        info->text = NULL;
+        g_object_set_data_full(G_OBJECT(controller),
+                               LIBBALSA_HTML_SEARCH_INFO, info, g_free);
+        g_signal_connect(controller, "failed-to-find-text",
+                         G_CALLBACK(lbh_search_failed_to_find_text_cb),
+                         info);
+        g_signal_connect(controller, "found-text",
+                         G_CALLBACK(lbh_search_found_text_cb),
+                         info);
+    }
+
+    g_free(info->text);
+    info->text = g_strdup(text);
+    info->search_cb = search_cb;
+    info->cb_data = cb_data;
 
     find_options = WEBKIT_FIND_OPTIONS_CASE_INSENSITIVE;
     if (!find_forward)
@@ -660,50 +678,79 @@ libbalsa_html_search_text(GtkWidget   * widget,
     if (wrap)
         find_options |= WEBKIT_FIND_OPTIONS_WRAP_AROUND;
 
-    find_controller = webkit_web_view_get_find_controller(web_view);
-    webkit_find_controller_search(find_controller, text, find_options,
+    webkit_find_controller_search(controller, text, find_options,
                                   G_MAXUINT);
+}
 
-    return FALSE;
+static void
+lbh_search_continue(WebKitFindController * controller,
+                    const gchar          * text,
+                    gboolean               find_forward,
+                    gboolean               wrap)
+{
+    guint32 find_options;
+
+    find_options = webkit_find_controller_get_options(controller);
+
+    if (!find_forward)
+        find_options |= WEBKIT_FIND_OPTIONS_BACKWARDS;
+    else
+        find_options &= ~WEBKIT_FIND_OPTIONS_BACKWARDS;
+
+    if (wrap)
+        find_options |= WEBKIT_FIND_OPTIONS_WRAP_AROUND;
+    else
+        find_options &= ~WEBKIT_FIND_OPTIONS_WRAP_AROUND;
+
+    if (find_options != webkit_find_controller_get_options(controller)) {
+        /* No setter for find-options, so we start a new search */
+        webkit_find_controller_search(controller, text, find_options,
+                                      G_MAXUINT);
+    } else {
+        /* OK to use next/previous methods */
+        if (find_forward)
+            webkit_find_controller_search_next(controller);
+        else
+            webkit_find_controller_search_previous(controller);
+    }
+}
+
+void
+libbalsa_html_search(GtkWidget                * widget,
+                     const gchar              * text,
+                     gboolean                   find_forward,
+                     gboolean                   wrap,
+                     LibBalsaHtmlSearchCallback search_cb,
+                     gpointer                   cb_data)
+{
+    WebKitWebView *web_view;
+    WebKitFindController *controller;
+    LibBalsaHtmlSearchInfo *info;
+
+    if (!lbh_get_web_view(widget, &web_view)) {
+        return;
+    }
+
+    controller = webkit_web_view_get_find_controller(web_view);
+
+    if (!(info = g_object_get_data(G_OBJECT(controller),
+                                   LIBBALSA_HTML_SEARCH_INFO)) ||
+        (!info->text || strcmp(text, info->text))) {
+        lbh_search_init(controller, text, find_forward, wrap,
+                        search_cb, cb_data);
+    } else {
+        lbh_search_continue(controller, text, find_forward, wrap);
+    }
 }
 
 /*
- * Get the rectangle containing the currently selected text, for
- * scrolling.
+ * We do not need selection bounds.
  */
-void
+gboolean
 libbalsa_html_get_selection_bounds(GtkWidget    * widget,
                                    GdkRectangle * selection_bounds)
 {
-    WebKitWebView *web_view;
-    JSGlobalContextRef ctx;
-    gchar script[] =
-        "window.getSelection().getRangeAt(0).getBoundingClientRect()";
-    JSValueRef value;
-
-    if (!lbh_get_web_view(widget, &web_view))
-        return;
-
-    ctx = webkit_web_view_get_javascript_global_context(web_view);
-    value = lbh_js_run_script(ctx, script);
-
-    if (value && JSValueIsObject(ctx, value)) {
-        JSObjectRef object = JSValueToObject(ctx, value, NULL);
-        gint x, y;
-
-        x = lbh_js_object_get_property(ctx, object, "left");
-        y = lbh_js_object_get_property(ctx, object, "top");
-
-        gtk_widget_translate_coordinates(GTK_WIDGET(web_view), widget,
-                                         x, y,
-                                         &selection_bounds->x,
-                                         &selection_bounds->y);
-
-        selection_bounds->width =
-            lbh_js_object_get_property(ctx, object, "width");
-        selection_bounds->height =
-            lbh_js_object_get_property(ctx, object, "height");
-    }
+    return FALSE;
 }
 
 /*
@@ -1231,35 +1278,42 @@ lbh_js_object_get_property(JSContextRef  ctx,
  * Search for the text; if text is empty, return TRUE (for consistency
  * with GtkTextIter methods).
  */
-gboolean
-libbalsa_html_search_text(GtkWidget   * widget,
-                          const gchar * text,
-                          gboolean      find_forward,
-                          gboolean      wrap)
+void
+libbalsa_html_search(GtkWidget                * widget,
+                     const gchar              * text,
+                     gboolean                   find_forward,
+                     gboolean                   wrap,
+                     LibBalsaHtmlSearchCallback search_cb,
+                     gpointer                   cb_data)
 {
     WebKitWebView *web_view;
+    gboolean retval;
 
     if (!lbh_get_web_view(widget, &web_view))
-        return FALSE;
+        return;
 
     if (!*text) {
         gchar script[] = "window.getSelection().removeAllRanges()";
 
         lbh_js_run_script(lbh_js_get_global_context(web_view), script);
 
-        return TRUE;
+        (*search_cb)(text, TRUE, cb_data);
+        return;
     }
 
-    return webkit_web_view_search_text(web_view, text,
-                                       FALSE,    /* case-insensitive */
-                                       find_forward, wrap);
+    retval = webkit_web_view_search_text(web_view, text,
+                                         FALSE,    /* case-insensitive */
+                                         find_forward, wrap);
+    (*search_cb)(text, retval, cb_data);
+
+    return;
 }
 
 /*
  * Get the rectangle containing the currently selected text, for
  * scrolling.
  */
-void
+gboolean
 libbalsa_html_get_selection_bounds(GtkWidget    * widget,
                                    GdkRectangle * selection_bounds)
 {
@@ -1270,7 +1324,7 @@ libbalsa_html_get_selection_bounds(GtkWidget    * widget,
     JSValueRef value;
 
     if (!lbh_get_web_view(widget, &web_view))
-        return;
+        return FALSE;
 
     ctx = lbh_js_get_global_context(web_view);
     value = lbh_js_run_script(ctx, script);
@@ -1291,7 +1345,11 @@ libbalsa_html_get_selection_bounds(GtkWidget    * widget,
             lbh_js_object_get_property(ctx, object, "width");
         selection_bounds->height =
             lbh_js_object_get_property(ctx, object, "height");
+
+        return TRUE;
     }
+
+    return FALSE;
 }
 
 /*
@@ -1820,17 +1878,21 @@ libbalsa_html_can_search(GtkWidget * widget)
     return FALSE;
 }
 
-gboolean
-libbalsa_html_search_text(GtkWidget * widget, const gchar * text,
-                          gboolean find_forward, gboolean wrap)
+void
+libbalsa_html_search(GtkWidget                * widget,
+                     const gchar              * text,
+                     gboolean                   find_forward,
+                     gboolean                   wrap,
+                     LibBalsaHtmlSearchCallback search_cb,
+                     gpointer                   cb_data)
 {
-    return FALSE;
 }
 
-void
+gboolean
 libbalsa_html_get_selection_bounds(GtkWidget    * widget,
                                    GdkRectangle * selection_bounds)
 {
+    return FALSE;
 }
 
 /*

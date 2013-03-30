@@ -441,6 +441,44 @@ bm_find_scroll_to_selection(BalsaMessage * bm,
     bm_find_scroll_to_rectangle(bm, GTK_WIDGET(text_view), &begin_location);
 }
 
+#ifdef HAVE_HTML_WIDGET
+typedef struct {
+    BalsaMessage *bm;
+    GtkWidget    *widget;
+    gboolean      continuing;
+    gboolean      wrapping;
+} BalsaMessageFindInfo;
+#define BALSA_MESSAGE_FIND_INFO "BalsaMessageFindInfo"
+
+static void
+bm_find_cb(const gchar * text, gboolean found, gpointer data)
+{
+    BalsaMessageFindInfo *info = data;
+
+    if (!found && info->continuing) {
+        info->wrapping = TRUE;
+        libbalsa_html_search(info->widget, text, info->bm->find_forward,
+                             TRUE, bm_find_cb, info);
+        return;
+    }
+
+    if (found && *text) {
+        GdkRectangle selection_bounds;
+        if (libbalsa_html_get_selection_bounds(info->widget,
+                                               &selection_bounds))
+            bm_find_scroll_to_rectangle(info->bm, info->widget,
+                                        &selection_bounds);
+    }
+
+    if (info->wrapping) {
+        info->wrapping = FALSE;
+        bm_find_set_status(info->bm, BM_FIND_STATUS_WRAPPED);
+    } else
+        bm_find_set_status(info->bm, found ? BM_FIND_STATUS_FOUND :
+                                             BM_FIND_STATUS_NOT_FOUND);
+}
+#endif                          /* HAVE_HTML_WIDGET */
+
 static void
 bm_find_entry_changed_cb(GtkEditable * editable, gpointer data)
 {
@@ -480,23 +518,26 @@ bm_find_entry_changed_cb(GtkEditable * editable, gpointer data)
                                         &match_begin, &match_end);
             bm->find_iter = match_begin;
         }
+
+        bm_find_set_status(bm, found ? BM_FIND_STATUS_FOUND :
+                                       BM_FIND_STATUS_NOT_FOUND);
 #ifdef HAVE_HTML_WIDGET
     } else if (libbalsa_html_can_search(widget)) {
-        found = libbalsa_html_search_text(widget, text,
-                                          bm->find_forward, TRUE);
-        if (found && *text) {
-            GdkRectangle selection_bounds;
+        BalsaMessageFindInfo *info;
 
-            libbalsa_html_get_selection_bounds(widget,
-                                               &selection_bounds);
-            bm_find_scroll_to_rectangle(bm, widget, &selection_bounds);
+        if (!(info = bm->html_find_info)) {
+            bm->html_find_info = info = g_new(BalsaMessageFindInfo, 1);
+            info->bm = bm;
         }
+        info->widget = widget;
+        info->continuing = FALSE;
+        info->wrapping = FALSE;
+
+        libbalsa_html_search(widget, text, bm->find_forward, TRUE,
+                             bm_find_cb, info);
 #endif                          /* HAVE_HTML_WIDGET */
     } else
         g_assert_not_reached();
-
-    bm_find_set_status(bm, found ?
-                       BM_FIND_STATUS_FOUND : BM_FIND_STATUS_NOT_FOUND);
 }
 
 static void
@@ -505,6 +546,8 @@ bm_find_again(BalsaMessage * bm, gboolean find_forward)
     const gchar *text = gtk_entry_get_text(GTK_ENTRY(bm->find_entry));
     GtkWidget *widget = bm->current_part->mime_widget->widget;
     gboolean found;
+
+    bm->find_forward = find_forward;
 
     if (GTK_IS_TEXT_VIEW(widget)) {
         GtkTextView *text_view = GTK_TEXT_VIEW(widget);
@@ -535,22 +578,19 @@ bm_find_again(BalsaMessage * bm, gboolean find_forward)
         bm_find_scroll_to_selection(bm, text_view,
                                     &match_begin, &match_end);
         bm->find_iter = match_begin;
+
+        bm_find_set_status(bm, found ?
+                           BM_FIND_STATUS_FOUND : BM_FIND_STATUS_WRAPPED);
 #ifdef HAVE_HTML_WIDGET
     } else if (libbalsa_html_can_search(widget)) {
-        GdkRectangle selection_bounds;
+        BalsaMessageFindInfo *info = bm->html_find_info;
 
-        found = libbalsa_html_search_text(widget, text, find_forward, FALSE);
-        if (!found)
-            libbalsa_html_search_text(widget, text, find_forward, TRUE);
-        libbalsa_html_get_selection_bounds(widget, &selection_bounds);
-        bm_find_scroll_to_rectangle(bm, widget, &selection_bounds);
+        info->continuing = TRUE;
+        libbalsa_html_search(widget, text, find_forward, FALSE,
+                             bm_find_cb, info);
 #endif                          /* HAVE_HTML_WIDGET */
     } else
         g_assert_not_reached();
-
-    bm_find_set_status(bm, found ?
-                       BM_FIND_STATUS_FOUND : BM_FIND_STATUS_WRAPPED);
-    bm->find_forward = find_forward;
 }
 
 static void
@@ -803,6 +843,13 @@ balsa_message_destroy(GObject * object)
 	g_object_unref(bm->parts_popup);
 	bm->parts_popup = NULL;
     }
+
+#ifdef HAVE_HTML_WIDGET
+    if (bm->html_find_info) {
+        g_free(bm->html_find_info);
+        bm->html_find_info = NULL;
+    }
+#endif                          /* HAVE_HTML_WIDGET */
 
     if (G_OBJECT_CLASS(parent_class)->dispose)
         (*G_OBJECT_CLASS(parent_class)->dispose) (object);

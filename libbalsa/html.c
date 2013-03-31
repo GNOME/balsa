@@ -103,7 +103,12 @@ typedef struct {
     GtkInfoBar           *info_bar;
     WebKitWebView        *web_view;
     gchar                *uri;
+    LibBalsaHtmlSearchCallback search_cb;
+    gpointer                   search_cb_data;
+    gchar                    * search_text;
 } LibBalsaWebKitInfo;
+
+#define LIBBALSA_HTML_INFO "libbalsa-webkit2-info"
 
 /*
  * Unlike older HTML widgets, webkit2 wants UTF-8 text
@@ -144,6 +149,8 @@ lbh_webkit_info_free(LibBalsaWebKitInfo * info)
         g_free(info->uri);
         (*info->hover_cb) (NULL);
     }
+
+    g_free(info->search_text);
     g_free(info);
 }
 
@@ -455,6 +462,7 @@ libbalsa_html_new(LibBalsaMessageBody * body,
     info->info_bar        = NULL;
     info->vbox = vbox     = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     info->uri             = NULL;
+    info->search_text     = NULL;
 
     widget = webkit_web_view_new();
     /* WebkitWebView is uncontrollably scrollable, so if we don't set a
@@ -464,7 +472,7 @@ libbalsa_html_new(LibBalsaMessageBody * body,
 
     info->web_view = web_view = WEBKIT_WEB_VIEW(widget);
     g_object_set_data(G_OBJECT(vbox), "libbalsa-html-web-view", web_view);
-    g_object_set_data_full(G_OBJECT(web_view), "libbalsa-html-info", info,
+    g_object_set_data_full(G_OBJECT(web_view), LIBBALSA_HTML_INFO, info,
                            (GDestroyNotify) lbh_webkit_info_free);
 
     settings = webkit_web_view_get_settings(web_view);
@@ -603,21 +611,13 @@ libbalsa_html_can_search(GtkWidget * widget)
  * (for consistency with GtkTextIter methods).
  */
 
-typedef struct {
-    LibBalsaHtmlSearchCallback search_cb;
-    gpointer                   cb_data;
-    gchar                    * text;
-} LibBalsaHtmlSearchInfo;
-
-#define LIBBALSA_HTML_SEARCH_INFO "LibBalsaHtmlSearchInfo"
-
 static void
 lbh_search_failed_to_find_text_cb(WebKitFindController * controller,
                                   gpointer               data)
 {
-    LibBalsaHtmlSearchInfo *info = data;
+    LibBalsaWebKitInfo *info = data;
 
-    (*info->search_cb)(info->text, FALSE, info->cb_data);
+    (*info->search_cb)(info->search_text, FALSE, info->search_cb_data);
 }
 
 static void
@@ -625,40 +625,24 @@ lbh_search_found_text_cb(WebKitFindController *controller,
                          guint                 match_count,
                          gpointer              data)
 {
-    LibBalsaHtmlSearchInfo *info = data;
+    LibBalsaWebKitInfo *info = data;
 
-    (*info->search_cb)(info->text, TRUE, info->cb_data);
+    (*info->search_cb)(info->search_text, TRUE, info->search_cb_data);
 }
 
 static void
-lbh_search_init(WebKitFindController     * controller,
+lbh_search_init(LibBalsaWebKitInfo       * info,
+                WebKitFindController     * controller,
                 const gchar              * text,
                 gboolean                   find_forward,
                 gboolean                   wrap,
                 LibBalsaHtmlSearchCallback search_cb,
                 gpointer                   cb_data)
 {
-    LibBalsaHtmlSearchInfo *info;
     guint32 find_options;
 
-    info = g_object_get_data(G_OBJECT(controller),
-                             LIBBALSA_HTML_SEARCH_INFO);
-
-    if (!*text) {
-        webkit_find_controller_search_finish(controller);
-        (*search_cb)(text, TRUE, cb_data);
-        if (info) {
-            g_free(info->text);
-            info->text = NULL;
-        }
-        return;
-    }
-
-    if (!info) {
-        info = g_new(LibBalsaHtmlSearchInfo, 1);
-        info->text = NULL;
-        g_object_set_data_full(G_OBJECT(controller),
-                               LIBBALSA_HTML_SEARCH_INFO, info, g_free);
+    if (!info->search_text) {
+        /* First search */
         g_signal_connect(controller, "failed-to-find-text",
                          G_CALLBACK(lbh_search_failed_to_find_text_cb),
                          info);
@@ -667,10 +651,16 @@ lbh_search_init(WebKitFindController     * controller,
                          info);
     }
 
-    g_free(info->text);
-    info->text = g_strdup(text);
+    g_free(info->search_text);
+    info->search_text = g_strdup(text);
     info->search_cb = search_cb;
-    info->cb_data = cb_data;
+    info->search_cb_data = cb_data;
+
+    if (!*text) {
+        webkit_find_controller_search_finish(controller);
+        (*search_cb)(text, TRUE, cb_data);
+        return;
+    }
 
     find_options = WEBKIT_FIND_OPTIONS_CASE_INSENSITIVE;
     if (!find_forward)
@@ -689,8 +679,10 @@ lbh_search_continue(WebKitFindController * controller,
                     gboolean               wrap)
 {
     guint32 find_options;
+    guint32 orig_find_options;
 
-    find_options = webkit_find_controller_get_options(controller);
+    orig_find_options = find_options =
+        webkit_find_controller_get_options(controller);
 
     if (!find_forward)
         find_options |= WEBKIT_FIND_OPTIONS_BACKWARDS;
@@ -702,7 +694,7 @@ lbh_search_continue(WebKitFindController * controller,
     else
         find_options &= ~WEBKIT_FIND_OPTIONS_WRAP_AROUND;
 
-    if (find_options != webkit_find_controller_get_options(controller)) {
+    if (find_options != orig_find_options) {
         /* No setter for find-options, so we start a new search */
         webkit_find_controller_search(controller, text, find_options,
                                       G_MAXUINT);
@@ -725,18 +717,17 @@ libbalsa_html_search(GtkWidget                * widget,
 {
     WebKitWebView *web_view;
     WebKitFindController *controller;
-    LibBalsaHtmlSearchInfo *info;
+    LibBalsaWebKitInfo *info;
 
     if (!lbh_get_web_view(widget, &web_view)) {
         return;
     }
 
+    info = g_object_get_data(G_OBJECT(web_view), LIBBALSA_HTML_INFO);
     controller = webkit_web_view_get_find_controller(web_view);
 
-    if (!(info = g_object_get_data(G_OBJECT(controller),
-                                   LIBBALSA_HTML_SEARCH_INFO)) ||
-        (!info->text || strcmp(text, info->text))) {
-        lbh_search_init(controller, text, find_forward, wrap,
+    if (!info->search_text || strcmp(text, info->search_text)) {
+        lbh_search_init(info, controller, text, find_forward, wrap,
                         search_cb, cb_data);
     } else {
         lbh_search_continue(controller, text, find_forward, wrap);

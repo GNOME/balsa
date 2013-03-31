@@ -1,3 +1,13 @@
+2013-03-31  Peter Bloomfield
+
+	Do not leak search-text
+
+	* libbalsa/html.c (lbh_webkit_info_free), (libbalsa_html_new),
+	(lbh_search_failed_to_find_text_cb), (lbh_search_found_text_cb),
+	(lbh_search_init), (lbh_search_continue), (libbalsa_html_search):
+	move search info to LibBalsaWebKitInfo, and free search-text in
+	the GDestroyNotify function.
+
 2013-03-30  Peter Bloomfield
 
 	Refactor HTML search code to work with asynchronous search in

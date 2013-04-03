@@ -1,3 +1,8 @@
+2013-04-02  Peter Bloomfield
+
+	* libbalsa/html.c (lbh_get_body_content_utf8): sanitize UTF-8
+	text.
+
 2013-03-31  Peter Bloomfield
 
 	Do not leak search-text

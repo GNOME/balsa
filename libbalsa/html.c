@@ -130,13 +130,18 @@ lbh_get_body_content_utf8(LibBalsaMessageBody  * body,
     if (charset) {
         *utf8_text = g_convert(text, len, "UTF-8", charset,
                                NULL, &utf8_len, NULL);
-        g_free(text);
-    } else {
-        *utf8_text = text;
-        utf8_len = len;
+        if (*utf8_text) {
+            /* Success! */
+            g_free(text);
+            return utf8_len;
+        }
     }
 
-    return utf8_len;
+    /* No charset, or g_convert failed; just make sure it's UTF-8 */
+    libbalsa_utf8_sanitize(&text, TRUE, NULL);
+    *utf8_text = text;
+
+    return strlen(text);
 }
 
 /*

@@ -1,3 +1,10 @@
+2013-04-03  Peter Bloomfield
+
+	* libbalsa/filter-funcs.c (append_header_names),
+	(append_flag_names): do not mark text-free string for
+	translation.
+	* libbalsa/imap-server.c (is_info_cb): ditto.
+
 2013-04-02  Peter Bloomfield
 
 	* libbalsa/html.c (lbh_get_body_content_utf8): sanitize UTF-8

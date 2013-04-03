@@ -346,7 +346,7 @@ is_info_cb(ImapMboxHandle *h, ImapResponse rc, const gchar* str, void *arg)
     case IMR_BYE: 
     case IMR_NO: 
         /* IMAP host name + message */
-        fmt = _("%s: %s");  it = LIBBALSA_INFORMATION_MESSAGE; break;
+        fmt = "%s: %s";  it = LIBBALSA_INFORMATION_MESSAGE; break;
     default:
         return;
     }

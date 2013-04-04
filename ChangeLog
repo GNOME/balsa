@@ -1,5 +1,12 @@
 2013-04-04  Peter Bloomfield
 
+	* libbalsa/html.c (lbh_info_bar_response_cb): no need to reload;
+	(lbh_resource_load_started_cb): no need for cache;
+	(lbh_cid_cb), (libbalsa_html_new): register the "cid:" protocol
+	handler only once, to avoid crashing the web process.
+
+2013-04-04  Peter Bloomfield
+
 	Handle "cid:" protocol for images
 
 	* libbalsa/html.c (lbh_info_bar_response_cb), (lbh_info_bar):

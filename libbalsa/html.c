@@ -311,7 +311,6 @@ lbh_info_bar_response_cb(GtkInfoBar * info_bar,
 
             settings = webkit_web_view_get_settings(info->web_view);
             webkit_settings_set_auto_load_images(settings, TRUE);
-            webkit_web_view_reload(info->web_view);
             webkit_web_view_load_html(info->web_view, text, NULL);
             g_free(text);
         }
@@ -381,25 +380,11 @@ lbh_resource_load_started_cb(WebKitWebView     * web_view,
     if (!g_ascii_strcasecmp(uri, "about:blank"))
         return;
 
-    if (g_ascii_strncasecmp(uri, "cid:", 4)) {
-        /* Loading a remote source.  Either the user OK'd downloading,
-         * or WebKit cached the image and is showing it from its cache. */
-        static GHashTable *cache = NULL;
-
-        if (!cache)
-            cache = g_hash_table_new_full(g_str_hash, g_str_equal,
-                                          g_free, NULL);
-
-        if (!g_hash_table_lookup(cache, uri)) {
-            /* New image, so we remember that it was downloaded. */
-            g_hash_table_insert(cache, g_strdup(uri),
-                                GINT_TO_POINTER(TRUE));
-        } else if (info->info_bar) {
-            /* We have seen this image before, so if the info bar is
-             * showing we destroy it. */
-            gtk_widget_destroy(info->info_bar);
-            info->info_bar = NULL;
-        }
+    if (info->info_bar) {
+        /* web_view is loading an image from its cache, so we do not
+         * need to ask the user for permission to download */
+        gtk_widget_destroy(info->info_bar);
+        info->info_bar = NULL;
     }
 }
 
@@ -421,7 +406,7 @@ static void
 lbh_cid_cb(WebKitURISchemeRequest * request,
            gpointer                 data)
 {
-    LibBalsaWebKitInfo *info = data;
+    LibBalsaWebKitInfo *info = *(LibBalsaWebKitInfo **) data;
     const gchar *path;
     LibBalsaMessageBody *body;
 
@@ -464,11 +449,11 @@ libbalsa_html_new(LibBalsaMessageBody * body,
 {
     gchar *text;
     gssize len;
-    WebKitWebContext *context;
     GtkWidget *widget;
     GtkWidget *vbox;
     WebKitWebView *web_view;
-    LibBalsaWebKitInfo *info;
+    static LibBalsaWebKitInfo *info;
+    static gboolean have_registered_cid = FALSE;
     WebKitSettings *settings;
     static const gchar cid_regex[] =
         "<[^>]*src\\s*=\\s*['\"]?\\s*cid:";
@@ -496,9 +481,19 @@ libbalsa_html_new(LibBalsaMessageBody * body,
     g_object_set_data_full(G_OBJECT(web_view), LIBBALSA_HTML_INFO, info,
                            (GDestroyNotify) lbh_webkit_info_free);
 
-    context = webkit_web_view_get_context(web_view);
-    webkit_web_context_register_uri_scheme(context, "cid", lbh_cid_cb,
-                                           info, NULL);
+    if (!have_registered_cid) {
+        WebKitWebContext *context;
+        /* Apparently, WebKitWebContext is static, and does not like to
+         * have the scheme registered many times (13? 15?), after which
+         * the web process crashes and does not get respawned.
+         * We register it once with the address of a static pointer to
+         * LibBalsaWebKitInfo. */
+
+        context = webkit_web_view_get_context(web_view);
+        webkit_web_context_register_uri_scheme(context, "cid", lbh_cid_cb,
+                                               &info, NULL);
+        have_registered_cid = TRUE;
+    }
 
     settings = webkit_web_view_get_settings(web_view);
     webkit_settings_set_enable_plugins(settings, FALSE);

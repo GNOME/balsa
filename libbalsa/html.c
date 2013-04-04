@@ -99,8 +99,7 @@ typedef struct {
     LibBalsaMessageBody  *body;
     LibBalsaHtmlCallback  hover_cb;
     LibBalsaHtmlCallback  clicked_cb;
-    GtkWidget            *vbox;
-    GtkInfoBar           *info_bar;
+    GtkWidget            *info_bar;
     WebKitWebView        *web_view;
     gchar                *uri;
     LibBalsaHtmlSearchCallback search_cb;
@@ -318,7 +317,7 @@ lbh_info_bar_response_cb(GtkInfoBar * info_bar,
         }
     }
 
-    gtk_widget_destroy(GTK_WIDGET(info_bar));
+    gtk_widget_destroy(info->info_bar);
     info->info_bar = NULL;
 }
 
@@ -328,34 +327,30 @@ lbh_info_bar_realize_cb(GtkInfoBar * info_bar)
     gtk_info_bar_set_default_response(info_bar, GTK_RESPONSE_CLOSE);
 }
 
-static void
-lbh_show_info_bar(LibBalsaWebKitInfo * info)
+static GtkWidget *
+lbh_info_bar(LibBalsaWebKitInfo * info)
 {
     GtkWidget *info_bar_widget;
     GtkInfoBar *info_bar;
     GtkWidget *label;
     GtkWidget *content_area;
-    gchar *text = _("This message part contains images "
+    static const gchar text[] =
+                 N_("This message part contains images "
                     "from a remote server. "
                     "To protect your privacy, "
                     "Balsa has not downloaded them. "
                     "You may choose to download them "
                     "if you trust the server.");
 
-    if (info->info_bar)
-        return;
-
     info_bar_widget =
         gtk_info_bar_new_with_buttons(_("_Download images"),
                                      GTK_RESPONSE_OK,
                                      GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
                                      NULL);
-    gtk_box_pack_start(GTK_BOX(info->vbox), info_bar_widget,
-                       FALSE, FALSE, 0);
 
     info_bar = GTK_INFO_BAR(info_bar_widget);
 
-    label = gtk_label_new(text);
+    label = gtk_label_new(_(text));
     gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
 
     content_area = gtk_info_bar_get_content_area(info_bar);
@@ -367,7 +362,7 @@ lbh_show_info_bar(LibBalsaWebKitInfo * info)
                      G_CALLBACK(lbh_info_bar_response_cb), info);
     gtk_info_bar_set_message_type(info_bar, GTK_MESSAGE_QUESTION);
 
-    info->info_bar = info_bar;
+    return info_bar_widget;
 }
 
 /*
@@ -402,23 +397,9 @@ lbh_resource_load_started_cb(WebKitWebView     * web_view,
         } else if (info->info_bar) {
             /* We have seen this image before, so if the info bar is
              * showing we destroy it. */
-            gtk_widget_destroy(GTK_WIDGET(info->info_bar));
+            gtk_widget_destroy(info->info_bar);
             info->info_bar = NULL;
         }
-#if 0 /* FIXME: handle cid: images */
-    } else {
-        LibBalsaMessageBody *body;
-
-        /* Replace "cid:" request with a "file:" request. */
-        if ((body =
-             libbalsa_message_get_part_by_id(info->body->message, uri + 4))
-            && libbalsa_message_body_save_temporary(body, NULL)) {
-            gchar *file_uri =
-                g_strconcat("file://", body->temp_filename, NULL);
-            webkit_uri_request_set_uri(request, file_uri);
-            g_free(file_uri);
-        }
-#endif
     }
 }
 
@@ -431,6 +412,41 @@ lbh_web_process_crashed_cb(WebKitWebView * web_view,
 {
     d(g_print("%s\n", __func__));
     return FALSE;
+}
+
+/*
+ * WebKitURISchemeRequestCallback for "cid:" URIs
+ */
+static void
+lbh_cid_cb(WebKitURISchemeRequest * request,
+           gpointer                 data)
+{
+    LibBalsaWebKitInfo *info = data;
+    const gchar *path;
+    LibBalsaMessageBody *body;
+
+    path = webkit_uri_scheme_request_get_path(request);
+    d(g_print("%s path %s\n", __func__, path));
+
+    if ((body =
+         libbalsa_message_get_part_by_id(info->body->message, path))) {
+        gchar *content;
+        gssize len;
+
+        len = libbalsa_message_body_get_content(body, &content, NULL);
+        if (len > 0) {
+            GInputStream *stream;
+            gchar *mime_type;
+
+            stream =
+                g_memory_input_stream_new_from_data(content, len, g_free);
+            mime_type = libbalsa_message_body_get_mime_type(body);
+            webkit_uri_scheme_request_finish(request, stream, len,
+                                             mime_type);
+            g_object_unref(stream);
+            g_free(mime_type);
+        }
+    }
 }
 
 /* Create a new WebKitWebView widget:
@@ -448,13 +464,16 @@ libbalsa_html_new(LibBalsaMessageBody * body,
 {
     gchar *text;
     gssize len;
-    GtkWidget *vbox;
+    WebKitWebContext *context;
     GtkWidget *widget;
+    GtkWidget *vbox;
     WebKitWebView *web_view;
     LibBalsaWebKitInfo *info;
     WebKitSettings *settings;
-    static gchar src_regex[] =
-        "<[^>]*src\\s*=\\s*['\"]\\s*[^c][^i][^d][^:]";
+    static const gchar cid_regex[] =
+        "<[^>]*src\\s*=\\s*['\"]?\\s*cid:";
+    static const gchar src_regex[] =
+        "<[^>]*src\\s*=\\s*['\"]?\\s*[^c][^i][^d][^:]";
 
     len = lbh_get_body_content_utf8(body, &text);
     if (len < 0)
@@ -465,7 +484,6 @@ libbalsa_html_new(LibBalsaMessageBody * body,
     info->hover_cb        = hover_cb;
     info->clicked_cb      = clicked_cb;
     info->info_bar        = NULL;
-    info->vbox = vbox     = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     info->uri             = NULL;
     info->search_text     = NULL;
 
@@ -473,16 +491,20 @@ libbalsa_html_new(LibBalsaMessageBody * body,
     /* WebkitWebView is uncontrollably scrollable, so if we don't set a
      * minimum size it may be just a few pixels high. */
     gtk_widget_set_size_request(widget, -1, 200);
-    gtk_box_pack_end(GTK_BOX(vbox), widget, TRUE, TRUE, 0);
 
     info->web_view = web_view = WEBKIT_WEB_VIEW(widget);
-    g_object_set_data(G_OBJECT(vbox), "libbalsa-html-web-view", web_view);
     g_object_set_data_full(G_OBJECT(web_view), LIBBALSA_HTML_INFO, info,
                            (GDestroyNotify) lbh_webkit_info_free);
 
+    context = webkit_web_view_get_context(web_view);
+    webkit_web_context_register_uri_scheme(context, "cid", lbh_cid_cb,
+                                           info, NULL);
+
     settings = webkit_web_view_get_settings(web_view);
-    webkit_settings_set_auto_load_images(settings, FALSE);
     webkit_settings_set_enable_plugins(settings, FALSE);
+    webkit_settings_set_auto_load_images
+        (settings,
+         g_regex_match_simple(cid_regex, text, G_REGEX_CASELESS, 0));
 
     g_signal_connect(web_view, "mouse-target-changed",
                      G_CALLBACK(lbh_mouse_target_changed_cb), info);
@@ -493,9 +515,15 @@ libbalsa_html_new(LibBalsaMessageBody * body,
     g_signal_connect(web_view, "web-process-crashed",
                      G_CALLBACK(lbh_web_process_crashed_cb), info);
 
+    vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+    g_object_set_data(G_OBJECT(vbox), "libbalsa-html-web-view", web_view);
+    gtk_box_pack_end(GTK_BOX(vbox), widget, TRUE, TRUE, 0);
+
     /* Simple check for possible resource requests: */
-    if (g_regex_match_simple(src_regex, text, G_REGEX_CASELESS, 0))
-        lbh_show_info_bar(info);
+    if (g_regex_match_simple(src_regex, text, G_REGEX_CASELESS, 0)) {
+        info->info_bar = lbh_info_bar(info);
+        gtk_box_pack_start(GTK_BOX(vbox), info->info_bar, FALSE, FALSE, 0);
+    }
 
     webkit_web_view_load_html(web_view, text, NULL);
     g_free(text);

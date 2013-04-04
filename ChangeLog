@@ -1,3 +1,12 @@
+2013-04-04  Peter Bloomfield
+
+	Handle "cid:" protocol for images
+
+	* libbalsa/html.c (lbh_info_bar_response_cb), (lbh_info_bar):
+	simplify info-bar code.
+	(lbh_resource_load_started_cb), (lbh_cid_cb),
+	(libbalsa_html_new): set up a handler for "cid:" protocol.
+
 2013-04-03  Peter Bloomfield
 
 	* libbalsa/filter-funcs.c (append_header_names),

@@ -1,3 +1,11 @@
+2013-04-05  Peter Bloomfield
+
+	* libbalsa/html.c (lbh_context_menu_cb), (libbalsa_html_new):
+	catch WebKit's "context-menu" signal, and emit "popup-menu" on
+	the parent widget instead.
+	* src/balsa-mime-widget-text.c (balsa_gtk_html_popup): do not
+	unref the popup menu.
+
 2013-04-04  Peter Bloomfield
 
 	* libbalsa/html.c (lbh_info_bar_response_cb): no need to reload;

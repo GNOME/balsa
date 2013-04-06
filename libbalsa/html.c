@@ -434,6 +434,25 @@ lbh_cid_cb(WebKitURISchemeRequest * request,
     }
 }
 
+/*
+ * Callback for the "context-menu" signal
+ */
+static gboolean
+lbh_context_menu_cb(WebKitWebView       * web_view,
+                    WebKitContextMenu   * context_menu,
+                    GdkEvent            * event,
+                    WebKitHitTestResult * hit_test_result,
+                    gpointer              data)
+{
+    GtkWidget *parent;
+    gboolean retval;
+
+    parent = gtk_widget_get_parent(GTK_WIDGET(web_view));
+    g_signal_emit_by_name(parent, "popup-menu", &retval);
+
+    return retval;
+}
+
 /* Create a new WebKitWebView widget:
  * body 		LibBalsaMessageBody that belongs to the
  *                      LibBalsaMessage from which to extract any
@@ -509,6 +528,8 @@ libbalsa_html_new(LibBalsaMessageBody * body,
                      G_CALLBACK(lbh_resource_load_started_cb), info);
     g_signal_connect(web_view, "web-process-crashed",
                      G_CALLBACK(lbh_web_process_crashed_cb), info);
+    g_signal_connect(web_view, "context-menu",
+                     G_CALLBACK(lbh_context_menu_cb), info);
 
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     g_object_set_data(G_OBJECT(vbox), "libbalsa-html-web-view", web_view);

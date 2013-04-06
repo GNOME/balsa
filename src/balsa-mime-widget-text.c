@@ -1090,10 +1090,8 @@ balsa_gtk_html_popup(GtkWidget * html, BalsaMessage * bm)
     bmwt_populate_popup_menu(bm, html, GTK_MENU(menu));
 
     gtk_widget_show_all(menu);
-    g_object_ref_sink(menu);
     gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL,
                    0, gtk_get_current_event_time());
-    g_object_unref(menu);
 
     return TRUE;
 }

@@ -1,5 +1,11 @@
 2013-04-06  Peter Bloomfield
 
+	* configure.ac: require GtkSourceView 3.2
+	* src/sendmsg-window.c: gtksource.h is the main header; fixes
+	bgo #697454 (Dominique Leuenberger).
+
+2013-04-06  Peter Bloomfield
+
 	* libbalsa/html.c (libbalsa_html_popup_menu_widget),
 	(libbalsa_html_print): actually print the HTML part.
 

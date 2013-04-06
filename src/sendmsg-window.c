@@ -77,7 +77,7 @@
 #include "spell-check.h"
 #endif                          /* HAVE_GTKSPELL */
 #if HAVE_GTKSOURCEVIEW
-#include <gtksourceview/gtksourceview.h>
+#include <gtksourceview/gtksource.h>
 #endif                          /* HAVE_GTKSOURCEVIEW */
 
 #define GNOME_MIME_BUG_WORKAROUND 1

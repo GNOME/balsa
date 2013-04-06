@@ -421,12 +421,8 @@ case "$use_html_widget" in
             fi
         fi
         if test $use_html_widget = webkit2 ; then
-            if $PKG_CONFIG --atleast-version=1.11.92 webkitgtk-3.0 ; then
-                PKG_CHECK_MODULES(HTML, [webkit2gtk-3.0 javascriptcoregtk-3.0])
-                AC_DEFINE(USE_WEBKIT2,1,[Defined when WebKit2 is requested.])
-            else
-                AC_MSG_ERROR([Webkit2 requires version at least 1.11.92])
-            fi
+            PKG_CHECK_MODULES(HTML, [webkit2gtk-3.0 >= 1.11.92 ])
+            AC_DEFINE(USE_WEBKIT2,1,[Defined when WebKit2 is requested.])
         else
             if $PKG_CONFIG --atleast-version=1.5.1 webkitgtk-3.0 ; then
                 PKG_CHECK_MODULES(HTML, [webkitgtk-3.0 javascriptcoregtk-3.0])

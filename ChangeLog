@@ -1,3 +1,8 @@
+2013-04-06  Peter Bloomfield
+
+	* libbalsa/html.c (libbalsa_html_popup_menu_widget),
+	(libbalsa_html_print): actually print the HTML part.
+
 2013-04-05  Peter Bloomfield
 
 	* libbalsa/html.c (lbh_context_menu_cb), (libbalsa_html_new):

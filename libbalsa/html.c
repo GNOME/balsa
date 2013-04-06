@@ -800,7 +800,6 @@ libbalsa_html_get_selection_bounds(GtkWidget    * widget,
 GtkWidget *
 libbalsa_html_popup_menu_widget(GtkWidget * widget)
 {
-    /* FIXME Need new API to access webkit2's "context-menu" signal */
     return NULL;
 }
 
@@ -833,10 +832,25 @@ libbalsa_html_print(GtkWidget * widget)
     WebKitWebView *web_view;
 
     if (lbh_get_web_view(widget, &web_view)) {
+        static GtkPrintSettings *settings = NULL;
         WebKitPrintOperation *print_operation;
+        WebKitPrintOperationResponse response;
+
+        if (!settings)
+            settings = gtk_print_settings_new();
 
         print_operation = webkit_print_operation_new(web_view);
-        webkit_print_operation_print(print_operation);
+        webkit_print_operation_set_print_settings(print_operation,
+                                                  settings);
+        response =
+            webkit_print_operation_run_dialog(print_operation, NULL);
+        if (response != WEBKIT_PRINT_OPERATION_RESPONSE_CANCEL) {
+            g_object_unref(settings);
+            settings =
+                webkit_print_operation_get_print_settings(print_operation);
+            g_object_ref(settings);
+        }
+        g_object_unref(print_operation);
     }
 }
 

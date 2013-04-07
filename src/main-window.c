@@ -1766,6 +1766,7 @@ balsa_window_new()
 			      (gpointer) &balsa_app.notebook);
 
     window->preview = balsa_message_new();
+    gtk_widget_hide(window->preview);
 
     g_signal_connect(G_OBJECT(window->preview), "select-part",
                      G_CALLBACK(bw_select_part_cb), window);

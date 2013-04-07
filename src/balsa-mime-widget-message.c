@@ -704,6 +704,14 @@ bmwm_buffer_set_prefs(GtkTextBuffer * buffer)
     g_object_set(tag, "foreground-gdk", &color, NULL);
 }
 
+static gboolean
+bmwm_set_headers_d_idle_cb(GtkWidget * view)
+{
+    gtk_widget_queue_resize(view);
+    g_object_unref(view);
+    return FALSE;
+}
+
 void
 balsa_mime_widget_message_set_headers_d(BalsaMessage * bm,
                                         BalsaMimeWidget *mw,
@@ -802,7 +810,8 @@ balsa_mime_widget_message_set_headers_d(BalsaMessage * bm,
 	    add_header_sigstate(view, part->sig_info);
     }
 #endif
-    gtk_widget_queue_resize(GTK_WIDGET(view));
+    g_idle_add((GSourceFunc) bmwm_set_headers_d_idle_cb,
+               g_object_ref(view));
 }
 
 

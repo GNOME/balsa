@@ -1,3 +1,10 @@
+2013-04-07  Peter Bloomfield
+
+	* src/balsa-mime-widget-message.c (bmwm_set_headers_d_idle_cb),
+	(balsa_mime_widget_message_set_headers_d): queue iheader widget
+	resize in an idle handler, to get the size right the first time.
+	* src/main-window.c: initially hide the preview.
+
 2013-04-06  Peter Bloomfield
 
 	* configure.ac: simplify WebKit2 configuration.

@@ -448,7 +448,13 @@ lbh_context_menu_cb(WebKitWebView       * web_view,
     gboolean retval;
 
     parent = gtk_widget_get_parent(GTK_WIDGET(web_view));
+    /* The signal is asynchronous, so gtk_get_current_event() gets NULL;
+     * we pass the event to the popup-menu handler: */
+    g_object_set_data(G_OBJECT(parent), LIBBALSA_HTML_POPUP_EVENT, event);
+
     g_signal_emit_by_name(parent, "popup-menu", &retval);
+
+    g_object_set_data(G_OBJECT(parent), LIBBALSA_HTML_POPUP_EVENT, NULL);
 
     return retval;
 }

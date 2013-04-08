@@ -73,6 +73,7 @@ gboolean libbalsa_html_get_selection_bounds(GtkWidget * widget,
                                             GdkRectangle *
                                             selection_bounds);
 
+#define LIBBALSA_HTML_POPUP_EVENT "libbalsa-html-popup-event"
 GtkWidget *libbalsa_html_popup_menu_widget(GtkWidget * widget);
 GtkWidget *libbalsa_html_get_view_widget(GtkWidget * widget);
 

@@ -1085,13 +1085,29 @@ static gboolean
 balsa_gtk_html_popup(GtkWidget * html, BalsaMessage * bm)
 {
     GtkWidget *menu;
+    const GdkEvent *event;
+    GdkEvent *current_event = NULL;
+    guint32 time;
+    guint button;
 
     menu = gtk_menu_new();
     bmwt_populate_popup_menu(bm, html, GTK_MENU(menu));
 
     gtk_widget_show_all(menu);
-    gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL,
-                   0, gtk_get_current_event_time());
+
+    /* In WebKit2, the context menu signal is asynchronous, so the
+     * GdkEvent is no longer current; instead it is preserved and passed
+     * to us: */
+    event = g_object_get_data(G_OBJECT(html), LIBBALSA_HTML_POPUP_EVENT);
+    if (!event)
+        event = current_event = gtk_get_current_event();
+    time = gdk_event_get_time(event);
+    button = 0;
+    gdk_event_get_button(event, &button);
+    if (current_event)
+        gdk_event_free(current_event);
+
+    gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL, button, time);
 
     return TRUE;
 }

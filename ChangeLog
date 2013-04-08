@@ -1,5 +1,13 @@
 2013-04-08  Peter Bloomfield
 
+	* libbalsa/html.c (lbh_context_menu_cb): pass the GdkEvent when
+	emitting "popup-menu";
+	* libbalsa/html.h: define key for GdkEvent.
+	* src/balsa-mime-widget-text.c (balsa_gtk_html_popup): use it to
+	pass the event time when popping up the menu.
+
+2013-04-08  Peter Bloomfield
+
 	* libbalsa/send.c (libbalsa_set_message_id): constify two
 	strings.
 

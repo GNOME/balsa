@@ -2026,11 +2026,11 @@ static void
 libbalsa_set_message_id(GMimeMessage * mime_message)
 {
     struct utsname utsbuf;
-    gchar *host = "localhost";
+    const gchar *host = "localhost";
     gchar *message_id;
 #ifdef _GNU_SOURCE
     gchar *fqdn;
-    gchar *domain = "localdomain";
+    const gchar *domain = "localdomain";
 
     /* In an ideal world, uname() allows us to make a FQDN. */
     if (uname(&utsbuf) == 0) {

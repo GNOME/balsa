@@ -1,3 +1,8 @@
+2013-04-08  Peter Bloomfield
+
+	* libbalsa/send.c (libbalsa_set_message_id): constify two
+	strings.
+
 2013-04-07  Peter Bloomfield
 
 	* src/balsa-mime-widget-message.c (bmwm_set_headers_d_idle_cb),

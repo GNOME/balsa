@@ -1,5 +1,9 @@
 2013-04-08  Peter Bloomfield
 
+	* configure.ac: add webkit2 as an option for --with-html-widget.
+
+2013-04-08  Peter Bloomfield
+
 	* libbalsa/html.c (lbh_get_web_view): can-select and select-all
 	sometimes pass the web-view and sometimes the container.
 	* src/balsa-mime-widget-text.c (bm_select_all_cb),

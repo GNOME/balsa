@@ -561,13 +561,19 @@ libbalsa_html_to_string(gchar ** text, size_t len)
              * it to an empty string. */
 }
 
+/*
+ * We may be passed either the WebKitWebView or its container:
+ */
 static gboolean
 lbh_get_web_view(GtkWidget * widget, WebKitWebView ** web_view)
 {
-    *web_view =
-        g_object_get_data(G_OBJECT(widget), "libbalsa-html-web-view");
+    if (!WEBKIT_IS_WEB_VIEW(widget))
+        widget =
+            g_object_get_data(G_OBJECT(widget), "libbalsa-html-web-view");
 
-    return *web_view && WEBKIT_IS_WEB_VIEW(*web_view);
+    *web_view = (WebKitWebView *) widget;
+
+    return WEBKIT_IS_WEB_VIEW(*web_view);
 }
 
 /*

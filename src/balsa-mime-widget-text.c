@@ -1032,6 +1032,12 @@ bm_zoom_reset(BalsaMessage * bm)
 }
 
 static void
+bm_select_all_cb(GtkWidget * html)
+{
+    libbalsa_html_select_all(html);
+}
+
+static void
 bmwt_populate_popup_menu(BalsaMessage * bm,
                          GtkWidget    * html,
                          GtkMenu      * menu)
@@ -1058,6 +1064,16 @@ bmwt_populate_popup_menu(BalsaMessage * bm,
 
     menuitem = gtk_separator_menu_item_new();
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
+
+    if (libbalsa_html_can_select(html)) {
+        menuitem = gtk_menu_item_new_with_mnemonic(_("Select _All"));
+        g_signal_connect_swapped(G_OBJECT(menuitem), "activate",
+                                 G_CALLBACK(bm_select_all_cb), html);
+        gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
+
+        menuitem = gtk_separator_menu_item_new();
+        gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
+    }
 
     libbalsa_vfs_fill_menu_by_content_type(GTK_MENU(menu), "text/html",
                                            G_CALLBACK

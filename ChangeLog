@@ -1,5 +1,13 @@
 2013-04-08  Peter Bloomfield
 
+	* libbalsa/html.c (lbh_get_web_view): can-select and select-all
+	sometimes pass the web-view and sometimes the container.
+	* src/balsa-mime-widget-text.c (bm_select_all_cb),
+	(bmwt_populate_popup_menu): add "select all" to the
+	webKitWebView context menu, the same as for a GtkTextView
+
+2013-04-08  Peter Bloomfield
+
 	* libbalsa/html.c (lbh_context_menu_cb): pass the GdkEvent when
 	emitting "popup-menu";
 	* libbalsa/html.h: define key for GdkEvent.

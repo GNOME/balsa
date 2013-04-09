@@ -1,3 +1,8 @@
+2013-04-09  Peter Bloomfield
+
+	* libbalsa/imap/imap_tst.c (main): g_type_init is deprecated.
+	* src/main.c (threads_init): ditto.
+
 2013-04-08  Peter Bloomfield
 
 	* configure.ac: add webkit2 as an option for --with-html-widget.

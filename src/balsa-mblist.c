@@ -973,10 +973,13 @@ struct update_mbox_data {
 };
 static void bmbl_update_mailbox(GtkTreeStore * store,
                                 LibBalsaMailbox * mailbox);
+
+G_LOCK_DEFINE_STATIC(mblist_update);
+
 static gboolean
 update_mailbox_idle(struct update_mbox_data *umd)
 {
-    gdk_threads_enter();
+    G_LOCK(mblist_update);
 
     if (umd->mailbox) {
         g_object_remove_weak_pointer(G_OBJECT(umd->mailbox),
@@ -1011,7 +1014,7 @@ update_mailbox_idle(struct update_mbox_data *umd)
     }
     g_free(umd);
 
-    gdk_threads_leave();
+    G_UNLOCK(mblist_update);
 
     return FALSE;
 }
@@ -1022,6 +1025,8 @@ bmbl_mailbox_changed_cb(LibBalsaMailbox * mailbox, gpointer data)
     struct update_mbox_data *umd;
 
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
+
+    G_LOCK(mblist_update);
 
     umd = g_object_get_data(G_OBJECT(mailbox), "mblist-update");
 
@@ -1036,6 +1041,8 @@ bmbl_mailbox_changed_cb(LibBalsaMailbox * mailbox, gpointer data)
 
     umd->notify = (mailbox->state == LB_MAILBOX_STATE_OPEN
                    || mailbox->state == LB_MAILBOX_STATE_CLOSED);
+
+    G_UNLOCK(mblist_update);
 }
 
 /* public methods */

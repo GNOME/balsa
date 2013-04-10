@@ -1,3 +1,8 @@
+2013-04-10  Peter Bloomfield
+
+	* src/balsa-mblist.c (update_mailbox_idle),
+	(bmbl_mailbox_changed_cb): replace Gdk lock with our own lock.
+
 2013-04-09  Peter Bloomfield
 
 	* libbalsa/imap/imap_tst.c (main): g_type_init is deprecated.

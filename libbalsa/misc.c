@@ -1174,6 +1174,14 @@ libbalsa_create_grid_entry(GtkWidget * grid, GCallback changed_func,
 static void
 lb_create_size_group_func(GtkWidget * widget, gpointer data)
 {
+#if GTK_CHECK_VERSION(3, 4, 0)
+    if (GTK_IS_LABEL(widget) &&
+         GTK_IS_GRID(gtk_widget_get_parent(widget)))
+        gtk_size_group_add_widget(GTK_SIZE_GROUP(data), widget);
+    else if (GTK_IS_CONTAINER(widget))
+        gtk_container_foreach(GTK_CONTAINER(widget),
+                              lb_create_size_group_func, data);
+#else                           /* GTK_CHECK_VERSION(3, 4, 0) */
     if (GTK_IS_LABEL(widget) &&
         (GTK_IS_TABLE(gtk_widget_get_parent(widget)) ||
          GTK_IS_GRID(gtk_widget_get_parent(widget))))
@@ -1181,6 +1189,7 @@ lb_create_size_group_func(GtkWidget * widget, gpointer data)
     else if (GTK_IS_CONTAINER(widget))
         gtk_container_foreach(GTK_CONTAINER(widget),
                               lb_create_size_group_func, data);
+#endif                          /* GTK_CHECK_VERSION(3, 4, 0) */
 }
 
 GtkSizeGroup *

@@ -1,5 +1,10 @@
 2013-04-11  Peter Bloomfield
 
+	* libbalsa/misc.c (lb_create_size_group_func): GtkTable is
+	deprecated.
+
+2013-04-11  Peter Bloomfield
+
 	* libbalsa/libbalsa.c (libbalsa_init): g_thread_supported is
 	deprecated in glib-2.36.
 

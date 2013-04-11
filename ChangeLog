@@ -1,5 +1,10 @@
 2013-04-11  Peter Bloomfield
 
+	* src/toolbar-prefs.c (create_toolbar_page):
+	gtk_scrolled_window_add_with_viewport is deprecated.
+
+2013-04-11  Peter Bloomfield
+
 	* libbalsa/misc.c (lb_create_size_group_func): GtkTable is
 	deprecated.
 

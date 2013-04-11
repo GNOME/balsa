@@ -418,8 +418,12 @@ create_toolbar_page(BalsaToolbarModel * model, GtkUIManager * ui_manager)
     gtk_box_pack_start(GTK_BOX(toolbar_ctlbox), toolbar_scroll,
                        TRUE, TRUE, 0);
 
+#if GTK_CHECK_VERSION(3, 8, 0)
+    gtk_container_add(GTK_CONTAINER(toolbar_scroll), page->toolbar);
+#else                           /* GTK_CHECK_VERSION(3, 8, 0) */
     gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(toolbar_scroll),
                                           page->toolbar);
+#endif                          /* GTK_CHECK_VERSION(3, 8, 0) */
 
     /* Button box */
     button_box = gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL);

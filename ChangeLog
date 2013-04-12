@@ -1,3 +1,8 @@
+2013-04-11  Peter Bloomfield  <peter@w500.bellsouth.net>
+
+	* libbalsa/misc.c (lb_create_size_group_func): we no longer use
+	GtkTable.
+
 2013-04-11  Peter Bloomfield
 
 	* src/balsa-message.c (bm_on_set_style),

@@ -344,7 +344,7 @@ bm_on_set_style(GtkWidget * widget,
     context = gtk_widget_get_style_context(bm->treeview);
     gtk_style_context_get_background_color(context, GTK_STATE_FLAG_NORMAL,
                                            &rgba);
-    gtk_widget_override_background_color(bm->cont_viewport,
+    gtk_widget_override_background_color(bm->scroll,
                                          GTK_STATE_FLAG_NORMAL, &rgba);
 }
 
@@ -411,8 +411,8 @@ bm_find_scroll_to_rectangle(BalsaMessage * bm,
                                      rectangle->x, rectangle->y,
                                      &x, &y);
 
-    g_object_get(G_OBJECT(bm->cont_viewport), "hadjustment", &hadj,
-                                              "vadjustment", &vadj, NULL);
+    g_object_get(G_OBJECT(bm->scroll), "hadjustment", &hadj,
+                                       "vadjustment", &vadj, NULL);
     gtk_adjustment_clamp_page(hadj, x, x + rectangle->width);
     gtk_adjustment_clamp_page(vadj, y, y + rectangle->height);
 }
@@ -723,11 +723,9 @@ balsa_message_init(BalsaMessage * bm)
     g_signal_connect(scroll, "key_press_event",
 		     G_CALLBACK(balsa_mime_widget_key_press_event), bm);
     gtk_box_pack_start(GTK_BOX(vbox), scroll, TRUE, TRUE, 0);
-    bm->cont_viewport = gtk_viewport_new(NULL, NULL);
-    gtk_container_add(GTK_CONTAINER(scroll), bm->cont_viewport);
     g_signal_connect_after(bm, "style-updated",
 			   G_CALLBACK(bm_on_set_style), bm);
-    g_signal_connect(bm->cont_viewport, "size-allocate",
+    g_signal_connect(bm->scroll, "size-allocate",
 		     G_CALLBACK(on_content_size_alloc), NULL);
 
     /* Widget to hold headers */
@@ -740,7 +738,12 @@ balsa_message_init(BalsaMessage * bm)
     g_signal_connect(G_OBJECT(bm->bm_widget->widget), "focus_out_event",
                      G_CALLBACK(balsa_mime_widget_unlimit_focus),
 		     (gpointer) bm);
-    gtk_container_add(GTK_CONTAINER(bm->cont_viewport), bm->bm_widget->widget);
+#if GTK_CHECK_VERSION(3, 8, 0)
+    gtk_container_add(GTK_CONTAINER(bm->scroll), bm->bm_widget->widget);
+#else                           /* GTK_CHECK_VERSION(3, 8, 0 */
+    gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(bm->scroll),
+                                          bm->bm_widget->widget);
+#endif                          /* GTK_CHECK_VERSION(3, 8, 0 */
 
     /* structure view */
     model = gtk_tree_store_new (NUM_COLUMNS,
@@ -2283,7 +2286,7 @@ select_part(BalsaMessage * bm, BalsaPartInfo *info)
 
     g_signal_emit(G_OBJECT(bm), balsa_message_signals[SELECT_PART], 0);
 
-    g_object_get(G_OBJECT(bm->cont_viewport), "hadjustment", &hadj,
+    g_object_get(G_OBJECT(bm->scroll), "hadjustment", &hadj,
                                               "vadjustment", &vadj, NULL);
     gtk_adjustment_set_value(hadj, 0);
     gtk_adjustment_set_value(vadj, 0);

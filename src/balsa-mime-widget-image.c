@@ -125,7 +125,7 @@ balsa_mime_widget_new_image(BalsaMessage * bm,
                      G_CALLBACK(balsa_image_button_press_cb), data);
 
     mwi->context =
-        gtk_widget_get_style_context(GTK_WIDGET(bm->cont_viewport));
+        gtk_widget_get_style_context(GTK_WIDGET(bm->scroll));
     bmwi_context_changed_cb(mwi->context, mw);
     mwi->context_changed_handler_id =
         g_signal_connect(mwi->context, "changed",

@@ -201,7 +201,8 @@ balsa_mime_widget_key_press_event(GtkWidget * widget, GdkEventKey * event,
     GtkAdjustment *adj;
     int page_adjust;
 
-    g_object_get(G_OBJECT(bm->cont_viewport), "vadjustment", &adj, NULL);
+    adj = gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW
+                                              (bm->scroll));
 
     page_adjust = balsa_app.pgdownmod ?
         (gtk_adjustment_get_page_size(adj) * balsa_app.pgdown_percent) /

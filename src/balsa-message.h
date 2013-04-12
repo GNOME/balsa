@@ -63,7 +63,6 @@ struct _BalsaMessage {
 	ShownHeaders shown_headers;
 
 	/* Widgets to hold content */
-        GtkWidget *cont_viewport;
 	GtkWidget *scroll;
 
         /* Widget to hold structure tree */

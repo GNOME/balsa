@@ -1,5 +1,16 @@
 2013-04-11  Peter Bloomfield
 
+	* src/balsa-message.c (bm_on_set_style),
+	(bm_find_scroll_to_rectangle), (balsa_message_init),
+	(select_part): remove dependence on GtkViewPort.
+	* src/balsa-message.h: ditto.
+	* src/balsa-mime-widget-callbacks.c
+	(balsa_mime_widget_key_press_event): ditto.
+	* src/balsa-mime-widget-image.c (balsa_mime_widget_new_image):
+	ditto.
+
+2013-04-11  Peter Bloomfield
+
 	* src/toolbar-prefs.c (create_toolbar_page):
 	gtk_scrolled_window_add_with_viewport is deprecated.
 

@@ -490,6 +490,7 @@ parse_mailbox(LibBalsaMailboxMbox * mbox)
 
     libbalsa_mailbox_local_set_threading_info(local);
     msg_info.local_info.message = NULL;
+    msg_info.local_info.loaded  = FALSE;
     while (!g_mime_parser_eos(gmime_parser)) {
 	GMimeMessage *mime_message;
         LibBalsaMessage *msg;
@@ -625,6 +626,7 @@ lbm_mbox_restore(LibBalsaMailboxMbox * mbox)
     end = 0;
     do {
         msg_info->local_info.message = NULL;
+        msg_info->local_info.loaded  = FALSE;
         if (msg_info->start != end)
             /* Error: this message doesn't start at the end of the
              * previous one. */

@@ -318,6 +318,8 @@ libbalsa_mailbox_local_load_message(LibBalsaMailboxLocal * local,
     LibBalsaMailbox *mbx = LIBBALSA_MAILBOX(local);
     gboolean match;
 
+    msg_info->loaded = TRUE;
+
     if ((msg_info->flags & LIBBALSA_MESSAGE_FLAG_NEW)
         && !(msg_info->flags & LIBBALSA_MESSAGE_FLAG_DELETED)) {
         mbx->unread_messages++;
@@ -574,6 +576,8 @@ lbm_local_restore_tree(LibBalsaMailboxLocal * local, guint * total)
     GNode *parent, *sibling;
     LibBalsaMailboxLocalTreeInfo *info;
     guint8 *seen;
+    LibBalsaMailboxLocalMessageInfo *(*get_info) (LibBalsaMailboxLocal *,
+                                                  guint);
 
     filename = lbm_local_get_cache_filename(local);
     name = mailbox->name ? g_strdup(mailbox->name) :
@@ -625,7 +629,9 @@ lbm_local_restore_tree(LibBalsaMailboxLocal * local, guint * total)
     seen = g_new0(guint8, *total);
     parent = mailbox->msg_tree;
     sibling = NULL;
+    get_info = LIBBALSA_MAILBOX_LOCAL_GET_CLASS(local)->get_info;
     while (++info < (LibBalsaMailboxLocalTreeInfo *) (contents + length)) {
+        LibBalsaMailboxLocalMessageInfo *msg_info;
         if (info->msgno == 0 || info->msgno > *total
             || seen[info->msgno - 1]) {
             libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
@@ -665,6 +671,10 @@ lbm_local_restore_tree(LibBalsaMailboxLocal * local, guint * total)
         }
         libbalsa_mailbox_msgno_inserted(mailbox, info->msgno,
                                         parent, &sibling);
+
+        msg_info = get_info(local, info->msgno);
+        msg_info->loaded = TRUE;
+
         if (libbalsa_mailbox_msgno_has_flags(mailbox, info->msgno,
                                              LIBBALSA_MESSAGE_FLAG_NEW,
                                              LIBBALSA_MESSAGE_FLAG_DELETED))
@@ -2220,7 +2230,6 @@ libbalsa_mailbox_local_messages_change_flags(LibBalsaMailbox * mailbox,
         guint msgno = g_array_index(msgnos, guint, i);
         LibBalsaMailboxLocalMessageInfo *msg_info;
         LibBalsaMessageFlag old_flags;
-        gboolean was_unread_undeleted, is_unread_undeleted;
 
         if (!(msgno > 0
               && msgno <= libbalsa_mailbox_total_messages(mailbox))) {
@@ -2242,12 +2251,18 @@ libbalsa_mailbox_local_messages_change_flags(LibBalsaMailbox * mailbox,
 
         libbalsa_mailbox_index_set_flags(mailbox, msgno, msg_info->flags);
 
-        was_unread_undeleted = (old_flags & LIBBALSA_MESSAGE_FLAG_NEW)
-            && !(old_flags & LIBBALSA_MESSAGE_FLAG_DELETED);
-        is_unread_undeleted = (msg_info->flags & LIBBALSA_MESSAGE_FLAG_NEW)
-            && !(msg_info->flags & LIBBALSA_MESSAGE_FLAG_DELETED);
-        mailbox->unread_messages +=
-            is_unread_undeleted - was_unread_undeleted;
+        if (msg_info->loaded) {
+            gboolean was_unread_undeleted, is_unread_undeleted;
+
+            was_unread_undeleted =
+                (old_flags & LIBBALSA_MESSAGE_FLAG_NEW)
+                && !(old_flags & LIBBALSA_MESSAGE_FLAG_DELETED);
+            is_unread_undeleted =
+                (msg_info->flags & LIBBALSA_MESSAGE_FLAG_NEW)
+                && !(msg_info->flags & LIBBALSA_MESSAGE_FLAG_DELETED);
+            mailbox->unread_messages +=
+                is_unread_undeleted - was_unread_undeleted;
+        }
     }
     libbalsa_unlock_mailbox(mailbox);
 

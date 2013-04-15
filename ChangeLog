@@ -1,3 +1,15 @@
+2013-04-15  Peter Bloomfield
+
+	Fix miscounting of unread messages
+
+	* libbalsa/mailbox_local.h: new member
+	gboolean _LibBalsaMailboxLocalMessageInfo::loaded.
+	* libbalsa/mailbox_local.c (libbalsa_mailbox_local_load_message),
+	(lbm_local_restore_tree): use it to indicate when we are
+	changing flags on a message that has not yet been counted.
+	* libbalsa/mailbox_mbox.c (parse_mailbox), (lbm_mbox_restore):
+	initialize it to FALSE.
+
 2013-04-12  Peter Bloomfield
 
 	* src/balsa-mime-widget-message.c (bm_header_widget_realized):

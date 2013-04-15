@@ -56,6 +56,7 @@ typedef struct _LibBalsaMailboxLocalPool LibBalsaMailboxLocalPool;
 struct _LibBalsaMailboxLocalMessageInfo {
     LibBalsaMessageFlag flags;          /* May have pseudo-flags */
     LibBalsaMessage *message;
+    gboolean loaded;
 };
 typedef struct _LibBalsaMailboxLocalMessageInfo LibBalsaMailboxLocalMessageInfo;
 

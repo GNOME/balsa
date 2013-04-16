@@ -1,3 +1,10 @@
+2013-04-16  Peter Bloomfield
+
+	* libbalsa/address-view.c (lbav_drop_down_activated_cb),
+	(libbalsa_address_view_new): use LibBalsaCellRendererButton for
+	the drop-down icon, so that we can drop down the combo-box when
+	the icon is clicked.
+
 2013-04-15  Peter Bloomfield
 
 	Fix miscounting of unread messages

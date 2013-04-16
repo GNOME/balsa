@@ -58,6 +58,7 @@ struct _LibBalsaAddressView {
 
     GtkTreeViewColumn *type_column;
     GtkTreeViewColumn *focus_column;
+    GtkCellRenderer   *renderer_combo;
 
     /*
      * Ephemera
@@ -890,6 +891,30 @@ lbav_button_activated_cb(LibBalsaCellRendererButton * button,
     gtk_tree_path_free(path);
 }
 
+/*
+ *     Callback for the drop_down's "activated" signal
+ *
+ *     Pop up the address type combo-box
+ */
+static void
+lbav_drop_down_activated_cb(LibBalsaCellRendererButton * drop_down,
+                            const gchar * path_string,
+                            LibBalsaAddressView * address_view)
+{
+    GtkTreePath *path;
+
+    path = gtk_tree_path_new_from_string(path_string);
+    gtk_tree_view_set_cursor_on_cell(GTK_TREE_VIEW(address_view),
+                                     path,
+                                     address_view->type_column,
+                                     address_view->renderer_combo,
+                                     TRUE);
+    gtk_tree_path_free(path);
+}
+
+/*
+ * Sort function for the address store
+ */
 static gint
 lbav_sort_func(GtkTreeModel * model, GtkTreeIter * a, GtkTreeIter * b,
                gpointer user_data)
@@ -1032,10 +1057,11 @@ libbalsa_address_view_new(const gchar * const *types,
             gtk_list_store_set(type_store, &iter, 0, _(types[i]), -1);
         }
 
-        column = gtk_tree_view_column_new();
+        address_view->type_column = column = gtk_tree_view_column_new();
 
         /* The address type combo: */
-        renderer = gtk_cell_renderer_combo_new();
+        address_view->renderer_combo = renderer =
+            gtk_cell_renderer_combo_new();
         g_object_set(renderer,
                      "editable", TRUE,
                      "has-entry", FALSE,
@@ -1054,7 +1080,10 @@ libbalsa_address_view_new(const gchar * const *types,
 
         /* Add a drop-down icon to indicate that this is in fact a
          * combo: */
-        renderer = gtk_cell_renderer_pixbuf_new();
+        renderer = libbalsa_cell_renderer_button_new();
+        g_signal_connect(renderer, "activated",
+                         G_CALLBACK(lbav_drop_down_activated_cb),
+                         address_view);
         g_object_set(renderer, "pixbuf", lbav_drop_down_icon, NULL);
         gtk_tree_view_column_pack_start(column, renderer, FALSE);
 

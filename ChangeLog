@@ -1,5 +1,23 @@
 2013-04-22  Peter Bloomfield
 
+	New message header widget, based on GtkInfoBar
+
+	* src/balsa-message.c (bm_header_tl_buttons),
+	(balsa_message_init): return an array of buttons instead of a
+	widget;
+	(display_face): get container from BalsaMessage.
+	* src/balsa-message.h: new member.
+	* src/balsa-mime-widget-message.c
+	(balsa_mime_widget_new_message_tl), (bm_header_extend_popup),
+	(bm_header_widget_new), (label_size_allocate_cb), (expanded_cb),
+	(add_header_gchar), (add_header_address_list), (foreach_label),
+	(balsa_mime_widget_message_set_headers),
+	(balsa_mime_widget_message_set_headers_d),
+	(add_header_sigstate): new widget.
+	* src/balsa-mime-widget-message.h: new API for passing buttons.
+
+2013-04-22  Peter Bloomfield
+
 	* src/balsa-index.c (bndx_scroll_on_open_idle),
 	(balsa_index_scroll_on_open): scroll in an idle handler, after
 	the mailbox has been opened.

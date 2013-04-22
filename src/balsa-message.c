@@ -253,8 +253,6 @@ balsa_message_class_init(BalsaMessageClass * klass)
 #define BALSA_MESSAGE_ATTACH_BTN "balsa-message-attach-btn"
 #define bm_header_widget_att_button(balsa_message) \
     g_object_get_data(G_OBJECT(balsa_message), BALSA_MESSAGE_ATTACH_BTN)
-#define BALSA_MESSAGE_FACE_BOX "balsa-message-face-box"
-
 
 static void
 balsa_headers_attachments_popup(GtkButton * button, BalsaMessage * bm)
@@ -265,28 +263,15 @@ balsa_headers_attachments_popup(GtkButton * button, BalsaMessage * bm)
 }
 
 
-static GtkWidget *
+static GtkWidget **
 bm_header_tl_buttons(BalsaMessage * bm)
 {
-    GtkWidget *ebox;
-    GtkWidget *hbox2;
-    GtkWidget *vbox;
+    GPtrArray *array;
     GtkWidget *button;
 
-    ebox = gtk_event_box_new();
-
-    hbox2 = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 6);
-    gtk_container_set_border_width(GTK_CONTAINER(hbox2), 6);
-    gtk_container_add(GTK_CONTAINER(ebox), hbox2);
-
-    vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-    gtk_box_pack_start(GTK_BOX(hbox2), vbox, FALSE, FALSE, 0);
-    g_object_set_data(G_OBJECT(bm), BALSA_MESSAGE_FACE_BOX, vbox);
+    array = g_ptr_array_new();
 
 #ifdef HAVE_GPGME
-    vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-    gtk_box_pack_start(GTK_BOX(hbox2), vbox, FALSE, FALSE, 0);
-
     button = gtk_button_new();
     gtk_widget_set_tooltip_text(button,
 			        _("Check cryptographic signature"));
@@ -300,13 +285,10 @@ bm_header_tl_buttons(BalsaMessage * bm)
     gtk_container_add(GTK_CONTAINER(button),
 		      gtk_image_new_from_stock(BALSA_PIXMAP_GPG_RECHECK,
 					       GTK_ICON_SIZE_LARGE_TOOLBAR));
-    gtk_box_pack_start(GTK_BOX(vbox), button, FALSE, FALSE, 0);
     g_signal_connect(button, "clicked",
 		     G_CALLBACK(message_recheck_crypto_cb), bm);
+    g_ptr_array_add(array, button);
 #endif
-
-    vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-    gtk_box_pack_start(GTK_BOX(hbox2), vbox, FALSE, FALSE, 0);
 
     button = gtk_button_new();
     gtk_widget_set_tooltip_text(button,
@@ -321,14 +303,16 @@ bm_header_tl_buttons(BalsaMessage * bm)
     gtk_container_add(GTK_CONTAINER(button),
 		      gtk_image_new_from_stock(BALSA_PIXMAP_ATTACHMENT,
 					       GTK_ICON_SIZE_LARGE_TOOLBAR));
-    gtk_box_pack_start(GTK_BOX(vbox), button, FALSE, FALSE, 0);
     g_signal_connect(button, "clicked",
 		     G_CALLBACK(balsa_headers_attachments_popup), bm);
     g_signal_connect(button, "key_press_event",
 		     G_CALLBACK(balsa_mime_widget_key_press_event), bm);
-    g_object_set_data(G_OBJECT(bm), BALSA_MESSAGE_ATTACH_BTN, vbox);
+    g_object_set_data(G_OBJECT(bm), BALSA_MESSAGE_ATTACH_BTN, button);
+    g_ptr_array_add(array, button);
 
-    return ebox;
+    g_ptr_array_add(array, NULL);
+
+    return (GtkWidget **) g_ptr_array_free(array, FALSE);
 }
 
 
@@ -704,6 +688,7 @@ balsa_message_init(BalsaMessage * bm)
     GtkWidget *vbox;
     GtkWidget *scroll;
     GtkWidget *label;
+    GtkWidget **buttons;
     GtkTreeStore *model;
     GtkCellRenderer *renderer;
     GtkTreeSelection *selection;
@@ -729,7 +714,9 @@ balsa_message_init(BalsaMessage * bm)
 		     G_CALLBACK(on_content_size_alloc), NULL);
 
     /* Widget to hold headers */
-    bm->bm_widget = balsa_mime_widget_new_message_tl(bm, bm_header_tl_buttons(bm));
+    buttons = bm_header_tl_buttons(bm);
+    bm->bm_widget = balsa_mime_widget_new_message_tl(bm, buttons);
+    g_free(buttons);
 
     /* Widget to hold message */
     g_signal_connect(G_OBJECT(bm->bm_widget->widget), "focus_in_event",
@@ -1556,7 +1543,7 @@ display_face(BalsaMessage * bm)
     GError *err = NULL;
     GtkWidget *image;
 
-    face_box = g_object_get_data(G_OBJECT(bm), BALSA_MESSAGE_FACE_BOX);
+    face_box = bm->face_box;
     gtk_container_foreach(GTK_CONTAINER(face_box),
                           (GtkCallback) gtk_widget_destroy, NULL);
 
@@ -1586,7 +1573,7 @@ display_face(BalsaMessage * bm)
     }
 
     gtk_box_pack_start(GTK_BOX(face_box), image, FALSE, FALSE, 0);
-    gtk_widget_show(image);
+    gtk_widget_show_all(face_box);
 }
 
 static void

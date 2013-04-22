@@ -35,7 +35,8 @@ BalsaMimeWidget *balsa_mime_widget_new_message(BalsaMessage * bm,
 					       LibBalsaMessageBody * mime_body,
 					       const gchar * content_type, gpointer data);
 BalsaMimeWidget *balsa_mime_widget_new_message_tl(BalsaMessage * bm,
-						  GtkWidget * tl_buttons);
+                                                  GtkWidget *
+                                                  const *tl_buttons);
 void balsa_mime_widget_message_set_headers(BalsaMessage * bm,
                                            BalsaMimeWidget *mw,
 					   LibBalsaMessageBody *part);

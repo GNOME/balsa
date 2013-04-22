@@ -95,6 +95,10 @@ struct _BalsaMessage {
 
         /* Tab position for headers */
         gint tab_position;
+
+        /* Widget to hold Faces */
+        GtkWidget *face_box;
+
 #ifdef HAVE_HTML_WIDGET
         gpointer html_find_info;
 #endif				/* HAVE_HTML_WIDGET */

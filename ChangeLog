@@ -1,3 +1,9 @@
+2013-04-22  Peter Bloomfield
+
+	* src/balsa-index.c (bndx_scroll_on_open_idle),
+	(balsa_index_scroll_on_open): scroll in an idle handler, after
+	the mailbox has been opened.
+
 2013-04-16  Peter Bloomfield
 
 	* libbalsa/address-view.c (lbav_drop_down_activated_cb),

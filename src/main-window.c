@@ -45,7 +45,9 @@
 #  include "macosx-helpers.h"
 #endif
 
-#if defined(HAVE_LIBNM_GLIB)
+#if GLIB_CHECK_VERSION(2, 32, 0)
+#include <gio/gio.h>
+#elif defined(HAVE_LIBNM_GLIB)
 #include <nm-client.h>
 #endif
 
@@ -113,7 +115,7 @@ static void bw_check_messages_thread(struct check_messages_thread_info
 #endif
 static void bw_display_new_mail_notification(int num_new, int has_new);
 
-#if defined(HAVE_LIBNM_GLIB)
+#if !GLIB_CHECK_VERSION(2, 32, 0) && defined(HAVE_LIBNM_GLIB)
 static void bw_nm_client_state_report(NMState state);
 static void bw_nm_client_state_changed_cb(GObject * gobject,
                                           GParamSpec * pspec,
@@ -998,10 +1000,41 @@ balsa_window_class_init(BalsaWindowClass * klass)
 
 }
 
+static gboolean bw_change_connection_status_idle(gpointer data);
+#define PRINT_NETWORK_STATUS(available)                 \
+    g_printerr("Network is %s (%u)\n",                  \
+               (available) ? "available" : "unavailable", \
+               (guint) time(NULL))
+
+static void
+bw_network_changed_cb(GNetworkMonitor * monitor,
+                      gboolean          available,
+                      gpointer          user_data)
+{
+    BalsaWindow *window = user_data;
+
+    if (window->network_available != available) {
+        window->network_available = available;
+        PRINT_NETWORK_STATUS(available);
+        g_idle_add(bw_change_connection_status_idle,
+                   GINT_TO_POINTER(available));
+    }
+}
+
 static void
 balsa_window_init(BalsaWindow * window)
 {
-#if defined(HAVE_LIBNM_GLIB)
+#if GLIB_CHECK_VERSION(2, 32, 0)
+    GNetworkMonitor *monitor;
+
+    monitor = g_network_monitor_get_default();
+    window->network_available =
+        g_network_monitor_get_network_available(monitor);
+    PRINT_NETWORK_STATUS(window->network_available);
+    g_signal_connect(monitor, "network-changed",
+                     G_CALLBACK(bw_network_changed_cb), window);
+    window->last_check_time = 0;
+#elif defined(HAVE_LIBNM_GLIB)
     NMClient *client = nm_client_new();
     if (client) {
         window->nm_state = nm_client_get_state(client);
@@ -2838,7 +2871,11 @@ bw_show_about_box(GtkAction * action, gpointer user_data)
 static void
 bw_check_mailbox_list(BalsaWindow * window, GList * mailbox_list)
 {
-#if defined(HAVE_LIBNM_GLIB)
+#if GLIB_CHECK_VERSION(2, 32, 0)
+    if (window && !window->network_available) {
+        return;
+    }
+#elif defined(HAVE_LIBNM_GLIB)
     if (window && window->nm_state != NM_STATE_CONNECTED) {
         return;
     }
@@ -2960,7 +2997,13 @@ bw_mailbox_check(LibBalsaMailbox * mailbox, BalsaWindow * window)
     if (libbalsa_mailbox_get_subscribe(mailbox) == LB_MAILBOX_SUBSCRIBE_NO)
         return;
 
-#if defined(HAVE_LIBNM_GLIB)
+#if GLIB_CHECK_VERSION(2, 32, 0)
+    if (LIBBALSA_IS_MAILBOX_IMAP(mailbox)) {
+        if (window && !window->network_available) {
+                return;
+        }
+    }
+#elif defined(HAVE_LIBNM_GLIB)
     if (LIBBALSA_IS_MAILBOX_IMAP(mailbox)) {
             if (window && window->nm_state != NM_STATE_CONNECTED) {
                 return;
@@ -3051,7 +3094,10 @@ check_new_messages_real(BalsaWindow * window, int type)
     if (window)
         bw_set_sensitive(window, "GetNewMail", TRUE);
 
-#if defined(HAVE_LIBNM_GLIB)
+#if GLIB_CHECK_VERSION(2, 32, 0)
+    if (window->network_available)
+        time(&window->last_check_time);
+#elif defined(HAVE_LIBNM_GLIB)
     if (window->nm_state == NM_STATE_CONNECTED)
         time(&window->last_check_time);
 #endif                          /* defined(HAVE_LIBNM_GLIB) */
@@ -3179,7 +3225,11 @@ bw_mailbox_check(LibBalsaMailbox * mailbox, BalsaWindow * window)
         return;
 
     if (LIBBALSA_IS_MAILBOX_IMAP(mailbox)) {
-#if defined(HAVE_LIBNM_GLIB)
+#if GLIB_CHECK_VERSION(2, 32, 0)
+        if (window && !window->network_available) {
+                return;
+        }
+#elif defined(HAVE_LIBNM_GLIB)
             if (window && window->nm_state != NM_STATE_CONNECTED) {
                 return;
         }
@@ -3234,7 +3284,10 @@ bw_check_messages_thread(struct check_messages_thread_info *info)
     if (info->window) {
         g_idle_add((GSourceFunc) bw_check_messages_thread_idle_cb,
                    g_object_ref(info->window));
-#if defined(HAVE_LIBNM_GLIB)
+#if GLIB_CHECK_VERSION(2, 32, 0)
+        if (info->window->network_available)
+            time(&info->window->last_check_time);
+#elif defined(HAVE_LIBNM_GLIB)
         if (info->window->nm_state == NM_STATE_CONNECTED)
             time(&info->window->last_check_time);
 #endif                          /* defined(HAVE_LIBNM_GLIB) */
@@ -3616,7 +3669,75 @@ bw_display_new_mail_notification(int num_new, int has_new)
     g_free(msg);
 }
 
-#if defined(HAVE_LIBNM_GLIB)
+#if GLIB_CHECK_VERSION(2, 32, 0)
+/*Callback to create or disconnect an IMAP mbox. */
+static gboolean
+mw_mbox_change_connection_status(GtkTreeModel * model, GtkTreePath * path,
+                                 GtkTreeIter * iter, gpointer arg)
+{
+    BalsaMailboxNode *mbnode;
+    LibBalsaMailbox *mailbox;
+
+    gtk_tree_model_get(model, iter, 0, &mbnode, -1);
+    g_return_val_if_fail(mbnode, FALSE);
+
+    if ((mailbox = mbnode->mailbox)) {  /* mailbox, not a folder */
+        if (LIBBALSA_IS_MAILBOX_IMAP(mailbox)) {
+            const gchar *host =
+                LIBBALSA_MAILBOX_REMOTE(mailbox)->server->host;
+            GNetworkMonitor *monitor;
+            GSocketConnectable *address;
+
+            monitor = g_network_monitor_get_default();
+            address = g_network_address_new(host, 0);
+            if (g_network_monitor_can_reach(monitor, address, NULL, NULL)) {
+                libbalsa_mailbox_imap_reconnect
+                    (LIBBALSA_MAILBOX_IMAP(mailbox));
+            } else {
+                libbalsa_mailbox_imap_force_disconnect
+                    (LIBBALSA_MAILBOX_IMAP(mailbox));
+            }
+            g_object_unref(address);
+        }
+    }
+    g_object_unref(mbnode);
+
+    return FALSE;
+}
+
+static gboolean
+check_new_messages_idle(gpointer user_data)
+{
+    check_new_messages_cb(NULL, balsa_app.main_window);
+    return FALSE;
+}
+
+static gboolean
+bw_change_connection_status_idle(gpointer arg)
+{
+    gboolean is_connected = GPOINTER_TO_INT(arg);
+
+    gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
+			   (GtkTreeModelForeachFunc)
+                           mw_mbox_change_connection_status,
+                           NULL);
+
+    /* GLib timeouts are now triggered by g_get_monotonic_time(),
+     * which doesn't increment while we're suspended, so we must
+     * check for ourselves whether a scheduled mail check was
+     * missed. */
+    if (is_connected &&
+        difftime(time(NULL), balsa_app.main_window->last_check_time) >
+        balsa_app.check_mail_timer * 60) {
+        /* Check the mail now, and reset the timer, remembering it
+           must be called from a main thread. */
+        g_idle_add(check_new_messages_idle, NULL);
+    }
+
+    return FALSE;
+}
+
+#elif defined(HAVE_LIBNM_GLIB)
 /*Callback to create or disconnect an IMAP mbox. */
 static gboolean
 mw_mbox_change_connection_status(GtkTreeModel * model, GtkTreePath * path,

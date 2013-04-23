@@ -1,5 +1,17 @@
 2013-04-22  Peter Bloomfield
 
+	Port to GNetworkMonitor from NetworkManager
+
+	* configure.ac: if configure --with-nm when GNetworkMonitor
+	is available (glib >= 2.32), announce that we will actually
+	use GNetworkMonitor.
+	* src/main-window.c: Use GNetworkMonitor, when available,
+	instead of NetworkManager.
+	* src/main-window.h: replace NMState nm_state with gboolean
+	network_available.
+
+2013-04-22  Peter Bloomfield
+
 	New message header widget, based on GtkInfoBar
 
 	* src/balsa-message.c (bm_header_tl_buttons),

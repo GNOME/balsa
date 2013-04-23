@@ -28,7 +28,9 @@
 #include <libnotify/notify.h>
 #endif
 
-#if defined(HAVE_LIBNM_GLIB)
+#if GLIB_CHECK_VERSION(2, 32, 0)
+#include <gio/gio.h>
+#elif defined(HAVE_LIBNM_GLIB)
 #include <nm-client.h>
 #endif
 
@@ -98,7 +100,11 @@ struct _BalsaWindow {
     NotifyNotification *new_mail_note;
 #endif                         /* HAVE_NOTIFY */
 
-#if defined(HAVE_LIBNM_GLIB)
+#if GLIB_CHECK_VERSION(2, 32, 0)
+    /* Support GNetworkMonitor: */
+    gboolean network_available;
+    time_t last_check_time;
+#elif defined(HAVE_LIBNM_GLIB)
     /* NetworkManager state */
     NMState nm_state;
     time_t last_check_time;

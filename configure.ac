@@ -759,6 +759,9 @@ fi
 
 # NetworkManager
 if test "$with_nm" != no ; then
+  if $PKG_CONFIG --atleast-version=2.32.0 glib-2.0 ; then
+    with_nm="no; using GNetworkMonitor instead"
+  fi
   PKG_CHECK_EXISTS([libnm-glib], 
   [ PKG_CHECK_MODULES(LIBNM_GLIB, [ libnm-glib >= 0.7.0]) ],
   [ PKG_CHECK_MODULES(LIBNM_GLIB, [ libnm_glib >= 0.7.0]) ])

@@ -1,5 +1,14 @@
 2013-04-22  Peter Bloomfield
 
+	More efficient use of space in header widget
+
+	* src/balsa-message.c (display_face): hide the face-box when
+	empty.
+	* src/balsa-mime-widget-message.c (bm_header_widget_new): allow
+	the face-box to be non-homogeneous.
+
+2013-04-22  Peter Bloomfield
+
 	Port to GNetworkMonitor from NetworkManager
 
 	* configure.ac: if configure --with-nm when GNetworkMonitor

@@ -1544,6 +1544,7 @@ display_face(BalsaMessage * bm)
     GtkWidget *image;
 
     face_box = bm->face_box;
+    gtk_widget_hide(face_box);
     gtk_container_foreach(GTK_CONTAINER(face_box),
                           (GtkCallback) gtk_widget_destroy, NULL);
 

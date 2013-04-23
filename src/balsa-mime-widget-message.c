@@ -467,6 +467,8 @@ bm_header_widget_new(BalsaMessage * bm, GtkWidget * const * buttons)
     if (!bm->face_box) {
         bm->face_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
         gtk_container_add(GTK_CONTAINER(action_area), bm->face_box);
+        gtk_button_box_set_child_non_homogeneous(GTK_BUTTON_BOX(action_area),
+                                                 bm->face_box, TRUE);
     }
 
     if (buttons) {

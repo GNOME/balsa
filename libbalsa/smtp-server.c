@@ -36,6 +36,7 @@
 #include "libbalsa-conf.h"
 #include "misc.h"
 #include <glib/gi18n.h>
+#include <libesmtp.h>
 
 #if HAVE_MACOSX_DESKTOP
 #  include "macosx-helpers.h"

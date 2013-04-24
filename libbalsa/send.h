@@ -54,7 +54,6 @@ gboolean libbalsa_message_postpone(LibBalsaMessage * message,
 
 
 #if ENABLE_ESMTP
-#include <libesmtp.h>
 
 LibBalsaMsgCreateResult libbalsa_message_queue(LibBalsaMessage* message, 
 					       LibBalsaMailbox* outbox,

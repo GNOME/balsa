@@ -48,6 +48,8 @@
 #include "information.h"
 
 #if ENABLE_ESMTP
+#include <auth-client.h>
+#include <libesmtp.h>
 #include "smtp-server.h"
 #include <stdarg.h>
 

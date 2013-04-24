@@ -24,7 +24,7 @@
 #define __SMTP_SERVER_H__
 
 #include <gtk/gtk.h>
-#include <libesmtp.h>
+#include <auth-client.h>
 #include "libbalsa.h"
 
 #define LIBBALSA_TYPE_SMTP_SERVER				\

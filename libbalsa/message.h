@@ -37,10 +37,6 @@
 #include "rfc3156.h"
 #endif
 
-#if ENABLE_ESMTP
-#include <auth-client.h>
-#endif
-
 #define MESSAGE_COPY_CONTENT 1
 #define LIBBALSA_TYPE_MESSAGE \
     (libbalsa_message_get_type())

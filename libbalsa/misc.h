@@ -31,10 +31,6 @@
 #include <gtk/gtk.h>
 #include <gmime/gmime.h>
 
-#if ENABLE_ESMTP
-#include <auth-client.h>
-#endif
-
 #if !USE_GREGEX
 #  ifdef HAVE_PCRE
 #    include <pcreposix.h>

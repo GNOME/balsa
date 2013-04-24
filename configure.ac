@@ -605,10 +605,12 @@ if test "x$with_esmtp" != xno  ; then
     AC_CHECK_LIB(esmtp, smtp_option_require_all_recipients, 
                  AC_DEFINE(ENABLE_ESMTP, 1, 
                            [Defined when ESTMP support is to be enabled.]),
-	AC_MSG_ERROR([*** You enabled ESMTP but esmtp library doesn't support
-	    'require_all_recipients'. Please get a Balsa aware
-	    libESMTP from http://balsa.gnome.org/main.html or compile
-	    libESMTP with './configure --enable-require-all-recipients'.]),
+                 AC_MSG_ERROR([*** You enabled ESMTP but esmtp library
+                               does not support 'require_all_recipients'.
+                               Please get a Balsa-aware libESMTP from
+                               http://pawsa.fedorapeople.org/balsa/download.html
+                               or compile libESMTP with
+                               './configure --enable-require-all-recipients'.]),
                  -lpthread)
     AC_CHECK_LIB(esmtp, smtp_starttls_set_password_cb,
 	AC_DEFINE(HAVE_SMTP_TLS_CLIENT_CERTIFICATE,1,

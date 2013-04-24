@@ -1000,6 +1000,7 @@ balsa_window_class_init(BalsaWindowClass * klass)
 
 }
 
+#if GLIB_CHECK_VERSION(2, 32, 0)
 static gboolean bw_change_connection_status_idle(gpointer data);
 #define PRINT_NETWORK_STATUS(available)                 \
     g_printerr("Network is %s (%u)\n",                  \
@@ -1020,6 +1021,7 @@ bw_network_changed_cb(GNetworkMonitor * monitor,
                    GINT_TO_POINTER(available));
     }
 }
+#endif                          /* GLIB_CHECK_VERSION(2, 32, 0) */
 
 static void
 balsa_window_init(BalsaWindow * window)

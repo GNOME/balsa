@@ -30,7 +30,7 @@ balsa_extra_dist =		\
 	intltool-update.in	\
 	mkinstalldirs
 
-if BUILD_WITH_G_D_U
+if HAVE_GNOME_DOC_UTILS
 balsa_g_d_u_extra_dist = gnome-doc-utils.make
 endif
 

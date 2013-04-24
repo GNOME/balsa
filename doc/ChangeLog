@@ -1,3 +1,8 @@
+2013-04-23  Peter Bloomfield
+
+	* Makefile.am: use HAVE_GNOME_DOC_UTILS instead of
+	BUILD_WITH_G_D_U.
+
 2010-07-25 Stanislav Brabec
 
 	* Makefile.am: remove reference to unused address-book-start.png

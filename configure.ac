@@ -226,28 +226,9 @@ AC_PATH_PROG(PKG_CONFIG, pkg-config, no)
 # scrollkeeper.
 #
 
-AC_PATH_PROG(gdtool, gnome-doc-tool, no)
-if test "$gdtool" = no; then
-with_g_d_u=no
-else
-   AC_MSG_CHECKING([whether we have gnome-doc-utils])
-   if $PKG_CONFIG --exists gnome-doc-utils; then
-       with_g_d_u=yes
-   else
-       with_g_d_u=no
-   fi
-   AC_MSG_RESULT($with_g_d_u)
-fi
-
-
-AM_CONDITIONAL([BUILD_WITH_G_D_U], [test $with_g_d_u = "yes"])
-
-if test $with_g_d_u = yes ; then
-GNOME_DOC_INIT
-AM_CONDITIONAL([HAVE_GNOME_DOC_UTILS],[true])
-else
 AM_CONDITIONAL([HAVE_GNOME_DOC_UTILS],[false])
-fi
+AM_CONDITIONAL([ENABLE_SK],[false])
+m4_ifdef([GNOME_DOC_INIT],[GNOME_DOC_INIT],[echo 'No gnome-doc-utils'])
 
 # glib-genmarshal
 #

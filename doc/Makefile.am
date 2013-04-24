@@ -1,4 +1,4 @@
-if BUILD_WITH_G_D_U
+if HAVE_GNOME_DOC_UTILS
 include $(top_srcdir)/gnome-doc-utils.make
 dist-hook: doc-dist-hook
 DOC_MODULE = balsa

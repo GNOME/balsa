@@ -58,15 +58,16 @@ extern "C" {
         GtkWidget *trash;
         gint my_num;
         gboolean paths_locked, need_set;
-        EntryMaster emaster;
-        EntryData ed[NUM_EDs];
+        GtkAssistant *druid;
     };
 
 /*
  * Public methods
  */
     void balsa_druid_page_directory(GtkAssistant * druid);
+#if defined(ENABLE_TOUCH_UI)
     void balsa_druid_page_directory_later(GtkWidget *druid);
+#endif                          /* defined(ENABLE_TOUCH_UI) */
 
 
 #ifdef __cplusplus

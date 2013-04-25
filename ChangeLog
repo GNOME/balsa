@@ -1,3 +1,29 @@
+2013-04-25  Peter Bloomfield  <peter@w500.bellsouth.net>
+
+	Improve path checking in the first-time assistant
+
+	* libinit_balsa/assistant_helper.c (balsa_init_add_grid_entry):
+	return the GtkEntry.
+	* libinit_balsa/assistant_helper.h: modified API.
+	* libinit_balsa/assistant_page_directory.c
+	(unconditional_mailbox): report NULL mailbox error;
+	(verify_mailbox_entry), (verify_button_clicked_cb),
+	(verify_button): add a button for the user to verify paths.
+	(entry_changed_cb), (balsa_druid_page_directory_init):
+	desensitize the "next" button when any entry is changed, to make
+	the user verify the new path;
+	(balsa_druid_page_directory): set row spacing for vbox;
+	(balsa_druid_page_directory_prepare): desensitize the "next"
+	button initially;
+	(balsa_druid_page_directory_back): declare as void, not
+	gboolean.
+	(balsa_druid_page_directory_next): ditto; move path verification
+	to verify_mailbox_entry.
+	* libinit_balsa/assistant_page_directory.h: remove
+	Entry{Data,Master} members, and for convenience add GtkAssistant
+	*druid; balsa_druid_page_directory_later is conditional on
+	ENABLE_TOUCH_UI.
+
 2013-04-25  Peter Bloomfield
 
 	* configure.ac: detect _FILE_OFFSET_BITS in configure.ac;

@@ -73,7 +73,7 @@ balsa_init_get_png(const gchar * fname)
     return img;
 }
 
-void
+GtkWidget *
 balsa_init_add_grid_entry(GtkGrid * grid, guint num, const gchar * ltext,
                           const gchar * etext, EntryData * ed,
                           GtkAssistant * druid, GtkWidget *page,
@@ -104,6 +104,7 @@ balsa_init_add_grid_entry(GtkGrid * grid, guint num, const gchar * ltext,
         ed->master->donemask = (ed->master->donemask << 1) | 1;
     }
     gtk_entry_set_text(GTK_ENTRY(e), etext);
+    return e;
 }
 
 static void

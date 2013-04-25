@@ -48,10 +48,11 @@ struct EntryMaster_s {
 
 GdkPixbuf *balsa_init_get_png(const gchar * fname);
 
-void balsa_init_add_grid_entry(GtkGrid * grid, guint num, const gchar * ltext,
-                               const gchar * etext, EntryData * ed,
-                               GtkAssistant * druid, GtkWidget *page,
-                               GtkWidget ** dest);
+GtkWidget *balsa_init_add_grid_entry(GtkGrid * grid, guint num,
+                                     const gchar * ltext,
+                                     const gchar * etext, EntryData * ed,
+                                     GtkAssistant * druid,
+                                     GtkWidget * page, GtkWidget ** dest);
 void balsa_init_add_grid_option(GtkGrid *grid, guint num,
                                 const gchar *ltext, const gchar **optns,
                                 GtkAssistant *druid, GtkWidget **dest);

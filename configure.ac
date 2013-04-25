@@ -24,6 +24,8 @@ AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADERS([config.h])
 AC_DEFINE_UNQUOTED(BALSA_VERSION, "AC_PACKAGE_VERSION",[Defines the Balsa version])
 
+AC_SYS_LARGEFILE
+
 dnl #####################################################################
 dnl 2. Options
 dnl #####################################################################

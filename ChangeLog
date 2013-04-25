@@ -1,3 +1,9 @@
+2013-04-25  Peter Bloomfield
+
+	* configure.ac: detect _FILE_OFFSET_BITS in configure.ac;
+	pancake, https://github.com/xtraeme/xbps-packages/commit/
+	a06181186ef559d84c120e3e9a3a557d4e4914dc.
+
 2013-04-23  Peter Bloomfield
 
 	* src/main-window.c: build with glib < 2.32.

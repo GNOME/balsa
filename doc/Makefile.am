@@ -1,10 +1,7 @@
-if HAVE_GNOME_DOC_UTILS
-include $(top_srcdir)/gnome-doc-utils.make
-dist-hook: doc-dist-hook
-DOC_MODULE = balsa
-DOC_ENTITIES =
-DOC_INCLUDES =
-DOC_FIGURES = figures/address-book-ldap.png			\
+if HAVE_YELPTOOL
+@YELP_HELP_RULES@
+HELP_ID      = balsa
+HELP_MEDIA   = figures/address-book-ldap.png			\
 	      figures/address-book-modify.png			\
 	      figures/address-book.png				\
 	      figures/address-book-vcard.png			\
@@ -21,12 +18,7 @@ DOC_FIGURES = figures/address-book-ldap.png			\
 	      figures/newmsg-window-toolbar.png			\
 	      figures/preferences-window.png			\
 	      figures/spell-check.png
-DOC_LINGUAS = de es fr sl
-else
-# gnome-doc-utils is not obligatory but the old documentation style
-# is not supported any more.
-# SUBDIRS = C de
-# EXTRA_DIST = omf.make xmldocs.make
+HELP_LINGUAS = de es fr sl
 
 doc-dist-hook:
 

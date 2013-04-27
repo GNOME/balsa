@@ -225,12 +225,21 @@ AC_PROG_LN_S
 #
 AC_PATH_PROG(PKG_CONFIG, pkg-config, no)
 
-# scrollkeeper.
+# yelp
 #
-
-AM_CONDITIONAL([HAVE_GNOME_DOC_UTILS],[false])
-AM_CONDITIONAL([ENABLE_SK],[false])
-m4_ifdef([GNOME_DOC_INIT],[GNOME_DOC_INIT],[echo 'No gnome-doc-utils'])
+AC_MSG_CHECKING([for Yelp tool])
+YELPTOOL=`which yelp-build 2>/dev/null`
+if test -z $YELPTOOL; then
+    AC_MSG_RESULT([no])
+    echo "*** The tools to build the documentation are not found."
+    echo "    To build it, please install the yelp-tools package."
+    echo "    Continuing with configure. ****"
+    AM_CONDITIONAL([HAVE_YELPTOOL], [false])
+else
+    AC_MSG_RESULT([yes])
+    YELP_HELP_INIT
+    AM_CONDITIONAL([HAVE_YELPTOOL], [true])
+fi
 
 # glib-genmarshal
 #

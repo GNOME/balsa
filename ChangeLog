@@ -1,3 +1,16 @@
+2013-04-27  Peter Bloomfield
+
+	Port to new documentation infrastructure
+
+	* .gitignore: change as in <URL:https://live.gnome.org/
+	GnomeGoals/NewDocumentationInfrastructure>
+	* Makefile.am: ditto.
+	* autogen.sh: remove gnome-doc-tool code.
+	* bootstrap.sh: ditto.
+	* configure.ac: test `which yelp-build` to detect yelp-tools
+	package, warn if not found, but continue to configure with
+	documentation disabled.
+
 2013-04-25  Peter Bloomfield  <peter@w500.bellsouth.net>
 
 	Improve path checking in the first-time assistant

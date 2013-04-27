@@ -30,13 +30,8 @@ balsa_extra_dist =		\
 	intltool-update.in	\
 	mkinstalldirs
 
-if HAVE_GNOME_DOC_UTILS
-balsa_g_d_u_extra_dist = gnome-doc-utils.make
-endif
-
 EXTRA_DIST =			\
-    $(balsa_extra_dist)		\
-    $(balsa_g_d_u_extra_dist)
+    $(balsa_extra_dist)
 
 if BUILD_WITH_GTKSOURCEVIEW
 gtksourceviewdir = $(BALSA_DATA_PREFIX)/gtksourceview-2.0
@@ -45,8 +40,7 @@ gtksourceview_DATA = balsa-mail.lang		\
 endif
 
 DISTCLEANFILES = $(desktop_DATA) $(server_DATA) \
-	intltool-extract intltool-merge intltool-update	\
-	gnome-doc-utils.make
+	intltool-extract intltool-merge intltool-update
 
 
 dist-hook: balsa.spec

@@ -30,7 +30,6 @@ config.status
 config.sub
 configure
 depcomp
-gnome-doc-utils.make
 install-sh
 intltool-extract.in
 intltool-merge.in

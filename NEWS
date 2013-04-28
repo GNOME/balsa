@@ -1,3 +1,12 @@
+* Balsa-2.5.1 release. Release date 2013-04-27
+
+- new message header widget
+- WebkitGtk2 widget integration
+- ported to GNetworkMonitor
+- yet another documentation port
+- initial config assistant improvements.
+
+
 * Balsa-2.5.0 release. Release date 2013-02-28
 
 - making gtk3 build the official one.

@@ -1,3 +1,9 @@
+2013-04-29  Peter Bloomfield
+
+	* src/sendmsg-window.c (delete_handler): tell the user the
+	message is to "(No name)" only as a last resort; thanks to Jack
+	Ostroff for reporting.
+
 2013-04-27  Pawel Salek
 
 	* NEWS: release balsa-2.5.1

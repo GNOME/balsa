@@ -902,8 +902,9 @@ static gint
 delete_handler(BalsaSendmsg * bsmsg)
 {
     InternetAddressList *list;
-    const InternetAddress *ia;
-    const gchar *tmp;
+    InternetAddress *ia;
+    const gchar *tmp = NULL;
+    gchar *free_me = NULL;
     gint reply;
     GtkWidget *d;
 
@@ -915,7 +916,13 @@ delete_handler(BalsaSendmsg * bsmsg)
 
     list = libbalsa_address_view_get_list(bsmsg->recipient_view, "To:");
     ia = internet_address_list_get_address(list, 0);
-    tmp = ia && ia->name ? ia->name : _("(No name)");
+    if (ia) {
+        tmp = ia->name;
+        if (!tmp || !*tmp)
+            tmp = free_me = internet_address_to_string(ia, FALSE);
+    }
+    if (!tmp || !*tmp)
+        tmp = _("(No name)");
 
     d = gtk_message_dialog_new(GTK_WINDOW(bsmsg->window),
                                GTK_DIALOG_DESTROY_WITH_PARENT,
@@ -923,6 +930,7 @@ delete_handler(BalsaSendmsg * bsmsg)
                                GTK_BUTTONS_YES_NO,
                                _("The message to '%s' is modified.\n"
                                  "Save message to Draftbox?"), tmp);
+    g_free(free_me);
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu_for_parent(d, GTK_WINDOW(bsmsg->window));
 #endif

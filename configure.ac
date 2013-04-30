@@ -752,21 +752,22 @@ if test x$with_libnotify != xno; then
 fi
 
 # NetworkManager
+AC_MSG_CHECKING([whether to use NetworkManager])
 if test "$with_nm" != no ; then
   if $PKG_CONFIG --atleast-version=2.32.0 glib-2.0 ; then
     with_nm="no; using GNetworkMonitor instead"
-  fi
-  PKG_CHECK_EXISTS([libnm-glib], 
-  [ PKG_CHECK_MODULES(LIBNM_GLIB, [ libnm-glib >= 0.7.0]) ],
-  [ PKG_CHECK_MODULES(LIBNM_GLIB, [ libnm_glib >= 0.7.0]) ])
+  else
+    PKG_CHECK_EXISTS([libnm-glib], 
+    [ PKG_CHECK_MODULES(LIBNM_GLIB, [ libnm-glib >= 0.7.0]) ],
+    [ PKG_CHECK_MODULES(LIBNM_GLIB, [ libnm_glib >= 0.7.0]) ])
 
-  AC_DEFINE(HAVE_LIBNM_GLIB,1,[ Defined if NetworkManager-glib-devel is found.])
-  BALSA_CFLAGS="$BALSA_CFLAGS $LIBNM_GLIB_CFLAGS"
-  LIBS="$LIBS $LIBNM_GLIB_LIBS"
-else
-AC_MSG_CHECKING([NetworkManager-glib-devel])
- AC_MSG_RESULT([no])
+    AC_DEFINE(HAVE_LIBNM_GLIB,1,
+              [ Defined if NetworkManager-glib-devel is found.])
+    BALSA_CFLAGS="$BALSA_CFLAGS $LIBNM_GLIB_CFLAGS"
+    LIBS="$LIBS $LIBNM_GLIB_LIBS"
+  fi
 fi
+AC_MSG_RESULT($with_nm)
 
 # Compface configuration
 #

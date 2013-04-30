@@ -1,3 +1,7 @@
+2013-04-30  Peter Bloomfield
+
+	* configure.ac: fix broken NetworkManager-glib logic.
+
 2013-04-29  Peter Bloomfield
 
 	* src/sendmsg-window.c (delete_handler): tell the user the

@@ -1,7 +1,50 @@
 if HAVE_YELPTOOL
+
 @YELP_HELP_RULES@
+
 HELP_ID      = balsa
-HELP_MEDIA   = figures/address-book-ldap.png			\
+
+balsa_help_files =						\
+               ab-conf.page					\
+               authors.page					\
+               common-tasks.page				\
+               folder-config.page				\
+               getting-started.page				\
+               glossary.page					\
+               identities.page					\
+               index.page					\
+               introduction.page				\
+               its-not-working.page				\
+               mbox-formats.page				\
+               preferences-address-books.page			\
+               preferences-display-options.page			\
+               preferences-mail-options.page			\
+               preferences-miscellaneous.page			\
+               preferences.page					\
+               preferences-startup.page				\
+               toolbar-prefs.page				\
+               win-composer.page				\
+               win-filters.page					\
+               win-main.page					\
+               win-message.page					\
+               win-run-filters.page				\
+               win-search.page
+
+if BUILD_WITH_GTKSPELL
+balsa_gtkspell_extra =
+balsa_gtkspell_extra_dist = preferences-spelling.page
+else
+balsa_gtkspell_extra_dist =
+balsa_gtkspell_extra = preferences-spelling.page
+endif
+
+HELP_FILES   = $(balsa_help_files) $(balsa_gtkspell_extra)
+EXTRA_DIST   = balsa.xml $(balsa_gtkspell_extra_dist)
+
+HELP_EXTRA   = balsa.entities
+
+HELP_MEDIA   =							\
+	      figures/address-book-ldap.png			\
 	      figures/address-book-modify.png			\
 	      figures/address-book.png				\
 	      figures/address-book-vcard.png			\
@@ -18,6 +61,7 @@ HELP_MEDIA   = figures/address-book-ldap.png			\
 	      figures/newmsg-window-toolbar.png			\
 	      figures/preferences-window.png			\
 	      figures/spell-check.png
+
 HELP_LINGUAS = de es fr sl
 
 doc-dist-hook:

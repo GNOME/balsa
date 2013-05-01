@@ -1,0 +1,88 @@
+<!DOCTYPE page
+[<!ENTITY % balsa SYSTEM "balsa.entities"> %balsa; ]>
+<page xmlns="http://projectmallard.org/1.0/" type="topic"
+id="its-not-working">
+  <info>
+    <link type="guide" xref="index" />
+  </info>
+  <title>It's not Working!!!</title>
+  <p>This is a FAQ for when &Balsa; appears to lock up, or
+  other things that you think should be happening aren't. If you
+  can't figure out how to do something but &Balsa; lets you do
+  it, that's a bug. Report it.</p>
+  <list>
+    <item>
+      <p>
+        <link xref="its-not-working#main-to-imap">i
+        I want one of the main
+        folders to be IMAP</link>
+      </p>
+    </item>
+    <item>
+      <p>
+        <link xref="its-not-working#frozen">
+        &Balsa;'s frozen!</link>
+      </p>
+    </item>
+    <item>
+      <p>
+        <link xref="its-not-working#spooky-win">
+        What's that window that flashed
+        on the screen?</link>
+      </p>
+    </item>
+    <item>
+      <p>
+        <link xref="its-not-working#address-book">
+        The address book doesn't
+        import my addresses.</link>
+      </p>
+    </item>
+  </list>
+  <section id="main-to-imap">
+    <title>I want a basic mailbox to use IMAP</title>
+    <p>See
+    <link xref="common-tasks#ct-main-folder-imap">this section</link>.</p>
+  </section>
+  <section id="frozen">
+    <title>&Balsa;'s frozen!</title>
+    <p>Odds are it isn't. Watch out for:</p>
+    <list>
+      <item>
+        <p>If you don't have threading, &Balsa; will stop
+        responding when it sends and receives email. Use threading,
+        if possible.</p>
+      </item>
+      <item>
+        <p>&Balsa; is downloading a new message or closing a
+        large mailbox. This could take a while, especially when
+        this file is accessed via NFS.</p>
+      </item>
+      <item>
+        <p>A dialog box is being displayed but it is obscured by
+        another one. This seems to happen under Sawfish. Try moving
+        the windows around and see if there's a hidden dialog
+        somewhere.</p>
+      </item>
+    </list>
+  </section>
+  <section id="spooky-win">
+    <title>What's that window that flashed on the screen?</title>
+    <p>Were you checking your mail? Probably. This is the window
+    that displays progress for retrieving &POP3; mail. If you
+    don't have any &POP3; accounts, it will still appear -- but
+    it'll disappear almost instantly. You can disable displaying
+    this window in preferences.</p>
+  </section>
+  <section id="address-book">
+    <title>The address book doesn't import my addresses.</title>
+    <p>&Balsa; attempts to open the file
+    <file>~/.gnome/GnomeCard.gcrd</file>. If you're not using this
+    file, you may need to create a symlink so that &Balsa; can
+    open it.</p>
+    <p>There have been slight changes in &GnomeCard;'s file
+    format between its various versions. &Balsa; is known to
+    work with at least &GnomeCard; version 1.0.10 and probably
+    most other releases.</p>
+  </section>
+</page>

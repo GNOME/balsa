@@ -1,0 +1,31 @@
+<!DOCTYPE page
+[<!ENTITY % balsa SYSTEM "balsa.entities"> %balsa;]>
+<page xmlns="http://projectmallard.org/1.0/" type="topic"
+id="getting-started">
+  <info>
+    <link type="guide" xref="index" />
+    <link type="next" xref="win-main" />
+  </info>
+  <title>Getting Started with &Balsa;</title>
+  <p>If you're starting &Balsa; for the first time, the first
+  thing you'll see is an assistant that will set up &Balsa;'s
+  basic settings. &Balsa; can guess most of what it needs to
+  know about you. It will also create five standard local
+  mailboxes: the Inbox, Outbox, Sentbox, Draftbox, and Trash.
+  (These can be changed to be &IMAP; mailboxes later.)</p>
+  <figure>
+    <media type="image" src="figures/druid-start.png" />
+    <title>&Balsa; Start Assistant</title>
+  </figure>
+  <p>Don't worry. &Balsa; cooperates with other
+  <link xref="glossary#mua">MUA</link>'s very well. They share the
+  same locking semantics for mailboxes. If &Balsa; shares the
+  same mail directory as &Pine; or &Mutt;, it will detect
+  new folders as they are created. So if you have to telnet in to
+  your mail machine, you won't be stuck.</p>
+  <p>There are many more settings in &Balsa;'s
+  <link xref="preferences">preferences window</link>, but most of
+  them do not need to be changed.</p>
+  <p>Once &Balsa; is configured, you will proceed on to the
+  <link xref="win-main">main window</link>.</p>
+</page>

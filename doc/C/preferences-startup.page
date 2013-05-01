@@ -1,0 +1,51 @@
+<!DOCTYPE page
+[<!ENTITY % balsa SYSTEM "balsa.entities">%balsa; ]>
+<page xmlns="http://projectmallard.org/1.0/" type="topic"
+id="preferences-startup">
+  <info>
+    <link type="topic" xref="preferences" />
+    <link type="guide" xref="preferences" />
+  </info>
+  <title>Startup Preferences</title>
+  <terms>
+    <item>
+      <title>
+        <gui>Open Inbox upon Startup</gui>
+      </title>
+      <p>If set, &Balsa; will open your system inbox upon
+      startup.</p>
+    </item>
+    <item>
+      <title>
+        <gui>Check Mail at Startup</gui>
+      </title>
+      <p>If set, &Balsa; will automatically attempt to download
+      mail from the &POP3; mail server upon startup, and will
+      check for new mail on an &IMAP; server.</p>
+    </item>
+    <item>
+      <title>
+        <gui>Remember Open Mailboxes Between Sessions</gui>
+      </title>
+      <p>When marked, &Balsa; will remember and reopen
+      mailboxes that were open when &Balsa; was last quit.</p>
+    </item>
+    <item>
+      <title>
+        <gui>Folder Scanning</gui>
+      </title>
+      <p>Scanning a folder tree can be time-consuming, because of
+      the need to explore an entire tree of subfolders. You can
+      defer scanning the tree by setting the scan depth to 1.
+      &Balsa; will then descend into the tree only far enough
+      to discover whether any folders that you can see have
+      subfolders. The first time you expand any subtree,
+      &Balsa; will explore more of the tree.</p>
+      <p>If you prefer to have the whole tree available from
+      startup, choose a depth as great as that of your folder tree.
+      Intermediate settings may also be used.</p>
+      <p>You may set the depth for initial scanning separately for
+      local and &IMAP; trees.</p>
+    </item>
+  </terms>
+</page>

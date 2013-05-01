@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE page [
+<!ENTITY % balsa SYSTEM "balsa.entities">
+<!ENTITY mdash "--">
+<!-- replace with actual app  version number--><!ENTITY version "2.5">
+<!ENTITY Balsa '<app xmlns="http://projectmallard.org/1.0/">Balsa</app>'>
+<!ENTITY Mutt '<app xmlns="http://projectmallard.org/1.0/">Mutt</app>'>
+<!ENTITY GnomeCard '<app xmlns="http://projectmallard.org/1.0/">GnomeCard</app>'>
+<!ENTITY Pine '<app xmlns="http://projectmallard.org/1.0/">pine</app>'>
+<!ENTITY procmail '<app xmlns="http://projectmallard.org/1.0/">procmail</app>'>
+<!ENTITY GnuPG '<app xmlns="http://projectmallard.org/1.0/">GnuPG</app>'>
+<!ENTITY balsalist "http://mail.gnome.org/mailman/listinfo/balsa-list">
+<!ENTITY IMAP '<link xmlns="http://projectmallard.org/1.0/"
+           xref ="glossary#imap">IMAP</link>'>
+<!ENTITY LDAP '<link xmlns="http://projectmallard.org/1.0/"
+           xref ="glossary#ldap">LDAP</link>'>
+<!ENTITY POP3 '<link xmlns="http://projectmallard.org/1.0/"
+           xref ="glossary#pop">POP3</link>'>
+<!ENTITY SMTP '<link xmlns="http://projectmallard.org/1.0/"
+           xref ="glossary#smtp">SMTP</link>'>
+<!ENTITY VCARD '<link xmlns="http://projectmallard.org/1.0/"
+           xref ="glossary#vcard">VCARD</link>'>
+]>
+<page xmlns="http://projectmallard.org/1.0/" type="topic" id="common-tasks" xml:lang="de">
+  <info>
+    <link type="guide" xref="index"/>
+  </info>
+  <title>Common Tasks with <app>Balsa</app></title>
+  <p>This section explains many of the things you might want to do
+  with <app>Balsa</app>.</p>
+  <list>
+    <item>
+      <p>
+        <link xref="common-tasks#ct-create-new-mb">Creating new
+        mailboxes</link>
+      </p>
+    </item>
+    <item>
+      <p>
+        <link xref="common-tasks#ct-move-msg">Moving messages around</link>
+      </p>
+    </item>
+    <item>
+      <p>
+        <link xref="common-tasks#ct-main-folder-imap">Making one of the main
+        folders IMAP-based</link>
+      </p>
+    </item>
+    <item>
+      <p>
+        <link xref="common-tasks#ct-alias-expansion">Expanding e-mail
+        addresses automatically</link>
+      </p>
+    </item>
+    <item>
+      <p>
+        <link xref="common-tasks#ct-ldap">Setting up LDAP address
+        books</link>
+      </p>
+    </item>
+  </list>
+  <section id="ct-create-new-mb">
+    <title>Erstellen neuer Postfächer</title>
+    <p>You can create new local and <link xref="glossary#imap">IMAP</link> mailboxes
+    using the <guiseq><gui>File</gui><gui>New</gui></guiseq> command, or
+    by
+    right-clicking in the mailbox list and selecting
+    <gui>New Mailbox</gui>.
+    This will start a dialog that will let you name the mailbox and
+    specify its location.</p>
+    <p>To create a new <link xref="glossary#pop">POP3</link> mailbox, go to the <link xref="preferences">preferences window</link>,
+    select the <gui>Mail options</gui> page, and click <gui>Add</gui>
+    in the <gui>Remote mailbox servers</gui>
+    area. A dialog will be displayed that will let you set up the
+    new mailbox.</p>
+  </section>
+  <section id="ct-move-msg">
+    <title>Verschieben von Nachrichten</title>
+    <p>There are several methods available for moving or copying
+    messages from one mailbox to another. The first is via the
+    <gui>Transfer</gui> context menu, and the second is using drag
+    and drop.</p>
+    <p>To transfer messages using the
+    <gui>Transfer</gui> menu, simply select the messages you desire
+    to move from one mailbox, then press
+    <keyseq><key>Shift</key><key>F10</key></keyseq> or <key>Menu</key>,
+    or click the right
+    mouse button,
+    to bring up the context menu and
+    select the
+    <gui>Move to</gui> submenu. This will display a list of
+    mailboxes similar to the mailbox list in the main window. The
+    list can be scrolled and trees expanded and collapsed, although
+    these changes will not be reflected in the main list. Selecting
+    a mailbox will start the transfer.</p>
+    <p>The other method of transferring messages is to simply drag
+    and drop the message(s) from the message index to the desired
+    destination. Select the message(s) you wish to transfer, then
+    drag them using the mouse until they are over the intended
+    mailbox. The destination can either be in the mailbox list in
+    the main window, or if open mailbox tabs are enabled the
+    messages can be dragged to them.  </p>
+  </section>
+  <section id="ct-main-folder-imap">
+    <title>I want one of the main folders to be IMAP</title>
+    <p>First, create the IMAP folder as you want it configured.
+    Then, press right mouse button on the mailbox entry and select
+    <gui>Mark as Inbox</gui>. That is all!</p>
+  </section>
+  <section id="ct-alias-expansion">
+    <title>I want Balsa to guess my friends</title>
+    <p><app>Balsa</app> can expand the names of your contacts it finds
+    in <app>Balsa</app> addressbooks. It will do this by any part of the
+    contact's name or email address.</p>
+    <p>As you type a username in any of the To:, Cc:, or Bcc: entry
+    boxes in the
+    <link xref="win-composer">Compose window</link>, it will do
+    a case insensitive search in the addressbook for a matching
+    username, and pop up a list of matching complete addresses.
+    Press
+    <key>Cursor-Down</key> to highlight one of the addresses, and
+    <key>Enter</key> to select it.</p>
+    <!--
+  This is best demonstrated
+  with the following picture:</p>
+
+  <figure>
+    <title>Expanding Aliases</title>
+    <screenshot>
+          <mediaobject>
+            <imageobject><imagedata
+                fileref="figures/example-alias.png" format="PNG"/>
+            </imageobject>
+          </mediaobject>
+    </screenshot>
+  </figure>
+
+  <p>The example shows what it looks like if "Balsa Mailing
+  List" is in your address book, and you have typed
+  &quot;ba&quot;</p>
+-->
+    <p>To enable this feature, you must select which address books
+    you wish to be searched for aliases to expand. This can be done
+    in the
+    <link xref="preferences-address-books">
+    Preferences</link> window, on the
+    <gui>Address Books</gui> page. Also, some address books are
+    expensive to lookup. You will need then to press
+    <key>Escape</key> to explicitly expand the alias.</p>
+  </section>
+  <section id="ct-ldap">
+    <title>Konfigurieren von LDAP-Adressbüchern</title>
+    <p>Only steps crucial for <app>Balsa</app> are described here. Some
+    of the steps may be specific to OpenLDAP server. Whenever in
+    doubt, consult the documentation provided with your LDAP
+    server.</p>
+    <list>
+      <item>
+        <p>Installieren Sie die LDAP-Serversoftware.</p>
+      </item>
+      <item>
+        <p>Configure. In the case of OpenLDAP, edit
+        <file>/etc/openldap/ldap.conf</file> and
+        <file>/etc/openldap/slapd.conf</file>. Consult your LDAP
+        configuration and other sources to choose the right Domain
+        Name for your institution and authentication level
+        apriopriate to your environment.</p>
+      </item>
+      <item>
+        <p>Import data to your LDAP server. OpenLDAP comes with a
+        set of migration tools but they do not create directly
+        objects of standard
+        <code>inetOrgPerson</code> class which is an apropriate type
+        for address book entry. You may need to tune them.</p>
+      </item>
+    </list>
+    <p><app>Balsa</app> searches for objects having
+    <sys>mail</sys> attribute. The search is done on the
+    <sys>cn</sys> attribute and the search filter has a form
+    "(&amp;(mail=*)(cn=John D))". <app>Balsa</app> uses
+    <sys>cn</sys>(common name),
+    <sys>givenName</sys>(given name),
+    <sys>sn</sys>(surname) and
+    <sys>mail</sys>(e-mail address) attributes of the found
+    objects.</p>
+  </section>
+</page>

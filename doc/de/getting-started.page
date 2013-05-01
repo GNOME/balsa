@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE page [
+<!ENTITY % balsa SYSTEM "balsa.entities">
+<!ENTITY mdash "--">
+<!-- replace with actual app  version number--><!ENTITY version "2.5">
+<!ENTITY Balsa '<app xmlns="http://projectmallard.org/1.0/">Balsa</app>'>
+<!ENTITY Mutt '<app xmlns="http://projectmallard.org/1.0/">Mutt</app>'>
+<!ENTITY GnomeCard '<app xmlns="http://projectmallard.org/1.0/">GnomeCard</app>'>
+<!ENTITY Pine '<app xmlns="http://projectmallard.org/1.0/">pine</app>'>
+<!ENTITY procmail '<app xmlns="http://projectmallard.org/1.0/">procmail</app>'>
+<!ENTITY GnuPG '<app xmlns="http://projectmallard.org/1.0/">GnuPG</app>'>
+<!ENTITY balsalist "http://mail.gnome.org/mailman/listinfo/balsa-list">
+<!ENTITY IMAP '<link xmlns="http://projectmallard.org/1.0/"
+           xref ="glossary#imap">IMAP</link>'>
+<!ENTITY LDAP '<link xmlns="http://projectmallard.org/1.0/"
+           xref ="glossary#ldap">LDAP</link>'>
+<!ENTITY POP3 '<link xmlns="http://projectmallard.org/1.0/"
+           xref ="glossary#pop">POP3</link>'>
+<!ENTITY SMTP '<link xmlns="http://projectmallard.org/1.0/"
+           xref ="glossary#smtp">SMTP</link>'>
+<!ENTITY VCARD '<link xmlns="http://projectmallard.org/1.0/"
+           xref ="glossary#vcard">VCARD</link>'>
+]>
+<page xmlns="http://projectmallard.org/1.0/" type="topic" id="getting-started" xml:lang="de">
+  <info>
+    <link type="guide" xref="index"/>
+    <link type="next" xref="win-main"/>
+  </info>
+  <title>Getting Started with <app>Balsa</app></title>
+  <p>If you're starting <app>Balsa</app> for the first time, the first
+  thing you'll see is an assistant that will set up <app>Balsa</app>'s
+  basic settings. <app>Balsa</app> can guess most of what it needs to
+  know about you. It will also create five standard local
+  mailboxes: the Inbox, Outbox, Sentbox, Draftbox, and Trash.
+  (These can be changed to be <link xref="glossary#imap">IMAP</link> mailboxes later.)</p>
+  <figure>
+    <media type="image" src="figures/druid-start.png"/>
+    <title><app>Balsa</app> Start Assistant</title>
+  </figure>
+  <p>Don't worry. <app>Balsa</app> cooperates with other
+  <link xref="glossary#mua">MUA</link>'s very well. They share the
+  same locking semantics for mailboxes. If <app>Balsa</app> shares the
+  same mail directory as <app>pine</app> or <app>Mutt</app>, it will detect
+  new folders as they are created. So if you have to telnet in to
+  your mail machine, you won't be stuck.</p>
+  <p>There are many more settings in <app>Balsa</app>'s
+  <link xref="preferences">preferences window</link>, but most of
+  them do not need to be changed.</p>
+  <p>Once <app>Balsa</app> is configured, you will proceed on to the
+  <link xref="win-main">main window</link>.</p>
+</page>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE page [
+<!ENTITY % balsa SYSTEM "balsa.entities">
+<!ENTITY mdash "--">
+<!-- replace with actual app  version number--><!ENTITY version "2.5">
+<!ENTITY Balsa '<app xmlns="http://projectmallard.org/1.0/">Balsa</app>'>
+<!ENTITY Mutt '<app xmlns="http://projectmallard.org/1.0/">Mutt</app>'>
+<!ENTITY GnomeCard '<app xmlns="http://projectmallard.org/1.0/">GnomeCard</app>'>
+<!ENTITY Pine '<app xmlns="http://projectmallard.org/1.0/">pine</app>'>
+<!ENTITY procmail '<app xmlns="http://projectmallard.org/1.0/">procmail</app>'>
+<!ENTITY GnuPG '<app xmlns="http://projectmallard.org/1.0/">GnuPG</app>'>
+<!ENTITY balsalist "http://mail.gnome.org/mailman/listinfo/balsa-list">
+<!ENTITY IMAP '<link xmlns="http://projectmallard.org/1.0/"
+           xref ="glossary#imap">IMAP</link>'>
+<!ENTITY LDAP '<link xmlns="http://projectmallard.org/1.0/"
+           xref ="glossary#ldap">LDAP</link>'>
+<!ENTITY POP3 '<link xmlns="http://projectmallard.org/1.0/"
+           xref ="glossary#pop">POP3</link>'>
+<!ENTITY SMTP '<link xmlns="http://projectmallard.org/1.0/"
+           xref ="glossary#smtp">SMTP</link>'>
+<!ENTITY VCARD '<link xmlns="http://projectmallard.org/1.0/"
+           xref ="glossary#vcard">VCARD</link>'>
+]>
+<page xmlns="http://projectmallard.org/1.0/" type="topic" id="introduction" xml:lang="sl">
+  <info>
+    <link type="guide" xref="index"/>
+    <link type="next" xref="getting-started"/>
+  </info>
+  <title>Uvod</title>
+  <media src="figures/balsa_logo.png" format="PNG" srccredit="tigert"/>
+  <p><app>Balsa</app> is a graphical mail client. It supports the
+  standard features of any good reader and has new features added
+  continually. See the abstract above for a quick feature
+  rundown.</p>
+  <p><app>Balsa</app> is written using GTK+ and GNOME. Originally based
+  on libmutt, the back end code to <app>Mutt</app>, <app>Balsa</app> now uses
+  a combination of GMime for handling Mime messages, and its own
+  drivers for local and remote mailstores.</p>
+  <p>If you want to learn more about <app>Balsa</app>, your best bet is
+  the mailing list
+  <code>balsa-list@gnome.org</code>, to which you can subscribe by
+  going to the website
+  <link href="http://mail.gnome.org/mailman/listinfo/balsa-list">
+  http://mail.gnome.org/mailman/listinfo/balsa-list</link> or by
+  sending a message with a subject of
+  <em>subscribe</em> to
+  <link href="mailto:balsa-list-request@gnome.org?subject=Subscribe">
+  balsa-list-request@gnome.org</link>. Bugs can be reported via
+  <app>bug-buddy</app> or to the
+  <link href="http://bugzilla.gnome.org/enter_bug.cgi?product=balsa">
+  Gnome bug tool</link>.</p>
+</page>

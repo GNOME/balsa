@@ -1,0 +1,70 @@
+<!DOCTYPE page
+[<!ENTITY % balsa SYSTEM "balsa.entities">%balsa; ]>
+<page xmlns="http://projectmallard.org/1.0/" type="topic"
+id="win-message">
+  <info>
+    <link type="guide" xref="index" />
+  </info>
+<title>The Message Window</title>
+
+<p>
+  In addition to the preview pane, &Balsa; can display messages in
+  separate windows.  Simply double-click on the desired message from
+  the message index in the main window, or select the message and press
+  the space bar.  Any number of windows may be
+  opened, although only one per unique message.
+</p>
+
+<p>
+  The message window has a menu and toolbar containing commands
+  pertinent to an individual message.  Commands are as described in
+  the <link xref="win-main">main window</link>.
+  Below the menu and toolbar are the message headers in a box,
+  followed by the message body.
+</p>
+
+<figure>
+  <title>Message Window</title>
+  <media type="image" src="figures/message-window.png" format="PNG"/>
+</figure>
+
+<p>
+  If your copy of &Balsa; has cryptographic support, there will be
+  an icon in the header box depicting an envelope with a lock and a
+  check mark.  Clicking the icon will check the key used to sign the
+  message.  The message body will contain an icon and some
+  descriptive text noting whether the signing key is valid, invalid,
+  or unchecked.
+</p>
+
+<p>
+  If the message contains attachments or more than one part of any
+  kind, an attachment icon will be present in the header box as
+  shown below.  Clicking this icon will show a menu of all available
+  parts.  Selecting a part will update the display of the message
+  body accordingly.
+</p>
+
+<figure>
+  <title>Selecting a Message Part</title>
+  <media tyep="image" src="figures/msg-part-select.png" format="PNG"/>
+</figure>
+
+<p>
+  The <gui>complete message</gui> selection will
+  do its best to render all
+  parts at once, but some may have to be selected individually or
+  opened in an external program.  Parts which cannot be rendered
+  within &Balsa; will instead display a list of options for opening
+  external programs or saving the data.  Right-clicking on a part
+  will also provide a menu with these options.
+</p>
+
+<p>
+  Navigation between messages is possible without returning to the
+  index in the main window.  Next unread being quite useful for
+  checking all new mail.  Deleting the current message will
+  automatically display the next unread one.  This behavior can be
+  changed in the <link xref="preferences">preferences</link>.
+</p>
+</page>

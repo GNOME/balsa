@@ -1,0 +1,52 @@
+<!DOCTYPE page
+[<!ENTITY % balsa SYSTEM "balsa.entities"> %balsa; ]>
+<page xmlns="http://projectmallard.org/1.0/" type="topic"
+id="mbox-formats">
+  <info>
+    <link type="guide" xref="index" />
+  </info>
+  <title>Available Mailbox Formats</title>
+  <p>&Balsa; handles several mailbox formats, including mbox.
+  Further information can be found in the following documents:</p>
+  <terms>
+    <item>
+      <title>Benchmarking mbox versus maildir</title>
+      <p>
+        <link href="http://www.courier-mta.org/mbox-vs-maildir/">
+        http://www.courier-mta.org/mbox-vs-maildir/</link>
+      </p>
+    </item>
+    <item>
+      <title>Mailbox Format Characteristics</title>
+      <p>
+        <link href="http://www.washington.edu/imap/documentation/formats.txt.html">
+        http://www.washington.edu/imap/documentation/formats.txt.html</link>
+      </p>
+    </item>
+    <item>
+      <title>Maildir format</title>
+      <p>maildir(5) manual page (from qmail):
+      <link href="http://www.qmail.org/qmail-manual-html/man5/maildir.html">
+      http://www.qmail.org/qmail-manual-html/man5/maildir.html</link></p>
+    </item>
+    <item>
+      <title>Using Maildir format</title>
+      <p>
+        <link href="http://cr.yp.to/proto/maildir.html">
+        http://cr.yp.to/proto/maildir.html</link>
+      </p>
+    </item>
+    <item>
+      <title>QMail</title>
+      <p>mbox(5) manual page (from qmail):
+      <link href="http://www.qmail.org/qmail-manual-html/man5/mbox.html">
+      http://www.qmail.org/qmail-manual-html/man5/mbox.html</link></p>
+    </item>
+    <item>
+      <title>Mailbox formats</title>
+      <p>(From Mail-Administrator HOWTO):
+      <link href="http://linuxdocs.org/HOWTOs/Mail-Administrator-HOWTO-3.html#ss3.5">
+      http://linuxdocs.org/HOWTOs/Mail-Administrator-HOWTO-3.html#ss3.5</link></p>
+    </item>
+  </terms>
+</page>

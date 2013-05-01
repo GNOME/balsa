@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE page [
+<!ENTITY % balsa SYSTEM "balsa.ent">
+<!ENTITY mdash "--">
+<!-- replace with actual app  version number--><!ENTITY version "2.5">
+<!ENTITY Balsa '<app xmlns="http://projectmallard.org/1.0/">Balsa</app>'>
+<!ENTITY Mutt '<app xmlns="http://projectmallard.org/1.0/">Mutt</app>'>
+<!ENTITY GnomeCard '<app xmlns="http://projectmallard.org/1.0/">GnomeCard</app>'>
+<!ENTITY Pine '<app xmlns="http://projectmallard.org/1.0/">pine</app>'>
+<!ENTITY procmail '<app xmlns="http://projectmallard.org/1.0/">procmail</app>'>
+<!ENTITY GnuPG '<app xmlns="http://projectmallard.org/1.0/">GnuPG</app>'>
+<!ENTITY balsalist "http://mail.gnome.org/mailman/listinfo/balsa-list">
+<!ENTITY IMAP '<link xmlns="http://projectmallard.org/1.0/"
+           xref ="glossary#imap">IMAP</link>'>
+<!ENTITY LDAP '<link xmlns="http://projectmallard.org/1.0/"
+           xref ="glossary#ldap">LDAP</link>'>
+<!ENTITY POP3 '<link xmlns="http://projectmallard.org/1.0/"
+           xref ="glossary#pop">POP3</link>'>
+<!ENTITY SMTP '<link xmlns="http://projectmallard.org/1.0/"
+           xref ="glossary#smtp">SMTP</link>'>
+<!ENTITY VCARD '<link xmlns="http://projectmallard.org/1.0/"
+           xref ="glossary#vcard">VCARD</link>'>
+]>
+<page xmlns="http://projectmallard.org/1.0/" type="topic" id="preferences-incoming-and-outgoing-mail" xml:lang="de">
+  <info>
+    <link type="guide" xref="index"/>
+    <link type="topic" xref="preferences"/>
+    <link type="guide" xref="preferences"/>
+  </info>
+  <title>Incoming and Outgoing Mail Preferences</title>
+  <p>Use this page to set the <app>Balsa</app>'s behaviour regarding
+  incoming and outgoing messages.</p>
+  <section id="incoming">
+    <title>Eingang</title>
+    <terms>
+      <item>
+        <title>
+          <gui>Check Mail Automatically</gui>
+        </title>
+        <p>If selected, <app>Balsa</app> will connect to your <link xref="glossary#pop">POP3</link>
+        servers at the given interval and check for mail.</p>
+      </item>
+      <item>
+        <title>
+          <gui>Check IMAP mailboxes</gui>
+        </title>
+        <p>If selected, <app>Balsa</app> will include your IMAP
+        mailboxes when checking for mail. You can also specify that
+        INBOX is the only mailbox to be checked.</p>
+        <p>Die Überprüfung von IMAP-Postfächern kann eine Zeit dauern. Mit diesen Optionen erhalten Sie weitere Möglichkeiten, die Dauer dieses Vorgangs zu beeinflussen.</p>
+      </item>
+      <item>
+        <title>
+          <gui>Display message if new mail has arrived</gui>
+        </title>
+        <p>If selected, <app>Balsa</app> will alert you when mail has
+        arrived.</p>
+      </item>
+      <item>
+        <title>
+          <gui>Do background check quietly</gui>
+        </title>
+        <p>If selected, <app>Balsa</app> will give you no indication
+        that a background mail check is in progress.</p>
+      </item>
+      <item>
+        <title>
+          <gui>Wrap Incoming Text</gui>
+        </title>
+        <p>If selected, <app>Balsa</app> will wrap text of incoming
+        messages at the specified line length.</p>
+      </item>
+      <item>
+        <title>
+          <gui>Reflow messages of type
+          `text/plain;format=flowed'</gui>
+        </title>
+        <p>The `format' parameter distinguishes two ways of
+        representing paragraphs in messages of type `text/plain'
+        (that is, simple text). The value `flowed' indicates that
+        paragraphs have been broken into lines ended with `soft'
+        line breaks: a space is left at the end of the line. A
+        `hard' line break (one that is not preceded by a space)
+        indicates the end of a paragraph.</p>
+        <p><app>Balsa</app> can reflow the paragraphs, quoted or
+        otherwise, in a message of this type. Reflowing eliminates
+        the line fragments that are left when text is first wrapped
+        at one length and then rewrapped to a shorter length, which
+        are often misquoted.</p>
+        <p>The only other value of `format' is `fixed', which is
+        the value assumed by default when `format' is not
+        specified, as with older mailers. In this case, all line
+        breaks must be respected. If you do not select the
+        `Reflow...' option, <app>Balsa</app> will treat all messages of
+        type `text/plain' as if they were `format=fixed'. Long
+        lines will still be wrapped, if the `Wrap Incoming
+        Messages' option is selected, but this will usually leave
+        unquoted line fragments.</p>
+      </item>
+      <item>
+        <title>
+          <gui>Message Disposition Notification request</gui>
+        </title>
+        <p>You will sometimes receive a message whose sender has
+        asked for notification that you have received or seen the
+        message. You can specify how <app>Balsa</app> responds to these
+        requests.</p>
+      </item>
+    </terms>
+  </section>
+  <!-- ################################################################# -->
+  <!--             SUBSECTION: PREFERENCES/MAIL OPTIONS/OUTGOING         -->
+  <!-- ################################################################# -->
+  <section id="outgoing">
+    <title>Ausgehend</title>
+    <terms>
+      <item>
+        <title>
+          <gui>Wrap Outgoing Text</gui>
+        </title>
+        <p>Have <app>Balsa</app> wrap all outgoing mail at the specified
+        column.</p>
+      </item>
+      <item>
+        <title>
+          <gui>Reply prefix</gui>
+        </title>
+        <p>The string that <app>Balsa</app> should use as a prefix when
+        quoting a message. Note: When you send a message with 
+        <gui>format=flowed</gui>, <app>Balsa</app> is required to use
+        the one-character string "&gt;".</p>
+      </item>
+      <item>
+        <title>
+          <gui>Automatically quote original when replying</gui>
+        </title>
+        <p>Have <app>Balsa</app> include the text of a message in the
+        reply. The text will be prefixed as shown above.</p>
+        <p>You can instead include the original message using an
+        option on the `Edit' menu, or by dragging the message from
+        the message index into the text area of the reply. If you
+        prefer to include text this way, do not select the
+        `Automatically quote...' option.</p>
+      </item>
+      <item>
+        <title>
+          <gui>Don't include HTML parts as text when replying or
+          forwarding mail</gui>
+        </title>
+        <p>Tell <app>Balsa</app> to be sensible.</p>
+      </item>
+      <item>
+        <title>
+          <gui>Forward a mail as attachment instead of quoting
+          it</gui>
+        </title>
+        <p>If this option is selected, messages that are
+        `Automatically quoted' will actually be attached
+        unmodified, instead of included in the text of the reply,
+        prefixed by the reply string.</p>
+        <p>You can also attach any message to a new message by
+        dragging it from the message index into the attachment area
+        of the new message (or, in fact, any part of the new
+        message window except the text area or the address
+        lines).</p>
+      </item>
+      <item>
+        <title>
+          <gui>Send button always queues outgoing mail in
+          outbox</gui>
+        </title>
+        <p>This option gives you control over when <app>Balsa</app>
+        connects to a server to send messages.</p>
+      </item>
+      <item>
+        <title>
+          <gui>Copy outgoing messages to sentbox</gui>
+        </title>
+        <p>Have <app>Balsa</app> save a copy of each message you send in
+        the mailbox marked as the `Sentbox'.</p>
+      </item>
+      <item>
+        <title>
+          <gui>Encoding</gui>
+        </title>
+        <p>Set the character encoding method to either 7 bit, 8
+        bit, or what the quoted message is using.</p>
+      </item>
+    </terms>
+  </section>
+</page>

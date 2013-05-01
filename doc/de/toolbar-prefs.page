@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE page [
+<!ENTITY % balsa SYSTEM "balsa.entities">
+<!ENTITY mdash "--">
+<!-- replace with actual app  version number--><!ENTITY version "2.5">
+<!ENTITY Balsa '<app xmlns="http://projectmallard.org/1.0/">Balsa</app>'>
+<!ENTITY Mutt '<app xmlns="http://projectmallard.org/1.0/">Mutt</app>'>
+<!ENTITY GnomeCard '<app xmlns="http://projectmallard.org/1.0/">GnomeCard</app>'>
+<!ENTITY Pine '<app xmlns="http://projectmallard.org/1.0/">pine</app>'>
+<!ENTITY procmail '<app xmlns="http://projectmallard.org/1.0/">procmail</app>'>
+<!ENTITY GnuPG '<app xmlns="http://projectmallard.org/1.0/">GnuPG</app>'>
+<!ENTITY balsalist "http://mail.gnome.org/mailman/listinfo/balsa-list">
+<!ENTITY IMAP '<link xmlns="http://projectmallard.org/1.0/"
+           xref ="glossary#imap">IMAP</link>'>
+<!ENTITY LDAP '<link xmlns="http://projectmallard.org/1.0/"
+           xref ="glossary#ldap">LDAP</link>'>
+<!ENTITY POP3 '<link xmlns="http://projectmallard.org/1.0/"
+           xref ="glossary#pop">POP3</link>'>
+<!ENTITY SMTP '<link xmlns="http://projectmallard.org/1.0/"
+           xref ="glossary#smtp">SMTP</link>'>
+<!ENTITY VCARD '<link xmlns="http://projectmallard.org/1.0/"
+           xref ="glossary#vcard">VCARD</link>'>
+]>
+<page xmlns="http://projectmallard.org/1.0/" type="topic" id="toolbar-prefs" xml:lang="de">
+  <info>
+    <link type="guide" xref="index"/>
+  </info>
+  <title> Anpassen der Werkzeugleisten</title>
+  <p><app>Balsa</app> allows you to change the layout of the toolbars on
+  the three main types of window: the
+  <link xref="win-main">main window</link>,
+  <link xref="win-message">message windows</link>, and
+  <link xref="win-composer">compose windows</link>. You open the
+  dialog with the
+  <guiseq>
+    <gui>Settings</gui>
+    <gui>Toolbars...</gui>
+  </guiseq> menu item.</p>
+  <p>The dialog contains a notebook with a page for each type of
+  window. On each page, you'll see a Preview of the toolbar, which
+  changes as you change the layout. The list of
+  <gui>Available buttons</gui> shows buttons that may be used on the
+  toolbar, but aren't currently used, and the
+  <gui>Current toolbar</gui> list shows the current layout,
+  including both buttons and separators. You can add buttons to the
+  current toolbar, remove them, or move them up or down in the
+  list, using the controls in the central button box.</p>
+  <p>Below the notebook is a checkbox for wrapping the button
+  labels (the text that may accompany the buttons). This option
+  applies to the toolbars on all three types of window. If you
+  choose wrapping, long labels will be shown on two lines.</p>
+  <p>This is an "instant apply" dialog: the changes you make take
+  effect immediately, as shown in the Preview toolbar. Below the
+  Preview toolbar you'll find a button that restores the standard
+  layout for that toolbar.</p>
+  <note>
+    <p>Note that the standard layout is the one that you see before
+    the toolbar has been customized. If you use this option, all
+    current <em>and past</em> changes will be undone.</p>
+  </note>
+  <p>A second button below the Preview toolbar pops up a menu that
+  gives you control over what is shown in the toolbar: icons, text,
+  or both. The popup (right click) menu for any actual toolbar
+  offers the same choices, as well as the option to open up this
+  dialog ("Customize Toolbars...").</p>
+</page>

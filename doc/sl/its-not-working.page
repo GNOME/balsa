@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE page [
+<!ENTITY % balsa SYSTEM "balsa.entities">
+<!ENTITY mdash "--">
+<!-- replace with actual app  version number--><!ENTITY version "2.5">
+<!ENTITY Balsa '<app xmlns="http://projectmallard.org/1.0/">Balsa</app>'>
+<!ENTITY Mutt '<app xmlns="http://projectmallard.org/1.0/">Mutt</app>'>
+<!ENTITY GnomeCard '<app xmlns="http://projectmallard.org/1.0/">GnomeCard</app>'>
+<!ENTITY Pine '<app xmlns="http://projectmallard.org/1.0/">pine</app>'>
+<!ENTITY procmail '<app xmlns="http://projectmallard.org/1.0/">procmail</app>'>
+<!ENTITY GnuPG '<app xmlns="http://projectmallard.org/1.0/">GnuPG</app>'>
+<!ENTITY balsalist "http://mail.gnome.org/mailman/listinfo/balsa-list">
+<!ENTITY IMAP '<link xmlns="http://projectmallard.org/1.0/"
+           xref ="glossary#imap">IMAP</link>'>
+<!ENTITY LDAP '<link xmlns="http://projectmallard.org/1.0/"
+           xref ="glossary#ldap">LDAP</link>'>
+<!ENTITY POP3 '<link xmlns="http://projectmallard.org/1.0/"
+           xref ="glossary#pop">POP3</link>'>
+<!ENTITY SMTP '<link xmlns="http://projectmallard.org/1.0/"
+           xref ="glossary#smtp">SMTP</link>'>
+<!ENTITY VCARD '<link xmlns="http://projectmallard.org/1.0/"
+           xref ="glossary#vcard">VCARD</link>'>
+]>
+<page xmlns="http://projectmallard.org/1.0/" type="topic" id="its-not-working" xml:lang="sl">
+  <info>
+    <link type="guide" xref="index"/>
+  </info>
+  <title>Ne deluje !!!</title>
+  <p>This is a FAQ for when <app>Balsa</app> appears to lock up, or
+  other things that you think should be happening aren't. If you
+  can't figure out how to do something but <app>Balsa</app> lets you do
+  it, that's a bug. Report it.</p>
+  <list>
+    <item>
+      <p>
+        <link xref="its-not-working#main-to-imap">i
+        I want one of the main
+        folders to be IMAP</link>
+      </p>
+    </item>
+    <item>
+      <p>
+        <link xref="its-not-working#frozen">
+        <app>Balsa</app>'s frozen!</link>
+      </p>
+    </item>
+    <item>
+      <p>
+        <link xref="its-not-working#spooky-win">
+        What's that window that flashed
+        on the screen?</link>
+      </p>
+    </item>
+    <item>
+      <p>
+        <link xref="its-not-working#address-book">
+        The address book doesn't
+        import my addresses.</link>
+      </p>
+    </item>
+  </list>
+  <section id="main-to-imap">
+    <title>Želim, da osnovni poštni predal uporablja IMAP </title>
+    <p>See
+    <link xref="common-tasks#ct-main-folder-imap">this section</link>.</p>
+  </section>
+  <section id="frozen">
+    <title><app>Balsa</app>'s frozen!</title>
+    <p>Verjetno ni. Pazite na:</p>
+    <list>
+      <item>
+        <p>If you don't have threading, <app>Balsa</app> will stop
+        responding when it sends and receives email. Use threading,
+        if possible.</p>
+      </item>
+      <item>
+        <p><app>Balsa</app> is downloading a new message or closing a
+        large mailbox. This could take a while, especially when
+        this file is accessed via NFS.</p>
+      </item>
+      <item>
+        <p>Pogovorno okno je prikazano, vendar ga zakriva drugo okno. To se dogaja pod Sawfish. Poskusite premakniti okna naokoli in poglejte ali je morda nekje skrito pogovorno okno.</p>
+      </item>
+    </list>
+  </section>
+  <section id="spooky-win">
+    <title>Kaj je okno, ki se bliska na zaslonu?</title>
+    <p>Were you checking your mail? Probably. This is the window
+    that displays progress for retrieving <link xref="glossary#pop">POP3</link> mail. If you
+    don't have any <link xref="glossary#pop">POP3</link> accounts, it will still appear -- but
+    it'll disappear almost instantly. You can disable displaying
+    this window in preferences.</p>
+  </section>
+  <section id="address-book">
+    <title>Imenika ne uvaža mojih naslovov.</title>
+    <p><app>Balsa</app> attempts to open the file
+    <file>~/.gnome/GnomeCard.gcrd</file>. If you're not using this
+    file, you may need to create a symlink so that <app>Balsa</app> can
+    open it.</p>
+    <p>There have been slight changes in <app>GnomeCard</app>'s file
+    format between its various versions. <app>Balsa</app> is known to
+    work with at least <app>GnomeCard</app> version 1.0.10 and probably
+    most other releases.</p>
+  </section>
+</page>

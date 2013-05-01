@@ -1,0 +1,890 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE page [
+<!ENTITY % balsa SYSTEM "balsa.entities">
+<!ENTITY mdash "--">
+<!-- replace with actual app  version number--><!ENTITY version "2.5">
+<!ENTITY Balsa '<app xmlns="http://projectmallard.org/1.0/">Balsa</app>'>
+<!ENTITY Mutt '<app xmlns="http://projectmallard.org/1.0/">Mutt</app>'>
+<!ENTITY GnomeCard '<app xmlns="http://projectmallard.org/1.0/">GnomeCard</app>'>
+<!ENTITY Pine '<app xmlns="http://projectmallard.org/1.0/">pine</app>'>
+<!ENTITY procmail '<app xmlns="http://projectmallard.org/1.0/">procmail</app>'>
+<!ENTITY GnuPG '<app xmlns="http://projectmallard.org/1.0/">GnuPG</app>'>
+<!ENTITY balsalist "http://mail.gnome.org/mailman/listinfo/balsa-list">
+<!ENTITY IMAP '<link xmlns="http://projectmallard.org/1.0/"
+           xref ="glossary#imap">IMAP</link>'>
+<!ENTITY LDAP '<link xmlns="http://projectmallard.org/1.0/"
+           xref ="glossary#ldap">LDAP</link>'>
+<!ENTITY POP3 '<link xmlns="http://projectmallard.org/1.0/"
+           xref ="glossary#pop">POP3</link>'>
+<!ENTITY SMTP '<link xmlns="http://projectmallard.org/1.0/"
+           xref ="glossary#smtp">SMTP</link>'>
+<!ENTITY VCARD '<link xmlns="http://projectmallard.org/1.0/"
+           xref ="glossary#vcard">VCARD</link>'>
+]>
+<page xmlns="http://projectmallard.org/1.0/" type="topic" id="win-main" xml:lang="de">
+  <info>
+    <link type="guide" xref="index"/>
+  </info>
+  <title>Das Hauptfenster</title>
+  <figure>
+    <media type="image" src="figures/main-window.png"/>
+    <title>Hauptfenster</title>
+  </figure>
+  <p> <app>Balsa</app> 's main window has three major areas. To the left
+  is the
+  <link xref="win-main#subwin-mblist"> mailbox list</link> . This displays all
+  the mailboxes <app>Balsa</app> knows about; it will scan for ones in
+  your local mail directory. (This means <app>Balsa</app> works well
+  with <app>procmail</app> .) It will also list <link xref="glossary#imap">IMAP</link> mailboxes that
+  you have configured. If the
+  <gui> Show Mailbox Info</gui> preference is set, two columns will
+  also be displayed next to the mailbox names containing the number
+  of unread and total messages in each mailbox that has unread
+  messages; otherwise, the number of unread messages is shown in
+  parentheses after the mailbox name. Also, any mailboxes that
+  contain unread messages will be shown in a bold font.</p>
+  <p> At the top-right is a view of the currently open mailbox,
+  called the
+  <link xref="win-main#subwin-msgindex"> message index</link> . You can browse
+  messages and manipulate them here.</p>
+  <p> At the bottom-right of <app>Balsa</app> 's main window is the
+  <link xref="win-main#subwin-msgview"> message view</link> . This displays
+  the message selected in the message index. You can save
+  attachments, view attachments, and read incoming email here.</p>
+  <section id="menu-toolbar">
+    <title>Menüs und Werkzeugleisten</title>
+    <figure>
+      <media type="image" src="figures/main-window-toolbar.png"/>
+      <title>Werkzeugleiste des Hauptfensters</title>
+    </figure>
+    <p>Die Menüleiste am oberen Rand des <interface>Hauptfensters</interface> stellt die folgenden Befehle bereit:</p>
+    <terms>
+      <item>
+        <title>
+          <guiseq>
+            <gui> File</gui>
+          </guiseq>
+        </title>
+        <p>Dieses Menü enthält grundlegende Befehle.</p>
+        <terms>
+          <item>
+            <title>
+              <guiseq>
+                <gui> File</gui>
+                <gui> New</gui>
+              </guiseq>
+            </title>
+            <list>
+              <item>
+                <p>
+                <guiseq>
+                  <gui> File</gui>
+                  <gui> New</gui>
+                  <gui> Message...</gui>
+                </guiseq>
+                <key>M</key> -- Create a new message, and
+                display a new window to type the message in.</p>
+              </item>
+              <item>
+                <p>
+                <guiseq>
+                  <gui> File</gui>
+                  <gui> New</gui>
+                  <gui> Mailbox...</gui>
+                </guiseq> -- Open a dialog box to create a new
+                mailbox. There are various items like this,
+                corresponding to the different types of mailbox
+                that <app>Balsa</app> supports. See the
+                <link xref="mbox-formats"> discussion of different
+                mailbox formats</link> and their advantages and
+                disadvantages.</p>
+              </item>
+              <item>
+                <p>
+                <guiseq>
+                  <gui> File</gui>
+                  <gui> New</gui>
+                  <gui> Remote IMAP folder...</gui>
+                </guiseq> -- Open a dialog box to create a
+                folder for an account on an IMAP server. This
+                <link xref="folder-config"> IMAP folder
+                properties</link> dialog can also be used to change
+                the details of the account.</p>
+              </item>
+              <item>
+                <p>
+                <guiseq>
+                  <gui> File</gui>
+                  <gui> New</gui>
+                  <gui> Remote IMAP subfolder...</gui>
+                </guiseq> -- Open a dialog box to create a new
+                subfolder in an existing IMAP folder tree. This
+                <link xref="subfolder-config"> IMAP subfolder
+                properties</link> dialog can also be used to rename
+                or move a subfolder.</p>
+              </item>
+            </list>
+          </item>
+          <item>
+            <p>
+            <guiseq>
+              <gui> File</gui>
+              <gui> Continue</gui>
+            </guiseq>
+            <key>C</key> -- Continue a postponed message.</p>
+          </item>
+          <item>
+            <p>
+            <guiseq>
+              <gui> File</gui>
+              <gui> Get New Mail</gui>
+            </guiseq>
+            <keyseq><key>Ctrl</key><key>M</key></keyseq> -- 
+            This causes <app>Balsa</app> to
+            attempt to retrieve any new messages from the
+            <link xref="glossary#pop">POP3</link> server.</p>
+          </item>
+          <item>
+            <p>
+            <guiseq>
+              <gui> File</gui>
+              <gui> Send Queued Mail</gui>
+            </guiseq>
+            <keyseq><key>Ctrl</key><key>T</key></keyseq> --
+            Send all mail waiting in the
+            Outbox mailbox to the mail server now.</p>
+          </item>
+          <item>
+            <p>
+            <guiseq>
+              <gui> File</gui>
+              <gui> Send and Receive Mail</gui>
+            </guiseq>
+            <keyseq><key>Ctrl</key><key>B</key></keyseq> --
+            Send all mail waiting in the
+            Outbox mailbox to the mail server now and retrieve any
+            new messages.</p>
+          </item>
+          <item>
+            <p>
+            <guiseq>
+              <gui> File</gui>
+              <gui> Page Setup</gui>
+            </guiseq> -- Set print options such as paper size
+            and print orientation.</p>
+          </item>
+          <item>
+            <p>
+            <guiseq>
+              <gui> File</gui>
+              <gui> Print</gui>
+            </guiseq> -- Print the currently selected message
+            (displayed in the message view pane.)</p>
+          </item>
+          <item>
+            <p>
+            <guiseq>
+              <gui> File</gui>
+              <gui> Address Book</gui>
+            </guiseq>
+            <key>B</key> -- Open <app>Balsa</app> 's address
+            book.</p>
+          </item>
+          <item>
+            <p>
+            <guiseq>
+              <gui> File</gui>
+              <gui> Quit</gui>
+            </guiseq>
+            <keyseq><key>Ctrl</key><key>Q</key></keyseq> --
+            Exit the program.</p>
+          </item>
+        </terms>
+      </item>
+      <item>
+        <title>
+          <gui> Edit</gui>
+        </title>
+        <list>
+          <item>
+            <p>
+            <guiseq>
+              <gui> Edit</gui>
+              <gui> Copy</gui>
+            </guiseq>
+            <keyseq><key>Ctrl&gt;</key><key>C</key></keyseq> --
+            Copy selected text to the clipboard.</p>
+          </item>
+          <item>
+            <p>
+            <guiseq>
+              <gui> Edit</gui>
+              <gui> Select All</gui>
+            </guiseq>
+            <keyseq><key>Ctrl</key><key>A</key></keyseq> --
+            Select all text in the currently
+            displayed message.</p>
+          </item>
+          <item>
+            <p>
+            <guiseq>
+              <gui> Edit</gui>
+              <gui> Select Thread</gui>
+            </guiseq> -- Select all messages in the same thread
+            as the currently displayed message.</p>
+          </item>
+          <item>
+            <p>
+            <guiseq>
+              <gui> Edit</gui>
+              <gui> Find</gui>
+            </guiseq> 
+            <keyseq><key>Ctrl</key><key>F</key></keyseq> --
+            Find messages in the current mailbox
+            that match a given set of conditions, using the
+            <link xref="win-search"> search mailbox
+            window</link> .</p>
+          </item>
+          <item>
+            <p>
+            <guiseq>
+              <gui> Edit</gui>
+              <gui> Find Next</gui>
+            </guiseq>
+            <keyseq><key>Ctrl</key><key>G</key></keyseq> --
+            Find the next matching message.</p>
+          </item>
+          <item>
+            <p>
+            <guiseq>
+              <gui> Edit</gui>
+              <gui> Find in Message</gui>
+            </guiseq> <key>/</key>--
+            Selecting this option opens a "search
+            bar" at the foot of the message preview, in which you
+            can type text for which <app>Balsa</app> will search in the
+            current message.</p>
+          </item>
+          <item>
+            <p>
+            <guiseq>
+              <gui> Edit</gui>
+              <gui> Filters</gui>
+            </guiseq> -- Open up the
+            <link xref="win-filters"> filters window</link> .</p>
+          </item>
+          <item>
+            <p>
+            <guiseq>
+              <gui> Edit</gui>
+              <gui> Export filters</gui>
+            </guiseq> -- Open up a window for exporting filters
+            in the Sieve format.</p>
+          </item>
+          <item>
+            <p>
+            <guiseq>
+              <gui> Edit</gui>
+              <gui> Preferences...</gui>
+            </guiseq> -- Open the
+            <link xref="preferences"> Preferences</link> window to
+            change the settings of <app>Balsa</app> .</p>
+          </item>
+        </list>
+      </item>
+      <item>
+        <title>
+          <gui> View</gui>
+        </title>
+        <p>Menü zum Anpassen der Nachrichtenansicht.</p>
+        <list>
+          <item>
+            <p>
+            <guiseq>
+              <gui> View</gui>
+              <gui> Show Mailbox Tree</gui>
+            </guiseq> <key>F9</key> --
+            Toggle the display of the mailbox tree
+            in the main window.</p>
+          </item>
+          <item>
+            <p>
+            <guiseq>
+              <gui> View</gui>
+              <gui> Show Mailbox Tabs</gui>
+            </guiseq> -- Toggle the display of tabs for all
+            open mailboxes.</p>
+          </item>
+          <item>
+            <p>
+            <guiseq>
+              <gui> View</gui>
+              <gui> Wrap</gui>
+            </guiseq> -- Toggle the display of messages using
+            word wrap. The column to which the message is wrapped
+            is set in the
+            <link xref="preferences"> Preferences</link> window.</p>
+          </item>
+          <item>
+            <p>
+            <guiseq>
+              <gui> View</gui>
+              <gui> No Headers</gui>
+            </guiseq> ,
+            <guiseq>
+              <gui> Selected Headers</gui>
+            </guiseq> ,
+            <guiseq>
+              <gui> All Headers</gui>
+            </guiseq> -- Select the headers to display in the
+            message pane.</p>
+          </item>
+          <item>
+            <p>
+            <guiseq>
+              <gui> View</gui>
+              <gui> Flat index</gui>
+            </guiseq> ,
+            <guiseq>
+              <gui> Simple threading</gui>
+            </guiseq> ,
+            <guiseq>
+              <gui> JWZ threading</gui>
+            </guiseq> -- Select the type of threading used to
+            display the messages in the message index.</p>
+          </item>
+          <item>
+            <p>
+            <guiseq>
+              <gui> View</gui>
+              <gui> Expand All</gui>
+            </guiseq>
+            <keyseq><key>Ctrl</key><key>E</key></keyseq> --
+            <guiseq>
+              <gui> View</gui>
+              <gui> Collapse All</gui>
+            </guiseq>
+             <keyseq><key>Ctrl</key><key>L</key></keyseq> --
+             Expand or collapse all
+             threads in the currently displayed mailbox.</p>
+          </item>
+          <item>
+            <p>
+            <guiseq>
+              <gui> View</gui>
+              <gui> Zoom In</gui>
+            </guiseq>
+            <keyseq><key>Ctrl</key><key>+</key></keyseq>,
+            <guiseq>
+              <gui> Zoom Out</gui>
+            </guiseq>
+            <keyseq><key>Ctrl</key><key>-</key></keyseq>,
+            <guiseq>
+              <gui> Zoom 100%</gui>
+            </guiseq> -- Alter the font size of HTML messages.
+            Plain text messages will always use the font specified
+            in the
+            <link xref="preferences"> Preferences</link> window.</p>
+          </item>
+        </list>
+      </item>
+      <item>
+        <title>
+          <gui> Mailbox</gui>
+        </title>
+        <p>Zum Bearbeiten von Postfächern.</p>
+        <list>
+          <item>
+            <p>
+            <guiseq>
+              <gui> Mailbox</gui>
+              <gui> Next</gui>
+            </guiseq> <key>N</key>--
+            Select the next message in the current
+            mailbox.</p>
+          </item>
+          <item>
+            <p>
+            <guiseq>
+              <gui> Mailbox</gui>
+              <gui> Previous</gui>
+            </guiseq> <key> P</key> --
+            Select the previous message in the
+            current mailbox.</p>
+          </item>
+          <item>
+            <p>
+            <guiseq>
+              <gui> Mailbox</gui>
+              <gui> Next Unread</gui>
+            </guiseq>
+            <keyseq><key>Ctrl</key><key>N</key></keyseq> --
+            Select the next unread message in the
+            current mailbox.</p>
+          </item>
+          <item>
+            <p>
+            <guiseq>
+              <gui> Mailbox</gui>
+              <gui> Next Flagged</gui>
+            </guiseq>
+            <keyseq><key>Ctrl</key><key>Alt</key><key>F</key></keyseq> --
+            Select the next flagged message in the
+            current mailbox.</p>
+          </item>
+          <item>
+            <p>
+            <guiseq>
+              <gui> Mailbox</gui>
+              <gui> Hide messages</gui>
+            </guiseq> -- A submenu listing all the types of
+            messages that may be hidden and unhidden in the current
+            mailbox. Types in the submenu are toggled when
+            selected. A Checkmark indicates it is currently
+            hidden.</p>
+          </item>
+          <item>
+            <p>
+            <guiseq>
+              <gui> Mailbox</gui>
+              <gui> Reset Filter</gui>
+            </guiseq> -- Resets to the mailbox filter.</p>
+          </item>
+          <item>
+            <p>
+            <guiseq>
+              <gui> Mailbox</gui>
+              <gui> Select All</gui>
+            </guiseq> -- Selects all messages in the current
+            mailbox.</p>
+          </item>
+          <item>
+            <p>
+            <guiseq>
+              <gui> Mailbox</gui>
+              <gui> Edit...</gui>
+            </guiseq> -- Edit mailbox properties.</p>
+          </item>
+          <item>
+            <p>
+            <guiseq>
+              <gui> Mailbox</gui>
+              <gui> Delete...</gui>
+            </guiseq> -- Delete the currently selected
+            mailbox.</p>
+          </item>
+          <item>
+            <p>
+            <guiseq>
+              <gui> Mailbox</gui>
+              <gui> Expunge Deleted Messages</gui>
+            </guiseq> -- Physically remove from the backing
+            mailstore all messages marked as deleted.</p>
+          </item>
+          <item>
+            <p>
+            <guiseq>
+              <gui> Mailbox</gui>
+              <gui> Close</gui>
+            </guiseq> -- Close the currently selected
+            mailbox.</p>
+          </item>
+          <item>
+            <p>
+            <guiseq>
+              <gui> Mailbox</gui>
+              <gui> Empty Trash</gui>
+            </guiseq> -- Delete all messages from the
+            <code> Trash</code> mailbox.</p>
+          </item>
+          <item>
+            <p>
+            <guiseq>
+              <gui> Mailbox</gui>
+              <gui> Select Filters</gui>
+            </guiseq> -- Pop up a dialog that allows you to
+            control which filters are applied to this mailbox, and
+            optionally to apply them.</p>
+          </item>
+          <item>
+            <p>
+            <guiseq>
+              <gui> Mailbox</gui>
+              <gui> Remove Duplicates</gui>
+            </guiseq> -- Remove duplicate messages; <app>Balsa</app>
+            locates all messages in the current mailbox that have
+            the same Message-ID header, and removes all but
+            one.</p>
+          </item>
+        </list>
+      </item>
+      <item id="subwin-messagemenu">
+        <title>
+          <gui> Message</gui>
+        </title>
+        <p>Dieses Menü verfügt über Befehle zum Bearbeiten von Nachrichten.</p>
+        <list>
+          <item>
+            <p>
+            <guiseq>
+              <key> R</key>
+              <gui> Message</gui>
+              <gui> Reply...</gui>
+            </guiseq> <key>R</key> -- Reply to the currently selected
+            message(s).</p>
+          </item>
+          <item>
+            <p>
+            <guiseq>
+              <key> A</key>
+              <gui> Message</gui>
+              <gui> Reply to All...</gui>
+            </guiseq> <key>A</key> -- Reply to the currently selected
+            message(s), sending the reply to all senders and
+            recipients of the message.</p>
+          </item>
+          <item>
+            <p>
+            <guiseq>
+              <key> G</key>
+              <gui> Message</gui>
+              <gui> Reply to Group...</gui>
+            </guiseq> <key>G</key> -- Reply to a mailing list, instead of
+            the sender to that list.</p>
+          </item>
+          <item>
+            <p>
+            <guiseq>
+              <key> F</key>
+              <gui> Message</gui>
+              <gui> Forward attached...</gui>
+            </guiseq> -- Forward the currently selected
+            message(s) as an attachment.</p>
+          </item>
+          <item>
+            <p>
+            <guiseq>
+              <gui> Message</gui>
+              <gui> Forward inline...</gui>
+            </guiseq> -- Forward the currently selected
+            message(s), quoted inline.</p>
+          </item>
+          <item>
+            <p>
+            <guiseq>
+              <gui> Message</gui>
+              <gui> Next Part</gui>
+            </guiseq>
+            <keyseq><key>Ctrl</key><key>.</key></keyseq>--
+            View the next part of the message (if
+            the message is multi-part).</p>
+          </item>
+          <item>
+            <p>
+            <guiseq>
+              <shortcut>
+                <keycombo>
+                  <sys> Ctrl</sys>
+                  <sys> ,</sys>
+                </keycombo>
+              </shortcut>
+              <gui> Message</gui>
+              <gui> Previous Part</gui>
+            </guiseq>
+            <keyseq><key>Ctrl</key><key>,</key></keyseq> --
+            View the previous part of the
+            message.</p>
+          </item>
+          <item>
+            <p>
+            <guiseq>
+              <gui> Message</gui>
+              <gui> Save Current Part...</gui>
+            </guiseq>
+            <keyseq><key>Ctrl</key><key>S</key></keyseq>--
+            Save the currently selected part of
+            the message to a file.</p>
+          </item>
+          <item>
+            <p>
+            <guiseq>
+              <shortcut>
+                <keycombo>
+                  <sys> Ctrl</sys>
+                  <sys> U</sys>
+                </keycombo>
+              </shortcut>
+              <gui> Message</gui>
+              <gui> View Source...</gui>
+            </guiseq>
+            <keyseq><key>Ctrl</key><key>U</key></keyseq> --
+            Opens a new window that displays the
+            raw message as received from the
+            <link xref="glossary#mta">MTA</link> .</p>
+          </item>
+          <item>
+            <p>
+            <guiseq>
+              <gui> Message</gui>
+              <gui> Copy</gui>
+            </guiseq>
+            <keyseq><key>Ctrl</key><key>C</key></keyseq> --
+            Copies to the clipboard any text
+            selected in the message view of the current
+            message.</p>
+          </item>
+          <item>
+            <p>
+            <guiseq>
+              <gui> Message</gui>
+              <gui> Select Text</gui>
+            </guiseq> -- Selects the entire text of the current
+            message in the message view.</p>
+          </item>
+          <item>
+            <p>
+            <guiseq>
+              <gui> Message</gui>
+              <gui> Move to Trash</gui>
+            </guiseq> <key>D</key> -- Moves the currently selected
+            message(s) to the Trash.</p>
+          </item>
+          <item>
+            <p>
+              <guiseq>
+                <gui> Message</gui>
+                <gui> Toggle flag</gui>
+              </guiseq>
+            </p>
+            <list>
+              <item>
+                <p>
+                <guiseq>
+                  <gui> Message</gui>
+                  <gui> Toggle flag</gui>
+                  <gui> Flagged</gui>
+                </guiseq> <key>X</key> --
+                Toggle the flag on the currently
+                selected message(s). This is shown as an
+                exclamation mark next in the message index.</p>
+              </item>
+              <item>
+                <p>
+                <guiseq>
+                  <shortcut>
+                    <keycombo>
+                      <sys> Ctrl</sys>
+                      <sys> D</sys>
+                    </keycombo>
+                  </shortcut>
+                  <gui> Message</gui>
+                  <gui> Toggle flag</gui>
+                  <gui> Deleted</gui>
+                </guiseq>
+                <keyseq><key>Ctrl</key><key>D</key></keyseq> --
+                Marks the message as set for
+                deletion. The message will be actually removed from
+                the backing mailstore when it is "expunged" either
+                manually, or as specified in the
+                <link xref="preferences">Preferences</link>.</p>
+              </item>
+              <item>
+                <p>
+                <guiseq>
+                  <shortcut>
+                    <keycombo>
+                      <sys> Ctrl</sys>
+                      <sys> R</sys>
+                    </keycombo>
+                  </shortcut>
+                  <gui> Message</gui>
+                  <gui> Toggle flag</gui>
+                  <gui> New</gui>
+                </guiseq>
+                <keyseq><key>Ctrl</key><key>R</key></keyseq> --
+                Marks a message that has been read
+                as new, and vice-versa. The message will display
+                the standard icon and font for a new message.</p>
+              </item>
+              <item>
+                <p>
+                <guiseq>
+                  <gui> Message</gui>
+                  <gui> Toggle flag</gui>
+                  <gui> Answered</gui>
+                </guiseq> -- Toggles the reply icon for a
+                message.</p>
+              </item>
+            </list>
+          </item>
+          <item>
+            <p>
+            <guiseq>
+              <key> S</key>
+              <gui> Message</gui>
+              <gui> Store Address...</gui>
+            </guiseq> <key>S</key>-- Add the sender of the currently
+            selected message to your address book.</p>
+          </item>
+        </list>
+      </item>
+      <item>
+        <title>
+          <gui> Settings</gui>
+        </title>
+        <p> Menu for changing <app>Balsa</app> 's configuration.</p>
+        <list>
+          <item>
+            <p>
+            <guiseq>
+              <gui> Settings</gui>
+              <gui> Toolbars...</gui>
+            </guiseq> -- Open the
+            <link xref="toolbar-prefs"> Toolbars</link> window to
+            modify the content and arrangement of the toolbars in
+            <app>Balsa</app> .</p>
+          </item>
+          <item>
+            <p>
+            <guiseq>
+              <gui> Settings</gui>
+              <gui> Identities...</gui>
+            </guiseq> -- Open the
+            <link xref="identities"> Identities</link> window to
+            customize how you present yourself to the rest of the
+            world.</p>
+          </item>
+        </list>
+      </item>
+      <item>
+        <title>
+          <gui>Help</gui>
+        </title>
+        <p>Menu for getting this help, and information about <app>Balsa</app>.</p>
+        <list>
+          <item>
+            <p>
+            <guiseq>
+              <gui>Help</gui>
+              <gui>Contents</gui>
+            </guiseq> <key>F1</key> -- Show this help file.</p>
+          </item>
+          <item>
+            <p>
+            <guiseq>
+              <gui>Help</gui>
+              <gui>About</gui>
+            </guiseq> -- Show information about <app>Balsa</app>.</p>
+          </item>
+        </list>
+      </item>
+    </terms>
+  </section>
+  <section id="subwin-mblist">
+    <title>Die Postfachliste</title>
+    <p> The mailbox list in the main window lists all of your
+    mailboxes. <app>Balsa</app> will automatically detect your local
+    mailboxes by searching for mailboxes under your local mail
+    directory (probably ~/mail). This lets <app>Balsa</app> coexist with
+    <app>pine</app> and <app>procmail</app> without causing problems.</p>
+    <p> Your mailboxes will be displayed as a tree view, with
+    mailboxes in subdirectories of your local mail directory
+    initially hidden but accessible by expanding the tree.
+    <link xref="glossary#imap">IMAP</link> mailboxes will also be displayed as being at the top
+    level of the tree. <link xref="glossary#pop">POP3</link> mailboxes are not displayed.</p>
+  </section>
+  <section id="subwin-msgindex">
+    <title>Der Nachrichtenindex</title>
+    <p>Der Nachrichtenindex zeigt die Nachrichten im aktuellen Ordner an. Sie können wählen, welche Nachricht angezeigt werden soll. Klicken Sie wie dargestellt auf die einzelnen Reiter der Reitermappe oder klicken Sie auf einen Ordner in der Postfachliste, um ihn in den Vordergrund zu bringen.</p>
+    <p> From the message index you can do a lot. Clicking on a
+    message will cause it to be displayed in the message view.
+    Right-clicking on it will give a pop-up menu letting you reply
+    to the message (or forward it, etc.) and move it to another
+    folder (using the
+    <gui> Move to</gui> menu item). Double-clicking on a message, or
+    pressing either the space-bar or the
+    <sys> Enter</sys> key while the keyboard focus is in the index,
+    will open the message in a separate window. Also, it is
+    possible to drag and drop messages from the index to other
+    mailboxes in the mailbox list and open mailbox tabs.</p>
+    <p>Das Kontextmenü enthält die folgenden Einträge:</p>
+    <list>
+      <item>
+        <p>
+        <guiseq>
+          <gui> Reply</gui>
+        </guiseq> ,
+        <guiseq>
+          <gui> Reply To All</gui>
+        </guiseq> ,
+        <guiseq>
+          <gui> Reply To Group</gui>
+        </guiseq> ,
+        <guiseq>
+          <gui> Forward Attached</gui>
+        </guiseq> ,
+        <guiseq>
+          <gui> Forward Inline</gui>
+        </guiseq> ,
+        <guiseq>
+          <gui> Store Address</gui>
+        </guiseq> ,
+        <guiseq>
+          <gui> Delete</gui>
+        </guiseq> ,
+        <guiseq>
+          <gui> Undelete</gui>
+        </guiseq> ,
+        <guiseq>
+          <gui> Move To Trash</gui>
+        </guiseq> ,
+        <guiseq>
+          <gui> Toggle Flagged</gui>
+        </guiseq> ,
+        <guiseq>
+          <gui> Toggle Unread</gui>
+        </guiseq> ,
+        <guiseq>
+          <gui> Move to</gui>
+        </guiseq> ,
+        <guiseq>
+          <gui> View Source</gui>
+        </guiseq> -- These perform the same actions as their
+        counterparts in the
+        <link xref="win-main#subwin-messagemenu"> message menu</link> .</p>
+      </item>
+      <item>
+        <p>
+        <guiseq>
+          <gui> Move to</gui>
+        </guiseq> -- Moves the currently selected message(s) to
+        another mailbox. When this menu item is selected, a list of
+        available mailboxes is displayed, from which the
+        destination may be selected.</p>
+      </item>
+    </list>
+  </section>
+  <section id="subwin-msgview">
+    <title>Das Nachrichtenfenster</title>
+    <p>Dies zeigt die im Nachrichtenindex ausgewählte Nachricht angezeigt. Die Kopfzeilen werden oberhalb des Nachrichtentexts dargestellt, es sei denn, Sie haben dies deaktiviert. Der Nachrichtentext wird unterhalb der Kopfzeilen angezeigt.</p>
+    <p> If the message is multipart, an attachment icon will appear
+    beside the headers. Clicking this icon will display a list of
+    the parts from which you may select one. If <app>Balsa</app> is
+    unable to display it, you will be given a choice of
+    applications known to handle the part. Additionally, there is
+    always an option to save the attachment to a file.</p>
+    <note>
+      <p> <app>Balsa</app> supports viewing HTML messages only when
+      compiled with
+      <app> gtkhtml</app> or
+      <app> WebKit</app> support. Gtkhtml support will be compiled in
+      if gtkhtml-devel files are found. WebKit is currently
+      supported only on an experimental basis,</p>
+    </note>
+    <p> You are not restricted to that pane either. Double-clicking
+    on a message in the message index, or touching either the space
+    bar or the
+    <sys> Enter</sys> key, will open it in a
+    <link xref="win-message"> separate window</link> .</p>
+  </section>
+</page>

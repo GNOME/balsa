@@ -1,0 +1,173 @@
+<!DOCTYPE page
+[<!ENTITY % balsa SYSTEM "balsa.entities"> %balsa; ]>
+<page xmlns="http://projectmallard.org/1.0/" type="topic"
+id="folder-config">
+  <info>
+    <link type="guide" xref="index" />
+  </info>
+  <title>IMAP Folder Configuration</title>
+  <p>The folder configuration edit dialog allows you to configure
+  entire mailbox sets on remote IMAP servers. Entire configuration
+  is split into basic and advanced parts.</p>
+  <section>
+    <title>Basic IMAP folder configuration</title>
+    <p>The basic IMAP folder configuration tab is probably the only
+    part you need to fill in.</p>
+    <list>
+      <item>
+        <p>Descriptive name is the name of the root node that will
+        be shown in the mailbox tree on the left side.</p>
+      </item>
+      <item>
+        <p>Server is the host name or IP number of the IMAP
+        server.</p>
+      </item>
+      <item>
+        <p>User name is the name used for authorization on the IMAP
+        server.</p>
+      </item>
+      <item>
+        <p>Some servers allow anonymous access to bulletin boards
+        or mailing list archives. Check this box if you want to use
+        this mode - you will not be asked for password.</p>
+      </item>
+      <item>
+        <p>Password is the password used for authorization on the
+        IMAP server.</p>
+      </item>
+      <item>
+        <p>Check box allows you to choose all mailboxes on the
+        server, or only those you subscribed to.</p>
+      </item>
+      <item>
+        <p>Prefix is the root mailbox on the server. You may leave
+        it empty if you want to show all the folders on your server
+        but if your IMAP server stores also other kind of files you
+        may specify for instance "mail".</p>
+      </item>
+    </list>
+  </section>
+  <section>
+    <title>Advanced IMAP folder configuration</title>
+    <p>Sometimes, it is necessary to tune the folder configuration
+    in order to assure a secure connection, adjust to server limits
+    or just obtain better performance. This functionality is
+    provided by the Advanced IMAP folder configuration tab.</p>
+    <list>
+      <item>
+        <p>The
+        <gui>Use SSL</gui> check box should be active if the
+        connection is to be made to IMAPS service on port 993.
+        Connection to this port will be encrypted from the start.
+        Not all servers provide this service - many provide only
+        negotiated TLS encryption.</p>
+      </item>
+      <item>
+        <p>The
+        <gui>Use TLS</gui> option list determines instruct balsa how
+        to negotiate the TLS encryption. &Balsa; can never
+        attempt to negotiate it, can start TLS encryption whenever
+        it is supported by server, or can abort the connection if
+        TLS is inavailable or fails for some reason.</p>
+      </item>
+      <item>
+        <p>
+        <gui>Max. number of connections</gui> limits the number of
+        concurrent connections open to the IMAP server. A number
+        around 15-40 is a sane option as it avoids time-consuming
+        and load-creating reselections of imap mailboxes. Some IMAP
+        servers -- notably Courier -- limit the number of
+        connections open from single IP number to 4 by default. The
+        limit in balsa has to be in such a case adjusted
+        accordingly.</p>
+      </item>
+      <item>
+        <p>The
+        <gui>Enable persistent cache</gui> check box chooses whether
+        &Balsa; should try to store downloaded messages between
+        sessions or throw them away when it is closed. The optimal
+        choice depends on the local configuration. If the
+        connection to the IMAP server is slow and local storage in
+        the home directory fast and cheap, it is recommended to
+        enable persistent message cache. If the home directory is
+        slow (eg. NFS-mounted) and the connection to the imap
+        server - fast, persistent cache becomes just a burden and
+        should be disabled.</p>
+      </item>
+      <item>
+        <p>The
+        <gui>Use IDLE command</gui> check box chooses whether
+        &Balsa; should try to use IDLE command when available.
+        With this command, some servers notify immediately when a
+        new command arrives. Also, this command may reduce the
+        amount of network traffic. There are some downsides, too:
+        some firewalls do not track IMAP connections correctly and
+        will incorrectly interrupt a session in an IDLE state. In
+        particular, home-grade network routers with NAT translation
+        have notoriously this bug. In such case, it may be safer to
+        disable this command.</p>
+      </item>
+      <item>
+        <p>The
+        <gui>Enable bug workarounds</gui> check box makes
+        &Balsa; work even with an IMAP server that cannot
+        provide selected message parts. &Balsa; in such a case
+        will try to fetch entire messages instead.</p>
+      </item>
+      <item>
+        <p>The
+        <gui>Use STATUS for mailbox checking</gui> check box enables
+        a more thorough but potentially more expensive way of
+        checking mailboxes on IMAP server. This method can be
+        consume many resources on the server and should be used
+        <em>only</em> on IMAP servers that have optimized STATUS
+        command.</p>
+      </item>
+    </list>
+  </section>
+  <section id="subfolder-config">
+    <title>IMAP Subfolder Properties</title>
+    <p>The subfolder properties dialog allows you to manage folders
+    on remote IMAP servers. Specifically, you can
+    <em>create</em> a new subfolder,
+    <em>rename</em> an existing subfolder, or
+    <em>move</em> a subfolder within the folder tree.</p>
+    <list>
+      <item>
+        <p>
+        <gui>Folder name</gui> is how the folder is shown in the
+        mailbox tree on the left side.</p>
+      </item>
+      <item>
+        <p>
+        <gui>Subfolder of</gui> indicates the immediate parent of
+        the folder.</p>
+      </item>
+    </list>
+    <p>When the dialog is opened from
+    <guiseq>
+      <gui>File</gui>
+      <gui>New</gui>
+      <gui>Remote IMAP subfolder</gui>
+    </guiseq>, you can enter the folder name and browse IMAP trees
+    to find the parent folder. If you had already selected a
+    mailbox in an IMAP tree, only that tree is shown for browsing;
+    otherwise, all IMAP trees will be shown.</p>
+    <p>When the dialog is opened from
+    <guiseq>
+      <gui>Mailbox</gui>
+      <gui>Edit</gui>
+    </guiseq> with an IMAP folder selected, or by right-clicking on
+    an IMAP mailbox and selecting
+    <gui>Properties...</gui>, the mailbox may be:</p>
+    <list>
+      <item>
+        <p>Renamed, by editing the folder name;</p>
+      </item>
+      <item>
+        <p>Moved, by browsing for a different parent folder in the
+        same tree.</p>
+      </item>
+    </list>
+  </section>
+</page>

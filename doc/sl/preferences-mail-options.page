@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE page [
+<!ENTITY % balsa SYSTEM "balsa.entities">
+<!ENTITY mdash "--">
+<!-- replace with actual app  version number--><!ENTITY version "2.5">
+<!ENTITY Balsa '<app xmlns="http://projectmallard.org/1.0/">Balsa</app>'>
+<!ENTITY Mutt '<app xmlns="http://projectmallard.org/1.0/">Mutt</app>'>
+<!ENTITY GnomeCard '<app xmlns="http://projectmallard.org/1.0/">GnomeCard</app>'>
+<!ENTITY Pine '<app xmlns="http://projectmallard.org/1.0/">pine</app>'>
+<!ENTITY procmail '<app xmlns="http://projectmallard.org/1.0/">procmail</app>'>
+<!ENTITY GnuPG '<app xmlns="http://projectmallard.org/1.0/">GnuPG</app>'>
+<!ENTITY balsalist "http://mail.gnome.org/mailman/listinfo/balsa-list">
+<!ENTITY IMAP '<link xmlns="http://projectmallard.org/1.0/"
+           xref ="glossary#imap">IMAP</link>'>
+<!ENTITY LDAP '<link xmlns="http://projectmallard.org/1.0/"
+           xref ="glossary#ldap">LDAP</link>'>
+<!ENTITY POP3 '<link xmlns="http://projectmallard.org/1.0/"
+           xref ="glossary#pop">POP3</link>'>
+<!ENTITY SMTP '<link xmlns="http://projectmallard.org/1.0/"
+           xref ="glossary#smtp">SMTP</link>'>
+<!ENTITY VCARD '<link xmlns="http://projectmallard.org/1.0/"
+           xref ="glossary#vcard">VCARD</link>'>
+]>
+<page xmlns="http://projectmallard.org/1.0/" type="topic" id="preferences-mail-options" xml:lang="sl">
+  <info>
+    <link type="topic" xref="preferences"/>
+    <link type="guide" xref="preferences"/>
+  </info>
+  <title>Mail Server Preferences</title>
+  <p>Ta stran vam omogoča navedbo kako želite dobiti pošto POP3, pošiljati pošto, itn.</p>
+  <terms>
+    <item>
+      <title>
+        <gui>Remote Mailbox Servers</gui>
+      </title>
+      <p>These are <link xref="glossary#imap">IMAP</link> and <link xref="glossary#pop">POP3</link> servers that you
+      receive email from. The three buttons let you create, modify,
+      and remove records. <link xref="glossary#pop">POP3</link> mailboxes will not show up in
+      the mailbox list. You can specify multiple servers, when
+      adding a server you will be asked to give:</p>
+      <list>
+        <item>
+          <p>ime poštnega predala ki bo določilo poštni predal</p>
+        </item>
+        <item>
+          <p>Strežnik na katerem imate pošti predal POP.</p>
+        </item>
+        <item>
+          <p>Vrata, ki bodo uporabljena za povezovanje s strežnikom. Običajno je številka vrat 110, vendar jo lahko spremenite, če na primer uporabljate neko vrsto tuneliranja povezave,</p>
+        </item>
+        <item>
+          <p>Uporabniško ime na strežniku poštnega predala.</p>
+        </item>
+        <item>
+          <p>Ustrezno geslo.</p>
+        </item>
+        <item>
+          <p>Za odstranitev prejetih sporočil s strežnika lahko izberete gumb 'izbriši s strežnika'.</p>
+        </item>
+        <item>
+          <p>You can choose to have messages filtered through
+          <app>procmail</app> .</p>
+        </item>
+        <item>
+          <p>The
+          <app>procmail</app> command.</p>
+        </item>
+        <item>
+          <p>Ali naj bo preverjeno za novo pošto.</p>
+        </item>
+      </list>
+    </item>
+    <item>
+      <title>
+        <gui>Local Mail Directory</gui>
+      </title>
+      <p>This is the directory that <app>Balsa</app> will scan looking
+      for mail folders.</p>
+    </item>
+    <item>
+      <title id="smtp-server-config">
+        <gui>Outgoing Mail Servers</gui>
+      </title>
+      <p>Most users will need only one outgoing mail server, but
+      you may need to use more than one. <app>Balsa</app> allows you to
+      set up as many as you need. The server used for a particular
+      message is controlled by the
+      <link xref="identities">identity</link> you choose for the
+      message.</p>
+      <p>To view or change the details of a server, select it and
+      click
+      <gui>Modify</gui> . To create a new server, click
+      <gui>Add</gui> . A dialog will open, showing the properties of
+      the selected server. Specify the domain name and optionally
+      the port for of the SMTP server you use for submitting mail.
+      Please note that the default port number is 587. The syntax
+      is hostname[:port]. Port can be a decimal number or the name
+      of the service as specified in
+      <file>/etc/services</file> . Typically you can just set this
+      to "localhost:smtp". <app>Balsa</app> can also break up a large
+      message into fragments, which can be reassembled by
+      <app>Balsa</app> or any RFC 2046-compliant mailer. This dialog
+      allows you to set this option, and the size above which a
+      message should be split.</p>
+      <p>You will be asked to give:</p>
+      <list>
+        <item>
+          <p>Opisno ime, ki bo določilo strežnik</p>
+        </item>
+        <item>
+          <p>Vrata in ime domene</p>
+        </item>
+        <item>
+          <p>Uporabniško ime na strežniku SMTP. V primeru da oddaljen strežnik SMTP zahteva overitev, sem vnesite svoje uporabniško ime. Vedite da je natančna oblika odvisna od MTA v uporabi. Na primer, nekateri sistemi pričakujejo uporabniško ime, drugi morda zahtevajo e-poštni naslov.</p>
+        </item>
+        <item>
+          <p>Ustrezna šifrirna fraza. V primeru da oddaljeni strežnik SMTP zahteva overitev, sem vnesite svojo šifrirno frazo. Nekateri sistemi šifrirno frazo imenujejo geslo. Omejitve dolžine šifrirne fraze so odvisni od strežnika SMTP.</p>
+        </item>
+        <item>
+          <p>When you want <app>Balsa</app> to use TLS.</p>
+        </item>
+        <item>
+          <p>Širfirna fraza potrdila TLS.</p>
+        </item>
+        <item>
+          <p>Ali naj bodo velika sporočila razdeljena in velikost praga.</p>
+        </item>
+      </list>
+    </item>
+  </terms>
+  <section id="incoming">
+    <title>Prihodna</title>
+    <terms>
+      <item>
+        <title>
+          <gui>Check Mail Automatically</gui>
+        </title>
+        <p>If selected, <app>Balsa</app> will connect to your <link xref="glossary#pop">POP3</link>
+        servers at the given interval and check for mail.</p>
+      </item>
+      <item>
+        <title>
+          <gui>Check IMAP mailboxes</gui>
+        </title>
+        <p>If selected, <app>Balsa</app> will include your IMAP
+        mailboxes when checking for mail. You can also specify that
+        INBOX is the only mailbox to be checked.</p>
+        <p>Preverjanje poštnih predalov IMAP lahko vzame nekaj časa; te možnosti vam dajejo dodaten nadzor nad trajanjem preverjanja poštnih predalov.</p>
+      </item>
+      <item>
+        <title>
+          <gui>Display message if new mail has arrived</gui>
+        </title>
+        <p>If selected, <app>Balsa</app> will alert you when mail has
+        arrived.</p>
+      </item>
+      <item>
+        <title>
+          <gui>Do background check quietly</gui>
+        </title>
+        <p>If selected, <app>Balsa</app> will give you no indication
+        that a background mail check is in progress.</p>
+      </item>
+      <item>
+        <title>
+          <gui>Wrap Incoming Text</gui>
+        </title>
+        <p>If selected, <app>Balsa</app> will wrap text of incoming
+        messages at the specified line length.</p>
+      </item>
+      <item>
+        <title>
+          <gui>Reflow messages of type
+          `text/plain;format=flowed'</gui>
+        </title>
+        <p>Parameter `oblika' loči med dvema načinoma predstavljanja odstavkov v sporočilih vrste `besedilo/običajno' (to je običajno besedilo). Vrednost `povezano' nakaže da so odstavki prelomljeni z `mehkimi' prelomi vrstic: na koncu vrsti je puščen presledek. `trd' prelom vrstice (pred katerim ni presledka) nakaže konec odstavka.</p>
+        <p><app>Balsa</app> can reflow the paragraphs, quoted or
+        otherwise, in a message of this type. Reflowing eliminates
+        the line fragments that are left when text is first wrapped
+        at one length and then rewrapped to a shorter length, which
+        are often misquoted.</p>
+        <p>The only other value of `format' is `fixed', which is
+        the value assumed by default when `format' is not
+        specified, as with older mailers. In this case, all line
+        breaks must be respected. If you do not select the
+        `Reflow...' option, <app>Balsa</app> will treat all messages of
+        type `text/plain' as if they were `format=fixed'. Long
+        lines will still be wrapped, if the `Wrap Incoming
+        Messages' option is selected, but this will usually leave
+        unquoted line fragments.</p>
+      </item>
+      <item>
+        <title>
+          <gui>Message Disposition Notification request</gui>
+        </title>
+        <p>You will sometimes receive a message whose sender has
+        asked for notification that you have received or seen the
+        message. You can specify how <app>Balsa</app> responds to these
+        requests.</p>
+      </item>
+    </terms>
+  </section>
+  <!-- ################################################################# -->
+  <!--             SUBSECTION: PREFERENCES/MAIL OPTIONS/OUTGOING         -->
+  <!-- ################################################################# -->
+  <section id="outgoing">
+    <title>Odhodno</title>
+    <terms>
+      <item>
+        <title>
+          <gui>Wrap Outgoing Text</gui>
+        </title>
+        <p>Have <app>Balsa</app> wrap all outgoing mail at the specified
+        column.</p>
+      </item>
+      <item>
+        <title>
+          <gui>Reply prefix</gui>
+        </title>
+        <p>The string that <app>Balsa</app> should use as a prefix when
+        quoting a message. Note: When you send a message with 
+        <gui>format=flowed</gui>, <app>Balsa</app> is required to use
+        the one-character string "&gt;".</p>
+      </item>
+      <item>
+        <title>
+          <gui>Automatically quote original when replying</gui>
+        </title>
+        <p>Have <app>Balsa</app> include the text of a message in the
+        reply. The text will be prefixed as shown above.</p>
+        <p>Namesto lahko vključite izvorno sporočilo z uporabo menija `Uredi' ali z vleko sporočilo iz kazala sporočil v področje besedila odgovora. V primeru da vam je ljubše ta način vključevanje besedila ne izberite možnosti `Samodejno citiraj...'.</p>
+      </item>
+      <item>
+        <title>
+          <gui>Don't include HTML parts as text when replying or
+          forwarding mail</gui>
+        </title>
+        <p>Tell <app>Balsa</app> to be sensible.</p>
+      </item>
+      <item>
+        <title>
+          <gui>Forward a mail as attachment instead of quoting
+          it</gui>
+        </title>
+        <p>V primeru da je možnost izbrana so sporočila, ki so `Samodejno citirana' priložena nespremenjena namesto vključitve v besedilo odgovora z predpono niza odgovora.</p>
+        <p>Novemu sporočilu lahko pripnete katerokoli sporočilo z vlečenjem iz kazala sporočila v področje prilog novih sporočil (ali v katerikoli del okna novega sporočila razen področja besedila ali vrstice naslovov).</p>
+      </item>
+      <item>
+        <title>
+          <gui>Send button always queues outgoing mail in
+          outbox</gui>
+        </title>
+        <p>This option gives you control over when <app>Balsa</app>
+        connects to a server to send messages.</p>
+      </item>
+      <item>
+        <title>
+          <gui>Copy outgoing messages to sentbox</gui>
+        </title>
+        <p>Have <app>Balsa</app> save a copy of each message you send in
+        the mailbox marked as the `Sentbox'.</p>
+      </item>
+      <item>
+        <title>
+          <gui>Encoding</gui>
+        </title>
+        <p>Nastavite način znakovnega kodiranja na 7 biten, 8 biten ali na znakovno kodiranje citiranega besedila.</p>
+      </item>
+    </terms>
+  </section>
+</page>

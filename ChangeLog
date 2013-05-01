@@ -1,3 +1,18 @@
+2013-05-01  Peter Bloomfield
+
+	Replace "ghelp:" help URIs by "help:" URIs
+
+	* libbalsa/identity.c (help_ident_cb):
+	* libbalsa/smtp-server.c (smtp_server_response):
+	* src/address-book-config.c (help_button_cb):
+	* src/filter-edit-callbacks.c (condition_dialog_response),
+	(fe_dialog_response):
+	* src/filter-run-callbacks.c (fr_dialog_response):
+	* src/folder-conf.c (folder_conf_response):
+	* src/main-window.c:
+	* src/pref-manager.c (balsa_help_pbox_display):
+	* src/toolbar-prefs.c (tp_dialog_response_cb):
+
 2013-04-30  Peter Bloomfield
 
 	* configure.ac: fix broken NetworkManager-glib logic.

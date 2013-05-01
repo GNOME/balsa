@@ -417,7 +417,8 @@ smtp_server_response(GtkDialog * dialog, gint response,
     switch (response) {
     case GTK_RESPONSE_HELP:
         screen = gtk_widget_get_screen(GTK_WIDGET(dialog));
-        gtk_show_uri(screen, "ghelp:balsa?smtp-server-config",
+        gtk_show_uri(screen,
+                     "help:preferences-mail-options#smtp-server-config",
                      gtk_get_current_event_time(), &error);
         if (error) {
             libbalsa_information(LIBBALSA_INFORMATION_WARNING,

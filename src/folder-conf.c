@@ -105,7 +105,7 @@ folder_conf_response(GtkDialog * dialog, int response,
     switch (response) {
     case GTK_RESPONSE_HELP:
         screen = gtk_widget_get_screen(GTK_WIDGET(dialog));
-        gtk_show_uri(screen, "ghelp:balsa?folder-config",
+        gtk_show_uri(screen, "help:balsa/folder-config",
                      gtk_get_current_event_time(), &err);
         if (err) {
             balsa_information(LIBBALSA_INFORMATION_WARNING,

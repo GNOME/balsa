@@ -178,7 +178,7 @@ void fr_dialog_response(GtkWidget * widget, gint response,
 	break;
     case GTK_RESPONSE_HELP:     /* Help button */
         screen = gtk_widget_get_screen(widget);
-        gtk_show_uri(screen, "ghelp:balsa?win-run-filters",
+        gtk_show_uri(screen, "help:balsa/win-run-filters",
                      gtk_get_current_event_time(), &err);
 	if (err) {
 	    balsa_information_parented(GTK_WINDOW(widget),

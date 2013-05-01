@@ -350,7 +350,7 @@ tp_dialog_response_cb(GtkDialog * dialog, gint response, gpointer data)
         break;
     case GTK_RESPONSE_HELP:
         screen = gtk_widget_get_screen(GTK_WIDGET(dialog));
-        gtk_show_uri(screen, "ghelp:balsa?toolbar-prefs",
+        gtk_show_uri(screen, "help:balsa/toolbar-prefs",
                      gtk_get_current_event_time(), &err);
         if (err) {
             balsa_information(LIBBALSA_INFORMATION_WARNING,

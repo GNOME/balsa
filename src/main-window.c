@@ -449,7 +449,7 @@ static const GtkActionEntry entries[] = {
      N_("Create and set current identities"),
      G_CALLBACK(bw_ident_manage_dialog_cb)},
     /* Help menu items */
-    {"TableOfContents", GTK_STOCK_HELP, N_("_Contents"), "F1",
+    {"TableOfContents", GTK_STOCK_HELP, N_("_User's Guide"), "F1",
      N_("Table of Contents"), G_CALLBACK(bw_contents_cb)},
     {"MailboxTab1", NULL, NULL, "<alt>1", NULL,
      G_CALLBACK(bw_mailbox_tab_n_cb)},
@@ -2797,7 +2797,7 @@ bw_contents_cb(GtkAction * action, gpointer user_data)
     GError *err = NULL;
 
     screen = gtk_window_get_screen(user_data);
-    gtk_show_uri(screen, "ghelp:balsa", gtk_get_current_event_time(),
+    gtk_show_uri(screen, "help:balsa", gtk_get_current_event_time(),
                  &err);
     if (err) {
         balsa_information(LIBBALSA_INFORMATION_WARNING,
@@ -4727,7 +4727,7 @@ bw_find_real(BalsaWindow * window, BalsaIndex * bindex, gboolean again)
                 break;
 	    case GTK_RESPONSE_HELP:
                 screen = gtk_widget_get_screen(GTK_WIDGET(window));
-                gtk_show_uri(screen, "ghelp:balsa?win-search",
+                gtk_show_uri(screen, "help:balsa/win-search",
                              gtk_get_current_event_time(), &err);
 		if (err) {
 		    balsa_information(LIBBALSA_INFORMATION_WARNING,

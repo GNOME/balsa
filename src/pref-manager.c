@@ -3435,34 +3435,44 @@ balsa_help_pbox_display(void)
     GtkTreeSelection *selection;
     GtkTreeModel *model;
     GtkTreeIter iter;
+    GtkTreeIter parent;
     gchar *text, *p;
-    gchar *link_id;
     GError *err = NULL;
     gchar *uri;
     GdkScreen *screen;
+    GString *string;
 
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(pui->view));
     if (!gtk_tree_selection_get_selected(selection, &model, &iter))
         return;
 
+    string = g_string_new("help:balsa/preferences-");
+
+    if (gtk_tree_model_iter_parent(model, &parent, &iter)) {
+        gtk_tree_model_get(model, &parent, PM_HELP_COL, &text, -1);
+        for (p = text; *p; p++)
+            *p = (*p == ' ') ? '-' : g_ascii_tolower(*p);
+        g_string_append(string, text);
+        g_free(text);
+        g_string_append_c(string, '#');
+    }
     gtk_tree_model_get(model, &iter, PM_HELP_COL, &text, -1);
     for (p = text; *p; p++)
         *p = (*p == ' ') ? '-' : g_ascii_tolower(*p);
-    link_id = g_strconcat("preferences-", text, NULL);
+    g_string_append(string, text);
     g_free(text);
 
-    uri = g_strconcat("ghelp:balsa?", link_id, NULL);
+    uri = g_string_free(string, FALSE);
     screen = gtk_widget_get_screen(pui->view);
     gtk_show_uri(screen, uri, gtk_get_current_event_time(), &err);
-    g_free(uri);
     if (err) {
         balsa_information(LIBBALSA_INFORMATION_WARNING,
-		_("Error displaying link_id %s: %s\n"),
-		link_id, err->message);
+		_("Error displaying %s: %s\n"),
+		uri, err->message);
         g_error_free(err);
     }
 
-    g_free(link_id);
+    g_free(uri);
 }
 
 /* pm_page: methods for making the contents of a notebook page

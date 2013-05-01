@@ -71,9 +71,9 @@
         <title>
           <gui>Page Up and Page Down</gui>
         </title>
-        <p>By default, the 
-        <key>Page Up</key>and 
-        <key>Page Down</key>keys scroll the message by whole pages.
+        <p>By default, the
+        <key>Page Up</key> and
+        <key>Page Down</key> keys scroll the message by whole pages.
         Use this option to choose a different amount.</p>
       </item>
     </terms>
@@ -131,7 +131,7 @@
         </title>
         <p>The entry box allows you to set a
         <link xref="glossary#regular-expression">regular
-        expression</link>you would like to use to identify text
+        expression</link> you would like to use to identify text
         that should be considered quoted for incoming messages. The
         regular expression should match the beginning of line of
         quoted text a single level deep, the program will then use
@@ -229,8 +229,8 @@
           </item>
         </list>
         <note>
-          <p>See the 
-          <code>strftime</code>manual page for a full listing of
+          <p>See the
+          <code>strftime</code> manual page for a full listing of
           conversion specifiers.</p>
         </note>
       </item>

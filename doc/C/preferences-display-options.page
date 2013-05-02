@@ -156,14 +156,6 @@ id="preferences-display-options">
         <p>&Balsa; uses this color to highlight a hyperlink in
         a message.</p>
       </item>
-      <item>
-        <title>
-          <gui>Composition Window</gui>
-        </title>
-        <p>When you are composing a message, &Balsa; uses color
-        to show when one of the address fields is incomplete.
-        Choose that color here.</p>
-      </item>
     </terms>
   </section>
   <section id="format">
@@ -174,7 +166,7 @@ id="preferences-display-options">
           <gui>Date Encoding</gui>
         </title>
         <p>Set the format used to display dates in &Balsa;.
-        This uses the same format string as 
+        This uses the same format string as
         <code>strftime</code>, a summary which is provided
         below:</p>
         <list>

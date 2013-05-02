@@ -1,5 +1,15 @@
 2013-05-01  Peter Bloomfield
 
+	We no longer use color in addresses
+
+	* C/preferences-display-options.page:
+	* de/preferences-display-options.page:
+	* es/preferences-display-options.page:
+	* fr/preferences-display-options.page:
+	* sl/preferences-display-options.page:
+
+2013-05-01  Peter Bloomfield
+
 	Restore missing spaces
 
 	* C/preferences-display-options.page:

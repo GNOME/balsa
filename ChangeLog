@@ -1,3 +1,10 @@
+2013-05-02  Peter Bloomfield
+
+	* libbalsa/libbalsa.c (libbalsa_init): reduce glib requirement
+	to 2.32.
+	* src/main.c (threads_init): ditto.
+	* src/balsa-message.c (balsa_message_init): typo.
+
 2013-05-01  Peter Bloomfield
 
 	Replace "ghelp:" help URIs by "help:" URIs

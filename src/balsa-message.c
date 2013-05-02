@@ -727,10 +727,10 @@ balsa_message_init(BalsaMessage * bm)
 		     (gpointer) bm);
 #if GTK_CHECK_VERSION(3, 8, 0)
     gtk_container_add(GTK_CONTAINER(bm->scroll), bm->bm_widget->widget);
-#else                           /* GTK_CHECK_VERSION(3, 8, 0 */
+#else                           /* GTK_CHECK_VERSION(3, 8, 0) */
     gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(bm->scroll),
                                           bm->bm_widget->widget);
-#endif                          /* GTK_CHECK_VERSION(3, 8, 0 */
+#endif                          /* GTK_CHECK_VERSION(3, 8, 0) */
 
     /* structure view */
     model = gtk_tree_store_new (NUM_COLUMNS,

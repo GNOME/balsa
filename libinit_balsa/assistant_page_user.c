@@ -90,14 +90,8 @@ balsa_druid_page_user_init(BalsaDruidPageUser * user,
     gtk_box_pack_start(GTK_BOX(page), GTK_WIDGET(label), FALSE, TRUE, 0);
 
     grid = GTK_GRID(gtk_grid_new());
-#if GTK_CHECK_VERSION(3, 0, 2)
     gtk_grid_set_row_spacing(grid, 2);
     gtk_grid_set_column_spacing(grid, 5);
-#else                   /* GTK_CHECK_VERSION(3, 0, 2) */
-    /* work around row <=> column spacing bug */
-    gtk_grid_set_row_spacing(grid, 5);
-    gtk_grid_set_column_spacing(grid, 2);
-#endif                  /* GTK_CHECK_VERSION(3, 0, 2) */
 
 #if 0
     label = GTK_LABEL(gtk_label_new(_(header21)));

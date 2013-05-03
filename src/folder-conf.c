@@ -823,13 +823,8 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
     }
 
     grid = libbalsa_create_grid();
-#if GTK_CHECK_VERSION(3, 2, 0)
     gtk_grid_set_row_spacing(GTK_GRID(grid), 6);
     gtk_grid_set_column_spacing(GTK_GRID(grid), 12);
-#else                           /* GTK_CHECK_VERSION(3, 2, 0) */
-    gtk_grid_set_row_spacing(GTK_GRID(grid), 12);
-    gtk_grid_set_column_spacing(GTK_GRID(grid), 6);
-#endif                          /* GTK_CHECK_VERSION(3, 2, 0) */
     gtk_container_set_border_width(GTK_CONTAINER(grid), 12);
     if (mn)
         content = grid;

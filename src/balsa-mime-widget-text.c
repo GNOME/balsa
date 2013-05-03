@@ -1210,13 +1210,8 @@ bm_widget_new_vcard(BalsaMessage *bm, LibBalsaMessageBody *mime_body,
 
     mw->widget = gtk_grid_new();
     grid = (GtkGrid*)mw->widget;
-#if GTK_CHECK_VERSION(3, 2, 0)
     gtk_grid_set_row_spacing(grid, 6);
     gtk_grid_set_column_spacing(grid, 12);
-#else                           /* GTK_CHECK_VERSION(3, 2, 0) */
-    gtk_grid_set_row_spacing(grid, 12);
-    gtk_grid_set_column_spacing(grid, 6);
-#endif                          /* GTK_CHECK_VERSION(3, 2, 0) */
 
     w = gtk_button_new_with_mnemonic(_("S_tore Address"));
     gtk_grid_attach(grid, w, 0, 0, 2, 1);

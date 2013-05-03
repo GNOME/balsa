@@ -255,10 +255,6 @@ pthread_mutex_t checking_mail_lock = PTHREAD_MUTEX_INITIALIZER;
 static void
 threads_init(void)
 {
-#if !GLIB_CHECK_VERSION(2, 32, 0)
-    g_type_init();
-#endif                          /* !GLIB_CHECK_VERSION(2, 32, 0) */
-
     pthread_mutex_init(&send_messages_lock, NULL);
     if (pipe(mail_thread_pipes) < 0) {
 	g_log("BALSA Init", G_LOG_LEVEL_DEBUG,

@@ -167,13 +167,8 @@ balsa_vevent_widget(LibBalsaVEvent * event, gboolean may_reply,
     LibBalsaIdentity *vevent_ident = NULL;
 
     grid = GTK_GRID(gtk_grid_new());
-#if GTK_CHECK_VERSION(3, 2, 0)
     gtk_grid_set_row_spacing(grid, 6);
     gtk_grid_set_column_spacing(grid, 12);
-#else                           /* GTK_CHECK_VERSION(3, 2, 0) */
-    gtk_grid_set_row_spacing(grid, 12);
-    gtk_grid_set_column_spacing(grid, 6);
-#endif                          /* GTK_CHECK_VERSION(3, 2, 0) */
     GRID_ATTACH(grid, event->summary, _("Summary:"));
     GRID_ATTACH_ADDRESS(grid, event->organizer, _("Organizer:"));
     GRID_ATTACH_DATE(grid, event->start, _("Start:"));

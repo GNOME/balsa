@@ -163,11 +163,6 @@ AC_ARG_WITH([macosx-desktop],
 	          [Use Mac OS X Desktop Integration (default=no, extremely experimental)]),
 		  [use_igemacint=$withval],[use_igemacint=no])
 
-AC_ARG_WITH(nm,
-   AC_HELP_STRING([--with-nm],
-                  [Enable NetworkManager (default=yes)]),
-                  [with_nm=$withval],[with_nm=yes])
-
 AC_ARG_ENABLE([pcre], 
    AC_HELP_STRING([--enable-pcre],
                   [Use Perl-compatible regular expressions if available (default=no)]),
@@ -343,16 +338,16 @@ dnl Make sure ld finds zlib:
 LIBS="$LIBS -lz"
 
 PKG_CHECK_MODULES(BALSA, [
-glib-2.0 >= 2.28.0
-gtk+-3.0
+glib-2.0 >= 2.32.0
+gtk+-3.0 >= 3.4.0
 gmime-$with_gmime
-gio-2.0 >= 2.27.0
+gio-2.0
 gthread-2.0
 $gnome_extras
 ])
 
 PKG_CHECK_MODULES(BALSA_AB, [
-   glib-2.0 >= 2.27.0
+   glib-2.0
    gtk+-3.0
    gmime-$with_gmime
    $gnome_extras
@@ -751,24 +746,6 @@ if test x$with_libnotify != xno; then
     with_libnotify=" >= 0.$notifyver"
 fi
 
-# NetworkManager
-AC_MSG_CHECKING([whether to use NetworkManager])
-if test "$with_nm" != no ; then
-  if $PKG_CONFIG --atleast-version=2.32.0 glib-2.0 ; then
-    with_nm="no; using GNetworkMonitor instead"
-  else
-    PKG_CHECK_EXISTS([libnm-glib], 
-    [ PKG_CHECK_MODULES(LIBNM_GLIB, [ libnm-glib >= 0.7.0]) ],
-    [ PKG_CHECK_MODULES(LIBNM_GLIB, [ libnm_glib >= 0.7.0]) ])
-
-    AC_DEFINE(HAVE_LIBNM_GLIB,1,
-              [ Defined if NetworkManager-glib-devel is found.])
-    BALSA_CFLAGS="$BALSA_CFLAGS $LIBNM_GLIB_CFLAGS"
-    LIBS="$LIBS $LIBNM_GLIB_LIBS"
-  fi
-fi
-AC_MSG_RESULT($with_nm)
-
 # Compface configuration
 #
 AC_MSG_CHECKING([whether to build Compface support])
@@ -1043,7 +1020,6 @@ echo "                  Use LDAP: $with_ldap"
 echo "                   Use GSS: $with_gss"
 echo "                Use SQLite: $with_sqlite"
 echo "                   Use SSL: $with_ssl"
-echo "        Use NetworkManager: $with_nm"
 echo "              Use GtkSpell: $with_gtkspell"
 echo "             Use Libnotify: $with_libnotify"
 echo "         Use GtkSourceView: $with_gtksourceview"

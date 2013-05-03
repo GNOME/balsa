@@ -1,5 +1,29 @@
 2013-05-02  Peter Bloomfield
 
+	* configure.ac: bump glib and gtk required versions.
+	* libbalsa/imap-server.c (libbalsa_imap_server_init),
+	(libbalsa_imap_server_finalize): drop conditional code.
+	* libbalsa/libbalsa-conf.c (lbc_lock), (lbc_unlock): ditto.
+	* libbalsa/libbalsa.c (libbalsa_init): ditto.
+	* libbalsa/mime-stream-shared.c (lbmss_stream_class_init),
+	(libbalsa_mime_stream_shared_lock),
+	(libbalsa_mime_stream_shared_unlock): ditto.
+	* libinit_balsa/assistant_page_user.c
+	(balsa_druid_page_user_init): ditto.
+	* src/balsa-mime-widget-text.c (bm_widget_new_vcard): ditto.
+	* src/balsa-mime-widget-vcalendar.c (balsa_vevent_widget):
+	ditto.
+	* src/filter-edit-callbacks.c (fe_apply_pressed),
+	(fe_filters_list_selection_changed): ditto.
+	* src/filter-edit-dialog.c (fe_make_color_buttons): ditto.
+	* src/folder-conf.c (folder_conf_imap_sub_node): ditto.
+	* src/main-window.c: ditto.
+	* src/main-window.h: ditto.
+	* src/main.c (threads_init): ditto.
+	* src/sendmsg-window.c (render_attach_size): ditto.
+
+2013-05-02  Peter Bloomfield
+
 	* libbalsa/libbalsa.c (libbalsa_init): reduce glib requirement
 	to 2.32.
 	* src/main.c (threads_init): ditto.

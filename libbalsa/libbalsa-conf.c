@@ -147,11 +147,7 @@ lbc_init(LibBalsaConf * conf, const gchar * filename,
 }
 
 #ifdef BALSA_USE_THREADS
-#if GLIB_CHECK_VERSION(2, 32, 0)
 static GRecMutex lbc_mutex;
-#else                           /* GLIB_CHECK_VERSION(2, 32, 0) */
-static GStaticRecMutex lbc_mutex = G_STATIC_REC_MUTEX_INIT;
-#endif                          /* GLIB_CHECK_VERSION(2, 32, 0) */
 #endif                          /* BALSA_USE_THREADS */
 
 static void
@@ -160,11 +156,7 @@ lbc_lock(void)
     static gboolean initialized = FALSE;
 
 #ifdef BALSA_USE_THREADS
-#if GLIB_CHECK_VERSION(2, 32, 0)
     g_rec_mutex_lock(&lbc_mutex);
-#else                           /* GLIB_CHECK_VERSION(2, 32, 0) */
-    g_static_rec_mutex_lock(&lbc_mutex);
-#endif                          /* GLIB_CHECK_VERSION(2, 32, 0) */
 #endif                          /* BALSA_USE_THREADS */
     if (!initialized) {
         lbc_init(&lbc_conf, "config", ".gnome2");
@@ -177,11 +169,7 @@ static void
 lbc_unlock(void)
 {
 #ifdef BALSA_USE_THREADS
-#if GLIB_CHECK_VERSION(2, 32, 0)
     g_rec_mutex_unlock(&lbc_mutex);
-#else                           /* GLIB_CHECK_VERSION(2, 32, 0) */
-    g_static_rec_mutex_unlock(&lbc_mutex);
-#endif                          /* GLIB_CHECK_VERSION(2, 32, 0) */
 #endif                          /* BALSA_USE_THREADS */
 }
 

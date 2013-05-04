@@ -755,7 +755,7 @@ add_header_sigstate(GtkGrid * grid, GMimeGpgmeSigstat * siginfo)
     gint row;
 
     format = siginfo->status ==
-        GPG_ERR_NO_ERROR ? "<i>%s%s</i>" : "<b><i>%s%s</i><b>";
+        GPG_ERR_NO_ERROR ? "<i>%s%s</i>" : "<b><i>%s%s</i></b>";
     msg = g_markup_printf_escaped
         (format,
          libbalsa_gpgme_sig_protocol_name(siginfo->protocol),

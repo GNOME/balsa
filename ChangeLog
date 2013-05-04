@@ -1,3 +1,8 @@
+2013-05-04  Peter Bloomfield
+
+	* src/balsa-mime-widget-message.c (add_header_sigstate): fix
+	typo.
+
 2013-05-02  Peter Bloomfield
 
 	* configure.ac: bump glib and gtk required versions.

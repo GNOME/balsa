@@ -1,5 +1,11 @@
 2013-05-16  Peter Bloomfield
 
+	* libbalsa/imap/imap-handle.c (idle_start): use try-lock to
+	avoid blocking main thread;
+	(imap_handle_idle_enable): use g_timeout_add_seconds.
+
+2013-05-16  Peter Bloomfield
+
 	* libbalsa/mailbox.h: scrap
 	LibBalsaMailboxView::mailing_list_address.
 	* libbalsa/mailbox.c (libbalsa_mailbox_view_free): ditto.

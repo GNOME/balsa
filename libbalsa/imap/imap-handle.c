@@ -446,7 +446,8 @@ idle_start(gpointer data)
 
   /* The test below can probably be weaker since it is ok for the
      channel to get disconnected before IDLE gets activated */
-  HANDLE_LOCK(h);
+  if(HANDLE_TRYLOCK(h) != 0)
+    return TRUE;/* Don't block, just try again later. */
   IMAP_REQUIRED_STATE3(h, IMHS_CONNECTED, IMHS_AUTHENTICATED,
                        IMHS_SELECTED, FALSE);
 
@@ -503,7 +504,7 @@ imap_handle_idle_enable(ImapMboxHandle *h, int seconds)
     return FALSE;
   }
   if(!h->idle_enable_id)
-    h->idle_enable_id = g_timeout_add(seconds*1000, idle_start, h);
+    h->idle_enable_id = g_timeout_add_seconds(seconds, idle_start, h);
   return TRUE;
 }
 

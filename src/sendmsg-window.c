@@ -6788,17 +6788,7 @@ set_list_post_address(BalsaSendmsg * bsmsg)
     LibBalsaMessage *message =
         bsmsg->parent_message ?
         bsmsg->parent_message : bsmsg->draft_message;
-    InternetAddressList *mailing_list_address;
     const gchar *header;
-
-    mailing_list_address =
-	libbalsa_mailbox_get_mailing_list_address(message->mailbox);
-    if (mailing_list_address) {
-        libbalsa_address_view_set_from_list(bsmsg->recipient_view, "To:",
-                                            mailing_list_address);
-        g_object_unref(mailing_list_address);
-        return;
-    }
 
     if ((header = libbalsa_message_get_user_header(message, "list-post"))
 	&& set_list_post_rfc2369(bsmsg, header))

@@ -1771,15 +1771,6 @@ config_load_mailbox_view(const gchar * url)
 
     view = libbalsa_mailbox_view_new();
 
-    if (libbalsa_conf_has_key("MailingListAddress")) {
-        gchar *address;
-
-        address = libbalsa_conf_get_string("MailingListAddress");
-        view->mailing_list_address =
-            internet_address_list_parse_string(address);
-        g_free(address);
-    }
-
     view->identity_name = libbalsa_conf_get_string("Identity");
 
     if (libbalsa_conf_has_key("Threading"))
@@ -1843,14 +1834,6 @@ config_save_mailbox_view(const gchar * url, LibBalsaMailboxView * view)
     libbalsa_conf_push_group(prefix);
     g_free(prefix);
 
-    if (view->mailing_list_address !=
-	libbalsa_mailbox_get_mailing_list_address(NULL)) {
-       gchar* tmp =
-	   internet_address_list_to_string(view->mailing_list_address,
-		                           FALSE);
-       libbalsa_conf_set_string("MailingListAddress", tmp);
-       g_free(tmp);
-    }
     if (view->identity_name  != libbalsa_mailbox_get_identity_name(NULL))
 	libbalsa_conf_set_string("Identity", view->identity_name);
     if (view->threading_type != libbalsa_mailbox_get_threading_type(NULL))

@@ -2350,7 +2350,6 @@ libbalsa_mailbox_set_threading(LibBalsaMailbox *mailbox,
  * =================================================================== */
 
 static LibBalsaMailboxView libbalsa_mailbox_view_default = {
-    NULL,			/* mailing_list_address */
     NULL,			/* identity_name        */
     LB_MAILBOX_THREADING_FLAT,	/* threading_type       */
     0,				/* filter               */
@@ -2388,8 +2387,6 @@ libbalsa_mailbox_view_free(LibBalsaMailboxView * view)
     if (!view)
         return;
 
-    if (view->mailing_list_address)
-        g_object_unref(view->mailing_list_address);
     g_free(view->identity_name);
     g_free(view);
 }
@@ -2605,14 +2602,6 @@ libbalsa_mailbox_set_mtime(LibBalsaMailbox * mailbox, time_t mtime)
 /* End of set methods. */
 
 /* Get methods; NULL mailbox is valid, and returns the default value. */
-
-InternetAddressList *
-libbalsa_mailbox_get_mailing_list_address(LibBalsaMailbox * mailbox)
-{
-    return (mailbox && mailbox->view) ?
-	mailbox->view->mailing_list_address :
-	libbalsa_mailbox_view_default.mailing_list_address;
-}
 
 const gchar *
 libbalsa_mailbox_get_identity_name(LibBalsaMailbox * mailbox)

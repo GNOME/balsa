@@ -162,7 +162,6 @@ typedef struct _LibBalsaMailboxClass LibBalsaMailboxClass;
 
 typedef struct _LibBalsaMailboxView LibBalsaMailboxView;
 struct _LibBalsaMailboxView {
-    InternetAddressList *mailing_list_address;
     gchar *identity_name;
     LibBalsaMailboxThreadingType threading_type;
     /** filter is a frontend-specific code determining used view
@@ -565,8 +564,6 @@ void libbalsa_mailbox_set_unread(LibBalsaMailbox * mailbox, gint unread);
 void libbalsa_mailbox_set_total (LibBalsaMailbox * mailbox, gint total);
 void libbalsa_mailbox_set_mtime (LibBalsaMailbox * mailbox, time_t mtime);
 
-InternetAddressList
-    *libbalsa_mailbox_get_mailing_list_address(LibBalsaMailbox * mailbox);
 const gchar *libbalsa_mailbox_get_identity_name(LibBalsaMailbox * mailbox);
 LibBalsaMailboxThreadingType
 libbalsa_mailbox_get_threading_type(LibBalsaMailbox * mailbox);

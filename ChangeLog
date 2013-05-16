@@ -1,3 +1,12 @@
+2013-05-16  Peter Bloomfield
+
+	* libbalsa/mailbox.h: scrap
+	LibBalsaMailboxView::mailing_list_address.
+	* libbalsa/mailbox.c (libbalsa_mailbox_view_free): ditto.
+	* src/save-restore.c (config_load_mailbox_view),
+	(config_save_mailbox_view): ditto.
+	* src/sendmsg-window.c (set_list_post_address): ditto.
+
 2013-05-04  Peter Bloomfield
 
 	* src/balsa-mime-widget-message.c (add_header_sigstate): fix

@@ -2168,7 +2168,7 @@ lbm_local_sync_real(LibBalsaMailboxLocal * local)
 static gboolean
 lbm_local_sync_idle(LibBalsaMailboxLocal * local)
 {
-#if 0 && defined(BALSA_USE_THREADS)
+#if defined(BALSA_USE_THREADS)
     pthread_t sync_thread;
 
     pthread_create(&sync_thread, NULL, (void *) lbm_local_sync_real, local);

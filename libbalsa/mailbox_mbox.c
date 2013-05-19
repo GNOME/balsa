@@ -742,9 +742,6 @@ libbalsa_mailbox_mbox_open(LibBalsaMailbox * mailbox, GError **err)
         lbm_mbox_restore(mbox);
         parse_mailbox(mbox);
     }
-    
-    LIBBALSA_MAILBOX_LOCAL(mailbox)->sync_time = time(NULL) - t0;
-    LIBBALSA_MAILBOX_LOCAL(mailbox)->sync_cnt  = 1;
 
     mbox_unlock(mailbox, gmime_stream);
     libbalsa_mime_stream_shared_unlock(gmime_stream);

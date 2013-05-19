@@ -2197,7 +2197,8 @@ lbm_local_sync_queue(LibBalsaMailboxLocal * local)
     /* queue sync job so that the delay is at least five times longer
      * than the syncing time. Otherwise large mailbox owners will be
      * annnoyed. */
-    schedule_delay = (local->sync_time*5000)/local->sync_cnt;
+    schedule_delay =
+        local->sync_cnt ? (local->sync_time * 5000) / local->sync_cnt : 0;
     local->sync_id = g_timeout_add_full(G_PRIORITY_LOW, schedule_delay,
                                         (GSourceFunc)lbm_local_sync_idle,
                                         local, NULL);

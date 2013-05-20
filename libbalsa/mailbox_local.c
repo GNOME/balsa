@@ -85,6 +85,12 @@ static gboolean libbalsa_mailbox_local_get_msg_part(LibBalsaMessage *msg,
                                                     GError **err);
 
 static void lbm_local_sort(LibBalsaMailbox * mailbox, GArray *sort_array);
+static guint
+libbalsa_mailbox_local_add_messages(LibBalsaMailbox          * mailbox,
+                                    LibBalsaAddMessageIterator msg_iterator,
+                                    gpointer                   iter_data,
+                                    GError                  ** err);
+
 static GArray *libbalsa_mailbox_local_duplicate_msgnos(LibBalsaMailbox *
                                                        mailbox);
 static gboolean
@@ -169,6 +175,8 @@ libbalsa_mailbox_local_class_init(LibBalsaMailboxLocalClass * klass)
     libbalsa_mailbox_class->get_message_part = 
         libbalsa_mailbox_local_get_msg_part;
     libbalsa_mailbox_class->sort = lbm_local_sort;
+    libbalsa_mailbox_class->add_messages =
+        libbalsa_mailbox_local_add_messages;
     libbalsa_mailbox_class->messages_change_flags =
         libbalsa_mailbox_local_messages_change_flags;
     libbalsa_mailbox_class->msgno_has_flags =
@@ -2209,6 +2217,34 @@ lbm_local_sort(LibBalsaMailbox * mailbox, GArray *sort_array)
 {
     LIBBALSA_MAILBOX_CLASS(parent_class)->sort(mailbox, sort_array);
     lbm_local_queue_save_tree(LIBBALSA_MAILBOX_LOCAL(mailbox));
+}
+
+static guint
+libbalsa_mailbox_local_add_messages(LibBalsaMailbox          * mailbox,
+                                    LibBalsaAddMessageIterator msg_iterator,
+                                    gpointer                   iter_data,
+                                    GError                  ** err)
+{
+    LibBalsaMessageFlag flag;
+    GMimeStream *stream;
+    LibBalsaMailboxLocal *local;
+    guint cnt;
+    LibBalsaMailboxLocalAddMessageFunc *add_message;
+
+    local = LIBBALSA_MAILBOX_LOCAL(mailbox);
+    cnt = 0;
+    add_message = LIBBALSA_MAILBOX_LOCAL_GET_CLASS(local)->add_message;
+    while (msg_iterator(&flag, &stream, iter_data)) {
+        gboolean success;
+
+        success = (*add_message)(local, stream, flag, err);
+        g_object_unref(stream);
+        if (!success)
+            break;
+        cnt++;
+    }
+
+    return cnt;
 }
 
 #define FLAGS_REALLY_DIFFER(flags0, flags1) \

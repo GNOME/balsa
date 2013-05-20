@@ -87,10 +87,6 @@ static gboolean
 libbalsa_mailbox_maildir_fetch_message_structure(LibBalsaMailbox * mailbox,
 						 LibBalsaMessage * message,
 						 LibBalsaFetchFlag flags);
-static guint libbalsa_mailbox_maildir_add_messages(LibBalsaMailbox *
-						   mailbox,
-						   LibBalsaAddMessageIterator m,
-						   void *m_arg, GError ** err);
 static guint
 libbalsa_mailbox_maildir_total_messages(LibBalsaMailbox * mailbox);
 
@@ -102,6 +98,7 @@ static void lbm_maildir_remove_files(LibBalsaMailboxLocal * local);
 static guint lbm_maildir_fileno(LibBalsaMailboxLocal * local, guint msgno);
 static LibBalsaMailboxLocalMessageInfo
     *lbm_maildir_get_info(LibBalsaMailboxLocal * local, guint msgno);
+static LibBalsaMailboxLocalAddMessageFunc lbm_maildir_add_message;
 
 /* util functions */
 static struct message_info *message_info_from_msgno(LibBalsaMailboxMaildir
@@ -167,8 +164,6 @@ libbalsa_mailbox_maildir_class_init(LibBalsaMailboxMaildirClass * klass)
 	libbalsa_mailbox_maildir_close_mailbox;
     libbalsa_mailbox_class->fetch_message_structure =
 	libbalsa_mailbox_maildir_fetch_message_structure;
-    libbalsa_mailbox_class->add_messages =
-	libbalsa_mailbox_maildir_add_messages;
     libbalsa_mailbox_class->total_messages =
 	libbalsa_mailbox_maildir_total_messages;
 
@@ -177,6 +172,7 @@ libbalsa_mailbox_maildir_class_init(LibBalsaMailboxMaildirClass * klass)
     libbalsa_mailbox_local_class->remove_files = lbm_maildir_remove_files;
     libbalsa_mailbox_local_class->fileno       = lbm_maildir_fileno;
     libbalsa_mailbox_local_class->get_info     = lbm_maildir_get_info;
+    libbalsa_mailbox_local_class->add_message  = lbm_maildir_add_message;
 }
 
 static void
@@ -885,11 +881,12 @@ lbm_maildir_get_info(LibBalsaMailboxLocal * local, guint msgno)
 
 /* Called with mailbox locked. */
 static gboolean
-libbalsa_mailbox_maildir_add_message(LibBalsaMailbox * mailbox,
-                                     GMimeStream * stream,
-                                     LibBalsaMessageFlag flags,
-                                     GError **err)
+lbm_maildir_add_message(LibBalsaMailboxLocal * local,
+                        GMimeStream          * stream,
+                        LibBalsaMessageFlag    flags,
+                        GError              ** err)
 {
+    LibBalsaMailbox *mailbox = (LibBalsaMailbox *) local;
     const char *path;
     char *tmp;
     int fd;
@@ -902,7 +899,7 @@ libbalsa_mailbox_maildir_add_message(LibBalsaMailbox * mailbox,
     time_t mtime;
 
     /* open tempfile */
-    path = libbalsa_mailbox_local_get_path(mailbox);
+    path = libbalsa_mailbox_local_get_path(local);
     fd = libbalsa_mailbox_maildir_open_temp(path, &tmp);
     if (fd == -1)
 	return FALSE;
@@ -951,27 +948,6 @@ libbalsa_mailbox_maildir_add_message(LibBalsaMailbox * mailbox,
 	libbalsa_mailbox_set_mtime(mailbox, --mtime);
 
     return retval;
-}
-
-static guint
-libbalsa_mailbox_maildir_add_messages(LibBalsaMailbox * mailbox,
-				      LibBalsaAddMessageIterator msg_iterator,
-				      void *arg,
-				      GError **err)
-{
-    LibBalsaMessageFlag flag;
-    GMimeStream *stream;
-
-    guint cnt = 0;
-    while( msg_iterator(&flag, &stream, arg) ) {
-	gboolean success =
-	    libbalsa_mailbox_maildir_add_message(mailbox, stream, flag, err);
-	g_object_unref(stream);
-	if(!success)
-	    break;
-	cnt++;
-    }
-    return cnt;
 }
 
 static guint

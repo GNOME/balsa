@@ -1,3 +1,20 @@
+2013-05-19  Peter Bloomfield
+
+	Implement add-messages at LibBalsaMailboxLocal level, and use a
+	new add-message method for the backends.
+
+	* libbalsa/mailbox_local.c (libbalsa_mailbox_local_class_init):
+	new add-messages method.
+	* libbalsa/mailbox_local.h: new member
+	LibBalsaMailboxLocalClass::add_message.
+	* libbalsa/mailbox_maildir.c (libbalsa_mailbox_maildir_class_init),
+	(lbm_maildir_add_message): implement
+	LibBalsaMailboxLocalClass::add_message.
+	* libbalsa/mailbox_mbox.c (libbalsa_mailbox_mbox_class_init),
+	(lbm_mbox_add_message): ditto.
+	* libbalsa/mailbox_mh.c (libbalsa_mailbox_mh_class_init),
+	(lbm_mh_add_message): ditto.
+
 2013-05-18  Peter Bloomfield
 
 	* libbalsa/mailbox_local.c: avoid zero-divide.

@@ -68,6 +68,7 @@ static void lbm_mh_set_path(LibBalsaMailboxLocal * mailbox,
 static void lbm_mh_remove_files(LibBalsaMailboxLocal *mailbox);
 static LibBalsaMailboxLocalMessageInfo
     *lbm_mh_get_info(LibBalsaMailboxLocal * local, guint msgno);
+static LibBalsaMailboxLocalAddMessageFunc lbm_mh_add_message;
 
 static gboolean libbalsa_mailbox_mh_open(LibBalsaMailbox * mailbox,
 					 GError **err);
@@ -85,10 +86,6 @@ static gboolean libbalsa_mailbox_mh_fetch_message_structure(LibBalsaMailbox
                                                             * message,
                                                             LibBalsaFetchFlag
                                                             flags);
-static guint libbalsa_mailbox_mh_add_messages(LibBalsaMailbox * mailbox,
-					      LibBalsaAddMessageIterator m,
-					      void *m_arg,
-					      GError ** err);
 static guint libbalsa_mailbox_mh_total_messages(LibBalsaMailbox * mailbox);
 
 
@@ -146,7 +143,6 @@ libbalsa_mailbox_mh_class_init(LibBalsaMailboxMhClass * klass)
 	libbalsa_mailbox_mh_close_mailbox;
     libbalsa_mailbox_class->fetch_message_structure =
 	libbalsa_mailbox_mh_fetch_message_structure;
-    libbalsa_mailbox_class->add_messages = libbalsa_mailbox_mh_add_messages;
     libbalsa_mailbox_class->total_messages =
 	libbalsa_mailbox_mh_total_messages;
 
@@ -154,6 +150,7 @@ libbalsa_mailbox_mh_class_init(LibBalsaMailboxMhClass * klass)
     libbalsa_mailbox_local_class->set_path     = lbm_mh_set_path;
     libbalsa_mailbox_local_class->remove_files = lbm_mh_remove_files;
     libbalsa_mailbox_local_class->get_info     = lbm_mh_get_info;
+    libbalsa_mailbox_local_class->add_message  = lbm_mh_add_message;
 }
 
 static void
@@ -1060,10 +1057,10 @@ lbm_mh_update_sequences(LibBalsaMailboxMh * mh, gint fileno,
 
 /* Called with mailbox locked. */
 static gboolean
-libbalsa_mailbox_mh_add_message(LibBalsaMailbox * mailbox,
-                                GMimeStream * stream,
-                                LibBalsaMessageFlag flags,
-                                GError ** err)
+lbm_mh_add_message(LibBalsaMailboxLocal * local,
+                   GMimeStream          * stream,
+                   LibBalsaMessageFlag    flags,
+                   GError              ** err)
 {
     LibBalsaMailboxMh *mh;
     const char *path;
@@ -1075,13 +1072,13 @@ libbalsa_mailbox_mh_add_message(LibBalsaMailbox * mailbox,
     int retries;
     GMimeStream *in_stream;
 
-    mh = LIBBALSA_MAILBOX_MH(mailbox);
+    mh = LIBBALSA_MAILBOX_MH(local);
 
     /* Make sure we know the highest message number: */
     lbm_mh_parse_mailbox(mh, FALSE);
 
     /* open tempfile */
-    path = libbalsa_mailbox_local_get_path(mailbox);
+    path = libbalsa_mailbox_local_get_path(local);
     fd = libbalsa_mailbox_mh_open_temp(path, &tmp);
     if (fd == -1) {
         g_set_error(err, LIBBALSA_MAILBOX_ERROR,
@@ -1150,27 +1147,6 @@ libbalsa_mailbox_mh_add_message(LibBalsaMailbox * mailbox,
                             flags | LIBBALSA_MESSAGE_FLAG_RECENT);
 
     return TRUE;
-}
-
-static guint
-libbalsa_mailbox_mh_add_messages(LibBalsaMailbox * mailbox,
-				 LibBalsaAddMessageIterator msg_iterator,
-				 void *arg,
-				 GError **err)
-{
-    LibBalsaMessageFlag flag;
-    GMimeStream *stream;
-
-    guint cnt = 0;
-    while( msg_iterator(&flag, &stream, arg) ) {
-	gboolean success =
-	    libbalsa_mailbox_mh_add_message(mailbox, stream, flag, err);
-	g_object_unref(stream);
-	if(!success)
-	    break;
-	cnt++;
-    }
-    return cnt;
 }
 
 static guint

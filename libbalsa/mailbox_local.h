@@ -78,6 +78,12 @@ struct _LibBalsaMailboxLocal {
     guint pool_seqno;
 };
 
+typedef gboolean LibBalsaMailboxLocalAddMessageFunc(LibBalsaMailboxLocal *
+                                                    local,
+                                                    GMimeStream * stream,
+                                                    LibBalsaMessageFlag
+                                                    flags, GError ** err);
+
 struct _LibBalsaMailboxLocalClass {
     LibBalsaMailboxClass klass;
 
@@ -87,6 +93,7 @@ struct _LibBalsaMailboxLocalClass {
     guint (*fileno)(LibBalsaMailboxLocal * local, guint msgno);
     LibBalsaMailboxLocalMessageInfo *(*get_info)(LibBalsaMailboxLocal * local,
                                                  guint msgno);
+    LibBalsaMailboxLocalAddMessageFunc *add_message;
 };
 
 GObject *libbalsa_mailbox_local_new(const gchar * path, gboolean create);

@@ -93,7 +93,6 @@ lbh_get_body_content(LibBalsaMessageBody * body, gchar ** buf)
 #endif
 
 #include <webkit2/webkit2.h>
-#include <JavaScriptCore/JavaScript.h>
 
 typedef struct {
     LibBalsaMessageBody  *body;

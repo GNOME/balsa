@@ -1,3 +1,7 @@
+2013-05-20  Peter Bloomfield
+
+	* libbalsa/html.c: drop obsolete include.
+
 2013-05-19  Peter Bloomfield
 
 	Implement add-messages at LibBalsaMailboxLocal level, and use a

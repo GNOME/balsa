@@ -1,5 +1,28 @@
 2013-05-22  Peter Bloomfield
 
+	Cast new mailboxes as LibBalsaMailbox, to reduce static and
+	dynamic casting.
+
+	* libbalsa/mailbox_imap.c (libbalsa_mailbox_imap_new): return
+	new mailbox as (LibBalsaMailbox *).
+	* libbalsa/mailbox_imap.h: ditto.
+	* libbalsa/mailbox_local.c: ditto.
+	* libbalsa/mailbox_local.h: ditto.
+	* libbalsa/mailbox_maildir.c (libbalsa_mailbox_maildir_new):
+	ditto.
+	* libbalsa/mailbox_maildir.h: ditto.
+	* libbalsa/mailbox_mbox.c (libbalsa_mailbox_mbox_new): ditto.
+	* libbalsa/mailbox_mbox.h: ditto.
+	* libbalsa/mailbox_mh.c (libbalsa_mailbox_mh_new): ditto.
+	* libbalsa/mailbox_mh.h: ditto.
+	* libinit_balsa/assistant_page_directory.c
+	(unconditional_mailbox): remove static casts to (LibBalsaMailbox *).
+	* src/mailbox-node.c (imap_scan_attach_mailbox),
+	(balsa_mailbox_node_new_imap), (add_local_mailbox): avoid
+	dynmaic casts to LIBBALSA_MAILBOX.
+
+2013-05-22  Peter Bloomfield
+
 	* src/balsa-message.c (part_info_init): do not mess with scroll
 	bars.
 	* src/balsa-mime-widget-text.c (balsa_mime_widget_new_text):

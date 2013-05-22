@@ -225,7 +225,7 @@ lbm_mbox_check_files(const gchar * path, gboolean create)
     return 0;
 }
 
-GObject *
+LibBalsaMailbox *
 libbalsa_mailbox_mbox_new(const gchar * path, gboolean create)
 {
     LibBalsaMailbox *mailbox;
@@ -233,14 +233,14 @@ libbalsa_mailbox_mbox_new(const gchar * path, gboolean create)
     mailbox = g_object_new(LIBBALSA_TYPE_MAILBOX_MBOX, NULL);
 
     mailbox->is_directory = FALSE;
-	
+
     if (libbalsa_mailbox_local_set_path(LIBBALSA_MAILBOX_LOCAL(mailbox),
                                         path, create) != 0) {
 	g_object_unref(mailbox);
 	return NULL;
     }
-    
-    return G_OBJECT(mailbox);
+
+    return mailbox;
 }
 
 /* Helper: seek to offset, and return TRUE if the seek succeeds and a

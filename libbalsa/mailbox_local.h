@@ -96,7 +96,8 @@ struct _LibBalsaMailboxLocalClass {
     LibBalsaMailboxLocalAddMessageFunc *add_message;
 };
 
-GObject *libbalsa_mailbox_local_new(const gchar * path, gboolean create);
+LibBalsaMailbox *libbalsa_mailbox_local_new(const gchar * path,
+                                            gboolean      create);
 gint libbalsa_mailbox_local_set_path(LibBalsaMailboxLocal * mailbox,
 				     const gchar * path, gboolean create);
 void libbalsa_mailbox_local_set_threading_info(LibBalsaMailboxLocal *

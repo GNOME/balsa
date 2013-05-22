@@ -259,7 +259,7 @@ lbm_maildir_set_path(LibBalsaMailboxLocal * local, const gchar * path)
     lbm_maildir_set_subdirs(LIBBALSA_MAILBOX_MAILDIR(local), path);
 }
 
-GObject *
+LibBalsaMailbox *
 libbalsa_mailbox_maildir_new(const gchar * path, gboolean create)
 {
     LibBalsaMailbox *mailbox;
@@ -274,7 +274,7 @@ libbalsa_mailbox_maildir_new(const gchar * path, gboolean create)
         return NULL;
     }
 
-    return G_OBJECT(mailbox);
+    return mailbox;
 }
 
 static void

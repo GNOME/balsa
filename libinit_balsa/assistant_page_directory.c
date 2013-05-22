@@ -116,7 +116,7 @@ unconditional_mailbox(const gchar * path, const gchar * prettyname,
     case U_IMAPS:
         ssl = TRUE;
     case U_IMAP:
-        *box = (LibBalsaMailbox *) libbalsa_mailbox_imap_new();
+        *box = libbalsa_mailbox_imap_new();
         libbalsa_mailbox_imap_set_path((LibBalsaMailboxImap *) * box,
                                        url.path);
         is_remote = TRUE;
@@ -128,11 +128,10 @@ unconditional_mailbox(const gchar * path, const gchar * prettyname,
         is_remote = TRUE;
         break;
     case U_FILE:
-        *box =
-            (LibBalsaMailbox *) libbalsa_mailbox_local_new(url.path, TRUE);
+        *box = libbalsa_mailbox_local_new(url.path, TRUE);
         break;
     default:
-        *box = (LibBalsaMailbox *) libbalsa_mailbox_local_new(path, TRUE);
+        *box = libbalsa_mailbox_local_new(path, TRUE);
         if (!*box) {
             *error = g_strdup_printf(_("Could not create mailbox"
                                        " at path \"%s\"\n"), path);
@@ -155,7 +154,7 @@ unconditional_mailbox(const gchar * path, const gchar * prettyname,
             char tmp[32] = "/tmp/balsa.XXXXXX";
 	    /* Don't fail if you can't create the spool mailbox. */
 	    close(mkstemp(tmp));
-		*box = (LibBalsaMailbox*)libbalsa_mailbox_local_new(tmp, FALSE);
+		*box = libbalsa_mailbox_local_new(tmp, FALSE);
 		if (*box) {
 			free((*box)->url);
 			(*box)->url = g_strdup_printf("file://%s",path);

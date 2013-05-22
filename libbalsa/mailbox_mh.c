@@ -216,7 +216,7 @@ lbm_mh_set_path(LibBalsaMailboxLocal * local, const gchar * path)
     lbm_mh_set_sequences_filename(LIBBALSA_MAILBOX_MH(local), path);
 }
 
-GObject *
+LibBalsaMailbox *
 libbalsa_mailbox_mh_new(const gchar * path, gboolean create)
 {
     LibBalsaMailbox *mailbox;
@@ -231,7 +231,7 @@ libbalsa_mailbox_mh_new(const gchar * path, gboolean create)
 	return NULL;
     }
 
-    return G_OBJECT(mailbox);
+    return mailbox;
 }
 
 static void

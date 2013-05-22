@@ -412,6 +412,7 @@ load_mailbox_view(BalsaMailboxNode * mbnode)
 static gboolean
 imap_scan_attach_mailbox(BalsaMailboxNode * mbnode, imap_scan_item * isi)
 {
+    LibBalsaMailbox *mailbox;
     LibBalsaMailboxImap *m;
 
     /* If the mailbox was added from the config file, it is already
@@ -424,26 +425,28 @@ imap_scan_attach_mailbox(BalsaMailboxNode * mbnode, imap_scan_item * isi)
     if (LIBBALSA_IS_MAILBOX_IMAP(mbnode->mailbox))
         /* it already has a mailbox */
         return FALSE;
-    m = LIBBALSA_MAILBOX_IMAP(libbalsa_mailbox_imap_new());
+
+    mailbox = libbalsa_mailbox_imap_new();
+    m = LIBBALSA_MAILBOX_IMAP(mailbox);
     libbalsa_mailbox_remote_set_server(LIBBALSA_MAILBOX_REMOTE(m),
 				       mbnode->server);
     libbalsa_mailbox_imap_set_path(m, isi->fn);
     if(balsa_app.debug)
         printf("imap_scan_attach_mailbox: add mbox of name %s "
-	       "(full path %s)\n", isi->fn, LIBBALSA_MAILBOX(m)->url);
+	       "(full path %s)\n", isi->fn, mailbox->url);
     /* avoid allocating the name again: */
-    LIBBALSA_MAILBOX(m)->name = mbnode->name;
+    mailbox->name = mbnode->name;
     mbnode->name = NULL;
-    mbnode->mailbox = LIBBALSA_MAILBOX(m);
+    mbnode->mailbox = mailbox;
     load_mailbox_view(mbnode);
     if (isi->special) {
 	if (*isi->special)
 	    g_object_remove_weak_pointer(G_OBJECT(*isi->special),
 					 (gpointer) isi->special);
-        *isi->special = LIBBALSA_MAILBOX(m);
+        *isi->special = mailbox;
 	g_object_add_weak_pointer(G_OBJECT(m), (gpointer) isi->special);
         if (isi->special == &balsa_app.outbox)
-            LIBBALSA_MAILBOX(m)->no_reassemble = TRUE;
+            mailbox->no_reassemble = TRUE;
     }
 
     return TRUE;
@@ -654,7 +657,7 @@ balsa_mailbox_node_new_imap(LibBalsaServer* s, const char*p)
     BalsaMailboxNode * folder = balsa_mailbox_node_new_imap_node(s, p);
     g_assert(s);
 
-    folder->mailbox = LIBBALSA_MAILBOX(libbalsa_mailbox_imap_new());
+    folder->mailbox = libbalsa_mailbox_imap_new();
     g_object_ref(G_OBJECT(folder->mailbox));
     libbalsa_mailbox_remote_set_server(
 	LIBBALSA_MAILBOX_REMOTE(folder->mailbox), s);
@@ -1220,12 +1223,11 @@ add_local_mailbox(BalsaMailboxNode *root, const gchar * name,
     mbnode = remove_special_mailbox_by_url(url, NULL);
     if (!mbnode) {
 	if ( type == LIBBALSA_TYPE_MAILBOX_MH ) {
-	    mailbox = LIBBALSA_MAILBOX(libbalsa_mailbox_mh_new(path, FALSE));
+	    mailbox = libbalsa_mailbox_mh_new(path, FALSE);
 	} else if ( type == LIBBALSA_TYPE_MAILBOX_MBOX ) {
-	    mailbox = LIBBALSA_MAILBOX(libbalsa_mailbox_mbox_new(path, FALSE));
+	    mailbox = libbalsa_mailbox_mbox_new(path, FALSE);
 	} else if ( type == LIBBALSA_TYPE_MAILBOX_MAILDIR ) {
-	    mailbox =
-		LIBBALSA_MAILBOX(libbalsa_mailbox_maildir_new(path, FALSE));
+	    mailbox = libbalsa_mailbox_maildir_new(path, FALSE);
 	} else {
 	    /* type is not a valid local mailbox type. */
 	    balsa_information(LIBBALSA_INFORMATION_DEBUG,

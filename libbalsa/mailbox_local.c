@@ -198,7 +198,7 @@ libbalsa_mailbox_local_init(LibBalsaMailboxLocal * mailbox)
     mailbox->save_tree_id = 0;
 }
 
-GObject *
+LibBalsaMailbox *
 libbalsa_mailbox_local_new(const gchar * path, gboolean create)
 {
     GType magic_type = libbalsa_mailbox_type_from_path(path);

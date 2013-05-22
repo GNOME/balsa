@@ -54,7 +54,8 @@ struct _LibBalsaMailboxMaildirClass {
 };
 
 GType libbalsa_mailbox_maildir_get_type(void);
-GObject *libbalsa_mailbox_maildir_new(const gchar * path, gboolean create);
+LibBalsaMailbox *libbalsa_mailbox_maildir_new(const gchar * path,
+                                              gboolean      create);
 
 #endif
 

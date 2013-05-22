@@ -1,5 +1,12 @@
 2013-05-22  Peter Bloomfield
 
+	* src/balsa-message.c (part_info_init): do not mess with scroll
+	bars.
+	* src/balsa-mime-widget-text.c (balsa_mime_widget_new_text):
+	ditto.
+
+2013-05-22  Peter Bloomfield
+
 	* src/sendmsg-window.c (create_info_pane): use
 	create_email_or_string_entry for Fcc header.
 

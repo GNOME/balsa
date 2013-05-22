@@ -153,12 +153,6 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
         BalsaMimeWidget *html_widget = NULL;
 
 #ifdef HAVE_HTML_WIDGET
-	/* Force vertical scrollbar while we render the html, otherwise
-	 * the widget will make itself too wide to accept one, forcing
-	 * otherwise unnecessary horizontal scrolling. */
-        gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(bm->scroll),
-                                       GTK_POLICY_AUTOMATIC,
-                                       GTK_POLICY_ALWAYS);
         html_widget = bm_widget_new_html(bm, mime_body);
 #endif
         return html_widget;

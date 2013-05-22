@@ -1303,10 +1303,6 @@ part_info_init(BalsaMessage * bm, BalsaPartInfo * info)
     g_return_if_fail(info != NULL);
     g_return_if_fail(info->body != NULL);
 
-    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(bm->scroll),
-                                   GTK_POLICY_AUTOMATIC,
-                                   GTK_POLICY_AUTOMATIC);
-
     info->mime_widget = balsa_mime_widget_new(bm, info->body, info->popup_menu);
 }
 

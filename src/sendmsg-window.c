@@ -2950,13 +2950,6 @@ create_info_pane(BalsaSendmsg * bsmsg)
 #endif
 
     /* fcc: mailbox folder where the message copy will be written to */
-    bsmsg->fcc[0] = gtk_label_new_with_mnemonic(_("F_cc:"));
-    gtk_misc_set_alignment(GTK_MISC(bsmsg->fcc[0]), 0.0, 0.5);
-    gtk_misc_set_padding(GTK_MISC(bsmsg->fcc[0]), GNOME_PAD_SMALL,
-			 GNOME_PAD_SMALL);
-    ++row;
-    gtk_grid_attach(GTK_GRID(grid), bsmsg->fcc[0], 0, row, 1, 1);
-
     if (!balsa_app.fcc_mru)
         balsa_mblist_mru_add(&balsa_app.fcc_mru, balsa_app.sentbox->url);
     balsa_mblist_mru_add(&balsa_app.fcc_mru, "");
@@ -2973,8 +2966,7 @@ create_info_pane(BalsaSendmsg * bsmsg)
     bsmsg->fcc[1] =
         balsa_mblist_mru_option_menu(GTK_WINDOW(bsmsg->window),
                                      &balsa_app.fcc_mru);
-    gtk_label_set_mnemonic_widget(GTK_LABEL(bsmsg->fcc[0]), bsmsg->fcc[1]);
-    gtk_grid_attach(GTK_GRID(grid), bsmsg->fcc[1] , 1, row, 1, 1);
+    create_email_or_string_entry(grid, _("F_cc:"), ++row, bsmsg->fcc);
 
     /* Attachment list */
     bsmsg->attachments[0] = gtk_label_new_with_mnemonic(_("_Attachments:"));

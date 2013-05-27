@@ -1,3 +1,8 @@
+2013-05-26  Peter Bloomfield
+
+	* src/main-window.c: report network availability with a
+	human-readable time; combine two idle callbacks into one.
+
 2013-05-22  Peter Bloomfield
 
 	Cast new mailboxes as LibBalsaMailbox, to reduce static and

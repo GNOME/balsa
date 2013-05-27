@@ -990,10 +990,21 @@ balsa_window_class_init(BalsaWindowClass * klass)
 }
 
 static gboolean bw_change_connection_status_idle(gpointer data);
-#define PRINT_NETWORK_STATUS(available)                 \
-    g_printerr("Network is %s (%u)\n",                  \
-               (available) ? "available" : "unavailable", \
-               (guint) time(NULL))
+static void
+print_network_status(gboolean available)
+{
+    GDateTime *datetime;
+    gchar *datetime_string;
+
+    datetime = g_date_time_new_now_local();
+    datetime_string = g_date_time_format(datetime, "%c");
+    g_date_time_unref(datetime);
+
+    g_printerr("Network is %s (%s)\n",
+               available ? "available  " : "unavailable",
+               datetime_string);
+    g_free(datetime_string);
+}
 
 static void
 bw_network_changed_cb(GNetworkMonitor * monitor,
@@ -1004,9 +1015,8 @@ bw_network_changed_cb(GNetworkMonitor * monitor,
 
     if (window->network_available != available) {
         window->network_available = available;
-        PRINT_NETWORK_STATUS(available);
-        g_idle_add(bw_change_connection_status_idle,
-                   GINT_TO_POINTER(available));
+        print_network_status(available);
+        g_idle_add(bw_change_connection_status_idle, window);
     }
 }
 
@@ -1018,7 +1028,7 @@ balsa_window_init(BalsaWindow * window)
     monitor = g_network_monitor_get_default();
     window->network_available =
         g_network_monitor_get_network_available(monitor);
-    PRINT_NETWORK_STATUS(window->network_available);
+    print_network_status(window->network_available);
     g_signal_connect(monitor, "network-changed",
                      G_CALLBACK(bw_network_changed_cb), window);
     window->last_check_time = 0;
@@ -3651,32 +3661,23 @@ mw_mbox_change_connection_status(GtkTreeModel * model, GtkTreePath * path,
 }
 
 static gboolean
-check_new_messages_idle(gpointer user_data)
+bw_change_connection_status_idle(gpointer user_data)
 {
-    check_new_messages_cb(NULL, balsa_app.main_window);
-    return FALSE;
-}
-
-static gboolean
-bw_change_connection_status_idle(gpointer arg)
-{
-    gboolean is_connected = GPOINTER_TO_INT(arg);
+    BalsaWindow *window = user_data;
 
     gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
-			   (GtkTreeModelForeachFunc)
-                           mw_mbox_change_connection_status,
-                           NULL);
+                           (GtkTreeModelForeachFunc)
+                           mw_mbox_change_connection_status, NULL);
 
     /* GLib timeouts are now triggered by g_get_monotonic_time(),
      * which doesn't increment while we're suspended, so we must
      * check for ourselves whether a scheduled mail check was
      * missed. */
-    if (is_connected &&
-        difftime(time(NULL), balsa_app.main_window->last_check_time) >
+    if (window->network_available &&
+        difftime(time(NULL), window->last_check_time) >
         balsa_app.check_mail_timer * 60) {
-        /* Check the mail now, and reset the timer, remembering it
-           must be called from a main thread. */
-        g_idle_add(check_new_messages_idle, NULL);
+        /* Check the mail now, and reset the timer */
+        check_new_messages_cb(NULL, window);
     }
 
     return FALSE;

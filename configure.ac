@@ -834,10 +834,20 @@ dnl #####################################################################
 
 # Spell check detection.
 #
+AC_MSG_CHECKING([whether to configure for gtkspell/enchant])
 if test x$with_gtkspell != xno; then
-    PKG_CHECK_MODULES(SPELL, [ gtkspell3-3.0 enchant ])
+    if $PKG_CONFIG --atleast-version=3.0.3 gtkspell3-3.0; then
+        AC_MSG_RESULT([gtkspell version >= 3.0.3])
+        PKG_CHECK_MODULES(SPELL, [ gtkspell3-3.0 ])
+        AC_DEFINE(HAVE_GTKSPELL_3_0_3,1,[Defined when GtkSpell version
+                                         is at least 3.0.3.])
+    else
+        AC_MSG_RESULT([gtkspell version < 3.0.3])
+        PKG_CHECK_MODULES(SPELL, [ gtkspell3-3.0 enchant ])
+    fi
     AC_DEFINE(HAVE_GTKSPELL,1,[Defined when GtkSpell can be used.])
 else
+    AC_MSG_RESULT([configure enchant])
     PKG_CHECK_MODULES(SPELL, [ enchant ])
 fi
 BALSA_CFLAGS="$BALSA_CFLAGS $SPELL_CFLAGS"

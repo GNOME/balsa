@@ -70,7 +70,9 @@
 #include "print.h"
 #include "macosx-helpers.h"
 
+#ifndef HAVE_GTKSPELL_3_0_3
 #include <enchant/enchant.h>
+#endif                          /* HAVE_GTKSPELL_3_0_3 */
 #if HAVE_GTKSPELL
 #include "gtkspell/gtkspell.h"
 #else                           /* HAVE_GTKSPELL */
@@ -4331,7 +4333,11 @@ create_lang_menu(GtkWidget * parent, BalsaSendmsg * bsmsg)
     GtkWidget *langs = gtk_menu_new();
     static gboolean locales_sorted = FALSE;
     GSList *group = NULL;
+#if HAVE_GTKSPELL_3_0_3
+    GList *lang_list;
+#else                           /* HAVE_GTKSPELL_3_0_3 */
     EnchantBroker *broker;
+#endif                          /* HAVE_GTKSPELL_3_0_3 */
 
     if (!locales_sorted) {
         for (i = 0; i < ELEMENTS(locales); i++)
@@ -4351,7 +4357,11 @@ create_lang_menu(GtkWidget * parent, BalsaSendmsg * bsmsg)
     selected_pos = find_locale_index_by_locale(setlocale(LC_CTYPE, NULL));
 #endif                          /* HAVE_GTKSPELL */
 
+#if HAVE_GTKSPELL_3_0_3
+    lang_list = gtkspell_get_language_list();
+#else                           /* HAVE_GTKSPELL_3_0_3 */
     broker = enchant_broker_init();
+#endif                          /* HAVE_GTKSPELL_3_0_3 */
 
     for (i = 0; i < ELEMENTS(locales); i++) {
         if (locales[i].locale == NULL || locales[i].locale[0] == '\0')
@@ -4359,7 +4369,12 @@ create_lang_menu(GtkWidget * parent, BalsaSendmsg * bsmsg)
              * lang; in either case, it does not go in the langs menu. */
             continue;
 
+#if HAVE_GTKSPELL_3_0_3
+        if (g_list_find_custom(lang_list, locales[i].locale,
+                               (GCompareFunc) strcmp)) {
+#else                           /* HAVE_GTKSPELL_3_0_3 */
         if (enchant_broker_dict_exists(broker, locales[i].locale)) {
+#endif                          /* HAVE_GTKSPELL_3_0_3 */
             GtkWidget *w;
 
             if (selected_pos < 0)
@@ -4382,7 +4397,13 @@ create_lang_menu(GtkWidget * parent, BalsaSendmsg * bsmsg)
             gtk_menu_shell_append(GTK_MENU_SHELL(langs), w);
         }
     }
+#if HAVE_GTKSPELL_3_0_3
+    /* We should add to the langs menu any available languages that are
+     * not listed in locales[]; not implemented, just free the list */
+    g_list_free(lang_list);
+#else                           /* HAVE_GTKSPELL_3_0_3 */
     enchant_broker_free(broker);
+#endif                          /* HAVE_GTKSPELL_3_0_3 */
 
     if (selected_pos >= 0)
         set_locale(bsmsg, selected_pos);

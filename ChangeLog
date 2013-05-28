@@ -1,3 +1,10 @@
+2013-05-28  Peter Bloomfield
+
+	* configure.ac: check GtkSpell version, and avoid explicit
+	dependence on enchant when possible.
+	* src/sendmsg-window.c: use gtkspell_get_language_list when
+	available, instead of enchant API.
+
 2013-05-26  Peter Bloomfield
 
 	* src/main-window.c: report network availability with a

@@ -1,3 +1,12 @@
+2013-05-29  Peter Bloomfield
+
+	GNOME Goal: Notification Sources
+
+	* balsa.desktop.in.in: add X-GNOME-UsesNotifications=true
+	* libbalsa/information.c (libbalsa_information_varg): set
+	"desktop-entry" hint for NotifyNotification.
+	* src/main-window.c: ditto.
+
 2013-05-28  Peter Bloomfield
 
 	* configure.ac: check GtkSpell version, and avoid explicit

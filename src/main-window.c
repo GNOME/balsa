@@ -3568,6 +3568,9 @@ bw_display_new_mail_notification(int num_new, int has_new)
 #if HAVE_NOTIFY >=7
             balsa_app.main_window->new_mail_note =
                 notify_notification_new("Balsa", NULL, NULL);
+            notify_notification_set_hint(balsa_app.main_window->
+                                         new_mail_note, "desktop-entry",
+                                         g_variant_new_string("balsa"));
 #else
             balsa_app.main_window->new_mail_note =
                 notify_notification_new("Balsa", NULL, NULL, NULL);

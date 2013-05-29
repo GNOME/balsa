@@ -10,3 +10,4 @@ Terminal=false
 Type=Application
 StartupNotify=true
 Categories=GNOME;GTK;Office;Email;
+X-GNOME-UsesNotifications=true

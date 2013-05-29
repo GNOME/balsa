@@ -124,6 +124,8 @@ libbalsa_information_varg(GtkWindow *parent, LibBalsaInformationType type,
 
 #if HAVE_NOTIFY >= 7
         note = notify_notification_new("Balsa", escaped->str, icon_str);
+        notify_notification_set_hint(note, "desktop-entry",
+                                     g_variant_new_string("balsa"));
 #else
         /* prior to 0.7.0 */
         note = notify_notification_new("Balsa", escaped->str, icon_str, NULL);

@@ -78,7 +78,7 @@ extern "C" {
 	SendType type;
         gboolean is_continue;
 	/* language selection related data */
-	const gchar *spell_check_lang;
+	gchar *spell_check_lang;
 	GtkWidget *current_language_menu;
 	/* identity related data */
 	LibBalsaIdentity* ident;

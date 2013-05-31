@@ -1,3 +1,12 @@
+2013-05-30  Peter Bloomfield
+
+	* src/sendmsg-window.c (balsa_sendmsg_destroy_handler),
+	(sw_broker_cb), (create_lang_menu), (sendmsg_window_continue),
+	(sw_spell_language_changed_cb), (sw_spell_attach), (set_locale),
+	(lang_set_cb): handle language changes fromGtkSpell's
+	context menu.
+	* src/sendmsg-window.h: spell_check_lang is no longer const.
+
 2013-05-29  Peter Bloomfield
 
 	GNOME Goal: Notification Sources

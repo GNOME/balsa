@@ -145,8 +145,11 @@ typedef struct _PropertyUI {
     /* arp */
     GtkWidget *quote_str;
 
+    GtkWidget *use_system_fonts;        /* toggle button */
+    GtkWidget *message_font_label;      /* label */
     GtkWidget *message_font_button;     /* font used to display messages */
-    GtkWidget *subject_font_button;     /* font used to display messages */
+    GtkWidget *subject_font_label;      /* label */
+    GtkWidget *subject_font_button;     /* font used to display subjects */
     GtkWidget *use_default_font_size;   /* toggle button */
 
     GtkWidget *date_format;
@@ -365,6 +368,7 @@ static void browse_modified_cb(GtkWidget * widget, GtkWidget * pbox);
 static void mark_quoted_modified_cb(GtkWidget * widget, GtkWidget * pbox);
 static void wrap_modified_cb(GtkWidget * widget, GtkWidget * pbox);
 
+static void use_system_fonts_cb(GtkWidget * widget, GtkWidget * pbox);
 static void font_modified_cb(GtkWidget * widget, GtkWidget * pbox);
 static void default_font_size_cb(GtkWidget * widget, GtkWidget * pbox);
 
@@ -697,6 +701,8 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
                      property_box);
 
     /* message font */
+    g_signal_connect(G_OBJECT(pui->use_system_fonts), "toggled",
+                     G_CALLBACK(use_system_fonts_cb), property_box);
     g_signal_connect(G_OBJECT(pui->message_font_button), "font-set",
                      G_CALLBACK(font_modified_cb), property_box);
     g_signal_connect(G_OBJECT(pui->subject_font_button), "font-set",
@@ -994,6 +1000,10 @@ apply_prefs(GtkDialog * pbox)
     balsa_app.quote_str =
         g_strdup(gtk_entry_get_text(GTK_ENTRY(pui->quote_str)));
 
+    /* fonts */
+    balsa_app.use_system_fonts =
+        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
+                                     (pui->use_system_fonts));
     check_font_button(pui->message_font_button, &balsa_app.message_font);
     check_font_button(pui->subject_font_button, &balsa_app.subject_font);
 
@@ -2369,9 +2379,9 @@ font_button_check_font_size(GtkWidget * button, GtkWidget * widget)
 static gboolean
 attach_font_button(const gchar * label, gint row, GtkGrid * grid,
                    GtkWidget * page, const gchar * font,
-                   GtkWidget ** button)
+                   GtkWidget ** label_widget, GtkWidget ** button)
 {
-    attach_label(label, grid, row, page);
+    *label_widget = attach_label(label, grid, row, page);
 
     *button = gtk_font_button_new_with_font(font);
     gtk_widget_set_hexpand(*button, TRUE);
@@ -2394,26 +2404,41 @@ preview_font_group(GtkWidget * page)
     GtkWidget *group;
     GtkGrid *grid;
     gboolean use_default_font_size = FALSE;
+    gint row;
 
     group = pm_group_new(_("Fonts"));
     grid = (GtkGrid *) create_grid(page);
     pm_group_add(group, (GtkWidget *) grid, FALSE);
 
-    if (attach_font_button(_("Message font:"), 0, grid, page,
+    row = 0;
+    pui->use_system_fonts =
+        gtk_check_button_new_with_label(_("Use system fonts"));
+    gtk_widget_set_hexpand(pui->use_system_fonts, TRUE);
+    gtk_grid_attach(grid, pui->use_system_fonts,
+                    0, row, 2, 1);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->use_system_fonts),
+                                 balsa_app.use_system_fonts);
+
+    ++row;
+    if (attach_font_button(_("Message font:"), row, grid, page,
                            balsa_app.message_font,
+                           &pui->message_font_label,
                            &pui->message_font_button))
         use_default_font_size = TRUE;
 
-    if (attach_font_button(_("Subject font:"), 1, grid, page,
+    ++row;
+    if (attach_font_button(_("Subject font:"), row, grid, page,
                            balsa_app.subject_font,
+                           &pui->subject_font_label,
                            &pui->subject_font_button))
         use_default_font_size = TRUE;
 
+    ++row;
     pui->use_default_font_size =
         gtk_check_button_new_with_label(_("Use default font size"));
     gtk_widget_set_hexpand(pui->use_default_font_size, TRUE);
     gtk_grid_attach(grid, pui->use_default_font_size,
-                     0, 2, 2, 1);
+                    0, row, 2, 1);
 
     if (use_default_font_size) {
         gtk_font_button_set_show_size(GTK_FONT_BUTTON
@@ -2422,6 +2447,14 @@ preview_font_group(GtkWidget * page)
                                       (pui->subject_font_button), FALSE);
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
                                      (pui->use_default_font_size), TRUE);
+    }
+
+    if (balsa_app.use_system_fonts) {
+        gtk_widget_set_sensitive(pui->message_font_label, FALSE);
+        gtk_widget_set_sensitive(pui->message_font_button, FALSE);
+        gtk_widget_set_sensitive(pui->subject_font_label, FALSE);
+        gtk_widget_set_sensitive(pui->subject_font_button, FALSE);
+        gtk_widget_set_sensitive(pui->use_default_font_size, FALSE);
     }
 
     return group;
@@ -3365,6 +3398,21 @@ convert_8bit_cb(GtkWidget * widget, GtkWidget * pbox)
 /*
  * Callbacks for the font group
  */
+
+static void
+use_system_fonts_cb(GtkWidget * widget, GtkWidget * pbox)
+{
+    gboolean use_custom_fonts =
+        !gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget));
+
+    properties_modified_cb(widget, pbox);
+
+    gtk_widget_set_sensitive(pui->message_font_label, use_custom_fonts);
+    gtk_widget_set_sensitive(pui->message_font_button, use_custom_fonts);
+    gtk_widget_set_sensitive(pui->subject_font_label, use_custom_fonts);
+    gtk_widget_set_sensitive(pui->subject_font_button, use_custom_fonts);
+    gtk_widget_set_sensitive(pui->use_default_font_size, use_custom_fonts);
+}
 
 static void
 font_modified_cb(GtkWidget * widget, GtkWidget * pbox)

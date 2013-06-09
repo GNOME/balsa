@@ -193,7 +193,8 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
     gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(mw->widget), GTK_WRAP_WORD_CHAR);
 
     /* set the message font */
-    bm_modify_font_from_string(mw->widget, balsa_app.message_font);
+    if (!balsa_app.use_system_fonts)
+        bm_modify_font_from_string(mw->widget, balsa_app.message_font);
 
     if (libbalsa_message_body_is_flowed(mime_body)) {
 	/* Parse, but don't wrap. */
@@ -336,8 +337,9 @@ create_text_widget(const char * content_type)
 static void
 bm_modify_font_from_string(GtkWidget * widget, const char *font)
 {
-    PangoFontDescription *desc =
-        pango_font_description_from_string(balsa_app.message_font);
+    PangoFontDescription *desc;
+
+    desc = pango_font_description_from_string(font);
     gtk_widget_override_font(widget, desc);
     pango_font_description_free(desc);
 }

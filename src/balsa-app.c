@@ -360,6 +360,7 @@ balsa_app_init(void)
     balsa_app.quote_regex = g_strdup(DEFAULT_QUOTE_REGEX);
 
     /* font */
+    balsa_app.use_system_fonts = FALSE;
     balsa_app.message_font = NULL;
     balsa_app.subject_font = NULL;
 

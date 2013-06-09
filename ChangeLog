@@ -1,3 +1,21 @@
+2013-06-09  Peter Bloomfield
+
+	Add the option to use system fonts
+
+	* src/balsa-app.h: new member gboolean use_system_fonts.
+	* src/balsa-app.c (balsa_app_init): initialize it.
+	* src/balsa-mime-widget-message.c (add_header_gchar): respect
+	it.
+	* src/balsa-mime-widget-text.c (balsa_mime_widget_new_text),
+	(bm_modify_font_from_string): ditto.
+	* src/pref-manager.c (open_preferences_manager), (apply_prefs),
+	(attach_font_button), (preview_font_group),
+	(use_system_fonts_cb): allow user to choose it.
+	* src/save-restore.c (config_global_load), (config_save): save
+	and restore it.
+	* src/sendmsg-window.c (create_email_or_string_entry),
+	(create_text_area): respect it also for compose window.
+
 2013-05-30  Peter Bloomfield
 
 	* src/sendmsg-window.c (balsa_sendmsg_destroy_handler),

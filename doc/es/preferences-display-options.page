@@ -128,9 +128,15 @@
         <title>
           <gui>Fonts</gui>
         </title>
-        <p>Choose the fonts that you want to be used to display a
-        message. You can choose a distinct font for the message's
-        subject line.</p>
+        <p>Using system fonts to view and compose messages makes the
+        display consistent with other applications. If you choose this
+        option, the message's subject line will be made bold.</p>
+        <p>Alternatively, you can choose your own font to view or
+        compose a message, with a different weight or font for the
+        subject line. A fixed-width font such as Monospace can be useful
+        for viewing source code, or formatted text such as tables or
+        <link href="https://en.wikipedia.org/wiki/ASCII_art">ASCII
+        art</link>.</p>
       </item>
       <item>
         <title>

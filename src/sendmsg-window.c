@@ -2602,7 +2602,6 @@ static void
 create_email_or_string_entry(GtkWidget * grid, const gchar * label,
                              int y_pos, GtkWidget * arr[])
 {
-    PangoFontDescription *desc;
     GtkWidget *mnemonic_widget;
 
     mnemonic_widget = arr[1];
@@ -2615,9 +2614,13 @@ create_email_or_string_entry(GtkWidget * grid, const gchar * label,
 			 GNOME_PAD_SMALL);
     gtk_grid_attach(GTK_GRID(grid), arr[0], 0, y_pos, 1, 1);
 
-    desc = pango_font_description_from_string(balsa_app.message_font);
-    gtk_widget_override_font(arr[1], desc);
-    pango_font_description_free(desc);
+    if (!balsa_app.use_system_fonts) {
+        PangoFontDescription *desc;
+
+        desc = pango_font_description_from_string(balsa_app.message_font);
+        gtk_widget_override_font(arr[1], desc);
+        pango_font_description_free(desc);
+    }
 
     gtk_widget_set_hexpand(arr[1], TRUE);
     gtk_grid_attach(GTK_GRID(grid), arr[1], 1, y_pos, 1, 1);
@@ -3220,7 +3223,6 @@ static GtkWidget *
 create_text_area(BalsaSendmsg * bsmsg)
 {
     GtkTextView *text_view;
-    PangoFontDescription *desc;
     GtkTextBuffer *buffer;
     GtkWidget *scroll;
 
@@ -3234,9 +3236,13 @@ create_text_area(BalsaSendmsg * bsmsg)
     gtk_text_view_set_right_margin(text_view, 2);
 
     /* set the message font */
-    desc = pango_font_description_from_string(balsa_app.message_font);
-    gtk_widget_override_font(bsmsg->text, desc);
-    pango_font_description_free(desc);
+    if (!balsa_app.use_system_fonts) {
+        PangoFontDescription *desc;
+
+        desc = pango_font_description_from_string(balsa_app.message_font);
+        gtk_widget_override_font(bsmsg->text, desc);
+        pango_font_description_free(desc);
+    }
 
     buffer = gtk_text_view_get_buffer(text_view);
 #if (HAVE_GTKSOURCEVIEW == 1)

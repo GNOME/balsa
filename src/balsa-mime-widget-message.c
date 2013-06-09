@@ -522,9 +522,7 @@ add_header_gchar(BalsaMessage * bm, GtkGrid * grid,
 {
     gint row;
     GtkWidget *lab;
-    PangoAttrList *attr_list;
     PangoFontDescription *font_desc;
-    PangoAttribute *attr;
 
     if (!(bm->shown_headers == HEADERS_ALL ||
 	  libbalsa_find_word(header, balsa_app.selected_headers)))
@@ -534,17 +532,21 @@ add_header_gchar(BalsaMessage * bm, GtkGrid * grid,
     while (gtk_grid_get_child_at(grid, 0, row))
         row++;
 
-    attr_list = pango_attr_list_new();
-    font_desc =
-        pango_font_description_from_string(strcmp(header, "subject") ?
-                                           balsa_app.message_font :
-                                           balsa_app.subject_font);
-    attr = pango_attr_font_desc_new(font_desc);
-    pango_font_description_free(font_desc);
-    pango_attr_list_insert(attr_list, attr);
+    if (balsa_app.use_system_fonts) {
+        font_desc = pango_font_description_new();
+        if (strcmp(header, "subject") == 0)
+            /* Use bold for the subject line */
+            pango_font_description_set_weight(font_desc,
+                                              PANGO_WEIGHT_BOLD);
+    } else {
+        font_desc =
+            pango_font_description_from_string(strcmp(header, "subject") ?
+                                               balsa_app.message_font :
+                                               balsa_app.subject_font);
+    }
 
     lab = gtk_label_new(label);
-    gtk_label_set_attributes(GTK_LABEL(lab), attr_list);
+    gtk_widget_override_font(lab, font_desc);
     gtk_grid_attach(grid, lab, 0, row, 1, 1);
     gtk_label_set_selectable(GTK_LABEL(lab), TRUE);
     gtk_misc_set_alignment(GTK_MISC(lab), 0, 0);
@@ -561,7 +563,7 @@ add_header_gchar(BalsaMessage * bm, GtkGrid * grid,
         lab = gtk_label_new(sanitized);
         g_free(sanitized);
 
-        gtk_label_set_attributes(GTK_LABEL(lab), attr_list);
+        gtk_widget_override_font(lab, font_desc);
         gtk_label_set_line_wrap_mode(GTK_LABEL(lab), PANGO_WRAP_WORD_CHAR);
         gtk_label_set_selectable(GTK_LABEL(lab), TRUE);
         gtk_misc_set_alignment(GTK_MISC(lab), 0, 0);
@@ -588,7 +590,7 @@ add_header_gchar(BalsaMessage * bm, GtkGrid * grid,
         gtk_grid_attach(grid, hbox, 1, row, 1, 1);
     }
 
-    pango_attr_list_unref(attr_list);
+    pango_font_description_free(font_desc);
 }
 
 static void

@@ -1,3 +1,13 @@
+2013-06-09  Peter Bloomfield  <peter@w500.bellsouth.net>
+
+	reviewed by: <delete if not using a buddy>
+
+	* C/preferences-display-options.page:
+	* de/preferences-display-options.page:
+	* es/preferences-display-options.page:
+	* fr/preferences-display-options.page:
+	* sl/preferences-display-options.page:
+
 2013-05-01  Peter Bloomfield
 
 	We no longer use color in addresses

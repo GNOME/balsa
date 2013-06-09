@@ -123,7 +123,15 @@
         <title>
           <gui>Fonts</gui>
         </title>
-        <p>Izberite pisave, ki jih želite uporabiti za prikaz sporočila. Za vrstico zadeve lahko uporabite drugačno pisavo.</p>
+        <p>Using system fonts to view and compose messages makes the
+        display consistent with other applications. If you choose this
+        option, the message's subject line will be made bold.</p>
+        <p>Alternatively, you can choose your own font to view or
+        compose a message, with a different weight or font for the
+        subject line. A fixed-width font such as Monospace can be useful
+        for viewing source code, or formatted text such as tables or
+        <link href="https://en.wikipedia.org/wiki/ASCII_art">ASCII
+        art</link>.</p>
       </item>
       <item>
         <title>

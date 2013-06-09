@@ -752,6 +752,8 @@ config_global_load(void)
     load_color("UrlColor", DEFAULT_URL_COLOR, &balsa_app.url_color);
 
     /* ... font used to display messages */
+    balsa_app.use_system_fonts =
+        libbalsa_conf_get_bool("UseSystemFonts=false");
     g_free(balsa_app.message_font);
     balsa_app.message_font =
 	libbalsa_conf_get_string("MessageFont=" DEFAULT_MESSAGE_FONT);
@@ -1273,6 +1275,7 @@ config_save(void)
 			 libbalsa_mailbox_get_threading_type(NULL));
     libbalsa_conf_set_bool("MarkQuoted", balsa_app.mark_quoted);
     libbalsa_conf_set_string("QuoteRegex", balsa_app.quote_regex);
+    libbalsa_conf_set_bool("UseSystemFonts", balsa_app.use_system_fonts);
     libbalsa_conf_set_string("MessageFont", balsa_app.message_font);
     libbalsa_conf_set_string("SubjectFont", balsa_app.subject_font);
     libbalsa_conf_set_bool("WordWrap", balsa_app.browse_wrap);

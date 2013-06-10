@@ -753,7 +753,7 @@ config_global_load(void)
 
     /* ... font used to display messages */
     balsa_app.use_system_fonts =
-        libbalsa_conf_get_bool("UseSystemFonts=false");
+        libbalsa_conf_get_bool("UseSystemFonts=true");
     g_free(balsa_app.message_font);
     balsa_app.message_font =
 	libbalsa_conf_get_string("MessageFont=" DEFAULT_MESSAGE_FONT);

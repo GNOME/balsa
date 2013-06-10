@@ -1,3 +1,9 @@
+2013-06-10  Peter Bloomfield
+
+	* src/save-restore.c (config_global_load): change default to
+	UseSystemFonts=true.
+	* src/balsa-app.c (balsa_app_init): ditto.
+
 2013-06-09  Peter Bloomfield
 
 	Add the option to use system fonts

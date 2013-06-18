@@ -1,3 +1,10 @@
+2013-06-17  Peter Bloomfield
+
+	* src/sendmsg-window.c (create_info_pane): allow the recipients
+	widget and the attachments list to expand;
+	(sendmsg_window_new): use a GtkPaned to allow the user to change
+	the space allocated to the headers.
+
 2013-06-10  Peter Bloomfield
 
 	* src/save-restore.c (config_global_load): change default to

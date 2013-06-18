@@ -2936,6 +2936,7 @@ create_info_pane(BalsaSendmsg * bsmsg)
     create_email_entry(grid, ++row, bsmsg, &bsmsg->recipient_view,
                        bsmsg->recipients, "Rec_ipients", address_types,
                        G_N_ELEMENTS(address_types));
+    gtk_widget_set_vexpand(bsmsg->recipients[1], TRUE);
     g_signal_connect_swapped(gtk_tree_view_get_model
                              (GTK_TREE_VIEW(bsmsg->recipient_view)),
                              "row-changed",
@@ -3002,6 +3003,7 @@ create_info_pane(BalsaSendmsg * bsmsg)
 			       G_TYPE_STRING);
 
     bsmsg->attachments[1] = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
+    gtk_widget_set_vexpand(bsmsg->attachments[1], TRUE);
     view = GTK_TREE_VIEW(bsmsg->attachments[1]);
     gtk_tree_view_set_headers_visible(view, TRUE);
     gtk_tree_view_set_rules_hint(view, TRUE);
@@ -4572,6 +4574,7 @@ sendmsg_window_new()
     GtkAccelGroup *accel_group;
     GError *error = NULL;
     GtkWidget *menubar;
+    GtkWidget *paned;
 
     bsmsg = g_malloc(sizeof(BalsaSendmsg));
     bsmsg->in_reply_to = NULL;
@@ -4677,13 +4680,17 @@ sendmsg_window_new()
     bsmsg_setup_gpg_ui(bsmsg);
 #endif
 
+    /* Paned window for the addresses at the top, and the content at the
+     * bottom: */
+    paned = gtk_paned_new(GTK_ORIENTATION_VERTICAL);
+    gtk_box_pack_start(GTK_BOX(main_box), paned, TRUE, TRUE, 0);
+    gtk_widget_show(paned);
+
     /* create the top portion with the to, from, etc in it */
-    gtk_box_pack_start(GTK_BOX(main_box), create_info_pane(bsmsg),
-                       FALSE, FALSE, 0);
+    gtk_paned_add1(GTK_PANED(paned), create_info_pane(bsmsg));
 
     /* create text area for the message */
-    gtk_box_pack_start(GTK_BOX(main_box), create_text_area(bsmsg),
-                       TRUE, TRUE, 0);
+    gtk_paned_add2(GTK_PANED(paned), create_text_area(bsmsg));
 
     /* set the menus - and language index */
     init_menus(bsmsg);

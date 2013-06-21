@@ -704,7 +704,7 @@ static BalsaAttachInfo* balsa_attach_info_new();
 static void balsa_attach_info_destroy(GObject * object);
 
 
-#define BALSA_MSG_ATTACH_MODEL(x)   gtk_tree_view_get_model(GTK_TREE_VIEW((x)->attachments[1]))
+#define BALSA_MSG_ATTACH_MODEL(x)   gtk_tree_view_get_model(GTK_TREE_VIEW((x)->tree_view))
 
 
 #define TYPE_BALSA_ATTACH_INFO          \
@@ -1696,7 +1696,7 @@ remove_attachment(GtkWidget * menu_item, BalsaAttachInfo *info)
     g_return_if_fail(info->bm != NULL);
 
     /* get the selected element */
-    selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(info->bm->attachments[1]));
+    selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(info->bm->tree_view));
     if (!gtk_tree_selection_get_selected(selection, &model, &iter))
 	return;
 
@@ -1738,7 +1738,7 @@ change_attach_mode(GtkWidget * menu_item, BalsaAttachInfo *info)
     g_return_if_fail(info->bm != NULL);
 
     /* get the selected element */
-    selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(info->bm->attachments[1]));
+    selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(info->bm->tree_view));
     if (!gtk_tree_selection_get_selected(selection, &model, &iter))
 	return;
 
@@ -1837,21 +1837,47 @@ on_open_url_cb(GtkWidget * menu_item, BalsaAttachInfo * info)
     }
 }
 
-
+static GtkWidget * sw_attachment_list(BalsaSendmsg *bsmsg);
 static void
 show_attachment_widget(BalsaSendmsg *bsmsg)
 {
-    int pos;
-    for(pos=0; pos<4; pos++)
-        gtk_widget_show_all(GTK_WIDGET(bsmsg->attachments[pos]));
-}
+    GtkPaned *outer_paned;
+    GtkWidget *child;
 
-static void
-hide_attachment_widget(BalsaSendmsg *bsmsg)
-{
-    int pos;
-    for(pos=0; pos<4; pos++)
-        gtk_widget_hide(GTK_WIDGET(bsmsg->attachments[pos]));
+    outer_paned = GTK_PANED(bsmsg->paned);
+    child = gtk_paned_get_child1(outer_paned);
+
+    if (!GTK_IS_PANED(child)) {
+        gint position;
+        GtkRequisition minimum_size;
+        GtkWidget *paned;
+        GtkPaned *inner_paned;
+
+        position = gtk_paned_get_position(outer_paned);
+        if (position <= 0) {
+            gtk_widget_get_preferred_size(child, &minimum_size, NULL);
+            position = minimum_size.height;
+        }
+        gtk_container_remove(GTK_CONTAINER(bsmsg->paned),
+                             g_object_ref(child));
+
+        paned = gtk_paned_new(GTK_ORIENTATION_VERTICAL);
+        gtk_widget_show(paned);
+
+        inner_paned = GTK_PANED(paned);
+        gtk_paned_add1(inner_paned, child);
+        g_object_unref(child);
+
+        child = sw_attachment_list(bsmsg);
+        gtk_widget_show_all(child);
+        gtk_paned_add2(inner_paned, child);
+        gtk_paned_set_position(inner_paned, position);
+
+        gtk_widget_get_preferred_size(child, &minimum_size, NULL);
+        gtk_paned_add1(outer_paned, paned);
+        gtk_paned_set_position(outer_paned,
+                               position + minimum_size.height);
+    }
 }
 
 /* Ask the user for a charset; returns ((LibBalsaCodeset) -1) on cancel. */
@@ -2116,6 +2142,8 @@ add_attachment(BalsaSendmsg * bsmsg, const gchar *filename,
 	    utf8name = g_strdup(uri_utf8);
     }
 
+    show_attachment_widget(bsmsg);
+
     model = BALSA_MSG_ATTACH_MODEL(bsmsg);
     gtk_list_store_append(GTK_LIST_STORE(model), &iter);
 
@@ -2208,8 +2236,6 @@ add_attachment(BalsaSendmsg * bsmsg, const gchar *filename,
     g_free(content_type);
     g_free(content_desc);
 
-    show_attachment_widget(bsmsg);
-
     return TRUE;
 }
 
@@ -2238,6 +2264,8 @@ add_urlref_attachment(BalsaSendmsg * bsmsg, gchar *url)
     /* create a new attachment info block */
     attach_data = balsa_attach_info_new(bsmsg);
     attach_data->charset = NULL;
+
+    show_attachment_widget(bsmsg);
 
     model = BALSA_MSG_ATTACH_MODEL(bsmsg);
     gtk_list_store_append(GTK_LIST_STORE(model), &iter);
@@ -2282,8 +2310,6 @@ add_urlref_attachment(BalsaSendmsg * bsmsg, gchar *url)
     g_object_unref(attach_data);
     g_object_unref(pixbuf);
     g_free(url);
-
-    show_attachment_widget(bsmsg);
 
     return TRUE;
 }
@@ -2908,13 +2934,7 @@ static GtkWidget *
 create_info_pane(BalsaSendmsg * bsmsg)
 {
     guint row = 0;
-    GtkWidget *sw;
     GtkWidget *grid;
-    GtkWidget *frame;
-    GtkListStore *store;
-    GtkCellRenderer *renderer;
-    GtkTreeView *view;
-    GtkTreeViewColumn *column;
 
     grid = gtk_grid_new();
     gtk_grid_set_row_spacing(GTK_GRID(grid), 6);
@@ -2977,22 +2997,39 @@ create_info_pane(BalsaSendmsg * bsmsg)
                                      &balsa_app.fcc_mru);
     create_email_or_string_entry(grid, _("F_cc:"), ++row, bsmsg->fcc);
 
+    gtk_widget_show_all(grid);
+    return grid;
+}
+
+static GtkWidget *
+sw_attachment_list(BalsaSendmsg *bsmsg)
+{
+    GtkWidget *grid;
+    GtkWidget *label;
+    GtkWidget *sw;
+    GtkListStore *store;
+    GtkWidget *tree_view;
+    GtkCellRenderer *renderer;
+    GtkTreeView *view;
+    GtkTreeViewColumn *column;
+    GtkWidget *frame;
+
+    grid = gtk_grid_new();
+    gtk_grid_set_row_spacing(GTK_GRID(grid), 6);
+    gtk_grid_set_column_spacing(GTK_GRID(grid), 6);
+    gtk_container_set_border_width(GTK_CONTAINER(grid), 6);
+
     /* Attachment list */
-    bsmsg->attachments[0] = gtk_label_new_with_mnemonic(_("_Attachments:"));
-    gtk_misc_set_alignment(GTK_MISC(bsmsg->attachments[0]), 0.0, 0.5);
-    gtk_misc_set_padding(GTK_MISC(bsmsg->attachments[0]), GNOME_PAD_SMALL,
+    label = gtk_label_new_with_mnemonic(_("_Attachments:"));
+    gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.5);
+    gtk_misc_set_padding(GTK_MISC(label), GNOME_PAD_SMALL,
 			 GNOME_PAD_SMALL);
-    ++row;
-    gtk_grid_attach(GTK_GRID(grid), bsmsg->attachments[0], 0, row, 1, 1);
+    gtk_grid_attach(GTK_GRID(grid), label, 0, 0, 1, 1);
 
     sw = gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(sw),
 				   GTK_POLICY_AUTOMATIC,
 				   GTK_POLICY_AUTOMATIC);
-#if 0
-    g_signal_connect(sw, "size-request",
-                     G_CALLBACK(sw_scroll_size_request), NULL);
-#endif
 
     store = gtk_list_store_new(ATTACH_NUM_COLUMNS,
 			       TYPE_BALSA_ATTACH_INFO,
@@ -3002,13 +3039,13 @@ create_info_pane(BalsaSendmsg * bsmsg)
 			       G_TYPE_UINT64,
 			       G_TYPE_STRING);
 
-    bsmsg->attachments[1] = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
-    gtk_widget_set_vexpand(bsmsg->attachments[1], TRUE);
-    view = GTK_TREE_VIEW(bsmsg->attachments[1]);
+    bsmsg->tree_view = tree_view =
+        gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
+    gtk_widget_set_vexpand(tree_view, TRUE);
+    view = GTK_TREE_VIEW(tree_view);
     gtk_tree_view_set_headers_visible(view, TRUE);
     gtk_tree_view_set_rules_hint(view, TRUE);
     g_object_unref(store);
-    bsmsg->attachments[2] = NULL;
 
     /* column for type icon */
     renderer = gtk_cell_renderer_pixbuf_new();
@@ -3069,21 +3106,16 @@ create_info_pane(BalsaSendmsg * bsmsg)
 		      drop_types, ELEMENTS(drop_types),
 		      GDK_ACTION_COPY | GDK_ACTION_MOVE | GDK_ACTION_LINK);
 
-    gtk_widget_set_size_request(bsmsg->attachments[1], -1, 100);
+    gtk_widget_set_size_request(tree_view, -1, 100);
 
     frame = gtk_frame_new(NULL);
     gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_IN);
-    gtk_container_add(GTK_CONTAINER(sw), bsmsg->attachments[1]);
+    gtk_container_add(GTK_CONTAINER(sw), tree_view);
     gtk_container_add(GTK_CONTAINER(frame), sw);
 
     gtk_widget_set_hexpand(frame, TRUE);
-    gtk_grid_attach(GTK_GRID(grid), frame, 1, row, 1, 1);
+    gtk_grid_attach(GTK_GRID(grid), frame, 1, 0, 1, 1);
 
-    bsmsg->attachments[2] = sw;
-    bsmsg->attachments[3] = frame;
-
-    gtk_widget_show_all(grid);
-    hide_attachment_widget(bsmsg);
     return grid;
 }
 
@@ -4682,12 +4714,13 @@ sendmsg_window_new()
 
     /* Paned window for the addresses at the top, and the content at the
      * bottom: */
-    paned = gtk_paned_new(GTK_ORIENTATION_VERTICAL);
+    bsmsg->paned = paned = gtk_paned_new(GTK_ORIENTATION_VERTICAL);
     gtk_box_pack_start(GTK_BOX(main_box), paned, TRUE, TRUE, 0);
     gtk_widget_show(paned);
 
     /* create the top portion with the to, from, etc in it */
     gtk_paned_add1(GTK_PANED(paned), create_info_pane(bsmsg));
+    bsmsg->tree_view = NULL;
 
     /* create text area for the message */
     gtk_paned_add2(GTK_PANED(paned), create_text_area(bsmsg));

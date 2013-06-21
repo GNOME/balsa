@@ -1,3 +1,12 @@
+2013-06-21  Peter Bloomfield
+
+	* src/sendmsg-window.c (remove_attachment), (change_attach_mode),
+	(show_attachment_widget), (add_attachment),
+	(add_urlref_attachment), (create_info_pane), (sw_attachment_list),
+	(sendmsg_window_new): put attachment list in its own pane.
+	* src/sendmsg-window.h: add members tree_view and paned, and
+	remove member attachments[].
+
 2013-06-17  Peter Bloomfield
 
 	* src/sendmsg-window.c (create_info_pane): allow the recipients

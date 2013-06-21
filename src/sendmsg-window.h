@@ -65,7 +65,7 @@ extern "C" {
 #if !defined(ENABLE_TOUCH_UI)
 	GtkWidget *replyto[2];
 #endif                          /* ENABLE_TOUCH_UI */
-	GtkWidget *attachments[4];
+	GtkWidget *tree_view;
         gchar *in_reply_to;
         GList *references;
 	GtkWidget *text;
@@ -117,6 +117,7 @@ extern "C" {
 #if !defined(ENABLE_TOUCH_UI)
         GtkActionGroup *gpg_action_group;
 #endif                          /* ENABLE_TOUCH_UI */
+        GtkWidget *paned;
     };
 
     BalsaSendmsg *sendmsg_window_compose(void);

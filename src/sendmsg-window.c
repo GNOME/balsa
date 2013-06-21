@@ -3194,8 +3194,9 @@ drag_data_quote(GtkWidget * widget,
 
 	    find_file.name = uri_list->data;
 	    find_file.found = FALSE;
-	    gtk_tree_model_foreach(BALSA_MSG_ATTACH_MODEL(bsmsg),
-				   has_file_attached, &find_file);
+            if (bsmsg->tree_view)
+                gtk_tree_model_foreach(BALSA_MSG_ATTACH_MODEL(bsmsg),
+                                       has_file_attached, &find_file);
             if (!find_file.found)
                 add_attachment(bsmsg, uri_list->data, FALSE, NULL);
         }
@@ -5699,8 +5700,9 @@ bsmsg2message(BalsaSendmsg * bsmsg)
     libbalsa_message_append_part(message, body);
 
     /* add attachments */
-    gtk_tree_model_foreach(BALSA_MSG_ATTACH_MODEL(bsmsg),
-			   attachment2message, message);
+    if (bsmsg->tree_view)
+        gtk_tree_model_foreach(BALSA_MSG_ATTACH_MODEL(bsmsg),
+                               attachment2message, message);
 
     message->headers->date = time(NULL);
 #ifdef HAVE_GPGME
@@ -5979,6 +5981,7 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
         gboolean warn_html_sign;
 
         warn_mp = (bsmsg->gpg_mode & LIBBALSA_PROTECT_MODE) != 0 &&
+            bsmsg->tree_view &&
             gtk_tree_model_get_iter_first(BALSA_MSG_ATTACH_MODEL(bsmsg), &iter);
         warn_html_sign = (bsmsg->gpg_mode & LIBBALSA_PROTECT_MODE) == LIBBALSA_PROTECT_SIGN &&
             bsmsg->send_mp_alt;

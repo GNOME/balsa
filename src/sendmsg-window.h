@@ -118,6 +118,7 @@ extern "C" {
         GtkActionGroup *gpg_action_group;
 #endif                          /* ENABLE_TOUCH_UI */
         GtkWidget *paned;
+        GtkSizeGroup *size_group;
     };
 
     BalsaSendmsg *sendmsg_window_compose(void);

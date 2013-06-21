@@ -2941,8 +2941,10 @@ create_info_pane(BalsaSendmsg * bsmsg)
     gtk_grid_set_column_spacing(GTK_GRID(grid), 6);
     gtk_container_set_border_width(GTK_CONTAINER(grid), 6);
 
+    bsmsg->size_group = gtk_size_group_new(GTK_SIZE_GROUP_HORIZONTAL);
     /* From: */
     create_from_entry(grid, bsmsg);
+    gtk_size_group_add_widget(bsmsg->size_group, bsmsg->from[0]);
 
 #if !defined(ENABLE_TOUCH_UI)
     /* Create the 'Reply To:' entry before the regular recipients, to
@@ -2950,12 +2952,14 @@ create_info_pane(BalsaSendmsg * bsmsg)
 #define REPLY_TO_ROW 3
     create_email_entry(grid, REPLY_TO_ROW, bsmsg, &bsmsg->replyto_view,
                        bsmsg->replyto, "R_eply To:", NULL, 0);
+    gtk_size_group_add_widget(bsmsg->size_group, bsmsg->replyto[0]);
 #endif
 
     /* To:, Cc:, and Bcc: */
     create_email_entry(grid, ++row, bsmsg, &bsmsg->recipient_view,
                        bsmsg->recipients, "Rec_ipients", address_types,
                        G_N_ELEMENTS(address_types));
+    gtk_size_group_add_widget(bsmsg->size_group, bsmsg->recipients[0]);
     gtk_widget_set_vexpand(bsmsg->recipients[1], TRUE);
     g_signal_connect_swapped(gtk_tree_view_get_model
                              (GTK_TREE_VIEW(bsmsg->recipient_view)),
@@ -2968,6 +2972,7 @@ create_info_pane(BalsaSendmsg * bsmsg)
 
     /* Subject: */
     create_string_entry(grid, _("S_ubject:"), ++row, bsmsg->subject);
+    gtk_size_group_add_widget(bsmsg->size_group, bsmsg->subject[0]);
     g_signal_connect_swapped(G_OBJECT(bsmsg->subject[1]), "changed",
                              G_CALLBACK(sendmsg_window_set_title), bsmsg);
 
@@ -2996,6 +3001,7 @@ create_info_pane(BalsaSendmsg * bsmsg)
         balsa_mblist_mru_option_menu(GTK_WINDOW(bsmsg->window),
                                      &balsa_app.fcc_mru);
     create_email_or_string_entry(grid, _("F_cc:"), ++row, bsmsg->fcc);
+    gtk_size_group_add_widget(bsmsg->size_group, bsmsg->fcc[0]);
 
     gtk_widget_show_all(grid);
     return grid;
@@ -3021,6 +3027,7 @@ sw_attachment_list(BalsaSendmsg *bsmsg)
 
     /* Attachment list */
     label = gtk_label_new_with_mnemonic(_("_Attachments:"));
+    gtk_size_group_add_widget(bsmsg->size_group, label);
     gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.5);
     gtk_misc_set_padding(GTK_MISC(label), GNOME_PAD_SMALL,
 			 GNOME_PAD_SMALL);

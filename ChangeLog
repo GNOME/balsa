@@ -1,5 +1,11 @@
 2013-06-21  Peter Bloomfield
 
+	* src/sendmsg-window.c (create_info_pane), (sw_attachment_list):
+	use a GtkSizeGroup to restore alignment of attachment list.
+	* src/sendmsg-window.h: new member size_group;
+
+2013-06-21  Peter Bloomfield
+
 	* src/sendmsg-window.c (drag_data_quote), (bsmsg2message),
 	(send_message_handler): check for NULL tree-view.
 

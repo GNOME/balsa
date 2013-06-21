@@ -1,5 +1,11 @@
 2013-06-21  Peter Bloomfield
 
+	* src/sendmsg-window.c (create_email_or_string_entry),
+	(create_string_entry), (create_email_entry), (create_from_entry),
+	(create_info_pane): consolidate most size-group code.
+
+2013-06-21  Peter Bloomfield
+
 	* src/sendmsg-window.c (create_info_pane), (sw_attachment_list):
 	use a GtkSizeGroup to restore alignment of attachment list.
 	* src/sendmsg-window.h: new member size_group;

@@ -2625,8 +2625,11 @@ to_add(GtkWidget * widget,
  * Output: GtkWidget* arr[] - arr[0] will be the label widget.
  */
 static void
-create_email_or_string_entry(GtkWidget * grid, const gchar * label,
-                             int y_pos, GtkWidget * arr[])
+create_email_or_string_entry(BalsaSendmsg * bsmsg,
+                             GtkWidget    * grid,
+                             const gchar  * label,
+                             int            y_pos,
+                             GtkWidget    * arr[])
 {
     GtkWidget *mnemonic_widget;
 
@@ -2634,6 +2637,7 @@ create_email_or_string_entry(GtkWidget * grid, const gchar * label,
     if (GTK_IS_FRAME(mnemonic_widget))
         mnemonic_widget = gtk_bin_get_child(GTK_BIN(mnemonic_widget));
     arr[0] = gtk_label_new_with_mnemonic(label);
+    gtk_size_group_add_widget(bsmsg->size_group, arr[0]);
     gtk_label_set_mnemonic_widget(GTK_LABEL(arr[0]), mnemonic_widget);
     gtk_misc_set_alignment(GTK_MISC(arr[0]), 0.0, 0.5);
     gtk_misc_set_padding(GTK_MISC(arr[0]), GNOME_PAD_SMALL,
@@ -2666,12 +2670,15 @@ create_email_or_string_entry(GtkWidget * grid, const gchar * label,
  *                          - arr[1] will be the entry widget.
  */
 static void
-create_string_entry(GtkWidget * grid, const gchar * label, int y_pos,
-                    GtkWidget * arr[])
+create_string_entry(BalsaSendmsg * bsmsg,
+                    GtkWidget    * grid,
+                    const gchar  * label,
+                    int            y_pos,
+                    GtkWidget    * arr[])
 {
     arr[1] = gtk_entry_new();
     gtk_entry_set_max_length(GTK_ENTRY(arr[1]), 2048);
-    create_email_or_string_entry(grid, label, y_pos, arr);
+    create_email_or_string_entry(bsmsg, grid, label, y_pos, arr);
 }
 
 /*
@@ -2680,9 +2687,10 @@ create_string_entry(GtkWidget * grid, const gchar * label, int y_pos,
  * Creates a gtk_label()/libbalsa_address_view() and button in a grid for
  * e-mail entries, eg. To:.  It also sets up some callbacks in gtk.
  *
- * Input:  GtkWidget *grid   - grid to insert the widgets into.
- *         int y_pos          - How far down in the grid to put label.
+ * Input:
  *         BalsaSendmsg *bsmsg  - The send message window
+ *         GtkWidget *grid   - grid to insert the widgets into.
+ *         int y_pos          - How far down in the grid to put label.
  * On return, bsmsg->address_view and bsmsg->addresses[1] have been set.
  */
 
@@ -2720,10 +2728,14 @@ sw_scroll_size_request(GtkWidget * widget, GtkRequisition * requisition)
 #endif
 
 static void
-create_email_entry(GtkWidget * grid, int y_pos, BalsaSendmsg * bsmsg,
-                   LibBalsaAddressView ** view, GtkWidget ** widget,
-                   const gchar * label, const gchar * const *types,
-                   guint n_types)
+create_email_entry(BalsaSendmsg         * bsmsg,
+                   GtkWidget            * grid,
+                   int                    y_pos,
+                   LibBalsaAddressView ** view,
+                   GtkWidget           ** widget,
+                   const gchar          * label,
+                   const gchar * const  * types,
+                   guint                  n_types)
 {
     GtkWidget *scroll;
 
@@ -2745,7 +2757,7 @@ create_email_entry(GtkWidget * grid, int y_pos, BalsaSendmsg * bsmsg,
     gtk_frame_set_shadow_type(GTK_FRAME(widget[1]), GTK_SHADOW_IN);
     gtk_container_add(GTK_CONTAINER(widget[1]), scroll);
 
-    create_email_or_string_entry(grid, _(label), y_pos, widget);
+    create_email_or_string_entry(bsmsg, grid, _(label), y_pos, widget);
 
     g_signal_connect(*view, "drag_data_received",
                      G_CALLBACK(to_add), NULL);
@@ -2829,7 +2841,7 @@ create_from_entry(GtkWidget * grid, BalsaSendmsg * bsmsg)
     g_object_unref(store);
     g_signal_connect(bsmsg->from[1], "changed",
                      G_CALLBACK(sw_combo_box_changed), bsmsg);
-    create_email_or_string_entry(grid, _("F_rom:"), 0, bsmsg->from);
+    create_email_or_string_entry(bsmsg, grid, _("F_rom:"), 0, bsmsg->from);
 }
 
 static gboolean
@@ -2944,22 +2956,19 @@ create_info_pane(BalsaSendmsg * bsmsg)
     bsmsg->size_group = gtk_size_group_new(GTK_SIZE_GROUP_HORIZONTAL);
     /* From: */
     create_from_entry(grid, bsmsg);
-    gtk_size_group_add_widget(bsmsg->size_group, bsmsg->from[0]);
 
 #if !defined(ENABLE_TOUCH_UI)
     /* Create the 'Reply To:' entry before the regular recipients, to
      * get the initial focus in the regular recipients*/
 #define REPLY_TO_ROW 3
-    create_email_entry(grid, REPLY_TO_ROW, bsmsg, &bsmsg->replyto_view,
+    create_email_entry(bsmsg, grid, REPLY_TO_ROW, &bsmsg->replyto_view,
                        bsmsg->replyto, "R_eply To:", NULL, 0);
-    gtk_size_group_add_widget(bsmsg->size_group, bsmsg->replyto[0]);
 #endif
 
     /* To:, Cc:, and Bcc: */
-    create_email_entry(grid, ++row, bsmsg, &bsmsg->recipient_view,
+    create_email_entry(bsmsg, grid, ++row, &bsmsg->recipient_view,
                        bsmsg->recipients, "Rec_ipients", address_types,
                        G_N_ELEMENTS(address_types));
-    gtk_size_group_add_widget(bsmsg->size_group, bsmsg->recipients[0]);
     gtk_widget_set_vexpand(bsmsg->recipients[1], TRUE);
     g_signal_connect_swapped(gtk_tree_view_get_model
                              (GTK_TREE_VIEW(bsmsg->recipient_view)),
@@ -2971,8 +2980,8 @@ create_info_pane(BalsaSendmsg * bsmsg)
                              G_CALLBACK(sendmsg_window_set_title), bsmsg);
 
     /* Subject: */
-    create_string_entry(grid, _("S_ubject:"), ++row, bsmsg->subject);
-    gtk_size_group_add_widget(bsmsg->size_group, bsmsg->subject[0]);
+    create_string_entry(bsmsg, grid, _("S_ubject:"), ++row,
+                        bsmsg->subject);
     g_signal_connect_swapped(G_OBJECT(bsmsg->subject[1]), "changed",
                              G_CALLBACK(sendmsg_window_set_title), bsmsg);
 
@@ -3000,8 +3009,8 @@ create_info_pane(BalsaSendmsg * bsmsg)
     bsmsg->fcc[1] =
         balsa_mblist_mru_option_menu(GTK_WINDOW(bsmsg->window),
                                      &balsa_app.fcc_mru);
-    create_email_or_string_entry(grid, _("F_cc:"), ++row, bsmsg->fcc);
-    gtk_size_group_add_widget(bsmsg->size_group, bsmsg->fcc[0]);
+    create_email_or_string_entry(bsmsg, grid, _("F_cc:"), ++row,
+                                 bsmsg->fcc);
 
     gtk_widget_show_all(grid);
     return grid;

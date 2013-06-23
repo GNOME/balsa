@@ -1,3 +1,8 @@
+2013-06-23  Peter Bloomfield
+
+	* src/sendmsg-window.c (create_email_entry),
+	(sw_attachment_list): clean up dead and redundant code.
+
 2013-06-21  Peter Bloomfield
 
 	* src/sendmsg-window.c (create_email_or_string_entry),
@@ -8,7 +13,7 @@
 
 	* src/sendmsg-window.c (create_info_pane), (sw_attachment_list):
 	use a GtkSizeGroup to restore alignment of attachment list.
-	* src/sendmsg-window.h: new member size_group;
+	* src/sendmsg-window.h: new member size_group.
 
 2013-06-21  Peter Bloomfield
 

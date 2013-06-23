@@ -2470,13 +2470,6 @@ attach_message_cb(GtkAction * action, BalsaSendmsg *bsmsg)
 }
 
 
-#if 0
-static gint include_messages_cb(GtkWidget *widget, BalsaSendmsg *bsmsg)
-{
-    return insert_selected_messages(bsmsg, TRUE);
-}
-#endif /* 0 */
-
 /* attachments_add - attachments field D&D callback */
 static GSList*
 uri2gslist(const char *uri_list)
@@ -2694,39 +2687,6 @@ create_string_entry(BalsaSendmsg * bsmsg,
  * On return, bsmsg->address_view and bsmsg->addresses[1] have been set.
  */
 
-#if 0
-static void
-sw_scroll_size_request(GtkWidget * widget, GtkRequisition * requisition)
-{
-    gint focus_width;
-    gint focus_pad;
-    gint border_width;
-    GtkPolicyType type = GTK_POLICY_NEVER;
-
-    gtk_widget_get_preferred_size(gtk_bin_get_child(GTK_BIN(widget)),
-                                  NULL, requisition);
-    gtk_widget_style_get(widget, "focus-line-width", &focus_width,
-                         "focus-padding", &focus_pad, NULL);
-
-    border_width =
-        (gtk_container_get_border_width(GTK_CONTAINER(widget)) + focus_width +
-         focus_pad) * 2;
-    requisition->width += border_width;
-    requisition->height += border_width;
-    if (requisition->width > balsa_app.sw_width * 3 / 4) {
-        requisition->width = balsa_app.sw_width * 3 / 4;
-        type = GTK_POLICY_AUTOMATIC;
-        requisition->height += 50;
-    }
-    if (requisition->height > 100) {
-        requisition->height = 100;
-        type = GTK_POLICY_AUTOMATIC;
-        requisition->width += 50;
-    }
-    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(widget), type, type);
-}
-#endif
-
 static void
 create_email_entry(BalsaSendmsg         * bsmsg,
                    GtkWidget            * grid,
@@ -2747,10 +2707,6 @@ create_email_entry(BalsaSendmsg         * bsmsg,
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll),
 				   GTK_POLICY_AUTOMATIC,
 				   GTK_POLICY_AUTOMATIC);
-#if 0
-    g_signal_connect(scroll, "size-request",
-                     G_CALLBACK(sw_scroll_size_request), NULL);
-#endif
     gtk_container_add(GTK_CONTAINER(scroll), GTK_WIDGET(*view));
 
     widget[1] = gtk_frame_new(NULL);
@@ -3121,8 +3077,6 @@ sw_attachment_list(BalsaSendmsg *bsmsg)
     gtk_drag_dest_set(GTK_WIDGET(bsmsg->window), GTK_DEST_DEFAULT_ALL,
 		      drop_types, ELEMENTS(drop_types),
 		      GDK_ACTION_COPY | GDK_ACTION_MOVE | GDK_ACTION_LINK);
-
-    gtk_widget_set_size_request(tree_view, -1, 100);
 
     frame = gtk_frame_new(NULL);
     gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_IN);

@@ -225,7 +225,8 @@ static GtkTargetEntry drop_types[] = {
 };
 
 static GtkTargetEntry email_field_drop_types[] = {
-    {"x-application/x-email", 0, TARGET_EMAIL}
+    { "STRING",     0, TARGET_STRING },
+    { "text/plain", 0, TARGET_STRING }
 };
 
 static void sw_undo_cb         (GtkAction * action, BalsaSendmsg * bsmsg);
@@ -2589,7 +2590,7 @@ attachments_add(GtkWidget * widget,
     gtk_drag_finish(context, drag_result, FALSE, time);
 }
 
-/* to_add - e-mail (To, From, Cc, Bcc) field D&D callback */
+/* to_add - address-view D&D callback; we assume it's a To: address */
 static void
 to_add(GtkWidget * widget,
        GdkDragContext * context,
@@ -2598,11 +2599,23 @@ to_add(GtkWidget * widget,
        GtkSelectionData * selection_data,
        guint info, guint32 time)
 {
-#if 0 /* FIXME */
-    append_comma_separated(GTK_EDITABLE(widget),
-	                   (gchar *) selection_data->data);
+    gboolean drag_result = FALSE;
+
+#ifdef DEBUG
+    /* This leaks the name: */
+    g_print("%s atom name %s\n", __func__,
+            gdk_atom_name(gtk_selection_data_get_target(selection_data)));
 #endif
-    gtk_drag_finish(context, TRUE, FALSE, time);
+    if (info == TARGET_STRING) {
+        const gchar *address;
+
+        address =
+            (const gchar *) gtk_selection_data_get_data(selection_data);
+        libbalsa_address_view_add_from_string(LIBBALSA_ADDRESS_VIEW
+                                              (widget), "To:", address);
+        drag_result = TRUE;
+    }
+    gtk_drag_finish(context, drag_result, FALSE, time);
 }
 
 /*
@@ -2722,7 +2735,7 @@ create_email_entry(BalsaSendmsg         * bsmsg,
     gtk_drag_dest_set(GTK_WIDGET(*view), GTK_DEST_DEFAULT_ALL,
 		      email_field_drop_types,
 		      ELEMENTS(email_field_drop_types),
-		      GDK_ACTION_COPY | GDK_ACTION_MOVE | GDK_ACTION_LINK);
+		      GDK_ACTION_COPY | GDK_ACTION_MOVE);
 
     libbalsa_address_view_set_domain(*view, bsmsg->ident->domain);
     g_signal_connect_swapped(gtk_tree_view_get_model(GTK_TREE_VIEW(*view)),

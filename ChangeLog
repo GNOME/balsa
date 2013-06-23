@@ -1,5 +1,10 @@
 2013-06-23  Peter Bloomfield
 
+	* src/sendmsg-window.c (to_add), (create_email_entry): restore
+	drag-and-drop of a string to the To: header.
+
+2013-06-23  Peter Bloomfield
+
 	* src/sendmsg-window.c (create_email_entry),
 	(sw_attachment_list): clean up dead and redundant code.
 

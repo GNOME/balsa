@@ -2075,7 +2075,7 @@ msgstr "Výchozí klient"
 
 #: ../libinit_balsa/assistant_page_directory.c:60
 msgid "_Inbox:"
-msgstr "_Doručená pošta:"
+msgstr "_Přijatá pošta:"
 
 #: ../libinit_balsa/assistant_page_directory.c:60
 msgid "_Outbox:"
@@ -2171,7 +2171,7 @@ msgstr "Ne, pokaždé je zadávat"
 
 #: ../libinit_balsa/assistant_page_user.c:103
 msgid "Name of mail server for incoming _mail:"
-msgstr "Název poštovního serveru pro _příchozí poštu:"
+msgstr "Název poštovního serveru pro _přijatou poštu:"
 
 #: ../libinit_balsa/assistant_page_user.c:108
 msgid "_Type of mail server:"
@@ -4256,7 +4256,7 @@ msgstr "_Odhlásit se"
 
 #: ../src/mailbox-node.c:1116
 msgid "Mark as _Inbox"
-msgstr "Označ_it jako „Doručená pošta“"
+msgstr "Označ_it jako „Přijatá pošta“"
 
 #: ../src/mailbox-node.c:1118
 msgid "_Mark as Sentbox"
@@ -4360,7 +4360,7 @@ msgstr "Balsa nemůže otevřít vaši poštovní schránku „%s“."
 
 #: ../src/main.c:603
 msgid "Inbox"
-msgstr "Doručená pošta"
+msgstr "Přijatá pošta"
 
 #: ../src/main.c:609
 msgid "Outbox"
@@ -4693,7 +4693,7 @@ msgstr "Na_jdi další"
 #: ../src/main-window.c:495 ../src/main-window.c:496
 #: ../src/message-window.c:298 ../src/message-window.c:299
 msgid "Next Message"
-msgstr "Další zpráva"
+msgstr "Následující zpráva"
 
 #: ../src/main-window.c:497 ../src/main-window.c:498
 #: ../src/message-window.c:303 ../src/message-window.c:304
@@ -4703,7 +4703,7 @@ msgstr "Předchozí zpráva"
 #: ../src/main-window.c:499 ../src/main-window.c:500
 #: ../src/message-window.c:305 ../src/message-window.c:306
 msgid "Next Flagged Message"
-msgstr "Další označená zpráva"
+msgstr "Následující označená zpráva"
 
 #: ../src/main-window.c:502
 msgid "_Hide Messages"

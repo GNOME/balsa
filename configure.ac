@@ -215,6 +215,8 @@ dnl #####################################################################
 AC_PROG_CC
 m4_ifdef([AM_PROG_LIBTOOL],[AM_PROG_LIBTOOL],[AC_PROG_RANLIB])
 AC_PROG_LN_S
+AC_USE_SYSTEM_EXTENSIONS
+AC_CHECK_MEMBERS([struct utsname.domainname],[],[],[[#include<sys/utsname.h>]])
 
 # pkg-config
 #
@@ -860,7 +862,6 @@ dnl #####################################################################
 AC_C_CONST
 AC_STDC_HEADERS
 
-AC_DEFINE([_XOPEN_SOURCE],[500],[We strive for XOPEN compliance])
 AC_CHECK_DECLS([localtime_r, gmtime_r, ctime_r], [], [], [[#include <time.h>]])
 AC_CHECK_FUNCS([localtime_r gmtime_r ctime_r])
 AC_CHECK_HEADER([zlib.h],,AC_MSG_ERROR([zlib library required]))

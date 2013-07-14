@@ -1,3 +1,13 @@
+2013-07-14  Peter Bloomfield
+
+	Fix bgo #704159 (Igor Pashev)
+
+	* configure.ac: add check for struct utsname.domainname, and
+	AC_USE_SYSTEM_EXTENSIONS.
+	* libbalsa/filter-file.c: do not define __EXTENSIONS__.
+	* libbalsa/send.c (libbalsa_set_message_id): check
+	HAVE_STRUCT_UTSNAME_DOMAINNAME as well as _GNU_SOURCE.
+
 2013-06-23  Peter Bloomfield
 
 	* src/sendmsg-window.c (to_add), (create_email_entry): restore

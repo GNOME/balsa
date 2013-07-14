@@ -2030,7 +2030,7 @@ libbalsa_set_message_id(GMimeMessage * mime_message)
     struct utsname utsbuf;
     const gchar *host = "localhost";
     gchar *message_id;
-#ifdef _GNU_SOURCE
+#if defined(_GNU_SOURCE) && defined(HAVE_STRUCT_UTSNAME_DOMAINNAME)
     gchar *fqdn;
     const gchar *domain = "localdomain";
 

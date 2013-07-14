@@ -32,8 +32,6 @@
 #endif                          /* HAVE_CONFIG_H */
 #include "filter-file.h"
 
-/* extensions  needed additonally on Solaris for strptime */
-#define __EXTENSIONS__
 #include <stdlib.h>
 #include <stdio.h>
 /* yellow dog has crappy libc and needs pthread.h to be included here */

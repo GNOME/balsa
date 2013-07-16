@@ -5701,7 +5701,7 @@ msgstr "procent"
 
 #: ../src/pref-manager.c:2266
 msgid "Display progress dialog"
-msgstr "Zobrazovat dialog s průběhem"
+msgstr "Zobrazovat dialogové okno s průběhem"
 
 #: ../src/pref-manager.c:2291
 msgid "Date encoding (for strftime):"

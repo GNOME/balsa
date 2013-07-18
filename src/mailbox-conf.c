@@ -416,7 +416,7 @@ mailbox_conf_delete(BalsaMailboxNode * mbnode)
         gtk_dialog_add_buttons(GTK_DIALOG(ask),
                                _("Remove from _list"), 0,
                                _("Remove from list and _disk"), 1,
-                               GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+                               _("_Cancel"), GTK_RESPONSE_CANCEL,
                                NULL);
     } else if (LIBBALSA_IS_MAILBOX_IMAP(mailbox) && !mailbox->config_prefix) {
 	/* deleting remote IMAP mailbox in a folder set */
@@ -437,7 +437,7 @@ mailbox_conf_delete(BalsaMailboxNode * mbnode)
 			             mailbox->name, mailbox->name);
         gtk_dialog_add_buttons(GTK_DIALOG(ask),
                                _("_Remove from server"), 0,
-                               GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+                               _("_Cancel"), GTK_RESPONSE_CANCEL,
                                NULL);
     } else { /* deleting other remote mailbox */
         ask = gtk_message_dialog_new(GTK_WINDOW(balsa_app.main_window), 0,
@@ -453,7 +453,7 @@ mailbox_conf_delete(BalsaMailboxNode * mbnode)
 			             mailbox->name);
         gtk_dialog_add_buttons(GTK_DIALOG(ask),
                                _("_Remove from list"), 0,
-                               GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+                               _("_Cancel"), GTK_RESPONSE_CANCEL,
                                NULL);
     }
     
@@ -1136,7 +1136,7 @@ create_local_mailbox_dialog(MailboxConfWindow *mcw)
                                     GTK_WINDOW(balsa_app.main_window),
                                     action,
                                     mcw->ok_button_name, MCW_RESPONSE,
-                                    GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
+                                    _("_Close"), GTK_RESPONSE_CLOSE,
                                     NULL);
     g_free(title);
 #if HAVE_MACOSX_DESKTOP
@@ -1172,7 +1172,7 @@ create_generic_dialog(MailboxConfWindow * mcw)
                                     GTK_WINDOW(balsa_app.main_window),
                                     GTK_DIALOG_DESTROY_WITH_PARENT,
                                     mcw->ok_button_name, MCW_RESPONSE,
-                                    GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
+                                    _("_Close"), GTK_RESPONSE_CLOSE,
                                     NULL);
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu_for_parent(dialog, GTK_WINDOW(balsa_app.main_window));

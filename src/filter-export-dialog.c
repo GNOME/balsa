@@ -76,9 +76,9 @@ filters_export_dialog(void)
     fex_window =
         gtk_dialog_new_with_buttons(_("Balsa Filters Export"),
                                     NULL, 0, /* FIXME */
-                                    GTK_STOCK_OK,     GTK_RESPONSE_OK,
-                                    GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-                                    GTK_STOCK_HELP,   GTK_RESPONSE_HELP,
+                                    _("_OK"), GTK_RESPONSE_OK,
+                                    _("_Cancel"), GTK_RESPONSE_CANCEL,
+                                    _("_Help"), GTK_RESPONSE_HELP,
                                     NULL);
     gtk_window_set_wmclass(GTK_WINDOW(fex_window), "filter-export",
                            "Balsa");

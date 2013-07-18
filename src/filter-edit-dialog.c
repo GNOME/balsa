@@ -223,13 +223,13 @@ build_left_side(void)
     gtk_box_pack_start(GTK_BOX(vbox), bbox, FALSE, FALSE, 2);
 
     /* new button */
-    fe_new_button = balsa_stock_button_with_label(GTK_STOCK_NEW, _("_New"));
+    fe_new_button = balsa_stock_button_with_label("document-new", _("_New"));
     g_signal_connect(G_OBJECT(fe_new_button), "clicked",
 		     G_CALLBACK(fe_new_pressed), NULL);
     gtk_container_add(GTK_CONTAINER(bbox), fe_new_button);
     /* delete button */
     fe_delete_button =
-        balsa_stock_button_with_label(GTK_STOCK_DELETE, _("_Delete"));
+        balsa_stock_button_with_label("edit-delete", _("_Delete"));
     g_signal_connect(G_OBJECT(fe_delete_button), "clicked",
 		     G_CALLBACK(fe_delete_pressed), NULL);
     gtk_container_add(GTK_CONTAINER(bbox), fe_delete_button);
@@ -402,8 +402,8 @@ build_action_page(GtkWindow * window)
     dialog =
         gtk_file_chooser_dialog_new(_("Use Sound..."), NULL,
                                     GTK_FILE_CHOOSER_ACTION_OPEN,
-                                    GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-                                    GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
+                                    _("_Cancel"), GTK_RESPONSE_CANCEL,
+                                    _("_Open"),   GTK_RESPONSE_ACCEPT,
                                     NULL);
     gtk_dialog_set_default_response(GTK_DIALOG(dialog),
                                     GTK_RESPONSE_ACCEPT);
@@ -501,13 +501,13 @@ build_right_side(GtkWindow * window)
     bbox = gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL);
     gtk_box_pack_start(GTK_BOX(rightside), bbox, FALSE, FALSE, 0);
 
-    fe_apply_button = gtk_button_new_from_stock(GTK_STOCK_APPLY);
+    fe_apply_button = gtk_button_new_with_mnemonic(_("_Apply"));
     g_signal_connect(G_OBJECT(fe_apply_button), "clicked",
 		     G_CALLBACK(fe_apply_pressed), NULL);
     gtk_container_add(GTK_CONTAINER(bbox), fe_apply_button);
 
     fe_revert_button =
-        balsa_stock_button_with_label(GTK_STOCK_UNDO, _("Revert"));
+        balsa_stock_button_with_label("edit-undo", _("Revert"));
     g_signal_connect(G_OBJECT(fe_revert_button), "clicked",
 		     G_CALLBACK(fe_revert_pressed), NULL);
     gtk_container_add(GTK_CONTAINER(bbox), fe_revert_button);
@@ -573,12 +573,9 @@ filters_edit_dialog(void)
 
     fe_window = gtk_dialog_new_with_buttons(_("Balsa Filters"),
                                             NULL, 0, /* FIXME */
-                                            GTK_STOCK_OK,
-                                            GTK_RESPONSE_OK,
-                                            GTK_STOCK_CANCEL,
-                                            GTK_RESPONSE_CANCEL,
-                                            GTK_STOCK_HELP,
-                                            GTK_RESPONSE_HELP,
+                                            _("_OK"), GTK_RESPONSE_OK,
+                                            _("_Cancel"), GTK_RESPONSE_CANCEL,
+                                            _("_Help"), GTK_RESPONSE_HELP,
 					    NULL);
 
     g_signal_connect(G_OBJECT(fe_window), "response",

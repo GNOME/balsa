@@ -68,14 +68,14 @@ load_balsa_pixmap(GtkIconTheme *icon_theme, GtkIconFactory *factory,
     gint n, width, height;
     const gchar * use_id;
     static pixmap_fallback_t fallback_id[] = {
-	{ "user-trash", GTK_STOCK_DELETE },
-	{ "user-trash-full", GTK_STOCK_DELETE },
+	{ "user-trash", "edit-delete" },
+	{ "user-trash-full", "edit-delete" },
 	{ "emblem-important", "stock_mail-flag-for-followup"},
         { "mail-reply-sender", "mail-replied"},
         { "stock_mail-reply-to-all", "mail-replied"},
         { "mail-forward", "mail-replied"},
-        { "folder-drag-accept", GTK_STOCK_OPEN},
-        { "folder", GTK_STOCK_DIRECTORY},
+        { "folder-drag-accept", "document-open"},
+        { "folder", "folder"},
 	{ NULL, NULL } };
     GtkSettings *settings;
 
@@ -94,7 +94,7 @@ load_balsa_pixmap(GtkIconTheme *icon_theme, GtkIconFactory *factory,
                        bpixmap->stock_id, use_id);
         } else {
 	    BICONS_ERR("icon %s unknown, no fallback", bpixmap->stock_id);
-	    use_id = GTK_STOCK_MISSING_IMAGE;
+	    use_id = "image-missing";
 	}
     } else
 	use_id = bpixmap->stock_id;
@@ -327,7 +327,8 @@ balsa_register_pixbufs(GtkWidget * widget)
 #endif
         {
         libbalsa_address_view_set_book_icon,  BALSA_PIXMAP_BOOK_RED}, {
-        libbalsa_address_view_set_close_icon, GTK_STOCK_CLOSE}, {
+            /* standard icon name is "window-close": */
+        libbalsa_address_view_set_close_icon, "gtk-close"}, {
         libbalsa_address_view_set_drop_down_icon, BALSA_PIXMAP_DROP_DOWN},
     };
     guint i;

@@ -84,8 +84,9 @@ balsa_mime_widget_ctx_menu_save(GtkWidget * parent_widget,
 	gtk_file_chooser_dialog_new(title,
                                     balsa_get_parent_window(parent_widget),
 				    GTK_FILE_CHOOSER_ACTION_SAVE,
-				    GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-				    GTK_STOCK_OK, GTK_RESPONSE_OK, NULL);
+                                    _("_Cancel"), GTK_RESPONSE_CANCEL,
+                                    _("_OK"),     GTK_RESPONSE_OK,
+                                    NULL);
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu_for_parent(save_dialog, balsa_get_parent_window(parent_widget));
 #endif

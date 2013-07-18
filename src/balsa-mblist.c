@@ -1882,8 +1882,7 @@ bmbl_mru_show_tree(GtkWidget * widget, gpointer data)
         gtk_dialog_new_with_buttons(_("Choose destination folder"),
                                     mru->window,
                                     GTK_DIALOG_MODAL,
-                                    GTK_STOCK_CANCEL,
-                                    GTK_RESPONSE_CANCEL,
+                                    _("_Cancel"), GTK_RESPONSE_CANCEL,
                                     NULL);
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu_for_parent(dialog, mru->window);

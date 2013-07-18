@@ -204,9 +204,9 @@ store_address_dialog(StoreAddressInfo * info)
         gtk_dialog_new_with_buttons(_("Store Address"),
                                     GTK_WINDOW(balsa_app.main_window),
                                     GTK_DIALOG_DESTROY_WITH_PARENT,
-                                    GTK_STOCK_OK, GTK_RESPONSE_OK,
-                                    GTK_STOCK_SAVE,  SA_RESPONSE_SAVE,
-                                    GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
+                                    _("_OK"), GTK_RESPONSE_OK,
+                                    _("_Save"),  SA_RESPONSE_SAVE,
+                                    _("_Close"), GTK_RESPONSE_CLOSE,
                                     NULL);
     GtkWidget *vbox = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
     GtkWidget *frame, *label;

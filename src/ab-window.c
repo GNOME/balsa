@@ -124,15 +124,15 @@ balsa_ab_window_new(gboolean composing, GtkWindow* parent)
 
     if ( composing ) {
 	gtk_dialog_add_buttons(GTK_DIALOG(ret),
-                               GTK_STOCK_OK,     GTK_RESPONSE_OK,
-                               GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+                               _("_OK"),     GTK_RESPONSE_OK,
+                               _("_Cancel"), GTK_RESPONSE_CANCEL,
                                NULL);
 	gtk_widget_show(GTK_WIDGET(BALSA_AB_WINDOW(ret)->send_to_label));
 	gtk_widget_show(GTK_WIDGET(BALSA_AB_WINDOW(ret)->send_to_list));
 	gtk_widget_show(GTK_WIDGET(BALSA_AB_WINDOW(ret)->arrow_box));
     } else {
 	gtk_dialog_add_buttons(GTK_DIALOG(ret),
-                               GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
+                               _("_Close"), GTK_RESPONSE_CLOSE,
                                NULL);
 	gtk_widget_hide(GTK_WIDGET(BALSA_AB_WINDOW(ret)->send_to_label));
 	gtk_widget_hide(GTK_WIDGET(BALSA_AB_WINDOW(ret)->send_to_list));
@@ -311,14 +311,14 @@ balsa_ab_window_init(BalsaAbWindow *ab)
     gtk_grid_attach(GTK_GRID(grid), hbox, 0, 2, 1, 1);
     gtk_widget_show(GTK_WIDGET(hbox));
 
-    w = balsa_stock_button_with_label(GTK_STOCK_OPEN,
+    w = balsa_stock_button_with_label("document-open",
                                       _("Run Editor"));
     g_signal_connect(w, "clicked",
                      G_CALLBACK(balsa_ab_window_run_editor), NULL);
     gtk_container_add(GTK_CONTAINER(hbox), w);
     gtk_widget_show(GTK_WIDGET(w));
 
-    w = balsa_stock_button_with_label(GTK_STOCK_ADD,
+    w = balsa_stock_button_with_label("list-add",
                                       _("_Re-Import"));
     g_signal_connect(G_OBJECT(w), "clicked",
                      G_CALLBACK(balsa_ab_window_reload),
@@ -335,14 +335,14 @@ balsa_ab_window_init(BalsaAbWindow *ab)
     gtk_grid_attach(GTK_GRID(grid), ab->arrow_box, 1, 1, 1, 1);
     gtk_widget_show(ab->arrow_box);
 
-    w = balsa_stock_button_with_label(GTK_STOCK_GO_FORWARD, "");
+    w = balsa_stock_button_with_label("go-next", "");
     gtk_box_pack_start(GTK_BOX(ab->arrow_box), w, TRUE, FALSE, 0);
     gtk_widget_show(w);
     g_signal_connect(G_OBJECT(w), "clicked",
 		     G_CALLBACK(balsa_ab_window_move_to_recipient_list),
 		       ab);
 
-    w = balsa_stock_button_with_label(GTK_STOCK_GO_BACK, "");
+    w = balsa_stock_button_with_label("go-previous", "");
     gtk_box_pack_start(GTK_BOX(ab->arrow_box), w, TRUE, FALSE, 0);
     gtk_widget_show(w);
     g_signal_connect(G_OBJECT(w), "clicked",

@@ -506,10 +506,10 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
         gtk_dialog_new_with_buttons(_("Balsa Preferences"),
                                     GTK_WINDOW(active_win),
                                     GTK_DIALOG_DESTROY_WITH_PARENT,
-                                    GTK_STOCK_OK, GTK_RESPONSE_OK,
-                                    GTK_STOCK_APPLY, GTK_RESPONSE_APPLY,
-                                    GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
-                                    GTK_STOCK_HELP, GTK_RESPONSE_HELP,
+                                    _("_OK"), GTK_RESPONSE_OK,
+                                    _("_Apply"), GTK_RESPONSE_APPLY,
+                                    _("_Close"), GTK_RESPONSE_CLOSE,
+                                    _("_Help"), GTK_RESPONSE_HELP,
                                     NULL);
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu_for_parent(property_box, GTK_WINDOW(active_win));

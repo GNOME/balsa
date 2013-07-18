@@ -331,7 +331,7 @@ static const GtkActionEntry entries[] = {
     /* Less frequently used entries of the 'Tools' menu */
     {"ToolsMoreMenu", NULL, N_("_More")},
 #endif                          /* ENABLE_TOUCH_UI */
-    {"IncludeFile", GTK_STOCK_OPEN, N_("_Include File..."), NULL,
+    {"IncludeFile", "document-open", N_("_Include File..."), NULL,
      N_("Include a file"), G_CALLBACK(include_file_cb)},
     {"AttachFile", BALSA_PIXMAP_ATTACHMENT, N_("_Attach File..."), NULL,
      N_("Attach a file"), G_CALLBACK(attach_clicked)},
@@ -339,25 +339,25 @@ static const GtkActionEntry entries[] = {
      N_("Include selected message(s)"), G_CALLBACK(include_message_cb)},
     {"AttachMessages", NULL, N_("Attach _Message(s)"), NULL,
      N_("Attach selected message(s)"), G_CALLBACK(attach_message_cb)},
-    {"Save", GTK_STOCK_SAVE, N_("_Save"), "<control>S",
+    {"Save", "document-save", N_("_Save"), "<control>S",
      N_("Save this message"), G_CALLBACK(save_message_cb)},
 #if !defined(ENABLE_TOUCH_UI)
     {"PageSetup", NULL, N_("Page _Setup"), NULL,
      N_("Set up page for printing"), G_CALLBACK(page_setup_cb)},
 #endif                          /* ENABLE_TOUCH_UI */
-    {"Print", GTK_STOCK_PRINT, N_("_Print..."), "<control>P",
+    {"Print", "document-print", N_("_Print..."), "<control>P",
      N_("Print the edited message"), G_CALLBACK(print_message_cb)},
-    {"Close", GTK_STOCK_CLOSE, N_("_Close"), "<control>W",
+    {"Close", "window-close", N_("_Close"), "<control>W",
      NULL, G_CALLBACK(close_window_cb)},
-    {"Undo", GTK_STOCK_UNDO, N_("_Undo"), "<control>Z",
+    {"Undo", "edit-undo", N_("_Undo"), "<control>Z",
      N_("Undo most recent change"), G_CALLBACK(sw_undo_cb)},
-    {"Redo", GTK_STOCK_REDO, N_("_Redo"), "<shift><control>Z",
+    {"Redo", "edit-redo", N_("_Redo"), "<shift><control>Z",
      N_("Redo most recent change"), G_CALLBACK(sw_redo_cb)},
-    {"Cut", GTK_STOCK_CUT, N_("Cu_t"), "<control>X",
+    {"Cut", "edit-cut", N_("Cu_t"), "<control>X",
      N_("Cut the selected text"), G_CALLBACK(cut_cb)},
-    {"Copy", GTK_STOCK_COPY, N_("_Copy"), "<control>C",
+    {"Copy", "edit-copy", N_("_Copy"), "<control>C",
      N_("Copy to the clipboard"), G_CALLBACK(copy_cb)},
-    {"Paste", GTK_STOCK_PASTE, N_("_Paste"), "<control>V",
+    {"Paste", "edit-paste", N_("_Paste"), "<control>V",
      N_("Paste from the clipboard"), G_CALLBACK(paste_cb)},
     {"SelectAll", NULL, N_("Select _All"), "<control>A",
      NULL, G_CALLBACK(select_all_cb)},
@@ -370,7 +370,7 @@ static const GtkActionEntry entries[] = {
     {"QuoteMessages", NULL, N_("_Quote Message(s)"), NULL,
      NULL, G_CALLBACK(quote_messages_cb)},
 #if !HAVE_GTKSPELL
-    {"CheckSpelling", GTK_STOCK_SPELL_CHECK, N_("C_heck Spelling"), NULL,
+    {"CheckSpelling", "tools-check-spelling", N_("C_heck Spelling"), NULL,
      N_("Check the spelling of the message"),
      G_CALLBACK(spell_check_cb)},
 #endif                          /* HAVE_GTKSPELL */
@@ -378,7 +378,7 @@ static const GtkActionEntry entries[] = {
      NULL, N_("Select the Identity to use for the message"),
      G_CALLBACK(change_identity_dialog_cb)},
 #if !defined(ENABLE_TOUCH_UI)
-    {"EditWithGnome", GTK_STOCK_EDIT, N_("_Edit with Gnome-Editor"),
+    {"EditWithGnome", "gtk-edit", N_("_Edit with Gnome-Editor"),
      NULL, N_("Edit the current message with the default Gnome editor"),
      G_CALLBACK(edit_with_gnome)},
 #endif                          /* ENABLE_TOUCH_UI */
@@ -412,7 +412,7 @@ static const GtkActionEntry ready_entries[] = {
 /* Toggle items */
 static const GtkToggleActionEntry toggle_entries[] = {
 #if HAVE_GTKSPELL
-    {"CheckSpelling", GTK_STOCK_SPELL_CHECK, N_("C_heck Spelling"), NULL,
+    {"CheckSpelling", "tools-check-spelling", N_("C_heck Spelling"), NULL,
      N_("Check the spelling of the message"),
      G_CALLBACK(spell_check_menu_cb), FALSE},
 #endif                          /* HAVE_GTKSPELL */
@@ -940,7 +940,7 @@ delete_handler(BalsaSendmsg * bsmsg)
     g_object_unref(list);
     gtk_dialog_set_default_response(GTK_DIALOG(d), GTK_RESPONSE_YES);
     gtk_dialog_add_button(GTK_DIALOG(d),
-                          GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL);
+                          "gtk-cancel", GTK_RESPONSE_CANCEL);
     reply = gtk_dialog_run(GTK_DIALOG(d));
     gtk_widget_destroy(d);
 
@@ -1900,8 +1900,8 @@ sw_get_user_codeset(BalsaSendmsg * bsmsg, gboolean * change_type,
         gtk_dialog_new_with_buttons(_("Choose charset"),
                                     GTK_WINDOW(bsmsg->window),
                                     GTK_DIALOG_DESTROY_WITH_PARENT,
-                                    GTK_STOCK_OK, GTK_RESPONSE_OK,
-                                    GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+                                    _("_OK"), GTK_RESPONSE_OK,
+                                    _("_Cancel"), GTK_RESPONSE_CANCEL,
                                     NULL);
     gchar *msg = g_strdup_printf
         (_("File\n%s\nis not encoded in US-ASCII or UTF-8.\n"
@@ -2259,7 +2259,7 @@ add_urlref_attachment(BalsaSendmsg * bsmsg, gchar *url)
     /* get the pixbuf for the attachment's content type */
     pixbuf =
         gtk_widget_render_icon_pixbuf(GTK_WIDGET(balsa_app.main_window),
-                                      GTK_STOCK_JUMP_TO,
+                                      "go-jump",
                                       GTK_ICON_SIZE_MENU);
 
     /* create a new attachment info block */
@@ -2362,8 +2362,9 @@ sw_attach_dialog(BalsaSendmsg * bsmsg)
         gtk_file_chooser_dialog_new(_("Attach file"),
                                     GTK_WINDOW(bsmsg->window),
                                     GTK_FILE_CHOOSER_ACTION_OPEN,
-                                    GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-                                    GTK_STOCK_OK, GTK_RESPONSE_OK, NULL);
+                                    _("_Cancel"), GTK_RESPONSE_CANCEL,
+                                    _("_OK"),     GTK_RESPONSE_OK,
+                                    NULL);
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu_for_parent(fsw, GTK_WINDOW(bsmsg->window));
 #endif
@@ -3688,7 +3689,7 @@ quote_parts_select_dlg(GtkTreeStore *tree_store, GtkWindow * parent)
     dialog = gtk_dialog_new_with_buttons(_("Select parts for quotation"),
 					 parent,
 					 GTK_DIALOG_DESTROY_WITH_PARENT,
-					 GTK_STOCK_OK, GTK_RESPONSE_OK,
+					 _("_OK"), GTK_RESPONSE_OK,
 					 NULL);
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu_for_parent(dialog, parent);
@@ -3699,7 +3700,7 @@ quote_parts_select_dlg(GtkTreeStore *tree_store, GtkWindow * parent)
     gtk_label_set_selectable(GTK_LABEL(label), TRUE);
     gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.0);
 
-    image = gtk_image_new_from_stock(GTK_STOCK_DIALOG_QUESTION,
+    image = gtk_image_new_from_stock("dialog-question",
 				     GTK_ICON_SIZE_DIALOG);
     gtk_misc_set_alignment(GTK_MISC(image), 0.5, 0.0);
 
@@ -4482,17 +4483,17 @@ create_lang_menu(GtkWidget * parent, BalsaSendmsg * bsmsg)
 /* Standard buttons; "" means a separator. */
 static const gchar* compose_toolbar[] = {
 #if defined(ENABLE_TOUCH_UI)
-    GTK_STOCK_UNDO,
-    GTK_STOCK_REDO,
-    GTK_STOCK_SPELL_CHECK,
+    "edit-undo",
+    "edit-redo",
+    "tools-check-spelling",
     "",
     BALSA_PIXMAP_ATTACHMENT,
     "",
-    GTK_STOCK_SAVE,
+    "document-save",
     "",
     BALSA_PIXMAP_SEND,
     "",
-    GTK_STOCK_CLOSE,
+    "window-close",
     "",
     BALSA_PIXMAP_IDENTITY,
 #else /* ENABLE_TOUCH_UI */
@@ -4500,18 +4501,18 @@ static const gchar* compose_toolbar[] = {
     "",
     BALSA_PIXMAP_ATTACHMENT,
     "",
-    GTK_STOCK_SAVE,
+    "document-save",
     "",
-    GTK_STOCK_UNDO,
-    GTK_STOCK_REDO,
+    "edit-undo",
+    "edit-redo",
     "",
     BALSA_PIXMAP_IDENTITY,
     "",
-    GTK_STOCK_SPELL_CHECK,
+    "tools-check-spelling",
     "",
-    GTK_STOCK_PRINT,
+    "document-print",
     "",
-    GTK_STOCK_CLOSE,
+    "window-close",
 #endif /* ENABLE_TOUCH_UI */
 };
 
@@ -5441,8 +5442,9 @@ include_file_cb(GtkAction * action, BalsaSendmsg * bsmsg)
 	gtk_file_chooser_dialog_new(_("Include file"),
                                     GTK_WINDOW(bsmsg->window),
                                     GTK_FILE_CHOOSER_ACTION_OPEN,
-                                    GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-                                    GTK_STOCK_OK, GTK_RESPONSE_OK, NULL);
+                                    _("_Cancel"), GTK_RESPONSE_CANCEL,
+                                    _("_OK"),     GTK_RESPONSE_OK,
+                                    NULL);
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu_for_parent(file_selector, GTK_WINDOW(bsmsg->window));
 #endif
@@ -5749,7 +5751,7 @@ subject_not_empty(BalsaSendmsg * bsmsg)
     gtk_box_pack_start (GTK_BOX (dialog_vbox), hbox, TRUE, TRUE, 0);
     gtk_container_set_border_width (GTK_CONTAINER (hbox), 6);
 
-    image = gtk_image_new_from_stock (GTK_STOCK_DIALOG_QUESTION, GTK_ICON_SIZE_DIALOG);
+    image = gtk_image_new_from_stock ("dialog-question", GTK_ICON_SIZE_DIALOG);
     gtk_box_pack_start (GTK_BOX (hbox), image, FALSE, FALSE, 0);
     gtk_misc_set_alignment (GTK_MISC (image), 0.5, 0);
 
@@ -5781,7 +5783,7 @@ subject_not_empty(BalsaSendmsg * bsmsg)
         gtk_dialog_get_action_area(GTK_DIALOG(no_subj_dialog));
     gtk_button_box_set_layout (GTK_BUTTON_BOX (dialog_action_area), GTK_BUTTONBOX_END);
 
-    cnclbutton = gtk_button_new_from_stock (GTK_STOCK_CANCEL);
+    cnclbutton = gtk_button_new_with_mnemonic(_("_Cancel"));
     gtk_dialog_add_action_widget (GTK_DIALOG (no_subj_dialog), cnclbutton, GTK_RESPONSE_CANCEL);
     gtk_widget_set_can_default(cnclbutton, TRUE);
 
@@ -5919,7 +5921,7 @@ check_suggest_encryption(BalsaSendmsg * bsmsg)
 	gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, FALSE, 0);
 	gtk_widget_show_all(button);
 
-	button = gtk_button_new_from_stock(GTK_STOCK_CANCEL);
+	button = gtk_button_new_with_mnemonic(_("_Cancel"));
 	gtk_widget_show(button);
 	gtk_dialog_add_action_widget(GTK_DIALOG(dialog), button, GTK_RESPONSE_CANCEL);
         gtk_widget_set_can_default(button, TRUE);
@@ -7173,7 +7175,7 @@ bsmsg_check_format_compatibility(GtkWindow *parent, const gchar *filename)
     dialog = (GtkDialog*)gtk_dialog_new_with_buttons
         ("Compatibility check", parent,
          GTK_DIALOG_MODAL| GTK_DIALOG_DESTROY_WITH_PARENT,
-         GTK_STOCK_CANCEL,                   GTK_RESPONSE_CANCEL,
+         "_Cancel",                          GTK_RESPONSE_CANCEL,
          "_Attach it in the current format", GTK_RESPONSE_OK, NULL);
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu_for_parent(GTK_WIDGET(dialog), parent);

@@ -243,12 +243,12 @@ static const GtkActionEntry entries[] = {
     {"MessageMenu", NULL, N_("_Message")},
     {"PageSetup", NULL, N_("Page _Setup"), "<control>S",
      N_("Set up page for printing"), G_CALLBACK(page_setup_cb)},
-    {"Print", GTK_STOCK_PRINT, N_("_Print..."), "<control>P",
+    {"Print", "document-print", N_("_Print..."), "<control>P",
      N_("Print current message"), G_CALLBACK(print_cb)},
-    {"Close", GTK_STOCK_CLOSE, N_("_Close"), "<control>W",
+    {"Close", "window-close", N_("_Close"), "<control>W",
      N_("Close the message window"),
      G_CALLBACK(close_message_window_cb)},
-    {"Copy", GTK_STOCK_COPY, N_("_Copy"), "<control>C", NULL,
+    {"Copy", "edit-copy", N_("_Copy"), "<control>C", NULL,
      G_CALLBACK(copy_cb)},
     {"SelectAll", NULL, N_("Select _All"), "<control>A", NULL,
      G_CALLBACK(select_all_cb)},
@@ -256,13 +256,13 @@ static const GtkActionEntry entries[] = {
      N_("Find a string in this message"),
      G_CALLBACK(mw_find_in_message_cb)},
 #ifdef HAVE_HTML_WIDGET
-    {"ZoomIn", GTK_STOCK_ZOOM_IN, N_("Zoom _In"), "<control>plus",
+    {"ZoomIn", "zoom-in", N_("Zoom _In"), "<control>plus",
      N_("Increase magnification"), G_CALLBACK(mw_zoom_in_cb)},
-    {"ZoomOut", GTK_STOCK_ZOOM_OUT, N_("Zoom _Out"), "<control>minus",
+    {"ZoomOut", "zoom-out", N_("Zoom _Out"), "<control>minus",
      N_("Decrease magnification"), G_CALLBACK(mw_zoom_out_cb)},
     /* To warn msgfmt that the % sign isn't a format specifier: */
     /* xgettext:no-c-format */
-    {"Zoom100", GTK_STOCK_ZOOM_100, N_("Zoom _100%"), NULL,
+    {"Zoom100", "zoom-original", N_("Zoom _100%"), NULL,
      N_("No magnification"), G_CALLBACK(mw_zoom_100_cb)},
 #endif                          /* HAVE_HTML_WIDGET */
     {"Reply", BALSA_PIXMAP_REPLY, N_("_Reply..."), "R",
@@ -272,7 +272,7 @@ static const GtkActionEntry entries[] = {
      G_CALLBACK(replytoall_message_cb)},
     {"ReplyGroup", BALSA_PIXMAP_REPLY_GROUP, N_("Reply to _Group..."), "G",
      N_("Reply to mailing list"), G_CALLBACK(replytogroup_message_cb)},
-    {"SavePart", GTK_STOCK_SAVE, N_("Save Current Part..."), "<control>S",
+    {"SavePart", "document-save", N_("Save Current Part..."), "<control>S",
      N_("Save currently displayed part of message"),
      G_CALLBACK(save_current_part_cb)},
     {"ViewSource", BALSA_PIXMAP_BOOK_OPEN, N_("_View Source..."),
@@ -305,7 +305,7 @@ static const GtkActionEntry entries[] = {
     {"NextFlagged", BALSA_PIXMAP_NEXT_FLAGGED, N_("Next Flagged Message"),
      "<control><alt>F", N_("Next Flagged Message"),
      G_CALLBACK(next_flagged_cb)},
-    {"MoveToTrash", GTK_STOCK_DELETE, N_("_Move to Trash"), "D",
+    {"MoveToTrash", "edit-delete", N_("_Move to Trash"), "D",
      N_("Move the message to Trash mailbox"),
      G_CALLBACK(trash_cb)}
 };
@@ -427,11 +427,11 @@ static const gchar* message_toolbar[] = {
     BALSA_PIXMAP_REPLY_ALL,
     BALSA_PIXMAP_FORWARD,
     "",
-    GTK_STOCK_PRINT,
+    "document-print",
     "",
-    GTK_STOCK_DELETE,
+    "edit-delete",
     "",
-    GTK_STOCK_CLOSE
+    "window-close"
 #else /* ENABLE_TOUCH_UI */
     BALSA_PIXMAP_NEXT_UNREAD,
     "",
@@ -442,11 +442,11 @@ static const gchar* message_toolbar[] = {
     "",
     BALSA_PIXMAP_PREVIOUS_PART,
     BALSA_PIXMAP_NEXT_PART,
-    GTK_STOCK_SAVE,
+    "document-save",
     "",
-    GTK_STOCK_PRINT,
+    "document-print",
     "",
-    GTK_STOCK_DELETE
+    "edit-delete"
 #endif /* ENEBLE_TOUCH_UI */
 };
 

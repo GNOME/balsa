@@ -161,9 +161,9 @@ lb_gpgme_select_key(const gchar * user_name, gboolean secret, GList * keys,
     dialog = gtk_dialog_new_with_buttons(_("Select key"),
 					 parent,
 					 GTK_DIALOG_DESTROY_WITH_PARENT,
-					 GTK_STOCK_OK, GTK_RESPONSE_OK,
-					 GTK_STOCK_CANCEL,
-					 GTK_RESPONSE_CANCEL, NULL);
+                                         _("_OK"),     GTK_RESPONSE_OK,
+                                         _("_Cancel"), GTK_RESPONSE_CANCEL,
+                                         NULL);
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu_for_parent(dialog, parent);
 #endif
@@ -344,9 +344,9 @@ get_passphrase_real(const gchar * uid_hint, const gchar * passphrase_info,
     /* FIXME: create dialog according to the Gnome HIG */
     dialog = gtk_dialog_new_with_buttons(_("Enter Passphrase"), parent,
 					 GTK_DIALOG_DESTROY_WITH_PARENT,
-					 GTK_STOCK_OK, GTK_RESPONSE_OK,
-					 GTK_STOCK_CANCEL,
-					 GTK_RESPONSE_CANCEL, NULL);
+                                         _("_OK"),     GTK_RESPONSE_OK,
+                                         _("_Cancel"), GTK_RESPONSE_CANCEL,
+                                         NULL);
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu_for_parent(dialog, parent);
 #endif

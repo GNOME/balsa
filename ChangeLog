@@ -1,3 +1,52 @@
+2013-07-18  Peter Bloomfield
+
+	Clean up deprecation of stock icons
+
+	* libbalsa/html.c (lbh_info_bar), (lbh_show_info_bar):
+	* libbalsa/identity.c (libbalsa_identity_select_dialog),
+	(libbalsa_identity_config_dialog):
+	* libbalsa/information.c (libbalsa_information_varg):
+	* libbalsa/libbalsa-gpgme-cb.c (lb_gpgme_select_key),
+	(get_passphrase_real):
+	* libbalsa/send.c (ensure_send_progress_dialog):
+	* libbalsa/smtp-server.c (libbalsa_smtp_server_dialog):
+	* libbalsa/source-viewer.c:
+	* src/ab-main.c (bab_get_edit_button_box), (bab_get_filter_box):
+	* src/ab-window.c (balsa_ab_window_new), (balsa_ab_window_init):
+	* src/address-book-config.c (create_local_dialog),
+	(create_generic_dialog):
+	* src/balsa-app.c (ask_password_real):
+	* src/balsa-icons.c (load_balsa_pixmap), (balsa_register_pixbufs):
+	* src/balsa-icons.h:
+	* src/balsa-index.c (bndx_popup_menu_create), (balsa_index_pipe):
+	* src/balsa-mblist.c (bmbl_mru_show_tree):
+	* src/balsa-message.c (part_context_dump_all_cb):
+	* src/balsa-mime-widget-callbacks.c
+	(balsa_mime_widget_ctx_menu_save):
+	* src/balsa-mime-widget-image.c (balsa_mime_widget_new_image):
+	* src/balsa-mime-widget-text.c (bmwt_populate_popup_menu):
+	* src/filter-edit-callbacks.c (fe_edit_condition):
+	* src/filter-edit-dialog.c (build_left_side), (build_action_page),
+	(build_right_side), (filters_edit_dialog):
+	* src/filter-export-dialog.c (filters_export_dialog):
+	* src/filter-run-dialog.c (balsa_filter_run_dialog_init):
+	* src/folder-conf.c (folder_conf_imap_node), (browse_button_cb),
+	(folder_conf_imap_sub_node):
+	* src/information-dialog.c (balsa_information_list):
+	* src/mailbox-conf.c (mailbox_conf_delete),
+	(create_local_mailbox_dialog), (create_generic_dialog):
+	* src/main-window.c:
+	* src/message-window.c:
+	* src/pref-manager.c (open_preferences_manager):
+	* src/sendmsg-window.c (delete_handler), (sw_get_user_codeset),
+	(add_urlref_attachment), (sw_attach_dialog),
+	(quote_parts_select_dlg), (include_file_cb), (subject_not_empty),
+	(check_suggest_encryption), (bsmsg_check_format_compatibility):
+	* src/spell-check.c (balsa_spell_check_init):
+	* src/store-address.c (store_address_dialog):
+	* src/toolbar-factory.c:
+	* src/toolbar-prefs.c (customize_dialog_cb), (create_toolbar_page):
+
 2013-07-14  Peter Bloomfield
 
 	Fix bgo #704159 (Igor Pashev)

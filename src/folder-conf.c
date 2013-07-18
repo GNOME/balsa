@@ -304,8 +304,9 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
                     GTK_WINDOW(balsa_app.main_window),
                     GTK_DIALOG_DESTROY_WITH_PARENT,
                     mn ? _("_Update") : _("C_reate"), GTK_RESPONSE_OK,
-                    GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-                    GTK_STOCK_HELP, GTK_RESPONSE_HELP, NULL));
+                    _("_Cancel"), GTK_RESPONSE_CANCEL,
+                    _("_Help"), GTK_RESPONSE_HELP,
+                    NULL));
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu_for_parent(GTK_WIDGET(fcw->dialog), GTK_WINDOW(balsa_app.main_window));
 #endif
@@ -567,8 +568,8 @@ browse_button_cb(GtkWidget * widget, SubfolderDialogData * sdd)
         gtk_dialog_new_with_buttons(_("Select parent folder"),
                                     GTK_WINDOW(sdd->dialog),
                                     GTK_DIALOG_DESTROY_WITH_PARENT,
-                                    GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-                                    GTK_STOCK_OK, GTK_RESPONSE_OK,
+                                    _("_Cancel"), GTK_RESPONSE_CANCEL,
+                                    _("_Help"), GTK_RESPONSE_HELP,
                                     NULL);
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu_for_parent(dialog, GTK_WINDOW(sdd->dialog));
@@ -799,8 +800,8 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
                     GTK_WINDOW(balsa_app.main_window),
                     GTK_DIALOG_DESTROY_WITH_PARENT, /* must NOT be modal */
                     mn ? _("_Update") : _("_Create"), GTK_RESPONSE_OK,
-                    GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-                    GTK_STOCK_HELP,   GTK_RESPONSE_HELP,
+                    _("_Cancel"), GTK_RESPONSE_CANCEL,
+                    _("_Help"), GTK_RESPONSE_HELP,
                     NULL));
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu_for_parent(GTK_WIDGET(sdd->dialog), GTK_WINDOW(balsa_app.main_window));

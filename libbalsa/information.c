@@ -93,13 +93,13 @@ libbalsa_information_varg(GtkWindow *parent, LibBalsaInformationType type,
 
         switch (type) {
         case LIBBALSA_INFORMATION_MESSAGE:
-            icon_str = GTK_STOCK_DIALOG_INFO;
+            icon_str = "dialog-information";
             break;
         case LIBBALSA_INFORMATION_WARNING:
-            icon_str = GTK_STOCK_DIALOG_WARNING;
+            icon_str = "dialog-warning";
             break;
         case LIBBALSA_INFORMATION_ERROR:
-            icon_str = GTK_STOCK_DIALOG_ERROR;
+            icon_str = "dialog-error";
             break;
         default:
             icon_str = NULL;

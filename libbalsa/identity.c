@@ -483,8 +483,8 @@ libbalsa_identity_select_dialog(GtkWindow * parent,
     sdi->dialog = dialog =
         gtk_dialog_new_with_buttons(prompt, parent,
                                     GTK_DIALOG_DESTROY_WITH_PARENT,
-                                    GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-                                    GTK_STOCK_OK, GTK_RESPONSE_OK,
+                                     _("_Cancel"), GTK_RESPONSE_CANCEL,
+                                     _("_OK"),     GTK_RESPONSE_OK,
                                     NULL);
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu_for_parent(dialog, parent);
@@ -1723,10 +1723,10 @@ libbalsa_identity_config_dialog(GtkWindow *parent, GList **identities,
         gtk_dialog_new_with_buttons(_("Manage Identities"),
                                     parent, /* must NOT be modal */
                                     GTK_DIALOG_DESTROY_WITH_PARENT,
-                                    GTK_STOCK_HELP, IDENTITY_RESPONSE_HELP,
-                                    GTK_STOCK_NEW, IDENTITY_RESPONSE_NEW,
-                                    GTK_STOCK_REMOVE, IDENTITY_RESPONSE_REMOVE,
-                                    GTK_STOCK_CLOSE, IDENTITY_RESPONSE_CLOSE,
+                                    _("_Help"),   IDENTITY_RESPONSE_HELP,
+                                    _("_New"),    IDENTITY_RESPONSE_NEW,
+                                    _("_Remove"), IDENTITY_RESPONSE_REMOVE,
+                                    _("_Close"),  IDENTITY_RESPONSE_CLOSE,
                                     NULL);
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu_for_parent(dialog, parent);

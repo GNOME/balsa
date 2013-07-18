@@ -343,7 +343,7 @@ lbh_info_bar(LibBalsaWebKitInfo * info)
     info_bar_widget =
         gtk_info_bar_new_with_buttons(_("_Download images"),
                                      GTK_RESPONSE_OK,
-                                     GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
+                                     _("_Close"), GTK_RESPONSE_CLOSE,
                                      NULL);
 
     info_bar = GTK_INFO_BAR(info_bar_widget);
@@ -986,7 +986,7 @@ lbh_show_info_bar(LibBalsaWebKitInfo * info)
     info_bar_widget =
         gtk_info_bar_new_with_buttons(_("_Download images"),
                                      GTK_RESPONSE_OK,
-                                     GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
+                                     _("_Close"), GTK_RESPONSE_CLOSE,
                                      NULL);
     gtk_box_pack_start(GTK_BOX(info->vbox), info_bar_widget,
                        FALSE, FALSE, 0);

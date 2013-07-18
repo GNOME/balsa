@@ -346,7 +346,7 @@ static const GtkActionEntry entries[] = {
     {"MessageMoreMenu", NULL, N_("_More")},
     {"ToolsMenu", NULL, N_("_Tools")},
     {"ToolsFiltersMenu", NULL, N_("_Filters")},
-    {"ManageFilters", GTK_STOCK_PROPERTIES, N_("F_ilters"), NULL,
+    {"ManageFilters", "document-properties", N_("F_ilters"), NULL,
      N_("Manage filters"), G_CALLBACK(bw_filter_dlg_cb)},
 #endif /* ENABLE_TOUCH_UI */
     /* File menu items */
@@ -368,46 +368,46 @@ static const GtkActionEntry entries[] = {
      N_("Set up page for printing"), G_CALLBACK(bw_page_setup_cb)},
     {"AddressBook", BALSA_PIXMAP_BOOK_RED, N_("_Address Book..."), MAC_MODIFIER "B",
      N_("Open the address book"), G_CALLBACK(bw_address_book_cb)},
-    {"Quit", GTK_STOCK_QUIT, N_("_Quit"), "<control>Q", N_("Quit Balsa"),
+    {"Quit", "application-exit", N_("_Quit"), "<control>Q", N_("Quit Balsa"),
      G_CALLBACK(bw_quit_nicely)},
     /* File:New submenu items */
     {"NewMessage", BALSA_PIXMAP_COMPOSE, N_("_Message..."), MAC_MODIFIER "M",
      N_("Compose a new message"), G_CALLBACK(bw_new_message_cb)},
 #if !defined(ENABLE_TOUCH_UI)
-    {"NewMbox", GTK_STOCK_ADD, N_("Local mbox mailbox..."), NULL,
+    {"NewMbox", "list-add", N_("Local mbox mailbox..."), NULL,
      N_("Add a new mbox style mailbox"),
      G_CALLBACK(mailbox_conf_add_mbox_cb)},
-    {"NewMaildir", GTK_STOCK_ADD, N_("Local Maildir mailbox..."), NULL,
+    {"NewMaildir", "list-add", N_("Local Maildir mailbox..."), NULL,
      N_("Add a new Maildir style mailbox"),
      G_CALLBACK(mailbox_conf_add_maildir_cb)},
-    {"NewMH", GTK_STOCK_ADD, N_("Local MH mailbox..."), NULL,
+    {"NewMH", "list-add", N_("Local MH mailbox..."), NULL,
      N_("Add a new MH style mailbox"), G_CALLBACK(mailbox_conf_add_mh_cb)},
 #else  /* ENABLE_TOUCH_UI */
-    {"NewMbox", GTK_STOCK_ADD, N_("New mailbox..."), NULL,
+    {"NewMbox", "list-add", N_("New mailbox..."), NULL,
      N_("Add a new mbox style mailbox"),
      G_CALLBACK(mailbox_conf_add_mbox_cb)},
-    {"NewMaildir", GTK_STOCK_ADD, N_("New \"Maildir\" mailbox..."), NULL,
+    {"NewMaildir", "list-add", N_("New \"Maildir\" mailbox..."), NULL,
      N_("Add a new Maildir style mailbox"),
      G_CALLBACK(mailbox_conf_add_maildir_cb)},
-    {"NewMH", GTK_STOCK_ADD, N_("New \"MH\" mailbox..."), NULL,
+    {"NewMH", "list-add", N_("New \"MH\" mailbox..."), NULL,
      N_("Add a new MH style mailbox"), G_CALLBACK(mailbox_conf_add_mh_cb)},
 #endif /* ENABLE_TOUCH_UI */
-    {"NewIMAPBox", GTK_STOCK_ADD, N_("Remote IMAP mailbox..."), NULL,
+    {"NewIMAPBox", "list-add", N_("Remote IMAP mailbox..."), NULL,
      N_("Add a new IMAP mailbox"), G_CALLBACK(mailbox_conf_add_imap_cb)},
-    {"NewIMAPFolder", GTK_STOCK_ADD, N_("Remote IMAP folder..."), NULL,
+    {"NewIMAPFolder", "list-add", N_("Remote IMAP folder..."), NULL,
      N_("Add a new IMAP folder"), G_CALLBACK(folder_conf_add_imap_cb)},
-    {"NewIMAPSubfolder", GTK_STOCK_ADD, N_("Remote IMAP subfolder..."),
+    {"NewIMAPSubfolder", "list-add", N_("Remote IMAP subfolder..."),
      NULL, N_("Add a new IMAP subfolder"),
      G_CALLBACK(folder_conf_add_imap_sub_cb)},
     /* Edit menu items */
-    {"Copy", GTK_STOCK_COPY, N_("_Copy"), "<control>C", NULL,
+    {"Copy", "edit-copy", N_("_Copy"), "<control>C", NULL,
      G_CALLBACK(bw_copy_cb)},
-    {"Filters", GTK_STOCK_PROPERTIES, N_("F_ilters..."), NULL,
+    {"Filters", "document-properties", N_("F_ilters..."), NULL,
      N_("Manage filters"), G_CALLBACK(bw_filter_dlg_cb)},
     /* Export selected filters to a text file. */
-    {"ExportFilters", GTK_STOCK_PROPERTIES, N_("_Export Filters..."), NULL,
+    {"ExportFilters", "document-properties", N_("_Export Filters..."), NULL,
      N_("Export filters as Sieve scripts"), G_CALLBACK(bw_filter_export_cb)},
-    {"Preferences", GTK_STOCK_PREFERENCES, N_("Prefere_nces"), NULL, NULL,
+    {"Preferences", "preferences-system", N_("Prefere_nces"), NULL, NULL,
      G_CALLBACK(open_preferences_manager)},
     /* View menu items */
     {"ExpandAll", NULL, N_("E_xpand All"), "<control>E",
@@ -415,30 +415,30 @@ static const GtkActionEntry entries[] = {
     {"CollapseAll", NULL, N_("_Collapse All"), "<control>L",
      N_("Collapse all expanded threads"), G_CALLBACK(bw_collapse_all_cb)},
 #ifdef HAVE_HTML_WIDGET
-    {"ZoomIn", GTK_STOCK_ZOOM_IN, N_("Zoom _In"), "<control>plus",
+    {"ZoomIn", "zoom-in", N_("Zoom _In"), "<control>plus",
      N_("Increase magnification"), G_CALLBACK(bw_zoom_in_cb)},
-    {"ZoomOut", GTK_STOCK_ZOOM_OUT, N_("Zoom _Out"), "<control>minus",
+    {"ZoomOut", "zoom-out", N_("Zoom _Out"), "<control>minus",
      N_("Decrease magnification"), G_CALLBACK(bw_zoom_out_cb)},
     /* To warn msgfmt that the % sign isn't a format specifier: */
     /* xgettext:no-c-format */
-    {"Zoom100", GTK_STOCK_ZOOM_100, N_("Zoom _100%"), NULL,
+    {"Zoom100", "zoom-original", N_("Zoom _100%"), NULL,
      N_("No magnification"), G_CALLBACK(bw_zoom_100_cb)},
 #endif                          /* HAVE_HTML_WIDGET */
     /* Mailbox menu item that does not require a mailbox */
     {"NextUnread", BALSA_PIXMAP_NEXT_UNREAD, N_("Next Unread Message"),
      "<control>N", N_("Next Unread Message"),
      G_CALLBACK(bw_next_unread_message_cb)},
-    {"EmptyTrash", GTK_STOCK_REMOVE, N_("Empty _Trash"), NULL,
+    {"EmptyTrash", "list-remove", N_("Empty _Trash"), NULL,
      N_("Delete messages from the Trash mailbox"),
      G_CALLBACK(bw_empty_trash_cb)},
     /* Settings menu items */
-    {"Toolbars", GTK_STOCK_EXECUTE, N_("_Toolbars..."), NULL,
+    {"Toolbars", "system-run", N_("_Toolbars..."), NULL,
      N_("Customize toolbars"), G_CALLBACK(customize_dialog_cb)},
     {"Identities", BALSA_PIXMAP_IDENTITY, N_("_Identities..."), NULL,
      N_("Create and set current identities"),
      G_CALLBACK(bw_ident_manage_dialog_cb)},
     /* Help menu items */
-    {"TableOfContents", GTK_STOCK_HELP, N_("_User's Guide"), "F1",
+    {"TableOfContents", "help-browser", N_("_User's Guide"), "F1",
      N_("Table of Contents"), G_CALLBACK(bw_contents_cb)},
     {"MailboxTab1", NULL, NULL, "<alt>1", NULL,
      G_CALLBACK(bw_mailbox_tab_n_cb)},
@@ -460,7 +460,7 @@ static const GtkActionEntry entries[] = {
      G_CALLBACK(bw_mailbox_tab_n_cb)},
     {"MailboxTab0", NULL, NULL, "<alt>0", NULL,
      G_CALLBACK(bw_mailbox_tab_n_cb)},
-    {"About", GTK_STOCK_ABOUT, N_("_About"), NULL, N_("About Balsa"),
+    {"About", "help-about", N_("_About"), NULL, N_("About Balsa"),
      G_CALLBACK(bw_show_about_box)}
 };
 
@@ -469,9 +469,9 @@ static const GtkActionEntry mailbox_entries[] = {
     /* Edit menu items */
     {"SelectAll", NULL, N_("Select _All"), "<control>A", NULL,
      G_CALLBACK(bw_select_all_cb)},
-    {"Find", GTK_STOCK_FIND, N_("_Find"), "<control>F", NULL,
+    {"Find", "edit-find", N_("_Find"), "<control>F", NULL,
      G_CALLBACK(bw_find_cb)},
-    {"FindNext", GTK_STOCK_FIND, N_("Find Ne_xt"), "<control>G", NULL,
+    {"FindNext", "edit-find", N_("Find Ne_xt"), "<control>G", NULL,
      G_CALLBACK(bw_find_again_cb)},
     /* Mailbox menu items */
     {"NextMessage", BALSA_PIXMAP_NEXT, N_("Next Message"), MAC_MODIFIER "N",
@@ -482,31 +482,31 @@ static const GtkActionEntry mailbox_entries[] = {
      "<control><alt>F", N_("Next Flagged Message"),
      G_CALLBACK(bw_next_flagged_message_cb)},
     {"MailboxHideMenu", NULL, N_("_Hide Messages")},
-    {"ResetFilter", GTK_STOCK_CANCEL, N_("_Reset Filter"), NULL,
+    {"ResetFilter", "gtk-cancel", N_("_Reset Filter"), NULL,
      N_("Reset mailbox filter"), G_CALLBACK(bw_reset_filter_cb)},
     {"MailboxSelectAll", BALSA_PIXMAP_MARK_ALL, N_("_Select All"), NULL,
      N_("Select all messages in current mailbox"),
      G_CALLBACK(bw_mark_all_cb)},
-    {"MailboxEdit", GTK_STOCK_PREFERENCES, N_("_Properties..."), NULL,
+    {"MailboxEdit", "preferences-system", N_("_Properties..."), NULL,
      N_("Edit the selected mailbox"), G_CALLBACK(mailbox_conf_edit_cb)},
-    {"MailboxDelete", GTK_STOCK_REMOVE, N_("_Delete..."), NULL,
+    {"MailboxDelete", "list-remove", N_("_Delete..."), NULL,
      N_("Delete the selected mailbox"),
      G_CALLBACK(mailbox_conf_delete_cb)},
 #if !defined(ENABLE_TOUCH_UI)
-    {"Expunge", GTK_STOCK_CLEAR, N_("E_xpunge Deleted Messages"), NULL,
+    {"Expunge", "edit-clear", N_("E_xpunge Deleted Messages"), NULL,
      N_("Expunge messages marked as deleted in the current mailbox"),
 #else  /* ENABLE_TOUCH_UI */
-    {"Expunge", GTK_STOCK_REMOVE, N_("E_xpunge Deleted Messages"), NULL,
+    {"Expunge", "list-remove", N_("E_xpunge Deleted Messages"), NULL,
      N_("Expunge messages marked as deleted in the current mailbox"),
 #endif /* ENABLE_TOUCH_UI */
      G_CALLBACK(bw_mailbox_expunge_cb)},
-    {"Close", GTK_STOCK_CLOSE, N_("_Close"), NULL, N_("Close mailbox"),
+    {"Close", "window-close", N_("_Close"), NULL, N_("Close mailbox"),
      G_CALLBACK(bw_mailbox_close_cb)},
-    {"SelectFilters", GTK_STOCK_PROPERTIES, N_("Select _Filters"), NULL,
+    {"SelectFilters", "document-properties", N_("Select _Filters"), NULL,
      N_("Select filters to be applied automatically to current mailbox"),
      G_CALLBACK(bw_filter_run_cb)},
 #if !defined(ENABLE_TOUCH_UI)
-    {"RemoveDuplicates", GTK_STOCK_REMOVE, N_("_Remove Duplicates"), NULL,
+    {"RemoveDuplicates", "list-remove", N_("_Remove Duplicates"), NULL,
      N_("Remove duplicated messages from the current mailbox"),
      G_CALLBACK(bw_remove_duplicates_cb)}
 #endif /* ENABLE_TOUCH_UI */
@@ -555,9 +555,9 @@ static const GtkActionEntry message_entries[] = {
 /* Actions that are sensitive only when some message is current: */
 static const GtkActionEntry current_message_entries[] = {
     /* File menu item */
-    {"Print", GTK_STOCK_PRINT, N_("_Print..."), "<control>P",
+    {"Print", "document-print", N_("_Print..."), "<control>P",
      N_("Print current message"), G_CALLBACK(bw_message_print_cb)},
-    {"SavePart", GTK_STOCK_SAVE, N_("Save Current Part..."), "<control>S",
+    {"SavePart", "document-save", N_("Save Current Part..."), "<control>S",
      N_("Save currently displayed part of message"),
      G_CALLBACK(bw_save_current_part_cb)},
 #if !defined(ENABLE_TOUCH_UI)
@@ -566,7 +566,7 @@ static const GtkActionEntry current_message_entries[] = {
     {"PreviousPart", BALSA_PIXMAP_PREVIOUS_PART, N_("_Previous Part"),
      "<control>comma", N_("Previous part in message"),
      G_CALLBACK(bw_previous_part_cb)},
-    {"CopyMessage", GTK_STOCK_COPY, N_("_Copy"), "<control>C",
+    {"CopyMessage", "edit-copy", N_("_Copy"), "<control>C",
      N_("Copy message"), G_CALLBACK(bw_message_copy_cb)},
     {"SelectText", NULL, N_("_Select Text"), NULL,
      N_("Select entire mail"), G_CALLBACK(bw_message_select_all_cb)},
@@ -581,11 +581,11 @@ static const GtkActionEntry current_message_entries[] = {
 static const GtkActionEntry modify_message_entries[] = {
     /* Message menu items */
 #if !defined(ENABLE_TOUCH_UI)
-    {"MoveToTrash", GTK_STOCK_DELETE, N_("_Move to Trash"), MAC_MODIFIER "D",
+    {"MoveToTrash", "edit-delete", N_("_Move to Trash"), MAC_MODIFIER "D",
      N_("Move the current message to Trash mailbox"),
      G_CALLBACK(bw_trash_message_cb)},
 #else  /* ENABLE_TOUCH_UI */
-    {"MoveToTrash", GTK_STOCK_DELETE, N_("_Delete to Trash"), MAC_MODIFIER "D",
+    {"MoveToTrash", "edit-delete", N_("_Delete to Trash"), MAC_MODIFIER "D",
      N_("Move the current message to Trash mailbox"),
      G_CALLBACK(bw_trash_message_cb)},
     {"ToolbarToggleNew", BALSA_PIXMAP_MARKED_NEW, N_("_New"), NULL,
@@ -595,7 +595,7 @@ static const GtkActionEntry modify_message_entries[] = {
     /* Message:toggle-flag submenu items */
     {"ToggleFlagged", BALSA_PIXMAP_INFO_FLAGGED, N_("_Flagged"), MAC_MODIFIER "X",
      N_("Toggle flagged"), G_CALLBACK(bw_toggle_flagged_message_cb)},
-    {"ToggleDeleted", GTK_STOCK_DELETE, N_("_Deleted"), "<control>D",
+    {"ToggleDeleted", "edit-delete", N_("_Deleted"), "<control>D",
      N_("Toggle deleted flag"), G_CALLBACK(bw_toggle_deleted_message_cb)},
     {"ToggleNew", BALSA_PIXMAP_INFO_NEW, N_("_New"), "<control>R",
      N_("Toggle New"), G_CALLBACK(bw_toggle_new_message_cb)},
@@ -1261,7 +1261,7 @@ bw_create_index_widget(BalsaWindow *bw)
                        button = gtk_button_new(),
                        FALSE, FALSE, 0);
     gtk_container_add(GTK_CONTAINER(button),
-                      gtk_image_new_from_stock(GTK_STOCK_OK,
+                      gtk_image_new_from_stock("gtk-ok",
                                                GTK_ICON_SIZE_BUTTON));
     g_signal_connect(G_OBJECT(bw->sos_entry), "activate",
                      G_CALLBACK(bw_filter_entry_activate),
@@ -1465,14 +1465,14 @@ static const gchar* main_toolbar[] = {
     BALSA_PIXMAP_REPLY_ALL,
     BALSA_PIXMAP_FORWARD,
     "",
-    GTK_STOCK_DELETE,
+    "edit-delete",
     "",
     BALSA_PIXMAP_NEXT_UNREAD,
     BALSA_PIXMAP_MARKED_NEW
 #else /* defined(ENABLE_TOUCH_UI) */
     BALSA_PIXMAP_RECEIVE,
     "",
-    GTK_STOCK_DELETE,
+    "edit-delete",
     "",
     BALSA_PIXMAP_COMPOSE,
     BALSA_PIXMAP_CONTINUE,
@@ -1482,7 +1482,7 @@ static const gchar* main_toolbar[] = {
     "",
     BALSA_PIXMAP_NEXT_UNREAD,
     "",
-    GTK_STOCK_PRINT
+    "document-print"
 #endif /* defined(ENABLE_TOUCH_UI) */
 };
 
@@ -2373,8 +2373,8 @@ bw_notebook_label_new(BalsaMailboxNode * mbnode)
     g_signal_connect(but, "clicked",
                      G_CALLBACK(bw_mailbox_tab_close_cb), mbnode);
 
-    close_pix = gtk_image_new_from_stock(GTK_STOCK_CLOSE,
-                                         GTK_ICON_SIZE_MENU);
+    close_pix = gtk_image_new_from_icon_name("window-close",
+                                             GTK_ICON_SIZE_MENU);
     gtk_container_add(GTK_CONTAINER(but), close_pix);
     gtk_box_pack_start(GTK_BOX(box), but, FALSE, FALSE, 0);
 
@@ -3612,7 +3612,7 @@ bw_display_new_mail_notification(int num_new, int has_new)
     msg = bw_get_new_message_notification_string(num_new, num_total);
     if (balsa_app.main_window->new_mail_note) {
         notify_notification_update(balsa_app.main_window->new_mail_note,
-                                   "Balsa", msg, GTK_STOCK_DIALOG_INFO);
+                                   "Balsa", msg, "dialog-information");
         /* 30 seconds: */
         notify_notification_set_timeout(balsa_app.main_window->
                                         new_mail_note, 30000);
@@ -4367,8 +4367,8 @@ bw_find_real(BalsaWindow * window, BalsaIndex * bindex, gboolean again)
             gtk_dialog_new_with_buttons(_("Search mailbox"),
                                         GTK_WINDOW(window),
                                         GTK_DIALOG_DESTROY_WITH_PARENT,
-					GTK_STOCK_HELP,   GTK_RESPONSE_HELP,
-                                        GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+					_("_Help"),   GTK_RESPONSE_HELP,
+                                        _("_Cancel"), GTK_RESPONSE_CANCEL,
                                         NULL);
 	GtkWidget *reverse_button, *wrap_button;
 	GtkWidget *search_entry, *w, *page, *grid;
@@ -4425,12 +4425,12 @@ bw_find_real(BalsaWindow * window, BalsaIndex * bindex, gboolean again)
 	/* Button box */
 	box = gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL);
 	gtk_container_set_border_width(GTK_CONTAINER(box), 6);
-	button = gtk_button_new_from_stock(GTK_STOCK_APPLY);
+	button = gtk_button_new_with_mnemonic(_("_Apply"));
 	g_signal_connect(G_OBJECT(button), "clicked",
 			 G_CALLBACK(bw_find_button_clicked),
 			 GINT_TO_POINTER(FIND_RESPONSE_FILTER));
 	gtk_container_add(GTK_CONTAINER(box), button);
-	button = gtk_button_new_from_stock(GTK_STOCK_CLEAR);
+	button = gtk_button_new_with_mnemonic(_("_Clear"));
 	g_signal_connect(G_OBJECT(button), "clicked",
 			 G_CALLBACK(bw_find_button_clicked),
 			 GINT_TO_POINTER(FIND_RESPONSE_RESET));
@@ -4461,7 +4461,7 @@ bw_find_real(BalsaWindow * window, BalsaIndex * bindex, gboolean again)
                                      wrap);
 	gtk_box_pack_start(GTK_BOX(box), w, TRUE, TRUE, 0);
 
-	button = gtk_button_new_from_stock(GTK_STOCK_OK);
+	button = gtk_button_new_with_mnemonic(_("_OK"));
 	g_signal_connect(G_OBJECT(button), "clicked",
 			 G_CALLBACK(bw_find_button_clicked),
 			 GINT_TO_POINTER(GTK_RESPONSE_OK));

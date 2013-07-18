@@ -233,8 +233,8 @@ balsa_information_list(GtkWindow *parent, LibBalsaInformationType type,
 	    gtk_dialog_new_with_buttons(_("Information - Balsa"), 
                                         parent,
                                         GTK_DIALOG_DESTROY_WITH_PARENT,
-                                        GTK_STOCK_CLEAR, GTK_RESPONSE_APPLY,
-                                        GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
+                                        _("_Clear"), GTK_RESPONSE_APPLY,
+                                        _("Cl_ose"), GTK_RESPONSE_CLOSE,
                                         NULL);
 #if HAVE_MACOSX_DESKTOP
 	libbalsa_macosx_menu_for_parent(information_dialog, parent);

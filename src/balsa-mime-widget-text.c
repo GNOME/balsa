@@ -1041,19 +1041,19 @@ bmwt_populate_popup_menu(BalsaMessage * bm,
     GtkWidget *menuitem;
     gpointer mime_body = g_object_get_data(G_OBJECT(html), "mime-body");
 
-    menuitem = gtk_image_menu_item_new_from_stock(GTK_STOCK_ZOOM_IN, NULL);
+    menuitem = gtk_image_menu_item_new_from_stock("zoom-in", NULL);
     g_signal_connect_swapped(G_OBJECT(menuitem), "activate",
                              G_CALLBACK(bm_zoom_in), bm);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
 
     menuitem =
-        gtk_image_menu_item_new_from_stock(GTK_STOCK_ZOOM_OUT, NULL);
+        gtk_image_menu_item_new_from_stock("zoom-out", NULL);
     g_signal_connect_swapped(G_OBJECT(menuitem), "activate",
                              G_CALLBACK(bm_zoom_out), bm);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
 
     menuitem =
-        gtk_image_menu_item_new_from_stock(GTK_STOCK_ZOOM_100, NULL);
+        gtk_image_menu_item_new_from_stock("zoom-original", NULL);
     g_signal_connect_swapped(G_OBJECT(menuitem), "activate",
                              G_CALLBACK(bm_zoom_reset), bm);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
@@ -1086,7 +1086,7 @@ bmwt_populate_popup_menu(BalsaMessage * bm,
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
 
     menuitem =
-        gtk_image_menu_item_new_from_stock(GTK_STOCK_PRINT, NULL);
+        gtk_image_menu_item_new_from_stock("document-print", NULL);
     g_signal_connect_swapped(G_OBJECT(menuitem), "activate",
                              G_CALLBACK(libbalsa_html_print), html);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);

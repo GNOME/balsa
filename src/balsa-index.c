@@ -1842,17 +1842,17 @@ bndx_popup_menu_create(BalsaIndex * index)
     gtk_menu_shell_append(GTK_MENU_SHELL(menu),
                           gtk_separator_menu_item_new());
     index->delete_item =
-        create_stock_menu_item(menu, GTK_STOCK_DELETE,
+        create_stock_menu_item(menu, "edit-delete",
                                _("_Delete"),
                                G_CALLBACK(bi_toggle_deleted_cb),
                                index);
     index->undelete_item =
-        create_stock_menu_item(menu, GTK_STOCK_UNDELETE,
+        create_stock_menu_item(menu, "gtk-undelete",
                                _("_Undelete"),
                                G_CALLBACK(bi_toggle_deleted_cb),
                                index);
     index->move_to_trash_item =
-        create_stock_menu_item(menu, GTK_STOCK_DELETE,
+        create_stock_menu_item(menu, "edit-delete",
                                _("Move To _Trash"),
                                G_CALLBACK
                                (balsa_message_move_to_trash), index);
@@ -2656,7 +2656,7 @@ balsa_index_pipe(BalsaIndex * index)
                                     GTK_WINDOW(balsa_app.main_window),
                                     GTK_DIALOG_DESTROY_WITH_PARENT,
                                     _("_Run"), GTK_RESPONSE_OK,
-                                    GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+                                    _("_Cancel"), GTK_RESPONSE_CANCEL,
                                     NULL);
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu_for_parent(dialog, GTK_WINDOW(balsa_app.main_window));

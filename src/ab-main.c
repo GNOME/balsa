@@ -538,7 +538,7 @@ static GtkActionEntry entries[] = {
     {"FileMenu", NULL, N_("_File")},
     {"EntryMenu", NULL, N_("_Entry")},
     {"HelpMenu", NULL, N_("_Help")},
-    {"New", GTK_STOCK_NEW, N_("_New")},
+    {"New", "document-new", N_("_New")},
     {"NewVcard", NULL, N_("VCard Address Book (GnomeCard)"), NULL, NULL,
      G_CALLBACK(file_new_vcard_cb)},
     {"NewExtern", NULL, N_("External query (a program)"), NULL, NULL,
@@ -557,17 +557,17 @@ static GtkActionEntry entries[] = {
     {"NewRubrica", NULL, N_("Rubrica Address Book"), NULL, NULL,
      G_CALLBACK(file_new_rubrica_cb)},
 #endif /* HAVE_RUBRICA */
-    {"Properties", GTK_STOCK_PROPERTIES, N_("_Properties"), NULL,
+    {"Properties", "document-properties", N_("_Properties"), NULL,
      N_("Edit address book properties"), G_CALLBACK(file_properties_cb)},
-    {"Delete", GTK_STOCK_DELETE, N_("_Delete"), NULL,
+    {"Delete", "edit-delete", N_("_Delete"), NULL,
      N_("Delete address book"), G_CALLBACK(file_delete_cb)},
-    {"Quit", GTK_STOCK_QUIT, N_("_Quit"), NULL, N_("Exit the program"),
+    {"Quit", "application-exit", N_("_Quit"), NULL, N_("Exit the program"),
      gtk_main_quit},
-    {"NewEntry", GTK_STOCK_NEW, N_("_New Entry"), "<shift><control>N",
+    {"NewEntry", "document-new", N_("_New Entry"), "<shift><control>N",
      N_("Add new entry"), G_CALLBACK(edit_new_entry_cb)},
-    {"DeleteEntry", GTK_STOCK_NEW, N_("_Delete Entry"), NULL,
+    {"DeleteEntry", "edit-delete", N_("_Delete Entry"), NULL,
      N_("Delete entry"), G_CALLBACK(edit_delete_entry_cb)},
-    {"About", GTK_STOCK_ABOUT, N_("_About"), NULL, NULL, NULL}
+    {"About", "help-about", N_("_About"), NULL, NULL, NULL}
 };
 
 static const char *ui_description =
@@ -903,17 +903,17 @@ bab_get_edit_button_box(struct ABMainWindow *abmw)
     box = gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL);
     gtk_container_add(GTK_CONTAINER(box),
                       abmw->apply_button =
-                      gtk_button_new_from_stock(GTK_STOCK_APPLY));
+                      gtk_button_new_with_mnemonic(_("_Apply")));
     g_signal_connect(G_OBJECT(abmw->apply_button), "clicked",
                      G_CALLBACK(apply_button_cb), (gpointer) NULL);
     gtk_container_add(GTK_CONTAINER(box),
-                      abmw->remove_button
-                      =gtk_button_new_from_stock(GTK_STOCK_REMOVE));
+                      abmw->remove_button =
+                      gtk_button_new_with_mnemonic(_("_Remove")));
     g_signal_connect(G_OBJECT(abmw->remove_button), "clicked",
                      G_CALLBACK(remove_button_cb), (gpointer) NULL);
     gtk_container_add(GTK_CONTAINER(box),
                       abmw->cancel_button =
-                      gtk_button_new_from_stock(GTK_STOCK_CANCEL));
+                      gtk_button_new_with_mnemonic(_("_Cancel")));
     g_signal_connect(G_OBJECT(abmw->cancel_button), "clicked",
                      G_CALLBACK(cancel_button_cb), abmw);
     return box;
@@ -951,7 +951,7 @@ bab_get_filter_box(void)
     gtk_label_set_mnemonic_widget(GTK_LABEL(find_label), find_entry);
     button = gtk_button_new();
     gtk_container_add(GTK_CONTAINER(button),
-                      gtk_image_new_from_stock(GTK_STOCK_OK,
+                      gtk_image_new_from_stock("gtk-ok",
                                                GTK_ICON_SIZE_BUTTON));
     gtk_box_pack_start(GTK_BOX(search_hbox), button, FALSE, FALSE, 1);
 

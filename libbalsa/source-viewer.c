@@ -47,9 +47,9 @@ static GtkActionEntry entries[] = {
     {"EditMenu", NULL, N_("_Edit")},
     {"ViewMenu", NULL, N_("_View")},
     /* Items */
-    {"Close", GTK_STOCK_CLOSE, N_("_Close"), "<control>W",
+    {"Close", "window-close", N_("_Close"), "<control>W",
      N_("Close the window"), G_CALLBACK(close_cb)},
-    {"Copy", GTK_STOCK_COPY, N_("_Copy"), "<control>C",
+    {"Copy", "edit-copy", N_("_Copy"), "<control>C",
      N_("Copy text"), G_CALLBACK(copy_cb)},
     {"Select", NULL, N_("_Select Text"), "<control>A",
      N_("Select entire mail"), G_CALLBACK(select_all_cb)},

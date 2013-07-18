@@ -131,8 +131,8 @@ customize_dialog_cb(GtkWidget * widget, gpointer data)
         gtk_dialog_new_with_buttons(_("Customize Toolbars"),
                                     GTK_WINDOW(active_window),
                                     GTK_DIALOG_DESTROY_WITH_PARENT,
-                                    GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
-                                    GTK_STOCK_HELP,  GTK_RESPONSE_HELP,
+                                    _("_Close"), GTK_RESPONSE_CLOSE,
+                                    _("_Help"),  GTK_RESPONSE_HELP,
                                     NULL);
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu_for_parent(customize_widget, GTK_WINDOW(active_window));
@@ -486,23 +486,23 @@ create_toolbar_page(BalsaToolbarModel * model, GtkUIManager * ui_manager)
 		       FALSE, FALSE, 0);
 
     page->back_button =
-        balsa_stock_button_with_label(GTK_STOCK_GO_UP, _("Up"));
+        balsa_stock_button_with_label("go-up", _("Up"));
     gtk_box_pack_start(GTK_BOX(button_box), page->back_button, FALSE, FALSE, 0);
 
     move_button_box=gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
     gtk_box_pack_start(GTK_BOX(button_box), move_button_box, FALSE, FALSE, 0);
 
     page->remove_button =
-        balsa_stock_button_with_label(GTK_STOCK_GO_BACK, "-");
+        balsa_stock_button_with_label("go-previous", "-");
     gtk_box_pack_start(GTK_BOX(move_button_box), page->remove_button,
                        FALSE, FALSE, 0);
 
     page->add_button =
-        balsa_stock_button_with_label(GTK_STOCK_GO_FORWARD, "+");
+        balsa_stock_button_with_label("go-next", "+");
     gtk_box_pack_start(GTK_BOX(move_button_box), page->add_button, FALSE, FALSE, 0);
 
     page->forward_button =
-        balsa_stock_button_with_label(GTK_STOCK_GO_DOWN, _("Down"));
+        balsa_stock_button_with_label("go-down", _("Down"));
     gtk_box_pack_start(GTK_BOX(button_box), page->forward_button, FALSE, FALSE, 0);
 
     /* Pack destination list */

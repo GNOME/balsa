@@ -334,7 +334,7 @@ balsa_spell_check_init(BalsaSpellCheck * spell_check)
     gtk_grid_set_row_spacing(grid, padding);
     gtk_grid_set_column_spacing(grid, padding);
 
-    widget = balsa_stock_button_with_label(GTK_STOCK_REDO, _("C_hange"));
+    widget = balsa_stock_button_with_label("edit-redo", _("C_hange"));
     gtk_widget_set_tooltip_text(widget,
                                 _("Replace the current word "
                                   "with the selected suggestion"));
@@ -351,7 +351,7 @@ balsa_spell_check_init(BalsaSpellCheck * spell_check)
 		     G_CALLBACK(change_all_cb), spell_check);
     gtk_grid_attach(grid, widget, 0, 1, 1, 1);
 
-    widget = balsa_stock_button_with_label(GTK_STOCK_GO_FORWARD,
+    widget = balsa_stock_button_with_label("go-next",
                                            _("_Ignore"));
     gtk_widget_set_tooltip_text(widget,
                                 _("Skip the current word"));
@@ -375,13 +375,13 @@ balsa_spell_check_init(BalsaSpellCheck * spell_check)
 		     G_CALLBACK(learn_cb), spell_check);
     gtk_grid_attach(grid, widget, 2, 0, 1, 1);
 
-    widget = balsa_stock_button_with_label(GTK_STOCK_OK, _("_Done"));
+    widget = balsa_stock_button_with_label("gtk-ok", _("_Done"));
     gtk_widget_set_tooltip_text(widget, _("Finish spell checking"));
     g_signal_connect(widget, "clicked",
 		     G_CALLBACK(done_cb), spell_check);
     gtk_grid_attach(grid, widget, 3, 0, 1, 1);
 
-    widget = balsa_stock_button_with_label(GTK_STOCK_CANCEL, _("_Cancel"));
+    widget = balsa_stock_button_with_label("gtk-cancel", _("_Cancel"));
     gtk_widget_set_tooltip_text(widget,
                                 _("Revert all changes and finish spell checking"));
     g_signal_connect(widget, "clicked",

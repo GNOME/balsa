@@ -223,20 +223,20 @@ create_local_dialog(AddressBookConfig * abc, const gchar * type)
     ab = abc->address_book;
     if (ab) {
         title = g_strdup_printf(_("Modify %s Address Book"), type);
-        action = GTK_STOCK_APPLY;
+        action = _("_Apply");
         name = ab->name;
     } else {
         title = g_strdup_printf(_("Add %s Address Book"), type);
-        action = GTK_STOCK_ADD;
+        action = _("_Add");
         name = NULL;
     }
 
     dialog =
         gtk_file_chooser_dialog_new(title, abc->parent,
                                     GTK_FILE_CHOOSER_ACTION_SAVE,
-                                    GTK_STOCK_HELP, GTK_RESPONSE_HELP,
-                                    action, GTK_RESPONSE_APPLY,
-                                    GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+                                    _("_Help"),   GTK_RESPONSE_HELP,
+                                    action,       GTK_RESPONSE_APPLY,
+                                    _("_Cancel"), GTK_RESPONSE_CANCEL,
                                     NULL);
     g_free(title);
 #if HAVE_MACOSX_DESKTOP
@@ -324,17 +324,17 @@ create_generic_dialog(AddressBookConfig * abc, const gchar * type)
     ab = abc->address_book;
     if (ab) {
         title = g_strdup_printf(_("Modify %s Address Book"), type);
-        action = GTK_STOCK_APPLY;
+        action = _("_Apply");
     } else {
         title = g_strdup_printf(_("Add %s Address Book"), type);
-        action = GTK_STOCK_ADD;
+        action = _("_Add");
     }
 
     dialog =
         gtk_dialog_new_with_buttons(title, abc->parent, 0,
-                                    GTK_STOCK_HELP, GTK_RESPONSE_HELP,
+                                    _("_Help"), GTK_RESPONSE_HELP,
                                     action, GTK_RESPONSE_APPLY,
-                                    GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+                                    _("_Cancel"), GTK_RESPONSE_CANCEL,
                                     NULL);
     g_free(title);
 #if HAVE_MACOSX_DESKTOP

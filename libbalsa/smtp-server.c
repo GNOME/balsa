@@ -540,9 +540,9 @@ libbalsa_smtp_server_dialog(LibBalsaSmtpServer * smtp_server,
         gtk_dialog_new_with_buttons(_("SMTP Server"),
                                     parent,
                                     GTK_DIALOG_DESTROY_WITH_PARENT,
-                                    GTK_STOCK_OK, GTK_RESPONSE_OK,
-                                    GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-                                    GTK_STOCK_HELP, GTK_RESPONSE_HELP,
+                                    _("_OK"),     GTK_RESPONSE_OK,
+                                    _("_Cancel"), GTK_RESPONSE_CANCEL,
+                                    _("_Help"),   GTK_RESPONSE_HELP,
                                     NULL);
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu_for_parent(dialog, parent);

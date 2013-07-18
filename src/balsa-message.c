@@ -1739,8 +1739,9 @@ part_context_dump_all_cb(GtkWidget * menu_item, GList * info_list)
         gtk_file_chooser_dialog_new(_("Select folder for saving selected parts"),
                                     balsa_get_parent_window(menu_item),
                                     GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER,
-                                    GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-                                    GTK_STOCK_OK, GTK_RESPONSE_OK, NULL);
+                                    _("_Cancel"), GTK_RESPONSE_CANCEL,
+                                    _("_OK"),     GTK_RESPONSE_OK,
+                                    NULL);
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu_for_parent(dump_dialog, balsa_get_parent_window(menu_item));
 #endif

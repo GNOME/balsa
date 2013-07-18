@@ -275,9 +275,9 @@ void balsa_filter_run_dialog_init(BalsaFilterRunDialog * p)
      */
 
     gtk_dialog_add_buttons(GTK_DIALOG(p),
-                           GTK_STOCK_OK,     GTK_RESPONSE_OK,
-                           GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-                           GTK_STOCK_HELP,   GTK_RESPONSE_HELP,
+                           _("_OK"),     GTK_RESPONSE_OK,
+                           _("_Cancel"), GTK_RESPONSE_CANCEL,
+                           _("_Help"),   GTK_RESPONSE_HELP,
                            NULL);
 
     g_signal_connect(G_OBJECT(p), "response",
@@ -314,7 +314,7 @@ void balsa_filter_run_dialog_init(BalsaFilterRunDialog * p)
     gtk_box_pack_start(GTK_BOX(vbox), bbox, FALSE, FALSE, 2);
 
     /* "Apply selected" button */
-    button = balsa_stock_button_with_label(GTK_STOCK_APPLY,
+    button = balsa_stock_button_with_label("gtk-apply",
                                            _("Apply Selected"));
     g_signal_connect_swapped(G_OBJECT(button), "clicked",
                              G_CALLBACK(fr_apply_selected_pressed), p);
@@ -326,12 +326,12 @@ void balsa_filter_run_dialog_init(BalsaFilterRunDialog * p)
     gtk_button_box_set_layout(GTK_BUTTON_BOX(bbox), GTK_BUTTONBOX_SPREAD);
 
     /* Right/Add button */
-    button = balsa_stock_button_with_label(GTK_STOCK_GO_FORWARD, _("A_dd"));
+    button = balsa_stock_button_with_label("go-next", _("A_dd"));
     g_signal_connect_swapped(G_OBJECT(button), "clicked",
                              G_CALLBACK(fr_add_pressed), G_OBJECT(p));
     gtk_container_add(GTK_CONTAINER(bbox), button);
     /* Left/Remove button */
-    button = balsa_stock_button_with_label(GTK_STOCK_GO_BACK, _("_Remove"));
+    button = balsa_stock_button_with_label("go-previous", _("_Remove"));
     g_signal_connect_swapped(G_OBJECT(button), "clicked",
                              G_CALLBACK(fr_remove_pressed), G_OBJECT(p));
     gtk_container_add(GTK_CONTAINER(bbox), button);
@@ -363,17 +363,17 @@ void balsa_filter_run_dialog_init(BalsaFilterRunDialog * p)
     gtk_box_pack_start(GTK_BOX(vbox), bbox, FALSE, FALSE, 2);
 
     /* up button */
-    button = balsa_stock_button_with_label(GTK_STOCK_GO_UP, _("_Up"));
+    button = balsa_stock_button_with_label("go-up", _("_Up"));
     g_signal_connect(G_OBJECT(button), "clicked",
 		     G_CALLBACK(fr_up_pressed), p);
     gtk_container_add(GTK_CONTAINER(bbox), button);
     /* down button */
-    button = balsa_stock_button_with_label(GTK_STOCK_GO_DOWN, _("Do_wn"));
+    button = balsa_stock_button_with_label("go-down", _("Do_wn"));
     g_signal_connect(G_OBJECT(button), "clicked",
 		     G_CALLBACK(fr_down_pressed), p);
     gtk_container_add(GTK_CONTAINER(bbox), button);
 
-    button = balsa_stock_button_with_label(GTK_STOCK_APPLY,
+    button = balsa_stock_button_with_label("gtk-apply",
                                            _("A_pply Now!"));
     g_signal_connect_swapped(G_OBJECT(button), "clicked",
                              G_CALLBACK(fr_apply_now_pressed), G_OBJECT(p));

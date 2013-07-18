@@ -1,5 +1,18 @@
 2013-07-18  Peter Bloomfield
 
+	More GtkStock deprecation cleanup
+
+	* configure.ac: to build, we must drop -DGDK_MULTIHEAD_SAFE.
+	* libbalsa/files.c (libbalsa_icon_finder):
+	gtk_icon_size_lookup_for_settings is deprecated for
+	gtk_icon_size_lookup.
+	* src/balsa-index.c (balsa_index_set_column_widths): ditto.
+	* src/balsa-app.c (balsa_stock_button_with_label):
+	gtk_image_new_from_stock is deprecated for
+	gtk_image_new_from_icon_name.
+
+2013-07-18  Peter Bloomfield
+
 	Clean up deprecation of stock icons
 
 	* libbalsa/html.c (lbh_info_bar), (lbh_show_info_bar):

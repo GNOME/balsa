@@ -1319,8 +1319,6 @@ balsa_index_set_column_widths(BalsaIndex * index)
 {
     GtkTreeView *tree_view = GTK_TREE_VIEW(index);
     gint icon_w;
-    GdkScreen *screen;
-    GtkSettings *settings;
 
 #if defined(TREE_VIEW_FIXED_HEIGHT)
     /* so that fixed width works properly */
@@ -1330,10 +1328,7 @@ balsa_index_set_column_widths(BalsaIndex * index)
 #endif
     /* I have no idea why we must add 5 pixels to the icon width - otherwise,
        the icon will be clipped... */
-    screen = gtk_widget_get_screen(GTK_WIDGET(index));
-    settings = gtk_settings_get_for_screen(screen);
-    gtk_icon_size_lookup_for_settings(settings, GTK_ICON_SIZE_MENU,
-                                      &icon_w, NULL);
+    gtk_icon_size_lookup(GTK_ICON_SIZE_MENU, &icon_w, NULL);
     gtk_tree_view_column_set_fixed_width(gtk_tree_view_get_column
                                          (tree_view, LB_MBOX_MARKED_COL),
                                          icon_w + 5);

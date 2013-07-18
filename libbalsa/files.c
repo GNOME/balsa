@@ -139,12 +139,8 @@ libbalsa_icon_finder(GtkWidget         * widget,
     GdkPixbuf *pixbuf = NULL;
     gint width, height;
     GtkIconTheme *icon_theme;
-    GtkSettings *settings;
 
-    settings = widget ? gtk_widget_get_settings(widget) : NULL;
-    if (!settings
-        || !gtk_icon_size_lookup_for_settings(settings, size,
-                                              &width, &height))
+    if (!gtk_icon_size_lookup(size, &width, &height))
         width = height = 16;
 
     if (mime_type)

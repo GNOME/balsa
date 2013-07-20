@@ -1,5 +1,9 @@
 2013-07-20  Peter Bloomfield
 
+	* src/main-window.c: use new prototype for source viewer.
+
+2013-07-20  Peter Bloomfield
+
 	* libbalsa/source-viewer.c (lsv_close_activated),
 	(lsv_copy_activated), (lsv_select_activated),
 	(lsv_toggle_activated), (lsv_escape_change_state),

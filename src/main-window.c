@@ -3952,7 +3952,8 @@ bw_view_msg_source_cb(GtkAction * action, gpointer data)
     for (list = messages; list; list = list->next) {
 	LibBalsaMessage *message = list->data;
 
-	libbalsa_show_message_source(message, balsa_app.message_font,
+	libbalsa_show_message_source(balsa_app.application,
+                                     message, balsa_app.message_font,
 				     &balsa_app.source_escape_specials,
                                      &balsa_app.source_width,
                                      &balsa_app.source_height);

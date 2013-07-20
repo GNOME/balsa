@@ -136,6 +136,8 @@ enum _MwActionAfterMove {
 
 /* global balsa application structure */
 extern struct BalsaApplication {
+    GtkApplication *application;
+
     /* personal information */
     GList* identities;
     LibBalsaIdentity* current_ident;

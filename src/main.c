@@ -834,8 +834,9 @@ handle_remote(int argc, char **argv,
 }
 
 static int
-command_line_cb(GApplication * application,
-                GApplicationCommandLine * command_line)
+command_line_cb(GApplication            * application,
+                GApplicationCommandLine * command_line,
+                gpointer                  user_data)
 {
     gchar **args, **argv;
     gint argc;
@@ -867,15 +868,17 @@ command_line_cb(GApplication * application,
 int
 main(int argc, char **argv)
 {
-    GApplication *application;
+    GtkApplication *application;
     int status;
 
-    application = g_application_new("org.desktop.Balsa",
-                                    G_APPLICATION_HANDLES_COMMAND_LINE);
+    balsa_app.application = application =
+        gtk_application_new("org.desktop.Balsa",
+                            G_APPLICATION_HANDLES_COMMAND_LINE);
     g_signal_connect(application, "command-line",
                      G_CALLBACK(command_line_cb), NULL);
+    g_object_set(application, "register-session", TRUE, NULL);
 
-    status = g_application_run(application, argc, argv);
+    status = g_application_run(G_APPLICATION(application), argc, argv);
 
     g_object_unref(application);
 

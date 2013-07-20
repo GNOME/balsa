@@ -1,3 +1,18 @@
+2013-07-20  Peter Bloomfield  <peter@w500.bellsouth.net>
+
+	reviewed by: <delete if not using a buddy>
+
+	* libbalsa/libbalsa.h:
+	* libbalsa/source-viewer.c (lsv_close_activated),
+	(lsv_copy_activated), (lsv_select_activated),
+	(lsv_toggle_activated), (lsv_escape_change_state),
+	(lsv_app_set_menus), (libbalsa_show_message_source):
+	* src/balsa-index.c (bndx_view_source):
+	* src/main-window.c:
+	* src/main-window.h:
+	* src/message-window.c (view_msg_source_cb):
+	* src/sendmsg-window.c (sendmsg_window_new_from_list):
+
 2013-07-18  Peter Bloomfield
 
 	More GtkStock deprecation cleanup

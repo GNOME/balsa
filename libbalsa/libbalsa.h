@@ -110,7 +110,8 @@ enum {
 void libbalsa_init(LibBalsaInformationFunc information_callback);
 void libbalsa_set_spool(const gchar * spool);
 
-void libbalsa_show_message_source(LibBalsaMessage * msg,
+void libbalsa_show_message_source(GtkApplication * application,
+                                  LibBalsaMessage * msg,
                                   const gchar * font,
                                   gboolean *escape_specials,
                                   gint * width, gint * height);

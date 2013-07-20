@@ -35,66 +35,31 @@
 #include "macosx-helpers.h"
 #include <glib/gi18n.h>
 
-static void close_cb(GtkAction * action, gpointer data);
-static void copy_cb(GtkAction * action, gpointer data);
-static void select_all_cb(GtkAction * action, gpointer data);
-static void lsv_escape_cb(GtkAction * action, gpointer data);
+typedef struct {
+    LibBalsaMessage *msg;
+    GtkWidget *text;
+    GtkWidget *window;
+    gboolean *escape_specials;
+    gint *width;
+    gint *height;
+} LibBalsaSourceViewerInfo;
 
-/* Normal items */
-static GtkActionEntry entries[] = {
-    /* Top level */
-    {"FileMenu", NULL, N_("_File")},
-    {"EditMenu", NULL, N_("_Edit")},
-    {"ViewMenu", NULL, N_("_View")},
-    /* Items */
-    {"Close", "window-close", N_("_Close"), "<control>W",
-     N_("Close the window"), G_CALLBACK(close_cb)},
-    {"Copy", "edit-copy", N_("_Copy"), "<control>C",
-     N_("Copy text"), G_CALLBACK(copy_cb)},
-    {"Select", NULL, N_("_Select Text"), "<control>A",
-     N_("Select entire mail"), G_CALLBACK(select_all_cb)},
-};
-
-/* Toggle items */
-static GtkToggleActionEntry toggle_entries[] = {
-    {"Escape", NULL, N_("_Escape Special Characters"), NULL,
-     N_("Escape special and non-ASCII characters"),
-     G_CALLBACK(lsv_escape_cb), FALSE}
-};
-
-static const char *ui_description =
-"<ui>"
-"  <menubar name='MainMenu'>"
-"    <menu action='FileMenu'>"
-"      <menuitem action='Close'/>"
-"    </menu>"
-"    <menu action='EditMenu'>"
-"      <menuitem action='Copy'/>"
-"      <separator/>"
-"      <menuitem action='Select'/>"
-"    </menu>"
-"    <menu action='ViewMenu'>"
-"      <menuitem action='Escape'/>"
-"    </menu>"
-"  </menubar>"
-"</ui>";
-
-static void 
-select_all_cb(GtkAction * action, gpointer data)
+static void
+lsv_close_activated(GSimpleAction * action,
+                    GVariant      * parameter,
+                    gpointer        user_data)
 {
-    GtkTextView *text = g_object_get_data(G_OBJECT(data), "text");
-    GtkTextBuffer *buffer = gtk_text_view_get_buffer(text);
-    GtkTextIter start, end;
-
-    gtk_text_buffer_get_bounds(buffer, &start, &end);
-    gtk_text_buffer_move_mark_by_name(buffer, "insert", &start);
-    gtk_text_buffer_move_mark_by_name(buffer, "selection_bound", &end);
+    gtk_widget_destroy(GTK_WIDGET(user_data));
 }
 
 static void
-copy_cb(GtkAction * action, gpointer data)
+lsv_copy_activated(GSimpleAction * action,
+                   GVariant      * parameter,
+                   gpointer        user_data)
 {
-    GtkTextView *text = g_object_get_data(G_OBJECT(data), "text");
+    LibBalsaSourceViewerInfo *lsvi =
+        g_object_get_data(G_OBJECT(user_data), "lsvi");
+    GtkTextView *text = GTK_TEXT_VIEW(lsvi->text);
     GtkTextBuffer *buffer = gtk_text_view_get_buffer(text);
     GdkDisplay *display;
     GtkClipboard *clipboard;
@@ -106,25 +71,38 @@ copy_cb(GtkAction * action, gpointer data)
 }
 
 static void
-close_cb(GtkAction * action, gpointer data)
+lsv_select_activated(GSimpleAction * action,
+                     GVariant      * parameter,
+                     gpointer        user_data)
 {
-    gtk_widget_destroy(GTK_WIDGET(data));
+    LibBalsaSourceViewerInfo *lsvi =
+        g_object_get_data(G_OBJECT(user_data), "lsvi");
+    GtkTextView *text = GTK_TEXT_VIEW(lsvi->text);
+    GtkTextBuffer *buffer = gtk_text_view_get_buffer(text);
+    GtkTextIter start, end;
+
+    gtk_text_buffer_get_bounds(buffer, &start, &end);
+    gtk_text_buffer_move_mark_by_name(buffer, "insert", &start);
+    gtk_text_buffer_move_mark_by_name(buffer, "selection_bound", &end);
 }
 
-struct _LibBalsaSourceViewerInfo {
-    LibBalsaMessage *msg;
-    GtkWidget *text;
-    GtkWidget *window;
-    gboolean *escape_specials;
-    gint *width;
-    gint *height;
-};
+static void
+lsv_toggle_activated(GSimpleAction * action,
+                     GVariant      * parameter,
+                     gpointer        user_data)
+{
+    GVariant *action_state;
+    gboolean state;
 
-typedef struct _LibBalsaSourceViewerInfo LibBalsaSourceViewerInfo;
+    action_state = g_action_get_state(G_ACTION(action));
+    state = g_variant_get_boolean(action_state);
+    g_action_change_state(G_ACTION(action), g_variant_new_boolean(!state));
+    g_variant_unref(action_state);
+}
 
 static void
 lsv_show_message(const char *message, LibBalsaSourceViewerInfo * lsvi,
-		      gboolean escape)
+                 gboolean escape)
 {
     GtkTextBuffer *buffer;
     GtkTextIter start;
@@ -149,10 +127,12 @@ lsv_show_message(const char *message, LibBalsaSourceViewerInfo * lsvi,
 }
 
 static void
-lsv_escape_cb(GtkAction * action, gpointer data)
+lsv_escape_change_state(GSimpleAction * action,
+                        GVariant      * state,
+                        gpointer        user_data)
 {
     LibBalsaSourceViewerInfo *lsvi =
-        g_object_get_data(G_OBJECT(data), "lsvi");
+        g_object_get_data(G_OBJECT(user_data), "lsvi");
     LibBalsaMessage *msg = lsvi->msg;
     GMimeStream *msg_stream;
     GMimeStream *mem_stream;
@@ -175,13 +155,22 @@ lsv_escape_cb(GtkAction * action, gpointer data)
     g_mime_stream_write(mem_stream, "", 1); /* close string */
     raw_message = (char *) GMIME_STREAM_MEM(mem_stream)->buffer->data;
 
-    *(lsvi->escape_specials) =
-	gtk_toggle_action_get_active(GTK_TOGGLE_ACTION(action));
+    *(lsvi->escape_specials) = g_variant_get_boolean(state);
     lsv_show_message(raw_message, lsvi, *(lsvi->escape_specials));
 
     g_object_unref(msg_stream);
     g_object_unref(mem_stream);
+
+    g_simple_action_set_state(action, state);
 }
+
+static GActionEntry win_entries[] = {
+    {"lsv-close",  lsv_close_activated},
+    {"lsv-copy",   lsv_copy_activated},
+    {"lsv-select", lsv_select_activated},
+    {"lsv-escape", lsv_toggle_activated, NULL, "false",
+        lsv_escape_change_state}
+};
 
 static void
 lsv_window_destroy_notify(LibBalsaSourceViewerInfo * lsvi)
@@ -195,44 +184,35 @@ lsv_window_destroy_notify(LibBalsaSourceViewerInfo * lsvi)
 */
 
 static GtkWidget*
-lbsv_app_set_menus(GtkWindow * app, GtkAction ** action)
+lsv_app_set_menus(GtkWindow * app, GAction ** action)
 {
     GtkWidget *window;
-    GtkWidget *menubar;
-    GtkActionGroup *action_group;
-    GtkUIManager *ui_manager;
-    GtkAccelGroup *accel_group;
-    GError *error = NULL;
+    GtkWidget *menu_bar = NULL;
+    GtkBuilder *builder;
+    GError *err = NULL;
 
     window = GTK_WIDGET(app);
 
-    action_group = gtk_action_group_new("MenuActions");
-    gtk_action_group_set_translation_domain(action_group, NULL);
+    g_action_map_add_action_entries(G_ACTION_MAP(app), win_entries,
+                                    G_N_ELEMENTS(win_entries), window);
+    *action = g_action_map_lookup_action(G_ACTION_MAP(app), "lsv-escape");
 
-    gtk_action_group_add_actions(action_group, entries,
-                                 G_N_ELEMENTS(entries), window);
-    gtk_action_group_add_toggle_actions(action_group, toggle_entries,
-                                        G_N_ELEMENTS(toggle_entries),
-                                        window);
+    builder = gtk_builder_new();
+    if (gtk_builder_add_from_file(builder, "source-viewer.ui", &err)) {
+        GMenuModel *menu_model;
 
-    ui_manager = gtk_ui_manager_new();
-    gtk_ui_manager_insert_action_group(ui_manager, action_group, 0);
-
-    accel_group = gtk_ui_manager_get_accel_group(ui_manager);
-    gtk_window_add_accel_group(GTK_WINDOW(window), accel_group);
-
-    if (!gtk_ui_manager_add_ui_from_string(ui_manager, ui_description,
-                                           -1, &error)) {
-        g_message("building menus failed: %s", error->message);
-        g_error_free(error);
-        return NULL;
+        menu_model = G_MENU_MODEL(gtk_builder_get_object(builder, "menubar"));
+        menu_bar = gtk_menu_bar_new_from_model(menu_model);
+    } else {
+        g_print("%s error: %s\n", __func__, err->message);
+        libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+                             _("Error adding from %s: %s\n"),
+                             "source-viewer.ui", err->message);
+        g_error_free(err);
     }
+    g_object_unref(builder);
 
-    menubar = gtk_ui_manager_get_widget(ui_manager, "/MainMenu");
-
-    *action =
-        gtk_ui_manager_get_action(ui_manager, "/MainMenu/ViewMenu/Escape");
-    return menubar;
+    return menu_bar;
 }
 
 static void
@@ -250,17 +230,20 @@ lsv_size_allocate_cb(GtkWindow * window, GtkAllocation * alloc,
 }
 
 void
-libbalsa_show_message_source(LibBalsaMessage* msg, const gchar * font,
-			     gboolean* escape_specials,
-                             gint * width, gint * height)
+libbalsa_show_message_source(GtkApplication  * application,
+                             LibBalsaMessage * msg,
+                             const gchar     * font,
+			     gboolean        * escape_specials,
+                             gint            * width,
+                             gint            * height)
 {
     GtkWidget *text;
     PangoFontDescription *desc;
     GtkWidget *vbox, *interior;
     GtkWidget *window;
-    GtkAction *escape_action = NULL;
+    GAction *escape_action = NULL;
     LibBalsaSourceViewerInfo *lsvi;
-    GtkWidget *menubar;
+    GtkWidget *menu_bar;
 
     g_return_if_fail(msg);
     g_return_if_fail(MAILBOX_OPEN(msg->mailbox));
@@ -280,20 +263,21 @@ libbalsa_show_message_source(LibBalsaMessage* msg, const gchar * font,
                                    GTK_POLICY_ALWAYS);
     gtk_container_add(GTK_CONTAINER(interior), GTK_WIDGET(text));
 
-    window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+    window = gtk_application_window_new(application);
+    gtk_application_window_set_show_menubar(GTK_APPLICATION_WINDOW(window),
+                                            FALSE);
     gtk_window_set_title(GTK_WINDOW(window), _("Message Source"));
-    g_object_set_data(G_OBJECT(window), "text", text);
     gtk_window_set_wmclass(GTK_WINDOW(window), "message-source", "Balsa");
     gtk_window_set_default_size(GTK_WINDOW(window), *width, *height);
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 1);
-    menubar = lbsv_app_set_menus(GTK_WINDOW(window), &escape_action);
-    
+    menu_bar = lsv_app_set_menus(GTK_WINDOW(window), &escape_action);
+
 #if HAVE_MACOSX_DESKTOP
-    libbalsa_macosx_menu(window, GTK_MENU_SHELL(menubar));
+    libbalsa_macosx_menu(window, GTK_MENU_SHELL(menu_bar));
 #else
-    gtk_box_pack_start(GTK_BOX(vbox), menubar, FALSE, TRUE, 1);
+    gtk_box_pack_start(GTK_BOX(vbox), menu_bar, FALSE, TRUE, 1);
 #endif
-    
+
     gtk_box_pack_start(GTK_BOX(vbox), interior, TRUE, TRUE, 0);
     gtk_container_add(GTK_CONTAINER(window), vbox);
 
@@ -311,9 +295,7 @@ libbalsa_show_message_source(LibBalsaMessage* msg, const gchar * font,
                      G_CALLBACK(lsv_size_allocate_cb), lsvi);
 
     gtk_widget_show_all(window);
-    if (*escape_specials)
-        gtk_toggle_action_set_active(GTK_TOGGLE_ACTION(escape_action),
-                                     TRUE);
-    else
-        lsv_escape_cb(escape_action, window);
+    lsv_escape_change_state(G_SIMPLE_ACTION(escape_action),
+                            g_variant_new_boolean(*escape_specials),
+                            window);
 }

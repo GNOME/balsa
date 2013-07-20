@@ -784,7 +784,8 @@ static void
 view_msg_source_cb(GtkAction * action, gpointer data)
 {
     MessageWindow *mw = (MessageWindow *) data;
-    libbalsa_show_message_source(mw->message, balsa_app.message_font,
+    libbalsa_show_message_source(balsa_app.application,
+                                 mw->message, balsa_app.message_font,
                                  &balsa_app.source_escape_specials,
                                  &balsa_app.source_width,
                                  &balsa_app.source_height);

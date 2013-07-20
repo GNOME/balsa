@@ -1,3 +1,15 @@
+2013-07-20  Peter Bloomfield
+
+	* libbalsa/source-viewer.c (lsv_close_activated),
+	(lsv_copy_activated), (lsv_select_activated),
+	(lsv_toggle_activated), (lsv_escape_change_state),
+	(lsv_app_set_menus), (libbalsa_show_message_source): port source
+	viewer to GMenu.
+	* libbalsa/libbalsa.h: new prototype for source viewer.
+	* src/balsa-index.c (bndx_view_source): use it.
+	* src/message-window.c (view_msg_source_cb): ditto.
+	* src/sendmsg-window.c (sendmsg_window_new_from_list): ditto.
+
 2013-07-20  Peter Bloomfield  <peter@w500.bellsouth.net>
 
 	reviewed by: <delete if not using a buddy>

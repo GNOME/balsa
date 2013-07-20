@@ -6866,10 +6866,11 @@ sendmsg_window_new_from_list(LibBalsaMailbox * mailbox,
     LibBalsaMessage *message;
     GtkTextBuffer *buffer;
     guint i;
-    guint msgno = g_array_index(selected, guint, 0);
+    guint msgno;
 
     g_return_val_if_fail(selected->len > 0, NULL);
 
+    msgno = g_array_index(selected, guint, 0);
     message = libbalsa_mailbox_get_message(mailbox, msgno);
     if (!message)
         return NULL;

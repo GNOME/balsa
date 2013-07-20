@@ -198,10 +198,13 @@ lsv_app_set_menus(GtkWindow * app, GAction ** action)
     *action = g_action_map_lookup_action(G_ACTION_MAP(app), "lsv-escape");
 
     builder = gtk_builder_new();
-    if (gtk_builder_add_from_file(builder, "source-viewer.ui", &err)) {
+    if (gtk_builder_add_from_file(builder,
+                                  BALSA_DATA_PREFIX "/ui/source-viewer.ui",
+                                  &err)) {
         GMenuModel *menu_model;
 
-        menu_model = G_MENU_MODEL(gtk_builder_get_object(builder, "menubar"));
+        menu_model =
+            G_MENU_MODEL(gtk_builder_get_object(builder, "menubar"));
         menu_bar = gtk_menu_bar_new_from_model(menu_model);
     } else {
         g_print("%s error: %s\n", __func__, err->message);

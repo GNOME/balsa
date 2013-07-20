@@ -1,0 +1,558 @@
+<interface>
+  <menu id='app-menu'>
+    <submenu>
+      <attribute name='label' translatable='yes'>_New</attribute>
+      <section>
+        <item>
+          <attribute name='label' translatable='yes'>_Message</attribute>
+          <attribute name='action'>app.new-message</attribute>
+          <attribute name='accel'>m</attribute>
+        </item>
+      </section>
+      <section>
+        <item>
+          <attribute name='label'
+            translatable='yes'>Local mbox mailbox…</attribute>
+          <attribute name='action'>app.new-mbox</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>Local Maildir mailbox…</attribute>
+          <attribute name='action'>app.new-maildir</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>Local MH mailbox…</attribute>
+          <attribute name='action'>app.new-mh</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>Remote IMAP mailbox…</attribute>
+          <attribute name='action'>app.new-imap-box</attribute>
+        </item>
+      </section>
+      <section>
+        <item>
+          <attribute name='label'
+            translatable='yes'>Remote IMAP folder…</attribute>
+          <attribute name='action'>app.new-imap-folder</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>Remote IMAP subfolder…</attribute>
+          <attribute name='action'>app.new-imap-subfolder</attribute>
+        </item>
+      </section>
+    </submenu>
+    <submenu>
+      <attribute name='label' translatable='yes'>_Settings</attribute>
+      <section>
+        <item>
+          <attribute name='label'
+            translatable='yes'>_Toolbars…</attribute>
+          <attribute name='action'>app.toolbars</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>_Identities…</attribute>
+          <attribute name='action'>app.identities</attribute>
+        </item>
+      </section>
+    </submenu>
+    <section>
+      <item>
+        <attribute name='label'
+          translatable='yes'>_Address Book</attribute>
+        <attribute name='action'>app.address-book</attribute>
+        <attribute name='accel'>b</attribute>
+      </item>
+    </section>
+    <section>
+      <item>
+        <attribute name='label' translatable='yes'>_Preferences</attribute>
+        <attribute name='action'>app.prefs</attribute>
+      </item>
+      <item>
+        <attribute name='label' translatable='yes'>_Help</attribute>
+        <attribute name='action'>app.help</attribute>
+      </item>
+      <item>
+        <attribute name='label' translatable='yes'>_About</attribute>
+        <attribute name='action'>app.about</attribute>
+      </item>
+    </section>
+    <section>
+      <item>
+        <attribute name='label' translatable='yes'>_Quit</attribute>
+        <attribute name='action'>app.quit</attribute>
+        <attribute name='accel'>&lt;Primary&gt;q</attribute>
+      </item>
+    </section>
+  </menu>
+  <menu id='menubar'>
+    <submenu>
+      <attribute name='label' translatable='yes'>_File</attribute>
+      <section>
+        <item>
+          <attribute name='label'
+            translatable='yes'>_Continue</attribute>
+          <attribute name='action'>win.continue</attribute>
+          <attribute name='accel'>c</attribute>
+        </item>
+      </section>
+      <section>
+        <item>
+          <attribute name='label'
+            translatable='yes'>_Get New Mail</attribute>
+          <attribute name='action'>win.get-new-mail</attribute>
+          <attribute name='accel'>&lt;Primary&gt;m</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>_Send Queued Mail</attribute>
+          <attribute name='action'>win.send-queued-mail</attribute>
+          <attribute name='accel'>&lt;Primary&gt;t</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>Send and _Receive Mail</attribute>
+          <attribute name='action'>win.send-and-receive-mail</attribute>
+          <attribute name='accel'>&lt;Primary&gt;b</attribute>
+        </item>
+      </section>
+      <section>
+        <item>
+          <attribute name='label'
+            translatable='yes'>Page _Setup</attribute>
+          <attribute name='action'>win.page-setup</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>_Print…</attribute>
+          <attribute name='action'>win.print</attribute>
+          <attribute name='accel'>&lt;Primary&gt;p</attribute>
+        </item>
+      </section>
+    </submenu>
+    <submenu>
+      <attribute name='label' translatable='yes'>_Edit</attribute>
+      <section>
+        <item>
+          <attribute name='label'
+            translatable='yes'>_Copy</attribute>
+          <attribute name='action'>win.copy</attribute>
+          <attribute name='accel'>&lt;Primary&gt;c</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>Select _All</attribute>
+          <attribute name='action'>win.select-all</attribute>
+          <attribute name='accel'>&lt;Primary&gt;a</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>Select _Thread</attribute>
+          <attribute name='action'>win.select-thread</attribute>
+        </item>
+      </section>
+      <section>
+        <item>
+          <attribute name='label'
+            translatable='yes'>_Find</attribute>
+          <attribute name='action'>win.find</attribute>
+          <attribute name='accel'>&lt;Primary&gt;f</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>Find Ne_xt</attribute>
+          <attribute name='action'>win.find-next</attribute>
+          <attribute name='accel'>&lt;Primary&gt;g</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>Find in _Message</attribute>
+          <attribute name='action'>win.find-in-message</attribute>
+          <attribute name='accel'>slash</attribute>
+        </item>
+      </section>
+      <section>
+        <item>
+          <attribute name='label'
+            translatable='yes'>F_ilters…</attribute>
+          <attribute name='action'>win.filters</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>_Export Filters…</attribute>
+          <attribute name='action'>win.export-filters</attribute>
+        </item>
+      </section>
+    </submenu>
+    <submenu>
+      <attribute name='label' translatable='yes'>_View</attribute>
+      <section>
+        <item>
+          <attribute name='label'
+            translatable='yes'>_Show Mailbox Tree</attribute>
+          <attribute name='action'>win.show-mailbox-tree</attribute>
+          <attribute name='accel'>F9</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>Show Mailbox _Tabs</attribute>
+          <attribute name='action'>win.show-mailbox-tabs</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>Show Too_lbar</attribute>
+          <attribute name='action'>win.show-toolbar</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>Show St_atus Bar</attribute>
+          <attribute name='action'>win.show-statusbar</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>Show _Index Filter</attribute>
+          <attribute name='action'>win.show-sos-bar</attribute>
+        </item>
+      </section>
+      <section>
+        <item>
+          <attribute name='label'
+            translatable='yes'>_Wrap</attribute>
+          <attribute name='action'>win.wrap</attribute>
+        </item>
+      </section>
+      <section>
+        <item>
+          <attribute name='label'
+            translatable='yes'>_No Headers</attribute>
+          <attribute name='action'>win.headers</attribute>
+          <attribute name='target'>none</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>S_elected Headers</attribute>
+          <attribute name='action'>win.headers</attribute>
+          <attribute name='target'>selected</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>All _Headers</attribute>
+          <attribute name='action'>win.headers</attribute>
+          <attribute name='target'>all</attribute>
+        </item>
+      </section>
+      <section>
+        <item>
+          <attribute name='label'
+            translatable='yes'>_Flat index</attribute>
+          <attribute name='action'>win.threading</attribute>
+          <attribute name='target'>flat</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>Si_mple threading</attribute>
+          <attribute name='action'>win.threading</attribute>
+          <attribute name='target'>simple</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>_JWZ threading</attribute>
+          <attribute name='action'>win.threading</attribute>
+          <attribute name='target'>jwz</attribute>
+        </item>
+      </section>
+      <section>
+        <item>
+          <attribute name='label'
+            translatable='yes'>E_xpand All</attribute>
+          <attribute name='action'>win.expand-all</attribute>
+          <attribute name='accel'>&lt;Primary&gt;e</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>_Collapse All</attribute>
+          <attribute name='action'>win.collapse-all</attribute>
+          <attribute name='accel'>&lt;Primary&gt;l</attribute>
+        </item>
+      </section>
+      <section>
+        <item>
+          <attribute name='label'
+            translatable='yes'>Zoom _In</attribute>
+          <attribute name='action'>win.zoom-in</attribute>
+          <attribute name='accel'>&lt;Primary&gt;plus</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>Zoom _Out</attribute>
+          <attribute name='action'>win.zoom-out</attribute>
+          <attribute name='accel'>&lt;Primary&gt;minus</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>Zoom _100%</attribute>
+          <attribute name='action'>win.zoom-normal</attribute>
+        </item>
+      </section>
+    </submenu>
+    <submenu>
+      <attribute name='label' translatable='yes'>Mail_box</attribute>
+      <section>
+        <item>
+          <attribute name='label'
+            translatable='yes'>Next Message</attribute>
+          <attribute name='action'>win.next-message</attribute>
+          <attribute name='accel'>n</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>Previous Message</attribute>
+          <attribute name='action'>win.previous-message</attribute>
+          <attribute name='accel'>p</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>Next Unread Message</attribute>
+          <attribute name='action'>win.next-unread</attribute>
+          <attribute name='accel'>&lt;Primary&gt;n</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>Next Flagged Message</attribute>
+          <attribute name='action'>win.next-flagged</attribute>
+          <attribute name='accel'>&lt;Primary&gt;&lt;Alt&gt;f</attribute>
+        </item>
+      </section>
+      <section>
+        <submenu>
+            <attribute name='label'
+              translatable='yes'>_Hide Messages</attribute>
+          <item>
+            <attribute name='label'
+              translatable='yes'>_Deleted</attribute>
+            <attribute name='action'>win.hide-deleted</attribute>
+          </item>
+          <item>
+            <attribute name='label'
+              translatable='yes'>Un_deleted</attribute>
+            <attribute name='action'>win.hide-undeleted</attribute>
+          </item>
+          <item>
+            <attribute name='label'
+              translatable='yes'>_Read</attribute>
+            <attribute name='action'>win.hide-read</attribute>
+          </item>
+          <item>
+            <attribute name='label'
+              translatable='yes'>Un_read</attribute>
+            <attribute name='action'>win.hide-unread</attribute>
+          </item>
+          <item>
+            <attribute name='label'
+              translatable='yes'>_Flagged</attribute>
+            <attribute name='action'>win.hide-flagged</attribute>
+          </item>
+          <item>
+            <attribute name='label'
+              translatable='yes'>Un_flagged</attribute>
+            <attribute name='action'>win.hide-unflagged</attribute>
+          </item>
+          <item>
+            <attribute name='label'
+              translatable='yes'>_Answered</attribute>
+            <attribute name='action'>win.hide-answered</attribute>
+          </item>
+          <item>
+            <attribute name='label'
+              translatable='yes'>Un_answered</attribute>
+            <attribute name='action'>win.hide-unanswered</attribute>
+          </item>
+        </submenu>
+        <item>
+          <attribute name='label'
+            translatable='yes'>_Reset Filter</attribute>
+          <attribute name='action'>win.reset-filter</attribute>
+        </item>
+      </section>
+      <section>
+        <item>
+          <attribute name='label'
+            translatable='yes'>Select _All</attribute>
+          <attribute name='action'>win.mailbox-select-all</attribute>
+        </item>
+      </section>
+      <section>
+        <item>
+          <attribute name='label'
+            translatable='yes'>_Properties</attribute>
+          <attribute name='action'>win.mailbox-edit</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>_Delete</attribute>
+          <attribute name='action'>win.mailbox-delete</attribute>
+        </item>
+      </section>
+      <section>
+        <item>
+          <attribute name='label'
+            translatable='yes'>E_xpunge Deleted Messages</attribute>
+          <attribute name='action'>win.mailbox-expunge</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>_Close</attribute>
+          <attribute name='action'>win.mailbox-close</attribute>
+          <attribute name='accel'>&lt;Primary&gt;w</attribute>
+        </item>
+      </section>
+      <section>
+        <item>
+          <attribute name='label'
+            translatable='yes'>Empty _Trash</attribute>
+          <attribute name='action'>win.empty-trash</attribute>
+        </item>
+      </section>
+      <section>
+        <item>
+          <attribute name='label'
+            translatable='yes'>Select _Filters…</attribute>
+          <attribute name='action'>win.select-filters</attribute>
+        </item>
+      </section>
+      <section>
+        <item>
+          <attribute name='label'
+            translatable='yes'>_Remove Duplicates</attribute>
+          <attribute name='action'>win.remove-duplicates</attribute>
+        </item>
+      </section>
+    </submenu>
+    <submenu>
+      <attribute name='label' translatable='yes'>_Message</attribute>
+      <section>
+        <item>
+          <attribute name='label'
+            translatable='yes'>_Reply…</attribute>
+          <attribute name='action'>win.reply</attribute>
+          <attribute name='accel'>r</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>Reply to _All…</attribute>
+          <attribute name='action'>win.reply-all</attribute>
+          <attribute name='accel'>a</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>Reply to _Group…</attribute>
+          <attribute name='action'>win.reply-group</attribute>
+          <attribute name='accel'>g</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>_Forward Attached…</attribute>
+          <attribute name='action'>win.forward-attached</attribute>
+          <attribute name='accel'>f</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>Forward _Inline…</attribute>
+          <attribute name='action'>win.forward-inline</attribute>
+        </item>
+      </section>
+      <section>
+        <item>
+          <attribute name='label'
+            translatable='yes'>_Pipe through…</attribute>
+          <attribute name='action'>win.pipe</attribute>
+        </item>
+      </section>
+      <section>
+        <item>
+          <attribute name='label'
+            translatable='yes'>_Next Part</attribute>
+          <attribute name='action'>win.next-part</attribute>
+          <attribute name='accel'>&lt;Primary&gt;period</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>_Previous Part</attribute>
+          <attribute name='action'>win.previous-part</attribute>
+          <attribute name='accel'>&lt;Primary&gt;comma</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>Save Current Part…</attribute>
+          <attribute name='action'>win.save-part</attribute>
+          <attribute name='accel'>&lt;Primary&gt;s</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>_View Source…</attribute>
+          <attribute name='action'>win.view-source</attribute>
+          <attribute name='accel'>&lt;Primary&gt;u</attribute>
+        </item>
+      </section>
+      <section>
+        <item>
+          <attribute name='label'
+            translatable='yes'>_Copy</attribute>
+          <attribute name='action'>win.copy-message</attribute>
+          <attribute name='accel'>&lt;Primary&gt;c</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>_Select Text</attribute>
+          <attribute name='action'>win.select-text</attribute>
+        </item>
+      </section>
+      <section>
+        <item>
+          <attribute name='label'
+            translatable='yes'>_Move to Trash</attribute>
+          <attribute name='action'>win.move-to-trash</attribute>
+          <attribute name='accel'>d</attribute>
+        </item>
+      </section>
+      <submenu>
+        <attribute name='label' translatable='yes'>_Toggle Flag</attribute>
+        <item>
+          <attribute name='label'
+            translatable='yes'>_Flagged</attribute>
+          <attribute name='action'>win.toggle-flagged</attribute>
+          <attribute name='accel'>x</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>_Deleted</attribute>
+          <attribute name='action'>win.toggle-deleted</attribute>
+          <attribute name='accel'>&lt;Primary&gt;d</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>_New</attribute>
+          <attribute name='action'>win.toggle-new</attribute>
+          <attribute name='accel'>&lt;Primary&gt;r</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>_Answered</attribute>
+          <attribute name='action'>win.toggle-answered</attribute>
+        </item>
+      </submenu>
+      <section>
+        <item>
+          <attribute name='label'
+              translatable='yes'>_Store Address…</attribute>
+          <attribute name='action'>win.store-address</attribute>
+          <attribute name='accel'>s</attribute>
+        </item>
+      </section>
+    </submenu>
+  </menu>
+</interface>

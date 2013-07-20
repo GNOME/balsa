@@ -1010,6 +1010,7 @@ libbalsa/Makefile
 libbalsa/imap/Makefile
 libinit_balsa/Makefile
 src/Makefile
+ui/Makefile
 ])
 
 dnl ##########################################################################

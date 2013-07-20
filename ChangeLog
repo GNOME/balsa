@@ -1,5 +1,9 @@
 2013-07-20  Peter Bloomfield
 
+	* README: minor updates.
+
+2013-07-20  Peter Bloomfield
+
 	Install and use a directory for GtkBuilder *.ui files
 
 	* ui/Makefile.am: new file.

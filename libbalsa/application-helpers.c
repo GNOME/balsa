@@ -1,0 +1,188 @@
+/* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
+/* Balsa E-Mail Client
+ * Copyright (C) 1998-2013 Stuart Parmenter and others, see AUTHORS file.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/*
+ * Helpers for GtkApplicationWindow
+ *
+ * Currently only one helper
+ */
+
+#if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
+# include "config.h"
+#endif                          /* HAVE_CONFIG_H */
+
+#include <gtk/gtk.h>
+#include <string.h>
+#include "application-helpers.h"
+
+/*
+ * libbalsa_window_get_menu_bar
+ *
+ * Construct a menu-bar for a GtkApplicationWindow that does not use the
+ * GApplication's menubar
+ *
+ * window       the GtkApplicationWindow
+ * entries      array of GActionEntry structures
+ * n_entries    length of the array
+ * ui_file      filename for GtkBuilder input defining a menu named
+ *              "menubar"
+ *
+ * returns:     the GtkMenuBar
+ */
+
+typedef struct {
+    GAction  *action;
+    GVariant *parameter;
+} AccelInfo;
+
+static void
+accel_info_free(AccelInfo * info)
+{
+    if (info->parameter)
+        g_variant_unref(info->parameter);
+    g_free(info);
+}
+
+static gboolean
+accel_activate(GtkAccelGroup * accel_group,
+               GObject       * acceleratable,
+               guint           keyval,
+               GdkModifierType modifier,
+               gpointer        user_data)
+{
+    AccelInfo *info = user_data;
+
+    g_action_activate(info->action, info->parameter);
+
+    return TRUE;
+}
+
+static void
+extract_accel_from_menu_item(GMenuModel    * model,
+                             gint            item,
+                             GActionMap    * action_map,
+                             GtkAccelGroup * accel_group)
+{
+    GMenuAttributeIter *iter;
+    const gchar *key;
+    GVariant *value;
+    const gchar *accel = NULL;
+    const gchar *action = NULL;
+    GVariant *target = NULL;
+
+    iter = g_menu_model_iterate_item_attributes(model, item);
+    while (g_menu_attribute_iter_get_next(iter, &key, &value)) {
+        if (g_str_equal(key, "action")
+            && g_variant_is_of_type(value, G_VARIANT_TYPE_STRING))
+            action = g_variant_get_string(value, NULL);
+        else if (g_str_equal(key, "accel")
+                 && g_variant_is_of_type(value, G_VARIANT_TYPE_STRING))
+            accel = g_variant_get_string(value, NULL);
+        else if (g_str_equal(key, "target"))
+            target = g_variant_ref(value);
+        g_variant_unref(value);
+    }
+    g_object_unref(iter);
+
+    if (accel && action) {
+        guint accel_key;
+        GdkModifierType accel_mods;
+        AccelInfo *info;
+        const gchar *basename;
+        GClosure *closure;
+
+        gtk_accelerator_parse(accel, &accel_key, &accel_mods);
+        basename = strchr(action, '.');
+        basename = basename ? basename + 1 : action;
+        info = g_new(AccelInfo, 1);
+        info->action = g_action_map_lookup_action(action_map, basename);
+        info->parameter = target ? g_variant_ref(target) : NULL;
+        closure = g_cclosure_new(G_CALLBACK(accel_activate), info,
+                                 (GClosureNotify) accel_info_free);
+        gtk_accel_group_connect(accel_group, accel_key, accel_mods, 0,
+                                closure);
+    }
+
+    if (target)
+        g_variant_unref(target);
+}
+
+static void
+extract_accels_from_menu(GMenuModel    * model,
+                         GActionMap    * action_map,
+                         GtkAccelGroup * accel_group)
+{
+    gint i;
+    GMenuLinkIter *iter;
+    const gchar *key;
+    GMenuModel *m;
+
+    for (i = 0; i < g_menu_model_get_n_items(model); i++) {
+        extract_accel_from_menu_item(model, i, action_map, accel_group);
+
+        iter = g_menu_model_iterate_item_links(model, i);
+        while (g_menu_link_iter_get_next(iter, &key, &m)) {
+            extract_accels_from_menu(m, action_map, accel_group);
+            g_object_unref(m);
+        }
+        g_object_unref(iter);
+    }
+}
+
+static GtkAccelGroup *
+libbalsa_window_get_accel_group(GMenuModel * model,
+                GActionMap * action_map)
+{
+    GtkAccelGroup *accel_group;
+
+    accel_group = gtk_accel_group_new();
+    extract_accels_from_menu(model, action_map, accel_group);
+
+    return accel_group;
+}
+
+GtkWidget *
+libbalsa_window_get_menu_bar(GtkApplicationWindow * window,
+                             const GActionEntry   * entries,
+                             gint                   n_entries,
+                             const gchar          * ui_file,
+                             GError              ** error)
+{
+    GActionMap *map = G_ACTION_MAP(window);
+    GtkBuilder *builder;
+    GtkWidget *menu_bar = NULL;
+
+    g_action_map_add_action_entries(map, entries, n_entries, window);
+
+    builder = gtk_builder_new();
+    if (gtk_builder_add_from_file(builder, ui_file, error)) {
+        GMenuModel *menu_model;
+        GtkAccelGroup *accel_group;
+
+        menu_model =
+            G_MENU_MODEL(gtk_builder_get_object(builder, "menubar"));
+
+        menu_bar = gtk_menu_bar_new_from_model(menu_model);
+
+        accel_group = libbalsa_window_get_accel_group(menu_model, map);
+        gtk_window_add_accel_group(GTK_WINDOW(window), accel_group);
+    }
+    g_object_unref(builder);
+
+    return menu_bar;
+}

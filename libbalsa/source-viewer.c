@@ -28,6 +28,7 @@
 
 #include <stdio.h>
 
+#include "application-helpers.h"
 #include "misc.h"
 #include "libbalsa.h"
 #include "libbalsa_private.h"
@@ -183,41 +184,6 @@ lsv_window_destroy_notify(LibBalsaSourceViewerInfo * lsvi)
    pops up a window containing the source of the message msg.
 */
 
-static GtkWidget*
-lsv_app_set_menus(GtkWindow * app, GAction ** action)
-{
-    GtkWidget *window;
-    GtkWidget *menu_bar = NULL;
-    GtkBuilder *builder;
-    GError *err = NULL;
-
-    window = GTK_WIDGET(app);
-
-    g_action_map_add_action_entries(G_ACTION_MAP(app), win_entries,
-                                    G_N_ELEMENTS(win_entries), window);
-    *action = g_action_map_lookup_action(G_ACTION_MAP(app), "lsv-escape");
-
-    builder = gtk_builder_new();
-    if (gtk_builder_add_from_file(builder,
-                                  BALSA_DATA_PREFIX "/ui/source-viewer.ui",
-                                  &err)) {
-        GMenuModel *menu_model;
-
-        menu_model =
-            G_MENU_MODEL(gtk_builder_get_object(builder, "menubar"));
-        menu_bar = gtk_menu_bar_new_from_model(menu_model);
-    } else {
-        g_print("%s error: %s\n", __func__, err->message);
-        libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-                             _("Error adding from %s: %s\n"),
-                             "source-viewer.ui", err->message);
-        g_error_free(err);
-    }
-    g_object_unref(builder);
-
-    return menu_bar;
-}
-
 static void
 lsv_size_allocate_cb(GtkWindow * window, GtkAllocation * alloc,
                      LibBalsaSourceViewerInfo * lsvi)
@@ -244,9 +210,11 @@ libbalsa_show_message_source(GtkApplication  * application,
     PangoFontDescription *desc;
     GtkWidget *vbox, *interior;
     GtkWidget *window;
-    GAction *escape_action = NULL;
-    LibBalsaSourceViewerInfo *lsvi;
+    gchar *ui_file;
     GtkWidget *menu_bar;
+    GError *err = NULL;
+    LibBalsaSourceViewerInfo *lsvi;
+    GAction *escape_action;
 
     g_return_if_fail(msg);
     g_return_if_fail(MAILBOX_OPEN(msg->mailbox));
@@ -272,9 +240,24 @@ libbalsa_show_message_source(GtkApplication  * application,
     gtk_window_set_title(GTK_WINDOW(window), _("Message Source"));
     gtk_window_set_wmclass(GTK_WINDOW(window), "message-source", "Balsa");
     gtk_window_set_default_size(GTK_WINDOW(window), *width, *height);
-    vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 1);
-    menu_bar = lsv_app_set_menus(GTK_WINDOW(window), &escape_action);
 
+    ui_file = g_build_filename(BALSA_DATA_PREFIX, "ui", "source-viewer.ui",
+                               NULL);
+    menu_bar = libbalsa_window_get_menu_bar(GTK_APPLICATION_WINDOW(window),
+                                            win_entries,
+                                            G_N_ELEMENTS(win_entries),
+                                            ui_file, &err);
+    if (!menu_bar) {
+        libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+                             _("Error adding from %s: %s\n"), ui_file,
+                             err->message);
+        g_free(ui_file);
+        g_error_free(err);
+        return;
+    }
+    g_free(ui_file);
+
+    vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 1);
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu(window, GTK_MENU_SHELL(menu_bar));
 #else
@@ -298,6 +281,9 @@ libbalsa_show_message_source(GtkApplication  * application,
                      G_CALLBACK(lsv_size_allocate_cb), lsvi);
 
     gtk_widget_show_all(window);
+
+    escape_action =
+        g_action_map_lookup_action(G_ACTION_MAP(window), "lsv-escape");
     lsv_escape_change_state(G_SIMPLE_ACTION(escape_action),
                             g_variant_new_boolean(*escape_specials),
                             window);

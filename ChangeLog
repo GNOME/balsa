@@ -1,5 +1,17 @@
 2013-07-21  Peter Bloomfield
 
+	* libbalsa/application-helpers.c (accel_info_free),
+	(accel_activate), (extract_accel_from_menu_item),
+	(extract_accels_from_menu), (libbalsa_window_get_accel_group),
+	(libbalsa_window_get_menu_bar): new file defining
+	libbalsa_window_get_menu_bar.
+	* libbalsa/application-helpers.h: ditto.
+	* libbalsa/Makefile.am: add them to SOURCES.
+	* libbalsa/source-viewer.c: use libbalsa_window_get_menu_bar to
+	construct the menu-bar and add the accelerators to the window.
+
+2013-07-21  Peter Bloomfield
+
 	More GtkStock deprecation cleanup
 
 	* src/balsa-index.c (bndx_popup_menu_create),

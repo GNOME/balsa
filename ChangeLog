@@ -1,3 +1,15 @@
+2013-07-21  Peter Bloomfield
+
+	More GtkStock deprecation cleanup
+
+	* src/balsa-index.c (bndx_popup_menu_create),
+	(create_stock_menu_item):
+	* src/balsa-message.c (bm_header_tl_buttons),
+	(get_crypto_content_icon):
+	* src/balsa-mime-widget-crypto.c (balsa_mime_widget_crypto_frame):
+	* src/balsa-mime-widget-image.c (balsa_mime_widget_new_image):
+	* src/balsa-mime-widget-text.c (bmwt_populate_popup_menu):
+
 2013-07-20  Peter Bloomfield
 
 	* README: minor updates.

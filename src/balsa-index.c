@@ -122,7 +122,6 @@ static void bndx_drag_cb(GtkWidget* widget,
 static GtkWidget* bndx_popup_menu_create(BalsaIndex * index);
 static void bndx_do_popup(BalsaIndex * index, GdkEventButton * event);
 static GtkWidget *create_stock_menu_item(GtkWidget * menu,
-                                         const gchar * type,
                                          const gchar * label,
                                          GCallback cb, gpointer data);
 
@@ -1832,35 +1831,31 @@ bndx_popup_menu_create(BalsaIndex * index)
     menu = gtk_menu_new();
 
     for (i = 0; i < ELEMENTS(entries); i++)
-        create_stock_menu_item(menu, entries[i].icon, _(entries[i].label),
+        create_stock_menu_item(menu, _(entries[i].label),
                                entries[i].func, index);
 
     gtk_menu_shell_append(GTK_MENU_SHELL(menu),
                           gtk_separator_menu_item_new());
     index->delete_item =
-        create_stock_menu_item(menu, "edit-delete",
-                               _("_Delete"),
+        create_stock_menu_item(menu, _("_Delete"),
                                G_CALLBACK(bi_toggle_deleted_cb),
                                index);
     index->undelete_item =
-        create_stock_menu_item(menu, "gtk-undelete",
-                               _("_Undelete"),
+        create_stock_menu_item(menu, _("_Undelete"),
                                G_CALLBACK(bi_toggle_deleted_cb),
                                index);
     index->move_to_trash_item =
-        create_stock_menu_item(menu, "edit-delete",
-                               _("Move To _Trash"),
+        create_stock_menu_item(menu, _("Move To _Trash"),
                                G_CALLBACK
                                (balsa_message_move_to_trash), index);
 
     menuitem = gtk_menu_item_new_with_mnemonic(_("T_oggle"));
     index->toggle_item = menuitem;
     submenu = gtk_menu_new();
-    create_stock_menu_item(submenu, BALSA_PIXMAP_INFO_FLAGGED,
-                           _("_Flagged"),
+    create_stock_menu_item(submenu, _("_Flagged"),
                            G_CALLBACK(bi_toggle_flagged_cb),
                            index);
-    create_stock_menu_item(submenu, BALSA_PIXMAP_INFO_NEW, _("_Unread"),
+    create_stock_menu_item(submenu, _("_Unread"),
                            G_CALLBACK(bi_toggle_new_cb),
                            index);
 
@@ -1875,8 +1870,7 @@ bndx_popup_menu_create(BalsaIndex * index)
 
     gtk_menu_shell_append(GTK_MENU_SHELL(menu),
                           gtk_separator_menu_item_new());
-    create_stock_menu_item(menu, BALSA_PIXMAP_BOOK_OPEN,
-                           _("_View Source"),
+    create_stock_menu_item(menu, _("_View Source"),
                            G_CALLBACK(bndx_view_source),
                            index);
 
@@ -1990,14 +1984,10 @@ bndx_do_popup(BalsaIndex * index, GdkEventButton * event)
 }
 
 static GtkWidget *
-create_stock_menu_item(GtkWidget * menu, const gchar * type,
-		       const gchar * label, GCallback cb,
+create_stock_menu_item(GtkWidget * menu, const gchar * label, GCallback cb,
 		       gpointer data)
 {
-    GtkWidget *menuitem = gtk_image_menu_item_new_with_mnemonic(label);
-    GtkWidget *image = gtk_image_new_from_stock(type, GTK_ICON_SIZE_MENU);
-
-    gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menuitem), image);
+    GtkWidget *menuitem = gtk_menu_item_new_with_mnemonic(label);
 
     g_signal_connect_swapped(G_OBJECT(menuitem), "activate",
                              G_CALLBACK(cb), data);

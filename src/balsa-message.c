@@ -283,8 +283,9 @@ bm_header_tl_buttons(BalsaMessage * bm)
 		     (gpointer) bm);
     gtk_button_set_relief(GTK_BUTTON(button), GTK_RELIEF_NONE);
     gtk_container_add(GTK_CONTAINER(button),
-		      gtk_image_new_from_stock(BALSA_PIXMAP_GPG_RECHECK,
-					       GTK_ICON_SIZE_LARGE_TOOLBAR));
+                      gtk_image_new_from_icon_name
+                      (BALSA_PIXMAP_GPG_RECHECK,
+                       GTK_ICON_SIZE_LARGE_TOOLBAR));
     g_signal_connect(button, "clicked",
 		     G_CALLBACK(message_recheck_crypto_cb), bm);
     g_ptr_array_add(array, button);
@@ -301,8 +302,9 @@ bm_header_tl_buttons(BalsaMessage * bm)
 		     (gpointer) bm);
     gtk_button_set_relief(GTK_BUTTON(button), GTK_RELIEF_NONE);
     gtk_container_add(GTK_CONTAINER(button),
-		      gtk_image_new_from_stock(BALSA_PIXMAP_ATTACHMENT,
-					       GTK_ICON_SIZE_LARGE_TOOLBAR));
+                      gtk_image_new_from_icon_name
+                      (BALSA_PIXMAP_ATTACHMENT,
+                       GTK_ICON_SIZE_LARGE_TOOLBAR));
     g_signal_connect(button, "clicked",
 		     G_CALLBACK(balsa_headers_attachments_popup), bm);
     g_signal_connect(button, "key_press_event",
@@ -2714,9 +2716,8 @@ get_crypto_content_icon(LibBalsaMessageBody * body, const gchar * content_type,
     if (!icon_name)
         return NULL;
     icon =
-        gtk_widget_render_icon_pixbuf(GTK_WIDGET(balsa_app.main_window),
-                                      icon_name,
-                                      GTK_ICON_SIZE_LARGE_TOOLBAR);
+        gtk_icon_theme_load_icon(gtk_icon_theme_get_default(), icon_name,
+                                 GTK_ICON_SIZE_LARGE_TOOLBAR, 0, NULL);
     if (!icon_title)
         return icon;
 

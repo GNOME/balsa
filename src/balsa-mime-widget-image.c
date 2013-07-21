@@ -131,8 +131,8 @@ balsa_mime_widget_new_image(BalsaMessage * bm,
         g_signal_connect(mwi->context, "changed",
                          G_CALLBACK(bmwi_context_changed_cb), mw);
 
-    image = gtk_image_new_from_stock("image-missing",
-                                     GTK_ICON_SIZE_BUTTON);
+    image = gtk_image_new_from_icon_name("image-missing",
+                                         GTK_ICON_SIZE_BUTTON);
     g_object_set_data(G_OBJECT(image), "orig-width",
 		      GINT_TO_POINTER(gdk_pixbuf_get_width(pixbuf)));
     g_object_set_data(G_OBJECT(image), "mime-body", mime_body);

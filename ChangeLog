@@ -1,5 +1,13 @@
 2013-07-21  Peter Bloomfield
 
+	* libbalsa/application-helpers.c (extract_accels_from_menu),
+	(get_accel_group), (libbalsa_window_get_menu_bar): make the
+	application-window not show the application's menubar here.
+	* libbalsa/source-viewer.c (libbalsa_show_message_source):
+	instead of here.
+
+2013-07-21  Peter Bloomfield
+
 	* libbalsa/application-helpers.c (accel_info_free),
 	(accel_activate), (extract_accel_from_menu_item),
 	(extract_accels_from_menu), (libbalsa_window_get_accel_group),

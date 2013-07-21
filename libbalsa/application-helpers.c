@@ -41,6 +41,7 @@
  * n_entries    length of the array
  * ui_file      filename for GtkBuilder input defining a menu named
  *              "menubar"
+ * error        GError for returning error information
  *
  * returns:     the GtkMenuBar
  */
@@ -127,12 +128,12 @@ extract_accels_from_menu(GMenuModel    * model,
                          GActionMap    * action_map,
                          GtkAccelGroup * accel_group)
 {
-    gint i;
+    gint i, n = g_menu_model_get_n_items(model);
     GMenuLinkIter *iter;
     const gchar *key;
     GMenuModel *m;
 
-    for (i = 0; i < g_menu_model_get_n_items(model); i++) {
+    for (i = 0; i < n; i++) {
         extract_accel_from_menu_item(model, i, action_map, accel_group);
 
         iter = g_menu_model_iterate_item_links(model, i);
@@ -145,7 +146,7 @@ extract_accels_from_menu(GMenuModel    * model,
 }
 
 static GtkAccelGroup *
-libbalsa_window_get_accel_group(GMenuModel * model,
+get_accel_group(GMenuModel * model,
                 GActionMap * action_map)
 {
     GtkAccelGroup *accel_group;
@@ -179,8 +180,9 @@ libbalsa_window_get_menu_bar(GtkApplicationWindow * window,
 
         menu_bar = gtk_menu_bar_new_from_model(menu_model);
 
-        accel_group = libbalsa_window_get_accel_group(menu_model, map);
+        accel_group = get_accel_group(menu_model, map);
         gtk_window_add_accel_group(GTK_WINDOW(window), accel_group);
+        gtk_application_window_set_show_menubar(window, FALSE);
     }
     g_object_unref(builder);
 

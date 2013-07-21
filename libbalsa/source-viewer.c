@@ -235,8 +235,6 @@ libbalsa_show_message_source(GtkApplication  * application,
     gtk_container_add(GTK_CONTAINER(interior), GTK_WIDGET(text));
 
     window = gtk_application_window_new(application);
-    gtk_application_window_set_show_menubar(GTK_APPLICATION_WINDOW(window),
-                                            FALSE);
     gtk_window_set_title(GTK_WINDOW(window), _("Message Source"));
     gtk_window_set_wmclass(GTK_WINDOW(window), "message-source", "Balsa");
     gtk_window_set_default_size(GTK_WINDOW(window), *width, *height);

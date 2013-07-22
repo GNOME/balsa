@@ -30,10 +30,10 @@
 #include "mailbox.h"
 #include "address-view.h"
 
-#define ELEMENTS(x) (sizeof (x) / sizeof (x[0]))
-
 /* comment out the next line to suppress info about loading images */
-/* #define BICONS_VERBOSE */
+#if 0
+#define BICONS_VERBOSE
+#endif
 
 #ifdef BICONS_VERBOSE
 #  define BICONS_LOG(...)   g_message(__VA_ARGS__)
@@ -59,11 +59,9 @@ typedef struct {
 static GHashTable *balsa_icon_table;
 
 static void
-load_balsa_pixmap(GtkIconTheme *icon_theme, GtkIconFactory *factory, 
-		  const balsa_pixmap_t *bpixmap)
+load_balsa_pixmap(GtkIconTheme *icon_theme, const balsa_pixmap_t *bpixmap)
 {
     GdkPixbuf *pixbuf;
-    GtkIconSet *icon_set;
     GError *error = NULL;
     gint n, width, height;
     const gchar * use_id;
@@ -77,7 +75,6 @@ load_balsa_pixmap(GtkIconTheme *icon_theme, GtkIconFactory *factory,
         { "folder-drag-accept", "document-open"},
         { "folder", "folder"},
 	{ NULL, NULL } };
-    GtkSettings *settings;
 
     BICONS_LOG("loading icon %s (stock id %s)", bpixmap->name,
 	       bpixmap->stock_id);
@@ -99,12 +96,11 @@ load_balsa_pixmap(GtkIconTheme *icon_theme, GtkIconFactory *factory,
     } else
 	use_id = bpixmap->stock_id;
 
+    BICONS_LOG("\tuse_id %s", use_id);
     g_hash_table_insert(balsa_icon_table, g_strdup(bpixmap->name),
                         g_strdup(use_id));
 
-    settings = gtk_settings_get_for_screen(gdk_screen_get_default());
-    if (!gtk_icon_size_lookup_for_settings(settings, bpixmap->sizes[0],
-                                           &width, &height)) {
+    if (!gtk_icon_size_lookup(bpixmap->sizes[0], &width, &height)) {
 	BICONS_ERR("failed: could not look up default icon size %d",
 		   bpixmap->sizes[0]);
 	return;
@@ -119,14 +115,12 @@ load_balsa_pixmap(GtkIconTheme *icon_theme, GtkIconFactory *factory,
 	return;
     }
     BICONS_LOG("\tloaded with size %d", width);
-    icon_set = gtk_icon_set_new_from_pixbuf(pixbuf);
     g_object_unref(pixbuf);
 
     for (n = 1;
 	 n < BALSA_PIXMAP_SIZES && bpixmap->sizes[n] > GTK_ICON_SIZE_INVALID;
 	 n++) {
-	if (gtk_icon_size_lookup_for_settings(settings, bpixmap->sizes[n],
-                                              &width, &height)) {
+	if (gtk_icon_size_lookup(bpixmap->sizes[n], &width, &height)) {
 	    pixbuf =
 		gtk_icon_theme_load_icon(icon_theme, use_id, width,
 					 GTK_ICON_LOOKUP_USE_BUILTIN, &error);
@@ -135,22 +129,13 @@ load_balsa_pixmap(GtkIconTheme *icon_theme, GtkIconFactory *factory,
 			   error->message);
 		g_clear_error(&error);
 	    } else {
-		GtkIconSource *icon_source = gtk_icon_source_new();
-		
-		BICONS_LOG("\tloaded with size %d", width);
-		gtk_icon_source_set_pixbuf(icon_source, pixbuf);
-		g_object_unref(pixbuf);
-		gtk_icon_source_set_size(icon_source, bpixmap->sizes[n]);
-		gtk_icon_source_set_size_wildcarded(icon_source, FALSE);
-		gtk_icon_set_add_source(icon_set, icon_source);
-                gtk_icon_source_free(icon_source);
+                BICONS_LOG("\tloaded with size %d", width);
+                gtk_icon_theme_add_builtin_icon(use_id, bpixmap->sizes[n],
+                                                pixbuf);
 	    }
 	} else
 	    BICONS_ERR("bad size %d", bpixmap->sizes[n]);
     }
-
-    gtk_icon_factory_add(factory, bpixmap->name, icon_set);
-    gtk_icon_set_unref(icon_set);
 }
 
 void
@@ -162,7 +147,7 @@ balsa_register_pixmaps(void)
 	  { GTK_ICON_SIZE_LARGE_TOOLBAR, GTK_ICON_SIZE_MENU } },
 	{ BALSA_PIXMAP_REPLY,           "mail-reply-sender",
 	  { GTK_ICON_SIZE_LARGE_TOOLBAR, GTK_ICON_SIZE_MENU } },
-	{ BALSA_PIXMAP_REPLY_GROUP,     "stock_mail-reply-to-all", 
+	{ BALSA_PIXMAP_REPLY_GROUP,     "stock_mail-reply-to-all",
 	  { GTK_ICON_SIZE_LARGE_TOOLBAR, GTK_ICON_SIZE_MENU } },
 	{ BALSA_PIXMAP_REQUEST_MDN,     "mail-reply-sender",
 	  { GTK_ICON_SIZE_LARGE_TOOLBAR, GTK_ICON_SIZE_MENU } },
@@ -267,7 +252,7 @@ balsa_register_pixmaps(void)
 	  { GTK_ICON_SIZE_MENU, GTK_ICON_SIZE_INVALID } },
         { BALSA_PIXMAP_MBOX_DIR_CLOSED, "folder",
 	  { GTK_ICON_SIZE_MENU, GTK_ICON_SIZE_INVALID } },
-	
+
 	/* index icons (16x16) */
         { BALSA_PIXMAP_INFO_REPLIED,    "mail-replied",
 	  { GTK_ICON_SIZE_MENU, GTK_ICON_SIZE_INVALID } },
@@ -282,17 +267,15 @@ balsa_register_pixmaps(void)
 	};
 
     unsigned i;
-    GtkIconFactory *factory = gtk_icon_factory_new();
     GtkIconTheme *icon_theme = gtk_icon_theme_get_default();
 
     balsa_icon_table =
         g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
-    gtk_icon_factory_add_default(factory);
     gtk_icon_theme_append_search_path(icon_theme, BALSA_STD_PREFIX "/share/icons");
     gtk_icon_theme_append_search_path(icon_theme, BALSA_DATA_PREFIX);
 
-    for (i = 0; i < ELEMENTS(balsa_icons); i++)
-	load_balsa_pixmap(icon_theme, factory, balsa_icons + i);
+    for (i = 0; i < G_N_ELEMENTS(balsa_icons); i++)
+	load_balsa_pixmap(icon_theme, balsa_icons + i);
 }
 
 void
@@ -332,10 +315,29 @@ balsa_register_pixbufs(GtkWidget * widget)
         libbalsa_address_view_set_drop_down_icon, BALSA_PIXMAP_DROP_DOWN},
     };
     guint i;
+    GtkIconTheme *icon_theme = gtk_icon_theme_get_default();
 
-    for (i = 0; i < ELEMENTS(icons); i++)
-        icons[i].set_icon(gtk_widget_render_icon_pixbuf
-                          (widget, icons[i].icon, GTK_ICON_SIZE_MENU));
+    gtk_icon_theme_append_search_path(icon_theme,
+                                      BALSA_STD_PREFIX "/share/icons");
+    gtk_icon_theme_append_search_path(icon_theme, BALSA_DATA_PREFIX);
+
+    for (i = 0; i < G_N_ELEMENTS(icons); i++) {
+        GdkPixbuf *pixbuf;
+        GError *err = NULL;
+        gint width, height;
+        const gchar *use_id = balsa_icon_id(icons[i].icon);
+
+        gtk_icon_size_lookup(GTK_ICON_SIZE_MENU, &width, &height);
+        pixbuf =
+            gtk_icon_theme_load_icon(icon_theme, use_id, width,
+                                     GTK_ICON_LOOKUP_USE_BUILTIN, &err);
+        if (err) {
+            g_print("%s %s size %d err %s\n", __func__, use_id,
+                    width, err->message);
+            g_clear_error(&err);
+        } else
+            icons[i].set_icon(pixbuf);
+    }
 }
 
 const gchar *

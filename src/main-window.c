@@ -1261,8 +1261,8 @@ bw_create_index_widget(BalsaWindow *bw)
                        button = gtk_button_new(),
                        FALSE, FALSE, 0);
     gtk_container_add(GTK_CONTAINER(button),
-                      gtk_image_new_from_stock("gtk-ok",
-                                               GTK_ICON_SIZE_BUTTON));
+                      gtk_image_new_from_icon_name("gtk-ok",
+                                                    GTK_ICON_SIZE_BUTTON));
     g_signal_connect(G_OBJECT(bw->sos_entry), "activate",
                      G_CALLBACK(bw_filter_entry_activate),
                      button);

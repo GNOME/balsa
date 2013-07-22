@@ -23,6 +23,7 @@
 # include "config.h"
 #endif                          /* HAVE_CONFIG_H */
 #include "balsa-app.h"
+#include "balsa-icons.h"
 
 #include <string.h>
 #include <stdlib.h>
@@ -585,7 +586,8 @@ balsa_stock_button_with_label(const char *icon, const char *text)
 {
     GtkWidget *button;
     GtkWidget *pixmap =
-        gtk_image_new_from_icon_name(icon, GTK_ICON_SIZE_BUTTON);
+        gtk_image_new_from_icon_name(balsa_icon_id(icon),
+                                     GTK_ICON_SIZE_BUTTON);
     GtkWidget *align = gtk_alignment_new(0.5, 0.5, 0, 0);
     GtkWidget *hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
 

@@ -1,3 +1,14 @@
+2013-07-22  Peter Bloomfield
+
+	More GtkStock deprecation cleanup
+
+	* src/balsa-app.c (balsa_stock_button_with_label):
+	* src/balsa-icons.c (load_balsa_pixmap), (balsa_register_pixmaps),
+	(balsa_register_pixbufs):
+	* src/balsa-message.c (bm_header_tl_buttons):
+	* src/balsa-mime-widget-crypto.c (balsa_mime_widget_crypto_frame):
+	* src/main-window.c:
+
 2013-07-21  Peter Bloomfield
 
 	* libbalsa/application-helpers.c (extract_accels_from_menu),

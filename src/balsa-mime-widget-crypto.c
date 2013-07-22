@@ -127,8 +127,9 @@ balsa_mime_widget_crypto_frame(LibBalsaMessageBody * mime_body, GtkWidget * chil
     icon_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, BMW_VBOX_SPACE);
     if (was_encrypted)
         gtk_box_pack_start(GTK_BOX(icon_box),
-                           gtk_image_new_from_icon_name(BALSA_PIXMAP_ENCR,
-                                                        GTK_ICON_SIZE_MENU),
+                           gtk_image_new_from_icon_name
+                           (balsa_icon_id(BALSA_PIXMAP_ENCR),
+                            GTK_ICON_SIZE_MENU),
                            FALSE, FALSE, 0);
     if (!no_signature) {
 	const gchar * icon_name =
@@ -136,8 +137,8 @@ balsa_mime_widget_crypto_frame(LibBalsaMessageBody * mime_body, GtkWidget * chil
 	if (!icon_name)
 	    icon_name = BALSA_PIXMAP_SIGN;
         gtk_box_pack_start(GTK_BOX(icon_box),
-                           gtk_image_new_from_icon_name(icon_name,
-                                                        GTK_ICON_SIZE_MENU),
+                           gtk_image_new_from_icon_name
+                           (balsa_icon_id(icon_name), GTK_ICON_SIZE_MENU),
                            FALSE, FALSE, 0);
     }
     gtk_frame_set_label_widget(GTK_FRAME(frame), icon_box);

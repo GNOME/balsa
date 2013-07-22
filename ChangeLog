@@ -1,5 +1,10 @@
 2013-07-22  Peter Bloomfield
 
+	* src/balsa-icons.c (load_balsa_pixmap): add built-in icon with
+	the correct size.
+
+2013-07-22  Peter Bloomfield
+
 	More GtkStock deprecation cleanup
 
 	* src/balsa-app.c (balsa_stock_button_with_label):

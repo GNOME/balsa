@@ -130,7 +130,7 @@ load_balsa_pixmap(GtkIconTheme *icon_theme, const balsa_pixmap_t *bpixmap)
 		g_clear_error(&error);
 	    } else {
                 BICONS_LOG("\tloaded with size %d", width);
-                gtk_icon_theme_add_builtin_icon(use_id, bpixmap->sizes[n],
+                gtk_icon_theme_add_builtin_icon(bpixmap->name, width,
                                                 pixbuf);
 	    }
 	} else

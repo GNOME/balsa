@@ -1,5 +1,9 @@
 2013-07-22  Peter Bloomfield
 
+	* src/balsa-icons.c (load_balsa_pixmap): do not leak pixbuf.
+
+2013-07-22  Peter Bloomfield
+
 	* src/balsa-icons.c (load_balsa_pixmap): add built-in icon with
 	the correct size.
 

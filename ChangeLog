@@ -1,5 +1,11 @@
 2013-07-22  Peter Bloomfield
 
+	* src/main-window.c (bw_set_menus): use installed ui file.
+	* ui/Makefile.am: install it.
+	* ui/main-window.ui: new file.
+
+2013-07-22  Peter Bloomfield
+
 	Move GAction-toggled callback to application-helpers
 
 	* libbalsa/application-helpers.c (libbalsa_window_get_menu_bar),

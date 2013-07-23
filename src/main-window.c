@@ -2021,7 +2021,7 @@ bw_set_menus(BalsaWindow * window)
         {"store-address",         store_address_activated}
     };
     GtkBuilder *builder;
-    static const gchar ui_file[] = "main-window.ui";
+    gchar *ui_file;
     GError *err = NULL;
 
     g_action_map_add_action_entries(G_ACTION_MAP(balsa_app.application),
@@ -2033,6 +2033,8 @@ bw_set_menus(BalsaWindow * window)
                                     window);
 
     builder = gtk_builder_new();
+    ui_file = g_build_filename(BALSA_DATA_PREFIX, "ui", "main-window.ui",
+                               NULL);
     if (gtk_builder_add_from_file(builder, ui_file, &err)) {
         gtk_application_set_app_menu(balsa_app.application,
                                      G_MENU_MODEL(gtk_builder_get_object
@@ -2047,6 +2049,7 @@ bw_set_menus(BalsaWindow * window)
                           err->message);
         g_error_free(err);
     }
+    g_free(ui_file);
     g_object_unref(builder);
 }
 

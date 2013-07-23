@@ -2148,7 +2148,7 @@ msgid ""
 "on the 'Tools' menu)"
 msgstr ""
 "Jsou také potřeba následující nastavení (v případě potřeby je později můžete "
-"najít v aplikaci Email v příkazech „Nastavení“ a „Identity“ v nabídce "
+"najít v aplikaci Email v příkazech „Předvolby“ a „Identity“ v nabídce "
 "„Nástroje“)"
 
 #: ../libinit_balsa/assistant_page_user.c:63
@@ -4585,7 +4585,7 @@ msgstr "Exportovat filtry jako skripty Sieve"
 
 #: ../src/main-window.c:428
 msgid "Prefere_nces"
-msgstr "_Nastavení"
+msgstr "_Předvolby"
 
 #. View menu items
 #: ../src/main-window.c:431

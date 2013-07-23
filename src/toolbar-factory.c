@@ -217,7 +217,9 @@ static void
 tm_load_model(BalsaToolbarModel * model)
 {
     gchar *key;
+#ifdef LOADING_MODEL_IS_FIXED
     guint j;
+#endif
 
     key = g_strconcat("toolbar-", balsa_toolbar_names[model->type], NULL);
     libbalsa_conf_push_group(key);
@@ -225,6 +227,7 @@ tm_load_model(BalsaToolbarModel * model)
 
     model->style = libbalsa_conf_get_int_with_default("Style=-1", NULL);
 
+#ifdef LOADING_MODEL_IS_FIXED
     model->current = NULL;
     for (j = 0;; j++) {
         gchar *item;
@@ -239,6 +242,7 @@ tm_load_model(BalsaToolbarModel * model)
         model->current = g_slist_prepend(model->current, item);
     }
     model->current = g_slist_reverse(model->current);
+#endif
 
     libbalsa_conf_pop_group();
 }

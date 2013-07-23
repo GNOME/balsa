@@ -1,3 +1,9 @@
+2013-07-23  Peter Bloomfield
+
+	* src/main-window.c (bw_alt_n_cb), (bw_set_alt_bindings),
+	(balsa_window_new): restore <alt>n key bindings to change
+	mailbox tab.
+
 2013-07-22  Peter Bloomfield
 
 	* src/main-window.c (toolbars_activated), (identities_activated),

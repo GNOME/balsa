@@ -2081,6 +2081,54 @@ bw_set_menus(BalsaWindow * window)
 }
 
 /*
+ * Implement <alt>n to switch to the n'th mailbox tab
+ * (n = 1, 2, ..., 9);
+ * <alt>0 switches to the last tab; useful when more than 9 mailboxes
+ * are open.
+ *
+ * Note that GtkNotebook natively supports <control><alt>page-up to
+ * switch one tab to the left and <control><alt>page-down to
+ * switch one tab to the right.
+ */
+
+static void
+bw_alt_n_cb(GtkAccelGroup * accel_group,
+            GObject       * acceleratable,
+            guint           keyval,
+            GdkModifierType modifier,
+            gpointer        user_data)
+{
+    BalsaWindow *window = user_data;
+
+    gtk_notebook_set_current_page(GTK_NOTEBOOK(window->notebook),
+                                  keyval - GDK_KEY_1);
+}
+
+static void
+bw_set_alt_bindings(BalsaWindow * window)
+{
+    GtkAccelGroup *accel_group;
+    gint i;
+
+    accel_group = gtk_accel_group_new();
+
+    for (i = 0; i < 10; i++) {
+        gchar accel[8];
+        guint accel_key;
+        GdkModifierType accel_mods;
+        GClosure *closure;
+
+        g_snprintf(accel, sizeof(accel), "<alt>%d", i);
+        gtk_accelerator_parse(accel, &accel_key, &accel_mods);
+
+        closure = g_cclosure_new(G_CALLBACK(bw_alt_n_cb), window, NULL);
+        gtk_accel_group_connect(accel_group, accel_key, accel_mods, 0,
+                                closure);
+    }
+    gtk_window_add_accel_group(GTK_WINDOW(window), accel_group);
+}
+
+/*
  * lists of actions that are enabled or disabled as groups
  */
 static const gchar *const mailbox_actions[] = {
@@ -2165,6 +2213,9 @@ balsa_window_new()
 
     /* Set up the GMenu structures */
     bw_set_menus(window);
+
+    /* Set up <alt>n key bindings */
+    bw_set_alt_bindings(window);
 
     window->vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     gtk_widget_show(window->vbox);

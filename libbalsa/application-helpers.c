@@ -18,8 +18,6 @@
 
 /*
  * Helpers for GtkApplicationWindow
- *
- * Currently only one helper
  */
 
 #if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
@@ -187,4 +185,29 @@ libbalsa_window_get_menu_bar(GtkApplicationWindow * window,
     g_object_unref(builder);
 
     return menu_bar;
+}
+
+/*
+ * libbalsa_toggle_activated
+ *
+ * Callback for the "activated" signal of GAction with a boolean state
+ * Toggle the action's state
+ *
+ * action       the GAction
+ * parameter    not used
+ * user_data    not used
+ */
+
+void
+libbalsa_toggle_activated(GSimpleAction * action,
+                          GVariant      * parameter,
+                          gpointer        user_data)
+{
+    GVariant *action_state;
+    gboolean state;
+
+    action_state = g_action_get_state(G_ACTION(action));
+    state = g_variant_get_boolean(action_state);
+    g_action_change_state(G_ACTION(action), g_variant_new_boolean(!state));
+    g_variant_unref(action_state);
 }

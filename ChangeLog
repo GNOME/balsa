@@ -1,5 +1,15 @@
 2013-07-22  Peter Bloomfield
 
+	Move GAction-toggled callback to application-helpers
+
+	* libbalsa/application-helpers.c (libbalsa_window_get_menu_bar),
+	(libbalsa_toggle_activated): install GAction-toggled callback.
+	* libbalsa/application-helpers.h: declare it.
+	* libbalsa/source-viewer.c: use it.
+	* src/main-window.c (bw_set_menus): ditto.
+
+2013-07-22  Peter Bloomfield
+
 	Make main-window a GtkApplicationWindow, and port menus from
 	GtkUIManager to GtkBuilder and from GtkAction to GAction
 

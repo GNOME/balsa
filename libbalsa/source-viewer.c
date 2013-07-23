@@ -88,20 +88,6 @@ lsv_select_activated(GSimpleAction * action,
 }
 
 static void
-lsv_toggle_activated(GSimpleAction * action,
-                     GVariant      * parameter,
-                     gpointer        user_data)
-{
-    GVariant *action_state;
-    gboolean state;
-
-    action_state = g_action_get_state(G_ACTION(action));
-    state = g_variant_get_boolean(action_state);
-    g_action_change_state(G_ACTION(action), g_variant_new_boolean(!state));
-    g_variant_unref(action_state);
-}
-
-static void
 lsv_show_message(const char *message, LibBalsaSourceViewerInfo * lsvi,
                  gboolean escape)
 {
@@ -169,7 +155,7 @@ static GActionEntry win_entries[] = {
     {"lsv-close",  lsv_close_activated},
     {"lsv-copy",   lsv_copy_activated},
     {"lsv-select", lsv_select_activated},
-    {"lsv-escape", lsv_toggle_activated, NULL, "false",
+    {"lsv-escape", libbalsa_toggle_activated, NULL, "false",
         lsv_escape_change_state}
 };
 

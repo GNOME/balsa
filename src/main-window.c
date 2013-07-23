@@ -34,6 +34,7 @@
 #include <gdk/gdkkeysyms.h>
 #include <gdk-pixbuf/gdk-pixbuf.h>
 
+#include "application-helpers.h"
 #include "imap-server.h"
 #include "libbalsa.h"
 #include "misc.h"
@@ -858,24 +859,6 @@ bw_actions_set_enabled(BalsaWindow         * window,
 /*
  * End of GAction helpers
  */
-
-/*
- * Common callback for the "activated" signal of a toggle action
- */
-
-static void
-toggle_activated(GSimpleAction * action,
-                 GVariant      * parameter,
-                 gpointer        user_data)
-{
-    GVariant *action_state;
-    gboolean state;
-
-    action_state = g_action_get_state(G_ACTION(action));
-    state = g_variant_get_boolean(action_state);
-    g_action_change_state(G_ACTION(action), g_variant_new_boolean(!state));
-    g_variant_unref(action_state);
-}
 
 /*
  * Common callback for the "activated" signal of a radio action
@@ -1966,17 +1949,17 @@ bw_set_menus(BalsaWindow * window)
         {"find-in-message",       find_in_message_activated},
         {"filters",               filters_activated},
         {"export-filters",        export_filters_activated},
-        {"show-mailbox-tree",     toggle_activated, NULL, "false",
+        {"show-mailbox-tree",     libbalsa_toggle_activated, NULL, "false",
                                   show_mailbox_tree_change_state},
-        {"show-mailbox-tabs",     toggle_activated, NULL, "false",
+        {"show-mailbox-tabs",     libbalsa_toggle_activated, NULL, "false",
                                   show_mailbox_tabs_change_state},
-        {"show-toolbar",          toggle_activated, NULL, "false",
+        {"show-toolbar",          libbalsa_toggle_activated, NULL, "false",
                                   show_toolbar_change_state},
-        {"show-statusbar",        toggle_activated, NULL, "false",
+        {"show-statusbar",        libbalsa_toggle_activated, NULL, "false",
                                   show_statusbar_change_state},
-        {"show-sos-bar",          toggle_activated, NULL, "false",
+        {"show-sos-bar",          libbalsa_toggle_activated, NULL, "false",
                                   show_sos_bar_change_state},
-        {"wrap",                  toggle_activated, NULL, "false",
+        {"wrap",                  libbalsa_toggle_activated, NULL, "false",
                                   wrap_change_state},
         {"headers",               radio_activated, "s", "'none'",
                                   header_change_state},
@@ -1993,21 +1976,21 @@ bw_set_menus(BalsaWindow * window)
         {"previous-message",      previous_message_activated},
         {"next-unread",           next_unread_activated},
         {"next-flagged",          next_flagged_activated},
-        {"hide-deleted",          toggle_activated, NULL, "false",
+        {"hide-deleted",          libbalsa_toggle_activated, NULL, "false",
                                   hide_change_state},
-        {"hide-undeleted",        toggle_activated, NULL, "false",
+        {"hide-undeleted",        libbalsa_toggle_activated, NULL, "false",
                                   hide_change_state},
-        {"hide-read",             toggle_activated, NULL, "false",
+        {"hide-read",             libbalsa_toggle_activated, NULL, "false",
                                   hide_change_state},
-        {"hide-unread",           toggle_activated, NULL, "false",
+        {"hide-unread",           libbalsa_toggle_activated, NULL, "false",
                                   hide_change_state},
-        {"hide-flagged",          toggle_activated, NULL, "false",
+        {"hide-flagged",          libbalsa_toggle_activated, NULL, "false",
                                   hide_change_state},
-        {"hide-unflagged",        toggle_activated, NULL, "false",
+        {"hide-unflagged",        libbalsa_toggle_activated, NULL, "false",
                                   hide_change_state},
-        {"hide-answered",         toggle_activated, NULL, "false",
+        {"hide-answered",         libbalsa_toggle_activated, NULL, "false",
                                   hide_change_state},
-        {"hide-unanswered",       toggle_activated, NULL, "false",
+        {"hide-unanswered",       libbalsa_toggle_activated, NULL, "false",
                                   hide_change_state},
         {"reset-filter",          reset_filter_activated},
         {"mailbox-select-all",    mailbox_select_all_activated},

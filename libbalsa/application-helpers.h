@@ -36,5 +36,8 @@ GtkWidget *libbalsa_window_get_menu_bar(GtkApplicationWindow * window,
                                         gint                   n_entries,
                                         const gchar          * ui_file,
                                         GError              ** error);
+void libbalsa_toggle_activated(GSimpleAction * action,
+                               GVariant      * parameter,
+                               gpointer        user_data);
 
 #endif				/* __LIBBALSA_APPLICATION_HELPERS_H__ */

@@ -58,7 +58,7 @@ typedef enum {
 
 
 struct _BalsaWindow {
-    GtkWindow window;
+    GtkApplicationWindow window;
 
     GtkWidget *toolbar;
     GtkWidget *sos_bar;
@@ -78,12 +78,6 @@ struct _BalsaWindow {
 
     guint set_message_id;
 
-    GtkActionGroup *action_group;
-    GtkActionGroup *mailbox_action_group;
-    GtkActionGroup *message_action_group;
-    GtkActionGroup *current_message_action_group;
-    GtkActionGroup *modify_message_action_group;
-
     /* Progress bar stuff: */
     BalsaWindowProgress progress_type;
     guint activity_handler;
@@ -102,7 +96,7 @@ struct _BalsaWindow {
 };
 
 struct _BalsaWindowClass {
-    GtkWindowClass parent_class;
+    GtkApplicationWindowClass parent_class;
 
     void (*open_mbnode)  (BalsaWindow * window,
                           BalsaMailboxNode * mbnode,
@@ -146,7 +140,6 @@ gboolean mail_progress_notify_cb(GIOChannel * source,
 gboolean send_progress_notify_cb(GIOChannel * source,
                                  GIOCondition condition,
                                  BalsaWindow ** window);
-void check_new_messages_cb(GtkAction * action, gpointer data);
 void check_new_messages_real(BalsaWindow * window, int type);
 void check_new_messages_count(LibBalsaMailbox * mailbox, gboolean notify);
 void empty_trash(BalsaWindow * window);

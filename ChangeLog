@@ -1,5 +1,95 @@
 2013-07-22  Peter Bloomfield
 
+	Make main-window a GtkApplicationWindow, and port menus from
+	GtkUIManager to GtkBuilder and from GtkAction to GAction
+
+	* src/main-window.c (balsa_window_get_toolbar_model),
+	(bw_action_set_boolean), (bw_action_get_boolean),
+	(bw_action_set_string), (bw_action_set_enabled),
+	(bw_app_action_set_enabled), (bw_actions_set_enabled),
+	(toggle_activated), (radio_activated), (bw_show_or_hide_widget),
+	(new_message_activated), (new_mbox_activated),
+	(new_maildir_activated), (new_mh_activated),
+	(new_imap_box_activated), (new_imap_folder_activated),
+	(new_imap_subfolder_activated), (address_book_activated),
+	(prefs_activated), (help_activated), (about_activated),
+	(quit_activated), (continue_activated), (get_new_mail_activated),
+	(send_queued_mail_activated), (send_and_receive_mail_activated),
+	(page_setup_activated), (print_activated), (copy_activated),
+	(select_all_activated), (select_thread_activated),
+	(find_activated), (find_next_activated),
+	(find_in_message_activated), (filters_activated),
+	(export_filters_activated), (expand_all_activated),
+	(collapse_all_activated), (zoom_in_activated),
+	(zoom_out_activated), (zoom_normal_activated),
+	(next_message_activated), (previous_message_activated),
+	(next_unread_activated), (next_flagged_activated),
+	(reset_filter_activated), (mailbox_select_all_activated),
+	(mailbox_edit_activated), (mailbox_delete_activated),
+	(mailbox_expunge_activated), (mailbox_close_activated),
+	(empty_trash_activated), (select_filters_activated),
+	(remove_duplicates_activated), (reply_activated),
+	(reply_all_activated), (reply_group_activated),
+	(forward_attached_activated), (forward_inline_activated),
+	(pipe_activated), (next_part_activated), (previous_part_activated),
+	(save_part_activated), (view_source_activated),
+	(copy_message_activated), (select_text_activated),
+	(move_to_trash_activated), (toggle_flag),
+	(toggle_flagged_activated), (toggle_deleted_activated),
+	(toggle_new_activated), (toggle_answered_activated),
+	(store_address_activated), (show_mailbox_tree_change_state),
+	(show_mailbox_tabs_change_state), (show_toolbar_change_state),
+	(show_statusbar_change_state), (show_sos_bar_change_state),
+	(wrap_change_state), (hide_change_state),
+	(bw_reset_show_all_headers), (header_change_state),
+	(threading_change_state), (bw_set_menus), (bw_enable_next_unread),
+	(balsa_window_new), (bw_enable_expand_collapse),
+	(bw_next_unread_mailbox), (bw_enable_mailbox_menus),
+	(balsa_window_update_book_menus), (bw_enable_message_menus),
+	(bw_enable_edit_menus), (bw_enable_view_menus),
+	(enable_empty_trash), (balsa_window_enable_continue),
+	(bw_enable_part_menu_items), (bw_set_threading_menu),
+	(bw_set_filter_menu), (bw_filter_to_int),
+	(bw_get_condition_from_int), (balsa_window_open_mbnode),
+	(balsa_window_close_mbnode), (bw_notebook_label_style),
+	(bw_mailbox_changed), (bw_notebook_label_notify),
+	(bw_notebook_label_new), (bw_real_open_mbnode_idle_cb),
+	(bw_real_open_mbnode_thread), (balsa_window_real_open_mbnode),
+	(bw_focus_idle), (balsa_window_real_close_mbnode),
+	(balsa_identities_changed), (bw_close_mailbox_on_timer),
+	(balsa_window_destroy), (balsa_window_refresh),
+	(bw_register_open_mailbox), (bw_unregister_open_mailbox),
+	(bw_is_open_mailbox), (bw_check_mailbox_list),
+	(bw_add_mbox_to_checklist), (bw_imap_check_test),
+	(bw_progress_dialog_destroy_cb), (bw_progress_dialog_response_cb),
+	(ensure_check_mail_dialog), (bw_mailbox_check),
+	(check_new_messages_real), (bw_check_new_messages),
+	(check_new_messages_count), (bw_check_messages_thread_idle_cb),
+	(bw_check_messages_thread), (mail_progress_notify_cb),
+	(send_progress_notify_cb),
+	(bw_get_new_message_notification_string),
+	(bw_display_new_mail_notification),
+	(mw_mbox_change_connection_status),
+	(bw_change_connection_status_idle),
+	(balsa_window_find_current_index), (bw_open_mailbox_cb),
+	(bw_find_real), (bw_hide_changed_set_view_filter),
+	(bw_reset_filter), (update_view_menu),
+	(balsa_window_set_statusbar), (balsa_window_next_unread):
+	* src/main-window.h: BalsaWindow now subclasses
+	GtkApplicationWindow.
+	* src/message-window.c (message_window_new): use new toolbar
+	API.
+	* src/sendmsg-window.c (sendmsg_window_new): ditto.
+	* src/toolbar-factory.c (balsa_toolbar_model_add_entries),
+	(tm_has_second_line), (tm_changed_cb), (tm_changed_old_cb),
+	(tm_toolbar_weak_notify), (tm_realize_cb), (balsa_toolbar_new):
+	main-window has a GActionMap, not a GtkUIManager.
+	* src/toolbar-factory.h: temporary API.
+	* src/toolbar-prefs.c (customize_dialog_cb),
+	(create_toolbar_page): temporary transition code.
+
+2013-07-22  Peter Bloomfield
+
 	* src/balsa-icons.c (load_balsa_pixmap): do not leak pixbuf.
 
 2013-07-22  Peter Bloomfield

@@ -153,10 +153,14 @@ customize_dialog_cb(GtkWidget * widget, gpointer data)
 
     /* The order of pages must be consistent with the BalsaToolbarType
      * enum. */
+#if 0
     model = balsa_window_get_toolbar_model();
     ui_manager = balsa_window_ui_manager_new(NULL);
     child = create_toolbar_page(model, ui_manager);
     g_object_unref(ui_manager);
+#else
+    child = gtk_label_new("Sorry, this toolbar cannot be edited yet.");
+#endif
     gtk_notebook_append_page(GTK_NOTEBOOK(notebook), child,
                              gtk_label_new(_("Main window")));
 
@@ -406,7 +410,7 @@ create_toolbar_page(BalsaToolbarModel * model, GtkUIManager * ui_manager)
                                       -1, NULL);
 
     /* The preview is an actual, fully functional toolbar */
-    page->toolbar = balsa_toolbar_new(model, ui_manager);
+    page->toolbar = balsa_toolbar_new(model, G_OBJECT(ui_manager));
     gtk_widget_set_sensitive(page->toolbar, FALSE);
 
     /* embedded in a scrolled_window */

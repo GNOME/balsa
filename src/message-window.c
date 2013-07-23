@@ -582,7 +582,7 @@ message_window_new(LibBalsaMailbox * mailbox, guint msgno)
     gtk_box_pack_start(GTK_BOX(vbox), menubar, FALSE, FALSE, 0);
 #endif
 
-    mw->toolbar = balsa_toolbar_new(model, ui_manager);
+    mw->toolbar = balsa_toolbar_new(model, G_OBJECT(ui_manager));
     gtk_box_pack_start(GTK_BOX(vbox), mw->toolbar, FALSE, FALSE, 0);
 
     /* Now that we have installed the menubar and toolbar, we no longer

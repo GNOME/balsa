@@ -4664,7 +4664,7 @@ sendmsg_window_new()
     gtk_box_pack_start(GTK_BOX(main_box), menubar, FALSE, FALSE, 0);
 #endif
 
-    bsmsg->toolbar = balsa_toolbar_new(model, ui_manager);
+    bsmsg->toolbar = balsa_toolbar_new(model, G_OBJECT(ui_manager));
     gtk_box_pack_start(GTK_BOX(main_box), bsmsg->toolbar,
                        FALSE, FALSE, 0);
 

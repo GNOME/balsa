@@ -329,6 +329,19 @@ tm_add_action(BalsaToolbarModel * model, const gchar * stock_id,
 }
 
 void
+balsa_toolbar_model_add_entries(BalsaToolbarModel       * model,
+                                const BalsaToolbarEntry * entries,
+                                guint                     n_entries)
+{
+    guint i;
+
+    for (i = 0; i < n_entries; i++) {
+        const BalsaToolbarEntry *entry = &entries[i];
+        tm_add_action(model, entry->icon, entry->action);
+    }
+}
+
+void
 balsa_toolbar_model_add_actions(BalsaToolbarModel * model,
                                 const GtkActionEntry * entries,
                                 guint n_entries)
@@ -412,12 +425,7 @@ tm_has_second_line(BalsaToolbarModel * model)
         const gchar *icon = list->data;
         gint button = get_toolbar_button_index(icon);
 
-        if (button < 0) {
-            g_warning("button '%s' not found. ABORT!\n", icon);
-            continue;
-        }
-
-        if (strchr(balsa_toolbar_button_text(button), '\n'))
+        if (button >= 0 && strchr(balsa_toolbar_button_text(button), '\n'))
             return TRUE;
     }
 
@@ -566,7 +574,15 @@ tm_set_style(GtkWidget * toolbar, BalsaToolbarModel * model)
 /* Update a real toolbar when the model has changed.
  */
 static void
-tm_changed_cb(BalsaToolbarModel * model, GtkUIManager * ui_manager)
+tm_changed_cb(BalsaToolbarModel * model, GtkWidget * toolbar)
+{
+    tm_set_style(toolbar, model);
+
+    tm_save_model(model);
+}
+
+static void
+tm_changed_old_cb(BalsaToolbarModel * model, GtkUIManager * ui_manager)
 {
     GArray *merge_ids =
         g_object_get_data(G_OBJECT(ui_manager), BALSA_TOOLBAR_MERGE_IDS);
@@ -589,16 +605,16 @@ tm_changed_cb(BalsaToolbarModel * model, GtkUIManager * ui_manager)
 
 typedef struct {
     BalsaToolbarModel *model;
-    GtkUIManager      *ui_manager;
+    GObject           *object;
     GtkWidget         *menu;
 } toolbar_info;
 
 static void
 tm_toolbar_weak_notify(toolbar_info * info, GtkWidget * toolbar)
 {
-    g_signal_handlers_disconnect_by_func(info->model, tm_changed_cb,
-                                         info->ui_manager);
-    g_object_unref(info->ui_manager);
+    g_signal_handlers_disconnect_by_func(info->model, tm_changed_old_cb,
+                                         info->object);
+    g_object_unref(info->object);
     g_free(info);
 }
 
@@ -815,27 +831,85 @@ tm_popup_menu_cb(GtkWidget * toolbar, toolbar_info * info)
     return tm_do_popup_menu(toolbar, NULL, info);
 }
 
+static void
+tm_realize_cb(GtkWidget * toolbar, BalsaToolbarModel * model)
+{
+    tm_set_style(toolbar, model);
+}
+
 GtkWidget *balsa_toolbar_new(BalsaToolbarModel * model,
-                             GtkUIManager * ui_manager)
+                   /* FIXME: GActionMap        * action_map */
+                             GObject * object)
 {
     GtkWidget *toolbar;
     toolbar_info *info;
-    GArray *merge_ids = g_array_new(FALSE, FALSE, sizeof(guint));
-
-    g_object_set_data_full(G_OBJECT(ui_manager), BALSA_TOOLBAR_MERGE_IDS,
-                           merge_ids, (GDestroyNotify) bt_free_merge_ids);
-
-    tm_populate(model, ui_manager, merge_ids);
-    g_signal_connect(model, "changed", G_CALLBACK(tm_changed_cb),
-                     ui_manager);
 
     info = g_new(toolbar_info, 1);
     info->model = model;
-    info->ui_manager = g_object_ref(ui_manager);
+    info->object = g_object_ref(object);
     info->menu = NULL;
 
-    toolbar = gtk_ui_manager_get_widget(ui_manager, "/Toolbar");
-    tm_set_style(toolbar, model);
+    if (GTK_IS_UI_MANAGER(object)) {
+        GtkUIManager *ui_manager = GTK_UI_MANAGER(object);
+        GArray *merge_ids = g_array_new(FALSE, FALSE, sizeof(guint));
+
+        g_object_set_data_full(G_OBJECT(ui_manager), BALSA_TOOLBAR_MERGE_IDS,
+                               merge_ids, (GDestroyNotify) bt_free_merge_ids);
+
+        tm_populate(model, ui_manager, merge_ids);
+        g_signal_connect(model, "changed", G_CALLBACK(tm_changed_old_cb),
+                         ui_manager);
+
+        toolbar = gtk_ui_manager_get_widget(ui_manager, "/Toolbar");
+    } else {
+        GActionMap *action_map = G_ACTION_MAP(object);
+        gboolean style_is_both;
+        gboolean make_two_line;
+        GSList *current = balsa_toolbar_model_get_current(model);
+        GSList *l;
+
+        style_is_both = (model->style == GTK_TOOLBAR_BOTH
+                         || (model->style == (GtkToolbarStyle) -1
+                             && tm_default_style() == GTK_TOOLBAR_BOTH));
+        make_two_line = style_is_both && tm_has_second_line(model);
+
+        toolbar = gtk_toolbar_new();
+        for (l = current; l; l = l->next) {
+            gchar *action_name, *icon_name;
+            GtkToolItem *item;
+
+            action_name = l->data;
+            l = l->next;
+            icon_name = l->data;
+
+            if (!*action_name) {
+                item = gtk_separator_tool_item_new();
+            } else {
+                GtkWidget *icon;
+                GAction *action;
+                gchar *prefixed_action;
+
+                icon = gtk_image_new_from_icon_name
+                    (icon_name, GTK_ICON_SIZE_SMALL_TOOLBAR);
+                item = gtk_tool_button_new(icon, action_name);
+                tm_set_tool_item_label(GTK_TOOL_ITEM(item), icon_name,
+                                       make_two_line);
+
+                action =
+                    g_action_map_lookup_action(action_map, action_name);
+                prefixed_action =
+                    g_strconcat(action ? "win." : "app.", action_name,
+                                NULL);
+                gtk_actionable_set_action_name(GTK_ACTIONABLE(item),
+                                               prefixed_action);
+                g_free(prefixed_action);
+            }
+            gtk_container_add(GTK_CONTAINER(toolbar), GTK_WIDGET(item));
+        }
+        g_signal_connect(model, "changed", G_CALLBACK(tm_changed_cb),
+                         toolbar);
+    }
+    g_signal_connect(toolbar, "realize", G_CALLBACK(tm_realize_cb), model);
     g_object_weak_ref(G_OBJECT(toolbar),
                       (GWeakNotify) tm_toolbar_weak_notify, info);
 
@@ -843,6 +917,8 @@ GtkWidget *balsa_toolbar_new(BalsaToolbarModel * model,
                      G_CALLBACK(tm_button_press_cb), info);
     g_signal_connect(toolbar, "popup-menu", G_CALLBACK(tm_popup_menu_cb),
                      info);
+
+    gtk_widget_show_all(toolbar);
 
     return toolbar;
 }

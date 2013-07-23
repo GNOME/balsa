@@ -959,6 +959,31 @@ new_imap_subfolder_activated(GSimpleAction * action,
 }
 
 static void
+toolbars_activated(GSimpleAction * action,
+                   GVariant      * parameter,
+                   gpointer        user_data)
+{
+    customize_dialog_cb(user_data, user_data);
+}
+
+static void
+identities_activated(GSimpleAction * action,
+                     GVariant      * parameter,
+                     gpointer        user_data)
+{
+    GtkWindow *window = GTK_WINDOW(user_data);
+
+    libbalsa_identity_config_dialog(window,
+                                    &balsa_app.identities,
+                                    &balsa_app.current_ident,
+#if ENABLE_ESMTP
+                                    balsa_app.smtp_servers,
+#endif /* ENABLE_ESMTP */
+                                    (void(*)(gpointer))
+                                    balsa_identities_changed);
+}
+
+static void
 address_book_activated(GSimpleAction * action,
                        GVariant      * parameter,
                        gpointer        user_data)
@@ -1928,6 +1953,8 @@ bw_set_menus(BalsaWindow * window)
         {"new-imap-box",          new_imap_box_activated},
         {"new-imap-folder",       new_imap_folder_activated},
         {"new-imap-subfolder",    new_imap_subfolder_activated},
+        {"toolbars",              toolbars_activated},
+        {"identities",            identities_activated},
         {"address-book",          address_book_activated},
         {"prefs",                 prefs_activated},
         {"help",                  help_activated},

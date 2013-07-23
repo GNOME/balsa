@@ -1,5 +1,10 @@
 2013-07-22  Peter Bloomfield
 
+	* src/main-window.c (toolbars_activated), (identities_activated),
+	(bw_set_menus): restore Settings submenu.
+
+2013-07-22  Peter Bloomfield
+
 	* src/toolbar-factory.c (tm_load_model): do not load stale
 	options.
 

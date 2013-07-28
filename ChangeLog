@@ -1,5 +1,15 @@
 2013-07-28  Peter Bloomfield
 
+	* src/message-window.c: make message-window a
+	GtkApplicationWindow, and port menus from GtkUIManager to
+	GtkBuilder and from GtkAction to GAction.
+	* src/toolbar-prefs.c: temporarily disable editing message-window
+	toolbar.
+	* ui/message-window.ui: new file.
+	* ui/Makefile.am: add it.
+
+2013-07-28  Peter Bloomfield
+
 	* libbalsa/application-helpers.c (libbalsa_window_get_menu_bar):
 	add callback-data argument;
 	(libbalsa_window_add_accelerator): new public method;

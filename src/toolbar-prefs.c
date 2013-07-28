@@ -171,10 +171,14 @@ customize_dialog_cb(GtkWidget * widget, gpointer data)
     gtk_notebook_append_page(GTK_NOTEBOOK(notebook), child,
                              gtk_label_new(_("Compose window")));
 
+#if 0
     model = message_window_get_toolbar_model();
     ui_manager = message_window_ui_manager_new(NULL);
     child = create_toolbar_page(model, ui_manager);
     g_object_unref(ui_manager);
+#else
+    child = gtk_label_new("Sorry, this toolbar cannot be edited yet.");
+#endif
     gtk_notebook_append_page(GTK_NOTEBOOK(notebook), child,
                              gtk_label_new(_("Message window")));
 

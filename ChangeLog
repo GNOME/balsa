@@ -1,3 +1,15 @@
+2013-07-28  Peter Bloomfield
+
+	* libbalsa/application-helpers.c (libbalsa_window_get_menu_bar):
+	add callback-data argument;
+	(libbalsa_window_add_accelerator): new public method;
+	(libbalsa_radio_activated): common callback for the "activated"
+	signal of a radio-GAction.
+	* libbalsa/application-helpers.h: new API.
+	* libbalsa/source-viewer.c (libbalsa_show_message_source): use
+	new API.
+	* src/main-window.c (bw_set_menus): ditto,
+
 2013-07-23  Peter Bloomfield
 
 	* src/main-window.c (bw_alt_n_cb), (bw_set_alt_bindings),

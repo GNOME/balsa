@@ -35,9 +35,19 @@ GtkWidget *libbalsa_window_get_menu_bar(GtkApplicationWindow * window,
                                         const GActionEntry   * entries,
                                         gint                   n_entries,
                                         const gchar          * ui_file,
-                                        GError              ** error);
-void libbalsa_toggle_activated(GSimpleAction * action,
-                               GVariant      * parameter,
-                               gpointer        user_data);
+                                        GError              ** error,
+                                        gpointer               cb_data);
+
+void libbalsa_window_add_accelerator   (GtkApplicationWindow * window,
+                                        const gchar          * accel,
+                                        const gchar          * action_name);
+
+void libbalsa_toggle_activated         (GSimpleAction        * action,
+                                        GVariant             * parameter,
+                                        gpointer               user_data);
+
+void libbalsa_radio_activated          (GSimpleAction        * action,
+                                        GVariant             * parameter,
+                                        gpointer               user_data);
 
 #endif				/* __LIBBALSA_APPLICATION_HELPERS_H__ */

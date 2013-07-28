@@ -230,7 +230,7 @@ libbalsa_show_message_source(GtkApplication  * application,
     menu_bar = libbalsa_window_get_menu_bar(GTK_APPLICATION_WINDOW(window),
                                             win_entries,
                                             G_N_ELEMENTS(win_entries),
-                                            ui_file, &err);
+                                            ui_file, &err, window);
     if (!menu_bar) {
         libbalsa_information(LIBBALSA_INFORMATION_WARNING,
                              _("Error adding from %s: %s\n"), ui_file,

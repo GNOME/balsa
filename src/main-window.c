@@ -861,19 +861,6 @@ bw_actions_set_enabled(BalsaWindow         * window,
  */
 
 /*
- * Common callback for the "activated" signal of a radio action
- */
-
-static void
-radio_activated(GSimpleAction * action,
-                GVariant      * parameter,
-                gpointer        user_data)
-{
-    g_action_change_state(G_ACTION(action), parameter);
-}
-
-
-/*
  * Helper for some show/hide actions
  */
 
@@ -1988,9 +1975,9 @@ bw_set_menus(BalsaWindow * window)
                                   show_sos_bar_change_state},
         {"wrap",                  libbalsa_toggle_activated, NULL, "false",
                                   wrap_change_state},
-        {"headers",               radio_activated, "s", "'none'",
+        {"headers",               libbalsa_radio_activated, "s", "'none'",
                                   header_change_state},
-        {"threading",             radio_activated, "s", "'flat'",
+        {"threading",             libbalsa_radio_activated, "s", "'flat'",
                                   threading_change_state},
         {"expand-all",            expand_all_activated},
         {"collapse-all",          collapse_all_activated},

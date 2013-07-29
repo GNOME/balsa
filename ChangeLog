@@ -1,6 +1,6 @@
 2013-07-29  Peter Bloomfield
 
-	Fix part of bug #704718 (Geoff Hughes).
+	Fix part of bug #704718 (Geoffrey Leach).
 
 	* src/pref-manager.c (apply_prefs), (set_prefs): apply and set
 	BalsaApplication::fatal_message.

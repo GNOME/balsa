@@ -1,3 +1,10 @@
+2013-07-29  Peter Bloomfield
+
+	Fix part of bug #704718 (Geoff Hughes).
+
+	* src/pref-manager.c (apply_prefs), (set_prefs): apply and set
+	BalsaApplication::fatal_message.
+
 2013-07-28  Peter Bloomfield
 
 	* src/message-window.c (mw_reset_show_all_headers),

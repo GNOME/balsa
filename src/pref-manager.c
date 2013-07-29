@@ -1090,6 +1090,8 @@ apply_prefs(GtkDialog * pbox)
         pm_combo_box_get_level(pui->warning_message_menu);
     balsa_app.error_message =
         pm_combo_box_get_level(pui->error_message_menu);
+    balsa_app.fatal_message =
+        pm_combo_box_get_level(pui->fatal_message_menu);
     balsa_app.debug_message =
         pm_combo_box_get_level(pui->debug_message_menu);
 
@@ -1319,6 +1321,8 @@ set_prefs(void)
                            balsa_app.warning_message);
     pm_combo_box_set_level(pui->error_message_menu,
                            balsa_app.error_message);
+    pm_combo_box_set_level(pui->fatal_message_menu,
+                           balsa_app.fatal_message);
     pm_combo_box_set_level(pui->debug_message_menu,
                            balsa_app.debug_message);
 

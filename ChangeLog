@@ -1,5 +1,13 @@
 2013-07-28  Peter Bloomfield
 
+	* src/message-window.c (mw_reset_show_all_headers),
+	(mw_set_buttons_sensitive), (mw_set_message),
+	(message_window_move_message), (mw_mru_menu_cb),
+	(mw_select_part_cb), (message_window_new): move code to
+	eliminate local declarations.
+
+2013-07-28  Peter Bloomfield
+
 	* src/message-window.c: make message-window a
 	GtkApplicationWindow, and port menus from GtkUIManager to
 	GtkBuilder and from GtkAction to GAction.

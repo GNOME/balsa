@@ -1,3 +1,7 @@
+2013-07-31  Peter Bloomfield
+
+	* ui/sendmsg-window.ui: new file with xml input for GtkBuilder.
+
 2013-07-29  Peter Bloomfield
 
 	Fix part of bug #704718 (Geoffrey Leach).

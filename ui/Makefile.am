@@ -1,4 +1,8 @@
-balsa_ui_FILES = source-viewer.ui main-window.ui message-window.ui
+balsa_ui_FILES =                   \
+		 source-viewer.ui  \
+		 main-window.ui    \
+		 message-window.ui \
+		 sendmsg-window.ui
 
 EXTRA_DIST = $(balsa_ui_FILES)
 

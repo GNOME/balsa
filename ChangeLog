@@ -1,5 +1,53 @@
 2013-07-31  Peter Bloomfield
 
+	Port compose window to GMenu and friends
+
+	* src/sendmsg-window.c (delete_event_cb), (sw_close_activated),
+	(destroy_event_cb), (sw_edit_activated),
+	(sw_select_ident_activated), (sw_get_action),
+	(sw_action_set_enabled), (sw_actions_set_enabled),
+	(sw_action_get_enabled), (sw_action_set_active),
+	(sw_action_get_active), (update_bsmsg_identity),
+	(add_urlref_attachment), (sw_attach_file_activated),
+	(sw_include_messages_activated), (sw_attach_messages_activated),
+	(sw_can_undo_cb), (sw_can_redo_cb), (quote_parts_select_dlg),
+	(sw_insert_sig_activated), (sw_quote_activated),
+	(sendmsg_window_get_toolbar_model), (bsmsg_identities_changed_cb),
+	(insert_initial_sig), (bsm_prepare_for_setup), (bsm_finish_setup),
+	(set_cc_from_all_recipients), (decode_and_strdup),
+	(sendmsg_window_process_url), (sw_attach_file),
+	(sw_include_file_activated), (subject_not_empty),
+	(check_suggest_encryption), (send_message_handler),
+	(sw_toolbar_send_activated), (sw_send_activated),
+	(sw_queue_activated), (message_postpone), (sw_postpone_activated),
+	(sw_save_activated), (sw_page_setup_activated),
+	(sw_print_activated), (sw_buffer_insert_text),
+	(sw_buffer_set_undo), (sw_spell_attach), (sw_undo_activated),
+	(sw_redo_activated), (sw_cut_activated), (sw_copy_activated),
+	(sw_paste_activated), (sw_select_text_activated),
+	(sw_wrap_body_activated), (sw_reflow_activated), (check_readiness),
+	(sw_entry_helper), (sw_from_change_state),
+	(sw_recips_change_state), (sw_reply_to_change_state),
+	(sw_fcc_change_state), (sw_request_mdn_change_state),
+	(sw_show_toolbar_change_state), (sw_flowed_change_state),
+	(sw_send_html_change_state), (sw_gpg_helper),
+	(sw_sign_change_state), (sw_encrypt_change_state),
+	(sw_gpg_mode_change_state), (init_menus),
+	(sw_spell_check_change_state), (sw_spell_check_activated),
+	(lang_set_cb), (bsmsg_update_gpg_ui_on_ident_change),
+	(bsmsg_setup_gpg_ui), (bsmsg_setup_gpg_ui_by_mode),
+	(sw_menubar_foreach), (sendmsg_window_new),
+	(sendmsg_window_compose), (sendmsg_window_compose_with_address),
+	(sendmsg_window_reply), (sendmsg_window_reply_embedded),
+	(sendmsg_window_forward), (sendmsg_window_continue):
+	* src/sendmsg-window.h: add member ready-to-send.
+	* src/toolbar-factory.c (tm_toolbar_weak_notify),
+	(balsa_toolbar_new): drop GtkUIManager code.
+	* src/toolbar-prefs.c (customize_dialog_cb): ditto.
+	* ui/Makefile.am: add sendmsg-window.ui.
+
+2013-07-31  Peter Bloomfield
+
 	* ui/sendmsg-window.ui: new file with xml input for GtkBuilder.
 
 2013-07-29  Peter Bloomfield

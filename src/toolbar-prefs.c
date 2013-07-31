@@ -69,11 +69,14 @@ struct ToolbarPage_ {
 /* Callbacks. */
 static void tp_dialog_response_cb(GtkDialog * dialog, gint response,
                                   gpointer data);
+#if 0
 static void add_button_cb(GtkWidget *, ToolbarPage * page);
 static void remove_button_cb(GtkWidget *, ToolbarPage * page);
 static void back_button_cb(GtkWidget *, ToolbarPage * page);
 static void forward_button_cb(GtkWidget *, ToolbarPage * page);
+#endif
 static void wrap_toggled_cb(GtkWidget * widget, GtkNotebook * notebook);
+#if 0
 static void available_selection_changed_cb(GtkTreeSelection * selection,
                                            ToolbarPage * page);
 static void current_selection_changed_cb(GtkTreeSelection * selection,
@@ -102,6 +105,7 @@ static void tp_page_remove_selected(ToolbarPage * page);
 static void tp_store_set(GtkListStore * store, GtkTreeIter * iter,
                          gint item);
 static void replace_nl_with_space(char* str);
+#endif
 
 /* Public methods. */
 
@@ -116,9 +120,11 @@ customize_dialog_cb(GtkWidget * widget, gpointer data)
     GtkWidget *option_box;
     GtkWidget *wrap_button;
     GtkWidget *active_window = data;
-    BalsaToolbarModel *model;
     BalsaToolbarType   type;
+#if 0
+    BalsaToolbarModel *model;
     GtkUIManager * ui_manager;
+#endif
     GtkWidget *content_area;
 
     /* There can only be one */
@@ -164,10 +170,14 @@ customize_dialog_cb(GtkWidget * widget, gpointer data)
     gtk_notebook_append_page(GTK_NOTEBOOK(notebook), child,
                              gtk_label_new(_("Main window")));
 
+#if 0
     model = sendmsg_window_get_toolbar_model();
     ui_manager = sendmsg_window_ui_manager_new(NULL);
     child = create_toolbar_page(model, ui_manager);
     g_object_unref(ui_manager);
+#else
+    child = gtk_label_new("Sorry, this toolbar cannot be edited yet.");
+#endif
     gtk_notebook_append_page(GTK_NOTEBOOK(notebook), child,
                              gtk_label_new(_("Compose window")));
 
@@ -247,6 +257,7 @@ wrap_toggled_cb(GtkWidget * widget, GtkNotebook * notebook)
     }
 }
 
+#if 0
 /* Button callbacks: each makes the appropriate change to the
  * page->current GtkTreeView, then refreshes the page's
  * BalsaToolbarModel and GtkToolbar; add_button_cb and remove_button_cb
@@ -344,6 +355,7 @@ current_selection_changed_cb(GtkTreeSelection * selection, ToolbarPage * page)
     gtk_widget_set_sensitive(page->forward_button, forward);
 }
 
+#endif
 /* Callback for the "response" signal of the dialog. */
 static void
 tp_dialog_response_cb(GtkDialog * dialog, gint response, gpointer data)
@@ -372,6 +384,7 @@ tp_dialog_response_cb(GtkDialog * dialog, gint response, gpointer data)
     }
 }
 
+#if 0
 /* Helpers. */
 
 /* Create a page for the main notebook.
@@ -881,3 +894,4 @@ replace_nl_with_space(char* str)
 	str++;
     }
 }
+#endif

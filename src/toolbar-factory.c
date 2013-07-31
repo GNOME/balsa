@@ -475,59 +475,6 @@ tm_set_tool_item_label(GtkToolItem * tool_item, const gchar * stock_id,
 
 static GtkToolbarStyle tm_default_style(void);
 
-static void
-tm_populate(BalsaToolbarModel * model, GtkUIManager * ui_manager,
-            GArray * merge_ids)
-{
-    gboolean style_is_both;
-    gboolean make_two_line;
-    GSList *list;
-
-    style_is_both = (model->style == GTK_TOOLBAR_BOTH
-                     || (model->style == (GtkToolbarStyle) -1
-                         && tm_default_style() == GTK_TOOLBAR_BOTH));
-    make_two_line = style_is_both && tm_has_second_line(model);
-
-    for (list = balsa_toolbar_model_get_current(model); list;
-         list = list->next) {
-        const gchar *stock_id = list->data;
-        guint merge_id = gtk_ui_manager_new_merge_id(ui_manager);
-
-        g_array_append_val(merge_ids, merge_id);
-
-        if (!*stock_id)
-            gtk_ui_manager_add_ui(ui_manager, merge_id, "/Toolbar",
-                                  NULL, NULL, GTK_UI_MANAGER_SEPARATOR,
-                                  FALSE);
-        else {
-            gchar *path, *name;
-            GtkWidget *tool_item;
-
-            name = g_hash_table_lookup(model->legal, stock_id);
-            if (!name) {
-                g_warning("no name for stock_id \"%s\"", stock_id);
-                continue;
-            }
-            gtk_ui_manager_add_ui(ui_manager, merge_id, "/Toolbar",
-                                  name, name, GTK_UI_MANAGER_AUTO, FALSE);
-            /* Replace the long menu-item label with the short
-             * tool-button label: */
-            path = g_strconcat("/Toolbar/", name, NULL);
-            tool_item = gtk_ui_manager_get_widget(ui_manager, path);
-            g_free(path);
-            tm_set_tool_item_label(GTK_TOOL_ITEM(tool_item), stock_id,
-                                   make_two_line);
-        }
-    }
-}
-
-#define BALSA_TOOLBAR_MERGE_IDS "balsa-toolbar-merge-ids"
-static void
-bt_free_merge_ids(GArray * merge_ids)
-{
-    g_array_free(merge_ids, TRUE);
-}
-
 static const struct {
     const gchar *text;
     const gchar *config_name;
@@ -585,28 +532,6 @@ tm_changed_cb(BalsaToolbarModel * model, GtkWidget * toolbar)
     tm_save_model(model);
 }
 
-static void
-tm_changed_old_cb(BalsaToolbarModel * model, GtkUIManager * ui_manager)
-{
-    GArray *merge_ids =
-        g_object_get_data(G_OBJECT(ui_manager), BALSA_TOOLBAR_MERGE_IDS);
-    guint i;
-    GtkWidget *toolbar;
-
-    for (i = 0; i < merge_ids->len; i++) {
-        guint merge_id = g_array_index(merge_ids, guint, i);
-        gtk_ui_manager_remove_ui(ui_manager, merge_id);
-    }
-    merge_ids->len = 0;
-
-    tm_populate(model, ui_manager, merge_ids);
-
-    toolbar = gtk_ui_manager_get_widget(ui_manager, "/Toolbar");
-    tm_set_style(toolbar, model);
-
-    tm_save_model(model);
-}
-
 typedef struct {
     BalsaToolbarModel *model;
     GObject           *object;
@@ -616,8 +541,6 @@ typedef struct {
 static void
 tm_toolbar_weak_notify(toolbar_info * info, GtkWidget * toolbar)
 {
-    g_signal_handlers_disconnect_by_func(info->model, tm_changed_old_cb,
-                                         info->object);
     g_object_unref(info->object);
     g_free(info);
 }
@@ -845,74 +768,66 @@ GtkWidget *balsa_toolbar_new(BalsaToolbarModel * model,
                    /* FIXME: GActionMap        * action_map */
                              GObject * object)
 {
-    GtkWidget *toolbar;
     toolbar_info *info;
+    GActionMap *action_map = G_ACTION_MAP(object);
+    gboolean style_is_both;
+    gboolean make_two_line;
+    GtkWidget *toolbar;
+    GSList *current = balsa_toolbar_model_get_current(model);
+    GSList *l;
 
     info = g_new(toolbar_info, 1);
     info->model = model;
     info->object = g_object_ref(object);
     info->menu = NULL;
 
-    if (GTK_IS_UI_MANAGER(object)) {
-        GtkUIManager *ui_manager = GTK_UI_MANAGER(object);
-        GArray *merge_ids = g_array_new(FALSE, FALSE, sizeof(guint));
+    style_is_both = (model->style == GTK_TOOLBAR_BOTH
+                     || (model->style == (GtkToolbarStyle) - 1
+                         && tm_default_style() == GTK_TOOLBAR_BOTH));
+    make_two_line = style_is_both && tm_has_second_line(model);
 
-        g_object_set_data_full(G_OBJECT(ui_manager), BALSA_TOOLBAR_MERGE_IDS,
-                               merge_ids, (GDestroyNotify) bt_free_merge_ids);
+    toolbar = gtk_toolbar_new();
+    for (l = current; l; l = l->next) {
+        gchar *action_name, *icon_name;
+        GtkToolItem *item;
 
-        tm_populate(model, ui_manager, merge_ids);
-        g_signal_connect(model, "changed", G_CALLBACK(tm_changed_old_cb),
-                         ui_manager);
+        action_name = l->data;
+        l = l->next;
+        icon_name = l->data;
 
-        toolbar = gtk_ui_manager_get_widget(ui_manager, "/Toolbar");
-    } else {
-        GActionMap *action_map = G_ACTION_MAP(object);
-        gboolean style_is_both;
-        gboolean make_two_line;
-        GSList *current = balsa_toolbar_model_get_current(model);
-        GSList *l;
+        if (!*action_name) {
+            item = gtk_separator_tool_item_new();
+        } else {
+            GtkWidget *icon;
+            GAction *action;
+            const GVariantType *type;
+            gchar *prefixed_action;
 
-        style_is_both = (model->style == GTK_TOOLBAR_BOTH
-                         || (model->style == (GtkToolbarStyle) -1
-                             && tm_default_style() == GTK_TOOLBAR_BOTH));
-        make_two_line = style_is_both && tm_has_second_line(model);
-
-        toolbar = gtk_toolbar_new();
-        for (l = current; l; l = l->next) {
-            gchar *action_name, *icon_name;
-            GtkToolItem *item;
-
-            action_name = l->data;
-            l = l->next;
-            icon_name = l->data;
-
-            if (!*action_name) {
-                item = gtk_separator_tool_item_new();
+            icon = gtk_image_new_from_icon_name
+                (icon_name, GTK_ICON_SIZE_SMALL_TOOLBAR);
+            action = g_action_map_lookup_action(action_map, action_name);
+            if (action &&
+                (type = g_action_get_state_type(action)) &&
+                g_variant_type_equal(type, G_VARIANT_TYPE_BOOLEAN)) {
+                item = gtk_toggle_tool_button_new();
+                g_object_set(G_OBJECT(item), "icon-widget", icon,
+                             "label", action_name, NULL);
             } else {
-                GtkWidget *icon;
-                GAction *action;
-                gchar *prefixed_action;
-
-                icon = gtk_image_new_from_icon_name
-                    (icon_name, GTK_ICON_SIZE_SMALL_TOOLBAR);
                 item = gtk_tool_button_new(icon, action_name);
-                tm_set_tool_item_label(GTK_TOOL_ITEM(item), icon_name,
-                                       make_two_line);
-
-                action =
-                    g_action_map_lookup_action(action_map, action_name);
-                prefixed_action =
-                    g_strconcat(action ? "win." : "app.", action_name,
-                                NULL);
-                gtk_actionable_set_action_name(GTK_ACTIONABLE(item),
-                                               prefixed_action);
-                g_free(prefixed_action);
             }
-            gtk_container_add(GTK_CONTAINER(toolbar), GTK_WIDGET(item));
+            tm_set_tool_item_label(GTK_TOOL_ITEM(item), icon_name,
+                                   make_two_line);
+
+            prefixed_action =
+                g_strconcat(action ? "win." : "app.", action_name, NULL);
+            gtk_actionable_set_action_name(GTK_ACTIONABLE(item),
+                                           prefixed_action);
+            g_free(prefixed_action);
         }
-        g_signal_connect(model, "changed", G_CALLBACK(tm_changed_cb),
-                         toolbar);
+        gtk_container_add(GTK_CONTAINER(toolbar), GTK_WIDGET(item));
     }
+
+    g_signal_connect(model, "changed", G_CALLBACK(tm_changed_cb), toolbar);
     g_signal_connect(toolbar, "realize", G_CALLBACK(tm_realize_cb), model);
     g_object_weak_ref(G_OBJECT(toolbar),
                       (GWeakNotify) tm_toolbar_weak_notify, info);

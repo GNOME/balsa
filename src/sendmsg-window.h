@@ -112,13 +112,9 @@ extern "C" {
         /* To update cursor after text is inserted. */
         GtkTextMark *insert_mark;
 
-        GtkActionGroup *action_group;
-	GtkActionGroup *ready_action_group;
-#if !defined(ENABLE_TOUCH_UI)
-        GtkActionGroup *gpg_action_group;
-#endif                          /* ENABLE_TOUCH_UI */
         GtkWidget *paned;
         GtkSizeGroup *size_group;
+        gboolean ready_to_send;
     };
 
     BalsaSendmsg *sendmsg_window_compose(void);

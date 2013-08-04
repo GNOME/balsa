@@ -5759,6 +5759,8 @@ sw_undo_activated(GSimpleAction * action, GVariant * parameter, gpointer data)
 static void
 sw_redo_activated(GSimpleAction * action, GVariant * parameter, gpointer data)
 {
+    BalsaSendmsg *bsmsg = data;
+
     sw_buffer_swap(bsmsg, FALSE);
 }
 #endif                          /* HAVE_GTKSOURCEVIEW */

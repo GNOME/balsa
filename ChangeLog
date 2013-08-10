@@ -1,3 +1,9 @@
+2013-08-10  Peter Bloomfield
+
+	* src/main-window.c (bw_action_set_boolean): use
+	g_action_change_state instead of g_simple_action_set_state, so
+	that the state is actually changed (Carlos Franke).
+
 2013-08-04  Pawel Salek
 
 	* src/sendmsg-window.c: compile with GtkSourceview

@@ -4175,8 +4175,10 @@ static const BalsaToolbarEntry compose_toolbar[] = {
 static const BalsaToolbarEntry compose_toolbar_extras[] = {
     { "postpone",    BALSA_PIXMAP_POSTPONE    },
     { "request-mdn", BALSA_PIXMAP_REQUEST_MDN },
+#ifdef HAVE_GPGME
     { "sign",        BALSA_PIXMAP_GPG_SIGN    },
     { "encrypt",     BALSA_PIXMAP_GPG_ENCRYPT },
+#endif /* HAVE_GPGME */
     { "edit",       "gtk-edit"                }
 };
 
@@ -6625,6 +6627,7 @@ static GActionEntry win_entries[] = {
                          sw_flowed_change_state         },
     {"send-html",        libbalsa_toggle_activated, NULL, "false",
                          sw_send_html_change_state      },
+#ifdef HAVE_GPGME
     {"sign",             libbalsa_toggle_activated, NULL, "false",
                          sw_sign_change_state           },
     {"encrypt",          libbalsa_toggle_activated, NULL, "false",
@@ -6635,6 +6638,7 @@ static GActionEntry win_entries[] = {
                          sw_gpg_mode_change_state       },
     {"gpg-mode",         libbalsa_radio_activated, "s", "'smime'",
                          sw_gpg_mode_change_state       },
+#endif /* HAVE_GPGME */
     /* Only a toolbar button: */
     {"toolbar-send",     sw_toolbar_send_activated      }
 };

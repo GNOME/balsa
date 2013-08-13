@@ -6111,9 +6111,30 @@ init_menus(BalsaSendmsg * bsmsg)
         gboolean found =
             libbalsa_find_word(header_action_names[i],
                                balsa_app.compose_headers);
-        /* This action is initially active, so if found is FALSE,
-         * setting it inactive will trigger the callback, which will
-         * hide the address line. */
+        if (!found) {
+            /* Be compatible with old action-names */
+            struct {
+                const gchar *old_action_name;
+                const gchar *new_action_name;
+            } name_map[] = {
+                {"From",       "from"},
+                {"Recipients", "recips"},
+#if !defined(ENABLE_TOUCH_UI)
+                {"ReplyTo",    "reply-to"},
+#endif                          /* ENABLE_TOUCH_UI */
+                {"Fcc",        "fcc"}
+            };
+            guint j;
+
+            for (j = 0; j < G_N_ELEMENTS(name_map); j++) {
+                if (strcmp(header_action_names[i],
+                           name_map[j].new_action_name) == 0) {
+                    found =
+                        libbalsa_find_word(name_map[j].old_action_name,
+                                           balsa_app.compose_headers);
+                }
+            }
+        }
         sw_action_set_active(bsmsg, header_action_names[i], found);
     }
 

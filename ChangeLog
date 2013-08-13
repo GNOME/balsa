@@ -2,6 +2,11 @@
 
 	* src/sendmsg-window.c: compile without gpgme.
 
+2013-08-13  Peter Bloomfield
+
+	* src/sendmsg-window.c (init_menus): add transition code to read
+	old message header choices.
+
 2013-08-10  Peter Bloomfield
 
 	* src/main-window.c (bw_action_set_boolean): use

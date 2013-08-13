@@ -541,6 +541,7 @@ typedef struct {
 static void
 tm_toolbar_weak_notify(toolbar_info * info, GtkWidget * toolbar)
 {
+    g_signal_handlers_disconnect_by_data(info->model, toolbar);
     g_object_unref(info->object);
     g_free(info);
 }

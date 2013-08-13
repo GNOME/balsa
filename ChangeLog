@@ -1,3 +1,8 @@
+2013-08-13  Peter Bloomfield
+
+	* src/toolbar-factory.c (tm_toolbar_weak_notify): disconnect
+	model's "changed" signal handler when toolbar is destroyed.
+
 2013-08-13  Pawel Salek
 
 	* src/sendmsg-window.c: compile without gpgme.

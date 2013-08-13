@@ -7056,7 +7056,7 @@ sendmsg_window_continue(LibBalsaMailbox * mailbox, guint msgno)
     }
     if ((postpone_hdr =
          libbalsa_message_get_user_header(message, "X-Balsa-Format")))
-        sw_action_set_active(bsmsg, "Flowed", strcmp(postpone_hdr, "Fixed"));
+        sw_action_set_active(bsmsg, "flowed", strcmp(postpone_hdr, "Fixed"));
     if ((postpone_hdr =
          libbalsa_message_get_user_header(message, "X-Balsa-MP-Alt")))
         sw_action_set_active(bsmsg, "send-html", !strcmp(postpone_hdr, "yes"));

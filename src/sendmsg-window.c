@@ -6505,6 +6505,8 @@ bsmsg_setup_gpg_ui(BalsaSendmsg *bsmsg)
 static void
 bsmsg_setup_gpg_ui_by_mode(BalsaSendmsg *bsmsg, gint mode)
 {
+    GAction *action;
+
     /* do nothing if we don't support crypto */
     if (!balsa_app.has_openpgp && !balsa_app.has_smime)
 	return;
@@ -6513,15 +6515,16 @@ bsmsg_setup_gpg_ui_by_mode(BalsaSendmsg *bsmsg, gint mode)
     sw_action_set_active(bsmsg, "sign", mode & LIBBALSA_PROTECT_SIGN);
     sw_action_set_active(bsmsg, "encrypt", mode & LIBBALSA_PROTECT_ENCRYPT);
 
+    action = sw_get_action(bsmsg, "gpg-mode");
 #ifdef HAVE_SMIME
     if (mode & LIBBALSA_PROTECT_SMIMEV3)
-        sw_action_set_active(bsmsg, "smime", TRUE);
+        g_action_change_state(action, g_variant_new_string("smime"));
     else
 #endif
     if (mode & LIBBALSA_PROTECT_OPENPGP)
-        sw_action_set_active(bsmsg, "OldOpenPgpMode", TRUE);
+        g_action_change_state(action, g_variant_new_string("open-pgp"));
     else
-        sw_action_set_active(bsmsg, "MimeMode", TRUE);
+        g_action_change_state(action, g_variant_new_string("mime"));
 }
 #endif /* HAVE_GPGME */
 

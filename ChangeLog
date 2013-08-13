@@ -4,6 +4,11 @@
 
 2013-08-13  Peter Bloomfield
 
+	* src/sendmsg-window.c (bsmsg_setup_gpg_ui_by_mode): set gpg
+	mode correctly.
+
+2013-08-13  Peter Bloomfield
+
 	* src/sendmsg-window.c (init_menus): add transition code to read
 	old message header choices.
 

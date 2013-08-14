@@ -1789,7 +1789,7 @@ static const struct {
     LibBalsaMessageFlag flag;
     unsigned set:1;
     gint states_index;
-    const gchar *g_action_name;
+    const gchar *action_name;
 } hide_states[] = {
     { LIBBALSA_MESSAGE_FLAG_DELETED, 1, 0, "hide-deleted"   },
     { LIBBALSA_MESSAGE_FLAG_DELETED, 0, 1, "hide-undeleted" },
@@ -1817,7 +1817,7 @@ hide_change_state(GSimpleAction * action,
         unsigned curr_idx, i;
 
         for (i = 0; i < G_N_ELEMENTS(hide_states); i++)
-            if (strcmp(action_name, hide_states[i].g_action_name) == 0)
+            if (strcmp(action_name, hide_states[i].action_name) == 0)
                 break;
         g_assert(i < G_N_ELEMENTS(hide_states));
         curr_idx = hide_states[i].states_index;
@@ -1826,13 +1826,13 @@ hide_change_state(GSimpleAction * action,
             int states_idx = hide_states[i].states_index;
 
             if (!bw_action_get_boolean(window,
-                                       hide_states[i].g_action_name))
+                                       hide_states[i].action_name))
                 continue;
 
             if (hide_states[states_idx].flag == hide_states[curr_idx].flag
                 && hide_states[states_idx].set !=
                 hide_states[curr_idx].set) {
-                bw_action_set_boolean(window, hide_states[i].g_action_name,
+                bw_action_set_boolean(window, hide_states[i].action_name,
                                       FALSE);
             }
         }
@@ -2672,19 +2672,14 @@ bw_set_filter_menu(BalsaWindow * window, int mask)
     unsigned i;
 
     for (i = 0; i < G_N_ELEMENTS(hide_states); i++) {
-        gint states_index = hide_states[i].states_index;
-        GAction *g_action =
-            g_action_map_lookup_action(G_ACTION_MAP(window),
-                                       hide_states[i].g_action_name);
+        GAction *action;
+        gboolean state;
 
-        g_signal_handlers_block_by_func(G_OBJECT(g_action),
-                                        G_CALLBACK(hide_change_state),
-                                        window);
-        bw_action_set_boolean(window, hide_states[i].g_action_name,
-                              (mask >> states_index) & 1);
-        g_signal_handlers_unblock_by_func(G_OBJECT(g_action),
-                                          G_CALLBACK(hide_change_state),
-                                          window);
+        action = g_action_map_lookup_action(G_ACTION_MAP(window),
+                                            hide_states[i].action_name);
+        state = (mask >> hide_states[i].states_index) & 1;
+        g_simple_action_set_state(G_SIMPLE_ACTION(action),
+                                  g_variant_new_boolean(state));
     }
 }
 
@@ -2698,7 +2693,7 @@ bw_filter_to_int(BalsaWindow * window)
     unsigned i;
     int res = 0;
     for (i = 0; i < G_N_ELEMENTS(hide_states); i++)
-        if (bw_action_get_boolean(window, hide_states[i].g_action_name))
+        if (bw_action_get_boolean(window, hide_states[i].action_name))
             res |= 1 << hide_states[i].states_index;
     return res;
 }

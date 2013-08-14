@@ -1,3 +1,10 @@
+2013-08-14  Peter Bloomfield
+
+	* src/main-window.c (hide_change_state), (bw_set_filter_menu),
+	(bw_filter_to_int): initialize the hide-messages menu items
+	with g_simple_action_set_state instead of g_action_change_state,
+	which does not seem to work for these items.
+
 2013-08-13  Peter Bloomfield
 
 	* src/toolbar-factory.c (tm_toolbar_weak_notify): disconnect

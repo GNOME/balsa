@@ -736,6 +736,26 @@ bw_is_active_notify(GObject * gobject, GParamSpec * pspec,
  * GAction helpers
  */
 
+static GAction *
+bw_get_action(BalsaWindow * window,
+              const gchar * action_name)
+{
+    GActionMap *action_map;
+    GAction *action;
+
+    action_map = G_ACTION_MAP(window);
+    action = g_action_map_lookup_action(action_map, action_name);
+    if (!action) {
+        action_map =
+            G_ACTION_MAP(gtk_window_get_application(GTK_WINDOW(window)));
+        action = g_action_map_lookup_action(action_map, action_name);
+    }
+    if (!action)
+        g_print("%s action \"%s\" not found\n", __func__, action_name);
+
+    return action;
+}
+
 /*
  * Set and get the state of a toggle action
  */
@@ -746,11 +766,9 @@ bw_action_set_boolean(BalsaWindow * window,
 {
     GAction *action;
 
-    action = g_action_map_lookup_action(G_ACTION_MAP(window), action_name);
+    action = bw_get_action(window, action_name);
     if (action)
         g_action_change_state(action, g_variant_new_boolean(state));
-    else
-        g_print("%s action \"%s\" not found\n", __func__, action_name);
 }
 
 static gboolean
@@ -760,15 +778,14 @@ bw_action_get_boolean(BalsaWindow * window,
     GAction *action;
     gboolean retval = FALSE;
 
-    action = g_action_map_lookup_action(G_ACTION_MAP(window), action_name);
+    action = bw_get_action(window, action_name);
     if (action) {
         GVariant *action_state;
 
         action_state = g_action_get_state(action);
         retval = g_variant_get_boolean(action_state);
         g_variant_unref(action_state);
-    } else
-        g_print("%s action \"%s\" not found\n", __func__, action_name);
+    }
 
     return retval;
 }
@@ -784,12 +801,10 @@ bw_action_set_string(BalsaWindow * window,
 {
     GAction *action;
 
-    action = g_action_map_lookup_action(G_ACTION_MAP(window), action_name);
+    action = bw_get_action(window, action_name);
     if (action)
         g_simple_action_set_state(G_SIMPLE_ACTION(action),
                                   g_variant_new_string(state));
-    else
-        g_print("%s action \"%s\" not found\n", __func__, action_name);
 }
 
 /*
@@ -801,42 +816,14 @@ bw_action_set_enabled(BalsaWindow * window,
                       const gchar * action_name,
                       gboolean      enabled)
 {
-    GActionMap *action_map;
     GAction *action;
 
     if (g_object_get_data(G_OBJECT(window), "destroying"))
         return;
 
-    action_map = G_ACTION_MAP(window);
-    action = g_action_map_lookup_action(action_map, action_name);
-    /* FIXME Remove test when all actions are implemented! */
+    action = bw_get_action(window, action_name);
     if (action)
         g_simple_action_set_enabled(G_SIMPLE_ACTION(action), enabled);
-    else
-        g_print("%s action \"%s\" not found in menubar\n", __func__,
-                action_name);
-}
-
-static void
-bw_app_action_set_enabled(BalsaWindow * window,
-                          const gchar * action_name,
-                          gboolean      enabled)
-{
-    GActionMap *action_map;
-    GAction *action;
-
-    if (g_object_get_data(G_OBJECT(window), "destroying"))
-        return;
-
-    action_map =
-        G_ACTION_MAP(gtk_window_get_application(GTK_WINDOW(window)));
-    action = g_action_map_lookup_action(action_map, action_name);
-    /* FIXME Remove test when all actions are implemented! */
-    if (action)
-        g_simple_action_set_enabled(G_SIMPLE_ACTION(action), enabled);
-    else
-        g_print("%s action \"%s\" not found in appmenu\n", __func__,
-                action_name);
 }
 
 /*
@@ -1832,8 +1819,12 @@ hide_change_state(GSimpleAction * action,
             if (hide_states[states_idx].flag == hide_states[curr_idx].flag
                 && hide_states[states_idx].set !=
                 hide_states[curr_idx].set) {
-                bw_action_set_boolean(window, hide_states[i].action_name,
-                                      FALSE);
+                GAction *coupled_action;
+
+                coupled_action =
+                    bw_get_action(window, hide_states[i].action_name);
+                g_simple_action_set_state(G_SIMPLE_ACTION(coupled_action),
+                                          g_variant_new_boolean(FALSE));
             }
         }
     }
@@ -2321,14 +2312,14 @@ balsa_window_new()
     /* set the toolbar style */
     balsa_window_refresh(window);
 
-    action = g_action_map_lookup_action(G_ACTION_MAP(window), "headers");
+    action = bw_get_action(window, "headers");
     g_simple_action_set_state(G_SIMPLE_ACTION(action),
                               g_variant_new_string(header_targets
                                                    [balsa_app.
                                                     shown_headers]));
 
 #if !defined(ENABLE_TOUCH_UI)
-    action = g_action_map_lookup_action(G_ACTION_MAP(window), "threading");
+    action = bw_get_action(window, "threading");
     g_simple_action_set_state(G_SIMPLE_ACTION(action),
                               g_variant_new_string("flat"));
 
@@ -2490,7 +2481,7 @@ balsa_window_update_book_menus(BalsaWindow * window)
 {
     gboolean has_books = balsa_app.address_book_list != NULL;
 
-    bw_app_action_set_enabled(window, "address-book",  has_books);
+    bw_action_set_enabled(window, "address-book",  has_books);
     bw_action_set_enabled(window, "store-address", has_books &&
                           window->current_index &&
                           BALSA_INDEX(window->current_index)->current_msgno);
@@ -2675,8 +2666,7 @@ bw_set_filter_menu(BalsaWindow * window, int mask)
         GAction *action;
         gboolean state;
 
-        action = g_action_map_lookup_action(G_ACTION_MAP(window),
-                                            hide_states[i].action_name);
+        action = bw_get_action(window, hide_states[i].action_name);
         state = (mask >> hide_states[i].states_index) & 1;
         g_simple_action_set_state(G_SIMPLE_ACTION(action),
                                   g_variant_new_boolean(state));
@@ -4943,8 +4933,6 @@ update_view_menu(BalsaWindow * window)
 {
 #if !defined(ENABLE_TOUCH_UI)
     bw_action_set_boolean(window, "wrap", balsa_app.browse_wrap);
-    balsa_message_set_wrap(BALSA_MESSAGE(window->preview),
-                           balsa_app.browse_wrap);
 #endif /* ENABLE_TOUCH_UI */
 }
 

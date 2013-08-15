@@ -1,3 +1,16 @@
+2013-08-15  Peter Bloomfield
+
+	* src/main-window.c (bw_get_action): wrapper for
+	g_action_map_lookup_action;
+	(bw_action_set_boolean), (bw_action_get_boolean),
+	(bw_action_set_string), (bw_action_set_enabled),
+	(hide_change_state), (balsa_window_new),
+	(balsa_window_update_book_menus): use it;
+	(bw_set_filter_menu): use g_simple_action_set_state, to avoid
+	recursion;
+	(update_view_menu): remove redundant call to
+	balsa_message_set_wrap.
+
 2013-08-14  Peter Bloomfield
 
 	* src/main-window.c (hide_change_state), (bw_set_filter_menu),

@@ -30,6 +30,5 @@ typedef struct _MessageWindow MessageWindow;
 
 void message_window_new(LibBalsaMailbox * mailbox, guint msgno);
 BalsaToolbarModel *message_window_get_toolbar_model(void);
-GtkUIManager *message_window_ui_manager_new(MessageWindow * mw);
 
 #endif				/* __MESSAGE_WINDOW_H__ */

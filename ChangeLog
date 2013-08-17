@@ -1,5 +1,15 @@
 2013-08-16  Peter Bloomfield
 
+	Deprecation cleanup
+
+	* src/main-window.h:
+	* src/message-window.h:
+	* src/sendmsg-window.h:
+	* src/toolbar-factory.c:
+	* src/toolbar-factory.h:
+
+2013-08-16  Peter Bloomfield
+
 	* src/sendmsg-window.c (sw_close_activated): mark window as
 	being destroyed;
 	(sw_get_action): check for window being destroyed, and return

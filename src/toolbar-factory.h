@@ -83,12 +83,6 @@ const gchar *balsa_toolbar_sanitize_id(const gchar * id);
 /* BalsaToolbarModel */
 BalsaToolbarModel *balsa_toolbar_model_new(BalsaToolbarType type,
                                            GSList * standard);
-void balsa_toolbar_model_add_actions(BalsaToolbarModel * model,
-                                     const GtkActionEntry * entries,
-                                     guint n_entries);
-void balsa_toolbar_model_add_toggle_actions(BalsaToolbarModel * model,
-                                            const GtkToggleActionEntry *
-                                            entries, guint n_entries);
 GHashTable *balsa_toolbar_model_get_legal(BalsaToolbarModel * model);
 GSList *balsa_toolbar_model_get_current(BalsaToolbarModel * model);
 gboolean balsa_toolbar_model_is_standard(BalsaToolbarModel * model);

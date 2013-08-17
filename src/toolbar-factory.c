@@ -345,28 +345,6 @@ balsa_toolbar_model_add_entries(BalsaToolbarModel       * model,
     }
 }
 
-void
-balsa_toolbar_model_add_actions(BalsaToolbarModel * model,
-                                const GtkActionEntry * entries,
-                                guint n_entries)
-{
-    guint i;
-
-    for (i = 0; i < n_entries; i++)
-        tm_add_action(model, entries[i].stock_id, entries[i].name);
-}
-
-void
-balsa_toolbar_model_add_toggle_actions(BalsaToolbarModel * model,
-                                       const GtkToggleActionEntry *
-                                       entries, guint n_entries)
-{
-    guint i;
-
-    for (i = 0; i < n_entries; i++)
-        tm_add_action(model, entries[i].stock_id, entries[i].name);
-}
-
 /* Return the legal icons.
  */
 GHashTable *

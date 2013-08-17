@@ -146,7 +146,6 @@ extern "C" {
                                                GArray * selected,
                                                SendType type);
     BalsaToolbarModel *sendmsg_window_get_toolbar_model(void);
-    GtkUIManager *sendmsg_window_ui_manager_new(BalsaSendmsg * bsmsg);
 
 #define SENDMSG_WINDOW_QUIT_ON_CLOSE(bsmsg) ((bsmsg)->quit_on_close=TRUE)
 

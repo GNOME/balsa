@@ -575,6 +575,8 @@ sw_close_activated(GSimpleAction * action,
     BalsaSendmsg *bsmsg = data;
 
     BALSA_DEBUG_MSG("close_window_cb: start\n");
+    g_object_set_data(G_OBJECT(bsmsg->window), "destroying",
+                      GINT_TO_POINTER(TRUE));
     if(!delete_handler(bsmsg))
 	gtk_widget_destroy(bsmsg->window);
     BALSA_DEBUG_MSG("close_window_cb: end\n");
@@ -981,6 +983,9 @@ sw_get_action(BalsaSendmsg * bsmsg, const gchar * action_name)
 {
     GAction *action;
 
+    if (g_object_get_data(G_OBJECT(bsmsg->window), "destroying"))
+        return NULL;
+
     action = g_action_map_lookup_action(G_ACTION_MAP(bsmsg->window),
                                         action_name);
     if (!action)
@@ -997,7 +1002,8 @@ sw_action_set_enabled(BalsaSendmsg * bsmsg,
     GAction *action;
 
     action = sw_get_action(bsmsg, action_name);
-    g_simple_action_set_enabled(G_SIMPLE_ACTION(action), enabled);
+    if (action)
+        g_simple_action_set_enabled(G_SIMPLE_ACTION(action), enabled);
 }
 
 /*
@@ -1024,7 +1030,7 @@ sw_action_get_enabled(BalsaSendmsg * bsmsg,
     GAction *action;
 
     action = sw_get_action(bsmsg, action_name);
-    return g_action_get_enabled(action);
+    return action ? g_action_get_enabled(action) : FALSE;
 }
 #endif                          /* HAVE_GTKSOURCEVIEW */
 
@@ -1037,7 +1043,8 @@ sw_action_set_active(BalsaSendmsg * bsmsg,
     GAction *action;
 
     action = sw_get_action(bsmsg, action_name);
-    g_action_change_state(action, g_variant_new_boolean(state));
+    if (action)
+        g_action_change_state(action, g_variant_new_boolean(state));
 }
 
 static gboolean
@@ -1045,13 +1052,16 @@ sw_action_get_active(BalsaSendmsg * bsmsg,
                      const gchar  * action_name)
 {
     GAction *action;
-    GVariant *state;
-    gboolean retval;
+    gboolean retval = FALSE;
 
     action = sw_get_action(bsmsg, action_name);
-    state = g_action_get_state(action);
-    retval = g_variant_get_boolean(state);
-    g_variant_unref(state);
+    if (action) {
+        GVariant *state;
+
+        state = g_action_get_state(action);
+        retval = g_variant_get_boolean(state);
+        g_variant_unref(state);
+    }
 
     return retval;
 }

@@ -1,3 +1,13 @@
+2013-08-16  Peter Bloomfield
+
+	* src/sendmsg-window.c (sw_close_activated): mark window as
+	being destroyed;
+	(sw_get_action): check for window being destroyed, and return
+	NULL if so;
+	(sw_action_set_enabled), (sw_action_get_enabled),
+	(sw_action_set_active), (sw_action_get_active): check for NULL
+	action.
+
 2013-08-15  Peter Bloomfield
 
 	* src/main-window.c (bw_get_action): wrapper for

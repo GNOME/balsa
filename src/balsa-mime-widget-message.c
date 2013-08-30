@@ -460,6 +460,10 @@ bm_header_widget_new(BalsaMessage * bm, GtkWidget * const * buttons)
 
     info_bar_widget = gtk_info_bar_new();
     info_bar = GTK_INFO_BAR(info_bar_widget);
+    gtk_orientable_set_orientation(GTK_ORIENTABLE
+                                   (gtk_info_bar_get_action_area
+                                    (info_bar)), GTK_ORIENTATION_VERTICAL);
+
     content_area = gtk_info_bar_get_content_area(info_bar);
     gtk_container_add(GTK_CONTAINER(content_area), grid);
 

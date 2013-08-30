@@ -1,5 +1,12 @@
 2013-08-30  Peter Bloomfield
 
+	* src/balsa-mime-widget-message.c (bm_header_widget_new): make
+	sure buttons are arranged vertically; would not be an issue,
+	except that GtkLabels are not wrapped in a GtkInfoBar (bgo
+	#707093).
+
+2013-08-30  Peter Bloomfield
+
 	* libbalsa/html.c (lbh_info_bar): make sure buttons are arranged
 	vertically.
 

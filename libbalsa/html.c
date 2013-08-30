@@ -332,6 +332,15 @@ lbh_info_bar(LibBalsaWebKitInfo * info)
     GtkInfoBar *info_bar;
     GtkWidget *label;
     GtkWidget *content_area;
+#if GTK_CHECK_VERSION(3, 9, 0)
+    static const gchar text[] =
+                 N_("This message part contains images "
+                    "from a remote server.\n"
+                    "To protect your privacy, "
+                    "Balsa has not downloaded them.\n"
+                    "You may choose to download them "
+                    "if you trust the server.");
+#else                           /* GTK_CHECK_VERSION(3, 9, 0) */
     static const gchar text[] =
                  N_("This message part contains images "
                     "from a remote server. "
@@ -339,6 +348,7 @@ lbh_info_bar(LibBalsaWebKitInfo * info)
                     "Balsa has not downloaded them. "
                     "You may choose to download them "
                     "if you trust the server.");
+#endif                          /* GTK_CHECK_VERSION(3, 9, 0) */
 
     info_bar_widget =
         gtk_info_bar_new_with_buttons(_("_Download images"),

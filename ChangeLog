@@ -1,5 +1,10 @@
 2013-08-30  Peter Bloomfield
 
+	* libbalsa/html.c (lbh_info_bar): make sure buttons are arranged
+	vertically.
+
+2013-08-30  Peter Bloomfield
+
 	* libbalsa/html.c (lbh_info_bar): break message string into
 	three separate lines, to work around GtkInfoBar breakage (bgo
 	#707093).

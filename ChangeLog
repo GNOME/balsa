@@ -1,3 +1,10 @@
+2013-09-14  Peter Bloomfield
+
+	* src/balsa-mime-widget-message.c (bm_header_widget_new):
+	replace GtkInfoBar with a simple GtkBox and a GtkButtonBox,
+	because GtkInfoBar prevents the GtkLabel from wrapping (bgo
+	#707093)
+
 2013-08-30  Peter Bloomfield
 
 	* src/balsa-mime-widget-message.c (bm_header_widget_new): make

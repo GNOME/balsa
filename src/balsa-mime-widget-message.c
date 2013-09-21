@@ -441,13 +441,13 @@ static GtkWidget *
 bm_header_widget_new(BalsaMessage * bm, GtkWidget * const * buttons)
 {
     GtkWidget *grid;
-#if GTK_CHECK_VERSION(3, 9, 0)
+#ifdef GTK_INFO_BAR_WRAPPING_IS_BROKEN
     GtkWidget *hbox;
-#else                           /* GTK_CHECK_VERSION(3, 9, 0) */
+#else                           /* GTK_INFO_BAR_WRAPPING_IS_BROKEN */
     GtkWidget *info_bar_widget;
     GtkInfoBar *info_bar;
     GtkWidget *content_area;
-#endif                          /* GTK_CHECK_VERSION(3, 9, 0) */
+#endif                          /* GTK_INFO_BAR_WRAPPING_IS_BROKEN */
     GtkWidget *action_area;
     GtkWidget *widget;
 
@@ -462,7 +462,7 @@ bm_header_widget_new(BalsaMessage * bm, GtkWidget * const * buttons)
     g_signal_connect(grid, "key_press_event",
 		     G_CALLBACK(balsa_mime_widget_key_press_event), bm);
 
-#if GTK_CHECK_VERSION(3, 9, 0)
+#ifdef GTK_INFO_BAR_WRAPPING_IS_BROKEN
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
     gtk_container_add(GTK_CONTAINER(hbox), grid);
     gtk_container_set_border_width(GTK_CONTAINER(hbox), 6);
@@ -471,18 +471,19 @@ bm_header_widget_new(BalsaMessage * bm, GtkWidget * const * buttons)
     gtk_button_box_set_layout(GTK_BUTTON_BOX(action_area),
                               GTK_BUTTONBOX_START);
     gtk_box_pack_end(GTK_BOX(hbox), action_area, FALSE, TRUE, 0);
-#else                           /* GTK_CHECK_VERSION(3, 9, 0) */
+#else                           /* GTK_INFO_BAR_WRAPPING_IS_BROKEN */
     info_bar_widget = gtk_info_bar_new();
     info_bar = GTK_INFO_BAR(info_bar_widget);
-    gtk_orientable_set_orientation(GTK_ORIENTABLE
-                                   (gtk_info_bar_get_action_area
-                                    (info_bar)), GTK_ORIENTATION_VERTICAL);
 
     content_area = gtk_info_bar_get_content_area(info_bar);
     gtk_container_add(GTK_CONTAINER(content_area), grid);
 
     action_area = gtk_info_bar_get_action_area(info_bar);
-#endif                          /* GTK_CHECK_VERSION(3, 9, 0) */
+    gtk_orientable_set_orientation(GTK_ORIENTABLE(action_area),
+                                   GTK_ORIENTATION_VERTICAL);
+    gtk_button_box_set_layout(GTK_BUTTON_BOX(action_area),
+                              GTK_BUTTONBOX_START);
+#endif                          /* GTK_INFO_BAR_WRAPPING_IS_BROKEN */
     if (!bm->face_box) {
         bm->face_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
         gtk_container_add(GTK_CONTAINER(action_area), bm->face_box);
@@ -498,11 +499,11 @@ bm_header_widget_new(BalsaMessage * bm, GtkWidget * const * buttons)
 
     widget = gtk_frame_new(NULL);
     gtk_frame_set_shadow_type(GTK_FRAME(widget), GTK_SHADOW_IN);
-#if GTK_CHECK_VERSION(3, 9, 0)
+#ifdef GTK_INFO_BAR_WRAPPING_IS_BROKEN
     gtk_container_add(GTK_CONTAINER(widget), hbox);
-#else                           /* GTK_CHECK_VERSION(3, 9, 0) */
+#else                           /* GTK_INFO_BAR_WRAPPING_IS_BROKEN */
     gtk_container_add(GTK_CONTAINER(widget), info_bar_widget);
-#endif                          /* GTK_CHECK_VERSION(3, 9, 0) */
+#endif                          /* GTK_INFO_BAR_WRAPPING_IS_BROKEN */
 
     g_object_set_data(G_OBJECT(widget), BALSA_MESSAGE_GRID, grid);
 

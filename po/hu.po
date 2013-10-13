@@ -1042,7 +1042,7 @@ msgstr "Az IMAP kiszolgáló leállította a kapcsolatot: %s. Újrakapcsolódás
 #: ../libbalsa/mailbox_imap.c:637
 #, c-format
 msgid "Async IMAP cmd %s could not be executed. Reconnecting..."
-msgstr "A(z) % aszinkron IMAP parancs nem hajtható végre. Újrakapcsolódás…"
+msgstr "A(z) %s aszinkron IMAP parancs nem hajtható végre. Újrakapcsolódás…"
 
 #: ../libbalsa/mailbox_imap.c:1128 ../libbalsa/mailbox_maildir.c:511
 #: ../libbalsa/mailbox_mbox.c:750 ../libbalsa/mailbox_mh.c:547
@@ -7110,7 +7110,7 @@ msgid ""
 "part can be signed.\n"
 msgstr ""
 "A levél szövege egyszerű szövegként és HTML formátumban lesz elküldve, de "
-"csak az egyszerű rész írható alá."
+"csak az egyszerű rész írható alá.\n"
 
 #: ../src/sendmsg-window.c:6002
 msgid ""

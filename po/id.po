@@ -2,15 +2,15 @@
 # Copyright (C) 2005
 # This file is distributed under the same license as the Balsa package.
 # Imam Musthaqim <musthaqim@telkom.net>, 2005.
-# Andika Triwidada <andika@gmail.com>, 2012.
+# Andika Triwidada <andika@gmail.com>, 2012, 2013.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa master\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=balsa&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2012-10-02 14:06+0000\n"
-"PO-Revision-Date: 2012-10-04 17:04+0700\n"
+"POT-Creation-Date: 2013-09-27 20:47+0000\n"
+"PO-Revision-Date: 2013-10-13 13:18+0700\n"
 "Last-Translator: Andika Triwidada <andika@gmail.com>\n"
 "Language-Team: Indonesian <gnome@i15n.org>\n"
 "Language: id\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Poedit 1.5.3\n"
+"X-Generator: Poedit 1.5.7\n"
 
 #: ../balsa.desktop.in.in.h:1 ../balsa-mailto-handler.desktop.in.in.h:1
 msgid "Balsa"
@@ -89,7 +89,7 @@ msgstr "Interaksi SASL\n"
 
 #: ../libbalsa/address-book-ldap.c:330
 msgid "TLS requested but not compiled in"
-msgstr "TLS diminta tapi tidak dikompilasi dalam"
+msgstr "TLS diminta tapi tidak ikut terkompilasi"
 
 #: ../libbalsa/address-book-ldap.c:610
 msgid "Undefined location of user address book"
@@ -207,7 +207,7 @@ msgstr "Kesalahan dalam sintaks ekspresi biasa"
 msgid "Attempt to apply an invalid filter"
 msgstr "Berusaha menerapkan filter yang invalid"
 
-#: ../libbalsa/filter-file.c:141
+#: ../libbalsa/filter-file.c:139
 #, c-format
 msgid "Invalid filters %s for mailbox %s"
 msgstr "Filter invalid %s untuk kotak-surat %s"
@@ -237,7 +237,7 @@ msgstr "Tubuh"
 #: ../libbalsa/filter-funcs.c:392
 #, c-format
 msgid "Header:%s"
-msgstr "Tajuk:%s"
+msgstr "Kepala:%s"
 
 #: ../libbalsa/filter-funcs.c:398 ../libbalsa/filter-funcs.c:426
 #, c-format
@@ -288,8 +288,7 @@ msgstr "Gagal mendekripsi bagian MIME: kesalahan mengurai"
 #: ../libbalsa/gmime-multipart-crypt.c:225
 msgid "Cannot verify multipart/signed part due to missing subparts."
 msgstr ""
-"Tak bisa memverifikasi bagian yang ditandatangani/multi bagian karena "
-"subbagian yang hilang."
+"Tak bisa memverifikasi bagian multipart/signed karena subbagian yang hilang."
 
 #: ../libbalsa/gmime-multipart-crypt.c:251
 #, c-format
@@ -301,8 +300,8 @@ msgid ""
 "Cannot verify multipart/signed part: signature content-type does not match "
 "protocol."
 msgstr ""
-"Tak bisa memverifikasi bagian yang ditandatangani/multi bagian: content-type "
-"tanda tangan tak cocok dengan protokol."
+"Tak bisa memverifikasi multipart/signed: content-type tanda tangan tak cocok "
+"dengan protokol."
 
 #: ../libbalsa/gmime-multipart-crypt.c:487
 #, c-format
@@ -310,8 +309,8 @@ msgid ""
 "Cannot decrypt multipart/encrypted part: unsupported encryption protocol "
 "'%s'."
 msgstr ""
-"Tak bisa mendekripsi bagian yang ditandatangani/multi bagian: protokol "
-"enkripsi '%s' tak didukung."
+"Tak bisa mendekripsi bagian multipart/encrypted: protokol enkripsi '%s' tak "
+"didukung."
 
 #: ../libbalsa/gmime-multipart-crypt.c:488
 msgid "(none)"
@@ -322,21 +321,20 @@ msgid ""
 "Cannot decrypt multipart/encrypted part: content-type does not match "
 "protocol."
 msgstr ""
-"Tak bisa mendekripsi bagian yang ditandatangani/multi bagian: content-type "
-"tak cocok dengan protokol."
+"Tak bisa mendekripsi bagian multipart/encrypted: content-type tak cocok "
+"dengan protokol."
 
 #: ../libbalsa/gmime-multipart-crypt.c:516
 msgid "Cannot decrypt multipart/encrypted part: unexpected content type"
 msgstr ""
-"Tak bisa mendekripsi bagian yang ditandatangani/multi bagian: tipe konten "
-"tak diharapkan"
+"Tak bisa mendekripsi bagian multipart/encrypted: tipe konten tak diharapkan"
 
 #: ../libbalsa/gmime-multipart-crypt.c:558
 msgid ""
 "Cannot decrypt multipart/encrypted part: failed to parse decrypted content"
 msgstr ""
-"Tak bisa mendekripsi bagian yang ditandatangani/multi bagian: gagal mengurai "
-"isi yang didekripsi"
+"Tak bisa mendekripsi bagian multipart/encrypted: gagal mengurai isi yang "
+"didekripsi"
 
 #: ../libbalsa/html.c:68
 #, c-format
@@ -349,7 +347,7 @@ msgid ""
 "privacy, Balsa has not downloaded them. You may choose to download them if "
 "you trust the server."
 msgstr ""
-"Bagian pesan ini memuat gambar dari server jauh. Untuk melindungi privasi "
+"Bagian pesan ini memuat gambar dari server remote. Untuk melindungi privasi "
 "Anda, Balsa belum mengunduh mereka. Anda dapat memilih untuk mengunduh "
 "mereka bila Anda mempercayai server."
 
@@ -395,7 +393,7 @@ msgstr "Tandatangan dalam %s bukan a UTF-8 teks."
 
 #: ../libbalsa/identity.c:496
 msgid "Current"
-msgstr "Yang Sekarang"
+msgstr "Saat Ini"
 
 #: ../libbalsa/identity.c:750 ../libbalsa/smtp-server.c:266
 msgid "Default"
@@ -508,7 +506,7 @@ msgstr ""
 
 #: ../libbalsa/identity.c:1056
 msgid "Security"
-msgstr "Securiti"
+msgstr "Keamanan"
 
 #: ../libbalsa/identity.c:1059
 msgid "sign messages by default"
@@ -580,7 +578,7 @@ msgstr "Galat saat menampilkan bantuan untuk identitas: %s\n"
 
 #: ../libbalsa/identity.c:1719
 msgid "Manage Identities"
-msgstr "Atur Identitas"
+msgstr "Kelola Identitas"
 
 #: ../libbalsa/identity.c:2116
 msgid "GnuPG MIME mode"
@@ -629,7 +627,7 @@ msgstr "Tidak bisa menyambung ke %s"
 #: ../libbalsa/imap-server.c:631 ../libbalsa/imap-server.c:636
 #, c-format
 msgid "Cannot connect to the server: %s"
-msgstr "Tidak bisa konek ke server: %s"
+msgstr "Tidak bisa menyambung ke server: %s"
 
 #: ../libbalsa/imap-server.c:784
 #, c-format
@@ -711,7 +709,7 @@ msgstr "Format masukan tak valid"
 #: ../libbalsa/libbalsa.c:923
 #, c-format
 msgid "Internal buffer overrun"
-msgstr "Penyangga internal tertabrak"
+msgstr "Penyangga internal terlindas (buffer overrun)"
 
 #. Translators: please do not translate Face.
 #: ../libbalsa/libbalsa.c:940
@@ -813,57 +811,57 @@ msgstr "%s: multi-kunci untuk %s"
 msgid "%s: insufficient validity for uid %s"
 msgstr "%s: validitas tak mencukupi untuk uid %s"
 
-#: ../libbalsa/libbalsa-gpgme-cb.c:144
+#: ../libbalsa/libbalsa-gpgme-cb.c:145
 msgid "User ID"
 msgstr "ID Pengguna"
 
-#: ../libbalsa/libbalsa-gpgme-cb.c:144
+#: ../libbalsa/libbalsa-gpgme-cb.c:145
 msgid "Key ID"
 msgstr "ID Kunci"
 
-#: ../libbalsa/libbalsa-gpgme-cb.c:144
+#: ../libbalsa/libbalsa-gpgme-cb.c:145
 msgid "Length"
 msgstr "Panjang"
 
-#: ../libbalsa/libbalsa-gpgme-cb.c:144
+#: ../libbalsa/libbalsa-gpgme-cb.c:145
 msgid "Validity"
 msgstr "Validitas"
 
 #. FIXME: create dialog according to the Gnome HIG
-#: ../libbalsa/libbalsa-gpgme-cb.c:159
+#: ../libbalsa/libbalsa-gpgme-cb.c:160
 msgid "Select key"
 msgstr "Pilih kunci"
 
-#: ../libbalsa/libbalsa-gpgme-cb.c:175
+#: ../libbalsa/libbalsa-gpgme-cb.c:176
 #, c-format
 msgid "Select the private key for the signer %s"
 msgstr "Pilih kunci privat untuk penandatangan %s"
 
-#: ../libbalsa/libbalsa-gpgme-cb.c:179
+#: ../libbalsa/libbalsa-gpgme-cb.c:180
 #, c-format
 msgid "Select the public key for the recipient %s"
 msgstr "Pilih kunci publik untuk penerima %s"
 
-#: ../libbalsa/libbalsa-gpgme-cb.c:302
+#: ../libbalsa/libbalsa-gpgme-cb.c:303
 #, c-format
 msgid "Insufficient trust for recipient %s"
 msgstr "Kepercayaan tak-mencukupi untuk penerima %s"
 
-#: ../libbalsa/libbalsa-gpgme-cb.c:306
+#: ../libbalsa/libbalsa-gpgme-cb.c:307
 #, c-format
 msgid "The validity of the key with user ID \"%s\" is \"%s\"."
 msgstr "Validitas kunci dengan ID pengguna \"%s\" adalah \"%s\"."
 
-#: ../libbalsa/libbalsa-gpgme-cb.c:317
+#: ../libbalsa/libbalsa-gpgme-cb.c:318
 msgid "Use this key anyway?"
 msgstr "Berkeras gunakan kunci ini?"
 
 #. FIXME: create dialog according to the Gnome HIG
-#: ../libbalsa/libbalsa-gpgme-cb.c:343
+#: ../libbalsa/libbalsa-gpgme-cb.c:344
 msgid "Enter Passphrase"
 msgstr "Masukkan Frasa Sandi"
 
-#: ../libbalsa/libbalsa-gpgme-cb.c:370
+#: ../libbalsa/libbalsa-gpgme-cb.c:371
 #, c-format
 msgid ""
 "%s\n"
@@ -876,7 +874,7 @@ msgstr ""
 "\n"
 "Kunci: %s"
 
-#: ../libbalsa/libbalsa-gpgme-cb.c:375
+#: ../libbalsa/libbalsa-gpgme-cb.c:376
 #, c-format
 msgid ""
 "%s\n"
@@ -985,7 +983,7 @@ msgstr "Kesalahan protokol IMAP. Cobalah memfungsikan penanganan kutu."
 #: ../libbalsa/mailbox_imap.c:625
 #, c-format
 msgid "IMAP server has shut the connection: %s Reconnecting..."
-msgstr "server IMAP telah menutup koneksi: %s Sambung-kembali..."
+msgstr "Server IMAP telah menutup koneksi: %s Sambung-kembali..."
 
 #: ../libbalsa/mailbox_imap.c:637
 #, c-format
@@ -1018,7 +1016,7 @@ msgid "No path found for mailbox \"%s\", using \"%s\""
 msgstr "Tidak ditemukan jalur untuk kotak-surat \"%s\", menggunakan \"%s\""
 
 #: ../libbalsa/mailbox_imap.c:1802 ../libbalsa/mailbox_imap.c:1843
-#, c-format
+#, fuzzy, c-format
 msgid "Cannot get IMAP handle"
 msgstr "Tidak bisa mendapatkan handel IMAP"
 
@@ -1045,7 +1043,7 @@ msgstr "Tak bisa menulis ke berkas temporer %s"
 #: ../libbalsa/mailbox_imap.c:2774 ../libbalsa/mailbox_imap.c:2893
 #, c-format
 msgid "Uploading %ld kB"
-msgstr "Uploading %ld kB"
+msgstr "Sedang mengunggah %ld kB"
 
 #: ../libbalsa/mailbox_imap.c:3196
 msgid "Server-side threading not supported."
@@ -1062,9 +1060,9 @@ msgid "Cache file for mailbox %s will be created"
 msgstr "Berkas singgahan bagi kotak surat %s akan dibuat"
 
 #: ../libbalsa/mailbox_local.c:581
-#, fuzzy, c-format
+#, c-format
 msgid "Failed to read cache file %s: %s"
-msgstr "Gagal menulis berkas cache: %s\n"
+msgstr "Gagal menulis berkas singgahan %s: %s"
 
 #: ../libbalsa/mailbox_local.c:599 ../libbalsa/mailbox_local.c:616
 #: ../libbalsa/mailbox_local.c:640
@@ -1085,7 +1083,7 @@ msgstr "Mempersiapkan %s"
 #: ../libbalsa/mailbox_local.c:2050
 #, c-format
 msgid "Open of %s failed. Errno = %d, "
-msgstr "Membuka  %s gagal. Errno = %d, "
+msgstr "Membuka %s gagal. Errno = %d, "
 
 #: ../libbalsa/mailbox_local.c:2072
 #, c-format
@@ -1150,19 +1148,21 @@ msgid "Could not write file %s: %s"
 msgstr "Tak bisa menulis berkas %s: %s"
 
 #: ../libbalsa/mailbox_mbox.c:441
-#, fuzzy, c-format
+#, c-format
 msgid "Failed to create temporary file \"%s\": %s"
-msgstr "Gagal membuat berkas temporer: %s"
+msgstr "Gagal membuat berkas temporer \"%s\": %s"
 
 #: ../libbalsa/mailbox_mbox.c:453
 #, c-format
 msgid "Failed to save cache file \"%s\": %s.  New version saved as \"%s\""
 msgstr ""
+"Gagal menyimpan berkas singgahan \"%s\": %s. Versi baru disimpan sebagai \"%s"
+"\""
 
 #: ../libbalsa/mailbox_mbox.c:461
-#, fuzzy, c-format
+#, c-format
 msgid "Could not unlink file %s: %s"
-msgstr "Tak bisa membuka berkas"
+msgstr "Tak bisa unlink berkas %s: %s"
 
 #: ../libbalsa/mailbox_mbox.c:702
 #, c-format
@@ -1225,9 +1225,9 @@ msgid "Error appending message %d from %s to %s: %s"
 msgstr "Kesalahan saat menambahkan pesan %d dari %s ke %s: %s"
 
 #: ../libbalsa/mailbox_pop3.c:341
-#, fuzzy, c-format
+#, c-format
 msgid "Saving POP message to %s failed"
-msgstr "Menyimpan pesan POP ke %s gagal."
+msgstr "Menyimpan pesan POP ke %s gagal"
 
 #: ../libbalsa/mailbox_pop3.c:348
 #, c-format
@@ -1245,21 +1245,23 @@ msgid "Saving POP message to %s failed."
 msgstr "Menyimpan pesan POP ke %s gagal."
 
 #: ../libbalsa/mailbox_pop3.c:395
-#, fuzzy, c-format
+#, c-format
 msgid "Transferring POP message to %s failed."
-msgstr "Menyimpan pesan POP ke %s gagal."
+msgstr "Mentransfer pesan POP ke %s gagal."
 
 #: ../libbalsa/mailbox_pop3.c:477
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "POP3 mailbox %s temp file error:\n"
 "%s"
-msgstr "Kesalahan saat menulis berkas surat sementara: %s"
+msgstr ""
+"POP3 kesalahan berkas temp kotak surat %s:\n"
+"%s"
 
 #: ../libbalsa/mailbox_pop3.c:502
-#, fuzzy, c-format
+#, c-format
 msgid "POP3 mailbox %s error: %s\n"
-msgstr "Rotak-surat POP3 jauh..."
+msgstr "POP3 kesalahan kotak surat %s: %s\n"
 
 #: ../libbalsa/mailbox_pop3.c:540
 #, c-format
@@ -1370,7 +1372,7 @@ msgstr "Tak bisa membuka %s: itu adalah taut simbolik"
 
 #: ../libbalsa/misc.c:967
 msgid "Timeout exceeded while attempting fcntl lock!"
-msgstr "Batas-waktu telah lewat saat mencapai kunci fcntl!"
+msgstr "Batas-waktu terlewati saat mencoba mengunci fcntl!"
 
 #: ../libbalsa/misc.c:974
 #, c-format
@@ -1379,12 +1381,12 @@ msgstr "Menunggu kunci fcntl... %d"
 
 #: ../libbalsa/misc.c:1002
 msgid "Timeout exceeded while attempting flock lock!"
-msgstr "Batas-waktu telah lewat saat mencapai kunci flock!"
+msgstr "Batas-waktu terlewati saat mencoba mengunci flock!"
 
 #: ../libbalsa/misc.c:1009
 #, c-format
 msgid "Waiting for flock attempt... %d"
-msgstr "Menunggu flock mencapai... %d"
+msgstr "Menunggu percobaan flock... %d"
 
 #: ../libbalsa/misc.c:1290
 #, c-format
@@ -1434,7 +1436,7 @@ msgstr "Permintaan Acara"
 
 #: ../libbalsa/rfc2445.c:686
 msgid "Reply to Event Request"
-msgstr "Balas ke Permintaan Acara"
+msgstr "Balasan ke Permintaan Acara"
 
 #: ../libbalsa/rfc2445.c:687
 msgid "Event Cancellation"
@@ -1484,7 +1486,7 @@ msgstr ""
 
 #: ../libbalsa/rfc3156.c:670
 msgid "The signature is invalid."
-msgstr "Tandatangan invalid."
+msgstr "Tandatangan tak valid."
 
 #: ../libbalsa/rfc3156.c:673
 msgid "The signature could not be verified due to a missing key."
@@ -1555,6 +1557,7 @@ msgid "full"
 msgstr "sepenuhnya"
 
 #: ../libbalsa/rfc3156.c:726
+#, fuzzy
 msgid "ultimate"
 msgstr "teramat"
 
@@ -1711,18 +1714,22 @@ msgid "Could not launch %s to query the public key %s."
 msgstr "Tak bisa meluncurkan %s untuk menanyakan kunci publik %s."
 
 #: ../libbalsa/rfc3156.c:996
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Running %s failed with return value %d:\n"
 "%s"
-msgstr "Galat balikan dengan body bertipe '%s'"
+msgstr ""
+"Menjalankan %s gagal dengan nilai balikan %d:\n"
+"%s"
 
 #: ../libbalsa/rfc3156.c:1003
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Running %s successful:\n"
 "%s"
-msgstr "Entri Sukses"
+msgstr ""
+"Menjalankan %s sukses:\n"
+"%s"
 
 #: ../libbalsa/rfc3156.c:1045
 msgid "Try again later."
@@ -1737,14 +1744,15 @@ msgid "_Hide"
 msgstr "_Sembunyikan"
 
 #: ../libbalsa/send.c:951
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Could not send the message to %s:\n"
 "%d: %s\n"
 "Message left in your outbox.\n"
 msgstr ""
-"Tidak bisa mengirim pesan ke %s:\\n%d: %s\\nPesan ditinggal dalam kotak-"
-"keluar Anda.\\n"
+"Tidak bisa mengirim pesan ke %s:\n"
+"%d: %s\n"
+"Pesan ditinggal dalam kotak-keluar Anda.\n"
 
 #: ../libbalsa/send.c:997
 #, c-format
@@ -1752,21 +1760,23 @@ msgid "Saving sent message to %s failed: %s"
 msgstr "Menyimpan pesan terkirim ke %s gagal: %s"
 
 #: ../libbalsa/send.c:1027 ../libbalsa/send.c:1039
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Relaying refused:\n"
 "%d: %s\n"
 "Message left in your outbox.\n"
-msgstr "Relay ditolak:\\n%d: %s\\nPesan ditinggal dalam kotak-keluar Anda.\\n"
+msgstr ""
+"Relay ditolak:\n"
+"%d: %s\n"
+"Pesan ditinggal dalam kotak-keluar Anda.\n"
 
 #: ../libbalsa/send.c:1046
-#, fuzzy
 msgid ""
 "Message submission problem, placing it into your outbox.\n"
 "System will attempt to resubmit the message until you delete it."
 msgstr ""
-"Pengiriman pesan bermasalah, menempatkannya dalam kotak-keluar Anda."
-"\\nSistem akan berusaha mengirim-ulang pesan hingga Anda menghapusnya."
+"Masalah pengiriman pesan, menempatkannya dalam kotak-keluar Anda.\n"
+"Sistem akan berusaha mengirim-ulang pesan hingga Anda menghapusnya."
 
 #: ../libbalsa/send.c:1076
 msgid "Connected to MTA"
@@ -1801,29 +1811,33 @@ msgid "Disconnected"
 msgstr "Terputus"
 
 #: ../libbalsa/send.c:1424
-#, fuzzy
 msgid ""
 "SMTP server refused connection.\n"
 "Check your internet connection."
-msgstr "Server SMTP menolak koneksi.\\nCek koneksi internet Anda."
+msgstr ""
+"Server SMTP menolak koneksi.\n"
+"Cek koneksi internet Anda."
 
 #: ../libbalsa/send.c:1429
-#, fuzzy
 msgid ""
 "SMTP server cannot be reached.\n"
 "Check your internet connection."
-msgstr "Server SMTP tidak bisa dicapai.\\nCek koneksi internet Anda."
+msgstr ""
+"Server SMTP tidak bisa dicapai.\n"
+"Cek koneksi internet Anda."
 
 #: ../libbalsa/send.c:1438
 msgid "Message left in Outbox (try again later)"
 msgstr "Pesan ditinggal dalam kotak-keluar (Coba lagi nanti)"
 
 #: ../libbalsa/send.c:1442
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "SMTP server problem (%d): %s\n"
 "Message is left in outbox."
-msgstr "Server SMTP bermasalah (%d): %s\\nPesan ditinggal dalam kotak-keluar."
+msgstr ""
+"Masalah server SMTP (%d): %s\n"
+"Pesan ditinggal dalam kotak-keluar."
 
 #: ../libbalsa/send.c:1757 ../libbalsa/send.c:1826
 #, c-format
@@ -1853,7 +1867,7 @@ msgstr "Pesan ini tidak akan dienkripsi untuk BCC: penerima."
 
 #. host, authentication method
 #: ../libbalsa/server.c:431
-#, c-format
+#, fuzzy, c-format
 msgid "Logging in to %s using %s"
 msgstr "Masuk ke %s menggunakan %s"
 
@@ -1874,9 +1888,9 @@ msgid "Required"
 msgstr "Diperlukan"
 
 #: ../libbalsa/smtp-server.c:430
-#, fuzzy, c-format
+#, c-format
 msgid "Error displaying server help: %s\n"
-msgstr "Galat sewaktu membuka dokumen bantuan"
+msgstr "Galat sewaktu menampilkan bantuan server: %s\n"
 
 #: ../libbalsa/smtp-server.c:545
 msgid "SMTP Server"
@@ -1894,26 +1908,22 @@ msgid "_Server:"
 msgstr "_Server:"
 
 #: ../libbalsa/smtp-server.c:586
-#, fuzzy
 msgid "_User Name:"
 msgstr "Nama Pengg_una:"
 
 #: ../libbalsa/smtp-server.c:593
-#, fuzzy
 msgid "_Pass Phrase:"
-msgstr "Frasa Sandi S_ertifikat:"
+msgstr "_Frasa Sandi:"
 
 #: ../libbalsa/smtp-server.c:602 ../src/mailbox-conf.c:242
-#, fuzzy
 msgid "Use _TLS:"
-msgstr "Pakai _TLS"
+msgstr "Pakai _TLS:"
 
 #: ../libbalsa/smtp-server.c:607
 msgid "C_ertificate Pass Phrase:"
 msgstr "Frasa Sandi S_ertifikat:"
 
 #: ../libbalsa/smtp-server.c:619
-#, fuzzy
 msgid "Sp_lit message larger than"
 msgstr "Tetapkan sebuah pesan selain dari \"Hello, World!\""
 
@@ -2017,13 +2027,12 @@ msgid "Couldn't create a directory: mkdir() failed on pathname \"%s\"."
 msgstr "Tidak bisa membuat direktori: mkdir() gagal pada lokasi \"%s\"."
 
 #: ../libinit_balsa/assistant_init.c:51
-#, fuzzy
 msgid ""
 "This will exit Balsa.\n"
 "Do you really want to do this?"
 msgstr ""
-"Apakah ingin melakukan pembaruan semua\n"
-"katalog di projek ini?"
+"Ini akan mengakhiri Balsa.\n"
+"Anda benar-benar ingin melakukannya?"
 
 #: ../libinit_balsa/assistant_init.c:74
 msgid "GnomeCard Address Book"
@@ -2039,9 +2048,8 @@ msgid "Configure Balsa"
 msgstr "Konfigurasi Balsa"
 
 #: ../libinit_balsa/assistant_page_defclient.c:59
-#, fuzzy
 msgid "Use Balsa as default email client?"
-msgstr "Gunakan balsa sebagai client email default?"
+msgstr "Gunakan Balsa sebagai klien surel baku?"
 
 #: ../libinit_balsa/assistant_page_defclient.c:63
 msgid "_Yes"
@@ -2089,13 +2097,12 @@ msgid "The mailbox \"%s\" does not appear to be valid."
 msgstr "Kotak-surat \"%s\" tampaknya tidak valid."
 
 #: ../libinit_balsa/assistant_page_directory.c:204
-#, fuzzy
 msgid ""
 "Please verify the locations of your default mail files.\n"
 "These will be created if necessary."
 msgstr ""
-"Harap verifikasi lokasi file surat default Anda.\\nIni akan dibuat jika "
-"perlu."
+"Harap verifikasi lokasi file surat default Anda.\n"
+"Ini akan dibuat jika perlu."
 
 #: ../libinit_balsa/assistant_page_directory.c:266
 msgid "Mail Files"
@@ -2103,18 +2110,21 @@ msgstr "File Surat"
 
 #: ../libinit_balsa/assistant_page_directory.c:362
 #: ../libinit_balsa/assistant_page_directory.c:396
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Problem Creating Mailboxes\n"
 "%s"
-msgstr "Mengecek kotak-surat _IMAP"
+msgstr ""
+"Masalah Saat Membuat Kotak Surat\n"
+"%s"
 
 #: ../libinit_balsa/assistant_page_finish.c:44
-#, fuzzy
 msgid ""
 "You've successfully set up Balsa. Have fun!\n"
 "   -- The Balsa development team"
-msgstr "Anda berhasil menyeting Balsa. Selamat!\\n   -- Tim Pengembangan Balsa"
+msgstr ""
+"Anda berhasil menyiapkan Balsa. Selamat!\n"
+"   -- Tim pengembangan Balsa"
 
 #: ../libinit_balsa/assistant_page_finish.c:49
 msgid "All Done!"
@@ -2211,7 +2221,6 @@ msgid "Welcome to Balsa!"
 msgstr "Selamat datang di Balsa!"
 
 #: ../libinit_balsa/assistant_page_welcome.c:32
-#, fuzzy
 msgid ""
 "Before you can send or receive email:\n"
 "\n"
@@ -2222,11 +2231,14 @@ msgid ""
 "-- or your Network Administrator at your place of work/study/similar may "
 "have set up your computer to connect to the network."
 msgstr ""
-"Sebelum Anda bisa mengirim atau menerima email:\\n\\n-- Anda harus telah "
-"punya akses Internet dan sebuah akun email, yang disediakan oleh Penyedia "
-"Layanan Internet, dan Anda sudah membuat koneksi Internet itu pada komputer "
-"Anda\\n\\n-- atau Administrator Jaringan Anda di tempat kerja/studi/"
-"semacamnya mungkin telah menyeting komputer Anda untuk konek ke jaringan."
+"Sebelum Anda bisa mengirim atau menerima surel:\n"
+"\n"
+"-- Anda harus telah punya akses Internet dan sebuah akun email, yang "
+"disediakan oleh Penyedia Layanan Internet, dan Anda sudah membuat koneksi "
+"Internet itu pada komputer Anda\n"
+"\n"
+"-- atau Administrator Jaringan Anda di tempat kerja/belajar/semacamnya "
+"mungkin telah menyiapkan komputer Anda untuk menyambung ke jaringan."
 
 #: ../sounds/balsa.soundlist.in.h:1
 msgid "Balsa E-mail reader"
@@ -2289,9 +2301,8 @@ msgid "_Properties"
 msgstr "_Properti"
 
 #: ../src/ab-main.c:576
-#, fuzzy
 msgid "Edit address book properties"
-msgstr "Menampilkan properti buku alamat yang dipilih"
+msgstr "Sunting properti buku alamat"
 
 #: ../src/ab-main.c:577 ../src/balsa-index.c:1911
 #: ../src/filter-edit-dialog.c:243 ../src/mailbox-node.c:1088
@@ -2402,23 +2413,21 @@ msgstr ""
 "%s"
 
 #: ../src/address-book-config.c:177
-#, fuzzy
 msgid "Suggest complete addresses:"
-msgstr "Tampilan Alamat"
+msgstr "Sarankan alamat lengkap:"
 
 #: ../src/address-book-config.c:183
 msgid "as I type"
 msgstr "ketika saya mengetik"
 
 #: ../src/address-book-config.c:192
-#, fuzzy
 msgid "when I hit the Escape key"
-msgstr "Tekan tombol Escape untuk meninggalkan mode layar penuh"
+msgstr "ketika saya menekan tombol Esc"
 
 #: ../src/address-book-config.c:229 ../src/address-book-config.c:330
-#, fuzzy, c-format
+#, c-format
 msgid "Modify %s Address Book"
-msgstr "Ubah Buku Alamat"
+msgstr "Ubah Buku Alamat %s"
 
 #: ../src/address-book-config.c:233 ../src/address-book-config.c:333
 #, c-format
@@ -2434,18 +2443,16 @@ msgid "A_ddress Book Name:"
 msgstr "Nama _Buku Alamat:"
 
 #: ../src/address-book-config.c:377
-#, fuzzy
 msgid "Load program location:"
-msgstr "Tidak dapat memuat lokasi"
+msgstr "Lokasi program muat:"
 
 #: ../src/address-book-config.c:383
 msgid "Select load program for address book"
 msgstr "Pilih muat program untuk buku alamat"
 
 #: ../src/address-book-config.c:390
-#, fuzzy
 msgid "Save program location:"
-msgstr "Simpan proyek saat ini di lokasi yang berbeda"
+msgstr "Simpan lokasi program:"
 
 #: ../src/address-book-config.c:396
 msgid "Select save program for address book"
@@ -2468,9 +2475,8 @@ msgid "_Password"
 msgstr "_Kata-sandi"
 
 #: ../src/address-book-config.c:464
-#, fuzzy
 msgid "_User Address Book DN"
-msgstr "Lokasi buku alamat pengguna tak didefinisikan"
+msgstr "DN Buku Alamat Pengg_una"
 
 #: ../src/address-book-config.c:470
 msgid "Enable _TLS"
@@ -2487,30 +2493,30 @@ msgid "No path found.  Do you want to give one?"
 msgstr "Tidak ditemukan jalur.  Anda ingin memberikannya?"
 
 #: ../src/address-book-config.c:899
-#, fuzzy
 msgid "Rubrica2 Address Book"
-msgstr "Buku alamat GnomeCard"
+msgstr "Buku Alamat Rubrica2"
 
 #: ../src/balsa-app.c:79 ../src/folder-conf.c:276 ../src/mailbox-conf.c:1328
-#, fuzzy
 msgid "_Remember password in keyring"
-msgstr "Tak bisa mengubah sandi ring kunci"
+msgstr "Ingat sandi dalam _ring kunci"
 
 #: ../src/balsa-app.c:82 ../src/folder-conf.c:279 ../src/mailbox-conf.c:1331
 msgid "_Remember password"
 msgstr "_Ingat kata-sandi"
 
 #: ../src/balsa-app.c:88
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Opening remote mailbox %s.\n"
 "The _password for %s@%s:"
-msgstr "Membuka kotak-surat jauh %s.\\nK_ata-sandi untuk %s@%s:"
+msgstr ""
+"Membuka kotak-surat jauh %s.\n"
+"K_ata-sandi untuk %s@%s:"
 
 #: ../src/balsa-app.c:93
-#, fuzzy, c-format
+#, c-format
 msgid "_Password for %s@%s (%s):"
-msgstr "Kata sandi bagi {0}"
+msgstr "K_ata sandi bagi %s@%s (%s):"
 
 #: ../src/balsa-app.c:96
 msgid "Password needed"
@@ -2575,7 +2581,7 @@ msgstr "Pindah Ke _Sampah"
 
 #: ../src/balsa-index.c:1925
 msgid "T_oggle"
-msgstr ""
+msgstr "Jungkitk_an"
 
 #. Message:toggle-flag submenu items
 #: ../src/balsa-index.c:1929 ../src/main-window.c:614 ../src/main-window.c:659
@@ -2595,10 +2601,10 @@ msgid "_View Source"
 msgstr "_Lihat Sumber"
 
 #: ../src/balsa-index.c:2193
-#, fuzzy, c-format
+#, c-format
 msgid "Failed to copy %d message to mailbox \"%s\": %s"
 msgid_plural "Failed to copy %d messages to mailbox \"%s\": %s"
-msgstr[0] "Pindah pesan ke kotak-surat Sampah"
+msgstr[0] "Gagal menyalin %d pesan ke kotak surat \"%s\": %s"
 
 #: ../src/balsa-index.c:2205
 #, c-format
@@ -2671,17 +2677,14 @@ msgid "Select message part to display"
 msgstr "Pilih bagian pesan untuk ditampilkan"
 
 #: ../src/balsa-message.c:411
-#, fuzzy
 msgid "Wrapped"
-msgstr "Terpotong"
+msgstr "Dilipat"
 
 #: ../src/balsa-message.c:415
-#, fuzzy
 msgid "Not found"
 msgstr "Tidak ditemukan"
 
 #: ../src/balsa-message.c:604
-#, fuzzy
 msgid "Find:"
 msgstr "Temukan:"
 
@@ -2744,9 +2747,8 @@ msgid "\"%s\" parts"
 msgstr "bagian \"%s\""
 
 #: ../src/balsa-message.c:1381
-#, fuzzy
 msgid "force inline for all parts"
-msgstr "Tidak, itu saja untuk saat ini"
+msgstr "paksa inline untuk semua bagian"
 
 #: ../src/balsa-message.c:1424
 #, c-format
@@ -2772,9 +2774,9 @@ msgid "encrypted: "
 msgstr "diacak: "
 
 #: ../src/balsa-message.c:1616
-#, fuzzy, c-format
+#, c-format
 msgid "Reading embedded message failed: %s"
-msgstr "Gagal mengambil pesan"
+msgstr "Pembacaan pesan tertanam gagal: %s"
 
 #: ../src/balsa-message.c:1624
 #, c-format
@@ -2782,7 +2784,6 @@ msgid "Appending message to %s failed: %s"
 msgstr "Menambahkan pesan ke %s gagal: %s"
 
 #: ../src/balsa-message.c:1653
-#, fuzzy
 msgid "_Save..."
 msgstr "_Simpan..."
 
@@ -2810,45 +2811,45 @@ msgid "Could not save %s: %s"
 msgstr "Tidak bisa menyimpan %s: %s"
 
 #: ../src/balsa-message.c:2486 ../src/balsa-message.c:2630
-#, fuzzy, c-format
+#, c-format
 msgid "Sending the disposition notification failed: %s"
-msgstr "secara baku minta Pe_mberitahuan Disposisi Pesan"
+msgstr "Pengiriman pemberitahuan disposisi gagal: %s"
 
 #: ../src/balsa-message.c:2583
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "The sender of this mail, %s, requested \n"
 "a Message Disposition Notification(MDN) to be returned to `%s'.\n"
 "Do you want to send this notification?"
 msgstr ""
-"Pengirim surat ini, %s, minta \\nPemberitahuan Disposisi Pesan (MDN) untuk "
-"dikembalikan ke `%s'.\\nAnda ingin mengirimkan pemberitahuan ini?"
+"Pengirim surat ini, %s, minta \n"
+"Pemberitahuan Disposisi Pesan (MDN) untuk dikembalikan ke '%s'.\n"
+"Anda ingin mengirimkan pemberitahuan ini?"
 
 #: ../src/balsa-message.c:2593
 msgid "Reply to MDN?"
 msgstr "Balas Ke MDN?"
 
 #: ../src/balsa-message.c:2804
-#, fuzzy
 msgid ""
 "The decryption cannot be performed because this message is displayed more "
 "than once.\n"
 "Please close the other instances of this message and try again."
 msgstr ""
-"Pengacakan tidak bisa dilakukan karena pesan ini telah ditampilkan lebih "
-"dari sekali.\\nHarap tutup instan lain dari pesan ini dan coba lagi."
+"Pengacakan tidak bisa dilakukan karena pesan ini ditampilkan lebih dari "
+"sekali.\n"
+"Harap tutup instansi lain dari pesan ini dan coba lagi."
 
 #: ../src/balsa-message.c:2825 ../src/balsa-message.c:2910
 #: ../src/balsa-message.c:3032
-#, fuzzy, c-format
+#, c-format
 msgid "Parsing a message part failed: %s"
-msgstr "Gagal memuat bagian '%s'"
+msgstr "Penguraian suatu bagian pesan gagal: %s"
 
 #: ../src/balsa-message.c:2826 ../src/balsa-message.c:2911
 #: ../src/balsa-message.c:3033
-#, fuzzy
 msgid "Possible disk space problem."
-msgstr "Sisa Ruang Disk pada \"%s\" Sedikit"
+msgstr "Mungkin masalah ruang diska."
 
 #: ../src/balsa-message.c:2840
 #, c-format
@@ -2921,14 +2922,15 @@ msgstr ""
 "tidak mencukupi"
 
 #: ../src/balsa-message.c:2986 ../src/balsa-message.c:3105
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Checking the signature of the message sent by %s with subject \"%s\" "
 "returned:\n"
 "%s"
 msgstr ""
-"Mengecek tandatangan pesan yang dikirim oleh %s dengan perihal \"%s\" gagal "
-"dengan kesalahan!"
+"Mengecek tandatangan pesan yang dikirim oleh %s dengan perihal \"%s\" "
+"mengembalikan:\n"
+"%s"
 
 #: ../src/balsa-message.c:2998
 #, c-format
@@ -2966,9 +2968,9 @@ msgid "File name: %s"
 msgstr "Nama File: %s"
 
 #: ../src/balsa-mime-widget.c:256
-#, fuzzy, c-format
+#, c-format
 msgid "Error reading message part: %s"
-msgstr "Bagian berikutnya dalam pesan"
+msgstr "Kesalahan saat membaca bagian pesan: %s"
 
 #: ../src/balsa-mime-widget.c:280
 #, c-format
@@ -3028,9 +3030,8 @@ msgid "OpenPGP"
 msgstr "OpenPGP"
 
 #: ../src/balsa-mime-widget-crypto.c:96
-#, fuzzy
 msgid "_Run GnuPG to import this key"
-msgstr "Impor CD audio ini ke pustaka"
+msgstr "Jalankan GnuPG untuk mengimpo_r kunci ini"
 
 #: ../src/balsa-mime-widget-crypto.c:100
 msgid "_Run GnuPG to check for an update of this key"
@@ -3069,9 +3070,9 @@ msgid "Access type: %s\n"
 msgstr "Tipe akses: %s\n"
 
 #: ../src/balsa-mime-widget-message.c:206
-#, fuzzy, c-format
+#, c-format
 msgid "FTP site: %s\n"
-msgstr "Pengarah ke situs FTP (%s)"
+msgstr "Situs FTP: %s\n"
 
 #: ../src/balsa-mime-widget-message.c:208
 #, c-format
@@ -3083,14 +3084,14 @@ msgid "Access type: mail-server\n"
 msgstr "Tipe akses: server-surel\n"
 
 #: ../src/balsa-mime-widget-message.c:256
-#, fuzzy, c-format
+#, c-format
 msgid "Mail server: %s\n"
-msgstr "Server surel"
+msgstr "Server surat: %s\n"
 
 #: ../src/balsa-mime-widget-message.c:258
-#, fuzzy, c-format
+#, c-format
 msgid "Subject: %s\n"
-msgstr "Perihal"
+msgstr "Subjek: %s\n"
 
 #: ../src/balsa-mime-widget-message.c:275
 msgid "Se_nd message to obtain this part"
@@ -3098,9 +3099,9 @@ msgstr "Kiri_m pesan untuk mengambil bagian ini"
 
 #: ../src/balsa-mime-widget-message.c:296 ../src/balsa-mime-widget-text.c:811
 #: ../src/sendmsg-window.c:1825
-#, fuzzy, c-format
+#, c-format
 msgid "Error showing %s: %s\n"
-msgstr "Error saat menampilkan url: %s\n"
+msgstr "Galat saat menampilkan %s: %s\n"
 
 #: ../src/balsa-mime-widget-message.c:331
 #, c-format
@@ -3123,7 +3124,6 @@ msgstr "… [terpotong]"
 
 #. Gmail sometimes fails to do that.
 #: ../src/balsa-mime-widget-message.c:705
-#, fuzzy
 msgid "Error:"
 msgstr "Galat:"
 
@@ -3175,14 +3175,12 @@ msgid "Copy link"
 msgstr "Salin taut"
 
 #: ../src/balsa-mime-widget-text.c:523
-#, fuzzy
 msgid "Open link"
-msgstr "_Buka Tautan"
+msgstr "Buka tautan"
 
 #: ../src/balsa-mime-widget-text.c:528
-#, fuzzy
 msgid "Send link..."
-msgstr "Kirim taut halaman ini"
+msgstr "Kirim tautan..."
 
 #: ../src/balsa-mime-widget-text.c:561 ../src/balsa-mime-widget-text.c:1053
 msgid "Save..."
@@ -3207,7 +3205,6 @@ msgid "S_tore"
 msgstr ""
 
 #: ../src/balsa-mime-widget-text.c:1178 ../src/balsa-print-object-text.c:508
-#, fuzzy
 msgid "Full Name"
 msgstr "Nama Lengkap"
 
@@ -3217,17 +3214,14 @@ msgid "Nick Name"
 msgstr "Nama aturan:"
 
 #: ../src/balsa-mime-widget-text.c:1180 ../src/balsa-print-object-text.c:512
-#, fuzzy
 msgid "First Name"
-msgstr "Nama Awal"
+msgstr "Nama Depan"
 
 #: ../src/balsa-mime-widget-text.c:1181 ../src/balsa-print-object-text.c:514
-#, fuzzy
 msgid "Last Name"
-msgstr "Nama Akhir"
+msgstr "Nama Belakang"
 
 #: ../src/balsa-mime-widget-text.c:1182 ../src/balsa-print-object-text.c:516
-#, fuzzy
 msgid "Organization"
 msgstr "Organisasi"
 
@@ -3251,13 +3245,11 @@ msgstr "Ini adalah pesan dari plugin \"%s\"."
 
 #: ../src/balsa-mime-widget-vcalendar.c:169
 #: ../src/balsa-print-object-text.c:665
-#, fuzzy
 msgid "Summary"
 msgstr "Ringkasan"
 
 #: ../src/balsa-mime-widget-vcalendar.c:170
 #: ../src/balsa-print-object-text.c:667
-#, fuzzy
 msgid "Organizer"
 msgstr "Penyelenggara"
 
@@ -3274,7 +3266,6 @@ msgstr "Akhir"
 
 #: ../src/balsa-mime-widget-vcalendar.c:173
 #: ../src/balsa-print-object-text.c:673
-#, fuzzy
 msgid "Location"
 msgstr "Lokasi"
 
@@ -3295,7 +3286,7 @@ msgstr "Keterangan"
 
 #: ../src/balsa-mime-widget-vcalendar.c:229
 msgid "The sender asks you for a reply to this request:"
-msgstr ""
+msgstr "Pengirim menanyakan jawaban Anda atas permintaan ini:"
 
 #: ../src/balsa-mime-widget-vcalendar.c:236
 msgid "Accept"
@@ -3930,6 +3921,8 @@ msgid ""
 "\n"
 "detailed permissions are available only for open folders"
 msgstr ""
+"\n"
+"hak akses terrinci hanya tersedia bagi folder yang terbuka"
 
 #: ../src/folder-conf.c:888
 msgid ""
@@ -3950,7 +3943,7 @@ msgstr "Kuota:"
 
 #: ../src/folder-conf.c:940
 msgid "quota information available only for open folders"
-msgstr ""
+msgstr "informasi kuota hanya tersedia bagi folder yang terbuka"
 
 #: ../src/folder-conf.c:945
 #, fuzzy
@@ -4171,9 +4164,8 @@ msgid "F_older path:"
 msgstr "Path Pertama:"
 
 #: ../src/mailbox-conf.c:1470
-#, fuzzy
 msgid "_Identity:"
-msgstr "Identitas"
+msgstr "_Identitas:"
 
 #: ../src/mailbox-conf.c:1512 ../src/pref-manager.c:3432
 msgid "Always"
@@ -4390,7 +4382,7 @@ msgstr "Kotak-rancangan"
 msgid "Trash"
 msgstr "Sampah"
 
-#: ../src/main.c:847
+#: ../src/main.c:845
 msgid "Compressing mail folders..."
 msgstr "Memadatkan folder-folder surat..."
 
@@ -4511,9 +4503,8 @@ msgid "Open the address book"
 msgstr "Buka buku alamat"
 
 #: ../src/main-window.c:389
-#, fuzzy
 msgid "Quit Balsa"
-msgstr "Konfigurasi Balsa"
+msgstr "Keluar Balsa"
 
 #. File:New submenu items
 #: ../src/main-window.c:392
@@ -4599,7 +4590,6 @@ msgid "Export filters as Sieve scripts"
 msgstr "Ekspor filter sebagai skrip Sieve"
 
 #: ../src/main-window.c:428
-#, fuzzy
 msgid "Prefere_nces"
 msgstr "Prefere_nsi"
 
@@ -4683,7 +4673,6 @@ msgid "_Contents"
 msgstr "_Isi"
 
 #: ../src/main-window.c:460
-#, fuzzy
 msgid "Table of Contents"
 msgstr "Daftar Isi"
 
@@ -4695,7 +4684,6 @@ msgstr "Tentang Balsa"
 #. Edit menu items
 #: ../src/main-window.c:488 ../src/message-window.c:253
 #: ../src/sendmsg-window.c:362
-#, fuzzy
 msgid "Select _All"
 msgstr "Pilih Semu_a"
 
@@ -5148,36 +5136,31 @@ msgid ""
 msgstr "Konfigurasi Balsa Anda sekarang disimpan dalam \"~/.balsa/config\"."
 
 #: ../src/main-window.c:1237
-#, fuzzy
 msgid "Subject or Sender Contains:"
-msgstr "Judul atau Pengirim berisi"
+msgstr "Judul atau Pengirim Memuat:"
 
 #: ../src/main-window.c:1238
-#, fuzzy
 msgid "Subject or Recipient Contains:"
-msgstr "Judul atau Pengirim berisi"
+msgstr "Judul atau Penerima Memuat:"
 
 #: ../src/main-window.c:1239
-#, fuzzy
 msgid "Subject Contains:"
-msgstr "Judul berisi"
+msgstr "Judul Memuat:"
 
 #: ../src/main-window.c:1240
 msgid "Body Contains:"
 msgstr "Badan Pesan Berisi:"
 
 #: ../src/main-window.c:1241
-#, fuzzy
 msgid "Older than (days):"
-msgstr "Hapus acara yang waktunya lebih tua dari"
+msgstr "Lebih lama dari (hari):"
 
 #: ../src/main-window.c:1242
-#, fuzzy
 msgid "Old at most (days):"
-msgstr "Ukuran paling be_sar"
+msgstr "Paling lama (hari):"
 
 #: ../src/main-window.c:2371
-#, fuzzy, c-format
+#, c-format
 msgid "Opening %s"
 msgstr "Membuka %s"
 
@@ -5194,7 +5177,7 @@ msgstr "Imam Musthaqim, <musthaqim@telkom.net>http://id.gnome.org/"
 
 #: ../src/main-window.c:2771
 msgid "The Balsa email client is part of the GNOME desktop environment."
-msgstr ""
+msgstr "Klien surel Balsa adalah bagian dari lingkungan desktop GNOME."
 
 #: ../src/main-window.c:2873 ../src/main-window.c:2891
 msgid "Checking Mail..."
@@ -5306,9 +5289,8 @@ msgid_plural "Removed %d duplicates"
 msgstr[0] "Gandakan CD"
 
 #: ../src/main-window.c:4608
-#, fuzzy
 msgid "No duplicates found"
-msgstr "Duplikat tak ditemukan."
+msgstr "Duplikat tak ditemukan"
 
 #: ../src/main-window.c:4837
 #, c-format
@@ -5333,10 +5315,10 @@ msgid "Shown mailbox: %s "
 msgstr "Berkas mailbox"
 
 #: ../src/main-window.c:5573
-#, fuzzy, c-format
+#, c-format
 msgid "with %d message"
 msgid_plural "with %d messages"
-msgstr[0] "Tidak ada pesan dengan UID %s"
+msgstr[0] "dengan %d pesan"
 
 #: ../src/main-window.c:5580
 #, c-format
@@ -5369,9 +5351,8 @@ msgid "Move the message to Trash mailbox"
 msgstr "Pindah pesan ke kotak-surat Sampah"
 
 #: ../src/message-window.c:316
-#, fuzzy
 msgid "Show toolbar"
-msgstr "Tampilkan batang tombol"
+msgstr "Tampilkan bilah alat"
 
 #: ../src/message-window.c:328
 msgid "_Selected Headers"
@@ -5383,14 +5364,12 @@ msgid "Message from %s: %s"
 msgstr "Pesan dari %s: %s"
 
 #: ../src/pref-manager.c:402
-#, fuzzy
 msgid "While retrieving messages"
-msgstr "Galat saat mengambil pesan"
+msgstr "Saat mengambil pesan"
 
 #: ../src/pref-manager.c:403
-#, fuzzy
 msgid "Until closed"
-msgstr "Kotak-surat ditutup"
+msgstr "Sampai ditutup"
 
 #: ../src/pref-manager.c:409
 msgid "Fast"
@@ -5426,9 +5405,8 @@ msgid "Balsa Preferences"
 msgstr "Preferensi Balsa"
 
 #: ../src/pref-manager.c:577
-#, fuzzy
 msgid "Mail options"
-msgstr "Pilihan penerimaan"
+msgstr "Opsi surat"
 
 #: ../src/pref-manager.c:579
 msgid "Display options"
@@ -5466,9 +5444,8 @@ msgid "Type"
 msgstr "Tipe"
 
 #: ../src/pref-manager.c:1700
-#, fuzzy
 msgid "Mailbox name"
-msgstr "Nama kotak-surat salah untuk filter: %s"
+msgstr "Nama kotak-surat"
 
 #: ../src/pref-manager.c:1714 ../src/pref-manager.c:1787
 #: ../src/pref-manager.c:2965
@@ -5490,14 +5467,12 @@ msgid "Outgoing mail servers"
 msgstr "Antarkan surat kiriman anda"
 
 #: ../src/pref-manager.c:1773
-#, fuzzy
 msgid "Server name"
-msgstr "Server Nama"
+msgstr "Nama server"
 
 #: ../src/pref-manager.c:1813
-#, fuzzy
 msgid "Mail servers"
-msgstr "Server LDAP"
+msgstr "Server surat"
 
 #: ../src/pref-manager.c:1815
 msgid "Incoming"
@@ -5529,23 +5504,20 @@ msgid "Check INBOX _only"
 msgstr "Mengecek KOTAK-MASUK _saja"
 
 #: ../src/pref-manager.c:1881
-#, fuzzy
 msgid "When mail arrives:"
-msgstr "Beritahu Anda ketika ada surat baru yang sampai"
+msgstr "Ketika surat tiba:"
 
 #: ../src/pref-manager.c:1886
 msgid "Display message"
 msgstr "Tampilkan pesan"
 
 #: ../src/pref-manager.c:1891
-#, fuzzy
 msgid "Play sound"
-msgstr "Mainkan suara"
+msgstr "Bunyikan suara"
 
 #: ../src/pref-manager.c:1896
-#, fuzzy
 msgid "Show icon"
-msgstr "Tampilkan Ikon Status"
+msgstr "Tampilkan ikon"
 
 #: ../src/pref-manager.c:1905
 msgid "Do background check quietly (no messages in status bar)"
@@ -5681,7 +5653,6 @@ msgstr ""
 "Jangan sertakan bagian HTML sebagai teks saat membalas atau meneruskan surat"
 
 #: ../src/pref-manager.c:2187
-#, fuzzy
 msgid "Layout"
 msgstr "Tata letak"
 
@@ -5699,14 +5670,12 @@ msgid "Colors"
 msgstr "Warna"
 
 #: ../src/pref-manager.c:2195 ../src/pref-manager.c:2286
-#, fuzzy
 msgid "Format"
 msgstr "Format"
 
 #: ../src/pref-manager.c:2197
-#, fuzzy
 msgid "Status messages"
-msgstr "Pesan Log:"
+msgstr "Pesan status"
 
 #: ../src/pref-manager.c:2222 ../src/toolbar-prefs.c:168
 msgid "Main window"
@@ -5752,19 +5721,16 @@ msgid "Selected headers:"
 msgstr "Header terpilih:"
 
 #: ../src/pref-manager.c:2315
-#, fuzzy
 msgid "Information messages"
-msgstr "Pesan Log:"
+msgstr "Pesan informasi"
 
 #: ../src/pref-manager.c:2320
-#, fuzzy
 msgid "Information messages:"
-msgstr "Pesan Log:"
+msgstr "Pesan informasi:"
 
 #: ../src/pref-manager.c:2324
-#, fuzzy
 msgid "Warning messages:"
-msgstr "Pesan Log:"
+msgstr "Pesan peringatan:"
 
 #: ../src/pref-manager.c:2328
 msgid "Error messages:"
@@ -5780,7 +5746,6 @@ msgid "Debug messages:"
 msgstr "Pesan awakutu:"
 
 #: ../src/pref-manager.c:2362
-#, fuzzy
 msgid "Message colors"
 msgstr "Warna pesan"
 
@@ -5790,9 +5755,8 @@ msgid "Quote level %d color"
 msgstr "Kutip level %d warna"
 
 #: ../src/pref-manager.c:2380
-#, fuzzy
 msgid "Link color"
-msgstr "Warna sambungan"
+msgstr "Warna tautan"
 
 #: ../src/pref-manager.c:2382
 msgid "Hyperlink color"
@@ -5811,19 +5775,16 @@ msgid "Fonts"
 msgstr "Font"
 
 #: ../src/pref-manager.c:2487
-#, fuzzy
 msgid "Message font:"
-msgstr "Gaya Fonta"
+msgstr "Fonta pesan:"
 
 #: ../src/pref-manager.c:2492
-#, fuzzy
 msgid "Subject font:"
-msgstr "Gaya Fonta"
+msgstr "Fonta subjek:"
 
 #: ../src/pref-manager.c:2498
-#, fuzzy
 msgid "Use default font size"
-msgstr "Ukuran fonta (baku: 64)"
+msgstr "Pakai ukuran fonta baku"
 
 #: ../src/pref-manager.c:2546
 #, fuzzy
@@ -5843,19 +5804,16 @@ msgid "Expand threads on open"
 msgstr "Lebarkan thread saat dibuka"
 
 #: ../src/pref-manager.c:2634
-#, fuzzy
 msgid "Pspell settings"
-msgstr "Pengaturan Surel"
+msgstr "Pengaturan pspell"
 
 #: ../src/pref-manager.c:2640
-#, fuzzy
 msgid "Spell check module"
-msgstr "Periksa ejaan inline"
+msgstr "Modul pemeriksaan ejaan"
 
 #: ../src/pref-manager.c:2646
-#, fuzzy
 msgid "Suggestion level"
-msgstr "Tingkat pelacakan:"
+msgstr "Tingkat saran"
 
 #. do the ignore length
 #: ../src/pref-manager.c:2651
@@ -5947,9 +5905,8 @@ msgid "Remember open mailboxes between sessions"
 msgstr "Ingat kotak-surat terbuka antar sesi"
 
 #: ../src/pref-manager.c:2847
-#, fuzzy
 msgid "Folder scanning"
-msgstr "Pemindaian %s gagal: %s"
+msgstr "Pemindaian folder"
 
 #: ../src/pref-manager.c:2849
 #, fuzzy
@@ -6014,14 +5971,12 @@ msgid "Default layout"
 msgstr "Tata letak baku"
 
 #: ../src/pref-manager.c:3548
-#, fuzzy
 msgid "Wide message layout"
-msgstr "Gunakan susunan sisi-demi-sisi atau melebar"
+msgstr "Tata letak pesan lebar"
 
 #: ../src/pref-manager.c:3549
-#, fuzzy
 msgid "Wide screen layout"
-msgstr "Gunakan susunan sisi-demi-sisi atau melebar"
+msgstr "Tata letak layar lebar"
 
 #: ../src/pref-manager.c:3557
 msgid "Show next unread message"
@@ -6041,7 +5996,7 @@ msgid "Error displaying link_id %s: %s\n"
 msgstr "Gagal membuka tautan yang diminta."
 
 #: ../src/print-gtk.c:91 ../src/print-gtk.c:250
-#, fuzzy, c-format
+#, c-format
 msgid "Page %d of %d"
 msgstr "Halaman %d dari %d"
 
@@ -6083,31 +6038,26 @@ msgid "default:mm"
 msgstr "default:mm"
 
 #: ../src/print-gtk.c:449
-#, fuzzy
 msgid "inch"
 msgstr "inci"
 
 #: ../src/print-gtk.c:456
-#, fuzzy
 msgid "mm"
 msgstr "mm"
 
 #: ../src/print-gtk.c:531
-#, fuzzy
 msgid "_Header Font:"
-msgstr "Huruf header"
+msgstr "Fonta _Kepala:"
 
 #: ../src/print-gtk.c:534
 msgid "B_ody Font:"
 msgstr "F_onta Badan Pesan:"
 
 #: ../src/print-gtk.c:537
-#, fuzzy
 msgid "_Footer Font:"
-msgstr "Pilih Fonta Kaki"
+msgstr "_Fonta Kaki:"
 
 #: ../src/print-gtk.c:544
-#, fuzzy
 msgid "Highlighting"
 msgstr "Penyorotan"
 
@@ -6136,19 +6086,17 @@ msgid "_Bottom"
 msgstr "_Bawah"
 
 #: ../src/print-gtk.c:619
-#, fuzzy
 msgid "_Left"
-msgstr "_Kiri"
+msgstr "K_iri"
 
 #: ../src/print-gtk.c:625
-#, fuzzy
 msgid "_Right"
-msgstr "Ka_nan"
+msgstr "K_anan"
 
 #: ../src/print-gtk.c:751
-#, fuzzy, c-format
+#, c-format
 msgid "Error printing message: %s"
-msgstr "Kesalahan ubah-nama pesan"
+msgstr "Kesalahan saat mencetak pesan: %s"
 
 #: ../src/save-restore.c:610
 msgid "Error during filters loading: "
@@ -6184,6 +6132,8 @@ msgid ""
 "This version of Balsa uses a new user interface; if you have changed Balsa's "
 "keyboard accelerators, you will need to set them again."
 msgstr ""
+"Versi Balsa ini memakai antar muka pengguna yang baru; bila Anda telah "
+"mengubah akselerator papan tik Balsa, Anda bakal perlu menata mereka lagi."
 
 #: ../src/save-restore.c:2170
 #, fuzzy
@@ -6255,14 +6205,12 @@ msgid "_German"
 msgstr "_Jerman"
 
 #: ../src/sendmsg-window.c:272
-#, fuzzy
 msgid "_German (Austrian)"
-msgstr "Low German"
+msgstr "_Jerman (Austria)"
 
 #: ../src/sendmsg-window.c:273
-#, fuzzy
 msgid "_German (Swiss)"
-msgstr "Jerman Swiss"
+msgstr "_Jerman (Swiss)"
 
 #: ../src/sendmsg-window.c:274
 msgid "_Greek"
@@ -6285,9 +6233,8 @@ msgid "_Japanese (JIS)"
 msgstr "_Jepang (JIS)"
 
 #: ../src/sendmsg-window.c:279
-#, fuzzy
 msgid "_Kazakh"
-msgstr "Kazakh"
+msgstr "_Kazakh"
 
 #: ../src/sendmsg-window.c:280
 msgid "_Korean"
@@ -6318,9 +6265,8 @@ msgid "_Romanian"
 msgstr "_Rumania"
 
 #: ../src/sendmsg-window.c:287
-#, fuzzy
 msgid "_Russian"
-msgstr "rusia"
+msgstr "_Rusia"
 
 #: ../src/sendmsg-window.c:288
 msgid "_Serbian"
@@ -6343,9 +6289,8 @@ msgid "_Swedish"
 msgstr "_Swedia"
 
 #: ../src/sendmsg-window.c:293
-#, fuzzy
 msgid "_Tatar"
-msgstr "Tatar"
+msgstr "_Tatar"
 
 #: ../src/sendmsg-window.c:294
 msgid "_Turkish"
@@ -6376,9 +6321,8 @@ msgid "_Include File..."
 msgstr "_Sertakan File..."
 
 #: ../src/sendmsg-window.c:335
-#, fuzzy
 msgid "Include a file"
-msgstr "_Sertakan File..."
+msgstr "Sertakan suatu berkas"
 
 #: ../src/sendmsg-window.c:336
 msgid "_Attach File..."
@@ -6393,9 +6337,8 @@ msgid "I_nclude Message(s)"
 msgstr "Sertaka_n Pesan"
 
 #: ../src/sendmsg-window.c:339
-#, fuzzy
 msgid "Include selected message(s)"
-msgstr "Lampirkan pesan-pesan yang dipilih"
+msgstr "Sertakan pesan-pesan yang dipilih"
 
 #: ../src/sendmsg-window.c:340
 msgid "Attach _Message(s)"
@@ -6448,12 +6391,10 @@ msgid "Copy to the clipboard"
 msgstr "Salin ke papan klip"
 
 #: ../src/sendmsg-window.c:360
-#, fuzzy
 msgid "_Paste"
 msgstr "Tem_pel"
 
 #: ../src/sendmsg-window.c:361
-#, fuzzy
 msgid "Paste from the clipboard"
 msgstr "Tempel dari papan klip"
 
@@ -6522,9 +6463,8 @@ msgid "_Postpone"
 msgstr "_Tunda"
 
 #: ../src/sendmsg-window.c:402
-#, fuzzy
 msgid "Save this message and close"
-msgstr "Simpan alamat ini dan tutup dialog?"
+msgstr "Simpan pesan ini dan tutup"
 
 #: ../src/sendmsg-window.c:404
 msgid "Send _Later"
@@ -6535,14 +6475,12 @@ msgid "Sa_ve and Close"
 msgstr "Sim_pan dan Tutup"
 
 #: ../src/sendmsg-window.c:419
-#, fuzzy
 msgid "Too_lbar"
-msgstr "Terlalu besar"
+msgstr "Bilah a_lat"
 
 #: ../src/sendmsg-window.c:421
-#, fuzzy
 msgid "F_rom"
-msgstr "Da_ri:"
+msgstr "Da_ri"
 
 #: ../src/sendmsg-window.c:423
 #, fuzzy
@@ -6555,9 +6493,8 @@ msgid "R_eply To"
 msgstr "Balas ke %s"
 
 #: ../src/sendmsg-window.c:429
-#, fuzzy
 msgid "F_cc"
-msgstr "Tembusan:"
+msgstr "F_cc"
 
 #: ../src/sendmsg-window.c:432
 msgid "_Request Disposition Notification"
@@ -6698,7 +6635,6 @@ msgid "Cannot create file URI object for %s"
 msgstr "Tak bisa membuat objek URI berkas bagi %s"
 
 #: ../src/sendmsg-window.c:2049
-#, fuzzy
 msgid "unknown error"
 msgstr "galat tak dikenal"
 
@@ -6765,9 +6701,8 @@ msgid "Could not save attachment: %s"
 msgstr "Tak bisa menyimpan lampiran: %s"
 
 #: ../src/sendmsg-window.c:3399
-#, fuzzy
 msgid "No subject"
-msgstr "(Tanpa subjek)"
+msgstr "Tanpa subjek"
 
 #: ../src/sendmsg-window.c:3432
 #, fuzzy, c-format
@@ -6811,7 +6746,7 @@ msgstr "Pilih folder untuk menyimpan bagian terpilih"
 
 #: ../src/sendmsg-window.c:3679
 msgid "Select the parts of the message which shall be quoted in the reply"
-msgstr ""
+msgstr "Pilih bagian dari pesan yang akan dikutip dalam jawaban"
 
 #: ../src/sendmsg-window.c:3821
 msgid "you"
@@ -6871,9 +6806,8 @@ msgid "not an absolute path"
 msgstr "Nama lokasi '%s' bukan lokasi absolut"
 
 #: ../src/sendmsg-window.c:5212
-#, fuzzy
 msgid "not in your directory"
-msgstr "Berkas Utama tak di dalam direktori."
+msgstr "tak di dalam direktori Anda"
 
 #: ../src/sendmsg-window.c:5219
 msgid "does not exist"
@@ -6891,6 +6825,9 @@ msgid ""
 "Please check that the address\n"
 "is appropriate."
 msgstr ""
+"Taut yang Anda pilih membuat\n"
+"alamat \"Blind copy\" (Bcc). Harap\n"
+"periksa bahwa alamat sesuai."
 
 #: ../src/sendmsg-window.c:5384
 #, c-format
@@ -6920,10 +6857,9 @@ msgstr "Set identitas yang akan dipakai untuk pesan ini"
 
 #: ../src/sendmsg-window.c:5751
 msgid "If you would like to provide one, enter it below."
-msgstr ""
+msgstr "Bila Anda hendak menyediakannya, masukkan di bawah."
 
 #: ../src/sendmsg-window.c:5801
-#, fuzzy
 msgid "_Send"
 msgstr "_Kirim"
 
@@ -6934,6 +6870,9 @@ msgid ""
 "available for all recipients. In order to protect your privacy, the message "
 "could be %s encrypted."
 msgstr ""
+"Anda tak memilih enkripsi bagi pesan ini, walaupun kunci publik %s tersedia "
+"bagi semua penerima. Untuk melindungi privasi Anda, pesan dapat disandikan "
+"%s."
 
 #: ../src/sendmsg-window.c:5911
 #, fuzzy
@@ -6955,11 +6894,13 @@ msgid ""
 "The message text will be sent as plain text and as HTML, but only the plain "
 "part can be signed.\n"
 msgstr ""
+"Teks pesan akan dikirim sebagai teks polos dan sebagai HTML, tapi hanya "
+"bagian polos yang dapat ditandatangani.\n"
 
 #: ../src/sendmsg-window.c:6002
 msgid ""
 "The message contains attachments, which cannot be signed or encrypted.\n"
-msgstr ""
+msgstr "Pesan memuat lampiran, yang tak bisa ditandatangani atau dienkripsi.\n"
 
 #: ../src/sendmsg-window.c:6006
 #, fuzzy
@@ -7004,11 +6945,13 @@ msgid "Message could not be encrypted"
 msgstr "Clipboard tak dapat disandikan."
 
 #: ../src/sendmsg-window.c:6085
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Send failed: %s\n"
 "%s"
-msgstr "Pengiriman gagal: %s"
+msgstr ""
+"Pengiriman gagal: %s\n"
+"%s"
 
 #: ../src/sendmsg-window.c:6090
 #, c-format
@@ -7076,7 +7019,6 @@ msgid ""
 msgstr "Ganti semua bentuk dari kata yang sekarang dengan saran yang dipilih"
 
 #: ../src/spell-check.c:527
-#, fuzzy
 msgid "_Ignore"
 msgstr "Aba_ikan"
 
@@ -7085,9 +7027,8 @@ msgid "Skip the current word"
 msgstr "Lompati kata yang sekarang"
 
 #: ../src/spell-check.c:534
-#, fuzzy
 msgid "Ignore A_ll"
-msgstr "Simpan Se_mua"
+msgstr "Abaikan Se_mua"
 
 #: ../src/spell-check.c:536
 msgid "Skip all occurrences of the current word"
@@ -7191,7 +7132,6 @@ msgid "Separator"
 msgstr "Pemisah"
 
 #: ../src/toolbar-factory.c:134
-#, fuzzy
 msgid "Quit"
 msgstr "Keluar"
 
@@ -7212,18 +7152,20 @@ msgid "Reply"
 msgstr "Balas"
 
 #: ../src/toolbar-factory.c:139
-#, fuzzy
 msgid ""
 "Reply\n"
 "to all"
-msgstr "Balas Ke Semu_a..."
+msgstr ""
+"Balas\n"
+"ke semua"
 
 #: ../src/toolbar-factory.c:140
-#, fuzzy
 msgid ""
 "Reply\n"
 "to group"
-msgstr "Balas Ke _Grup..."
+msgstr ""
+"Balas\n"
+"ke grup"
 
 #: ../src/toolbar-factory.c:141
 msgid "Forward"
@@ -7244,18 +7186,20 @@ msgid ""
 msgstr "Berikutnya - Bawaan"
 
 #: ../src/toolbar-factory.c:146
-#, fuzzy
 msgid ""
 "Previous\n"
 "part"
-msgstr "Ri_wayat Sebelumnya"
+msgstr ""
+"Bagian\n"
+"sebelumnya"
 
 #: ../src/toolbar-factory.c:147
-#, fuzzy
 msgid ""
 "Next\n"
 "part"
-msgstr "Berikutnya - Bawaan"
+msgstr ""
+"Bagian\n"
+"selanjutnya"
 
 #: ../src/toolbar-factory.c:148
 #, fuzzy
@@ -7304,11 +7248,12 @@ msgid "Close"
 msgstr "Tutup"
 
 #: ../src/toolbar-factory.c:159
-#, fuzzy
 msgid ""
 "Toggle\n"
 "new"
-msgstr "Jungkitkan keadaan"
+msgstr ""
+"Jungkitkan\n"
+"baru"
 
 #: ../src/toolbar-factory.c:160
 msgid "Mark all"
@@ -7378,14 +7323,12 @@ msgid "Priority Text Be_side Icons"
 msgstr "Teks dan ikon ukuran besar yang redup"
 
 #: ../src/toolbar-factory.c:530
-#, fuzzy
 msgid "_Icons Only"
-msgstr "_Ikon saja\" "
+msgstr "_Ikon Saja"
 
 #: ../src/toolbar-factory.c:531
-#, fuzzy
 msgid "_Text Only"
-msgstr "_Teks saja"
+msgstr "_Teks Saja"
 
 #: ../src/toolbar-factory.c:754
 #, fuzzy, c-format
@@ -7413,9 +7356,9 @@ msgid "_Wrap button labels"
 msgstr "_Lipat label tombol"
 
 #: ../src/toolbar-prefs.c:408
-#, fuzzy, c-format
+#, c-format
 msgid "Error displaying toolbar help: %s\n"
-msgstr "Galat sewaktu membuka dokumen bantuan"
+msgstr "Galat sewaktu menampilkan bantuan bilah alat: %s\n"
 
 #. Preview display
 #: ../src/toolbar-prefs.c:444

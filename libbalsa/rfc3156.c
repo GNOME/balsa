@@ -178,7 +178,8 @@ libbalsa_message_body_protection(LibBalsaMessageBody * body)
 			  "octet-stream"))
 	    result |= LIBBALSA_PROTECT_ERROR;
 	g_free(protocol);
-    } else if (body_is_type(body, "application", "pkcs7-mime")) {
+    } else if (body_is_type(body, "application", "pkcs7-mime") ||
+	    body_is_type(body, "application", "x-pkcs7-mime")) {
 	gchar *smime_type =
 	    libbalsa_message_body_get_parameter(body, "smime-type");
 
@@ -282,6 +283,7 @@ libbalsa_encrypt_mime_object(GMimeObject ** content, GList * rfc822_for,
     else {
 	GMimePart *pkcs7 =
 	    g_mime_part_new_with_type("application", "pkcs7-mime");
+	encrypted_obj = GMIME_OBJECT(pkcs7);
 
 	result = g_mime_application_pkcs7_encrypt(pkcs7, *content, recipients, always_trust, parent, error);
     }

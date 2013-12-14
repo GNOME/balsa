@@ -1,3 +1,14 @@
+2013-12-13  Peter Bloomfield
+
+	Fix S/MIME sending and Outlook2007 reception; bgo #720423
+	(Lilith Bryant, dark141 at gmail dot com)
+
+	* libbalsa/rfc3156.c (libbalsa_message_body_protection):
+	x-pkcs7-mime is synonymous with pkcs7-mime;
+	(libbalsa_encrypt_mime_object): use pkcs7 instead of leaking it.
+	* src/balsa-message.c (libbalsa_msg_try_decrypt):
+	x-pkcs7-mime is synonymous with pkcs7-mime.
+
 2013-09-20  Peter Bloomfield
 
 	Disable GtkInfoBar workarounds

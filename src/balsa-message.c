@@ -2764,7 +2764,8 @@ libbalsa_msg_try_decrypt(LibBalsaMessage * message, LibBalsaMessageBody * body,
     this_body = body;
     mime_type = libbalsa_message_body_get_mime_type(this_body);
     while (!g_ascii_strcasecmp(mime_type, "multipart/encrypted") ||
-	   !g_ascii_strcasecmp(mime_type, "application/pkcs7-mime")) {
+	   !g_ascii_strcasecmp(mime_type, "application/pkcs7-mime") ||
+	   !g_ascii_strcasecmp(mime_type, "application/x-pkcs7-mime")) {
 	gint encrres;
 
 	/* FIXME: not checking for body_ref > 1 (or > 2 when re-checking, which

@@ -1,3 +1,10 @@
+2013-12-16  Albrecht Dreß
+
+	Fix bgo #720443 (Lilith Bryant, dark141 at gmail dot com)
+
+	* libbalsa/rfc3156.c (libbalsa_body_decrypt): trivial patch
+	to fix the OL pk7 S/MIME issue.
+
 2013-12-13  Peter Bloomfield
 
 	Fix S/MIME sending and Outlook2007 reception; bgo #720423

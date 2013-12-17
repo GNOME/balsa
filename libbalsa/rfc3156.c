@@ -449,7 +449,9 @@ libbalsa_body_decrypt(LibBalsaMessageBody *body, gpgme_protocol_t protocol, GtkW
 	if (!smime_type || !GMIME_IS_PART(body->mime_part))
 	    return body;
 	if (!g_ascii_strcasecmp(smime_type, "enveloped-data"))
-	    smime_encrypted = FALSE;
+	    smime_encrypted = TRUE;
+	else
+            smime_encrypted = body->was_encrypted;
     }
 #endif
 

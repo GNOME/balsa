@@ -492,6 +492,8 @@ libbalsa_body_decrypt(LibBalsaMessageBody *body, gpgme_protocol_t protocol, GtkW
     else
 	body->was_encrypted = smime_encrypted;
 #endif
+    if (body->was_encrypted)
+        body->message->prot_state = LIBBALSA_MSG_PROTECT_CRYPT;
 
     libbalsa_message_body_set_mime_body(body, mime_obj);
     if (sig_state) {

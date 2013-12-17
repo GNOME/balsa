@@ -1,5 +1,10 @@
 2013-12-16  Albrecht Dreß
 
+	* libbalsa/rfc3156.c (libbalsa_body_decrypt): tree view icons
+	were handled differently for GPG and S/MIME.
+
+2013-12-16  Albrecht Dreß
+
 	Fix bgo #720443 (Lilith Bryant, dark141 at gmail dot com)
 
 	* libbalsa/rfc3156.c (libbalsa_body_decrypt): trivial patch

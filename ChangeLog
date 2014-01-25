@@ -1,3 +1,13 @@
+2014-01-25  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Remove accelerators from app-menu; duplicate "new message",
+	"address book", and "quit" on main-window's "file" menu.
+
+	* src/main-window.c (bw_set_menus): duplicate "new message",
+	"address book", and "quit" on main-window's "file" menu, with
+	accelerators;
+	* ui/main-window.ui: remove accelerators from app-menu.
+
 2013-12-16  Albrecht Dreß
 
 	* libbalsa/rfc3156.c (libbalsa_body_decrypt): tree view icons

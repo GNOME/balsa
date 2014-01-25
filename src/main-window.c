@@ -1939,12 +1939,15 @@ bw_set_menus(BalsaWindow * window)
         {"quit",                  quit_activated}
     };
     static GActionEntry win_entries[] = {
+        {"new-message",           new_message_activated},
         {"continue",              continue_activated},
         {"get-new-mail",          get_new_mail_activated},
         {"send-queued-mail",      send_queued_mail_activated},
         {"send-and-receive-mail", send_and_receive_mail_activated},
         {"page-setup",            page_setup_activated},
         {"print",                 print_activated},
+        {"address-book",          address_book_activated},
+        {"quit",                  quit_activated},
         {"copy",                  copy_activated},
         {"select-all",            select_all_activated},
         {"select-thread",         select_thread_activated},

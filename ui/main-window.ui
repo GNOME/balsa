@@ -6,7 +6,6 @@
         <item>
           <attribute name='label' translatable='yes'>_Message</attribute>
           <attribute name='action'>app.new-message</attribute>
-          <attribute name='accel'>m</attribute>
         </item>
       </section>
       <section>
@@ -64,7 +63,6 @@
         <attribute name='label'
           translatable='yes'>_Address Book</attribute>
         <attribute name='action'>app.address-book</attribute>
-        <attribute name='accel'>b</attribute>
       </item>
     </section>
     <section>
@@ -72,6 +70,8 @@
         <attribute name='label' translatable='yes'>_Preferences</attribute>
         <attribute name='action'>app.prefs</attribute>
       </item>
+    </section>
+    <section>
       <item>
         <attribute name='label' translatable='yes'>_Help</attribute>
         <attribute name='action'>app.help</attribute>
@@ -80,18 +80,22 @@
         <attribute name='label' translatable='yes'>_About</attribute>
         <attribute name='action'>app.about</attribute>
       </item>
-    </section>
-    <section>
       <item>
         <attribute name='label' translatable='yes'>_Quit</attribute>
         <attribute name='action'>app.quit</attribute>
-        <attribute name='accel'>&lt;Primary&gt;q</attribute>
       </item>
     </section>
   </menu>
   <menu id='menubar'>
     <submenu>
       <attribute name='label' translatable='yes'>_File</attribute>
+      <section>
+        <item>
+          <attribute name='label' translatable='yes'>New _Message</attribute>
+          <attribute name='action'>win.new-message</attribute>
+          <attribute name='accel'>m</attribute>
+        </item>
+      </section>
       <section>
         <item>
           <attribute name='label'
@@ -131,6 +135,21 @@
             translatable='yes'>_Print…</attribute>
           <attribute name='action'>win.print</attribute>
           <attribute name='accel'>&lt;Primary&gt;p</attribute>
+        </item>
+      </section>
+      <section>
+        <item>
+          <attribute name='label'
+            translatable='yes'>_Address Book</attribute>
+          <attribute name='action'>win.address-book</attribute>
+          <attribute name='accel'>b</attribute>
+        </item>
+      </section>
+      <section>
+        <item>
+          <attribute name='label' translatable='yes'>_Quit</attribute>
+          <attribute name='action'>win.quit</attribute>
+          <attribute name='accel'>&lt;Primary&gt;q</attribute>
         </item>
       </section>
     </submenu>

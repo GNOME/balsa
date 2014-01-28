@@ -342,7 +342,7 @@ balsa_spell_check_init(BalsaSpellCheck * spell_check)
 		     G_CALLBACK(change_cb), spell_check);
     gtk_grid_attach(grid, widget, 0, 0, 1, 1);
 
-    widget = balsa_stock_button_with_label(GTK_STOCK_REFRESH,
+    widget = balsa_stock_button_with_label("view-refresh",
                                            _("Change _All"));
     gtk_widget_set_tooltip_text(widget,
                                 _("Replace all occurrences of the current word "
@@ -359,7 +359,7 @@ balsa_spell_check_init(BalsaSpellCheck * spell_check)
 		     G_CALLBACK(ignore_cb), spell_check);
     gtk_grid_attach(grid, widget, 1, 0, 1, 1);
 
-    widget = balsa_stock_button_with_label(GTK_STOCK_GOTO_LAST,
+    widget = balsa_stock_button_with_label("go-last",
                                            _("I_gnore All"));
     gtk_widget_set_tooltip_text(widget,
                                 _("Skip all occurrences of the current word"));

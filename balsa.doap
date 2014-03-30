@@ -6,10 +6,14 @@
 
   <name xml:lang="en">balsa</name>
   <shortdesc xml:lang="en">Mail client</shortdesc>
-  <homepage rdf:resource="http://balsa.gnome.org/" />
+  <description>
+Balsa is an e-mail reader.  This client is part of the GNOME
+desktop environment.  It supports local mailboxes, POP3 and IMAP.
+  </description>
+  <homepage rdf:resource="http://pawsa.fedorapeople.org/balsa/" />
   <mailing-list rdf:resource="http://mail.gnome.org/mailman/listinfo/balsa-list" />
-  <download-page rdf:resource="http://balsa.gnome.org/download/" />
-  <bug-database rdf:resource="http://balsa.gnome.org/bugs.html" />
+  <download-page rdf:resource="http://pawsa.fedorapeople.org/balsa/download.html" />
+  <bug-database rdf:resource="http://pawsa.fedorapeople.org/balsa/bugs.html" />
 
   <!-- DOAP category: This is used to categorize repositories in cgit.
        Pulse has taken its best guess at the correct category.  You may

@@ -1,3 +1,8 @@
+2015-01-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* ui/ab-main.ui: GtkBuilder description of address-book editor
+	UI.
+
 2014-01-28  Pawel Salek
 
 	* src/spell-check.c: do not use deprecated icon names.

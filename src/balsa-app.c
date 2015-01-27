@@ -582,19 +582,20 @@ balsa_add_open_mailbox_urls(GPtrArray * url_array)
 }
 
 GtkWidget *
-balsa_stock_button_with_label(const char *icon, const char *text)
+balsa_stock_button_with_label(const gchar * icon, const gchar * text)
 {
     GtkWidget *button;
-    GtkWidget *pixmap =
-        gtk_image_new_from_icon_name(balsa_icon_id(icon),
-                                     GTK_ICON_SIZE_BUTTON);
-    GtkWidget *align = gtk_alignment_new(0.5, 0.5, 0, 0);
-    GtkWidget *hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+    GtkWidget *hbox;
+    GtkWidget *pixmap;
+
+    hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+    gtk_widget_set_halign(hbox, GTK_ALIGN_CENTER);
+    gtk_widget_set_valign(hbox, GTK_ALIGN_CENTER);
 
     button = gtk_button_new();
-    gtk_container_add(GTK_CONTAINER(button), align);
-    gtk_container_add(GTK_CONTAINER(align), hbox);
+    gtk_container_add(GTK_CONTAINER(button), hbox);
 
+    pixmap = gtk_image_new_from_icon_name(balsa_icon_id(icon), GTK_ICON_SIZE_BUTTON);
     gtk_box_pack_start(GTK_BOX(hbox), pixmap, FALSE, FALSE, 0);
     if (text && *text) {
         GtkWidget *label = gtk_label_new_with_mnemonic(text);

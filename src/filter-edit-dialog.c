@@ -407,9 +407,6 @@ build_action_page(GtkWindow * window)
                                     NULL);
     gtk_dialog_set_default_response(GTK_DIALOG(dialog),
                                     GTK_RESPONSE_ACCEPT);
-    gtk_dialog_set_alternative_button_order(GTK_DIALOG(dialog),
-                                            GTK_RESPONSE_ACCEPT,
-                                            GTK_RESPONSE_CANCEL, -1);
     fe_sound_entry = gtk_file_chooser_button_new_with_dialog(dialog);
     gtk_widget_set_hexpand(fe_sound_entry, TRUE);
     gtk_grid_attach(GTK_GRID(grid), fe_sound_entry, 1, 0, 1, 1);

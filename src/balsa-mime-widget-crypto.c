@@ -85,7 +85,7 @@ balsa_mime_widget_signature_widget(LibBalsaMessageBody * mime_body,
     gtk_container_set_border_width(GTK_CONTAINER(vbox), BMW_CONTAINER_BORDER);
     label = gtk_label_new(infostr);
     gtk_label_set_selectable(GTK_LABEL(label), TRUE);
-    gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.5);
+    gtk_widget_set_halign(label, GTK_ALIGN_START);
     gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 0);
     g_free(infostr);
 #ifdef HAVE_GPG

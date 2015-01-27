@@ -175,7 +175,7 @@ add_radio_buttons(GtkWidget * grid, gint row, AddressBookConfig * abc)
     GtkWidget *button;
 
     label = gtk_label_new(_("Suggest complete addresses:"));
-    gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
+    gtk_widget_set_halign(label, GTK_ALIGN_START);
     gtk_grid_attach(GTK_GRID(grid), label, 0, row, 2, 1);
 
     abc->as_i_type =
@@ -370,7 +370,7 @@ create_externq_dialog(AddressBookConfig * abc)
 				   label);
 
     label = gtk_label_new(_("Load program location:"));
-    gtk_misc_set_alignment(GTK_MISC(label), 1.0, 0.5);
+    gtk_widget_set_halign(label, GTK_ALIGN_END);
     gtk_grid_attach(GTK_GRID(grid), label, 0, 1, 1, 1);
     abc->ab_specific.externq.load =
         gtk_file_chooser_button_new
@@ -383,7 +383,7 @@ create_externq_dialog(AddressBookConfig * abc)
                                   abc->ab_specific.externq.load);
 
     label = gtk_label_new(_("Save program location:"));
-    gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
+    gtk_widget_set_halign(label, GTK_ALIGN_START);
     gtk_grid_attach(GTK_GRID(grid), label, 0, 2, 1, 1);
     abc->ab_specific.externq.save =
         gtk_file_chooser_button_new

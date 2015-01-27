@@ -92,7 +92,16 @@ lbh_get_body_content(LibBalsaMessageBody * body, gchar ** buf)
 #define d(x)
 #endif
 
+/* WebKitContextMenuItem uses GtkAction, which is deprecated.
+ * We don't use it, but it breaks the git-tree build, so we just mangle
+ * it: */
+#if defined(GTK_DISABLE_DEPRECATED)
+#define GtkAction GAction
 #include <webkit2/webkit2.h>
+#undef GtkAction
+#else  /* defined(GTK_DISABLE_DEPRECATED) */
+#include <webkit2/webkit2.h>
+#endif /* defined(GTK_DISABLE_DEPRECATED) */
 
 typedef struct {
     LibBalsaMessageBody  *body;
@@ -198,31 +207,33 @@ static void
 lbh_navigation_policy_decision(WebKitPolicyDecision * decision,
                                gpointer               data)
 {
-    WebKitNavigationPolicyDecision *navigation_decision =
-        WEBKIT_NAVIGATION_POLICY_DECISION(decision);
+    WebKitNavigationPolicyDecision *navigation_decision;
+    WebKitNavigationAction *navigation_action;
     LibBalsaWebKitInfo *info = data;
     WebKitURIRequest *request;
 
-    switch (webkit_navigation_policy_decision_get_navigation_type
-            (navigation_decision)) {
+    navigation_decision = WEBKIT_NAVIGATION_POLICY_DECISION(decision);
+    navigation_action =
+         webkit_navigation_policy_decision_get_navigation_action
+            (navigation_decision);
+    switch (webkit_navigation_action_get_navigation_type
+            (navigation_action)) {
     case WEBKIT_NAVIGATION_TYPE_OTHER:
     case WEBKIT_NAVIGATION_TYPE_RELOAD:
         d(g_print("%s type %d, used\n", __func__,
-                  webkit_navigation_policy_decision_get_navigation_type
-                  (navigation_decision)));
+                  webkit_navigation_action_get_navigation_type
+                  (navigation_action)));
         webkit_policy_decision_use(decision);
         break;
     case WEBKIT_NAVIGATION_TYPE_LINK_CLICKED:
-        request =
-            webkit_navigation_policy_decision_get_request
-            (navigation_decision);
+        request = webkit_navigation_action_get_request(navigation_action);
         d(g_print("%s clicked %s\n", __func__,
                   webkit_uri_request_get_uri(request)));
         (*info->clicked_cb) (webkit_uri_request_get_uri(request));
     default:
         d(g_print("%s type %d, ignored\n", __func__,
-                  webkit_navigation_policy_decision_get_navigation_type
-                  (navigation_decision)));
+                  webkit_navigation_action_get_navigation_type
+                  (navigation_action)));
         webkit_policy_decision_ignore(decision);
     }
 }
@@ -231,24 +242,26 @@ static void
 lbh_new_window_policy_decision(WebKitPolicyDecision * decision,
                                gpointer               data)
 {
-    WebKitNavigationPolicyDecision *navigation_decision =
-        WEBKIT_NAVIGATION_POLICY_DECISION(decision);
+    WebKitNavigationPolicyDecision *navigation_decision;
+    WebKitNavigationAction *navigation_action;
     LibBalsaWebKitInfo *info = data;
     WebKitURIRequest *request;
 
-    switch (webkit_navigation_policy_decision_get_navigation_type
-            (navigation_decision)) {
-    case WEBKIT_NAVIGATION_TYPE_LINK_CLICKED:
-        request =
-            webkit_navigation_policy_decision_get_request
+    navigation_decision = WEBKIT_NAVIGATION_POLICY_DECISION(decision);
+    navigation_action =
+         webkit_navigation_policy_decision_get_navigation_action
             (navigation_decision);
+    switch (webkit_navigation_action_get_navigation_type
+            (navigation_action)) {
+    case WEBKIT_NAVIGATION_TYPE_LINK_CLICKED:
+        request = webkit_navigation_action_get_request(navigation_action);
         d(g_print("%s clicked %s\n", __func__,
                   webkit_uri_request_get_uri(request)));
         (*info->clicked_cb) (webkit_uri_request_get_uri(request));
     default:
         d(g_print("%s type %d, ignored\n", __func__,
-                  webkit_navigation_policy_decision_get_navigation_type
-                  (navigation_decision)));
+                  webkit_navigation_action_get_navigation_type
+                  (navigation_action)));
 
         webkit_policy_decision_ignore(decision);
     }

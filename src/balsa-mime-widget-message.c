@@ -573,7 +573,7 @@ add_header_gchar(BalsaMessage * bm, GtkGrid * grid,
     gtk_widget_override_font(lab, font_desc);
     gtk_grid_attach(grid, lab, 0, row, 1, 1);
     gtk_label_set_selectable(GTK_LABEL(lab), TRUE);
-    gtk_misc_set_alignment(GTK_MISC(lab), 0, 0);
+    gtk_widget_set_halign(lab, GTK_ALIGN_START);
     gtk_widget_show(lab);
 
     if (value && *value != '\0') {
@@ -590,7 +590,7 @@ add_header_gchar(BalsaMessage * bm, GtkGrid * grid,
         gtk_widget_override_font(lab, font_desc);
         gtk_label_set_line_wrap_mode(GTK_LABEL(lab), PANGO_WRAP_WORD_CHAR);
         gtk_label_set_selectable(GTK_LABEL(lab), TRUE);
-        gtk_misc_set_alignment(GTK_MISC(lab), 0, 0);
+        gtk_widget_set_halign(lab, GTK_ALIGN_START);
         gtk_widget_set_hexpand(lab, TRUE);
 
         expander = gtk_expander_new(NULL);
@@ -790,7 +790,7 @@ add_header_sigstate(GtkGrid * grid, GMimeGpgmeSigstat * siginfo)
     label = gtk_label_new(NULL);
     gtk_label_set_markup(GTK_LABEL(label), msg);
     g_free(msg);
-    gtk_misc_set_alignment(GTK_MISC(label), 0, 0);
+    gtk_widget_set_halign(label, GTK_ALIGN_START);
     gtk_widget_show(label);
 
     row = 0;

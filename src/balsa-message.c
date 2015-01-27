@@ -589,6 +589,7 @@ bm_find_bar_new(BalsaMessage * bm)
     GtkWidget *toolbar;
     GtkWidget *hbox;
     GtkToolItem *tool_item;
+    GtkWidget *image;
 
     toolbar = gtk_toolbar_new();
     gtk_toolbar_set_style(GTK_TOOLBAR(toolbar), GTK_TOOLBAR_BOTH_HORIZ);
@@ -605,17 +606,15 @@ bm_find_bar_new(BalsaMessage * bm)
     gtk_container_add(GTK_CONTAINER(tool_item), hbox);
     gtk_toolbar_insert(GTK_TOOLBAR(toolbar), tool_item, -1);
 
-    tool_item =
-        gtk_tool_button_new(gtk_arrow_new(GTK_ARROW_LEFT, GTK_SHADOW_NONE),
-                            _("Previous"));
+    image = gtk_image_new_from_icon_name("pan_up_symbolic", GTK_ICON_SIZE_BUTTON);
+    tool_item = gtk_tool_button_new(image, _("Previous"));
     bm->find_prev = GTK_WIDGET(tool_item);
     gtk_tool_item_set_is_important(tool_item, TRUE);
     g_signal_connect(tool_item, "clicked", G_CALLBACK(bm_find_prev_cb), bm);
     gtk_toolbar_insert(GTK_TOOLBAR(toolbar), tool_item, -1);
 
-    tool_item =
-        gtk_tool_button_new(gtk_arrow_new(GTK_ARROW_RIGHT, GTK_SHADOW_NONE),
-                            _("Next"));
+    image = gtk_image_new_from_icon_name("pan_down_symbolic", GTK_ICON_SIZE_BUTTON);
+    tool_item = gtk_tool_button_new(image, _("Next"));
     bm->find_next = GTK_WIDGET(tool_item);
     gtk_tool_item_set_is_important(tool_item, TRUE);
     g_signal_connect(tool_item, "clicked", G_CALLBACK(bm_find_next_cb), bm);
@@ -741,7 +740,6 @@ balsa_message_init(BalsaMessage * bm)
     g_signal_connect(bm->treeview, "popup-menu",
                      G_CALLBACK(tree_menu_popup_key_cb), bm);
     g_object_unref (G_OBJECT (model));
-    gtk_tree_view_set_rules_hint (GTK_TREE_VIEW (bm->treeview), TRUE);
     gtk_tree_selection_set_mode (selection, GTK_SELECTION_MULTIPLE);
     gtk_tree_view_set_headers_visible (GTK_TREE_VIEW (bm->treeview), FALSE);
 

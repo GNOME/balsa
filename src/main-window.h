@@ -84,8 +84,6 @@ struct _BalsaWindow {
     guint activity_counter;
     GSList *activity_messages;
 
-    /* New mail notification: */
-    GtkStatusIcon *new_mail_tray;
 #ifdef HAVE_NOTIFY
     NotifyNotification *new_mail_note;
 #endif                         /* HAVE_NOTIFY */

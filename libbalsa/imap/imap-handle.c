@@ -20,7 +20,7 @@
 
 #define _POSIX_C_SOURCE 199506L
 #define _XOPEN_SOURCE 500
-#define _BSD_SOURCE     1
+#define _DEFAULT_SOURCE     1
 
 #include <sys/types.h>
 #include <sys/socket.h>

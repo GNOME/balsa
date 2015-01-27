@@ -22,6 +22,7 @@ balsa.1
 balsa.desktop
 balsa.desktop.in
 balsa.spec
+compile
 config.guess
 config.h
 config.h.in

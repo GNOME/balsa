@@ -2303,9 +2303,8 @@ create_email_or_string_entry(BalsaSendmsg * bsmsg,
     arr[0] = gtk_label_new_with_mnemonic(label);
     gtk_size_group_add_widget(bsmsg->size_group, arr[0]);
     gtk_label_set_mnemonic_widget(GTK_LABEL(arr[0]), mnemonic_widget);
-    gtk_misc_set_alignment(GTK_MISC(arr[0]), 0.0, 0.5);
-    gtk_misc_set_padding(GTK_MISC(arr[0]), GNOME_PAD_SMALL,
-			 GNOME_PAD_SMALL);
+    gtk_widget_set_halign(arr[0], GTK_ALIGN_START);
+    g_object_set(arr[0], "margin", GNOME_PAD_SMALL, NULL);
     gtk_grid_attach(GTK_GRID(grid), arr[0], 0, y_pos, 1, 1);
 
     if (!balsa_app.use_system_fonts) {
@@ -2664,9 +2663,8 @@ sw_attachment_list(BalsaSendmsg *bsmsg)
     /* Attachment list */
     label = gtk_label_new_with_mnemonic(_("_Attachments:"));
     gtk_size_group_add_widget(bsmsg->size_group, label);
-    gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.5);
-    gtk_misc_set_padding(GTK_MISC(label), GNOME_PAD_SMALL,
-			 GNOME_PAD_SMALL);
+    gtk_widget_set_halign(label, GTK_ALIGN_START);
+    g_object_set(label, "margin", GNOME_PAD_SMALL, NULL);
     gtk_grid_attach(GTK_GRID(grid), label, 0, 0, 1, 1);
 
     sw = gtk_scrolled_window_new(NULL, NULL);
@@ -2687,7 +2685,6 @@ sw_attachment_list(BalsaSendmsg *bsmsg)
     gtk_widget_set_vexpand(tree_view, TRUE);
     view = GTK_TREE_VIEW(tree_view);
     gtk_tree_view_set_headers_visible(view, TRUE);
-    gtk_tree_view_set_rules_hint(view, TRUE);
     g_object_unref(store);
 
     /* column for type icon */
@@ -3356,11 +3353,12 @@ quote_parts_select_dlg(GtkTreeStore *tree_store, GtkWindow * parent)
                             " which shall be quoted in the reply"));
     gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
     gtk_label_set_selectable(GTK_LABEL(label), TRUE);
-    gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.0);
+    gtk_widget_set_halign(label, GTK_ALIGN_START);
+    gtk_widget_set_valign(label, GTK_ALIGN_START);
 
     image = gtk_image_new_from_icon_name("dialog-question",
                                          GTK_ICON_SIZE_DIALOG);
-    gtk_misc_set_alignment(GTK_MISC(image), 0.5, 0.0);
+    gtk_widget_set_valign(image, GTK_ALIGN_START);
 
     /* stolen form gtk/gtkmessagedialog.c */
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 12);
@@ -4990,10 +4988,8 @@ subject_not_empty(BalsaSendmsg * bsmsg)
     gchar *text_str;
     GtkWidget *label;
     GtkWidget *subj_entry;
-    GtkWidget *dialog_action_area;
     GtkWidget *cnclbutton;
     GtkWidget *okbutton;
-    GtkWidget *alignment;
     gint response;
 
     /* read the subject widget and verify that it is contains something else
@@ -5024,7 +5020,7 @@ subject_not_empty(BalsaSendmsg * bsmsg)
     image = gtk_image_new_from_icon_name("dialog-question",
                                          GTK_ICON_SIZE_DIALOG);
     gtk_box_pack_start (GTK_BOX (hbox), image, FALSE, FALSE, 0);
-    gtk_misc_set_alignment (GTK_MISC (image), 0.5, 0);
+    gtk_widget_set_valign(image, GTK_ALIGN_START);
 
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 12);
     gtk_box_pack_start (GTK_BOX (hbox), vbox, TRUE, TRUE, 0);
@@ -5037,7 +5033,8 @@ subject_not_empty(BalsaSendmsg * bsmsg)
     gtk_box_pack_start (GTK_BOX (vbox), label, FALSE, FALSE, 0);
     gtk_label_set_use_markup (GTK_LABEL (label), TRUE);
     gtk_label_set_line_wrap (GTK_LABEL (label), TRUE);
-    gtk_misc_set_alignment (GTK_MISC (label), 0, 0);
+    gtk_widget_set_halign(label, GTK_ALIGN_START);
+    gtk_widget_set_valign(label, GTK_ALIGN_START);
 
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 6);
     gtk_box_pack_start (GTK_BOX (vbox), hbox, FALSE, FALSE, 0);
@@ -5050,9 +5047,6 @@ subject_not_empty(BalsaSendmsg * bsmsg)
     gtk_box_pack_start (GTK_BOX (hbox), subj_entry, TRUE, TRUE, 0);
     gtk_entry_set_activates_default (GTK_ENTRY (subj_entry), TRUE);
 
-    dialog_action_area =
-        gtk_dialog_get_action_area(GTK_DIALOG(no_subj_dialog));
-    gtk_button_box_set_layout (GTK_BUTTON_BOX (dialog_action_area), GTK_BUTTONBOX_END);
 
     cnclbutton = gtk_button_new_with_mnemonic(_("_Cancel"));
     gtk_dialog_add_action_widget (GTK_DIALOG (no_subj_dialog), cnclbutton, GTK_RESPONSE_CANCEL);
@@ -5064,11 +5058,10 @@ subject_not_empty(BalsaSendmsg * bsmsg)
     gtk_dialog_set_default_response(GTK_DIALOG (no_subj_dialog),
                                     GTK_RESPONSE_OK);
 
-    alignment = gtk_alignment_new (0.5, 0.5, 0, 0);
-    gtk_container_add (GTK_CONTAINER (okbutton), alignment);
-
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 2);
-    gtk_container_add (GTK_CONTAINER (alignment), hbox);
+    gtk_widget_set_halign(hbox, GTK_ALIGN_CENTER);
+    gtk_widget_set_valign(hbox, GTK_ALIGN_CENTER);
+    gtk_container_add (GTK_CONTAINER (okbutton), hbox);
 
     image = gtk_image_new_from_icon_name(BALSA_PIXMAP_SEND,
                                          GTK_ICON_SIZE_BUTTON);
@@ -5140,9 +5133,7 @@ check_suggest_encryption(BalsaSendmsg * bsmsg)
     if (can_encrypt) {
 	GtkWidget *dialog;
 	gint choice;
-	GtkWidget *dialog_action_area;
 	GtkWidget *button;
-	GtkWidget *alignment;
 	GtkWidget *hbox;
 	GtkWidget *image;
 	GtkWidget *label;
@@ -5161,18 +5152,16 @@ check_suggest_encryption(BalsaSendmsg * bsmsg)
         libbalsa_macosx_menu_for_parent(dialog, GTK_WINDOW(bsmsg->window));
 #endif
 
-	dialog_action_area = gtk_dialog_get_action_area(GTK_DIALOG(dialog));
-	gtk_button_box_set_layout(GTK_BUTTON_BOX(dialog_action_area), GTK_BUTTONBOX_END);
 
 	button = gtk_button_new();
 	gtk_dialog_add_action_widget(GTK_DIALOG(dialog), button, GTK_RESPONSE_YES);
         gtk_widget_set_can_default(button, TRUE);
 	gtk_widget_grab_focus(button);
-	alignment = gtk_alignment_new (0.5, 0.5, 0, 0);
-	gtk_container_add(GTK_CONTAINER(button), alignment);
 
 	hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 2);
-	gtk_container_add(GTK_CONTAINER(alignment), hbox);
+        gtk_widget_set_halign(hbox, GTK_ALIGN_CENTER);
+        gtk_widget_set_valign(hbox, GTK_ALIGN_CENTER);
+	gtk_container_add(GTK_CONTAINER(button), hbox);
 	image = gtk_image_new_from_icon_name(BALSA_PIXMAP_GPG_ENCRYPT,
                                              GTK_ICON_SIZE_BUTTON);
 	gtk_box_pack_start(GTK_BOX(hbox), image, FALSE, FALSE, 0);
@@ -5183,11 +5172,11 @@ check_suggest_encryption(BalsaSendmsg * bsmsg)
 	button = gtk_button_new();
 	gtk_dialog_add_action_widget(GTK_DIALOG(dialog), button, GTK_RESPONSE_NO);
         gtk_widget_set_can_default(button, TRUE);
-	alignment = gtk_alignment_new (0.5, 0.5, 0, 0);
-	gtk_container_add(GTK_CONTAINER(button), alignment);
 
 	hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 2);
-	gtk_container_add(GTK_CONTAINER(alignment), hbox);
+        gtk_widget_set_halign(hbox, GTK_ALIGN_CENTER);
+        gtk_widget_set_valign(hbox, GTK_ALIGN_CENTER);
+	gtk_container_add(GTK_CONTAINER(button), hbox);
 	image = gtk_image_new_from_icon_name(BALSA_PIXMAP_SEND,
                                              GTK_ICON_SIZE_BUTTON);
 	gtk_box_pack_start(GTK_BOX(hbox), image, FALSE, FALSE, 0);

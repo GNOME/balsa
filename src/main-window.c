@@ -703,9 +703,6 @@ bw_window_state_event_cb(BalsaWindow * window,
     balsa_app.mw_maximized =
         event->new_window_state & GDK_WINDOW_STATE_MAXIMIZED;
 
-    gtk_window_set_has_resize_grip(GTK_WINDOW(window),
-                                   !balsa_app.mw_maximized);
-
     return FALSE;
 }
 
@@ -722,8 +719,6 @@ bw_is_active_notify(GObject * gobject, GParamSpec * pspec,
         if (window->new_mail_note)
             notify_notification_close(window->new_mail_note, NULL);
 #endif                          /* HAVE_NOTIFY */
-        if (window->new_mail_tray)
-            gtk_status_icon_set_visible(window->new_mail_tray, FALSE);
         gtk_window_set_urgency_hint(gtk_window, FALSE);
     }
 }
@@ -2778,6 +2773,23 @@ bw_notebook_label_new(BalsaMailboxNode * mbnode)
     box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 4);
 
     lab = gtk_label_new(mbnode->mailbox->name);
+    gtk_widget_set_name(lab, "balsa-notebook-tab-label");
+
+    /* Try to make text not bold: */
+    css_provider = gtk_css_provider_new();
+    if (!gtk_css_provider_load_from_data(css_provider,
+                                         "#balsa-notebook-tab-label"
+                                         "{"
+                                           "font-weight:normal;"
+                                         "}",
+                                         -1, NULL))
+        g_print("Could not load label CSS data.\n");
+
+    gtk_style_context_add_provider(gtk_widget_get_style_context(lab) ,
+                                   GTK_STYLE_PROVIDER(css_provider),
+                                   GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+    g_object_unref(css_provider);
+
     bw_notebook_label_style(GTK_LABEL(lab),
                             libbalsa_mailbox_get_unread(mbnode->mailbox) > 0);
     g_signal_connect(mbnode->mailbox, "changed",
@@ -3824,34 +3836,6 @@ bw_display_new_mail_notification(int num_new, int has_new)
 
     if (!gtk_window_is_active(window))
         gtk_window_set_urgency_hint(window, TRUE);
-
-    if (balsa_app.notify_new_mail_icon) {
-        /* set up the sys tray icon when it is not yet present */
-        if (!gtk_window_is_active(window)) {
-	    if (!balsa_app.main_window->new_mail_tray) {
-		balsa_app.main_window->new_mail_tray =
-		    gtk_status_icon_new_from_icon_name("mail-message-new");
-                g_signal_connect_swapped(balsa_app.main_window->
-                                         new_mail_tray, "activate",
-                                         G_CALLBACK(gtk_window_present),
-                                         balsa_app.main_window);
-	    }
-	    /* show sys tray icon if we don't have the focus */
-            if (num_new > 0)
-                msg = g_strdup_printf
-                    (ngettext
-                     ("Balsa: you have received %d new message.",
-                      "Balsa: you have received %d new messages.",
-                      num_new + num_total), num_new + num_total);
-            else
-                msg = g_strdup(_("Balsa: you have new mail."));
-            gtk_status_icon_set_tooltip_text(balsa_app.main_window->
-                                             new_mail_tray, msg);
-            gtk_status_icon_set_visible(balsa_app.main_window->
-                                        new_mail_tray, TRUE);
-            g_free(msg);
-        }
-    }
 
     if (!balsa_app.notify_new_mail_dialog)
         return;

@@ -24,7 +24,7 @@
 # include "config.h"
 #endif                          /* HAVE_CONFIG_H */
 
-#define _BSD_SOURCE     1 
+#define _DEFAULT_SOURCE 1 
 #define _POSIX_C_SOURCE 199309L
 #include "send.h"
 

@@ -181,7 +181,7 @@ lb_gpgme_select_key(const gchar * user_name, gboolean secret, GList * keys,
 				 ("Select the public key for the recipient %s"),
 				 user_name);
     label = gtk_label_new(prompt);
-    gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.5);
+    gtk_widget_set_halign(label, GTK_ALIGN_START);
     g_free(prompt);
     gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, TRUE, 0);
 

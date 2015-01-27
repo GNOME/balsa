@@ -68,7 +68,8 @@ balsa_mime_widget_new_vcalendar(BalsaMessage * bm,
 			   libbalsa_vcal_method_to_str(vcal_obj->method));
     label = gtk_label_new(text);
     g_free(text);
-    gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.0);
+    gtk_widget_set_halign(label, GTK_ALIGN_START);
+    gtk_widget_set_valign(label, GTK_ALIGN_START);
     gtk_container_add(GTK_CONTAINER(mw->widget), label);
 
     /* a reply may be created only for unread requests */

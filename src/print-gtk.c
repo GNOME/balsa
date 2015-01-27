@@ -509,7 +509,7 @@ message_prefs_widget(GtkPrintOperation * operation,
     gtk_label_set_markup(GTK_LABEL(label), markup);
     g_free(markup);
     gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
-    gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
+    gtk_widget_set_halign(label, GTK_ALIGN_START);
     gtk_box_pack_start(GTK_BOX(group), label, FALSE, FALSE, 0);
 
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
@@ -543,7 +543,7 @@ message_prefs_widget(GtkPrintOperation * operation,
     gtk_label_set_markup(GTK_LABEL(label), markup);
     g_free(markup);
     gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
-    gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
+    gtk_widget_set_halign(label, GTK_ALIGN_START);
     gtk_box_pack_start(GTK_BOX(group), label, FALSE, FALSE, 0);
 
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
@@ -578,7 +578,7 @@ message_prefs_widget(GtkPrintOperation * operation,
     gtk_label_set_markup(GTK_LABEL(label), markup);
     g_free(markup);
     gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
-    gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
+    gtk_widget_set_halign(label, GTK_ALIGN_START);
     gtk_box_pack_start(GTK_BOX(group), label, FALSE, FALSE, 0);
 
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);

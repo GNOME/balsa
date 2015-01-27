@@ -1,5 +1,42 @@
 2015-01-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Deprecation cleanup
+
+	* .gitignore: add "compile"
+	* configure.ac: use webkit2gtk-4.0
+	* libbalsa/address.c (libbalsa_address_get_edit_widget):
+	* libbalsa/html.c (lbh_navigation_policy_decision),
+	(lbh_new_window_policy_decision):
+	* libbalsa/imap/imap-handle.c:
+	* libbalsa/libbalsa-gpgme-cb.c (lb_gpgme_select_key):
+	* libbalsa/send.c:
+	* libbalsa/url.c:
+	* src/address-book-config.c (add_radio_buttons),
+	(create_externq_dialog):
+	* src/balsa-app.c (balsa_stock_button_with_label):
+	* src/balsa-icons.c (load_balsa_pixmap):
+	* src/balsa-message.c (bm_find_bar_new), (balsa_message_init):
+	* src/balsa-mime-widget-crypto.c
+	(balsa_mime_widget_signature_widget):
+	* src/balsa-mime-widget-message.c (add_header_gchar),
+	(add_header_sigstate):
+	* src/balsa-mime-widget-vcalendar.c
+	(balsa_mime_widget_new_vcalendar):
+	* src/filter-edit-dialog.c (build_action_page):
+	* src/main-window.c (bw_window_state_event_cb),
+	(bw_is_active_notify), (bw_notebook_label_new),
+	(bw_display_new_mail_notification):
+	* src/main-window.h:
+	* src/pref-manager.c (attach_label), (checking_group),
+	(quoted_group), (mdn_group), (main_window_group), (add_pref_menu),
+	(deleting_messages_group), (folder_scanning_group), (pm_group_new):
+	* src/print-gtk.c (message_prefs_widget):
+	* src/sendmsg-window.c (create_email_or_string_entry),
+	(sw_attachment_list), (quote_parts_select_dlg),
+	(subject_not_empty), (check_suggest_encryption):
+
+2015-01-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* src/ab-main.c (bab_load_cb), (bab_set_address_book),
 	(address_book_change_state), (set_address_book_menu_items),
 	(address_book_change), (file_new_vcard_activated),

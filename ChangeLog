@@ -1,5 +1,21 @@
 2015-01-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	* src/ab-main.c (bab_load_cb), (bab_set_address_book),
+	(address_book_change_state), (set_address_book_menu_items),
+	(address_book_change), (file_new_vcard_activated),
+	(file_new_extern_activated), (file_new_ldif_activated),
+	(file_new_ldap_activated), (file_new_gpe_activated),
+	(file_new_rubrica_activated), (file_properties_activated),
+	(file_delete_activated), (file_quit_activated),
+	(entry_new_activated), (entry_delete_activated),
+	(help_about_activated), (get_main_menu),
+	(list_selection_changed_cb), (list_row_activated_cb),
+	(bab_get_filter_box), (bab_window_new), (main): port to
+	GApplication and friends.
+	* ui/Makefile.am: add ab-main.ui.
+
+2015-01-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* ui/ab-main.ui: GtkBuilder description of address-book editor
 	UI.
 

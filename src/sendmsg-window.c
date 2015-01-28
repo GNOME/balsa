@@ -216,7 +216,7 @@ struct SendLocales {
     {"lt_LT", "ISO-8859-13",   N_("_Lithuanian")},
     {"no_NO", "ISO-8859-1",    N_("_Norwegian")},
     {"pl_PL", "ISO-8859-2",    N_("_Polish")},
-    {"pt_PT", "ISO-8859-15",   N_("_Portugese")},
+    {"pt_PT", "ISO-8859-15",   N_("_Portuguese")},
     {"ro_RO", "ISO-8859-2",    N_("_Romanian")},
     {"ru_RU", "KOI8-R",        N_("_Russian")},
     {"sr_Cyrl", "ISO-8859-5",  N_("_Serbian")},

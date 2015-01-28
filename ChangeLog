@@ -1,5 +1,12 @@
 2015-01-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Fix bug #741805 (Anders Jonsson)
+
+	* help/C/balsa.sgml: fix spelling of "Portuguese".
+	* src/sendmsg-window.c: ditto.
+
+2015-01-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Deprecation cleanup
 
 	* .gitignore: add "compile"

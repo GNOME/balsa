@@ -1,3 +1,10 @@
+2015-01-28  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* src/ab-main.c (bab_cleanup), (set_address_book_menu_items),
+	(get_main_menu), (bab_window_list_new), (bab_window_new),
+	(ab_warning), (bab_set_intial_address_book), (main): streamline
+	code.
+
 2015-01-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Fix bug #741805 (Anders Jonsson)

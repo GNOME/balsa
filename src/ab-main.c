@@ -73,7 +73,11 @@ struct ABMainWindow {
 } contacts_app;
 
 
-static void bab_cleanup(void);
+static void
+bab_cleanup(void)
+{
+    gtk_main_quit();
+}
 
 static void ab_set_edit_widget(LibBalsaAddress * address,
                                gboolean can_remove);
@@ -258,10 +262,6 @@ set_address_book_menu_items(void)
     guint pos;
     gchar *s;
     GtkBuilder *builder;
-    static GActionEntry entry = {
-        "address-book", libbalsa_radio_activated, "s", NULL,
-        address_book_change_state
-    };
 
     pos = g_menu_model_get_n_items(G_MENU_MODEL (contacts_app.file_menu));
     g_menu_remove(contacts_app.file_menu, --pos);
@@ -310,12 +310,6 @@ set_address_book_menu_items(void)
                           G_MENU_MODEL(gtk_builder_get_object
                                        (builder, "address-book-menu")));
     g_object_unref(builder);
-
-    string = g_string_new(NULL);
-    g_string_append_printf(string, "'%s'", contacts_app.address_book->name);
-    entry.state = g_string_free(string, FALSE);
-    g_action_map_add_action_entries(G_ACTION_MAP(contacts_app.window),
-                                    &entry, 1, contacts_app.window);
 }
 
 static gboolean
@@ -583,6 +577,8 @@ get_main_menu(GtkApplication * application)
         {"entry-new",           entry_new_activated},
         {"entry-delete",        entry_delete_activated},
         {"help-about",          help_about_activated},
+        {"address-book",        libbalsa_radio_activated, "s", "''",
+            address_book_change_state},
     };
     GtkBuilder *builder;
     gchar *ui_file;
@@ -714,7 +710,7 @@ addrlist_drag_get_cb(GtkWidget* widget, GdkDragContext* drag_context,
 }
 
 static GtkWidget *
-bab_window_list_new(gpointer cb_data)
+bab_window_list_new(void)
 {
     GtkListStore *store;
     GtkWidget *tree;
@@ -740,9 +736,9 @@ bab_window_list_new(gpointer cb_data)
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree));
     gtk_tree_selection_set_mode(selection, GTK_SELECTION_SINGLE);
     g_signal_connect(G_OBJECT(selection), "changed",
-                     G_CALLBACK(list_selection_changed_cb), cb_data);
+                     G_CALLBACK(list_selection_changed_cb), NULL);
     g_signal_connect(G_OBJECT(tree), "row-activated",
-                     G_CALLBACK(list_row_activated_cb), cb_data);
+                     G_CALLBACK(list_row_activated_cb), NULL);
 
     renderer = gtk_cell_renderer_text_new();
     column =
@@ -957,7 +953,7 @@ bab_window_new(GtkApplication * application)
 				   GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
     gtk_box_pack_start(GTK_BOX(browse_widget), scroll, TRUE, TRUE, 1);
 
-    contacts_app.entry_list = bab_window_list_new(&contacts_app);
+    contacts_app.entry_list = bab_window_list_new();
     gtk_container_add(GTK_CONTAINER(scroll), contacts_app.entry_list);
 
     gtk_notebook_append_page(GTK_NOTEBOOK(contacts_app.notebook), browse_widget,
@@ -995,7 +991,6 @@ bab_delete_ok(void)
     return FALSE;
 }
 /* -------------------------- main --------------------------------- */
-static GtkWidget *ab_window = NULL;
 static void
 ab_warning(const char *fmt, ...)
 {
@@ -1005,7 +1000,7 @@ ab_warning(const char *fmt, ...)
     va_start(va_args, fmt);
     msg =  g_strdup_vprintf(fmt, va_args);
     va_end(va_args);
-    d = gtk_message_dialog_new(GTK_WINDOW(ab_window),
+    d = gtk_message_dialog_new(contacts_app.window,
                                GTK_DIALOG_DESTROY_WITH_PARENT,
                                GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE,
                                "%s", msg);
@@ -1037,10 +1032,23 @@ information_real(void)
     /* FIXME */
 }
 
+static void
+bab_set_intial_address_book(LibBalsaAddressBook * ab,
+                            GtkWidget           * window)
+{
+    GAction *action;
+
+    action =
+        g_action_map_lookup_action(G_ACTION_MAP(window), "address-book");
+    g_action_change_state(action, g_variant_new_string(ab->name));
+}
+
 int
 main(int argc, char *argv[])
 {
     GtkApplication *application;
+    LibBalsaAddressBook *ab;
+    GtkWidget *ab_window;
     GList *l;
 
     application =
@@ -1071,9 +1079,9 @@ main(int argc, char *argv[])
     libbalsa_conf_pop_group();
     libbalsa_conf_foreach_group(ADDRESS_BOOK_SECTION_PREFIX,
                                 bab_config_init, NULL);
-    if (contacts_app.address_book_list)
-        contacts_app.address_book =
-            contacts_app.address_book_list->data;
+    ab = contacts_app.default_address_book ?
+        contacts_app.default_address_book :
+        contacts_app.address_book_list->data;
 
     ab_window = bab_window_new(application);
 
@@ -1081,8 +1089,7 @@ main(int argc, char *argv[])
                      G_CALLBACK(bab_cleanup), NULL);
     g_signal_connect(G_OBJECT(ab_window), "delete-event",
                      G_CALLBACK(bab_delete_ok), NULL);
-    bab_set_address_book(contacts_app.address_book,
-                         contacts_app.entry_list, NULL);
+    bab_set_intial_address_book(ab, ab_window);
 
     /* session management */
 
@@ -1098,10 +1105,4 @@ main(int argc, char *argv[])
     g_list_free(contacts_app.address_book_list);
 
     return 0;
-}
-
-static void
-bab_cleanup(void)
-{
-    gtk_main_quit();
 }

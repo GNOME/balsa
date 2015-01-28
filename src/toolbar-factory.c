@@ -783,7 +783,7 @@ GtkWidget *balsa_toolbar_new(BalsaToolbarModel * model,
             gchar *prefixed_action;
 
             icon = gtk_image_new_from_icon_name
-                (icon_name, GTK_ICON_SIZE_SMALL_TOOLBAR);
+                (balsa_icon_id(icon_name), GTK_ICON_SIZE_SMALL_TOOLBAR);
             action = g_action_map_lookup_action(action_map, action_name);
             if (action &&
                 (type = g_action_get_state_type(action)) &&

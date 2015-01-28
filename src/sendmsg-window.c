@@ -5063,7 +5063,7 @@ subject_not_empty(BalsaSendmsg * bsmsg)
     gtk_widget_set_valign(hbox, GTK_ALIGN_CENTER);
     gtk_container_add (GTK_CONTAINER (okbutton), hbox);
 
-    image = gtk_image_new_from_icon_name(BALSA_PIXMAP_SEND,
+    image = gtk_image_new_from_icon_name(balsa_icon_id(BALSA_PIXMAP_SEND),
                                          GTK_ICON_SIZE_BUTTON);
     gtk_box_pack_start (GTK_BOX (hbox), image, FALSE, FALSE, 0);
 
@@ -5162,7 +5162,7 @@ check_suggest_encryption(BalsaSendmsg * bsmsg)
         gtk_widget_set_halign(hbox, GTK_ALIGN_CENTER);
         gtk_widget_set_valign(hbox, GTK_ALIGN_CENTER);
 	gtk_container_add(GTK_CONTAINER(button), hbox);
-	image = gtk_image_new_from_icon_name(BALSA_PIXMAP_GPG_ENCRYPT,
+	image = gtk_image_new_from_icon_name(balsa_icon_id(BALSA_PIXMAP_GPG_ENCRYPT),
                                              GTK_ICON_SIZE_BUTTON);
 	gtk_box_pack_start(GTK_BOX(hbox), image, FALSE, FALSE, 0);
 	label = gtk_label_new_with_mnemonic(_("Send _encrypted"));
@@ -5177,7 +5177,7 @@ check_suggest_encryption(BalsaSendmsg * bsmsg)
         gtk_widget_set_halign(hbox, GTK_ALIGN_CENTER);
         gtk_widget_set_valign(hbox, GTK_ALIGN_CENTER);
 	gtk_container_add(GTK_CONTAINER(button), hbox);
-	image = gtk_image_new_from_icon_name(BALSA_PIXMAP_SEND,
+	image = gtk_image_new_from_icon_name(balsa_icon_id(BALSA_PIXMAP_SEND),
                                              GTK_ICON_SIZE_BUTTON);
 	gtk_box_pack_start(GTK_BOX(hbox), image, FALSE, FALSE, 0);
 	label = gtk_label_new_with_mnemonic(_("Send _unencrypted"));

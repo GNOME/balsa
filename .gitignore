@@ -4,6 +4,7 @@
 *.a
 *.gmo
 *.omf
+*.stamp
 
 doc/*/*.mo
 doc/*/*.xml

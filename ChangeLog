@@ -1,5 +1,11 @@
 2015-01-29  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Possible fix for RedHat bug #831889 (Geoff Leach)
+
+	* src/sendmsg-window.c (collect_for_quote): check for NULL root.
+
+2015-01-29  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Possible fix for RedHat bug #1097953 (Geoff Leach)
 
 	* src/main-window.c (balsa_window_class_init), (balsa_window_new),

@@ -3428,9 +3428,14 @@ collect_for_quote(LibBalsaMessageBody *root, gchar * reply_prefix_str,
 {
     GtkTreeStore * tree_store;
     gint text_bodies;
-    LibBalsaMessage *message = root->message;
+    LibBalsaMessage *message;
     GString *q_body = NULL;
 
+
+    if (!root)
+        return q_body;
+
+    message = root->message;
     libbalsa_message_body_ref(message, FALSE, FALSE);
 
     /* scan the message and collect text parts which might be included

@@ -1553,8 +1553,9 @@ bndx_compose_foreach(BalsaIndex * index, SendType send_type)
             g_assert_not_reached();
             sm = NULL; /** silence invalid warnings */
         }
-        g_signal_connect(G_OBJECT(sm->window), "destroy",
-                         G_CALLBACK(sendmsg_window_destroy_cb), NULL);
+        if (sm)
+            g_signal_connect(G_OBJECT(sm->window), "destroy",
+                             G_CALLBACK(sendmsg_window_destroy_cb), NULL);
     }
     balsa_index_selected_msgnos_free(index, selected);
 }

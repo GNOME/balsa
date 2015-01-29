@@ -1,5 +1,12 @@
 2015-01-29  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Possible fix for RedHat bug #1050738 (Geoff Leach)
+
+	* src/balsa-index.c (bndx_compose_foreach): check for NULL
+	compose window.
+
+2015-01-29  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Possible fix for RedHat bug #831889 (Geoff Leach)
 
 	* src/sendmsg-window.c (collect_for_quote): check for NULL root.

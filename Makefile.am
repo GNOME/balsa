@@ -11,6 +11,10 @@ pixmap_DATA = gnome-balsa2.png
 desktopdir = $(datadir)/applications
 desktop_in_files = balsa.desktop.in balsa-mailto-handler.desktop.in
 desktop_DATA = balsa.desktop balsa-mailto-handler.desktop
+
+appdatadir = $(datarootdir)/appdata
+dist_appdata_DATA = balsa.appdata.xml
+
 @INTLTOOL_DESKTOP_RULE@
 
 balsa_extra_dist =		\

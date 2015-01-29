@@ -1,5 +1,9 @@
 2015-01-28  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	* balsa.appdata.xml: new appdata file
+
+2015-01-28  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* src/balsa-icons.c (load_balsa_pixmap),
 	(balsa_register_pixmaps): prune much pointless code.
 	* src/sendmsg-window.c (subject_not_empty),

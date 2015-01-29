@@ -47,6 +47,7 @@ struct _MessageWindow {
     GtkWidget *bmessage;
     GtkWidget *toolbar;
 
+    LibBalsaMailbox *mailbox;
     LibBalsaMessage *message;
     BalsaIndex *bindex;
     int headers_shown;
@@ -393,10 +394,13 @@ destroy_message_window(GtkWidget * widget, MessageWindow * mw)
         mw->bindex = NULL;
     }
 
-    if (mw->message && mw->message->mailbox)
-        g_signal_handlers_disconnect_matched(G_OBJECT(mw->message->mailbox),
+    if (mw->mailbox) {
+        g_object_remove_weak_pointer(G_OBJECT(mw->mailbox), (gpointer) &mw->mailbox);
+        g_signal_handlers_disconnect_matched(G_OBJECT(mw->mailbox),
                                              G_SIGNAL_MATCH_DATA, 0, 0,
                                              NULL, NULL, mw);
+        mw->mailbox = NULL;
+    }
 
     if (mw->bmessage)
         g_signal_handlers_disconnect_matched(G_OBJECT(mw->bmessage),
@@ -896,6 +900,8 @@ message_window_new(LibBalsaMailbox * mailbox, guint msgno)
     g_signal_connect_swapped(G_OBJECT(mw->bindex), "index-changed",
 			     G_CALLBACK(mw_set_buttons_sensitive), mw);
 
+    mw->mailbox = mailbox;
+    g_object_add_weak_pointer(G_OBJECT(mailbox), (gpointer) &mw->mailbox);
     g_signal_connect(mailbox, "message_expunged",
                      G_CALLBACK(mw_expunged_cb), mw);
 

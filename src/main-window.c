@@ -121,7 +121,7 @@ static void balsa_window_real_close_mbnode(BalsaWindow *window,
 					   BalsaMailboxNode *mbnode);
 static void balsa_window_destroy(GObject * object);
 
-static gboolean bw_close_mailbox_on_timer(void);
+static gboolean bw_close_mailbox_on_timer(BalsaWindow * window);
 
 static void bw_index_changed_cb(GtkWidget * widget, gpointer data);
 static void bw_idle_replace(BalsaWindow * window, BalsaIndex * bindex);
@@ -231,9 +231,6 @@ balsa_window_class_init(BalsaWindowClass * klass)
 
     /* Signals */
     klass->identities_changed = NULL;
-
-    g_timeout_add_seconds(30, (GSourceFunc) bw_close_mailbox_on_timer, NULL);
-
 }
 
 static gboolean bw_change_connection_status_idle(gpointer data);
@@ -2366,6 +2363,8 @@ balsa_window_new()
     bw_action_set_enabled(window, "get-new-mail", !checking_mail);
 #endif
 
+    g_timeout_add_seconds(30, (GSourceFunc) bw_close_mailbox_on_timer, window);
+
     gtk_widget_show(GTK_WIDGET(window));
     return GTK_WIDGET(window);
 }
@@ -3105,7 +3104,7 @@ balsa_identities_changed(BalsaWindow *bw)
 }
 
 static gboolean
-bw_close_mailbox_on_timer(void)
+bw_close_mailbox_on_timer(BalsaWindow * window)
 {
     time_t current_time;
     GtkWidget *page;
@@ -3116,7 +3115,6 @@ bw_close_mailbox_on_timer(void)
     if (!balsa_app.close_mailbox_auto)
         return TRUE;
 
-    gdk_threads_enter();
     time(&current_time);
 
     c = gtk_notebook_get_current_page(GTK_NOTEBOOK(balsa_app.notebook));
@@ -3136,14 +3134,12 @@ bw_close_mailbox_on_timer(void)
             if (balsa_app.debug)
                 fprintf(stderr, "Closing Page %d unused for %d s\n",
                         i, delta_time);
-            bw_unregister_open_mailbox(index->mailbox_node->mailbox);
-            gtk_notebook_remove_page(GTK_NOTEBOOK(balsa_app.notebook), i);
+            balsa_window_real_close_mbnode(window, index->mailbox_node);
             if (i < c)
                 c--;
             i--;
         }
     }
-    gdk_threads_leave();
     return TRUE;
 }
 

@@ -1,3 +1,13 @@
+2015-01-29  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Possible fix for RedHat bug #1097953 (Geoff Leach)
+
+	* src/main-window.c (balsa_window_class_init), (balsa_window_new),
+	(bw_close_mailbox_on_timer): use balsa_window_real_close_mbnode
+	to close the mailbox instead of directly removing the notebook page.
+	* src/message-window.c (destroy_message_window),
+	(message_window_new): disconnect mailbox signals more carefully.
+
 2015-01-28  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* balsa.appdata.xml: new appdata file

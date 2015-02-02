@@ -2751,14 +2751,6 @@ bw_mailbox_changed(LibBalsaMailbox * mailbox, GtkLabel * lab)
     bw_notebook_label_style(lab, libbalsa_mailbox_get_unread(mailbox) > 0);
 }
 
-static void
-bw_notebook_label_notify(LibBalsaMailbox * mailbox, GtkLabel * lab)
-{
-    if (LIBBALSA_IS_MAILBOX(mailbox))
-        g_signal_handlers_disconnect_by_func(mailbox, bw_mailbox_changed,
-                                             lab);
-}
-
 static GtkWidget *
 bw_notebook_label_new(BalsaMailboxNode * mbnode)
 {
@@ -2791,10 +2783,8 @@ bw_notebook_label_new(BalsaMailboxNode * mbnode)
 
     bw_notebook_label_style(GTK_LABEL(lab),
                             libbalsa_mailbox_get_unread(mbnode->mailbox) > 0);
-    g_signal_connect(mbnode->mailbox, "changed",
-                     G_CALLBACK(bw_mailbox_changed), lab);
-    g_object_weak_ref(G_OBJECT(lab), (GWeakNotify) bw_notebook_label_notify,
-                      mbnode->mailbox);
+    g_signal_connect_object(mbnode->mailbox, "changed",
+                            G_CALLBACK(bw_mailbox_changed), lab, 0);
     gtk_box_pack_start(GTK_BOX(box), lab, TRUE, TRUE, 0);
 
     but = gtk_button_new();

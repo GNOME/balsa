@@ -1,5 +1,13 @@
 2015-02-02  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Simplify notebook-label destruction
+
+	* src/main-window.c (bw_notebook_label_new): use
+	g_signal_connect_object to handle destruction of label, instead
+	of a weak-ref.
+
+2015-02-02  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Close compose windows on exit
 
 	* src/sendmsg-window.c (balsa_sendmsg_destroy_handler),

@@ -602,10 +602,12 @@ balsa_sendmsg_destroy_handler(BalsaSendmsg * bsmsg)
 
     g_assert(bsmsg != NULL);
 
-    g_signal_handler_disconnect(G_OBJECT(balsa_app.main_window),
-                                bsmsg->delete_sig_id);
-    g_signal_handler_disconnect(G_OBJECT(balsa_app.main_window),
-                                bsmsg->identities_changed_id);
+    if (balsa_app.main_window) {
+        g_signal_handler_disconnect(G_OBJECT(balsa_app.main_window),
+                                    bsmsg->delete_sig_id);
+        g_signal_handler_disconnect(G_OBJECT(balsa_app.main_window),
+                                    bsmsg->identities_changed_id);
+    }
     if(balsa_app.debug) g_message("balsa_sendmsg_destroy()_handler: Start.");
 
     if (bsmsg->parent_message) {

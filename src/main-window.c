@@ -4612,7 +4612,8 @@ bw_select_part_cb(BalsaMessage * bm, gpointer data)
 static void
 bw_send_msg_window_destroy_cb(GtkWidget * widget, gpointer data)
 {
-    balsa_window_enable_continue(BALSA_WINDOW(data));
+    if (balsa_app.main_window)
+        balsa_window_enable_continue(BALSA_WINDOW(data));
 }
 #endif /*ENABLE_TOUCH_UI */
 

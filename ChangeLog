@@ -1,5 +1,15 @@
 2015-02-02  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Prune some dead code
+
+	* src/balsa-message.c (balsa_message_init), (balsa_message_new):
+	close-with-msg is unused.
+	* src/balsa-message.h: remove it, and its setter.
+	* src/message-window.c (message_window_idle_handler),
+	(mw_set_selected): setter has gone away.
+
+2015-02-02  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Compose window may outlive main window
 
 	* src/main-window.c (bw_send_msg_window_destroy_cb): check for

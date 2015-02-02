@@ -793,7 +793,6 @@ balsa_message_init(BalsaMessage * bm)
 
     bm->wrap_text = balsa_app.browse_wrap;
     bm->shown_headers = balsa_app.shown_headers;
-    bm->close_with_msg = FALSE;
 
     gtk_widget_show_all(GTK_WIDGET(bm));
 
@@ -845,12 +844,6 @@ balsa_message_new(void)
     bm = g_object_new(BALSA_TYPE_MESSAGE, NULL);
 
     return GTK_WIDGET(bm);
-}
-
-void
-balsa_message_set_close(BalsaMessage * bm, gboolean close_with_msg)
-{
-    bm->close_with_msg = close_with_msg;
 }
 
 /* Returns a BalsaPartInfo with a reference (g_object_unref when done). */

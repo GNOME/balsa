@@ -125,7 +125,6 @@ message_window_idle_handler(MessageWindow * mw)
         return FALSE;
     }
     balsa_message_grab_focus(msg);
-    balsa_message_set_close(msg, TRUE);
 
     gdk_threads_leave();
     return FALSE;
@@ -613,11 +612,6 @@ mw_set_selected(MessageWindow * mw, void (*select_func) (BalsaIndex *))
         gtk_widget_destroy(tmp->window);
     }
 
-    /* Temporarily tell the BalsaMessage not to close when its message
-     * is finalized, so we can safely unref it in mw_set_message.
-     * We'll restore the usual close-with-message behavior after setting
-     * the new message. */
-    balsa_message_set_close(BALSA_MESSAGE(mw->bmessage), FALSE);
     mw_set_message(mw, message);
 }
 

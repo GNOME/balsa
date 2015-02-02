@@ -607,6 +607,8 @@ balsa_sendmsg_destroy_handler(BalsaSendmsg * bsmsg)
                                     bsmsg->delete_sig_id);
         g_signal_handler_disconnect(G_OBJECT(balsa_app.main_window),
                                     bsmsg->identities_changed_id);
+        g_object_weak_unref(G_OBJECT(balsa_app.main_window),
+                            (GWeakNotify) gtk_widget_destroy, bsmsg->window);
     }
     if(balsa_app.debug) g_message("balsa_sendmsg_destroy()_handler: Start.");
 
@@ -6745,6 +6747,10 @@ sendmsg_window_new()
 		     G_CALLBACK(destroy_event_cb), bsmsg);
     g_signal_connect(G_OBJECT(window), "size_allocate",
 		     G_CALLBACK(sw_size_alloc_cb), bsmsg);
+    /* If any compose windows are open when Balsa is closed, we want
+     * them also to be closed. */
+    g_object_weak_ref(G_OBJECT(balsa_app.main_window),
+                      (GWeakNotify) gtk_widget_destroy, window);
 
     model = sendmsg_window_get_toolbar_model();
 

@@ -1,5 +1,13 @@
 2015-02-02  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Close compose windows on exit
+
+	* src/sendmsg-window.c (balsa_sendmsg_destroy_handler),
+	(sendmsg_window_new): weak-ref the main-window and close any
+	compose window that is still open.
+
+2015-02-02  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Prune some dead code
 
 	* src/balsa-message.c (balsa_message_init), (balsa_message_new):

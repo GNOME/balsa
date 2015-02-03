@@ -1,3 +1,10 @@
+2015-02-03  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Simplify BalsaMailboxConfView destruction
+
+	* src/mailbox-conf.c (mailbox_conf_view_new_full): use g_free as
+	a weak-ref-notify instead of a wrapper.
+
 2015-02-02  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Simplify notebook-label destruction

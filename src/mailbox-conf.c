@@ -1396,13 +1396,6 @@ create_imap_mailbox_dialog(MailboxConfWindow *mcw)
  * Other aspects like sort column and sort order are just remembered
  * when the user changes them with the GtkTreeView controls. */
 
-/* Free a BalsaMailboxConfView. */
-static void
-mailbox_conf_view_free(BalsaMailboxConfView *view_info)
-{
-    g_free(view_info);
-}
-
 /* Create the dialog items in the dialog's grid, and allocate and
  * populate a BalsaMailboxConfView with the info that needs to be passed
  * around. The memory is deallocated when the window is finalized. 
@@ -1430,8 +1423,7 @@ mailbox_conf_view_new_full(LibBalsaMailbox * mailbox,
     gint active;
 
     view_info = g_new(BalsaMailboxConfView, 1);
-    g_object_weak_ref(G_OBJECT(window),
-                      (GWeakNotify) mailbox_conf_view_free, view_info);
+    g_object_weak_ref(G_OBJECT(window), (GWeakNotify) g_free, view_info);
     view_info->window = window;
 
     label = libbalsa_create_grid_label(_("_Identity:"), grid, row);

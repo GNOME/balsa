@@ -2206,9 +2206,7 @@ balsa_window_new()
     gtk_box_pack_end(GTK_BOX(window->vbox), hbox, FALSE, FALSE, 0);
 
     window->progress_bar = gtk_progress_bar_new();
-    /* If we don't request a minimum size, the progress bar expands
-     * vertically when we set text in it--ugly!! */
-    gtk_widget_set_size_request(window->progress_bar, -1, 1);
+    gtk_widget_set_valign(window->progress_bar, GTK_ALIGN_CENTER);
     gtk_progress_bar_set_pulse_step(GTK_PROGRESS_BAR(window->progress_bar),
                                     0.01);
     gtk_box_pack_start(GTK_BOX(hbox), window->progress_bar, FALSE, FALSE,

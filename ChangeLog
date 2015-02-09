@@ -1,5 +1,10 @@
 2015-02-08  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	* src/main-window.c (balsa_window_new): vertically center the
+	new skinny progress bar.
+
+2015-02-08  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Allow for quoted strings in vcal items
 
 	* libbalsa/rfc2445.c (vcal_strchr): replacement for strchr that

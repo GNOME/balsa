@@ -1,3 +1,13 @@
+2015-02-08  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Allow for quoted strings in vcal items
+
+	* libbalsa/rfc2445.c (vcal_strchr): replacement for strchr that
+	ignores matches in quoted strings;
+	(vcal_strsplit_at_char): replacement for g_strsplit that uses
+	vcal_strchr;
+	(libbalsa_vcal_new_from_body): use them.
+
 2015-02-03  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Simplify BalsaMailboxConfView destruction

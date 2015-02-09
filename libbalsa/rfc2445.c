@@ -245,6 +245,54 @@ libbalsa_vevent_new(void)
         s = text_2445_unescape(v);              \
     } while (0)
 
+/*
+ * Find the first occurrence of c in s that is not in a double-quoted
+ * string.
+ *
+ * Note that if c is '\0', the return value is NULL, *not* a pointer to
+ * the terminating '\0' (c.f. strchr).
+ */
+static gchar *
+vcal_strchr(gchar * s, gint c)
+{
+    gboolean is_quoted = FALSE;
+
+    while (*s) {
+        if (*s == '"')
+            is_quoted = !is_quoted;
+        else if (*s == c && !is_quoted)
+            return s;
+        ++s;
+    }
+
+    return NULL;
+}
+
+/*
+ * Split the string s at unquoted occurrences of c.
+ *
+ * Note that c is a single character, not a string, as in g_strsplit,
+ * and that there is no limit on the number of splits.
+ *
+ * Returns a newly-allocated NULL-terminated array of strings. Use
+ * g_strfreev() to free it.
+ */
+static gchar **
+vcal_strsplit_at_char(gchar * s, gint c)
+{
+    GPtrArray *array = g_ptr_array_new();
+    gchar *p;
+
+    while ((p = vcal_strchr(s, c))) {
+        g_ptr_array_add(array, g_strndup(s, p - s));
+        s = p + 1;
+    }
+    g_ptr_array_add(array, g_strdup(s));
+    g_ptr_array_add(array, NULL);
+
+    return (gchar **) g_ptr_array_free(array, FALSE);
+}
+
 /* parse a text/calendar part and convert it into a LibBalsaVCal object */
 LibBalsaVCal *
 libbalsa_vcal_new_from_body(LibBalsaMessageBody * body)
@@ -314,12 +362,12 @@ libbalsa_vcal_new_from_body(LibBalsaMessageBody * body)
 	    if (!g_ascii_strcasecmp("BEGIN:VEVENT", lines[k]))
 		event = libbalsa_vevent_new();
 	} else if (strlen(lines[k])) {
-	    gchar *value = strchr(lines[k], ':');
+	    gchar *value = vcal_strchr(lines[k], ':');
 	    gchar **entry;
 
 	    if (value)
 		*value++ = '\0';
-	    entry = g_strsplit(lines[k], ";", -1);
+	    entry = vcal_strsplit_at_char(lines[k], ';');
 	    if (!g_ascii_strcasecmp(entry[0], "END")) {
                 if (value && !g_ascii_strcasecmp(value, "VEVENT")) {
                     retval->vevent = g_list_append(retval->vevent, event);

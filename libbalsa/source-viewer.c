@@ -184,6 +184,8 @@ lsv_size_allocate_cb(GtkWindow * window, GtkAllocation * alloc,
     }
 }
 
+#define BALSA_SOURCE_VIEWER "balsa-source-viewer"
+
 void
 libbalsa_show_message_source(GtkApplication  * application,
                              LibBalsaMessage * msg,
@@ -193,7 +195,8 @@ libbalsa_show_message_source(GtkApplication  * application,
                              gint            * height)
 {
     GtkWidget *text;
-    PangoFontDescription *desc;
+    gchar *css;
+    GtkCssProvider *css_provider;
     GtkWidget *vbox, *interior;
     GtkWidget *window;
     gchar *ui_file;
@@ -207,9 +210,17 @@ libbalsa_show_message_source(GtkApplication  * application,
 
     text = gtk_text_view_new();
 
-    desc = pango_font_description_from_string(font);
-    gtk_widget_override_font(text, desc);
-    pango_font_description_free(desc);
+    gtk_widget_set_name(text, BALSA_SOURCE_VIEWER);
+    css = g_strconcat("#" BALSA_SOURCE_VIEWER " {font:", font, "}", NULL);
+
+    css_provider = gtk_css_provider_new();
+    gtk_css_provider_load_from_data(css_provider, css, -1, NULL);
+    g_free(css);
+
+    gtk_style_context_add_provider(gtk_widget_get_style_context(text) ,
+                                   GTK_STYLE_PROVIDER(css_provider),
+                                   GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+    g_object_unref(css_provider);
 
     gtk_text_view_set_editable(GTK_TEXT_VIEW(text), FALSE);
     gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(text), GTK_WRAP_WORD_CHAR);

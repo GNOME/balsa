@@ -310,6 +310,7 @@ bm_header_tl_buttons(BalsaMessage * bm)
 }
 
 
+#if !GTK_CHECK_VERSION(3, 15, 0)
 /* Callback for the "style-updated" signal; set the message background to
  * match the base color of the content in the tree-view. */
 static void
@@ -325,6 +326,7 @@ bm_on_set_style(GtkWidget * widget,
     gtk_widget_override_background_color(bm->scroll,
                                          GTK_STATE_FLAG_NORMAL, &rgba);
 }
+#endif
 
 static void
 on_content_size_alloc(GtkWidget * widget, GtkAllocation * allocation,
@@ -701,8 +703,10 @@ balsa_message_init(BalsaMessage * bm)
     g_signal_connect(scroll, "key_press_event",
 		     G_CALLBACK(balsa_mime_widget_key_press_event), bm);
     gtk_box_pack_start(GTK_BOX(vbox), scroll, TRUE, TRUE, 0);
+#if !GTK_CHECK_VERSION(3, 15, 0)
     g_signal_connect_after(bm, "style-updated",
 			   G_CALLBACK(bm_on_set_style), bm);
+#endif
     g_signal_connect(bm->scroll, "size-allocate",
 		     G_CALLBACK(on_content_size_alloc), NULL);
 

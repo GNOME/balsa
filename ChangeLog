@@ -2,6 +2,16 @@
 
 	Deprecation cleanup
 
+	* src/balsa-message.c (balsa_message_init):
+	gtk_style_context_get_background_color and
+	gtk_widget_override_background_color are deprecated; when we
+	replace the GtkNotebook with a GtkStack, we should get
+	consistent backgrounds again.
+
+2015-02-10  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Deprecation cleanup
+
 	* libbalsa/source-viewer.c (libbalsa_show_message_source):
 	gtk_widget_override_font is deprecated, use CSS instead.
 

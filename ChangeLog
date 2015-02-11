@@ -1,3 +1,11 @@
+2015-02-11  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Port BalsaMessage from GtkNotebook to GtkStack
+
+	* src/balsa-message.c (balsa_message_get_type): BalsaMessage now
+	subclasses GtkBox instead of GtkNotebook.
+	* src/balsa-message.h: ditto.
+
 2015-02-10  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Deprecation cleanup

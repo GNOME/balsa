@@ -34,8 +34,10 @@
 struct _BalsaMimeWidgetImage {
     BalsaMimeWidget  parent;
 
+#if !GTK_CHECK_VERSION(3, 15, 0)
     GtkStyleContext *context;
     gulong           context_changed_handler_id;
+#endif
 };
 
 struct _BalsaMimeWidgetImageClass {
@@ -56,11 +58,13 @@ balsa_mime_widget_image_dispose(GObject * obj)
 {
     BalsaMimeWidgetImage *mwi = BALSA_MIME_WIDGET_IMAGE(obj);
 
+#if !GTK_CHECK_VERSION(3, 15, 0)
     if (mwi->context_changed_handler_id) {
         g_signal_handler_disconnect(mwi->context,
                                     mwi->context_changed_handler_id);
         mwi->context_changed_handler_id = 0;
     }
+#endif
 
     (*G_OBJECT_CLASS(balsa_mime_widget_image_parent_class)->
           dispose) (obj);
@@ -81,6 +85,7 @@ static gboolean balsa_image_button_press_cb(GtkWidget * widget, GdkEventButton *
 					    GtkMenu * menu);
 static gboolean img_check_size(GtkImage ** widget_p);
 
+#if !GTK_CHECK_VERSION(3, 15, 0)
 static void
 bmwi_context_changed_cb(GtkStyleContext * context, BalsaMimeWidget * mw)
 {
@@ -91,6 +96,7 @@ bmwi_context_changed_cb(GtkStyleContext * context, BalsaMimeWidget * mw)
     gtk_widget_override_background_color(mw->widget,
                                          GTK_STATE_FLAG_NORMAL, &rgba);
 }
+#endif
 
 BalsaMimeWidget *
 balsa_mime_widget_new_image(BalsaMessage * bm,
@@ -124,12 +130,14 @@ balsa_mime_widget_new_image(BalsaMessage * bm,
     g_signal_connect(G_OBJECT(mw->widget), "button-press-event",
                      G_CALLBACK(balsa_image_button_press_cb), data);
 
+#if !GTK_CHECK_VERSION(3, 15, 0)
     mwi->context =
         gtk_widget_get_style_context(GTK_WIDGET(bm->scroll));
     bmwi_context_changed_cb(mwi->context, mw);
     mwi->context_changed_handler_id =
         g_signal_connect(mwi->context, "changed",
                          G_CALLBACK(bmwi_context_changed_cb), mw);
+#endif
 
     image = gtk_image_new_from_icon_name("image-missing",
                                          GTK_ICON_SIZE_BUTTON);

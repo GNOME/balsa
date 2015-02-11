@@ -539,14 +539,17 @@ expanded_cb(GtkExpander * expander, GParamSpec * arg1, GtkLabel * label)
     }
 }
 
+#define BALSA_MESSAGE_HEADER "balsa-message-header"
+
 static void
 add_header_gchar(BalsaMessage * bm, GtkGrid * grid,
 		 const gchar * header, const gchar * label,
 		 const gchar * value)
 {
     gint row;
+    gchar *css;
+    GtkCssProvider *css_provider;
     GtkWidget *lab;
-    PangoFontDescription *font_desc;
 
     if (!(bm->shown_headers == HEADERS_ALL ||
 	  libbalsa_find_word(header, balsa_app.selected_headers)))
@@ -557,20 +560,29 @@ add_header_gchar(BalsaMessage * bm, GtkGrid * grid,
         row++;
 
     if (balsa_app.use_system_fonts) {
-        font_desc = pango_font_description_new();
         if (strcmp(header, "subject") == 0)
             /* Use bold for the subject line */
-            pango_font_description_set_weight(font_desc,
-                                              PANGO_WEIGHT_BOLD);
+            css = g_strdup("#" BALSA_MESSAGE_HEADER " {font-weight:bold}");
+        else
+            css = g_strdup("");
     } else {
-        font_desc =
-            pango_font_description_from_string(strcmp(header, "subject") ?
-                                               balsa_app.message_font :
-                                               balsa_app.subject_font);
+        css =
+            g_strconcat("#" BALSA_MESSAGE_HEADER " {font:",
+                        strcmp(header, "subject")
+                        ? balsa_app.message_font
+                        : balsa_app.subject_font, "}", NULL);
     }
 
+    css_provider = gtk_css_provider_new();
+    gtk_css_provider_load_from_data(css_provider, css, -1, NULL);
+    g_free(css);
+
     lab = gtk_label_new(label);
-    gtk_widget_override_font(lab, font_desc);
+    gtk_widget_set_name(lab, BALSA_MESSAGE_HEADER);
+    gtk_style_context_add_provider(gtk_widget_get_style_context(lab) ,
+                                   GTK_STYLE_PROVIDER(css_provider),
+                                   GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+
     gtk_grid_attach(grid, lab, 0, row, 1, 1);
     gtk_label_set_selectable(GTK_LABEL(lab), TRUE);
     gtk_widget_set_halign(lab, GTK_ALIGN_START);
@@ -587,7 +599,11 @@ add_header_gchar(BalsaMessage * bm, GtkGrid * grid,
         lab = gtk_label_new(sanitized);
         g_free(sanitized);
 
-        gtk_widget_override_font(lab, font_desc);
+        gtk_widget_set_name(lab, BALSA_MESSAGE_HEADER);
+        gtk_style_context_add_provider(gtk_widget_get_style_context(lab) ,
+                                       GTK_STYLE_PROVIDER(css_provider),
+                                       GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+
         gtk_label_set_line_wrap_mode(GTK_LABEL(lab), PANGO_WRAP_WORD_CHAR);
         gtk_label_set_selectable(GTK_LABEL(lab), TRUE);
         gtk_widget_set_halign(lab, GTK_ALIGN_START);
@@ -614,7 +630,7 @@ add_header_gchar(BalsaMessage * bm, GtkGrid * grid,
         gtk_grid_attach(grid, hbox, 1, row, 1, 1);
     }
 
-    pango_font_description_free(font_desc);
+    g_object_unref(css_provider);
 }
 
 static void

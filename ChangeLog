@@ -2,6 +2,13 @@
 
 	Deprecation cleanup
 
+	* src/balsa-mime-widget-message.c (add_header_gchar):
+	gtk_widget_override_font is deprecated, use CSS instead.
+
+2015-02-10  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Deprecation cleanup
+
 	* src/balsa-mime-widget-image.c (balsa_mime_widget_image_dispose),
 	(balsa_mime_widget_new_image):
 	gtk_style_context_get_background_color and

@@ -2,6 +2,14 @@
 
 	Deprecation cleanup
 
+	* src/sendmsg-window.c (create_email_or_string_entry),
+	(create_text_area):
+	gtk_widget_override_font is deprecated, use CSS instead.
+
+2015-02-10  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Deprecation cleanup
+
 	* src/balsa-mime-widget-text.c (draw_cite_bar_real):
 	gtk_widget_override_color is deprecated, use CSS instead.
 

@@ -2292,6 +2292,9 @@ to_add(GtkWidget * widget,
  *
  * Output: GtkWidget* arr[] - arr[0] will be the label widget.
  */
+
+#define BALSA_COMPOSE_ENTRY "balsa-compose-entry"
+
 static void
 create_email_or_string_entry(BalsaSendmsg * bsmsg,
                              GtkWidget    * grid,
@@ -2312,11 +2315,22 @@ create_email_or_string_entry(BalsaSendmsg * bsmsg,
     gtk_grid_attach(GTK_GRID(grid), arr[0], 0, y_pos, 1, 1);
 
     if (!balsa_app.use_system_fonts) {
-        PangoFontDescription *desc;
+        gchar *css;
+        GtkCssProvider *css_provider;
 
-        desc = pango_font_description_from_string(balsa_app.message_font);
-        gtk_widget_override_font(arr[1], desc);
-        pango_font_description_free(desc);
+        gtk_widget_set_name(arr[1], BALSA_COMPOSE_ENTRY);
+        css =
+            g_strconcat("#" BALSA_COMPOSE_ENTRY " {font:",
+                        balsa_app.message_font, "}", NULL);
+
+        css_provider = gtk_css_provider_new();
+        gtk_css_provider_load_from_data(css_provider, css, -1, NULL);
+        g_free(css);
+
+        gtk_style_context_add_provider(gtk_widget_get_style_context(arr[1]) ,
+                                       GTK_STYLE_PROVIDER(css_provider),
+                                       GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+        g_object_unref(css_provider);
     }
 
     gtk_widget_set_hexpand(arr[1], TRUE);
@@ -2914,11 +2928,22 @@ create_text_area(BalsaSendmsg * bsmsg)
 
     /* set the message font */
     if (!balsa_app.use_system_fonts) {
-        PangoFontDescription *desc;
+        gchar *css;
+        GtkCssProvider *css_provider;
 
-        desc = pango_font_description_from_string(balsa_app.message_font);
-        gtk_widget_override_font(bsmsg->text, desc);
-        pango_font_description_free(desc);
+        css =
+            g_strconcat("#" BALSA_COMPOSE_ENTRY " {font:",
+                        balsa_app.message_font, "}", NULL);
+
+        css_provider = gtk_css_provider_new();
+        gtk_css_provider_load_from_data(css_provider, css, -1, NULL);
+        g_free(css);
+
+        gtk_widget_set_name(bsmsg->text, BALSA_COMPOSE_ENTRY);
+        gtk_style_context_add_provider(gtk_widget_get_style_context(bsmsg->text) ,
+                                       GTK_STYLE_PROVIDER(css_provider),
+                                       GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+        g_object_unref(css_provider);
     }
 
     buffer = gtk_text_view_get_buffer(text_view);

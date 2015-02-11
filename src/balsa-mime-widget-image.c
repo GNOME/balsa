@@ -56,9 +56,9 @@ balsa_mime_widget_image_init(BalsaMimeWidgetImage * mwi)
 static void
 balsa_mime_widget_image_dispose(GObject * obj)
 {
+#if !GTK_CHECK_VERSION(3, 15, 0)
     BalsaMimeWidgetImage *mwi = BALSA_MIME_WIDGET_IMAGE(obj);
 
-#if !GTK_CHECK_VERSION(3, 15, 0)
     if (mwi->context_changed_handler_id) {
         g_signal_handler_disconnect(mwi->context,
                                     mwi->context_changed_handler_id);

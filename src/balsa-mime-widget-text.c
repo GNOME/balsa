@@ -334,14 +334,25 @@ create_text_widget(const char * content_type)
 #endif
 }
 
+#define BALSA_MESSAGE_TEXT_HEADER "balsa-message-text-header"
+
 static void
 bm_modify_font_from_string(GtkWidget * widget, const char *font)
 {
-    PangoFontDescription *desc;
+    gchar *css;
+    GtkCssProvider *css_provider;
 
-    desc = pango_font_description_from_string(font);
-    gtk_widget_override_font(widget, desc);
-    pango_font_description_free(desc);
+    gtk_widget_set_name(widget, BALSA_MESSAGE_TEXT_HEADER);
+    css = g_strconcat("#" BALSA_MESSAGE_TEXT_HEADER " {font:", font, "}", NULL);
+
+    css_provider = gtk_css_provider_new();
+    gtk_css_provider_load_from_data(css_provider, css, -1, NULL);
+    g_free(css);
+
+    gtk_style_context_add_provider(gtk_widget_get_style_context(widget) ,
+                                   GTK_STYLE_PROVIDER(css_provider),
+                                   GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+    g_object_unref(css_provider);
 }
 
 /* quote_tag:

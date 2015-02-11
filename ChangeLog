@@ -1,5 +1,12 @@
 2015-02-10  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Deprecation cleanup
+
+	* src/balsa-mime-widget-text.c (bm_modify_font_from_string):
+	gtk_widget_override_font is deprecated, use CSS instead.
+
+2015-02-10  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* src/balsa-mime-widget-image.c
 	(balsa_mime_widget_image_dispose): fix typo.
 

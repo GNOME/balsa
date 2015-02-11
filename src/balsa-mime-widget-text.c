@@ -965,13 +965,30 @@ draw_cite_bar_real(cite_bar_t * bar, cite_bar_draw_mode_t * draw_mode)
 
     /* add a new widget if necessary */
     if (!bar->bar) {
+#define BALSA_MESSAGE_CITE_BAR "balsa-message-cite-bar"
+        gchar *color;
+        gchar *css;
+        GtkCssProvider *css_provider;
+
         bar->bar =
             balsa_cite_bar_new(height, bar->depth, draw_mode->dimension);
+        gtk_widget_set_name(bar->bar, BALSA_MESSAGE_CITE_BAR);
 
-        gtk_widget_override_color(bar->bar, GTK_STATE_FLAG_NORMAL,
-                                  &balsa_app.
-                                  quoted_color[(bar->depth -
-                                                1) % MAX_QUOTED_COLOR]);
+        color =
+            gdk_rgba_to_string(&balsa_app.
+                               quoted_color[(bar->depth -
+                                             1) % MAX_QUOTED_COLOR]);
+        css = g_strconcat("#" BALSA_MESSAGE_CITE_BAR " {color:", color, "}", NULL);
+        g_free(color);
+
+        css_provider = gtk_css_provider_new();
+        gtk_css_provider_load_from_data(css_provider, css, -1, NULL);
+        g_free(css);
+
+        gtk_style_context_add_provider(gtk_widget_get_style_context(bar->bar) ,
+                                       GTK_STYLE_PROVIDER(css_provider),
+                                       GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+        g_object_unref(css_provider);
 
         gtk_widget_show(bar->bar);
         gtk_text_view_add_child_in_window(draw_mode->view, bar->bar,

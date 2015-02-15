@@ -1,3 +1,20 @@
+2015-02-15  Albrecht Dreß
+
+	Build with clang (ver. LLVM 3.4)
+
+	* libbalsa/files.c: remove unused assignment (detected by cppcheck)
+	* libbalsa/imap/auth-cram.c: fix possible writing behind buffer end
+	* libbalsa/imap/imap-commands.c: remove check for a value >= 0 for an
+	unsigned value
+	* libbalsa/imap/imap-handle.c, libbalsa/mailbox_imap.c: add empty
+	'if' body
+	* libbalsa/mailbox_imap.c, libbalsa/send.c, libbalsa/smtp-server.c:
+	fix enum mismatch
+	* libbalsa/mailbox_mbox.c: don't assign a signed value to an unsigned
+	* libbalsa/message.h, libbalsa/mailbox_mh.c: introduce proper
+	"invalid" flag (clang optimises the current solution away,
+	as it can never be true)
+
 2015-02-11  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Port BalsaMessage from GtkNotebook to GtkStack

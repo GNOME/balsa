@@ -141,7 +141,7 @@ libbalsa_icon_finder(GtkWidget         * widget,
     GtkIconTheme *icon_theme;
 
     if (!gtk_icon_size_lookup(size, &width, &height))
-        width = height = 16;
+        width = 16;
 
     if (mime_type)
         content_type = mime_type;

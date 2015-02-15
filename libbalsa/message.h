@@ -59,7 +59,8 @@ enum _LibBalsaMessageFlag {
     LIBBALSA_MESSAGE_FLAG_REPLIED = 1 << 2,
     LIBBALSA_MESSAGE_FLAG_FLAGGED = 1 << 3,
     LIBBALSA_MESSAGE_FLAG_RECENT  = 1 << 4,
-    LIBBALSA_MESSAGE_FLAG_SELECTED= 1 << 5	/* pseudo flag */
+    LIBBALSA_MESSAGE_FLAG_SELECTED= 1 << 5,	/* pseudo flag */
+    LIBBALSA_MESSAGE_FLAG_INVALID = 1 << 6 	/* pseudo flag */
 };
 
 #define LIBBALSA_MESSAGE_FLAGS_REAL \

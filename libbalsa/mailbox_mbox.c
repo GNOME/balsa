@@ -1513,7 +1513,7 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
     temp_stream = g_mime_stream_fs_new(i);
 
     for (i = first; i < messages; i++) {
-	guint status_len, x_status_len;
+	gint status_len, x_status_len;
 
 	msg_info = message_info_from_msgno(mbox, i + 1);
 	if (expunge && (msg_info->local_info.flags & LIBBALSA_MESSAGE_FLAG_DELETED))

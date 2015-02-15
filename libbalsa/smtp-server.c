@@ -443,13 +443,13 @@ smtp_server_response(GtkDialog * dialog, gint response,
 #if HAVE_SMTP_TLS_CLIENT_CERTIFICATE
         switch (gtk_combo_box_get_active(GTK_COMBO_BOX(sdi->tlsm))) {
         case 0:
-            server->tls_mode = Starttls_DISABLED;
+            server->tls_mode = LIBBALSA_TLS_DISABLED;
             break;
         case 1:
-            server->tls_mode = Starttls_ENABLED;
+            server->tls_mode = LIBBALSA_TLS_ENABLED;
             break;
         case 2:
-            server->tls_mode = Starttls_REQUIRED;
+            server->tls_mode = LIBBALSA_TLS_REQUIRED;
             break;
         default:
             break;

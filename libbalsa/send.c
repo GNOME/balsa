@@ -670,7 +670,7 @@ lbs_process_queue(LibBalsaMailbox * outbox, LibBalsaFccboxFinder finder,
     g_free(host_with_port);
 
     /* Tell libESMTP how to use the SMTP STARTTLS extension.  */
-    smtp_starttls_enable (session, server->tls_mode);
+    smtp_starttls_enable (session, (enum starttls_option) server->tls_mode);
 
     /* Now tell libESMTP it can use the SMTP AUTH extension.  */
     smtp_auth_set_context(session,

@@ -4163,7 +4163,7 @@ create_lang_menu(GtkWidget * parent, BalsaSendmsg * bsmsg)
                 active_item = w;
         }
     }
-    g_list_free(lang_list);
+    g_list_free_full(lang_list, (GDestroyNotify) g_free);
 #if !HAVE_GTKSPELL_3_0_3
     enchant_broker_free(broker);
 #endif                          /* HAVE_GTKSPELL_3_0_3 */

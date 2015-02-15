@@ -1,5 +1,10 @@
 2015-02-15  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	* src/sendmsg-window.c (create_lang_menu): do not leak language
+	names.
+
+2015-02-15  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* libbalsa/imap/auth-cram.c (imap_auth_cram): cosmetic change to
 	length of copy in strncat.
 

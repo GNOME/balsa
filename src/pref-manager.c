@@ -50,8 +50,6 @@
 
 #include <glib/gi18n.h>
 
-#define ELEMENTS(x) (sizeof (x) / sizeof (x[0]))
-
 #define NUM_ENCODING_MODES 3
 #define NUM_PWINDOW_MODES 3
 #define NUM_THREADING_STYLES 3
@@ -73,6 +71,8 @@
 
 #define BALSA_PAGE_SIZE_GROUP_KEY  "balsa-page-size-group"
 #define BALSA_GRID_PAGE_KEY  "balsa-grid-page"
+#define BALSA_MAX_WIDTH_CHARS 40
+
 typedef struct _PropertyUI {
     /* The page index: */
     GtkWidget *view;
@@ -550,8 +550,6 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
 
     already_open = TRUE;
 
-    gtk_window_set_wmclass(GTK_WINDOW(property_box), "preferences",
-                           "Balsa");
     gtk_window_set_resizable(GTK_WINDOW(property_box), FALSE);
     g_object_set_data(G_OBJECT(property_box), "balsawindow", active_win);
 
@@ -1515,6 +1513,19 @@ attach_entry(const gchar * label, gint row, GtkGrid * grid)
     return attach_entry_full(label, row, grid, 0, 1, 2);
 }
 
+static void
+set_align(GtkWidget * label, gdouble xalign, gdouble yalign)
+{
+#if GTK_CHECK_VERSION(3, 16, 0)
+    gtk_label_set_xalign((GtkLabel *) label, xalign);
+    gtk_label_set_yalign((GtkLabel *) label, yalign);
+#else                           /* GTK_CHECK_VERSION(3, 16, 0) */
+G_GNUC_BEGIN_IGNORE_DEPRECATIONS
+    gtk_misc_set_alignment((GtkMisc *) label, xalign, yalign);
+G_GNUC_END_IGNORE_DEPRECATIONS
+#endif                          /* GTK_CHECK_VERSION(3, 16, 0) */
+}
+
 static GtkWidget *
 attach_entry_full(const gchar * label, gint row, GtkGrid * grid,
                   gint col_left, gint col_middle, gint col_right)
@@ -1527,8 +1538,7 @@ attach_entry_full(const gchar * label, gint row, GtkGrid * grid,
     page = g_object_get_data(G_OBJECT(grid), BALSA_GRID_PAGE_KEY);
     pm_page_add_to_size_group(page, lw);
 
-    gtk_widget_set_halign(lw, GTK_ALIGN_START);
-    gtk_widget_set_hexpand(lw, TRUE);
+    set_align(lw, 0.0, 0.5);
     gtk_grid_attach(grid, lw, col_left, row, col_middle - col_left, 1);
 
     res = gtk_entry_new();
@@ -1549,7 +1559,6 @@ attach_information_menu(const gchar * label, gint row, GtkGrid * grid,
 
     combo_box = create_information_message_menu();
     pm_combo_box_set_level(combo_box, defval);
-    gtk_widget_set_hexpand(combo_box, TRUE);
     gtk_grid_attach(grid, combo_box, 1, row, 1, 1);
     return combo_box;
 }
@@ -1563,7 +1572,7 @@ attach_label(const gchar * text, GtkGrid * grid, gint row,
     label = gtk_label_new(text);
     gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
     gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
-    gtk_widget_set_halign(label, GTK_ALIGN_START);
+    set_align(label, 0.0, 0.5);
     gtk_grid_attach(grid, label, 0, row, 1, 1);
     if (page)
         pm_page_add_to_size_group(page, label);
@@ -1855,7 +1864,7 @@ checking_group(GtkWidget * page)
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, COL_SPACING);
 
     label = gtk_label_new(_("When mail arrives:"));
-    gtk_widget_set_halign(label, GTK_ALIGN_START);
+    set_align(label, 0.0, 0.5);
     gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, FALSE, 0);
 
     pui->notify_new_mail_dialog =
@@ -1933,6 +1942,7 @@ quoted_group(GtkWidget * page)
     gtk_widget_set_hexpand(pui->browse_wrap_length, TRUE);
     gtk_grid_attach(grid, pui->browse_wrap_length, 1, row, 1, 1);
     label = gtk_label_new(_("characters"));
+    set_align(label, 0.0, 0.5);
     gtk_widget_set_halign(label, GTK_ALIGN_START);
     gtk_grid_attach(grid, label, 2, row, 1, 1);
 
@@ -1998,7 +2008,6 @@ broken_8bit_codeset_group(GtkWidget * page)
     return group;
 }
 
-
 static GtkWidget *
 mdn_group(GtkWidget * page)
 {
@@ -2014,9 +2023,9 @@ mdn_group(GtkWidget * page)
                             "requested a "
                             "Message Disposition Notification (MDN), "
                             "send it if:"));
-    gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
     gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
-    gtk_widget_set_halign(label, GTK_ALIGN_START);
+    gtk_label_set_max_width_chars(GTK_LABEL(label), BALSA_MAX_WIDTH_CHARS);
+    set_align(label, 0.0, 0.5);
     pm_group_add(group, label, FALSE);
 
     grid = create_grid(page);
@@ -2026,6 +2035,8 @@ mdn_group(GtkWidget * page)
                             "(the notify-to address is the return path, "
                             "and I am in the \"To:\" or \"Cc:\" list)."));
     gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
+    gtk_label_set_max_width_chars(GTK_LABEL(label), BALSA_MAX_WIDTH_CHARS);
+    set_align(label, 0.0, 0.5);
     gtk_grid_attach(grid, label, 0, 0, 1, 1);
     pm_page_add_to_size_group(page, label);
 
@@ -2036,6 +2047,8 @@ mdn_group(GtkWidget * page)
 
     label = gtk_label_new(_("The message header looks suspicious."));
     gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
+    gtk_label_set_max_width_chars(GTK_LABEL(label), BALSA_MAX_WIDTH_CHARS);
+    set_align(label, 0.0, 0.5);
     gtk_grid_attach(grid, label, 0, 1, 1, 1);
     pm_page_add_to_size_group(page, label);
 
@@ -2194,7 +2207,7 @@ main_window_group(GtkWidget * page)
     gtk_widget_set_hexpand(pui->pgdown_percent, TRUE);
     gtk_grid_attach(grid, pui->pgdown_percent, 1, 0, 1, 1);
     label = gtk_label_new(_("percent"));
-    gtk_widget_set_halign(label, GTK_ALIGN_START);
+    set_align(label, 0.0, 0.5);
     gtk_grid_attach(grid, label, 2, 0, 1, 1);
 
     return group;
@@ -2499,7 +2512,7 @@ threading_group(GtkWidget * page)
     vbox = pm_group_get_vbox(group);
     pui->default_sort_field = 
         add_pref_menu(_("Default sort column:"), sort_field_label, 
-                      ELEMENTS(sort_field_label), &pui->sort_field_index, 
+                      G_N_ELEMENTS(sort_field_label), &pui->sort_field_index, 
                       GTK_BOX(vbox), 2 * HIG_PADDING, page);
     pui->default_threading_type = 
         add_pref_menu(_("Default threading style:"), threading_type_label, 
@@ -2523,7 +2536,7 @@ add_pref_menu(const gchar* label, const gchar *names[], gint size,
 
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, padding);
     lbw = gtk_label_new(label);
-    gtk_widget_set_halign(lbw, GTK_ALIGN_START);
+    set_align(lbw, 0.0, 0.5);
     pm_page_add_to_size_group(page, lbw);
     gtk_box_pack_start(GTK_BOX(hbox), lbw,   FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(hbox), omenu, TRUE,  TRUE,  0);
@@ -2638,10 +2651,9 @@ deleting_messages_group(GtkWidget * page)
 			   "\342\226\272");
     label = gtk_label_new(text);
     g_free(text);
-    gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
     gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
-    gtk_widget_set_halign(label, GTK_ALIGN_START);
-    gtk_widget_set_valign(label, GTK_ALIGN_START);
+    gtk_label_set_max_width_chars(GTK_LABEL(label), BALSA_MAX_WIDTH_CHARS);
+    set_align(label, 0.0, 0.0);
     pm_group_add(group, label, FALSE);
     pui->hide_deleted =
         pm_group_add_check(group, _("Hide messages marked as deleted"));
@@ -2649,8 +2661,7 @@ deleting_messages_group(GtkWidget * page)
     label = gtk_label_new(_("The following settings are global:"));
     gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
     gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
-    gtk_widget_set_halign(label, GTK_ALIGN_START);
-    gtk_widget_set_valign(label, GTK_ALIGN_START);
+    set_align(label, 0.0, 0.0);
     pm_group_add(group, label, FALSE);
     pui->expunge_on_close =
         pm_group_add_check(group, _("Expunge deleted messages "
@@ -2694,7 +2705,6 @@ message_window_group(GtkWidget * page)
     pui->action_after_move_menu = create_action_after_move_menu();
     pm_combo_box_set_level(pui->action_after_move_menu,
                            balsa_app.mw_action_after_move);
-    gtk_widget_set_hexpand(pui->action_after_move_menu, TRUE);
     gtk_grid_attach(grid, pui->action_after_move_menu, 1, 0, 1, 1);
 
     return group;
@@ -2743,16 +2753,15 @@ folder_scanning_group(GtkWidget * page)
                             "this defers scanning some folders.  "
                             "To see more of the tree at startup, "
                             "choose a greater depth."));
-    gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
     gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
-    gtk_widget_set_halign(label, GTK_ALIGN_START);
-    gtk_widget_set_valign(label, GTK_ALIGN_START);
+    gtk_label_set_max_width_chars(GTK_LABEL(label), BALSA_MAX_WIDTH_CHARS);
+    set_align(label, 0.0, 0.0);
     pm_group_add(group, label, FALSE);
 
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, COL_SPACING);
     pm_group_add(group, hbox, FALSE);
     label = gtk_label_new(_("Scan local folders to depth"));
-    gtk_widget_set_halign(label, GTK_ALIGN_START);
+    set_align(label, 0.0, 0.5);
     pm_page_add_to_size_group(page, label);
     gtk_box_pack_start(GTK_BOX(hbox), label,
                        FALSE, FALSE, 0);
@@ -2764,7 +2773,7 @@ folder_scanning_group(GtkWidget * page)
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, COL_SPACING);
     pm_group_add(group, hbox, FALSE);
     label = gtk_label_new(_("Scan IMAP folders to depth"));
-    gtk_widget_set_halign(label, GTK_ALIGN_START);
+    set_align(label, 0.0, 0.5);
     pm_page_add_to_size_group(page, label);
     gtk_box_pack_start(GTK_BOX(hbox), label,
                        FALSE, FALSE, 0);
@@ -3324,9 +3333,11 @@ static GtkWidget *
 create_mdn_reply_menu(void)
 {
     GtkWidget *combo_box = pm_combo_box_new();
+
     add_show_menu(_("Never"),  BALSA_MDN_REPLY_NEVER,  combo_box);
     add_show_menu(_("Ask me"), BALSA_MDN_REPLY_ASKME,  combo_box);
     add_show_menu(_("Always"), BALSA_MDN_REPLY_ALWAYS, combo_box);
+
     return combo_box;
 }
 
@@ -3612,7 +3623,7 @@ pm_group_new(const gchar * text)
     gtk_label_set_markup(GTK_LABEL(label), markup);
     g_free(markup);
     gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
-    gtk_widget_set_halign(label, GTK_ALIGN_START);
+    set_align(label, 0.0, 0.5);
     gtk_box_pack_start(GTK_BOX(group), label, FALSE, FALSE, 0);
 
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
@@ -3660,6 +3671,8 @@ pm_combo_box_new(void)
 {
     GtkWidget *combo_box = gtk_combo_box_text_new();
     struct pm_combo_box_info *info = g_new0(struct pm_combo_box_info, 1);
+
+    gtk_widget_set_hexpand(combo_box, TRUE);
 
     g_object_set_data_full(G_OBJECT(combo_box), PM_COMBO_BOX_INFO, info,
                            (GDestroyNotify) pm_combo_box_info_free);

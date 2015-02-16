@@ -1,3 +1,16 @@
+2015-02-16  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Fix some alignment issues
+
+	* src/pref-manager.c (open_preferences_manager), (set_align),
+	(attach_entry_full), (attach_information_menu), (attach_label),
+	(checking_group), (quoted_group), (mdn_group), (main_window_group),
+	(threading_group), (add_pref_menu), (deleting_messages_group),
+	(message_window_group), (folder_scanning_group),
+	(create_mdn_reply_menu), (pm_group_new), (pm_combo_box_new):
+	revert to deprecated GtkMisc stuff until gtk_label_set_{xy}align
+	is available.
+
 2015-02-15  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* src/sendmsg-window.c (create_lang_menu): do not leak language

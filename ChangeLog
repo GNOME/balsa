@@ -1,3 +1,9 @@
+2015-02-16  Albrecht Dreß
+
+	* libbalsa/imap/imap-tls.c (imap_create_ssl): disable SSLv3,
+	with an option in the code to override, and enable TLSv1.1 and 1.2
+
+
 2013-07-14  Peter Bloomfield
 
 	Fix bgo #704159 (Igor Pashev)

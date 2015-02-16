@@ -55,6 +55,15 @@
 #include <pthread.h>
 #endif
 
+/* Support for SSLv3 should *not* be enabled as it is unsafe (see
+ * <http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2014-3566> and
+ * <http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2014-8730>.
+ *
+ * Uncomment the following line if you *really* want to enable SSLv3 support.
+ * Otherwise, only the "safe" protocols TLS 1.0, TLS 1.1 and TLS 1.2 are used
+ * (note that TLS 1.1 and TLS 1.2 support depends upon the OpenSSL version) */
+/* #define ENABLE_SSL3 1 */
+
 #include "siobuf.h"
 #include "imap_private.h"
 
@@ -183,13 +192,17 @@ imap_create_ssl(void)
     imaptls_thread_setup();
     SSL_library_init();
     SSL_load_error_strings();
-#if 1
+#if 0
     global_ssl_context = SSL_CTX_new (TLSv1_client_method ());
 #else
-    /* we could also enable SSLv3 but it doe not work very well with 
-     * all servers. */
+    /* Note: SSLv23_client_method() actually enables *all* protocols, including
+     * SSLv(2|3) and TLSv1.(0|1|2), so we must switch all unsafe ones off */
     global_ssl_context = SSL_CTX_new (SSLv23_client_method ());
+#ifdef ENABLE_SSL3
     SSL_CTX_set_options(global_ssl_context, SSL_OP_ALL|SSL_OP_NO_SSLv2);
+#else
+    SSL_CTX_set_options(global_ssl_context, SSL_OP_ALL|SSL_OP_NO_SSLv2|SSL_OP_NO_SSLv3);
+#endif
 #endif
     /* no client certificate password support yet
      * SSL_CTX_set_default_passwd_cb (ctx, ctx_password_cb);

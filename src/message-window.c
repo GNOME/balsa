@@ -156,7 +156,7 @@ static const BalsaToolbarEntry message_toolbar[] = {
     { "", ""                                         },
     { "reply",            BALSA_PIXMAP_REPLY         },
     { "reply-all",        BALSA_PIXMAP_REPLY_ALL     },
-    { "reply-to-group",   BALSA_PIXMAP_REPLY_GROUP   },
+    { "reply-group",      BALSA_PIXMAP_REPLY_GROUP   },
     { "forward-attached", BALSA_PIXMAP_FORWARD       },
     { "", ""                                         },
     { "previous-part",    BALSA_PIXMAP_PREVIOUS_PART },

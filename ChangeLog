@@ -1,3 +1,12 @@
+2015-02-18  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Fix broken toolbar items
+
+	* src/message-window.c: correct action names.
+	* src/main-window.c (show_all_headers_change_state),
+	(show_preview_pane_change_state), (bw_add_win_action_entries):
+	ditto, and implement missing actions.
+
 2015-02-18  Albrecht Dreß
 
 	* src/balsa-mime-widget-text.c (create_text_widget): allow for

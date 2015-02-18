@@ -641,14 +641,14 @@ static const BalsaToolbarEntry main_toolbar[] = {
 /* Optional extra buttons */
 static const BalsaToolbarEntry main_toolbar_extras[] = {
     { "quit",              "application-exit"          },
-    { "reply-to-group",     BALSA_PIXMAP_REPLY_GROUP   },
+    { "reply-group",        BALSA_PIXMAP_REPLY_GROUP   },
     { "previous-message",   BALSA_PIXMAP_PREVIOUS      },
     { "next-message",       BALSA_PIXMAP_NEXT          },
     { "next-flagged",       BALSA_PIXMAP_NEXT_FLAGGED  },
     { "previous-part",      BALSA_PIXMAP_PREVIOUS_PART },
     { "next-part",          BALSA_PIXMAP_NEXT_PART     },
-    { "send",               BALSA_PIXMAP_SEND          },
-    { "send-and-receive",   BALSA_PIXMAP_SEND_RECEIVE  },
+    { "send-queued-mail",   BALSA_PIXMAP_SEND          },
+    { "send-and-receive-mail", BALSA_PIXMAP_SEND_RECEIVE  },
     { "save-part",         "document-save"             },
     { "identities",         BALSA_PIXMAP_IDENTITY      },
     { "mailbox-close",     "window-close"              },
@@ -656,7 +656,7 @@ static const BalsaToolbarEntry main_toolbar_extras[] = {
     { "show-all-headers",   BALSA_PIXMAP_SHOW_HEADERS  },
     { "reset-filter",      "gtk-cancel"                },
     { "show-preview-pane",  BALSA_PIXMAP_SHOW_PREVIEW  },
-    { "expunge",           "edit-clear"                },
+    { "mailbox-expunge",   "edit-clear"                },
     { "empty-trash",       "list-remove"               }
 };
 
@@ -1753,6 +1753,41 @@ wrap_change_state(GSimpleAction * action,
     g_simple_action_set_state(action, state);
 }
 
+/*
+ * Toggle actions that are used only in the toolbar
+ */
+
+static void
+show_all_headers_change_state(GSimpleAction * action,
+                              GVariant      * state,
+                              gpointer        user_data)
+{
+    BalsaWindow *window = BALSA_WINDOW(user_data);
+
+    balsa_app.show_all_headers = g_variant_get_boolean(state);
+
+    balsa_message_set_displayed_headers(BALSA_MESSAGE(window->preview),
+                                        balsa_app.show_all_headers ?
+                                        HEADERS_ALL :
+                                        balsa_app.shown_headers);
+
+    g_simple_action_set_state(action, state);
+}
+
+static void
+show_preview_pane_change_state(GSimpleAction * action,
+                               GVariant      * state,
+                               gpointer        user_data)
+{
+    BalsaWindow *window = BALSA_WINDOW(user_data);
+
+    balsa_app.previewpane = g_variant_get_boolean(state);
+
+    balsa_window_refresh(window);
+
+    g_simple_action_set_state(action, state);
+}
+
 /* Really, entire mailbox_hide_menu should be build dynamically from
  * the hide_states array since different mailboxes support different
  * set of flags/keywords. */
@@ -2017,7 +2052,12 @@ bw_add_win_action_entries(GActionMap * action_map)
         {"toggle-deleted",        toggle_deleted_activated},
         {"toggle-new",            toggle_new_activated},
         {"toggle-answered",       toggle_answered_activated},
-        {"store-address",         store_address_activated}
+        {"store-address",         store_address_activated},
+        /* toolbar actions that are not in any menu: */
+        {"show-all-headers",      libbalsa_toggle_activated, NULL, "false",
+                                  show_all_headers_change_state},
+        {"show-preview-pane",     libbalsa_toggle_activated, NULL, "true",
+                                  show_preview_pane_change_state},
     };
 
     g_action_map_add_action_entries(action_map, win_entries,

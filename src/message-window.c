@@ -186,23 +186,14 @@ BalsaToolbarModel *
 message_window_get_toolbar_model(void)
 {
     static BalsaToolbarModel *model = NULL;
-    GSList *standard;
-    guint i;
 
     if (model)
         return model;
 
-    standard = NULL;
-    for (i = 0; i < G_N_ELEMENTS(message_toolbar); i++) {
-        const BalsaToolbarEntry *entry = &message_toolbar[i];
-        standard = g_slist_prepend(standard, g_strdup(entry->action));
-        standard = g_slist_prepend(standard, g_strdup(entry->icon));
-    }
-    standard = g_slist_reverse(standard);
-
     model =
         balsa_toolbar_model_new(BALSA_TOOLBAR_TYPE_MESSAGE_WINDOW,
-                                standard);
+                                message_toolbar,
+                                G_N_ELEMENTS(message_toolbar));
     balsa_toolbar_model_add_entries(model, message_toolbar_extras,
                                     G_N_ELEMENTS(message_toolbar_extras));
 
@@ -816,6 +807,13 @@ static GActionEntry win_entries[] = {
 };
 
 void
+message_window_add_action_entries(GActionMap * action_map)
+{
+    g_action_map_add_action_entries(action_map, win_entries,
+                                    G_N_ELEMENTS(win_entries), action_map);
+}
+
+void
 message_window_new(LibBalsaMailbox * mailbox, guint msgno)
 {
     LibBalsaMessage *message;
@@ -879,7 +877,7 @@ message_window_new(LibBalsaMailbox * mailbox, guint msgno)
 
     model = message_window_get_toolbar_model();
 
-    mw->toolbar = balsa_toolbar_new(model, G_OBJECT(window));
+    mw->toolbar = balsa_toolbar_new(model, G_ACTION_MAP(window));
     gtk_box_pack_start(GTK_BOX(vbox), mw->toolbar, FALSE, FALSE, 0);
 
     gtk_window_set_wmclass(GTK_WINDOW(window), "message", "Balsa");

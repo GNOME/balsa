@@ -48,8 +48,8 @@ struct BalsaToolbarModel_ {
     GObject object;
 
     GHashTable      *legal;
-    GSList          *standard;
-    GSList          *current;
+    GArray          *standard;
+    GArray          *current;
     BalsaToolbarType type;
     GtkToolbarStyle  style;
 #if HAVE_GNOME
@@ -69,9 +69,16 @@ static void
 balsa_toolbar_model_finalize(GObject * object)
 {
     BalsaToolbarModel *model = BALSA_TOOLBAR_MODEL(object);
-    g_hash_table_destroy(model->legal);
+
+    if (model->legal) {
+        g_hash_table_destroy(model->legal);
+        model->legal = NULL;
+    }
 #if HAVE_GNOME
-    g_object_unref(model->settings);
+    if (model->settings) {
+        g_object_unref(model->settings);
+        model->settings = NULL;
+    }
 #endif /* HAVE_GNOME */
     G_OBJECT_CLASS(parent_class)->finalize(object);
 }
@@ -98,7 +105,7 @@ static void
 balsa_toolbar_model_init(BalsaToolbarModel * model)
 {
     model->legal =
-        g_hash_table_new_full(g_str_hash, g_str_equal, NULL, g_free);
+        g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
 }
 
 GType
@@ -133,7 +140,7 @@ balsa_toolbar_model_get_type()
 /* The descriptions must be SHORT */
 button_data toolbar_buttons[]={
     {"",                         N_("Separator"),       FALSE},
-    {"application-exit",             N_("Quit"),            FALSE},
+    {"application-exit",         N_("Quit"),            FALSE},
     {BALSA_PIXMAP_RECEIVE,       N_("Check"),           TRUE},
     {BALSA_PIXMAP_COMPOSE,       N_("Compose"),         TRUE},
     {BALSA_PIXMAP_CONTINUE,      N_("Continue"),        FALSE},
@@ -199,15 +206,13 @@ balsa_toolbar_sanitize_id(const gchar *id)
 }
 
 /* this should go to GTK because it modifies its internal structures. */
-void
+static void
 balsa_toolbar_remove_all(GtkWidget * widget)
 {
-    GList *child, *children;
+    GtkToolItem *item;
 
-    children = gtk_container_get_children(GTK_CONTAINER(widget));
-    for (child = children; child; child = child->next)
-        gtk_widget_destroy(child->data);
-    g_list_free(children);
+    while ((item = gtk_toolbar_get_nth_item((GtkToolbar *) widget, 0)))
+        gtk_container_remove((GtkContainer *) widget, (GtkWidget *) item);
 }
 
 /* Load and save config
@@ -217,9 +222,7 @@ static void
 tm_load_model(BalsaToolbarModel * model)
 {
     gchar *key;
-#ifdef LOADING_MODEL_IS_FIXED
     guint j;
-#endif
 
     key = g_strconcat("toolbar-", balsa_toolbar_names[model->type], NULL);
     libbalsa_conf_push_group(key);
@@ -227,22 +230,22 @@ tm_load_model(BalsaToolbarModel * model)
 
     model->style = libbalsa_conf_get_int_with_default("Style=-1", NULL);
 
-#ifdef LOADING_MODEL_IS_FIXED
-    model->current = NULL;
     for (j = 0;; j++) {
-        gchar *item;
+        BalsaToolbarEntry entry;
 
-        key = g_strdup_printf("Item%d", j);
-        item = libbalsa_conf_get_string(key);
+        key = g_strdup_printf("Action%d", j);
+        entry.action = libbalsa_conf_get_string(key);
         g_free(key);
 
-        if (!item)
+        if (!entry.action)
             break;
 
-        model->current = g_slist_prepend(model->current, item);
+        key = g_strdup_printf("Icon%d", j);
+        entry.icon = libbalsa_conf_get_string(key);
+        g_free(key);
+
+        g_array_append_val(model->current, entry);
     }
-    model->current = g_slist_reverse(model->current);
-#endif
 
     libbalsa_conf_pop_group();
 }
@@ -252,7 +255,6 @@ tm_save_model(BalsaToolbarModel * model)
 {
     gchar *key;
     guint j;
-    GSList *list;
 
     key = g_strconcat("toolbar-", balsa_toolbar_names[model->type], NULL);
     libbalsa_conf_remove_group(key);
@@ -262,11 +264,16 @@ tm_save_model(BalsaToolbarModel * model)
     if (model->style != (GtkToolbarStyle) (-1))
         libbalsa_conf_set_int("Style", model->style);
 
-    for (j = 0, list = model->current;
-         list;
-         j++, list = list->next) {
-        key = g_strdup_printf("Item%d", j);
-        libbalsa_conf_set_string(key, list->data);
+
+    for (j = 0; j < model->current->len; j++) {
+        BalsaToolbarEntry *entry;
+
+        entry = &g_array_index(model->current, BalsaToolbarEntry, j);
+        key = g_strdup_printf("Action%d", j);
+        libbalsa_conf_set_string(key, entry->action);
+        g_free(key);
+        key = g_strdup_printf("Icon%d", j);
+        libbalsa_conf_set_string(key, entry->icon);
         g_free(key);
     }
 
@@ -292,13 +299,27 @@ tm_gsettings_change_cb(GSettings   * settings,
 /* Create a BalsaToolbarModel structure.
  */
 BalsaToolbarModel *
-balsa_toolbar_model_new(BalsaToolbarType type, GSList * standard)
+balsa_toolbar_model_new(BalsaToolbarType          type,
+                        const BalsaToolbarEntry * entries,
+                        guint                     n_entries)
 {
-    BalsaToolbarModel *model =
-        g_object_new(BALSA_TYPE_TOOLBAR_MODEL, NULL);
+    guint i;
+    BalsaToolbarModel *model;
+
+    model = g_object_new(BALSA_TYPE_TOOLBAR_MODEL, NULL);
+
+    model->current = g_array_new(FALSE, FALSE, sizeof(BalsaToolbarEntry));
+    model->standard = g_array_new(FALSE, FALSE, sizeof(BalsaToolbarEntry));
+    for (i = 0; i < n_entries; i++) {
+        BalsaToolbarEntry entry;
+
+        entry.action = g_strdup(entries[i].action);
+        entry.icon   = g_strdup(entries[i].icon);
+        g_array_append_val(model->standard, entry);
+    }
 
     model->type = type;
-    model->standard = standard;
+    balsa_toolbar_model_add_entries(model, entries, n_entries);
     tm_load_model(model);
 
 #if HAVE_GNOME
@@ -323,13 +344,13 @@ balsa_toolbar_model_changed(BalsaToolbarModel * model)
 }
 
 static void
-tm_add_action(BalsaToolbarModel * model, const gchar * stock_id,
-              const gchar * name)
+tm_add_action(BalsaToolbarModel       * model,
+              const BalsaToolbarEntry * entry)
 {
     /* Check whether we have already seen this icon: */
-    if (stock_id && !g_hash_table_lookup(model->legal, stock_id))
-        g_hash_table_insert(model->legal, (gchar *) stock_id,
-                            (gchar *) name);
+    if (entry->icon && !g_hash_table_lookup(model->legal, entry->icon))
+        g_hash_table_insert(model->legal, g_strdup(entry->icon),
+                            g_strdup(entry->action));
 }
 
 void
@@ -337,11 +358,9 @@ balsa_toolbar_model_add_entries(BalsaToolbarModel       * model,
                                 const BalsaToolbarEntry * entries,
                                 guint                     n_entries)
 {
-    guint i;
-
-    for (i = 0; i < n_entries; i++) {
-        const BalsaToolbarEntry *entry = &entries[i];
-        tm_add_action(model, entry->icon, entry->action);
+    while (n_entries > 0) {
+        tm_add_action(model, entries++);
+        --n_entries;
     }
 }
 
@@ -355,16 +374,16 @@ balsa_toolbar_model_get_legal(BalsaToolbarModel * model)
 
 /* Return the current icons.
  */
-GSList *
+GArray *
 balsa_toolbar_model_get_current(BalsaToolbarModel * model)
 {
-    return model->current ? model->current : model->standard;
+    return model->current->len > 0 ?  model->current : model->standard;
 }
 
 gboolean
 balsa_toolbar_model_is_standard(BalsaToolbarModel * model)
 {
-    return model->current == NULL;
+    return model->current->len == 0;
 }
 
 /* Add an icon to the list of current icons in a BalsaToolbarModel.
@@ -375,11 +394,16 @@ balsa_toolbar_model_insert_icon(BalsaToolbarModel * model, gchar * icon,
 {
     const gchar *real_button = balsa_toolbar_sanitize_id(icon);
 
-    if (real_button)
-        model->current =
-            g_slist_insert(model->current, g_strdup(real_button),
-                           position);
-    else
+    if (real_button) {
+        BalsaToolbarEntry entry;
+
+        entry.action = g_strdup(g_hash_table_lookup(model->legal, real_button));
+        entry.icon   = g_strdup(real_button);
+        if (position >= 0)
+            g_array_insert_val(model->current, position, entry);
+        else
+            g_array_append_val(model->current, entry);
+    } else
         g_warning(_("Unknown toolbar icon \"%s\""), icon);
 }
 
@@ -388,9 +412,16 @@ balsa_toolbar_model_insert_icon(BalsaToolbarModel * model, gchar * icon,
 void
 balsa_toolbar_model_clear(BalsaToolbarModel * model)
 {
-    g_slist_foreach(model->current, (GFunc) g_free, NULL);
-    g_slist_free(model->current);
-    model->current = NULL;
+    guint j;
+
+    for (j = 0; j < model->current->len; j++) {
+        BalsaToolbarEntry *entry;
+
+        entry = &g_array_index(model->current, BalsaToolbarEntry, j);
+        g_free(entry->action);
+        g_free(entry->icon);
+    }
+    g_array_set_size(model->current, 0);
 }
 
 /* Create a new instance of a toolbar
@@ -399,13 +430,17 @@ balsa_toolbar_model_clear(BalsaToolbarModel * model)
 static gboolean
 tm_has_second_line(BalsaToolbarModel * model)
 {
-    GSList *list;
+    GArray *current;
+    guint j;
 
     /* Find out whether any button has 2 lines of text. */
-    for (list = balsa_toolbar_model_get_current(model); list;
-         list = list->next) {
-        const gchar *icon = list->data;
-        gint button = get_toolbar_button_index(icon);
+    current = balsa_toolbar_model_get_current(model);
+    for (j = 0; j < current->len; j++) {
+        const gchar *icon;
+        gint button;
+
+        icon = g_array_index(current, BalsaToolbarEntry, j).icon;
+        button = get_toolbar_button_index(icon);
 
         if (button >= 0 && strchr(balsa_toolbar_button_text(button), '\n'))
             return TRUE;
@@ -500,19 +535,78 @@ tm_set_style(GtkWidget * toolbar, BalsaToolbarModel * model)
                           model->style : tm_default_style());
 }
 
+/* Populate a model
+ */
+#define BALSA_TOOLBAR_ACTION_MAP "balsa-toolbar-action-map"
+static void
+tm_populate(GtkWidget * toolbar, BalsaToolbarModel * model)
+{
+    gboolean style_is_both;
+    gboolean make_two_line;
+    GArray *current;
+    guint j;
+    GActionMap *action_map =
+        g_object_get_data(G_OBJECT(toolbar), BALSA_TOOLBAR_ACTION_MAP);
+
+    style_is_both = (model->style == GTK_TOOLBAR_BOTH
+                     || (model->style == (GtkToolbarStyle) - 1
+                         && tm_default_style() == GTK_TOOLBAR_BOTH));
+    make_two_line = style_is_both && tm_has_second_line(model);
+
+    current = balsa_toolbar_model_get_current(model);
+    for (j = 0; j < current->len; j++) {
+        BalsaToolbarEntry *entry;
+        GtkToolItem *item;
+
+        entry = &g_array_index(current, BalsaToolbarEntry, j);
+
+        if (!*entry->action) {
+            item = gtk_separator_tool_item_new();
+        } else {
+            GtkWidget *icon;
+            GAction *action;
+            const GVariantType *type;
+            gchar *prefixed_action;
+
+            icon = gtk_image_new_from_icon_name
+                (balsa_icon_id(entry->icon), GTK_ICON_SIZE_SMALL_TOOLBAR);
+            action = g_action_map_lookup_action(action_map, entry->action);
+            if (action &&
+                (type = g_action_get_state_type(action)) &&
+                g_variant_type_equal(type, G_VARIANT_TYPE_BOOLEAN)) {
+                item = gtk_toggle_tool_button_new();
+                g_object_set(G_OBJECT(item), "icon-widget", icon,
+                             "label", entry->action, NULL);
+            } else {
+                item = gtk_tool_button_new(icon, entry->action);
+            }
+            tm_set_tool_item_label(GTK_TOOL_ITEM(item), entry->icon,
+                                   make_two_line);
+
+            prefixed_action =
+                g_strconcat(action ? "win." : "app.", entry->action, NULL);
+            gtk_actionable_set_action_name(GTK_ACTIONABLE(item),
+                                           prefixed_action);
+            g_free(prefixed_action);
+        }
+        gtk_toolbar_insert((GtkToolbar *) toolbar, item, -1);
+    }
+    gtk_widget_show_all(toolbar);
+}
+
 /* Update a real toolbar when the model has changed.
  */
 static void
 tm_changed_cb(BalsaToolbarModel * model, GtkWidget * toolbar)
 {
+    balsa_toolbar_remove_all(toolbar);
+    tm_populate(toolbar, model);
     tm_set_style(toolbar, model);
-
     tm_save_model(model);
 }
 
 typedef struct {
     BalsaToolbarModel *model;
-    GObject           *object;
     GtkWidget         *menu;
 } toolbar_info;
 
@@ -520,7 +614,6 @@ static void
 tm_toolbar_weak_notify(toolbar_info * info, GtkWidget * toolbar)
 {
     g_signal_handlers_disconnect_by_data(info->model, toolbar);
-    g_object_unref(info->object);
     g_free(info);
 }
 
@@ -744,67 +837,20 @@ tm_realize_cb(GtkWidget * toolbar, BalsaToolbarModel * model)
 }
 
 GtkWidget *balsa_toolbar_new(BalsaToolbarModel * model,
-                   /* FIXME: GActionMap        * action_map */
-                             GObject * object)
+                             GActionMap        * action_map)
 {
     toolbar_info *info;
-    GActionMap *action_map = G_ACTION_MAP(object);
-    gboolean style_is_both;
-    gboolean make_two_line;
     GtkWidget *toolbar;
-    GSList *current = balsa_toolbar_model_get_current(model);
-    GSList *l;
 
     info = g_new(toolbar_info, 1);
     info->model = model;
-    info->object = g_object_ref(object);
     info->menu = NULL;
 
-    style_is_both = (model->style == GTK_TOOLBAR_BOTH
-                     || (model->style == (GtkToolbarStyle) - 1
-                         && tm_default_style() == GTK_TOOLBAR_BOTH));
-    make_two_line = style_is_both && tm_has_second_line(model);
-
     toolbar = gtk_toolbar_new();
-    for (l = current; l; l = l->next) {
-        gchar *action_name, *icon_name;
-        GtkToolItem *item;
-
-        action_name = l->data;
-        l = l->next;
-        icon_name = l->data;
-
-        if (!*action_name) {
-            item = gtk_separator_tool_item_new();
-        } else {
-            GtkWidget *icon;
-            GAction *action;
-            const GVariantType *type;
-            gchar *prefixed_action;
-
-            icon = gtk_image_new_from_icon_name
-                (balsa_icon_id(icon_name), GTK_ICON_SIZE_SMALL_TOOLBAR);
-            action = g_action_map_lookup_action(action_map, action_name);
-            if (action &&
-                (type = g_action_get_state_type(action)) &&
-                g_variant_type_equal(type, G_VARIANT_TYPE_BOOLEAN)) {
-                item = gtk_toggle_tool_button_new();
-                g_object_set(G_OBJECT(item), "icon-widget", icon,
-                             "label", action_name, NULL);
-            } else {
-                item = gtk_tool_button_new(icon, action_name);
-            }
-            tm_set_tool_item_label(GTK_TOOL_ITEM(item), icon_name,
-                                   make_two_line);
-
-            prefixed_action =
-                g_strconcat(action ? "win." : "app.", action_name, NULL);
-            gtk_actionable_set_action_name(GTK_ACTIONABLE(item),
-                                           prefixed_action);
-            g_free(prefixed_action);
-        }
-        gtk_container_add(GTK_CONTAINER(toolbar), GTK_WIDGET(item));
-    }
+    g_object_set_data_full(G_OBJECT(toolbar), BALSA_TOOLBAR_ACTION_MAP,
+                           g_object_ref(action_map),
+                           (GDestroyNotify) g_object_unref);
+    tm_populate(toolbar, model);
 
     g_signal_connect(model, "changed", G_CALLBACK(tm_changed_cb), toolbar);
     g_signal_connect(toolbar, "realize", G_CALLBACK(tm_realize_cb), model);

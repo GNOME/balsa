@@ -30,5 +30,6 @@ typedef struct _MessageWindow MessageWindow;
 
 void message_window_new(LibBalsaMailbox * mailbox, guint msgno);
 BalsaToolbarModel *message_window_get_toolbar_model(void);
+void message_window_add_action_entries(GActionMap * action_map);
 
 #endif				/* __MESSAGE_WINDOW_H__ */

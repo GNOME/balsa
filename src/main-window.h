@@ -143,6 +143,7 @@ void check_new_messages_count(LibBalsaMailbox * mailbox, gboolean notify);
 void empty_trash(BalsaWindow * window);
 void update_view_menu(BalsaWindow * window);
 BalsaToolbarModel *balsa_window_get_toolbar_model(void);
+void balsa_window_add_action_entries(GActionMap * action_map);
 void balsa_window_select_all(GtkWindow * window);
 gboolean balsa_window_next_unread(BalsaWindow * window);
 

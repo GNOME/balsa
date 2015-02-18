@@ -59,13 +59,9 @@ extern button_data toolbar_buttons[];
 extern const int toolbar_button_count;
 
 typedef struct {
-    const gchar *action;
-    const gchar *icon;
+    gchar *action;
+    gchar *icon;
 } BalsaToolbarEntry;
-
-void balsa_toolbar_model_add_entries(BalsaToolbarModel       * model,
-                                     const BalsaToolbarEntry * entries,
-                                     guint                     n_entries);
 
 typedef enum {
     BALSA_TOOLBAR_TYPE_MAIN_WINDOW,
@@ -74,17 +70,21 @@ typedef enum {
 } BalsaToolbarType;
 
 void update_all_toolbars(void);
-void balsa_toolbar_remove_all(GtkWidget * toolbar);
 
 /* toolbar code for gtk+-2 */
 const gchar *balsa_toolbar_button_text(gint button);
 const gchar *balsa_toolbar_sanitize_id(const gchar * id);
 
 /* BalsaToolbarModel */
-BalsaToolbarModel *balsa_toolbar_model_new(BalsaToolbarType type,
-                                           GSList * standard);
+BalsaToolbarModel *
+    balsa_toolbar_model_new(BalsaToolbarType          type,
+                            const BalsaToolbarEntry * entries,
+                            guint                     n_entries);
+void balsa_toolbar_model_add_entries(BalsaToolbarModel       * model,
+                                     const BalsaToolbarEntry * entries,
+                                     guint                     n_entries);
 GHashTable *balsa_toolbar_model_get_legal(BalsaToolbarModel * model);
-GSList *balsa_toolbar_model_get_current(BalsaToolbarModel * model);
+GArray *balsa_toolbar_model_get_current(BalsaToolbarModel * model);
 gboolean balsa_toolbar_model_is_standard(BalsaToolbarModel * model);
 void balsa_toolbar_model_insert_icon(BalsaToolbarModel * model,
                                      gchar * icon, gint position);
@@ -94,6 +94,7 @@ void balsa_toolbar_model_clear(BalsaToolbarModel * model);
 void balsa_toolbar_model_changed(BalsaToolbarModel * model);
 
 /* BalsaToolbar */
-GtkWidget *balsa_toolbar_new(BalsaToolbarModel * model, GObject * object);
+GtkWidget *balsa_toolbar_new(BalsaToolbarModel * model,
+                             GActionMap        * map);
 
 #endif

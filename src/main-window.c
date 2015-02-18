@@ -664,22 +664,14 @@ BalsaToolbarModel *
 balsa_window_get_toolbar_model(void)
 {
     static BalsaToolbarModel *model = NULL;
-    GSList *standard;
-    guint i;
 
     if (model)
         return model;
 
-    standard = NULL;
-    for (i = 0; i < G_N_ELEMENTS(main_toolbar); i++) {
-        const BalsaToolbarEntry *entry = &main_toolbar[i];
-        standard = g_slist_prepend(standard, g_strdup(entry->action));
-        standard = g_slist_prepend(standard, g_strdup(entry->icon));
-    }
-    standard = g_slist_reverse(standard);
-
     model =
-        balsa_toolbar_model_new(BALSA_TOOLBAR_TYPE_MAIN_WINDOW, standard);
+        balsa_toolbar_model_new(BALSA_TOOLBAR_TYPE_MAIN_WINDOW,
+                                main_toolbar,
+                                G_N_ELEMENTS(main_toolbar));
     balsa_toolbar_model_add_entries(model, main_toolbar_extras,
                                     G_N_ELEMENTS(main_toolbar_extras));
 
@@ -1912,7 +1904,7 @@ threading_change_state(GSimpleAction * action,
  */
 
 static void
-bw_set_menus(BalsaWindow * window)
+bw_add_app_action_entries(GActionMap * action_map, gpointer user_data)
 {
     static GActionEntry app_entries[] = {
         {"new-message",           new_message_activated},
@@ -1930,6 +1922,14 @@ bw_set_menus(BalsaWindow * window)
         {"about",                 about_activated},
         {"quit",                  quit_activated}
     };
+
+    g_action_map_add_action_entries(action_map, app_entries,
+                                    G_N_ELEMENTS(app_entries), user_data);
+}
+
+static void
+bw_add_win_action_entries(GActionMap * action_map)
+{
     static GActionEntry win_entries[] = {
         {"new-message",           new_message_activated},
         {"continue",              continue_activated},
@@ -2019,17 +2019,27 @@ bw_set_menus(BalsaWindow * window)
         {"toggle-answered",       toggle_answered_activated},
         {"store-address",         store_address_activated}
     };
+
+    g_action_map_add_action_entries(action_map, win_entries,
+                                    G_N_ELEMENTS(win_entries), action_map);
+}
+
+void
+balsa_window_add_action_entries(GActionMap * action_map)
+{
+    bw_add_app_action_entries(action_map, NULL);
+    bw_add_win_action_entries(action_map);
+}
+
+static void
+bw_set_menus(BalsaWindow * window)
+{
     GtkBuilder *builder;
     gchar *ui_file;
     GError *err = NULL;
 
-    g_action_map_add_action_entries(G_ACTION_MAP(balsa_app.application),
-                                    app_entries, G_N_ELEMENTS(app_entries),
-                                    window);
-
-    g_action_map_add_action_entries(G_ACTION_MAP(window),
-                                    win_entries, G_N_ELEMENTS(win_entries),
-                                    window);
+    bw_add_app_action_entries(G_ACTION_MAP(balsa_app.application), window);
+    bw_add_win_action_entries(G_ACTION_MAP(window));
 
     builder = gtk_builder_new();
     ui_file = g_build_filename(BALSA_DATA_PREFIX, "ui", "main-window.ui",
@@ -2198,7 +2208,7 @@ balsa_window_new()
 
     model = balsa_window_get_toolbar_model();
 
-    window->toolbar = balsa_toolbar_new(model, G_OBJECT(window));
+    window->toolbar = balsa_toolbar_new(model, G_ACTION_MAP(window));
     gtk_box_pack_start(GTK_BOX(window->vbox), window->toolbar,
                        FALSE, FALSE, 0);
 

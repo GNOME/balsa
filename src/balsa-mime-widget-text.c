@@ -283,7 +283,7 @@ create_text_widget(const char * content_type)
     widget = gtk_source_view_new_with_buffer(buffer);
     g_object_unref(buffer);
     return widget;
-#elif (HAVE_GTKSOURCEVIEW == 2)
+#elif (HAVE_GTKSOURCEVIEW > 1)
     static GtkSourceLanguageManager * lm = NULL;
     static const gchar * const * lm_ids = NULL;
     GtkWidget * widget = NULL;

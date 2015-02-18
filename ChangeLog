@@ -1,3 +1,8 @@
+2015-02-18  Albrecht Dreß
+
+	* src/balsa-mime-widget-text.c (create_text_widget): allow for
+	GtkSourceView versions greater than 2.
+
 2015-02-17  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Restore toolbar editing

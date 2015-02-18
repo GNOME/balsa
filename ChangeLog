@@ -1,5 +1,12 @@
 2015-02-18  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	* src/toolbar-prefs.c (customize_dialog_cb), (standard_button_cb),
+	(create_toolbar_page), (tp_page_refresh_available),
+	(tp_page_add_selected), (tp_page_remove_selected): conditionally
+	compiled debug code to check for unimplemented action names.
+
+2015-02-18  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Fix broken toolbar items
 
 	* src/message-window.c: correct action names.

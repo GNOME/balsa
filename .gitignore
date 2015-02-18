@@ -56,3 +56,4 @@ src/balsa-ab
 stamp-h1
 autoscan.log
 configure.scan
+gnome-doc-utils.make

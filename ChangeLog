@@ -1,3 +1,8 @@
+2015-02-19  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* libbalsa/address-book-text.c (lbab_text_group_address):
+	compile with MAKE_GROUP_BY_ORGANIZATION defined.
+
 2015-02-18  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* src/toolbar-prefs.c (customize_dialog_cb), (standard_button_cb),

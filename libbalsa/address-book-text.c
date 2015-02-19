@@ -259,7 +259,7 @@ lbab_text_group_address(const gchar * group_name,
             InternetAddress *member =
                 internet_address_mailbox_new(address->full_name,
 					     mailbox->data);
-            internet_address_group_add_member(ia, member);
+            internet_address_group_add_member((InternetAddressGroup *)ia, member);
             g_object_unref(member);
         }
     }

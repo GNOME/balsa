@@ -262,6 +262,7 @@ set_address_book_menu_items(void)
     guint pos;
     gchar *s;
     GtkBuilder *builder;
+    GMenuModel *menu_model;
 
     pos = g_menu_model_get_n_items(G_MENU_MODEL (contacts_app.file_menu));
     g_menu_remove(contacts_app.file_menu, --pos);
@@ -306,9 +307,12 @@ set_address_book_menu_items(void)
     builder = gtk_builder_new_from_string(s, -1);
     g_free(s);
 
-    g_menu_append_section(contacts_app.file_menu, NULL,
-                          G_MENU_MODEL(gtk_builder_get_object
-                                       (builder, "address-book-menu")));
+    menu_model =
+        G_MENU_MODEL(gtk_builder_get_object(builder, "address-book-menu"));
+    g_menu_append_section(contacts_app.file_menu, NULL, menu_model);
+    libbalsa_window_set_accels(GTK_APPLICATION_WINDOW(contacts_app.window),
+                               menu_model);
+
     g_object_unref(builder);
 }
 

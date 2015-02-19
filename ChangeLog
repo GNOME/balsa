@@ -1,5 +1,15 @@
 2015-02-19  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Make the address book editor accelerators actually work
+
+	* libbalsa/application-helpers.c (libbalsa_window_set_accels):
+	new helper;
+	(libbalsa_window_get_menu_bar) use it.
+	* libbalsa/application-helpers.h: export it.
+	* src/ab-main.c (set_address_book_menu_items): use it.
+
+2015-02-19  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* libbalsa/address-book-text.c (lbab_text_group_address):
 	compile with MAKE_GROUP_BY_ORGANIZATION defined.
 

@@ -231,7 +231,7 @@ address_book_change_state(GSimpleAction * action,
     value = g_variant_get_string(state, NULL);
     for (l = contacts_app.address_book_list; l; l = l->next) {
         address_book = l->data;
-        if (strcmp(value, address_book->name) == 0)
+        if (address_book && strcmp(value, address_book->name) == 0)
             break;
     }
 

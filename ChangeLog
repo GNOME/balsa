@@ -1,5 +1,10 @@
 2015-02-20  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	* src/ab-main.c (address_book_change_state): do not crash after
+	deleting address book.
+
+2015-02-20  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* libbalsa/application-helpers.c (libbalsa_window_get_menu_bar),
 	(libbalsa_window_set_accels): remove old accel group before
 	setting new one.

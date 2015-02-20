@@ -1,3 +1,9 @@
+2015-02-20  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* libbalsa/application-helpers.c (libbalsa_window_get_menu_bar),
+	(libbalsa_window_set_accels): remove old accel group before
+	setting new one.
+
 2015-02-19  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Make the address book editor accelerators actually work

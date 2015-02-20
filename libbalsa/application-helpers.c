@@ -173,19 +173,12 @@ libbalsa_window_get_menu_bar(GtkApplicationWindow * window,
     builder = gtk_builder_new();
     if (gtk_builder_add_from_file(builder, ui_file, error)) {
         GMenuModel *menu_model;
-        GSList *accel_groups;
 
         menu_model =
             G_MENU_MODEL(gtk_builder_get_object(builder, "menubar"));
 
         menu_bar = gtk_menu_bar_new_from_model(menu_model);
 
-        /* Remove main-window accelerators: */
-        accel_groups = gtk_accel_groups_from_object(G_OBJECT(window));
-        if (accel_groups)
-            /* Last is first... */
-            gtk_window_remove_accel_group(GTK_WINDOW(window),
-                                          accel_groups->data);
         libbalsa_window_set_accels(window, menu_model);
         gtk_application_window_set_show_menubar(window, FALSE);
     }
@@ -208,7 +201,15 @@ void
 libbalsa_window_set_accels(GtkApplicationWindow * window,
                            GMenuModel           * menu_model)
 {
+    GSList *accel_groups;
     GtkAccelGroup *accel_group;
+
+    /* Remove current accelerators: */
+    accel_groups = gtk_accel_groups_from_object(G_OBJECT(window));
+    if (accel_groups)
+        /* Last is first... */
+        gtk_window_remove_accel_group(GTK_WINDOW(window),
+                                      accel_groups->data);
 
     accel_group = get_accel_group(menu_model, G_ACTION_MAP(window));
     gtk_window_add_accel_group(GTK_WINDOW(window), accel_group);

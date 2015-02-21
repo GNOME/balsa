@@ -1,5 +1,10 @@
 2015-02-20  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	* src/main-window.c (bw_enable_mailbox_menus): suppress cppcheck
+	null pointer error.
+
+2015-02-20  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* src/ab-main.c (address_book_change_state): do not crash after
 	deleting address book.
 

@@ -2470,8 +2470,8 @@ bw_enable_mailbox_menus(BalsaWindow * window, BalsaIndex * index)
         mbnode = index->mailbox_node;
         mailbox = mbnode->mailbox;
     }
-    /* cppcheck-suppress nullPointer */
     bw_action_set_enabled(window, "mailbox-expunge",
+    /* cppcheck-suppress nullPointer */
                           mailbox && !mailbox->readonly);
 #if defined(ENABLE_TOUCH_UI)
     {gboolean can_sort, can_thread; guint i;

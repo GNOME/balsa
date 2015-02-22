@@ -1,3 +1,12 @@
+2015-02-22  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Fix some spacing issues
+
+	* src/toolbar-prefs.c (customize_dialog_cb): allocate extra
+	vertical space to the available and current toolbar item lists;
+	(create_toolbar_page): separate the 'restore' and 'current'
+	buttons by minimum 5px.
+
 2015-02-20  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* src/main-window.c (bw_enable_mailbox_menus): suppress cppcheck

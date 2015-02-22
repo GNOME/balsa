@@ -152,7 +152,7 @@ customize_dialog_cb(GtkWidget * widget, gpointer data)
     notebook = gtk_notebook_new();
     content_area =
         gtk_dialog_get_content_area(GTK_DIALOG(customize_widget));
-    gtk_container_add(GTK_CONTAINER(content_area), notebook);
+    gtk_box_pack_start(GTK_BOX(content_area), notebook, TRUE, TRUE, 0);
 
     gtk_window_set_wmclass(GTK_WINDOW(customize_widget), "customize",
                            "Balsa");
@@ -444,6 +444,7 @@ create_toolbar_page(BalsaToolbarModel * model, GActionMap * map)
 
     /* Button box */
     button_box = gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL);
+    gtk_box_set_spacing(GTK_BOX(button_box), 5);
     gtk_box_pack_start(GTK_BOX(toolbar_ctlbox), button_box, FALSE, FALSE, 0);
 
     /* Standard button */

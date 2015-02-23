@@ -150,7 +150,7 @@ imap_compress(ImapMboxHandle *handle)
 void
 imap_compress_init(struct ImapCompressContext *buf)
 {
-  memset(buf, 0, sizeof(buf));
+  memset(buf, 0, sizeof(struct ImapCompressContext));
 }
 
 /** releases any data that might have been allocated by compression routines. */

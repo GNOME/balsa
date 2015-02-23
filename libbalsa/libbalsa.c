@@ -93,9 +93,11 @@ libbalsa_init(LibBalsaInformationFunc information_callback)
 #endif
 
 #ifdef BALSA_USE_THREADS
+#if (GLIB_MINOR_VERSION < 31)
     if (!g_thread_supported()) {
 	g_error("Threads have not been initialised.");
     }
+#endif
     main_thread_id = pthread_self();
 #endif
 

@@ -1,3 +1,26 @@
+2015-02-23  Albrecht Dreß
+
+	Build with clang
+
+	* configure.in:
+	* libbalsa/files.c (libbalsa_icon_finder):
+	* libbalsa/imap/auth-cram.c (imap_auth_cram):
+	* libbalsa/imap/imap-commands.c (imap_mbox_handle_can_do):
+	* libbalsa/imap/imap-handle.c (imap_get_address):
+	* libbalsa/imap/imap_compress.c (imap_compress_init):
+	* libbalsa/imap/imap_tst.c (main):
+	* libbalsa/libbalsa.c (libbalsa_init):
+	* libbalsa/mailbox_imap.c (libbalsa_mailbox_imap_noop),
+	(lbmi_get_imap_sort_key):
+	* libbalsa/mailbox_mbox.c (libbalsa_mailbox_mbox_sync):
+	* libbalsa/mailbox_mh.c (lbm_mh_get_info), (lbm_mh_parse_mailbox),
+	(lbm_mh_flag_line), (libbalsa_mailbox_mh_sync):
+	* libbalsa/message.h:
+	* libbalsa/send.c (lbs_process_queue):
+	* libbalsa/smtp-server.c (smtp_server_tls_widget),
+	(smtp_server_response):
+	* libbalsa/url.c:
+
 2015-02-16  Albrecht Dreß
 
 	* libbalsa/imap/imap-tls.c (imap_create_ssl): disable SSLv3,

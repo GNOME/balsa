@@ -114,7 +114,7 @@ imap_auth_cram(ImapMboxHandle* handle)
    */
   
   lit_conv_to_base64(ibuf, obuf, strlen (obuf), sizeof(ibuf)-2);
-  strncat (ibuf, "\r\n", sizeof (ibuf));
+  strncat (ibuf, "\r\n", sizeof(ibuf) - strlen(ibuf) - 1);
   imap_handle_write(handle, ibuf, strlen(ibuf));
   imap_handle_flush(handle);
   g_free(user); g_free(pass); /* FIXME: clean passwd first */

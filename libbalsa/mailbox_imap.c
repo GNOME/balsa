@@ -1725,9 +1725,9 @@ libbalsa_mailbox_imap_noop(LibBalsaMailboxImap* mimap)
     g_return_if_fail(mimap != NULL);
 
     if (mimap->handle) /* we do not attempt to reconnect here */
-	if (imap_mbox_handle_noop(mimap->handle) != IMR_OK)
+	if (imap_mbox_handle_noop(mimap->handle) != IMR_OK) {
 	    /* FIXME: report error... */
-	    ;
+	}
 }
 
 void
@@ -3153,7 +3153,7 @@ libbalsa_mailbox_imap_can_do(LibBalsaMailbox* mbox,
 static ImapSortKey
 lbmi_get_imap_sort_key(LibBalsaMailbox *mbox)
 {
-    ImapSortKey key = LB_MBOX_FROM_COL;
+    ImapSortKey key = (ImapSortKey) LB_MBOX_FROM_COL;
 
     switch (mbox->view->sort_field) {
     default:

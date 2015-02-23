@@ -301,8 +301,6 @@ lbm_mh_remove_files(LibBalsaMailboxLocal *mailbox)
     LIBBALSA_MAILBOX_LOCAL_CLASS(parent_class)->remove_files(mailbox);
 }
 
-#define INVALID_FLAG ((unsigned) -1)
-
 static LibBalsaMailboxLocalMessageInfo *
 lbm_mh_get_info(LibBalsaMailboxLocal * local, guint msgno)
 {
@@ -310,7 +308,7 @@ lbm_mh_get_info(LibBalsaMailboxLocal * local, guint msgno)
 
     msg_info = lbm_mh_message_info_from_msgno(LIBBALSA_MAILBOX_MH(local),
 					      msgno);
-    if (msg_info->local_info.flags == INVALID_FLAG)
+    if (msg_info->local_info.flags == LIBBALSA_MESSAGE_FLAG_INVALID)
         msg_info->local_info.flags = msg_info->orig_flags;
 
     return &msg_info->local_info;
@@ -371,7 +369,7 @@ lbm_mh_parse_mailbox(LibBalsaMailboxMh * mh, gboolean add_msg_info)
 				    GINT_TO_POINTER(fileno));
 	    if (!msg_info) {
 		msg_info = g_new0(struct message_info, 1);
-		msg_info->local_info.flags = INVALID_FLAG;
+		msg_info->local_info.flags = LIBBALSA_MESSAGE_FLAG_INVALID;
 		g_hash_table_insert(mh->messages_info,
 				    GINT_TO_POINTER(fileno), msg_info);
 		g_ptr_array_add(mh->msgno_2_msg_info, msg_info);
@@ -757,7 +755,7 @@ static void
 lbm_mh_flag_line(struct message_info *msg_info, LibBalsaMessageFlag flag,
 		 struct line_info *li)
 {
-    if (msg_info->local_info.flags == INVALID_FLAG)
+    if (msg_info->local_info.flags == LIBBALSA_MESSAGE_FLAG_INVALID)
 	msg_info->local_info.flags = msg_info->orig_flags;
     if (!(msg_info->local_info.flags & flag))
 	return;
@@ -830,7 +828,7 @@ libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox, gboolean expunge)
     msgno = 1;
     while (msgno <= mh->msgno_2_msg_info->len) {
 	msg_info = lbm_mh_message_info_from_msgno(mh, msgno);
-	if (msg_info->local_info.flags == INVALID_FLAG)
+	if (msg_info->local_info.flags == LIBBALSA_MESSAGE_FLAG_INVALID)
 	    msg_info->local_info.flags = msg_info->orig_flags;
 	if (mailbox->state == LB_MAILBOX_STATE_CLOSING)
 	    msg_info->local_info.flags &= ~LIBBALSA_MESSAGE_FLAG_RECENT;
@@ -872,9 +870,9 @@ libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 		new_file = g_build_filename(path, tmp, NULL);
 		g_free(tmp);
 
-		if (libbalsa_safe_rename(old_file, new_file) == -1)
+		if (libbalsa_safe_rename(old_file, new_file) == -1) {
 		    /* FIXME: report error ... */
-		    ;
+		}
 
 		g_free(old_file);
 		g_free(new_file);

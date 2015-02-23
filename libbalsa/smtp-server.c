@@ -395,13 +395,13 @@ smtp_server_tls_widget(LibBalsaSmtpServer * smtp_server)
 #endif                          /* GTK_CHECK_VERSION(2, 24, 0) */
 
     switch (server->tls_mode) {
-    case Starttls_DISABLED:
+    case LIBBALSA_TLS_DISABLED:
         gtk_combo_box_set_active(GTK_COMBO_BOX(combo_box), 0);
         break;
-    case Starttls_ENABLED:
+    case LIBBALSA_TLS_ENABLED:
         gtk_combo_box_set_active(GTK_COMBO_BOX(combo_box), 1);
         break;
-    case Starttls_REQUIRED:
+    case LIBBALSA_TLS_REQUIRED:
         gtk_combo_box_set_active(GTK_COMBO_BOX(combo_box), 2);
         break;
     default:
@@ -446,13 +446,13 @@ smtp_server_response(GtkDialog * dialog, gint response,
 #if HAVE_SMTP_TLS_CLIENT_CERTIFICATE
         switch (gtk_combo_box_get_active(GTK_COMBO_BOX(sdi->tlsm))) {
         case 0:
-            server->tls_mode = Starttls_DISABLED;
+            server->tls_mode = LIBBALSA_TLS_DISABLED;
             break;
         case 1:
-            server->tls_mode = Starttls_ENABLED;
+            server->tls_mode = LIBBALSA_TLS_ENABLED;
             break;
         case 2:
-            server->tls_mode = Starttls_REQUIRED;
+            server->tls_mode = LIBBALSA_TLS_REQUIRED;
             break;
         default:
             break;

@@ -138,7 +138,7 @@ imap_mbox_handle_can_do(ImapMboxHandle* handle, ImapCapability cap)
   if(!handle->has_capabilities)
     imap_check_capability(handle);
 
-  if(cap>=0 && cap<IMCAP_MAX)
+  if(cap<IMCAP_MAX)
     return handle->capabilities[cap];
   else return 0;
 }

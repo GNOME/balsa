@@ -869,7 +869,7 @@ dnl #####################################################################
 AC_C_CONST
 AC_STDC_HEADERS
 
-AC_DEFINE([_XOPEN_SOURCE],[500],[We strive for XOPEN compliance])
+# AC_DEFINE([_XOPEN_SOURCE],[500],[We strive for XOPEN compliance])
 AC_CHECK_DECLS([localtime_r, gmtime_r, ctime_r], [], [], [[#include <time.h>]])
 AC_CHECK_FUNCS([localtime_r gmtime_r ctime_r])
 AC_CHECK_HEADER([zlib.h],,AC_MSG_ERROR([zlib library required]))

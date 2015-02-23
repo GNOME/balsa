@@ -5673,11 +5673,26 @@ sw_spell_language_changed_cb(GtkSpellChecker * spell,
     balsa_app.spell_check_lang = g_strdup(new_lang);
 }
 
+static gboolean
+sw_spell_detach(BalsaSendmsg * bsmsg)
+{
+    GtkSpellChecker *spell;
+
+    spell = gtk_spell_checker_get_from_text_view(GTK_TEXT_VIEW(bsmsg->text));
+    if (spell)
+        gtk_spell_checker_detach(spell);
+
+    return spell != NULL;
+}
+
 static void
 sw_spell_attach(BalsaSendmsg * bsmsg)
 {
     GtkSpellChecker *spell;
     GError *err = NULL;
+
+    /* Detach any existing spell checker */
+    sw_spell_detach(bsmsg);
 
     spell = gtk_spell_checker_new();
     gtk_spell_checker_set_language(spell, bsmsg->spell_check_lang, &err);
@@ -5696,18 +5711,6 @@ sw_spell_attach(BalsaSendmsg * bsmsg)
         g_signal_connect(spell, "language-changed",
                          G_CALLBACK(sw_spell_language_changed_cb), bsmsg);
     }
-}
-
-static gboolean
-sw_spell_detach(BalsaSendmsg * bsmsg)
-{
-    GtkSpellChecker *spell;
-
-    spell = gtk_spell_checker_get_from_text_view(GTK_TEXT_VIEW(bsmsg->text));
-    if (spell)
-        gtk_spell_checker_detach(spell);
-
-    return spell != NULL;
 }
 #endif                          /* HAVE_GTKSPELL */
 

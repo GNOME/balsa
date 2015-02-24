@@ -77,6 +77,7 @@ extern "C"
         gchar *face;
         gchar *x_face;
 	gboolean request_mdn;
+	gboolean request_dsn;
 
 	gboolean gpg_sign;
 	gboolean gpg_encrypt;

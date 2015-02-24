@@ -130,6 +130,8 @@ static void toggle_fcc_cb          (GtkToggleAction * toggle_action,
                                     BalsaSendmsg * bsmsg);
 static void toggle_reqdispnotify_cb(GtkToggleAction * toggle_action,
                                     BalsaSendmsg * bsmsg);
+static void toggle_reqdsn_cb       (GtkToggleAction * toggle_action,
+                                    BalsaSendmsg * bsmsg);
 static void sw_show_toolbar_cb     (GtkToggleAction * action,
                                     BalsaSendmsg * bsmsg);
 static void toggle_format_cb       (GtkToggleAction * toggle_action,
@@ -428,10 +430,14 @@ static const GtkToggleActionEntry toggle_entries[] = {
 #endif                          /* ENABLE_TOUCH_UI */
     {"Fcc", NULL, N_("F_cc"), NULL, NULL,
      G_CALLBACK(toggle_fcc_cb), TRUE},
-    {"RequestMDN", BALSA_PIXMAP_REQUEST_MDN,
-     N_("_Request Disposition Notification"), NULL, 
-     N_("Request Message Disposition Notification"),
-     G_CALLBACK(toggle_reqdispnotify_cb), FALSE},
+     {"RequestMDN", BALSA_PIXMAP_REQUEST_MDN,
+      N_("_Request Disposition Notification"), NULL,
+      N_("Request Message Disposition Notification"),
+      G_CALLBACK(toggle_reqdispnotify_cb), FALSE},
+     {"RequestDSN", BALSA_PIXMAP_REQUEST_MDN,
+       N_("_Request Delivery Status Notification"), NULL,
+       N_("Request positive (successful) Delivery Status Notification"),
+       G_CALLBACK(toggle_reqdsn_cb), FALSE},
     {"Flowed", NULL, N_("_Format = Flowed"), NULL,
      NULL, G_CALLBACK(toggle_format_cb), FALSE},
     /* Send as message/alternative with text/plain and text/html parts */
@@ -524,6 +530,7 @@ static const char *ui_description =
 "    <menu action='LanguageMenu'>"
 "    </menu>"
 "    <menu action='OptionsMenu'>"
+"      <menuitem action='RequestDSN'/>"
 "      <menuitem action='RequestMDN'/>"
 "      <menuitem action='Flowed'/>"
 "      <menuitem action='SendMPAlt'/>"
@@ -591,6 +598,7 @@ static const char *ui_description =
 "      </menu>"
 "      <separator/>"
 "      <menuitem action='SelectIdentity'/>"
+"      <menuitem action='RequestDSN'/>"
 "      <menuitem action='RequestMDN'/>"
 "      <menu action='ToolsMoreMenu'>"
 "        <menuitem action='Flowed'/>"
@@ -1658,6 +1666,7 @@ update_bsmsg_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity* ident)
     libbalsa_address_view_set_domain(bsmsg->recipient_view, ident->domain);
 
     sw_set_active(bsmsg, "RequestMDN", ident->request_mdn);
+    sw_set_active(bsmsg, "RequestDSN", ident->request_dsn);
 }
 
 
@@ -4680,7 +4689,8 @@ sendmsg_window_new()
 #endif                          /* HAVE_GTKSOURCEVIEW */
 
     /* set options */
-    bsmsg->req_dispnotify = FALSE;
+    bsmsg->req_mdn = FALSE;
+    bsmsg->req_dsn = FALSE;
 
     sw_set_active(bsmsg, "Flowed", bsmsg->flow);
     sw_set_active(bsmsg, "SendMPAlt", bsmsg->ident->send_mp_alternative);
@@ -5087,6 +5097,9 @@ sendmsg_window_continue(LibBalsaMailbox * mailbox, guint msgno)
     if ((postpone_hdr =
          libbalsa_message_get_user_header(message, "X-Balsa-MDN")))
         sw_set_active(bsmsg, "RequestMDN", atoi(postpone_hdr) != 0);
+    if ((postpone_hdr =
+         libbalsa_message_get_user_header(message, "X-Balsa-DSN")))
+        sw_set_active(bsmsg, "RequestDSN", atoi(postpone_hdr) != 0);
     if ((postpone_hdr =
          libbalsa_message_get_user_header(message, "X-Balsa-Lang"))) {
         GtkWidget *langs =
@@ -5610,8 +5623,9 @@ bsmsg2message(BalsaSendmsg * bsmsg)
         libbalsa_address_view_get_list(bsmsg->replyto_view, "Reply To:");
 #endif
 
-    if (bsmsg->req_dispnotify)
+    if (bsmsg->req_mdn)
 	libbalsa_message_set_dispnotify(message, ident->ia);
+    message->request_dsn = bsmsg->req_dsn;
 
     sw_set_header_from_path(message, "Face", ident->face,
             /* Translators: please do not translate Face. */
@@ -6136,7 +6150,9 @@ message_postpone(BalsaSendmsg * bsmsg)
         g_ptr_array_add(headers, g_strdup(bsmsg->fcc_url));
     }
     g_ptr_array_add(headers, g_strdup("X-Balsa-MDN"));
-    g_ptr_array_add(headers, g_strdup_printf("%d", bsmsg->req_dispnotify));
+    g_ptr_array_add(headers, g_strdup_printf("%d", bsmsg->req_mdn));
+    g_ptr_array_add(headers, g_strdup("X-Balsa-DSN"));
+    g_ptr_array_add(headers, g_strdup_printf("%d", bsmsg->req_dsn));
 #ifdef HAVE_GPGME
     g_ptr_array_add(headers, g_strdup("X-Balsa-Crypto"));
     g_ptr_array_add(headers, g_strdup_printf("%d", bsmsg->gpg_mode));
@@ -6639,7 +6655,14 @@ static void
 toggle_reqdispnotify_cb(GtkToggleAction * action,
                         BalsaSendmsg * bsmsg)
 {
-    bsmsg->req_dispnotify = gtk_toggle_action_get_active(action);
+    bsmsg->req_mdn = gtk_toggle_action_get_active(action);
+}
+
+static void
+toggle_reqdsn_cb(GtkToggleAction * action,
+                 BalsaSendmsg * bsmsg)
+{
+    bsmsg->req_dsn = gtk_toggle_action_get_active(action);
 }
 
 static void

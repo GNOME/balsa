@@ -139,8 +139,9 @@ load_balsa_pixmap(GtkIconTheme *icon_theme, GtkIconFactory *factory,
 		gtk_icon_set_add_source(icon_set, icon_source);
                 gtk_icon_source_free(icon_source);
 	    }
-	} else
+	} else {
 	    BICONS_ERR("bad size %d", bpixmap->sizes[n]);
+	}
     }
 
     gtk_icon_factory_add(factory, bpixmap->name, icon_set);

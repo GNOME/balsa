@@ -33,9 +33,13 @@
  * Error domains for GError: only one for now, more to come.
  */
 
+#if 0
 enum {
     IMAP_ERROR
 };
+#else
+#define IMAP_ERROR (g_quark_from_static_string("libbalsa-imap-quark"))
+#endif
  
 /*
  * Error codes for GError: only one for now, more to come.

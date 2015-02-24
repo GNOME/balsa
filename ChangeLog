@@ -1,3 +1,18 @@
+2015-02-24  Albrecht Dreß
+
+	Support for successful DSN's
+
+	* libbalsa/identity.[hc]: define default DSN setting, load and
+	store it
+	* libbalsa/identity.c, src/balsa-index.c,
+	src/filter-edit-callbacks.c: fix clang nagging about a misplaced
+	'static const' qualifier
+	* libbalsa/message.h: add request dsn flag
+	* libbalsa/send.c: instruct libesmtp to request the DSN
+	* libbalsa/send.c: pass const parameter as const
+	* src/balsa-icons.c: add braces around macro
+	* src/sendmsg-window.[hc]: add GUI stuff for requesting the DSN
+
 2015-02-23  Albrecht Dreß
 
 	Build with clang

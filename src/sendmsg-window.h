@@ -97,7 +97,8 @@ extern "C" {
         gulong identities_changed_id;
 	gboolean flow;          /* send format=flowed */ 
 	gboolean send_mp_alt;   /* send multipart/alternative (plain and html) */ 
-	gboolean req_dispnotify; /* send a MDN */ 
+	gboolean req_mdn; 	 /* send a MDN */
+	gboolean req_dsn;	 /* send a delivery status notification */
 	gboolean quit_on_close; /* quit balsa after the compose window */
 	                        /* is closed.                          */
         /* style for changing the color of address labels when the

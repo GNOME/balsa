@@ -214,6 +214,9 @@ struct _LibBalsaMessage {
     gchar * force_key_id;
 #endif
 
+    /* request a DSN (sending) */
+    gboolean request_dsn;
+
     /* a forced multipart subtype or NULL for mixed; used only for
      * sending */
     gchar *subtype;

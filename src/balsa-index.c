@@ -1874,7 +1874,7 @@ mru_menu_cb(const gchar * url, BalsaIndex * index)
 static GtkWidget *
 bndx_popup_menu_create(BalsaIndex * index)
 {
-    const static struct {       /* this is a invariable part of */
+    static const struct {       /* this is a invariable part of */
         const char *icon, *label;       /* the context message menu.    */
         GCallback func;
     } entries[] = {

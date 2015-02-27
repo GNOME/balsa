@@ -1698,7 +1698,7 @@ change_filter_name(gchar * old_name,gchar * new_name)
 void
 fe_new_pressed(GtkWidget * widget, gpointer data)
 {
-    const static char FLT_NAME_TEMPLATE[] = N_("New filter");
+    static const char FLT_NAME_TEMPLATE[] = N_("New filter");
     gint filter_number;
     LibBalsaFilter* fil;
     guint len = strlen(_(FLT_NAME_TEMPLATE))+4;

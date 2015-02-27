@@ -476,6 +476,8 @@ libbalsa_message_queue(LibBalsaMessage * message, LibBalsaMailbox * outbox,
     if (fccbox)
         g_mime_object_set_header(GMIME_OBJECT(message->mime_msg), "X-Balsa-Fcc",
                                   fccbox->url);
+    g_mime_object_set_header(GMIME_OBJECT(message->mime_msg), "X-Balsa-DSN",
+			     message->request_dsn ? "1" : "0");
 #if ENABLE_ESMTP
     g_mime_object_set_header(GMIME_OBJECT(message->mime_msg), "X-Balsa-SmtpServer",
 	                      libbalsa_smtp_server_get_name(smtp_server));
@@ -600,7 +602,8 @@ libbalsa_message_cb (void **buf, int *len, void *arg)
 
 static void
 add_recipients(smtp_message_t message,
-               InternetAddressList * recipient_list)
+               InternetAddressList * recipient_list,
+               gboolean request_dsn)
 {
     const InternetAddress *ia;
     int i;
@@ -611,14 +614,24 @@ add_recipients(smtp_message_t message,
     for (i = 0; i < internet_address_list_length (recipient_list); i++) {
         ia = internet_address_list_get_address (recipient_list, i);
 
-	if (INTERNET_ADDRESS_IS_MAILBOX (ia))
-	    smtp_add_recipient (message, INTERNET_ADDRESS_MAILBOX (ia)->addr);
-	else
-	    add_recipients(message, INTERNET_ADDRESS_GROUP (ia)->members);
+	if (INTERNET_ADDRESS_IS_MAILBOX (ia)) {
+	    smtp_recipient_t recipient;
 
-            /* XXX  - this is where to add DSN requests.  It would be
-               cool if LibBalsaAddress could contain DSN options
-               for a particular recipient. */
+            recipient =
+                smtp_add_recipient(message,
+                                   INTERNET_ADDRESS_MAILBOX(ia)->addr);
+	    if (request_dsn) {
+                smtp_dsn_set_notify(recipient,
+                                    Notify_SUCCESS | Notify_FAILURE |
+                                    Notify_DELAY);
+
+		/* XXX  - It would be cool if LibBalsaAddress could contain DSN options
+	           for a particular recipient.  For the time being, just use a switch */
+	    }
+	} else {
+            add_recipients(message, INTERNET_ADDRESS_GROUP(ia)->members,
+                           request_dsn);
+	}
     }
 }
 
@@ -707,6 +720,8 @@ lbs_process_queue(LibBalsaMailbox * outbox, LibBalsaFccboxFinder finder,
             g_object_unref(msg);
             continue;
         }
+        msg->request_dsn =
+        	(atoi(libbalsa_message_get_user_header(msg, "X-Balsa-DSN")) != 0);
 
 	new_message = msg_queue_item_new(finder);
         created = libbalsa_fill_msg_queue_item_from_queu(msg, new_message);
@@ -778,6 +793,11 @@ lbs_process_queue(LibBalsaMailbox * outbox, LibBalsaFccboxFinder finder,
 
 	    /* Add this after the Bcc: copy. */
 	    message = smtp_add_message (session);
+
+	    if (msg->request_dsn) {
+		smtp_dsn_set_ret(message, Ret_HDRS);
+		smtp_dsn_set_envid(message, msg->message_id);
+	    }
 
             /* The main copy must not contain a Bcc: header, unless the
              * message has no To: recipients and no Cc: recipients, and
@@ -859,11 +879,11 @@ lbs_process_queue(LibBalsaMailbox * outbox, LibBalsaFccboxFinder finder,
 	       the Bcc recipient list, when it has more than one address.
 	       The bcc copy gets the single Bcc recipient.  */
 
-            add_recipients(message, msg->headers->to_list);
-            add_recipients(message, msg->headers->cc_list);
+            add_recipients(message, msg->headers->to_list, msg->request_dsn);
+            add_recipients(message, msg->headers->cc_list, msg->request_dsn);
 
             add_recipients(bcc_message ? bcc_message : message, 
-                           msg->headers->bcc_list);
+                           msg->headers->bcc_list, msg->request_dsn);
 
 	    /* Prohibit status headers. */
 	    smtp_set_header_option(message, "Status", Hdr_PROHIBIT, 1);
@@ -1618,7 +1638,7 @@ balsa_send_message_real(SendMessageInfo* info)
 
 
 static void
-message_add_references(LibBalsaMessage * message, GMimeMessage * msg)
+message_add_references(const LibBalsaMessage * message, GMimeMessage * msg)
 {
     /* If the message has references set, add them to the envelope */
     if (message->references != NULL) {
@@ -2088,6 +2108,8 @@ libbalsa_fill_msg_queue_item_from_queu(LibBalsaMessage * message,
                                     "X-Balsa-Fcc");
         g_mime_object_remove_header(GMIME_OBJECT(message->mime_msg),
                                     "X-Balsa-SmtpServer");
+        g_mime_object_remove_header(GMIME_OBJECT(message->mime_msg),
+                                    "X-Balsa-DSN");
 	mqi->stream = g_mime_stream_mem_new();
         libbalsa_mailbox_lock_store(message->mailbox);
 	g_mime_object_write_to_stream(GMIME_OBJECT(message->mime_msg),

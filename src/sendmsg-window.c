@@ -1317,6 +1317,7 @@ update_bsmsg_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity* ident)
     libbalsa_address_view_set_domain(bsmsg->recipient_view, ident->domain);
 
     sw_action_set_active(bsmsg, "request-mdn", ident->request_mdn);
+    sw_action_set_active(bsmsg, "request-dsn", ident->request_dsn);
 }
 
 
@@ -4913,8 +4914,9 @@ bsmsg2message(BalsaSendmsg * bsmsg)
         libbalsa_address_view_get_list(bsmsg->replyto_view, "Reply To:");
 #endif
 
-    if (bsmsg->req_dispnotify)
+    if (bsmsg->req_mdn)
 	libbalsa_message_set_dispnotify(message, ident->ia);
+    message->request_dsn = bsmsg->req_dsn;
 
     sw_set_header_from_path(message, "Face", ident->face,
             /* Translators: please do not translate Face. */
@@ -5418,7 +5420,9 @@ message_postpone(BalsaSendmsg * bsmsg)
         g_ptr_array_add(headers, g_strdup(bsmsg->fcc_url));
     }
     g_ptr_array_add(headers, g_strdup("X-Balsa-MDN"));
-    g_ptr_array_add(headers, g_strdup_printf("%d", bsmsg->req_dispnotify));
+    g_ptr_array_add(headers, g_strdup_printf("%d", bsmsg->req_mdn));
+    g_ptr_array_add(headers, g_strdup("X-Balsa-DSN"));
+    g_ptr_array_add(headers, g_strdup_printf("%d", bsmsg->req_dsn));
 #ifdef HAVE_GPGME
     g_ptr_array_add(headers, g_strdup("X-Balsa-Crypto"));
     g_ptr_array_add(headers, g_strdup_printf("%d", bsmsg->gpg_mode));
@@ -6018,7 +6022,17 @@ sw_request_mdn_change_state(GSimpleAction * action, GVariant * state, gpointer d
 {
     BalsaSendmsg *bsmsg = data;
 
-    bsmsg->req_dispnotify = g_variant_get_boolean(state);
+    bsmsg->req_mdn = g_variant_get_boolean(state);
+
+    g_simple_action_set_state(action, state);
+}
+
+static void
+sw_request_dsn_change_state(GSimpleAction * action, GVariant * state, gpointer data)
+{
+    BalsaSendmsg *bsmsg = data;
+
+    bsmsg->req_dsn = g_variant_get_boolean(state);
 
     g_simple_action_set_state(action, state);
 }
@@ -6674,6 +6688,8 @@ static GActionEntry win_entries[] = {
                          sw_fcc_change_state            },
     {"request-mdn",      libbalsa_toggle_activated, NULL, "false",
                          sw_request_mdn_change_state    },
+    {"request-dsn",      libbalsa_toggle_activated, NULL, "false",
+                         sw_request_dsn_change_state    },
     {"flowed",           libbalsa_toggle_activated, NULL, "false",
                          sw_flowed_change_state         },
     {"send-html",        libbalsa_toggle_activated, NULL, "false",
@@ -6819,7 +6835,8 @@ sendmsg_window_new()
 #endif                          /* HAVE_GTKSOURCEVIEW */
 
     /* set options */
-    bsmsg->req_dispnotify = FALSE;
+    bsmsg->req_mdn = FALSE;
+    bsmsg->req_dsn = FALSE;
 
     sw_action_set_active(bsmsg, "flowed", bsmsg->flow);
     sw_action_set_active(bsmsg, "send-html", bsmsg->ident->send_mp_alternative);
@@ -7073,6 +7090,9 @@ sendmsg_window_continue(LibBalsaMailbox * mailbox, guint msgno)
     if ((postpone_hdr =
          libbalsa_message_get_user_header(message, "X-Balsa-MDN")))
         sw_action_set_active(bsmsg, "request-mdn", atoi(postpone_hdr) != 0);
+    if ((postpone_hdr =
+         libbalsa_message_get_user_header(message, "X-Balsa-DSN")))
+        sw_action_set_active(bsmsg, "request-dsn", atoi(postpone_hdr) != 0);
     if ((postpone_hdr =
          libbalsa_message_get_user_header(message, "X-Balsa-Lang"))) {
         GtkWidget *langs =

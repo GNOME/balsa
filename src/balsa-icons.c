@@ -88,8 +88,9 @@ load_balsa_pixmap(GtkIconTheme *icon_theme, const balsa_pixmap_t *bpixmap)
 	    BICONS_ERR("icon %s unknown, no fallback", bpixmap->stock_id);
 	    use_id = "image-missing";
 	}
-    } else
+    } else {
 	use_id = bpixmap->stock_id;
+    }
 
     BICONS_LOG("\tuse_id %s", use_id);
     g_hash_table_insert(balsa_icon_table, g_strdup(bpixmap->name),
@@ -242,8 +243,9 @@ balsa_register_pixbufs(GtkWidget * widget)
             g_print("%s %s size %d err %s\n", __func__, use_id,
                     width, err->message);
             g_clear_error(&err);
-        } else
+        } else {
             icons[i].set_icon(pixbuf);
+        }
     }
 }
 

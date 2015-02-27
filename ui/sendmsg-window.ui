@@ -206,6 +206,11 @@
         </item>
         <item>
           <attribute name='label'
+            translatable='yes'>_Request Delivery Status Notification</attribute>
+          <attribute name='action'>win.request-dsn</attribute>
+        </item>
+        <item>
+          <attribute name='label'
             translatable='yes'>_Format = Flowed</attribute>
           <attribute name='action'>win.flowed</attribute>
         </item>

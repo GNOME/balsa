@@ -117,6 +117,7 @@ libbalsa_identity_init(LibBalsaIdentity* ident)
     ident->crypt_protocol = LIBBALSA_PROTECT_OPENPGP;
     ident->force_key_id = NULL;
     ident->request_mdn = FALSE;
+    ident->request_dsn = FALSE;
     /*
     ident->face = NULL;
     ident->x_face = NULL;
@@ -945,13 +946,13 @@ append_ident_notebook_page(GtkNotebook *notebook, guint rows,
  * Put the required GtkEntries, Labels, and Checkbuttons in the dialog
  * for creating/editing identities.
  */
-struct {
+static const struct {
     const gchar *mnemonic;
     const gchar *path_key;
     const gchar *box_key;
     const gchar *basename;
     const gchar *info;
-} static const path_info[] = {
+} path_info[] = {
         /* Translators: please do not translate Face. */
     {N_("_Face Path"),
      "identity-facepath",
@@ -1012,6 +1013,10 @@ setup_ident_frame(GtkDialog * dialog, gboolean createp, gpointer tree)
     ident_dialog_add_checkbutton(grid, row++, dialog,
                                  _("send messages in both plain text and _HTML format"),
                                  "identity-sendmpalternative", TRUE);
+    ident_dialog_add_checkbutton(grid, row++, dialog,
+                                 _("request positive (successful)"
+                                   " _Delivery Status Notification by default"),
+                                 "identity-requestdsn", TRUE);
     ident_dialog_add_checkbutton(grid, row++, dialog,
                                  _("request _Message Disposition Notification by default"),
                                  "identity-requestmdn", TRUE);
@@ -1492,6 +1497,7 @@ ident_dialog_update(GObject * dlg)
     g_free(id->x_face);
     id->x_face          = ident_dialog_get_path(dlg, "identity-xfacepath");
     id->request_mdn     = ident_dialog_get_bool(dlg, "identity-requestmdn");
+    id->request_dsn     = ident_dialog_get_bool(dlg, "identity-requestdsn");
 
     id->gpg_sign        = ident_dialog_get_bool(dlg, "identity-gpgsign");
     id->gpg_encrypt     = ident_dialog_get_bool(dlg, "identity-gpgencrypt");
@@ -1876,6 +1882,8 @@ display_frame_update(GObject * dialog, LibBalsaIdentity* ident)
                            ident->x_face, TRUE);
     display_frame_set_boolean(dialog, "identity-requestmdn",
                               ident->request_mdn);
+    display_frame_set_boolean(dialog, "identity-requestdsn",
+                              ident->request_dsn);
 
     display_frame_set_boolean(dialog, "identity-gpgsign",
                               ident->gpg_sign);
@@ -1981,6 +1989,7 @@ libbalsa_identity_new_config(const gchar* name)
     ident->face = libbalsa_conf_get_string("FacePath");
     ident->x_face = libbalsa_conf_get_string("XFacePath");
     ident->request_mdn = libbalsa_conf_get_bool("RequestMDN");
+    ident->request_dsn = libbalsa_conf_get_bool("RequestDSN");
 
     ident->gpg_sign = libbalsa_conf_get_bool("GpgSign");
     ident->gpg_encrypt = libbalsa_conf_get_bool("GpgEncrypt");
@@ -2027,6 +2036,7 @@ libbalsa_identity_save(LibBalsaIdentity* ident, const gchar* group)
     if (ident->x_face)
         libbalsa_conf_set_string("XFacePath", ident->x_face);
     libbalsa_conf_set_bool("RequestMDN", ident->request_mdn);
+    libbalsa_conf_set_bool("RequestDSN", ident->request_dsn);
 
     libbalsa_conf_set_bool("GpgSign", ident->gpg_sign);
     libbalsa_conf_set_bool("GpgEncrypt", ident->gpg_encrypt);

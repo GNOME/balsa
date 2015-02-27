@@ -1,3 +1,9 @@
+2015-02-27  Albrecht Dreß
+
+	* libbalsa/send.c (libbalsa_message_queue), (lbs_process_queue),
+	(libbalsa_fill_msg_queue_item_from_queu): complete support for
+	DSN's
+
 2015-02-24  Albrecht Dreß
 
 	Support for successful DSN's

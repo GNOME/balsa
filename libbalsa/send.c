@@ -473,6 +473,8 @@ libbalsa_message_queue(LibBalsaMessage * message, LibBalsaMailbox * outbox,
     if (fccbox)
         g_mime_object_set_header(GMIME_OBJECT(message->mime_msg), "X-Balsa-Fcc",
                                   fccbox->url);
+    g_mime_object_set_header(GMIME_OBJECT(message->mime_msg), "X-Balsa-DSN",
+			     message->request_dsn ? "1" : "0");
 #if ENABLE_ESMTP
     g_mime_object_set_header(GMIME_OBJECT(message->mime_msg), "X-Balsa-SmtpServer",
 	                      libbalsa_smtp_server_get_name(smtp_server));
@@ -710,6 +712,8 @@ lbs_process_queue(LibBalsaMailbox * outbox, LibBalsaFccboxFinder finder,
             g_object_unref(msg);
             continue;
         }
+        msg->request_dsn =
+        	(atoi(libbalsa_message_get_user_header(msg, "X-Balsa-DSN")) != 0);
 
 	new_message = msg_queue_item_new(finder);
         created = libbalsa_fill_msg_queue_item_from_queu(msg, new_message);
@@ -2082,6 +2086,8 @@ libbalsa_fill_msg_queue_item_from_queu(LibBalsaMessage * message,
                                     "X-Balsa-Fcc");
         g_mime_object_remove_header(GMIME_OBJECT(message->mime_msg),
                                     "X-Balsa-SmtpServer");
+        g_mime_object_remove_header(GMIME_OBJECT(message->mime_msg),
+                                    "X-Balsa-DSN");
 	mqi->stream = g_mime_stream_mem_new();
         libbalsa_mailbox_lock_store(message->mailbox);
 	g_mime_object_write_to_stream(GMIME_OBJECT(message->mime_msg),

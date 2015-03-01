@@ -139,8 +139,6 @@ balsa_mime_widget_new_message(BalsaMessage * bm,
 	mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
 	mw->widget = gtk_frame_new(_("message headers"));
 	mw->header_widget = bm_header_widget_new(bm, NULL);
-        gtk_widget_set_halign(mw->header_widget, GTK_ALIGN_END);
-        gtk_widget_set_hexpand(mw->header_widget, TRUE);
         gtk_widget_set_valign(mw->header_widget, GTK_ALIGN_START);
         gtk_widget_set_vexpand(mw->header_widget, FALSE);
         g_object_set(G_OBJECT(mw->header_widget), "margin", 5, NULL);

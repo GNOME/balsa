@@ -1,3 +1,11 @@
+2015-03-01  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Fix alignment of text/rfc822-headers parts widget
+
+	* src/balsa-mime-widget-message.c
+	(balsa_mime_widget_new_message): do not override default
+	settings of horizontal align and expand.
+
 2015-03-01  Albrecht Dreß
 
 	Display and print text/rfc822-headers parts

@@ -2024,29 +2024,45 @@ libbalsa_message_postpone(LibBalsaMessage * message,
 static void
 libbalsa_set_message_id(GMimeMessage * mime_message)
 {
-    struct utsname utsbuf;
-    gchar *host = "localhost";
+    static GMutex mutex;	/* as to make me thread-safe... */
+    static GRand *rand = NULL;
+    static struct {
+	gint64 now_monotonic;
+	gdouble randval;
+	char user_name[16];
+	char host_name[16];
+    } id_data;
+    GHmac *msg_id_hash;
+    guint8 buffer[32];
+    gsize buflen;
     gchar *message_id;
-#if defined(_GNU_SOURCE) && defined(HAVE_STRUCT_UTSNAME_DOMAINNAME)
-    gchar *fqdn;
-    gchar *domain = "localdomain";
 
-    /* In an ideal world, uname() allows us to make a FQDN. */
-    if (uname(&utsbuf) == 0) {
-	if (*utsbuf.nodename)
-	    host = utsbuf.nodename;
-	if (*utsbuf.domainname)
-	    domain = utsbuf.domainname;
+    g_mutex_lock(&mutex);
+    if (rand == NULL) {
+	/* initialise some stuff on first-time use... */
+	rand = g_rand_new_with_seed((guint32) time(NULL));
+	strncpy(id_data.user_name, g_get_user_name(), sizeof(id_data.user_name));
+	strncpy(id_data.host_name, g_get_host_name(), sizeof(id_data.host_name));
     }
-    fqdn = g_strconcat(host, ".", domain, NULL);
-    message_id = g_mime_utils_generate_message_id(fqdn);
-    g_free(fqdn);
-#else				/* _GNU_SOURCE */
 
-    if (uname(&utsbuf) == 0 && *utsbuf.nodename)
-	host = utsbuf.nodename;
-    message_id = g_mime_utils_generate_message_id(host);
-#endif				/* _GNU_SOURCE */
+    /* get some randomness... */
+    id_data.now_monotonic = g_get_monotonic_time();
+    id_data.randval = g_rand_double(rand);
+
+    /* hash the buffer */
+    msg_id_hash = g_hmac_new(G_CHECKSUM_SHA256, (const guchar *) &id_data, sizeof(id_data));
+    buflen = sizeof(buffer);
+    g_hmac_get_digest(msg_id_hash, buffer, &buflen);
+    g_hmac_unref(msg_id_hash);
+    g_mutex_unlock(&mutex);
+
+    /* create a msg id string
+     * Note: RFC 5322, sect. 3.6.4 explicitly allows the form
+     *    dot-atom-text "@" dot-atom-text
+     * where dot-atom-text may include all base64 (RFC 1421) chars, including '+' and '/' */
+    message_id = g_base64_encode(buffer, buflen);
+    memmove(message_id + 23, message_id + 22, strlen(message_id) - 23);
+    message_id[22] = '@';
 
     g_mime_message_set_message_id(mime_message, message_id);
     g_free(message_id);

@@ -1,5 +1,13 @@
 2015-03-01  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Use pan-down-symbolic instead of balsa-drop-down
+
+	* images/16x16/Makefile.am: balsa-drop-down has been removed
+	* src/balsa-icons.c (balsa_register_pixmaps): change to
+	pan-down-symbolic
+
+2015-03-01  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* images/16x16/balsa-drop-down.png: remove it.
 
 2015-02-27  Albrecht Dreß

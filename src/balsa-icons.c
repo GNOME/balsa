@@ -171,7 +171,7 @@ balsa_register_pixmaps(void)
 	{ BALSA_PIXMAP_INFO_FLAGGED,    "emblem-important" },
 
         /* drop-down icon for the address-view (16x16) */
-	{ BALSA_PIXMAP_DROP_DOWN,       "balsa-drop-down" },
+	{ BALSA_PIXMAP_DROP_DOWN,       "pan-down-symbolic" },
 	};
 
     unsigned i;

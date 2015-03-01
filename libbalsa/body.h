@@ -69,7 +69,7 @@ struct _LibBalsaMessageBody {
     gchar *buffer;		/* holds raw data of the MIME part, or NULL */
     gchar *html_buffer;         /* holds the html representation of the part or NULL */
     ssize_t buflen;             /* size of the block */
-    LibBalsaMessageHeaders *embhdrs;  /* headers of a message/rfc822 part */
+    LibBalsaMessageHeaders *embhdrs;  /* headers of a message/rfc822 or text/rfc822-headers part */
     LibBalsaMessageBodyType body_type;
     gchar *content_type;        /* value of the Content-Type header of
                                  * the body including mime type with

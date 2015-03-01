@@ -1,5 +1,15 @@
 2015-03-01  Albrecht Dreß
 
+	Display and print text/rfc822-headers parts
+
+	* libbalsa/body.[hc]: parse text/rfc822-headers parts,
+	  and store them in the body structure
+	* src/balsa-mime-widget.c, src/balsa-mime-widget-message.c:
+	  display a text/rfc822-headers part
+	* src/balsa-print-object.c: print a text/rfc822-headers part
+
+2015-03-01  Albrecht Dreß
+
 	* libbalsa/send.c (libbalsa_set_message_id): obfuscate the
 	message-id header.
 

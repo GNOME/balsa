@@ -133,6 +133,17 @@ balsa_mime_widget_new_message(BalsaMessage * bm,
 	gtk_box_pack_start(GTK_BOX(mw->container), emb_hdrs, FALSE, FALSE, 0);
 	
 	balsa_mime_widget_message_set_headers(bm, mw, mime_body);
+    } else if (!g_ascii_strcasecmp("text/rfc822-headers", content_type)) {
+	GtkWidget *alignment;
+
+	mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
+	mw->widget = gtk_frame_new(_("message headers"));
+	alignment = gtk_alignment_new(1.0, 0.0, 1.0, 0.0);
+	gtk_container_add(GTK_CONTAINER(mw->widget), alignment);
+	gtk_alignment_set_padding(GTK_ALIGNMENT(alignment), 5, 5, 5, 5);
+	mw->header_widget = bm_header_widget_new(bm, NULL);
+	gtk_container_add(GTK_CONTAINER(alignment), mw->header_widget);
+	balsa_mime_widget_message_set_headers(bm, mw, mime_body);
     }
 
     /* return the created widget (may be NULL) */

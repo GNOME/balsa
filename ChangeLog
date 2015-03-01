@@ -1,3 +1,10 @@
+2015-03-01  Albrecht Dreß
+
+	Obfuscate the message-id header
+
+	* libbalsa/send.c (libbalsa_set_message_id): obfuscate the
+	message-id header (in response to bgo #738155).
+
 2015-03-01  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Use pan-down-symbolic instead of balsa-drop-down

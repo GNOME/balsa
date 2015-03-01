@@ -216,6 +216,35 @@ libbalsa_message_body_set_multipart(LibBalsaMessageBody * body,
 }
 
 static void
+libbalsa_message_body_set_text_rfc822headers(LibBalsaMessageBody *body)
+{
+    GMimeStream *headers;
+    GError *err = NULL;
+
+    libbalsa_mailbox_lock_store(body->message->mailbox);
+    headers = libbalsa_message_body_get_stream(body, &err);
+    if (err != NULL) {
+	g_error_free(err);
+    }
+
+    if (headers != NULL) {
+	GMimeMessage *dummy_msg;
+	GMimeParser *parser;
+
+	g_mime_stream_reset(headers);
+	parser = g_mime_parser_new_with_stream(headers);
+	g_object_unref(headers);
+	dummy_msg = g_mime_parser_construct_message(parser);
+	g_object_unref(parser);
+
+	body->embhdrs = libbalsa_message_body_extract_embedded_headers(dummy_msg);
+	g_object_unref(dummy_msg);
+    }
+
+    libbalsa_mailbox_unlock_store(body->message->mailbox);
+}
+
+static void
 libbalsa_message_body_set_parts(LibBalsaMessageBody * body)
 {
     LibBalsaMessageBody **next_part = &body->parts;
@@ -224,6 +253,15 @@ libbalsa_message_body_set_parts(LibBalsaMessageBody * body)
 	next_part = libbalsa_message_body_set_message_part(body, next_part);
     else if (GMIME_IS_MULTIPART(body->mime_part))
 	next_part = libbalsa_message_body_set_multipart(body, next_part);
+    else {
+	gchar *mime_type;
+
+	mime_type = libbalsa_message_body_get_mime_type(body);
+	if (strcmp(mime_type, "text/rfc822-headers") == 0) {
+	    libbalsa_message_body_set_text_rfc822headers(body);
+	}
+	g_free(mime_type);
+    }
 
     /* Free any parts that weren't used; the test isn't strictly
      * necessary, but it should fail unless something really strange has

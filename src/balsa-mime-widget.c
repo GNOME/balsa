@@ -117,6 +117,7 @@ static mime_delegate_t mime_delegate[] =
     { {FALSE, "message/delivery-status",       balsa_mime_widget_new_text},
       {TRUE,  "message/",                      balsa_mime_widget_new_message},
       {FALSE, "text/calendar",                 balsa_mime_widget_new_vcalendar},
+      {FALSE, "text/rfc822-headers",           balsa_mime_widget_new_message},
       {TRUE,  "text/",                         balsa_mime_widget_new_text},
       {TRUE,  "multipart/",                    balsa_mime_widget_new_multipart},
       {TRUE,  "image/",                        balsa_mime_widget_new_image},
@@ -270,7 +271,7 @@ balsa_mime_widget_new_unknown(BalsaMessage * bm,
             g_object_unref(stream);
             use_content_type = libbalsa_vfs_content_type_of_buffer(buffer, size);
             if (g_ascii_strncasecmp(use_content_type, "text", 4) == 0
-                && libbalsa_text_attr_string(buffer) & LIBBALSA_TEXT_HI_BIT) {
+                && (libbalsa_text_attr_string(buffer) & LIBBALSA_TEXT_HI_BIT)) {
                 /* Hmmm...better stick with application/octet-stream. */
                 g_free(use_content_type);
                 use_content_type = g_strdup("application/octet-stream");

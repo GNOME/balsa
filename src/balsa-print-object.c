@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2013 Stuart Parmenter and others
- * Written by (C) Albrecht Dreﬂ <albrecht.dress@arcor.de> 2007
+ * Copyright (C) 1997-2015 Stuart Parmenter and others
+ * Written by (C) Albrecht Dre√ü <albrecht.dress@arcor.de> 2007
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,9 +14,7 @@
  * GNU General Public License for more details.
  *  
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  
- * 02111-1307, USA.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
@@ -24,6 +22,7 @@
 #endif                          /* HAVE_CONFIG_H */
 #include "balsa-print-object.h"
 
+#include <glib/gi18n.h>
 #include <gtk/gtk.h>
 #include <libbalsa.h>
 #include "balsa-app.h"
@@ -106,6 +105,15 @@ balsa_print_object_emb_message(GList * list, GtkPrintContext * context,
     return balsa_print_object_header_from_body(list, context, mime_body, psetup);
 }
 
+static GList *
+balsa_print_object_emb_headers(GList * list, GtkPrintContext * context,
+	     LibBalsaMessageBody * mime_body,
+	     BalsaPrintSetup * psetup)
+{
+    list = balsa_print_object_frame_begin(list, _("message headers"), psetup);
+    list = balsa_print_object_header_from_body(list, context, mime_body, psetup);
+    return balsa_print_object_frame_end(list, psetup);
+}
 
 #ifdef HAVE_GPGME
 static GList *
@@ -137,6 +145,7 @@ balsa_print_objects_append_from_body(GList * list,
         { "text/directory",                -1, balsa_print_object_text_vcard },
         { "text/calendar",                 -1, balsa_print_object_text_calendar },
         { "text/plain",                    -1, balsa_print_object_text_plain },
+        { "text/rfc822-headers",	   -1, balsa_print_object_emb_headers },
         { "text/",                          5, balsa_print_object_text },
         { "image/",                         6, balsa_print_object_image },
         { "message/rfc822",                -1, balsa_print_object_emb_message },

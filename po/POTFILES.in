@@ -75,6 +75,7 @@ src/balsa-mime-widget-image.c
 src/balsa-mime-widget-message.c
 src/balsa-mime-widget-text.c
 src/balsa-mime-widget-vcalendar.c
+src/balsa-print-object.c
 src/balsa-print-object-default.c
 src/balsa-print-object-header.c
 src/balsa-print-object-text.c

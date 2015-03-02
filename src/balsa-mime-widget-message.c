@@ -82,6 +82,11 @@ static void add_header_sigstate(GtkGrid * grid,
 				GMimeGpgmeSigstat * siginfo);
 #endif
 
+static void bmw_message_set_headers(BalsaMessage        * bm,
+                                    BalsaMimeWidget     * mw,
+                                    LibBalsaMessageBody * part,
+                                    gboolean              show_all_headers);
+
 BalsaMimeWidget *
 balsa_mime_widget_new_message(BalsaMessage * bm,
 			      LibBalsaMessageBody * mime_body,
@@ -134,7 +139,8 @@ balsa_mime_widget_new_message(BalsaMessage * bm,
         mw->header_widget = emb_hdrs = bm_header_widget_new(bm, NULL);
 	gtk_box_pack_start(GTK_BOX(mw->container), emb_hdrs, FALSE, FALSE, 0);
 
-	balsa_mime_widget_message_set_headers(bm, mw, mime_body);
+        bmw_message_set_headers(bm, mw, mime_body,
+                                bm->shown_headers == HEADERS_ALL);
     } else if (!g_ascii_strcasecmp("text/rfc822-headers", content_type)) {
 	mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
 	mw->widget = gtk_frame_new(_("message headers"));
@@ -143,7 +149,7 @@ balsa_mime_widget_new_message(BalsaMessage * bm,
         gtk_widget_set_vexpand(mw->header_widget, FALSE);
         g_object_set(G_OBJECT(mw->header_widget), "margin", 5, NULL);
 	gtk_container_add(GTK_CONTAINER(mw->widget), mw->header_widget);
-	balsa_mime_widget_message_set_headers(bm, mw, mime_body);
+	bmw_message_set_headers(bm, mw, mime_body, TRUE);
     }
 
     /* return the created widget (may be NULL) */
@@ -555,14 +561,14 @@ expanded_cb(GtkExpander * expander, GParamSpec * arg1, GtkLabel * label)
 static void
 add_header_gchar(BalsaMessage * bm, GtkGrid * grid,
 		 const gchar * header, const gchar * label,
-		 const gchar * value)
+		 const gchar * value, gboolean show_all_headers)
 {
     gint row;
     gchar *css;
     GtkCssProvider *css_provider;
     GtkWidget *lab;
 
-    if (!(bm->shown_headers == HEADERS_ALL ||
+    if (!(show_all_headers ||
 	  libbalsa_find_word(header, balsa_app.selected_headers)))
 	return;
 
@@ -597,6 +603,7 @@ add_header_gchar(BalsaMessage * bm, GtkGrid * grid,
     gtk_grid_attach(grid, lab, 0, row, 1, 1);
     gtk_label_set_selectable(GTK_LABEL(lab), TRUE);
     gtk_widget_set_halign(lab, GTK_ALIGN_START);
+    gtk_widget_set_valign(lab, GTK_ALIGN_START);
     gtk_widget_show(lab);
 
     if (value && *value != '\0') {
@@ -617,6 +624,13 @@ add_header_gchar(BalsaMessage * bm, GtkGrid * grid,
 
         gtk_label_set_line_wrap_mode(GTK_LABEL(lab), PANGO_WRAP_WORD_CHAR);
         gtk_label_set_selectable(GTK_LABEL(lab), TRUE);
+#if GTK_CHECK_VERSION(3, 16, 0)
+        gtk_label_set_xalign((GtkLabel *) lab, 0.0);
+#else                           /* GTK_CHECK_VERSION(3, 16, 0) */
+G_GNUC_BEGIN_IGNORE_DEPRECATIONS
+        gtk_misc_set_alignment((GtkMisc *) lab, 0.0, 0.0);
+G_GNUC_END_IGNORE_DEPRECATIONS
+#endif                          /* GTK_CHECK_VERSION(3, 16, 0) */
         gtk_widget_set_halign(lab, GTK_ALIGN_START);
         gtk_widget_set_hexpand(lab, TRUE);
 
@@ -660,7 +674,7 @@ add_header_address_list(BalsaMessage * bm, GtkGrid * grid,
 
     value = internet_address_list_to_string(list, FALSE);
 
-    add_header_gchar(bm, grid, header, label, value);
+    add_header_gchar(bm, grid, header, label, value, FALSE);
 
     g_free(value);
 }
@@ -677,30 +691,13 @@ foreach_label(GtkWidget * widget, LibBalsaMessageBody * part)
                          G_CALLBACK(bm_header_extend_popup), part);
 }
 
-void
-balsa_mime_widget_message_set_headers(BalsaMessage * bm, BalsaMimeWidget *mw,
-				      LibBalsaMessageBody * part)
-{
-    GtkWidget *widget;
-    GtkGrid *grid;
-
-    balsa_mime_widget_message_set_headers_d(bm, mw, part->embhdrs, part->parts,
-                                            part->embhdrs
-                                            ? part->embhdrs->subject
-                                            : NULL );
-    if (!(widget = mw->header_widget))
-	return;
-    grid = bm_header_widget_get_grid(widget);
-    gtk_container_foreach(GTK_CONTAINER(grid), (GtkCallback) foreach_label,
-                          part);
-}
-
-void
-balsa_mime_widget_message_set_headers_d(BalsaMessage * bm,
-                                        BalsaMimeWidget *mw,
-                                        LibBalsaMessageHeaders *headers,
-                                        LibBalsaMessageBody *part,
-                                        const gchar *subject)
+static void
+bmw_message_set_headers_d(BalsaMessage           * bm,
+                          BalsaMimeWidget        * mw,
+                          LibBalsaMessageHeaders * headers,
+                          LibBalsaMessageBody    * part,
+                          const gchar            * subject,
+                          gboolean                 show_all_headers)
 {
     GtkGrid *grid;
     GList *p;
@@ -717,7 +714,8 @@ balsa_mime_widget_message_set_headers_d(BalsaMessage * bm,
     if (!headers) {
         /* Gmail sometimes fails to do that. */
         add_header_gchar(bm, grid, "subject", _("Error:"),
-                         _("IMAP server did not report message structure"));
+                         _("IMAP server did not report message structure"),
+                         show_all_headers);
         return;
     }
 
@@ -729,24 +727,27 @@ balsa_mime_widget_message_set_headers_d(BalsaMessage * bm,
 
     bm->tab_position = 0;
 
-    add_header_gchar(bm, grid, "subject", _("Subject:"), subject);
+    add_header_gchar(bm, grid, "subject", _("Subject:"), subject,
+                     show_all_headers);
 
     date = libbalsa_message_headers_date_to_utf8(headers,
 						 balsa_app.date_string);
-    add_header_gchar(bm, grid, "date", _("Date:"), date);
+    add_header_gchar(bm, grid, "date", _("Date:"), date, show_all_headers);
     g_free(date);
 
     if (headers->from) {
 	gchar *from =
 	    internet_address_list_to_string(headers->from, FALSE);
-	add_header_gchar(bm, grid, "from", _("From:"), from);
+	add_header_gchar(bm, grid, "from", _("From:"), from,
+                         show_all_headers);
 	g_free(from);
     }
 
     if (headers->reply_to) {
 	gchar *reply_to =
 	    internet_address_list_to_string(headers->reply_to, FALSE);
-	add_header_gchar(bm, grid, "reply-to", _("Reply-To:"), reply_to);
+	add_header_gchar(bm, grid, "reply-to", _("Reply-To:"), reply_to,
+                         show_all_headers);
 	g_free(reply_to);
     }
     add_header_address_list(bm, grid, "to", _("To:"), headers->to_list);
@@ -755,14 +756,16 @@ balsa_mime_widget_message_set_headers_d(BalsaMessage * bm,
 
 #if BALSA_SHOW_FCC_AS_WELL_AS_X_BALSA_FCC
     if (headers->fcc_url)
-	add_header_gchar(bm, grid, "fcc", _("Fcc:"), headers->fcc_url);
+	add_header_gchar(bm, grid, "fcc", _("Fcc:"), headers->fcc_url,
+                         show_all_headers);
 #endif
 
     if (headers->dispnotify_to) {
 	gchar *mdn_to =
 	    internet_address_list_to_string(headers->dispnotify_to, FALSE);
 	add_header_gchar(bm, grid, "disposition-notification-to",
-			 _("Disposition-Notification-To:"), mdn_to);
+			 _("Disposition-Notification-To:"), mdn_to,
+                         show_all_headers);
 	g_free(mdn_to);
     }
 
@@ -772,7 +775,8 @@ balsa_mime_widget_message_set_headers_d(BalsaMessage * bm,
 	gchar *hdr;
 
 	hdr = g_strconcat(pair[0], ":", NULL);
-	add_header_gchar(bm, grid, pair[0], hdr, pair[1]);
+	add_header_gchar(bm, grid, pair[0], hdr, pair[1],
+                         show_all_headers);
 	g_free(hdr);
     }
 
@@ -793,6 +797,42 @@ balsa_mime_widget_message_set_headers_d(BalsaMessage * bm,
 #endif
 }
 
+static void
+bmw_message_set_headers(BalsaMessage        * bm,
+                        BalsaMimeWidget     * mw,
+                        LibBalsaMessageBody * part,
+                        gboolean              show_all_headers)
+{
+    GtkWidget *widget;
+    GtkGrid *grid;
+
+    bmw_message_set_headers_d(bm, mw, part->embhdrs, part->parts,
+                              part->embhdrs ? part->embhdrs->subject : NULL,
+                              show_all_headers);
+    if (!(widget = mw->header_widget))
+	return;
+    grid = bm_header_widget_get_grid(widget);
+    gtk_container_foreach(GTK_CONTAINER(grid), (GtkCallback) foreach_label,
+                          part);
+}
+
+void
+balsa_mime_widget_message_set_headers(BalsaMessage        * bm,
+                                      BalsaMimeWidget     * mw,
+                                      LibBalsaMessageBody * part)
+{
+    bmw_message_set_headers(bm, mw, part, FALSE);
+}
+
+void
+balsa_mime_widget_message_set_headers_d(BalsaMessage           * bm,
+                                        BalsaMimeWidget        * mw,
+                                        LibBalsaMessageHeaders * headers,
+                                        LibBalsaMessageBody    * part,
+                                        const gchar            * subject)
+{
+    bmw_message_set_headers_d(bm, mw, headers, part, subject, FALSE);
+}
 
 #ifdef HAVE_GPGME
 /*

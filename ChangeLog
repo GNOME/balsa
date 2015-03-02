@@ -1,5 +1,17 @@
 2015-03-02  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Show all headers in a text/rfc822-headers part
+
+	* src/balsa-mime-widget-message.c (add_header_gchar): new
+	parameter gboolean show_all_headers;
+	(balsa_mime_widget_new_message),
+	(add_header_address_list),
+	(bmw_message_set_headers_d), (bmw_message_set_headers),
+	(balsa_mime_widget_message_set_headers),
+	(balsa_mime_widget_message_set_headers_d): use it.
+
+2015-03-02  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Provide a parent window for the send-progress dialog
 
 	* libbalsa/send.c (ensure_send_progress_dialog),

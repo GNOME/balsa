@@ -1,3 +1,17 @@
+2015-03-02  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Provide a parent window for the send-progress dialog
+
+	* libbalsa/send.c (ensure_send_progress_dialog),
+	(libbalsa_message_send), (lbs_process_queue),
+	(libbalsa_process_queue): new parameter GtkWindow *parent.
+	* libbalsa/send.h: ditto.
+	* src/balsa-message.c: use it.
+	* src/balsa-mime-widget-message.c (extbody_send_mail): ditto.
+	* src/balsa-mime-widget-vcalendar.c (vevent_reply): ditto.
+	* src/main-window.c (send_queued_mail_activated): ditto.
+	* src/sendmsg-window.c (send_message_handler): ditto.
+
 2015-03-01  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Fix alignment of text/rfc822-headers parts widget

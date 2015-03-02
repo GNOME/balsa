@@ -328,10 +328,14 @@ vevent_reply(GObject * button, GtkWidget * box)
     result = libbalsa_message_send(message, balsa_app.outbox, NULL,
 				   balsa_find_sentbox_by_url,
 				   ident->smtp_server,
+                                   GTK_WINDOW(gtk_widget_get_toplevel
+                                              ((GtkWidget *) button)),
 				   FALSE, balsa_app.debug, &error);
 #else
     result = libbalsa_message_send(message, balsa_app.outbox, NULL,
 				   balsa_find_sentbox_by_url,
+                                   GTK_WINDOW(gtk_widget_get_toplevel
+                                              ((GtkWidget *) button)),
 				   FALSE, balsa_app.debug, &error);
 #endif
     if (result != LIBBALSA_MESSAGE_CREATE_OK)

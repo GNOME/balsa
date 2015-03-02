@@ -245,7 +245,7 @@ send_dialog_destroy_cb(GtkWidget* w)
    ensures that there is send_dialog available.
 */
 static void
-ensure_send_progress_dialog()
+ensure_send_progress_dialog(GtkWindow * parent)
 {
     GtkWidget* label;
     GtkBox *content_box;
@@ -253,7 +253,7 @@ ensure_send_progress_dialog()
     if(send_dialog) return;
 
     send_dialog = gtk_dialog_new_with_buttons(_("Sending Mail..."), 
-                                              NULL,
+                                              parent,
                                               GTK_DIALOG_DESTROY_WITH_PARENT,
                                               _("_Hide"), GTK_RESPONSE_CLOSE,
                                               NULL);
@@ -283,7 +283,7 @@ ensure_send_progress_dialog()
 #define send_unlock() pthread_mutex_unlock(&send_messages_lock);
 
 #else
-#define ensure_send_progress_dialog()
+#define ensure_send_progress_dialog(parent)
 #define send_lock()   
 #define send_unlock() 
 #endif
@@ -529,13 +529,15 @@ libbalsa_message_queue(LibBalsaMessage * message, LibBalsaMailbox * outbox,
 static gboolean lbs_process_queue(LibBalsaMailbox * outbox,
                                   LibBalsaFccboxFinder finder,
                                   LibBalsaSmtpServer * smtp_server,
-                                  gboolean debug);
+                                  gboolean debug,
+                                  GtkWindow * parent);
 
 LibBalsaMsgCreateResult
 libbalsa_message_send(LibBalsaMessage * message, LibBalsaMailbox * outbox,
                       LibBalsaMailbox * fccbox,
                       LibBalsaFccboxFinder finder,
                       LibBalsaSmtpServer * smtp_server,
+                      GtkWindow * parent,
                       gboolean flow, gboolean debug,
 		      GError ** error)
 {
@@ -549,7 +551,7 @@ libbalsa_message_send(LibBalsaMessage * message, LibBalsaMailbox * outbox,
                                         smtp_server, flow, error);
 
     if (result == LIBBALSA_MESSAGE_CREATE_OK
-        && !lbs_process_queue(outbox, finder, smtp_server, debug))
+        && !lbs_process_queue(outbox, finder, smtp_server, debug, parent))
             return LIBBALSA_MESSAGE_SEND_ERROR;
 
     return result;
@@ -646,7 +648,8 @@ add_recipients(smtp_message_t message,
  */
 static gboolean
 lbs_process_queue(LibBalsaMailbox * outbox, LibBalsaFccboxFinder finder,
-		  LibBalsaSmtpServer * smtp_server, gboolean debug)
+		  LibBalsaSmtpServer * smtp_server, gboolean debug,
+                  GtkWindow * parent)
 {
     LibBalsaServer *server = LIBBALSA_SERVER(smtp_server);
     MessageQueueItem *new_message;
@@ -670,7 +673,7 @@ lbs_process_queue(LibBalsaMailbox * outbox, LibBalsaFccboxFinder finder,
 	return TRUE;
     }
     /* We create here the progress bar */
-    ensure_send_progress_dialog();
+    ensure_send_progress_dialog(parent);
 
     /* Create the libESMTP session.  Loop over the out box and add the
        messages to the session. */
@@ -948,12 +951,13 @@ gboolean
 libbalsa_process_queue(LibBalsaMailbox * outbox,
                        LibBalsaFccboxFinder finder,
                        GSList * smtp_servers,
+                       GtkWindow * parent,
 		       gboolean debug)
 {
     for (; smtp_servers; smtp_servers = smtp_servers->next) {
         LibBalsaSmtpServer *smtp_server =
 		LIBBALSA_SMTP_SERVER(smtp_servers->data);
-        if (!lbs_process_queue(outbox, finder, smtp_server, debug))
+        if (!lbs_process_queue(outbox, finder, smtp_server, debug, parent))
             return FALSE;
     }
 
@@ -1254,7 +1258,7 @@ libbalsa_smtp_event_cb_serial(smtp_session_t session, int event_no,
 */
 gboolean 
 libbalsa_process_queue(LibBalsaMailbox* outbox, LibBalsaFccboxFinder finder,
-                       gboolean debug)
+                       gboolean debug, GtkWindow * parent)
 {
     MessageQueueItem *mqi = NULL, *new_message;
     SendMessageInfo *send_message_info;
@@ -1273,7 +1277,7 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, LibBalsaFccboxFinder finder,
     sending_threads++;
 #endif
 
-    ensure_send_progress_dialog();
+    ensure_send_progress_dialog(parent);
     if (!libbalsa_mailbox_open(outbox, NULL)) {
 #ifdef BALSA_USE_THREADS
 	sending_threads--;

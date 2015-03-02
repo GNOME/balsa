@@ -2512,10 +2512,12 @@ handle_mdn_request(GtkWindow *parent, LibBalsaMessage *message)
         result = libbalsa_message_send(mdn, balsa_app.outbox, NULL,
 				       balsa_find_sentbox_by_url,
 				       mdn_ident->smtp_server,
+                                       parent,
 				       TRUE, balsa_app.debug, &error);
 #else
         result = libbalsa_message_send(mdn, balsa_app.outbox, NULL,
 				       balsa_find_sentbox_by_url,
+                                       parent,
 				       TRUE, balsa_app.debug, &error);
 #endif
 	if (result != LIBBALSA_MESSAGE_CREATE_OK)
@@ -2653,13 +2655,18 @@ mdn_dialog_response(GtkWidget * dialog, gint response, gpointer user_data)
 
     if (response == GTK_RESPONSE_YES) {
 #if ENABLE_ESMTP
-        result = libbalsa_message_send(send_msg, balsa_app.outbox, NULL,
-				       balsa_find_sentbox_by_url,
-				       mdn_ident->smtp_server,
-				       TRUE, balsa_app.debug, &error);
+        result =
+            libbalsa_message_send(send_msg, balsa_app.outbox, NULL,
+                                  balsa_find_sentbox_by_url,
+                                  mdn_ident->smtp_server,
+                                  gtk_window_get_transient_for
+                                  ((GtkWindow *) dialog),
+                                  TRUE, balsa_app.debug, &error);
 #else
         result = libbalsa_message_send(send_msg, balsa_app.outbox, NULL,
 				       balsa_find_sentbox_by_url,
+                                       gtk_window_get_transient_for
+                                       ((GtkWindow *) dialog),
 				       TRUE, balsa_app.debug, &error);
 #endif
         if (result != LIBBALSA_MESSAGE_CREATE_OK)

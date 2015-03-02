@@ -67,12 +67,16 @@ LibBalsaMsgCreateResult libbalsa_message_send(LibBalsaMessage * message,
                                               LibBalsaMailbox * fccbox,
                                               LibBalsaFccboxFinder finder,
                                               LibBalsaSmtpServer *
-                                              smtp_server, gboolean flow,
+                                              smtp_server,
+                                              GtkWindow * parent,
+                                              gboolean flow,
                                               gboolean debug,
 					      GError ** error);
 gboolean libbalsa_process_queue(LibBalsaMailbox * outbox,
                                 LibBalsaFccboxFinder finder,
-                                GSList * smtp_servers, gboolean debug);
+                                GSList * smtp_servers,
+                                GtkWindow * parent,
+                                gboolean debug);
 #else
 
 LibBalsaMsgCreateResult libbalsa_message_queue(LibBalsaMessage* message, 

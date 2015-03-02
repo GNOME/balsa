@@ -1085,6 +1085,7 @@ send_queued_mail_activated(GSimpleAction * action,
 #if ENABLE_ESMTP
                            balsa_app.smtp_servers,
 #endif /* ENABLE_ESMTP */
+                           (GtkWindow *) balsa_app.main_window,
 			   balsa_app.debug);
 }
 

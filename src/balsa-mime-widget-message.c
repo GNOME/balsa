@@ -559,8 +559,7 @@ expanded_cb(GtkExpander * expander, GParamSpec * arg1, GtkLabel * label)
 #define BALSA_MESSAGE_HEADER "balsa-message-header"
 
 static void
-add_header_gchar(BalsaMessage * bm, GtkGrid * grid,
-		 const gchar * header, const gchar * label,
+add_header_gchar(GtkGrid * grid, const gchar * header, const gchar * label,
 		 const gchar * value, gboolean show_all_headers)
 {
     gint row;
@@ -638,7 +637,7 @@ G_GNUC_END_IGNORE_DEPRECATIONS
         g_signal_connect(expander, "notify::expanded",
                          G_CALLBACK(expanded_cb), lab);
 
-        if(bm->shown_headers == HEADERS_ALL) {
+        if(show_all_headers) {
             gtk_label_set_line_wrap(GTK_LABEL(lab), TRUE);
             gtk_expander_set_expanded(GTK_EXPANDER(expander), TRUE);
         } else {
@@ -674,7 +673,7 @@ add_header_address_list(BalsaMessage * bm, GtkGrid * grid,
 
     value = internet_address_list_to_string(list, FALSE);
 
-    add_header_gchar(bm, grid, header, label, value, FALSE);
+    add_header_gchar(grid, header, label, value, FALSE);
 
     g_free(value);
 }
@@ -713,7 +712,7 @@ bmw_message_set_headers_d(BalsaMessage           * bm,
 
     if (!headers) {
         /* Gmail sometimes fails to do that. */
-        add_header_gchar(bm, grid, "subject", _("Error:"),
+        add_header_gchar(grid, "subject", _("Error:"),
                          _("IMAP server did not report message structure"),
                          show_all_headers);
         return;
@@ -727,26 +726,25 @@ bmw_message_set_headers_d(BalsaMessage           * bm,
 
     bm->tab_position = 0;
 
-    add_header_gchar(bm, grid, "subject", _("Subject:"), subject,
+    add_header_gchar(grid, "subject", _("Subject:"), subject,
                      show_all_headers);
 
     date = libbalsa_message_headers_date_to_utf8(headers,
 						 balsa_app.date_string);
-    add_header_gchar(bm, grid, "date", _("Date:"), date, show_all_headers);
+    add_header_gchar(grid, "date", _("Date:"), date, show_all_headers);
     g_free(date);
 
     if (headers->from) {
 	gchar *from =
 	    internet_address_list_to_string(headers->from, FALSE);
-	add_header_gchar(bm, grid, "from", _("From:"), from,
-                         show_all_headers);
+	add_header_gchar(grid, "from", _("From:"), from, show_all_headers);
 	g_free(from);
     }
 
     if (headers->reply_to) {
 	gchar *reply_to =
 	    internet_address_list_to_string(headers->reply_to, FALSE);
-	add_header_gchar(bm, grid, "reply-to", _("Reply-To:"), reply_to,
+	add_header_gchar(grid, "reply-to", _("Reply-To:"), reply_to,
                          show_all_headers);
 	g_free(reply_to);
     }
@@ -756,14 +754,14 @@ bmw_message_set_headers_d(BalsaMessage           * bm,
 
 #if BALSA_SHOW_FCC_AS_WELL_AS_X_BALSA_FCC
     if (headers->fcc_url)
-	add_header_gchar(bm, grid, "fcc", _("Fcc:"), headers->fcc_url,
+	add_header_gchar(grid, "fcc", _("Fcc:"), headers->fcc_url,
                          show_all_headers);
 #endif
 
     if (headers->dispnotify_to) {
 	gchar *mdn_to =
 	    internet_address_list_to_string(headers->dispnotify_to, FALSE);
-	add_header_gchar(bm, grid, "disposition-notification-to",
+	add_header_gchar(grid, "disposition-notification-to",
 			 _("Disposition-Notification-To:"), mdn_to,
                          show_all_headers);
 	g_free(mdn_to);
@@ -775,8 +773,7 @@ bmw_message_set_headers_d(BalsaMessage           * bm,
 	gchar *hdr;
 
 	hdr = g_strconcat(pair[0], ":", NULL);
-	add_header_gchar(bm, grid, pair[0], hdr, pair[1],
-                         show_all_headers);
+	add_header_gchar(grid, pair[0], hdr, pair[1], show_all_headers);
 	g_free(hdr);
     }
 

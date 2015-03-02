@@ -1,5 +1,13 @@
 2015-03-02  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Remove unnecessary parameter
+
+	* src/balsa-mime-widget-message.c (add_header_gchar),
+	(add_header_address_list), (bmw_message_set_headers_d): we do
+	not need to pass the BalsaMessage.
+
+2015-03-02  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Show all headers in a text/rfc822-headers part
 
 	* src/balsa-mime-widget-message.c (add_header_gchar): new

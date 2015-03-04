@@ -559,7 +559,7 @@ bmwm_set_tabs(BalsaMessage * bm, GtkTextView * view,
 static void
 add_header_gchar(BalsaMessage * bm, GtkTextView * view,
 		 const gchar * header, const gchar * label,
-		 const gchar * value)
+		 const gchar * value, gboolean show_all_headers)
 {
     static const gchar * all_tag_const = N_("... [truncated]");
     GtkTextBuffer *buffer;
@@ -567,7 +567,7 @@ add_header_gchar(BalsaMessage * bm, GtkTextView * view,
     const gchar *font;
     GdkRectangle location;
 
-    if (!(bm->shown_headers == HEADERS_ALL ||
+    if (!(show_all_headers || bm->shown_headers == HEADERS_ALL ||
 	  libbalsa_find_word(header, balsa_app.selected_headers)))
 	return;
 
@@ -598,7 +598,7 @@ add_header_gchar(BalsaMessage * bm, GtkTextView * view,
         libbalsa_utf8_sanitize(&sanitized,
                                balsa_app.convert_unknown_8bit, NULL);
 
-        if(bm->shown_headers != HEADERS_ALL) {
+        if(!show_all_headers && bm->shown_headers != HEADERS_ALL) {
             static const gssize MAXLEN = 160;
             ssize_t all_tag_len = g_utf8_strlen(all_tag, -1);
             /* Look far enough into value to be sure that we can tell if
@@ -639,7 +639,7 @@ add_header_address_list(BalsaMessage * bm, GtkTextView * view,
 
     value = internet_address_list_to_string(list, FALSE);
 
-    add_header_gchar(bm, view, header, label, value);
+    add_header_gchar(bm, view, header, label, value, FALSE);
 
     g_free(value);
 }
@@ -654,7 +654,8 @@ balsa_mime_widget_message_set_headers(BalsaMessage * bm, BalsaMimeWidget *mw,
     balsa_mime_widget_message_set_headers_d(bm, mw, part->embhdrs, part->parts,
                                             part->embhdrs
                                             ? part->embhdrs->subject
-                                            : NULL );
+                                            : NULL,
+                                            part->body_type == LIBBALSA_MESSAGE_BODY_TYPE_TEXT);
     if (!(widget = mw->header_widget))
 	return;
     view = bm_header_widget_get_text_view(widget);
@@ -693,7 +694,8 @@ balsa_mime_widget_message_set_headers_d(BalsaMessage * bm,
                                         BalsaMimeWidget *mw,
                                         LibBalsaMessageHeaders *headers,
                                         LibBalsaMessageBody *part,
-                                        const gchar *subject)
+                                        const gchar *subject,
+                                        gboolean show_all_headers)
 {
     GtkTextView *view;
     GtkTextBuffer *buffer;
@@ -712,7 +714,8 @@ balsa_mime_widget_message_set_headers_d(BalsaMessage * bm,
     if (!headers) {
         /* Gmail sometimes fails to do that. */
         add_header_gchar(bm, view, "subject", _("Error:"),
-                         _("IMAP server did not report message structure"));
+                         _("IMAP server did not report message structure"),
+                         show_all_headers);
         return;
     }
 
@@ -724,24 +727,24 @@ balsa_mime_widget_message_set_headers_d(BalsaMessage * bm,
 
     bm->tab_position = 0;
 
-    add_header_gchar(bm, view, "subject", _("Subject:"), subject);
+    add_header_gchar(bm, view, "subject", _("Subject:"), subject, show_all_headers);
 
     date = libbalsa_message_headers_date_to_utf8(headers,
 						 balsa_app.date_string);
-    add_header_gchar(bm, view, "date", _("Date:"), date);
+    add_header_gchar(bm, view, "date", _("Date:"), date, show_all_headers);
     g_free(date);
 
     if (headers->from) {
 	gchar *from =
 	    internet_address_list_to_string(headers->from, FALSE);
-	add_header_gchar(bm, view, "from", _("From:"), from);
+	add_header_gchar(bm, view, "from", _("From:"), from, show_all_headers);
 	g_free(from);
     }
 
     if (headers->reply_to) {
 	gchar *reply_to =
 	    internet_address_list_to_string(headers->reply_to, FALSE);
-	add_header_gchar(bm, view, "reply-to", _("Reply-To:"), reply_to);
+	add_header_gchar(bm, view, "reply-to", _("Reply-To:"), reply_to, show_all_headers);
 	g_free(reply_to);
     }
     add_header_address_list(bm, view, "to", _("To:"), headers->to_list);
@@ -757,7 +760,7 @@ balsa_mime_widget_message_set_headers_d(BalsaMessage * bm,
 	gchar *mdn_to =
 	    internet_address_list_to_string(headers->dispnotify_to, FALSE);
 	add_header_gchar(bm, view, "disposition-notification-to",
-			 _("Disposition-Notification-To:"), mdn_to);
+			 _("Disposition-Notification-To:"), mdn_to, show_all_headers);
 	g_free(mdn_to);
     }
 
@@ -767,7 +770,7 @@ balsa_mime_widget_message_set_headers_d(BalsaMessage * bm,
 	gchar *hdr;
 
 	hdr = g_strconcat(pair[0], ":", NULL);
-	add_header_gchar(bm, view, pair[0], hdr, pair[1]);
+	add_header_gchar(bm, view, pair[0], hdr, pair[1], show_all_headers);
 	g_free(hdr);
     }
 

@@ -1,3 +1,20 @@
+2015-03-03  Albrecht Dreß
+
+	Improve display and printing of text/rfc822-headers parts
+
+	* src/balsa-mime-widget-message.h: add gboolean show_all_headers
+	to the API.
+	* src/balsa-message.c (balsa_message_set_embedded_hdr),
+	(display_headers): use it.
+	* src/balsa-mime-widget-message.c (add_header_gchar),
+	(add_header_address_list), (balsa_mime_widget_message_set_headers),
+	(balsa_mime_widget_message_set_headers_d): respect it.
+	* src/balsa-print-object-header.c
+	(balsa_print_object_header_new_real),
+	(balsa_print_object_header_from_message),
+	(balsa_print_object_header_from_body), (header_add_string),
+	(header_add_list): new parameter gboolean print_all_headers.
+
 2015-03-01  Albrecht Dreß
 
 	Display and print text/rfc822-headers parts

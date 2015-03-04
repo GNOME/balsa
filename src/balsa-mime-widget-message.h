@@ -45,7 +45,8 @@ void balsa_mime_widget_message_set_headers_d(BalsaMessage * bm,
                                              BalsaMimeWidget *mw,
                                              LibBalsaMessageHeaders *h,
                                              LibBalsaMessageBody *parts,
-                                             const gchar *subject);
+                                             const gchar *subject,
+                                             gboolean show_all_headers);
 
 
 #ifdef __cplusplus

@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  * Copyright (C) 1997-2001 Stuart Parmenter and others
- * Written by (C) Albrecht Dreﬂ <albrecht.dress@arcor.de> 2007
+ * Written by (C) Albrecht Dre√ü <albrecht.dress@arcor.de> 2007
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -41,11 +41,13 @@ static void balsa_print_object_header_draw(BalsaPrintObject * self,
 
 static void header_add_string(PangoLayout * layout, GString * header_buf,
 			      const gchar * field_id, const gchar * label,
-			      const gchar * value, gint * p_label_width);
+			      const gchar * value, gint * p_label_width,
+			      gboolean print_all_headers);
 static void header_add_list(PangoLayout * layout, GString * header_buf,
 			    const gchar * field_id, const gchar * label,
 			    InternetAddressList * values,
-			    gint * p_label_width);
+			    gint * p_label_width,
+			    gboolean print_all_headers);
 
 
 static BalsaPrintObjectClass *parent_class = NULL;
@@ -116,7 +118,8 @@ balsa_print_object_header_new_real(GList * list,
 				   LibBalsaMessageBody * sig_body,
 				   LibBalsaMessageHeaders * headers,
 				   const gchar * the_subject,
-				   BalsaPrintSetup * psetup)
+				   BalsaPrintSetup * psetup,
+				   gboolean print_all_headers)
 {
     gchar *subject;
     gchar *date;
@@ -151,7 +154,7 @@ balsa_print_object_header_new_real(GList * list,
     subject = g_strdup(the_subject);
     libbalsa_utf8_sanitize(&subject, balsa_app.convert_unknown_8bit, NULL);
     header_add_string(test_layout, header_buf, "subject", _("Subject:"),
-		      subject, &p_label_width);
+		      subject, &p_label_width, print_all_headers);
     g_free(subject);
 
     /* date */
@@ -159,23 +162,23 @@ balsa_print_object_header_new_real(GList * list,
 	libbalsa_message_headers_date_to_utf8(headers,
 					      balsa_app.date_string);
     header_add_string(test_layout, header_buf, "date", _("Date:"), date,
-		      &p_label_width);
+		      &p_label_width, print_all_headers);
     g_free(date);
 
     /* addresses */
     header_add_list(test_layout, header_buf, "from", _("From:"),
-		    headers->from, &p_label_width);
+		    headers->from, &p_label_width, print_all_headers);
     header_add_list(test_layout, header_buf, "to", _("To:"),
-		    headers->to_list, &p_label_width);
+		    headers->to_list, &p_label_width, print_all_headers);
     header_add_list(test_layout, header_buf, "cc", _("Cc:"),
-		    headers->cc_list, &p_label_width);
+		    headers->cc_list, &p_label_width, print_all_headers);
     header_add_list(test_layout, header_buf, "bcc", _("Bcc:"),
-		    headers->bcc_list, &p_label_width);
+		    headers->bcc_list, &p_label_width, print_all_headers);
     header_add_string(test_layout, header_buf, "fcc", _("Fcc:"),
-		      headers->fcc_url, &p_label_width);
+		      headers->fcc_url, &p_label_width, print_all_headers);
     header_add_list(test_layout, header_buf, "disposition-notification-to",
 		    _("Disposition-Notification-To:"),
-		    headers->dispnotify_to, &p_label_width);
+		    headers->dispnotify_to, &p_label_width, print_all_headers);
 
     /* user headers */
     p = g_list_first(headers->user_hdrs);
@@ -186,7 +189,7 @@ balsa_print_object_header_new_real(GList * list,
 	pair = p->data;
 	curr_hdr = g_strconcat(pair[0], ":", NULL);
 	header_add_string(test_layout, header_buf, pair[0], curr_hdr,
-			  pair[1], &p_label_width);
+			  pair[1], &p_label_width, print_all_headers);
 	g_free(curr_hdr);
 
 	/* check for face and x-face */
@@ -329,7 +332,7 @@ balsa_print_object_header_from_message(GList *list,
     return balsa_print_object_header_new_real(list, context,
 					      message->body_list,
 					      message->headers, subject,
-					      psetup);
+					      psetup, FALSE);
 }
 
 
@@ -342,7 +345,8 @@ balsa_print_object_header_from_body(GList *list,
     return balsa_print_object_header_new_real(list, context, body->parts,
 					      body->embhdrs,
 					      body->embhdrs->subject,
-					      psetup);
+					      psetup,
+					      body->body_type == LIBBALSA_MESSAGE_BODY_TYPE_TEXT);
 }
 
 
@@ -489,13 +493,15 @@ balsa_print_object_header_draw(BalsaPrintObject * self,
 static void
 header_add_string(PangoLayout * layout, GString * header_buf,
 		  const gchar * field_id, const gchar * label,
-		  const gchar * value, gint * p_label_width)
+		  const gchar * value, gint * p_label_width,
+		  gboolean print_all_headers)
 {
     gchar *_value;
     gint p_width;
 
     if (!value || balsa_app.shown_headers == HEADERS_NONE ||
-	!(balsa_app.show_all_headers ||
+	!(print_all_headers ||
+	  balsa_app.show_all_headers ||
 	  balsa_app.shown_headers == HEADERS_ALL ||
 	  libbalsa_find_word(field_id, balsa_app.selected_headers)))
 	return;
@@ -513,13 +519,15 @@ header_add_string(PangoLayout * layout, GString * header_buf,
 static void
 header_add_list(PangoLayout * layout, GString * header_buf,
 		const gchar * field_id, const gchar * label,
-		InternetAddressList * values, gint * p_label_width)
+		InternetAddressList * values, gint * p_label_width,
+		gboolean print_all_headers)
 {
     gchar *_value;
     gint p_width;
 
     if (balsa_app.shown_headers == HEADERS_NONE ||
-	!(balsa_app.show_all_headers ||
+	!(print_all_headers ||
+	  balsa_app.show_all_headers ||
 	  balsa_app.shown_headers == HEADERS_ALL ||
 	  libbalsa_find_word(field_id, balsa_app.selected_headers)) ||
         !values ||

@@ -818,7 +818,8 @@ balsa_mime_widget_message_set_headers(BalsaMessage        * bm,
                                       BalsaMimeWidget     * mw,
                                       LibBalsaMessageBody * part)
 {
-    bmw_message_set_headers(bm, mw, part, FALSE);
+    bmw_message_set_headers(bm, mw, part,
+                            bm->shown_headers == HEADERS_ALL);
 }
 
 void
@@ -828,7 +829,8 @@ balsa_mime_widget_message_set_headers_d(BalsaMessage           * bm,
                                         LibBalsaMessageBody    * part,
                                         const gchar            * subject)
 {
-    bmw_message_set_headers_d(bm, mw, headers, part, subject, FALSE);
+    bmw_message_set_headers_d(bm, mw, headers, part, subject,
+                              bm->shown_headers == HEADERS_ALL);
 }
 
 #ifdef HAVE_GPGME

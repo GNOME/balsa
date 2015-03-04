@@ -1,3 +1,14 @@
+2015-03-04  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Respect the "All headers" option on the "View" menu (Helmut
+	Jarausch,
+	<https://mail.gnome.org/archives/balsa-list/2015-March/msg00001.html>)
+
+	* src/balsa-mime-widget-message.c
+	(balsa_mime_widget_message_set_headers),
+	(balsa_mime_widget_message_set_headers_d): set the
+	show-all-headers parameter correctly.
+
 2015-03-03  Albrecht Dreß
 
 	Improve printing of text/rfc822-headers parts

@@ -218,8 +218,7 @@ balsa_register_pixbufs(GtkWidget * widget)
 #endif
         {
         libbalsa_address_view_set_book_icon,  BALSA_PIXMAP_BOOK_RED}, {
-            /* standard icon name is "window-close": */
-        libbalsa_address_view_set_close_icon, "gtk-close"}, {
+        libbalsa_address_view_set_close_icon, "window-close"}, {
         libbalsa_address_view_set_drop_down_icon, BALSA_PIXMAP_DROP_DOWN},
     };
     guint i;

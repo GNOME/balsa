@@ -1,3 +1,9 @@
+2015-03-09  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* src/balsa-icons.c (balsa_register_pixbufs): use
+	freedesktop.org standard window-close icon instead of gtk-close
+	<http://standards.freedesktop.org/icon-naming-spec/latest/>
+
 2015-03-04  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Respect the "All headers" option on the "View" menu (Helmut

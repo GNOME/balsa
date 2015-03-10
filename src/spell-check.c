@@ -326,7 +326,6 @@ balsa_spell_check_init(BalsaSpellCheck * spell_check)
     gtk_tree_view_set_headers_visible(tree_view, FALSE);
 
     /* setup buttons to perform actions */
-    box = GTK_BOX(gtk_dialog_get_action_area(GTK_DIALOG(spell_check)));
     widget = gtk_grid_new();
     gtk_box_pack_start(box, widget, FALSE, FALSE, 0);
 

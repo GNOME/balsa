@@ -1,5 +1,13 @@
 2015-03-09  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Build with the home-grown spell checker
+
+	* src/spell-check.c (balsa_spell_check_init): put button grid in
+	the content-area, now that accessing the action-area is
+	deprecated.
+
+2015-03-09  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* src/balsa-icons.c (balsa_register_pixbufs): use
 	freedesktop.org standard window-close icon instead of gtk-close
 	<http://standards.freedesktop.org/icon-naming-spec/latest/>

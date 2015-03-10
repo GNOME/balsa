@@ -40,6 +40,10 @@
 #include "quote-color.h"
 #include "balsa-icons.h"
 
+#if HAVE_GTKSOURCEVIEW
+#include <gtksourceview/gtksourcebuffer.h>
+#endif                          /* HAVE_GTKSOURCEVIEW */
+
 /* the basic structures */
 struct _BalsaSpellCheck {
     GtkDialog dialog;
@@ -54,7 +58,11 @@ struct _BalsaSpellCheck {
     gchar **suggestions;
 
     /* restoration information */
+#if HAVE_GTKSOURCEVIEW
+    GtkSourceBuffer *original_text;
+#else                           /* HAVE_GTKSOURCEVIEW */
     GtkTextBuffer *original_text;
+#endif                          /* HAVE_GTKSOURCEVIEW */
     GtkTextMark *original_mark;
     gint original_offset;
 
@@ -598,12 +606,23 @@ balsa_spell_check_start(BalsaSpellCheck * spell_check)
         gtk_text_buffer_create_mark(buffer, NULL, &start, FALSE);
 
     /* Get the original text so we can always revert */
+#if HAVE_GTKSOURCEVIEW
+    spell_check->original_text =
+	gtk_source_buffer_new(gtk_text_buffer_get_tag_table(buffer));
+    gtk_text_buffer_get_start_iter((GtkTextBuffer *)
+                                   spell_check->original_text, &iter);
+    gtk_text_buffer_get_bounds((GtkTextBuffer *) buffer, &start, &end);
+    gtk_text_buffer_insert_range((GtkTextBuffer *)
+                                 spell_check->original_text, &iter,
+                                 &start, &end);
+#else                           /* HAVE_GTKSOURCEVIEW */
     spell_check->original_text =
 	gtk_text_buffer_new(gtk_text_buffer_get_tag_table(buffer));
     gtk_text_buffer_get_start_iter(spell_check->original_text, &iter);
     gtk_text_buffer_get_bounds(buffer, &start, &end);
     gtk_text_buffer_insert_range(spell_check->original_text, &iter,
                                  &start, &end);
+#endif                          /* HAVE_GTKSOURCEVIEW */
 
     if (balsa_app.debug)
 	balsa_information(LIBBALSA_INFORMATION_DEBUG,
@@ -887,7 +906,11 @@ spch_finish(BalsaSpellCheck * spell_check, gboolean keep_changes)
         g_object_unref(spell_check->original_text);
     } else {
 	/* replace corrected text with original text */
+#if HAVE_GTKSOURCEVIEW
+        buffer = (GtkTextBuffer *) spell_check->original_text;
+#else                           /* HAVE_GTKSOURCEVIEW */
         buffer = spell_check->original_text;
+#endif                          /* HAVE_GTKSOURCEVIEW */
         gtk_text_view_set_buffer(spell_check->text_view, buffer);
         gtk_text_buffer_get_iter_at_offset(buffer, &original,
                                            spell_check->original_offset);

@@ -1,5 +1,13 @@
 2015-03-09  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Avoid critical message from GtkSourceView
+
+	* src/spell-check.c (balsa_spell_check_start), (spch_finish):
+	save the current state in a GtkSourceBuffer when we are using
+	GtkSourceview.
+
+2015-03-09  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Build with the home-grown spell checker
 
 	* src/spell-check.c (balsa_spell_check_init): put button grid in

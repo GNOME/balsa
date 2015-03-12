@@ -44,9 +44,11 @@
 #include <gtksourceview/gtksourcebuffer.h>
 #endif                          /* HAVE_GTKSOURCEVIEW */
 
+#define BALSA_SPELL_CHECK_PADDING 6
+
 /* the basic structures */
 struct _BalsaSpellCheck {
-    GtkDialog dialog;
+    GtkWindow window;
 
     GtkTextView *text_view;
     GtkTreeView *tree_view;
@@ -80,9 +82,7 @@ struct _BalsaSpellCheck {
 };
 
 struct _BalsaSpellCheckClass {
-    GtkDialogClass parent_class;
-
-    void (*done_spell_check) (BalsaSpellCheck * spell_check);
+    GtkWindowClass parent_class;
 };
 
 /* enumerations */
@@ -146,7 +146,7 @@ static void spch_finish(BalsaSpellCheck * spell_check,
 
 /* define the class */
 
-G_DEFINE_TYPE(BalsaSpellCheck, balsa_spell_check, GTK_TYPE_DIALOG);
+G_DEFINE_TYPE(BalsaSpellCheck, balsa_spell_check, GTK_TYPE_WINDOW);
 
 static void
 balsa_spell_check_class_init(BalsaSpellCheckClass * klass)
@@ -166,8 +166,6 @@ balsa_spell_check_class_init(BalsaSpellCheckClass * klass)
                                                         G_PARAM_READWRITE));
 
     object_class->dispose = balsa_spell_check_destroy;
-
-    klass->done_spell_check = NULL;
 }
 
 
@@ -207,7 +205,7 @@ spch_get_property(GObject * object, guint prop_id, GValue * value,
 
 
 /* balsa_spell_check_new ()
- * 
+ *
  * Create a new spell check widget.
  * */
 GtkWidget *
@@ -217,8 +215,12 @@ balsa_spell_check_new(GtkWindow * parent)
 
     g_return_val_if_fail(GTK_IS_WINDOW(parent), NULL);
 
-    spell_check = g_object_new(BALSA_TYPE_SPELL_CHECK, NULL);
-    gtk_window_set_transient_for(GTK_WINDOW(spell_check), parent);
+    spell_check = g_object_new(BALSA_TYPE_SPELL_CHECK,
+                               "type", GTK_WINDOW_TOPLEVEL,
+                               "transient-for", parent,
+                               "destroy-with-parent", TRUE,
+                               "border-width", BALSA_SPELL_CHECK_PADDING,
+                               NULL);
 
     return GTK_WIDGET(spell_check);
 }
@@ -290,9 +292,8 @@ balsa_spell_check_init(BalsaSpellCheck * spell_check)
     GtkCellRenderer *renderer;
     GtkTreeViewColumn *column;
     GtkTreeSelection *selection;
+    GtkWidget *box_widget;
     GtkBox *box;
-
-    const guint padding = 6;
 
     /* Set spell checker */
 
@@ -304,7 +305,11 @@ balsa_spell_check_init(BalsaSpellCheck * spell_check)
     /* setup suggestion display */
     widget = gtk_entry_new();
     spell_check->entry = GTK_ENTRY(widget);
-    box = GTK_BOX(gtk_dialog_get_content_area(GTK_DIALOG(spell_check)));
+    box_widget =
+        gtk_box_new(GTK_ORIENTATION_VERTICAL, BALSA_SPELL_CHECK_PADDING);
+    gtk_container_add((GtkContainer *) spell_check, box_widget);
+
+    box = (GtkBox *) box_widget;
     gtk_box_pack_start(box, widget, FALSE, FALSE, 0);
 
     sw = gtk_scrolled_window_new(NULL, NULL);
@@ -338,8 +343,8 @@ balsa_spell_check_init(BalsaSpellCheck * spell_check)
     gtk_box_pack_start(box, widget, FALSE, FALSE, 0);
 
     grid = GTK_GRID(widget);
-    gtk_grid_set_row_spacing(grid, padding);
-    gtk_grid_set_column_spacing(grid, padding);
+    gtk_grid_set_row_spacing(grid, BALSA_SPELL_CHECK_PADDING);
+    gtk_grid_set_column_spacing(grid, BALSA_SPELL_CHECK_PADDING);
 
     widget = balsa_stock_button_with_label("edit-redo", _("C_hange"));
     gtk_widget_set_tooltip_text(widget,
@@ -582,8 +587,7 @@ balsa_spell_check_start(BalsaSpellCheck * spell_check)
                                    "%s",
                                    enchant_error);
 
-	/* Generate a response signal. */
-	gtk_dialog_response(GTK_DIALOG(spell_check), 0);
+	gtk_widget_destroy((GtkWidget *) spell_check);
 
 	return;
     }
@@ -857,7 +861,7 @@ balsa_spell_check_destroy(GObject * object)
     }
 
     if (spell_check->broker) {
-	spch_finish(spell_check, TRUE);
+	spch_finish(spell_check, FALSE);
     }
 
     g_free(spell_check->language_tag);
@@ -884,9 +888,8 @@ balsa_spell_check_destroy(GObject * object)
 
 
 /* spch_finish ()
- * 
- * Clean up the variables from the spell check, and emit the done
- * signal so that the main program knows to resume normal operation.
+ *
+ * Clean up the variables from the spell check
  * */
 static void
 spch_finish(BalsaSpellCheck * spell_check, gboolean keep_changes)
@@ -935,8 +938,7 @@ spch_finish(BalsaSpellCheck * spell_check, gboolean keep_changes)
 	balsa_information(LIBBALSA_INFORMATION_DEBUG,
 			  "BalsaSpellCheck: Finished\n");
 
-    /* Generate a response signal. */
-    gtk_dialog_response(GTK_DIALOG(spell_check), 0);
+    gtk_widget_destroy((GtkWidget *) spell_check);
 }
 
 

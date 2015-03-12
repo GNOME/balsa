@@ -110,8 +110,7 @@ static gboolean bsmsg_check_format_compatibility(GtkWindow *parent,
 #endif /* ENABLE_TOUCH_UI */
 
 #if !HAVE_GTKSPELL
-static void sw_spell_check_response(BalsaSpellCheck * spell_check,
-                                    gint response, BalsaSendmsg * bsmsg);
+static void sw_spell_check_weak_notify(BalsaSendmsg * bsmsg);
 #endif                          /* HAVE_GTKSPELL */
 
 static void address_book_cb(LibBalsaAddressView * address_view,
@@ -6245,24 +6244,21 @@ sw_spell_check_activated(GSimpleAction * action,
 
     bsmsg->spell_checker = balsa_spell_check_new(GTK_WINDOW(bsmsg->window));
     sc = BALSA_SPELL_CHECK(bsmsg->spell_checker);
-    g_object_add_weak_pointer(G_OBJECT(sc), (gpointer) &bsmsg->spell_checker);
 
     /* configure the spell checker */
     balsa_spell_check_set_text(sc, text_view);
     balsa_spell_check_set_language(sc, bsmsg->spell_check_lang);
 
-    g_signal_connect(G_OBJECT(sc), "response",
-                     G_CALLBACK(sw_spell_check_response), bsmsg);
+    g_object_weak_ref(G_OBJECT(sc),
+                     (GWeakNotify) sw_spell_check_weak_notify, bsmsg);
     gtk_text_view_set_editable(text_view, FALSE);
 
     balsa_spell_check_start(sc);
 }
 
 static void
-sw_spell_check_response(BalsaSpellCheck * spell_check, gint response,
-                        BalsaSendmsg * bsmsg)
+sw_spell_check_weak_notify(BalsaSendmsg * bsmsg)
 {
-    gtk_widget_destroy(GTK_WIDGET(spell_check));
     bsmsg->spell_checker = NULL;
     gtk_text_view_set_editable(GTK_TEXT_VIEW(bsmsg->text), TRUE);
     sw_buffer_signals_connect(bsmsg);

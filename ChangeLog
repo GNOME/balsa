@@ -1,3 +1,17 @@
+2015-03-12  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	BalsaSpellCheck no longer uses any properties of GtkDialog, so
+	instead make it a direct subclass of GtkWindow
+
+	* src/sendmsg-window.c (sw_spell_check_activated),
+	(sw_spell_check_weak_notify): weak-ref the spell checker
+	instead of waiting for the "response" signal.
+	* src/spell-check.c (balsa_spell_check_class_init),
+	(balsa_spell_check_new), (balsa_spell_check_init),
+	(balsa_spell_check_start), (balsa_spell_check_destroy),
+	(spch_finish): make BalsaSpellCheck a subclass of GtkWindow,
+	instead of GtkDialog.
+
 2015-03-09  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Avoid critical message from GtkSourceView

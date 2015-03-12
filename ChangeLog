@@ -1,5 +1,16 @@
 2015-03-12  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Clean up spell checker
+
+	* src/spell-check.c (balsa_spell_check_new): set the window
+	title as an object property;
+	(balsa_spell_check_new_with_text): use static cast instead of
+	dynamic cast; indentation;
+	(balsa_spell_check_init): title is now set as an object
+	property.
+
+2015-03-12  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	BalsaSpellCheck no longer uses any properties of GtkDialog, so
 	instead make it a direct subclass of GtkWindow
 

@@ -219,19 +219,20 @@ balsa_spell_check_new(GtkWindow * parent)
                                "type", GTK_WINDOW_TOPLEVEL,
                                "transient-for", parent,
                                "destroy-with-parent", TRUE,
+                               "title", _("Spell check"),
                                "border-width", BALSA_SPELL_CHECK_PADDING,
                                NULL);
 
-    return GTK_WIDGET(spell_check);
+    return (GtkWidget *) spell_check;
 }
 
 
 /* balsa_spell_check_new_with_text
- * 
+ *
  * Create a new spell check widget, assigning the GtkText to check.
  * */
 GtkWidget *
-balsa_spell_check_new_with_text(GtkWindow * parent, 
+balsa_spell_check_new_with_text(GtkWindow   * parent,
                                 GtkTextView * check_text)
 {
     BalsaSpellCheck *spell_check;
@@ -239,20 +240,20 @@ balsa_spell_check_new_with_text(GtkWindow * parent,
     g_return_val_if_fail(GTK_IS_WINDOW(parent), NULL);
     g_return_val_if_fail(GTK_IS_TEXT_VIEW(check_text), NULL);
 
-    spell_check = BALSA_SPELL_CHECK(balsa_spell_check_new(parent));
+    spell_check = (BalsaSpellCheck *) balsa_spell_check_new(parent);
     spell_check->text_view = check_text;
 
-    return GTK_WIDGET(spell_check);
+    return (GtkWidget *) spell_check;
 }
 
 
 /* balsa_spell_check_set_text ()
- * 
+ *
  * Set the text widget the spell check should check.
  * */
 void
 balsa_spell_check_set_text(BalsaSpellCheck * spell_check,
-			   GtkTextView * check_text)
+                           GtkTextView     * check_text)
 {
     g_return_if_fail(BALSA_IS_SPELL_CHECK(spell_check));
     g_return_if_fail(GTK_IS_TEXT_VIEW(check_text));
@@ -262,12 +263,12 @@ balsa_spell_check_set_text(BalsaSpellCheck * spell_check,
 
 
 /* balsa_spell_check_set_language ()
- * 
+ *
  * Set the language to do spell checking in.
  * */
 void
 balsa_spell_check_set_language(BalsaSpellCheck * spell_check,
-			       const gchar * language)
+                               const gchar     * language)
 {
     g_return_if_fail(BALSA_IS_SPELL_CHECK(spell_check));
 
@@ -399,8 +400,6 @@ balsa_spell_check_init(BalsaSpellCheck * spell_check)
     g_signal_connect(widget, "clicked",
 		     G_CALLBACK(cancel_cb), spell_check);
     gtk_grid_attach(grid, widget, 3, 1, 1, 1);
-
-    gtk_window_set_title(GTK_WINDOW(spell_check), _("Spell check"));
 }
 
 

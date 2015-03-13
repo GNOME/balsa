@@ -164,7 +164,7 @@ button_data toolbar_buttons[]={
     {"document-save",             N_("Save"),            TRUE},
     {BALSA_PIXMAP_IDENTITY,      N_("Identity"),        FALSE},
     {"tools-check-spelling",      N_("Spelling"),        TRUE},
-    {"window-close",            N_("Close"),           FALSE},
+    {"window-close-symbolic",    N_("Close"),           FALSE},
     {BALSA_PIXMAP_MARKED_NEW,    N_("Toggle\nnew"),     FALSE},
     {BALSA_PIXMAP_MARK_ALL,      N_("Mark all"),        FALSE},
     {BALSA_PIXMAP_SHOW_HEADERS,  N_("All\nheaders"),    FALSE},

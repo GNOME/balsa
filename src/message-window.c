@@ -175,7 +175,7 @@ static const BalsaToolbarEntry message_toolbar_extras[] = {
     { "next-message",     BALSA_PIXMAP_NEXT          },
     { "next-flagged",     BALSA_PIXMAP_NEXT_FLAGGED  },
     { "previous-part",    BALSA_PIXMAP_PREVIOUS_PART },
-    { "close",           "window-close"              },
+    { "close",           "window-close-symbolic"     },
     { "show-all-headers", BALSA_PIXMAP_SHOW_HEADERS  }
 };
 

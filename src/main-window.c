@@ -651,7 +651,7 @@ static const BalsaToolbarEntry main_toolbar_extras[] = {
     { "send-and-receive-mail", BALSA_PIXMAP_SEND_RECEIVE  },
     { "save-part",         "document-save"             },
     { "identities",         BALSA_PIXMAP_IDENTITY      },
-    { "mailbox-close",     "window-close"              },
+    { "mailbox-close",     "window-close-symbolic"     },
     { "mailbox-select-all", BALSA_PIXMAP_MARK_ALL      },
     { "show-all-headers",   BALSA_PIXMAP_SHOW_HEADERS  },
     { "reset-filter",      "gtk-cancel"                },
@@ -2839,26 +2839,6 @@ bw_notebook_label_new(BalsaMailboxNode * mbnode)
     but = gtk_button_new();
     gtk_button_set_focus_on_click(GTK_BUTTON(but), FALSE);
     gtk_button_set_relief(GTK_BUTTON(but), GTK_RELIEF_NONE);
-    gtk_widget_set_name(but, "balsa-notebook-tab-button");
-
-    /* Try to make small close buttons: */
-    css_provider = gtk_css_provider_new();
-    if (!gtk_css_provider_load_from_data(css_provider,
-                                         "#balsa-notebook-tab-button"
-                                         "{"
-                                           "-GtkWidget-focus-padding: 0px;"
-                                           "-GtkWidget-focus-line-width: 0px;"
-                                           "border-width: 0px;"
-                                           "padding: 0px;"
-                                           "margin: 0px;"
-                                         "}",
-                                         -1, NULL))
-        g_print("Could not load CSS data.\n");
-
-    gtk_style_context_add_provider(gtk_widget_get_style_context(but) ,
-                                   GTK_STYLE_PROVIDER(css_provider),
-                                   GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
-    g_object_unref(css_provider);
 
     gtk_icon_size_lookup(GTK_ICON_SIZE_MENU, &w, &h);
     gtk_widget_set_size_request(but, w, h);
@@ -2866,7 +2846,7 @@ bw_notebook_label_new(BalsaMailboxNode * mbnode)
     g_signal_connect(but, "clicked",
                      G_CALLBACK(bw_mailbox_tab_close_cb), mbnode);
 
-    close_pix = gtk_image_new_from_icon_name("window-close",
+    close_pix = gtk_image_new_from_icon_name("window-close-symbolic",
                                              GTK_ICON_SIZE_MENU);
     gtk_container_add(GTK_CONTAINER(but), close_pix);
     gtk_box_pack_start(GTK_BOX(box), but, FALSE, FALSE, 0);

@@ -1,5 +1,17 @@
 2015-03-12  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Use symbolic icons
+
+	* src/balsa-icons.c (balsa_register_pixbufs): use
+	window-close-symbolic instead of window-close.
+	* src/message-window.c: ditto.
+	* src/sendmsg-window.c: ditto.
+	* src/toolbar-factory.c: ditto.
+	* src/main-window.c (bw_notebook_label_new): ditto, and give up
+	on making close-button small--it's not working.
+
+2015-03-12  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Clean up spell checker
 
 	* src/spell-check.c (balsa_spell_check_new): set the window

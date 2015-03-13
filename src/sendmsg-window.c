@@ -4190,7 +4190,7 @@ static const BalsaToolbarEntry compose_toolbar[] = {
     "",
     BALSA_PIXMAP_SEND,
     "",
-    "window-close",
+    "window-close-symbolic",
     "",
     BALSA_PIXMAP_IDENTITY,
 #else /* ENABLE_TOUCH_UI */
@@ -4209,7 +4209,7 @@ static const BalsaToolbarEntry compose_toolbar[] = {
     { "", ""                                  },
     {"print",        "document-print"         },
     { "", ""                                  },
-    {"close",        "window-close"           }
+    {"close",        "window-close-symbolic"  }
 #endif /* ENABLE_TOUCH_UI */
 };
 

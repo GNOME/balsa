@@ -335,14 +335,16 @@ balsa_ab_window_init(BalsaAbWindow *ab)
     gtk_grid_attach(GTK_GRID(grid), ab->arrow_box, 1, 1, 1, 1);
     gtk_widget_show(ab->arrow_box);
 
-    w = balsa_stock_button_with_label("go-next", "");
+    w = gtk_button_new_from_icon_name("go-next-symbolic",
+                                      GTK_ICON_SIZE_BUTTON);
     gtk_box_pack_start(GTK_BOX(ab->arrow_box), w, TRUE, FALSE, 0);
     gtk_widget_show(w);
     g_signal_connect(G_OBJECT(w), "clicked",
 		     G_CALLBACK(balsa_ab_window_move_to_recipient_list),
 		       ab);
 
-    w = balsa_stock_button_with_label("go-previous", "");
+    w = gtk_button_new_from_icon_name("go-previous-symbolic",
+                                      GTK_ICON_SIZE_BUTTON);
     gtk_box_pack_start(GTK_BOX(ab->arrow_box), w, TRUE, FALSE, 0);
     gtk_widget_show(w);
     g_signal_connect(G_OBJECT(w), "clicked",

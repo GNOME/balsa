@@ -276,7 +276,9 @@ bm_header_tl_buttons(BalsaMessage * bm)
     array = g_ptr_array_new();
 
 #ifdef HAVE_GPGME
-    button = balsa_stock_button_with_label(BALSA_PIXMAP_GPG_RECHECK, NULL);
+    button =
+        gtk_button_new_from_icon_name(balsa_icon_id(BALSA_PIXMAP_GPG_RECHECK),
+                                      GTK_ICON_SIZE_BUTTON);
     gtk_widget_set_tooltip_text(button,
 			        _("Check cryptographic signature"));
     g_signal_connect(G_OBJECT(button), "focus_in_event",
@@ -291,7 +293,9 @@ bm_header_tl_buttons(BalsaMessage * bm)
     g_ptr_array_add(array, button);
 #endif
 
-    button = balsa_stock_button_with_label(BALSA_PIXMAP_ATTACHMENT, NULL);
+    button =
+        gtk_button_new_from_icon_name(balsa_icon_id(BALSA_PIXMAP_ATTACHMENT),
+                                      GTK_ICON_SIZE_BUTTON);
     gtk_widget_set_tooltip_text(button,
 			        _("Select message part to display"));
     g_signal_connect(G_OBJECT(button), "focus_in_event",

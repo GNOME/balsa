@@ -298,7 +298,7 @@ void balsa_filter_run_dialog_init(BalsaFilterRunDialog * p)
                                  NULL, TRUE);
     g_signal_connect(G_OBJECT(p->available_filters), "row-activated",
                      G_CALLBACK(available_list_activated), p);
-                                                  
+
     sw = gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(sw),
 				   GTK_POLICY_AUTOMATIC,
@@ -314,8 +314,7 @@ void balsa_filter_run_dialog_init(BalsaFilterRunDialog * p)
     gtk_box_pack_start(GTK_BOX(vbox), bbox, FALSE, FALSE, 2);
 
     /* "Apply selected" button */
-    button = balsa_stock_button_with_label("gtk-apply",
-                                           _("Apply Selected"));
+    button = gtk_button_new_with_mnemonic(_("_Apply Selected"));
     g_signal_connect_swapped(G_OBJECT(button), "clicked",
                              G_CALLBACK(fr_apply_selected_pressed), p);
     gtk_container_add(GTK_CONTAINER(bbox), button);
@@ -326,12 +325,16 @@ void balsa_filter_run_dialog_init(BalsaFilterRunDialog * p)
     gtk_button_box_set_layout(GTK_BUTTON_BOX(bbox), GTK_BUTTONBOX_SPREAD);
 
     /* Right/Add button */
-    button = balsa_stock_button_with_label("go-next", _("A_dd"));
+    button =
+        gtk_button_new_from_icon_name("go-next-symbolic",
+                                      GTK_ICON_SIZE_BUTTON);
     g_signal_connect_swapped(G_OBJECT(button), "clicked",
                              G_CALLBACK(fr_add_pressed), G_OBJECT(p));
     gtk_container_add(GTK_CONTAINER(bbox), button);
     /* Left/Remove button */
-    button = balsa_stock_button_with_label("go-previous", _("_Remove"));
+    button =
+        gtk_button_new_from_icon_name("go-previous-symbolic",
+                                      GTK_ICON_SIZE_BUTTON);
     g_signal_connect_swapped(G_OBJECT(button), "clicked",
                              G_CALLBACK(fr_remove_pressed), G_OBJECT(p));
     gtk_container_add(GTK_CONTAINER(bbox), button);
@@ -363,18 +366,21 @@ void balsa_filter_run_dialog_init(BalsaFilterRunDialog * p)
     gtk_box_pack_start(GTK_BOX(vbox), bbox, FALSE, FALSE, 2);
 
     /* up button */
-    button = balsa_stock_button_with_label("go-up", _("_Up"));
+    button =
+        gtk_button_new_from_icon_name("go-up-symbolic",
+                                      GTK_ICON_SIZE_BUTTON);
     g_signal_connect(G_OBJECT(button), "clicked",
 		     G_CALLBACK(fr_up_pressed), p);
     gtk_container_add(GTK_CONTAINER(bbox), button);
     /* down button */
-    button = balsa_stock_button_with_label("go-down", _("Do_wn"));
+    button =
+        gtk_button_new_from_icon_name("go-down-symbolic",
+                                      GTK_ICON_SIZE_BUTTON);
     g_signal_connect(G_OBJECT(button), "clicked",
 		     G_CALLBACK(fr_down_pressed), p);
     gtk_container_add(GTK_CONTAINER(bbox), button);
 
-    button = balsa_stock_button_with_label("gtk-apply",
-                                           _("A_pply Now!"));
+    button = gtk_button_new_with_mnemonic(_("A_pply Now!"));
     g_signal_connect_swapped(G_OBJECT(button), "clicked",
                              G_CALLBACK(fr_apply_now_pressed), G_OBJECT(p));
     gtk_container_add(GTK_CONTAINER(bbox), button);

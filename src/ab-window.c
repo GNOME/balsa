@@ -311,15 +311,13 @@ balsa_ab_window_init(BalsaAbWindow *ab)
     gtk_grid_attach(GTK_GRID(grid), hbox, 0, 2, 1, 1);
     gtk_widget_show(GTK_WIDGET(hbox));
 
-    w = balsa_stock_button_with_label("document-open",
-                                      _("Run Editor"));
+    w = gtk_button_new_with_mnemonic(_("Run _Editor"));
     g_signal_connect(w, "clicked",
                      G_CALLBACK(balsa_ab_window_run_editor), NULL);
     gtk_container_add(GTK_CONTAINER(hbox), w);
     gtk_widget_show(GTK_WIDGET(w));
 
-    w = balsa_stock_button_with_label("list-add",
-                                      _("_Re-Import"));
+    w = gtk_button_new_with_mnemonic(_("_Re-Import"));
     g_signal_connect(G_OBJECT(w), "clicked",
                      G_CALLBACK(balsa_ab_window_reload),
 		       ab);

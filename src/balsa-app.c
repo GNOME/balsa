@@ -581,32 +581,6 @@ balsa_add_open_mailbox_urls(GPtrArray * url_array)
                                 append_url_if_open, url_array);
 }
 
-GtkWidget *
-balsa_stock_button_with_label(const gchar * icon, const gchar * text)
-{
-    GtkWidget *button;
-    GtkWidget *hbox;
-    GtkWidget *pixmap;
-
-    hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-    gtk_widget_set_halign(hbox, GTK_ALIGN_CENTER);
-    gtk_widget_set_valign(hbox, GTK_ALIGN_CENTER);
-
-    button = gtk_button_new();
-    gtk_container_add(GTK_CONTAINER(button), hbox);
-
-    pixmap = gtk_image_new_from_icon_name(balsa_icon_id(icon), GTK_ICON_SIZE_BUTTON);
-    gtk_box_pack_start(GTK_BOX(hbox), pixmap, FALSE, FALSE, 0);
-    if (text && *text) {
-        GtkWidget *label = gtk_label_new_with_mnemonic(text);
-        gtk_label_set_mnemonic_widget(GTK_LABEL(label), button);
-        gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, FALSE, 2);
-    }
-
-    gtk_widget_show_all(button);
-    return button;
-}
-
 /* 
  * Utilities for searching a GNode tree of BalsaMailboxNodes
  *

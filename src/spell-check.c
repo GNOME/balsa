@@ -347,7 +347,7 @@ balsa_spell_check_init(BalsaSpellCheck * spell_check)
     gtk_grid_set_row_spacing(grid, BALSA_SPELL_CHECK_PADDING);
     gtk_grid_set_column_spacing(grid, BALSA_SPELL_CHECK_PADDING);
 
-    widget = balsa_stock_button_with_label("edit-redo", _("C_hange"));
+    widget = gtk_button_new_with_mnemonic(_("C_hange"));
     gtk_widget_set_tooltip_text(widget,
                                 _("Replace the current word "
                                   "with the selected suggestion"));
@@ -355,8 +355,7 @@ balsa_spell_check_init(BalsaSpellCheck * spell_check)
 		     G_CALLBACK(change_cb), spell_check);
     gtk_grid_attach(grid, widget, 0, 0, 1, 1);
 
-    widget = balsa_stock_button_with_label("view-refresh",
-                                           _("Change _All"));
+    widget = gtk_button_new_with_mnemonic(_("Change _All"));
     gtk_widget_set_tooltip_text(widget,
                                 _("Replace all occurrences of the current word "
                                   "with the selected suggestion"));
@@ -364,37 +363,34 @@ balsa_spell_check_init(BalsaSpellCheck * spell_check)
 		     G_CALLBACK(change_all_cb), spell_check);
     gtk_grid_attach(grid, widget, 0, 1, 1, 1);
 
-    widget = balsa_stock_button_with_label("go-next",
-                                           _("_Ignore"));
+    widget = gtk_button_new_with_mnemonic(_("_Ignore"));
     gtk_widget_set_tooltip_text(widget,
                                 _("Skip the current word"));
     g_signal_connect(widget, "clicked",
 		     G_CALLBACK(ignore_cb), spell_check);
     gtk_grid_attach(grid, widget, 1, 0, 1, 1);
 
-    widget = balsa_stock_button_with_label("go-last",
-                                           _("I_gnore All"));
+    widget = gtk_button_new_with_mnemonic(_("I_gnore All"));
     gtk_widget_set_tooltip_text(widget,
                                 _("Skip all occurrences of the current word"));
     g_signal_connect(widget, "clicked",
 		     G_CALLBACK(ignore_all_cb), spell_check);
     gtk_grid_attach(grid, widget, 1, 1, 1, 1);
 
-    widget = balsa_stock_button_with_label(BALSA_PIXMAP_BOOK_OPEN,
-                                           _("_Learn"));
+    widget = gtk_button_new_with_mnemonic(_("_Learn"));
     gtk_widget_set_tooltip_text(widget,
                                 _("Add the current word to your personal dictionary"));
     g_signal_connect(widget, "clicked",
 		     G_CALLBACK(learn_cb), spell_check);
     gtk_grid_attach(grid, widget, 2, 0, 1, 1);
 
-    widget = balsa_stock_button_with_label("gtk-ok", _("_Done"));
+    widget = gtk_button_new_with_mnemonic(_("_Done"));
     gtk_widget_set_tooltip_text(widget, _("Finish spell checking"));
     g_signal_connect(widget, "clicked",
 		     G_CALLBACK(done_cb), spell_check);
     gtk_grid_attach(grid, widget, 3, 0, 1, 1);
 
-    widget = balsa_stock_button_with_label("gtk-cancel", _("_Cancel"));
+    widget = gtk_button_new_with_mnemonic(_("_Cancel"));
     gtk_widget_set_tooltip_text(widget,
                                 _("Revert all changes and finish spell checking"));
     g_signal_connect(widget, "clicked",

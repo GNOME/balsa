@@ -504,23 +504,27 @@ create_toolbar_page(BalsaToolbarModel * model, GActionMap * map)
 		       FALSE, FALSE, 0);
 
     page->back_button =
-        balsa_stock_button_with_label("go-up", _("Up"));
+        gtk_button_new_from_icon_name("go-up-symbolic",
+                                      GTK_ICON_SIZE_BUTTON);
     gtk_box_pack_start(GTK_BOX(button_box), page->back_button, FALSE, FALSE, 0);
 
     move_button_box=gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
     gtk_box_pack_start(GTK_BOX(button_box), move_button_box, FALSE, FALSE, 0);
 
     page->remove_button =
-        balsa_stock_button_with_label("go-previous", "-");
+        gtk_button_new_from_icon_name("go-previous-symbolic",
+                                      GTK_ICON_SIZE_BUTTON);
     gtk_box_pack_start(GTK_BOX(move_button_box), page->remove_button,
                        FALSE, FALSE, 0);
 
     page->add_button =
-        balsa_stock_button_with_label("go-next", "+");
+        gtk_button_new_from_icon_name("go-next-symbolic",
+                                      GTK_ICON_SIZE_BUTTON);
     gtk_box_pack_start(GTK_BOX(move_button_box), page->add_button, FALSE, FALSE, 0);
 
     page->forward_button =
-        balsa_stock_button_with_label("go-down", _("Down"));
+        gtk_button_new_from_icon_name("go-down-symbolic",
+                                      GTK_ICON_SIZE_BUTTON);
     gtk_box_pack_start(GTK_BOX(button_box), page->forward_button, FALSE, FALSE, 0);
 
     /* Pack destination list */

@@ -223,17 +223,16 @@ build_left_side(void)
     gtk_box_pack_start(GTK_BOX(vbox), bbox, FALSE, FALSE, 2);
 
     /* new button */
-    fe_new_button = balsa_stock_button_with_label("document-new", _("_New"));
+    fe_new_button = gtk_button_new_with_mnemonic(_("_New"));
     g_signal_connect(G_OBJECT(fe_new_button), "clicked",
 		     G_CALLBACK(fe_new_pressed), NULL);
     gtk_container_add(GTK_CONTAINER(bbox), fe_new_button);
     /* delete button */
-    fe_delete_button =
-        balsa_stock_button_with_label("edit-delete", _("_Delete"));
+    fe_delete_button = gtk_button_new_with_mnemonic(("_Delete"));
     g_signal_connect(G_OBJECT(fe_delete_button), "clicked",
 		     G_CALLBACK(fe_delete_pressed), NULL);
     gtk_container_add(GTK_CONTAINER(bbox), fe_delete_button);
-    gtk_widget_set_sensitive(fe_delete_button,FALSE);
+    gtk_widget_set_sensitive(fe_delete_button, FALSE);
 
     return vbox;
 }				/* end build_left_side() */
@@ -503,13 +502,12 @@ build_right_side(GtkWindow * window)
 		     G_CALLBACK(fe_apply_pressed), NULL);
     gtk_container_add(GTK_CONTAINER(bbox), fe_apply_button);
 
-    fe_revert_button =
-        balsa_stock_button_with_label("edit-undo", _("Revert"));
+    fe_revert_button = gtk_button_new_with_mnemonic(_("Re_vert"));
     g_signal_connect(G_OBJECT(fe_revert_button), "clicked",
 		     G_CALLBACK(fe_revert_pressed), NULL);
     gtk_container_add(GTK_CONTAINER(bbox), fe_revert_button);
-    gtk_widget_set_sensitive(fe_apply_button,FALSE);
-    gtk_widget_set_sensitive(fe_revert_button,FALSE);
+    gtk_widget_set_sensitive(fe_apply_button, FALSE);
+    gtk_widget_set_sensitive(fe_revert_button, FALSE);
 
     return rightside;
 }				/* end build_right_side() */

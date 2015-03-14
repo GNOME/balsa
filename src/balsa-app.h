@@ -399,8 +399,6 @@ void balsa_app_destroy(void);
 void update_timer(gboolean update, guint minutes);
 
 gchar *ask_password(LibBalsaServer * server, LibBalsaMailbox * mbox);
-GtkWidget *balsa_stock_button_with_label(const char *icon,
-					 const char *label);
 void balsa_open_mailbox_list(gchar ** urls);
 
 /* Search functions */

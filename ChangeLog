@@ -1,3 +1,19 @@
+2015-03-14  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Abandon buttons with both an icon and text, and use a symbolic
+	icon where we keep the icon.
+
+	* src/balsa-app.c: remove balsa_stock_button_with_label.
+	* src/balsa-app.h: ditto.
+	* src/ab-window.c (balsa_ab_window_init): drop icons.
+	* src/filter-edit-dialog.c (build_left_side),
+	(build_right_side): ditto.
+	* src/filter-run-dialog.c (balsa_filter_run_dialog_init): drop
+	icons from "Apply" buttons; drop labels from direction buttons.
+	* src/spell-check.c (balsa_spell_check_init): drop icons.
+	* src/toolbar-prefs.c (create_toolbar_page): drop labels from
+	direction buttons.
+
 2015-03-13  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* src/ab-window.c (balsa_ab_window_init): use

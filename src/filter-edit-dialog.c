@@ -542,7 +542,7 @@ fe_collect_user_headers(LibBalsaCondition * condition)
  */
 #define BALSA_FILTER_PADDING 6
 void
-filters_edit_dialog(void)
+filters_edit_dialog(GtkWindow * parent)
 {
     GtkWidget *hbox;
     GtkWidget *piece;
@@ -566,12 +566,17 @@ filters_edit_dialog(void)
 
     piece = build_left_side();
 
-    fe_window = gtk_dialog_new_with_buttons(_("Balsa Filters"),
-                                            NULL, 0, /* FIXME */
-                                            _("_OK"), GTK_RESPONSE_OK,
-                                            _("_Cancel"), GTK_RESPONSE_CANCEL,
-                                            _("_Help"), GTK_RESPONSE_HELP,
-					    NULL);
+    fe_window =
+        g_object_new(GTK_TYPE_DIALOG,
+                     "transient-for", parent,
+                     "use-header-bar", TRUE,
+                     "title", _("Filters"),
+                     NULL);
+    gtk_dialog_add_buttons(GTK_DIALOG(fe_window),
+                           _("_OK"),     GTK_RESPONSE_OK,
+                           _("_Cancel"), GTK_RESPONSE_CANCEL,
+                           _("_Help"),   GTK_RESPONSE_HELP,
+			   NULL);
 
     g_signal_connect(G_OBJECT(fe_window), "response",
                      G_CALLBACK(fe_dialog_response), NULL);

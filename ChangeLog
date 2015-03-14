@@ -1,5 +1,18 @@
 2015-03-14  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	reviewed by: <delete if not using a buddy>
+
+	* libbalsa/filter.h: add parent window to filters_edit_dialog
+	and filters_export_dialog API.
+	* src/filter-edit-dialog.c (filters_edit_dialog): use it, and
+	add a header bar.
+	* src/filter-export-dialog.c (filters_export_dialog): ditto.
+	* src/main-window.c (filters_activated),
+	(export_filters_activated): pass the main window as the
+	transient parent.
+
+2015-03-14  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Use a transient parent for the BalsaFilterRunDialog, and manage
 	sensitivity of various buttons
 

@@ -1217,7 +1217,7 @@ filters_activated(GSimpleAction * action,
                   GVariant      * parameter,
                   gpointer        user_data)
 {
-    filters_edit_dialog();
+    filters_edit_dialog(GTK_WINDOW(user_data));
 }
 
 static void
@@ -1225,7 +1225,7 @@ export_filters_activated(GSimpleAction * action,
                          GVariant      * parameter,
                          gpointer        user_data)
 {
-    filters_export_dialog();
+    filters_export_dialog(GTK_WINDOW(user_data));
 }
 
 static void

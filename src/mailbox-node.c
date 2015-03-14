@@ -1027,7 +1027,9 @@ mb_rescan_cb(GtkWidget * widget, BalsaMailboxNode * mbnode)
 static void
 mb_filter_cb(GtkWidget * widget, BalsaMailboxNode * mbnode)
 {
-    if (mbnode->mailbox) filters_run_dialog(mbnode->mailbox);
+    if (mbnode->mailbox)
+        filters_run_dialog(mbnode->mailbox,
+                           GTK_WINDOW(balsa_app.main_window));
     else
 	/* FIXME : Perhaps should we be able to apply filters on
 	   folders (ie recurse on all mailboxes in it), but there are

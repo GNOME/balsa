@@ -259,7 +259,7 @@ void filters_edit_dialog(void);
 
 /* filter_run_dialog edits and runs the list of filters of the mailbox
  */
-void filters_run_dialog(LibBalsaMailbox *mbox);
+void filters_run_dialog(LibBalsaMailbox *mbox, GtkWindow *parent);
 
 /* filter_export_dialog to export filters as sieve scripts
  */

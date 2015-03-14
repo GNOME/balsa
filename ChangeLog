@@ -1,5 +1,27 @@
 2015-03-14  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Use a transient parent for the BalsaFilterRunDialog, and manage
+	sensitivity of various buttons
+
+	* libbalsa/filter.h: add parent window to filters_run_dialog
+	API.
+	* src/filter-run-dialog.c (balsa_filter_run_dialog_new): use it,
+	and add a header bar.
+	(available_list_selection_changed),
+	(selected_list_selection_changed): callbacks for selection
+	"changed" signals, so we can set the sensitivity of various
+	buttons.
+	(balsa_filter_run_dialog_init): connect to the signals, and save
+	the buttons in BalsaFilterRunDialog.
+	(filters_run_dialog): new API.
+	* src/filter-run.h: new members in BalsaFilterRunDialog for the
+	buttons.
+	* src/mailbox-node.c (mb_filter_cb): pass the main window as the
+	transient parent for the dialog.
+	* src/main-window.c (select_filters_activated): ditto.
+
+2015-03-14  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	reviewed by: <delete if not using a buddy>
 
 	* src/toolbar-prefs.c (customize_dialog_cb): use a header bar.

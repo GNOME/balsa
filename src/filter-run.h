@@ -78,6 +78,14 @@ struct _BalsaFilterRunDialog {
 
     /* Temporary list variable */
     GSList *filters;
+
+    /* Buttons */
+    GtkWidget *add_button;
+    GtkWidget *remove_button;
+    GtkWidget *move_up_button;
+    GtkWidget *move_down_button;
+    GtkWidget *apply_selected_button;
+    GtkWidget *apply_now_button;
 };
 
 struct _BalsaFilterRunDialogClass {
@@ -88,8 +96,6 @@ struct _BalsaFilterRunDialogClass {
 };
 
 GType balsa_filter_run_dialog_get_type(void) G_GNUC_CONST;
-
-GtkWidget *balsa_filter_run_dialog_new(LibBalsaMailbox * mbox);
 
 void fr_clean_associated_mailbox_filters(GtkTreeView * filter_list);
 

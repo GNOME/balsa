@@ -1423,7 +1423,8 @@ select_filters_activated(GSimpleAction * action,
 
     index = balsa_window_find_current_index(window);
     if (index)
-        filters_run_dialog(BALSA_INDEX(index)->mailbox_node->mailbox);
+        filters_run_dialog(BALSA_INDEX(index)->mailbox_node->mailbox,
+                           GTK_WINDOW(balsa_app.main_window));
     else
 	/* FIXME : Perhaps should we be able to apply filters on folders (ie recurse on all mailboxes in it),
 	   but there are problems of infinite recursion (when one mailbox being filtered is also the destination

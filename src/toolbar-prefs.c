@@ -135,12 +135,16 @@ customize_dialog_cb(GtkWidget * widget, gpointer data)
     }
 
     customize_widget =
-        gtk_dialog_new_with_buttons(_("Customize Toolbars"),
-                                    GTK_WINDOW(active_window),
-                                    GTK_DIALOG_DESTROY_WITH_PARENT,
-                                    _("_Close"), GTK_RESPONSE_CLOSE,
-                                    _("_Help"),  GTK_RESPONSE_HELP,
-                                    NULL);
+        g_object_new(GTK_TYPE_DIALOG,
+                     "title", _("Customize Toolbars"),
+                     "transient-for", active_window,
+                     "destroy-with-parent", TRUE,
+                     "use-header-bar", TRUE,
+                     NULL);
+    gtk_dialog_add_buttons(GTK_DIALOG(customize_widget),
+                           _("_Close"), GTK_RESPONSE_CLOSE,
+                           _("_Help"),  GTK_RESPONSE_HELP,
+                           NULL);
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu_for_parent(customize_widget, GTK_WINDOW(active_window));
 #endif
@@ -506,6 +510,8 @@ create_toolbar_page(BalsaToolbarModel * model, GActionMap * map)
     page->back_button =
         gtk_button_new_from_icon_name("go-up-symbolic",
                                       GTK_ICON_SIZE_BUTTON);
+    gtk_widget_set_tooltip_text(page->back_button,
+                                _("Move selected item up"));
     gtk_box_pack_start(GTK_BOX(button_box), page->back_button, FALSE, FALSE, 0);
 
     move_button_box=gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
@@ -514,17 +520,23 @@ create_toolbar_page(BalsaToolbarModel * model, GActionMap * map)
     page->remove_button =
         gtk_button_new_from_icon_name("go-previous-symbolic",
                                       GTK_ICON_SIZE_BUTTON);
+    gtk_widget_set_tooltip_text(page->remove_button,
+                                _("Remove selected item from toolbar"));
     gtk_box_pack_start(GTK_BOX(move_button_box), page->remove_button,
                        FALSE, FALSE, 0);
 
     page->add_button =
         gtk_button_new_from_icon_name("go-next-symbolic",
                                       GTK_ICON_SIZE_BUTTON);
+    gtk_widget_set_tooltip_text(page->add_button,
+                                _("Add selected item to toolbar"));
     gtk_box_pack_start(GTK_BOX(move_button_box), page->add_button, FALSE, FALSE, 0);
 
     page->forward_button =
         gtk_button_new_from_icon_name("go-down-symbolic",
                                       GTK_ICON_SIZE_BUTTON);
+    gtk_widget_set_tooltip_text(page->forward_button,
+                                _("Move selected item down"));
     gtk_box_pack_start(GTK_BOX(button_box), page->forward_button, FALSE, FALSE, 0);
 
     /* Pack destination list */

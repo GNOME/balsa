@@ -1,5 +1,12 @@
 2015-03-14  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	reviewed by: <delete if not using a buddy>
+
+	* src/toolbar-prefs.c (customize_dialog_cb): use a header bar.
+	(create_toolbar_page): add tooltips to direction buttons.
+
+2015-03-14  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Abandon buttons with both an icon and text, and use a symbolic
 	icon where we keep the icon.
 

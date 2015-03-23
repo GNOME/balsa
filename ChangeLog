@@ -2,8 +2,15 @@
 
 	Deprecation cleanup
 
+	* src/balsa-mime-widget-text.c (quote_tag):
+	GtkTextTag:foreground-gdk is deprecated.
+
+2015-03-23  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Deprecation cleanup
+
 	* src/balsa-app.c (balsa_app_init):
-	GtkSettings:gtk-fallback-icon-theme is deprecated
+	GtkSettings:gtk-fallback-icon-theme is deprecated.
 
 2015-03-23  Peter Bloomfield  <pbloomfield@bellsouth.net>
 

@@ -382,18 +382,11 @@ quote_tag(GtkTextBuffer * buffer, gint level, gint margin)
 
         if (!tag) {
             GdkRGBA *rgba;
-            GdkColor color;
 
             rgba = &balsa_app.quoted_color[q_level];
-            /* As of now, GtkTextTag has no "foreground-rgba" property :( */
-            color.red   = G_MAXUINT16 * rgba->red;
-            color.green = G_MAXUINT16 * rgba->green;
-            color.blue  = G_MAXUINT16 * rgba->blue;
-            color.pixel = 0;
-
             tag =
                 gtk_text_buffer_create_tag(buffer, name,
-                                           "foreground-gdk", &color,
+                                           "foreground-rgba", rgba,
 					   "left-margin", BALSA_LEFT_MARGIN
                                            + margin * level,
                                            NULL);

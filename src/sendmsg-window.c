@@ -2395,6 +2395,10 @@ create_email_entry(BalsaSendmsg         * bsmsg,
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll),
 				   GTK_POLICY_AUTOMATIC,
 				   GTK_POLICY_AUTOMATIC);
+    /* This is a horrible hack, but we need to make sure that the
+     * recipient list is more than one line high: */
+    gtk_scrolled_window_set_min_content_height(GTK_SCROLLED_WINDOW(scroll),
+                                               60);
     gtk_container_add(GTK_CONTAINER(scroll), GTK_WIDGET(*view));
 
     widget[1] = gtk_frame_new(NULL);

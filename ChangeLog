@@ -1,5 +1,12 @@
 2015-03-23  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Set minimum vertical space for recipient list
+
+	* src/sendmsg-window.c (create_email_entry): try to give the
+	recipient list around two lines of space.
+
+2015-03-23  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Deprecation cleanup--I missed one :(
 
 	* src/balsa-mime-widget-text.c (fill_text_buf_cited):

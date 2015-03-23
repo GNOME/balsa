@@ -1,6 +1,13 @@
+2015-03-23  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Use a transient parent and a header bar in the no-subject dialog
+
+	* src/sendmsg-window.c (subject_not_empty): use a transient parent
+	and a header bar.
+
 2015-03-14  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
-	reviewed by: <delete if not using a buddy>
+	Use a transient parent for filter dialogs
 
 	* libbalsa/filter.h: add parent window to filters_edit_dialog
 	and filters_export_dialog API.
@@ -35,7 +42,7 @@
 
 2015-03-14  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
-	reviewed by: <delete if not using a buddy>
+	Use a header bar in the toolbar editor
 
 	* src/toolbar-prefs.c (customize_dialog_cb): use a header bar.
 	(create_toolbar_page): add tooltips to direction buttons.

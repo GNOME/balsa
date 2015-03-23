@@ -5031,11 +5031,15 @@ subject_not_empty(BalsaSendmsg * bsmsg)
     }
 
     /* build the dialog */
-    no_subj_dialog = gtk_dialog_new ();
-    gtk_container_set_border_width (GTK_CONTAINER (no_subj_dialog), 6);
-    gtk_window_set_modal (GTK_WINDOW (no_subj_dialog), TRUE);
-    gtk_window_set_resizable (GTK_WINDOW (no_subj_dialog), FALSE);
-    gtk_window_set_type_hint (GTK_WINDOW (no_subj_dialog), GDK_WINDOW_TYPE_HINT_DIALOG);
+    no_subj_dialog = g_object_new(GTK_TYPE_DIALOG,
+                                  "use-header-bar", TRUE,
+                                  "transient-for", bsmsg->window,
+                                  "title", _("No Subject"),
+                                  "border-width", 6,
+                                  "modal", TRUE,
+                                  "resizable", FALSE,
+                                  "type-hint", GDK_WINDOW_TYPE_HINT_DIALOG,
+                                  NULL);
 
     dialog_vbox = gtk_dialog_get_content_area(GTK_DIALOG(no_subj_dialog));
 
@@ -5074,29 +5078,17 @@ subject_not_empty(BalsaSendmsg * bsmsg)
     gtk_entry_set_activates_default (GTK_ENTRY (subj_entry), TRUE);
 
 
-    cnclbutton = gtk_button_new_with_mnemonic(_("_Cancel"));
-    gtk_dialog_add_action_widget (GTK_DIALOG (no_subj_dialog), cnclbutton, GTK_RESPONSE_CANCEL);
+    cnclbutton =
+        gtk_dialog_add_button(GTK_DIALOG(no_subj_dialog),
+                              _("_Cancel"), GTK_RESPONSE_CANCEL);
     gtk_widget_set_can_default(cnclbutton, TRUE);
 
-    okbutton = gtk_button_new ();
-    gtk_dialog_add_action_widget (GTK_DIALOG (no_subj_dialog), okbutton, GTK_RESPONSE_OK);
+    okbutton =
+        gtk_dialog_add_button(GTK_DIALOG(no_subj_dialog),
+                              _("_Send"), GTK_RESPONSE_OK);
     gtk_widget_set_can_default(okbutton, TRUE);
     gtk_dialog_set_default_response(GTK_DIALOG (no_subj_dialog),
                                     GTK_RESPONSE_OK);
-
-    hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 2);
-    gtk_widget_set_halign(hbox, GTK_ALIGN_CENTER);
-    gtk_widget_set_valign(hbox, GTK_ALIGN_CENTER);
-    gtk_container_add (GTK_CONTAINER (okbutton), hbox);
-
-    image = gtk_image_new_from_icon_name(balsa_icon_id(BALSA_PIXMAP_SEND),
-                                         GTK_ICON_SIZE_BUTTON);
-    gtk_box_pack_start (GTK_BOX (hbox), image, FALSE, FALSE, 0);
-
-    label = gtk_label_new_with_mnemonic (_("_Send"));
-    gtk_box_pack_start (GTK_BOX (hbox), label, FALSE, FALSE, 0);
-    gtk_widget_set_can_focus(label, TRUE);
-    gtk_widget_set_can_default(label, TRUE);
 
     gtk_widget_grab_focus (subj_entry);
     gtk_editable_select_region(GTK_EDITABLE(subj_entry), 0, -1);

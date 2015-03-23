@@ -1307,7 +1307,7 @@ fill_text_buf_cited(GtkWidget *widget, const gchar *text_body,
     regex_t rex;
 #endif                          /* USE_GREGEX */
     gboolean have_regex;
-    GdkColor color;
+    GdkRGBA *rgba;
 
     /* prepare citation regular expression for plain bodies */
     if (is_plain) {
@@ -1333,12 +1333,9 @@ fill_text_buf_cited(GtkWidget *widget, const gchar *text_body,
     screen = gtk_widget_get_screen(widget);
     margin = (char_width / 72.0) * gdk_screen_get_resolution(screen);
 
-    color.red   = G_MAXUINT16 * balsa_app.url_color.red;
-    color.green = G_MAXUINT16 * balsa_app.url_color.green;
-    color.blue  = G_MAXUINT16 * balsa_app.url_color.blue;
-    color.pixel = 0;
+    rgba = &balsa_app.url_color;
     gtk_text_buffer_create_tag(buffer, "url",
-                               "foreground-gdk", &color, NULL);
+                               "foreground-rgba", rgba, NULL);
     gtk_text_buffer_create_tag(buffer, "emphasize",
                                "foreground", "red",
                                "underline", PANGO_UNDERLINE_SINGLE,

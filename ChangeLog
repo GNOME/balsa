@@ -1,5 +1,15 @@
 2015-03-24  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Use GtkDialog API and GTK_DIALOG_* flags instead of g_object_new
+	and GObject properties
+
+	* src/filter-edit-dialog.c (filters_edit_dialog):
+	* src/filter-export-dialog.c (filters_export_dialog):
+	* src/sendmsg-window.c (subject_not_empty):
+	* src/toolbar-prefs.c (customize_dialog_cb):
+
+2015-03-24  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* libbalsa/libbalsa.c (ask_cert_real), (ask_timeout_real): use
 	header bars.
 

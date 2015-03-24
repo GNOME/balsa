@@ -74,18 +74,13 @@ filters_export_dialog(GtkWindow * parent)
     fex_already_open = TRUE;
 
     fex_window =
-        g_object_new(GTK_TYPE_DIALOG,
-                     "transient-for", parent,
-                     "use-header-bar", TRUE,
-                     "title", _("Export Filters"),
-                     NULL);
-    gtk_dialog_add_buttons(GTK_DIALOG(fex_window),
-                           _("_OK"), GTK_RESPONSE_OK,
-                           _("_Cancel"), GTK_RESPONSE_CANCEL,
-                           /* We don't actually offer any help:
-                           _("_Help"), GTK_RESPONSE_HELP,
-                           */
-                           NULL);
+        gtk_dialog_new_with_buttons(_("Export Filters"),
+                                    parent,
+                                    GTK_DIALOG_USE_HEADER_BAR,
+                                    _("_OK"), GTK_RESPONSE_OK,
+                                    _("_Cancel"), GTK_RESPONSE_CANCEL,
+                                    _("_Help"), GTK_RESPONSE_HELP,
+                                    NULL);
     gtk_window_set_wmclass(GTK_WINDOW(fex_window), "filter-export",
                            "Balsa");
 

@@ -135,16 +135,13 @@ customize_dialog_cb(GtkWidget * widget, gpointer data)
     }
 
     customize_widget =
-        g_object_new(GTK_TYPE_DIALOG,
-                     "title", _("Customize Toolbars"),
-                     "transient-for", active_window,
-                     "destroy-with-parent", TRUE,
-                     "use-header-bar", TRUE,
-                     NULL);
-    gtk_dialog_add_buttons(GTK_DIALOG(customize_widget),
-                           _("_Close"), GTK_RESPONSE_CLOSE,
-                           _("_Help"),  GTK_RESPONSE_HELP,
-                           NULL);
+        gtk_dialog_new_with_buttons(_("Customize Toolbars"),
+                                    GTK_WINDOW(active_window),
+                                    GTK_DIALOG_DESTROY_WITH_PARENT |
+                                    GTK_DIALOG_USE_HEADER_BAR,
+                                    _("_Close"), GTK_RESPONSE_CLOSE,
+                                    _("_Help"),  GTK_RESPONSE_HELP,
+                                    NULL);
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu_for_parent(customize_widget, GTK_WINDOW(active_window));
 #endif

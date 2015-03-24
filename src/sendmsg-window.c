@@ -5018,8 +5018,6 @@ subject_not_empty(BalsaSendmsg * bsmsg)
     gchar *text_str;
     GtkWidget *label;
     GtkWidget *subj_entry;
-    GtkWidget *cnclbutton;
-    GtkWidget *okbutton;
     gint response;
 
     /* read the subject widget and verify that it is contains something else
@@ -5035,15 +5033,17 @@ subject_not_empty(BalsaSendmsg * bsmsg)
     }
 
     /* build the dialog */
-    no_subj_dialog = g_object_new(GTK_TYPE_DIALOG,
-                                  "use-header-bar", TRUE,
-                                  "transient-for", bsmsg->window,
-                                  "title", _("No Subject"),
-                                  "border-width", 6,
-                                  "modal", TRUE,
-                                  "resizable", FALSE,
-                                  "type-hint", GDK_WINDOW_TYPE_HINT_DIALOG,
-                                  NULL);
+    no_subj_dialog =
+        gtk_dialog_new_with_buttons(_("No Subject"),
+                                    GTK_WINDOW(bsmsg->window),
+                                    GTK_DIALOG_MODAL |
+                                    GTK_DIALOG_USE_HEADER_BAR,
+                                    _("_Cancel"), GTK_RESPONSE_CANCEL,
+                                    _("_Send"),   GTK_RESPONSE_OK,
+                                    NULL);
+    gtk_container_set_border_width (GTK_CONTAINER (no_subj_dialog), 6);
+    gtk_window_set_resizable (GTK_WINDOW (no_subj_dialog), FALSE);
+    gtk_window_set_type_hint (GTK_WINDOW (no_subj_dialog), GDK_WINDOW_TYPE_HINT_DIALOG);
 
     dialog_vbox = gtk_dialog_get_content_area(GTK_DIALOG(no_subj_dialog));
 
@@ -5080,17 +5080,6 @@ subject_not_empty(BalsaSendmsg * bsmsg)
     gtk_entry_set_text(GTK_ENTRY(subj_entry), _("(no subject)"));
     gtk_box_pack_start (GTK_BOX (hbox), subj_entry, TRUE, TRUE, 0);
     gtk_entry_set_activates_default (GTK_ENTRY (subj_entry), TRUE);
-
-
-    cnclbutton =
-        gtk_dialog_add_button(GTK_DIALOG(no_subj_dialog),
-                              _("_Cancel"), GTK_RESPONSE_CANCEL);
-    gtk_widget_set_can_default(cnclbutton, TRUE);
-
-    okbutton =
-        gtk_dialog_add_button(GTK_DIALOG(no_subj_dialog),
-                              _("_Send"), GTK_RESPONSE_OK);
-    gtk_widget_set_can_default(okbutton, TRUE);
     gtk_dialog_set_default_response(GTK_DIALOG (no_subj_dialog),
                                     GTK_RESPONSE_OK);
 

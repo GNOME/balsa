@@ -566,17 +566,13 @@ filters_edit_dialog(GtkWindow * parent)
 
     piece = build_left_side();
 
-    fe_window =
-        g_object_new(GTK_TYPE_DIALOG,
-                     "transient-for", parent,
-                     "use-header-bar", TRUE,
-                     "title", _("Filters"),
-                     NULL);
-    gtk_dialog_add_buttons(GTK_DIALOG(fe_window),
-                           _("_OK"),     GTK_RESPONSE_OK,
-                           _("_Cancel"), GTK_RESPONSE_CANCEL,
-                           _("_Help"),   GTK_RESPONSE_HELP,
-			   NULL);
+    fe_window = gtk_dialog_new_with_buttons(_("Filters"),
+                                            parent,
+                                            GTK_DIALOG_USE_HEADER_BAR,
+                                            _("_OK"), GTK_RESPONSE_OK,
+                                            _("_Cancel"), GTK_RESPONSE_CANCEL,
+                                            _("_Help"), GTK_RESPONSE_HELP,
+					    NULL);
 
     g_signal_connect(G_OBJECT(fe_window), "response",
                      G_CALLBACK(fe_dialog_response), NULL);

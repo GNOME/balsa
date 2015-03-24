@@ -582,8 +582,10 @@ ask_cert_real(void *data)
         c = str->str + pos;
     }
 
-    dialog = gtk_dialog_new_with_buttons(_("SSL/TLS certificate"), NULL,
-                                         GTK_DIALOG_MODAL,
+    dialog = gtk_dialog_new_with_buttons(_("SSL/TLS certificate"),
+                                         NULL, /* FIXME: NULL parent */
+                                         GTK_DIALOG_MODAL |
+                                         GTK_DIALOG_USE_HEADER_BAR,
                                          _("_Accept Once"), 0,
                                          _("Accept&_Save"), 1,
                                          _("_Reject"), GTK_RESPONSE_CANCEL, 
@@ -630,7 +632,10 @@ ask_timeout_real(void *data)
     GtkWidget* dialog;
     int i;
 
-    dialog = gtk_message_dialog_new(NULL, GTK_DIALOG_MODAL, GTK_MESSAGE_INFO,
+    dialog = gtk_message_dialog_new(NULL, /* FIXME: NULL parent */
+                                    GTK_DIALOG_MODAL |
+                                    GTK_DIALOG_USE_HEADER_BAR,
+                                    GTK_MESSAGE_INFO,
                                     GTK_BUTTONS_YES_NO,
                                     _("Connection to %s timed out. Abort?"),
                                     host);

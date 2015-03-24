@@ -1,5 +1,10 @@
 2015-03-24  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	* libbalsa/libbalsa.c (ask_cert_real), (ask_timeout_real): use
+	header bars.
+
+2015-03-24  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* libbalsa/misc.c (libbalsa_create_grid_entry): set hexpand on
 	the entry.
 

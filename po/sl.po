@@ -5,15 +5,15 @@
 # Andraž Tori <andraz.tori1@guest.arnes.si>, 2002.
 # Tadej Janež <tadej_janez@email.si>, 2003.
 # Andrej Žnidaršič <andrej.znidarsic@gmail.com>, 2010.
-# Matej Urbančič <mateju@svn.gnome.org>, 2006 - 2015.
+# Matej Urbančič <mateju@svn.gnome.org>, 2006-2015.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa master\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=balsa&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2015-02-28 15:51+0000\n"
-"PO-Revision-Date: 2015-02-28 21:24+0100\n"
+"POT-Creation-Date: 2015-03-24 15:54+0000\n"
+"PO-Revision-Date: 2015-03-24 19:21+0100\n"
 "Last-Translator: Matej Urbančič <mateju@svn.gnome.org>\n"
 "Language-Team: Slovenščina <gnome-si@googlegroups.com>\n"
 "Language: sl_SI\n"
@@ -130,20 +130,20 @@ msgstr "_Elektronski naslov:"
 msgid "A_dd"
 msgstr "_Dodaj"
 
-#: ../libbalsa/address-view.c:127 ../src/balsa-mime-widget-message.c:736
-#: ../src/balsa-print-object-header.c:168 ../src/sendmsg-window.c:1121
+#: ../libbalsa/address-view.c:127 ../src/balsa-mime-widget-message.c:750
+#: ../src/balsa-print-object-header.c:171 ../src/sendmsg-window.c:1121
 #: ../src/sendmsg-window.c:3864 ../src/store-address.c:339
 msgid "To:"
 msgstr "Za:"
 
-#: ../libbalsa/address-view.c:128 ../src/balsa-mime-widget-message.c:737
-#: ../src/balsa-print-object-header.c:170 ../src/sendmsg-window.c:1121
+#: ../libbalsa/address-view.c:128 ../src/balsa-mime-widget-message.c:751
+#: ../src/balsa-print-object-header.c:173 ../src/sendmsg-window.c:1121
 #: ../src/sendmsg-window.c:3872 ../src/store-address.c:340
 msgid "Cc:"
 msgstr "Kp:"
 
-#: ../libbalsa/address-view.c:129 ../src/balsa-mime-widget-message.c:738
-#: ../src/balsa-print-object-header.c:172 ../src/sendmsg-window.c:1121
+#: ../libbalsa/address-view.c:129 ../src/balsa-mime-widget-message.c:752
+#: ../src/balsa-print-object-header.c:175 ../src/sendmsg-window.c:1121
 #: ../src/store-address.c:341
 msgid "Bcc:"
 msgstr "Skp:"
@@ -157,12 +157,12 @@ msgstr "Odgovori na:"
 msgid "(No subject)"
 msgstr "(brez zadeve)"
 
-#: ../libbalsa/body.c:350 ../libbalsa/body.c:397
+#: ../libbalsa/body.c:388 ../libbalsa/body.c:435
 #, c-format
 msgid "Failed to create output stream"
 msgstr "Ustvarjanje izhodnega pretoka je spodletelo"
 
-#: ../libbalsa/body.c:541
+#: ../libbalsa/body.c:579
 #, c-format
 msgid "Could not read embedded message"
 msgstr "Vključenega sporočila ni mogoče prebrati"
@@ -567,7 +567,7 @@ msgid "Face header file %s contains binary data."
 msgstr "Face datoteka glave %s vsebuje dvojiške podatke."
 
 #. Translators: please do not translate Face.
-#: ../libbalsa/identity.c:1250 ../src/balsa-message.c:1571
+#: ../libbalsa/identity.c:1250 ../src/balsa-message.c:1573
 #, c-format
 msgid "Error loading Face: %s"
 msgstr "Napaka med nalaganjem Face: %s"
@@ -1874,7 +1874,7 @@ msgstr ""
 "Ni mogoče določiti nabora znakov za datoteko `%s'; pošiljanje kot mime vrsta "
 "`%s'"
 
-#: ../libbalsa/send.c:2157
+#: ../libbalsa/send.c:2173
 msgid "This message will not be encrypted for the BCC: recipient."
 msgid_plural "This message will not be encrypted for the BCC: recipients."
 msgstr[0] "Sporočilo ne bo šifrirano za prejemnike BCC:."
@@ -1882,7 +1882,7 @@ msgstr[1] "Sporočilo ne bo šifrirano za prejemnika BCC:."
 msgstr[2] "Sporočilo ne bo šifrirano za prejemnika BCC:."
 msgstr[3] "Sporočilo ne bo šifrirano za prejemnike BCC:."
 
-#: ../libbalsa/send.c:2245
+#: ../libbalsa/send.c:2261
 msgid "This message will not be encrypted for the BCC: recipient(s)."
 msgstr "Sporočilo ne bo šifrirano za prejemnike SKP:."
 
@@ -2742,101 +2742,101 @@ msgstr "(ni pošiljatelja)"
 msgid "Could not access message %u in mailbox \"%s\"."
 msgstr "Ni mogoče dostopati do sporočila %u v poštnem predalu \"%s\"."
 
-#: ../src/balsa-message.c:1321
+#: ../src/balsa-message.c:1323
 msgid "mixed parts"
 msgstr "mešani deli"
 
-#: ../src/balsa-message.c:1323
+#: ../src/balsa-message.c:1325
 msgid "alternative parts"
 msgstr "dodatni deli"
 
-#: ../src/balsa-message.c:1325
+#: ../src/balsa-message.c:1327
 msgid "signed parts"
 msgstr "podpisani deli"
 
-#: ../src/balsa-message.c:1327
+#: ../src/balsa-message.c:1329
 msgid "encrypted parts"
 msgstr "šifrirani deli"
 
-#: ../src/balsa-message.c:1329
+#: ../src/balsa-message.c:1331
 msgid "rfc822 message"
 msgstr "sporočilo rfc822"
 
-#: ../src/balsa-message.c:1331
+#: ../src/balsa-message.c:1333
 #, c-format
 msgid "\"%s\" parts"
 msgstr "\"%s\" deli"
 
-#: ../src/balsa-message.c:1379
+#: ../src/balsa-message.c:1381
 msgid "force inline for all parts"
 msgstr "vsili vse dele medvrstično"
 
-#: ../src/balsa-message.c:1422
+#: ../src/balsa-message.c:1424
 #, c-format
 msgid "rfc822 message (from %s, subject \"%s\")"
 msgstr "sporočilo rfc822 (pošiljatelj %s, zadeva \"%s\")"
 
-#: ../src/balsa-message.c:1434
+#: ../src/balsa-message.c:1436
 msgid "complete message"
 msgstr "celotno sporočilo"
 
-#: ../src/balsa-message.c:1451
+#: ../src/balsa-message.c:1453
 #, c-format
 msgid "part %s: %s (file %s)"
 msgstr "del %s: %s (datoteka %s)"
 
-#: ../src/balsa-message.c:1462
+#: ../src/balsa-message.c:1464
 #, c-format
 msgid "part %s: %s"
 msgstr "del %s: %s"
 
-#: ../src/balsa-message.c:1477
+#: ../src/balsa-message.c:1479
 msgid "encrypted: "
 msgstr "šifrirano:"
 
-#: ../src/balsa-message.c:1614
+#: ../src/balsa-message.c:1616
 #, c-format
 msgid "Reading embedded message failed: %s"
 msgstr "Branje vključenega sporočila je spodletelo: %s"
 
-#: ../src/balsa-message.c:1622
+#: ../src/balsa-message.c:1624
 #, c-format
 msgid "Appending message to %s failed: %s"
 msgstr "Pripenjanje sporočila %s je spodletelo: %s"
 
-#: ../src/balsa-message.c:1651
+#: ../src/balsa-message.c:1653
 msgid "_Save..."
 msgstr "_Shrani ..."
 
-#: ../src/balsa-message.c:1660 ../src/balsa-mime-widget-message.c:456
+#: ../src/balsa-message.c:1662 ../src/balsa-mime-widget-message.c:467
 msgid "_Copy to folder..."
 msgstr "_Kopiraj v mapo ..."
 
-#: ../src/balsa-message.c:1743
+#: ../src/balsa-message.c:1745
 msgid "Select folder for saving selected parts"
 msgstr "Izbor mape za shranjevanje izbranih delov"
 
-#: ../src/balsa-message.c:1767
+#: ../src/balsa-message.c:1769
 #, c-format
 msgid "Could not create URI for %s"
 msgstr "Ni mogoče ustvariti naslova URI za %s"
 
-#: ../src/balsa-message.c:1792
+#: ../src/balsa-message.c:1794
 #, c-format
 msgid "%s message part"
 msgstr "%s del sporočila"
 
-#: ../src/balsa-message.c:1825 ../src/balsa-mime-widget-callbacks.c:163
+#: ../src/balsa-message.c:1827 ../src/balsa-mime-widget-callbacks.c:163
 #, c-format
 msgid "Could not save %s: %s"
 msgstr "Ni mogoče shraniti %s: %s"
 
-#: ../src/balsa-message.c:2484 ../src/balsa-message.c:2628
+#: ../src/balsa-message.c:2486 ../src/balsa-message.c:2630
 #, c-format
 msgid "Sending the disposition notification failed: %s"
 msgstr "Pošiljanje sporočila o prejetju je spodletelo: %s"
 
-#: ../src/balsa-message.c:2581
+#: ../src/balsa-message.c:2583
 #, c-format
 msgid ""
 "The sender of this mail, %s, requested \n"
@@ -2847,11 +2847,11 @@ msgstr ""
 "se obvestilo o prejetju sporočila vrne na naslov `%s'.\n"
 "Ali želite poslati to obvestilo?"
 
-#: ../src/balsa-message.c:2591
+#: ../src/balsa-message.c:2593
 msgid "Reply to MDN?"
 msgstr "Odgovori na obvestilo o prejetju sporočilca?"
 
-#: ../src/balsa-message.c:2802
+#: ../src/balsa-message.c:2804
 msgid ""
 "The decryption cannot be performed because this message is displayed more "
 "than once.\n"
@@ -2860,18 +2860,18 @@ msgstr ""
 "Ni mogoče dešifrirati sporočila, ker je sporočilo prikazano več kot enkrat.\n"
 "Zaprite druge primere tega sporočila in poskusite znova."
 
-#: ../src/balsa-message.c:2823 ../src/balsa-message.c:2908
-#: ../src/balsa-message.c:3030
+#: ../src/balsa-message.c:2825 ../src/balsa-message.c:2910
+#: ../src/balsa-message.c:3032
 #, c-format
 msgid "Parsing a message part failed: %s"
 msgstr "Razčlenjevanje dela sporočila ni uspelo: %s"
 
-#: ../src/balsa-message.c:2824 ../src/balsa-message.c:2909
-#: ../src/balsa-message.c:3031
+#: ../src/balsa-message.c:2826 ../src/balsa-message.c:2911
+#: ../src/balsa-message.c:3033
 msgid "Possible disk space problem."
 msgstr "Mogoča je težava s prostorom na disku."
 
-#: ../src/balsa-message.c:2838
+#: ../src/balsa-message.c:2840
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains an encrypted part, but "
@@ -2880,7 +2880,7 @@ msgstr ""
 "Sporočilo poslano od %s z zadevo \"%s\" vsebuje šifriran del, vendar je "
 "njihova struktura napačna."
 
-#: ../src/balsa-message.c:2846
+#: ../src/balsa-message.c:2848
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains a PGP encrypted part, "
@@ -2889,7 +2889,7 @@ msgstr ""
 "Sporočilo poslano od %s z zadevo \"%s\" vsebuje PGP šifriran del, vendar "
 "šifrirni protokol ni na voljo."
 
-#: ../src/balsa-message.c:2859
+#: ../src/balsa-message.c:2861
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains a S/MIME encrypted part, "
@@ -2898,7 +2898,7 @@ msgstr ""
 "Sporočilo poslano od %s z zadevo \"%s\" vsebuje S/MIME šifriran del, vendar "
 "šifrirni protokol ni na voljo."
 
-#: ../src/balsa-message.c:2926
+#: ../src/balsa-message.c:2928
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains a signed part, but its "
@@ -2907,7 +2907,7 @@ msgstr ""
 "Sporočilo poslano od %s z zadevo \"%s\" vsebuje podpisan del, vendar je "
 "njegova struktura neveljavna. Podpisa, če obstaja, ni mogoče preveriti."
 
-#: ../src/balsa-message.c:2939
+#: ../src/balsa-message.c:2941
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains a %s signed part, but "
@@ -2916,28 +2916,28 @@ msgstr ""
 "Sporočilo poslano od %s z zadevo  \"%s\" vsebuje podpisan del %s, vendar "
 "šifrirni protokol ni na voljo."
 
-#: ../src/balsa-message.c:2942
+#: ../src/balsa-message.c:2944
 msgid "PGP"
 msgstr "PGP"
 
-#: ../src/balsa-message.c:2942 ../src/balsa-mime-widget-crypto.c:76
+#: ../src/balsa-message.c:2944 ../src/balsa-mime-widget-crypto.c:76
 #: ../src/print-gtk.c:199
 msgid "S/MIME"
 msgstr "S/MIME"
 
-#: ../src/balsa-message.c:2966 ../src/balsa-message.c:3093
+#: ../src/balsa-message.c:2968 ../src/balsa-message.c:3095
 msgid "Detected a good signature"
 msgstr "Zaznan je dober podpis"
 
-#: ../src/balsa-message.c:2972
+#: ../src/balsa-message.c:2974
 msgid "Detected a good signature with insufficient validity"
 msgstr "Zaznan je dober podpis z nezadostno veljavnostjo"
 
-#: ../src/balsa-message.c:2977 ../src/balsa-message.c:3097
+#: ../src/balsa-message.c:2979 ../src/balsa-message.c:3099
 msgid "Detected a good signature with insufficient validity/trust"
 msgstr "Zaznan je dober podpis z nezadostno veljavnostjo ali zaupanjem"
 
-#: ../src/balsa-message.c:2984 ../src/balsa-message.c:3103
+#: ../src/balsa-message.c:2986 ../src/balsa-message.c:3105
 #, c-format
 msgid ""
 "Checking the signature of the message sent by %s with subject \"%s\" "
@@ -2947,7 +2947,7 @@ msgstr ""
 "Preverjanje podpisa sporočila od %s z zadevo \"%s\" je vrnilo:\n"
 "%s"
 
-#: ../src/balsa-message.c:2996
+#: ../src/balsa-message.c:2998
 #, c-format
 msgid ""
 "Checking the signature of the message sent by %s with subject \"%s\" failed "
@@ -2955,14 +2955,14 @@ msgid ""
 msgstr ""
 "Preverjanje podpisa sporočila od %s z zadevo \"%s\" je spodletelo z napako!"
 
-#: ../src/balsa-message.c:3055
+#: ../src/balsa-message.c:3057
 msgid ""
 "The decryption cannot be performed because this message is displayed more "
 "than once."
 msgstr ""
 "Dešifriranje sporočila ni mogoče, ker je sporočilo prikazano več kot enkrat."
 
-#: ../src/balsa-message.c:3057
+#: ../src/balsa-message.c:3059
 msgid ""
 "The signature check and removal of the OpenPGP armor cannot be performed "
 "because this message is displayed more than once."
@@ -2970,36 +2970,36 @@ msgstr ""
 "Ni mogoče preveriti podpisa in odstraniti oklepa OpenPGP, ker je to "
 "sporočilo prikazano več kot enkrat."
 
-#: ../src/balsa-message.c:3060
+#: ../src/balsa-message.c:3062
 msgid "Please close the other instances of this message and try again."
 msgstr "Zaprite druge odprte primerke tega sporočila in poskusite znova."
 
-#: ../src/balsa-mime-widget.c:235 ../src/balsa-mime-widget-message.c:161
-#: ../src/balsa-mime-widget-message.c:207
+#: ../src/balsa-mime-widget.c:236 ../src/balsa-mime-widget-message.c:172
+#: ../src/balsa-mime-widget-message.c:218
 #, c-format
 msgid "File name: %s"
 msgstr "Ime datoteke: %s"
 
-#: ../src/balsa-mime-widget.c:254
+#: ../src/balsa-mime-widget.c:255
 #, c-format
 msgid "Error reading message part: %s"
 msgstr "Napaka med branjem dela sporočila: %s"
 
-#: ../src/balsa-mime-widget.c:278
+#: ../src/balsa-mime-widget.c:279
 #, c-format
 msgid "Type: %s (%s)"
 msgstr "Vrsta: %s (%s)"
 
-#: ../src/balsa-mime-widget.c:282
+#: ../src/balsa-mime-widget.c:283
 #, c-format
 msgid "Content Type: %s"
 msgstr "Vrsta vsebine: %s"
 
-#: ../src/balsa-mime-widget.c:295
+#: ../src/balsa-mime-widget.c:296
 msgid "No open or view action defined for this content type"
 msgstr "Za to vrsto vsebine ni določeno dejanje odpiranja ali ogleda"
 
-#: ../src/balsa-mime-widget.c:300
+#: ../src/balsa-mime-widget.c:301
 msgid "S_ave part"
 msgstr "_Shrani del"
 
@@ -3053,124 +3053,128 @@ msgstr "_Zaženi GnuPG za preverjanje, če obstaja posodobitev tega ključa"
 msgid "Error loading attached image: %s\n"
 msgstr "Napaka med nalaganjem priložene slike: %s\n"
 
-#: ../src/balsa-mime-widget-message.c:159
-#: ../src/balsa-mime-widget-message.c:171
-#: ../src/balsa-mime-widget-message.c:199
-#: ../src/balsa-mime-widget-message.c:252
+#: ../src/balsa-mime-widget-message.c:140 ../src/balsa-print-object.c:113
+msgid "message headers"
+msgstr "glave sporočil"
+
+#: ../src/balsa-mime-widget-message.c:170
+#: ../src/balsa-mime-widget-message.c:182
+#: ../src/balsa-mime-widget-message.c:210
+#: ../src/balsa-mime-widget-message.c:263
 msgid "Content Type: external-body\n"
 msgstr "Vrsta vsebine: zunanje-telo\n"
 
-#: ../src/balsa-mime-widget-message.c:160
+#: ../src/balsa-mime-widget-message.c:171
 #, c-format
 msgid "Access type: local-file\n"
 msgstr "Vrsta dostopa: krajevna-datoteka\n"
 
-#: ../src/balsa-mime-widget-message.c:172
+#: ../src/balsa-mime-widget-message.c:183
 #, c-format
 msgid "Access type: URL\n"
 msgstr "Vrsta dostopa: URL\n"
 
-#: ../src/balsa-mime-widget-message.c:173
+#: ../src/balsa-mime-widget-message.c:184
 #, c-format
 msgid "URL: %s"
 msgstr "URL: %s"
 
-#: ../src/balsa-mime-widget-message.c:200
+#: ../src/balsa-mime-widget-message.c:211
 #, c-format
 msgid "Access type: %s\n"
 msgstr "Vrsta dostopa: %s\n"
 
-#: ../src/balsa-mime-widget-message.c:204
+#: ../src/balsa-mime-widget-message.c:215
 #, c-format
 msgid "FTP site: %s\n"
 msgstr "Stran FTP: %s\n"
 
-#: ../src/balsa-mime-widget-message.c:206
+#: ../src/balsa-mime-widget-message.c:217
 #, c-format
 msgid "Directory: %s\n"
 msgstr "Mapa: %s\n"
 
-#: ../src/balsa-mime-widget-message.c:253
+#: ../src/balsa-mime-widget-message.c:264
 msgid "Access type: mail-server\n"
 msgstr "Vrsta dostopa: poštni-strežnik\n"
 
-#: ../src/balsa-mime-widget-message.c:254
+#: ../src/balsa-mime-widget-message.c:265
 #, c-format
 msgid "Mail server: %s\n"
 msgstr "Poštni strežnik: %s\n"
 
-#: ../src/balsa-mime-widget-message.c:256
+#: ../src/balsa-mime-widget-message.c:267
 #, c-format
 msgid "Subject: %s\n"
 msgstr "Zadeva: %s\n"
 
-#: ../src/balsa-mime-widget-message.c:273
+#: ../src/balsa-mime-widget-message.c:284
 msgid "Se_nd message to obtain this part"
 msgstr "Pošlji _sporočilo za pridobitev tega dela"
 
-#: ../src/balsa-mime-widget-message.c:294 ../src/balsa-mime-widget-text.c:809
+#: ../src/balsa-mime-widget-message.c:305 ../src/balsa-mime-widget-text.c:809
 #: ../src/sendmsg-window.c:1834
 #, c-format
 msgid "Error showing %s: %s\n"
 msgstr "Napaka med prikazovanjem %s: %s\n"
 
-#: ../src/balsa-mime-widget-message.c:329
+#: ../src/balsa-mime-widget-message.c:340
 #, c-format
 msgid "Could not get a part: %s"
 msgstr "Ni mogoče dobiti dela: %s"
 
-#: ../src/balsa-mime-widget-message.c:361
+#: ../src/balsa-mime-widget-message.c:372
 #, c-format
 msgid "Sending the external body request failed: %s"
 msgstr "Pošiljanje zahteve zunanjega telesa je spodletelo: %s"
 
-#: ../src/balsa-mime-widget-message.c:448
+#: ../src/balsa-mime-widget-message.c:459
 msgid "Reply..."
 msgstr "Odgovori ..."
 
-#: ../src/balsa-mime-widget-message.c:553
+#: ../src/balsa-mime-widget-message.c:564
 msgid "... [truncated]"
 msgstr "... [skrajšano]"
 
 #. Gmail sometimes fails to do that.
-#: ../src/balsa-mime-widget-message.c:703
+#: ../src/balsa-mime-widget-message.c:716
 msgid "Error:"
 msgstr "Napaka:"
 
-#: ../src/balsa-mime-widget-message.c:704
+#: ../src/balsa-mime-widget-message.c:717
 msgid "IMAP server did not report message structure"
 msgstr "Strežnik IMAP ni poročal o zgradbi sporočila"
 
-#: ../src/balsa-mime-widget-message.c:716
-#: ../src/balsa-print-object-header.c:153 ../src/sendmsg-window.c:1152
+#: ../src/balsa-mime-widget-message.c:730
+#: ../src/balsa-print-object-header.c:156 ../src/sendmsg-window.c:1152
 #: ../src/sendmsg-window.c:1154 ../src/sendmsg-window.c:1244
 #: ../src/sendmsg-window.c:3849 ../src/sendmsg-window.c:5776
 msgid "Subject:"
 msgstr "Zadeva:"
 
-#: ../src/balsa-mime-widget-message.c:720
-#: ../src/balsa-print-object-header.c:161 ../src/sendmsg-window.c:3845
+#: ../src/balsa-mime-widget-message.c:734
+#: ../src/balsa-print-object-header.c:164 ../src/sendmsg-window.c:3845
 msgid "Date:"
 msgstr "Datum:"
 
 #. addresses
-#: ../src/balsa-mime-widget-message.c:726
-#: ../src/balsa-print-object-header.c:166 ../src/sendmsg-window.c:3856
+#: ../src/balsa-mime-widget-message.c:740
+#: ../src/balsa-print-object-header.c:169 ../src/sendmsg-window.c:3856
 #: ../src/store-address.c:338
 msgid "From:"
 msgstr "Od:"
 
-#: ../src/balsa-mime-widget-message.c:733
+#: ../src/balsa-mime-widget-message.c:747
 msgid "Reply-To:"
 msgstr "Odgovor-za:"
 
-#: ../src/balsa-mime-widget-message.c:742
-#: ../src/balsa-print-object-header.c:174
+#: ../src/balsa-mime-widget-message.c:756
+#: ../src/balsa-print-object-header.c:177
 msgid "Fcc:"
 msgstr "MKp:"
 
-#: ../src/balsa-mime-widget-message.c:749
-#: ../src/balsa-print-object-header.c:177
+#: ../src/balsa-mime-widget-message.c:763
+#: ../src/balsa-print-object-header.c:180
 msgid "Disposition-Notification-To:"
 msgstr "Obvestilo-o-prejetju-na:"
 

@@ -408,7 +408,7 @@ libbalsa_identity_set_smtp_server(LibBalsaIdentity * ident,
 /* Used by both dialogs: */
 
 /* Widget padding: */
-static const guint padding = 12;
+static const guint padding = 6;
 
 /* Forward references: */
 static void identity_list_update_real(GtkTreeView * tree,
@@ -483,9 +483,10 @@ libbalsa_identity_select_dialog(GtkWindow * parent,
     sdi->idle_handler_id = 0;
     sdi->dialog = dialog =
         gtk_dialog_new_with_buttons(prompt, parent,
-                                    GTK_DIALOG_DESTROY_WITH_PARENT,
-                                     _("_Cancel"), GTK_RESPONSE_CANCEL,
-                                     _("_OK"),     GTK_RESPONSE_OK,
+                                    GTK_DIALOG_DESTROY_WITH_PARENT |
+                                    GTK_DIALOG_USE_HEADER_BAR,
+                                    _("_Cancel"), GTK_RESPONSE_CANCEL,
+                                    _("_OK"),     GTK_RESPONSE_OK,
                                     NULL);
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu_for_parent(dialog, parent);
@@ -859,7 +860,7 @@ get_selected_identity(GtkTreeView * tree)
 
 enum {
     IDENTITY_RESPONSE_HELP = GTK_RESPONSE_HELP,
-    IDENTITY_RESPONSE_CLOSE,
+    IDENTITY_RESPONSE_CLOSE = GTK_RESPONSE_CANCEL,
     IDENTITY_RESPONSE_NEW,
     IDENTITY_RESPONSE_REMOVE
 };
@@ -914,11 +915,10 @@ new_ident_cb(GtkTreeView * tree, GObject * dialog)
 
 
 /*
- * Helper: append a notebook page containing a table with the requested
- * number of rows
+ * Helper: append a notebook page containing a table
  */
 static GtkWidget*
-append_ident_notebook_page(GtkNotebook *notebook, guint rows,
+append_ident_notebook_page(GtkNotebook *notebook,
 			   const gchar * tab_label,
                            const gchar * footnote)
 {
@@ -988,7 +988,7 @@ setup_ident_frame(GtkDialog * dialog, gboolean createp, gpointer tree)
     gchar *footnote;
 
     /* create the "General" tab */
-    grid = append_ident_notebook_page(notebook, 5, _("General"), NULL);
+    grid = append_ident_notebook_page(notebook, _("General"), NULL);
     row = 0;
     ident_dialog_add_entry(grid, row++, dialog, _("_Identity name:"),
 		           "identity-name");
@@ -1002,7 +1002,7 @@ setup_ident_frame(GtkDialog * dialog, gboolean createp, gpointer tree)
                            "identity-domain");
 
     /* create the "Messages" tab */
-    grid = append_ident_notebook_page(notebook, 9, _("Messages"), NULL);
+    grid = append_ident_notebook_page(notebook, _("Messages"), NULL);
     row = 0;
     ident_dialog_add_entry(grid, row++, dialog, _("_Bcc:"),
                            "identity-bcc");
@@ -1033,7 +1033,7 @@ setup_ident_frame(GtkDialog * dialog, gboolean createp, gpointer tree)
 #endif /* ENABLE_ESMTP */
 
     /* create the "Signature" tab */
-    grid = append_ident_notebook_page(notebook, 7, _("Signature"), NULL);
+    grid = append_ident_notebook_page(notebook, _("Signature"), NULL);
     row = 0;
     ident_dialog_add_check_and_entry(grid, row++, dialog,
                                      _("Signature _path"),
@@ -1065,7 +1065,7 @@ setup_ident_frame(GtkDialog * dialog, gboolean createp, gpointer tree)
 #endif
     /* create the "Security" tab */
     grid =
-        append_ident_notebook_page(notebook, 5, _("Security"), footnote);
+        append_ident_notebook_page(notebook, _("Security"), footnote);
     row = 0;
     ident_dialog_add_checkbutton(grid, row++, dialog,
                                  _("sign messages by default"),
@@ -1083,7 +1083,7 @@ setup_ident_frame(GtkDialog * dialog, gboolean createp, gpointer tree)
                                  _("remind me if messages can be encrypted"),
                                  "identity-warn-send-plain", TRUE);
     ident_dialog_add_entry(grid, row++, dialog,
-                           _("use secret key with this id for signing "
+                           _("use secret key with this id for signing\n"
                              "(leave empty for automatic selection)"),
                            "identity-keyid");
 #ifndef HAVE_GPGME
@@ -1638,7 +1638,8 @@ delete_ident_cb(GtkTreeView * tree, GtkWidget * dialog)
     default_id = g_object_get_data(G_OBJECT(tree), "default-id");
     g_return_if_fail(ident != *default_id);
     confirm = gtk_message_dialog_new(GTK_WINDOW(dialog),
-                                     GTK_DIALOG_DESTROY_WITH_PARENT,
+                                     GTK_DIALOG_DESTROY_WITH_PARENT |
+                                     GTK_DIALOG_USE_HEADER_BAR,
                                      GTK_MESSAGE_QUESTION,
                                      GTK_BUTTONS_OK_CANCEL,
                                      _("Do you really want to delete"
@@ -1728,7 +1729,8 @@ libbalsa_identity_config_dialog(GtkWindow *parent, GList **identities,
     dialog =
         gtk_dialog_new_with_buttons(_("Manage Identities"),
                                     parent, /* must NOT be modal */
-                                    GTK_DIALOG_DESTROY_WITH_PARENT,
+                                    GTK_DIALOG_DESTROY_WITH_PARENT |
+                                    GTK_DIALOG_USE_HEADER_BAR,
                                     _("_Help"),   IDENTITY_RESPONSE_HELP,
                                     _("_New"),    IDENTITY_RESPONSE_NEW,
                                     _("_Remove"), IDENTITY_RESPONSE_REMOVE,

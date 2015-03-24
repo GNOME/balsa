@@ -1,3 +1,13 @@
+2015-03-24  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Use header bars in identity dialogs
+
+	* libbalsa/identity.c (libbalsa_identity_select_dialog),
+	(delete_ident_cb), (libbalsa_identity_config_dialog): use header
+	bars.
+	(append_ident_notebook_page), (setup_ident_frame): remove
+	redundant argument.
+
 2015-03-23  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Set minimum vertical space for recipient list

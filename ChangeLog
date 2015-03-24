@@ -1,5 +1,13 @@
 2015-03-24  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Use header bars
+
+	* libbalsa/libbalsa-gpgme-cb.c (lb_gpgme_select_key),
+	(lb_gpgme_accept_low_trust_key), (get_passphrase_real): use
+	header bars in dialogs.
+
+2015-03-24  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Use GtkDialog API and GTK_DIALOG_* flags instead of g_object_new
 	and GObject properties
 

@@ -1153,6 +1153,7 @@ libbalsa_create_grid_entry(GtkWidget * grid, GCallback changed_func,
     GtkWidget *entry;
 
     entry = gtk_entry_new();
+    gtk_widget_set_hexpand(entry, TRUE);
 
     gtk_grid_attach(GTK_GRID(grid), entry, 1, row, 1, 1);
 

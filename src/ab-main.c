@@ -1005,7 +1005,8 @@ ab_warning(const char *fmt, ...)
     msg =  g_strdup_vprintf(fmt, va_args);
     va_end(va_args);
     d = gtk_message_dialog_new(contacts_app.window,
-                               GTK_DIALOG_DESTROY_WITH_PARENT,
+                               GTK_DIALOG_DESTROY_WITH_PARENT |
+                               GTK_DIALOG_USE_HEADER_BAR,
                                GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE,
                                "%s", msg);
     gtk_dialog_run(GTK_DIALOG(d));

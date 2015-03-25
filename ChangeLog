@@ -1,5 +1,11 @@
 2015-03-25  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	* src/mailbox-conf.c (create_local_mailbox_dialog): use
+	GTK_RESPONSE_CANCEL instead of CLOSE;
+	(create_generic_dialog): use header bar.
+
+2015-03-25  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* src/information-dialog.c (balsa_information_dialog),
 	(balsa_information_list): use header bars in dialogs.
 

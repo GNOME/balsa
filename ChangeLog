@@ -1,5 +1,11 @@
 2015-03-25  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	* src/sendmsg-window.c (sw_get_user_codeset),
+	(quote_parts_select_dlg), (bsmsg_check_format_compatibility):
+	use header bars in dialogs.
+
+2015-03-25  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* src/pref-manager.c (open_preferences_manager): use a header
 	bar.
 

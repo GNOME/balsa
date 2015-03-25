@@ -1550,7 +1550,8 @@ sw_get_user_codeset(BalsaSendmsg * bsmsg, gboolean * change_type,
     GtkWidget *dialog =
         gtk_dialog_new_with_buttons(_("Choose charset"),
                                     GTK_WINDOW(bsmsg->window),
-                                    GTK_DIALOG_DESTROY_WITH_PARENT,
+                                    GTK_DIALOG_DESTROY_WITH_PARENT |
+                                    GTK_DIALOG_USE_HEADER_BAR,
                                     _("_OK"), GTK_RESPONSE_OK,
                                     _("_Cancel"), GTK_RESPONSE_CANCEL,
                                     NULL);
@@ -3375,7 +3376,8 @@ quote_parts_select_dlg(GtkTreeStore *tree_store, GtkWindow * parent)
 
     dialog = gtk_dialog_new_with_buttons(_("Select parts for quotation"),
 					 parent,
-					 GTK_DIALOG_DESTROY_WITH_PARENT,
+					 GTK_DIALOG_DESTROY_WITH_PARENT |
+                                         GTK_DIALOG_USE_HEADER_BAR,
 					 _("_OK"), GTK_RESPONSE_OK,
 					 NULL);
 #if HAVE_MACOSX_DESKTOP
@@ -6587,7 +6589,8 @@ bsmsg_check_format_compatibility(GtkWindow *parent, const gchar *filename)
     /* time to ask the user for his/her opinion */
     dialog = (GtkDialog*)gtk_dialog_new_with_buttons
         ("Compatibility check", parent,
-         GTK_DIALOG_MODAL| GTK_DIALOG_DESTROY_WITH_PARENT,
+         GTK_DIALOG_MODAL| GTK_DIALOG_DESTROY_WITH_PARENT |
+         GTK_DIALOG_USE_HEADER_BAR,
          "_Cancel",                          GTK_RESPONSE_CANCEL,
          "_Attach it in the current format", GTK_RESPONSE_OK, NULL);
 #if HAVE_MACOSX_DESKTOP

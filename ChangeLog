@@ -1,5 +1,12 @@
 2015-03-24  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Use header bar
+
+	* libbalsa/rfc3156.c (check_gpg_child): use a header bar in
+	dialog.
+
+2015-03-24  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Use header bars
 
 	* libbalsa/libbalsa-gpgme-cb.c (lb_gpgme_select_key),

@@ -1638,8 +1638,7 @@ delete_ident_cb(GtkTreeView * tree, GtkWidget * dialog)
     default_id = g_object_get_data(G_OBJECT(tree), "default-id");
     g_return_if_fail(ident != *default_id);
     confirm = gtk_message_dialog_new(GTK_WINDOW(dialog),
-                                     GTK_DIALOG_DESTROY_WITH_PARENT |
-                                     GTK_DIALOG_USE_HEADER_BAR,
+                                     GTK_DIALOG_DESTROY_WITH_PARENT,
                                      GTK_MESSAGE_QUESTION,
                                      GTK_BUTTONS_OK_CANCEL,
                                      _("Do you really want to delete"

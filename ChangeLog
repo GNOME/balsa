@@ -1,5 +1,20 @@
 2015-03-25  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Do not use header bar in GtkMessageDialog, it does nothing
+
+	* libbalsa/identity.c (delete_ident_cb):
+	* libbalsa/libbalsa-gpgme-cb.c (lb_gpgme_accept_low_trust_key):
+	* libbalsa/libbalsa.c (ask_timeout_real):
+	* libbalsa/rfc3156.c (check_gpg_child):
+	* src/ab-main.c (ab_warning):
+	* src/balsa-message.c:
+	* src/balsa-mime-widget-callbacks.c
+	(balsa_mime_widget_ctx_menu_save):
+	* src/folder-conf.c (folder_conf_delete):
+	* src/information-dialog.c (balsa_information_dialog):
+
+2015-03-25  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* src/sendmsg-window.c (sw_get_user_codeset),
 	(quote_parts_select_dlg), (bsmsg_check_format_compatibility):
 	use header bars in dialogs.

@@ -312,8 +312,7 @@ lb_gpgme_accept_low_trust_key(const gchar * user_name,
 							       validity));
     dialog =
 	gtk_message_dialog_new_with_markup(parent,
-					   GTK_DIALOG_DESTROY_WITH_PARENT |
-                                           GTK_DIALOG_USE_HEADER_BAR,
+					   GTK_DIALOG_DESTROY_WITH_PARENT,
 					   GTK_MESSAGE_WARNING,
 					   GTK_BUTTONS_YES_NO,
 					   "<b>%s</b>\n\n%s\n%s", message1,

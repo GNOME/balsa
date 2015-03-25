@@ -1007,8 +1007,7 @@ folder_conf_delete(BalsaMailboxNode* mbnode)
 	return;
     }
 	
-    ask = gtk_message_dialog_new(GTK_WINDOW(balsa_app.main_window),
-                                 GTK_DIALOG_USE_HEADER_BAR,
+    ask = gtk_message_dialog_new(GTK_WINDOW(balsa_app.main_window), 0,
                                  GTK_MESSAGE_QUESTION,
                                  GTK_BUTTONS_OK_CANCEL,
                                  _("This will remove the folder "

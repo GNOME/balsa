@@ -996,8 +996,7 @@ check_gpg_child(gpointer data)
     if (WEXITSTATUS(status) > 0)
 	dialog =
 	    gtk_message_dialog_new(spawned_gpg->parent,
-				   GTK_DIALOG_DESTROY_WITH_PARENT |
-                                   GTK_DIALOG_USE_HEADER_BAR,
+				   GTK_DIALOG_DESTROY_WITH_PARENT,
 				   GTK_MESSAGE_WARNING, GTK_BUTTONS_CLOSE,
 				   _
 				   ("Running %s failed with return value %d:\n%s"),
@@ -1005,8 +1004,7 @@ check_gpg_child(gpointer data)
     else
 	dialog =
 	    gtk_message_dialog_new(spawned_gpg->parent,
-				   GTK_DIALOG_DESTROY_WITH_PARENT |
-                                   GTK_DIALOG_USE_HEADER_BAR,
+				   GTK_DIALOG_DESTROY_WITH_PARENT,
 				   GTK_MESSAGE_INFO, GTK_BUTTONS_CLOSE,
 				   _("Running %s successful:\n%s"),
 				   GPG_PATH, gpg_message);

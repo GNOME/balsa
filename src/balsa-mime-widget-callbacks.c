@@ -137,8 +137,7 @@ balsa_mime_widget_ctx_menu_save(GtkWidget * parent_widget,
 
 	/* File exists. check if they really want to overwrite */
 	confirm = gtk_message_dialog_new(GTK_WINDOW(balsa_app.main_window),
-					 GTK_DIALOG_MODAL |
-                                         GTK_DIALOG_USE_HEADER_BAR,
+					 GTK_DIALOG_MODAL,
 					 GTK_MESSAGE_QUESTION,
 					 GTK_BUTTONS_YES_NO,
 					 _("File already exists. Overwrite?"));

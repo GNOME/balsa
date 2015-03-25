@@ -633,8 +633,7 @@ ask_timeout_real(void *data)
     int i;
 
     dialog = gtk_message_dialog_new(NULL, /* FIXME: NULL parent */
-                                    GTK_DIALOG_MODAL |
-                                    GTK_DIALOG_USE_HEADER_BAR,
+                                    GTK_DIALOG_MODAL,
                                     GTK_MESSAGE_INFO,
                                     GTK_BUTTONS_YES_NO,
                                     _("Connection to %s timed out. Abort?"),

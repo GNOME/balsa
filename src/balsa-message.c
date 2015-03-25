@@ -2620,7 +2620,8 @@ create_mdn_dialog(GtkWindow *parent, gchar * sender, gchar * mdn_to_address,
 
     mdn_dialog =
         gtk_message_dialog_new(parent,
-                               GTK_DIALOG_DESTROY_WITH_PARENT,
+                               GTK_DIALOG_DESTROY_WITH_PARENT |
+                               GTK_DIALOG_USE_HEADER_BAR,
                                GTK_MESSAGE_QUESTION,
                                GTK_BUTTONS_YES_NO,
                                _("The sender of this mail, %s, "

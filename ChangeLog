@@ -1,5 +1,10 @@
 2015-03-24  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	* src/ab-window.c (balsa_ab_window_new): drop redundant dynamic
+	casts to GtkWidget
+
+2015-03-24  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Use header bar
 
 	* src/ab-window.c (balsa_ab_window_new): use header bar in

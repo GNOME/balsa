@@ -130,16 +130,16 @@ balsa_ab_window_new(gboolean composing, GtkWindow* parent)
                                _("_OK"),     GTK_RESPONSE_OK,
                                _("_Cancel"), GTK_RESPONSE_CANCEL,
                                NULL);
-	gtk_widget_show(GTK_WIDGET(BALSA_AB_WINDOW(ret)->send_to_label));
-	gtk_widget_show(GTK_WIDGET(BALSA_AB_WINDOW(ret)->send_to_list));
-	gtk_widget_show(GTK_WIDGET(BALSA_AB_WINDOW(ret)->arrow_box));
+	gtk_widget_show(BALSA_AB_WINDOW(ret)->send_to_label);
+	gtk_widget_show(BALSA_AB_WINDOW(ret)->send_to_list);
+	gtk_widget_show(BALSA_AB_WINDOW(ret)->arrow_box);
     } else {
 	gtk_dialog_add_buttons(GTK_DIALOG(ret),
                                _("_Close"), GTK_RESPONSE_CLOSE,
                                NULL);
-	gtk_widget_hide(GTK_WIDGET(BALSA_AB_WINDOW(ret)->send_to_label));
-	gtk_widget_hide(GTK_WIDGET(BALSA_AB_WINDOW(ret)->send_to_list));
-	gtk_widget_hide(GTK_WIDGET(BALSA_AB_WINDOW(ret)->arrow_box));
+	gtk_widget_hide(BALSA_AB_WINDOW(ret)->send_to_label);
+	gtk_widget_hide(BALSA_AB_WINDOW(ret)->send_to_list);
+	gtk_widget_hide(BALSA_AB_WINDOW(ret)->arrow_box);
     }
 
     return ret;

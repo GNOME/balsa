@@ -1,5 +1,10 @@
 2015-03-25  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	* src/information-dialog.c (balsa_information_dialog),
+	(balsa_information_list): use header bars in dialogs.
+
+2015-03-25  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* src/folder-conf.c (folder_conf_imap_node), (browse_button_cb),
 	(subfolder_conf_clicked_ok), (folder_conf_imap_sub_node),
 	(folder_conf_delete): use header bars in dialogs.

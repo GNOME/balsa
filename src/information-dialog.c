@@ -182,7 +182,8 @@ balsa_information_dialog(GtkWindow *parent, LibBalsaInformationType type,
      * the message string. */
     messagebox =
         gtk_message_dialog_new(GTK_WINDOW(parent),
-                               GTK_DIALOG_DESTROY_WITH_PARENT,
+                               GTK_DIALOG_DESTROY_WITH_PARENT |
+                               GTK_DIALOG_USE_HEADER_BAR,
                                message_type, GTK_BUTTONS_CLOSE,
                                "%s", msg);
 #if HAVE_MACOSX_DESKTOP
@@ -232,7 +233,8 @@ balsa_information_list(GtkWindow *parent, LibBalsaInformationType type,
 	information_dialog =
 	    gtk_dialog_new_with_buttons(_("Information - Balsa"), 
                                         parent,
-                                        GTK_DIALOG_DESTROY_WITH_PARENT,
+                                        GTK_DIALOG_DESTROY_WITH_PARENT |
+                                        GTK_DIALOG_USE_HEADER_BAR,
                                         _("_Clear"), GTK_RESPONSE_APPLY,
                                         _("Cl_ose"), GTK_RESPONSE_CLOSE,
                                         NULL);

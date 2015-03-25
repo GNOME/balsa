@@ -2,6 +2,13 @@
 
 	Use header bar
 
+	* src/balsa-index.c (balsa_index_pipe): use header bar in
+	dialog.
+
+2015-03-24  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Use header bar
+
 	* src/balsa-app.c (ask_password_real): use header bar in dialog.
 
 2015-03-24  Peter Bloomfield  <pbloomfield@bellsouth.net>

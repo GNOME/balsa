@@ -2641,7 +2641,8 @@ balsa_index_pipe(BalsaIndex * index)
     info->dialog = dialog =
         gtk_dialog_new_with_buttons(_("Pipe message through a program"),
                                     GTK_WINDOW(balsa_app.main_window),
-                                    GTK_DIALOG_DESTROY_WITH_PARENT,
+                                    GTK_DIALOG_DESTROY_WITH_PARENT |
+                                    GTK_DIALOG_USE_HEADER_BAR,
                                     _("_Run"), GTK_RESPONSE_OK,
                                     _("_Cancel"), GTK_RESPONSE_CANCEL,
                                     NULL);

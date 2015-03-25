@@ -3334,7 +3334,8 @@ ensure_check_mail_dialog(BalsaWindow * window)
     progress_dialog =
 	gtk_dialog_new_with_buttons(_("Checking Mail..."),
                                     GTK_WINDOW(window),
-                                    GTK_DIALOG_DESTROY_WITH_PARENT,
+                                    GTK_DIALOG_DESTROY_WITH_PARENT |
+                                    GTK_DIALOG_USE_HEADER_BAR,
                                     _("_Hide"), GTK_RESPONSE_CLOSE,
                                     NULL);
 #if HAVE_MACOSX_DESKTOP
@@ -4064,9 +4065,10 @@ bw_find_real(BalsaWindow * window, BalsaIndex * bindex, gboolean again)
 	GtkWidget* vbox, *dia =
             gtk_dialog_new_with_buttons(_("Search mailbox"),
                                         GTK_WINDOW(window),
-                                        GTK_DIALOG_DESTROY_WITH_PARENT,
+                                        GTK_DIALOG_DESTROY_WITH_PARENT |
+                                        GTK_DIALOG_USE_HEADER_BAR,
 					_("_Help"),   GTK_RESPONSE_HELP,
-                                        _("_Cancel"), GTK_RESPONSE_CANCEL,
+                                        _("_Close"), GTK_RESPONSE_CLOSE,
                                         NULL);
 	GtkWidget *reverse_button, *wrap_button;
 	GtkWidget *search_entry, *w, *page, *grid;

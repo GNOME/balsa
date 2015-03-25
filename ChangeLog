@@ -1,5 +1,10 @@
 2015-03-25  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	* src/main-window.c (ensure_check_mail_dialog), (bw_find_real):
+	use header bars in dialogs.
+
+2015-03-25  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* src/mailbox-conf.c (create_local_mailbox_dialog): use
 	GTK_RESPONSE_CANCEL instead of CLOSE;
 	(create_generic_dialog): use header bar.

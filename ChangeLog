@@ -1,5 +1,12 @@
 2015-03-24  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Use header bar
+
+	* src/address-book-config.c (create_generic_dialog): use header
+	bar in all dialogs.
+
+2015-03-24  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* src/ab-window.c (balsa_ab_window_new): avoid multiple dynamic
 	casts.
 

@@ -302,7 +302,8 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
         GTK_DIALOG(gtk_dialog_new_with_buttons
                    (_("Remote IMAP folder"),
                     GTK_WINDOW(balsa_app.main_window),
-                    GTK_DIALOG_DESTROY_WITH_PARENT,
+                    GTK_DIALOG_DESTROY_WITH_PARENT |
+                    GTK_DIALOG_USE_HEADER_BAR,
                     mn ? _("_Update") : _("C_reate"), GTK_RESPONSE_OK,
                     _("_Cancel"), GTK_RESPONSE_CANCEL,
                     _("_Help"), GTK_RESPONSE_HELP,
@@ -567,7 +568,8 @@ browse_button_cb(GtkWidget * widget, SubfolderDialogData * sdd)
     dialog =
         gtk_dialog_new_with_buttons(_("Select parent folder"),
                                     GTK_WINDOW(sdd->dialog),
-                                    GTK_DIALOG_DESTROY_WITH_PARENT,
+                                    GTK_DIALOG_DESTROY_WITH_PARENT |
+                                    GTK_DIALOG_USE_HEADER_BAR,
                                     _("_Cancel"), GTK_RESPONSE_CANCEL,
                                     _("_Help"), GTK_RESPONSE_HELP,
                                     NULL);
@@ -649,16 +651,16 @@ subfolder_conf_clicked_ok(SubfolderDialogData * sdd)
                                      "INBOX and its subfolders will remain.\n"
                                      "What would you like to do?"),
 folder, parent);
-                GtkWidget *ask = gtk_dialog_new_with_buttons(_("Question"),
-                                                             GTK_WINDOW
-                                                             (sdd->dialog),
-                                                             GTK_DIALOG_MODAL,
-                                                             _
-                                                             ("Rename INBOX"),
-                                                             GTK_RESPONSE_OK,
-                                                             _("Cancel"),
-                                                             GTK_RESPONSE_CANCEL,
-                                                             NULL);
+                GtkWidget *ask =
+                    gtk_dialog_new_with_buttons(_("Question"),
+                                                GTK_WINDOW(sdd->dialog),
+                                                GTK_DIALOG_MODAL |
+                                                GTK_DIALOG_USE_HEADER_BAR,
+                                                _("Rename INBOX"),
+                                                GTK_RESPONSE_OK,
+                                                _("Cancel"),
+                                                GTK_RESPONSE_CANCEL,
+                                                NULL);
 #if HAVE_MACOSX_DESKTOP
 		libbalsa_macosx_menu_for_parent(ask, GTK_WINDOW(sdd->dialog));
 #endif
@@ -798,7 +800,8 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
         GTK_DIALOG(gtk_dialog_new_with_buttons
                    (_("Remote IMAP subfolder"), 
                     GTK_WINDOW(balsa_app.main_window),
-                    GTK_DIALOG_DESTROY_WITH_PARENT, /* must NOT be modal */
+                    GTK_DIALOG_DESTROY_WITH_PARENT | /* must NOT be modal */
+                    GTK_DIALOG_USE_HEADER_BAR,
                     mn ? _("_Update") : _("_Create"), GTK_RESPONSE_OK,
                     _("_Cancel"), GTK_RESPONSE_CANCEL,
                     _("_Help"), GTK_RESPONSE_HELP,
@@ -1004,7 +1007,8 @@ folder_conf_delete(BalsaMailboxNode* mbnode)
 	return;
     }
 	
-    ask = gtk_message_dialog_new(GTK_WINDOW(balsa_app.main_window), 0,
+    ask = gtk_message_dialog_new(GTK_WINDOW(balsa_app.main_window),
+                                 GTK_DIALOG_USE_HEADER_BAR,
                                  GTK_MESSAGE_QUESTION,
                                  GTK_BUTTONS_OK_CANCEL,
                                  _("This will remove the folder "

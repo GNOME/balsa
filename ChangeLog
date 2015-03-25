@@ -2,6 +2,13 @@
 
 	Use header bar
 
+	* libbalsa/smtp-server.c (libbalsa_smtp_server_dialog): use a
+	header bar in dialog.
+
+2015-03-24  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Use header bar
+
 	* libbalsa/send.c (ensure_send_progress_dialog): use a header
 	bar in dialog.
 

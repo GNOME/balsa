@@ -539,7 +539,8 @@ libbalsa_smtp_server_dialog(LibBalsaSmtpServer * smtp_server,
     sdi->dialog = dialog =
         gtk_dialog_new_with_buttons(_("SMTP Server"),
                                     parent,
-                                    GTK_DIALOG_DESTROY_WITH_PARENT,
+                                    GTK_DIALOG_DESTROY_WITH_PARENT |
+                                    GTK_DIALOG_USE_HEADER_BAR,
                                     _("_OK"),     GTK_RESPONSE_OK,
                                     _("_Cancel"), GTK_RESPONSE_CANCEL,
                                     _("_Help"),   GTK_RESPONSE_HELP,

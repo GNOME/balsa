@@ -116,30 +116,32 @@ GtkWidget *
 balsa_ab_window_new(gboolean composing, GtkWindow* parent)
 {
     GtkWidget *ret;
+    BalsaAbWindow *ab;
 
     ret = g_object_new(BALSA_TYPE_AB_WINDOW,
                        "use-header-bar", TRUE,
                        "transient-for", parent,
                        NULL);
-    g_return_val_if_fail(ret, NULL);
+    g_return_val_if_fail(ret != NULL, NULL);
+    ab = (BalsaAbWindow *) ret;
 
-    BALSA_AB_WINDOW(ret)->composing = composing;
+    ab->composing = composing;
 
     if ( composing ) {
 	gtk_dialog_add_buttons(GTK_DIALOG(ret),
                                _("_OK"),     GTK_RESPONSE_OK,
                                _("_Cancel"), GTK_RESPONSE_CANCEL,
                                NULL);
-	gtk_widget_show(BALSA_AB_WINDOW(ret)->send_to_label);
-	gtk_widget_show(BALSA_AB_WINDOW(ret)->send_to_list);
-	gtk_widget_show(BALSA_AB_WINDOW(ret)->arrow_box);
+	gtk_widget_show(ab->send_to_label);
+	gtk_widget_show(ab->send_to_list);
+	gtk_widget_show(ab->arrow_box);
     } else {
 	gtk_dialog_add_buttons(GTK_DIALOG(ret),
                                _("_Close"), GTK_RESPONSE_CLOSE,
                                NULL);
-	gtk_widget_hide(BALSA_AB_WINDOW(ret)->send_to_label);
-	gtk_widget_hide(BALSA_AB_WINDOW(ret)->send_to_list);
-	gtk_widget_hide(BALSA_AB_WINDOW(ret)->arrow_box);
+	gtk_widget_hide(ab->send_to_label);
+	gtk_widget_hide(ab->send_to_list);
+	gtk_widget_hide(ab->arrow_box);
     }
 
     return ret;

@@ -2,6 +2,13 @@
 
 	Use header bar
 
+	* src/balsa-mime-widget-callbacks.c
+	(balsa_mime_widget_ctx_menu_save): use header bar in dialog.
+
+2015-03-24  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Use header bar
+
 	* src/balsa-message.c: use header bar in dialog.
 
 2015-03-24  Peter Bloomfield  <pbloomfield@bellsouth.net>

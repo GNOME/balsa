@@ -117,7 +117,10 @@ balsa_ab_window_new(gboolean composing, GtkWindow* parent)
 {
     GtkWidget *ret;
 
-    ret = g_object_new(BALSA_TYPE_AB_WINDOW, NULL);
+    ret = g_object_new(BALSA_TYPE_AB_WINDOW,
+                       "use-header-bar", TRUE,
+                       "transient-for", parent,
+                       NULL);
     g_return_val_if_fail(ret, NULL);
 
     BALSA_AB_WINDOW(ret)->composing = composing;
@@ -138,9 +141,8 @@ balsa_ab_window_new(gboolean composing, GtkWindow* parent)
 	gtk_widget_hide(GTK_WIDGET(BALSA_AB_WINDOW(ret)->send_to_list));
 	gtk_widget_hide(GTK_WIDGET(BALSA_AB_WINDOW(ret)->arrow_box));
     }
-    if(parent) gtk_window_set_transient_for(GTK_WINDOW(ret), parent);
-    return ret;
 
+    return ret;
 }
 
 static GtkWidget *

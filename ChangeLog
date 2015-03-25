@@ -2,6 +2,13 @@
 
 	Use header bar
 
+	* src/ab-window.c (balsa_ab_window_new): use header bar in
+	dialog.
+
+2015-03-24  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Use header bar
+
 	* src/ab-main.c (ab_warning): use header bar in dialog.
 
 2015-03-24  Peter Bloomfield  <pbloomfield@bellsouth.net>

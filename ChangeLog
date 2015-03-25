@@ -1,3 +1,8 @@
+2015-03-25  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* src/filter-edit-callbacks.c (fe_edit_condition): use header
+	bar in dialog.
+
 2015-03-24  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Use header bar

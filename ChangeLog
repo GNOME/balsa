@@ -1,5 +1,10 @@
 2015-03-25  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	* src/pref-manager.c (open_preferences_manager): use a header
+	bar.
+
+2015-03-25  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* src/main-window.c (ensure_check_mail_dialog), (bw_find_real):
 	use header bars in dialogs.
 

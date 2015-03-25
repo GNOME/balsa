@@ -1881,7 +1881,8 @@ bmbl_mru_show_tree(GtkWidget * widget, gpointer data)
     dialog =
         gtk_dialog_new_with_buttons(_("Choose destination folder"),
                                     mru->window,
-                                    GTK_DIALOG_MODAL,
+                                    GTK_DIALOG_MODAL |
+                                    GTK_DIALOG_USE_HEADER_BAR,
                                     _("_Cancel"), GTK_RESPONSE_CANCEL,
                                     NULL);
 #if HAVE_MACOSX_DESKTOP

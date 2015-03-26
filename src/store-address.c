@@ -42,12 +42,9 @@ struct _StoreAddressInfo {
     GtkWidget *notebook;
     GtkWidget *dialog;
 };
-enum StoreAddressResponse {
-    SA_RESPONSE_SAVE = 1,
-};
 
 /* statics */
-GtkWidget *store_address_dialog(StoreAddressInfo * info);
+static GtkWidget *store_address_dialog(StoreAddressInfo * info);
 static void store_address_weak_notify(StoreAddressInfo * info,
                                       gpointer message);
 static void store_address_response(GtkWidget * dialog, gint response,
@@ -81,7 +78,7 @@ balsa_store_address_from_messages(GList * messages)
     GList *message_list = NULL;
     GList *list;
 
-    for (list = messages; list; list = g_list_next(list)) {
+    for (list = messages; list; list = list->next) {
         gpointer data = g_object_get_data(G_OBJECT(list->data),
                                           BALSA_STORE_ADDRESS_KEY);
 
@@ -111,7 +108,7 @@ balsa_store_address_from_messages(GList * messages)
         return;
     }
 
-    for (list = message_list; list; list = g_list_next(list)) {
+    for (list = message_list; list; list = list->next) {
         g_object_set_data(G_OBJECT(list->data),
                           BALSA_STORE_ADDRESS_KEY, info);
         g_object_weak_ref(G_OBJECT(list->data),
@@ -163,19 +160,20 @@ store_address_response(GtkWidget * dialog, gint response,
      * response ==  2 => close
      * response == -1    if user closed dialog using the window
      *                   decorations */
-    if (response == GTK_RESPONSE_OK || response == SA_RESPONSE_SAVE) {
+    if (response == GTK_RESPONSE_OK) {
         /* Save the current address. */
-        gint page = gtk_notebook_get_current_page(notebook);
-        GList *list = g_list_nth(info->entries_list, page);
-        gboolean successful = 
-            store_address_from_entries(GTK_WINDOW(dialog), info, list->data);
-        if (response == SA_RESPONSE_SAVE || !successful)
+        gint page;
+        GtkWidget **entries;
+
+        page = gtk_notebook_get_current_page(notebook);
+        entries = g_list_nth_data(info->entries_list, page);
+        if (!store_address_from_entries(GTK_WINDOW(dialog), info, entries))
             /* Keep the dialog open. */
             return;
     }
 
     /* Let go of remaining messages. */
-    for (list = info->message_list; list; list = g_list_next(list)) {
+    for (list = info->message_list; list; list = list->next) {
         g_object_set_data(G_OBJECT(list->data), BALSA_STORE_ADDRESS_KEY,
                           NULL);
         g_object_weak_unref(G_OBJECT(list->data),
@@ -197,35 +195,39 @@ store_address_free(StoreAddressInfo * info)
 
 /* store_address_dialog:
  * create the main dialog */
-GtkWidget *
+static GtkWidget *
 store_address_dialog(StoreAddressInfo * info)
 {
-    GtkWidget *dialog =
+    GtkWidget *dialog;
+    GtkWidget *vbox;
+    GtkWidget *frame;
+
+    dialog =
         gtk_dialog_new_with_buttons(_("Store Address"),
                                     GTK_WINDOW(balsa_app.main_window),
-                                    GTK_DIALOG_DESTROY_WITH_PARENT,
+                                    GTK_DIALOG_DESTROY_WITH_PARENT |
+                                    GTK_DIALOG_USE_HEADER_BAR,
+                                    _("_Cancel"), GTK_RESPONSE_CANCEL,
                                     _("_OK"), GTK_RESPONSE_OK,
-                                    _("_Save"),  SA_RESPONSE_SAVE,
-                                    _("_Close"), GTK_RESPONSE_CLOSE,
                                     NULL);
-    GtkWidget *vbox = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
-    GtkWidget *frame, *label;
+    gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
+    vbox = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
 
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu_for_parent(dialog, GTK_WINDOW(balsa_app.main_window));
 #endif
-    frame = store_address_book_frame(info);
-    if(g_list_length(balsa_app.address_book_list)>1)
+
+    if (balsa_app.address_book_list && balsa_app.address_book_list->next) {
+        /* User has more than one address book, so show the options */
+        frame = store_address_book_frame(info);
         gtk_widget_show_all(frame);
-    gtk_box_pack_start(GTK_BOX(vbox), frame, TRUE, TRUE, 0);
+        gtk_box_pack_start(GTK_BOX(vbox), frame, FALSE, FALSE, 0);
+    }
+
     frame = store_address_note_frame(info);
     gtk_widget_show_all(frame);
     gtk_box_pack_start(GTK_BOX(vbox), frame, TRUE, TRUE, 0);
-    gtk_box_pack_start(GTK_BOX(vbox), 
-                       label = gtk_label_new(_("Save this address "
-                                               "and close the dialog?")),
-                       TRUE, TRUE, 0);
-    gtk_widget_show(label);
+
     return dialog;
 }
 
@@ -276,12 +278,13 @@ store_address_from_entries(GtkWindow *window, StoreAddressInfo * info,
 static GtkWidget *
 store_address_book_frame(StoreAddressInfo * info)
 {
-    GtkWidget *frame;
     GtkWidget *combo_box;
 
     combo_box = gtk_combo_box_text_new();
+    gtk_container_set_border_width(GTK_CONTAINER(combo_box), 4);
     g_signal_connect(combo_box, "changed",
                      G_CALLBACK(store_address_book_menu_cb), info);
+
     if (balsa_app.address_book_list) {
         guint default_ab_offset = 0, off;
         GList *ab_list;
@@ -309,10 +312,7 @@ store_address_book_frame(StoreAddressInfo * info)
                                  default_ab_offset);
     }
 
-    frame = gtk_frame_new(_("Choose Address Book"));
-    gtk_container_add(GTK_CONTAINER(frame), combo_box);
-
-    return frame;
+    return combo_box;
 }
 
 /* store_address_note_frame:
@@ -320,14 +320,12 @@ store_address_book_frame(StoreAddressInfo * info)
 static GtkWidget *
 store_address_note_frame(StoreAddressInfo *info)
 {
-    GtkWidget *frame = gtk_frame_new(_("Choose Address"));
     LibBalsaMessage *message;
     GList *list;
 
     info->notebook = gtk_notebook_new();
     gtk_notebook_set_scrollable(GTK_NOTEBOOK(info->notebook), TRUE);
-    gtk_container_set_border_width(GTK_CONTAINER(info->notebook), 5);
-    gtk_container_add(GTK_CONTAINER(frame), info->notebook);
+    gtk_container_set_border_width(GTK_CONTAINER(info->notebook), 4);
 
     for (list = info->message_list; list; list = list->next) {
         message = LIBBALSA_MESSAGE(list->data);
@@ -339,7 +337,7 @@ store_address_note_frame(StoreAddressInfo *info)
 	}
     }
 
-    return frame;
+    return info->notebook;
 }
 
 /* store_address_book_menu_cb:

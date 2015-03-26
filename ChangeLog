@@ -1,3 +1,16 @@
+2015-03-26  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* src/store-address.c (balsa_store_address_from_messages): clean
+	up code;
+	(store_address_response): drop response for "save this address
+	and keep the dialog open";
+	(store_address_dialog): use header bar, and change buttons to
+	standard OK/Cancel;
+	(store_address_book_frame): do not put a GtkFrame around the
+	address-book combo-box;
+	(store_address_note_frame): do not put a GtkFrame around the
+	address notebook.
+
 2015-03-25  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Do not use header bar in GtkMessageDialog, it does nothing

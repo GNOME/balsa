@@ -211,6 +211,8 @@ store_address_dialog(StoreAddressInfo * info)
                                     _("_OK"), GTK_RESPONSE_OK,
                                     NULL);
     gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
+    gtk_widget_grab_focus(gtk_dialog_get_widget_for_response
+                          (GTK_DIALOG(dialog), GTK_RESPONSE_OK));
     vbox = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
 
 #if HAVE_MACOSX_DESKTOP

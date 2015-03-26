@@ -1,5 +1,11 @@
 2015-03-26  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	* src/store-address.c (store_address_dialog): grab the keyboard
+	focus to the default button, "OK", instead of the address book
+	combo-box.
+
+2015-03-26  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* src/store-address.c (balsa_store_address_from_messages): clean
 	up code;
 	(store_address_response): drop response for "save this address

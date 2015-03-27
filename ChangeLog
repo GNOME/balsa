@@ -1,3 +1,8 @@
+2015-03-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* src/balsa-message.c: do not crash when current part is changed
+	while the find-bar is showing.
+
 2015-03-26  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* src/store-address.c (store_address_dialog): grab the keyboard

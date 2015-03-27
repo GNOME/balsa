@@ -2324,9 +2324,7 @@ select_part(BalsaMessage * bm, BalsaPartInfo *info)
     GtkAdjustment *hadj, *vadj;
 
     hide_all_parts(bm);
-
-    if (bm->current_part)
-        g_object_unref(bm->current_part);
+    bm_disable_find_entry(bm);
 
     body = add_part(bm, info, bm->bm_widget->container);
     bm->current_part = part_info_from_body(bm, body);

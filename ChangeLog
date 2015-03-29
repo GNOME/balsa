@@ -1,3 +1,9 @@
+2015-03-28  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* src/balsa-mime-widget-crypto.c
+	(balsa_mime_widget_signature_widget): put digital signature info
+	in a GtkExpander.
+
 2015-03-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* src/balsa-message.c: do not crash when current part is changed

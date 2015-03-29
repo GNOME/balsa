@@ -61,6 +61,7 @@ balsa_mime_widget_signature_widget(LibBalsaMessageBody * mime_body,
 {
     gchar *infostr;
     GtkWidget *vbox, *label;
+    GtkWidget *expander;
 
     if (!mime_body->sig_info ||
 	mime_body->sig_info->status == GPG_ERR_NOT_SIGNED)
@@ -108,7 +109,10 @@ balsa_mime_widget_signature_widget(LibBalsaMessageBody * mime_body,
     }
 #endif /* HAVE_GPG */
 
-    return vbox;
+    expander = gtk_expander_new(_("Digital Signature"));
+    gtk_container_add(GTK_CONTAINER(expander), vbox);
+
+    return expander;
 }
 
 

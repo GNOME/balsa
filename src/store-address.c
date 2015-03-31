@@ -280,10 +280,15 @@ store_address_from_entries(GtkWindow *window, StoreAddressInfo * info,
 static GtkWidget *
 store_address_book_frame(StoreAddressInfo * info)
 {
+    GtkWidget *hbox;
     GtkWidget *combo_box;
 
+    hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 12);
+    gtk_container_set_border_width(GTK_CONTAINER(hbox), 4);
+    gtk_box_pack_start(GTK_BOX(hbox), gtk_label_new(_("Address Book:")),
+                       FALSE, FALSE, 0);
+
     combo_box = gtk_combo_box_text_new();
-    gtk_container_set_border_width(GTK_CONTAINER(combo_box), 4);
     g_signal_connect(combo_box, "changed",
                      G_CALLBACK(store_address_book_menu_cb), info);
 
@@ -314,7 +319,9 @@ store_address_book_frame(StoreAddressInfo * info)
                                  default_ab_offset);
     }
 
-    return combo_box;
+    gtk_box_pack_start(GTK_BOX(hbox), combo_box, TRUE, TRUE, 0);
+
+    return hbox;
 }
 
 /* store_address_note_frame:
@@ -332,10 +339,10 @@ store_address_note_frame(StoreAddressInfo *info)
     for (list = info->message_list; list; list = list->next) {
         message = LIBBALSA_MESSAGE(list->data);
 	if (message->headers) {
-	    store_address_add_list(info, _("From:"), message->headers->from);
-	    store_address_add_list(info, _("To:"), message->headers->to_list);
-	    store_address_add_list(info, _("Cc:"), message->headers->cc_list);
-	    store_address_add_list(info, _("Bcc:"), message->headers->bcc_list);
+	    store_address_add_list(info, _("From: "), message->headers->from);
+	    store_address_add_list(info, _("To: "), message->headers->to_list);
+	    store_address_add_list(info, _("Cc: "), message->headers->cc_list);
+	    store_address_add_list(info, _("Bcc: "), message->headers->bcc_list);
 	}
     }
 
@@ -403,9 +410,9 @@ store_address_add_address(StoreAddressInfo * info,
 
     label_text = g_strconcat(lab, text, NULL);
     g_free(text);
-    if (g_utf8_strlen(label_text, -1) > 10)
+    if (g_utf8_strlen(label_text, -1) > 15)
         /* truncate to an arbitrary length: */
-        *g_utf8_offset_to_pointer(label_text, 10) = '\0';
+        *g_utf8_offset_to_pointer(label_text, 15) = '\0';
     gtk_notebook_append_page(GTK_NOTEBOOK(info->notebook), ew,
                              gtk_label_new(label_text));
     g_free(label_text);
@@ -426,9 +433,9 @@ store_address_add_lbaddress(StoreAddressInfo * info,
 
     label_text = g_strdup(address->full_name ? address->full_name :
                           address->address_list->data);
-    if (g_utf8_strlen(label_text, -1) > 10)
+    if (g_utf8_strlen(label_text, -1) > 15)
         /* truncate to an arbitrary length: */
-        *g_utf8_offset_to_pointer(label_text, 10) = '\0';
+        *g_utf8_offset_to_pointer(label_text, 15) = '\0';
     gtk_notebook_append_page(GTK_NOTEBOOK(info->notebook), ew,
                              gtk_label_new(label_text));
     g_free(label_text);

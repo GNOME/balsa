@@ -1,3 +1,14 @@
+2015-03-30  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Clean up store-address dialog
+
+	* src/store-address.c (store_address_book_frame): add a label to
+	explain address-book combo-box;
+	(store_address_note_frame): add space after header name;
+	(store_address_add_address): increase notebook tab label to 15
+	characters;
+	(store_address_add_lbaddress): ditto.
+
 2015-03-28  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* src/balsa-mime-widget-crypto.c

@@ -1,3 +1,9 @@
+2015-04-01  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* src/sendmsg-window.c (quote_parts_select_dlg),
+	(collect_for_quote), (quote_body): add a cancel button and
+	provide a parent for the quote-parts dialog.
+
 2015-03-30  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Clean up store-address dialog

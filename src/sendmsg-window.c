@@ -3379,6 +3379,7 @@ quote_parts_select_dlg(GtkTreeStore *tree_store, GtkWindow * parent)
 					 GTK_DIALOG_DESTROY_WITH_PARENT |
                                          GTK_DIALOG_USE_HEADER_BAR,
 					 _("_OK"), GTK_RESPONSE_OK,
+					 _("_Cancel"), GTK_RESPONSE_CANCEL,
 					 NULL);
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu_for_parent(dialog, parent);
@@ -3458,8 +3459,12 @@ tree_find_single_part(GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter,
 }
 
 static GString *
-collect_for_quote(LibBalsaMessageBody *root, gchar * reply_prefix_str,
-		  gint llen, gboolean ignore_html, gboolean flow)
+collect_for_quote(BalsaSendmsg        * bsmsg,
+                  LibBalsaMessageBody * root,
+                  gchar               * reply_prefix_str,
+                  gint                  llen,
+                  gboolean              ignore_html,
+                  gboolean              flow)
 {
     GtkTreeStore * tree_store;
     gint text_bodies;
@@ -3490,7 +3495,7 @@ collect_for_quote(LibBalsaMessageBody *root, gchar * reply_prefix_str,
 	    q_body = process_mime_part(message, this_body, reply_prefix_str,
 				       llen, FALSE, flow);
     } else if (text_bodies > 1) {
-	if (quote_parts_select_dlg(tree_store, NULL)) {
+	if (quote_parts_select_dlg(tree_store, GTK_WINDOW(bsmsg->window))) {
 	    GtkTreeIter iter;
 
 	    q_body = g_string_new("");
@@ -3602,7 +3607,7 @@ quote_body(BalsaSendmsg * bsmsg, LibBalsaMessageHeaders *headers,
 
 	/* scan the message and collect text parts which might be included
 	 * in the reply */
-	body = collect_for_quote(root,
+	body = collect_for_quote(bsmsg, root,
 				 qtype == QUOTE_ALL ? balsa_app.quote_str : NULL,
 				 bsmsg->flow ? -1 : balsa_app.wraplength,
 				 balsa_app.reply_strip_html, bsmsg->flow);

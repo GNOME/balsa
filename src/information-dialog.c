@@ -235,14 +235,14 @@ balsa_information_list(GtkWindow *parent, LibBalsaInformationType type,
                                         GTK_DIALOG_DESTROY_WITH_PARENT |
                                         GTK_DIALOG_USE_HEADER_BAR,
                                         _("_Clear"), GTK_RESPONSE_APPLY,
-                                        _("Cl_ose"), GTK_RESPONSE_CLOSE,
+                                        _("Cl_ose"), GTK_RESPONSE_CANCEL,
                                         NULL);
 #if HAVE_MACOSX_DESKTOP
 	libbalsa_macosx_menu_for_parent(information_dialog, parent);
 #endif
 	/* Default is to close */
 	gtk_dialog_set_default_response(GTK_DIALOG(information_dialog), 
-                                        GTK_RESPONSE_CLOSE);
+                                        GTK_RESPONSE_CANCEL);
 
 	/* Reset the policy gtk_dialog_new makes itself non-resizable */
 	gtk_window_set_resizable(GTK_WINDOW(information_dialog), TRUE);

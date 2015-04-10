@@ -1,5 +1,11 @@
 2015-04-10  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	* src/sendmsg-window.c (delete_handler),
+	(bsmsg_check_format_compatibility): mark strings for
+	translation.
+
+2015-04-10  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* src/information-dialog.c (balsa_information_list): make the
 	"Close" button use GTK_RESPONSE_CANCEL, to move the button
 	to the left.

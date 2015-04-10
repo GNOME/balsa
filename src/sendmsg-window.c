@@ -537,7 +537,7 @@ delete_handler(BalsaSendmsg * bsmsg)
     g_object_unref(list);
     gtk_dialog_set_default_response(GTK_DIALOG(d), GTK_RESPONSE_YES);
     gtk_dialog_add_button(GTK_DIALOG(d),
-                          "gtk-cancel", GTK_RESPONSE_CANCEL);
+                          _("_Cancel"), GTK_RESPONSE_CANCEL);
     reply = gtk_dialog_run(GTK_DIALOG(d));
     gtk_widget_destroy(d);
 
@@ -6593,24 +6593,24 @@ bsmsg_check_format_compatibility(GtkWindow *parent, const gchar *filename)
 
     /* time to ask the user for his/her opinion */
     dialog = (GtkDialog*)gtk_dialog_new_with_buttons
-        ("Compatibility check", parent,
+        (_("Compatibility check"), parent,
          GTK_DIALOG_MODAL| GTK_DIALOG_DESTROY_WITH_PARENT |
          GTK_DIALOG_USE_HEADER_BAR,
-         "_Cancel",                          GTK_RESPONSE_CANCEL,
-         "_Attach it in the current format", GTK_RESPONSE_OK, NULL);
+         _("_Cancel"),                          GTK_RESPONSE_CANCEL,
+         _("_Attach it in the current format"), GTK_RESPONSE_OK, NULL);
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu_for_parent(GTK_WIDGET(dialog), parent);
 #endif
 
     gtk_dialog_set_default_response(dialog, GTK_RESPONSE_OK);
     str = g_strdup_printf
-        ("File %s is currently in the %s's own format.\n"
-         "If you need to send it to people who use %s, "
-         "then open the file in the %s, use \"Save As\" "
-         "on the \"File\" menu, and select the \"%s\" format. "
-         "When you click \"OK\" it will save a new "
-         "\"%s\" version of the file, with \"%s\" on the end "
-         "of the document name, which you can then attach instead.",
+        (_("File %s is currently in the %s's own format.\n"
+           "If you need to send it to people who use %s, "
+           "then open the file in the %s, use \"Save As\" "
+           "on the \"File\" menu, and select the \"%s\" format. "
+           "When you click \"OK\" it will save a new "
+           "\"%s\" version of the file, with \"%s\" on the end "
+           "of the document name, which you can then attach instead."),
          filename,
          compatibility_table[i].linux_program,
          compatibility_table[i].other_program,
@@ -6625,7 +6625,7 @@ bsmsg_check_format_compatibility(GtkWindow *parent, const gchar *filename)
     gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
     g_free(str);
     checkbox = gtk_check_button_new_with_mnemonic
-        ("_Do not show this dialog any more.");
+        (_("_Do not show this dialog any more."));
     gtk_box_pack_start(vbox, checkbox, TRUE, TRUE, 0);
     gtk_widget_show(checkbox);
     gtk_widget_show(label);

@@ -658,7 +658,7 @@ msgid ""
 "<b>This certificate belongs to:</b>\n"
 msgstr ""
 "No s'ha pogut comprovar l'autenticitat d'aquest certificat.\n"
-"<b>Raó:</b>%s\n"
+"<b>Raó:</b> %s\n"
 "<b>Aquest certificat pertany a:</b>\n"
 
 #: ../libbalsa/libbalsa.c:559

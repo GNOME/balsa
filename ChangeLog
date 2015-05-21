@@ -1,3 +1,11 @@
+2015-05-20  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Silence some autoconf and automake complaints.
+
+	* configure.ac: silence autoconf.
+	* libbalsa/imap/Makefile.am: silence automake.
+	* libinit_balsa/Makefile.am: ditto.
+
 2015-04-10  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* src/sendmsg-window.c (delete_handler),

@@ -24,6 +24,7 @@ AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADERS([config.h])
 AC_DEFINE_UNQUOTED(BALSA_VERSION, "AC_PACKAGE_VERSION",[Defines the Balsa version])
 
+AC_USE_SYSTEM_EXTENSIONS
 AC_SYS_LARGEFILE
 
 dnl #####################################################################
@@ -213,9 +214,8 @@ dnl #####################################################################
 dnl 3. Programs: compilers and their options.
 dnl #####################################################################
 AC_PROG_CC
-m4_ifdef([AM_PROG_LIBTOOL],[AM_PROG_LIBTOOL],[AC_PROG_RANLIB])
+m4_ifdef([LT_INIT],[LT_INIT],[AC_PROG_LIBTOOL])
 AC_PROG_LN_S
-AC_USE_SYSTEM_EXTENSIONS
 AC_CHECK_MEMBERS([struct utsname.domainname],[],[],[[#include<sys/utsname.h>]])
 
 # pkg-config
@@ -356,17 +356,15 @@ PKG_CHECK_MODULES(BALSA_AB, [
 ])
 
 AC_MSG_CHECKING(whether res_init is available)
-AC_LINK_IFELSE(AC_LANG_PROGRAM([#include <resolv.h>
-                               ],
-                               [res_init();]),
+AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <resolv.h>;]],
+                               [[res_init();]])],
                have_res_init=yes,
                have_res_init=no)
 if test $have_res_init = no ; then
     save_LIBS=$LIBS
     LIBS="$LIBS -lresolv"
-    AC_LINK_IFELSE(AC_LANG_PROGRAM([#include <resolv.h>
-                                   ],
-                                   [res_init();]),
+    AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <resolv.h>;]],
+                                   [[res_init();]])],
                    have_res_init=yes)
 fi
 AC_MSG_RESULT([$have_res_init])

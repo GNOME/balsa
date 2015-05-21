@@ -44,7 +44,7 @@ libimap_a_SOURCES = \
 EXTRA_DIST = \
 	libimap-marshal.list
 
-INCLUDES= -I${top_builddir} -I${top_srcdir} -I${top_srcdir}/libbalsa \
+AM_CPPFLAGS = -I${top_builddir} -I${top_srcdir} -I${top_srcdir}/libbalsa \
 	-I${top_srcdir}/libbalsa/imap \
 	$(BALSA_CFLAGS)
 

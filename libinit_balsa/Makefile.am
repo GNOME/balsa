@@ -16,7 +16,7 @@ libinit_balsa_a_SOURCES = 		\
 	assistant_helper.c		\
 	assistant_helper.h
 
-INCLUDES=-I$(top_builddir) -I$(top_srcdir) \
+AM_CPPFLAGS = -I$(top_builddir) -I$(top_srcdir) \
 	-I$(top_srcdir)/libbalsa \
 	-I$(top_srcdir)/src \
         $(BALSA_CFLAGS)

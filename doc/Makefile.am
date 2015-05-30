@@ -30,16 +30,19 @@ balsa_help_files =						\
                win-run-filters.page				\
                win-search.page
 
+HELP_LINGUAS = de es fr sl
+
 if BUILD_WITH_GTKSPELL
 balsa_gtkspell_extra =
-balsa_gtkspell_extra_dist = preferences-spelling.page
+helpdirs = C $(HELP_LINGUAS)
+balsa_gtkspell_extra_dist = $(foreach lc,$(helpdirs),$(lc)/preferences-spelling.page) #
 else
 balsa_gtkspell_extra_dist =
 balsa_gtkspell_extra = preferences-spelling.page
 endif
 
 HELP_FILES   = $(balsa_help_files) $(balsa_gtkspell_extra)
-EXTRA_DIST   = balsa.xml $(balsa_gtkspell_extra_dist)
+EXTRA_DIST   = $(balsa_gtkspell_extra_dist)
 
 HELP_EXTRA   = balsa.entities
 
@@ -62,7 +65,6 @@ HELP_MEDIA   =							\
 	      figures/preferences-window.png			\
 	      figures/spell-check.png
 
-HELP_LINGUAS = de es fr sl
 
 doc-dist-hook:
 

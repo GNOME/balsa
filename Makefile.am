@@ -52,16 +52,16 @@ dist-hook: balsa.spec
 
 @MAINT@RPM: balsa.spec
 @MAINT@	rm -f *.rpm
-@MAINT@	$(MAKE) distdir="$(PACKAGE)-@BALSA_VERSION@" dist
+@MAINT@	$(MAKE) distdir="$(PACKAGE)-$(PACKAGE_VERSION)" dist
 @MAINT@	cp $(top_srcdir)/rpm-po.patch $(top_builddir)/rpm-po.patch
-@MAINT@	rpm -ta "./$(PACKAGE)-@BALSA_VERSION@.tar.gz"
+@MAINT@	rpm -ta "./$(PACKAGE)-$(PACKAGE_VERSION).tar.gz"
 @MAINT@	rm $(top_builddir)/rpm-po.patch
-@MAINT@	-test -f "/usr/src/redhat/SRPMS/$(PACKAGE)-@VERSION@-@BALSA_RELEASE@.src.rpm" \
-@MAINT@		&& cp -f "/usr/src/redhat/SRPMS/$(PACKAGE)-@VERSION@-@BALSA_RELEASE@.src.rpm" .
+@MAINT@	-test -f "/usr/src/redhat/SRPMS/$(PACKAGE)-$(PACKAGE_VERSION)-@BALSA_RELEASE@.src.rpm" \
+@MAINT@		&& cp -f "/usr/src/redhat/SRPMS/$(PACKAGE)-$(PACKAGE_VERSION)-@BALSA_RELEASE@.src.rpm" .
 @MAINT@	-for ping in /usr/src/redhat/RPMS/* ; do \
 @MAINT@		if test -d $$ping ; then \
 @MAINT@			arch=`echo $$ping |sed -e 's,/.*/\([^/][^/]*\),\1,'` ; \
-@MAINT@			f="$$ping/$(PACKAGE)-@VERSION@-@BALSA_RELEASE@.$$arch.rpm" ; \
+@MAINT@			f="$$ping/$(PACKAGE)-$(PACKAGE_VERSION)-@BALSA_RELEASE@.$$arch.rpm" ; \
 @MAINT@			test -f $$f && cp -f $$f . ; \
 @MAINT@		fi ; \
 @MAINT@	done

@@ -10,7 +10,7 @@
 %endif
 
 Name:           balsa
-Version:        @BALSA_VERSION@
+Version:        @PACKAGE_VERSION@
 Release:        1
 Summary:        Mail Client
 
@@ -25,26 +25,26 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 
 %if %fedora
-Requires: libesmtp >= 1.0.4
-Requires: scrollkeeper
-BuildRequires: automake
-BuildRequires: desktop-file-utils
-BuildRequires: gettext
-BuildRequires: gmime-devel
-BuildRequires: gnome-vfs2-devel
-BuildRequires: gtk2-devel
-BuildRequires: gtkhtml2-devel
-BuildRequires: gtkspell-devel
-BuildRequires: enchant-devel
-BuildRequires: intltool
-BuildRequires: libesmtp-devel >= 1.0.4
-BuildRequires: libgnome-devel
-BuildRequires: libgnomeui-devel
-BuildRequires: libnotify-devel
-BuildRequires: openssl-devel
+Requires: libesmtp >= 1.0.6
+#BuildRequires: gnome-vfs2-devel
 BuildRequires: NetworkManager-glib-devel
-BuildRequires: scrollkeeper
+BuildRequires: desktop-file-utils
+BuildRequires: enchant-devel
+BuildRequires: gettext
+BuildRequires: gmime-devel >= 2.5.1
 BuildRequires: gnome-doc-utils
+BuildRequires: gpgme-devel
+BuildRequires: gtkspell3-devel
+BuildRequires: intltool
+BuildRequires: libesmtp-devel >= 1.0.6
+BuildRequires: libnotify-devel
+BuildRequires: libsecret-devel
+BuildRequires: libtool
+BuildRequires: openssl-devel
+BuildRequires: rarian-compat
+BuildRequires: unique-devel
+BuildRequires: webkitgtk3-devel
+BuildRequires: yelp-tools
 %endif
 %if %mdk
 BuildRequires:  libgnome-vfs2_0-devel
@@ -129,15 +129,16 @@ fi
 %doc docs/vconvert.awk docs/pine2vcard
 %{_bindir}/balsa
 %{_bindir}/balsa-ab
-%{_libdir}/bonobo/servers/GNOME_Balsa.server
 %{_datadir}/applications/*.desktop
-%{_datadir}/balsa
-%{_datadir}/gnome/help/balsa/
-/usr/share/icons/hicolor/*
-%{_datadir}/idl/Balsa.idl
-%{_datadir}/omf/balsa/
+%{_datadir}/balsa/
+%{_datadir}/help/C/balsa/
+%{_datadir}/help/de/balsa/
+%{_datadir}/help/es/balsa/
+%{_datadir}/help/fr/balsa/
+%{_datadir}/help/sl/balsa/
+%{_datadir}/icons/hicolor/*
 %{_datadir}/pixmaps/gnome-balsa2.png
-%{_datadir}/sounds/balsa/*
+%{_datadir}/sounds/balsa/
 %{_mandir}/man1/balsa.1*
 %config(noreplace) %{_sysconfdir}/sound/events/balsa.soundlist
 

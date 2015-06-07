@@ -9,5 +9,5 @@ Icon=gnome-balsa2
 Terminal=false
 Type=Application
 StartupNotify=true
-Categories=GNOME;GTK;Office;Email;
+Categories=@TOOLKIT_CATEGORIES@Network;Email;
 X-GNOME-UsesNotifications=true

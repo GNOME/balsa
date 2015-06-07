@@ -282,6 +282,7 @@ dnl GNOME libs
 dnl #####################################################################
 
 if test x$with_gnome != xno; then
+   TOOLKIT_CATEGORIES="GNOME;GTK;"
    gnome_extras="$gnome_extras gio-unix-2.0"
    if test x$with_libsecret == xno; then
      AC_MSG_CHECKING([whether we have gnome-keyring])
@@ -301,8 +302,10 @@ if test x$with_gnome != xno; then
    fi
    AC_DEFINE(HAVE_GNOME,1,[Defined when building for GNOME.])
 else
+   TOOLKIT_CATEGORIES="GTK;"
    gnome_extras=""
 fi
+AC_SUBST(TOOLKIT_CATEGORIES)
 
 # GMime configuration
 #

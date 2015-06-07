@@ -1,3 +1,9 @@
+2015-06-07  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Fix bgo #750515 (pachoramos1 at gmail dot com)
+
+	* POTFILES.in: add src/balsa-print-object.c.
+
 2012-03-21  Peter Bloomfield
 
 	Move generated *.in files from POTFILES.in to

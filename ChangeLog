@@ -1,3 +1,15 @@
+2015-07-23  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Fix the image-loading option for HTML message parts
+
+	* libbalsa/html.c (lbh_navigation_policy_decision):
+	do not hide the info-bar unless we are loading an actual image;
+	(lbh_resource_notify_response_cb): new function--we do not know
+	what we are loading until we have an actual response;
+	(lbh_resource_load_started_cb): just connect to the
+	"notify::response" signal;
+	(libbalsa_html_new): add debugging.
+
 2015-06-07  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Fix bgo #750516 (pachoramos1@gmail.com)

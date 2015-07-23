@@ -207,33 +207,34 @@ static void
 lbh_navigation_policy_decision(WebKitPolicyDecision * decision,
                                gpointer               data)
 {
+    LibBalsaWebKitInfo *info = data;
     WebKitNavigationPolicyDecision *navigation_decision;
     WebKitNavigationAction *navigation_action;
-    LibBalsaWebKitInfo *info = data;
+    WebKitNavigationType navigation_type;
     WebKitURIRequest *request;
+    const gchar *uri;
 
     navigation_decision = WEBKIT_NAVIGATION_POLICY_DECISION(decision);
     navigation_action =
-         webkit_navigation_policy_decision_get_navigation_action
-            (navigation_decision);
-    switch (webkit_navigation_action_get_navigation_type
-            (navigation_action)) {
+        webkit_navigation_policy_decision_get_navigation_action
+        (navigation_decision);
+    navigation_type =
+        webkit_navigation_action_get_navigation_type(navigation_action);
+    request = webkit_navigation_action_get_request(navigation_action);
+    uri = webkit_uri_request_get_uri(request);
+
+    switch (navigation_type) {
     case WEBKIT_NAVIGATION_TYPE_OTHER:
     case WEBKIT_NAVIGATION_TYPE_RELOAD:
-        d(g_print("%s type %d, used\n", __func__,
-                  webkit_navigation_action_get_navigation_type
-                  (navigation_action)));
+        d(g_print("%s uri %s, type %d, used\n", __func__, uri,
+                  navigation_type));
         webkit_policy_decision_use(decision);
         break;
     case WEBKIT_NAVIGATION_TYPE_LINK_CLICKED:
-        request = webkit_navigation_action_get_request(navigation_action);
-        d(g_print("%s clicked %s\n", __func__,
-                  webkit_uri_request_get_uri(request)));
-        (*info->clicked_cb) (webkit_uri_request_get_uri(request));
+        d(g_print("%s clicked %s\n", __func__, uri));
+        (*info->clicked_cb) (uri);
     default:
-        d(g_print("%s type %d, ignored\n", __func__,
-                  webkit_navigation_action_get_navigation_type
-                  (navigation_action)));
+        d(g_print("%s type %d, ignored\n", __func__, navigation_type));
         webkit_policy_decision_ignore(decision);
     }
 }
@@ -393,24 +394,47 @@ lbh_info_bar(LibBalsaWebKitInfo * info)
  * Callback for the "resource-load-started" signal
  */
 static void
+lbh_resource_notify_response_cb(WebKitWebResource * resource,
+                                GParamSpec        * pspec,
+                                gpointer            data)
+{
+    LibBalsaWebKitInfo *info = data;
+    const gchar *mime_type;
+    WebKitURIResponse *response;
+
+    response = webkit_web_resource_get_response(resource);
+    mime_type = webkit_uri_response_get_mime_type(response);
+    d(g_print("%s mime-type %s\n", __func__, mime_type));
+    if (g_ascii_strncasecmp(mime_type, "image/", 6) != 0)
+        return;
+
+    if (info->info_bar) {
+        d(g_print("%s %s destroy info_bar\n", __func__,
+                  webkit_web_resource_get_uri(resource)));
+        /* web_view is loading an image from its cache, so we do not
+         * need to ask the user for permission to download */
+        gtk_widget_destroy(info->info_bar);
+        info->info_bar = NULL;
+    } else {
+        d(g_print("%s %s null info_bar\n", __func__,
+                  webkit_web_resource_get_uri(resource)));
+    }
+}
+
+static void
 lbh_resource_load_started_cb(WebKitWebView     * web_view,
                              WebKitWebResource * resource,
                              WebKitURIRequest  * request,
                              gpointer            data)
 {
-    LibBalsaWebKitInfo *info = data;
     const gchar *uri;
 
     uri = webkit_uri_request_get_uri(request);
     if (!g_ascii_strcasecmp(uri, "about:blank"))
         return;
 
-    if (info->info_bar) {
-        /* web_view is loading an image from its cache, so we do not
-         * need to ask the user for permission to download */
-        gtk_widget_destroy(info->info_bar);
-        info->info_bar = NULL;
-    }
+    g_signal_connect(resource, "notify::response",
+                     G_CALLBACK(lbh_resource_notify_response_cb), data);
 }
 
 /*
@@ -543,6 +567,7 @@ libbalsa_html_new(LibBalsaMessageBody * body,
         webkit_web_context_register_uri_scheme(context, "cid", lbh_cid_cb,
                                                &info, NULL);
         have_registered_cid = TRUE;
+        d(g_print("%s registered cid: scheme\n", __func__));
     }
 
     settings = webkit_web_view_get_settings(web_view);
@@ -570,6 +595,7 @@ libbalsa_html_new(LibBalsaMessageBody * body,
     if (g_regex_match_simple(src_regex, text, G_REGEX_CASELESS, 0)) {
         info->info_bar = lbh_info_bar(info);
         gtk_box_pack_start(GTK_BOX(vbox), info->info_bar, FALSE, FALSE, 0);
+        d(g_print("%s shows info_bar\n", __func__));
     }
 
     webkit_web_view_load_html(web_view, text, NULL);

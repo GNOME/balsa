@@ -102,7 +102,7 @@ balsa_mime_widget_ctx_menu_save(GtkWidget * parent_widget,
                                                 balsa_app.save_dir);
 
     if (mime_body->filename) {
-        gchar * filename = g_strdup(mime_body->filename);
+        gchar * filename = g_path_get_basename(mime_body->filename);
 	libbalsa_utf8_sanitize(&filename, balsa_app.convert_unknown_8bit,
 			       NULL);
 	gtk_file_chooser_set_current_name(GTK_FILE_CHOOSER(save_dialog),

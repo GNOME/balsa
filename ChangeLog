@@ -1,5 +1,11 @@
 2015-09-21  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	* src/balsa-mime-widget-callbacks.c
+	(balsa_mime_widget_ctx_menu_save): use only the basename of an
+	attachment's filename.
+
+2015-09-21  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* libbalsa/body.c (libbalsa_message_body_save_temporary): use
 	only the basename of an attachment's filename.
 

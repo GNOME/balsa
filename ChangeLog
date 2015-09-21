@@ -1,3 +1,8 @@
+2015-09-21  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* libbalsa/body.c (libbalsa_message_body_save_temporary): use
+	only the basename of an attachment's filename.
+
 2015-07-23  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Fix the image-loading option for HTML message parts

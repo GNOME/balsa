@@ -366,8 +366,13 @@ libbalsa_message_body_save_temporary(LibBalsaMessageBody * body, GError **err)
                             LIBBALSA_MAILBOX_TEMPDIR_ERROR,
                             "Failed to create temporary directory");
             } else {
+                gchar *basename;
+
+                basename = g_path_get_basename(filename);
                 body->temp_filename =
-                    g_build_filename(tempdir, filename, NULL);
+                    g_build_filename(tempdir, basename, NULL);
+                g_free(basename);
+
                 fd = open(body->temp_filename,
                           O_WRONLY | O_EXCL | O_CREAT,
                           S_IRUSR);

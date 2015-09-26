@@ -6321,7 +6321,7 @@ msgstr "无法打印第 %d 页，因为文档只有 %d 页。"
 #.
 #: ../src/print-gtk.c:380
 msgid "default:mm"
-msgstr "默认:毫米"
+msgstr "default:mm"
 
 #: ../src/print-gtk.c:437
 msgid "inch"

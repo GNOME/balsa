@@ -6001,7 +6001,7 @@ msgstr[2] "Ne mogu ispisati stranicu %d jer dokument ima samo %d stranica."
 #.
 #: ../src/print-gtk.c:390
 msgid "default:mm"
-msgstr "podrazumijevano:mm"
+msgstr "default:mm"
 
 #: ../src/print-gtk.c:447
 msgid "inch"

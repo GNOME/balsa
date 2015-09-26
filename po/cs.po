@@ -6028,7 +6028,7 @@ msgstr[2] "Nelze vytisknout stránku %d, protože dokument má jen %d stránek."
 #.
 #: ../src/print-gtk.c:390
 msgid "default:mm"
-msgstr "výchozí:mm"
+msgstr "default:mm"
 
 #: ../src/print-gtk.c:447
 msgid "inch"

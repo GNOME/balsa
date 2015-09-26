@@ -5962,7 +5962,7 @@ msgstr "Ezin izan da %d orria inprimatu, dokumentua %d orri soilik dituelako."
 #.
 #: ../src/print-gtk.c:380
 msgid "default:mm"
-msgstr "lehenetsia:mm"
+msgstr "default:mm"
 
 #: ../src/print-gtk.c:437
 msgid "inch"

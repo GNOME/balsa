@@ -6012,7 +6012,7 @@ msgstr[3] "Strani %d ni mogoče natisniti, ker ima dokument samo %d strani."
 #.
 #: ../src/print-gtk.c:390
 msgid "default:mm"
-msgstr "privzeto:mm"
+msgstr "default:mm"
 
 #: ../src/print-gtk.c:447
 msgid "inch"

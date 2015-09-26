@@ -5384,7 +5384,7 @@ msgstr ""
 #.
 #: ../src/print-gtk.c:378
 msgid "default:mm"
-msgstr "Defau"
+msgstr "default:mm"
 
 #: ../src/print-gtk.c:435
 msgid "inch"

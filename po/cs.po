@@ -253,19 +253,19 @@ msgstr ", %s"
 
 #: ../libbalsa/filter-funcs.c:412
 msgid "New"
-msgstr "Nová"
+msgstr "Nový"
 
 #: ../libbalsa/filter-funcs.c:413 ../src/filter-edit-callbacks.c:1009
 msgid "Deleted"
-msgstr "Odstraněna"
+msgstr "Smazaná"
 
 #: ../libbalsa/filter-funcs.c:414 ../src/filter-edit-callbacks.c:1009
 msgid "Replied"
-msgstr "Odpovězena"
+msgstr "Odpovězená"
 
 #: ../libbalsa/filter-funcs.c:415 ../src/filter-edit-callbacks.c:1009
 msgid "Flagged"
-msgstr "Označena"
+msgstr "Označená"
 
 #: ../libbalsa/filter-funcs.c:439
 msgid "Not "
@@ -2324,7 +2324,7 @@ msgstr "Upravit vlastnosti adresáře kontaktů"
 #: ../src/mailbox-node.c:1102 ../src/pref-manager.c:1714
 #: ../src/pref-manager.c:1789 ../src/pref-manager.c:2966
 msgid "_Delete"
-msgstr "_Odstranit"
+msgstr "_Smazat"
 
 #
 #: ../src/ab-main.c:576

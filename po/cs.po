@@ -65,7 +65,7 @@ msgstr "V adresáři nelze hledat"
 
 #: ../libbalsa/address-book.c:318
 msgid "Cannot add duplicate entry"
-msgstr "Nelze přidat duplikátní záznam"
+msgstr "Nelze přidat duplicitní záznam"
 
 #: ../libbalsa/address-book.c:320
 msgid "Cannot find address in address book"
@@ -152,7 +152,7 @@ msgstr "Skrytá kopie:"
 
 #: ../libbalsa/address-view.c:131
 msgid "Reply To:"
-msgstr "Odpovědět komu:"
+msgstr "Komu odpovědět:"
 
 #: ../libbalsa/body.c:121 ../libbalsa/mailbox_local.c:1760
 #: ../libbalsa/message.c:843
@@ -457,15 +457,15 @@ msgstr "Text _přeposlání:"
 
 #: ../libbalsa/identity.c:1005
 msgid "send messages in both plain text and _HTML format"
-msgstr "odeslat zprávu jako čistý text i v _HTML formátu"
+msgstr "Odeslat zprávu jako čistý text i v _HTML formátu"
 
 #: ../libbalsa/identity.c:1008
 msgid "request positive (successful) _Delivery Status Notification by default"
-msgstr "standardně požadovat _Oznámení o stavu doručení (DSN)"
+msgstr "Standardně požadovat _Oznámení o stavu doručení (DSN)"
 
 #: ../libbalsa/identity.c:1011
 msgid "request _Message Disposition Notification by default"
-msgstr "standardně požadovat _Oznámení o přenesení zprávy (MDN)"
+msgstr "Standardně požadovat _Oznámení o přenesení zprávy (MDN)"
 
 #: ../libbalsa/identity.c:1021
 msgid "SMT_P server:"
@@ -486,15 +486,15 @@ msgstr "Sp_ustit podpis"
 
 #: ../libbalsa/identity.c:1035
 msgid "Incl_ude signature"
-msgstr "Při_ložit podpis"
+msgstr "V_ložit podpis"
 
 #: ../libbalsa/identity.c:1038
 msgid "Include signature when for_warding"
-msgstr "Přiložit podpis při _přeposlání"
+msgstr "Vložit podpis při _přeposlání"
 
 #: ../libbalsa/identity.c:1041
 msgid "Include signature when rep_lying"
-msgstr "Přiložit podpis při _odpovědi"
+msgstr "Vložit podpis při _odpovědi"
 
 #: ../libbalsa/identity.c:1044
 msgid "_Add signature separator"
@@ -502,7 +502,7 @@ msgstr "Přid_at oddělovač podpisu"
 
 #: ../libbalsa/identity.c:1047
 msgid "Prepend si_gnature"
-msgstr "Při_dat podpis na začátek"
+msgstr "Vložit po_dpis na začátek"
 
 #: ../libbalsa/identity.c:1053
 msgid ""
@@ -510,7 +510,7 @@ msgid ""
 "only if Balsa is built with cryptographic support."
 msgstr ""
 "Podepisování a šifrování zpráv je možné\n"
-"pouze pokud je Balsa přeložena s podporou šifrování."
+"pouze pokud je Balsa sestavená s podporou šifrování."
 
 #: ../libbalsa/identity.c:1058
 msgid "Security"
@@ -518,31 +518,31 @@ msgstr "Zabezpečení"
 
 #: ../libbalsa/identity.c:1061
 msgid "sign messages by default"
-msgstr "ve výchozím stavu podepisovat zprávy"
+msgstr "Jako výchozí zprávy podepisovat"
 
 #: ../libbalsa/identity.c:1064
 msgid "encrypt messages by default"
-msgstr "ve výchozím stavu šifrovat zprávy"
+msgstr "Jako výchozí zprávy šifrovat"
 
 #: ../libbalsa/identity.c:1067
 msgid "default protocol"
-msgstr "výchozí protokol"
+msgstr "Výchozí protokol"
 
 #: ../libbalsa/identity.c:1070
 msgid "always trust GnuPG keys when encrypting"
-msgstr "při šifrování vždy důvěřovat klíčům GnuPG"
+msgstr "Při šifrování vždy důvěřovat klíčům GnuPG"
 
 #: ../libbalsa/identity.c:1073
 msgid "remind me if messages can be encrypted"
-msgstr "upozornit mě, pokud lze zprávu zašifrovat"
+msgstr "Připomenout mi, když zpráva může být šifrovaná"
 
 #: ../libbalsa/identity.c:1076
 msgid ""
 "use secret key with this id for signing\n"
 "(leave empty for automatic selection)"
 msgstr ""
-"použít k podpisu tajný klíč s tímto ID\n"
-"(nechte prázdné pro automatický výběr)"
+"Používat k podepisování tajný klíč s tímto ID\n"
+"(ponechte prázdné pro automatický výběr)"
 
 #: ../libbalsa/identity.c:1210
 #, c-format
@@ -975,7 +975,7 @@ msgstr "Rekonstrukce zprávy"
 #: ../libbalsa/mailbox.c:4348
 #, c-format
 msgid "Finding duplicate messages in source mailbox failed"
-msgstr "Vyhledání duplicitních zpráv ve zdrojové poštovní schránce selhalo"
+msgstr "Vyhledání zdvojených zpráv ve zdrojové poštovní schránce selhalo"
 
 #. ImapIssue macro handles reconnecting. We might issue a
 #. LIBBALSA_INFORMATION_MESSAGE here but it would be overwritten by
@@ -1784,7 +1784,7 @@ msgid ""
 "System will attempt to resubmit the message until you delete it."
 msgstr ""
 "Problém při předání zprávy, ukládá se do schránky „Pošta k odeslání“.\n"
-"Systém se bude pokoušet znovu poslat zprávu, dokud ji nesmažete."
+"Systém se bude pokoušet znovu odeslat zprávu, dokud ji nesmažete."
 
 #: ../libbalsa/send.c:1089
 msgid "Connected to MTA"
@@ -2438,7 +2438,7 @@ msgstr "během psaní"
 
 #: ../src/address-book-config.c:190
 msgid "when I hit the Escape key"
-msgstr "když stisknu klávesu Esc"
+msgstr "když zmáčknu klávesu Esc"
 
 #: ../src/address-book-config.c:227 ../src/address-book-config.c:328
 #, c-format
@@ -2578,7 +2578,7 @@ msgstr "Přeposlat _jako přílohu…"
 
 #: ../src/balsa-index.c:1890
 msgid "Forward _Inline..."
-msgstr "Přeposlat uvn_itř…"
+msgstr "Přeposlat jako _citaci…"
 
 #: ../src/balsa-index.c:1892 ../src/main-window.c:562
 msgid "_Pipe through..."
@@ -2615,7 +2615,7 @@ msgstr "_Přesunout do"
 
 #: ../src/balsa-index.c:1946
 msgid "_View Source"
-msgstr "Zobrazit zdro_j"
+msgstr "Zobrazit zdro_jovou formu"
 
 #: ../src/balsa-index.c:2191
 #, c-format
@@ -2689,11 +2689,11 @@ msgstr "Jiné…"
 
 #: ../src/balsa-message.c:301
 msgid "Check cryptographic signature"
-msgstr "Kontrolovat kryptografický podpis"
+msgstr "Zkontrolovat kryptografický podpis"
 
 #: ../src/balsa-message.c:322
 msgid "Select message part to display"
-msgstr "Zvolte část zprávy, kterou zobrazit"
+msgstr "Vyberte část zprávy, která se má zobrazit"
 
 #: ../src/balsa-message.c:409
 msgid "Wrapped"
@@ -2841,9 +2841,9 @@ msgid ""
 "a Message Disposition Notification(MDN) to be returned to `%s'.\n"
 "Do you want to send this notification?"
 msgstr ""
-"Odesílatel této zprávy, %s, vyžaduje \n"
+"Odesílatel této zprávy, %s, požaduje \n"
 "zaslání oznámení o přenesení zprávy (MDN) na adresu „%s“.\n"
-"Chcete poslat toto oznámení?"
+"Chcete odeslat toto oznámení?"
 
 #: ../src/balsa-message.c:2591
 msgid "Reply to MDN?"
@@ -4767,11 +4767,11 @@ msgstr "Vybrat filtry, které automaticky používat v aktuální poštovní sch
 
 #: ../src/main-window.c:525
 msgid "_Remove Duplicates"
-msgstr "_Odstranit duplikáty"
+msgstr "_Odstranit zdvojené zprávy"
 
 #: ../src/main-window.c:526
 msgid "Remove duplicated messages from the current mailbox"
-msgstr "Odstranit duplicitní zprávy z této poštovní schránky"
+msgstr "Odstranit zdvojené zprávy z této poštovní schránky"
 
 #: ../src/main-window.c:536 ../src/message-window.c:267
 msgid "Reply to the current message"
@@ -4924,11 +4924,11 @@ msgstr "Přepnout označené"
 #. Hide messages menu items
 #: ../src/main-window.c:614 ../src/main-window.c:649
 msgid "_Deleted"
-msgstr "_Odstraněno"
+msgstr "_Smazáno"
 
 #: ../src/main-window.c:615
 msgid "Toggle deleted flag"
-msgstr "Přepnout příznak odstranění"
+msgstr "Přepnout příznak smazání"
 
 #: ../src/main-window.c:618 ../src/main-window.c:661
 msgid "_Answered"
@@ -4948,7 +4948,7 @@ msgstr "Přepnout zobrazování stromu poštovních schránek a složek"
 
 #: ../src/main-window.c:629
 msgid "Show Mailbox _Tabs"
-msgstr "Zobrazovat zá_ložky poštovních schránek"
+msgstr "Zobrazovat kar_ty poštovních schránek"
 
 #: ../src/main-window.c:630
 msgid "Toggle display of mailbox notebook tabs"
@@ -5060,7 +5060,7 @@ msgstr "Zobrazovat všechny hlavičky zpráv"
 
 #: ../src/main-window.c:685
 msgid "_Flat index"
-msgstr "Jednoduchý _index"
+msgstr "_Jednoduchý seznam"
 
 #: ../src/main-window.c:686
 msgid "No threading at all"
@@ -5290,19 +5290,19 @@ msgstr "Filtry lze aplikovat pouze na poštovní schránky\n"
 #: ../src/main-window.c:4595
 #, c-format
 msgid "Removing duplicates failed: %s"
-msgstr "Odstraňování duplikátů selhalo: %s"
+msgstr "Odstranění zdvojených zpráv selhalo: %s"
 
 #: ../src/main-window.c:4601
 #, c-format
 msgid "Removed %d duplicate"
 msgid_plural "Removed %d duplicates"
-msgstr[0] "Odstraněn %d duplikát"
-msgstr[1] "Odstraněny %d duplikáty"
-msgstr[2] "Odstraněno %d duplikátů"
+msgstr[0] "Odstraněna %d zdvojená zpráva"
+msgstr[1] "Odstraněny %d zdvojené zprávy"
+msgstr[2] "Odstraněno %d zdvojených zpráv"
 
 #: ../src/main-window.c:4606
 msgid "No duplicates found"
-msgstr "Duplikáty nenalezeny"
+msgstr "Nebyly nalezeny žádné zdvojené zprávy"
 
 #: ../src/main-window.c:4835
 #, c-format
@@ -5630,7 +5630,7 @@ msgstr "Ostatní volby"
 
 #: ../src/pref-manager.c:2152
 msgid "Reply prefix:"
-msgstr "Prefix odpovědi:"
+msgstr "Uvození odpovědi:"
 
 #: ../src/pref-manager.c:2155
 msgid "Automatically quote original when replying"
@@ -5646,7 +5646,7 @@ msgstr "Kopírovat odchozí zprávy do Odeslané pošty"
 
 #: ../src/pref-manager.c:2163
 msgid "Send button always queues outgoing mail in outbox"
-msgstr "Tlačítko Poslat vždy zařadí odchozí poštu do K odeslání"
+msgstr "Tlačítko Odeslat vždy zařadí odchozí poštu do K odeslání"
 
 #: ../src/pref-manager.c:2166
 msgid "Edit headers in external editor"
@@ -6314,11 +6314,11 @@ msgstr "Vložit soubor"
 
 #: ../src/sendmsg-window.c:338
 msgid "_Attach File..."
-msgstr "_Připojit soubor…"
+msgstr "_Přiložit soubor…"
 
 #: ../src/sendmsg-window.c:339
 msgid "Attach a file"
-msgstr "Připojit soubor"
+msgstr "Přiložit soubor"
 
 #: ../src/sendmsg-window.c:340
 msgid "I_nclude Message(s)"
@@ -6433,16 +6433,16 @@ msgstr "Upravit tuto zprávu pomocí výchozího editoru prostředí GNOME"
 #. * the others.
 #: ../src/sendmsg-window.c:395 ../src/sendmsg-window.c:397
 msgid "Sen_d"
-msgstr "Po_slat"
+msgstr "O_deslat"
 
 #
 #: ../src/sendmsg-window.c:396 ../src/sendmsg-window.c:398
 msgid "Send this message"
-msgstr "Poslat tuto zprávu"
+msgstr "Odeslat tuto zprávu"
 
 #: ../src/sendmsg-window.c:400
 msgid "_Queue"
-msgstr "_Zařadit"
+msgstr "_Zařadit do fronty"
 
 #
 #: ../src/sendmsg-window.c:401 ../src/sendmsg-window.c:407
@@ -7218,7 +7218,7 @@ msgstr ""
 
 #: ../src/toolbar-factory.c:150
 msgid "Send"
-msgstr "Poslat"
+msgstr "Odslat"
 
 #: ../src/toolbar-factory.c:151
 msgid "Exchange"
@@ -7305,7 +7305,7 @@ msgstr "Neznámá ikona nástrojové lišty „%s“"
 #
 #: ../src/toolbar-factory.c:459
 msgid "Queue this message for sending"
-msgstr "Zařadit tuto zprávu pro odeslání"
+msgstr "Zařadit tuto zprávu do fronty pro odeslání"
 
 #: ../src/toolbar-factory.c:525
 msgid "Text Be_low Icons"

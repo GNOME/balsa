@@ -938,7 +938,7 @@ msgstr "Nelze vytvořit poštovní schránku typu %s"
 #: ../libbalsa/mailbox.c:872
 #, c-format
 msgid "Applying filter rules to %s"
-msgstr "Aplikovat pravidla filtrování na %s"
+msgstr "Použít pravidla filtrování na %s"
 
 #: ../libbalsa/mailbox.c:1027
 #, c-format
@@ -3722,7 +3722,7 @@ msgstr "Do_le"
 
 #: ../src/filter-run-dialog.c:375
 msgid "A_pply Now!"
-msgstr "_Aplikovat teď!"
+msgstr "_Použít nyní"
 
 #: ../src/filter-run-dialog.c:419
 msgid ""
@@ -4284,7 +4284,7 @@ msgstr "Vy_sypat koš"
 
 #: ../src/mailbox-node.c:1128
 msgid "_Edit/Apply filters"
-msgstr "U_pravit/Aplikovat filtry"
+msgstr "U_pravit/použít filtry"
 
 #: ../src/mailbox-node.c:1216
 #, c-format

@@ -6389,7 +6389,7 @@ msgstr "Vložit ze schránky"
 
 #: ../src/sendmsg-window.c:366
 msgid "_Wrap Body"
-msgstr "_Zalomit text"
+msgstr "_Zalámat text"
 
 #: ../src/sendmsg-window.c:368
 msgid "_Reflow Selected Text"

@@ -3616,7 +3616,7 @@ msgstr "Provést akci:"
 
 #: ../src/filter-edit-dialog.c:510
 msgid "Match"
-msgstr "Shoda"
+msgstr "Porovnávání"
 
 #: ../src/filter-edit-dialog.c:513
 msgid "Action"

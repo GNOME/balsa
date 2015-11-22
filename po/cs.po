@@ -2079,19 +2079,19 @@ msgstr "Výchozí klient"
 
 #: ../libinit_balsa/assistant_page_directory.c:58
 msgid "_Inbox:"
-msgstr "_Přijatá pošta:"
+msgstr "_Přijaté:"
 
 #: ../libinit_balsa/assistant_page_directory.c:58
 msgid "_Outbox:"
-msgstr "Pošta k _odeslání:"
+msgstr "K _odeslání:"
 
 #: ../libinit_balsa/assistant_page_directory.c:58
 msgid "_Sentbox:"
-msgstr "Ode_slaná pošta:"
+msgstr "Ode_slané:"
 
 #: ../libinit_balsa/assistant_page_directory.c:58
 msgid "_Draftbox:"
-msgstr "_Rozepsaná pošta:"
+msgstr "_Koncepty:"
 
 #: ../libinit_balsa/assistant_page_directory.c:59
 msgid "_Trash:"
@@ -4264,11 +4264,11 @@ msgstr "_Odhlásit se"
 
 #: ../src/mailbox-node.c:1114
 msgid "Mark as _Inbox"
-msgstr "Označ_it jako „Přijatá pošta“"
+msgstr "Označ_it jako „Přijaté“"
 
 #: ../src/mailbox-node.c:1116
 msgid "_Mark as Sentbox"
-msgstr "Označit _jako „Odeslaná pošta“"
+msgstr "Označit _jako „Odeslané“"
 
 #: ../src/mailbox-node.c:1118
 msgid "Mark as _Trash"
@@ -4276,7 +4276,7 @@ msgstr "Označi_t jako „Koš“"
 
 #: ../src/mailbox-node.c:1120
 msgid "Mark as D_raftbox"
-msgstr "Označit jako „_Rozepsaná pošta“"
+msgstr "Označit jako „_Koncepty“"
 
 #: ../src/mailbox-node.c:1123
 msgid "_Empty trash"
@@ -4368,19 +4368,19 @@ msgstr "Balsa nemůže otevřít vaši poštovní schránku „%s“."
 
 #: ../src/main.c:601
 msgid "Inbox"
-msgstr "Přijatá pošta"
+msgstr "Přijaté"
 
 #: ../src/main.c:607
 msgid "Outbox"
-msgstr "Pošta k odeslání"
+msgstr "K odeslání"
 
 #: ../src/main.c:613
 msgid "Sentbox"
-msgstr "Odeslaná pošta"
+msgstr "Odeslané"
 
 #: ../src/main.c:619
 msgid "Draftbox"
-msgstr "Rozepsaná pošta"
+msgstr "Koncepty"
 
 #: ../src/main.c:624
 msgid "Trash"
@@ -6570,7 +6570,7 @@ msgid ""
 "Save message to Draftbox?"
 msgstr ""
 "Zpráva pro „%s“ byla změněna.\n"
-"Uložit zprávu do Rozepsané pošty?"
+"Uložit zprávu do konceptů?"
 
 #: ../src/sendmsg-window.c:1233
 msgid "Gnome editor is not defined in your preferred applications."
@@ -6785,7 +6785,7 @@ msgstr "Nelze uložit zprávu."
 #: ../src/sendmsg-window.c:4200
 #, c-format
 msgid "Could not open draftbox: %s"
-msgstr "Nelze otevřít Rozepsanou poštu: %s"
+msgstr "Nelze otevřít koncepty: %s"
 
 #: ../src/sendmsg-window.c:4225
 msgid "Message saved."

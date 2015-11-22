@@ -3171,7 +3171,7 @@ msgstr "Odpověď komu:"
 #: ../src/balsa-mime-widget-message.c:753
 #: ../src/balsa-print-object-header.c:174
 msgid "Fcc:"
-msgstr "Automatická kopie:"
+msgstr "Kopie do složky:"
 
 #: ../src/balsa-mime-widget-message.c:760
 #: ../src/balsa-print-object-header.c:177

@@ -5579,7 +5579,7 @@ msgstr "Upřednostnit čistý text/plain před HTML"
 
 #: ../src/pref-manager.c:2000
 msgid "National (8-bit) characters in broken messages without codeset header"
-msgstr "Národní (osmibitové) znaky v chybných zprávách bez hlavičky codeset"
+msgstr "Národní (8bitové) znaky v chybných zprávách bez hlavičky Codeset"
 
 #: ../src/pref-manager.c:2007
 msgid "display as \"?\""
@@ -6684,7 +6684,7 @@ msgstr "_Předmět:"
 #. fcc: mailbox folder where the message copy will be written to
 #: ../src/sendmsg-window.c:2959
 msgid "F_cc:"
-msgstr "_Automatická kopie:"
+msgstr "Kopie do _složky:"
 
 #. Attachment list
 #: ../src/sendmsg-window.c:2988

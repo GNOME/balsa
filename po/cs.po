@@ -482,7 +482,7 @@ msgstr "Cesta k _podpisu"
 
 #: ../libbalsa/identity.c:1032
 msgid "_Execute signature"
-msgstr "Sp_ustit podpis"
+msgstr "P_rovést podpis"
 
 #: ../libbalsa/identity.c:1035
 msgid "Incl_ude signature"
@@ -5892,11 +5892,11 @@ msgstr "Po spuštění otevřít schránku s doručenou poštou"
 
 #: ../src/pref-manager.c:2829
 msgid "Check mail upon startup"
-msgstr "Po spuštění kontrolovat poštu"
+msgstr "Po spuštění zkontrolovat poštu"
 
 #: ../src/pref-manager.c:2831
 msgid "Remember open mailboxes between sessions"
-msgstr "Pamatovat si otevřené poštovní schránky mezi sezeními"
+msgstr "Pamatovat si mezi sezeními otevřené poštovní schránky"
 
 #: ../src/pref-manager.c:2845
 msgid "Folder scanning"

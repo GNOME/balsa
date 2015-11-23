@@ -3581,7 +3581,7 @@ msgstr "Operace mezi podmínkami"
 
 #: ../src/filter-edit-dialog.c:335
 msgid "Ne_w"
-msgstr "No_vý"
+msgstr "No_vá"
 
 #: ../src/filter-edit-dialog.c:363
 msgid "Foreground"
@@ -6549,15 +6549,15 @@ msgstr "Režim _S/MIME (GpgSM)"
 
 #: ../src/sendmsg-window.c:688
 msgid "Attachment"
-msgstr "Příloha"
+msgstr "Jako přílohu"
 
 #: ../src/sendmsg-window.c:688
 msgid "Inline"
-msgstr "Vloženo"
+msgstr "Jako vložené"
 
 #: ../src/sendmsg-window.c:688
 msgid "Reference"
-msgstr "Odkaz"
+msgstr "Jako odkaz"
 
 #: ../src/sendmsg-window.c:929
 msgid "(No name)"

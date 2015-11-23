@@ -4308,7 +4308,7 @@ msgstr "Nelze zapisovat do %s: %s"
 
 #: ../src/main.c:460 ../src/main.c:509
 msgid "Get new mail on startup"
-msgstr "Získat novou poštu po spuštění programu"
+msgstr "Po spuštění stáhnout novou poštu"
 
 #: ../src/main.c:462 ../src/main.c:511
 msgid "Compose a new email to EMAIL@ADDRESS"
@@ -4316,15 +4316,15 @@ msgstr "Vytvořit novou zprávu pro ELEKTRONICKÁ@ADRESA"
 
 #: ../src/main.c:464
 msgid "Attach file at PATH"
-msgstr "Připojit soubor na CESTĚ"
+msgstr "Přiložit soubor z CESTY"
 
 #: ../src/main.c:466 ../src/main.c:516
 msgid "Opens MAILBOXNAME"
-msgstr "Otevřít POŠTOVNÍSCHRÁNKU"
+msgstr "Otevřít POŠTOVNÍ_SCHRÁNKU"
 
 #: ../src/main.c:466 ../src/main.c:516
 msgid "MAILBOXNAME"
-msgstr "POŠTOVNÍSCHRÁNKA"
+msgstr "POŠTOVNÍ_SCHRÁNKA"
 
 #: ../src/main.c:469 ../src/main.c:519
 msgid "Opens first unread mailbox"
@@ -4348,17 +4348,17 @@ msgstr "Ladit spojení IMAP"
 
 #: ../src/main.c:501
 msgid "The Balsa E-Mail Client"
-msgstr "Klient e-mailu Balsa"
+msgstr "Poštovní Klient Balsa"
 
 #: ../src/main.c:513
 msgid "Attach file at URI"
-msgstr "Připojit soubor na adrese URI"
+msgstr "Přiložit soubor z adresy URI"
 
 #: ../src/main.c:554
 #, c-format
 msgid "Run '%s --help' to see a full list of available command line options.\n"
 msgstr ""
-"Spuštěním „%s --help“ zobrazíte celý seznam dostupných voleb příkazu.\n"
+"Spuštěním „%s --help“ si zobrazíte úplný seznam dostupných voleb příkazové řádky.\n"
 
 #: ../src/main.c:601 ../src/main.c:606 ../src/main.c:612 ../src/main.c:618
 #: ../src/main.c:624
@@ -6331,12 +6331,12 @@ msgstr "Vložit zvolenou zprávu (zprávy)"
 #
 #: ../src/sendmsg-window.c:342
 msgid "Attach _Message(s)"
-msgstr "Připojit _zprávu (zprávy)"
+msgstr "Přiložit _zprávu (zprávy)"
 
 #
 #: ../src/sendmsg-window.c:343
 msgid "Attach selected message(s)"
-msgstr "Připojit zvolenou zprávu (zprávy)"
+msgstr "Přiložit vybranou zprávu (zprávy)"
 
 #: ../src/sendmsg-window.c:344
 msgid "_Save"
@@ -6597,7 +6597,7 @@ msgstr ""
 
 #: ../src/sendmsg-window.c:1780
 msgid "Attach as Reference?"
-msgstr "Připojit jako odkaz?"
+msgstr "Přiložit jako odkaz?"
 
 #: ../src/sendmsg-window.c:1873
 msgid "Choose charset"
@@ -6618,7 +6618,7 @@ msgstr ""
 
 #: ../src/sendmsg-window.c:1900
 msgid "Attach as MIME type:"
-msgstr "Připojit jako typ MIME:"
+msgstr "Přiložit jako typ MIME:"
 
 #: ../src/sendmsg-window.c:1969
 #, c-format
@@ -6661,7 +6661,7 @@ msgstr "(URL)"
 
 #: ../src/sendmsg-window.c:2341
 msgid "Attach file"
-msgstr "Připojit soubor"
+msgstr "Přiložit soubor"
 
 #: ../src/sendmsg-window.c:2442 ../src/sendmsg-window.c:2552
 #: ../src/sendmsg-window.c:5033
@@ -7226,7 +7226,7 @@ msgstr "Vyměnit"
 
 #: ../src/toolbar-factory.c:152
 msgid "Attach"
-msgstr "Připojit"
+msgstr "Přiložit"
 
 #: ../src/toolbar-factory.c:153
 msgid "Save"

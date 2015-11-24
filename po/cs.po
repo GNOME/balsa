@@ -406,12 +406,12 @@ msgstr "Výchozí"
 #. Translators: please do not translate Face.
 #: ../libbalsa/identity.c:948
 msgid "_Face Path"
-msgstr "Cesta k _Face"
+msgstr "Cesta k ikoně _Face"
 
 #. Translators: please do not translate Face.
 #: ../libbalsa/identity.c:954
 msgid "_X-Face Path"
-msgstr "Cesta k _X-Face"
+msgstr "Cesta k ikoně _X-Face"
 
 #. create the "General" tab
 #: ../libbalsa/identity.c:982
@@ -3808,7 +3808,7 @@ msgstr "Vždy zobrazovat _INBOX"
 
 #: ../src/folder-conf.c:408
 msgid "Pr_efix:"
-msgstr "_Předpona:"
+msgstr "Z_ačít v:"
 
 #: ../src/folder-conf.c:554
 msgid "Select parent folder"
@@ -5868,7 +5868,7 @@ msgstr "Následující nastavení jsou globální:"
 
 #: ../src/pref-manager.c:2758
 msgid "Expunge deleted messages when mailbox is closed"
-msgstr "Odstraňovat vymazané zprávy při zavření poštovní schránky"
+msgstr "Odstraňovat smazané zprávy při zavření poštovní schránky"
 
 #: ../src/pref-manager.c:2765
 msgid "...and if unused more than"

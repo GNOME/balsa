@@ -457,7 +457,7 @@ msgstr "Text _přeposlání:"
 
 #: ../libbalsa/identity.c:1005
 msgid "send messages in both plain text and _HTML format"
-msgstr "Odeslat zprávu jako čistý text i v _HTML formátu"
+msgstr "Odeslat zprávu jako prostý text i v _HTML formátu"
 
 #: ../libbalsa/identity.c:1008
 msgid "request positive (successful) _Delivery Status Notification by default"
@@ -1066,18 +1066,18 @@ msgstr "Nelze uložit soubor mezipaměti „%s“: %s."
 #: ../libbalsa/mailbox_local.c:570
 #, c-format
 msgid "Cache file for mailbox %s will be created"
-msgstr "Bude vytvořen soubor s keší pro schránku %s"
+msgstr "Bude vytvořen soubor mezipaměti pro schránku %s"
 
 #: ../libbalsa/mailbox_local.c:579
 #, c-format
 msgid "Failed to read cache file %s: %s"
-msgstr "Nelze část ze souboru keše %s: %s"
+msgstr "Nelze číst ze souboru mezipaměti %s: %s"
 
 #: ../libbalsa/mailbox_local.c:597 ../libbalsa/mailbox_local.c:614
 #: ../libbalsa/mailbox_local.c:638
 #, c-format
 msgid "Cache file for mailbox %s will be repaired"
-msgstr "Soubor s keší pro schránku %s bude opraven"
+msgstr "Soubor mezipaměti pro schránku %s bude opraven"
 
 #: ../libbalsa/mailbox_local.c:1164
 #, c-format
@@ -1381,7 +1381,7 @@ msgstr "Nelze otevřít %s: je to symbolický odkaz"
 
 #: ../libbalsa/misc.c:967
 msgid "Timeout exceeded while attempting fcntl lock!"
-msgstr "Časový interval vypršel při pokusu vytvořit zámek fcntl!"
+msgstr "Při pokusu vytvořit zámek fcntl vypršelo časové omezení!"
 
 #: ../libbalsa/misc.c:974
 #, c-format
@@ -1390,7 +1390,7 @@ msgstr "Čeká se na zámek fcntl… %d"
 
 #: ../libbalsa/misc.c:1002
 msgid "Timeout exceeded while attempting flock lock!"
-msgstr "Časový interval vypršel při pokusu vytvořit zámek flock!"
+msgstr "Při pokusu vytvořit zámek flock vypršelo časové omezení!"
 
 #: ../libbalsa/misc.c:1009
 #, c-format
@@ -1437,7 +1437,7 @@ msgstr "zpracovává se"
 
 #: ../libbalsa/rfc2445.c:682
 msgid "Event Notification"
-msgstr "Oznámení události"
+msgstr "Upozornění na událost"
 
 #: ../libbalsa/rfc2445.c:683
 msgid "Event Request"
@@ -3468,7 +3468,7 @@ msgstr "Odpovídá, pokud je datum zprávy v rozmezí:"
 
 #: ../src/filter-edit-callbacks.c:1135
 msgid "Inside/outside the date interval"
-msgstr "Uvnitř/Mimo časový interval"
+msgstr "Uvnitř/mimo rozmezí dat"
 
 #: ../src/filter-edit-callbacks.c:1182
 msgid "Match when one flag is set/when no flag is set"
@@ -3531,7 +3531,7 @@ msgstr "Regulární výraz"
 
 #: ../src/filter-edit-dialog.c:97
 msgid "Date interval"
-msgstr "Časový interval"
+msgstr "Rozmezí dat"
 
 #: ../src/filter-edit-dialog.c:98
 msgid "Flag condition"
@@ -3761,11 +3761,11 @@ msgstr "_Maximální počet spojení:"
 
 #: ../src/folder-conf.c:337 ../src/mailbox-conf.c:1399
 msgid "Enable _persistent cache"
-msgstr "Povolit _trvalou keš"
+msgstr "Povolit _trvalou mezipaměť"
 
 #: ../src/folder-conf.c:345
 msgid "Use IDLE command"
-msgstr "Použít příkaz IDLE"
+msgstr "Používat příkaz IDLE"
 
 #: ../src/folder-conf.c:352 ../src/mailbox-conf.c:1403
 msgid "Enable _bug workarounds"
@@ -4642,7 +4642,7 @@ msgstr "Žádné zvětšení"
 #: ../src/main-window.c:444 ../src/main-window.c:445
 #: ../src/message-window.c:298 ../src/message-window.c:299
 msgid "Next Unread Message"
-msgstr "Další nepřečtená zpráva"
+msgstr "Následující nepřečtená zpráva"
 
 #: ../src/main-window.c:447
 msgid "Empty _Trash"
@@ -4695,7 +4695,7 @@ msgstr "_Hledat"
 
 #: ../src/main-window.c:490
 msgid "Find Ne_xt"
-msgstr "Na_jdi další"
+msgstr "Na_jít další"
 
 #. Mailbox menu items
 #: ../src/main-window.c:493 ../src/main-window.c:494
@@ -4872,7 +4872,7 @@ msgstr "_Následující část"
 #
 #: ../src/main-window.c:581 ../src/message-window.c:292
 msgid "Next part in message"
-msgstr "Další část zprávy"
+msgstr "Následující část zprávy"
 
 #: ../src/main-window.c:582 ../src/message-window.c:293
 msgid "_Previous Part"
@@ -5032,7 +5032,7 @@ msgstr "Náhled zprávy"
 #
 #: ../src/main-window.c:670
 msgid "Show preview pane"
-msgstr "Zobrazit panel náhledu"
+msgstr "Zobrazit panel s náhledem"
 
 #: ../src/main-window.c:676 ../src/message-window.c:324
 msgid "_No Headers"
@@ -5575,7 +5575,7 @@ msgstr "Zobrazení částí Multipart/Alternative"
 
 #: ../src/pref-manager.c:1984
 msgid "Prefer text/plain over html"
-msgstr "Upřednostnit čistý text/plain před HTML"
+msgstr "Upřednostnit prostý text před HTML"
 
 #: ../src/pref-manager.c:2000
 msgid "National (8-bit) characters in broken messages without codeset header"
@@ -5690,7 +5690,7 @@ msgstr "Používat panel náhledu"
 
 #: ../src/pref-manager.c:2225
 msgid "Show mailbox statistics in left pane"
-msgstr "Zobrazovat statistiky poštovní schránky v levém panelu"
+msgstr "Zobrazovat statistiky u poštovních schránek v levém panelu"
 
 #: ../src/pref-manager.c:2229
 msgid "Automatically view message when mailbox opened"
@@ -6496,20 +6496,20 @@ msgstr "Požadovat oznámení o přenesení zprávy (MDN)"
 
 #: ../src/sendmsg-window.c:438
 msgid "_Request Delivery Status Notification"
-msgstr "Požadovat _oznámení o stavu doručení"
+msgstr "Požadovat _oznámení o doručení"
 
 #: ../src/sendmsg-window.c:439
 msgid "Request positive (successful) Delivery Status Notification"
-msgstr "Požadovat oznámení o kladné (úspěšném) doručení zprávy (DSN)"
+msgstr "Požadovat oznámení o (úspěšném) doručení zprávy (DSN)"
 
 #: ../src/sendmsg-window.c:441
 msgid "_Format = Flowed"
-msgstr "_Format = Flowed"
+msgstr "_Formát = Flowed"
 
 #. Send as message/alternative with text/plain and text/html parts
 #: ../src/sendmsg-window.c:444
 msgid "Send as plain text and _HTML"
-msgstr "Odeslat jako čistý text a _HTML"
+msgstr "Odeslat jako prostý text i _HTML"
 
 #: ../src/sendmsg-window.c:448 ../src/sendmsg-window.c:454
 msgid "_Sign Message"
@@ -6887,7 +6887,7 @@ msgid ""
 "The message text will be sent as plain text and as HTML, but only the plain "
 "part can be signed.\n"
 msgstr ""
-"Text zprávy bude odeslán jako čistý text a jako HTML, ale pouze čistý text "
+"Text zprávy bude odeslán jako prostý text i jako HTML, ale pouze prostý text "
 "může být podepsán.\n"
 
 #: ../src/sendmsg-window.c:6016
@@ -7166,7 +7166,7 @@ msgid ""
 "unread"
 msgstr ""
 "Následující\n"
-"nečtená"
+"nepřečtená"
 
 #: ../src/toolbar-factory.c:143
 msgid ""
@@ -7373,7 +7373,7 @@ msgstr "Dostupná tlačítka"
 
 #: ../src/toolbar-prefs.c:516
 msgid "Current toolbar"
-msgstr "Aktuální nástrojová lišta"
+msgstr "Současná nástrojová lišta"
 
 #: ../src/toolbar-prefs.c:533
 msgid "Up"

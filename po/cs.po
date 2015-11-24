@@ -3718,7 +3718,7 @@ msgstr "Nahor_u"
 #. down button
 #: ../src/filter-run-dialog.c:369
 msgid "Do_wn"
-msgstr "Do_le"
+msgstr "Do_lů"
 
 #: ../src/filter-run-dialog.c:375
 msgid "A_pply Now!"
@@ -4462,7 +4462,7 @@ msgstr "Pokračovat v psaní této zprávy"
 
 #: ../src/main-window.c:374
 msgid "_Get New Mail"
-msgstr "_Získat novou poštu"
+msgstr "_Přijmout novou poštu"
 
 #: ../src/main-window.c:375
 msgid "Fetch new incoming mail"
@@ -4474,7 +4474,7 @@ msgstr "Ode_slat poštu z fronty"
 
 #: ../src/main-window.c:377
 msgid "Send messages from the outbox"
-msgstr "Odeslat poštu z poštovní schránky „Pošta k odeslání“"
+msgstr "Odeslat poštu z poštovní schránky „K odeslání“"
 
 #: ../src/main-window.c:380
 msgid "Send and _Receive Mail"
@@ -5268,7 +5268,7 @@ msgstr "_Předmět"
 #. Frame with Apply and Clear buttons
 #: ../src/main-window.c:4368
 msgid "Show only matching messages"
-msgstr "Zobrazovat jen odpovídající zprávy"
+msgstr "Zobrazit jen vyhovující zprávy"
 
 #. Frame with OK button
 #: ../src/main-window.c:4389
@@ -5499,7 +5499,7 @@ msgstr "Odchozí"
 
 #: ../src/pref-manager.c:1842
 msgid "Checking"
-msgstr "Kontrola"
+msgstr "Kontroluje se"
 
 #: ../src/pref-manager.c:1848
 msgid "_Check mail automatically every"
@@ -5742,7 +5742,7 @@ msgstr "Závažná chybová hlášení:"
 
 #: ../src/pref-manager.c:2334
 msgid "Debug messages:"
-msgstr "Zprávy lazení:"
+msgstr "Zprávy ladění:"
 
 #: ../src/pref-manager.c:2360
 msgid "Message colors"

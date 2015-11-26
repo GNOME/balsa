@@ -4396,7 +4396,7 @@ msgstr "Balsa zavírá soubory a spojení. Počkejte prosím…"
 
 #: ../src/main-window.c:347
 msgid "Mail_box"
-msgstr "Poštovní schrán_ka"
+msgstr "Schrán_ka"
 
 #: ../src/main-window.c:348 ../src/message-window.c:241
 msgid "_Message"

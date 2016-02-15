@@ -2838,7 +2838,11 @@ bw_notebook_label_new(BalsaMailboxNode * mbnode)
     gtk_box_pack_start(GTK_BOX(box), lab, TRUE, TRUE, 0);
 
     but = gtk_button_new();
+#if GTK_CHECK_VERSION(3, 19, 0)
+    gtk_widget_set_focus_on_click(but, FALSE);
+#else                           /* GTK_CHECK_VERSION(3, 20, 0) */
     gtk_button_set_focus_on_click(GTK_BUTTON(but), FALSE);
+#endif                          /* GTK_CHECK_VERSION(3, 20, 0) */
     gtk_button_set_relief(GTK_BUTTON(but), GTK_RELIEF_NONE);
 
     gtk_icon_size_lookup(GTK_ICON_SIZE_MENU, &w, &h);

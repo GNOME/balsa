@@ -506,7 +506,11 @@ text_view_url_popup(GtkTextView *textview, GtkMenu *menu)
     gint x, y;
     GdkWindow *window;
     GdkDisplay *display;
+#if GTK_CHECK_VERSION(3, 19, 0)
+    GdkSeat *seat;
+#else                           /* GTK_CHECK_VERSION(3, 20, 0) */
     GdkDeviceManager *manager;
+#endif                          /* GTK_CHECK_VERSION(3, 20, 0) */
     GdkDevice *device;
     GtkWidget *menu_item;
 
@@ -517,8 +521,13 @@ text_view_url_popup(GtkTextView *textview, GtkMenu *menu)
     /* check if we are over an url */
     window = gtk_text_view_get_window(textview, GTK_TEXT_WINDOW_TEXT);
     display = gdk_window_get_display(window);
+#if GTK_CHECK_VERSION(3, 19, 0)
+    seat = gdk_display_get_default_seat(display);
+    device = gdk_seat_get_pointer(seat);
+#else                           /* GTK_CHECK_VERSION(3, 20, 0) */
     manager = gdk_display_get_device_manager(display);
     device = gdk_device_manager_get_client_pointer(manager);
+#endif                          /* GTK_CHECK_VERSION(3, 20, 0) */
     gdk_window_get_device_position(window, device, &x, &y, NULL);
 
     url = find_url(GTK_WIDGET(textview), x, y, url_list);
@@ -704,8 +713,13 @@ prepare_url_offsets(GtkTextBuffer * buffer, GList * url_list)
         gtk_text_iter_backward_to_tag_toggle(&iter, url_tag);
 #else
         while (gtk_text_iter_backward_char(&iter))
+#if GTK_CHECK_VERSION(3, 19, 0)
+            if (gtk_text_iter_starts_tag(&iter, url_tag))
+                break;
+#else                           /* GTK_CHECK_VERSION(3, 20, 0) */
             if (gtk_text_iter_begins_tag(&iter, url_tag))
                 break;
+#endif                          /* GTK_CHECK_VERSION(3, 20, 0) */
 #endif                          /* BUG_102711_FIXED */
         url->start = gtk_text_iter_get_offset(&iter);
     }

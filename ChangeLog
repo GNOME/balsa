@@ -1,3 +1,15 @@
+2016-02-15  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Gtk 3.20 deprecation cleanup
+
+	* libbalsa/mime.c (is_in_url): gtk_text_iter_begins_tag is
+	deprecated;
+	* src/balsa-mime-widget-text.c (text_view_url_popup),
+	(prepare_url_offsets): ditto; also gdk_display_get_device_manager
+	is deprecated;
+	* src/main-window.c (bw_notebook_label_new):
+	gtk_button_set_focus_on_click is deprecated.
+
 2016-02-15  Albrecht Dreß
 
 	Build with Gtk+ < 3.12

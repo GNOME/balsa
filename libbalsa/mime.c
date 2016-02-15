@@ -660,8 +660,13 @@ static gboolean
 is_in_url(GtkTextIter * iter, gint offset, GtkTextTag * url_tag)
 {
     gtk_text_iter_set_line_offset(iter, offset);
+#if GTK_CHECK_VERSION(3, 19, 0)
+    return url_tag ? (gtk_text_iter_has_tag(iter, url_tag)
+                      && !gtk_text_iter_starts_tag(iter, url_tag)) : FALSE;
+#else                           /* GTK_CHECK_VERSION(3, 20, 0) */
     return url_tag ? (gtk_text_iter_has_tag(iter, url_tag)
                       && !gtk_text_iter_begins_tag(iter, url_tag)) : FALSE;
+#endif                          /* GTK_CHECK_VERSION(3, 20, 0) */
 }
 
 /* Remove soft newlines and associated quote strings from num_paras

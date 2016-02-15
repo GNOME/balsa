@@ -332,7 +332,7 @@ create_generic_dialog(AddressBookConfig * abc, const gchar * type)
 
     dialog =
         gtk_dialog_new_with_buttons(title, abc->parent,
-                                    GTK_DIALOG_USE_HEADER_BAR,
+                                    BALSA_DIALOG_FLAGS,
                                     _("_Help"), GTK_RESPONSE_HELP,
                                     action, GTK_RESPONSE_APPLY,
                                     _("_Cancel"), GTK_RESPONSE_CANCEL,

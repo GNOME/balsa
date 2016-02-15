@@ -585,7 +585,7 @@ ask_cert_real(void *data)
     dialog = gtk_dialog_new_with_buttons(_("SSL/TLS certificate"),
                                          NULL, /* FIXME: NULL parent */
                                          GTK_DIALOG_MODAL |
-                                         GTK_DIALOG_USE_HEADER_BAR,
+                                         BALSA_DIALOG_FLAGS,
                                          _("_Accept Once"), 0,
                                          _("Accept&_Save"), 1,
                                          _("_Reject"), GTK_RESPONSE_CANCEL, 

@@ -1237,7 +1237,7 @@ fe_edit_condition(GtkWidget * throwaway,gpointer is_new_cnd)
             gtk_dialog_new_with_buttons("",
                                         GTK_WINDOW(fe_window),
                                         GTK_DIALOG_DESTROY_WITH_PARENT |
-                                        GTK_DIALOG_USE_HEADER_BAR,
+                                        BALSA_DIALOG_FLAGS,
                                         _("_OK"), GTK_RESPONSE_OK,
                                         _("_Cancel"), GTK_RESPONSE_CANCEL,
                                         _("_Help"), GTK_RESPONSE_HELP,

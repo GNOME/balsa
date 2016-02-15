@@ -303,7 +303,7 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
                    (_("Remote IMAP folder"),
                     GTK_WINDOW(balsa_app.main_window),
                     GTK_DIALOG_DESTROY_WITH_PARENT |
-                    GTK_DIALOG_USE_HEADER_BAR,
+                    BALSA_DIALOG_FLAGS,
                     mn ? _("_Update") : _("C_reate"), GTK_RESPONSE_OK,
                     _("_Cancel"), GTK_RESPONSE_CANCEL,
                     _("_Help"), GTK_RESPONSE_HELP,
@@ -569,7 +569,7 @@ browse_button_cb(GtkWidget * widget, SubfolderDialogData * sdd)
         gtk_dialog_new_with_buttons(_("Select parent folder"),
                                     GTK_WINDOW(sdd->dialog),
                                     GTK_DIALOG_DESTROY_WITH_PARENT |
-                                    GTK_DIALOG_USE_HEADER_BAR,
+                                    BALSA_DIALOG_FLAGS,
                                     _("_Cancel"), GTK_RESPONSE_CANCEL,
                                     _("_Help"), GTK_RESPONSE_HELP,
                                     NULL);
@@ -655,7 +655,7 @@ folder, parent);
                     gtk_dialog_new_with_buttons(_("Question"),
                                                 GTK_WINDOW(sdd->dialog),
                                                 GTK_DIALOG_MODAL |
-                                                GTK_DIALOG_USE_HEADER_BAR,
+                                                BALSA_DIALOG_FLAGS,
                                                 _("Rename INBOX"),
                                                 GTK_RESPONSE_OK,
                                                 _("Cancel"),
@@ -801,7 +801,7 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
                    (_("Remote IMAP subfolder"), 
                     GTK_WINDOW(balsa_app.main_window),
                     GTK_DIALOG_DESTROY_WITH_PARENT | /* must NOT be modal */
-                    GTK_DIALOG_USE_HEADER_BAR,
+                    BALSA_DIALOG_FLAGS,
                     mn ? _("_Update") : _("_Create"), GTK_RESPONSE_OK,
                     _("_Cancel"), GTK_RESPONSE_CANCEL,
                     _("_Help"), GTK_RESPONSE_HELP,

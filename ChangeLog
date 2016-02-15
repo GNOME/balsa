@@ -1,3 +1,35 @@
+2016-02-15  Albrecht Dreß
+
+	Build with Gtk+ < 3.12
+
+	* configure.ac: define BALSA_DIALOG_FLAGS as either
+	GTK_DIALOG_USE_HEADER_BAR or 0.
+	* libbalsa/identity.c (libbalsa_identity_select_dialog),
+	(libbalsa_identity_config_dialog):
+	* libbalsa/libbalsa-gpgme-cb.c (lb_gpgme_select_key),
+	(get_passphrase_real):
+	* libbalsa/libbalsa.c (ask_cert_real):
+	* libbalsa/send.c (ensure_send_progress_dialog):
+	* libbalsa/smtp-server.c (libbalsa_smtp_server_dialog):
+	* src/address-book-config.c (create_generic_dialog):
+	* src/balsa-app.c (ask_password_real):
+	* src/balsa-index.c (balsa_index_pipe):
+	* src/balsa-mblist.c (bmbl_mru_show_tree):
+	* src/filter-edit-callbacks.c (fe_edit_condition):
+	* src/filter-edit-dialog.c (filters_edit_dialog):
+	* src/filter-export-dialog.c (filters_export_dialog):
+	* src/folder-conf.c (folder_conf_imap_node), (browse_button_cb),
+	(subfolder_conf_clicked_ok), (folder_conf_imap_sub_node):
+	* src/information-dialog.c (balsa_information_list):
+	* src/mailbox-conf.c (create_generic_dialog):
+	* src/main-window.c (ensure_check_mail_dialog), (bw_find_real):
+	* src/pref-manager.c (open_preferences_manager):
+	* src/sendmsg-window.c (sw_get_user_codeset),
+	(quote_parts_select_dlg), (subject_not_empty),
+	(bsmsg_check_format_compatibility):
+	* src/store-address.c (store_address_dialog):
+	* src/toolbar-prefs.c (customize_dialog_cb): use it.
+
 2015-09-21  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* src/balsa-mime-widget-callbacks.c

@@ -484,7 +484,7 @@ libbalsa_identity_select_dialog(GtkWindow * parent,
     sdi->dialog = dialog =
         gtk_dialog_new_with_buttons(prompt, parent,
                                     GTK_DIALOG_DESTROY_WITH_PARENT |
-                                    GTK_DIALOG_USE_HEADER_BAR,
+                                    BALSA_DIALOG_FLAGS,
                                     _("_Cancel"), GTK_RESPONSE_CANCEL,
                                     _("_OK"),     GTK_RESPONSE_OK,
                                     NULL);
@@ -1729,7 +1729,7 @@ libbalsa_identity_config_dialog(GtkWindow *parent, GList **identities,
         gtk_dialog_new_with_buttons(_("Manage Identities"),
                                     parent, /* must NOT be modal */
                                     GTK_DIALOG_DESTROY_WITH_PARENT |
-                                    GTK_DIALOG_USE_HEADER_BAR,
+                                    BALSA_DIALOG_FLAGS,
                                     _("_Help"),   IDENTITY_RESPONSE_HELP,
                                     _("_New"),    IDENTITY_RESPONSE_NEW,
                                     _("_Remove"), IDENTITY_RESPONSE_REMOVE,

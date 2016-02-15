@@ -88,7 +88,7 @@ ask_password_real(LibBalsaServer * server, LibBalsaMailbox * mbox)
     dialog = gtk_dialog_new_with_buttons(_("Password needed"),
                                          GTK_WINDOW(balsa_app.main_window),
                                          GTK_DIALOG_DESTROY_WITH_PARENT |
-                                         GTK_DIALOG_USE_HEADER_BAR,
+                                         BALSA_DIALOG_FLAGS,
                                          _("_OK"), GTK_RESPONSE_OK,
                                          _("_Cancel"), GTK_RESPONSE_CANCEL,
                                          NULL); 

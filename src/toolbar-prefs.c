@@ -138,7 +138,7 @@ customize_dialog_cb(GtkWidget * widget, gpointer data)
         gtk_dialog_new_with_buttons(_("Customize Toolbars"),
                                     GTK_WINDOW(active_window),
                                     GTK_DIALOG_DESTROY_WITH_PARENT |
-                                    GTK_DIALOG_USE_HEADER_BAR,
+                                    BALSA_DIALOG_FLAGS,
                                     _("_Close"), GTK_RESPONSE_CLOSE,
                                     _("_Help"),  GTK_RESPONSE_HELP,
                                     NULL);

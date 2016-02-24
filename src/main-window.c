@@ -702,9 +702,9 @@ bw_is_active_notify(GObject * gobject, GParamSpec * pspec,
     GtkWindow *gtk_window = GTK_WINDOW(gobject);
 
     if (gtk_window_is_active(gtk_window)) {
+#ifdef HAVE_NOTIFY
         BalsaWindow *window = BALSA_WINDOW(gobject);
 
-#ifdef HAVE_NOTIFY
         if (window->new_mail_note)
             notify_notification_close(window->new_mail_note, NULL);
 #endif                          /* HAVE_NOTIFY */

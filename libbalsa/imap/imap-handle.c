@@ -1846,7 +1846,7 @@ ImapMessage*
 imap_message_new(void)
 {
   ImapMessage * msg=g_malloc0(sizeof(ImapMessage));
-  msg->rfc822size=-1;
+  msg->rfc822size = -1;
   return msg;
 }
 

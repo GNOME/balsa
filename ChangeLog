@@ -1,5 +1,10 @@
 2016-03-12  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	* libbalsa/imap/imap-handle.c (imap_message_new): use whitespace
+	  to resolve ambiguous assignment.
+
+2016-03-12  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* libbalsa/libbalsa-gpgme-cb.h: remove Emacs hack.
 
 2016-03-12  Albrecht Dreß
@@ -21,7 +26,7 @@
 	  fix a few minor glitches, and remove a few unused statements.
 
 	* libbalsa-gpgme.c: fix callback assignment bug,
-	implement new function to verify all subkeys of a key
+	  implement new function to verify all subkeys of a key
 	* rfc3156.c: remove confusing error message
 	* gmime-application-pkcs7.h, gmime-application-pkcs7.c,
 	  gmime-multipart-crypt.c, gmime-multipart-crypt.h,

@@ -168,8 +168,8 @@ libbalsa_gpgme_init(gpgme_passphrase_cb_t get_passphrase,
 #endif
 
     /* remember callbacks */
-    select_key = select_key_cb;
-    accept_low_trust = accept_low_trust_cb;
+    select_key_cb = select_key;
+    accept_low_trust_cb = accept_low_trust;
 }
 
 
@@ -327,9 +327,8 @@ libbalsa_gpgme_sign(const gchar * userid, GMimeStream * istream,
 			 protocol == GPGME_PROTOCOL_CMS, GPGME_MD_NONE);
 
     /* create the GpgME context */
-    if ((err =
-	 gpgme_new_with_protocol(&ctx, protocol, parent,
-				 error)) != GPG_ERR_NO_ERROR)
+    if (gpgme_new_with_protocol(&ctx, protocol, parent,
+				 error) != GPG_ERR_NO_ERROR)
 	return GPGME_MD_NONE;
 
     /* set the signature mode */
@@ -402,13 +401,13 @@ libbalsa_gpgme_sign(const gchar * userid, GMimeStream * istream,
  *        to ask the user whether a low-trust key shall be accepted.
  * \param parent Parent window to be passed to the callback functions.
  * \param error Filled with error information on error.
- * \return 0 on success, or -1 on error.
+ * \return TRUE on success, or FALSE on error.
  *
  * Encrypt the passed matter and write the result to the output stream.
  * Combined signing and encryption is allowed for single-part OpenPGP mode
  * only.
  */
-int
+gboolean
 libbalsa_gpgme_encrypt(GPtrArray * recipients, const char *sign_for,
 		       GMimeStream * istream, GMimeStream * ostream,
 		       gpgme_protocol_t protocol, gboolean singlepart_mode,
@@ -428,17 +427,16 @@ libbalsa_gpgme_encrypt(GPtrArray * recipients, const char *sign_for,
     };
 
     /* paranoia checks */
-    g_return_val_if_fail(recipients != NULL, -1);
-    g_return_val_if_fail(GMIME_IS_STREAM(istream), -1);
-    g_return_val_if_fail(GMIME_IS_STREAM(ostream), GPGME_MD_NONE);
+    g_return_val_if_fail(recipients != NULL, FALSE);
+    g_return_val_if_fail(GMIME_IS_STREAM(istream), FALSE);
+    g_return_val_if_fail(GMIME_IS_STREAM(ostream), FALSE);
     g_return_val_if_fail(protocol == GPGME_PROTOCOL_OpenPGP ||
-			 protocol == GPGME_PROTOCOL_CMS, -1);
+			 protocol == GPGME_PROTOCOL_CMS, FALSE);
 
     /* create the GpgME context */
-    if ((err =
-	 gpgme_new_with_protocol(&ctx, protocol, parent,
-				 error)) != GPG_ERR_NO_ERROR)
-	return -1;
+    if (gpgme_new_with_protocol(&ctx, protocol, parent,
+				 error) != GPG_ERR_NO_ERROR)
+	return FALSE;
 
     /* sign & encrypt is valid only for single-part OpenPGP */
     if (sign_for != NULL
@@ -448,13 +446,13 @@ libbalsa_gpgme_encrypt(GPtrArray * recipients, const char *sign_for,
 			_
 			("combined signing and encryption is defined only for RFC 2440"));
 	gpgme_release(ctx);
-	return -1;
+	return FALSE;
     }
 
     /* if requested, find the secret key for "userid" */
     if (sign_for && !gpgme_add_signer(ctx, sign_for, parent, error)) {
 	gpgme_release(ctx);
-	return -1;
+	return FALSE;
     }
 
     /* build the list of recipients */
@@ -463,7 +461,7 @@ libbalsa_gpgme_encrypt(GPtrArray * recipients, const char *sign_for,
 	 gpgme_build_recipients(ctx, recipients, trust_all_keys, parent,
 				error))) {
 	gpgme_release(ctx);
-	return -1;
+	return FALSE;
     }
 
     /* create the data objects */
@@ -481,7 +479,7 @@ libbalsa_gpgme_encrypt(GPtrArray * recipients, const char *sign_for,
 			       _("could not get data from stream"));
 	release_keylist(rcpt_keys);
 	gpgme_release(ctx);
-	return -1;
+	return FALSE;
     }
     if ((err =
 	 gpgme_data_new_from_cbs(&crypt, &cbs,
@@ -491,7 +489,7 @@ libbalsa_gpgme_encrypt(GPtrArray * recipients, const char *sign_for,
 	release_keylist(rcpt_keys);
 	gpgme_data_release(plain);
 	gpgme_release(ctx);
-	return -1;
+	return FALSE;
     }
 
     /* do the encrypt or sign and encrypt operation
@@ -517,9 +515,9 @@ libbalsa_gpgme_encrypt(GPtrArray * recipients, const char *sign_for,
 				   _("signing and encryption failed"));
 	else
 	    g_set_error_from_gpgme(error, err, _("encryption failed"));
-	return -1;
+	return FALSE;
     } else
-	return 0;
+	return TRUE;
 }
 
 
@@ -561,9 +559,8 @@ libbalsa_gpgme_decrypt(GMimeStream * crypted, GMimeStream * plain,
 			 protocol == GPGME_PROTOCOL_CMS, NULL);
 
     /* create the GpgME context */
-    if ((err =
-	 gpgme_new_with_protocol(&ctx, protocol, parent,
-				 error)) != GPG_ERR_NO_ERROR)
+    if (gpgme_new_with_protocol(&ctx, protocol, parent,
+				 error) != GPG_ERR_NO_ERROR)
 	return NULL;
 
     /* create the data streams */
@@ -606,16 +603,23 @@ libbalsa_gpgme_decrypt(GMimeStream * crypted, GMimeStream * plain,
 
 /* ---- local stuff ---------------------------------------------------- */
 
-#define UTF8_VALID_STR(s)						\
-    do {								\
-	if ((s) && !g_utf8_validate(s, -1, NULL)) {			\
-	    gsize bwr;							\
-	    gchar * newstr = g_locale_to_utf8(s, -1, NULL, &bwr, NULL);	\
-									\
-	    g_free(s);							\
-	    s = newstr;							\
-	}								\
-    } while (0)
+static gchar *
+utf8_valid_str(const char *gpgme_str)
+{
+	gchar *result;
+
+	if (gpgme_str != NULL) {
+		if (g_utf8_validate(gpgme_str, -1, NULL)) {
+			result = g_strdup(gpgme_str);
+		} else {
+			gsize bytes_written;
+			result = g_locale_to_utf8(gpgme_str, -1, NULL, &bytes_written, NULL);
+		}
+	} else {
+		result = NULL;
+	}
+	return result;
+}
 
 
 /*
@@ -631,10 +635,8 @@ g_set_error_from_gpgme(GError ** error, gpgme_error_t gpgme_err,
     if (!error)
 	return;
 
-    srcstr = g_strdup(gpgme_strsource(gpgme_err));
-    UTF8_VALID_STR(srcstr);
-    errstr = g_strdup(gpgme_strerror(gpgme_err));
-    UTF8_VALID_STR(errstr);
+    srcstr = utf8_valid_str(gpgme_strsource(gpgme_err));
+    errstr = utf8_valid_str(gpgme_strerror(gpgme_err));
     g_set_error(error, GPGME_ERROR_QUARK, gpgme_err, "%s: %s: %s", srcstr,
 		message, errstr);
     g_free(srcstr);
@@ -709,6 +711,32 @@ gpgme_new_with_protocol(gpgme_ctx_t * ctx, gpgme_protocol_t protocol,
     return err;
 }
 
+/* return TRUE if the passed key is not expired, not revoked, not disabled
+ * and not invalid, and has at least one subkey which can be used for signing
+ * if secret is TRUE, or one subkey which can be used for encryption if secret
+ * is FALSE, and the particular subkey is not expired, not revoked, not
+ * disabled and not invalid */
+static gboolean
+check_key(const gpgme_key_t key, gboolean secret, time_t now)
+{
+	gboolean result = FALSE;
+
+	if (!key->expired && !key->revoked && !key->disabled && !key->invalid) {
+		gpgme_subkey_t subkey = key->subkeys;
+
+		while (!result && (subkey != NULL)) {
+			if (((secret && subkey->can_sign) || (!secret && subkey->can_encrypt)) &&
+				!subkey->expired && !subkey->revoked && !subkey->disabled && !subkey->invalid &&
+				(subkey->expires == 0 || subkey->expires > now)) {
+				result = TRUE;
+			} else {
+				subkey = subkey->next;
+			}
+		}
+	}
+
+	return result;
+}
 
 /*
  * Get a key for name. If secret_only is set, choose only secret (private)
@@ -717,8 +745,6 @@ gpgme_new_with_protocol(gpgme_ctx_t * ctx, gpgme_protocol_t protocol,
  * no matching key could be found or if any error occurs, return NULL and
  * set error.
  */
-#define KEY_IS_OK(k)   (!((k)->expired || (k)->revoked || \
-                          (k)->disabled || (k)->invalid))
 static gpgme_key_t
 get_key_from_name(gpgme_ctx_t ctx, const gchar * name, gboolean secret,
 		  gboolean accept_all, GtkWindow * parent, GError ** error)
@@ -743,18 +769,8 @@ get_key_from_name(gpgme_ctx_t ctx, const gchar * name, gboolean secret,
     found_bad = FALSE;
     while ((err = gpgme_op_keylist_next(ctx, &key)) == GPG_ERR_NO_ERROR) {
 	/* check if this key and the relevant subkey are usable */
-	if (KEY_IS_OK(key)) {
-	    gpgme_subkey_t subkey = key->subkeys;
-
-	    while (subkey && ((secret && !subkey->can_sign) ||
-			      (!secret && !subkey->can_encrypt)))
-		subkey = subkey->next;
-
-	    if (subkey && KEY_IS_OK(subkey) &&
-		(subkey->expires == 0 || subkey->expires > now))
+	if (check_key(key, secret, now)) {
 		keys = g_list_append(keys, key);
-	    else
-		found_bad = TRUE;
 	} else
 	    found_bad = TRUE;
     }
@@ -877,7 +893,7 @@ static gboolean
 gpgme_add_signer(gpgme_ctx_t ctx, const gchar * signer, GtkWindow * parent,
 		 GError ** error)
 {
-    gpgme_key_t key = NULL;
+    gpgme_key_t key;
 
     /* note: private (secret) key has never low trust... */
     if (!

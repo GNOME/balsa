@@ -221,7 +221,6 @@ libbalsa_fill_msg_queue_item_from_queu(LibBalsaMessage * message,
                                        MessageQueueItem *mqi);
 
 #ifdef BALSA_USE_THREADS
-void balsa_send_thread(MessageQueueItem * first_message);
 
 GtkWidget *send_progress_message = NULL;
 GtkWidget *send_dialog = NULL;

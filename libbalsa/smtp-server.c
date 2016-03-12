@@ -159,8 +159,6 @@ libbalsa_smtp_server_init(LibBalsaSmtpServer * smtp_server)
 #endif                          /* HAVE_SMTP_TLS_CLIENT_CERTIFICATE */
 }
 
-static void libbalsa_smtp_server_finalize(GObject * object);
-
 /* Class boilerplate */
 
 GType

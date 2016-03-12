@@ -36,9 +36,6 @@
 
 #ifdef __cplusplus
 extern "C" {
-#ifdef MAKE_EMACS_HAPPY
-}
-#endif
 #endif				/* __cplusplus */
 
 
@@ -56,7 +53,8 @@ extern "C" {
  * - list of available keys (gpgme_key_t data elements)
  * - protocol
  * - parent window
- */ typedef gpgme_key_t(*lbgpgme_select_key_cb) (const gchar *,
+ */
+typedef gpgme_key_t(*lbgpgme_select_key_cb) (const gchar *,
 						 gboolean,
 						 GList *,
 						 gpgme_protocol_t,
@@ -92,7 +90,7 @@ gpgme_hash_algo_t libbalsa_gpgme_sign(const gchar * userid,
 				      gboolean singlepart_mode,
 				      GtkWindow * parent, GError ** error);
 
-int libbalsa_gpgme_encrypt(GPtrArray * recipients,
+gboolean libbalsa_gpgme_encrypt(GPtrArray * recipients,
 			   const char *sign_for,
 			   GMimeStream * istream,
 			   GMimeStream * ostream,

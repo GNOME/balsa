@@ -1,3 +1,37 @@
+2016-03-12  Albrecht Dreß
+
+	* Bug fixes: due to broken assignments in libbalsa_gpgme_init(),
+	  the callbacks for selecting a GnuPG key from a list
+	  or for accepting low-trust keys individually are never called.
+	  When selecting a key, only the first subkey is checked,
+	  instead of all potential ones.
+	* Message improvements: When checking a GnuPG signed message
+	  where the key has expired, Balsa displays a
+	  "Signature could not be checked" error
+	  and an informational message containg the "real" result.
+	  The patch removes the (wrong) former message.
+	* Code cleanups: change the return value of all crypto-related
+	  functions which return an essentially bool value to gboolean
+	  instead of (g)int, remove hacks for Emacs (still someone using it?)
+	  in header files which confuse almost all other tools,
+	  fix a few minor glitches, and remove a few unused statements.
+
+	* libbalsa-gpgme.c: fix callback assignment bug,
+	implement new function to verify all subkeys of a key
+	* rfc3156.c: remove confusing error message
+	* gmime-application-pkcs7.h, gmime-application-pkcs7.c,
+	  gmime-multipart-crypt.c, gmime-multipart-crypt.h,
+	  gmime-part-rfc2440.c, gmime-part-rfc2440.h, libbalsa-gpgme.c,
+	  libbalsa-gpgme.h: change function return types to gboolean
+	* rfc3156.c: used changed api
+	* gmime-gpgme-signature.h, gmime-multipart-crypt.h,
+	  gmime-part-rfc2440.h, libbalsa-gpgme.h: remove Emacs hack
+	* gmime-multipart-crypt.c: reorder statements to avoid duplicated ones
+	  (g_mime_gpgme_mps_sign)
+	* gmime-multipart-crypt.c, rfc3156.c: use error checking macro instead of cast
+	* libbalsa-gpgme.c: remove assignments of variables which are never used
+	* send.c, smtp-server.c, src/filter-edit-callbacks.c: remove unused statements
+
 2016-02-23  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Build without libnotify

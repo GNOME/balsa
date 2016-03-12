@@ -41,7 +41,7 @@
  *
  * Check if the passed part is RFC 2440 signed or encrypted by looking for
  * the "magic" strings defined there.  Note that parts which include extra
- * data before the beginning or after the end of signed or encryped matter
+ * data before the beginning or after the end of signed or encrypted matter
  * are always classified as GMIME_PART_RFC2440_NONE.
  */
 GMimePartRfc2440Mode
@@ -115,16 +115,15 @@ g_mime_part_check_rfc2440(GMimePart * part)
  *        encryption.
  * \param parent Parent window to be passed to the callback functions.
  * \param error Filled with error information on error.
- * \return 0 on success, or -1 on error.
+ * \return TRUE on success, or FALSE on error.
  *
  * RFC2440 sign, encrypt or sign and encrypt a gmime part.  If sign_userid
  * is not NULL, part will be signed.  If recipients is not NULL, encrypt
  * part for recipients.  If both are not null, part will be both signed and
- * encrypted. Returns 0 on success or -1 on fail. If any operation
- * failed, an exception will be set on err to provide more
- * information.
+ * encrypted. Returns TRUE on success or FALSE on fail. If any operation
+ * failed, an exception will be set on err to provide more information.
  */
-int
+gboolean
 g_mime_part_rfc2440_sign_encrypt(GMimePart * part, const char *sign_userid,
 				 GPtrArray * recipients,
 				 gboolean trust_all, GtkWindow * parent,
@@ -133,14 +132,14 @@ g_mime_part_rfc2440_sign_encrypt(GMimePart * part, const char *sign_userid,
     GMimeDataWrapper *wrapper;
     GMimeStream *stream, *cipherstream;
     GByteArray *cipherdata;
-    gint result;
+    gboolean result;
 
-    g_return_val_if_fail(GMIME_IS_PART(part), -1);
-    g_return_val_if_fail(recipients != NULL || sign_userid != NULL, -1);
+    g_return_val_if_fail(GMIME_IS_PART(part), FALSE);
+    g_return_val_if_fail(recipients != NULL || sign_userid != NULL, FALSE);
 
     /* get the raw content */
     wrapper = g_mime_part_get_content_object(part);
-    g_return_val_if_fail(wrapper, -1); /* Incomplete part. */
+    g_return_val_if_fail(wrapper, FALSE); /* Incomplete part. */
     stream = g_mime_data_wrapper_get_stream(wrapper);
     g_mime_stream_reset(stream);
 
@@ -154,17 +153,17 @@ g_mime_part_rfc2440_sign_encrypt(GMimePart * part, const char *sign_userid,
 	if (libbalsa_gpgme_sign
 	    (sign_userid, stream, cipherstream, GPGME_PROTOCOL_OpenPGP,
 	     TRUE, parent, err) == GPGME_MD_NONE)
-	    result = -1;
+	    result = FALSE;
     else
-	    result = 0;
+	    result = TRUE;
     } else
 	result =
 	    libbalsa_gpgme_encrypt(recipients, sign_userid, stream,
 				   cipherstream, GPGME_PROTOCOL_OpenPGP,
 				   TRUE, trust_all, parent, err);
-    if (result == -1) {
+    if (!result) {
 	g_object_unref(cipherstream);
-	return -1;
+	return result;
     }
 
     /* add the headers to encrypted ascii armor output: as there is no
@@ -217,7 +216,7 @@ g_mime_part_rfc2440_sign_encrypt(GMimePart * part, const char *sign_userid,
     g_object_unref(cipherstream);
     g_object_unref(wrapper);
 
-    return 0;
+    return result;
 }
 
 

@@ -228,7 +228,7 @@ libbalsa_sign_mime_object(GMimeObject ** content, const gchar * rfc822_for,
 	return FALSE;
     }
 
-    if (g_mime_gpgme_mps_sign(mps, *content, rfc822_for, protocol, parent, error) != 0) {
+    if (!g_mime_gpgme_mps_sign(mps, *content, rfc822_for, protocol, parent, error)) {
 	g_object_unref(mps);
 	return FALSE;
     }
@@ -251,7 +251,7 @@ libbalsa_encrypt_mime_object(GMimeObject ** content, GList * rfc822_for,
 {
     GMimeObject *encrypted_obj = NULL;
     GPtrArray *recipients;
-    int result = -1;
+    gboolean result = FALSE;
 
     /* paranoia checks */
     g_return_val_if_fail(rfc822_for != NULL, FALSE);
@@ -291,14 +291,13 @@ libbalsa_encrypt_mime_object(GMimeObject ** content, GList * rfc822_for,
     g_ptr_array_free(recipients, FALSE);
 
     /* error checking */
-    if (result != 0) {
+    if (!result) {
 	g_object_unref(encrypted_obj);
-	return FALSE;
     } else {
     g_object_unref(G_OBJECT(*content));
     *content = GMIME_OBJECT(encrypted_obj);
-    return TRUE;
     }
+    return result;
 }
 
 
@@ -382,7 +381,7 @@ libbalsa_body_check_signature(LibBalsaMessageBody * body,
     /* check if the body is really a multipart/signed */
     if (!GMIME_IS_MULTIPART_SIGNED(body->mime_part)
         || (g_mime_multipart_get_count
-            (((GMimeMultipart *) body->mime_part))) < 2)
+            (GMIME_MULTIPART(body->mime_part)) < 2))
         return FALSE;
     if (body->parts->next->sig_info)
 	g_object_unref(G_OBJECT(body->parts->next->sig_info));
@@ -390,7 +389,7 @@ libbalsa_body_check_signature(LibBalsaMessageBody * body,
     /* verify the signature */
     libbalsa_mailbox_lock_store(body->message->mailbox);
     result = g_mime_gpgme_mps_verify(GMIME_MULTIPART_SIGNED(body->mime_part), &error);
-    if (!result || result->status != GPG_ERR_NO_ERROR) {
+    if (!result) {
 	if (error) {
 	    libbalsa_information(LIBBALSA_INFORMATION_ERROR, "%s: %s",
 				 _("signature verification failed"),
@@ -515,7 +514,7 @@ libbalsa_rfc2440_sign_encrypt(GMimePart *part, const gchar *sign_for,
 			      GtkWindow *parent, GError **error)
 {
     GPtrArray *recipients;
-    gint result;
+    gboolean result;
 
     /* paranoia checks */
     g_return_val_if_fail(part != NULL, FALSE);
@@ -541,7 +540,7 @@ libbalsa_rfc2440_sign_encrypt(GMimePart *part, const gchar *sign_for,
     /* clean up */
     if (recipients)
 	g_ptr_array_free(recipients, FALSE);
-    return (result == 0) ? TRUE : FALSE;
+    return result;
 }
 
 
@@ -571,7 +570,7 @@ libbalsa_rfc2440_verify(GMimePart * part, GMimeGpgmeSigstat ** sig_info)
 
     /* verify */
     result = g_mime_part_rfc2440_verify(part, &error);
-    if (!result || result->status != GPG_ERR_NO_ERROR) {
+    if (!result) {
 	if (error) {
 	    libbalsa_information(LIBBALSA_INFORMATION_ERROR, "%s: %s",
 				 _("signature verification failed"),

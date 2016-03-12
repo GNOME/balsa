@@ -41,19 +41,16 @@
 
 #ifdef __cplusplus
 extern "C" {
-#ifdef MAKE_EMACS_HAPPY
-}
-#endif
 #endif				/* __cplusplus */
 
 
 GMimeGpgmeSigstat *g_mime_gpgme_mps_verify(GMimeMultipartSigned * mps,
 					   GError ** error);
-int g_mime_gpgme_mps_sign(GMimeMultipartSigned * mps,
+gboolean g_mime_gpgme_mps_sign(GMimeMultipartSigned * mps,
 			  GMimeObject * content, const gchar * userid,
 			  gpgme_protocol_t protocol, GtkWindow * parent,
 			  GError ** err);
-int g_mime_gpgme_mpe_encrypt(GMimeMultipartEncrypted * mpe,
+gboolean g_mime_gpgme_mpe_encrypt(GMimeMultipartEncrypted * mpe,
 			     GMimeObject * content, GPtrArray * recipients,
 			     gboolean trust_all, GtkWindow * parent,
 			     GError ** err);

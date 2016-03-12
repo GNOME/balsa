@@ -36,7 +36,7 @@ extern "C" {
 							 GtkWindow *
 							 parent,
 							 GError ** err);
-    int g_mime_application_pkcs7_encrypt(GMimePart * pkcs7,
+	gboolean g_mime_application_pkcs7_encrypt(GMimePart * pkcs7,
 				  GMimeObject * content,
 					 GPtrArray * recipients,
 					 gboolean trust_all,

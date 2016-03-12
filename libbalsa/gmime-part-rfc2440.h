@@ -30,10 +30,6 @@
 
 #ifdef __cplusplus
 extern "C" {
-
-#ifdef MAKE_EMACS_HAPPY
-}
-#endif
 #endif				/* __cplusplus */
 typedef enum _GMimePartRfc2440Mode GMimePartRfc2440Mode;
 enum _GMimePartRfc2440Mode { 
@@ -47,7 +43,7 @@ enum _GMimePartRfc2440Mode {
 GMimePartRfc2440Mode g_mime_part_check_rfc2440(GMimePart * part);
 
 /* crypto routines */
-int g_mime_part_rfc2440_sign_encrypt(GMimePart * part,
+gboolean g_mime_part_rfc2440_sign_encrypt(GMimePart * part,
 				     const char *sign_userid,
 				     GPtrArray * recipients,
 				     gboolean trust_all,

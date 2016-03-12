@@ -79,7 +79,6 @@ GtkWidget *fe_search_option_menu;
 extern GtkWidget *fe_op_codes_option_menu;
     
 /* Name field */
-extern GtkWidget *fe_name_label;
 extern GtkWidget *fe_name_entry;
     
 /* widgets for the matching fields */

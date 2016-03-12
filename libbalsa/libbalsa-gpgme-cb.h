@@ -34,9 +34,6 @@
 
 #ifdef __cplusplus
 extern "C" {
-#ifdef MAKE_EMACS_HAPPY
-}
-#endif
 #endif				/* __cplusplus */
 
 

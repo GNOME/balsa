@@ -1,3 +1,7 @@
+2016-03-12  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* libbalsa/libbalsa-gpgme-cb.h: remove Emacs hack.
+
 2016-03-12  Albrecht Dreß
 
 	* Bug fixes: due to broken assignments in libbalsa_gpgme_init(),

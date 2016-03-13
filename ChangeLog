@@ -1,5 +1,11 @@
 2016-03-12  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	* src/main-window.c (bw_display_new_mail_notification):
+	  duplicate some lines of code to simplify conditional
+	  compilation.
+
+2016-03-12  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* libbalsa/imap/imap-handle.c (imap_message_new): use whitespace
 	  to resolve ambiguous assignment.
 

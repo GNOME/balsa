@@ -3894,7 +3894,42 @@ bw_display_new_mail_notification(int num_new, int has_new)
                              "closed", G_CALLBACK(g_object_unref), NULL);
         }
     } else {
-#endif
+        if (dlg) {
+            /* the user didn't acknowledge the last info, so we'll
+             * accumulate the count */
+            num_total += num_new;
+            gtk_window_present(GTK_WINDOW(dlg));
+        } else {
+            num_total = num_new;
+            dlg = gtk_message_dialog_new(NULL, /* NOT transient for
+                                                * Balsa's main window */
+                    (GtkDialogFlags) 0,
+                    GTK_MESSAGE_INFO,
+                    GTK_BUTTONS_OK, "%s", msg);
+            gtk_window_set_title(GTK_WINDOW(dlg), _("Balsa: New mail"));
+            gtk_window_set_wmclass(GTK_WINDOW(dlg), "new_mail_dialog",
+                    "Balsa");
+            gtk_window_set_type_hint(GTK_WINDOW(dlg),
+                    GDK_WINDOW_TYPE_HINT_NORMAL);
+            g_signal_connect(G_OBJECT(dlg), "response",
+                    G_CALLBACK(gtk_widget_destroy), NULL);
+            g_object_add_weak_pointer(G_OBJECT(dlg), (gpointer) & dlg);
+            gtk_widget_show_all(GTK_WIDGET(dlg));
+        }
+    }
+
+    msg = bw_get_new_message_notification_string(num_new, num_total);
+    if (balsa_app.main_window->new_mail_note) {
+        notify_notification_update(balsa_app.main_window->new_mail_note,
+                                   "Balsa", msg, "dialog-information");
+        /* 30 seconds: */
+        notify_notification_set_timeout(balsa_app.main_window->
+                                        new_mail_note, 30000);
+        notify_notification_show(balsa_app.main_window->new_mail_note,
+                                 NULL);
+    } else
+        gtk_message_dialog_set_markup(GTK_MESSAGE_DIALOG(dlg), msg);
+#else
     if (dlg) {
         /* the user didn't acknowledge the last info, so we'll
          * accumulate the count */
@@ -3917,21 +3952,6 @@ bw_display_new_mail_notification(int num_new, int has_new)
         g_object_add_weak_pointer(G_OBJECT(dlg), (gpointer) & dlg);
         gtk_widget_show_all(GTK_WIDGET(dlg));
     }
-#ifdef HAVE_NOTIFY
-    }
-
-    msg = bw_get_new_message_notification_string(num_new, num_total);
-    if (balsa_app.main_window->new_mail_note) {
-        notify_notification_update(balsa_app.main_window->new_mail_note,
-                                   "Balsa", msg, "dialog-information");
-        /* 30 seconds: */
-        notify_notification_set_timeout(balsa_app.main_window->
-                                        new_mail_note, 30000);
-        notify_notification_show(balsa_app.main_window->new_mail_note,
-                                 NULL);
-    } else
-        gtk_message_dialog_set_markup(GTK_MESSAGE_DIALOG(dlg), msg);
-#else
 
     msg = bw_get_new_message_notification_string(num_new, num_total);
     gtk_message_dialog_set_markup(GTK_MESSAGE_DIALOG(dlg), msg);

@@ -373,14 +373,14 @@ pop_auth_user(PopHandle *pop, const char *greeting, GError **err)
   if(pop->user_cb)
     pop->user_cb(IME_GET_USER_PASS, pop->user_arg,
                     "LOGIN", &user, &pass, &ok);
-    if(!ok || user == NULL || pass == NULL) {
-      g_set_error(err, IMAP_ERROR, IMAP_POP_AUTH_ERROR,
-                  "USER Authentication cancelled");
-      return IMAP_AUTH_FAILURE;
-    }
+  if(!ok || user == NULL || pass == NULL) {
+    g_set_error(err, IMAP_ERROR, IMAP_POP_AUTH_ERROR,
+                "USER Authentication cancelled");
+    return IMAP_AUTH_FAILURE;
+  }
 
   g_snprintf(line, sizeof(line), "User %s\r\n", user);
-  g_free(user); 
+  g_free(user);
   if(!pop_exec(pop, line, err)) { /* RFC 1939: User is optional */
     g_free(pass);
     g_clear_error(err);

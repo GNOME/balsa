@@ -33,6 +33,9 @@
 #include <sys/stat.h>
 #include <stdarg.h>
 #include <unistd.h>
+#include <openssl/ssl.h>
+#include <openssl/x509.h>
+#include <openssl/err.h>
 
 #ifdef HAVE_NOTIFY
 #include <libnotify/notify.h>
@@ -364,10 +367,6 @@ libbalsa_ask(gboolean (*cb)(void *arg), void *arg)
 #endif /* BALSA_USE_THREADS */
 
 
-#if defined(USE_SSL)
-#include <openssl/ssl.h>
-#include <openssl/x509.h>
-#include <openssl/err.h>
 static int libbalsa_ask_for_cert_acceptance(X509 *cert,
 					    const char *explanation);
 static char*
@@ -622,7 +621,6 @@ libbalsa_ask_for_cert_acceptance(X509 *cert, const char *explanation)
     acd.explanation = explanation;
     return libbalsa_ask(ask_cert_real, &acd);
 }
-#endif /* WITH_SSL */
 
 
 static int

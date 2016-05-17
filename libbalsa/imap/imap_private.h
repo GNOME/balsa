@@ -20,6 +20,7 @@
  */
 
 #include <glib-object.h>
+#include <openssl/ssl.h>
 
 #include "config.h"
 
@@ -152,12 +153,9 @@ struct _ImapMboxHandle {
   gulong quota_used_k;        /**< used quota in kByte */
   gchar *quota_root;
 
-  /* conditional stuff at the end for the safety. */
-#ifdef USE_TLS
   unsigned over_ssl:1; /* transmission is to be made over SSL-protected
                         * connection, usually to imaps port. */
   unsigned using_tls:1;
-#endif
 };
 
 #define IMAP_MBOX_IS_DISCONNECTED(h)  ((h)->state == IMHS_DISCONNECTED)
@@ -215,12 +213,9 @@ ImapResponse imap_search_exec_unlocked(ImapMboxHandle *h, gboolean uid,
 ImapResponse imap_assure_needed_flags(ImapMboxHandle *h,
                                       ImapMsgFlag needed_flags);
 
-#ifdef USE_TLS
-#include <openssl/ssl.h>
 SSL* imap_create_ssl(void);
 int imap_setup_ssl(struct siobuf *sio, const char* host, SSL *ssl,
                    ImapUserCb user_cb, void *user_arg);
-#endif
 
 void imap_handle_disconnect(ImapMboxHandle *h);
 ImapConnectionState imap_mbox_handle_get_state(ImapMboxHandle *h);

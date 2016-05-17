@@ -40,15 +40,11 @@
 #include <unistd.h>
 #include <glib.h>
 
-#ifdef USE_TLS
-# include <openssl/ssl.h>
-#endif
+#include <openssl/ssl.h>
 
 #include "siobuf.h"
 
-#ifdef USE_TLS
 static int sio_sslpoll (struct siobuf *sio, int ret);
-#endif
 
 /* Socket I/O buffering */
 struct siobuf
@@ -78,9 +74,7 @@ struct siobuf
     void *secarg;
     timeoutcb_t timeout_cb;     /* timeout (retry/abort) action callback */
     void *timeout_arg;          /* argument of timeout callback */
-#ifdef USE_TLS
     SSL *ssl;			/* The SSL connection */
-#endif
 
     void *user_data;
   };
@@ -142,7 +136,6 @@ sio_detach (struct siobuf *sio)
      destroyed anyway. */
   sio->timeout_cb = NULL;
   sio->timeout_arg = NULL;
-#ifdef USE_TLS
   if (sio->ssl != NULL)
     {
       int ret;
@@ -155,7 +148,6 @@ sio_detach (struct siobuf *sio)
       SSL_free (sio->ssl);
       sio->ssl = NULL;
     }
-#endif
   free (sio->read_buffer);
   free (sio->write_buffer);
   free (sio);
@@ -186,7 +178,6 @@ sio_set_timeout (struct siobuf *sio, int milliseconds)
   assert (sio != NULL);
 
   sio->milliseconds = milliseconds;
-#ifdef USE_TLS
   if (sio->ssl != NULL)
     {
       long ssl_timeout;
@@ -197,10 +188,8 @@ sio_set_timeout (struct siobuf *sio, int milliseconds)
         ssl_timeout = ((long) milliseconds + 999L) / 1000L;
       SSL_SESSION_set_timeout (SSL_get_session (sio->ssl), ssl_timeout);
     }
-#endif
 }
 
-#ifdef USE_TLS
 int
 sio_set_tlsclient_ssl (struct siobuf *sio, SSL *ssl)
 {
@@ -248,7 +237,6 @@ sio_set_tlsserver_ssl (struct siobuf *sio, SSL *ssl)
     }
   return sio->ssl != NULL;
 }
-#endif
 
 void
 sio_set_securitycb (struct siobuf *sio,
@@ -275,7 +263,6 @@ sio_poll (struct siobuf *sio, int want_read, int want_write, int fast)
 
   if (want_read && sio->read_unread > 0)
     return SIO_READ;
-#ifdef USE_TLS
   /* SSL_read() returns data a record at a time, however it is possible
      that more than one record was read from the socket.  If this happens
      poll() will not report data waiting to be read but SSL_read() will
@@ -283,7 +270,6 @@ sio_poll (struct siobuf *sio, int want_read, int want_write, int fast)
    */
   if (want_read && sio->ssl != NULL && SSL_pending (sio->ssl))
     return SIO_READ;
-#endif
 
   npoll = 0;
   if (want_read)
@@ -328,7 +314,6 @@ sio_poll (struct siobuf *sio, int want_read, int want_write, int fast)
   return (rval > 0) ? rval : -1;
 }
 
-#ifdef USE_TLS
 static int
 sio_sslpoll (struct siobuf *sio, int ret)
 {
@@ -355,7 +340,6 @@ sio_sslpoll (struct siobuf *sio, int ret)
   }
   return sio_poll (sio, want_read, want_write, 0);
 }
-#endif
 
 void
 sio_write (struct siobuf *sio, const void *bufp, int buflen)
@@ -401,7 +385,6 @@ raw_write (struct siobuf *sio, const char *buf, int len)
   assert (sio != NULL && buf != NULL);
 
   for (total = 0; total < len; total += n)
-#ifdef USE_TLS
     if (sio->ssl != NULL)
       {
 	/* SSL_write() writes a record a time.	The outer loop calls
@@ -413,7 +396,6 @@ raw_write (struct siobuf *sio, const char *buf, int len)
 	    return n;
       }
     else
-#endif
       {
         /* Its conceiveable that write() actually writes less than
            requested.  The outer loop calls this until all of the write
@@ -545,7 +527,6 @@ raw_read (struct siobuf *sio, char *buf, int len)
 
   assert (sio != NULL && buf != NULL && len > 0);
 
-#ifdef USE_TLS
   if (sio->ssl != NULL)
     {
       /* SSL_read() reads complete records from the network and returns
@@ -559,7 +540,6 @@ raw_read (struct siobuf *sio, char *buf, int len)
 	  break;
     }
   else
-#endif
     {
       pollfd.fd = sio->sdr;
       pollfd.events = POLLIN;

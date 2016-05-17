@@ -180,11 +180,6 @@ AC_ARG_WITH([sqlite],
                   [Use SQLite for GPE address books (default=no)]),
                   [with_sqlite=$withval],[with_sqlite=no])
 
-AC_ARG_WITH(ssl,
-   AC_HELP_STRING([--with-ssl],
-                  [Enable SSL (default=no)]),
-                  [ with_ssl=$withval ],[ with_ssl=no ])
-
 AC_ARG_WITH(gmime,
    AC_HELP_STRING([--with-gmime],
                   [Version of GMime 2.4, or 2.6 (default=detect)]),
@@ -679,49 +674,15 @@ fi
 
 # OpenSSL configuration.
 #
-
-AC_MSG_CHECKING([whether to build SSL support])
-if test "x$with_ssl" != xno  ; then
-# openssl >=0.9.7 is pkg-config compatible.
-   if pkg-config openssl >/dev/null 2>&1; then
-      BALSA_LIBS="$BALSA_LIBS `pkg-config --libs openssl`"
-      BALSA_CFLAGS="`pkg-config --cflags-only-I openssl` $BALSA_CFLAGS"
-      AC_MSG_RESULT(yes)
-      AC_DEFINE(USE_SSL,1,[Defined when SSL support is to be compiled.])
-      AC_DEFINE(USE_TLS,USE_SSL,[Defined when TLS is to be enabled.])
-   else
-      if test -d $with_ssl && test -f "$with_ssl/include/openssl/ssl.h" ; then
-         ssldir=$with_ssl
-      else
-           AC_TRY_COMPILE([#include <openssl/ssl.h>], ,
-		          ssldir=default,
-			  ssldir="")
-	   if test "x$ssldir" = x ; then		
-              for prefixdir in /usr /usr/local /usr/lib /usr/pkg /var /opt; do
-                  for dir in $prefixdir $prefixdir/openssl $prefixdir/ssl; do
-                      if test -f "$dir/include/openssl/ssl.h"; then
-                         ssldir=$dir
-                      fi
-                  done
-              done
-	   fi
-       fi
-       if test -z "$ssldir"; then
-          AC_MSG_ERROR([SSL requested but no SSL headers found.])
-       else
-          AC_MSG_RESULT(yes)
-          BALSA_LIBS="$BALSA_LIBS -lssl -lcrypto"
-	  if test "x$ssldir" != xdefault ; then
-		BALSA_CFLAGS="-I${ssldir}/include $BALSA_CFLAGS"
-	  fi
-	  ac_cv_path_openssl=$ssldir
-	  AC_DEFINE(USE_SSL,1,[Defined when SSL support is to be compiled.])
-          AC_DEFINE(USE_TLS,USE_SSL,[Defined when TLS is to be enabled.])
-       fi
-   fi
-else
-   AC_MSG_RESULT(no)
-fi
+PKG_CHECK_MODULES(OPENSSL, [openssl],
+   [BALSA_CFLAGS="$OPENSSL_CFLAGS $BALSA_CFLAGS"
+    BALSA_LIBS="$OPENSSL_LIBS $BALSA_LIBS"],
+   [ AC_CHECK_HEADERS([openssl/ssl.h], [],
+                      [AC_MSG_ERROR([OpenSSL headers not found])], [])
+     AC_SEARCH_LIBS(SSL_library_init, ssl,
+                    [BALSA_LIBS="$BALSA_LIBS -lssl -lcrypto"],
+                    [AC_MSG_ERROR([libssl not found])], [-lcrypto]) ]
+)
 
 # KRB5/GSSAPI configuration.
 #
@@ -1036,7 +997,6 @@ echo "                 Use GPGME: $gpgmecfg"
 echo "                  Use LDAP: $with_ldap"
 echo "                   Use GSS: $with_gss"
 echo "                Use SQLite: $with_sqlite"
-echo "                   Use SSL: $with_ssl"
 echo "              Use GtkSpell: $with_gtkspell"
 echo "             Use Libnotify: $with_libnotify"
 echo "         Use GtkSourceView: $with_gtksourceview"

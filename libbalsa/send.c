@@ -1168,7 +1168,6 @@ libbalsa_smtp_event_cb (smtp_session_t session, int event_no, void *arg, ...)
 		      NULL, NULL, 0);
         break;
 
-#ifdef USE_TLS
         /* SMTP_TLS related things. Observe that we need to have SSL
 	 * enabled in balsa to properly interpret libesmtp
 	 * messages. */
@@ -1198,7 +1197,6 @@ libbalsa_smtp_event_cb (smtp_session_t session, int event_no, void *arg, ...)
 	*ok = 1;
 	break;
     }
-#endif /* USE_TLS */
     }
     va_end (ap);
 }

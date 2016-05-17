@@ -29,15 +29,13 @@
 #include <string.h>
 #include <unistd.h>
 
-#if defined(USE_TLS)
 #include <openssl/ssl.h>
+#include <openssl/evp.h>
 #include <openssl/err.h>
-#endif
 
 #include "pop3.h"
 #include "siobuf.h"
 #include "imap_private.h"
-#include "md5-utils.h"
 
 #define ELEMENTS(x) (sizeof (x) / sizeof(x[0]))
 
@@ -194,7 +192,7 @@ pop_check_status(PopHandle *pop, GError **err)
                 "POP3 connection severed");
     return FALSE;
   }
-     
+
   if(strncmp(buf, "+OK", 3) == 0)
     res = TRUE;
   /*
@@ -311,16 +309,16 @@ get_apop_stamp(const char *greeting, char *stamp)
 static void
 compute_auth_hash(char *stamp, char *hash, const char *passwd)
 {
-  MD5Context mdContext;
+  EVP_MD_CTX ctx;
   register unsigned char *dp;
   register char *cp;
   unsigned char *ep;
   unsigned char digest[16];
   
-  md5_init(&mdContext);
-  md5_update(&mdContext, (unsigned char *)stamp, strlen(stamp));
-  md5_update(&mdContext, (unsigned char *)passwd, strlen(passwd));
-  md5_final(&mdContext, digest);
+  EVP_DigestInit(&ctx, EVP_md5());
+  EVP_DigestUpdate(&ctx, stamp, strlen(stamp));
+  EVP_DigestUpdate(&ctx, passwd, strlen(passwd));
+  EVP_DigestFinal(&ctx, digest, NULL);
   
   cp = hash;
   dp = digest;
@@ -431,7 +429,6 @@ pop_authenticate(PopHandle *pop, const char *greeting, GError **err)
    ===================================================================
 */
 
-#ifdef USE_TLS
 static gboolean
 pop_stls(PopHandle *pop, GError **err)
 {
@@ -457,7 +454,6 @@ pop_stls(PopHandle *pop, GError **err)
     return FALSE;
   }
 }
-#endif
 
 static gboolean
 parse_list_response(PopHandle *pop, char *line, ssize_t sz, GError **err)
@@ -504,9 +500,7 @@ pop_connect(PopHandle *pop, const char *host, GError **err)
   const char *service = "pop3";
   char line[POP_LINE_LEN];
 
-#ifdef USE_TLS
   if(pop->over_ssl) service = "pop3s";
-#endif
 
   g_free(pop->host);
   pop->host = g_strdup(host);
@@ -527,7 +521,6 @@ pop_connect(PopHandle *pop, const char *host, GError **err)
   }
   if(pop->timeout>0)
     sio_set_timeout(pop->sio, pop->timeout);
-#ifdef USE_TLS
   if(pop->over_ssl) {
     SSL *ssl = imap_create_ssl();
     if(!ssl || !imap_setup_ssl(pop->sio, pop->host, ssl,
@@ -539,7 +532,6 @@ pop_connect(PopHandle *pop, const char *host, GError **err)
       return IMAP_UNSECURE;
     }
   }
-#endif
   if(pop->monitor_cb) 
     sio_set_monitorcb(pop->sio, pop->monitor_cb, pop->monitor_arg);
 
@@ -554,12 +546,10 @@ pop_connect(PopHandle *pop, const char *host, GError **err)
     else return FALSE;
   }
   
-#ifdef USE_TLS
   if(pop->tls_mode != IMAP_TLS_DISABLED && pop_can_do(pop, POP_CAP_STLS)) {
     if(!pop_stls(pop, err)) /* TLS negotiation attempted.. */
       return FALSE;         /* .. but failed. */
   }
-#endif
   if(pop->tls_mode == IMAP_TLS_REQUIRED && 
      !(pop->tls_enabled || pop->over_ssl) ) {
     sio_detach(pop->sio); pop->sio = NULL; close(pop->sd);

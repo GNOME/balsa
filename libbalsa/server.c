@@ -34,9 +34,7 @@
 #include <gnome-keyring.h>
 #endif                          /* defined(HAVE_LIBSECRET) */
 
-#ifdef USE_TLS
 #include <openssl/err.h>
-#endif
 
 #include "libbalsa.h"
 #include "libbalsa_private.h"
@@ -510,7 +508,6 @@ libbalsa_server_user_cb(ImapUserEventType ue, void *arg, ...)
         break;
     }
     case IME_TLS_VERIFY_ERROR:  {
-#ifdef USE_TLS
         long vfy_result;
         SSL *ssl;
         X509 *cert;
@@ -527,9 +524,6 @@ libbalsa_server_user_cb(ImapUserEventType ue, void *arg, ...)
 	    *ok = libbalsa_is_cert_known(cert, vfy_result);
 	    X509_free(cert);
 	}
-#else
-        g_warning("TLS error with TLS disabled!?");
-#endif
         break;
     }
     case IME_TLS_NO_PEER_CERT: {

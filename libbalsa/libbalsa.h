@@ -42,6 +42,7 @@ typedef struct _LibBalsaSmtpServer LibBalsaSmtpServer;
 typedef struct _LibbalsaVfs LibbalsaVfs;
 
 
+#include <openssl/ssl.h>
 #include "message.h"
 #include "body.h"
 #include "files.h"
@@ -132,11 +133,8 @@ gchar *libbalsa_guess_imap_inbox(void);
 gchar* libbalsa_date_to_utf8(const time_t *date, const gchar *date_string);
 LibBalsaMessageStatus libbalsa_get_icon_from_flags(LibBalsaMessageFlag flags);
 
-#ifdef USE_TLS
-#include <openssl/ssl.h>
 gboolean libbalsa_is_cert_known(X509* cert, long vfy_result);
 void libbalsa_certs_destroy(void);
-#endif
 
 gboolean libbalsa_abort_on_timeout(const char *host);
 

@@ -42,10 +42,8 @@
 #include <resolv.h>
 #endif                          /* defined(HAVE_RES_INIT) */
 
-#if defined(USE_TLS)
 #include <openssl/ssl.h>
 #include <openssl/err.h>
-#endif
 
 #include "libimap-marshal.h"
 #include "imap-auth.h"
@@ -149,9 +147,7 @@ imap_mbox_handle_init(ImapMboxHandle *handle)
   handle->msg_cache = NULL;
   handle->flag_cache=  g_array_new(FALSE, TRUE, sizeof(ImapFlagCache));
   handle->doing_logout = FALSE;
-#ifdef USE_TLS
   handle->using_tls = 0;
-#endif
   handle->tls_mode = IMAP_TLS_ENABLED;
   handle->idle_state = IDLE_INACTIVE;
   handle->cmd_info = NULL;
@@ -592,15 +588,7 @@ imap_mbox_handle_connect(ImapMboxHandle* ret, const char *host, int over_ssl)
   g_return_val_if_fail(imap_mbox_is_disconnected(ret), IMAP_CONNECT_FAILED);
 
   HANDLE_LOCK(ret);
-#if !defined(USE_TLS)
-  if(over_ssl) {
-    imap_mbox_handle_set_msg(ret,"SSL requested but SSL support not compiled");
-    HANDLE_UNLOCK(ret);
-    return IMAP_UNSECURE;
-  }
-#else
   ret->over_ssl = over_ssl;
-#endif
 
   g_free(ret->host);   ret->host   = g_strdup(host);
 
@@ -790,10 +778,8 @@ imap_mbox_connect(ImapMboxHandle* handle)
     imap_compress_release(&handle->compress);
   }
 
-#ifdef USE_TLS
   handle->using_tls = 0;
   if(handle->over_ssl) service = "imaps";
-#endif
 
   handle->sd = imap_socket_open(handle->host, service);
   if(handle->sd<0)
@@ -810,7 +796,6 @@ imap_mbox_connect(ImapMboxHandle* handle)
     sio_set_timeout(handle->sio, handle->timeout);
     sio_set_timeoutcb(handle->sio, imap_timeout_cb, handle);
   }
-#ifdef USE_TLS
   if(handle->over_ssl) {
     SSL *ssl = imap_create_ssl();
     if(!ssl) {
@@ -826,7 +811,6 @@ imap_mbox_connect(ImapMboxHandle* handle)
       return IMAP_UNSECURE;
     }
   }
-#endif
   if(handle->monitor_cb) 
     sio_set_monitorcb(handle->sio, handle->monitor_cb, handle->monitor_arg);
 
@@ -839,7 +823,6 @@ imap_mbox_connect(ImapMboxHandle* handle)
   }
   handle->can_fetch_body = 
     (strncmp(handle->last_msg, "Microsoft Exchange", 18) != 0);
-#if defined(USE_TLS)
   if(handle->over_ssl)
     resp = IMR_OK; /* secured already with SSL */
   else if(handle->tls_mode != IMAP_TLS_DISABLED &&
@@ -851,9 +834,6 @@ imap_mbox_connect(ImapMboxHandle* handle)
     resp = IMR_OK; /* secured with TLS */
   } else
     resp = IMR_NO; /* not over SSL and TLS unavailable */
-#else
-  resp = IMR_NO;
-#endif
   if(handle->tls_mode == IMAP_TLS_REQUIRED && resp != IMR_OK) {
     imap_mbox_handle_set_msg(handle,"TLS required but not available");
     return IMAP_UNSECURE;
@@ -2010,7 +1990,6 @@ imap_cmd_step(ImapMboxHandle* handle, unsigned lastcmd)
   g_return_val_if_fail(handle, IMR_BAD);
   g_return_val_if_fail(handle->state != IMHS_DISCONNECTED, IMR_BAD);
 
-#ifdef USE_TLS
   if(ERR_peek_error()) {
     fprintf(stderr, "OpenSSL error in %s():\n", __FUNCTION__);
     ERR_print_errors_fp(stderr);
@@ -2018,7 +1997,6 @@ imap_cmd_step(ImapMboxHandle* handle, unsigned lastcmd)
     imap_handle_disconnect(handle);
     return IMR_SEVERED;
   }
-#endif
   ci = cmdi_find_by_no(handle->cmd_info, lastcmd);
   if(ci && ci->completed) {
     /* The response to this command has been encountered earlier,

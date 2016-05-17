@@ -32,8 +32,6 @@ libimap_a_SOURCES = \
 	libimap-marshal.c	\
 	libimap-marshal.h	\
 	libimap.h	\
-	md5-utils.c	\
-	md5-utils.h	\
 	pop3.c		\
 	pop3.h		\
 	siobuf.c	\

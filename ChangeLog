@@ -1,5 +1,12 @@
 2016-05-16  Albrecht Dreß
 
+	Make SSL mandatory
+
+	* libbalsa/imap/md5-utils.c: remove.
+	* libbalsa/imap/md5-utils.h: ditto.
+
+2016-05-16  Albrecht Dreß
+
 	With this patch, Balsa will pop up the key selection dialogue
 	containing /all/ keys which may be used for encryption in this
 	case.  The user can either select a key, or cancel the

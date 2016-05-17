@@ -44,8 +44,6 @@
 
 #include "config.h"
 
-#ifdef USE_TLS
-
 #include <string.h>
 #include <openssl/ssl.h>
 #include <openssl/x509v3.h>
@@ -400,4 +398,3 @@ imap_handle_starttls(ImapMboxHandle *handle)
     return IMR_NO;
   }
 }
-#endif /* USE_TLS */

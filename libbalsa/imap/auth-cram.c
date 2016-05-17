@@ -26,9 +26,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <glib.h>
+#include <openssl/evp.h>
 
 #include "imap-auth.h"
-#include "md5-utils.h"
 #include "util.h"
 
 #include "imap_private.h"
@@ -132,10 +132,9 @@ static void
 hmac_md5 (const char* password, char* challenge,
           unsigned char* response)
 {  
-  MD5Context ctx;
+  EVP_MD_CTX ctx;
   unsigned char ipad[MD5_BLOCK_LEN], opad[MD5_BLOCK_LEN];
   unsigned char secret[MD5_BLOCK_LEN+1];
-  unsigned char hash_passwd[MD5_DIGEST_LEN];
   unsigned int secret_len, chal_len;
   int i;
 
@@ -145,11 +144,9 @@ hmac_md5 (const char* password, char* challenge,
   /* passwords longer than MD5_BLOCK_LEN bytes are substituted with their MD5
    * digests */
   if (secret_len > MD5_BLOCK_LEN) {
-    md5_init (&ctx);
-    md5_update (&ctx, (unsigned char*) password, secret_len);
-    md5_final (&ctx, hash_passwd);
-    strncpy ((char*) secret, (char*) hash_passwd, MD5_DIGEST_LEN);
-    secret_len = MD5_DIGEST_LEN;
+	EVP_DigestInit(&ctx, EVP_md5());
+	EVP_DigestUpdate(&ctx, (const unsigned char*) password, secret_len);
+	EVP_DigestFinal(&ctx, secret, &secret_len);
   }
   else
     strncpy ((char *) secret, password, sizeof (secret));
@@ -165,14 +162,14 @@ hmac_md5 (const char* password, char* challenge,
   }
 
   /* inner hash: challenge and ipadded secret */
-  md5_init (&ctx);
-  md5_update (&ctx, ipad, MD5_BLOCK_LEN);
-  md5_update (&ctx, (unsigned char*) challenge, chal_len);
-  md5_final (&ctx, response);
+  EVP_DigestInit(&ctx, EVP_md5());
+  EVP_DigestUpdate(&ctx, ipad, MD5_BLOCK_LEN);
+  EVP_DigestUpdate(&ctx, (unsigned char*) challenge, chal_len);
+  EVP_DigestFinal(&ctx, response, NULL);
 
   /* outer hash: inner hash and opadded secret */
-  md5_init (&ctx);
-  md5_update (&ctx, opad, MD5_BLOCK_LEN);
-  md5_update (&ctx, response, MD5_DIGEST_LEN);
-  md5_final (&ctx, response);
+  EVP_DigestInit(&ctx, EVP_md5());
+  EVP_DigestUpdate(&ctx, opad, MD5_BLOCK_LEN);
+  EVP_DigestUpdate(&ctx, response, chal_len);
+  EVP_DigestFinal(&ctx, response, NULL);
 }

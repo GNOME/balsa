@@ -47,11 +47,7 @@
 #include "imap-commands.h"
 #include <glib/gi18n.h>
 
-#ifdef USE_TLS
 #define REQ_SSL(s) (LIBBALSA_SERVER(s)->use_ssl)
-#else
-#define REQ_SSL(s) (0)
-#endif
 
 /** wait 60 seconds for packets */
 #define IMAP_CMD_TIMEOUT (60*1000)

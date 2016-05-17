@@ -61,7 +61,8 @@ balsa_mime_widget_signature_widget(LibBalsaMessageBody * mime_body,
 {
     gchar *infostr;
     GtkWidget *vbox, *label;
-    GtkWidget *expander;
+    GtkWidget *signature_widget;
+    gchar **lines;
 
     if (!mime_body->sig_info ||
 	mime_body->sig_info->status == GPG_ERR_NOT_SIGNED)
@@ -81,14 +82,17 @@ balsa_mime_widget_signature_widget(LibBalsaMessageBody * mime_body,
 	g_free(infostr);
 	infostr = labelstr;
     }
+
+    if (!infostr)
+        return NULL;
+    lines = g_strsplit(infostr, "\n", 2);
+    g_free(infostr);
     
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, BMW_VBOX_SPACE);
-    gtk_container_set_border_width(GTK_CONTAINER(vbox), BMW_CONTAINER_BORDER);
-    label = gtk_label_new(infostr);
+    label = gtk_label_new(lines[1] ? lines[1] : lines[0]);
     gtk_label_set_selectable(GTK_LABEL(label), TRUE);
     gtk_widget_set_halign(label, GTK_ALIGN_START);
     gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 0);
-    g_free(infostr);
 #ifdef HAVE_GPG
     if (mime_body->sig_info->protocol == GPGME_PROTOCOL_OpenPGP) {
         GtkWidget *button;
@@ -109,10 +113,17 @@ balsa_mime_widget_signature_widget(LibBalsaMessageBody * mime_body,
     }
 #endif /* HAVE_GPG */
 
-    expander = gtk_expander_new(_("Digital Signature"));
-    gtk_container_add(GTK_CONTAINER(expander), vbox);
+    if (lines[1]) {
+        signature_widget = gtk_expander_new(lines[0]);
+        gtk_container_add(GTK_CONTAINER(signature_widget), vbox);
+    } else {
+        signature_widget = vbox;
+    }
+    gtk_container_set_border_width(GTK_CONTAINER(signature_widget), BMW_CONTAINER_BORDER);
 
-    return expander;
+    g_strfreev(lines);
+
+    return signature_widget;
 }
 
 

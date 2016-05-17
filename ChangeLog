@@ -1,5 +1,20 @@
 2016-05-16  Albrecht Dreß
 
+	With this patch, Balsa will pop up the key selection dialogue
+	containing /all/ keys which may be used for encryption in this
+	case.  The user can either select a key, or cancel the
+	operation.  This basically is the same behaviour as of
+	Thunderbird.
+
+	* libbalsa/libbalsa-gpgme-cb.c (lb_gpgme_select_key),
+	(key_selection_changed_cb), (sort_iter_cmp_fn):
+	* libbalsa/libbalsa-gpgme-cb.h:
+	* libbalsa/libbalsa-gpgme.c (get_key_from_name), (get_pubkey),
+	(gpgme_add_signer), (gpgme_build_recipients):
+	* libbalsa/libbalsa-gpgme.h:
+
+2016-05-16  Albrecht Dreß
+
 	* libbalsa/gmime-gpgme-signature.c
 	(libbalsa_cert_subject_readable):
 	This trivial patch makes sure that the GPG key or S/MIME

@@ -31,6 +31,7 @@
 #include <glib.h>
 #include <gtk/gtk.h>
 #include <gmime/gmime.h>
+#include "libbalsa-gpgme-cb.h"
 #include "gmime-gpgme-signature.h"
 
 
@@ -55,7 +56,7 @@ extern "C" {
  * - parent window
  */
 typedef gpgme_key_t(*lbgpgme_select_key_cb) (const gchar *,
-						 gboolean,
+						 lb_key_sel_md_t,
 						 GList *,
 						 gpgme_protocol_t,
 						 GtkWindow *);

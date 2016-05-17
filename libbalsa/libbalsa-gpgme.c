@@ -823,8 +823,9 @@ get_key_from_name(gpgme_ctx_t ctx, const gchar * name, gboolean secret,
     if (g_list_length(keys) > 1) {
 	if (select_key_cb)
 	    key =
-		select_key_cb(name, secret, keys, gpgme_get_protocol(ctx),
-			      parent);
+		select_key_cb(name,
+					  secret ? LB_SELECT_PRIVATE_KEY : LB_SELECT_PUBLIC_KEY_USER,
+					  keys, gpgme_get_protocol(ctx), parent);
 	else {
 	    if (error)
 		g_set_error(error, GPGME_ERROR_QUARK,
@@ -885,6 +886,57 @@ get_key_from_name(gpgme_ctx_t ctx, const gchar * name, gboolean secret,
 }
 
 
+static gpgme_key_t
+get_pubkey(gpgme_ctx_t ctx, const gchar * name, gboolean accept_all,
+	GtkWindow * parent, GError ** error)
+{
+	GList *keys = NULL;
+	gpgme_key_t key;
+	gpgme_error_t err;
+	time_t now = time(NULL);
+
+	/* let gpgme list keys */
+	if ((err = gpgme_op_keylist_start(ctx, NULL, 0)) != GPG_ERR_NO_ERROR) {
+		gchar *msg = g_strdup_printf(_("could not list keys"));
+
+		g_set_error_from_gpgme(error, err, msg);
+		g_free(msg);
+		return NULL;
+	}
+
+	while ((err = gpgme_op_keylist_next(ctx, &key)) == GPG_ERR_NO_ERROR) {
+		/* check if this key and the relevant subkey are usable */
+		if (check_key(key, 0, now))
+			keys = g_list_append(keys, key);
+	}
+
+	if (gpg_err_code(err) != GPG_ERR_EOF || !keys) {
+		gchar *msg = g_strdup_printf(_("could not list keys"));
+
+		g_set_error_from_gpgme(error, err, msg);
+		g_free(msg);
+		gpgme_op_keylist_end(ctx);
+		g_list_foreach(keys, (GFunc) gpgme_key_unref, NULL);
+		g_list_free(keys);
+		return NULL;
+	}
+	gpgme_op_keylist_end(ctx);
+
+	/* let the user select a key from the list, even if there is only one */
+	if (select_key_cb)
+		key = select_key_cb(name, LB_SELECT_PUBLIC_KEY_ANY, keys,
+							gpgme_get_protocol(ctx), parent);
+	else
+		key = NULL;
+	if (key) {
+		gpgme_key_ref(key);
+		g_list_foreach(keys, (GFunc) gpgme_key_unref, NULL);
+	}
+	g_list_free(keys);
+	return key;
+}
+
+
 /*
  * Add signer to ctx's list of signers and return TRUE on success or FALSE
  * on error.
@@ -893,19 +945,20 @@ static gboolean
 gpgme_add_signer(gpgme_ctx_t ctx, const gchar * signer, GtkWindow * parent,
 		 GError ** error)
 {
-    gpgme_key_t key;
+	gboolean result = FALSE;
+	gpgme_key_t key;
 
     /* note: private (secret) key has never low trust... */
-    if (!
-	(key = get_key_from_name(ctx, signer, TRUE, FALSE, parent, error)))
-	return FALSE;
+	key = get_key_from_name(ctx, signer, TRUE, FALSE, parent, error);
+	if (key != NULL) {
+		/* set the key (the previous operation guaranteed that it exists, no
+		 * need 2 check return values...) */
+		gpgme_signers_add(ctx, key);
+		gpgme_key_unref(key);
+		result = TRUE;
+	}
 
-    /* set the key (the previous operation guaranteed that it exists, no
-     * need 2 check return values...) */
-    gpgme_signers_add(ctx, key);
-    gpgme_key_unref(key);
-
-    return TRUE;
+    return result;
 }
 
 
@@ -927,12 +980,13 @@ gpgme_build_recipients(gpgme_ctx_t ctx, GPtrArray * rcpt_list,
 	gchar *name = (gchar *) g_ptr_array_index(rcpt_list, num_rcpts);
 	gpgme_key_t key;
 
-	if (!
-	    (key =
-	     get_key_from_name(ctx, name, FALSE, accept_low_trust, parent,
-			       error))) {
-	    release_keylist(rcpt);
-	    return NULL;
+		key = get_key_from_name(ctx, name, FALSE, accept_low_trust, parent, error);
+		if (key == NULL) {
+			key = get_pubkey(ctx, name, accept_low_trust, parent, error);
+			if (key == NULL) {
+				release_keylist(rcpt);
+				return NULL;
+			}
 	}
 
 	/* set the recipient */

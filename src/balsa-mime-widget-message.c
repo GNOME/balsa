@@ -562,7 +562,6 @@ static void
 add_header_gchar(GtkGrid * grid, const gchar * header, const gchar * label,
 		 const gchar * value, gboolean show_all_headers)
 {
-    gint row;
     gchar *css;
     GtkCssProvider *css_provider;
     GtkWidget *lab;
@@ -570,10 +569,6 @@ add_header_gchar(GtkGrid * grid, const gchar * header, const gchar * label,
     if (!(show_all_headers ||
 	  libbalsa_find_word(header, balsa_app.selected_headers)))
 	return;
-
-    row = 0;
-    while (gtk_grid_get_child_at(grid, 0, row))
-        row++;
 
     if (balsa_app.use_system_fonts) {
         if (strcmp(header, "subject") == 0)
@@ -599,7 +594,7 @@ add_header_gchar(GtkGrid * grid, const gchar * header, const gchar * label,
                                    GTK_STYLE_PROVIDER(css_provider),
                                    GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 
-    gtk_grid_attach(grid, lab, 0, row, 1, 1);
+    gtk_grid_attach_next_to(grid, lab, NULL, GTK_POS_BOTTOM, 1, 1);
     gtk_label_set_selectable(GTK_LABEL(lab), TRUE);
     gtk_widget_set_halign(lab, GTK_ALIGN_START);
     gtk_widget_set_valign(lab, GTK_ALIGN_START);
@@ -607,51 +602,52 @@ add_header_gchar(GtkGrid * grid, const gchar * header, const gchar * label,
 
     if (value && *value != '\0') {
         gchar *sanitized;
+        GtkWidget *value_label;
         GtkWidget *expander;
         GtkWidget *hbox;
 
         sanitized = g_strdup(value);
         libbalsa_utf8_sanitize(&sanitized,
                                balsa_app.convert_unknown_8bit, NULL);
-        lab = gtk_label_new(sanitized);
+        value_label = gtk_label_new(sanitized);
         g_free(sanitized);
 
-        gtk_widget_set_name(lab, BALSA_MESSAGE_HEADER);
-        gtk_style_context_add_provider(gtk_widget_get_style_context(lab) ,
+        gtk_widget_set_name(value_label, BALSA_MESSAGE_HEADER);
+        gtk_style_context_add_provider(gtk_widget_get_style_context(value_label) ,
                                        GTK_STYLE_PROVIDER(css_provider),
                                        GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 
-        gtk_label_set_line_wrap_mode(GTK_LABEL(lab), PANGO_WRAP_WORD_CHAR);
-        gtk_label_set_selectable(GTK_LABEL(lab), TRUE);
+        gtk_label_set_line_wrap_mode(GTK_LABEL(value_label), PANGO_WRAP_WORD_CHAR);
+        gtk_label_set_selectable(GTK_LABEL(value_label), TRUE);
 #if GTK_CHECK_VERSION(3, 16, 0)
-        gtk_label_set_xalign((GtkLabel *) lab, 0.0);
+        gtk_label_set_xalign((GtkLabel *) value_label, 0.0);
 #else                           /* GTK_CHECK_VERSION(3, 16, 0) */
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS
-        gtk_misc_set_alignment((GtkMisc *) lab, 0.0, 0.0);
+        gtk_misc_set_alignment((GtkMisc *) value_label, 0.0, 0.0);
 G_GNUC_END_IGNORE_DEPRECATIONS
 #endif                          /* GTK_CHECK_VERSION(3, 16, 0) */
-        gtk_widget_set_halign(lab, GTK_ALIGN_START);
-        gtk_widget_set_hexpand(lab, TRUE);
+        gtk_widget_set_halign(value_label, GTK_ALIGN_START);
+        gtk_widget_set_hexpand(value_label, TRUE);
 
         expander = gtk_expander_new(NULL);
         g_signal_connect(expander, "notify::expanded",
-                         G_CALLBACK(expanded_cb), lab);
+                         G_CALLBACK(expanded_cb), value_label);
 
         if(show_all_headers) {
-            gtk_label_set_line_wrap(GTK_LABEL(lab), TRUE);
+            gtk_label_set_line_wrap(GTK_LABEL(value_label), TRUE);
             gtk_expander_set_expanded(GTK_EXPANDER(expander), TRUE);
         } else {
-            gtk_label_set_ellipsize(GTK_LABEL(lab), PANGO_ELLIPSIZE_END);
+            gtk_label_set_ellipsize(GTK_LABEL(value_label), PANGO_ELLIPSIZE_END);
             gtk_expander_set_expanded(GTK_EXPANDER(expander), FALSE);
         }
-        g_signal_connect(lab, "size-allocate",
+        g_signal_connect(value_label, "size-allocate",
                          G_CALLBACK(label_size_allocate_cb), expander);
 
         hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-        gtk_container_add(GTK_CONTAINER(hbox), lab);
+        gtk_container_add(GTK_CONTAINER(hbox), value_label);
         gtk_container_add(GTK_CONTAINER(hbox), expander);
         gtk_widget_show_all(hbox);
-        gtk_grid_attach(grid, hbox, 1, row, 1, 1);
+        gtk_grid_attach_next_to(grid, hbox, lab, GTK_POS_RIGHT, 1, 1);
     }
 
     g_object_unref(css_provider);
@@ -844,7 +840,6 @@ add_header_sigstate(GtkGrid * grid, GMimeGpgmeSigstat * siginfo)
     gchar *format;
     gchar *msg;
     GtkWidget *label;
-    gint row;
 
     format = siginfo->status ==
         GPG_ERR_NO_ERROR ? "<i>%s%s</i>" : "<b><i>%s%s</i></b>";
@@ -859,9 +854,6 @@ add_header_sigstate(GtkGrid * grid, GMimeGpgmeSigstat * siginfo)
     gtk_widget_set_halign(label, GTK_ALIGN_START);
     gtk_widget_show(label);
 
-    row = 0;
-    while (gtk_grid_get_child_at(grid, 0, row))
-        row++;
-    gtk_grid_attach(grid, label, 0, row, 2, 1);
+    gtk_grid_attach_next_to(grid, label, NULL, GTK_POS_BOTTOM, 2, 1);
 }
 #endif

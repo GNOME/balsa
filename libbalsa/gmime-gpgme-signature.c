@@ -28,6 +28,7 @@
 #include <string.h>
 #include <glib.h>
 #include "libbalsa-gpgme.h"
+#include "misc.h"
 #include "gmime-gpgme-signature.h"
 
 
@@ -183,6 +184,7 @@ libbalsa_cert_subject_readable(const gchar *subject)
     gchar **elements;
     gint n;
     GString *result;
+    gchar *readable_subject;
 
     if (!subject)
         return NULL;
@@ -218,7 +220,9 @@ libbalsa_cert_subject_readable(const gchar *subject)
             result = g_string_append_c(result, ',');
     }
     g_strfreev(elements);
-    return g_string_free(result, FALSE);
+    readable_subject = g_string_free(result, FALSE);
+    libbalsa_utf8_sanitize(&readable_subject, TRUE, NULL);
+    return readable_subject;
 }
 
 static void

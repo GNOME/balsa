@@ -1,3 +1,11 @@
+2016-05-16  Albrecht Dreß
+
+	* libbalsa/gmime-gpgme-signature.c
+	(libbalsa_cert_subject_readable):
+	This trivial patch makes sure that the GPG key or S/MIME
+	certificate subject string as returned by
+	libbalsa_cert_subject_readable() is utf8-clean.
+
 2016-03-12  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* src/main-window.c (bw_display_new_mail_notification):

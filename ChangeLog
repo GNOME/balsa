@@ -1,3 +1,9 @@
+2016-05-20  Albrecht Dreß
+
+	* src/balsa-mime-widget-crypto.c
+	(balsa_mime_widget_signature_widget): remove confusing signature
+	info.
+
 2016-05-17  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* src/balsa-mime-widget-message.c (add_header_gchar),

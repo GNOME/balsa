@@ -67,27 +67,15 @@ balsa_mime_widget_signature_widget(LibBalsaMessageBody * mime_body,
     if (!mime_body->sig_info ||
 	mime_body->sig_info->status == GPG_ERR_NOT_SIGNED)
 	return NULL;
-				   
+
     infostr =
         libbalsa_signature_info_to_gchar(mime_body->sig_info,
                                          balsa_app.date_string);
-    if (g_ascii_strcasecmp(content_type, "application/pgp-signature") &&
-	g_ascii_strcasecmp(content_type, "application/pkcs7-signature") &&
-	g_ascii_strcasecmp(content_type, "application/x-pkcs7-signature")) {
-	gchar * labelstr = 
-	    g_strdup_printf(_("This is an inline %s signed %s message part:\n%s"),
-			    mime_body->sig_info->protocol == GPGME_PROTOCOL_OpenPGP ?
-			    _("OpenPGP") : _("S/MIME"),
-			    content_type, infostr);
-	g_free(infostr);
-	infostr = labelstr;
-    }
-
     if (!infostr)
         return NULL;
     lines = g_strsplit(infostr, "\n", 2);
     g_free(infostr);
-    
+
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, BMW_VBOX_SPACE);
     label = gtk_label_new(lines[1] ? lines[1] : lines[0]);
     gtk_label_set_selectable(GTK_LABEL(label), TRUE);

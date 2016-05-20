@@ -94,7 +94,9 @@ g_mime_gpgme_mps_sign(GMimeMultipartSigned * mps, GMimeObject * content,
     GMimeDataWrapper *wrapper;
     GMimeParser *parser;
     GMimePart *signature;
-    const gchar *sig_type;
+    gchar *micalg;
+    const gchar *proto_type;
+    const gchar *sig_subtype;
     gpgme_hash_algo_t hash_algo;
 
     g_return_val_if_fail(GMIME_IS_MULTIPART_SIGNED(mps), FALSE);
@@ -148,19 +150,18 @@ g_mime_gpgme_mps_sign(GMimeMultipartSigned * mps, GMimeObject * content,
     /* set the multipart/signed protocol and micalg */
     content_type = g_mime_object_get_content_type(GMIME_OBJECT(mps));
     if (protocol == GPGME_PROTOCOL_OpenPGP) {
-	gchar *micalg;
-
 	micalg =
 	    g_strdup_printf("PGP-%s", gpgme_hash_algo_name(hash_algo));
-	g_mime_content_type_set_parameter(content_type, "micalg", micalg);
-	g_free(micalg);
-	sig_type = "application/pgp-signature";
+	proto_type = "application/pgp-signature";
+	sig_subtype = "pgp-signature";
     } else {
-	g_mime_content_type_set_parameter(content_type, "micalg",
-					  gpgme_hash_algo_name(hash_algo));
-	sig_type = "application/pkcs7-signature";
+	micalg = g_strdup(gpgme_hash_algo_name(hash_algo));
+	proto_type = "application/pkcs7-signature";
+	sig_subtype = "pkcs7-signature";
     }
-    g_mime_content_type_set_parameter(content_type, "protocol", sig_type);
+    g_mime_content_type_set_parameter(content_type, "micalg", micalg);
+    g_free(micalg);
+    g_mime_content_type_set_parameter(content_type, "protocol", proto_type);
     g_mime_multipart_set_boundary(GMIME_MULTIPART(mps), NULL);
 
     /* construct the content part */
@@ -170,11 +171,7 @@ g_mime_gpgme_mps_sign(GMimeMultipartSigned * mps, GMimeObject * content,
     g_object_unref(parser);
 
     /* construct the signature part */
-    content_type = g_mime_content_type_new_from_string(sig_type);
-    signature =
-	g_mime_part_new_with_type(content_type->type,
-				  content_type->subtype);
-    g_object_unref(content_type);
+    signature = g_mime_part_new_with_type("application", sig_subtype);
 
     wrapper = g_mime_data_wrapper_new();
     g_mime_data_wrapper_set_stream(wrapper, sigstream);
@@ -322,7 +319,6 @@ g_mime_gpgme_mpe_encrypt(GMimeMultipartEncrypted * mpe,
     GMimeStream *stream;
     GMimePart *version_part;
     GMimePart *encrypted_part;
-    GMimeContentType *content_type;
     GMimeDataWrapper *wrapper;
     GMimeFilter *crlf_filter;
 
@@ -359,17 +355,8 @@ g_mime_gpgme_mpe_encrypt(GMimeMultipartEncrypted * mpe,
     g_mime_stream_reset(ciphertext);
 
     /* construct the version part */
-    content_type =
-	g_mime_content_type_new_from_string("application/pgp-encrypted");
     version_part =
-	g_mime_part_new_with_type(content_type->type,
-				  content_type->subtype);
-    g_object_unref(content_type);
-
-    content_type =
-	g_mime_content_type_new_from_string("application/pgp-encrypted");
-    g_mime_object_set_content_type(GMIME_OBJECT(version_part),
-				   content_type);
+	g_mime_part_new_with_type("application", "pgp-encrypted");
     g_mime_part_set_content_encoding(version_part,
 				     GMIME_CONTENT_ENCODING_7BIT);
     stream =

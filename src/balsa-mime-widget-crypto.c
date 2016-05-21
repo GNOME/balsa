@@ -102,8 +102,16 @@ balsa_mime_widget_signature_widget(LibBalsaMessageBody * mime_body,
 #endif /* HAVE_GPG */
 
     if (lines[1]) {
-        signature_widget = gtk_expander_new(lines[0]);
-        gtk_container_add(GTK_CONTAINER(signature_widget), vbox);
+        /* Hack alert: if we omit the box below and use the expander as signature widget
+         * directly, setting the container border width of the container = the expander
+         * causes its sensitive area to shrink to an almost unusable narrow line above
+         * the label... */
+        GtkWidget *expander;
+
+        signature_widget = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+        expander = gtk_expander_new(lines[0]);
+        gtk_container_add(GTK_CONTAINER(signature_widget), expander);
+        gtk_container_add(GTK_CONTAINER(expander), vbox);
     } else {
         signature_widget = vbox;
     }

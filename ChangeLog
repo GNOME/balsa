@@ -1,5 +1,12 @@
 2016-05-20  Albrecht Dreß
 
+	* src/balsa-mime-widget-crypto.c
+	(balsa_mime_widget_signature_widget): pack the GtkExpander in a
+	GtkBox, to work around a Gtk bug that limits the mouse-sensitive
+	area of the expander when the border-width is set.
+
+2016-05-20  Albrecht Dreß
+
 	* libbalsa/gmime-multipart-crypt.c (g_mime_gpgme_mps_sign):
 	refactor;
 	(g_mime_gpgme_mpe_encrypt): ditto, removing leak.

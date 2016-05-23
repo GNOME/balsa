@@ -355,11 +355,7 @@ imap_write_key_date(ImapMboxHandle *handle, ImapSearchDateRange range,
   static const char *month[] = 
     { "Jan", "Feb", "Mar", "Apr", "May",
       "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
-#if GLIB_CHECK_VERSION(2,10,0)
   GDate date;
-#else
-  struct tm date;
-#endif
   if(!internal) sio_write(handle->sio, "SENT", 4);
   switch(range) {
   case IMSE_D_BEFORE : sio_write(handle->sio, "BEFORE ", 7); break;
@@ -367,15 +363,9 @@ imap_write_key_date(ImapMboxHandle *handle, ImapSearchDateRange range,
   default: /* which is -2, the only remaining option */
   case IMSE_D_SINCE  : sio_write(handle->sio, "SINCE " , 6); break;
   }
-#if GLIB_CHECK_VERSION(2,10,0)
   g_date_set_time_t(&date, tm);
   sio_printf(handle->sio, "%02d-%s-%04d",
 	     date.day, month[date.month - 1], date.year);
-#else
-  localtime_r(&tm, &date);
-  sio_printf(handle->sio, "%02d-%s-%04d",
-             date.tm_mday, month[date.tm_mon], date.tm_year + 1900);
-#endif
 }
 
 static void

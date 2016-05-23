@@ -1,3 +1,8 @@
+2016-05-23  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* libbalsa/imap/imap_search.c (imap_write_key_date): drop
+	redundant glib version check.
+
 2016-05-20  Albrecht Dreß
 
 	* src/balsa-mime-widget-crypto.c

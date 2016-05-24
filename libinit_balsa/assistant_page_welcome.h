@@ -22,20 +22,17 @@
 #ifndef __BALSA_DRUID_PAGE_WELCOME_H__
 #define __BALSA_DRUID_PAGE_WELCOME_H__
 
-#ifdef __cplusplus
-extern "C" {
-#endif                          /* __cplusplus */
-
 #include <gtk/gtk.h>
 #include "assistant_helper.h"
 #include "assistant_init.h"
+
+G_BEGIN_DECLS
 
 /*
  * Public methods
  */
     void balsa_druid_page_welcome(GtkAssistant * druid);
 
-#ifdef __cplusplus
-}
-#endif                          /* __cplusplus */
+G_END_DECLS
+
 #endif

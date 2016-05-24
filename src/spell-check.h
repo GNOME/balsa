@@ -26,9 +26,7 @@
 
 #define USE_ORIGINAL_MANAGER_FUNCS
 
-#ifdef __cplusplus
-extern "C" {
-#endif				/* __cplusplus */
+G_BEGIN_DECLS
 
 #define BALSA_TYPE_SPELL_CHECK \
         (balsa_spell_check_get_type ())
@@ -61,7 +59,6 @@ extern "C" {
     void balsa_spell_check_start(BalsaSpellCheck * spell_check);
 
 
-#ifdef __cplusplus
-}
-#endif				/* __cplusplus */
+G_END_DECLS
+
 #endif				/* __BALSA_SPELL_CHECK_H__ */

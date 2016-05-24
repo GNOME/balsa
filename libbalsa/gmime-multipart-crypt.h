@@ -39,9 +39,7 @@
 #include "gmime-gpgme-signature.h"
 
 
-#ifdef __cplusplus
-extern "C" {
-#endif				/* __cplusplus */
+G_BEGIN_DECLS
 
 
 GMimeGpgmeSigstat *g_mime_gpgme_mps_verify(GMimeMultipartSigned * mps,
@@ -59,8 +57,7 @@ GMimeObject *g_mime_gpgme_mpe_decrypt(GMimeMultipartEncrypted * mpe,
 				      GtkWindow * parent, GError ** err);
 
 
-#ifdef __cplusplus
-}
-#endif				/* __cplusplus */
+G_END_DECLS
+
 
 #endif				/* __GMIME_MULTIPART_CRYPT_H__ */

@@ -32,9 +32,7 @@
 #include "balsa-message.h"
 #include "balsa-mime-widget.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif				/* __cplusplus */
+G_BEGIN_DECLS
 
 
 BalsaMimeWidget *balsa_mime_widget_new_signature(BalsaMessage * bm,
@@ -48,8 +46,7 @@ GtkWidget * balsa_mime_widget_crypto_frame(LibBalsaMessageBody * mime_body, GtkW
 const gchar *balsa_mime_widget_signature_icon_name(LibBalsaMsgProtectState protect_state);
 
 
-#ifdef __cplusplus
-}
-#endif				/* __cplusplus */
+G_END_DECLS
+
 #endif                          /* HAVE_GPGME */
 #endif				/* __BALSA_MIME_WIDGET_IMAGE_H__ */

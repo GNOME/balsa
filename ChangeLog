@@ -1,3 +1,35 @@
+2016-05-24  Albrecht Dreß
+
+	Use G_{BEGIN,END}_DECLS
+
+	* libbalsa/gmime-application-pkcs7.h:
+	* libbalsa/gmime-gpgme-signature.h:
+	* libbalsa/gmime-multipart-crypt.h:
+	* libbalsa/gmime-part-rfc2440.h:
+	* libbalsa/identity.h:
+	* libbalsa/libbalsa-gpgme-cb.h:
+	* libbalsa/libbalsa-gpgme.h:
+	* libinit_balsa/assistant_init.h:
+	* libinit_balsa/assistant_page_defclient.h:
+	* libinit_balsa/assistant_page_directory.h:
+	* libinit_balsa/assistant_page_finish.h:
+	* libinit_balsa/assistant_page_user.h:
+	* libinit_balsa/assistant_page_welcome.h:
+	* src/balsa-index.h:
+	* src/balsa-message.h:
+	* src/balsa-mime-widget-callbacks.h:
+	* src/balsa-mime-widget-crypto.h:
+	* src/balsa-mime-widget-image.h:
+	* src/balsa-mime-widget-message.h:
+	* src/balsa-mime-widget-multipart.h:
+	* src/balsa-mime-widget-text.h:
+	* src/balsa-mime-widget.h:
+	* src/filter-run.h:
+	* src/print.h:
+	* src/quote-color.h:
+	* src/sendmsg-window.h:
+	* src/spell-check.h:
+
 2016-05-23  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* libbalsa/imap/imap_search.c (imap_write_key_date): drop

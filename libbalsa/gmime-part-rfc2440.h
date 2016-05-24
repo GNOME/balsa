@@ -28,9 +28,9 @@
 #include <gmime/gmime.h>
 
 
-#ifdef __cplusplus
-extern "C" {
-#endif				/* __cplusplus */
+G_BEGIN_DECLS
+
+
 typedef enum _GMimePartRfc2440Mode GMimePartRfc2440Mode;
 enum _GMimePartRfc2440Mode { 
     GMIME_PART_RFC2440_NONE,
@@ -54,8 +54,7 @@ GMimeGpgmeSigstat *g_mime_part_rfc2440_decrypt(GMimePart * part,
 					       GtkWindow * parent,
                                                 GError ** err);
 
-#ifdef __cplusplus
-}
-#endif				/* __cplusplus */
+G_END_DECLS
+
 
 #endif				/* __GMIME_PART_RFC2440_H__ */

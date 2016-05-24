@@ -23,12 +23,11 @@
 #ifndef __BALSA_INITDRUID_H__
 #define __BALSA_INITDRUID_H__
 
-#ifdef __cplusplus
-extern "C" {
-#endif                          /* __cplusplus */
-
 #include <gtk/gtk.h>
 #include "assistant_helper.h"
+
+
+G_BEGIN_DECLS
 
 /*
  * Public methods
@@ -37,7 +36,6 @@ extern "C" {
 
 void balsa_init_begin( void );
 
-#ifdef __cplusplus
-}
-#endif                          /* __cplusplus */
+G_END_DECLS
+
 #endif

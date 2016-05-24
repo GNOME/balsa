@@ -32,9 +32,7 @@
 #include <gtk/gtk.h>
 
 
-#ifdef __cplusplus
-extern "C" {
-#endif				/* __cplusplus */
+G_BEGIN_DECLS
 
 
 typedef enum {
@@ -55,9 +53,7 @@ gboolean lb_gpgme_accept_low_trust_key(const gchar * user_name,
 				       GtkWindow * parent);
 
 
-#ifdef __cplusplus
-}
-#endif				/* __cplusplus */
+G_END_DECLS
 
 
 #endif				/* LIBBALSA_GPGME_CB_H_ */

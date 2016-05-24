@@ -26,11 +26,9 @@
 # error "Include config.h before this file."
 #endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif				/* __cplusplus */
-
 #include <gtk/gtk.h>
+
+G_BEGIN_DECLS
 
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
@@ -52,7 +50,6 @@ extern "C" {
     extern guint is_a_quote(const gchar *, regex_t * rex);
 #endif                          /* USE_GREGEX */
 
-#ifdef __cplusplus
-}
-#endif				/* __cplusplus */
+G_END_DECLS
+
 #endif				/* __BALSA_QUOTECOLOR_H__ */

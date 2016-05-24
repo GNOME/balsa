@@ -22,14 +22,12 @@
 #ifndef __BALSA_DRUID_PAGE_DIRECTORY_H__
 #define __BALSA_DRUID_PAGE_DIRECTORY_H__
 
-#ifdef __cplusplus
-extern "C" {
-#endif                          /* __cplusplus */
-
 #include <gtk/gtk.h>
 
 #include "assistant_helper.h"
 #include "assistant_init.h"
+
+G_BEGIN_DECLS
 
 /*
  * Main object structure
@@ -70,7 +68,6 @@ extern "C" {
 #endif                          /* defined(ENABLE_TOUCH_UI) */
 
 
-#ifdef __cplusplus
-}
-#endif                          /* __cplusplus */
+G_END_DECLS
+
 #endif

@@ -26,9 +26,7 @@
 #include "balsa-message.h"
 
 
-#ifdef __cplusplus
-extern "C" {
-#endif				/* __cplusplus */
+G_BEGIN_DECLS
 
 
 void balsa_mime_widget_ctx_menu_cb(GtkWidget * menu_item, LibBalsaMessageBody * mime_body);
@@ -40,7 +38,6 @@ gint balsa_mime_widget_limit_focus(GtkWidget * widget, GdkEventFocus * event, Ba
 gint balsa_mime_widget_unlimit_focus(GtkWidget * widget, GdkEventFocus * event, BalsaMessage * bm);
 
 
-#ifdef __cplusplus
-}
-#endif				/* __cplusplus */
+G_END_DECLS
+
 #endif				/* __BALSA_MIME_WIDGET_CALLBACKS_H__ */

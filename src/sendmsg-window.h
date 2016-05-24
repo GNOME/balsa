@@ -26,13 +26,11 @@
 # error "Include config.h before this file."
 #endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif				/* __cplusplus */
-
 #include "libbalsa.h"
 #include "address-view.h"
 #include "toolbar-factory.h"
+
+G_BEGIN_DECLS
 
     typedef enum {
        SEND_NORMAL,            /* initialized by Compose */
@@ -151,7 +149,6 @@ extern "C" {
 
 #define SENDMSG_WINDOW_QUIT_ON_CLOSE(bsmsg) ((bsmsg)->quit_on_close=TRUE)
 
-#ifdef __cplusplus
-}
-#endif				/* __cplusplus */
+G_END_DECLS
+
 #endif				/* __BALSA_SENDMSG_H__ */

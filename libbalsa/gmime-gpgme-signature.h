@@ -25,10 +25,7 @@
 #include <glib.h>
 
 
-#ifdef __cplusplus
-extern "C" {
-#endif				/* __cplusplus */
-
+G_BEGIN_DECLS
 
 /* the signature status as returned by gpgme as a GObject */
 #define GMIME_TYPE_GPGME_SIGSTAT	    (g_mime_gpgme_sigstat_get_type())
@@ -69,9 +66,6 @@ GMimeGpgmeSigstat *g_mime_gpgme_sigstat_new_from_gpgme_ctx(gpgme_ctx_t
 gchar *libbalsa_cert_subject_readable(const gchar *subject);
 
 
-#ifdef __cplusplus
-/* cppcheck-suppress syntaxError */
-}
-#endif				/* __cplusplus */
+G_END_DECLS
 
 #endif				/* __GMIME_GPGME_SIGNATURE_H__ */

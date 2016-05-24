@@ -24,9 +24,7 @@
 #include "balsa-message.h"
 #include "balsa-mime-widget.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif				/* __cplusplus */
+G_BEGIN_DECLS
 
 /*
  * GObject class definitions
@@ -69,7 +67,6 @@ BalsaMimeWidget *balsa_mime_widget_new_image(BalsaMessage * bm,
 void balsa_mime_widget_image_resize_all(GtkWidget * widget, gpointer user_data);
 
 
-#ifdef __cplusplus
-}
-#endif				/* __cplusplus */
+G_END_DECLS
+
 #endif				/* __BALSA_MIME_WIDGET_IMAGE_H__ */

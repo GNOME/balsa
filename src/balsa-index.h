@@ -26,9 +26,7 @@
 #include "filter.h"
 #include "mailbox-node.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif				/* __cplusplus */
+G_BEGIN_DECLS
 
     GType balsa_index_get_type(void);
 
@@ -188,7 +186,6 @@ extern "C" {
 
 #define BALSA_INDEX_VIEW_ON_OPEN "balsa-index-view-on-open"
 
-#ifdef __cplusplus
-}
-#endif				/* __cplusplus */
+G_END_DECLS
+
 #endif				/* __BALSA_INDEX_H__ */

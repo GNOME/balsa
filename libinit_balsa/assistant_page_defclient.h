@@ -28,12 +28,10 @@
 # error "Include config.h before this file."
 #endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif                          /* __cplusplus */
-
 #include "assistant_helper.h"
 #include "assistant_init.h"
+
+G_BEGIN_DECLS
 
 /*
  * Main object structure
@@ -53,7 +51,6 @@ extern "C" {
     void balsa_druid_page_defclient(GtkAssistant * druid);
     void balsa_druid_page_defclient_save(BalsaDruidPageDefclient * defclient);
 
-#ifdef __cplusplus
-}
-#endif                          /* __cplusplus */
+G_END_DECLS
+
 #endif

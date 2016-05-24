@@ -39,9 +39,7 @@
  * fr = filter run
  */
 
-#ifdef __cplusplus
-extern "C" {
-#endif				/* __cplusplus */
+G_BEGIN_DECLS
 
 
 #define BALSA_TYPE_FILTER_RUN_DIALOG     \
@@ -127,7 +125,6 @@ void selected_list_toggled(GtkCellRendererToggle * cellrenderertoggle,
 void selected_list_activated(GtkTreeView * treeview, GtkTreePath * path,
                              GtkTreeViewColumn * column, gpointer data);
 
-#ifdef __cplusplus
-}
-#endif				/* __cplusplus */
+G_END_DECLS
+
 #endif  /* __FILTER_RUN_H__ */

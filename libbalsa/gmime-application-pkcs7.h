@@ -22,10 +22,7 @@
 #ifndef __GMIME_APPLICATION_PKCS7_H__
 #define __GMIME_APPLICATION_PKCS7_H__
 
-#ifdef __cplusplus
-extern "C" {
-#pragma }
-#endif				/* __cplusplus */
+G_BEGIN_DECLS
 
 #include <gmime/gmime.h>
 
@@ -43,7 +40,6 @@ extern "C" {
 					 GtkWindow * parent,
 					 GError ** err);
 
-#ifdef __cplusplus
-}
-#endif				/* __cplusplus */
+G_END_DECLS
+
 #endif				/* __GMIME_APPLICATION_PKCS7_H__ */

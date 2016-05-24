@@ -26,14 +26,11 @@
 # error "Include config.h before this file."
 #endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif				/* __cplusplus */
+G_BEGIN_DECLS
 
     void message_print(LibBalsaMessage * msg, GtkWindow * parent);
     void message_print_page_setup(GtkWindow * parent);
 
-#ifdef __cplusplus
-}
-#endif				/* __cplusplus */
+G_END_DECLS
+
 #endif				/* __PRINT_H__ */

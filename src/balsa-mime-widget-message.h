@@ -26,9 +26,7 @@
 #include "balsa-message.h"
 #include "balsa-mime-widget.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif				/* __cplusplus */
+G_BEGIN_DECLS
 
 
 BalsaMimeWidget *balsa_mime_widget_new_message(BalsaMessage * bm,
@@ -51,7 +49,6 @@ void balsa_mime_widget_message_set_headers_d(BalsaMessage * bm,
                                              const gchar *subject);
 
 
-#ifdef __cplusplus
-}
-#endif				/* __cplusplus */
+G_END_DECLS
+
 #endif				/* __BALSA_MIME_WIDGET_MESSAGE_H__ */

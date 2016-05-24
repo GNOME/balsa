@@ -32,10 +32,9 @@
 
 #include "libbalsa.h"
 
-#ifdef __cplusplus
-extern "C" 
-{
-#endif /* __cplusplus */
+
+G_BEGIN_DECLS
+
 
     GType libbalsa_identity_get_type(void);
 
@@ -149,7 +148,8 @@ extern "C"
     LibBalsaIdentity* libbalsa_identity_new_config(const gchar* name);
     void libbalsa_identity_save(LibBalsaIdentity* id, const gchar* prefix);
 
-#ifdef __cplusplus
-}
-#endif
+
+G_END_DECLS
+
+
 #endif /* __LIBBALSA_IDENTITY_H__ */

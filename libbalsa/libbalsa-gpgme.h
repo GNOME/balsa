@@ -35,9 +35,7 @@
 #include "gmime-gpgme-signature.h"
 
 
-#ifdef __cplusplus
-extern "C" {
-#endif				/* __cplusplus */
+G_BEGIN_DECLS
 
 
 #define GPG_ERR_KEY_SELECTION          GPG_ERR_USER_14
@@ -107,8 +105,7 @@ GMimeGpgmeSigstat *libbalsa_gpgme_decrypt(GMimeStream * crypted,
 					  GError ** error);
 
 
-#ifdef __cplusplus
-}
-#endif				/* __cplusplus */
+G_END_DECLS
+
 
 #endif				/* LIBBALSA_GPGME_H_ */

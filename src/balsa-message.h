@@ -33,9 +33,7 @@
 #define BALSA_USE_GTK_STACK
 #endif                          /* GTK_CHECK_VERSION(3, 10, 0) */
 
-#ifdef __cplusplus
-extern "C" {
-#endif				/* __cplusplus */
+G_BEGIN_DECLS
 
 
 #define BALSA_TYPE_MESSAGE          (balsa_message_get_type ())
@@ -157,7 +155,6 @@ void balsa_message_perform_crypto(LibBalsaMessage * message,
 
 void balsa_message_find_in_message (BalsaMessage * bm);
 
-#ifdef __cplusplus
-}
-#endif				/* __cplusplus */
+G_END_DECLS
+
 #endif				/* __BALSA_MESSAGE_H__ */

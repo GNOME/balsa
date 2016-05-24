@@ -25,9 +25,7 @@
 #include "libbalsa.h"
 #include "balsa-message.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif				/* __cplusplus */
+G_BEGIN_DECLS
 
 
 /* define some constants to simplify the layout */
@@ -76,7 +74,6 @@ void balsa_mime_widget_destroy(GObject * object);
 void balsa_mime_widget_schedule_resize(GtkWidget * widget);
 
 
-#ifdef __cplusplus
-}
-#endif				/* __cplusplus */
+G_END_DECLS
+
 #endif				/* __BALSA_MIME_WIDGET_H__ */

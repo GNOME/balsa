@@ -113,7 +113,7 @@ struct _LibBalsaMailboxMbox {
 
     GPtrArray *msgno_2_msg_info;
     GMimeStream *gmime_stream;
-    gint size;
+    off_t size;
     gboolean messages_info_changed;
 };
 
@@ -921,10 +921,10 @@ lbm_mbox_check_file(LibBalsaMailboxMbox * mbox,
 
         if (content_length) {
             /* Seek past the content. */
-            ssize_t remaining;
+            off_t remaining;
 
             buffer->start += content_length;
-            remaining = buffer->end - buffer->start;
+            remaining = (off_t) buffer->end - (off_t) buffer->start;
             if (remaining < 0) {
                 g_mime_stream_seek(buffer->stream, -remaining,
                                    GMIME_STREAM_SEEK_CUR);
@@ -1167,15 +1167,19 @@ static gint
 lbm_mbox_newline(GMimeStream * stream)
 {
     gint retval;
-    gchar buf[1];
-    static gchar newlines[] = "\n\n";
+    static const gchar newlines[] = "\n\n";
 
-    retval = g_mime_stream_seek(stream, -1, GMIME_STREAM_SEEK_CUR);
-    if (retval >= 0)
-	retval = g_mime_stream_read(stream, buf, 1);
-    if (retval == 1)
-	retval =
-	    g_mime_stream_write(stream, newlines, buf[0] == '\n' ? 1 : 2);
+    if (g_mime_stream_seek(stream, -1, GMIME_STREAM_SEEK_CUR) < 0) {
+    	retval = -1;
+    } else {
+        gchar buf;
+
+    	retval = g_mime_stream_read(stream, &buf, 1);
+    	if (retval == 1) {
+    		retval =
+    			g_mime_stream_write(stream, newlines, buf == '\n' ? 1 : 2);
+    	}
+    }
 
     return retval;
 }
@@ -1950,7 +1954,7 @@ libbalsa_mailbox_mbox_add_message(LibBalsaMailbox * mailbox,
     GMimeObject *armored_object;
     GMimeStream *armored_dest;
     GMimeStream *dest;
-    gint retval;
+    off_t retval;
     off_t orig_length;
 
     message = libbalsa_message_new();

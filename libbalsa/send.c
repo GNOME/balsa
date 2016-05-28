@@ -588,6 +588,8 @@ libbalsa_message_cb (void **buf, int *len, void *arg)
 	return NULL;
     }
 
+    /* note: the following calculation works *only* for messages < 2 GB
+     * due to the limited range of int, but this should be safe... */
     *len = g_mime_stream_length(current_message->stream)
 	    - g_mime_stream_tell(current_message->stream);
     ptr = (char *) mem_stream->buffer->data

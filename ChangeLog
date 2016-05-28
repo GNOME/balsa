@@ -1,3 +1,13 @@
+2016-05-27  Albrecht Dreß
+
+	Fix accessing MBox files > 2 GByte
+
+	* libbalsa/mailbox_mbox.c (lbm_mbox_check_file),
+	(lbm_mbox_newline), (libbalsa_mailbox_mbox_add_message): use
+	64-bit sizes;
+	* libbalsa/send.c (libbalsa_message_cb): comment warning about
+	file size.
+
 2015-03-03  Albrecht Dreß
 
 	Improve display and printing of text/rfc822-headers parts

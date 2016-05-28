@@ -1,3 +1,12 @@
+2016-05-27  Albrecht Dreß
+
+	Fix accessing MBox files > 2 GByte
+
+	* libbalsa/mailbox_mbox.c (lbm_mbox_check_file),
+	(lbm_mbox_newline), (lbm_mbox_add_message): use 64-bit sizes;
+	* libbalsa/send.c (libbalsa_message_cb): comment about file size
+	limitation.
+
 2016-05-24  Albrecht Dreß
 
 	Use G_{BEGIN,END}_DECLS

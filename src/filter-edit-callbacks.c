@@ -724,8 +724,8 @@ fill_condition_widgets(LibBalsaCondition* cnd)
     GtkTreeModel *model =
         gtk_tree_view_get_model(fe_type_regex_list);
 #endif                  /* REGULAR_EXPRESSION_FILTERING_IS_IMPLEMENTED */
-    gchar str[20];
-    struct tm date;
+    gchar *str;
+    GDateTime *date;
     gint row,col;
     gboolean andmask;
     static gchar xformat[] = "%x"; /* to suppress error in strftime */
@@ -800,18 +800,22 @@ fill_condition_widgets(LibBalsaCondition* cnd)
 #endif
         break;
     case CONDITION_DATE:
-        if (cnd->match.date.date_low==0) str[0]='\0';
+        if (cnd->match.date.date_low==0) str = g_strdup("");
         else {
-            localtime_r(&cnd->match.date.date_low, &date);
-            strftime(str, sizeof(str), xformat, &date);
+        	date = g_date_time_new_from_unix_local(cnd->match.date.date_low);
+            str = g_date_time_format(date, xformat);
+            g_date_time_unref(date);
         }
         gtk_entry_set_text(GTK_ENTRY(fe_type_date_low_entry),str);
-        if (cnd->match.date.date_high==0) str[0]='\0';
+        g_free(str);
+        if (cnd->match.date.date_high==0) str = g_strdup("");
         else {
-            localtime_r(&cnd->match.date.date_high, &date);
-            strftime(str,sizeof(str), xformat, &date);
+        	date = g_date_time_new_from_unix_local(cnd->match.date.date_low);
+            str = g_date_time_format(date, xformat);
+            g_date_time_unref(date);
         }
         gtk_entry_set_text(GTK_ENTRY(fe_type_date_high_entry),str);
+        g_free(str);
         fe_update_label(fe_type_date_label, &date_label);
         break;
     case CONDITION_FLAG:

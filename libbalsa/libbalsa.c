@@ -263,23 +263,23 @@ gboolean libbalsa_ldap_exists(const gchar *server)
 }
 
 gchar*
-libbalsa_date_to_utf8(const time_t *date, const gchar *date_string)
+libbalsa_date_to_utf8(const time_t date, const gchar *date_string)
 {
-    struct tm footime;
-    gchar rettime[128];
+	gchar *result;
 
-    g_return_val_if_fail(date != NULL, NULL);
     g_return_val_if_fail(date_string != NULL, NULL);
 
-    if (!*date)
+    if (date == (time_t) 0) {
         /* Missing "Date:" field?  It is required by RFC 2822. */
-        return NULL;
+        result = NULL;
+    } else {
+    	GDateTime *footime;
 
-    localtime_r(date, &footime);
-
-    strftime(rettime, sizeof(rettime), date_string, &footime);
-
-    return g_locale_to_utf8(rettime, -1, NULL, NULL, NULL);
+    	footime = g_date_time_new_from_unix_local(date);
+    	result = g_date_time_format(footime, date_string);
+    	g_date_time_unref(footime);
+    }
+    return result;
 }
 
 LibBalsaMessageStatus

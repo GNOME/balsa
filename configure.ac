@@ -115,18 +115,13 @@ AC_ARG_WITH(esmtp,
                   [Enable libESMTP (default=yes)]),
                   [ with_esmtp=$withval ],[ with_esmtp=yes ])
 
-AC_ARG_ENABLE([gregex], 
-   AC_HELP_STRING([--enable-gregex],
-                  [Use GRegex regular expressions if available (default=no)]),
-                  [ check_gregex=$enableval],[ check_gregex=no ])
-
 AC_ARG_WITH(gss,
    AC_HELP_STRING([--with-gss],
                   [Enable GSS (default=no)]),
                   [with_gss=$withval],[with_gss=no])
 
 AC_ARG_WITH(html-widget,
-            AC_HELP_STRING([--with-html-widget=(no|gtkhtml2|gtkhtml4|webkit|webkit2)],
+            AC_HELP_STRING([--with-html-widget=(no|gtkhtml4|webkit|webkit2)],
                            [select the HTML renderer (default webkit)]),
             [use_html_widget=$withval],
             [use_html_widget=webkit])
@@ -164,12 +159,6 @@ AC_ARG_WITH([macosx-desktop],
 	          [Use Mac OS X Desktop Integration (default=no, extremely experimental)]),
 		  [use_igemacint=$withval],[use_igemacint=no])
 
-AC_ARG_ENABLE([pcre], 
-   AC_HELP_STRING([--enable-pcre],
-                  [Use Perl-compatible regular expressions if available (default=no)]),
-                  [ check_pcre=$enableval],[ check_pcre=no ])
-
-
 AC_ARG_WITH([rubrica],
    AC_HELP_STRING([--with-rubrica],
                   [add Rubrica2 address book support (needs libxml2, default=no)]),
@@ -179,11 +168,6 @@ AC_ARG_WITH([sqlite],
    AC_HELP_STRING([--with-sqlite=DIR],
                   [Use SQLite for GPE address books (default=no)]),
                   [with_sqlite=$withval],[with_sqlite=no])
-
-AC_ARG_WITH(gmime,
-   AC_HELP_STRING([--with-gmime],
-                  [Version of GMime 2.4, or 2.6 (default=detect)]),
-                  [with_gmime=$withval],[with_gmime=detect])
 
 AC_ARG_WITH(libsecret,
    AC_HELP_STRING([--with-libsecret],
@@ -232,11 +216,6 @@ else
     YELP_HELP_INIT
     AM_CONDITIONAL([HAVE_YELPTOOL], [true])
 fi
-
-# glib-genmarshal
-#
-AC_SUBST(GLIB_GENMARSHAL)
-GLIB_GENMARSHAL=`pkg-config --variable=glib_genmarshal glib-2.0`
 
 # gettext
 #
@@ -302,34 +281,6 @@ else
 fi
 AC_SUBST(TOOLKIT_CATEGORIES)
 
-# GMime configuration
-#
-if test "$with_gmime" = detect; then
-   AC_MSG_CHECKING([Gmime version])
-   if $PKG_CONFIG --exists gmime-2.6; then
-      with_gmime=2.6
-   else
-      if $PKG_CONFIG --exists gmime-2.4; then
-         with_gmime=2.4
-      else
-         AC_MSG_ERROR([GMime 2.6 or 2.4 not detected.])
-      fi
-   fi
-   AC_MSG_RESULT([$with_gmime])
-fi
-
-case "$with_gmime" in
-    2.4) ;;
-    2.6) AC_DEFINE([HAVE_GMIME_2_6], [1],
-                   [Defined to build with GMime version 2.5 or 2.6])
-         if $PKG_CONFIG --atleast-version=2.5.7 gmime-2.6; then
-             AC_DEFINE([HAVE_GMIME_2_5_7], [1],
-                       [Defined when GMime version is at least 2.5.7])
-         fi
-         ;;
-    *) AC_MSG_ERROR([unknown GMime version $with_gmime]) ;;
-esac
-
 dnl #####################################################################
 dnl 4. Libraries.
 dnl #####################################################################
@@ -340,7 +291,7 @@ LIBS="$LIBS -lz"
 PKG_CHECK_MODULES(BALSA, [
 glib-2.0 >= 2.32.0
 gtk+-3.0 >= 3.4.0
-gmime-$with_gmime
+gmime-2.6
 gio-2.0
 gthread-2.0
 $gnome_extras
@@ -349,7 +300,7 @@ $gnome_extras
 PKG_CHECK_MODULES(BALSA_AB, [
    glib-2.0
    gtk+-3.0
-   gmime-$with_gmime
+   gmime-2.6
    $gnome_extras
 ])
 
@@ -391,11 +342,6 @@ AC_SUBST(BALSA_DEFS)
 #
 AC_MSG_CHECKING(whether to use an HTML widget)
 case "$use_html_widget" in
-    gtkhtml2)
-        AC_MSG_RESULT([$use_html_widget])
-        PKG_CHECK_MODULES(HTML, [ libgtkhtml-2.0 ])
-        AC_DEFINE(HAVE_GTKHTML2,1,[Defined when GtkHtml-2 can be used.])
-    ;;
     gtkhtml4)
         AC_MSG_RESULT([$use_html_widget])
         PKG_CHECK_MODULES(HTML, [ libgtkhtml-4.0 ], [],
@@ -405,11 +351,6 @@ case "$use_html_widget" in
     ;;
     webkit | webkit2)
         AC_MSG_RESULT([$use_html_widget])
-        if test x"$use_threads" = xno ; then
-            if ! $PKG_CONFIG --atleast-version=2.24.0 glib-2.0; then
-                AC_MSG_ERROR([WebKit cannot be used with threads disabled and glib older than version 2.24.])
-            fi
-        fi
         if test $use_html_widget = webkit2 ; then
             PKG_CHECK_MODULES(HTML, [ webkit2gtk-4.0 ])
             AC_DEFINE(USE_WEBKIT2,1,[Defined when WebKit2 is requested.])
@@ -453,11 +394,13 @@ if test x"$gpgmecfg" != xno ; then
         gpgme_ve=`echo $gpgmever|sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)/\1/'`
         gpgme_ma=`echo $gpgmever|sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)/\2/'`
         gpgme_mi=`echo $gpgmever|sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)/\3/'`
-	if test $gpgme_ve -eq 0 ; then
-		if test $gpgme_ma -lt 9 ; then
-			gpgmecfg=no
-			have_smime=no
-		fi
+	if test $gpgme_ve -lt 1; then
+		gpgmecfg=no
+		have_smime=no
+	fi
+	if test \( $gpgme_ve -eq 1 \) -a \( $gpgme_ma -lt 2 \) ; then
+		gpgmecfg=no
+		have_smime=no
 	fi
 	if test x"$gpgmecfg" != xno ; then
 		if test x"$use_threads" = xyes; then
@@ -472,7 +415,7 @@ if test x"$gpgmecfg" != xno ; then
 		BALSA_CFLAGS="$BALSA_CFLAGS `$gpgmecfg --cflags`"
 		gpgmecfg=yes
 	else
-		AC_MSG_WARN([sorry, you need at least gpgme version 0.9.0])
+		AC_MSG_WARN([sorry, you need at least gpgme version 1.2.0])
 	fi
 else
 	have_smime=no
@@ -629,47 +572,6 @@ if test "x$with_esmtp" != xno  ; then
     test "$with_esmtp" != yes && CPPFLAGS="$CPPFLAGS -I$with_esmtp/include"
 else
     AC_MSG_RESULT([no])
-fi
-
-# PCRE configuration.
-#
-
-AC_MSG_CHECKING(Regular expressions)
-if test x"$check_gregex" = xyes ; then
-    if $PKG_CONFIG --atleast-version=2.14.0 glib-2.0; then
-        AC_MSG_RESULT(GRegex)
-        AC_DEFINE(USE_GREGEX,1,[Defined when GRegex is to be used.])
-    else
-        AC_MSG_ERROR([*** You enabled GRegex but glib is too old. Please
-                      upgrade glib to version at least 2.14.0.])
-    fi
-else
-   if   test x"$check_pcre" = xyes ; then
-	if pcre-config --libs-posix > /dev/null 2>&1; then
-        	vers=`pcre-config --version`
-	        case $vers in
-                       2.*) have_pcre=no ;;
-                       *)   have_pcre=yes ;;
-        	esac
-	else
-        	have_pcre=no
-	fi
-
-	if test x"$have_pcre" = xyes ; then
-	       	AC_MSG_RESULT(PCRE)
-		BALSA_CFLAGS="$BALSA_CFLAGS `pcre-config --cflags-posix`"
-                PCRE_LIBS="`pcre-config --libs-posix`"
-                AC_SUBST(PCRE_LIBS)
-		BALSA_LIBS="$BALSA_LIBS $PCRE_LIBS"
-		AC_DEFINE(HAVE_PCRE,1,
-                          [Defined when PCRE library is available.])
-	else
-	        AC_MSG_RESULT(not found)
-	fi
-   else
-	have_pcre=no
-	AC_MSG_RESULT(POSIX)
-   fi
 fi
 
 # OpenSSL configuration.
@@ -829,8 +731,8 @@ dnl #####################################################################
 AC_C_CONST
 AC_STDC_HEADERS
 
-AC_CHECK_DECLS([localtime_r, gmtime_r, ctime_r], [], [], [[#include <time.h>]])
-AC_CHECK_FUNCS([localtime_r gmtime_r ctime_r])
+AC_CHECK_DECLS([ctime_r], [], [], [[#include <time.h>]])
+AC_CHECK_FUNCS([ctime_r])
 AC_CHECK_HEADER([zlib.h],,AC_MSG_ERROR([zlib library required]))
 
 # more warnings.
@@ -893,15 +795,7 @@ AC_MSG_RESULT($BALSA_FROM_GIT)
 dnl #####################################################################
 dnl 7. extra functions.
 dnl #####################################################################
-AC_CHECK_FUNCS(getaddrinfo getnameinfo gai_strerror)
-
-# isblank()
-AC_MSG_CHECKING([for isblank])
-AC_TRY_LINK( [#include <ctype.h>], [return isblank('a');],
-	     AC_MSG_RESULT(yes),
-	     [AC_MSG_RESULT(no)
-	      AC_DEFINE(isblank,isspace,
-                        [Redefined to isspace if isblank is not available.])] )
+AC_CHECK_FUNCS(getaddrinfo)
 
 
 dnl ###########################################################################
@@ -1003,7 +897,6 @@ echo "         Use GtkSourceView: $with_gtksourceview"
 echo "              Use Compface: $with_compface"
 echo "  Install extra MIME icons: $install_mimeicons"
 echo "    Configure for Touch UI: $enable_touch_ui"
-echo "             GMime version: $with_gmime"
 echo "             Use libsecret: $with_libsecret"
 dnl echo "                  Use SASL: $need_sasl"
 echo ""

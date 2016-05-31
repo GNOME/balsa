@@ -27,11 +27,6 @@
 # error "Include config.h before this file."
 #endif
 
-# if defined(HAVE_GTKHTML2)
-/* gtkhtml2 uses deprecated api */
-#  undef GTK_DISABLE_DEPRECATED
-# endif
-
 #  include <gtk/gtk.h>
 #include "libbalsa.h"
 

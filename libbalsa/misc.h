@@ -31,15 +31,6 @@
 #include <gtk/gtk.h>
 #include <gmime/gmime.h>
 
-#if !USE_GREGEX
-#  ifdef HAVE_PCRE
-#    include <pcreposix.h>
-#  else
-#    include <sys/types.h>
-#    include <regex.h>
-#  endif
-#endif                          /* USE_GREGEX */
-
 typedef enum _LibBalsaCodeset LibBalsaCodeset;
 
 enum _LibBalsaCodeset {
@@ -140,15 +131,9 @@ gboolean libbalsa_insert_with_url(GtkTextBuffer * buffer,
 				  guint len,
 				  GtkTextTag * tag,
 				  LibBalsaUrlInsertInfo *url_info);
-#if USE_GREGEX
 void libbalsa_unwrap_selection(GtkTextBuffer * buffer, GRegex * rex);
 gboolean libbalsa_match_regex(const gchar * line, GRegex * rex,
 			      guint * count, guint * index);
-#else                           /* USE_GREGEX */
-void libbalsa_unwrap_selection(GtkTextBuffer * buffer, regex_t * rex);
-gboolean libbalsa_match_regex(const gchar * line, regex_t * rex,
-			      guint * count, guint * index);
-#endif                          /* USE_GREGEX */
 
 int libbalsa_safe_open (const char *path, int flags, mode_t mode, GError **err);
 int libbalsa_lock_file (const char *path, int fd, int excl, int dot, int timeout);

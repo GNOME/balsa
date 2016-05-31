@@ -1702,32 +1702,21 @@ parse_content_type(const char* content_type)
     return ret;
 }
 
-/* get_tz_offset() returns tz offset in minutes. NOTE: not all hours
-   have 60 seconds! Once in a while they get corrected.  */
-#define MIN_SEC		60		/* seconds in a minute */
-#define	HOUR_MIN	60		/* minutes in an hour */
-#define DAY_MIN		(24 * HOUR_MIN)	/* minutes in a day */
-
-static int
-get_tz_offset(time_t *t)
+/* get_tz_offset() returns tz offset in RFC 5322 format ([-]hhmm) */
+static gint
+get_tz_offset(time_t t)
 {
-    struct tm gmt, lt;
-    int off;
-    gmtime_r(t, &gmt);
-    localtime_r(t, &lt);
+	GTimeZone *local_tz;
+	gint interval;
+	gint32 offset;
+	gint hours;
 
-    off = (lt.tm_hour - gmt.tm_hour) * HOUR_MIN + lt.tm_min - gmt.tm_min;
-    if (lt.tm_year < gmt.tm_year)       off -= DAY_MIN;
-    else if (lt.tm_year > gmt.tm_year)	off += DAY_MIN;
-    else if (lt.tm_yday < gmt.tm_yday)  off -= DAY_MIN;
-    else if (lt.tm_yday > gmt.tm_yday)  off += DAY_MIN;
-
-    /* special case: funny minutes */
-    if (lt.tm_sec <= gmt.tm_sec - MIN_SEC) off -= 1;
-    else if (lt.tm_sec >= gmt.tm_sec + MIN_SEC)	off += 1;
-
-    return (off*100)/60; /* time zone offset in hundreds of hours (funny
-                          * unit required by gmime) */
+	local_tz = g_time_zone_new_local();
+	interval = g_time_zone_find_interval(local_tz, G_TIME_TYPE_UNIVERSAL, t);
+	offset = g_time_zone_get_offset(local_tz, interval);
+	g_time_zone_unref(local_tz);
+	hours = offset / 3600;
+	return (hours * 100) + ((offset - (hours * 3600)) / 60);
 }
 
 static LibBalsaMsgCreateResult
@@ -1964,7 +1953,7 @@ libbalsa_message_create_mime_message(LibBalsaMessage* message, gboolean flow,
 				   LIBBALSA_MESSAGE_GET_SUBJECT(message));
 
     g_mime_message_set_date(mime_message, message->headers->date,
-                            get_tz_offset(&message->headers->date));
+                            get_tz_offset(message->headers->date));
 
     if ((ia_list = message->headers->to_list)) {
         InternetAddressList *recipients =

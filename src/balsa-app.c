@@ -899,7 +899,6 @@ balsa_find_index_by_mailbox(LibBalsaMailbox * mailbox)
     return NULL;
 }
 
-#if USE_GREGEX
 GRegex *
 balsa_quote_regex_new(void)
 {
@@ -927,4 +926,3 @@ balsa_quote_regex_new(void)
 
     return g_regex_ref(regex);
 }
-#endif                          /* USE_GREGEX */

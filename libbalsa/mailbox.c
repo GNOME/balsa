@@ -3055,7 +3055,7 @@ mbox_model_get_value(GtkTreeModel *tree_model,
         break;
     case LB_MBOX_DATE_COL:
         if(msg) {
-            tmp = libbalsa_date_to_utf8(&msg->msg_date,
+            tmp = libbalsa_date_to_utf8(msg->msg_date,
 		                        libbalsa_mailbox_date_format);
             g_value_take_string(value, tmp);
         }

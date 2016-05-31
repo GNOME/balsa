@@ -369,11 +369,6 @@ g_mime_gpgme_mpe_encrypt(GMimeMultipartEncrypted * mpe,
     g_object_unref(wrapper);
     g_object_unref(stream);
 
-#if !defined(HAVE_GMIME_2_6)
-    mpe->decrypted = content;
-    g_object_ref(content);
-#endif
-
     /* construct the encrypted mime part */
     encrypted_part =
 	g_mime_part_new_with_type("application", "octet-stream");
@@ -448,13 +443,6 @@ g_mime_gpgme_mpe_decrypt(GMimeMultipartEncrypted * mpe,
     char *content_type;
 
     g_return_val_if_fail(GMIME_IS_MULTIPART_ENCRYPTED(mpe), NULL);
-
-#if !defined(HAVE_GMIME_2_6)
-    if (mpe->decrypted) {
-	/* we seem to have already decrypted the part */
-	return mpe->decrypted;
-    }
-#endif
 
     if (signature && *signature) {
 	g_object_unref(G_OBJECT(*signature));
@@ -549,9 +537,6 @@ g_mime_gpgme_mpe_decrypt(GMimeMultipartEncrypted * mpe,
 
 
     /* cache the decrypted part */
-#if !defined(HAVE_GMIME_2_6)
-    mpe->decrypted = decrypted;
-#endif
     if (signature) {
 	if (sigstat->status != GPG_ERR_NOT_SIGNED)
 	    *signature = sigstat;

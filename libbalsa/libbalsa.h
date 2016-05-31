@@ -130,7 +130,7 @@ gchar *libbalsa_guess_ldap_server(void);
 gchar *libbalsa_guess_imap_inbox(void);
 
 
-gchar* libbalsa_date_to_utf8(const time_t *date, const gchar *date_string);
+gchar* libbalsa_date_to_utf8(time_t date, const gchar *date_string);
 LibBalsaMessageStatus libbalsa_get_icon_from_flags(LibBalsaMessageFlag flags);
 
 gboolean libbalsa_is_cert_known(X509* cert, long vfy_result);

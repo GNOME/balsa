@@ -1315,26 +1315,14 @@ fill_text_buf_cited(GtkWidget *widget, const gchar *text_body,
     PangoContext *context = gtk_widget_get_pango_context(widget);
     PangoFontDescription *desc = pango_context_get_font_description(context);
     GtkTextBuffer *buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(widget));
-#if USE_GREGEX
     GRegex *rex = NULL;
-#else                           /* USE_GREGEX */
-    regex_t rex;
-#endif                          /* USE_GREGEX */
     gboolean have_regex;
     GdkRGBA *rgba;
 
     /* prepare citation regular expression for plain bodies */
     if (is_plain) {
-#if USE_GREGEX
         rex = balsa_quote_regex_new();
         have_regex = rex ? TRUE : FALSE;
-#else                           /* USE_GREGEX */
-        if (!balsa_app.mark_quoted
-            || regcomp(&rex, balsa_app.quote_regex, REG_EXTENDED))
-            have_regex = FALSE;
-        else
-            have_regex = TRUE;
-#endif                          /* USE_GREGEX */
     } else
         have_regex = FALSE;
 
@@ -1382,13 +1370,8 @@ fill_text_buf_cited(GtkWidget *widget, const gchar *text_body,
             guint cite_idx;
 
             /* get the cite level only for text/plain parts */
-#if USE_GREGEX
             libbalsa_match_regex(text_body, rex, &quote_level,
                                  &cite_idx);
-#else                           /* USE_GREGEX */
-            libbalsa_match_regex(text_body, &rex, &quote_level,
-                                 &cite_idx);
-#endif                          /* USE_GREGEX */
 
             /* check if the citation level changed */
             if (cite_level != quote_level) {
@@ -1458,11 +1441,7 @@ fill_text_buf_cited(GtkWidget *widget, const gchar *text_body,
     }
 
     if (have_regex)
-#if USE_GREGEX
         g_regex_unref(rex);
-#else                           /* USE_GREGEX */
-        regfree(&rex);
-#endif                          /* USE_GREGEX */
 
     return url_list;
 }

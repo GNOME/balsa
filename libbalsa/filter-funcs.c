@@ -496,11 +496,7 @@ libbalsa_condition_regex_free(LibBalsaConditionRegex* reg, gpointer throwaway)
 
     g_free(reg->string);
     if (reg->compiled) 
-#if USE_GREGEX
         g_regex_unref(reg->compiled);
-#else                           /* USE_GREGEX */
-	regfree(reg->compiled);
-#endif                          /* USE_GREGEX */
 }				/* end condition_regex_free() */
 
 void 

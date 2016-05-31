@@ -1,3 +1,27 @@
+2016-05-31  Albrecht Dreß
+
+	Reduce the code complexity (in particular conditional parts)
+	by weeding out deprecated stuff.
+
+	* configure.ac: apply the aforementioned simplifications
+	* libbalsa/filter-funcs.c, libbalsa/filter-private.h, libbalsa/mime.c,
+	  libbalsa/misc.h, src/balsa-app.c, src/balsa-app.h,
+	  src/balsa-print-object-text.c, src/quote-color.c, src/quote-color.h,
+	  src/sendmsg-window.c, src/spell-check.c: always use GRegex
+	* libbalsa/gmime-multipart-crypt.c, libbalsa/gmime-stream-gio.c,
+	  libbalsa/mailbox_mbox.c: drop conditional code for gmime < 2.6
+	* libbalsa/html.h: remove hack for Gtkhtml 2
+	* libbalsa/libbalsa.c, libbalsa/libbalsa.h: use GDateTime,
+	  simplify API of libbalsa_date_to_utf8()
+	* libbalsa/mailbox.c, libbalsa/message.h, libbalsa/rfc3156.c,
+	  src/balsa-mime-widget-vcalendar.c, src/balsa-print-object-text.c:
+	  use simplified libbalsa_date_to_utf8() API
+	* libbalsa/missing.h, libbalsa/missing_time.c: remove localtime_r,
+	  gmtime_r implementations
+	* libbalsa/rfc2445.c: use ISO 8601 GTimeVal and GDateTime functions
+	* libbalsa/send.c: use GTimeZone functions
+	* src/filter-edit-callbacks.c: use GDateTime functions
+
 2016-05-27  Albrecht Dreß
 
 	Fix accessing MBox files > 2 GByte

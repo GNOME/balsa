@@ -124,7 +124,7 @@ balsa_mime_widget_new_vcalendar(BalsaMessage * bm,
     do {                                                                \
         if (date != (time_t) -1) {                                      \
             gchar * _dstr =                                             \
-                libbalsa_date_to_utf8(&date, balsa_app.date_string);    \
+                libbalsa_date_to_utf8(date, balsa_app.date_string);     \
             GRID_ATTACH(g, _dstr, label);                               \
             g_free(_dstr);                                              \
         }                                                               \

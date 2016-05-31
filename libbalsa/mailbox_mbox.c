@@ -1843,57 +1843,6 @@ static void update_message_status_headers(GMimeMessage *message,
     g_string_free(new_header, TRUE);
 }
 
-#if !defined(HAVE_GMIME_2_6)
-/*
- * Encode text parts as quoted-printable.
- */
-static void
-lbm_mbox_prepare_object(GMimeObject * object)
-{
-    g_mime_object_remove_header(object, "Content-Length");
-
-    if (GMIME_IS_MULTIPART(object)) {
-        /* Do not break crypto */
-        if (!(GMIME_IS_MULTIPART_SIGNED(object) ||
-              GMIME_IS_MULTIPART_ENCRYPTED(object))) {
-            GMimeMultipart *multipart = (GMimeMultipart *) object;
-            gint i, count = g_mime_multipart_get_count(multipart);
-
-            for (i = 0; i < count; ++i)
-                lbm_mbox_prepare_object(g_mime_multipart_get_part
-                                        (multipart, i));
-        }
-    } else if (GMIME_IS_MESSAGE_PART(object))
-        lbm_mbox_prepare_object(GMIME_OBJECT
-                                (((GMimeMessagePart *) object)->message));
-    else if (GMIME_IS_MESSAGE(object))
-        lbm_mbox_prepare_object(((GMimeMessage *) object)->mime_part);
-    else if (GMIME_IS_PART(object)) {
-        GMimePart *mime_part = (GMimePart *) object;
-        GMimeContentEncoding encoding;
-        GMimeContentType *mime_type;
-
-        if (GMIME_IS_MESSAGE_PARTIAL(mime_part))
-            return;
-
-        encoding = g_mime_part_get_content_encoding(mime_part);
-        if (encoding == GMIME_CONTENT_ENCODING_BASE64)
-            return;
-
-        mime_type = g_mime_object_get_content_type(object);
-        if (g_mime_content_type_is_type(mime_type, "text", "plain")) {
-            const gchar *format =
-                g_mime_content_type_get_parameter(mime_type, "format");
-            if (format && !g_ascii_strcasecmp(format, "flowed"))
-                /* Format=Flowed text cannot contain From_ lines. */
-                return;
-        }
-
-        g_mime_part_set_content_encoding
-            (mime_part, GMIME_CONTENT_ENCODING_QUOTEDPRINTABLE);
-    }
-}
-#endif                          /* defined(HAVE_GMIME_2_6) */
 
 static GMimeObject *
 lbm_mbox_armored_object(GMimeStream * stream)
@@ -1904,12 +1853,7 @@ lbm_mbox_armored_object(GMimeStream * stream)
     parser = g_mime_parser_new_with_stream(stream);
     object = GMIME_OBJECT(g_mime_parser_construct_message(parser));
     g_object_unref(parser);
-
-#if defined(HAVE_GMIME_2_6)
     g_mime_object_encode(object, GMIME_ENCODING_CONSTRAINT_7BIT);
-#else                           /* defined(HAVE_GMIME_2_6) */
-    lbm_mbox_prepare_object(object);
-#endif                          /* defined(HAVE_GMIME_2_6) */
 
     return object;
 }

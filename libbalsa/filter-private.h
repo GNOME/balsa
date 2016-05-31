@@ -32,15 +32,6 @@
 # error "Include config.h before this file."
 #endif
 
-#if !USE_GREGEX
-#  ifdef HAVE_PCRE
-#    include <pcreposix.h>
-#  else
-#    include <sys/types.h>
-#    include <regex.h>
-#  endif
-#endif                          /* USE_GREGEX */
-
 
 /* regex options */
 #define FILTER_REGCOMP       (REG_NEWLINE | REG_NOSUB | REG_EXTENDED)
@@ -49,11 +40,7 @@
 /* regex struct */
 struct _LibBalsaConditionRegex {
     gchar *string;
-#if USE_GREGEX
     GRegex *compiled;
-#else                           /* USE_GREGEX */
-    regex_t *compiled;
-#endif                          /* USE_GREGEX */
 };
 
 #endif				/* __FILTER_PRIVATE_H__ */

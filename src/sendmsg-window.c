@@ -5863,27 +5863,13 @@ sw_reflow_activated(GSimpleAction * action, GVariant * parameter, gpointer data)
     BalsaSendmsg *bsmsg = data;
     GtkTextView *text_view;
     GtkTextBuffer *buffer;
-#if USE_GREGEX
     GRegex *rex;
-#else                           /* USE_GREGEX */
-    regex_t rex;
-#endif                          /* USE_GREGEX */
 
     if (!bsmsg->flow)
 	return;
 
-#if USE_GREGEX
     if (!(rex = balsa_quote_regex_new()))
         return;
-#else                           /* USE_GREGEX */
-    if (regcomp(&rex, balsa_app.quote_regex, REG_EXTENDED)) {
-	balsa_information_parented(GTK_WINDOW(bsmsg->window),
-                                   LIBBALSA_INFORMATION_WARNING,
-                                   _("Could not compile %s"),
-                                   _("Quoted Text Regular Expression"));
-	return;
-    }
-#endif                          /* USE_GREGEX */
 
 #if !HAVE_GTKSOURCEVIEW
     sw_buffer_save(bsmsg);
@@ -5892,11 +5878,7 @@ sw_reflow_activated(GSimpleAction * action, GVariant * parameter, gpointer data)
     text_view = GTK_TEXT_VIEW(bsmsg->text);
     buffer = gtk_text_view_get_buffer(text_view);
     sw_buffer_signals_block(bsmsg, buffer);
-#if USE_GREGEX
     libbalsa_unwrap_selection(buffer, rex);
-#else                           /* USE_GREGEX */
-    libbalsa_unwrap_selection(buffer, &rex);
-#endif                          /* USE_GREGEX */
     sw_buffer_signals_unblock(bsmsg, buffer);
 
     bsmsg->state = SENDMSG_STATE_MODIFIED;
@@ -5904,11 +5886,7 @@ sw_reflow_activated(GSimpleAction * action, GVariant * parameter, gpointer data)
 				 gtk_text_buffer_get_insert(buffer),
 				 0, FALSE, 0, 0);
 
-#if USE_GREGEX
     g_regex_unref(rex);
-#else                           /* USE_GREGEX */
-    regfree(&rex);
-#endif                          /* USE_GREGEX */
 }
 
 /* To field "changed" signal callback. */

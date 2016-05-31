@@ -24,9 +24,7 @@
 # include "config.h"
 #endif                          /* HAVE_CONFIG_H */
 
-#if !defined(HAVE_CTIME_R)     || \
-    !defined(HAVE_LOCALTIME_R) || \
-    !defined(HAVE_GMTIME_R)
+#if !defined(HAVE_CTIME_R)
 
 #include "missing.h"
 
@@ -53,27 +51,4 @@ ctime_r(const time_t *clock, char *buf)
 }
 #endif
 
-
-#ifndef HAVE_LOCALTIME_R 
-struct tm *
-localtime_r(const time_t *clock, struct tm *result)
-{
-    LOCK(time_lock);
-    memcpy(result, localtime(clock), sizeof(struct tm));
-    UNLOCK(time_lock);
-    return result;
-}
-#endif
-
-
-#ifndef HAVE_GMTIME_R
-struct tm *
-gmtime_r(const time_t *clock, struct tm *result)
-{
-    LOCK(time_lock);
-    memcpy(result, gmtime(clock), sizeof(struct tm));
-    UNLOCK(time_lock);
-    return result;
-}
-#endif
 #endif

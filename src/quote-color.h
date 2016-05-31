@@ -30,25 +30,8 @@
 
 G_BEGIN_DECLS
 
-#ifdef HAVE_UNISTD_H
-#include <unistd.h>
-#endif
-
-#if !USE_GREGEX
-#  ifdef HAVE_PCRE
-#    include <pcreposix.h>
-#  else
-#    include <sys/types.h>
-#    include <regex.h>
-#  endif
-#endif                          /* USE_GREGEX */
-
     extern void make_gradient(GdkColor colors[], gint, gint);
-#if USE_GREGEX
     extern guint is_a_quote(const gchar *, GRegex * rex);
-#else                           /* USE_GREGEX */
-    extern guint is_a_quote(const gchar *, regex_t * rex);
-#endif                          /* USE_GREGEX */
 
 G_END_DECLS
 

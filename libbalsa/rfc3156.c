@@ -749,10 +749,10 @@ libbalsa_gpgme_sig_protocol_name(gpgme_protocol_t protocol)
 }
 
 static inline void
-append_time_t(GString *str, const gchar *format, time_t *when,
+append_time_t(GString *str, const gchar *format, time_t when,
               const gchar * date_string)
 {
-    if (*when != (time_t) 0) {
+    if (when != (time_t) 0) {
         gchar *tbuf = libbalsa_date_to_utf8(when, date_string);
         g_string_append_printf(str, format, tbuf);
         g_free(tbuf);
@@ -777,7 +777,7 @@ libbalsa_signature_info_to_gchar(GMimeGpgmeSigstat * info,
     g_string_append_printf(msg, _("\nSignature validity: %s"),
 			   libbalsa_gpgme_validity_to_gchar(info->
 							    validity));
-    append_time_t(msg, _("\nSigned on: %s"), &info->sign_time, date_string);
+    append_time_t(msg, _("\nSigned on: %s"), info->sign_time, date_string);
     if (info->protocol == GPGME_PROTOCOL_OpenPGP && info->key)
 	g_string_append_printf(msg, _("\nKey owner trust: %s"),
 			       libbalsa_gpgme_validity_to_gchar_short
@@ -841,9 +841,9 @@ libbalsa_signature_info_to_gchar(GMimeGpgmeSigstat * info,
 
             if (subkey) {
         	append_time_t(msg, _("\nSubkey created on: %s"),
-        		      &subkey->timestamp, date_string);
+        		      subkey->timestamp, date_string);
         	append_time_t(msg, _("\nSubkey expires on: %s"),
-        		      &subkey->expires, date_string);
+        		      subkey->expires, date_string);
         	if (subkey->revoked || subkey->expired || subkey->disabled ||
         	    subkey->invalid) {
        GString * attrs = g_string_new("");

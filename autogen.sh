@@ -1,5 +1,12 @@
 #! /bin/sh
 # bootstrap file to be used when autogen.sh fails.
+test -n "$srcdir" || srcdir=`dirname "$0"`
+test -n "$srcdir" || srcdir=.
+
+olddir=`pwd`
+
+cd $srcdir
+
 echo "Running gettextize...  Ignore non-fatal messages."
 glib-gettextize --force --copy || exit 1
 echo "running intltoolize..."
@@ -15,5 +22,8 @@ echo "Running autoheader..."
 autoheader || exit 1
 echo "Running automake..."
 automake --gnu --add-missing --copy || exit 1
+
+cd $olddir
+
 echo "Running configure $* ..."
-exec ./configure "$@"
+exec $srcdir/configure "$@"

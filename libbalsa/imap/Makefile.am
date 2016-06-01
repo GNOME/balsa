@@ -50,13 +50,14 @@ AM_CFLAGS   = $(LIBIMAP_CFLAGS) -ansi
 
 #Signal marshallers
 marshal_prefix = libimap
+marshal_srcdir = ${top_srcdir}/libbalsa/imap
 libimap-marshal.h: libimap-marshal.list
-	( @GLIB_GENMARSHAL@ --prefix=$(marshal_prefix) libimap-marshal.list --header > libimap-marshal.tmp \
+	( @GLIB_GENMARSHAL@ --prefix=$(marshal_prefix) ${marshal_srcdir}/libimap-marshal.list --header > libimap-marshal.tmp \
 	&& mv libimap-marshal.tmp libimap-marshal.h ) \
 	|| ( rm -f libimap-marshal.tmp && exit 1 )
 libimap-marshal.c: libimap-marshal.h
 	( echo "#include \"libimap-marshal.h\"" > libimap-marshal.tmp \
-	&& @GLIB_GENMARSHAL@ --prefix=$(marshal_prefix) libimap-marshal.list --body >> libimap-marshal.tmp \
+	&& @GLIB_GENMARSHAL@ --prefix=$(marshal_prefix) ${marshal_srcdir}/libimap-marshal.list --body >> libimap-marshal.tmp \
 	&& mv libimap-marshal.tmp libimap-marshal.c ) \
 	|| ( rm -f libimap-marshal.tmp && exit 1 )
 

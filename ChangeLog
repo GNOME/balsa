@@ -1,3 +1,12 @@
+2016-05-31  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Build with builddir != srcdir
+
+	* autogen.sh: chdir to srcdir to create configure, then back to
+	  builddir to use it.
+	* libbalsa/imap/Makefile.am: provide path to
+	  libimap-marshal.list.
+
 2016-05-31  Albrecht Dreß
 
 	Reduce the code complexity (in particular conditional parts)

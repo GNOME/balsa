@@ -14,22 +14,23 @@
 # Jens Seidel <jseidel@cvs.gnome.org>, 2005.
 # Mario Blättermann <mario.blaettermann@gmail.com>, 2008-2012, 2015.
 # Christian Kirbach <Christian.Kirbach@googlemail.com>, 2011.
+# Florian Heiser <postfuerflo@gmail.com>, 2016.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa master\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=balsa&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2015-03-01 20:55+0000\n"
-"PO-Revision-Date: 2015-12-30 12:46+0100\n"
-"Last-Translator: Mario Blättermann <mario.blaettermann@gmail.com>\n"
+"POT-Creation-Date: 2015-12-30 11:55+0000\n"
+"PO-Revision-Date: 2016-06-01 20:46+0100\n"
+"Last-Translator: Florian Heiser <postfuerflo@gmail.com>\n"
 "Language-Team: German <gnome-de@gnome.org>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 1.8.5\n"
+"X-Generator: Gedit\n"
 
 #: ../balsa.desktop.in.in.h:1 ../balsa-mailto-handler.desktop.in.in.h:1
 msgid "Balsa"
@@ -136,20 +137,20 @@ msgstr "_E-Mail-Adresse:"
 msgid "A_dd"
 msgstr "_Hinzufügen"
 
-#: ../libbalsa/address-view.c:127 ../src/balsa-mime-widget-message.c:747
-#: ../src/balsa-print-object-header.c:168 ../src/sendmsg-window.c:1121
+#: ../libbalsa/address-view.c:127 ../src/balsa-mime-widget-message.c:750
+#: ../src/balsa-print-object-header.c:171 ../src/sendmsg-window.c:1121
 #: ../src/sendmsg-window.c:3864 ../src/store-address.c:339
 msgid "To:"
 msgstr "An:"
 
-#: ../libbalsa/address-view.c:128 ../src/balsa-mime-widget-message.c:748
-#: ../src/balsa-print-object-header.c:170 ../src/sendmsg-window.c:1121
+#: ../libbalsa/address-view.c:128 ../src/balsa-mime-widget-message.c:751
+#: ../src/balsa-print-object-header.c:173 ../src/sendmsg-window.c:1121
 #: ../src/sendmsg-window.c:3872 ../src/store-address.c:340
 msgid "Cc:"
 msgstr "Kopie an:"
 
-#: ../libbalsa/address-view.c:129 ../src/balsa-mime-widget-message.c:749
-#: ../src/balsa-print-object-header.c:172 ../src/sendmsg-window.c:1121
+#: ../libbalsa/address-view.c:129 ../src/balsa-mime-widget-message.c:752
+#: ../src/balsa-print-object-header.c:175 ../src/sendmsg-window.c:1121
 #: ../src/store-address.c:341
 msgid "Bcc:"
 msgstr "Blindkopie an:"
@@ -573,7 +574,7 @@ msgid "Face header file %s contains binary data."
 msgstr "Face-Kopfzeilendatei %s enthält Binärdaten."
 
 #. Translators: please do not translate Face.
-#: ../libbalsa/identity.c:1250 ../src/balsa-message.c:1571
+#: ../libbalsa/identity.c:1250 ../src/balsa-message.c:1573
 #, c-format
 msgid "Error loading Face: %s"
 msgstr "Face konnte nicht geladen werden: %s"
@@ -2771,101 +2772,101 @@ msgstr "(Kein Absender)"
 msgid "Could not access message %u in mailbox \"%s\"."
 msgstr "Auf Nachricht %u im Postfach »%s« konnte nicht zugegriffen werden"
 
-#: ../src/balsa-message.c:1321
+#: ../src/balsa-message.c:1323
 msgid "mixed parts"
 msgstr "gemischte Teile"
 
-#: ../src/balsa-message.c:1323
+#: ../src/balsa-message.c:1325
 msgid "alternative parts"
 msgstr "alternative Teile"
 
-#: ../src/balsa-message.c:1325
+#: ../src/balsa-message.c:1327
 msgid "signed parts"
 msgstr "signierte Teile"
 
-#: ../src/balsa-message.c:1327
+#: ../src/balsa-message.c:1329
 msgid "encrypted parts"
 msgstr "verschlüsselte Teile"
 
-#: ../src/balsa-message.c:1329
+#: ../src/balsa-message.c:1331
 msgid "rfc822 message"
 msgstr "rfc822-Nachricht"
 
-#: ../src/balsa-message.c:1331
+#: ../src/balsa-message.c:1333
 #, c-format
 msgid "\"%s\" parts"
 msgstr "»%s«-Teile"
 
-#: ../src/balsa-message.c:1379
+#: ../src/balsa-message.c:1381
 msgid "force inline for all parts"
 msgstr "Einbettung für alle Teile erzwingen"
 
-#: ../src/balsa-message.c:1422
+#: ../src/balsa-message.c:1424
 #, c-format
 msgid "rfc822 message (from %s, subject \"%s\")"
 msgstr "rfc822-Nachricht (von %s, Betreff »%s«)"
 
-#: ../src/balsa-message.c:1434
+#: ../src/balsa-message.c:1436
 msgid "complete message"
 msgstr "Vollständige Nachricht"
 
-#: ../src/balsa-message.c:1451
+#: ../src/balsa-message.c:1453
 #, c-format
 msgid "part %s: %s (file %s)"
 msgstr "Teil %s: %s (Datei %s)"
 
-#: ../src/balsa-message.c:1462
+#: ../src/balsa-message.c:1464
 #, c-format
 msgid "part %s: %s"
 msgstr "Teil %s: %s"
 
-#: ../src/balsa-message.c:1477
+#: ../src/balsa-message.c:1479
 msgid "encrypted: "
 msgstr "verschlüsselt: "
 
-#: ../src/balsa-message.c:1614
+#: ../src/balsa-message.c:1616
 #, c-format
 msgid "Reading embedded message failed: %s"
 msgstr "Lesen der eingebetteten Nachricht ist fehlgeschlagen: %s"
 
-#: ../src/balsa-message.c:1622
+#: ../src/balsa-message.c:1624
 #, c-format
 msgid "Appending message to %s failed: %s"
 msgstr "Beilegen der Nachricht zu %s ist fehlgeschlagen: %s"
 
-#: ../src/balsa-message.c:1651
+#: ../src/balsa-message.c:1653
 msgid "_Save..."
 msgstr "_Speichern …"
 
-#: ../src/balsa-message.c:1660 ../src/balsa-mime-widget-message.c:467
+#: ../src/balsa-message.c:1662 ../src/balsa-mime-widget-message.c:467
 msgid "_Copy to folder..."
 msgstr "In Ordner _kopieren …"
 
-#: ../src/balsa-message.c:1743
+#: ../src/balsa-message.c:1745
 msgid "Select folder for saving selected parts"
 msgstr "Ordner zum Speichern der markierten Teile auswählen"
 
-#: ../src/balsa-message.c:1767
+#: ../src/balsa-message.c:1769
 #, c-format
 msgid "Could not create URI for %s"
 msgstr "Adresse für %s konnte nicht erstellt werden"
 
-#: ../src/balsa-message.c:1792
+#: ../src/balsa-message.c:1794
 #, c-format
 msgid "%s message part"
 msgstr "Nachrichtenteil %s"
 
-#: ../src/balsa-message.c:1825 ../src/balsa-mime-widget-callbacks.c:163
+#: ../src/balsa-message.c:1827 ../src/balsa-mime-widget-callbacks.c:163
 #, c-format
 msgid "Could not save %s: %s"
 msgstr "%s konnte nicht gespeichert werden: %s"
 
-#: ../src/balsa-message.c:2484 ../src/balsa-message.c:2628
+#: ../src/balsa-message.c:2486 ../src/balsa-message.c:2630
 #, c-format
 msgid "Sending the disposition notification failed: %s"
 msgstr "Übermittlung der Empfangsbestätigung gescheitert: %s"
 
-#: ../src/balsa-message.c:2581
+#: ../src/balsa-message.c:2583
 #, c-format
 msgid ""
 "The sender of this mail, %s, requested \n"
@@ -2876,11 +2877,11 @@ msgstr ""
 "Empfangsbestätigung angefordert, die an »%s« zurückgeschickt werden soll.\n"
 "Soll diese Bestätigung abgeschickt werden?"
 
-#: ../src/balsa-message.c:2591
+#: ../src/balsa-message.c:2593
 msgid "Reply to MDN?"
 msgstr "Auf Empfangsbestätigung antworten?"
 
-#: ../src/balsa-message.c:2802
+#: ../src/balsa-message.c:2804
 msgid ""
 "The decryption cannot be performed because this message is displayed more "
 "than once.\n"
@@ -2891,18 +2892,18 @@ msgstr ""
 "Bitte schließen Sie zunächst alle anderen Ansichten dieser Nachricht und "
 "versuchen Sie es dann erneut."
 
-#: ../src/balsa-message.c:2823 ../src/balsa-message.c:2908
-#: ../src/balsa-message.c:3030
+#: ../src/balsa-message.c:2825 ../src/balsa-message.c:2910
+#: ../src/balsa-message.c:3032
 #, c-format
 msgid "Parsing a message part failed: %s"
 msgstr "Das Analysieren eines Nachrichtenteils ist fehlgeschlagen: %s"
 
-#: ../src/balsa-message.c:2824 ../src/balsa-message.c:2909
-#: ../src/balsa-message.c:3031
+#: ../src/balsa-message.c:2826 ../src/balsa-message.c:2911
+#: ../src/balsa-message.c:3033
 msgid "Possible disk space problem."
 msgstr "Es gibt möglicherweise ein Speicherplatzproblem."
 
-#: ../src/balsa-message.c:2838
+#: ../src/balsa-message.c:2840
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains an encrypted part, but "
@@ -2911,7 +2912,7 @@ msgstr ""
 "Die von %s verschickte Nachricht mit Betreff »%s« enthält einen "
 "verschlüsselten Teil, dessen Struktur jedoch ungültig ist."
 
-#: ../src/balsa-message.c:2846
+#: ../src/balsa-message.c:2848
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains a PGP encrypted part, "
@@ -2921,7 +2922,7 @@ msgstr ""
 "verschlüsselten Teil, jedoch ist dieses Verschlüsselungsprotokoll nicht "
 "verfügbar."
 
-#: ../src/balsa-message.c:2859
+#: ../src/balsa-message.c:2861
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains a S/MIME encrypted part, "
@@ -2931,7 +2932,7 @@ msgstr ""
 "verschlüsselten Teil, jedoch ist dieses Verschlüsselungsprotokoll nicht "
 "verfügbar."
 
-#: ../src/balsa-message.c:2926
+#: ../src/balsa-message.c:2928
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains a signed part, but its "
@@ -2941,7 +2942,7 @@ msgstr ""
 "verschlüsselten Teil, dessen Struktur jedoch ungültig ist. Falls eine "
 "Signatur existiert, kann diese nicht überprüft werden."
 
-#: ../src/balsa-message.c:2939
+#: ../src/balsa-message.c:2941
 #, c-format
 msgid ""
 "The message sent by %s with subject \"%s\" contains a %s signed part, but "
@@ -2951,31 +2952,31 @@ msgstr ""
 "verschlüsselten Teil, jedoch ist das Verschlüsselungsprotokoll nicht "
 "verfügbar."
 
-#: ../src/balsa-message.c:2942
+#: ../src/balsa-message.c:2944
 msgid "PGP"
 msgstr "PGP"
 
-#: ../src/balsa-message.c:2942 ../src/balsa-mime-widget-crypto.c:76
+#: ../src/balsa-message.c:2944 ../src/balsa-mime-widget-crypto.c:76
 #: ../src/print-gtk.c:199
 msgid "S/MIME"
 msgstr "S/MIME"
 
-#: ../src/balsa-message.c:2966 ../src/balsa-message.c:3093
+#: ../src/balsa-message.c:2968 ../src/balsa-message.c:3095
 msgid "Detected a good signature"
 msgstr "Gültige Signatur erkannt"
 
-#: ../src/balsa-message.c:2972
+#: ../src/balsa-message.c:2974
 msgid "Detected a good signature with insufficient validity"
 msgstr ""
 "Es wurde eine fehlerfreie Signatur mit unzureichender Gültigkeit erkannt"
 
-#: ../src/balsa-message.c:2977 ../src/balsa-message.c:3097
+#: ../src/balsa-message.c:2979 ../src/balsa-message.c:3099
 msgid "Detected a good signature with insufficient validity/trust"
 msgstr ""
 "Es wurde eine fehlerfreie Signatur mit unzureichender Gültigkeit oder "
 "unzureichendem Vertrauen erkannt"
 
-#: ../src/balsa-message.c:2984 ../src/balsa-message.c:3103
+#: ../src/balsa-message.c:2986 ../src/balsa-message.c:3105
 #, c-format
 msgid ""
 "Checking the signature of the message sent by %s with subject \"%s\" "
@@ -2986,7 +2987,7 @@ msgstr ""
 "lieferte:\n"
 "%s"
 
-#: ../src/balsa-message.c:2996
+#: ../src/balsa-message.c:2998
 #, c-format
 msgid ""
 "Checking the signature of the message sent by %s with subject \"%s\" failed "
@@ -2995,7 +2996,7 @@ msgstr ""
 "Die Überprüfung der von %s mit dem Betreff »%s« verschickten Nachricht "
 "schlug fehl und lieferte einen Fehler!"
 
-#: ../src/balsa-message.c:3055
+#: ../src/balsa-message.c:3057
 msgid ""
 "The decryption cannot be performed because this message is displayed more "
 "than once."
@@ -3003,7 +3004,7 @@ msgstr ""
 "Die Entschlüsselung konnte nicht ausgeführt werden, das diese Nachricht mehr "
 "als einmal angezeigt wird."
 
-#: ../src/balsa-message.c:3057
+#: ../src/balsa-message.c:3059
 msgid ""
 "The signature check and removal of the OpenPGP armor cannot be performed "
 "because this message is displayed more than once."
@@ -3011,7 +3012,7 @@ msgstr ""
 "Die Signaturüberprüfung und das Entfernen des OpenPGP-Schutzes konnte nicht "
 "nicht durchgeführt werden, da diese Nachricht mehr als einmal angezeigt wird."
 
-#: ../src/balsa-message.c:3060
+#: ../src/balsa-message.c:3062
 msgid "Please close the other instances of this message and try again."
 msgstr ""
 "Bitte schließen Sie alle anderen Ansichten dieser Nachricht und versuchen "
@@ -3097,7 +3098,7 @@ msgstr "GnuPG ausfüh_ren, um nach Aktualisierungen dieses Schlüssels zu suchen
 msgid "Error loading attached image: %s\n"
 msgstr "Fehler beim Laden des beigelegten Bildes: %s\n"
 
-#: ../src/balsa-mime-widget-message.c:140
+#: ../src/balsa-mime-widget-message.c:140 ../src/balsa-print-object.c:113
 msgid "message headers"
 msgstr "Nachrichtenkopfzeilen"
 
@@ -3182,44 +3183,44 @@ msgid "... [truncated]"
 msgstr "... [gekürzt]"
 
 #. Gmail sometimes fails to do that.
-#: ../src/balsa-mime-widget-message.c:714
+#: ../src/balsa-mime-widget-message.c:716
 msgid "Error:"
 msgstr "Fehler:"
 
-#: ../src/balsa-mime-widget-message.c:715
+#: ../src/balsa-mime-widget-message.c:717
 msgid "IMAP server did not report message structure"
 msgstr "IMAP-Server lieferte keine Information zur Nachrichtenstruktur"
 
-#: ../src/balsa-mime-widget-message.c:727
-#: ../src/balsa-print-object-header.c:153 ../src/sendmsg-window.c:1152
+#: ../src/balsa-mime-widget-message.c:730
+#: ../src/balsa-print-object-header.c:156 ../src/sendmsg-window.c:1152
 #: ../src/sendmsg-window.c:1154 ../src/sendmsg-window.c:1244
 #: ../src/sendmsg-window.c:3849 ../src/sendmsg-window.c:5776
 msgid "Subject:"
 msgstr "Betreff:"
 
-#: ../src/balsa-mime-widget-message.c:731
-#: ../src/balsa-print-object-header.c:161 ../src/sendmsg-window.c:3845
+#: ../src/balsa-mime-widget-message.c:734
+#: ../src/balsa-print-object-header.c:164 ../src/sendmsg-window.c:3845
 msgid "Date:"
 msgstr "Datum:"
 
 #. addresses
-#: ../src/balsa-mime-widget-message.c:737
-#: ../src/balsa-print-object-header.c:166 ../src/sendmsg-window.c:3856
+#: ../src/balsa-mime-widget-message.c:740
+#: ../src/balsa-print-object-header.c:169 ../src/sendmsg-window.c:3856
 #: ../src/store-address.c:338
 msgid "From:"
 msgstr "Von:"
 
-#: ../src/balsa-mime-widget-message.c:744
+#: ../src/balsa-mime-widget-message.c:747
 msgid "Reply-To:"
 msgstr "Antwort an:"
 
-#: ../src/balsa-mime-widget-message.c:753
-#: ../src/balsa-print-object-header.c:174
+#: ../src/balsa-mime-widget-message.c:756
+#: ../src/balsa-print-object-header.c:177
 msgid "Fcc:"
 msgstr "Durchschlag in:"
 
-#: ../src/balsa-mime-widget-message.c:760
-#: ../src/balsa-print-object-header.c:177
+#: ../src/balsa-mime-widget-message.c:763
+#: ../src/balsa-print-object-header.c:180
 msgid "Disposition-Notification-To:"
 msgstr "Empfangsbestätigung an:"
 
@@ -6526,19 +6527,19 @@ msgstr "_Kopie an:"
 
 #: ../src/sendmsg-window.c:434
 msgid "_Request Disposition Notification"
-msgstr "Um _Empfangsbestätigung bitten"
+msgstr "Um _Empfangsbestätigung (MDN) bitten"
 
 #: ../src/sendmsg-window.c:435
 msgid "Request Message Disposition Notification"
-msgstr "Um Empfangsbestätigung bitten"
+msgstr "Um Empfangsbestätigung (MDN) bitten"
 
 #: ../src/sendmsg-window.c:438
 msgid "_Request Delivery Status Notification"
-msgstr "Um _Empfangsbestätigung bitten"
+msgstr "Um _Übermittlungsstatusnachricht (DSN) bitten"
 
 #: ../src/sendmsg-window.c:439
 msgid "Request positive (successful) Delivery Status Notification"
-msgstr "Um positive (erfolgreiche) Empfangsbestätigung bitten"
+msgstr "Um positive (erfolgreiche) Übermittlungsstatusnachricht (DSN) bitten"
 
 #: ../src/sendmsg-window.c:441
 msgid "_Format = Flowed"
@@ -7418,4 +7419,3 @@ msgstr "Rauf"
 #: ../src/toolbar-prefs.c:549
 msgid "Down"
 msgstr "Runter"
-

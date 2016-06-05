@@ -1,3 +1,13 @@
+2016-06-05  Albrecht Dreß
+
+	As Webkit does not have a method to convert html to text,
+	we cannot quote html-only messages.
+	As a workaround, try to use html2text.
+
+	* configure.ac: detect an html-to-text-or-markdown filter;
+	* libbalsa/html.c (html2text), (libbalsa_html_to_string):
+	  use it.
+
 2016-06-04  Albrecht Dreß
 
 	Force proper icon sizes

@@ -79,6 +79,57 @@ lbh_get_body_content(LibBalsaMessageBody * body, gchar ** buf)
 }
 
 # if defined(HAVE_WEBKIT)
+
+#ifdef HTML2TEXT
+
+/* common function for all Webkit versions */
+static void
+html2text(gchar ** text, gsize len)
+{
+    gchar *html2text[] = { HTML2TEXT, NULL, NULL };
+    GFile *html_data;
+    GFileIOStream *stream;
+    GError *err = NULL;
+
+    html_data = g_file_new_tmp("balsa-conv-XXXXXX.html", &stream, &err);
+    if (html_data != NULL) {
+        gsize bytes_written;
+        GOutputStream *ostream =
+            g_io_stream_get_output_stream(G_IO_STREAM(stream));
+
+        if (g_output_stream_write_all(ostream, *text, len,
+                                      &bytes_written, NULL, &err)) {
+            gchar *result = NULL;
+
+            g_output_stream_flush(ostream, NULL, NULL);
+            html2text[1] = g_file_get_path(html_data);
+            if (g_spawn_sync(NULL, html2text, NULL,
+                             G_SPAWN_STDERR_TO_DEV_NULL, NULL, NULL,
+                             &result, NULL, NULL, &err)) {
+                g_free(*text);
+                *text = result;
+            }
+            g_free(html2text[1]);
+        }
+        g_output_stream_close(ostream, NULL, NULL);
+        g_object_unref(G_OBJECT(stream));
+        g_file_delete(html_data, NULL, NULL);
+        g_object_unref(G_OBJECT(html_data));
+    }
+    if (err != NULL) {
+        libbalsa_information(LIBBALSA_INFORMATION_ERROR,
+                             _("Could not convert HTML part to text: %s"),
+                             err ? err->message : "Unknown error");
+        g_error_free(err);
+    }
+}
+
+#else
+
+#define html2text(p, l)
+
+#endif
+
 #  if defined(USE_WEBKIT2)
 
 /*
@@ -607,9 +658,8 @@ libbalsa_html_new(LibBalsaMessageBody * body,
 void
 libbalsa_html_to_string(gchar ** text, size_t len)
 {
-    return; /* this widget does not support conversion to a string. The
-             * string won't be altered. Other alternative would be to set
-             * it to an empty string. */
+    /* this widget does not support conversion to a string. */
+    html2text(text, len);
 }
 
 /*
@@ -1259,9 +1309,8 @@ libbalsa_html_new(LibBalsaMessageBody * body,
 void
 libbalsa_html_to_string(gchar ** text, size_t len)
 {
-    return; /* this widget does not support conversion to a string. The
-             * string won't be altered. Other alternative would be to set
-             * it to an empty string. */
+    /* this widget does not support conversion to a string. */
+    html2text(text, len);
 }
 
 static gboolean

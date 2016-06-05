@@ -161,7 +161,7 @@ libbalsa_icon_finder(GtkWidget         * widget,
             g_object_get(G_OBJECT(icon), "names", &icon_names, NULL);
             while (!pixbuf && icon_names && icon_names[i]) {
                 pixbuf = gtk_icon_theme_load_icon(icon_theme, icon_names[i],
-                                                  width, 0, NULL);
+                                                  width, GTK_ICON_LOOKUP_FORCE_SIZE, NULL);
                 i++;
             }
             g_strfreev(icon_names);
@@ -175,7 +175,7 @@ libbalsa_icon_finder(GtkWidget         * widget,
                 if (slash)
                     *slash = '\0';
                 pixbuf = gtk_icon_theme_load_icon(icon_theme, base_type_icon,
-                                                   width, 0, NULL);
+                                                   width, GTK_ICON_LOOKUP_FORCE_SIZE, NULL);
                 g_free(base_type_icon);
             }
 

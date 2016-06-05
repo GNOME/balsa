@@ -1,5 +1,12 @@
 2016-06-04  Albrecht Dreß
 
+	Force proper icon sizes
+
+	* libbalsa/files.c (libbalsa_icon_finder): force proper icon
+	sizes (e.g. in the message structure view).
+
+2016-06-04  Albrecht Dreß
+
 	We always use gtksourceview-3.0
 
 	* Makefile.am: store helper files in a properly named folder;

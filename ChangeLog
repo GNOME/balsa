@@ -1,5 +1,16 @@
 2016-06-04  Albrecht Dreß
 
+	We always use gtksourceview-3.0
+
+	* Makefile.am: store helper files in a properly named folder;
+	* configure.ac: clean up setting the #define;
+	* libbalsa/libbalsa.c (libbalsa_source_view_new): clean up, use
+	  proper helper files folder;
+	* src/balsa-mime-widget-text.c (create_text_widget): clean up;
+	* src/sendmsg-window.c (create_text_area): ditto.
+
+2016-06-04  Albrecht Dreß
+
 	Delete the Gtkhtml2 code
 
 	* libbalsa/html.c (libbalsa_html_print): delete the Gtkhtml2 code.

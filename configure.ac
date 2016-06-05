@@ -641,13 +641,11 @@ fi
 #
 if test x$with_gtksourceview != xno; then
     PKG_CHECK_MODULES(GTKSOURCEVIEW, [ gtksourceview-3.0 >= 3.2.0 ])
-    AC_DEFINE(HAVE_GTKSOURCEVIEW,3,[Defined when GtkSourceView-3 can be used.])
-    AC_MSG_NOTICE([Note: using GtkSourceview Version 3])
-    with_gtksourceview=3
+    AC_DEFINE(HAVE_GTKSOURCEVIEW,1,[Defined when GtkSourceView-3 can be used.])
     BALSA_CFLAGS="$BALSA_CFLAGS $GTKSOURCEVIEW_CFLAGS"
     BALSA_LIBS="$BALSA_LIBS $GTKSOURCEVIEW_LIBS"
 fi
-AM_CONDITIONAL([BUILD_WITH_GTKSOURCEVIEW], [test x$with_gtksourceview = x3 ])
+AM_CONDITIONAL([BUILD_WITH_GTKSOURCEVIEW], [test x$with_gtksourceview = x1 ])
 
 # libcanberra configuration
 #

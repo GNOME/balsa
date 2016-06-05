@@ -40,11 +40,7 @@
 #include <gtksourceview/gtksourceview.h>
 #include <gtksourceview/gtksourcebuffer.h>
 #include <gtksourceview/gtksourcelanguage.h>
-#if (HAVE_GTKSOURCEVIEW == 1)
-#  include <gtksourceview/gtksourcelanguagesmanager.h>
-#else
-#  include <gtksourceview/gtksourcelanguagemanager.h>
-#endif
+#include <gtksourceview/gtksourcelanguagemanager.h>
 #endif
 
 
@@ -258,32 +254,7 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
 static GtkWidget *
 create_text_widget(const char * content_type)
 {
-#if (HAVE_GTKSOURCEVIEW == 1)
-    static GtkSourceLanguagesManager * lm = NULL;
-    GtkSourceLanguage * lang;
-    GtkSourceBuffer * buffer;
-    GtkWidget * widget;
-
-    /* we use or own highlighting for text/plain */
-    if (!g_ascii_strcasecmp(content_type, "text/plain"))
-	return gtk_text_view_new();
-
-    /* check if GtkSourceView knows our content type */
-    if (!lm)
-	lm = gtk_source_languages_manager_new();
-    if (!lm ||
-	!(lang = gtk_source_languages_manager_get_language_from_mime_type(lm, content_type)))
-	return gtk_text_view_new();
-
-    /* create a GtkSourceView for our content type */
-    buffer = gtk_source_buffer_new_with_language(lang);
-    gtk_source_buffer_set_highlight(buffer, TRUE);
-    // TODO: maybe we want to use (a) our own highlighting styles or (b) use
-    // GEdit-2's here?
-    widget = gtk_source_view_new_with_buffer(buffer);
-    g_object_unref(buffer);
-    return widget;
-#elif (HAVE_GTKSOURCEVIEW > 1)
+#if HAVE_GTKSOURCEVIEW
     static GtkSourceLanguageManager * lm = NULL;
     static const gchar * const * lm_ids = NULL;
     GtkWidget * widget = NULL;

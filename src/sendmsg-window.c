@@ -2875,23 +2875,7 @@ drag_data_quote(GtkWidget * widget,
 /* create_text_area
    Creates the text entry part of the compose window.
 */
-#if (HAVE_GTKSOURCEVIEW == 1)
-
-static void
-sw_can_undo_cb(GtkSourceBuffer * source_buffer, gboolean can_undo,
-               BalsaSendmsg * bsmsg)
-{
-    sw_action_set_enabled(bsmsg, "undo", can_undo);
-}
-
-static void
-sw_can_redo_cb(GtkSourceBuffer * source_buffer, gboolean can_redo,
-               BalsaSendmsg * bsmsg)
-{
-    sw_action_set_enabled(bsmsg, "redo", can_redo);
-}
-
-#elif (HAVE_GTKSOURCEVIEW >= 2)
+#ifdef HAVE_GTKSOURCEVIEW
 
 static void
 sw_can_undo_cb(GtkSourceBuffer * source_buffer, GParamSpec *arg1,
@@ -2952,12 +2936,7 @@ create_text_area(BalsaSendmsg * bsmsg)
     }
 
     buffer = gtk_text_view_get_buffer(text_view);
-#if (HAVE_GTKSOURCEVIEW == 1)
-    g_signal_connect(buffer, "can-undo",
-                     G_CALLBACK(sw_can_undo_cb), bsmsg);
-    g_signal_connect(buffer, "can-redo",
-                     G_CALLBACK(sw_can_redo_cb), bsmsg);
-#elif (HAVE_GTKSOURCEVIEW)
+#ifdef HAVE_GTKSOURCEVIEW
     g_signal_connect(G_OBJECT(buffer), "notify::can-undo",
                      G_CALLBACK(sw_can_undo_cb), bsmsg);
     g_signal_connect(G_OBJECT(buffer), "notify::can-redo",

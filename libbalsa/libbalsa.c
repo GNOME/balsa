@@ -52,16 +52,10 @@
 #if HAVE_GTKSOURCEVIEW
 #include <gtksourceview/gtksourceview.h>
 #include <gtksourceview/gtksourcebuffer.h>
-/* note GtkSourceview 1 and 2 have a slightly different API */
-#if (HAVE_GTKSOURCEVIEW == 1)
-#  include <gtksourceview/gtksourcetag.h>
-#  include <gtksourceview/gtksourcetagstyle.h>
-#else
-#  include <gtksourceview/gtksourcelanguage.h>
-#  include <gtksourceview/gtksourcelanguagemanager.h>
-#  include <gtksourceview/gtksourcestylescheme.h>
-#  include <gtksourceview/gtksourcestyleschememanager.h>
-#endif
+#include <gtksourceview/gtksourcelanguage.h>
+#include <gtksourceview/gtksourcelanguagemanager.h>
+#include <gtksourceview/gtksourcestylescheme.h>
+#include <gtksourceview/gtksourcestyleschememanager.h>
 #endif
 
 #include "misc.h"
@@ -899,7 +893,7 @@ libbalsa_source_view_new(gboolean highlight_phrases)
 	    lm_rpaths = g_new0(gchar *, n + 2);
 	    for (n = 0; lm_dpaths[n]; n++)
 		lm_rpaths[n] = g_strdup(lm_dpaths[n]);
-	    lm_rpaths[n] = g_strdup(BALSA_DATA_PREFIX "/gtksourceview-2.0");
+	    lm_rpaths[n] = g_strdup(BALSA_DATA_PREFIX "/gtksourceview-3.0");
 	    gtk_source_language_manager_set_search_path(lm, lm_rpaths);
 	    g_strfreev(lm_rpaths);
 
@@ -909,7 +903,7 @@ libbalsa_source_view_new(gboolean highlight_phrases)
 		GtkSourceStyleSchemeManager *smgr =
 		    gtk_source_style_scheme_manager_new();
 		gchar * sm_paths[] = {
-		    BALSA_DATA_PREFIX "/gtksourceview-2.0",
+		    BALSA_DATA_PREFIX "/gtksourceview-3.0",
 		    NULL };
 	    
 		/* try to load the colouring scheme */

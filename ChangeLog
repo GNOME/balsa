@@ -1,3 +1,9 @@
+2016-06-04  Albrecht Dreß
+
+	Delete the Gtkhtml2 code
+
+	* libbalsa/html.c (libbalsa_html_print): delete the Gtkhtml2 code.
+
 2016-05-31  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* configure.ac: restore AC_SUBST(GLIB_GENMARSHAL).

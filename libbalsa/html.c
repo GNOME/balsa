@@ -1516,7 +1516,9 @@ libbalsa_html_print(GtkWidget * widget)
 #  endif                        /* defined(USE_WEBKIT2) */
 # else                          /* defined(HAVE_WEBKIT) */
 
-/* Common code for both GtkHtml widgets. */
+/* Code for GtkHTML-4 */
+#include <gtkhtml/gtkhtml.h>
+#include <gtkhtml/gtkhtml-stream.h>
 
 /* Forward reference. */
 static gboolean libbalsa_html_url_requested(GtkWidget * html,
@@ -1550,13 +1552,6 @@ lbh_hovering_over_link_cb(GtkWidget   * widget,
     if (info->hover_cb)
         (*info->hover_cb) (uri);
 }
-
-# ifdef HAVE_GTKHTML4
-
-/* Code for GtkHTML-4 */
-
-#  include <gtkhtml/gtkhtml.h>
-#  include <gtkhtml/gtkhtml-stream.h>
 
 /* Callback for exporting an HTML part as text/plain. */
 static gboolean
@@ -1776,179 +1771,6 @@ libbalsa_html_print(GtkWidget * widget)
                                  NULL, NULL, NULL, NULL, NULL, NULL, NULL);
     g_object_unref(operation);
 }
-
-# else				/* HAVE_GTKHTML4 */
-
-/* Code for GtkHtml-2 */
-
-#  include <libgtkhtml/gtkhtml.h>
-
-/* Widget-dependent helper. */
-static void
-libbalsa_html_write_mime_stream(HtmlStream * stream, 
-                                GMimeStream * mime_stream)
-{
-    gint i;
-    char buf[4096];
-
-    while ((i = g_mime_stream_read(mime_stream, buf, sizeof(buf))) > 0)
-	html_stream_write(stream, buf, i);
-    html_stream_close(stream);
-}
-
-static void
-lbh_size_request_cb(GtkWidget      * widget,
-                    GtkRequisition * requisition,
-                    gpointer         data)
-{
-    GtkAdjustment *hadjustment, *vadjustment;
-
-    g_object_get(G_OBJECT(widget), "hadjustment", &hadjustment,
-                                   "vadjustment", &vadjustment, NULL);
-    requisition->width  = gtk_adjustment_get_upper(hadjustment);
-    requisition->height = gtk_adjustment_get_upper(vadjustment);
-}
-
-/* Create a new HtmlView widget:
- * text			the HTML source;
- * len			length of text;
- * body        		LibBalsaMessageBody that belongs to the
- *                      LibBalsaMessage from which to extract any
- *                      HTML objects (by url);
- * hover_cb             callback for the "on-url" signal;
- * link_clicked_cb	callback for the "link-clicked" signal;
- */
-
-GtkWidget *
-libbalsa_html_new(LibBalsaMessageBody  * body,
-                  LibBalsaHtmlCallback   hover_cb,
-                  LibBalsaHtmlCallback   link_clicked_cb)
-{
-    HtmlDocument *document;
-    LibBalsaHTMLInfo *info;
-    GtkWidget *html;
-    gssize len;
-    gchar *text;
-
-    len = lbh_get_body_content(body, &text);
-    if (len < 0)
-        return NULL;
-
-    document = html_document_new();
-    info = g_new(LibBalsaHTMLInfo, 1);
-    g_object_weak_ref(G_OBJECT(document), (GWeakNotify) g_free, info);
-
-    g_signal_connect(document, "request-url",
-                     G_CALLBACK(libbalsa_html_url_requested),
-                     body->message);
-
-    info->clicked_cb = link_clicked_cb;
-    g_signal_connect(document, "link-clicked",
-                     G_CALLBACK(lbh_navigation_requested_cb), info);
-
-    /* We need to first set_document and then do *_stream() operations
-     * or gtkhtml2 will crash. */
-    html = html_view_new();
-    html_view_set_document(HTML_VIEW(html), document);
-
-    info->hover_cb = hover_cb;
-    g_signal_connect(html, "on-url",
-                     G_CALLBACK(lbh_hovering_over_link_cb), info);
-
-    g_signal_connect(html, "size-request",
-                     G_CALLBACK(lbh_size_request_cb), info);
-
-    html_document_open_stream(document, "text/html");
-    html_document_write_stream(document, text, len);
-    g_free(text);
-    html_document_close_stream(document);
-
-    return html;
-}
-
-void
-libbalsa_html_to_string(gchar ** text, size_t len)
-{
-    return; /* this widget does not support conversion to a string. The
-             * string won't be altered. Other alternative would be to set
-             * it to an empty string. */
-}
-
-/*
- * Does the widget support zoom?
- */
-gboolean
-libbalsa_html_can_zoom(GtkWidget * widget)
-{
-    return HTML_IS_VIEW(widget);
-}
-
-/*
- * Zoom the widget.
- */
-void
-libbalsa_html_zoom(GtkWidget * widget, gint in_out)
-{
-    switch (in_out) {
-    case +1:
-	html_view_zoom_in(HTML_VIEW(widget));
-	break;
-    case -1:
-	html_view_zoom_out(HTML_VIEW(widget));
-	break;
-    case 0:
-	html_view_zoom_reset(HTML_VIEW(widget));
-	break;
-    default:
-	break;
-    }
-}
-
-/*
- * HtmlView doesn't support selecting text.
- */
-gboolean
-libbalsa_html_can_select(GtkWidget * widget)
-{
-    return FALSE;
-}
-
-/*
- * Do nothing.
- */
-void
-libbalsa_html_select_all(GtkWidget * widget)
-{
-}
-
-/*
- * Do nothing.
- */
-void
-libbalsa_html_copy(GtkWidget * widget)
-{
-}
-
-/*
- * HtmlView doesn't support printing.
- */
-gboolean
-libbalsa_html_can_print(GtkWidget * widget)
-{
-    return FALSE;
-}
-
-/*
- * Do nothing.
- */
-void
-libbalsa_html_print(GtkWidget * widget)
-{
-}
-
-# endif				/* HAVE_GTKHTML4 */
-
-/* Common code for both widgets. */
 
 static gboolean
 libbalsa_html_url_requested(GtkWidget * html, const gchar * url,

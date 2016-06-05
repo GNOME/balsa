@@ -658,7 +658,7 @@ if test x$with_gtksourceview != xno; then
     BALSA_CFLAGS="$BALSA_CFLAGS $GTKSOURCEVIEW_CFLAGS"
     BALSA_LIBS="$BALSA_LIBS $GTKSOURCEVIEW_LIBS"
 fi
-AM_CONDITIONAL([BUILD_WITH_GTKSOURCEVIEW], [test x$with_gtksourceview = x1 ])
+AM_CONDITIONAL([BUILD_WITH_GTKSOURCEVIEW], [test x$with_gtksourceview != xno ])
 
 # libcanberra configuration
 #

@@ -1,3 +1,9 @@
+2016-06-05  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Install gtksourceview helper files in the new folder.
+
+	* configure.ac: fix BUILD_WITH_GTKSOURCEVIEW.
+
 2016-06-05  Albrecht Dreß
 
 	As Webkit does not have a method to convert html to text,

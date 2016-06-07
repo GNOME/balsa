@@ -262,10 +262,6 @@ extern struct BalsaApplication {
     gboolean ask_before_select;
     gboolean pgdownmod;
     gint pgdown_percent;
-#if defined(ENABLE_TOUCH_UI)
-    gboolean do_file_format_check; /* do file format check on attaching */
-    gboolean enable_view_filter;   /* enable quick view filter */
-#endif
 
     /* Show toolbars, status bar, and subject-or-sender search bar */
     gboolean show_main_toolbar;

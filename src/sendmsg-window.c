@@ -104,11 +104,6 @@ static void bsmsg_update_gpg_ui_on_ident_change(BalsaSendmsg *bsmsg,
 static void bsmsg_setup_gpg_ui_by_mode(BalsaSendmsg *bsmsg, gint mode);
 #endif
 
-#if defined(ENABLE_TOUCH_UI)
-static gboolean bsmsg_check_format_compatibility(GtkWindow *parent,
-                                                 const char *filename);
-#endif /* ENABLE_TOUCH_UI */
-
 #if !HAVE_GTKSPELL
 static void sw_spell_check_weak_notify(BalsaSendmsg * bsmsg);
 #endif                          /* HAVE_GTKSPELL */
@@ -726,7 +721,6 @@ sw_buffer_signals_unblock(BalsaSendmsg * bsmsg, GtkTextBuffer * buffer)
 static const gchar *const address_types[] =
     { N_("To:"), N_("Cc:"), N_("Bcc:") };
 
-#if !defined(ENABLE_TOUCH_UI)
 static gboolean
 edit_with_gnome_check(gpointer data) {
     FILE *tmp;
@@ -890,8 +884,6 @@ sw_edit_activated(GSimpleAction * action,
     edit_data->bsmsg = bsmsg;
     g_timeout_add(200, (GSourceFunc)edit_with_gnome_check, edit_data);
 }
-
-#endif /* ENABLE_TOUCH_UI */
 
 static void
 sw_select_ident_activated(GSimpleAction * action,
@@ -1114,7 +1106,6 @@ update_bsmsg_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity* ident)
     gtk_combo_box_set_active(GTK_COMBO_BOX(bsmsg->from[1]),
                              g_list_index(balsa_app.identities, ident));
 
-#if !defined(ENABLE_TOUCH_UI)
     if (ident->replyto && *ident->replyto) {
         libbalsa_address_view_set_from_string(bsmsg->replyto_view,
                                               "Reply To:",
@@ -1125,7 +1116,6 @@ update_bsmsg_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity* ident)
         gtk_widget_hide(bsmsg->replyto[0]);
         gtk_widget_hide(bsmsg->replyto[1]);
     }
-#endif
 
     if (bsmsg->ident->bcc) {
         InternetAddressList *bcc_list, *ident_list;
@@ -1731,14 +1721,6 @@ add_attachment(BalsaSendmsg * bsmsg, const gchar *filename,
 	g_object_unref(file_uri);
 	return FALSE;
     }
-
-#if defined(ENABLE_TOUCH_UI)
-    if(!bsmsg_check_format_compatibility(GTK_WINDOW(bsmsg->window),
-		                         filename)) {
-	g_object_unref(file_uri);
-        return FALSE;
-    }
-#endif /* ENABLE_TOUCH_UI */
 
     /* get the pixbuf for the attachment's content type */
     is_fwd_message = forced_mime_type &&
@@ -2606,13 +2588,11 @@ create_info_pane(BalsaSendmsg * bsmsg)
     /* From: */
     create_from_entry(grid, bsmsg);
 
-#if !defined(ENABLE_TOUCH_UI)
     /* Create the 'Reply To:' entry before the regular recipients, to
      * get the initial focus in the regular recipients*/
 #define REPLY_TO_ROW 3
     create_email_entry(bsmsg, grid, REPLY_TO_ROW, &bsmsg->replyto_view,
                        bsmsg->replyto, "R_eply To:", NULL, 0);
-#endif
 
     /* To:, Cc:, and Bcc: */
     create_email_entry(bsmsg, grid, ++row, &bsmsg->recipient_view,
@@ -2634,12 +2614,10 @@ create_info_pane(BalsaSendmsg * bsmsg)
     g_signal_connect_swapped(G_OBJECT(bsmsg->subject[1]), "changed",
                              G_CALLBACK(sendmsg_window_set_title), bsmsg);
 
-#if !defined(ENABLE_TOUCH_UI)
     /* Reply To: */
     /* We already created it, so just increment row: */
     g_assert(++row == REPLY_TO_ROW);
 #undef REPLY_TO_ROW
-#endif
 
     /* fcc: mailbox folder where the message copy will be written to */
     if (!balsa_app.fcc_mru)
@@ -4012,12 +3990,10 @@ setup_headers_from_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity *ident)
 {
     gtk_combo_box_set_active(GTK_COMBO_BOX(bsmsg->from[1]),
                              g_list_index(balsa_app.identities, ident));
-#if !defined(ENABLE_TOUCH_UI)
     if(ident->replyto)
         libbalsa_address_view_set_from_string(bsmsg->replyto_view,
                                               "Reply To:",
                                               ident->replyto);
-#endif
     if(ident->bcc)
         libbalsa_address_view_set_from_string(bsmsg->recipient_view,
                                               "Bcc:",
@@ -4169,21 +4145,6 @@ create_lang_menu(GtkWidget * parent, BalsaSendmsg * bsmsg)
 
 /* Standard buttons; "" means a separator. */
 static const BalsaToolbarEntry compose_toolbar[] = {
-#if defined(ENABLE_TOUCH_UI)
-    "edit-undo",
-    "edit-redo",
-    "tools-check-spelling",
-    "",
-    BALSA_PIXMAP_ATTACHMENT,
-    "",
-    "document-save",
-    "",
-    BALSA_PIXMAP_SEND,
-    "",
-    "window-close-symbolic",
-    "",
-    BALSA_PIXMAP_IDENTITY,
-#else /* ENABLE_TOUCH_UI */
     { "send",         BALSA_PIXMAP_SEND       },
     { "", ""                                  },
     { "attach-file",  BALSA_PIXMAP_ATTACHMENT },
@@ -4200,7 +4161,6 @@ static const BalsaToolbarEntry compose_toolbar[] = {
     {"print",        "document-print"         },
     { "", ""                                  },
     {"close",        "window-close-symbolic"  }
-#endif /* ENABLE_TOUCH_UI */
 };
 
 /* Optional extra buttons */
@@ -4601,14 +4561,12 @@ sendmsg_window_set_field(BalsaSendmsg * bsmsg, const gchar * key,
             gtk_widget_show_all(dialog);
         }
     }
-#if !defined(ENABLE_TOUCH_UI)
     else if(g_ascii_strcasecmp(key, "replyto") == 0) {
         libbalsa_address_view_add_from_string(bsmsg->replyto_view,
                                               "Reply To:",
                                               val);
         return;
     }
-#endif
     else return;
 
     libbalsa_address_view_add_from_string(bsmsg->recipient_view, type, val);
@@ -4898,10 +4856,8 @@ bsmsg2message(BalsaSendmsg * bsmsg)
     bsmsg->fcc_url =
         g_strdup(balsa_mblist_mru_option_menu_get(bsmsg->fcc[1]));
 
-#if !defined(ENABLE_TOUCH_UI)
     message->headers->reply_to =
         libbalsa_address_view_get_list(bsmsg->replyto_view, "Reply To:");
-#endif
 
     if (bsmsg->req_mdn)
 	libbalsa_message_set_dispnotify(message, ident->ia);
@@ -5478,7 +5434,6 @@ sw_save_activated(GSimpleAction * action,
         bsmsg->state = SENDMSG_STATE_CLEAN;
 }
 
-#if !defined(ENABLE_TOUCH_UI)
 static void
 sw_page_setup_activated(GSimpleAction * action,
                         GVariant      * parameter,
@@ -5491,7 +5446,6 @@ sw_page_setup_activated(GSimpleAction * action,
     message_print_page_setup(GTK_WINDOW(bsmsg->window));
     g_object_unref(message);
 }
-#endif /* ENABLE_TOUCH_UI */
 
 static void
 sw_print_activated(GSimpleAction * action,
@@ -5874,11 +5828,9 @@ check_readiness(BalsaSendmsg * bsmsg)
 {
     gboolean ready =
         libbalsa_address_view_n_addresses(bsmsg->recipient_view) > 0;
-#if !defined(ENABLE_TOUCH_UI)
     if (ready
         && libbalsa_address_view_n_addresses(bsmsg->replyto_view) < 0)
         ready = FALSE;
-#endif
 
     bsmsg->ready_to_send = ready;
     sw_actions_set_enabled(bsmsg, ready_actions,
@@ -5888,9 +5840,7 @@ check_readiness(BalsaSendmsg * bsmsg)
 static const gchar * const header_action_names[] = {
     "from",
     "recips",
-#if !defined(ENABLE_TOUCH_UI)
     "reply-to",
-#endif                          /* ENABLE_TOUCH_UI */
     "fcc"
 };
 
@@ -5949,7 +5899,6 @@ sw_recips_change_state(GSimpleAction * action, GVariant * state, gpointer data)
     sw_entry_helper(action, state, bsmsg, bsmsg->recipients);
 }
 
-#if !defined(ENABLE_TOUCH_UI)
 static void
 sw_reply_to_change_state(GSimpleAction * action, GVariant * state, gpointer data)
 {
@@ -5957,7 +5906,6 @@ sw_reply_to_change_state(GSimpleAction * action, GVariant * state, gpointer data
 
     sw_entry_helper(action, state, bsmsg, bsmsg->replyto);
 }
-#endif                          /* ENABLE_TOUCH_UI */
 
 static void
 sw_fcc_change_state(GSimpleAction * action, GVariant * state, gpointer data)
@@ -6039,9 +5987,7 @@ sw_gpg_helper(GSimpleAction  * action,
         bsmsg->gpg_mode &= ~mask;
 
     radio_on = (bsmsg->gpg_mode & LIBBALSA_PROTECT_MODE) > 0;
-#if !defined(ENABLE_TOUCH_UI)
     sw_action_set_enabled(bsmsg, "gpg-mode", radio_on);
-#endif                          /* ENABLE_TOUCH_UI */
 
     g_simple_action_set_state(action, state);
 }
@@ -6058,7 +6004,6 @@ sw_encrypt_change_state(GSimpleAction * action, GVariant * state, gpointer data)
     sw_gpg_helper(action, state, data, LIBBALSA_PROTECT_ENCRYPT);
 }
 
-#if !defined(ENABLE_TOUCH_UI)
 static void
 sw_gpg_mode_change_state(GSimpleAction  * action,
                          GVariant       * state,
@@ -6085,7 +6030,6 @@ sw_gpg_mode_change_state(GSimpleAction  * action,
 
     g_simple_action_set_state(action, state);
 }
-#endif                          /* ENABLE_TOUCH_UI */
 #endif                          /* HAVE_GPGME */
 
 
@@ -6110,9 +6054,7 @@ init_menus(BalsaSendmsg * bsmsg)
             } name_map[] = {
                 {"From",       "from"},
                 {"Recipients", "recips"},
-#if !defined(ENABLE_TOUCH_UI)
                 {"ReplyTo",    "reply-to"},
-#endif                          /* ENABLE_TOUCH_UI */
                 {"Fcc",        "fcc"}
             };
             guint j;
@@ -6462,7 +6404,6 @@ bsmsg_update_gpg_ui_on_ident_change(BalsaSendmsg * bsmsg,
     if (ident->gpg_encrypt)
         bsmsg->gpg_mode |= LIBBALSA_PROTECT_ENCRYPT;
 
-#if !defined(ENABLE_TOUCH_UI)
     switch (ident->crypt_protocol) {
     case LIBBALSA_PROTECT_OPENPGP:
         bsmsg->gpg_mode |= LIBBALSA_PROTECT_OPENPGP;
@@ -6479,7 +6420,6 @@ bsmsg_update_gpg_ui_on_ident_change(BalsaSendmsg * bsmsg,
         bsmsg->gpg_mode |= LIBBALSA_PROTECT_RFC3156;
         g_action_change_state(action, g_variant_new_string("mime"));
     }
-#endif                          /* ENABLE_TOUCH_UI */
 }
 
 static void
@@ -6515,84 +6455,6 @@ bsmsg_setup_gpg_ui_by_mode(BalsaSendmsg *bsmsg, gint mode)
         g_action_change_state(action, g_variant_new_string("mime"));
 }
 #endif /* HAVE_GPGME */
-
-#if defined(ENABLE_TOUCH_UI)
-static gboolean
-bsmsg_check_format_compatibility(GtkWindow *parent, const gchar *filename)
-{
-    static const struct {
-        const char *linux_extension, *linux_program;
-        const char *other_extension, *other_program;
-    } compatibility_table[] = {
-        { ".abw",      "AbiWord",  ".doc", "Microsoft Word"  },
-        { ".gnumeric", "Gnumeric", ".xls", "Microsoft Excel" }
-    };
-    GtkDialog *dialog;
-    GtkBox *vbox;
-    GtkWidget *label, *checkbox = NULL;
-    unsigned i, fn_len = strlen(filename);
-    int response;
-    gchar *str;
-
-    if(!balsa_app.do_file_format_check)
-        return TRUE; /* blank accept from the User */
-
-    for(i=0; i<ELEMENTS(compatibility_table); i++) {
-        unsigned le_len = strlen(compatibility_table[i].linux_extension);
-        int offset = fn_len - le_len;
-
-        if(offset>0 &&
-           strcmp(filename+offset, compatibility_table[i].linux_extension)==0)
-            break; /* a match has been found */
-    }
-    if(i>=ELEMENTS(compatibility_table))
-        return TRUE; /* no potential compatibility problems */
-
-    /* time to ask the user for his/her opinion */
-    dialog = (GtkDialog*)gtk_dialog_new_with_buttons
-        (_("Compatibility check"), parent,
-         GTK_DIALOG_MODAL| GTK_DIALOG_DESTROY_WITH_PARENT |
-         BALSA_DIALOG_FLAGS,
-         _("_Cancel"),                          GTK_RESPONSE_CANCEL,
-         _("_Attach it in the current format"), GTK_RESPONSE_OK, NULL);
-#if HAVE_MACOSX_DESKTOP
-    libbalsa_macosx_menu_for_parent(GTK_WIDGET(dialog), parent);
-#endif
-
-    gtk_dialog_set_default_response(dialog, GTK_RESPONSE_OK);
-    str = g_strdup_printf
-        (_("File %s is currently in the %s's own format.\n"
-           "If you need to send it to people who use %s, "
-           "then open the file in the %s, use \"Save As\" "
-           "on the \"File\" menu, and select the \"%s\" format. "
-           "When you click \"OK\" it will save a new "
-           "\"%s\" version of the file, with \"%s\" on the end "
-           "of the document name, which you can then attach instead."),
-         filename,
-         compatibility_table[i].linux_program,
-         compatibility_table[i].other_program,
-         compatibility_table[i].linux_program,
-         compatibility_table[i].other_program,
-         compatibility_table[i].other_program,
-         compatibility_table[i].other_extension);
-    vbox = GTK_BOX(gtk_dialog_get_content_area(dialog));
-    gtk_box_set_spacing(vbox, 10);
-    gtk_box_pack_start(vbox, label = gtk_label_new(str),
-                       TRUE, TRUE, 0);
-    gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
-    g_free(str);
-    checkbox = gtk_check_button_new_with_mnemonic
-        (_("_Do not show this dialog any more."));
-    gtk_box_pack_start(vbox, checkbox, TRUE, TRUE, 0);
-    gtk_widget_show(checkbox);
-    gtk_widget_show(label);
-    response = gtk_dialog_run(dialog);
-    balsa_app.do_file_format_check =
-        !gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(checkbox));
-    gtk_widget_destroy(GTK_WIDGET(dialog));
-    return response == GTK_RESPONSE_OK;
-}
-#endif /* ENABLE_TOUCH_UI */
 
 static GActionEntry win_entries[] = {
     {"include-file",     sw_include_file_activated      },
@@ -7021,11 +6883,9 @@ sendmsg_window_continue(LibBalsaMailbox * mailbox, guint msgno)
     set_identity(bsmsg, message);
     setup_headers_from_message(bsmsg, message);
 
-#if !defined(ENABLE_TOUCH_UI)
     libbalsa_address_view_set_from_list(bsmsg->replyto_view,
                                         "Reply To:",
                                         message->headers->reply_to);
-#endif
     if (message->in_reply_to)
         bsmsg->in_reply_to =
             g_strconcat("<", message->in_reply_to->data, ">", NULL);

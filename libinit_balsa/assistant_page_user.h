@@ -49,9 +49,7 @@ G_BEGIN_DECLS
 #endif
         GtkWidget *name;
         GtkWidget *email;
-#if !defined(ENABLE_TOUCH_UI)
         GtkWidget *localmaildir;
-#endif /* ENABLE_TOUCH_UI */
         EntryMaster emaster;
         EntryData ed0;
         EntryData ed1;

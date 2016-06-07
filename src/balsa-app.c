@@ -369,11 +369,6 @@ balsa_app_init(void)
     /* compose: shown headers */
     balsa_app.compose_headers = NULL;
 
-    /* command line options */
-#if defined(ENABLE_TOUCH_UI)
-    balsa_app.open_inbox_upon_startup = TRUE;
-#endif /* ENABLE_TOUCH_UI */
-
     /* date format */
     balsa_app.date_string = g_strdup(DEFAULT_DATE_FORMAT);
 

@@ -197,11 +197,9 @@ folder_conf_clicked_ok(FolderDialogData * fcw)
         (LIBBALSA_IMAP_SERVER(s),
          gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON
                                           (fcw->connection_limit)));
-#if !defined(ENABLE_TOUCH_UI)
     libbalsa_imap_server_enable_persistent_cache
         (LIBBALSA_IMAP_SERVER(s),
          gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fcw->enable_persistent)));
-#endif
     libbalsa_imap_server_set_use_idle
         (LIBBALSA_IMAP_SERVER(s), 
          gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fcw->use_idle)));
@@ -340,7 +338,6 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
          s 
          ? libbalsa_imap_server_get_max_connections(LIBBALSA_IMAP_SERVER(s))
          : 20);
-#if !defined(ENABLE_TOUCH_UI)
     fcw->enable_persistent = 
         balsa_server_conf_add_checkbox(&fcw->bsc,
                                        _("Enable _persistent cache"));
@@ -348,7 +345,6 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
        libbalsa_imap_server_has_persistent_cache(LIBBALSA_IMAP_SERVER(s)))
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fcw->enable_persistent),
                                      TRUE);
-#endif
     fcw->use_idle = 
         balsa_server_conf_add_checkbox(&fcw->bsc,
                                        _("Use IDLE command"));

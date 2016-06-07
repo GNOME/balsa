@@ -58,11 +58,7 @@
 /* Spacing suggestions from
  * http://developer.gnome.org/projects/gup/hig/1.0/layout.html#window-layout-spacing
  */
-#ifdef ENABLE_TOUCH_UI
-#define HIG_PADDING     3
-#else  /* ENABLE_TOUCH_UI */
 #define HIG_PADDING     6
-#endif /* ENABLE_TOUCH_UI */
 #define BORDER_WIDTH    (2 * HIG_PADDING)
 #define GROUP_SPACING   (3 * HIG_PADDING)
 #define HEADER_SPACING  (2 * HIG_PADDING)

@@ -82,9 +82,7 @@ balsa_druid_page_user_init(BalsaDruidPageUser * user,
     user->ed2.master = &(user->emaster);
 #endif
     user->ed3.master = &(user->emaster);
-#if !defined(ENABLE_TOUCH_UI)
     user->ed4.master = &(user->emaster);
-#endif
     label = GTK_LABEL(gtk_label_new(_(header2)));
     gtk_label_set_line_wrap(label, TRUE);
     gtk_box_pack_start(GTK_BOX(page), GTK_WIDGET(label), FALSE, TRUE, 0);
@@ -145,14 +143,12 @@ balsa_druid_page_user_init(BalsaDruidPageUser * user,
                                 remember_passwd, druid,
                                 &(user->remember_passwd));
 
-#if !defined(ENABLE_TOUCH_UI)
     preset = g_strconcat(g_get_home_dir(), "/mail", NULL);
     balsa_init_add_grid_entry(grid, row++, _("_Local mail directory:"),
                                preset,
                                &(user->ed4), druid, page,
                                &(user->localmaildir));
     g_free(preset);
-#endif
     gtk_box_pack_start(GTK_BOX(page), GTK_WIDGET(grid), FALSE, FALSE, 3);
 
     user->need_set = FALSE;
@@ -315,13 +311,8 @@ balsa_druid_page_user_next(GtkAssistant * druid, GtkWidget * page,
 #endif
 
     g_free(balsa_app.local_mail_directory);
-#if defined(ENABLE_TOUCH_UI)
-    balsa_app.local_mail_directory = 
-        g_strconcat(g_get_home_dir(), "/mail", NULL);
-#else
     balsa_app.local_mail_directory =
         gtk_editable_get_chars(GTK_EDITABLE(user->localmaildir), 0, -1);
-#endif /* ENABLE_TOUCH_UI */
 
     if (balsa_init_create_to_directory
         (balsa_app.local_mail_directory, &uhoh)) {

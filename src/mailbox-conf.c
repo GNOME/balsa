@@ -701,13 +701,11 @@ mailbox_conf_set_values(MailboxConfWindow *mcw)
 	    gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.imap.folderpath),
 			       path);
         balsa_server_conf_set_values(&mcw->mb_data.imap.bsc, server);
-#if !defined(ENABLE_TOUCH_UI)
         if(libbalsa_imap_server_has_persistent_cache
            (LIBBALSA_IMAP_SERVER(server)))
             gtk_toggle_button_set_active
                 (GTK_TOGGLE_BUTTON(mcw->mb_data.imap.enable_persistent),
                  TRUE);
-#endif
         if(libbalsa_imap_server_has_bug(LIBBALSA_IMAP_SERVER(server),
                                         ISBUG_FETCH))
             gtk_toggle_button_set_active
@@ -858,12 +856,10 @@ update_imap_mailbox(MailboxConfWindow *mcw)
     libbalsa_server_set_password(server,
 				 gtk_entry_get_text(GTK_ENTRY
 						    (mcw->mb_data.imap.password)));
-#if !defined(ENABLE_TOUCH_UI)
     libbalsa_imap_server_enable_persistent_cache
         (LIBBALSA_IMAP_SERVER(server),
          gtk_toggle_button_get_active
          GTK_TOGGLE_BUTTON(mcw->mb_data.imap.enable_persistent));
-#endif
     libbalsa_imap_server_set_bug
         (LIBBALSA_IMAP_SERVER(server), ISBUG_FETCH,
          gtk_toggle_button_get_active
@@ -1348,11 +1344,9 @@ create_imap_mailbox_dialog(MailboxConfWindow *mcw)
     advanced =
         balsa_server_conf_get_advanced_widget(&mcw->mb_data.imap.bsc,
                                               NULL, 1);
-#if !defined(ENABLE_TOUCH_UI)
     mcw->mb_data.imap.enable_persistent = 
         balsa_server_conf_add_checkbox(&mcw->mb_data.imap.bsc,
                                        _("Enable _persistent cache"));
-#endif
     mcw->mb_data.imap.has_bugs = 
         balsa_server_conf_add_checkbox(&mcw->mb_data.imap.bsc,
                                        _("Enable _bug workarounds"));

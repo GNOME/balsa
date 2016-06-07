@@ -66,9 +66,6 @@ balsa_initdruid_apply(GtkAssistant * druid)
     gchar *address_book;
     LibBalsaAddressBook *ab = NULL;
 
-#if defined(ENABLE_TOUCH_UI)
-    balsa_druid_page_directory_later(GTK_WIDGET(druid));
-#endif
     address_book = g_build_filename(g_get_home_dir(), "GnomeCard.gcrd", NULL);
     if (g_file_test(address_book, G_FILE_TEST_EXISTS))
         ab = libbalsa_address_book_vcard_new(_("GnomeCard Address Book"),
@@ -119,10 +116,8 @@ balsa_initdruid(GtkAssistant * assistant)
 
     balsa_druid_page_welcome(assistant);
     balsa_druid_page_user(assistant);
-#if !defined(ENABLE_TOUCH_UI)
     balsa_druid_page_directory(assistant);
     balsa_druid_page_defclient(assistant);
-#endif
     balsa_druid_page_finish(assistant);
 }
 

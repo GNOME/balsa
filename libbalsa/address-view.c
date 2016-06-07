@@ -162,9 +162,7 @@ const gchar *const libbalsa_address_view_types[] = {
     N_("To:"),
     N_("Cc:"),
     N_("Bcc:"),
-#if !defined(ENABLE_TOUCH_UI)
     N_("Reply To:"),
-#endif                          /* ENABLE_TOUCH_UI */
 };
 
 /* Pixbufs */

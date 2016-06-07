@@ -473,10 +473,8 @@ periodic_expunge_cb(void)
 {
     GSList *list = NULL, *l;
 
-#if !defined(ENABLE_TOUCH_UI)
     /* should we enforce expunging now and then? Perhaps not... */
     if(!balsa_app.expunge_auto) return TRUE;
-#endif
 
     gdk_threads_enter();
     libbalsa_information(LIBBALSA_INFORMATION_DEBUG,

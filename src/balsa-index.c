@@ -266,10 +266,8 @@ static void
 bi_apply_other_column_settings(GtkTreeViewColumn *column,
                                gboolean sortable, gint typeid)
 {
-#if !defined(ENABLE_TOUCH_UI)
     if(sortable)
         gtk_tree_view_column_set_sort_column_id(column, typeid);
-#endif /* ENABLE_TOUCH_UI */
 
     gtk_tree_view_column_set_alignment(column, 0.5);
 

@@ -40,26 +40,15 @@
 #include "server.h"
 #include "url.h"
 
-#if !defined(ENABLE_TOUCH_UI)
 #define INBOX_NAME    "Inbox"
 #define OUTBOX_NAME   "Outbox"
 #define SENTBOX_NAME  "Sentbox"
 #define DRAFTBOX_NAME "Draftbox"
-#else /* defined(ENABLE_TOUCH_UI) */
-#define INBOX_NAME    "In"
-#define OUTBOX_NAME   "Out"
-#define SENTBOX_NAME  "Sent"
-#define DRAFTBOX_NAME "Drafts"
-#endif /* defined(ENABLE_TOUCH_UI) */
 #define TRASH_NAME    "Trash"
 
 static const gchar * const init_mbnames[NUM_EDs] = {
-#if defined(ENABLE_TOUCH_UI)
-    "_In:", "_Out:", "_Sent:", "_Drafts:", "_Trash:"
-#else
     N_("_Inbox:"), N_("_Outbox:"), N_("_Sentbox:"), N_("_Draftbox:"),
     N_("_Trash:")
-#endif
 };
 
 static void balsa_druid_page_directory_prepare(GtkAssistant * druid,
@@ -299,16 +288,11 @@ balsa_druid_page_directory_init(BalsaDruidPageDirectory * dir,
         else
             preset = g_strdup("[Dummy value]");
 
-#if defined(ENABLE_TOUCH_UI)
-        balsa_init_add_grid_entry(grid, i, init_mbnames[i], preset,
-                                   &(dir->ed[i]), druid, page, init_widgets[i]);
-#else
         entry = balsa_init_add_grid_entry(grid, i, _(init_mbnames[i]),
                                           preset, NULL, NULL, NULL,
                                           init_widgets[i]);
         g_signal_connect(entry, "changed",
                          G_CALLBACK(entry_changed_cb), dir);
-#endif
 
         g_free(preset);
     }
@@ -410,36 +394,3 @@ balsa_druid_page_directory_next(GtkAssistant * page, GtkWidget * druid,
 {
     dir->paths_locked = TRUE;
 }
-
-#if defined(ENABLE_TOUCH_UI)
-#define SET_MAILBOX(fname, config, mbx) \
-do { gchar *t=g_build_filename(balsa_app.local_mail_directory,(fname),NULL);\
- unconditional_mailbox(t, config, (mbx), &error); g_free(t);}while(0)
-
-void
-balsa_druid_page_directory_later(GtkWidget *druid)
-{
-    gchar *error = NULL;
-    gchar *spool = libbalsa_guess_mail_spool();
-    unconditional_mailbox(spool, INBOX_NAME, &balsa_app.inbox, &error);
-    g_free(spool);
-    SET_MAILBOX("trash",    TRASH_NAME,    &balsa_app.trash);
-    SET_MAILBOX("outbox",   OUTBOX_NAME,   &balsa_app.outbox);
-    SET_MAILBOX("sentbox",  SENTBOX_NAME,  &balsa_app.sentbox);
-    SET_MAILBOX("draftbox", DRAFTBOX_NAME, &balsa_app.draftbox);
-    if (error) {
-        GtkWidget *dlg =
-            gtk_message_dialog_new(GTK_WINDOW(gtk_widget_get_ancestor
-                                          (GTK_WIDGET(druid), 
-                                           GTK_TYPE_WINDOW)),
-                                   GTK_DIALOG_MODAL,
-                                   GTK_MESSAGE_ERROR,
-                                   GTK_BUTTONS_OK,
-                                   _("Problem Creating Mailboxes\n%s"),
-                                   error);
-        g_free(error);
-        gtk_dialog_run(GTK_DIALOG(dlg));
-        gtk_widget_destroy(dlg);
-    }
-}
-#endif                          /* defined(ENABLE_TOUCH_UI) */

@@ -1207,27 +1207,14 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMailbox * mailbox, guint msgno)
     display_content(bm);
     gtk_widget_show(GTK_WIDGET(bm));
 
-#if defined(ENABLE_TOUCH_UI)
-    /* hide tabs so that they do not confuse keyboard navigation.
-     * This could probably be a configuration option. */
-#ifndef BALSA_USE_GTK_STACK
-    gtk_notebook_set_show_tabs(GTK_NOTEBOOK(bm), FALSE);
-#else /* BALSA_USE_GTK_STACK */
-    gtk_widget_hide(bm->switcher);
-#endif /* BALSA_USE_GTK_STACK */
-#else
 #ifndef BALSA_USE_GTK_STACK
     gtk_notebook_set_show_tabs(GTK_NOTEBOOK(bm), bm->info_count > 1);
+    gtk_notebook_set_current_page(GTK_NOTEBOOK(bm), 0);
 #else /* BALSA_USE_GTK_STACK */
     if (bm->info_count > 1)
         gtk_widget_show(bm->switcher);
     else
         gtk_widget_hide(bm->switcher);
-#endif /* BALSA_USE_GTK_STACK */
-#endif /* ENABLE_TOUCH_UI */
-#ifndef BALSA_USE_GTK_STACK
-    gtk_notebook_set_current_page(GTK_NOTEBOOK(bm), 0);
-#else /* BALSA_USE_GTK_STACK */
     gtk_stack_set_visible_child_name(GTK_STACK(bm->stack), "content");
 #endif /* BALSA_USE_GTK_STACK */
 
@@ -3293,27 +3280,14 @@ message_recheck_crypto_cb(GtkWidget * button, BalsaMessage * bm)
     display_headers(bm);
     display_content(bm);
 
-#if defined(ENABLE_TOUCH_UI)
-    /* hide tabs so that they do not confuse keyboard navigation.
-     * This could probably be a configuration option. */
-#ifndef BALSA_USE_GTK_STACK
-    gtk_notebook_set_show_tabs(GTK_NOTEBOOK(bm), FALSE);
-#else /* BALSA_USE_GTK_STACK */
-    gtk_widget_hide(bm->switcher);
-#endif /* BALSA_USE_GTK_STACK */
-#else
 #ifndef BALSA_USE_GTK_STACK
     gtk_notebook_set_show_tabs(GTK_NOTEBOOK(bm), bm->info_count > 1);
+    gtk_notebook_set_current_page(GTK_NOTEBOOK(bm), 0);
 #else /* BALSA_USE_GTK_STACK */
     if (bm->info_count > 1)
         gtk_widget_show(bm->switcher);
     else
         gtk_widget_hide(bm->switcher);
-#endif /* BALSA_USE_GTK_STACK */
-#endif /* ENABLE_TOUCH_UI */
-#ifndef BALSA_USE_GTK_STACK
-    gtk_notebook_set_current_page(GTK_NOTEBOOK(bm), 0);
-#else /* BALSA_USE_GTK_STACK */
     gtk_stack_set_visible_child_name(GTK_STACK(bm->stack), "content");
 #endif /* BALSA_USE_GTK_STACK */
 

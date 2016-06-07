@@ -139,19 +139,6 @@ message_window_idle_handler(MessageWindow * mw)
 
 /* Standard buttons; "" means a separator. */
 static const BalsaToolbarEntry message_toolbar[] = {
-#if defined(ENABLE_TOUCH_UI)
-    BALSA_PIXMAP_NEXT_UNREAD,
-    "",
-    BALSA_PIXMAP_REPLY,
-    BALSA_PIXMAP_REPLY_ALL,
-    BALSA_PIXMAP_FORWARD,
-    "",
-    "document-print",
-    "",
-    "edit-delete",
-    "",
-    "window-close"
-#else /* ENABLE_TOUCH_UI */
     { "next-unread",      BALSA_PIXMAP_NEXT_UNREAD   },
     { "", ""                                         },
     { "reply",            BALSA_PIXMAP_REPLY         },
@@ -166,7 +153,6 @@ static const BalsaToolbarEntry message_toolbar[] = {
     { "print",           "document-print"            },
     { "", ""                                         },
     { "move-to-trash",   "edit-delete"               }
-#endif /* ENEBLE_TOUCH_UI */
 };
 
 /* Optional extra buttons */

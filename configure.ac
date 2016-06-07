@@ -180,14 +180,6 @@ AC_ARG_ENABLE(more-warnings,
                   [set_more_warnings="$enableval"], [set_more_warnings=yes])
 
 
-dnl ##########################################################################
-dnl Enable touchscreen optimized UI?
-dnl ##########################################################################
-
-AC_ARG_ENABLE(touch-ui,
-              AC_HELP_STRING([--enable-touch-ui],
-                             [Enable Touchscreen UI mode (default=no)]),
-              [enable_touch_ui="$enableval"],[enable_touch_ui=no])
 
 dnl #####################################################################
 dnl 3. Programs: compilers and their options.
@@ -690,16 +682,6 @@ else
     AC_MSG_RESULT([no])
 fi
 
-# Touch UI configuration
-#
-AC_MSG_CHECKING([whether to configure for Touch UI])
-if test x$enable_touch_ui != xno; then
-    AC_DEFINE(ENABLE_TOUCH_UI,1,[Defined when touchscreen optimized UI is to be enabled.])
-    AC_MSG_RESULT([yes])
-else
-    AC_MSG_RESULT([no])
-fi
-
 # Libsecret configuration
 #
 AC_MSG_CHECKING([whether to configure for libsecret])
@@ -912,7 +894,6 @@ echo "             Use Libnotify: $with_libnotify"
 echo "         Use GtkSourceView: $with_gtksourceview"
 echo "              Use Compface: $with_compface"
 echo "  Install extra MIME icons: $install_mimeicons"
-echo "    Configure for Touch UI: $enable_touch_ui"
 echo "             Use libsecret: $with_libsecret"
 dnl echo "                  Use SASL: $need_sasl"
 echo ""

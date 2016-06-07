@@ -63,9 +63,6 @@ G_BEGIN_DECLS
  * Public methods
  */
     void balsa_druid_page_directory(GtkAssistant * druid);
-#if defined(ENABLE_TOUCH_UI)
-    void balsa_druid_page_directory_later(GtkWidget *druid);
-#endif                          /* defined(ENABLE_TOUCH_UI) */
 
 
 G_END_DECLS

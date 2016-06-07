@@ -1,3 +1,48 @@
+2016-06-07  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Drop the --enable-touch-ui configuration option and the
+	corresponding conditionally compiled code
+
+	* configure.ac: drop the option;
+	* libbalsa/address-view.c and below: drop the code.
+	* libbalsa/imap-server.c (libbalsa_imap_server_init):
+	* libinit_balsa/assistant_init.c (balsa_initdruid_apply),
+	(balsa_initdruid):
+	* libinit_balsa/assistant_page_directory.c
+	(balsa_druid_page_directory_init),
+	(balsa_druid_page_directory_next):
+	* libinit_balsa/assistant_page_directory.h:
+	* libinit_balsa/assistant_page_user.c (balsa_druid_page_user_init),
+	(balsa_druid_page_user_next):
+	* libinit_balsa/assistant_page_user.h:
+	* src/balsa-app.c (balsa_app_init):
+	* src/balsa-app.h:
+	* src/balsa-index.c (bi_apply_other_column_settings):
+	* src/balsa-mblist.c (bmbl_core_mailbox):
+	* src/balsa-message.c:
+	* src/folder-conf.c (folder_conf_clicked_ok),
+	(folder_conf_imap_node):
+	* src/mailbox-conf.c (mailbox_conf_set_values),
+	(update_imap_mailbox), (create_imap_mailbox_dialog):
+	* src/main-window.c (bw_create_index_widget),
+	(new_message_activated), (balsa_window_new),
+	(bw_enable_mailbox_menus), (bw_enable_message_menus),
+	(bw_enable_edit_menus), (balsa_window_enable_continue),
+	(bw_set_threading_menu), (bw_select_part_cb),
+	(bw_send_msg_window_destroy_cb), (update_view_menu):
+	* src/main.c (periodic_expunge_cb):
+	* src/message-window.c:
+	* src/pref-manager.c:
+	* src/save-restore.c (config_global_load), (config_save):
+	* src/sendmsg-window.c (update_bsmsg_identity), (add_attachment),
+	(create_info_pane), (setup_headers_from_identity),
+	(sendmsg_window_set_field), (bsmsg2message),
+	(sw_page_setup_activated), (check_readiness),
+	(sw_reply_to_change_state), (sw_gpg_helper),
+	(sw_gpg_mode_change_state), (init_menus),
+	(bsmsg_update_gpg_ui_on_ident_change), (sendmsg_window_continue):
+	* src/sendmsg-window.h:
+
 2016-06-05  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Install gtksourceview helper files in the new folder.

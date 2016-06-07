@@ -149,21 +149,10 @@ static gboolean bw_is_open_mailbox(LibBalsaMailbox *m);
 
 static void bw_mailbox_tab_close_cb(GtkWidget * widget, gpointer data);
 
-#if defined(ENABLE_TOUCH_UI)
-static void bw_set_sort_menu(BalsaWindow *window,
-                             LibBalsaMailboxSortFields col,
-                             LibBalsaMailboxSortType   order);
-#endif /* ENABLE_TOUCH_UI */
-
-#if !defined(ENABLE_TOUCH_UI)
 static void bw_set_threading_menu(BalsaWindow * window, int option);
 static void bw_show_mbtree(BalsaWindow * window);
-#endif /* ENABLE_TOUCH_UI */
 static void bw_set_filter_menu(BalsaWindow * window, int gui_filter);
 static LibBalsaCondition *bw_get_view_filter(BalsaWindow * window);
-#if defined(ENABLE_TOUCH_UI)
-static gboolean bw_open_mailbox_cb(GtkWidget *w, GdkEventKey *e, gpointer data);
-#endif /* ENABLE_TOUCH_UI */
 
 static void bw_select_part_cb(BalsaMessage * bm, gpointer data);
 
@@ -179,9 +168,7 @@ static void bw_notebook_switch_page_cb(GtkWidget * notebook,
                                        void * page,
                                        guint page_num,
                                        gpointer data);
-#if !defined(ENABLE_TOUCH_UI)
 static void bw_send_msg_window_destroy_cb(GtkWidget * widget, gpointer data);
-#endif /*ENABLE_TOUCH_UI */
 static BalsaIndex *bw_notebook_find_page(GtkNotebook * notebook,
                                          gint x, gint y);
 static void bw_notebook_drag_received_cb(GtkWidget* widget,
@@ -520,12 +507,7 @@ bw_create_index_widget(BalsaWindow *bw)
                      G_CALLBACK(bw_filter_entry_changed), button);
     gtk_widget_show_all(button);
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-#if defined(ENABLE_TOUCH_UI)
-    /* Usually we want to show the widget unless we operate in
-     * space-constrained conditions. */
-    if(balsa_app.enable_view_filter)
-#endif
-        gtk_widget_show(bw->sos_bar);
+    gtk_widget_show(bw->sos_bar);
     gtk_box_pack_start(GTK_BOX(vbox), bw->sos_bar, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(vbox), bw->notebook, TRUE, TRUE, 0);
     gtk_container_set_focus_chain(GTK_CONTAINER(vbox),
@@ -609,19 +591,6 @@ bw_set_panes(BalsaWindow * window)
  */
 /* Standard buttons; "" means a separator. */
 static const BalsaToolbarEntry main_toolbar[] = {
-#if defined(ENABLE_TOUCH_UI)
-    BALSA_PIXMAP_RECEIVE,
-    "",
-    BALSA_PIXMAP_COMPOSE,
-    BALSA_PIXMAP_REPLY,
-    BALSA_PIXMAP_REPLY_ALL,
-    BALSA_PIXMAP_FORWARD,
-    "",
-    "edit-delete",
-    "",
-    BALSA_PIXMAP_NEXT_UNREAD,
-    BALSA_PIXMAP_MARKED_NEW
-#else /* defined(ENABLE_TOUCH_UI) */
     { "get-new-mail",     BALSA_PIXMAP_RECEIVE     },
     { "", ""                                       },
     { "move-to-trash",   "edit-delete"             },
@@ -635,7 +604,6 @@ static const BalsaToolbarEntry main_toolbar[] = {
     { "next-unread",      BALSA_PIXMAP_NEXT_UNREAD },
     { "", ""                                       },
     { "print",           "document-print"          }
-#endif /* defined(ENABLE_TOUCH_UI) */
 };
 
 /* Optional extra buttons */
@@ -861,10 +829,8 @@ new_message_activated(GSimpleAction * action,
 
     smwindow = sendmsg_window_compose();
 
-#if !defined(ENABLE_TOUCH_UI)
     g_signal_connect(G_OBJECT(smwindow->window), "destroy",
                      G_CALLBACK(bw_send_msg_window_destroy_cb), user_data);
-#endif /*ENABLE_TOUCH_UI */
 }
 
 static void
@@ -2167,10 +2133,7 @@ static const gchar *const mailbox_actions[] = {
 #endif
     "reset-filter",
     "mailbox-select-all", "mailbox-edit", "mailbox-delete",
-    "mailbox-expunge", "mailbox-close", "select-filters"
-#if !defined(ENABLE_TOUCH_UI)
-        , "remove-duplicates"
-#endif                          /* ENABLE_TOUCH_UI */
+    "mailbox-expunge", "mailbox-close", "select-filters", "remove-duplicates"
 };
 
 static const gchar *const message_actions[] = {
@@ -2219,8 +2182,6 @@ balsa_window_new()
     GtkWidget *hbox;
     static const gchar *const header_targets[] =
         { "none", "selected", "all" };
-#if !defined(ENABLE_TOUCH_UI)
-#endif
 #if HAVE_MACOSX_DESKTOP
     IgeMacMenuGroup *group;
 #endif
@@ -2329,10 +2290,8 @@ balsa_window_new()
     bw_set_panes(window);
 
     /*PKGW: do it this way, without the usizes. */
-#if !defined(ENABLE_TOUCH_UI)
     bw_action_set_boolean(window, "show-mailbox-tree",
                           balsa_app.show_mblist);
-#endif                          /* !defined(ENABLE_TOUCH_UI) */
 
     if (balsa_app.show_mblist) {
         gtk_widget_show(window->mblist);
@@ -2363,7 +2322,6 @@ balsa_window_new()
                                                    [balsa_app.
                                                     shown_headers]));
 
-#if !defined(ENABLE_TOUCH_UI)
     action = bw_get_action(window, "threading");
     g_simple_action_set_state(G_SIMPLE_ACTION(action),
                               g_variant_new_string("flat"));
@@ -2371,10 +2329,6 @@ balsa_window_new()
     bw_action_set_boolean(window, "show-mailbox-tabs",
                           balsa_app.show_notebook_tabs);
     bw_action_set_boolean(window, "wrap", balsa_app.browse_wrap);
-#else
-    g_signal_connect_after(G_OBJECT(window), "key_press_event",
-                     G_CALLBACK(bw_open_mailbox_cb), NULL);
-#endif
     bw_action_set_boolean(window, "show-toolbar",
                           balsa_app.show_main_toolbar);
     bw_action_set_boolean(window, "show-statusbar",
@@ -2388,9 +2342,7 @@ balsa_window_new()
 #ifdef HAVE_HTML_WIDGET
     bw_enable_view_menus(window, NULL);
 #endif				/* HAVE_HTML_WIDGET */
-#if !defined(ENABLE_TOUCH_UI)
     balsa_window_enable_continue(window);
-#endif /*ENABLE_TOUCH_UI */
 
     /* set initial state of toggle preview pane button */
 
@@ -2475,21 +2427,6 @@ bw_enable_mailbox_menus(BalsaWindow * window, BalsaIndex * index)
     bw_action_set_enabled(window, "mailbox-expunge",
     /* cppcheck-suppress nullPointer */
                           mailbox && !mailbox->readonly);
-#if defined(ENABLE_TOUCH_UI)
-    {gboolean can_sort, can_thread; guint i;
-    static const gchar * const sort_actions[] = {
-        "ByArrival",
-        "BySender",
-        "BySubject",
-        "BySize"
-    };
-
-    can_sort = mailbox &&
-        libbalsa_mailbox_can_do(mailbox, LIBBALSA_MAILBOX_CAN_SORT);
-    can_thread = mailbox &&
-        libbalsa_mailbox_can_do(mailbox, LIBBALSA_MAILBOX_CAN_THREAD);
-    }
-#endif
 
     bw_actions_set_enabled(window, mailbox_actions,
                            G_N_ELEMENTS(mailbox_actions), enable);
@@ -2498,21 +2435,13 @@ bw_enable_mailbox_menus(BalsaWindow * window, BalsaIndex * index)
     bw_action_set_enabled(window, "previous-message",
                           index && index->prev_message);
 
-#if !defined(ENABLE_TOUCH_UI)
     bw_action_set_enabled(window, "remove-duplicates", mailbox &&
                           libbalsa_mailbox_can_move_duplicates(mailbox));
-#endif
 
     if (mailbox) {
-#if defined(ENABLE_TOUCH_UI)
-        bw_set_sort_menu(window,
-                                   libbalsa_mailbox_get_sort_field(mailbox),
-                                   libbalsa_mailbox_get_sort_type(mailbox));
-#else
 	bw_set_threading_menu(window,
 					libbalsa_mailbox_get_threading_type
 					(mailbox));
-#endif
 	bw_set_filter_menu(window,
 				     libbalsa_mailbox_get_filter(mailbox));
     }
@@ -2561,9 +2490,7 @@ bw_enable_message_menus(BalsaWindow * window, guint msgno)
     enable_store = (enable && balsa_app.address_book_list != NULL);
     bw_action_set_enabled(window, "store-address", enable_store);
 
-#if !defined(ENABLE_TOUCH_UI)
     balsa_window_enable_continue(window);
-#endif /*ENABLE_TOUCH_UI */
 }
 
 /*
@@ -2573,7 +2500,6 @@ bw_enable_message_menus(BalsaWindow * window, guint msgno)
 static void
 bw_enable_edit_menus(BalsaWindow * window, BalsaMessage * bm)
 {
-#if !defined(ENABLE_TOUCH_UI)
     static const gchar * const edit_actions[] = {
         "copy", "copy-message", "select-text"
     };
@@ -2581,7 +2507,6 @@ bw_enable_edit_menus(BalsaWindow * window, BalsaMessage * bm)
 
     bw_actions_set_enabled(window, edit_actions,
                            G_N_ELEMENTS(edit_actions), enable);
-#endif /* ENABLE_TOUCH_UI */
 #ifdef HAVE_HTML_WIDGET
     bw_enable_view_menus(window, bm);
 #endif				/* HAVE_HTML_WIDGET */
@@ -2651,7 +2576,6 @@ enable_empty_trash(BalsaWindow * window, TrashState status)
 void
 balsa_window_enable_continue(BalsaWindow * window)
 {
-#if !defined(ENABLE_TOUCH_UI)
     if (!window)
 	return;
 
@@ -2672,10 +2596,8 @@ balsa_window_enable_continue(BalsaWindow * window)
 
 /*      libbalsa_mailbox_close(balsa_app.draftbox); */
     }
-#endif /* ENABLE_TOUCH_UI */
 }
 
-#if !defined(ENABLE_TOUCH_UI)
 static void
 bw_enable_part_menu_items(BalsaWindow * window)
 {
@@ -2702,7 +2624,6 @@ bw_set_threading_menu(BalsaWindow * window, int option)
 	&& (mailbox = mbnode->mailbox))
 	bw_enable_expand_collapse(window, mailbox);
 }
-#endif /* ENABLE_TOUCH_UI */
 
 static void
 bw_set_filter_menu(BalsaWindow * window, int mask)
@@ -4025,27 +3946,6 @@ balsa_window_find_current_index(BalsaWindow * window)
     return window->current_index;
 }
 
-#if defined(ENABLE_TOUCH_UI)
-static gboolean
-bw_open_mailbox_cb(GtkWidget *widget, GdkEventKey *event, gpointer data)
-{
-    LibBalsaMailbox *mailbox;
-
-    if( (event->state & (GDK_CONTROL_MASK|GDK_SHIFT_MASK)) !=
-        (GDK_CONTROL_MASK|GDK_SHIFT_MASK)) return FALSE;
-    switch(event->keyval) {
-    case 'I': mailbox = balsa_app.inbox;    break;
-    case 'D': mailbox = balsa_app.draftbox; break;
-    case 'O': mailbox = balsa_app.outbox;   break;
-    case 'S': mailbox = balsa_app.sentbox;  break;
-    case 'T': mailbox = balsa_app.trash;    break;
-    default: return FALSE;
-    }
-    balsa_mblist_open_mailbox(mailbox);
-    return TRUE;
-}
-#endif /* ENABLE_TOUCH_UI */
-
 static GtkToggleButton*
 bw_add_check_button(GtkWidget* grid, const gchar* label, gint x, gint y)
 {
@@ -4422,7 +4322,6 @@ empty_trash(BalsaWindow * window)
         enable_empty_trash(window, TRASH_EMPTY);
 }
 
-#if !defined(ENABLE_TOUCH_UI)
 static void
 bw_show_mbtree(BalsaWindow * bw)
 {
@@ -4442,8 +4341,6 @@ bw_show_mbtree(BalsaWindow * bw)
         gtk_paned_set_position(GTK_PANED(parent), 0);
     }
 }
-
-#endif /* ENABLE_TOUCH_UI */
 
 void
 balsa_change_window_layout(BalsaWindow *window)
@@ -4649,19 +4546,15 @@ static void
 bw_select_part_cb(BalsaMessage * bm, gpointer data)
 {
     bw_enable_edit_menus(BALSA_WINDOW(data), bm);
-#if !defined(ENABLE_TOUCH_UI)
     bw_enable_part_menu_items(BALSA_WINDOW(data));
-#endif /*ENABLE_TOUCH_UI */
 }
 
-#if !defined(ENABLE_TOUCH_UI)
 static void
 bw_send_msg_window_destroy_cb(GtkWidget * widget, gpointer data)
 {
     if (balsa_app.main_window)
         balsa_window_enable_continue(BALSA_WINDOW(data));
 }
-#endif /*ENABLE_TOUCH_UI */
 
 
 /* notebook_find_page
@@ -4961,9 +4854,7 @@ balsa_window_increment_progress(BalsaWindow * window, gdouble fraction,
 void
 update_view_menu(BalsaWindow * window)
 {
-#if !defined(ENABLE_TOUCH_UI)
     bw_action_set_boolean(window, "wrap", balsa_app.browse_wrap);
-#endif /* ENABLE_TOUCH_UI */
 }
 
 /* Update the notebook tab label when the mailbox name is changed. */

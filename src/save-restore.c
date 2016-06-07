@@ -154,18 +154,11 @@ load_toolbars(void)
 
    WARNING: may destroy mailbox.
 */
-#if defined(ENABLE_TOUCH_UI)
-#define INBOX_NAME   "In"
-#define SENTBOX_NAME "Sent"
-#define DRAFTS_NAME  "Drafts"
-#define OUTBOX_NAME  "Out"
-#else
 #define INBOX_NAME   "Inbox"
 #define SENTBOX_NAME "Sentbox"
 #define DRAFTS_NAME  "Draftbox"
 #define OUTBOX_NAME  "Outbox"
-#endif /* ENABLE_TOUCH_UI */
-#define TRASH_NAME "Trash"
+#define TRASH_NAME   "Trash"
 
 static void
 sr_special_notify(gpointer data, GObject * mailbox)
@@ -799,11 +792,6 @@ config_global_load(void)
     balsa_app.pgdown_percent = libbalsa_conf_get_int("PageDownPercent=50");
     if (balsa_app.pgdown_percent < 10)
 	balsa_app.pgdown_percent = 10;
-#if defined(ENABLE_TOUCH_UI)
-    balsa_app.do_file_format_check =
-        libbalsa_conf_get_bool("FileFormatCheck=true");
-    balsa_app.enable_view_filter = libbalsa_conf_get_bool("ViewFilter=false");
-#endif /* ENABLE_TOUCH_UI */
 
     balsa_app.show_main_toolbar =
         libbalsa_conf_get_bool("ShowMainWindowToolbar=true");
@@ -1067,13 +1055,8 @@ config_global_load(void)
     balsa_app.root_node =
         balsa_mailbox_node_new_from_dir(balsa_app.local_mail_directory);
 
-#if defined(ENABLE_TOUCH_UI)
-     balsa_app.open_inbox_upon_startup =
-	libbalsa_conf_get_bool("OpenInboxOnStartup=true");
-#else
      balsa_app.open_inbox_upon_startup =
 	libbalsa_conf_get_bool("OpenInboxOnStartup=false");
-#endif /* ENABLE_TOUCH_UI */
     /* debugging enabled */
     balsa_app.debug = libbalsa_conf_get_bool("Debug=false");
 
@@ -1312,10 +1295,6 @@ config_save(void)
     libbalsa_conf_set_bool("AskBeforeSelect", balsa_app.ask_before_select);
     libbalsa_conf_set_bool("PageDownMod", balsa_app.pgdownmod);
     libbalsa_conf_set_int("PageDownPercent", balsa_app.pgdown_percent);
-#if defined(ENABLE_TOUCH_UI)
-    libbalsa_conf_set_bool("FileFormatCheck", balsa_app.do_file_format_check);
-    libbalsa_conf_set_bool("ViewFilter",      balsa_app.enable_view_filter);
-#endif /* ENABLE_TOUCH_UI */
 
     libbalsa_conf_set_bool("ShowMainWindowToolbar",
                            balsa_app.show_main_toolbar);

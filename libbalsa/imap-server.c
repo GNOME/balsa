@@ -216,11 +216,7 @@ libbalsa_imap_server_init(LibBalsaImapServer * imap_server)
     imap_server->used_connections = 0;
     imap_server->used_handles = NULL;
     imap_server->free_handles = NULL;
-#if defined(ENABLE_TOUCH_UI)
-    imap_server->persistent_cache = FALSE;
-#else
     imap_server->persistent_cache = TRUE;
-#endif /* ENABLE_TOUCH_UI */
     imap_server->use_idle = TRUE;
     imap_server->connection_cleanup_id = 
         g_timeout_add_seconds(CONNECTION_CLEANUP_POLL_PERIOD,

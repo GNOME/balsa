@@ -48,11 +48,8 @@ G_BEGIN_DECLS
         SENDMSG_STATE_AUTO_SAVED
     } SendmsgState;
 
-#if defined(ENABLE_TOUCH_UI)
-#define VIEW_MENU_LENGTH 4
-#else
 #define VIEW_MENU_LENGTH 5
-#endif
+
     typedef struct _BalsaSendmsg BalsaSendmsg;
 
     struct _BalsaSendmsg {
@@ -60,9 +57,7 @@ G_BEGIN_DECLS
 	GtkWidget *toolbar;
         LibBalsaAddressView *recipient_view, *replyto_view;
 	GtkWidget *from[2], *recipients[2], *subject[2], *fcc[2];
-#if !defined(ENABLE_TOUCH_UI)
 	GtkWidget *replyto[2];
-#endif                          /* ENABLE_TOUCH_UI */
 	GtkWidget *tree_view;
         gchar *in_reply_to;
         GList *references;

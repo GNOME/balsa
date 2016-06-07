@@ -1572,19 +1572,11 @@ bmbl_core_mailbox(LibBalsaMailbox* mailbox)
 {
     static const int num_core_mailboxes = 5;
     LibBalsaMailbox* core_mailbox[] = {
-#if !defined(ENABLE_TOUCH_UI)
         balsa_app.inbox,
         balsa_app.sentbox,
         balsa_app.draftbox,
         balsa_app.outbox,
         balsa_app.trash
-#else /* defined(ENABLE_TOUCH_UI) */
-        balsa_app.inbox,
-        balsa_app.draftbox,
-        balsa_app.outbox,
-        balsa_app.sentbox,
-        balsa_app.trash
-#endif /* defined(ENABLE_TOUCH_UI) */
     };
     gint i = 0;
 

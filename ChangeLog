@@ -1,3 +1,8 @@
+2016-06-10  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* src/balsa-mime-widget-message.c (expanded_cb): cut redundant
+	dynamic cast.
+
 2016-06-07  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Drop the --enable-touch-ui configuration option and the

@@ -548,11 +548,11 @@ static void
 expanded_cb(GtkExpander * expander, GParamSpec * arg1, GtkLabel * label)
 {
     if (gtk_expander_get_expanded(expander)) {
-        gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
-        gtk_label_set_ellipsize(GTK_LABEL(label), PANGO_ELLIPSIZE_NONE);
+        gtk_label_set_line_wrap(label, TRUE);
+        gtk_label_set_ellipsize(label, PANGO_ELLIPSIZE_NONE);
     } else {
-        gtk_label_set_line_wrap(GTK_LABEL(label), FALSE);
-        gtk_label_set_ellipsize(GTK_LABEL(label), PANGO_ELLIPSIZE_END);
+        gtk_label_set_line_wrap(label, FALSE);
+        gtk_label_set_ellipsize(label, PANGO_ELLIPSIZE_END);
     }
 }
 

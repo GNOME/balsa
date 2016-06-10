@@ -1,5 +1,13 @@
 2016-06-10  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	* src/balsa-mime-widget-message.c (add_header_gchar): comment on
+	why show-all-headers is used to set the initial state of the
+	expander;
+	(add_header_address_list): new parameter show_all_headers;
+	(bmw_message_set_headers_d): use it.
+
+2016-06-10  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* src/balsa-mime-widget-message.c (expanded_cb): cut redundant
 	dynamic cast.
 

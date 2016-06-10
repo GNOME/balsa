@@ -633,6 +633,10 @@ G_GNUC_END_IGNORE_DEPRECATIONS
         g_signal_connect(expander, "notify::expanded",
                          G_CALLBACK(expanded_cb), value_label);
 
+        /*
+         * If we are showing all headers, we initially expand the
+         * header, otherwise collapse it.
+         */
         if(show_all_headers) {
             gtk_label_set_line_wrap(GTK_LABEL(value_label), TRUE);
             gtk_expander_set_expanded(GTK_EXPANDER(expander), TRUE);
@@ -656,7 +660,8 @@ G_GNUC_END_IGNORE_DEPRECATIONS
 static void
 add_header_address_list(BalsaMessage * bm, GtkGrid * grid,
 			gchar * header, gchar * label,
-			InternetAddressList * list)
+			InternetAddressList * list,
+                        gboolean show_all_headers)
 {
     gchar *value;
 
@@ -669,7 +674,7 @@ add_header_address_list(BalsaMessage * bm, GtkGrid * grid,
 
     value = internet_address_list_to_string(list, FALSE);
 
-    add_header_gchar(grid, header, label, value, FALSE);
+    add_header_gchar(grid, header, label, value, show_all_headers);
 
     g_free(value);
 }
@@ -744,9 +749,12 @@ bmw_message_set_headers_d(BalsaMessage           * bm,
                          show_all_headers);
 	g_free(reply_to);
     }
-    add_header_address_list(bm, grid, "to", _("To:"), headers->to_list);
-    add_header_address_list(bm, grid, "cc", _("Cc:"), headers->cc_list);
-    add_header_address_list(bm, grid, "bcc", _("Bcc:"), headers->bcc_list);
+    add_header_address_list(bm, grid, "to", _("To:"), headers->to_list,
+                            show_all_headers);
+    add_header_address_list(bm, grid, "cc", _("Cc:"), headers->cc_list,
+                            show_all_headers);
+    add_header_address_list(bm, grid, "bcc", _("Bcc:"), headers->bcc_list,
+                            show_all_headers);
 
 #if BALSA_SHOW_FCC_AS_WELL_AS_X_BALSA_FCC
     if (headers->fcc_url)

@@ -1,3 +1,8 @@
+2016-06-11  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* src/balsa-mime-widget-message.c (add_header_gchar): in an
+	address, replace '\r' or '\n' with a space.
+
 2016-06-10  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* src/balsa-mime-widget-message.c (add_header_gchar): comment on

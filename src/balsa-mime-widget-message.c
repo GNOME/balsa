@@ -609,6 +609,7 @@ add_header_gchar(GtkGrid * grid, const gchar * header, const gchar * label,
         sanitized = g_strdup(value);
         libbalsa_utf8_sanitize(&sanitized,
                                balsa_app.convert_unknown_8bit, NULL);
+        g_strdelimit(sanitized, "\r\n", ' ');
         value_label = gtk_label_new(sanitized);
         g_free(sanitized);
 

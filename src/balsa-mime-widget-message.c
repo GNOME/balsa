@@ -547,13 +547,9 @@ label_size_allocate_cb(GtkLabel * label, GdkRectangle * rectangle,
 static void
 expanded_cb(GtkExpander * expander, GParamSpec * arg1, GtkLabel * label)
 {
-    if (gtk_expander_get_expanded(expander)) {
-        gtk_label_set_line_wrap(label, TRUE);
-        gtk_label_set_ellipsize(label, PANGO_ELLIPSIZE_NONE);
-    } else {
-        gtk_label_set_line_wrap(label, FALSE);
-        gtk_label_set_ellipsize(label, PANGO_ELLIPSIZE_END);
-    }
+    gtk_label_set_ellipsize(label,
+                            gtk_expander_get_expanded(expander) ?
+                            PANGO_ELLIPSIZE_NONE : PANGO_ELLIPSIZE_END);
 }
 
 #define BALSA_MESSAGE_HEADER "balsa-message-header"
@@ -618,6 +614,7 @@ add_header_gchar(GtkGrid * grid, const gchar * header, const gchar * label,
                                        GTK_STYLE_PROVIDER(css_provider),
                                        GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 
+        gtk_label_set_line_wrap(GTK_LABEL(value_label), TRUE);
         gtk_label_set_line_wrap_mode(GTK_LABEL(value_label), PANGO_WRAP_WORD_CHAR);
         gtk_label_set_selectable(GTK_LABEL(value_label), TRUE);
 #if GTK_CHECK_VERSION(3, 16, 0)
@@ -631,20 +628,20 @@ G_GNUC_END_IGNORE_DEPRECATIONS
         gtk_widget_set_hexpand(value_label, TRUE);
 
         expander = gtk_expander_new(NULL);
-        g_signal_connect(expander, "notify::expanded",
-                         G_CALLBACK(expanded_cb), value_label);
 
         /*
          * If we are showing all headers, we initially expand the
          * header, otherwise collapse it.
          */
-        if(show_all_headers) {
-            gtk_label_set_line_wrap(GTK_LABEL(value_label), TRUE);
+        if (show_all_headers) {
+            gtk_label_set_ellipsize(GTK_LABEL(value_label), PANGO_ELLIPSIZE_NONE);
             gtk_expander_set_expanded(GTK_EXPANDER(expander), TRUE);
         } else {
             gtk_label_set_ellipsize(GTK_LABEL(value_label), PANGO_ELLIPSIZE_END);
             gtk_expander_set_expanded(GTK_EXPANDER(expander), FALSE);
         }
+        g_signal_connect(expander, "notify::expanded",
+                         G_CALLBACK(expanded_cb), value_label);
         g_signal_connect(value_label, "size-allocate",
                          G_CALLBACK(label_size_allocate_cb), expander);
 

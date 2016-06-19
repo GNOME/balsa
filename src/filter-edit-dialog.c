@@ -568,7 +568,7 @@ filters_edit_dialog(GtkWindow * parent)
 
     fe_window = gtk_dialog_new_with_buttons(_("Filters"),
                                             parent,
-                                            BALSA_DIALOG_FLAGS,
+                                            libbalsa_dialog_flags(),
                                             _("_OK"), GTK_RESPONSE_OK,
                                             _("_Cancel"), GTK_RESPONSE_CANCEL,
                                             _("_Help"), GTK_RESPONSE_HELP,

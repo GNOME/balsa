@@ -1152,7 +1152,7 @@ create_generic_dialog(MailboxConfWindow * mcw)
         gtk_dialog_new_with_buttons(_("Remote Mailbox Configurator"),
                                     GTK_WINDOW(balsa_app.main_window),
                                     GTK_DIALOG_DESTROY_WITH_PARENT |
-                                    BALSA_DIALOG_FLAGS,
+                                    libbalsa_dialog_flags(),
                                     mcw->ok_button_name, MCW_RESPONSE,
                                     _("_Close"), GTK_RESPONSE_CLOSE,
                                     NULL);

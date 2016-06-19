@@ -2640,7 +2640,7 @@ balsa_index_pipe(BalsaIndex * index)
         gtk_dialog_new_with_buttons(_("Pipe message through a program"),
                                     GTK_WINDOW(balsa_app.main_window),
                                     GTK_DIALOG_DESTROY_WITH_PARENT |
-                                    BALSA_DIALOG_FLAGS,
+                                    libbalsa_dialog_flags(),
                                     _("_Run"), GTK_RESPONSE_OK,
                                     _("_Cancel"), GTK_RESPONSE_CANCEL,
                                     NULL);

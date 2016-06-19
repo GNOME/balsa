@@ -1,3 +1,43 @@
+2016-06-19  Albrecht Dreß
+
+	Make Gtk3 dialog header bars configurable
+	Basically, a new function libbalsa_dialog_flags() is added to
+	libbalsa.c (or simply expanded to 0 for older Gtk versions than
+	3.12.0).  When being called for the first time, the function
+	checks if the environment variable BALSA_DIALOG_HEADERBAR exists
+	and is set to 0.  Only in this case, the header bars are
+	disabled.  The function call replaces the macro
+	BALSA_DIALOG_FLAGS.
+
+	* configure.ac: remove definition of BALSA_DIALOG_FLAGS.
+	* libbalsa/libbalsa.c (libbalsa_dialog_flags): define it;
+	  (ask_cert_real): use it.
+	* libbalsa/libbalsa.h: declare it.
+	* libbalsa/identity.c (libbalsa_identity_select_dialog),
+	  (libbalsa_identity_config_dialog):
+	* libbalsa/libbalsa-gpgme-cb.c (lb_gpgme_select_key),
+	  (get_passphrase_real):
+	* libbalsa/send.c (ensure_send_progress_dialog):
+	* libbalsa/smtp-server.c (libbalsa_smtp_server_dialog):
+	* src/ab-main.c (libbalsa_dialog_flags):
+	* src/address-book-config.c (create_generic_dialog):
+	* src/balsa-app.c (ask_password_real):
+	* src/balsa-index.c (balsa_index_pipe):
+	* src/balsa-mblist.c (bmbl_mru_show_tree):
+	* src/filter-edit-callbacks.c (fe_edit_condition):
+	* src/filter-edit-dialog.c (filters_edit_dialog):
+	* src/filter-export-dialog.c (filters_export_dialog):
+	* src/folder-conf.c (folder_conf_imap_node), (browse_button_cb),
+	  (subfolder_conf_clicked_ok), (folder_conf_imap_sub_node):
+	* src/information-dialog.c (balsa_information_list):
+	* src/mailbox-conf.c (create_generic_dialog):
+	* src/main-window.c (ensure_check_mail_dialog), (bw_find_real):
+	* src/pref-manager.c (open_preferences_manager):
+	* src/sendmsg-window.c (sw_get_user_codeset),
+	  (quote_parts_select_dlg), (subject_not_empty):
+	* src/store-address.c (store_address_dialog):
+	* src/toolbar-prefs.c (customize_dialog_cb): all use it.
+
 2016-06-18  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Fix saving address when user has only one address book

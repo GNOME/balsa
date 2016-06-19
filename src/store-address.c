@@ -206,7 +206,7 @@ store_address_dialog(StoreAddressInfo * info)
         gtk_dialog_new_with_buttons(_("Store Address"),
                                     GTK_WINDOW(balsa_app.main_window),
                                     GTK_DIALOG_DESTROY_WITH_PARENT |
-                                    BALSA_DIALOG_FLAGS,
+                                    libbalsa_dialog_flags(),
                                     _("_Cancel"), GTK_RESPONSE_CANCEL,
                                     _("_OK"), GTK_RESPONSE_OK,
                                     NULL);

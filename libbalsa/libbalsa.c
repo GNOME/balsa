@@ -578,7 +578,7 @@ ask_cert_real(void *data)
     dialog = gtk_dialog_new_with_buttons(_("SSL/TLS certificate"),
                                          NULL, /* FIXME: NULL parent */
                                          GTK_DIALOG_MODAL |
-                                         BALSA_DIALOG_FLAGS,
+                                         libbalsa_dialog_flags(),
                                          _("_Accept Once"), 0,
                                          _("Accept&_Save"), 1,
                                          _("_Reject"), GTK_RESPONSE_CANCEL, 
@@ -960,3 +960,23 @@ libbalsa_image_error_quark(void)
         quark = g_quark_from_static_string("libbalsa-image-error-quark");
     return quark;
 }
+
+#if GTK_CHECK_VERSION(3, 12, 0)
+GtkDialogFlags
+libbalsa_dialog_flags(void)
+{
+	static GtkDialogFlags dialog_flags = GTK_DIALOG_USE_HEADER_BAR;
+	static gint check_done = 0;
+
+	if (g_atomic_int_get(&check_done) == 0) {
+		const gchar *dialog_env;
+
+		dialog_env = g_getenv("BALSA_DIALOG_HEADERBAR");
+		if ((dialog_env != NULL) && (atoi(dialog_env) == 0)) {
+			dialog_flags = (GtkDialogFlags) 0;
+		}
+		g_atomic_int_set(&check_done, 1);
+	}
+	return dialog_flags;
+}
+#endif

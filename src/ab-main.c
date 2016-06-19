@@ -1047,6 +1047,26 @@ bab_set_intial_address_book(LibBalsaAddressBook * ab,
     g_action_change_state(action, g_variant_new_string(ab->name));
 }
 
+#if GTK_CHECK_VERSION(3, 12, 0)
+GtkDialogFlags
+libbalsa_dialog_flags(void)
+{
+	static GtkDialogFlags dialog_flags = GTK_DIALOG_USE_HEADER_BAR;
+	static gint check_done = 0;
+
+	if (g_atomic_int_get(&check_done) == 0) {
+		const gchar *dialog_env;
+
+		dialog_env = g_getenv("BALSA_DIALOG_HEADERBAR");
+		if ((dialog_env != NULL) && (atoi(dialog_env) == 0)) {
+			dialog_flags = (GtkDialogFlags) 0;
+		}
+		g_atomic_int_set(&check_done, 0);
+	}
+	return dialog_flags;
+}
+#endif
+
 int
 main(int argc, char *argv[])
 {

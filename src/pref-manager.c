@@ -502,7 +502,7 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
         gtk_dialog_new_with_buttons(_("Balsa Preferences"),
                                     GTK_WINDOW(active_win),
                                     GTK_DIALOG_DESTROY_WITH_PARENT |
-                                    BALSA_DIALOG_FLAGS,
+                                    libbalsa_dialog_flags(),
                                     _("_OK"), GTK_RESPONSE_OK,
                                     _("_Apply"), GTK_RESPONSE_APPLY,
                                     _("_Cancel"), GTK_RESPONSE_CANCEL,

@@ -165,7 +165,7 @@ lb_gpgme_select_key(const gchar * user_name, lb_key_sel_md_t mode, GList * keys,
     dialog = gtk_dialog_new_with_buttons(_("Select key"),
 					 parent,
 					 GTK_DIALOG_DESTROY_WITH_PARENT |
-                                         BALSA_DIALOG_FLAGS,
+                                         libbalsa_dialog_flags(),
                                          _("_OK"),     GTK_RESPONSE_OK,
                                          _("_Cancel"), GTK_RESPONSE_CANCEL,
                                          NULL);
@@ -377,7 +377,7 @@ get_passphrase_real(const gchar * uid_hint, const gchar * passphrase_info,
     /* FIXME: create dialog according to the Gnome HIG */
     dialog = gtk_dialog_new_with_buttons(_("Enter Passphrase"), parent,
 					 GTK_DIALOG_DESTROY_WITH_PARENT |
-                                         BALSA_DIALOG_FLAGS,
+                                         libbalsa_dialog_flags(),
                                          _("_OK"),     GTK_RESPONSE_OK,
                                          _("_Cancel"), GTK_RESPONSE_CANCEL,
                                          NULL);

@@ -301,11 +301,6 @@ PKG_CHECK_MODULES(BALSA_AB, [
    $gnome_extras
 ])
 
-PKG_CHECK_MODULES(GTK3_12, [gtk+-3.0 >= 3.12.0],
-	[AC_DEFINE([BALSA_DIALOG_FLAGS], [GTK_DIALOG_USE_HEADER_BAR], [Create dialog with actions in header bar instead of action area])],
-	[AC_DEFINE([BALSA_DIALOG_FLAGS], [0], [])])
-
-
 AC_MSG_CHECKING(whether res_init is available)
 AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <resolv.h>;]],
                                [[res_init();]])],

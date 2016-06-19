@@ -3260,7 +3260,7 @@ ensure_check_mail_dialog(BalsaWindow * window)
 	gtk_dialog_new_with_buttons(_("Checking Mail..."),
                                     GTK_WINDOW(window),
                                     GTK_DIALOG_DESTROY_WITH_PARENT |
-                                    BALSA_DIALOG_FLAGS,
+                                    libbalsa_dialog_flags(),
                                     _("_Hide"), GTK_RESPONSE_CLOSE,
                                     NULL);
 #if HAVE_MACOSX_DESKTOP
@@ -3990,7 +3990,7 @@ bw_find_real(BalsaWindow * window, BalsaIndex * bindex, gboolean again)
             gtk_dialog_new_with_buttons(_("Search mailbox"),
                                         GTK_WINDOW(window),
                                         GTK_DIALOG_DESTROY_WITH_PARENT |
-                                        BALSA_DIALOG_FLAGS,
+                                        libbalsa_dialog_flags(),
 					_("_Help"),   GTK_RESPONSE_HELP,
                                         _("_Close"), GTK_RESPONSE_CLOSE,
                                         NULL);

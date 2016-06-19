@@ -1541,7 +1541,7 @@ sw_get_user_codeset(BalsaSendmsg * bsmsg, gboolean * change_type,
         gtk_dialog_new_with_buttons(_("Choose charset"),
                                     GTK_WINDOW(bsmsg->window),
                                     GTK_DIALOG_DESTROY_WITH_PARENT |
-                                    BALSA_DIALOG_FLAGS,
+                                    libbalsa_dialog_flags(),
                                     _("_OK"), GTK_RESPONSE_OK,
                                     _("_Cancel"), GTK_RESPONSE_CANCEL,
                                     NULL);
@@ -3334,7 +3334,7 @@ quote_parts_select_dlg(GtkTreeStore *tree_store, GtkWindow * parent)
     dialog = gtk_dialog_new_with_buttons(_("Select parts for quotation"),
 					 parent,
 					 GTK_DIALOG_DESTROY_WITH_PARENT |
-                                         BALSA_DIALOG_FLAGS,
+                                         libbalsa_dialog_flags(),
 					 _("_OK"), GTK_RESPONSE_OK,
 					 _("_Cancel"), GTK_RESPONSE_CANCEL,
 					 NULL);
@@ -4979,7 +4979,7 @@ subject_not_empty(BalsaSendmsg * bsmsg)
         gtk_dialog_new_with_buttons(_("No Subject"),
                                     GTK_WINDOW(bsmsg->window),
                                     GTK_DIALOG_MODAL |
-                                    BALSA_DIALOG_FLAGS,
+                                    libbalsa_dialog_flags(),
                                     _("_Cancel"), GTK_RESPONSE_CANCEL,
                                     _("_Send"),   GTK_RESPONSE_OK,
                                     NULL);

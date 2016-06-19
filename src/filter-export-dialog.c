@@ -76,7 +76,7 @@ filters_export_dialog(GtkWindow * parent)
     fex_window =
         gtk_dialog_new_with_buttons(_("Export Filters"),
                                     parent,
-                                    BALSA_DIALOG_FLAGS,
+                                    libbalsa_dialog_flags(),
                                     _("_OK"), GTK_RESPONSE_OK,
                                     _("_Cancel"), GTK_RESPONSE_CANCEL,
                                     _("_Help"), GTK_RESPONSE_HELP,

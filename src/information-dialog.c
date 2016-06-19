@@ -233,7 +233,7 @@ balsa_information_list(GtkWindow *parent, LibBalsaInformationType type,
 	    gtk_dialog_new_with_buttons(_("Information - Balsa"), 
                                         parent,
                                         GTK_DIALOG_DESTROY_WITH_PARENT |
-                                        BALSA_DIALOG_FLAGS,
+                                        libbalsa_dialog_flags(),
                                         _("_Clear"), GTK_RESPONSE_APPLY,
                                         _("Cl_ose"), GTK_RESPONSE_CANCEL,
                                         NULL);

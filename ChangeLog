@@ -1,3 +1,13 @@
+2016-06-18  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Fix saving address when user has only one address book
+	(https://mail.gnome.org/archives/balsa-list/2016-June/msg00030.html)
+
+	* src/store-address.c (store_address_dialog): always set current
+	address book;
+	(store_address_book_frame): no need to check
+	balsa_app.address_book_list != NULL.
+
 2016-06-11  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Set line-wrapping of a long label to TRUE and do not change it.

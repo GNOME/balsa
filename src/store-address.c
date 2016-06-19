@@ -219,6 +219,7 @@ store_address_dialog(StoreAddressInfo * info)
     libbalsa_macosx_menu_for_parent(dialog, GTK_WINDOW(balsa_app.main_window));
 #endif
 
+    info->current_address_book = balsa_app.default_address_book;
     if (balsa_app.address_book_list && balsa_app.address_book_list->next) {
         /* User has more than one address book, so show the options */
         frame = store_address_book_frame(info);
@@ -280,8 +281,11 @@ store_address_from_entries(GtkWindow *window, StoreAddressInfo * info,
 static GtkWidget *
 store_address_book_frame(StoreAddressInfo * info)
 {
+    guint default_ab_offset = 0;
     GtkWidget *hbox;
     GtkWidget *combo_box;
+    guint off;
+    GList *ab_list;
 
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 12);
     gtk_container_set_border_width(GTK_CONTAINER(hbox), 4);
@@ -292,32 +296,24 @@ store_address_book_frame(StoreAddressInfo * info)
     g_signal_connect(combo_box, "changed",
                      G_CALLBACK(store_address_book_menu_cb), info);
 
-    if (balsa_app.address_book_list) {
-        guint default_ab_offset = 0, off;
-        GList *ab_list;
+    /* NOTE: we have to store the default address book index and
+       call set_active() after all books are added to the list or
+       gtk-2.10.4 will lose the setting. */
+    for (off = 0, ab_list = balsa_app.address_book_list;
+         ab_list != NULL;
+         off++, ab_list = ab_list->next) {
+        LibBalsaAddressBook *address_book;
 
-	info->current_address_book = balsa_app.default_address_book;
+        address_book = LIBBALSA_ADDRESS_BOOK(ab_list->data);
+        if (info->current_address_book == NULL)
+            info->current_address_book = address_book;
 
-	/* NOTE: we have to store the default address book index and
-           call set_active() after all books are added to the list or
-           gtk-2.10.4 will lose the setting. */
-	for(off=0, ab_list = balsa_app.address_book_list;
-            ab_list;
-            off++, ab_list = ab_list->next) {
-            LibBalsaAddressBook *address_book;
-
-	    address_book = LIBBALSA_ADDRESS_BOOK(ab_list->data);
-	    if (info->current_address_book == NULL)
-		info->current_address_book = address_book;
-
-	    gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(combo_box),
-                                           address_book->name);
-	    if (address_book == balsa_app.default_address_book)
-                default_ab_offset = off;
-	}
-        gtk_combo_box_set_active(GTK_COMBO_BOX(combo_box),
-                                 default_ab_offset);
+        gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(combo_box),
+                                       address_book->name);
+        if (address_book == balsa_app.default_address_book)
+            default_ab_offset = off;
     }
+    gtk_combo_box_set_active(GTK_COMBO_BOX(combo_box), default_ab_offset);
 
     gtk_box_pack_start(GTK_BOX(hbox), combo_box, TRUE, TRUE, 0);
 

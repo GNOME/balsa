@@ -1061,7 +1061,7 @@ libbalsa_dialog_flags(void)
 		if ((dialog_env != NULL) && (atoi(dialog_env) == 0)) {
 			dialog_flags = (GtkDialogFlags) 0;
 		}
-		g_atomic_int_set(&check_done, 0);
+		g_atomic_int_set(&check_done, 1);
 	}
 	return dialog_flags;
 }

@@ -1,3 +1,8 @@
+2016-06-19  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* src/ab-main.c (libbalsa_dialog_flags): set check_done to a
+	non-zero value.
+
 2016-06-19  Albrecht Dreß
 
 	Make Gtk3 dialog header bars configurable

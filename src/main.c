@@ -693,9 +693,8 @@ real_main(int argc, char *argv[])
 
     balsa_check_open_compose_window();
 
-    gtk_widget_show(window);
-
     g_idle_add((GSourceFunc) scan_mailboxes_idle_cb, NULL);
+    g_idle_add((GSourceFunc) balsa_window_fix_paned, balsa_app.main_window);
     g_timeout_add_seconds(1801, (GSourceFunc) periodic_expunge_cb, NULL);
 
     if (cmd_check_mail_on_startup || balsa_app.check_mail_upon_startup)

@@ -2248,8 +2248,6 @@ balsa_window_new()
                                balsa_app.show_notebook_tabs);
     gtk_notebook_set_show_border (GTK_NOTEBOOK(window->notebook), FALSE);
     gtk_notebook_set_scrollable (GTK_NOTEBOOK (window->notebook), TRUE);
-    g_signal_connect(G_OBJECT(window->notebook), "size_allocate",
-                     G_CALLBACK(bw_notebook_size_allocate_cb), window);
     g_signal_connect(G_OBJECT(window->notebook), "switch_page",
                      G_CALLBACK(bw_notebook_switch_page_cb), window);
     gtk_drag_dest_set (GTK_WIDGET (window->notebook), GTK_DEST_DEFAULT_ALL,
@@ -2281,8 +2279,6 @@ balsa_window_new()
                       GTK_WIDGET(balsa_app.mblist));
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(window->mblist),
                                    GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-    g_signal_connect(G_OBJECT(balsa_app.mblist), "size_allocate",
-		     G_CALLBACK(bw_mblist_size_allocate_cb), window);
     g_signal_connect_swapped(balsa_app.mblist, "has-unread-mailbox",
 		             G_CALLBACK(bw_enable_next_unread), window);
     balsa_mblist_default_signal_bindings(balsa_app.mblist);
@@ -2369,6 +2365,26 @@ balsa_window_new()
 
     gtk_widget_show(GTK_WIDGET(window));
     return GTK_WIDGET(window);
+}
+
+gboolean
+balsa_window_fix_paned(BalsaWindow *window)
+{
+    if (balsa_app.show_mblist) {
+        gtk_paned_set_position(GTK_PANED(window->paned_master),
+                               balsa_app.mblist_width);
+    }
+    if (balsa_app.previewpane) {
+        gtk_paned_set_position(GTK_PANED(window->paned_slave),
+                               balsa_app.notebook_height);
+    }
+
+    g_signal_connect(balsa_app.mblist, "size_allocate",
+                     G_CALLBACK(bw_mblist_size_allocate_cb), window);
+    g_signal_connect(window->notebook, "size_allocate",
+                     G_CALLBACK(bw_notebook_size_allocate_cb), window);
+
+    return FALSE;
 }
 
 /*

@@ -1,3 +1,13 @@
+2016-06-22  Albrecht Dreß
+
+	Fix shrinking message list
+
+	* src/main-window.c (balsa_window_new),
+	(balsa_window_fix_paned): set the size of the elements of the
+	main window in an idle callback instead of the window creator;
+	* src/main-window.h: export the idle callback;
+	* src/main.c (real_main): add the idle call.
+
 2016-06-19  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* src/ab-main.c (libbalsa_dialog_flags): set check_done to a

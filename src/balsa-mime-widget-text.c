@@ -37,10 +37,7 @@
 #include "balsa-cite-bar.h"
 
 #if HAVE_GTKSOURCEVIEW
-#include <gtksourceview/gtksourceview.h>
-#include <gtksourceview/gtksourcebuffer.h>
-#include <gtksourceview/gtksourcelanguage.h>
-#include <gtksourceview/gtksourcelanguagemanager.h>
+#include <gtksourceview/gtksource.h>
 #endif
 
 

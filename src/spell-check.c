@@ -32,7 +32,7 @@
 #include "balsa-icons.h"
 
 #if HAVE_GTKSOURCEVIEW
-#include <gtksourceview/gtksourcebuffer.h>
+#include <gtksourceview/gtksource.h>
 #endif                          /* HAVE_GTKSOURCEVIEW */
 
 #define BALSA_SPELL_CHECK_PADDING 6

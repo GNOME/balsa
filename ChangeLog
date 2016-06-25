@@ -1,3 +1,12 @@
+2016-06-25  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	As of gtksource version 2.21.?, only <gtksourceview/gtksource.h>
+	can be included directly.
+
+	* libbalsa/libbalsa.c: include only gtksource.h.
+	* src/balsa-mime-widget-text.c: ditto.
+	* src/spell-check.c: ditto.
+
 2016-06-22  Albrecht Dreß
 
 	Fix shrinking message list

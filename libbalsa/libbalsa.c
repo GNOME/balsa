@@ -50,12 +50,7 @@
 #endif                          /* HAVE_COMPFACE */
 
 #if HAVE_GTKSOURCEVIEW
-#include <gtksourceview/gtksourceview.h>
-#include <gtksourceview/gtksourcebuffer.h>
-#include <gtksourceview/gtksourcelanguage.h>
-#include <gtksourceview/gtksourcelanguagemanager.h>
-#include <gtksourceview/gtksourcestylescheme.h>
-#include <gtksourceview/gtksourcestyleschememanager.h>
+#include <gtksourceview/gtksource.h>
 #endif
 
 #include "misc.h"

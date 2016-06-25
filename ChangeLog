@@ -1,5 +1,12 @@
 2016-06-25  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Symbolic icon names like pan-down-symbolic now contain hyphens
+	and can no longer use underscores.
+
+	* src/balsa-message.c: fix symbolic icon names.
+
+2016-06-25  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	As of gtksource version 2.21.?, only <gtksourceview/gtksource.h>
 	can be included directly.
 

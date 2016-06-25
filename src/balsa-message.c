@@ -616,14 +616,14 @@ bm_find_bar_new(BalsaMessage * bm)
     gtk_container_add(GTK_CONTAINER(tool_item), hbox);
     gtk_toolbar_insert(GTK_TOOLBAR(toolbar), tool_item, -1);
 
-    image = gtk_image_new_from_icon_name("pan_up_symbolic", GTK_ICON_SIZE_BUTTON);
+    image = gtk_image_new_from_icon_name("pan-up-symbolic", GTK_ICON_SIZE_BUTTON);
     tool_item = gtk_tool_button_new(image, _("Previous"));
     bm->find_prev = GTK_WIDGET(tool_item);
     gtk_tool_item_set_is_important(tool_item, TRUE);
     g_signal_connect(tool_item, "clicked", G_CALLBACK(bm_find_prev_cb), bm);
     gtk_toolbar_insert(GTK_TOOLBAR(toolbar), tool_item, -1);
 
-    image = gtk_image_new_from_icon_name("pan_down_symbolic", GTK_ICON_SIZE_BUTTON);
+    image = gtk_image_new_from_icon_name("pan-down-symbolic", GTK_ICON_SIZE_BUTTON);
     tool_item = gtk_tool_button_new(image, _("Next"));
     bm->find_next = GTK_WIDGET(tool_item);
     gtk_tool_item_set_is_important(tool_item, TRUE);

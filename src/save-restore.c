@@ -883,7 +883,7 @@ config_global_load(void)
     /* Spelling options ... */
     libbalsa_conf_push_group("Spelling");
 
-#if HAVE_GTKSPELL
+#if HAVE_GSPELL || HAVE_GTKSPELL
     balsa_app.spell_check_lang =
         libbalsa_conf_get_string("SpellCheckLanguage");
     balsa_app.spell_check_active =
@@ -1362,7 +1362,7 @@ config_save(void)
     libbalsa_conf_remove_group("Spelling");
     libbalsa_conf_push_group("Spelling");
 
-#if HAVE_GTKSPELL
+#if HAVE_GSPELL || HAVE_GTKSPELL
     libbalsa_conf_set_string("SpellCheckLanguage",
                              balsa_app.spell_check_lang);
     libbalsa_conf_set_bool("SpellCheckActive", 

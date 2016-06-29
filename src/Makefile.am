@@ -86,27 +86,27 @@ balsa_print_source = print-gtk.c	\
 	balsa-print-object-text.c	\
 	balsa-print-object-text.h
 
-if BUILD_WITH_GTKSPELL
-balsa_gtkspell_extra =
-balsa_gtkspell_extra_dist =	\
+if BUILD_WITH_SPELL_CHECKER
+balsa_spell_extra =
+balsa_spell_extra_dist =	\
 		spell-check.c		\
 		spell-check.h
 else
-balsa_gtkspell_extra_dist =
-balsa_gtkspell_extra =		\
+balsa_spell_extra_dist =
+balsa_spell_extra =		\
 		spell-check.c		\
 		spell-check.h
 endif
 
 balsa_SOURCES =			\
 	$(balsa_BASE_SRCLIST)	\
-	$(balsa_gtkspell_extra) \
+	$(balsa_spell_extra) \
 	$(balsa_print_source)
 
 
 DISTCLEANFILES = $(balsa_IDL_SRCLIST)
 
-EXTRA_DIST = $(balsa_gtkspell_extra_dist)
+EXTRA_DIST = $(balsa_spell_extra_dist)
 
 AM_CPPFLAGS = \
 	-DGNOMELOCALEDIR=\""$(datadir)/locale"\" \

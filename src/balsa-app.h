@@ -345,13 +345,13 @@ extern struct BalsaApplication {
     LibBalsaAddressBook *default_address_book;
 
     /* spell checking */
-#if HAVE_GTKSPELL
+#if HAVE_GSPELL || HAVE_GTKSPELL
     gchar   *spell_check_lang;
     gboolean spell_check_active;
-#else                           /* HAVE_GTKSPELL */
+#else                           /* HAVE_GSPELL */
     gboolean check_sig;
     gboolean check_quoted;
-#endif                          /* HAVE_GTKSPELL */
+#endif                          /* HAVE_GSPELL */
 
     /* Information messages */
     BalsaInformationShow information_message;

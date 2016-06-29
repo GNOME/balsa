@@ -1,3 +1,20 @@
+2016-06-28  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Support Gspell as an alternative to GtkSpell
+
+	* configure.ac: replace --with-gtkspell with
+	--with-spell-checker = (no|gtkspell|gspell) and change the
+	AM_CONDITIONAL BUILD_WITH_GTK_SPELL to BUILD_WITH_SPELL_CHECKER.
+	* src/Makefile.am: use the new AM_CONDITIONAL.
+	* src/balsa-app.c (balsa_app_init): support Gspell.
+	* src/balsa-app.h: ditto.
+	* src/pref-manager.c (apply_prefs), (set_prefs): ditto.
+	* src/save-restore.c (config_global_load), (config_save): ditto.
+	* src/sendmsg-window.c (balsa_sendmsg_destroy_handler),
+	(create_text_area), (create_lang_menu), (message_postpone),
+	(set_locale), (sw_spell_check_change_state), (lang_set_cb),
+	(sendmsg_window_new): Gspell has a different API from GtkSpell.
+
 2016-06-25  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Symbolic icon names like pan-down-symbolic now contain hyphens

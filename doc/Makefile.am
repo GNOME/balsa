@@ -32,17 +32,17 @@ balsa_help_files =						\
 
 HELP_LINGUAS = de es fr sl
 
-if BUILD_WITH_GTKSPELL
-balsa_gtkspell_extra =
+if BUILD_WITH_SPELL_CHECKER
+balsa_spell_extra =
 helpdirs = C $(HELP_LINGUAS)
-balsa_gtkspell_extra_dist = $(foreach lc,$(helpdirs),$(lc)/preferences-spelling.page) #
+balsa_spell_extra_dist = $(foreach lc,$(helpdirs),$(lc)/preferences-spelling.page) #
 else
-balsa_gtkspell_extra_dist =
-balsa_gtkspell_extra = preferences-spelling.page
+balsa_spell_extra_dist =
+balsa_spell_extra = preferences-spelling.page
 endif
 
-HELP_FILES   = $(balsa_help_files) $(balsa_gtkspell_extra)
-EXTRA_DIST   = $(balsa_gtkspell_extra_dist)
+HELP_FILES   = $(balsa_help_files) $(balsa_spell_extra)
+EXTRA_DIST   = $(balsa_spell_extra_dist)
 
 HELP_EXTRA   = balsa.entities
 

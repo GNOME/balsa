@@ -390,13 +390,13 @@ balsa_app_init(void)
     balsa_app.filters=NULL;
 
     /* spell check */
-#if HAVE_GTKSPELL
+#if HAVE_GSPELL || HAVE_GTKSPELL
     balsa_app.spell_check_lang = NULL;
     balsa_app.spell_check_active = FALSE;
-#else                           /* HAVE_GTKSPELL */
+#else                           /* HAVE_GSPELL */
     balsa_app.check_sig = DEFAULT_CHECK_SIG;
     balsa_app.check_quoted = DEFAULT_CHECK_QUOTED;
-#endif                          /* HAVE_GTKSPELL */
+#endif                          /* HAVE_GSPELL */
 
     /* Information messages */
     balsa_app.information_message = 0;

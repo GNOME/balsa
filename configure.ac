@@ -131,10 +131,11 @@ AC_ARG_WITH([gtksourceview],
                   [Use GtkSourceView-3 if available (default=no)]),
 		  [with_gtksourceview=$withval],[with_gtksourceview=no])
 
-AC_ARG_WITH([gtkspell],
-   AC_HELP_STRING([--with-gtkspell],
-                  [Use GtkSpell/enchant if available (default=no)]),
-		  [with_gtkspell=$withval],[with_gtkspell=no])
+AC_ARG_WITH([spell-checker],
+            AC_HELP_STRING([--with-spell-checker=(no|gtkspell|gspell)],
+                           [select the external spell checker (default no)]),
+            [use_spell_checker=$withval],
+            [use_spell_checker=no])
 
 AC_ARG_WITH(iconv,      
    AC_HELP_STRING([--with-iconv=DIR],
@@ -698,8 +699,14 @@ dnl #####################################################################
 
 # Spell check detection.
 #
-AC_MSG_CHECKING([whether to configure for gtkspell/enchant])
-if test x$with_gtkspell != xno; then
+AC_MSG_CHECKING(whether to use an external spell checker)
+case "$use_spell_checker" in
+    gspell)
+    AC_MSG_RESULT([configure gspell])
+    PKG_CHECK_MODULES(SPELL, [ gspell-1 ])
+    AC_DEFINE(HAVE_GSPELL,1,[Defined when Gspell can be used.])
+    ;;
+    gtkspell)
     if $PKG_CONFIG --atleast-version=3.0.3 gtkspell3-3.0; then
         AC_MSG_RESULT([gtkspell version >= 3.0.3])
         PKG_CHECK_MODULES(SPELL, [ gtkspell3-3.0 ])
@@ -710,13 +717,18 @@ if test x$with_gtkspell != xno; then
         PKG_CHECK_MODULES(SPELL, [ gtkspell3-3.0 enchant ])
     fi
     AC_DEFINE(HAVE_GTKSPELL,1,[Defined when GtkSpell can be used.])
-else
+    ;;
+    no)
     AC_MSG_RESULT([configure enchant])
     PKG_CHECK_MODULES(SPELL, [ enchant ])
-fi
+    ;;
+    *)
+    AC_MSG_ERROR([bad option $use_spell_checker])
+    ;;
+esac
 BALSA_CFLAGS="$BALSA_CFLAGS $SPELL_CFLAGS"
 BALSA_LIBS="$BALSA_LIBS $SPELL_LIBS"
-AM_CONDITIONAL([BUILD_WITH_GTKSPELL], [test $with_gtkspell = "yes"])
+AM_CONDITIONAL([BUILD_WITH_SPELL_CHECKER], [test $use_spell_checker != "no"])
 
 dnl #####################################################################
 dnl 6. Typedefs, structures and compiler characteristics.
@@ -884,7 +896,7 @@ echo "                 Use GPGME: $gpgmecfg"
 echo "                  Use LDAP: $with_ldap"
 echo "                   Use GSS: $with_gss"
 echo "                Use SQLite: $with_sqlite"
-echo "              Use GtkSpell: $with_gtkspell"
+echo "    External spell checker: $use_spell_checker"
 echo "             Use Libnotify: $with_libnotify"
 echo "         Use GtkSourceView: $with_gtksourceview"
 echo "              Use Compface: $with_compface"

@@ -1040,7 +1040,7 @@ apply_prefs(GtkDialog * pbox)
     balsa_app.empty_trash_on_exit =
         gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pui->empty_trash));
 
-#if !HAVE_GTKSPELL
+#if !HAVE_GSPELL && !HAVE_GTKSPELL
     /* spell checking */
     balsa_app.check_sig =
         gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
@@ -1282,7 +1282,7 @@ set_prefs(void)
     pm_combo_box_set_level(pui->default_threading_type,
                            pui->threading_type_index);
 
-#if !HAVE_GTKSPELL
+#if !HAVE_GSPELL && !HAVE_GTKSPELL
     /* spelling */
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->spell_check_sig),
                                  balsa_app.check_sig);

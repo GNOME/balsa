@@ -705,6 +705,9 @@ case "$use_spell_checker" in
     AC_MSG_RESULT([configure gspell])
     PKG_CHECK_MODULES(SPELL, [ gspell-1 ])
     AC_DEFINE(HAVE_GSPELL,1,[Defined when Gspell can be used.])
+    if $PKG_CONFIG --atleast-version=1.1.2 gspell-1; then
+        AC_DEFINE(HAVE_GSPELL_1_2,1,[Defined when Gspell API is version 1.2.])
+    fi
     ;;
     gtkspell)
     if $PKG_CONFIG --atleast-version=3.0.3 gtkspell3-3.0; then

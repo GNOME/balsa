@@ -1,3 +1,13 @@
+2016-06-30  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Use Gspell-1.2 API
+
+	* configure.ac: check whether we can use the Gspell-1.2 API;
+	* src/sendmsg-window.c (create_text_area): if so, set the
+	enable-language-menu property, to allow the user to change the
+	spell-checker language from the context menu as well as from
+	Balsa's menubar menu.
+
 2016-06-28  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Support Gspell as an alternative to GtkSpell

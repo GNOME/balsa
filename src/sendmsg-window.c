@@ -2887,6 +2887,9 @@ create_text_area(BalsaSendmsg * bsmsg)
 #if HAVE_GSPELL
     GspellTextBuffer *gspell_buffer;
     GspellChecker *checker;
+#if HAVE_GSPELL_1_2
+    GspellTextView *gspell_view;
+#endif                          /* HAVE_GSPELL_1_2 */
 #endif                          /* HAVE_GSPELL */
     GtkWidget *scroll;
 
@@ -2938,6 +2941,11 @@ create_text_area(BalsaSendmsg * bsmsg)
     checker = gspell_checker_new(NULL);
     gspell_text_buffer_set_spell_checker(gspell_buffer, checker);
     g_object_unref(checker);
+
+#if HAVE_GSPELL_1_2
+    gspell_view = gspell_text_view_get_from_gtk_text_view(text_view);
+    gspell_text_view_set_enable_language_menu(gspell_view, TRUE);
+#endif                          /* HAVE_GSPELL_1_2 */
 #endif                          /* HAVE_GSPELL */
 
     scroll = gtk_scrolled_window_new(NULL, NULL);

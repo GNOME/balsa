@@ -915,4 +915,9 @@ if test x"$BALSA_FROM_GIT" = xyes ; then
 	echo "or just plain not work. Use it at your own risk. You have been warned."
 	echo "======================================================================"
 	echo ""
+        if test x$with_gnome_keyring == xyes ; then
+            AC_MSG_ERROR([Cannot build in a git tree with deprecated GnomeKeyring.
+                  Either install and configure with libsecret
+                  or configure --without-gnome.])
+        fi
 fi

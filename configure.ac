@@ -786,7 +786,7 @@ if test -d "${srcdir}/.git" ; then
 -DGTK_DISABLE_SINGLE_INCLUDES \
 -DNM_DISABLE_DEPRECATED \
 -DPANGO_DISABLE_DEPRECATED \
--D_FORTIFY_SOURCE=2 \
+-U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2 \
 "
 
     if test x"$use_html_widget" != xgtkhtml2 ; then

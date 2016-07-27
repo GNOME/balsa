@@ -1,5 +1,15 @@
 2016-07-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Andreas Schmidt suggested an improvement to the list of identities
+	in the mailbox properties dialog.
+	<URL:https://mail.gnome.org/archives/balsa-list/2016-July/msg00034.html>
+
+	* src/mailbox-conf.c (mailbox_conf_view_new_full): include the
+	  identity name as well as the mailing address in the identities
+	  combo-box.
+
+2016-07-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Since porting to GtkApplication, command line options have been
 	handled in a subsequent invocation of Balsa, but not in the
 	startup invocation.

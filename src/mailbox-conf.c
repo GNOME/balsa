@@ -1387,6 +1387,12 @@ create_imap_mailbox_dialog(MailboxConfWindow *mcw)
  * grid:       the grid in which to place the widgets;
  * row:         the row of the grid in which to start.
  */
+enum {
+    IDENTITY_COMBO_BOX_ADDRESS_COLUMN = 0,
+    IDENTITY_COMBO_BOX_IDENTITY_NAME_COLUMN,
+    IDENTITY_COMBO_BOX_N_COLUMNS
+};
+
 static BalsaMailboxConfView *
 mailbox_conf_view_new_full(LibBalsaMailbox * mailbox,
                            GtkWindow * window,
@@ -1401,6 +1407,8 @@ mailbox_conf_view_new_full(LibBalsaMailbox * mailbox,
     GList *list;
     const gchar *identity_name;
     gint active;
+    GtkListStore *list_store;
+    GtkCellRenderer *cell;
 
     view_info = g_new(BalsaMailboxConfView, 1);
     g_object_weak_ref(G_OBJECT(window), (GWeakNotify) g_free, view_info);
@@ -1410,26 +1418,51 @@ mailbox_conf_view_new_full(LibBalsaMailbox * mailbox,
     if (size_group)
         gtk_size_group_add_widget(size_group, label);
 
-    view_info->identity_combo_box = widget = gtk_combo_box_text_new();
-    if (mcw)
-        g_signal_connect(view_info->identity_combo_box, "changed",
-                         G_CALLBACK(check_for_blank_fields), mcw);
+    list_store = gtk_list_store_new(IDENTITY_COMBO_BOX_N_COLUMNS,
+                                    G_TYPE_STRING, G_TYPE_STRING);
+    view_info->identity_combo_box = widget =
+        gtk_combo_box_new_with_model(GTK_TREE_MODEL(list_store));
+
+    cell = gtk_cell_renderer_text_new();
+    gtk_cell_layout_pack_start(GTK_CELL_LAYOUT(widget), cell, TRUE);
+    gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(widget), cell,
+                                   "text", IDENTITY_COMBO_BOX_IDENTITY_NAME_COLUMN,
+                                   NULL);
+    cell = gtk_cell_renderer_text_new();
+    gtk_cell_layout_pack_start(GTK_CELL_LAYOUT(widget), cell, TRUE);
+    gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(widget), cell,
+                                   "text", IDENTITY_COMBO_BOX_ADDRESS_COLUMN,
+                                   NULL);
+
     gtk_label_set_mnemonic_widget(GTK_LABEL(label), widget);
     identity_name = libbalsa_mailbox_get_identity_name(mailbox);
+
     for (list = balsa_app.identities, active = 0; list;
          list = list->next, ++active) {
         LibBalsaIdentity *ident = list->data;
-        gchar *name;
+        gchar *address;
+        GtkTreeIter iter;
 
-        name = internet_address_to_string(ident->ia, FALSE);
-        gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(widget), name);
-        g_free(name);
+        address = internet_address_to_string(ident->ia, FALSE);
+        gtk_list_store_append(list_store, &iter);
+        gtk_list_store_set(list_store, &iter,
+                           IDENTITY_COMBO_BOX_IDENTITY_NAME_COLUMN,
+                           ident->identity_name,
+                           IDENTITY_COMBO_BOX_ADDRESS_COLUMN, address,
+                           -1);
+        g_free(address);
+
         if (identity_name
             && strcmp(identity_name, ident->identity_name) == 0)
             gtk_combo_box_set_active(GTK_COMBO_BOX(widget), active);
     }
+
     gtk_widget_set_hexpand(widget, TRUE);
     gtk_grid_attach(GTK_GRID(grid), widget, 1, row, 1, 1);
+
+    if (mcw)
+        g_signal_connect(view_info->identity_combo_box, "changed",
+                         G_CALLBACK(check_for_blank_fields), mcw);
     if (callback)
         g_signal_connect_swapped(view_info->identity_combo_box, "changed",
                                  callback, window);

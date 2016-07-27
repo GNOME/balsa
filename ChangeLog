@@ -1,3 +1,12 @@
+2016-07-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Since porting to GtkApplication, command line options have been
+	handled in a subsequent invocation of Balsa, but not in the
+	startup invocation.
+
+	* src/main.c (real_main), (parse_options), (handle_remote),
+	  (command_line_cb): handle command line options at startup time.
+
 2016-07-24  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* configure.ac: issue an error if building in a git tree with

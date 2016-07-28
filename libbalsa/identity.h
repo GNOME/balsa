@@ -144,6 +144,10 @@ G_BEGIN_DECLS
                                          LibBalsaIdentity * initial_id,
                                          LibBalsaIdentityCallback update,
                                          gpointer data);
+    GtkWidget * libbalsa_identity_combo_box(GList       * identities,
+                                            const gchar * active_name,
+                                            GCallback     changed_cb,
+                                            gpointer      changed_data);
 
     LibBalsaIdentity* libbalsa_identity_new_config(const gchar* name);
     void libbalsa_identity_save(LibBalsaIdentity* id, const gchar* prefix);

@@ -2428,52 +2428,9 @@ sw_combo_box_changed(GtkComboBox * combo_box, BalsaSendmsg * bsmsg)
 static void
 create_from_entry(GtkWidget * grid, BalsaSendmsg * bsmsg)
 {
-    GList *list;
-    GtkListStore *store;
-    GtkCellRenderer *renderer;
-
-    /* For each identity, store the address, the identity name, and a
-     * ref to the identity in a combo-box.
-     * Note: we can't depend on balsa_app.identities staying in the same
-     * order while the compose window is open, so we need a ref to the
-     * actual identity. */
-    store = gtk_list_store_new(3,
-                               G_TYPE_STRING,
-                               G_TYPE_STRING,
-                               G_TYPE_OBJECT);
-    for (list = balsa_app.identities; list; list = list->next) {
-        LibBalsaIdentity *ident;
-        gchar *from, *name;
-        GtkTreeIter iter;
-
-        ident = list->data;
-        from = internet_address_to_string(ident->ia, FALSE);
-	name = g_strconcat("(", ident->identity_name, ")", NULL);
-
-        gtk_list_store_append(store, &iter);
-        gtk_list_store_set(store, &iter,
-                           0, from,
-                           1, name,
-                           2, ident,
-                           -1);
-
-        g_free(from);
-        g_free(name);
-    }
-    bsmsg->from[1] = gtk_combo_box_new_with_model(GTK_TREE_MODEL(store));
-    renderer = gtk_cell_renderer_text_new();
-    gtk_cell_layout_pack_start(GTK_CELL_LAYOUT(bsmsg->from[1]), renderer,
-                               TRUE);
-    gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(bsmsg->from[1]),
-                                   renderer, "text", 0, NULL);
-    renderer = gtk_cell_renderer_text_new();
-    gtk_cell_layout_pack_start(GTK_CELL_LAYOUT(bsmsg->from[1]), renderer,
-	                       FALSE);
-    gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(bsmsg->from[1]),
-                                   renderer, "text", 1, NULL);
-    g_object_unref(store);
-    g_signal_connect(bsmsg->from[1], "changed",
-                     G_CALLBACK(sw_combo_box_changed), bsmsg);
+    bsmsg->from[1] =
+        libbalsa_identity_combo_box(balsa_app.identities, NULL,
+                                    G_CALLBACK(sw_combo_box_changed), bsmsg);
     create_email_or_string_entry(bsmsg, grid, _("F_rom:"), 0, bsmsg->from);
 }
 

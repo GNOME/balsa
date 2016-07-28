@@ -1,3 +1,19 @@
+2016-07-28  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Implement a GtkComboBox for selecting a LibBalsaIdentity, and
+	use it for the mailbox properties dialog and as the From address
+	in the compose window.
+
+	* libbalsa/identity.c (libbalsa_identity_combo_box): implement
+	  the widget;
+	* libbalsa/identity.h: export it;
+	* src/mailbox-conf.c (check_for_blank_fields): allow NULL
+	  argument;
+	  (mailbox_conf_view_new_full): use the widget;
+	  (mailbox_conf_view_check): get the identity from the widget
+	  instead of the list;
+	* src/sendmsg-window.c (create_from_entry): use the widget.
+
 2016-07-28  Albrecht Dreß
 
 	Fix a bug in the configure script discovered by Jack

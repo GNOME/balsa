@@ -730,7 +730,12 @@ mailbox_conf_set_values(MailboxConfWindow *mcw)
 static void
 check_for_blank_fields(GtkWidget *widget, MailboxConfWindow *mcw)
 {
-    gboolean sensitive = TRUE;
+    gboolean sensitive;
+
+    if (mcw == NULL || mcw->window == NULL)
+        return;
+
+    sensitive = TRUE;
 
     if (mcw->mailbox_name &&!*gtk_entry_get_text(GTK_ENTRY(mcw->mailbox_name)))
 	sensitive = FALSE;
@@ -1404,11 +1409,7 @@ mailbox_conf_view_new_full(LibBalsaMailbox * mailbox,
     GtkWidget *label;
     BalsaMailboxConfView *view_info;
     GtkWidget *widget;
-    GList *list;
     const gchar *identity_name;
-    gint active;
-    GtkListStore *list_store;
-    GtkCellRenderer *cell;
 
     view_info = g_new(BalsaMailboxConfView, 1);
     g_object_weak_ref(G_OBJECT(window), (GWeakNotify) g_free, view_info);
@@ -1418,54 +1419,18 @@ mailbox_conf_view_new_full(LibBalsaMailbox * mailbox,
     if (size_group)
         gtk_size_group_add_widget(size_group, label);
 
-    list_store = gtk_list_store_new(IDENTITY_COMBO_BOX_N_COLUMNS,
-                                    G_TYPE_STRING, G_TYPE_STRING);
+    identity_name = libbalsa_mailbox_get_identity_name(mailbox);
     view_info->identity_combo_box = widget =
-        gtk_combo_box_new_with_model(GTK_TREE_MODEL(list_store));
-
-    cell = gtk_cell_renderer_text_new();
-    gtk_cell_layout_pack_start(GTK_CELL_LAYOUT(widget), cell, TRUE);
-    gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(widget), cell,
-                                   "text", IDENTITY_COMBO_BOX_IDENTITY_NAME_COLUMN,
-                                   NULL);
-    cell = gtk_cell_renderer_text_new();
-    gtk_cell_layout_pack_start(GTK_CELL_LAYOUT(widget), cell, TRUE);
-    gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(widget), cell,
-                                   "text", IDENTITY_COMBO_BOX_ADDRESS_COLUMN,
-                                   NULL);
+        libbalsa_identity_combo_box(balsa_app.identities, identity_name,
+                                    G_CALLBACK(check_for_blank_fields), mcw);
 
     gtk_label_set_mnemonic_widget(GTK_LABEL(label), widget);
-    identity_name = libbalsa_mailbox_get_identity_name(mailbox);
-
-    for (list = balsa_app.identities, active = 0; list;
-         list = list->next, ++active) {
-        LibBalsaIdentity *ident = list->data;
-        gchar *address;
-        GtkTreeIter iter;
-
-        address = internet_address_to_string(ident->ia, FALSE);
-        gtk_list_store_append(list_store, &iter);
-        gtk_list_store_set(list_store, &iter,
-                           IDENTITY_COMBO_BOX_IDENTITY_NAME_COLUMN,
-                           ident->identity_name,
-                           IDENTITY_COMBO_BOX_ADDRESS_COLUMN, address,
-                           -1);
-        g_free(address);
-
-        if (identity_name
-            && strcmp(identity_name, ident->identity_name) == 0)
-            gtk_combo_box_set_active(GTK_COMBO_BOX(widget), active);
-    }
 
     gtk_widget_set_hexpand(widget, TRUE);
     gtk_grid_attach(GTK_GRID(grid), widget, 1, row, 1, 1);
 
-    if (mcw)
-        g_signal_connect(view_info->identity_combo_box, "changed",
-                         G_CALLBACK(check_for_blank_fields), mcw);
     if (callback)
-        g_signal_connect_swapped(view_info->identity_combo_box, "changed",
-                                 callback, window);
+        g_signal_connect_swapped(widget, "changed", callback, window);
 
 #ifdef HAVE_GPGME
     {
@@ -1567,6 +1532,8 @@ mailbox_conf_view_check(BalsaMailboxConfView * view_info,
 			LibBalsaMailbox * mailbox)
 {
     gboolean changed;
+    GtkComboBox *combo_box;
+    GtkTreeIter iter;
     gint active;
 
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
@@ -1575,7 +1542,7 @@ mailbox_conf_view_check(BalsaMailboxConfView * view_info,
 
     changed = FALSE;
 
-    g_warn_if_fail(mailbox->view == NULL);
+    libbalsa_mailbox_view_free(mailbox->view);
     g_print("%s set view on %s\n", __func__, mailbox->name);
     mailbox->view = config_load_mailbox_view(mailbox->url);
     if (!mailbox->view) {
@@ -1583,13 +1550,15 @@ mailbox_conf_view_check(BalsaMailboxConfView * view_info,
 	mailbox->view = libbalsa_mailbox_view_new();
     }
 
-    active =
-        gtk_combo_box_get_active(GTK_COMBO_BOX
-                                 (view_info->identity_combo_box));
-    if (active >= 0) {
-        LibBalsaIdentity *ident =
-            g_list_nth_data(balsa_app.identities, active);
+    combo_box = GTK_COMBO_BOX(view_info->identity_combo_box);
+    if (gtk_combo_box_get_active_iter(combo_box, &iter)) {
+        GtkTreeModel *model;
+        LibBalsaIdentity *ident;
+
+        model = gtk_combo_box_get_model(combo_box);
+        gtk_tree_model_get(model, &iter, 2, &ident, -1);
         libbalsa_mailbox_set_identity_name(mailbox, ident->identity_name);
+        g_object_unref(ident);
         changed = TRUE;
     }
 

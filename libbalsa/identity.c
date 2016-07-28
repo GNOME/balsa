@@ -2216,3 +2216,64 @@ ident_dialog_get_value(GObject * dialog, const gchar * key)
 
     return g_ptr_array_index(values, value);
 }
+
+GtkWidget *
+libbalsa_identity_combo_box(GList       * identities,
+                            const gchar * active_name,
+                            GCallback     changed_cb,
+                            gpointer      changed_data)
+{
+    GList *list;
+    GtkListStore *store;
+    GtkWidget *combo_box;
+    GtkCellLayout *layout;
+    GtkCellRenderer *renderer;
+
+    /* For each identity, store the address, the identity name, and a
+     * ref to the identity in a combo-box.
+     * Note: we can't depend on identities staying in the same
+     * order while the combo-box is open, so we need a ref to the
+     * actual identity. */
+    store = gtk_list_store_new(3,
+                               G_TYPE_STRING,
+                               G_TYPE_STRING,
+                               G_TYPE_OBJECT);
+    combo_box = gtk_combo_box_new_with_model(GTK_TREE_MODEL(store));
+
+    for (list = identities; list != NULL; list = list->next) {
+        LibBalsaIdentity *ident;
+        gchar *from;
+        gchar *name;
+        GtkTreeIter iter;
+
+        ident = list->data;
+        from = internet_address_to_string(ident->ia, FALSE);
+	name = g_strconcat("(", ident->identity_name, ")", NULL);
+
+        gtk_list_store_append(store, &iter);
+        gtk_list_store_set(store, &iter,
+                           0, from,
+                           1, name,
+                           2, ident,
+                           -1);
+
+        if (active_name && strcmp(active_name, name) == 0)
+            gtk_combo_box_set_active_iter(GTK_COMBO_BOX(combo_box), &iter);
+
+        g_free(from);
+        g_free(name);
+    }
+    g_object_unref(store);
+
+    layout = GTK_CELL_LAYOUT(combo_box);
+    renderer = gtk_cell_renderer_text_new();
+    gtk_cell_layout_pack_start(layout, renderer, TRUE);
+    gtk_cell_layout_set_attributes(layout, renderer, "text", 0, NULL);
+    renderer = gtk_cell_renderer_text_new();
+    gtk_cell_layout_pack_start(layout, renderer, FALSE);
+    gtk_cell_layout_set_attributes(layout, renderer, "text", 1, NULL);
+
+    g_signal_connect(combo_box, "changed", changed_cb, changed_data);
+
+    return combo_box;
+}

@@ -361,9 +361,9 @@ case "$use_html_widget" in
                        html2markdown.py2 \
                        html2markdown.py3 \
                        html2text],
-                      no)
-        if test x"$ac_cv_path_HTML2TEXT" != "xno" ; then
-            AC_DEFINE_UNQUOTED(HTML2TEXT, "$ac_cv_path_HTML2TEXT",
+                      [no])
+        if test x"$HTML2TEXT" != "xno" ; then
+            AC_DEFINE_UNQUOTED(HTML2TEXT, "$HTML2TEXT",
 				[Path to html2text program.])
 		else
 			AC_MSG_WARN([You cannot properly quote html-only messags.])

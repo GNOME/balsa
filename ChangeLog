@@ -1,3 +1,11 @@
+2016-07-28  Albrecht Dreß
+
+	Fix a bug in the configure script discovered by Jack
+	<URL:https://mail.gnome.org/archives/balsa-list/2016-July/msg00039.html>
+
+	* configure.ac: when no external html-to-text converter could
+	  be found, undef HTML2TEXT instead of defining it to "".
+
 2016-07-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Andreas Schmidt suggested an improvement to the list of identities

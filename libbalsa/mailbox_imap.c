@@ -44,10 +44,6 @@
 /* for uint32_t */
 #include <stdint.h>
 
-#ifdef BALSA_USE_THREADS
-#include <pthread.h>
-#endif
-
 #include "filter-funcs.h"
 #include "filter.h"
 #include "imap-commands.h"

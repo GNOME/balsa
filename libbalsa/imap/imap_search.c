@@ -551,9 +551,9 @@ imap_search_exec(ImapMboxHandle *h, gboolean uid,
 {
   ImapResponse rc;
 
-  HANDLE_LOCK(h);
+  g_mutex_lock(&h->mutex);
   rc = imap_search_exec_unlocked(h, uid, s, cb, cb_arg);
-  HANDLE_UNLOCK(h);
+  g_mutex_unlock(&h->mutex);
 
   return rc;
 }

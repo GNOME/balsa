@@ -152,11 +152,11 @@ ImapResponse
 imap_mbox_handle_noop(ImapMboxHandle *handle)
 {
   ImapResponse rc;
-  if(HANDLE_TRYLOCK(handle) != 0) return IMR_OK;
+  if(!g_mutex_trylock(&handle->mutex)) return IMR_OK;
   IMAP_REQUIRED_STATE3(handle, IMHS_CONNECTED, IMHS_AUTHENTICATED,
                        IMHS_SELECTED, IMR_BAD);
   rc = imap_cmd_exec(handle, "NOOP");
-  HANDLE_UNLOCK(handle);
+  g_mutex_unlock(&handle->mutex);
   return rc;
 }
 
@@ -244,9 +244,9 @@ imap_mbox_select(ImapMboxHandle* handle, const char *mbox,
                  gboolean *readonly_mbox)
 {
   ImapResponse rc;
-  HANDLE_LOCK(handle);
+  g_mutex_lock(&handle->mutex);
   rc = imap_mbox_select_unlocked(handle, mbox, readonly_mbox);
-  HANDLE_UNLOCK(handle);
+  g_mutex_unlock(&handle->mutex);
   return rc;
 }
 
@@ -254,7 +254,7 @@ imap_mbox_select(ImapMboxHandle* handle, const char *mbox,
 ImapResponse
 imap_mbox_examine(ImapMboxHandle* handle, const char* mbox)
 {
-  HANDLE_LOCK(handle);
+	g_mutex_lock(&handle->mutex);
   IMAP_REQUIRED_STATE3(handle, IMHS_CONNECTED, IMHS_AUTHENTICATED,
                        IMHS_SELECTED, IMR_BAD);
   {
@@ -268,7 +268,7 @@ imap_mbox_examine(ImapMboxHandle* handle, const char* mbox)
     handle->state = IMHS_SELECTED;
     handle->has_rights = 0;
   } 
-  HANDLE_UNLOCK(handle);
+  g_mutex_unlock(&handle->mutex);
   return rc;
   }
 }
@@ -281,14 +281,14 @@ imap_mbox_create(ImapMboxHandle* handle, const char* mbox)
   gchar *mbx7, *cmd;
   ImapResponse rc;
 
-  HANDLE_LOCK(handle);
+  g_mutex_lock(&handle->mutex);
   IMAP_REQUIRED_STATE2(handle, IMHS_AUTHENTICATED, IMHS_SELECTED, IMR_BAD);
 
   mbx7 = imap_utf8_to_mailbox(mbox);
   cmd = g_strdup_printf("CREATE \"%s\"", mbx7);
   rc = imap_cmd_exec(handle, cmd);
   g_free(mbx7); g_free(cmd);
-  HANDLE_UNLOCK(handle);
+  g_mutex_unlock(&handle->mutex);
 
   return rc;
 }
@@ -301,14 +301,14 @@ imap_mbox_delete(ImapMboxHandle* handle, const char* mbox)
   gchar *mbx7, *cmd;
   ImapResponse rc;
 
-  HANDLE_LOCK(handle);
+  g_mutex_lock(&handle->mutex);
   IMAP_REQUIRED_STATE2(handle,IMHS_AUTHENTICATED, IMHS_SELECTED, IMR_BAD);
 
   mbx7 = imap_utf8_to_mailbox(mbox);
   cmd = g_strdup_printf("DELETE \"%s\"", mbx7);
   rc = imap_cmd_exec(handle, cmd);
   g_free(cmd);
-  HANDLE_UNLOCK(handle);
+  g_mutex_unlock(&handle->mutex);
 
   return rc;
 }
@@ -323,7 +323,7 @@ imap_mbox_rename(ImapMboxHandle* handle,
   gchar *mbx7o, *mbx7n, *cmd;  
   ImapResponse rc;
 
-  HANDLE_LOCK(handle);
+  g_mutex_lock(&handle->mutex);
   IMAP_REQUIRED_STATE2(handle,IMHS_AUTHENTICATED, IMHS_SELECTED, IMR_BAD);
 
   mbx7o = imap_utf8_to_mailbox(old_mbox);
@@ -333,7 +333,7 @@ imap_mbox_rename(ImapMboxHandle* handle,
   rc = imap_cmd_exec(handle, cmd);
   g_free(cmd);
 
-  HANDLE_UNLOCK(handle);
+  g_mutex_unlock(&handle->mutex);
   return rc;
 }
 
@@ -347,7 +347,7 @@ imap_mbox_subscribe(ImapMboxHandle* handle,
   gchar *mbx7, *cmd;
   ImapResponse rc;
 
-  HANDLE_LOCK(handle);
+  g_mutex_lock(&handle->mutex);
   IMAP_REQUIRED_STATE2(handle,IMHS_AUTHENTICATED, IMHS_SELECTED, IMR_BAD);
 
   mbx7 = imap_utf8_to_mailbox(mbox);
@@ -357,7 +357,7 @@ imap_mbox_subscribe(ImapMboxHandle* handle,
   rc = imap_cmd_exec(handle, cmd);
   g_free(mbx7); g_free(cmd);
 
-  HANDLE_UNLOCK(handle);
+  g_mutex_unlock(&handle->mutex);
   return rc;
 }
 
@@ -369,7 +369,7 @@ imap_mbox_list(ImapMboxHandle *handle, const char* what)
   gchar *mbx7, *cmd;
   ImapResponse rc;
 
-  HANDLE_LOCK(handle);
+  g_mutex_lock(&handle->mutex);
   IMAP_REQUIRED_STATE2(handle,IMHS_AUTHENTICATED, IMHS_SELECTED, IMR_BAD);
   mbx7 = imap_utf8_to_mailbox(what);
   cmd = g_strdup_printf("LIST \"%s\" \"%%\"", mbx7);
@@ -377,7 +377,7 @@ imap_mbox_list(ImapMboxHandle *handle, const char* what)
   g_free(cmd);
   g_free(mbx7);
 
-  HANDLE_UNLOCK(handle);
+  g_mutex_unlock(&handle->mutex);
   return rc;
 }
 
@@ -389,7 +389,7 @@ imap_mbox_lsub(ImapMboxHandle *handle, const char* what)
   gchar *mbx7, *cmd;
   ImapResponse rc;
 
-  HANDLE_LOCK(handle);
+  g_mutex_lock(&handle->mutex);
   IMAP_REQUIRED_STATE2(handle,IMHS_AUTHENTICATED, IMHS_SELECTED, IMR_BAD);
 
   mbx7 = imap_utf8_to_mailbox(what);
@@ -397,7 +397,7 @@ imap_mbox_lsub(ImapMboxHandle *handle, const char* what)
   rc = imap_cmd_exec(handle, cmd);
   g_free(mbx7); g_free(cmd);
 
-  HANDLE_UNLOCK(handle);
+  g_mutex_unlock(&handle->mutex);
   return rc;
 }
 
@@ -425,11 +425,11 @@ imap_mbox_status(ImapMboxHandle *r, const char*what,
     gchar *mbx7 = imap_utf8_to_mailbox(what);
     gchar *items = g_strjoinv(" ", (gchar**)&item_arr[0]);
     gchar *cmd = g_strdup_printf("STATUS \"%s\" (%s)", mbx7, items);
-    HANDLE_LOCK(r);
+    g_mutex_lock(&r->mutex);
     g_hash_table_insert(r->status_resps, (gpointer)what, res);
     rc = imap_cmd_exec(r, cmd);
     g_hash_table_remove(r->status_resps, what);
-    HANDLE_UNLOCK(r);
+    g_mutex_unlock(&r->mutex);
     g_free(mbx7); g_free(cmd);
     g_free(items);
   }
@@ -668,10 +668,10 @@ imap_mbox_append_multi(ImapMboxHandle *handle,
 {
   ImapResponse rc;
 
-  HANDLE_LOCK(handle);
+  g_mutex_lock(&handle->mutex);
   IMAP_REQUIRED_STATE2(handle,IMHS_AUTHENTICATED, IMHS_SELECTED, IMR_BAD);
   rc = imap_mbox_append_multi_real(handle, mbox, dump_cb, cb_arg, uids);
-  HANDLE_UNLOCK(handle);
+  g_mutex_unlock(&handle->mutex);
   return rc;
 }
 
@@ -725,13 +725,13 @@ ImapResponse
 imap_mbox_close(ImapMboxHandle *h)
 {
   ImapResponse rc;
-  HANDLE_LOCK(h);
+  g_mutex_lock(&h->mutex);
   IMAP_REQUIRED_STATE1(h, IMHS_SELECTED, IMR_BAD);
 
   rc = imap_cmd_exec(h, "CLOSE");  
   if(rc == IMR_OK)
     h->state = IMHS_AUTHENTICATED;
-  HANDLE_UNLOCK(h);
+  g_mutex_unlock(&h->mutex);
   return rc;
 }
 
@@ -741,10 +741,10 @@ imap_mbox_expunge(ImapMboxHandle *handle)
 {
   ImapResponse rc;
 
-  HANDLE_LOCK(handle);
+  g_mutex_lock(&handle->mutex);
   IMAP_REQUIRED_STATE1(handle, IMHS_SELECTED, IMR_BAD);
   rc = imap_cmd_exec(handle, "EXPUNGE");
-  HANDLE_UNLOCK(handle);
+  g_mutex_unlock(&handle->mutex);
   return rc;
 }
 
@@ -752,13 +752,13 @@ ImapResponse
 imap_mbox_expunge_a(ImapMboxHandle *handle)
 {
   ImapResponse rc;
-  HANDLE_LOCK(handle);
+  g_mutex_lock(&handle->mutex);
   IMAP_REQUIRED_STATE1(handle, IMHS_SELECTED, IMR_BAD);
   /* extra care would be required to use this once since no other
      commands that use sequence numbers can be issued before this one
      finishes... */
   rc = imap_cmd_issue(handle, "EXPUNGE");
-  HANDLE_UNLOCK(handle);
+  g_mutex_unlock(&handle->mutex);
   return rc;
 }
 
@@ -817,7 +817,7 @@ imap_mbox_find_all(ImapMboxHandle * h,
   gchar *cmd;
   ImapResponse rc;
 
-  HANDLE_LOCK(h);
+  g_mutex_lock(&h->mutex);
   IMAP_REQUIRED_STATE1(h, IMHS_SELECTED, IMR_BAD);
   filter_str = mbox_view_get_str(&h->mbox_view);
   cmd = g_strdup_printf("SEARCH ALL (SUBJECT \"%s\"%s%s)", search_str,
@@ -825,7 +825,7 @@ imap_mbox_find_all(ImapMboxHandle * h,
   rc = imap_mbox_find_helper(h, cmd, msgcnt, msgs);
   g_free(cmd);
 
-  HANDLE_UNLOCK(h);
+  g_mutex_unlock(&h->mutex);
   return rc;
 }
 
@@ -836,10 +836,10 @@ imap_mbox_find_unseen(ImapMboxHandle * h,
 {
     ImapResponse rc;
 
-    HANDLE_LOCK(h);
+    g_mutex_lock(&h->mutex);
     IMAP_REQUIRED_STATE1(h, IMHS_SELECTED, IMR_BAD);
     rc = imap_mbox_find_helper(h, "SEARCH UNSEEN UNDELETED", msgcnt, msgs);
-    HANDLE_UNLOCK(h);
+    g_mutex_unlock(&h->mutex);
     return rc;
 }
 
@@ -971,7 +971,7 @@ imap_mbox_handle_msgno_has_flags(ImapMboxHandle *h, unsigned msgno,
   ImapMsgFlag needed_flags;
   gboolean retval;
 
-  HANDLE_LOCK(h);
+  g_mutex_lock(&h->mutex);
   IMAP_REQUIRED_STATE1(h, IMHS_SELECTED, IMR_BAD);
 
   flags = &g_array_index(h->flag_cache, ImapFlagCache, msgno-1);
@@ -982,7 +982,7 @@ imap_mbox_handle_msgno_has_flags(ImapMboxHandle *h, unsigned msgno,
     (!needed_flags||imap_assure_needed_flags(h, needed_flags) == IMR_OK) &&
     (flags->flag_values & flag_set) == flag_set &&
     (flags->flag_values & flag_unset) == 0;
-  HANDLE_UNLOCK(h);
+  g_mutex_unlock(&h->mutex);
 
   return retval;
 }
@@ -1063,7 +1063,7 @@ imap_mbox_handle_fetch_range(ImapMboxHandle* handle,
   if(lo>hi) return IMR_OK;
   if(lo<1) lo = 1;
 
-  HANDLE_LOCK(handle);
+  g_mutex_lock(&handle->mutex);
   IMAP_REQUIRED_STATE1(handle, IMHS_SELECTED, IMR_BAD);
 
   cf = (ImapCoalesceFunc)(mbox_view_is_active(&handle->mbox_view)
@@ -1081,7 +1081,7 @@ imap_mbox_handle_fetch_range(ImapMboxHandle* handle,
     g_free(seq);
   } else rc = IMR_OK;
 
-  HANDLE_UNLOCK(handle);
+  g_mutex_unlock(&handle->mutex);
   return rc;
 }
 
@@ -1118,9 +1118,9 @@ imap_mbox_handle_fetch_set(ImapMboxHandle* handle,
                            unsigned *set, unsigned cnt, ImapFetchType ift)
 {
   ImapResponse rc;
-  HANDLE_LOCK(handle);
+  g_mutex_lock(&handle->mutex);
   rc = imap_mbox_handle_fetch_set_unlocked(handle, set, cnt, ift);
-  HANDLE_UNLOCK(handle);
+  g_mutex_unlock(&handle->mutex);
   return rc;
 }
 
@@ -1202,7 +1202,7 @@ imap_mbox_handle_fetch_rfc822(ImapMboxHandle* handle,
   ImapResponse rc = IMR_OK;
   gchar *seq;
 
-  HANDLE_LOCK(handle);
+  g_mutex_lock(&handle->mutex);
   IMAP_REQUIRED_STATE1(handle, IMHS_SELECTED, IMR_BAD);
 
   seq = imap_coalesce_set(cnt, set);
@@ -1232,7 +1232,7 @@ imap_mbox_handle_fetch_rfc822(ImapMboxHandle* handle,
       imap_mbox_handle_set_msg(handle, "Unordered data received from server");
     }
   }
-  HANDLE_UNLOCK(handle);
+  g_mutex_unlock(&handle->mutex);
 
   return rc;
 }
@@ -1332,7 +1332,7 @@ imap_mbox_handle_fetch_rfc822_uid(ImapMboxHandle* handle, unsigned uid,
   struct FetchBodyHeaderText separate_arg;
 
 
-  HANDLE_LOCK(handle);
+  g_mutex_lock(&handle->mutex);
   IMAP_REQUIRED_STATE1(handle, IMHS_SELECTED, IMR_BAD);
 
   /* Consider switching between BODY.PEEK[HEADER] BODY.PEEK[TEXT] and
@@ -1359,7 +1359,7 @@ imap_mbox_handle_fetch_rfc822_uid(ImapMboxHandle* handle, unsigned uid,
 
   handle->body_cb  = cb;
   handle->body_arg = arg;
-  HANDLE_UNLOCK(handle);
+  g_mutex_unlock(&handle->mutex);
   return rc;
 }
 
@@ -1404,7 +1404,7 @@ imap_mbox_handle_fetch_body(ImapMboxHandle* handle,
   const gchar *peek_string = peek_only ? ".PEEK" : "";
   struct PassHeaderTextOrdered pass_ordered_data;
 
-  HANDLE_LOCK(handle);
+  g_mutex_lock(&handle->mutex);
   IMAP_REQUIRED_STATE1(handle, IMHS_SELECTED, IMR_BAD);
   fcb = handle->body_cb;
   farg = handle->body_arg;
@@ -1426,7 +1426,7 @@ imap_mbox_handle_fetch_body(ImapMboxHandle* handle,
     if(rc != IMR_NO) { /* unknown-cte */
       handle->body_cb  = fcb;
       handle->body_arg = farg;
-      HANDLE_UNLOCK(handle);
+      g_mutex_unlock(&handle->mutex);
       return rc;
     }
   }
@@ -1465,7 +1465,7 @@ imap_mbox_handle_fetch_body(ImapMboxHandle* handle,
   handle->body_cb  = fcb;
   handle->body_arg = farg;
 
-  HANDLE_UNLOCK(handle);
+  g_mutex_unlock(&handle->mutex);
   return rc;
 }
 
@@ -1537,14 +1537,14 @@ imap_mbox_store_flag(ImapMboxHandle *h, unsigned msgcnt, unsigned*seqno,
   ImapResponse res;
   gchar* cmd;
 
-  HANDLE_LOCK(h);
+  g_mutex_lock(&h->mutex);
   IMAP_REQUIRED_STATE1(h, IMHS_SELECTED, IMR_BAD);
   cmd = imap_store_prepare(h, msgcnt, seqno, flg, state);
   if(cmd) {
     res = imap_cmd_exec(h, cmd);
     g_free(cmd);
   } res = IMR_OK;
-  HANDLE_UNLOCK(h);
+  g_mutex_unlock(&h->mutex);
   return res;
 }
 
@@ -1555,7 +1555,7 @@ imap_mbox_store_flag_a(ImapMboxHandle *h, unsigned msgcnt, unsigned*seqno,
   gchar* cmd;
   ImapResponse rc;
 
-  HANDLE_LOCK(h);
+  g_mutex_lock(&h->mutex);
   IMAP_REQUIRED_STATE1(h, IMHS_SELECTED, IMR_BAD);
   cmd = imap_store_prepare(h, msgcnt, seqno, flg, state);
   if(cmd) {
@@ -1565,7 +1565,7 @@ imap_mbox_store_flag_a(ImapMboxHandle *h, unsigned msgcnt, unsigned*seqno,
   } else /* no action to be done, perhaps message has the flag set already? */
     rc = IMR_OK;
   
-  HANDLE_UNLOCK(h);
+  g_mutex_unlock(&h->mutex);
   return rc;
 }
 
@@ -1580,7 +1580,7 @@ imap_mbox_handle_copy(ImapMboxHandle* handle, unsigned cnt, unsigned *seqno,
 {
   ImapResponse rc;
 
-  HANDLE_LOCK(handle);
+  g_mutex_lock(&handle->mutex);
   IMAP_REQUIRED_STATE1(handle, IMHS_SELECTED, IMR_BAD);
   {
     gchar *mbx7 = imap_utf8_to_mailbox(dest);
@@ -1608,7 +1608,7 @@ imap_mbox_handle_copy(ImapMboxHandle* handle, unsigned cnt, unsigned *seqno,
       handle->uidplus.store_response = 0;
     }
   }
-  HANDLE_UNLOCK(handle);
+  g_mutex_unlock(&handle->mutex);
   return rc;
 }
 
@@ -1642,7 +1642,7 @@ imap_mbox_unselect(ImapMboxHandle *h)
 {
   ImapResponse rc;
 
-  HANDLE_LOCK(h);
+  g_mutex_lock(&h->mutex);
   IMAP_REQUIRED_STATE1(h, IMHS_SELECTED, IMR_BAD);
   if(imap_mbox_handle_can_do(h, IMCAP_UNSELECT)) {
     rc = imap_cmd_exec(h, "UNSELECT");  
@@ -1651,7 +1651,7 @@ imap_mbox_unselect(ImapMboxHandle *h)
   } else 
     rc = IMR_OK;
 
-  HANDLE_UNLOCK(h);
+  g_mutex_unlock(&h->mutex);
   return rc;
 }
 
@@ -1664,7 +1664,7 @@ imap_mbox_thread(ImapMboxHandle *h, const char *how, ImapSearchKey *filter)
 {
   ImapResponse rc = IMR_NO;
 
-  HANDLE_LOCK(h);
+  g_mutex_lock(&h->mutex);
   IMAP_REQUIRED_STATE1(h, IMHS_SELECTED, IMR_BAD);
 
   if(imap_mbox_handle_can_do(h, IMCAP_THREAD_REFERENCES)) {
@@ -1691,7 +1691,7 @@ imap_mbox_thread(ImapMboxHandle *h, const char *how, ImapSearchKey *filter)
     imap_handle_idle_enable(h, 30);
   }
  exit_cleanup:
-  HANDLE_UNLOCK(h);
+  g_mutex_unlock(&h->mutex);
 
   return rc;
 }
@@ -1917,7 +1917,7 @@ imap_mbox_sort_msgno(ImapMboxHandle *handle, ImapSortKey key,
 {
   ImapResponse rc;
 
-  HANDLE_LOCK(handle);
+  g_mutex_lock(&handle->mutex);
   IMAP_REQUIRED_STATE1(handle, IMHS_SELECTED, IMR_BAD);
   if(imap_mbox_handle_can_do(handle, IMCAP_SORT)) 
     rc = imap_mbox_sort_msgno_srv(handle, key, ascending, msgno, cnt);
@@ -1926,7 +1926,7 @@ imap_mbox_sort_msgno(ImapMboxHandle *handle, ImapSortKey key,
       ? imap_mbox_sort_msgno_client(handle, key, ascending, msgno, cnt)
       : IMR_NO;
   }
-  HANDLE_UNLOCK(handle);
+  g_mutex_unlock(&handle->mutex);
   return rc;
 }
 
@@ -1953,7 +1953,7 @@ imap_mbox_sort_filter(ImapMboxHandle *handle, ImapSortKey key, int ascending,
   unsigned i;
 
 
-  HANDLE_LOCK(handle);
+  g_mutex_lock(&handle->mutex);
   IMAP_REQUIRED_STATE1(handle, IMHS_SELECTED, IMR_BAD);
   if(key == IMSO_MSGNO) {
     if(filter) { /* CASE 1a */
@@ -2037,7 +2037,7 @@ imap_mbox_sort_filter(ImapMboxHandle *handle, ImapSortKey key, int ascending,
                          GUINT_TO_POINTER(handle->mbox_view.arr[i]));
   }
  cleanup:
-  HANDLE_UNLOCK(handle);
+  g_mutex_unlock(&handle->mutex);
 
   return rc;
 }
@@ -2056,10 +2056,10 @@ imap_mbox_filter_msgnos(ImapMboxHandle *handle, ImapSearchKey *filter,
 			GHashTable *msgnos)
 {
   ImapResponse res;
-  HANDLE_LOCK(handle);
+  g_mutex_lock(&handle->mutex);
   res = imap_search_exec_unlocked(handle, FALSE, filter,
 				  (ImapSearchCb)make_msgno_table, msgnos);
-  HANDLE_UNLOCK(handle);
+  g_mutex_unlock(&handle->mutex);
   return res;
 }
 
@@ -2098,7 +2098,7 @@ imap_mbox_complete_msgids(ImapMboxHandle *h,
   ImapFetchBodyInternalCb cb;
   void *arg;
 
-  HANDLE_LOCK(h);
+  g_mutex_lock(&h->mutex);
   IMAP_REQUIRED_STATE1(h, IMHS_SELECTED, IMR_BAD);
   seq = imap_coalesce_seq_range(first_seqno_to_fetch, msgids->len,
 				(ImapCoalesceFunc)need_msgid, msgids);
@@ -2115,7 +2115,7 @@ imap_mbox_complete_msgids(ImapMboxHandle *h,
     g_free(cmd);
   }
 
-  HANDLE_UNLOCK(h);
+  g_mutex_unlock(&h->mutex);
   return rc;
 }
 
@@ -2127,7 +2127,7 @@ imap_mbox_get_quota(ImapMboxHandle* handle, const char* mbox,
   if (!imap_mbox_handle_can_do(handle, IMCAP_QUOTA))
     return IMR_NO;
 
-  HANDLE_LOCK(handle);
+  g_mutex_lock(&handle->mutex);
   IMAP_REQUIRED_STATE2(handle, IMHS_AUTHENTICATED, IMHS_SELECTED, IMR_BAD);
   {
   gchar *mbx7 = imap_utf8_to_mailbox(mbox);
@@ -2138,7 +2138,7 @@ imap_mbox_get_quota(ImapMboxHandle* handle, const char* mbox,
   g_free(mbx7); g_free(cmd);
   *max = handle->quota_max_k;
   *used = handle->quota_used_k;
-  HANDLE_UNLOCK(handle);
+  g_mutex_unlock(&handle->mutex);
   return rc;
   }
 }
@@ -2165,7 +2165,7 @@ imap_mbox_get_my_rights(ImapMboxHandle* handle, ImapAclType* my_rights,
 {
   ImapResponse rc;
 
-  HANDLE_LOCK(handle);
+  g_mutex_lock(&handle->mutex);
   IMAP_REQUIRED_STATE1(handle, IMHS_SELECTED, IMR_BAD);
 
   if (force_update || !handle->has_rights) {
@@ -2176,7 +2176,7 @@ imap_mbox_get_my_rights(ImapMboxHandle* handle, ImapAclType* my_rights,
 
   *my_rights = handle->rights;
   
-  HANDLE_UNLOCK(handle);
+  g_mutex_unlock(&handle->mutex);
   return rc;
 }
 
@@ -2187,7 +2187,7 @@ imap_mbox_get_acl(ImapMboxHandle* handle, const char* mbox, GList** acls)
   if (!imap_mbox_handle_can_do(handle, IMCAP_ACL))
     return IMR_NO;
 
-  HANDLE_LOCK(handle);
+  g_mutex_lock(&handle->mutex);
 
   IMAP_REQUIRED_STATE2(handle, IMHS_AUTHENTICATED, IMHS_SELECTED, IMR_BAD);
   {
@@ -2201,7 +2201,7 @@ imap_mbox_get_acl(ImapMboxHandle* handle, const char* mbox, GList** acls)
   g_list_free(*acls);
   *acls = handle->acls;
   handle->acls = NULL;
-  HANDLE_UNLOCK(handle);
+  g_mutex_unlock(&handle->mutex);
   return rc;
   }
 }

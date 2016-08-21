@@ -138,13 +138,8 @@ void libbalsa_certs_destroy(void);
 
 gboolean libbalsa_abort_on_timeout(const char *host);
 
-#ifdef BALSA_USE_THREADS
-#include <pthread.h>
-pthread_t libbalsa_get_main_thread(void);
+GThread *libbalsa_get_main_thread(void);
 gboolean libbalsa_am_i_subthread(void);
-#else
-#define libbalsa_am_i_subthread() FALSE
-#endif /* BALSA_USE_THREADS */
 #if defined(BALSA_DEBUG_THREADS)
 #define gdk_threads_enter()                       \
     do if (libbalsa_am_i_subthread())             \
@@ -155,10 +150,7 @@ gboolean libbalsa_am_i_subthread(void);
 #endif
 #define gdk_threads_leave()
 void libbalsa_message(const char *fmt, ...)
-#ifdef __GNUC__
-    __attribute__ ((format (printf, 1, 2)))
-#endif
-;
+	G_GNUC_PRINTF(1, 2);
 gchar * libbalsa_rot(const gchar * pass);
 
 typedef enum {

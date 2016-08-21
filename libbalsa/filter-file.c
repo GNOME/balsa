@@ -34,10 +34,6 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-/* yellow dog has crappy libc and needs pthread.h to be included here */
-#ifdef BALSA_USE_THREADS
-#  include <pthread.h>
-#endif
 #include <string.h>
 #include <time.h>
 #include <sys/types.h>

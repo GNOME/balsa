@@ -60,18 +60,6 @@ if test x$balsa_cv_fcntl = xyes; then
 	AC_DEFINE(USE_FCNTL,1,[Define if fcntl locking should be used.])
 fi
 
-AC_ARG_ENABLE(threads,
-        AC_HELP_STRING([--enable-threads],
-                       [Use threading for mail retrieval (default=yes)]),[
-	use_threads=$enableval
-],[
-	use_threads=yes
-])
-
-if test x"$use_threads" = xyes; then 
-        AC_DEFINE(BALSA_USE_THREADS, 1,[Defined when balsa is to use threads.])
-fi
-
 AC_ARG_ENABLE(debug-threads,
         AC_HELP_STRING([--enable-debug-threads],
                        [Debug threads (default=no)]),[
@@ -409,13 +397,9 @@ if test x"$gpgmecfg" != xno ; then
 		have_smime=no
 	fi
 	if test x"$gpgmecfg" != xno ; then
-		if test x"$use_threads" = xyes; then
-			BALSA_LIBS="$BALSA_LIBS `$gpgmecfg --thread=pthread --libs`"
-			if test x"$?" != x0 ; then
-				AC_MSG_ERROR([*** You enabled gpgme and pthread support, but your gpgme installation does not support threads.])
-			fi
-		else
-			BALSA_LIBS="$BALSA_LIBS `$gpgmecfg --libs`"
+		BALSA_LIBS="$BALSA_LIBS `$gpgmecfg --thread=pthread --libs`"
+		if test x"$?" != x0 ; then
+			AC_MSG_ERROR([*** You enabled gpgme support, but your gpgme installation does not support threads.])
 		fi
 		AC_DEFINE(HAVE_GPGME,1,[Defined when gpgme is available.])
 		BALSA_CFLAGS="$BALSA_CFLAGS `$gpgmecfg --cflags`"
@@ -889,7 +873,6 @@ dnl ##########################################################################
 echo ""
 echo "================ Final configuration ==================="
 echo "    Installing into prefix: $prefix"
-echo "      Using multithreading: $use_threads"
 echo "   Enable compile warnings: $set_more_warnings"
 echo "                Use ESMTP : $with_esmtp"
 echo "               HTML widget: $use_html_widget"

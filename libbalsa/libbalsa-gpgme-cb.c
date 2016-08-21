@@ -32,11 +32,6 @@
 #include "macosx-helpers.h"
 #endif
 
-#ifdef BALSA_USE_THREADS
-#include <pthread.h>
-#include "misc.h"
-#endif
-
 #include <gpgme.h>
 #include <glib.h>
 #include <glib/gi18n.h>
@@ -56,17 +51,17 @@ enum {
     GPG_KEY_NUM_COLUMNS
 };
 
-#ifdef BALSA_USE_THREADS
+
 /* FIXME: is this really necessary? */
 typedef struct {
-    pthread_cond_t cond;
+    GCond cond;
     const gchar *uid_hint;
     const gchar *passphrase_info;
     gint was_bad;
     GtkWindow *parent;
     gchar *res;
+    gboolean done;
 } ask_passphrase_data_t;
-#endif
 
 
 static void key_selection_changed_cb(GtkTreeSelection * selection,
@@ -77,9 +72,7 @@ static gchar *get_passphrase_real(const gchar * uid_hint,
 				  const gchar * passphrase_info,
 				  int prev_was_bad, GtkWindow * parent);
 
-#ifdef BALSA_USE_THREADS
 static gboolean get_passphrase_idle(gpointer data);
-#endif
 
 
 gpgme_error_t
@@ -97,33 +90,29 @@ lb_gpgme_passphrase(void *hook, const gchar * uid_hint,
     else
 	parent = NULL;
 
-#ifdef BALSA_USE_THREADS
     if (!libbalsa_am_i_subthread())
 	passwd =
 	    get_passphrase_real(uid_hint, passphrase_info, prev_was_bad,
 				parent);
     else {
-	static pthread_mutex_t get_passphrase_lock =
-	    PTHREAD_MUTEX_INITIALIZER;
+	static GMutex get_passphrase_lock;
 	ask_passphrase_data_t apd;
 
-	pthread_mutex_lock(&get_passphrase_lock);
-	pthread_cond_init(&apd.cond, NULL);
+	g_mutex_lock(&get_passphrase_lock);
+	g_cond_init(&apd.cond);
 	apd.uid_hint = uid_hint;
 	apd.was_bad = prev_was_bad;
 	apd.passphrase_info = passphrase_info;
 	apd.parent = parent;
+	apd.done = FALSE;
 	g_idle_add(get_passphrase_idle, &apd);
-	pthread_cond_wait(&apd.cond, &get_passphrase_lock);
-	pthread_cond_destroy(&apd.cond);
-	pthread_mutex_unlock(&get_passphrase_lock);
+	while (!apd.done) {
+		g_cond_wait(&apd.cond, &get_passphrase_lock);
+	}
+	g_cond_clear(&apd.cond);
+	g_mutex_unlock(&get_passphrase_lock);
 	passwd = apd.res;
     }
-#else
-    passwd =
-        get_passphrase_real(uid_hint, passphrase_info, prev_was_bad,
-                            parent);
-#endif				/* BALSA_USE_THREADS */
 
     if (!passwd) {
 	foo = write(fd, "\n", 1);
@@ -433,7 +422,6 @@ get_passphrase_real(const gchar * uid_hint, const gchar * passphrase_info,
 }
 
 
-#ifdef BALSA_USE_THREADS
 /* get_passphrase_idle:
    called in MT mode by the main thread.
  */
@@ -446,11 +434,11 @@ get_passphrase_idle(gpointer data)
     apd->res =
 	get_passphrase_real(apd->uid_hint, apd->passphrase_info,
 			    apd->was_bad, apd->parent);
+    apd->done = TRUE;
     gdk_threads_leave();
-    pthread_cond_signal(&apd->cond);
+    g_cond_signal(&apd->cond);
     return FALSE;
 }
-#endif
 
 
 /* callback function if a new row is selected in the list */

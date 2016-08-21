@@ -146,18 +146,14 @@ lbc_init(LibBalsaConf * conf, const gchar * filename,
     }
 }
 
-#ifdef BALSA_USE_THREADS
 static GRecMutex lbc_mutex;
-#endif                          /* BALSA_USE_THREADS */
 
 static void
 lbc_lock(void)
 {
     static gboolean initialized = FALSE;
 
-#ifdef BALSA_USE_THREADS
     g_rec_mutex_lock(&lbc_mutex);
-#endif                          /* BALSA_USE_THREADS */
     if (!initialized) {
         lbc_init(&lbc_conf, "config", ".gnome2");
         lbc_init(&lbc_conf_priv, "config-private", ".gnome2_private");
@@ -168,9 +164,7 @@ lbc_lock(void)
 static void
 lbc_unlock(void)
 {
-#ifdef BALSA_USE_THREADS
     g_rec_mutex_unlock(&lbc_mutex);
-#endif                          /* BALSA_USE_THREADS */
 }
 
 /* 
@@ -525,16 +519,12 @@ lbc_sync(LibBalsaConf * conf)
 }
 
 static guint lbc_sync_idle_id;
-#ifdef BALSA_USE_THREADS
 G_LOCK_DEFINE_STATIC(lbc_sync_idle_id);
-#endif                          /* BALSA_USE_THREADS */
 
 void
 libbalsa_conf_sync(void)
 {
-#ifdef BALSA_USE_THREADS
     G_LOCK(lbc_sync_idle_id);
-#endif                          /* BALSA_USE_THREADS */
 #if DEBUG
     g_print("%s id %d, will be cleared\n", __func__, lbc_sync_idle_id);
 #endif                          /* DEBUG */
@@ -542,9 +532,7 @@ libbalsa_conf_sync(void)
         g_source_remove(lbc_sync_idle_id);
         lbc_sync_idle_id = 0;
     }
-#ifdef BALSA_USE_THREADS
     G_UNLOCK(lbc_sync_idle_id);
-#endif                          /* BALSA_USE_THREADS */
     lbc_lock();
     lbc_sync(&lbc_conf);
     lbc_sync(&lbc_conf_priv);
@@ -562,9 +550,7 @@ libbalsa_conf_sync_idle_cb(gpointer data)
 void
 libbalsa_conf_queue_sync(void)
 {
-#ifdef BALSA_USE_THREADS
     G_LOCK(lbc_sync_idle_id);
-#endif                          /* BALSA_USE_THREADS */
 #if DEBUG
     g_print("%s id %d, will be set if zero\n", __func__, lbc_sync_idle_id);
 #endif                          /* DEBUG */
@@ -574,7 +560,5 @@ libbalsa_conf_queue_sync(void)
 #if DEBUG
     g_print("%s id now %d\n", __func__, lbc_sync_idle_id);
 #endif                          /* DEBUG */
-#ifdef BALSA_USE_THREADS
     G_UNLOCK(lbc_sync_idle_id);
-#endif                          /* BALSA_USE_THREADS */
 }

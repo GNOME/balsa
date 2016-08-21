@@ -45,18 +45,10 @@ struct LibBalsaMailboxIndexEntry_ {
     unsigned foreground_set:1;
     unsigned background_set:1;
     unsigned unseen:1;
-#ifdef BALSA_USE_THREADS
     unsigned idle_pending:1;
-#endif                          /* BALSA_USE_THREADS */
 } ;
 
-#ifdef BALSA_USE_THREADS
-#include <pthread.h>
 void libbalsa_lock_mailbox(LibBalsaMailbox * mailbox);
 void libbalsa_unlock_mailbox(LibBalsaMailbox * mailbox);
-#else
-# define libbalsa_lock_mailbox(m)
-# define libbalsa_unlock_mailbox(m)
-#endif
 
 #endif				/* __LIBBALSA_PRIVATE_H__ */

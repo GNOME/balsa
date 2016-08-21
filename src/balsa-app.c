@@ -27,9 +27,6 @@
 
 #include <string.h>
 #include <stdlib.h>
-#ifdef BALSA_USE_THREADS
-#include <pthread.h>
-#endif
 
 /* for creat(2) */
 #include <sys/types.h>
@@ -128,12 +125,12 @@ ask_password_real(LibBalsaServer * server, LibBalsaMailbox * mbox)
     return passwd;
 }
 
-#ifdef BALSA_USE_THREADS
 typedef struct {
-    pthread_cond_t cond;
+    GCond cond;
     LibBalsaServer* server;
     LibBalsaMailbox* mbox;
     gchar* res;
+    gboolean done;
 } AskPasswdData;
 
 /* ask_passwd_idle:
@@ -145,8 +142,9 @@ ask_passwd_idle(gpointer data)
     AskPasswdData* apd = (AskPasswdData*)data;
     gdk_threads_enter();
     apd->res = ask_password_real(apd->server, apd->mbox);
+    apd->done = TRUE;
     gdk_threads_leave();
-    pthread_cond_signal(&apd->cond);
+    g_cond_signal(&apd->cond);
     return FALSE;
 }
 
@@ -156,21 +154,23 @@ ask_passwd_idle(gpointer data)
 static gchar *
 ask_password_mt(LibBalsaServer * server, LibBalsaMailbox * mbox)
 {
-    static pthread_mutex_t ask_passwd_lock = PTHREAD_MUTEX_INITIALIZER;
+    static GMutex ask_passwd_lock;
     AskPasswdData apd;
 
-    pthread_mutex_lock(&ask_passwd_lock);
-    pthread_cond_init(&apd.cond, NULL);
+    g_mutex_lock(&ask_passwd_lock);
+    g_cond_init(&apd.cond);
     apd.server = server;
     apd.mbox   = mbox;
+    apd.done   = FALSE;
     g_idle_add(ask_passwd_idle, &apd);
-    pthread_cond_wait(&apd.cond, &ask_passwd_lock);
+    while (!apd.done) {
+    	g_cond_wait(&apd.cond, &ask_passwd_lock);
+    }
     
-    pthread_cond_destroy(&apd.cond);
-    pthread_mutex_unlock(&ask_passwd_lock);
+    g_cond_clear(&apd.cond);
+    g_mutex_unlock(&ask_passwd_lock);
     return apd.res;
 }
-#endif
 
 static gboolean
 set_passwd_from_matching_server(GtkTreeModel *model,
@@ -241,21 +241,15 @@ ask_password(LibBalsaServer *server, LibBalsaMailbox *mbox)
 	}
     }
 
-    if (!password)
-#ifdef BALSA_USE_THREADS
-    {
+    if (!password) {
         G_LOCK_DEFINE_STATIC(ask_password);
 
         G_LOCK(ask_password);
-	password = (pthread_self() == libbalsa_get_main_thread()) ?
+	password = !libbalsa_am_i_subthread() ?
             ask_password_real(server, mbox) : ask_password_mt(server, mbox);
         G_UNLOCK(ask_password);
 	return password;
     }
-#else
-	return ask_password_real(server, mbox);
-#endif
-    else
 	return password;
 }
 

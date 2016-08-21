@@ -35,8 +35,6 @@
 # include "config.h"
 #endif                          /* HAVE_CONFIG_H */
 
-#if BALSA_USE_THREADS
-
 #include "mime-stream-shared.h"
 
 #include <unistd.h>
@@ -317,5 +315,3 @@ libbalsa_mime_stream_shared_unlock(GMimeStream * stream)
         g_cond_signal(&lbmss_cond);
     g_mutex_unlock(&lbmss_mutex);
 }
-
-#endif                          /* BALSA_USE_THREADS */

@@ -165,9 +165,7 @@ imap_mbox_handle_init(ImapMboxHandle *handle)
   handle->has_rights = 0;
   mbox_view_init(&handle->mbox_view);
 
-#if defined(BALSA_USE_THREADS)
-  pthread_mutex_init(&handle->mutex, NULL);
-#endif
+  g_mutex_init(&handle->mutex);
 }
 
 static void
@@ -414,22 +412,22 @@ async_process(GIOChannel *source, GIOCondition condition, gpointer data)
   g_return_val_if_fail(h, FALSE);
 
   if(ASYNC_DEBUG) printf("async_process() ENTER\n");
-  if(HANDLE_TRYLOCK(h) != 0) 
+  if(!g_mutex_trylock(&h->mutex))
     return FALSE;/* async data on already locked handle? Don't try again. */
   if(ASYNC_DEBUG) printf("async_process() LOCKED\n");
   if(h->state == IMHS_DISCONNECTED) {
     if(ASYNC_DEBUG) printf("async_process() on disconnected\n");
-    HANDLE_UNLOCK(h);
+    g_mutex_unlock(&h->mutex);
     return FALSE;
   }
   if( (condition & G_IO_HUP) == G_IO_HUP) {
       imap_handle_disconnect(h);
-      HANDLE_UNLOCK(h);
+      g_mutex_unlock(&h->mutex);
       return FALSE;
   }
   retval_async = async_process_real(h);
 
-  HANDLE_UNLOCK(h);
+  g_mutex_unlock(&h->mutex);
   return retval_async;
 }
 
@@ -442,7 +440,7 @@ idle_start(gpointer data)
 
   /* The test below can probably be weaker since it is ok for the
      channel to get disconnected before IDLE gets activated */
-  if(HANDLE_TRYLOCK(h) != 0)
+  if(!g_mutex_trylock(&h->mutex))
     return TRUE;/* Don't block, just try again later. */
   IMAP_REQUIRED_STATE3(h, IMHS_CONNECTED, IMHS_AUTHENTICATED,
                        IMHS_SELECTED, FALSE);
@@ -460,7 +458,7 @@ idle_start(gpointer data)
   h->idle_enable_id = 0;
   h->idle_state = IDLE_RESPONSE_PENDING;
 
-  HANDLE_UNLOCK(h);
+  g_mutex_unlock(&h->mutex);
   return FALSE;
 }
 
@@ -587,7 +585,7 @@ imap_mbox_handle_connect(ImapMboxHandle* ret, const char *host, int over_ssl)
 
   g_return_val_if_fail(imap_mbox_is_disconnected(ret), IMAP_CONNECT_FAILED);
 
-  HANDLE_LOCK(ret);
+  g_mutex_lock(&ret->mutex);
   ret->over_ssl = over_ssl;
 
   g_free(ret->host);   ret->host   = g_strdup(host);
@@ -601,7 +599,7 @@ imap_mbox_handle_connect(ImapMboxHandle* ret, const char *host, int over_ssl)
     }
   }
 
-  HANDLE_UNLOCK(ret);
+  g_mutex_unlock(&ret->mutex);
 
   return rc;
 }
@@ -631,7 +629,7 @@ imap_mbox_handle_reconnect(ImapMboxHandle* h, gboolean *readonly)
 {
   ImapResult rc;
   
-  HANDLE_LOCK(h);
+  g_mutex_lock(&h->mutex);
 
   if( (rc=imap_mbox_connect(h)) == IMAP_SUCCESS) {
     if( (rc = imap_authenticate(h)) == IMAP_SUCCESS) {
@@ -654,7 +652,7 @@ imap_mbox_handle_reconnect(ImapMboxHandle* h, gboolean *readonly)
 
     }
   }
-  HANDLE_UNLOCK(h);
+  g_mutex_unlock(&h->mutex);
   return rc;
 }
 
@@ -663,9 +661,9 @@ imap_mbox_handle_reconnect(ImapMboxHandle* h, gboolean *readonly)
 void
 imap_handle_force_disconnect(ImapMboxHandle *h)
 {
-  HANDLE_LOCK(h);
+  g_mutex_lock(&h->mutex);
   imap_handle_disconnect(h);
-  HANDLE_UNLOCK(h);
+  g_mutex_unlock(&h->mutex);
 }
 
 ImapTlsMode
@@ -947,7 +945,7 @@ imap_mbox_handle_get_delim(ImapMboxHandle* handle,
   guint handler_id;
   gchar * cmd, *mbx7;
 
-  HANDLE_LOCK(handle);
+  g_mutex_lock(&handle->mutex);
   /* FIXME: block other list response signals here? */
   handler_id = g_signal_connect(G_OBJECT(handle), "list-response",
 				G_CALLBACK(get_delim),
@@ -959,7 +957,7 @@ imap_mbox_handle_get_delim(ImapMboxHandle* handle,
   imap_cmd_exec(handle, cmd); /* ignore return code.. */
   g_free(cmd);
   g_signal_handler_disconnect(G_OBJECT(handle), handler_id);
-  HANDLE_UNLOCK(handle);
+  g_mutex_unlock(&handle->mutex);
   return delim;
 
 }
@@ -984,7 +982,7 @@ imap_mbox_handle_finalize(GObject* gobject)
   ImapMboxHandle* handle = IMAP_MBOX_HANDLE(gobject);
   g_return_if_fail(handle);
 
-  HANDLE_LOCK(handle);
+  g_mutex_lock(&handle->mutex);
   if(handle->state != IMHS_DISCONNECTED) {
     handle->doing_logout = TRUE;
     imap_cmd_exec(handle, "LOGOUT");
@@ -1006,10 +1004,8 @@ imap_mbox_handle_finalize(GObject* gobject)
   g_list_free(handle->acls); handle->acls = NULL;
   g_free(handle->quota_root); handle->quota_root = NULL;
 
-  HANDLE_UNLOCK(handle);
-#if defined(BALSA_USE_THREADS)
-  pthread_mutex_destroy(&handle->mutex);
-#endif
+  g_mutex_unlock(&handle->mutex);
+  g_mutex_clear(&handle->mutex);
 
   G_OBJECT_CLASS(parent_class)->finalize(gobject);  
 }

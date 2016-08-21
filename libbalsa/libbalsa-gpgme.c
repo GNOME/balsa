@@ -28,11 +28,6 @@
 #include <locale.h>
 #endif
 
-#ifdef BALSA_USE_THREADS
-#include <pthread.h>
-#include "misc.h"
-#endif
-
 #if HAVE_MACOSX_DESKTOP
 #include "macosx-helpers.h"
 #endif
@@ -629,18 +624,19 @@ static void
 g_set_error_from_gpgme(GError ** error, gpgme_error_t gpgme_err,
 		       const gchar * message)
 {
-    gchar *errstr;
-    gchar *srcstr;
+    if (error != NULL) {
+    	gchar errbuf[4096];		/* should be large enough... */
+        gchar *errstr;
+        gchar *srcstr;
 
-    if (!error)
-	return;
-
-    srcstr = utf8_valid_str(gpgme_strsource(gpgme_err));
-    errstr = utf8_valid_str(gpgme_strerror(gpgme_err));
-    g_set_error(error, GPGME_ERROR_QUARK, gpgme_err, "%s: %s: %s", srcstr,
-		message, errstr);
-    g_free(srcstr);
-    g_free(errstr);
+        srcstr = utf8_valid_str(gpgme_strsource(gpgme_err));
+        gpgme_strerror_r(gpgme_err, errbuf, sizeof(errbuf));
+        errstr = utf8_valid_str(errbuf);
+        g_set_error(error, GPGME_ERROR_QUARK, gpgme_err, "%s: %s: %s", srcstr,
+        	message, errstr);
+        g_free(srcstr);
+        g_free(errstr);
+    }
 }
 
 

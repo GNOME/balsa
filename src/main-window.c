@@ -65,10 +65,7 @@
 #include "save-restore.h"
 #include "toolbar-prefs.h"
 #include "toolbar-factory.h"
-
-#ifdef BALSA_USE_THREADS
 #include "threads.h"
-#endif
 
 #include "filter.h"
 #include "filter-funcs.h"
@@ -93,7 +90,6 @@ static GtkTargetEntry notebook_drop_types[NUM_DROP_TYPES] = {
     {"x-application/x-message-list", GTK_TARGET_SAME_APP, TARGET_MESSAGES}
 };
 
-#ifdef BALSA_USE_THREADS
 /* Define thread-related globals, including dialogs */
 GtkWidget *progress_dialog = NULL;
 GtkWidget *progress_dialog_source = NULL;
@@ -109,7 +105,6 @@ struct check_messages_thread_info {
 static void bw_check_messages_thread(struct check_messages_thread_info
                                      *info);
 
-#endif
 static void bw_display_new_mail_notification(int num_new, int has_new);
 
 static void balsa_window_class_init(BalsaWindowClass * klass);
@@ -268,7 +263,6 @@ balsa_window_init(BalsaWindow * window)
 static gboolean
 bw_delete_cb(GtkWidget* main_window)
 {
-#ifdef BALSA_USE_THREADS
     /* we cannot leave main window disabled because compose windows
      * (for example) could refuse to get deleted and we would be left
      * with disabled main window. */
@@ -286,7 +280,6 @@ bw_delete_cb(GtkWidget* main_window)
         gtk_widget_destroy(d);
         return retval != GTK_RESPONSE_YES; /* keep running unless OK */
     }
-#endif
     return FALSE; /* allow delete */
 }
 
@@ -2356,10 +2349,8 @@ balsa_window_new()
     g_signal_connect(window, "notify::is-active",
                      G_CALLBACK(bw_is_active_notify), NULL);
 
-#ifdef BALSA_USE_THREADS
     /* set initial state of Get-New-Mail button */
     bw_action_set_enabled(window, "get-new-mail", !checking_mail);
-#endif
 
     g_timeout_add_seconds(30, (GSourceFunc) bw_close_mailbox_on_timer, window);
 
@@ -2890,18 +2881,14 @@ bw_real_open_mbnode_idle_cb(BalsaWindowRealOpenMbnodeInfo * info)
 static void
 bw_real_open_mbnode_thread(BalsaWindowRealOpenMbnodeInfo * info)
 {
-#ifdef BALSA_USE_THREADS
-    static pthread_mutex_t open_lock = PTHREAD_MUTEX_INITIALIZER;
-#endif                          /* BALSA_USE_THREADS */
+    static GMutex open_lock;
     gint try_cnt;
     LibBalsaMailbox *mailbox = info->mbnode->mailbox;
     GError *err = NULL;
     gboolean successp;
 
-#ifdef BALSA_USE_THREADS
     /* Use a mutex to ensure we open only one mailbox at a time */
-    pthread_mutex_lock(&open_lock);
-#endif                          /* BALSA_USE_THREADS */
+    g_mutex_lock(&open_lock);
 
     try_cnt = 0;
     do {
@@ -2933,9 +2920,7 @@ bw_real_open_mbnode_thread(BalsaWindowRealOpenMbnodeInfo * info)
         g_object_unref(info->mbnode);
         g_free(info);
     }
-#ifdef BALSA_USE_THREADS
-    pthread_mutex_unlock(&open_lock);
-#endif                          /* BALSA_USE_THREADS */
+    g_mutex_unlock(&open_lock);
 }
 
 static void
@@ -2946,9 +2931,7 @@ balsa_window_real_open_mbnode(BalsaWindow * window,
     BalsaIndex * index;
     gchar *message;
     LibBalsaMailbox *mailbox;
-#ifdef BALSA_USE_THREADS
-    pthread_t open_thread;
-#endif                          /* BALSA_USE_THREADS */
+    GThread *open_thread;
     BalsaWindowRealOpenMbnodeInfo *info;
 
     if (bw_is_open_mailbox(mailbox = mbnode->mailbox))
@@ -2970,14 +2953,11 @@ balsa_window_real_open_mbnode(BalsaWindow * window,
     info->set_current = set_current;
     info->index = index;
     info->message = message;
-#ifdef BALSA_USE_THREADS
-    pthread_create(&open_thread, NULL,
-                   (void*(*)(void*))bw_real_open_mbnode_thread,
-                   info);
-    pthread_detach(open_thread);
-#else                           /* BALSA_USE_THREADS */
-    bw_real_open_mbnode_thread(info);
-#endif                          /* BALSA_USE_THREADS */
+    open_thread =
+    	g_thread_new("bw_real_open_mbnode_thread",
+    				 (GThreadFunc) bw_real_open_mbnode_thread,
+					 info);
+    g_thread_unref(open_thread);
 }
 
 /* balsa_window_real_close_mbnode:
@@ -3151,39 +3131,33 @@ balsa_window_refresh(BalsaWindow * window)
 /* monitored functions for MT-safe manipulation of the open mailbox list
    QUESTION: could they migrate to balsa-app.c?
 */
-#ifdef BALSA_USE_THREADS
-static pthread_mutex_t open_list_lock = PTHREAD_MUTEX_INITIALIZER;
-#define LOCK_OPEN_LIST pthread_mutex_lock(&open_list_lock)
-#define UNLOCK_OPEN_LIST pthread_mutex_unlock(&open_list_lock)
-#else
-#define LOCK_OPEN_LIST
-#define UNLOCK_OPEN_LIST
-#endif
+static GMutex open_list_lock;
+
 static void
 bw_register_open_mailbox(LibBalsaMailbox *m)
 {
-    LOCK_OPEN_LIST;
+	g_mutex_lock(&open_list_lock);
     balsa_app.open_mailbox_list =
         g_list_prepend(balsa_app.open_mailbox_list, m);
-    UNLOCK_OPEN_LIST;
+    g_mutex_unlock(&open_list_lock);
     libbalsa_mailbox_set_open(m, TRUE);
 }
 static void
 bw_unregister_open_mailbox(LibBalsaMailbox *m)
 {
-    LOCK_OPEN_LIST;
+	g_mutex_lock(&open_list_lock);
     balsa_app.open_mailbox_list =
         g_list_remove(balsa_app.open_mailbox_list, m);
-    UNLOCK_OPEN_LIST;
+    g_mutex_unlock(&open_list_lock);
     libbalsa_mailbox_set_open(m, FALSE);
 }
 static gboolean
 bw_is_open_mailbox(LibBalsaMailbox *m)
 {
     GList *res;
-    LOCK_OPEN_LIST;
+    g_mutex_lock(&open_list_lock);
     res= g_list_find(balsa_app.open_mailbox_list, m);
-    UNLOCK_OPEN_LIST;
+    g_mutex_unlock(&open_list_lock);
     return (res != NULL);
 }
 
@@ -3241,7 +3215,6 @@ bw_imap_check_test(const gchar * path)
         strcmp(path, "INBOX") == 0 : balsa_app.check_imap;
 }
 
-#if BALSA_USE_THREADS
 static void
 bw_mailbox_check(LibBalsaMailbox * mailbox, BalsaWindow * window);
 
@@ -3307,23 +3280,6 @@ ensure_check_mail_dialog(BalsaWindow * window)
     gtk_widget_show_all(progress_dialog);
 }
 
-#else /* BALSA_USE_THREADS */
-static void
-bw_mailbox_check(LibBalsaMailbox * mailbox, BalsaWindow * window)
-{
-    if (libbalsa_mailbox_get_subscribe(mailbox) == LB_MAILBOX_SUBSCRIBE_NO)
-        return;
-
-    if (LIBBALSA_IS_MAILBOX_IMAP(mailbox)) {
-        if (window && !window->network_available) {
-                return;
-        }
-    }
-
-    libbalsa_mailbox_check(mailbox);
-}
-#endif /* BALSA_USE_THREADS */
-
 /*
  * Callbacks
  */
@@ -3336,32 +3292,30 @@ void
 check_new_messages_real(BalsaWindow * window, int type)
 {
     GSList *list;
-#if defined(BALSA_USE_THREADS)
     struct check_messages_thread_info *info;
-#endif
+    GThread *get_mail_thread;
 
     if (window && !BALSA_IS_WINDOW(window))
         return;
 
     list = NULL;
-#if defined(BALSA_USE_THREADS)
     /*  Only Run once -- If already checking mail, return.  */
-    pthread_mutex_lock(&checking_mail_lock);
+    g_mutex_lock(&checking_mail_lock);
     if (checking_mail) {
-        pthread_mutex_unlock(&checking_mail_lock);
+        g_mutex_unlock(&checking_mail_lock);
         fprintf(stderr, "Already Checking Mail!\n");
 	if (progress_dialog)
 	    gtk_window_present(GTK_WINDOW(progress_dialog));
         return;
     }
-    checking_mail = 1;
+    checking_mail = TRUE;
     if (window)
         bw_action_set_enabled(window, "get-new-mail", FALSE);
 
     quiet_check = (type == TYPE_CALLBACK)
         ? 0 : balsa_app.quiet_background_check;
 
-    pthread_mutex_unlock(&checking_mail_lock);
+    g_mutex_unlock(&checking_mail_lock);
 
     if (type == TYPE_CALLBACK &&
         (balsa_app.pwindow_option == WHILERETR ||
@@ -3376,36 +3330,16 @@ check_new_messages_real(BalsaWindow * window, int type)
     info = g_new(struct check_messages_thread_info, 1);
     info->list = list;
     info->window = window ? g_object_ref(window) : window;
-    pthread_create(&get_mail_thread,
-                   NULL, (void *) &bw_check_messages_thread, info);
+    get_mail_thread =
+    	g_thread_new("bw_check_messages_thread",
+    				 (GThreadFunc) bw_check_messages_thread,
+					 info);
 
-    /* Detach so we don't need to pthread_join
+    /* Detach so we don't need to g_thread_join
      * This means that all resources will be
      * reclaimed as soon as the thread exits
      */
-    pthread_detach(get_mail_thread);
-#else
-
-    if (window)
-        bw_action_set_enabled(window, "get-new-mail", FALSE);
-
-    bw_check_mailbox_list(window, balsa_app.inbox_input);
-
-    if (!balsa_app.mblist_tree_store)
-        return;
-    gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
-			   (GtkTreeModelForeachFunc) bw_add_mbox_to_checklist,
-			   &list);
-    g_slist_foreach(list, (GFunc) bw_mailbox_check, window);
-    g_slist_foreach(list, (GFunc) g_object_unref, NULL);
-    g_slist_free(list);
-
-    if (window)
-        bw_action_set_enabled(window, "get-new-mail", TRUE);
-
-    if (window->network_available)
-        time(&window->last_check_time);
-#endif
+    g_thread_unref(get_mail_thread);
 }
 
 static void
@@ -3457,7 +3391,6 @@ check_new_messages_count(LibBalsaMailbox * mailbox, gboolean notify)
 }
 
 /* this one is called only in the threaded code */
-#if defined(BALSA_USE_THREADS)
 static void
 bw_mailbox_check(LibBalsaMailbox * mailbox, BalsaWindow * window)
 {
@@ -3496,14 +3429,12 @@ static void
 bw_check_messages_thread(struct check_messages_thread_info *info)
 {
     /*
-     *  It is assumed that this will always be called as a pthread,
+     *  It is assumed that this will always be called as a GThread,
      *  and that the calling procedure will check for an existing lock
      *  and set checking_mail to true before calling.
      */
     MailThreadMessage *threadmessage;
     GSList *list = info->list;
-
-    pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
 
     MSGMAILTHREAD(threadmessage, LIBBALSA_NTFY_SOURCE, NULL, "POP3", 0, 0);
     bw_check_mailbox_list(info->window, balsa_app.inbox_input);
@@ -3515,8 +3446,8 @@ bw_check_messages_thread(struct check_messages_thread_info *info)
     MSGMAILTHREAD(threadmessage, LIBBALSA_NTFY_FINISHED, NULL, "Finished",
                   0, 0);
 
-    pthread_mutex_lock(&checking_mail_lock);
-    checking_mail = 0;
+    g_mutex_lock(&checking_mail_lock);
+    checking_mail = FALSE;
 
     if (info->window) {
         g_idle_add((GSourceFunc) bw_check_messages_thread_idle_cb,
@@ -3525,10 +3456,10 @@ bw_check_messages_thread(struct check_messages_thread_info *info)
             time(&info->window->last_check_time);
         g_object_unref(info->window);
     }
-    pthread_mutex_unlock(&checking_mail_lock);
+    g_mutex_unlock(&checking_mail_lock);
 
     g_free(info);
-    pthread_exit(0);
+    g_thread_exit(0);
 }
 
 /* mail_progress_notify_cb:
@@ -3759,7 +3690,6 @@ send_progress_notify_cb(GIOChannel * source, GIOCondition condition,
     return TRUE;
 }
 
-#endif /* BALSA_USE_THREADS */
 
 /** Returns properly formatted string informing the user about the
     amount of the new mail.

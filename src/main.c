@@ -27,10 +27,6 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#ifdef BALSA_USE_THREADS
-#include <pthread.h>
-#endif
-
 #ifdef HAVE_LOCALE_H
 #include <locale.h>
 #endif
@@ -53,6 +49,7 @@
 #include "information.h"
 #include "imap-server.h"
 #include "libbalsa-conf.h"
+#include "threads.h"
 
 #include "libinit_balsa/assistant_init.h"
 
@@ -61,14 +58,9 @@
 #include "libbalsa-gpgme-cb.h"
 #endif
 
-#ifdef BALSA_USE_THREADS
-#include "threads.h"
-
 /* Globals for Thread creation, messaging, pipe I/O */
-pthread_t get_mail_thread;
-pthread_t send_mail;
-pthread_mutex_t send_messages_lock;
-int checking_mail;
+GMutex send_messages_lock;
+gboolean checking_mail;
 int mail_thread_pipes[2];
 int send_thread_pipes[2];
 GIOChannel *mail_thread_msg_send;
@@ -78,7 +70,6 @@ GIOChannel *send_thread_msg_receive;
 
 static void threads_init(void);
 static void threads_destroy(void);
-#endif				/* BALSA_USE_THREADS */
 
 static void config_init(gboolean check_only);
 static void mailboxes_init(gboolean check_only);
@@ -183,14 +174,12 @@ mailboxes_init(gboolean check_only)
     }
 }
 
-#ifdef BALSA_USE_THREADS
-
-pthread_mutex_t checking_mail_lock = PTHREAD_MUTEX_INITIALIZER;
+GMutex checking_mail_lock;
 
 static void
 threads_init(void)
 {
-    pthread_mutex_init(&send_messages_lock, NULL);
+    g_mutex_init(&send_messages_lock);
     if (pipe(mail_thread_pipes) < 0) {
 	g_log("BALSA Init", G_LOG_LEVEL_DEBUG,
 	      "Error opening pipes.\n");
@@ -217,11 +206,9 @@ threads_init(void)
 static void
 threads_destroy(void)
 {
-    pthread_mutex_destroy(&checking_mail_lock);
-    pthread_mutex_destroy(&send_messages_lock);
+    g_mutex_clear(&checking_mail_lock);
+    g_mutex_clear(&send_messages_lock);
 }
-
-#endif				/* BALSA_USE_THREADS */
 
 /* initial_open_mailboxes:
    open mailboxes on startup if requested so.
@@ -561,10 +548,8 @@ real_main(int argc, char *argv[])
     setlocale(LC_ALL, "");
 #endif
 
-#ifdef BALSA_USE_THREADS
     /* initiate thread mutexs, variables */
     threads_init();
-#endif
 
 #ifdef HAVE_RUBRICA
     /* initialise libxml */
@@ -641,9 +626,8 @@ real_main(int argc, char *argv[])
     balsa_cleanup();
     accel_map_save();
 
-#ifdef BALSA_USE_THREADS
     threads_destroy();
-#endif
+
     libbalsa_imap_server_close_all_connections();
     return 0;
 }
@@ -651,25 +635,6 @@ real_main(int argc, char *argv[])
 static void
 balsa_cleanup(void)
 {
-#ifdef BALSA_USE_THREADS
-    /* move threads shutdown to separate routine?
-       There are actually many things to do, e.g. threads should not
-       be started after this point.
-    */
-    pthread_mutex_lock(&checking_mail_lock);
-    if(checking_mail) {
-        /* We want to quit but there is a checking thread active.
-           The alternatives are to:
-           a. wait for the checking thread to finish - but it could be
-           time consuming.
-           b. send cancel signal to it.
-        */
-        pthread_cancel(get_mail_thread);
-        printf("Mail check thread cancelled. I know it is rough.\n");
-        sleep(1);
-    }
-    pthread_mutex_unlock(&checking_mail_lock);
-#endif
     balsa_app_destroy();
 
     libbalsa_conf_drop_all();

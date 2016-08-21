@@ -104,10 +104,7 @@ bab_config_init(const gchar * group, const gchar * value, gpointer data)
 }
 
 static void ab_warning(const char *fmt, ...)
-#ifdef __GNUC__
-    __attribute__ ((format (printf, 1, 2)))
-#endif
-;
+	G_GNUC_PRINTF(1, 2);
 
 enum {
     LIST_COLUMN_NAME,

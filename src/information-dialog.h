@@ -34,18 +34,12 @@ enum _BalsaInformationShow {
 };
 
 void balsa_information(LibBalsaInformationType type, const char *fmt, ...)
-#ifdef __GNUC__
-    __attribute__ ((format (printf, 2, 3)))
-#endif
-;
+	G_GNUC_PRINTF(2, 3);
 
 void balsa_information_parented(GtkWindow *widget,
                                 LibBalsaInformationType type, 
                                 const char *fmt, ...)
-#ifdef __GNUC__
-    __attribute__ ((format (printf, 3, 4)));
-#endif
-;
+	G_GNUC_PRINTF(3, 4);
 
 void balsa_information_real(GtkWindow *parent, LibBalsaInformationType type,
                             const char *msg);

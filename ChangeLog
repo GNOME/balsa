@@ -1,3 +1,106 @@
+2016-08-21  Albrecht Dreß
+
+	Always use multithreading, and use only the glib abstraction
+	instead of "native" pthreads.
+
+	* configure.ac: remove --enable-threads configure option and its
+	consequences.
+	* libbalsa/filter-file.c: remove reference to BALSA_USE_THREADS.
+	* libbalsa/gmime-gpgme-signature.c
+	(g_mime_gpgme_sigstat_new_from_gpgme_ctx):
+	* libbalsa/imap-server.c (libbalsa_imap_server_set_username),
+	(libbalsa_imap_server_set_host), (libbalsa_imap_server_init),
+	(libbalsa_imap_server_finalize), (lb_imap_server_cleanup),
+	(connection_cleanup), (get_or_create),
+	(libbalsa_imap_server_get_handle),
+	(libbalsa_imap_server_get_handle_with_user),
+	(libbalsa_imap_server_release_handle),
+	(libbalsa_imap_server_force_disconnect),
+	(libbalsa_imap_server_close_all_connections),
+	(libbalsa_imap_server_has_free_handles):
+	* libbalsa/imap/imap-commands.c (imap_mbox_handle_noop),
+	(imap_mbox_select), (imap_mbox_examine), (imap_mbox_create),
+	(imap_mbox_delete), (imap_mbox_rename), (imap_mbox_subscribe),
+	(imap_mbox_list), (imap_mbox_lsub), (imap_mbox_status),
+	(imap_mbox_append_multi), (imap_mbox_close), (imap_mbox_expunge),
+	(imap_mbox_expunge_a), (imap_mbox_find_all),
+	(imap_mbox_find_unseen), (imap_mbox_handle_msgno_has_flags),
+	(imap_mbox_handle_fetch_range), (imap_mbox_handle_fetch_set),
+	(imap_mbox_handle_fetch_rfc822),
+	(imap_mbox_handle_fetch_rfc822_uid), (imap_mbox_handle_fetch_body),
+	(imap_mbox_store_flag), (imap_mbox_store_flag_a),
+	(imap_mbox_handle_copy), (imap_mbox_unselect), (imap_mbox_thread),
+	(imap_mbox_sort_msgno), (imap_mbox_sort_filter),
+	(imap_mbox_filter_msgnos), (imap_mbox_complete_msgids),
+	(imap_mbox_get_quota), (imap_mbox_get_my_rights),
+	(imap_mbox_get_acl):
+	* libbalsa/imap/imap-handle.c (imap_mbox_handle_init),
+	(async_process), (idle_start), (imap_mbox_handle_connect),
+	(imap_mbox_handle_reconnect), (imap_handle_force_disconnect),
+	(imap_mbox_handle_get_delim), (imap_mbox_handle_finalize):
+	* libbalsa/imap/imap-tls.c (locking_function), (id_function),
+	(dyn_create_function), (dyn_lock_function), (dyn_destroy_function),
+	(imaptls_thread_setup), (imaptls_thread_cleanup),
+	(imap_create_ssl):
+	* libbalsa/imap/imap_private.h:
+	* libbalsa/imap/imap_search.c (imap_search_exec):
+	* libbalsa/information.h:
+	* libbalsa/libbalsa-conf.c (lbc_lock), (lbc_unlock),
+	(libbalsa_conf_sync), (libbalsa_conf_queue_sync):
+	* libbalsa/libbalsa-gpgme-cb.c (lb_gpgme_passphrase),
+	(get_passphrase_idle):
+	* libbalsa/libbalsa-gpgme.c (g_set_error_from_gpgme):
+	* libbalsa/libbalsa.c (libbalsa_init), (ask_idle), (libbalsa_ask),
+	(libbalsa_certs_destroy), (libbalsa_is_cert_known),
+	(libbalsa_am_i_subthread), (libbalsa_lock_mailbox),
+	(libbalsa_unlock_mailbox):
+	* libbalsa/libbalsa.h:
+	* libbalsa/libbalsa_private.h:
+	* libbalsa/mailbox.c (libbalsa_mailbox_class_init),
+	(lbm_index_entry_populate_from_msg), (lbm_index_entry_new_pending),
+	(lbm_index_entry_free), (libbalsa_mailbox_finalize),
+	(libbalsa_mailbox_check), (libbalsa_mailbox_real_lock_store),
+	(lbm_msgno_changed_expunged_cb), (lbm_msgnos_changed_idle_cb),
+	(lbm_msgno_changed), (lbm_msgno_filt_check_idle_cb),
+	(libbalsa_mailbox_msgno_filt_check), (lbm_cache_message),
+	(libbalsa_mailbox_get_message),
+	(libbalsa_mailbox_messages_change_flags),
+	(lbm_set_threading_idle_cb), (lbm_set_threading),
+	(lbm_get_index_entry_expunged_cb), (lbm_get_index_entry_real),
+	(lbm_get_index_entry), (lbm_check_idle),
+	(libbalsa_mailbox_unlock_store):
+	* libbalsa/mailbox.h:
+	* libbalsa/mailbox_imap.c:
+	* libbalsa/mailbox_local.c (lbm_local_save_tree_idle),
+	(message_match_real), (lbml_set_threading_idle_cb),
+	(libbalsa_mailbox_local_set_threading):
+	* libbalsa/mailbox_mbox.c (libbalsa_mailbox_mbox_class_init),
+	(libbalsa_mailbox_mbox_lock_store):
+	* libbalsa/mime-stream-shared.c
+	(libbalsa_mime_stream_shared_unlock):
+	* libbalsa/mime-stream-shared.h:
+	* libbalsa/missing_time.c (ctime_r):
+	* libbalsa/rfc3156.c (libbalsa_gpgme_sig_stat_to_gchar):
+	* libbalsa/send.c (lbs_process_queue), (handle_successful_send),
+	(libbalsa_smtp_event_cb), (libbalsa_process_queue),
+	(balsa_send_message_real):
+	* libbalsa/send.h:
+	* src/ab-main.c:
+	* src/balsa-app.c (ask_passwd_idle), (ask_password_mt),
+	(ask_password):
+	* src/filter-edit-callbacks.c:
+	* src/information-dialog.h:
+	* src/main-window.c (bw_delete_cb), (balsa_window_new),
+	(bw_real_open_mbnode_thread), (balsa_window_real_open_mbnode),
+	(bw_register_open_mailbox), (bw_unregister_open_mailbox),
+	(bw_is_open_mailbox), (check_new_messages_real),
+	(bw_check_messages_thread):
+	* src/main.c (threads_init), (threads_destroy), (real_main),
+	(balsa_cleanup):
+	* src/save-restore.c (pop3_progress_notify):
+	* src/sendmsg-window.c (balsa_sendmsg_destroy_handler):
+	* src/threads.h: ditto.
+
 2016-07-28  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Implement a GtkComboBox for selecting a LibBalsaIdentity, and

@@ -57,9 +57,7 @@
 #include "missing.h"
 #include <glib/gi18n.h>
 
-#ifdef BALSA_USE_THREADS
-static pthread_t main_thread_id;
-#endif
+static GThread *main_thread_id;
 
 
 void
@@ -82,9 +80,7 @@ libbalsa_init(LibBalsaInformationFunc information_callback)
     notify_init("Basics");
 #endif
 
-#ifdef BALSA_USE_THREADS
-    main_thread_id = pthread_self();
-#endif
+    main_thread_id = g_thread_self();
 
     uname(&utsname);
 
@@ -289,13 +285,12 @@ libbalsa_get_icon_from_flags(LibBalsaMessageFlag flags)
 }
 
 
-#ifdef BALSA_USE_THREADS
-#include <pthread.h>
 typedef struct {
-    pthread_mutex_t lock;
-    pthread_cond_t condvar;
+    GMutex lock;
+    GCond condvar;
     int (*cb)(void *arg);
     void *arg;
+    gboolean done;
     int res;
 } AskData;
 
@@ -309,8 +304,9 @@ ask_idle(gpointer data)
     printf("ask_idle: ENTER %p\n", data);
     gdk_threads_enter();
     ad->res = (ad->cb)(ad->arg);
+    ad->done = TRUE;
     gdk_threads_leave();
-    pthread_cond_signal(&ad->condvar);
+    g_cond_signal(&ad->condvar);
     printf("ask_idle: LEAVE %p\n", data);
     return FALSE;
 }
@@ -324,7 +320,7 @@ libbalsa_ask(gboolean (*cb)(void *arg), void *arg)
 {
     AskData ad;
 
-    if (pthread_self() == main_thread_id) {
+    if (!libbalsa_am_i_subthread()) {
         int ret;
         printf("Main thread asks the following question.\n");
         gdk_threads_enter();
@@ -333,27 +329,22 @@ libbalsa_ask(gboolean (*cb)(void *arg), void *arg)
         return ret;
     }
     printf("Side thread asks the following question.\n");
-    pthread_mutex_init(&ad.lock, NULL);
-    pthread_cond_init(&ad.condvar, NULL);
+    g_mutex_init(&ad.lock);
+    g_cond_init(&ad.condvar);
     ad.cb  = cb;
     ad.arg = arg;
+    ad.done = FALSE;
 
-    pthread_mutex_lock(&ad.lock);
-    pthread_cond_init(&ad.condvar, NULL);
+    g_mutex_lock(&ad.lock);
     g_idle_add(ask_idle, &ad);
-    pthread_cond_wait(&ad.condvar, &ad.lock);
+    while (!ad.done) {
+    	g_cond_wait(&ad.condvar, &ad.lock);
+    }
 
-    pthread_cond_destroy(&ad.condvar);
-    pthread_mutex_unlock(&ad.lock);
+    g_cond_clear(&ad.condvar);
+    g_mutex_unlock(&ad.lock);
     return ad.res;
 }
-#else /* BALSA_USE_THREADS */
-static gboolean
-libbalsa_ask(gboolean (*cb)(void *arg), void *arg)
-{
-    return cb(arg);
-}
-#endif /* BALSA_USE_THREADS */
 
 
 static int libbalsa_ask_for_cert_acceptance(X509 *cert,
@@ -415,24 +406,16 @@ x509_fingerprint (char *s, unsigned len, X509 * cert)
 }
 
 static GList *accepted_certs = NULL; /* certs accepted for this session */
-
-#ifdef BALSA_USE_THREADS
-static pthread_mutex_t certificate_lock = PTHREAD_MUTEX_INITIALIZER;
-#define LOCK_CERTIFICATES   pthread_mutex_lock(&certificate_lock)
-#define UNLOCK_CERTIFICATES pthread_mutex_unlock(&certificate_lock)
-#else
-#define LOCK_CERTIFICATES
-#define UNLOCK_CERTIFICATES
-#endif
+static GMutex certificate_lock;
 
 void
 libbalsa_certs_destroy(void)
 {
-    LOCK_CERTIFICATES;
+	g_mutex_lock(&certificate_lock);
     g_list_foreach(accepted_certs, (GFunc)X509_free, NULL);
     g_list_free(accepted_certs);
     accepted_certs = NULL;
-    UNLOCK_CERTIFICATES;
+    g_mutex_unlock(&certificate_lock);
 }
 
 /* compare Example 10-7 in the OpenSSL book */
@@ -445,11 +428,11 @@ libbalsa_is_cert_known(X509* cert, long vfy_result)
     gboolean res = FALSE;
     GList *lst;
 
-    LOCK_CERTIFICATES;
+    g_mutex_lock(&certificate_lock);
     for(lst = accepted_certs; lst; lst = lst->next) {
         int res = X509_cmp(cert, lst->data);
         if(res == 0) {
-	    UNLOCK_CERTIFICATES;
+        	g_mutex_unlock(&certificate_lock);
             return TRUE;
 	}
     }
@@ -473,12 +456,12 @@ libbalsa_is_cert_known(X509* cert, long vfy_result)
         ERR_clear_error();
         fclose(fp);
     }
-    UNLOCK_CERTIFICATES;
+    g_mutex_unlock(&certificate_lock);
     
     if(!res) {
 	const char *reason = X509_verify_cert_error_string(vfy_result);
 	res = libbalsa_ask_for_cert_acceptance(cert, reason);
-	LOCK_CERTIFICATES;
+	g_mutex_lock(&certificate_lock);
 	if(res == 2) {
 	    cert_name = g_strconcat(g_get_home_dir(),
 				    "/.balsa/certificates", NULL);
@@ -494,7 +477,7 @@ libbalsa_is_cert_known(X509* cert, long vfy_result)
 	if(res == 1)
 	    accepted_certs = 
 		g_list_prepend(accepted_certs, X509_dup(cert));
-	UNLOCK_CERTIFICATES;
+	g_mutex_unlock(&certificate_lock);
     }
 
     return res;
@@ -654,8 +637,7 @@ libbalsa_abort_on_timeout(const char *host)
 }
 
 
-#ifdef BALSA_USE_THREADS
-pthread_t
+GThread *
 libbalsa_get_main_thread(void)
 {
     return main_thread_id;
@@ -664,14 +646,13 @@ libbalsa_get_main_thread(void)
 gboolean
 libbalsa_am_i_subthread(void)
 {
-    return pthread_self() != main_thread_id;
+    return g_thread_self() != main_thread_id;
 }
-#endif /* BALSA_USE_THREADS */
 
-#ifdef BALSA_USE_THREADS
+
 #include "libbalsa_private.h"	/* for prototypes */
-static pthread_mutex_t mailbox_mutex = PTHREAD_MUTEX_INITIALIZER;
-static pthread_cond_t  mailbox_cond  = PTHREAD_COND_INITIALIZER;
+static GMutex mailbox_mutex;
+static GCond  mailbox_cond;
 
 /* Lock/unlock a mailbox; no argument checking--we'll assume the caller
  * took care of that. 
@@ -680,13 +661,13 @@ static pthread_cond_t  mailbox_cond  = PTHREAD_COND_INITIALIZER;
 void
 libbalsa_lock_mailbox(LibBalsaMailbox * mailbox)
 {
-    pthread_t thread_id = pthread_self();
+	GThread *thread_id = g_thread_self();
 
-    pthread_mutex_lock(&mailbox_mutex);
+    g_mutex_lock(&mailbox_mutex);
 
     if (mailbox->thread_id && mailbox->thread_id != thread_id)
         while (mailbox->lock)
-            pthread_cond_wait(&mailbox_cond, &mailbox_mutex);
+            g_cond_wait(&mailbox_cond, &mailbox_mutex);
 
     /* We'll assume that no-one would destroy a mailbox while we've been
      * trying to lock it. If they have, we have larger problems than
@@ -694,33 +675,32 @@ libbalsa_lock_mailbox(LibBalsaMailbox * mailbox)
     mailbox->lock++;
     mailbox->thread_id = thread_id;
 
-    pthread_mutex_unlock(&mailbox_mutex);
+    g_mutex_unlock(&mailbox_mutex);
 }
 
 void
 libbalsa_unlock_mailbox(LibBalsaMailbox * mailbox)
 {
-    pthread_t self;
+	GThread *self;
 
-    self = pthread_self();
+    self = g_thread_self();
 
-    pthread_mutex_lock(&mailbox_mutex);
+    g_mutex_lock(&mailbox_mutex);
 
     if (mailbox->lock == 0 || self != mailbox->thread_id) {
 	g_warning("Not holding mailbox lock!!!");
-        pthread_mutex_unlock(&mailbox_mutex);
+        g_mutex_unlock(&mailbox_mutex);
 	return;
     }
 
     if(--mailbox->lock == 0) {
         mailbox->thread_id = 0;
-        pthread_cond_broadcast(&mailbox_cond);
+        g_cond_broadcast(&mailbox_cond);
     }
 
-    pthread_mutex_unlock(&mailbox_mutex);
+    g_mutex_unlock(&mailbox_mutex);
 }
 
-#endif				/* BALSA_USE_THREADS */
 
 /* Initialized by the front end. */
 void (*libbalsa_progress_set_text) (LibBalsaProgress * progress,

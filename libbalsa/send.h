@@ -96,9 +96,7 @@ gboolean libbalsa_process_queue(LibBalsaMailbox* outbox,
 
 #endif
 
-#ifdef BALSA_USE_THREADS
-extern pthread_t send_mail;
-extern pthread_mutex_t send_messages_lock;
+extern GMutex send_messages_lock;
 extern int send_thread_pipes[2];
 
 typedef struct {
@@ -127,7 +125,5 @@ enum {
     MSGSENDTHREADDELETE,
     MSGSENDTHREADFINISHED
 };
-
-#endif /* BALSA_USE_THREADS */
 
 #endif /* __SEND_H__ */

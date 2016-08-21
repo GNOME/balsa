@@ -30,23 +30,15 @@
 
 #include <string.h>
 
-#if BALSA_USE_THREADS
-#include <pthread.h>
-static pthread_mutex_t time_lock = PTHREAD_MUTEX_INITIALIZER;
-#define LOCK(mutex)   pthread_mutex_lock(&mutex)
-#define UNLOCK(mutex) pthread_mutex_unlock(&mutex)
-#else
-#define LOCK(mutex)
-#define UNLOCK(mutex)
-#endif /* BALSA_USE_THREADS */
-
 #ifndef HAVE_CTIME_R
 char *
 ctime_r(const time_t *clock, char *buf)
 {
-    LOCK(time_lock);
+	static GMutex time_lock;
+
+	g_mutex_lock(&mutex);
     strcpy(buf, ctime(clock));
-    UNLOCK(time_lock);
+	g_mutex_unlock(&mutex);
     return buf;
 }
 #endif

@@ -27,10 +27,6 @@
 # include "config.h"
 #endif                          /* HAVE_CONFIG_H */
 
-/* yellow dog has crappy libc and needs pthread.h to be included here */
-#ifdef BALSA_USE_THREADS
-#  include <pthread.h>
-#endif
 #include <time.h>
 
 #include <string.h>

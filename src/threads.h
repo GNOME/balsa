@@ -25,11 +25,10 @@
 #include <unistd.h>
 
 /*  allocated in main.c */
-extern pthread_mutex_t checking_mail_lock;
+extern GMutex checking_mail_lock;
 
 /*  define thread globals */
-extern pthread_t get_mail_thread;
-extern int checking_mail;
+extern gboolean checking_mail;
 extern int mail_thread_pipes[2];
 extern GIOChannel *mail_thread_msg_send;
 extern GIOChannel *mail_thread_msg_receive;

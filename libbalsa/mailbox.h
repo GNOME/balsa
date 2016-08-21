@@ -30,10 +30,6 @@
 #include <gdk/gdk.h>
 #include <gmime/gmime.h>
 
-#ifdef BALSA_USE_THREADS
-#include <pthread.h>
-#endif
-
 #include "libbalsa.h"
 
 #define LIBBALSA_TYPE_MAILBOX \
@@ -211,9 +207,7 @@ struct _LibBalsaMailbox {
     
     int lock; /* 0 if mailbox is unlocked; */
               /* >0 if mailbox is (recursively locked). */
-#ifdef BALSA_USE_THREADS
-    pthread_t thread_id; /* id of thread that locked the mailbox */
-#endif
+    GThread *thread_id; /* id of thread that locked the mailbox */
     gboolean is_directory;
     gboolean readonly;
     gboolean disconnected;
@@ -252,12 +246,11 @@ struct _LibBalsaMailbox {
     /* Whether the tree has been changed since some event. */
     gboolean msg_tree_changed;
 
-#ifdef BALSA_USE_THREADS
     /* Array of msgnos that need to be displayed. */
     GArray *msgnos_pending;
     /* Array of msgnos that have been changed. */
     GArray *msgnos_changed;
-#endif                          /* BALSA_USE_THREADS */
+
     guint changed_idle_id;
     guint queue_check_idle_id;
 };
@@ -340,9 +333,7 @@ struct _LibBalsaMailboxClass {
     gboolean (*close_backend)(LibBalsaMailbox * mailbox);
     guint (*total_messages)(LibBalsaMailbox * mailbox);
     GArray *(*duplicate_msgnos) (LibBalsaMailbox * mailbox);
-#if BALSA_USE_THREADS
     void (*lock_store) (LibBalsaMailbox * mailbox, gboolean lock);
-#endif                          /* BALSA_USE_THREADS */
 };
 
 GType libbalsa_mailbox_get_type(void);
@@ -654,19 +645,10 @@ void libbalsa_mailbox_set_foreground(LibBalsaMailbox * mailbox,
 void libbalsa_mailbox_set_background(LibBalsaMailbox * mailbox,
                                      GArray * msgnos, const gchar * color);
 
-#if BALSA_USE_THREADS
-
 /* Lock and unlock the mail store--currently, a no-op except for mbox.
  */
 void libbalsa_mailbox_lock_store  (LibBalsaMailbox * mailbox);
 void libbalsa_mailbox_unlock_store(LibBalsaMailbox * mailbox);
-
-#else                           /* BALSA_USE_THREADS */
-
-#define libbalsa_mailbox_lock_store(mailbox)
-#define libbalsa_mailbox_unlock_store(mailbox)
-
-#endif                          /* BALSA_USE_THREADS */
 
 /* columns ids */
 typedef enum {

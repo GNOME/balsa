@@ -19,21 +19,11 @@
  * 02111-1307, USA.
  */
 
+#include <glib.h>
 #include <glib-object.h>
 #include <openssl/ssl.h>
 
 #include "config.h"
-
-#if defined(BALSA_USE_THREADS)
-#include <pthread.h>
-#define HANDLE_LOCK(h)   pthread_mutex_lock(&h->mutex)
-#define HANDLE_TRYLOCK(h) pthread_mutex_trylock(&h->mutex)
-#define HANDLE_UNLOCK(h) pthread_mutex_unlock(&h->mutex)
-#else
-#define HANDLE_LOCK(h) 
-#define HANDLE_TRYLOCK(h) 0
-#define HANDLE_UNLOCK(h)
-#endif
 
 #include "imap-commands.h"
 #include "imap_compress.h"
@@ -125,9 +115,7 @@ struct _ImapMboxHandle {
   GHashTable *status_resps; /* A hash of STATUS responses that we wait for */
 
   GIOChannel *iochannel; /* IO channel used for monitoring the connection */
-#if defined(BALSA_USE_THREADS)
-  pthread_mutex_t mutex;
-#endif
+  GMutex mutex;
   guint idle_enable_id; /* callback to issue IDLE after a period of
                            inactivity */
   guint async_watch_id;  /* callback to process incoming data */
@@ -165,17 +153,17 @@ struct _ImapMboxHandle {
 
 #define IMAP_REQUIRED_STATE1(h, state1, ret)            \
     do{if(!(h) || h->state != (state1))                 \
-            { HANDLE_UNLOCK(h);return (ret);}}while(0);
+            {g_mutex_unlock(&h->mutex); return (ret);}}while(0);
 #define IMAP_REQUIRED_STATE1_U(h, state1, ret)                  \
     do{if(!(h) || h->state != (state1)) return (ret);}while(0);
 
 #define IMAP_REQUIRED_STATE2(h, state1, state2, ret)                    \
     do{if(!(h) || !(h->state == (state1) || h->state == (state2)))      \
-            {HANDLE_UNLOCK(h); return (ret);}}while(0);
+            {g_mutex_unlock(&h->mutex); return (ret);}}while(0);
 #define IMAP_REQUIRED_STATE3(h, state1, state2, state3, ret)           \
     do{if(!(h) || !(h->state == (state1) || h->state == (state2)||     \
                     h->state == (state3)))                             \
-            {HANDLE_UNLOCK(h);return (ret);}}while(0);
+            {g_mutex_unlock(&h->mutex);return (ret);}}while(0);
 #define IMAP_REQUIRED_STATE3_U(h, state1, state2, state3, ret)           \
     do{if(!(h) || !(h->state == (state1) || h->state == (state2)||     \
                     h->state == (state3)))                             \

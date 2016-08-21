@@ -27,8 +27,6 @@
 # error "Include config.h before this file."
 #endif
 
-#if BALSA_USE_THREADS
-
 #include <gmime/gmime-stream-fs.h>
 
 #define LIBBALSA_TYPE_MIME_STREAM_SHARED                           \
@@ -61,13 +59,5 @@ GMimeStream *libbalsa_mime_stream_shared_new(int fd);
 
 void libbalsa_mime_stream_shared_lock  (GMimeStream * stream);
 void libbalsa_mime_stream_shared_unlock(GMimeStream * stream);
-
-#else                           /* BALSA_USE_THREADS */
-
-#define libbalsa_mime_stream_shared_new(fd) g_mime_stream_fs_new(fd)
-#define libbalsa_mime_stream_shared_lock(stream)
-#define libbalsa_mime_stream_shared_unlock(stream)
-
-#endif                          /* BALSA_USE_THREADS */
 
 #endif                          /* __LIBBALSA_MIME_STREAM_SHARED_H__ */

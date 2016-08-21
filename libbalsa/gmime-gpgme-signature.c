@@ -106,10 +106,13 @@ g_mime_gpgme_sigstat_new_from_gpgme_ctx(gpgme_ctx_t ctx)
 
     /* try to get the related key */
     err = gpgme_get_key(ctx, sig_stat->fingerprint, &sig_stat->key, 0);
-    if (err != GPG_ERR_NO_ERROR)
-          g_message("could not retrieve the key with fingerprint %s: %s: %s",
-                    sig_stat->fingerprint, gpgme_strsource(err),
-                    gpgme_strerror(err));
+    if (err != GPG_ERR_NO_ERROR) {
+    	gchar errbuf[4096];		/* should be large enough... */
+
+    	gpgme_strerror_r(err, errbuf, sizeof(errbuf));
+    	g_message("could not retrieve the key with fingerprint %s: %s: %s",
+    		sig_stat->fingerprint, gpgme_strsource(err), errbuf);
+    }
 
     return sig_stat;
 }

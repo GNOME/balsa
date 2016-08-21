@@ -59,11 +59,7 @@
 #include "balsa-message.h"
 #include "balsa-index.h"
 #include "balsa-icons.h"
-
-#ifdef BALSA_USE_THREADS
-#include <pthread.h>
 #include "threads.h"
-#endif
 
 #include "missing.h"
 #include "ab-window.h"
@@ -665,9 +661,7 @@ balsa_sendmsg_destroy_handler(BalsaSendmsg * bsmsg)
     g_free(bsmsg);
 
     if (quit_on_close) {
-#ifdef BALSA_USE_THREADS
         libbalsa_wait_for_sending_thread(-1);
-#endif
 	gtk_main_quit();
     }
     if(balsa_app.debug) g_message("balsa_sendmsg_destroy(): Stop.");

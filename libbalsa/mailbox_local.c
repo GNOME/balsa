@@ -720,15 +720,7 @@ lbm_local_save_tree_real(LibBalsaMailboxLocal * local)
 static gboolean
 lbm_local_save_tree_idle(LibBalsaMailboxLocal * local)
 {
-#if 0 && defined(BALSA_USE_THREADS)
-    pthread_t save_tree_thread;
-
-    pthread_create(&save_tree_thread, NULL,
-                   (void *) lbm_local_save_tree_real, local);
-    pthread_detach(save_tree_thread);
-#else                           /* BALSA_USE_THREADS */
     lbm_local_save_tree_real(local);
-#endif                          /* BALSA_USE_THREADS */
 
     return FALSE;
 }
@@ -856,10 +848,8 @@ message_match_real(LibBalsaMailbox *mailbox, guint msgno,
         info  = g_ptr_array_index(local->threading_info, msgno - 1);
     }
 
-#if defined(BALSA_USE_THREADS)
     if (entry->idle_pending)
         return FALSE;   /* Can't match. */
-#endif                  /* defined(BALSA_USE_THREADS) */
 
     switch (cond->type) {
     case CONDITION_STRING:
@@ -1143,7 +1133,6 @@ lbml_set_threading(LibBalsaMailbox * mailbox,
     }
 }
 
-#ifdef BALSA_USE_THREADS
 typedef struct {
     LibBalsaMailbox *mailbox;
     LibBalsaMailboxThreadingType thread_type;
@@ -1157,7 +1146,6 @@ lbml_set_threading_idle_cb(LbmlSetThreadingInfo * info)
     g_slice_free(LbmlSetThreadingInfo, info);
     return FALSE;
 }
-#endif                          /* BALSA_USE_THREADS */
 
 static void
 libbalsa_mailbox_local_set_threading(LibBalsaMailbox * mailbox,
@@ -1201,7 +1189,6 @@ libbalsa_mailbox_local_set_threading(LibBalsaMailbox * mailbox,
             return;
     }
 
-#ifdef BALSA_USE_THREADS
     if (libbalsa_am_i_subthread()) {
         LbmlSetThreadingInfo *info;
 
@@ -1214,9 +1201,6 @@ libbalsa_mailbox_local_set_threading(LibBalsaMailbox * mailbox,
         lbml_set_threading(mailbox, thread_type);
         gdk_threads_leave();
     }
-#else                           /* BALSA_USE_THREADS */
-    lbml_set_threading(mailbox, thread_type);
-#endif                          /* BALSA_USE_THREADS */
 #if defined(DEBUG_LOADING_AND_THREADING)
     printf("after threading time=%lu\n", (unsigned long) time(NULL));
 #endif
@@ -2176,14 +2160,11 @@ lbm_local_sync_real(LibBalsaMailboxLocal * local)
 static gboolean
 lbm_local_sync_idle(LibBalsaMailboxLocal * local)
 {
-#if defined(BALSA_USE_THREADS)
-    pthread_t sync_thread;
+    GThread *sync_thread;
 
-    pthread_create(&sync_thread, NULL, (void *) lbm_local_sync_real, local);
-    pthread_detach(sync_thread);
-#else                           /*BALSA_USE_THREADS */
-    lbm_local_sync_real(local);
-#endif                          /*BALSA_USE_THREADS */
+    sync_thread =
+    	g_thread_new("lbm_local_sync_real", (GThreadFunc) lbm_local_sync_real, local);
+    g_thread_unref(sync_thread);
 
     return FALSE;
 }

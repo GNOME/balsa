@@ -49,10 +49,6 @@
 #include <openssl/x509v3.h>
 #include <openssl/err.h>
 
-#ifdef BALSA_USE_THREADS
-#include <pthread.h>
-#endif
-
 /* Support for SSLv3 should *not* be enabled as it is unsafe (see
  * <http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2014-3566> and
  * <http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2014-8730>.
@@ -66,38 +62,29 @@
 #include "imap_private.h"
 
 static SSL_CTX *global_ssl_context = NULL;
-#ifdef BALSA_USE_THREADS
-static pthread_mutex_t global_tls_lock = PTHREAD_MUTEX_INITIALIZER;
-
-/* provide support only for _POSIX_THREADS */
-#define MUTEX_TYPE pthread_mutex_t
-#define MUTEX_SETUP(m)   pthread_mutex_init (&(m), NULL)
-#define MUTEX_CLEANUP(m) pthread_mutex_destroy(&(m))
-#define MUTEX_LOCK(m)    pthread_mutex_lock(&(m))
-#define MUTEX_UNLOCK(m)  pthread_mutex_unlock(&(m))
-#define THREAD_ID        pthread_self()
+static GMutex global_tls_lock;
 
 /* OpenSSL static locks */
-static MUTEX_TYPE *mutexes = NULL;
+static GMutex *mutexes = NULL;
 
 static void
 locking_function(int mode, int n, const char *file, int line)
 {
   if(mode & CRYPTO_LOCK)
-    MUTEX_LOCK(mutexes[n]);
+	  g_mutex_lock(&mutexes[n]);
   else
-    MUTEX_UNLOCK(mutexes[n]);
+	  g_mutex_unlock(&mutexes[n]);
 }
 
 static unsigned long
 id_function(void)
 {
-  return (unsigned long)THREAD_ID;
+  return (unsigned long) g_thread_self();
 }
 
 /* OpenSSL dynamic locks */
 struct CRYPTO_dynlock_value {
-  MUTEX_TYPE mutex;
+  GMutex mutex;
 };
 
 static struct CRYPTO_dynlock_value*
@@ -108,7 +95,7 @@ dyn_create_function(const char *file, int line)
 
   if(!value)
     return NULL;
-  MUTEX_SETUP(value->mutex);
+  g_mutex_init(&value->mutex);
   return value;
 }
 
@@ -117,16 +104,16 @@ dyn_lock_function(int mode, struct CRYPTO_dynlock_value *l,
                   const char *file, int line)
 {
   if(mode & CRYPTO_LOCK)
-    MUTEX_LOCK(l->mutex);
+	  g_mutex_lock(&l->mutex);
   else
-    MUTEX_UNLOCK(l->mutex);
+	  g_mutex_unlock(&l->mutex);
 }
 
 static void
 dyn_destroy_function(struct CRYPTO_dynlock_value *l,
                      const char *file, int line)
 {
-  MUTEX_CLEANUP(l->mutex);
+	g_mutex_clear(&l->mutex);
   free(l);
 }
 
@@ -135,11 +122,11 @@ imaptls_thread_setup(void)
 {
   int i, mutex_cnt = CRYPTO_num_locks();
 
-  mutexes = (MUTEX_TYPE*)malloc(mutex_cnt*sizeof(MUTEX_TYPE));
+  mutexes = (GMutex*)malloc(mutex_cnt*sizeof(GMutex));
   if(!mutexes)
     return 0;
   for(i=0; i<mutex_cnt; i++)
-    MUTEX_SETUP(mutexes[i]);
+	  g_mutex_init(&mutexes[i]);
   CRYPTO_set_id_callback(id_function);
   CRYPTO_set_locking_callback(locking_function);
   
@@ -163,27 +150,18 @@ imaptls_thread_cleanup(void)
   CRYPTO_set_dynlock_lock_callback(NULL);
   CRYPTO_set_dynlock_destroy_callback(NULL);
   for(i=0; i<mutex_cnt; i++)
-    MUTEX_CLEANUP(mutexes[i]);
+	  g_mutex_clear(&mutexes[i]);
   free(mutexes); mutexes = NULL;
   return 1;
 }
 #endif /* DO_PROPER_OPENSSL_CLEANUP */
-
-#else /* BALSA_USE_THREADS */
-static void
-imaptls_thread_setup(void)
-{
-}
-#endif /* BALSA_USE_THREADS */
 
 SSL*
 imap_create_ssl(void)
 {
   SSL *ssl;
 
-#ifdef BALSA_USE_THREADS
-  pthread_mutex_lock(&global_tls_lock);
-#endif
+  g_mutex_lock(&global_tls_lock);
   if(!global_ssl_context) {
     /* Initialize OpenSSL library, follow "Network Security with
        OpenSSL", ISBN 0-596-00270-X, guidelines. Example 4-2. */
@@ -213,9 +191,7 @@ imap_create_ssl(void)
     */
    SSL_CTX_set_default_verify_paths (global_ssl_context);
   }
-#ifdef BALSA_USE_THREADS
-  pthread_mutex_unlock(&global_tls_lock);
-#endif
+  g_mutex_unlock(&global_tls_lock);
 
   ssl = SSL_new(global_ssl_context);
 

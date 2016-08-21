@@ -43,11 +43,6 @@
 #  include "gmime-application-pkcs7.h"
 #endif
 
-#ifdef BALSA_USE_THREADS
-#  include <pthread.h>
-#  include "misc.h"
-#endif
-
 #if HAVE_MACOSX_DESKTOP
 #  include "macosx-helpers.h"
 #endif
@@ -684,9 +679,13 @@ libbalsa_gpgme_sig_stat_to_gchar(gpgme_error_t stat)
     case GPG_ERR_TRY_AGAIN:
 	return _
 	    ("GnuPG is rebuilding the trust database and is currently unavailable.");
-    default:
-	g_message("stat %d: %s %s", stat, gpgme_strsource(stat), gpgme_strerror(stat));
+    default: {
+	gchar errbuf[4096];		/* should be large enough... */
+
+	gpgme_strerror_r(stat, errbuf, sizeof(errbuf));
+	g_message("stat %d: %s %s", stat, gpgme_strsource(stat), errbuf);
 	return _("An error prevented the signature verification.");
+    }
     }
 }
 

@@ -36,9 +36,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-/* we include time because pthread.h may require it when compiled with c89 */
-#include <time.h>
-
 #include "libbalsa.h"
 #include "libbalsa_private.h"
 #include "misc.h"
@@ -98,10 +95,8 @@ libbalsa_mailbox_mbox_fetch_message_structure(LibBalsaMailbox * mailbox,
                                               LibBalsaFetchFlag flags);
 static guint
 libbalsa_mailbox_mbox_total_messages(LibBalsaMailbox * mailbox);
-#if BALSA_USE_THREADS
 static void libbalsa_mailbox_mbox_lock_store(LibBalsaMailbox * mailbox,
                                              gboolean lock);
-#endif                          /* BALSA_USE_THREADS */
 
 struct _LibBalsaMailboxMboxClass {
     LibBalsaMailboxLocalClass klass;
@@ -168,9 +163,7 @@ libbalsa_mailbox_mbox_class_init(LibBalsaMailboxMboxClass * klass)
 	libbalsa_mailbox_mbox_fetch_message_structure;
     libbalsa_mailbox_class->total_messages =
 	libbalsa_mailbox_mbox_total_messages;
-#if BALSA_USE_THREADS
     libbalsa_mailbox_class->lock_store = libbalsa_mailbox_mbox_lock_store;
-#endif                          /* BALSA_USE_THREADS */
 
     libbalsa_mailbox_local_class->check_files  = lbm_mbox_check_files;
     libbalsa_mailbox_local_class->remove_files = 
@@ -1998,7 +1991,6 @@ libbalsa_mailbox_mbox_total_messages(LibBalsaMailbox * mailbox)
     return mbox->msgno_2_msg_info ? mbox->msgno_2_msg_info->len : 0;
 }
 
-#if BALSA_USE_THREADS
 static void
 libbalsa_mailbox_mbox_lock_store(LibBalsaMailbox * mailbox, gboolean lock)
 {
@@ -2010,4 +2002,3 @@ libbalsa_mailbox_mbox_lock_store(LibBalsaMailbox * mailbox, gboolean lock)
     else
         libbalsa_mime_stream_shared_unlock(stream);
 }
-#endif                          /* BALSA_USE_THREADS */

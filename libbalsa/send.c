@@ -33,10 +33,6 @@
 #include <stdlib.h>
 #include <time.h>
 
-#ifdef BALSA_USE_THREADS
-#include <pthread.h>
-#endif
-
 #include <string.h>
 
 #include "libbalsa.h"
@@ -220,8 +216,6 @@ static LibBalsaMsgCreateResult
 libbalsa_fill_msg_queue_item_from_queu(LibBalsaMessage * message,
                                        MessageQueueItem *mqi);
 
-#ifdef BALSA_USE_THREADS
-
 GtkWidget *send_progress_message = NULL;
 GtkWidget *send_dialog = NULL;
 GtkWidget *send_dialog_bar = NULL;
@@ -276,17 +270,6 @@ ensure_send_progress_dialog(GtkWindow * parent)
 		     G_CALLBACK(send_dialog_destroy_cb), NULL);
     /* Progress bar done */
 }
-
-/* define commands for locking and unlocking: it makes deadlock debugging
- * easier. */
-#define send_lock()   pthread_mutex_lock(&send_messages_lock); 
-#define send_unlock() pthread_mutex_unlock(&send_messages_lock);
-
-#else
-#define ensure_send_progress_dialog(parent)
-#define send_lock()   
-#define send_unlock() 
-#endif
 
 static void
 lbs_set_content(GMimePart * mime_part, gchar * content)
@@ -663,15 +646,17 @@ lbs_process_queue(LibBalsaMailbox * outbox, LibBalsaFccboxFinder finder,
     long estimate;
     guint msgno;
     gchar *host_with_port;
-    send_lock();
+    GThread *send_mail;
+
+    g_mutex_lock(&send_messages_lock);
 
     if (!libbalsa_mailbox_open(outbox, NULL)) {
-	send_unlock();
+    	g_mutex_unlock(&send_messages_lock);
 	return FALSE;
     }
     if (!libbalsa_mailbox_total_messages(outbox)) {
 	libbalsa_mailbox_close(outbox, TRUE);
-	send_unlock();
+	g_mutex_unlock(&send_messages_lock);
 	return TRUE;
     }
     /* We create here the progress bar */
@@ -933,19 +918,17 @@ lbs_process_queue(LibBalsaMailbox * outbox, LibBalsaFccboxFinder finder,
 
     send_message_info=send_message_info_new(outbox, session, debug);
 
-#if defined(BALSA_USE_THREADS)
     sending_threads++;
-    pthread_create(&send_mail, NULL,
-		   (void *) &balsa_send_message_real, send_message_info);
-    /* Detach so we don't need to pthread_join
+    send_mail =
+    	g_thread_new("balsa_send_message_real",
+    				 (GThreadFunc) balsa_send_message_real,
+					 send_message_info);
+    /* Detach so we don't need to g_thread_join
      * This means that all resources will be
      * reclaimed as soon as the thread exits
      */
-    pthread_detach(send_mail);
-    send_unlock();
-#else				/*non-threaded code */
-    balsa_send_message_real(send_message_info);
-#endif
+    g_thread_unref(send_mail);
+    g_mutex_unlock(&send_messages_lock);
     return TRUE;
 }
 
@@ -989,7 +972,7 @@ handle_successful_send(smtp_message_t message, void *be_verbose)
     MessageQueueItem *mqi;
     const smtp_status_t *status;
 
-    send_lock();
+    g_mutex_lock(&send_messages_lock);
     /* Get the app data and decrement the reference count.  Only delete
        structures if refcount reaches zero */
     mqi = smtp_message_get_application_data (message);
@@ -1078,10 +1061,9 @@ handle_successful_send(smtp_message_t message, void *be_verbose)
     }
     if (mqi != NULL && mqi->refcount <= 0)
         msg_queue_item_destroy(mqi);
-    send_unlock();
+    g_mutex_unlock(&send_messages_lock);
 }
 
-#ifdef BALSA_USE_THREADS
 static void
 libbalsa_smtp_event_cb (smtp_session_t session, int event_no, void *arg, ...)
 {
@@ -1202,49 +1184,6 @@ libbalsa_smtp_event_cb (smtp_session_t session, int event_no, void *arg, ...)
     }
     va_end (ap);
 }
-#else /* BALSA: USE_THREADS */
-static void
-libbalsa_smtp_event_cb_serial(smtp_session_t session, int event_no,
-                              void *arg, ...)
-{
-    va_list ap;
-
-    va_start (ap, arg);
-    switch (event_no) {
-#ifdef USE_TLS
-        /* SMTP_TLS related things. Observe that we need to have SSL
-	 * enabled in balsa to properly interpret libesmtp
-	 * messages. */
-    case SMTP_EV_INVALID_PEER_CERTIFICATE: {
-        long vfy_result;
-	SSL  *ssl;
-	X509 *cert;
-        int *ok;
-        vfy_result = va_arg(ap, long); ok = va_arg(ap, int*);
-	ssl = va_arg(ap, SSL*);
-	cert = SSL_get_peer_certificate(ssl);
-	if(cert) {
-	    *ok = libbalsa_is_cert_known(cert, vfy_result);
-	    X509_free(cert);
-	}
-        break;
-    }
-    case SMTP_EV_NO_PEER_CERTIFICATE:
-    case SMTP_EV_WRONG_PEER_CERTIFICATE:
-#if LIBESMTP_1_0_3_AVAILABLE
-    case SMTP_EV_NO_CLIENT_CERTIFICATE:
-#endif
-    {
-	int *ok;
-	ok = va_arg(ap, int*);
-	*ok = 1;
-	break;
-    }
-#endif /* USE_TLS */
-    }
-    va_end (ap);
-}
-#endif /* BALSA_USE_THREADS */
 
 #else /* ESMTP */
 
@@ -1319,20 +1258,8 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, LibBalsaFccboxFinder finder,
 
     send_message_info=send_message_info_new(outbox, finder, debug);
     
-#if 0 && defined(BALSA_USE_THREADS)
-    
-    pthread_create(&send_mail, NULL,
-		   (void *) &balsa_send_message_real, send_message_info);
-    /* Detach so we don't need to pthread_join
-     * This means that all resources will be
-     * reclaimed as soon as the thread exits
-     */
-    pthread_detach(send_mail);
-    
-#else				/*non-threaded code */
-    
     balsa_send_message_real(send_message_info);
-#endif
+
     send_unlock();
     return TRUE;
 }
@@ -1430,7 +1357,6 @@ static guint
 balsa_send_message_real(SendMessageInfo* info)
 {
     gboolean session_started;
-#ifdef BALSA_USE_THREADS
     SendThreadMessage *threadmsg;
 
     /* The event callback is used to write messages to the the progress
@@ -1439,9 +1365,6 @@ balsa_send_message_real(SendMessageInfo* info)
        feedback in non-MT version.
     */
     smtp_set_eventcb (info->session, libbalsa_smtp_event_cb, NULL);
-#else
-    smtp_set_eventcb (info->session, libbalsa_smtp_event_cb_serial, NULL);
-#endif
 
     /* Add a protocol monitor when debugging is enabled. */
     if(info->debug)
@@ -1498,12 +1421,10 @@ balsa_send_message_real(SendMessageInfo* info)
      * gdk_threads_leave();
      */
 
-#ifdef BALSA_USE_THREADS
-    send_lock();
+    g_mutex_lock(&send_messages_lock);
     MSGSENDTHREAD(threadmsg, MSGSENDTHREADFINISHED, "", NULL, NULL, 0);
     sending_threads--;
-    send_unlock();
-#endif
+    g_mutex_unlock(&send_messages_lock);
         
     smtp_destroy_session (info->session);
     send_message_info_destroy(info);	

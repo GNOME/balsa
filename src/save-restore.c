@@ -39,10 +39,7 @@
 #include "filter-funcs.h"
 #include "mailbox-filter.h"
 #include "libbalsa-conf.h"
-
-#ifdef BALSA_USE_THREADS
 #include "threads.h"
-#endif
 
 #if ENABLE_ESMTP
 #include "smtp-server.h"
@@ -379,7 +376,6 @@ static void
 pop3_progress_notify(LibBalsaMailbox* mailbox, int msg_type, int prog, int tot,
                      const char* msg)
 {
-#ifdef BALSA_USE_THREADS
     MailThreadMessage *message;
 
     message = g_new(MailThreadMessage, 1);
@@ -397,11 +393,6 @@ pop3_progress_notify(LibBalsaMailbox* mailbox, int msg_type, int prog, int tot,
     if (write(mail_thread_pipes[1], (void *) &message, sizeof(void *))
         != sizeof(void *))
         g_warning("pipe error");
-#else
-    while(gtk_events_pending())
-        gtk_main_iteration_do(FALSE);
-#endif
-    /* cppcheck-suppress memleak */
 }
 
 /* Initialize the specified mailbox, creating the internal data

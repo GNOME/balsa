@@ -1,3 +1,10 @@
+2016-08-29  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Plug memory leak.
+
+	* src/main-window.c (bw_create_index_widget): do not leak
+	focus-chain GList.
+
 2016-08-21  Albrecht Dreß
 
 	Always use multithreading, and use only the glib abstraction

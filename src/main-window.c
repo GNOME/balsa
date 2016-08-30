@@ -455,6 +455,7 @@ bw_create_index_widget(BalsaWindow *bw)
 {
     GtkWidget *vbox, *button;
     unsigned i;
+    GList *focusable_widgets;
 
     if(!view_filters_translated) {
         for(i=0; i<ELEMENTS(view_filters); i++)
@@ -503,8 +504,11 @@ bw_create_index_widget(BalsaWindow *bw)
     gtk_widget_show(bw->sos_bar);
     gtk_box_pack_start(GTK_BOX(vbox), bw->sos_bar, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(vbox), bw->notebook, TRUE, TRUE, 0);
-    gtk_container_set_focus_chain(GTK_CONTAINER(vbox),
-                                  g_list_append(NULL, bw->notebook));
+
+    focusable_widgets = g_list_append(NULL, bw->notebook);
+    gtk_container_set_focus_chain(GTK_CONTAINER(vbox), focusable_widgets);
+    g_list_free(focusable_widgets);
+
     gtk_widget_set_sensitive(button, FALSE);
     gtk_widget_show(vbox);
     return vbox;

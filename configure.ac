@@ -112,7 +112,7 @@ AC_ARG_WITH(html-widget,
             AC_HELP_STRING([--with-html-widget=(no|gtkhtml4|webkit|webkit2)],
                            [select the HTML renderer (default webkit)]),
             [use_html_widget=$withval],
-            [use_html_widget=webkit])
+            [use_html_widget=webkit2])
 
 AC_ARG_WITH([gtksourceview],
    AC_HELP_STRING([--with-gtksourceview],
@@ -903,4 +903,14 @@ if test x"$BALSA_FROM_GIT" = xyes ; then
                   Either install and configure with libsecret
                   or configure --without-gnome.])
         fi
+fi
+
+if test x"$use_html_widget" = xwebkit ; then
+    AC_MSG_WARN([
+*** You have configured Balsa to use the old webkitgtk HTML widget.
+*** This widget is no longer being actively developed, and likely
+*** has security issues fixed in the newer webkit2 widget.
+*** Balsa will continue support for the old webkit widget only
+*** while needed by long-term-stable releases of major distributors.
+                 ])
 fi

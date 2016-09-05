@@ -1,3 +1,13 @@
+2016-09-05  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Respond to
+	<URL:https://bugzilla.gnome.org/show_bug.cgi?id=770500>
+	by making webkit2 the default instead of webkit, and warning if
+	Balsa is configured for webkit.
+
+	* configure.ac: make webkit2 the default HTML widget, and warn
+	  if Balsa is configured for webkit.
+
 2016-08-29  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Plug memory leak.

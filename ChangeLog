@@ -1,3 +1,8 @@
+2016-09-06  Albrecht Dreß
+
+	* configure.ac: make the help string match the actual default,
+	webkit2.
+
 2016-09-05  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Respond to

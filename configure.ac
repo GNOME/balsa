@@ -110,7 +110,7 @@ AC_ARG_WITH(gss,
 
 AC_ARG_WITH(html-widget,
             AC_HELP_STRING([--with-html-widget=(no|gtkhtml4|webkit|webkit2)],
-                           [select the HTML renderer (default webkit)]),
+                           [select the HTML renderer (default webkit2)]),
             [use_html_widget=$withval],
             [use_html_widget=webkit2])
 

@@ -5980,7 +5980,7 @@ msgstr "Nelze vytisknout stranu %d, protože dokument má jen %d stran."
 #.
 #: ../src/print-gtk.c:380
 msgid "default:mm"
-msgstr "výchozí:mm"
+msgstr "default:mm"
 
 #: ../src/print-gtk.c:437
 msgid "inch"

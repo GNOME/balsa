@@ -6046,7 +6046,7 @@ msgstr ""
 #.
 #: ../src/print-gtk.c:380
 msgid "default:mm"
-msgstr "défaut : mm"
+msgstr "default:mm"
 
 #: ../src/print-gtk.c:437
 msgid "inch"

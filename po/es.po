@@ -7151,7 +7151,7 @@ msgstr ""
 #.
 #: ../src/print-gtk.c:380
 msgid "default:mm"
-msgstr "por omisión:mm"
+msgstr "default:mm"
 
 #: ../src/print-gtk.c:437
 msgid "inch"

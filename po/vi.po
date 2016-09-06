@@ -5695,7 +5695,7 @@ msgstr "Không thể in trang %d vì tài liệu này chỉ có %d trang."
 #. * it isn't default:mm or default:inch it will not work
 #.
 msgid "default:mm"
-msgstr "mm"
+msgstr "default:mm"
 
 #: ../src/print-gtk.c:435
 msgid "inch"

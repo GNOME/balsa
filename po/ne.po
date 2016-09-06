@@ -5434,7 +5434,7 @@ msgstr "कागजातमा %d पृष्ठ मात्र भएका
 #.
 #: ../src/print-gtk.c:378
 msgid "default:mm"
-msgstr "पूर्वनिर्धारित:mm"
+msgstr "default:mm"
 
 #: ../src/print-gtk.c:435
 msgid "inch"

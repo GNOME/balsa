@@ -16,8 +16,8 @@ msgstr ""
 "Project-Id-Version: balsa gtk3\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=balsa&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2016-09-07 05:12+0000\n"
-"PO-Revision-Date: 2016-09-17 15:55+0200\n"
+"POT-Creation-Date: 2016-09-17 13:58+0000\n"
+"PO-Revision-Date: 2016-09-17 16:00+0200\n"
 "Last-Translator: Marek Černocký <marek@manet.cz>\n"
 "Language-Team: čeština <gnome-cs-list@gnome.org>\n"
 "Language: cs\n"
@@ -689,7 +689,7 @@ msgstr "Chyba při vyhledávání hesla pro %s@%s: %s\n"
 #: ../libbalsa/imap-server.c:531 ../libbalsa/server.c:355
 #, c-format
 msgid "Falling back\n"
-msgstr ""
+msgstr "Přepíná se na záložní řešení\n"
 
 #: ../libbalsa/imap-server.c:541 ../libbalsa/imap-server.c:577
 #: ../libbalsa/server.c:364 ../libbalsa/server.c:398 ../libbalsa/server.c:443

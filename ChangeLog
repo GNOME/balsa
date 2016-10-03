@@ -1,3 +1,18 @@
+2016-10-03  Albrecht Dreß
+
+	Deprecation cleanups
+
+	* AUTHORS:
+	* README:
+	* configure.ac:
+	* libbalsa/imap/imap_tst.c (main):
+	* src/balsa-message.c (balsa_message_get_type),
+	(balsa_message_init), (balsa_message_new), (tree_activate_row_cb),
+	(balsa_message_set), (atattchments_menu_cb),
+	(toggle_all_inline_cb), (message_recheck_crypto_cb):
+	* src/balsa-message.h:
+	* src/toolbar-prefs.c (create_toolbar_page):
+
 2016-09-06  Albrecht Dreß
 
 	* configure.ac: make the help string match the actual default,

@@ -29,10 +29,6 @@
 #include "libbalsa.h"
 #include "balsa-app.h"
 
-#if GTK_CHECK_VERSION(3, 10, 0)
-#define BALSA_USE_GTK_STACK
-#endif                          /* GTK_CHECK_VERSION(3, 10, 0) */
-
 G_BEGIN_DECLS
 
 
@@ -56,14 +52,10 @@ typedef enum {
 } BalsaMessageFocusState;
 
 struct _BalsaMessage {
-#ifndef BALSA_USE_GTK_STACK
-	GtkNotebook parent;
-#else /* BALSA_USE_GTK_STACK */
         GtkBox parent;
 
         GtkWidget *stack;
         GtkWidget *switcher;
-#endif /* BALSA_USE_GTK_STACK */
 
         /* Top-level MIME widget */
         BalsaMimeWidget *bm_widget;

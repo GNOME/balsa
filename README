@@ -3,7 +3,7 @@ Balsa E-Mail Client 2.5.x
 
 See ChangeLog for the list of the recent changes and NEWS for highlights.
 
-Copyright (C) 1997-2013 Stuart Parmenter and others
+Copyright (C) 1997-2016 Stuart Parmenter and others
 
 See 'COPYING' for licence information.  Please note linking against
 OpenSSL libraries is explicitly allowed.
@@ -33,6 +33,13 @@ Configuration:
 should run './configure --help' to get an idea of them. More
 complete descriptions are here.
 
+Basically, Balsa requires
+- glib-2.0 >= 2.40.0
+- gtk+-3.0 >= 3.10.0
+- gmime-2.6
+- gio-2.0
+- gthread-2.0
+
 --disable-more-warnings
 	Balsa by default is very sensitive to compilation warnings
 which often mean simply programming or configuration errors. If you
@@ -40,44 +47,67 @@ are sure this is not the case, or you cannot change your system setup
 use this option to compile the code and hope for the best. 
 (some Solaris setups require this).
 
---enable-threads
-	Compile Balsa with threading for more responsiveness.
-This works very well and should be enabled if possible.
+--with-gnome
+	Use GNOME libraries.  FIXME - what do we actually require?
 
---disable-system-install
-	If specified, Balsa will not put files into the 
-prefix of Gnome, but instead into the prefix of other Balsa
-files. This allows Balsa to be installed locally if you don't
-have the permissions to install into /usr or /usr/local or
-wherever Gnome lives. Balsa will be able to find all the files
-that it needs, but Gnome may not be able to locate certain
-resources such as balsa.desktop, balsa.soundlist, etc.
+--with-libsecret
+	Link to libsecret instead of gnome-keyring.
 
---with-gpgme
-        Use GPGME library for message signing and encryption. 
-GPGME version more recent than  0.3.x w/ x >= 14 is required. 
-Please note that all national characters in the passphrase must be
-valid UTF-8 characters, see
+--with-gpgme[=gpgme-config]
+	Use GPGME library for GnuPG message signing and encryption.
+The path of the gpgme-config tool must be specified only if it is
+installed in an uncommon place.  See the (rather outdated) web page
 http://home.arcor.de/dralbrecht.dress/balsa/UsingGnuPG.html#FAQ
 for more details.
+
+--enable-smime
+	Include support for S/MIME signed and encrypted messages.
+This option requires GPGME (see above).
+
+--with-gpg-app=PATH
+	Specify the GnuPG application which shall be used by GPGME.
+Typically, configure will automatically detect gpg, so this option
+should be given only if the desired gpg version is installed in an
+uncommon place.
 
 --with-gss[=/usr/kerberos]
 	This enables GSSAPI Kerberos based authentication scheme. 
 Specify the kerberos directory as the argument.
 
---with-ssl
-	Use OpenSASL library for POP/IMAP authentication instead of
-mutt's native code (in the future, the native code will most likely be
-phased out in favour of SASL library).
+--with-html-widget=(no|gtkhtml4|webkit|webkit2)
+        Choose preferred HTML renderer library.  Note that webkit is
+not actively supported any more and thus not recommended.
+When using webkit or webkit2, in order to quote html-only messages
+it is recommended to install a html-to-text conversion tool.  Supported
+tools are python-html2text, html2markdown, html2markdown.py2,
+html2markdown.py3 and html2text.
 
---with-gtkhtml=version
-        Choose preferred version of the GtkHtml library. Sensible
-choices for the version are 2 or 3. Version 3 supports eg. printing
-but does not support CSS formatting.
+--with-spell-checker=(no|gtkspell|gspell)
+	Select the external spell checker for the message composer.
 
 --with-ldap
         Use ldap libraries for a read-only address book. The read/write
 address book is in the works but needs some finishing touches.
+
+--with-sqlite
+	Use SQLite for GPE address books.
+
+--with-rubrica
+	Use libxml2 for Rubrica2 address book support.
+
+--with-canberra
+	Use libcanberra-gtk3 for filter sounds.
+
+--with-compface
+	Use Compface for rendering X-Face format thumbnails of email
+authors in a mail header.
+
+--with-gtksourceview
+	Use GtkSourceview for highlighting structured phrases in
+messages, and for syntax highlighting in attachments.
+
+--with-libnotify
+	Use libnotify for sending desktop notifications.
 
 
 Libraries:
@@ -93,7 +123,7 @@ libtdl is missing it means you need to install just that package).
 
 
 Website:
--------
+--------
 	Balsa source comes with the Balsa website in the
 directory for balsa/website/. Read balsa/website/README and
 balsa/website/INSTALL for more information. If you retrieved
@@ -102,13 +132,14 @@ may not exist. To get it, you need to go to ....
 
 
 Balsa GIT:
----------
+----------
 	Balsa is hosted on the Gnome git servers. To get
 the latest source, get the module 'balsa' from
 https://wiki.gnome.org/Git/Developers
 
+
 Specifying the SMTP Server:
---------------------------
+---------------------------
 
 	when compiled to use libESMTP, the remote SMTP server details
 are configured on the Mail Servers tab of the Preferences dialogue box
@@ -158,8 +189,18 @@ TLS extension in SMTP mail submission:
     attacks.
 
 
+Gtk+-3 Dialog Header Bars:
+--------------------------
+	If the Gtk+ version is >= 3.12.0, Balsa uses the new Gtk header
+bars instead of the traditional action areas.  As this may look ugly when
+using other desktop environments than Gnome (e.g. XFCE), Balsa can be
+switched to the old style by defining the environment variable
+
+	BALSA_DIALOG_HEADERBAR=0
+
+
 Help System:
------------
+------------
 	In order to compile the help files, you need to have the
 Mallard documentation system. Very good documentation
 can be found at: http://projectmallard.org/
@@ -170,8 +211,9 @@ Balsa as mailto protocol handler:
 	Balsa can be used as mailto protocol handler; by default, a
         desktop file that declares this capability is installed.
 
+
 Mailbox locking:
----------------
+----------------
     Balsa uses flock+dotfile for mailbox file locking. It does not
     use fcntl (although it can be enabled) since this locking method is
     very fragile and often not portable (see for example
@@ -217,7 +259,6 @@ Reporting Bugs:
 --------------
 	See http://balsa.gnome.org/bugs.html for instructions.
         Patches are welcome.
-
 
 
 Known issues:

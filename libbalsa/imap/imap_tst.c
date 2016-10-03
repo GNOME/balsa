@@ -648,10 +648,6 @@ process_options(int argc, char *argv[])
 
 int
 main(int argc, char *argv[]) {
-#if !GLIB_CHECK_VERSION(2, 35, 0)
-  g_type_init();
-#endif                          /* !GLIB_CHECK_VERSION(2, 35, 0) */
-
   if(argc<=1) {
     test_envelope_strings();
     test_body_strings();

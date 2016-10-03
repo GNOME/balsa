@@ -218,12 +218,7 @@ balsa_message_get_type()
         };
 
         balsa_message_type =
-#ifndef BALSA_USE_GTK_STACK
-            g_type_register_static(GTK_TYPE_NOTEBOOK, "BalsaMessage",
-#else /* BALSA_USE_GTK_STACK */
-            g_type_register_static(GTK_TYPE_BOX, "BalsaMessage",
-#endif /* BALSA_USE_GTK_STACK */
-                                   &balsa_message_info, 0);
+        	g_type_register_static(GTK_TYPE_BOX, "BalsaMessage", &balsa_message_info, 0);
     }
 
     return balsa_message_type;
@@ -688,22 +683,14 @@ bm_disable_find_entry(BalsaMessage * bm)
 static void
 balsa_message_init(BalsaMessage * bm)
 {
-#ifdef BALSA_USE_GTK_STACK
     GtkStack  *stack;
-#endif /* BALSA_USE_GTK_STACK */
     GtkWidget *vbox;
     GtkWidget *scroll;
-#ifndef BALSA_USE_GTK_STACK
-    GtkWidget *label;
-#endif /* ! BALSA_USE_GTK_STACK */
     GtkWidget **buttons;
     GtkTreeStore *model;
     GtkCellRenderer *renderer;
     GtkTreeSelection *selection;
 
-#ifndef BALSA_USE_GTK_STACK
-    gtk_notebook_set_show_border(GTK_NOTEBOOK(bm), FALSE);
-#else /* BALSA_USE_GTK_STACK */
     bm->switcher = gtk_stack_switcher_new();
     gtk_box_pack_start(GTK_BOX(bm), bm->switcher, FALSE, FALSE, 0);
 
@@ -713,16 +700,10 @@ balsa_message_init(BalsaMessage * bm)
                                   GTK_STACK_TRANSITION_TYPE_SLIDE_UP_DOWN);
     gtk_stack_switcher_set_stack(GTK_STACK_SWITCHER(bm->switcher), stack);
     gtk_box_pack_start(GTK_BOX(bm), bm->stack, TRUE, TRUE, 0);
-#endif /* BALSA_USE_GTK_STACK */
 
     /* Box to hold the scrolled window and the find bar */
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-#ifndef BALSA_USE_GTK_STACK
-    label = gtk_label_new(_("Content"));
-    gtk_notebook_append_page(GTK_NOTEBOOK(bm), vbox, label);
-#else /* BALSA_USE_GTK_STACK */
     gtk_stack_add_titled(stack, vbox, "content", _("Content"));
-#endif /* BALSA_USE_GTK_STACK */
 
     /* scrolled window for the contents */
     bm->scroll = scroll = gtk_scrolled_window_new(NULL, NULL);
@@ -751,12 +732,7 @@ balsa_message_init(BalsaMessage * bm)
     g_signal_connect(G_OBJECT(bm->bm_widget->widget), "focus_out_event",
                      G_CALLBACK(balsa_mime_widget_unlimit_focus),
 		     (gpointer) bm);
-#if GTK_CHECK_VERSION(3, 8, 0)
     gtk_container_add(GTK_CONTAINER(bm->scroll), bm->bm_widget->widget);
-#else                           /* GTK_CHECK_VERSION(3, 8, 0) */
-    gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(bm->scroll),
-                                          bm->bm_widget->widget);
-#endif                          /* GTK_CHECK_VERSION(3, 8, 0) */
 
     /* structure view */
     model = gtk_tree_store_new (NUM_COLUMNS,
@@ -813,16 +789,8 @@ balsa_message_init(BalsaMessage * bm)
 	(GTK_TREE_VIEW (bm->treeview), gtk_tree_view_get_column
 	 (GTK_TREE_VIEW (bm->treeview), MIME_ICON_COLUMN - 1));
 
-#ifndef BALSA_USE_GTK_STACK
-    label = gtk_label_new(_("Message parts"));
-    gtk_notebook_append_page(GTK_NOTEBOOK(bm), scroll, label);
-#else /* BALSA_USE_GTK_STACK */
     gtk_stack_add_titled(stack, scroll, "parts", _("Message parts"));
-#endif /* BALSA_USE_GTK_STACK */
     gtk_container_add(GTK_CONTAINER(scroll), bm->treeview);
-#ifndef BALSA_USE_GTK_STACK
-    gtk_notebook_set_show_tabs(GTK_NOTEBOOK(bm), FALSE);
-#endif /* ! BALSA_USE_GTK_STACK */
 
     bm->current_part = NULL;
     bm->message = NULL;
@@ -880,13 +848,9 @@ balsa_message_new(void)
 {
     BalsaMessage *bm;
 
-#ifndef BALSA_USE_GTK_STACK
-    bm = g_object_new(BALSA_TYPE_MESSAGE, NULL);
-#else /* BALSA_USE_GTK_STACK */
     bm = g_object_new(BALSA_TYPE_MESSAGE,
                       "orientation", GTK_ORIENTATION_VERTICAL,
                       NULL);
-#endif /* BALSA_USE_GTK_STACK */
 
     return GTK_WIDGET(bm);
 }
@@ -946,11 +910,7 @@ tree_activate_row_cb(GtkTreeView *treeview, GtkTreePath *arg1,
         }
     }
 
-#ifndef BALSA_USE_GTK_STACK
-    gtk_notebook_set_current_page(GTK_NOTEBOOK(bm), 0);
-#else /* BALSA_USE_GTK_STACK */
     gtk_stack_set_visible_child_name(GTK_STACK(bm->stack), "content");
-#endif /* BALSA_USE_GTK_STACK */
     select_part(bm, info);
     if (info)
         g_object_unref(info);
@@ -1150,13 +1110,8 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMailbox * mailbox, guint msgno)
     }
 
     if (mailbox == NULL || msgno == 0) {
-#ifndef BALSA_USE_GTK_STACK
-        gtk_notebook_set_show_tabs(GTK_NOTEBOOK(bm), FALSE);
-        gtk_notebook_set_current_page(GTK_NOTEBOOK(bm), 0);
-#else /* BALSA_USE_GTK_STACK */
         gtk_widget_hide(bm->switcher);
         gtk_stack_set_visible_child_name(GTK_STACK(bm->stack), "content");
-#endif /* BALSA_USE_GTK_STACK */
         return TRUE;
     }
 
@@ -1207,16 +1162,11 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMailbox * mailbox, guint msgno)
     display_content(bm);
     gtk_widget_show(GTK_WIDGET(bm));
 
-#ifndef BALSA_USE_GTK_STACK
-    gtk_notebook_set_show_tabs(GTK_NOTEBOOK(bm), bm->info_count > 1);
-    gtk_notebook_set_current_page(GTK_NOTEBOOK(bm), 0);
-#else /* BALSA_USE_GTK_STACK */
     if (bm->info_count > 1)
         gtk_widget_show(bm->switcher);
     else
         gtk_widget_hide(bm->switcher);
     gtk_stack_set_visible_child_name(GTK_STACK(bm->stack), "content");
-#endif /* BALSA_USE_GTK_STACK */
 
     /*
      * At this point we check if (a) a message was new (its not new
@@ -1374,11 +1324,7 @@ atattchments_menu_cb(GtkWidget * widget, BalsaPartInfo *info)
     g_return_if_fail(bm);
     g_return_if_fail(info);
 
-#ifndef BALSA_USE_GTK_STACK
-    gtk_notebook_set_current_page(GTK_NOTEBOOK(bm), 0);
-#else /* BALSA_USE_GTK_STACK */
     gtk_stack_set_visible_child_name(GTK_STACK(bm->stack), "content");
-#endif /* BALSA_USE_GTK_STACK */
     select_part(bm, info);
 }
 
@@ -1405,11 +1351,7 @@ toggle_all_inline_cb(GtkCheckMenuItem * item, BalsaPartInfo *info)
 
     bm->force_inline = gtk_check_menu_item_get_active(item);
 
-#ifndef BALSA_USE_GTK_STACK
-    gtk_notebook_set_current_page(GTK_NOTEBOOK(bm), 0);
-#else /* BALSA_USE_GTK_STACK */
     gtk_stack_set_visible_child_name(GTK_STACK(bm->stack), "content");
-#endif /* BALSA_USE_GTK_STACK */
     select_part(bm, info);
 }
 
@@ -3280,16 +3222,11 @@ message_recheck_crypto_cb(GtkWidget * button, BalsaMessage * bm)
     display_headers(bm);
     display_content(bm);
 
-#ifndef BALSA_USE_GTK_STACK
-    gtk_notebook_set_show_tabs(GTK_NOTEBOOK(bm), bm->info_count > 1);
-    gtk_notebook_set_current_page(GTK_NOTEBOOK(bm), 0);
-#else /* BALSA_USE_GTK_STACK */
     if (bm->info_count > 1)
         gtk_widget_show(bm->switcher);
     else
         gtk_widget_hide(bm->switcher);
     gtk_stack_set_visible_child_name(GTK_STACK(bm->stack), "content");
-#endif /* BALSA_USE_GTK_STACK */
 
     if (!gtk_tree_model_get_iter_first (gtk_tree_view_get_model(GTK_TREE_VIEW(bm->treeview)),
                                         &iter)) {

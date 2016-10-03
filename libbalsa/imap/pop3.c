@@ -240,7 +240,10 @@ pop_get_capa(PopHandle *pop, GError **err)
       if(strstr(buf, " CRAM-MD5"))
         pop->capabilities[POP_CAP_AUTH_CRAM] = 1;
     } else if(strncmp(buf, "SASL", 4) == 0) {
-      /* FIXME: implement SASL support */
+    	if (strstr(buf, " PLAIN") != NULL) {
+    		pop->capabilities[POP_CAP_SASL_PLAIN] = 1;
+    	}
+      /* FIXME: implement more SASL mechanisms */
     } else {
       unsigned i;
       for(i=0; i<ELEMENTS(capa_names); i++) {
@@ -389,12 +392,51 @@ pop_auth_user(PopHandle *pop, const char *greeting, GError **err)
   return pop_exec(pop, line, err) ? IMAP_SUCCESS : IMAP_AUTH_FAILURE;
 }
 
+static ImapResult
+pop_auth_sasl_plain(PopHandle *pop, const char *greeting, GError **err)
+{
+	char *user = NULL, *pass = NULL;
+	int ok = 0;
+	gchar *base64_buf;
+	gchar *plain_buf;
+	size_t user_len;
+	size_t passwd_len;
+	char line[POP_LINE_LEN];
+
+	if (pop_can_do(pop, POP_CAP_SASL_PLAIN) == 0) {
+		return IMAP_AUTH_UNAVAIL;
+	}
+
+	if (pop->user_cb != NULL) {
+		pop->user_cb(IME_GET_USER_PASS, pop->user_arg, "SASL PLAIN", &user, &pass, &ok);
+	}
+	if ((ok == 0) || (user == NULL) || (pass == NULL)) {
+		g_set_error(err, IMAP_ERROR, IMAP_POP_AUTH_ERROR, "SASL PLAIN Authentication cancelled");
+		return IMAP_AUTH_FAILURE;
+	}
+
+	user_len = strlen(user);
+	passwd_len = strlen(pass);
+	plain_buf = g_malloc0((2U * user_len) + passwd_len + 3U);
+	strcpy(plain_buf, user);
+	strcpy(&plain_buf[user_len + 1U], user);
+	g_free(user);
+	strcpy(&plain_buf[(2U * user_len) + 2U], pass);
+	g_free(pass);
+	base64_buf = g_base64_encode((const guchar *) plain_buf, (2U * user_len) + passwd_len + 2U);
+	g_free(plain_buf);
+	g_snprintf(line, sizeof(line), "AUTH PLAIN %s\r\n", base64_buf);
+	g_free(base64_buf);
+	return pop_exec(pop, line, err) ? IMAP_SUCCESS : IMAP_AUTH_FAILURE;
+}
+
 typedef ImapResult (*PopAuthenticator)(PopHandle*, const char*, GError **err);
 /* ordered from strongest to weakest */
 static const PopAuthenticator pop_authenticators_arr[] = {
   pop_auth_cram,
   pop_auth_apop,
   pop_auth_user,
+  pop_auth_sasl_plain,
   NULL
 };
 

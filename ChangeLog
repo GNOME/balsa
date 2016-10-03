@@ -1,5 +1,13 @@
 2016-10-03  Albrecht Dreß
 
+	Implement the 'AUTH PLAIN' SASL mechanism for POP3
+	according to RFC 5043 and RFC 4616
+
+	* libbalsa/imap/pop3.c (pop_get_capa), (pop_auth_sasl_plain):
+	  implement the 'AUTH PLAIN' SASL mechanism for POP3.
+
+2016-10-03  Albrecht Dreß
+
 	Deprecation cleanups
 
 	* AUTHORS:

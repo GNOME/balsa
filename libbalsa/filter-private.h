@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2013 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -30,15 +30,6 @@
 # error "Include config.h before this file."
 #endif
 
-#if !USE_GREGEX
-#  ifdef HAVE_PCRE
-#    include <pcreposix.h>
-#  else
-#    include <sys/types.h>
-#    include <regex.h>
-#  endif
-#endif                          /* USE_GREGEX */
-
 
 /* regex options */
 #define FILTER_REGCOMP       (REG_NEWLINE | REG_NOSUB | REG_EXTENDED)
@@ -47,11 +38,7 @@
 /* regex struct */
 struct _LibBalsaConditionRegex {
     gchar *string;
-#if USE_GREGEX
     GRegex *compiled;
-#else                           /* USE_GREGEX */
-    regex_t *compiled;
-#endif                          /* USE_GREGEX */
 };
 
 #endif				/* __FILTER_PRIVATE_H__ */

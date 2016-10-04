@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2001 Stuart Parmenter and others,
+ * Copyright (C) 1997-2013 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -27,6 +27,8 @@
 #include "libbalsa.h"
 #include "mailbox-node.h"
 
+#define VIEW_BY_URL_SECTION_PREFIX "viewByUrl-"
+
 typedef enum {
     SPECIAL_INBOX = 0,
     SPECIAL_SENT,
@@ -41,9 +43,7 @@ void config_mailbox_set_as_special(LibBalsaMailbox * mailbox,
 gint config_load(void);
 void config_load_sections(void);
 gint config_save(void);
-#if HAVE_GNOME
 void config_defclient_save(void);
-#endif
 
 gchar *mailbox_get_pkey(const LibBalsaMailbox * mbox);
 gint config_mailbox_add(LibBalsaMailbox * mailbox, const char *key_arg);
@@ -59,9 +59,12 @@ void config_address_book_delete(LibBalsaAddressBook * ab);
 void config_address_books_load(void);
 
 void config_identities_save(void);
-void config_views_load(void);
-void config_views_save(void);
 void config_view_remove(const gchar * url);
+LibBalsaMailboxView *config_load_mailbox_view(const gchar * url);
+void config_save_mailbox_view(const gchar * url, LibBalsaMailboxView * view);
+
+gboolean config_mailbox_was_open(const gchar * url);
+gboolean config_mailbox_was_exposed(const gchar * url);
 
 void config_filters_save(void);
 void config_mailbox_filters_save(LibBalsaMailbox * mbox);

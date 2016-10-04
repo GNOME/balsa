@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2002 Stuart Parmenter and others,
+ * Copyright (C) 1997-2013 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -22,14 +22,10 @@
 #endif                          /* HAVE_CONFIG_H */
 #include "assistant_page_defclient.h"
 
-#if HAVE_GNOME
-/* setting the default Gnome mail client doesn't make sense if we don't build
- for Gnome */
-
 #include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <gconf/gconf-client.h>
+#include <gio/gio.h>
 
 #include <glib/gi18n.h>
 #include "balsa-app.h"
@@ -51,6 +47,7 @@ balsa_druid_page_defclient_init(BalsaDruidPageDefclient * defclient,
     GtkWidget *yes, *no;
 
     defclient->default_client = 1;
+    balsa_app.default_client = defclient->default_client;
 
     label =
         GTK_LABEL(gtk_label_new
@@ -74,31 +71,27 @@ balsa_druid_page_defclient_init(BalsaDruidPageDefclient * defclient,
 }
 
 void
-balsa_druid_page_defclient(GtkAssistant *druid, GdkPixbuf *default_logo)
+balsa_druid_page_defclient(GtkAssistant *druid)
 {
+    GAppInfo *info;
     BalsaDruidPageDefclient *defclient;
     GtkWidget *page;
-    GConfClient *gc;
 
-    gc = gconf_client_get_default(); /* FIXME: error handling */
-    if(gc) {
-        GError *err = NULL;
-        gchar *cmd;
+    info = g_app_info_get_default_for_uri_scheme("mailto");
+    if (info) {
         gboolean set_to_balsa_already;
-        cmd = 
-            gconf_client_get_string
-            (gc, "/desktop/gnome/url-handlers/mailto/command", &err);
-        set_to_balsa_already = !err && cmd && strncmp(cmd,"balsa",5)==0;
-        if(err) g_error_free(err);
-        g_free(cmd);
+
+        set_to_balsa_already = !strcmp(g_app_info_get_name(info), "Balsa");
+        g_object_unref(info);
+
         if(set_to_balsa_already)
             return;
     }
+
     defclient = g_new0(BalsaDruidPageDefclient, 1);
-    page = gtk_vbox_new(FALSE, FALSE);
+    page = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     gtk_assistant_append_page(druid, page);
     gtk_assistant_set_page_title(druid, page, _("Default Client"));
-    gtk_assistant_set_page_header_image(druid, page, default_logo);
     balsa_druid_page_defclient_init(defclient, page, druid);
     /* This one is ready to pass through. */
     gtk_assistant_set_page_complete(druid, page, TRUE);
@@ -110,6 +103,5 @@ balsa_druid_page_defclient_toggle(GtkWidget * page,
                                   BalsaDruidPageDefclient * defclient)
 {
     defclient->default_client = ! (defclient->default_client);
+    balsa_app.default_client = defclient->default_client;
 }
-
-#endif /* HAVE_GNOME */

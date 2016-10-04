@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2001 Stuart Parmenter and others
+ * Copyright (C) 1997-2013 Stuart Parmenter and others
  * Written by (C) Albrecht Dreﬂ <albrecht.dress@arcor.de> 2007
  *
  * This program is free software; you can redistribute it and/or modify
@@ -115,7 +115,7 @@ balsa_print_object_image(GList * list, GtkPrintContext *context,
     /* check if we can handle the image */
     pixbuf = libbalsa_message_body_get_pixbuf(body, &err);
     if (err) {
-	g_warning("Error loading image from file: %s", err->message);
+	g_message("Error loading image from file: %s", err->message);
 	g_error_free(err);
     }
 

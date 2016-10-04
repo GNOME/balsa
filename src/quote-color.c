@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2013 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -61,11 +61,7 @@ make_gradient(GdkColor colors[], gint first, gint last)
  *   an integer saying how many levels deep.  
  * */
 guint
-#if USE_GREGEX
 is_a_quote(const gchar * str, GRegex * rex)
-#else                           /* USE_GREGEX */
-is_a_quote(const gchar * str, regex_t * rex)
-#endif                          /* USE_GREGEX */
 {
     guint cnt;
 
@@ -78,30 +74,3 @@ is_a_quote(const gchar * str, regex_t * rex)
 
     return cnt;
 }
-
-
-/*
- * void allocate_quote_colors.
- *
- * Allocate a color for each of the gradients from the correct
- * colormap.
- */
-void
-allocate_quote_colors(GtkWidget * widget, GdkColor color[],
-                      gint first, gint last)
-{
-    gint i;
-
-    for (i = first; i <= last; i++) {
-        if (!gdk_colormap_alloc_color(balsa_app.colormap,
-                                      &color[i], FALSE, TRUE)) {
-            /* Use black instead: */
-            color[i].red = color[i].green = color[i].blue = 0;
-            gdk_colormap_alloc_color(balsa_app.colormap, &color[i], FALSE,
-                                     TRUE);
-        }
-    }
-}
-
-
-

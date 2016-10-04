@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2002 Stuart Parmenter and others,
+ * Copyright (C) 1997-2013 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -40,6 +40,7 @@ typedef struct _LibBalsaSmtpServer LibBalsaSmtpServer;
 typedef struct _LibbalsaVfs LibbalsaVfs;
 
 
+#include <openssl/ssl.h>
 #include "message.h"
 #include "body.h"
 #include "files.h"
@@ -76,10 +77,10 @@ typedef struct _LibbalsaVfs LibbalsaVfs;
 /*
  * Error domains for GError:
  */
-enum {
-    LIBBALSA_SCANNER_ERROR,
-    LIBBALSA_MAILBOX_ERROR
-};
+GQuark libbalsa_scanner_error_quark(void);
+#define LIBBALSA_SCANNER_ERROR libbalsa_scanner_error_quark()
+GQuark libbalsa_mailbox_error_quark(void);
+#define LIBBALSA_MAILBOX_ERROR libbalsa_mailbox_error_quark()
 
 /*
  * Error codes for GError:
@@ -108,7 +109,8 @@ enum {
 void libbalsa_init(LibBalsaInformationFunc information_callback);
 void libbalsa_set_spool(const gchar * spool);
 
-void libbalsa_show_message_source(LibBalsaMessage * msg,
+void libbalsa_show_message_source(GtkApplication * application,
+                                  LibBalsaMessage * msg,
                                   const gchar * font,
                                   gboolean *escape_specials,
                                   gint * width, gint * height);
@@ -126,33 +128,27 @@ gchar *libbalsa_guess_ldap_server(void);
 gchar *libbalsa_guess_imap_inbox(void);
 
 
-gchar* libbalsa_date_to_utf8(const time_t *date, const gchar *date_string);
+gchar* libbalsa_date_to_utf8(time_t date, const gchar *date_string);
 LibBalsaMessageStatus libbalsa_get_icon_from_flags(LibBalsaMessageFlag flags);
 
-#ifdef USE_TLS
-#include <openssl/ssl.h>
 gboolean libbalsa_is_cert_known(X509* cert, long vfy_result);
 void libbalsa_certs_destroy(void);
-#endif
 
 gboolean libbalsa_abort_on_timeout(const char *host);
 
-#ifdef BALSA_USE_THREADS
-#include <pthread.h>
-pthread_t libbalsa_get_main_thread(void);
+GThread *libbalsa_get_main_thread(void);
 gboolean libbalsa_am_i_subthread(void);
-void libbalsa_threads_init(void);
-void libbalsa_threads_destroy(void);
-gboolean libbalsa_threads_has_lock(void);
+#if defined(BALSA_DEBUG_THREADS)
+#define gdk_threads_enter()                       \
+    do if (libbalsa_am_i_subthread())             \
+        g_warning("%s: sub-thread!\n", __func__); \
+    while (0)
 #else
-#define libbalsa_am_i_subthread() FALSE
-#define libbalsa_threads_has_lock() TRUE
-#endif /* BALSA_USE_THREADS */
-void libbalsa_message(const char *fmt, ...)
-#ifdef __GNUC__
-    __attribute__ ((format (printf, 1, 2)))
+#define gdk_threads_enter()
 #endif
-;
+#define gdk_threads_leave()
+void libbalsa_message(const char *fmt, ...)
+	G_GNUC_PRINTF(1, 2);
 gchar * libbalsa_rot(const gchar * pass);
 
 typedef enum {
@@ -202,8 +198,14 @@ enum LibBalsaImageError {
 #endif                          /* HAVE_COMPFACE */
 };
 
+#if GTK_CHECK_VERSION(3, 12, 0)
+GtkDialogFlags libbalsa_dialog_flags(void);
+#else
+#define libbalsa_dialog_flags()		(GtkDialogFlags) (0)
+#endif
+
 #if HAVE_GTKSOURCEVIEW
-GtkWidget *libbalsa_source_view_new(gboolean highlight_phrases, GdkColor *q_colour);
+GtkWidget *libbalsa_source_view_new(gboolean highlight_phrases);
 #endif                          /* HAVE_GTKSOURCEVIEW */
 
 #endif                          /* __LIBBALSA_H__ */

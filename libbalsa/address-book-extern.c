@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2009 Stuart Parmenter and others,
+ * Copyright (C) 1997-2013 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -53,6 +53,7 @@
 
 /* FIXME: Arbitrary constant */
 #define LINE_LEN 256
+#define LINE_LEN_STR "256"
 
 static LibBalsaAddressBookClass *parent_class = NULL;
 
@@ -268,7 +269,10 @@ parse_externq_file(LibBalsaAddressBookExtern *addr_externq,
     }  /* FIXME check error */
 	
     while (fgets(string, sizeof(string), gc)) {
-        int i=sscanf(string, "%[^\t]\t%[^\t]%[^\n]", email, name, tmp);
+        int i=sscanf(string, "%" LINE_LEN_STR "[^\t]\t"
+                             "%" LINE_LEN_STR "[^\t]"
+                             "%" LINE_LEN_STR "[^\n]",
+                             email, name, tmp);
 #ifdef DEBUG
         printf("%s =>%i\n", string, i);
 #endif
@@ -278,7 +282,7 @@ parse_externq_file(LibBalsaAddressBookExtern *addr_externq,
 #endif
         cb(email, name, data);
     }
-    fclose(gc);
+    pclose(gc);
     
     return TRUE;
 }

@@ -1,0 +1,243 @@
+<!DOCTYPE page
+[<!ENTITY % balsa SYSTEM "balsa.entities"> %balsa; ]>
+<page xmlns="http://projectmallard.org/1.0/" type="topic"
+id="identities">
+  <info>
+    <link type="guide" xref="index" />
+  </info>
+  <title>Identities</title>
+  <p>This dialog window lets you specify how you present yourself
+  to the rest of the world through your email. The first page has
+  your general information:</p>
+  <terms>
+    <item>
+      <title>
+        <gui>Identity Name</gui>
+      </title>
+      <p>A unique title by which this identity will be named within
+      &Balsa;.</p>
+    </item>
+    <item>
+      <title>
+        <gui>Full Name</gui>
+      </title>
+      <p>This doesn't
+      <em>have</em> to be your name, I guess. But it's the word
+      prefixing your email address in mail you send.</p>
+    </item>
+    <item>
+      <title>
+        <gui>Mailing Address</gui>
+      </title>
+      <p>As you wish it to appear in your "From" header.</p>
+    </item>
+    <item>
+      <title>
+        <gui>Reply-To address</gui>
+      </title>
+      <p>The address that you wish people to reply to your email
+      with (if you have a home and a work address, for
+      instance).</p>
+    </item>
+    <item>
+      <title>
+        <gui>Default Domain</gui>
+      </title>
+      <p>The domain that you wish to append to all e-mail entries
+      where you did not specify the domain. Normally you would use
+      your local domain. You need to enable
+      <link xref="preferences-address-books">Alias
+      Expansion</link> for this to work.</p>
+    </item>
+  </terms>
+  <p>The "Messages" page shows various initial settings for the new
+  message:</p>
+  <terms>
+    <item>
+      <title>
+        <gui>Bcc</gui>
+      </title>
+      <p>The default value for the blind-carbon-copy field when
+      using this identity. Useful if you want to always send a copy
+      of outgoing mail to another account.</p>
+    </item>
+    <item>
+      <title>
+        <gui>Reply String</gui>
+      </title>
+      <p>The prefix for the subject line when replying to a
+      message.</p>
+    </item>
+    <item>
+      <title>
+        <gui>Forward String</gui>
+      </title>
+      <p>The prefix for the subject line when forwarding a
+      message.</p>
+    </item>
+    <item>
+      <title>
+        <gui>Request Message Disposition Notification</gui>
+      </title>
+      <p>Whether Message Disposition Notification should be
+      requested by default.</p>
+    </item>
+    <item>
+      <title>
+        <gui>Face Path</gui>
+      </title>
+      <p>Whether a "Face" header should be attached to a program.
+      Specified path points out to a file containing a textual
+      representation of the face icon. Please see
+      <link href="http://quimby.gnus.org/circus/face/">a
+      description of Face and X-Face</link> headers for more details
+      as well as the list of mail programs supporting this
+      feature.</p>
+    </item>
+    <item>
+      <title>
+        <gui>X-Face Path</gui>
+      </title>
+      <p>Whether a "Face" header should be attached to a program.
+      Specified path points out to a file containing a textual
+      representation of the face icon.</p>
+    </item>
+    <item>
+      <title>
+        <gui>SMTP server</gui>
+      </title>
+      <p>The
+      <link xref="preferences-mail-options#smtp-server-config">
+      SMTP server</link> to be
+      used for this identity.</p>
+    </item>
+  </terms>
+  <p>You control the signature that &Balsa; appends to your
+  messages on the "Signature" page:</p>
+  <terms>
+    <item>
+      <title>
+        <gui>Signature Path</gui>
+      </title>
+      <p>The file containing the signature to append to all your
+      messages. This can be generated in one of three ways:</p>
+      <list>
+        <item>
+          <p>From a regular file. List the path to any regular
+          file, and the text from that file will be appended to
+          your messages.</p>
+        </item>
+        <item>
+          <p>A named pipe or FIFO. In this case, to &Balsa;,
+          the file looks normal, but in reality, it is a pipe to a
+          program that is generating the content. List the path to
+          the pipe.</p>
+        </item>
+        <item>
+          <p>An executable program. &Balsa; will execute the
+          program and read its output, appending that text to the
+          message. List the path to the program with a "|"
+          prepended to it. For example:</p>
+          <p>"|/home/user/dynsig.pl"</p>
+        </item>
+      </list>
+    </item>
+    <item>
+      <title>
+        <gui>Execute Signature</gui>
+      </title>
+      <p>Execute the instructions in the signature file and use the
+      results as the signature to append to outgoing mail. Select
+      this when generating the signature from an executable program
+      as outlined above in Signature Path.</p>
+    </item>
+    <item>
+      <title>
+        <gui>Include Signature</gui>
+      </title>
+      <p>Append the signature to the end of all outgoing mail.</p>
+    </item>
+    <item>
+      <title>
+        <gui>Include Signature When Forwarding</gui>
+      </title>
+      <p>Add the signature when forwarding an existing mail.</p>
+    </item>
+    <item>
+      <title>
+        <gui>Include Signature When Replying</gui>
+      </title>
+      <p>Add the signature when replying to a existing message.</p>
+    </item>
+    <item>
+      <title>
+        <gui>Add Signature Separator</gui>
+      </title>
+      <p>When checked, this has &Balsa; insert the standard
+      signature separator before your signature.</p>
+    </item>
+    <item>
+      <title>
+        <gui>Prepend Signature</gui>
+      </title>
+      <p>Add the signature before the message text, rather than
+      after it.</p>
+    </item>
+  </terms>
+  <p>Security settings are on the fourth page:</p>
+  <terms>
+    <item>
+      <title>
+        <gui>Sign messages by default.</gui>
+      </title>
+      <p>By default enable the cryptographic signature for every
+      new message. The default protocol is determined by the
+      "Default protocol" option.</p>
+    </item>
+    <item>
+      <title>
+        <gui>Encrypt messages by default.</gui>
+      </title>
+      <p>By default encrypt every new message. The default protocol
+      is determined by the "Default protocol" option.</p>
+    </item>
+    <item>
+      <title>
+        <gui>Default protocol.</gui>
+      </title>
+      <p>Choose the default protocol for the cryptographic
+      signature and message encryption.</p>
+    </item>
+    <item>
+      <title>
+        <gui>Always trust GnuPG keys when encrypting.</gui>
+      </title>
+      <p>Do not ask for confirmation when encrypting for a
+      recipient whose GnuPG key is not fully trusted.</p>
+    </item>
+    <item>
+      <title>
+        <gui>Remind me if messages can be encrypted.</gui>
+      </title>
+      <p>Before sending a message, check if valid keys are present
+      for all recipients and show a dialog in this case.</p>
+    </item>
+    <item>
+      <title>
+        <gui>Use secret key with this id for signing.</gui>
+      </title>
+      <p>Usually, &Balsa; automatically selects a proper secret
+      key for cryptographic signatures from the identity's mail
+      address. Therefore, most users should leave this entry empty.
+      If you want to force using a specific secret key for
+      cryptographic signatures, enter the key id here. You can get
+      the key id by running the command
+      <cmd>gpg --list-secret-keys</cmd>.</p>
+    </item>
+  </terms>
+  <note>
+    <p>These security options are available only if &Balsa; is
+    built with
+    <app>GnuPG</app> support.</p>
+  </note>
+</page>

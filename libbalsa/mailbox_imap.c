@@ -1,6 +1,6 @@
 /* -*-mode:c; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2003 Stuart Parmenter and others,
+ * Copyright (C) 1997-2013 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -41,10 +41,6 @@
 
 /* for uint32_t */
 #include <stdint.h>
-
-#ifdef BALSA_USE_THREADS
-#include <pthread.h>
-#endif
 
 #include "filter-funcs.h"
 #include "filter.h"
@@ -347,10 +343,10 @@ libbalsa_mailbox_imap_finalize(GObject * object)
 	G_OBJECT_CLASS(parent_class)->finalize(object);
 }
 
-LibBalsaMailboxImap*
+LibBalsaMailbox*
 libbalsa_mailbox_imap_new(void)
 {
-    LibBalsaMailboxImap *mailbox;
+    LibBalsaMailbox *mailbox;
     mailbox = g_object_new(LIBBALSA_TYPE_MAILBOX_IMAP, NULL);
 
     return mailbox;
@@ -2322,8 +2318,8 @@ is_child_of(LibBalsaMessageBody *body, LibBalsaMessageBody *child,
                    body->parts->body_type ==
                    LIBBALSA_MESSAGE_BODY_TYPE_MULTIPART);
         if(is_child_of(body->parts, child, s, do_mod)){
-            char buf[12];
             if(modify) {
+                char buf[12];
                 snprintf(buf, sizeof(buf), "%u.", i);
                 g_string_prepend(s, buf);
             }
@@ -2921,9 +2917,9 @@ create_cache_copy(const gchar *src, const gchar *cache_dir, const gchar *name)
 
 	if(in) {
 	    FILE *out = fopen(dst, "w");
-	    char buf[65536];
-	    size_t sz;
 	    if(out) {
+	        size_t sz;
+	        char buf[65536];
 		gboolean err;
 		while( (sz=fread(buf, 1, sizeof(buf), in)) > 0)
 		    if(fwrite(buf, 1, sz, out) != sz)
@@ -3260,23 +3256,26 @@ lbmi_compare_func(const SortTuple * a,
 static void
 libbalsa_mailbox_imap_sort(LibBalsaMailbox *mbox, GArray *array)
 {
-    unsigned *msgno_arr, i;
-    ImapResponse rc;
     LibBalsaMailboxImap *mimap;
 
     mimap = LIBBALSA_MAILBOX_IMAP(mbox);
     if (mimap->sort_field != mbox->view->sort_field) {
 	/* Cached ranks are invalid. */
-        guint len = mimap->messages_info->len;
+        unsigned *msgno_arr;
+        guint i, len;
+
+        len = mimap->messages_info->len;
         msgno_arr = g_malloc(len * sizeof(unsigned));
         for (i = 0; i < len; i++)
             msgno_arr[i] = i + 1;
-        if (mbox->view->sort_field != LB_MAILBOX_SORT_NO)
+        if (mbox->view->sort_field != LB_MAILBOX_SORT_NO) {
+            ImapResponse rc;
 	    /* Server-side sort of the whole mailbox. */
             II(rc, LIBBALSA_MAILBOX_IMAP(mbox)->handle,
                imap_mbox_sort_msgno(LIBBALSA_MAILBOX_IMAP(mbox)->handle,
                                     lbmi_get_imap_sort_key(mbox), TRUE,
                                     msgno_arr, len)); /* ignore errors */
+        }
         g_array_set_size(mimap->sort_ranks, len);
         for (i = 0; i < len; i++)
 	    g_array_index(mimap->sort_ranks, guint, msgno_arr[i] - 1) = i;
@@ -3475,6 +3474,7 @@ imap_cache_manager_new_from_file(const char *header_cache_path)
     }
     if(fread(&i, sizeof(i), 1, f) != 1) {
 	printf("Could not read cache table size.\n");
+        fclose(f);
 	return NULL;
     }
     
@@ -3484,6 +3484,7 @@ imap_cache_manager_new_from_file(const char *header_cache_path)
        fread(&icm->exists,      sizeof(uint32_t), 1, f) != 1) {
 	imap_cache_manager_free(icm);
 	printf("Couldn't read cache - aborting...\n");
+        fclose(f);
 	return NULL;
     }
 

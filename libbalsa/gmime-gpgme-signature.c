@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /*
  * gmime/gpgme glue layer library
- * Copyright (C) 2004-2011 Albrecht Dreß <albrecht.dress@arcor.de>
+ * Copyright (C) 2004-2013 Albrecht Dreß <albrecht.dress@arcor.de>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@
 #include <string.h>
 #include <glib.h>
 #include "libbalsa-gpgme.h"
+#include "misc.h"
 #include "gmime-gpgme-signature.h"
 
 
@@ -103,10 +104,13 @@ g_mime_gpgme_sigstat_new_from_gpgme_ctx(gpgme_ctx_t ctx)
 
     /* try to get the related key */
     err = gpgme_get_key(ctx, sig_stat->fingerprint, &sig_stat->key, 0);
-    if (err != GPG_ERR_NO_ERROR)
-          g_message("could not retrieve the key with fingerprint %s: %s: %s",
-                    sig_stat->fingerprint, gpgme_strsource(err),
-                    gpgme_strerror(err));
+    if (err != GPG_ERR_NO_ERROR) {
+    	gchar errbuf[4096];		/* should be large enough... */
+
+    	gpgme_strerror_r(err, errbuf, sizeof(errbuf));
+    	g_message("could not retrieve the key with fingerprint %s: %s: %s",
+    		sig_stat->fingerprint, gpgme_strsource(err), errbuf);
+    }
 
     return sig_stat;
 }
@@ -181,6 +185,7 @@ libbalsa_cert_subject_readable(const gchar *subject)
     gchar **elements;
     gint n;
     GString *result;
+    gchar *readable_subject;
 
     if (!subject)
         return NULL;
@@ -216,7 +221,9 @@ libbalsa_cert_subject_readable(const gchar *subject)
             result = g_string_append_c(result, ',');
     }
     g_strfreev(elements);
-    return g_string_free(result, FALSE);
+    readable_subject = g_string_free(result, FALSE);
+    libbalsa_utf8_sanitize(&readable_subject, TRUE, NULL);
+    return readable_subject;
 }
 
 static void

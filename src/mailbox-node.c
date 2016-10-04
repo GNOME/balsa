@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2002 Stuart Parmenter and others,
+ * Copyright (C) 1997-2013 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -190,12 +190,15 @@ static void
 balsa_mailbox_node_dispose(GObject * object)
 {
     BalsaMailboxNode *mn = BALSA_MAILBOX_NODE(object);
+    LibBalsaMailbox *mailbox = mn->mailbox;
 
-    if(mn->mailbox) {
-	libbalsa_mailbox_set_frozen(mn->mailbox, TRUE);
+    if (mailbox) {
+        libbalsa_mailbox_set_open(mailbox,
+                                  libbalsa_mailbox_is_open(mailbox));
+        config_save_mailbox_view(mailbox->url, mailbox->view);
 	if (balsa_app.main_window)
 	    balsa_window_close_mbnode(balsa_app.main_window, mn);
-	g_object_unref(mn->mailbox);
+	g_object_unref(mailbox);
 	mn->mailbox = NULL;
     }
 
@@ -322,13 +325,25 @@ struct _CheckPathInfo {
     gboolean must_scan;
 };
 
-static void
-check_url_func(const gchar * url, LibBalsaMailboxView * view,
-	       CheckPathInfo * cpi)
+static gboolean
+check_url_func(const gchar * group, const gchar * encoded_url,
+               CheckPathInfo * cpi)
 {
-    if ((view->exposed || view->open) && !cpi->must_scan
-	&& strncmp(url, cpi->url, strlen(cpi->url)) == 0)
-	cpi->must_scan = TRUE;
+    gchar *url;
+
+    url = libbalsa_urldecode(encoded_url);
+
+    if (g_str_has_prefix(url, cpi->url)
+        && (config_mailbox_was_exposed(url)
+            || (balsa_app.remember_open_mboxes
+                && config_mailbox_was_open(url)))
+        )
+        cpi->must_scan = TRUE;
+
+    g_free(url);
+
+    /* stop checking if we already know we must scan deeper */
+    return cpi->must_scan;
 }
 
 static gboolean
@@ -346,13 +361,11 @@ check_local_path(const gchar * path, guint depth)
 	/* Top level folder. */
 	return TRUE;
 
-    if (!libbalsa_mailbox_view_table)
-        return FALSE;
-
     cpi.url = g_strconcat("file://", path, NULL);
     cpi.must_scan = FALSE;
-    g_hash_table_foreach(libbalsa_mailbox_view_table,
-                         (GHFunc) check_url_func, &cpi);
+    libbalsa_conf_foreach_group(VIEW_BY_URL_SECTION_PREFIX,
+                                (LibBalsaConfForeachFunc) check_url_func,
+                                &cpi);
     if(balsa_app.debug) 
 	printf("check_local_path: path \"%s\" must_scan %d.\n",
                cpi.url, cpi.must_scan);
@@ -390,21 +403,14 @@ load_mailbox_view(BalsaMailboxNode * mbnode)
 {
     LibBalsaMailbox *mailbox = mbnode->mailbox;
 
-    if (!mailbox->url)
-	return;
-
-    mailbox->view =
-	g_hash_table_lookup(libbalsa_mailbox_view_table, mailbox->url);
-    if (libbalsa_mailbox_get_frozen(mailbox)
-	&& libbalsa_mailbox_get_open(mailbox))
-	/* We are rescanning. */
-	balsa_window_open_mbnode(balsa_app.main_window, mbnode, TRUE);
-    libbalsa_mailbox_set_frozen(mailbox, FALSE);
+    if (!mailbox->view)
+        mailbox->view = config_load_mailbox_view(mailbox->url);
 }
 
 static gboolean
 imap_scan_attach_mailbox(BalsaMailboxNode * mbnode, imap_scan_item * isi)
 {
+    LibBalsaMailbox *mailbox;
     LibBalsaMailboxImap *m;
 
     /* If the mailbox was added from the config file, it is already
@@ -417,26 +423,28 @@ imap_scan_attach_mailbox(BalsaMailboxNode * mbnode, imap_scan_item * isi)
     if (LIBBALSA_IS_MAILBOX_IMAP(mbnode->mailbox))
         /* it already has a mailbox */
         return FALSE;
-    m = LIBBALSA_MAILBOX_IMAP(libbalsa_mailbox_imap_new());
+
+    mailbox = libbalsa_mailbox_imap_new();
+    m = LIBBALSA_MAILBOX_IMAP(mailbox);
     libbalsa_mailbox_remote_set_server(LIBBALSA_MAILBOX_REMOTE(m),
 				       mbnode->server);
     libbalsa_mailbox_imap_set_path(m, isi->fn);
     if(balsa_app.debug)
         printf("imap_scan_attach_mailbox: add mbox of name %s "
-	       "(full path %s)\n", isi->fn, LIBBALSA_MAILBOX(m)->url);
+	       "(full path %s)\n", isi->fn, mailbox->url);
     /* avoid allocating the name again: */
-    LIBBALSA_MAILBOX(m)->name = mbnode->name;
+    mailbox->name = mbnode->name;
     mbnode->name = NULL;
-    mbnode->mailbox = LIBBALSA_MAILBOX(m);
+    mbnode->mailbox = mailbox;
     load_mailbox_view(mbnode);
     if (isi->special) {
 	if (*isi->special)
 	    g_object_remove_weak_pointer(G_OBJECT(*isi->special),
 					 (gpointer) isi->special);
-        *isi->special = LIBBALSA_MAILBOX(m);
+        *isi->special = mailbox;
 	g_object_add_weak_pointer(G_OBJECT(m), (gpointer) isi->special);
         if (isi->special == &balsa_app.outbox)
-            LIBBALSA_MAILBOX(m)->no_reassemble = TRUE;
+            mailbox->no_reassemble = TRUE;
     }
 
     return TRUE;
@@ -530,8 +538,6 @@ imap_dir_cb(BalsaMailboxNode* mb)
 	    balsa_mblist_mailbox_node_redraw(n);
         if(item->marked)
             libbalsa_mailbox_set_unread_messages_flag(n->mailbox, TRUE);
-	g_object_unref(n);
-        
     }
     imap_scan_destroy_tree(&imap_tree);
 
@@ -649,7 +655,7 @@ balsa_mailbox_node_new_imap(LibBalsaServer* s, const char*p)
     BalsaMailboxNode * folder = balsa_mailbox_node_new_imap_node(s, p);
     g_assert(s);
 
-    folder->mailbox = LIBBALSA_MAILBOX(libbalsa_mailbox_imap_new());
+    folder->mailbox = libbalsa_mailbox_imap_new();
     g_object_ref(G_OBJECT(folder->mailbox));
     libbalsa_mailbox_remote_set_server(
 	LIBBALSA_MAILBOX_REMOTE(folder->mailbox), s);
@@ -723,16 +729,15 @@ find_dir(const gchar * dir)
 void
 balsa_mailbox_local_append(LibBalsaMailbox* mbx)
 {
-    gchar *dir; 
+    gchar *dir;
     BalsaMailboxNode *mbnode;
     BalsaMailboxNode *parent = NULL;
 
     g_return_if_fail(LIBBALSA_IS_MAILBOX_LOCAL(mbx));
 
-    for(dir = g_strdup(libbalsa_mailbox_local_get_path(mbx));
-        strlen(dir)>1 /* i.e dir != "/" */ &&
-            !(parent = find_dir(dir));
-        ) {
+    dir = g_strdup(libbalsa_mailbox_local_get_path(mbx));
+    while (dir[1] /* i.e. dir != "/" */
+           && !(parent = find_dir(dir))) {
         gchar* tmp =  g_path_get_dirname(dir);
         g_free(dir);
         dir = tmp;
@@ -1002,13 +1007,27 @@ mb_unsubscribe_cb(GtkWidget * widget, BalsaMailboxNode * mbnode)
 static void
 mb_rescan_cb(GtkWidget * widget, BalsaMailboxNode * mbnode)
 {
+    gchar *current_mailbox_url;
+    GPtrArray *url_array;
+
+    current_mailbox_url = g_strdup(balsa_app.current_mailbox_url);
     balsa_mailbox_node_rescan(mbnode);
+
+    /* Reopen mailboxes */
+    url_array = g_ptr_array_new();
+    if (current_mailbox_url)
+        g_ptr_array_add(url_array, current_mailbox_url);
+    balsa_add_open_mailbox_urls(url_array);
+    g_ptr_array_add(url_array, NULL);
+    balsa_open_mailbox_list((gchar **) g_ptr_array_free(url_array, FALSE));
 }
 
 static void
 mb_filter_cb(GtkWidget * widget, BalsaMailboxNode * mbnode)
 {
-    if (mbnode->mailbox) filters_run_dialog(mbnode->mailbox);
+    if (mbnode->mailbox)
+        filters_run_dialog(mbnode->mailbox,
+                           GTK_WINDOW(balsa_app.main_window));
     else
 	/* FIXME : Perhaps should we be able to apply filters on
 	   folders (ie recurse on all mailboxes in it), but there are
@@ -1038,7 +1057,7 @@ balsa_mailbox_node_get_context_menu(BalsaMailboxNode * mbnode)
     menu = gtk_menu_new();
     /* it's a single-use menu, so we must destroy it when we're done */
     g_signal_connect(G_OBJECT(menu), "selection-done",
-                     G_CALLBACK(gtk_object_destroy), NULL);
+                     G_CALLBACK(gtk_widget_destroy), NULL);
 
     submenu = gtk_menu_new();
     add_menu_entry(submenu, _("Local _mbox mailbox..."),  
@@ -1204,12 +1223,11 @@ add_local_mailbox(BalsaMailboxNode *root, const gchar * name,
     mbnode = remove_special_mailbox_by_url(url, NULL);
     if (!mbnode) {
 	if ( type == LIBBALSA_TYPE_MAILBOX_MH ) {
-	    mailbox = LIBBALSA_MAILBOX(libbalsa_mailbox_mh_new(path, FALSE));
+	    mailbox = libbalsa_mailbox_mh_new(path, FALSE);
 	} else if ( type == LIBBALSA_TYPE_MAILBOX_MBOX ) {
-	    mailbox = LIBBALSA_MAILBOX(libbalsa_mailbox_mbox_new(path, FALSE));
+	    mailbox = libbalsa_mailbox_mbox_new(path, FALSE);
 	} else if ( type == LIBBALSA_TYPE_MAILBOX_MAILDIR ) {
-	    mailbox =
-		LIBBALSA_MAILBOX(libbalsa_mailbox_maildir_new(path, FALSE));
+	    mailbox = libbalsa_mailbox_maildir_new(path, FALSE);
 	} else {
 	    /* type is not a valid local mailbox type. */
 	    balsa_information(LIBBALSA_INFORMATION_DEBUG,
@@ -1295,6 +1313,7 @@ imap_scan_create_mbnode(BalsaMailboxNode * root, imap_scan_item * isi,
     mbnode = balsa_find_url(url);
     if (mbnode) {
 	/* A mailbox with this url is already in the tree... */
+	LibBalsaMailboxView *view;
 	BalsaMailboxNode *special =
 	    remove_special_mailbox_by_url(url, &isi->special);
 	if (special) {
@@ -1304,7 +1323,14 @@ imap_scan_create_mbnode(BalsaMailboxNode * root, imap_scan_item * isi,
 	} else {
             balsa_mblist_mailbox_node_remove(mbnode);
         }
+        /* Unreffing mbnode may finalize it, which would push the
+         * mailbox view to the config; to save the open state, we
+         * retrieve the view from the config, and restore it after
+         * unreffing. */
+        view = config_load_mailbox_view(url);
 	g_object_unref(mbnode);
+        config_save_mailbox_view(url, view);
+        libbalsa_mailbox_view_free(view);
     }
     g_free(url);
 
@@ -1329,7 +1355,6 @@ imap_scan_create_mbnode(BalsaMailboxNode * root, imap_scan_item * isi,
     mbnode->subscribed = parent->subscribed;
     mbnode->scanned = isi->scanned;
 
-    g_object_ref(mbnode);
     balsa_mblist_mailbox_node_append(mbnode->parent, mbnode);
     g_object_unref(parent);
     
@@ -1405,13 +1430,11 @@ check_imap_path(const gchar *fn, LibBalsaServer * server, guint depth)
     if (depth < balsa_app.imap_scan_depth)
         return TRUE;
 
-    if (!libbalsa_mailbox_view_table)
-        return FALSE;
-
     cpi.url = libbalsa_imap_url(server, fn);
     cpi.must_scan = FALSE;
-    g_hash_table_foreach(libbalsa_mailbox_view_table,
-                         (GHFunc) check_url_func, &cpi);
+    libbalsa_conf_foreach_group(VIEW_BY_URL_SECTION_PREFIX,
+                                (LibBalsaConfForeachFunc) check_url_func,
+                                &cpi);
     if(balsa_app.debug) 
 	printf("check_imap_path: path \"%s\" must_scan %d.\n",
                cpi.url, cpi.must_scan);

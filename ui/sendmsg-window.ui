@@ -1,0 +1,255 @@
+<interface>
+  <menu id='menubar'>
+    <submenu>
+      <attribute name='label' translatable='yes'>_File</attribute>
+      <section>
+        <item>
+          <attribute name='label'
+            translatable='yes'>_Include File…</attribute>
+          <attribute name='action'>win.include-file</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>_Attach File…</attribute>
+          <attribute name='action'>win.attach-file</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>I_nclude Messages…</attribute>
+          <attribute name='action'>win.include-messages</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>Attach _Messages…</attribute>
+          <attribute name='action'>win.attach-messages</attribute>
+        </item>
+      </section>
+      <section>
+        <item>
+          <attribute name='label'
+            translatable='yes'>Send</attribute>
+          <attribute name='action'>win.send</attribute>
+          <attribute name='accel'>&lt;Primary&gt;Return</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+              translatable='yes'>Queue</attribute>
+          <attribute name='action'>win.queue</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+              translatable='yes'>Postpone</attribute>
+          <attribute name='action'>win.postpone</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>_Save</attribute>
+          <attribute name='action'>win.save</attribute>
+          <attribute name='accel'>&lt;Primary&gt;s</attribute>
+        </item>
+      </section>
+      <section>
+        <item>
+          <attribute name='label'
+            translatable='yes'>Page S_etup</attribute>
+          <attribute name='action'>win.page-setup</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>_Print…</attribute>
+          <attribute name='action'>win.print</attribute>
+          <attribute name='accel'>&lt;Primary&gt;p</attribute>
+        </item>
+      </section>
+      <section>
+        <item>
+          <attribute name='label'
+            translatable='yes'>_Close</attribute>
+          <attribute name='action'>win.close</attribute>
+          <attribute name='accel'>&lt;Primary&gt;w</attribute>
+        </item>
+      </section>
+    </submenu>
+    <submenu>
+      <attribute name='label' translatable='yes'>_Edit</attribute>
+      <section>
+        <item>
+          <attribute name='label'
+            translatable='yes'>Undo</attribute>
+          <attribute name='action'>win.undo</attribute>
+          <attribute name='accel'>&lt;Primary&gt;z</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>Redo</attribute>
+          <attribute name='action'>win.redo</attribute>
+          <attribute name='accel'>&lt;Shift&gt;&lt;Primary&gt;z</attribute>
+        </item>
+      </section>
+      <section>
+        <item>
+          <attribute name='label'
+            translatable='yes'>Cu_t</attribute>
+          <attribute name='action'>win.cut</attribute>
+          <attribute name='accel'>&lt;Primary&gt;x</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>_Copy</attribute>
+          <attribute name='action'>win.copy</attribute>
+          <attribute name='accel'>&lt;Primary&gt;c</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>_Paste</attribute>
+          <attribute name='action'>win.paste</attribute>
+          <attribute name='accel'>&lt;Primary&gt;v</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>Select _All</attribute>
+          <attribute name='action'>win.select-all</attribute>
+          <attribute name='accel'>&lt;Primary&gt;a</attribute>
+        </item>
+      </section>
+      <section>
+        <item>
+          <attribute name='label'
+            translatable='yes'>_Wrap Body</attribute>
+          <attribute name='action'>win.wrap-body</attribute>
+          <attribute name='accel'>&lt;Primary&gt;b</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>_Reflow Selected Text</attribute>
+          <attribute name='action'>win.reflow</attribute>
+          <attribute name='accel'>&lt;Primary&gt;r</attribute>
+        </item>
+      </section>
+      <section>
+        <item>
+          <attribute name='label'
+            translatable='yes'>Insert Si_gnature</attribute>
+          <attribute name='action'>win.insert-sig</attribute>
+          <attribute name='accel'>&lt;Primary&gt;g</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>_Quote Message(s)</attribute>
+          <attribute name='action'>win.quote</attribute>
+        </item>
+      </section>
+      <section>
+        <item>
+          <attribute name='label'
+            translatable='yes'>C_heck Spelling</attribute>
+          <attribute name='action'>win.spell-check</attribute>
+        </item>
+      </section>
+      <section>
+        <item>
+          <attribute name='label'
+            translatable='yes'>Select _Identity…</attribute>
+          <attribute name='action'>win.select-ident</attribute>
+        </item>
+      </section>
+      <section>
+        <item>
+          <attribute name='label'
+            translatable='yes'>Edit with Gnome-Editor</attribute>
+          <attribute name='action'>win.edit</attribute>
+        </item>
+      </section>
+    </submenu>
+    <submenu>
+      <attribute name='label' translatable='yes'>_Show</attribute>
+      <section>
+        <item>
+          <attribute name='label'
+            translatable='yes'>Show Too_lbar</attribute>
+          <attribute name='action'>win.show-toolbar</attribute>
+        </item>
+      </section>
+      <section>
+        <item>
+          <attribute name='label'
+            translatable='yes'>F_rom</attribute>
+          <attribute name='action'>win.from</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>Rec_ipients</attribute>
+          <attribute name='action'>win.recips</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>R_eply To</attribute>
+          <attribute name='action'>win.reply-to</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>F_cc</attribute>
+          <attribute name='action'>win.fcc</attribute>
+        </item>
+      </section>
+    </submenu>
+    <submenu>
+      <attribute name='label' translatable='yes'>_Language</attribute>
+    </submenu>
+    <submenu>
+      <attribute name='label' translatable='yes'>_Options</attribute>
+      <section>
+        <item>
+          <attribute name='label'
+            translatable='yes'>_Request Disposition Notification</attribute>
+          <attribute name='action'>win.request-mdn</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>_Request Delivery Status Notification</attribute>
+          <attribute name='action'>win.request-dsn</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>_Format = Flowed</attribute>
+          <attribute name='action'>win.flowed</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>Send as plain text and _HTML</attribute>
+          <attribute name='action'>win.send-html</attribute>
+        </item>
+      </section>
+      <section>
+        <item>
+          <attribute name='label'
+            translatable='yes'>_Sign Message</attribute>
+          <attribute name='action'>win.sign</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>_Encrypt Message</attribute>
+          <attribute name='action'>win.encrypt</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>GnuPG uses _MIME mode</attribute>
+          <attribute name='action'>win.gpg-mode</attribute>
+          <attribute name='target'>mime</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>GnuPG uses old _OpenPGP mode</attribute>
+          <attribute name='action'>win.gpg-mode</attribute>
+          <attribute name='target'>open-pgp</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+              translatable='yes'>S/MIME mode (_GpgSM)</attribute>
+          <attribute name='action'>win.gpg-mode</attribute>
+          <attribute name='target'>smime</attribute>
+        </item>
+      </section>
+    </submenu>
+  </menu>
+</interface>

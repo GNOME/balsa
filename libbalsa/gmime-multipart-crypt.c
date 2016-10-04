@@ -20,7 +20,9 @@
  * GNU General Public License for more details.
  *  
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, see <http://www.gnu.org/licenses/>.
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  
+ * 02111-1307, USA.
  */
 
 #if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
@@ -48,11 +50,12 @@ static void
 sign_prepare(GMimeObject * mime_part)
 {
     GMimeContentEncoding encoding;
-    GMimeMultipart *multipart;
     GMimeObject *subpart;
-    int i, n;
 
     if (GMIME_IS_MULTIPART(mime_part)) {
+        GMimeMultipart *multipart;
+        int i, n;
+
 	multipart = (GMimeMultipart *) mime_part;
 
 	if (GMIME_IS_MULTIPART_SIGNED(multipart) ||
@@ -78,7 +81,7 @@ sign_prepare(GMimeObject * mime_part)
 }
 
 
-int
+gboolean
 g_mime_gpgme_mps_sign(GMimeMultipartSigned * mps, GMimeObject * content,
 		      const gchar * userid, gpgme_protocol_t protocol,
 		      GtkWindow * parent, GError ** err)
@@ -91,11 +94,13 @@ g_mime_gpgme_mps_sign(GMimeMultipartSigned * mps, GMimeObject * content,
     GMimeDataWrapper *wrapper;
     GMimeParser *parser;
     GMimePart *signature;
-    const gchar *sig_type;
+    gchar *micalg;
+    const gchar *proto_type;
+    const gchar *sig_subtype;
     gpgme_hash_algo_t hash_algo;
 
-    g_return_val_if_fail(GMIME_IS_MULTIPART_SIGNED(mps), -1);
-    g_return_val_if_fail(GMIME_IS_OBJECT(content), -1);
+    g_return_val_if_fail(GMIME_IS_MULTIPART_SIGNED(mps), FALSE);
+    g_return_val_if_fail(GMIME_IS_OBJECT(content), FALSE);
 
     /* Prepare all the parts for signing... */
     sign_prepare(content);
@@ -132,33 +137,31 @@ g_mime_gpgme_mps_sign(GMimeMultipartSigned * mps, GMimeObject * content,
     hash_algo =
 	libbalsa_gpgme_sign(userid, filtered, sigstream, protocol, FALSE,
 			    parent, err);
+    g_object_unref(filtered);
     if (hash_algo == GPGME_MD_NONE) {
 	g_object_unref(sigstream);
-	g_object_unref(filtered);
 	g_object_unref(stream);
-	return -1;
+	return FALSE;
     }
 
-    g_object_unref(filtered);
     g_mime_stream_reset(sigstream);
     g_mime_stream_reset(stream);
 
     /* set the multipart/signed protocol and micalg */
     content_type = g_mime_object_get_content_type(GMIME_OBJECT(mps));
     if (protocol == GPGME_PROTOCOL_OpenPGP) {
-	gchar *micalg;
-
 	micalg =
 	    g_strdup_printf("PGP-%s", gpgme_hash_algo_name(hash_algo));
-	g_mime_content_type_set_parameter(content_type, "micalg", micalg);
-	g_free(micalg);
-	sig_type = "application/pgp-signature";
+	proto_type = "application/pgp-signature";
+	sig_subtype = "pgp-signature";
     } else {
-	g_mime_content_type_set_parameter(content_type, "micalg",
-					  gpgme_hash_algo_name(hash_algo));
-	sig_type = "application/pkcs7-signature";
+	micalg = g_strdup(gpgme_hash_algo_name(hash_algo));
+	proto_type = "application/pkcs7-signature";
+	sig_subtype = "pkcs7-signature";
     }
-    g_mime_content_type_set_parameter(content_type, "protocol", sig_type);
+    g_mime_content_type_set_parameter(content_type, "micalg", micalg);
+    g_free(micalg);
+    g_mime_content_type_set_parameter(content_type, "protocol", proto_type);
     g_mime_multipart_set_boundary(GMIME_MULTIPART(mps), NULL);
 
     /* construct the content part */
@@ -168,11 +171,7 @@ g_mime_gpgme_mps_sign(GMimeMultipartSigned * mps, GMimeObject * content,
     g_object_unref(parser);
 
     /* construct the signature part */
-    content_type = g_mime_content_type_new_from_string(sig_type);
-    signature =
-	g_mime_part_new_with_type(content_type->type,
-				  content_type->subtype);
-    g_object_unref(content_type);
+    signature = g_mime_part_new_with_type("application", sig_subtype);
 
     wrapper = g_mime_data_wrapper_new();
     g_mime_data_wrapper_set_stream(wrapper, sigstream);
@@ -196,7 +195,7 @@ g_mime_gpgme_mps_sign(GMimeMultipartSigned * mps, GMimeObject * content,
     g_object_unref(signature);
     g_object_unref(content);
 
-    return 0;
+    return TRUE;
 }
 
 
@@ -217,7 +216,7 @@ g_mime_gpgme_mps_verify(GMimeMultipartSigned * mps, GError ** error)
 
     g_return_val_if_fail(GMIME_IS_MULTIPART_SIGNED(mps), NULL);
 
-    if (g_mime_multipart_get_count((GMimeMultipart *) mps) < 2) {
+    if (g_mime_multipart_get_count(GMIME_MULTIPART(mps)) < 2) {
 	g_set_error(error, GMIME_ERROR, GMIME_ERROR_PARSE_ERROR, "%s",
 		    _
 		    ("Cannot verify multipart/signed part due to missing subparts."));
@@ -309,7 +308,7 @@ g_mime_gpgme_mps_verify(GMimeMultipartSigned * mps, GError ** error)
 }
 
 
-int
+gboolean
 g_mime_gpgme_mpe_encrypt(GMimeMultipartEncrypted * mpe,
 			 GMimeObject * content, GPtrArray * recipients,
 			 gboolean trust_all, GtkWindow * parent,
@@ -320,12 +319,11 @@ g_mime_gpgme_mpe_encrypt(GMimeMultipartEncrypted * mpe,
     GMimeStream *stream;
     GMimePart *version_part;
     GMimePart *encrypted_part;
-    GMimeContentType *content_type;
     GMimeDataWrapper *wrapper;
     GMimeFilter *crlf_filter;
 
-    g_return_val_if_fail(GMIME_IS_MULTIPART_ENCRYPTED(mpe), -1);
-    g_return_val_if_fail(GMIME_IS_OBJECT(content), -1);
+    g_return_val_if_fail(GMIME_IS_MULTIPART_ENCRYPTED(mpe), FALSE);
+    g_return_val_if_fail(GMIME_IS_OBJECT(content), FALSE);
 
     /* get the cleartext */
     stream = g_mime_stream_mem_new();
@@ -345,29 +343,20 @@ g_mime_gpgme_mpe_encrypt(GMimeMultipartEncrypted * mpe,
 
     /* encrypt the content stream */
     ciphertext = g_mime_stream_mem_new();
-    if (libbalsa_gpgme_encrypt
+    if (!libbalsa_gpgme_encrypt
 	(recipients, NULL, stream, ciphertext, GPGME_PROTOCOL_OpenPGP,
-	 FALSE, trust_all, parent, err) == -1) {
+	 FALSE, trust_all, parent, err)) {
 	g_object_unref(ciphertext);
 	g_object_unref(stream);
-	return -1;
+	return FALSE;
     }
 
     g_object_unref(stream);
     g_mime_stream_reset(ciphertext);
 
     /* construct the version part */
-    content_type =
-	g_mime_content_type_new_from_string("application/pgp-encrypted");
     version_part =
-	g_mime_part_new_with_type(content_type->type,
-				  content_type->subtype);
-    g_object_unref(content_type);
-
-    content_type =
-	g_mime_content_type_new_from_string("application/pgp-encrypted");
-    g_mime_object_set_content_type(GMIME_OBJECT(version_part),
-				   content_type);
+	g_mime_part_new_with_type("application", "pgp-encrypted");
     g_mime_part_set_content_encoding(version_part,
 				     GMIME_CONTENT_ENCODING_7BIT);
     stream =
@@ -379,11 +368,6 @@ g_mime_gpgme_mpe_encrypt(GMimeMultipartEncrypted * mpe,
     g_mime_part_set_content_object(version_part, wrapper);
     g_object_unref(wrapper);
     g_object_unref(stream);
-
-#if !defined(HAVE_GMIME_2_6)
-    mpe->decrypted = content;
-    g_object_ref(content);
-#endif
 
     /* construct the encrypted mime part */
     encrypted_part =
@@ -410,7 +394,7 @@ g_mime_gpgme_mpe_encrypt(GMimeMultipartEncrypted * mpe,
 					     "application/pgp-encrypted");
     g_mime_multipart_set_boundary(GMIME_MULTIPART(mpe), NULL);
 
-    return 0;
+    return TRUE;
 }
 
 
@@ -459,13 +443,6 @@ g_mime_gpgme_mpe_decrypt(GMimeMultipartEncrypted * mpe,
     char *content_type;
 
     g_return_val_if_fail(GMIME_IS_MULTIPART_ENCRYPTED(mpe), NULL);
-
-#if !defined(HAVE_GMIME_2_6)
-    if (mpe->decrypted) {
-	/* we seem to have already decrypted the part */
-	return mpe->decrypted;
-    }
-#endif
 
     if (signature && *signature) {
 	g_object_unref(G_OBJECT(*signature));
@@ -560,9 +537,6 @@ g_mime_gpgme_mpe_decrypt(GMimeMultipartEncrypted * mpe,
 
 
     /* cache the decrypted part */
-#if !defined(HAVE_GMIME_2_6)
-    mpe->decrypted = decrypted;
-#endif
     if (signature) {
 	if (sigstat->status != GPG_ERR_NOT_SIGNED)
 	    *signature = sigstat;

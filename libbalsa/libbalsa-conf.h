@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2002 Stuart Parmenter and others,
+ * Copyright (C) 1997-2013 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -31,6 +31,7 @@ void libbalsa_conf_remove_group_(const char *group, gboolean priv);
         (libbalsa_conf_remove_group_((group),TRUE))
 
 gboolean libbalsa_conf_has_group(const char *group);
+gboolean libbalsa_conf_has_key(const gchar *key);
 
 /* Wrapper for iterating over groups. */
 typedef gboolean (*LibBalsaConfForeachFunc)(const gchar * key,
@@ -118,5 +119,6 @@ void libbalsa_conf_get_vector_with_default   (const char *path,
 
 void libbalsa_conf_drop_all                  (void);
 void libbalsa_conf_sync                      (void);
+void libbalsa_conf_queue_sync                (void);
 
 #endif                          /* __LIBCONFIG_H__ */

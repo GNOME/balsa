@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2002 Stuart Parmenter and others,
+ * Copyright (C) 1997-2013 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -24,8 +24,6 @@
 #ifndef BALSA_VERSION
 # error "Include config.h before this file."
 #endif
-
-#if BALSA_USE_THREADS
 
 #include <gmime/gmime-stream-fs.h>
 
@@ -59,13 +57,5 @@ GMimeStream *libbalsa_mime_stream_shared_new(int fd);
 
 void libbalsa_mime_stream_shared_lock  (GMimeStream * stream);
 void libbalsa_mime_stream_shared_unlock(GMimeStream * stream);
-
-#else                           /* BALSA_USE_THREADS */
-
-#define libbalsa_mime_stream_shared_new(fd) g_mime_stream_fs_new(fd)
-#define libbalsa_mime_stream_shared_lock(stream)
-#define libbalsa_mime_stream_shared_unlock(stream)
-
-#endif                          /* BALSA_USE_THREADS */
 
 #endif                          /* __LIBBALSA_MIME_STREAM_SHARED_H__ */

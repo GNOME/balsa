@@ -1,7 +1,7 @@
 /* -*-mode:c; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2002 Stuart Parmenter and others,
+ * Copyright (C) 1997-2013 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -31,10 +31,6 @@
 #include <stdlib.h>
 #include <time.h>
 
-#ifdef BALSA_USE_THREADS
-#include <pthread.h>
-#endif
-
 #include <string.h>
 
 #include "libbalsa.h"
@@ -46,6 +42,8 @@
 #include "information.h"
 
 #if ENABLE_ESMTP
+#include <auth-client.h>
+#include <libesmtp.h>
 #include "smtp-server.h"
 #include <stdarg.h>
 
@@ -216,9 +214,6 @@ static LibBalsaMsgCreateResult
 libbalsa_fill_msg_queue_item_from_queu(LibBalsaMessage * message,
                                        MessageQueueItem *mqi);
 
-#ifdef BALSA_USE_THREADS
-void balsa_send_thread(MessageQueueItem * first_message);
-
 GtkWidget *send_progress_message = NULL;
 GtkWidget *send_dialog = NULL;
 GtkWidget *send_dialog_bar = NULL;
@@ -241,7 +236,7 @@ send_dialog_destroy_cb(GtkWidget* w)
    ensures that there is send_dialog available.
 */
 static void
-ensure_send_progress_dialog()
+ensure_send_progress_dialog(GtkWindow * parent)
 {
     GtkWidget* label;
     GtkBox *content_box;
@@ -249,10 +244,10 @@ ensure_send_progress_dialog()
     if(send_dialog) return;
 
     send_dialog = gtk_dialog_new_with_buttons(_("Sending Mail..."), 
-                                              NULL,
-                                              GTK_DIALOG_DESTROY_WITH_PARENT,
-                                              _("_Hide"), 
-                                              GTK_RESPONSE_CLOSE,
+                                              parent,
+                                              GTK_DIALOG_DESTROY_WITH_PARENT |
+                                              libbalsa_dialog_flags(),
+                                              _("_Hide"), GTK_RESPONSE_CLOSE,
                                               NULL);
     gtk_window_set_wmclass(GTK_WINDOW(send_dialog), "send_dialog", "Balsa");
     label = gtk_label_new(_("Sending Mail..."));
@@ -273,17 +268,6 @@ ensure_send_progress_dialog()
 		     G_CALLBACK(send_dialog_destroy_cb), NULL);
     /* Progress bar done */
 }
-
-/* define commands for locking and unlocking: it makes deadlock debugging
- * easier. */
-#define send_lock()   pthread_mutex_lock(&send_messages_lock); 
-#define send_unlock() pthread_mutex_unlock(&send_messages_lock);
-
-#else
-#define ensure_send_progress_dialog()
-#define send_lock()   
-#define send_unlock() 
-#endif
 
 static void
 lbs_set_content(GMimePart * mime_part, gchar * content)
@@ -526,13 +510,15 @@ libbalsa_message_queue(LibBalsaMessage * message, LibBalsaMailbox * outbox,
 static gboolean lbs_process_queue(LibBalsaMailbox * outbox,
                                   LibBalsaFccboxFinder finder,
                                   LibBalsaSmtpServer * smtp_server,
-                                  gboolean debug);
+                                  gboolean debug,
+                                  GtkWindow * parent);
 
 LibBalsaMsgCreateResult
 libbalsa_message_send(LibBalsaMessage * message, LibBalsaMailbox * outbox,
                       LibBalsaMailbox * fccbox,
                       LibBalsaFccboxFinder finder,
                       LibBalsaSmtpServer * smtp_server,
+                      GtkWindow * parent,
                       gboolean flow, gboolean debug,
 		      GError ** error)
 {
@@ -546,7 +532,7 @@ libbalsa_message_send(LibBalsaMessage * message, LibBalsaMailbox * outbox,
                                         smtp_server, flow, error);
 
     if (result == LIBBALSA_MESSAGE_CREATE_OK
-        && !lbs_process_queue(outbox, finder, smtp_server, debug))
+        && !lbs_process_queue(outbox, finder, smtp_server, debug, parent))
             return LIBBALSA_MESSAGE_SEND_ERROR;
 
     return result;
@@ -616,15 +602,20 @@ add_recipients(smtp_message_t message,
 	if (INTERNET_ADDRESS_IS_MAILBOX (ia)) {
 	    smtp_recipient_t recipient;
 
-	    recipient = smtp_add_recipient (message, INTERNET_ADDRESS_MAILBOX (ia)->addr);
+            recipient =
+                smtp_add_recipient(message,
+                                   INTERNET_ADDRESS_MAILBOX(ia)->addr);
 	    if (request_dsn) {
-		smtp_dsn_set_notify(recipient, Notify_SUCCESS | Notify_FAILURE | Notify_DELAY);
+                smtp_dsn_set_notify(recipient,
+                                    Notify_SUCCESS | Notify_FAILURE |
+                                    Notify_DELAY);
 
 		/* XXX  - It would be cool if LibBalsaAddress could contain DSN options
 	           for a particular recipient.  For the time being, just use a switch */
 	    }
 	} else {
-	    add_recipients(message, INTERNET_ADDRESS_GROUP (ia)->members, request_dsn);
+            add_recipients(message, INTERNET_ADDRESS_GROUP(ia)->members,
+                           request_dsn);
 	}
     }
 }
@@ -640,7 +631,8 @@ add_recipients(smtp_message_t message,
  */
 static gboolean
 lbs_process_queue(LibBalsaMailbox * outbox, LibBalsaFccboxFinder finder,
-		  LibBalsaSmtpServer * smtp_server, gboolean debug)
+		  LibBalsaSmtpServer * smtp_server, gboolean debug,
+                  GtkWindow * parent)
 {
     LibBalsaServer *server = LIBBALSA_SERVER(smtp_server);
     MessageQueueItem *new_message;
@@ -652,19 +644,21 @@ lbs_process_queue(LibBalsaMailbox * outbox, LibBalsaFccboxFinder finder,
     long estimate;
     guint msgno;
     gchar *host_with_port;
-    send_lock();
+    GThread *send_mail;
+
+    g_mutex_lock(&send_messages_lock);
 
     if (!libbalsa_mailbox_open(outbox, NULL)) {
-	send_unlock();
+    	g_mutex_unlock(&send_messages_lock);
 	return FALSE;
     }
     if (!libbalsa_mailbox_total_messages(outbox)) {
 	libbalsa_mailbox_close(outbox, TRUE);
-	send_unlock();
+	g_mutex_unlock(&send_messages_lock);
 	return TRUE;
     }
     /* We create here the progress bar */
-    ensure_send_progress_dialog();
+    ensure_send_progress_dialog(parent);
 
     /* Create the libESMTP session.  Loop over the out box and add the
        messages to the session. */
@@ -922,19 +916,17 @@ lbs_process_queue(LibBalsaMailbox * outbox, LibBalsaFccboxFinder finder,
 
     send_message_info=send_message_info_new(outbox, session, debug);
 
-#ifdef BALSA_USE_THREADS
     sending_threads++;
-    pthread_create(&send_mail, NULL,
-		   (void *) &balsa_send_message_real, send_message_info);
-    /* Detach so we don't need to pthread_join
+    send_mail =
+    	g_thread_new("balsa_send_message_real",
+    				 (GThreadFunc) balsa_send_message_real,
+					 send_message_info);
+    /* Detach so we don't need to g_thread_join
      * This means that all resources will be
      * reclaimed as soon as the thread exits
      */
-    pthread_detach(send_mail);
-    send_unlock();
-#else				/*non-threaded code */
-    balsa_send_message_real(send_message_info);
-#endif
+    g_thread_unref(send_mail);
+    g_mutex_unlock(&send_messages_lock);
     return TRUE;
 }
 
@@ -942,12 +934,13 @@ gboolean
 libbalsa_process_queue(LibBalsaMailbox * outbox,
                        LibBalsaFccboxFinder finder,
                        GSList * smtp_servers,
+                       GtkWindow * parent,
 		       gboolean debug)
 {
     for (; smtp_servers; smtp_servers = smtp_servers->next) {
         LibBalsaSmtpServer *smtp_server =
 		LIBBALSA_SMTP_SERVER(smtp_servers->data);
-        if (!lbs_process_queue(outbox, finder, smtp_server, debug))
+        if (!lbs_process_queue(outbox, finder, smtp_server, debug, parent))
             return FALSE;
     }
 
@@ -977,7 +970,7 @@ handle_successful_send(smtp_message_t message, void *be_verbose)
     MessageQueueItem *mqi;
     const smtp_status_t *status;
 
-    send_lock();
+    g_mutex_lock(&send_messages_lock);
     /* Get the app data and decrement the reference count.  Only delete
        structures if refcount reaches zero */
     mqi = smtp_message_get_application_data (message);
@@ -1066,10 +1059,9 @@ handle_successful_send(smtp_message_t message, void *be_verbose)
     }
     if (mqi != NULL && mqi->refcount <= 0)
         msg_queue_item_destroy(mqi);
-    send_unlock();
+    g_mutex_unlock(&send_messages_lock);
 }
 
-#ifdef BALSA_USE_THREADS
 static void
 libbalsa_smtp_event_cb (smtp_session_t session, int event_no, void *arg, ...)
 {
@@ -1158,7 +1150,6 @@ libbalsa_smtp_event_cb (smtp_session_t session, int event_no, void *arg, ...)
 		      NULL, NULL, 0);
         break;
 
-#ifdef USE_TLS
         /* SMTP_TLS related things. Observe that we need to have SSL
 	 * enabled in balsa to properly interpret libesmtp
 	 * messages. */
@@ -1188,53 +1179,9 @@ libbalsa_smtp_event_cb (smtp_session_t session, int event_no, void *arg, ...)
 	*ok = 1;
 	break;
     }
-#endif /* USE_TLS */
     }
     va_end (ap);
 }
-#else /* BALSA: USE_THREADS */
-static void
-libbalsa_smtp_event_cb_serial(smtp_session_t session, int event_no,
-                              void *arg, ...)
-{
-    va_list ap;
-
-    va_start (ap, arg);
-    switch (event_no) {
-#ifdef USE_TLS
-        /* SMTP_TLS related things. Observe that we need to have SSL
-	 * enabled in balsa to properly interpret libesmtp
-	 * messages. */
-    case SMTP_EV_INVALID_PEER_CERTIFICATE: {
-        long vfy_result;
-	SSL  *ssl;
-	X509 *cert;
-        int *ok;
-        vfy_result = va_arg(ap, long); ok = va_arg(ap, int*);
-	ssl = va_arg(ap, SSL*);
-	cert = SSL_get_peer_certificate(ssl);
-	if(cert) {
-	    *ok = libbalsa_is_cert_known(cert, vfy_result);
-	    X509_free(cert);
-	}
-        break;
-    }
-    case SMTP_EV_NO_PEER_CERTIFICATE:
-    case SMTP_EV_WRONG_PEER_CERTIFICATE:
-#if LIBESMTP_1_0_3_AVAILABLE
-    case SMTP_EV_NO_CLIENT_CERTIFICATE:
-#endif
-    {
-	int *ok;
-	ok = va_arg(ap, int*);
-	*ok = 1;
-	break;
-    }
-#endif /* USE_TLS */
-    }
-    va_end (ap);
-}
-#endif /* BALSA_USE_THREADS */
 
 #else /* ESMTP */
 
@@ -1248,7 +1195,7 @@ libbalsa_smtp_event_cb_serial(smtp_session_t session, int event_no,
 */
 gboolean 
 libbalsa_process_queue(LibBalsaMailbox* outbox, LibBalsaFccboxFinder finder,
-                       gboolean debug)
+                       gboolean debug, GtkWindow * parent)
 {
     MessageQueueItem *mqi = NULL, *new_message;
     SendMessageInfo *send_message_info;
@@ -1267,7 +1214,7 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, LibBalsaFccboxFinder finder,
     sending_threads++;
 #endif
 
-    ensure_send_progress_dialog();
+    ensure_send_progress_dialog(parent);
     if (!libbalsa_mailbox_open(outbox, NULL)) {
 #ifdef BALSA_USE_THREADS
 	sending_threads--;
@@ -1309,20 +1256,8 @@ libbalsa_process_queue(LibBalsaMailbox* outbox, LibBalsaFccboxFinder finder,
 
     send_message_info=send_message_info_new(outbox, finder, debug);
     
-#ifdef BALSA_USE_THREADS
-    
-    pthread_create(&send_mail, NULL,
-		   (void *) &balsa_send_message_real, send_message_info);
-    /* Detach so we don't need to pthread_join
-     * This means that all resources will be
-     * reclaimed as soon as the thread exits
-     */
-    pthread_detach(send_mail);
-    
-#else				/*non-threaded code */
-    
     balsa_send_message_real(send_message_info);
-#endif
+
     send_unlock();
     return TRUE;
 }
@@ -1406,11 +1341,20 @@ monitor_cb (const char *buf, int buflen, int writing, void *arg)
 
 /* [BCS] radically different since it uses the libESMTP interface.
  */
+
+static gboolean
+balsa_send_message_real_idle_cb(LibBalsaMailbox * outbox)
+{
+    libbalsa_mailbox_close(outbox, TRUE);
+    g_object_unref(outbox);
+
+    return FALSE;
+}
+
 static guint
 balsa_send_message_real(SendMessageInfo* info)
 {
     gboolean session_started;
-#ifdef BALSA_USE_THREADS
     SendThreadMessage *threadmsg;
 
     /* The event callback is used to write messages to the the progress
@@ -1419,9 +1363,6 @@ balsa_send_message_real(SendMessageInfo* info)
        feedback in non-MT version.
     */
     smtp_set_eventcb (info->session, libbalsa_smtp_event_cb, NULL);
-#else
-    smtp_set_eventcb (info->session, libbalsa_smtp_event_cb_serial, NULL);
-#endif
 
     /* Add a protocol monitor when debugging is enabled. */
     if(info->debug)
@@ -1470,21 +1411,23 @@ balsa_send_message_real(SendMessageInfo* info)
     smtp_enumerate_messages (info->session, handle_successful_send, 
                              &session_started);
 
-    libbalsa_mailbox_close(info->outbox, TRUE);
+    /* close outbox in an idle callback, as it might affect the display */
+    g_idle_add((GSourceFunc) balsa_send_message_real_idle_cb,
+               g_object_ref(info->outbox));
     /*
      * gdk_flush();
      * gdk_threads_leave();
      */
 
-#ifdef BALSA_USE_THREADS
-    send_lock();
+    g_mutex_lock(&send_messages_lock);
     MSGSENDTHREAD(threadmsg, MSGSENDTHREADFINISHED, "", NULL, NULL, 0);
     sending_threads--;
-    send_unlock();
-#endif
+    g_mutex_unlock(&send_messages_lock);
         
     smtp_destroy_session (info->session);
     send_message_info_destroy(info);	
+    /* threadmsg is not leaked: */
+    /* cppcheck-suppress memleak */
     return TRUE;
 }
 
@@ -1678,32 +1621,21 @@ parse_content_type(const char* content_type)
     return ret;
 }
 
-/* get_tz_offset() returns tz offset in minutes. NOTE: not all hours
-   have 60 seconds! Once in a while they get corrected.  */
-#define MIN_SEC		60		/* seconds in a minute */
-#define	HOUR_MIN	60		/* minutes in an hour */
-#define DAY_MIN		(24 * HOUR_MIN)	/* minutes in a day */
-
-static int
-get_tz_offset(time_t *t)
+/* get_tz_offset() returns tz offset in RFC 5322 format ([-]hhmm) */
+static gint
+get_tz_offset(time_t t)
 {
-    struct tm gmt, lt;
-    int off;
-    gmtime_r(t, &gmt);
-    localtime_r(t, &lt);
+	GTimeZone *local_tz;
+	gint interval;
+	gint32 offset;
+	gint hours;
 
-    off = (lt.tm_hour - gmt.tm_hour) * HOUR_MIN + lt.tm_min - gmt.tm_min;
-    if (lt.tm_year < gmt.tm_year)       off -= DAY_MIN;
-    else if (lt.tm_year > gmt.tm_year)	off += DAY_MIN;
-    else if (lt.tm_yday < gmt.tm_yday)  off -= DAY_MIN;
-    else if (lt.tm_yday > gmt.tm_yday)  off += DAY_MIN;
-
-    /* special case: funny minutes */
-    if (lt.tm_sec <= gmt.tm_sec - MIN_SEC) off -= 1;
-    else if (lt.tm_sec >= gmt.tm_sec + MIN_SEC)	off += 1;
-
-    return (off*100)/60; /* time zone offset in hundreds of hours (funny
-                          * unit required by gmime) */
+	local_tz = g_time_zone_new_local();
+	interval = g_time_zone_find_interval(local_tz, G_TIME_TYPE_UNIVERSAL, t);
+	offset = g_time_zone_get_offset(local_tz, interval);
+	g_time_zone_unref(local_tz);
+	hours = offset / 3600;
+	return (hours * 100) + ((offset - (hours * 3600)) / 60);
 }
 
 static LibBalsaMsgCreateResult
@@ -1940,7 +1872,7 @@ libbalsa_message_create_mime_message(LibBalsaMessage* message, gboolean flow,
 				   LIBBALSA_MESSAGE_GET_SUBJECT(message));
 
     g_mime_message_set_date(mime_message, message->headers->date,
-                            get_tz_offset(&message->headers->date));
+                            get_tz_offset(message->headers->date));
 
     if ((ia_list = message->headers->to_list)) {
         InternetAddressList *recipients =
@@ -2043,8 +1975,10 @@ libbalsa_set_message_id(GMimeMessage * mime_message)
     if (rand == NULL) {
 	/* initialise some stuff on first-time use... */
 	rand = g_rand_new_with_seed((guint32) time(NULL));
-	strncpy(id_data.user_name, g_get_user_name(), sizeof(id_data.user_name));
-	strncpy(id_data.host_name, g_get_host_name(), sizeof(id_data.host_name));
+	strncpy(id_data.user_name, g_get_user_name(),
+                sizeof(id_data.user_name));
+	strncpy(id_data.host_name, g_get_host_name(),
+                sizeof(id_data.host_name));
     }
 
     /* get some randomness... */
@@ -2052,7 +1986,9 @@ libbalsa_set_message_id(GMimeMessage * mime_message)
     id_data.randval = g_rand_double(rand);
 
     /* hash the buffer */
-    msg_id_hash = g_hmac_new(G_CHECKSUM_SHA256, (const guchar *) &id_data, sizeof(id_data));
+    msg_id_hash =
+        g_hmac_new(G_CHECKSUM_SHA256, (const guchar *) &id_data,
+                   sizeof(id_data));
     buflen = sizeof(buffer);
     g_hmac_get_digest(msg_id_hash, buffer, &buflen);
     g_hmac_unref(msg_id_hash);
@@ -2061,7 +1997,8 @@ libbalsa_set_message_id(GMimeMessage * mime_message)
     /* create a msg id string
      * Note: RFC 5322, sect. 3.6.4 explicitly allows the form
      *    dot-atom-text "@" dot-atom-text
-     * where dot-atom-text may include all base64 (RFC 1421) chars, including '+' and '/' */
+     * where dot-atom-text may include all base64 (RFC 1421) chars,
+     * including '+' and '/' */
     message_id = g_base64_encode(buffer, buflen);
     memmove(message_id + 23, message_id + 22, strlen(message_id) - 23);
     message_id[22] = '@';

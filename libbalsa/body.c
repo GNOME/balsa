@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2009 Stuart Parmenter and others,
+ * Copyright (C) 1997-2013 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -364,8 +364,13 @@ libbalsa_message_body_save_temporary(LibBalsaMessageBody * body, GError **err)
                             LIBBALSA_MAILBOX_TEMPDIR_ERROR,
                             "Failed to create temporary directory");
             } else {
+                gchar *basename;
+
+                basename = g_path_get_basename(filename);
                 body->temp_filename =
-                    g_build_filename(tempdir, filename, NULL);
+                    g_build_filename(tempdir, basename, NULL);
+                g_free(basename);
+
                 fd = open(body->temp_filename,
                           O_WRONLY | O_EXCL | O_CREAT,
                           S_IRUSR);
@@ -494,21 +499,9 @@ libbalsa_message_body_get_part_stream(LibBalsaMessageBody * body,
 
     switch (encoding) {
     case GMIME_CONTENT_ENCODING_BASE64:
-        filter =
-            g_mime_filter_basic_new(GMIME_CONTENT_ENCODING_BASE64,
-                                    FALSE);
-        stream = libbalsa_message_body_stream_add_filter(stream, filter);
-        break;
     case GMIME_CONTENT_ENCODING_QUOTEDPRINTABLE:
-        filter =
-            g_mime_filter_basic_new(GMIME_CONTENT_ENCODING_QUOTEDPRINTABLE,
-                                    FALSE);
-        stream = libbalsa_message_body_stream_add_filter(stream, filter);
-        break;
     case GMIME_CONTENT_ENCODING_UUENCODE:
-        filter =
-            g_mime_filter_basic_new(GMIME_CONTENT_ENCODING_UUENCODE,
-                                    FALSE);
+        filter = g_mime_filter_basic_new(encoding, FALSE);
         stream = libbalsa_message_body_stream_add_filter(stream, filter);
         break;
     default:
@@ -682,7 +675,9 @@ libbalsa_message_body_get_pixbuf(LibBalsaMessageBody * body, GError ** err)
 
 #define ENABLE_WORKAROUND_FOR_IE_NON_IANA_MIME_TYPE TRUE
 #if ENABLE_WORKAROUND_FOR_IE_NON_IANA_MIME_TYPE
-    if (!loader && g_ascii_strcasecmp(mime_type, "image/pjpeg") == 0) {
+    if (!loader
+        && (!g_ascii_strcasecmp(mime_type, "image/pjpeg")
+            || !g_ascii_strcasecmp(mime_type, "image/jpg"))) {
         g_clear_error(err);
         loader = gdk_pixbuf_loader_new_with_mime_type("image/jpeg", err);
     }
@@ -698,8 +693,10 @@ libbalsa_message_body_get_pixbuf(LibBalsaMessageBody * body, GError ** err)
             if (!gdk_pixbuf_loader_write(loader, (guchar *) buf, count, err))
                 break;
 
-        if (gdk_pixbuf_loader_close(loader, *err ? NULL : err))
-            pixbuf = g_object_ref(gdk_pixbuf_loader_get_pixbuf(loader));
+        if (!*err && gdk_pixbuf_loader_close(loader, err)) {
+            pixbuf = gdk_pixbuf_loader_get_pixbuf(loader);
+            pixbuf = gdk_pixbuf_apply_embedded_orientation(pixbuf);
+        }
 
         g_object_unref(loader);
     }

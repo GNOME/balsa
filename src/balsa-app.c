@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2005 Stuart Parmenter and others,
+ * Copyright (C) 1997-2013 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -21,12 +21,10 @@
 # include "config.h"
 #endif                          /* HAVE_CONFIG_H */
 #include "balsa-app.h"
+#include "balsa-icons.h"
 
 #include <string.h>
 #include <stdlib.h>
-#ifdef BALSA_USE_THREADS
-#include <pthread.h>
-#endif
 
 /* for creat(2) */
 #include <sys/types.h>
@@ -34,6 +32,7 @@
 #include <fcntl.h>
 
 #include "filter-funcs.h"
+#include "libbalsa-conf.h"
 #include "misc.h"
 #include "server.h"
 #include "smtp-server.h"
@@ -48,19 +47,6 @@
 /* Global application structure */
 struct BalsaApplication balsa_app;
 
-#if !HAVE_GTKSPELL
-const gchar *pspell_modules[] = {
-    "ispell",
-    "aspell"
-};
-
-const gchar *pspell_suggest_modes[] = {
-    "fast",
-    "normal",
-    "bad-spellers"
-};
-#endif                          /* HAVE_GTKSPELL */
-
 #define HIG_PADDING 12
 
 /* ask_password:
@@ -72,13 +58,16 @@ ask_password_real(LibBalsaServer * server, LibBalsaMailbox * mbox)
     GtkWidget *dialog, *entry, *rememb;
     GtkWidget *content_area;
     gchar *prompt, *passwd = NULL;
-#if defined(HAVE_GNOME_KEYRING)
+#if defined(HAVE_LIBSECRET)
+    static const gchar *remember_password_message =
+        N_("_Remember password in Secret Service");
+#elif defined (HAVE_GNOME_KEYRING)
     static const gchar *remember_password_message =
         N_("_Remember password in keyring");
 #else
     static const gchar *remember_password_message =
         N_("_Remember password");
-#endif
+#endif                          /* defined(HAVE_LIBSECRET) */
 
     g_return_val_if_fail(server != NULL, NULL);
     if (mbox)
@@ -93,9 +82,10 @@ ask_password_real(LibBalsaServer * server, LibBalsaMailbox * mbox)
 
     dialog = gtk_dialog_new_with_buttons(_("Password needed"),
                                          GTK_WINDOW(balsa_app.main_window),
-                                         GTK_DIALOG_DESTROY_WITH_PARENT,
-                                         GTK_STOCK_OK, GTK_RESPONSE_OK,
-                                         GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+                                         GTK_DIALOG_DESTROY_WITH_PARENT |
+                                         libbalsa_dialog_flags(),
+                                         _("_OK"), GTK_RESPONSE_OK,
+                                         _("_Cancel"), GTK_RESPONSE_CANCEL,
                                          NULL); 
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu_for_parent(dialog, GTK_WINDOW(balsa_app.main_window));
@@ -133,12 +123,12 @@ ask_password_real(LibBalsaServer * server, LibBalsaMailbox * mbox)
     return passwd;
 }
 
-#ifdef BALSA_USE_THREADS
 typedef struct {
-    pthread_cond_t cond;
+    GCond cond;
     LibBalsaServer* server;
     LibBalsaMailbox* mbox;
     gchar* res;
+    gboolean done;
 } AskPasswdData;
 
 /* ask_passwd_idle:
@@ -150,8 +140,9 @@ ask_passwd_idle(gpointer data)
     AskPasswdData* apd = (AskPasswdData*)data;
     gdk_threads_enter();
     apd->res = ask_password_real(apd->server, apd->mbox);
+    apd->done = TRUE;
     gdk_threads_leave();
-    pthread_cond_signal(&apd->cond);
+    g_cond_signal(&apd->cond);
     return FALSE;
 }
 
@@ -161,21 +152,23 @@ ask_passwd_idle(gpointer data)
 static gchar *
 ask_password_mt(LibBalsaServer * server, LibBalsaMailbox * mbox)
 {
-    static pthread_mutex_t ask_passwd_lock = PTHREAD_MUTEX_INITIALIZER;
+    static GMutex ask_passwd_lock;
     AskPasswdData apd;
 
-    pthread_mutex_lock(&ask_passwd_lock);
-    pthread_cond_init(&apd.cond, NULL);
+    g_mutex_lock(&ask_passwd_lock);
+    g_cond_init(&apd.cond);
     apd.server = server;
     apd.mbox   = mbox;
+    apd.done   = FALSE;
     g_idle_add(ask_passwd_idle, &apd);
-    pthread_cond_wait(&apd.cond, &ask_passwd_lock);
+    while (!apd.done) {
+    	g_cond_wait(&apd.cond, &ask_passwd_lock);
+    }
     
-    pthread_cond_destroy(&apd.cond);
-    pthread_mutex_unlock(&ask_passwd_lock);
+    g_cond_clear(&apd.cond);
+    g_mutex_unlock(&ask_passwd_lock);
     return apd.res;
 }
-#endif
 
 static gboolean
 set_passwd_from_matching_server(GtkTreeModel *model,
@@ -236,15 +229,9 @@ ask_password(LibBalsaServer *server, LibBalsaMailbox *mbox)
     
     password = NULL;
     if (mbox) {
-	gboolean is_sub_thread = libbalsa_am_i_subthread();
-
-	if (is_sub_thread)
-	    gdk_threads_enter();
 	gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
 			       (GtkTreeModelForeachFunc)
 			       set_passwd_from_matching_server, server);
-	if (is_sub_thread)
-	    gdk_threads_leave();
 
 	if (server->passwd != NULL) {
 	    password = server->passwd;
@@ -252,14 +239,15 @@ ask_password(LibBalsaServer *server, LibBalsaMailbox *mbox)
 	}
     }
 
-    if (!password)
-#ifdef BALSA_USE_THREADS
-	return (pthread_self() == libbalsa_get_main_thread()) ?
+    if (!password) {
+        G_LOCK_DEFINE_STATIC(ask_password);
+
+        G_LOCK(ask_password);
+	password = !libbalsa_am_i_subthread() ?
             ask_password_real(server, mbox) : ask_password_mt(server, mbox);
-#else
-	return ask_password_real(server, mbox);
-#endif
-    else
+        G_UNLOCK(ask_password);
+	return password;
+    }
 	return password;
 }
 
@@ -359,14 +347,6 @@ balsa_app_init(void)
     balsa_app.mblist_newmsg_width = NEWMSGCOUNT_DEFAULT_WIDTH;
     balsa_app.mblist_totalmsg_width = TOTALMSGCOUNT_DEFAULT_WIDTH;
 
-    /* Allocate the best colormap we can get */
-    balsa_app.visual = gdk_visual_get_best();
-    if (!(balsa_app.colormap = gdk_colormap_new(balsa_app.visual, TRUE))) {
-	balsa_app.visual = gdk_visual_get_system();
-	balsa_app.colormap = gdk_colormap_get_system();
-    }
-    g_assert(balsa_app.colormap);
-    
     /* arp */
     balsa_app.quote_str = NULL;
 
@@ -374,16 +354,12 @@ balsa_app_init(void)
     balsa_app.quote_regex = g_strdup(DEFAULT_QUOTE_REGEX);
 
     /* font */
+    balsa_app.use_system_fonts = TRUE;
     balsa_app.message_font = NULL;
     balsa_app.subject_font = NULL;
 
     /* compose: shown headers */
     balsa_app.compose_headers = NULL;
-
-    /* command line options */
-#if defined(ENABLE_TOUCH_UI)
-    balsa_app.open_inbox_upon_startup = TRUE;
-#endif /* ENABLE_TOUCH_UI */
 
     /* date format */
     balsa_app.date_string = g_strdup(DEFAULT_DATE_FORMAT);
@@ -406,18 +382,13 @@ balsa_app_init(void)
     balsa_app.filters=NULL;
 
     /* spell check */
-#if HAVE_GTKSPELL
+#if HAVE_GSPELL || HAVE_GTKSPELL
     balsa_app.spell_check_lang = NULL;
     balsa_app.spell_check_active = FALSE;
-#else                           /* HAVE_GTKSPELL */
-    balsa_app.module = SPELL_CHECK_MODULE_ASPELL;
-    balsa_app.suggestion_mode = SPELL_CHECK_SUGGEST_NORMAL;
-    balsa_app.ignore_size = 0;
+#else                           /* HAVE_GSPELL */
     balsa_app.check_sig = DEFAULT_CHECK_SIG;
-
-    spell_check_modules_name = pspell_modules;
-    spell_check_suggest_mode_name = pspell_suggest_modes;
-#endif                          /* HAVE_GTKSPELL */
+    balsa_app.check_quoted = DEFAULT_CHECK_QUOTED;
+#endif                          /* HAVE_GSPELL */
 
     /* Information messages */
     balsa_app.information_message = 0;
@@ -444,15 +415,11 @@ balsa_app_init(void)
     /* Message filing */
     balsa_app.folder_mru=NULL;
     balsa_app.fcc_mru=NULL;
-
-    g_object_set (gtk_settings_get_default (),
-		  "gtk-fallback-icon-theme", "gnome", NULL);
 }
 
 void
 balsa_app_destroy(void)
 {
-    config_views_save();
     config_save();
 
     g_list_foreach(balsa_app.address_book_list, (GFunc)g_object_unref, NULL);
@@ -465,13 +432,20 @@ balsa_app_destroy(void)
     g_slist_free(balsa_app.filters);
     balsa_app.filters = NULL;
 
-
     g_list_foreach(balsa_app.identities, (GFunc)g_object_unref, NULL);
     g_list_free(balsa_app.identities);
     balsa_app.identities = NULL;
 
 
-    g_object_unref(balsa_app.colormap);
+    g_list_foreach(balsa_app.folder_mru, (GFunc)g_free, NULL);
+    g_list_free(balsa_app.folder_mru);
+    balsa_app.folder_mru = NULL;
+
+    g_list_foreach(balsa_app.fcc_mru, (GFunc)g_free, NULL);
+    g_list_free(balsa_app.fcc_mru);
+    balsa_app.fcc_mru = NULL;
+
+
     if(balsa_app.debug) g_print("balsa_app: Finished cleaning up.\n");
 }
 
@@ -501,19 +475,27 @@ update_timer(gboolean update, guint minutes)
 }
 
 
-
-/* open_mailboxes_idle_cb:
-   open mailboxes on startup if requested so.
-   This is an idle handler. Be sure to use gdk_threads_{enter/leave}
-   Release the passed argument when done.
+/*
+ * balsa_open_mailbox_list:
+ * Called on startup if remember_open_mboxes is set, and also after
+ * rescanning.
+ * Frees the passed argument when done.
  */
 
-static void
-append_url_if_open(const gchar * url, LibBalsaMailboxView * view,
+static gboolean
+append_url_if_open(const gchar * group, const gchar * encoded_url,
                    GPtrArray * array)
 {
-    if (view->open)
-        g_ptr_array_add(array, g_strdup(url));
+    gchar *url;
+
+    url = libbalsa_urldecode(encoded_url);
+
+    if (config_mailbox_was_open(url))
+        g_ptr_array_add(array, url);
+    else
+        g_free(url);
+
+    return FALSE;
 }
 
 static void
@@ -521,12 +503,9 @@ open_mailbox_by_url(const gchar * url, gboolean hidden)
 {
     LibBalsaMailbox *mailbox;
 
-    if (!(url && *url))
-        return;
-
     mailbox = balsa_find_mailbox_by_url(url);
     if (balsa_app.debug)
-        fprintf(stderr, "open_mailboxes_idle_cb: opening %s => %p..\n",
+        fprintf(stderr, "balsa_open_mailbox_list: opening %s => %p..\n",
                 url, mailbox);
     if (mailbox) {
         if (hidden)
@@ -535,8 +514,7 @@ open_mailbox_by_url(const gchar * url, gboolean hidden)
             balsa_mblist_open_mailbox(mailbox);
     } else {
         /* Do not try to open it next time. */
-        LibBalsaMailboxView *view =
-            g_hash_table_lookup(libbalsa_mailbox_view_table, url);
+        LibBalsaMailboxView *view = config_load_mailbox_view(url);
         /* The mailbox may have been requested to be open because its
          * stored view might say so or the user requested it from the
          * command line - in which case, view may or may not be present.
@@ -544,77 +522,49 @@ open_mailbox_by_url(const gchar * url, gboolean hidden)
         if (view) {
             view->open = FALSE;
             view->in_sync = FALSE;
+            config_save_mailbox_view(url, view);
+            libbalsa_mailbox_view_free(view);
         }
         balsa_information(LIBBALSA_INFORMATION_WARNING,
                           _("Couldn't open mailbox \"%s\""), url);
     }
 }
 
-gboolean
-open_mailboxes_idle_cb(gchar ** urls)
+void
+balsa_open_mailbox_list(gchar ** urls)
 {
+    gboolean hidden = FALSE;
     gchar **tmp;
+
+    g_return_if_fail(urls != NULL);
 
     gdk_threads_enter();
 
-    if (urls) {
-        gboolean hidden;
+    for (tmp = urls; *tmp; ++tmp) {
+        gchar **p;
 
-        hidden = FALSE;
-        for (tmp = urls; *tmp; ++tmp) {
+        /* Have we already seen this URL? */
+        for (p = urls; p < tmp; ++p)
+            if (!strcmp(*p, *tmp))
+                break;
+        if (p == tmp) {
             open_mailbox_by_url(*tmp, hidden);
             hidden = TRUE;
-        }
-    } else if (libbalsa_mailbox_view_table) {
-        GPtrArray *array;
-
-        array = g_ptr_array_new();
-        g_hash_table_foreach(libbalsa_mailbox_view_table,
-                             (GHFunc) append_url_if_open, array);
-        g_ptr_array_add(array, NULL);
-        urls = (gchar **) g_ptr_array_free(array, FALSE);
-
-        if (urls) {
-            if (*urls) {
-                open_mailbox_by_url(balsa_app.current_mailbox_url, TRUE);
-
-                for (tmp = urls; *tmp; ++tmp) {
-                    if (!balsa_app.current_mailbox_url
-                        || strcmp(*tmp, balsa_app.current_mailbox_url)) {
-                        open_mailbox_by_url(*tmp, TRUE);
-                    }
-                }
-            }
         }
     }
 
     g_strfreev(urls);
-    gdk_threads_leave();
 
-    return FALSE;
+    g_strfreev(urls);
+    gdk_threads_leave();
 }
 
-GtkWidget *
-balsa_stock_button_with_label(const char *icon, const char *text)
+void
+balsa_add_open_mailbox_urls(GPtrArray * url_array)
 {
-    GtkWidget *button;
-    GtkWidget *pixmap = gtk_image_new_from_stock(icon, GTK_ICON_SIZE_BUTTON);
-    GtkWidget *align = gtk_alignment_new(0.5, 0.5, 0, 0);
-    GtkWidget *hbox = gtk_hbox_new(FALSE, 0);
-
-    button = gtk_button_new();
-    gtk_container_add(GTK_CONTAINER(button), align);
-    gtk_container_add(GTK_CONTAINER(align), hbox);
-
-    gtk_box_pack_start(GTK_BOX(hbox), pixmap, FALSE, FALSE, 0);
-    if (text && *text) {
-        GtkWidget *label = gtk_label_new_with_mnemonic(text);
-        gtk_label_set_mnemonic_widget(GTK_LABEL(label), button);
-        gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, FALSE, 2);
-    }
-
-    gtk_widget_show_all(button);
-    return button;
+    libbalsa_conf_foreach_group(VIEW_BY_URL_SECTION_PREFIX,
+                                (LibBalsaConfForeachFunc)
+                                append_url_if_open, url_array);
 }
 
 /* 
@@ -719,8 +669,8 @@ find_url(GtkTreeModel * model, GtkTreePath * path, GtkTreeIter * iter,
 
     gtk_tree_model_get(model, iter, 0, &mbnode, -1);
     if ((mailbox = mbnode->mailbox) && !strcmp(mailbox->url, bf->data)) {
-	bf->mbnode = mbnode;
-	return TRUE;
+        bf->mbnode = mbnode;
+        return TRUE;
     }
     g_object_unref(mbnode);
 
@@ -731,23 +681,27 @@ find_url(GtkTreeModel * model, GtkTreePath * path, GtkTreeIter * iter,
  * looks for a mailbox node with the given url.
  * returns NULL on failure; caller must unref mbnode when non-NULL.
  */
+
 BalsaMailboxNode *
 balsa_find_url(const gchar * url)
 {
     BalsaFind bf;
 
-    gboolean is_sub_thread = libbalsa_am_i_subthread();
-
-    if (is_sub_thread)
-	gdk_threads_enter();
-
     bf.data = url;
     bf.mbnode = NULL;
+
     if (balsa_app.mblist_tree_store)
+        g_object_ref(balsa_app.mblist_tree_store);
+    /*
+     * Check again, in case the main thread managed to finalize
+     * balsa_app.mblist_tree_store between the check and the object-ref.
+     */
+    if (balsa_app.mblist_tree_store) {
         gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
-                               (GtkTreeModelForeachFunc) find_url, &bf);
-    if (is_sub_thread)
-	gdk_threads_leave();
+                               (GtkTreeModelForeachFunc) find_url,
+                               &bf);
+        g_object_unref(balsa_app.mblist_tree_store);
+    }
 
     return bf.mbnode;
 }
@@ -774,6 +728,22 @@ balsa_find_sentbox_by_url(const gchar *url)
 {
     LibBalsaMailbox *res = balsa_find_mailbox_by_url(url);
     return res ? res : balsa_app.sentbox;
+}
+
+gchar*
+balsa_get_short_mailbox_name(const gchar *url)
+{
+    BalsaMailboxNode *mbnode;
+
+    if ((mbnode = balsa_find_url(url)) && mbnode->mailbox) {
+        if (mbnode->server) {
+            return g_strconcat(mbnode->server->host, ":",
+                               mbnode->mailbox->name, NULL);
+        } else {
+            return g_strdup(mbnode->mailbox->name);
+        }
+    }
+    return g_strdup(url);
 }
 
 struct balsa_find_iter_by_data_info {
@@ -809,6 +779,10 @@ balsa_find_iter_by_data(GtkTreeIter * iter , gpointer data)
 
     /* We may call it from initial config, it's ok for
        mblist_tree_store not to exist. */
+#ifdef BALSA_DEBUG_THREADS
+    if (libbalsa_am_i_subthread())
+        g_warning("%s sub-thread!\n", __func__);
+#endif
     if(!balsa_app.mblist_tree_store)
         return FALSE;
 
@@ -913,7 +887,6 @@ balsa_find_index_by_mailbox(LibBalsaMailbox * mailbox)
     return NULL;
 }
 
-#if USE_GREGEX
 GRegex *
 balsa_quote_regex_new(void)
 {
@@ -941,4 +914,3 @@ balsa_quote_regex_new(void)
 
     return g_regex_ref(regex);
 }
-#endif                          /* USE_GREGEX */

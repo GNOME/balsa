@@ -1,5 +1,5 @@
 /* libimap library.
- * Copyright (C) 2003-2010 Pawel Salek.
+ * Copyright (C) 2003-2013 Pawel Salek.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -59,13 +59,14 @@ monitor_cb(const char *buffer, int length, int direction, void *arg)
 
 static gchar*
 get_user(const char* method) {
-  char buf[256];
-  size_t len;
 
   if(TestContext.user) {
     printf("Login with method %s as user: %s\n", method, TestContext.user);
     return g_strdup(TestContext.user);
   } else {
+    char buf[256];
+    size_t len;
+
     fprintf(stderr, "Login with method %s as user: ", method);
     fflush(stderr);
     if(!fgets(buf, sizeof(buf), stdin))
@@ -113,9 +114,9 @@ static void
 user_cb(ImapUserEventType ue, void *arg, ...)
 {
     va_list alist;
-    int *ok;
     va_start(alist, arg);
     switch(ue) {
+        int *ok;
     case IME_GET_USER_PASS: {
         gchar *method = va_arg(alist, gchar*);
         gchar **user = va_arg(alist, gchar**);
@@ -645,10 +646,6 @@ process_options(int argc, char *argv[])
 
 int
 main(int argc, char *argv[]) {
-#if (GLIB_MINOR_VERSION < 36)
-  g_type_init(); /* not required since glib 2.36 */
-#endif
-
   if(argc<=1) {
     test_envelope_strings();
     test_body_strings();

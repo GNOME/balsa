@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2010 Stuart Parmenter and others,
+ * Copyright (C) 1997-2013 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -14,7 +14,7 @@
  * GNU General Public License for more details.
  *  
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef __MAIN_WINDOW_H__
@@ -28,9 +28,7 @@
 #include <libnotify/notify.h>
 #endif
 
-#if defined(HAVE_LIBNM_GLIB)
-#include <nm-client.h>
-#endif
+#include <gio/gio.h>
 
 #include "mailbox-node.h"
 #include "toolbar-factory.h"
@@ -40,6 +38,9 @@
 #define BALSA_WINDOW_CLASS(klass)	       (G_TYPE_CHECK_CLASS_CAST (klass, BALSA_TYPE_WINDOW, BalsaWindowClass))
 #define BALSA_IS_WINDOW(obj)		       (G_TYPE_CHECK_INSTANCE_TYPE (obj, BALSA_TYPE_WINDOW))
 #define BALSA_IS_WINDOW_CLASS(klass)	       (G_TYPE_CHECK_CLASS_TYPE (klass, BALSA_TYPE_WINDOW))
+#define BALSA_WINDOW_GET_CLASS(window)                       \
+    (G_TYPE_INSTANCE_GET_CLASS ((window), BALSA_TYPE_WINDOW, \
+				BalsaWindowClass))
 
 /* Type values for mailbox checking */
 enum MailboxCheckType {
@@ -57,10 +58,11 @@ typedef enum {
 
 
 struct _BalsaWindow {
-    GtkWindow window;
+    GtkApplicationWindow window;
 
     GtkWidget *toolbar;
     GtkWidget *sos_bar;
+    GtkWidget *bottom_bar;
     GtkWidget *progress_bar;
     GtkWidget *statusbar;
     GtkWidget *mblist;
@@ -76,33 +78,23 @@ struct _BalsaWindow {
 
     guint set_message_id;
 
-    GtkActionGroup *action_group;
-    GtkActionGroup *mailbox_action_group;
-    GtkActionGroup *message_action_group;
-    GtkActionGroup *current_message_action_group;
-    GtkActionGroup *modify_message_action_group;
-
     /* Progress bar stuff: */
     BalsaWindowProgress progress_type;
     guint activity_handler;
     guint activity_counter;
     GSList *activity_messages;
 
-    /* New mail notification: */
-    GtkStatusIcon *new_mail_tray;
 #ifdef HAVE_NOTIFY
     NotifyNotification *new_mail_note;
 #endif                         /* HAVE_NOTIFY */
 
-#if defined(HAVE_LIBNM_GLIB)
-    /* NetworkManager state */
-    NMState nm_state;
-    gboolean check_mail_skipped;
-#endif                          /* defined(HAVE_LIBNM_GLIB) */
+    /* Support GNetworkMonitor: */
+    gboolean network_available;
+    time_t last_check_time;
 };
 
 struct _BalsaWindowClass {
-    GtkWindowClass parent_class;
+    GtkApplicationWindowClass parent_class;
 
     void (*open_mbnode)  (BalsaWindow * window,
                           BalsaMailboxNode * mbnode,
@@ -127,6 +119,7 @@ enum {
 
 GType balsa_window_get_type(void);
 GtkWidget *balsa_window_new(void);
+gboolean balsa_window_fix_paned(BalsaWindow *window);
 GtkWidget *balsa_window_find_current_index(BalsaWindow * window);
 void balsa_window_update_book_menus(BalsaWindow *window);
 void balsa_window_refresh(BalsaWindow * window);
@@ -146,13 +139,12 @@ gboolean mail_progress_notify_cb(GIOChannel * source,
 gboolean send_progress_notify_cb(GIOChannel * source,
                                  GIOCondition condition,
                                  BalsaWindow ** window);
-void check_new_messages_cb(GtkAction * action, gpointer data);
 void check_new_messages_real(BalsaWindow * window, int type);
 void check_new_messages_count(LibBalsaMailbox * mailbox, gboolean notify);
 void empty_trash(BalsaWindow * window);
 void update_view_menu(BalsaWindow * window);
 BalsaToolbarModel *balsa_window_get_toolbar_model(void);
-GtkUIManager *balsa_window_ui_manager_new(BalsaWindow * window);
+void balsa_window_add_action_entries(GActionMap * action_map);
 void balsa_window_select_all(GtkWindow * window);
 gboolean balsa_window_next_unread(BalsaWindow * window);
 

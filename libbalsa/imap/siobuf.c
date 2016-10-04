@@ -40,15 +40,11 @@
 #include <unistd.h>
 #include <glib.h>
 
-#ifdef USE_TLS
-# include <openssl/ssl.h>
-#endif
+#include <openssl/ssl.h>
 
 #include "siobuf.h"
 
-#ifdef USE_TLS
 static int sio_sslpoll (struct siobuf *sio, int ret);
-#endif
 
 /* Socket I/O buffering */
 struct siobuf
@@ -78,14 +74,12 @@ struct siobuf
     void *secarg;
     timeoutcb_t timeout_cb;     /* timeout (retry/abort) action callback */
     void *timeout_arg;          /* argument of timeout callback */
-#ifdef USE_TLS
     SSL *ssl;			/* The SSL connection */
-#endif
 
     void *user_data;
   };
 
-static void sio_flush_buffer (struct siobuf *sio);
+static int sio_flush_buffer (struct siobuf *sio);
 
 /* Attach bi-directional buffering to the socket descriptor.
  */
@@ -142,7 +136,6 @@ sio_detach (struct siobuf *sio)
      destroyed anyway. */
   sio->timeout_cb = NULL;
   sio->timeout_arg = NULL;
-#ifdef USE_TLS
   if (sio->ssl != NULL)
     {
       int ret;
@@ -155,7 +148,6 @@ sio_detach (struct siobuf *sio)
       SSL_free (sio->ssl);
       sio->ssl = NULL;
     }
-#endif
   free (sio->read_buffer);
   free (sio->write_buffer);
   free (sio);
@@ -186,7 +178,6 @@ sio_set_timeout (struct siobuf *sio, int milliseconds)
   assert (sio != NULL);
 
   sio->milliseconds = milliseconds;
-#ifdef USE_TLS
   if (sio->ssl != NULL)
     {
       long ssl_timeout;
@@ -197,19 +188,17 @@ sio_set_timeout (struct siobuf *sio, int milliseconds)
         ssl_timeout = ((long) milliseconds + 999L) / 1000L;
       SSL_SESSION_set_timeout (SSL_get_session (sio->ssl), ssl_timeout);
     }
-#endif
 }
 
-#ifdef USE_TLS
 int
 sio_set_tlsclient_ssl (struct siobuf *sio, SSL *ssl)
 {
-  int ret;
-
   assert (sio != NULL);
 
   if (ssl != NULL)
     {
+      int ret;
+
       sio->ssl = ssl;
       SSL_set_rfd (sio->ssl, sio->sdr);
       SSL_set_wfd (sio->ssl, sio->sdw);
@@ -228,12 +217,12 @@ sio_set_tlsclient_ssl (struct siobuf *sio, SSL *ssl)
 int
 sio_set_tlsserver_ssl (struct siobuf *sio, SSL *ssl)
 {
-  int ret;
-
   assert (sio != NULL);
 
   if (ssl != NULL)
     {
+      int ret;
+
       sio->ssl = ssl;
       SSL_set_rfd (sio->ssl, sio->sdr);
       SSL_set_wfd (sio->ssl, sio->sdw);
@@ -248,7 +237,6 @@ sio_set_tlsserver_ssl (struct siobuf *sio, SSL *ssl)
     }
   return sio->ssl != NULL;
 }
-#endif
 
 void
 sio_set_securitycb (struct siobuf *sio,
@@ -275,7 +263,6 @@ sio_poll (struct siobuf *sio, int want_read, int want_write, int fast)
 
   if (want_read && sio->read_unread > 0)
     return SIO_READ;
-#ifdef USE_TLS
   /* SSL_read() returns data a record at a time, however it is possible
      that more than one record was read from the socket.  If this happens
      poll() will not report data waiting to be read but SSL_read() will
@@ -283,7 +270,6 @@ sio_poll (struct siobuf *sio, int want_read, int want_write, int fast)
    */
   if (want_read && sio->ssl != NULL && SSL_pending (sio->ssl))
     return SIO_READ;
-#endif
 
   npoll = 0;
   if (want_read)
@@ -328,7 +314,6 @@ sio_poll (struct siobuf *sio, int want_read, int want_write, int fast)
   return (rval > 0) ? rval : -1;
 }
 
-#ifdef USE_TLS
 static int
 sio_sslpoll (struct siobuf *sio, int ret)
 {
@@ -355,7 +340,6 @@ sio_sslpoll (struct siobuf *sio, int ret)
   }
   return sio_poll (sio, want_read, want_write, 0);
 }
-#endif
 
 void
 sio_write (struct siobuf *sio, const void *bufp, int buflen)
@@ -392,16 +376,15 @@ sio_write (struct siobuf *sio, const void *bufp, int buflen)
     }
 }
 
-static void
+static int
 raw_write (struct siobuf *sio, const char *buf, int len)
 {
-  int n, total, status;
+  int n = 0, total, status;
   struct pollfd pollfd;
 
   assert (sio != NULL && buf != NULL);
 
   for (total = 0; total < len; total += n)
-#ifdef USE_TLS
     if (sio->ssl != NULL)
       {
 	/* SSL_write() writes a record a time.	The outer loop calls
@@ -410,10 +393,9 @@ raw_write (struct siobuf *sio, const char *buf, int len)
 	   propagating up through OpenSSL. */
 	while ((n = SSL_write (sio->ssl, buf, len)) <= 0)
 	  if (sio_sslpoll (sio, n) <= 0)
-	    return;
+	    return n;
       }
     else
-#endif
       {
         /* Its conceiveable that write() actually writes less than
            requested.  The outer loop calls this until all of the write
@@ -427,25 +409,26 @@ raw_write (struct siobuf *sio, const char *buf, int len)
 	    if (errno == EINTR)
 	      continue;
 	    if (errno != EAGAIN)
-	      return;
+	      return n;
 
 	    pollfd.revents = 0;
 	    while ((status = poll (&pollfd, 1, sio->milliseconds)) < 0)
 	      if (errno != EINTR)
-		return;
+		return -1;
 	    if (status == 0)
 	      {
 	        errno = ETIMEDOUT;
-		return;
+		return -1;
 	      }
 	    if (!(pollfd.revents & POLLOUT))
-	      return;
+	      return -1;
 	    errno = 0;
 	  }
       }
+  return n;
 }
 
-static void
+static int
 sio_flush_buffer (struct siobuf *sio)
 {
   int length;
@@ -457,7 +440,7 @@ sio_flush_buffer (struct siobuf *sio)
   else
     length = sio->write_position - sio->write_buffer;
   if (length <= 0)
-    return;
+    return 0;
 
   if (sio->monitor_cb != NULL)
     (*sio->monitor_cb) (sio->write_buffer, length, 1, sio->cbarg);
@@ -477,11 +460,13 @@ sio_flush_buffer (struct siobuf *sio)
          used to maintain this buffer. */
       while ((*sio->encode_cb) (&buf, &len, sio->write_buffer, 
                                 length, sio->secarg) >0) {
-        raw_write (sio, buf, len);
+        if (raw_write (sio, buf, len) < 0)
+            return -1;
       }
     }
   else
-    raw_write (sio, sio->write_buffer, length);
+    if (raw_write (sio, sio->write_buffer, length) < 0)
+        return -1;
 
   if (sio->flush_mark != NULL && sio->flush_mark > sio->write_buffer)
     {
@@ -494,13 +479,14 @@ sio_flush_buffer (struct siobuf *sio)
   sio->write_available = sio->buffer_size - length;
   sio->write_position = sio->write_buffer + length;
   sio->flush_mark = NULL;
+
+  return 0;
 }
 
 void
 sio_flush (struct siobuf *sio)
 {
-  sio_flush_buffer (sio);
-  if (sio->encode_cb != NULL)
+  if (sio_flush_buffer (sio) >= 0 && sio->encode_cb != NULL)
     {
       char *buf;
       int len = 0;
@@ -515,7 +501,8 @@ sio_flush (struct siobuf *sio)
          used to maintain this buffer. */
       while ((*sio->encode_cb) (&buf, &len, sio->write_buffer, 
                                 0, sio->secarg) >0) {
-        raw_write (sio, buf, len);
+        if (raw_write (sio, buf, len) < 0)
+            break;
       }
     }
 }
@@ -535,12 +522,11 @@ sio_mark (struct siobuf *sio)
 static int
 raw_read (struct siobuf *sio, char *buf, int len)
 {
-  int n, status;
+  int n;
   struct pollfd pollfd;
 
   assert (sio != NULL && buf != NULL && len > 0);
 
-#ifdef USE_TLS
   if (sio->ssl != NULL)
     {
       /* SSL_read() reads complete records from the network and returns
@@ -554,13 +540,14 @@ raw_read (struct siobuf *sio, char *buf, int len)
 	  break;
     }
   else
-#endif
     {
       pollfd.fd = sio->sdr;
       pollfd.events = POLLIN;
       errno = 0;
       while ((n = read (sio->sdr, buf, len)) < 0)
 	{
+          int status;
+
 	  if (errno == EINTR)
 	    continue;
 	  if (errno != EAGAIN)

@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2001 Stuart Parmenter and others,
+ * Copyright (C) 1997-2013 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -56,6 +56,11 @@ typedef struct t_button_data {
 extern button_data toolbar_buttons[];
 extern const int toolbar_button_count;
 
+typedef struct {
+    gchar *action;
+    gchar *icon;
+} BalsaToolbarEntry;
+
 typedef enum {
     BALSA_TOOLBAR_TYPE_MAIN_WINDOW,
     BALSA_TOOLBAR_TYPE_COMPOSE_WINDOW,
@@ -63,23 +68,21 @@ typedef enum {
 } BalsaToolbarType;
 
 void update_all_toolbars(void);
-void balsa_toolbar_remove_all(GtkWidget * toolbar);
 
 /* toolbar code for gtk+-2 */
 const gchar *balsa_toolbar_button_text(gint button);
 const gchar *balsa_toolbar_sanitize_id(const gchar * id);
 
 /* BalsaToolbarModel */
-BalsaToolbarModel *balsa_toolbar_model_new(BalsaToolbarType type,
-                                           GSList * standard);
-void balsa_toolbar_model_add_actions(BalsaToolbarModel * model,
-                                     const GtkActionEntry * entries,
-                                     guint n_entries);
-void balsa_toolbar_model_add_toggle_actions(BalsaToolbarModel * model,
-                                            const GtkToggleActionEntry *
-                                            entries, guint n_entries);
+BalsaToolbarModel *
+    balsa_toolbar_model_new(BalsaToolbarType          type,
+                            const BalsaToolbarEntry * entries,
+                            guint                     n_entries);
+void balsa_toolbar_model_add_entries(BalsaToolbarModel       * model,
+                                     const BalsaToolbarEntry * entries,
+                                     guint                     n_entries);
 GHashTable *balsa_toolbar_model_get_legal(BalsaToolbarModel * model);
-GSList *balsa_toolbar_model_get_current(BalsaToolbarModel * model);
+GArray *balsa_toolbar_model_get_current(BalsaToolbarModel * model);
 gboolean balsa_toolbar_model_is_standard(BalsaToolbarModel * model);
 void balsa_toolbar_model_insert_icon(BalsaToolbarModel * model,
                                      gchar * icon, gint position);
@@ -90,6 +93,6 @@ void balsa_toolbar_model_changed(BalsaToolbarModel * model);
 
 /* BalsaToolbar */
 GtkWidget *balsa_toolbar_new(BalsaToolbarModel * model,
-                             GtkUIManager * ui_manager);
+                             GActionMap        * map);
 
 #endif

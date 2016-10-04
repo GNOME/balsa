@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2001 Stuart Parmenter and others
+ * Copyright (C) 1997-2013 Stuart Parmenter and others
  * Written by (C) Albrecht Dreﬂ <albrecht.dress@arcor.de> 2007
  *
  * This program is free software; you can redistribute it and/or modify
@@ -133,7 +133,8 @@ balsa_print_object_default(GList * list,
     /* get a pixbuf according to the mime type */
     conttype = libbalsa_message_body_get_mime_type(body);
     pod->pixbuf =
-	libbalsa_icon_finder(conttype, NULL, NULL, GTK_ICON_SIZE_DND);
+	libbalsa_icon_finder(NULL, conttype, NULL, NULL,
+                             GTK_ICON_SIZE_DND);
     pod->c_image_width = gdk_pixbuf_get_width(pod->pixbuf);
     pod->c_image_height = gdk_pixbuf_get_height(pod->pixbuf);
 

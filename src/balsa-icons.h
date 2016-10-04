@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2001 Stuart Parmenter and others,
+ * Copyright (C) 1997-2013 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -71,7 +71,7 @@
 #define BALSA_PIXMAP_INFO_REPLIED               "balsa_info_replied"
 #define BALSA_PIXMAP_INFO_NEW                   "balsa_info_new"
 #define BALSA_PIXMAP_INFO_ATTACHMENT            BALSA_PIXMAP_ATTACHMENT
-#define BALSA_PIXMAP_INFO_DELETED               GTK_STOCK_DELETE
+#define BALSA_PIXMAP_INFO_DELETED               "edit-delete"
 #ifdef HAVE_GPGME
 #  define BALSA_PIXMAP_GPG_SIGN                 "balsa_gpg_sign"
 #  define BALSA_PIXMAP_GPG_ENCRYPT              "balsa_gpg_encrypt"

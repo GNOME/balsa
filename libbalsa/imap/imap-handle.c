@@ -1,5 +1,5 @@
 /* libimap library.
- * Copyright (C) 2003-2010 Pawel Salek.
+ * Copyright (C) 2003-2013 Pawel Salek.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 
 #define _POSIX_C_SOURCE 199506L
 #define _XOPEN_SOURCE 500
-#define _DEFAULT_SOURCE 1
+#define _DEFAULT_SOURCE     1
 
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -40,10 +40,8 @@
 #include <resolv.h>
 #endif                          /* defined(HAVE_RES_INIT) */
 
-#if defined(USE_TLS)
 #include <openssl/ssl.h>
 #include <openssl/err.h>
-#endif
 
 #include "libimap-marshal.h"
 #include "imap-auth.h"
@@ -147,9 +145,7 @@ imap_mbox_handle_init(ImapMboxHandle *handle)
   handle->msg_cache = NULL;
   handle->flag_cache=  g_array_new(FALSE, TRUE, sizeof(ImapFlagCache));
   handle->doing_logout = FALSE;
-#ifdef USE_TLS
   handle->using_tls = 0;
-#endif
   handle->tls_mode = IMAP_TLS_ENABLED;
   handle->idle_state = IDLE_INACTIVE;
   handle->cmd_info = NULL;
@@ -167,9 +163,7 @@ imap_mbox_handle_init(ImapMboxHandle *handle)
   handle->has_rights = 0;
   mbox_view_init(&handle->mbox_view);
 
-#if defined(BALSA_USE_THREADS)
-  pthread_mutex_init(&handle->mutex, NULL);
-#endif
+  g_mutex_init(&handle->mutex);
 }
 
 static void
@@ -416,22 +410,22 @@ async_process(GIOChannel *source, GIOCondition condition, gpointer data)
   g_return_val_if_fail(h, FALSE);
 
   if(ASYNC_DEBUG) printf("async_process() ENTER\n");
-  if(HANDLE_TRYLOCK(h) != 0) 
+  if(!g_mutex_trylock(&h->mutex))
     return FALSE;/* async data on already locked handle? Don't try again. */
   if(ASYNC_DEBUG) printf("async_process() LOCKED\n");
   if(h->state == IMHS_DISCONNECTED) {
     if(ASYNC_DEBUG) printf("async_process() on disconnected\n");
-    HANDLE_UNLOCK(h);
+    g_mutex_unlock(&h->mutex);
     return FALSE;
   }
   if( (condition & G_IO_HUP) == G_IO_HUP) {
       imap_handle_disconnect(h);
-      HANDLE_UNLOCK(h);
+      g_mutex_unlock(&h->mutex);
       return FALSE;
   }
   retval_async = async_process_real(h);
 
-  HANDLE_UNLOCK(h);
+  g_mutex_unlock(&h->mutex);
   return retval_async;
 }
 
@@ -444,7 +438,8 @@ idle_start(gpointer data)
 
   /* The test below can probably be weaker since it is ok for the
      channel to get disconnected before IDLE gets activated */
-  HANDLE_LOCK(h);
+  if(!g_mutex_trylock(&h->mutex))
+    return TRUE;/* Don't block, just try again later. */
   IMAP_REQUIRED_STATE3(h, IMHS_CONNECTED, IMHS_AUTHENTICATED,
                        IMHS_SELECTED, FALSE);
 
@@ -461,7 +456,7 @@ idle_start(gpointer data)
   h->idle_enable_id = 0;
   h->idle_state = IDLE_RESPONSE_PENDING;
 
-  HANDLE_UNLOCK(h);
+  g_mutex_unlock(&h->mutex);
   return FALSE;
 }
 
@@ -501,7 +496,7 @@ imap_handle_idle_enable(ImapMboxHandle *h, int seconds)
     return FALSE;
   }
   if(!h->idle_enable_id)
-    h->idle_enable_id = g_timeout_add(seconds*1000, idle_start, h);
+    h->idle_enable_id = g_timeout_add_seconds(seconds, idle_start, h);
   return TRUE;
 }
 
@@ -553,6 +548,7 @@ imap_handle_op_cancelled(ImapMboxHandle *h)
 void
 imap_handle_disconnect(ImapMboxHandle *h)
 {
+  /* cppcheck-suppress unreadVariable */
   gboolean still_connected __attribute__ ((__unused__));
 
   still_connected = imap_handle_idle_disable(h);
@@ -587,16 +583,8 @@ imap_mbox_handle_connect(ImapMboxHandle* ret, const char *host, int over_ssl)
 
   g_return_val_if_fail(imap_mbox_is_disconnected(ret), IMAP_CONNECT_FAILED);
 
-  HANDLE_LOCK(ret);
-#if !defined(USE_TLS)
-  if(over_ssl) {
-    imap_mbox_handle_set_msg(ret,"SSL requested but SSL support not compiled");
-    HANDLE_UNLOCK(ret);
-    return IMAP_UNSECURE;
-  }
-#else
+  g_mutex_lock(&ret->mutex);
   ret->over_ssl = over_ssl;
-#endif
 
   g_free(ret->host);   ret->host   = g_strdup(host);
 
@@ -609,7 +597,7 @@ imap_mbox_handle_connect(ImapMboxHandle* ret, const char *host, int over_ssl)
     }
   }
 
-  HANDLE_UNLOCK(ret);
+  g_mutex_unlock(&ret->mutex);
 
   return rc;
 }
@@ -639,7 +627,7 @@ imap_mbox_handle_reconnect(ImapMboxHandle* h, gboolean *readonly)
 {
   ImapResult rc;
   
-  HANDLE_LOCK(h);
+  g_mutex_lock(&h->mutex);
 
   if( (rc=imap_mbox_connect(h)) == IMAP_SUCCESS) {
     if( (rc = imap_authenticate(h)) == IMAP_SUCCESS) {
@@ -662,7 +650,7 @@ imap_mbox_handle_reconnect(ImapMboxHandle* h, gboolean *readonly)
 
     }
   }
-  HANDLE_UNLOCK(h);
+  g_mutex_unlock(&h->mutex);
   return rc;
 }
 
@@ -671,9 +659,9 @@ imap_mbox_handle_reconnect(ImapMboxHandle* h, gboolean *readonly)
 void
 imap_handle_force_disconnect(ImapMboxHandle *h)
 {
-  HANDLE_LOCK(h);
+  g_mutex_lock(&h->mutex);
   imap_handle_disconnect(h);
-  HANDLE_UNLOCK(h);
+  g_mutex_unlock(&h->mutex);
 }
 
 ImapTlsMode
@@ -786,10 +774,8 @@ imap_mbox_connect(ImapMboxHandle* handle)
     imap_compress_release(&handle->compress);
   }
 
-#ifdef USE_TLS
   handle->using_tls = 0;
   if(handle->over_ssl) service = "imaps";
-#endif
 
   handle->sd = imap_socket_open(handle->host, service);
   if(handle->sd<0)
@@ -806,7 +792,6 @@ imap_mbox_connect(ImapMboxHandle* handle)
     sio_set_timeout(handle->sio, handle->timeout);
     sio_set_timeoutcb(handle->sio, imap_timeout_cb, handle);
   }
-#ifdef USE_TLS
   if(handle->over_ssl) {
     SSL *ssl = imap_create_ssl();
     if(!ssl) {
@@ -822,7 +807,6 @@ imap_mbox_connect(ImapMboxHandle* handle)
       return IMAP_UNSECURE;
     }
   }
-#endif
   if(handle->monitor_cb) 
     sio_set_monitorcb(handle->sio, handle->monitor_cb, handle->monitor_arg);
 
@@ -835,7 +819,6 @@ imap_mbox_connect(ImapMboxHandle* handle)
   }
   handle->can_fetch_body = 
     (strncmp(handle->last_msg, "Microsoft Exchange", 18) != 0);
-#if defined(USE_TLS)
   if(handle->over_ssl)
     resp = IMR_OK; /* secured already with SSL */
   else if(handle->tls_mode != IMAP_TLS_DISABLED &&
@@ -847,9 +830,6 @@ imap_mbox_connect(ImapMboxHandle* handle)
     resp = IMR_OK; /* secured with TLS */
   } else
     resp = IMR_NO; /* not over SSL and TLS unavailable */
-#else
-  resp = IMR_NO;
-#endif
   if(handle->tls_mode == IMAP_TLS_REQUIRED && resp != IMR_OK) {
     imap_mbox_handle_set_msg(handle,"TLS required but not available");
     return IMAP_UNSECURE;
@@ -963,7 +943,7 @@ imap_mbox_handle_get_delim(ImapMboxHandle* handle,
   guint handler_id;
   gchar * cmd, *mbx7;
 
-  HANDLE_LOCK(handle);
+  g_mutex_lock(&handle->mutex);
   /* FIXME: block other list response signals here? */
   handler_id = g_signal_connect(G_OBJECT(handle), "list-response",
 				G_CALLBACK(get_delim),
@@ -975,7 +955,7 @@ imap_mbox_handle_get_delim(ImapMboxHandle* handle,
   imap_cmd_exec(handle, cmd); /* ignore return code.. */
   g_free(cmd);
   g_signal_handler_disconnect(G_OBJECT(handle), handler_id);
-  HANDLE_UNLOCK(handle);
+  g_mutex_unlock(&handle->mutex);
   return delim;
 
 }
@@ -1000,7 +980,7 @@ imap_mbox_handle_finalize(GObject* gobject)
   ImapMboxHandle* handle = IMAP_MBOX_HANDLE(gobject);
   g_return_if_fail(handle);
 
-  HANDLE_LOCK(handle);
+  g_mutex_lock(&handle->mutex);
   if(handle->state != IMHS_DISCONNECTED) {
     handle->doing_logout = TRUE;
     imap_cmd_exec(handle, "LOGOUT");
@@ -1022,10 +1002,8 @@ imap_mbox_handle_finalize(GObject* gobject)
   g_list_free(handle->acls); handle->acls = NULL;
   g_free(handle->quota_root); handle->quota_root = NULL;
 
-  HANDLE_UNLOCK(handle);
-#if defined(BALSA_USE_THREADS)
-  pthread_mutex_destroy(&handle->mutex);
-#endif
+  g_mutex_unlock(&handle->mutex);
+  g_mutex_clear(&handle->mutex);
 
   G_OBJECT_CLASS(parent_class)->finalize(gobject);  
 }
@@ -1842,7 +1820,7 @@ ImapMessage*
 imap_message_new(void)
 {
   ImapMessage * msg=g_malloc0(sizeof(ImapMessage));
-  msg->rfc822size=-1;
+  msg->rfc822size = -1;
   return msg;
 }
 
@@ -2006,7 +1984,6 @@ imap_cmd_step(ImapMboxHandle* handle, unsigned lastcmd)
   g_return_val_if_fail(handle, IMR_BAD);
   g_return_val_if_fail(handle->state != IMHS_DISCONNECTED, IMR_BAD);
 
-#ifdef USE_TLS
   if(ERR_peek_error()) {
     fprintf(stderr, "OpenSSL error in %s():\n", __FUNCTION__);
     ERR_print_errors_fp(stderr);
@@ -2014,7 +1991,6 @@ imap_cmd_step(ImapMboxHandle* handle, unsigned lastcmd)
     imap_handle_disconnect(handle);
     return IMR_SEVERED;
   }
-#endif
   ci = cmdi_find_by_no(handle->cmd_info, lastcmd);
   if(ci && ci->completed) {
     /* The response to this command has been encountered earlier,
@@ -2045,8 +2021,8 @@ imap_cmd_step(ImapMboxHandle* handle, unsigned lastcmd)
     return IMR_RESPOND;
 
   /* tagged completion code is the only alternative. */
-  /* our command tags are hexadecimal numbers */
-  if(sscanf(tag, "%x", &cmdno) != 1) {
+  /* our command tags are hexadecimal numbers, at most 7 chars */
+  if(sscanf(tag, "%7x", &cmdno) != 1) {
     printf("scanning '%s' for tag number failed. Cannot recover.\n", tag);
     imap_handle_disconnect(handle);
     return IMR_BAD;
@@ -2418,12 +2394,12 @@ imap_get_sequence(ImapMboxHandle *h, ImapUidRangeCb seq_cb, void *seq_arg)
       for(p=value; *p &&
 	    (unsigned)(p-value) <=
 	    sizeof(value)-(2*LENGTH_OF_LARGEST_UNSIGNED+1); ) {
-	if(sscanf(p, "%u", &seq.lo) != 1)
+	if(sscanf(p, "%30u", &seq.lo) != 1)
 	  return IMR_PROTOCOL;
 	while(*p && isdigit(*p)) p++;
 	if( *p == ':') {
 	  p++;
-	  if(sscanf(p, "%u", &seq.hi) != 1)
+	  if(sscanf(p, "%30u", &seq.hi) != 1)
 	    return c;
 	} else seq.hi = seq.lo;
 
@@ -2463,7 +2439,6 @@ ir_get_append_copy_uids(ImapMboxHandle *h, gboolean append_only)
 {
   int c;
   char buf[12];
-  ImapResponse rc;
 
   if( (c=imap_get_atom(h->sio, buf, sizeof(buf))) == EOF)
     return IMR_PROTOCOL;
@@ -2473,6 +2448,8 @@ ir_get_append_copy_uids(ImapMboxHandle *h, gboolean append_only)
     return IMR_PROTOCOL;
 
   if(!append_only) {
+    ImapResponse rc;
+
     if( (rc = imap_get_sequence(h, NULL, NULL)) != IMR_OK)
       return rc;
     if( (c=sio_getc(h->sio)) != ' ') {
@@ -2748,7 +2725,7 @@ ir_status(ImapMboxHandle *h)
           break;
       for(i= 0; resp[i].item != IMSTAT_NONE; i++) {
         if(resp[i].item == idx) {
-          if (sscanf(count, "%u", &resp[i].result) != 1) {
+          if (sscanf(count, "%13u", &resp[i].result) != 1) {
             g_free(name);
             return IMR_PROTOCOL;
           }
@@ -2997,11 +2974,12 @@ ir_quota(ImapMboxHandle *h)
       if (c == '(') {
         do {
           char resource[32];
-          char usage[16];
-          char limit[16];
           
           c = imap_get_atom(h->sio, resource, 32);
           if (c == ' ') {
+            char usage[16];
+            char limit[16];
+
             imap_get_atom(h->sio, usage, 16);
             c = imap_get_atom(h->sio, limit, 16);
 
@@ -3253,9 +3231,7 @@ imap_get_address(struct siobuf* sio)
   
   for(i=0; i<4; i++) {
     addr[i] = imap_get_nstring(sio);
-    if( (c=sio_getc(sio)) != ' ') {
-	/* error if i < 3 but do nothing */
-    }
+    if( (c=sio_getc(sio)) != ' ') {} /* error if i < 3 but do nothing */
   }
 
   if (addr[0] && (p = strchr(addr[0], '\r'))) {
@@ -3687,7 +3663,6 @@ ir_body_fld_lang (struct siobuf *sio, ImapBody * body)
 static ImapResponse
 ir_body_extension (struct siobuf *sio, ImapBody * body)
 {
-  ImapResponse rc;
   int c;
 
   c = sio_getc (sio);
@@ -3696,6 +3671,8 @@ ir_body_extension (struct siobuf *sio, ImapBody * body)
       /* "(" body-extension *(SP body-extension) ")" */
       do
 	{
+          ImapResponse rc;
+
 	  rc = ir_body_extension (sio, body);
 	  if (rc != IMR_OK)
 	    return rc;
@@ -4398,11 +4375,12 @@ ir_handle_response(ImapMboxHandle *h)
 {
   int c;
   char atom[LONG_STRING];
-  unsigned i, seqno;
   ImapResponse rc = IMR_BAD; /* unknown response is really an error */
 
   c = imap_get_atom(h->sio, atom, sizeof(atom));
   if( isdigit(atom[0]) ) {
+    unsigned i, seqno;
+
     if (c != ' ')
       return IMR_PROTOCOL;
     seqno = strtol(atom, NULL, 10);
@@ -4417,6 +4395,8 @@ ir_handle_response(ImapMboxHandle *h)
       }
     }
   } else {
+    unsigned i;
+
     if (c == 0x0d)
       sio_ungetc(h->sio);
     for(i=0; i<ELEMENTS(ResponseHandlers); i++) {

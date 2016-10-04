@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2009 Stuart Parmenter and others,
+ * Copyright (C) 1997-2013 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -118,7 +118,7 @@ libbalsa_default_attachment_pixbuf(gint size)
 }
 
 
-/* balsa_icon_finder:
+/* libbalsa_icon_finder:
  *   locate a suitable icon (pixmap graphic) based on 'mime-type' and/or
  *   'filename', either of which can be NULL.  If both arguments are
  *   non-NULL, 'mime-type' has priority.  If both are NULL, the default
@@ -126,8 +126,11 @@ libbalsa_default_attachment_pixbuf(gint size)
  *   return the complete path to the icon file.
  */
 GdkPixbuf *
-libbalsa_icon_finder(const char *mime_type, const LibbalsaVfs * for_file, 
-                     gchar** used_type, GtkIconSize size)
+libbalsa_icon_finder(GtkWidget         * widget,
+                     const char        * mime_type,
+                     const LibbalsaVfs * for_file,
+                     gchar            ** used_type,
+                     GtkIconSize         size)
 {
     const gchar *content_type;
     gchar *icon = NULL;
@@ -136,8 +139,8 @@ libbalsa_icon_finder(const char *mime_type, const LibbalsaVfs * for_file,
     GtkIconTheme *icon_theme;
 
     if (!gtk_icon_size_lookup(size, &width, &height))
-	width = 16;
-    
+        width = 16;
+
     if (mime_type)
         content_type = mime_type;
     else if (for_file) {
@@ -156,7 +159,7 @@ libbalsa_icon_finder(const char *mime_type, const LibbalsaVfs * for_file,
             g_object_get(G_OBJECT(icon), "names", &icon_names, NULL);
             while (!pixbuf && icon_names && icon_names[i]) {
                 pixbuf = gtk_icon_theme_load_icon(icon_theme, icon_names[i],
-                                                  width, 0, NULL);
+                                                  width, GTK_ICON_LOOKUP_FORCE_SIZE, NULL);
                 i++;
             }
             g_strfreev(icon_names);
@@ -170,7 +173,7 @@ libbalsa_icon_finder(const char *mime_type, const LibbalsaVfs * for_file,
                 if (slash)
                     *slash = '\0';
                 pixbuf = gtk_icon_theme_load_icon(icon_theme, base_type_icon,
-                                                   width, 0, NULL);
+                                                   width, GTK_ICON_LOOKUP_FORCE_SIZE, NULL);
                 g_free(base_type_icon);
             }
 

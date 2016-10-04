@@ -1,6 +1,6 @@
 # List of source files that should NOT be translated.
 # Please keep this list in alphabetical order.
+balsa.desktop.in
 balsa-mail.lang
 balsa-mail-style.xml
 balsa-mailto-handler.desktop.in
-balsa.desktop.in

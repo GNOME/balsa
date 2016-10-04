@@ -1,7 +1,7 @@
 #ifndef __IMAP_PRIVATE_H__
 #define __IMAP_PRIVATE_H__
 /* libimap library.
- * Copyright (C) 2003-2006 Pawel Salek.
+ * Copyright (C) 2003-2013 Pawel Salek.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,20 +17,11 @@
  * along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <glib.h>
 #include <glib-object.h>
+#include <openssl/ssl.h>
 
 #include "config.h"
-
-#if defined(BALSA_USE_THREADS)
-#include <pthread.h>
-#define HANDLE_LOCK(h)   pthread_mutex_lock(&h->mutex)
-#define HANDLE_TRYLOCK(h) pthread_mutex_trylock(&h->mutex)
-#define HANDLE_UNLOCK(h) pthread_mutex_unlock(&h->mutex)
-#else
-#define HANDLE_LOCK(h) 
-#define HANDLE_TRYLOCK(h) 0
-#define HANDLE_UNLOCK(h)
-#endif
 
 #include "imap-commands.h"
 #include "imap_compress.h"
@@ -122,9 +113,7 @@ struct _ImapMboxHandle {
   GHashTable *status_resps; /* A hash of STATUS responses that we wait for */
 
   GIOChannel *iochannel; /* IO channel used for monitoring the connection */
-#if defined(BALSA_USE_THREADS)
-  pthread_mutex_t mutex;
-#endif
+  GMutex mutex;
   guint idle_enable_id; /* callback to issue IDLE after a period of
                            inactivity */
   guint async_watch_id;  /* callback to process incoming data */
@@ -150,12 +139,9 @@ struct _ImapMboxHandle {
   gulong quota_used_k;        /**< used quota in kByte */
   gchar *quota_root;
 
-  /* conditional stuff at the end for the safety. */
-#ifdef USE_TLS
   unsigned over_ssl:1; /* transmission is to be made over SSL-protected
                         * connection, usually to imaps port. */
   unsigned using_tls:1;
-#endif
 };
 
 #define IMAP_MBOX_IS_DISCONNECTED(h)  ((h)->state == IMHS_DISCONNECTED)
@@ -165,17 +151,17 @@ struct _ImapMboxHandle {
 
 #define IMAP_REQUIRED_STATE1(h, state1, ret)            \
     do{if(!(h) || h->state != (state1))                 \
-            { HANDLE_UNLOCK(h);return (ret);}}while(0);
+            {g_mutex_unlock(&h->mutex); return (ret);}}while(0);
 #define IMAP_REQUIRED_STATE1_U(h, state1, ret)                  \
     do{if(!(h) || h->state != (state1)) return (ret);}while(0);
 
 #define IMAP_REQUIRED_STATE2(h, state1, state2, ret)                    \
     do{if(!(h) || !(h->state == (state1) || h->state == (state2)))      \
-            {HANDLE_UNLOCK(h); return (ret);}}while(0);
+            {g_mutex_unlock(&h->mutex); return (ret);}}while(0);
 #define IMAP_REQUIRED_STATE3(h, state1, state2, state3, ret)           \
     do{if(!(h) || !(h->state == (state1) || h->state == (state2)||     \
                     h->state == (state3)))                             \
-            {HANDLE_UNLOCK(h);return (ret);}}while(0);
+            {g_mutex_unlock(&h->mutex);return (ret);}}while(0);
 #define IMAP_REQUIRED_STATE3_U(h, state1, state2, state3, ret)           \
     do{if(!(h) || !(h->state == (state1) || h->state == (state2)||     \
                     h->state == (state3)))                             \
@@ -213,12 +199,9 @@ ImapResponse imap_search_exec_unlocked(ImapMboxHandle *h, gboolean uid,
 ImapResponse imap_assure_needed_flags(ImapMboxHandle *h,
                                       ImapMsgFlag needed_flags);
 
-#ifdef USE_TLS
-#include <openssl/ssl.h>
 SSL* imap_create_ssl(void);
 int imap_setup_ssl(struct siobuf *sio, const char* host, SSL *ssl,
                    ImapUserCb user_cb, void *user_arg);
-#endif
 
 void imap_handle_disconnect(ImapMboxHandle *h);
 ImapConnectionState imap_mbox_handle_get_state(ImapMboxHandle *h);

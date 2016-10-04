@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2001 Stuart Parmenter and others,
+ * Copyright (C) 1997-2013 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -24,16 +24,15 @@
 #include "balsa-message.h"
 #include "balsa-mime-widget.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif				/* __cplusplus */
+G_BEGIN_DECLS
 
 
 BalsaMimeWidget *balsa_mime_widget_new_message(BalsaMessage * bm,
 					       LibBalsaMessageBody * mime_body,
 					       const gchar * content_type, gpointer data);
 BalsaMimeWidget *balsa_mime_widget_new_message_tl(BalsaMessage * bm,
-						  GtkWidget * tl_buttons);
+                                                  GtkWidget *
+                                                  const *tl_buttons);
 void balsa_mime_widget_message_set_headers(BalsaMessage * bm,
                                            BalsaMimeWidget *mw,
 					   LibBalsaMessageBody *part);
@@ -49,7 +48,6 @@ void balsa_mime_widget_message_set_headers_d(BalsaMessage * bm,
                                              gboolean show_all_headers);
 
 
-#ifdef __cplusplus
-}
-#endif				/* __cplusplus */
+G_END_DECLS
+
 #endif				/* __BALSA_MIME_WIDGET_MESSAGE_H__ */

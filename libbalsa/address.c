@@ -1,21 +1,23 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2009 Stuart Parmenter and others,
+ * Copyright (C) 1997-2013 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option) 
+ * the Free Software Foundation; either version 2, or (at your option)
  * any later version.
- *  
+ *
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *  
+ *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, see <http://www.gnu.org/licenses/>.
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+ * 02111-1307, USA.
  */
 
 #if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
@@ -136,8 +138,11 @@ libbalsa_address_extract_name(const gchar * string, gchar ** last_name,
     while (fld[cpt] != NULL)
 	cpt++;
 
-    if (cpt == 0)		/* insane empty name */
-	return NULL;
+    if (cpt == 0) {
+        /* insane empty name */
+        g_strfreev(fld);
+        return NULL;
+    }
 
     if (fld[LAST] && *fld[LAST])
         *last_name = g_strdup(fld[LAST]);
@@ -576,7 +581,7 @@ rfc2822_group(const gchar *full_name, GList *addr_list)
     return res;
 }
 
-/* 
+/*
    Get a string version of this address.
 
    If n == -1 then return all addresses, else return the n'th one.
@@ -615,7 +620,7 @@ lba_get_name_or_mailbox(InternetAddressList * address_list,
     const gchar *retval = NULL;
     InternetAddress *ia;
     gint i, len;
-    
+
     if (address_list == NULL)
 	return NULL;
 
@@ -728,7 +733,7 @@ libbalsa_address_set_edit_entries(const LibBalsaAddress * address,
 		;
 
 	    /* get first name */
-	    first_name = g_strdup(address->first_name 
+	    first_name = g_strdup(address->first_name
                                   ? address->first_name : names[0]);
 
 	    /* get last name */
@@ -792,7 +797,7 @@ libbalsa_address_set_edit_entries(const LibBalsaAddress * address,
 
 /** libbalsa_address_get_edit_widget() returns an widget adapted
     for a LibBalsaAddress edition, with initial values set if address
-    is provided. The edit entries are set in entries array 
+    is provided. The edit entries are set in entries array
     and enumerated with LibBalsaAddressField constants
 */
 static void
@@ -898,10 +903,10 @@ addrlist_drag_received_cb(GtkWidget * widget, GdkDragContext * context,
         default: g_print ("nothing good");
         }
     }
-    
+
     if (!dnd_success)
         g_print ("DnD data transfer failed!\n");
-        
+
     gtk_drag_finish(context, dnd_success, FALSE, time);
 }
 
@@ -912,24 +917,20 @@ addrlist_drag_drop_cb(GtkWidget *widget, GdkDragContext *context,
   gboolean        is_valid_drop_site;
   GdkAtom         target_type;
   GList          *targets;
-        
+
   /* Check to see if (x,y) is a valid drop site within widget */
   is_valid_drop_site = TRUE;
-        
+
   /* If the source offers a target */
-#if GTK_CHECK_VERSION(2,22,0)
   targets = gdk_drag_context_list_targets(context);
-#else
-  targets = context->targets;
-#endif
   if (targets) {
       /* Choose the best target type */
-      target_type = GDK_POINTER_TO_ATOM 
+      target_type = GDK_POINTER_TO_ATOM
         (g_list_nth_data (targets, LIBBALSA_ADDRESS_TRG_ADDRESS));
-                
+
       /* Request the data from the source. */
       printf("drag_drop requests target=%p\n", target_type);
-      gtk_drag_get_data 
+      gtk_drag_get_data
         (
          widget,         /* will receive 'drag-data-received' signal */
          context,        /* represents the current state of the DnD */
@@ -939,7 +940,7 @@ addrlist_drag_drop_cb(GtkWidget *widget, GdkDragContext *context,
   } else {
       is_valid_drop_site = FALSE;
   }
-     
+
   return  is_valid_drop_site;
 }
 
@@ -958,22 +959,22 @@ libbalsa_address_get_edit_widget(const LibBalsaAddress *address,
         N_("_Email Address:")
     };
 
-    GtkWidget *table, *label, *lhs;
+    GtkWidget *grid, *label, *lhs;
     gint cnt;
 
-    table = gtk_table_new(NUM_FIELDS, 2, FALSE);
+    grid = gtk_grid_new();
 #define HIG_PADDING 6
-    gtk_table_set_row_spacings(GTK_TABLE(table), HIG_PADDING);
-    gtk_table_set_col_spacings(GTK_TABLE(table), HIG_PADDING);
-    gtk_container_set_border_width(GTK_CONTAINER(table), HIG_PADDING);
+    gtk_grid_set_row_spacing(GTK_GRID(grid), HIG_PADDING);
+    gtk_grid_set_column_spacing(GTK_GRID(grid), HIG_PADDING);
+    gtk_container_set_border_width(GTK_CONTAINER(grid), HIG_PADDING);
 
     for (cnt = 0; cnt < NUM_FIELDS; cnt++) {
         if (!labels[cnt])
             continue;
 	label = gtk_label_new_with_mnemonic(_(labels[cnt]));
-	gtk_misc_set_alignment(GTK_MISC(label), 1.0, 0.0);
+	gtk_widget_set_halign(label, GTK_ALIGN_END);
         if (cnt == EMAIL_ADDRESS) {
-            GtkWidget *box = gtk_vbox_new(FALSE, 0);
+            GtkWidget *box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
             GtkWidget *but = gtk_button_new_with_mnemonic(_("A_dd"));
             entries[cnt] = lba_address_list_widget(changed_cb,
                                                    changed_data);
@@ -985,7 +986,7 @@ libbalsa_address_get_edit_widget(const LibBalsaAddress *address,
              gtk_drag_dest_set(entries[cnt],
                                GTK_DEST_DEFAULT_MOTION |
                                GTK_DEST_DEFAULT_HIGHLIGHT,
-                               libbalsa_address_target_list,            
+                               libbalsa_address_target_list,
                                2,              /* size of list */
                                GDK_ACTION_COPY);
             g_signal_connect(G_OBJECT(entries[cnt]), "drag-data-received",
@@ -1001,14 +1002,13 @@ libbalsa_address_get_edit_widget(const LibBalsaAddress *address,
         }
 	gtk_label_set_mnemonic_widget(GTK_LABEL(label), entries[cnt]);
 
-	gtk_table_attach(GTK_TABLE(table), lhs, 0, 1, cnt + 1, cnt + 2,
-			 GTK_FILL, GTK_FILL, 4, 4);
+	gtk_grid_attach(GTK_GRID(grid), lhs, 0, cnt + 1, 1, 1);
 
 	gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
 
-	gtk_table_attach(GTK_TABLE(table), entries[cnt], 1, 2, cnt + 1,
-			 cnt + 2, GTK_FILL | GTK_EXPAND,
-			 GTK_FILL | GTK_EXPAND, 2, 2);
+        gtk_widget_set_hexpand(entries[cnt], TRUE);
+        gtk_widget_set_vexpand(entries[cnt], TRUE);
+	gtk_grid_attach(GTK_GRID(grid), entries[cnt], 1, cnt + 1, 1, 1);
     }
     g_signal_connect(entries[FIRST_NAME], "changed",
                      G_CALLBACK(lba_entry_changed), entries);
@@ -1027,7 +1027,7 @@ libbalsa_address_get_edit_widget(const LibBalsaAddress *address,
         g_signal_connect_swapped(G_OBJECT(model), "row-deleted",
                                  changed_cb, changed_data);
     }
-    return table;
+    return grid;
 }
 
 LibBalsaAddress *

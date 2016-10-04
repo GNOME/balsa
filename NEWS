@@ -1,23 +1,15 @@
-* Balsa-2.4.14 release. Release date 2013-02-14
+* Balsa-2.5.1 release. Release date 2013-04-27
 
-- drop legacy gnome-icons-theme dependency.
+- new message header widget
+- WebkitGtk2 widget integration
+- ported to GNetworkMonitor
+- yet another documentation port
+- initial config assistant improvements.
 
-* Balsa-2.4.13 release. Release date 2012-10-29
 
-- fix long-line POP3 bug.
-- fix bugs 684124,
+* Balsa-2.5.0 release. Release date 2013-02-28
 
-* Balsa-2.4.12 release. Release date 2012-04-21
-
-- GPGME fixes.
-- building GPG with gmime-2.6.0
-
-* Balsa-2.4.10 release. Release date 2011-06-13
-
-- preserve identity order.
-- trivial gtkhtml-3.15 support.
-- improve interaction with unique.
-- bugs fixed #636801, #636805, #647695.
+- making gtk3 build the official one.
 
 * Balsa-2.4.9 release. Release date 2010-11-19
 

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE page [
+<!ENTITY % balsa SYSTEM "balsa.entities">
+<!ENTITY mdash "--">
+<!-- replace with actual app  version number--><!ENTITY version "2.5">
+<!ENTITY Balsa '<app xmlns="http://projectmallard.org/1.0/">Balsa</app>'>
+<!ENTITY Mutt '<app xmlns="http://projectmallard.org/1.0/">Mutt</app>'>
+<!ENTITY GnomeCard '<app xmlns="http://projectmallard.org/1.0/">GnomeCard</app>'>
+<!ENTITY Pine '<app xmlns="http://projectmallard.org/1.0/">pine</app>'>
+<!ENTITY procmail '<app xmlns="http://projectmallard.org/1.0/">procmail</app>'>
+<!ENTITY GnuPG '<app xmlns="http://projectmallard.org/1.0/">GnuPG</app>'>
+<!ENTITY balsalist "http://mail.gnome.org/mailman/listinfo/balsa-list">
+<!ENTITY IMAP '<link xmlns="http://projectmallard.org/1.0/"
+           xref ="glossary#imap">IMAP</link>'>
+<!ENTITY LDAP '<link xmlns="http://projectmallard.org/1.0/"
+           xref ="glossary#ldap">LDAP</link>'>
+<!ENTITY POP3 '<link xmlns="http://projectmallard.org/1.0/"
+           xref ="glossary#pop">POP3</link>'>
+<!ENTITY SMTP '<link xmlns="http://projectmallard.org/1.0/"
+           xref ="glossary#smtp">SMTP</link>'>
+<!ENTITY VCARD '<link xmlns="http://projectmallard.org/1.0/"
+           xref ="glossary#vcard">VCARD</link>'>
+]>
+<page xmlns="http://projectmallard.org/1.0/" type="guide" id="index" xml:lang="de">
+  <title><app>Balsa</app> User's Guide</title>
+  <info>
+    <link type="next" xref="introduction"/>
+    <credit type="maintainer">
+      <name>Pawel Salek</name>
+    </credit>
+    <credit type="copyright">
+      <name>Stuart Parmenter und weitere, eine vollständige Liste finden Sie in AUTOREN</name>
+      <years>1997-2013</years>
+    </credit>
+    <license>
+      <p>Es ist Ihnen gestattet, wortwörtliche Kopien dieses Handbuchs zu erstellen und zu verteilen, welche den Urheberrechtshinweis sowie einen Hinweis auf diese Erlaubnis in allen Kopien enthalten.</p>
+      <p>Permission is granted to copy and distribute modified
+      versions of this manual under the conditions for verbatim
+      copying, provided that the entire resulting derived work is
+      distributed under the terms of a permission notice identical
+      to this one.</p>
+      <p>Permission is granted to copy and distribute translations
+      of this manual into another language, under the above
+      conditions for modified versions, except that this permission
+      notice may be stated in a translation approved by the Free
+      Software Foundation.</p>
+      <p>UNIX ist ein eingetragenes Warenzeichen von X/Open Group.</p>
+      <p>Linux ist ein eingetragenes Warenzeichen von Linus Torvalds.</p>
+      <p>X Window System ist ein eingetragenes Warenzeichen von X Consortium, Inc.</p>
+      <p>Windows ist ein eingetragenes Warenzeichen der Microsoft Corp.</p>
+      <p>Macintosh und Apple sind eingetragene Warenzeichen von Apple Computer, Inc.</p>
+      <p>Alle weiteren Warenzeichen gehören den jeweiligen Eigentümern.</p>
+    </license>
+  </info>
+  <p><app>Balsa</app> is a graphical mail client. While it is in active
+  development, <app>Balsa</app> has many features such as: <link xref="glossary#imap">IMAP</link>
+  and <link xref="glossary#pop">POP3</link> support; sendmail or direct <link xref="glossary#smtp">SMTP</link> support;
+  optional multi-threaded retrieval and sending of messages;
+  support for all configurations of local mail folders; automatic
+  mail checking; mail printing; inline attachment viewing; and the
+  proverbial much, much more.</p>
+  <p>This document will introduce a person who understands mail to
+  using <app>Balsa</app>. However, it will not explain email to a
+  confused individual. If you're looking for that, try asking a
+  friend or visiting the
+  <link href="http://www.cs.queensu.ca/FAQs/email/" type="http">
+  Email FAQ</link>.</p>
+</page>

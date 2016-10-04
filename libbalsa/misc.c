@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2011 Stuart Parmenter and others,
+ * Copyright (C) 1997-2013 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -671,21 +671,13 @@ libbalsa_charset_button_new(void)
     LibBalsaCodeset n, active = WEST_EUROPE;
     const gchar *locale_charset;
 
-#if GTK_CHECK_VERSION(2, 24, 0)
     combo_box = gtk_combo_box_text_new();
-#else                           /* GTK_CHECK_VERSION(2, 24, 0) */
-    combo_box = gtk_combo_box_new_text();
-#endif                          /* GTK_CHECK_VERSION(2, 24, 0) */
     locale_charset = g_mime_locale_charset();
 
     for (n = 0; n < LIBBALSA_NUM_CODESETS; n++) {
         LibBalsaCodesetInfo *info = &libbalsa_codeset_info[n];
         gchar *tmp = g_strdup_printf("%s (%s)", _(info->label), info->std);
-#if GTK_CHECK_VERSION(2, 24, 0)
         gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(combo_box), tmp);
-#else                           /* GTK_CHECK_VERSION(2, 24, 0) */
-        gtk_combo_box_append_text(GTK_COMBO_BOX(combo_box), tmp);
-#endif                          /* GTK_CHECK_VERSION(2, 24, 0) */
         g_free(tmp);
 
 	if (!g_ascii_strcasecmp(info->std, locale_charset))
@@ -1101,16 +1093,16 @@ libbalsa_ia_rfc2821_equal(const InternetAddress * a,
 #define LB_PADDING 12           /* per HIG */
 
 GtkWidget *
-libbalsa_create_table(guint rows, guint columns)
+libbalsa_create_grid(void)
 {
-    GtkWidget *table;
+    GtkWidget *grid;
 
-    table = gtk_table_new(rows, columns, FALSE);
+    grid = gtk_grid_new();
 
-    gtk_table_set_row_spacings(GTK_TABLE(table), LB_PADDING);
-    gtk_table_set_col_spacings(GTK_TABLE(table), LB_PADDING);
+    gtk_grid_set_row_spacing(GTK_GRID(grid), LB_PADDING);
+    gtk_grid_set_column_spacing(GTK_GRID(grid), LB_PADDING);
 
-    return table;
+    return grid;
 }
 
 /* create_label:
@@ -1119,14 +1111,15 @@ libbalsa_create_table(guint rows, guint columns)
    in create_entry.
 */
 GtkWidget *
-libbalsa_create_label(const gchar * text, GtkWidget * table, gint row)
+libbalsa_create_grid_label(const gchar * text, GtkWidget * grid, gint row)
 {
-    GtkWidget *label = gtk_label_new_with_mnemonic(text);
+    GtkWidget *label;
 
-    gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.5);
+    label = gtk_label_new_with_mnemonic(text);
+    gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
+    gtk_widget_set_halign(label, GTK_ALIGN_START);
 
-    gtk_table_attach(GTK_TABLE(table), label, 0, 1, row, row + 1,
-                     GTK_FILL, GTK_FILL, 0, 0);
+    gtk_grid_attach(GTK_GRID(grid), label, 0, row, 1, 1);
 
     return label;
 }
@@ -1135,15 +1128,14 @@ libbalsa_create_label(const gchar * text, GtkWidget * table, gint row)
    creates a checkbox with a given label and places them in given array.
 */
 GtkWidget *
-libbalsa_create_check(const gchar * text, GtkWidget * table, gint row,
-                      gboolean initval)
+libbalsa_create_grid_check(const gchar * text, GtkWidget * grid, gint row,
+                           gboolean initval)
 {
     GtkWidget *check_button;
 
     check_button = gtk_check_button_new_with_mnemonic(text);
 
-    gtk_table_attach(GTK_TABLE(table), check_button, 0, 2, row, row + 1,
-                     GTK_FILL, 0, 0, 0);
+    gtk_grid_attach(GTK_GRID(grid), check_button, 0, row, 2, 1);
 
     if (initval)
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button),
@@ -1154,16 +1146,16 @@ libbalsa_create_check(const gchar * text, GtkWidget * table, gint row,
 
 /* Create a text entry and add it to the table */
 GtkWidget *
-libbalsa_create_entry(GtkWidget * table, GCallback changed_func,
-                      gpointer data, gint row, const gchar * initval,
-                      GtkWidget * hotlabel)
+libbalsa_create_grid_entry(GtkWidget * grid, GCallback changed_func,
+                           gpointer data, gint row, const gchar * initval,
+                           GtkWidget * hotlabel)
 {
     GtkWidget *entry;
 
     entry = gtk_entry_new();
+    gtk_widget_set_hexpand(entry, TRUE);
 
-    gtk_table_attach(GTK_TABLE(table), entry, 1, 2, row, row + 1,
-                     GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0);
+    gtk_grid_attach(GTK_GRID(grid), entry, 1, row, 1, 1);
 
     if (initval)
         gtk_entry_set_text(GTK_ENTRY(entry), initval);
@@ -1177,13 +1169,14 @@ libbalsa_create_entry(GtkWidget * table, GCallback changed_func,
     return entry;
 }
 
-/* Create a GtkSizeGroup and add to it any GtkLabel packed in a GtkTable
+/* Create a GtkSizeGroup and add to it any GtkLabel packed in a GtkGrid
  * inside the chooser widget; size_group will be unreffed when the
  * chooser widget is finalized. */
 static void
 lb_create_size_group_func(GtkWidget * widget, gpointer data)
 {
-    if (GTK_IS_LABEL(widget) && GTK_IS_TABLE(gtk_widget_get_parent(widget)))
+    if (GTK_IS_LABEL(widget) &&
+        GTK_IS_GRID(gtk_widget_get_parent(widget)))
         gtk_size_group_add_widget(GTK_SIZE_GROUP(data), widget);
     else if (GTK_IS_CONTAINER(widget))
         gtk_container_foreach(GTK_CONTAINER(widget),

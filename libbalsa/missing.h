@@ -3,7 +3,7 @@
 #define __MISSING_H__ 1
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2002 Stuart Parmenter and others,
+ * Copyright (C) 1997-2013 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -29,14 +29,6 @@
 
 #if (HAVE_DECL_CTIME_R == 0)
 char * ctime_r(const time_t *clock, char *buf);
-#endif
-
-#if (HAVE_DECL_LOCALTIME_R == 0)
-struct tm * localtime_r(const time_t *clock, struct tm *result);
-#endif
-
-#if (HAVE_DECL_GMTIME_R == 0)
-struct tm * gmtime_r(const time_t *clock, struct tm *result);
 #endif
 
 #endif

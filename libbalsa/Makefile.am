@@ -66,6 +66,8 @@ libbalsa_a_SOURCES = 		\
 	address-view.h		\
 	address.c		\
 	address.h		\
+	application-helpers.c   \
+	application-helpers.h   \
 	body.c			\
 	body.h			\
 	cell-renderer-button.c  \

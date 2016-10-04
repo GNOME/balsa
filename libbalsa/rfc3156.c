@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2001 Stuart Parmenter and others,
+ * Copyright (C) 1997-2013 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -39,11 +39,6 @@
 
 #ifdef HAVE_SMIME
 #  include "gmime-application-pkcs7.h"
-#endif
-
-#ifdef BALSA_USE_THREADS
-#  include <pthread.h>
-#  include "misc.h"
 #endif
 
 #if HAVE_MACOSX_DESKTOP
@@ -176,7 +171,8 @@ libbalsa_message_body_protection(LibBalsaMessageBody * body)
 			  "octet-stream"))
 	    result |= LIBBALSA_PROTECT_ERROR;
 	g_free(protocol);
-    } else if (body_is_type(body, "application", "pkcs7-mime")) {
+    } else if (body_is_type(body, "application", "pkcs7-mime") ||
+	    body_is_type(body, "application", "x-pkcs7-mime")) {
 	gchar *smime_type =
 	    libbalsa_message_body_get_parameter(body, "smime-type");
 
@@ -225,7 +221,7 @@ libbalsa_sign_mime_object(GMimeObject ** content, const gchar * rfc822_for,
 	return FALSE;
     }
 
-    if (g_mime_gpgme_mps_sign(mps, *content, rfc822_for, protocol, parent, error) != 0) {
+    if (!g_mime_gpgme_mps_sign(mps, *content, rfc822_for, protocol, parent, error)) {
 	g_object_unref(mps);
 	return FALSE;
     }
@@ -248,7 +244,7 @@ libbalsa_encrypt_mime_object(GMimeObject ** content, GList * rfc822_for,
 {
     GMimeObject *encrypted_obj = NULL;
     GPtrArray *recipients;
-    int result = -1;
+    gboolean result = FALSE;
 
     /* paranoia checks */
     g_return_val_if_fail(rfc822_for != NULL, FALSE);
@@ -280,6 +276,7 @@ libbalsa_encrypt_mime_object(GMimeObject ** content, GList * rfc822_for,
     else {
 	GMimePart *pkcs7 =
 	    g_mime_part_new_with_type("application", "pkcs7-mime");
+	encrypted_obj = GMIME_OBJECT(pkcs7);
 
 	result = g_mime_application_pkcs7_encrypt(pkcs7, *content, recipients, always_trust, parent, error);
     }
@@ -287,14 +284,13 @@ libbalsa_encrypt_mime_object(GMimeObject ** content, GList * rfc822_for,
     g_ptr_array_free(recipients, FALSE);
 
     /* error checking */
-    if (result != 0) {
+    if (!result) {
 	g_object_unref(encrypted_obj);
-	return FALSE;
     } else {
     g_object_unref(G_OBJECT(*content));
     *content = GMIME_OBJECT(encrypted_obj);
-    return TRUE;
     }
+    return result;
 }
 
 
@@ -378,7 +374,7 @@ libbalsa_body_check_signature(LibBalsaMessageBody * body,
     /* check if the body is really a multipart/signed */
     if (!GMIME_IS_MULTIPART_SIGNED(body->mime_part)
         || (g_mime_multipart_get_count
-            (((GMimeMultipart *) body->mime_part))) < 2)
+            (GMIME_MULTIPART(body->mime_part)) < 2))
         return FALSE;
     if (body->parts->next->sig_info)
 	g_object_unref(G_OBJECT(body->parts->next->sig_info));
@@ -386,7 +382,7 @@ libbalsa_body_check_signature(LibBalsaMessageBody * body,
     /* verify the signature */
     libbalsa_mailbox_lock_store(body->message->mailbox);
     result = g_mime_gpgme_mps_verify(GMIME_MULTIPART_SIGNED(body->mime_part), &error);
-    if (!result || result->status != GPG_ERR_NO_ERROR) {
+    if (!result) {
 	if (error) {
 	    libbalsa_information(LIBBALSA_INFORMATION_ERROR, "%s: %s",
 				 _("signature verification failed"),
@@ -445,7 +441,9 @@ libbalsa_body_decrypt(LibBalsaMessageBody *body, gpgme_protocol_t protocol, GtkW
 	if (!smime_type || !GMIME_IS_PART(body->mime_part))
 	    return body;
 	if (!g_ascii_strcasecmp(smime_type, "enveloped-data"))
-	    smime_encrypted = FALSE;
+	    smime_encrypted = TRUE;
+	else
+            smime_encrypted = body->was_encrypted;
     }
 #endif
 
@@ -486,6 +484,8 @@ libbalsa_body_decrypt(LibBalsaMessageBody *body, gpgme_protocol_t protocol, GtkW
     else
 	body->was_encrypted = smime_encrypted;
 #endif
+    if (body->was_encrypted)
+        body->message->prot_state = LIBBALSA_MSG_PROTECT_CRYPT;
 
     libbalsa_message_body_set_mime_body(body, mime_obj);
     if (sig_state) {
@@ -507,7 +507,7 @@ libbalsa_rfc2440_sign_encrypt(GMimePart *part, const gchar *sign_for,
 			      GtkWindow *parent, GError **error)
 {
     GPtrArray *recipients;
-    gint result;
+    gboolean result;
 
     /* paranoia checks */
     g_return_val_if_fail(part != NULL, FALSE);
@@ -533,7 +533,7 @@ libbalsa_rfc2440_sign_encrypt(GMimePart *part, const gchar *sign_for,
     /* clean up */
     if (recipients)
 	g_ptr_array_free(recipients, FALSE);
-    return (result == 0) ? TRUE : FALSE;
+    return result;
 }
 
 
@@ -563,7 +563,7 @@ libbalsa_rfc2440_verify(GMimePart * part, GMimeGpgmeSigstat ** sig_info)
 
     /* verify */
     result = g_mime_part_rfc2440_verify(part, &error);
-    if (!result || result->status != GPG_ERR_NO_ERROR) {
+    if (!result) {
 	if (error) {
 	    libbalsa_information(LIBBALSA_INFORMATION_ERROR, "%s: %s",
 				 _("signature verification failed"),
@@ -677,9 +677,13 @@ libbalsa_gpgme_sig_stat_to_gchar(gpgme_error_t stat)
     case GPG_ERR_TRY_AGAIN:
 	return _
 	    ("GnuPG is rebuilding the trust database and is currently unavailable.");
-    default:
-	g_message("stat %d: %s %s", stat, gpgme_strsource(stat), gpgme_strerror(stat));
+    default: {
+	gchar errbuf[4096];		/* should be large enough... */
+
+	gpgme_strerror_r(stat, errbuf, sizeof(errbuf));
+	g_message("stat %d: %s %s", stat, gpgme_strsource(stat), errbuf);
 	return _("An error prevented the signature verification.");
+    }
     }
 }
 
@@ -742,10 +746,10 @@ libbalsa_gpgme_sig_protocol_name(gpgme_protocol_t protocol)
 }
 
 static inline void
-append_time_t(GString *str, const gchar *format, time_t *when,
+append_time_t(GString *str, const gchar *format, time_t when,
               const gchar * date_string)
 {
-    if (*when != (time_t) 0) {
+    if (when != (time_t) 0) {
         gchar *tbuf = libbalsa_date_to_utf8(when, date_string);
         g_string_append_printf(str, format, tbuf);
         g_free(tbuf);
@@ -770,7 +774,7 @@ libbalsa_signature_info_to_gchar(GMimeGpgmeSigstat * info,
     g_string_append_printf(msg, _("\nSignature validity: %s"),
 			   libbalsa_gpgme_validity_to_gchar(info->
 							    validity));
-    append_time_t(msg, _("\nSigned on: %s"), &info->sign_time, date_string);
+    append_time_t(msg, _("\nSigned on: %s"), info->sign_time, date_string);
     if (info->protocol == GPGME_PROTOCOL_OpenPGP && info->key)
 	g_string_append_printf(msg, _("\nKey owner trust: %s"),
 			       libbalsa_gpgme_validity_to_gchar_short
@@ -834,9 +838,9 @@ libbalsa_signature_info_to_gchar(GMimeGpgmeSigstat * info,
 
             if (subkey) {
         	append_time_t(msg, _("\nSubkey created on: %s"),
-        		      &subkey->timestamp, date_string);
+        		      subkey->timestamp, date_string);
         	append_time_t(msg, _("\nSubkey expires on: %s"),
-        		      &subkey->expires, date_string);
+        		      subkey->expires, date_string);
         	if (subkey->revoked || subkey->expired || subkey->disabled ||
         	    subkey->invalid) {
        GString * attrs = g_string_new("");

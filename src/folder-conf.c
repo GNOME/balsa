@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2003 Stuart Parmenter and others,
+ * Copyright (C) 1997-2013 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -91,6 +91,7 @@ static void
 folder_conf_response(GtkDialog * dialog, int response,
                      CommonDialogData * cdd)
 {
+    GdkScreen *screen;
     GError *err = NULL;
 
     /* If mbnode's parent gets rescanned, mbnode will be finalized,
@@ -101,7 +102,8 @@ folder_conf_response(GtkDialog * dialog, int response,
 	g_object_ref(cdd->mbnode);
     switch (response) {
     case GTK_RESPONSE_HELP:
-        gtk_show_uri(NULL, "ghelp:balsa?folder-config",
+        screen = gtk_widget_get_screen(GTK_WIDGET(dialog));
+        gtk_show_uri(screen, "help:balsa/folder-config",
                      gtk_get_current_event_time(), &err);
         if (err) {
             balsa_information(LIBBALSA_INFORMATION_WARNING,
@@ -193,11 +195,9 @@ folder_conf_clicked_ok(FolderDialogData * fcw)
         (LIBBALSA_IMAP_SERVER(s),
          gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON
                                           (fcw->connection_limit)));
-#if !defined(ENABLE_TOUCH_UI)
     libbalsa_imap_server_enable_persistent_cache
         (LIBBALSA_IMAP_SERVER(s),
          gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fcw->enable_persistent)));
-#endif
     libbalsa_imap_server_set_use_idle
         (LIBBALSA_IMAP_SERVER(s), 
          gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fcw->use_idle)));
@@ -262,20 +262,23 @@ folder_conf_clicked_ok(FolderDialogData * fcw)
 void
 folder_conf_imap_node(BalsaMailboxNode *mn)
 {
-    GtkWidget *notebook, *table, *label, *advanced;
+    GtkWidget *notebook, *grid, *label, *advanced;
     FolderDialogData *fcw;
     static FolderDialogData *fcw_new;
     LibBalsaServer *s;
     gchar *default_server;
     int r = 0;
 
-#if defined(HAVE_GNOME_KEYRING)
+#if defined(HAVE_LIBSECRET)
+    static const gchar *remember_password_message =
+        N_("_Remember password in Secret Service");
+#elif defined (HAVE_GNOME_KEYRING)
     static const gchar *remember_password_message =
         N_("_Remember password in keyring");
 #else
     static const gchar *remember_password_message =
         N_("_Remember password");
-#endif
+#endif                          /* defined(HAVE_LIBSECRET) */
 
     /* Allow only one dialog per mailbox node, and one with mn == NULL
      * for creating a new folder. */
@@ -295,10 +298,12 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
         GTK_DIALOG(gtk_dialog_new_with_buttons
                    (_("Remote IMAP folder"),
                     GTK_WINDOW(balsa_app.main_window),
-                    GTK_DIALOG_DESTROY_WITH_PARENT,
+                    GTK_DIALOG_DESTROY_WITH_PARENT |
+                    libbalsa_dialog_flags(),
                     mn ? _("_Update") : _("C_reate"), GTK_RESPONSE_OK,
-                    GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-                    GTK_STOCK_HELP, GTK_RESPONSE_HELP, NULL));
+                    _("_Cancel"), GTK_RESPONSE_CANCEL,
+                    _("_Help"), GTK_RESPONSE_HELP,
+                    NULL));
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu_for_parent(GTK_WIDGET(fcw->dialog), GTK_WINDOW(balsa_app.main_window));
 #endif
@@ -319,9 +324,9 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
     notebook = gtk_notebook_new();
     gtk_box_pack_start(GTK_BOX(gtk_dialog_get_content_area(fcw->dialog)),
                        notebook, TRUE, TRUE, 0);
-    table = libbalsa_create_table(9, 2);
-    gtk_container_set_border_width(GTK_CONTAINER(table), 12);
-    gtk_notebook_append_page(GTK_NOTEBOOK(notebook), table,
+    grid = libbalsa_create_grid();
+    gtk_container_set_border_width(GTK_CONTAINER(grid), 12);
+    gtk_notebook_append_page(GTK_NOTEBOOK(notebook), grid,
                              gtk_label_new_with_mnemonic(_("_Basic")));
     advanced = balsa_server_conf_get_advanced_widget(&fcw->bsc, s, 3);
     /* Limit number of connections */
@@ -331,7 +336,6 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
          s 
          ? libbalsa_imap_server_get_max_connections(LIBBALSA_IMAP_SERVER(s))
          : 20);
-#if !defined(ENABLE_TOUCH_UI)
     fcw->enable_persistent = 
         balsa_server_conf_add_checkbox(&fcw->bsc,
                                        _("Enable _persistent cache"));
@@ -339,7 +343,6 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
        libbalsa_imap_server_has_persistent_cache(LIBBALSA_IMAP_SERVER(s)))
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fcw->enable_persistent),
                                      TRUE);
-#endif
     fcw->use_idle = 
         balsa_server_conf_add_checkbox(&fcw->bsc,
                                        _("Use IDLE command"));
@@ -365,50 +368,56 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
                              gtk_label_new_with_mnemonic(_("_Advanced")));
 
     /* INPUT FIELD CREATION */
-    label = libbalsa_create_label(_("Descriptive _name:"), table, 0);
-    fcw->folder_name = libbalsa_create_entry(table,
-                                   G_CALLBACK(validate_folder),
-                                   fcw, r++, mn ? mn->name : NULL, 
+    label = libbalsa_create_grid_label(_("Descriptive _name:"), grid, 0);
+    fcw->folder_name =
+        libbalsa_create_grid_entry(grid, G_CALLBACK(validate_folder),
+                                   fcw, r++, mn ? mn->name : NULL,
 				   label);
 
     default_server = libbalsa_guess_imap_server();
-    label = libbalsa_create_label(_("_Server:"), table, 1);
-    fcw->bsc.server = libbalsa_create_entry(table,
-                              G_CALLBACK(validate_folder),
-                              fcw, r++, s ? s->host : default_server,
-			      label);
+    label = libbalsa_create_grid_label(_("_Server:"), grid, 1);
+    fcw->bsc.server =
+        libbalsa_create_grid_entry(grid, G_CALLBACK(validate_folder),
+                                   fcw, r++, s ? s->host : default_server,
+                                   label);
     fcw->bsc.default_ports = IMAP_DEFAULT_PORTS;
     g_free(default_server);
 
-    label= libbalsa_create_label(_("Use_r name:"), table, r);
-    fcw->username = libbalsa_create_entry(table,
-                                G_CALLBACK(validate_folder),
-                                fcw, r++, s ? s->user : g_get_user_name(), 
-			        label);
+    label= libbalsa_create_grid_label(_("Use_r name:"), grid, r);
+    fcw->username =
+        libbalsa_create_grid_entry(grid, G_CALLBACK(validate_folder),
+                                   fcw, r++, s ? s->user : g_get_user_name(),
+                                   label);
 
-    label = libbalsa_create_label(_("_Password:"), table, r);
-    fcw->password = libbalsa_create_entry(table, NULL, NULL, r++,
-				s ? s->passwd : NULL, label);
+    label = libbalsa_create_grid_label(_("_Password:"), grid, r);
+    fcw->password =
+        libbalsa_create_grid_entry(grid, NULL, NULL, r++,
+                                   s ? s->passwd : NULL, label);
     gtk_entry_set_visibility(GTK_ENTRY(fcw->password), FALSE);
 
-    fcw->anonymous = libbalsa_create_check(_("_Anonymous access"), 
-                                table, r++, s ? s->try_anonymous : FALSE);
+    fcw->anonymous =
+        libbalsa_create_grid_check(_("_Anonymous access"), grid, r++,
+                                   s ? s->try_anonymous : FALSE);
     g_signal_connect(G_OBJECT(fcw->anonymous), "toggled",
                      G_CALLBACK(anonymous_cb), fcw);
-    fcw->remember = libbalsa_create_check(_(remember_password_message), 
-                                table, r++, s ? s->remember_passwd : TRUE);
+    fcw->remember =
+        libbalsa_create_grid_check(_(remember_password_message), grid, r++,
+                                   s ? s->remember_passwd : TRUE);
     g_signal_connect(G_OBJECT(fcw->remember), "toggled",
                      G_CALLBACK(remember_cb), fcw);
 
-    fcw->subscribed = libbalsa_create_check(_("Subscribed _folders only"), 
-                                  table, r++, mn ? mn->subscribed : FALSE);
-    fcw->list_inbox = libbalsa_create_check(_("Always show _INBOX"), 
-                                  table, r++, mn ? mn->list_inbox : TRUE); 
+    fcw->subscribed =
+        libbalsa_create_grid_check(_("Subscribed _folders only"), grid, r++,
+                                   mn ? mn->subscribed : FALSE);
+    fcw->list_inbox =
+        libbalsa_create_grid_check(_("Always show _INBOX"), grid, r++,
+                                   mn ? mn->list_inbox : TRUE);
 
-    label = libbalsa_create_label(_("Pr_efix:"), table, r);
-    fcw->prefix = libbalsa_create_entry(table, NULL, NULL, r++,
-			      mn ? mn->dir : NULL, label);
-    
+    label = libbalsa_create_grid_label(_("Pr_efix:"), grid, r);
+    fcw->prefix =
+        libbalsa_create_grid_entry(grid, NULL, NULL, r++,
+                                   mn ? mn->dir : NULL, label);
+
     gtk_widget_show_all(GTK_WIDGET(fcw->dialog));
 
     validate_folder(NULL, fcw);
@@ -553,9 +562,10 @@ browse_button_cb(GtkWidget * widget, SubfolderDialogData * sdd)
     dialog =
         gtk_dialog_new_with_buttons(_("Select parent folder"),
                                     GTK_WINDOW(sdd->dialog),
-                                    GTK_DIALOG_DESTROY_WITH_PARENT,
-                                    GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-                                    GTK_STOCK_OK, GTK_RESPONSE_OK,
+                                    GTK_DIALOG_DESTROY_WITH_PARENT |
+                                    libbalsa_dialog_flags(),
+                                    _("_Cancel"), GTK_RESPONSE_CANCEL,
+                                    _("_Help"), GTK_RESPONSE_HELP,
                                     NULL);
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu_for_parent(dialog, GTK_WINDOW(sdd->dialog));
@@ -584,7 +594,7 @@ browse_button_cb(GtkWidget * widget, SubfolderDialogData * sdd)
                      G_CALLBACK(browse_button_row_activated), bbd);
 
     /* Force the mailbox list to be a reasonable size. */
-    gtk_widget_size_request(tree_view, &req);
+    gtk_widget_get_preferred_size(tree_view, NULL, &req);
     /* don't mess with the width, it gets saved! */
     if (req.height > balsa_app.mw_height)
         req.height = balsa_app.mw_height;
@@ -635,16 +645,16 @@ subfolder_conf_clicked_ok(SubfolderDialogData * sdd)
                                      "INBOX and its subfolders will remain.\n"
                                      "What would you like to do?"),
 folder, parent);
-                GtkWidget *ask = gtk_dialog_new_with_buttons(_("Question"),
-                                                             GTK_WINDOW
-                                                             (sdd->dialog),
-                                                             GTK_DIALOG_MODAL,
-                                                             _
-                                                             ("Rename INBOX"),
-                                                             GTK_RESPONSE_OK,
-                                                             _("Cancel"),
-                                                             GTK_RESPONSE_CANCEL,
-                                                             NULL);
+                GtkWidget *ask =
+                    gtk_dialog_new_with_buttons(_("Question"),
+                                                GTK_WINDOW(sdd->dialog),
+                                                GTK_DIALOG_MODAL |
+                                                libbalsa_dialog_flags(),
+                                                _("Rename INBOX"),
+                                                GTK_RESPONSE_OK,
+                                                _("Cancel"),
+                                                GTK_RESPONSE_CANCEL,
+                                                NULL);
 #if HAVE_MACOSX_DESKTOP
 		libbalsa_macosx_menu_for_parent(ask, GTK_WINDOW(sdd->dialog));
 #endif
@@ -745,7 +755,7 @@ set_ok_sensitive(GtkDialog * dialog)
 void
 folder_conf_imap_sub_node(BalsaMailboxNode * mn)
 {
-    GtkWidget *content, *table, *button, *label, *hbox;
+    GtkWidget *content, *grid, *button, *label, *hbox;
     SubfolderDialogData *sdd;
     static SubfolderDialogData *sdd_new = NULL;
     guint row;
@@ -768,6 +778,7 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
             balsa_information(LIBBALSA_INFORMATION_ERROR,
                               _("An IMAP folder that is not a mailbox\n"
                                 "has no properties that can be changed."));
+            g_free(sdd);
 	    return;
 	}
 	sdd->parent = mn->parent;
@@ -783,10 +794,11 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
         GTK_DIALOG(gtk_dialog_new_with_buttons
                    (_("Remote IMAP subfolder"), 
                     GTK_WINDOW(balsa_app.main_window),
-                    GTK_DIALOG_DESTROY_WITH_PARENT, /* must NOT be modal */
+                    GTK_DIALOG_DESTROY_WITH_PARENT | /* must NOT be modal */
+                    libbalsa_dialog_flags(),
                     mn ? _("_Update") : _("_Create"), GTK_RESPONSE_OK,
-                    GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-                    GTK_STOCK_HELP,   GTK_RESPONSE_HELP,
+                    _("_Cancel"), GTK_RESPONSE_CANCEL,
+                    _("_Help"), GTK_RESPONSE_HELP,
                     NULL));
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu_for_parent(GTK_WIDGET(sdd->dialog), GTK_WINDOW(balsa_app.main_window));
@@ -808,37 +820,37 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
                                   (gpointer) &sdd_new);
     }
 
-    table = libbalsa_create_table(3, 2);
-    gtk_table_set_row_spacings(GTK_TABLE(table), 6);
-    gtk_table_set_col_spacings(GTK_TABLE(table), 12);
-    gtk_container_set_border_width(GTK_CONTAINER(table), 12);
+    grid = libbalsa_create_grid();
+    gtk_grid_set_row_spacing(GTK_GRID(grid), 6);
+    gtk_grid_set_column_spacing(GTK_GRID(grid), 12);
+    gtk_container_set_border_width(GTK_CONTAINER(grid), 12);
     if (mn)
-        content = table;
+        content = grid;
     else {
         content = gtk_frame_new(_("Create subfolder"));
-        gtk_container_add(GTK_CONTAINER(content), table);
+        gtk_container_add(GTK_CONTAINER(content), grid);
     }
     gtk_box_pack_start(GTK_BOX(gtk_dialog_get_content_area(sdd->dialog)),
                        content, TRUE, TRUE, 0);
  
     row = 0;
     /* INPUT FIELD CREATION */
-    label= libbalsa_create_label(_("_Folder name:"), table, row);
+    label= libbalsa_create_grid_label(_("_Folder name:"), grid, row);
     sdd->folder_name =
-        libbalsa_create_entry(table, G_CALLBACK(validate_sub_folder),
-                              sdd, row, sdd->old_folder, label);
+        libbalsa_create_grid_entry(grid, G_CALLBACK(validate_sub_folder),
+                                   sdd, row, sdd->old_folder, label);
 
     ++row;
-    label = libbalsa_create_label(_("Host:"), table, row);
-    sdd->host_label = 
+    label = libbalsa_create_grid_label(_("Host:"), grid, row);
+    sdd->host_label =
         gtk_label_new(sdd->mbnode && sdd->mbnode->server
                       ? sdd->mbnode->server->host : "");
-    gtk_misc_set_alignment(GTK_MISC(sdd->host_label), 0.0, 0.5);
-    gtk_table_attach(GTK_TABLE(table), sdd->host_label, 1, 2, row, row + 1,
-		     GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0);
+    gtk_widget_set_halign(sdd->host_label, GTK_ALIGN_START);
+    gtk_widget_set_hexpand(sdd->host_label, TRUE);
+    gtk_grid_attach(GTK_GRID(grid), sdd->host_label, 1, row, 1, 1);
 
     ++row;
-    label = libbalsa_create_label(_("Subfolder of:"), table, row);
+    label = libbalsa_create_grid_label(_("Subfolder of:"), grid, row);
     sdd->parent_folder = gtk_entry_new();
     gtk_editable_set_editable(GTK_EDITABLE(sdd->parent_folder), FALSE);
     gtk_entry_set_text(GTK_ENTRY(sdd->parent_folder), sdd->old_parent);
@@ -847,11 +859,11 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
     g_signal_connect(G_OBJECT(button), "clicked",
 		     G_CALLBACK(browse_button_cb), (gpointer) sdd);
 
-    hbox = gtk_hbox_new(FALSE, 12);
+    hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 12);
+    gtk_widget_set_hexpand(hbox, TRUE);
     gtk_box_pack_start(GTK_BOX(hbox), sdd->parent_folder, TRUE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, FALSE, 0);
-    gtk_table_attach(GTK_TABLE(table), hbox, 1, 2, row, row + 1,
-                     GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0);
+    gtk_grid_attach(GTK_GRID(grid), hbox, 1, row, 1, 1);
 
     if (!mn)
         validate_sub_folder(NULL, sdd);
@@ -869,7 +881,7 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
         gchar * quotas;
 
         ++row;
-        label = libbalsa_create_label(_("Permissions:"), table, row);
+        label = libbalsa_create_grid_label(_("Permissions:"), grid, row);
 
         /* mailbox closed: no detailed permissions available */
         if (!libbalsa_mailbox_imap_is_connected(LIBBALSA_MAILBOX_IMAP(mn->mailbox))) {
@@ -925,13 +937,12 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
         }
         rights = g_string_free(rights_str, FALSE);
         label = gtk_label_new(rights);
-        gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.5);
-        gtk_table_attach(GTK_TABLE(table), label, 1, 2, row, row + 1,
-                         GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0);
+        gtk_widget_set_halign(label, GTK_ALIGN_START);
+        gtk_grid_attach(GTK_GRID(grid), label, 1, row, 1, 1);
         g_free(rights);
 
         ++row;
-        label = libbalsa_create_label(_("Quota:"), table, row);
+        label = libbalsa_create_grid_label(_("Quota:"), grid, row);
 
         /* mailbox closed: no quota available */
         if (!libbalsa_mailbox_imap_is_connected(LIBBALSA_MAILBOX_IMAP(mn->mailbox)))
@@ -954,14 +965,14 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
             }
         }
         label = gtk_label_new(quotas);
-        gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.5);
-        gtk_table_attach(GTK_TABLE(table), label, 1, 2, row, row + 1,
-                         GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0);
+        gtk_widget_set_halign(label, GTK_ALIGN_START);
+        gtk_widget_set_hexpand(label, TRUE);
+        gtk_grid_attach(GTK_GRID(grid), label, 1, row, 1, 1);
         g_free(quotas);
 
         sdd->mcv = mailbox_conf_view_new(mn->mailbox,
                                          GTK_WINDOW(sdd->dialog),
-                                         table, 5,
+                                         grid, 5,
                                          G_CALLBACK(set_ok_sensitive));
     }
 

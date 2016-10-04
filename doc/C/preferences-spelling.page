@@ -1,0 +1,86 @@
+<!DOCTYPE page
+[<!ENTITY % balsa SYSTEM "balsa.entities">%balsa; ]>
+<page xmlns="http://projectmallard.org/1.0/" type="topic"
+id="preferences-spelling">
+  <info>
+    <link type="topic" xref="preferences" />
+    <link type="guide" xref="preferences" />
+  </info>
+  <title>Spell Check Preferences</title>
+  <p>If &Balsa; is using GtkSpell, you can choose to have your
+  spelling checked as you type. &Balsa; uses GtkSpell's default
+  settings.</p>
+  <p>If &Balsa; is not using GtkSpell, you can use this pane to
+  setup &Balsa; spell check options. &Balsa; uses the
+  Portable Spell Checking library
+  (<link href="http://pspell.sourceforge.net">pspell</link>) to
+  provide an interface to the spell checking program of your
+  choice. Currently there are modules for ispell or aspell, both of
+  which can be found at the pspell website. For more information
+  visit the &Balsa; homepage.</p>
+  <terms>
+    <item>
+      <title>
+        <gui>Pspell Module</gui>
+      </title>
+      <p>The Pspell library allows you to use whatever spell
+      checking engine you prefer, though the use of loadable
+      modules. Currently Pspell has support for two modules, the
+      traditional ispell, and the newer and more advanced
+      aspell.</p>
+      <p>
+      <app>Ispell</app> is most likely available on your system as
+      it is a Unix standard; however
+      <app>Aspell</app> is more advanced as it uses an advanced
+      phonetics engine and adaptive techniques to learn how you
+      tend to misspell words. More information is available at the
+      <link href="http://aspell.sourceforge.net">Aspell
+      website</link>.</p>
+      <p>&Balsa; will attempt to use whatever module you
+      specify here, however if the module is not installed it will
+      not work and generate an error.</p>
+    </item>
+    <item>
+      <title>
+        <gui>Suggestion Mode</gui>
+      </title>
+      <p>The suggestion mode determines how hard the computer will
+      search for suggestions for misspelled words. There are three
+      options:</p>
+      <terms>
+        <item>
+          <title>
+            <gui>Fast</gui>
+          </title>
+          <p>This mode quickly scans for replacements, which means
+          it might be used by a good speller who occasionally makes
+          typographical errors.</p>
+        </item>
+        <item>
+          <title>
+            <gui>Normal</gui>
+          </title>
+          <p>The Normal mode is probably good enough for most
+          people; it should produce the correct suggestion in the
+          majority of cases.</p>
+        </item>
+        <item>
+          <title>
+            <gui>Bad Spellers</gui>
+          </title>
+          <p>The Bad Spellers mode is the most thorough and
+          accurate mode; however, it also takes the longest to find
+          a list of suggestions.</p>
+        </item>
+      </terms>
+    </item>
+    <item>
+      <title>
+        <gui>Ignore Length</gui>
+      </title>
+      <p>This provides the ability to ignore words shorter than a
+      certain length. It may be useful to automatically skip short
+      acronyms that are normally flagged as incorrect.</p>
+    </item>
+  </terms>
+</page>

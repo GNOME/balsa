@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2002 Stuart Parmenter and others,
+ * Copyright (C) 1997-2013 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -22,56 +22,23 @@
 # include "config.h"
 #endif                          /* HAVE_CONFIG_H */
 
-#if !defined(HAVE_CTIME_R)     || \
-    !defined(HAVE_LOCALTIME_R) || \
-    !defined(HAVE_GMTIME_R)
+#if !defined(HAVE_CTIME_R)
 
 #include "missing.h"
 
 #include <string.h>
 
-#if BALSA_USE_THREADS
-#include <pthread.h>
-static pthread_mutex_t time_lock = PTHREAD_MUTEX_INITIALIZER;
-#define LOCK(mutex)   pthread_mutex_lock(&mutex)
-#define UNLOCK(mutex) pthread_mutex_unlock(&mutex)
-#else
-#define LOCK(mutex)
-#define UNLOCK(mutex)
-#endif /* BALSA_USE_THREADS */
-
 #ifndef HAVE_CTIME_R
 char *
 ctime_r(const time_t *clock, char *buf)
 {
-    LOCK(time_lock);
+	static GMutex time_lock;
+
+	g_mutex_lock(&mutex);
     strcpy(buf, ctime(clock));
-    UNLOCK(time_lock);
+	g_mutex_unlock(&mutex);
     return buf;
 }
 #endif
 
-
-#ifndef HAVE_LOCALTIME_R 
-struct tm *
-localtime_r(const time_t *clock, struct tm *result)
-{
-    LOCK(time_lock);
-    memcpy(result, localtime(clock), sizeof(struct tm));
-    UNLOCK(time_lock);
-    return result;
-}
-#endif
-
-
-#ifndef HAVE_GMTIME_R
-struct tm *
-gmtime_r(const time_t *clock, struct tm *result)
-{
-    LOCK(time_lock);
-    memcpy(result, gmtime(clock), sizeof(struct tm));
-    UNLOCK(time_lock);
-    return result;
-}
-#endif
 #endif

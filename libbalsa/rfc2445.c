@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /*
  * VCalendar (RFC 2445) stuff
- * Copyright (C) 2009 Albrecht Dreﬂ <albrecht.dress@arcor.de>
+ * Copyright (C) 2009 Albrecht Dre√ü <albrecht.dress@arcor.de>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -243,6 +243,54 @@ libbalsa_vevent_new(void)
         s = text_2445_unescape(v);              \
     } while (0)
 
+/*
+ * Find the first occurrence of c in s that is not in a double-quoted
+ * string.
+ *
+ * Note that if c is '\0', the return value is NULL, *not* a pointer to
+ * the terminating '\0' (c.f. strchr).
+ */
+static gchar *
+vcal_strchr(gchar * s, gint c)
+{
+    gboolean is_quoted = FALSE;
+
+    while (*s) {
+        if (*s == '"')
+            is_quoted = !is_quoted;
+        else if (*s == c && !is_quoted)
+            return s;
+        ++s;
+    }
+
+    return NULL;
+}
+
+/*
+ * Split the string s at unquoted occurrences of c.
+ *
+ * Note that c is a single character, not a string, as in g_strsplit,
+ * and that there is no limit on the number of splits.
+ *
+ * Returns a newly-allocated NULL-terminated array of strings. Use
+ * g_strfreev() to free it.
+ */
+static gchar **
+vcal_strsplit_at_char(gchar * s, gint c)
+{
+    GPtrArray *array = g_ptr_array_new();
+    gchar *p;
+
+    while ((p = vcal_strchr(s, c))) {
+        g_ptr_array_add(array, g_strndup(s, p - s));
+        s = p + 1;
+    }
+    g_ptr_array_add(array, g_strdup(s));
+    g_ptr_array_add(array, NULL);
+
+    return (gchar **) g_ptr_array_free(array, FALSE);
+}
+
 /* parse a text/calendar part and convert it into a LibBalsaVCal object */
 LibBalsaVCal *
 libbalsa_vcal_new_from_body(LibBalsaMessageBody * body)
@@ -312,12 +360,12 @@ libbalsa_vcal_new_from_body(LibBalsaMessageBody * body)
 	    if (!g_ascii_strcasecmp("BEGIN:VEVENT", lines[k]))
 		event = libbalsa_vevent_new();
 	} else if (strlen(lines[k])) {
-	    gchar *value = strchr(lines[k], ':');
+	    gchar *value = vcal_strchr(lines[k], ':');
 	    gchar **entry;
 
 	    if (value)
 		*value++ = '\0';
-	    entry = g_strsplit(lines[k], ";", -1);
+	    entry = vcal_strsplit_at_char(lines[k], ';');
 	    if (!g_ascii_strcasecmp(entry[0], "END")) {
                 if (value && !g_ascii_strcasecmp(value, "VEVENT")) {
                     retval->vevent = g_list_append(retval->vevent, event);
@@ -486,62 +534,27 @@ libbalsa_vevent_reply(const LibBalsaVEvent * event, const gchar * sender,
 
 /* -- rfc 2445 parser helper functions -- */
 
-#define FILL_TM(tm, buf, idx)                   \
-    do {                                        \
-        tm = atoi(buf + idx);                   \
-        buf[idx] = '\0';                        \
-    } while (0)
-
 /* convert a rfc 2445 time string into a time_t value */
 // FIXME - what about entries containing a TZID?
 static time_t
-date_time_2445_to_time_t(const gchar * date_time)
+date_time_2445_to_time_t(const gchar *date_time)
 {
     gint len;
-    struct tm tm_buf;
-    char strbuf[17];
-    time_t the_time;
-    struct tm utc_tm;
-    time_t utc_time;
-    gint diff_min;
+    time_t the_time = (time_t) (-1);;
 
     g_return_val_if_fail(date_time != NULL, (time_t) (-1));
     len = strlen(date_time);
 
     /* must be yyyymmddThhmmssZ? */
-    if (len < 15 || len > 16 || date_time[8] != 'T' ||
-	(len == 16 && date_time[15] != 'Z'))
-	return (time_t) - 1;
+    if (((len == 15) || ((len == 16) && (date_time[15] == 'Z'))) &&
+    	(date_time[8] == 'T')) {
+        GTimeVal timeval;
 
-    /* fill for conversion... */
-    strcpy(strbuf, date_time);	/* safe, due to checks above */
-    if (len == 16) {
-	strbuf[15] = '\0';
+        /* the rfc2445 date-time is a special case of an iso8901 date/time value... */
+        if (g_time_val_from_iso8601(date_time, &timeval)) {
+        	the_time = timeval.tv_sec;
+        }
     }
-    FILL_TM(tm_buf.tm_sec, strbuf, 13);
-    FILL_TM(tm_buf.tm_min, strbuf, 11);
-    FILL_TM(tm_buf.tm_hour, strbuf, 9);
-    FILL_TM(tm_buf.tm_mday, strbuf, 6);
-    FILL_TM(tm_buf.tm_mon, strbuf, 4);
-    FILL_TM(tm_buf.tm_year, strbuf, 0);
-    tm_buf.tm_mon--;
-    tm_buf.tm_year -= 1900;
-    tm_buf.tm_isdst = -1;
-    the_time = mktime(&tm_buf);
-
-    /* return value if local time was requested */
-    if (len == 15)
-	return the_time;
-
-    /* adjust for utc */
-    gmtime_r(&the_time, &utc_tm);
-    utc_tm.tm_isdst = -1;
-    utc_time = mktime(&utc_tm);
-    diff_min = (utc_time - the_time) / 60;
-    tm_buf.tm_min -= diff_min % 60;
-    tm_buf.tm_hour -= diff_min / 60;
-    tm_buf.tm_isdst = -1;
-    the_time = mktime(&tm_buf);
 
     return the_time;
 }
@@ -550,12 +563,15 @@ date_time_2445_to_time_t(const gchar * date_time)
 static gchar *
 time_t_to_date_time_2445(time_t ttime)
 {
-    gchar *retval = g_malloc(17);
-    struct tm tm;
+	gchar *retval = NULL;
+	GDateTime *date_time;
 
-    gmtime_r(&ttime, &tm);
-    strftime(retval, 17, "%Y%m%dT%H%M%SZ", &tm);
-    return retval;
+	date_time = g_date_time_new_from_unix_utc(ttime);
+	if (date_time != NULL) {
+		retval = g_date_time_format(date_time, "%Y%m%dT%H%M%SZ");
+		g_date_time_unref(date_time);
+	}
+	return retval;
 }
 
 

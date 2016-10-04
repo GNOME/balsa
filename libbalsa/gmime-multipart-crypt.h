@@ -20,7 +20,9 @@
  * GNU General Public License for more details.
  *  
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, see <http://www.gnu.org/licenses/>.
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  
+ * 02111-1307, USA.
  */
 
 #ifndef __GMIME_MULTIPART_CRYPT_H__
@@ -37,21 +39,16 @@
 #include "gmime-gpgme-signature.h"
 
 
-#ifdef __cplusplus
-extern "C" {
-#ifdef MAKE_EMACS_HAPPY
-}
-#endif
-#endif				/* __cplusplus */
+G_BEGIN_DECLS
 
 
 GMimeGpgmeSigstat *g_mime_gpgme_mps_verify(GMimeMultipartSigned * mps,
 					   GError ** error);
-int g_mime_gpgme_mps_sign(GMimeMultipartSigned * mps,
+gboolean g_mime_gpgme_mps_sign(GMimeMultipartSigned * mps,
 			  GMimeObject * content, const gchar * userid,
 			  gpgme_protocol_t protocol, GtkWindow * parent,
 			  GError ** err);
-int g_mime_gpgme_mpe_encrypt(GMimeMultipartEncrypted * mpe,
+gboolean g_mime_gpgme_mpe_encrypt(GMimeMultipartEncrypted * mpe,
 			     GMimeObject * content, GPtrArray * recipients,
 			     gboolean trust_all, GtkWindow * parent,
 			     GError ** err);
@@ -60,8 +57,7 @@ GMimeObject *g_mime_gpgme_mpe_decrypt(GMimeMultipartEncrypted * mpe,
 				      GtkWindow * parent, GError ** err);
 
 
-#ifdef __cplusplus
-}
-#endif				/* __cplusplus */
+G_END_DECLS
+
 
 #endif				/* __GMIME_MULTIPART_CRYPT_H__ */

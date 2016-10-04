@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2009 Stuart Parmenter and others,
+ * Copyright (C) 1997-2013 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -40,6 +40,39 @@
 #include "address-book.h"
 #include "cell-renderer-button.h"
 #include "misc.h"
+
+struct _LibBalsaAddressView {
+    GtkTreeView parent;
+
+    /*
+     * Permanent data
+     */
+    const gchar *const *types;
+    guint n_types;
+    gboolean fallback;
+    GList *address_book_list;
+
+    gchar *domain;
+
+    GtkTreeViewColumn *type_column;
+    GtkTreeViewColumn *focus_column;
+    GtkCellRenderer   *renderer_combo;
+
+    /*
+     * Ephemera
+     */
+    gboolean last_was_escape;   /* keystroke    */
+
+    GtkTreeRowReference *focus_row;     /* set cursor   */
+    guint focus_idle_id;        /* ditto        */
+
+    GtkCellEditable *editable;  /* cell editing */
+    gchar *path_string;         /* ditto        */
+};
+
+struct _LibBalsaAddressViewClass {
+    GtkTreeViewClass parent_class;
+};
 
 /*
  *     GObject class boilerplate
@@ -127,9 +160,7 @@ const gchar *const libbalsa_address_view_types[] = {
     N_("To:"),
     N_("Cc:"),
     N_("Bcc:"),
-#if !defined(ENABLE_TOUCH_UI)
     N_("Reply To:"),
-#endif                          /* ENABLE_TOUCH_UI */
 };
 
 /* Pixbufs */
@@ -233,33 +264,25 @@ lbav_entry_setup_matches(LibBalsaAddressView * address_view,
 
 /*
  *     Idle callback to set the GtkTreeView's cursor.
+ *
+ *     Scheduled with gdk_threads_add_idle, so it already holds the GDK
+ *     lock, and its GSource has not been removed.
  */
 static gboolean
 lbav_ensure_blank_line_idle_cb(LibBalsaAddressView * address_view)
 {
     GtkTreePath *focus_path;
 
-    gdk_threads_enter();
-
     focus_path = gtk_tree_row_reference_get_path(address_view->focus_row);
     gtk_tree_row_reference_free(address_view->focus_row);
     address_view->focus_row = NULL;
 
-    /* This will open the entry for editing;
-     * NOTE: the GtkTreeView documentation states that:
-     *  "This function is often followed by
-     *   gtk_widget_grab_focus(tree_view) in order to give keyboard
-     *   focus to the widget."
-     * but in fact, that leaves the entry /not/ open for editing. */
-    gtk_tree_view_set_cursor_on_cell(GTK_TREE_VIEW(address_view),
-                                     focus_path,
-                                     address_view->focus_column,
-                                     address_view->focus_cell, TRUE);
+    /* This will open the entry for editing */
+    gtk_tree_view_set_cursor(GTK_TREE_VIEW(address_view), focus_path,
+                             address_view->focus_column, TRUE);
     gtk_tree_path_free(focus_path);
 
     address_view->focus_idle_id = 0;
-
-    gdk_threads_leave();
 
     return FALSE;
 }
@@ -326,8 +349,9 @@ lbav_ensure_blank_line(LibBalsaAddressView * address_view,
 
     if (!address_view->focus_idle_id)
         address_view->focus_idle_id =
-            g_idle_add((GSourceFunc) lbav_ensure_blank_line_idle_cb,
-                       address_view);
+            gdk_threads_add_idle((GSourceFunc)
+                                 lbav_ensure_blank_line_idle_cb,
+                                 address_view);
 }
 
 /*
@@ -469,8 +493,7 @@ lbav_set_or_add(LibBalsaAddressView * address_view, guint type,
  * Parse new text and set it in the address store.
  */
 static void
-lbav_set_text_at_path(LibBalsaAddressView * address_view,
-                      const gchar * text, const gchar * path_string)
+lbav_set_text(LibBalsaAddressView * address_view, const gchar * text)
 {
     GtkTreeView *tree_view = GTK_TREE_VIEW(address_view);
     GtkTreeModel *model = gtk_tree_view_get_model(tree_view);
@@ -482,7 +505,7 @@ lbav_set_text_at_path(LibBalsaAddressView * address_view,
     gboolean valid;
     guint count;
 
-    path = gtk_tree_path_new_from_string(path_string);
+    path = gtk_tree_path_new_from_string(address_view->path_string);
     valid = gtk_tree_model_get_iter(model, &iter, path);
     gtk_tree_path_free(path);
     if (!valid)
@@ -579,7 +602,7 @@ lbav_key_pressed_cb(GtkEntry * entry,
 {
     GtkEntryCompletion *completion;
 
-    if (event->keyval != GDK_Escape)
+    if (event->keyval != GDK_KEY_Escape)
         return FALSE;
 
     if (address_view->last_was_escape) {
@@ -713,6 +736,19 @@ lbav_combo_edited_cb(GtkCellRendererText * renderer,
     gtk_widget_grab_focus(GTK_WIDGET(address_view));
 }
 
+/*
+ *     Callback for the cell-editable's "editing-done" signal
+ *     Store the new text.
+ */
+static void
+lbav_editing_done(GtkCellEditable * cell_editable,
+                  LibBalsaAddressView * address_view)
+{
+    const gchar *text = gtk_entry_get_text(GTK_ENTRY(cell_editable));
+
+    lbav_set_text(address_view, text);
+}
+
 
 /*
  * Focus Out callback
@@ -792,6 +828,8 @@ lbav_row_editing_cb(GtkCellRenderer * renderer,
                      G_CALLBACK(lbav_key_pressed_cb), address_view);
     g_signal_connect(editable, "insert-text",
                      G_CALLBACK(lbav_insert_text_cb), address_view);
+    g_signal_connect(editable, "editing-done",
+                     G_CALLBACK(lbav_editing_done), address_view);
     g_signal_connect_after(GTK_ENTRY(editable), "focus-out-event",
 			   G_CALLBACK(lbav_focus_out_cb), address_view);
     gtk_entry_set_completion(GTK_ENTRY(editable), completion);
@@ -801,33 +839,6 @@ lbav_row_editing_cb(GtkCellRenderer * renderer,
     address_view->editable = editable;
     g_free(address_view->path_string);
     address_view->path_string = g_strdup(path_string);
-}
-
-/*
- *     Callback for the tree-view's "edited" signal
- */
-static void
-lbav_row_edited_cb(GtkCellRendererText * renderer,
-                   const gchar * path_string,
-                   const gchar * new_text,
-                   LibBalsaAddressView * address_view)
-{
-    lbav_set_text_at_path(address_view, new_text, path_string);
-}
-
-/*
- *     Callback for the tree-view's "editing-canceled" signal
- *     NOTE: We treat this the same as "edited", to avoid a lot of user
- *     surprises.
- */
-static void
-lbav_row_editing_canceled_cb(GtkCellRendererText * renderer,
-                             LibBalsaAddressView * address_view)
-{
-    const gchar *text =
-        gtk_entry_get_text(GTK_ENTRY(address_view->editable));
-
-    lbav_set_text_at_path(address_view, text, address_view->path_string);
 }
 
 /*
@@ -876,6 +887,30 @@ lbav_button_activated_cb(LibBalsaCellRendererButton * button,
     gtk_tree_path_free(path);
 }
 
+/*
+ *     Callback for the drop_down's "activated" signal
+ *
+ *     Pop up the address type combo-box
+ */
+static void
+lbav_drop_down_activated_cb(LibBalsaCellRendererButton * drop_down,
+                            const gchar * path_string,
+                            LibBalsaAddressView * address_view)
+{
+    GtkTreePath *path;
+
+    path = gtk_tree_path_new_from_string(path_string);
+    gtk_tree_view_set_cursor_on_cell(GTK_TREE_VIEW(address_view),
+                                     path,
+                                     address_view->type_column,
+                                     address_view->renderer_combo,
+                                     TRUE);
+    gtk_tree_path_free(path);
+}
+
+/*
+ * Sort function for the address store
+ */
 static gint
 lbav_sort_func(GtkTreeModel * model, GtkTreeIter * a, GtkTreeIter * b,
                gpointer user_data)
@@ -1018,10 +1053,11 @@ libbalsa_address_view_new(const gchar * const *types,
             gtk_list_store_set(type_store, &iter, 0, _(types[i]), -1);
         }
 
-        column = gtk_tree_view_column_new();
+        address_view->type_column = column = gtk_tree_view_column_new();
 
         /* The address type combo: */
-        renderer = gtk_cell_renderer_combo_new();
+        address_view->renderer_combo = renderer =
+            gtk_cell_renderer_combo_new();
         g_object_set(renderer,
                      "editable", TRUE,
                      "has-entry", FALSE,
@@ -1040,26 +1076,24 @@ libbalsa_address_view_new(const gchar * const *types,
 
         /* Add a drop-down icon to indicate that this is in fact a
          * combo: */
-        renderer = gtk_cell_renderer_pixbuf_new();
+        renderer = libbalsa_cell_renderer_button_new();
+        g_signal_connect(renderer, "activated",
+                         G_CALLBACK(lbav_drop_down_activated_cb),
+                         address_view);
         g_object_set(renderer, "pixbuf", lbav_drop_down_icon, NULL);
         gtk_tree_view_column_pack_start(column, renderer, FALSE);
 
         gtk_tree_view_append_column(tree_view, column);
     }
 
-    /* Column for the entry widget and the address-book/remove button. */
+    /* Column for the entry widget. */
     address_view->focus_column = column = gtk_tree_view_column_new();
 
     /* The address entry: */
-    address_view->focus_cell = renderer = gtk_cell_renderer_text_new();
+    renderer = gtk_cell_renderer_text_new();
     g_object_set(renderer, "editable", TRUE, NULL);
     g_signal_connect(renderer, "editing-started",
                      G_CALLBACK(lbav_row_editing_cb), address_view);
-    g_signal_connect(renderer, "edited",
-                     G_CALLBACK(lbav_row_edited_cb), address_view);
-    g_signal_connect(renderer, "editing-canceled",
-                     G_CALLBACK(lbav_row_editing_canceled_cb),
-                     address_view);
     gtk_tree_view_column_pack_start(column, renderer, TRUE);
     gtk_tree_view_column_set_attributes(column, renderer,
                                         "text", ADDRESS_NAME_COL, NULL);

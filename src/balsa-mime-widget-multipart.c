@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2001 Stuart Parmenter and others,
+ * Copyright (C) 1997-2013 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -39,7 +39,7 @@ balsa_mime_widget_new_multipart(BalsaMessage * bm,
     g_return_val_if_fail(content_type != NULL, NULL);
 
     mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
-    mw->widget = mw->container = gtk_vbox_new(FALSE, BMW_MESSAGE_PADDING);
+    mw->widget = mw->container = gtk_box_new(GTK_ORIENTATION_VERTICAL, BMW_MESSAGE_PADDING);
 
 #ifdef HAVE_GPGME
     if (!g_ascii_strcasecmp("multipart/signed", content_type) &&

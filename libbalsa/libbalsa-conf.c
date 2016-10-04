@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2005 Stuart Parmenter and others,
+ * Copyright (C) 1997-2013 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -144,7 +144,6 @@ lbc_init(LibBalsaConf * conf, const gchar * filename,
     }
 }
 
-#ifdef BALSA_USE_THREADS
 static GRecMutex lbc_mutex;
 
 static void
@@ -165,20 +164,6 @@ lbc_unlock(void)
 {
     g_rec_mutex_unlock(&lbc_mutex);
 }
-#else                           /* BALSA_USE_THREADS */
-static void
-lbc_lock(void)
-{
-    static gboolean initialized = FALSE;
-    if (!initialized) {
-        lbc_init(&lbc_conf, "config", ".gnome2");
-        lbc_init(&lbc_conf_priv, "config-private", ".gnome2_private");
-        initialized = TRUE;
-    }
-}
-
-#define lbc_unlock()
-#endif                          /* BALSA_USE_THREADS */
 
 /* 
  * Call @func for each group that begins with @prefix.
@@ -262,6 +247,16 @@ libbalsa_conf_has_group(const char *group)
 {
     return (g_key_file_has_group(lbc_conf.key_file, group) ||
             g_key_file_has_group(lbc_conf_priv.key_file, group));
+}
+
+gboolean
+libbalsa_conf_has_key(const gchar * key)
+{
+    /* g_key_file_has_key returns FALSE on error, but that is OK */
+    return (g_key_file_has_key(lbc_conf.key_file, lbc_groups->data,
+                               key, NULL) ||
+            g_key_file_has_key(lbc_conf_priv.key_file, lbc_groups->data,
+                                  key, NULL));
 }
 
 static void
@@ -521,11 +516,47 @@ lbc_sync(LibBalsaConf * conf)
     g_free(buf);
 }
 
+static guint lbc_sync_idle_id;
+G_LOCK_DEFINE_STATIC(lbc_sync_idle_id);
+
 void
 libbalsa_conf_sync(void)
 {
+    G_LOCK(lbc_sync_idle_id);
+#if DEBUG
+    g_print("%s id %d, will be cleared\n", __func__, lbc_sync_idle_id);
+#endif                          /* DEBUG */
+    if (lbc_sync_idle_id) {
+        g_source_remove(lbc_sync_idle_id);
+        lbc_sync_idle_id = 0;
+    }
+    G_UNLOCK(lbc_sync_idle_id);
     lbc_lock();
     lbc_sync(&lbc_conf);
     lbc_sync(&lbc_conf_priv);
     lbc_unlock();
+}
+
+static gboolean
+libbalsa_conf_sync_idle_cb(gpointer data)
+{
+    libbalsa_conf_sync();
+
+    return FALSE;
+}
+
+void
+libbalsa_conf_queue_sync(void)
+{
+    G_LOCK(lbc_sync_idle_id);
+#if DEBUG
+    g_print("%s id %d, will be set if zero\n", __func__, lbc_sync_idle_id);
+#endif                          /* DEBUG */
+    if (!lbc_sync_idle_id)
+        lbc_sync_idle_id =
+            g_idle_add((GSourceFunc) libbalsa_conf_sync_idle_cb, NULL);
+#if DEBUG
+    g_print("%s id now %d\n", __func__, lbc_sync_idle_id);
+#endif                          /* DEBUG */
+    G_UNLOCK(lbc_sync_idle_id);
 }

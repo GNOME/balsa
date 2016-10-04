@@ -1,0 +1,90 @@
+<!DOCTYPE page
+[<!ENTITY % balsa SYSTEM "balsa.entities">%balsa; ]>
+<page xmlns="http://projectmallard.org/1.0/" type="topic"
+id="preferences-address-books">
+  <info>
+    <link type="topic" xref="preferences" />
+    <link type="guide" xref="preferences" />
+  </info>
+  <title>Address Book Preferences</title>
+  <p>&Balsa; supports the use of multiple address books, both
+  local
+  <link xref="glossary#vcard">VCARD</link> and remote &LDAP;
+  address books, both of which can be configured here.
+  &GnomeCard; also uses VCARD address books, so this allows
+  &Balsa; to share address books with other GNOME
+  applications.</p>
+  <p>&Balsa; also supports LDIF address books, and can be built
+  to use GPE address books, when SQLite is available, and Rubrica
+  address books. Which types are supported depends on how
+  &Balsa; was built.</p>
+  <p>The main portion of the preferences page is occupied by the
+  list of current address books for &Balsa;. The list shows the
+  type of address book, the name, and whether it is included in
+  automatic alias expansion when typing new messages. There are
+  also several buttons that manipulate the list of address
+  books:</p>
+  <terms>
+    <item>
+      <title>
+        <gui>Add</gui>
+      </title>
+      <p>Using this adds a new address book for &Balsa; to use
+      to find addresses. If you click it, a drop-down menu of the
+      supported address book types is shown. Click one to begin the
+      process. &Balsa; pops up a dialog, which, if you choose
+      VCARD, looks like this:</p>
+      <figure>
+        <title>VCARD Address Book Dialog</title>
+        <media type="image" src="figures/address-book-vcard.png" />
+      </figure>
+      <p>With &LDAP; support, the dialog looks somewhat
+      different, offering options to set the location of the
+      directory instead of a file.</p>
+      <figure>
+        <title>&LDAP; Address Book Dialog</title>
+        <media type="image" src="figures/address-book-ldap.png" />
+      </figure>
+      <p>In order to use a LDAP address book, you need to know the
+      host name of the LDAP server. Depending on the server
+      configuration, you may need also so called Base Domain Name
+      which identifies your particular department. You can always
+      try leaving Base Domain Name field empty and a default value
+      will be used (OpenLDAP stores the default Base Domain Name in
+
+      <file>/etc/openldap/ldap.conf</file>). If this does not work,
+      you may need to ask your administrator for the value of this.
+      The usual values are usually similar to:
+      "dc=theochem,dc=KTH,dc=se" or "o=Theoretical Chemistry,
+      c=SE".</p>
+    </item>
+    <item>
+      <title>
+        <gui>Modify</gui>
+      </title>
+      <p>This enables you to change the properties of the selected
+      address book.</p>
+      <figure>
+        <title>Modify an Address Book</title>
+        <media type="image"
+        src="figures/address-book-modify.png" />
+      </figure>
+      <p>It is possible to modify both the name and location for
+      any address book. Also, you can change whether the contents
+      of the address book will be used when attempting to
+      auto-complete an address when sending a message.</p>
+    </item>
+    <item>
+      <title>
+        <gui>Delete</gui>
+      </title>
+      <p>Delete the selected address book.</p>
+    </item>
+    <item>
+      <title>
+        <gui>Set as Default</gui>
+      </title>
+      <p>Set the selected address book as default.</p>
+    </item>
+  </terms>
+</page>

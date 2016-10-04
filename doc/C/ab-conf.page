@@ -1,0 +1,103 @@
+<!DOCTYPE page
+[<!ENTITY % balsa SYSTEM "balsa.entities"> %balsa; ]>
+<page xmlns="http://projectmallard.org/1.0/" type="topic"
+id="ab-conf">
+  <info>
+    <link type="guide" xref="index" />
+  </info>
+<title>Address Book Configuration</title>
+  <p>This is to be filled in.</p>
+
+<section id="CHOICE">
+  <title>Address book type</title>
+  <p>You can choose among several address book types.</p>
+</section>
+
+<section id="EXTERN">
+<title>External address book</title>
+<!-- Balsa support for an external query addressbook -->
+<!-- By Jelmer Vernooij <jelmer@nl.linux.org>        -->
+
+<p>The balsa addressbook supports input from programs. Thus, you
+can use (no importing needed!) for example your pine or mutt
+addressbook. The mutt mailer (<link
+href="http://www.mutt.org/">www.mutt.org</link>) uses an identical
+system to retrieve addresses from programs.</p>
+
+  <section id="extern-existing-programs">
+   <title>Existing programs</title>
+
+<p>The following programs are compatible with the mutt mail reader
+and <em>should</em> be with balsa. Submit links to more programs.</p>
+
+<list>
+<item><p>
+<link href="http://www.spinnaker.de/lbdb/"
+       type="http">http://www.spinnaker.de/lbdb/</link> - The little
+brother database. Read emailaddresses and names from: finger,
+/etc/passwd, incoming procmail email, NIS, fido, the abook program,
+mutt addressbook, pine addressbook, palm addressbook, gnomecard
+addressbook, big brother database, ldap database.
+</p></item>
+
+<item><p>
+<link href="http://www.fiction.net/blong/programs/mutt/">http://www.fiction.net/blong/programs/mutt/</link>
+ - palm address database, ldapsearch wrapper, ph/qi server, UIUC, ph,
+</p></item>
+</list>
+</section>
+
+<section id="extern-load-scripts">
+<title>Writing your own load scripts</title>
+
+<p>&Balsa; ignores the first line of output from your program. You
+might want to write comments or debug output on this line. The
+remaining lines should have this format:</p>
+<p><output>
+e-mail address	full name	nickname
+</output></p>
+
+<p>The three fields should be separated by tabs. The third field is
+currently not used by balsa, but might be in the future. It is also
+kept to ensure compatibility with mutt. </p>
+
+<p>&Balsa; executes your script with one argument: the pattern to
+search for. A space (" ") is used as the first argument when creating
+a list of all users.</p>
+
+<p>All characters are allowed, except the tab (\t), since that
+is the field separator.
+</p>
+
+<p>An example output could be:</p>
+<p><output>
+lbdbq: 3 matches
+</output></p>
+<p><output>
+balsa-list@gnome.org	Balsa List	balsa-list
+</output></p><p><output>
+jelmer@nl.linux.org	Jelmer Vernooij	jelmer
+</output></p><p><output>
+balsa-maintainer@theochem.kth.se	Pawel Salek	balsa-maintainer
+</output></p>
+
+
+<note><p>Your script/program should write its output to stdout and not
+to stderr!
+</p></note>
+</section>
+
+<section id="extern-save-scripts">
+<title>Writing your own save scripts</title>
+
+<p>Adding addresses is also possible. Your script should receive 3
+arguments. The first is an email address, the second a full name and
+the third is an alias (currently not used and replaced by 'TODO').</p>
+
+<p>Note that mutt does not have support for adding addresses and there is thus no compatibility in this case.</p>
+
+<p>Comments are welcome:
+<link href="mailto:jelmer@nl.linux.org">jelmer@nl.linux.org</link></p>
+</section>
+</section> <!-- EXTERN -->
+</page>

@@ -460,10 +460,9 @@ libbalsa_vfs_get_text_attr(const LibbalsaVfs * file)
 }
 
 
-gsize
+guint64
 libbalsa_vfs_get_size(const LibbalsaVfs * file)
 {
-    gsize retval = 0;
     struct _LibbalsaVfsPriv * priv;
 
     g_return_val_if_fail(file, 0);
@@ -479,11 +478,10 @@ libbalsa_vfs_get_size(const LibbalsaVfs * file)
             g_file_query_info(priv->gio_gfile, GIO_INFO_ATTS,
                               G_FILE_QUERY_INFO_NONE, NULL, NULL);
     if (priv->info)
-        retval =
-            (gsize) g_file_info_get_attribute_uint64(priv->info,
-                                                     G_FILE_ATTRIBUTE_STANDARD_SIZE);
+        return g_file_info_get_attribute_uint64(priv->info,
+                                                G_FILE_ATTRIBUTE_STANDARD_SIZE);
 
-    return retval;
+    return 0;
 }
 
 

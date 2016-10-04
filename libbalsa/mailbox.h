@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2002 Stuart Parmenter and others,
+ * Copyright (C) 1997-2013 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -27,10 +27,6 @@
 
 #include <gdk/gdk.h>
 #include <gmime/gmime.h>
-
-#ifdef BALSA_USE_THREADS
-#include <pthread.h>
-#endif
 
 #include "libbalsa.h"
 
@@ -160,7 +156,6 @@ typedef struct _LibBalsaMailboxClass LibBalsaMailboxClass;
 
 typedef struct _LibBalsaMailboxView LibBalsaMailboxView;
 struct _LibBalsaMailboxView {
-    InternetAddressList *mailing_list_address;
     gchar *identity_name;
     LibBalsaMailboxThreadingType threading_type;
     /** filter is a frontend-specific code determining used view
@@ -178,7 +173,6 @@ struct _LibBalsaMailboxView {
     gboolean exposed;
     gboolean open;
     gboolean in_sync;		/* view is in sync with config */
-    gboolean frozen;		/* don't update view if set    */
     gboolean used;		/* keep track of usage         */
 
 #ifdef HAVE_GPGME
@@ -211,9 +205,7 @@ struct _LibBalsaMailbox {
     
     int lock; /* 0 if mailbox is unlocked; */
               /* >0 if mailbox is (recursively locked). */
-#ifdef BALSA_USE_THREADS
-    pthread_t thread_id; /* id of thread that locked the mailbox */
-#endif
+    GThread *thread_id; /* id of thread that locked the mailbox */
     gboolean is_directory;
     gboolean readonly;
     gboolean disconnected;
@@ -252,19 +244,21 @@ struct _LibBalsaMailbox {
     /* Whether the tree has been changed since some event. */
     gboolean msg_tree_changed;
 
-#ifdef BALSA_USE_THREADS
     /* Array of msgnos that need to be displayed. */
     GArray *msgnos_pending;
     /* Array of msgnos that have been changed. */
     GArray *msgnos_changed;
-#endif                          /* BALSA_USE_THREADS */
+
+    guint changed_idle_id;
+    guint queue_check_idle_id;
 };
 
 /* Search iter */
 struct _LibBalsaMailboxSearchIter {
-    LibBalsaMailbox *mailbox;
+    gint ref_count;
     gint stamp;
-    LibBalsaCondition *condition;	
+    LibBalsaMailbox *mailbox;
+    LibBalsaCondition *condition;
     gpointer user_data;		/* private backend info */
 };
 
@@ -337,9 +331,7 @@ struct _LibBalsaMailboxClass {
     gboolean (*close_backend)(LibBalsaMailbox * mailbox);
     guint (*total_messages)(LibBalsaMailbox * mailbox);
     GArray *(*duplicate_msgnos) (LibBalsaMailbox * mailbox);
-#if BALSA_USE_THREADS
     void (*lock_store) (LibBalsaMailbox * mailbox, gboolean lock);
-#endif                          /* BALSA_USE_THREADS */
 };
 
 GType libbalsa_mailbox_get_type(void);
@@ -441,17 +433,19 @@ gboolean libbalsa_mailbox_message_match(LibBalsaMailbox  *mailbox,
 					LibBalsaMailboxSearchIter *search_iter);
 
 /* Search iter */
-LibBalsaMailboxSearchIter *libbalsa_mailbox_search_iter_new(LibBalsaCondition
-							    * condition);
-LibBalsaMailboxSearchIter *libbalsa_mailbox_search_iter_view(LibBalsaMailbox
-							     * mailbox);
+LibBalsaMailboxSearchIter
+    *libbalsa_mailbox_search_iter_new(LibBalsaCondition * condition);
+LibBalsaMailboxSearchIter
+    *libbalsa_mailbox_search_iter_view(LibBalsaMailbox * mailbox);
+LibBalsaMailboxSearchIter
+    *libbalsa_mailbox_search_iter_ref(LibBalsaMailboxSearchIter * iter);
+void libbalsa_mailbox_search_iter_unref(LibBalsaMailboxSearchIter * iter);
 gboolean libbalsa_mailbox_search_iter_step(LibBalsaMailbox * mailbox,
 					   LibBalsaMailboxSearchIter 
 					   * search_iter,
 					   GtkTreeIter * iter,
 					   gboolean forward,
 					   guint stop_msgno);
-void libbalsa_mailbox_search_iter_free(LibBalsaMailboxSearchIter * iter);
 
 /* Default filtering function (on reception)
    It is ONLY FOR INTERNAL USE
@@ -500,8 +494,6 @@ gint libbalsa_mailbox_move_duplicates(LibBalsaMailbox * mailbox,
  * Mailbox views-related functions.
  */
 typedef struct LibBalsaMailboxIndexEntry_ LibBalsaMailboxIndexEntry;
-LibBalsaMailboxIndexEntry* libbalsa_mailbox_index_entry_new_from_msg
-                           (LibBalsaMessage *msg);
 void libbalsa_mailbox_index_entry_set_no(LibBalsaMailboxIndexEntry *entry,
                                          unsigned no);
 void libbalsa_mailbox_index_entry_clear(LibBalsaMailbox * mailbox,
@@ -533,8 +525,6 @@ void libbalsa_mailbox_unlink_and_prepend(LibBalsaMailbox * mailbox,
 					 GNode * node, GNode * parent);
 
 /* Mailbox views. */
-extern GHashTable *libbalsa_mailbox_view_table;
-
 LibBalsaMailboxView *libbalsa_mailbox_view_new(void);
 void libbalsa_mailbox_view_free(LibBalsaMailboxView * view);
 gboolean libbalsa_mailbox_set_identity_name(LibBalsaMailbox * mailbox,
@@ -555,7 +545,6 @@ void libbalsa_mailbox_set_exposed(LibBalsaMailbox * mailbox,
 				  gboolean exposed);
 void libbalsa_mailbox_set_open(LibBalsaMailbox * mailbox, gboolean open);
 void libbalsa_mailbox_set_filter(LibBalsaMailbox * mailbox, gint filter);
-void libbalsa_mailbox_set_frozen(LibBalsaMailbox * mailbox, gboolean frozen);
 #ifdef HAVE_GPGME
 gboolean libbalsa_mailbox_set_crypto_mode(LibBalsaMailbox * mailbox,
 					  LibBalsaChkCryptoMode gpg_chk_mode);
@@ -564,8 +553,6 @@ void libbalsa_mailbox_set_unread(LibBalsaMailbox * mailbox, gint unread);
 void libbalsa_mailbox_set_total (LibBalsaMailbox * mailbox, gint total);
 void libbalsa_mailbox_set_mtime (LibBalsaMailbox * mailbox, time_t mtime);
 
-InternetAddressList
-    *libbalsa_mailbox_get_mailing_list_address(LibBalsaMailbox * mailbox);
 const gchar *libbalsa_mailbox_get_identity_name(LibBalsaMailbox * mailbox);
 LibBalsaMailboxThreadingType
 libbalsa_mailbox_get_threading_type(LibBalsaMailbox * mailbox);
@@ -579,7 +566,6 @@ LibBalsaMailboxSubscribe libbalsa_mailbox_get_subscribe(LibBalsaMailbox *
 gboolean libbalsa_mailbox_get_exposed(LibBalsaMailbox * mailbox);
 gboolean libbalsa_mailbox_get_open(LibBalsaMailbox * mailbox);
 gint libbalsa_mailbox_get_filter(LibBalsaMailbox * mailbox);
-gboolean libbalsa_mailbox_get_frozen(LibBalsaMailbox * mailbox);
 #ifdef HAVE_GPGME
 LibBalsaChkCryptoMode libbalsa_mailbox_get_crypto_mode(LibBalsaMailbox * mailbox);
 #endif
@@ -593,8 +579,6 @@ void libbalsa_mailbox_msgno_inserted(LibBalsaMailbox * mailbox,
                                      guint seqno, GNode * parent,
                                      GNode ** sibling);
 void libbalsa_mailbox_msgno_removed(LibBalsaMailbox  *mailbox, guint seqno);
-void libbalsa_mailbox_msgno_filt_in(LibBalsaMailbox * mailbox, guint seqno);
-void libbalsa_mailbox_msgno_filt_out(LibBalsaMailbox * mailbox, guint seqno);
 void libbalsa_mailbox_msgno_filt_check(LibBalsaMailbox * mailbox,
 				       guint seqno,
 				       LibBalsaMailboxSearchIter
@@ -659,19 +643,10 @@ void libbalsa_mailbox_set_foreground(LibBalsaMailbox * mailbox,
 void libbalsa_mailbox_set_background(LibBalsaMailbox * mailbox,
                                      GArray * msgnos, const gchar * color);
 
-#if BALSA_USE_THREADS
-
 /* Lock and unlock the mail store--currently, a no-op except for mbox.
  */
 void libbalsa_mailbox_lock_store  (LibBalsaMailbox * mailbox);
 void libbalsa_mailbox_unlock_store(LibBalsaMailbox * mailbox);
-
-#else                           /* BALSA_USE_THREADS */
-
-#define libbalsa_mailbox_lock_store(mailbox)
-#define libbalsa_mailbox_unlock_store(mailbox)
-
-#endif                          /* BALSA_USE_THREADS */
 
 /* columns ids */
 typedef enum {

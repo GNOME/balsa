@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2002 Stuart Parmenter and others,
+ * Copyright (C) 1997-2013 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -26,16 +26,10 @@
 # error "Include config.h before this file."
 #endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif                          /* __cplusplus */
-
-#if HAVE_GNOME
-/* setting the default Gnome mail client doesn't make sense if we don't build
- for Gnome */
-
 #include "assistant_helper.h"
 #include "assistant_init.h"
+
+G_BEGIN_DECLS
 
 /*
  * Main object structure
@@ -52,13 +46,9 @@ extern "C" {
 /*
  * Public methods
  */
-    void balsa_druid_page_defclient(GtkAssistant * druid, 
-                                    GdkPixbuf * default_logo);
+    void balsa_druid_page_defclient(GtkAssistant * druid);
     void balsa_druid_page_defclient_save(BalsaDruidPageDefclient * defclient);
 
-#endif /* HAVE_GNOME */
+G_END_DECLS
 
-#ifdef __cplusplus
-}
-#endif                          /* __cplusplus */
 #endif

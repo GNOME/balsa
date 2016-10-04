@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2002 Stuart Parmenter and others,
+ * Copyright (C) 1997-2013 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -24,9 +24,7 @@
 
 #define USE_ORIGINAL_MANAGER_FUNCS
 
-#ifdef __cplusplus
-extern "C" {
-#endif				/* __cplusplus */
+G_BEGIN_DECLS
 
 #define BALSA_TYPE_SPELL_CHECK \
         (balsa_spell_check_get_type ())
@@ -48,13 +46,7 @@ extern "C" {
     GType balsa_spell_check_get_type(void);
 
 /* argument setters */
-    void balsa_spell_check_set_module(BalsaSpellCheck *, const gchar *);
-    void balsa_spell_check_set_suggest_mode(BalsaSpellCheck *,
-					    const gchar *);
-    void balsa_spell_check_set_ignore_length(BalsaSpellCheck *, guint);
     void balsa_spell_check_set_language(BalsaSpellCheck *, const gchar *);
-    void balsa_spell_check_set_character_set(BalsaSpellCheck *,
-					     const gchar *);
 
 /* function prototypes */
     GtkWidget *balsa_spell_check_new(GtkWindow * parent);
@@ -62,11 +54,9 @@ extern "C" {
                                                GtkTextView * view);
     void balsa_spell_check_set_text(BalsaSpellCheck * spell_check,
 				    GtkTextView * view);
-    void balsa_spell_check_start(BalsaSpellCheck * spell_check,
-                                 GtkWindow *parent);
+    void balsa_spell_check_start(BalsaSpellCheck * spell_check);
 
 
-#ifdef __cplusplus
-}
-#endif				/* __cplusplus */
+G_END_DECLS
+
 #endif				/* __BALSA_SPELL_CHECK_H__ */

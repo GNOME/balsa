@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2002 Stuart Parmenter and others,
+ * Copyright (C) 1997-2013 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -26,13 +26,13 @@
 #include <string.h>
 #include <stdlib.h>
 
-#if defined(HAVE_GNOME_KEYRING)
+#if defined(HAVE_LIBSECRET)
+#include <libsecret/secret.h>
+#elif defined(HAVE_GNOME_KEYRING)
 #include <gnome-keyring.h>
-#endif
+#endif                          /* defined(HAVE_LIBSECRET) */
 
-#ifdef USE_TLS
 #include <openssl/err.h>
-#endif
 
 #include "libbalsa.h"
 #include "libbalsa_private.h"
@@ -40,7 +40,18 @@
 #include "libbalsa-conf.h"
 #include <glib/gi18n.h>
 
-#if defined(HAVE_GNOME_KEYRING) && !defined(HAVE_GNOME_KEYRING_24)
+#if defined(HAVE_LIBSECRET)
+static const SecretSchema server_schema = {
+    "org.gnome.Balsa.NetworkPassword", SECRET_SCHEMA_NONE,
+    {
+	{ "protocol", SECRET_SCHEMA_ATTRIBUTE_STRING },
+	{ "server",   SECRET_SCHEMA_ATTRIBUTE_STRING },
+	{ "user",     SECRET_SCHEMA_ATTRIBUTE_STRING },
+	{ NULL, 0 }
+    }
+};
+const SecretSchema *LIBBALSA_SERVER_SECRET_SCHEMA = &server_schema;
+#elif defined(HAVE_GNOME_KEYRING) && !defined(HAVE_GNOME_KEYRING_24)
 static const GnomeKeyringPasswordSchema server_schema = {
     GNOME_KEYRING_ITEM_GENERIC_SECRET,
     {
@@ -52,7 +63,7 @@ static const GnomeKeyringPasswordSchema server_schema = {
 };
 const GnomeKeyringPasswordSchema* LIBBALSA_SERVER_KEYRING_SCHEMA =
     &server_schema;
-#endif /* HAVE_GNOME_KEYRING */
+#endif                          /* defined(HAVE_LIBSECRET) */
 
 static GObjectClass *parent_class = NULL;
 static void libbalsa_server_class_init(LibBalsaServerClass * klass);
@@ -324,7 +335,46 @@ libbalsa_server_load_config(LibBalsaServer * server)
     server->remember_passwd = libbalsa_conf_get_bool("RememberPasswd=false");
 
     if(server->remember_passwd) {
-#if defined (HAVE_GNOME_KEYRING)
+#if defined(HAVE_LIBSECRET)
+        GError *err = NULL;
+
+        server->passwd =
+            secret_password_lookup_sync(LIBBALSA_SERVER_SECRET_SCHEMA,
+                                        NULL, &err,
+                                        "protocol", server->protocol,
+                                        "server",   server->host,
+                                        "user",     server->user,
+                                        NULL);
+        if (err) {
+            libbalsa_free_password(server->passwd);
+            server->passwd = NULL;
+            printf(_("Error looking up password for %s@%s: %s\n"),
+                   server->user, server->host, err->message);
+            printf(_("Falling back\n"));
+            g_clear_error(&err);
+            server->passwd = libbalsa_conf_private_get_string("Password");
+            if (server->passwd != NULL) {
+                gchar *buff = libbalsa_rot(server->passwd);
+                libbalsa_free_password(server->passwd);
+                server->passwd = buff;
+                secret_password_store_sync
+                    (LIBBALSA_SERVER_SECRET_SCHEMA, NULL,
+                     _("Balsa passwords"), server->passwd, NULL, &err,
+                     "protocol", server->protocol,
+                     "server",   server->host,
+                     "user",     server->user,
+                     NULL);
+                /* We could in principle clear the password in the
+                 * config file here but we do not for the backward
+                 * compatibility. */
+                if (err) {
+                    printf(_("Error storing password for %s@%s: %s\n"),
+                           server->user, server->host, err->message);
+                    g_error_free(err);
+                }
+            }
+        }
+#elif defined (HAVE_GNOME_KEYRING)
 	GnomeKeyringResult res =
 	    gnome_keyring_find_password_sync(LIBBALSA_SERVER_KEYRING_SCHEMA,
 					     &server->passwd,
@@ -384,7 +434,22 @@ libbalsa_server_save_config(LibBalsaServer * server)
                           server->remember_passwd && server->passwd != NULL);
 
     if (server->remember_passwd && server->passwd != NULL) {
-#if defined(HAVE_GNOME_KEYRING)
+#if defined(HAVE_LIBSECRET)
+        GError *err = NULL;
+
+        secret_password_store_sync(LIBBALSA_SERVER_SECRET_SCHEMA, NULL,
+                                   _("Balsa passwords"), server->passwd,
+                                   NULL, &err,
+                                   "protocol", server->protocol,
+                                   "server",   server->host,
+                                   "user",     server->user,
+                                   NULL);
+        if (err) {
+            printf(_("Error storing password for %s@%s: %s\n"),
+                   server->user, server->host, err->message);
+            g_error_free(err);
+        }
+#elif defined (HAVE_GNOME_KEYRING)
 	gnome_keyring_store_password_sync(LIBBALSA_SERVER_KEYRING_SCHEMA,
 				     NULL,
 				     _("Balsa passwords"),
@@ -397,7 +462,7 @@ libbalsa_server_save_config(LibBalsaServer * server)
 	gchar *buff = libbalsa_rot(server->passwd);
 	libbalsa_conf_private_set_string("Password", buff);
 	g_free(buff);
-#endif
+#endif                          /* defined(HAVE_LIBSECRET) */
     }
     libbalsa_conf_set_bool("SSL", server->use_ssl);
     libbalsa_conf_set_int("TLSMode", server->tls_mode);
@@ -441,7 +506,6 @@ libbalsa_server_user_cb(ImapUserEventType ue, void *arg, ...)
         break;
     }
     case IME_TLS_VERIFY_ERROR:  {
-#ifdef USE_TLS
         long vfy_result;
         SSL *ssl;
         X509 *cert;
@@ -458,9 +522,6 @@ libbalsa_server_user_cb(ImapUserEventType ue, void *arg, ...)
 	    *ok = libbalsa_is_cert_known(cert, vfy_result);
 	    X509_free(cert);
 	}
-#else
-        g_warning("TLS error with TLS disabled!?");
-#endif
         break;
     }
     case IME_TLS_NO_PEER_CERT: {

@@ -1,0 +1,206 @@
+<interface>
+  <menu id='menubar'>
+    <submenu>
+      <attribute name='label' translatable='yes'>_File</attribute>
+      <section>
+        <item>
+          <attribute name='label'
+            translatable='yes'>Page _Setup</attribute>
+          <attribute name='action'>win.page-setup</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>_Print…</attribute>
+          <attribute name='action'>win.print</attribute>
+          <attribute name='accel'>&lt;Primary&gt;p</attribute>
+        </item>
+      </section>
+      <section>
+        <item>
+          <attribute name='label'
+            translatable='yes'>_Close</attribute>
+          <attribute name='action'>win.close</attribute>
+          <attribute name='accel'>&lt;Primary&gt;w</attribute>
+        </item>
+      </section>
+    </submenu>
+    <submenu>
+      <attribute name='label' translatable='yes'>_Edit</attribute>
+      <section>
+        <item>
+          <attribute name='label'
+            translatable='yes'>_Copy</attribute>
+          <attribute name='action'>win.copy</attribute>
+          <attribute name='accel'>&lt;Primary&gt;c</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>Select _All</attribute>
+          <attribute name='action'>win.select-all</attribute>
+          <attribute name='accel'>&lt;Primary&gt;a</attribute>
+        </item>
+      </section>
+      <section>
+        <item>
+          <attribute name='label'
+            translatable='yes'>Find in _Message</attribute>
+          <attribute name='action'>win.find-in-message</attribute>
+          <attribute name='accel'>slash</attribute>
+        </item>
+      </section>
+    </submenu>
+    <submenu>
+      <attribute name='label' translatable='yes'>_View</attribute>
+      <section>
+        <item>
+          <attribute name='label'
+            translatable='yes'>Show Too_lbar</attribute>
+          <attribute name='action'>win.show-toolbar</attribute>
+        </item>
+      </section>
+      <section>
+        <item>
+          <attribute name='label'
+            translatable='yes'>_Wrap</attribute>
+          <attribute name='action'>win.wrap</attribute>
+        </item>
+      </section>
+      <section>
+        <item>
+          <attribute name='label'
+            translatable='yes'>_No Headers</attribute>
+          <attribute name='action'>win.headers</attribute>
+          <attribute name='target'>none</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>S_elected Headers</attribute>
+          <attribute name='action'>win.headers</attribute>
+          <attribute name='target'>selected</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>All _Headers</attribute>
+          <attribute name='action'>win.headers</attribute>
+          <attribute name='target'>all</attribute>
+        </item>
+      </section>
+      <section>
+        <item>
+          <attribute name='label'
+            translatable='yes'>Zoom _In</attribute>
+          <attribute name='action'>win.zoom-in</attribute>
+          <attribute name='accel'>&lt;Primary&gt;plus</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>Zoom _Out</attribute>
+          <attribute name='action'>win.zoom-out</attribute>
+          <attribute name='accel'>&lt;Primary&gt;minus</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>Zoom _100%</attribute>
+          <attribute name='action'>win.zoom-normal</attribute>
+        </item>
+      </section>
+    </submenu>
+    <submenu>
+      <attribute name='label' translatable='yes'>M_ove</attribute>
+    </submenu>
+    <submenu>
+      <attribute name='label' translatable='yes'>_Message</attribute>
+      <section>
+        <item>
+          <attribute name='label'
+            translatable='yes'>_Reply…</attribute>
+          <attribute name='action'>win.reply</attribute>
+          <attribute name='accel'>r</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>Reply to _All…</attribute>
+          <attribute name='action'>win.reply-all</attribute>
+          <attribute name='accel'>a</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>Reply to _Group…</attribute>
+          <attribute name='action'>win.reply-group</attribute>
+          <attribute name='accel'>g</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>_Forward Attached…</attribute>
+          <attribute name='action'>win.forward-attached</attribute>
+          <attribute name='accel'>f</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>Forward _Inline…</attribute>
+          <attribute name='action'>win.forward-inline</attribute>
+        </item>
+      </section>
+      <section>
+        <item>
+          <attribute name='label'
+            translatable='yes'>_Next Part</attribute>
+          <attribute name='action'>win.next-part</attribute>
+          <attribute name='accel'>&lt;Primary&gt;period</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>_Previous Part</attribute>
+          <attribute name='action'>win.previous-part</attribute>
+          <attribute name='accel'>&lt;Primary&gt;comma</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>Save Current Part…</attribute>
+          <attribute name='action'>win.save-part</attribute>
+          <attribute name='accel'>&lt;Primary&gt;s</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>_View Source…</attribute>
+          <attribute name='action'>win.view-source</attribute>
+          <attribute name='accel'>&lt;Primary&gt;u</attribute>
+        </item>
+      </section>
+      <section>
+        <item>
+          <attribute name='label'
+            translatable='yes'>Next Message</attribute>
+          <attribute name='action'>win.next-message</attribute>
+          <attribute name='accel'>n</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>Previous Message</attribute>
+          <attribute name='action'>win.previous-message</attribute>
+          <attribute name='accel'>p</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>Next Unread Message</attribute>
+          <attribute name='action'>win.next-unread</attribute>
+          <attribute name='accel'>&lt;Primary&gt;n</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>Next Flagged Message</attribute>
+          <attribute name='action'>win.next-flagged</attribute>
+          <attribute name='accel'>&lt;Primary&gt;&lt;Alt&gt;f</attribute>
+        </item>
+      </section>
+      <section>
+        <item>
+          <attribute name='label'
+            translatable='yes'>_Move to Trash</attribute>
+          <attribute name='action'>win.move-to-trash</attribute>
+          <attribute name='accel'>d</attribute>
+        </item>
+      </section>
+    </submenu>
+  </menu>
+</interface>

@@ -14,7 +14,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, see <http://www.gnu.org/licenses/>.
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+ * 02111-1307, USA.
  */
 
 #ifndef LIBBALSA_GPGME_H_
@@ -29,15 +31,11 @@
 #include <glib.h>
 #include <gtk/gtk.h>
 #include <gmime/gmime.h>
+#include "libbalsa-gpgme-cb.h"
 #include "gmime-gpgme-signature.h"
 
 
-#ifdef __cplusplus
-extern "C" {
-#ifdef MAKE_EMACS_HAPPY
-}
-#endif
-#endif				/* __cplusplus */
+G_BEGIN_DECLS
 
 
 #define GPG_ERR_KEY_SELECTION          GPG_ERR_USER_14
@@ -54,8 +52,9 @@ extern "C" {
  * - list of available keys (gpgme_key_t data elements)
  * - protocol
  * - parent window
- */ typedef gpgme_key_t(*lbgpgme_select_key_cb) (const gchar *,
-						 gboolean,
+ */
+typedef gpgme_key_t(*lbgpgme_select_key_cb) (const gchar *,
+						 lb_key_sel_md_t,
 						 GList *,
 						 gpgme_protocol_t,
 						 GtkWindow *);
@@ -90,7 +89,7 @@ gpgme_hash_algo_t libbalsa_gpgme_sign(const gchar * userid,
 				      gboolean singlepart_mode,
 				      GtkWindow * parent, GError ** error);
 
-int libbalsa_gpgme_encrypt(GPtrArray * recipients,
+gboolean libbalsa_gpgme_encrypt(GPtrArray * recipients,
 			   const char *sign_for,
 			   GMimeStream * istream,
 			   GMimeStream * ostream,
@@ -106,8 +105,7 @@ GMimeGpgmeSigstat *libbalsa_gpgme_decrypt(GMimeStream * crypted,
 					  GError ** error);
 
 
-#ifdef __cplusplus
-}
-#endif				/* __cplusplus */
+G_END_DECLS
+
 
 #endif				/* LIBBALSA_GPGME_H_ */

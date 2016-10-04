@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2009 Stuart Parmenter and others,
+ * Copyright (C) 1997-2013 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -40,8 +40,8 @@ libbalsa_cell_renderer_button_activate(GtkCellRenderer    * cell,
                                        GdkEvent           * event,
                                        GtkWidget          * widget,
                                        const gchar        * path,
-                                       GdkRectangle       * background_area,
-                                       GdkRectangle       * cell_area,
+                                       const GdkRectangle * background_area,
+                                       const GdkRectangle * cell_area,
                                        GtkCellRendererState flags)
 {
     g_signal_emit(cell, cell_button_signals[ACTIVATED], 0, path);

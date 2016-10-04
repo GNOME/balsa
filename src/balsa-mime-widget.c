@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2001 Stuart Parmenter and others,
+ * Copyright (C) 1997-2013 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -168,7 +168,7 @@ balsa_mime_widget_new(BalsaMessage * bm, LibBalsaMessageBody * mime_body, gpoint
 		g_ascii_strcasecmp("application/pgp-signature", content_type) &&
 		g_ascii_strcasecmp("application/pkcs7-signature", content_type) &&
 		g_ascii_strcasecmp("application/x-pkcs7-signature", content_type)) {
-		GtkWidget * signature = 
+		GtkWidget * signature =
 		    balsa_mime_widget_signature_widget(mime_body, content_type);
 		mw->widget = balsa_mime_widget_crypto_frame(mime_body, mw->widget,
 							    mime_body->was_encrypted,
@@ -181,15 +181,19 @@ balsa_mime_widget_new(BalsaMessage * bm, LibBalsaMessageBody * mime_body, gpoint
 #endif
             g_object_ref_sink(mw->widget);
 
-	    if (GTK_IS_LAYOUT(mw->widget)) 
-		g_signal_connect(G_OBJECT(gtk_layout_get_vadjustment(GTK_LAYOUT(mw->widget))),
-				 "changed",
+	    if (GTK_IS_LAYOUT(mw->widget)) {
+                GtkAdjustment *vadj;
+
+                g_object_get(G_OBJECT(mw->widget), "vadjustment", &vadj,
+                             NULL);
+		g_signal_connect(vadj, "changed",
 				 G_CALLBACK(vadj_change_cb), mw->widget);
+            }
+
+            gtk_widget_show_all(mw->widget);
 	}
     }
     g_free(content_type);
-    
-    gtk_widget_show_all(mw->widget);
 
     return mw;
 }
@@ -228,7 +232,7 @@ balsa_mime_widget_new_unknown(BalsaMessage * bm,
     g_return_val_if_fail(mime_body, NULL);
     mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
 
-    mw->widget = gtk_vbox_new(FALSE, BMW_VBOX_SPACE);
+    mw->widget = gtk_box_new(GTK_ORIENTATION_VERTICAL, BMW_VBOX_SPACE);
     gtk_container_set_border_width(GTK_CONTAINER(mw->widget),
 				   BMW_CONTAINER_BORDER);
 
@@ -245,9 +249,7 @@ balsa_mime_widget_new_unknown(BalsaMessage * bm,
 	 g_ascii_strcasecmp(content_type, "application/octet-stream") == 0)
 	&& LIBBALSA_IS_MAILBOX_LOCAL(mime_body->message->mailbox)) {
         GError *err = NULL;
-	ssize_t length = 1024 /* g_mime_stream_length(stream) */ ;
 	gpointer buffer;
-	ssize_t size;
 	GMimeStream *stream = 
             libbalsa_message_body_get_stream(mime_body, &err);
         if(!stream) {
@@ -257,6 +259,9 @@ balsa_mime_widget_new_unknown(BalsaMessage * bm,
             g_clear_error(&err);
             use_content_type = g_strdup(content_type);
         } else {
+            ssize_t length = 1024 /* g_mime_stream_length(stream) */ ;
+            ssize_t size;
+
             buffer = g_malloc(length);
             libbalsa_mime_stream_shared_lock(stream);
             size = g_mime_stream_read(stream, buffer, length);
@@ -286,7 +291,8 @@ balsa_mime_widget_new_unknown(BalsaMessage * bm,
     gtk_label_set_ellipsize(GTK_LABEL(msg_label), PANGO_ELLIPSIZE_END);
     gtk_box_pack_start(GTK_BOX(mw->widget), msg_label, FALSE, FALSE, 0);
 
-    hbox = gtk_hbox_new(TRUE, BMW_HBOX_SPACE);
+    hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, BMW_HBOX_SPACE);
+    gtk_box_set_homogeneous(GTK_BOX(hbox), TRUE);
     if ((button = libbalsa_vfs_mime_button(mime_body, use_content_type,
                                            G_CALLBACK(balsa_mime_widget_ctx_menu_cb),
                                            (gpointer) mime_body)))

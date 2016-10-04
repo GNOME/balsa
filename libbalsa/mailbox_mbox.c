@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2013 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -33,9 +33,6 @@
 #include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-
-/* we include time because pthread.h may require it when compiled with c89 */
-#include <time.h>
 
 #include "libbalsa.h"
 #include "libbalsa_private.h"
@@ -88,21 +85,16 @@ static gboolean libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox,
 /* LibBalsaMailboxLocal class methods */
 static LibBalsaMailboxLocalMessageInfo
     *lbm_mbox_get_info(LibBalsaMailboxLocal * local, guint msgno);
+static LibBalsaMailboxLocalAddMessageFunc lbm_mbox_add_message;
 
 static gboolean
 libbalsa_mailbox_mbox_fetch_message_structure(LibBalsaMailbox * mailbox,
                                               LibBalsaMessage * message,
                                               LibBalsaFetchFlag flags);
-static guint libbalsa_mailbox_mbox_add_messages(LibBalsaMailbox *mailbox,
-						LibBalsaAddMessageIterator m,
-						void *m_arg,
-						GError ** err);
 static guint
 libbalsa_mailbox_mbox_total_messages(LibBalsaMailbox * mailbox);
-#if BALSA_USE_THREADS
 static void libbalsa_mailbox_mbox_lock_store(LibBalsaMailbox * mailbox,
                                              gboolean lock);
-#endif                          /* BALSA_USE_THREADS */
 
 struct _LibBalsaMailboxMboxClass {
     LibBalsaMailboxLocalClass klass;
@@ -167,18 +159,16 @@ libbalsa_mailbox_mbox_class_init(LibBalsaMailboxMboxClass * klass)
 	libbalsa_mailbox_mbox_close_mailbox;
     libbalsa_mailbox_class->fetch_message_structure =
 	libbalsa_mailbox_mbox_fetch_message_structure;
-    libbalsa_mailbox_class->add_messages = libbalsa_mailbox_mbox_add_messages;
     libbalsa_mailbox_class->total_messages =
 	libbalsa_mailbox_mbox_total_messages;
-#if BALSA_USE_THREADS
     libbalsa_mailbox_class->lock_store = libbalsa_mailbox_mbox_lock_store;
-#endif                          /* BALSA_USE_THREADS */
 
     libbalsa_mailbox_local_class->check_files  = lbm_mbox_check_files;
     libbalsa_mailbox_local_class->remove_files = 
 	libbalsa_mailbox_mbox_remove_files;
 
     libbalsa_mailbox_local_class->get_info = lbm_mbox_get_info;
+    libbalsa_mailbox_local_class->add_message = lbm_mbox_add_message;
     object_class->dispose = libbalsa_mailbox_mbox_dispose;
 }
 
@@ -226,7 +216,7 @@ lbm_mbox_check_files(const gchar * path, gboolean create)
     return 0;
 }
 
-GObject *
+LibBalsaMailbox *
 libbalsa_mailbox_mbox_new(const gchar * path, gboolean create)
 {
     LibBalsaMailbox *mailbox;
@@ -234,14 +224,14 @@ libbalsa_mailbox_mbox_new(const gchar * path, gboolean create)
     mailbox = g_object_new(LIBBALSA_TYPE_MAILBOX_MBOX, NULL);
 
     mailbox->is_directory = FALSE;
-	
+
     if (libbalsa_mailbox_local_set_path(LIBBALSA_MAILBOX_LOCAL(mailbox),
                                         path, create) != 0) {
 	g_object_unref(mailbox);
 	return NULL;
     }
-    
-    return G_OBJECT(mailbox);
+
+    return mailbox;
 }
 
 /* Helper: seek to offset, and return TRUE if the seek succeeds and a
@@ -257,15 +247,15 @@ lbm_mbox_stream_seek_to_message(GMimeStream * stream, off_t offset)
         && (nread = g_mime_stream_read(stream, buffer, sizeof buffer))
         == sizeof buffer
         && strncmp("From ", buffer, 5) == 0;
-#if DEBUG_SEEK
     if (!retval) {
         if (nread == sizeof buffer)
             --nread;
         buffer[nread] = 0;
+#if DEBUG_SEEK
         g_print("%s at %ld failed: read %ld chars, saw \"%s\"\n", __func__,
                 (long) offset, (long) nread, buffer);
-    }
 #endif
+    }
 
     g_mime_stream_seek(stream, offset, GMIME_STREAM_SEEK_SET);
 
@@ -488,6 +478,7 @@ parse_mailbox(LibBalsaMailboxMbox * mbox)
 
     libbalsa_mailbox_local_set_threading_info(local);
     msg_info.local_info.message = NULL;
+    msg_info.local_info.loaded  = FALSE;
     while (!g_mime_parser_eos(gmime_parser)) {
 	GMimeMessage *mime_message;
         LibBalsaMessage *msg;
@@ -623,6 +614,7 @@ lbm_mbox_restore(LibBalsaMailboxMbox * mbox)
     end = 0;
     do {
         msg_info->local_info.message = NULL;
+        msg_info->local_info.loaded  = FALSE;
         if (msg_info->start != end)
             /* Error: this message doesn't start at the end of the
              * previous one. */
@@ -738,9 +730,6 @@ libbalsa_mailbox_mbox_open(LibBalsaMailbox * mailbox, GError **err)
         lbm_mbox_restore(mbox);
         parse_mailbox(mbox);
     }
-    
-    LIBBALSA_MAILBOX_LOCAL(mailbox)->sync_time = time(NULL) - t0;
-    LIBBALSA_MAILBOX_LOCAL(mailbox)->sync_cnt  = 1;
 
     mbox_unlock(mailbox, gmime_stream);
     libbalsa_mime_stream_shared_unlock(gmime_stream);
@@ -1845,57 +1834,6 @@ static void update_message_status_headers(GMimeMessage *message,
     g_string_free(new_header, TRUE);
 }
 
-#if !defined(HAVE_GMIME_2_6)
-/*
- * Encode text parts as quoted-printable.
- */
-static void
-lbm_mbox_prepare_object(GMimeObject * object)
-{
-    g_mime_object_remove_header(object, "Content-Length");
-
-    if (GMIME_IS_MULTIPART(object)) {
-        /* Do not break crypto */
-        if (!(GMIME_IS_MULTIPART_SIGNED(object) ||
-              GMIME_IS_MULTIPART_ENCRYPTED(object))) {
-            GMimeMultipart *multipart = (GMimeMultipart *) object;
-            gint i, count = g_mime_multipart_get_count(multipart);
-
-            for (i = 0; i < count; ++i)
-                lbm_mbox_prepare_object(g_mime_multipart_get_part
-                                        (multipart, i));
-        }
-    } else if (GMIME_IS_MESSAGE_PART(object))
-        lbm_mbox_prepare_object(GMIME_OBJECT
-                                (((GMimeMessagePart *) object)->message));
-    else if (GMIME_IS_MESSAGE(object))
-        lbm_mbox_prepare_object(((GMimeMessage *) object)->mime_part);
-    else if (GMIME_IS_PART(object)) {
-        GMimePart *mime_part = (GMimePart *) object;
-        GMimeContentEncoding encoding;
-        GMimeContentType *mime_type;
-
-        if (GMIME_IS_MESSAGE_PARTIAL(mime_part))
-            return;
-
-        encoding = g_mime_part_get_content_encoding(mime_part);
-        if (encoding == GMIME_CONTENT_ENCODING_BASE64)
-            return;
-
-        mime_type = g_mime_object_get_content_type(object);
-        if (g_mime_content_type_is_type(mime_type, "text", "plain")) {
-            const gchar *format =
-                g_mime_content_type_get_parameter(mime_type, "format");
-            if (format && !g_ascii_strcasecmp(format, "flowed"))
-                /* Format=Flowed text cannot contain From_ lines. */
-                return;
-        }
-
-        g_mime_part_set_content_encoding
-            (mime_part, GMIME_CONTENT_ENCODING_QUOTEDPRINTABLE);
-    }
-}
-#endif                          /* defined(HAVE_GMIME_2_6) */
 
 static GMimeObject *
 lbm_mbox_armored_object(GMimeStream * stream)
@@ -1906,12 +1844,7 @@ lbm_mbox_armored_object(GMimeStream * stream)
     parser = g_mime_parser_new_with_stream(stream);
     object = GMIME_OBJECT(g_mime_parser_construct_message(parser));
     g_object_unref(parser);
-
-#if defined(HAVE_GMIME_2_6)
     g_mime_object_encode(object, GMIME_ENCODING_CONSTRAINT_7BIT);
-#else                           /* defined(HAVE_GMIME_2_6) */
-    lbm_mbox_prepare_object(object);
-#endif                          /* defined(HAVE_GMIME_2_6) */
 
     return object;
 }
@@ -1938,11 +1871,12 @@ lbm_mbox_armored_stream(GMimeStream * stream)
 
 /* Called with mailbox locked. */
 static gboolean
-libbalsa_mailbox_mbox_add_message(LibBalsaMailbox * mailbox,
-                                  GMimeStream * stream,
-                                  LibBalsaMessageFlag flags,
-                                  GError ** err)
+lbm_mbox_add_message(LibBalsaMailboxLocal * local,
+                     GMimeStream          * stream,
+                     LibBalsaMessageFlag    flags,
+                     GError              ** err)
 {
+    LibBalsaMailbox *mailbox = (LibBalsaMailbox *) local;
     LibBalsaMessage *message;
     gchar date_string[27];
     gchar *sender;
@@ -1981,13 +1915,14 @@ libbalsa_mailbox_mbox_add_message(LibBalsaMailbox * mailbox,
     from = g_strdup_printf ("From %s %s", address, date_string );
     g_free(address);
     
-    path = libbalsa_mailbox_local_get_path(mailbox);
+    path = libbalsa_mailbox_local_get_path(local);
     /* open in read-write mode */
     fd = open(path, O_RDWR);
     if (fd < 0) {
         g_set_error(err, LIBBALSA_MAILBOX_ERROR,
                     LIBBALSA_MAILBOX_APPEND_ERROR,
                     _("%s: could not open %s."), "MBOX", path);
+        g_free(from);
         return FALSE;
     }
     
@@ -2047,27 +1982,6 @@ libbalsa_mailbox_mbox_add_message(LibBalsaMailbox * mailbox,
 }
 
 static guint
-libbalsa_mailbox_mbox_add_messages(LibBalsaMailbox * mailbox,
-				   LibBalsaAddMessageIterator msg_iterator,
-				   void *arg,
-				   GError **err)
-{
-    LibBalsaMessageFlag flag;
-    GMimeStream *stream;
-
-    guint cnt = 0;
-    while( msg_iterator(&flag, &stream, arg) ) {
-	gboolean success =
-	    libbalsa_mailbox_mbox_add_message(mailbox, stream, flag, err);
-	g_object_unref(stream);
-	if(!success)
-	    break;
-	cnt++;
-    }
-    return cnt;
-}
-
-static guint
 libbalsa_mailbox_mbox_total_messages(LibBalsaMailbox * mailbox)
 {
     LibBalsaMailboxMbox *mbox = (LibBalsaMailboxMbox *) mailbox;
@@ -2075,7 +1989,6 @@ libbalsa_mailbox_mbox_total_messages(LibBalsaMailbox * mailbox)
     return mbox->msgno_2_msg_info ? mbox->msgno_2_msg_info->len : 0;
 }
 
-#if BALSA_USE_THREADS
 static void
 libbalsa_mailbox_mbox_lock_store(LibBalsaMailbox * mailbox, gboolean lock)
 {
@@ -2087,4 +2000,3 @@ libbalsa_mailbox_mbox_lock_store(LibBalsaMailbox * mailbox, gboolean lock)
     else
         libbalsa_mime_stream_shared_unlock(stream);
 }
-#endif                          /* BALSA_USE_THREADS */

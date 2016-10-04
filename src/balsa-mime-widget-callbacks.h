@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2001 Stuart Parmenter and others,
+ * Copyright (C) 1997-2013 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -24,9 +24,7 @@
 #include "balsa-message.h"
 
 
-#ifdef __cplusplus
-extern "C" {
-#endif				/* __cplusplus */
+G_BEGIN_DECLS
 
 
 void balsa_mime_widget_ctx_menu_cb(GtkWidget * menu_item, LibBalsaMessageBody * mime_body);
@@ -38,7 +36,6 @@ gint balsa_mime_widget_limit_focus(GtkWidget * widget, GdkEventFocus * event, Ba
 gint balsa_mime_widget_unlimit_focus(GtkWidget * widget, GdkEventFocus * event, BalsaMessage * bm);
 
 
-#ifdef __cplusplus
-}
-#endif				/* __cplusplus */
+G_END_DECLS
+
 #endif				/* __BALSA_MIME_WIDGET_CALLBACKS_H__ */

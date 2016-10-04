@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2001 Stuart Parmenter and others,
+ * Copyright (C) 1997-2013 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -27,9 +27,7 @@
 #include "libbalsa.h"
 #include "balsa-app.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif				/* __cplusplus */
+G_BEGIN_DECLS
 
 
 #define BALSA_TYPE_MESSAGE          (balsa_message_get_type ())
@@ -52,7 +50,10 @@ typedef enum {
 } BalsaMessageFocusState;
 
 struct _BalsaMessage {
-	GtkNotebook parent;
+        GtkBox parent;
+
+        GtkWidget *stack;
+        GtkWidget *switcher;
 
         /* Top-level MIME widget */
         BalsaMimeWidget *bm_widget;
@@ -61,7 +62,6 @@ struct _BalsaMessage {
 	ShownHeaders shown_headers;
 
 	/* Widgets to hold content */
-        GtkWidget *cont_viewport;
 	GtkWidget *scroll;
 
         /* Widget to hold structure tree */
@@ -78,8 +78,6 @@ struct _BalsaMessage {
 
 	LibBalsaMessage *message;
 
-	gboolean close_with_msg;
-
         BalsaMessageFocusState focus_state;
 
         /* Find-in-message stuff */
@@ -94,6 +92,13 @@ struct _BalsaMessage {
 
         /* Tab position for headers */
         gint tab_position;
+
+        /* Widget to hold Faces */
+        GtkWidget *face_box;
+
+#ifdef HAVE_HTML_WIDGET
+        gpointer html_find_info;
+#endif				/* HAVE_HTML_WIDGET */
 };
 
 struct _BalsaMessageClass {
@@ -104,8 +109,6 @@ struct _BalsaMessageClass {
 
 GType balsa_message_get_type(void);
 GtkWidget *balsa_message_new(void);
-void balsa_message_set_close(BalsaMessage * bmessage,
-			     gboolean close_with_msg);
 
 gboolean balsa_message_set(BalsaMessage * bmessage,
 			   LibBalsaMailbox * mailbox, guint msgno);
@@ -142,7 +145,6 @@ void balsa_message_perform_crypto(LibBalsaMessage * message,
 
 void balsa_message_find_in_message (BalsaMessage * bm);
 
-#ifdef __cplusplus
-}
-#endif				/* __cplusplus */
+G_END_DECLS
+
 #endif				/* __BALSA_MESSAGE_H__ */

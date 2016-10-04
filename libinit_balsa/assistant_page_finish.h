@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2002 Stuart Parmenter and others,
+ * Copyright (C) 1997-2013 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -21,22 +21,18 @@
 #ifndef __BALSA_DRUID_PAGE_FINISH_H__
 #define __BALSA_DRUID_PAGE_FINISH_H__
 
-#ifdef __cplusplus
-extern "C" {
-#endif                          /* __cplusplus */
-
 #include <gtk/gtk.h>
 
 #include "assistant_helper.h"
 #include "assistant_init.h"
 
+G_BEGIN_DECLS
+
 /*
  * Public methods
  */
-    void balsa_druid_page_finish(GtkAssistant * druid,
-                                 GdkPixbuf * default_logo);
+    void balsa_druid_page_finish(GtkAssistant * druid);
 
-#ifdef __cplusplus
-}
-#endif                          /* __cplusplus */
+G_END_DECLS
+
 #endif

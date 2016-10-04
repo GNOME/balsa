@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2002 Stuart Parmenter and others,
+ * Copyright (C) 1997-2013 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -55,7 +55,7 @@ balsa_druid_page_user_init(BalsaDruidPageUser * user,
         N_("The following settings are also needed "
            "(and you can find them later, if need be, in the Email "
            "application in the 'Preferences' and 'Identities' "
-           "commands on the 'Tools' menu)");
+           "menu items)");
 #if 0
     static const char *header21 =
         N_(" Whoever provides your email account should be able "
@@ -66,7 +66,7 @@ balsa_druid_page_user_init(BalsaDruidPageUser * user,
     static const char* server_types[] = { "POP3", "IMAP", NULL };
     static const char* remember_passwd[] = {
         N_("Yes, remember it"), N_("No, type it in every time"), NULL };
-    GtkTable *table;
+    GtkGrid *grid;
     GtkLabel *label;
     gchar *preset;
     int row = 0;
@@ -80,40 +80,40 @@ balsa_druid_page_user_init(BalsaDruidPageUser * user,
     user->ed2.master = &(user->emaster);
 #endif
     user->ed3.master = &(user->emaster);
-#if !defined(ENABLE_TOUCH_UI)
     user->ed4.master = &(user->emaster);
-#endif
     label = GTK_LABEL(gtk_label_new(_(header2)));
     gtk_label_set_line_wrap(label, TRUE);
     gtk_box_pack_start(GTK_BOX(page), GTK_WIDGET(label), FALSE, TRUE, 0);
 
-    table = GTK_TABLE(gtk_table_new(10, 2, FALSE));
+    grid = GTK_GRID(gtk_grid_new());
+    gtk_grid_set_row_spacing(grid, 2);
+    gtk_grid_set_column_spacing(grid, 5);
 
 #if 0
     label = GTK_LABEL(gtk_label_new(_(header21)));
     gtk_label_set_justify(label, GTK_JUSTIFY_CENTER);
     gtk_label_set_line_wrap(label, TRUE);
-    gtk_table_attach(table, GTK_WIDGET(label), 0, 2, 0, 1,
+    gtk_grid_attach(grid, GTK_WIDGET(label), 0, 2, 0, 1,
                      GTK_EXPAND | GTK_FILL, GTK_EXPAND | GTK_FILL, 8, 4);
 #endif
     /* 2.1 */
-    balsa_init_add_table_entry(table, row++,
+    balsa_init_add_grid_entry(grid, row++,
                                _("Name of mail server for incoming _mail:"),
                                "", /* no guessing here */
                                NULL, druid, page, &(user->incoming_srv));
 
-    balsa_init_add_table_option(table, row++,
+    balsa_init_add_grid_option(grid, row++,
                                 _("_Type of mail server:"),
                                server_types, druid, &(user->incoming_type));
 
-    balsa_init_add_table_checkbox(table, row++,
+    balsa_init_add_grid_checkbox(grid, row++,
                                   _("Connect using _SSL:"), FALSE,
                                   druid, &(user->using_ssl));
 
-    balsa_init_add_table_entry(table, row++, _("Your email _login name:"),
+    balsa_init_add_grid_entry(grid, row++, _("Your email _login name:"),
                                g_get_user_name(),
                                NULL, druid, page, &(user->login));
-    balsa_init_add_table_entry(table, row++, _("Your _password:"),
+    balsa_init_add_grid_entry(grid, row++, _("Your _password:"),
                                "",
                                NULL, druid, page, &(user->passwd));
     gtk_entry_set_visibility(GTK_ENTRY(user->passwd), FALSE);
@@ -121,49 +121,46 @@ balsa_druid_page_user_init(BalsaDruidPageUser * user,
 
 #if ENABLE_ESMTP
     preset = "localhost:25";
-    balsa_init_add_table_entry(table, row++, _("_SMTP Server:"), preset,
+    balsa_init_add_grid_entry(grid, row++, _("_SMTP Server:"), preset,
                                &(user->ed2), druid, page, &(user->smtp));
 #endif
 
     /* 2.1 */
-    balsa_init_add_table_entry(table, row++, _("Your real _name:"),
+    balsa_init_add_grid_entry(grid, row++, _("Your real _name:"),
                                g_get_real_name(),
                                &(user->ed0), druid, page, &(user->name));
 
     preset = libbalsa_guess_email_address();
-    balsa_init_add_table_entry
-        (table, row++, _("Your _Email Address, for this email account:"),
+    balsa_init_add_grid_entry
+        (grid, row++, _("Your _Email Address, for this email account:"),
          preset, &(user->ed1), druid, page, &(user->email));
     g_free(preset);
 
-    balsa_init_add_table_option(table, row++,
+    balsa_init_add_grid_option(grid, row++,
                                 _("_Remember your password:"),
                                 remember_passwd, druid,
                                 &(user->remember_passwd));
 
-#if !defined(ENABLE_TOUCH_UI)
     preset = g_strconcat(g_get_home_dir(), "/mail", NULL);
-    balsa_init_add_table_entry(table, row++, _("_Local mail directory:"),
+    balsa_init_add_grid_entry(grid, row++, _("_Local mail directory:"),
                                preset,
                                &(user->ed4), druid, page,
                                &(user->localmaildir));
     g_free(preset);
-#endif
-    gtk_box_pack_start(GTK_BOX(page), GTK_WIDGET(table), FALSE, FALSE, 8);
+    gtk_box_pack_start(GTK_BOX(page), GTK_WIDGET(grid), FALSE, FALSE, 3);
 
     user->need_set = FALSE;
 }
 
 void
-balsa_druid_page_user(GtkAssistant * druid, GdkPixbuf * default_logo)
+balsa_druid_page_user(GtkAssistant * druid)
 {
     BalsaDruidPageUser *user;
 
     user = g_new0(BalsaDruidPageUser, 1);
-    user->page = gtk_vbox_new(FALSE, FALSE);
+    user->page = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     gtk_assistant_append_page(druid, user->page);
     gtk_assistant_set_page_title(druid, user->page, _("User Settings"));
-    gtk_assistant_set_page_header_image(druid, user->page, default_logo);
     balsa_druid_page_user_init(user, user->page, druid);
 
     g_signal_connect(G_OBJECT(druid), "prepare",
@@ -312,13 +309,8 @@ balsa_druid_page_user_next(GtkAssistant * druid, GtkWidget * page,
 #endif
 
     g_free(balsa_app.local_mail_directory);
-#if defined(ENABLE_TOUCH_UI)
-    balsa_app.local_mail_directory = 
-        g_strconcat(g_get_home_dir(), "/mail", NULL);
-#else
     balsa_app.local_mail_directory =
         gtk_editable_get_chars(GTK_EDITABLE(user->localmaildir), 0, -1);
-#endif /* ENABLE_TOUCH_UI */
 
     if (balsa_init_create_to_directory
         (balsa_app.local_mail_directory, &uhoh)) {

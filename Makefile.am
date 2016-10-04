@@ -1,6 +1,6 @@
 #intl dir needed for tarball --disable-nls build.
-DISTCHECK_CONFIGURE_FLAGS=--disable-extra-mimeicons --without-gnome --without-html-widget
-SUBDIRS = po sounds images doc libbalsa libinit_balsa src
+DISTCHECK_CONFIGURE_FLAGS="--disable-extra-mimeicons"
+SUBDIRS = po sounds images doc libbalsa libinit_balsa src ui
 # set tar in case it is not set by automake or make
 
 man_MANS=balsa.1
@@ -11,10 +11,13 @@ pixmap_DATA = gnome-balsa2.png
 desktopdir = $(datadir)/applications
 desktop_in_files = balsa.desktop.in balsa-mailto-handler.desktop.in
 desktop_DATA = balsa.desktop balsa-mailto-handler.desktop
+
+appdatadir = $(datarootdir)/appdata
+dist_appdata_DATA = balsa.appdata.xml
+
 @INTLTOOL_DESKTOP_RULE@
 
 balsa_extra_dist =		\
-	GNOME_Balsa.server.in	\
 	HACKING			\
 	balsa-mail-style.xml	\
 	balsa-mail.lang		\
@@ -31,33 +34,17 @@ balsa_extra_dist =		\
 	intltool-update.in	\
 	mkinstalldirs
 
-if BUILD_WITH_G_D_U
-balsa_g_d_u_extra_dist = gnome-doc-utils.make
-endif
-
-if !BUILD_WITH_UNIQUE
-serverdir               = $(libdir)/bonobo/servers
-server_in_files         = GNOME_Balsa.server
-server_DATA             = $(server_in_files:.server.in=.server)
-
-$(server_in_files): $(server_in_files).in
-	sed -e "s|\@bindir\@|$(bindir)|" $< > $@
-
-endif
-
 EXTRA_DIST =			\
-    $(balsa_extra_dist)		\
-    $(balsa_g_d_u_extra_dist)
+    $(balsa_extra_dist)
 
-if BUILD_WITH_GTKSOURCEVIEW2
-gtksourceviewdir = $(BALSA_DATA_PREFIX)/gtksourceview-2.0
+if BUILD_WITH_GTKSOURCEVIEW
+gtksourceviewdir = $(BALSA_DATA_PREFIX)/gtksourceview-3.0
 gtksourceview_DATA = balsa-mail.lang		\
 	balsa-mail-style.xml
 endif
 
 DISTCLEANFILES = $(desktop_DATA) $(server_DATA) \
-	intltool-extract intltool-merge intltool-update	\
-	gnome-doc-utils.make
+	intltool-extract intltool-merge intltool-update
 
 
 dist-hook: balsa.spec
@@ -65,16 +52,16 @@ dist-hook: balsa.spec
 
 @MAINT@RPM: balsa.spec
 @MAINT@	rm -f *.rpm
-@MAINT@	$(MAKE) distdir="$(PACKAGE)-@BALSA_VERSION@" dist
+@MAINT@	$(MAKE) distdir="$(PACKAGE)-$(PACKAGE_VERSION)" dist
 @MAINT@	cp $(top_srcdir)/rpm-po.patch $(top_builddir)/rpm-po.patch
-@MAINT@	rpm -ta "./$(PACKAGE)-@BALSA_VERSION@.tar.gz"
+@MAINT@	rpm -ta "./$(PACKAGE)-$(PACKAGE_VERSION).tar.gz"
 @MAINT@	rm $(top_builddir)/rpm-po.patch
-@MAINT@	-test -f "/usr/src/redhat/SRPMS/$(PACKAGE)-@VERSION@-@BALSA_RELEASE@.src.rpm" \
-@MAINT@		&& cp -f "/usr/src/redhat/SRPMS/$(PACKAGE)-@VERSION@-@BALSA_RELEASE@.src.rpm" .
+@MAINT@	-test -f "/usr/src/redhat/SRPMS/$(PACKAGE)-$(PACKAGE_VERSION)-@BALSA_RELEASE@.src.rpm" \
+@MAINT@		&& cp -f "/usr/src/redhat/SRPMS/$(PACKAGE)-$(PACKAGE_VERSION)-@BALSA_RELEASE@.src.rpm" .
 @MAINT@	-for ping in /usr/src/redhat/RPMS/* ; do \
 @MAINT@		if test -d $$ping ; then \
 @MAINT@			arch=`echo $$ping |sed -e 's,/.*/\([^/][^/]*\),\1,'` ; \
-@MAINT@			f="$$ping/$(PACKAGE)-@VERSION@-@BALSA_RELEASE@.$$arch.rpm" ; \
+@MAINT@			f="$$ping/$(PACKAGE)-$(PACKAGE_VERSION)-@BALSA_RELEASE@.$$arch.rpm" ; \
 @MAINT@			test -f $$f && cp -f $$f . ; \
 @MAINT@		fi ; \
 @MAINT@	done

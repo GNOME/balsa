@@ -1,17 +1,17 @@
 #! /bin/sh
 # bootstrap file to be used when autogen.sh fails.
+test -n "$srcdir" || srcdir=`dirname "$0"`
+test -n "$srcdir" || srcdir=.
+
+olddir=`pwd`
+
+cd $srcdir
+
 echo "Running gettextize...  Ignore non-fatal messages."
 glib-gettextize --force --copy || exit 1
 echo "running intltoolize..."
 [ -d m4 ] || mkdir m4
 intltoolize --copy --force --automake || exit 1
-echo "Running gnome-doc-prepare --force - ignore errors."
-if gnome-doc-prepare --force > /dev/null 2>&1; then
-   :
-else
-    test -L gnome-doc-utils.make && rm gnome-doc-utils.make
-    touch gnome-doc-utils.make
-fi
 echo "Running libtoolize..."
 libtoolize --force || exit 1
 echo "Running aclocal..."
@@ -22,6 +22,8 @@ echo "Running autoheader..."
 autoheader || exit 1
 echo "Running automake..."
 automake --gnu --add-missing --copy || exit 1
+
+cd $olddir
+
 echo "Running configure $* ..."
-exec ./configure "$@"
-gnome-doc-tool -V > /dev/null 2>&1 || echo "gnome-doc-utils required to make dist"
+exec $srcdir/configure "$@"

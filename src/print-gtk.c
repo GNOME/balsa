@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2002 Stuart Parmenter and others,
+ * Copyright (C) 1997-2013 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -33,9 +33,9 @@
 #include "balsa-print-object-decor.h"
 #include "balsa-print-object-header.h"
 
-#ifdef HAVE_LANGINFO
+#if HAVE__NL_MEASUREMENT_MEASUREMENT
 #include <langinfo.h>
-#endif
+#endif                          /* HAVE__NL_MEASUREMENT_MEASUREMENT */
 
 typedef struct {
     GtkWidget *header_font;
@@ -311,7 +311,7 @@ begin_print(GtkPrintOperation * operation, GtkPrintContext * context,
 	pango_layout_set_width(layout, C_TO_P(pdata->setup.c_width));
 	pango_layout_set_alignment(layout, PANGO_ALIGN_CENTER);
 
-	/* calculate the height and adjust the printable region */
+	/* calculate the height and adjust the pringrid region */
 	p_height = p_string_height_from_layout(layout, footer_string->str);
 	pdata->c_footer_y =
 	    pdata->setup.c_y0 + pdata->setup.c_height - P_TO_C(p_height);
@@ -389,7 +389,7 @@ get_default_user_units(void)
      */
     gchar *e = _("default:mm");
   
-#if (HAVE_LANGINFO && defined(_NL_MEASUREMENT_MEASUREMENT))
+#if HAVE__NL_MEASUREMENT_MEASUREMENT
     gchar *imperial = NULL;
   
     imperial = nl_langinfo(_NL_MEASUREMENT_MEASUREMENT);
@@ -397,7 +397,7 @@ get_default_user_units(void)
 	return GTK_UNIT_INCH;  /* imperial */
     if (imperial && imperial[0] == 1 )
 	return GTK_UNIT_MM;  /* metric */
-#endif
+#endif                          /* HAVE__NL_MEASUREMENT_MEASUREMENT */
   
     if (strcmp(e, "default:inch")==0)
 	return GTK_UNIT_INCH;
@@ -407,7 +407,7 @@ get_default_user_units(void)
 }
 
 static GtkWidget *
-add_font_button(const gchar * text, const gchar * font, GtkTable * table,
+add_font_button(const gchar * text, const gchar * font, GtkGrid * grid,
 		gint row)
 {
     GtkWidget *label;
@@ -416,14 +416,13 @@ add_font_button(const gchar * text, const gchar * font, GtkTable * table,
     label = gtk_label_new_with_mnemonic(text);
     gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
     gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
-    gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
-    gtk_table_attach(table, label, 0, 1, row, row + 1, GTK_FILL, 0, 0, 0);
+    gtk_widget_set_halign(label, GTK_ALIGN_START);
+    gtk_grid_attach(grid, label, 0, row, 1, 1);
 
     font_button = gtk_font_button_new_with_font(font);
     gtk_label_set_mnemonic_widget(GTK_LABEL(label), font_button);
-    gtk_table_attach(table, font_button, 1, 2, row, row + 1,
-		     GTK_EXPAND | GTK_FILL,
-		     (GtkAttachOptions) (GTK_FILL), 0, 0);
+    gtk_widget_set_hexpand(font_button, TRUE);
+    gtk_grid_attach(grid, font_button, 1, row, 1, 1);
 
     return font_button;
 }
@@ -431,7 +430,7 @@ add_font_button(const gchar * text, const gchar * font, GtkTable * table,
 /* note: min and max are passed in points = 1/72" */
 static GtkWidget *
 add_margin_spinbtn(const gchar * text, gdouble min, gdouble max, gdouble dflt,
-		   GtkTable * table, gint row)
+		   GtkGrid * grid, gint row)
 {
     GtkWidget *label;
     GtkWidget *spinbtn;
@@ -440,8 +439,8 @@ add_margin_spinbtn(const gchar * text, gdouble min, gdouble max, gdouble dflt,
     label = gtk_label_new_with_mnemonic(text);
     gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
     gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
-    gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
-    gtk_table_attach(table, label, 0, 1, row, row + 1, GTK_FILL, 0, 0, 0);
+    gtk_widget_set_halign(label, GTK_ALIGN_START);
+    gtk_grid_attach(grid, label, 0, row, 1, 1);
 
     if (get_default_user_units() == GTK_UNIT_INCH) {
 	unit = _("inch");
@@ -460,14 +459,13 @@ add_margin_spinbtn(const gchar * text, gdouble min, gdouble max, gdouble dflt,
     }
     gtk_spin_button_set_numeric(GTK_SPIN_BUTTON(spinbtn), TRUE);
     gtk_label_set_mnemonic_widget(GTK_LABEL(label), spinbtn);
-    gtk_table_attach(table, spinbtn, 1, 2, row, row + 1, GTK_FILL,
-		     (GtkAttachOptions) (GTK_FILL), 0, 0);
-    
+    gtk_grid_attach(grid, spinbtn, 1, row, 1, 1);
+
     label = gtk_label_new(unit);
     gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
     gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
-    gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
-    gtk_table_attach(table, label, 2, 3, row, row + 1, GTK_FILL, 0, 0, 0);
+    gtk_widget_set_halign(label, GTK_ALIGN_START);
+    gtk_grid_attach(grid, label, 2, row, 1, 1);
 
     return spinbtn;
 }
@@ -492,16 +490,16 @@ message_prefs_widget(GtkPrintOperation * operation,
     GtkWidget *label;
     GtkWidget *hbox;
     GtkWidget *vbox;
-    GtkWidget *table;
+    GtkWidget *grid;
     GtkPageSetup *pg_setup;
     gchar *markup;
 
     gtk_print_operation_set_custom_tab_label(operation, _("Message"));
 
-    page = gtk_vbox_new(FALSE, 18);
+    page = gtk_box_new(GTK_ORIENTATION_VERTICAL, 18);
     gtk_container_set_border_width(GTK_CONTAINER(page), 12);
 
-    group = gtk_vbox_new(FALSE, 12);
+    group = gtk_box_new(GTK_ORIENTATION_VERTICAL, 12);
     gtk_box_pack_start(GTK_BOX(page), group, FALSE, TRUE, 0);
 
     label = gtk_label_new(NULL);
@@ -509,33 +507,33 @@ message_prefs_widget(GtkPrintOperation * operation,
     gtk_label_set_markup(GTK_LABEL(label), markup);
     g_free(markup);
     gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
-    gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
+    gtk_widget_set_halign(label, GTK_ALIGN_START);
     gtk_box_pack_start(GTK_BOX(group), label, FALSE, FALSE, 0);
 
-    hbox = gtk_hbox_new(FALSE, 0);
+    hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
     gtk_box_pack_start(GTK_BOX(group), hbox, TRUE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(hbox), gtk_label_new("    "),
 		       FALSE, FALSE, 0);
-    vbox = gtk_vbox_new(FALSE, 6);
+    vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 6);
     gtk_box_pack_start(GTK_BOX(hbox), vbox, TRUE, TRUE, 0);
 
-    table = gtk_table_new(3, 2, FALSE);
-    gtk_table_set_row_spacings(GTK_TABLE(table), 6);
-    gtk_table_set_col_spacings(GTK_TABLE(table), 6);
+    grid = gtk_grid_new();
+    gtk_grid_set_row_spacing(GTK_GRID(grid), 6);
+    gtk_grid_set_column_spacing(GTK_GRID(grid), 6);
 
-    gtk_box_pack_start(GTK_BOX(vbox), table, FALSE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(vbox), grid, FALSE, TRUE, 0);
 
     print_prefs->header_font =
 	add_font_button(_("_Header Font:"), balsa_app.print_header_font,
-			GTK_TABLE(table), 0);
+			GTK_GRID(grid), 0);
     print_prefs->body_font =
 	add_font_button(_("B_ody Font:"), balsa_app.print_body_font,
-			GTK_TABLE(table), 1);
+			GTK_GRID(grid), 1);
     print_prefs->footer_font =
 	add_font_button(_("_Footer Font:"), balsa_app.print_footer_font,
-			GTK_TABLE(table), 2);
+			GTK_GRID(grid), 2);
 
-    group = gtk_vbox_new(FALSE, 12);
+    group = gtk_box_new(GTK_ORIENTATION_VERTICAL, 12);
     gtk_box_pack_start(GTK_BOX(page), group, FALSE, TRUE, 0);
 
     label = gtk_label_new(NULL);
@@ -543,14 +541,14 @@ message_prefs_widget(GtkPrintOperation * operation,
     gtk_label_set_markup(GTK_LABEL(label), markup);
     g_free(markup);
     gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
-    gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
+    gtk_widget_set_halign(label, GTK_ALIGN_START);
     gtk_box_pack_start(GTK_BOX(group), label, FALSE, FALSE, 0);
 
-    hbox = gtk_hbox_new(FALSE, 0);
+    hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
     gtk_box_pack_start(GTK_BOX(group), hbox, TRUE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(hbox), gtk_label_new("    "),
 		       FALSE, FALSE, 0);
-    vbox = gtk_vbox_new(FALSE, 6);
+    vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 6);
     gtk_box_pack_start(GTK_BOX(hbox), vbox, TRUE, TRUE, 0);
 
     print_prefs->highlight_cited =
@@ -570,7 +568,7 @@ message_prefs_widget(GtkPrintOperation * operation,
     gtk_box_pack_start(GTK_BOX(vbox), print_prefs->highlight_phrases,
 		       FALSE, TRUE, 0);
 
-    group = gtk_vbox_new(FALSE, 12);
+    group = gtk_box_new(GTK_ORIENTATION_VERTICAL, 12);
     gtk_box_pack_start(GTK_BOX(page), group, FALSE, TRUE, 0);
 
     label = gtk_label_new(NULL);
@@ -578,21 +576,21 @@ message_prefs_widget(GtkPrintOperation * operation,
     gtk_label_set_markup(GTK_LABEL(label), markup);
     g_free(markup);
     gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
-    gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
+    gtk_widget_set_halign(label, GTK_ALIGN_START);
     gtk_box_pack_start(GTK_BOX(group), label, FALSE, FALSE, 0);
 
-    hbox = gtk_hbox_new(FALSE, 0);
+    hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
     gtk_box_pack_start(GTK_BOX(group), hbox, TRUE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(hbox), gtk_label_new("    "),
 		       FALSE, FALSE, 0);
-    vbox = gtk_vbox_new(FALSE, 6);
+    vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 6);
     gtk_box_pack_start(GTK_BOX(hbox), vbox, TRUE, TRUE, 0);
 
-    table = gtk_table_new(4, 3, FALSE);
-    gtk_table_set_row_spacings(GTK_TABLE(table), 6);
-    gtk_table_set_col_spacings(GTK_TABLE(table), 6);
+    grid = gtk_grid_new();
+    gtk_grid_set_row_spacing(GTK_GRID(grid), 6);
+    gtk_grid_set_column_spacing(GTK_GRID(grid), 6);
 
-    gtk_box_pack_start(GTK_BOX(vbox), table, FALSE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(vbox), grid, FALSE, TRUE, 0);
 
     pg_setup = gtk_print_operation_get_default_page_setup(operation);
     print_prefs->margin_top =
@@ -600,13 +598,13 @@ message_prefs_widget(GtkPrintOperation * operation,
 			   gtk_page_setup_get_top_margin(pg_setup, GTK_UNIT_POINTS),
 			   gtk_page_setup_get_page_height(pg_setup, GTK_UNIT_POINTS),
 			   balsa_app.margin_top,
-			   GTK_TABLE(table), 0);
+			   GTK_GRID(grid), 0);
     print_prefs->margin_bottom =
 	add_margin_spinbtn(_("_Bottom"),
 			   gtk_page_setup_get_bottom_margin(pg_setup, GTK_UNIT_POINTS),
 			   gtk_page_setup_get_page_height(pg_setup, GTK_UNIT_POINTS), 
 			   balsa_app.margin_bottom,
-			   GTK_TABLE(table), 1);
+			   GTK_GRID(grid), 1);
     g_signal_connect(G_OBJECT(gtk_spin_button_get_adjustment(GTK_SPIN_BUTTON(print_prefs->margin_top))),
 		     "value-changed", G_CALLBACK(check_margins),
 		     gtk_spin_button_get_adjustment(GTK_SPIN_BUTTON(print_prefs->margin_bottom)));
@@ -618,13 +616,13 @@ message_prefs_widget(GtkPrintOperation * operation,
 			   gtk_page_setup_get_left_margin(pg_setup, GTK_UNIT_POINTS),
 			   gtk_page_setup_get_page_width(pg_setup, GTK_UNIT_POINTS), 
 			   balsa_app.margin_left,
-			   GTK_TABLE(table), 2);
+			   GTK_GRID(grid), 2);
     print_prefs->margin_right =
 	add_margin_spinbtn(_("_Right"),
 			   gtk_page_setup_get_right_margin(pg_setup, GTK_UNIT_POINTS),
 			   gtk_page_setup_get_page_width(pg_setup, GTK_UNIT_POINTS), 
 			   balsa_app.margin_right,
-			   GTK_TABLE(table), 3);
+			   GTK_GRID(grid), 3);
     g_signal_connect(G_OBJECT(gtk_spin_button_get_adjustment(GTK_SPIN_BUTTON(print_prefs->margin_left))),
 		     "value-changed", G_CALLBACK(check_margins),
 		     gtk_spin_button_get_adjustment(GTK_SPIN_BUTTON(print_prefs->margin_right)));

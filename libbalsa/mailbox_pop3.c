@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2002 Stuart Parmenter and others,
+ * Copyright (C) 1997-2013 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -48,6 +48,12 @@ enum {
     LAST_SIGNAL
 };
 static LibBalsaMailboxClass *parent_class = NULL;
+
+struct _LibBalsaMailboxPop3Class {
+    LibBalsaMailboxRemoteClass klass;
+
+    void (*config_changed) (LibBalsaMailboxPop3* mailbox);
+};
 
 static void libbalsa_mailbox_pop3_finalize(GObject * object);
 static void libbalsa_mailbox_pop3_class_init(LibBalsaMailboxPop3Class *
@@ -199,7 +205,6 @@ move_from_msgdrop(const gchar *tmp_path, LibBalsaMailbox *dest,
 static GHashTable*
 mp_load_uids(void)
 {
-    char line[1024]; /* arbitrary limit of uid len */
     GHashTable *res = g_hash_table_new_full(g_str_hash, g_str_equal,
                                             g_free, NULL);
     gchar *fname = g_strconcat(g_get_home_dir(), "/.balsa/pop-uids", NULL);
@@ -207,6 +212,7 @@ mp_load_uids(void)
     g_free(fname);
     if(f) {
         struct flock lck;
+        char line[1024]; /* arbitrary limit of uid len */
         memset (&lck, 0, sizeof(struct flock));
         lck.l_type = F_RDLCK; lck.l_whence = SEEK_SET;
         fcntl(fileno(f), F_SETLK, &lck);

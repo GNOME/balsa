@@ -1,5 +1,5 @@
 /* libimap library.
- * Copyright (C) 2003-2008 Pawel Salek.
+ * Copyright (C) 2003-2013 Pawel Salek.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -101,16 +101,17 @@ imap_search_key_new_string(unsigned negated, ImapSearchHeader hdr,
                            const char *string, const char *user_hdr)
 {
   ImapSearchKey *s = g_new(ImapSearchKey,1);
-  int i;
   s->next = NULL;
   s->type = IMSE_STRING;
   s->negated = negated;
   s->d.string.hdr = hdr;
   s->d.string.usr = (user_hdr && *user_hdr) ? g_strdup(user_hdr) : NULL;
   s->d.string.s = g_strdup(string);
-  if(s->d.string.usr)
+  if(s->d.string.usr) {
+    int i;
     for(i=strlen(s->d.string.usr)-1; i>=0; i--)
       if(!IS_ATOM_CHAR(s->d.string.usr[i])) s->d.string.usr[i] = '_';
+  }
   return s;
 }
 
@@ -336,7 +337,7 @@ imap_write_key_string(ImapMboxHandle *handle, ImapSearchKey *k,
       sio_write(handle->sio, "\"", 1);
       for(s=k->d.string.s; *s; s++) {
         if(*s == '"') sio_write(handle->sio, "\\\"", 2);
-        else if(*s == '"') sio_write(handle->sio, "\\\\", 2);
+        else if(*s == '\\') sio_write(handle->sio, "\\\\", 2);
         else sio_write(handle->sio, s, 1);
       }
       sio_write(handle->sio, "\"", 1);
@@ -352,11 +353,7 @@ imap_write_key_date(ImapMboxHandle *handle, ImapSearchDateRange range,
   static const char *month[] = 
     { "Jan", "Feb", "Mar", "Apr", "May",
       "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
-#if GLIB_CHECK_VERSION(2,10,0)
   GDate date;
-#else
-  struct tm date;
-#endif
   if(!internal) sio_write(handle->sio, "SENT", 4);
   switch(range) {
   case IMSE_D_BEFORE : sio_write(handle->sio, "BEFORE ", 7); break;
@@ -364,15 +361,9 @@ imap_write_key_date(ImapMboxHandle *handle, ImapSearchDateRange range,
   default: /* which is -2, the only remaining option */
   case IMSE_D_SINCE  : sio_write(handle->sio, "SINCE " , 6); break;
   }
-#if GLIB_CHECK_VERSION(2,10,0)
   g_date_set_time_t(&date, tm);
   sio_printf(handle->sio, "%02d-%s-%04d",
 	     date.day, month[date.month - 1], date.year);
-#else
-  localtime_r(&tm, &date);
-  sio_printf(handle->sio, "%02d-%s-%04d",
-             date.tm_mday, month[date.tm_mon], date.tm_year + 1900);
-#endif
 }
 
 static void
@@ -468,9 +459,6 @@ ImapResponse
 imap_search_exec_unlocked(ImapMboxHandle *h, gboolean uid, 
 			  ImapSearchKey *s, ImapSearchCb cb, void *cb_arg)
 {
-  static const unsigned BODY_TO_SEARCH_AT_ONCE   = 500000;
-  static const unsigned HEADER_TO_SEARCH_AT_ONCE = 2000;
-  static const unsigned UIDS_TO_SEARCH_AT_ONCE   = 100000;
   int can_do_literals =
     imap_mbox_handle_can_do(h, IMCAP_LITERAL);
 
@@ -483,7 +471,7 @@ imap_search_exec_unlocked(ImapMboxHandle *h, gboolean uid,
   ImapCmdTag tag;
   ImapSearchCb ocb;
   void *oarg;
-  unsigned cmdno, lo, delta;
+  unsigned cmdno;
   const gchar *cmd_string;
   gboolean split;
 
@@ -507,11 +495,16 @@ imap_search_exec_unlocked(ImapMboxHandle *h, gboolean uid,
 
   split = imap_search_checks(s, IMSE_SEQUENCE);
   if(split) {
+    unsigned delta, lo;
+
     if(imap_search_checks_body(s)) {
+      static const unsigned BODY_TO_SEARCH_AT_ONCE   = 500000;
       delta = BODY_TO_SEARCH_AT_ONCE;
     } else if(imap_search_checks(s, IMSE_STRING)) {
+      static const unsigned HEADER_TO_SEARCH_AT_ONCE = 2000;
       delta = HEADER_TO_SEARCH_AT_ONCE;
     } else {
+      static const unsigned UIDS_TO_SEARCH_AT_ONCE   = 100000;
       delta = UIDS_TO_SEARCH_AT_ONCE;
     }
 
@@ -556,9 +549,9 @@ imap_search_exec(ImapMboxHandle *h, gboolean uid,
 {
   ImapResponse rc;
 
-  HANDLE_LOCK(h);
+  g_mutex_lock(&h->mutex);
   rc = imap_search_exec_unlocked(h, uid, s, cb, cb_arg);
-  HANDLE_UNLOCK(h);
+  g_mutex_unlock(&h->mutex);
 
   return rc;
 }

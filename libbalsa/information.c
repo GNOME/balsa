@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2007 Stuart Parmenter and others,
+ * Copyright (C) 1997-2013 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -22,6 +22,7 @@
 # include "config.h"
 #endif                          /* HAVE_CONFIG_H */
 #include "information.h"
+#include "libbalsa.h"
 
 #ifdef HAVE_NOTIFY
 #include <libnotify/notify.h>
@@ -90,13 +91,13 @@ libbalsa_information_varg(GtkWindow *parent, LibBalsaInformationType type,
 
         switch (type) {
         case LIBBALSA_INFORMATION_MESSAGE:
-            icon_str = GTK_STOCK_DIALOG_INFO;
+            icon_str = "dialog-information";
             break;
         case LIBBALSA_INFORMATION_WARNING:
-            icon_str = GTK_STOCK_DIALOG_WARNING;
+            icon_str = "dialog-warning";
             break;
         case LIBBALSA_INFORMATION_ERROR:
-            icon_str = GTK_STOCK_DIALOG_ERROR;
+            icon_str = "dialog-error";
             break;
         default:
             icon_str = NULL;
@@ -121,6 +122,8 @@ libbalsa_information_varg(GtkWindow *parent, LibBalsaInformationType type,
 
 #if HAVE_NOTIFY >= 7
         note = notify_notification_new("Balsa", escaped->str, icon_str);
+        notify_notification_set_hint(note, "desktop-entry",
+                                     g_variant_new_string("balsa"));
 #else
         /* prior to 0.7.0 */
         note = notify_notification_new("Balsa", escaped->str, icon_str, NULL);

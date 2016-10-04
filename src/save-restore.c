@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2010 Stuart Parmenter and others,
+ * Copyright (C) 1997-2013 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -24,9 +24,8 @@
 
 #include <stdlib.h>
 #include <string.h>
-#if HAVE_GNOME
-#include <gconf/gconf-client.h>
-#endif
+#include <gio/gio.h>
+#include <gio/gdesktopappinfo.h>
 #include <glib/gi18n.h>
 #include "balsa-app.h"
 #include "server.h"
@@ -38,10 +37,7 @@
 #include "filter-funcs.h"
 #include "mailbox-filter.h"
 #include "libbalsa-conf.h"
-
-#ifdef BALSA_USE_THREADS
 #include "threads.h"
-#endif
 
 #if ENABLE_ESMTP
 #include "smtp-server.h"
@@ -52,7 +48,6 @@
 #define ADDRESS_BOOK_SECTION_PREFIX "address-book-"
 #define IDENTITY_SECTION_PREFIX "identity-"
 #define VIEW_SECTION_PREFIX "view-"
-#define VIEW_BY_URL_SECTION_PREFIX "viewByUrl-"
 #define SMTP_SERVER_SECTION_PREFIX "smtp-server-"
 
 static gint config_global_load(void);
@@ -60,15 +55,15 @@ static gint config_folder_init(const gchar * group);
 static gint config_mailbox_init(const gchar * group);
 static gchar *config_get_unused_group(const gchar * group);
 
-static void save_color(gchar * key, GdkColor * color);
-static void load_color(gchar * key, GdkColor * color);
+static void save_color(const gchar * key, GdkRGBA * rgba);
+static void load_color(const gchar * name,
+                       const gchar * def_val,
+                       GdkRGBA     * rgba);
 static void save_mru(GList  *mru, const gchar * group);
 static void load_mru(GList **mru, const gchar * group);
 
 static void config_address_books_save(void);
 static void config_identities_load(void);
-
-static void check_for_old_sigs(GList * id_list_tmp);
 
 static void config_filters_load(void);
 
@@ -111,6 +106,7 @@ config_load_sections(void)
     libbalsa_conf_foreach_group(MAILBOX_SECTION_PREFIX,
                                 config_load_section,
                                 config_mailbox_init);
+    balsa_app.inbox_input = g_list_reverse(balsa_app.inbox_input);
     libbalsa_conf_foreach_group(FOLDER_SECTION_PREFIX,
                                 config_load_section,
                                 config_folder_init);
@@ -153,18 +149,11 @@ load_toolbars(void)
 
    WARNING: may destroy mailbox.
 */
-#if defined(ENABLE_TOUCH_UI)
-#define INBOX_NAME   "In"
-#define SENTBOX_NAME "Sent"
-#define DRAFTS_NAME  "Drafts"
-#define OUTBOX_NAME  "Out"
-#else
 #define INBOX_NAME   "Inbox"
 #define SENTBOX_NAME "Sentbox"
 #define DRAFTS_NAME  "Draftbox"
 #define OUTBOX_NAME  "Outbox"
-#endif /* ENABLE_TOUCH_UI */
-#define TRASH_NAME "Trash"
+#define TRASH_NAME   "Trash"
 
 static void
 sr_special_notify(gpointer data, GObject * mailbox)
@@ -259,7 +248,7 @@ config_address_book_save(LibBalsaAddressBook * ab)
 
     g_free(group);
 
-    libbalsa_conf_sync();
+    libbalsa_conf_queue_sync();
 }
 
 void
@@ -268,7 +257,7 @@ config_address_book_delete(LibBalsaAddressBook * ab)
     if (ab->config_prefix) {
 	libbalsa_conf_remove_group(ab->config_prefix);
 	libbalsa_conf_private_remove_group(ab->config_prefix);
-	libbalsa_conf_sync();
+	libbalsa_conf_queue_sync();
     }
 }
 
@@ -292,7 +281,7 @@ gint config_mailbox_add(LibBalsaMailbox * mailbox, const char *key_arg)
     libbalsa_conf_pop_group();
     g_free(tmp);
 
-    libbalsa_conf_sync();
+    libbalsa_conf_queue_sync();
     return TRUE;
 }				/* config_mailbox_add */
 
@@ -315,7 +304,7 @@ gint config_folder_add(BalsaMailboxNode * mbnode, const char *key_arg)
     libbalsa_conf_pop_group();
     g_free(tmp);
 
-    libbalsa_conf_sync();
+    libbalsa_conf_queue_sync();
     return TRUE;
 }				/* config_mailbox_add */
 
@@ -327,7 +316,7 @@ gint config_mailbox_delete(const LibBalsaMailbox * mailbox)
     tmp = mailbox_section_path(mailbox);
     res = libbalsa_conf_has_group(tmp);
     libbalsa_conf_remove_group(tmp);
-    libbalsa_conf_sync();
+    libbalsa_conf_queue_sync();
     g_free(tmp);
     return res;
 }				/* config_mailbox_delete */
@@ -340,7 +329,7 @@ config_folder_delete(const BalsaMailboxNode * mbnode)
     tmp = folder_section_path(mbnode);
     res = libbalsa_conf_has_group(tmp);
     libbalsa_conf_remove_group(tmp);
-    libbalsa_conf_sync();
+    libbalsa_conf_queue_sync();
     g_free(tmp);
     return res;
 }				/* config_folder_delete */
@@ -359,7 +348,7 @@ gint config_mailbox_update(LibBalsaMailbox * mailbox)
     libbalsa_mailbox_save_config(mailbox, key);
     g_free(key);
     libbalsa_conf_pop_group();
-    libbalsa_conf_sync();
+    libbalsa_conf_queue_sync();
     return res;
 }				/* config_mailbox_update */
 
@@ -377,7 +366,7 @@ gint config_folder_update(BalsaMailboxNode * mbnode)
     balsa_mailbox_node_save_config(mbnode, key);
     g_free(key);
     libbalsa_conf_pop_group();
-    libbalsa_conf_sync();
+    libbalsa_conf_queue_sync();
     return res;
 }				/* config_folder_update */
 
@@ -385,7 +374,6 @@ static void
 pop3_progress_notify(LibBalsaMailbox* mailbox, int msg_type, int prog, int tot,
                      const char* msg)
 {
-#ifdef BALSA_USE_THREADS
     MailThreadMessage *message;
 
     message = g_new(MailThreadMessage, 1);
@@ -403,10 +391,6 @@ pop3_progress_notify(LibBalsaMailbox* mailbox, int msg_type, int prog, int tot,
     if (write(mail_thread_pipes[1], (void *) &message, sizeof(void *))
         != sizeof(void *))
         g_warning("pipe error");
-#else
-    while(gtk_events_pending())
-        gtk_main_iteration_do(FALSE);
-#endif
 }
 
 /* Initialize the specified mailbox, creating the internal data
@@ -436,8 +420,8 @@ config_mailbox_init(const gchar * prefix)
                          "progress-notify", G_CALLBACK(pop3_progress_notify),
                          mailbox);
 	balsa_app.inbox_input =
-	    g_list_append(balsa_app.inbox_input, 
-			  balsa_mailbox_node_new_from_mailbox(mailbox));
+            g_list_prepend(balsa_app.inbox_input,
+                           balsa_mailbox_node_new_from_mailbox(mailbox));
     } else {
         LibBalsaMailbox **special = NULL;
 	BalsaMailboxNode *mbnode;
@@ -612,9 +596,6 @@ config_global_load(void)
  			     filter_strerror(filter_errno));
     }
 
-    /* find and convert old-style signature entries */
-    check_for_old_sigs(balsa_app.identities);
-
     /* Section for the balsa_information() settings... */
     libbalsa_conf_push_group("InformationMessages");
 
@@ -738,21 +719,23 @@ config_global_load(void)
 	int i;
 	gchar *default_quoted_color[MAX_QUOTED_COLOR] = {"#088", "#800"};
 	for(i=0;i<MAX_QUOTED_COLOR;i++) {
-	    gchar *text = g_strdup_printf("QuotedColor%d=%s", i, i<6 ?
-			  default_quoted_color[i] : DEFAULT_QUOTED_COLOR);
-	    load_color(text, &balsa_app.quoted_color[i]);
-	    g_free(text);
+            gchar *key;
+            const gchar *def_val;
+
+            key = g_strdup_printf("QuotedColor%d", i);
+            def_val =
+                i < 6 ? default_quoted_color[i] : DEFAULT_QUOTED_COLOR;
+            load_color(key, def_val, &balsa_app.quoted_color[i]);
+            g_free(key);
 	}
     }
 
     /* URL coloring */
-    load_color("UrlColor=" DEFAULT_URL_COLOR, &balsa_app.url_color);
-
-    /* bad address coloring */
-    load_color("BadAddressColor=" DEFAULT_BAD_ADDRESS_COLOR,
-               &balsa_app.bad_address_color);
+    load_color("UrlColor", DEFAULT_URL_COLOR, &balsa_app.url_color);
 
     /* ... font used to display messages */
+    balsa_app.use_system_fonts =
+        libbalsa_conf_get_bool("UseSystemFonts=true");
     g_free(balsa_app.message_font);
     balsa_app.message_font =
 	libbalsa_conf_get_string("MessageFont=" DEFAULT_MESSAGE_FONT);
@@ -798,11 +781,6 @@ config_global_load(void)
     balsa_app.pgdown_percent = libbalsa_conf_get_int("PageDownPercent=50");
     if (balsa_app.pgdown_percent < 10)
 	balsa_app.pgdown_percent = 10;
-#if defined(ENABLE_TOUCH_UI)
-    balsa_app.do_file_format_check =
-        libbalsa_conf_get_bool("FileFormatCheck=true");
-    balsa_app.enable_view_filter = libbalsa_conf_get_bool("ViewFilter=false");
-#endif /* ENABLE_TOUCH_UI */
 
     balsa_app.show_main_toolbar =
         libbalsa_conf_get_bool("ShowMainWindowToolbar=true");
@@ -849,6 +827,12 @@ config_global_load(void)
     balsa_app.source_height = libbalsa_conf_get_int("Height=400");
     libbalsa_conf_pop_group();
 
+    /* MRU mailbox tree ... */
+    libbalsa_conf_push_group("MruTree");
+    balsa_app.mru_tree_width  = libbalsa_conf_get_int("Width=150");
+    balsa_app.mru_tree_height = libbalsa_conf_get_int("Height=300");
+    libbalsa_conf_pop_group();
+
     /* Printing options ... */
     libbalsa_conf_push_group("Printing");
 
@@ -888,7 +872,7 @@ config_global_load(void)
     /* Spelling options ... */
     libbalsa_conf_push_group("Spelling");
 
-#if HAVE_GTKSPELL
+#if HAVE_GSPELL || HAVE_GTKSPELL
     balsa_app.spell_check_lang =
         libbalsa_conf_get_string("SpellCheckLanguage");
     balsa_app.spell_check_active =
@@ -896,11 +880,6 @@ config_global_load(void)
     if (def_used)
         balsa_app.spell_check_active = balsa_app.spell_check_lang != NULL;
 #else                           /* HAVE_GTKSPELL */
-    balsa_app.module = d_get_gint("PspellModule", DEFAULT_PSPELL_MODULE);
-    balsa_app.suggestion_mode =
-	d_get_gint("PspellSuggestMode", DEFAULT_PSPELL_SUGGEST_MODE);
-    balsa_app.ignore_size =
-	d_get_gint("PspellIgnoreSize", DEFAULT_PSPELL_IGNORE_SIZE);
     balsa_app.check_sig =
 	d_get_gint("SpellCheckSignature", DEFAULT_CHECK_SIG);
     balsa_app.check_quoted =
@@ -1065,13 +1044,8 @@ config_global_load(void)
     balsa_app.root_node =
         balsa_mailbox_node_new_from_dir(balsa_app.local_mail_directory);
 
-#if defined(ENABLE_TOUCH_UI)
-     balsa_app.open_inbox_upon_startup =
-	libbalsa_conf_get_bool("OpenInboxOnStartup=true");
-#else
      balsa_app.open_inbox_upon_startup =
 	libbalsa_conf_get_bool("OpenInboxOnStartup=false");
-#endif /* ENABLE_TOUCH_UI */
     /* debugging enabled */
     balsa_app.debug = libbalsa_conf_get_bool("Debug=false");
 
@@ -1273,6 +1247,7 @@ config_save(void)
 			 libbalsa_mailbox_get_threading_type(NULL));
     libbalsa_conf_set_bool("MarkQuoted", balsa_app.mark_quoted);
     libbalsa_conf_set_string("QuoteRegex", balsa_app.quote_regex);
+    libbalsa_conf_set_bool("UseSystemFonts", balsa_app.use_system_fonts);
     libbalsa_conf_set_string("MessageFont", balsa_app.message_font);
     libbalsa_conf_set_string("SubjectFont", balsa_app.subject_font);
     libbalsa_conf_set_bool("WordWrap", balsa_app.browse_wrap);
@@ -1285,7 +1260,6 @@ config_save(void)
     }
 
     save_color("UrlColor", &balsa_app.url_color);
-    save_color("BadAddressColor", &balsa_app.bad_address_color);
 
     /* ... handling of Multipart/Alternative */
     libbalsa_conf_set_bool("DisplayAlternativeAsPlain",
@@ -1310,10 +1284,6 @@ config_save(void)
     libbalsa_conf_set_bool("AskBeforeSelect", balsa_app.ask_before_select);
     libbalsa_conf_set_bool("PageDownMod", balsa_app.pgdownmod);
     libbalsa_conf_set_int("PageDownPercent", balsa_app.pgdown_percent);
-#if defined(ENABLE_TOUCH_UI)
-    libbalsa_conf_set_bool("FileFormatCheck", balsa_app.do_file_format_check);
-    libbalsa_conf_set_bool("ViewFilter",      balsa_app.enable_view_filter);
-#endif /* ENABLE_TOUCH_UI */
 
     libbalsa_conf_set_bool("ShowMainWindowToolbar",
                            balsa_app.show_main_toolbar);
@@ -1342,6 +1312,12 @@ config_save(void)
                           balsa_app.source_escape_specials);
     libbalsa_conf_set_int("Width",  balsa_app.source_width);
     libbalsa_conf_set_int("Height", balsa_app.source_height);
+    libbalsa_conf_pop_group();
+
+    /* MRU mailbox tree ... */
+    libbalsa_conf_push_group("MruTree");
+    libbalsa_conf_set_int("Width",  balsa_app.mru_tree_width);
+    libbalsa_conf_set_int("Height", balsa_app.mru_tree_height);
     libbalsa_conf_pop_group();
 
     /* Printing options ... */
@@ -1375,15 +1351,12 @@ config_save(void)
     libbalsa_conf_remove_group("Spelling");
     libbalsa_conf_push_group("Spelling");
 
-#if HAVE_GTKSPELL
+#if HAVE_GSPELL || HAVE_GTKSPELL
     libbalsa_conf_set_string("SpellCheckLanguage",
                              balsa_app.spell_check_lang);
     libbalsa_conf_set_bool("SpellCheckActive", 
                            balsa_app.spell_check_active);
 #else                           /* HAVE_GTKSPELL */
-    libbalsa_conf_set_int("PspellModule", balsa_app.module);
-    libbalsa_conf_set_int("PspellSuggestMode", balsa_app.suggestion_mode);
-    libbalsa_conf_set_int("PspellIgnoreSize", balsa_app.ignore_size);
     libbalsa_conf_set_int("SpellCheckSignature", balsa_app.check_sig);
     libbalsa_conf_set_int("SpellCheckQuoted", balsa_app.check_quoted);
 #endif                          /* HAVE_GTKSPELL */
@@ -1581,7 +1554,7 @@ config_address_book_load(const gchar * key, const gchar * value,
 
     if (address_book) {
         balsa_app.address_book_list =
-            g_list_append(balsa_app.address_book_list, address_book);
+            g_list_prepend(balsa_app.address_book_list, address_book);
 
         if (default_address_book_prefix
             && strcmp(key, default_address_book_prefix) == 0) {
@@ -1603,14 +1576,15 @@ config_address_books_load(void)
     libbalsa_conf_pop_group();
 
     /* Free old data in case address books were set by eg. config druid. */
-    g_list_foreach(balsa_app.address_book_list, (GFunc) g_object_unref,
-                   NULL);
-    g_list_free(balsa_app.address_book_list);
+    g_list_free_full(balsa_app.address_book_list, g_object_unref);
     balsa_app.address_book_list = NULL;
 
     libbalsa_conf_foreach_group(ADDRESS_BOOK_SECTION_PREFIX,
                                 config_address_book_load,
                                 default_address_book_prefix);
+
+    balsa_app.address_book_list =
+        g_list_reverse(balsa_app.address_book_list);
 
     g_free(default_address_book_prefix);
 }
@@ -1678,8 +1652,7 @@ config_identities_load()
     gchar *default_ident;
 
     /* Free old data in case identities were set by eg. config druid. */
-    g_list_foreach(balsa_app.identities, (GFunc) g_object_unref, NULL);
-    g_list_free(balsa_app.identities);
+    g_list_free_full(balsa_app.identities, g_object_unref);
     balsa_app.identities = NULL;
 
     libbalsa_conf_push_group("identity");
@@ -1735,107 +1708,6 @@ config_identities_save(void)
     }
 }
 
-static gboolean
-config_view_load(const gchar * key, const gchar * value, gpointer data)
-{
-    gboolean compat = GPOINTER_TO_INT(data);
-    gchar *url;
-    gint def;
-
-    libbalsa_conf_push_group(key);
-
-    url = compat ? libbalsa_conf_get_string_with_default("URL", &def) :
-        libbalsa_urldecode(value);
-
-    if (!compat || !def) {
-        LibBalsaMailboxView *view;
-        gint tmp;
-        gchar *address;
-
-        view = libbalsa_mailbox_view_new();
-        /* In compatibility mode, mark as not in sync, to force
-         * the view to be saved in the config file. */
-        view->in_sync = !compat;
-        g_hash_table_insert(libbalsa_mailbox_view_table, g_strdup(url),
-                            view);
-
-        address =
-            libbalsa_conf_get_string_with_default("MailingListAddress",
-                                                  &def);
-        view->mailing_list_address =
-            def ? NULL : internet_address_list_parse_string(address);
-        g_free(address);
-
-        view->identity_name = libbalsa_conf_get_string("Identity");
-
-        tmp = libbalsa_conf_get_int_with_default("Threading", &def);
-        if (!def)
-            view->threading_type = tmp;
-
-        tmp = libbalsa_conf_get_int_with_default("GUIFilter", &def);
-        if (!def)
-            view->filter = tmp;
-
-        tmp = libbalsa_conf_get_int_with_default("SortType", &def);
-        if (!def)
-            view->sort_type = tmp;
-
-        tmp = libbalsa_conf_get_int_with_default("SortField", &def);
-        if (!def)
-            view->sort_field = tmp;
-
-        tmp = libbalsa_conf_get_int_with_default("Show", &def);
-        if (!def)
-            view->show = tmp;
-
-        tmp = libbalsa_conf_get_int_with_default("Subscribe", &def);
-        if (!def)
-            view->subscribe = tmp;
-
-        tmp = libbalsa_conf_get_bool_with_default("Exposed", &def);
-        if (!def)
-            view->exposed = tmp;
-
-        tmp = libbalsa_conf_get_bool_with_default("Open", &def);
-        if (!def)
-            view->open = tmp;
-#ifdef HAVE_GPGME
-        tmp = libbalsa_conf_get_int_with_default("CryptoMode", &def);
-        if (!def)
-            view->gpg_chk_mode = tmp;
-#endif
-
-        tmp = libbalsa_conf_get_int_with_default("Total", &def);
-        if (!def)
-            view->total = tmp;
-
-        tmp = libbalsa_conf_get_int_with_default("Unread", &def);
-        if (!def)
-            view->unread = tmp;
-
-        tmp = libbalsa_conf_get_int_with_default("ModTime", &def);
-        if (!def)
-            view->mtime = tmp;
-    }
-
-    libbalsa_conf_pop_group();
-    g_free(url);
-
-    return FALSE;
-}
-
-void
-config_views_load(void)
-{
-    /* Load old-style config sections in compatibility mode. */
-    libbalsa_conf_foreach_group(VIEW_SECTION_PREFIX,
-                                config_view_load,
-                                GINT_TO_POINTER(TRUE));
-    libbalsa_conf_foreach_group(VIEW_BY_URL_SECTION_PREFIX,
-                                config_view_load,
-                                GINT_TO_POINTER(FALSE));
-}
-
 /* Get viewByUrl prefix */
 static gchar *
 view_by_url_prefix(const gchar * url)
@@ -1850,11 +1722,74 @@ view_by_url_prefix(const gchar * url)
     return prefix;
 }
 
-/* config_views_save:
-   iterates over all mailbox views.
-*/
-static void
-save_view(const gchar * url, LibBalsaMailboxView * view)
+
+LibBalsaMailboxView *
+config_load_mailbox_view(const gchar * url)
+{
+    gchar *prefix;
+    LibBalsaMailboxView *view;
+
+    if (!url)
+        return NULL;
+
+    prefix = view_by_url_prefix(url);
+    if (!libbalsa_conf_has_group(prefix)) {
+        g_free(prefix);
+        return NULL;
+    }
+
+    libbalsa_conf_push_group(prefix);
+
+    view = libbalsa_mailbox_view_new();
+
+    view->identity_name = libbalsa_conf_get_string("Identity");
+
+    if (libbalsa_conf_has_key("Threading"))
+        view->threading_type = libbalsa_conf_get_int("Threading");
+
+    if (libbalsa_conf_has_key("GUIFilter"))
+        view->filter = libbalsa_conf_get_int("GUIFilter");
+
+    if (libbalsa_conf_has_key("SortType"))
+        view->sort_type = libbalsa_conf_get_int("SortType");
+
+    if (libbalsa_conf_has_key("SortField"))
+        view->sort_field = libbalsa_conf_get_int("SortField");
+
+    if (libbalsa_conf_has_key("Show"))
+        view->show = libbalsa_conf_get_int("Show");
+
+    if (libbalsa_conf_has_key("Subscribe"))
+        view->subscribe = libbalsa_conf_get_int("Subscribe");
+
+    if (libbalsa_conf_has_key("Exposed"))
+        view->exposed = libbalsa_conf_get_bool("Exposed");
+
+    if (libbalsa_conf_has_key("Open"))
+        view->open = libbalsa_conf_get_bool("Open");
+
+#ifdef HAVE_GPGME
+    if (libbalsa_conf_has_key("CryptoMode"))
+        view->gpg_chk_mode = libbalsa_conf_get_int("CryptoMode");
+#endif
+
+    if (libbalsa_conf_has_key("Total"))
+        view->total = libbalsa_conf_get_int("Total");
+
+    if (libbalsa_conf_has_key("Unread"))
+        view->unread = libbalsa_conf_get_int("Unread");
+
+    if (libbalsa_conf_has_key("ModTime"))
+        view->mtime = libbalsa_conf_get_int("ModTime");
+
+    libbalsa_conf_pop_group();
+    g_free(prefix);
+
+    return view;
+}
+
+void
+config_save_mailbox_view(const gchar * url, LibBalsaMailboxView * view)
 {
     gchar *prefix;
 
@@ -1870,14 +1805,6 @@ save_view(const gchar * url, LibBalsaMailboxView * view)
     libbalsa_conf_push_group(prefix);
     g_free(prefix);
 
-    if (view->mailing_list_address !=
-	libbalsa_mailbox_get_mailing_list_address(NULL)) {
-       gchar* tmp =
-	   internet_address_list_to_string(view->mailing_list_address,
-		                           FALSE);
-       libbalsa_conf_set_string("MailingListAddress", tmp);
-       g_free(tmp);
-    }
     if (view->identity_name  != libbalsa_mailbox_get_identity_name(NULL))
 	libbalsa_conf_set_string("Identity", view->identity_name);
     if (view->threading_type != libbalsa_mailbox_get_threading_type(NULL))
@@ -1894,7 +1821,8 @@ save_view(const gchar * url, LibBalsaMailboxView * view)
 	libbalsa_conf_set_int("Subscribe",   view->subscribe);
     if (view->exposed        != libbalsa_mailbox_get_exposed(NULL))
 	libbalsa_conf_set_bool("Exposed",    view->exposed);
-    if (view->open           != libbalsa_mailbox_get_open(NULL))
+    if (balsa_app.remember_open_mboxes &&
+        view->open           != libbalsa_mailbox_get_open(NULL))
 	libbalsa_conf_set_bool("Open",       view->open);
 #ifdef HAVE_GPGME
     if (view->gpg_chk_mode   != libbalsa_mailbox_get_crypto_mode(NULL))
@@ -1920,32 +1848,24 @@ save_view(const gchar * url, LibBalsaMailboxView * view)
 }
 
 void
-config_views_save(void)
-{
-    config_remove_groups(VIEW_SECTION_PREFIX);
-    /* save current */
-    g_hash_table_foreach(libbalsa_mailbox_view_table, (GHFunc) save_view,
-			 NULL);
-}
-
-void
 config_view_remove(const gchar * url)
 {
     gchar *prefix = view_by_url_prefix(url);
     libbalsa_conf_remove_group(prefix);
     g_free(prefix);
-    g_hash_table_remove(libbalsa_mailbox_view_table, url);
 }
 
 static void
-save_color(gchar * key, GdkColor * color)
+save_color(const gchar * key, GdkRGBA * rgba)
 {
+    gchar *full_key;
     gchar *str;
 
-    str = g_strdup_printf("#%04x%04x%04x", color->red, color->green,
-                          color->blue);
-    libbalsa_conf_set_string(key, str);
+    full_key = g_strconcat(key, "RGBA", NULL);
+    str = gdk_rgba_to_string(rgba);
+    libbalsa_conf_set_string(full_key, str);
     g_free(str);
+    g_free(full_key);
 }
 
 static gboolean
@@ -2013,7 +1933,7 @@ config_filters_save(void)
 	libbalsa_filter_save_config(fil);
 	libbalsa_conf_pop_group();
     }
-    libbalsa_conf_sync();
+    libbalsa_conf_queue_sync();
     /* This loop takes care of cleaning up old filter sections */
     while (TRUE) {
 	i=snprintf(tmp,tmp_len,"%d",nb++);
@@ -2024,7 +1944,7 @@ config_filters_save(void)
 	}
 	else break;
     }
-    libbalsa_conf_sync();
+    libbalsa_conf_queue_sync();
     g_free(buffer);
 }
 
@@ -2055,19 +1975,25 @@ config_mailbox_filters_save(LibBalsaMailbox * mbox)
     }
     libbalsa_mailbox_filters_save_config(mbox);
     libbalsa_conf_pop_group();
-    libbalsa_conf_sync();
+    libbalsa_conf_queue_sync();
 }
 
 static void
-load_color(gchar * key, GdkColor * color)
+load_color(const gchar * key, const gchar * def_val, GdkRGBA * rgba)
 {
+    gchar *full_key;
     gchar *str;
+    gboolean def_used;
 
-    str = libbalsa_conf_get_string(key);
-    if (g_ascii_strncasecmp(str, "rgb:", 4)
-        || sscanf(str + 4, "%4hx/%4hx/%4hx", &color->red, &color->green,
-                  &color->blue) != 3)
-        gdk_color_parse(str, color);
+    full_key = g_strdup_printf("%sRGBA", key);
+    str = libbalsa_conf_get_string(full_key);
+    if (!str) {
+        g_free(full_key);
+        full_key = g_strdup_printf("%s=%s", key, def_val);
+        str = libbalsa_conf_get_string_with_default(full_key, &def_used);
+    }
+    g_free(full_key);
+    gdk_rgba_parse(rgba, str);
     g_free(str);
 }
 
@@ -2085,8 +2011,9 @@ load_mru(GList **mru, const gchar * group)
         gchar *val;
 	snprintf(tmpkey, sizeof tmpkey - 1, "MRU%d", i + 1);
         if( (val = libbalsa_conf_get_string(tmpkey)) != NULL )
-            (*mru)=g_list_append((*mru), val);
+            (*mru)=g_list_prepend((*mru), val);
     }
+    *mru = g_list_reverse(*mru);
     libbalsa_conf_pop_group();
 }
 
@@ -2109,88 +2036,63 @@ save_mru(GList * mru, const gchar * group)
     libbalsa_conf_pop_group();
 }
 
-/* check_for_old_sigs:
-   function for old style signature conversion (executable sigs prefixed
-   with '|') to new style (filename and a checkbox).
-   this function just strips the leading '|'.
-*/
-static void 
-check_for_old_sigs(GList * id_list_tmp)
-{
-    /* strip pipes and spaces,set executable flag if warranted */
-    /* FIXME remove after a few stable releases.*/
-    
-    LibBalsaIdentity* id_tmp = NULL;
-    
-    for (id_list_tmp = balsa_app.identities; id_list_tmp; 
-         id_list_tmp = id_list_tmp->next) {
-       
-        id_tmp = LIBBALSA_IDENTITY(id_list_tmp->data);
-        if(!id_tmp->signature_path) continue;
-
-        id_tmp->signature_path = g_strstrip(id_tmp->signature_path);
-        if(*id_tmp->signature_path == '|'){
-            printf("Found old style signature for identity: %s\n"\
-                   "Converting: %s --> ", id_tmp->identity_name, 
-                   id_tmp->signature_path);
-            id_tmp->signature_path = g_strchug(id_tmp->signature_path+1);
-            printf("%s \n", id_tmp->signature_path);
-            
-            /* set new-style executable var*/
-            id_tmp->sig_executable=TRUE;
-            printf("Setting converted signature as executable.\n");
-        }
-    }
-}
-
-#if HAVE_GNOME
 void
 config_defclient_save(void)
 {
-    static struct {
-        const char *key, *val;
-    } gconf_string[] = {
-        {"/desktop/gnome/url-handlers/mailto/command",     "balsa -m \"%s\""},
-        {"/desktop/gnome/url-handlers/mailto/description", "Email" }};
-    static struct {
-        const char *key; gboolean val;
-    } gconf_bool[] = {
-        {"/desktop/gnome/url-handlers/mailto/need-terminal", FALSE},
-        {"/desktop/gnome/url-handlers/mailto/enabled",       TRUE}};
+    GDesktopAppInfo *info;
+    GError *err;
 
-    if (balsa_app.default_client) {
-        GError *err = NULL;
-        GConfClient *gc;
-        unsigned i;
-        gc = gconf_client_get_default(); /* FIXME: error handling */
-        if (gc == NULL) {
-            balsa_information(LIBBALSA_INFORMATION_WARNING,
-                              _("Error opening GConf database\n"));
-            return;
-        }
-        for(i=0; i<ELEMENTS(gconf_string); i++) {
-            gconf_client_set_string(gc, gconf_string[i].key, 
-                                    gconf_string[i].val, &err);
-            if (err) {
-                balsa_information(LIBBALSA_INFORMATION_WARNING,
-                                  _("Error setting GConf field: %s\n"),
-                                  err->message);
-                g_error_free(err);
-                return;
-            }
-        }
-        for(i=0; i<ELEMENTS(gconf_bool); i++) {
-            gconf_client_set_bool(gc, gconf_bool[i].key,
-                                  gconf_bool[i].val, &err);
-            if (err) {
-                balsa_information(LIBBALSA_INFORMATION_WARNING,
-                                  _("Error setting GConf field: %s\n"),
-                                  err->message);
-                g_error_free(err);
-                return;
-            }
-            g_object_unref(gc);
-        }
+    if (!balsa_app.default_client)
+        return;
+
+    info = g_desktop_app_info_new("balsa.desktop");
+    if (!info) {
+        g_warning("Failed to create default application for Balsa "
+                  "for \"mailto\"");
+        return;
     }
+
+    err = NULL;
+    if (!g_app_info_set_as_default_for_type
+        (G_APP_INFO(info), "x-scheme-handler/mailto", &err)) {
+        g_warning("Failed to set Balsa as the default application "
+                  "for \"mailto\": %s", err->message);
+        g_error_free(err);
+    }
+    g_object_unref(info);
 }
-#endif /* HAVE_GNOME */
+
+static gboolean
+config_mailbox_had_property(const gchar * url, const gchar * key)
+{
+    gchar *prefix;
+    gboolean retval = FALSE;
+
+    prefix = view_by_url_prefix(url);
+    if (!libbalsa_conf_has_group(prefix)) {
+        g_free(prefix);
+        return retval;
+    }
+
+    libbalsa_conf_push_group(prefix);
+
+    if (libbalsa_conf_has_key(key))
+        retval = libbalsa_conf_get_bool(key);
+
+    libbalsa_conf_pop_group();
+    g_free(prefix);
+
+    return retval;
+}
+
+gboolean
+config_mailbox_was_open(const gchar * url)
+{
+    return config_mailbox_had_property(url, "Open");
+}
+
+gboolean
+config_mailbox_was_exposed(const gchar * url)
+{
+    return config_mailbox_had_property(url, "Exposed");
+}

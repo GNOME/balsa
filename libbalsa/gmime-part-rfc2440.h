@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /*
  * gmime/gpgme implementation for RFC2440 parts
- * Copyright (C) 2004-2011 Albrecht Dreß <albrecht.dress@arcor.de>
+ * Copyright (C) 2004-2013 Albrecht Dreß <albrecht.dress@arcor.de>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,13 +26,9 @@
 #include <gmime/gmime.h>
 
 
-#ifdef __cplusplus
-extern "C" {
+G_BEGIN_DECLS
 
-#ifdef MAKE_EMACS_HAPPY
-}
-#endif
-#endif				/* __cplusplus */
+
 typedef enum _GMimePartRfc2440Mode GMimePartRfc2440Mode;
 enum _GMimePartRfc2440Mode { 
     GMIME_PART_RFC2440_NONE,
@@ -45,7 +41,7 @@ enum _GMimePartRfc2440Mode {
 GMimePartRfc2440Mode g_mime_part_check_rfc2440(GMimePart * part);
 
 /* crypto routines */
-int g_mime_part_rfc2440_sign_encrypt(GMimePart * part,
+gboolean g_mime_part_rfc2440_sign_encrypt(GMimePart * part,
 				     const char *sign_userid,
 				     GPtrArray * recipients,
 				     gboolean trust_all,
@@ -56,8 +52,7 @@ GMimeGpgmeSigstat *g_mime_part_rfc2440_decrypt(GMimePart * part,
 					       GtkWindow * parent,
                                                 GError ** err);
 
-#ifdef __cplusplus
-}
-#endif				/* __cplusplus */
+G_END_DECLS
+
 
 #endif				/* __GMIME_PART_RFC2440_H__ */

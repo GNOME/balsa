@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2001 Stuart Parmenter and others,
+ * Copyright (C) 1997-2013 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -30,10 +30,9 @@
 
 #include "libbalsa.h"
 
-#ifdef __cpluscplus
-extern "C" 
-{
-#endif /* __cplusplus */
+
+G_BEGIN_DECLS
+
 
     GType libbalsa_identity_get_type(void);
 
@@ -143,11 +142,16 @@ extern "C"
                                          LibBalsaIdentity * initial_id,
                                          LibBalsaIdentityCallback update,
                                          gpointer data);
+    GtkWidget * libbalsa_identity_combo_box(GList       * identities,
+                                            const gchar * active_name,
+                                            GCallback     changed_cb,
+                                            gpointer      changed_data);
 
     LibBalsaIdentity* libbalsa_identity_new_config(const gchar* name);
     void libbalsa_identity_save(LibBalsaIdentity* id, const gchar* prefix);
 
-#ifdef __cplusplus
-}
-#endif
+
+G_END_DECLS
+
+
 #endif /* __LIBBALSA_IDENTITY_H__ */

@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2003 Stuart Parmenter and others,
+ * Copyright (C) 1997-2013 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -28,19 +28,6 @@
 #include <stdio.h>
 #include <gtk/gtk.h>
 #include <gmime/gmime.h>
-
-#if ENABLE_ESMTP
-#include <auth-client.h>
-#endif
-
-#if !USE_GREGEX
-#  ifdef HAVE_PCRE
-#    include <pcreposix.h>
-#  else
-#    include <sys/types.h>
-#    include <regex.h>
-#  endif
-#endif                          /* USE_GREGEX */
 
 typedef enum _LibBalsaCodeset LibBalsaCodeset;
 
@@ -142,15 +129,9 @@ gboolean libbalsa_insert_with_url(GtkTextBuffer * buffer,
 				  guint len,
 				  GtkTextTag * tag,
 				  LibBalsaUrlInsertInfo *url_info);
-#if USE_GREGEX
 void libbalsa_unwrap_selection(GtkTextBuffer * buffer, GRegex * rex);
 gboolean libbalsa_match_regex(const gchar * line, GRegex * rex,
 			      guint * count, guint * index);
-#else                           /* USE_GREGEX */
-void libbalsa_unwrap_selection(GtkTextBuffer * buffer, regex_t * rex);
-gboolean libbalsa_match_regex(const gchar * line, regex_t * rex,
-			      guint * count, guint * index);
-#endif                          /* USE_GREGEX */
 
 int libbalsa_safe_open (const char *path, int flags, mode_t mode, GError **err);
 int libbalsa_lock_file (const char *path, int fd, int excl, int dot, int timeout);
@@ -161,16 +142,15 @@ int libbalsa_safe_rename (const char *src, const char *target);
 gboolean libbalsa_ia_rfc2821_equal(const InternetAddress * a,
 				   const InternetAddress * b);
 
-
-GtkWidget *libbalsa_create_table(guint rows, guint columns);
-GtkWidget *libbalsa_create_label(const gchar * label, GtkWidget * table,
-                                 gint row);
-GtkWidget *libbalsa_create_entry(GtkWidget * table, GCallback func,
-                                 gpointer data, gint row,
-                                 const gchar * initval,
-                                 GtkWidget * hotlabel);
-GtkWidget *libbalsa_create_check(const gchar * label, GtkWidget * table,
-                                 gint row, gboolean initval);
+GtkWidget *libbalsa_create_grid(void);
+GtkWidget *libbalsa_create_grid_label(const gchar * label, GtkWidget * grid,
+                                      gint row);
+GtkWidget *libbalsa_create_grid_entry(GtkWidget * grid, GCallback func,
+                                      gpointer data, gint row,
+                                      const gchar * initval,
+                                      GtkWidget * hotlabel);
+GtkWidget *libbalsa_create_grid_check(const gchar * label, GtkWidget * grid,
+                                      gint row, gboolean initval);
 GtkSizeGroup *libbalsa_create_size_group(GtkWidget * chooser);
 
 void libbalsa_assure_balsa_dir(void);

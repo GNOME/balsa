@@ -128,11 +128,11 @@ g_mime_application_pkcs7_decrypt_verify(GMimePart * pkcs7,
 
 /*
  * Encrypt content for all recipients in recipients using the context ctx and
- * return the resulting application/pkcs7-mime object in pkcs7. Return 0 on
- * success and -1 on fail. In the latter case, fill err with more information
+ * return the resulting application/pkcs7-mime object in pkcs7. Return TRUE on
+ * success and FALSE on fail. In the latter case, fill err with more information
  * about the reason.
  */
-int
+gboolean
 g_mime_application_pkcs7_encrypt(GMimePart * pkcs7, GMimeObject * content,
 				 GPtrArray * recipients,
 				 gboolean trust_all, GtkWindow * parent,
@@ -143,8 +143,8 @@ g_mime_application_pkcs7_encrypt(GMimePart * pkcs7, GMimeObject * content,
     GMimeStream *stream, *ciphertext;
     GMimeFilter *crlf_filter;
 	
-    g_return_val_if_fail(GMIME_IS_PART(pkcs7), -1);
-    g_return_val_if_fail(GMIME_IS_OBJECT(content), -1);
+    g_return_val_if_fail(GMIME_IS_PART(pkcs7), FALSE);
+    g_return_val_if_fail(GMIME_IS_OBJECT(content), FALSE);
 	
     /* get the cleartext */
     stream = g_mime_stream_mem_new();
@@ -164,12 +164,12 @@ g_mime_application_pkcs7_encrypt(GMimePart * pkcs7, GMimeObject * content,
 	
     /* encrypt the content stream */
     ciphertext = g_mime_stream_mem_new();
-    if (libbalsa_gpgme_encrypt
+    if (!libbalsa_gpgme_encrypt
 	(recipients, NULL, stream, ciphertext, GPGME_PROTOCOL_CMS, TRUE,
-	 trust_all, parent, err) == -1) {
+	 trust_all, parent, err)) {
 	g_object_unref(ciphertext);
 	g_object_unref(stream);
-	return -1;
+	return FALSE;
     }
 	
     g_object_unref(stream);
@@ -192,5 +192,5 @@ g_mime_application_pkcs7_encrypt(GMimePart * pkcs7, GMimeObject * content,
     g_mime_object_set_content_type_parameter(GMIME_OBJECT(pkcs7), "name",
 					     "smime.p7m");
 	
-    return 0;
+    return TRUE;
 }

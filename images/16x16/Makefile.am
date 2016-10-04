@@ -1,5 +1,4 @@
 extra_appicons_IMGS = \
-	balsa-drop-down.png	\
 	balsa-encrypted.png	\
 	balsa-mark-all.png	\
 	balsa-mbox-draft.png	\

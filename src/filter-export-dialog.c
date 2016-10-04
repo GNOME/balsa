@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2002 Stuart Parmenter and others,
+ * Copyright (C) 1997-2013 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -49,7 +49,7 @@ GtkWidget * fex_window;
  * Returns immediately, but fires off the filter export dialog.
  */
 void
-filters_export_dialog(void)
+filters_export_dialog(GtkWindow * parent)
 {
     GtkTreeView *list;
     GtkTreeModel *model;
@@ -72,11 +72,12 @@ filters_export_dialog(void)
     fex_already_open = TRUE;
 
     fex_window =
-        gtk_dialog_new_with_buttons(_("Balsa Filters Export"),
-                                    NULL, 0, /* FIXME */
-                                    GTK_STOCK_OK,     GTK_RESPONSE_OK,
-                                    GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-                                    GTK_STOCK_HELP,   GTK_RESPONSE_HELP,
+        gtk_dialog_new_with_buttons(_("Export Filters"),
+                                    parent,
+                                    libbalsa_dialog_flags(),
+                                    _("_OK"), GTK_RESPONSE_OK,
+                                    _("_Cancel"), GTK_RESPONSE_CANCEL,
+                                    _("_Help"), GTK_RESPONSE_HELP,
                                     NULL);
     gtk_window_set_wmclass(GTK_WINDOW(fex_window), "filter-export",
                            "Balsa");

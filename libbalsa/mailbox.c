@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2003 Stuart Parmenter and others,
+ * Copyright (C) 1997-2013 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -62,10 +62,8 @@ static void libbalsa_mailbox_real_load_config(LibBalsaMailbox * mailbox,
                                               const gchar * group);
 static gboolean libbalsa_mailbox_real_close_backend (LibBalsaMailbox *
                                                      mailbox);
-#if BALSA_USE_THREADS
 static void libbalsa_mailbox_real_lock_store(LibBalsaMailbox * mailbox,
                                              gboolean lock);
-#endif                          /* BALSA_USE_THREADS */
 
 /* SIGNALS MEANINGS :
    - CHANGED: notification signal sent by the mailbox to allow the
@@ -231,9 +229,7 @@ libbalsa_mailbox_class_init(LibBalsaMailboxClass * klass)
     klass->close_backend  = libbalsa_mailbox_real_close_backend;
     klass->total_messages = NULL;
     klass->duplicate_msgnos = NULL;
-#if BALSA_USE_THREADS
     klass->lock_store  = libbalsa_mailbox_real_lock_store;
-#endif                          /* BALSA_USE_THREADS */
 }
 
 static void
@@ -359,21 +355,10 @@ lbm_index_entry_populate_from_msg(LibBalsaMailboxIndexEntry * entry,
     entry->foreground_set = 0;
     entry->background_set = 0;
     entry->unseen        = LIBBALSA_MESSAGE_IS_UNREAD(msg);
-#ifdef BALSA_USE_THREADS
     entry->idle_pending  = 0;
-#endif                          /*BALSA_USE_THREADS */
     libbalsa_mailbox_msgno_changed(msg->mailbox, msg->msgno);
 }
 
-LibBalsaMailboxIndexEntry*
-libbalsa_mailbox_index_entry_new_from_msg(LibBalsaMessage *msg)
-{
-    LibBalsaMailboxIndexEntry *entry = g_new(LibBalsaMailboxIndexEntry,1);
-    lbm_index_entry_populate_from_msg(entry, msg);
-    return entry;
-}
-
-#ifdef BALSA_USE_THREADS
 static LibBalsaMailboxIndexEntry*
 lbm_index_entry_new_pending(void)
 {
@@ -381,15 +366,12 @@ lbm_index_entry_new_pending(void)
     entry->idle_pending = 1;
     return entry;
 }
-#endif                          /*BALSA_USE_THREADS */
 
 static void
 lbm_index_entry_free(LibBalsaMailboxIndexEntry *entry)
 {
     if(entry) {
-#ifdef BALSA_USE_THREADS
         if (!entry->idle_pending)
-#endif                          /*BALSA_USE_THREADS */
         {
             g_free(entry->from);
             g_free(entry->subject);
@@ -414,12 +396,8 @@ libbalsa_mailbox_index_entry_clear(LibBalsaMailbox * mailbox, guint msgno)
     }
 }
 
-#ifdef BALSA_USE_THREADS
-#  define VALID_ENTRY(entry) \
+#define VALID_ENTRY(entry) \
     ((entry) && !((LibBalsaMailboxIndexEntry *) (entry))->idle_pending)
-#else                           /*BALSA_USE_THREADS */
-#  define VALID_ENTRY(entry) ((entry) != NULL)
-#endif                          /*BALSA_USE_THREADS */
 
 void
 libbalsa_mailbox_index_set_flags(LibBalsaMailbox *mailbox,
@@ -443,12 +421,10 @@ libbalsa_mailbox_index_set_flags(LibBalsaMailbox *mailbox,
    destroys mailbox. Must leave it in sane state.
 */
 
-#ifdef BALSA_USE_THREADS
 static void lbm_msgno_changed_expunged_cb(LibBalsaMailbox * mailbox,
                                           guint seqno);
 static void lbm_get_index_entry_expunged_cb(LibBalsaMailbox * mailbox,
                                             guint seqno);
-#endif
 
 static void
 libbalsa_mailbox_finalize(GObject * object)
@@ -479,7 +455,6 @@ libbalsa_mailbox_finalize(GObject * object)
     mailbox->filters = NULL;
     mailbox->filters_loaded = FALSE;
 
-#ifdef BALSA_USE_THREADS
     if (mailbox->msgnos_pending) {
         g_signal_handlers_disconnect_by_func(mailbox,
                                              lbm_get_index_entry_expunged_cb,
@@ -495,10 +470,19 @@ libbalsa_mailbox_finalize(GObject * object)
         g_array_free(mailbox->msgnos_changed, TRUE);
         mailbox->msgnos_changed = NULL;
     }
-#endif                          /*BALSA_USE_THREADS */
 
-    /* The LibBalsaMailboxView is owned by balsa_app.mailbox_views. */
+    libbalsa_mailbox_view_free(mailbox->view);
     mailbox->view = NULL;
+
+    if (mailbox->changed_idle_id) {
+        g_source_remove(mailbox->changed_idle_id);
+        mailbox->changed_idle_id = 0;
+    }
+
+    if (mailbox->queue_check_idle_id) {
+        g_source_remove(mailbox->queue_check_idle_id);
+        mailbox->queue_check_idle_id = 0;
+    }
 
     G_OBJECT_CLASS(parent_class)->finalize(object);
 }
@@ -685,17 +669,15 @@ libbalsa_mailbox_progress_notify(LibBalsaMailbox * mailbox,
     g_return_if_fail(mailbox != NULL);
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
 
+    /* OK to emit in a subthread, because the handler expects it. */
     g_signal_emit(G_OBJECT(mailbox),
                   libbalsa_mailbox_signals[PROGRESS_NOTIFY],
                   0, type, prog, tot, msg);
 }
 
-#define LB_MAILBOX_CHECK_ID_KEY "libbalsa-mailbox-check-id"
-
 void
 libbalsa_mailbox_check(LibBalsaMailbox * mailbox)
 {
-    guint id;
     GSList *unthreaded;
 
     g_return_if_fail(mailbox != NULL);
@@ -703,13 +685,10 @@ libbalsa_mailbox_check(LibBalsaMailbox * mailbox)
 
     libbalsa_lock_mailbox(mailbox);
 
-    id = GPOINTER_TO_UINT(g_object_get_data(G_OBJECT(mailbox),
-                                            LB_MAILBOX_CHECK_ID_KEY));
-    if (id) {
+    if (mailbox->queue_check_idle_id) {
 	/* Remove scheduled idle callback. */
-	g_source_remove(id);
-	g_object_set_data(G_OBJECT(mailbox), LB_MAILBOX_CHECK_ID_KEY,
-			  GUINT_TO_POINTER(0));
+        g_source_remove(mailbox->queue_check_idle_id);
+        mailbox->queue_check_idle_id = 0;
     }
 
     unthreaded = NULL;
@@ -727,15 +706,40 @@ libbalsa_mailbox_check(LibBalsaMailbox * mailbox)
     }
 
     libbalsa_unlock_mailbox(mailbox);
-
-#ifdef BALSA_USE_THREADS
-    pthread_testcancel();
-#endif
 }
 
 static gboolean
-lbm_changed(LibBalsaMailbox * mailbox)
+lbm_changed_idle_cb(LibBalsaMailbox * mailbox)
 {
+    libbalsa_lock_mailbox(mailbox);
+    g_signal_emit(mailbox, libbalsa_mailbox_signals[CHANGED], 0);
+    mailbox->changed_idle_id = 0;
+    libbalsa_unlock_mailbox(mailbox);
+    return FALSE;
+}
+
+static void
+lbm_changed_schedule_idle(LibBalsaMailbox * mailbox)
+{
+    libbalsa_lock_mailbox(mailbox);
+    if (!mailbox->changed_idle_id)
+        mailbox->changed_idle_id =
+            g_idle_add((GSourceFunc) lbm_changed_idle_cb, mailbox);
+    libbalsa_unlock_mailbox(mailbox);
+}
+
+void
+libbalsa_mailbox_changed(LibBalsaMailbox * mailbox)
+{
+    libbalsa_lock_mailbox(mailbox);
+    if (!g_signal_has_handler_pending
+        (mailbox, libbalsa_mailbox_signals[CHANGED], 0, TRUE)) {
+        /* No one cares, so don't set any message counts--that might
+         * cause mailbox->view to be created. */
+        libbalsa_unlock_mailbox(mailbox);
+        return;
+    }
+
     if (MAILBOX_OPEN(mailbox)) {
         /* Both counts are valid. */
         libbalsa_mailbox_set_total(mailbox,
@@ -750,26 +754,8 @@ lbm_changed(LibBalsaMailbox * mailbox)
         libbalsa_mailbox_set_unread(mailbox, 1);
     }
 
-    gdk_threads_enter();
-    g_signal_emit(mailbox, libbalsa_mailbox_signals[CHANGED], 0);
-    gdk_threads_leave();
-
-    return FALSE;
-}
-
-void
-libbalsa_mailbox_changed(LibBalsaMailbox * mailbox)
-{
-    if (!g_signal_has_handler_pending
-        (mailbox, libbalsa_mailbox_signals[CHANGED], 0, TRUE))
-        /* No one cares, so don't set any message counts--that might
-         * cause mailbox->view to be created. */
-        return;
-
-    if (!libbalsa_am_i_subthread())
-        lbm_changed(mailbox);
-    else
-        g_idle_add((GSourceFunc) lbm_changed, mailbox);
+    lbm_changed_schedule_idle(mailbox);
+    libbalsa_unlock_mailbox(mailbox);
 }
 
 /* libbalsa_mailbox_message_match:
@@ -819,8 +805,8 @@ libbalsa_mailbox_can_match(LibBalsaMailbox * mailbox,
 
 /* Helper function to run the "on reception" filters on a mailbox */
 
-void
-libbalsa_mailbox_run_filters_on_reception(LibBalsaMailbox * mailbox)
+static gboolean
+lbm_run_filters_on_reception_idle_cb(LibBalsaMailbox * mailbox)
 {
     GSList *filters;
     guint progress_count;
@@ -831,7 +817,11 @@ libbalsa_mailbox_run_filters_on_reception(LibBalsaMailbox * mailbox)
     guint progress_total;
     LibBalsaProgress progress;
 
-    g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
+    g_object_add_weak_pointer(G_OBJECT(mailbox), (gpointer) &mailbox);
+    g_object_unref(mailbox);
+    if (!mailbox)
+        return FALSE;
+    g_object_remove_weak_pointer(G_OBJECT(mailbox), (gpointer) &mailbox);
 
     if (!mailbox->filters_loaded) {
         config_mailbox_filters_load(mailbox);
@@ -842,10 +832,10 @@ libbalsa_mailbox_run_filters_on_reception(LibBalsaMailbox * mailbox)
                                             FILTER_WHEN_INCOMING);
 
     if (!filters)
-        return;
+        return FALSE;
     if (!filters_prepare_to_run(filters)) {
         g_slist_free(filters);
-        return;
+        return FALSE;
     }
 
     progress_count = 0;
@@ -872,7 +862,7 @@ libbalsa_mailbox_run_filters_on_reception(LibBalsaMailbox * mailbox)
     text = g_strdup_printf(_("Applying filter rules to %s"), mailbox->name);
     total = libbalsa_mailbox_total_messages(mailbox);
     progress_total = progress_count * total;
-        libbalsa_progress_set_text(&progress, text, progress_total);
+    libbalsa_progress_set_text(&progress, text, progress_total);
     g_free(text);
 
     progress_count = 0;
@@ -906,7 +896,7 @@ libbalsa_mailbox_run_filters_on_reception(LibBalsaMailbox * mailbox)
                                                /
                                                ((gdouble) progress_total));
         }
-        libbalsa_mailbox_search_iter_free(search_iter);
+        libbalsa_mailbox_search_iter_unref(search_iter);
 
         libbalsa_mailbox_register_msgnos(mailbox, msgnos);
         libbalsa_filter_mailbox_messages(filter, mailbox, msgnos);
@@ -917,6 +907,16 @@ libbalsa_mailbox_run_filters_on_reception(LibBalsaMailbox * mailbox)
     libbalsa_unlock_mailbox(mailbox);
 
     g_slist_free(filters);
+    return FALSE;
+}
+
+void
+libbalsa_mailbox_run_filters_on_reception(LibBalsaMailbox * mailbox)
+{
+    g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
+
+    g_idle_add((GSourceFunc) lbm_run_filters_on_reception_idle_cb,
+               g_object_ref(mailbox));
 }
 
 void
@@ -1094,13 +1094,11 @@ libbalsa_mailbox_real_close_backend(LibBalsaMailbox * mailbox)
     return TRUE;                /* Default is noop. */
 }
 
-#if BALSA_USE_THREADS
 static void
 libbalsa_mailbox_real_lock_store(LibBalsaMailbox * mailbox, gboolean lock)
 {
     /* Default is noop. */
 }
-#endif                          /* BALSA_USE_THREADS */
 
 GType
 libbalsa_mailbox_type_from_path(const gchar * path)
@@ -1111,7 +1109,6 @@ libbalsa_mailbox_type_from_path(const gchar * path)
  */
 {
     struct stat st;
-    char tmp[_POSIX_PATH_MAX];
 
     if(strncmp(path, "imap://", 7) == 0)
         return LIBBALSA_TYPE_MAILBOX_IMAP;
@@ -1120,6 +1117,8 @@ libbalsa_mailbox_type_from_path(const gchar * path)
         return G_TYPE_OBJECT;
     
     if (S_ISDIR (st.st_mode)) {
+        char tmp[_POSIX_PATH_MAX];
+
         /* check for maildir-style mailbox */
         snprintf (tmp, sizeof (tmp), "%s/cur", path);
         if (stat (tmp, &st) == 0 && S_ISDIR (st.st_mode))
@@ -1175,7 +1174,7 @@ libbalsa_mailbox_type_from_path(const gchar * path)
  */
 
 static LibBalsaMailboxIndexEntry *lbm_get_index_entry(LibBalsaMailbox *
-						      lmm, GNode * node);
+						      lmm, guint msgno);
 /* Does the node (non-NULL) have unseen children? */
 static gboolean
 lbm_node_has_unseen_child(LibBalsaMailbox * lmm, GNode * node)
@@ -1183,19 +1182,18 @@ lbm_node_has_unseen_child(LibBalsaMailbox * lmm, GNode * node)
     for (node = node->children; node; node = node->next) {
 	LibBalsaMailboxIndexEntry *entry =
 	    /* g_ptr_array_index(lmm->mindex, msgno - 1); ?? */
-	    lbm_get_index_entry(lmm, node);
+	    lbm_get_index_entry(lmm, GPOINTER_TO_UINT(node->data));
 	if ((entry && entry->unseen) || lbm_node_has_unseen_child(lmm, node))
 	    return TRUE;
     }
     return FALSE;
 }
 
-#ifdef BALSA_USE_THREADS
 /* Protects access to mailbox->msgnos_changed; may be locked
  * with or without the gdk lock, so WE MUST NOT GRAB THE GDK LOCK WHILE
  * HOLDING IT. */
 
-static pthread_mutex_t msgnos_changed_lock = PTHREAD_MUTEX_INITIALIZER;
+static GMutex msgnos_changed_lock;
 
 static void lbm_update_msgnos(LibBalsaMailbox * mailbox, guint seqno,
                               GArray * msgnos);
@@ -1203,10 +1201,32 @@ static void lbm_update_msgnos(LibBalsaMailbox * mailbox, guint seqno,
 static void
 lbm_msgno_changed_expunged_cb(LibBalsaMailbox * mailbox, guint seqno)
 {
-    pthread_mutex_lock(&msgnos_changed_lock);
+    g_mutex_lock(&msgnos_changed_lock);
     lbm_update_msgnos(mailbox, seqno, mailbox->msgnos_changed);
-    pthread_mutex_unlock(&msgnos_changed_lock);
+    g_mutex_unlock(&msgnos_changed_lock);
 }
+
+
+static void
+lbm_msgno_row_changed(LibBalsaMailbox * mailbox, guint msgno,
+                      GtkTreeIter * iter)
+{
+    if (!iter->user_data)
+        iter->user_data =
+            g_node_find(mailbox->msg_tree, G_PRE_ORDER, G_TRAVERSE_ALL,
+                        GUINT_TO_POINTER(msgno));
+
+    if (iter->user_data) {
+        GtkTreePath *path;
+
+        iter->stamp = mailbox->stamp;
+        path = gtk_tree_model_get_path(GTK_TREE_MODEL(mailbox), iter);
+        g_signal_emit(mailbox, libbalsa_mbox_model_signals[ROW_CHANGED], 0,
+                      path, iter);
+        gtk_tree_path_free(path);
+    }
+}
+
 
 static gboolean
 lbm_msgnos_changed_idle_cb(LibBalsaMailbox * mailbox)
@@ -1222,7 +1242,7 @@ lbm_msgnos_changed_idle_cb(LibBalsaMailbox * mailbox)
             mailbox->msgnos_changed->len);
 #endif
 
-    pthread_mutex_lock(&msgnos_changed_lock);
+    g_mutex_lock(&msgnos_changed_lock);
     for (i = 0; i < mailbox->msgnos_changed->len; i++) {
         guint msgno = g_array_index(mailbox->msgnos_changed, guint, i);
         GtkTreeIter iter;
@@ -1233,23 +1253,10 @@ lbm_msgnos_changed_idle_cb(LibBalsaMailbox * mailbox)
 #if DEBUG
         g_print("%s %s msgno %d\n", __func__, mailbox->name, msgno);
 #endif
-        pthread_mutex_unlock(&msgnos_changed_lock);
-        gdk_threads_enter();
-        iter.user_data =
-            g_node_find(mailbox->msg_tree, G_PRE_ORDER, G_TRAVERSE_ALL,
-                        GUINT_TO_POINTER(msgno));
-        if (iter.user_data) {
-            GtkTreePath *path;
-
-            iter.stamp = mailbox->stamp;
-            path = gtk_tree_model_get_path(GTK_TREE_MODEL(mailbox), &iter);
-            g_signal_emit(mailbox,
-                          libbalsa_mbox_model_signals[ROW_CHANGED], 0,
-                          path, &iter);
-            gtk_tree_path_free(path);
-        }
-        gdk_threads_leave();
-        pthread_mutex_lock(&msgnos_changed_lock);
+        g_mutex_unlock(&msgnos_changed_lock);
+        iter.user_data = NULL;
+        lbm_msgno_row_changed(mailbox, msgno, &iter);
+        g_mutex_lock(&msgnos_changed_lock);
     }
 
 #if DEBUG
@@ -1257,28 +1264,19 @@ lbm_msgnos_changed_idle_cb(LibBalsaMailbox * mailbox)
             mailbox->msgnos_changed->len);
 #endif
     mailbox->msgnos_changed->len = 0;
-    pthread_mutex_unlock(&msgnos_changed_lock);
+    g_mutex_unlock(&msgnos_changed_lock);
 
     g_object_unref(mailbox);
     return FALSE;
 }
-#endif /* BALSA_USE_THREADS */
+
 
 static void
 lbm_msgno_changed(LibBalsaMailbox * mailbox, guint seqno,
                   GtkTreeIter * iter)
 {
-    GtkTreePath *path;
-#ifdef BALSA_USE_THREADS
-    gboolean is_main_thread = !libbalsa_am_i_subthread();
-
-#if DEBUG
-    if (is_main_thread && !libbalsa_threads_has_lock())
-        g_warning("Main thread is not holding gdk lock");
-#endif
-
-    if (!is_main_thread) {
-        pthread_mutex_lock(&msgnos_changed_lock);
+    if (libbalsa_am_i_subthread()) {
+        g_mutex_lock(&msgnos_changed_lock);
         if (!mailbox->msgnos_changed) {
             mailbox->msgnos_changed =
                 g_array_new(FALSE, FALSE, sizeof(guint));
@@ -1291,42 +1289,26 @@ lbm_msgno_changed(LibBalsaMailbox * mailbox, guint seqno,
                        g_object_ref(mailbox));
 
         g_array_append_val(mailbox->msgnos_changed, seqno);
-        pthread_mutex_unlock(&msgnos_changed_lock);
+        g_mutex_unlock(&msgnos_changed_lock);
+
+        /* Not calling lbm_msgno_row_changed, so we must make sure
+         * iter->user_data is set: */
+        if (!iter->user_data)
+            iter->user_data =
+                g_node_find(mailbox->msg_tree, G_PRE_ORDER, G_TRAVERSE_ALL,
+                            GUINT_TO_POINTER(seqno));
         return;
     }
-#endif
 
-    if (!mailbox->msg_tree)
-        return;
-
-    if (iter->user_data == NULL)
-        iter->user_data =
-            g_node_find(mailbox->msg_tree, G_PRE_ORDER, G_TRAVERSE_ALL,
-                        GUINT_TO_POINTER(seqno));
-    /* trying to modify seqno that is not in the tree?  Possible for
-     * filtered views... Perhaps there is nothing to worry about.
-     */
-    if (iter->user_data == NULL)
-	return;
-
-    iter->stamp = mailbox->stamp;
-    path = gtk_tree_model_get_path(GTK_TREE_MODEL(mailbox), iter);
-    g_signal_emit(mailbox, libbalsa_mbox_model_signals[ROW_CHANGED], 0,
-                  path, iter);
-    gtk_tree_path_free(path);
+    lbm_msgno_row_changed(mailbox, seqno, iter);
 }
 
 void
 libbalsa_mailbox_msgno_changed(LibBalsaMailbox * mailbox, guint seqno)
 {
     GtkTreeIter iter;
-    gboolean is_main_thread = !libbalsa_am_i_subthread();
 
-    if (is_main_thread)
-        gdk_threads_enter();
     if (!mailbox->msg_tree) {
-        if (is_main_thread)
-            gdk_threads_leave();
         return;
     }
 
@@ -1341,9 +1323,6 @@ libbalsa_mailbox_msgno_changed(LibBalsaMailbox * mailbox, guint seqno)
         if (parent && (seqno = GPOINTER_TO_UINT(parent->data)) > 0)
             lbm_msgno_changed(mailbox, seqno, &iter);
     }
-
-    if (is_main_thread)
-        gdk_threads_leave();
 }
 
 void
@@ -1354,8 +1333,6 @@ libbalsa_mailbox_msgno_inserted(LibBalsaMailbox *mailbox, guint seqno,
     GtkTreePath *path;
     GSList **unthreaded;
 
-    if (!libbalsa_threads_has_lock())
-        g_warning("Thread is not holding gdk lock");
     if (!mailbox->msg_tree)
         return;
 #undef SANITY_CHECK
@@ -1365,6 +1342,7 @@ libbalsa_mailbox_msgno_inserted(LibBalsaMailbox *mailbox, guint seqno,
                                   GUINT_TO_POINTER(seqno)));
 #endif
 
+    gdk_threads_enter();
     /* Insert node into the message tree before getting path. */
     iter.user_data = g_node_new(GUINT_TO_POINTER(seqno));
     iter.stamp = mailbox->stamp;
@@ -1386,9 +1364,10 @@ libbalsa_mailbox_msgno_inserted(LibBalsaMailbox *mailbox, guint seqno,
             g_slist_prepend(*unthreaded, GUINT_TO_POINTER(seqno));
 
     mailbox->msg_tree_changed = TRUE;
+    gdk_threads_leave();
 }
 
-void
+static void
 libbalsa_mailbox_msgno_filt_in(LibBalsaMailbox *mailbox, guint seqno)
 {
     GtkTreeIter iter;
@@ -1411,11 +1390,14 @@ libbalsa_mailbox_msgno_filt_in(LibBalsaMailbox *mailbox, guint seqno)
     gtk_tree_path_free(path);
 
     mailbox->msg_tree_changed = TRUE;
-    g_signal_emit(mailbox, libbalsa_mailbox_signals[CHANGED], 0);
+    lbm_changed_schedule_idle(mailbox);
 
     gdk_threads_leave();
 }
 
+/*
+ * libbalsa_mailbox_msgno_removed and helpers
+ */
 struct remove_data {LibBalsaMailbox *mailbox; unsigned seqno; GNode *node; };
 static gboolean
 decrease_post(GNode *node, gpointer data)
@@ -1442,10 +1424,10 @@ libbalsa_mailbox_msgno_removed(LibBalsaMailbox * mailbox, guint seqno)
     GNode *child;
     GNode *parent;
 
+    gdk_threads_enter();
     g_signal_emit(mailbox, libbalsa_mailbox_signals[MESSAGE_EXPUNGED],
                   0, seqno);
 
-    gdk_threads_enter();
     if (!mailbox->msg_tree) {
         gdk_threads_leave();
         return;
@@ -1522,23 +1504,15 @@ libbalsa_mailbox_msgno_removed(LibBalsaMailbox * mailbox, guint seqno)
     gdk_threads_leave();
 }
 
-void
-libbalsa_mailbox_msgno_filt_out(LibBalsaMailbox * mailbox, guint seqno)
+static void
+libbalsa_mailbox_msgno_filt_out(LibBalsaMailbox * mailbox, GNode * node)
 {
     GtkTreeIter iter;
     GtkTreePath *path;
-    GNode *child, *parent, *node;
+    GNode *child, *parent;
 
     gdk_threads_enter();
     if (!mailbox->msg_tree) {
-        gdk_threads_leave();
-        return;
-    }
-
-    node = g_node_find(mailbox->msg_tree, G_PRE_ORDER, G_TRAVERSE_ALL, 
-                       GUINT_TO_POINTER(seqno));
-    if (!node) {
-        g_warning("filt_out: msgno %d not found", seqno);
         gdk_threads_leave();
         return;
     }
@@ -1585,7 +1559,7 @@ libbalsa_mailbox_msgno_filt_out(LibBalsaMailbox * mailbox, guint seqno)
     mailbox->stamp++;
 
     mailbox->msg_tree_changed = TRUE;
-    g_signal_emit(mailbox, libbalsa_mailbox_signals[CHANGED], 0);
+    lbm_changed_schedule_idle(mailbox);
 
     gdk_threads_leave();
 }
@@ -1597,26 +1571,20 @@ libbalsa_mailbox_msgno_filt_out(LibBalsaMailbox * mailbox, guint seqno)
  *   messages;
  * - if it isn't in the view and it matches the condition, filter it in.
  */
-void
-libbalsa_mailbox_msgno_filt_check(LibBalsaMailbox * mailbox, guint seqno,
-                                  LibBalsaMailboxSearchIter * search_iter,
-                                  gboolean hold_selected)
+
+static void
+lbm_msgno_filt_check(LibBalsaMailbox * mailbox, guint seqno,
+                     LibBalsaMailboxSearchIter * search_iter,
+                     gboolean hold_selected)
 {
     gboolean match;
-
-    g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
-
-    gdk_threads_enter();
-
-    if (!mailbox->msg_tree) {
-        gdk_threads_leave();
-        return;
-    }
+    GNode *node;
 
     match = search_iter ?
         libbalsa_mailbox_message_match(mailbox, seqno, search_iter) : TRUE;
-    if (g_node_find(mailbox->msg_tree, G_PRE_ORDER, G_TRAVERSE_ALL,
-                    GUINT_TO_POINTER(seqno))) {
+    node = g_node_find(mailbox->msg_tree, G_PRE_ORDER, G_TRAVERSE_ALL,
+                       GUINT_TO_POINTER(seqno));
+    if (node) {
         if (!match) {
             gboolean filt_out = hold_selected ?
                 libbalsa_mailbox_msgno_has_flags(mailbox, seqno, 0,
@@ -1633,14 +1601,58 @@ libbalsa_mailbox_msgno_filt_check(LibBalsaMailbox * mailbox, guint seqno,
 		filt_out = FALSE;
 #endif
             if (filt_out)
-                libbalsa_mailbox_msgno_filt_out(mailbox, seqno);
+                libbalsa_mailbox_msgno_filt_out(mailbox, node);
         }
     } else {
         if (match)
             libbalsa_mailbox_msgno_filt_in(mailbox, seqno);
     }
+}
 
-    gdk_threads_leave();
+typedef struct {
+    LibBalsaMailbox           *mailbox;
+    guint                      seqno;
+    LibBalsaMailboxSearchIter *search_iter;
+    gboolean                   hold_selected;
+} LibBalsaMailboxMsgnoFiltCheckInfo;
+
+static gboolean
+lbm_msgno_filt_check_idle_cb(LibBalsaMailboxMsgnoFiltCheckInfo * info)
+{
+    if (MAILBOX_OPEN(info->mailbox))
+        lbm_msgno_filt_check(info->mailbox, info->seqno, info->search_iter,
+                             info->hold_selected);
+
+    g_object_unref(info->mailbox);
+    libbalsa_mailbox_search_iter_unref(info->search_iter);
+    g_free(info);
+
+    return FALSE;
+}
+
+void
+libbalsa_mailbox_msgno_filt_check(LibBalsaMailbox * mailbox, guint seqno,
+                                  LibBalsaMailboxSearchIter * search_iter,
+                                  gboolean hold_selected)
+{
+    g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
+
+    if (!mailbox->msg_tree) {
+        return;
+    }
+
+    if (!libbalsa_am_i_subthread()) {
+        lbm_msgno_filt_check(mailbox, seqno, search_iter, hold_selected);
+    } else {
+        LibBalsaMailboxMsgnoFiltCheckInfo *info;
+
+        info = g_new(LibBalsaMailboxMsgnoFiltCheckInfo, 1);
+        info->mailbox = g_object_ref(mailbox);
+        info->seqno = seqno;
+        info->search_iter = libbalsa_mailbox_search_iter_ref(search_iter);
+        info->hold_selected = hold_selected;
+        g_idle_add((GSourceFunc) lbm_msgno_filt_check_idle_cb, info);
+    }
 }
 
 /* Search iters */
@@ -1652,11 +1664,12 @@ libbalsa_mailbox_search_iter_new(LibBalsaCondition * condition)
     if (!condition)
         return NULL;
 
-    iter = g_new(LibBalsaMailboxSearchIter, 1);
+    iter = g_slice_new(LibBalsaMailboxSearchIter);
     iter->mailbox = NULL;
     iter->stamp = 0;
     iter->condition = libbalsa_condition_ref(condition);
     iter->user_data = NULL;
+    iter->ref_count = 1;
 
     return iter;
 }
@@ -1670,12 +1683,25 @@ libbalsa_mailbox_search_iter_view(LibBalsaMailbox * mailbox)
     return libbalsa_mailbox_search_iter_new(mailbox->view_filter);
 }
 
+/* Increment reference count of a LibBalsaMailboxSearchIter, if it is
+ * valid */
+LibBalsaMailboxSearchIter *
+libbalsa_mailbox_search_iter_ref(LibBalsaMailboxSearchIter * search_iter)
+{
+    if (search_iter)
+        ++search_iter->ref_count;
+
+    return search_iter;
+}
+
+/* Decrement reference count of a LibBalsaMailboxSearchIter, if it is
+ * non-NULL and valid, and free it if it goes to zero */
 void
-libbalsa_mailbox_search_iter_free(LibBalsaMailboxSearchIter * search_iter)
+libbalsa_mailbox_search_iter_unref(LibBalsaMailboxSearchIter * search_iter)
 {
     LibBalsaMailbox *mailbox;
 
-    if (!search_iter)
+    if (!search_iter || --search_iter->ref_count > 0)
         return;
 
     mailbox = search_iter->mailbox;
@@ -1683,7 +1709,7 @@ libbalsa_mailbox_search_iter_free(LibBalsaMailboxSearchIter * search_iter)
         LIBBALSA_MAILBOX_GET_CLASS(mailbox)->search_iter_free(search_iter);
 
     libbalsa_condition_unref(search_iter->condition);
-    g_free(search_iter);
+    g_slice_free(LibBalsaMailboxSearchIter, search_iter);
 }
 
 /* GNode iterators; they return the root node when they run out of nodes,
@@ -1743,8 +1769,6 @@ libbalsa_mailbox_msgno_find(LibBalsaMailbox * mailbox, guint seqno,
 {
     GtkTreeIter tmp_iter;
 
-    if (!libbalsa_threads_has_lock())
-        g_warning("Thread is not holding gdk lock");
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
     g_return_val_if_fail(seqno > 0, FALSE);
 
@@ -1911,13 +1935,12 @@ lbm_cache_message(LibBalsaMailbox * mailbox, guint msgno,
 
     entry = g_ptr_array_index(mailbox->mindex, msgno - 1);
 
-    if (!entry)
+    if (!entry) {
         g_ptr_array_index(mailbox->mindex, msgno - 1) =
-            libbalsa_mailbox_index_entry_new_from_msg(message);
-#if BALSA_USE_THREADS
-    else if (entry->idle_pending)
+            entry = g_new(LibBalsaMailboxIndexEntry, 1);
         lbm_index_entry_populate_from_msg(entry, message);
-#endif                          /* BALSA_USE_THREADS */
+    } else if (entry->idle_pending)
+        lbm_index_entry_populate_from_msg(entry, message);
 }
 
 LibBalsaMessage *
@@ -1937,16 +1960,11 @@ libbalsa_mailbox_get_message(LibBalsaMailbox * mailbox, guint msgno)
         return NULL;
     }
 
-#ifdef BALSA_USE_THREADS
     if( !(msgno > 0 && msgno <= libbalsa_mailbox_total_messages(mailbox)) ) {
 	libbalsa_unlock_mailbox(mailbox);
 	g_warning("get_message: msgno %d out of range", msgno);
 	return NULL;
     }
-#else                           /* BALSA_USE_THREADS */
-    g_return_val_if_fail(msgno > 0 && msgno <=
-                         libbalsa_mailbox_total_messages(mailbox), NULL);
-#endif                          /* BALSA_USE_THREADS */
 
     message = LIBBALSA_MAILBOX_GET_CLASS(mailbox)->get_message(mailbox,
                                                                msgno);
@@ -2072,13 +2090,13 @@ libbalsa_mailbox_messages_change_flags(LibBalsaMailbox * mailbox,
             libbalsa_mailbox_msgno_filt_check(mailbox, msgno, iter_view,
                                               TRUE);
         }
-        libbalsa_mailbox_search_iter_free(iter_view);
+        libbalsa_mailbox_search_iter_unref(iter_view);
     }
 
     if (real_flag)
 	libbalsa_unlock_mailbox(mailbox);
 
-    if (set & LIBBALSA_MESSAGE_FLAG_DELETED && retval)
+    if ((set & LIBBALSA_MESSAGE_FLAG_DELETED) && retval)
         libbalsa_mailbox_changed(mailbox);
 
     return retval;
@@ -2164,24 +2182,20 @@ libbalsa_mailbox_set_view_filter(LibBalsaMailbox *mailbox,
                                  gboolean update_immediately)
 {
     gboolean retval = FALSE;
-    gboolean view_is_stale;
 
     libbalsa_lock_mailbox(mailbox);
 
-    view_is_stale = mailbox->view_filter_pending
-        || !libbalsa_condition_compare(mailbox->view_filter, cond);
+    if (!libbalsa_condition_compare(mailbox->view_filter, cond))
+        mailbox->view_filter_pending = TRUE;
 
     libbalsa_condition_unref(mailbox->view_filter);
     mailbox->view_filter = libbalsa_condition_ref(cond);
 
-    if (view_is_stale) {
-        if (update_immediately) {
-            LIBBALSA_MAILBOX_GET_CLASS(mailbox)->update_view_filter(mailbox,
-                                                                    cond);
-            retval = lbm_set_threading(mailbox, mailbox->view->threading_type);
-            mailbox->view_filter_pending = FALSE;
-        } else
-            mailbox->view_filter_pending = TRUE;
+    if (update_immediately && mailbox->view_filter_pending) {
+        LIBBALSA_MAILBOX_GET_CLASS(mailbox)->update_view_filter(mailbox,
+                                                                cond);
+        retval = lbm_set_threading(mailbox, mailbox->view->threading_type);
+        mailbox->view_filter_pending = FALSE;
     }
 
     libbalsa_unlock_mailbox(mailbox);
@@ -2231,6 +2245,24 @@ libbalsa_mailbox_can_do(LibBalsaMailbox *mailbox,
 
 
 static void lbm_sort(LibBalsaMailbox * mbox, GNode * parent);
+
+static void
+lbm_check_and_sort(LibBalsaMailbox * mailbox)
+{
+    if (mailbox->msg_tree)
+        lbm_sort(mailbox, mailbox->msg_tree);
+
+    libbalsa_mailbox_changed(mailbox);
+}
+
+static gboolean
+lbm_set_threading_idle_cb(LibBalsaMailbox * mailbox)
+{
+    lbm_check_and_sort(mailbox);
+    g_object_unref(mailbox);
+    return FALSE;
+}
+
 static gboolean
 lbm_set_threading(LibBalsaMailbox * mailbox,
                   LibBalsaMailboxThreadingType thread_type)
@@ -2240,12 +2272,14 @@ lbm_set_threading(LibBalsaMailbox * mailbox,
 
     LIBBALSA_MAILBOX_GET_CLASS(mailbox)->set_threading(mailbox,
                                                        thread_type);
-    gdk_threads_enter();
-    if (mailbox->msg_tree)
-        lbm_sort(mailbox, mailbox->msg_tree);
-
-    libbalsa_mailbox_changed(mailbox);
-    gdk_threads_leave();
+    if (libbalsa_am_i_subthread()) {
+        gdk_threads_add_idle((GSourceFunc) lbm_set_threading_idle_cb,
+                             g_object_ref(mailbox));
+    } else {
+        gdk_threads_enter();
+        lbm_check_and_sort(mailbox);
+        gdk_threads_leave();
+    }
 
     return TRUE;
 }
@@ -2266,9 +2300,7 @@ libbalsa_mailbox_set_threading(LibBalsaMailbox *mailbox,
  * Mailbox view methods                                                *
  * =================================================================== */
 
-GHashTable *libbalsa_mailbox_view_table;
 static LibBalsaMailboxView libbalsa_mailbox_view_default = {
-    NULL,			/* mailing_list_address */
     NULL,			/* identity_name        */
     LB_MAILBOX_THREADING_FLAT,	/* threading_type       */
     0,				/* filter               */
@@ -2280,7 +2312,6 @@ static LibBalsaMailboxView libbalsa_mailbox_view_default = {
     0,				/* exposed              */
     0,				/* open                 */
     1,				/* in_sync              */
-    0,				/* frozen		*/
     0,				/* used 		*/
 #ifdef HAVE_GPGME
     LB_MAILBOX_CHK_CRYPT_MAYBE, /* gpg_chk_mode         */
@@ -2304,8 +2335,9 @@ libbalsa_mailbox_view_new(void)
 void
 libbalsa_mailbox_view_free(LibBalsaMailboxView * view)
 {
-    if (view->mailing_list_address)
-        g_object_unref(view->mailing_list_address);
+    if (!view)
+        return;
+
     g_free(view->identity_name);
     g_free(view);
 }
@@ -2314,24 +2346,13 @@ libbalsa_mailbox_view_free(LibBalsaMailboxView * view)
 static LibBalsaMailboxView *
 lbm_get_view(LibBalsaMailbox * mailbox)
 {
-    LibBalsaMailboxView *view;
-
     if (!mailbox)
 	return &libbalsa_mailbox_view_default;
 
-    view = mailbox->view;
-    if (!view) {
-        view =
-            g_hash_table_lookup(libbalsa_mailbox_view_table, mailbox->url);
-        if (!view) {
-            view = libbalsa_mailbox_view_new();
-            g_hash_table_insert(libbalsa_mailbox_view_table,
-                                g_strdup(mailbox->url), view);
-        }
-        mailbox->view = view;
-    }
+    if (!mailbox->view)
+        mailbox->view = libbalsa_mailbox_view_new();
 
-    return view;
+    return mailbox->view;
 }
 
 /* Set methods; NULL mailbox is valid, and changes the default value. */
@@ -2342,9 +2363,7 @@ libbalsa_mailbox_set_identity_name(LibBalsaMailbox * mailbox,
 {
     LibBalsaMailboxView *view = lbm_get_view(mailbox);
 
-    if (!view->frozen
-	&& (!view->identity_name
-	    || strcmp(view->identity_name, identity_name))) {
+    if (!view->identity_name || strcmp(view->identity_name, identity_name)) {
 	g_free(view->identity_name);
 	view->identity_name = g_strdup(identity_name);
 	if (mailbox)
@@ -2361,7 +2380,7 @@ libbalsa_mailbox_set_threading_type(LibBalsaMailbox * mailbox,
 {
     LibBalsaMailboxView *view = lbm_get_view(mailbox);
 
-    if (!view->frozen && view->threading_type != threading_type) {
+    if (view->threading_type != threading_type) {
 	view->threading_type = threading_type;
 	if (mailbox)
 	    view->in_sync = 0;
@@ -2374,7 +2393,7 @@ libbalsa_mailbox_set_sort_type(LibBalsaMailbox * mailbox,
 {
     LibBalsaMailboxView *view = lbm_get_view(mailbox);
 
-    if (!view->frozen && view->sort_type != sort_type) {
+    if (view->sort_type != sort_type) {
 	view->sort_type = sort_type;
 	if (mailbox)
 	    view->in_sync = 0;
@@ -2387,7 +2406,7 @@ libbalsa_mailbox_set_sort_field(LibBalsaMailbox * mailbox,
 {
     LibBalsaMailboxView *view = lbm_get_view(mailbox);
 
-    if (!view->frozen && view->sort_field != sort_field) {
+    if (view->sort_field != sort_field) {
 	view->sort_field_prev = view->sort_field;
 	view->sort_field = sort_field;
 	if (mailbox)
@@ -2400,7 +2419,7 @@ libbalsa_mailbox_set_show(LibBalsaMailbox * mailbox, LibBalsaMailboxShow show)
 {
     LibBalsaMailboxView *view = lbm_get_view(mailbox);
 
-    if (!view->frozen && view->show != show) {
+    if (view->show != show) {
 	/* Don't set not in sync if we're just replacing UNSET with the
 	 * default. */
 	if (mailbox && view->show != LB_MAILBOX_SHOW_UNSET)
@@ -2417,7 +2436,7 @@ libbalsa_mailbox_set_subscribe(LibBalsaMailbox * mailbox,
 {
     LibBalsaMailboxView *view = lbm_get_view(mailbox);
 
-    if (!view->frozen && view->subscribe != subscribe) {
+    if (view->subscribe != subscribe) {
 	/* Don't set not in sync if we're just replacing UNSET with the
 	 * default. */
 	if (mailbox && view->subscribe != LB_MAILBOX_SUBSCRIBE_UNSET)
@@ -2433,7 +2452,7 @@ libbalsa_mailbox_set_exposed(LibBalsaMailbox * mailbox, gboolean exposed)
 {
     LibBalsaMailboxView *view = lbm_get_view(mailbox);
 
-    if (!view->frozen && view->exposed != exposed) {
+    if (view->exposed != exposed) {
 	view->exposed = exposed ? 1 : 0;
 	if (mailbox)
 	    view->in_sync = 0;
@@ -2445,7 +2464,7 @@ libbalsa_mailbox_set_open(LibBalsaMailbox * mailbox, gboolean open)
 {
     LibBalsaMailboxView *view = lbm_get_view(mailbox);
 
-    if (!view->frozen && view->open != open) {
+    if (view->open != open) {
 	view->open = open ? 1 : 0;
 	if (mailbox)
 	    view->in_sync = 0;
@@ -2457,27 +2476,11 @@ libbalsa_mailbox_set_filter(LibBalsaMailbox * mailbox, gint filter)
 {
     LibBalsaMailboxView *view = lbm_get_view(mailbox);
 
-    if (!view->frozen && view->filter != filter) {
+    if (view->filter != filter) {
 	view->filter = filter;
 	if (mailbox)
 	    view->in_sync = 0;
     }
-}
-
-/* Freeze or unfreeze the view: no changes are made while the view is
- * frozen;
- * - changing the default is not allowed;
- * - no action needed if the view is NULL. */
-void
-libbalsa_mailbox_set_frozen(LibBalsaMailbox * mailbox, gboolean frozen)
-{
-    LibBalsaMailboxView *view;
-
-    g_return_if_fail(mailbox != NULL);
-
-    view = mailbox->view;
-    if (view)
-	view->frozen = frozen ? 1 : 0;
 }
 
 #ifdef HAVE_GPGME
@@ -2509,7 +2512,7 @@ libbalsa_mailbox_set_unread(LibBalsaMailbox * mailbox, gint unread)
     view = lbm_get_view(mailbox);
     view->used = 1;
 
-    if (!view->frozen && view->unread != unread) {
+    if (view->unread != unread) {
 	view->unread = unread;
         view->in_sync = 0;
     }
@@ -2525,7 +2528,7 @@ libbalsa_mailbox_set_total(LibBalsaMailbox * mailbox, gint total)
 
     view = lbm_get_view(mailbox);
 
-    if (!view->frozen && view->total != total) {
+    if (view->total != total) {
 	view->total = total;
         view->in_sync = 0;
     }
@@ -2541,7 +2544,7 @@ libbalsa_mailbox_set_mtime(LibBalsaMailbox * mailbox, time_t mtime)
 
     view = lbm_get_view(mailbox);
 
-    if (!view->frozen && view->mtime != mtime) {
+    if (view->mtime != mtime) {
 	view->mtime = mtime;
         view->in_sync = 0;
     }
@@ -2550,14 +2553,6 @@ libbalsa_mailbox_set_mtime(LibBalsaMailbox * mailbox, time_t mtime)
 /* End of set methods. */
 
 /* Get methods; NULL mailbox is valid, and returns the default value. */
-
-InternetAddressList *
-libbalsa_mailbox_get_mailing_list_address(LibBalsaMailbox * mailbox)
-{
-    return (mailbox && mailbox->view) ?
-	mailbox->view->mailing_list_address :
-	libbalsa_mailbox_view_default.mailing_list_address;
-}
 
 const gchar *
 libbalsa_mailbox_get_identity_name(LibBalsaMailbox * mailbox)
@@ -2624,13 +2619,6 @@ libbalsa_mailbox_get_filter(LibBalsaMailbox * mailbox)
 {
     return (mailbox && mailbox->view) ?
 	mailbox->view->filter : libbalsa_mailbox_view_default.filter;
-}
-
-gboolean
-libbalsa_mailbox_get_frozen(LibBalsaMailbox * mailbox)
-{
-    return (mailbox && mailbox->view) ?
-	mailbox->view->frozen : FALSE;
 }
 
 #ifdef HAVE_GPGME
@@ -2840,8 +2828,6 @@ mbox_model_get_path(GtkTreeModel * tree_model, GtkTreeIter * iter)
     GNode *parent_node;
 #endif
 
-    if (!libbalsa_threads_has_lock())
-        g_warning("Thread is not holding gdk lock");
     g_return_val_if_fail(VALID_ITER(iter, tree_model), NULL);
 
     node = iter->user_data;
@@ -2866,18 +2852,16 @@ mbox_model_get_path(GtkTreeModel * tree_model, GtkTreeIter * iter)
 static GdkPixbuf *status_icons[LIBBALSA_MESSAGE_STATUS_ICONS_NUM];
 static GdkPixbuf *attach_icons[LIBBALSA_MESSAGE_ATTACH_ICONS_NUM];
 
-#ifdef BALSA_USE_THREADS
-/* Protects access to mailbox->msgnos_pending; may be locked 
- * with or without the gdk lock, so WE MUST NOT GRAB THE GDK LOCK WHILE
- * HOLDING IT. */
-static pthread_mutex_t get_index_entry_lock = PTHREAD_MUTEX_INITIALIZER;
+
+/* Protects access to mailbox->msgnos_pending; */
+static GMutex get_index_entry_lock;
 
 static void
 lbm_get_index_entry_expunged_cb(LibBalsaMailbox * mailbox, guint seqno)
 {
-    pthread_mutex_lock(&get_index_entry_lock);
+    g_mutex_lock(&get_index_entry_lock);
     lbm_update_msgnos(mailbox, seqno, mailbox->msgnos_pending);
-    pthread_mutex_unlock(&get_index_entry_lock);
+    g_mutex_unlock(&get_index_entry_lock);
 }
 
 static void
@@ -2889,7 +2873,7 @@ lbm_get_index_entry_real(LibBalsaMailbox * mailbox)
     g_print("%s %s %d requested\n", __func__, mailbox->name,
             mailbox->msgnos_pending->len);
 #endif
-    pthread_mutex_lock(&get_index_entry_lock);
+    g_mutex_lock(&get_index_entry_lock);
     for (i = 0; i < mailbox->msgnos_pending->len; i++) {
         guint msgno = g_array_index(mailbox->msgnos_pending, guint, i);
         LibBalsaMessage *message;
@@ -2900,12 +2884,12 @@ lbm_get_index_entry_real(LibBalsaMailbox * mailbox)
 #if DEBUG
         g_print("%s %s msgno %d\n", __func__, mailbox->name, msgno);
 #endif
-        pthread_mutex_unlock(&get_index_entry_lock);
+        g_mutex_unlock(&get_index_entry_lock);
         if ((message = libbalsa_mailbox_get_message(mailbox, msgno)))
             /* get-message has cached the message info, so we just unref
              * message. */
             g_object_unref(message);
-        pthread_mutex_lock(&get_index_entry_lock);
+        g_mutex_lock(&get_index_entry_lock);
     }
 
 #if DEBUG
@@ -2913,16 +2897,15 @@ lbm_get_index_entry_real(LibBalsaMailbox * mailbox)
             mailbox->msgnos_pending->len);
 #endif
     mailbox->msgnos_pending->len = 0;
-    pthread_mutex_unlock(&get_index_entry_lock);
+    g_mutex_unlock(&get_index_entry_lock);
 
     g_object_unref(mailbox);
 }
-#endif                          /*BALSA_USE_THREADS */
+
 
 static LibBalsaMailboxIndexEntry *
-lbm_get_index_entry(LibBalsaMailbox * lmm, GNode * node)
+lbm_get_index_entry(LibBalsaMailbox * lmm, guint msgno)
 {
-    guint msgno = GPOINTER_TO_UINT(node->data);
     LibBalsaMailboxIndexEntry *entry;
 
     if (!lmm->mindex)
@@ -2932,11 +2915,10 @@ lbm_get_index_entry(LibBalsaMailbox * lmm, GNode * node)
         g_ptr_array_set_size(lmm->mindex, msgno);
 
     entry = g_ptr_array_index(lmm->mindex, msgno - 1);
-#ifdef BALSA_USE_THREADS
     if (entry)
         return entry->idle_pending ? NULL : entry;
 
-    pthread_mutex_lock(&get_index_entry_lock);
+    g_mutex_lock(&get_index_entry_lock);
     if (!lmm->msgnos_pending) {
         lmm->msgnos_pending = g_array_new(FALSE, FALSE, sizeof(guint));
         g_signal_connect(lmm, "message-expunged",
@@ -2944,12 +2926,14 @@ lbm_get_index_entry(LibBalsaMailbox * lmm, GNode * node)
     }
 
     if (!lmm->msgnos_pending->len) {
-        pthread_t get_index_entry_thread;
+        GThread *get_index_entry_thread;
 
         g_object_ref(lmm);
-        pthread_create(&get_index_entry_thread, NULL,
-                       (void *) lbm_get_index_entry_real, lmm);
-        pthread_detach(get_index_entry_thread);
+        get_index_entry_thread =
+        	g_thread_new("lbm_get_index_entry_real",
+        				 (GThreadFunc) lbm_get_index_entry_real,
+						 lmm);
+        g_thread_unref(get_index_entry_thread);
     }
 
     g_array_append_val(lmm->msgnos_pending, msgno);
@@ -2957,19 +2941,7 @@ lbm_get_index_entry(LibBalsaMailbox * lmm, GNode * node)
      * lock. */
     g_ptr_array_index(lmm->mindex, msgno - 1) =
         lbm_index_entry_new_pending();
-    pthread_mutex_unlock(&get_index_entry_lock);
-#else                           /*BALSA_USE_THREADS */
-    if (!entry) {
-        LibBalsaMessage *message =
-            libbalsa_mailbox_get_message(lmm, msgno);
-        if (message) {
-            /* get-message has cached the message info, so we just unref
-             * message. */
-            g_object_unref(message);
-            entry = g_ptr_array_index(lmm->mindex, msgno - 1);
-        }
-    }
-#endif                          /*BALSA_USE_THREADS */
+    g_mutex_unlock(&get_index_entry_lock);
 
     return entry;
 }
@@ -2998,7 +2970,7 @@ mbox_model_get_value(GtkTreeModel *tree_model,
         return;
     }
     g_return_if_fail(msgno<=libbalsa_mailbox_total_messages(lmm));
-    msg = lbm_get_index_entry(lmm, (GNode *) iter->user_data);
+    msg = lbm_get_index_entry(lmm, msgno);
     switch(column) {
         /* case LB_MBOX_MSGNO_COL: handled above */
     case LB_MBOX_MARKED_COL:
@@ -3023,7 +2995,7 @@ mbox_model_get_value(GtkTreeModel *tree_model,
         break;
     case LB_MBOX_DATE_COL:
         if(msg) {
-            tmp = libbalsa_date_to_utf8(&msg->msg_date,
+            tmp = libbalsa_date_to_utf8(msg->msg_date,
 		                        libbalsa_mailbox_date_format);
             g_value_take_string(value, tmp);
         }
@@ -3708,14 +3680,13 @@ libbalsa_mailbox_unlink_and_prepend(LibBalsaMailbox * mailbox,
     GtkTreePath *path;
     GNode *current_parent;
 
-    if (!libbalsa_threads_has_lock())
-        g_warning("Thread is not holding gdk lock");
     g_return_if_fail(node != NULL);
     g_return_if_fail(parent != node);
 #ifdef SANITY_CHECK
     g_return_if_fail(!parent || !g_node_is_ancestor(node, parent));
 #endif
 
+    gdk_threads_enter();
     iter.stamp = mailbox->stamp;
 
     path = mbox_model_get_path_helper(node, mailbox->msg_tree);
@@ -3765,6 +3736,7 @@ libbalsa_mailbox_unlink_and_prepend(LibBalsaMailbox * mailbox,
 
         mailbox->msg_tree_changed = TRUE;
     }
+    gdk_threads_leave();
 }
 
 struct lbm_update_msg_tree_info {
@@ -3886,14 +3858,12 @@ lbm_set_msg_tree(LibBalsaMailbox * mailbox)
     GNode *node;
     GtkTreePath *path;
 
-    if (!libbalsa_threads_has_lock())
-        g_warning("Thread is not holding gdk lock");
-
     iter.stamp = ++mailbox->stamp;
 
     if (!mailbox->msg_tree)
         return;
 
+    gdk_threads_enter();
     path = gtk_tree_path_new();
     gtk_tree_path_down(path);
 
@@ -3910,6 +3880,7 @@ lbm_set_msg_tree(LibBalsaMailbox * mailbox)
     }
 
     gtk_tree_path_free(path);
+    gdk_threads_leave();
 }
 
 void
@@ -4229,8 +4200,6 @@ static void
 lbm_check_real(LibBalsaMailbox * mailbox)
 {
     libbalsa_lock_mailbox(mailbox);
-    g_object_set_data(G_OBJECT(mailbox), LB_MAILBOX_CHECK_ID_KEY,
-                      GUINT_TO_POINTER(0));
     libbalsa_mailbox_check(mailbox);
     libbalsa_unlock_mailbox(mailbox);
     g_object_unref(mailbox);
@@ -4239,14 +4208,15 @@ lbm_check_real(LibBalsaMailbox * mailbox)
 static gboolean
 lbm_check_idle(LibBalsaMailbox * mailbox)
 {
-#ifdef BALSA_USE_THREADS
-    pthread_t check_thread;
+    GThread *check_thread;
 
-    pthread_create(&check_thread, NULL, (void *) lbm_check_real, mailbox);
-    pthread_detach(check_thread);
-#else                           /*BALSA_USE_THREADS */
-    lbm_check_real(mailbox);
-#endif                          /*BALSA_USE_THREADS */
+    check_thread =
+    	g_thread_new("lbm_check_real", (GThreadFunc) lbm_check_real, mailbox);
+    g_thread_unref(check_thread);
+
+    libbalsa_lock_mailbox(mailbox);
+    mailbox->queue_check_idle_id = 0;
+    libbalsa_unlock_mailbox(mailbox);
 
     return FALSE;
 }
@@ -4254,17 +4224,12 @@ lbm_check_idle(LibBalsaMailbox * mailbox)
 static void
 lbm_queue_check(LibBalsaMailbox * mailbox)
 {
-    guint id;
-
-    if (GPOINTER_TO_UINT(g_object_get_data(G_OBJECT(mailbox),
-                                           LB_MAILBOX_CHECK_ID_KEY)))
-	/* Idle callback already scheduled. */
-        return;
-
-    g_object_ref(mailbox);
-    id = g_idle_add((GSourceFunc) lbm_check_idle, mailbox);
-    g_object_set_data(G_OBJECT(mailbox), LB_MAILBOX_CHECK_ID_KEY,
-                      GUINT_TO_POINTER(id));
+    libbalsa_lock_mailbox(mailbox);
+    if (!mailbox->queue_check_idle_id)
+        mailbox->queue_check_idle_id =
+            g_idle_add((GSourceFunc) lbm_check_idle,
+                       g_object_ref(mailbox));
+    libbalsa_unlock_mailbox(mailbox);
 }
 
 /* Search mailbox for a message matching the condition in search_iter,
@@ -4286,9 +4251,6 @@ libbalsa_mailbox_search_iter_step(LibBalsaMailbox * mailbox,
     GNode *node;
     gboolean retval = FALSE;
     gint total;
-
-    if (!libbalsa_threads_has_lock())
-        g_warning("Thread is not holding gdk lock");
 
     node = iter->user_data;
     if (!node)
@@ -4365,7 +4327,6 @@ libbalsa_mailbox_move_duplicates(LibBalsaMailbox * mailbox,
     return retval;
 }
 
-#if BALSA_USE_THREADS
 /* Lock and unlock the mail store. NULL mailbox is not an error. */
 void 
 libbalsa_mailbox_lock_store(LibBalsaMailbox * mailbox)
@@ -4380,7 +4341,6 @@ libbalsa_mailbox_unlock_store(LibBalsaMailbox * mailbox)
     if (mailbox)
         LIBBALSA_MAILBOX_GET_CLASS(mailbox)->lock_store(mailbox, FALSE);
 }
-#endif                          /* BALSA_USE_THREADS */
 
 void
 libbalsa_mailbox_cache_message(LibBalsaMailbox * mailbox, guint msgno,

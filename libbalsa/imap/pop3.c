@@ -27,15 +27,13 @@
 #include <string.h>
 #include <unistd.h>
 
-#if defined(USE_TLS)
 #include <openssl/ssl.h>
+#include <openssl/evp.h>
 #include <openssl/err.h>
-#endif
 
 #include "pop3.h"
 #include "siobuf.h"
 #include "imap_private.h"
-#include "md5-utils.h"
 
 #define ELEMENTS(x) (sizeof (x) / sizeof(x[0]))
 
@@ -109,6 +107,20 @@ struct PopHandle_ {
 };
 #define pop_can_do(pop, cap) ((pop)->capabilities[cap])
 
+/*
+ * IMAP_ERROR domain for g_set_error()
+ */
+GQuark
+pop_imap_error_quark(void)
+{
+    static GQuark quark;
+
+    if (!quark)
+        quark = g_quark_from_static_string("imap-pop3-error-quark");
+
+    return quark;
+}
+
 PopHandle *
 pop_new(void)
 {
@@ -178,11 +190,13 @@ pop_check_status(PopHandle *pop, GError **err)
                 "POP3 connection severed");
     return FALSE;
   }
-     
+
   if(strncmp(buf, "+OK", 3) == 0)
     res = TRUE;
+  /*
   else if(strncmp(buf, "-ERR", 4) == 0)
     res = FALSE;
+    */
   else
     res = FALSE;
 
@@ -224,7 +238,10 @@ pop_get_capa(PopHandle *pop, GError **err)
       if(strstr(buf, " CRAM-MD5"))
         pop->capabilities[POP_CAP_AUTH_CRAM] = 1;
     } else if(strncmp(buf, "SASL", 4) == 0) {
-      /* FIXME: implement SASL support */
+    	if (strstr(buf, " PLAIN") != NULL) {
+    		pop->capabilities[POP_CAP_SASL_PLAIN] = 1;
+    	}
+      /* FIXME: implement more SASL mechanisms */
     } else {
       unsigned i;
       for(i=0; i<ELEMENTS(capa_names); i++) {
@@ -293,16 +310,16 @@ get_apop_stamp(const char *greeting, char *stamp)
 static void
 compute_auth_hash(char *stamp, char *hash, const char *passwd)
 {
-  MD5Context mdContext;
+  EVP_MD_CTX ctx;
   register unsigned char *dp;
   register char *cp;
   unsigned char *ep;
   unsigned char digest[16];
   
-  md5_init(&mdContext);
-  md5_update(&mdContext, (unsigned char *)stamp, strlen(stamp));
-  md5_update(&mdContext, (unsigned char *)passwd, strlen(passwd));
-  md5_final(&mdContext, digest);
+  EVP_DigestInit(&ctx, EVP_md5());
+  EVP_DigestUpdate(&ctx, stamp, strlen(stamp));
+  EVP_DigestUpdate(&ctx, passwd, strlen(passwd));
+  EVP_DigestFinal(&ctx, digest, NULL);
   
   cp = hash;
   dp = digest;
@@ -355,14 +372,14 @@ pop_auth_user(PopHandle *pop, const char *greeting, GError **err)
   if(pop->user_cb)
     pop->user_cb(IME_GET_USER_PASS, pop->user_arg,
                     "LOGIN", &user, &pass, &ok);
-    if(!ok || user == NULL || pass == NULL) {
-      g_set_error(err, IMAP_ERROR, IMAP_POP_AUTH_ERROR,
-                  "USER Authentication cancelled");
-      return IMAP_AUTH_FAILURE;
-    }
+  if(!ok || user == NULL || pass == NULL) {
+    g_set_error(err, IMAP_ERROR, IMAP_POP_AUTH_ERROR,
+                "USER Authentication cancelled");
+    return IMAP_AUTH_FAILURE;
+  }
 
   g_snprintf(line, sizeof(line), "User %s\r\n", user);
-  g_free(user); 
+  g_free(user);
   if(!pop_exec(pop, line, err)) { /* RFC 1939: User is optional */
     g_free(pass);
     g_clear_error(err);
@@ -373,12 +390,51 @@ pop_auth_user(PopHandle *pop, const char *greeting, GError **err)
   return pop_exec(pop, line, err) ? IMAP_SUCCESS : IMAP_AUTH_FAILURE;
 }
 
+static ImapResult
+pop_auth_sasl_plain(PopHandle *pop, const char *greeting, GError **err)
+{
+	char *user = NULL, *pass = NULL;
+	int ok = 0;
+	gchar *base64_buf;
+	gchar *plain_buf;
+	size_t user_len;
+	size_t passwd_len;
+	char line[POP_LINE_LEN];
+
+	if (pop_can_do(pop, POP_CAP_SASL_PLAIN) == 0) {
+		return IMAP_AUTH_UNAVAIL;
+	}
+
+	if (pop->user_cb != NULL) {
+		pop->user_cb(IME_GET_USER_PASS, pop->user_arg, "SASL PLAIN", &user, &pass, &ok);
+	}
+	if ((ok == 0) || (user == NULL) || (pass == NULL)) {
+		g_set_error(err, IMAP_ERROR, IMAP_POP_AUTH_ERROR, "SASL PLAIN Authentication cancelled");
+		return IMAP_AUTH_FAILURE;
+	}
+
+	user_len = strlen(user);
+	passwd_len = strlen(pass);
+	plain_buf = g_malloc0((2U * user_len) + passwd_len + 3U);
+	strcpy(plain_buf, user);
+	strcpy(&plain_buf[user_len + 1U], user);
+	g_free(user);
+	strcpy(&plain_buf[(2U * user_len) + 2U], pass);
+	g_free(pass);
+	base64_buf = g_base64_encode((const guchar *) plain_buf, (2U * user_len) + passwd_len + 2U);
+	g_free(plain_buf);
+	g_snprintf(line, sizeof(line), "AUTH PLAIN %s\r\n", base64_buf);
+	g_free(base64_buf);
+	return pop_exec(pop, line, err) ? IMAP_SUCCESS : IMAP_AUTH_FAILURE;
+}
+
 typedef ImapResult (*PopAuthenticator)(PopHandle*, const char*, GError **err);
 /* ordered from strongest to weakest */
 static const PopAuthenticator pop_authenticators_arr[] = {
   pop_auth_cram,
   pop_auth_apop,
   pop_auth_user,
+  pop_auth_sasl_plain,
   NULL
 };
 
@@ -413,7 +469,6 @@ pop_authenticate(PopHandle *pop, const char *greeting, GError **err)
    ===================================================================
 */
 
-#ifdef USE_TLS
 static gboolean
 pop_stls(PopHandle *pop, GError **err)
 {
@@ -439,7 +494,6 @@ pop_stls(PopHandle *pop, GError **err)
     return FALSE;
   }
 }
-#endif
 
 static gboolean
 parse_list_response(PopHandle *pop, char *line, ssize_t sz, GError **err)
@@ -457,7 +511,7 @@ parse_list_response(PopHandle *pop, char *line, ssize_t sz, GError **err)
       }
       if(line[0]=='.' && (line[1] == '\r' || line[1] == '\n'))
         break;
-      if( sscanf(line, "%u%u", &msg, &msg_size) < 2 ) {
+      if( sscanf(line, "%10u%10u", &msg, &msg_size) < 2 ) {
         g_set_error(err, IMAP_ERROR, IMAP_POP_PROTOCOL_ERROR,
                     "Server %s did not response correctly to LIST: %s",
                     pop->host, line);
@@ -486,9 +540,7 @@ pop_connect(PopHandle *pop, const char *host, GError **err)
   const char *service = "pop3";
   char line[POP_LINE_LEN];
 
-#ifdef USE_TLS
   if(pop->over_ssl) service = "pop3s";
-#endif
 
   g_free(pop->host);
   pop->host = g_strdup(host);
@@ -509,7 +561,6 @@ pop_connect(PopHandle *pop, const char *host, GError **err)
   }
   if(pop->timeout>0)
     sio_set_timeout(pop->sio, pop->timeout);
-#ifdef USE_TLS
   if(pop->over_ssl) {
     SSL *ssl = imap_create_ssl();
     if(!ssl || !imap_setup_ssl(pop->sio, pop->host, ssl,
@@ -521,7 +572,6 @@ pop_connect(PopHandle *pop, const char *host, GError **err)
       return IMAP_UNSECURE;
     }
   }
-#endif
   if(pop->monitor_cb) 
     sio_set_monitorcb(pop->sio, pop->monitor_cb, pop->monitor_arg);
 
@@ -536,12 +586,10 @@ pop_connect(PopHandle *pop, const char *host, GError **err)
     else return FALSE;
   }
   
-#ifdef USE_TLS
   if(pop->tls_mode != IMAP_TLS_DISABLED && pop_can_do(pop, POP_CAP_STLS)) {
     if(!pop_stls(pop, err)) /* TLS negotiation attempted.. */
       return FALSE;         /* .. but failed. */
   }
-#endif
   if(pop->tls_mode == IMAP_TLS_REQUIRED && 
      !(pop->tls_enabled || pop->over_ssl) ) {
     sio_detach(pop->sio); pop->sio = NULL; close(pop->sd);

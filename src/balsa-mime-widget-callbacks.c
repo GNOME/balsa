@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2001 Stuart Parmenter and others,
+ * Copyright (C) 1997-2013 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -82,8 +82,9 @@ balsa_mime_widget_ctx_menu_save(GtkWidget * parent_widget,
 	gtk_file_chooser_dialog_new(title,
                                     balsa_get_parent_window(parent_widget),
 				    GTK_FILE_CHOOSER_ACTION_SAVE,
-				    GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-				    GTK_STOCK_OK, GTK_RESPONSE_OK, NULL);
+                                    _("_Cancel"), GTK_RESPONSE_CANCEL,
+                                    _("_OK"),     GTK_RESPONSE_OK,
+                                    NULL);
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu_for_parent(save_dialog, balsa_get_parent_window(parent_widget));
 #endif
@@ -99,7 +100,7 @@ balsa_mime_widget_ctx_menu_save(GtkWidget * parent_widget,
                                                 balsa_app.save_dir);
 
     if (mime_body->filename) {
-        gchar * filename = g_strdup(mime_body->filename);
+        gchar * filename = g_path_get_basename(mime_body->filename);
 	libbalsa_utf8_sanitize(&filename, balsa_app.convert_unknown_8bit,
 			       NULL);
 	gtk_file_chooser_set_current_name(GTK_FILE_CHOOSER(save_dialog),
@@ -196,43 +197,42 @@ gint
 balsa_mime_widget_key_press_event(GtkWidget * widget, GdkEventKey * event,
 				  BalsaMessage * bm)
 {
-    GtkViewport *viewport;
     GtkAdjustment *adj;
     int page_adjust;
 
-    viewport = GTK_VIEWPORT(bm->cont_viewport);
-    adj = gtk_viewport_get_vadjustment(viewport);
+    adj = gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW
+                                              (bm->scroll));
 
     page_adjust = balsa_app.pgdownmod ?
         (gtk_adjustment_get_page_size(adj) * balsa_app.pgdown_percent) /
         100 : gtk_adjustment_get_page_increment(adj);
 
     switch (event->keyval) {
-    case GDK_Up:
+    case GDK_KEY_Up:
         scroll_change(adj, -gtk_adjustment_get_step_increment(adj), NULL);
         break;
-    case GDK_Down:
+    case GDK_KEY_Down:
         scroll_change(adj, gtk_adjustment_get_step_increment(adj), NULL);
         break;
-    case GDK_Page_Up:
+    case GDK_KEY_Page_Up:
         scroll_change(adj, -page_adjust, NULL);
         break;
-    case GDK_Page_Down:
+    case GDK_KEY_Page_Down:
         scroll_change(adj, page_adjust, NULL);
         break;
-    case GDK_Home:
+    case GDK_KEY_Home:
         if (event->state & GDK_CONTROL_MASK)
             scroll_change(adj, -gtk_adjustment_get_value(adj), NULL);
         else
             return FALSE;
         break;
-    case GDK_End:
+    case GDK_KEY_End:
         if (event->state & GDK_CONTROL_MASK)
             scroll_change(adj, gtk_adjustment_get_upper(adj), NULL);
         else
             return FALSE;
         break;
-    case GDK_F10:
+    case GDK_KEY_F10:
         if (event->state & GDK_SHIFT_MASK) {
 	    GtkWidget *current_widget = balsa_message_current_part_widget(bm);
 
@@ -247,7 +247,7 @@ balsa_mime_widget_key_press_event(GtkWidget * widget, GdkEventKey * event,
         } else
             return FALSE;
         break;
-    case GDK_space:
+    case GDK_KEY_space:
         scroll_change(adj, page_adjust, bm);
         break;
 

@@ -19,7 +19,7 @@
  * A simple URL parser.
  */
 
-#define _DEFAULT_SOURCE 1
+#define _DEFAULT_SOURCE 1 
 
 #include <stdio.h>
 #include <ctype.h>

@@ -14,7 +14,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, see <http://www.gnu.org/licenses/>.
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+ * 02111-1307, USA.
  */
 
 #ifndef LIBBALSA_GPGME_CB_H_
@@ -30,18 +32,20 @@
 #include <gtk/gtk.h>
 
 
-#ifdef __cplusplus
-extern "C" {
-#ifdef MAKE_EMACS_HAPPY
-}
-#endif
-#endif				/* __cplusplus */
+G_BEGIN_DECLS
+
+
+typedef enum {
+    LB_SELECT_PRIVATE_KEY = 1,
+    LB_SELECT_PUBLIC_KEY_USER,
+    LB_SELECT_PUBLIC_KEY_ANY
+} lb_key_sel_md_t;
 
 
 gpgme_error_t lb_gpgme_passphrase(void *hook, const gchar * uid_hint,
 				  const gchar * passphrase_info,
 				  int prev_was_bad, int fd);
-gpgme_key_t lb_gpgme_select_key(const gchar * user_name, gboolean secret,
+gpgme_key_t lb_gpgme_select_key(const gchar * user_name, lb_key_sel_md_t mode,
 				GList * keys, gpgme_protocol_t protocol,
 				GtkWindow * parent);
 gboolean lb_gpgme_accept_low_trust_key(const gchar * user_name,
@@ -49,9 +53,7 @@ gboolean lb_gpgme_accept_low_trust_key(const gchar * user_name,
 				       GtkWindow * parent);
 
 
-#ifdef __cplusplus
-}
-#endif				/* __cplusplus */
+G_END_DECLS
 
 
 #endif				/* LIBBALSA_GPGME_CB_H_ */

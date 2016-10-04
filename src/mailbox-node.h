@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2001 Stuart Parmenter and others,
+ * Copyright (C) 1997-2013 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -71,10 +71,6 @@ struct _BalsaMailboxNode {
     LibBalsaServer * server; /* Used only by remote; is referenced */
     char delim; /* IMAP delimiter so that we do not need to check it
 		 * too often. */
-
-
-    unsigned remote:1;/* is dirname or server field used in data union.
-		       * If there is a need for more types, make a subclass. */
 
     unsigned subscribed:1;     /* Used only by remote */
     unsigned list_inbox:1;     /* Used only by remote */

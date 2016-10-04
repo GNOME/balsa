@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2002 Stuart Parmenter and others,
+ * Copyright (C) 1997-2013 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -64,9 +64,6 @@ balsa_initdruid_apply(GtkAssistant * druid)
     gchar *address_book;
     LibBalsaAddressBook *ab = NULL;
 
-#if defined(ENABLE_TOUCH_UI)
-    balsa_druid_page_directory_later(GTK_WIDGET(druid));
-#endif
     address_book = g_build_filename(g_get_home_dir(), "GnomeCard.gcrd", NULL);
     if (g_file_test(address_book, G_FILE_TEST_EXISTS))
         ab = libbalsa_address_book_vcard_new(_("GnomeCard Address Book"),
@@ -107,8 +104,6 @@ balsa_initdruid_apply(GtkAssistant * druid)
 void
 balsa_initdruid(GtkAssistant * assistant)
 {
-    GdkPixbuf *default_logo = balsa_init_get_png("balsa-logo.png");
-
     g_return_if_fail(assistant != NULL);
     g_return_if_fail(GTK_IS_ASSISTANT(assistant));
 
@@ -117,15 +112,11 @@ balsa_initdruid(GtkAssistant * assistant)
     g_signal_connect(G_OBJECT(assistant), "close",
                      G_CALLBACK(balsa_initdruid_apply), NULL);
 
-    balsa_druid_page_welcome(assistant, default_logo);
-    balsa_druid_page_user(assistant, default_logo);
-#if !defined(ENABLE_TOUCH_UI)
-    balsa_druid_page_directory(assistant, default_logo);
-#if HAVE_GNOME
-    balsa_druid_page_defclient(assistant, default_logo);
-#endif
-#endif
-    balsa_druid_page_finish(assistant, default_logo);
+    balsa_druid_page_welcome(assistant);
+    balsa_druid_page_user(assistant);
+    balsa_druid_page_directory(assistant);
+    balsa_druid_page_defclient(assistant);
+    balsa_druid_page_finish(assistant);
 }
 
 

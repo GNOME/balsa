@@ -3,7 +3,6 @@
 # Please keep this list in alphabetical order.
 balsa.desktop.in.in
 balsa-mailto-handler.desktop.in.in
-libbalsa/address-book.c
 libbalsa/address-book-extern.c
 libbalsa/address-book-ldap.c
 libbalsa/address-book-ldif.c
@@ -14,6 +13,7 @@ libbalsa/body.c
 libbalsa/files.c
 libbalsa/filter.c
 libbalsa/filter-error.c
+libbalsa/filter-funcs.c
 libbalsa/filter-file.c
 libbalsa/filter-funcs.c
 libbalsa/folder-scanners.c
@@ -24,6 +24,10 @@ libbalsa/gmime-part-rfc2440.c
 libbalsa/html.c
 libbalsa/identity.c
 libbalsa/imap-server.c
+libbalsa/libbalsa-gpgme-cb.c
+libbalsa/libbalsa-gpgme.c
+libbalsa/libbalsa-conf.c
+libbalsa/libbalsa-vfs.c
 libbalsa/libbalsa.c
 libbalsa/libbalsa-conf.c
 libbalsa/libbalsa-gpgme.c
@@ -75,6 +79,7 @@ src/balsa-mime-widget-image.c
 src/balsa-mime-widget-message.c
 src/balsa-mime-widget-text.c
 src/balsa-mime-widget-vcalendar.c
+src/balsa-mime-widget.c
 src/balsa-print-object.c
 src/balsa-print-object-default.c
 src/balsa-print-object-header.c

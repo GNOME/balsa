@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2002 Stuart Parmenter and others,
+ * Copyright (C) 1997-2013 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -119,7 +119,7 @@ run_filters_on_mailbox(GSList * filters, LibBalsaMailbox * mbox)
 	     msgno++)
 	    if (libbalsa_mailbox_message_match(mbox, msgno, search_iter))
 		g_array_append_val(messages, msgno);
-	libbalsa_mailbox_search_iter_free(search_iter);
+	libbalsa_mailbox_search_iter_unref(search_iter);
 
 	libbalsa_mailbox_register_msgnos(mbox, messages);
 	sent_to_trash +=
@@ -159,6 +159,7 @@ void fr_dialog_response(GtkWidget * widget, gint response,
 			gpointer throwaway)
 {
     BalsaFilterRunDialog * p;
+    GdkScreen *screen;
     GError *err = NULL;
 
     p=BALSA_FILTER_RUN_DIALOG(widget);
@@ -171,10 +172,11 @@ void fr_dialog_response(GtkWidget * widget, gint response,
     case GTK_RESPONSE_NONE:     /* Close window */
 	/* We free the mailbox_filter datas, they are useless now */
 	fr_clean_associated_mailbox_filters(p->selected_filters);
-	
+
 	break;
     case GTK_RESPONSE_HELP:     /* Help button */
-        gtk_show_uri(NULL, "ghelp:balsa?win-run-filters",
+        screen = gtk_widget_get_screen(widget);
+        gtk_show_uri(screen, "help:balsa/win-run-filters",
                      gtk_get_current_event_time(), &err);
 	if (err) {
 	    balsa_information_parented(GTK_WINDOW(widget),
@@ -193,7 +195,7 @@ void fr_dialog_response(GtkWidget * widget, gint response,
 }
 
 
-/* 
+/*
  *Callbacks for apply/left/right buttons
  */
 

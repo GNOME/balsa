@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE page [
+<!ENTITY % balsa SYSTEM "balsa.entities">
+<!ENTITY mdash "--">
+<!-- replace with actual app  version number--><!ENTITY version "2.5">
+<!ENTITY Balsa '<app xmlns="http://projectmallard.org/1.0/">Balsa</app>'>
+<!ENTITY Mutt '<app xmlns="http://projectmallard.org/1.0/">Mutt</app>'>
+<!ENTITY GnomeCard '<app xmlns="http://projectmallard.org/1.0/">GnomeCard</app>'>
+<!ENTITY Pine '<app xmlns="http://projectmallard.org/1.0/">pine</app>'>
+<!ENTITY procmail '<app xmlns="http://projectmallard.org/1.0/">procmail</app>'>
+<!ENTITY GnuPG '<app xmlns="http://projectmallard.org/1.0/">GnuPG</app>'>
+<!ENTITY balsalist "http://mail.gnome.org/mailman/listinfo/balsa-list">
+<!ENTITY IMAP '<link xmlns="http://projectmallard.org/1.0/"
+           xref ="glossary#imap">IMAP</link>'>
+<!ENTITY LDAP '<link xmlns="http://projectmallard.org/1.0/"
+           xref ="glossary#ldap">LDAP</link>'>
+<!ENTITY POP3 '<link xmlns="http://projectmallard.org/1.0/"
+           xref ="glossary#pop">POP3</link>'>
+<!ENTITY SMTP '<link xmlns="http://projectmallard.org/1.0/"
+           xref ="glossary#smtp">SMTP</link>'>
+<!ENTITY VCARD '<link xmlns="http://projectmallard.org/1.0/"
+           xref ="glossary#vcard">VCARD</link>'>
+]>
+<page xmlns="http://projectmallard.org/1.0/" type="topic" id="identities" xml:lang="fr">
+  <info>
+    <link type="guide" xref="index"/>
+  </info>
+  <title>Identités</title>
+  <p>Cette boîte de dialogue vous permet de définir la manière de vous présenter au reste du monde à travers vos courriers électroniques. Le premier onglet contient des informations d'ordre général :</p>
+  <terms>
+    <item>
+      <title>
+        <gui>Identity Name</gui>
+      </title>
+      <p>A unique title by which this identity will be named within
+      <app>Balsa</app>.</p>
+    </item>
+    <item>
+      <title>
+        <gui>Full Name</gui>
+      </title>
+      <p>This doesn't
+      <em>have</em> to be your name, I guess. But it's the word
+      prefixing your email address in mail you send.</p>
+    </item>
+    <item>
+      <title>
+        <gui>Mailing Address</gui>
+      </title>
+      <p>L'adresse telle que vous souhaitez la voir affichée dans le champ « De » de l'en-tête.</p>
+    </item>
+    <item>
+      <title>
+        <gui>Reply-To address</gui>
+      </title>
+      <p>L'adresse à laquelle vous souhaitez que les gens adressent leurs courriels de réponse (si vous avez une adresse personnelle et de travail par exemple).</p>
+    </item>
+    <item>
+      <title>
+        <gui>Default Domain</gui>
+      </title>
+      <p>The domain that you wish to append to all e-mail entries
+      where you did not specify the domain. Normally you would use
+      your local domain. You need to enable
+      <link xref="preferences-address-books">Alias
+      Expansion</link> for this to work.</p>
+    </item>
+  </terms>
+  <p>The "Messages" page shows various initial settings for the new
+  message:</p>
+  <terms>
+    <item>
+      <title>
+        <gui>Bcc</gui>
+      </title>
+      <p>La valeur par défaut pour la copie carbone invisible lorsque vous utilisez cette identité. Utile si vous souhaitez toujours envoyer une copie du courriel sortant à un autre compte.</p>
+    </item>
+    <item>
+      <title>
+        <gui>Reply String</gui>
+      </title>
+      <p>Le préfixe utilisé dans la ligne Sujet lors de la réponse à un message.</p>
+    </item>
+    <item>
+      <title>
+        <gui>Forward String</gui>
+      </title>
+      <p>Le préfixe utilisé dans la ligne Sujet lors du transfert d'un message.</p>
+    </item>
+    <item>
+      <title>
+        <gui>Request Message Disposition Notification</gui>
+      </title>
+      <p>Indique si l'accusé de réception de message doit être demandé par défaut.</p>
+    </item>
+    <item>
+      <title>
+        <gui>Face Path</gui>
+      </title>
+      <p>Whether a "Face" header should be attached to a program.
+      Specified path points out to a file containing a textual
+      representation of the face icon. Please see
+      <link href="http://quimby.gnus.org/circus/face/">a
+      description of Face and X-Face</link> headers for more details
+      as well as the list of mail programs supporting this
+      feature.</p>
+    </item>
+    <item>
+      <title>
+        <gui>X-Face Path</gui>
+      </title>
+      <p>Indique si l'en-tête « Face » doit être joint à un programme. Le chemin spécifié pointe vers un fichier contenant une représentation en caractères alphabétiques de l'icône de l'avatar.</p>
+    </item>
+    <item>
+      <title>
+        <gui>SMTP server</gui>
+      </title>
+      <p>The
+      <link xref="preferences-mail-options#smtp-server-config">
+      SMTP server</link> to be
+      used for this identity.</p>
+    </item>
+  </terms>
+  <p>You control the signature that <app>Balsa</app> appends to your
+  messages on the "Signature" page:</p>
+  <terms>
+    <item>
+      <title>
+        <gui>Signature Path</gui>
+      </title>
+      <p>Le fichier contenant la signature que vous ajoutez à tous vos messages. La signature peut être générée de l'une des trois façons suivantes :</p>
+      <list>
+        <item>
+          <p>à partir d'un fichier ordinaire. Sélectionnez le chemin de n'importe quel fichier et le texte qu'il contient est alors ajouté en fin de vos messages.</p>
+        </item>
+        <item>
+          <p>A named pipe or FIFO. In this case, to <app>Balsa</app>,
+          the file looks normal, but in reality, it is a pipe to a
+          program that is generating the content. List the path to
+          the pipe.</p>
+        </item>
+        <item>
+          <p>An executable program. <app>Balsa</app> will execute the
+          program and read its output, appending that text to the
+          message. List the path to the program with a "|"
+          prepended to it. For example:</p>
+          <p>"|/home/user/dynsig.pl"</p>
+        </item>
+      </list>
+    </item>
+    <item>
+      <title>
+        <gui>Execute Signature</gui>
+      </title>
+      <p>Exécute les instructions contenues dans le fichier signature et ajoute le résultat en tant que signature des courriels sortants. Sélectionnez cette option quand vous générez la signature à l'aide d'un programme comme décrit ci-dessus dans Chemin de la signature.</p>
+    </item>
+    <item>
+      <title>
+        <gui>Include Signature</gui>
+      </title>
+      <p>Ajoute la signature à la fin de tout courriel sortant.</p>
+    </item>
+    <item>
+      <title>
+        <gui>Include Signature When Forwarding</gui>
+      </title>
+      <p>Inclut la signature lorsque vous faites suivre un courriel existant.</p>
+    </item>
+    <item>
+      <title>
+        <gui>Include Signature When Replying</gui>
+      </title>
+      <p>Ajoute la signature lorsque vous répondez à un courriel.</p>
+    </item>
+    <item>
+      <title>
+        <gui>Add Signature Separator</gui>
+      </title>
+      <p>When checked, this has <app>Balsa</app> insert the standard
+      signature separator before your signature.</p>
+    </item>
+    <item>
+      <title>
+        <gui>Prepend Signature</gui>
+      </title>
+      <p>Ajoute la signature avant le texte du message, au lieu de la placer à la fin.</p>
+    </item>
+  </terms>
+  <p>Les paramètres de sécurité se définissent dans le quatrième onglet :</p>
+  <terms>
+    <item>
+      <title>
+        <gui>Sign messages by default.</gui>
+      </title>
+      <p>By default enable the cryptographic signature for every
+      new message. The default protocol is determined by the
+      "Default protocol" option.</p>
+    </item>
+    <item>
+      <title>
+        <gui>Encrypt messages by default.</gui>
+      </title>
+      <p>By default encrypt every new message. The default protocol
+      is determined by the "Default protocol" option.</p>
+    </item>
+    <item>
+      <title>
+        <gui>Default protocol.</gui>
+      </title>
+      <p>Choisit le protocole par défaut pour la signature chiffrée et le chiffrement des messages.</p>
+    </item>
+    <item>
+      <title>
+        <gui>Always trust GnuPG keys when encrypting.</gui>
+      </title>
+      <p>Ne demande pas de confirmation lors du chiffrement d'un message dont le destinataire n'a pas de clé GnuPG entièrement approuvée.</p>
+    </item>
+    <item>
+      <title>
+        <gui>Remind me if messages can be encrypted.</gui>
+      </title>
+      <p>Avant d'envoyer un message, vérifie si des clés valides sont présentes pour tous les destinataires et affiche une boîte de dialogue dans ce cas.</p>
+    </item>
+    <item>
+      <title>
+        <gui>Use secret key with this id for signing.</gui>
+      </title>
+      <p>Usually, <app>Balsa</app> automatically selects a proper secret
+      key for cryptographic signatures from the identity's mail
+      address. Therefore, most users should leave this entry empty.
+      If you want to force using a specific secret key for
+      cryptographic signatures, enter the key id here. You can get
+      the key id by running the command
+      <cmd>gpg --list-secret-keys</cmd>.</p>
+    </item>
+  </terms>
+  <note>
+    <p>These security options are available only if <app>Balsa</app> is
+    built with
+    <app>GnuPG</app> support.</p>
+  </note>
+</page>

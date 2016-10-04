@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2002 Stuart Parmenter and others,
+ * Copyright (C) 1997-2013 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -444,7 +444,7 @@ prepend_header_misc(const char *name, const char *value,
 	/* Empty header */
 	return;
     /* Standard Headers*/
-    for(i=0; name[i] && i<sizeof(lcname)-1; i++)
+    for(i=0; i<sizeof(lcname)-1 && name[i]; i++)
         lcname[i] = tolower(name[i]);
     if (i < sizeof(lcname)) {
 	/* short enough to be on the ignored-headers list */

@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /*
  * gmime/gpgme glue layer library
- * Copyright (C) 2004-2011 Albrecht Dreß <albrecht.dress@arcor.de>
+ * Copyright (C) 2004-2013 Albrecht Dreß <albrecht.dress@arcor.de>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,13 +23,7 @@
 #include <glib.h>
 
 
-#ifdef __cplusplus
-extern "C" {
-#  ifdef MAKE_EMACS_HAPPY
-}
-#  endif
-#endif				/* __cplusplus */
-
+G_BEGIN_DECLS
 
 /* the signature status as returned by gpgme as a GObject */
 #define GMIME_TYPE_GPGME_SIGSTAT	    (g_mime_gpgme_sigstat_get_type())
@@ -70,8 +64,6 @@ GMimeGpgmeSigstat *g_mime_gpgme_sigstat_new_from_gpgme_ctx(gpgme_ctx_t
 gchar *libbalsa_cert_subject_readable(const gchar *subject);
 
 
-#ifdef __cplusplus
-}
-#endif				/* __cplusplus */
+G_END_DECLS
 
 #endif				/* __GMIME_GPGME_SIGNATURE_H__ */

@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE page [
+<!ENTITY % balsa SYSTEM "balsa.entities">
+<!ENTITY mdash "--">
+<!-- replace with actual app  version number--><!ENTITY version "2.5">
+<!ENTITY Balsa '<app xmlns="http://projectmallard.org/1.0/">Balsa</app>'>
+<!ENTITY Mutt '<app xmlns="http://projectmallard.org/1.0/">Mutt</app>'>
+<!ENTITY GnomeCard '<app xmlns="http://projectmallard.org/1.0/">GnomeCard</app>'>
+<!ENTITY Pine '<app xmlns="http://projectmallard.org/1.0/">pine</app>'>
+<!ENTITY procmail '<app xmlns="http://projectmallard.org/1.0/">procmail</app>'>
+<!ENTITY GnuPG '<app xmlns="http://projectmallard.org/1.0/">GnuPG</app>'>
+<!ENTITY balsalist "http://mail.gnome.org/mailman/listinfo/balsa-list">
+<!ENTITY IMAP '<link xmlns="http://projectmallard.org/1.0/"
+           xref ="glossary#imap">IMAP</link>'>
+<!ENTITY LDAP '<link xmlns="http://projectmallard.org/1.0/"
+           xref ="glossary#ldap">LDAP</link>'>
+<!ENTITY POP3 '<link xmlns="http://projectmallard.org/1.0/"
+           xref ="glossary#pop">POP3</link>'>
+<!ENTITY SMTP '<link xmlns="http://projectmallard.org/1.0/"
+           xref ="glossary#smtp">SMTP</link>'>
+<!ENTITY VCARD '<link xmlns="http://projectmallard.org/1.0/"
+           xref ="glossary#vcard">VCARD</link>'>
+]>
+<page xmlns="http://projectmallard.org/1.0/" type="topic" id="glossary" xml:lang="sl">
+  <info>
+    <link type="guide" xref="index"/>
+  </info>
+  <title>Slovar</title>
+    <section id="pop">
+      <title>POP</title>
+      <p>Akronim za "Protokol poštnega urada", preprosta metoda za pridobivanje oddaljenih sporočil z oddaljenega poštnega strežnika. Pogosto jih uporabljajo poštni odjemalci za prenos pošte s strežnikov ponudnikov medmrežnega dostopa na računalnik uporabnika za ogled. Trenutno večina ljudi uporablja tretjo različico protokola, poznano kot POP3. Protokol je zelo preprost in ni prilagodljiv, toda enostaven za podpiranje in vseprisoten na medmrežju. </p>
+    </section>
+    <section id="imap">
+      <title>IMAP</title>
+      <p>An acronym that stands for "Internet Mail Access
+      Protocol". It is a newer method of accessing mail over the
+      internet. It is far more featureful than <link xref="glossary#pop">POP3</link>, allowing
+      for remote folders on the mail server, and more control over
+      mail delivery. However it is not as widely supported.</p>
+    </section>
+    <section id="ldap">
+      <title>LDAP</title>
+      <p>An acronym for "Lightweight Directory Access Protocol". It
+      is a widely-accepted standard for accessing contact
+      information over a network. This enables organizations to
+      store address information in a central database, but have
+      many people able to access it.</p>
+    </section>
+    <section id="libmutt">
+      <title>libmutt</title>
+      <p>The library based on Mutt's code and used by previous
+      versions of <app>Balsa</app> to handle local mail and IMAP
+      servers.</p>
+    </section>
+    <section id="mailbox-list">
+      <title>seznam poštnega predala</title>
+      <p>The list of mailboxes found in <app>Balsa</app>'s left hand
+      pane.</p>
+    </section>
+    <section id="message-index">
+      <title>kazalo sporočila</title>
+      <p>The list of messages in <app>Balsa</app>'s upper-right hand
+      pane.</p>
+    </section>
+    <section id="message-view">
+      <title>ogled sporočila</title>
+      <p>The message display in <app>Balsa</app>'s lower-right hand
+      pane.</p>
+    </section>
+    <section id="mda">
+      <title>MDA</title>
+      <p>An acronym for "Mail Delivery Agent", this type of program
+      is also known as a Local Delivery Agent (LDA). It is
+      responsible for delivering the mail recieved for someone on a
+      machine to the mail folder of that person. <app>procmail</app> is
+      an example of this type of program, although many
+      <link xref="glossary#mta">MTA</link>'s have their own
+      MDA implementations.</p>
+    </section>
+    <section id="mta">
+      <title>MTA</title>
+      <p>An acronym for "Mail Transfer Agent", this class of
+      program is responsible for moving mail around between people,
+      be they on the same computer, on on completely separate
+      networks. Examples of this type of program include
+      <app>sendmail</app>,
+      <app>qmail</app>, and
+      <app>postfix</app>.</p>
+    </section>
+    <section id="mua">
+      <title>MUA</title>
+      <p>An acronym for "Mail User Agent", this the program a user
+      would use to read existing mail and create new messages. MUAs
+      are one of three types of programs that allow internet email
+      to work. The other two types of programs are
+      <link xref="glossary#mta">MTA</link> s and
+      <link xref="glossary#mda">MDA</link> s. <app>Balsa</app> is
+      primarily an MUA, but it also functions as an MDA/MTA when
+      retrieving mail from a remote server.</p>
+    </section>
+    <section id="regular-expression">
+      <title>Logični izraz</title>
+      <p>Often abbreviated as a
+      <em>regexp</em>, this is a method of specifing a pattern to
+      match in text. Both very simple and very complex patterns can
+      be easily matched using this method. For information on how
+      to understand and construct regular expressions the best
+      source is the
+      <cmd>grep</cmd> manual or info page.</p>
+    </section>
+    <section id="smtp">
+      <title>SMTP</title>
+      <p>Akronim, ki pomeni "Preprost protokol za prenašanje pošte". To je standard ki določi preprost in zanesljiv način prenašanja sporočil med računalniki na omrežju. Uporablja ga večina, če ne vsi poštni programi za prenašanje pošte.</p>
+    </section>
+    <section id="vcard">
+      <title>VCARD</title>
+      <p>VCARD is a standard method of storing contact information
+      for easy exchange between programs. <app>Balsa</app> supports
+      VCARD addressbooks, as does GnomeCard and Evolution. Many
+      other programs are capable of exporting their contact lists
+      in VCARD format as well.</p>
+    </section>
+</page>

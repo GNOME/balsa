@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2005 Stuart Parmenter and others,
+ * Copyright (C) 1997-2013 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -32,8 +32,6 @@
 #if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
 # include "config.h"
 #endif                          /* HAVE_CONFIG_H */
-
-#if BALSA_USE_THREADS
 
 #include "mime-stream-shared.h"
 
@@ -105,8 +103,6 @@ lbmss_stream_class_init(LibBalsaMimeStreamSharedClass * klass)
     GObjectClass *object_class = G_OBJECT_CLASS(klass);
 
     parent_class = g_type_class_ref(GMIME_TYPE_STREAM_FS);
-    g_mutex_init(&lbmss_mutex);
-    g_cond_init(&lbmss_cond);
 
     object_class->finalize  = lbmss_finalize;
 
@@ -317,5 +313,3 @@ libbalsa_mime_stream_shared_unlock(GMimeStream * stream)
         g_cond_signal(&lbmss_cond);
     g_mutex_unlock(&lbmss_mutex);
 }
-
-#endif                          /* BALSA_USE_THREADS */

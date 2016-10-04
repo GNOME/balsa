@@ -1,0 +1,26 @@
+<!DOCTYPE page
+[<!ENTITY % balsa SYSTEM "balsa.entities">%balsa; ]>
+<page xmlns="http://projectmallard.org/1.0/" type="topic"
+id="preferences">
+  <info>
+    <link type="guide" xref="index" />
+  </info>
+<title>The Preferences Window</title>
+
+<p>
+  &Balsa; has many more options than the initial assistant reveals.
+  To access the Preferences window, select
+  <guiseq>
+      <gui>Edit</gui> <gui>Preferences</gui>
+  </guiseq>.
+  In the Preferences window, options are organized into groups,
+  and related groups are shown on individual pages.
+  The pages and groups are explained below.
+</p>
+<!--
+<figure>
+  <title>Preferences Window</title>
+  <media type="image" src="figures/preferences-window.png"/>
+</figure>
+-->
+</page>

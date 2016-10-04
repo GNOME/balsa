@@ -4,11 +4,13 @@
 *.a
 *.gmo
 *.omf
+*.stamp
 
 doc/*/*.mo
 doc/*/*.xml
 
 .deps
+.libs
 Makefile
 Makefile.in
 
@@ -21,6 +23,7 @@ balsa.1
 balsa.desktop
 balsa.desktop.in
 balsa.spec
+compile
 config.guess
 config.h
 config.h.in
@@ -29,7 +32,6 @@ config.status
 config.sub
 configure
 depcomp
-gnome-doc-utils.make
 install-sh
 intltool-extract.in
 intltool-merge.in
@@ -54,3 +56,4 @@ src/balsa-ab
 stamp-h1
 autoscan.log
 configure.scan
+gnome-doc-utils.make

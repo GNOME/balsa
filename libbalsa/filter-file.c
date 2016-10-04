@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2009 Stuart Parmenter and others,
+ * Copyright (C) 1997-2013 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -32,10 +32,6 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-/* yellow dog has crappy libc and needs pthread.h to be included here */
-#ifdef BALSA_USE_THREADS
-#  include <pthread.h>
-#endif
 #include <string.h>
 #include <time.h>
 #include <sys/types.h>

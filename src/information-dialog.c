@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2013 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -68,11 +68,12 @@ balsa_information_real(GtkWindow *parent, LibBalsaInformationType type,
                        const char *msg)
 {
     BalsaInformationShow show;
-    gchar * show_msg = g_strdup(msg);
+    gchar *show_msg;
 
     if (!balsa_app.main_window)
         return;
 
+    show_msg = g_strdup(msg);
     libbalsa_utf8_sanitize(&show_msg, balsa_app.convert_unknown_8bit, NULL);
     switch (type) {
     case LIBBALSA_INFORMATION_MESSAGE:
@@ -229,16 +230,17 @@ balsa_information_list(GtkWindow *parent, LibBalsaInformationType type,
 	information_dialog =
 	    gtk_dialog_new_with_buttons(_("Information - Balsa"), 
                                         parent,
-                                        GTK_DIALOG_DESTROY_WITH_PARENT,
-                                        GTK_STOCK_CLEAR, GTK_RESPONSE_APPLY,
-                                        GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
+                                        GTK_DIALOG_DESTROY_WITH_PARENT |
+                                        libbalsa_dialog_flags(),
+                                        _("_Clear"), GTK_RESPONSE_APPLY,
+                                        _("Cl_ose"), GTK_RESPONSE_CANCEL,
                                         NULL);
 #if HAVE_MACOSX_DESKTOP
 	libbalsa_macosx_menu_for_parent(information_dialog, parent);
 #endif
 	/* Default is to close */
 	gtk_dialog_set_default_response(GTK_DIALOG(information_dialog), 
-                                        GTK_RESPONSE_CLOSE);
+                                        GTK_RESPONSE_CANCEL);
 
 	/* Reset the policy gtk_dialog_new makes itself non-resizable */
 	gtk_window_set_resizable(GTK_WINDOW(information_dialog), TRUE);

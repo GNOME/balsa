@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE page [
+<!ENTITY % balsa SYSTEM "balsa.entities">
+<!ENTITY mdash "--">
+<!-- replace with actual app  version number--><!ENTITY version "2.5">
+<!ENTITY Balsa '<app xmlns="http://projectmallard.org/1.0/">Balsa</app>'>
+<!ENTITY Mutt '<app xmlns="http://projectmallard.org/1.0/">Mutt</app>'>
+<!ENTITY GnomeCard '<app xmlns="http://projectmallard.org/1.0/">GnomeCard</app>'>
+<!ENTITY Pine '<app xmlns="http://projectmallard.org/1.0/">pine</app>'>
+<!ENTITY procmail '<app xmlns="http://projectmallard.org/1.0/">procmail</app>'>
+<!ENTITY GnuPG '<app xmlns="http://projectmallard.org/1.0/">GnuPG</app>'>
+<!ENTITY balsalist "http://mail.gnome.org/mailman/listinfo/balsa-list">
+<!ENTITY IMAP '<link xmlns="http://projectmallard.org/1.0/"
+           xref ="glossary#imap">IMAP</link>'>
+<!ENTITY LDAP '<link xmlns="http://projectmallard.org/1.0/"
+           xref ="glossary#ldap">LDAP</link>'>
+<!ENTITY POP3 '<link xmlns="http://projectmallard.org/1.0/"
+           xref ="glossary#pop">POP3</link>'>
+<!ENTITY SMTP '<link xmlns="http://projectmallard.org/1.0/"
+           xref ="glossary#smtp">SMTP</link>'>
+<!ENTITY VCARD '<link xmlns="http://projectmallard.org/1.0/"
+           xref ="glossary#vcard">VCARD</link>'>
+]>
+<page xmlns="http://projectmallard.org/1.0/" type="topic" id="mbox-formats" xml:lang="fr">
+  <info>
+    <link type="guide" xref="index"/>
+  </info>
+  <title>Available Mailbox Formats</title>
+  <p><app>Balsa</app> handles several mailbox formats, including mbox.
+  Further information can be found in the following documents:</p>
+  <terms>
+    <item>
+      <title>Benchmarking mbox versus maildir</title>
+      <p>
+        <link href="http://www.courier-mta.org/mbox-vs-maildir/">
+        http://www.courier-mta.org/mbox-vs-maildir/</link>
+      </p>
+    </item>
+    <item>
+      <title>Mailbox Format Characteristics</title>
+      <p>
+        <link href="http://www.washington.edu/imap/documentation/formats.txt.html">
+        http://www.washington.edu/imap/documentation/formats.txt.html</link>
+      </p>
+    </item>
+    <item>
+      <title>Maildir format</title>
+      <p>maildir(5) manual page (from qmail):
+      <link href="http://www.qmail.org/qmail-manual-html/man5/maildir.html">
+      http://www.qmail.org/qmail-manual-html/man5/maildir.html</link></p>
+    </item>
+    <item>
+      <title>Using Maildir format</title>
+      <p>
+        <link href="http://cr.yp.to/proto/maildir.html">
+        http://cr.yp.to/proto/maildir.html</link>
+      </p>
+    </item>
+    <item>
+      <title>QMail</title>
+      <p>mbox(5) manual page (from qmail):
+      <link href="http://www.qmail.org/qmail-manual-html/man5/mbox.html">
+      http://www.qmail.org/qmail-manual-html/man5/mbox.html</link></p>
+    </item>
+    <item>
+      <title>Mailbox formats</title>
+      <p>(From Mail-Administrator HOWTO):
+      <link href="http://linuxdocs.org/HOWTOs/Mail-Administrator-HOWTO-3.html#ss3.5">
+      http://linuxdocs.org/HOWTOs/Mail-Administrator-HOWTO-3.html#ss3.5</link></p>
+    </item>
+  </terms>
+</page>

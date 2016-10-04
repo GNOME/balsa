@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2002 Stuart Parmenter and others,
+ * Copyright (C) 1997-2013 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -24,9 +24,7 @@
 #include "filter.h"
 #include "mailbox-node.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif				/* __cplusplus */
+G_BEGIN_DECLS
 
     GType balsa_index_get_type(void);
 
@@ -104,8 +102,7 @@ extern "C" {
 /* sets the mail stream; if it's a new stream, then it's 
  * contents is loaded into the index */
     gboolean balsa_index_load_mailbox_node(BalsaIndex * bindex,
-                                           BalsaMailboxNode * mbnode,
-					   GError **err);
+                                           BalsaMailboxNode * mbnode);
     void balsa_index_set_width_preference(BalsaIndex *bindex,
                                           BalsaIndexWidthPreference pref);
     void balsa_index_scroll_on_open(BalsaIndex *index);
@@ -187,7 +184,6 @@ extern "C" {
 
 #define BALSA_INDEX_VIEW_ON_OPEN "balsa-index-view-on-open"
 
-#ifdef __cplusplus
-}
-#endif				/* __cplusplus */
+G_END_DECLS
+
 #endif				/* __BALSA_INDEX_H__ */

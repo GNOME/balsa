@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2002 Stuart Parmenter and others,
+ * Copyright (C) 1997-2013 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -24,13 +24,11 @@
 # error "Include config.h before this file."
 #endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif				/* __cplusplus */
-
 #include "libbalsa.h"
 #include "address-view.h"
 #include "toolbar-factory.h"
+
+G_BEGIN_DECLS
 
     typedef enum {
        SEND_NORMAL,            /* initialized by Compose */
@@ -48,11 +46,8 @@ extern "C" {
         SENDMSG_STATE_AUTO_SAVED
     } SendmsgState;
 
-#if defined(ENABLE_TOUCH_UI)
-#define VIEW_MENU_LENGTH 4
-#else
 #define VIEW_MENU_LENGTH 5
-#endif
+
     typedef struct _BalsaSendmsg BalsaSendmsg;
 
     struct _BalsaSendmsg {
@@ -60,10 +55,8 @@ extern "C" {
 	GtkWidget *toolbar;
         LibBalsaAddressView *recipient_view, *replyto_view;
 	GtkWidget *from[2], *recipients[2], *subject[2], *fcc[2];
-#if !defined(ENABLE_TOUCH_UI)
 	GtkWidget *replyto[2];
-#endif                          /* ENABLE_TOUCH_UI */
-	GtkWidget *attachments[4];
+	GtkWidget *tree_view;
         gchar *in_reply_to;
         GList *references;
 	GtkWidget *text;
@@ -76,7 +69,7 @@ extern "C" {
 	SendType type;
         gboolean is_continue;
 	/* language selection related data */
-	const gchar *spell_check_lang;
+	gchar *spell_check_lang;
 	GtkWidget *current_language_menu;
 	/* identity related data */
 	LibBalsaIdentity* ident;
@@ -91,7 +84,6 @@ extern "C" {
         gulong delete_range_sig_id;
 #endif                          /* HAVE_GTKSOURCEVIEW */
         gulong insert_text_sig_id;
-        guint wrap_timeout_id;
         guint autosave_timeout_id;
         SendmsgState state;
         gulong identities_changed_id;
@@ -101,13 +93,9 @@ extern "C" {
 	gboolean req_dsn;	 /* send a delivery status notification */
 	gboolean quit_on_close; /* quit balsa after the compose window */
 	                        /* is closed.                          */
-        /* style for changing the color of address labels when the
-         * address isn't valid: */
-        GtkStyle *bad_address_style;  
 #ifdef HAVE_GPGME
 	guint gpg_mode;
 #endif
-        GtkWidget *header_table;
 
 #if !HAVE_GTKSOURCEVIEW
         GtkTextBuffer *buffer2;       /* Undo buffer. */
@@ -116,11 +104,9 @@ extern "C" {
         /* To update cursor after text is inserted. */
         GtkTextMark *insert_mark;
 
-        GtkActionGroup *action_group;
-	GtkActionGroup *ready_action_group;
-#if !defined(ENABLE_TOUCH_UI)
-        GtkActionGroup *gpg_action_group;
-#endif                          /* ENABLE_TOUCH_UI */
+        GtkWidget *paned;
+        GtkSizeGroup *size_group;
+        gboolean ready_to_send;
     };
 
     BalsaSendmsg *sendmsg_window_compose(void);
@@ -152,11 +138,10 @@ extern "C" {
                                                GArray * selected,
                                                SendType type);
     BalsaToolbarModel *sendmsg_window_get_toolbar_model(void);
-    GtkUIManager *sendmsg_window_ui_manager_new(BalsaSendmsg * bsmsg);
+    void sendmsg_window_add_action_entries(GActionMap * action_map);
 
 #define SENDMSG_WINDOW_QUIT_ON_CLOSE(bsmsg) ((bsmsg)->quit_on_close=TRUE)
 
-#ifdef __cplusplus
-}
-#endif				/* __cplusplus */
+G_END_DECLS
+
 #endif				/* __BALSA_SENDMSG_H__ */

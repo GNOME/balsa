@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2003 Stuart Parmenter and others,
+ * Copyright (C) 1997-2013 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -40,12 +40,9 @@ struct _StoreAddressInfo {
     GtkWidget *notebook;
     GtkWidget *dialog;
 };
-enum StoreAddressResponse {
-    SA_RESPONSE_SAVE = 1,
-};
 
 /* statics */
-GtkWidget *store_address_dialog(StoreAddressInfo * info);
+static GtkWidget *store_address_dialog(StoreAddressInfo * info);
 static void store_address_weak_notify(StoreAddressInfo * info,
                                       gpointer message);
 static void store_address_response(GtkWidget * dialog, gint response,
@@ -79,7 +76,7 @@ balsa_store_address_from_messages(GList * messages)
     GList *message_list = NULL;
     GList *list;
 
-    for (list = messages; list; list = g_list_next(list)) {
+    for (list = messages; list; list = list->next) {
         gpointer data = g_object_get_data(G_OBJECT(list->data),
                                           BALSA_STORE_ADDRESS_KEY);
 
@@ -109,7 +106,7 @@ balsa_store_address_from_messages(GList * messages)
         return;
     }
 
-    for (list = message_list; list; list = g_list_next(list)) {
+    for (list = message_list; list; list = list->next) {
         g_object_set_data(G_OBJECT(list->data),
                           BALSA_STORE_ADDRESS_KEY, info);
         g_object_weak_ref(G_OBJECT(list->data),
@@ -161,19 +158,20 @@ store_address_response(GtkWidget * dialog, gint response,
      * response ==  2 => close
      * response == -1    if user closed dialog using the window
      *                   decorations */
-    if (response == GTK_RESPONSE_OK || response == SA_RESPONSE_SAVE) {
+    if (response == GTK_RESPONSE_OK) {
         /* Save the current address. */
-        gint page = gtk_notebook_get_current_page(notebook);
-        GList *list = g_list_nth(info->entries_list, page);
-        gboolean successful = 
-            store_address_from_entries(GTK_WINDOW(dialog), info, list->data);
-        if (response == SA_RESPONSE_SAVE || !successful)
+        gint page;
+        GtkWidget **entries;
+
+        page = gtk_notebook_get_current_page(notebook);
+        entries = g_list_nth_data(info->entries_list, page);
+        if (!store_address_from_entries(GTK_WINDOW(dialog), info, entries))
             /* Keep the dialog open. */
             return;
     }
 
     /* Let go of remaining messages. */
-    for (list = info->message_list; list; list = g_list_next(list)) {
+    for (list = info->message_list; list; list = list->next) {
         g_object_set_data(G_OBJECT(list->data), BALSA_STORE_ADDRESS_KEY,
                           NULL);
         g_object_weak_unref(G_OBJECT(list->data),
@@ -195,35 +193,42 @@ store_address_free(StoreAddressInfo * info)
 
 /* store_address_dialog:
  * create the main dialog */
-GtkWidget *
+static GtkWidget *
 store_address_dialog(StoreAddressInfo * info)
 {
-    GtkWidget *dialog =
+    GtkWidget *dialog;
+    GtkWidget *vbox;
+    GtkWidget *frame;
+
+    dialog =
         gtk_dialog_new_with_buttons(_("Store Address"),
                                     GTK_WINDOW(balsa_app.main_window),
-                                    GTK_DIALOG_DESTROY_WITH_PARENT,
-                                    GTK_STOCK_OK, GTK_RESPONSE_OK,
-                                    GTK_STOCK_SAVE,  SA_RESPONSE_SAVE,
-                                    GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
+                                    GTK_DIALOG_DESTROY_WITH_PARENT |
+                                    libbalsa_dialog_flags(),
+                                    _("_Cancel"), GTK_RESPONSE_CANCEL,
+                                    _("_OK"), GTK_RESPONSE_OK,
                                     NULL);
-    GtkWidget *vbox = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
-    GtkWidget *frame, *label;
+    gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
+    gtk_widget_grab_focus(gtk_dialog_get_widget_for_response
+                          (GTK_DIALOG(dialog), GTK_RESPONSE_OK));
+    vbox = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
 
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu_for_parent(dialog, GTK_WINDOW(balsa_app.main_window));
 #endif
-    frame = store_address_book_frame(info);
-    if(g_list_length(balsa_app.address_book_list)>1)
+
+    info->current_address_book = balsa_app.default_address_book;
+    if (balsa_app.address_book_list && balsa_app.address_book_list->next) {
+        /* User has more than one address book, so show the options */
+        frame = store_address_book_frame(info);
         gtk_widget_show_all(frame);
-    gtk_box_pack_start(GTK_BOX(vbox), frame, TRUE, TRUE, 0);
+        gtk_box_pack_start(GTK_BOX(vbox), frame, FALSE, FALSE, 0);
+    }
+
     frame = store_address_note_frame(info);
     gtk_widget_show_all(frame);
     gtk_box_pack_start(GTK_BOX(vbox), frame, TRUE, TRUE, 0);
-    gtk_box_pack_start(GTK_BOX(vbox), 
-                       label = gtk_label_new(_("Save this address "
-                                               "and close the dialog?")),
-                       TRUE, TRUE, 0);
-    gtk_widget_show(label);
+
     return dialog;
 }
 
@@ -274,48 +279,43 @@ store_address_from_entries(GtkWindow *window, StoreAddressInfo * info,
 static GtkWidget *
 store_address_book_frame(StoreAddressInfo * info)
 {
-    GList *ab_list;
-    GtkWidget *frame = gtk_frame_new(_("Choose Address Book"));
+    guint default_ab_offset = 0;
+    GtkWidget *hbox;
     GtkWidget *combo_box;
-    LibBalsaAddressBook *address_book;
-    guint default_ab_offset = 0, off;
+    guint off;
+    GList *ab_list;
 
-#if GTK_CHECK_VERSION(2, 24, 0)
+    hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 12);
+    gtk_container_set_border_width(GTK_CONTAINER(hbox), 4);
+    gtk_box_pack_start(GTK_BOX(hbox), gtk_label_new(_("Address Book:")),
+                       FALSE, FALSE, 0);
+
     combo_box = gtk_combo_box_text_new();
-#else                           /* GTK_CHECK_VERSION(2, 24, 0) */
-    combo_box = gtk_combo_box_new_text();
-#endif                          /* GTK_CHECK_VERSION(2, 24, 0) */
     g_signal_connect(combo_box, "changed",
                      G_CALLBACK(store_address_book_menu_cb), info);
-    if (balsa_app.address_book_list) {
-	info->current_address_book = balsa_app.default_address_book;
 
-	/* NOTE: we have to store the default address book index and
-           call set_active() after all books are added to the list or
-           gtk-2.10.4 will lose the setting. */
-	for(off=0, ab_list = balsa_app.address_book_list;
-            ab_list; 
-            off++, ab_list = g_list_next(ab_list)) {
-	    address_book = LIBBALSA_ADDRESS_BOOK(ab_list->data);
-	    if (info->current_address_book == NULL)
-		info->current_address_book = address_book;
+    /* NOTE: we have to store the default address book index and
+       call set_active() after all books are added to the list or
+       gtk-2.10.4 will lose the setting. */
+    for (off = 0, ab_list = balsa_app.address_book_list;
+         ab_list != NULL;
+         off++, ab_list = ab_list->next) {
+        LibBalsaAddressBook *address_book;
 
-#if GTK_CHECK_VERSION(2, 24, 0)
-            gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(combo_box),
-                                           address_book->name);
-#else                           /* GTK_CHECK_VERSION(2, 24, 0) */
-	    gtk_combo_box_append_text(GTK_COMBO_BOX(combo_box),
-                                      address_book->name);
-#endif                          /* GTK_CHECK_VERSION(2, 24, 0) */
-	    if (address_book == balsa_app.default_address_book)
-                default_ab_offset = off;
-	}
-        gtk_combo_box_set_active(GTK_COMBO_BOX(combo_box),
-                                 default_ab_offset);
+        address_book = LIBBALSA_ADDRESS_BOOK(ab_list->data);
+        if (info->current_address_book == NULL)
+            info->current_address_book = address_book;
+
+        gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(combo_box),
+                                       address_book->name);
+        if (address_book == balsa_app.default_address_book)
+            default_ab_offset = off;
     }
-    gtk_container_add(GTK_CONTAINER(frame), combo_box);
+    gtk_combo_box_set_active(GTK_COMBO_BOX(combo_box), default_ab_offset);
 
-    return frame;
+    gtk_box_pack_start(GTK_BOX(hbox), combo_box, TRUE, TRUE, 0);
+
+    return hbox;
 }
 
 /* store_address_note_frame:
@@ -323,26 +323,24 @@ store_address_book_frame(StoreAddressInfo * info)
 static GtkWidget *
 store_address_note_frame(StoreAddressInfo *info)
 {
-    GtkWidget *frame = gtk_frame_new(_("Choose Address"));
     LibBalsaMessage *message;
     GList *list;
 
     info->notebook = gtk_notebook_new();
     gtk_notebook_set_scrollable(GTK_NOTEBOOK(info->notebook), TRUE);
-    gtk_container_set_border_width(GTK_CONTAINER(info->notebook), 5);
-    gtk_container_add(GTK_CONTAINER(frame), info->notebook);
+    gtk_container_set_border_width(GTK_CONTAINER(info->notebook), 4);
 
     for (list = info->message_list; list; list = list->next) {
         message = LIBBALSA_MESSAGE(list->data);
 	if (message->headers) {
-	    store_address_add_list(info, _("From:"), message->headers->from);
-	    store_address_add_list(info, _("To:"), message->headers->to_list);
-	    store_address_add_list(info, _("Cc:"), message->headers->cc_list);
-	    store_address_add_list(info, _("Bcc:"), message->headers->bcc_list);
+	    store_address_add_list(info, _("From: "), message->headers->from);
+	    store_address_add_list(info, _("To: "), message->headers->to_list);
+	    store_address_add_list(info, _("Cc: "), message->headers->cc_list);
+	    store_address_add_list(info, _("Bcc: "), message->headers->bcc_list);
 	}
     }
 
-    return frame;
+    return info->notebook;
 }
 
 /* store_address_book_menu_cb:
@@ -379,15 +377,36 @@ store_address_add_address(StoreAddressInfo * info,
     address = libbalsa_address_new();
     address->full_name =
         g_strdup(ia->name ? ia->name : group ? group->name : NULL);
-    address->address_list = g_list_prepend(NULL, g_strdup(INTERNET_ADDRESS_MAILBOX (ia)->addr));
+    if (INTERNET_ADDRESS_IS_GROUP(ia)) {
+        InternetAddressList *members;
+        int j;
+
+        address->address_list = NULL;
+        members = INTERNET_ADDRESS_GROUP(ia)->members;
+
+        for (j = 0; j < internet_address_list_length(members); j++) {
+            InternetAddress *member_address =
+                internet_address_list_get_address(members, j);
+            if (INTERNET_ADDRESS_IS_MAILBOX(member_address))
+                address->address_list =
+                    g_list_prepend(address->address_list,
+                                   g_strdup(INTERNET_ADDRESS_MAILBOX
+                                            (member_address)->addr));
+        }
+        address->address_list = g_list_reverse(address->address_list);
+    } else {
+        address->address_list =
+            g_list_prepend(NULL,
+                           g_strdup(INTERNET_ADDRESS_MAILBOX(ia)->addr));
+    }
     ew = libbalsa_address_get_edit_widget(address, entries, NULL, NULL);
     g_object_unref(address);
 
     label_text = g_strconcat(lab, text, NULL);
     g_free(text);
-    if (g_utf8_strlen(label_text, -1) > 10)
+    if (g_utf8_strlen(label_text, -1) > 15)
         /* truncate to an arbitrary length: */
-        *g_utf8_offset_to_pointer(label_text, 10) = '\0';
+        *g_utf8_offset_to_pointer(label_text, 15) = '\0';
     gtk_notebook_append_page(GTK_NOTEBOOK(info->notebook), ew,
                              gtk_label_new(label_text));
     g_free(label_text);
@@ -408,9 +427,9 @@ store_address_add_lbaddress(StoreAddressInfo * info,
 
     label_text = g_strdup(address->full_name ? address->full_name :
                           address->address_list->data);
-    if (g_utf8_strlen(label_text, -1) > 10)
+    if (g_utf8_strlen(label_text, -1) > 15)
         /* truncate to an arbitrary length: */
-        *g_utf8_offset_to_pointer(label_text, 10) = '\0';
+        *g_utf8_offset_to_pointer(label_text, 15) = '\0';
     gtk_notebook_append_page(GTK_NOTEBOOK(info->notebook), ew,
                              gtk_label_new(label_text));
     g_free(label_text);
@@ -420,27 +439,31 @@ store_address_add_lbaddress(StoreAddressInfo * info,
  * take a list of addresses and pass them one at a time to
  * store_address_add_address */
 static void
-store_address_add_list(StoreAddressInfo * info,
-                       const gchar * label,
+store_address_add_list(StoreAddressInfo    * info,
+                       const gchar         * label,
                        InternetAddressList * list)
 {
     int i, j;
-    
+
     if (!list)
         return;
 
-    for (i = 0; i < internet_address_list_length (list); i++) {
-        InternetAddress *ia = internet_address_list_get_address (list, i);
-	
-        if (INTERNET_ADDRESS_IS_MAILBOX (ia))
+    for (i = 0; i < internet_address_list_length(list); i++) {
+        InternetAddress *ia = internet_address_list_get_address(list, i);
+
+        if (INTERNET_ADDRESS_IS_MAILBOX(ia)) {
             store_address_add_address(info, label, ia, NULL);
-        else {
-            InternetAddressList *members = INTERNET_ADDRESS_GROUP (ia)->members;
+        } else if (info->current_address_book->dist_list_mode) {
+            store_address_add_address(info, label, ia, ia);
+        } else {
+            InternetAddressList *members =
+                INTERNET_ADDRESS_GROUP(ia)->members;
 
-            for (j = 0; j < internet_address_list_length (members); j++) {
-                InternetAddress *member_address = internet_address_list_get_address (members, j);
+            for (j = 0; j < internet_address_list_length(members); j++) {
+                InternetAddress *member_address =
+                    internet_address_list_get_address(members, j);
 
-                if (INTERNET_ADDRESS_IS_MAILBOX (member_address))
+                if (INTERNET_ADDRESS_IS_MAILBOX(member_address))
                     store_address_add_address(info, label, member_address,
                                               ia);
             }

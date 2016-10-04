@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2002 Stuart Parmenter and others,
+ * Copyright (C) 1997-2013 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -52,7 +52,6 @@ gboolean libbalsa_message_postpone(LibBalsaMessage * message,
 
 
 #if ENABLE_ESMTP
-#include <libesmtp.h>
 
 LibBalsaMsgCreateResult libbalsa_message_queue(LibBalsaMessage* message, 
 					       LibBalsaMailbox* outbox,
@@ -66,12 +65,16 @@ LibBalsaMsgCreateResult libbalsa_message_send(LibBalsaMessage * message,
                                               LibBalsaMailbox * fccbox,
                                               LibBalsaFccboxFinder finder,
                                               LibBalsaSmtpServer *
-                                              smtp_server, gboolean flow,
+                                              smtp_server,
+                                              GtkWindow * parent,
+                                              gboolean flow,
                                               gboolean debug,
 					      GError ** error);
 gboolean libbalsa_process_queue(LibBalsaMailbox * outbox,
                                 LibBalsaFccboxFinder finder,
-                                GSList * smtp_servers, gboolean debug);
+                                GSList * smtp_servers,
+                                GtkWindow * parent,
+                                gboolean debug);
 #else
 
 LibBalsaMsgCreateResult libbalsa_message_queue(LibBalsaMessage* message, 
@@ -91,9 +94,7 @@ gboolean libbalsa_process_queue(LibBalsaMailbox* outbox,
 
 #endif
 
-#ifdef BALSA_USE_THREADS
-extern pthread_t send_mail;
-extern pthread_mutex_t send_messages_lock;
+extern GMutex send_messages_lock;
 extern int send_thread_pipes[2];
 
 typedef struct {
@@ -122,7 +123,5 @@ enum {
     MSGSENDTHREADDELETE,
     MSGSENDTHREADFINISHED
 };
-
-#endif /* BALSA_USE_THREADS */
 
 #endif /* __SEND_H__ */

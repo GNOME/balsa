@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2003 Stuart Parmenter and others,
+ * Copyright (C) 1997-2013 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -24,11 +24,6 @@
 #ifndef BALSA_VERSION
 # error "Include config.h before this file."
 #endif
-
-# if defined(HAVE_GTKHTML2)
-/* gtkhtml2 uses deprecated api */
-#  undef GTK_DISABLE_DEPRECATED
-# endif
 
 #  include <gtk/gtk.h>
 #include "libbalsa.h"
@@ -57,12 +52,21 @@ void libbalsa_html_copy(GtkWidget * widget);
 guint libbalsa_html_filter(LibBalsaHTMLType html_type, gchar ** text,
 			   guint len);
 
+typedef void (*LibBalsaHtmlSearchCallback)(const gchar * text,
+                                           gboolean      found,
+                                           gpointer      data);
 gboolean libbalsa_html_can_search(GtkWidget * widget);
-gboolean libbalsa_html_search_text(GtkWidget * widget, const gchar * text,
-                                   gboolean find_forward, gboolean wrap);
-void libbalsa_html_get_selection_bounds(GtkWidget * widget,
-                                        GdkRectangle * selection_bounds);
+void libbalsa_html_search(GtkWidget                * widget,
+                          const gchar              * text,
+                          gboolean                   find_forward,
+                          gboolean                   wrap,
+                          LibBalsaHtmlSearchCallback search_cb,
+                          gpointer                   cb_data);
+gboolean libbalsa_html_get_selection_bounds(GtkWidget * widget,
+                                            GdkRectangle *
+                                            selection_bounds);
 
+#define LIBBALSA_HTML_POPUP_EVENT "libbalsa-html-popup-event"
 GtkWidget *libbalsa_html_popup_menu_widget(GtkWidget * widget);
 GtkWidget *libbalsa_html_get_view_widget(GtkWidget * widget);
 

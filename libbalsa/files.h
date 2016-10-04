@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2009 Stuart Parmenter and others,
+ * Copyright (C) 1997-2013 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -42,7 +42,10 @@ gchar *balsa_file_finder(const gchar * filename, const gchar * splice,
 #define balsa_pixmap_finder_no_warn(filename) \
     (balsa_file_finder((filename), "pixmaps", NULL, FALSE))
 
-GdkPixbuf *libbalsa_icon_finder(const char *mime_type, const LibbalsaVfs * for_file,
-				gchar** used_type, GtkIconSize size);
+GdkPixbuf *libbalsa_icon_finder(GtkWidget         * widget,
+                                const char        * mime_type,
+                                const LibbalsaVfs * for_file,
+                                gchar            ** used_type,
+                                GtkIconSize         size);
 
 #endif

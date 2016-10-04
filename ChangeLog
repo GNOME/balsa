@@ -1,94 +1,2087 @@
+2016-10-03  Albrecht Dreß
+
+	Implement the 'AUTH PLAIN' SASL mechanism for POP3
+	according to RFC 5043 and RFC 4616
+
+	* libbalsa/imap/pop3.c (pop_get_capa), (pop_auth_sasl_plain):
+	  implement the 'AUTH PLAIN' SASL mechanism for POP3.
+
+2016-10-03  Albrecht Dreß
+
+	Deprecation cleanups
+
+	* AUTHORS:
+	* README:
+	* configure.ac:
+	* libbalsa/imap/imap_tst.c (main):
+	* src/balsa-message.c (balsa_message_get_type),
+	(balsa_message_init), (balsa_message_new), (tree_activate_row_cb),
+	(balsa_message_set), (atattchments_menu_cb),
+	(toggle_all_inline_cb), (message_recheck_crypto_cb):
+	* src/balsa-message.h:
+	* src/toolbar-prefs.c (create_toolbar_page):
+
+2016-09-06  Albrecht Dreß
+
+	* configure.ac: make the help string match the actual default,
+	webkit2.
+
+2016-09-05  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Respond to
+	<URL:https://bugzilla.gnome.org/show_bug.cgi?id=770500>
+	by making webkit2 the default instead of webkit, and warning if
+	Balsa is configured for webkit.
+
+	* configure.ac: make webkit2 the default HTML widget, and warn
+	  if Balsa is configured for webkit.
+
+2016-08-29  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Plug memory leak.
+
+	* src/main-window.c (bw_create_index_widget): do not leak
+	focus-chain GList.
+
+2016-08-21  Albrecht Dreß
+
+	Always use multithreading, and use only the glib abstraction
+	instead of "native" pthreads.
+
+	* configure.ac: remove --enable-threads configure option and its
+	consequences.
+	* libbalsa/filter-file.c: remove reference to BALSA_USE_THREADS.
+	* libbalsa/gmime-gpgme-signature.c
+	(g_mime_gpgme_sigstat_new_from_gpgme_ctx):
+	* libbalsa/imap-server.c (libbalsa_imap_server_set_username),
+	(libbalsa_imap_server_set_host), (libbalsa_imap_server_init),
+	(libbalsa_imap_server_finalize), (lb_imap_server_cleanup),
+	(connection_cleanup), (get_or_create),
+	(libbalsa_imap_server_get_handle),
+	(libbalsa_imap_server_get_handle_with_user),
+	(libbalsa_imap_server_release_handle),
+	(libbalsa_imap_server_force_disconnect),
+	(libbalsa_imap_server_close_all_connections),
+	(libbalsa_imap_server_has_free_handles):
+	* libbalsa/imap/imap-commands.c (imap_mbox_handle_noop),
+	(imap_mbox_select), (imap_mbox_examine), (imap_mbox_create),
+	(imap_mbox_delete), (imap_mbox_rename), (imap_mbox_subscribe),
+	(imap_mbox_list), (imap_mbox_lsub), (imap_mbox_status),
+	(imap_mbox_append_multi), (imap_mbox_close), (imap_mbox_expunge),
+	(imap_mbox_expunge_a), (imap_mbox_find_all),
+	(imap_mbox_find_unseen), (imap_mbox_handle_msgno_has_flags),
+	(imap_mbox_handle_fetch_range), (imap_mbox_handle_fetch_set),
+	(imap_mbox_handle_fetch_rfc822),
+	(imap_mbox_handle_fetch_rfc822_uid), (imap_mbox_handle_fetch_body),
+	(imap_mbox_store_flag), (imap_mbox_store_flag_a),
+	(imap_mbox_handle_copy), (imap_mbox_unselect), (imap_mbox_thread),
+	(imap_mbox_sort_msgno), (imap_mbox_sort_filter),
+	(imap_mbox_filter_msgnos), (imap_mbox_complete_msgids),
+	(imap_mbox_get_quota), (imap_mbox_get_my_rights),
+	(imap_mbox_get_acl):
+	* libbalsa/imap/imap-handle.c (imap_mbox_handle_init),
+	(async_process), (idle_start), (imap_mbox_handle_connect),
+	(imap_mbox_handle_reconnect), (imap_handle_force_disconnect),
+	(imap_mbox_handle_get_delim), (imap_mbox_handle_finalize):
+	* libbalsa/imap/imap-tls.c (locking_function), (id_function),
+	(dyn_create_function), (dyn_lock_function), (dyn_destroy_function),
+	(imaptls_thread_setup), (imaptls_thread_cleanup),
+	(imap_create_ssl):
+	* libbalsa/imap/imap_private.h:
+	* libbalsa/imap/imap_search.c (imap_search_exec):
+	* libbalsa/information.h:
+	* libbalsa/libbalsa-conf.c (lbc_lock), (lbc_unlock),
+	(libbalsa_conf_sync), (libbalsa_conf_queue_sync):
+	* libbalsa/libbalsa-gpgme-cb.c (lb_gpgme_passphrase),
+	(get_passphrase_idle):
+	* libbalsa/libbalsa-gpgme.c (g_set_error_from_gpgme):
+	* libbalsa/libbalsa.c (libbalsa_init), (ask_idle), (libbalsa_ask),
+	(libbalsa_certs_destroy), (libbalsa_is_cert_known),
+	(libbalsa_am_i_subthread), (libbalsa_lock_mailbox),
+	(libbalsa_unlock_mailbox):
+	* libbalsa/libbalsa.h:
+	* libbalsa/libbalsa_private.h:
+	* libbalsa/mailbox.c (libbalsa_mailbox_class_init),
+	(lbm_index_entry_populate_from_msg), (lbm_index_entry_new_pending),
+	(lbm_index_entry_free), (libbalsa_mailbox_finalize),
+	(libbalsa_mailbox_check), (libbalsa_mailbox_real_lock_store),
+	(lbm_msgno_changed_expunged_cb), (lbm_msgnos_changed_idle_cb),
+	(lbm_msgno_changed), (lbm_msgno_filt_check_idle_cb),
+	(libbalsa_mailbox_msgno_filt_check), (lbm_cache_message),
+	(libbalsa_mailbox_get_message),
+	(libbalsa_mailbox_messages_change_flags),
+	(lbm_set_threading_idle_cb), (lbm_set_threading),
+	(lbm_get_index_entry_expunged_cb), (lbm_get_index_entry_real),
+	(lbm_get_index_entry), (lbm_check_idle),
+	(libbalsa_mailbox_unlock_store):
+	* libbalsa/mailbox.h:
+	* libbalsa/mailbox_imap.c:
+	* libbalsa/mailbox_local.c (lbm_local_save_tree_idle),
+	(message_match_real), (lbml_set_threading_idle_cb),
+	(libbalsa_mailbox_local_set_threading):
+	* libbalsa/mailbox_mbox.c (libbalsa_mailbox_mbox_class_init),
+	(libbalsa_mailbox_mbox_lock_store):
+	* libbalsa/mime-stream-shared.c
+	(libbalsa_mime_stream_shared_unlock):
+	* libbalsa/mime-stream-shared.h:
+	* libbalsa/missing_time.c (ctime_r):
+	* libbalsa/rfc3156.c (libbalsa_gpgme_sig_stat_to_gchar):
+	* libbalsa/send.c (lbs_process_queue), (handle_successful_send),
+	(libbalsa_smtp_event_cb), (libbalsa_process_queue),
+	(balsa_send_message_real):
+	* libbalsa/send.h:
+	* src/ab-main.c:
+	* src/balsa-app.c (ask_passwd_idle), (ask_password_mt),
+	(ask_password):
+	* src/filter-edit-callbacks.c:
+	* src/information-dialog.h:
+	* src/main-window.c (bw_delete_cb), (balsa_window_new),
+	(bw_real_open_mbnode_thread), (balsa_window_real_open_mbnode),
+	(bw_register_open_mailbox), (bw_unregister_open_mailbox),
+	(bw_is_open_mailbox), (check_new_messages_real),
+	(bw_check_messages_thread):
+	* src/main.c (threads_init), (threads_destroy), (real_main),
+	(balsa_cleanup):
+	* src/save-restore.c (pop3_progress_notify):
+	* src/sendmsg-window.c (balsa_sendmsg_destroy_handler):
+	* src/threads.h: ditto.
+
+2016-07-28  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Implement a GtkComboBox for selecting a LibBalsaIdentity, and
+	use it for the mailbox properties dialog and as the From address
+	in the compose window.
+
+	* libbalsa/identity.c (libbalsa_identity_combo_box): implement
+	  the widget;
+	* libbalsa/identity.h: export it;
+	* src/mailbox-conf.c (check_for_blank_fields): allow NULL
+	  argument;
+	  (mailbox_conf_view_new_full): use the widget;
+	  (mailbox_conf_view_check): get the identity from the widget
+	  instead of the list;
+	* src/sendmsg-window.c (create_from_entry): use the widget.
+
+2016-07-28  Albrecht Dreß
+
+	Fix a bug in the configure script discovered by Jack
+	<URL:https://mail.gnome.org/archives/balsa-list/2016-July/msg00039.html>
+
+	* configure.ac: when no external html-to-text converter could
+	  be found, undef HTML2TEXT instead of defining it to "".
+
+2016-07-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Andreas Schmidt suggested an improvement to the list of identities
+	in the mailbox properties dialog.
+	<URL:https://mail.gnome.org/archives/balsa-list/2016-July/msg00034.html>
+
+	* src/mailbox-conf.c (mailbox_conf_view_new_full): include the
+	  identity name as well as the mailing address in the identities
+	  combo-box.
+
+2016-07-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Since porting to GtkApplication, command line options have been
+	handled in a subsequent invocation of Balsa, but not in the
+	startup invocation.
+
+	* src/main.c (real_main), (parse_options), (handle_remote),
+	  (command_line_cb): handle command line options at startup time.
+
+2016-07-24  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* configure.ac: issue an error if building in a git tree with
+	  deprecated GnomeKeyring.
+
+2016-07-23  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Fix building with toolchains that predefine _FORTIFY_SOURCE
+
+	* configure.ac: undefine _FORTIFY_SOURCE before defining it to
+	have the value 2.
+
+2016-06-30  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Use Gspell-1.2 API
+
+	* configure.ac: check whether we can use the Gspell-1.2 API;
+	* src/sendmsg-window.c (create_text_area): if so, set the
+	enable-language-menu property, to allow the user to change the
+	spell-checker language from the context menu as well as from
+	Balsa's menubar menu.
+
+2016-06-28  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Support Gspell as an alternative to GtkSpell
+
+	* configure.ac: replace --with-gtkspell with
+	--with-spell-checker = (no|gtkspell|gspell) and change the
+	AM_CONDITIONAL BUILD_WITH_GTK_SPELL to BUILD_WITH_SPELL_CHECKER.
+	* src/Makefile.am: use the new AM_CONDITIONAL.
+	* src/balsa-app.c (balsa_app_init): support Gspell.
+	* src/balsa-app.h: ditto.
+	* src/pref-manager.c (apply_prefs), (set_prefs): ditto.
+	* src/save-restore.c (config_global_load), (config_save): ditto.
+	* src/sendmsg-window.c (balsa_sendmsg_destroy_handler),
+	(create_text_area), (create_lang_menu), (message_postpone),
+	(set_locale), (sw_spell_check_change_state), (lang_set_cb),
+	(sendmsg_window_new): Gspell has a different API from GtkSpell.
+
+2016-06-25  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Symbolic icon names like pan-down-symbolic now contain hyphens
+	and can no longer use underscores.
+
+	* src/balsa-message.c: fix symbolic icon names.
+
+2016-06-25  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	As of gtksource version 2.21.?, only <gtksourceview/gtksource.h>
+	can be included directly.
+
+	* libbalsa/libbalsa.c: include only gtksource.h.
+	* src/balsa-mime-widget-text.c: ditto.
+	* src/spell-check.c: ditto.
+
+2016-06-22  Albrecht Dreß
+
+	Fix shrinking message list
+
+	* src/main-window.c (balsa_window_new),
+	(balsa_window_fix_paned): set the size of the elements of the
+	main window in an idle callback instead of the window creator;
+	* src/main-window.h: export the idle callback;
+	* src/main.c (real_main): add the idle call.
+
+2016-06-19  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* src/ab-main.c (libbalsa_dialog_flags): set check_done to a
+	non-zero value.
+
+2016-06-19  Albrecht Dreß
+
+	Make Gtk3 dialog header bars configurable
+	Basically, a new function libbalsa_dialog_flags() is added to
+	libbalsa.c (or simply expanded to 0 for older Gtk versions than
+	3.12.0).  When being called for the first time, the function
+	checks if the environment variable BALSA_DIALOG_HEADERBAR exists
+	and is set to 0.  Only in this case, the header bars are
+	disabled.  The function call replaces the macro
+	BALSA_DIALOG_FLAGS.
+
+	* configure.ac: remove definition of BALSA_DIALOG_FLAGS.
+	* libbalsa/libbalsa.c (libbalsa_dialog_flags): define it;
+	  (ask_cert_real): use it.
+	* libbalsa/libbalsa.h: declare it.
+	* libbalsa/identity.c (libbalsa_identity_select_dialog),
+	  (libbalsa_identity_config_dialog):
+	* libbalsa/libbalsa-gpgme-cb.c (lb_gpgme_select_key),
+	  (get_passphrase_real):
+	* libbalsa/send.c (ensure_send_progress_dialog):
+	* libbalsa/smtp-server.c (libbalsa_smtp_server_dialog):
+	* src/ab-main.c (libbalsa_dialog_flags):
+	* src/address-book-config.c (create_generic_dialog):
+	* src/balsa-app.c (ask_password_real):
+	* src/balsa-index.c (balsa_index_pipe):
+	* src/balsa-mblist.c (bmbl_mru_show_tree):
+	* src/filter-edit-callbacks.c (fe_edit_condition):
+	* src/filter-edit-dialog.c (filters_edit_dialog):
+	* src/filter-export-dialog.c (filters_export_dialog):
+	* src/folder-conf.c (folder_conf_imap_node), (browse_button_cb),
+	  (subfolder_conf_clicked_ok), (folder_conf_imap_sub_node):
+	* src/information-dialog.c (balsa_information_list):
+	* src/mailbox-conf.c (create_generic_dialog):
+	* src/main-window.c (ensure_check_mail_dialog), (bw_find_real):
+	* src/pref-manager.c (open_preferences_manager):
+	* src/sendmsg-window.c (sw_get_user_codeset),
+	  (quote_parts_select_dlg), (subject_not_empty):
+	* src/store-address.c (store_address_dialog):
+	* src/toolbar-prefs.c (customize_dialog_cb): all use it.
+
+2016-06-18  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Fix saving address when user has only one address book
+	(https://mail.gnome.org/archives/balsa-list/2016-June/msg00030.html)
+
+	* src/store-address.c (store_address_dialog): always set current
+	address book;
+	(store_address_book_frame): no need to check
+	balsa_app.address_book_list != NULL.
+
+2016-06-11  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Set line-wrapping of a long label to TRUE and do not change it.
+
+	* src/balsa-mime-widget-message.c (expanded_cb): do not change
+	line-wrapping;
+	(add_header_gchar): set line-wrapping to TRUE even if the label
+	is to be ellipsized.
+
+2016-06-11  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* src/balsa-mime-widget-message.c (add_header_gchar): in an
+	address, replace '\r' or '\n' with a space.
+
+2016-06-10  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* src/balsa-mime-widget-message.c (add_header_gchar): comment on
+	why show-all-headers is used to set the initial state of the
+	expander;
+	(add_header_address_list): new parameter show_all_headers;
+	(bmw_message_set_headers_d): use it.
+
+2016-06-10  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* src/balsa-mime-widget-message.c (expanded_cb): cut redundant
+	dynamic cast.
+
+2016-06-07  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Drop the --enable-touch-ui configuration option and the
+	corresponding conditionally compiled code
+
+	* configure.ac: drop the option;
+	* libbalsa/address-view.c and below: drop the code.
+	* libbalsa/imap-server.c (libbalsa_imap_server_init):
+	* libinit_balsa/assistant_init.c (balsa_initdruid_apply),
+	(balsa_initdruid):
+	* libinit_balsa/assistant_page_directory.c
+	(balsa_druid_page_directory_init),
+	(balsa_druid_page_directory_next):
+	* libinit_balsa/assistant_page_directory.h:
+	* libinit_balsa/assistant_page_user.c (balsa_druid_page_user_init),
+	(balsa_druid_page_user_next):
+	* libinit_balsa/assistant_page_user.h:
+	* src/balsa-app.c (balsa_app_init):
+	* src/balsa-app.h:
+	* src/balsa-index.c (bi_apply_other_column_settings):
+	* src/balsa-mblist.c (bmbl_core_mailbox):
+	* src/balsa-message.c:
+	* src/folder-conf.c (folder_conf_clicked_ok),
+	(folder_conf_imap_node):
+	* src/mailbox-conf.c (mailbox_conf_set_values),
+	(update_imap_mailbox), (create_imap_mailbox_dialog):
+	* src/main-window.c (bw_create_index_widget),
+	(new_message_activated), (balsa_window_new),
+	(bw_enable_mailbox_menus), (bw_enable_message_menus),
+	(bw_enable_edit_menus), (balsa_window_enable_continue),
+	(bw_set_threading_menu), (bw_select_part_cb),
+	(bw_send_msg_window_destroy_cb), (update_view_menu):
+	* src/main.c (periodic_expunge_cb):
+	* src/message-window.c:
+	* src/pref-manager.c:
+	* src/save-restore.c (config_global_load), (config_save):
+	* src/sendmsg-window.c (update_bsmsg_identity), (add_attachment),
+	(create_info_pane), (setup_headers_from_identity),
+	(sendmsg_window_set_field), (bsmsg2message),
+	(sw_page_setup_activated), (check_readiness),
+	(sw_reply_to_change_state), (sw_gpg_helper),
+	(sw_gpg_mode_change_state), (init_menus),
+	(bsmsg_update_gpg_ui_on_ident_change), (sendmsg_window_continue):
+	* src/sendmsg-window.h:
+
+2016-06-05  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Install gtksourceview helper files in the new folder.
+
+	* configure.ac: fix BUILD_WITH_GTKSOURCEVIEW.
+
+2016-06-05  Albrecht Dreß
+
+	As Webkit does not have a method to convert html to text,
+	we cannot quote html-only messages.
+	As a workaround, try to use html2text.
+
+	* configure.ac: detect an html-to-text-or-markdown filter;
+	* libbalsa/html.c (html2text), (libbalsa_html_to_string):
+	  use it.
+
+2016-06-04  Albrecht Dreß
+
+	Force proper icon sizes
+
+	* libbalsa/files.c (libbalsa_icon_finder): force proper icon
+	sizes (e.g. in the message structure view).
+
+2016-06-04  Albrecht Dreß
+
+	We always use gtksourceview-3.0
+
+	* Makefile.am: store helper files in a properly named folder;
+	* configure.ac: clean up setting the #define;
+	* libbalsa/libbalsa.c (libbalsa_source_view_new): clean up, use
+	  proper helper files folder;
+	* src/balsa-mime-widget-text.c (create_text_widget): clean up;
+	* src/sendmsg-window.c (create_text_area): ditto.
+
+2016-06-04  Albrecht Dreß
+
+	Delete the Gtkhtml2 code
+
+	* libbalsa/html.c (libbalsa_html_print): delete the Gtkhtml2 code.
+
+2016-05-31  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* configure.ac: restore AC_SUBST(GLIB_GENMARSHAL).
+
+2016-05-31  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Build with builddir != srcdir
+
+	* autogen.sh: chdir to srcdir to create configure, then back to
+	  builddir to use it.
+	* libbalsa/imap/Makefile.am: provide path to
+	  libimap-marshal.list.
+
+2016-05-31  Albrecht Dreß
+
+	Reduce the code complexity (in particular conditional parts)
+	by weeding out deprecated stuff.
+
+	* configure.ac: apply the aforementioned simplifications
+	* libbalsa/filter-funcs.c, libbalsa/filter-private.h, libbalsa/mime.c,
+	  libbalsa/misc.h, src/balsa-app.c, src/balsa-app.h,
+	  src/balsa-print-object-text.c, src/quote-color.c, src/quote-color.h,
+	  src/sendmsg-window.c, src/spell-check.c: always use GRegex
+	* libbalsa/gmime-multipart-crypt.c, libbalsa/gmime-stream-gio.c,
+	  libbalsa/mailbox_mbox.c: drop conditional code for gmime < 2.6
+	* libbalsa/html.h: remove hack for Gtkhtml 2
+	* libbalsa/libbalsa.c, libbalsa/libbalsa.h: use GDateTime,
+	  simplify API of libbalsa_date_to_utf8()
+	* libbalsa/mailbox.c, libbalsa/message.h, libbalsa/rfc3156.c,
+	  src/balsa-mime-widget-vcalendar.c, src/balsa-print-object-text.c:
+	  use simplified libbalsa_date_to_utf8() API
+	* libbalsa/missing.h, libbalsa/missing_time.c: remove localtime_r,
+	  gmtime_r implementations
+	* libbalsa/rfc2445.c: use ISO 8601 GTimeVal and GDateTime functions
+	* libbalsa/send.c: use GTimeZone functions
+	* src/filter-edit-callbacks.c: use GDateTime functions
+
 2016-05-27  Albrecht Dreß
 
 	Fix accessing MBox files > 2 GByte
 
 	* libbalsa/mailbox_mbox.c (lbm_mbox_check_file),
-	(lbm_mbox_newline), (libbalsa_mailbox_mbox_add_message): use
-	64-bit sizes;
-	* libbalsa/send.c (libbalsa_message_cb): comment warning about
-	file size.
+	(lbm_mbox_newline), (lbm_mbox_add_message): use 64-bit sizes;
+	* libbalsa/send.c (libbalsa_message_cb): comment about file size
+	limitation.
+
+2016-05-24  Albrecht Dreß
+
+	Use G_{BEGIN,END}_DECLS
+
+	* libbalsa/gmime-application-pkcs7.h:
+	* libbalsa/gmime-gpgme-signature.h:
+	* libbalsa/gmime-multipart-crypt.h:
+	* libbalsa/gmime-part-rfc2440.h:
+	* libbalsa/identity.h:
+	* libbalsa/libbalsa-gpgme-cb.h:
+	* libbalsa/libbalsa-gpgme.h:
+	* libinit_balsa/assistant_init.h:
+	* libinit_balsa/assistant_page_defclient.h:
+	* libinit_balsa/assistant_page_directory.h:
+	* libinit_balsa/assistant_page_finish.h:
+	* libinit_balsa/assistant_page_user.h:
+	* libinit_balsa/assistant_page_welcome.h:
+	* src/balsa-index.h:
+	* src/balsa-message.h:
+	* src/balsa-mime-widget-callbacks.h:
+	* src/balsa-mime-widget-crypto.h:
+	* src/balsa-mime-widget-image.h:
+	* src/balsa-mime-widget-message.h:
+	* src/balsa-mime-widget-multipart.h:
+	* src/balsa-mime-widget-text.h:
+	* src/balsa-mime-widget.h:
+	* src/filter-run.h:
+	* src/print.h:
+	* src/quote-color.h:
+	* src/sendmsg-window.h:
+	* src/spell-check.h:
+
+2016-05-23  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* libbalsa/imap/imap_search.c (imap_write_key_date): drop
+	redundant glib version check.
+
+2016-05-20  Albrecht Dreß
+
+	* src/balsa-mime-widget-crypto.c
+	(balsa_mime_widget_signature_widget): pack the GtkExpander in a
+	GtkBox, to work around a Gtk bug that limits the mouse-sensitive
+	area of the expander when the border-width is set.
+
+2016-05-20  Albrecht Dreß
+
+	* libbalsa/gmime-multipart-crypt.c (g_mime_gpgme_mps_sign):
+	refactor;
+	(g_mime_gpgme_mpe_encrypt): ditto, removing leak.
+
+2016-05-20  Albrecht Dreß
+
+	* src/balsa-mime-widget-crypto.c
+	(balsa_mime_widget_signature_widget): remove confusing signature
+	info.
+
+2016-05-17  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* src/balsa-mime-widget-message.c (add_header_gchar),
+	(add_header_sigstate): use GtkGrid API better.
+
+2016-05-16  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Use top line of digital signature for GtkExpander label instead
+	of "Digital Signature"
+
+	* src/balsa-mime-widget-crypto.c
+	(balsa_mime_widget_signature_widget):
+
+2016-05-16  Albrecht Dreß
+
+	Make SSL mandatory
+
+	* libbalsa/imap/md5-utils.c: remove.
+	* libbalsa/imap/md5-utils.h: ditto.
+
+2016-05-16  Albrecht Dreß
+
+	With this patch, Balsa will pop up the key selection dialogue
+	containing /all/ keys which may be used for encryption in this
+	case.  The user can either select a key, or cancel the
+	operation.  This basically is the same behaviour as of
+	Thunderbird.
+
+	* libbalsa/libbalsa-gpgme-cb.c (lb_gpgme_select_key),
+	(key_selection_changed_cb), (sort_iter_cmp_fn):
+	* libbalsa/libbalsa-gpgme-cb.h:
+	* libbalsa/libbalsa-gpgme.c (get_key_from_name), (get_pubkey),
+	(gpgme_add_signer), (gpgme_build_recipients):
+	* libbalsa/libbalsa-gpgme.h:
+
+2016-05-16  Albrecht Dreß
+
+	* libbalsa/gmime-gpgme-signature.c
+	(libbalsa_cert_subject_readable):
+	This trivial patch makes sure that the GPG key or S/MIME
+	certificate subject string as returned by
+	libbalsa_cert_subject_readable() is utf8-clean.
+
+2016-03-12  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* src/main-window.c (bw_display_new_mail_notification):
+	  duplicate some lines of code to simplify conditional
+	  compilation.
+
+2016-03-12  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* libbalsa/imap/imap-handle.c (imap_message_new): use whitespace
+	  to resolve ambiguous assignment.
+
+2016-03-12  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* libbalsa/libbalsa-gpgme-cb.h: remove Emacs hack.
+
+2016-03-12  Albrecht Dreß
+
+	* Bug fixes: due to broken assignments in libbalsa_gpgme_init(),
+	  the callbacks for selecting a GnuPG key from a list
+	  or for accepting low-trust keys individually are never called.
+	  When selecting a key, only the first subkey is checked,
+	  instead of all potential ones.
+	* Message improvements: When checking a GnuPG signed message
+	  where the key has expired, Balsa displays a
+	  "Signature could not be checked" error
+	  and an informational message containg the "real" result.
+	  The patch removes the (wrong) former message.
+	* Code cleanups: change the return value of all crypto-related
+	  functions which return an essentially bool value to gboolean
+	  instead of (g)int, remove hacks for Emacs (still someone using it?)
+	  in header files which confuse almost all other tools,
+	  fix a few minor glitches, and remove a few unused statements.
+
+	* libbalsa-gpgme.c: fix callback assignment bug,
+	  implement new function to verify all subkeys of a key
+	* rfc3156.c: remove confusing error message
+	* gmime-application-pkcs7.h, gmime-application-pkcs7.c,
+	  gmime-multipart-crypt.c, gmime-multipart-crypt.h,
+	  gmime-part-rfc2440.c, gmime-part-rfc2440.h, libbalsa-gpgme.c,
+	  libbalsa-gpgme.h: change function return types to gboolean
+	* rfc3156.c: used changed api
+	* gmime-gpgme-signature.h, gmime-multipart-crypt.h,
+	  gmime-part-rfc2440.h, libbalsa-gpgme.h: remove Emacs hack
+	* gmime-multipart-crypt.c: reorder statements to avoid duplicated ones
+	  (g_mime_gpgme_mps_sign)
+	* gmime-multipart-crypt.c, rfc3156.c: use error checking macro instead of cast
+	* libbalsa-gpgme.c: remove assignments of variables which are never used
+	* send.c, smtp-server.c, src/filter-edit-callbacks.c: remove unused statements
+
+2016-02-23  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Build without libnotify
+
+	* src/main-window.c (bw_is_active_notify): fix conditional code.
+
+2016-02-15  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Gtk 3.20 deprecation cleanup
+
+	* libbalsa/mime.c (is_in_url): gtk_text_iter_begins_tag is
+	deprecated;
+	* src/balsa-mime-widget-text.c (text_view_url_popup),
+	(prepare_url_offsets): ditto; also gdk_display_get_device_manager
+	is deprecated;
+	* src/main-window.c (bw_notebook_label_new):
+	gtk_button_set_focus_on_click is deprecated.
+
+2016-02-15  Albrecht Dreß
+
+	Build with Gtk+ < 3.12
+
+	* configure.ac: define BALSA_DIALOG_FLAGS as either
+	GTK_DIALOG_USE_HEADER_BAR or 0.
+	* libbalsa/identity.c (libbalsa_identity_select_dialog),
+	(libbalsa_identity_config_dialog):
+	* libbalsa/libbalsa-gpgme-cb.c (lb_gpgme_select_key),
+	(get_passphrase_real):
+	* libbalsa/libbalsa.c (ask_cert_real):
+	* libbalsa/send.c (ensure_send_progress_dialog):
+	* libbalsa/smtp-server.c (libbalsa_smtp_server_dialog):
+	* src/address-book-config.c (create_generic_dialog):
+	* src/balsa-app.c (ask_password_real):
+	* src/balsa-index.c (balsa_index_pipe):
+	* src/balsa-mblist.c (bmbl_mru_show_tree):
+	* src/filter-edit-callbacks.c (fe_edit_condition):
+	* src/filter-edit-dialog.c (filters_edit_dialog):
+	* src/filter-export-dialog.c (filters_export_dialog):
+	* src/folder-conf.c (folder_conf_imap_node), (browse_button_cb),
+	(subfolder_conf_clicked_ok), (folder_conf_imap_sub_node):
+	* src/information-dialog.c (balsa_information_list):
+	* src/mailbox-conf.c (create_generic_dialog):
+	* src/main-window.c (ensure_check_mail_dialog), (bw_find_real):
+	* src/pref-manager.c (open_preferences_manager):
+	* src/sendmsg-window.c (sw_get_user_codeset),
+	(quote_parts_select_dlg), (subject_not_empty),
+	(bsmsg_check_format_compatibility):
+	* src/store-address.c (store_address_dialog):
+	* src/toolbar-prefs.c (customize_dialog_cb): use it.
+
+2015-09-21  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* src/balsa-mime-widget-callbacks.c
+	(balsa_mime_widget_ctx_menu_save): use only the basename of an
+	attachment's filename.
+
+2015-09-21  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* libbalsa/body.c (libbalsa_message_body_save_temporary): use
+	only the basename of an attachment's filename.
+
+2015-07-23  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Fix the image-loading option for HTML message parts
+
+	* libbalsa/html.c (lbh_navigation_policy_decision):
+	do not hide the info-bar unless we are loading an actual image;
+	(lbh_resource_notify_response_cb): new function--we do not know
+	what we are loading until we have an actual response;
+	(lbh_resource_load_started_cb): just connect to the
+	"notify::response" signal;
+	(libbalsa_html_new): add debugging.
+
+2015-06-07  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Fix bgo #750516 (pachoramos1@gmail.com)
+
+	* balsa.desktop.in.in: use the same macro TOOLKIT_CATEGORIES as
+	in balsa-mailto-handler.desktop.in.in.
+	* configure.ac: actually define said macro.
+
+2015-05-20  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Silence some autoconf and automake complaints.
+
+	* configure.ac: silence autoconf.
+	* libbalsa/imap/Makefile.am: silence automake.
+	* libinit_balsa/Makefile.am: ditto.
+
+2015-04-10  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* src/sendmsg-window.c (delete_handler),
+	(bsmsg_check_format_compatibility): mark strings for
+	translation.
+
+2015-04-10  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* src/information-dialog.c (balsa_information_list): make the
+	"Close" button use GTK_RESPONSE_CANCEL, to move the button
+	to the left.
+
+2015-04-01  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* src/sendmsg-window.c (quote_parts_select_dlg),
+	(collect_for_quote), (quote_body): add a cancel button and
+	provide a parent for the quote-parts dialog.
+
+2015-03-30  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Clean up store-address dialog
+
+	* src/store-address.c (store_address_book_frame): add a label to
+	explain address-book combo-box;
+	(store_address_note_frame): add space after header name;
+	(store_address_add_address): increase notebook tab label to 15
+	characters;
+	(store_address_add_lbaddress): ditto.
+
+2015-03-28  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* src/balsa-mime-widget-crypto.c
+	(balsa_mime_widget_signature_widget): put digital signature info
+	in a GtkExpander.
+
+2015-03-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* src/balsa-message.c: do not crash when current part is changed
+	while the find-bar is showing.
+
+2015-03-26  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* src/store-address.c (store_address_dialog): grab the keyboard
+	focus to the default button, "OK", instead of the address book
+	combo-box.
+
+2015-03-26  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* src/store-address.c (balsa_store_address_from_messages): clean
+	up code;
+	(store_address_response): drop response for "save this address
+	and keep the dialog open";
+	(store_address_dialog): use header bar, and change buttons to
+	standard OK/Cancel;
+	(store_address_book_frame): do not put a GtkFrame around the
+	address-book combo-box;
+	(store_address_note_frame): do not put a GtkFrame around the
+	address notebook.
+
+2015-03-25  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Do not use header bar in GtkMessageDialog, it does nothing
+
+	* libbalsa/identity.c (delete_ident_cb):
+	* libbalsa/libbalsa-gpgme-cb.c (lb_gpgme_accept_low_trust_key):
+	* libbalsa/libbalsa.c (ask_timeout_real):
+	* libbalsa/rfc3156.c (check_gpg_child):
+	* src/ab-main.c (ab_warning):
+	* src/balsa-message.c:
+	* src/balsa-mime-widget-callbacks.c
+	(balsa_mime_widget_ctx_menu_save):
+	* src/folder-conf.c (folder_conf_delete):
+	* src/information-dialog.c (balsa_information_dialog):
+
+2015-03-25  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* src/sendmsg-window.c (sw_get_user_codeset),
+	(quote_parts_select_dlg), (bsmsg_check_format_compatibility):
+	use header bars in dialogs.
+
+2015-03-25  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* src/pref-manager.c (open_preferences_manager): use a header
+	bar.
+
+2015-03-25  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* src/main-window.c (ensure_check_mail_dialog), (bw_find_real):
+	use header bars in dialogs.
+
+2015-03-25  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* src/mailbox-conf.c (create_local_mailbox_dialog): use
+	GTK_RESPONSE_CANCEL instead of CLOSE;
+	(create_generic_dialog): use header bar.
+
+2015-03-25  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* src/information-dialog.c (balsa_information_dialog),
+	(balsa_information_list): use header bars in dialogs.
+
+2015-03-25  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* src/folder-conf.c (folder_conf_imap_node), (browse_button_cb),
+	(subfolder_conf_clicked_ok), (folder_conf_imap_sub_node),
+	(folder_conf_delete): use header bars in dialogs.
+
+2015-03-25  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* src/filter-edit-callbacks.c (fe_edit_condition): use header
+	bar in dialog.
+
+2015-03-24  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Use header bar
+
+	* src/balsa-mime-widget-callbacks.c
+	(balsa_mime_widget_ctx_menu_save): use header bar in dialog.
+
+2015-03-24  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Use header bar
+
+	* src/balsa-message.c: use header bar in dialog.
+
+2015-03-24  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Use header bar
+
+	* src/balsa-mblist.c (bmbl_mru_show_tree): use header bar in
+	dialog.
+
+2015-03-24  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Use header bar
+
+	* src/balsa-index.c (balsa_index_pipe): use header bar in
+	dialog.
+
+2015-03-24  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Use header bar
+
+	* src/balsa-app.c (ask_password_real): use header bar in dialog.
+
+2015-03-24  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Use header bar
+
+	* src/address-book-config.c (create_generic_dialog): use header
+	bar in all dialogs.
+
+2015-03-24  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* src/ab-window.c (balsa_ab_window_new): avoid multiple dynamic
+	casts.
+
+2015-03-24  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* src/ab-window.c (balsa_ab_window_new): drop redundant dynamic
+	casts to GtkWidget
+
+2015-03-24  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Use header bar
+
+	* src/ab-window.c (balsa_ab_window_new): use header bar in
+	dialog.
+
+2015-03-24  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Use header bar
+
+	* src/ab-main.c (ab_warning): use header bar in dialog.
+
+2015-03-24  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Use header bar
+
+	* libbalsa/smtp-server.c (libbalsa_smtp_server_dialog): use a
+	header bar in dialog.
+
+2015-03-24  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Use header bar
+
+	* libbalsa/send.c (ensure_send_progress_dialog): use a header
+	bar in dialog.
+
+2015-03-24  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Use header bar
+
+	* libbalsa/rfc3156.c (check_gpg_child): use a header bar in
+	dialog.
+
+2015-03-24  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Use header bars
+
+	* libbalsa/libbalsa-gpgme-cb.c (lb_gpgme_select_key),
+	(lb_gpgme_accept_low_trust_key), (get_passphrase_real): use
+	header bars in dialogs.
+
+2015-03-24  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Use GtkDialog API and GTK_DIALOG_* flags instead of g_object_new
+	and GObject properties
+
+	* src/filter-edit-dialog.c (filters_edit_dialog):
+	* src/filter-export-dialog.c (filters_export_dialog):
+	* src/sendmsg-window.c (subject_not_empty):
+	* src/toolbar-prefs.c (customize_dialog_cb):
+
+2015-03-24  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* libbalsa/libbalsa.c (ask_cert_real), (ask_timeout_real): use
+	header bars.
+
+2015-03-24  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* libbalsa/misc.c (libbalsa_create_grid_entry): set hexpand on
+	the entry.
+
+2015-03-24  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Use header bars in identity dialogs
+
+	* libbalsa/identity.c (libbalsa_identity_select_dialog),
+	(delete_ident_cb), (libbalsa_identity_config_dialog): use header
+	bars.
+	(append_ident_notebook_page), (setup_ident_frame): remove
+	redundant argument.
+
+2015-03-23  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Set minimum vertical space for recipient list
+
+	* src/sendmsg-window.c (create_email_entry): try to give the
+	recipient list around two lines of space.
+
+2015-03-23  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Deprecation cleanup--I missed one :(
+
+	* src/balsa-mime-widget-text.c (fill_text_buf_cited):
+	GtkTextTag:foreground-gdk is deprecated.
+
+2015-03-23  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Deprecation cleanup
+
+	* src/balsa-mime-widget-text.c (quote_tag):
+	GtkTextTag:foreground-gdk is deprecated.
+
+2015-03-23  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Deprecation cleanup
+
+	* src/balsa-app.c (balsa_app_init):
+	GtkSettings:gtk-fallback-icon-theme is deprecated.
+
+2015-03-23  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Use a transient parent and a header bar in the no-subject dialog
+
+	* src/sendmsg-window.c (subject_not_empty): use a transient parent
+	and a header bar.
+
+2015-03-14  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Use a transient parent for filter dialogs
+
+	* libbalsa/filter.h: add parent window to filters_edit_dialog
+	and filters_export_dialog API.
+	* src/filter-edit-dialog.c (filters_edit_dialog): use it, and
+	add a header bar.
+	* src/filter-export-dialog.c (filters_export_dialog): ditto.
+	* src/main-window.c (filters_activated),
+	(export_filters_activated): pass the main window as the
+	transient parent.
+
+2015-03-14  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Use a transient parent for the BalsaFilterRunDialog, and manage
+	sensitivity of various buttons
+
+	* libbalsa/filter.h: add parent window to filters_run_dialog
+	API.
+	* src/filter-run-dialog.c (balsa_filter_run_dialog_new): use it,
+	and add a header bar.
+	(available_list_selection_changed),
+	(selected_list_selection_changed): callbacks for selection
+	"changed" signals, so we can set the sensitivity of various
+	buttons.
+	(balsa_filter_run_dialog_init): connect to the signals, and save
+	the buttons in BalsaFilterRunDialog.
+	(filters_run_dialog): new API.
+	* src/filter-run.h: new members in BalsaFilterRunDialog for the
+	buttons.
+	* src/mailbox-node.c (mb_filter_cb): pass the main window as the
+	transient parent for the dialog.
+	* src/main-window.c (select_filters_activated): ditto.
+
+2015-03-14  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Use a header bar in the toolbar editor
+
+	* src/toolbar-prefs.c (customize_dialog_cb): use a header bar.
+	(create_toolbar_page): add tooltips to direction buttons.
+
+2015-03-14  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Abandon buttons with both an icon and text, and use a symbolic
+	icon where we keep the icon.
+
+	* src/balsa-app.c: remove balsa_stock_button_with_label.
+	* src/balsa-app.h: ditto.
+	* src/ab-window.c (balsa_ab_window_init): drop icons.
+	* src/filter-edit-dialog.c (build_left_side),
+	(build_right_side): ditto.
+	* src/filter-run-dialog.c (balsa_filter_run_dialog_init): drop
+	icons from "Apply" buttons; drop labels from direction buttons.
+	* src/spell-check.c (balsa_spell_check_init): drop icons.
+	* src/toolbar-prefs.c (create_toolbar_page): drop labels from
+	direction buttons.
+
+2015-03-13  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* src/ab-window.c (balsa_ab_window_init): use
+	gtk_button_new_from_icon_name for a button with only an icon,
+	no text.
+
+2015-03-13  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* src/balsa-message.c: use gtk_button_new_from_icon_name for a
+	button with only an icon, no text.
+
+2015-03-12  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Use symbolic icons
+
+	* src/balsa-icons.c (balsa_register_pixbufs): use
+	window-close-symbolic instead of window-close.
+	* src/message-window.c: ditto.
+	* src/sendmsg-window.c: ditto.
+	* src/toolbar-factory.c: ditto.
+	* src/main-window.c (bw_notebook_label_new): ditto, and give up
+	on making close-button small--it's not working.
+
+2015-03-12  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Clean up spell checker
+
+	* src/spell-check.c (balsa_spell_check_new): set the window
+	title as an object property;
+	(balsa_spell_check_new_with_text): use static cast instead of
+	dynamic cast; indentation;
+	(balsa_spell_check_init): title is now set as an object
+	property.
+
+2015-03-12  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	BalsaSpellCheck no longer uses any properties of GtkDialog, so
+	instead make it a direct subclass of GtkWindow
+
+	* src/sendmsg-window.c (sw_spell_check_activated),
+	(sw_spell_check_weak_notify): weak-ref the spell checker
+	instead of waiting for the "response" signal.
+	* src/spell-check.c (balsa_spell_check_class_init),
+	(balsa_spell_check_new), (balsa_spell_check_init),
+	(balsa_spell_check_start), (balsa_spell_check_destroy),
+	(spch_finish): make BalsaSpellCheck a subclass of GtkWindow,
+	instead of GtkDialog.
+
+2015-03-09  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Avoid critical message from GtkSourceView
+
+	* src/spell-check.c (balsa_spell_check_start), (spch_finish):
+	save the current state in a GtkSourceBuffer when we are using
+	GtkSourceview.
+
+2015-03-09  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Build with the home-grown spell checker
+
+	* src/spell-check.c (balsa_spell_check_init): put button grid in
+	the content-area, now that accessing the action-area is
+	deprecated.
+
+2015-03-09  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* src/balsa-icons.c (balsa_register_pixbufs): use
+	freedesktop.org standard window-close icon instead of gtk-close
+	<http://standards.freedesktop.org/icon-naming-spec/latest/>
+
+2015-03-04  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Respect the "All headers" option on the "View" menu (Helmut
+	Jarausch,
+	<https://mail.gnome.org/archives/balsa-list/2015-March/msg00001.html>)
+
+	* src/balsa-mime-widget-message.c
+	(balsa_mime_widget_message_set_headers),
+	(balsa_mime_widget_message_set_headers_d): set the
+	show-all-headers parameter correctly.
 
 2015-03-03  Albrecht Dreß
 
-	Improve display and printing of text/rfc822-headers parts
+	Improve printing of text/rfc822-headers parts
 
-	* src/balsa-mime-widget-message.h: add gboolean show_all_headers
-	to the API.
-	* src/balsa-message.c (balsa_message_set_embedded_hdr),
-	(display_headers): use it.
-	* src/balsa-mime-widget-message.c (add_header_gchar),
-	(add_header_address_list), (balsa_mime_widget_message_set_headers),
-	(balsa_mime_widget_message_set_headers_d): respect it.
 	* src/balsa-print-object-header.c
 	(balsa_print_object_header_new_real),
 	(balsa_print_object_header_from_message),
 	(balsa_print_object_header_from_body), (header_add_string),
-	(header_add_list): new parameter gboolean print_all_headers.
+	(header_add_list): implement and respect new parameter gboolean
+	print_all_headers.
+
+2015-03-02  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Remove unnecessary parameter
+
+	* src/balsa-mime-widget-message.c (add_header_gchar),
+	(add_header_address_list), (bmw_message_set_headers_d): we do
+	not need to pass the BalsaMessage.
+
+2015-03-02  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Show all headers in a text/rfc822-headers part
+
+	* src/balsa-mime-widget-message.c (add_header_gchar): new
+	parameter gboolean show_all_headers;
+	(balsa_mime_widget_new_message),
+	(add_header_address_list),
+	(bmw_message_set_headers_d), (bmw_message_set_headers),
+	(balsa_mime_widget_message_set_headers),
+	(balsa_mime_widget_message_set_headers_d): use it.
+
+2015-03-02  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Provide a parent window for the send-progress dialog
+
+	* libbalsa/send.c (ensure_send_progress_dialog),
+	(libbalsa_message_send), (lbs_process_queue),
+	(libbalsa_process_queue): new parameter GtkWindow *parent.
+	* libbalsa/send.h: ditto.
+	* src/balsa-message.c: use it.
+	* src/balsa-mime-widget-message.c (extbody_send_mail): ditto.
+	* src/balsa-mime-widget-vcalendar.c (vevent_reply): ditto.
+	* src/main-window.c (send_queued_mail_activated): ditto.
+	* src/sendmsg-window.c (send_message_handler): ditto.
+
+2015-03-01  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Fix alignment of text/rfc822-headers parts widget
+
+	* src/balsa-mime-widget-message.c
+	(balsa_mime_widget_new_message): do not override default
+	settings of horizontal align and expand.
 
 2015-03-01  Albrecht Dreß
 
 	Display and print text/rfc822-headers parts
 
 	* libbalsa/body.[hc]: parse text/rfc822-headers parts,
-	  and store them in the body structure
+	and store them in the body structure
 	* src/balsa-mime-widget.c, src/balsa-mime-widget-message.c:
-	  display a text/rfc822-headers part
+	display a text/rfc822-headers part
 	* src/balsa-print-object.c: print a text/rfc822-headers part
 
 2015-03-01  Albrecht Dreß
 
+	Obfuscate the message-id header
+
 	* libbalsa/send.c (libbalsa_set_message_id): obfuscate the
-	message-id header.
+	message-id header (in response to bgo #738155).
+
+2015-03-01  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Use pan-down-symbolic instead of balsa-drop-down
+
+	* images/16x16/Makefile.am: balsa-drop-down has been removed
+	* src/balsa-icons.c (balsa_register_pixmaps): change to
+	pan-down-symbolic
+
+2015-03-01  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* images/16x16/balsa-drop-down.png: remove it.
 
 2015-02-27  Albrecht Dreß
 
-	* libbalsa/send.c (libbalsa_message_queue), (lbs_process_queue),
-	(libbalsa_fill_msg_queue_item_from_queu): complete support for
-	DSN's
+	Enable the request of Delivery Status Notifications
 
-2015-02-24  Albrecht Dreß
-
-	Support for successful DSN's
-
-	* libbalsa/identity.[hc]: define default DSN setting, load and
-	store it
-	* libbalsa/identity.c, src/balsa-index.c,
-	src/filter-edit-callbacks.c: fix clang nagging about a misplaced
-	'static const' qualifier
+	* libbalsa/identity.[hc]: define default DSN setting, load and store it
+	* libbalsa/identity.c, src/balsa-index.c, src/filter-edit-callbacks.c:
+	fix clang nagging about a misplaced 'static const' qualifier
 	* libbalsa/message.h: add request dsn flag
 	* libbalsa/send.c: instruct libesmtp to request the DSN
 	* libbalsa/send.c: pass const parameter as const
 	* src/balsa-icons.c: add braces around macro
 	* src/sendmsg-window.[hc]: add GUI stuff for requesting the DSN
 
-2015-02-23  Albrecht Dreß
+2015-02-23  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
-	Build with clang
+	Actually change spell-checking language
 
-	* configure.in:
-	* libbalsa/files.c (libbalsa_icon_finder):
-	* libbalsa/imap/auth-cram.c (imap_auth_cram):
-	* libbalsa/imap/imap-commands.c (imap_mbox_handle_can_do):
-	* libbalsa/imap/imap-handle.c (imap_get_address):
-	* libbalsa/imap/imap_compress.c (imap_compress_init):
-	* libbalsa/imap/imap_tst.c (main):
-	* libbalsa/libbalsa.c (libbalsa_init):
-	* libbalsa/mailbox_imap.c (libbalsa_mailbox_imap_noop),
-	(lbmi_get_imap_sort_key):
-	* libbalsa/mailbox_mbox.c (libbalsa_mailbox_mbox_sync):
-	* libbalsa/mailbox_mh.c (lbm_mh_get_info), (lbm_mh_parse_mailbox),
-	(lbm_mh_flag_line), (libbalsa_mailbox_mh_sync):
-	* libbalsa/message.h:
-	* libbalsa/send.c (lbs_process_queue):
-	* libbalsa/smtp-server.c (smtp_server_tls_widget),
-	(smtp_server_response):
-	* libbalsa/url.c:
+	* src/sendmsg-window.c (sw_spell_detach), (sw_spell_attach):
+	detach any current spell-checker before attaching a new one.
+
+2015-02-22  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Fix some spacing issues
+
+	* src/toolbar-prefs.c (customize_dialog_cb): allocate extra
+	vertical space to the available and current toolbar item lists;
+	(create_toolbar_page): separate the 'restore' and 'current'
+	buttons by minimum 5px.
+
+2015-02-20  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* src/main-window.c (bw_enable_mailbox_menus): suppress cppcheck
+	null pointer error.
+
+2015-02-20  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* src/ab-main.c (address_book_change_state): do not crash after
+	deleting address book.
+
+2015-02-20  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* libbalsa/application-helpers.c (libbalsa_window_get_menu_bar),
+	(libbalsa_window_set_accels): remove old accel group before
+	setting new one.
+
+2015-02-19  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Make the address book editor accelerators actually work
+
+	* libbalsa/application-helpers.c (libbalsa_window_set_accels):
+	new helper;
+	(libbalsa_window_get_menu_bar) use it.
+	* libbalsa/application-helpers.h: export it.
+	* src/ab-main.c (set_address_book_menu_items): use it.
+
+2015-02-19  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* libbalsa/address-book-text.c (lbab_text_group_address):
+	compile with MAKE_GROUP_BY_ORGANIZATION defined.
+
+2015-02-18  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* src/toolbar-prefs.c (customize_dialog_cb), (standard_button_cb),
+	(create_toolbar_page), (tp_page_refresh_available),
+	(tp_page_add_selected), (tp_page_remove_selected): conditionally
+	compiled debug code to check for unimplemented action names.
+
+2015-02-18  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Fix broken toolbar items
+
+	* src/message-window.c: correct action names.
+	* src/main-window.c (show_all_headers_change_state),
+	(show_preview_pane_change_state), (bw_add_win_action_entries):
+	ditto, and implement missing actions.
+
+2015-02-18  Albrecht Dreß
+
+	* src/balsa-mime-widget-text.c (create_text_widget): allow for
+	GtkSourceView versions greater than 2.
+
+2015-02-17  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Restore toolbar editing
+
+	* src/main-window.c (balsa_window_get_toolbar_model),
+	(bw_add_app_action_entries), (bw_add_win_action_entries),
+	(balsa_window_add_action_entries), (bw_set_menus),
+	(balsa_window_new):
+	* src/main-window.h:
+	* src/message-window.c (message_window_get_toolbar_model),
+	(message_window_add_action_entries), (message_window_new):
+	* src/message-window.h:
+	* src/sendmsg-window.c (sendmsg_window_get_toolbar_model),
+	(sendmsg_window_add_action_entries), (sendmsg_window_new):
+	* src/sendmsg-window.h:
+	* src/toolbar-factory.c (balsa_toolbar_model_finalize),
+	(balsa_toolbar_model_init), (balsa_toolbar_remove_all),
+	(tm_load_model), (tm_save_model), (balsa_toolbar_model_new),
+	(tm_add_action), (balsa_toolbar_model_add_entries),
+	(balsa_toolbar_model_get_current),
+	(balsa_toolbar_model_is_standard),
+	(balsa_toolbar_model_insert_icon), (balsa_toolbar_model_clear),
+	(tm_has_second_line), (tm_populate), (tm_changed_cb),
+	(tm_toolbar_weak_notify), (balsa_toolbar_new):
+	* src/toolbar-factory.h:
+	* src/toolbar-prefs.c (customize_dialog_cb), (wrap_toggled_cb),
+	(create_toolbar_page), (tp_find_icon), (tp_page_refresh_available),
+	(tp_page_refresh_current), (tp_store_set), (replace_nl_with_space):
 
 2015-02-16  Albrecht Dreß
 
-	* libbalsa/imap/imap-tls.c (imap_create_ssl): disable SSLv3,
-	with an option in the code to override, and enable TLSv1.1 and 1.2
+	Disable SSLv3, with an option in the code to override, and
+	enable TLSv1.1 and 1.2
 
+	* libbalsa/imap/imap-tls.c (imap_create_ssl):
+
+2015-02-16  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Fix some alignment issues
+
+	* src/pref-manager.c (open_preferences_manager), (set_align),
+	(attach_entry_full), (attach_information_menu), (attach_label),
+	(checking_group), (quoted_group), (mdn_group), (main_window_group),
+	(threading_group), (add_pref_menu), (deleting_messages_group),
+	(message_window_group), (folder_scanning_group),
+	(create_mdn_reply_menu), (pm_group_new), (pm_combo_box_new):
+	revert to deprecated GtkMisc stuff until gtk_label_set_{xy}align
+	is available.
+
+2015-02-15  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* src/sendmsg-window.c (create_lang_menu): do not leak language
+	names.
+
+2015-02-15  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* libbalsa/imap/auth-cram.c (imap_auth_cram): cosmetic change to
+	length of copy in strncat.
+
+2015-02-15  Albrecht Dreß
+
+	Build with clang (ver. LLVM 3.4)
+
+	* libbalsa/files.c: remove unused assignment (detected by cppcheck)
+	* libbalsa/imap/auth-cram.c: fix possible writing behind buffer end
+	* libbalsa/imap/imap-commands.c: remove check for a value >= 0 for an
+	unsigned value
+	* libbalsa/imap/imap-handle.c, libbalsa/mailbox_imap.c: add empty
+	'if' body
+	* libbalsa/mailbox_imap.c, libbalsa/send.c, libbalsa/smtp-server.c:
+	fix enum mismatch
+	* libbalsa/mailbox_mbox.c: don't assign a signed value to an unsigned
+	* libbalsa/message.h, libbalsa/mailbox_mh.c: introduce proper
+	"invalid" flag (clang optimises the current solution away,
+	as it can never be true)
+
+2015-02-11  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Port BalsaMessage from GtkNotebook to GtkStack
+
+	* src/balsa-message.c (balsa_message_get_type): BalsaMessage now
+	subclasses GtkBox instead of GtkNotebook.
+	* src/balsa-message.h: ditto.
+
+2015-02-10  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Deprecation cleanup
+
+	* src/sendmsg-window.c (create_email_or_string_entry),
+	(create_text_area):
+	gtk_widget_override_font is deprecated, use CSS instead.
+
+2015-02-10  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Deprecation cleanup
+
+	* src/balsa-mime-widget-text.c (draw_cite_bar_real):
+	gtk_widget_override_color is deprecated, use CSS instead.
+
+2015-02-10  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Deprecation cleanup
+
+	* src/balsa-mime-widget-text.c (bm_modify_font_from_string):
+	gtk_widget_override_font is deprecated, use CSS instead.
+
+2015-02-10  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* src/balsa-mime-widget-image.c
+	(balsa_mime_widget_image_dispose): fix typo.
+
+2015-02-10  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Deprecation cleanup
+
+	* src/balsa-mime-widget-message.c (add_header_gchar):
+	gtk_widget_override_font is deprecated, use CSS instead.
+
+2015-02-10  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Deprecation cleanup
+
+	* src/balsa-mime-widget-image.c (balsa_mime_widget_image_dispose),
+	(balsa_mime_widget_new_image):
+	gtk_style_context_get_background_color and
+	gtk_widget_override_background_color are deprecated; when we
+	replace the GtkNotebook with a GtkStack, we should get
+	consistent backgrounds again.
+
+2015-02-10  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Deprecation cleanup
+
+	* src/balsa-message.c (balsa_message_init):
+	gtk_style_context_get_background_color and
+	gtk_widget_override_background_color are deprecated; when we
+	replace the GtkNotebook with a GtkStack, we should get
+	consistent backgrounds again.
+
+2015-02-10  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Deprecation cleanup
+
+	* libbalsa/source-viewer.c (libbalsa_show_message_source):
+	gtk_widget_override_font is deprecated, use CSS instead.
+
+2015-02-08  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* src/main-window.c (balsa_window_new): vertically center the
+	new skinny progress bar.
+
+2015-02-08  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Allow for quoted strings in vcal items
+
+	* libbalsa/rfc2445.c (vcal_strchr): replacement for strchr that
+	ignores matches in quoted strings;
+	(vcal_strsplit_at_char): replacement for g_strsplit that uses
+	vcal_strchr;
+	(libbalsa_vcal_new_from_body): use them.
+
+2015-02-03  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Simplify BalsaMailboxConfView destruction
+
+	* src/mailbox-conf.c (mailbox_conf_view_new_full): use g_free as
+	a weak-ref-notify instead of a wrapper.
+
+2015-02-02  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Simplify notebook-label destruction
+
+	* src/main-window.c (bw_notebook_label_new): use
+	g_signal_connect_object to handle destruction of label, instead
+	of a weak-ref.
+
+2015-02-02  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Close compose windows on exit
+
+	* src/sendmsg-window.c (balsa_sendmsg_destroy_handler),
+	(sendmsg_window_new): weak-ref the main-window and close any
+	compose window that is still open.
+
+2015-02-02  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Prune some dead code
+
+	* src/balsa-message.c (balsa_message_init), (balsa_message_new):
+	close-with-msg is unused.
+	* src/balsa-message.h: remove it, and its setter.
+	* src/message-window.c (message_window_idle_handler),
+	(mw_set_selected): setter has gone away.
+
+2015-02-02  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Compose window may outlive main window
+
+	* src/main-window.c (bw_send_msg_window_destroy_cb): check for
+	NULL main-window.
+	* src/sendmsg-window.c (balsa_sendmsg_destroy_handler): ditto.
+
+2015-01-29  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Possible fix for RedHat bug #1050738 (Geoff Leach)
+
+	* src/balsa-index.c (bndx_compose_foreach): check for NULL
+	compose window.
+
+2015-01-29  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Possible fix for RedHat bug #831889 (Geoff Leach)
+
+	* src/sendmsg-window.c (collect_for_quote): check for NULL root.
+
+2015-01-29  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Possible fix for RedHat bug #1097953 (Geoff Leach)
+
+	* src/main-window.c (balsa_window_class_init), (balsa_window_new),
+	(bw_close_mailbox_on_timer): use balsa_window_real_close_mbnode
+	to close the mailbox instead of directly removing the notebook page.
+	* src/message-window.c (destroy_message_window),
+	(message_window_new): disconnect mailbox signals more carefully.
+
+2015-01-28  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* balsa.appdata.xml: new appdata file
+
+2015-01-28  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* src/balsa-icons.c (load_balsa_pixmap),
+	(balsa_register_pixmaps): prune much pointless code.
+	* src/sendmsg-window.c (subject_not_empty),
+	(check_suggest_encryption): fix broken icons.
+	* src/toolbar-factory.c (balsa_toolbar_new): ditto.
+
+2015-01-28  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* src/ab-main.c (bab_cleanup), (set_address_book_menu_items),
+	(get_main_menu), (bab_window_list_new), (bab_window_new),
+	(ab_warning), (bab_set_intial_address_book), (main): streamline
+	code.
+
+2015-01-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Fix bug #741805 (Anders Jonsson)
+
+	* help/C/balsa.sgml: fix spelling of "Portuguese".
+	* src/sendmsg-window.c: ditto.
+
+2015-01-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Deprecation cleanup
+
+	* .gitignore: add "compile"
+	* configure.ac: use webkit2gtk-4.0
+	* libbalsa/address.c (libbalsa_address_get_edit_widget):
+	* libbalsa/html.c (lbh_navigation_policy_decision),
+	(lbh_new_window_policy_decision):
+	* libbalsa/imap/imap-handle.c:
+	* libbalsa/libbalsa-gpgme-cb.c (lb_gpgme_select_key):
+	* libbalsa/send.c:
+	* libbalsa/url.c:
+	* src/address-book-config.c (add_radio_buttons),
+	(create_externq_dialog):
+	* src/balsa-app.c (balsa_stock_button_with_label):
+	* src/balsa-icons.c (load_balsa_pixmap):
+	* src/balsa-message.c (bm_find_bar_new), (balsa_message_init):
+	* src/balsa-mime-widget-crypto.c
+	(balsa_mime_widget_signature_widget):
+	* src/balsa-mime-widget-message.c (add_header_gchar),
+	(add_header_sigstate):
+	* src/balsa-mime-widget-vcalendar.c
+	(balsa_mime_widget_new_vcalendar):
+	* src/filter-edit-dialog.c (build_action_page):
+	* src/main-window.c (bw_window_state_event_cb),
+	(bw_is_active_notify), (bw_notebook_label_new),
+	(bw_display_new_mail_notification):
+	* src/main-window.h:
+	* src/pref-manager.c (attach_label), (checking_group),
+	(quoted_group), (mdn_group), (main_window_group), (add_pref_menu),
+	(deleting_messages_group), (folder_scanning_group), (pm_group_new):
+	* src/print-gtk.c (message_prefs_widget):
+	* src/sendmsg-window.c (create_email_or_string_entry),
+	(sw_attachment_list), (quote_parts_select_dlg),
+	(subject_not_empty), (check_suggest_encryption):
+
+2015-01-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* src/ab-main.c (bab_load_cb), (bab_set_address_book),
+	(address_book_change_state), (set_address_book_menu_items),
+	(address_book_change), (file_new_vcard_activated),
+	(file_new_extern_activated), (file_new_ldif_activated),
+	(file_new_ldap_activated), (file_new_gpe_activated),
+	(file_new_rubrica_activated), (file_properties_activated),
+	(file_delete_activated), (file_quit_activated),
+	(entry_new_activated), (entry_delete_activated),
+	(help_about_activated), (get_main_menu),
+	(list_selection_changed_cb), (list_row_activated_cb),
+	(bab_get_filter_box), (bab_window_new), (main): port to
+	GApplication and friends.
+	* ui/Makefile.am: add ab-main.ui.
+
+2015-01-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* ui/ab-main.ui: GtkBuilder description of address-book editor
+	UI.
+
+2014-01-28  Pawel Salek
+
+	* src/spell-check.c: do not use deprecated icon names.
+
+2014-01-25  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Remove accelerators from app-menu; duplicate "new message",
+	"address book", and "quit" on main-window's "file" menu.
+
+	* src/main-window.c (bw_set_menus): duplicate "new message",
+	"address book", and "quit" on main-window's "file" menu, with
+	accelerators;
+	* ui/main-window.ui: remove accelerators from app-menu.
+
+2013-12-16  Albrecht Dreß
+
+	* libbalsa/rfc3156.c (libbalsa_body_decrypt): tree view icons
+	were handled differently for GPG and S/MIME.
+
+2013-12-16  Albrecht Dreß
+
+	Fix bgo #720443 (Lilith Bryant, dark141 at gmail dot com)
+
+	* libbalsa/rfc3156.c (libbalsa_body_decrypt): trivial patch
+	to fix the OL pk7 S/MIME issue.
+
+2013-12-13  Peter Bloomfield
+
+	Fix S/MIME sending and Outlook2007 reception; bgo #720423
+	(Lilith Bryant, dark141 at gmail dot com)
+
+	* libbalsa/rfc3156.c (libbalsa_message_body_protection):
+	x-pkcs7-mime is synonymous with pkcs7-mime;
+	(libbalsa_encrypt_mime_object): use pkcs7 instead of leaking it.
+	* src/balsa-message.c (libbalsa_msg_try_decrypt):
+	x-pkcs7-mime is synonymous with pkcs7-mime.
+
+2013-09-20  Peter Bloomfield
+
+	Disable GtkInfoBar workarounds
+
+	* libbalsa/html.c (lbh_info_bar): disable GtkInfoBar workaround.
+	* src/balsa-mime-widget-message.c (bm_header_widget_new): ditto.
+
+2013-09-14  Peter Bloomfield
+
+	* src/balsa-mime-widget-message.c (bm_header_widget_new):
+	replace GtkInfoBar with a simple GtkBox and a GtkButtonBox,
+	because GtkInfoBar prevents the GtkLabel from wrapping (bgo
+	#707093)
+
+2013-08-30  Peter Bloomfield
+
+	* src/balsa-mime-widget-message.c (bm_header_widget_new): make
+	sure buttons are arranged vertically; would not be an issue,
+	except that GtkLabels are not wrapped in a GtkInfoBar (bgo
+	#707093).
+
+2013-08-30  Peter Bloomfield
+
+	* libbalsa/html.c (lbh_info_bar): make sure buttons are arranged
+	vertically.
+
+2013-08-30  Peter Bloomfield
+
+	* libbalsa/html.c (lbh_info_bar): break message string into
+	three separate lines, to work around GtkInfoBar breakage (bgo
+	#707093).
+
+2013-08-16  Peter Bloomfield
+
+	Deprecation cleanup
+
+	* src/main-window.h:
+	* src/message-window.h:
+	* src/sendmsg-window.h:
+	* src/toolbar-factory.c:
+	* src/toolbar-factory.h:
+
+2013-08-16  Peter Bloomfield
+
+	* src/sendmsg-window.c (sw_close_activated): mark window as
+	being destroyed;
+	(sw_get_action): check for window being destroyed, and return
+	NULL if so;
+	(sw_action_set_enabled), (sw_action_get_enabled),
+	(sw_action_set_active), (sw_action_get_active): check for NULL
+	action.
+
+2013-08-15  Peter Bloomfield
+
+	* src/main-window.c (bw_get_action): wrapper for
+	g_action_map_lookup_action;
+	(bw_action_set_boolean), (bw_action_get_boolean),
+	(bw_action_set_string), (bw_action_set_enabled),
+	(hide_change_state), (balsa_window_new),
+	(balsa_window_update_book_menus): use it;
+	(bw_set_filter_menu): use g_simple_action_set_state, to avoid
+	recursion;
+	(update_view_menu): remove redundant call to
+	balsa_message_set_wrap.
+
+2013-08-14  Peter Bloomfield
+
+	* src/main-window.c (hide_change_state), (bw_set_filter_menu),
+	(bw_filter_to_int): initialize the hide-messages menu items
+	with g_simple_action_set_state instead of g_action_change_state,
+	which does not seem to work for these items.
+
+2013-08-13  Peter Bloomfield
+
+	* src/toolbar-factory.c (tm_toolbar_weak_notify): disconnect
+	model's "changed" signal handler when toolbar is destroyed.
+
+2013-08-13  Pawel Salek
+
+	* src/sendmsg-window.c: compile without gpgme.
+
+2013-08-13  Peter Bloomfield
+
+	* src/sendmsg-window.c (sendmsg_window_continue): fix action
+	name.
+
+2013-08-13  Peter Bloomfield
+
+	* src/sendmsg-window.c (bsmsg_setup_gpg_ui_by_mode): set gpg
+	mode correctly.
+
+2013-08-13  Peter Bloomfield
+
+	* src/sendmsg-window.c (init_menus): add transition code to read
+	old message header choices.
+
+2013-08-10  Peter Bloomfield
+
+	* src/main-window.c (bw_action_set_boolean): use
+	g_action_change_state instead of g_simple_action_set_state, so
+	that the state is actually changed (Carlos Franke).
+
+2013-08-04  Pawel Salek
+
+	* src/sendmsg-window.c: compile with GtkSourceview
+
+2013-07-31  Peter Bloomfield
+
+	Port compose window to GMenu and friends
+
+	* src/sendmsg-window.c (delete_event_cb), (sw_close_activated),
+	(destroy_event_cb), (sw_edit_activated),
+	(sw_select_ident_activated), (sw_get_action),
+	(sw_action_set_enabled), (sw_actions_set_enabled),
+	(sw_action_get_enabled), (sw_action_set_active),
+	(sw_action_get_active), (update_bsmsg_identity),
+	(add_urlref_attachment), (sw_attach_file_activated),
+	(sw_include_messages_activated), (sw_attach_messages_activated),
+	(sw_can_undo_cb), (sw_can_redo_cb), (quote_parts_select_dlg),
+	(sw_insert_sig_activated), (sw_quote_activated),
+	(sendmsg_window_get_toolbar_model), (bsmsg_identities_changed_cb),
+	(insert_initial_sig), (bsm_prepare_for_setup), (bsm_finish_setup),
+	(set_cc_from_all_recipients), (decode_and_strdup),
+	(sendmsg_window_process_url), (sw_attach_file),
+	(sw_include_file_activated), (subject_not_empty),
+	(check_suggest_encryption), (send_message_handler),
+	(sw_toolbar_send_activated), (sw_send_activated),
+	(sw_queue_activated), (message_postpone), (sw_postpone_activated),
+	(sw_save_activated), (sw_page_setup_activated),
+	(sw_print_activated), (sw_buffer_insert_text),
+	(sw_buffer_set_undo), (sw_spell_attach), (sw_undo_activated),
+	(sw_redo_activated), (sw_cut_activated), (sw_copy_activated),
+	(sw_paste_activated), (sw_select_text_activated),
+	(sw_wrap_body_activated), (sw_reflow_activated), (check_readiness),
+	(sw_entry_helper), (sw_from_change_state),
+	(sw_recips_change_state), (sw_reply_to_change_state),
+	(sw_fcc_change_state), (sw_request_mdn_change_state),
+	(sw_show_toolbar_change_state), (sw_flowed_change_state),
+	(sw_send_html_change_state), (sw_gpg_helper),
+	(sw_sign_change_state), (sw_encrypt_change_state),
+	(sw_gpg_mode_change_state), (init_menus),
+	(sw_spell_check_change_state), (sw_spell_check_activated),
+	(lang_set_cb), (bsmsg_update_gpg_ui_on_ident_change),
+	(bsmsg_setup_gpg_ui), (bsmsg_setup_gpg_ui_by_mode),
+	(sw_menubar_foreach), (sendmsg_window_new),
+	(sendmsg_window_compose), (sendmsg_window_compose_with_address),
+	(sendmsg_window_reply), (sendmsg_window_reply_embedded),
+	(sendmsg_window_forward), (sendmsg_window_continue):
+	* src/sendmsg-window.h: add member ready-to-send.
+	* src/toolbar-factory.c (tm_toolbar_weak_notify),
+	(balsa_toolbar_new): drop GtkUIManager code.
+	* src/toolbar-prefs.c (customize_dialog_cb): ditto.
+	* ui/Makefile.am: add sendmsg-window.ui.
+
+2013-07-31  Peter Bloomfield
+
+	* ui/sendmsg-window.ui: new file with xml input for GtkBuilder.
+
+2013-07-29  Peter Bloomfield
+
+	Fix part of bug #704718 (Geoffrey Leach).
+
+	* src/pref-manager.c (apply_prefs), (set_prefs): apply and set
+	BalsaApplication::fatal_message.
+
+2013-07-28  Peter Bloomfield
+
+	* src/message-window.c (mw_reset_show_all_headers),
+	(mw_set_buttons_sensitive), (mw_set_message),
+	(message_window_move_message), (mw_mru_menu_cb),
+	(mw_select_part_cb), (message_window_new): move code to
+	eliminate local declarations.
+
+2013-07-28  Peter Bloomfield
+
+	* src/message-window.c: make message-window a
+	GtkApplicationWindow, and port menus from GtkUIManager to
+	GtkBuilder and from GtkAction to GAction.
+	* src/toolbar-prefs.c: temporarily disable editing message-window
+	toolbar.
+	* ui/message-window.ui: new file.
+	* ui/Makefile.am: add it.
+
+2013-07-28  Peter Bloomfield
+
+	* libbalsa/application-helpers.c (libbalsa_window_get_menu_bar):
+	add callback-data argument;
+	(libbalsa_window_add_accelerator): new public method;
+	(libbalsa_radio_activated): common callback for the "activated"
+	signal of a radio-GAction.
+	* libbalsa/application-helpers.h: new API.
+	* libbalsa/source-viewer.c (libbalsa_show_message_source): use
+	new API.
+	* src/main-window.c (bw_set_menus): ditto,
+
+2013-07-23  Peter Bloomfield
+
+	* src/main-window.c (bw_alt_n_cb), (bw_set_alt_bindings),
+	(balsa_window_new): restore <alt>n key bindings to change
+	mailbox tab.
+
+2013-07-22  Peter Bloomfield
+
+	* src/main-window.c (toolbars_activated), (identities_activated),
+	(bw_set_menus): restore Settings submenu.
+
+2013-07-22  Peter Bloomfield
+
+	* src/toolbar-factory.c (tm_load_model): do not load stale
+	options.
+
+2013-07-22  Peter Bloomfield
+
+	* src/main-window.c (bw_set_menus): use installed ui file.
+	* ui/Makefile.am: install it.
+	* ui/main-window.ui: new file.
+
+2013-07-22  Peter Bloomfield
+
+	Move GAction-toggled callback to application-helpers
+
+	* libbalsa/application-helpers.c (libbalsa_window_get_menu_bar),
+	(libbalsa_toggle_activated): install GAction-toggled callback.
+	* libbalsa/application-helpers.h: declare it.
+	* libbalsa/source-viewer.c: use it.
+	* src/main-window.c (bw_set_menus): ditto.
+
+2013-07-22  Peter Bloomfield
+
+	Make main-window a GtkApplicationWindow, and port menus from
+	GtkUIManager to GtkBuilder and from GtkAction to GAction
+
+	* src/main-window.c (balsa_window_get_toolbar_model),
+	(bw_action_set_boolean), (bw_action_get_boolean),
+	(bw_action_set_string), (bw_action_set_enabled),
+	(bw_app_action_set_enabled), (bw_actions_set_enabled),
+	(toggle_activated), (radio_activated), (bw_show_or_hide_widget),
+	(new_message_activated), (new_mbox_activated),
+	(new_maildir_activated), (new_mh_activated),
+	(new_imap_box_activated), (new_imap_folder_activated),
+	(new_imap_subfolder_activated), (address_book_activated),
+	(prefs_activated), (help_activated), (about_activated),
+	(quit_activated), (continue_activated), (get_new_mail_activated),
+	(send_queued_mail_activated), (send_and_receive_mail_activated),
+	(page_setup_activated), (print_activated), (copy_activated),
+	(select_all_activated), (select_thread_activated),
+	(find_activated), (find_next_activated),
+	(find_in_message_activated), (filters_activated),
+	(export_filters_activated), (expand_all_activated),
+	(collapse_all_activated), (zoom_in_activated),
+	(zoom_out_activated), (zoom_normal_activated),
+	(next_message_activated), (previous_message_activated),
+	(next_unread_activated), (next_flagged_activated),
+	(reset_filter_activated), (mailbox_select_all_activated),
+	(mailbox_edit_activated), (mailbox_delete_activated),
+	(mailbox_expunge_activated), (mailbox_close_activated),
+	(empty_trash_activated), (select_filters_activated),
+	(remove_duplicates_activated), (reply_activated),
+	(reply_all_activated), (reply_group_activated),
+	(forward_attached_activated), (forward_inline_activated),
+	(pipe_activated), (next_part_activated), (previous_part_activated),
+	(save_part_activated), (view_source_activated),
+	(copy_message_activated), (select_text_activated),
+	(move_to_trash_activated), (toggle_flag),
+	(toggle_flagged_activated), (toggle_deleted_activated),
+	(toggle_new_activated), (toggle_answered_activated),
+	(store_address_activated), (show_mailbox_tree_change_state),
+	(show_mailbox_tabs_change_state), (show_toolbar_change_state),
+	(show_statusbar_change_state), (show_sos_bar_change_state),
+	(wrap_change_state), (hide_change_state),
+	(bw_reset_show_all_headers), (header_change_state),
+	(threading_change_state), (bw_set_menus), (bw_enable_next_unread),
+	(balsa_window_new), (bw_enable_expand_collapse),
+	(bw_next_unread_mailbox), (bw_enable_mailbox_menus),
+	(balsa_window_update_book_menus), (bw_enable_message_menus),
+	(bw_enable_edit_menus), (bw_enable_view_menus),
+	(enable_empty_trash), (balsa_window_enable_continue),
+	(bw_enable_part_menu_items), (bw_set_threading_menu),
+	(bw_set_filter_menu), (bw_filter_to_int),
+	(bw_get_condition_from_int), (balsa_window_open_mbnode),
+	(balsa_window_close_mbnode), (bw_notebook_label_style),
+	(bw_mailbox_changed), (bw_notebook_label_notify),
+	(bw_notebook_label_new), (bw_real_open_mbnode_idle_cb),
+	(bw_real_open_mbnode_thread), (balsa_window_real_open_mbnode),
+	(bw_focus_idle), (balsa_window_real_close_mbnode),
+	(balsa_identities_changed), (bw_close_mailbox_on_timer),
+	(balsa_window_destroy), (balsa_window_refresh),
+	(bw_register_open_mailbox), (bw_unregister_open_mailbox),
+	(bw_is_open_mailbox), (bw_check_mailbox_list),
+	(bw_add_mbox_to_checklist), (bw_imap_check_test),
+	(bw_progress_dialog_destroy_cb), (bw_progress_dialog_response_cb),
+	(ensure_check_mail_dialog), (bw_mailbox_check),
+	(check_new_messages_real), (bw_check_new_messages),
+	(check_new_messages_count), (bw_check_messages_thread_idle_cb),
+	(bw_check_messages_thread), (mail_progress_notify_cb),
+	(send_progress_notify_cb),
+	(bw_get_new_message_notification_string),
+	(bw_display_new_mail_notification),
+	(mw_mbox_change_connection_status),
+	(bw_change_connection_status_idle),
+	(balsa_window_find_current_index), (bw_open_mailbox_cb),
+	(bw_find_real), (bw_hide_changed_set_view_filter),
+	(bw_reset_filter), (update_view_menu),
+	(balsa_window_set_statusbar), (balsa_window_next_unread):
+	* src/main-window.h: BalsaWindow now subclasses
+	GtkApplicationWindow.
+	* src/message-window.c (message_window_new): use new toolbar
+	API.
+	* src/sendmsg-window.c (sendmsg_window_new): ditto.
+	* src/toolbar-factory.c (balsa_toolbar_model_add_entries),
+	(tm_has_second_line), (tm_changed_cb), (tm_changed_old_cb),
+	(tm_toolbar_weak_notify), (tm_realize_cb), (balsa_toolbar_new):
+	main-window has a GActionMap, not a GtkUIManager.
+	* src/toolbar-factory.h: temporary API.
+	* src/toolbar-prefs.c (customize_dialog_cb),
+	(create_toolbar_page): temporary transition code.
+
+2013-07-22  Peter Bloomfield
+
+	* src/balsa-icons.c (load_balsa_pixmap): do not leak pixbuf.
+
+2013-07-22  Peter Bloomfield
+
+	* src/balsa-icons.c (load_balsa_pixmap): add built-in icon with
+	the correct size.
+
+2013-07-22  Peter Bloomfield
+
+	More GtkStock deprecation cleanup
+
+	* src/balsa-app.c (balsa_stock_button_with_label):
+	* src/balsa-icons.c (load_balsa_pixmap), (balsa_register_pixmaps),
+	(balsa_register_pixbufs):
+	* src/balsa-message.c (bm_header_tl_buttons):
+	* src/balsa-mime-widget-crypto.c (balsa_mime_widget_crypto_frame):
+	* src/main-window.c:
+
+2013-07-21  Peter Bloomfield
+
+	* libbalsa/application-helpers.c (extract_accels_from_menu),
+	(get_accel_group), (libbalsa_window_get_menu_bar): make the
+	application-window not show the application's menubar here.
+	* libbalsa/source-viewer.c (libbalsa_show_message_source):
+	instead of here.
+
+2013-07-21  Peter Bloomfield
+
+	* libbalsa/application-helpers.c (accel_info_free),
+	(accel_activate), (extract_accel_from_menu_item),
+	(extract_accels_from_menu), (libbalsa_window_get_accel_group),
+	(libbalsa_window_get_menu_bar): new file defining
+	libbalsa_window_get_menu_bar.
+	* libbalsa/application-helpers.h: ditto.
+	* libbalsa/Makefile.am: add them to SOURCES.
+	* libbalsa/source-viewer.c: use libbalsa_window_get_menu_bar to
+	construct the menu-bar and add the accelerators to the window.
+
+2013-07-21  Peter Bloomfield
+
+	More GtkStock deprecation cleanup
+
+	* src/balsa-index.c (bndx_popup_menu_create),
+	(create_stock_menu_item):
+	* src/balsa-message.c (bm_header_tl_buttons),
+	(get_crypto_content_icon):
+	* src/balsa-mime-widget-crypto.c (balsa_mime_widget_crypto_frame):
+	* src/balsa-mime-widget-image.c (balsa_mime_widget_new_image):
+	* src/balsa-mime-widget-text.c (bmwt_populate_popup_menu):
+
+2013-07-20  Peter Bloomfield
+
+	* README: minor updates.
+
+2013-07-20  Peter Bloomfield
+
+	Install and use a directory for GtkBuilder *.ui files
+
+	* ui/Makefile.am: new file.
+	* ui/main-window.ui: ditto.
+	* ui/source-viewer.ui: ditto.
+	* Makefile.am: add ui to SUBDIRS.
+	* configure.ac: add ui/Makefile to AC_OUTPUT.
+	* libbalsa/source-viewer.c: use installed ui file.
+
+2013-07-20  Peter Bloomfield
+
+	* src/main-window.c: use new prototype for source viewer.
+
+2013-07-20  Peter Bloomfield
+
+	* libbalsa/source-viewer.c (lsv_close_activated),
+	(lsv_copy_activated), (lsv_select_activated),
+	(lsv_toggle_activated), (lsv_escape_change_state),
+	(lsv_app_set_menus), (libbalsa_show_message_source): port source
+	viewer to GMenu.
+	* libbalsa/libbalsa.h: new prototype for source viewer.
+	* src/balsa-index.c (bndx_view_source): use it.
+	* src/message-window.c (view_msg_source_cb): ditto.
+	* src/sendmsg-window.c (sendmsg_window_new_from_list): ditto.
+
+2013-07-18  Peter Bloomfield
+
+	More GtkStock deprecation cleanup
+
+	* configure.ac: to build, we must drop -DGDK_MULTIHEAD_SAFE.
+	* libbalsa/files.c (libbalsa_icon_finder):
+	gtk_icon_size_lookup_for_settings is deprecated for
+	gtk_icon_size_lookup.
+	* src/balsa-index.c (balsa_index_set_column_widths): ditto.
+	* src/balsa-app.c (balsa_stock_button_with_label):
+	gtk_image_new_from_stock is deprecated for
+	gtk_image_new_from_icon_name.
+
+2013-07-18  Peter Bloomfield
+
+	Clean up deprecation of stock icons
+
+	* libbalsa/html.c (lbh_info_bar), (lbh_show_info_bar):
+	* libbalsa/identity.c (libbalsa_identity_select_dialog),
+	(libbalsa_identity_config_dialog):
+	* libbalsa/information.c (libbalsa_information_varg):
+	* libbalsa/libbalsa-gpgme-cb.c (lb_gpgme_select_key),
+	(get_passphrase_real):
+	* libbalsa/send.c (ensure_send_progress_dialog):
+	* libbalsa/smtp-server.c (libbalsa_smtp_server_dialog):
+	* libbalsa/source-viewer.c:
+	* src/ab-main.c (bab_get_edit_button_box), (bab_get_filter_box):
+	* src/ab-window.c (balsa_ab_window_new), (balsa_ab_window_init):
+	* src/address-book-config.c (create_local_dialog),
+	(create_generic_dialog):
+	* src/balsa-app.c (ask_password_real):
+	* src/balsa-icons.c (load_balsa_pixmap), (balsa_register_pixbufs):
+	* src/balsa-icons.h:
+	* src/balsa-index.c (bndx_popup_menu_create), (balsa_index_pipe):
+	* src/balsa-mblist.c (bmbl_mru_show_tree):
+	* src/balsa-message.c (part_context_dump_all_cb):
+	* src/balsa-mime-widget-callbacks.c
+	(balsa_mime_widget_ctx_menu_save):
+	* src/balsa-mime-widget-image.c (balsa_mime_widget_new_image):
+	* src/balsa-mime-widget-text.c (bmwt_populate_popup_menu):
+	* src/filter-edit-callbacks.c (fe_edit_condition):
+	* src/filter-edit-dialog.c (build_left_side), (build_action_page),
+	(build_right_side), (filters_edit_dialog):
+	* src/filter-export-dialog.c (filters_export_dialog):
+	* src/filter-run-dialog.c (balsa_filter_run_dialog_init):
+	* src/folder-conf.c (folder_conf_imap_node), (browse_button_cb),
+	(folder_conf_imap_sub_node):
+	* src/information-dialog.c (balsa_information_list):
+	* src/mailbox-conf.c (mailbox_conf_delete),
+	(create_local_mailbox_dialog), (create_generic_dialog):
+	* src/main-window.c:
+	* src/message-window.c:
+	* src/pref-manager.c (open_preferences_manager):
+	* src/sendmsg-window.c (delete_handler), (sw_get_user_codeset),
+	(add_urlref_attachment), (sw_attach_dialog),
+	(quote_parts_select_dlg), (include_file_cb), (subject_not_empty),
+	(check_suggest_encryption), (bsmsg_check_format_compatibility):
+	* src/spell-check.c (balsa_spell_check_init):
+	* src/store-address.c (store_address_dialog):
+	* src/toolbar-factory.c:
+	* src/toolbar-prefs.c (customize_dialog_cb), (create_toolbar_page):
 
 2013-07-14  Peter Bloomfield
 
@@ -100,21 +2093,1139 @@
 	* libbalsa/send.c (libbalsa_set_message_id): check
 	HAVE_STRUCT_UTSNAME_DOMAINNAME as well as _GNU_SOURCE.
 
-2013-02-14  Pawel Salek
+2013-06-23  Peter Bloomfield
 
-	* NEWS, configure.in: release balsa-2.4.14 buildable on fedora rawhide.
-	* libbalsa/imap-server.c:
-	* libbalsa/libbalsa-conf.c: replace deprecacted gthreads API.
-	* libbalsa/mime-stream-shared.c: 
-	* src/main.c: ditto.
+	* src/sendmsg-window.c (to_add), (create_email_entry): restore
+	drag-and-drop of a string to the To: header.
 
-2012-10-29  Pawel Salek
+2013-06-23  Peter Bloomfield
 
-	* NEWS, configure.in: release balsa-2.4.13
+	* src/sendmsg-window.c (create_email_entry),
+	(sw_attachment_list): clean up dead and redundant code.
+
+2013-06-21  Peter Bloomfield
+
+	* src/sendmsg-window.c (create_email_or_string_entry),
+	(create_string_entry), (create_email_entry), (create_from_entry),
+	(create_info_pane): consolidate most size-group code.
+
+2013-06-21  Peter Bloomfield
+
+	* src/sendmsg-window.c (create_info_pane), (sw_attachment_list):
+	use a GtkSizeGroup to restore alignment of attachment list.
+	* src/sendmsg-window.h: new member size_group.
+
+2013-06-21  Peter Bloomfield
+
+	* src/sendmsg-window.c (drag_data_quote), (bsmsg2message),
+	(send_message_handler): check for NULL tree-view.
+
+2013-06-21  Peter Bloomfield
+
+	* src/sendmsg-window.c (remove_attachment), (change_attach_mode),
+	(show_attachment_widget), (add_attachment),
+	(add_urlref_attachment), (create_info_pane), (sw_attachment_list),
+	(sendmsg_window_new): put attachment list in its own pane.
+	* src/sendmsg-window.h: add members tree_view and paned, and
+	remove member attachments[].
+
+2013-06-17  Peter Bloomfield
+
+	* src/sendmsg-window.c (create_info_pane): allow the recipients
+	widget and the attachments list to expand;
+	(sendmsg_window_new): use a GtkPaned to allow the user to change
+	the space allocated to the headers.
+
+2013-06-10  Peter Bloomfield
+
+	* src/save-restore.c (config_global_load): change default to
+	UseSystemFonts=true.
+	* src/balsa-app.c (balsa_app_init): ditto.
+
+2013-06-09  Peter Bloomfield
+
+	Add the option to use system fonts
+
+	* src/balsa-app.h: new member gboolean use_system_fonts.
+	* src/balsa-app.c (balsa_app_init): initialize it.
+	* src/balsa-mime-widget-message.c (add_header_gchar): respect
+	it.
+	* src/balsa-mime-widget-text.c (balsa_mime_widget_new_text),
+	(bm_modify_font_from_string): ditto.
+	* src/pref-manager.c (open_preferences_manager), (apply_prefs),
+	(attach_font_button), (preview_font_group),
+	(use_system_fonts_cb): allow user to choose it.
+	* src/save-restore.c (config_global_load), (config_save): save
+	and restore it.
+	* src/sendmsg-window.c (create_email_or_string_entry),
+	(create_text_area): respect it also for compose window.
+
+2013-05-30  Peter Bloomfield
+
+	* src/sendmsg-window.c (balsa_sendmsg_destroy_handler),
+	(sw_broker_cb), (create_lang_menu), (sendmsg_window_continue),
+	(sw_spell_language_changed_cb), (sw_spell_attach), (set_locale),
+	(lang_set_cb): handle language changes fromGtkSpell's
+	context menu.
+	* src/sendmsg-window.h: spell_check_lang is no longer const.
+
+2013-05-29  Peter Bloomfield
+
+	GNOME Goal: Notification Sources
+
+	* balsa.desktop.in.in: add X-GNOME-UsesNotifications=true
+	* libbalsa/information.c (libbalsa_information_varg): set
+	"desktop-entry" hint for NotifyNotification.
+	* src/main-window.c: ditto.
+
+2013-05-28  Peter Bloomfield
+
+	* configure.ac: check GtkSpell version, and avoid explicit
+	dependence on enchant when possible.
+	* src/sendmsg-window.c: use gtkspell_get_language_list when
+	available, instead of enchant API.
+
+2013-05-26  Peter Bloomfield
+
+	* src/main-window.c: report network availability with a
+	human-readable time; combine two idle callbacks into one.
+
+2013-05-22  Peter Bloomfield
+
+	Cast new mailboxes as LibBalsaMailbox, to reduce static and
+	dynamic casting.
+
+	* libbalsa/mailbox_imap.c (libbalsa_mailbox_imap_new): return
+	new mailbox as (LibBalsaMailbox *).
+	* libbalsa/mailbox_imap.h: ditto.
+	* libbalsa/mailbox_local.c: ditto.
+	* libbalsa/mailbox_local.h: ditto.
+	* libbalsa/mailbox_maildir.c (libbalsa_mailbox_maildir_new):
+	ditto.
+	* libbalsa/mailbox_maildir.h: ditto.
+	* libbalsa/mailbox_mbox.c (libbalsa_mailbox_mbox_new): ditto.
+	* libbalsa/mailbox_mbox.h: ditto.
+	* libbalsa/mailbox_mh.c (libbalsa_mailbox_mh_new): ditto.
+	* libbalsa/mailbox_mh.h: ditto.
+	* libinit_balsa/assistant_page_directory.c
+	(unconditional_mailbox): remove static casts to (LibBalsaMailbox *).
+	* src/mailbox-node.c (imap_scan_attach_mailbox),
+	(balsa_mailbox_node_new_imap), (add_local_mailbox): avoid
+	dynmaic casts to LIBBALSA_MAILBOX.
+
+2013-05-22  Peter Bloomfield
+
+	* src/balsa-message.c (part_info_init): do not mess with scroll
+	bars.
+	* src/balsa-mime-widget-text.c (balsa_mime_widget_new_text):
+	ditto.
+
+2013-05-22  Peter Bloomfield
+
+	* src/sendmsg-window.c (create_info_pane): use
+	create_email_or_string_entry for Fcc header.
+
+2013-05-20  Peter Bloomfield
+
+	* libbalsa/html.c: drop obsolete include.
+
+2013-05-19  Peter Bloomfield
+
+	Implement add-messages at LibBalsaMailboxLocal level, and use a
+	new add-message method for the backends.
+
+	* libbalsa/mailbox_local.c (libbalsa_mailbox_local_class_init):
+	new add-messages method.
+	* libbalsa/mailbox_local.h: new member
+	LibBalsaMailboxLocalClass::add_message.
+	* libbalsa/mailbox_maildir.c (libbalsa_mailbox_maildir_class_init),
+	(lbm_maildir_add_message): implement
+	LibBalsaMailboxLocalClass::add_message.
+	* libbalsa/mailbox_mbox.c (libbalsa_mailbox_mbox_class_init),
+	(lbm_mbox_add_message): ditto.
+	* libbalsa/mailbox_mh.c (libbalsa_mailbox_mh_class_init),
+	(lbm_mh_add_message): ditto.
+
+2013-05-18  Peter Bloomfield
+
+	* libbalsa/mailbox_local.c: avoid zero-divide.
+	* libbalsa/mailbox_maildir.c (libbalsa_mailbox_maildir_open): do
+	not change LibBalsaMailboxLocal::sync_time or ::sync_cnt.
+	* libbalsa/mailbox_mbox.c (libbalsa_mailbox_mbox_open): ditto.
+	* libbalsa/mailbox_mh.c (libbalsa_mailbox_mh_open): ditto.
+
+2013-05-18  Peter Bloomfield
+
+	* libbalsa/mailbox_local.c: restore syncing mailbox in a thread.
+
+2013-05-16  Peter Bloomfield
+
+	* libbalsa/imap/imap-handle.c (idle_start): use try-lock to
+	avoid blocking main thread;
+	(imap_handle_idle_enable): use g_timeout_add_seconds.
+
+2013-05-16  Peter Bloomfield
+
+	* libbalsa/mailbox.h: scrap
+	LibBalsaMailboxView::mailing_list_address.
+	* libbalsa/mailbox.c (libbalsa_mailbox_view_free): ditto.
+	* src/save-restore.c (config_load_mailbox_view),
+	(config_save_mailbox_view): ditto.
+	* src/sendmsg-window.c (set_list_post_address): ditto.
+
+2013-05-04  Peter Bloomfield
+
+	* src/balsa-mime-widget-message.c (add_header_sigstate): fix
+	typo.
+
+2013-05-02  Peter Bloomfield
+
+	* configure.ac: bump glib and gtk required versions.
+	* libbalsa/imap-server.c (libbalsa_imap_server_init),
+	(libbalsa_imap_server_finalize): drop conditional code.
+	* libbalsa/libbalsa-conf.c (lbc_lock), (lbc_unlock): ditto.
+	* libbalsa/libbalsa.c (libbalsa_init): ditto.
+	* libbalsa/mime-stream-shared.c (lbmss_stream_class_init),
+	(libbalsa_mime_stream_shared_lock),
+	(libbalsa_mime_stream_shared_unlock): ditto.
+	* libinit_balsa/assistant_page_user.c
+	(balsa_druid_page_user_init): ditto.
+	* src/balsa-mime-widget-text.c (bm_widget_new_vcard): ditto.
+	* src/balsa-mime-widget-vcalendar.c (balsa_vevent_widget):
+	ditto.
+	* src/filter-edit-callbacks.c (fe_apply_pressed),
+	(fe_filters_list_selection_changed): ditto.
+	* src/filter-edit-dialog.c (fe_make_color_buttons): ditto.
+	* src/folder-conf.c (folder_conf_imap_sub_node): ditto.
+	* src/main-window.c: ditto.
+	* src/main-window.h: ditto.
+	* src/main.c (threads_init): ditto.
+	* src/sendmsg-window.c (render_attach_size): ditto.
+
+2013-05-02  Peter Bloomfield
+
+	* libbalsa/libbalsa.c (libbalsa_init): reduce glib requirement
+	to 2.32.
+	* src/main.c (threads_init): ditto.
+	* src/balsa-message.c (balsa_message_init): typo.
+
+2013-05-01  Peter Bloomfield
+
+	Replace "ghelp:" help URIs by "help:" URIs
+
+	* libbalsa/identity.c (help_ident_cb):
+	* libbalsa/smtp-server.c (smtp_server_response):
+	* src/address-book-config.c (help_button_cb):
+	* src/filter-edit-callbacks.c (condition_dialog_response),
+	(fe_dialog_response):
+	* src/filter-run-callbacks.c (fr_dialog_response):
+	* src/folder-conf.c (folder_conf_response):
+	* src/main-window.c:
+	* src/pref-manager.c (balsa_help_pbox_display):
+	* src/toolbar-prefs.c (tp_dialog_response_cb):
+
+2013-04-30  Peter Bloomfield
+
+	* configure.ac: fix broken NetworkManager-glib logic.
+
+2013-04-29  Peter Bloomfield
+
+	* src/sendmsg-window.c (delete_handler): tell the user the
+	message is to "(No name)" only as a last resort; thanks to Jack
+	Ostroff for reporting.
+
+2013-04-27  Pawel Salek
+
+	* NEWS: release balsa-2.5.1
+
+2013-04-27  Peter Bloomfield
+
+	Port to new documentation infrastructure
+
+	* .gitignore: change as in <URL:https://live.gnome.org/
+	GnomeGoals/NewDocumentationInfrastructure>
+	* Makefile.am: ditto.
+	* autogen.sh: remove gnome-doc-tool code.
+	* bootstrap.sh: ditto.
+	* configure.ac: test `which yelp-build` to detect yelp-tools
+	package, warn if not found, but continue to configure with
+	documentation disabled.
+
+2013-04-25  Peter Bloomfield  <peter@w500.bellsouth.net>
+
+	Improve path checking in the first-time assistant
+
+	* libinit_balsa/assistant_helper.c (balsa_init_add_grid_entry):
+	return the GtkEntry.
+	* libinit_balsa/assistant_helper.h: modified API.
+	* libinit_balsa/assistant_page_directory.c
+	(unconditional_mailbox): report NULL mailbox error;
+	(verify_mailbox_entry), (verify_button_clicked_cb),
+	(verify_button): add a button for the user to verify paths.
+	(entry_changed_cb), (balsa_druid_page_directory_init):
+	desensitize the "next" button when any entry is changed, to make
+	the user verify the new path;
+	(balsa_druid_page_directory): set row spacing for vbox;
+	(balsa_druid_page_directory_prepare): desensitize the "next"
+	button initially;
+	(balsa_druid_page_directory_back): declare as void, not
+	gboolean.
+	(balsa_druid_page_directory_next): ditto; move path verification
+	to verify_mailbox_entry.
+	* libinit_balsa/assistant_page_directory.h: remove
+	Entry{Data,Master} members, and for convenience add GtkAssistant
+	*druid; balsa_druid_page_directory_later is conditional on
+	ENABLE_TOUCH_UI.
+
+2013-04-25  Peter Bloomfield
+
+	* configure.ac: detect _FILE_OFFSET_BITS in configure.ac;
+	pancake, https://github.com/xtraeme/xbps-packages/commit/
+	a06181186ef559d84c120e3e9a3a557d4e4914dc.
+
+2013-04-23  Peter Bloomfield
+
+	* src/main-window.c: build with glib < 2.32.
+
+2013-04-23  Peter Bloomfield
+
+	Clean up LibESMTP header includes
+
+	* libbalsa/message.h:
+	* libbalsa/misc.h:
+	* libbalsa/send.c:
+	* libbalsa/send.h:
+	* libbalsa/smtp-server.c:
+	* libbalsa/smtp-server.h:
+
+2013-04-23  Peter Bloomfield
+
+	* configure.ac: fix URI for finding libesmtp.
+
+2013-04-23  Peter Bloomfield
+
+	* Makefile.am: use HAVE_GNOME_DOC_UTILS instead of
+	BUILD_WITH_G_D_U.
+	* configure.ac: make sure HAVE_GNOME_DOC_UTILS and ENABLE_SK are
+	defined.
+
+2013-04-22  Peter Bloomfield
+
+	More efficient use of space in header widget
+
+	* src/balsa-message.c (display_face): hide the face-box when
+	empty.
+	* src/balsa-mime-widget-message.c (bm_header_widget_new): allow
+	the face-box to be non-homogeneous.
+
+2013-04-22  Peter Bloomfield
+
+	Port to GNetworkMonitor from NetworkManager
+
+	* configure.ac: if configure --with-nm when GNetworkMonitor
+	is available (glib >= 2.32), announce that we will actually
+	use GNetworkMonitor.
+	* src/main-window.c: Use GNetworkMonitor, when available,
+	instead of NetworkManager.
+	* src/main-window.h: replace NMState nm_state with gboolean
+	network_available.
+
+2013-04-22  Peter Bloomfield
+
+	New message header widget, based on GtkInfoBar
+
+	* src/balsa-message.c (bm_header_tl_buttons),
+	(balsa_message_init): return an array of buttons instead of a
+	widget;
+	(display_face): get container from BalsaMessage.
+	* src/balsa-message.h: new member.
+	* src/balsa-mime-widget-message.c
+	(balsa_mime_widget_new_message_tl), (bm_header_extend_popup),
+	(bm_header_widget_new), (label_size_allocate_cb), (expanded_cb),
+	(add_header_gchar), (add_header_address_list), (foreach_label),
+	(balsa_mime_widget_message_set_headers),
+	(balsa_mime_widget_message_set_headers_d),
+	(add_header_sigstate): new widget.
+	* src/balsa-mime-widget-message.h: new API for passing buttons.
+
+2013-04-22  Peter Bloomfield
+
+	* src/balsa-index.c (bndx_scroll_on_open_idle),
+	(balsa_index_scroll_on_open): scroll in an idle handler, after
+	the mailbox has been opened.
+
+2013-04-16  Peter Bloomfield
+
+	* libbalsa/address-view.c (lbav_drop_down_activated_cb),
+	(libbalsa_address_view_new): use LibBalsaCellRendererButton for
+	the drop-down icon, so that we can drop down the combo-box when
+	the icon is clicked.
+
+2013-04-15  Peter Bloomfield
+
+	Fix miscounting of unread messages
+
+	* libbalsa/mailbox_local.h: new member
+	gboolean _LibBalsaMailboxLocalMessageInfo::loaded.
+	* libbalsa/mailbox_local.c (libbalsa_mailbox_local_load_message),
+	(lbm_local_restore_tree): use it to indicate when we are
+	changing flags on a message that has not yet been counted.
+	* libbalsa/mailbox_mbox.c (parse_mailbox), (lbm_mbox_restore):
+	initialize it to FALSE.
+
+2013-04-12  Peter Bloomfield
+
+	* src/balsa-mime-widget-message.c (bm_header_widget_realized):
+	set colors from the treeview instead of the scrolled window.
+
+2013-04-11  Peter Bloomfield  <peter@w500.bellsouth.net>
+
+	* libbalsa/misc.c (lb_create_size_group_func): we no longer use
+	GtkTable.
+
+2013-04-11  Peter Bloomfield
+
+	* src/balsa-message.c (bm_on_set_style),
+	(bm_find_scroll_to_rectangle), (balsa_message_init),
+	(select_part): remove dependence on GtkViewPort.
+	* src/balsa-message.h: ditto.
+	* src/balsa-mime-widget-callbacks.c
+	(balsa_mime_widget_key_press_event): ditto.
+	* src/balsa-mime-widget-image.c (balsa_mime_widget_new_image):
+	ditto.
+
+2013-04-11  Peter Bloomfield
+
+	* src/toolbar-prefs.c (create_toolbar_page):
+	gtk_scrolled_window_add_with_viewport is deprecated.
+
+2013-04-11  Peter Bloomfield
+
+	* libbalsa/misc.c (lb_create_size_group_func): GtkTable is
+	deprecated.
+
+2013-04-11  Peter Bloomfield
+
+	* libbalsa/libbalsa.c (libbalsa_init): g_thread_supported is
+	deprecated in glib-2.36.
+
+2013-04-10  Peter Bloomfield
+
+	* src/balsa-mblist.c (update_mailbox_idle),
+	(bmbl_mailbox_changed_cb): replace Gdk lock with our own lock.
+
+2013-04-09  Peter Bloomfield
+
+	* libbalsa/imap/imap_tst.c (main): g_type_init is deprecated.
+	* src/main.c (threads_init): ditto.
+
+2013-04-08  Peter Bloomfield
+
+	* configure.ac: add webkit2 as an option for --with-html-widget.
+
+2013-04-08  Peter Bloomfield
+
+	* libbalsa/html.c (lbh_get_web_view): can-select and select-all
+	sometimes pass the web-view and sometimes the container.
+	* src/balsa-mime-widget-text.c (bm_select_all_cb),
+	(bmwt_populate_popup_menu): add "select all" to the
+	webKitWebView context menu, the same as for a GtkTextView
+
+2013-04-08  Peter Bloomfield
+
+	* libbalsa/html.c (lbh_context_menu_cb): pass the GdkEvent when
+	emitting "popup-menu";
+	* libbalsa/html.h: define key for GdkEvent.
+	* src/balsa-mime-widget-text.c (balsa_gtk_html_popup): use it to
+	pass the event time when popping up the menu.
+
+2013-04-08  Peter Bloomfield
+
+	* libbalsa/send.c (libbalsa_set_message_id): constify two
+	strings.
+
+2013-04-07  Peter Bloomfield
+
+	* src/balsa-mime-widget-message.c (bmwm_set_headers_d_idle_cb),
+	(balsa_mime_widget_message_set_headers_d): queue iheader widget
+	resize in an idle handler, to get the size right the first time.
+	* src/main-window.c: initially hide the preview.
+
+2013-04-06  Peter Bloomfield
+
+	* configure.ac: simplify WebKit2 configuration.
+
+2013-04-06  Peter Bloomfield
+
+	* configure.ac: require GtkSourceView 3.2
+	* src/sendmsg-window.c: gtksource.h is the main header; fixes
+	bgo #697454 (Dominique Leuenberger).
+
+2013-04-06  Peter Bloomfield
+
+	* libbalsa/html.c (libbalsa_html_popup_menu_widget),
+	(libbalsa_html_print): actually print the HTML part.
+
+2013-04-05  Peter Bloomfield
+
+	* libbalsa/html.c (lbh_context_menu_cb), (libbalsa_html_new):
+	catch WebKit's "context-menu" signal, and emit "popup-menu" on
+	the parent widget instead.
+	* src/balsa-mime-widget-text.c (balsa_gtk_html_popup): do not
+	unref the popup menu.
+
+2013-04-04  Peter Bloomfield
+
+	* libbalsa/html.c (lbh_info_bar_response_cb): no need to reload;
+	(lbh_resource_load_started_cb): no need for cache;
+	(lbh_cid_cb), (libbalsa_html_new): register the "cid:" protocol
+	handler only once, to avoid crashing the web process.
+
+2013-04-04  Peter Bloomfield
+
+	Handle "cid:" protocol for images
+
+	* libbalsa/html.c (lbh_info_bar_response_cb), (lbh_info_bar):
+	simplify info-bar code.
+	(lbh_resource_load_started_cb), (lbh_cid_cb),
+	(libbalsa_html_new): set up a handler for "cid:" protocol.
+
+2013-04-03  Peter Bloomfield
+
+	* libbalsa/filter-funcs.c (append_header_names),
+	(append_flag_names): do not mark text-free string for
+	translation.
+	* libbalsa/imap-server.c (is_info_cb): ditto.
+
+2013-04-02  Peter Bloomfield
+
+	* libbalsa/html.c (lbh_get_body_content_utf8): sanitize UTF-8
+	text.
+
+2013-03-31  Peter Bloomfield
+
+	Do not leak search-text
+
+	* libbalsa/html.c (lbh_webkit_info_free), (libbalsa_html_new),
+	(lbh_search_failed_to_find_text_cb), (lbh_search_found_text_cb),
+	(lbh_search_init), (lbh_search_continue), (libbalsa_html_search):
+	move search info to LibBalsaWebKitInfo, and free search-text in
+	the GDestroyNotify function.
+
+2013-03-30  Peter Bloomfield
+
+	Refactor HTML search code to work with asynchronous search in
+	Webkit2.
+
+	* libbalsa/html.c (lbh_web_process_crashed_cb): spew message
+	only when debugging;
+	(lbh_search_failed_to_find_text_cb), (lbh_search_found_text_cb),
+	(lbh_search_init), (lbh_search_continue),
+	(libbalsa_html_search): work with asynchronous search;
+	(libbalsa_html_get_selection_bounds): is now gboolean, return
+	FALSE in Webkit2 version.
+	* libbalsa/html.h: new protoypes.
+	* src/balsa-message.c (bm_find_cb), (bm_find_entry_changed_cb),
+	(bm_find_again), (balsa_message_destroy): work with asynchronous
+	search.
+	* src/balsa-message.h: add gpointer member to store HTML search
+	info.
+
+2013-03-28  Peter Bloomfield
+
+	* libbalsa/html.c (lbh_navigation_policy_decision),
+	(lbh_new_window_policy_decision), (lbh_response_policy_decision):
+	Clicking a link may cause a new window policy decision, instead
+	of a navigation policy decision; we handle both cases.
+
+2013-03-27  Peter Bloomfield
+
+	* libbalsa/html.c: reduce zoom factor to +/- 20%.
+
+2013-03-27  Peter Bloomfield
+
+	* libbalsa/html.c (lbh_info_bar_response_cb),
+	(lbh_info_bar_realize_cb), (lbh_show_info_bar),
+	(lbh_resource_load_started_cb), (libbalsa_html_new):
+	Use regex scan of HTML text to detect downloads, because Webkit2
+	does not alert us in time to control them.
+
+2013-03-24  Peter Bloomfield
+
+	Initial check in support for WebKitGtk2
+
+	* configure.ac: add webkit2 as an html-engine option; default is
+	still webkit.
+	* libbalsa/html.c (lbh_get_body_content_utf8),
+	(lbh_webkit_info_free), (lbh_mouse_target_changed_cb),
+	(lbh_navigation_policy_decision), (lbh_new_window_policy_decision),
+	(lbh_response_policy_decision), (lbh_decide_policy_cb),
+	(lbh_info_bar_response_cb), (lbh_show_info_bar),
+	(lbh_resource_load_started_cb), (lbh_web_process_crashed_cb),
+	(libbalsa_html_new), (libbalsa_html_to_string), (lbh_get_web_view),
+	(libbalsa_html_can_zoom), (libbalsa_html_zoom),
+	(libbalsa_html_can_select), (libbalsa_html_select_all),
+	(libbalsa_html_copy), (libbalsa_html_can_search),
+	(lbh_js_run_script), (lbh_js_object_get_property),
+	(libbalsa_html_search_text), (libbalsa_html_get_selection_bounds),
+	(libbalsa_html_popup_menu_widget), (libbalsa_html_get_view_widget),
+	(libbalsa_html_can_print), (libbalsa_html_print): support
+	webkit2 option.
+
+2013-03-21  Peter Bloomfield
+
+	* libbalsa/mailbox.c (libbalsa_mailbox_set_view_filter): clean
+	up logic.
+
+2013-03-21  Peter Bloomfield
+
+	* src/main-window.c: set mailbox view filter on opening, not on
+	notebook page change.
+
+2013-03-19  Peter Bloomfield
+
+	* src/balsa-index.c (balsa_index_load_mailbox_node),
+	(bndx_mailbox_changed_cb): connect signal not swapped.
+
+2013-03-19  Peter Bloomfield
+
+	GdkThreads deprecation cleanup
+
+	* libbalsa/libbalsa.c (libbalsa_lock_mailbox),
+	(libbalsa_unlock_mailbox): strip out GdkThreads-related code.
+	* libbalsa/libbalsa.h: ditto.
+	* libbalsa/mailbox.c (libbalsa_mailbox_msgno_find),
+	(mbox_model_get_path), (libbalsa_mailbox_search_iter_step):
+	ditto.
+	* src/main.c (threads_init), (threads_destroy): ditto.
+
+2013-03-19  Peter Bloomfield
+
+	* src/main-window.c: use thread to check for new mail.
+
+2013-03-17  Peter Bloomfield
+
+	* src/mailbox-node.c (mb_rescan_cb): reopen mailboxes in the UI
+	callback,
+	(balsa_mailbox_node_rescan): not in the recursive function
+	* src/balsa-app.c (balsa_open_mailbox_list): make sure first
+	mailbox in the list is not hidden.
+
+2013-03-17  Peter Bloomfield
+
+	* src/balsa-app.c (open_mailbox_by_url),
+	(balsa_open_mailbox_list): change gboolean
+	open_mailboxes_idle_cb() to void balsa_open_mailbox_list().
+	* src/balsa-app.h: ditto.
+	* src/mailbox-node.c (balsa_mailbox_node_rescan): ditto.
+	* src/main.c (open_mailboxes_idle_cb), (scan_mailboxes_idle_cb):
+	open_mailboxes_idle_cb is now just the idle callback.
+
+2013-03-17  Peter Bloomfield
+
+	Reopen mailboxes after rescanning
+
+	* src/mailbox-node.c (imap_dir_cb): do not unref mbnode;
+	(imap_scan_create_mbnode): do not ref mbnode; protect view
+	during rescanning;
+	(balsa_mailbox_node_rescan): reopen mailboxes after scanning.
+
+2013-03-17  Peter Bloomfield
+
+	* libbalsa/libbalsa-conf.c (libbalsa_conf_sync),
+	(libbalsa_conf_sync_idle_cb): remove source in public method.
+
+2013-03-16  Peter Bloomfield
+
+	* libbalsa/mailbox_local.c (lbm_local_queue_save_tree): build
+	with threads disabled.
+
+2013-03-16  Peter Bloomfield
+
+	* libbalsa/libbalsa-conf.c (libbalsa_conf_sync_idle_cb),
+	(libbalsa_conf_queue_sync): fix error and use lock only when
+	using threads.
+
+2013-03-16  Peter Bloomfield
+
+	Queue config syncs instead of syncing immediately, except on
+	exit cleanup
+
+	* libbalsa/libbalsa-conf.c (libbalsa_conf_sync_idle_cb),
+	(libbalsa_conf_queue_sync): new API libbalsa_conf_queue_sync.
+	* libbalsa/libbalsa-conf.h: ditto.
+	* src/ab-main.c (address_book_change), (file_delete_cb): use it.
+	* src/save-restore.c (config_address_book_save),
+	(config_address_book_delete), (config_mailbox_add),
+	(config_folder_add), (config_mailbox_delete),
+	(config_folder_delete), (config_mailbox_update),
+	(config_folder_update), (config_filters_save),
+	(config_mailbox_filters_save): ditto.
+
+2013-03-16  Peter Bloomfield
+
+	* src/main-window.c: do not leak object refs on error.
+
+2013-03-16  Peter Bloomfield
+
+	* src/mailbox-node.c (balsa_mailbox_node_dispose): make sure
+	LibBalsaMailboxView::open is correct before saving the view.
+
+2013-03-15  Peter Bloomfield
+
+	* src/balsa-app.c (append_url_if_open): libbalsa_conf_foreach
+	passes an encoded URL.
+	* src/mailbox-node.c (check_url_func): ditto.
+
+2013-03-14  Peter Bloomfield
+
+	Streamline handling of LibBalsaMailboxView
+
+	* libbalsa/mailbox.c (libbalsa_mailbox_finalize): free the view;
+	(libbalsa_mailbox_view_free), (lbm_get_view): check for NULL
+	view;
+	(libbalsa_mailbox_set_identity_name),
+	(libbalsa_mailbox_set_threading_type),
+	(libbalsa_mailbox_set_sort_type),
+	(libbalsa_mailbox_set_sort_field), (libbalsa_mailbox_set_show),
+	(libbalsa_mailbox_set_subscribe), (libbalsa_mailbox_set_exposed),
+	(libbalsa_mailbox_set_open), (libbalsa_mailbox_set_filter),
+	(libbalsa_mailbox_set_unread), (libbalsa_mailbox_set_total),
+	(libbalsa_mailbox_set_mtime), (libbalsa_mailbox_get_filter):
+	drop LibBalsaMailboxView::frozen and the hash table.
+	* libbalsa/mailbox.h: ditto.
+	* src/balsa-app.c (balsa_app_destroy), (append_url_if_open),
+	(open_mailbox_by_url), (open_mailboxes_idle_cb),
+	(balsa_add_open_mailbox_urls): traverse views in the config
+	instead of in the hash table.
+	* src/mailbox-conf.c (mailbox_conf_add),
+	(mailbox_conf_view_check): ditto.
+	* src/mailbox-node.c (balsa_mailbox_node_dispose),
+	(check_url_func), (check_local_path), (load_mailbox_view),
+	(check_imap_path): ditto.
+	* src/pref-manager.c (update_view_defaults), (apply_prefs):
+	ditto.
+	* src/main.c (real_main), (balsa_cleanup): no hash table.
+	* src/save-restore.c (config_view_remove),
+	(config_defclient_save): no hash table.
+	(config_mailbox_had_property), (config_mailbox_was_open),
+	(config_mailbox_was_exposed), (config_load_mailbox_view),
+	(config_save_mailbox_view): new methods.
+	* src/save-restore.h: ditto.
+
+2013-03-14  Peter Bloomfield
+
+	* libbalsa/libbalsa-conf.c (libbalsa_conf_has_key): new
+	function.
+	* libbalsa/libbalsa-conf.h: ditto.
+
+2013-03-11  Peter Bloomfield
+
+	Lock mailbox to avoid race
+
+	* libbalsa/mailbox.c (lbm_changed_idle_cb),
+	(lbm_changed_schedule_idle), (libbalsa_mailbox_changed),
+	(lbm_check_idle), (lbm_queue_check): lock the mailbox while
+	storing the id of an idle call, to avoid a race with the main
+	thread callback.
+	* libbalsa/mailbox_local.c (lbm_local_queue_save_tree),
+	(lbml_load_messages_idle_cb),
+	(libbalsa_mailbox_local_load_messages),
+	(libbalsa_mailbox_local_prepare_threading): ditto.
+
+2013-03-07  Peter Bloomfield
+
+	Use --with-gnome more carefully
+
+	* configure.ac: set HAVE_GNOME when configuring --with-gnome.
+	* libinit_balsa/assistant_init.c (balsa_initdruid):
+	default-client makes sense on non-GNOME builds.
+	* libinit_balsa/assistant_page_defclient.c
+	(balsa_druid_page_defclient_toggle): ditto.
+	* libinit_balsa/assistant_page_defclient.h: ditto.
+	* src/main.c (config_init), (mailboxes_init): ditto.
+	* src/save-restore.c (config_defclient_save): ditto.
+	* src/main-window.c: gnome-triggers code is totally dead.
+
+2013-03-06  Peter Bloomfield
+
+	* src/main.c (scan_mailboxes_idle_cb): do not pass unowned
+	string.
+
+2013-03-06  Peter Bloomfield
+
+	Combine all mailboxes to be opened at startup into a single
+	array.
+
+	* src/balsa-app.c (open_mailboxes_idle_cb),
+	(balsa_add_open_mailbox_urls):
+	* src/balsa-app.h: new method balsa_add_open_mailbox_urls; drop
+	hacky extra-open-ref.
+	* src/main.c (initial_open_inbox), (balsa_check_open_mailboxes),
+	(scan_mailboxes_idle_cb), (balsa_cleanup), (handle_remote):
+	collect mailbox URLs in an array.
+
+2013-03-06  Peter Bloomfield
+
+	* src/balsa-index.c (bndx_queue_draw_idle_cb),
+	(bndx_mailbox_changed_idle): queue redrawing the message index
+	each time anything changes, to try to fix mis-rendering.
+
+2013-03-04  Peter Bloomfield
+
+	* src/main.c (initial_open_inbox), (balsa_cleanup): remember
+	when we have opened Inbox twice.
+	* src/balsa-app.h: add member to remember it.
+
+2013-03-03  Peter Bloomfield
+
+	* src/balsa-index.c (balsa_index_scroll_on_open): always use an
+	idle callback to select a message or set the tree-view's cursor.
+
+2013-03-02  Peter Bloomfield
+
+	* libbalsa/mailbox.c (lbm_changed_schedule_idle),
+	(libbalsa_mailbox_msgno_filt_in),
+	(libbalsa_mailbox_msgno_filt_out): set mailbox_changed only when
+	it really has changed.
+	* libbalsa/mailbox_local.c (libbalsa_mailbox_local_class_init),
+	(libbalsa_mailbox_local_changed), (lbm_local_save_tree_real),
+	(lbm_local_queue_save_tree), (lbml_load_messages_idle_cb),
+	(libbalsa_mailbox_local_load_messages): implement the "changed"
+	vfunc, and use it to schedule saving the message tree structure.
+	* libbalsa/mailbox_local.h: new member to temporarily hold the
+	current last msgno.
+
+2013-03-02  Peter Bloomfield
+
+	* libbalsa/server.c (libbalsa_server_save_config): report
+	error saving password.
+
+2013-03-02  Peter Bloomfield
+
+	Re-enable mailbox check in a subthread
+
+	* libbalsa/mailbox.c (libbalsa_mailbox_progress_notify),
+	(libbalsa_mailbox_msgno_inserted),
+	(libbalsa_mailbox_msgno_removed),
+	(libbalsa_mailbox_unlink_and_prepend), (lbm_set_msg_tree):
+	insert subthread warnings.
+	(lbm_check_idle): check mailbox in a subthread.
+	* libbalsa/mailbox_local.c (lbml_load_messages_idle_cb),
+	(libbalsa_mailbox_local_load_messages): load messages in the
+	main thread, in an idle callback;
+	(libbalsa_mailbox_local_finalize): remove any pending idle call.
+	* libbalsa/mailbox_local.h: new member of LibBalsaMailboxLocal
+	for the idle id.
+
+2013-03-01  Peter Bloomfield
+
+	* libbalsa/mailbox.h: idle id is guint, not gulong.
+
+2013-03-01  Peter Bloomfield
+
+	* libbalsa/mailbox.h: new LibBalsaMailbox members
+	changed_idle_id and queue_check_idle_id.
+	* libbalsa/mailbox.c (libbalsa_mailbox_finalize),
+	(libbalsa_mailbox_check), (lbm_changed_idle_cb),
+	(lbm_changed_schedule_idle), (libbalsa_mailbox_changed),
+	(libbalsa_mailbox_msgno_filt_in),
+	(libbalsa_mailbox_msgno_filt_out), (lbm_check_real),
+	(lbm_queue_check): use them.
+
+2013-02-28  Peter Bloomfield
+
+	* src/balsa-index.c: refactor and simplify.
+
+2013-02-28  Peter Bloomfield
+
+	* src/main-window.c: survive torture test.
+
+2013-02-28  Peter Bloomfield
+
+	* libbalsa/mailbox.c (lbm_msgno_filt_check),
+	(lbm_msgno_filt_check_idle_cb),
+	(libbalsa_mailbox_msgno_filt_check): check message against view
+	filter synchronously when in the main thread.
+
+2013-02-28  Pawel Salek
+
+	* configure.ac: remove dependency on legacy gnome-icon-scheme pkg.
+	* NEWS, configure.ac: release balsa-2.5.0
+
+2013-02-28  Peter Bloomfield
+
+	* libbalsa/mailbox.c: build with threads disabled.
+
+2013-02-27  Peter Bloomfield
+
+	* libbalsa/mailbox.c (lbm_run_filters_on_reception_idle_cb),
+	(libbalsa_mailbox_run_filters_on_reception): run filters in an
+	idle callback.
+
+2013-02-26  Peter Bloomfield
+
+	* src/main-window.c: do not use another idle handler to set the
+	mailbox view-filter.
+
+2013-02-26  Peter Bloomfield
+
+	Instead of forgetting open mailboxes, do not remember them in
+	the first place.
+
+	* src/balsa-app.c (append_url_if_open): revert.
+	* src/main.c (scan_mailboxes_idle_cb): ditto.
+	* src/save-restore.c (save_view): remember open mailbox only if
+	balsa_app.remember_open_mboxes.
+
+2013-02-26  Peter Bloomfield
+
+	* src/balsa-app.c (ask_password): use a mutex to make sure that
+	only one dialog pops up at a time.
+
+2013-02-26  Peter Bloomfield
+
+	* libbalsa/mailbox_local.c (lbm_local_save_tree_real),
+	(lbm_local_queue_save_tree): check that the message tree has
+	changed in the idle handler, instead of in the scheduler.
+
+2013-02-26  Peter Bloomfield
+
+	* src/balsa-app.c (append_url_if_open): in_sync is gboolean.
+
+2013-02-26  Peter Bloomfield
+
+	* src/balsa-app.c (append_url_if_open): mark view out-of-sync
+	only if it really is.
+
+2013-02-26  Peter Bloomfield
+
+	* src/balsa-app.c (append_url_if_open),
+	(open_mailboxes_idle_cb): if we are not remembering open
+	mailboxes, forget them.
+	* src/main.c (scan_mailboxes_idle_cb): always call
+	open_mailboxes_idle_cb so we can forget them.
+
+2013-02-25  Peter Bloomfield
+
+	* src/sendmsg-window.c (balsa_sendmsg_destroy_handler),
+	(sendmsg_window_new), (bsmsg2message), (sw_buffer_changed):
+	remove annoying wrap timeout, and carry out autosave timeout
+	without disturbing the compose window.
+	* src/sendmsg-window.h: remove timeout id.
+
+2013-02-25  Peter Bloomfield
+
+	* libbalsa/mailbox.c (lbm_msgno_filt_check): check that mailbox
+	is still open.
+
+2013-02-25  Peter Bloomfield
+
+	* libbalsa/mailbox.c (libbalsa_mailbox_search_iter_ref): allow
+	NULL iter.
+
+2013-02-25  Peter Bloomfield
+
+	* configure.in: actually error out if libsecret devel is not
+	installed.
+
+2013-02-24  Peter Bloomfield
+
+	Port from GnomeKeyring to libsecret.
+
+	* configure.in: implement --with-libsecret as an alternative to
+	GnomeSecret.
+	* libbalsa/imap-server.c (libbalsa_imap_server_new_from_config):
+	use libsecret if configured.
+	* libbalsa/server.c (libbalsa_server_load_config),
+	(libbalsa_server_save_config): ditto.
+	* libbalsa/server.h: ditto.
+	* src/balsa-app.c (ask_password_real): new string to request
+	saving in secret service.
+	* src/folder-conf.c (folder_conf_imap_node): ditto.
+	* src/mailbox-conf.c (create_imap_mailbox_dialog): ditto.
+
+2013-02-23  Peter Bloomfield
+
+	* update all copyrights to 2013.
+
+2013-02-23  Peter Bloomfield
+
+	* src/main.c (handle_remote): handle -h option.
+
+2013-02-23  Peter Bloomfield
+
+	* libbalsa/mailbox.c (lbm_msgno_changed),
+	(libbalsa_mailbox_msgno_changed): make sure parent message is
+	checked.
+
+2013-02-23  Peter Bloomfield
+
+	* libbalsa/mailbox.c (lbm_msgno_filt_check),
+	(libbalsa_mailbox_msgno_filt_check): use an idle callback to
+	check whether to filter a message in or out.
+
+2013-02-21  Peter Bloomfield
+
+	* libbalsa/mailbox.c (libbalsa_mailbox_finalize),
+	(lbm_msgno_row_changed), (lbm_msgnos_changed_idle_cb),
+	(lbm_msgno_changed), (lbm_get_index_entry): restore threaded
+	versions of get_index_entry and msgno_changed.
+
+2013-02-21  Peter Bloomfield
+
+	* src/ab-main.c (main): deprecation cleanup.
+
+2013-02-21  Peter Bloomfield
+
+	* libbalsa/mailbox.c (libbalsa_mailbox_finalize): build without
+	threads.
+
+2013-02-21  Peter Bloomfield
+
+	* src/main-window.c: do not leave progress bar crawling.
+
+2013-02-21  Peter Bloomfield
+
+	* src/balsa-index.c (balsa_index_load_mailbox_node): move
+	libbalsa_mailbox_open call to balsa_window_real_open_mbnode.
+	* src/balsa-index.h: drop unused argument.
+	* src/main-window.c: open mailbox in a thread.
+
+2013-02-21  Peter Bloomfield
+
+	* src/main.c (balsa_progress_set_text): do not check for
+	subthread, as balsa_window_setup_progress is thread-safe.
+
+2013-02-20  Peter Bloomfield
+
+	* src/main-window.c: set up progress bar in an idle callback.
+
+2013-02-20  Peter Bloomfield
+
+	* src/main-window.c: change button sensitivity in an idle
+	callback.
+
+2013-02-20  Peter Bloomfield
+
+	* src/balsa-app.c (balsa_find_iter_by_data): check for
+	sub-thread.
+
+2013-02-20  Peter Bloomfield
+
+	* src/balsa-app.c (balsa_find_url): thread-safe.
+
+2013-02-20  Peter Bloomfield
+
+	* libbalsa/send.c (balsa_send_message_real_idle_cb),
+	(balsa_send_message_real): close outbox in an idle callback.
+
+2013-02-20  Peter Bloomfield
+
+	* libbalsa/libbalsa-gpgme.c (libbalsa_gpgme_init): use g_message
+	instead of g_warning.
+
+2013-02-20  Peter Bloomfield
+
+	* configure.in: new option --enable-debug-threads.
+	* libbalsa/libbalsa.h: use it to define gdk_threads_enter() to
+	detect a sub-thread.
+
+2013-02-20  Peter Bloomfield
+
+	Build with enable-threads; check POP3 mail and send messages in
+	threads.
+
+	* libbalsa/libbalsa.c (libbalsa_lock_mailbox),
+	(libbalsa_threads_init), (libbalsa_threads_has_lock): rip out
+	gdk_threads-related code.
+	* libbalsa/libbalsa.h: ditto.
+	* src/main.c (threads_init): ditto.
+	* libbalsa/imap-server.c (connection_cleanup): not ready for
+	threads.
+	* libbalsa/mailbox.c (libbalsa_mailbox_class_init),
+	(lbm_get_index_entry), (lbm_check_idle): ditto.
+	* libbalsa/mailbox_local.c (lbm_local_save_tree_idle): ditto
+	* libbalsa/mailbox_pop3.c: use a thread.
+	* libbalsa/mailbox_pop3.h: ditto.
+	* libbalsa/send.c (lbs_process_queue), (libbalsa_process_queue):
+	* src/main-window.c: ditto.
+
+2013-02-16  Peter Bloomfield
+
+	* libbalsa/libbalsa-conf.c (lbc_lock), (lbc_unlock): call
+	lbc_init() only once.
+
+2013-01-15  Peter Bloomfield
+
+	* src/main-window.c: emit signal instead of calling NULL class
+	method.
+
+2013-01-08  Peter Bloomfield
+
+	* src/pref-manager.c (create_layout_types_menu): use relevant
+	enum.
+
+2013-01-08  Peter Bloomfield
+
+	* src/main-window.c: mailbox index cannot shrink.
+
+2012-12-08  Peter Bloomfield
+
+	* src/main-window.c: use idle callback to check mail when not
+	threaded.
+
+2012-11-27  Peter Bloomfield
+
+	* src/balsa-index.c (balsa_index_scroll_on_open): use idle
+	callback only from a subthread.
+
+2012-11-21  Peter Bloomfield
+
+	Build with gtk 3.6, at least without threads
+
+	* libbalsa/information.c: include libbalsa.h.
+	* libbalsa/libbalsa.h: when not threaded, define
+	gdk_threads_{enter,leave} to nothing.
+	* libbalsa/mailbox.c (lbm_cache_message): when not threaded,
+	avoid recursive signal call.
+	* libbalsa/misc.c: remove deprecated GtkTable code.
+	* libbalsa/misc.h: ditto.
+	* src/balsa-mime-widget-image.c (img_check_size): build with
+	gdk_threads_{enter,leave} defined to nothing.
+	* src/filter-edit-callbacks.c (fe_apply_pressed),
+	(fe_filters_list_selection_changed): deprecation cleanup.
+	* src/filter-edit-dialog.c (fe_make_color_buttons): ditto.
+	* src/main-window.c: CSS cleanup.
+	* src/pref-manager.c (apply_prefs), (set_prefs): deprecation
+	cleanup.
+
+2012-11-14  Peter Bloomfield
+
+	Port to newly released Gtkspell 3.0
+
+	* configure.in: renamed pkg-config file.
+	* src/sendmsg-window.c (sw_spell_attach), (sw_spell_detach): new
+	API.
+
+2012-10-29
+
+	* configure.in, NEWS: release 2.4.91
 
 2012-10-22  Pawel Salek
 
 	* libbalsa/imap/pop3.c: fix long-line POP3 bug reported by Rob Landley.
+
+2012-09-30  Peter Bloomfield
+
+	* src/store-address.c (store_address_add_address),
+	(store_address_add_list): store a group as a distribution list,
+	if the address book implements lists.
+
+2012-09-30  Peter Bloomfield
+
+	* libbalsa/libbalsa.c (ask_cert_real): replace "&" by "&amp;" in
+	marked-up string.
 
 2012-09-17  Peter Bloomfield
 
@@ -127,13 +3238,606 @@
 	* src/filter-edit-dialog.c (filters_edit_dialog): space after
 	".".
 
+2012-09-17  Ildar Mulyukov <ildar@altlinux.ru>
+
+	* balsa.desktop.in.in: fix desktop categories.
+
+2012-09-17  Peter Bloomfield
+
+	Revert all changes moving Gtk access from subthreads to main
+	thread.
+
+	* libbalsa/libbalsa.c (libbalsa_threads_enter):
+	* libbalsa/mailbox.c (lbm_index_entry_new_from_msg),
+	(libbalsa_mailbox_close), (libbalsa_mailbox_msgno_inserted),
+	(libbalsa_mailbox_msgno_removed),
+	(libbalsa_mailbox_msgno_filt_check), (lbm_cache_message):
+	* libbalsa/mailbox_local.c (libbalsa_mailbox_local_load_messages):
+	* src/balsa-app.c (find_url), (balsa_find_url):
+	* src/balsa-index.c (balsa_index_load_mailbox_node):
+	* src/balsa-index.h:
+	* src/main-window.c:
+	* src/main.c (balsa_progress_set_text),
+	(balsa_progress_set_fraction):
+
+2012-09-08  Peter Bloomfield
+
+	* configure.in:  _NL_MEASUREMENT_MEASUREMENT is an enum and not
+	a define.
+	* src/print-gtk.c (get_default_user_units): use
+	HAVE__NL_MEASUREMENT_MEASUREMENT.
+
+2012-08-10  Peter Bloomfield
+
+	* libbalsa/body.c (libbalsa_message_body_get_part_stream):
+	simplify filter selection switch.
+
+2012-08-09  Peter Bloomfield
+
+	* src/balsa-mime-widget-message.c (bm_header_widget_realized):
+	use BalsaMessage::scroll as the context for header widget
+	colors.
+
+2012-07-22  Peter Bloomfield
+
+	* src/store-address.c (store_address_book_frame): reduce scope
+	of variables.
+
+2012-07-22  Peter Bloomfield
+
+	* src/sendmsg-window.c (update_bsmsg_identity): reduce scope of
+	variables;
+	(tree_add_quote_body): suppress null pointer warning.
+
+2012-07-22  Peter Bloomfield
+
+	* src/save-restore.c (pop3_progress_notify): suppress memory
+	leak warning.
+
+2012-07-22  Peter Bloomfield
+
+	* src/main-window.c: use sscanf field limits; suppress null
+	pointer warning.
+
+2012-07-22  Peter Bloomfield
+
+	* src/mailbox-conf.c (mailbox_conf_update): reduce scope of
+	variable.
+
+2012-07-22  Peter Bloomfield
+
+	* src/balsa-mime-widget.c (balsa_mime_widget_new_unknown):
+	reduce scope of variables.
+
+2012-07-22  Peter Bloomfield
+
+	* src/balsa-index.c (pipe_out_watch): reduce scope of variable.
+
+2012-07-22  Peter Bloomfield
+
+	* libinit_balsa/assistant_page_directory.c
+	(unconditional_mailbox): reduce scope of variable.
+
+2012-07-22  Peter Bloomfield
+
+	* libbalsa/send.c (balsa_send_message_real): suppress memory
+	leak warning.
+
+2012-07-22  Peter Bloomfield
+
+	* libbalsa/message.c (prepend_header_misc): check loop index
+	value before using it.
+
+2012-07-22  Peter Bloomfield
+
+	* libbalsa/mailbox_pop3.c (mp_load_uids): reduce scope of
+	variable.
+
+2012-07-22  Peter Bloomfield
+
+	* libbalsa/mailbox_mh.c (lbm_mh_parse_mailbox),
+	(lbm_mh_handle_seq_line), (lbm_mh_check): use sscanf field
+	limits.
+
+2012-07-22  Peter Bloomfield
+
+	* libbalsa/mailbox_mbox.c (lbm_mbox_stream_seek_to_message):
+	avoid unread variable error.
+
+2012-07-22  Peter Bloomfield
+
+	* libbalsa/mailbox_imap.c (is_child_of), (create_cache_copy),
+	(libbalsa_mailbox_imap_sort): reduce scope of variables.
+
+2012-07-22  Peter Bloomfield
+
+	* libbalsa/mailbox.c (libbalsa_mailbox_type_from_path): reduce
+	scope of variable.
+
+2012-07-22  Peter Bloomfield
+
+	* libbalsa/libbalsa.c (libbalsa_guess_mail_spool),
+	(asn1time_to_string), (x509_get_part): reduce scope of
+	variables;
+	(libbalsa_get_image_from_x_face_header): use sscanf field limit.
+
+2012-07-22  Peter Bloomfield
+
+	* libbalsa/imap/siobuf.c (sio_set_tlsclient_ssl),
+	(sio_set_tlsserver_ssl), (raw_read): reduce scope of variables.
+
+2012-07-22  Peter Bloomfield
+
+	* libbalsa/imap/pop3.c (parse_list_response): use sscanf field
+	limits.
+
+2012-07-22  Peter Bloomfield
+
+	* libbalsa/imap/imap_tst.c (get_user), (user_cb): reduce scope
+	of variables.
+
+2012-07-22  Peter Bloomfield
+
+	* libbalsa/imap/imap_search.c (imap_search_key_new_string),
+	(imap_search_exec_unlocked): reduce scope of variables.
+
+2012-07-22  Peter Bloomfield
+
+	* libbalsa/imap/imap-tls.c (imap_check_server_identity): reduce
+	scope of variable.
+
+2012-07-22  Peter Bloomfield
+
+	* libbalsa/imap/imap-handle.c (imap_handle_disconnect),
+	(imap_cmd_step), (imap_get_sequence), (ir_get_append_copy_uids),
+	(ir_status), (ir_quota), (ir_body_extension),
+	(ir_handle_response): suppress unread-variable error, use sscanf
+	field limits, reduce scope.
+
+2012-07-22  Peter Bloomfield
+
+	* libbalsa/imap/imap-commands.c (imap_assure_needed_flags),
+	(imap_mbox_sort_msgno_srv), (imap_mbox_sort_filter): reduce
+	scope of variables.
+
+2012-07-22  Peter Bloomfield
+
+	* libbalsa/imap-server.c (libbalsa_imap_server_get_handle,
+	libbalsa_imap_server_get_handle_with_user): reduce scope of
+	variables; suppress incorrect null pointer error.
+
+2012-07-22  Peter Bloomfield
+
+	* libbalsa/gmime-multipart-crypt.c (sign_prepare): reduce scope.
+
+2012-07-22  Peter Bloomfield
+
+	* libbalsa/gmime-gpgme-signature.h: suppress cppcheck syntax
+	error.
+
+2012-07-22  Peter Bloomfield
+
+	* libbalsa/address-book-extern.c (parse_externq_file): use
+	*scanf field limits to satisfy cppcheck.
+
+2012-07-15  Peter Bloomfield
+
+	* src/mailbox-node.c (balsa_mailbox_local_append): simplify.
+
+2012-07-15  Peter Bloomfield
+
+	* libbalsa/mailbox_imap.c (imap_cache_manager_new_from_file): do
+	not leak FILE on error.
+
+2012-07-15  Peter Bloomfield
+
+	* libbalsa/imap/pop3.c (pop_check_status): remove redundant else
+	clause.
+
+2012-07-15  Peter Bloomfield
+
+	* libbalsa/identity.h: typo.
+
+2012-07-15  Peter Bloomfield
+
+	* libbalsa/identity.c (libbalsa_identity_get_signature): limit
+	scope of fp.
+
+2012-07-15  Peter Bloomfield
+
+	* src/sendmsg-window.c (edit_with_gnome): plug mem leak.
+
+2012-07-15  Peter Bloomfield
+
+	* libbalsa/address.c (libbalsa_address_extract_name): plug mem
+	leak.
+
+2012-07-15  Peter Bloomfield
+
+	* libbalsa/address-book-ldif.c
+	(libbalsa_address_book_ldif_save_address): fseek before writing
+	to stream.
+
+2012-07-15  Peter Bloomfield
+
+	* libbalsa/imap/imap_compress.c (imap_compress_init): memset
+	size of struct, not size of pointer to struct.
+
+2012-07-15  Peter Bloomfield
+
+	* src/balsa-mime-widget-text.c (structured_phrases_toggle):
+	typo.
+
+2012-07-15  Peter Bloomfield
+
+	* libbalsa/imap/imap_search.c (imap_write_key_string): typo.
+
+2012-07-15  Albrecht Dreß
+
+	* src/sendmsg-window.c (edit_with_gnome): fix mem leak on error.
+
+2012-07-15  Albrecht Dreß
+
+	* src/mailbox-conf.c (mailbox_conf_delete): fix mem leak on
+	error.
+
+2012-07-15  Albrecht Dreß
+
+	* src/information-dialog.c (balsa_information_real): fix mem
+	leak on NULL main widget.
+
+2012-07-15  Albrecht Dreß
+
+	* src/folder-conf.c (folder_conf_imap_sub_node): fix mem leak
+	on error.
+
+2012-07-15  Albrecht Dreß
+
+	* src/balsa-index.c (bndx_start_pipe_messages_array): fix mem
+	leak on error.
+
+2012-07-15  Albrecht Dreß
+
+	* libbalsa/mailbox_mbox.c (libbalsa_mailbox_mbox_add_message):
+	fix mem leak on error.
+
+2012-07-15  Albrecht Dreß
+
+	* libbalsa/mailbox_imap.c (imap_cache_manager_new_from_file): do
+	not leak open file on error.
+
+2012-07-15  Albrecht Dreß
+
+	* libbalsa/filter-funcs.c (libbalsa_filter_export_sieve): do not
+	leak open file.
+
+2012-07-15  Albrecht Dreß
+
+	* libbalsa/address-book-ldap.c
+	(libbalsa_address_book_ldap_get_address): drop useless
+	assignment to nick_name, fix mem leak;
+	(libbalsa_address_book_ldap_modify_address): fix mem leak.
+
+2012-07-15  Albrecht Dreß
+
+	* libbalsa/address-book-extern.c (parse_externq_file): pipe
+	stream must be closed with pclose, not fclose.
+
+2012-07-13  Peter Bloomfield
+
+	* libbalsa/mime.c (process_mime_part): build
+	--with-html-widget=no; fixes bgo #679869 (Aljosha).
+
+2012-07-04  Peter Bloomfield
+
+	* src/main-window.c: manage sensitivity of check mail button in
+	unthreaded build.
+
+2012-06-27  Peter Bloomfield
+
+	* src/save-restore.c (config_load_sections), (config_mailbox_init),
+	(config_address_book_load), (config_address_books_load),
+	(config_identities_load), (load_mru): prepend to GList and
+	reverse it, instead of appending; use g_list_free_full().
+
+2012-06-25  Peter Bloomfield
+
+	* libbalsa/mailbox.c (libbalsa_mailbox_msgno_filt_out),
+	(lbm_msgno_filt_check): find node once, not twice.
+
+2012-06-19  Peter Bloomfield
+
+	* libbalsa/mailbox.c (lbm_node_has_unseen_child),
+	(lbm_get_index_entry), (mbox_model_get_value): get index entry
+	by message number instead of by GNode.
+
+2012-06-13  Peter Bloomfield
+
+	* libbalsa/mailbox.c (lbm_msgno_inserted_idle_cb): lock mutex
+	before signalling cond.
+
+2012-06-13  Peter Bloomfield
+
+	* src/balsa-app.c (find_url_idle_cb): lock mutex before
+	signalling cond.
+
+2012-06-12  Peter Bloomfield
+
+	* libbalsa/mailbox.c (lbm_message_expunged_cb),
+	(lbm_msgno_removed_idle_cb), (libbalsa_mailbox_msgno_removed),
+	(lbm_msgno_filt_check_idle_cb),
+	(libbalsa_mailbox_msgno_filt_check): update message number if a
+	message is expunged.
+
+2012-06-11  Peter Bloomfield
+
+	* libbalsa/mailbox.c (lbm_msgno_filt_check_idle_cb): unref the
+	LibBalsaMailboxSearchIter.
+
+2012-06-11  Peter Bloomfield
+
+	* libbalsa/imap-server.c: remove redundant parentheses.
+
+2012-06-11  Peter Bloomfield
+
+	Ref count LibBalsaMailboxSearchIter
+
+	* libbalsa/mailbox.c (libbalsa_mailbox_run_filters_on_reception),
+	(libbalsa_mailbox_msgno_filt_check),
+	(libbalsa_mailbox_search_iter_new),
+	(libbalsa_mailbox_search_iter_ref),
+	(libbalsa_mailbox_search_iter_unref),
+	(libbalsa_mailbox_messages_change_flags): ref count
+	LibBalsaMailboxSearchIter, and unref it instead of free.
+	* libbalsa/mailbox.h: new member ref_count.
+	* libbalsa/mailbox_local.c (lbm_local_update_view_filter): unref
+	LibBalsaMailboxSearchIter instead of free.
+	* src/balsa-index.c (bndx_destroy),
+	(bndx_select_next_with_flag): ditto.
+	* src/filter-run-callbacks.c (run_filters_on_mailbox): ditto.
+	* src/main-window.c: ditto.
+
+2012-06-10  Peter Bloomfield
+
+	* libbalsa/libbalsa.c (libbalsa_scanner_error_quark),
+	(libbalsa_mailbox_error_quark), (libbalsa_image_error_quark):
+	GQuarks for GError.
+	* libbalsa/libbalsa.h: export them.
+
+2012-06-10  Peter Bloomfield
+
+	* libbalsa/imap/pop3.c (pop_imap_error_quark): a GQuark for use
+	in g_set_error.
+	* libbalsa/imap/pop3.h: export it.
+
+2012-06-09  Peter Bloomfield
+
+	* libbalsa/mailbox.h: do not export
+	libbalsa_mailbox_msgno_filt_{in,out}.
+	* libbalsa/mailbox.c: declare them static.
+
+2012-06-09  Peter Bloomfield
+
+	* libbalsa/mailbox.c (lbm_msgno_filt_check),
+	(lbm_msgno_filt_check_idle_cb),
+	(libbalsa_mailbox_msgno_filt_check): check whether message
+	matches current view filter in an idle callback instead of in
+	subthread.
+
+2012-06-08  Peter Bloomfield
+
+	* libbalsa/mailbox.c (lbm_msgno_removed_idle_cb),
+	(libbalsa_mailbox_msgno_removed): use GSlice instead of g_new();
+	use g_idle_add instead of gdk_threads_add_idle.
+
+2012-06-08  Peter Bloomfield
+
+	* libbalsa/mailbox.c (lbm_check_and_sort),
+	(lbm_set_threading_idle_cb), (lbm_set_threading): sort in an
+	idle callback instead of subthread.
+	* libbalsa/mailbox_local.c (lbml_set_threading),
+	(lbml_set_threading_idle_cb),
+	(libbalsa_mailbox_local_set_threading): set threading type in an
+	idle callback instead of subthread.
+
+2012-06-07  Peter Bloomfield
+
+	* src/main.c (progress_set_text), (progress_set_text_idle_cb),
+	(balsa_progress_set_text), (progress_set_fraction),
+	(progress_set_fraction_idle_cb), (balsa_progress_set_fraction):
+	call Gtk in idle callbacks instead of subthreads.
+
+2012-06-07  Peter Bloomfield
+
+	* libbalsa/mailbox.c (lbm_msgno_inserted),
+	(lbm_msgno_inserted_idle_cb), (libbalsa_mailbox_msgno_inserted):
+	block subthread and use an idle callback to insert message in
+	main thread.
+	* libbalsa/mailbox_local.c
+	(libbalsa_mailbox_local_load_messages): do not grab GDK lock.
+
+2012-06-07  Peter Bloomfield
+
+	* libbalsa/libbalsa.c (libbalsa_threads_enter): warn when
+	locking a subthread, to help find bad code paths.
+
+2012-06-07  Peter Bloomfield
+
+	* src/main-window.c: check for NULL index.
+
+2012-06-07  Peter Bloomfield
+
+	* src/balsa-index.c (bndx_find_root): check for NULL tree model.
+
+2012-06-07  Peter Bloomfield
+
+	* src/main-window.c: check for NULL focus widget.
+
+2012-06-06  Peter Bloomfield
+
+	* libbalsa/mailbox.c (libbalsa_mailbox_close), (lbm_msgno_removed),
+	(lbm_msgno_removed_idle_cb), (libbalsa_mailbox_msgno_removed):
+	use an idle callback to remove the message from the tree-model.
+
+2012-06-06  Peter Bloomfield
+
+	* src/balsa-app.c (find_url_func), (find_url), (find_url_idle_cb),
+	(balsa_find_url): block the subthread and use an idle callback
+	to find the BalsaMailboxNode for the URL.
+
+2012-06-06  Peter Bloomfield
+
+	* libbalsa/mime-stream-shared.c
+	(libbalsa_mime_stream_shared_lock): build with glib < 2.32.
+
+2012-06-05  Peter Bloomfield
+
+	Make changes in previous commit conditional on glib version
+	at least 2.32.
+
+	* libbalsa/imap-server.c (libbalsa_imap_server_init),
+	(libbalsa_imap_server_finalize): make previous changes
+	conditional on glib version at least 2.32.
+	* libbalsa/libbalsa-conf.c (lbc_lock), (lbc_unlock): ditto.
+	* libbalsa/mime-stream-shared.c (lbmss_stream_class_init),
+	(libbalsa_mime_stream_shared_lock),
+	(libbalsa_mime_stream_shared_unlock): ditto.
+
+2012-06-05  Peter Bloomfield
+
+	Deprecation cleanup; fixes bgo #677381
+
+	* libbalsa/imap-server.c (libbalsa_imap_server_init),
+	(libbalsa_imap_server_finalize): deprecation cleanup.
+	* libbalsa/libbalsa-conf.c (lbc_lock), (lbc_unlock): ditto.
+	* libbalsa/mime-stream-shared.c (lbmss_stream_class_init),
+	(libbalsa_mime_stream_shared_lock),
+	(libbalsa_mime_stream_shared_unlock): ditto.
+
+2012-06-03  Peter Bloomfield
+
+	* src/main-window.c: change sensitivity of mail-check button in
+	the main thread, in an idle callback.
+
+2012-06-03  Peter Bloomfield
+
+	Call Gtk from only the main thread when opening a mailbox
+
+	* libbalsa/mailbox.c (lbm_cache_message): avoid infinite
+	recursion.
+	* libbalsa/mailbox.h: do not export
+	libbalsa_mailbox_index_entry_new_from_msg.
+	* src/balsa-index.c (bndx_set_mailbox), (bndx_open_mailbox),
+	(balsa_index_load_mailbox_node): open mailbox in a subthread.
+	* src/balsa-index.h: do not export balsa_index_load_mailbox_node
+	and balsa_index_scroll_on_open.
+	* src/main-window.c: start opening mailbox in the main thread.
+
+2012-05-28  Peter Bloomfield
+
+	* src/balsa-index.c (bi_view_on_open,
+	balsa_index_scroll_on_open): set the cursor on the most recent
+	message, even when not selecting it.
+
+2012-05-28  Peter Bloomfield
+
+	* src/main-window.c: restore "identities-changed" signal.
+
+2012-05-28  Peter Bloomfield
+
+	* src/main-window.c: show mailbox list on startup only if
+	necessary; fixes point 1 of
+	<URL:https://mail.gnome.org/archives/balsa-list/2012-May/
+	msg00011.html> (Carlos Franke).
+
+2012-05-27  Peter Bloomfield
+
+	* src/main-window.c: use class methods instead of emitting
+	signals.
+	* src/main-window.h: define class getter.
+
 2012-05-21  Peter Bloomfield
 
 	* libbalsa/imap/md5-utils.c (md5_final): avoid gcc whining.
 
-2012-04-21  Pawel Salek
+2012-04-22  Pawel Salek
 
-	* NEWS, configure.in: release balsa-2.4.12
+	* src/balsa-app.{c,h}: free mem on exit. Longer 'short' mailbox names.
+	* src/balsa-mblist.c: use them.
+	* src/mailbox-node.h: remove unused bit field.
+	* src/main-window.c: check_mailboxes must be called from main thread.
+
+2012-04-20  Peter Bloomfield
+
+	* src/main-window.c: hide current message immediately, instead
+	of in the idle callback; use gdk_threads_add_idle convenience
+	function.
+	* src/balsa-message.c (balsa_message_set): message is already
+	hidden.
+
+2012-04-19  Peter Bloomfield
+
+	* libbalsa/body.c (libbalsa_message_body_get_pixbuf): apply
+	embedded orientation to pixbuf.
+
+2012-04-16  Peter Bloomfield
+
+	* src/balsa-mblist.c (balsa_mblist_mru_add): add folder to the
+	MRU folder list as well as to the given list, if different.
+
+2012-04-16  Peter Bloomfield
+
+	Revert previous commit; fixes
+	<URL:http://mail.gnome.org/archives/balsa-list/2012-April/msg00003.html>
+	from Ildar Mulyukov
+
+	* src/balsa-app.c (balsa_app_init):
+	* src/balsa-app.h:
+	* src/save-restore.c (config_mailbox_set_as_special),
+	(config_global_load), (config_save):
+	* src/sendmsg-window.c (create_info_pane):
+
+2012-03-27  Peter Bloomfield
+
+	Use a single MRU folder list
+
+	* src/balsa-app.h: drop separate Fcc list.
+	* src/balsa-app.c (balsa_app_init): ditto.
+	* src/save-restore.c (config_mailbox_set_as_special): use
+	combined list;
+	(config_global_load), (config_save): do not save and restore
+	separate Fcc list.
+	* src/sendmsg-window.c (create_info_pane): use combined list.
+
+2012-03-27  Peter Bloomfield
+
+	Remember geometry of MRU mailbox tree
+
+	* src/balsa-app.h: new members mru_tree_{width,height}
+	* src/balsa-mblist.c (bmbl_mru_size_allocate_cb): save them when
+	the dialog's size is changed;
+	(bmbl_mru_show_tree): use the saved values.
+	* src/save-restore.c (config_global_load), (config_save): save
+	and restore them.
+
+2012-03-20  Peter Bloomfield
+
+	* configure.in: work around "intltool-update -m" bug: it knows
+	about m4_esyscmd, not m4_esyscmd_s.
+
+2012-03-06  Peter Bloomfield
+
+	* src/main-window.c: update last-check-time only if connected.
+
+2012-03-06  Peter Bloomfield
+
+	* src/main-window.c: check local mailboxes even when network is
+	not connected.
+
+2012-03-06  Peter Bloomfield
+
+	* libbalsa/libbalsa-gpgme-cb.c (lb_gpgme_passphrase): build
+	with --disable-threads.
 
 2012-02-08  Albrecht Dreß
 
@@ -172,34 +3876,64 @@
 
 2011-12-18  Peter Bloomfield
 
+	* src/main.c (balsa_check_open_mailboxes),
+	(scan_mailboxes_idle_cb), (balsa_check_open_compose_window),
+	(real_main), (handle_remote): reuse identical code.
+
+2011-12-18  Peter Bloomfield
+
 	* .cvsignore: delete.
 	* .gitignore: add.
 
-2011-12-11  Peter Bloomfield
+2011-12-17  Peter Bloomfield
 
-	* libbalsa/libbalsa-gpgme-cb.c: include stdlib.h directly
+	* src/main.c (handle_remote): do not leak option-handling
+	resources.
 
-2011-12-11  Peter Bloomfield
+2011-12-17  Peter Bloomfield
 
-	Define G_CONST_RETURN as const and use g_format_size(),
-	to avoid deprecation breakage
+	* src/main-window.c: build --without-nm; thanks to Jack
+	<URL:http://mail.gnome.org/archives/balsa-list/2011-December/msg00013.html>.
 
-	* libbalsa/libbalsa.c: define G_CONST_RETURN as const.
-	* src/balsa-mime-widget-text.c: ditto.
-	* src/main.c: ditto.
-	* src/sendmsg-window.c (render_attach_size): use
-	g_format_size().
+2011-12-17  Peter Bloomfield
 
-2011-12-11  Albrecht Dreß
+	* src/main.c (handle_remote): use the capabilities of
+	g_application_command_line_print.
 
-	New files needed for previous commit (Peter's oops)
+2011-12-17  Peter Bloomfield
 
-	* libbalsa/gmime-multipart-crypt.c
-	* libbalsa/gmime-multipart-crypt.h
-	* libbalsa/libbalsa-gpgme-cb.c
-	* libbalsa/libbalsa-gpgme-cb.h
-	* libbalsa/libbalsa-gpgme.c
-	* libbalsa/libbalsa-gpgme.h
+	* src/main.c (scan_mailboxes_idle_cb), (real_main),
+	(handle_remote), (command_line_cb): free option-handling resources
+	when no longer needed, instead of later; ignore other options
+	when --get-stats is requested by a second instance, as in the
+	primary instance; add comments to document logic.
+
+2011-12-16  Peter Bloomfield
+
+	* src/main.c: do not leak option-context; use opt-attach-list as
+	gchar ** instead of GSlist; do not pass GApplication to
+	handle-remote.
+
+2011-12-16  Peter Bloomfield
+
+	* src/sendmsg-window.c: drop ctrl-Q accelerator for
+	file:queue-for-sending.
+
+2011-12-15  Peter Bloomfield
+
+	Migrate to GApplication
+
+	* GNOME_Balsa.server.in: remove obsolete file.
+	* Makefile.am: remove reference to obsolete file.
+	* configure.in: remove libUnique configuration, and bump glib
+	requirement to 2.28.
+	* src/main.c (balsa_init), (scan_mailboxes_idle_cb), (real_main),
+	(balsa_cleanup), (handle_remote), (command_line_cb), (main):
+	migrate to GApplication.
+
+2011-12-10  Peter Bloomfield
+
+	* libbalsa/libbalsa-gpgme-cb.c: include stdlib.h directly.
 
 2011-12-10  Albrecht Dreß
 
@@ -234,15 +3968,43 @@
 	* src/balsa-message.c (libbalsa_msg_part_2440): ditto.
 	* src/main.c (main): ditto.
 
-2011-11-27  Peter Bloomfield
+2011-12-03  Peter Bloomfield
 
-	Build with GMime 2.6.0
+	* src/sendmsg-window.c (create_text_area): remove redundant
+	dynamic cast; use more appropriate identifier.
 
-	* configure.in: check for GMime >= 2.5.7
+2011-12-03  Peter Bloomfield
+
+	* src/sendmsg-window.c (create_text_area): build without
+	GtkSourceView.
+
+2011-12-02  Peter Bloomfield
+
+	Add mailto-handler desktop file
+
+	* balsa-mailto-handler.desktop.in.in: new file.
+	* balsa.desktop.in.in: do not use -m.
+
+2011-11-12  Peter Bloomfield
+
+	* libbalsa/rfc3156.c (libbalsa_body_check_signature): use only
+	one dynamic cast.
+
+2011-11-10  Peter Bloomfield
+
+	* libbalsa/rfc3156.c (libbalsa_body_check_signature): restore
+	handling of application/x-pkcs7-signature.
+
+2011-11-09  Peter Bloomfield
+
+	Build with GMime version >= 2.5.7
+
+	* configure.in: check GMime version.
 	* libbalsa/gmime-application-pkcs7.c
 	(g_mime_application_pkcs7_sign), (g_mime_application_pkcs7_verify),
 	(g_mime_application_pkcs7_encrypt),
-	(g_mime_application_pkcs7_decrypt): build with GMime >= 2.5.7.
+	(g_mime_application_pkcs7_decrypt): build with GMime version >=
+	2.5.7.
 	* libbalsa/gmime-application-pkcs7.h: ditto.
 	* libbalsa/gmime-gpgme-context.c (g_mime_gpgme_context_get_type),
 	(g_mime_gpgme_context_class_init), (g_mime_gpgme_context_finalize),
@@ -250,17 +4012,23 @@
 	* libbalsa/gmime-gpgme-context.h: ditto.
 	* libbalsa/gmime-part-rfc2440.c (g_mime_part_rfc2440_sign_encrypt),
 	(g_mime_part_rfc2440_verify), (g_mime_part_rfc2440_decrypt):
-	ditto.
 	* libbalsa/gmime-part-rfc2440.h: ditto.
 	* libbalsa/rfc3156.c (password_request_func),
 	(libbalsa_sign_mime_object), (libbalsa_encrypt_mime_object),
 	(libbalsa_body_check_signature), (libbalsa_body_decrypt): ditto.
 
-2011-11-22  Pawel Salek
+2011-10-26  Peter Bloomfield
 
-	* NEWS, configure.in: release balsa-2.4.11
+	* src/sendmsg-window.c (create_info_pane): do not set vertical
+	expand flag on attachment frame, it causes weird vertical
+	spacing when the attachments are shown.
 
-2011-10-24  Peter Bloomfield  <peter@t43.bellsouth.net>
+2011-10-26  Peter Bloomfield
+
+	* src/main.c (threads_init): use g_type_init, which is required,
+	not g_threads_init, which is redundant.
+
+2011-10-24  Peter Bloomfield
 
 	* src/main.c (balsa_handle_automation_options), (balsa_init),
 	(scan_mailboxes_idle_cb): handle multiple -o options.
@@ -270,6 +4038,259 @@
 	* src/balsa-app.c (open_mailboxes_idle_cb): select first
 	command-line mailbox; see discussion at
 	http://mail.gnome.org/archives/balsa-list/2011-October/msg00010.html
+
+2011-10-21  Peter Bloomfield
+
+	* src/main-window.c: when network is connected, check mail in
+	the subthread, so that the signal handler can return.
+
+2011-10-14  Peter Bloomfield
+
+	gtk_assistant_set_page_header_image and
+	gtk_assistant_set_page_side_image are deprecated.
+
+	* images/Makefile.am: no need for balsa-logo.png and
+	balsa-watermark.png.
+	* libinit_balsa/assistant_init.c (balsa_initdruid):
+	* libinit_balsa/assistant_page_defclient.c
+	(balsa_druid_page_defclient):
+	* libinit_balsa/assistant_page_defclient.h:
+	* libinit_balsa/assistant_page_directory.c
+	(balsa_druid_page_directory):
+	* libinit_balsa/assistant_page_directory.h:
+	* libinit_balsa/assistant_page_finish.c (balsa_druid_page_finish):
+	* libinit_balsa/assistant_page_finish.h:
+	* libinit_balsa/assistant_page_user.c (balsa_druid_page_user):
+	* libinit_balsa/assistant_page_user.h:
+	* libinit_balsa/assistant_page_welcome.c
+	(balsa_druid_page_welcome):
+	* libinit_balsa/assistant_page_welcome.h: deprecation cleanup.
+
+2011-10-14  Peter Bloomfield
+
+	Gtk{HV}Paned is deprecated.
+
+	* src/main-window.c: deprecation cleanup.
+
+2011-10-14  Peter Bloomfield
+
+	Gtk{HV}Separator is deprecated.
+
+	* src/filter-edit-dialog.c (filters_edit_dialog): deprecation
+	cleanup.
+
+2011-10-14  Peter Bloomfield
+
+	Gtk{HV}ButtonBox is deprecated.
+
+	* src/ab-main.c (bab_get_edit_button_box):
+	* src/ab-window.c (balsa_ab_window_init):
+	* src/balsa-mime-widget-vcalendar.c (balsa_vevent_widget):
+	* src/filter-edit-dialog.c (build_left_side), (build_right_side):
+	* src/filter-run-dialog.c (balsa_filter_run_dialog_init):
+	* src/main-window.c:
+	* src/toolbar-prefs.c (create_toolbar_page): deprecation
+	cleanup.
+
+
+2011-10-13  Peter Bloomfield
+
+	Gtk{HV}Box is deprecated.
+
+	* libbalsa/address.c (libbalsa_address_get_edit_widget):
+	* libbalsa/html.c (libbalsa_html_new):
+	* libbalsa/identity.c (append_ident_notebook_page),
+	(ident_dialog_add_boxes), (libbalsa_identity_config_dialog):
+	* libbalsa/rfc3156.c (select_key_from_list), (get_passphrase_real):
+	* libbalsa/smtp-server.c (libbalsa_smtp_server_dialog):
+	* libbalsa/source-viewer.c (libbalsa_show_message_source):
+	* libinit_balsa/assistant_page_defclient.c
+	(balsa_druid_page_defclient):
+	* libinit_balsa/assistant_page_directory.c
+	(balsa_druid_page_directory):
+	* libinit_balsa/assistant_page_user.c (balsa_druid_page_user):
+	* src/ab-main.c (bab_get_filter_box), (bab_window_new):
+	* src/ab-window.c (balsa_ab_window_init):
+	* src/balsa-app.c (balsa_stock_button_with_label):
+	* src/balsa-message.c (bm_header_tl_buttons), (bm_find_bar_new),
+	(balsa_message_init):
+	* src/balsa-mime-widget-crypto.c
+	(balsa_mime_widget_signature_widget),
+	(balsa_mime_widget_crypto_frame):
+	* src/balsa-mime-widget-message.c (balsa_mime_widget_new_message),
+	(bmw_message_extbody_url), (bmw_message_extbody_mail),
+	(balsa_mime_widget_new_message_tl), (bm_header_widget_new):
+	* src/balsa-mime-widget-multipart.c
+	(balsa_mime_widget_new_multipart):
+	* src/balsa-mime-widget-vcalendar.c
+	(balsa_mime_widget_new_vcalendar), (balsa_vevent_widget):
+	* src/balsa-mime-widget.c (balsa_mime_widget_new_unknown):
+	* src/filter-edit-callbacks.c (build_type_notebook),
+	(build_condition_dialog):
+	* src/filter-edit-dialog.c (build_left_side), (build_match_page),
+	(build_action_page), (build_right_side), (filters_edit_dialog):
+	* src/filter-run-dialog.c (balsa_filter_run_dialog_init):
+	* src/folder-conf.c (folder_conf_imap_sub_node):
+	* src/mailbox-conf.c (balsa_server_conf_get_advanced_widget):
+	* src/main-window.c:
+	* src/message-window.c (message_window_new):
+	* src/pref-manager.c (open_preferences_manager),
+	(vbox_in_container), (color_box), (remote_mailbox_servers_group),
+	(outgoing_mail_group), (checking_group), (message_colors_group),
+	(add_pref_menu), (misc_group), (deleting_messages_group),
+	(folder_scanning_group), (address_books_group), (pm_page_new),
+	(pm_group_new):
+	* src/print-gtk.c (message_prefs_widget):
+	* src/sendmsg-window.c (sw_get_user_codeset),
+	(quote_parts_select_dlg), (sendmsg_window_new),
+	(subject_not_empty), (check_suggest_encryption):
+	* src/toolbar-prefs.c (customize_dialog_cb),
+	(create_toolbar_page): deprecation cleanup.
+
+2011-10-13  Peter Bloomfield
+
+	* src/sendmsg-window.h: remove redundant member header_table.
+	* src/sendmsg-window.c (create_email_or_string_entry),
+	(create_string_entry), (create_email_entry), (create_from_entry),
+	(create_info_pane), (create_text_area): ditto; migrate from
+	GtkTable to GtkGrid.
+
+2011-10-13  Peter Bloomfield
+
+	* src/print-gtk.c (begin_print), (add_font_button),
+	(add_margin_spinbtn), (message_prefs_widget): migrate from
+	GtkTable to GtkGrid.
+
+2011-10-13  Peter Bloomfield
+
+	* src/pref-manager.c (attach_entry), (attach_entry_full),
+	(attach_information_menu), (attach_label), (checking_group),
+	(quoted_group), (broken_8bit_codeset_group), (mdn_group),
+	(word_wrap_group), (other_options_group), (main_window_group),
+	(display_formats_group), (information_messages_group),
+	(attach_font_button), (preview_font_group), (create_grid),
+	(message_window_group): migrate from GtkTable to GtkGrid.
+
+2011-10-06  Peter Bloomfield
+
+	* src/main-window.c: migrate from GtkTable to GtkGrid.
+
+2011-10-06  Peter Bloomfield
+
+	* src/mailbox-conf.c (balsa_server_conf_get_advanced_widget),
+	(balsa_server_conf_add_checkbox), (balsa_server_conf_add_spinner),
+	(create_local_mailbox_dialog), (create_pop_mailbox_dialog),
+	(create_imap_mailbox_dialog), (mailbox_conf_view_new_full),
+	(mailbox_conf_view_new): migrate from GtkTable to GtkGrid.
+	* src/mailbox-conf.h: ditto.
+
+2011-10-06  Peter Bloomfield
+
+	* src/folder-conf.c (folder_conf_imap_node),
+	(folder_conf_imap_sub_node): migrate from GtkTable to GtkGrid.
+
+2011-10-06  Peter Bloomfield
+
+	* src/filter-edit-dialog.c (build_match_page),
+	(fe_make_color_buttons), (build_action_page),
+	(build_right_side): migrate from GtkTable to GtkGrid.
+
+2011-10-06  Peter Bloomfield
+
+	* src/filter-edit-callbacks.c (build_type_notebook): add a
+	margin to notebook pages.
+
+2011-10-06  Peter Bloomfield
+
+	* src/filter-edit-callbacks.c (add_button), (add_check),
+	(get_field_frame), (build_type_notebook): migrate from GtkTable
+	to GtkGrid.
+
+2011-10-05  Peter Bloomfield
+
+	* src/balsa-mime-widget-vcalendar.c (balsa_vevent_widget):
+	migrate from GtkTable to GtkGrid.
+
+2011-10-05  Peter Bloomfield
+
+	* src/address-book-config.c (create_gpe_dialog): build with GPE
+	address book.
+
+2011-10-05  Peter Bloomfield
+
+	* src/balsa-mime-widget-text.c (bm_widget_new_vcard): make
+	button span two columns, and left-align labels instead of right.
+
+2011-10-04  Peter Bloomfield
+
+	* src/balsa-mime-widget-text.c (bm_widget_new_vcard): migrate
+	from GtkTable to GtkGrid.
+
+2011-10-04  Peter Bloomfield
+
+	* src/address-book-config.c (add_radio_buttons),
+	(create_local_dialog), (create_externq_dialog),
+	(create_ldap_dialog), (create_gpe_dialog): migrate from GtkTable
+	to GtkGrid.
+
+2011-10-04  Peter Bloomfield
+
+	* src/ab-window.c (balsa_ab_window_init): migrate from GtkTable
+	to GtkGrid.
+
+2011-10-03  Peter Bloomfield
+
+	Migrate from GtkTable to GtkGrid
+
+	* libinit_balsa/assistant_helper.c (balsa_init_add_grid_entry),
+	(balsa_init_add_grid_option), (balsa_init_add_grid_checkbox):
+	* libinit_balsa/assistant_helper.h:
+	* libinit_balsa/assistant_page_directory.c
+	(balsa_druid_page_directory_init):
+	* libinit_balsa/assistant_page_user.c (balsa_druid_page_user_init):
+
+2011-10-03  Peter Bloomfield
+
+	* libbalsa/smtp-server.c (smtp_server_add_widget),
+	(libbalsa_smtp_server_dialog): migrate from GtkTable to GtkGrid.
+
+2011-10-03  Peter Bloomfield
+
+	* libbalsa/identity.c (append_ident_notebook_page),
+	(setup_ident_frame), (ident_dialog_add_checkbutton),
+	(ident_dialog_add_check_and_entry), (ident_dialog_add_entry),
+	(ident_dialog_add_file_chooser_button), (ident_dialog_add_boxes),
+	(ident_dialog_add_gpg_menu), (ident_dialog_add_smtp_menu):
+	migrate from GtkTable to GtkGrid.
+
+2011-10-03  Peter Bloomfield
+
+	* libbalsa/address.c (libbalsa_address_get_edit_widget): migrate
+	from GtkTable to GtkGrid.
+
+2011-10-03  Peter Bloomfield
+
+	* libbalsa/misc.c (libbalsa_create_grid),
+	(libbalsa_create_grid_label), (libbalsa_create_grid_check),
+	(libbalsa_create_grid_entry), (lb_create_size_group_func):
+	new GtkGrid helpers.
+	* libbalsa/misc.h: export them.
+
+2011-10-03  Peter Bloomfield
+
+	* src/pref-manager.c (remote_mailbox_servers_group),
+	(address_books_group), (address_book_add_cb), (server_add_cb),
+	(server_add_menu_widget): do not leak menus.
+
+2011-10-02  Peter Bloomfield
+
+	* src/pref-manager.c (address_book_add_cb), (server_add_cb): do
+	not ref-sink and unref popup menus.
+
+2011-10-02  Peter Bloomfield
+
+	* src/save-restore.c (config_defclient_save): do not use
+	uninitialized GError.
 
 2011-09-28  Peter Bloomfield
 
@@ -281,12 +4302,21 @@
 	* src/print-gtk.c (draw_page): use ngettext for plural; fixes
 	bgo #659390.
 
-2011-09-09  Peter Bloomfield  <peter@t43.bellsouth.net>
+2011-09-09  Peter Bloomfield
 
 	* src/main-window.c: use checking_mail_lock to protect access to
 	checking_mail.
 	* src/main.c (balsa_cleanup): ditto.
 	* src/threads.h: declare checking_mail.
+
+2011-09-08  Peter Bloomfield
+
+	* src/main-window.c: set view-filter in an idle callback.
+
+2011-09-06  Peter Bloomfield
+
+	* src/balsa-mblist.c (bmbl_mru_show_tree): try better default
+	size for mblist widget.
 
 2011-09-01  Peter Bloomfield
 
@@ -300,6 +4330,18 @@
 	* libbalsa/misc.c (libbalsa_text_attr_file): use GFile methods.
 	* src/sendmsg-window.c (sw_set_charset): check for error return.
 
+2011-08-30  Peter Bloomfield
+
+	* src/main-window.c: call gtk_container_resize_children after
+	adding the notebook page for a newly opened mailbox; should not
+	be necessary, but seems to fix
+	<URL:http://mail.gnome.org/archives/balsa-list/2011-August/msg00017.html>.
+
+2011-08-30  Peter Bloomfield
+
+	* configure.in: webkit can be used with threads disabled if glib
+	version is 2.24 or later.
+
 2011-08-29  Pawel Salek
 
 	* libbalsa/filter-funcs.c: implement libbalsa_condition_to_string_user
@@ -307,15 +4349,136 @@
 	* src/filter-edit-callbacks.c: use it to provide more user-friendly
 	filter view.
 
-2011-06-15  Peter Bloomfield
+2011-08-28  Peter Bloomfield
 
-	* src/main-window.c: use GDK_1 instead of new GDK_KEY_1 in alt-n
-	code.
+	* src/main-window.c: when network connection is reestablished,
+	check mail if elapsed time since last check exceeds mail check
+	interval.
+	* src/main-window.h: new member last_check_time.
 
-2011-06-13  Pawel Salek
+2011-08-28  Peter Bloomfield
 
-	* configure.in: gtkhtml-4.0 does not work with gtk-2.0
-	* NEWS: release balsa-2.4.10
+	* libbalsa/body.c (libbalsa_message_body_get_pixbuf): check for
+	error before closing loader.
+	* src/balsa-print-object-image.c (balsa_print_object_image): use
+	g_message instead of g_warning for image format error.
+
+2011-08-26  Peter Bloomfield
+
+	Make BalsaMimeWidgetImage a subclass of BalsaMimeWidget
+
+	* src/balsa-mime-widget-image.h: subclass boilerplate.
+	* src/balsa-mime-widget-image.c (balsa_mime_widget_image_init),
+	(balsa_mime_widget_image_class_init): ditto.
+	(balsa_mime_widget_image_dispose): disconnect signal handler.
+	(balsa_mime_widget_new_image): store signal handler id.
+
+2011-08-21  Peter Bloomfield
+
+	* libbalsa/libbalsa-vfs.c (libbalsa_vfs_get_size): get size as
+	guint64.
+	* libbalsa/libbalsa-vfs.h: ditto.
+	* src/sendmsg-window.c (add_attachment), (add_urlref_attachment),
+	(create_info_pane): ditto;
+	(render_attach_size): use g_format_size() instead of deprecated
+	g_format_size_for_display().
+
+2011-08-21  Peter Bloomfield
+
+	* libbalsa/address-view.c (lbav_ensure_blank_line_idle_cb):
+	remove irrelevant comment.
+	* src/sendmsg-window.c (create_info_pane): create "Reply-To:"
+	entry before regular recipients, so the latter get the focus.
+
+2011-08-20  Peter Bloomfield
+
+	* src/main-window.h: add BalsaWindow::bottom_bar.
+	* src/main-window.c: use it to hide both the progress bar and
+	the status bar.
+
+2011-08-20  Peter Bloomfield
+
+	(lbav_ensure_blank_line): use gdk_threads_add_idle() for
+	convenience;
+	* libbalsa/address-view.c (lbav_ensure_blank_line_idle_cb): no
+	need to check GSource removal.
+
+2011-08-20  Peter Bloomfield
+
+	* src/sendmsg-window.c (create_lang_menu): use
+	enchant_broker_dict_exists() to check languages for Balsa's
+	spell-checker.
+
+2011-08-19  Peter Bloomfield
+
+	* libbalsa/address-view.c (lbav_ensure_blank_line_idle_cb),
+	(lbav_set_text), (lbav_editing_done), (lbav_row_editing_cb),
+	(libbalsa_address_view_new): use GtkCellEditable's
+	"editing-done" signal to capture address, instead of
+	GtkCellRendererText's "edited" and "editing-canceled" signals.
+
+2011-08-15  Peter Bloomfield
+
+	* configure.in: when building with-gtkspell, check for
+	gtkspell-3.0; do not warn about gtkspell or html widget.
+
+2011-08-09  Peter Bloomfield
+
+	Migrate spell-checker from PSpell to Enchant
+
+	* configure.in: change tests.
+	* src/balsa-app.c (balsa_app_init): remove all PSpell options.
+	* src/balsa-app.h: ditto
+	* src/pref-manager.c (open_preferences_manager), (apply_prefs),
+	(set_prefs), (create_spelling_page): ditto.
+	* src/save-restore.c (config_global_load), (config_save):
+	* src/sendmsg-window.c (spell_check_cb): ditto.
+	* src/spell-check.c (balsa_spell_check_class_init),
+	(spch_set_property), (spch_get_property), (balsa_spell_check_new),
+	(balsa_spell_check_new_with_text), (balsa_spell_check_set_text),
+	(balsa_spell_check_set_language), (balsa_spell_check_init),
+	(ignore_cb), (ignore_all_cb), (change_cb), (change_all_cb),
+	(learn_cb), (cancel_cb), (done_cb), (balsa_spell_check_start),
+	(balsa_spell_check_next), (highlight_idle),
+	(balsa_spell_check_learn), (balsa_spell_check_fix),
+	(balsa_spell_check_destroy), (spch_finish), (setup_suggestions),
+	(check_word), (finish_check), (check_error), (next_word),
+	(switch_word), (spch_save_word_iters), (spch_restore_word_iters):
+	migrate.
+	* src/spell-check.h: remove PSpell options.
+
+2011-07-21  Peter Bloomfield
+
+	* libbalsa/imap/siobuf.c (raw_write), (sio_flush_buffer),
+	(sio_flush): indicate when buffer has been deallocated.
+
+2011-07-13  Peter Bloomfield
+
+	* configure.in: remove references to gtk+-2.0.
+
+2011-06-22  Peter Bloomfield
+
+	Drop bad-address-color
+
+	* src/balsa-app.h:
+	* src/balsa-mime-widget-message.c (add_header_sigstate):
+	* src/pref-manager.c (open_preferences_manager), (apply_prefs),
+	(set_prefs), (colors_subpage):
+	* src/save-restore.c (config_global_load), (config_save):
+	* src/sendmsg-window.c (balsa_sendmsg_destroy_handler),
+	(create_info_pane):
+	* src/sendmsg-window.h:
+
+2011-06-22  Peter Bloomfield
+
+	* src/sendmsg-window.c (add_attachment): do not cast non-widget
+	to GtkWidget*.
+
+2011-06-10  Peter Bloomfield
+
+	* src/balsa-mime-widget-message.c (bm_header_widget_realized):
+	set the foreground and background colors for SELECTED state as
+	well as for NORMAL, so that selected text is distinguished.
 
 2011-06-05  Peter Bloomfield
 
@@ -330,11 +4493,12 @@
 
 2011-06-01  Peter Bloomfield
 
+	Respond to
+	<URL:http://mail.gnome.org/archives/balsa-list/2011-May/msg00023.html>
+
 	* src/sendmsg-window.c (setup_headers_from_message): make the
 	blank line in the recipient widget not a Bcc: line;
 	(setup_headers_from_identity): ditto.
-	* src/spell-check.c (balsa_spell_check_class_init): silence
-	gcc-4.6.
 
 2011-05-31  Peter Bloomfield
 
@@ -343,75 +4507,309 @@
 	because when NULL it creates a fake timestamp, which results in
 	the running window being presented.
 
-2011-05-28  Pawel Salek
+2011-05-28  Peter Bloomfield
 
-	* libbalsa/mime.c: Correct the conditional compilation regression
-	* configure.in: add gtkhtml-4.0 support.
-
-2011-05-27  Pawel Salek
-
-	* libbalsa/mime.c:
-	* libbalsa/send.c: get rid of compilation warnings.
+	* src/main.c (balsa_handle_automation_options): do not send
+	ACTIVATE when asked for status; see
+	http://mail.gnome.org/archives/balsa-list/2011-May/msg00015.html
 
 2011-04-16  Peter Bloomfield
 
-	Deprecation cleanup and fix gcc issues
+	Use GDesktopAppInfo instead of GAppInfo
+
+	* configure.in: add gio-unix-2.0 to gnome-extras so we can use
+	GDesktopAppInfo.
+	* src/save-restore.c (config_defclient_save): use GDesktopAppInfo
+	instead of GAppInfo to set Balsa as default client.
+
+2011-04-15  Peter Bloomfield
+
+	Fix bz #647695; Pawel's patch for master, with one change.
+
+	* src/balsa-message.c (bm_find_bar_new), (balsa_message_init),
+	(balsa_message_find_in_message): show all of the widget before
+	adding the find bar.
+	* src/message-window.c (message_window_new): show the widget,
+	not show all.
+
+2011-04-14  Peter Bloomfield
+
+	* src/save-restore.c (config_defclient_save): fix launch
+	commandline.
+
+2011-04-13  Peter Bloomfield
+
+	Migrate from GConf
+
+	* configure.in: do not check gconf-2.0.
+	* libinit_balsa/assistant_page_defclient.c
+	(balsa_druid_page_defclient_init), (balsa_druid_page_defclient),
+	(balsa_druid_page_defclient_toggle): use GAppInfo to check
+	default mailer.
+	* src/save-restore.c (config_defclient_save): use GAppInfo to
+	set default mailer.
+	* website/faq.html: update.
+
+2011-04-06  Peter Bloomfield
+
+	* src/main-window.c: implement alt-n to switch to mailbox n.
+
+2011-04-06  Peter Bloomfield
+
+	* balsa.desktop.in: declare Balsa to be
+	MimeType=x-scheme-handler/mailto.
+
+2011-04-05  Peter Bloomfield
+
+	* src/balsa-mime-widget-text.c (balsa_mime_widget_new_text): new
+	GtkSourceView macro.
+
+2011-02-05  Peter Bloomfield
+
+	* src/balsa-message.c (hide_all_parts): just destroy the
+	children, no need to recurse deeper.
+
+2011-02-05  Peter Bloomfield
+
+	* src/balsa-mblist.c (bmbl_init): remove redundant and crashing
+	column-set-visible.
+
+2011-02-05  Peter Bloomfield
+
+	* configure.in: GtkHtml-4 is the new GtkHtml-3.
+	* libbalsa/html.c (libbalsa_html_new), (lbh_size_request_cb):
+	ditto; do not connect to "size-request" signal.
+
+2011-01-30  Peter Bloomfield
+
+	Revert from GSettings to GConf for default client stuff
+
+	* configure.in:
+	* libinit_balsa/assistant_page_defclient.c
+	(balsa_druid_page_defclient):
+	* src/save-restore.c (config_defclient_save):
+
+2011-01-30  Peter Bloomfield
+
+	Silence whining from gcc-4.6
 
 	* libbalsa/files.c (libbalsa_icon_finder):
 	* libbalsa/filter-funcs.c (libbalsa_filter_export_sieve):
-	* libbalsa/identity.c (libbalsa_identity_get_signature),
-	(ident_dialog_add_gpg_menu), (add_show_menu),
-	(ident_dialog_add_smtp_menu):
+	* libbalsa/identity.c (libbalsa_identity_get_signature):
 	* libbalsa/imap-server.c (libbalsa_imap_server_finalize):
+	* libbalsa/imap/imap-handle.c (ir_esearch):
 	* libbalsa/mailbox_imap.c (libbalsa_mailbox_imap_open):
 	* libbalsa/mailbox_local.c (libbalsa_mailbox_local_load_config):
 	* libbalsa/mailbox_maildir.c
 	(libbalsa_mailbox_maildir_add_message):
-	* libbalsa/misc.c (libbalsa_charset_button_new):
 	* libbalsa/rfc2445.c (date_time_2445_to_time_t):
 	* libbalsa/rfc3156.c (get_passphrase_cb):
 	* libbalsa/server.c (libbalsa_server_user_cb):
 	* libbalsa/smtp-server.c (libbalsa_smtp_server_finalize),
-	(libbalsa_smtp_server_class_init), (smtp_server_tls_widget):
-	* libinit_balsa/assistant_helper.c (balsa_init_add_table_option):
-	* src/ab-window.c (balsa_ab_window_load_books),
-	(balsa_ab_window_init):
+	(libbalsa_smtp_server_class_init):
 	* src/address-book-config.c (create_generic_dialog):
-	* src/balsa-index.c (bndx_pipe_response), (balsa_index_pipe):
-	* src/balsa-mime-widget-text.c (text_view_populate_popup):
-	* src/filter-edit-callbacks.c (fe_user_header_add),
-	(get_field_frame):
-	* src/filter-edit-dialog.c (fe_build_option_menu):
-	* src/mailbox-conf.c (mailbox_conf_combo_box_make),
-	(balsa_server_conf_get_advanced_widget),
-	(mailbox_conf_view_new_full):
+	* src/main.c (config_init), (mailboxes_init):
+	* src/save-restore.c (config_filter_load), (config_filters_save),
+	(config_defclient_save):
+	* src/sendmsg-window.c (edit_with_gnome_check):
+	* src/spell-check.c (balsa_spell_check_class_init):
+
+2011-01-30  Peter Bloomfield
+
+	* src/toolbar-factory.c (balsa_toolbar_model_finalize),
+	(balsa_toolbar_model_new): do not refer to "org.gnome.*" when
+	not HAVE_GNOME;
+	(tm_populate), (tm_default_style): add empty second line only
+	for GTK_TOOLBAR_BOTH.
+
+2011-01-30  Peter Bloomfield
+
+	* configure.in: restore HAVE_GNOME to wrap reference to
+	"org.gnome.*".
+
+2011-01-30  Peter Bloomfield
+
+	* balsa.desktop.in: add MimeType=x-scheme-handler/mailto.
+
+2011-01-29  Peter Bloomfield
+
+	* src/toolbar-factory.c (balsa_toolbar_model_finalize),
+	(tm_gsettings_change_cb), (balsa_toolbar_model_new),
+	(tm_default_style): really use the desktop default when so
+	configured.
+
+2011-01-28  Peter Bloomfield
+
+	Migrate from GConf to GSettings
+
+	* libinit_balsa/assistant_page_defclient.c
+	(balsa_druid_page_defclient):
+	* src/ab-main.c (main):
+	* src/main.c (config_init), (mailboxes_init), (main):
+	* src/save-restore.c (config_global_load), (config_defclient_save):
+	* src/save-restore.h:
+	* src/toolbar-factory.c (tm_gsettings_change_cb),
+	(balsa_toolbar_model_new), (tm_default_style):
+
+2011-01-28  Peter Bloomfield
+
+	* src/balsa-index.c (balsa_index_load_mailbox_node): fix failed
+	assertion.
+
+2011-01-24  Peter Bloomfield
+
+	* configure.in: new deprecation tests GDK_MULTIHEAD_SAFE,
+	GDK_MULTIDEVICE_SAFE.
+	* libbalsa/files.c (libbalsa_icon_finder): add widget argument
+	so we can find settings.
+	* libbalsa/files.h: ditto.
+	* libbalsa/filter.c (libbalsa_filter_mailbox_messages):
+	deprecation cleanup.
+	* libbalsa/identity.c (help_ident_cb), (md_response_cb): ditto.
+	* libbalsa/smtp-server.c (smtp_server_response): ditto.
+	* libbalsa/source-viewer.c (copy_cb): ditto.
+	* src/address-book-config.c (help_button_cb): ditto.
+	* src/balsa-app.c (balsa_app_init): ditto.
+	* src/balsa-icons.c (load_balsa_pixmap): ditto.
+	* src/balsa-index.c (balsa_index_set_column_widths): ditto.
+	* src/balsa-message.c (display_part): ditto.
+	* src/balsa-mime-widget-message.c (extbody_call_url): ditto.
+	* src/balsa-mime-widget-text.c (fix_text_widget), (url_copy_cb),
+	(check_over_url), (handle_url), (fill_text_buf_cited): ditto.
+	* src/balsa-print-object-default.c (balsa_print_object_default):
+	ditto.
+	* src/balsa-print-object-text.c (balsa_print_object_text_vcard),
+	(balsa_print_object_text_calendar): ditto.
+	* src/filter-edit-callbacks.c (condition_dialog_response),
+	(fe_dialog_response): ditto.
+	* src/filter-run-callbacks.c (fr_dialog_response): ditto.
+	* src/folder-conf.c (folder_conf_response): ditto.
+	* src/main-window.c: ditto.
+	* src/pref-manager.c (balsa_help_pbox_display): ditto.
+	* src/sendmsg-window.c (on_open_url_cb), (add_attachment):
+	ditto.
+	* src/toolbar-prefs.c (tp_dialog_response_cb): ditto.
+
+2011-01-23  Peter Bloomfield
+
+	* src/balsa-mime-widget-text.c (text_view_url_popup):
+	deprecation cleanup.
+
+2011-01-23  Peter Bloomfield
+
+	* libbalsa/address-view.c (lbav_ensure_blank_line_idle_cb),
+	(libbalsa_address_view_new): clean up, and make
+	LibBalsaAddressView opaque.
+	* libbalsa/address-view.h: ditto.
+
+2011-01-23  Peter Bloomfield
+
+	* configure.in: change html-widget default to "webkit", and warn
+	if it is not chosen; change gtkspell default to "no", and warn
+	if it is not chosen; clarify GtkSourceView option.
+
+2011-01-21  Peter Bloomfield
+
+	* libbalsa/html.c (lbh_show_info_bar), (libbalsa_html_new): use
+	GtkBox packing instead of the event-box.
+
+2011-01-21  Peter Bloomfield
+
+	* libbalsa/html.c (lbh_info_bar_response_cb), (lbh_show_info_bar),
+	(lbh_resource_request_starting_cb), (libbalsa_html_new): put
+	info-bar in an event-box, and only when needed.
+
+2011-01-19  Peter Bloomfield
+
+	* src/save-restore.c (config_global_load), (save_color),
+	(load_color): save rgba() colors with "RGBA" suffix.
+
+2011-01-19  Peter Bloomfield
+
+	Pass default screen instead of NULL to gtk_show_uri
+
+	* libbalsa/identity.c (help_ident_cb):
+	* libbalsa/smtp-server.c (smtp_server_response):
+	* src/address-book-config.c (help_button_cb):
+	* src/balsa-mime-widget-message.c (extbody_call_url):
+	* src/balsa-mime-widget-text.c (store_button_coords),
+	(check_over_url), (handle_url):
+	* src/filter-edit-callbacks.c (condition_dialog_response),
+	(fe_dialog_response):
+	* src/filter-run-callbacks.c (fr_dialog_response):
+	* src/folder-conf.c (folder_conf_response):
 	* src/main-window.c:
-	* src/pref-manager.c (add_show_menu), (pm_combo_box_new):
-	* src/save-restore.c (config_filter_load), (config_filters_save):
-	* src/sendmsg-window.c (edit_with_gnome_check),
-	(sw_get_user_codeset):
-	* src/store-address.c (store_address_book_frame):
+	* src/pref-manager.c (balsa_help_pbox_display):
+	* src/sendmsg-window.c (on_open_url_cb):
+	* src/toolbar-prefs.c (tp_dialog_response_cb):
 
-2011-04-15  Pawel Salek
+2011-01-17  Peter Bloomfield
 
-	* src/balsa-message.c:
-	* src/message-window.c: fix bug 647695.
-	* libbalsa/imap/imap-handle.c: remove unused variable.
+	* src/sendmsg-window.c (create_email_or_string_entry): new
+	override font API.
 
-2011-03-29  Peter Bloomfield
+2011-01-17  Peter Bloomfield
 
-	* src/main-window.c: implement alt-n to switch to mailbox at
-	n-th tab.
+	* src/balsa-mime-widget-image.c (bmwi_context_changed_cb),
+	(balsa_mime_widget_new_image): set background color from
+	viewport.
 
-2011-03-21  Pawel Salek
+2011-01-17  Peter Bloomfield
 
-	* src/balsa-index.c: revert last change, it was wrong.
-	* Makefile.am: merge patch from bug 645444.
-	* configure.in: ditto.
-	* balsa.desktop.in: ditto.
-	* po/POTFILES.{skip,in}: add balsa-mailto-handler.desktop file.
-	* src/Makefile.am: fix dist target when configured without gnome
-	or unique.
+	* src/balsa-mime-widget-crypto.c
+	(balsa_mime_widget_signature_widget),
+	(balsa_mime_widget_crypto_frame): reorganize window-showing.
+
+2011-01-17  Peter Bloomfield
+
+	* src/balsa-icons.c (balsa_register_pixbufs): new icon-render
+	API.
+	* src/balsa-mime-widget.c (balsa_mime_widget_new),
+	(balsa_mime_widget_new_unknown): ditto.
+	* src/toolbar-prefs.c (tp_store_set): ditto.
+
+2011-01-17  Peter Bloomfield
+
+	* src/balsa-app.h: port from GdkColor to GdkRGBA.
+	* src/balsa-cite-bar.c (balsa_cite_bar_draw): ditto, and from
+	GtkStyle to GtkStyleContext.
+	* src/balsa-message.c (bm_on_set_style), (balsa_message_init),
+	(get_crypto_content_icon): ditto.
+	* src/balsa-mime-widget-image.c (balsa_mime_widget_new_image):
+	ditto.
+	* src/balsa-mime-widget-message.c (balsa_mime_widget_new_message),
+	(balsa_mime_widget_new_message_tl), (bm_header_widget_realized),
+	(bm_header_widget_set_style), (bm_header_widget_new),
+	(bmwm_buffer_set_prefs),
+	(balsa_mime_widget_message_set_headers_d): ditto, and reorganize
+	widget-showing.
+	* src/balsa-mime-widget-text.c (balsa_mime_widget_new_text),
+	(bm_modify_font_from_string), (quote_tag), (draw_cite_bar_real),
+	(bm_widget_new_vcard), (fill_text_buf_cited): ditto, and drop
+	allocate_quote_colors.
+	* src/balsa-mime-widget-vcalendar.c: reorganize widget-showing.
+	* src/balsa-print-object-text.c (balsa_print_object_text_draw):
+	port from GdkColor to GdkRGBA.
+	* src/main-window.c: port from GtkStyle to GtkStyleContext.
+	* src/pref-manager.c (apply_prefs), (set_prefs): port from
+	GdkColor to GdkRGBA.
+	* src/quote-color.c (is_a_quote): drop allocate_quote_colors.
+	* src/quote-color.h: ditto.
+	* src/save-restore.c (save_color), (load_color): port from
+	GdkColor to GdkRGBA.
+	* src/sendmsg-window.c (add_urlref_attachment),
+	(create_email_or_string_entry), (create_text_area): ditto.
+
+2011-01-17  Peter Bloomfield
+
+	* libbalsa/source-viewer.c (libbalsa_show_message_source): new
+	override font API.
+
+2011-01-17  Peter Bloomfield
+
+	* libbalsa/libbalsa.c (libbalsa_source_view_new): drop support
+	for GtkSourceView-1.
+	* libbalsa/libbalsa.h: ditto.
 
 2011-01-15  Pawel Salek
 
@@ -423,6 +4821,135 @@
 	* libbalsa/imap/imap-handle.c: zeroize released pointers (pancake).
 	* libinit_balsa/assistant_page_user.c: fix widget packing (pancake).
 	* src/balsa-index.c: return FALSE on failure (pancake).
+
+2011-01-11  Peter Bloomfield
+
+	* src/balsa-mime-widget-message.c
+	(balsa_mime_widget_new_message): show the message.
+
+2011-01-09  Peter Bloomfield
+
+	* configure.in: do not configure Bonobo/Corba; do not check
+	GtkSourceview version.
+	* Makefile.am: unversioned GtkSourceview test.
+
+2011-01-08  Peter Bloomfield
+
+	* src/pref-manager.c (quoted_group), (mdn_group): let GtkLabel
+	wrap text.
+
+2011-01-08  Peter Bloomfield
+
+	* src/balsa-mblist.c (bmbl_mru_show_tree): make the mailbox tree
+	dialog a reasonable size.
+
+2010-12-29  Peter Bloomfield
+
+	* src/balsa-mime-widget-image.c (img_check_size): revert; use
+	previous calculation, with a different magic number (16).
+
+2010-12-28  Peter Bloomfield
+
+	* src/balsa-mime-widget-image.c (img_check_size): use parent
+	width.
+
+2010-12-28  Peter Bloomfield
+
+	* libbalsa/filter.c (libbalsa_filter_mailbox_messages): do not
+	use GnomeSound.
+
+2010-12-28  Peter Bloomfield
+
+	Clean up dead code and trailing white space
+
+	* libbalsa/address.c (addrlist_drag_drop_cb):
+	* libbalsa/identity.c (ident_dialog_get_path):
+	* libinit_balsa/assistant_helper.c (entry_changed_cb):
+	* src/ab-window.c (balsa_ab_window_init):
+	* src/balsa-index.c (bndx_string_width),
+	(bndx_popup_position_func):
+	* src/balsa-mblist.c (bmbl_drag_motion), (bmbl_drag_cb):
+	* src/balsa-message.c (bm_find_pass_to_entry),
+	(balsa_get_parent_window), (balsa_message_grab_focus):
+	* src/main-window.c:
+	* src/sendmsg-window.c (drag_data_quote), (subject_not_empty),
+	(check_suggest_encryption):
+	* src/toolbar-factory.c (tm_popup_position_func),
+	(tm_do_popup_menu):
+
+2010-12-28  Peter Bloomfield
+
+	Do not support BonoboActivation
+
+	* src/balsa-bonobo.c: deleted.
+	* src/balsa-bonobo.h: ditto.
+
+2010-12-28  Peter Bloomfield
+
+	Initial commit for gtk3 development branch
+
+	* configure.in:
+	* libbalsa/address-view.c (lbav_key_pressed_cb):
+	* libbalsa/body.c (libbalsa_message_body_get_pixbuf):
+	* libbalsa/cell-renderer-button.c
+	(libbalsa_cell_renderer_button_activate):
+	* libbalsa/html.c (lbh_resource_request_starting_cb),
+	(lbh_info_bar_widget), (libbalsa_html_new):
+	* libbalsa/identity.c (ident_dialog_add_gpg_menu), (add_show_menu),
+	(ident_dialog_add_smtp_menu):
+	* libbalsa/misc.c (libbalsa_charset_button_new):
+	* libbalsa/smtp-server.c (smtp_server_tls_widget):
+	* libinit_balsa/assistant_helper.c (balsa_init_add_table_option):
+	* src/ab-main.c (ew_key_pressed):
+	* src/ab-window.c (balsa_ab_window_load_books),
+	(balsa_ab_window_init):
+	* src/address-book-config.c (create_generic_dialog):
+	* src/balsa-app.c (balsa_app_init), (balsa_app_destroy):
+	* src/balsa-app.h:
+	* src/balsa-cite-bar.c (balsa_cite_bar_class_init),
+	(balsa_cite_bar_init), (balsa_cite_bar_get_preferred_width),
+	(balsa_cite_bar_get_preferred_height), (balsa_cite_bar_draw):
+	* src/balsa-index.c (bndx_class_init), (bndx_destroy),
+	(bndx_popup_position_func), (bndx_pipe_response),
+	(balsa_index_pipe):
+	* src/balsa-mblist.c (bmbl_class_init), (bmbl_mru_show_tree):
+	* src/balsa-message.c (balsa_message_class_init),
+	(bm_find_scroll_to_rectangle), (bm_find_pass_to_entry),
+	(balsa_message_destroy), (select_part):
+	* src/balsa-mime-widget-callbacks.c
+	(balsa_mime_widget_key_press_event):
+	* src/balsa-mime-widget-crypto.c
+	(balsa_mime_widget_signature_widget),
+	(balsa_mime_widget_crypto_frame):
+	* src/balsa-mime-widget-image.c (balsa_mime_widget_new_image),
+	(img_check_size):
+	* src/balsa-mime-widget-text.c (gtk_widget_destroy_insensitive),
+	(text_view_populate_popup), (fill_text_buf_cited):
+	* src/balsa-mime-widget.c (balsa_mime_widget_new),
+	(balsa_mime_widget_new_unknown):
+	* src/filter-edit-callbacks.c (fe_user_header_add),
+	(get_field_frame):
+	* src/filter-edit-dialog.c (fe_build_option_menu):
+	* src/folder-conf.c (browse_button_cb):
+	* src/mailbox-conf.c (mailbox_conf_combo_box_make),
+	(balsa_server_conf_get_advanced_widget),
+	(mailbox_conf_view_new_full):
+	* src/mailbox-node.c (balsa_mailbox_node_get_context_menu):
+	* src/main-window.c:
+	* src/message-window.c (message_window_new):
+	* src/pref-manager.c (apply_prefs), (checking_group),
+	(quoted_group), (word_wrap_group), (main_window_group),
+	(pspell_settings_group), (misc_group), (deleting_messages_group),
+	(folder_scanning_group), (option_menu_cb), (add_show_menu),
+	(pm_combo_box_new):
+	* src/quote-color.c (allocate_quote_colors):
+	* src/sendmsg-window.c (sw_get_user_codeset),
+	(sw_scroll_size_request), (create_email_entry), (create_info_pane),
+	(create_text_area):
+	* src/spell-check.c (balsa_spell_check_class_init),
+	(balsa_spell_check_destroy):
+	* src/store-address.c (store_address_book_frame):
+	* src/toolbar-factory.c (tm_popup_position_func):
 
 2010-12-09  Peter Bloomfield
 
@@ -1049,9 +5576,7 @@
 	notebook page;
 	(empty_trash): check for NULL window.
 
-2010-01-18  Peter Bloomfield  <peter@t43.bellsouth.net>
-
-	reviewed by: <delete if not using a buddy>
+2010-01-18  Peter Bloomfield
 
 	* src/balsa-index.c (bndx_mbnode_weak_notify), (bndx_destroy),
 	(balsa_index_load_mailbox_node): clear BalsaIndex::mailbox_node

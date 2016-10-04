@@ -1,6 +1,6 @@
 /* -*-mode:c; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2010 Stuart Parmenter and others,
+ * Copyright (C) 1997-2013 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -29,11 +29,12 @@
 
 #include <string.h>
 #include <stdlib.h>
-#include <pthread.h>
 
-#if defined(HAVE_GNOME_KEYRING)
+#if defined(HAVE_LIBSECRET)
+#include <libsecret/secret.h>
+#elif defined(HAVE_GNOME_KEYRING)
 #include <gnome-keyring.h>
-#endif
+#endif                          /* defined(HAVE_LIBSECRET) */
 
 #include "libbalsa.h"
 #include "libbalsa-conf.h"
@@ -43,11 +44,7 @@
 #include "imap-commands.h"
 #include <glib/gi18n.h>
 
-#ifdef USE_TLS
 #define REQ_SSL(s) (LIBBALSA_SERVER(s)->use_ssl)
-#else
-#define REQ_SSL(s) (0)
-#endif
 
 /** wait 60 seconds for packets */
 #define IMAP_CMD_TIMEOUT (60*1000)
@@ -62,9 +59,7 @@ struct LibBalsaImapServer_ {
     guint max_connections;
     gboolean offline_mode;
     
-#if defined(BALSA_USE_THREADS)
     GMutex lock; /* protects the following members */
-#endif
     guint used_connections;
     GList *used_handles;
     GList *free_handles;
@@ -96,20 +91,7 @@ static gboolean connection_cleanup(gpointer ptr);
 /* We try to avoid too many connections per server */
 #define MAX_CONNECTIONS_PER_SERVER 20
 
-#if defined(BALSA_USE_THREADS)
-static pthread_mutex_t imap_servers_lock = PTHREAD_MUTEX_INITIALIZER;
-#define LOCK_SERVERS()   pthread_mutex_lock(&imap_servers_lock)
-#define UNLOCK_SERVERS() pthread_mutex_unlock(&imap_servers_lock)
-#define LOCK_SERVER(server)    g_mutex_lock(&(server)->lock)
-#define TRYLOCK_SERVER(server) g_mutex_trylock(&(server)->lock)
-#define UNLOCK_SERVER(server)  g_mutex_unlock(&(server)->lock)
-#else
-#define LOCK_SERVERS()
-#define UNLOCK_SERVERS()
-#define LOCK_SERVER(server)
-#define TRYLOCK_SERVER(server) TRUE
-#define UNLOCK_SERVER(server)
-#endif
+static GMutex imap_servers_lock;
 static GHashTable *imap_servers = NULL;
 
 struct handle_info {
@@ -160,12 +142,12 @@ static void libbalsa_imap_server_set_username(LibBalsaServer * server,
     if(server->host && name) { /* we have been initialized... */
         LibBalsaImapServer *imap_server = LIBBALSA_IMAP_SERVER(server);
         
-        LOCK_SERVERS();
+        g_mutex_lock(&imap_servers_lock);
         g_hash_table_steal(imap_servers, imap_server->key);
         g_free(imap_server->key);
         imap_server->key = g_strdup_printf("%s@%s", name, server->host);
         g_hash_table_insert(imap_servers, imap_server->key, imap_server);
-        UNLOCK_SERVERS();
+        g_mutex_unlock(&imap_servers_lock);
     }
     (parent_class)->set_username(server, name);
 }
@@ -175,12 +157,12 @@ libbalsa_imap_server_set_host(LibBalsaServer * server,
 {
     if(server->user && host) { /* we have been initialized... */
         LibBalsaImapServer *imap_server = LIBBALSA_IMAP_SERVER(server);
-        LOCK_SERVERS();
+        g_mutex_lock(&imap_servers_lock);
         g_hash_table_steal(imap_servers, imap_server->key);
         g_free(imap_server->key);
         imap_server->key = g_strdup_printf("%s@%s", server->user, host);
         g_hash_table_insert(imap_servers, imap_server->key, imap_server);
-        UNLOCK_SERVERS();
+        g_mutex_unlock(&imap_servers_lock);
     }
     (parent_class)->set_host(server, host, use_ssl);
 }
@@ -209,18 +191,12 @@ libbalsa_imap_server_init(LibBalsaImapServer * imap_server)
 {
     LIBBALSA_SERVER(imap_server)->protocol = "imap";
     imap_server->key = NULL;
-#if defined(BALSA_USE_THREADS)
     g_mutex_init(&imap_server->lock);
-#endif
     imap_server->max_connections = MAX_CONNECTIONS_PER_SERVER;
     imap_server->used_connections = 0;
     imap_server->used_handles = NULL;
     imap_server->free_handles = NULL;
-#if defined(ENABLE_TOUCH_UI)
-    imap_server->persistent_cache = FALSE;
-#else
     imap_server->persistent_cache = TRUE;
-#endif /* ENABLE_TOUCH_UI */
     imap_server->use_idle = TRUE;
     imap_server->connection_cleanup_id = 
         g_timeout_add_seconds(CONNECTION_CLEANUP_POLL_PERIOD,
@@ -237,19 +213,14 @@ libbalsa_imap_server_finalize(GObject * object)
 
     imap_server = LIBBALSA_IMAP_SERVER(object);
 
-    LOCK_SERVERS();
+    g_mutex_lock(&imap_servers_lock);
     g_hash_table_remove(imap_servers, imap_server->key);
-    UNLOCK_SERVERS();
+    g_mutex_unlock(&imap_servers_lock);
 
     g_source_remove(imap_server->connection_cleanup_id);
 
-#if 0
-    LOCK_SERVER(imap_server);
-#endif
     libbalsa_imap_server_force_disconnect(imap_server);
-#if defined(BALSA_USE_THREADS)
     g_mutex_clear(&imap_server->lock);
-#endif
     g_free(imap_server->key); imap_server->key = NULL;
 
     G_OBJECT_CLASS(parent_class)->finalize(object);
@@ -324,7 +295,7 @@ is_info_cb(ImapMboxHandle *h, ImapResponse rc, const gchar* str, void *arg)
     case IMR_BYE: 
     case IMR_NO: 
         /* IMAP host name + message */
-        fmt = _("%s: %s");  it = LIBBALSA_INFORMATION_MESSAGE; break;
+        fmt = "%s: %s";  it = LIBBALSA_INFORMATION_MESSAGE; break;
     default:
         return;
     }
@@ -394,7 +365,7 @@ lb_imap_server_cleanup(LibBalsaImapServer * imap_server)
     /* Quit if there is an action going on, eg. an connection is being
      * opened and the user is asked to confirm the certificate or
      * provide password, etc. */
-    if(!TRYLOCK_SERVER(imap_server))
+    if(!g_mutex_trylock(&imap_server->lock))
         return; 
 
     idle_marker = time(NULL) - CONNECTION_CLEANUP_IDLE_TIME;
@@ -431,26 +402,17 @@ lb_imap_server_cleanup(LibBalsaImapServer * imap_server)
         }
     }
 
-    UNLOCK_SERVER(imap_server);
+    g_mutex_unlock(&imap_server->lock);
 }
 
 static gboolean connection_cleanup(gpointer ptr)
 {
-#ifdef BALSA_USE_THREADS
-    pthread_t cleanup_thread;
-#endif                          /*BALSA_USE_THREADS */
     LibBalsaImapServer *imap_server;
 
     g_return_val_if_fail(LIBBALSA_IS_IMAP_SERVER(ptr), FALSE);
 
     imap_server = LIBBALSA_IMAP_SERVER(ptr);
-#ifdef BALSA_USE_THREADS
-    pthread_create(&cleanup_thread, NULL,
-                   (void *) lb_imap_server_cleanup, imap_server);
-    pthread_detach(cleanup_thread);
-#else                           /*BALSA_USE_THREADS */
     lb_imap_server_cleanup(imap_server);
-#endif                          /*BALSA_USE_THREADS */
 
     return TRUE;
 }
@@ -462,15 +424,15 @@ static LibBalsaImapServer* get_or_create(const gchar *username,
     gchar *key;
 
     if (!imap_servers) {
-        LOCK_SERVERS();
+    	g_mutex_lock(&imap_servers_lock);
         if (!imap_servers)
             imap_servers = g_hash_table_new(g_str_hash, g_str_equal);
-        UNLOCK_SERVERS();
+        g_mutex_unlock(&imap_servers_lock);
     }
 
     /* lookup username@host */
     key = g_strdup_printf("%s@%s", username, host);
-    LOCK_SERVERS();
+    g_mutex_lock(&imap_servers_lock);
     imap_server = g_hash_table_lookup(imap_servers, key);
     if (!imap_server) {
         imap_server = g_object_new(LIBBALSA_TYPE_IMAP_SERVER, NULL);
@@ -480,7 +442,7 @@ static LibBalsaImapServer* get_or_create(const gchar *username,
         g_free(key);
         g_object_ref(imap_server);
     }
-    UNLOCK_SERVERS();
+    g_mutex_unlock(&imap_servers_lock);
     return imap_server;
 }
 
@@ -549,7 +511,47 @@ libbalsa_imap_server_new_from_config(void)
     if (!server->passwd) {
         server->remember_passwd = libbalsa_conf_get_bool("RememberPasswd=false");
         if(server->remember_passwd) {
-#if defined (HAVE_GNOME_KEYRING)
+#if defined(HAVE_LIBSECRET)
+            GError *err = NULL;
+
+            server->passwd =
+                secret_password_lookup_sync(LIBBALSA_SERVER_SECRET_SCHEMA,
+                                            NULL, &err,
+                                            "protocol", server->protocol,
+                                            "server",   server->host,
+                                            "user",     server->user,
+                                            NULL);
+            if (err) {
+                libbalsa_free_password(server->passwd);
+                server->passwd = NULL;
+                printf(_("Error looking up password for %s@%s: %s\n"),
+                       server->user, server->host, err->message);
+                printf(_("Falling back\n"));
+                g_clear_error(&err);
+                server->passwd =
+                    libbalsa_conf_private_get_string("Password");
+                if (server->passwd != NULL) {
+                    gchar *buff = libbalsa_rot(server->passwd);
+                    libbalsa_free_password(server->passwd);
+                    server->passwd = buff;
+                    secret_password_store_sync
+                        (LIBBALSA_SERVER_SECRET_SCHEMA, NULL,
+                         _("Balsa passwords"), server->passwd, NULL, &err,
+                         "protocol", server->protocol,
+                         "server",   server->host,
+                         "user",     server->user,
+                         NULL);
+                    /* We could in principle clear the password in the
+                     * config file here but we do not for the backward
+                     * compatibility. */
+                    if (err) {
+                        printf(_("Error storing password for %s@%s: %s\n"),
+                               server->user, server->host, err->message);
+                        g_error_free(err);
+                    }
+                }
+            }
+#elif defined (HAVE_GNOME_KEYRING)
 	    GnomeKeyringResult r;
 	    server->passwd = NULL;
 	    r = gnome_keyring_find_password_sync(LIBBALSA_SERVER_KEYRING_SCHEMA,
@@ -587,7 +589,7 @@ libbalsa_imap_server_new_from_config(void)
 		libbalsa_free_password(server->passwd);
 		server->passwd = buff;
 	    }
-#endif
+#endif                          /* defined(HAVE_LIBSECRET) */
 	}
         if(server->passwd && server->passwd[0] == '\0') {
             libbalsa_free_password(server->passwd);
@@ -655,12 +657,11 @@ libbalsa_imap_server_get_handle(LibBalsaImapServer *imap_server, GError **err)
 {
     LibBalsaServer *server = LIBBALSA_SERVER(imap_server);
     struct handle_info *info = NULL;
-    ImapResult rc;
 
     if (!imap_server || imap_server->offline_mode)
         return NULL;
 
-    LOCK_SERVER(imap_server);
+    g_mutex_lock(&imap_server->lock);
     /* look for free connection */
     if (imap_server->free_handles) {
         GList *conn;
@@ -675,26 +676,28 @@ libbalsa_imap_server_get_handle(LibBalsaImapServer *imap_server, GError **err)
     /* create if used < max connections */
     if (!info
         && imap_server->used_connections < imap_server->max_connections) {
-        UNLOCK_SERVER(imap_server);
+    	g_mutex_unlock(&imap_server->lock);
         info = lb_imap_server_info_new(server);
-        LOCK_SERVER(imap_server);
+        g_mutex_lock(&imap_server->lock);
         /* FIXME: after dropping and reacquiring the lock,
          * (imap_server->used_connections < imap_server->max_connections)
          * might no longer be true--do we care?
         if (imap_server->used_connections >= imap_server->max_connections) {
             lb_imap_server_info_free(info);
-            UNLOCK_SERVER(imap_server);
+            g_mutex_unlock(&imap_server->lock);
             return NULL;
         }
          */
     }
     if (info) {
         if(imap_mbox_is_disconnected(info->handle)) {
+            ImapResult rc;
+
             rc=imap_mbox_handle_connect(info->handle, server->host,
                                         REQ_SSL(server));
             if(rc != IMAP_SUCCESS) {
                 handle_connection_error(rc, info, server, err);
-                UNLOCK_SERVER(imap_server);
+                g_mutex_unlock(&imap_server->lock);
                 return NULL;
             }
         }
@@ -703,8 +706,9 @@ libbalsa_imap_server_get_handle(LibBalsaImapServer *imap_server, GError **err)
                                                    info);
         imap_server->used_connections++;
     }
-    UNLOCK_SERVER(imap_server);
+    g_mutex_unlock(&imap_server->lock);
 
+    /* cppcheck-suppress nullPointer */
     return info ? info->handle : NULL;
 }
 
@@ -728,12 +732,11 @@ libbalsa_imap_server_get_handle_with_user(LibBalsaImapServer *imap_server,
 {
     LibBalsaServer *server = LIBBALSA_SERVER(imap_server);
     struct handle_info *info = NULL;
-    ImapResult rc;
 
     if (imap_server->offline_mode)
         return NULL;
 
-    LOCK_SERVER(imap_server);
+    g_mutex_lock(&imap_server->lock);
     /* look for free reusable connection */
     if (imap_server->free_handles) {
         GList *conn=NULL;
@@ -753,17 +756,17 @@ libbalsa_imap_server_get_handle_with_user(LibBalsaImapServer *imap_server,
      * those that do not SELECT any mailbox. */
     if (!info
         && imap_server->used_connections < imap_server->max_connections-1) {
-        UNLOCK_SERVER(imap_server);
+    	g_mutex_unlock(&imap_server->lock);
         info = lb_imap_server_info_new(server);
         if (!info)
             return NULL;
-        LOCK_SERVER(imap_server);
+        g_mutex_lock(&imap_server->lock);
         /* FIXME: after dropping and reacquiring the lock,
          * (imap_server->used_connections < imap_server->max_connections)
          * might no longer be true--do we care?
         if (imap_server->used_connections >= imap_server->max_connections) {
             lb_imap_server_info_free(info);
-            UNLOCK_SERVER(imap_server);
+            g_mutex_unlock(&imap_server->lock);
             return NULL;
         }
          */
@@ -781,16 +784,18 @@ libbalsa_imap_server_get_handle_with_user(LibBalsaImapServer *imap_server,
                     LIBBALSA_MAILBOX_TOOMANYOPEN_ERROR,
                     _("Exceeded the number of connections per server %s"),
                     server->host);
-        UNLOCK_SERVER(imap_server);
+        g_mutex_unlock(&imap_server->lock);
         return NULL;
     }
 
     if (imap_mbox_is_disconnected(info->handle)) {
+        ImapResult rc;
+
         rc=imap_mbox_handle_connect(info->handle, server->host,
                                     REQ_SSL(server));
         if(rc != IMAP_SUCCESS) {
             handle_connection_error(rc, info, server, err);
-            UNLOCK_SERVER(imap_server);
+            g_mutex_unlock(&imap_server->lock);
             return NULL;
         }
     }
@@ -799,7 +804,7 @@ libbalsa_imap_server_get_handle_with_user(LibBalsaImapServer *imap_server,
     imap_server->used_handles = g_list_prepend(imap_server->used_handles,
                                                info);
     imap_server->used_connections++;
-    UNLOCK_SERVER(imap_server);
+    g_mutex_unlock(&imap_server->lock);
 
     return info->handle;
 }
@@ -819,7 +824,7 @@ void libbalsa_imap_server_release_handle(LibBalsaImapServer *imap_server,
     if (!handle)
         return;
 
-    LOCK_SERVER(imap_server);
+    g_mutex_lock(&imap_server->lock);
     /* remove from used list */
     if (imap_server->used_handles) {
         GList *conn;
@@ -836,7 +841,7 @@ void libbalsa_imap_server_release_handle(LibBalsaImapServer *imap_server,
     /* add to free list */
         imap_server->free_handles = g_list_append(imap_server->free_handles,
                                                   info);
-    UNLOCK_SERVER(imap_server);
+    g_mutex_unlock(&imap_server->lock);
 }
 
 /**
@@ -882,7 +887,7 @@ libbalsa_imap_server_has_persistent_cache(LibBalsaImapServer *srv)
 void
 libbalsa_imap_server_force_disconnect(LibBalsaImapServer *imap_server)
 {
-    LOCK_SERVER(imap_server);
+	g_mutex_lock(&imap_server->lock);
     g_list_foreach(imap_server->used_handles,
                    (GFunc) lb_imap_server_info_free, NULL);
     g_list_free(imap_server->used_handles);
@@ -891,7 +896,7 @@ libbalsa_imap_server_force_disconnect(LibBalsaImapServer *imap_server)
                    (GFunc) lb_imap_server_info_free, NULL);
     g_list_free(imap_server->free_handles);
     imap_server->free_handles = NULL;
-    UNLOCK_SERVER(imap_server);
+    g_mutex_unlock(&imap_server->lock);
 }
 
 /**
@@ -911,10 +916,10 @@ static void close_all_connections_cb(gpointer key, gpointer value,
 void
 libbalsa_imap_server_close_all_connections(void)
 {
-    LOCK_SERVERS();
+	g_mutex_lock(&imap_servers_lock);
     if (imap_servers)
         g_hash_table_foreach(imap_servers, close_all_connections_cb, NULL);
-    UNLOCK_SERVERS();
+    g_mutex_unlock(&imap_servers_lock);
     libbalsa_imap_purge_temp_dir(0);
 }
 
@@ -930,10 +935,10 @@ libbalsa_imap_server_close_all_connections(void)
 gboolean libbalsa_imap_server_has_free_handles(LibBalsaImapServer *imap_server)
 {
     gboolean result;
-    LOCK_SERVER(imap_server);
+    g_mutex_lock(&imap_server->lock);
     result = imap_server->used_connections < imap_server->max_connections
         || imap_server->free_handles;
-    UNLOCK_SERVER(imap_server);
+    g_mutex_unlock(&imap_server->lock);
     return result;
 }
 

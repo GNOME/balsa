@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2013 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -32,18 +32,12 @@ enum _BalsaInformationShow {
 };
 
 void balsa_information(LibBalsaInformationType type, const char *fmt, ...)
-#ifdef __GNUC__
-    __attribute__ ((format (printf, 2, 3)))
-#endif
-;
+	G_GNUC_PRINTF(2, 3);
 
 void balsa_information_parented(GtkWindow *widget,
                                 LibBalsaInformationType type, 
                                 const char *fmt, ...)
-#ifdef __GNUC__
-    __attribute__ ((format (printf, 3, 4)));
-#endif
-;
+	G_GNUC_PRINTF(3, 4);
 
 void balsa_information_real(GtkWindow *parent, LibBalsaInformationType type,
                             const char *msg);

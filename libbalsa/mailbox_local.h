@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2013 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -54,6 +54,7 @@ typedef struct _LibBalsaMailboxLocalPool LibBalsaMailboxLocalPool;
 struct _LibBalsaMailboxLocalMessageInfo {
     LibBalsaMessageFlag flags;          /* May have pseudo-flags */
     LibBalsaMessage *message;
+    gboolean loaded;
 };
 typedef struct _LibBalsaMailboxLocalMessageInfo LibBalsaMailboxLocalMessageInfo;
 
@@ -68,10 +69,18 @@ struct _LibBalsaMailboxLocal {
                      * average the syncing time for mailbox. */
     guint thread_id;    /* id of the idle mailbox thread job */
     guint save_tree_id; /* id of the idle mailbox save-tree job */
+    guint load_messages_id; /* id of the idle load-messages job */
+    guint msgno;            /* where to start loading messages */
     GPtrArray *threading_info;
     LibBalsaMailboxLocalPool message_pool[LBML_POOL_SIZE];
     guint pool_seqno;
 };
+
+typedef gboolean LibBalsaMailboxLocalAddMessageFunc(LibBalsaMailboxLocal *
+                                                    local,
+                                                    GMimeStream * stream,
+                                                    LibBalsaMessageFlag
+                                                    flags, GError ** err);
 
 struct _LibBalsaMailboxLocalClass {
     LibBalsaMailboxClass klass;
@@ -82,9 +91,11 @@ struct _LibBalsaMailboxLocalClass {
     guint (*fileno)(LibBalsaMailboxLocal * local, guint msgno);
     LibBalsaMailboxLocalMessageInfo *(*get_info)(LibBalsaMailboxLocal * local,
                                                  guint msgno);
+    LibBalsaMailboxLocalAddMessageFunc *add_message;
 };
 
-GObject *libbalsa_mailbox_local_new(const gchar * path, gboolean create);
+LibBalsaMailbox *libbalsa_mailbox_local_new(const gchar * path,
+                                            gboolean      create);
 gint libbalsa_mailbox_local_set_path(LibBalsaMailboxLocal * mailbox,
 				     const gchar * path, gboolean create);
 void libbalsa_mailbox_local_set_threading_info(LibBalsaMailboxLocal *

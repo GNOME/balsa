@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; indent-tab-mode: nil; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2002 Stuart Parmenter and others,
+ * Copyright (C) 1997-2013 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -25,10 +25,6 @@
 # include "config.h"
 #endif                          /* HAVE_CONFIG_H */
 
-/* yellow dog has crappy libc and needs pthread.h to be included here */
-#ifdef BALSA_USE_THREADS
-#  include <pthread.h>
-#endif
 #include <time.h>
 
 #include <string.h>
@@ -77,7 +73,6 @@ GtkWidget *fe_search_option_menu;
 extern GtkWidget *fe_op_codes_option_menu;
     
 /* Name field */
-extern GtkWidget *fe_name_label;
 extern GtkWidget *fe_name_entry;
     
 /* widgets for the matching fields */
@@ -480,24 +475,15 @@ fe_user_header_add(const gchar * user_header)
 
         /* First clear the combo box... */
         for (lst = fe_user_headers_list; lst; lst = lst->next)
-#if GTK_CHECK_VERSION(2, 24, 0)
             gtk_combo_box_text_remove(GTK_COMBO_BOX_TEXT(fe_user_header),
                                       0);
-#else                           /* GTK_CHECK_VERSION(2, 24, 0) */
-            gtk_combo_box_remove_text(GTK_COMBO_BOX(fe_user_header), 0);
-#endif                          /* GTK_CHECK_VERSION(2, 24, 0) */
 
         fe_add_new_user_header(user_header);
 
         /* ...then remake it with the new string... */
         for (lst = fe_user_headers_list; lst; lst = lst->next)
-#if GTK_CHECK_VERSION(2, 24, 0)
-            gtk_combo_box_text_append_text
-                (GTK_COMBO_BOX_TEXT(fe_user_header), lst->data);
-#else                           /* GTK_CHECK_VERSION(2, 24, 0) */
-            gtk_combo_box_append_text(GTK_COMBO_BOX(fe_user_header),
-                                      lst->data);
-#endif                          /* GTK_CHECK_VERSION(2, 24, 0) */
+            gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT
+                                           (fe_user_header), lst->data);
 
         fe_user_header_set_active(user_header);
     }
@@ -732,8 +718,8 @@ fill_condition_widgets(LibBalsaCondition* cnd)
     GtkTreeModel *model =
         gtk_tree_view_get_model(fe_type_regex_list);
 #endif                  /* REGULAR_EXPRESSION_FILTERING_IS_IMPLEMENTED */
-    gchar str[20];
-    struct tm date;
+    gchar *str;
+    GDateTime *date;
     gint row,col;
     gboolean andmask;
     static gchar xformat[] = "%x"; /* to suppress error in strftime */
@@ -808,18 +794,22 @@ fill_condition_widgets(LibBalsaCondition* cnd)
 #endif
         break;
     case CONDITION_DATE:
-        if (cnd->match.date.date_low==0) str[0]='\0';
+        if (cnd->match.date.date_low==0) str = g_strdup("");
         else {
-            localtime_r(&cnd->match.date.date_low, &date);
-            strftime(str, sizeof(str), xformat, &date);
+        	date = g_date_time_new_from_unix_local(cnd->match.date.date_low);
+            str = g_date_time_format(date, xformat);
+            g_date_time_unref(date);
         }
         gtk_entry_set_text(GTK_ENTRY(fe_type_date_low_entry),str);
-        if (cnd->match.date.date_high==0) str[0]='\0';
+        g_free(str);
+        if (cnd->match.date.date_high==0) str = g_strdup("");
         else {
-            localtime_r(&cnd->match.date.date_high, &date);
-            strftime(str,sizeof(str), xformat, &date);
+        	date = g_date_time_new_from_unix_local(cnd->match.date.date_low);
+            str = g_date_time_format(date, xformat);
+            g_date_time_unref(date);
         }
         gtk_entry_set_text(GTK_ENTRY(fe_type_date_high_entry),str);
+        g_free(str);
         fe_update_label(fe_type_date_label, &date_label);
         break;
     case CONDITION_FLAG:
@@ -845,6 +835,7 @@ condition_dialog_response(GtkWidget * dialog, gint response,
 {
     LibBalsaCondition *new_cnd;
     GError *err = NULL;
+    GdkScreen *screen;
 
     switch (response) {
     case GTK_RESPONSE_OK:       /* OK button */
@@ -900,7 +891,8 @@ condition_dialog_response(GtkWidget * dialog, gint response,
         gtk_widget_hide(dialog);
         break;
     case GTK_RESPONSE_HELP:     /* Help button */
-        gtk_show_uri(NULL, "ghelp:balsa?win-condition",
+        screen = gtk_widget_get_screen(dialog);
+        gtk_show_uri(screen, "help:balsa/win-filters#win-condition",
                      gtk_get_current_event_time(), &err);
 	if (err) {
 	    balsa_information_parented(GTK_WINDOW(dialog),
@@ -918,25 +910,22 @@ condition_dialog_response(GtkWidget * dialog, gint response,
  * condition type (simple, regex, date, flag)
  */
 static void
-add_button(GtkWidget *table, const char *label, int row,
+add_button(GtkWidget *grid, const char *label, int col,
            GCallback action, int p)
 {
     GtkWidget* button = gtk_button_new_with_mnemonic(label);
-    gtk_table_attach(GTK_TABLE(table),
-                     button,
-                     row, row+1, 4, 5,
-                     GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 2, 2); 
+    gtk_widget_set_hexpand(button, TRUE);
+    gtk_grid_attach(GTK_GRID(grid), button, col, 4, 1, 1);
     g_signal_connect(G_OBJECT(button), "clicked",
                      action,
                      GINT_TO_POINTER(p));
 }
 static GtkWidget*
-add_check(GtkWidget *table, const char *label, int col, int row)
+add_check(GtkWidget *grid, const char *label, int col, int row)
 {
     GtkWidget* res = gtk_check_button_new_with_mnemonic(label);
-    gtk_table_attach(GTK_TABLE(table), res,
-                     col, col+1, row, row+1,
-                     GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 2, 2);
+    gtk_widget_set_hexpand(res, TRUE);
+    gtk_grid_attach(GTK_GRID(grid), res, col, row, 1, 1);
     g_signal_connect(G_OBJECT(res), "toggled",
                      G_CALLBACK(fe_condition_changed_cb), NULL);
     return res;
@@ -945,51 +934,44 @@ add_check(GtkWidget *table, const char *label, int col, int row)
 static GtkWidget*
 get_field_frame(void)
 {
-    GtkWidget *table;
+    GtkWidget *grid;
     GtkWidget *frame = gtk_frame_new(_("Match Fields"));
     GList *list;
 
-    gtk_frame_set_label_align(GTK_FRAME(frame), 
+    gtk_frame_set_label_align(GTK_FRAME(frame),
                               GTK_POS_LEFT, GTK_POS_TOP);
     gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_ETCHED_IN);
-    
-    table = gtk_table_new(5, 2, TRUE);
-    gtk_container_add(GTK_CONTAINER(frame), table);
 
-    add_button(table, _("_All"),  0,G_CALLBACK(fe_match_fields_buttons_cb),1);
-    add_button(table, _("C_lear"),1,G_CALLBACK(fe_match_fields_buttons_cb),3);
+    grid = gtk_grid_new();
+    gtk_grid_set_row_spacing(GTK_GRID(grid), 2);
+    gtk_grid_set_column_spacing(GTK_GRID(grid), 2);
+    gtk_grid_set_column_homogeneous(GTK_GRID(grid), TRUE);
 
-    fe_matching_fields_body    = add_check(table, _("_Body"),    0,0);
-    fe_matching_fields_to      = add_check(table, _("_To:"),     0,1);
-    fe_matching_fields_from    = add_check(table, _("_From:"),   1,1);
-    fe_matching_fields_subject = add_check(table, _("_Subject"), 0,2);
-    fe_matching_fields_cc      = add_check(table,  _("_Cc:"),    1,2);
+    gtk_container_add(GTK_CONTAINER(frame), grid);
+
+    add_button(grid, _("_All"),  0,G_CALLBACK(fe_match_fields_buttons_cb),1);
+    add_button(grid, _("C_lear"),1,G_CALLBACK(fe_match_fields_buttons_cb),3);
+
+    fe_matching_fields_body    = add_check(grid, _("_Body"),    0,0);
+    fe_matching_fields_to      = add_check(grid, _("_To:"),     0,1);
+    fe_matching_fields_from    = add_check(grid, _("_From:"),   1,1);
+    fe_matching_fields_subject = add_check(grid, _("_Subject"), 0,2);
+    fe_matching_fields_cc      = add_check(grid, _("_Cc:"),     1,2);
     fe_matching_fields_us_head =
         gtk_check_button_new_with_mnemonic(_("_User header:"));
-    gtk_table_attach(GTK_TABLE(table),
-                     fe_matching_fields_us_head,
-                     0, 1, 3, 4,
-                     GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 2, 2);
+    gtk_widget_set_hexpand(fe_matching_fields_us_head, TRUE);
+    gtk_grid_attach(GTK_GRID(grid), fe_matching_fields_us_head, 0, 3, 1, 1);
     g_signal_connect(G_OBJECT(fe_matching_fields_us_head), "toggled",
                      G_CALLBACK(fe_match_field_user_header_cb), NULL);
 
-#if GTK_CHECK_VERSION(2, 24, 0)
     fe_user_header = gtk_combo_box_text_new_with_entry();
     for (list = fe_user_headers_list; list; list = list->next)
         gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(fe_user_header),
                                        list->data);
-#else                           /* GTK_CHECK_VERSION(2, 24, 0) */
-    fe_user_header = gtk_combo_box_entry_new_text();
-    for (list = fe_user_headers_list; list; list = list->next)
-        gtk_combo_box_append_text(GTK_COMBO_BOX(fe_user_header),
-                                  list->data);
-#endif                          /* GTK_CHECK_VERSION(2, 24, 0) */
     g_signal_connect(G_OBJECT(fe_user_header), "changed",
                      G_CALLBACK(fe_condition_changed_cb), NULL);
-    gtk_table_attach(GTK_TABLE(table),
-                     fe_user_header,
-                     1, 2, 3, 4,
-                     GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 2, 2);
+    gtk_widget_set_hexpand(fe_user_header, TRUE);
+    gtk_grid_attach(GTK_GRID(grid), fe_user_header, 1, 3, 1, 1);
     return frame;
 }
 
@@ -1001,9 +983,10 @@ build_type_notebook()
     GtkWidget *scroll;
 #else                   /* REGULAR_EXPRESSION_FILTERING_IS_IMPLEMENTED */
     const gchar *msg;
+    GtkWidget *label;
 #endif                  /* REGULAR_EXPRESSION_FILTERING_IS_IMPLEMENTED */
     GtkWidget *box;
-    GtkWidget *button, *table;
+    GtkWidget *button, *grid;
     gint row,col;
     static gchar * flag_names[]=
         {N_("Unread"), N_("Deleted"), N_("Replied"), N_("Flagged")};
@@ -1016,38 +999,37 @@ build_type_notebook()
 
     /* The simple page of the notebook */
 
-    box = gtk_vbox_new(FALSE, 5);
-    table = gtk_table_new(7, 2, FALSE);
-    gtk_box_pack_start(GTK_BOX(box), table, TRUE, TRUE, 0);
+    grid = gtk_grid_new();
+    gtk_grid_set_row_spacing(GTK_GRID(grid), 5);
+    gtk_grid_set_column_spacing(GTK_GRID(grid), 5);
+
+    box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
+    g_object_set(box, "margin", 5, NULL);
+    gtk_box_pack_start(GTK_BOX(box), grid, TRUE, TRUE, 0);
 
     fe_type_simple_label = 
 	gtk_label_new_with_mnemonic(_("One of the specified f_ields contains"));
-    gtk_table_attach(GTK_TABLE(table),
-                     fe_type_simple_label,
-                     0, 5, 0, 1,
-                     GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 5, 5);
+    gtk_widget_set_hexpand(fe_type_simple_label, TRUE);
+    gtk_grid_attach(GTK_GRID(grid), fe_type_simple_label, 0, 0, 1, 1);
     fe_type_simple_entry = gtk_entry_new();
     g_signal_connect(G_OBJECT(fe_type_simple_entry), "changed",
                      G_CALLBACK(fe_condition_changed_cb), NULL);
-    gtk_table_attach(GTK_TABLE(table),
-                     fe_type_simple_entry,
-                     0, 5, 1, 2,
-                     GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 5, 5);
+    gtk_widget_set_hexpand(fe_type_simple_entry, TRUE);
+    gtk_grid_attach(GTK_GRID(grid), fe_type_simple_entry, 0, 1, 1, 1);
     gtk_label_set_mnemonic_widget(GTK_LABEL(fe_type_simple_label),
 				  fe_type_simple_entry);
 
     button = gtk_button_new_with_mnemonic(_("Contain/Does _Not Contain"));
     g_signal_connect(G_OBJECT(button), "clicked",
                      G_CALLBACK(fe_negate_condition), NULL);
-    gtk_table_attach(GTK_TABLE(table),
-                     button,
-                     0, 5, 2, 3,
-                     GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 5, 5);
+    gtk_widget_set_hexpand(button, TRUE);
+    gtk_grid_attach(GTK_GRID(grid), button, 0, 2, 1, 1);
 
     gtk_notebook_append_page(GTK_NOTEBOOK(fe_type_notebook), box, NULL);
     
     /* The regex page of the type notebook */
-    box = gtk_vbox_new(FALSE, 5);
+    box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
+    g_object_set(box, "margin", 5, NULL);
 
     gtk_notebook_append_page(GTK_NOTEBOOK(fe_type_notebook), box, NULL);
 
@@ -1078,7 +1060,8 @@ build_type_notebook()
 
     gtk_container_add(GTK_CONTAINER(scroll), GTK_WIDGET(fe_type_regex_list));
 
-    box = gtk_hbox_new(TRUE, 5);
+    box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
+    gtk_box_set_homogeneous(GTK_BOX(box), TRUE);
     gtk_table_attach(GTK_TABLE(page),
                      box,
                      0, 5, 4, 5,
@@ -1103,89 +1086,81 @@ build_type_notebook()
                      GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 2, 2);
 #else                   /* REGULAR_EXPRESSION_FILTERING_IS_IMPLEMENTED */
     msg = _("Filtering using regular expressions is not yet implemented.");
-    gtk_box_pack_start(GTK_BOX(box), gtk_label_new(msg), TRUE, TRUE, 0);
+    label = gtk_label_new(msg);
+    gtk_box_pack_start(GTK_BOX(box), label, TRUE, TRUE, 0);
 #endif                  /* REGULAR_EXPRESSION_FILTERING_IS_IMPLEMENTED */
 
     /* The date page of the notebook */
 
-    page = gtk_table_new(5, 3, FALSE);
+    page = gtk_grid_new();
+    gtk_grid_set_row_spacing(GTK_GRID(page), 5);
+    gtk_grid_set_column_spacing(GTK_GRID(page), 5);
+    g_object_set(page, "margin", 5, NULL);
+
     gtk_notebook_append_page(GTK_NOTEBOOK(fe_type_notebook), page, NULL);
 
-    fe_type_date_label = 
+    fe_type_date_label =
         gtk_label_new(_("Match when message date is in the interval:"));
-    gtk_table_attach(GTK_TABLE(page),
-                     fe_type_date_label,
-                     0, 5, 0, 1,
-                     GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 5, 5);
+    gtk_grid_attach(GTK_GRID(page), fe_type_date_label, 0, 0, 2, 1);
     fe_type_date_low_entry = gtk_entry_new();
+    gtk_widget_set_hexpand(fe_type_date_low_entry, TRUE);
     g_signal_connect(G_OBJECT(fe_type_date_low_entry), "changed",
                      G_CALLBACK(fe_condition_changed_cb), NULL);
-    gtk_table_attach(GTK_TABLE(page),
-                     fe_type_date_low_entry,
-                     0, 2, 1, 2,
-                     GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 5, 5);
+    gtk_grid_attach(GTK_GRID(page), fe_type_date_low_entry, 0, 1, 1, 1);
     fe_type_date_high_entry = gtk_entry_new();
+    gtk_widget_set_hexpand(fe_type_date_high_entry, TRUE);
     g_signal_connect(G_OBJECT(fe_type_date_high_entry), "changed",
                      G_CALLBACK(fe_condition_changed_cb), NULL);
-    gtk_table_attach(GTK_TABLE(page),
-                     fe_type_date_high_entry,
-                     3, 5, 1, 2,
-                     GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 5, 5);
+    gtk_grid_attach(GTK_GRID(page), fe_type_date_high_entry, 1, 1, 1, 1);
 
     button = gtk_button_new_with_label(_("Inside/outside the date interval"));
+    gtk_widget_set_hexpand(button, TRUE);
     g_signal_connect(G_OBJECT(button), "clicked",
                      G_CALLBACK(fe_negate_condition), NULL);
-    gtk_table_attach(GTK_TABLE(page),
-                     button,
-                     0, 5, 2, 3,
-                     GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 5, 5);
+    gtk_grid_attach(GTK_GRID(page), button, 0, 2, 2, 1);
 
-    gtk_table_attach(GTK_TABLE(page),
-                     fe_date_sample(),
-                     0, 5, 3, 4,
-                     GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 5, 5);
+    gtk_grid_attach(GTK_GRID(page), fe_date_sample(), 0, 3, 2, 1);
 
     /* The flag page of the notebook */
 
-    page = gtk_table_new(1, 2, FALSE);
+    page = gtk_grid_new();
+    gtk_widget_set_vexpand(page, TRUE);
+    gtk_grid_set_row_spacing(GTK_GRID(page), 5);
+    gtk_grid_set_column_spacing(GTK_GRID(page), 5);
+    g_object_set(page, "margin", 5, NULL);
+
     gtk_notebook_append_page(GTK_NOTEBOOK(fe_type_notebook), page, NULL);
     fe_type_flag_label =
         gtk_label_new(_("Match when one of these flags is set:"));
-    gtk_table_attach(GTK_TABLE(page),
-                     fe_type_flag_label,
-                     0, 1, 0, 1,
-                     GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 5, 5);
+    gtk_grid_attach(GTK_GRID(page), fe_type_flag_label, 0, 0, 1, 1);
     frame = gtk_frame_new(NULL);
     gtk_frame_set_label_align(GTK_FRAME(frame), GTK_POS_LEFT, GTK_POS_TOP);
     gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_ETCHED_IN);
-    gtk_table_attach(GTK_TABLE(page),
-                     frame,
-                     0, 1, 1, 2,
-                     GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 5, 5);
+    gtk_grid_attach(GTK_GRID(page), frame, 0, 1, 1, 1);
 
-    page = gtk_table_new(2, 3, FALSE);
+    page = gtk_grid_new();
+    gtk_grid_set_row_spacing(GTK_GRID(page), 2);
+    gtk_grid_set_column_spacing(GTK_GRID(page), 2);
+
     gtk_container_add(GTK_CONTAINER(frame), page);
 
     for (row=0;row<2;row++)
         for (col=0;col<2;col++) {
-            fe_type_flag_buttons[row*2+col] = 
+            button =
                 gtk_check_button_new_with_label(_(flag_names[row*2+col]));
-            g_signal_connect(G_OBJECT(fe_type_flag_buttons[row*2+col]),
-                             "toggled",
+            fe_type_flag_buttons[row*2+col] = button;
+            gtk_widget_set_hexpand(button, TRUE);
+            g_signal_connect(button, "toggled",
                              G_CALLBACK(fe_condition_changed_cb), NULL);
-            gtk_table_attach(GTK_TABLE(page),
-                             fe_type_flag_buttons[row*2+col],
-                             col, col+1,row,row+1,
-                             GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 
-                             2, 2);
+            gtk_grid_attach(GTK_GRID(page), button, col, row, 1, 1);
         }
     button = gtk_button_new_with_label(_("Match when one flag is set/when no flag is set"));
+    gtk_widget_set_hexpand(button, TRUE);
     g_signal_connect(G_OBJECT(button), "clicked",
                      G_CALLBACK(fe_negate_condition), NULL);
-    gtk_table_attach(GTK_TABLE(page),
+    gtk_grid_attach(GTK_GRID(page),
                      button,
-                     0, 2, 2, 3,
-                     GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 5, 5);
+                     0, 2, 2, 1);
 }                               /* end build_type_notebook() */
 
 static
@@ -1197,7 +1172,7 @@ void build_condition_dialog(GtkWidget * condition_dialog)
 
     /* builds the toggle buttons to specify fields concerned by the
      * conditions of the filter */
-    box = gtk_hbox_new(FALSE, 5);
+    box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
     label = gtk_label_new_with_mnemonic(_("Search T_ype:"));
     gtk_box_pack_start(GTK_BOX(box), label, FALSE, FALSE, 5);
     fe_search_option_menu = 
@@ -1258,10 +1233,11 @@ fe_edit_condition(GtkWidget * throwaway,gpointer is_new_cnd)
         condition_dialog=
             gtk_dialog_new_with_buttons("",
                                         GTK_WINDOW(fe_window),
-                                        GTK_DIALOG_DESTROY_WITH_PARENT,
-                                        GTK_STOCK_OK, GTK_RESPONSE_OK,
-                                        GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-                                        GTK_STOCK_HELP, GTK_RESPONSE_HELP,
+                                        GTK_DIALOG_DESTROY_WITH_PARENT |
+                                        libbalsa_dialog_flags(),
+                                        _("_OK"), GTK_RESPONSE_OK,
+                                        _("_Cancel"), GTK_RESPONSE_CANCEL,
+                                        _("_Help"), GTK_RESPONSE_HELP,
                                         NULL);
 #if HAVE_MACOSX_DESKTOP
 	libbalsa_macosx_menu_for_parent(condition_dialog, GTK_WINDOW(fe_window));
@@ -1465,7 +1441,7 @@ void fe_destroy_window_cb(GtkWidget * widget,gpointer throwaway)
 /*
  * fe_dialog_response()
  *
- * Handles the clicking of the main buttons at the 
+ * Handles the clicking of the main buttons at the
  * bottom of the dialog.  wooo.
  */
 void
@@ -1476,13 +1452,14 @@ fe_dialog_response(GtkWidget * dialog, gint response, gpointer data)
     GtkTreeIter iter;
     gboolean valid;
     GError *err = NULL;
-    
+    GdkScreen *screen;
+
     switch (response) {
     case GTK_RESPONSE_OK:       /* OK button */
         /* We clear the old filters */
         libbalsa_filter_clear_filters(balsa_app.filters,TRUE);
         balsa_app.filters=NULL;
-        
+
         /* We put the modified filters */
     for (valid = gtk_tree_model_get_iter_first(model, &iter); valid;
          valid = gtk_tree_model_iter_next(model, &iter)) {
@@ -1514,7 +1491,8 @@ fe_dialog_response(GtkWidget * dialog, gint response, gpointer data)
         break;
 
     case GTK_RESPONSE_HELP:     /* Help button */
-        gtk_show_uri(NULL, "ghelp:balsa?win-filters",
+        screen = gtk_widget_get_screen(dialog);
+        gtk_show_uri(screen, "help:balsa/win-filters",
                      gtk_get_current_event_time(), &err);
 	if (err) {
 	    balsa_information_parented(GTK_WINDOW(dialog),
@@ -1917,16 +1895,16 @@ fe_apply_pressed(GtkWidget * widget, gpointer data)
     fil->action=action;
 
     if (fil->action == FILTER_COLOR) {
-        GdkColor color;
+        GdkRGBA rgba;
         GString *string = g_string_new(NULL);
         GtkToggleButton *toggle_button;
         gchar *color_string;
 
         toggle_button = (GTK_TOGGLE_BUTTON(fe_foreground_set));
         if (gtk_toggle_button_get_active(toggle_button)) {
-            gtk_color_button_get_color(GTK_COLOR_BUTTON(fe_foreground),
-                                       &color);
-            color_string = gdk_color_to_string(&color);
+            gtk_color_chooser_get_rgba(GTK_COLOR_CHOOSER(fe_foreground),
+                                       &rgba);
+            color_string = gdk_rgba_to_string(&rgba);
             g_string_append_printf(string, "foreground:%s", color_string);
             g_free(color_string);
             gtk_toggle_button_set_active(toggle_button, FALSE);
@@ -1934,9 +1912,9 @@ fe_apply_pressed(GtkWidget * widget, gpointer data)
 
         toggle_button = (GTK_TOGGLE_BUTTON(fe_background_set));
         if (gtk_toggle_button_get_active(toggle_button)) {
-            gtk_color_button_get_color(GTK_COLOR_BUTTON(fe_background),
-                                       &color);
-            color_string = gdk_color_to_string(&color);
+            gtk_color_chooser_get_rgba(GTK_COLOR_CHOOSER(fe_background),
+                                       &rgba);
+            color_string = gdk_rgba_to_string(&rgba);
             if (string->len > 0)
                 g_string_append_c(string, ';');
             g_string_append_printf(string, "background:%s", color_string);
@@ -2082,21 +2060,21 @@ fe_filters_list_selection_changed(GtkTreeSelection * selection,
     gtk_combo_box_set_active(GTK_COMBO_BOX(fe_op_codes_option_menu), pos);
     if (fil->action == FILTER_COLOR) {
         gchar **parts, **p;
-        GdkColor color;
+        GdkRGBA rgba;
 
         parts = g_strsplit(fil->action_string, ";", 2);
         for (p = parts; *p; p++) {
             if (g_str_has_prefix(*p, "foreground:")) {
-                gdk_color_parse((*p) + 11, &color);
-                gtk_color_button_set_color(GTK_COLOR_BUTTON(fe_foreground),
-                                           &color);
+                gdk_rgba_parse(&rgba, (*p) + 11);
+                gtk_color_chooser_set_rgba(GTK_COLOR_CHOOSER(fe_foreground),
+                                           &rgba);
                 gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
                                              (fe_foreground_set), TRUE);
             }
             if (g_str_has_prefix(*p, "background:")) {
-                gdk_color_parse((*p) + 11, &color);
-                gtk_color_button_set_color(GTK_COLOR_BUTTON(fe_background),
-                                           &color);
+                gdk_rgba_parse(&rgba, (*p) + 11);
+                gtk_color_chooser_set_rgba(GTK_COLOR_CHOOSER(fe_background),
+                                           &rgba);
                 gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
                                              (fe_background_set), TRUE);
             }

@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2000 Stuart Parmenter and others,
+ * Copyright (C) 1997-2013 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -253,17 +253,16 @@ LibBalsaFilter* libbalsa_filter_get_by_name(const gchar* fname);
 /* filters_edit_dialog launches (guess what :) the filters edit dialog box
  * to modify the list of all filters
  */
-void filters_edit_dialog(void);
+void filters_edit_dialog(GtkWindow * parent);
 
 /* filter_run_dialog edits and runs the list of filters of the mailbox
  */
-void filters_run_dialog(LibBalsaMailbox *mbox);
+void filters_run_dialog(LibBalsaMailbox * mbox, GtkWindow * parent);
 
 /* filter_export_dialog to export filters as sieve scripts
  */
 
-void
-filters_export_dialog(void);
+void filters_export_dialog(GtkWindow * parent);
 
 void libbalsa_filters_set_trash(LibBalsaMailbox* new_trash);
 typedef LibBalsaMailbox* (*UrlToMailboxMapper)(const gchar* url);

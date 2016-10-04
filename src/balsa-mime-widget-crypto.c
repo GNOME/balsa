@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2001 Stuart Parmenter and others,
+ * Copyright (C) 1997-2013 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -59,33 +59,26 @@ balsa_mime_widget_signature_widget(LibBalsaMessageBody * mime_body,
 {
     gchar *infostr;
     GtkWidget *vbox, *label;
+    GtkWidget *signature_widget;
+    gchar **lines;
 
     if (!mime_body->sig_info ||
 	mime_body->sig_info->status == GPG_ERR_NOT_SIGNED)
 	return NULL;
-				   
+
     infostr =
         libbalsa_signature_info_to_gchar(mime_body->sig_info,
                                          balsa_app.date_string);
-    if (g_ascii_strcasecmp(content_type, "application/pgp-signature") &&
-	g_ascii_strcasecmp(content_type, "application/pkcs7-signature") &&
-	g_ascii_strcasecmp(content_type, "application/x-pkcs7-signature")) {
-	gchar * labelstr = 
-	    g_strdup_printf(_("This is an inline %s signed %s message part:\n%s"),
-			    mime_body->sig_info->protocol == GPGME_PROTOCOL_OpenPGP ?
-			    _("OpenPGP") : _("S/MIME"),
-			    content_type, infostr);
-	g_free(infostr);
-	infostr = labelstr;
-    }
-    
-    vbox = gtk_vbox_new(FALSE, BMW_VBOX_SPACE);
-    gtk_container_set_border_width(GTK_CONTAINER(vbox), BMW_CONTAINER_BORDER);
-    label = gtk_label_new(infostr);
-    gtk_label_set_selectable(GTK_LABEL(label), TRUE);
-    gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.5);
-    gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 0);
+    if (!infostr)
+        return NULL;
+    lines = g_strsplit(infostr, "\n", 2);
     g_free(infostr);
+
+    vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, BMW_VBOX_SPACE);
+    label = gtk_label_new(lines[1] ? lines[1] : lines[0]);
+    gtk_label_set_selectable(GTK_LABEL(label), TRUE);
+    gtk_widget_set_halign(label, GTK_ALIGN_START);
+    gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 0);
 #ifdef HAVE_GPG
     if (mime_body->sig_info->protocol == GPGME_PROTOCOL_OpenPGP) {
         GtkWidget *button;
@@ -106,7 +99,25 @@ balsa_mime_widget_signature_widget(LibBalsaMessageBody * mime_body,
     }
 #endif /* HAVE_GPG */
 
-    return vbox;
+    if (lines[1]) {
+        /* Hack alert: if we omit the box below and use the expander as signature widget
+         * directly, setting the container border width of the container = the expander
+         * causes its sensitive area to shrink to an almost unusable narrow line above
+         * the label... */
+        GtkWidget *expander;
+
+        signature_widget = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+        expander = gtk_expander_new(lines[0]);
+        gtk_container_add(GTK_CONTAINER(signature_widget), expander);
+        gtk_container_add(GTK_CONTAINER(expander), vbox);
+    } else {
+        signature_widget = vbox;
+    }
+    gtk_container_set_border_width(GTK_CONTAINER(signature_widget), BMW_CONTAINER_BORDER);
+
+    g_strfreev(lines);
+
+    return signature_widget;
 }
 
 
@@ -119,29 +130,34 @@ balsa_mime_widget_crypto_frame(LibBalsaMessageBody * mime_body, GtkWidget * chil
     GtkWidget * vbox;
     GtkWidget * icon_box;
 
-    frame = gtk_frame_new(NULL);       
-    vbox = gtk_vbox_new(FALSE, BMW_VBOX_SPACE);
+    frame = gtk_frame_new(NULL);
+    vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, BMW_VBOX_SPACE);
     gtk_container_add(GTK_CONTAINER(frame), vbox);
-    icon_box = gtk_hbox_new(FALSE, BMW_VBOX_SPACE);
+    icon_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, BMW_VBOX_SPACE);
     if (was_encrypted)
-	gtk_box_pack_start(GTK_BOX(icon_box),
-			   gtk_image_new_from_stock(BALSA_PIXMAP_ENCR, GTK_ICON_SIZE_MENU),
-			   FALSE, FALSE, 0);
+        gtk_box_pack_start(GTK_BOX(icon_box),
+                           gtk_image_new_from_icon_name
+                           (balsa_icon_id(BALSA_PIXMAP_ENCR),
+                            GTK_ICON_SIZE_MENU),
+                           FALSE, FALSE, 0);
     if (!no_signature) {
 	const gchar * icon_name =
 	    balsa_mime_widget_signature_icon_name(libbalsa_message_body_protect_state(mime_body));
 	if (!icon_name)
 	    icon_name = BALSA_PIXMAP_SIGN;
-	gtk_box_pack_start(GTK_BOX(icon_box),
-			   gtk_image_new_from_stock(icon_name, GTK_ICON_SIZE_MENU),
-			   FALSE, FALSE, 0);
+        gtk_box_pack_start(GTK_BOX(icon_box),
+                           gtk_image_new_from_icon_name
+                           (balsa_icon_id(icon_name), GTK_ICON_SIZE_MENU),
+                           FALSE, FALSE, 0);
     }
     gtk_frame_set_label_widget(GTK_FRAME(frame), icon_box);
     gtk_container_set_border_width(GTK_CONTAINER(vbox), BMW_MESSAGE_PADDING);
+
     gtk_box_pack_start(GTK_BOX(vbox), child, FALSE, FALSE, 0);
 
-    if (signature)
+    if (signature) {
 	gtk_box_pack_end(GTK_BOX(vbox), signature, FALSE, FALSE, 0);
+    }
 
     return frame;
 }

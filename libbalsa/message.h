@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2001 Stuart Parmenter and others,
+ * Copyright (C) 1997-2013 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -33,10 +33,6 @@
 
 #ifdef HAVE_GPGME
 #include "rfc3156.h"
-#endif
-
-#if ENABLE_ESMTP
-#include <auth-client.h>
 #endif
 
 #define MESSAGE_COPY_CONTENT 1
@@ -344,8 +340,8 @@ glong libbalsa_message_get_length(LibBalsaMessage* msg);
 glong libbalsa_message_get_no(LibBalsaMessage* msg);
 LibBalsaMessageAttach libbalsa_message_get_attach_icon(LibBalsaMessage *
 						       message);
-#define libbalsa_message_date_to_utf8(m, f) libbalsa_date_to_utf8(&(m)->headers->date, (f))
-#define libbalsa_message_headers_date_to_utf8(h, f) libbalsa_date_to_utf8(&(h)->date, (f))
+#define libbalsa_message_date_to_utf8(m, f) libbalsa_date_to_utf8((m)->headers->date, (f))
+#define libbalsa_message_headers_date_to_utf8(h, f) libbalsa_date_to_utf8((h)->date, (f))
 
 GList *libbalsa_message_refs_for_threading(LibBalsaMessage* msg);
 

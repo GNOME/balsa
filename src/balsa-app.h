@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2010 Stuart Parmenter and others,
+ * Copyright (C) 1997-2013 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -97,9 +97,6 @@
 #define DEFAULT_ENCODING ENC8BIT
 #define DEFAULT_LINESIZE 78
 
-#define DEFAULT_PSPELL_MODULE SPELL_CHECK_MODULE_ISPELL
-#define DEFAULT_PSPELL_SUGGEST_MODE SPELL_CHECK_SUGGEST_NORMAL
-#define DEFAULT_PSPELL_IGNORE_SIZE 0
 #define DEFAULT_CHECK_SIG FALSE
 #define DEFAULT_CHECK_QUOTED FALSE
 
@@ -121,32 +118,6 @@ enum _ShownHeaders {
 };
 
 
-#if !HAVE_GTKSPELL
-/* The different spell modules available to the program. */
-#define NUM_PSPELL_MODULES 2
-typedef enum _SpellCheckModule SpellCheckModule;
-enum _SpellCheckModule {
-    SPELL_CHECK_MODULE_ISPELL,
-    SPELL_CHECK_MODULE_ASPELL
-};
-const gchar **spell_check_modules_name;
-
-
-/* The suggestion modes available to spell.  If this is changed,
- * don't forget to also update the array in pref-manager.c containing
- * the labels used in the preferences dialog. 
- * */
-#define NUM_SUGGEST_MODES 3
-typedef enum _SpellCheckSuggestMode SpellCheckSuggestMode;
-enum _SpellCheckSuggestMode {
-    SPELL_CHECK_SUGGEST_FAST,
-    SPELL_CHECK_SUGGEST_NORMAL,
-    SPELL_CHECK_SUGGEST_BAD_SPELLERS
-};
-const gchar **spell_check_suggest_mode_name;
-#endif                          /* HAVE_GTKSPELL */
-
-
 typedef enum _BalsaMDNReply BalsaMDNReply;
 enum _BalsaMDNReply {
     BALSA_MDN_REPLY_NEVER = 0,
@@ -163,6 +134,8 @@ enum _MwActionAfterMove {
 
 /* global balsa application structure */
 extern struct BalsaApplication {
+    GtkApplication *application;
+
     /* personal information */
     GList* identities;
     LibBalsaIdentity* current_ident;
@@ -263,20 +236,13 @@ extern struct BalsaApplication {
     gint mblist_newmsg_width;
     gint mblist_totalmsg_width;
 
-    /* Colour of mailboxes with unread messages in mailbox list */
-    GdkVisual *visual;
-    GdkColormap *colormap;
-
     /* Colour of quoted text. */
     gboolean mark_quoted;
     gchar *quote_regex;
-    GdkColor quoted_color[MAX_QUOTED_COLOR];
+    GdkRGBA quoted_color[MAX_QUOTED_COLOR];
 
     /* text color of URL's */
-    GdkColor url_color;
-
-    /* label color of bad addresses */
-    GdkColor bad_address_color;
+    GdkRGBA url_color;
 
     guint pwindow_option;
     gboolean wordwrap;
@@ -294,10 +260,6 @@ extern struct BalsaApplication {
     gboolean ask_before_select;
     gboolean pgdownmod;
     gint pgdown_percent;
-#if defined(ENABLE_TOUCH_UI)
-    gboolean do_file_format_check; /* do file format check on attaching */
-    gboolean enable_view_filter;   /* enable quick view filter */
-#endif
 
     /* Show toolbars, status bar, and subject-or-sender search bar */
     gboolean show_main_toolbar;
@@ -314,6 +276,10 @@ extern struct BalsaApplication {
     gboolean source_escape_specials;
     gint source_width;
     gint source_height;
+
+    /* MRU mailbox tree */
+    gint mru_tree_width;
+    gint mru_tree_height;
 
     /* what to do with message window after moving the message */
     MwActionAfterMove mw_action_after_move;
@@ -343,7 +309,8 @@ extern struct BalsaApplication {
     GList *open_mailbox_list;  /* data is a pointer to the mailbox */
     gchar *current_mailbox_url;/* remember for next session */
     
-    /* font used to display messages */
+    /* fonts */
+    gboolean use_system_fonts;
     gchar *message_font;
     gchar *subject_font;
 
@@ -376,16 +343,13 @@ extern struct BalsaApplication {
     LibBalsaAddressBook *default_address_book;
 
     /* spell checking */
-#if HAVE_GTKSPELL
+#if HAVE_GSPELL || HAVE_GTKSPELL
     gchar   *spell_check_lang;
     gboolean spell_check_active;
-#else                           /* HAVE_GTKSPELL */
-    SpellCheckModule module;
-    SpellCheckSuggestMode suggestion_mode;
-    guint ignore_size;
+#else                           /* HAVE_GSPELL */
     gboolean check_sig;
     gboolean check_quoted;
-#endif                          /* HAVE_GTKSPELL */
+#endif                          /* HAVE_GSPELL */
 
     /* Information messages */
     BalsaInformationShow information_message;
@@ -429,9 +393,7 @@ void balsa_app_destroy(void);
 void update_timer(gboolean update, guint minutes);
 
 gchar *ask_password(LibBalsaServer * server, LibBalsaMailbox * mbox);
-GtkWidget *balsa_stock_button_with_label(const char *icon,
-					 const char *label);
-gboolean open_mailboxes_idle_cb(gchar * names[]);
+void balsa_open_mailbox_list(gchar ** urls);
 
 /* Search functions */
 BalsaMailboxNode *balsa_find_mailbox(LibBalsaMailbox * mailbox);
@@ -439,13 +401,17 @@ BalsaMailboxNode *balsa_find_dir(LibBalsaServer *server, const gchar * path);
 BalsaMailboxNode *balsa_find_url(const gchar * url);
 LibBalsaMailbox *balsa_find_mailbox_by_url(const gchar * url);
 LibBalsaMailbox *balsa_find_sentbox_by_url(const gchar * url);
+void balsa_add_open_mailbox_urls(GPtrArray * url_array);
+
+/** Returns a short mailbox name that identifies the host. This is
+    longer than LibBalsaMailbox::name which contains only filename
+    without information about mailbox's location in the hierarchy. */
+gchar *balsa_get_short_mailbox_name(const gchar * url);
 gboolean balsa_find_iter_by_data(GtkTreeIter * iter, gpointer data);
 BalsaIndex* balsa_find_index_by_mailbox(LibBalsaMailbox* mailbox);
 
 void  balsa_remove_children_mailbox_nodes(BalsaMailboxNode * mbnode);
 
-#if USE_GREGEX
 GRegex *balsa_quote_regex_new(void);
-#endif                          /* USE_GREGEX */
 
 #endif				/* __BALSA_APP_H__ */

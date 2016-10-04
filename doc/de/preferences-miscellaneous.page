@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE page [
+<!ENTITY % balsa SYSTEM "balsa.entities">
+<!ENTITY mdash "--">
+<!-- replace with actual app  version number--><!ENTITY version "2.5">
+<!ENTITY Balsa '<app xmlns="http://projectmallard.org/1.0/">Balsa</app>'>
+<!ENTITY Mutt '<app xmlns="http://projectmallard.org/1.0/">Mutt</app>'>
+<!ENTITY GnomeCard '<app xmlns="http://projectmallard.org/1.0/">GnomeCard</app>'>
+<!ENTITY Pine '<app xmlns="http://projectmallard.org/1.0/">pine</app>'>
+<!ENTITY procmail '<app xmlns="http://projectmallard.org/1.0/">procmail</app>'>
+<!ENTITY GnuPG '<app xmlns="http://projectmallard.org/1.0/">GnuPG</app>'>
+<!ENTITY balsalist "http://mail.gnome.org/mailman/listinfo/balsa-list">
+<!ENTITY IMAP '<link xmlns="http://projectmallard.org/1.0/"
+           xref ="glossary#imap">IMAP</link>'>
+<!ENTITY LDAP '<link xmlns="http://projectmallard.org/1.0/"
+           xref ="glossary#ldap">LDAP</link>'>
+<!ENTITY POP3 '<link xmlns="http://projectmallard.org/1.0/"
+           xref ="glossary#pop">POP3</link>'>
+<!ENTITY SMTP '<link xmlns="http://projectmallard.org/1.0/"
+           xref ="glossary#smtp">SMTP</link>'>
+<!ENTITY VCARD '<link xmlns="http://projectmallard.org/1.0/"
+           xref ="glossary#vcard">VCARD</link>'>
+]>
+<page xmlns="http://projectmallard.org/1.0/" type="topic" id="preferences-miscellaneous" xml:lang="de">
+  <info>
+    <link type="topic" xref="preferences"/>
+    <link type="guide" xref="preferences"/>
+  </info>
+  <title>Miscellaneous Preferences</title>
+  <terms>
+    <item>
+      <title>
+        <gui>Debug</gui>
+      </title>
+      <p>Toggle the output of debugging information. Depending on
+      what notification priority set for it in the
+      <link xref="preferences-display-options">
+      Display</link> page, it can show up in list or dialog as the
+      program runs.</p>
+    </item>
+    <item>
+      <title>
+        <gui>Empty Trash on Exit</gui>
+      </title>
+      <p>Set <app>Balsa</app> to delete all messages in the
+      <code>Trash</code> mailbox when <app>Balsa</app> exits.</p>
+    </item>
+    <item>
+      <title>
+        <gui>Automatically close mailbox</gui>
+      </title>
+      <p>Set <app>Balsa</app> to close any mailbox that is unused for
+      more than the specified time. The currently displayed mailbox
+      is never automatically closed.</p>
+    </item>
+    <item>
+      <title>
+        <gui>Hide messages marked as deleted</gui>
+      </title>
+      <p>When a message is moved to another mailbox, including the
+      <code>Trash</code> mailbox, it is actually copied to the
+      destination, and the original is marked as deleted. Deleted
+      messages may either be shown in the mailbox index, with the
+      trashcan icon indicating that they are deleted, or hidden.
+      This item controls which of those actions is taken.</p>
+      <p>A message may also be simply marked as deleted, without
+      copying it to another mailbox:
+      <guiseq>
+        <gui>Message</gui>
+        <gui>Toggle flag</gui>
+        <gui>Deleted</gui>
+      </guiseq>. Again, this item controls whether such a message
+      is hidden.</p>
+    </item>
+    <item>
+      <title>
+        <gui>Expunge deleted messages on close</gui>
+      </title>
+      <p>"Expunging" is the act of physically removing from the
+      backing mailstore all messages marked as deleted. You can
+      expunge messages manually:
+      <guiseq>
+        <gui>Mailbox</gui>
+        <gui>Expunge deleted messages</gui>
+      </guiseq>, or you can set <app>Balsa</app> to expunge deleted
+      messages when the mailbox is closed (all mailboxes are closed
+      when you exit <app>Balsa</app>).</p>
+    </item>
+  </terms>
+</page>

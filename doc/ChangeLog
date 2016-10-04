@@ -1,3 +1,11 @@
+2016-10-04  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	List HELP_FILES explicitly
+
+	* Makefile.am: list HELP_FILES explicitly instead of
+	dereferencing variables, so that Damned Lies can parse it.
+	<URL:https://mail.gnome.org/archives/gnome-i18n/2016-September/msg00042.html>
+
 2016-06-28  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	reviewed by: <delete if not using a buddy>

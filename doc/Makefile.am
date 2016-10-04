@@ -4,7 +4,10 @@ if HAVE_YELPTOOL
 
 HELP_ID      = balsa
 
-balsa_help_files =						\
+HELP_LINGUAS = de es fr sl
+
+if BUILD_WITH_SPELL_CHECKER
+HELP_FILES   =	 						\
                ab-conf.page					\
                authors.page					\
                common-tasks.page				\
@@ -30,18 +33,41 @@ balsa_help_files =						\
                win-run-filters.page				\
                win-search.page
 
-HELP_LINGUAS = de es fr sl
-
-if BUILD_WITH_SPELL_CHECKER
-balsa_spell_extra =
 helpdirs = C $(HELP_LINGUAS)
 balsa_spell_extra_dist = $(foreach lc,$(helpdirs),$(lc)/preferences-spelling.page) #
+
 else
+HELP_FILES   =	 						\
+               ab-conf.page					\
+               authors.page					\
+               common-tasks.page				\
+               folder-config.page				\
+               getting-started.page				\
+               glossary.page					\
+               identities.page					\
+               index.page					\
+               introduction.page				\
+               its-not-working.page				\
+               mbox-formats.page				\
+               preferences-address-books.page			\
+               preferences-display-options.page			\
+               preferences-mail-options.page			\
+               preferences-miscellaneous.page			\
+               preferences.page					\
+	       preferences-spelling.page			\
+               preferences-startup.page				\
+               toolbar-prefs.page				\
+               win-composer.page				\
+               win-filters.page					\
+               win-main.page					\
+               win-message.page					\
+               win-run-filters.page				\
+               win-search.page
+
 balsa_spell_extra_dist =
-balsa_spell_extra = preferences-spelling.page
+
 endif
 
-HELP_FILES   = $(balsa_help_files) $(balsa_spell_extra)
 EXTRA_DIST   = $(balsa_spell_extra_dist)
 
 HELP_EXTRA   = balsa.entities

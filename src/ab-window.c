@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2013 Stuart Parmenter and others,
+ * Copyright (C) 1997-2016 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -14,9 +14,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
- * 02111-1307, USA.
+ * along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
 
 #if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
@@ -209,7 +207,6 @@ balsa_ab_window_load_books(BalsaAbWindow * ab)
 
         gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(ab->combo_box),
                                   address_book->name);
-#endif                          /* GTK_CHECK_VERSION(2, 24, 0) */
 
         if (ab->current_address_book == NULL)
             ab->current_address_book = address_book;

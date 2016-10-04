@@ -1722,9 +1722,6 @@ msgstr "Impossível executar %s para consultar a chave pública %s."
 
 #: ../libbalsa/rfc3156.c:994
 #, c-format
-#| msgid ""
-#| "Running gpg failed with return value %d:\n"
-#| "%s"
 msgid ""
 "Running %s failed with return value %d:\n"
 "%s"
@@ -1734,9 +1731,6 @@ msgstr ""
 
 #: ../libbalsa/rfc3156.c:1001
 #, c-format
-#| msgid ""
-#| "Running gpg successful:\n"
-#| "%s"
 msgid ""
 "Running %s successful:\n"
 "%s"

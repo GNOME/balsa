@@ -1,8 +1,5 @@
 # German Balsa translation.
 # Copyright (C) 2000 Free Software Foundation, Inc.
-#
-# Bitte nach der Evolution-Übersetzung richten.
-#
 # Matthias Warkus <mawarkus@gnome.org>, 1999-2001.
 # Michael Duelli <m.duelli@web.de>, 2000.
 # Kai Lahmann <kl@linuxfaqs.de>, 2000.
@@ -286,17 +283,8 @@ msgstr "Fehler beim Verschieben von Nachrichten: %s"
 
 #: ../libbalsa/gmime-application-pkcs7.c:125
 #, c-format
-msgid "Invalid filters %s for mailbox %s"
-msgstr "Ungültige Filter %s für das Postfach %s"
-
-#. FIXME: this is hack!
-#: ../libbalsa/filter-funcs.c:381 ../src/balsa-index.c:1053
-msgid "To"
-msgstr "An"
-
-#: ../libbalsa/filter-funcs.c:382 ../src/balsa-index.c:357
-msgid "From"
-msgstr "Von"
+msgid "Failed to decrypt MIME part: parse error"
+msgstr "Der MIME-Teil konnte nicht dekodiert werden: Analysefehler"
 
 #: ../libbalsa/gmime-multipart-crypt.c:222
 msgid "Cannot verify multipart/signed part due to missing subparts."
@@ -720,206 +708,10 @@ msgstr "Fehler beim Speichern des Passworts für %s@%s: %s\n"
 msgid "Cannot connect to %s"
 msgstr "Verbindung mit %s konnte nicht aufgebaut werden"
 
-#: ../libbalsa/imap-server.c:629 ../libbalsa/imap-server.c:634
+#: ../libbalsa/imap-server.c:633 ../libbalsa/imap-server.c:638
 #, c-format
 msgid "Cannot connect to the server: %s"
 msgstr "Verbindung mit Server konnte nicht aufgebaut werden: %s"
-
-#: ../libbalsa/imap-server.c:782
-#, c-format
-msgid "Exceeded the number of connections per server %s"
-msgstr "Die maximale Anzahl an Verbindungen wurden für den Server %s erreicht"
-
-#: ../libbalsa/libbalsa.c:385
-msgid "Invalid date"
-msgstr "Ungültiges Datum"
-
-#: ../libbalsa/libbalsa.c:401 ../src/pref-manager.c:1406
-#: ../src/pref-manager.c:1502
-msgid "Unknown"
-msgstr "Unbekannt"
-
-#: ../libbalsa/libbalsa.c:547
-#, c-format
-msgid ""
-"Authenticity of this certificate could not be verified.\n"
-"<b>Reason:</b> %s\n"
-"<b>This certificate belongs to:</b>\n"
-msgstr ""
-"Die Echtheit dieses Zertifikats konnte nicht bestätigt werden.\n"
-"<b>Ursache:</b> %s\n"
-"<b>Dieses Zertifikat gehört zu:</b>\n"
-
-#: ../libbalsa/libbalsa.c:559
-msgid ""
-"\n"
-"<b>This certificate was issued by:</b>\n"
-msgstr ""
-"\n"
-"<b>Dieses Zertifikat wurde ausgegeben von:</b>\n"
-
-#: ../libbalsa/libbalsa.c:570
-#, c-format
-msgid ""
-"<b>This certificate is valid</b>\n"
-"from %s\n"
-"to %s\n"
-"<b>Fingerprint:</b> %s"
-msgstr ""
-"<b>Dieses Zertifikat ist gültig</b>\n"
-"von %s\n"
-"bis %s\n"
-"<b>Fingerabdruck:</b> %s"
-
-#: ../libbalsa/libbalsa.c:579
-msgid "SSL/TLS certificate"
-msgstr "SSL/TLS-Zertifikat"
-
-#: ../libbalsa/libbalsa.c:581
-msgid "_Accept Once"
-msgstr "Einmal _annehmen"
-
-#: ../libbalsa/libbalsa.c:582
-msgid "Accept&_Save"
-msgstr "Annehmen und _Speichern"
-
-#: ../libbalsa/libbalsa.c:583
-msgid "_Reject"
-msgstr "A_blehnen"
-
-#: ../libbalsa/libbalsa.c:629
-#, c-format
-msgid "Connection to %s timed out. Abort?"
-msgstr "Zeitüberschreitung bei Verbindung zu %s. Abbrechen?"
-
-#: ../libbalsa/libbalsa.c:875
-#, c-format
-msgid "No image data"
-msgstr "Keine Bilddaten"
-
-#: ../libbalsa/libbalsa.c:919
-#, c-format
-msgid "Invalid input format"
-msgstr "Ungültiges Eingabeformat"
-
-#: ../libbalsa/libbalsa.c:923
-#, c-format
-msgid "Internal buffer overrun"
-msgstr "Interner Pufferüberlauf"
-
-#. Translators: please do not translate Face.
-#: ../libbalsa/libbalsa.c:940
-#, c-format
-msgid "Bad X-Face data"
-msgstr "Ungültige X-Face-Daten"
-
-#: ../libbalsa/libbalsa-conf.c:141
-msgid "Your Balsa configuration is now stored in \"~/.balsa/config\"."
-msgstr "Ihre Konfiguration von Balsa wurde in »~/.balsa/config« gesichert"
-
-#: ../libbalsa/libbalsa-gpgme.c:243 ../libbalsa/libbalsa-gpgme.c:254
-#: ../libbalsa/libbalsa-gpgme.c:356 ../libbalsa/libbalsa-gpgme.c:479
-#: ../libbalsa/libbalsa-gpgme.c:572
-msgid "could not get data from stream"
-msgstr "Daten konnten nicht aus dem Datenstrom empfangen werden"
-
-#: ../libbalsa/libbalsa-gpgme.c:267 ../libbalsa/rfc3156.c:392
-#: ../libbalsa/rfc3156.c:397 ../libbalsa/rfc3156.c:569
-#: ../libbalsa/rfc3156.c:575
-msgid "signature verification failed"
-msgstr "Signatur konnte nicht überprüft werden"
-
-#: ../libbalsa/libbalsa-gpgme.c:364 ../libbalsa/libbalsa-gpgme.c:488
-#: ../libbalsa/libbalsa-gpgme.c:580
-msgid "could not create new data object"
-msgstr "Neues Datenobjekt konnte nicht erzeugt werden"
-
-#: ../libbalsa/libbalsa-gpgme.c:373
-msgid "signing failed"
-msgstr "Signieren fehlgeschlagen"
-
-#: ../libbalsa/libbalsa-gpgme.c:447
-#, c-format
-msgid "combined signing and encryption is defined only for RFC 2440"
-msgstr ""
-"Die Kombination von Signatur und Verschlüsselung ist nur für RFC 2440 "
-"definiert"
-
-#: ../libbalsa/libbalsa-gpgme.c:515
-msgid "signing and encryption failed"
-msgstr "Signieren und Verschlüsseln fehlgeschlagen"
-
-#: ../libbalsa/libbalsa-gpgme.c:517
-msgid "encryption failed"
-msgstr "Verschlüsseln fehlgeschlagen"
-
-#: ../libbalsa/libbalsa-gpgme.c:590 ../libbalsa/rfc3156.c:470
-#: ../libbalsa/rfc3156.c:475
-msgid "decryption failed"
-msgstr "Entschlüsselung fehlgeschlagen"
-
-#: ../libbalsa/libbalsa-gpgme.c:691
-msgid "could not create context"
-msgstr "Kontext konnte nicht erzeugt werden"
-
-#: ../libbalsa/libbalsa-gpgme.c:695
-#, c-format
-msgid "could not set protocol '%s'"
-msgstr "Protokoll »%s« konnte nicht gesetzt werden"
-
-#: ../libbalsa/libbalsa-gpgme.c:734 ../libbalsa/libbalsa-gpgme.c:762
-#, c-format
-msgid "could not list keys for \"%s\""
-msgstr "Schlüsselliste für »%s« konnte nicht erstellt werden"
-
-#: ../libbalsa/libbalsa-gpgme.c:780
-#, c-format
-msgid ""
-"%s: a key for %s is present, but it is expired, disabled, revoked or invalid"
-msgstr ""
-"%s: Ein Schlüssel für %s ist verfügbar, aber entweder abgelaufen, "
-"deaktiviert, widerrufen oder ungültig"
-
-#: ../libbalsa/libbalsa-gpgme.c:785
-#, c-format
-msgid "%s: could not find a key for %s"
-msgstr "%s: es wurde kein Schlüssel für %s gefunden"
-
-#: ../libbalsa/libbalsa-gpgme.c:792
-#, c-format
-msgid ""
-"%s: a key with id %s is present, but it is expired, disabled, revoked or "
-"invalid"
-msgstr ""
-"%s: Ein Schlüssel mit der Kennung %s ist verfügbar, aber entweder "
-"abgelaufen, deaktiviert, widerrufen oder ungültig"
-
-#: ../libbalsa/libbalsa-gpgme.c:797
-#, c-format
-msgid "%s: could not find a key with id %s"
-msgstr "%s: Schlüssel mit der Kennung %s konnte nicht gefunden werden"
-
-#: ../libbalsa/libbalsa-gpgme.c:814
-#, c-format
-msgid "%s: multiple keys for %s"
-msgstr "%s: es gibt mehrere verschiedene Schlüssel für %s"
-
-#: ../libbalsa/libbalsa-gpgme.c:860
-#, c-format
-msgid "%s: insufficient validity for uid %s"
-msgstr "%s: unzureichende Gültigkeit für Benutzerkennung %s"
-
-#: ../libbalsa/libbalsa-gpgme-cb.c:143
-msgid "User ID"
-msgstr "Benutzerkennung"
-
-#: ../libbalsa/libbalsa-gpgme-cb.c:143
-msgid "Key ID"
-msgstr "Schlüsselkennung"
-
-#: ../libbalsa/libbalsa-gpgme-cb.c:143
-msgid "Length"
-msgstr "Länge"
 
 #: ../libbalsa/imap-server.c:787
 #, c-format
@@ -1210,14 +1002,14 @@ msgstr "Ungültiges Eingabeformat"
 
 #: ../libbalsa/libbalsa.c:804
 #, c-format
-msgid "Open with %s"
-msgstr "Mit %s öffnen"
+msgid "Internal buffer overrun"
+msgstr "Interner Pufferüberlauf"
 
 #. Translators: please do not translate Face.
 #: ../libbalsa/libbalsa.c:821
 #, c-format
-msgid "Open _part with %s"
-msgstr "_Teil mit %s öffnen"
+msgid "Bad X-Face data"
+msgstr "Ungültige X-Face-Daten"
 
 #: ../libbalsa/mailbox.c:506
 #, c-format
@@ -1244,7 +1036,7 @@ msgstr "Postfach des Typs %s konnte nicht angelegt werden"
 msgid "Applying filter rules to %s"
 msgstr "Filterregeln auf %s anwenden"
 
-#: ../libbalsa/mailbox.c:1027
+#: ../libbalsa/mailbox.c:1029
 #, c-format
 msgid "Copying from %s to %s"
 msgstr "Von »%s« nach »%s« kopieren"
@@ -1290,7 +1082,7 @@ msgstr "Die IMAP-Verbindung wurde getrennt. Wiederherstellen …"
 
 #: ../libbalsa/mailbox_imap.c:618
 msgid "IMAP protocol error. Try enabling bug workarounds."
-msgstr "IMAP-Protokollfehler. Versuchen Sie, Fehlerumgehungen zu aktivieren."
+msgstr "IMAP-Protokollfehler. Versuchen Sie, Bug-Workarounds zu aktivieren."
 
 #: ../libbalsa/mailbox_imap.c:621
 #, c-format
@@ -1464,7 +1256,7 @@ msgstr "Datei %s konnte nicht geschrieben werden: %s"
 #: ../libbalsa/mailbox_mbox.c:431
 #, c-format
 msgid "Failed to create temporary file \"%s\": %s"
-msgstr "Temporäre Datei »%s« konnte nicht angelegt werden: %s"
+msgstr "Temporärdatei »%s« konnte nicht angelegt werden: %s"
 
 #: ../libbalsa/mailbox_mbox.c:443
 #, c-format
@@ -1597,7 +1389,7 @@ msgstr "POP3-Fehler: %s konnte nicht geschlossen werden."
 msgid "POP3 error: %s."
 msgstr "POP3-Fehler: %s"
 
-#: ../libbalsa/message.c:615
+#: ../libbalsa/message.c:617
 #, c-format
 msgid "Mailbox (%s) is readonly: cannot change flags."
 msgstr ""
@@ -1714,31 +1506,31 @@ msgstr "LDAP-Verzeichnis für %s"
 msgid "unknown"
 msgstr "unbekannt"
 
-#: ../libbalsa/rfc2445.c:89
+#: ../libbalsa/rfc2445.c:91
 msgid "needs action"
 msgstr "Aktion erforderlich"
 
-#: ../libbalsa/rfc2445.c:90
+#: ../libbalsa/rfc2445.c:92
 msgid "accepted"
 msgstr "angenommen"
 
-#: ../libbalsa/rfc2445.c:91
+#: ../libbalsa/rfc2445.c:93
 msgid "declined"
 msgstr "abgelehnt"
 
-#: ../libbalsa/rfc2445.c:92
+#: ../libbalsa/rfc2445.c:94
 msgid "tentatively accepted"
 msgstr "vorläufig akzeptiert"
 
-#: ../libbalsa/rfc2445.c:93
+#: ../libbalsa/rfc2445.c:95
 msgid "delegated"
 msgstr "delegiert"
 
-#: ../libbalsa/rfc2445.c:94
+#: ../libbalsa/rfc2445.c:96
 msgid "completed"
 msgstr "vervollständigt"
 
-#: ../libbalsa/rfc2445.c:95
+#: ../libbalsa/rfc2445.c:97
 msgid "in process"
 msgstr "in Verarbeitung"
 
@@ -2216,12 +2008,12 @@ msgstr "Wenn möglich"
 msgid "Required"
 msgstr "Notwendig"
 
-#: ../libbalsa/smtp-server.c:428
+#: ../libbalsa/smtp-server.c:423
 #, c-format
 msgid "Error displaying server help: %s\n"
 msgstr "Fehler beim Anzeigen der Hilfe: %s\n"
 
-#: ../libbalsa/smtp-server.c:543
+#: ../libbalsa/smtp-server.c:538
 msgid "SMTP Server"
 msgstr "SMTP-Server"
 
@@ -2308,7 +2100,7 @@ msgstr ""
 "Ordner konnte nicht angelegt werden: mkdir() ist mit dem Pfadnamen »%s« "
 "fehlgeschlagen."
 
-#: ../libinit_balsa/assistant_init.c:49
+#: ../libinit_balsa/assistant_init.c:51
 msgid ""
 "This will exit Balsa.\n"
 "Do you really want to do this?"
@@ -2363,7 +2155,7 @@ msgstr "E_ntwürfe:"
 
 #: ../libinit_balsa/assistant_page_directory.c:51
 msgid "_Trash:"
-msgstr "_Papierkorb:"
+msgstr "_Müll:"
 
 #: ../libinit_balsa/assistant_page_directory.c:85
 #, c-format
@@ -2412,7 +2204,7 @@ msgstr ""
 msgid "Mail Files"
 msgstr "Maildateien"
 
-#: ../libinit_balsa/assistant_page_finish.c:42
+#: ../libinit_balsa/assistant_page_finish.c:44
 msgid ""
 "You've successfully set up Balsa. Have fun!\n"
 "   -- The Balsa development team"
@@ -2420,11 +2212,11 @@ msgstr ""
 "Sie haben Balsa erfolgreich eingerichtet. Viel Spaß!\n"
 "   -- Das Balsa-Entwicklerteam"
 
-#: ../libinit_balsa/assistant_page_finish.c:47
+#: ../libinit_balsa/assistant_page_finish.c:49
 msgid "All Done!"
 msgstr "Fertig!"
 
-#: ../libinit_balsa/assistant_page_user.c:55
+#: ../libinit_balsa/assistant_page_user.c:57
 msgid ""
 "The following settings are also needed (and you can find them later, if need "
 "be, in the Email application in the 'Preferences' and 'Identities' menu "
@@ -2434,7 +2226,7 @@ msgstr ""
 "falls notwendig später in Balsa im Menü »Werkzeuge« unter »Einstellungen« "
 "und »Identitäten«."
 
-#: ../libinit_balsa/assistant_page_user.c:61
+#: ../libinit_balsa/assistant_page_user.c:63
 msgid ""
 " Whoever provides your email account should be able to give you the "
 "following information (if you have a Network Administrator, they may already "
@@ -2444,48 +2236,48 @@ msgstr ""
 "Falls Sie Zugang zu einem Netzwerkadministrator haben, sollte auch dieser "
 "Ihnen weiterhelfen können:"
 
-#: ../libinit_balsa/assistant_page_user.c:68
+#: ../libinit_balsa/assistant_page_user.c:70
 msgid "Yes, remember it"
 msgstr "Ja, daran erinnern"
 
-#: ../libinit_balsa/assistant_page_user.c:68
+#: ../libinit_balsa/assistant_page_user.c:70
 msgid "No, type it in every time"
 msgstr "Nein, jedes Mal eingeben"
 
-#: ../libinit_balsa/assistant_page_user.c:101
+#: ../libinit_balsa/assistant_page_user.c:103
 msgid "Name of mail server for incoming _mail:"
 msgstr "Name des E-Mail-Servers für eingehende _Nachrichten:"
 
-#: ../libinit_balsa/assistant_page_user.c:106
+#: ../libinit_balsa/assistant_page_user.c:108
 msgid "_Type of mail server:"
 msgstr "_Art des Mail-Servers:"
 
-#: ../libinit_balsa/assistant_page_user.c:110
+#: ../libinit_balsa/assistant_page_user.c:112
 msgid "Connect using _SSL:"
 msgstr "Verbindung über _SSL:"
 
-#: ../libinit_balsa/assistant_page_user.c:113
+#: ../libinit_balsa/assistant_page_user.c:115
 msgid "Your email _login name:"
 msgstr "Ihr E-Mail-_Benutzername:"
 
-#: ../libinit_balsa/assistant_page_user.c:116
+#: ../libinit_balsa/assistant_page_user.c:118
 msgid "Your _password:"
 msgstr "Ihr _Passwort:"
 
-#: ../libinit_balsa/assistant_page_user.c:124
+#: ../libinit_balsa/assistant_page_user.c:126
 msgid "_SMTP Server:"
 msgstr "SMT_P-Server:"
 
 #. 2.1
-#: ../libinit_balsa/assistant_page_user.c:129
+#: ../libinit_balsa/assistant_page_user.c:131
 msgid "Your real _name:"
 msgstr "Ihr richtiger _Name:"
 
-#: ../libinit_balsa/assistant_page_user.c:135
+#: ../libinit_balsa/assistant_page_user.c:137
 msgid "Your _Email Address, for this email account:"
 msgstr "Ihre _E-Mail-Adresse für dieses E-Mail-Postfach:"
 
-#: ../libinit_balsa/assistant_page_user.c:140
+#: ../libinit_balsa/assistant_page_user.c:142
 msgid "_Remember your password:"
 msgstr "An Passwort _erinnern:"
 
@@ -2510,11 +2302,11 @@ msgstr ""
 "Problem mit lokaler Mail\n"
 "%s"
 
-#: ../libinit_balsa/assistant_page_welcome.c:27
+#: ../libinit_balsa/assistant_page_welcome.c:29
 msgid "Welcome to Balsa!"
 msgstr "Willkommen bei Balsa!"
 
-#: ../libinit_balsa/assistant_page_welcome.c:30
+#: ../libinit_balsa/assistant_page_welcome.c:32
 msgid ""
 "Before you can send or receive email:\n"
 "\n"
@@ -2627,7 +2419,7 @@ msgstr ""
 "Fehler beim Öffnen des Adressbuchs »%s«:\n"
 "%s"
 
-#: ../src/address-book-config.c:175
+#: ../src/address-book-config.c:177
 msgid "Suggest complete addresses:"
 msgstr "Adressenvervollständigung aktivieren:"
 
@@ -2784,7 +2576,7 @@ msgstr "Größe"
 #: ../src/balsa-index.c:1655
 #, c-format
 msgid "Move to Trash failed: %s"
-msgstr "Verschieben in den Papierkorb ist fehlgeschlagen: %s"
+msgstr "Verschieben in den Müll ist fehlgeschlagen: %s"
 
 #: ../src/balsa-index.c:1813
 msgid "_Reply..."
@@ -2826,7 +2618,7 @@ msgstr "_Wiederherstellen"
 
 #: ../src/balsa-index.c:1847
 msgid "Move To _Trash"
-msgstr "In den _Papierkorb verschieben"
+msgstr "In den _Müll verschieben"
 
 #: ../src/balsa-index.c:1851
 msgid "T_oggle"
@@ -3223,7 +3015,7 @@ msgstr ""
 msgid "Could not launch application: %s"
 msgstr "Anwendung konnte nicht gestartet werden: %s"
 
-#: ../src/balsa-mime-widget-callbacks.c:79
+#: ../src/balsa-mime-widget-callbacks.c:81
 #, c-format
 msgid "Save %s MIME Part"
 msgstr "MIME-Teil von %s speichern"
@@ -3470,7 +3262,7 @@ msgstr ""
 "der Kopfzeile wurde jedoch nicht angegeben, welcher Zeichensatz verwendet "
 "wurde (umgewandelt zu %s)"
 
-#: ../src/balsa-mime-widget-vcalendar.c:65
+#: ../src/balsa-mime-widget-vcalendar.c:67
 #, c-format
 msgid "This is an iTIP calendar \"%s\" message."
 msgstr "Dies ist eine »%s«-Meldung eines iTip-Kalenders."
@@ -3654,31 +3446,31 @@ msgid "Match when none of these flags is set:"
 msgstr "Passt, wenn keine dieser Markierungen gesetzt ist:"
 
 # CHECK
-#: ../src/filter-edit-callbacks.c:552
+#: ../src/filter-edit-callbacks.c:540
 msgid "You must specify the name of the user header to match on"
 msgstr "Sie müssen mindestens den Namen des Benutzer-Headers angeben"
 
-#: ../src/filter-edit-callbacks.c:563
+#: ../src/filter-edit-callbacks.c:551
 msgid "You must specify at least one field for matching"
 msgstr "Sie müssen mindestens ein Feld für eine Übereinstimmung angeben"
 
-#: ../src/filter-edit-callbacks.c:573
+#: ../src/filter-edit-callbacks.c:561
 msgid "You must provide a string"
 msgstr "Sie müssen eine Zeichenkette angeben"
 
-#: ../src/filter-edit-callbacks.c:581
+#: ../src/filter-edit-callbacks.c:569
 msgid "You must provide at least one regular expression"
 msgstr "Sie müssen mindestens einen regulären Ausdruck angeben"
 
-#: ../src/filter-edit-callbacks.c:594
+#: ../src/filter-edit-callbacks.c:582
 msgid "Low date is incorrect"
 msgstr "Erstes Datum ist fehlerhaft"
 
-#: ../src/filter-edit-callbacks.c:605
+#: ../src/filter-edit-callbacks.c:593
 msgid "High date is incorrect"
 msgstr "Zweites Datum ist fehlerhaft"
 
-#: ../src/filter-edit-callbacks.c:613
+#: ../src/filter-edit-callbacks.c:601
 msgid "Low date is greater than high date"
 msgstr "Erstes Datum ist größer als zweites Datum"
 
@@ -3812,47 +3604,47 @@ msgstr "(Beispiel: 31. Dezember 2000 als %s schreiben)"
 msgid "Simple"
 msgstr "Einfach"
 
-#: ../src/filter-edit-dialog.c:96
+#: ../src/filter-edit-dialog.c:98
 msgid "Regular Expression"
 msgstr "Regulärer Ausdruck"
 
-#: ../src/filter-edit-dialog.c:97
+#: ../src/filter-edit-dialog.c:99
 msgid "Date interval"
 msgstr "Datumszeitraum"
 
-#: ../src/filter-edit-dialog.c:98
+#: ../src/filter-edit-dialog.c:100
 msgid "Flag condition"
 msgstr "Markierungsbedingung"
 
-#: ../src/filter-edit-dialog.c:102
+#: ../src/filter-edit-dialog.c:104
 msgid "Copy to folder:"
 msgstr "Kopie in Ordner:"
 
-#: ../src/filter-edit-dialog.c:103
+#: ../src/filter-edit-dialog.c:105
 msgid "Move to folder:"
 msgstr "Verschieben in Ordner:"
 
-#: ../src/filter-edit-dialog.c:104
+#: ../src/filter-edit-dialog.c:106
 msgid "Colorize"
 msgstr "Färben"
 
-#: ../src/filter-edit-dialog.c:105
+#: ../src/filter-edit-dialog.c:107
 msgid "Print on printer:"
 msgstr "Ausgeben auf Drucker:"
 
-#: ../src/filter-edit-dialog.c:106
+#: ../src/filter-edit-dialog.c:108
 msgid "Run program:"
 msgstr "Programm starten:"
 
-#: ../src/filter-edit-dialog.c:107
+#: ../src/filter-edit-dialog.c:109
 msgid "Send to Trash"
-msgstr "In den Papierkorb verschieben"
+msgstr "In den Müll verschieben"
 
-#: ../src/filter-edit-dialog.c:111
+#: ../src/filter-edit-dialog.c:113
 msgid "OR"
 msgstr "ODER"
 
-#: ../src/filter-edit-dialog.c:112
+#: ../src/filter-edit-dialog.c:114
 msgid "AND"
 msgstr "UND"
 
@@ -3936,17 +3728,17 @@ msgstr "Filter"
 msgid "Filter \"%s\" has no condition."
 msgstr "Der Filter »%s« hat keine Bedingungen."
 
-#: ../src/filter-export-callbacks.c:57
+#: ../src/filter-export-callbacks.c:59
 #, c-format
 msgid "Unable to export filter %s, an error occurred."
 msgstr "Filter %s konnte nicht exportiert werden: Es trat ein Fehler auf."
 
-#: ../src/filter-export-dialog.c:63
+#: ../src/filter-export-dialog.c:65
 msgid ""
 "There are opened filter run dialogs, close them before you can modify "
 "filters."
 msgstr ""
-"Es gibt offene Filterstart-Dialoge, schließen Sie diese, bevor Sie Filter "
+"Es gibt offene Filterstart-Dialoge, schließen Sie diese bevor sie Filter "
 "ändern können."
 
 #: ../src/filter-export-dialog.c:77
@@ -4034,8 +3826,8 @@ msgid ""
 "The filters dialog is opened, close it before you can run filters on any "
 "mailbox"
 msgstr ""
-"Der Filter-Dialog ist geöffnet. Schließen Sie ihn, um Filter auf ein "
-"beliebiges Postfach anwenden zu können"
+"Der Filter-Dialog ist geöffnet. Schließen Sie ihn, um Filter auf eine "
+"beliebige Mailbox anwenden zu können"
 
 #: ../src/folder-conf.c:112
 #, c-format
@@ -4344,9 +4136,9 @@ msgid ""
 "mailbox again.\n"
 "What would you like to do?"
 msgstr ""
-"Dies wird das Postfach »%s« aus der Liste der Postfächer entfernen. Sie "
-"können auch die Datei(en), die auf der Platte mit diesem Postfach verknüpft "
-"ist/sind, entfernen.\n"
+"Dies wird das Postfach %s aus der Liste der Postfächer entfernen. Sie können "
+"auch die Datei(en), die auf der Platte mit diesem Postfach verknüpft ist/"
+"sind, entfernen.\n"
 "Falls Sie die Datei(en) auf der Platte nicht entfernen, können Sie das "
 "»Postfach hinzufügen«, um später wieder darauf zuzugreifen.\n"
 "Was wollen Sie tun?"
@@ -4385,7 +4177,7 @@ msgid ""
 "You may use \"Add Mailbox\" later to access this mailbox again.\n"
 "What would you like to do?"
 msgstr ""
-"Dies wird das Postfach »%s« aus der Liste der Postfächer entfernen.\n"
+"Dies wird das Postfach %s aus der Liste der Postfächer entfernen.\n"
 "Sie können später »Postfach hinzufügen« verwenden, um wieder darauf "
 "zuzugreifen.\n"
 "Was wollen Sie tun?"
@@ -4447,7 +4239,7 @@ msgstr "Nachrichten nach dem Herunterladen vom Server _löschen"
 
 #: ../src/mailbox-conf.c:1215
 msgid "_Enable check for new mail"
-msgstr "Dieses Postfach auf neue Nachrichten über_prüfen"
+msgstr "Dieses Postfach auf neue Mail über_prüfen"
 
 #: ../src/mailbox-conf.c:1220
 msgid "_Filter messages through procmail"
@@ -4492,7 +4284,7 @@ msgstr "Spalte »Empfänge_r« anstelle von »Absender« anzeigen"
 
 #: ../src/mailbox-conf.c:1486
 msgid "_Subscribe for new mail check"
-msgstr "_Automatisch nach neuen Nachrichten sehen"
+msgstr "_Automatisch nach neuen E-Mails sehen"
 
 #: ../src/mailbox-node.c:319
 msgid "The folder edition to be written."
@@ -4568,7 +4360,7 @@ msgstr "Als _Verschickt verwenden"
 
 #: ../src/mailbox-node.c:1139
 msgid "Mark as _Trash"
-msgstr "Als _Papierkorb verwenden"
+msgstr "Als _Müll verwenden"
 
 #: ../src/mailbox-node.c:1141
 msgid "Mark as D_raftbox"
@@ -4576,7 +4368,7 @@ msgstr "Als _Entwürfe verwenden"
 
 #: ../src/mailbox-node.c:1144
 msgid "_Empty trash"
-msgstr "Papierkorb _leeren"
+msgstr "Müll _leeren"
 
 #: ../src/mailbox-node.c:1149
 msgid "_Edit/Apply filters"

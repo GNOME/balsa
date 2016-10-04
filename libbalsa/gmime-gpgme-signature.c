@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /*
  * gmime/gpgme glue layer library
- * Copyright (C) 2004-2013 Albrecht Dreß <albrecht.dress@arcor.de>
+ * Copyright (C) 2004-2016 Albrecht Dreß <albrecht.dress@arcor.de>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

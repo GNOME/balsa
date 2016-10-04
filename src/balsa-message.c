@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2013 Stuart Parmenter and others,
+ * Copyright (C) 1997-2016 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -14,9 +14,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
- * 02111-1307, USA.
+ * along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
 
 #if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
@@ -1224,8 +1222,7 @@ balsa_message_set_embedded_hdr(GtkTreeModel * model, GtkTreePath * path,
  	    balsa_mime_widget_message_set_headers_d(bm, info->mime_widget,
                                                     info->body->embhdrs,
                                                     info->body->parts,
-                                                    info->body->embhdrs->subject,
-                                                    info->body->body_type == LIBBALSA_MESSAGE_BODY_TYPE_TEXT);
+                                                    info->body->embhdrs->subject);
 	g_object_unref(G_OBJECT(info));
     }
 
@@ -1284,8 +1281,7 @@ display_headers(BalsaMessage * bm)
     balsa_mime_widget_message_set_headers_d(bm, bm->bm_widget,
                                             bm->message->headers,
                                             bm->message->body_list,
-                                            LIBBALSA_MESSAGE_GET_SUBJECT(bm->message),
-                                            FALSE);
+                                            LIBBALSA_MESSAGE_GET_SUBJECT(bm->message));
 }
 
 

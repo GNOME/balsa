@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2013 Stuart Parmenter and others,
+ * Copyright (C) 1997-2016 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -472,8 +472,6 @@ bw_create_index_widget(BalsaWindow *bw)
         gtk_combo_box_text_insert_text(GTK_COMBO_BOX_TEXT(bw->filter_choice),
                                        i, view_filters[i].str);
     gtk_combo_box_set_active(GTK_COMBO_BOX(bw->filter_choice), 0);
-    gtk_box_pack_start(GTK_BOX(bw->sos_bar), bw->filter_choice,
-                       FALSE, FALSE, 0);
     gtk_widget_show(bw->filter_choice);
     bw->sos_entry = gtk_entry_new();
     /* gtk_label_set_mnemonic_widget(GTK_LABEL(bw->filter_choice),
@@ -973,7 +971,7 @@ about_activated(GSimpleAction * action,
     gtk_show_about_dialog(window,
                           "version", BALSA_VERSION,
                           "copyright",
-                          "Copyright \xc2\xa9 1997-2013 The Balsa Developers",
+                          "Copyright \xc2\xa9 1997-2016 The Balsa Developers",
                           "comments",
                           _("The Balsa email client is part of "
                             "the GNOME desktop environment."),
@@ -1671,9 +1669,6 @@ show_mailbox_tabs_change_state(GSimpleAction * action,
     g_simple_action_set_state(action, state);
 }
 
-/*
- * show the about box for Balsa
- */
 static void
 show_toolbar_change_state(GSimpleAction * action,
                           GVariant      * state,

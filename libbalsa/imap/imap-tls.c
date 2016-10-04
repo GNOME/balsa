@@ -1,5 +1,5 @@
 /* libimap library.
- * Copyright (C) 2003-2013 Pawel Salek.
+ * Copyright (C) 2003-2016 Pawel Salek.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -46,15 +46,6 @@
 #include <openssl/ssl.h>
 #include <openssl/x509v3.h>
 #include <openssl/err.h>
-
-/* Support for SSLv3 should *not* be enabled as it is unsafe (see
- * <http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2014-3566> and
- * <http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2014-8730>.
- *
- * Uncomment the following line if you *really* want to enable SSLv3 support.
- * Otherwise, only the "safe" protocols TLS 1.0, TLS 1.1 and TLS 1.2 are used
- * (note that TLS 1.1 and TLS 1.2 support depends upon the OpenSSL version) */
-/* #define ENABLE_SSL3 1 */
 
 /* Support for SSLv3 should *not* be enabled as it is unsafe (see
  * <http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2014-3566> and

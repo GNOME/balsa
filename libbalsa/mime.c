@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2013 Stuart Parmenter and others,
+ * Copyright (C) 1997-2016 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -55,7 +55,6 @@ process_mime_part(LibBalsaMessage * message, LibBalsaMessageBody * body,
     GString *reply = NULL;
     gchar *mime_type;
     LibBalsaHTMLType html_type;
-    ssize_t allocated;
 
     switch (libbalsa_message_body_type(body)) {
     case LIBBALSA_MESSAGE_BODY_TYPE_OTHER:
@@ -81,7 +80,7 @@ process_mime_part(LibBalsaMessage * message, LibBalsaMessageBody * body,
 
 #ifdef HAVE_HTML_WIDGET
 	allocated = libbalsa_message_body_get_content(body, &res, NULL);
-	if (!res || allocated == -1)
+	if (!res)
 	    return NULL;
 
 	if (html_type) {

@@ -267,8 +267,8 @@ msgstr "Hiba lépett fel a levelek másolása közben: %s"
 
 #: ../libbalsa/filter.c:296
 #, c-format
-msgid "Header:%s"
-msgstr "Fejléc:%s"
+msgid "Error when trashing messages: %s"
+msgstr "Hiba lépett fel a levelek kidobása közben: %s"
 
 #: ../libbalsa/filter.c:309
 #, c-format
@@ -1095,21 +1095,19 @@ msgstr "A(z) %s aszinkron IMAP parancs nem hajtható végre. Újrakapcsolódás�
 #: ../libbalsa/mailbox_imap.c:1124 ../libbalsa/mailbox_maildir.c:505
 #: ../libbalsa/mailbox_mbox.c:739 ../libbalsa/mailbox_mh.c:541
 #, c-format
-msgid ""
-"%s: a key for %s is present, but it is expired, disabled, revoked or invalid"
-msgstr ""
-"%s: létezik %s kulcsa, de lejárt, letiltott, visszavonták vagy érvénytelen"
+msgid "%s: Opening %s Refcount: %d\n"
+msgstr "%s: %s megnyitása, hivatkozások száma: %d\n"
 
 #: ../libbalsa/mailbox_imap.c:1211
 #, c-format
-msgid "%s: could not find a key for %s"
-msgstr "%s: nem sikerült kulcsot találni ehhez: %s"
+msgid "Downloading %ld kB"
+msgstr "%ld kB letöltése"
 
 #: ../libbalsa/mailbox_imap.c:1610
 #, c-format
 msgid ""
-"%s: a key with id %s is present, but it is expired, disabled, revoked or "
-"invalid"
+"IMAP SEARCH command failed for mailbox %s\n"
+"falling back to default searching method"
 msgstr ""
 "Az IMAP SEARCH parancs sikertelen a(z) %s postafiókra,\n"
 "visszatérés az alapértelmezett keresési eljárásra"
@@ -1141,13 +1139,13 @@ msgstr "Nem hozható létre átmeneti fájl"
 
 #: ../libbalsa/mailbox_imap.c:2541
 #, c-format
-msgid "%s: multiple keys for %s"
-msgstr "%s: többszörös kulcs ehhez: %s"
+msgid "Cannot write to temporary file %s"
+msgstr "Nem lehet írni a(z) %s átmeneti fájlba"
 
 #: ../libbalsa/mailbox_imap.c:2770 ../libbalsa/mailbox_imap.c:2889
 #, c-format
-msgid "%s: insufficient validity for uid %s"
-msgstr "%s: elégtelen érvényesség a(z) %s felhasználói azonosítóhoz"
+msgid "Uploading %ld kB"
+msgstr "%ld kB feltöltése"
 
 #: ../libbalsa/mailbox_imap.c:3192
 msgid "Server-side threading not supported."

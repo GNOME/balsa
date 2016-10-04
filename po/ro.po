@@ -1010,7 +1010,8 @@ msgstr "Se descarcă %ld kB"
 #: ../libbalsa/mailbox_imap.c:1614
 #, c-format
 msgid ""
-"%s: a key for %s is present, but it is expired, disabled, revoked or invalid"
+"IMAP SEARCH command failed for mailbox %s\n"
+"falling back to default searching method"
 msgstr ""
 "Comanda IMAP SEARCH a eșuat penrtu căsuța %s.\n"
 "Se revine la metoda de căutare implicită."
@@ -3612,7 +3613,7 @@ msgstr "Nume _filtru:"
 msgid "Operation between conditions:"
 msgstr "Operator între condiții:"
 
-#: ../src/filter-edit-dialog.c:337
+#: ../src/filter-edit-dialog.c:317
 msgid "Ne_w"
 msgstr "_Nou"
 
@@ -4234,11 +4235,6 @@ msgid "The folder edition to be written."
 msgstr "Formatul dosarului ce va fi scris."
 
 #: ../src/mailbox-node.c:491
-#, c-format
-msgid "Scanning %s. Please wait..."
-msgstr "Se scanează %s. Așteptați..."
-
-#: ../src/mailbox-node.c:507
 #, c-format
 msgid "Scanning %s. Please wait..."
 msgstr "Se scanează %s. Așteptați..."

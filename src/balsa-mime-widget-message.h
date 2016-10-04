@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2013 Stuart Parmenter and others,
+ * Copyright (C) 1997-2016 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -44,8 +44,7 @@ void balsa_mime_widget_message_set_headers_d(BalsaMessage * bm,
                                              BalsaMimeWidget *mw,
                                              LibBalsaMessageHeaders *h,
                                              LibBalsaMessageBody *parts,
-                                             const gchar *subject,
-                                             gboolean show_all_headers);
+                                             const gchar *subject);
 
 
 G_END_DECLS

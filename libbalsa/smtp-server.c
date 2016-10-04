@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2013 Stuart Parmenter and others,
+ * Copyright (C) 1997-2016 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -385,13 +385,13 @@ smtp_server_tls_widget(LibBalsaSmtpServer * smtp_server)
                                    _("Required"));
 
     switch (server->tls_mode) {
-    case LIBBALSA_TLS_DISABLED:
+    case Starttls_DISABLED:
         gtk_combo_box_set_active(GTK_COMBO_BOX(combo_box), 0);
         break;
-    case LIBBALSA_TLS_ENABLED:
+    case Starttls_ENABLED:
         gtk_combo_box_set_active(GTK_COMBO_BOX(combo_box), 1);
         break;
-    case LIBBALSA_TLS_REQUIRED:
+    case Starttls_REQUIRED:
         gtk_combo_box_set_active(GTK_COMBO_BOX(combo_box), 2);
         break;
     default:

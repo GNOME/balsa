@@ -241,7 +241,7 @@ msgstr "Или"
 #: ../libbalsa/filter-file.c:135
 #, c-format
 msgid "Invalid filters %s for mailbox %s"
-msgstr "Неисправни пропусники %s за сандуче %s"
+msgstr "Неисправни филтери %s за сандуче %s"
 
 #: ../libbalsa/filter.c:127 ../libbalsa/mailbox_local.c:866
 msgid "Unable to load message body to match filter"
@@ -249,13 +249,13 @@ msgstr "Не могу да учитам тело поруке које одго�
 
 #: ../libbalsa/filter.c:234
 #, c-format
-msgid "Header:%s"
-msgstr "Заглавље:%s"
+msgid "Invalid filter: %s"
+msgstr "Неисправан филтер: %s"
 
 #: ../libbalsa/filter.c:282 ../libbalsa/filter.c:305
 #, c-format
-msgid ",%s"
-msgstr ",%s"
+msgid "Bad mailbox name for filter: %s"
+msgstr "Лош назив сандучета за филтер: %s"
 
 #: ../libbalsa/filter.c:286
 #, c-format
@@ -1213,7 +1213,8 @@ msgstr "Не могу да створим „MailDir“ у %s (%s)"
 #: ../libbalsa/mailbox_maildir.c:337 ../libbalsa/mailbox_mh.c:291
 #, c-format
 msgid ""
-"%s: a key for %s is present, but it is expired, disabled, revoked or invalid"
+"Could not remove contents of %s:\n"
+"%s"
 msgstr ""
 "Не могу да уклоним садржај %s:\n"
 "%s"
@@ -1222,8 +1223,8 @@ msgstr ""
 #: ../libbalsa/mailbox_mh.c:297
 #, c-format
 msgid ""
-"%s: a key with id %s is present, but it is expired, disabled, revoked or "
-"invalid"
+"Could not remove %s:\n"
+"%s"
 msgstr ""
 "Не могу да уклоним %s:\n"
 "%s"
@@ -3525,7 +3526,7 @@ msgstr "_Врста претраге:"
 
 #: ../src/filter-edit-callbacks.c:1256
 msgid "Edit condition for filter: "
-msgstr "Уреди услов пропусника: "
+msgstr "Уреди услов филтера: "
 
 #: ../src/filter-edit-callbacks.c:1475 ../src/save-restore.c:1893
 msgid "Filter with no condition was omitted"
@@ -3538,7 +3539,7 @@ msgstr "Грешка приказивања помоћи филтера: %s\n"
 
 #: ../src/filter-edit-callbacks.c:1701
 msgid "New filter"
-msgstr "Нови пропусник"
+msgstr "Нови филтер"
 
 #: ../src/filter-edit-callbacks.c:1830
 msgid "No filter name specified."
@@ -3617,7 +3618,7 @@ msgstr "И"
 #. The name entry
 #: ../src/filter-edit-dialog.c:260
 msgid "_Filter name:"
-msgstr "Назив _пропусника:"
+msgstr "Назив _филтера:"
 
 #. The filter op-code : "OR" or "AND" all the conditions
 #: ../src/filter-edit-dialog.c:274
@@ -3699,7 +3700,7 @@ msgstr "Пропусник „%s“ нема услов."
 #: ../src/filter-export-callbacks.c:59
 #, c-format
 msgid "Unable to export filter %s, an error occurred."
-msgstr "Не могу да извезем пропусник %s, дошло је до грешке."
+msgstr "Не могу да извезем филтер %s, дошло је до грешке."
 
 #: ../src/filter-export-dialog.c:65
 msgid ""
@@ -3721,7 +3722,7 @@ msgstr "Грешка приказивања помоћи за покретање
 
 #: ../src/filter-run-callbacks.c:236 ../src/filter-run-callbacks.c:258
 msgid "Error when applying filters"
-msgstr "Грешка при примени пропусника"
+msgstr "Грешка при примени филтера"
 
 #: ../src/filter-run-callbacks.c:239 ../src/filter-run-callbacks.c:261
 #, c-format
@@ -4339,7 +4340,7 @@ msgstr "_Избаци смеће"
 
 #: ../src/mailbox-node.c:1149
 msgid "_Edit/Apply filters"
-msgstr "_Уреди/примени пропуснике"
+msgstr "_Уреди/примени филтере"
 
 #: ../src/mailbox-node.c:1236
 #, c-format
@@ -5357,7 +5358,7 @@ msgstr "Грешка штампања поруке: %s"
 
 #: ../src/save-restore.c:594
 msgid "Error during filters loading: "
-msgstr "Грешка при учитавању пропусника: "
+msgstr "Грешка при учитавању филтера: "
 
 #: ../src/save-restore.c:596
 #, c-format
@@ -6245,8 +6246,8 @@ msgstr "Обележи све"
 
 #: ../src/toolbar-factory.c:170
 msgid ""
-"Reset\n"
-"Filter"
+"All\n"
+"headers"
 msgstr ""
 "Сва\n"
 "заглавља"

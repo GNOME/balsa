@@ -8,6 +8,7 @@
 
 doc/*/*.mo
 doc/*/*.xml
+doc/??/*.page
 
 .deps
 .libs

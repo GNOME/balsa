@@ -1,14 +1,13 @@
 # Czech translation for balsa.
 # Copyright (C) 2013 balsa's COPYRIGHT HOLDER
 # This file is distributed under the same license as the balsa package.
-#
 # Marek Černocký <marek@manet.cz>, 2013, 2015, 2016.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa master\n"
 "POT-Creation-Date: 2016-10-06 17:14+0000\n"
-"PO-Revision-Date: 2016-10-07 21:26+0200\n"
+"PO-Revision-Date: 2016-10-07 21:51+0200\n"
 "Last-Translator: Marek Černocký <marek@manet.cz>\n"
 "Language-Team: čeština <gnome-cs-list@gnome.org>\n"
 "Language: cs\n"
@@ -50,7 +49,6 @@ msgstr "Externí adresář"
 
 #. (itstool) path: section/p
 #: C/ab-conf.page:21
-#, fuzzy
 msgid ""
 "The balsa addressbook supports input from programs. Thus, you can use (no "
 "importing needed!) for example your pine or mutt addressbook. The mutt "
@@ -59,7 +57,7 @@ msgid ""
 msgstr ""
 "Adresář Balsa podporuje vstup z programů. Můžete tak použít (bez potřeby "
 "importu) například svůj adresář z aplikace pine nebo mutt. Pošťák mutt "
-"(<ulink url=\"http://www.mutt.org/\">www.mutt.org</ulink>) používá stejný "
+"(<link href=\"http://www.mutt.org/\">www.mutt.org</link>) používá stejný "
 "systém k získávání adres z programů."
 
 #. (itstool) path: section/title
@@ -69,13 +67,12 @@ msgstr "Existující programy"
 
 #. (itstool) path: section/p
 #: C/ab-conf.page:30
-#, fuzzy
 msgid ""
 "The following programs are compatible with the mutt mail reader and "
 "<em>should</em> be with balsa. Submit links to more programs."
 msgstr ""
-"Následující programy jsou kompatibilní se čtečkou pošty mutt a s pošťákem "
-"Balsa (nebo by měly být). Jestli víte o dalších, dejte nám prosím vědět."
+"Následující programy jsou kompatibilní se čtečkou pošty mutt a <em>měly by "
+"být</em> i s pošťákem Balsa. Jestli víte o dalších, dejte nám prosím vědět."
 
 #. (itstool) path: item/p
 #: C/ab-conf.page:34
@@ -238,11 +235,10 @@ msgstr "Autoři"
 
 #. (itstool) path: page/p
 #: C/authors.page:9
-#, fuzzy
 msgid "<app>Balsa</app> is currently developed by (in alphabetical order):"
 msgstr ""
-"Aplikace <application>Balsa</application> je v současnosti vyvíjena těmito "
-"lidmi (v abecedním pořadí): <placeholder-1/>"
+"Aplikace <app>Balsa</app> je v současnosti vyvíjena těmito lidmi (v "
+"abecedním pořadí):"
 
 #. (itstool) path: item/p
 #: C/authors.page:13 C/authors.page:80
@@ -421,13 +417,12 @@ msgstr "Běžné činnosti s aplikací <app>Balsa</app>"
 
 #. (itstool) path: page/p
 #: C/common-tasks.page:9
-#, fuzzy
 msgid ""
 "This section explains many of the things you might want to do with "
 "<app>Balsa</app>."
 msgstr ""
 "Tento oddíl objasňuje řadu věcí, které může chtít dělat s aplikací "
-"<application>Balsa</application>."
+"<app>Balsa</app>."
 
 #. (itstool) path: item/p
 #: C/common-tasks.page:13
@@ -450,11 +445,12 @@ msgstr "Jak jednu z hlavních složek nastavit na typ IMAP"
 
 #. (itstool) path: item/p
 #: C/common-tasks.page:30
-#, fuzzy
 msgid ""
 "<link xref=\"common-tasks#ct-alias-expansion\">Expanding e-mail addresses "
 "automatically</link>"
-msgstr "Automatické doplňování e-mailových adres"
+msgstr ""
+"<link xref=\"common-tasks#ct-alias-expansion\">Automatické doplňování e-"
+"mailových adres</link>"
 
 #. (itstool) path: item/p
 #: C/common-tasks.page:36
@@ -696,7 +692,6 @@ msgstr ""
 
 #. (itstool) path: page/title
 #: C/folder-config.page:8
-#, fuzzy
 msgid "IMAP Folder Configuration"
 msgstr "Nastavení složky IMAP"
 
@@ -939,20 +934,17 @@ msgstr ""
 
 #. (itstool) path: item/p
 #: C/folder-config.page:137
-#, fuzzy
 msgid ""
 "<gui>Folder name</gui> is how the folder is shown in the mailbox tree on the "
 "left side."
 msgstr ""
-"<guilabel>Název složky</guilabel> je ten, který se zobrazuje ve stromu "
-"poštovních schránek na levé straně."
+"<gui>Název složky</gui> je ten, který se zobrazuje ve stromu poštovních "
+"schránek na levé straně."
 
 #. (itstool) path: item/p
 #: C/folder-config.page:142
-#, fuzzy
 msgid "<gui>Subfolder of</gui> indicates the immediate parent of the folder."
-msgstr ""
-"<guilabel>Podsložka v</guilabel> ukazuje bezprostředního rodiče složky."
+msgstr "<gui>Podsložka v</gui> ukazuje bezprostředního rodiče složky."
 
 #. (itstool) path: section/p
 #: C/folder-config.page:147
@@ -1001,18 +993,16 @@ msgstr "přesunout výběrem jiné rodičovské složky ve stejném stromu"
 #. update your localized copy. The msgstr is not used at all. Set it to
 #. whatever you like once you have updated your copy of the file.
 #: C/getting-started.page:17
-#, fuzzy
 msgctxt "_"
 msgid ""
 "external ref='figures/druid-start.png' md5='68bf6bf83a3f6fa5a4099bad2d2706a5'"
 msgstr ""
-"@@image: 'figures/druid-start.png'; md5=68bf6bf83a3f6fa5a4099bad2d2706a5"
+"external ref='figures/druid-start.png' md5='68bf6bf83a3f6fa5a4099bad2d2706a5'"
 
 #. (itstool) path: page/title
 #: C/getting-started.page:9
-#, fuzzy
 msgid "Getting Started with <app>Balsa</app>"
-msgstr "Začínáme s aplikací <application>Balsa</application>"
+msgstr "Začínáme s aplikací <app>Balsa</app>"
 
 #. (itstool) path: page/p
 #: C/getting-started.page:10
@@ -1035,9 +1025,8 @@ msgstr ""
 
 #. (itstool) path: figure/title
 #: C/getting-started.page:18
-#, fuzzy
 msgid "<app>Balsa</app> Start Assistant"
-msgstr "Průvodce prvotním spuštěním aplikace <application>Balsa</application>"
+msgstr "Průvodce prvotním spuštěním aplikace <app>Balsa</app>"
 
 #. (itstool) path: page/p
 #: C/getting-started.page:20
@@ -1153,14 +1142,12 @@ msgstr "libmutt"
 
 #. (itstool) path: section/p
 #: C/glossary.page:37
-#, fuzzy
 msgid ""
 "The library based on Mutt's code and used by previous versions of "
 "<app>Balsa</app> to handle local mail and IMAP servers."
 msgstr ""
 "Knihovna vycházející z kódu programu Mutt a používaná předchozí verzí "
-"aplikace <application>Balsa</application> k práci s místní poštou a servery "
-"IMAP."
+"aplikace <app>Balsa</app> k práci s místní poštou a servery IMAP."
 
 #. (itstool) path: section/title
 #: C/glossary.page:42
@@ -1169,11 +1156,10 @@ msgstr "seznam poštovních schránek"
 
 #. (itstool) path: section/p
 #: C/glossary.page:43
-#, fuzzy
 msgid "The list of mailboxes found in <app>Balsa</app>'s left hand pane."
 msgstr ""
 "Seznam poštovních schránek nacházející se v levém panelu aplikace "
-"<application>Balsa</application>."
+"<app>Balsa</app>."
 
 #. (itstool) path: section/title
 #: C/glossary.page:47
@@ -1182,11 +1168,8 @@ msgstr "seznam zpráv"
 
 #. (itstool) path: section/p
 #: C/glossary.page:48
-#, fuzzy
 msgid "The list of messages in <app>Balsa</app>'s upper-right hand pane."
-msgstr ""
-"Seznam zpráv v pravém horním panelu v aplikaci <application>Balsa</"
-"application>."
+msgstr "Seznam zpráv v pravém horním panelu v aplikaci <app>Balsa</app>."
 
 #. (itstool) path: section/title
 #: C/glossary.page:52
@@ -1195,11 +1178,8 @@ msgstr "zobrazení zprávy"
 
 #. (itstool) path: section/p
 #: C/glossary.page:53
-#, fuzzy
 msgid "The message display in <app>Balsa</app>'s lower-right hand pane."
-msgstr ""
-"Zpráva zobrazená v levém dolním panelu v aplikaci <application>Balsa</"
-"application>."
+msgstr "Zpráva zobrazená v levém dolním panelu v aplikaci <app>Balsa</app>."
 
 #. (itstool) path: section/title
 #: C/glossary.page:57
@@ -1311,7 +1291,6 @@ msgstr "VCARD"
 
 #. (itstool) path: section/p
 #: C/glossary.page:107
-#, fuzzy
 msgid ""
 "VCARD is a standard method of storing contact information for easy exchange "
 "between programs. <app>Balsa</app> supports VCARD addressbooks, as does "
@@ -1319,9 +1298,9 @@ msgid ""
 "contact lists in VCARD format as well."
 msgstr ""
 "VCARD je standardní způsob ukládání kontaktních údajů pro snadnou výměnu "
-"mezi programy. <application>Balsa</application> podporuje adresář VCARD, "
-"obdobně jako GnomeCard a Evolution. Spousta dalších programů umí exportovat "
-"své seznamy kontaktů ve formátu VCARD."
+"mezi programy. <app>Balsa</app> podporuje adresář VCARD, obdobně jako "
+"GnomeCard a Evolution. Spousta dalších programů umí exportovat své seznamy "
+"kontaktů ve formátu VCARD."
 
 #. (itstool) path: page/title
 #: C/identities.page:8
@@ -1339,9 +1318,8 @@ msgstr ""
 
 #. (itstool) path: item/title
 #: C/identities.page:14
-#, fuzzy
 msgid "<gui>Identity Name</gui>"
-msgstr "Název identity"
+msgstr "<gui>Název identity</gui>"
 
 #. (itstool) path: item/p
 #: C/identities.page:17
@@ -1354,9 +1332,8 @@ msgstr ""
 
 #. (itstool) path: item/title
 #: C/identities.page:21
-#, fuzzy
 msgid "<gui>Full Name</gui>"
-msgstr "Celé jméno"
+msgstr "<gui>Celé jméno</gui>"
 
 #. (itstool) path: item/p
 #: C/identities.page:24
@@ -1370,9 +1347,8 @@ msgstr ""
 
 #. (itstool) path: item/title
 #: C/identities.page:29
-#, fuzzy
 msgid "<gui>Mailing Address</gui>"
-msgstr "Poštovní adresa"
+msgstr "<gui>Poštovní adresa</gui>"
 
 #. (itstool) path: item/p
 #: C/identities.page:32
@@ -1381,9 +1357,8 @@ msgstr "Tak, jak si přejete, aby se objevila v hlavičce „Od“."
 
 #. (itstool) path: item/title
 #: C/identities.page:35
-#, fuzzy
 msgid "<gui>Reply-To address</gui>"
-msgstr "Adresa „Komu odpovědět“"
+msgstr "<gui>Adresa „Komu odpovědět“</gui>"
 
 #. (itstool) path: item/p
 #: C/identities.page:38
@@ -1396,9 +1371,8 @@ msgstr ""
 
 #. (itstool) path: item/title
 #: C/identities.page:43
-#, fuzzy
 msgid "<gui>Default Domain</gui>"
-msgstr "Výchozí doména"
+msgstr "<gui>Výchozí doména</gui>"
 
 #. (itstool) path: item/p
 #: C/identities.page:46
@@ -1439,9 +1413,8 @@ msgstr ""
 
 #. (itstool) path: item/title
 #: C/identities.page:65
-#, fuzzy
 msgid "<gui>Reply String</gui>"
-msgstr "Řetězec odpovědi"
+msgstr "<gui>Řetězec odpovědi</gui>"
 
 #. (itstool) path: item/p
 #: C/identities.page:68
@@ -1476,9 +1449,8 @@ msgstr ""
 
 #. (itstool) path: item/title
 #: C/identities.page:86
-#, fuzzy
 msgid "<gui>Face Path</gui>"
-msgstr "Cesta k ikoně Face"
+msgstr "<gui>Cesta k ikoně Face</gui>"
 
 #. (itstool) path: item/p
 #: C/identities.page:89
@@ -1498,9 +1470,8 @@ msgstr ""
 
 #. (itstool) path: item/title
 #: C/identities.page:98
-#, fuzzy
 msgid "<gui>X-Face Path</gui>"
-msgstr "Cesta k ikoně X-Face"
+msgstr "<gui>Cesta k ikoně X-Face</gui>"
 
 #. (itstool) path: item/p
 #: C/identities.page:101
@@ -1513,9 +1484,8 @@ msgstr ""
 
 #. (itstool) path: item/title
 #: C/identities.page:106
-#, fuzzy
 msgid "<gui>SMTP server</gui>"
-msgstr "Server SMTP"
+msgstr "<gui>Server SMTP</gui>"
 
 #. (itstool) path: item/p
 #: C/identities.page:109
@@ -1539,9 +1509,8 @@ msgstr ""
 
 #. (itstool) path: item/title
 #: C/identities.page:119
-#, fuzzy
 msgid "<gui>Signature Path</gui>"
-msgstr "Cesta k podpisu"
+msgstr "<gui>Cesta k podpisu</gui>"
 
 #. (itstool) path: item/p
 #: C/identities.page:122
@@ -1593,9 +1562,8 @@ msgstr "|/home/user/dynampodpis.pl"
 
 #. (itstool) path: item/title
 #: C/identities.page:146
-#, fuzzy
 msgid "<gui>Execute Signature</gui>"
-msgstr "Provést podpis"
+msgstr "<gui>Provést podpis</gui>"
 
 #. (itstool) path: item/p
 #: C/identities.page:149
@@ -1610,9 +1578,8 @@ msgstr ""
 
 #. (itstool) path: item/title
 #: C/identities.page:155
-#, fuzzy
 msgid "<gui>Include Signature</gui>"
-msgstr "Vložit podpis"
+msgstr "<gui>Vložit podpis</gui>"
 
 #. (itstool) path: item/p
 #: C/identities.page:158
@@ -1621,9 +1588,8 @@ msgstr "Na konec odchozí zprávy připojit podpis."
 
 #. (itstool) path: item/title
 #: C/identities.page:161
-#, fuzzy
 msgid "<gui>Include Signature When Forwarding</gui>"
-msgstr "Vložit podpis při přeposílání"
+msgstr "<gui>Vložit podpis při přeposílání</gui>"
 
 #. (itstool) path: item/p
 #: C/identities.page:164
@@ -1632,9 +1598,8 @@ msgstr "Při přeposílání stávající zprávy na její konec připojit podpi
 
 #. (itstool) path: item/title
 #: C/identities.page:167
-#, fuzzy
 msgid "<gui>Include Signature When Replying</gui>"
-msgstr "Vložit podpis při odpovídání"
+msgstr "<gui>Vložit podpis při odpovídání</gui>"
 
 #. (itstool) path: item/p
 #: C/identities.page:170
@@ -1643,9 +1608,8 @@ msgstr "Při odpovídání na stávající zprávu na její konec připojit podp
 
 #. (itstool) path: item/title
 #: C/identities.page:173
-#, fuzzy
 msgid "<gui>Add Signature Separator</gui>"
-msgstr "Přidat oddělovač podpisu"
+msgstr "<gui>Přidat oddělovač podpisu</gui>"
 
 #. (itstool) path: item/p
 #: C/identities.page:176
@@ -1659,9 +1623,8 @@ msgstr ""
 
 #. (itstool) path: item/title
 #: C/identities.page:180
-#, fuzzy
 msgid "<gui>Prepend Signature</gui>"
-msgstr "Vložit podpis na začátek"
+msgstr "<gui>Vložit podpis na začátek</gui>"
 
 #. (itstool) path: item/p
 #: C/identities.page:183
@@ -1675,9 +1638,8 @@ msgstr "Bezpečnostní nastavení jsou na čtvrté stránce:"
 
 #. (itstool) path: item/title
 #: C/identities.page:190
-#, fuzzy
 msgid "<gui>Sign messages by default.</gui>"
-msgstr "Jako výchozí zprávy podepisovat"
+msgstr "<gui>Jako výchozí zprávy podepisovat</gui>"
 
 #. (itstool) path: item/p
 #: C/identities.page:193
@@ -1691,9 +1653,8 @@ msgstr ""
 
 #. (itstool) path: item/title
 #: C/identities.page:198
-#, fuzzy
 msgid "<gui>Encrypt messages by default.</gui>"
-msgstr "Jako výchozí zprávy šifrovat"
+msgstr "<gui>Jako výchozí zprávy šifrovat</gui>"
 
 #. (itstool) path: item/p
 #: C/identities.page:201
@@ -1707,9 +1668,8 @@ msgstr ""
 
 #. (itstool) path: item/title
 #: C/identities.page:205
-#, fuzzy
 msgid "<gui>Default protocol.</gui>"
-msgstr "Výchozí protokol"
+msgstr "<gui>Výchozí protokol</gui>"
 
 #. (itstool) path: item/p
 #: C/identities.page:208
@@ -1721,9 +1681,8 @@ msgstr ""
 
 #. (itstool) path: item/title
 #: C/identities.page:212
-#, fuzzy
 msgid "<gui>Always trust GnuPG keys when encrypting.</gui>"
-msgstr "Při šifrování vždy důvěřovat klíčům GnuPG"
+msgstr "<gui>Při šifrování vždy důvěřovat klíčům GnuPG</gui>"
 
 #. (itstool) path: item/p
 #: C/identities.page:215
@@ -1736,9 +1695,8 @@ msgstr ""
 
 #. (itstool) path: item/title
 #: C/identities.page:219
-#, fuzzy
 msgid "<gui>Remind me if messages can be encrypted.</gui>"
-msgstr "Připomenout mi, když zpráva může být šifrovaná"
+msgstr "<gui>Připomenout mi, když zpráva může být šifrovaná</gui>"
 
 #. (itstool) path: item/p
 #: C/identities.page:222
@@ -1784,13 +1742,12 @@ msgstr ""
 #. (itstool) path: page/title
 #: C/index.page:5
 msgid "<app>Balsa</app> User's Guide"
-msgstr ""
+msgstr "Uživatelská příručka aplikace <app>Balsa</app>"
 
 #. (itstool) path: credit/name
 #: C/index.page:9
-#, fuzzy
 msgid "Pawel Salek"
-msgstr "Pawel"
+msgstr "Pawel Salek"
 
 #. (itstool) path: credit/name
 #: C/index.page:12
@@ -2000,11 +1957,12 @@ msgstr ""
 
 #. (itstool) path: item/p
 #: C/its-not-working.page:15
-#, fuzzy
 msgid ""
 "<link xref=\"its-not-working#main-to-imap\">i I want one of the main folders "
 "to be IMAP</link>"
-msgstr "Chci, aby jedna z hlavních složek byla IMAP"
+msgstr ""
+"<link xref=\"its-not-working#main-to-imap\">Chci, aby jedna z hlavních "
+"složek byla IMAP.</link>"
 
 #. (itstool) path: item/p
 #: C/its-not-working.page:22
@@ -2014,19 +1972,21 @@ msgstr ""
 
 #. (itstool) path: item/p
 #: C/its-not-working.page:28
-#, fuzzy
 msgid ""
 "<link xref=\"its-not-working#spooky-win\"> What's that window that flashed "
 "on the screen?</link>"
-msgstr "Co je to za okno, které problikne na obrazovce?"
+msgstr ""
+"<link xref=\"its-not-working#spooky-win\">Co je to za okno, které problikne "
+"na obrazovce?</link>"
 
 #. (itstool) path: item/p
 #: C/its-not-working.page:35
-#, fuzzy
 msgid ""
 "<link xref=\"its-not-working#address-book\"> The address book doesn't import "
 "my addresses.</link>"
-msgstr "Adresář nechce naimportovat moje adresy."
+msgstr ""
+"<link xref=\"its-not-working#address-book\">Adresář nechce naimportovat moje "
+"adresy.</link>"
 
 #. (itstool) path: section/title
 #: C/its-not-working.page:43
@@ -2035,10 +1995,10 @@ msgstr "Chci, aby základní poštovní schránka používala IMAP"
 
 #. (itstool) path: section/p
 #: C/its-not-working.page:44
-#, fuzzy
 msgid ""
 "See <link xref=\"common-tasks#ct-main-folder-imap\">this section</link>."
-msgstr "Viz <link linkend=\"ct-main-folder-imap\">tento oddíl</link>."
+msgstr ""
+"Viz <link xref=\"common-tasks#ct-main-folder-imap\">tento oddíl</link>."
 
 #. (itstool) path: section/title
 #: C/its-not-working.page:48
@@ -2136,7 +2096,6 @@ msgstr ""
 
 #. (itstool) path: page/title
 #: C/mbox-formats.page:8
-#, fuzzy
 msgid "Available Mailbox Formats"
 msgstr "Dostupné formáty poštovní schránky"
 
@@ -2181,7 +2140,7 @@ msgstr ""
 #. (itstool) path: item/title
 #: C/mbox-formats.page:27
 msgid "Maildir format"
-msgstr ""
+msgstr "Fomrát Maildir"
 
 #. (itstool) path: item/p
 #: C/mbox-formats.page:28
@@ -2198,7 +2157,7 @@ msgstr ""
 #. (itstool) path: item/title
 #: C/mbox-formats.page:33
 msgid "Using Maildir format"
-msgstr ""
+msgstr "Používání formátu Maildir"
 
 #. (itstool) path: item/p
 #: C/mbox-formats.page:34
@@ -2289,9 +2248,8 @@ msgstr ""
 
 #. (itstool) path: page/title
 #: C/preferences-address-books.page:9
-#, fuzzy
 msgid "Address Book Preferences"
-msgstr "Adresáře"
+msgstr "Předvolby adresáře"
 
 #. (itstool) path: page/p
 #: C/preferences-address-books.page:10
@@ -2447,9 +2405,8 @@ msgstr "Odebere vybraný adresář."
 
 #. (itstool) path: item/title
 #: C/preferences-address-books.page:84
-#, fuzzy
 msgid "<gui>Set as Default</gui>"
-msgstr "Nastavit jako výchozí"
+msgstr "<gui>Nastavit jako výchozí</gui>"
 
 #. (itstool) path: item/p
 #: C/preferences-address-books.page:87
@@ -2601,9 +2558,8 @@ msgstr "Řazení a vlákna"
 
 #. (itstool) path: item/title
 #: C/preferences-display-options.page:81
-#, fuzzy
 msgid "<gui>Default sort column</gui>"
-msgstr "Výchozí sloupec pro řazení"
+msgstr "<gui>Výchozí sloupec pro řazení</gui>"
 
 #. (itstool) path: item/p
 #: C/preferences-display-options.page:84
@@ -2614,9 +2570,8 @@ msgstr ""
 
 #. (itstool) path: item/title
 #: C/preferences-display-options.page:88
-#, fuzzy
 msgid "<gui>Default threading style</gui>"
-msgstr "Výchozí styl vláken"
+msgstr "<gui>Výchozí styl vláken</gui>"
 
 #. (itstool) path: item/p
 #: C/preferences-display-options.page:91
@@ -2646,7 +2601,7 @@ msgstr "Nabídka pro zprávy"
 #. (itstool) path: item/title
 #: C/preferences-display-options.page:108
 msgid "<gui>Fonts</gui>"
-msgstr ""
+msgstr "<gui>Fonty</gui>"
 
 #. (itstool) path: item/p
 #: C/preferences-display-options.page:111
@@ -2668,9 +2623,8 @@ msgstr ""
 
 #. (itstool) path: item/title
 #: C/preferences-display-options.page:122
-#, fuzzy
 msgid "<gui>Quoted Text Regular Expression</gui>"
-msgstr "Regulární výraz pro citovaný text"
+msgstr "<gui>Regulární výraz pro citovaný text</gui>"
 
 #. (itstool) path: item/p
 #: C/preferences-display-options.page:125
@@ -2706,9 +2660,8 @@ msgstr ""
 
 #. (itstool) path: item/title
 #: C/preferences-display-options.page:140
-#, fuzzy
 msgid "<gui>Alternative Parts</gui>"
-msgstr "Alternativní části"
+msgstr "<gui>Alternativní části</gui>"
 
 #. (itstool) path: item/p
 #: C/preferences-display-options.page:143
@@ -2737,9 +2690,8 @@ msgstr "Volba barev pro citovaný text."
 
 #. (itstool) path: item/title
 #: C/preferences-display-options.page:159
-#, fuzzy
 msgid "<gui>Link Color</gui>"
-msgstr "Barva odkazu"
+msgstr "<gui>Barva odkazu</gui>"
 
 #. (itstool) path: item/p
 #: C/preferences-display-options.page:162
@@ -2773,53 +2725,44 @@ msgstr ""
 
 #. (itstool) path: item/p
 #: C/preferences-display-options.page:180
-#, fuzzy
 msgid "<code>%a</code>-- The abbreviated weekday name."
-msgstr "<literal>%a</literal> – zkratka dne v týdnu"
+msgstr "<code>%a</code> – zkratka dne v týdnu"
 
 #. (itstool) path: item/p
 #: C/preferences-display-options.page:185
-#, fuzzy
 msgid "<code>%A</code>-- The full weekday name."
-msgstr "<literal>%A</literal> – plný název dne v týdnu."
+msgstr "<code>%A</code> – plný název dne v týdnu."
 
 #. (itstool) path: item/p
 #: C/preferences-display-options.page:189
-#, fuzzy
 msgid "<code>%b</code>-- The abbreviated month name."
-msgstr "<literal>%b</literal> – zkratka názvu měsíce."
+msgstr "<code>%b</code> – zkratka názvu měsíce."
 
 #. (itstool) path: item/p
 #: C/preferences-display-options.page:193
-#, fuzzy
 msgid "<code>%B</code>-- The full month name."
-msgstr "<literal>%B</literal> – plný název měsíce."
+msgstr "<code>%B</code> – plný název měsíce."
 
 #. (itstool) path: item/p
 #: C/preferences-display-options.page:197
-#, fuzzy
 msgid "<code>%d</code>-- The day of the month."
-msgstr "<literal>%d</literal> – den v měsíci."
+msgstr "<code>%d</code> – den v měsíci."
 
 #. (itstool) path: item/p
 #: C/preferences-display-options.page:201
-#, fuzzy
 msgid "<code>%R</code>-- The time using a 24-hour clock. (HH:MM)"
-msgstr "<literal>%R</literal> – čas ve 24hodinovém formátu (HH:MM)."
+msgstr "<code>%R</code> – čas ve 24hodinovém formátu (HH:MM)."
 
 #. (itstool) path: item/p
 #: C/preferences-display-options.page:206
-#, fuzzy
 msgid "<code>%r</code>-- The time using a 12-hour clock (HH:MM AM/PM)."
-msgstr "<literal>%r</literal> – čas ve 12hodinovém formátu (HH:MM dop./odp.)."
+msgstr "<code>%r</code> – čas ve 12hodinovém formátu (HH:MM dop./odp.)."
 
 #. (itstool) path: item/p
 #: C/preferences-display-options.page:211
-#, fuzzy
 msgid ""
 "<code>%T</code>-- The time using a 24-hour clock, with seconds (HH:MM:SS)."
-msgstr ""
-"<literal>%T</literal> – čas ve 24hodinovém formátu s vteřinami (HH:MM:SS)."
+msgstr "<code>%T</code> – čas ve 24hodinovém formátu s vteřinami (HH:MM:SS)."
 
 #. (itstool) path: note/p
 #: C/preferences-display-options.page:217
@@ -2833,9 +2776,8 @@ msgstr ""
 
 #. (itstool) path: item/title
 #: C/preferences-display-options.page:223
-#, fuzzy
 msgid "<gui>Selected Headers</gui>"
-msgstr "Vybrané hlavičky"
+msgstr "<gui>Vybrané hlavičky</gui>"
 
 #. (itstool) path: item/p
 #: C/preferences-display-options.page:226
@@ -2846,9 +2788,8 @@ msgstr ""
 
 #. (itstool) path: item/title
 #: C/preferences-display-options.page:230
-#, fuzzy
 msgid "<gui>Fallback codeset</gui>"
-msgstr "Záložní sada kódování"
+msgstr "<gui>Záložní sada kódování</gui>"
 
 #. (itstool) path: item/p
 #: C/preferences-display-options.page:233
@@ -2870,9 +2811,8 @@ msgstr "Stavové zprávy"
 
 #. (itstool) path: item/title
 #: C/preferences-display-options.page:244
-#, fuzzy
 msgid "<gui>Information Messages</gui>"
-msgstr "Informační zprávy"
+msgstr "<gui>Informační zprávy</gui>"
 
 #. (itstool) path: item/p
 #: C/preferences-display-options.page:247
@@ -2887,9 +2827,8 @@ msgstr ""
 
 #. (itstool) path: item/title
 #: C/preferences-display-options.page:252
-#, fuzzy
 msgid "<gui>Display Progress</gui>"
-msgstr "Zobrazovat průběh"
+msgstr "<gui>Zobrazovat průběh</gui>"
 
 #. (itstool) path: item/p
 #: C/preferences-display-options.page:255
@@ -2912,9 +2851,8 @@ msgstr ""
 
 #. (itstool) path: page/title
 #: C/preferences-mail-options.page:9
-#, fuzzy
 msgid "Mail Server Preferences"
-msgstr "Poštovní servery"
+msgstr "Předvolby poštovního serveru"
 
 #. (itstool) path: page/p
 #: C/preferences-mail-options.page:10
@@ -2925,9 +2863,8 @@ msgstr ""
 
 #. (itstool) path: item/title
 #: C/preferences-mail-options.page:14
-#, fuzzy
 msgid "<gui>Remote Mailbox Servers</gui>"
-msgstr "Servery vzdálených poštovních schránek"
+msgstr "<gui>Servery vzdálených poštovních schránek</gui>"
 
 #. (itstool) path: item/p
 #: C/preferences-mail-options.page:17
@@ -2997,9 +2934,8 @@ msgstr ""
 
 #. (itstool) path: item/p
 #: C/preferences-mail-options.page:50
-#, fuzzy
 msgid "The <app>procmail</app> command."
-msgstr "Příkaz <application>procmail</application>."
+msgstr "Příkaz <app>procmail</app>."
 
 #. (itstool) path: item/p
 #: C/preferences-mail-options.page:54
@@ -3008,9 +2944,8 @@ msgstr "Jestli se má kontrolovat nová pošta."
 
 #. (itstool) path: item/title
 #: C/preferences-mail-options.page:59
-#, fuzzy
 msgid "<gui>Local Mail Directory</gui>"
-msgstr "Složka místní pošty"
+msgstr "<gui>Složka místní pošty</gui>"
 
 #. (itstool) path: item/p
 #: C/preferences-mail-options.page:62
@@ -3024,9 +2959,8 @@ msgstr ""
 
 #. (itstool) path: item/title
 #: C/preferences-mail-options.page:66
-#, fuzzy
 msgid "<gui>Outgoing Mail Servers</gui>"
-msgstr "Servery pro odchozí poštu"
+msgstr "<gui>Servery pro odchozí poštu</gui>"
 
 #. (itstool) path: item/p
 #: C/preferences-mail-options.page:69
@@ -3115,9 +3049,8 @@ msgstr ""
 
 #. (itstool) path: item/p
 #: C/preferences-mail-options.page:113
-#, fuzzy
 msgid "When you want <app>Balsa</app> to use TLS."
-msgstr "Jestli chcete, aby <application>Balsa</application> používala TLS."
+msgstr "Jestli chcete, aby <app>Balsa</app> používala TLS."
 
 #. (itstool) path: item/p
 #: C/preferences-mail-options.page:116
@@ -3138,9 +3071,8 @@ msgstr "Příchozí"
 
 #. (itstool) path: item/title
 #: C/preferences-mail-options.page:129
-#, fuzzy
 msgid "<gui>Check Mail Automatically</gui>"
-msgstr "Kontrolovat poštu automaticky"
+msgstr "<gui>Kontrolovat poštu automaticky</gui>"
 
 #. (itstool) path: item/p
 #: C/preferences-mail-options.page:132
@@ -3155,9 +3087,8 @@ msgstr ""
 
 #. (itstool) path: item/title
 #: C/preferences-mail-options.page:136
-#, fuzzy
 msgid "<gui>Check IMAP mailboxes</gui>"
-msgstr "Kontrolovat schránky IMAP"
+msgstr "<gui>Kontrolovat schránky IMAP</gui>"
 
 #. (itstool) path: item/p
 #: C/preferences-mail-options.page:139
@@ -3181,9 +3112,8 @@ msgstr ""
 
 #. (itstool) path: item/title
 #: C/preferences-mail-options.page:147
-#, fuzzy
 msgid "<gui>Display message if new mail has arrived</gui>"
-msgstr "Zobrazit zprávu, když dorazí nová pošta"
+msgstr "<gui>Zobrazit zprávu, když dorazí nová pošta</gui>"
 
 #. (itstool) path: item/p
 #: C/preferences-mail-options.page:150
@@ -3195,9 +3125,8 @@ msgstr ""
 
 #. (itstool) path: item/title
 #: C/preferences-mail-options.page:154
-#, fuzzy
 msgid "<gui>Do background check quietly</gui>"
-msgstr "Kontrolovat tiše na pozadí"
+msgstr "<gui>Kontrolovat tiše na pozadí</gui>"
 
 #. (itstool) path: item/p
 #: C/preferences-mail-options.page:157
@@ -3211,9 +3140,8 @@ msgstr ""
 
 #. (itstool) path: item/title
 #: C/preferences-mail-options.page:161
-#, fuzzy
 msgid "<gui>Wrap Incoming Text</gui>"
-msgstr "Zalamovat příchozí text"
+msgstr "<gui>Zalamovat příchozí text</gui>"
 
 #. (itstool) path: item/p
 #: C/preferences-mail-options.page:164
@@ -3227,9 +3155,8 @@ msgstr ""
 
 #. (itstool) path: item/title
 #: C/preferences-mail-options.page:168
-#, fuzzy
 msgid "<gui>Reflow messages of type `text/plain;format=flowed'</gui>"
-msgstr "Přeformátovat zprávy typu „text/plain;format=flowed“"
+msgstr "<gui>Přeformátovat zprávy typu „text/plain;format=flowed“</gui>"
 
 #. (itstool) path: item/p
 #: C/preferences-mail-options.page:172
@@ -3281,9 +3208,8 @@ msgstr ""
 
 #. (itstool) path: item/title
 #: C/preferences-mail-options.page:195
-#, fuzzy
 msgid "<gui>Message Disposition Notification request</gui>"
-msgstr "Požadavky na oznámení o doručení"
+msgstr "<gui>Požadavky na oznámení o doručení</gui>"
 
 #. (itstool) path: item/p
 #: C/preferences-mail-options.page:198
@@ -3304,9 +3230,8 @@ msgstr "Odchozí"
 
 #. (itstool) path: item/title
 #: C/preferences-mail-options.page:212
-#, fuzzy
 msgid "<gui>Wrap Outgoing Text</gui>"
-msgstr "Zalamovat odchozí text"
+msgstr "<gui>Zalamovat odchozí text</gui>"
 
 #. (itstool) path: item/p
 #: C/preferences-mail-options.page:215
@@ -3318,9 +3243,8 @@ msgstr ""
 
 #. (itstool) path: item/title
 #: C/preferences-mail-options.page:219
-#, fuzzy
 msgid "<gui>Reply prefix</gui>"
-msgstr "Uvození odpovědi"
+msgstr "<gui>Uvození odpovědi</gui>"
 
 #. (itstool) path: item/p
 #: C/preferences-mail-options.page:222
@@ -3337,9 +3261,8 @@ msgstr ""
 
 #. (itstool) path: item/title
 #: C/preferences-mail-options.page:228
-#, fuzzy
 msgid "<gui>Automatically quote original when replying</gui>"
-msgstr "Automaticky citovat originál při odpovědi"
+msgstr "<gui>Automaticky citovat originál při odpovědi</gui>"
 
 #. (itstool) path: item/p
 #: C/preferences-mail-options.page:231
@@ -3374,15 +3297,13 @@ msgstr ""
 
 #. (itstool) path: item/p
 #: C/preferences-mail-options.page:244
-#, fuzzy
 msgid "Tell <app>Balsa</app> to be sensible."
-msgstr "Říká <application>Balse</application>, aby se chovala rozumně."
+msgstr "Říká <app>Balse</app>, aby se chovala rozumně."
 
 #. (itstool) path: item/title
 #: C/preferences-mail-options.page:247
-#, fuzzy
 msgid "<gui>Forward a mail as attachment instead of quoting it</gui>"
-msgstr "Přeposílat zprávu jako přílohu místo jejího citování"
+msgstr "<gui>Přeposílat zprávu jako přílohu místo jejího citování</gui>"
 
 #. (itstool) path: item/p
 #: C/preferences-mail-options.page:251
@@ -3409,9 +3330,8 @@ msgstr ""
 
 #. (itstool) path: item/title
 #: C/preferences-mail-options.page:262
-#, fuzzy
 msgid "<gui>Send button always queues outgoing mail in outbox</gui>"
-msgstr "Tlačítko Poslat vždy zařadí odchozí poštu do K odeslání"
+msgstr "<gui>Tlačítko Poslat vždy zařadí odchozí poštu do K odeslání</gui>"
 
 #. (itstool) path: item/p
 #: C/preferences-mail-options.page:266
@@ -3425,9 +3345,8 @@ msgstr ""
 
 #. (itstool) path: item/title
 #: C/preferences-mail-options.page:270
-#, fuzzy
 msgid "<gui>Copy outgoing messages to sentbox</gui>"
-msgstr "Kopírovat odchozí zprávu do Odeslané pošty"
+msgstr "<gui>Kopírovat odchozí zprávu do Odeslané pošty</gui>"
 
 #. (itstool) path: item/p
 #: C/preferences-mail-options.page:273
@@ -3477,9 +3396,8 @@ msgstr ""
 
 #. (itstool) path: item/title
 #: C/preferences-miscellaneous.page:22
-#, fuzzy
 msgid "<gui>Empty Trash on Exit</gui>"
-msgstr "Při ukončení vysypat koš"
+msgstr "<gui>Při ukončení vysypat koš</gui>"
 
 #. (itstool) path: item/p
 #: C/preferences-miscellaneous.page:25
@@ -3511,9 +3429,8 @@ msgstr ""
 
 #. (itstool) path: item/title
 #: C/preferences-miscellaneous.page:37
-#, fuzzy
 msgid "<gui>Hide messages marked as deleted</gui>"
-msgstr "Skrývat zprávy označené jako smazané"
+msgstr "<gui>Skrývat zprávy označené jako smazané</gui>"
 
 #. (itstool) path: item/p
 #: C/preferences-miscellaneous.page:40
@@ -3547,9 +3464,8 @@ msgstr ""
 
 #. (itstool) path: item/title
 #: C/preferences-miscellaneous.page:56
-#, fuzzy
 msgid "<gui>Expunge deleted messages on close</gui>"
-msgstr "Odstraňovat smazané zprávy při zavření poštovní schránky"
+msgstr "<gui>Odstraňovat smazané zprávy při zavření poštovní schránky</gui>"
 
 #. (itstool) path: item/p
 #: C/preferences-miscellaneous.page:59
@@ -3598,9 +3514,8 @@ msgstr ""
 
 #. (itstool) path: item/title
 #: C/preferences-startup.page:12
-#, fuzzy
 msgid "<gui>Open Inbox upon Startup</gui>"
-msgstr "Po spuštění otevřít schránku s doručenou poštou"
+msgstr "<gui>Po spuštění otevřít schránku s doručenou poštou</gui>"
 
 #. (itstool) path: item/p
 #: C/preferences-startup.page:15
@@ -3612,9 +3527,8 @@ msgstr ""
 
 #. (itstool) path: item/title
 #: C/preferences-startup.page:19
-#, fuzzy
 msgid "<gui>Check Mail at Startup</gui>"
-msgstr "Po spuštění zkontrolovat poštu"
+msgstr "<gui>Po spuštění zkontrolovat poštu</gui>"
 
 #. (itstool) path: item/p
 #: C/preferences-startup.page:22
@@ -3650,9 +3564,8 @@ msgstr ""
 
 #. (itstool) path: item/title
 #: C/preferences-startup.page:34
-#, fuzzy
 msgid "<gui>Folder Scanning</gui>"
-msgstr "Zkoumání složek"
+msgstr "<gui>Zkoumání složek</gui>"
 
 #. (itstool) path: item/p
 #: C/preferences-startup.page:37
@@ -6474,10 +6387,8 @@ msgstr ""
 
 #. (itstool) path: page/p
 #: C/win-run-filters.page:27
-#, fuzzy
 msgid "Note: the <gui>On exit</gui> feature is not yet implemented."
-msgstr ""
-"Poznámka: Funkce <guilabel>Při ukončení</guilabel> zatím není implementována."
+msgstr "Poznámka: Funkce <gui>Při ukončení</gui> zatím není implementována."
 
 #. (itstool) path: page/p
 #: C/win-run-filters.page:29
@@ -6580,15 +6491,13 @@ msgstr ""
 
 #. (itstool) path: page/p
 #: C/win-search.page:22
-#, fuzzy
 msgid "You can view the matching messages in two ways:"
-msgstr "Vyhovující zprávy můžete zobrazit dvěma způsoby: <placeholder-1/>"
+msgstr "Vyhovující zprávy můžete zobrazit dvěma způsoby:"
 
 #. (itstool) path: item/title
 #: C/win-search.page:25
-#, fuzzy
 msgid "<gui>Show only matching messages</gui>"
-msgstr "Zobrazovat jen vyhovující zprávy"
+msgstr "<gui>Zobrazovat jen vyhovující zprávy</gui>"
 
 #. (itstool) path: item/p
 #: C/win-search.page:28
@@ -6609,9 +6518,8 @@ msgstr ""
 
 #. (itstool) path: item/title
 #: C/win-search.page:41
-#, fuzzy
 msgid "<gui>Open next matching message</gui>"
-msgstr "Otevřít následující vyhovující zprávu"
+msgstr "<gui>Otevřít následující vyhovující zprávu</gui>"
 
 #. (itstool) path: item/p
 #: C/win-search.page:44

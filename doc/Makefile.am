@@ -4,7 +4,7 @@ if HAVE_YELPTOOL
 
 HELP_ID      = balsa
 
-HELP_LINGUAS = cs de es fr sl
+HELP_LINGUAS = cs de el es fr sl
 
 if BUILD_WITH_SPELL_CHECKER
 HELP_FILES   =	 						\

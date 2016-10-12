@@ -105,7 +105,7 @@ msgstr "CC:"
 #: ../src/balsa-print-object-header.c:174 ../src/sendmsg-window.c:1091
 #: ../src/store-address.c:334
 msgid "Bcc:"
-msgstr "BCC"
+msgstr "BCC:"
 
 #: ../libbalsa/address-view.c:133
 msgid "Reply To:"
@@ -493,7 +493,7 @@ msgstr "Seguretat"
 
 #: ../libbalsa/identity.c:1068
 msgid "sign messages by default"
-msgstr "per defecte signa el missatges"
+msgstr "per defecte signa els missatges"
 
 #: ../libbalsa/identity.c:1071
 msgid "encrypt messages by default"
@@ -1385,7 +1385,7 @@ msgstr "Aquesta part no és una signatura real del PGP."
 #: ../libbalsa/rfc3156.c:988
 msgid "The signature could not be verified due to an invalid crypto engine."
 msgstr ""
-"No s'ha pogut verificar la signatura perquè l'eina de xifratge no és vàlida"
+"No s'ha pogut verificar la signatura perquè l'eina de xifratge no és vàlida."
 
 #: ../libbalsa/rfc3156.c:991 ../libbalsa/rfc3156.c:1751
 msgid "GnuPG is rebuilding the trust database and is currently unavailable."
@@ -1403,7 +1403,7 @@ msgstr "Es desconeix la validesa de l'identificador de l'usuari."
 
 #: ../libbalsa/rfc3156.c:1004
 msgid "The validity of the user ID is undefined."
-msgstr "La validesa de l'identificador de l'usuari no està definia."
+msgstr "La validesa de l'identificador de l'usuari no està definida."
 
 #: ../libbalsa/rfc3156.c:1006
 msgid "The user ID is never valid."
@@ -1635,7 +1635,7 @@ msgstr "Selecciona la clau privada pel signant %s"
 #: ../libbalsa/rfc3156.c:1393
 #, c-format
 msgid "Select the public key for the recipient %s"
-msgstr "Selecciona la clau públic pel destinatari %s"
+msgstr "Selecciona la clau pública pel destinatari %s"
 
 #: ../libbalsa/rfc3156.c:1524
 #, c-format
@@ -1785,7 +1785,7 @@ msgstr[1] "El missatge no es xifrarà per als destinataris del camp BCC:."
 
 #: ../libbalsa/send.c:2193
 msgid "This message will not be encrypted for the BCC: recipient(s)."
-msgstr "El missatge no es xifrarà pel destinataris del camp BCC:."
+msgstr "El missatge no es xifrarà pels destinataris del camp BCC:."
 
 #. host, authentication method
 #: ../libbalsa/server.c:431
@@ -1842,7 +1842,7 @@ msgstr "Utilitza el _TLS:"
 
 #: ../libbalsa/smtp-server.c:598
 msgid "C_ertificate Pass Phrase:"
-msgstr "Contrasenya del ce_rtificat"
+msgstr "Contrasenya del ce_rtificat:"
 
 #: ../libbalsa/smtp-server.c:610
 msgid "Sp_lit message larger than"
@@ -2160,7 +2160,7 @@ msgstr ""
 "que proporciona un ISP, i hauríeu de tenir la connexió a internet "
 "configurada en el vostre ordinador\n"
 "\n"
-"-- o l'administrador de la xarxa del lloc on treballeu/estudieu/similiar "
+"-- o l'administrador de la xarxa del lloc on treballeu/estudieu/similar "
 "hauria d'haver-vos configurat l'ordinador per connectar-vos a la xarxa."
 
 #: ../sounds/balsa.soundlist.in.h:1
@@ -2892,7 +2892,7 @@ msgstr ""
 #: ../src/balsa-message.c:2985
 msgid "Please close the other instances of this message and try again."
 msgstr ""
-"Tanqueu les altres visualitzacions del missatges i torneu-ho a intentar."
+"Tanqueu les altres visualitzacions dels missatges i torneu-ho a intentar."
 
 #: ../src/balsa-mime-widget-callbacks.c:54 ../src/sendmsg-window.c:1782
 #, c-format
@@ -3057,7 +3057,7 @@ msgstr "Respon a:"
 #: ../src/balsa-mime-widget-message.c:737
 #: ../src/balsa-print-object-header.c:176
 msgid "Fcc:"
-msgstr "Fcc"
+msgstr "Fcc:"
 
 #: ../src/balsa-mime-widget-message.c:744
 #: ../src/balsa-print-object-header.c:179
@@ -3618,9 +3618,9 @@ msgid ""
 "match instead."
 msgstr ""
 "El filtre «%s» no és compatible amb el tipus de la bústia de «%s».\n"
-"Acostuma a succeir quan s'utiltizen coincidències d'expressions regulars amb "
+"Acostuma a succeir quan s'utilitzen coincidències d'expressions regulars amb "
 "les\n"
-"bústies de l'IMAP, el mètode que s'utilitza és molt lent i és recomenable\n"
+"bústies de l'IMAP, el mètode que s'utilitza és molt lent i és recomanable\n"
 "utilitzar coincidències de subcadenes."
 
 #: ../src/filter-run-dialog.c:191
@@ -4943,7 +4943,7 @@ msgstr "S'està enviant l'error: %s"
 #, c-format
 msgid "You have received %d new message."
 msgid_plural "You have received %d new messages."
-msgstr[0] "Heu rebut %d missatge nous."
+msgstr[0] "Heu rebut %d missatge nou."
 msgstr[1] "Heu rebut %d missatges nous."
 
 #: ../src/main-window.c:3260
@@ -5354,7 +5354,7 @@ msgstr ""
 
 #: ../src/pref-manager.c:1828
 msgid "_POP message size limit:"
-msgstr "Mida limit dels missatges _POP:"
+msgstr "Mida límit dels missatges _POP:"
 
 #. Quoted text regular expression
 #. and RFC2646-style flowed text
@@ -5675,7 +5675,7 @@ msgstr "Els paràmetres següents són globals:"
 
 #: ../src/pref-manager.c:2592
 msgid "Expunge deleted messages when mailbox is closed"
-msgstr "Desfés-te dels missatges suprimit en tancar la bústia"
+msgstr "Desfés-te dels missatges suprimits en tancar la bústia"
 
 #: ../src/pref-manager.c:2599
 msgid "...and if unused more than"
@@ -5714,7 +5714,7 @@ msgid ""
 "Choose depth 1 for fast startup; this defers scanning some folders.  To see "
 "more of the tree at startup, choose a greater depth."
 msgstr ""
-"Escolliu un nivell de profunditat 1 per a un inici ràpid, cosa que aplaça "
+"Escolliu un nivell de profunditat 1 per a un inici ràpid, cosa que ajorna "
 "l'escaneig d'algunes carpetes. Per a visualitzar més parts de l'arbre a "
 "l'inici, seleccioneu un nivell de profunditat més gran."
 
@@ -5845,7 +5845,7 @@ msgstr "Tipus de lletra de la _capçalera:"
 
 #: ../src/print-gtk.c:518
 msgid "B_ody Font:"
-msgstr "Tipus de lletra del c_os"
+msgstr "Tipus de lletra del c_os:"
 
 #: ../src/print-gtk.c:521
 msgid "_Footer Font:"
@@ -6377,7 +6377,7 @@ msgid ""
 "\n"
 "Do you really want to attach this file as reference?"
 msgstr ""
-"Si dieu que sí no s'enviarà el fitxer «%s» en sí, sinó només una referència "
+"Si dieu que sí no s'enviarà el fitxer «%s» en si, sinó només una referència "
 "MIME de missatge/cos extern. Tingueu en compte que el destinatari haurà de "
 "tenir els permisos adequats per a visualitzar el fitxer real.\n"
 "\n"

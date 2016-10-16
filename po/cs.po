@@ -5023,11 +5023,11 @@ msgstr "Používat systémový font"
 
 #: ../src/pref-manager.c:2436
 msgid "Message font:"
-msgstr "Písmo zprávy:"
+msgstr "Font zprávy:"
 
 #: ../src/pref-manager.c:2443
 msgid "Subject font:"
-msgstr "Písmo předmětu:"
+msgstr "Font předmětu:"
 
 #: ../src/pref-manager.c:2451
 msgid "Use default font size"
@@ -5283,7 +5283,7 @@ msgstr "mm"
 
 #: ../src/print-gtk.c:529
 msgid "_Header Font:"
-msgstr "Písmo _hlavičky:"
+msgstr "Font _hlavičky:"
 
 #: ../src/print-gtk.c:532
 msgid "B_ody Font:"
@@ -5291,7 +5291,7 @@ msgstr "Písm_o těla:"
 
 #: ../src/print-gtk.c:535
 msgid "_Footer Font:"
-msgstr "Písmo _patičky:"
+msgstr "Font _patičky:"
 
 #: ../src/print-gtk.c:542
 msgid "Highlighting"

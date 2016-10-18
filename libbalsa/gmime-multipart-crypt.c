@@ -284,16 +284,10 @@ g_mime_gpgme_mps_verify(GMimeMultipartSigned * mps, GError ** error)
     /* get the signature stream */
     wrapper = g_mime_part_get_content_object(GMIME_PART(signature));
 
-    /* FIXME: temporary hack for Balsa to support S/MIME,
-     * ::verify() should probably take a mime part so it can
-     * decode this itself if it needs to. */
-    if (crypto_prot == GPGME_PROTOCOL_CMS) {
+    /* a s/mime signature is always encoded, a pgp signature shouldn't,
+     * but there exist implementations which encode it... */
 	sigstream = g_mime_stream_mem_new();
 	g_mime_data_wrapper_write_to_stream(wrapper, sigstream);
-    } else {
-	sigstream = g_mime_data_wrapper_get_stream(wrapper);
-    }
-
     g_mime_stream_reset(sigstream);
 
     /* verify the signature */
@@ -301,6 +295,7 @@ g_mime_gpgme_mps_verify(GMimeMultipartSigned * mps, GError ** error)
 	libbalsa_gpgme_verify(stream, sigstream, crypto_prot, FALSE,
 			      error);
     g_object_unref(stream);
+    g_object_unref(sigstream);
 
     return result;
 }

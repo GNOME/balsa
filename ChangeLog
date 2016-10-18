@@ -1,3 +1,17 @@
+2016-10-18  Albrecht Dreß
+
+	Usually, RFC 3156 (PGP/MIME) signature parts
+	(application/pgp-signature, see RFC 3156, sect. 9.2.) should
+	never be encoded as they are 7-bit clean.  However, there are
+	implementations which apply an (superfluous) encoding to such
+	parts, which Balsa fails to interpret properly.  The attached
+	patch fixes this behaviour, and as a side effect plugs a gmime
+	stream leak when checking a S/MIME signature which is always
+	encoded.
+
+	* libbalsa/gmime-multipart-crypt.c (g_mime_gpgme_mps_verify):
+	always decrypt the signature; do not leak sigstream.
+
 2016-10-03  Albrecht Dreß
 
 	Implement the 'AUTH PLAIN' SASL mechanism for POP3

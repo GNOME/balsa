@@ -34,7 +34,7 @@ HELP_FILES   =	 						\
                win-search.page
 
 helpdirs = C $(HELP_LINGUAS)
-balsa_spell_extra_dist = $(foreach lc,$(helpdirs),$(lc)/preferences-spelling.page) #
+balsa_spell_extra_dist = $(helpdirs:=/preferences-spelling.page)
 
 else
 HELP_FILES   =	 						\

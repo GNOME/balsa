@@ -1,3 +1,8 @@
+2016-10-18  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* Makefile.am: create balsa-spell-extra-dist using tools that
+	automake does not whine about.
+
 2016-10-06  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Do not track translated help files in git

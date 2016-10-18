@@ -4,8 +4,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa help master\n"
-"POT-Creation-Date: 2016-10-04 20:20+0000\n"
-"PO-Revision-Date: 2016-10-16 16:57+0200\n"
+"POT-Creation-Date: 2016-10-16 14:58+0000\n"
+"PO-Revision-Date: 2016-10-18 22:19+0200\n"
 "Last-Translator: Mario Blättermann <mario.blaettermann@gmail.com>\n"
 "Language-Team: German <gnome-de@gnome.org>\n"
 "Language: de\n"
@@ -52,6 +52,11 @@ msgid ""
 "mailer (<link href=\"http://www.mutt.org/\">www.mutt.org</link>) uses an "
 "identical system to retrieve addresses from programs."
 msgstr ""
+"Das Balsa-Adressbuch unterstützt die Eingabe aus Anwendungen. Daher können "
+"Sie (ohne dass ein Import nötig ist) zum Beispiel die Adressbücher von "
+"<gui>Pine</gui> oder <gui>Mutt</gui> nutzen. Das Mailprogramm <gui>Mutt</"
+"gui> (<link href=\"http://www.mutt.org/\">www.mutt.org</link>) verwendet ein "
+"identisches System zum Holen von Adressen aus Anwendungen."
 
 #. (itstool) path: section/title
 #: C/ab-conf.page:28
@@ -65,8 +70,8 @@ msgid ""
 "The following programs are compatible with the mutt mail reader and "
 "<em>should</em> be with balsa. Submit links to more programs."
 msgstr ""
-"Die folgenden Programme sind zum Mailprogramm <app>mutt</app> kompatibel und "
-"<em>sollten/em> auch mit <app>balsa</app> funktionieren. Bitte stellen Sie "
+"Die folgenden Programme sind zum Mailprogramm <app>Mutt</app> kompatibel und "
+"<em>sollten/em> auch mit <app>Balsa</app> funktionieren. Bitte stellen Sie "
 "Links zu weiteren Programmen zur Verfügung."
 
 #. (itstool) path: item/p
@@ -151,25 +156,16 @@ msgstr "<output> lbdbq: 3 matches </output>"
 
 #. (itstool) path: section/p
 #: C/ab-conf.page:76
-#| msgid ""
-#| "\n"
-#| "balsa-list@gnome.org\tBalsa List\tbalsa-list\n"
 msgid "<output> balsa-list@gnome.org Balsa List balsa-list </output>"
 msgstr "<output> balsa-list@gnome.org Balsa-Liste balsa-list </output>"
 
 #. (itstool) path: section/p
 #: C/ab-conf.page:78
-#| msgid ""
-#| "\n"
-#| "jelmer@nl.linux.org\tJelmer Vernooij\tjelmer\n"
 msgid "<output> jelmer@nl.linux.org Jelmer Vernooij jelmer </output>"
 msgstr "<output> jelmer@nl.linux.org Jelmer Vernooij jelmer </output>"
 
 #. (itstool) path: section/p
 #: C/ab-conf.page:80
-#| msgid ""
-#| "\n"
-#| "balsa-maintainer@theochem.kth.se\tPawel Salek\tbalsa-maintainer\n"
 msgid ""
 "<output> balsa-maintainer@theochem.kth.se Pawel Salek balsa-maintainer </"
 "output>"
@@ -234,7 +230,6 @@ msgstr ""
 
 #. (itstool) path: item/p
 #: C/authors.page:13 C/authors.page:80
-#| msgid "Peter Bloomfield (<email>peterbloomfield@bellsouth.net</email>)"
 msgid ""
 "Peter Bloomfield ( <link href=\"mailto:peterbloomfield@bellsouth.net\"> "
 "peterbloomfield@bellsouth.net</link> )"
@@ -244,7 +239,6 @@ msgstr ""
 
 #. (itstool) path: item/p
 #: C/authors.page:18
-#| msgid "Carlos Morgado (<email>chbm@chbm.nu</email>)"
 msgid ""
 "Carlos Morgado ( <link href=\"mailto:chbm@chbm.nu\">chbm@chbm.nu</link> )"
 msgstr ""
@@ -252,7 +246,6 @@ msgstr ""
 
 #. (itstool) path: item/p
 #: C/authors.page:22 C/authors.page:100
-#| msgid "Pawel Salek (<email>pawsa@theochem.kth.se</email>)"
 msgid ""
 "Pawel Salek ( <link href=\"mailto:pawsa@theochem.kth.se\"> pawsa@theochem."
 "kth.se</link> )"
@@ -271,7 +264,6 @@ msgstr ""
 
 #. (itstool) path: item/p
 #: C/authors.page:31
-#| msgid "Hector Garcia Alvarez (<email>hector@scouts-es.org</email>)"
 msgid ""
 "Hector Garcia Alvarez ( <link href=\"mailto:hector@scouts-es.org\"> "
 "hector@scouts-es.org</link> )"
@@ -281,7 +273,6 @@ msgstr ""
 
 #. (itstool) path: item/p
 #: C/authors.page:36 C/authors.page:90
-#| msgid "Matthew Guenther (<email>guentherm@asme.org</email>)"
 msgid ""
 "Matthew Guenther ( <link href=\"mailto:guentherm@asme.org\"> guentherm@asme."
 "org</link> )"
@@ -291,7 +282,6 @@ msgstr ""
 
 #. (itstool) path: item/p
 #: C/authors.page:41
-#| msgid "Bruno Pires Marinho (<email>bapm@camoes.rnl.ist.utl.pt</email>)"
 msgid ""
 "Bruno Pires Marinho ( <link href=\"mailto:bapm@camoes.rnl.ist.utl.pt\"> "
 "bapm@camoes.rnl.ist.utl.pt</link> )"
@@ -301,7 +291,6 @@ msgstr ""
 
 #. (itstool) path: item/p
 #: C/authors.page:46
-#| msgid "Jay Painter (<email>jpaint@gimp.org</email>)"
 msgid ""
 "Jay Painter ( <link href=\"mailto:jpaint@gimp.org\"> jpaint@gimp.org</link> )"
 msgstr ""
@@ -309,7 +298,6 @@ msgstr ""
 
 #. (itstool) path: item/p
 #: C/authors.page:51
-#| msgid "Stuart Parmenter (<email>pavlov@pavlov.net</email>)"
 msgid ""
 "Stuart Parmenter ( <link href=\"mailto:pavlov@pavlov.net\"> pavlov@pavlov."
 "net</link> )"
@@ -319,7 +307,6 @@ msgstr ""
 
 #. (itstool) path: item/p
 #: C/authors.page:56
-#| msgid "David Pickens (<email>dpickens@iaesthetic.com</email>)"
 msgid ""
 "David Pickens ( <link href=\"mailto:dpickens@iaesthetic.com\"> "
 "dpickens@iaesthetic.com</link> )"
@@ -329,7 +316,6 @@ msgstr ""
 
 #. (itstool) path: item/p
 #: C/authors.page:61 C/authors.page:110
-#| msgid "Peter Williams (<email>peter@newton.cx</email>)"
 msgid ""
 "Peter Williams ( <link href=\"mailto:peter@newton.cx\"> peter@newton.cx</"
 "link> )"
@@ -349,6 +335,14 @@ msgid ""
 "later, you can also use command <cmd>bug-buddy</cmd> for submitting bug "
 "reports."
 msgstr ""
+"Weitere Informationen finden Sie auf der <link href=\"http://balsa.gnome.org/"
+"\">Webseite von <app>Balsa</app></link>. Bitte senden Sie alle Kommentare, "
+"Anregungen und Fehlerberichte an das <link href=\"http://bugs.gnome.org/"
+"\">GNOME-Fehlererfassungssystem</link>. Anweisungen zum Melden von Fehlern "
+"finden Sie online auf <link href=\"http://balsa.gnome.org/bugs.html\"> "
+"http://balsa.gnome.org/bugs.html</link>. Wenn Sie GNOME 1.1 oder neuer "
+"verwenden, können Sie auch den Befehl <cmd>bug-buddy</cmd> zum Erstellen und "
+"Übermitteln von Fehlerberichten verwenden."
 
 #. (itstool) path: page/p
 #: C/authors.page:77
@@ -357,7 +351,6 @@ msgstr "Beiträge zu diesem Handbuch stammen von den folgenden Personen:"
 
 #. (itstool) path: item/p
 #: C/authors.page:85
-#| msgid "Berend De Schouwer (<email>bds@jhb.ucs.co.za</email>)"
 msgid ""
 "Berend De Schouwer ( <link href=\"mailto:bds@jhb.ucs.co.za\"> bds@jhb.ucs.co."
 "za</link> )"
@@ -367,7 +360,6 @@ msgstr ""
 
 #. (itstool) path: item/p
 #: C/authors.page:95
-#| msgid "Craig Routledge (<email>webstuff@craigroutledge.com</email>)"
 msgid ""
 "Craig Routledge ( <link href=\"mailto:webstuff@craigroutledge.com\"> "
 "webstuff@craigroutledge.com</link> )"
@@ -377,7 +369,6 @@ msgstr ""
 
 #. (itstool) path: item/p
 #: C/authors.page:105
-#| msgid "Jelmer Vernooij (<email>jelmer@nl.linux.org</email>)"
 msgid ""
 "Jelmer Vernooij ( <link href=\"mailto:jelmer@nl.linux.org\"> jelmer@nl.linux."
 "org</link> )"
@@ -436,6 +427,8 @@ msgid ""
 "<link xref=\"common-tasks#ct-main-folder-imap\">Making one of the main "
 "folders IMAP-based</link>"
 msgstr ""
+"<link xref=\"common-tasks#ct-main-folder-imap\">Einen der Hauptordner als "
+"IMAP-Ordner einrichten</link>"
 
 #. (itstool) path: item/p
 #: C/common-tasks.page:30
@@ -443,6 +436,8 @@ msgid ""
 "<link xref=\"common-tasks#ct-alias-expansion\">Expanding e-mail addresses "
 "automatically</link>"
 msgstr ""
+"<link xref=\"common-tasks#ct-alias-expansion\">E-Mail-Adressen automatisch "
+"expandieren</link>"
 
 #. (itstool) path: item/p
 #: C/common-tasks.page:36
@@ -644,8 +639,7 @@ msgstr ""
 #: C/folder-config.page:22
 msgid "Server is the host name or IP number of the IMAP server."
 msgstr ""
-"<guilabel>Server</guilabel> ist der Rechnername oder die IP-Adresse des IMAP-"
-"Servers."
+"<gui>Server</gui> ist der Rechnername oder die IP-Adresse des IMAP-Servers."
 
 #. (itstool) path: item/p
 #: C/folder-config.page:26
@@ -669,8 +663,8 @@ msgstr ""
 #: C/folder-config.page:35
 msgid "Password is the password used for authorization on the IMAP server."
 msgstr ""
-"<guilabel>Passwort</guilabel> ist das für die Legitimierung am IMAP-Server "
-"verwendete Passwort."
+"<gui>Passwort</gui> ist das für die Legitimierung am IMAP-Server verwendete "
+"Passwort."
 
 #. (itstool) path: item/p
 #: C/folder-config.page:39
@@ -678,6 +672,8 @@ msgid ""
 "Check box allows you to choose all mailboxes on the server, or only those "
 "you subscribed to."
 msgstr ""
+"Das Ankreuzfeld ermöglicht Ihnen die Auswahl aller Postfächer auf dem "
+"Server, oder nur jener, die Sie abonniert haben."
 
 #. (itstool) path: item/p
 #: C/folder-config.page:43
@@ -889,18 +885,13 @@ msgstr ""
 
 #. (itstool) path: page/p
 #: C/getting-started.page:26
-#, fuzzy
-#| msgid ""
-#| "There are many more settings in <application>Balsa</application>'s <link "
-#| "linkend=\"preferences\">preferences window</link>, but most of them do "
-#| "not need to be changed."
 msgid ""
 "There are many more settings in <app>Balsa</app>'s <link xref=\"preferences"
 "\">preferences window</link>, but most of them do not need to be changed."
 msgstr ""
-"Es gibt noch weitaus mehr Einstellungen im <link linkend=\"preferences"
-"\">Einstellungsfenster</link> von <application>Balsa</application>, aber die "
-"meisten davon brauchen nicht geändert zu werden."
+"Es gibt noch weitaus mehr Einstellungen im <link xref=\"preferences"
+"\">Einstellungsfenster</link> von <app>Balsa</app>, aber die meisten davon "
+"brauchen nicht geändert zu werden."
 
 #. (itstool) path: page/p
 #: C/getting-started.page:29
@@ -953,6 +944,12 @@ msgid ""
 "mail server, and more control over mail delivery. However it is not as "
 "widely supported."
 msgstr ""
+"Die Abkürzung für »Internet Mail Access Protocol«. Es ist eine neuere "
+"Methode zum Zugriff auf Nachrichten über das Internet. Es ist weitaus "
+"funktionsreicher als <link xref=\"glossary#pop\">POP3</link>. Sie können "
+"damit auf entfernte Ordner auf dem Mailserver zugreifen, wobei mehr "
+"Möglichkeiten zur Steuerung der Abholung von Nachrichten verfügbar sind. Es "
+"wird allerdings noch nicht überall unterstützt."
 
 #. (itstool) path: section/title
 #: C/glossary.page:28
@@ -1081,6 +1078,11 @@ msgid ""
 "construct regular expressions the best source is the <cmd>grep</cmd> manual "
 "or info page."
 msgstr ""
+"Oft als <em>regexp</em> abgekürzt, ist dies eine Methode zur Angabe von "
+"Textmustern, nach denen gesucht werden soll. Sowohl nach sehr einfachen als "
+"auch nach sehr komplexen Muster kann damit gesucht werden. In den Unix-"
+"Handbuchseiten oder der GNU-Info-Seite zu <cmd>grep</cmd> finden Sie weitere "
+"Informationen zum Verstehen und Konstruieren regulärer Ausdrücke."
 
 #. (itstool) path: section/title
 #: C/glossary.page:98
@@ -1131,10 +1133,8 @@ msgstr ""
 
 #. (itstool) path: item/title
 #: C/identities.page:14
-#, fuzzy
-#| msgid "Identity Name"
 msgid "<gui>Identity Name</gui>"
-msgstr "I"
+msgstr ""
 
 #. (itstool) path: item/p
 #: C/identities.page:17
@@ -1250,7 +1250,6 @@ msgstr ""
 
 #. (itstool) path: item/title
 #: C/identities.page:86
-#| msgid "Face Path"
 msgid "<gui>Face Path</gui>"
 msgstr "<gui>Face-Pfad</gui>"
 
@@ -1266,7 +1265,6 @@ msgstr ""
 
 #. (itstool) path: item/title
 #: C/identities.page:98
-#| msgid "X-Face Path"
 msgid "<gui>X-Face Path</gui>"
 msgstr "<gui>X-Face-Pfad</gui>"
 
@@ -1279,7 +1277,6 @@ msgstr ""
 
 #. (itstool) path: item/title
 #: C/identities.page:106
-#| msgid "SMTP server"
 msgid "<gui>SMTP server</gui>"
 msgstr "<gui>SMTP-Server</gui>"
 
@@ -1338,16 +1335,13 @@ msgstr ""
 
 #. (itstool) path: item/p
 #: C/identities.page:141
-#| msgid "|/home/user/dynsig.pl"
 msgid "\"|/home/user/dynsig.pl\""
 msgstr "\"|/home/user/dynsig.pl\""
 
 #. (itstool) path: item/title
 #: C/identities.page:146
-#, fuzzy
-#| msgid "Execute Signature"
 msgid "<gui>Execute Signature</gui>"
-msgstr "Signatur ausführen"
+msgstr "<gui>Signatur ausführen</gui>"
 
 #. (itstool) path: item/p
 #: C/identities.page:149
@@ -1510,7 +1504,6 @@ msgstr "<app>Balsa</app>-Benutzerhandbuch"
 
 #. (itstool) path: credit/name
 #: C/index.page:9
-#| msgid "Pawel"
 msgid "Pawel Salek"
 msgstr "Pawel Salek"
 
@@ -1522,7 +1515,6 @@ msgstr ""
 
 #. (itstool) path: credit/years
 #: C/index.page:14
-#| msgid "1997-2009"
 msgid "1997-2013"
 msgstr "1997-2013"
 
@@ -1589,17 +1581,6 @@ msgstr "Alle weiteren Warenzeichen gehören den jeweiligen Eigentümern."
 
 #. (itstool) path: page/p
 #: C/index.page:40
-#, fuzzy
-#| msgid ""
-#| "<application>Balsa</application> is a graphical mail client. While it is "
-#| "in active development, <application>Balsa</application> has many features "
-#| "such as: <glossterm linkend=\"glossary-imap\"><acronym>IMAP</acronym></"
-#| "glossterm> and <glossterm linkend=\"glossary-pop\"><acronym>POP3</"
-#| "acronym></glossterm> support; sendmail or direct <glossterm linkend="
-#| "\"glossary-smtp\"><acronym>SMTP</acronym></glossterm> support; optional "
-#| "multi-threaded retrieval and sending of messages; support for all "
-#| "configurations of local mail folders; automatic mail checking; mail "
-#| "printing; inline attachment viewing; and the proverbial much, much more."
 msgid ""
 "<app>Balsa</app> is a graphical mail client. While it is in active "
 "development, <app>Balsa</app> has many features such as: <link xref="
@@ -1609,26 +1590,18 @@ msgid ""
 "for all configurations of local mail folders; automatic mail checking; mail "
 "printing; inline attachment viewing; and the proverbial much, much more."
 msgstr ""
-"<application>Balsa</application> ist ein grafisches E-Mail-Programm. Während "
-"es aktiv entwickelt wird, verfügt <application>Balsa</application> bereits "
-"über zahlreiche Funktionsmerkmale wie: Unterstützung für <glossterm linkend="
-"\"glossary-imap\"><acronym>IMAP</acronym></glossterm> und <glossterm linkend="
-"\"glossary-pop\"><acronym>POP3</acronym></glossterm>; Versand mit Sendmail "
-"oder direkt über <glossterm linkend=\"glossary-smtp\"><acronym>SMTP</"
-"acronym></glossterm>; optionaler Empfang und Versand von Nachrichten über "
-"mehrere Konten; Unterstützung für sämtliche Konfigurationen lokaler Mail-"
-"Ordner; automatische Überprüfung auf eingegangene Nachrichten; Drucken; "
-"eingebettete Anzeige von Anhängen und noch viel mehr."
+"<app>Balsa</app> ist ein grafisches E-Mail-Programm. Während es aktiv "
+"entwickelt wird, verfügt <app>Balsa</app> bereits über zahlreiche "
+"Funktionsmerkmale wie: Unterstützung für <link xref=\"glossary#imap\">IMAP</"
+"link> und <link xref=\"glossary#pop\">POP3</link>; Versand mit Sendmail oder "
+"direkt über <link xref=\"glossary#smtp\">SMTP</link>; optionaler Empfang und "
+"Versand von Nachrichten über mehrere Konten; Unterstützung für sämtliche "
+"Konfigurationen lokaler Mail-Ordner; automatische Überprüfung auf "
+"eingegangene Nachrichten; Drucken; eingebettete Anzeige von Anhängen und "
+"noch viel mehr."
 
 #. (itstool) path: page/p
 #: C/index.page:47
-#, fuzzy
-#| msgid ""
-#| "This document will introduce a person who understands mail to using "
-#| "<application>Balsa</application>. However, it will not explain email to a "
-#| "confused individual. If you're looking for that, try asking a friend or "
-#| "visiting the <ulink url=\"http://www.cs.queensu.ca/FAQs/email/\" type="
-#| "\"http\">Email FAQ</ulink>."
 msgid ""
 "This document will introduce a person who understands mail to using "
 "<app>Balsa</app>. However, it will not explain email to a confused "
@@ -1636,12 +1609,12 @@ msgid ""
 "<link href=\"http://www.cs.queensu.ca/FAQs/email/\" type=\"http\"> Email "
 "FAQ</link>."
 msgstr ""
-"Dieses Dokument will eine Einführung in <application>Balsa</application> "
-"geben, für jemanden, der mit E-Mail vertraut ist. Es will jedoch keine "
-"Anleitung sein, die E-Mail einem Unwissenden in allen Einzelheiten erklärt. "
-"Falls Sie etwas in dieser Richtung wissen wollen, wenden Sie sich "
-"vertrauensvoll an einen Freund oder lesen Sie die <ulink url=\"http://www.cs."
-"queensu.ca/FAQs/email/\" type=\"http\">E-Mail-FAQ</ulink>."
+"Dieses Dokument will eine Einführung in <app>Balsa</app> geben, für "
+"jemanden, der mit E-Mail vertraut ist. Es will jedoch keine Anleitung sein, "
+"die E-Mail einem Unwissenden in allen Einzelheiten erklärt. Falls Sie etwas "
+"in dieser Richtung wissen wollen, wenden Sie sich vertrauensvoll an einen "
+"Freund oder lesen Sie die <link href=\"http://www.cs.queensu.ca/FAQs/email/"
+"\" type=\"http\"> E-Mail-FAQ</link>."
 
 #. (itstool) path: media
 #. This is a reference to an external file such as an image or video. When
@@ -1661,42 +1634,27 @@ msgstr "Einführung"
 
 #. (itstool) path: page/p
 #: C/introduction.page:12
-#, fuzzy
-#| msgid ""
-#| "<application>Balsa</application> is a graphical mail client. It supports "
-#| "the standard features of any good reader and has new features added "
-#| "continually. See the abstract above for a quick feature rundown."
 msgid ""
 "<app>Balsa</app> is a graphical mail client. It supports the standard "
 "features of any good reader and has new features added continually. See the "
 "abstract above for a quick feature rundown."
 msgstr ""
-"<application>Balsa</application> ist ein grafisches E-Mail-Programm. Es "
-"unterstützt die Standardfunktionen jedes guten Mailprogramms, neue "
-"Funktionen kommen ständig hinzu. Obenstehend finden Sie eine "
-"Funktionsübersicht."
+"<app>Balsa</app> ist ein grafisches E-Mail-Programm. Es unterstützt die "
+"Standardfunktionen jedes guten Mailprogramms, neue Funktionen kommen ständig "
+"hinzu. Obenstehend finden Sie eine Funktionsübersicht."
 
 #. (itstool) path: page/p
 #: C/introduction.page:16
-#, fuzzy
-#| msgid ""
-#| "<application>Balsa</application> is written using <acronym>GTK+</acronym> "
-#| "and <acronym>GNOME</acronym>. Originally based on libmutt, the back end "
-#| "code to <application>Mutt</application>, <application>Balsa</application> "
-#| "now uses a combination of GMime for handling Mime messages, and its own "
-#| "drivers for local and remote mailstores."
 msgid ""
 "<app>Balsa</app> is written using GTK+ and GNOME. Originally based on "
 "libmutt, the back end code to <app>Mutt</app>, <app>Balsa</app> now uses a "
 "combination of GMime for handling Mime messages, and its own drivers for "
 "local and remote mailstores."
 msgstr ""
-"<application>Balsa</application> wird auf der Basis von <acronym>GTK+</"
-"acronym> und <acronym>GNOME</acronym> entwickelt. Original basierend auf "
-"libmutt, dem Backend-Code von <application>Mutt</application>, verwendet "
-"<application>Balsa</application> nun eine Kombination aus GMime für die "
-"Verarbeitung von MIME-Meldungen sowie eigene Treiber für lokale und ferne "
-"Postfächer."
+"<app>Balsa</app> wird auf der Basis von GTK+ und GNOME entwickelt. Original "
+"basierend auf libmutt, dem Backend-Code von <app>Mutt</app>, verwendet "
+"<app>Balsa</app> nun eine Kombination aus GMime für die Verarbeitung von "
+"MIME-Meldungen sowie eigene Treiber für lokale und ferne Postfächer."
 
 #. (itstool) path: page/p
 #: C/introduction.page:20
@@ -1762,12 +1720,12 @@ msgstr ""
 
 #. (itstool) path: item/p
 #: C/its-not-working.page:28
-#, fuzzy
-#| msgid "What's that window that flashed on the screen?"
 msgid ""
 "<link xref=\"its-not-working#spooky-win\"> What's that window that flashed "
 "on the screen?</link>"
-msgstr "Was ist das für ein Fenster, das auf dem Bildschirm blinkt?"
+msgstr ""
+"<link xref=\"its-not-working#spooky-win\"> Was ist das für ein Fenster, das "
+"auf dem Bildschirm blinkt?</link>"
 
 #. (itstool) path: item/p
 #: C/its-not-working.page:35
@@ -1899,7 +1857,7 @@ msgstr ""
 #. (itstool) path: item/title
 #: C/mbox-formats.page:20
 msgid "Mailbox Format Characteristics"
-msgstr ""
+msgstr "Charakteristiken der Mailbox-Formate"
 
 #. (itstool) path: item/p
 #: C/mbox-formats.page:21
@@ -1937,7 +1895,6 @@ msgstr ""
 
 #. (itstool) path: item/title
 #: C/mbox-formats.page:40
-#| msgid "Mailbox"
 msgid "QMail"
 msgstr "QMail"
 
@@ -2050,31 +2007,24 @@ msgstr ""
 
 #. (itstool) path: figure/title
 #: C/preferences-address-books.page:38
-#, fuzzy
-#| msgid "<acronym>VCARD</acronym> Address Book Dialog"
 msgid "VCARD Address Book Dialog"
-msgstr "<acronym>VCARD</acronym>-Adressbuch-Dialog"
+msgstr "VCARD-Adressbuch-Dialog"
 
 #. (itstool) path: item/p
 #: C/preferences-address-books.page:41
-#, fuzzy
-#| msgid ""
-#| "With <glossterm linkend=\"glossary-ldap\"><acronym>LDAP</acronym></"
-#| "glossterm> support, the dialog looks somewhat different, offering options "
-#| "to set the location of the directory instead of a file."
 msgid ""
 "With <link xref=\"glossary#ldap\">LDAP</link> support, the dialog looks "
 "somewhat different, offering options to set the location of the directory "
 "instead of a file."
 msgstr ""
-"Mit <glossterm linkend=\"glossary-ldap\"><acronym>LDAP</acronym></glossterm>-"
-"Unterstützung sieht der Dialog etwas anders aus. Sie können dann den Ort "
-"eines Verzeichnisses anstatt einer Datei angeben."
+"Mit <link xref=\"glossary#ldap\">LDAP</link>-Unterstützung sieht der Dialog "
+"etwas anders aus. Sie können dann den Ort eines Verzeichnisses anstatt einer "
+"Datei angeben."
 
 #. (itstool) path: figure/title
 #: C/preferences-address-books.page:45
 msgid "<link xref=\"glossary#ldap\">LDAP</link> Address Book Dialog"
-msgstr ""
+msgstr "<link xref=\"glossary#ldap\">LDAP</link>-Addressbuchdialog"
 
 #. (itstool) path: item/p
 #: C/preferences-address-books.page:48
@@ -2130,10 +2080,8 @@ msgstr "Entfernt das ausgewählte Adressbuch."
 
 #. (itstool) path: item/title
 #: C/preferences-address-books.page:84
-#, fuzzy
-#| msgid "Set as Default"
 msgid "<gui>Set as Default</gui>"
-msgstr "Zur Vorgabe machen"
+msgstr "<gui>Zur Vorgabe machen</gui>"
 
 #. (itstool) path: item/p
 #: C/preferences-address-books.page:87
@@ -2233,10 +2181,8 @@ msgstr "Das Nachrichtenfenster"
 
 #. (itstool) path: item/title
 #: C/preferences-display-options.page:66
-#, fuzzy
-#| msgid "Moving a Message"
 msgid "<gui>Moving a Message</gui>"
-msgstr "Verschieben einer Nachricht"
+msgstr "<gui>Verschieben einer Nachricht</gui>"
 
 #. (itstool) path: item/p
 #: C/preferences-display-options.page:69
@@ -2253,10 +2199,8 @@ msgstr "Sortieren und Thematisieren"
 
 #. (itstool) path: item/title
 #: C/preferences-display-options.page:81
-#, fuzzy
-#| msgid "Default sort column"
 msgid "<gui>Default sort column</gui>"
-msgstr "Nach dieser Spalte sortieren"
+msgstr "<gui>Nach dieser Spalte sortieren</gui>"
 
 #. (itstool) path: item/p
 #: C/preferences-display-options.page:84
@@ -2265,10 +2209,8 @@ msgstr ""
 
 #. (itstool) path: item/title
 #: C/preferences-display-options.page:88
-#, fuzzy
-#| msgid "Default threading style"
 msgid "<gui>Default threading style</gui>"
-msgstr "Vorgabestil für Themen"
+msgstr ""
 
 #. (itstool) path: item/p
 #: C/preferences-display-options.page:91
@@ -2390,10 +2332,8 @@ msgstr "Format"
 
 #. (itstool) path: item/title
 #: C/preferences-display-options.page:171
-#, fuzzy
-#| msgid "Date Encoding"
 msgid "<gui>Date Encoding</gui>"
-msgstr "Datumsformat"
+msgstr "<gui>Datumsformat</gui>"
 
 #. (itstool) path: item/p
 #: C/preferences-display-options.page:174
@@ -2496,10 +2436,8 @@ msgstr ""
 
 #. (itstool) path: item/title
 #: C/preferences-display-options.page:252
-#, fuzzy
-#| msgid "Display Progress"
 msgid "<gui>Display Progress</gui>"
-msgstr "Fortschrittsdialog anzeigen"
+msgstr "<gui>Fortschrittsdialog anzeigen</gui>"
 
 #. (itstool) path: item/p
 #: C/preferences-display-options.page:255
@@ -2613,13 +2551,6 @@ msgstr "<gui>Server für ausgehende E-Mails</gui>"
 
 #. (itstool) path: item/p
 #: C/preferences-mail-options.page:69
-#, fuzzy
-#| msgid ""
-#| "Most users will need only one outgoing mail server, but you may need to "
-#| "use more than one. <application>Balsa</application> allows you to set up "
-#| "as many as you need. The server used for a particular message is "
-#| "controlled by the <link linkend=\"identities\">identity</link> you choose "
-#| "for the message."
 msgid ""
 "Most users will need only one outgoing mail server, but you may need to use "
 "more than one. <app>Balsa</app> allows you to set up as many as you need. "
@@ -2627,11 +2558,10 @@ msgid ""
 "\"identities\">identity</link> you choose for the message."
 msgstr ""
 "Die meisten Benutzer werden nur einen Server für ausgehende Nachrichten "
-"benötigen, aber vielleicht möchten Sie auch mehrere verwenden? "
-"<application>Balsa</application> ermöglicht Ihnen, so viele zu verwenden wie "
-"Sie wollen. Der für eine bestimmte Nachricht verwendete Server wird durch "
-"die <link linkend=\"identities\">Identität</link> bestimmt, welche Sie für "
-"die Nachricht ausgewählt haben."
+"benötigen, aber vielleicht möchten Sie auch mehrere verwenden? <app>Balsa</"
+"app> ermöglicht Ihnen, so viele zu verwenden wie Sie wollen. Der für eine "
+"bestimmte Nachricht verwendete Server wird durch die <link xref=\"identities"
+"\">Identität</link> bestimmt, welche Sie für die Nachricht ausgewählt haben."
 
 #. (itstool) path: item/p
 #: C/preferences-mail-options.page:75
@@ -2825,10 +2755,8 @@ msgstr ""
 
 #. (itstool) path: item/title
 #: C/preferences-mail-options.page:195
-#, fuzzy
-#| msgid "Message Disposition Notification request"
 msgid "<gui>Message Disposition Notification request</gui>"
-msgstr "Bitte um Empfangsbestätigung"
+msgstr "<gui>Bitte um Empfangsbestätigung</gui>"
 
 #. (itstool) path: item/p
 #: C/preferences-mail-options.page:198
@@ -2982,25 +2910,17 @@ msgstr ""
 
 #. (itstool) path: item/title
 #: C/preferences-miscellaneous.page:22
-#, fuzzy
-#| msgid "Empty Trash on Exit"
 msgid "<gui>Empty Trash on Exit</gui>"
-msgstr "Müllordner beim Beenden leeren"
+msgstr "<gui>Müllordner beim Beenden leeren</gui>"
 
 #. (itstool) path: item/p
 #: C/preferences-miscellaneous.page:25
-#, fuzzy
-#| msgid ""
-#| "Set <application>Balsa</application> to delete all messages in the "
-#| "<symbol>Trash</symbol> mailbox when <application>Balsa</application> "
-#| "exits."
 msgid ""
 "Set <app>Balsa</app> to delete all messages in the <code>Trash</code> "
 "mailbox when <app>Balsa</app> exits."
 msgstr ""
-"Weist <application>Balsa</application> an, alle Nachrichten im <symbol>Müll</"
-"symbol>-Ordner zu löschen, wenn <application>Balsa</application> beendet "
-"wird."
+"Weist <app>Balsa</app> an, alle Nachrichten im <code>Müll</code>-Ordner zu "
+"löschen, wenn <app>Balsa</app> beendet wird."
 
 #. (itstool) path: item/title
 #: C/preferences-miscellaneous.page:29
@@ -3009,18 +2929,13 @@ msgstr "<gui>Postfach automatisch schließen</gui>"
 
 #. (itstool) path: item/p
 #: C/preferences-miscellaneous.page:32
-#, fuzzy
-#| msgid ""
-#| "Set <application>Balsa</application> to close any mailbox that is unused "
-#| "for more than the specified time. The currently displayed mailbox is "
-#| "never automatically closed."
 msgid ""
 "Set <app>Balsa</app> to close any mailbox that is unused for more than the "
 "specified time. The currently displayed mailbox is never automatically "
 "closed."
 msgstr ""
-"Weist <application>Balsa</application> an, ein für länger als die angegebene "
-"Zeit ungenutztes Postfach zu schließen. Das aktuell angezeigte Postfach wird "
+"Weist <app>Balsa</app> an, ein für länger als die angegebene Zeit "
+"ungenutztes Postfach zu schließen. Das aktuell angezeigte Postfach wird "
 "niemals automatisch geschlossen."
 
 #. (itstool) path: item/title
@@ -3372,18 +3287,13 @@ msgstr "Das Datei-Menü enthält Befehle zum Bearbeiten der Nachricht an sich."
 
 #. (itstool) path: item/p
 #: C/win-composer.page:60
-#, fuzzy
-#| msgid ""
-#| "<menuchoice><guimenu>File</guimenu><guimenuitem>Include File...</"
-#| "guimenuitem></menuchoice> -- Include a text file in the body of the "
-#| "message; only works for plain text files."
 msgid ""
 "<guiseq> <gui>File</gui> <gui>Include File...</gui> </guiseq> -- Include a "
 "text file in the body of the message; only works for plain text files."
 msgstr ""
-"<menuchoice><guimenu>Datei</guimenu><guimenuitem>Datei einfügen</"
-"guimenuitem></menuchoice> -- Fügt eine Textdatei in den Nachrichtentext ein, "
-"dies funktioniert nur mit einfachen Textdateien."
+"<guiseq> <gui>Datei</gui> <gui>Datei einfügen …</gui> </guiseq> -- Fügt eine "
+"Textdatei in den Nachrichtentext ein, dies funktioniert nur mit einfachen "
+"Textdateien."
 
 #. (itstool) path: item/p
 #: C/win-composer.page:68
@@ -3407,52 +3317,37 @@ msgstr ""
 
 #. (itstool) path: item/p
 #: C/win-composer.page:87
-#, fuzzy
-#| msgid ""
-#| "<menuchoice><guimenu>File</guimenu><guimenuitem>Queue</guimenuitem></"
-#| "menuchoice> -- Queue the message in the outbox for sending later."
 msgid ""
 "<guiseq> <gui>File</gui> <gui>Queue</gui> </guiseq> <keyseq> <key>Ctrl</key> "
 "<key>Q</key> </keyseq> -- Queue the message in the outbox for sending later."
 msgstr ""
-"<menuchoice><guimenu>Datei</guimenu><guimenuitem>Ablegen</guimenuitem></"
-"menuchoice> -- Legt die Datei in einer Warteschlange zum späteren Versenden "
-"ab."
+"<guiseq> <gui>Datei</gui> <gui>Ablegen</gui> </guiseq> <keyseq> <key>Strg</"
+"key> <key>Q</key> </keyseq> -- Legt die Datei in einer Warteschlange zum "
+"späteren Versenden ab."
 
 #. (itstool) path: note/p
 #: C/win-composer.page:98
-#, fuzzy
-#| msgid ""
-#| "A message is considered valid (ready for sending or queuing) if it "
-#| "contains at least one valid email address, and no invalid addresses, in "
-#| "the <guilabel>Recipients</guilabel> fields."
 msgid ""
 "A message is considered valid (ready for sending or queuing) if it contains "
 "at least one valid email address, and no invalid addresses, in the "
 "<gui>Recipients</gui> fields."
 msgstr ""
 "Eine Nachricht wird als gültig (sendebereit) betrachtet, wenn sie mindestens "
-"eine gültige E-Mail-Adresse enthält, sowie in den <guilabel>Empfänger</"
-"guilabel>-Feldern keine ungültigen E-Mail-Adressen enthält."
+"eine gültige E-Mail-Adresse enthält, sowie in den <gui>Empfänger</gui>-"
+"Feldern keine ungültigen E-Mail-Adressen enthält."
 
 #. (itstool) path: item/p
 #: C/win-composer.page:105
-#, fuzzy
-#| msgid ""
-#| "<menuchoice><guimenu>File</guimenu><guimenuitem>Postpone</guimenuitem></"
-#| "menuchoice> -- Save the message in the <symbol>Draftbox</symbol> for "
-#| "later revision and sending. You will be unable to postpone a message that "
-#| "is not currently valid."
 msgid ""
 "<guiseq> <gui>File</gui> <gui>Postpone</gui> </guiseq> -- Save the message "
 "in the <code>Draftbox</code> for later revision and sending, and close the "
 "compose window. You will be unable to postpone a message that is not "
 "currently valid."
 msgstr ""
-"<menuchoice><guimenu>Datei</guimenu><guimenuitem>Zurückstellen</"
-"guimenuitem></menuchoice> -- Speichert die Nachricht als <symbol>Entwurf</"
-"symbol> für späteres Weiterbearbeiten und Senden. Eine derzeit noch nicht "
-"gültige Nachricht kann nicht als Entwurf gespeichert werden."
+"<guiseq> <gui>Datei</gui> <gui>Zurückstellen</gui> </guiseq> -- Speichert "
+"die Nachricht als <code>Entwurf</code> für späteres Weiterbearbeiten und "
+"Senden. Eine derzeit noch nicht gültige Nachricht kann nicht als Entwurf "
+"gespeichert werden."
 
 #. (itstool) path: item/p
 #: C/win-composer.page:115
@@ -3464,30 +3359,21 @@ msgstr ""
 
 #. (itstool) path: item/p
 #: C/win-composer.page:127
-#, fuzzy
-#| msgid ""
-#| "<menuchoice><guimenu>File</guimenu><guimenuitem>Page Setup</guimenuitem></"
-#| "menuchoice> -- Set print options such as paper size and print orientation."
 msgid ""
 "<guiseq> <gui>File</gui> <gui>Page Setup</gui> </guiseq> -- Set print "
 "options such as paper size and print orientation."
 msgstr ""
-"<menuchoice><guimenu>Datei</guimenu><guimenuitem>Seite einrichten</"
-"guimenuitem></menuchoice> -- Legt Druckoptionen wie Papiergröße und -"
-"ausrichtung fest."
+"<guiseq> <gui>Datei</gui> <gui>Seite einrichten</gui> </guiseq> -- Legt "
+"Druckoptionen wie Papiergröße und -ausrichtung fest."
 
 #. (itstool) path: item/p
 #: C/win-composer.page:135
-#, fuzzy
-#| msgid ""
-#| "<menuchoice><guimenu>File</guimenu><guimenuitem>Print...</guimenuitem></"
-#| "menuchoice> -- Print a hard-copy of the current message."
 msgid ""
 "<guiseq> <gui>File</gui> <gui>Print...</gui> </guiseq> <keyseq> <key>Ctrl</"
 "key> <key>P</key> </keyseq> -- Print a hard-copy of the current message."
 msgstr ""
-"<menuchoice><guimenu>Datei</guimenu><guimenuitem>Drucken</guimenuitem></"
-"menuchoice> -- Druckt eine Kopie der gegenwärtigen Nachricht."
+"<guiseq> <gui>Datei</gui> <gui>Drucken …</gui> </guiseq> <keyseq> <key>Strg</"
+"key> <key>P</key> </keyseq> -- Druckt eine Kopie der gegenwärtigen Nachricht."
 
 #. (itstool) path: item/p
 #: C/win-composer.page:147
@@ -3695,17 +3581,14 @@ msgstr "<gui>Sprache</gui>"
 
 #. (itstool) path: item/p
 #: C/win-composer.page:330
-#, fuzzy
-#| msgid ""
-#| "The Language menu allows you to set the language to use for composing and "
-#| "checking the spelling of the message."
 msgid ""
 "The Language menu allows you to set the language to use for composing and "
 "checking the spelling of the message. Only languages for which you have "
 "dictionaries installed are shown."
 msgstr ""
 "Das Sprachmenü ermöglicht Ihnen das Festlegen der Sprache für die Erstellung "
-"und Rechtschreibprüfung der Nachricht."
+"und Rechtschreibprüfung der Nachricht. Es werden nur Sprachen angezeigt, für "
+"die auch Wörterbücher installiert sind."
 
 #. (itstool) path: item/title
 #: C/win-composer.page:336
@@ -3815,15 +3698,6 @@ msgstr ""
 
 #. (itstool) path: note/p
 #: C/win-composer.page:450
-#, fuzzy
-#| msgid ""
-#| "Cryptographic signatures and encryption are available only when "
-#| "<application>Balsa</application> has been built with <application>GnuPG</"
-#| "application> support. For a detailed description of E-Mail cryptography, "
-#| "see the <ulink url=\"http://www.gnupg.org/documentation/manuals/gnupg/\" "
-#| "type=\"http\">GnuPG Manual</ulink> and the <ulink url=\"http://www."
-#| "dewinter.com/gnupg_howto/english/GPGMiniHowto.html\" type=\"http\">GnuPG "
-#| "HOWTO</ulink>."
 msgid ""
 "Cryptographic signatures and encryption are available only when <app>Balsa</"
 "app> has been built with <app>GnuPG</app> support. For a detailed "
@@ -3833,12 +3707,11 @@ msgid ""
 "html\" type=\"http\"> GnuPG HOWTO</link> ."
 msgstr ""
 "Kryptografisches Signieren und Verschlüsselung sind nur dann möglich, wenn "
-"<application>Balsa</application> mit <application>GnuPG</application>-"
-"Unterstützung gebaut wurde. Eine detaillierte Beschreibung der E-Mail-"
-"Kryptografie finden Sie im <ulink url=\"http://www.gnupg.org/documentation/"
-"manuals/gnupg/\" type=\"http\">GnuPG-Handbuch</ulink> und im <ulink url="
-"\"http://www.dewinter.com/gnupg_howto/english/GPGMiniHowto.html\" type=\"http"
-"\">GnuPG-HOWTO</ulink>."
+"<app>Balsa</app> mit <app>GnuPG</app>-Unterstützung gebaut wurde. Eine "
+"detaillierte Beschreibung der E-Mail-Kryptografie finden Sie im <link href="
+"\"http://www.gnupg.org/documentation/manuals/gnupg/\" type=\"http\">GnuPG-"
+"Handbuch</link> und im <link href=\"http://www.dewinter.com/gnupg_howto/"
+"english/GPGMiniHowto.html\" type=\"http\">GnuPG-HOWTO</link>."
 
 #. (itstool) path: section/p
 #: C/win-composer.page:466
@@ -3856,7 +3729,7 @@ msgstr ""
 #. (itstool) path: item/title
 #: C/win-composer.page:477
 msgid "<gui>Send</gui>"
-msgstr ""
+msgstr "<gui>Senden</gui>"
 
 #. (itstool) path: item/p
 #: C/win-composer.page:480
@@ -3891,10 +3764,8 @@ msgstr ""
 
 #. (itstool) path: item/title
 #: C/win-composer.page:502
-#, fuzzy
-#| msgid "Check Spelling"
 msgid "<gui>Check Spelling</gui>"
-msgstr "Rechtschreibung prüfen"
+msgstr "<gui>Rechtschreibung prüfen</gui>"
 
 #. (itstool) path: item/p
 #: C/win-composer.page:505
@@ -3963,30 +3834,24 @@ msgstr ""
 #. (itstool) path: item/title
 #: C/win-composer.page:539
 msgid "<gui>From</gui>"
-msgstr ""
+msgstr "<gui>Von</gui>"
 
 #. (itstool) path: item/p
 #: C/win-composer.page:542
-#, fuzzy
-#| msgid ""
-#| "<literal>From</literal> is used to indicate the origin of the message, "
-#| "<application>Balsa</application> automatically fills this in for you if "
-#| "you have entered your name and email address in the <link linkend="
-#| "\"identities\">identities</link> window."
 msgid ""
 "<code>From</code> is used to indicate the origin of the message, <app>Balsa</"
 "app> automatically fills this in for you if you have entered your name and "
 "email address in the <link xref=\"identities\">identities</link> window."
 msgstr ""
-"<literal>Von</literal> wird verwendet, um die Herkunft der Nachricht "
-"anzugeben. <application>Balsa</application> füllt dieses Feld automatisch, "
-"wenn Sie Ihren Namen und Ihre E-Mail-Adresse im <link linkend=\"identities"
-"\">Identitäten</link>-Fenster eingegeben haben"
+"<code>Von</code> wird verwendet, um die Herkunft der Nachricht anzugeben. "
+"<app>Balsa</app> füllt dieses Feld automatisch, wenn Sie Ihren Namen und "
+"Ihre E-Mail-Adresse im <link xref=\"identities\">Identitäten</link>-Fenster "
+"eingegeben haben."
 
 #. (itstool) path: item/title
 #: C/win-composer.page:549
 msgid "<gui>To</gui>"
-msgstr ""
+msgstr "<gui>An</gui>"
 
 #. (itstool) path: item/p
 #: C/win-composer.page:552
@@ -4009,7 +3874,7 @@ msgstr ""
 #. (itstool) path: item/title
 #: C/win-composer.page:558
 msgid "<gui>Subject</gui>"
-msgstr ""
+msgstr "<gui>Betreff</gui>"
 
 #. (itstool) path: item/p
 #: C/win-composer.page:561
@@ -4077,21 +3942,15 @@ msgstr "Angabe von Adressen"
 
 #. (itstool) path: section/p
 #: C/win-composer.page:605
-#, fuzzy
-#| msgid ""
-#| "<application>Balsa</application> supports many different methods of "
-#| "selecting email addresss. All of the headers that can contain addresses "
-#| "have a small colored book to the right of them that will open up "
-#| "<application>Balsa</application>'s address book."
 msgid ""
 "<app>Balsa</app> supports many different methods of selecting email "
 "addresss. All of the headers that can contain addresses have a small colored "
 "book to the left of them that will open up <app>Balsa</app>'s address book."
 msgstr ""
-"<application>Balsa</application> verfügt über verschiedene Methoden zur "
-"Auswahl von E-Mail-Adressen. Alle Kopfzeilen, die Adressen enthalten können, "
-"haben ein kleines Buch-Symbol an der rechten Seite. Klicken Sie darauf, um "
-"das Adressbuch von <application>Balsa</application> zu öffnen."
+"<app>Balsa</app> verfügt über verschiedene Methoden zur Auswahl von E-Mail-"
+"Adressen. Alle Kopfzeilen, die Adressen enthalten können, haben ein kleines "
+"Buch-Symbol an der rechten Seite. Klicken Sie darauf, um das Adressbuch von "
+"<app>Balsa</app> zu öffnen."
 
 #. (itstool) path: section/p
 #: C/win-composer.page:609
@@ -4165,11 +4024,6 @@ msgstr ""
 
 #. (itstool) path: section/p
 #: C/win-composer.page:652
-#, fuzzy
-#| msgid ""
-#| "If the message is a reply or forward, the referenced message will be "
-#| "displayed in the body text widget, with the prefix specified in the <link "
-#| "linkend=\"preferences-outgoing\">Preferences</link> dialog."
 msgid ""
 "If the message is a reply or forward, the referenced message will be "
 "displayed in the body text widget, with the prefix specified in the <link "
@@ -4177,7 +4031,7 @@ msgid ""
 msgstr ""
 "Falls es sich bei der Nachricht um eine Antwort oder Weiterleitung handelt, "
 "wird die Ursprungsnachricht im Nachrichtenrumpf angezeigt, mit dem im <link "
-"linkend=\"preferences-outgoing\">Einstellungsdialog</link> festgelegten "
+"xref=\"preferences-outgoing\">Einstellungsdialog</link> festgelegten "
 "Hinweistext."
 
 #. (itstool) path: section/title
@@ -4314,12 +4168,6 @@ msgstr "Adressbuch"
 
 #. (itstool) path: section/p
 #: C/win-composer.page:737
-#, fuzzy
-#| msgid ""
-#| "When composing a message, clicking on any of the colored book icons next "
-#| "to a destination field (To, Cc, Bcc) will bring up the "
-#| "<application>Balsa</application> address book. It helps you to select "
-#| "recipients for your messages quickly and easily."
 msgid ""
 "When composing a message, clicking on any of the colored book icons next to "
 "a destination field (To, Cc, Bcc) will bring up the <app>Balsa</app> address "
@@ -4327,8 +4175,8 @@ msgid ""
 msgstr ""
 "Wenn Sie beim Verfassen einer Nachricht auf eines der farbigen Buch-Symbole "
 "neben den Adressfeldern (An, Kopie an, Blindkopie an) klicken, wird das "
-"Adressbuch von <application>Balsa</application> geöffnet. Es hilft Ihnen bei "
-"der schnellen und einfachen Auswahl der Empfänger."
+"Adressbuch von <app>Balsa</app> geöffnet. Es hilft Ihnen bei der schnellen "
+"und einfachen Auswahl der Empfänger."
 
 #. (itstool) path: figure/title
 #: C/win-composer.page:742
@@ -4455,8 +4303,6 @@ msgstr ""
 
 #. (itstool) path: section/title
 #: C/win-filters.page:99
-#, fuzzy
-#| msgid "The action page"
 msgid "The Action Page"
 msgstr "Die Aktionen-Seite"
 
@@ -4672,7 +4518,7 @@ msgstr ""
 #. (itstool) path: item/title
 #: C/win-main.page:44
 msgid "<guiseq> <gui> File</gui> </guiseq>"
-msgstr ""
+msgstr "<guiseq> <gui> Datei</gui> </guiseq>"
 
 #. (itstool) path: item/p
 #: C/win-main.page:49
@@ -4682,7 +4528,7 @@ msgstr "Dieses Menü enthält grundlegende Befehle."
 #. (itstool) path: item/title
 #: C/win-main.page:52
 msgid "<guiseq> <gui> File</gui> <gui> New</gui> </guiseq>"
-msgstr ""
+msgstr "<guiseq> <gui> Datei</gui> <gui> Neu</gui> </guiseq>"
 
 #. (itstool) path: item/p
 #: C/win-main.page:60
@@ -4886,7 +4732,7 @@ msgstr ""
 #. (itstool) path: item/title
 #: C/win-main.page:186
 msgid "<gui> Edit</gui>"
-msgstr ""
+msgstr "<gui> Bearbeiten</gui>"
 
 #. (itstool) path: item/p
 #: C/win-main.page:191
@@ -5036,7 +4882,7 @@ msgstr ""
 #. (itstool) path: item/title
 #: C/win-main.page:277
 msgid "<gui> View</gui>"
-msgstr ""
+msgstr "<gui> Ansicht</gui>"
 
 #. (itstool) path: item/p
 #: C/win-main.page:280
@@ -5168,7 +5014,7 @@ msgstr ""
 #. (itstool) path: item/title
 #: C/win-main.page:373
 msgid "<gui> Mailbox</gui>"
-msgstr ""
+msgstr "<gui> Postfach</gui>"
 
 #. (itstool) path: item/p
 #: C/win-main.page:376
@@ -5250,56 +5096,39 @@ msgstr ""
 
 #. (itstool) path: item/p
 #: C/win-main.page:428
-#, fuzzy
-#| msgid ""
-#| "<menuchoice><guimenu>Mailbox</guimenu><guimenuitem>Reset Filter</"
-#| "guimenuitem></menuchoice> -- Resets to the mailbox filter."
 msgid ""
 "<guiseq> <gui> Mailbox</gui> <gui> Reset Filter</gui> </guiseq> -- Resets to "
 "the mailbox filter."
 msgstr ""
-"<menuchoice><guimenu>Postfach</guimenu><guimenuitem>Filter zurücksetzen</"
-"guimenuitem></menuchoice> -- Setzt den Filter für dieses Postfach zurück."
+"<guiseq> <gui> Postfach</gui> <gui> Filter zurücksetzen</gui> </guiseq> -- "
+"Setzt den Filter für dieses Postfach zurück."
 
 #. (itstool) path: item/p
 #: C/win-main.page:435
-#, fuzzy
-#| msgid ""
-#| "<menuchoice><guimenu>Mailbox</guimenu><guimenuitem>Select All</"
-#| "guimenuitem></menuchoice> -- Selects all messages in the current mailbox."
 msgid ""
 "<guiseq> <gui> Mailbox</gui> <gui> Select All</gui> </guiseq> -- Selects all "
 "messages in the current mailbox."
 msgstr ""
-"<menuchoice><guimenu>Postfach</guimenu><guimenuitem>Alles auswählen</"
-"guimenuitem></menuchoice> -- Wählt alle Nachrichten im gegenwärtig "
-"angezeigten Postfach aus."
+"<guiseq> <gui> Postfach</gui> <gui> Alles auswählen</gui> </guiseq> -- Wählt "
+"alle Nachrichten im gegenwärtig angezeigten Postfach aus."
 
 #. (itstool) path: item/p
 #: C/win-main.page:443
-#, fuzzy
-#| msgid ""
-#| "<menuchoice><guimenu>Mailbox</guimenu><guimenuitem>Edit...</guimenuitem></"
-#| "menuchoice> -- Edit mailbox properties."
 msgid ""
 "<guiseq> <gui> Mailbox</gui> <gui> Edit...</gui> </guiseq> -- Edit mailbox "
 "properties."
 msgstr ""
-"<menuchoice><guimenu>Postfach</guimenu><guimenuitem>Bearbeiten …</"
-"guimenuitem></menuchoice> -- Bearbeiten der Eigenschaften eines Postfachs."
+"<guiseq> <gui> Postfach</gui> <gui> Bearbeiten …</gui> </guiseq> -- "
+"Bearbeiten der Eigenschaften eines Postfachs."
 
 #. (itstool) path: item/p
 #: C/win-main.page:450
-#, fuzzy
-#| msgid ""
-#| "<menuchoice><guimenu>Mailbox</guimenu><guimenuitem>Delete...</"
-#| "guimenuitem></menuchoice> -- Delete the currently selected mailbox."
 msgid ""
 "<guiseq> <gui> Mailbox</gui> <gui> Delete...</gui> </guiseq> -- Delete the "
 "currently selected mailbox."
 msgstr ""
-"<menuchoice><guimenu>Postfach</guimenu><guimenuitem>Löschen</guimenuitem></"
-"menuchoice> -- Löscht das aktuell ausgewählte Postfach."
+"<guiseq> <gui> Postfach</gui> <gui> Löschen …</gui> </guiseq> -- Löscht das "
+"aktuell ausgewählte Postfach."
 
 #. (itstool) path: item/p
 #: C/win-main.page:458
@@ -5385,7 +5214,7 @@ msgstr ""
 #. (itstool) path: item/title
 #: C/win-main.page:503
 msgid "<gui> Message</gui>"
-msgstr ""
+msgstr "<gui> Nachricht</gui>"
 
 #. (itstool) path: item/p
 #: C/win-main.page:506
@@ -5677,15 +5506,12 @@ msgstr ""
 #. (itstool) path: item/title
 #: C/win-main.page:713
 msgid "<gui> Settings</gui>"
-msgstr ""
+msgstr "<gui> Einstellungen</gui>"
 
 #. (itstool) path: item/p
 #: C/win-main.page:716
-#, fuzzy
-#| msgid "Menu for changing <application>Balsa</application>'s configuration."
 msgid "Menu for changing <app>Balsa</app> 's configuration."
-msgstr ""
-"Menü zum Ändern der Konfiguration von <application>Balsa</application>."
+msgstr "Menü zum Ändern der Konfiguration von <app>Balsa</app>."
 
 #. (itstool) path: item/p
 #: C/win-main.page:719
@@ -5727,12 +5553,12 @@ msgstr ""
 #. (itstool) path: item/title
 #: C/win-main.page:741
 msgid "<gui>Help</gui>"
-msgstr ""
+msgstr "<gui>Hilfe</gui>"
 
 #. (itstool) path: item/p
 #: C/win-main.page:744
 msgid "Menu for getting this help, and information about <app>Balsa</app>."
-msgstr ""
+msgstr "Menü zum Öffnen der Hilfe und Informationen zu <app>Balsa</app>."
 
 #. (itstool) path: item/p
 #: C/win-main.page:747
@@ -5740,6 +5566,8 @@ msgid ""
 "<guiseq> <gui>Help</gui> <gui>Contents</gui> </guiseq> <key>F1</key> -- Show "
 "this help file."
 msgstr ""
+"<guiseq> <gui>Hilfe</gui> <gui>Inhalte</gui> </guiseq> <key>F1</key> -- "
+"Zeigt diese Hilfedatei an."
 
 #. (itstool) path: item/p
 #: C/win-main.page:754
@@ -5747,6 +5575,8 @@ msgid ""
 "<guiseq> <gui>Help</gui> <gui>About</gui> </guiseq> -- Show information "
 "about <app>Balsa</app>."
 msgstr ""
+"<guiseq> <gui>Hilfe</gui> <gui>Info</gui> </guiseq> -- Zeigt Informationen "
+"über <app>Balsa</app> an."
 
 #. (itstool) path: section/title
 #: C/win-main.page:765
@@ -5755,14 +5585,6 @@ msgstr "Die Postfachliste"
 
 #. (itstool) path: section/p
 #: C/win-main.page:766
-#, fuzzy
-#| msgid ""
-#| "The mailbox list in the main window lists all of your mailboxes. "
-#| "<application>Balsa</application> will automatically detect your local "
-#| "mailboxes by searching for mailboxes under your local mail directory "
-#| "(probably ~/mail). This lets <application>Balsa</application> coexist "
-#| "with <application>pine</application> and <application>procmail</"
-#| "application> without causing problems."
 msgid ""
 "The mailbox list in the main window lists all of your mailboxes. <app>Balsa</"
 "app> will automatically detect your local mailboxes by searching for "
@@ -5771,22 +5593,13 @@ msgid ""
 "without causing problems."
 msgstr ""
 "Die Postfachliste im Hauptfenster listet alle Ihre Postfächer auf. "
-"<application>Balsa</application> erkennt alle Postfächer in Ihrem lokalen "
-"Mail-Ordner automatisch, beispielsweise in ~/mail. Dadurch wird ermöglicht, "
-"dass <application>Balsa</application> unabhängig und problemlos neben "
-"anderen Programmen wie <application>pine</application> und "
-"<application>procmail</application> nutzbar ist."
+"<app>Balsa</app> erkennt alle Postfächer in Ihrem lokalen Mail-Ordner "
+"automatisch, beispielsweise in ~/mail. Dadurch wird ermöglicht, dass "
+"<app>Balsa</app> unabhängig und problemlos neben anderen Programmen wie "
+"<app>Pine</app> und <app>Procmail</app> nutzbar ist."
 
 #. (itstool) path: section/p
 #: C/win-main.page:771
-#, fuzzy
-#| msgid ""
-#| "Your mailboxes will be displayed as a tree view, with mailboxes in "
-#| "subdirectories of your local mail directory initially hidden but "
-#| "accessible by expanding the tree. <glossterm linkend=\"glossary-imap"
-#| "\"><acronym>IMAP</acronym></glossterm> mailboxes will also be displayed "
-#| "as being at the top level of the tree. <glossterm linkend=\"glossary-pop"
-#| "\"><acronym>POP3</acronym></glossterm> mailboxes are not displayed."
 msgid ""
 "Your mailboxes will be displayed as a tree view, with mailboxes in "
 "subdirectories of your local mail directory initially hidden but accessible "
@@ -5796,11 +5609,10 @@ msgid ""
 msgstr ""
 "Ihre Postfächer werden in einer Baumansicht dargestellt. Die Postfächer in "
 "den Unterordnern Ihres lokalen Mail-Ordners werden dabei zunächst verborgen "
-"dargestellt. Durch Ausklappen des Baums werden sie sichtbar. <glossterm "
-"linkend=\"glossary-imap\"><acronym>IMAP</acronym></glossterm>-Postfächer "
-"werden in der obersten Ebene der Baumansicht dargestellt. <glossterm linkend="
-"\"glossary-pop\"><acronym>POP3</acronym></glossterm>-Postfächer werden nicht "
-"angezeigt. "
+"dargestellt. Durch Ausklappen des Baums werden sie sichtbar. <link xref="
+"\"glossary#imap\">IMAP</link>-Postfächer werden in der obersten Ebene der "
+"Baumansicht dargestellt. <link xref=\"glossary#pop\">POP3</link>-Postfächer "
+"werden nicht angezeigt."
 
 #. (itstool) path: section/title
 #: C/win-main.page:778
@@ -5889,26 +5701,17 @@ msgstr ""
 
 #. (itstool) path: note/p
 #: C/win-main.page:864
-#, fuzzy
-#| msgid ""
-#| "<application>Balsa</application> supports viewing <acronym>HTML</acronym> "
-#| "messages only when compiled with <application>gtkhtml</application> or "
-#| "<application>WebKit</application> support. Gtkhtml support will be "
-#| "compiled in if gtkhtml-devel files are found. WebKit is currently "
-#| "supported only on an experimental basis,"
 msgid ""
 "<app>Balsa</app> supports viewing HTML messages only when compiled with "
 "<app> gtkhtml</app> or <app> WebKit</app> support. Gtkhtml support will be "
 "compiled in if gtkhtml-devel files are found. WebKit is currently supported "
 "only on an experimental basis,"
 msgstr ""
-"Gegenwärtig unterstützt <application>Balsa</application> nur dann "
-"<acronym>HTML</acronym>-Nachrichten, wenn das Programm mit "
-"<application>gtkhtml</application>- oder <application>WebKit</application>-"
-"Unterstützung kompiliert wurde. <application>gtkhtml</application> wird "
-"verwendet, wenn beim Erstellen des Programms die <application>gtkhtml</"
-"application>-Entwicklerdateien gefunden wurden. <application>WebKit</"
-"application> wird derzeit nur experimentell unterstützt."
+"Gegenwärtig unterstützt <app>Balsa</app> nur dann HTML-Nachrichten, wenn das "
+"Programm mit <app>gtkhtml</app>- oder <app>WebKit</app>-Unterstützung "
+"kompiliert wurde. <app>gtkhtml</app> wird verwendet, wenn beim Erstellen des "
+"Programms die <app>gtkhtml</app>-Entwicklerdateien gefunden wurden. "
+"<app>WebKit</app> wird derzeit nur experimentell unterstützt."
 
 #. (itstool) path: section/p
 #: C/win-main.page:871
@@ -6115,19 +5918,15 @@ msgstr ""
 
 #. (itstool) path: page/p
 #: C/win-search.page:22
-#, fuzzy
-#| msgid "You can view the matching messages in two ways: <placeholder-1/>"
 msgid "You can view the matching messages in two ways:"
 msgstr ""
 "Sie können die Übereinstimmungen enthaltenden Nachrichten auf zwei Arten "
-"anzeigen lassen: <placeholder-1/>"
+"anzeigen lassen:"
 
 #. (itstool) path: item/title
 #: C/win-search.page:25
-#, fuzzy
-#| msgid "Show only matching messages"
 msgid "<gui>Show only matching messages</gui>"
-msgstr "Nur zutreffende Nachrichten anzeigen"
+msgstr "<gui>Nur zutreffende Nachrichten anzeigen</gui>"
 
 #. (itstool) path: item/p
 #: C/win-search.page:28
@@ -6141,10 +5940,8 @@ msgstr ""
 
 #. (itstool) path: item/title
 #: C/win-search.page:41
-#, fuzzy
-#| msgid "Open next matching message"
 msgid "<gui>Open next matching message</gui>"
-msgstr "Nächste zutreffende Nachricht öffnen"
+msgstr "<gui>Nächste zutreffende Nachricht öffnen</gui>"
 
 #. (itstool) path: item/p
 #: C/win-search.page:44

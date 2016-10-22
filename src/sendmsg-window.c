@@ -6606,7 +6606,7 @@ sendmsg_window_new()
     if (balsa_app.sw_maximized)
         gtk_window_maximize(GTK_WINDOW(window));
 
-    gtk_window_set_wmclass(GTK_WINDOW(window), "compose", "Balsa");
+    gtk_window_set_role(GTK_WINDOW(window), "compose");
 
     gtk_container_add(GTK_CONTAINER(window), main_box);
     gtk_widget_show_all(window);

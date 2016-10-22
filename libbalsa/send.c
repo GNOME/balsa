@@ -249,7 +249,7 @@ ensure_send_progress_dialog(GtkWindow * parent)
                                               libbalsa_dialog_flags(),
                                               _("_Hide"), GTK_RESPONSE_CLOSE,
                                               NULL);
-    gtk_window_set_wmclass(GTK_WINDOW(send_dialog), "send_dialog", "Balsa");
+    gtk_window_set_role(GTK_WINDOW(send_dialog), "send_dialog");
     label = gtk_label_new(_("Sending Mail..."));
     content_box =
         GTK_BOX(gtk_dialog_get_content_area(GTK_DIALOG(send_dialog)));

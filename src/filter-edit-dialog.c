@@ -577,7 +577,7 @@ filters_edit_dialog(GtkWindow * parent)
     g_signal_connect(G_OBJECT(fe_window), "destroy",
 	             G_CALLBACK(fe_destroy_window_cb), NULL);
 
-    gtk_window_set_wmclass(GTK_WINDOW (fe_window), "filter-edit", "Balsa");
+    gtk_window_set_role(GTK_WINDOW (fe_window), "filter-edit");
     gtk_dialog_set_response_sensitive(GTK_DIALOG(fe_window),
                                       GTK_RESPONSE_OK, FALSE);
 

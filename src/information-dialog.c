@@ -245,8 +245,7 @@ balsa_information_list(GtkWindow *parent, LibBalsaInformationType type,
 	/* Reset the policy gtk_dialog_new makes itself non-resizable */
 	gtk_window_set_resizable(GTK_WINDOW(information_dialog), TRUE);
 	gtk_window_set_default_size(GTK_WINDOW(information_dialog), 350, 200);
-	gtk_window_set_wmclass(GTK_WINDOW(information_dialog),
-			       "Information", "Balsa");
+	gtk_window_set_role(GTK_WINDOW(information_dialog), "Information");
 
         g_object_add_weak_pointer(G_OBJECT(information_dialog),
                                   (gpointer) &information_list);

@@ -559,7 +559,7 @@ ask_cert_real(void *data)
                                          _("Accept&_Save"), 1,
                                          _("_Reject"), GTK_RESPONSE_CANCEL, 
                                          NULL);
-    gtk_window_set_wmclass(GTK_WINDOW(dialog), "tls_cert_dialog", "Balsa");
+    gtk_window_set_role(GTK_WINDOW(dialog), "tls_cert_dialog");
     label = gtk_label_new(str->str);
     g_string_free(str, TRUE);
     gtk_label_set_use_markup(GTK_LABEL(label), TRUE);
@@ -606,7 +606,7 @@ ask_timeout_real(void *data)
                                     GTK_BUTTONS_YES_NO,
                                     _("Connection to %s timed out. Abort?"),
                                     host);
-    gtk_window_set_wmclass(GTK_WINDOW(dialog), "timeout_dialog", "Balsa");
+    gtk_window_set_role(GTK_WINDOW(dialog), "timeout_dialog");
     switch(gtk_dialog_run(GTK_DIALOG(dialog))) {
     case GTK_RESPONSE_YES: i = 1; break;
     case GTK_RESPONSE_NO: i = 0; break;

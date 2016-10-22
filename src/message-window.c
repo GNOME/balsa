@@ -864,7 +864,7 @@ message_window_new(LibBalsaMailbox * mailbox, guint msgno)
     mw->toolbar = balsa_toolbar_new(model, G_ACTION_MAP(window));
     gtk_box_pack_start(GTK_BOX(vbox), mw->toolbar, FALSE, FALSE, 0);
 
-    gtk_window_set_wmclass(GTK_WINDOW(window), "message", "Balsa");
+    gtk_window_set_role(GTK_WINDOW(window), "message");
 
     g_signal_connect(G_OBJECT(window), "destroy",
 		     G_CALLBACK(destroy_message_window), mw);

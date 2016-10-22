@@ -153,8 +153,7 @@ customize_dialog_cb(GtkWidget * widget, gpointer data)
         gtk_dialog_get_content_area(GTK_DIALOG(customize_widget));
     gtk_box_pack_start(GTK_BOX(content_area), notebook, TRUE, TRUE, 0);
 
-    gtk_window_set_wmclass(GTK_WINDOW(customize_widget), "customize",
-                           "Balsa");
+    gtk_window_set_role(GTK_WINDOW(customize_widget), "customize");
     gtk_window_set_default_size(GTK_WINDOW(customize_widget), 600, 440);
 
     /* The order of pages must be consistent with the BalsaToolbarType

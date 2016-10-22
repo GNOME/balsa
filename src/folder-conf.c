@@ -309,8 +309,7 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
 #endif
     g_object_add_weak_pointer(G_OBJECT(fcw->dialog),
                               (gpointer) &fcw->dialog);
-    gtk_window_set_wmclass(GTK_WINDOW(fcw->dialog), 
-			   "folder_config_dialog", "Balsa");
+    gtk_window_set_role(GTK_WINDOW(fcw->dialog), "folder_config_dialog");
     if (mn) {
         g_object_set_data_full(G_OBJECT(mn),
                                BALSA_FOLDER_CONF_IMAP_KEY, fcw, 
@@ -807,8 +806,7 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
                               (gpointer) &sdd->dialog);
     /* `Enter' key => Create: */
     gtk_dialog_set_default_response(GTK_DIALOG(sdd->dialog), GTK_RESPONSE_OK);
-    gtk_window_set_wmclass(GTK_WINDOW(sdd->dialog), 
-			   "subfolder_config_dialog", "Balsa");
+    gtk_window_set_role(GTK_WINDOW(sdd->dialog), "subfolder_config_dialog");
 
     if (sdd->mbnode) {
         g_object_set_data_full(G_OBJECT(sdd->mbnode),

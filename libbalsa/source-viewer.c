@@ -231,7 +231,7 @@ libbalsa_show_message_source(GtkApplication  * application,
 
     window = gtk_application_window_new(application);
     gtk_window_set_title(GTK_WINDOW(window), _("Message Source"));
-    gtk_window_set_wmclass(GTK_WINDOW(window), "message-source", "Balsa");
+    gtk_window_set_role(GTK_WINDOW(window), "message-source");
     gtk_window_set_default_size(GTK_WINDOW(window), *width, *height);
 
     ui_file = g_build_filename(BALSA_DATA_PREFIX, "ui", "source-viewer.ui",

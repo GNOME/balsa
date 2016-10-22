@@ -3259,8 +3259,7 @@ ensure_check_mail_dialog(BalsaWindow * window)
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu_for_parent(progress_dialog, GTK_WINDOW(window));
 #endif
-    gtk_window_set_wmclass(GTK_WINDOW(progress_dialog),
-			   "progress_dialog", "Balsa");
+    gtk_window_set_role(GTK_WINDOW(progress_dialog), "progress_dialog");
 
     g_signal_connect(G_OBJECT(progress_dialog), "destroy",
 		     G_CALLBACK(bw_progress_dialog_destroy_cb), NULL);
@@ -3778,8 +3777,7 @@ bw_display_new_mail_notification(int num_new, int has_new)
                     GTK_MESSAGE_INFO,
                     GTK_BUTTONS_OK, "%s", msg);
             gtk_window_set_title(GTK_WINDOW(dlg), _("Balsa: New mail"));
-            gtk_window_set_wmclass(GTK_WINDOW(dlg), "new_mail_dialog",
-                    "Balsa");
+            gtk_window_set_role(GTK_WINDOW(dlg), "new_mail_dialog");
             gtk_window_set_type_hint(GTK_WINDOW(dlg),
                     GDK_WINDOW_TYPE_HINT_NORMAL);
             g_signal_connect(G_OBJECT(dlg), "response",
@@ -3814,8 +3812,7 @@ bw_display_new_mail_notification(int num_new, int has_new)
                                      GTK_MESSAGE_INFO,
                                      GTK_BUTTONS_OK, "%s", msg);
         gtk_window_set_title(GTK_WINDOW(dlg), _("Balsa: New mail"));
-        gtk_window_set_wmclass(GTK_WINDOW(dlg), "new_mail_dialog",
-                               "Balsa");
+        gtk_window_set_role(GTK_WINDOW(dlg), "new_mail_dialog");
         gtk_window_set_type_hint(GTK_WINDOW(dlg),
                                  GDK_WINDOW_TYPE_HINT_NORMAL);
         g_signal_connect(G_OBJECT(dlg), "response",

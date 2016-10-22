@@ -1,6 +1,29 @@
 2016-10-21  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Fix deprecation issues in gtk 3.22
+	
+	Replace gtk_window_set_wmclass, which is deprecated in gtk 3.22,
+	with gtk_window_set_role.
+
+	* libbalsa/libbalsa.c (ask_cert_real), (ask_timeout_real):
+	* libbalsa/send.c (ensure_send_progress_dialog):
+	* libbalsa/source-viewer.c (libbalsa_show_message_source):
+	* src/ab-window.c (balsa_ab_window_init):
+	* src/filter-edit-dialog.c (filters_edit_dialog):
+	* src/filter-export-dialog.c (filters_export_dialog):
+	* src/filter-run-dialog.c (balsa_filter_run_dialog_new):
+	* src/folder-conf.c (folder_conf_imap_node),
+	(folder_conf_imap_sub_node):
+	* src/information-dialog.c (balsa_information_list):
+	* src/main-window.c (ensure_check_mail_dialog),
+	(bw_display_new_mail_notification):
+	* src/message-window.c (message_window_new):
+	* src/sendmsg-window.c (sendmsg_window_new):
+	* src/toolbar-prefs.c (customize_dialog_cb):
+
+2016-10-21  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Fix deprecation issues in gtk 3.22
 
 	The Gtk+ API for popping up context menus has changed in 3.22;
 	gtk_menu_popup is deprecated.

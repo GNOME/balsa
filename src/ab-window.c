@@ -237,7 +237,7 @@ balsa_ab_window_init(BalsaAbWindow *ab)
 
     vbox = gtk_dialog_get_content_area(GTK_DIALOG(ab));
 
-    gtk_window_set_wmclass(GTK_WINDOW(ab), "addressbook", "Balsa");
+    gtk_window_set_role(GTK_WINDOW(ab), "addressbook");
 
     /* hig defaults */
     gtk_container_set_border_width(GTK_CONTAINER(ab), 6);

@@ -1,3 +1,21 @@
+2016-10-21  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Fix deprecation issues in gtk 3.22
+
+	The Gtk+ API for popping up context menus has changed in 3.22;
+	gtk_menu_popup is deprecated.
+
+	* src/balsa-index.c (bndx_do_popup):
+	* src/balsa-mblist.c (bmbl_do_popup):
+	* src/balsa-message.c (balsa_headers_attachments_popup),
+	(tree_mult_selection_popup), (tree_button_press_cb):
+	* src/balsa-mime-widget-image.c (balsa_image_button_press_cb):
+	* src/balsa-mime-widget-text.c (balsa_gtk_html_popup):
+	* src/pref-manager.c (address_book_add_cb), (server_add_cb):
+	* src/sendmsg-window.c (attachment_button_press_cb),
+	(attachment_popup_cb):
+	* src/toolbar-factory.c (tm_do_popup_menu):
+
 2016-10-18  Albrecht Dreß
 
 	Usually, RFC 3156 (PGP/MIME) signature parts

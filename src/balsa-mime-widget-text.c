@@ -1097,8 +1097,10 @@ balsa_gtk_html_popup(GtkWidget * html, BalsaMessage * bm)
     GtkWidget *menu;
     const GdkEvent *event;
     GdkEvent *current_event = NULL;
+#if !GTK_CHECK_VERSION(3, 22, 0)
     guint32 time;
     guint button;
+#endif                          /*GTK_CHECK_VERSION(3, 22, 0) */
 
     menu = gtk_menu_new();
     bmwt_populate_popup_menu(bm, html, GTK_MENU(menu));
@@ -1111,6 +1113,18 @@ balsa_gtk_html_popup(GtkWidget * html, BalsaMessage * bm)
     event = g_object_get_data(G_OBJECT(html), LIBBALSA_HTML_POPUP_EVENT);
     if (!event)
         event = current_event = gtk_get_current_event();
+#if GTK_CHECK_VERSION(3, 22, 0)
+    if (event)
+        gtk_menu_popup_at_pointer(GTK_MENU(menu),
+                                  (GdkEvent *) event);
+    else
+        gtk_menu_popup_at_widget(GTK_MENU(menu),
+                                 GTK_WIDGET(bm),
+                                 GDK_GRAVITY_CENTER, GDK_GRAVITY_CENTER,
+                                 NULL);
+    if (current_event)
+        gdk_event_free(current_event);
+#else                           /*GTK_CHECK_VERSION(3, 22, 0) */
     time = gdk_event_get_time(event);
     button = 0;
     gdk_event_get_button(event, &button);
@@ -1118,6 +1132,7 @@ balsa_gtk_html_popup(GtkWidget * html, BalsaMessage * bm)
         gdk_event_free(current_event);
 
     gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL, button, time);
+#endif                          /*GTK_CHECK_VERSION(3, 22, 0) */
 
     return TRUE;
 }

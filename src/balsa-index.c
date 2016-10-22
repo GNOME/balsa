@@ -1882,6 +1882,7 @@ bndx_popup_menu_create(BalsaIndex * index)
 /* If the menu is popped up in response to a keystroke, center it
  * below the headers of the tree-view.
  */
+#if !GTK_CHECK_VERSION(3, 22, 0)
 static void
 bndx_popup_position_func(GtkMenu * menu, gint * x, gint * y,
                          gboolean * push_in, gpointer user_data)
@@ -1914,6 +1915,7 @@ bndx_popup_position_func(GtkMenu * menu, gint * x, gint * y,
 
     *push_in = FALSE;
 }
+#endif                          /*GTK_CHECK_VERSION(3, 22, 0) */
 
 static void
 bndx_do_popup(BalsaIndex * index, GdkEventButton * event)
@@ -1971,6 +1973,14 @@ bndx_do_popup(BalsaIndex * index, GdkEventButton * event)
 
     gtk_widget_show_all(menu);
 
+#if GTK_CHECK_VERSION(3, 22, 0)
+    if (event)
+        gtk_menu_popup_at_pointer(GTK_MENU(menu), (GdkEvent *) event);
+    else
+        gtk_menu_popup_at_widget(GTK_MENU(menu), GTK_WIDGET(index),
+                                 GDK_GRAVITY_CENTER, GDK_GRAVITY_CENTER,
+                                 NULL);
+#else                           /*GTK_CHECK_VERSION(3, 22, 0) */
     if (event)
         gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL,
                        event->button, event->time);
@@ -1978,6 +1988,7 @@ bndx_do_popup(BalsaIndex * index, GdkEventButton * event)
         gtk_menu_popup(GTK_MENU(menu), NULL, NULL,
                        bndx_popup_position_func, index,
                        0, gtk_get_current_event_time());
+#endif                          /*GTK_CHECK_VERSION(3, 22, 0) */
 }
 
 static GtkWidget *

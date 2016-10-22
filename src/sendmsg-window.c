@@ -2457,8 +2457,13 @@ attachment_button_press_cb(GtkWidget * widget, GdkEventButton * event,
 	    gtk_tree_model_get(model, &iter, ATTACH_INFO_COLUMN, &attach_info, -1);
 	    if (attach_info) {
 		if (attach_info->popup_menu)
+#if GTK_CHECK_VERSION(3, 22, 0)
+                    gtk_menu_popup_at_pointer(GTK_MENU(attach_info->popup_menu),
+                                              (GdkEvent *) event);
+#else                           /*GTK_CHECK_VERSION(3, 22, 0) */
 		    gtk_menu_popup(GTK_MENU(attach_info->popup_menu), NULL, NULL,
 				   NULL, NULL, event->button, event->time);
+#endif                          /*GTK_CHECK_VERSION(3, 22, 0) */
 		g_object_unref(attach_info);
 	    }
         }
@@ -2483,8 +2488,15 @@ attachment_popup_cb(GtkWidget *widget, gpointer user_data)
     gtk_tree_model_get(model, &iter, ATTACH_INFO_COLUMN, &attach_info, -1);
     if (attach_info) {
 	if (attach_info->popup_menu)
+#if GTK_CHECK_VERSION(3, 22, 0)
+            gtk_menu_popup_at_widget(GTK_MENU(attach_info->popup_menu),
+                                     GTK_WIDGET(widget),
+                                     GDK_GRAVITY_CENTER, GDK_GRAVITY_CENTER,
+                                     NULL);
+#else                           /*GTK_CHECK_VERSION(3, 22, 0) */
 	gtk_menu_popup(GTK_MENU(attach_info->popup_menu), NULL, NULL, NULL,
 		       NULL, 0, gtk_get_current_event_time());
+#endif                          /*GTK_CHECK_VERSION(3, 22, 0) */
 	g_object_unref(attach_info);
     }
 

@@ -728,8 +728,10 @@ bmbl_do_popup(GtkTreeView * tree_view, GtkTreePath * path,
               GdkEventButton * event)
 {
     BalsaMailboxNode *mbnode = NULL;
+#if !GTK_CHECK_VERSION(3, 22, 0)
     gint event_button;
     guint event_time;
+#endif                          /*GTK_CHECK_VERSION(3, 22, 0) */
     GtkWidget *menu;
 
     if (path) {
@@ -741,6 +743,7 @@ bmbl_do_popup(GtkTreeView * tree_view, GtkTreePath * path,
         gtk_tree_path_free(path);
     }
 
+#if !GTK_CHECK_VERSION(3, 22, 0)
     if (event) {
         event_button = event->button;
         event_time = event->time;
@@ -748,12 +751,22 @@ bmbl_do_popup(GtkTreeView * tree_view, GtkTreePath * path,
         event_button = 0;
         event_time = gtk_get_current_event_time();
     }
+#endif                          /*GTK_CHECK_VERSION(3, 22, 0) */
 
     menu = balsa_mailbox_node_get_context_menu(mbnode);
     g_object_ref(menu);
     g_object_ref_sink(menu);
+#if GTK_CHECK_VERSION(3, 22, 0)
+    if (event)
+        gtk_menu_popup_at_pointer(GTK_MENU(menu), (GdkEvent *) event);
+    else
+        gtk_menu_popup_at_widget(GTK_MENU(menu), GTK_WIDGET(tree_view),
+                                 GDK_GRAVITY_CENTER, GDK_GRAVITY_CENTER,
+                                 NULL);
+#else                           /*GTK_CHECK_VERSION(3, 22, 0) */
     gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL,
 		   event_button, event_time);
+#endif                          /*GTK_CHECK_VERSION(3, 22, 0) */
     g_object_unref(menu);
 
     if (mbnode)

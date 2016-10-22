@@ -3131,8 +3131,14 @@ static void
 address_book_add_cb(GtkWidget * menu)
 {
     gtk_widget_show_all(menu);
+#if GTK_CHECK_VERSION(3, 22, 0)
+    gtk_menu_popup_at_widget(GTK_MENU(menu), GTK_WIDGET(pui->view),
+                             GDK_GRAVITY_CENTER, GDK_GRAVITY_CENTER,
+                             NULL);
+#else                           /*GTK_CHECK_VERSION(3, 22, 0) */
     gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL, 0,
                    gtk_get_current_event_time());
+#endif                          /*GTK_CHECK_VERSION(3, 22, 0) */
 }
 
 static void
@@ -3172,8 +3178,14 @@ static void
 server_add_cb(GtkWidget * menu)
 {
     gtk_widget_show_all(menu);
+#if GTK_CHECK_VERSION(3, 22, 0)
+    gtk_menu_popup_at_widget(GTK_MENU(menu), GTK_WIDGET(pui->view),
+                             GDK_GRAVITY_CENTER, GDK_GRAVITY_CENTER,
+                             NULL);
+#else                           /*GTK_CHECK_VERSION(3, 22, 0) */
     gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL, 0,
                    gtk_get_current_event_time());
+#endif                          /*GTK_CHECK_VERSION(3, 22, 0) */
 }
 
 static GtkWidget *

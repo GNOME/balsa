@@ -661,6 +661,7 @@ tm_remove_underscore(const gchar * text)
     return r;
 }
 
+#if !GTK_CHECK_VERSION(3, 22, 0)
 /* If the menu is popped up in response to a keystroke, center it
  * immediately below the toolbar.
  */
@@ -696,13 +697,16 @@ tm_popup_position_func(GtkMenu * menu, gint * x, gint * y,
 
     *push_in = FALSE;
 }
+#endif                          /*GTK_CHECK_VERSION(3, 22, 0) */
 
 static gboolean
 tm_do_popup_menu(GtkWidget * toolbar, GdkEventButton * event,
                  toolbar_info * info)
 {
     GtkWidget *menu;
+#if !GTK_CHECK_VERSION(3, 22, 0)
     int button, event_time;
+#endif                          /*GTK_CHECK_VERSION(3, 22, 0) */
     guint i;
     GSList *group = NULL;
     GtkToolbarStyle default_style = tm_default_style();
@@ -792,6 +796,17 @@ tm_do_popup_menu(GtkWidget * toolbar, GdkEventButton * event,
 
     gtk_widget_show_all(menu);
 
+#if GTK_CHECK_VERSION(3, 22, 0)
+    gtk_menu_attach_to_widget(GTK_MENU(menu), toolbar, NULL);
+    if (event)
+        gtk_menu_popup_at_pointer(GTK_MENU(menu),
+                                  (GdkEvent *) event);
+    else
+        gtk_menu_popup_at_widget(GTK_MENU(menu),
+                                 GTK_WIDGET(toolbar),
+                                 GDK_GRAVITY_CENTER, GDK_GRAVITY_CENTER,
+                                 NULL);
+#else                           /*GTK_CHECK_VERSION(3, 22, 0) */
     if (event) {
         button = event->button;
         event_time = event->time;
@@ -807,6 +822,7 @@ tm_do_popup_menu(GtkWidget * toolbar, GdkEventButton * event,
     else
         gtk_menu_popup(GTK_MENU(menu), NULL, NULL, tm_popup_position_func,
                        toolbar, button, event_time);
+#endif                          /*GTK_CHECK_VERSION(3, 22, 0) */
 
     return TRUE;
 }

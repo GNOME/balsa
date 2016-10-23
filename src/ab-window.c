@@ -115,9 +115,19 @@ balsa_ab_window_new(gboolean composing, GtkWindow* parent)
 {
     GtkWidget *ret;
     BalsaAbWindow *ab;
+    gint use_headerbar = 1;
+#if GTK_CHECK_VERSION(3, 12, 0)
+	const gchar *dialog_env;
+
+    /* header bar configuration */
+	dialog_env = g_getenv("BALSA_DIALOG_HEADERBAR");
+	if ((dialog_env != NULL) && (atoi(dialog_env) == 0)) {
+		use_headerbar = 0;
+	}
+#endif
 
     ret = g_object_new(BALSA_TYPE_AB_WINDOW,
-                       "use-header-bar", TRUE,
+                       "use-header-bar", use_headerbar,
                        "transient-for", parent,
                        NULL);
     g_return_val_if_fail(ret != NULL, NULL);

@@ -125,14 +125,6 @@ AC_ARG_WITH([spell-checker],
             [use_spell_checker=$withval],
             [use_spell_checker=no])
 
-AC_ARG_WITH(iconv,      
-   AC_HELP_STRING([--with-iconv=DIR],
-                  [Where libiconv is installed]),
-		  [if test "$with_iconv" != yes -a "$with_iconv" != no ; then
-                   CPPFLAGS="-I${with_iconv}/include $CPPFLAGS"
-                   LDFLAGS="-liconv -L${with_iconv}/lib $LDFLAGS"
-		   fi])
-
 AC_ARG_WITH([ldap],
    AC_HELP_STRING([--with-ldap=DIR],
                   [Use OpenLDAP if available (default=no)]),

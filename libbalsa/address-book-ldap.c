@@ -43,7 +43,6 @@
 #include <string.h>
 #include <lber.h>
 #include <ldap.h>
-#include <iconv.h>
 
 #ifdef HAVE_CYRUS_SASL
 #include <sasl.h>

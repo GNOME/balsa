@@ -26,7 +26,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
-#include <iconv.h>
 #include <sys/utsname.h>
 
 #include "balsa-app.h"

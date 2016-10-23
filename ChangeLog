@@ -1,3 +1,11 @@
+2016-10-23  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	We no longer use libiconv.
+
+	* configure.ac: remove --with-iconv option.
+	* libbalsa/address-book-ldap.c: do not include iconv.h.
+	* src/balsa-message.c: ditto.
+
 2016-10-21  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Fix deprecation issues in gtk 3.22

@@ -1,5 +1,13 @@
 2016-10-23  Albrecht Dreß
 
+Support GCR to display a certificate widget
+
+	* configure.ac: new option --with-gcr.
+	* libbalsa/libbalsa.c (ask_cert_real): use gcr certificate API
+	to display the certificate.
+
+2016-10-23  Albrecht Dreß
+
 Disable header bars in the address book widgets if the
 environment variable BALSA_DIALOG_HEADERBAR is 0.
 

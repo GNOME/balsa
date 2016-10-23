@@ -155,6 +155,11 @@ AC_ARG_WITH(libsecret,
                   [Link to libsecret instead of gnome-keyring (default=no)]),
                   [with_libsecret=$withval],[with_libsecret=no])
 
+AC_ARG_WITH(gcr,
+   AC_HELP_STRING([--with-gcr],
+                  [Use libgcr-3 for dealing with TLS certificates (experimental, default=no)]),
+                  [with_gcr=$withval],[with_gcr=no])
+
 AC_ARG_ENABLE(more-warnings,
    AC_HELP_STRING([--enable-more-warnings],
                   [Enable maximum compiler warnings (default=yes)]),
@@ -599,6 +604,14 @@ if test x$with_libnotify != xno; then
     with_libnotify=" >= 0.$notifyver"
 fi
 
+# gcr configuration
+if test x$with_gcr != xno; then
+    PKG_CHECK_MODULES(GCR, [ gcr-3 ])
+    AC_DEFINE(HAVE_GCR,1,[Defined when gcr-3 can be used.])
+    BALSA_CFLAGS="$BALSA_CFLAGS $GCR_CFLAGS"
+    BALSA_LIBS="$BALSA_LIBS $GCR_LIBS"
+fi
+
 # Compface configuration
 #
 AC_MSG_CHECKING([whether to build Compface support])
@@ -880,6 +893,7 @@ echo "         Use GtkSourceView: $with_gtksourceview"
 echo "              Use Compface: $with_compface"
 echo "  Install extra MIME icons: $install_mimeicons"
 echo "             Use libsecret: $with_libsecret"
+echo "                   Use gcr: $with_gcr"
 dnl echo "                  Use SASL: $need_sasl"
 echo ""
 

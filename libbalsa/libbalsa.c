@@ -51,6 +51,11 @@
 #include <gtksourceview/gtksource.h>
 #endif
 
+#if HAVE_GCR
+#define GCR_API_SUBJECT_TO_CHANGE
+#include <gcr/gcr.h>
+#endif
+
 #include "misc.h"
 #include "missing.h"
 #include <glib/gi18n.h>
@@ -347,6 +352,9 @@ libbalsa_ask(gboolean (*cb)(void *arg), void *arg)
 
 static int libbalsa_ask_for_cert_acceptance(X509 *cert,
 					    const char *explanation);
+
+#ifndef HAVE_GCR
+
 static char*
 asn1time_to_string(ASN1_UTCTIME *tm)
 {
@@ -402,6 +410,8 @@ x509_fingerprint (char *s, unsigned len, X509 * cert)
     }
     s[i] = '\0';
 }
+
+#endif  /* HAVE_GCR */
 
 static GList *accepted_certs = NULL; /* certs accepted for this session */
 static GMutex certificate_lock;
@@ -494,6 +504,69 @@ struct AskCertData {
     const char *explanation;
 };
 
+#if HAVE_GCR
+
+static int
+ask_cert_real(void *data)
+{
+    struct AskCertData *acd = (struct AskCertData*)data;
+    GtkWidget *dialog;
+    GtkWidget *cert_widget;
+    GString *str;
+    unsigned i;
+    unsigned char *der_buf = NULL;
+    int der_len;
+    GcrCertificate *gcr_cert;
+    GtkWidget *label;
+
+    dialog = gtk_dialog_new_with_buttons(_("SSL/TLS certificate"),
+                                         NULL, /* FIXME: NULL parent */
+                                         GTK_DIALOG_MODAL |
+                                         libbalsa_dialog_flags(),
+                                         _("_Accept Once"), 0,
+                                         _("Accept&_Save"), 1,
+                                         _("_Reject"), GTK_RESPONSE_CANCEL,
+                                         NULL);
+    gtk_window_set_role(GTK_WINDOW(dialog), "tls_cert_dialog");
+    der_len = i2d_X509(acd->certificate, &der_buf);
+    gcr_cert = gcr_simple_certificate_new(der_buf, der_len);
+    OPENSSL_free(der_buf);
+    cert_widget = GTK_WIDGET(gcr_certificate_widget_new(gcr_cert));
+    g_object_unref(G_OBJECT(gcr_cert));
+
+    str = g_string_new("");
+    g_string_printf(str, _("<big><b>Authenticity of this certificate "
+                           "could not be verified.</b></big>\n"
+                           "Reason: %s"),
+                    acd->explanation);
+    label = gtk_label_new(str->str);
+    g_string_free(str, TRUE);
+    gtk_label_set_use_markup(GTK_LABEL(label), TRUE);
+    gtk_box_pack_start(GTK_BOX(gtk_dialog_get_content_area(GTK_DIALOG(dialog))),
+                       label, FALSE, FALSE, 1);
+    gtk_widget_show(label);
+    gtk_box_pack_start(GTK_BOX(gtk_dialog_get_content_area(GTK_DIALOG(dialog))),
+                       cert_widget, TRUE, TRUE, 1);
+    gtk_widget_show(cert_widget);
+
+    switch(gtk_dialog_run(GTK_DIALOG(dialog))) {
+    case 0:
+    	i = 1;
+    	break;
+    case 1:
+    	i = 2;
+    	break;
+    case GTK_RESPONSE_CANCEL:
+    default:
+    	i = 0;
+    	break;
+    }
+    gtk_widget_destroy(dialog);
+    return i;
+}
+
+#else
+
 static int
 ask_cert_real(void *data)
 {
@@ -582,6 +655,8 @@ ask_cert_real(void *data)
     printf("%s returns %d\n", __FUNCTION__, i);
     return i;
 }
+
+#endif	/* HAVE_GCR */
 
 static int
 libbalsa_ask_for_cert_acceptance(X509 *cert, const char *explanation)

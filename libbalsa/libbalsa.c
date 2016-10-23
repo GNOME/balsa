@@ -524,7 +524,7 @@ ask_cert_real(void *data)
                                          GTK_DIALOG_MODAL |
                                          libbalsa_dialog_flags(),
                                          _("_Accept Once"), 0,
-                                         _("Accept&_Save"), 1,
+                                         _("Accept & _Save"), 1,
                                          _("_Reject"), GTK_RESPONSE_CANCEL,
                                          NULL);
     gtk_window_set_role(GTK_WINDOW(dialog), "tls_cert_dialog");
@@ -629,7 +629,7 @@ ask_cert_real(void *data)
                                          GTK_DIALOG_MODAL |
                                          libbalsa_dialog_flags(),
                                          _("_Accept Once"), 0,
-                                         _("Accept&_Save"), 1,
+                                         _("Accept & _Save"), 1,
                                          _("_Reject"), GTK_RESPONSE_CANCEL, 
                                          NULL);
     gtk_window_set_role(GTK_WINDOW(dialog), "tls_cert_dialog");

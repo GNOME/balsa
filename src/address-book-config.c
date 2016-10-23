@@ -161,7 +161,6 @@ edit_book_response(GtkWidget * dialog, gint response,
     gtk_widget_destroy(dialog);
     if (abc->address_book)
         g_object_set_data(G_OBJECT(abc->address_book), "balsa-abc", NULL);
-    g_free(abc);
 }
 
 /* Radio buttons */
@@ -783,8 +782,6 @@ modify_book(AddressBookConfig * abc)
 static void
 add_vcard_cb(GtkWidget * widget, AddressBookConfig * abc)
 {
-    g_object_weak_unref(G_OBJECT(gtk_widget_get_parent(widget)),
-                        (GWeakNotify) g_free, abc);
     abc->type = LIBBALSA_TYPE_ADDRESS_BOOK_VCARD;
     abc->window = create_vcard_dialog(abc);
     gtk_widget_show_all(abc->window);
@@ -793,8 +790,6 @@ add_vcard_cb(GtkWidget * widget, AddressBookConfig * abc)
 static void
 add_externq_cb(GtkWidget * widget, AddressBookConfig * abc)
 {
-    g_object_weak_unref(G_OBJECT(gtk_widget_get_parent(widget)),
-                        (GWeakNotify) g_free, abc);
     abc->type = LIBBALSA_TYPE_ADDRESS_BOOK_EXTERN;
     abc->window = create_externq_dialog(abc);
     gtk_widget_show_all(abc->window);
@@ -803,8 +798,6 @@ add_externq_cb(GtkWidget * widget, AddressBookConfig * abc)
 static void
 add_ldif_cb(GtkWidget * widget, AddressBookConfig * abc)
 {
-    g_object_weak_unref(G_OBJECT(gtk_widget_get_parent(widget)),
-                        (GWeakNotify) g_free, abc);
     abc->type = LIBBALSA_TYPE_ADDRESS_BOOK_LDIF;
     abc->window = create_ldif_dialog(abc);
     gtk_widget_show_all(abc->window);
@@ -814,8 +807,6 @@ add_ldif_cb(GtkWidget * widget, AddressBookConfig * abc)
 static void
 add_ldap_cb(GtkWidget * widget, AddressBookConfig * abc)
 {
-    g_object_weak_unref(G_OBJECT(gtk_widget_get_parent(widget)),
-                        (GWeakNotify) g_free, abc);
     abc->type = LIBBALSA_TYPE_ADDRESS_BOOK_LDAP;
     abc->window = create_ldap_dialog(abc);
     gtk_widget_show_all(abc->window);
@@ -826,8 +817,6 @@ add_ldap_cb(GtkWidget * widget, AddressBookConfig * abc)
 static void
 add_gpe_cb(GtkWidget * widget, AddressBookConfig * abc)
 {
-    g_object_weak_unref(G_OBJECT(gtk_widget_get_parent(widget)),
-                        (GWeakNotify) g_free, abc);
     abc->type = LIBBALSA_TYPE_ADDRESS_BOOK_GPE;
     abc->window = create_gpe_dialog(abc);
     gtk_widget_show_all(abc->window);
@@ -838,8 +827,6 @@ add_gpe_cb(GtkWidget * widget, AddressBookConfig * abc)
 static void
 add_rubrica_cb(GtkWidget * widget, AddressBookConfig * abc)
 {
-    g_object_weak_unref(G_OBJECT(gtk_widget_get_parent(widget)),
-                        (GWeakNotify) g_free, abc);
     abc->type = LIBBALSA_TYPE_ADDRESS_BOOK_RUBRICA;
     abc->window = create_rubrica_dialog(abc);
     gtk_widget_show_all(abc->window);

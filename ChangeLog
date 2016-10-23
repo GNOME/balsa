@@ -1,3 +1,14 @@
+2016-10-23  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Do not crash after cancelling the add-address-book dialog.
+
+	* src/address-book-config.c (edit_book_response): do not free
+	the AddressBookConfig;
+	(add_vcard_cb),
+	(add_externq_cb), (add_ldif_cb), (add_ldap_cb), (add_gpe_cb),
+	(add_rubrica_cb): do not remove the weak ref that frees
+	the AddressBookConfig.
+
 2016-10-23  Albrecht Dreß
 
 Support GCR to display a certificate widget

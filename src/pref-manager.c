@@ -340,7 +340,7 @@ static void properties_modified_cb(GtkWidget * widget, GtkWidget * pbox);
 
 static void server_edit_cb(GtkTreeView * tree_view);
 static void pop3_add_cb(void);
-static void server_add_cb(GtkWidget * menu);
+static void add_menu_cb(GtkWidget * menu, GtkWidget * widget);
 static void server_del_cb(GtkTreeView * tree_view);
 
 #if ENABLE_ESMTP
@@ -352,7 +352,6 @@ static void smtp_server_changed (GtkTreeSelection * selection,
 #endif                          /* ENABLE_ESMTP */
 
 static void address_book_edit_cb(GtkTreeView * tree_view);
-static void address_book_add_cb(GtkWidget * menu);
 static void address_book_delete_cb(GtkTreeView * tree_view);
 static void address_book_set_default_cb(GtkTreeView * tree_view);
 static void timer_modified_cb(GtkWidget * widget, GtkWidget * pbox);
@@ -1693,7 +1692,7 @@ remote_mailbox_servers_group(GtkWidget * page)
     g_object_weak_ref(G_OBJECT(vbox), (GWeakNotify) g_object_unref,
                       server_add_menu);
     g_object_ref_sink(server_add_menu);
-    add_button_to_box(_("_Add"), G_CALLBACK(server_add_cb),
+    add_button_to_box(_("_Add"), G_CALLBACK(add_menu_cb),
                       server_add_menu, vbox);
 
     add_button_to_box(_("_Modify"), G_CALLBACK(server_edit_cb),
@@ -2867,7 +2866,7 @@ address_books_group(GtkWidget * page)
                       address_book_add_menu);
     g_object_ref_sink(address_book_add_menu);
     add_button_to_box(_("_Add"),
-                      G_CALLBACK(address_book_add_cb),
+                      G_CALLBACK(add_menu_cb),
                       address_book_add_menu, vbox);
 
     add_button_to_box(_("_Modify"),
@@ -3128,12 +3127,12 @@ address_book_set_default_cb(GtkTreeView * tree_view)
 }
 
 static void
-address_book_add_cb(GtkWidget * menu)
+add_menu_cb(GtkWidget * menu, GtkWidget * widget)
 {
     gtk_widget_show_all(menu);
 #if GTK_CHECK_VERSION(3, 22, 0)
-    gtk_menu_popup_at_widget(GTK_MENU(menu), GTK_WIDGET(pui->view),
-                             GDK_GRAVITY_CENTER, GDK_GRAVITY_CENTER,
+    gtk_menu_popup_at_widget(GTK_MENU(menu), GTK_WIDGET(widget),
+                             GDK_GRAVITY_NORTH_WEST, GDK_GRAVITY_NORTH_WEST,
                              NULL);
 #else                           /*GTK_CHECK_VERSION(3, 22, 0) */
     gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL, 0,
@@ -3172,20 +3171,6 @@ static void
 pop3_add_cb(void)
 {
     mailbox_conf_new(LIBBALSA_TYPE_MAILBOX_POP3);
-}
-
-static void
-server_add_cb(GtkWidget * menu)
-{
-    gtk_widget_show_all(menu);
-#if GTK_CHECK_VERSION(3, 22, 0)
-    gtk_menu_popup_at_widget(GTK_MENU(menu), GTK_WIDGET(pui->view),
-                             GDK_GRAVITY_CENTER, GDK_GRAVITY_CENTER,
-                             NULL);
-#else                           /*GTK_CHECK_VERSION(3, 22, 0) */
-    gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL, 0,
-                   gtk_get_current_event_time());
-#endif                          /*GTK_CHECK_VERSION(3, 22, 0) */
 }
 
 static GtkWidget *

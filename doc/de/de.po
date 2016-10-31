@@ -71,7 +71,7 @@ msgid ""
 "<em>should</em> be with balsa. Submit links to more programs."
 msgstr ""
 "Die folgenden Programme sind zum Mailprogramm <app>Mutt</app> kompatibel und "
-"<em>sollten/em> auch mit <app>Balsa</app> funktionieren. Bitte stellen Sie "
+"<em>sollten</em> auch mit <app>Balsa</app> funktionieren. Bitte stellen Sie "
 "Links zu weiteren Programmen zur Verfügung."
 
 #. (itstool) path: item/p

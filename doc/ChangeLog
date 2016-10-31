@@ -1,3 +1,7 @@
+2016-10-31  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* de/de.po: fix XML tag.
+
 2016-10-18  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* Makefile.am: create balsa-spell-extra-dist using tools that

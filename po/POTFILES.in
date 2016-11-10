@@ -6,6 +6,7 @@ balsa-mailto-handler.desktop.in.in
 libbalsa/address-book-extern.c
 libbalsa/address-book-ldap.c
 libbalsa/address-book-ldif.c
+libbalsa/address-book-osmo.c
 libbalsa/address-book-vcard.c
 libbalsa/address-book.c
 libbalsa/address-view.c
@@ -42,6 +43,7 @@ libbalsa/mime.c
 libbalsa/misc.c
 libbalsa/rfc2445.c
 libbalsa/rfc3156.c
+libbalsa/rfc6350.c
 libbalsa/send.c
 libbalsa/server.c
 libbalsa/smtp-server.c

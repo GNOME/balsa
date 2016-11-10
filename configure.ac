@@ -145,6 +145,11 @@ AC_ARG_WITH([rubrica],
                   [add Rubrica2 address book support (needs libxml2, default=no)]),
 		  [with_rubrica=$withval],[with_rubrica=no])
 
+AC_ARG_WITH([osmo],
+   AC_HELP_STRING([--with-osmo],
+                  [add Osmo address book support (experimental, needs osmo > svn rev. 1099, default=no)]),
+		  [with_osmo=$withval],[with_osmo=no])
+
 AC_ARG_WITH([sqlite],
    AC_HELP_STRING([--with-sqlite=DIR],
                   [Use SQLite for GPE address books (default=no)]),
@@ -528,6 +533,15 @@ if test x$with_rubrica != xno ; then
     BALSA_CFLAGS="$BALSA_CFLAGS $LIBXML2_CFLAGS"
     BALSA_LIBS="$BALSA_LIBS $LIBXML2_LIBS"
     BALSA_AB_LIBS="$BALSA_AB_LIBS $LIBXML2_LIBS"
+else
+    AC_MSG_RESULT([no])
+fi
+
+# Osmo address book support
+AC_MSG_CHECKING(whether to include experimental Osmo support)
+if test x$with_osmo != xno ; then
+    AC_MSG_RESULT([yes])
+    AC_DEFINE(HAVE_OSMO,1,[If defined, enable Osmo address book support.])
 else
     AC_MSG_RESULT([no])
 fi

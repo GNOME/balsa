@@ -95,6 +95,10 @@ address book is in the works but needs some finishing touches.
 --with-rubrica
 	Use libxml2 for Rubrica2 address book support.
 
+--with-osmo
+	Enable experimental support for read-only DBus access to the Osmo
+	contacts.  Note that Osmo svn rev. 1099 or later is required.
+
 --with-canberra
 	Use libcanberra-gtk3 for filter sounds.
 

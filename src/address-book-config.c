@@ -78,6 +78,9 @@ static GtkWidget *create_gpe_dialog(AddressBookConfig * abc);
 #ifdef HAVE_RUBRICA
 static GtkWidget *create_rubrica_dialog(AddressBookConfig * abc);
 #endif
+#ifdef HAVE_OSMO
+static GtkWidget *create_osmo_dialog(AddressBookConfig *abc);
+#endif
 
 static void help_button_cb(AddressBookConfig * abc);
 static gboolean handle_close(AddressBookConfig * abc);
@@ -303,6 +306,10 @@ create_dialog_from_type(AddressBookConfig * abc)
     } else if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_RUBRICA) {
         return create_rubrica_dialog(abc);
 #endif
+#ifdef HAVE_OSMO
+    } else if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_OSMO) {
+    	return create_osmo_dialog(abc);
+#endif
     } else {
         g_assert_not_reached();
     }
@@ -347,6 +354,60 @@ create_generic_dialog(AddressBookConfig * abc, const gchar * type)
 
     return dialog;
 }
+
+#ifdef HAVE_OSMO
+static GtkWidget *
+create_osmo_dialog(AddressBookConfig *abc)
+{
+    GtkWidget *dialog;
+    GtkWidget *content_area;
+    gchar *title;
+    const gchar *action;
+    const gchar *name;
+    GtkWidget *grid;
+    GtkWidget *label;
+    LibBalsaAddressBook *ab;
+    GtkSizeGroup *size_group;
+
+    ab = abc->address_book;
+    if (ab) {
+        title = g_strdup_printf(_("Modify Osmo Address Book"));
+        action = _("_Apply");
+        name = ab->name;
+    } else {
+        title = g_strdup_printf(_("Add Osmo Address Book"));
+        action = _("_Add");
+        name = NULL;
+    }
+
+    dialog =
+        gtk_dialog_new_with_buttons(title, abc->parent,
+                                    libbalsa_dialog_flags(),
+                                    _("_Help"), GTK_RESPONSE_HELP,
+                                    action, GTK_RESPONSE_APPLY,
+                                    _("_Cancel"), GTK_RESPONSE_CANCEL,
+                                    NULL);
+    g_free(title);
+#if HAVE_MACOSX_DESKTOP
+    libbalsa_macosx_menu_for_parent(dialog, abc->parent);
+#endif
+    size_group = libbalsa_create_size_group(dialog);
+
+    grid = libbalsa_create_grid();
+    content_area = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
+    gtk_container_add(GTK_CONTAINER(content_area), grid);
+    gtk_file_chooser_set_extra_widget(GTK_FILE_CHOOSER(dialog), grid);
+    label = libbalsa_create_grid_label(_("A_ddress Book Name:"), grid, 0);
+    gtk_size_group_add_widget(size_group, label);
+    abc->name_entry =
+        libbalsa_create_grid_entry(grid, NULL, NULL, 0, name, label);
+    add_radio_buttons(grid, 1, abc);
+    g_signal_connect(G_OBJECT(dialog), "response",
+                     G_CALLBACK(edit_book_response), abc);
+
+    return dialog;
+}
+#endif /* HAVE_OSMO */
 
 static GtkWidget *
 create_externq_dialog(AddressBookConfig * abc)
@@ -679,6 +740,10 @@ create_book(AddressBookConfig * abc)
             address_book = libbalsa_address_book_rubrica_new(name, path);
         g_free(path);
 #endif
+#ifdef HAVE_OSMO
+    } else if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_OSMO) {
+    	address_book = libbalsa_address_book_osmo_new(name);
+#endif
     } else
         g_assert_not_reached();
 
@@ -766,6 +831,10 @@ modify_book(AddressBookConfig * abc)
 #if HAVE_SQLITE
     } else if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_GPE) {
 #endif /* HAVE_SQLITE */
+#if HAVE_OSMO
+    } else if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_OSMO) {
+    	/* nothing to do here */
+#endif
     } else
         g_assert_not_reached();
 
@@ -833,6 +902,16 @@ add_rubrica_cb(GtkWidget * widget, AddressBookConfig * abc)
 }
 #endif /* HAVE_SQLITE */
 
+#ifdef HAVE_OSMO
+static void
+add_osmo_cb(GtkWidget * widget, AddressBookConfig * abc)
+{
+    abc->type = LIBBALSA_TYPE_ADDRESS_BOOK_OSMO;
+    abc->window = create_osmo_dialog(abc);
+    gtk_widget_show_all(abc->window);
+}
+#endif /* HAVE_OSMO */
+
 GtkWidget *
 balsa_address_book_add_menu(BalsaAddressBookCallback callback,
                             GtkWindow * parent)
@@ -884,6 +963,13 @@ balsa_address_book_add_menu(BalsaAddressBookCallback callback,
                      G_CALLBACK(add_rubrica_cb), abc);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
 #endif /* HAVE_RUBRICA */
+
+#ifdef HAVE_OSMO
+    menuitem = gtk_menu_item_new_with_label(_("Osmo Address Book"));
+    g_signal_connect(G_OBJECT(menuitem), "activate",
+                     G_CALLBACK(add_osmo_cb), abc);
+    gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
+#endif
 
     return menu;
 }

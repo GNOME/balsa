@@ -62,6 +62,9 @@ typedef struct _LibbalsaVfs LibbalsaVfs;
 #if HAVE_RUBRICA
 #include "address-book-rubrica.h"
 #endif
+#if HAVE_OSMO
+#include "address-book-osmo.h"
+#endif
 
 #include "mailbox.h"
 #include "mailbox_local.h"

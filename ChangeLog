@@ -1,3 +1,20 @@
+2016-11-09  Albrecht Dreß
+
+	Support for Osmo address book
+
+	* libbalsa/address-book-osmo.c, libbalsa/address-book-osmo.h:
+	  new files; implement read-only Osmo address book core
+	* libbalsa/rfc6350.c, libbalsa/rfc6350.h: new files;
+	  simple RFC 6350 to LibBalsaAddress parser
+	* README: add note about new configure item
+	* configure.ac: make Osmo address book configurable (default
+	  disabled)
+	* libbalsa/Makefile.am: add new sources
+	* libbalsa/libbalsa.c: initialise address book type
+	* libbalsa/libbalsa.h: include header
+	* src/address-book-config.c: implement configuration dialogue
+	* src/pref-manager.c: add to pref manager
+
 2016-10-23  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Improve pop-up menu positioning.

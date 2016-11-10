@@ -124,6 +124,9 @@ libbalsa_init(LibBalsaInformationFunc information_callback)
 #if HAVE_RUBRICA
     LIBBALSA_TYPE_ADDRESS_BOOK_RUBRICA;
 #endif
+#if HAVE_OSMO
+    LIBBALSA_TYPE_ADDRESS_BOOK_OSMO;
+#endif
 }
 
 

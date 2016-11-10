@@ -54,6 +54,8 @@ libbalsa_a_SOURCES = 		\
 	address-book-ldap.h	\
 	address-book-ldif.c	\
 	address-book-ldif.h	\
+	address-book-osmo.c	\
+	address-book-osmo.h	\
 	address-book-rubrica.c	\
 	address-book-rubrica.h	\
 	address-book-text.c	\
@@ -140,6 +142,8 @@ libbalsa_a_SOURCES = 		\
 	rfc2445.h		\
 	rfc3156.c		\
 	rfc3156.h		\
+	rfc6350.c		\
+	rfc6350.h		\
 	send.c			\
 	send.h			\
 	server.c		\

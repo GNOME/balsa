@@ -700,7 +700,7 @@ bw_get_action(BalsaWindow * window,
         action = g_action_map_lookup_action(action_map, action_name);
     }
     if (!action)
-        g_print("%s action \"%s\" not found\n", __func__, action_name);
+        g_print("%s action “%s” not found\n", __func__, action_name);
 
     return action;
 }
@@ -1001,7 +1001,7 @@ quit_activated(GSimpleAction * action,
     libbalsa_information_parented(window,
                                   LIBBALSA_INFORMATION_MESSAGE,
                                   _("Balsa closes files and connections."
-                                    "Please wait..."));
+                                    " Please wait…"));
     while(gtk_events_pending())
         gtk_main_iteration_do(FALSE);
     gdk_event_put((GdkEvent*)&e);
@@ -1849,7 +1849,7 @@ header_change_state(GSimpleAction * action,
     else if (strcmp(value, "all") == 0)
         sh = HEADERS_ALL;
     else {
-        g_print("%s unknown value \"%s\"\n", __func__, value);
+        g_print("%s unknown value “%s”\n", __func__, value);
         return;
     }
 
@@ -1882,7 +1882,7 @@ threading_change_state(GSimpleAction * action,
     else if (strcmp(value, "jwz") == 0)
         type = LB_MAILBOX_THREADING_JWZ;
     else {
-        g_print("%s unknown value \"%s\"\n", __func__, value);
+        g_print("%s unknown value “%s”\n", __func__, value);
         return;
     }
 
@@ -3250,7 +3250,7 @@ ensure_check_mail_dialog(BalsaWindow * window)
 	gtk_widget_destroy(GTK_WIDGET(progress_dialog));
 
     progress_dialog =
-	gtk_dialog_new_with_buttons(_("Checking Mail..."),
+	gtk_dialog_new_with_buttons(_("Checking Mail…"),
                                     GTK_WINDOW(window),
                                     GTK_DIALOG_DESTROY_WITH_PARENT |
                                     libbalsa_dialog_flags(),
@@ -3268,7 +3268,7 @@ ensure_check_mail_dialog(BalsaWindow * window)
 
     content_box =
         GTK_BOX(gtk_dialog_get_content_area(GTK_DIALOG(progress_dialog)));
-    progress_dialog_source = gtk_label_new(_("Checking Mail..."));
+    progress_dialog_source = gtk_label_new(_("Checking Mail…"));
     gtk_box_pack_start(content_box, progress_dialog_source,
                        FALSE, FALSE, 0);
 

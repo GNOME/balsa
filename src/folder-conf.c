@@ -853,7 +853,7 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
     gtk_editable_set_editable(GTK_EDITABLE(sdd->parent_folder), FALSE);
     gtk_entry_set_text(GTK_ENTRY(sdd->parent_folder), sdd->old_parent);
 
-    button = gtk_button_new_with_mnemonic(_("_Browse..."));
+    button = gtk_button_new_with_mnemonic(_("_Browse…"));
     g_signal_connect(G_OBJECT(button), "clicked",
 		     G_CALLBACK(browse_button_cb), (gpointer) sdd);
 
@@ -1003,8 +1003,8 @@ folder_conf_delete(BalsaMailboxNode* mbnode)
                                  GTK_MESSAGE_QUESTION,
                                  GTK_BUTTONS_OK_CANCEL,
                                  _("This will remove the folder "
-                                   "\"%s\" from the list.\n"
-                                   "You may use \"New IMAP Folder\" "
+                                   "“%s” from the list.\n"
+                                   "You may use “New IMAP Folder” "
                                    "later to add this folder again.\n"),
                                  mbnode->name);
 #if HAVE_MACOSX_DESKTOP

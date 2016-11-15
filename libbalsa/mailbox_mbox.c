@@ -205,7 +205,7 @@ lbm_mbox_check_files(const gchar * path, gboolean create)
 
         if ((fd = creat(path, S_IRUSR | S_IWUSR)) == -1) {
             g_warning("An error:\n%s\n occurred while trying to "
-                      "create the mailbox \"%s\"\n",
+                      "create the mailbox “%s”\n",
                       strerror(errno), path);
             return -1;
         } else
@@ -252,7 +252,7 @@ lbm_mbox_stream_seek_to_message(GMimeStream * stream, off_t offset)
             --nread;
         buffer[nread] = 0;
 #if DEBUG_SEEK
-        g_print("%s at %ld failed: read %ld chars, saw \"%s\"\n", __func__,
+        g_print("%s at %ld failed: read %ld chars, saw “%s”\n", __func__,
                 (long) offset, (long) nread, buffer);
 #endif
     }
@@ -427,7 +427,7 @@ lbm_mbox_save(LibBalsaMailboxMbox * mbox)
             (ssize_t) messages_info->len) {
             libbalsa_information(LIBBALSA_INFORMATION_WARNING,
                                  _("Failed to create temporary file "
-                                   "\"%s\": %s"), template,
+                                   "“%s”: %s"), template,
                                  strerror(errno));
             g_free(template);
             g_free(filename);
@@ -438,8 +438,8 @@ lbm_mbox_save(LibBalsaMailboxMbox * mbox)
             || (unlink(filename) != 0 && errno != ENOENT)
             || libbalsa_safe_rename(template, filename) != 0)
             libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-                                 _("Failed to save cache file \"%s\": %s.  "
-                                   "New version saved as \"%s\""),
+                                 _("Failed to save cache file “%s”: %s.  "
+                                   "New version saved as “%s”"),
                                  filename, strerror(errno), template);
         g_free(template);
 #endif                          /* !defined(__APPLE__) */
@@ -1482,7 +1482,7 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 	if (g_mime_stream_flush(mbox_stream) < 0)
 	    g_warning("can't flush mailbox stream\n");
 	if (fstat(GMIME_STREAM_FS(mbox_stream)->fd, &st))
-	    g_warning("can't stat \"%s\"", path);
+	    g_warning("can't stat “%s”", path);
 	else
             libbalsa_mailbox_set_mtime(mailbox, st.st_mtime);
         lbm_mbox_save(mbox);

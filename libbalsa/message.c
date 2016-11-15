@@ -1108,7 +1108,7 @@ lbmsg_set_header(LibBalsaMessage *message, const gchar *name,
         val = g_mime_utils_header_encode_text(tmp);
         g_free(tmp);
 #ifdef DEBUG
-        g_print("%s: non-ascii \"%s\" header \"%s\" encoded as \"%s\"\n",
+        g_print("%s: non-ascii “%s” header “%s” encoded as “%s”\n",
                 __func__, name, value, val);
 #endif /* DEBUG */
         value = val;

@@ -610,13 +610,13 @@ mi_reconnect(ImapMboxHandle *h)
         break;\
     else if(rc==IMR_SEVERED)                             \
     libbalsa_information(LIBBALSA_INFORMATION_WARNING, \
-    _("IMAP connection has been severed. Reconnecting...")); \
+    _("IMAP connection has been severed. Reconnecting…")); \
     else if(rc==IMR_PROTOCOL)                               \
     libbalsa_information(LIBBALSA_INFORMATION_WARNING, \
     _("IMAP protocol error. Try enabling bug workarounds.")); \
     else if(rc==IMR_BYE) {char *msg = imap_mbox_handle_get_last_msg(h); \
     libbalsa_information(LIBBALSA_INFORMATION_WARNING, \
-    _("IMAP server has shut the connection: %s Reconnecting..."), msg); \
+    _("IMAP server has shut the connection: %s Reconnecting…"), msg); \
     g_free(msg);}\
     else break;}while(trials-->0);}
 #define IIA(rc,h,line,cmd)                         \
@@ -628,7 +628,7 @@ mi_reconnect(ImapMboxHandle *h)
         break;\
     else if(rc != IMR_OK) \
     libbalsa_information(LIBBALSA_INFORMATION_WARNING, \
-     _("Async IMAP cmd %s could not be executed. Reconnecting..."),cmd); \
+     _("Async IMAP cmd %s could not be executed. Reconnecting…"),cmd); \
     else break;}while(trials-->0);}
 
 static ImapMboxHandle *
@@ -1665,8 +1665,8 @@ libbalsa_mailbox_imap_load_config(LibBalsaMailbox * mailbox,
     if (!mimap->path) {
 	mimap->path = g_strdup("INBOX");
 	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-                             _("No path found for mailbox \"%s\", "
-			       "using \"%s\""),
+                             _("No path found for mailbox “%s”, "
+			       "using “%s”"),
 			     mailbox->name, mimap->path);
     }
 
@@ -3483,7 +3483,7 @@ imap_cache_manager_new_from_file(const char *header_cache_path)
        fread(&icm->uidnext,     sizeof(uint32_t), 1, f) != 1 ||
        fread(&icm->exists,      sizeof(uint32_t), 1, f) != 1) {
 	imap_cache_manager_free(icm);
-	printf("Couldn't read cache - aborting...\n");
+	printf("Couldn't read cache - aborting…\n");
         fclose(f);
 	return NULL;
     }

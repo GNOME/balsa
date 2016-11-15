@@ -71,7 +71,7 @@ mw_set_enabled(MessageWindow * mw, const gchar * action_name,
     if (action)
         g_simple_action_set_enabled(G_SIMPLE_ACTION(action), enabled);
     else
-        g_print("%s action \"%s\" not found\n", __func__, action_name);
+        g_print("%s action “%s” not found\n", __func__, action_name);
 }
 
 /*
@@ -88,7 +88,7 @@ mw_set_active(MessageWindow * mw,
     if (action)
         g_action_change_state(action, g_variant_new_boolean(state));
     else
-        g_print("%s action \"%s\" not found\n", __func__, action_name);
+        g_print("%s action “%s” not found\n", __func__, action_name);
 }
 
 /*
@@ -264,7 +264,7 @@ mw_header_change_state(GSimpleAction * action,
     else if (strcmp(value, "all") == 0)
         sh = HEADERS_ALL;
     else {
-        g_print("%s unknown value \"%s\"\n", __func__, value);
+        g_print("%s unknown value “%s”\n", __func__, value);
         return;
     }
 

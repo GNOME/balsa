@@ -561,7 +561,7 @@ lbm_local_save_tree(LibBalsaMailboxLocal * local)
                              save_info.array->len *
                              sizeof(LibBalsaMailboxLocalTreeInfo), &err)) {
         libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-                             _("Failed to save cache file \"%s\": %s."),
+                             _("Failed to save cache file “%s”: %s."),
                              filename, err->message);
         g_error_free(err);
     }
@@ -1842,13 +1842,17 @@ lbml_subject_gather(GNode * node, ThreadingInfo * ti)
     old = g_hash_table_lookup(subject_table, chopped_subject);
 #ifdef MAKE_EMPTY_CONTAINER_FOR_MISSING_PARENT
     if (old == NULL || (node->data == NULL && old->data != NULL)) {
-#else				/* MAKE_EMPTY_CONTAINER_FOR_MISSING_PARENT */
-    if (old == NULL) {
-#endif				/* MAKE_EMPTY_CONTAINER_FOR_MISSING_PARENT */
 	g_hash_table_insert(subject_table, (char *) chopped_subject,
 			    node);
 	return;
     }
+#else				/* MAKE_EMPTY_CONTAINER_FOR_MISSING_PARENT */
+    if (old == NULL) {
+	g_hash_table_insert(subject_table, (char *) chopped_subject,
+			    node);
+	return;
+    }
+#endif				/* MAKE_EMPTY_CONTAINER_FOR_MISSING_PARENT */
 
     old_subject = lbml_get_subject(old, ti);
 
@@ -2146,7 +2150,7 @@ lbm_local_sync_real(LibBalsaMailboxLocal * local)
         MAILBOX_OPEN(mailbox) &&                   /* mailbox still open */
         !libbalsa_mailbox_sync_storage(mailbox, FALSE))   /* cannot sync */
 	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-			     _("Failed to sync mailbox \"%s\""),
+			     _("Failed to sync mailbox “%s”"),
 			     mailbox->name);
     local->sync_id = 0;
     local->sync_time += time(NULL)-tstart;

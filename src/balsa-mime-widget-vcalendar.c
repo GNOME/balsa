@@ -62,7 +62,7 @@ balsa_mime_widget_new_vcalendar(BalsaMessage * bm,
     mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
     mw->widget = gtk_box_new(GTK_ORIENTATION_VERTICAL, 12);
 
-    text = g_strdup_printf(_("This is an iTIP calendar \"%s\" message."),
+    text = g_strdup_printf(_("This is an iTIP calendar “%s” message."),
 			   libbalsa_vcal_method_to_str(vcal_obj->method));
     label = gtk_label_new(text);
     g_free(text);

@@ -211,8 +211,8 @@ balsa_init_create_to_directory(const gchar * dir, gchar ** complaint)
                 if (mkdir(sofar, S_IRUSR | S_IWUSR | S_IXUSR) < 0) {
                     (*complaint) =
                         g_strdup_printf(_("Couldn't create a directory:"
-                                          " mkdir() failed on pathname \"%s\","
-                                          " with error \"%s\"."),
+                                          " mkdir() failed on pathname “%s”,"
+                                          " with error “%s”."),
                                         sofar, g_strerror(errno));
                     g_free(sofar);
                     return TRUE;
@@ -222,7 +222,7 @@ balsa_init_create_to_directory(const gchar * dir, gchar ** complaint)
             if (!S_ISDIR(sb.st_mode)) {
                 (*complaint) =
                     g_strdup_printf(_
-                                    ("The file with pathname \"%s\" is not a directory."),
+                                    ("The file with pathname “%s” is not a directory."),
                                     sofar);
                 g_free(sofar);
                 return TRUE;
@@ -236,7 +236,7 @@ balsa_init_create_to_directory(const gchar * dir, gchar ** complaint)
         if (mkdir(dir, S_IRUSR | S_IWUSR | S_IXUSR) < 0) {
             (*complaint) =
                 g_strdup_printf(_
-                                ("Couldn't create a directory: mkdir() failed on pathname \"%s\"."),
+                                ("Couldn't create a directory: mkdir() failed on pathname “%s”."),
                                 dir);
             return TRUE;
         }
@@ -245,7 +245,7 @@ balsa_init_create_to_directory(const gchar * dir, gchar ** complaint)
     if (!S_ISDIR(sb.st_mode)) {
         (*complaint) =
             g_strdup_printf(_
-                            ("The file with pathname \"%s\" is not a directory."),
+                            ("The file with pathname “%s” is not a directory."),
                             dir);
         return TRUE;
     }

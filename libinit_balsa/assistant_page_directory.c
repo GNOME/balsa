@@ -80,7 +80,7 @@ unconditional_mailbox(const gchar * path, const gchar * prettyname,
     if (index == NULL) {
         (*error) =
             g_strdup_printf(_
-                            ("The pathname \"%s\" must be specified"
+                            ("The pathname “%s” must be specified"
                              " canonically -- it must start with a \'/\'."),
                             dup);
         g_free(dup);
@@ -121,7 +121,7 @@ unconditional_mailbox(const gchar * path, const gchar * prettyname,
         *box = libbalsa_mailbox_local_new(path, TRUE);
         if (!*box) {
             *error = g_strdup_printf(_("Could not create mailbox"
-                                       " at path \"%s\"\n"), path);
+                                       " at path “%s”\n"), path);
             g_free(dup);
             return;
         }
@@ -152,7 +152,7 @@ unconditional_mailbox(const gchar * path, const gchar * prettyname,
     if ( *box == NULL) {
             (*error) =
                 g_strdup_printf(_
-                                ("The mailbox \"%s\" does not appear to be valid."),
+                                ("The mailbox “%s” does not appear to be valid."),
                                 path);
         return;
     }
@@ -186,7 +186,7 @@ verify_mailbox_entry(GtkWidget * entry, const gchar * name,
                                    GTK_DIALOG_MODAL,
                                    GTK_MESSAGE_ERROR,
                                    GTK_BUTTONS_OK,
-                                   _("Problem verifying path \"%s\":\n%s"),
+                                   _("Problem verifying path “%s”:\n%s"),
                                    text, error);
         g_free(error);
         gtk_dialog_run(GTK_DIALOG(dlg));

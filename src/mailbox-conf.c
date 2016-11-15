@@ -375,7 +375,7 @@ mailbox_conf_delete(BalsaMailboxNode * mbnode)
     if(BALSA_IS_MAILBOX_SPECIAL(mailbox)) {
 	balsa_information(
 	    LIBBALSA_INFORMATION_ERROR,
-	    _("Mailbox \"%s\" is used by Balsa and I cannot remove it.\n"
+	    _("Mailbox “%s” is used by Balsa and I cannot remove it.\n"
 	      "If you really want to remove it, assign its function\n"
 	      "to some other mailbox."), mailbox->name);
 	return;
@@ -386,13 +386,13 @@ mailbox_conf_delete(BalsaMailboxNode * mbnode)
                                      GTK_MESSAGE_QUESTION,
                                      GTK_BUTTONS_NONE,
                                      _("This will remove the mailbox "
-                                       "\"%s\" from the list "
+                                       "“%s” from the list "
                                        "of mailboxes.  "
                                        "You may also delete the disk "
                                        "file or files associated with "
                                        "this mailbox.\n"
                                        "If you do not remove the file "
-                                       "on disk you may \"Add  Mailbox\" "
+                                       "on disk you may “Add  Mailbox” "
                                        "to access the mailbox again.\n"
                                        "What would you like to do?"),
                                      mailbox->name);
@@ -407,13 +407,13 @@ mailbox_conf_delete(BalsaMailboxNode * mbnode)
                                      GTK_MESSAGE_QUESTION,
                                      GTK_BUTTONS_NONE,
 	                             _("This will remove the mailbox "
-                                       "\"%s\" and all its messages "
+                                       "“%s” and all its messages "
                                        "from your IMAP server.  "
 	                               "If %s has subfolders, it will "
                                        "still appear as a node in the "
                                        "folder tree.\n"
 	                               "You may use "
-                                       "\"New IMAP subfolder\" "
+                                       "“New IMAP subfolder” "
                                        "later to add a mailbox "
                                        "with this name.\n"
 	                               "What would you like to do?"),
@@ -427,9 +427,9 @@ mailbox_conf_delete(BalsaMailboxNode * mbnode)
                                      GTK_MESSAGE_QUESTION,
                                      GTK_BUTTONS_NONE,
 	                             _("This will remove the mailbox "
-                                       "\"%s\" from the list "
+                                       "“%s” from the list "
                                        "of mailboxes.\n"
-				       "You may use \"Add Mailbox\" "
+				       "You may use “Add Mailbox” "
                                        "later to access "
                                        "this mailbox again.\n"
 			 	       "What would you like to do?"),

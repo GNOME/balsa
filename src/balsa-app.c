@@ -455,7 +455,7 @@ check_new_messages_auto_cb(gpointer data)
     check_new_messages_real(balsa_app.main_window, TYPE_BACKGROUND);
 
     if (balsa_app.debug)
-        fprintf(stderr, "Auto-checked for new messages...\n");
+        fprintf(stderr, "Auto-checked for new messages…\n");
 
     /*  preserver timer */
     return TRUE;
@@ -526,7 +526,7 @@ open_mailbox_by_url(const gchar * url, gboolean hidden)
             libbalsa_mailbox_view_free(view);
         }
         balsa_information(LIBBALSA_INFORMATION_WARNING,
-                          _("Couldn't open mailbox \"%s\""), url);
+                          _("Couldn't open mailbox “%s”"), url);
     }
 }
 

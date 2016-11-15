@@ -121,30 +121,30 @@ check_special_mailboxes(void)
     gboolean bomb = FALSE;
 
     if (balsa_app.inbox == NULL) {
-	g_warning(_("Balsa cannot open your \"%s\" mailbox."), _("Inbox"));
+	g_warning(_("Balsa cannot open your “%s” mailbox."), _("Inbox"));
 	bomb = TRUE;
     }
 
     if (balsa_app.outbox == NULL) {
-	g_warning(_("Balsa cannot open your \"%s\" mailbox."),
+	g_warning(_("Balsa cannot open your “%s” mailbox."),
 		  _("Outbox"));
 	bomb = TRUE;
     }
 
     if (balsa_app.sentbox == NULL) {
-	g_warning(_("Balsa cannot open your \"%s\" mailbox."),
+	g_warning(_("Balsa cannot open your “%s” mailbox."),
 		  _("Sentbox"));
 	bomb = TRUE;
     }
 
     if (balsa_app.draftbox == NULL) {
-	g_warning(_("Balsa cannot open your \"%s\" mailbox."),
+	g_warning(_("Balsa cannot open your “%s” mailbox."),
 		  _("Draftbox"));
 	bomb = TRUE;
     }
 
     if (balsa_app.trash == NULL) {
-	g_warning(_("Balsa cannot open your \"%s\" mailbox."), _("Trash"));
+	g_warning(_("Balsa cannot open your “%s” mailbox."), _("Trash"));
 	bomb = TRUE;
     }
 
@@ -398,7 +398,7 @@ periodic_expunge_cb(void)
 
     gdk_threads_enter();
     libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
-                         _("Compressing mail folders..."));
+                         _("Compressing mail folders…"));
     gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
 			   (GtkTreeModelForeachFunc)mbnode_expunge_func,
 			   &list);

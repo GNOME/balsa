@@ -397,7 +397,7 @@ build_action_page(GtkWindow * window)
     gtk_grid_attach(GTK_GRID(grid), fe_sound_button, 0, 0, 1, 1);
 
     dialog =
-        gtk_file_chooser_dialog_new(_("Use Sound..."), NULL,
+        gtk_file_chooser_dialog_new(_("Use Sound…"), NULL,
                                     GTK_FILE_CHOOSER_ACTION_OPEN,
                                     _("_Cancel"), GTK_RESPONSE_CANCEL,
                                     _("_Open"),   GTK_RESPONSE_ACCEPT,
@@ -632,7 +632,7 @@ filters_edit_dialog(GtkWindow * parent)
             cpfil->condition = libbalsa_condition_ref(fil->condition);
         else
             balsa_information(LIBBALSA_INFORMATION_WARNING,
-                              _("Filter \"%s\" has no condition."),
+                              _("Filter “%s” has no condition."),
                               fil->name);
 
 	fe_collect_user_headers(fil->condition);

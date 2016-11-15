@@ -97,7 +97,7 @@ lsv_show_message(const char *message, LibBalsaSourceViewerInfo * lsvi,
     gtk_text_buffer_set_text(buffer, "", 0);
 
     if (escape)
-	tmp = g_strescape(message, "\n\"");
+	tmp = g_strescape(message, "\n“");
     else {
 	tmp = g_strdup(message);
 	libbalsa_utf8_sanitize(&tmp, FALSE, NULL);

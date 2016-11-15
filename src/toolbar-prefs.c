@@ -446,7 +446,7 @@ create_toolbar_page(BalsaToolbarModel * model, GActionMap * map)
     gtk_container_add(GTK_CONTAINER(button_box), page->standard_button);
 
     /* Style button */
-    style_button = gtk_button_new_with_mnemonic(_("Toolbar _style..."));
+    style_button = gtk_button_new_with_mnemonic(_("Toolbar _style…"));
     gtk_container_add(GTK_CONTAINER(button_box), style_button);
 
     /* Done with preview */
@@ -624,7 +624,7 @@ tp_page_refresh_available(ToolbarPage * page, GActionMap * map)
 
                 action = g_hash_table_lookup(legal, toolbar_buttons[item].pixmap_id);
                 if (action && !g_action_map_lookup_action(map, action))
-                    g_print("undefined action: \"%s\"\n", action);
+                    g_print("undefined action: “%s”\n", action);
             }
         }
 #endif /* BALSA_TOOLBAR_DEBUG_ACTIONS */

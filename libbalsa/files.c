@@ -91,8 +91,8 @@ balsa_file_finder(const gchar * filename, const gchar * splice,
     g_free(cat);
 
     if (warn)
-        g_warning("Cannot find expected file \"%s\" "
-                  "(spliced with \"%s\") %s extra prefixes",
+        g_warning("Cannot find expected file “%s” "
+                  "(spliced with “%s”) %s extra prefixes",
 	          filename, splice,
                   prefixes ? "even with" : "with no");
     return NULL;

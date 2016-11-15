@@ -396,7 +396,7 @@ libbalsa_address_book_ldap_load(LibBalsaAddressBook * ab,
          * we use the asynchronous lookup to fetch the results in chunks
          * in case we exceed administrative limits.
          */ 
-        /* g_print("Performing full lookup...\n"); */
+        /* g_print("Performing full lookup…\n"); */
         ldap_filter = filter 
             ? g_strdup_printf("(&(objectClass=organizationalPerson)(mail=*)"
                               "(|(cn=%s*)(sn=%s*)(mail=%s*@*)))",
@@ -658,7 +658,7 @@ libbalsa_address_book_ldap_add_address(LibBalsaAddressBook *ab,
 	}
         /* fall through */
         default:
-            fprintf(stderr, "ldap_add for dn=\"%s\" failed[0x%x]: %s\n",
+            fprintf(stderr, "ldap_add for dn=“%s” failed[0x%x]: %s\n",
                     dn, rc, ldap_err2string(rc));
         }
     } while(cnt++<1);
@@ -701,7 +701,7 @@ libbalsa_address_book_ldap_remove_address(LibBalsaAddressBook *ab,
 	    }
             /* fall through */
         default:
-            fprintf(stderr, "ldap_delete for dn=\"%s\" failed[0x%x]: %s\n",
+            fprintf(stderr, "ldap_delete for dn=“%s” failed[0x%x]: %s\n",
                     dn, rc, ldap_err2string(rc));
         }
     } while(cnt++<1);
@@ -813,7 +813,7 @@ libbalsa_address_book_ldap_modify_address(LibBalsaAddressBook *ab,
 	    }
             /* fall through */
         default:
-            fprintf(stderr, "ldap_modify for dn=\2%s\" failed[0x%x]: %s\n",
+            fprintf(stderr, "ldap_modify for dn=“%s” failed[0x%x]: %s\n",
                     dn, rc, ldap_err2string(rc));
         }
     } while(cnt++<1);

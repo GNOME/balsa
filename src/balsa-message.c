@@ -985,14 +985,14 @@ tree_mult_selection_popup(BalsaMessage * bm, GdkEventButton * event,
         bm->save_all_popup = gtk_menu_new ();
         g_object_ref_sink(bm->save_all_popup);
         menu_item =
-            gtk_menu_item_new_with_label (_("Save selected as..."));
+            gtk_menu_item_new_with_label (_("Save selected as…"));
         gtk_widget_show(menu_item);
         g_signal_connect (G_OBJECT (menu_item), "activate",
                           G_CALLBACK (part_context_save_all_cb),
                           (gpointer) bm->save_all_list);
         gtk_menu_shell_append (GTK_MENU_SHELL (bm->save_all_popup), menu_item);
         menu_item =
-            gtk_menu_item_new_with_label (_("Save selected to folder..."));
+            gtk_menu_item_new_with_label (_("Save selected to folder…"));
         gtk_widget_show(menu_item);
         g_signal_connect (G_OBJECT (menu_item), "activate",
                           G_CALLBACK (part_context_dump_all_cb),
@@ -1155,7 +1155,7 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMailbox * mailbox, guint msgno)
     if (!message) {
 	balsa_information(LIBBALSA_INFORMATION_WARNING,
                           _("Could not access message %u "
-                            "in mailbox \"%s\"."),
+                            "in mailbox “%s”."),
 			  msgno, mailbox->name);
         return FALSE;
     }
@@ -1167,7 +1167,7 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMailbox * mailbox, guint msgno)
         bm->message = NULL;
 	balsa_information(LIBBALSA_INFORMATION_WARNING,
                           _("Could not access message %u "
-                            "in mailbox \"%s\"."),
+                            "in mailbox “%s”."),
 			  (unsigned int) message->msgno, mailbox->name);
         return FALSE;
     }
@@ -1343,7 +1343,7 @@ mpart_content_name(const gchar *content_type)
     else if (g_ascii_strcasecmp(content_type, "message/rfc822") == 0)
         return g_strdup(_("rfc822 message"));
     else
-        return g_strdup_printf(_("\"%s\" parts"),
+        return g_strdup_printf(_("“%s” parts"),
                                strchr(content_type, '/') + 1);
 }
 
@@ -1434,7 +1434,7 @@ display_part(BalsaMessage * bm, LibBalsaMessageBody * body,
             libbalsa_utf8_sanitize(&from, balsa_app.convert_unknown_8bit, NULL);
             libbalsa_utf8_sanitize(&subj, balsa_app.convert_unknown_8bit, NULL);
             icon_title =
-                g_strdup_printf(_("rfc822 message (from %s, subject \"%s\")"),
+                g_strdup_printf(_("rfc822 message (from %s, subject “%s”)"),
                                 from, subj);
             g_free(from);
             g_free(subj);
@@ -1666,7 +1666,7 @@ part_create_menu (BalsaPartInfo* info)
 					   G_CALLBACK (balsa_mime_widget_ctx_menu_cb),
 					   (gpointer)info->body);
 
-    menu_item = gtk_menu_item_new_with_mnemonic (_("_Save..."));
+    menu_item = gtk_menu_item_new_with_mnemonic (_("_Save…"));
     g_signal_connect (G_OBJECT (menu_item), "activate",
                       G_CALLBACK (balsa_mime_widget_ctx_menu_save), (gpointer) info->body);
     gtk_menu_shell_append (GTK_MENU_SHELL (info->popup_menu), menu_item);
@@ -1675,7 +1675,7 @@ part_create_menu (BalsaPartInfo* info)
         GtkWidget *submenu;
 
         menu_item =
-            gtk_menu_item_new_with_mnemonic(_("_Copy to folder..."));
+            gtk_menu_item_new_with_mnemonic(_("_Copy to folder…"));
         gtk_menu_shell_append(GTK_MENU_SHELL(info->popup_menu), menu_item);
 
         submenu =
@@ -2527,7 +2527,7 @@ static LibBalsaMessage *create_mdn_reply (const LibBalsaIdentity *mdn_ident,
     date = libbalsa_message_date_to_utf8(for_msg, balsa_app.date_string);
     dummy = internet_address_list_to_string(for_msg->headers->to_list, FALSE);
     body->buffer = g_strdup_printf(
-        "The message sent on %s to %s with subject \"%s\" has been displayed.\n"
+        "The message sent on %s to %s with subject “%s” has been displayed.\n"
         "There is no guarantee that the message has been read or understood.\n\n",
         date, dummy, LIBBALSA_MESSAGE_GET_SUBJECT(for_msg));
     g_free (date);
@@ -2845,7 +2845,7 @@ libbalsa_msg_try_decrypt(LibBalsaMessage * message, LibBalsaMessageBody * body,
 		libbalsa_information
 		    (chk_crypto->chk_mode == LB_MAILBOX_CHK_CRYPT_ALWAYS ?
 		     LIBBALSA_INFORMATION_ERROR : LIBBALSA_INFORMATION_MESSAGE,
-                     _("The message sent by %s with subject \"%s\" contains "
+                     _("The message sent by %s with subject “%s” contains "
                        "an encrypted part, but it's structure is invalid."),
 		     chk_crypto->sender, chk_crypto->subject);
             } else if (encrres & LIBBALSA_PROTECT_RFC3156) {
@@ -2853,7 +2853,7 @@ libbalsa_msg_try_decrypt(LibBalsaMessage * message, LibBalsaMessageBody * body,
                     libbalsa_information
                         (chk_crypto->chk_mode == LB_MAILBOX_CHK_CRYPT_ALWAYS ?
 			 LIBBALSA_INFORMATION_WARNING : LIBBALSA_INFORMATION_MESSAGE,
-                         _("The message sent by %s with subject \"%s\" "
+                         _("The message sent by %s with subject “%s” "
                            "contains a PGP encrypted part, but this "
                            "crypto protocol is not available."),
                          chk_crypto->sender, chk_crypto->subject);
@@ -2866,7 +2866,7 @@ libbalsa_msg_try_decrypt(LibBalsaMessage * message, LibBalsaMessageBody * body,
                     libbalsa_information
                         (chk_crypto->chk_mode == LB_MAILBOX_CHK_CRYPT_ALWAYS ?
 			 LIBBALSA_INFORMATION_WARNING : LIBBALSA_INFORMATION_MESSAGE,
-                         _("The message sent by %s with subject \"%s\" "
+                         _("The message sent by %s with subject “%s” "
                            "contains a S/MIME encrypted part, but this "
                            "crypto protocol is not available."),
                          chk_crypto->sender, chk_crypto->subject);
@@ -2933,7 +2933,7 @@ libbalsa_msg_try_mp_signed(LibBalsaMessage * message, LibBalsaMessageBody *body,
 	libbalsa_information
 	    (chk_crypto->chk_mode == LB_MAILBOX_CHK_CRYPT_ALWAYS ?
 	     LIBBALSA_INFORMATION_ERROR : LIBBALSA_INFORMATION_MESSAGE,
-	     _("The message sent by %s with subject \"%s\" contains a signed "
+	     _("The message sent by %s with subject “%s” contains a signed "
 	       "part, but its structure is invalid. The signature, if there "
 	       "is any, cannot be checked."),
 	     chk_crypto->sender, chk_crypto->subject);
@@ -2946,7 +2946,7 @@ libbalsa_msg_try_mp_signed(LibBalsaMessage * message, LibBalsaMessageBody *body,
 	libbalsa_information
 	    (chk_crypto->chk_mode == LB_MAILBOX_CHK_CRYPT_ALWAYS ?
 	     LIBBALSA_INFORMATION_WARNING : LIBBALSA_INFORMATION_MESSAGE,
-	     _("The message sent by %s with subject \"%s\" contains a %s "
+	     _("The message sent by %s with subject “%s” contains a %s "
 	       "signed part, but this crypto protocol is not available."),
 	     chk_crypto->sender, chk_crypto->subject,
 	     signres & LIBBALSA_PROTECT_RFC3156 ? _("PGP") : _("S/MIME"));
@@ -2992,7 +2992,7 @@ libbalsa_msg_try_mp_signed(LibBalsaMessage * message, LibBalsaMessageBody *body,
 		(chk_crypto->chk_mode == LB_MAILBOX_CHK_CRYPT_ALWAYS ?
 		 LIBBALSA_INFORMATION_ERROR : LIBBALSA_INFORMATION_MESSAGE,
 		 _("Checking the signature of the message sent by %s with "
-		   "subject \"%s\" returned:\n%s"),
+		   "subject “%s” returned:\n%s"),
 		 chk_crypto->sender, chk_crypto->subject,
 		 libbalsa_gpgme_sig_stat_to_gchar(body->parts->next->sig_info->status));
 	    break;
@@ -3004,7 +3004,7 @@ libbalsa_msg_try_mp_signed(LibBalsaMessage * message, LibBalsaMessageBody *body,
 	    (chk_crypto->chk_mode == LB_MAILBOX_CHK_CRYPT_ALWAYS ?
 	     LIBBALSA_INFORMATION_ERROR : LIBBALSA_INFORMATION_MESSAGE,
 	     _("Checking the signature of the message sent by %s with subject "
-	       "\"%s\" failed with an error!"),
+	       "“%s” failed with an error!"),
 	     chk_crypto->sender, chk_crypto->subject);
 }
 
@@ -3111,7 +3111,7 @@ libbalsa_msg_part_2440(LibBalsaMessage * message, LibBalsaMessageBody * body,
 	    (chk_crypto->chk_mode == LB_MAILBOX_CHK_CRYPT_ALWAYS ?
 	     LIBBALSA_INFORMATION_ERROR : LIBBALSA_INFORMATION_MESSAGE,
 	     _("Checking the signature of the message sent by %s with "
-	       "subject \"%s\" returned:\n%s"),
+	       "subject “%s” returned:\n%s"),
 	     chk_crypto->sender, chk_crypto->subject,
 	     libbalsa_gpgme_sig_stat_to_gchar(sig_res));
 }

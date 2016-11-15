@@ -514,7 +514,7 @@ text_view_url_popup(GtkTextView *textview, GtkMenu *menu)
                       G_CALLBACK (url_open_cb), (gpointer)url);
     gtk_menu_shell_append (GTK_MENU_SHELL (menu), menu_item);
 
-    menu_item = gtk_menu_item_new_with_label (_("Send link..."));
+    menu_item = gtk_menu_item_new_with_label (_("Send link…"));
     g_signal_connect (G_OBJECT (menu_item), "activate",
                       G_CALLBACK (url_send_cb), (gpointer)url);
     gtk_menu_shell_append (GTK_MENU_SHELL (menu), menu_item);
@@ -545,7 +545,7 @@ text_view_populate_popup(GtkTextView *textview, GtkMenu *menu,
 					   G_CALLBACK (balsa_mime_widget_ctx_menu_cb),
 					   (gpointer)mime_body);
 
-    menu_item = gtk_menu_item_new_with_label (_("Save..."));
+    menu_item = gtk_menu_item_new_with_label (_("Save…"));
     g_signal_connect (G_OBJECT (menu_item), "activate",
                       G_CALLBACK (balsa_mime_widget_ctx_menu_save), (gpointer)mime_body);
     gtk_menu_shell_append (GTK_MENU_SHELL (menu), menu_item);
@@ -782,7 +782,7 @@ handle_url(const gchar * url)
     } else {
         GtkStatusbar *statusbar;
         guint context_id;
-        gchar *notice = g_strdup_printf(_("Calling URL %s..."), url);
+        gchar *notice = g_strdup_printf(_("Calling URL %s…"), url);
         GdkScreen *screen;
         GError *err = NULL;
 
@@ -1075,7 +1075,7 @@ bmwt_populate_popup_menu(BalsaMessage * bm,
                                            (balsa_mime_widget_ctx_menu_cb),
                                            mime_body);
 
-    menuitem = gtk_menu_item_new_with_label(_("Save..."));
+    menuitem = gtk_menu_item_new_with_label(_("Save…"));
     g_signal_connect(G_OBJECT(menuitem), "activate",
                      G_CALLBACK(balsa_mime_widget_ctx_menu_save),
                      mime_body);
@@ -1084,7 +1084,7 @@ bmwt_populate_popup_menu(BalsaMessage * bm,
     menuitem = gtk_separator_menu_item_new();
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
 
-    menuitem = gtk_menu_item_new_with_label(_("Print..."));
+    menuitem = gtk_menu_item_new_with_label(_("Print…"));
     g_signal_connect_swapped(G_OBJECT(menuitem), "activate",
                              G_CALLBACK(libbalsa_html_print), html);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
@@ -1263,11 +1263,11 @@ check_text_encoding(BalsaMessage * bm, gchar *text_buf)
                                NULL);
         libbalsa_information
             (LIBBALSA_INFORMATION_MESSAGE,
-             _("The message sent by %s with subject \"%s\" contains 8-bit "
+             _("The message sent by %s with subject “%s” contains 8-bit "
                "characters, but no header describing the used codeset "
                "(converted to %s)"),
              from, subject,
-             target_cs ? target_cs : "\"?\"");
+             target_cs ? target_cs : "“?”");
         g_free(subject);
         g_free(from);
         /* Avoid multiple notifications: */

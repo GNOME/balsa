@@ -963,7 +963,7 @@ libbalsa_lock_file (const char *path, int fd, int excl, int dot, int timeout)
     prev_sb = sb;
  
     libbalsa_information(LIBBALSA_INFORMATION_MESSAGE,
-			 _("Waiting for fcntl lock... %d"), ++attempt);
+			 _("Waiting for fcntl lock… %d"), ++attempt);
     sleep (1);
 }
 #endif /* USE_FCNTL */
@@ -998,7 +998,7 @@ while (flock (fd, (excl ? LOCK_EX : LOCK_SH) | LOCK_NB) == -1)
  
     prev_sb = sb;
  
-    libbalsa_message (_("Waiting for flock attempt... %d"), ++attempt);
+    libbalsa_message (_("Waiting for flock attempt… %d"), ++attempt);
     sleep (1);
 }
 #endif /* USE_FLOCK */

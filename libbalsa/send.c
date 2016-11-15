@@ -243,14 +243,14 @@ ensure_send_progress_dialog(GtkWindow * parent)
 
     if(send_dialog) return;
 
-    send_dialog = gtk_dialog_new_with_buttons(_("Sending Mail..."), 
+    send_dialog = gtk_dialog_new_with_buttons(_("Sending Mail…"), 
                                               parent,
                                               GTK_DIALOG_DESTROY_WITH_PARENT |
                                               libbalsa_dialog_flags(),
                                               _("_Hide"), GTK_RESPONSE_CLOSE,
                                               NULL);
     gtk_window_set_role(GTK_WINDOW(send_dialog), "send_dialog");
-    label = gtk_label_new(_("Sending Mail..."));
+    label = gtk_label_new(_("Sending Mail…"));
     content_box =
         GTK_BOX(gtk_dialog_get_content_area(GTK_DIALOG(send_dialog)));
     gtk_box_pack_start(content_box, label, FALSE, FALSE, 0);

@@ -438,7 +438,7 @@ lbab_text_open_temp(LibBalsaAddressBookText * ab_text, gchar ** path,
     *stream = fopen(*path, "w");
     if (*stream == NULL) {
 #if DEBUG
-        g_message("Failed to open temporary address book file \"%s\"\n"
+        g_message("Failed to open temporary address book file “%s”\n"
                   " changes not saved", *path);
 #endif                          /* DEBUG */
         g_free(*path);
@@ -455,8 +455,8 @@ lbab_text_close_temp(LibBalsaAddressBookText * ab_text, const gchar * path)
     if (unlink(ab_text->path) < 0
         && g_file_error_from_errno(errno) != G_FILE_ERROR_NOENT) {
 #if DEBUG
-        g_message("Failed to unlink address book file \"%s\"\n"
-                  " new address book file saved as \"%s\"", ab_text->path,
+        g_message("Failed to unlink address book file “%s”\n"
+                  " new address book file saved as “%s”", ab_text->path,
                   path);
         perror("TEXT");
 #endif                          /* DEBUG */
@@ -465,7 +465,7 @@ lbab_text_close_temp(LibBalsaAddressBookText * ab_text, const gchar * path)
 
     if (rename(path, ab_text->path) < 0) {
 #if DEBUG
-        g_message("Failed to rename temporary address book file \"%s\"\n",
+        g_message("Failed to rename temporary address book file “%s”\n",
                   path);
 #endif                          /* DEBUG */
         return LBABERR_CANNOT_WRITE;
@@ -659,7 +659,7 @@ libbalsa_address_book_text_modify_address(LibBalsaAddressBook * ab,
         res = lbab_text_close_temp(ab_text, path);
 #if DEBUG
     else
-        g_message("Failed to write to temporary address book file \"%s\"\n"
+        g_message("Failed to write to temporary address book file “%s”\n"
                   " changes not saved", path);
 #endif                          /* DEBUG */
     g_free(path);

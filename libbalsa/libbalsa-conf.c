@@ -62,7 +62,7 @@ lbc_readfile(const gchar * filename)
 
     if (!g_file_get_contents(filename, &buf, NULL, NULL)) {
 #if DEBUG
-        g_message("Failed to read \"%s\"\n", filename);
+        g_message("Failed to read “%s”\n", filename);
 #endif                          /* DEBUG */
         return NULL;
     }
@@ -110,8 +110,8 @@ lbc_init(LibBalsaConf * conf, const gchar * filename,
         old_path =
             g_build_filename(g_get_home_dir(), old_dir, "balsa", NULL);
 #if DEBUG
-        g_message("Could not load config from \"%s\":\n %s\n"
-                  " trying \"%s\"", conf->path, error->message, old_path);
+        g_message("Could not load config from “%s”:\n %s\n"
+                  " trying “%s”", conf->path, error->message, old_path);
 #endif                          /* DEBUG */
         g_clear_error(&error);
 
@@ -128,7 +128,7 @@ lbc_init(LibBalsaConf * conf, const gchar * filename,
         }
         if (!buf || error) {
 #if DEBUG
-            g_message("Could not load key file from file \"%s\": %s",
+            g_message("Could not load key file from file “%s”: %s",
                       old_path,
                       error ? error->message : g_strerror(errno));
 #endif                          /* DEBUG */
@@ -140,7 +140,7 @@ lbc_init(LibBalsaConf * conf, const gchar * filename,
             libbalsa_information(LIBBALSA_INFORMATION_WARNING,
                                  _("Your Balsa configuration "
                                    "is now stored in "
-                                   "\"~/.balsa/config\"."));
+                                   "“~/.balsa/config”."));
     }
 }
 
@@ -489,7 +489,7 @@ lbc_sync(LibBalsaConf * conf)
     buf = g_key_file_to_data(conf->key_file, &len, &error);
     if (error) {
 #if DEBUG
-        g_message("Failed to sync config file \"%s\": %s\n"
+        g_message("Failed to sync config file “%s”: %s\n"
                   " changes not saved", conf->path, error->message);
 #endif                          /* DEBUG */
         g_error_free(error);
@@ -501,13 +501,13 @@ lbc_sync(LibBalsaConf * conf)
     if (!g_file_set_contents(conf->path, buf, len, &error)) {
         if (error) {
 #if DEBUG
-            g_message("Failed to rewrite config file \"%s\": %s\n"
+            g_message("Failed to rewrite config file “%s”: %s\n"
                       " changes not saved", conf->path, error->message);
 #endif                          /* DEBUG */
             g_error_free(error);
 #if DEBUG
         } else {
-                g_message("Failed to rewrite config file \"%s\";"
+                g_message("Failed to rewrite config file “%s”;"
                           " changes not saved", conf->path);
 #endif                          /* DEBUG */
         }

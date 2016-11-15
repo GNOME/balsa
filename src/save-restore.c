@@ -712,7 +712,7 @@ config_global_load(void)
                                        &def_used);
     if (!def_used)
         g_idle_add((GSourceFunc) config_warning_idle,
-                   _("The option not to recognize \"format=flowed\" "
+                   _("The option not to recognize “format=flowed” "
                      "text has been removed."));
 
     {
@@ -991,7 +991,7 @@ config_global_load(void)
                                        &def_used);
     if (!def_used)
         g_idle_add((GSourceFunc) config_warning_idle,
-                   _("The option not to send \"format=flowed\" text is now "
+                   _("The option not to send “format=flowed” text is now "
                      "on the Options menu of the compose window."));
 
     balsa_app.autoquote = 
@@ -2048,7 +2048,7 @@ config_defclient_save(void)
     info = g_desktop_app_info_new("balsa.desktop");
     if (!info) {
         g_warning("Failed to create default application for Balsa "
-                  "for \"mailto\"");
+                  "for “mailto”");
         return;
     }
 
@@ -2056,7 +2056,7 @@ config_defclient_save(void)
     if (!g_app_info_set_as_default_for_type
         (G_APP_INFO(info), "x-scheme-handler/mailto", &err)) {
         g_warning("Failed to set Balsa as the default application "
-                  "for \"mailto\": %s", err->message);
+                  "for “mailto”: %s", err->message);
         g_error_free(err);
     }
     g_object_unref(info);

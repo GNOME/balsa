@@ -325,7 +325,7 @@ lb_gpgme_accept_low_trust_key(const gchar * user_name,
 			user_name);
     message2 =
 	g_strdup_printf(_
-			("The validity of the key with user ID \"%s\" is \"%s\"."),
+			("The validity of the key with user ID “%s” is “%s”."),
 			user_id->uid,
 			libbalsa_gpgme_validity_to_gchar_short(user_id->
 							       validity));

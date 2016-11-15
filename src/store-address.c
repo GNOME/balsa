@@ -243,7 +243,7 @@ store_address_from_entries(GtkWindow *window, StoreAddressInfo * info,
 
     if (info->current_address_book == NULL) {
         balsa_information(LIBBALSA_INFORMATION_WARNING,
-    		      _("No address book selected...."));
+    		      _("No address book selected…"));
         return FALSE;
     }
 

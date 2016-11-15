@@ -425,7 +425,7 @@ static void lbm_maildir_parse(LibBalsaMailboxMaildir * mdir,
 	    if (FLAGS_REALLY_DIFFER(msg_info->orig_flags, flags)) {
 #undef DEBUG /* #define DEBUG TRUE */
 #ifdef DEBUG
-		g_message("Message flags for \"%s\" changed\n",
+		g_message("Message flags for “%s” changed\n",
                           msg_info->key);
 #endif
 		msg_info->orig_flags = flags;
@@ -707,7 +707,7 @@ maildir_sync_add(struct message_info *msg_info, const gchar * path)
     if (strcmp(orig, new)) {
         while (g_file_test(new, G_FILE_TEST_EXISTS)) {
 #ifdef DEBUG
-	    g_message("File \"%s\" exists, requesting new key.\n", new);
+	    g_message("File “%s” exists, requesting new key.\n", new);
 #endif
             g_free(msg_info->key);
             msg_info->key = lbm_mdir_get_key();
@@ -722,7 +722,7 @@ maildir_sync_add(struct message_info *msg_info, const gchar * path)
 	    msg_info->subdir = subdir;
 	else {
 #ifdef DEBUG
-            g_message("Rename \"%s\" \"%s\": %s\n", orig, new,
+            g_message("Rename “%s” “%s”: %s\n", orig, new,
                       g_strerror(errno));
 #endif
 	    retval = FALSE;

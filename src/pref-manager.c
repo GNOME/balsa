@@ -1980,7 +1980,7 @@ broken_8bit_codeset_group(GtkWidget * page)
 
     pui->convert_unknown_8bit[0] =
 	GTK_RADIO_BUTTON(gtk_radio_button_new_with_label(radio_group,
-							 _("display as \"?\"")));
+							 _("display as “?”")));
     gtk_grid_attach(grid, GTK_WIDGET(pui->convert_unknown_8bit[0]),
                     0, 0, 2, 1);
     radio_group =
@@ -2031,7 +2031,7 @@ mdn_group(GtkWidget * page)
 
     label = gtk_label_new(_("The message header looks clean "
                             "(the notify-to address is the return path, "
-                            "and I am in the \"To:\" or \"Cc:\" list)."));
+                            "and I am in the “To:” or “Cc:” list)."));
     gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
     gtk_label_set_max_width_chars(GTK_LABEL(label), BALSA_MAX_WIDTH_CHARS);
     set_align(label, 0.0, 0.5);
@@ -2669,7 +2669,7 @@ deleting_messages_group(GtkWidget * page)
     pm_group_add(group, hbox, FALSE);
 
     pui->expunge_auto =
-	gtk_check_button_new_with_label(_("...and if unused more than"));
+	gtk_check_button_new_with_label(_("…and if unused more than"));
     gtk_box_pack_start(GTK_BOX(hbox), pui->expunge_auto,
                        FALSE, FALSE, 0);
     pm_page_add_to_size_group(page, pui->expunge_auto);
@@ -3184,15 +3184,15 @@ server_add_menu_widget(void)
     GtkWidget *menuitem;
 
     menu = gtk_menu_new();
-    menuitem = gtk_menu_item_new_with_label(_("Remote POP3 mailbox..."));
+    menuitem = gtk_menu_item_new_with_label(_("Remote POP3 mailbox…"));
     g_signal_connect(G_OBJECT(menuitem), "activate",
                      G_CALLBACK(pop3_add_cb), NULL);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
-    menuitem = gtk_menu_item_new_with_label(_("Remote IMAP mailbox..."));
+    menuitem = gtk_menu_item_new_with_label(_("Remote IMAP mailbox…"));
     g_signal_connect(G_OBJECT(menuitem), "activate",
 		     G_CALLBACK(mailbox_conf_add_imap_cb), NULL);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
-    menuitem = gtk_menu_item_new_with_label(_("Remote IMAP folder..."));
+    menuitem = gtk_menu_item_new_with_label(_("Remote IMAP folder…"));
     g_signal_connect(G_OBJECT(menuitem), "activate",
 		     G_CALLBACK(folder_conf_add_imap_cb), NULL);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);

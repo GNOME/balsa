@@ -1,3 +1,89 @@
+2016-11-15  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Use Unicode characters for double quotation marks and ellipses.
+
+	* libbalsa/address-book-gpe.c (libbalsa_address_book_gpe_open_db),
+	(libbalsa_address_book_gpe_load):
+	* libbalsa/address-book-ldap.c (libbalsa_address_book_ldap_load),
+	(libbalsa_address_book_ldap_add_address),
+	(libbalsa_address_book_ldap_remove_address),
+	(libbalsa_address_book_ldap_modify_address):
+	* libbalsa/address-book-text.c (lbab_text_open_temp),
+	(lbab_text_close_temp),
+	(libbalsa_address_book_text_modify_address):
+	* libbalsa/application-helpers.c (libbalsa_window_add_accelerator):
+	* libbalsa/files.c (balsa_file_finder):
+	* libbalsa/html.c (lbh_navigation_policy_decision_requested_cb):
+	* libbalsa/libbalsa-conf.c (lbc_readfile), (lbc_init), (lbc_sync):
+	* libbalsa/libbalsa-gpgme-cb.c (lb_gpgme_accept_low_trust_key):
+	* libbalsa/libbalsa-gpgme.c (get_key_from_name):
+	* libbalsa/mailbox.c (get_from_field),
+	(libbalsa_mailbox_new_from_config), (mbox_model_get_value):
+	* libbalsa/mailbox_imap.c (libbalsa_mailbox_imap_load_config),
+	(imap_cache_manager_new_from_file):
+	* libbalsa/mailbox_local.c (lbm_local_save_tree),
+	(lbml_subject_gather), (lbm_local_sync_real):
+	* libbalsa/mailbox_maildir.c (lbm_maildir_parse),
+	(maildir_sync_add):
+	* libbalsa/mailbox_mbox.c (lbm_mbox_check_files),
+	(lbm_mbox_stream_seek_to_message), (lbm_mbox_save),
+	(libbalsa_mailbox_mbox_sync):
+	* libbalsa/mailbox_mh.c (libbalsa_mailbox_mh_sync):
+	* libbalsa/message.c (lbmsg_set_header):
+	* libbalsa/misc.c (libbalsa_lock_file):
+	* libbalsa/send.c (ensure_send_progress_dialog):
+	* libbalsa/source-viewer.c (lsv_show_message):
+	* libinit_balsa/assistant_helper.c
+	(balsa_init_create_to_directory):
+	* libinit_balsa/assistant_page_directory.c (unconditional_mailbox),
+	(verify_mailbox_entry):
+	* src/balsa-app.c (check_new_messages_auto_cb),
+	(open_mailbox_by_url):
+	* src/balsa-index.c (bndx_popup_menu_create),
+	(balsa_index_transfer), (pipe_out_watch):
+	* src/balsa-mblist.c (bmbl_mru_menu), (bmbl_mru_combo_box_setup):
+	* src/balsa-message.c (tree_mult_selection_popup),
+	(balsa_message_set), (mpart_content_name), (display_part),
+	(part_create_menu), (create_mdn_reply), (libbalsa_msg_try_decrypt),
+	(libbalsa_msg_try_mp_signed), (libbalsa_msg_part_2440):
+	* src/balsa-mime-widget-message.c (bm_header_extend_popup):
+	* src/balsa-mime-widget-text.c (text_view_url_popup),
+	(text_view_populate_popup), (handle_url),
+	(bmwt_populate_popup_menu), (check_text_encoding):
+	* src/balsa-mime-widget-vcalendar.c
+	(balsa_mime_widget_new_vcalendar):
+	* src/filter-edit-callbacks.c (fe_apply_pressed):
+	* src/filter-edit-dialog.c (build_action_page),
+	(filters_edit_dialog):
+	* src/filter-run-callbacks.c (fr_apply_selected_pressed),
+	(fr_apply_now_pressed), (fr_add_pressed_func):
+	* src/folder-conf.c (folder_conf_imap_sub_node),
+	(folder_conf_delete):
+	* src/mailbox-conf.c (mailbox_conf_delete):
+	* src/mailbox-node.c (check_local_path), (imap_dir_cb),
+	(bmbn_scan_children_idle), (balsa_mailbox_node_get_context_menu),
+	(add_local_mailbox), (handle_imap_path), (check_imap_path),
+	(mark_imap_path):
+	* src/main-window.c (bw_get_action), (quit_activated),
+	(header_change_state), (threading_change_state),
+	(ensure_check_mail_dialog):
+	* src/main.c (check_special_mailboxes), (periodic_expunge_cb):
+	* src/message-window.c (mw_set_enabled), (mw_set_active),
+	(mw_header_change_state):
+	* src/pref-manager.c (broken_8bit_codeset_group), (mdn_group),
+	(deleting_messages_group), (server_add_menu_widget):
+	* src/save-restore.c (config_global_load), (config_defclient_save):
+	* src/sendmsg-window.c (sw_set_charset), (add_attachment),
+	(add_urlref_attachment), (tree_add_quote_body), (scan_bodies),
+	(append_parts), (sendmsg_window_set_field),
+	(sw_gpg_mode_change_state):
+	* src/spell-check.c (check_word):
+	* src/store-address.c (store_address_from_entries):
+	* src/toolbar-factory.c (balsa_toolbar_model_insert_icon),
+	(tm_do_popup_menu):
+	* src/toolbar-prefs.c (create_toolbar_page),
+	(tp_page_refresh_available):
+
 2016-11-09  Albrecht Dreß
 
 	Support for Osmo address book

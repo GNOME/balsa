@@ -903,7 +903,7 @@ libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox, gboolean expunge)
         if (sequences_fd >= 0)
             libbalsa_unlock_file(sequences_filename, sequences_fd, 1);
 #ifdef DEBUG
-        g_print("MH sync \"%s\": cannot open temp file.\n", path);
+        g_print("MH sync “%s”: cannot open temp file.\n", path);
 #endif
 	return retval;
     }
@@ -951,7 +951,7 @@ libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox, gboolean expunge)
         if (sequences_fd >= 0)
             libbalsa_unlock_file(sequences_filename, sequences_fd, 1);
 #ifdef DEBUG
-        g_print("MH sync \"%s\": error finishing sequences line.\n", path);
+        g_print("MH sync “%s”: error finishing sequences line.\n", path);
 #endif
 	return retval;
     }
@@ -966,7 +966,7 @@ libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox, gboolean expunge)
     retval = (libbalsa_safe_rename(tmp, sequences_filename) != -1);
 #ifdef DEBUG
     if (!retval)
-        g_print("MH sync \"%s\": error renaming sequences file.\n", path);
+        g_print("MH sync “%s”: error renaming sequences file.\n", path);
 #endif
     if (!retval)
 	unlink (tmp);

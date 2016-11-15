@@ -242,7 +242,7 @@ libbalsa_window_add_accelerator(GtkApplicationWindow * window,
 
     gtk_accelerator_parse(accel, &accel_key, &accel_mods);
     if (!accel_key) {
-        g_print("%s: could not parse accelerator \"%s\"\n", __func__,
+        g_print("%s: could not parse accelerator “%s”\n", __func__,
                 accel);
         return;
     }
@@ -251,7 +251,7 @@ libbalsa_window_add_accelerator(GtkApplicationWindow * window,
     basename = basename ? basename + 1 : action_name;
     action = g_action_map_lookup_action(action_map, basename);
     if (!action) {
-        g_print("%s: could not lookup action \"%s\"\n", __func__,
+        g_print("%s: could not lookup action “%s”\n", __func__,
                 action_name);
         return;
     }

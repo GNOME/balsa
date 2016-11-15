@@ -402,7 +402,7 @@ balsa_toolbar_model_insert_icon(BalsaToolbarModel * model, gchar * icon,
         else
             g_array_append_val(model->current, entry);
     } else
-        g_warning(_("Unknown toolbar icon \"%s\""), icon);
+        g_warning(_("Unknown toolbar icon “%s”"), icon);
 }
 
 /* Remove all icons from the BalsaToolbarModel.
@@ -783,7 +783,7 @@ tm_do_popup_menu(GtkWidget * toolbar, GdkEventButton * event,
         gtk_menu_shell_append(GTK_MENU_SHELL(menu),
                               gtk_separator_menu_item_new());
         item =
-            gtk_menu_item_new_with_mnemonic(_("_Customize Toolbars..."));
+            gtk_menu_item_new_with_mnemonic(_("_Customize Toolbars…"));
         g_signal_connect(item, "activate", G_CALLBACK(customize_dialog_cb),
                          gtk_widget_get_toplevel(toolbar));
         gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);

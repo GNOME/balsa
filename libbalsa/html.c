@@ -1023,7 +1023,7 @@ lbh_navigation_policy_decision_requested_cb(WebKitWebView             * web_view
     else if (web_view == info->web_view
              && frame != info->frame
              && reason == WEBKIT_WEB_NAVIGATION_REASON_OTHER) {
-        g_message("%s new frame ignored:\n URI=\"%s\"", __func__, 
+        g_message("%s new frame ignored:\n URI=“%s”", __func__, 
                   webkit_network_request_get_uri(request));
         webkit_web_policy_decision_ignore(decision);
         return TRUE;

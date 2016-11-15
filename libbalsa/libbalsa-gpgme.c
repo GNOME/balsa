@@ -753,7 +753,7 @@ get_key_from_name(gpgme_ctx_t ctx, const gchar * name, gboolean secret,
     if ((err =
 	 gpgme_op_keylist_start(ctx, name, secret)) != GPG_ERR_NO_ERROR) {
 	gchar *msg =
-	    g_strdup_printf(_("could not list keys for \"%s\""), name);
+	    g_strdup_printf(_("could not list keys for “%s”"), name);
 
 	g_set_error_from_gpgme(error, err, msg);
 	g_free(msg);
@@ -771,7 +771,7 @@ get_key_from_name(gpgme_ctx_t ctx, const gchar * name, gboolean secret,
 
     if (gpg_err_code(err) != GPG_ERR_EOF) {
 	gchar *msg =
-	    g_strdup_printf(_("could not list keys for \"%s\""), name);
+	    g_strdup_printf(_("could not list keys for “%s”"), name);
 
 	g_set_error_from_gpgme(error, err, msg);
 	g_free(msg);

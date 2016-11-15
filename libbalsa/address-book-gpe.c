@@ -200,7 +200,7 @@ libbalsa_address_book_gpe_open_db(LibBalsaAddressBookGpe * ab)
     g_free(dir);
 
     if (sqlite3_open(name, &ab->db) != SQLITE_OK) {
-        printf("Cannot open \"%s\": %s\n", name, sqlite3_errmsg(ab->db));
+        printf("Cannot open “%s”: %s\n", name, sqlite3_errmsg(ab->db));
         g_free(name);
         sqlite3_close(ab->db);
         ab->db = NULL;
@@ -359,7 +359,6 @@ libbalsa_address_book_gpe_load(LibBalsaAddressBook * ab,
     gc.gpe      = gpe_ab;
     /* FIXME: error reporting */
 #ifdef HAVE_SQLITE3
-{
     if (filter && *filter) {
         gchar *sql =
             sqlite3_mprintf("select distinct urn from contacts where "
@@ -377,7 +376,6 @@ libbalsa_address_book_gpe_load(LibBalsaAddressBook * ab,
                          "select distinct urn from contacts_urn",
                          gpe_read_address, &gc, &err);
     }
-}
 #else                           /* HAVE_SQLITE3 */
     if(filter && *filter) {
         r = sqlite_exec_printf

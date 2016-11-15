@@ -974,7 +974,7 @@ check_word(BalsaSpellCheck * spell_check)
 
 	if (balsa_app.debug)
 	    balsa_information(LIBBALSA_INFORMATION_DEBUG,
-			      " ...incorrect.\n");
+			      " …incorrect.\n");
 
 	spell_check->suggestions =
 	    enchant_dict_suggest(spell_check->dict, word, -1, &n_suggs);
@@ -982,7 +982,7 @@ check_word(BalsaSpellCheck * spell_check)
     } else {
 	if (balsa_app.debug)
 	    balsa_information(LIBBALSA_INFORMATION_DEBUG,
-			      " ...correct.\n");
+			      " …correct.\n");
     }
 
     g_free(word);

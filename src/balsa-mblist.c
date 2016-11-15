@@ -1772,7 +1772,7 @@ bmbl_mru_menu(GtkWindow * window, GList ** url_list,
     mru = bmbl_mru_new(url_list, user_func, user_data, NULL);
     mru->window = window;
     mru->setup_cb = setup_cb;
-    item = gtk_menu_item_new_with_mnemonic(_("_Other..."));
+    item = gtk_menu_item_new_with_mnemonic(_("_Other…"));
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
     g_signal_connect_data(item, "activate",
                           G_CALLBACK(bmbl_mru_show_tree), mru,
@@ -2076,7 +2076,7 @@ bmbl_mru_combo_box_setup(GtkComboBox * combo_box)
     gtk_list_store_set(store, &iter, 1, TRUE, -1);
     gtk_list_store_append(store, &iter);
     gtk_list_store_set(store, &iter,
-                       0, _("Other..."),
+                       0, _("Other…"),
 		       1, FALSE, -1);
     gtk_combo_box_set_active(combo_box, 0);
 }

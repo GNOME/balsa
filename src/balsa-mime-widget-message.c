@@ -430,7 +430,7 @@ bm_header_extend_popup(GtkWidget * widget, GtkMenu * menu, gpointer arg)
 
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), separator);
     gtk_widget_show(separator);
-    menu_item = gtk_menu_item_new_with_label(_("Reply..."));
+    menu_item = gtk_menu_item_new_with_label(_("Reply…"));
     g_signal_connect(G_OBJECT(menu_item), "activate",
                      G_CALLBACK(bm_header_ctx_menu_reply),
                      arg);
@@ -438,7 +438,7 @@ bm_header_extend_popup(GtkWidget * widget, GtkMenu * menu, gpointer arg)
     gtk_widget_show(menu_item);
 
 
-    menu_item = gtk_menu_item_new_with_mnemonic(_("_Copy to folder..."));
+    menu_item = gtk_menu_item_new_with_mnemonic(_("_Copy to folder…"));
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
     gtk_widget_show(menu_item);
 

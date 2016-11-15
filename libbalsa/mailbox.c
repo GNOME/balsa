@@ -332,7 +332,7 @@ get_from_field(LibBalsaMessage *message)
 
     if (name_str == NULL)
         name_str = "";
-    from = append_dots ? g_strconcat(name_str, ",...", NULL)
+    from = append_dots ? g_strconcat(name_str, ",…", NULL)
                        : g_strdup(name_str);
     libbalsa_utf8_sanitize(&from, TRUE, NULL);
 
@@ -525,7 +525,7 @@ libbalsa_mailbox_new_from_config(const gchar * group)
             libbalsa_conf_set_string("Type", g_type_name(type));
         else
             libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-                                 _("Bad local mailbox path \"%s\""), path);
+                                 _("Bad local mailbox path “%s”"), path);
     }
     mailbox = (type != G_TYPE_OBJECT ? g_object_new(type, NULL) : NULL);
     if (mailbox == NULL)
@@ -2988,7 +2988,7 @@ mbox_model_get_value(GtkTreeModel *tree_model,
             else
                 g_value_set_static_string(value, _("from unknown"));
         } else
-            g_value_set_static_string(value, _("Loading..."));
+            g_value_set_static_string(value, _("Loading…"));
         break;
     case LB_MBOX_SUBJECT_COL:
         if(msg) g_value_set_string(value, msg->subject);

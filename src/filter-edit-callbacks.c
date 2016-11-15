@@ -1830,7 +1830,7 @@ fe_apply_pressed(GtkWidget * widget, gpointer data)
     } 
     if(!unique_filter_name(temp)) {
         balsa_information(LIBBALSA_INFORMATION_ERROR,
-                          _("Filter \"%s\" already exists."), temp);
+                          _("Filter “%s” already exists."), temp);
         return;
     }
     

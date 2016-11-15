@@ -1808,19 +1808,19 @@ bndx_popup_menu_create(BalsaIndex * index)
         GCallback func;
     } entries[] = {
         {
-        BALSA_PIXMAP_REPLY, N_("_Reply..."),
+        BALSA_PIXMAP_REPLY, N_("_Reply…"),
                 G_CALLBACK(balsa_message_reply)}, {
-        BALSA_PIXMAP_REPLY_ALL, N_("Reply To _All..."),
+        BALSA_PIXMAP_REPLY_ALL, N_("Reply To _All…"),
                 G_CALLBACK(balsa_message_replytoall)}, {
-        BALSA_PIXMAP_REPLY_GROUP, N_("Reply To _Group..."),
+        BALSA_PIXMAP_REPLY_GROUP, N_("Reply To _Group…"),
                 G_CALLBACK(balsa_message_replytogroup)}, {
-        BALSA_PIXMAP_FORWARD, N_("_Forward Attached..."),
+        BALSA_PIXMAP_FORWARD, N_("_Forward Attached…"),
                 G_CALLBACK(balsa_message_forward_attached)}, {
-        BALSA_PIXMAP_FORWARD, N_("Forward _Inline..."),
+        BALSA_PIXMAP_FORWARD, N_("Forward _Inline…"),
                 G_CALLBACK(balsa_message_forward_inline)}, {
-        NULL,                 N_("_Pipe through..."),
+        NULL,                 N_("_Pipe through…"),
                 G_CALLBACK(balsa_index_pipe)}, {
-        BALSA_PIXMAP_BOOK_RED, N_("_Store Address..."),
+        BALSA_PIXMAP_BOOK_RED, N_("_Store Address…"),
                 G_CALLBACK(bndx_store_address)}};
     GtkWidget *menu, *menuitem, *submenu;
     unsigned i;
@@ -2113,8 +2113,8 @@ balsa_index_transfer(BalsaIndex *index, GArray * msgnos,
     if (!success) {
 	balsa_information
             (LIBBALSA_INFORMATION_WARNING,
-             ngettext("Failed to copy %d message to mailbox \"%s\": %s",
-                      "Failed to copy %d messages to mailbox \"%s\": %s",
+             ngettext("Failed to copy %d message to mailbox “%s”: %s",
+                      "Failed to copy %d messages to mailbox “%s”: %s",
                       msgnos->len),
              msgnos->len, to_mailbox->name, e ? e->message : "?");
 	return;
@@ -2125,8 +2125,8 @@ balsa_index_transfer(BalsaIndex *index, GArray * msgnos,
     else if (to_mailbox == balsa_app.trash)
         enable_empty_trash(balsa_app.main_window, TRASH_FULL);
     balsa_information(LIBBALSA_INFORMATION_MESSAGE,
-                      copy ? _("Copied to \"%s\".")
-                      : _("Moved to \"%s\"."), to_mailbox->name);
+                      copy ? _("Copied to “%s”.")
+                      : _("Moved to “%s”."), to_mailbox->name);
     if (!copy)
 	/* Note when message was flagged as deleted, for use in
 	 * auto-expunge. */
@@ -2411,7 +2411,7 @@ pipe_out_watch(GIOChannel *channel, GIOCondition condition, gpointer data)
 
     if ( (condition & G_IO_ERR) == G_IO_ERR) {
 	fprintf(stderr,
-		"pipe_out_watch encountered error...\n");
+		"pipe_out_watch encountered error…\n");
 	pipe_data_destroy(pipe);
 	return FALSE;
     }

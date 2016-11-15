@@ -234,7 +234,7 @@ fr_apply_selected_pressed(BalsaFilterRunDialog * p)
                                    _("Error when applying filters"));
     else
         balsa_information(LIBBALSA_INFORMATION_MESSAGE,
-                          _("Filter applied to \"%s\"."),
+                          _("Filter applied to “%s”."),
                           p->mbox->name);
 
     g_slist_free(p->filters);
@@ -256,7 +256,7 @@ fr_apply_now_pressed(BalsaFilterRunDialog* p)
                                    _("Error when applying filters"));
     else
         balsa_information(LIBBALSA_INFORMATION_MESSAGE,
-                          _("Filter applied to \"%s\"."),
+                          _("Filter applied to “%s”."),
                           p->mbox->name);
 }
 
@@ -296,15 +296,15 @@ fr_add_pressed_func(GtkTreeModel * model, GtkTreePath * path,
     } else
         balsa_information(LIBBALSA_INFORMATION_ERROR,
                           _("The destination mailbox of "
-                            "the filter \"%s\" is \"%s\".\n"
+                            "the filter “%s” is “%s”.\n"
                             "You can't associate it with the same "
                             "mailbox (that causes recursion)."),
                           fil->name, p->mbox->name);
 
     if (!libbalsa_mailbox_can_match(p->mbox, fil->condition))
 	balsa_information(LIBBALSA_INFORMATION_WARNING,
-			  _("The filter \"%s\" is not compatible with "
-			    "the mailbox type of \"%s\".\n"
+			  _("The filter “%s” is not compatible with "
+			    "the mailbox type of “%s”.\n"
 			    "This happens for example when you use"
 			    " regular expressions match with IMAP mailboxes,"
 			    " it is done by a very slow method; if possible, use substring match"

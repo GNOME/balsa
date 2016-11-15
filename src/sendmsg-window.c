@@ -1624,7 +1624,7 @@ sw_set_charset(BalsaSendmsg * bsmsg, const gchar * filename,
             balsa_information_parented(GTK_WINDOW(bsmsg->window),
                                        LIBBALSA_INFORMATION_WARNING,
                                        _("Character set for file %s changed "
-                                         "from \"%s\" to \"%s\"."), filename,
+                                         "from “%s” to “%s”."), filename,
                                        info->std, info->win);
         }
     }
@@ -1757,7 +1757,7 @@ add_attachment(BalsaSendmsg * bsmsg, const gchar *filename,
             gchar *tmp =
                 internet_address_list_to_string(attach_data->headers->from,
                                                 FALSE);
-	    utf8name = g_strdup_printf(_("Message from %s, subject: \"%s\""),
+	    utf8name = g_strdup_printf(_("Message from %s, subject: “%s”"),
 				       tmp,
 				       attach_data->headers->subject);
 	    g_free(tmp);
@@ -1920,7 +1920,7 @@ add_urlref_attachment(BalsaSendmsg * bsmsg, gchar *url)
     gtk_menu_shell_append(GTK_MENU_SHELL(attach_data->popup_menu),
 			  gtk_separator_menu_item_new());
     menu_item =
-	gtk_menu_item_new_with_label(_("Open..."));
+	gtk_menu_item_new_with_label(_("Open…"));
     g_signal_connect(G_OBJECT (menu_item), "activate",
 		     G_CALLBACK(on_open_url_cb),
 		     (gpointer)attach_data);
@@ -3077,10 +3077,10 @@ tree_add_quote_body(LibBalsaMessageBody * body, GtkTreeStore * store, GtkTreeIte
 	!g_ascii_strcasecmp(disp_type, "inline");
     if (body->filename && *body->filename) {
         if (preselect)
-            description = g_strdup_printf(_("inlined file \"%s\" (%s)"),
+            description = g_strdup_printf(_("inlined file “%s” (%s)"),
                                           body->filename, mime_type);
         else
-            description = g_strdup_printf(_("attached file \"%s\" (%s)"),
+            description = g_strdup_printf(_("attached file “%s” (%s)"),
                                           body->filename, mime_type);
     } else {
         if (preselect)
@@ -3154,7 +3154,7 @@ scan_bodies(GtkTreeStore * bodies, GtkTreeIter * parent, LibBalsaMessageBody * b
 		    libbalsa_utf8_sanitize(&from, balsa_app.convert_unknown_8bit, NULL);
 		    libbalsa_utf8_sanitize(&subj, balsa_app.convert_unknown_8bit, NULL);
 		    description =
-			g_strdup_printf(_("message from %s, subject \"%s\""),
+			g_strdup_printf(_("message from %s, subject “%s”"),
 					from, subj);
 		    g_free(from);
 		    g_free(subj);
@@ -3285,7 +3285,7 @@ append_parts(GString * q_body, LibBalsaMessage *message, GtkTreeModel * model,
 			used_from_msg = TRUE;
 		    } else if (q_body->len > 0) {
 			if (this_body->filename)
-			    g_string_append_printf(q_body, "\n------%s \"%s\"------\n",
+			    g_string_append_printf(q_body, "\n------%s “%s”------\n",
 						   _("quoted attachment"), this_body->filename);
 			else
 			    g_string_append_printf(q_body, "\n------%s------\n",
@@ -4552,7 +4552,7 @@ sendmsg_window_set_field(BalsaSendmsg * bsmsg, const gchar * key,
                  GTK_MESSAGE_INFO,
                  GTK_BUTTONS_OK,
                  _("The link that you selected created\n"
-                   "a \"Blind copy\" (Bcc) address.\n"
+                   "a “Blind copy” (Bcc) address.\n"
                    "Please check that the address\n"
                    "is appropriate."));
 #if HAVE_MACOSX_DESKTOP
@@ -6025,7 +6025,7 @@ sw_gpg_mode_change_state(GSimpleAction  * action,
     else if (strcmp(mode, "smime") == 0)
         rfc_flag = LIBBALSA_PROTECT_SMIMEV3;
     else {
-        g_print("%s unknown mode \"%s\"\n", __func__, mode);
+        g_print("%s unknown mode “%s”\n", __func__, mode);
         return;
     }
 

@@ -367,7 +367,7 @@ check_local_path(const gchar * path, guint depth)
                                 (LibBalsaConfForeachFunc) check_url_func,
                                 &cpi);
     if(balsa_app.debug) 
-	printf("check_local_path: path \"%s\" must_scan %d.\n",
+	printf("check_local_path: path “%s” must_scan %d.\n",
                cpi.url, cpi.must_scan);
     g_free(cpi.url);
 
@@ -494,7 +494,7 @@ imap_dir_cb(BalsaMailboxNode* mb)
 
     while(mroot->parent)
 	mroot = mroot->parent;
-    msg = g_strdup_printf(_("Scanning %s. Please wait..."), mroot->name);
+    msg = g_strdup_printf(_("Scanning %s. Please wait…"), mroot->name);
     gtk_statusbar_push(statusbar, context_id, msg);
     g_free(msg);
 
@@ -893,7 +893,7 @@ bmbn_scan_children_idle(BalsaMailboxNode ** mbnode)
                 mn->mailbox->has_unread_messages = has_unread_messages;
             mn->scanned = TRUE;
         } else if (balsa_app.debug)
-            g_print("%s: %s \"%s\" was already scanned\n", __func__,
+            g_print("%s: %s “%s” was already scanned\n", __func__,
                     mn->mailbox ? "mailbox" : "folder",
                     mn->mailbox ? mn->mailbox->name : mn->name);
         g_object_remove_weak_pointer(G_OBJECT(mn), & l->data);
@@ -1060,18 +1060,18 @@ balsa_mailbox_node_get_context_menu(BalsaMailboxNode * mbnode)
                      G_CALLBACK(gtk_widget_destroy), NULL);
 
     submenu = gtk_menu_new();
-    add_menu_entry(submenu, _("Local _mbox mailbox..."),  
+    add_menu_entry(submenu, _("Local _mbox mailbox…"),  
 		   G_CALLBACK(mailbox_conf_add_mbox_cb), NULL);
-    add_menu_entry(submenu, _("Local Mail_dir mailbox..."), 
+    add_menu_entry(submenu, _("Local Mail_dir mailbox…"), 
 		   G_CALLBACK(mailbox_conf_add_maildir_cb), NULL);
-    add_menu_entry(submenu, _("Local M_H mailbox..."),
+    add_menu_entry(submenu, _("Local M_H mailbox…"),
 		   G_CALLBACK(mailbox_conf_add_mh_cb), NULL);
-    add_menu_entry(submenu, _("Remote _IMAP mailbox..."), 
+    add_menu_entry(submenu, _("Remote _IMAP mailbox…"), 
 		   G_CALLBACK(mailbox_conf_add_imap_cb), NULL);
     add_menu_entry(submenu, NULL, NULL, mbnode);
-    add_menu_entry(submenu, _("Remote IMAP _folder..."), 
+    add_menu_entry(submenu, _("Remote IMAP _folder…"), 
 		   G_CALLBACK(folder_conf_add_imap_cb), NULL);
-    add_menu_entry(submenu, _("Remote IMAP _subfolder..."), 
+    add_menu_entry(submenu, _("Remote IMAP _subfolder…"), 
 		   G_CALLBACK(folder_conf_add_imap_sub_cb), NULL);
     gtk_widget_show(submenu);
     
@@ -1092,7 +1092,7 @@ balsa_mailbox_node_get_context_menu(BalsaMailboxNode * mbnode)
     if (g_signal_has_handler_pending(G_OBJECT(mbnode),
                                      balsa_mailbox_node_signals
                                      [SHOW_PROP_DIALOG], 0, FALSE))
-        add_menu_entry(menu, _("_Properties..."),
+        add_menu_entry(menu, _("_Properties…"),
                        G_CALLBACK(mb_conf_cb), mbnode);
 
     if (g_signal_has_handler_pending(G_OBJECT(mbnode),
@@ -1231,7 +1231,7 @@ add_local_mailbox(BalsaMailboxNode *root, const gchar * name,
 	} else {
 	    /* type is not a valid local mailbox type. */
 	    balsa_information(LIBBALSA_INFORMATION_DEBUG,
-			      _("The path \"%s\" does not lead to a mailbox."),
+			      _("The path “%s” does not lead to a mailbox."),
 			      path);
 	    mailbox = NULL;
 	}
@@ -1406,7 +1406,7 @@ handle_imap_path(const char *fn, char delim, int noselect, int noscan,
 	    return;
     }
     if (balsa_app.debug)
-	printf("handle_imap_path: Adding mailbox of path \"%s\" "
+	printf("handle_imap_path: Adding mailbox of path “%s” "
 	       "delim `%c' noselect %d noscan %d\n",
 	       fn, delim, noselect, noscan);
     add_imap_entry(fn, delim, noscan, !noselect, marked, data);
@@ -1436,7 +1436,7 @@ check_imap_path(const gchar *fn, LibBalsaServer * server, guint depth)
                                 (LibBalsaConfForeachFunc) check_url_func,
                                 &cpi);
     if(balsa_app.debug) 
-	printf("check_imap_path: path \"%s\" must_scan %d.\n",
+	printf("check_imap_path: path “%s” must_scan %d.\n",
                cpi.url, cpi.must_scan);
     g_free(cpi.url);
 
@@ -1454,7 +1454,7 @@ mark_imap_path(const gchar * fn, gpointer data)
     GSList *list;
 
     if(balsa_app.debug) 
-	printf("mark_imap_path: find path \"%s\".\n", fn);
+	printf("mark_imap_path: find path “%s”.\n", fn);
     for (list = tree->list; list; list = list->next) {
         imap_scan_item *item = list->data;
         if (!strcmp(item->fn, fn)) {

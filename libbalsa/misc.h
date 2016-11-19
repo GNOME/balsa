@@ -167,5 +167,6 @@ gchar *libbalsa_size_to_gchar(guint64 length);
 
 gchar * libbalsa_text_to_html(const gchar * title, const gchar * body, const gchar * lang);
 GString * libbalsa_html_encode_hyperlinks(GString * paragraph);
+gchar *libbalsa_font_string_to_css(const gchar * font_string, const gchar * name);
 
 #endif				/* __LIBBALSA_MISC_H__ */

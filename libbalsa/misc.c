@@ -1355,3 +1355,102 @@ libbalsa_size_to_gchar(guint64 size)
 
     return g_strdup_printf("%" G_GUINT64_FORMAT, size);
 }
+
+gchar *
+libbalsa_font_string_to_css(const gchar * font_string,
+                            const gchar * name)
+{
+    PangoFontDescription *desc;
+    guint mask;
+    GString *string;
+
+    g_return_val_if_fail(font_string != NULL, NULL);
+    g_return_val_if_fail(name != NULL, NULL);
+
+    desc = pango_font_description_from_string(font_string);
+    mask = pango_font_description_get_set_fields(desc);
+
+    string = g_string_new(NULL);
+    g_string_printf(string, "#%s {\n", name);
+
+    if (mask & PANGO_FONT_MASK_FAMILY) {
+        g_string_append_printf(string, "font-family: \"%s\";\n",
+                               pango_font_description_get_family(desc));
+    }
+    if (mask & PANGO_FONT_MASK_STYLE) {
+        const gchar *style = NULL;
+
+        switch (pango_font_description_get_style(desc)) {
+        case PANGO_STYLE_OBLIQUE:
+            style = "oblique";
+            break;
+        case PANGO_STYLE_ITALIC:
+            style = "italic";
+            break;
+        default:
+            break;
+        }
+        if (style != NULL)
+            g_string_append_printf(string, "font-style: %s;\n", style);
+    }
+    if (mask & PANGO_FONT_MASK_VARIANT) {
+        if (pango_font_description_get_variant(desc) ==
+            PANGO_VARIANT_SMALL_CAPS)
+            g_string_append(string, "font-variant: small-caps;\n");
+    }
+    if (mask & PANGO_FONT_MASK_WEIGHT) {
+        PangoWeight weight;
+
+        weight = pango_font_description_get_weight(desc);
+        if (weight != PANGO_WEIGHT_NORMAL)
+            g_string_append_printf(string, " font-weight: %d;\n", weight);
+    }
+    if (mask & PANGO_FONT_MASK_STRETCH) {
+        const gchar *stretch = NULL;
+
+        switch (pango_font_description_get_stretch(desc)) {
+        case PANGO_STRETCH_ULTRA_CONDENSED:
+            stretch = "ultra-condensed";
+            break;
+        case PANGO_STRETCH_EXTRA_CONDENSED:
+            stretch = "extra-condensed";
+            break;
+        case PANGO_STRETCH_CONDENSED:
+            stretch = "condensed";
+            break;
+        case PANGO_STRETCH_SEMI_CONDENSED:
+            stretch = "semi-condensed";
+            break;
+        case PANGO_STRETCH_SEMI_EXPANDED:
+            stretch = "semi-expanded";
+            break;
+        case PANGO_STRETCH_EXPANDED:
+            stretch = "expanded";
+            break;
+        case PANGO_STRETCH_EXTRA_EXPANDED:
+            stretch = "extra-expanded";
+            break;
+        case PANGO_STRETCH_ULTRA_EXPANDED:
+            stretch = "ultra-expanded";
+            break;
+        default:
+            break;
+        }
+        if (stretch != NULL)
+            g_string_append_printf(string, "font-stretch: %s;\n", stretch);
+    }
+    if (mask & PANGO_FONT_MASK_SIZE) {
+        gint size;
+
+        size = pango_font_description_get_size(desc);
+        if (!pango_font_description_get_size_is_absolute(desc))
+            size *= gdk_screen_get_resolution(gdk_screen_get_default()) / 72;
+        size = PANGO_PIXELS(size);
+        g_string_append_printf(string, "font-size: %dpx;\n", size);
+    }
+    g_string_append_c(string, '}');
+
+    pango_font_description_free(desc);
+
+    return g_string_free(string, FALSE);
+}

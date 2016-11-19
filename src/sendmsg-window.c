@@ -2298,9 +2298,8 @@ create_email_or_string_entry(BalsaSendmsg * bsmsg,
         GtkCssProvider *css_provider;
 
         gtk_widget_set_name(arr[1], BALSA_COMPOSE_ENTRY);
-        css =
-            g_strconcat("#" BALSA_COMPOSE_ENTRY " {font:",
-                        balsa_app.message_font, "}", NULL);
+        css = libbalsa_font_string_to_css(balsa_app.message_font,
+                                          BALSA_COMPOSE_ENTRY);
 
         css_provider = gtk_css_provider_new();
         gtk_css_provider_load_from_data(css_provider, css, -1, NULL);
@@ -2870,9 +2869,8 @@ create_text_area(BalsaSendmsg * bsmsg)
         gchar *css;
         GtkCssProvider *css_provider;
 
-        css =
-            g_strconcat("#" BALSA_COMPOSE_ENTRY " {font:",
-                        balsa_app.message_font, "}", NULL);
+        css = libbalsa_font_string_to_css(balsa_app.message_font,
+                                          BALSA_COMPOSE_ENTRY);
 
         css_provider = gtk_css_provider_new();
         gtk_css_provider_load_from_data(css_provider, css, -1, NULL);

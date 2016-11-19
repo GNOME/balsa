@@ -309,7 +309,7 @@ bm_modify_font_from_string(GtkWidget * widget, const char *font)
     GtkCssProvider *css_provider;
 
     gtk_widget_set_name(widget, BALSA_MESSAGE_TEXT_HEADER);
-    css = g_strconcat("#" BALSA_MESSAGE_TEXT_HEADER " {font:", font, "}", NULL);
+    css = libbalsa_font_string_to_css(font, BALSA_MESSAGE_TEXT_HEADER);
 
     css_provider = gtk_css_provider_new();
     gtk_css_provider_load_from_data(css_provider, css, -1, NULL);

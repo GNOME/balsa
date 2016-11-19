@@ -1,3 +1,18 @@
+2016-11-19  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Silence some whining about "Using Pango syntax for the font:
+	style property is deprecated; please use CSS syntax".
+
+	* libbalsa/misc.c (libbalsa_font_string_to_css): new function.
+	* libbalsa/misc.h: export it.
+	* libbalsa/source-viewer.c (libbalsa_show_message_source): use
+	it.
+	* src/balsa-mime-widget-message.c (add_header_gchar): ditto.
+	* src/balsa-mime-widget-text.c (bm_modify_font_from_string):
+	ditto.
+	* src/sendmsg-window.c (create_email_or_string_entry),
+	(create_text_area): ditto.
+
 2016-11-15  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Use Unicode characters for double quotation marks and ellipses.

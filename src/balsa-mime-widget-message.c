@@ -571,11 +571,10 @@ add_header_gchar(GtkGrid * grid, const gchar * header, const gchar * label,
         else
             css = g_strdup("");
     } else {
-        css =
-            g_strconcat("#" BALSA_MESSAGE_HEADER " {font:",
-                        strcmp(header, "subject")
-                        ? balsa_app.message_font
-                        : balsa_app.subject_font, "}", NULL);
+        css = libbalsa_font_string_to_css(strcmp(header, "subject")
+                                          ? balsa_app.message_font
+                                          : balsa_app.subject_font,
+                                          BALSA_MESSAGE_HEADER);
     }
 
     css_provider = gtk_css_provider_new();

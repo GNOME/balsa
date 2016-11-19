@@ -209,7 +209,7 @@ libbalsa_show_message_source(GtkApplication  * application,
     text = gtk_text_view_new();
 
     gtk_widget_set_name(text, BALSA_SOURCE_VIEWER);
-    css = g_strconcat("#" BALSA_SOURCE_VIEWER " {font:", font, "}", NULL);
+    css = libbalsa_font_string_to_css(font, BALSA_SOURCE_VIEWER);
 
     css_provider = gtk_css_provider_new();
     gtk_css_provider_load_from_data(css_provider, css, -1, NULL);

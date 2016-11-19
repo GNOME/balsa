@@ -1,5 +1,9 @@
 2016-11-19  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	* libbalsa/misc.c: document libbalsa_font_string_to_css.
+
+2016-11-19  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Silence some whining about "Using Pango syntax for the font:
 	style property is deprecated; please use CSS syntax".
 

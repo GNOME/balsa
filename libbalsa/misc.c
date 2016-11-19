@@ -1356,6 +1356,17 @@ libbalsa_size_to_gchar(guint64 size)
     return g_strdup_printf("%" G_GUINT64_FORMAT, size);
 }
 
+/*
+ * libbalsa_font_string_to_css: construct CSS text corresponding to a
+ * PangoFontDescription string.
+ *
+ * font_string: the PangoFontDescription string;
+ * name:        the name of the widget to which the font is to be applied.
+ *
+ * Returns:     a newly allocated string with the CSS text;
+ *              g_free() when no longer needed.
+ */
+
 gchar *
 libbalsa_font_string_to_css(const gchar * font_string,
                             const gchar * name)

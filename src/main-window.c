@@ -4335,8 +4335,9 @@ static void
 bw_size_allocate_cb(GtkWidget * window, GtkAllocation * alloc)
 {
     if (!balsa_app.mw_maximized) {
-        balsa_app.mw_height = alloc->height;
-        balsa_app.mw_width  = alloc->width;
+        gtk_window_get_size(GTK_WINDOW(window),
+                            & balsa_app.mw_width,
+                            & balsa_app.mw_height);
     }
 }
 

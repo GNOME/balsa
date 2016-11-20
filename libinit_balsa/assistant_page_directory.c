@@ -81,7 +81,7 @@ unconditional_mailbox(const gchar * path, const gchar * prettyname,
         (*error) =
             g_strdup_printf(_
                             ("The pathname “%s” must be specified"
-                             " canonically -- it must start with a \'/\'."),
+                             " canonically — it must start with a “/”."),
                             dup);
         g_free(dup);
         return;

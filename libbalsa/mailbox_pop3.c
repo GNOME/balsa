@@ -541,7 +541,7 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
         if(m->msg_size_limit>0 && msg_size >= (unsigned)m->msg_size_limit) {
             libbalsa_information
                 (LIBBALSA_INFORMATION_WARNING,
-                 _("POP3 message %d oversized: %d kB - skipped."),
+                 _("POP3 message %d oversized: %d kB — skipped."),
                  i, msg_size);
             total_size -= msg_size;
             continue;

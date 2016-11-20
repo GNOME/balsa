@@ -39,7 +39,7 @@ void
 balsa_druid_page_finish(GtkAssistant * druid)
 {
     static const gchar bye[] =
-        N_("You've successfully set up Balsa. Have fun!\n"
+        N_("You’ve successfully set up Balsa. Have fun!\n"
            "   -- The Balsa development team");
     GtkWidget *page = gtk_label_new(_(bye));
 

@@ -353,7 +353,7 @@ libbalsa_identity_get_signature(LibBalsaIdentity* identity, GtkWindow *parent)
             fclose(fp);
         } else
             libbalsa_information_parented(parent, LIBBALSA_INFORMATION_ERROR,
-                                          _("Cannot open signature file '%s' "
+                                          _("Cannot open signature file “%s” "
                                             "for reading"),
                                           identity->signature_path);
     }

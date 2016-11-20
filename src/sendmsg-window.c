@@ -521,7 +521,7 @@ delete_handler(BalsaSendmsg * bsmsg)
                                GTK_DIALOG_DESTROY_WITH_PARENT,
                                GTK_MESSAGE_QUESTION,
                                GTK_BUTTONS_YES_NO,
-                               _("The message to '%s' is modified.\n"
+                               _("The message to “%s” is modified.\n"
                                  "Save message to Draftbox?"), tmp);
     g_free(free_me);
 #if HAVE_MACOSX_DESKTOP
@@ -1401,11 +1401,11 @@ change_attach_mode(GtkWidget * menu_item, BalsaAttachInfo *info)
 				   GTK_MESSAGE_QUESTION,
 				   GTK_BUTTONS_YES_NO,
 				   _("Saying yes will not send the file "
-				     "`%s' itself, but just a MIME "
+				     "“%s” itself, but just a MIME "
 				     "message/external-body reference.  "
 				     "Note that the recipient must "
 				     "have proper permissions to see the "
-				     "`real' file.\n\n"
+				     "“real” file.\n\n"
 				     "Do you really want to attach "
 				     "this file as reference?"),
 				   libbalsa_vfs_get_uri_utf8(info->file_uri));

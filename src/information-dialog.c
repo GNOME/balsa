@@ -228,7 +228,7 @@ balsa_information_list(GtkWindow *parent, LibBalsaInformationType type,
 	GtkWidget *scrolled_window;
 
 	information_dialog =
-	    gtk_dialog_new_with_buttons(_("Information - Balsa"), 
+	    gtk_dialog_new_with_buttons(_("Information — Balsa"), 
                                         parent,
                                         GTK_DIALOG_DESTROY_WITH_PARENT |
                                         libbalsa_dialog_flags(),

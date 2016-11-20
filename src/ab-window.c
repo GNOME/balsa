@@ -727,7 +727,7 @@ balsa_ab_window_load(BalsaAbWindow *ab)
 	    libbalsa_address_book_strerror(ab->current_address_book, err);
         balsa_information_parented(GTK_WINDOW(ab),
 				   LIBBALSA_INFORMATION_ERROR,
-				   _("Error opening address book '%s':\n%s"),
+				   _("Error opening address book “%s”:\n%s"),
 				   ab->current_address_book->name, desc);
     }
     balsa_ab_window_set_title(ab);

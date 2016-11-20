@@ -54,7 +54,7 @@ balsa_druid_page_user_init(BalsaDruidPageUser * user,
     static const char *header2 =
         N_("The following settings are also needed "
            "(and you can find them later, if need be, in the Email "
-           "application in the 'Preferences' and 'Identities' "
+           "application in the “Preferences” and “Identities” "
            "menu items)");
 #if 0
     static const char *header21 =

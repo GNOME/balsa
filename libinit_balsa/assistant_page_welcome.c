@@ -28,11 +28,11 @@ balsa_druid_page_welcome(GtkAssistant * druid)
     static const gchar text[] =
         N_
         ("Before you can send or receive email:\n\n"
-         "-- either you should already have Internet access and an "
+         "• either you should already have Internet access and an "
          "email account, provided by an Internet Service Provider, "
          "and you should have made that Internet connection on your "
          "computer\n\n"
-         "-- or your Network Administrator at your place of "
+         "• or your Network Administrator at your place of "
          "work/study/similar may have set up your computer to "
          "connect to the network.");
 

@@ -893,7 +893,7 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
                 rights_str = g_string_new(std_acls[mn->mailbox->readonly ? 1 : 3]);
                 rights_str =
                     g_string_append(rights_str,
-                                    _("\nthe server does not support ACL's"));
+                                    _("\nthe server does not support ACLs"));
             } else {
                 gint n;
                 gchar **acls;

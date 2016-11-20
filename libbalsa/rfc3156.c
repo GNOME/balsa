@@ -794,7 +794,7 @@ libbalsa_signature_info_to_gchar(GMimeGpgmeSigstat * info,
 
             uid = info->key->uids;
             if (uid->next) {
-        	msg = g_string_append(msg, _("\nUser ID's:"));
+        	msg = g_string_append(msg, _("\nUser IDs:"));
         	lead_text = "\n\342\200\242";
             } else {
         	msg = g_string_append(msg, _("\nUser ID:"));

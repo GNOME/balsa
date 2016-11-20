@@ -2584,7 +2584,7 @@ create_mdn_dialog(GtkWindow *parent, gchar * sender, gchar * mdn_to_address,
                                _("The sender of this mail, %s, "
                                  "requested \n"
                                  "a Message Disposition Notification"
-                                 "(MDN) to be returned to `%s'.\n"
+                                 "(MDN) to be returned to “%s”.\n"
                                  "Do you want to send "
                                  "this notification?"),
                                sender, mdn_to_address);
@@ -2846,7 +2846,7 @@ libbalsa_msg_try_decrypt(LibBalsaMessage * message, LibBalsaMessageBody * body,
 		    (chk_crypto->chk_mode == LB_MAILBOX_CHK_CRYPT_ALWAYS ?
 		     LIBBALSA_INFORMATION_ERROR : LIBBALSA_INFORMATION_MESSAGE,
                      _("The message sent by %s with subject “%s” contains "
-                       "an encrypted part, but it's structure is invalid."),
+                       "an encrypted part, but its structure is invalid."),
 		     chk_crypto->sender, chk_crypto->subject);
             } else if (encrres & LIBBALSA_PROTECT_RFC3156) {
                 if (!balsa_app.has_openpgp)

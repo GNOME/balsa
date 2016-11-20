@@ -243,7 +243,7 @@ g_mime_gpgme_mps_verify(GMimeMultipartSigned * mps, GError ** error)
     /* eject on unknown protocols */
     if (crypto_prot == GPGME_PROTOCOL_UNKNOWN) {
 	g_set_error(error, GPGME_ERROR_QUARK, GPG_ERR_INV_VALUE,
-		    _("unsupported protocol '%s'"), protocol);
+		    _("unsupported protocol “%s”"), protocol);
 	return NULL;
     }
 
@@ -452,7 +452,7 @@ g_mime_gpgme_mpe_decrypt(GMimeMultipartEncrypted * mpe,
 			      protocol) != 0) {
 	g_set_error(err, GMIME_ERROR, GMIME_ERROR_PROTOCOL_ERROR,
 		    _
-		    ("Cannot decrypt multipart/encrypted part: unsupported encryption protocol '%s'."),
+		    ("Cannot decrypt multipart/encrypted part: unsupported encryption protocol “%s”."),
 		    protocol ? protocol : _("(none)"));
 	return NULL;
     }

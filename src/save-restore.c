@@ -1101,7 +1101,7 @@ config_global_load(void)
         if (!libbalsa_conf_get_bool("GtkUIManager")) {
             g_idle_add((GSourceFunc) config_warning_idle,
                        _("This version of Balsa uses a new user interface; "
-                         "if you have changed Balsa's keyboard accelerators, "
+                         "if you have changed Balsa’s keyboard accelerators, "
                          "you will need to set them again."));
             libbalsa_conf_set_bool("GtkUIManager", TRUE);
         }

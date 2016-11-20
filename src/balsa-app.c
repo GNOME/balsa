@@ -526,7 +526,7 @@ open_mailbox_by_url(const gchar * url, gboolean hidden)
             libbalsa_mailbox_view_free(view);
         }
         balsa_information(LIBBALSA_INFORMATION_WARNING,
-                          _("Couldn't open mailbox “%s”"), url);
+                          _("Couldn’t open mailbox “%s”"), url);
     }
 }
 

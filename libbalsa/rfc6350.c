@@ -256,7 +256,7 @@ rfc6350_eval_line(gchar			  *line,
 	/* split into name and value */
 	value = strchr(line, ':');
 	if (value == NULL) {
-		g_set_error(error, RFC6350_ERROR_QUARK, RFC6350_ERROR_NO_COLON, _("malformed line '%s', missing ':'"), line);
+		g_set_error(error, RFC6350_ERROR_QUARK, RFC6350_ERROR_NO_COLON, _("malformed line “%s”, missing “:”"), line);
 		result = FALSE;
 	} else {
 		gchar *namepart;
@@ -267,7 +267,7 @@ rfc6350_eval_line(gchar			  *line,
 		name = rfc6350_get_name(namepart);
 		value = &value[1];
 		if ((name[0] == '\0') || (value[0] == '\0')) {
-			g_set_error(error, RFC6350_ERROR_QUARK, RFC6350_ERROR_EMPTY, _("malformed line '%s', empty name or value"), line);
+			g_set_error(error, RFC6350_ERROR_QUARK, RFC6350_ERROR_EMPTY, _("malformed line “%s”, empty name or value"), line);
 			result = FALSE;
 		} else {
 			g_debug("%s: line='%s' name='%s', value='%s'", __func__, line, name, value);

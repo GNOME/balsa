@@ -690,7 +690,7 @@ gpgme_new_with_protocol(gpgme_ctx_t * ctx, gpgme_protocol_t protocol,
     } else {
 	if ((err = gpgme_set_protocol(*ctx, protocol)) != GPG_ERR_NO_ERROR) {
 	    gchar *errmsg =
-		g_strdup_printf(_("could not set protocol '%s'"),
+		g_strdup_printf(_("could not set protocol “%s”"),
 				gpgme_get_protocol_name(protocol));
 
 	    g_set_error_from_gpgme(error, err, errmsg);

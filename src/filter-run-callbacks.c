@@ -297,7 +297,7 @@ fr_add_pressed_func(GtkTreeModel * model, GtkTreePath * path,
         balsa_information(LIBBALSA_INFORMATION_ERROR,
                           _("The destination mailbox of "
                             "the filter “%s” is “%s”.\n"
-                            "You can't associate it with the same "
+                            "You can’t associate it with the same "
                             "mailbox (that causes recursion)."),
                           fil->name, p->mbox->name);
 

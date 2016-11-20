@@ -1,5 +1,14 @@
 2016-11-20  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Disable accelerated compositing in webkit2, to avoid some gdk
+	warnings; see thread at
+	https://lists.webkit.org/pipermail/webkit-gtk/2016-November/002863.html
+
+	* src/main.c (main): set WEBKIT_DISABLE_COMPOSITING_MODE
+	environment variable.
+
+2016-11-20  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Save the main window state more carefully
 
 	* src/main-window.c (bw_window_state_event_cb): note when the

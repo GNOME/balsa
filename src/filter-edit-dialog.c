@@ -415,7 +415,7 @@ build_action_page(GtkWindow * window)
     g_signal_connect(G_OBJECT(dialog), "response",
                      G_CALLBACK(fe_sound_response), NULL);
 
-    fe_popup_button = gtk_check_button_new_with_label(_("Popup text:"));
+    fe_popup_button = gtk_check_button_new_with_label(_("Pop-up text:"));
     gtk_widget_set_hexpand(fe_popup_button, TRUE);
     gtk_grid_attach(GTK_GRID(grid), fe_popup_button, 0, 1, 1, 1);
     fe_popup_entry = gtk_entry_new();

@@ -1,6 +1,6 @@
 [Desktop Entry]
 _Name=Balsa
-_Comment=E-Mail utility
+_Comment=Email utility
 _GenericName=Mail Client
 _X-GNOME-FullName=Balsa Mail Client
 TryExec=balsa

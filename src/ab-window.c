@@ -189,7 +189,7 @@ balsa_ab_window_list(BalsaAbWindow * ab, GCallback row_activated_cb)
 
     renderer = gtk_cell_renderer_text_new();
     column =
-        gtk_tree_view_column_new_with_attributes(_("E-Mail Address"),
+        gtk_tree_view_column_new_with_attributes(_("Email Address"),
                                                  renderer,
                                                  "text",
                                                  LIST_COLUMN_ADDRESS_STRING,
@@ -329,7 +329,7 @@ balsa_ab_window_init(BalsaAbWindow *ab)
     gtk_container_add(GTK_CONTAINER(hbox), w);
     gtk_widget_show(GTK_WIDGET(w));
 
-    w = gtk_button_new_with_mnemonic(_("_Re-Import"));
+    w = gtk_button_new_with_mnemonic(_("_Re-import"));
     g_signal_connect(G_OBJECT(w), "clicked",
                      G_CALLBACK(balsa_ab_window_reload),
 		       ab);

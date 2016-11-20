@@ -612,7 +612,7 @@ libbalsa_message_change_flags(LibBalsaMessage * message,
 
     if (message->mailbox->readonly) {
         libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-                             _("Mailbox (%s) is readonly: "
+                             _("Mailbox (%s) is read-only: "
                                "cannot change flags."),
                              message->mailbox->name);
         return;

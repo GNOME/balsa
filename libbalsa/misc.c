@@ -593,53 +593,53 @@ libbalsa_utf8_strstr(const gchar *s1, const gchar *s2)
 /* The LibBalsaCodeset enum is not used for anything currently, but this
  * list must be the same length, and should probably be kept consistent: */
 LibBalsaCodesetInfo libbalsa_codeset_info[LIBBALSA_NUM_CODESETS] = {
-    {N_("west european"),       /* WEST_EUROPE          */
+    {N_("West European"),       /* WEST_EUROPE          */
      "iso-8859-1", "windows-1252"} ,
-    {N_("east european"),       /* EAST_EUROPE          */
+    {N_("East European"),       /* EAST_EUROPE          */
      "iso-8859-2", "windows-1250"} ,
-    {N_("south european"),      /* SOUTH_EUROPE         */
+    {N_("South European"),      /* SOUTH_EUROPE         */
      "iso-8859-3"} ,
-    {N_("north european"),      /* NORTH_EUROPE         */
+    {N_("North European"),      /* NORTH_EUROPE         */
      "iso-8859-4"} ,
-    {N_("cyrillic"),            /* CYRILLIC             */
+    {N_("Cyrillic"),            /* CYRILLIC             */
      "iso-8859-5", "windows-1251"} ,
-    {N_("arabic"),              /* ARABIC               */
+    {N_("Arabic"),              /* ARABIC               */
      "iso-8859-6", "windows-1256"} ,
-    {N_("greek"),               /* GREEK                */
+    {N_("Greek"),               /* GREEK                */
      "iso-8859-7", "windows-1253"} ,
-    {N_("hebrew"),              /* HEBREW               */
+    {N_("Hebrew"),              /* HEBREW               */
      "iso-8859-8", "windows-1255"} ,
-    {N_("turkish"),             /* TURKISH              */
+    {N_("Turkish"),             /* TURKISH              */
      "iso-8859-9", "windows-1254"} ,
-    {N_("nordic"),              /* NORDIC               */
+    {N_("Nordic"),              /* NORDIC               */
      "iso-8859-10"} ,
-    {N_("thai"),                /* THAI                 */
+    {N_("Thai"),                /* THAI                 */
      "iso-8859-11"} ,
-    {N_("baltic"),              /* BALTIC               */
+    {N_("Baltic"),              /* BALTIC               */
      "iso-8859-13", "windows-1257"} ,
-    {N_("celtic"),              /* CELTIC               */
+    {N_("Celtic"),              /* CELTIC               */
      "iso-8859-14"} ,
-    {N_("west europe (euro)"),  /* WEST_EUROPE_EURO     */
+    {N_("West European (euro)"),  /* WEST_EUROPE_EURO     */
      "iso-8859-15"} ,
-    {N_("russian"),             /* RUSSIAN              */
+    {N_("Russian"),             /* RUSSIAN              */
      "koi-8r"} ,
-    {N_("ukrainian"),           /* UKRAINE              */
+    {N_("Ukrainian"),           /* UKRAINE              */
      "koi-8u"} ,
-    {N_("japanese"),            /* JAPAN                */
+    {N_("Japanese"),            /* JAPAN                */
      "iso-2022-jp"} ,
-    {N_("korean"),              /* KOREA                */
+    {N_("Korean"),              /* KOREA                */
      "euc-kr"} ,
-    {N_("east european"),       /* EAST_EUROPE_WIN      */
+    {N_("East European"),       /* EAST_EUROPE_WIN      */
      "windows-1250"} ,
-    {N_("cyrillic"),            /* CYRILLIC_WIN         */
+    {N_("Cyrillic"),            /* CYRILLIC_WIN         */
      "windows-1251"} ,
-    {N_("greek"),               /* GREEK_WIN            */
+    {N_("Greek"),               /* GREEK_WIN            */
      "windows-1253"} ,
-    {N_("hebrew"),              /* HEBREW_WIN           */
+    {N_("Hebrew"),              /* HEBREW_WIN           */
      "windows-1255"} ,
-    {N_("arabic"),              /* ARABIC_WIN           */
+    {N_("Arabic"),              /* ARABIC_WIN           */
      "windows-1256"} ,
-    {N_("baltic"),              /* BALTIC_WIN           */
+    {N_("Baltic"),              /* BALTIC_WIN           */
      "windows-1257"} ,
 };
 

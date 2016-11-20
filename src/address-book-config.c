@@ -668,7 +668,7 @@ bad_path(gchar * path, GtkWindow * window, gint type)
 				 GTK_DIALOG_MODAL|
 				 GTK_DIALOG_DESTROY_WITH_PARENT,
                                  GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO,
-                                 _("No path found.  "
+                                 _("No path found. "
 				   "Do you want to give one?"));
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu_for_parent(ask, window);
@@ -927,7 +927,7 @@ balsa_address_book_add_menu(BalsaAddressBookCallback callback,
     g_object_weak_ref(G_OBJECT(menu), (GWeakNotify) g_free, abc);
 
     menuitem =
-        gtk_menu_item_new_with_label(_("VCard Address Book (GnomeCard)"));
+        gtk_menu_item_new_with_label(_("vCard Address Book (GnomeCard)"));
     g_signal_connect(G_OBJECT(menuitem), "activate",
                      G_CALLBACK(add_vcard_cb), abc);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);

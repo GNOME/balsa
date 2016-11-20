@@ -158,8 +158,8 @@ enum LibBalsaAddressViewMatchType_ {
 /* Must be consistent with LibBalsaAddressType enum: */
 const gchar *const libbalsa_address_view_types[] = {
     N_("To:"),
-    N_("Cc:"),
-    N_("Bcc:"),
+    N_("CC:"),
+    N_("BCC:"),
     N_("Reply To:"),
 };
 

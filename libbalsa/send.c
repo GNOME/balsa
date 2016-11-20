@@ -1734,7 +1734,7 @@ libbalsa_message_create_mime_message(LibBalsaMessage* message, gboolean flow,
 			    "application/octet-stream";
 
 			libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-					     _("Cannot determine charset "
+					     _("Cannot determine character set "
 					       "for text file “%s”; "
 					       "sending as mime type “%s”"),
 					     libbalsa_vfs_get_uri_utf8(body->file_uri),

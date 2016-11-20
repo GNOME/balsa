@@ -167,7 +167,7 @@ lbm_mh_check_files(const gchar * path, gboolean create)
         if (libbalsa_mailbox_type_from_path(path) !=
             LIBBALSA_TYPE_MAILBOX_MH) {
             libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-                                 _("Mailbox %s does not appear to be a Mh mailbox."),
+                                 _("Mailbox %s does not appear to be an MH mailbox."),
                                  path);
             return -1;
         }

@@ -3984,7 +3984,7 @@ bw_find_real(BalsaWindow * window, BalsaIndex * bindex, gboolean again)
 	matching_to      = bw_add_check_button(grid, _("_To:"),     1, 0);
 	matching_from    = bw_add_check_button(grid, _("_From:"),   1, 1);
         matching_subject = bw_add_check_button(grid, _("S_ubject"), 2, 0);
-	matching_cc      = bw_add_check_button(grid, _("_Cc:"),     2, 1);
+	matching_cc      = bw_add_check_button(grid, _("_CC:"),     2, 1);
 	gtk_container_add(GTK_CONTAINER(frame), grid);
 
 	/* Frame with Apply and Clear buttons */
@@ -4380,7 +4380,7 @@ bw_notebook_switch_page_cb(GtkWidget * notebook,
     if (mailbox->name) {
         if (mailbox->readonly) {
             title =
-                g_strdup_printf(_("Balsa: %s (readonly)"), mailbox->name);
+                g_strdup_printf(_("Balsa: %s (read-only)"), mailbox->name);
         } else {
             title = g_strdup_printf(_("Balsa: %s"), mailbox->name);
         }

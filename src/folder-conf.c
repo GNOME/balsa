@@ -409,7 +409,7 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
         libbalsa_create_grid_check(_("Subscribed _folders only"), grid, r++,
                                    mn ? mn->subscribed : FALSE);
     fcw->list_inbox =
-        libbalsa_create_grid_check(_("Always show _INBOX"), grid, r++,
+        libbalsa_create_grid_check(_("Always show _Inbox"), grid, r++,
                                    mn ? mn->list_inbox : TRUE);
 
     label = libbalsa_create_grid_label(_("Pr_efix:"), grid, r);
@@ -638,10 +638,10 @@ subfolder_conf_clicked_ok(SubfolderDialogData * sdd)
                 (!sdd->old_parent || !*sdd->old_parent)) {
                 gchar *msg =
                     g_strdup_printf(_
-                                    ("Renaming INBOX is special!\n"
+                                    ("Renaming Inbox is special!\n"
                                      "You will create a subfolder %s in %s\n"
-                                     "containing the messages from INBOX.\n"
-                                     "INBOX and its subfolders will remain.\n"
+                                     "containing the messages from Inbox.\n"
+                                     "Inbox and its subfolders will remain.\n"
                                      "What would you like to do?"),
 folder, parent);
                 GtkWidget *ask =
@@ -649,7 +649,7 @@ folder, parent);
                                                 GTK_WINDOW(sdd->dialog),
                                                 GTK_DIALOG_MODAL |
                                                 libbalsa_dialog_flags(),
-                                                _("Rename INBOX"),
+                                                _("Rename Inbox"),
                                                 GTK_RESPONSE_OK,
                                                 _("Cancel"),
                                                 GTK_RESPONSE_CANCEL,

@@ -300,7 +300,7 @@ vevent_reply(GObject * button, GtkWidget * box)
 
     /* create the message subject */
     dummy = g_strdup_printf("%s: %s",
-			    event->summary ? event->summary : _("iTip Calendar Request"),
+			    event->summary ? event->summary : _("iTIP Calendar Request"),
 			    libbalsa_vcal_part_stat_to_str(pstat));
     libbalsa_message_set_subject(message, dummy);
     g_free(dummy);
@@ -338,7 +338,7 @@ vevent_reply(GObject * button, GtkWidget * box)
 #endif
     if (result != LIBBALSA_MESSAGE_CREATE_OK)
 	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-			     _("Sending the iTip calendar reply failed: %s"),
+			     _("Sending the iTIP calendar reply failed: %s"),
 			     error ? error->message : "?");
     if (error)
 	g_error_free(error);

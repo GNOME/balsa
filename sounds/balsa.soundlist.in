@@ -1,9 +1,9 @@
 [__section_info__]
-_description=Balsa E-mail reader
+_description=Balsa Email Reader
 
 [startup]
 file=balsa/startup.wav
-_description=Program startup
+_description=Program start-up
 
 [newmail]
 file=balsa/newmail.wav

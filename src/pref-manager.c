@@ -561,7 +561,7 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
 #endif                          /* HAVE_GTKSPELL */
 
     pm_append_page(notebook, create_startup_page(store),
-                   N_("Startup"), store, NULL);
+                   N_("Start-up"), store, NULL);
     pm_append_page(notebook, create_misc_page(store),
                    N_("Miscellaneous"), store, NULL);
 
@@ -1855,7 +1855,7 @@ checking_group(GtkWidget * page)
     pm_page_add_to_size_group(page, pui->check_imap);
 
     pui->check_imap_inbox =
-        gtk_check_button_new_with_mnemonic(_("Check INBOX _only"));
+        gtk_check_button_new_with_mnemonic(_("Check Inbox _only"));
     gtk_grid_attach(grid, pui->check_imap_inbox, 1, row, 2, 1);
 
     ++row;
@@ -1957,7 +1957,7 @@ alternative_group(GtkWidget * page)
     group = pm_group_new(_("Display of multipart/alternative parts"));
 
     pui->display_alt_plain =
-	gtk_check_button_new_with_label(_("Prefer text/plain over html"));
+	gtk_check_button_new_with_label(_("Prefer text/plain over HTML"));
     pm_group_add(group, pui->display_alt_plain, FALSE);
 
     return group;
@@ -2031,7 +2031,7 @@ mdn_group(GtkWidget * page)
 
     label = gtk_label_new(_("The message header looks clean "
                             "(the notify-to address is the return path, "
-                            "and I am in the “To:” or “Cc:” list)."));
+                            "and I am in the “To:” or “CC:” list)."));
     gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
     gtk_label_set_max_width_chars(GTK_LABEL(label), BALSA_MAX_WIDTH_CHARS);
     set_align(label, 0.0, 0.5);
@@ -2196,7 +2196,7 @@ main_window_group(GtkWidget * page)
     grid = create_grid(page);
     pm_group_add(group, (GtkWidget *) grid, FALSE);
     pui->pgdownmod =
-        gtk_check_button_new_with_label(_("PageUp/PageDown keys "
+        gtk_check_button_new_with_label(_("Page Up/Page Down keys "
                                           "scroll text by"));
     gtk_grid_attach(grid, pui->pgdownmod, 0, 0, 1, 1);
     scroll_adj = gtk_adjustment_new(50.0, 10.0, 100.0, 5.0, 10.0, 0.0);
@@ -2724,12 +2724,12 @@ options_group(GtkWidget * page)
 {
     GtkWidget *group;
 
-    group = pm_group_new(_("Startup options"));
+    group = pm_group_new(_("Start-up options"));
 
     pui->open_inbox_upon_startup =
-        pm_group_add_check(group, _("Open Inbox upon startup"));
+        pm_group_add_check(group, _("Open Inbox upon start-up"));
     pui->check_mail_upon_startup =
-        pm_group_add_check(group, _("Check mail upon startup"));
+        pm_group_add_check(group, _("Check mail upon start-up"));
     pui->remember_open_mboxes =
         pm_group_add_check(group, _("Remember open mailboxes "
                                     "between sessions"));
@@ -2747,9 +2747,9 @@ folder_scanning_group(GtkWidget * page)
 
     group = pm_group_new(_("Folder scanning"));
 
-    label = gtk_label_new(_("Choose depth 1 for fast startup; "
-                            "this defers scanning some folders.  "
-                            "To see more of the tree at startup, "
+    label = gtk_label_new(_("Choose depth 1 for fast start-up; "
+                            "this defers scanning some folders. "
+                            "To see more of the tree at start-up, "
                             "choose a greater depth."));
     gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
     gtk_label_set_max_width_chars(GTK_LABEL(label), BALSA_MAX_WIDTH_CHARS);

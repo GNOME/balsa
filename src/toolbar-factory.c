@@ -167,7 +167,7 @@ button_data toolbar_buttons[]={
     {BALSA_PIXMAP_MARK_ALL,      N_("Mark all"),        FALSE},
     {BALSA_PIXMAP_SHOW_HEADERS,  N_("All\nheaders"),    FALSE},
     {"gtk-cancel",           N_("Reset\nFilter"),   FALSE},
-    {BALSA_PIXMAP_SHOW_PREVIEW,  N_("Msg Preview"),     FALSE},
+    {BALSA_PIXMAP_SHOW_PREVIEW,  N_("Message Preview"),     FALSE},
 #ifdef HAVE_GPGME
     {BALSA_PIXMAP_GPG_SIGN,      N_("Sign"),            FALSE},
     {BALSA_PIXMAP_GPG_ENCRYPT,   N_("Encrypt"),         FALSE},

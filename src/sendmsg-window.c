@@ -715,7 +715,7 @@ sw_buffer_signals_unblock(BalsaSendmsg * bsmsg, GtkTextBuffer * buffer)
 }
 
 static const gchar *const address_types[] =
-    { N_("To:"), N_("Cc:"), N_("Bcc:") };
+    { N_("To:"), N_("CC:"), N_("BCC:") };
 
 static gboolean
 edit_with_gnome_check(gpointer data) {
@@ -1406,7 +1406,7 @@ change_attach_mode(GtkWidget * menu_item, BalsaAttachInfo *info)
 				   GTK_BUTTONS_YES_NO,
 				   _("Saying yes will not send the file "
 				     "“%s” itself, but just a MIME "
-				     "message/external-body reference.  "
+				     "message/external-body reference. "
 				     "Note that the recipient must "
 				     "have proper permissions to see the "
 				     "“real” file.\n\n"
@@ -1538,7 +1538,7 @@ sw_get_user_codeset(BalsaSendmsg * bsmsg, gboolean * change_type,
     GtkWidget *combo_box = NULL;
     gint codeset = -1;
     GtkWidget *dialog =
-        gtk_dialog_new_with_buttons(_("Choose charset"),
+        gtk_dialog_new_with_buttons(_("Choose character set"),
                                     GTK_WINDOW(bsmsg->window),
                                     GTK_DIALOG_DESTROY_WITH_PARENT |
                                     libbalsa_dialog_flags(),
@@ -1547,7 +1547,7 @@ sw_get_user_codeset(BalsaSendmsg * bsmsg, gboolean * change_type,
                                     NULL);
     gchar *msg = g_strdup_printf
         (_("File\n%s\nis not encoded in US-ASCII or UTF-8.\n"
-           "Please choose the charset used to encode the file."),
+           "Please choose the character set used to encode the file."),
          fname);
     GtkWidget *info = gtk_label_new(msg);
     GtkWidget *charset_button = libbalsa_charset_button_new();
@@ -2604,7 +2604,7 @@ create_info_pane(BalsaSendmsg * bsmsg)
     bsmsg->fcc[1] =
         balsa_mblist_mru_option_menu(GTK_WINDOW(bsmsg->window),
                                      &balsa_app.fcc_mru);
-    create_email_or_string_entry(bsmsg, grid, _("F_cc:"), ++row,
+    create_email_or_string_entry(bsmsg, grid, _("F_CC:"), ++row,
                                  bsmsg->fcc);
 
     gtk_widget_show_all(grid);
@@ -3523,7 +3523,7 @@ quote_body(BalsaSendmsg * bsmsg, LibBalsaMessageHeaders *headers,
 	    gchar *cc_list =
 		internet_address_list_to_string(headers->cc_list,
 			                        FALSE);
-	    g_string_append_printf(body, "%s %s\n", _("Cc:"), cc_list);
+	    g_string_append_printf(body, "%s %s\n", _("CC:"), cc_list);
 	    g_free(cc_list);
 	}
 
@@ -4554,7 +4554,7 @@ sendmsg_window_set_field(BalsaSendmsg * bsmsg, const gchar * key,
                  GTK_MESSAGE_INFO,
                  GTK_BUTTONS_OK,
                  _("The link that you selected created\n"
-                   "a “Blind copy” (Bcc) address.\n"
+                   "a “Blind copy” (BCC) address.\n"
                    "Please check that the address\n"
                    "is appropriate."));
 #if HAVE_MACOSX_DESKTOP
@@ -5238,7 +5238,7 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
 #ifdef HAVE_GPGME
     balsa_information_parented(GTK_WINDOW(bsmsg->window),
                                LIBBALSA_INFORMATION_DEBUG,
-                               _("sending message with gpg mode %d"),
+                               _("sending message with GPG mode %d"),
                                message->gpg_mode);
 #endif
 

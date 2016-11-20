@@ -196,7 +196,7 @@ lbm_mbox_check_files(const gchar * path, gboolean create)
         if (libbalsa_mailbox_type_from_path(path) !=
             LIBBALSA_TYPE_MAILBOX_MBOX) {
             libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-                                 _("Mailbox %s does not appear to be an Mbox mailbox."),
+                                 _("Mailbox %s does not appear to be an mbox mailbox."),
                                  path);
             return -1;
         }
@@ -438,7 +438,7 @@ lbm_mbox_save(LibBalsaMailboxMbox * mbox)
             || (unlink(filename) != 0 && errno != ENOENT)
             || libbalsa_safe_rename(template, filename) != 0)
             libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-                                 _("Failed to save cache file “%s”: %s.  "
+                                 _("Failed to save cache file “%s”: %s. "
                                    "New version saved as “%s”"),
                                  filename, strerror(errno), template);
         g_free(template);

@@ -197,7 +197,7 @@ lbm_maildir_check_files(const gchar * path, gboolean create)
 
         if (mkdir(path, S_IRWXU)) {
             libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-                                 _("Could not create a MailDir directory at %s (%s)"),
+                                 _("Could not create a Maildir directory at %s (%s)"),
                                  path, strerror(errno));
             return -1;
         }
@@ -205,7 +205,7 @@ lbm_maildir_check_files(const gchar * path, gboolean create)
         snprintf(tmp, sizeof(tmp), "%s/cur", path);
         if (mkdir(tmp, S_IRWXU)) {
             libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-                                 _("Could not create a MailDir at %s (%s)"),
+                                 _("Could not create a Maildir at %s (%s)"),
                                  path, strerror(errno));
             rmdir(path);
             return -1;
@@ -214,7 +214,7 @@ lbm_maildir_check_files(const gchar * path, gboolean create)
         snprintf(tmp, sizeof(tmp), "%s/new", path);
         if (mkdir(tmp, S_IRWXU)) {
             libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-                                 _("Could not create a MailDir at %s (%s)"),
+                                 _("Could not create a Maildir at %s (%s)"),
                                  path, strerror(errno));
             snprintf(tmp, sizeof(tmp), "%s/cur", path);
             rmdir(tmp);
@@ -225,7 +225,7 @@ lbm_maildir_check_files(const gchar * path, gboolean create)
         snprintf(tmp, sizeof(tmp), "%s/tmp", path);
         if (mkdir(tmp, S_IRWXU)) {
             libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-                                 _("Could not create a MailDir at %s (%s)"),
+                                 _("Could not create a Maildir at %s (%s)"),
                                  path, strerror(errno));
             snprintf(tmp, sizeof(tmp), "%s/cur", path);
             rmdir(tmp);

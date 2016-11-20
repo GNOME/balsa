@@ -746,14 +746,14 @@ bmw_message_set_headers_d(BalsaMessage           * bm,
     }
     add_header_address_list(bm, grid, "to", _("To:"), headers->to_list,
                             show_all_headers);
-    add_header_address_list(bm, grid, "cc", _("Cc:"), headers->cc_list,
+    add_header_address_list(bm, grid, "cc", _("CC:"), headers->cc_list,
                             show_all_headers);
-    add_header_address_list(bm, grid, "bcc", _("Bcc:"), headers->bcc_list,
+    add_header_address_list(bm, grid, "bcc", _("BCC:"), headers->bcc_list,
                             show_all_headers);
 
 #if BALSA_SHOW_FCC_AS_WELL_AS_X_BALSA_FCC
     if (headers->fcc_url)
-	add_header_gchar(grid, "fcc", _("Fcc:"), headers->fcc_url,
+	add_header_gchar(grid, "fcc", _("FCC:"), headers->fcc_url,
                          show_all_headers);
 #endif
 

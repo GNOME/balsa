@@ -1002,7 +1002,7 @@ setup_ident_frame(GtkDialog * dialog, gboolean createp, gpointer tree)
     /* create the "Messages" tab */
     grid = append_ident_notebook_page(notebook, _("Messages"), NULL);
     row = 0;
-    ident_dialog_add_entry(grid, row++, dialog, _("_Bcc:"),
+    ident_dialog_add_entry(grid, row++, dialog, _("_BCC:"),
                            "identity-bcc");
     ident_dialog_add_entry(grid, row++, dialog, _("Reply _string:"),
                            "identity-replystring");

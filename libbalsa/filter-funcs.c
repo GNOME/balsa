@@ -381,7 +381,7 @@ append_header_names(LibBalsaCondition *cond, GString *res)
         { CONDITION_MATCH_TO, N_("To") },
         { CONDITION_MATCH_FROM, N_("From") },
         { CONDITION_MATCH_SUBJECT, N_("Subject") },
-        { CONDITION_MATCH_CC, N_("Cc") },
+        { CONDITION_MATCH_CC, N_("CC") },
         { CONDITION_MATCH_BODY, N_("Body") }
     };
 

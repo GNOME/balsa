@@ -32,7 +32,7 @@ balsa_druid_page_welcome(GtkAssistant * druid)
          "email account, provided by an Internet Service Provider, "
          "and you should have made that Internet connection on your "
          "computer\n\n"
-         "• or your Network Administrator at your place of "
+         "• or your network administrator at your place of "
          "work/study/similar may have set up your computer to "
          "connect to the network.");
 

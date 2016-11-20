@@ -335,8 +335,8 @@ store_address_note_frame(StoreAddressInfo *info)
 	if (message->headers) {
 	    store_address_add_list(info, _("From: "), message->headers->from);
 	    store_address_add_list(info, _("To: "), message->headers->to_list);
-	    store_address_add_list(info, _("Cc: "), message->headers->cc_list);
-	    store_address_add_list(info, _("Bcc: "), message->headers->bcc_list);
+	    store_address_add_list(info, _("CC: "), message->headers->cc_list);
+	    store_address_add_list(info, _("BCC: "), message->headers->bcc_list);
 	}
     }
 

@@ -387,12 +387,12 @@ mailbox_conf_delete(BalsaMailboxNode * mbnode)
                                      GTK_BUTTONS_NONE,
                                      _("This will remove the mailbox "
                                        "“%s” from the list "
-                                       "of mailboxes.  "
+                                       "of mailboxes. "
                                        "You may also delete the disk "
                                        "file or files associated with "
                                        "this mailbox.\n"
                                        "If you do not remove the file "
-                                       "on disk you may “Add  Mailbox” "
+                                       "on disk you may “Add Mailbox” "
                                        "to access the mailbox again.\n"
                                        "What would you like to do?"),
                                      mailbox->name);
@@ -408,7 +408,7 @@ mailbox_conf_delete(BalsaMailboxNode * mbnode)
                                      GTK_BUTTONS_NONE,
 	                             _("This will remove the mailbox "
                                        "“%s” and all its messages "
-                                       "from your IMAP server.  "
+                                       "from your IMAP server. "
 	                               "If %s has subfolders, it will "
                                        "still appear as a node in the "
                                        "folder tree.\n"

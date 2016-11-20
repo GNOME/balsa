@@ -956,7 +956,7 @@ get_field_frame(void)
     fe_matching_fields_to      = add_check(grid, _("_To:"),     0,1);
     fe_matching_fields_from    = add_check(grid, _("_From:"),   1,1);
     fe_matching_fields_subject = add_check(grid, _("_Subject"), 0,2);
-    fe_matching_fields_cc      = add_check(grid, _("_Cc:"),     1,2);
+    fe_matching_fields_cc      = add_check(grid, _("_CC:"),     1,2);
     fe_matching_fields_us_head =
         gtk_check_button_new_with_mnemonic(_("_User header:"));
     gtk_widget_set_hexpand(fe_matching_fields_us_head, TRUE);

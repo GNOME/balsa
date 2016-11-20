@@ -132,7 +132,7 @@ balsa_druid_page_user_init(BalsaDruidPageUser * user,
 
     preset = libbalsa_guess_email_address();
     balsa_init_add_grid_entry
-        (grid, row++, _("Your _Email Address, for this email account:"),
+        (grid, row++, _("Your _email address for this email account:"),
          preset, &(user->ed1), druid, page, &(user->email));
     g_free(preset);
 

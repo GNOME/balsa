@@ -170,11 +170,11 @@ balsa_print_object_header_new_real(GList * list,
 		    headers->from, &p_label_width, print_all_headers);
     header_add_list(test_layout, header_buf, "to", _("To:"),
 		    headers->to_list, &p_label_width, print_all_headers);
-    header_add_list(test_layout, header_buf, "cc", _("Cc:"),
+    header_add_list(test_layout, header_buf, "cc", _("CC:"),
 		    headers->cc_list, &p_label_width, print_all_headers);
-    header_add_list(test_layout, header_buf, "bcc", _("Bcc:"),
+    header_add_list(test_layout, header_buf, "bcc", _("BCC:"),
 		    headers->bcc_list, &p_label_width, print_all_headers);
-    header_add_string(test_layout, header_buf, "fcc", _("Fcc:"),
+    header_add_string(test_layout, header_buf, "fcc", _("FCC:"),
 		      headers->fcc_url, &p_label_width, print_all_headers);
     header_add_list(test_layout, header_buf, "disposition-notification-to",
 		    _("Disposition-Notification-To:"),

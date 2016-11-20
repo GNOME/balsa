@@ -1341,7 +1341,7 @@ mpart_content_name(const gchar *content_type)
     else if (g_ascii_strcasecmp(content_type, "multipart/encrypted") == 0)
         return g_strdup(_("encrypted parts"));
     else if (g_ascii_strcasecmp(content_type, "message/rfc822") == 0)
-        return g_strdup(_("rfc822 message"));
+        return g_strdup(_("RFC822 message"));
     else
         return g_strdup_printf(_("“%s” parts"),
                                strchr(content_type, '/') + 1);
@@ -1434,7 +1434,7 @@ display_part(BalsaMessage * bm, LibBalsaMessageBody * body,
             libbalsa_utf8_sanitize(&from, balsa_app.convert_unknown_8bit, NULL);
             libbalsa_utf8_sanitize(&subj, balsa_app.convert_unknown_8bit, NULL);
             icon_title =
-                g_strdup_printf(_("rfc822 message (from %s, subject “%s”)"),
+                g_strdup_printf(_("RFC822 message (from %s, subject “%s”)"),
                                 from, subj);
             g_free(from);
             g_free(subj);
@@ -2583,7 +2583,7 @@ create_mdn_dialog(GtkWindow *parent, gchar * sender, gchar * mdn_to_address,
                                GTK_BUTTONS_YES_NO,
                                _("The sender of this mail, %s, "
                                  "requested \n"
-                                 "a Message Disposition Notification"
+                                 "a Message Disposition Notification "
                                  "(MDN) to be returned to “%s”.\n"
                                  "Do you want to send "
                                  "this notification?"),

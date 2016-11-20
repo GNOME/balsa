@@ -870,7 +870,7 @@ get_key_from_name(gpgme_ctx_t ctx, const gchar * name, gboolean secret,
 		if (error)
 		    g_set_error(error, GPGME_ERROR_QUARK,
 				GPG_ERR_KEY_SELECTION,
-				_("%s: insufficient validity for uid %s"),
+				_("%s: insufficient validity for UID %s"),
 				"gmime-gpgme", name);
 	    }
 	}

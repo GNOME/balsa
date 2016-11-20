@@ -1,5 +1,13 @@
 2016-11-20  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Save the main window state more carefully
+
+	* src/main-window.c (bw_window_state_event_cb): note when the
+	main window is either maximized or fullscreen, and save the
+	information as TRUE or FALSE.
+
+2016-11-20  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Save the correct window geometry
 
 	* src/main-window.c (bw_size_allocate_cb): save the window

@@ -645,17 +645,17 @@ balsa_window_get_toolbar_model(void)
 
 /*
  * "window-state-event" signal handler
- *
- * If the window is maximized, the resize grip is still sensitive but
- * does nothing, so leaving it showing could be confusing.
  */
 static gboolean
 bw_window_state_event_cb(BalsaWindow * window,
                          GdkEventWindowState * event,
                          GtkStatusbar * statusbar)
 {
+    /* Note when we are either maximized or fullscreen, to avoid saving
+     * nonsensical geometry. */
     balsa_app.mw_maximized =
-        event->new_window_state & GDK_WINDOW_STATE_MAXIMIZED;
+        (event->new_window_state & GDK_WINDOW_STATE_MAXIMIZED) != 0
+        || (event->new_window_state & GDK_WINDOW_STATE_FULLSCREEN) != 0;
 
     return FALSE;
 }

@@ -1,3 +1,15 @@
+2016-11-21  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Save the correct window geometry
+
+	* libbalsa/source-viewer.c (lsv_size_allocate_cb): save the window
+	  geometry from gtk_window_get_size instead of the GtkAllocation.
+	* src/balsa-mblist.c (bmbl_mru_size_allocate_cb): ditto.
+	* src/message-window.c (size_alloc_cb): ditto.
+	* src/sendmsg-window.c (sw_size_alloc_cb): ditto.
+	* src/main-window.c (bw_window_state_event_cb): simplify the
+	  code.
+
 2016-11-20  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Disable accelerated compositing in webkit2, to avoid some gdk

@@ -654,8 +654,8 @@ bw_window_state_event_cb(BalsaWindow * window,
     /* Note when we are either maximized or fullscreen, to avoid saving
      * nonsensical geometry. */
     balsa_app.mw_maximized =
-        (event->new_window_state & GDK_WINDOW_STATE_MAXIMIZED) != 0
-        || (event->new_window_state & GDK_WINDOW_STATE_FULLSCREEN) != 0;
+        (event->new_window_state & (GDK_WINDOW_STATE_MAXIMIZED |
+                                    GDK_WINDOW_STATE_FULLSCREEN)) != 0;
 
     return FALSE;
 }

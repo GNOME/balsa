@@ -1847,14 +1847,21 @@ bmbl_mru_size_allocate_cb(GtkWidget * widget, GdkRectangle * allocation,
                           gpointer user_data)
 {
     GdkWindow *gdk_window;
+    gboolean maximized;
+
+    gdk_window = gtk_widget_get_window(widget);
+    if (gdk_window == NULL)
+        return;
 
     /* Maximizing a GtkDialog may not be possible, but we check anyway. */
-    if ((gdk_window = gtk_widget_get_window(widget))
-        && !(gdk_window_get_state(gdk_window)
-             & GDK_WINDOW_STATE_MAXIMIZED)) {
-        balsa_app.mru_tree_width  = allocation->width;
-        balsa_app.mru_tree_height = allocation->height;
-    }
+    maximized =
+        (gdk_window_get_state(gdk_window) &
+         (GDK_WINDOW_STATE_MAXIMIZED | GDK_WINDOW_STATE_FULLSCREEN)) != 0;
+
+    if (!maximized)
+        gtk_window_get_size(GTK_WINDOW(widget),
+                            & balsa_app.mru_tree_width,
+                            & balsa_app.mru_tree_height);
 }
 
 static void

@@ -169,17 +169,22 @@ lsv_window_destroy_notify(LibBalsaSourceViewerInfo * lsvi)
 */
 
 static void
-lsv_size_allocate_cb(GtkWindow * window, GtkAllocation * alloc,
+lsv_size_allocate_cb(GtkWidget * window, GtkAllocation * alloc,
                      LibBalsaSourceViewerInfo * lsvi)
 {
     GdkWindow *gdk_window;
+    gboolean maximized;
 
-    if ((gdk_window = gtk_widget_get_window(lsvi->window))
-        && !(gdk_window_get_state(gdk_window)
-             & GDK_WINDOW_STATE_MAXIMIZED)) {
-        *lsvi->width  = alloc->width;
-        *lsvi->height = alloc->height;
-    }
+    gdk_window = gtk_widget_get_window(window);
+    if (gdk_window == NULL)
+        return;
+
+    maximized =
+        (gdk_window_get_state(gdk_window) &
+         (GDK_WINDOW_STATE_MAXIMIZED | GDK_WINDOW_STATE_FULLSCREEN)) != 0;
+
+    if (!maximized)
+        gtk_window_get_size(GTK_WINDOW(window), lsvi->width, lsvi->height);
 }
 
 #define BALSA_SOURCE_VIEWER "balsa-source-viewer"

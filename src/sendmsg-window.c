@@ -1117,7 +1117,7 @@ update_bsmsg_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity* ident)
         InternetAddressList *bcc_list, *ident_list;
 
         bcc_list =
-            libbalsa_address_view_get_list(bsmsg->recipient_view, "Bcc:");
+            libbalsa_address_view_get_list(bsmsg->recipient_view, "BCC:");
 
         ident_list = internet_address_list_parse_string(bsmsg->ident->bcc);
         if (ident_list) {
@@ -1155,7 +1155,7 @@ update_bsmsg_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity* ident)
         }
 
         /* Set the resulting list: */
-        libbalsa_address_view_set_from_list(bsmsg->recipient_view, "Bcc:",
+        libbalsa_address_view_set_from_list(bsmsg->recipient_view, "BCC:",
                                             bcc_list);
         g_object_unref(bcc_list);
     }
@@ -3864,13 +3864,13 @@ setup_headers_from_message(BalsaSendmsg* bsmsg, LibBalsaMessage *message)
      * Note that if set-from-list is given an empty list, the blank line
      * will be a To: line */
     libbalsa_address_view_set_from_list(bsmsg->recipient_view,
-                                        "Bcc:",
+                                        "BCC:",
                                         message->headers->bcc_list);
     libbalsa_address_view_set_from_list(bsmsg->recipient_view,
                                         "To:",
                                         message->headers->to_list);
     libbalsa_address_view_set_from_list(bsmsg->recipient_view,
-                                        "Cc:",
+                                        "CC:",
                                         message->headers->cc_list);
 }
 
@@ -3982,7 +3982,7 @@ setup_headers_from_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity *ident)
                                               ident->replyto);
     if(ident->bcc)
         libbalsa_address_view_set_from_string(bsmsg->recipient_view,
-                                              "Bcc:",
+                                              "BCC:",
                                               ident->bcc);
 
     /* Make sure the blank line is "To:" */
@@ -4292,7 +4292,7 @@ set_cc_from_all_recipients(BalsaSendmsg* bsmsg,
     sw_cc_add_list(&new_cc, headers->cc_list);
 
     libbalsa_address_view_set_from_list(bsmsg->recipient_view,
-                                        "Cc:",
+                                        "CC:",
                                         new_cc);
     if (new_cc)
         g_object_unref(new_cc);
@@ -4542,9 +4542,9 @@ sendmsg_window_set_field(BalsaSendmsg * bsmsg, const gchar * key,
     if (g_ascii_strcasecmp(key, "to") == 0)
         type = "To:";
     else if(g_ascii_strcasecmp(key, "cc") == 0)
-        type = "Cc:";
+        type = "CC:";
     else if(g_ascii_strcasecmp(key, "bcc") == 0) {
-        type = "Bcc:";
+        type = "BCC:";
         if (!g_object_get_data(G_OBJECT(bsmsg->window),
                                "balsa-sendmsg-window-url-bcc")) {
             GtkWidget *dialog =
@@ -4852,10 +4852,10 @@ bsmsg2message(BalsaSendmsg * bsmsg)
         libbalsa_address_view_get_list(bsmsg->recipient_view, "To:");
 
     message->headers->cc_list =
-        libbalsa_address_view_get_list(bsmsg->recipient_view, "Cc:");
+        libbalsa_address_view_get_list(bsmsg->recipient_view, "CC:");
 
     message->headers->bcc_list =
-        libbalsa_address_view_get_list(bsmsg->recipient_view, "Bcc:");
+        libbalsa_address_view_get_list(bsmsg->recipient_view, "BCC:");
 
 
     /* get the fcc-box from the option menu widget */
@@ -5063,7 +5063,7 @@ check_suggest_encryption(BalsaSendmsg * bsmsg)
 	return TRUE;
 
     /* we can not encrypt if we have bcc recipients */
-    ia_list = libbalsa_address_view_get_list(bsmsg->recipient_view, "Bcc:");
+    ia_list = libbalsa_address_view_get_list(bsmsg->recipient_view, "BCC:");
     len = internet_address_list_length(ia_list);
     g_object_unref(ia_list);
     if (len > 0)
@@ -5077,7 +5077,7 @@ check_suggest_encryption(BalsaSendmsg * bsmsg)
     can_encrypt = libbalsa_can_encrypt_for_all(ia_list, protocol);
     g_object_unref(ia_list);
     if (can_encrypt) {
-        ia_list = libbalsa_address_view_get_list(bsmsg->recipient_view, "Cc:");
+        ia_list = libbalsa_address_view_get_list(bsmsg->recipient_view, "CC:");
         can_encrypt = libbalsa_can_encrypt_for_all(ia_list, protocol);
         g_object_unref(ia_list);
     }

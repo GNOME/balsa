@@ -1,3 +1,12 @@
+2016-11-22  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Adapt to new recipient strings
+
+	* src/sendmsg-window.c (update_bsmsg_identity),
+	(setup_headers_from_message), (setup_headers_from_identity),
+	(set_cc_from_all_recipients), (sendmsg_window_set_field),
+	(bsmsg2message), (check_suggest_encryption):
+
 2016-11-21  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Save the correct window geometry

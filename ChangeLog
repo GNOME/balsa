@@ -1,3 +1,8 @@
+2016-11-23  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* libbalsa/misc.c (libbalsa_font_string_to_css): make new CSS
+	parsing conditional on gtk version 3.22.
+
 2016-11-22  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Adapt to new recipient strings

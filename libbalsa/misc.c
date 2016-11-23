@@ -1371,8 +1371,14 @@ gchar *
 libbalsa_font_string_to_css(const gchar * font_string,
                             const gchar * name)
 {
+#if !GTK_CHECK_VERSION(3, 22,0)
+    g_return_val_if_fail(font_string != NULL, NULL);
+    g_return_val_if_fail(name != NULL, NULL);
+
+    return g_strconcat("#", name, " {font:", font_string, "}", NULL);
+#else                           /* !GTK_CHECK_VERSION(3, 22,0) */
     PangoFontDescription *desc;
-    guint mask;
+    PangoFontMask mask;
     GString *string;
 
     g_return_val_if_fail(font_string != NULL, NULL);
@@ -1389,79 +1395,64 @@ libbalsa_font_string_to_css(const gchar * font_string,
                                pango_font_description_get_family(desc));
     }
     if (mask & PANGO_FONT_MASK_STYLE) {
-        const gchar *style = NULL;
+        PangoStyle style; /* An enum with default values,
+                           * so use it to index the array. */
+        static const gchar *styles[] = {
+            "normal",
+            "oblique",
+            "italic"
+        };
 
-        switch (pango_font_description_get_style(desc)) {
-        case PANGO_STYLE_OBLIQUE:
-            style = "oblique";
-            break;
-        case PANGO_STYLE_ITALIC:
-            style = "italic";
-            break;
-        default:
-            break;
-        }
-        if (style != NULL)
-            g_string_append_printf(string, "font-style: %s;\n", style);
+        style = pango_font_description_get_style(desc);
+        g_string_append_printf(string, "font-style: %s;\n", styles[style]);
     }
     if (mask & PANGO_FONT_MASK_VARIANT) {
-        if (pango_font_description_get_variant(desc) ==
-            PANGO_VARIANT_SMALL_CAPS)
-            g_string_append(string, "font-variant: small-caps;\n");
+        PangoVariant variant; /* An enum with default values,
+                               * so use it to index the array. */
+        static const gchar *variants[] = {
+            "normal",
+            "small-caps"
+        };
+
+        variant = pango_font_description_get_variant(desc);
+        g_string_append_printf(string, "font-variant: %s;\n", variants[variant]);
     }
     if (mask & PANGO_FONT_MASK_WEIGHT) {
-        PangoWeight weight;
+        PangoWeight weight; /* An enum with weight values, so use the value. */
 
         weight = pango_font_description_get_weight(desc);
-        if (weight != PANGO_WEIGHT_NORMAL)
-            g_string_append_printf(string, " font-weight: %d;\n", weight);
+        g_string_append_printf(string, "font-weight: %d;\n", weight);
     }
     if (mask & PANGO_FONT_MASK_STRETCH) {
-        const gchar *stretch = NULL;
+        PangoStretch stretch; /* An enum with default values,
+                               * so use it to index the array. */
+        static const gchar *stretches[] = {
+            "ultra-condensed",
+            "extra-condensed",
+            "condensed",
+            "semi-condensed",
+            "normal",
+            "semi-expanded",
+            "expanded",
+            "extra-expanded",
+            "ultra-expanded"
+        };
 
-        switch (pango_font_description_get_stretch(desc)) {
-        case PANGO_STRETCH_ULTRA_CONDENSED:
-            stretch = "ultra-condensed";
-            break;
-        case PANGO_STRETCH_EXTRA_CONDENSED:
-            stretch = "extra-condensed";
-            break;
-        case PANGO_STRETCH_CONDENSED:
-            stretch = "condensed";
-            break;
-        case PANGO_STRETCH_SEMI_CONDENSED:
-            stretch = "semi-condensed";
-            break;
-        case PANGO_STRETCH_SEMI_EXPANDED:
-            stretch = "semi-expanded";
-            break;
-        case PANGO_STRETCH_EXPANDED:
-            stretch = "expanded";
-            break;
-        case PANGO_STRETCH_EXTRA_EXPANDED:
-            stretch = "extra-expanded";
-            break;
-        case PANGO_STRETCH_ULTRA_EXPANDED:
-            stretch = "ultra-expanded";
-            break;
-        default:
-            break;
-        }
-        if (stretch != NULL)
-            g_string_append_printf(string, "font-stretch: %s;\n", stretch);
+        stretch = pango_font_description_get_stretch(desc);
+        g_string_append_printf(string, "font-stretch: %s;\n", stretches[stretch]);
     }
     if (mask & PANGO_FONT_MASK_SIZE) {
-        gint size;
+        gdouble size;
+        const gchar *units;
 
-        size = pango_font_description_get_size(desc);
-        if (!pango_font_description_get_size_is_absolute(desc))
-            size *= gdk_screen_get_resolution(gdk_screen_get_default()) / 72;
-        size = PANGO_PIXELS(size);
-        g_string_append_printf(string, "font-size: %dpx;\n", size);
+        size = (gdouble) pango_font_description_get_size(desc) / PANGO_SCALE;
+        units = pango_font_description_get_size_is_absolute(desc) ? "px" : "pt";
+        g_string_append_printf(string, "font-size: %.1f%s;\n", size, units);
     }
     g_string_append_c(string, '}');
 
     pango_font_description_free(desc);
 
     return g_string_free(string, FALSE);
+#endif                          /* !GTK_CHECK_VERSION(3, 22,0) */
 }

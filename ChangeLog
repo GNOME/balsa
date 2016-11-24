@@ -1,5 +1,13 @@
 2016-11-23  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Correct alignment of recipient labels.
+
+	* src/sendmsg-window.h: remove redundant GtkSizeGroup;
+	* src/sendmsg-window.c (create_email_or_string_entry),
+	(create_info_pane), (sw_attachment_list): do not use it.
+
+2016-11-23  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* libbalsa/misc.c (libbalsa_font_string_to_css): make new CSS
 	parsing conditional on gtk version 3.22.
 

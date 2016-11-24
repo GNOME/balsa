@@ -105,7 +105,6 @@ G_BEGIN_DECLS
         GtkTextMark *insert_mark;
 
         GtkWidget *paned;
-        GtkSizeGroup *size_group;
         gboolean ready_to_send;
     };
 

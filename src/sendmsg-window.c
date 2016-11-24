@@ -2291,7 +2291,6 @@ create_email_or_string_entry(BalsaSendmsg * bsmsg,
     if (GTK_IS_FRAME(mnemonic_widget))
         mnemonic_widget = gtk_bin_get_child(GTK_BIN(mnemonic_widget));
     arr[0] = gtk_label_new_with_mnemonic(label);
-    gtk_size_group_add_widget(bsmsg->size_group, arr[0]);
     gtk_label_set_mnemonic_widget(GTK_LABEL(arr[0]), mnemonic_widget);
     gtk_widget_set_halign(arr[0], GTK_ALIGN_START);
     g_object_set(arr[0], "margin", GNOME_PAD_SMALL, NULL);
@@ -2552,7 +2551,6 @@ create_info_pane(BalsaSendmsg * bsmsg)
     gtk_grid_set_column_spacing(GTK_GRID(grid), 6);
     gtk_container_set_border_width(GTK_CONTAINER(grid), 6);
 
-    bsmsg->size_group = gtk_size_group_new(GTK_SIZE_GROUP_HORIZONTAL);
     /* From: */
     create_from_entry(grid, bsmsg);
 
@@ -2564,7 +2562,7 @@ create_info_pane(BalsaSendmsg * bsmsg)
 
     /* To:, Cc:, and Bcc: */
     create_email_entry(bsmsg, grid, ++row, &bsmsg->recipient_view,
-                       bsmsg->recipients, "Rec_ipients", address_types,
+                       bsmsg->recipients, "Rec_ipients:", address_types,
                        G_N_ELEMENTS(address_types));
     gtk_widget_set_vexpand(bsmsg->recipients[1], TRUE);
     g_signal_connect_swapped(gtk_tree_view_get_model
@@ -2631,7 +2629,6 @@ sw_attachment_list(BalsaSendmsg *bsmsg)
 
     /* Attachment list */
     label = gtk_label_new_with_mnemonic(_("_Attachments:"));
-    gtk_size_group_add_widget(bsmsg->size_group, label);
     gtk_widget_set_halign(label, GTK_ALIGN_START);
     g_object_set(label, "margin", GNOME_PAD_SMALL, NULL);
     gtk_grid_attach(GTK_GRID(grid), label, 0, 0, 1, 1);

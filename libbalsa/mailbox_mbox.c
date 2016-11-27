@@ -1933,7 +1933,7 @@ lbm_mbox_add_message(LibBalsaMailboxLocal * local,
 	g_free(from);
         g_set_error(err, LIBBALSA_MAILBOX_ERROR,
                     LIBBALSA_MAILBOX_APPEND_ERROR,
-                    _("%s: could not get new mime stream."),
+                    _("%s: could not get new MIME stream."),
                     "MBOX");
 	return FALSE;
     }

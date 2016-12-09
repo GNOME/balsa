@@ -31,8 +31,7 @@ balsa_extra_dist =		\
 	gnome-balsa2.png	\
 	intltool-extract.in	\
 	intltool-merge.in	\
-	intltool-update.in	\
-	mkinstalldirs
+	intltool-update.in
 
 EXTRA_DIST =			\
     $(balsa_extra_dist)

@@ -1,3 +1,9 @@
+2016-12-09  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Version bump to 2.5.3
+
+	* configure.ac: bump the version string to 2.5.3
+
 2016-11-23  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Correct alignment of recipient labels.

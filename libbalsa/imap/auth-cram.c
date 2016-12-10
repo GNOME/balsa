@@ -131,7 +131,7 @@ static void
 hmac_md5 (const char* password, char* challenge,
           unsigned char* response)
 {  
-  EVP_MD_CTX ctx;
+  EVP_MD_CTX *ctx = EVP_MD_CTX_create();
   unsigned char ipad[MD5_BLOCK_LEN], opad[MD5_BLOCK_LEN];
   unsigned char secret[MD5_BLOCK_LEN+1];
   unsigned int secret_len, chal_len;
@@ -143,9 +143,9 @@ hmac_md5 (const char* password, char* challenge,
   /* passwords longer than MD5_BLOCK_LEN bytes are substituted with their MD5
    * digests */
   if (secret_len > MD5_BLOCK_LEN) {
-	EVP_DigestInit(&ctx, EVP_md5());
-	EVP_DigestUpdate(&ctx, (const unsigned char*) password, secret_len);
-	EVP_DigestFinal(&ctx, secret, &secret_len);
+	EVP_DigestInit(ctx, EVP_md5());
+	EVP_DigestUpdate(ctx, (const unsigned char*) password, secret_len);
+	EVP_DigestFinal(ctx, secret, &secret_len);
   }
   else
     strncpy ((char *) secret, password, sizeof (secret));
@@ -161,14 +161,16 @@ hmac_md5 (const char* password, char* challenge,
   }
 
   /* inner hash: challenge and ipadded secret */
-  EVP_DigestInit(&ctx, EVP_md5());
-  EVP_DigestUpdate(&ctx, ipad, MD5_BLOCK_LEN);
-  EVP_DigestUpdate(&ctx, (unsigned char*) challenge, chal_len);
-  EVP_DigestFinal(&ctx, response, NULL);
+  EVP_DigestInit(ctx, EVP_md5());
+  EVP_DigestUpdate(ctx, ipad, MD5_BLOCK_LEN);
+  EVP_DigestUpdate(ctx, (unsigned char*) challenge, chal_len);
+  EVP_DigestFinal(ctx, response, NULL);
 
   /* outer hash: inner hash and opadded secret */
-  EVP_DigestInit(&ctx, EVP_md5());
-  EVP_DigestUpdate(&ctx, opad, MD5_BLOCK_LEN);
-  EVP_DigestUpdate(&ctx, response, chal_len);
-  EVP_DigestFinal(&ctx, response, NULL);
+  EVP_DigestInit(ctx, EVP_md5());
+  EVP_DigestUpdate(ctx, opad, MD5_BLOCK_LEN);
+  EVP_DigestUpdate(ctx, response, MD5_DIGEST_LEN);
+  EVP_DigestFinal(ctx, response, NULL);
+
+  EVP_MD_CTX_destroy(ctx);
 }

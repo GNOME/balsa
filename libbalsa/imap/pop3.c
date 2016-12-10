@@ -310,16 +310,17 @@ get_apop_stamp(const char *greeting, char *stamp)
 static void
 compute_auth_hash(char *stamp, char *hash, const char *passwd)
 {
-  EVP_MD_CTX ctx;
+  EVP_MD_CTX* ctx = EVP_MD_CTX_create();
   register unsigned char *dp;
   register char *cp;
   unsigned char *ep;
   unsigned char digest[16];
   
-  EVP_DigestInit(&ctx, EVP_md5());
-  EVP_DigestUpdate(&ctx, stamp, strlen(stamp));
-  EVP_DigestUpdate(&ctx, passwd, strlen(passwd));
-  EVP_DigestFinal(&ctx, digest, NULL);
+  EVP_DigestInit(ctx, EVP_md5());
+  EVP_DigestUpdate(ctx, stamp, strlen(stamp));
+  EVP_DigestUpdate(ctx, passwd, strlen(passwd));
+  EVP_DigestFinal(ctx, digest, NULL);
+  EVP_MD_CTX_destroy(ctx);
   
   cp = hash;
   dp = digest;

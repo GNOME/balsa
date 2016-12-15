@@ -399,10 +399,14 @@ if test x"$gpgmecfg" != xno ; then
 		have_smime=no
 	fi
 	if test x"$gpgmecfg" != xno ; then
-		BALSA_LIBS="$BALSA_LIBS `$gpgmecfg --thread=pthread --libs`"
-		if test x"$?" != x0 ; then
-			AC_MSG_ERROR([*** You enabled gpgme support, but your gpgme installation does not support threads.])
-		fi
+	        if test \( $gpgme_ve -eq 1 \) -a \( $gpgme_ma -lt 8 \) ; then
+		        BALSA_LIBS="$BALSA_LIBS `$gpgmecfg --thread=pthread --libs`"
+		        if test x"$?" != x0 ; then
+			        AC_MSG_ERROR([*** You enabled gpgme support, but your gpgme installation does not support threads.])
+		        fi
+                else
+		        BALSA_LIBS="$BALSA_LIBS `$gpgmecfg --libs`"
+                fi
 		AC_DEFINE(HAVE_GPGME,1,[Defined when gpgme is available.])
 		BALSA_CFLAGS="$BALSA_CFLAGS `$gpgmecfg --cflags`"
 		gpgmecfg=yes

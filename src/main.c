@@ -609,7 +609,17 @@ real_main(int argc, char *argv[])
     balsa_check_open_compose_window();
 
     g_idle_add((GSourceFunc) scan_mailboxes_idle_cb, NULL);
-    g_idle_add((GSourceFunc) balsa_window_fix_paned, balsa_app.main_window);
+    if (balsa_app.mw_maximized) {
+        /*
+         * When maximized at startup, the window changes from maximized
+         * to not maximized a couple of times, so we wait until it has
+         * stabilized (100 msec is not enough!).
+         */
+        g_timeout_add(500, (GSourceFunc) balsa_window_fix_paned, balsa_app.main_window);
+    } else {
+        /* No need to wait. */
+        g_idle_add((GSourceFunc) balsa_window_fix_paned, balsa_app.main_window);
+    }
     g_timeout_add_seconds(1801, (GSourceFunc) periodic_expunge_cb, NULL);
 
     if (cmd_check_mail_on_startup || balsa_app.check_mail_upon_startup)

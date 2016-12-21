@@ -1,3 +1,11 @@
+2016-12-20  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Avoid geometry creep when maximized.
+
+	* src/main.c (real_main): when initially maximized,
+	delay 500 msec before setting paned positions and connecting to
+	signals.
+
 2016-12-14  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Build with gpgme version >= 1.8

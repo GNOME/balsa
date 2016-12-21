@@ -1,5 +1,15 @@
 2016-12-20  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Get notifications about GtkPaned's position to save the new
+	position, instead of the size-allocate signal for the child.
+
+	* src/main-window.c (bw_master_position_cb): callback for
+	  changes in the paned-master's position;
+	  (bw_slave_position_cb): ditto paned-slave;
+	  (balsa_window_fix_paned): change signal connections.
+
+2016-12-20  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Avoid geometry creep when maximized.
 
 	* src/main.c (real_main): when initially maximized,

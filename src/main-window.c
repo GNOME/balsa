@@ -154,9 +154,9 @@ static void bw_select_part_cb(BalsaMessage * bm, gpointer data);
 static void bw_find_real(BalsaWindow * window, BalsaIndex * bindex,
                          gboolean again);
 
-static void bw_notebook_size_allocate_cb(GtkWidget * notebook,
-                                         GtkAllocation * alloc,
-                                         BalsaWindow * bw);
+static void bw_slave_position_cb(GtkPaned   * paned_slave,
+                                 GParamSpec * pspec,
+                                 gpointer     user_data);
 static void bw_size_allocate_cb(GtkWidget * window, GtkAllocation * alloc);
 
 static void bw_notebook_switch_page_cb(GtkWidget * notebook,
@@ -284,12 +284,13 @@ bw_delete_cb(GtkWidget* main_window)
 }
 
 static void
-bw_mblist_size_allocate_cb(GtkWidget * widget, GtkAllocation * alloc,
-                           BalsaWindow * bw)
+bw_master_position_cb(GtkPaned   * paned_master,
+                      GParamSpec * pspec,
+                      gpointer     user_data)
 {
     if (balsa_app.show_mblist && !balsa_app.mw_maximized)
         balsa_app.mblist_width = /* FIXME: this makes some assumptions... */
-            gtk_paned_get_position(GTK_PANED(bw->paned_master));
+            gtk_paned_get_position(paned_master);
 }
 
 static GtkWidget *
@@ -2374,10 +2375,10 @@ balsa_window_fix_paned(BalsaWindow *window)
                                balsa_app.notebook_height);
     }
 
-    g_signal_connect(balsa_app.mblist, "size_allocate",
-                     G_CALLBACK(bw_mblist_size_allocate_cb), window);
-    g_signal_connect(window->notebook, "size_allocate",
-                     G_CALLBACK(bw_notebook_size_allocate_cb), window);
+    g_signal_connect(window->paned_master, "notify::position",
+                     G_CALLBACK(bw_master_position_cb), NULL);
+    g_signal_connect(window->paned_slave, "notify::position",
+                     G_CALLBACK(bw_slave_position_cb), NULL);
 
     return FALSE;
 }
@@ -4323,12 +4324,13 @@ balsa_change_window_layout(BalsaWindow *window)
 
 /* PKGW: remember when they change the position of the vpaned. */
 static void
-bw_notebook_size_allocate_cb(GtkWidget * notebook, GtkAllocation * alloc,
-                             BalsaWindow * bw)
+bw_slave_position_cb(GtkPaned   * paned_slave,
+                     GParamSpec * pspec,
+                     gpointer     user_data)
 {
     if (balsa_app.previewpane && !balsa_app.mw_maximized)
         balsa_app.notebook_height =
-            gtk_paned_get_position(GTK_PANED(bw->paned_slave));
+            gtk_paned_get_position(paned_slave);
 }
 
 static void

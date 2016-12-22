@@ -16,7 +16,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=balsa&keywords=I18N+L10N&component=general\n"
 "POT-Creation-Date: 2016-11-27 16:45+0000\n"
-"PO-Revision-Date: 2016-12-22 16:06+0100\n"
+"PO-Revision-Date: 2016-12-22 16:21+0100\n"
 "Last-Translator: Daniel Mustieles <daniel.mustieles@gmail.com>\n"
 "Language-Team: es <gnome-es-list@gnome.org>\n"
 "Language: es\n"
@@ -82,10 +82,10 @@ msgstr "Ubicación indefinida de la libreta de direcciones del usuario"
 # libmutt/imap/auth.c:373
 # libmutt/imap/auth.c:373
 #: ../libbalsa/address-book-osmo.c:146
-#, fuzzy, c-format
+#, c-format
 #| msgid "Removing duplicates failed: %s"
 msgid "Reading Osmo contacts failed: %s"
-msgstr "La eliminación de duplicados falló: %s"
+msgstr "Falló al leer los contactos de Osmo: %s"
 
 #: ../libbalsa/address-book.c:312 ../libbalsa/filter-error.c:45
 msgid "No error"
@@ -290,10 +290,9 @@ msgstr "Cabecera:%s"
 # src/main-window.c:191
 # src/main-window.c:196
 #: ../libbalsa/filter-funcs.c:412
-#, fuzzy
 #| msgid "_New"
 msgid "New"
-msgstr "_Nuevo"
+msgstr "Nuevo"
 
 # src/balsa-index-page.c:492 src/filter-edit-dialog.c:228
 # src/main-window.c:435 src/mblist-window.c:452 src/pref-manager.c:1112
@@ -393,6 +392,8 @@ msgstr "Fallo al descifrar la parte MIME: error de parseo"
 #: ../libbalsa/gmime-multipart-crypt.c:220
 msgid "Cannot verify multipart/signed part due to missing subparts."
 msgstr ""
+"No se puede descifrar la parte multipart/encrypted porque faltan las "
+"subpartes."
 
 #: ../libbalsa/gmime-multipart-crypt.c:246
 #, c-format
@@ -407,6 +408,8 @@ msgid ""
 "Cannot verify multipart/signed part: signature content-type does not match "
 "protocol."
 msgstr ""
+"No se puede descifrar la parte multipart/encrypted: la firma del tipo de "
+"contenido no coincide con el protocolo."
 
 #: ../libbalsa/gmime-multipart-crypt.c:455
 #, c-format
@@ -414,25 +417,33 @@ msgid ""
 "Cannot decrypt multipart/encrypted part: unsupported encryption protocol "
 "“%s”."
 msgstr ""
+"No se puede descifrar la parte multipart/encrypted: protocolo de cifrado "
+"«%s» no soportado."
 
 #: ../libbalsa/gmime-multipart-crypt.c:456
 msgid "(none)"
-msgstr ""
+msgstr "(nada)"
 
 #: ../libbalsa/gmime-multipart-crypt.c:469
 msgid ""
 "Cannot decrypt multipart/encrypted part: content-type does not match "
 "protocol."
 msgstr ""
+"No se puede descifrar la parte multipart/encrypted: el tipo de contenido no "
+"coincide con el protocolo."
 
 #: ../libbalsa/gmime-multipart-crypt.c:484
 msgid "Cannot decrypt multipart/encrypted part: unexpected content type"
 msgstr ""
+"No se puede descifrar la parte multipart/encrypted: tipo de contenido no "
+"esperado"
 
 #: ../libbalsa/gmime-multipart-crypt.c:526
 msgid ""
 "Cannot decrypt multipart/encrypted part: failed to parse decrypted content"
 msgstr ""
+"No se puede descifrar la parte multipart/encrypted: falló al analizar el "
+"contenido descifrado"
 
 # src/balsa-message.c:301
 # src/balsa-message.c:331
@@ -1734,10 +1745,10 @@ msgid "POP3 mailbox %s error: %s\n"
 msgstr "Error al acceder al buzón POP3 %s:%s\n"
 
 #: ../libbalsa/mailbox_pop3.c:544
-#, fuzzy, c-format
+#, c-format
 #| msgid "POP3 message %d oversized: %d kB - skipped."
 msgid "POP3 message %d oversized: %d kB — skipped."
-msgstr "El mensaje POP3 %d sobrepasa el tamaño: %d KiB - se salta."
+msgstr "El mensaje POP3 %d sobrepasa el tamaño: %d kB - se omite."
 
 #: ../libbalsa/mailbox_pop3.c:556
 #, c-format
@@ -2433,14 +2444,14 @@ msgid "Cannot read %s"
 msgstr "No se puede leer %s"
 
 #: ../libbalsa/send.c:1737
-#, fuzzy, c-format
+#, c-format
 #| msgid ""
 #| "Cannot determine charset for text file `%s'; sending as mime type `%s'"
 msgid ""
 "Cannot determine character set for text file “%s”; sending as MIME type “%s”"
 msgstr ""
 "No puedo determinar el conjunto de caracteres para el archivo de texto «%s»; "
-"enviando como tipo mime «%s»"
+"enviando como tipo MIME «%s»"
 
 #: ../libbalsa/send.c:2112
 msgid "This message will not be encrypted for the BCC: recipient."
@@ -2545,10 +2556,10 @@ msgstr "Fuente del mensaje"
 # src/sendmsg-window.c:1749
 #: ../libbalsa/source-viewer.c:250 ../src/main-window.c:2062
 #: ../src/message-window.c:848
-#, fuzzy, c-format
+#, c-format
 #| msgid "Error loading %s: %s\n"
 msgid "Error adding from %s: %s\n"
-msgstr "Ha ocurrido un error al cargar %s: %s\n"
+msgstr "Error al desde %s: %s\n"
 
 # src/sendmsg-window.c:1694
 # src/sendmsg-window.c:1749
@@ -2569,7 +2580,7 @@ msgstr ""
 # libinit_balsa/helper.c:152 libinit_balsa/helper.c:170
 # libinit_balsa/helper.c:152 libinit_balsa/helper.c:170
 #: ../libinit_balsa/assistant_helper.c:213
-#, fuzzy, c-format
+#, c-format
 #| msgid ""
 #| "Couldn't create a directory: mkdir() failed on pathname \"%s\", with "
 #| "error \"%s\"."
@@ -2577,25 +2588,25 @@ msgid ""
 "Couldn’t create a directory: mkdir() failed on pathname “%s”, with error "
 "“%s”."
 msgstr ""
-"No se pudo crear un directorio: mkdir() falló en la ruta «%s», con el error "
+"No se pudo crear la carpeta: mkdir() falló en la ruta «%s», con el error "
 "«%s»."
 
 # libinit_balsa/helper.c:159 libinit_balsa/helper.c:176
 # libinit_balsa/helper.c:159 libinit_balsa/helper.c:176
 #: ../libinit_balsa/assistant_helper.c:225
 #: ../libinit_balsa/assistant_helper.c:248
-#, fuzzy, c-format
+#, c-format
 #| msgid "The file with pathname \"%s\" is not a directory."
 msgid "The file with pathname “%s” is not a directory."
-msgstr "El archivo con la ruta «%s» no es un directorio."
+msgstr "El archivo con la ruta «%s» no es una carpeta."
 
 # libinit_balsa/helper.c:152 libinit_balsa/helper.c:170
 # libinit_balsa/helper.c:152 libinit_balsa/helper.c:170
 #: ../libinit_balsa/assistant_helper.c:239
-#, fuzzy, c-format
+#, c-format
 #| msgid "Couldn't create a directory: mkdir() failed on pathname \"%s\"."
 msgid "Couldn’t create a directory: mkdir() failed on pathname “%s”."
-msgstr "No se ha podido crear un directorio: mkdir() falló en la ruta «%s»."
+msgstr "No se ha podido crear la carpeta: mkdir() falló en la ruta «%s»."
 
 # libinit_balsa/balsa-initdruid.gob:96
 # libinit_balsa/balsa-initdruid.gob:97
@@ -2627,10 +2638,9 @@ msgid "Configure Balsa"
 msgstr "Configurar Balsa"
 
 #: ../libinit_balsa/assistant_page_defclient.c:54
-#, fuzzy
 #| msgid "Use balsa as default email client?"
 msgid "Use Balsa as default email client?"
-msgstr "¿Quiere usar balsa como cliente de correo predeterminado?"
+msgstr "¿Quiere usar Balsa como cliente de correo predeterminado?"
 
 #: ../libinit_balsa/assistant_page_defclient.c:58
 msgid "_Yes"
@@ -2694,15 +2704,15 @@ msgstr ""
 # libbalsa/mailbox.c:275
 # libbalsa/mailbox.c:290
 #: ../libinit_balsa/assistant_page_directory.c:123
-#, fuzzy, c-format
+#, c-format
 #| msgid "Could not create a mailbox of type %s"
 msgid "Could not create mailbox at path “%s”\n"
-msgstr "No se pudo crear un buzón del tipo %s"
+msgstr "No se pudo crear un buzón en la ruta «%s»\n"
 
 # libinit_balsa/balsa-druid-page-directory.gob:101
 # libinit_balsa/balsa-druid-page-directory.gob:101
 #: ../libinit_balsa/assistant_page_directory.c:155
-#, fuzzy, c-format
+#, c-format
 #| msgid "The mailbox \"%s\" does not appear to be valid."
 msgid "The mailbox “%s” does not appear to be valid."
 msgstr "El buzón «%s» aparentemente no es válido."
@@ -2914,7 +2924,6 @@ msgid "Balsa Email Reader"
 msgstr "Lector de correo Balsa"
 
 #: ../sounds/balsa.soundlist.in.h:2
-#, fuzzy
 #| msgid "Program startup"
 msgid "Program start-up"
 msgstr "Inicio del programa"
@@ -3166,7 +3175,6 @@ msgstr "No se ha encontrado una ruta.  ¿Quiere especificar una?"
 # src/address-book-config.c:240
 # src/address-book-config.c:265
 #: ../src/address-book-config.c:930
-#, fuzzy
 #| msgid "VCard Address Book (GnomeCard)"
 msgid "vCard Address Book (GnomeCard)"
 msgstr "Libreta de direcciones VCard (GnomeCard)"
@@ -3240,7 +3248,7 @@ msgstr "Se necesita contraseña"
 
 # libmutt/mbox.c:1028
 #: ../src/balsa-app.c:529
-#, fuzzy, c-format
+#, c-format
 #| msgid "Couldn't open mailbox \"%s\""
 msgid "Couldn’t open mailbox “%s”"
 msgstr "No se pudo abrir el buzón «%s»"
@@ -3360,7 +3368,7 @@ msgstr "_Ver fuente"
 
 # libmutt/mbox.c:712
 #: ../src/balsa-index.c:2116
-#, fuzzy, c-format
+#, c-format
 #| msgid "Failed to copy %d message to mailbox \"%s\": %s"
 #| msgid_plural "Failed to copy %d messages to mailbox \"%s\": %s"
 msgid "Failed to copy %d message to mailbox “%s”: %s"
@@ -3522,7 +3530,7 @@ msgstr "(sin remitente)"
 
 # libmutt/mbox.c:712
 #: ../src/balsa-message.c:1157 ../src/balsa-message.c:1169
-#, fuzzy, c-format
+#, c-format
 #| msgid "Could not access message %u in mailbox \"%s\"."
 msgid "Could not access message %u in mailbox “%s”."
 msgstr "No se pudo acceder al mensaje %u en el buzón «%s»."
@@ -4022,7 +4030,7 @@ msgstr "Responder a:"
 #: ../src/balsa-mime-widget-message.c:756
 #: ../src/balsa-print-object-header.c:177
 msgid "FCC:"
-msgstr ""
+msgstr "Fcc:"
 
 # src/filter-edit-dialog.c:626
 # src/filter-edit-dialog.c:538
@@ -4226,7 +4234,7 @@ msgid "iTIP Calendar Request"
 msgstr "Petición de calendario iTIP"
 
 #: ../src/balsa-mime-widget-vcalendar.c:341
-#, fuzzy, c-format
+#, c-format
 #| msgid "Sending the iTip calendar reply failed: %s"
 msgid "Sending the iTIP calendar reply failed: %s"
 msgstr "Falló al enviar la respuesta al calendario iTIP: %s"
@@ -4712,12 +4720,11 @@ msgid "Re_vert"
 msgstr "Re_vertir"
 
 #: ../src/filter-edit-dialog.c:554
-#, fuzzy
 #| msgid "A filter run dialog is open.Close it before you can modify filters."
 msgid "A filter run dialog is open. Close it before you can modify filters."
 msgstr ""
-"Un diálogo de ejecución de filtros está abierto. Ciérrelo antes para\n"
-"poder modificar los filtros."
+"Un diálogo de ejecución de filtros está abierto. Ciérrelo antes para poder "
+"modificar los filtros."
 
 # src/main-window.c:259
 # src/main-window.c:262
@@ -4780,7 +4787,7 @@ msgstr ""
 "No se puede asociar con el mismo buzón (porque causa recursividad)."
 
 #: ../src/filter-run-callbacks.c:306
-#, fuzzy, c-format
+#, c-format
 #| msgid ""
 #| "The filter \"%s\" is not compatible with the mailbox type of \"%s\".\n"
 #| "This happens for example when you use regular expressions match with IMAP "
@@ -4963,7 +4970,7 @@ msgid "Select parent folder"
 msgstr "Seleccione carpeta madre"
 
 #: ../src/folder-conf.c:641
-#, fuzzy, c-format
+#, c-format
 #| msgid ""
 #| "Renaming INBOX is special!\n"
 #| "You will create a subfolder %s in %s\n"
@@ -5209,7 +5216,7 @@ msgid "No mailbox selected."
 msgstr "Ningún buzón seleccionado."
 
 #: ../src/mailbox-conf.c:378
-#, fuzzy, c-format
+#, c-format
 #| msgid ""
 #| "Mailbox \"%s\" is used by Balsa and I cannot remove it.\n"
 #| "If you really want to remove it, assign its function\n"
@@ -5220,7 +5227,8 @@ msgid ""
 "to some other mailbox."
 msgstr ""
 "El buzón «%s» lo está usando Balsa y no se puede quitar.\n"
-"Si quiere quitarlo, asigne su función a otro buzón."
+"Si realmente quiere quitarlo, asigne su función\n"
+"a otro buzón."
 
 # src/mailbox-conf.c:157
 # src/mailbox-conf.c:157
@@ -5621,7 +5629,6 @@ msgid "About Balsa"
 msgstr "Acerca de Balsa"
 
 #: ../src/main-window.c:1003
-#, fuzzy
 #| msgid "Balsa closes files and connections. Please wait..."
 msgid "Balsa closes files and connections. Please wait…"
 msgstr "Balsa cierra los archivos y conexiones. Espere…"
@@ -5875,7 +5882,6 @@ msgid "Compressing mail folders…"
 msgstr "Comprimiendo las carpetas de correo…"
 
 #: ../src/main.c:655
-#, fuzzy
 #| msgid "Get new mail on startup"
 msgid "Get new mail on start-up"
 msgstr "Obtener el correo nuevo al iniciar"
@@ -5903,7 +5909,6 @@ msgid "Opens first unread mailbox"
 msgstr "Abre el primer buzón no leído"
 
 #: ../src/main.c:668
-#, fuzzy
 #| msgid "Opens default Inbox on startup"
 msgid "Opens default Inbox on start-up"
 msgstr "Abre la bandeja de entrada predeterminado al inicio"
@@ -6779,7 +6784,6 @@ msgid "The option not to recognize “format=flowed” text has been removed."
 msgstr "La opción de no reconocer text «format=flowed» se ha eliminado."
 
 #: ../src/save-restore.c:994
-#, fuzzy
 #| msgid ""
 #| "The option not to send \"format=flowed\" text is now on the Options menu "
 #| "of the compose window."
@@ -6798,7 +6802,6 @@ msgstr ""
 "ventana de redacción."
 
 #: ../src/save-restore.c:1103
-#, fuzzy
 #| msgid ""
 #| "This version of Balsa uses a new user interface; if you have changed "
 #| "Balsa's keyboard accelerators, you will need to set them again."
@@ -6806,8 +6809,8 @@ msgid ""
 "This version of Balsa uses a new user interface; if you have changed Balsa’s "
 "keyboard accelerators, you will need to set them again."
 msgstr ""
-"Esta versión de Balsa usa una nueva interfaz; si ha cambiado las teclas "
-"rápidas de Balsa, deberá ajustarlas de nuevo."
+"Esta versión de Balsa usa una nueva interfaz; si ha cambiado los "
+"aceleradores del teclado de Balsa, deberá configurarlos de nuevo."
 
 #. Translators: please use the initial letter of each language as
 #. * its accelerator; this is a long list, and unique accelerators
@@ -6996,7 +6999,7 @@ msgid "(No name)"
 msgstr "(sin nombre)"
 
 #: ../src/sendmsg-window.c:524
-#, fuzzy, c-format
+#, c-format
 #| msgid ""
 #| "The message to '%s' is modified.\n"
 #| "Save message to Draftbox?"
@@ -7004,7 +7007,7 @@ msgid ""
 "The message to “%s” is modified.\n"
 "Save message to Draftbox?"
 msgstr ""
-"El mensaje a «%s» está modificado.\n"
+"El mensaje a «%s» se ha modificado.\n"
 "¿Guardar mensaje en borradores?"
 
 #: ../src/sendmsg-window.c:819
@@ -7098,7 +7101,7 @@ msgid "forwarded message"
 msgstr "mensaje reenviado"
 
 #: ../src/sendmsg-window.c:1764
-#, fuzzy, c-format
+#, c-format
 #| msgid "Message from %s, subject: \"%s\""
 msgid "Message from %s, subject: “%s”"
 msgstr "Mensaje de %s, asunto: «%s»"
@@ -7150,7 +7153,7 @@ msgstr "As_unto:"
 
 #: ../src/sendmsg-window.c:2605
 msgid "F_CC:"
-msgstr ""
+msgstr "F_cc:"
 
 # src/sendmsg-window.c:891
 # src/sendmsg-window.c:934
@@ -7883,10 +7886,10 @@ msgid "Queue"
 msgstr "Encolar"
 
 #: ../src/toolbar-factory.c:405
-#, fuzzy, c-format
+#, c-format
 #| msgid "Unknown toolbar icon \"%s\""
 msgid "Unknown toolbar icon “%s”"
-msgstr "Icono de barra de herramientas «%s» desconocido"
+msgstr "Icono «%s» de la barra de herramientas desconocido"
 
 #: ../src/toolbar-factory.c:482
 msgid "Queue this message for sending"
@@ -7914,10 +7917,9 @@ msgid "Use Desktop _Default (%s)"
 msgstr "Usar los pre_determinados del escritorio (%s)"
 
 #: ../src/toolbar-factory.c:786
-#, fuzzy
 #| msgid "Customize Toolbars"
 msgid "_Customize Toolbars…"
-msgstr "Personalizar barras de herramientas"
+msgstr "_Personalizar barras de herramientas…"
 
 #: ../src/toolbar-prefs.c:136
 msgid "Customize Toolbars"
@@ -7980,7 +7982,7 @@ msgstr "Guardar seleccionados a carpeta…"
 
 #: ../src/toolbar-prefs.c:521
 msgid "Add selected item to toolbar"
-msgstr ""
+msgstr "Añadir el elemento seleccionado a la barra de herramientas"
 
 # src/main-window.c:392
 # src/main-window.c:389

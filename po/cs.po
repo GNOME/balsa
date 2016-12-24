@@ -16,8 +16,8 @@ msgstr ""
 "Project-Id-Version: balsa gtk3\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=balsa&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2016-11-27 16:45+0000\n"
-"PO-Revision-Date: 2016-12-21 01:09+0100\n"
+"POT-Creation-Date: 2016-12-21 00:10+0000\n"
+"PO-Revision-Date: 2016-12-24 14:57+0100\n"
 "Last-Translator: Marek Černocký <marek@manet.cz>\n"
 "Language-Team: čeština <gnome-cs-list@gnome.org>\n"
 "Language: cs\n"
@@ -1404,11 +1404,11 @@ msgid "Mailbox (%s) is read-only: cannot change flags."
 msgstr "Poštovní schránka (%s) je pouze pro čtení: nelze změnit příznaky."
 
 #: ../libbalsa/misc.c:596
-msgid "west European"
+msgid "West European"
 msgstr "západoevropské"
 
 #: ../libbalsa/misc.c:598 ../libbalsa/misc.c:632
-msgid "east European"
+msgid "East European"
 msgstr "východoevropské"
 
 #: ../libbalsa/misc.c:600
@@ -6412,3 +6412,4 @@ msgstr "Přidat vybrané položky na nástrojovou lištu"
 #: ../src/toolbar-prefs.c:528
 msgid "Move selected item down"
 msgstr "Posunout vybrané položky níž"
+

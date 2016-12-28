@@ -62,6 +62,8 @@
 static SSL_CTX *global_ssl_context = NULL;
 static GMutex global_tls_lock;
 
+  /* Setting callbacks is not required any more with 1.1.0-pre4 and newer */
+#if OPENSSL_VERSION_NUMBER < 0x010100040L
 /* OpenSSL static locks */
 static GMutex *mutexes = NULL;
 
@@ -153,6 +155,9 @@ imaptls_thread_cleanup(void)
   return 1;
 }
 #endif /* DO_PROPER_OPENSSL_CLEANUP */
+#else
+static int imaptls_thread_setup() { return 0; }
+#endif /* OPENSSL_VERSION_NUMBER < OPENSSL_VER(1,1,0,0,4) */
 
 SSL*
 imap_create_ssl(void)

@@ -1,3 +1,7 @@
+2016-12-28  Pawel Salek <pawsa0@gmail.com>
+
+	* libbalsa/imap/imap-tls.c: avoid warnings with openssl-1.1.x
+
 2016-12-20  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Get notifications about GtkPaned's position to save the new

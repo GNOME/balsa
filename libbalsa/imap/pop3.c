@@ -28,7 +28,6 @@
 #include <unistd.h>
 
 #include <openssl/ssl.h>
-#include <openssl/evp.h>
 #include <openssl/err.h>
 
 #include "pop3.h"
@@ -310,26 +309,13 @@ get_apop_stamp(const char *greeting, char *stamp)
 static void
 compute_auth_hash(char *stamp, char *hash, const char *passwd)
 {
-  EVP_MD_CTX* ctx = EVP_MD_CTX_create();
-  register unsigned char *dp;
-  register char *cp;
-  unsigned char *ep;
-  unsigned char digest[16];
-  
-  EVP_DigestInit(ctx, EVP_md5());
-  EVP_DigestUpdate(ctx, stamp, strlen(stamp));
-  EVP_DigestUpdate(ctx, passwd, strlen(passwd));
-  EVP_DigestFinal(ctx, digest, NULL);
-  EVP_MD_CTX_destroy(ctx);
-  
-  cp = hash;
-  dp = digest;
-  for(ep = dp + sizeof(digest)/sizeof(digest[0]); dp < ep; cp += 2) {
-    sprintf(cp, "%02x", *dp);
-    dp++;
-  }
-    
-  *cp = '\0';
+	GChecksum *ctx;
+
+	ctx = g_checksum_new(G_CHECKSUM_MD5);
+	g_checksum_update(ctx, (const guchar *) stamp, -1);
+	g_checksum_update(ctx, (const guchar *) passwd, -1);
+	strncpy(hash, g_checksum_get_string(ctx), POP_LINE_LEN);
+	g_checksum_free(ctx);
 }
 
 static ImapResult

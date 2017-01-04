@@ -25,7 +25,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <glib.h>
-#include <openssl/evp.h>
 
 #include "imap-auth.h"
 #include "util.h"
@@ -34,21 +33,15 @@
 
 #define LONG_STRING 1024
 
-#define MD5_DIGEST_LEN 16
-
-/* forward declarations */
-static void hmac_md5(const char* password, char* challenge,
-                     unsigned char* response);
-
 /* imap_auth_cram_md5: AUTH=CRAM-MD5 support. */
 ImapResult
 imap_auth_cram(ImapMboxHandle* handle)
 {
   char ibuf[LONG_STRING*2], obuf[LONG_STRING];
-  unsigned char hmac_response[MD5_DIGEST_LEN];
   unsigned cmdno;
   int len, rc, ok;
   char *user = NULL, *pass = NULL;
+  gchar *digest;
 
   if (!imap_mbox_handle_can_do(handle, IMCAP_ACRAM_MD5))
     return IMAP_AUTH_UNAVAIL;
@@ -101,14 +94,9 @@ imap_auth_cram(ImapMboxHandle* handle)
    *   around them when the bug report comes in. Until then, we'll remain
    *   blissfully RFC-compliant.
    */
-  hmac_md5 (pass, obuf, hmac_response);
-  g_snprintf (obuf, sizeof (obuf),
-    "%s %02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",
-    user,
-    hmac_response[0], hmac_response[1], hmac_response[2], hmac_response[3],
-    hmac_response[4], hmac_response[5], hmac_response[6], hmac_response[7],
-    hmac_response[8], hmac_response[9], hmac_response[10], hmac_response[11],
-    hmac_response[12], hmac_response[13], hmac_response[14], hmac_response[15]);
+  digest = g_compute_hmac_for_string(G_CHECKSUM_MD5, (const guchar *) pass, strlen(pass), obuf, -1);
+  g_snprintf (obuf, sizeof (obuf), "%s %s", user, digest);
+  g_free(digest);
   /* XXX - ibuf must be long enough to store the base64 encoding of obuf, 
    * plus the additional debris
    */
@@ -123,54 +111,4 @@ imap_auth_cram(ImapMboxHandle* handle)
   while (rc == IMR_UNTAGGED);
 
   return rc == IMR_OK ? IMAP_SUCCESS : IMAP_AUTH_FAILURE;
-}
-
-/* hmac_md5: produce CRAM-MD5 challenge response. */
-#define MD5_BLOCK_LEN  64
-static void
-hmac_md5 (const char* password, char* challenge,
-          unsigned char* response)
-{  
-  EVP_MD_CTX *ctx = EVP_MD_CTX_create();
-  unsigned char ipad[MD5_BLOCK_LEN], opad[MD5_BLOCK_LEN];
-  unsigned char secret[MD5_BLOCK_LEN+1];
-  unsigned int secret_len, chal_len;
-  int i;
-
-  secret_len = strlen(password);
-  chal_len = strlen(challenge);
-
-  /* passwords longer than MD5_BLOCK_LEN bytes are substituted with their MD5
-   * digests */
-  if (secret_len > MD5_BLOCK_LEN) {
-	EVP_DigestInit(ctx, EVP_md5());
-	EVP_DigestUpdate(ctx, (const unsigned char*) password, secret_len);
-	EVP_DigestFinal(ctx, secret, &secret_len);
-  }
-  else
-    strncpy ((char *) secret, password, sizeof (secret));
-
-  memset (ipad, 0, sizeof(ipad));
-  memset (opad, 0, sizeof(opad));
-  memcpy (ipad, secret, secret_len);
-  memcpy (opad, secret, secret_len);
-
-  for (i=0; i<MD5_BLOCK_LEN; i++) {
-    ipad[i] ^= 0x36;
-    opad[i] ^= 0x5c;
-  }
-
-  /* inner hash: challenge and ipadded secret */
-  EVP_DigestInit(ctx, EVP_md5());
-  EVP_DigestUpdate(ctx, ipad, MD5_BLOCK_LEN);
-  EVP_DigestUpdate(ctx, (unsigned char*) challenge, chal_len);
-  EVP_DigestFinal(ctx, response, NULL);
-
-  /* outer hash: inner hash and opadded secret */
-  EVP_DigestInit(ctx, EVP_md5());
-  EVP_DigestUpdate(ctx, opad, MD5_BLOCK_LEN);
-  EVP_DigestUpdate(ctx, response, MD5_DIGEST_LEN);
-  EVP_DigestFinal(ctx, response, NULL);
-
-  EVP_MD_CTX_destroy(ctx);
 }

@@ -1,3 +1,14 @@
+2017-01-24  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Fix some conditional compilation code so that uncrustify does
+	not break the build.
+
+	* src/balsa-message.c (balsa_headers_attachments_popup),
+	(tree_button_press_cb): fix it.
+	* src/balsa-mime-widget-text.c (prepare_url_offsets): ditto.
+	* src/sendmsg-window.c (attachment_button_press_cb),
+	(attachment_popup_cb): ditto.
+
 2017-01-03  Albrecht Dreß
 
 	Use glib for digest calculations

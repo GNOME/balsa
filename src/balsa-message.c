@@ -253,7 +253,7 @@ balsa_message_class_init(BalsaMessageClass * klass)
 static void
 balsa_headers_attachments_popup(GtkButton * button, BalsaMessage * bm)
 {
-    if (bm->parts_popup)
+    if (bm->parts_popup) {
 #if GTK_CHECK_VERSION(3, 22, 0)
         gtk_menu_popup_at_widget(GTK_MENU(bm->parts_popup),
                                  GTK_WIDGET(bm),
@@ -263,6 +263,7 @@ balsa_headers_attachments_popup(GtkButton * button, BalsaMessage * bm)
 	gtk_menu_popup(GTK_MENU(bm->parts_popup), NULL, NULL, NULL, NULL, 0,
 		       gtk_get_current_event_time());
 #endif                          /*GTK_CHECK_VERSION(3, 22, 0) */
+    }
 }
 
 
@@ -1066,7 +1067,7 @@ tree_button_press_cb(GtkWidget * widget, GdkEventButton * event,
             if (gtk_tree_model_get_iter (model, &iter, path)) {
                 gtk_tree_model_get(model, &iter, PART_INFO_COLUMN, &info, -1);
                 if (info) {
-                    if (info->popup_menu)
+                    if (info->popup_menu) {
 #if GTK_CHECK_VERSION(3, 22, 0)
                         gtk_menu_popup_at_pointer(GTK_MENU(info->popup_menu),
                                                   (GdkEvent *) event);
@@ -1074,6 +1075,7 @@ tree_button_press_cb(GtkWidget * widget, GdkEventButton * event,
                         gtk_menu_popup(GTK_MENU(info->popup_menu), NULL, NULL,
                                        NULL, NULL, event->button, event->time);
 #endif                          /*GTK_CHECK_VERSION(3, 22, 0) */
+                    }
                     g_object_unref(info);
                 }
             }

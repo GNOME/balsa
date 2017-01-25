@@ -678,7 +678,7 @@ prepare_url_offsets(GtkTextBuffer * buffer, GList * url_list)
 #ifdef BUG_102711_FIXED
         gtk_text_iter_backward_to_tag_toggle(&iter, url_tag);
 #else
-        while (gtk_text_iter_backward_char(&iter))
+        while (gtk_text_iter_backward_char(&iter)) {
 #if GTK_CHECK_VERSION(3, 19, 0)
             if (gtk_text_iter_starts_tag(&iter, url_tag))
                 break;
@@ -686,6 +686,7 @@ prepare_url_offsets(GtkTextBuffer * buffer, GList * url_list)
             if (gtk_text_iter_begins_tag(&iter, url_tag))
                 break;
 #endif                          /* GTK_CHECK_VERSION(3, 20, 0) */
+        }
 #endif                          /* BUG_102711_FIXED */
         url->start = gtk_text_iter_get_offset(&iter);
     }

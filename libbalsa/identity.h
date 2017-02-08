@@ -84,9 +84,7 @@ G_BEGIN_DECLS
 	gboolean warn_send_plain;
 	gint crypt_protocol;
         gchar *force_key_id;
-#if ENABLE_ESMTP
 	LibBalsaSmtpServer *smtp_server;
-#endif                          /* ENABLE_ESMTP */
     };
 
     struct _LibBalsaIdentityClass 
@@ -116,11 +114,9 @@ G_BEGIN_DECLS
     void libbalsa_identity_set_sig_prepend(LibBalsaIdentity*, gboolean);
     gchar* libbalsa_identity_get_signature(LibBalsaIdentity*, 
                                            GtkWindow *parent);
-#if ENABLE_ESMTP
     void libbalsa_identity_set_smtp_server(LibBalsaIdentity * ident,
                                            LibBalsaSmtpServer *
                                            smtp_server);
-#endif                          /* ENABLE_ESMTP */
 
     void libbalsa_identity_set_gpg_sign(LibBalsaIdentity*, gboolean);
     void libbalsa_identity_set_gpg_encrypt(LibBalsaIdentity*, gboolean);
@@ -129,9 +125,7 @@ G_BEGIN_DECLS
     void libbalsa_identity_config_dialog(GtkWindow * parent,
                                          GList ** identities,
                                          LibBalsaIdentity ** current,
-#if ENABLE_ESMTP
-					 GSList * smtp_servers,
-#endif                          /* ENABLE_ESMTP */
+										 GSList * smtp_servers,
                                          void (*changed_cb)(gpointer));
 
     typedef void (*LibBalsaIdentityCallback) (gpointer data,

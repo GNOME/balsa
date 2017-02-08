@@ -39,9 +39,7 @@
 #include "libbalsa-conf.h"
 #include "threads.h"
 
-#if ENABLE_ESMTP
 #include "smtp-server.h"
-#endif                          /* ENABLE_ESMTP */
 
 #define FOLDER_SECTION_PREFIX "folder-"
 #define MAILBOX_SECTION_PREFIX "mailbox-"
@@ -486,7 +484,6 @@ config_warning_idle(const gchar * text)
     return FALSE;
 }
 
-#if ENABLE_ESMTP
 static gboolean
 config_load_smtp_server(const gchar * key, const gchar * value, gpointer data)
 {
@@ -502,7 +499,6 @@ config_load_smtp_server(const gchar * key, const gchar * value, gpointer data)
 
     return FALSE;
 }
-#endif                          /* ENABLE_ESMTP */
 
 static gboolean
 load_gtk_print_setting(const gchar * key, const gchar * value, gpointer data)
@@ -579,12 +575,11 @@ config_global_load(void)
     static gboolean new_user = FALSE;
 
     config_address_books_load();
-#if ENABLE_ESMTP
+
     /* Load SMTP servers before identities. */
     libbalsa_conf_foreach_group(SMTP_SERVER_SECTION_PREFIX,
 	                        config_load_smtp_server,
 	                        &balsa_app.smtp_servers);
-#endif                          /* ENABLE_ESMTP */
 
     /* We must load filters before mailboxes, because they refer to the filters list */
     config_filters_load();
@@ -935,7 +930,6 @@ config_global_load(void)
     /* Sending options ... */
     libbalsa_conf_push_group("Sending");
 
-#if ENABLE_ESMTP
     /* ... SMTP servers */
     if (!balsa_app.smtp_servers) {
 	/* Transition code */
@@ -969,7 +963,6 @@ config_global_load(void)
         /* default set to "Use TLS if possible" */
 	server->tls_mode = libbalsa_conf_get_int("ESMTPTLSMode=1");
 
-#if HAVE_SMTP_TLS_CLIENT_CERTIFICATE
 	passphrase =
 	    libbalsa_conf_private_get_string("ESMTPCertificatePassphrase");
 	if (passphrase) {
@@ -977,9 +970,8 @@ config_global_load(void)
             g_free(passphrase);
 	    libbalsa_smtp_server_set_cert_passphrase(smtp_server, tmp);
 	}
-#endif
     }
-#endif                          /* ENABLE_ESMTP */
+
     /* ... outgoing mail */
     balsa_app.wordwrap = libbalsa_conf_get_bool("WordWrap=false");
     balsa_app.wraplength = libbalsa_conf_get_int("WrapLength=72");
@@ -1173,9 +1165,7 @@ gint
 config_save(void)
 {
     gint i;
-#if ENABLE_ESMTP
     GSList *list;
-#endif                          /* ENABLE_ESMTP */
 
     config_address_books_save();
     config_identities_save();
@@ -1404,7 +1394,6 @@ config_save(void)
     libbalsa_conf_pop_group();
 
     /* Sending options ... */
-#if ENABLE_ESMTP
     for (list = balsa_app.smtp_servers; list; list = list->next) {
         LibBalsaSmtpServer *smtp_server = LIBBALSA_SMTP_SERVER(list->data);
         gchar *group;
@@ -1417,7 +1406,6 @@ config_save(void)
         libbalsa_smtp_server_save_config(smtp_server);
         libbalsa_conf_pop_group();
     }
-#endif                          /* ENABLE_ESMTP */
 
     libbalsa_conf_remove_group("Sending");
     libbalsa_conf_private_remove_group("Sending");
@@ -1596,7 +1584,6 @@ config_address_books_save(void)
                    (GFunc) config_address_book_save, NULL);
 }
 
-#if ENABLE_ESMTP
 static LibBalsaSmtpServer *
 find_smtp_server_by_name(const gchar * name)
 {
@@ -1618,26 +1605,21 @@ find_smtp_server_by_name(const gchar * name)
     g_return_val_if_fail(balsa_app.smtp_servers, NULL);
     return LIBBALSA_SMTP_SERVER(balsa_app.smtp_servers->data);
 }
-#endif                          /* ESMTP */
 
 static gboolean
 config_identity_load(const gchar * key, const gchar * value, gpointer data)
 {
     const gchar *default_ident = data;
     LibBalsaIdentity *ident;
-#if ENABLE_ESMTP
     gchar *smtp_server_name;
-#endif                          /* ENABLE_ESMTP */
 
     libbalsa_conf_push_group(key);
     ident = libbalsa_identity_new_config(value);
-#if ENABLE_ESMTP
     smtp_server_name = libbalsa_conf_get_string("SmtpServer");
     libbalsa_identity_set_smtp_server(ident,
                                       find_smtp_server_by_name
                                       (smtp_server_name));
     g_free(smtp_server_name);
-#endif                          /* ENABLE_ESMTP */
     libbalsa_conf_pop_group();
     balsa_app.identities = g_list_prepend(balsa_app.identities, ident);
     if (g_ascii_strcasecmp(default_ident, ident->identity_name) == 0)

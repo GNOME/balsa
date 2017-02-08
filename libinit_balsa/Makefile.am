@@ -18,6 +18,7 @@ libinit_balsa_a_SOURCES = 		\
 
 AM_CPPFLAGS = -I$(top_builddir) -I$(top_srcdir) \
 	-I$(top_srcdir)/libbalsa \
+	-I${top_srcdir}/libnetclient \
 	-I$(top_srcdir)/src \
         $(BALSA_CFLAGS)
 

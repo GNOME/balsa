@@ -62,6 +62,8 @@ libinit_balsa/assistant_page_user.c
 libinit_balsa/assistant_page_user.c
 libinit_balsa/assistant_page_welcome.c
 libinit_balsa/assistant_page_welcome.c
+libnetclient/net-client-smtp.c
+libnetclient/net-client.c
 sounds/balsa.soundlist.in
 src/ab-main.c
 src/ab-window.c

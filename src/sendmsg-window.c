@@ -5241,7 +5241,6 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
                                message->gpg_mode);
 #endif
 
-#if ENABLE_ESMTP
     if(queue_only)
 	result = libbalsa_message_queue(message, balsa_app.outbox, fcc,
 					bsmsg->ident->smtp_server,
@@ -5252,16 +5251,6 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
 				       bsmsg->ident->smtp_server,
                                        GTK_WINDOW(bsmsg->window),
                                        bsmsg->flow, balsa_app.debug, &error);
-#else
-    if(queue_only)
-	result = libbalsa_message_queue(message, balsa_app.outbox, fcc,
-					bsmsg->flow, &error);
-    else
-        result = libbalsa_message_send(message, balsa_app.outbox, fcc,
-                                       balsa_find_sentbox_by_url,
-                                       GTK_WINDOW(bsmsg->window),
-				       bsmsg->flow, balsa_app.debug, &error);
-#endif
     if (result == LIBBALSA_MESSAGE_CREATE_OK) {
 	if (bsmsg->parent_message && bsmsg->parent_message->mailbox
             && !bsmsg->parent_message->mailbox->readonly)

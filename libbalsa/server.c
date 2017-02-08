@@ -182,6 +182,7 @@ libbalsa_server_init(LibBalsaServer * server)
     server->remember_passwd = TRUE;
     server->use_ssl         = FALSE;
     server->tls_mode        = LIBBALSA_TLS_ENABLED;
+    server->security		= NET_CLIENT_CRYPT_STARTTLS;
 }
 
 /* leave object in sane state (NULLified fields) */
@@ -324,9 +325,14 @@ libbalsa_server_load_config(LibBalsaServer * server)
         }
     }       
     server->use_ssl = libbalsa_conf_get_bool("SSL=false");
-    d=0;
+    d = FALSE;
     server->tls_mode = libbalsa_conf_get_int_with_default("TLSMode", &d);
     if(d) server->tls_mode = LIBBALSA_TLS_ENABLED;
+    d = FALSE;
+    server->security = libbalsa_conf_get_int_with_default("Security", &d);
+    if (d) {
+    	server->security = NET_CLIENT_CRYPT_STARTTLS;
+    }
     server->user = libbalsa_conf_private_get_string("Username");
     if (!server->user)
 	server->user = g_strdup(getenv("USER"));
@@ -466,6 +472,7 @@ libbalsa_server_save_config(LibBalsaServer * server)
     }
     libbalsa_conf_set_bool("SSL", server->use_ssl);
     libbalsa_conf_set_int("TLSMode", server->tls_mode);
+    libbalsa_conf_set_int("Security", server->security);
 }
 
 void

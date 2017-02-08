@@ -2472,18 +2472,11 @@ handle_mdn_request(GtkWindow *parent, LibBalsaMessage *message)
 	GError * error = NULL;
 	LibBalsaMsgCreateResult result;
 
-#if ENABLE_ESMTP
         result = libbalsa_message_send(mdn, balsa_app.outbox, NULL,
 				       balsa_find_sentbox_by_url,
 				       mdn_ident->smtp_server,
                                        parent,
 				       TRUE, balsa_app.debug, &error);
-#else
-        result = libbalsa_message_send(mdn, balsa_app.outbox, NULL,
-				       balsa_find_sentbox_by_url,
-                                       parent,
-				       TRUE, balsa_app.debug, &error);
-#endif
 	if (result != LIBBALSA_MESSAGE_CREATE_OK)
 	    libbalsa_information(LIBBALSA_INFORMATION_ERROR,
 				 _("Sending the disposition notification failed: %s"),
@@ -2618,7 +2611,6 @@ mdn_dialog_response(GtkWidget * dialog, gint response, gpointer user_data)
     g_return_if_fail(mdn_ident != NULL);
 
     if (response == GTK_RESPONSE_YES) {
-#if ENABLE_ESMTP
         result =
             libbalsa_message_send(send_msg, balsa_app.outbox, NULL,
                                   balsa_find_sentbox_by_url,
@@ -2626,13 +2618,6 @@ mdn_dialog_response(GtkWidget * dialog, gint response, gpointer user_data)
                                   gtk_window_get_transient_for
                                   ((GtkWindow *) dialog),
                                   TRUE, balsa_app.debug, &error);
-#else
-        result = libbalsa_message_send(send_msg, balsa_app.outbox, NULL,
-				       balsa_find_sentbox_by_url,
-                                       gtk_window_get_transient_for
-                                       ((GtkWindow *) dialog),
-				       TRUE, balsa_app.debug, &error);
-#endif
         if (result != LIBBALSA_MESSAGE_CREATE_OK)
             libbalsa_information(LIBBALSA_INFORMATION_ERROR,
                                  _("Sending the disposition notification failed: %s"),

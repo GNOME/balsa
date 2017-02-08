@@ -22,7 +22,7 @@
 # include "config.h"
 #endif                          /* HAVE_CONFIG_H */
 
-#define _DEFAULT_SOURCE 1 
+#define _DEFAULT_SOURCE 1
 #define _POSIX_C_SOURCE 199309L
 #include "send.h"
 
@@ -41,61 +41,35 @@
 #include "missing.h"
 #include "information.h"
 
-#if ENABLE_ESMTP
-#include <auth-client.h>
-#include <libesmtp.h>
+#include "net-client-smtp.h"
+#include "gmime-filter-header.h"
 #include "smtp-server.h"
-#include <stdarg.h>
-
-#include <sys/types.h>
-#include <sys/stat.h>
-#endif /* ESMTP */
-
-#include <sys/utsname.h>
 
 #include <glib/gi18n.h>
 
 typedef struct _MessageQueueItem MessageQueueItem;
 
 struct _MessageQueueItem {
-    char tempfile[_POSIX_PATH_MAX];
     LibBalsaMessage *orig;
     GMimeStream *stream;
     LibBalsaFccboxFinder finder;
-#if !ENABLE_ESMTP
-    MessageQueueItem *next_message;
-    enum {MQI_WAITING, MQI_FAILED,MQI_SENT} status;
-#else
-    long message_size;
-    long sent;
-    long acc;
-    long update;
-    int refcount;
-    gboolean error;
-#endif
+    NetClientSmtpMessage *smtp_msg;
+    gint64 message_size;
+    gint64 sent;
+    gint64 acc;
+    gint64 update;
 };
 
 typedef struct _SendMessageInfo SendMessageInfo;
 
-struct _SendMessageInfo{
-    LibBalsaMailbox* outbox;
-#if ENABLE_ESMTP
-    /* [BCS] - The smtp_session_t structure holds all the information
-       needed to transfer the message to the SMTP server.  This structure
-       is opaque to the application. */
-    smtp_session_t session;
-#else
-    LibBalsaFccboxFinder finder;
-#endif
+struct _SendMessageInfo {
+    LibBalsaMailbox *outbox;
+    NetClientSmtp *session;
+    gchar *mta_name;
+    GList *items;		/* of MessageQueueItem */
     gboolean debug;
 };
 
-/* Variables storing the state of the sending thread.
- * These variables are protected in MT by send_messages_lock mutex */
-#if ENABLE_ESMTP
-#else
-static MessageQueueItem *message_queue;
-#endif
 static int sending_threads = 0; /* how many sending threads are active? */
 /* end of state variables section */
 
@@ -132,64 +106,48 @@ msg_queue_item_new(LibBalsaFccboxFinder finder)
 {
     MessageQueueItem *mqi;
 
-    mqi = g_new(MessageQueueItem, 1);
+    mqi = g_new0(MessageQueueItem, 1U);
     mqi->finder = finder;
-#if !ENABLE_ESMTP
-    mqi->next_message = NULL;
-    mqi->status = MQI_WAITING;
-#else
-    mqi->error = FALSE;
-#endif
-    mqi->stream=NULL;
-    mqi->tempfile[0] = '\0';
     return mqi;
 }
 
 static void
-msg_queue_item_destroy(MessageQueueItem * mqi)
+msg_queue_item_destroy(MessageQueueItem *mqi)
 {
-    if (*mqi->tempfile)
-	unlink(mqi->tempfile);
-    if (mqi->stream)
-	g_object_unref(mqi->stream);
-    if (mqi->orig)
-	g_object_unref(mqi->orig);
+	if (mqi->smtp_msg != NULL) {
+		net_client_smtp_msg_free(mqi->smtp_msg);
+	}
+    if (mqi->stream != NULL) {
+    	g_object_unref(G_OBJECT(mqi->stream));
+	}
+    if (mqi->orig != NULL) {
+    	g_object_unref(G_OBJECT(mqi->orig));
+	}
     g_free(mqi);
 }
 
-#if ENABLE_ESMTP
 static SendMessageInfo *
-send_message_info_new(LibBalsaMailbox* outbox, smtp_session_t session,
-                      gboolean debug)
+send_message_info_new(LibBalsaMailbox *outbox, NetClientSmtp *session, const gchar *name)
 {
     SendMessageInfo *smi;
 
-    smi=g_new(SendMessageInfo,1);
+    smi = g_new0(SendMessageInfo, 1);
     smi->session = session;
     smi->outbox = outbox;
-    smi->debug = debug;
-
+    smi->mta_name = g_strdup(name);
     return smi;
 }
-#else
-static SendMessageInfo *
-send_message_info_new(LibBalsaMailbox* outbox,
-                      LibBalsaFccboxFinder finder, gboolean debug)
-{
-    SendMessageInfo *smi;
-
-    smi=g_new(SendMessageInfo,1);
-    smi->outbox = outbox;
-    smi->finder = finder;
-    smi->debug = debug;
-
-    return smi;
-}
-#endif
 
 static void
 send_message_info_destroy(SendMessageInfo *smi)
 {
+	if (smi->session != NULL) {
+		g_object_unref(G_OBJECT(smi->session));
+	}
+	if (smi->items != NULL) {
+		g_list_free(smi->items);
+	}
+	g_free(smi->mta_name);
     g_free(smi);
 }
 
@@ -203,7 +161,7 @@ do_multipart_crypto(LibBalsaMessage * message, GMimeObject ** mime_root,
 		    GtkWindow * parent, GError ** error);
 #endif
 
-static guint balsa_send_message_real(SendMessageInfo* info);
+static gboolean balsa_send_message_real(SendMessageInfo* info);
 static LibBalsaMsgCreateResult
 libbalsa_message_create_mime_message(LibBalsaMessage* message,
 				     gboolean flow, gboolean postponing,
@@ -436,15 +394,11 @@ static void libbalsa_set_message_id(GMimeMessage * mime_message);
 LibBalsaMsgCreateResult
 libbalsa_message_queue(LibBalsaMessage * message, LibBalsaMailbox * outbox,
 		       LibBalsaMailbox * fccbox,
-#if ENABLE_ESMTP
-                       LibBalsaSmtpServer * smtp_server,
-#endif /* ESMTP */
+			   LibBalsaSmtpServer * smtp_server,
 		       gboolean flow, GError ** error)
 {
     LibBalsaMsgCreateResult result;
-#if ENABLE_ESMTP
     guint big_message;
-#endif /* ESMTP */
     gboolean rc;
 
     g_assert(error != NULL);
@@ -459,7 +413,6 @@ libbalsa_message_queue(LibBalsaMessage * message, LibBalsaMailbox * outbox,
                                   fccbox->url);
     g_mime_object_set_header(GMIME_OBJECT(message->mime_msg), "X-Balsa-DSN",
 			     message->request_dsn ? "1" : "0");
-#if ENABLE_ESMTP
     g_mime_object_set_header(GMIME_OBJECT(message->mime_msg), "X-Balsa-SmtpServer",
 	                      libbalsa_smtp_server_get_name(smtp_server));
 
@@ -495,9 +448,6 @@ libbalsa_message_queue(LibBalsaMessage * message, LibBalsaMailbox * outbox,
         message->mime_msg = mime_msg;
     } else
         rc = libbalsa_message_copy(message, outbox, error);
-#else                           /* ESMTP */
-    rc = libbalsa_message_copy(message, outbox, error);
-#endif                          /* ESMTP */
 
     return rc ?  LIBBALSA_MESSAGE_CREATE_OK : LIBBALSA_MESSAGE_QUEUE_ERROR;
 }
@@ -506,7 +456,6 @@ libbalsa_message_queue(LibBalsaMessage * message, LibBalsaMailbox * outbox,
    send the given messsage (if any, it can be NULL) and all the messages
    in given outbox.
 */
-#if ENABLE_ESMTP
 static gboolean lbs_process_queue(LibBalsaMailbox * outbox,
                                   LibBalsaFccboxFinder finder,
                                   LibBalsaSmtpServer * smtp_server,
@@ -537,88 +486,130 @@ libbalsa_message_send(LibBalsaMessage * message, LibBalsaMailbox * outbox,
 
     return result;
 }
-#else /* ENABLE_ESMTP */
-LibBalsaMsgCreateResult
-libbalsa_message_send(LibBalsaMessage* message, LibBalsaMailbox* outbox,
-		      LibBalsaMailbox* fccbox, LibBalsaFccboxFinder finder,
-                      gboolean flow, gboolean debug,
-		      GError ** error)
-{
-    LibBalsaMsgCreateResult result = LIBBALSA_MESSAGE_CREATE_OK;
 
-    if (message != NULL)
- 	result = libbalsa_message_queue(message, outbox, fccbox, flow, error);
-    if (result == LIBBALSA_MESSAGE_CREATE_OK)
- 	if (!libbalsa_process_queue(outbox, finder, debug))
- 	    return LIBBALSA_MESSAGE_SEND_ERROR;
- 
-    return result;
-}
-#endif /* ENABLE_ESMTP */
-
-#if ENABLE_ESMTP
-/* [BCS] - libESMTP uses a callback function to read the message from the
-   application to the SMTP server.
- */
-#define BUFLEN	8192
-
-static const char *
-libbalsa_message_cb (void **buf, int *len, void *arg)
-{
-    MessageQueueItem *current_message = arg;
-    GMimeStreamMem *mem_stream = GMIME_STREAM_MEM(current_message->stream);
-    char *ptr;
-
-    if (len == NULL) {
-	g_mime_stream_reset(current_message->stream);
-	return NULL;
-    }
-
-    /* note: the following calculation works *only* for messages < 2 GB
-     * due to the limited range of int, but this should be safe... */
-    *len = g_mime_stream_length(current_message->stream)
-	    - g_mime_stream_tell(current_message->stream);
-    ptr = (char *) mem_stream->buffer->data
-	    + g_mime_stream_tell(current_message->stream);
-    g_mime_stream_seek(current_message->stream, *len, GMIME_STREAM_SEEK_CUR);
-
-    return ptr;
-}
 
 static void
-add_recipients(smtp_message_t message,
-               InternetAddressList * recipient_list,
-               gboolean request_dsn)
+add_recipients(NetClientSmtpMessage *message, InternetAddressList * recipient_list, gboolean request_dsn)
 {
-    const InternetAddress *ia;
-    int i;
-    
-    if (recipient_list == NULL)
-	return;
-    
-    for (i = 0; i < internet_address_list_length (recipient_list); i++) {
-        ia = internet_address_list_get_address (recipient_list, i);
-
-	if (INTERNET_ADDRESS_IS_MAILBOX (ia)) {
-	    smtp_recipient_t recipient;
-
-            recipient =
-                smtp_add_recipient(message,
-                                   INTERNET_ADDRESS_MAILBOX(ia)->addr);
-	    if (request_dsn) {
-                smtp_dsn_set_notify(recipient,
-                                    Notify_SUCCESS | Notify_FAILURE |
-                                    Notify_DELAY);
+	if (recipient_list != NULL) {
+		const InternetAddress *ia;
+		NetClientSmtpDsnMode dsn_mode;
+		int i;
 
 		/* XXX  - It would be cool if LibBalsaAddress could contain DSN options
-	           for a particular recipient.  For the time being, just use a switch */
-	    }
-	} else {
-            add_recipients(message, INTERNET_ADDRESS_GROUP(ia)->members,
-                           request_dsn);
+   	       for a particular recipient.  For the time being, just use a switch */
+		if (request_dsn) {
+			dsn_mode = NET_CLIENT_SMTP_DSN_SUCCESS + NET_CLIENT_SMTP_DSN_FAILURE + NET_CLIENT_SMTP_DSN_DELAY;
+		} else {
+			dsn_mode = NET_CLIENT_SMTP_DSN_NEVER;
+		}
+
+		for (i = 0; i < internet_address_list_length(recipient_list); i++) {
+			ia = internet_address_list_get_address(recipient_list, i);
+
+			if (INTERNET_ADDRESS_IS_MAILBOX(ia)) {
+				net_client_smtp_msg_add_recipient(message, INTERNET_ADDRESS_MAILBOX(ia)->addr, dsn_mode);
+			} else {
+				add_recipients(message, INTERNET_ADDRESS_GROUP(ia)->members, request_dsn);
+			}
+		}
 	}
-    }
 }
+
+
+static gssize
+send_message_data_cb(gchar *buffer, gsize count, gpointer user_data, GError **error)
+{
+	ssize_t read_res;
+	MessageQueueItem *mqi = (MessageQueueItem *) user_data;
+
+	read_res = g_mime_stream_read(mqi->stream, buffer, count);
+	if ((mqi->message_size > 0) && (read_res > 0)) {
+		mqi->acc += read_res;
+		if (mqi->acc >= mqi->update) {
+			float percent;
+			SendThreadMessage *threadmsg;
+
+			mqi->sent += mqi->acc;
+			mqi->acc = 0;
+			percent = (float) mqi->sent / (float) mqi->message_size;
+			if (percent > 1.0F) {
+				percent = 1.0F;
+			}
+			MSGSENDTHREAD(threadmsg, MSGSENDTHREADPROGRESS, "", NULL, NULL, percent);
+		}
+	}
+	return read_res;
+}
+
+
+static gboolean
+check_cert(NetClient *client, GTlsCertificate *peer_cert, GTlsCertificateFlags errors, gpointer user_data)
+{
+	GByteArray *cert_der = NULL;
+	gboolean result = FALSE;
+
+	/* FIXME - this a hack, simulating the (OpenSSL based) input for libbalsa_is_cert_known().  If we switch completely to
+	 * (GnuTLS based) GTlsCertificate/GTlsClientConnection, we can omit this... */
+	g_debug("%s: %p %p %u %p", __func__, client, peer_cert, errors, user_data);
+
+	/* create a OpenSSL X509 object from the certificate's DER data */
+	g_object_get(G_OBJECT(peer_cert), "certificate", &cert_der, NULL);
+	if (cert_der != NULL) {
+		X509 *ossl_cert;
+		const unsigned char *der_p;
+
+		der_p = (const unsigned char *) cert_der->data;
+		ossl_cert = d2i_X509(NULL, &der_p, cert_der->len);
+		g_byte_array_unref(cert_der);
+
+		if (ossl_cert != NULL) {
+			long vfy_result;
+
+			/* convert the GIO error flags into OpenSSL error flags */
+			if ((errors & G_TLS_CERTIFICATE_UNKNOWN_CA) == G_TLS_CERTIFICATE_UNKNOWN_CA) {
+				vfy_result = X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT;
+			} else if ((errors & G_TLS_CERTIFICATE_BAD_IDENTITY) == G_TLS_CERTIFICATE_BAD_IDENTITY) {
+				vfy_result = X509_V_ERR_SUBJECT_ISSUER_MISMATCH;
+			} else if ((errors & G_TLS_CERTIFICATE_NOT_ACTIVATED) == G_TLS_CERTIFICATE_NOT_ACTIVATED) {
+				vfy_result = X509_V_ERR_CERT_NOT_YET_VALID;
+			} else if ((errors & G_TLS_CERTIFICATE_EXPIRED) == G_TLS_CERTIFICATE_EXPIRED) {
+				vfy_result = X509_V_ERR_CERT_HAS_EXPIRED;
+			} else if ((errors & G_TLS_CERTIFICATE_REVOKED) == G_TLS_CERTIFICATE_REVOKED) {
+				vfy_result = X509_V_ERR_CERT_REVOKED;
+			} else {
+				vfy_result = X509_V_ERR_APPLICATION_VERIFICATION;
+			}
+
+			result = libbalsa_is_cert_known(ossl_cert, vfy_result);
+			X509_free(ossl_cert);
+		}
+	}
+
+	return result;
+}
+
+
+static gchar **
+get_auth(NetClient *client, gpointer user_data)
+{
+	LibBalsaServer *server = LIBBALSA_SERVER(user_data);
+	gchar **result = NULL;
+
+	g_debug("%s: %p %p: encrypted = %d", __func__, client, user_data, net_client_is_encrypted(client));
+	/* Note: if the usr name is empty, we assume anonymous access */
+	if ((server->try_anonymous == 0U) && (server->user != NULL) && (server->user[0] != '\0')) {
+		result = g_new0(gchar *, 3U);
+		result[0] = g_strdup(server->user);
+		if ((server->passwd != NULL) && (server->passwd[0] != '\0')) {
+			result[1] = g_strdup(server->passwd);
+		} else {
+			result[1] = libbalsa_server_get_password(server, NULL);
+		}
+	}
+	return result;
+}
+
 
 /* libbalsa_process_queue:
    treats given mailbox as a set of messages to send. Loads them up and
@@ -631,303 +622,126 @@ add_recipients(smtp_message_t message,
  */
 static gboolean
 lbs_process_queue(LibBalsaMailbox * outbox, LibBalsaFccboxFinder finder,
-		  LibBalsaSmtpServer * smtp_server, gboolean debug,
-                  GtkWindow * parent)
+	LibBalsaSmtpServer * smtp_server, gboolean debug,
+	GtkWindow * parent)
 {
-    LibBalsaServer *server = LIBBALSA_SERVER(smtp_server);
-    MessageQueueItem *new_message;
-    SendMessageInfo *send_message_info;
-    LibBalsaMessage *msg;
-    smtp_session_t session;
-    smtp_message_t message, bcc_message;
-    const gchar *phrase, *mailbox, *subject;
-    long estimate;
-    guint msgno;
-    gchar *host_with_port;
-    GThread *send_mail;
+	LibBalsaServer *server = LIBBALSA_SERVER(smtp_server);
+	SendMessageInfo *send_message_info;
+	NetClientSmtp *session;
+	guint msgno;
 
-    g_mutex_lock(&send_messages_lock);
+	g_mutex_lock(&send_messages_lock);
 
-    if (!libbalsa_mailbox_open(outbox, NULL)) {
-    	g_mutex_unlock(&send_messages_lock);
-	return FALSE;
-    }
-    if (!libbalsa_mailbox_total_messages(outbox)) {
-	libbalsa_mailbox_close(outbox, TRUE);
+	if (!libbalsa_mailbox_open(outbox, NULL)) {
+		g_mutex_unlock(&send_messages_lock);
+		return FALSE;
+	}
+
+	/* create the SMTP session */
+	if (server->security == NET_CLIENT_CRYPT_ENCRYPTED) {
+		session = net_client_smtp_new(server->host, 465U, server->security);
+	} else {
+		// FIXME - submission (587) is the standard, but most isp's use 25...
+		session = net_client_smtp_new(server->host, 587U, server->security);
+	}
+	// FIXME - set user cert and connect cert-pass signal if we have a user cert
+	g_signal_connect(G_OBJECT(session), "cert-check", G_CALLBACK(check_cert), session);	// FIXME!!
+	g_signal_connect(G_OBJECT(session), "auth", G_CALLBACK(get_auth), smtp_server);
+
+	send_message_info = send_message_info_new(outbox, session, libbalsa_smtp_server_get_name(smtp_server));
+
+	for (msgno = libbalsa_mailbox_total_messages(outbox); msgno > 0U; msgno--) {
+		MessageQueueItem *new_message;
+		LibBalsaMessage *msg;
+		const gchar *smtp_server_name;
+		LibBalsaMsgCreateResult created;
+
+		/* Skip this message if it either FLAGGED or DELETED: */
+		if (!libbalsa_mailbox_msgno_has_flags(outbox, msgno, 0, (LIBBALSA_MESSAGE_FLAG_FLAGGED | LIBBALSA_MESSAGE_FLAG_DELETED)))
+			continue;
+
+		msg = libbalsa_mailbox_get_message(outbox, msgno);
+		if (!msg) /* error? */
+			continue;
+		libbalsa_message_body_ref(msg, TRUE, TRUE);
+		smtp_server_name = libbalsa_message_get_user_header(msg, "X-Balsa-SmtpServer");
+		if (!smtp_server_name)
+			smtp_server_name = libbalsa_smtp_server_get_name(NULL);
+		if (strcmp(smtp_server_name, libbalsa_smtp_server_get_name(smtp_server)) != 0) {
+			libbalsa_message_body_unref(msg);
+			g_object_unref(msg);
+			continue;
+		}
+		msg->request_dsn = (atoi(libbalsa_message_get_user_header(msg, "X-Balsa-DSN")) != 0);
+
+		new_message = msg_queue_item_new(finder);
+		created = libbalsa_fill_msg_queue_item_from_queu(msg, new_message);
+		libbalsa_message_body_unref(msg);
+
+		if (created != LIBBALSA_MESSAGE_CREATE_OK) {
+			msg_queue_item_destroy(new_message);
+		} else {
+			const InternetAddress *ia;
+			const gchar *mailbox;
+
+			libbalsa_message_change_flags(msg, LIBBALSA_MESSAGE_FLAG_FLAGGED, 0);
+
+			send_message_info->items = g_list_prepend(send_message_info->items, new_message);
+			new_message->smtp_msg = net_client_smtp_msg_new(send_message_data_cb, new_message);
+
+			if (msg->request_dsn) {
+				net_client_smtp_msg_set_dsn_opts(new_message->smtp_msg, msg->message_id, FALSE);
+			}
+
+			/* Add the sender info */
+			if (msg->headers->from && (ia = internet_address_list_get_address(msg->headers->from, 0))) {
+				while (ia && INTERNET_ADDRESS_IS_GROUP(ia)) {
+					ia = internet_address_list_get_address (INTERNET_ADDRESS_GROUP(ia)->members, 0);
+				}
+				mailbox = ia ? INTERNET_ADDRESS_MAILBOX(ia)->addr : "";
+			} else {
+				mailbox = "";
+			}
+			net_client_smtp_msg_set_sender(new_message->smtp_msg, mailbox);
+
+			/* Now need to add the recipients to the message. */
+			add_recipients(new_message->smtp_msg, msg->headers->to_list, msg->request_dsn);
+			add_recipients(new_message->smtp_msg, msg->headers->cc_list, msg->request_dsn);
+			add_recipients(new_message->smtp_msg, msg->headers->bcc_list, msg->request_dsn);
+
+			/* Estimate the size of the message.  This need not be exact but it's better to err on the large side since some
+			 * message headers may be altered during the transfer. */
+			new_message->message_size = g_mime_stream_length(new_message->stream);
+
+			/* Set up counters for the progress bar.  Update is the byte count when the progress bar should be updated.  This is
+			 * capped around 5k so that the progress bar moves about once per second on a slow line.  On small messages it is
+			 * smaller to allow smooth progress of the bar. */
+			new_message->update = new_message->message_size / 20;
+			if (new_message->update < 100) {
+				new_message->update = 100;
+			} else if (new_message->update > 5 * 1024) {
+				new_message->update = 5 * 1024;
+			}
+			new_message->sent = 0;
+			new_message->acc = 0;
+		}
+		g_object_unref(msg);
+	}
+
+	/* launch the thread for sending the messages only if we collected any */
+	if (send_message_info->items != NULL) {
+		GThread *send_mail;
+
+		ensure_send_progress_dialog(parent);
+		sending_threads++;
+		send_mail = g_thread_new("balsa_send_message_real", (GThreadFunc) balsa_send_message_real, send_message_info);
+		g_thread_unref(send_mail);
+	} else {
+		send_message_info_destroy(send_message_info);
+	}
+
 	g_mutex_unlock(&send_messages_lock);
 	return TRUE;
-    }
-    /* We create here the progress bar */
-    ensure_send_progress_dialog(parent);
-
-    /* Create the libESMTP session.  Loop over the out box and add the
-       messages to the session. */
-
-    /* FIXME - check for failure returns in the smtp_xxx() calls */
-    host_with_port = strchr(server->host, ':') ?
-        g_strdup(server->host) : g_strconcat(server->host, ":smtp", NULL);
-    session = smtp_create_session ();
-    smtp_set_server (session, host_with_port);
-    g_free(host_with_port);
-
-    /* Tell libESMTP how to use the SMTP STARTTLS extension.  */
-    smtp_starttls_enable (session, (enum starttls_option) server->tls_mode);
-
-    /* Now tell libESMTP it can use the SMTP AUTH extension.  */
-    smtp_auth_set_context(session,
-                          libbalsa_smtp_server_get_authctx(smtp_server));
- 
-    /* At present Balsa can't handle one recipient only out of many
-       failing.  Make libESMTP require all specified recipients to
-       succeed before transferring a message.  */
-    smtp_option_require_all_recipients (session, 1);
-
-    for (msgno = libbalsa_mailbox_total_messages(outbox);
-	 msgno > 0; msgno--) {
-	const gchar *smtp_server_name;
-        LibBalsaMsgCreateResult created;
-
-        /* Skip this message if it either FLAGGED or DELETED: */
-        if (!libbalsa_mailbox_msgno_has_flags
-            (outbox, msgno, 0,
-             (LIBBALSA_MESSAGE_FLAG_FLAGGED |
-              LIBBALSA_MESSAGE_FLAG_DELETED)))
-            continue;
-
-	msg = libbalsa_mailbox_get_message(outbox, msgno);
-        if (!msg) /* error? */
-            continue;
-        libbalsa_message_body_ref(msg, TRUE, TRUE);
-        smtp_server_name =
-            libbalsa_message_get_user_header(msg, "X-Balsa-SmtpServer");
-        if (!smtp_server_name)
-            smtp_server_name = libbalsa_smtp_server_get_name(NULL);
-        if (strcmp(smtp_server_name,
-                   libbalsa_smtp_server_get_name(smtp_server)) != 0) {
-            libbalsa_message_body_unref(msg);
-            g_object_unref(msg);
-            continue;
-        }
-        msg->request_dsn =
-        	(atoi(libbalsa_message_get_user_header(msg, "X-Balsa-DSN")) != 0);
-
-	new_message = msg_queue_item_new(finder);
-        created = libbalsa_fill_msg_queue_item_from_queu(msg, new_message);
-        libbalsa_message_body_unref(msg);
-
-	if (created != LIBBALSA_MESSAGE_CREATE_OK) {
-	    msg_queue_item_destroy(new_message);
-	} else {
-            gboolean has_open_recipients;
-            guint n_bcc_recipients;
-	    const InternetAddress *ia;
-
-	    libbalsa_message_change_flags(msg,
-                                          LIBBALSA_MESSAGE_FLAG_FLAGGED, 0);
-	    /*
-	       The message needs to be filtered and the newlines converted to
-	       \r\n because internally the lines foolishly terminate with the
-	       Unix \n despite RFC 2822 calling for \r\n.  Furthermore RFC 822
-	       states that bare \n and \r are acceptable in messages and that
-	       individually they do not constitute a line termination.  This
-	       requirement cannot be reconciled with storing messages with Unix
-	       line terminations.  RFC 2822 relieves this situation slightly by
-	       prohibiting bare \r and \n.
-
-	       The following code cannot therefore work correctly in all
-	       situations.  Furthermore it is very inefficient since it must
-	       search for the \n.
-	     */
-	    {
-		GMimeStream *mem_stream;
-		GMimeStream *filter_stream;
-		GMimeFilter *filter;
-
-		mem_stream = new_message->stream;
-		filter_stream =
-		    g_mime_stream_filter_new(mem_stream);
-		filter =
-		    g_mime_filter_crlf_new( TRUE,
-					    FALSE);
-		g_mime_stream_filter_add(GMIME_STREAM_FILTER(filter_stream),
-					 filter);
-		g_object_unref(G_OBJECT(filter));
-		mem_stream = g_mime_stream_mem_new();
-		g_mime_stream_write_to_stream(filter_stream, mem_stream);
-		g_object_unref(filter_stream);
-		g_mime_stream_reset(mem_stream);
-		g_object_unref(new_message->stream);
-		new_message->stream = mem_stream;
-	    }
-
-            /* If the message has To: or Cc: recipients, and the Bcc:
-             * recipient list is present and contains exactly one
-             * address, add an additional copy of the message to the
-             * session for that one recipient, in which the Bcc: header
-             * is preserved. */
-            has_open_recipients =
-                libbalsa_address_n_mailboxes_in_list(msg->headers->
-                                                     to_list) > 0
-                || libbalsa_address_n_mailboxes_in_list(msg->headers->
-                                                        cc_list) > 0;
-            n_bcc_recipients =
-                libbalsa_address_n_mailboxes_in_list(msg->headers->
-                                                     bcc_list);
-            if (has_open_recipients && n_bcc_recipients == 1)
-		bcc_message = smtp_add_message (session);
-	    else
-		bcc_message = NULL;
-            new_message->refcount = bcc_message ? 2 : 1;
-
-	    /* Add this after the Bcc: copy. */
-	    message = smtp_add_message (session);
-
-	    if (msg->request_dsn) {
-		smtp_dsn_set_ret(message, Ret_HDRS);
-		smtp_dsn_set_envid(message, msg->message_id);
-	    }
-
-            /* The main copy must not contain a Bcc: header, unless the
-             * message has no To: recipients and no Cc: recipients, and
-             * exactly one Bcc: recipient: */
-            if ((has_open_recipients && n_bcc_recipients > 0)
-                || n_bcc_recipients > 1)
-		smtp_set_header_option (message, "Bcc", Hdr_PROHIBIT, 1);
-
-	    smtp_message_set_application_data (message, new_message);
-	    smtp_set_messagecb (message, libbalsa_message_cb, new_message);
-	    if (bcc_message) {
-		smtp_message_set_application_data (bcc_message, new_message);
-		smtp_set_messagecb (bcc_message,
-				    libbalsa_message_cb, new_message);
-	    }
-
-#define LIBESMTP_ADDS_HEADERS
-#ifdef LIBESMTP_ADDS_HEADERS
-	    /* XXX - The following calls to smtp_set_header() probably
-		     aren't necessary since they should already be in the
-		     message. */
-
-	    smtp_set_header (message, "Date", &msg->headers->date);
-	    if (bcc_message)
-		smtp_set_header (bcc_message, "Date", &msg->headers->date);
-
-	    /* RFC 2822 does not require a message to have a subject.
-	               I assume this is NULL if not present */
-	    subject = LIBBALSA_MESSAGE_GET_SUBJECT(msg);
-	    if (subject) {
-	    	smtp_set_header (message, "Subject", subject);
-		if (bcc_message)
-		    smtp_set_header (bcc_message, "Subject", subject);
-	    }
-
-	    /* Add the sender info */
-            if (msg->headers->from
-		&& (ia = internet_address_list_get_address (msg->headers->from, 0))) {
-	        phrase = ia->name;
-		while (ia && INTERNET_ADDRESS_IS_GROUP (ia))
-		    ia = internet_address_list_get_address (INTERNET_ADDRESS_GROUP (ia)->members, 0);
-	        mailbox = ia ? INTERNET_ADDRESS_MAILBOX (ia)->addr : "";
-            } else
-                phrase = mailbox = "";
-	    smtp_set_reverse_path (message, mailbox);
-	    smtp_set_header (message, "From", phrase, mailbox);
-	    if (bcc_message) {
-		smtp_set_reverse_path (bcc_message, mailbox);
-	        smtp_set_header (bcc_message, "From", phrase, mailbox);
-	    }
-
-	    if (msg->headers->reply_to
-		&& (ia = internet_address_list_get_address (msg->headers->reply_to, 0))) {
-		phrase = ia->name;
-		while (ia && INTERNET_ADDRESS_IS_GROUP (ia))
-		    ia = internet_address_list_get_address (INTERNET_ADDRESS_GROUP (ia)->members, 0);
-	        mailbox = ia ? INTERNET_ADDRESS_MAILBOX (ia)->addr : "";
-		smtp_set_header (message, "Reply-To", phrase, mailbox);
-		if (bcc_message)
-		    smtp_set_header (bcc_message, "Reply-To", phrase, mailbox);
-	    }
-
-	    if (msg->headers->dispnotify_to
-		&& (ia = internet_address_list_get_address (msg->headers->dispnotify_to, 0))) {
-		phrase = ia->name;
-		while (ia && INTERNET_ADDRESS_IS_GROUP (ia))
-		    ia = internet_address_list_get_address (INTERNET_ADDRESS_GROUP (ia)->members, 0);
-	        mailbox = ia ? INTERNET_ADDRESS_MAILBOX (ia)->addr : "";
-		smtp_set_header (message, "Disposition-Notification-To",
-				 phrase, mailbox);
-		if (bcc_message)
-		    smtp_set_header (bcc_message, "Disposition-Notification-To",
-		    	             phrase, mailbox);
-	    }
-#endif
-
-	    /* Now need to add the recipients to the message.  The main
-	       copy of the message gets the To and Cc recipient list, and
-	       the Bcc recipient list, when it has more than one address.
-	       The bcc copy gets the single Bcc recipient.  */
-
-            add_recipients(message, msg->headers->to_list, msg->request_dsn);
-            add_recipients(message, msg->headers->cc_list, msg->request_dsn);
-
-            add_recipients(bcc_message ? bcc_message : message, 
-                           msg->headers->bcc_list, msg->request_dsn);
-
-	    /* Prohibit status headers. */
-	    smtp_set_header_option(message, "Status", Hdr_PROHIBIT, 1);
-	    smtp_set_header_option(message, "X-Status", Hdr_PROHIBIT, 1);
-            /* ... and all X-Balsa-* headers. */
-            smtp_set_header_option(message, "X-Balsa-", Hdr_PROHIBIT, 1);
-
-
-	    /* Estimate the size of the message.  This need not be exact
-	       but it's better to err on the large side since some message
-	       headers may be altered during the transfer. */
-	    new_message->message_size = g_mime_stream_length(new_message->stream);
-
-	    if (new_message->message_size > 0) {
-		estimate = new_message->message_size;
-		estimate += 1024 - (estimate % 1024);
-		smtp_size_set_estimate (message, estimate);
-		if (bcc_message)
-		    smtp_size_set_estimate (bcc_message, estimate);
-	    }
-
-	    /* Set up counters for the progress bar.  Update is the byte
-	       count when the progress bar should be updated.  This is
-	       capped around 5k so that the progress bar moves about once
-	       per second on a slow line.  On small messages it is smaller
-	       to allow smooth progress of the bar. */
-	    new_message->update = new_message->message_size / 20;
-	    if (new_message->update < 100)
-	        new_message->update = 100;
-	    else if (new_message->update > 5 * 1024)
-	        new_message->update = 5 * 1024;
-	    new_message->sent = 0;
-	    new_message->acc = 0;
-	}
-	g_object_unref(msg);
-    }
-
-   /* At this point the session is ready to be sent.  As I've written the
-      code, a new smtp session is created for every call here.  Therefore
-      a new thread is always required to dispatch it.
-    */
-
-    send_message_info=send_message_info_new(outbox, session, debug);
-
-    sending_threads++;
-    send_mail =
-    	g_thread_new("balsa_send_message_real",
-    				 (GThreadFunc) balsa_send_message_real,
-					 send_message_info);
-    /* Detach so we don't need to g_thread_join
-     * This means that all resources will be
-     * reclaimed as soon as the thread exits
-     */
-    g_thread_unref(send_mail);
-    g_mutex_unlock(&send_messages_lock);
-    return TRUE;
 }
 
 gboolean
@@ -947,400 +761,12 @@ libbalsa_process_queue(LibBalsaMailbox * outbox,
     return TRUE;
 }
 
-static void
-disp_recipient_status(smtp_recipient_t recipient,
-                      const char *mailbox, void *arg)
-{
-  const smtp_status_t *status = smtp_recipient_status (recipient);
-
-  if(status->code != 0 && status->code != 250) {
-      libbalsa_information(
-                           LIBBALSA_INFORMATION_ERROR,
-                           _("Could not send the message to %s:\n"
-                             "%d: %s\n"
-                             "Message left in your outbox.\n"), 
-                           mailbox, status->code, status->text);
-      (*(int*)arg)++;
-  }
-}
-
-static void
-handle_successful_send(smtp_message_t message, void *be_verbose)
-{
-    MessageQueueItem *mqi;
-    const smtp_status_t *status;
-
-    g_mutex_lock(&send_messages_lock);
-    /* Get the app data and decrement the reference count.  Only delete
-       structures if refcount reaches zero */
-    mqi = smtp_message_get_application_data (message);
-    if (mqi != NULL)
-      mqi->refcount--;
-
-    if(mqi != NULL && mqi->orig != NULL && mqi->orig->mailbox && !mqi->error)
-	libbalsa_message_change_flags(mqi->orig, 0,
-                                      LIBBALSA_MESSAGE_FLAG_FLAGGED);
-    else printf("mqi: %p mqi->orig: %p mqi->orig->mailbox: %p\n",
-                  mqi, mqi ? mqi->orig : NULL, 
-                  mqi&&mqi->orig ? mqi->orig->mailbox : NULL);
-    status = smtp_message_transfer_status (message);
-    if (status->code / 100 == 2) {
-	if (mqi != NULL && mqi->orig != NULL && mqi->refcount <= 0 &&
-            mqi->orig->mailbox && !mqi->error) {
-            gboolean remove = TRUE;
-            const gchar *fccurl =
-                libbalsa_message_get_user_header(mqi->orig, "X-Balsa-Fcc");
-
-	    if (fccurl) {
-                LibBalsaMailbox *fccbox = mqi->finder(fccurl);
-                GError *err = NULL;
-                libbalsa_message_change_flags(mqi->orig, 0,
-                                              LIBBALSA_MESSAGE_FLAG_NEW |
-                                              LIBBALSA_MESSAGE_FLAG_FLAGGED);
-		libbalsa_mailbox_sync_storage(mqi->orig->mailbox, FALSE);
-                remove = libbalsa_message_copy(mqi->orig, fccbox, &err);
-                if(!remove) {
-                    libbalsa_information
-                        (LIBBALSA_INFORMATION_ERROR, 
-                         _("Saving sent message to %s failed: %s"),
-                         fccbox->url, err ? err->message : "?");
-                    g_clear_error(&err);
-                }
-            }
-            /* If copy failed, mark the message again as flagged -
-               otherwise it will get resent again. And again, and
-               again... */
-            libbalsa_message_change_flags(mqi->orig, remove ?
-                                          LIBBALSA_MESSAGE_FLAG_DELETED :
-                                          LIBBALSA_MESSAGE_FLAG_FLAGGED, 0);
-	}
-    } else {
-        /* Record the error, so that the message will not be deleted
-         * later... */
-        mqi->error = TRUE;
-        /* ...and mark it as:
-         *   - flagged, so it will not be sent again until the error
-         *     is fixed and the user manually clears the flag;
-         *   - undeleted, in case it was already deleted. */
-        if (mqi->orig && mqi->orig->mailbox)
-            libbalsa_message_change_flags(mqi->orig,
-                                          LIBBALSA_MESSAGE_FLAG_FLAGGED,
-                                          LIBBALSA_MESSAGE_FLAG_DELETED);
-	/* Check whether it was a problem with transfer. */
-        if(*(gboolean*)be_verbose) {
-            int cnt = 0;
-            if(status->code != 250 && status->code != 0) {
-                libbalsa_information(
-                                     LIBBALSA_INFORMATION_ERROR,
-                                     _("Relaying refused:\n"
-                                       "%d: %s\n"
-                                       "Message left in your outbox.\n"), 
-                                     status->code, status->text);
-                cnt++;
-            }
-            smtp_enumerate_recipients (message, disp_recipient_status, &cnt);
-            if(cnt==0) { /* other error, maybe sender or message size? */
-                status = smtp_reverse_path_status(message);
-                if(status->code != 250 && status->code != 0) {
-                    libbalsa_information
-                        (LIBBALSA_INFORMATION_ERROR,
-                         _("Relaying refused:\n"
-                           "%d: %s\n"
-                           "Message left in your outbox.\n"), 
-                         status->code, status->text);
-                } else
-                    libbalsa_information
-                        (LIBBALSA_INFORMATION_ERROR,
-                         _("Message submission problem, placing it into your outbox.\n"
-                           "System will attempt to resubmit the message until you delete it."));
-                
-            }
-        }
-    }
-    if (mqi != NULL && mqi->refcount <= 0)
-        msg_queue_item_destroy(mqi);
-    g_mutex_unlock(&send_messages_lock);
-}
-
-static void
-libbalsa_smtp_event_cb (smtp_session_t session, int event_no, void *arg, ...)
-{
-    SendThreadMessage *threadmsg;
-    MessageQueueItem *mqi;
-    char buf[1024];
-    va_list ap;
-    const char *mailbox;
-    smtp_message_t message;
-    smtp_recipient_t recipient;
-    const smtp_status_t *status;
-    int len;
-    float percent;
-
-    va_start (ap, arg);
-    switch (event_no) {
-    case SMTP_EV_CONNECT:
-	MSGSENDTHREAD(threadmsg, MSGSENDTHREADPROGRESS,
-		      _("Connected to MTA"),
-		      NULL, NULL, 0);
-        break;
-    case SMTP_EV_MAILSTATUS:
-        mailbox = va_arg (ap, const char *);
-        message = va_arg (ap, smtp_message_t);
-	status = smtp_reverse_path_status (message);
-
-        /* status code, mailbox */
-        snprintf (buf, sizeof buf, _("From: %d <%s>"), status->code, mailbox);
-	MSGSENDTHREAD(threadmsg, MSGSENDTHREADPROGRESS, buf, NULL, NULL, 0);
-
-        /* mailbox, status code, status text */
-        snprintf (buf, sizeof buf, _("From %s: %d %s"), 
-	          mailbox, status->code, status->text);
-        g_strchomp(buf);
-	libbalsa_information(LIBBALSA_INFORMATION_DEBUG, "%s", buf);
-        break;
-    case SMTP_EV_RCPTSTATUS:
-        mailbox = va_arg (ap, const char *);
-        recipient = va_arg (ap, smtp_recipient_t);
-	status = smtp_recipient_status (recipient);
-
-        /* status code, mailbox */
-        snprintf (buf, sizeof buf, _("To: %d <%s>"),  status->code, mailbox);
-	MSGSENDTHREAD(threadmsg, MSGSENDTHREADPROGRESS, buf, NULL, NULL, 0);
-
-        /* mailbox, status code, status text */
-        snprintf (buf, sizeof buf, _("To %s: %d %s"),
-	          mailbox, status->code, status->text);
-        g_strchomp(buf);
-	libbalsa_information(LIBBALSA_INFORMATION_DEBUG, "%s", buf);
-        break;
-    case SMTP_EV_MESSAGEDATA:
-        message = va_arg (ap, smtp_message_t);
-        len = va_arg (ap, int);
-        mqi = smtp_message_get_application_data (message);
-        if (mqi != NULL && mqi->message_size > 0) {
-	    mqi->acc += len;
-	    if (mqi->acc >= mqi->update) {
-		mqi->sent += mqi->acc;
-		mqi->acc = 0;
-
-		percent = (float) mqi->sent / (float) mqi->message_size;
-		if(percent>1) percent = 1;
-		MSGSENDTHREAD(threadmsg, MSGSENDTHREADPROGRESS, "", NULL, NULL,
-			      percent);
-	    }
-	}
-        break;
-    case SMTP_EV_MESSAGESENT:
-        message = va_arg (ap, smtp_message_t);
-        status = smtp_message_transfer_status (message);
-	snprintf (buf, sizeof buf, "%d %s", status->code, status->text);
-        g_strchomp(buf);
-	MSGSENDTHREAD(threadmsg, MSGSENDTHREADPROGRESS, buf, NULL, NULL, 0);
-	libbalsa_information(LIBBALSA_INFORMATION_DEBUG, "%s", buf);
-        /* Reset 'mqi->sent' for the next message (i.e. bcc copy) */
-        mqi = smtp_message_get_application_data (message);
-        if (mqi != NULL) {
-	    mqi->sent = 0;
-	    mqi->acc = 0;
-        }
-        break;
-    case SMTP_EV_DISCONNECT:
-	MSGSENDTHREAD(threadmsg, MSGSENDTHREADPROGRESS,
-		      _("Disconnected"),
-		      NULL, NULL, 0);
-        break;
-
-        /* SMTP_TLS related things. Observe that we need to have SSL
-	 * enabled in balsa to properly interpret libesmtp
-	 * messages. */
-    case SMTP_EV_INVALID_PEER_CERTIFICATE: {
-        long vfy_result;
-	SSL  *ssl;
-	X509 *cert;
-        int *ok;
-        vfy_result = va_arg(ap, long); ok = va_arg(ap, int*);
-	ssl = va_arg(ap, SSL*);
-	cert = SSL_get_peer_certificate(ssl);
-	if(cert) {
-	    *ok = libbalsa_is_cert_known(cert, vfy_result);
-	    X509_free(cert);
-	}
-        break;
-    }
-    case SMTP_EV_NO_PEER_CERTIFICATE:
-    case SMTP_EV_WRONG_PEER_CERTIFICATE:
-#if LIBESMTP_1_0_3_AVAILABLE
-    case SMTP_EV_NO_CLIENT_CERTIFICATE:
-#endif
-    {
-	int *ok;
-	printf("SMTP-TLS event_no=%d\n", event_no);
-	ok = va_arg(ap, int*);
-	*ok = 1;
-	break;
-    }
-    }
-    va_end (ap);
-}
-
-#else /* ESMTP */
-
-/* CHBM: non-esmtp version */
-
-/* libbalsa_process_queue:
-   treats given mailbox as a set of messages to send. Loads them up and
-   launches sending thread/routine.
-   NOTE that we do not close outbox after reading. send_real/thread message 
-   handler does that.
-*/
-gboolean 
-libbalsa_process_queue(LibBalsaMailbox* outbox, LibBalsaFccboxFinder finder,
-                       gboolean debug, GtkWindow * parent)
-{
-    MessageQueueItem *mqi = NULL, *new_message;
-    SendMessageInfo *send_message_info;
-    LibBalsaMessage *msg;
-    guint msgno;
-
-    /* We do messages in queue now only if where are not sending them already */
-
-    send_lock();
-
-#ifdef BALSA_USE_THREADS
-    if (sending_threads>0) {
-	send_unlock();
-	return TRUE;
-    }
-    sending_threads++;
-#endif
-
-    ensure_send_progress_dialog(parent);
-    if (!libbalsa_mailbox_open(outbox, NULL)) {
-#ifdef BALSA_USE_THREADS
-	sending_threads--;
-	send_unlock();
-#endif
-	return FALSE;
-    }
-    for (msgno = libbalsa_mailbox_total_messages(outbox);
-	 msgno > 0; msgno--) {
-        LibBalsaMsgCreateResult created;
-
-        if (libbalsa_mailbox_msgno_has_flags(outbox, msgno, 
-                                             (LIBBALSA_MESSAGE_FLAG_FLAGGED |
-                                              LIBBALSA_MESSAGE_FLAG_DELETED),
-                                             0))
-            continue;
-
-	msg = libbalsa_mailbox_get_message(outbox, msgno);
-        if (!msg) /* error? */
-            continue;
-        libbalsa_message_body_ref(msg, TRUE, TRUE); /* FIXME: do we need
-                                                      * all headers? */
-	new_message = msg_queue_item_new(finder);
-        created = libbalsa_fill_msg_queue_item_from_queu(msg, new_message);
-        libbalsa_message_body_unref(msg);
-	
-	if (created != LIBBALSA_MESSAGE_CREATE_OK) {
-	    msg_queue_item_destroy(new_message);
-	} else {
-	    libbalsa_message_change_flags(msg,
-                                          LIBBALSA_MESSAGE_FLAG_FLAGGED, 0);
-	    if (mqi)
-		mqi->next_message = new_message;
-	    else
-		message_queue = new_message;
-	    mqi = new_message;
-	}
-    }
-
-    send_message_info=send_message_info_new(outbox, finder, debug);
-    
-    balsa_send_message_real(send_message_info);
-
-    send_unlock();
-    return TRUE;
-}
-
-static void
-handle_successful_send(MessageQueueItem *mqi, LibBalsaFccboxFinder finder)
-{
-    if (mqi->orig->mailbox) {
-        gboolean remove = TRUE;
-        const gchar *fccurl =
-            libbalsa_message_get_user_header(mqi->orig, "X-Balsa-Fcc");
-
-        libbalsa_message_change_flags(mqi->orig, 0,
-                                      LIBBALSA_MESSAGE_FLAG_NEW |
-                                      LIBBALSA_MESSAGE_FLAG_FLAGGED);
-	libbalsa_mailbox_sync_storage(mqi->orig->mailbox, FALSE);
-
-        if (mqi->orig->mailbox && fccurl) {
-            LibBalsaMailbox *fccbox = mqi->finder(fccurl);
-            remove =
-                libbalsa_message_copy(mqi->orig, fccbox, NULL)>=0;
-        }
-        /* If copy failed, mark the message again as flagged -
-           otherwise it will get resent again. And again, and
-           again... */
-        libbalsa_message_change_flags(mqi->orig, remove ?
-                                      LIBBALSA_MESSAGE_FLAG_DELETED :
-                                      LIBBALSA_MESSAGE_FLAG_FLAGGED, 0);
-    }
-    mqi->status = MQI_SENT;
-}
-
-/* get_msg2send: 
-   returns first waiting message on the message_queue.
-*/
-static MessageQueueItem* get_msg2send()
-{
-    MessageQueueItem* res = message_queue;
-    send_lock();
-
-    while(res && res->status != MQI_WAITING)
-	res = res->next_message;
-
-    send_unlock();
-    return res;
-}
-
-#endif /* ESMTP */
-
-#if ENABLE_ESMTP
-static void
-monitor_cb (const char *buf, int buflen, int writing, void *arg)
-{
-  FILE *fp = arg;
-
-  if (writing == SMTP_CB_HEADERS)
-    {
-      fputs ("H: ", fp);
-      if (fwrite (buf, 1, buflen, fp) != (size_t) buflen)
-        /* FIXME */ return;
-      return;
-    }
-
- fputs (writing ? "C: " : "S: ", fp);
- if (writing && g_ascii_strncasecmp(buf, "auth plain", 10) == 0) {
-     fputs("AUTH (details hidden)\n", fp);
-     return;
- }
- if (fwrite (buf, 1, buflen, fp) != (size_t) buflen)
-   /* FIXME */ return;
- if (buf[buflen - 1] != '\n')
-   putc ('\n', fp);
-}
-
 /* balsa_send_message_real:
    does the actual message sending. 
    This function may be called as a thread and should therefore do
    proper gdk_threads_{enter/leave} stuff around GTK or libbalsa calls.
    Also, structure info should be freed before exiting.
 */
-
-/* [BCS] radically different since it uses the libESMTP interface.
- */
 
 static gboolean
 balsa_send_message_real_idle_cb(LibBalsaMailbox * outbox)
@@ -1351,214 +777,102 @@ balsa_send_message_real_idle_cb(LibBalsaMailbox * outbox)
     return FALSE;
 }
 
-static guint
-balsa_send_message_real(SendMessageInfo* info)
+static gboolean
+balsa_send_message_real(SendMessageInfo *info)
 {
-    gboolean session_started;
-    SendThreadMessage *threadmsg;
+	gboolean result;
+	GError *error = NULL;
+	SendThreadMessage *threadmsg;
+	gchar *greeting = NULL;
 
-    /* The event callback is used to write messages to the the progress
-       dialog shown when transferring a message to the SMTP server. 
-       This callback is only used in MT build, we do not show any
-       feedback in non-MT version.
-    */
-    smtp_set_eventcb (info->session, libbalsa_smtp_event_cb, NULL);
+	g_debug("%s: starting", __func__);
 
-    /* Add a protocol monitor when debugging is enabled. */
-    if(info->debug)
-        smtp_set_monitorcb (info->session, monitor_cb, stderr, 1);
+	/* connect the SMTP server */
+	result = net_client_smtp_connect(info->session, &greeting, &error);
+	g_debug("%s: connect = %d [%p]: '%s'", __func__, result, info->items, greeting);
+	if (result) {
+		GList *this_msg;
+		gchar *msg;
 
-    /* Kick off the connection with the MTA.  When this returns, all
-       messages with valid recipients have been sent. */
-    if ( !(session_started = smtp_start_session (info->session)) ){
-        char buf[256];
-        int smtp_err = smtp_errno();
-        switch(smtp_err) {
-        case -ECONNREFUSED:
-            libbalsa_information
-                (LIBBALSA_INFORMATION_ERROR,
-                 _("SMTP server refused connection.\n"
-                   "Check your internet connection."));
-        case -EHOSTUNREACH:
-            libbalsa_information
-                (LIBBALSA_INFORMATION_ERROR,
-                 _("SMTP server cannot be reached.\n"
-                   "Check your internet connection."));
-            break;
-        case SMTP_ERR_NOTHING_TO_DO: /* silence this one? */
-            break;
-        case SMTP_ERR_EAI_AGAIN:
-            /* this is really problem with DNS but it is nowadays
-               caused by general connection problems. */
-            libbalsa_information(LIBBALSA_INFORMATION_MESSAGE,
-                                 _("Message left in Outbox (try again later)"));
-            break;
-        default:
-            libbalsa_information (LIBBALSA_INFORMATION_ERROR,
-                                  _("SMTP server problem (%d): %s\n"
-                                    "Message is left in outbox."),
-                                  smtp_errno(),
-                                  smtp_strerror (smtp_errno (), 
-                                                 buf, sizeof buf));
-        }
-    } 
-    /* We give back all the resources used and delete the sent messages */
-    /* Quite a bit of status info has been gathered about messages and
-       their recipients.  The following will do a libbalsa_message_delete()
-       on the messages with a 2xx status recorded against them.  However
-       its possible for individual recipients to fail too.  Need a way to
-       report it all.  */
-    smtp_enumerate_messages (info->session, handle_successful_send, 
-                             &session_started);
+		msg = g_strdup_printf(_("Connected to MTA %s: %s"), info->mta_name, greeting);
+		MSGSENDTHREAD(threadmsg, MSGSENDTHREADPROGRESS, msg, NULL, NULL, 0);
+		g_free(msg);
+		for (this_msg = info->items; this_msg != NULL; this_msg = this_msg->next) {
+			MessageQueueItem *mqi = (MessageQueueItem *) this_msg->data;
+			gboolean send_res;
+
+			g_debug("%s: mqi = %p", __func__, mqi);
+			/* send the message */
+			send_res = net_client_smtp_send_msg(info->session, mqi->smtp_msg, &error);
+
+			g_mutex_lock(&send_messages_lock);
+			if ((mqi->orig != NULL) && (mqi->orig->mailbox != NULL)) {
+				libbalsa_message_change_flags(mqi->orig, 0, LIBBALSA_MESSAGE_FLAG_FLAGGED);
+			} else {
+				g_message("mqi: %p mqi->orig: %p mqi->orig->mailbox: %p\n", mqi, mqi ? mqi->orig : NULL,
+						  mqi && mqi->orig ? mqi->orig->mailbox : NULL);
+			}
+
+			if (send_res) {
+				/* sending message successful */
+				if ((mqi->orig != NULL) && (mqi->orig->mailbox != NULL)) {
+					gboolean remove = TRUE;
+					const gchar *fccurl = libbalsa_message_get_user_header(mqi->orig, "X-Balsa-Fcc");
+
+					if (fccurl != NULL) {
+						LibBalsaMailbox *fccbox = mqi->finder(fccurl);
+						GError *err = NULL;
+
+						libbalsa_message_change_flags(mqi->orig, 0, LIBBALSA_MESSAGE_FLAG_NEW | LIBBALSA_MESSAGE_FLAG_FLAGGED);
+						libbalsa_mailbox_sync_storage(mqi->orig->mailbox, FALSE);
+						remove = libbalsa_message_copy(mqi->orig, fccbox, &err);
+						if (!remove) {
+							libbalsa_information(LIBBALSA_INFORMATION_ERROR, _("Saving sent message to %s failed: %s"),
+												 fccbox->url, err ? err->message : "?");
+							g_clear_error(&err);
+						}
+					}
+					/* If copy failed, mark the message again as flagged - otherwise it will get resent again. And again, and
+					 * again... */
+					libbalsa_message_change_flags(mqi->orig,
+												  remove ? LIBBALSA_MESSAGE_FLAG_DELETED : LIBBALSA_MESSAGE_FLAG_FLAGGED, 0);
+				}
+			} else {
+				/* sending message failed - mark it as:
+				 *   - flagged, so it will not be sent again until the error is fixed and the user manually clears the flag;
+				 *   - undeleted, in case it was already deleted. */
+				if ((mqi->orig != NULL) && (mqi->orig->mailbox != NULL)) {
+					libbalsa_message_change_flags(mqi->orig, LIBBALSA_MESSAGE_FLAG_FLAGGED, LIBBALSA_MESSAGE_FLAG_DELETED);
+				}
+				libbalsa_information(LIBBALSA_INFORMATION_ERROR, _("Sending message failed: %s\nMessage left in your outbox."),
+									 error->message);
+				g_clear_error(&error);
+			}
+
+			/* free data */
+			msg_queue_item_destroy(mqi);
+			g_mutex_unlock(&send_messages_lock);
+		}
+	} else {
+		libbalsa_information(LIBBALSA_INFORMATION_ERROR, _("Connecting MTA %s (%s) failed: %s"),
+							 info->mta_name, net_client_get_host(NET_CLIENT(info->session)), error->message);
+		g_error_free(error);
+	}
+	g_free(greeting);
 
     /* close outbox in an idle callback, as it might affect the display */
-    g_idle_add((GSourceFunc) balsa_send_message_real_idle_cb,
-               g_object_ref(info->outbox));
-    /*
-     * gdk_flush();
-     * gdk_threads_leave();
-     */
+    g_idle_add((GSourceFunc) balsa_send_message_real_idle_cb, g_object_ref(info->outbox));
 
-    g_mutex_lock(&send_messages_lock);
+	/* clean up */
+    send_message_info_destroy(info);
+
+	g_mutex_lock(&send_messages_lock);
     MSGSENDTHREAD(threadmsg, MSGSENDTHREADFINISHED, "", NULL, NULL, 0);
-    sending_threads--;
-    g_mutex_unlock(&send_messages_lock);
-        
-    smtp_destroy_session (info->session);
-    send_message_info_destroy(info);	
-    /* threadmsg is not leaked: */
-    /* cppcheck-suppress memleak */
-    return TRUE;
-}
-
-#else /* ESMTP */
-static void
-sendmail_add_recipients(GPtrArray *args, InternetAddressList* recipient_list)
-{
-    const InternetAddress *ia;
-    int i;
-    
-    if (recipient_list == NULL)
-	return;
-    
-    for (i = 0; i < internet_address_list_length(recipient_list); i++) {
-        ia = internet_address_list_get_address(recipient_list, i);
-
-	if (INTERNET_ADDRESS_IS_MAILBOX(ia))
-	    g_ptr_array_add(args, INTERNET_ADDRESS_MAILBOX(ia)->addr);
-	else
-	    sendmail_add_recipients(args, INTERNET_ADDRESS_GROUP(ia)->members);
-    }
-}
-
-/* balsa_send_message_real:
-   does the actual message sending. 
-   This function may be called as a thread and should therefore do
-   proper gdk_threads_{enter/leave} stuff around GTK,libbalsa or
-   libmutt calls. Also, structure info should be freed before exiting.
-*/
-
-static guint
-balsa_send_message_real(SendMessageInfo* info)
-{
-    MessageQueueItem *mqi, *next_message;
-#ifdef BALSA_USE_THREADS
-    SendThreadMessage *threadmsg;
-    send_lock();
-    if (!message_queue) {
 	sending_threads--;
-	send_unlock();
-	MSGSENDTHREAD(threadmsg, MSGSENDTHREADFINISHED, "", NULL, NULL, 0);
-	send_message_info_destroy(info);	
-	return TRUE;
-    }
-    send_unlock();
-#else
-    if(!message_queue){
-	send_message_info_destroy(info);	
-	return TRUE;
-    }	
-#endif
+	g_mutex_unlock(&send_messages_lock);
 
-
-    while ( (mqi = get_msg2send()) != NULL) {
-	GPtrArray *args = g_ptr_array_new();
-	LibBalsaMessage *msg = LIBBALSA_MESSAGE(mqi->orig);
-	InternetAddress *ia;
-	gchar *cmd;
-	FILE *sendmail;
-	GMimeStream *out;
-
-	g_ptr_array_add(args, SENDMAIL);
-
-        /* Determine the sender info */
-        if (msg->headers->from
-            && (ia=internet_address_list_get_address(msg->headers->from, 0))) {
-            while (ia && INTERNET_ADDRESS_IS_GROUP (ia))
-                ia = internet_address_list_get_address
-                    (INTERNET_ADDRESS_GROUP (ia)->members, 0);
-
-            if (ia) {
-                g_ptr_array_add(args, "-f");
-                g_ptr_array_add(args, INTERNET_ADDRESS_MAILBOX (ia)->addr);
-            }
-        } 
-
-	g_ptr_array_add(args, "--");
-        
-        sendmail_add_recipients(args, msg->headers->to_list);
-        sendmail_add_recipients(args, msg->headers->cc_list);
-        sendmail_add_recipients(args, msg->headers->bcc_list);
-
-	g_ptr_array_add(args, NULL);
-	cmd = g_strjoinv(" ", (gchar**)args->pdata);
-	g_ptr_array_free(args, FALSE);
-	if ( (sendmail=popen(cmd, "w")) == NULL) {
-	    /* Error while sending */
-	    mqi->status = MQI_FAILED;
-	} else {
-	    out = g_mime_stream_file_new(sendmail);
-	    g_mime_stream_file_set_owner(GMIME_STREAM_FILE(out), FALSE);
-	    if (g_mime_stream_write_to_stream(mqi->stream, out) == -1)
-		mqi->status = MQI_FAILED;
-	    g_object_unref(out);
-	    if (pclose(sendmail) != 0)
-		mqi->status = MQI_FAILED;
-	    if (mqi->status != MQI_FAILED)
-		mqi->status = MQI_SENT;
-	}
-	g_free(cmd);
-    }
-
-    /* We give back all the resources used and delete the sent messages */
-    
-    send_lock();
-    mqi = message_queue;
-    
-    while (mqi != NULL) {
-	if (mqi->status == MQI_SENT) 
-	    handle_successful_send(mqi, info->finder);
-	next_message = mqi->next_message;
-	msg_queue_item_destroy(mqi);
-	mqi = next_message;
-    }
-    
-    gdk_threads_enter();
-    libbalsa_mailbox_close(info->outbox, TRUE);
-    gdk_threads_leave();
-
-    message_queue = NULL;
-#ifdef BALSA_USE_THREADS
-    sending_threads--;
-    MSGSENDTHREAD(threadmsg, MSGSENDTHREADFINISHED, "", NULL, NULL, 0);
-#endif
-    send_message_info_destroy(info);	
-    send_unlock();
-    return TRUE;
+	return result;
 }
-
-#endif /* ESMTP */
-
 
 static void
 message_add_references(const LibBalsaMessage * message, GMimeMessage * msg)
@@ -1953,6 +1267,18 @@ libbalsa_message_postpone(LibBalsaMessage * message,
 }
 
 
+static inline gchar
+base32_char(guint8 val)
+{
+	val &= 0x1f;
+	if (val <= 25) {
+		return val + 'A';
+	} else {
+		return val + '2' - 26;
+	}
+}
+
+
 /* Create a message-id and set it on the mime message.
  */
 static void
@@ -1970,6 +1296,8 @@ libbalsa_set_message_id(GMimeMessage * mime_message)
     guint8 buffer[32];
     gsize buflen;
     gchar *message_id;
+    guint8 *src;
+    gchar *dst;
 
     g_mutex_lock(&mutex);
     if (rand == NULL) {
@@ -1994,15 +1322,28 @@ libbalsa_set_message_id(GMimeMessage * mime_message)
     g_hmac_unref(msg_id_hash);
     g_mutex_unlock(&mutex);
 
-    /* create a msg id string
-     * Note: RFC 5322, sect. 3.6.4 explicitly allows the form
-     *    dot-atom-text "@" dot-atom-text
-     * where dot-atom-text may include all base64 (RFC 1421) chars,
-     * including '+' and '/' */
-    message_id = g_base64_encode(buffer, buflen);
-    memmove(message_id + 23, message_id + 22, strlen(message_id) - 23);
-    message_id[22] = '@';
-
+    /* create a msg id string as base32-encoded string from the first
+     * 30 bytes of the hashed result, and separate the groups by '.'
+     * or '@' */
+    message_id = dst = g_malloc0(54U);	/* = (32 / 5) * 9 */
+    src = buffer;
+	while (buflen >= 5U) {
+		*dst++ = base32_char(src[0] >> 3);
+		*dst++ = base32_char((src[0] << 2) + (src[1] >> 6));
+		*dst++ = base32_char(src[1] >> 1);
+		*dst++ = base32_char((src[1] << 4) + (src[2] >> 4));
+		*dst++ = base32_char((src[2] << 1) + (src[3] >> 7));
+		*dst++ = base32_char(src[3] >> 2);
+		*dst++ = base32_char((src[3] << 3) + (src[4] >> 5));
+		*dst++ = base32_char(src[4]);
+		src = &src[5];
+		buflen -= 5U;
+		if (dst == &message_id[(54U / 2U) - 1U]) {
+			*dst++ = '@';
+		} else if (buflen >= 5U) {
+			*dst++ = '.';
+		}
+	}
     g_mime_message_set_message_id(mime_message, message_id);
     g_free(message_id);
 }
@@ -2027,34 +1368,50 @@ libbalsa_create_msg(LibBalsaMessage * message, gboolean flow, GError ** error)
 }
 
 static LibBalsaMsgCreateResult
-libbalsa_fill_msg_queue_item_from_queu(LibBalsaMessage * message,
-                                       MessageQueueItem *mqi)
+libbalsa_fill_msg_queue_item_from_queu(LibBalsaMessage * message, MessageQueueItem *mqi)
 {
-    mqi->orig = message;
-    g_object_ref(mqi->orig);
-    if (message->mime_msg) {
-        g_mime_object_remove_header(GMIME_OBJECT(message->mime_msg),
-                                    "Status");
-        g_mime_object_remove_header(GMIME_OBJECT(message->mime_msg),
-                                    "X-Status");
-        g_mime_object_remove_header(GMIME_OBJECT(message->mime_msg),
-                                    "X-Balsa-Fcc");
-        g_mime_object_remove_header(GMIME_OBJECT(message->mime_msg),
-                                    "X-Balsa-SmtpServer");
-        g_mime_object_remove_header(GMIME_OBJECT(message->mime_msg),
-                                    "X-Balsa-DSN");
-	mqi->stream = g_mime_stream_mem_new();
-        libbalsa_mailbox_lock_store(message->mailbox);
-	g_mime_object_write_to_stream(GMIME_OBJECT(message->mime_msg),
-                                      mqi->stream);
-        libbalsa_mailbox_unlock_store(message->mailbox);
-	g_mime_stream_reset(mqi->stream);
-    } else
-	mqi->stream = libbalsa_message_stream(message);
-    if (mqi->stream == NULL)
-	return LIBBALSA_MESSAGE_CREATE_ERROR;
-  
-    return LIBBALSA_MESSAGE_CREATE_OK;
+	GMimeStream *msg_stream;
+	LibBalsaMsgCreateResult result = LIBBALSA_MESSAGE_CREATE_ERROR;
+
+	mqi->orig = message;
+	if (message->mime_msg != NULL) {
+		msg_stream = g_mime_stream_mem_new();
+		libbalsa_mailbox_lock_store(message->mailbox);
+		g_mime_object_write_to_stream(GMIME_OBJECT(message->mime_msg), msg_stream);
+		libbalsa_mailbox_unlock_store(message->mailbox);
+		g_mime_stream_reset(msg_stream);
+	} else {
+		msg_stream = libbalsa_message_stream(message);
+	}
+
+	if (msg_stream != NULL) {
+		GMimeStream *filter_stream;
+		GMimeFilter *filter;
+
+		filter_stream = g_mime_stream_filter_new(msg_stream);
+
+		/* filter out unwanted headers */
+		filter = g_mime_filter_header_new();
+		g_mime_stream_filter_add(GMIME_STREAM_FILTER(filter_stream), filter);
+		g_object_unref(G_OBJECT(filter));
+
+		/* add CRLF, encode dot */
+		filter = g_mime_filter_crlf_new(TRUE, TRUE);
+		g_mime_stream_filter_add(GMIME_STREAM_FILTER(filter_stream), filter);
+		g_object_unref(G_OBJECT(filter));
+
+		/* write to a new stream */
+		mqi->stream = g_mime_stream_mem_new();
+		g_mime_stream_write_to_stream(filter_stream, mqi->stream);
+		g_object_unref(G_OBJECT(filter_stream));
+		g_mime_stream_reset(mqi->stream);
+		g_object_unref(G_OBJECT(msg_stream));
+
+		g_object_ref(G_OBJECT(mqi->orig));
+		result = LIBBALSA_MESSAGE_CREATE_OK;
+	}
+
+	return result;
 }
 
 

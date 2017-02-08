@@ -50,9 +50,6 @@ gboolean libbalsa_message_postpone(LibBalsaMessage * message,
 				   gboolean flow, 
 				   GError **error);
 
-
-#if ENABLE_ESMTP
-
 LibBalsaMsgCreateResult libbalsa_message_queue(LibBalsaMessage* message, 
 					       LibBalsaMailbox* outbox,
                                                LibBalsaMailbox* fccbox,
@@ -75,24 +72,6 @@ gboolean libbalsa_process_queue(LibBalsaMailbox * outbox,
                                 GSList * smtp_servers,
                                 GtkWindow * parent,
                                 gboolean debug);
-#else
-
-LibBalsaMsgCreateResult libbalsa_message_queue(LibBalsaMessage* message, 
-					       LibBalsaMailbox* outbox,
-                                               LibBalsaMailbox* fccbox,
-					       gboolean flow,
-					       GError ** error);
-LibBalsaMsgCreateResult libbalsa_message_send(LibBalsaMessage* message,
-					      LibBalsaMailbox* outbox,  
-					      LibBalsaMailbox* fccbox,
-                                              LibBalsaFccboxFinder finder, 
-					      gboolean flow, gboolean debug,
-					      GError ** error);
-gboolean libbalsa_process_queue(LibBalsaMailbox* outbox, 
-                                LibBalsaFccboxFinder finder,
-                                gboolean debug);
-
-#endif
 
 extern GMutex send_messages_lock;
 extern int send_thread_pipes[2];

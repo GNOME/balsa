@@ -251,17 +251,6 @@ ask_password(LibBalsaServer *server, LibBalsaMailbox *mbox)
 	return password;
 }
 
-#if ENABLE_ESMTP
-static void
-authapi_exit (void)
-{
-    g_slist_foreach(balsa_app.smtp_servers, (GFunc) g_object_unref, NULL);
-    g_slist_free(balsa_app.smtp_servers);
-    balsa_app.smtp_servers = NULL;
-    auth_client_exit ();
-}
-#endif /* ESMTP */
-
 void
 balsa_app_init(void)
 {
@@ -272,16 +261,7 @@ balsa_app_init(void)
     balsa_app.identities = NULL;
     balsa_app.current_ident = NULL;
     balsa_app.local_mail_directory = NULL;
-
-#if ENABLE_ESMTP
     balsa_app.smtp_servers = NULL;
-
-    /* Do what's needed at application level to allow libESMTP
-       to use authentication.  */
-    auth_client_init ();
-    atexit (authapi_exit);
-#endif
-
     balsa_app.inbox = NULL;
     balsa_app.inbox_input = NULL;
     balsa_app.outbox = NULL;

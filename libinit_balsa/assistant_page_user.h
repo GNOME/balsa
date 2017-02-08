@@ -42,9 +42,7 @@ G_BEGIN_DECLS
         GtkWidget *login;
         GtkWidget *passwd;
         GtkWidget *remember_passwd;
-#if ENABLE_ESMTP
         GtkWidget *smtp;
-#endif
         GtkWidget *name;
         GtkWidget *email;
         GtkWidget *localmaildir;

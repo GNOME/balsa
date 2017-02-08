@@ -76,9 +76,7 @@ balsa_druid_page_user_init(BalsaDruidPageUser * user,
     user->emaster.donemask = 0;
     user->ed0.master = &(user->emaster);
     user->ed1.master = &(user->emaster);
-#if ENABLE_ESMTP
     user->ed2.master = &(user->emaster);
-#endif
     user->ed3.master = &(user->emaster);
     user->ed4.master = &(user->emaster);
     label = GTK_LABEL(gtk_label_new(_(header2)));
@@ -119,11 +117,9 @@ balsa_druid_page_user_init(BalsaDruidPageUser * user,
     gtk_entry_set_visibility(GTK_ENTRY(user->passwd), FALSE);
     /* separator line here */
 
-#if ENABLE_ESMTP
     preset = "localhost:25";
     balsa_init_add_grid_entry(grid, row++, _("_SMTP Server:"), preset,
                                &(user->ed2), druid, page, &(user->smtp));
-#endif
 
     /* 2.1 */
     balsa_init_add_grid_entry(grid, row++, _("Your real _name:"),
@@ -242,9 +238,7 @@ balsa_druid_page_user_next(GtkAssistant * druid, GtkWidget * page,
     gchar *uhoh;
     LibBalsaIdentity *ident;
     InternetAddress *ia;
-#if ENABLE_ESMTP
     LibBalsaSmtpServer *smtp_server;
-#endif /* ENABLE_ESMTP */
     
 #if 0
     printf("USER next ENTER %p %p\n", page, user->page);
@@ -294,7 +288,6 @@ balsa_druid_page_user_next(GtkAssistant * druid, GtkWidget * page,
     libbalsa_identity_set_address (ident, ia);
 
     /* outgoing mail */
-#if ENABLE_ESMTP
     if (balsa_app.smtp_servers == NULL) {
 	smtp_server = libbalsa_smtp_server_new();
         libbalsa_smtp_server_set_name(smtp_server,
@@ -306,7 +299,6 @@ balsa_druid_page_user_next(GtkAssistant * druid, GtkWidget * page,
     libbalsa_server_set_host(LIBBALSA_SERVER(smtp_server),
                              gtk_entry_get_text(GTK_ENTRY(user->smtp)),
                              FALSE);
-#endif
 
     g_free(balsa_app.local_mail_directory);
     balsa_app.local_mail_directory =

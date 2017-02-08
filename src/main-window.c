@@ -897,9 +897,7 @@ identities_activated(GSimpleAction * action,
     libbalsa_identity_config_dialog(window,
                                     &balsa_app.identities,
                                     &balsa_app.current_ident,
-#if ENABLE_ESMTP
                                     balsa_app.smtp_servers,
-#endif /* ENABLE_ESMTP */
                                     (void(*)(gpointer))
                                     balsa_identities_changed);
 }
@@ -1046,9 +1044,7 @@ send_queued_mail_activated(GSimpleAction * action,
                            gpointer        user_data)
 {
     libbalsa_process_queue(balsa_app.outbox, balsa_find_sentbox_by_url,
-#if ENABLE_ESMTP
                            balsa_app.smtp_servers,
-#endif /* ENABLE_ESMTP */
                            (GtkWindow *) balsa_app.main_window,
 			   balsa_app.debug);
 }

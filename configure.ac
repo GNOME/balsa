@@ -98,11 +98,6 @@ AC_ARG_WITH(compface,
                   [Enable Compface (default=no)]),
                   [with_compface=$withval],[with_compface=no])
 
-AC_ARG_WITH(esmtp,
-   AC_HELP_STRING([--with-esmtp=DIR],
-                  [Enable libESMTP (default=yes)]),
-                  [ with_esmtp=$withval ],[ with_esmtp=yes ])
-
 AC_ARG_WITH(gss,
    AC_HELP_STRING([--with-gss],
                   [Enable GSS (default=no)]),
@@ -170,6 +165,16 @@ AC_ARG_ENABLE(more-warnings,
                   [Enable maximum compiler warnings (default=yes)]),
                   [set_more_warnings="$enableval"], [set_more_warnings=yes])
 
+dnl Documentation and Testing requirements for libnetclient
+AC_ARG_WITH(libnetclient-docs,
+   AC_HELP_STRING([--with-libnetclient-docs],
+                  [Check requirements for building the libnetclient API docs (see libnetclient/README; default=no)]),
+                  [with_libncdocs=$withval],[with_libncdocs=no])
+
+AC_ARG_WITH(libnetclient-test,
+   AC_HELP_STRING([--with-libnetclient-test],
+                  [Check requirements for running libnetclient tests (see libnetclient/README; default=no)]),
+                  [with_libncdtest=$withval],[with_libncdtest=no])
 
 
 dnl #####################################################################
@@ -231,14 +236,6 @@ if test "$have__nl_measurement_measurement" = "yes"; then
 	    [Define if _NL_MEASUREMENT_MEASUREMENT is available])
 fi
 
-# sendmail
-#
-if test x"$with_esmtp" = xno; then
-AC_PATH_PROG(SENDMAIL, sendmail, no, $PATH:/usr/sbin:/usr/lib)
-AC_DEFINE_UNQUOTED(SENDMAIL, "$ac_cv_path_SENDMAIL",
-		   [Path to sendmail program.])
-fi
-
 dnl #####################################################################
 dnl GNOME libs
 dnl #####################################################################
@@ -282,6 +279,7 @@ gtk+-3.0 >= 3.10.0
 gmime-2.6
 gio-2.0
 gthread-2.0
+gnutls
 $gnome_extras
 ])
 
@@ -291,6 +289,12 @@ PKG_CHECK_MODULES(BALSA_AB, [
    gmime-2.6
    $gnome_extras
 ])
+
+PKG_CHECK_MODULES(LIBNETCLIENT, [
+	glib-2.0
+	gio-2.0
+	gnutls
+])	
 
 AC_MSG_CHECKING(whether res_init is available)
 AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <resolv.h>;]],
@@ -546,35 +550,6 @@ AC_MSG_CHECKING(whether to include experimental Osmo support)
 if test x$with_osmo != xno ; then
     AC_MSG_RESULT([yes])
     AC_DEFINE(HAVE_OSMO,1,[If defined, enable Osmo address book support.])
-else
-    AC_MSG_RESULT([no])
-fi
-
-# LibESMTP configuration.
-#
-AC_MSG_CHECKING([whether to build ESMTP support])
-if test "x$with_esmtp" != xno  ; then
-    AC_MSG_RESULT([yes])
-    test "$with_esmtp" != yes && LIBS="$LIBS -L$with_esmtp/lib"
-    AC_CHECK_LIB(esmtp, smtp_start_session,BALSA_LIBS="$BALSA_LIBS -lesmtp",
-	AC_MSG_ERROR([*** You enabled ESMTP but esmtp library is not found.]),
-                 -lpthread)
-    AC_CHECK_LIB(esmtp, smtp_option_require_all_recipients, 
-                 AC_DEFINE(ENABLE_ESMTP, 1, 
-                           [Defined when ESTMP support is to be enabled.]),
-                 AC_MSG_ERROR([*** You enabled ESMTP but esmtp library
-                               does not support 'require_all_recipients'.
-                               Please get a Balsa-aware libESMTP from
-                               http://pawsa.fedorapeople.org/balsa/download.html
-                               or compile libESMTP with
-                               './configure --enable-require-all-recipients'.]),
-                 -lpthread)
-    AC_CHECK_LIB(esmtp, smtp_starttls_set_password_cb,
-	AC_DEFINE(HAVE_SMTP_TLS_CLIENT_CERTIFICATE,1,
-	         [Defined when libESMTP has TLS support.]),
-                 ,
-		 -lpthread)
-    test "$with_esmtp" != yes && CPPFLAGS="$CPPFLAGS -I$with_esmtp/include"
 else
     AC_MSG_RESULT([no])
 fi
@@ -865,11 +840,44 @@ dnl however, we do not mess with the icon caches - it messes up more
 dnl things that it fixes, for eg. user installs, package builds etc.
 dnl AC_PATH_PROG(GTK_UPDATE_ICON_CACHE, gtk-update-icon-cache)
 
+dnl Documentation and Testing requirements for libnetclient
+
+if test x$with_libncdocs != xno; then
+	AC_PATH_PROGS(DOXYGEN, doxygen, no)
+	if test "x$DOXYGEN" = "xno" ; then
+		AC_MSG_ERROR([*** Cannot build libnetclient API documentation, see libnetclient/README for fixing this issue ***])
+	fi
+fi
+
+if test x$with_libncdtest != xno; then
+	AC_CHECK_HEADER([sput.h],[have_sput_h=yes],[have_sput_h=no])
+	AC_PROG_SED
+	AC_PATH_PROGS(NCAT, ncat, no)
+	AC_PATH_PROGS(VALGRIND, valgrind, no)
+	AC_PATH_PROGS(LCOV, lcov, no)
+	AC_PATH_PROGS(GENHTML, genhtml, no)
+	AC_PATH_PROGS(SCREEN, screen, no)
+	AC_PATH_PROGS(GTLSSRV, gnutls-serv, no)
+	AC_PATH_PROGS(SUDO, sudo, no)
+	AC_PATH_PROGS(INETSIM, inetsim, no)
+	if test "x$have_sput_h" = "xno" || \
+	   test "x$NCAT" = "xno" || \
+	   test "x$VALGRIND" = "xno" || \
+	   test "x$LCOV" = "xno" || \
+	   test "x$GENHTML" = "xno" || \
+	   test "x$SCREEN" = "xno" || \
+	   test "x$GTLSSRV" = "xno" || \
+	   test "x$SUDO" = "xno" || \
+	   test "x$INETSIM" = "xno" ; then
+	    AC_MSG_ERROR([*** Cannot run libnetclient tests, see libnetclient/README for fixing this issue ***])
+	fi
+fi
+
 dnl #####################################################################
 dnl 8. Output
 dnl #####################################################################
 
-AC_OUTPUT([
+AC_CONFIG_FILES([
 Makefile
 balsa.1
 balsa.spec
@@ -885,9 +893,14 @@ doc/Makefile
 libbalsa/Makefile
 libbalsa/imap/Makefile
 libinit_balsa/Makefile
+libnetclient/Makefile
+libnetclient/test/Makefile
+libnetclient/test/start-test-env.sh
 src/Makefile
 ui/Makefile
-])
+],
+[chmod +x libnetclient/test/start-test-env.sh])
+AC_OUTPUT
 
 dnl ##########################################################################
 dnl Summary
@@ -897,7 +910,6 @@ echo ""
 echo "================ Final configuration ==================="
 echo "    Installing into prefix: $prefix"
 echo "   Enable compile warnings: $set_more_warnings"
-echo "                Use ESMTP : $with_esmtp"
 echo "               HTML widget: $use_html_widget"
 echo "                 Use GNOME: $with_gnome"
 echo "              Use Canberra: $with_canberra"

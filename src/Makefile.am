@@ -112,6 +112,7 @@ AM_CPPFLAGS = \
 	-DGNOMELOCALEDIR=\""$(datadir)/locale"\" \
 	-I$(top_builddir) -I$(top_srcdir) \
 	-I$(top_srcdir)/libbalsa \
+	-I${top_srcdir}/libnetclient \
 	$(BALSA_DEFS)
 
 AM_CFLAGS = $(BALSA_CFLAGS)
@@ -120,6 +121,7 @@ balsa_LDADD = \
 	$(top_builddir)/libinit_balsa/libinit_balsa.a \
 	$(top_builddir)/libbalsa/libbalsa.a	\
 	$(top_builddir)/libbalsa/imap/libimap.a	\
+	$(top_builddir)/libnetclient/libnetclient.a \
 	$(balsa_IDL_OBJS) \
 	$(INTLLIBS) \
         $(BALSA_LIBS)

@@ -21,7 +21,6 @@
 # include "config.h"
 #endif                          /* HAVE_CONFIG_H */
 
-#if ENABLE_ESMTP
 /*
  * LibBalsaSmtpServer is a subclass of LibBalsaServer.
  */
@@ -34,7 +33,7 @@
 #include "libbalsa-conf.h"
 #include "misc.h"
 #include <glib/gi18n.h>
-#include <libesmtp.h>
+#include "net-client.h"
 
 #if HAVE_MACOSX_DESKTOP
 #  include "macosx-helpers.h"
@@ -46,10 +45,7 @@ struct _LibBalsaSmtpServer {
     LibBalsaServer server;
 
     gchar *name;
-    auth_context_t authctx;
-#if HAVE_SMTP_TLS_CLIENT_CERTIFICATE
     gchar *cert_passphrase;
-#endif                          /* HAVE_SMTP_TLS_CLIENT_CERTIFICATE */
     guint big_message; /* size of partial messages; in kB */
 };
 
@@ -70,11 +66,8 @@ libbalsa_smtp_server_finalize(GObject * object)
 
     smtp_server = LIBBALSA_SMTP_SERVER(object);
 
-    auth_destroy_context(smtp_server->authctx);
     g_free(smtp_server->name);
-#if HAVE_SMTP_TLS_CLIENT_CERTIFICATE
     g_free(smtp_server->cert_passphrase);
-#endif                          /* HAVE_SMTP_TLS_CLIENT_CERTIFICATE */
 
     G_OBJECT_CLASS(parent_class)->finalize(object);
 }
@@ -91,70 +84,10 @@ libbalsa_smtp_server_class_init(LibBalsaSmtpServerClass * klass)
     object_class->finalize = libbalsa_smtp_server_finalize;
 }
 
-/* Callback to get user/password info from SMTP server preferences.
-   This is adequate for simple username / password requests but does
-   not adequately cope with all SASL mechanisms.  */
-static int
-authinteract(auth_client_request_t request, char **result, int fields,
-             void *arg)
-{
-    LibBalsaServer *server = LIBBALSA_SERVER(arg);
-    int i;
-
-    for (i = 0; i < fields; i++) {
-        if (request[i].flags & AUTH_PASS) {
-	    /* We need to return a const pointer, this is why we
-	       ignore the result from get_password, and take and
-	       advantage of the fact that this function sets the
-	       passwd field of the server. */
-	    if(!server->passwd)
-		g_free(libbalsa_server_get_password(server, NULL));
-            result[i] = server->passwd;
-	}
-        else if (request[i].flags & AUTH_USER)
-            result[i] = (server->user
-                         && *server->user) ? server->user : NULL;
-
-        /* Fail the AUTH exchange if something was requested
-           but not supplied. */
-        if (result[i] == NULL)
-            return 0;
-    }
-
-    return 1;
-}
-
-#if HAVE_SMTP_TLS_CLIENT_CERTIFICATE
-static int
-tlsinteract(char *buf, int buflen, int rwflag, void *arg)
-{
-    LibBalsaSmtpServer *smtp_server = LIBBALSA_SMTP_SERVER(arg);
-    char *pw;
-    int len;
-
-    pw = smtp_server->cert_passphrase;
-    len = strlen(pw);
-    if (len + 1 > buflen)
-        return 0;
-    strcpy(buf, pw);
-    return len;
-}
-#endif                          /* HAVE_SMTP_TLS_CLIENT_CERTIFICATE */
-
 static void
 libbalsa_smtp_server_init(LibBalsaSmtpServer * smtp_server)
 {
     LIBBALSA_SERVER(smtp_server)->protocol = "smtp";
-    smtp_server->authctx = auth_create_context();
-    auth_set_mechanism_flags(smtp_server->authctx, AUTH_PLUGIN_PLAIN, 0);
-    auth_set_interact_cb(smtp_server->authctx, authinteract, smtp_server);
-
-#if HAVE_SMTP_TLS_CLIENT_CERTIFICATE
-    /* Use our callback for X.509 certificate passwords.  If STARTTLS is
-       not in use or disabled in configure, the following is harmless. */
-    smtp_server->cert_passphrase = NULL;
-    smtp_starttls_set_password_cb(tlsinteract, smtp_server);
-#endif                          /* HAVE_SMTP_TLS_CLIENT_CERTIFICATE */
 }
 
 /* Class boilerplate */
@@ -219,7 +152,6 @@ libbalsa_smtp_server_new_from_config(const gchar * name)
 
     libbalsa_server_load_config(LIBBALSA_SERVER(smtp_server));
 
-#if HAVE_SMTP_TLS_CLIENT_CERTIFICATE
     smtp_server->cert_passphrase =
         libbalsa_conf_private_get_string("CertificatePassphrase");
     if (smtp_server->cert_passphrase) {
@@ -227,7 +159,6 @@ libbalsa_smtp_server_new_from_config(const gchar * name)
         g_free(smtp_server->cert_passphrase);
         smtp_server->cert_passphrase = tmp;
     }
-#endif                          /* HAVE_SMTP_TLS_CLIENT_CERTIFICATE */
 
     smtp_server->big_message = libbalsa_conf_get_int("BigMessage=0");
 
@@ -239,13 +170,11 @@ libbalsa_smtp_server_save_config(LibBalsaSmtpServer * smtp_server)
 {
     libbalsa_server_save_config(LIBBALSA_SERVER(smtp_server));
 
-#if HAVE_SMTP_TLS_CLIENT_CERTIFICATE
     if (smtp_server->cert_passphrase) {
         gchar *tmp = libbalsa_rot(smtp_server->cert_passphrase);
         libbalsa_conf_private_set_string("CertificatePassphrase", tmp);
         g_free(tmp);
     }
-#endif                          /* HAVE_SMTP_TLS_CLIENT_CERTIFICATE */
     libbalsa_conf_set_int("BigMessage", smtp_server->big_message);
 }
 
@@ -263,7 +192,6 @@ libbalsa_smtp_server_get_name(LibBalsaSmtpServer * smtp_server)
     return smtp_server ? smtp_server->name : _("Default");
 }
 
-#if HAVE_SMTP_TLS_CLIENT_CERTIFICATE
 void
 libbalsa_smtp_server_set_cert_passphrase(LibBalsaSmtpServer * smtp_server,
                                          const gchar * passphrase)
@@ -276,13 +204,6 @@ const gchar *
 libbalsa_smtp_server_get_cert_passphrase(LibBalsaSmtpServer * smtp_server)
 {
     return smtp_server->cert_passphrase;
-}
-#endif                          /* HAVE_SMTP_TLS_CLIENT_CERTIFICATE */
-
-auth_context_t
-libbalsa_smtp_server_get_authctx(LibBalsaSmtpServer * smtp_server)
-{
-    return smtp_server->authctx;
 }
 
 guint
@@ -333,10 +254,8 @@ struct smtp_server_dialog_info {
     GtkWidget *host;
     GtkWidget *user;
     GtkWidget *pass;
-#if HAVE_SMTP_TLS_CLIENT_CERTIFICATE
     GtkWidget *tlsm;
     GtkWidget *cert;
-#endif                          /* HAVE_SMTP_TLS_CLIENT_CERTIFICATE */
     GtkWidget *split_button;
     GtkWidget *big_message;
 };
@@ -369,7 +288,6 @@ smtp_server_add_widget(GtkWidget * grid, gint row, const gchar * text,
     gtk_label_set_mnemonic_widget(GTK_LABEL(label), widget);
 }
 
-#if HAVE_SMTP_TLS_CLIENT_CERTIFICATE
 static
 GtkWidget *
 smtp_server_tls_widget(LibBalsaSmtpServer * smtp_server)
@@ -377,30 +295,15 @@ smtp_server_tls_widget(LibBalsaSmtpServer * smtp_server)
     LibBalsaServer *server = LIBBALSA_SERVER(smtp_server);
     GtkWidget *combo_box = gtk_combo_box_text_new();
 
-    gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(combo_box),
-                                   _("Never"));
-    gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(combo_box),
-                                   _("If Possible"));
-    gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(combo_box),
-                                   _("Required"));
+    gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(combo_box), _("SMTP over SSL (SMTPS)"));
+    gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(combo_box), _("TLS required"));
+    gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(combo_box), _("TLS if possible (not recommended)"));
+    gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(combo_box), _("None (not recommended)"));
 
-    switch (server->tls_mode) {
-    case Starttls_DISABLED:
-        gtk_combo_box_set_active(GTK_COMBO_BOX(combo_box), 0);
-        break;
-    case Starttls_ENABLED:
-        gtk_combo_box_set_active(GTK_COMBO_BOX(combo_box), 1);
-        break;
-    case Starttls_REQUIRED:
-        gtk_combo_box_set_active(GTK_COMBO_BOX(combo_box), 2);
-        break;
-    default:
-        break;
-    }
+    gtk_combo_box_set_active(GTK_COMBO_BOX(combo_box), (gint) server->security - 1);
 
     return combo_box;
 }
-#endif                          /* HAVE_SMTP_TLS_CLIENT_CERTIFICATE */
 
 static void
 smtp_server_response(GtkDialog * dialog, gint response,
@@ -436,24 +339,10 @@ smtp_server_response(GtkDialog * dialog, gint response,
         libbalsa_server_set_password(server,
                                      gtk_entry_get_text(GTK_ENTRY
                                                         (sdi->pass)));
-#if HAVE_SMTP_TLS_CLIENT_CERTIFICATE
-        switch (gtk_combo_box_get_active(GTK_COMBO_BOX(sdi->tlsm))) {
-        case 0:
-            server->tls_mode = LIBBALSA_TLS_DISABLED;
-            break;
-        case 1:
-            server->tls_mode = LIBBALSA_TLS_ENABLED;
-            break;
-        case 2:
-            server->tls_mode = LIBBALSA_TLS_REQUIRED;
-            break;
-        default:
-            break;
-        }
+        server->security = (NetClientCryptMode) (gtk_combo_box_get_active(GTK_COMBO_BOX(sdi->tlsm)) + 1);
         libbalsa_smtp_server_set_cert_passphrase(sdi->smtp_server,
                                                  gtk_entry_get_text
                                                  (GTK_ENTRY(sdi->cert)));
-#endif                          /* HAVE_SMTP_TLS_CLIENT_CERTIFICATE */
         if (gtk_toggle_button_get_active
             (GTK_TOGGLE_BUTTON(sdi->split_button)))
             /* big_message is stored in kB, but the widget is in MB. */
@@ -590,8 +479,7 @@ libbalsa_smtp_server_dialog(LibBalsaSmtpServer * smtp_server,
     g_signal_connect(sdi->pass, "changed", G_CALLBACK(smtp_server_changed),
                      sdi);
 
-#if HAVE_SMTP_TLS_CLIENT_CERTIFICATE
-    smtp_server_add_widget(grid, ++row, _("Use _TLS:"), sdi->tlsm =
+    smtp_server_add_widget(grid, ++row, _("Se_curity:"), sdi->tlsm =
                            smtp_server_tls_widget(smtp_server));
     g_signal_connect(sdi->tlsm, "changed", G_CALLBACK(smtp_server_changed),
                      sdi);
@@ -604,7 +492,6 @@ libbalsa_smtp_server_dialog(LibBalsaSmtpServer * smtp_server,
                            smtp_server->cert_passphrase);
     g_signal_connect(sdi->cert, "changed", G_CALLBACK(smtp_server_changed),
                      sdi);
-#endif                          /* HAVE_SMTP_TLS_CLIENT_CERTIFICATE */
 
     ++row;
     sdi->split_button =
@@ -636,5 +523,3 @@ libbalsa_smtp_server_dialog(LibBalsaSmtpServer * smtp_server,
 
     gtk_widget_show_all(dialog);
 }
-
-#endif                          /* ENABLE_ESMTP */

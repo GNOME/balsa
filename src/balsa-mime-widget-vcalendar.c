@@ -322,20 +322,12 @@ vevent_reply(GObject * button, GtkWidget * box)
     params[2] = NULL;
     message->parameters = g_list_prepend(message->parameters, params);
 
-#if ENABLE_ESMTP
     result = libbalsa_message_send(message, balsa_app.outbox, NULL,
 				   balsa_find_sentbox_by_url,
 				   ident->smtp_server,
                                    GTK_WINDOW(gtk_widget_get_toplevel
                                               ((GtkWidget *) button)),
 				   FALSE, balsa_app.debug, &error);
-#else
-    result = libbalsa_message_send(message, balsa_app.outbox, NULL,
-				   balsa_find_sentbox_by_url,
-                                   GTK_WINDOW(gtk_widget_get_toplevel
-                                              ((GtkWidget *) button)),
-				   FALSE, balsa_app.debug, &error);
-#endif
     if (result != LIBBALSA_MESSAGE_CREATE_OK)
 	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
 			     _("Sending the iTIP calendar reply failed: %s"),

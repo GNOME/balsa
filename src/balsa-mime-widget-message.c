@@ -363,18 +363,12 @@ extbody_send_mail(GtkWidget * button, LibBalsaMessageBody * mime_body)
     else
 	body->charset = g_strdup("US-ASCII");
     libbalsa_message_append_part(message, body);
-#if ENABLE_ESMTP
     result = libbalsa_message_send(message, balsa_app.outbox, NULL,
 				   balsa_find_sentbox_by_url,
 				   balsa_app.current_ident->smtp_server,
                                    GTK_WINDOW(gtk_widget_get_toplevel
                                               (button)),
 				   FALSE, balsa_app.debug, &err);
-#else
-    result = libbalsa_message_send(message, balsa_app.outbox, NULL,
-				   balsa_find_sentbox_by_url,
-				   FALSE, balsa_app.debug, &err);
-#endif
     if (result != LIBBALSA_MESSAGE_CREATE_OK)
 	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
 			     _("Sending the external body request failed: %s"),

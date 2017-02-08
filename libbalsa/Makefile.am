@@ -88,6 +88,8 @@ libbalsa_a_SOURCES = 		\
 	filter.h		\
 	folder-scanners.c	\
 	folder-scanners.h	\
+	gmime-filter-header.c      \
+	gmime-filter-header.h      \
 	gmime-stream-gio.c      \
 	gmime-stream-gio.h      \
 	html.c                  \
@@ -164,6 +166,7 @@ EXTRA_DIST = 				\
 	${libbalsa_smime_extra_dist}
 
 AM_CPPFLAGS = -I${top_builddir} -I${top_srcdir} -I${top_srcdir}/libbalsa \
+	-I${top_srcdir}/libnetclient \
 	-I${top_srcdir}/libbalsa/imap \
 	$(BALSA_DEFS)
 

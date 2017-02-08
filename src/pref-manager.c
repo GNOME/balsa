@@ -39,12 +39,8 @@
 #  include "macosx-helpers.h"
 #endif
 
-#if ENABLE_ESMTP
-#include <libesmtp.h>
-#include <string.h>
 #include "smtp-server.h"
 #include "libbalsa-conf.h"
-#endif                          /* ENABLE_ESMTP */
 
 #include <glib/gi18n.h>
 
@@ -74,14 +70,10 @@ typedef struct _PropertyUI {
     GtkWidget *address_books;
 
     GtkWidget *mail_servers;
-#if ENABLE_ESMTP
     GtkWidget *smtp_servers;
     GtkWidget *smtp_server_edit_button;
     GtkWidget *smtp_server_del_button;
-#if HAVE_SMTP_TLS_CLIENT_CERTIFICATE
     GtkWidget *smtp_certificate_passphrase;
-#endif
-#endif                          /* ENABLE_ESMTP */
     GtkWidget *mail_directory;
     GtkWidget *encoding_menu;
     GtkWidget *check_mail_auto;
@@ -200,9 +192,7 @@ static GtkWidget *mailserver_subpage(void);
 
 static GtkWidget *remote_mailbox_servers_group(GtkWidget * page);
 static GtkWidget *local_mail_group(GtkWidget * page);
-#if ENABLE_ESMTP
 static GtkWidget *outgoing_mail_group(GtkWidget * page);
-#endif                          /* ENABLE_ESMTP */
 
 static GtkWidget *incoming_subpage(void);
 
@@ -326,11 +316,9 @@ static void balsa_help_pbox_display(void);
 static void set_prefs(void);
 static void apply_prefs(GtkDialog * dialog);
 void update_mail_servers(void); /* public; in pref-manager.h */
-#if ENABLE_ESMTP
 static void smtp_server_update(LibBalsaSmtpServer *, GtkResponseType,
 		               const gchar *);
 static void update_smtp_servers(void);
-#endif                          /* ENABLE_ESMTP */
 
     /* callbacks */
 static void response_cb(GtkDialog * dialog, gint response, gpointer data);
@@ -343,13 +331,11 @@ static void pop3_add_cb(void);
 static void add_menu_cb(GtkWidget * menu, GtkWidget * widget);
 static void server_del_cb(GtkTreeView * tree_view);
 
-#if ENABLE_ESMTP
 static void smtp_server_edit_cb(GtkTreeView * tree_view);
 static void smtp_server_add_cb(void);
 static void smtp_server_del_cb(GtkTreeView * tree_view);
 static void smtp_server_changed (GtkTreeSelection * selection,
 				 gpointer user_data);
-#endif                          /* ENABLE_ESMTP */
 
 static void address_book_edit_cb(GtkTreeView * tree_view);
 static void address_book_delete_cb(GtkTreeView * tree_view);
@@ -1628,9 +1614,7 @@ mailserver_subpage()
 
     pm_page_add(page, remote_mailbox_servers_group(page), TRUE);
     pm_page_add(page, local_mail_group(page), FALSE);
-#if ENABLE_ESMTP
     pm_page_add(page, outgoing_mail_group(page), TRUE);
-#endif                          /* ENABLE_ESMTP */
 
     return page;
 }
@@ -1722,7 +1706,6 @@ local_mail_group(GtkWidget * page)
     return group;
 }
 
-#if ENABLE_ESMTP
 static GtkWidget *
 outgoing_mail_group(GtkWidget * page)
 {
@@ -1785,7 +1768,6 @@ outgoing_mail_group(GtkWidget * page)
 
     return group;
 }
-#endif                          /* ENABLE_ESMTP */
 
 static GtkWidget *
 create_mail_options_page(GtkTreeStore * store)
@@ -2917,9 +2899,6 @@ server_edit_cb(GtkTreeView * tree_view)
     balsa_mailbox_node_show_prop_dialog(mbnode);
 }
 
-#if ENABLE_ESMTP
-/* SMTP server callbacks */
-
 /* Clear and populate the list. */
 static void
 update_smtp_servers(void)
@@ -3072,7 +3051,6 @@ smtp_server_changed(GtkTreeSelection * selection, gpointer user_data)
                              && gtk_tree_model_iter_n_children(model,
                                                                NULL) > 1);
 }
-#endif                          /* ENABLE_ESMTP */
 
 /* Address book callbacks */
 

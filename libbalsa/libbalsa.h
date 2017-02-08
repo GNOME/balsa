@@ -34,9 +34,7 @@ typedef struct _LibBalsaMessage LibBalsaMessage;
 typedef struct _LibBalsaMessageHeaders LibBalsaMessageHeaders;
 typedef struct _LibBalsaMessageBody LibBalsaMessageBody;
 typedef struct _LibBalsaServer LibBalsaServer;
-#if ENABLE_ESMTP
 typedef struct _LibBalsaSmtpServer LibBalsaSmtpServer;
-#endif                          /* ENABLE_ESMTP */
 typedef struct _LibbalsaVfs LibbalsaVfs;
 
 

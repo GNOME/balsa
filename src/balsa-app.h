@@ -34,11 +34,6 @@
 /* misc.h for LibBalsaCodeset */
 #include "misc.h"
 
-#if ENABLE_ESMTP
-#include <libesmtp.h>			/* part of libESMTP */
-#include <auth-client.h>		/* part of libESMTP */
-#endif
-
 /* Work around nonprivileged installs so we can find icons */
 #ifdef BALSA_LOCAL_INSTALL
 #define gnome_pixmap_file( s ) g_strconcat( BALSA_RESOURCE_PREFIX, "/pixmaps/", s, NULL ) 
@@ -144,9 +139,7 @@ extern struct BalsaApplication {
 
     gchar *local_mail_directory;
 
-#if ENABLE_ESMTP
     GSList *smtp_servers;
-#endif
 
     /* folder scanning */
     guint local_scan_depth;

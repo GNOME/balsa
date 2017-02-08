@@ -27,6 +27,7 @@
 
 #include "imap/libimap.h"
 #include "libbalsa.h"
+#include "net-client.h"
 
 #if defined(HAVE_LIBSECRET)
 #include <libsecret/secret.h>
@@ -75,6 +76,7 @@ struct _LibBalsaServer {
     gchar *host;
     gchar *user;
     gchar *passwd;
+    NetClientCryptMode security;
     /* We include SSL support in UI unconditionally to preserve config
      * between SSL and non-SSL builds. We just fail if SSL is requested
      * in non-SSL build. */

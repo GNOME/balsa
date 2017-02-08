@@ -17,12 +17,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
-#if ENABLE_ESMTP
 #ifndef __SMTP_SERVER_H__
 #define __SMTP_SERVER_H__
 
 #include <gtk/gtk.h>
-#include <auth-client.h>
 #include "libbalsa.h"
 
 #define LIBBALSA_TYPE_SMTP_SERVER				\
@@ -53,8 +51,6 @@ void libbalsa_smtp_server_set_cert_passphrase(LibBalsaSmtpServer *
                                               const gchar * passphrase);
 const gchar *libbalsa_smtp_server_get_cert_passphrase(LibBalsaSmtpServer *
                                                       smtp_server);
-auth_context_t libbalsa_smtp_server_get_authctx(LibBalsaSmtpServer *
-                                                smtp_server);
 guint libbalsa_smtp_server_get_big_message(LibBalsaSmtpServer *
                                            smtp_server);
 void libbalsa_smtp_server_add_to_list(LibBalsaSmtpServer * smtp_server,
@@ -68,4 +64,3 @@ void libbalsa_smtp_server_dialog(LibBalsaSmtpServer * smtp_server,
                                  LibBalsaSmtpServerUpdate update);
 
 #endif                          /* __SMTP_SERVER_H__ */
-#endif                          /* ENABLE_ESMTP */

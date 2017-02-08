@@ -33,10 +33,8 @@
 #  include "macosx-helpers.h"
 #endif
 
-#if ENABLE_ESMTP
 #include <string.h>
 #include "smtp-server.h"
-#endif                          /* ENABLE_ESMTP */
 
 /*
  * The class.
@@ -139,10 +137,8 @@ libbalsa_identity_finalize(GObject * object)
     g_free(ident->reply_string);
     g_free(ident->forward_string);
     g_free(ident->signature_path);
-#if ENABLE_ESMTP
     if (ident->smtp_server)
         g_object_unref(ident->smtp_server);
-#endif                          /* ENABLE_ESMTP */
     g_free(ident->face);
     g_free(ident->x_face);
     g_free(ident->force_key_id);
@@ -387,7 +383,6 @@ libbalsa_identity_get_signature(LibBalsaIdentity* identity, GtkWindow *parent)
     return ret;
 }
 
-#if ENABLE_ESMTP
 void
 libbalsa_identity_set_smtp_server(LibBalsaIdentity * ident,
                                   LibBalsaSmtpServer * smtp_server)
@@ -400,7 +395,6 @@ libbalsa_identity_set_smtp_server(LibBalsaIdentity * ident,
     if (smtp_server)
 	g_object_ref(smtp_server);
 }
-#endif                          /* ENABLE_ESMTP */
 
 
 /* Used by both dialogs: */
@@ -614,8 +608,6 @@ static void ident_dialog_add_file_chooser_button(GtkWidget * grid,
 static void ident_dialog_add_boxes(GtkWidget * grid, gint row,
                                    GtkDialog * dialog, const gchar * key1,
                                    const gchar * key2);
-#if ENABLE_ESMTP
-#endif /* ENABLE_ESMTP */
 static gchar *ident_dialog_get_text(GObject *, const gchar *);
 static gboolean ident_dialog_get_bool(GObject *, const gchar *);
 static gchar *ident_dialog_get_path(GObject * dialog, const gchar * key);
@@ -654,7 +646,6 @@ static void ident_dialog_free_values(GPtrArray * values);
 static void display_frame_set_gpg_mode(GObject * dialog,
                                        const gchar * key, gint * value);
 
-#if ENABLE_ESMTP
 static void ident_dialog_add_smtp_menu(GtkWidget * grid, gint row,
                                        GtkDialog * dialog,
                                        const gchar * label_name,
@@ -663,7 +654,6 @@ static void ident_dialog_add_smtp_menu(GtkWidget * grid, gint row,
 static void display_frame_set_server(GObject * dialog,
                                      const gchar * key,
                                      LibBalsaSmtpServer * smtp_server);
-#endif /* ENABLE_ESMTP */
 
 static gpointer ident_dialog_get_value(GObject * dialog,
                                        const gchar * key);
@@ -969,14 +959,9 @@ static const struct {
 static void md_sig_path_changed_cb(GtkToggleButton * sig_button,
                                    GObject * dialog);
 
-#if ENABLE_ESMTP
 static GtkWidget*
 setup_ident_frame(GtkDialog * dialog, gboolean createp, gpointer tree,
                   GSList * smtp_servers)
-#else                           /* ENABLE_ESMTP */
-static GtkWidget*
-setup_ident_frame(GtkDialog * dialog, gboolean createp, gpointer tree)
-#endif                          /* ENABLE_ESMTP */
 {
     GtkNotebook *notebook = GTK_NOTEBOOK(gtk_notebook_new());
     GtkWidget *grid;
@@ -1025,10 +1010,8 @@ setup_ident_frame(GtkDialog * dialog, gboolean createp, gpointer tree)
     ident_dialog_add_boxes(grid, row++, dialog,
                            path_info[LBI_PATH_TYPE_FACE].box_key,
                            path_info[LBI_PATH_TYPE_XFACE].box_key);
-#if ENABLE_ESMTP
     ident_dialog_add_smtp_menu(grid, row++, dialog, _("SMT_P server:"),
                                "identity-smtp-server", smtp_servers);
-#endif /* ENABLE_ESMTP */
 
     /* create the "Signature" tab */
     grid = append_ident_notebook_page(notebook, _("Signature"), NULL);
@@ -1474,11 +1457,9 @@ ident_dialog_update(GObject * dlg)
     g_free(id->forward_string);
     id->forward_string  = ident_dialog_get_text(dlg, "identity-forwardstring");
     id->send_mp_alternative = ident_dialog_get_bool(dlg, "identity-sendmpalternative");
-#if ENABLE_ESMTP
     if(id->smtp_server) g_object_unref(id->smtp_server);
     id->smtp_server = ident_dialog_get_value(dlg, "identity-smtp-server");
     g_object_ref(id->smtp_server);
-#endif /* ENABLE_ESMTP */
 
     g_free(id->signature_path);
     id->signature_path  = ident_dialog_get_text(dlg, "identity-sigpath");
@@ -1689,7 +1670,6 @@ help_ident_cb(GtkWidget * widget)
    identites, the default one. Additionally, a callback is passed that
    will be executed when the identity list is modified: new entries
    are added or other entries are removed. */
-#if ENABLE_ESMTP
 static void
 lbi_free_smtp_server_list(GSList ** smtp_server_list)
 {
@@ -1697,15 +1677,11 @@ lbi_free_smtp_server_list(GSList ** smtp_server_list)
     g_slist_free(*smtp_server_list);
     g_free(smtp_server_list);
 }
-#endif /* ENABLE_ESMTP */
 
 void
 libbalsa_identity_config_dialog(GtkWindow *parent, GList **identities,
-				LibBalsaIdentity **default_id,
-#if ENABLE_ESMTP
-				GSList * smtp_servers,
-#endif /* ENABLE_ESMTP */
-                                void (*changed_cb)(gpointer))
+				LibBalsaIdentity **default_id, GSList * smtp_servers,
+				void (*changed_cb)(gpointer))
 {
     static GtkWidget *dialog = NULL;
     GtkWidget* frame;
@@ -1713,9 +1689,7 @@ libbalsa_identity_config_dialog(GtkWindow *parent, GList **identities,
     GtkWidget* hbox;
     GtkTreeView* tree;
     GtkTreeSelection *select;
-#if ENABLE_ESMTP
     GSList **smtp_server_list;
-#endif /* ENABLE_ESMTP */
 
     /* Show only one dialog at a time. */
     if (dialog) {
@@ -1755,7 +1729,6 @@ libbalsa_identity_config_dialog(GtkWindow *parent, GList **identities,
 
     gtk_box_pack_start(GTK_BOX(hbox), frame, FALSE, FALSE, 0);
 
-#if ENABLE_ESMTP
     smtp_server_list = g_new(GSList *, 1);
     *smtp_server_list = g_slist_copy(smtp_servers);
     g_slist_foreach(smtp_servers, (GFunc) g_object_ref, NULL);
@@ -1764,9 +1737,6 @@ libbalsa_identity_config_dialog(GtkWindow *parent, GList **identities,
     g_object_weak_ref(G_OBJECT(display_frame),
 	              (GWeakNotify) lbi_free_smtp_server_list,
 		      smtp_server_list);
-#else  /* ENABLE_ESMTP */
-    display_frame = setup_ident_frame(GTK_DIALOG(dialog), FALSE, tree);
-#endif /* ENABLE_ESMTP */
 
     gtk_box_pack_start(GTK_BOX(hbox), display_frame, TRUE, TRUE, 0);
 
@@ -1849,10 +1819,8 @@ display_frame_update(GObject * dialog, LibBalsaIdentity* ident)
                             ident->forward_string);
     display_frame_set_boolean(dialog, "identity-sendmpalternative",
                               ident->send_mp_alternative);
-#if ENABLE_ESMTP
     display_frame_set_server(dialog, "identity-smtp-server",
                              ident->smtp_server);
-#endif /* ENABLE_ESMTP */
 
     display_frame_set_path(dialog, "identity-sigpath",
                            ident->signature_path, FALSE);
@@ -2017,11 +1985,9 @@ libbalsa_identity_save(LibBalsaIdentity* ident, const gchar* group)
     libbalsa_conf_set_string("ReplyString", ident->reply_string);
     libbalsa_conf_set_string("ForwardString", ident->forward_string);
     libbalsa_conf_set_bool("SendMultipartAlternative", ident->send_mp_alternative);
-#if ENABLE_ESMTP
     libbalsa_conf_set_string("SmtpServer",
                              libbalsa_smtp_server_get_name(ident->
                                                            smtp_server));
-#endif                          /* ENABLE_ESMTP */
 
     libbalsa_conf_set_string("SignaturePath", ident->signature_path);
     libbalsa_conf_set_bool("SigExecutable", ident->sig_executable);
@@ -2150,7 +2116,6 @@ ident_dialog_free_values(GPtrArray * values)
     g_ptr_array_free(values, TRUE);
 }
 
-#if ENABLE_ESMTP
 static void
 ident_dialog_add_smtp_menu(GtkWidget * grid, gint row, GtkDialog * dialog,
                            const gchar * label_name,
@@ -2195,8 +2160,6 @@ display_frame_set_server(GObject * dialog, const gchar * key,
             gtk_combo_box_set_active(combo_box, i);
     }
 }
-
-#endif                          /* ENABLE_ESMTP */
 
 /*
  * Get the value of the active option menu item

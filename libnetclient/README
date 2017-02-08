@@ -1,0 +1,103 @@
+Written by Albrecht Dreß <albrecht.dress@arcor.de>
+Copyright (C) Albrecht Dreß 2017
+
+This library is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published bythe Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
+
+This library is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with
+this library.  If not, see <http://www.gnu.org/licenses/>.
+
+
+Purpose
+=======
+
+This library provides an implementation of CRLF-terminated line-based client
+protocols built on top of GIO.  It provides a base module, containing the
+line-based IO methods, and on top of that a SMTP (RFC5321) client class.
+
+
+Coding Style
+============
+
+The implementation tries to follow the MISRA C:2012 (MISRA C3) and SEI CERT
+Secure Coding standards for safer code.  For further details about these
+standards, see
+<https://www.misra.org.uk/Publications/tabid/57/Default.aspx> and
+<https://www.securecoding.cert.org/confluence/display/c/SEI+CERT+C+Coding+Standard>.
+
+
+Requirements
+============
+
+Apart from GLib/GIO (at least version 2.40.0) it requires GnuTLS.
+
+
+API Documentation
+=================
+
+Doxygen is required to create a HTML API documentation.  Install doxygen from
+<http://www.stack.nl/~dimitri/doxygen/download.html>.  Then run in this folder
+
+	make doc
+
+and open html/index.html.
+
+
+Testing
+=======
+
+In the folder test, a test application for running unit tests, a check for
+memory leaks and a coverage analysis is available.  The following packages
+are required for running them:
+
+- the Sput Unit Testing Framework for C/C++, available from
+  <http://www.use-strict.de/sput-unit-testing/>
+- ncat, available from <https://nmap.org/ncat/>
+- screen, available from <https://www.gnu.org/software/screen/>
+- sudo, available from <https://www.sudo.ws/>
+- Valgrind, avilable from <http://valgrind.org/>
+- LCOV and Genhtml, available from
+  <http://ltp.sourceforge.net/coverage/lcov.php>
+- gnutls-serv, which is a part of the GnuTLS package, available from
+  <https://www.gnutls.org/>
+- INetSim Internet Services Simulation Suite, available from
+  <http://www.inetsim.org/>
+
+Note that most of these requirements are typically available pre-packaged
+for your favorite distribution.
+
+For running the tests, open two terminal windows, and cd to the test folder
+of this package.
+
+In the first terminal, call
+
+	./start-test-env.sh
+
+which will launch several dummy servers required for testing.  Note that
+INetSim requires root permissions and is thus called via sudo.
+
+Then, in the second terminal, call
+
+	make tests
+
+to build the test application, and run it in Valgrind.  Note that the test
+application will report many CRITICAL glib errors.  This is normal, as the
+behaviour of the library's parameter checks is verified.
+
+The test produces the following output:
+- stdout/stderr: unit test results, which shall report zero failed
+- tests.vg: the output of the Valgrind memory check
+- gcov/index.html: results of the coverage analysis
+
+Finally, just terminate the test servers in the first window.  Note that
+INetSim will dump further information in its output files (typically in
+/var/log/inetsim).  You should verify that INetSim recorded the requested
+operations properly.
+
+								-oOo-

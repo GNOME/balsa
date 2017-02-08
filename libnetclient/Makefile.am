@@ -1,0 +1,19 @@
+# $Id$
+
+noinst_LIBRARIES = libnetclient.a
+libnetclient_a_SOURCES =	\
+	net-client.c			\
+	net-client.h			\
+	net-client-smtp.c		\
+	net-client-smtp.h		\
+	net-client-utils.c		\
+	net-client-utils.h
+CLEANFILES = doxygen.log
+SUBDIRS = test
+AM_CFLAGS = $(LIBNETCLIENT_CFLAGS)
+
+clean-local:
+	-rm -rf html
+
+doc:
+	@DOXYGEN@ libnetclient.dox

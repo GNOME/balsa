@@ -1,0 +1,20 @@
+#!/bin/sh
+# $Id$
+
+echo "starting test environment:"
+
+echo "GnuTLS server w/o client checking @ port 65001 as s_server1..."
+@SCREEN@ -d -m -S s_server1 \
+	@GTLSSRV@ -a --x509keyfile=cert_u.pem --x509certfile=cert_u.pem --echo -p 65001
+echo "GnuTLS server w/ client checking @ port 65002 as s_server2..."
+@SCREEN@ -d -m -S s_server2 \
+	@GTLSSRV@ -r --verify-client-cert --x509keyfile=cert_u.pem --x509certfile=cert_u.pem \
+	--x509cafile=ca_cert.pem --echo -p 65002
+@SCREEN@ -ls
+
+echo "inetsim (as root)..."
+@SUDO@ @INETSIM@ --config inetsim.conf
+
+echo "shut down GnuTLS servers..."
+@SCREEN@ -S s_server1 -X quit
+@SCREEN@ -S s_server2 -X quit

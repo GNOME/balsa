@@ -1,0 +1,17 @@
+# Valgrind suppressions
+{
+   g_type_register_fundamental
+   Memcheck:Leak
+   match-leak-kinds:all
+   ...
+   fun:g_type_register_fundamental
+}
+
+{
+   g_type_register_static
+   Memcheck:Leak
+   match-leak-kinds:all
+   ...
+   fun:g_type_register_static
+}
+

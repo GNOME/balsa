@@ -1,3 +1,11 @@
+2017-02-08  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Do not access a stale pointer
+
+	* src/main-window.c (balsa_window_destroy): nullify window->preview;
+	(bw_action_set_enabled): check for NULL window->preview;
+	(bw_idle_replace): ditto.
+
 2017-01-24  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Fix some conditional compilation code so that uncrustify does

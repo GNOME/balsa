@@ -768,7 +768,8 @@ bw_action_set_enabled(BalsaWindow * window,
 {
     GAction *action;
 
-    if (g_object_get_data(G_OBJECT(window), "destroying"))
+    /* Is the window being destroyed? */
+    if (window->preview == NULL)
         return;
 
     action = bw_get_action(window, action_name);
@@ -3088,10 +3089,15 @@ bw_close_mailbox_on_timer(BalsaWindow * window)
 static void
 balsa_window_destroy(GObject * object)
 {
-    g_object_set_data(object, "destroying", GINT_TO_POINTER(TRUE));
-    bw_idle_remove(BALSA_WINDOW(object));
+    BalsaWindow *window;
 
-    if (G_OBJECT_CLASS(balsa_window_parent_class)->dispose)
+    window = BALSA_WINDOW(object);
+    bw_idle_remove(window);
+    /* The preview window seems to get finalized without notification;
+     * we no longer need it, so we just drop our pointer: */
+    window->preview = NULL;
+
+    if (G_OBJECT_CLASS(balsa_window_parent_class)->dispose != NULL)
         G_OBJECT_CLASS(balsa_window_parent_class)->dispose(object);
 
     balsa_unregister_pixmaps();
@@ -4435,10 +4441,13 @@ bw_idle_replace(BalsaWindow * window, BalsaIndex * bindex)
 {
     if (balsa_app.previewpane) {
         bw_idle_remove(window);
-        window->set_message_id =
-            gdk_threads_add_idle((GSourceFunc) bw_idle_cb, window);
-        if (BALSA_MESSAGE(window->preview)->message)
-            gtk_widget_hide(window->preview);
+        /* Skip if the window is being destroyed: */
+        if (window->preview != NULL) {
+            window->set_message_id =
+                gdk_threads_add_idle((GSourceFunc) bw_idle_cb, window);
+            if (BALSA_MESSAGE(window->preview)->message != NULL)
+                gtk_widget_hide(window->preview);
+        }
     }
 }
 

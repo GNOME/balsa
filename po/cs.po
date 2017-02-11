@@ -1894,7 +1894,7 @@ msgid ""
 "Message left in your outbox."
 msgstr ""
 "Odeslání zprávy selhalo: %s\n"
-"Zpráva zůstala ve schránce „Pošta k odeslání“.\n"
+"Zpráva zůstala ve schránce „Pošta k odeslání“."
 
 #: ../libbalsa/send.c:857
 #, c-format
@@ -2278,7 +2278,7 @@ msgstr "žádný použitelný ověřovací mechanizmus"
 #: ../libnetclient/net-client-smtp.c:618
 #, c-format
 msgid "bad server reply: %s"
-msgstr "chybná odpověď serveru: %s\n"
+msgstr "chybná odpověď serveru: %s"
 
 #: ../libnetclient/net-client-smtp.c:608
 #, c-format

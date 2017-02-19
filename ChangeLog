@@ -1,3 +1,20 @@
+2017-02-19  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	SMTP extensions: TLS client cert; rework config dialog
+
+	* README: make it not quite so out of date.
+	* libbalsa/send.c (get_auth), (get_cert_pass),
+	(lbs_process_queue): use client cert if required.
+	* libbalsa/smtp-server.c (libbalsa_smtp_server_finalize),
+	(libbalsa_smtp_server_new_from_config),
+	(libbalsa_smtp_server_save_config),
+	(libbalsa_smtp_server_require_client_cert),
+	(libbalsa_smtp_server_get_cert_file), (smtp_server_response),
+	(smtp_server_changed), (libbalsa_smtp_server_dialog): add
+	cert-related entries to LibBalsaSmtpServer, and set and use
+	them.
+	* libbalsa/smtp-server.h: add cert-related API.
+
 2017-02-19  Albrecht Dreß
 
 	Make "Select Filters..." dialogue respect the headerbars config

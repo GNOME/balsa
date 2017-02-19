@@ -654,8 +654,7 @@ get_auth(NetClient *client,
 
     g_debug("%s: %p %p: encrypted = %d", __func__, client, user_data,
             net_client_is_encrypted(client));
-    /* Note: if the usr name is empty, we assume anonymous access */
-    if ((server->try_anonymous == 0U) && (server->user != NULL) && (server->user[0] != '\0')) {
+    if (server->try_anonymous == 0U) {
         result = g_new0(gchar *, 3U);
         result[0] = g_strdup(server->user);
         if ((server->passwd != NULL) && (server->passwd[0] != '\0')) {
@@ -665,6 +664,16 @@ get_auth(NetClient *client,
         }
     }
     return result;
+}
+
+
+static gchar *
+get_cert_pass(NetClient        *client,
+			  const GByteArray *cert_der,
+			  gpointer          user_data)
+{
+	/* FIXME - we just return the passphrase from the config, but we may also want to show a dialogue here... */
+	return g_strdup(libbalsa_smtp_server_get_cert_passphrase(LIBBALSA_SMTP_SERVER(user_data)));
 }
 
 
@@ -700,8 +709,25 @@ lbs_process_queue(LibBalsaMailbox     *outbox,
         // FIXME - submission (587) is the standard, but most isp's use 25...
         session = net_client_smtp_new(server->host, 587U, server->security);
     }
-    // FIXME - set user cert and connect cert-pass signal if we have a user cert
-    g_signal_connect(G_OBJECT(session), "cert-check", G_CALLBACK(check_cert), session);         // FIXME!!
+
+    /* load client certificate if configured */
+    if (libbalsa_smtp_server_require_client_cert(smtp_server)) {
+        const gchar *client_cert = libbalsa_smtp_server_get_cert_file(smtp_server);
+    	GError *error = NULL;
+
+    	g_signal_connect(G_OBJECT(session), "cert-pass", G_CALLBACK(get_cert_pass), smtp_server);
+    	if (!net_client_set_cert_from_file(NET_CLIENT(session), client_cert, &error)) {
+            libbalsa_information(LIBBALSA_INFORMATION_ERROR,
+                                 _("Cannot load certificate file %s: %s"),
+								 client_cert, error->message);
+            g_error_free(error);
+            g_mutex_unlock(&send_messages_lock);
+    		return FALSE;
+    	}
+    }
+
+    /* connect signals */
+    g_signal_connect(G_OBJECT(session), "cert-check", G_CALLBACK(check_cert), session);
     g_signal_connect(G_OBJECT(session), "auth", G_CALLBACK(get_auth), smtp_server);
 
     send_message_info =

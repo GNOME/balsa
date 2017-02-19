@@ -116,10 +116,7 @@ messages, and for syntax highlighting in attachments.
 
 Libraries:
 ---------
-	Balsa uses libESMTP library available at 
-http://www.stafford.uklinux.net/libesmtp/
-
-Balsa also needs the aspell spell checking libraries.
+Balsa needs the aspell spell checking libraries.
 
 	Make sure you have libtool installed (if you get some error 
 messages during compilation or when running precompiled binaries saying that
@@ -145,17 +142,22 @@ https://wiki.gnome.org/Git/Developers
 Specifying the SMTP Server:
 ---------------------------
 
-	when compiled to use libESMTP, the remote SMTP server details
-are configured on the Mail Servers tab of the Preferences dialogue box
-as follows:-
-
 Remote SMTP Server:
 	Specify the domain name and optionally the port for of the SMTP
 	server you use for submitting mail.  Please note that the
-	default port number is 587.  The syntax is hostname[:port].
-	Port can be a decimal number or the name of the service as
-	specified in /etc/services.  Typically you can just set this to
-	localhost:25.
+	default port number is 587 or 465 for SMTPS (see below).  The
+	syntax is hostname[:port].  Port can be a decimal number or the
+	name of the service as specified in /etc/services.  Typically
+	you can just set this to localhost:25.
+
+Security:
+	Specify the security level.  For an ISP, this is typically "SMTP
+	over SSL (SMTPS)" (default port 465) or "TLS required" (default
+	587, but many ISP's listen on port 25).  If your ISP does not
+	support either, choose a different ISP.  For a local connection
+	(i.e. to localhost), an unencrypted connection is fine.
+	Note that Balsa will not use the PLAIN or LOGIN authentication
+	mechanisms if the connection is not encrypted.
 
 User:
 	If the remote SMTP server requires authentication, enter your
@@ -169,28 +171,14 @@ Pass Phrase:
 	password.  Limitations on the length of the pass phrase depend
 	on the SMTP server.
 
+Client Certificate and Pass Phrase:
+	Few ISP's hand over a client certificate Balsa must present when
+	connecting.  Choose the PEM-encoded certificate file and -if it
+	has an encrypted private key- set the key's pass phrase.
 
-TLS extension in SMTP mail submission:
---------------------------------------
-
-    If you have libESMTP 0.8.5{preX} there will be a box for entry of
-    the client certificate's password.  The client certificate should
-    be stored in PEM format in the file
-
-    $HOME/.authenticate/$HOSTNAME/private/smtp-starttls.pem
-    
-    Both the certificate and the private key are stored in the same
-    file.  The permissions on the certificate file *must* be 0600 or 0400
-    otherwise libESMTP will ignore it.
-
-    libESMTP 0.8.4 will establish an encrypted connection with servers
-    supporting STARTTLS but there is no certificate support.  If the
-    remote SMTP server requires a certificate, you will have to set
-    "Use TLS" to "Never".
-
-    Note that libESMTP 0.8.5 will only negotiate a TLS connection.  It
-    will not use SSLv2 or SSLv3 which are subject to downgrade
-    attacks.
+Split large messages:
+	Some ISP's impose a message size limit.  In this case, enter the
+	appropriate value here.
 
 
 Gtk+-3 Dialog Header Bars:

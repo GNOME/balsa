@@ -45,8 +45,10 @@ struct _LibBalsaSmtpServer {
     LibBalsaServer server;
 
     gchar *name;
-    gchar *cert_passphrase;
-    guint big_message; /* size of partial messages; in kB */
+    gboolean client_cert;		// FIXME - maybe move to the server base class?
+    gchar *cert_file;			// FIXME - maybe move to the server base class?
+    gchar *cert_passphrase;		// FIXME - maybe move to the server base class?
+    guint big_message; /* size of partial messages; in kB; 0 disables splitting */
 };
 
 typedef struct _LibBalsaSmtpServerClass {
@@ -67,6 +69,7 @@ libbalsa_smtp_server_finalize(GObject * object)
     smtp_server = LIBBALSA_SMTP_SERVER(object);
 
     g_free(smtp_server->name);
+    g_free(smtp_server->cert_file);
     g_free(smtp_server->cert_passphrase);
 
     G_OBJECT_CLASS(parent_class)->finalize(object);
@@ -152,8 +155,9 @@ libbalsa_smtp_server_new_from_config(const gchar * name)
 
     libbalsa_server_load_config(LIBBALSA_SERVER(smtp_server));
 
-    smtp_server->cert_passphrase =
-        libbalsa_conf_private_get_string("CertificatePassphrase");
+    smtp_server->client_cert = libbalsa_conf_get_bool("NeedClientCert=false");
+    smtp_server->cert_file = libbalsa_conf_get_string("UserCertificateFile");
+    smtp_server->cert_passphrase = libbalsa_conf_private_get_string("CertificatePassphrase");
     if (smtp_server->cert_passphrase) {
         gchar *tmp = libbalsa_rot(smtp_server->cert_passphrase);
         g_free(smtp_server->cert_passphrase);
@@ -170,6 +174,10 @@ libbalsa_smtp_server_save_config(LibBalsaSmtpServer * smtp_server)
 {
     libbalsa_server_save_config(LIBBALSA_SERVER(smtp_server));
 
+    libbalsa_conf_set_bool("NeedClientCert", smtp_server->client_cert);
+    if (smtp_server->cert_file != NULL) {
+    	libbalsa_conf_set_string("UserCertificateFile", smtp_server->cert_file);
+    }
     if (smtp_server->cert_passphrase) {
         gchar *tmp = libbalsa_rot(smtp_server->cert_passphrase);
         libbalsa_conf_private_set_string("CertificatePassphrase", tmp);
@@ -190,6 +198,18 @@ const gchar *
 libbalsa_smtp_server_get_name(LibBalsaSmtpServer * smtp_server)
 {
     return smtp_server ? smtp_server->name : _("Default");
+}
+
+gboolean
+libbalsa_smtp_server_require_client_cert(LibBalsaSmtpServer *smtp_server)
+{
+	return smtp_server->client_cert;
+}
+
+const gchar *
+libbalsa_smtp_server_get_cert_file(LibBalsaSmtpServer *smtp_server)
+{
+	return smtp_server->cert_file;
 }
 
 void
@@ -255,7 +275,10 @@ struct smtp_server_dialog_info {
     GtkWidget *user;
     GtkWidget *pass;
     GtkWidget *tlsm;
-    GtkWidget *cert;
+    GtkWidget *auth_button;
+    GtkWidget *cert_button;
+    GtkWidget *cert_file;
+    GtkWidget *cert_pass;
     GtkWidget *split_button;
     GtkWidget *big_message;
 };
@@ -333,6 +356,7 @@ smtp_server_response(GtkDialog * dialog, gint response,
         libbalsa_server_set_host(server,
                                  gtk_entry_get_text(GTK_ENTRY(sdi->host)),
                                  FALSE);
+        server->try_anonymous = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(sdi->auth_button)) ? 0U : 1U;
         libbalsa_server_set_username(server,
                                      gtk_entry_get_text(GTK_ENTRY
                                                         (sdi->user)));
@@ -340,17 +364,19 @@ smtp_server_response(GtkDialog * dialog, gint response,
                                      gtk_entry_get_text(GTK_ENTRY
                                                         (sdi->pass)));
         server->security = (NetClientCryptMode) (gtk_combo_box_get_active(GTK_COMBO_BOX(sdi->tlsm)) + 1);
+        sdi->smtp_server->client_cert = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(sdi->cert_button));
+        g_free(sdi->smtp_server->cert_file);
+        sdi->smtp_server->cert_file = g_strdup(gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(sdi->cert_file)));
         libbalsa_smtp_server_set_cert_passphrase(sdi->smtp_server,
                                                  gtk_entry_get_text
-                                                 (GTK_ENTRY(sdi->cert)));
-        if (gtk_toggle_button_get_active
-            (GTK_TOGGLE_BUTTON(sdi->split_button)))
+                                                 (GTK_ENTRY(sdi->cert_pass)));
+        if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(sdi->split_button))) {
             /* big_message is stored in kB, but the widget is in MB. */
-            LIBBALSA_SMTP_SERVER(server)->big_message =
-                gtk_spin_button_get_value(GTK_SPIN_BUTTON
-                                          (sdi->big_message)) * 1024;
-        else
-            LIBBALSA_SMTP_SERVER(server)->big_message = 0;
+        	sdi->smtp_server->big_message =
+                gtk_spin_button_get_value(GTK_SPIN_BUTTON(sdi->big_message)) * 1024.0;
+        } else {
+        	sdi->smtp_server->big_message = 0U;
+        }
         break;
     default:
         break;
@@ -367,30 +393,61 @@ smtp_server_response(GtkDialog * dialog, gint response,
 }
 
 static void
-smtp_server_changed(GtkWidget * widget,
+smtp_server_changed(GtkWidget G_GNUC_UNUSED *widget,
                     struct smtp_server_dialog_info *sdi)
 {
-    gboolean ok;
+	gboolean sensitive;
+	gboolean enable_ok = FALSE;
 
-    /* Minimal sanity check: Name and Host fields both non-blank. */
-    ok = *gtk_entry_get_text(GTK_ENTRY(sdi->name))
-        && *gtk_entry_get_text(GTK_ENTRY(sdi->host));
+	/* enable ok button only if a name and a host have been given */
+    if ((sdi->name != NULL) && (sdi->host != NULL)) {
+    	enable_ok = (*gtk_entry_get_text(GTK_ENTRY(sdi->name)) != '\0')
+        	&& (*gtk_entry_get_text(GTK_ENTRY(sdi->host)) != '\0');
+    }
 
-    gtk_dialog_set_response_sensitive(GTK_DIALOG(sdi->dialog),
-                                      GTK_RESPONSE_OK, ok);
+	/* user name/password only if authentication is required */
+	if ((sdi->auth_button != NULL) && (sdi->user != NULL) && (sdi->pass != NULL)) {
+		sensitive = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(sdi->auth_button));
+		gtk_widget_set_sensitive(sdi->user, sensitive);
+		gtk_widget_set_sensitive(sdi->pass, sensitive);
+
+		/* disable ok if authentication is required, but no user name given */
+		if (sensitive && (*gtk_entry_get_text(GTK_ENTRY(sdi->user)) == '\0')) {
+			enable_ok = FALSE;
+		}
+	}
+
+	/* client certificate and passphrase stuff only if TLS/SSL is enabled */
+	if ((sdi->tlsm != NULL) && (sdi->cert_button != NULL) && (sdi->cert_file != NULL) && (sdi->cert_pass != NULL)) {
+		sensitive = (NetClientCryptMode) (gtk_combo_box_get_active(GTK_COMBO_BOX(sdi->tlsm)) + 1) != NET_CLIENT_CRYPT_NONE;
+		gtk_widget_set_sensitive(sdi->cert_button, sensitive);
+		if (sensitive) {
+			sensitive = sensitive && gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(sdi->cert_button));
+		}
+
+		gtk_widget_set_sensitive(sdi->cert_file, sensitive);
+		gtk_widget_set_sensitive(sdi->cert_pass, sensitive);
+
+		/* disable ok if a certificate is required, but no file name given */
+		if (sensitive) {
+			gchar *cert_file = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(sdi->cert_file));
+
+			if ((cert_file == NULL) || (cert_file[0] == '\0')) {
+				enable_ok = FALSE;
+			}
+			g_free(cert_file);
+		}
+	}
+
+	/* split big messages */
+	if ((sdi->big_message != NULL) && (sdi->split_button != NULL)) {
+		sensitive = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(sdi->split_button));
+	    gtk_widget_set_sensitive(sdi->big_message, sensitive);
+	}
+
+    gtk_dialog_set_response_sensitive(GTK_DIALOG(sdi->dialog), GTK_RESPONSE_OK, enable_ok);
     gtk_dialog_set_default_response(GTK_DIALOG(sdi->dialog),
-                                    ok ? GTK_RESPONSE_OK :
-                                    GTK_RESPONSE_CANCEL);
-}
-
-static void
-smtp_server_split_button_changed(GtkWidget * button,
-                                 struct smtp_server_dialog_info *sdi)
-{
-    gtk_widget_set_sensitive(sdi->big_message,
-                             gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
-                                                          (button)));
-    smtp_server_changed(button, sdi);
+    	enable_ok ? GTK_RESPONSE_OK : GTK_RESPONSE_CANCEL);
 }
 
 void
@@ -401,6 +458,7 @@ libbalsa_smtp_server_dialog(LibBalsaSmtpServer * smtp_server,
     LibBalsaServer *server = LIBBALSA_SERVER(smtp_server);
     struct smtp_server_dialog_info *sdi;
     GtkWidget *dialog;
+    GtkWidget *notebook;
     GtkWidget *grid;
     gint row;
     GtkWidget *label, *hbox;
@@ -408,12 +466,12 @@ libbalsa_smtp_server_dialog(LibBalsaSmtpServer * smtp_server,
     /* Show only one dialog at a time. */
     sdi = g_object_get_data(G_OBJECT(smtp_server),
                             LIBBALSA_SMTP_SERVER_DIALOG_KEY);
-    if (sdi) {
+    if (sdi != NULL) {
         gtk_window_present(GTK_WINDOW(sdi->dialog));
         return;
     }
 
-    sdi = g_new(struct smtp_server_dialog_info, 1);
+    sdi = g_new0(struct smtp_server_dialog_info, 1U);
     g_object_set_data_full(G_OBJECT(smtp_server),
                            LIBBALSA_SMTP_SERVER_DIALOG_KEY, sdi,
                            (GDestroyNotify) smtp_server_destroy_notify);
@@ -442,84 +500,115 @@ libbalsa_smtp_server_dialog(LibBalsaSmtpServer * smtp_server,
     gtk_dialog_set_response_sensitive(GTK_DIALOG(dialog), GTK_RESPONSE_OK,
                                       FALSE);
 
+    notebook = gtk_notebook_new();
+    gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(GTK_DIALOG(dialog))), notebook);
+
 #define HIG_PADDING 12
+
+    /* notebook page with basic options */
     grid = libbalsa_create_grid();
-    gtk_container_set_border_width(GTK_CONTAINER(grid), HIG_PADDING);
-    gtk_container_add(GTK_CONTAINER
-                      (gtk_dialog_get_content_area(GTK_DIALOG(dialog))),
-                      grid);
-
     row = 0;
-    smtp_server_add_widget(grid, row, _("_Descriptive Name:"),
-                           sdi->name = gtk_entry_new());
-    if (smtp_server->name)
+    gtk_container_set_border_width(GTK_CONTAINER(grid), HIG_PADDING);
+    gtk_notebook_append_page(GTK_NOTEBOOK(notebook), grid,
+                             gtk_label_new_with_mnemonic(_("_Basic")));
+
+    /* server descriptive name */
+    sdi->name = gtk_entry_new();
+    gtk_widget_set_hexpand(sdi->name, TRUE);
+    smtp_server_add_widget(grid, row, _("_Descriptive Name:"), sdi->name);
+    if (smtp_server->name != NULL) {
         gtk_entry_set_text(GTK_ENTRY(sdi->name), smtp_server->name);
-    g_signal_connect(sdi->name, "changed", G_CALLBACK(smtp_server_changed),
-                     sdi);
+    }
+    g_signal_connect(sdi->name, "changed", G_CALLBACK(smtp_server_changed), sdi);
 
-    smtp_server_add_widget(grid, ++row, _("_Server:"),
-                           sdi->host = gtk_entry_new());
-    if (server->host)
+    /* host and port */
+    sdi->host = gtk_entry_new();
+    smtp_server_add_widget(grid, ++row, _("_Server:"), sdi->host);
+    if (server->host != NULL) {
         gtk_entry_set_text(GTK_ENTRY(sdi->host), server->host);
-    g_signal_connect(sdi->host, "changed", G_CALLBACK(smtp_server_changed),
-                     sdi);
+    }
+    g_signal_connect(sdi->host, "changed", G_CALLBACK(smtp_server_changed), sdi);
 
-    smtp_server_add_widget(grid, ++row, _("_User Name:"),
-                           sdi->user = gtk_entry_new());
-    if (server->user)
+    /* security settings */
+    sdi->tlsm = smtp_server_tls_widget(smtp_server);
+    smtp_server_add_widget(grid, ++row, _("Se_curity:"), sdi->tlsm);
+    g_signal_connect(sdi->tlsm, "changed", G_CALLBACK(smtp_server_changed), sdi);
+
+    /* authentication or anonymous access */
+    sdi->auth_button = gtk_check_button_new_with_mnemonic(_("Server requires authentication"));
+    smtp_server_add_widget(grid, ++row, _("_Authentication:"), sdi->auth_button);
+    g_signal_connect(sdi->auth_button, "toggled", G_CALLBACK(smtp_server_changed), sdi);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(sdi->auth_button), server->try_anonymous == 0U);
+
+    /* user name and password */
+    sdi->user = gtk_entry_new();
+    smtp_server_add_widget(grid, ++row, _("_User Name:"), sdi->user);
+    if (server->user != NULL) {
         gtk_entry_set_text(GTK_ENTRY(sdi->user), server->user);
-    g_signal_connect(sdi->user, "changed", G_CALLBACK(smtp_server_changed),
-                     sdi);
+    }
+    g_signal_connect(sdi->user, "changed", G_CALLBACK(smtp_server_changed), sdi);
 
-    smtp_server_add_widget(grid, ++row, _("_Pass Phrase:"),
-                           sdi->pass = gtk_entry_new());
+    sdi->pass = gtk_entry_new();
+    smtp_server_add_widget(grid, ++row, _("_Pass Phrase:"), sdi->pass);
+    g_object_set(G_OBJECT(sdi->pass), "input-purpose", GTK_INPUT_PURPOSE_PASSWORD, NULL);
     gtk_entry_set_visibility(GTK_ENTRY(sdi->pass), FALSE);
-    if (server->passwd)
+    if (server->passwd != NULL) {
         gtk_entry_set_text(GTK_ENTRY(sdi->pass), server->passwd);
-    g_signal_connect(sdi->pass, "changed", G_CALLBACK(smtp_server_changed),
-                     sdi);
+    }
+    g_signal_connect(sdi->pass, "changed", G_CALLBACK(smtp_server_changed), sdi);
 
-    smtp_server_add_widget(grid, ++row, _("Se_curity:"), sdi->tlsm =
-                           smtp_server_tls_widget(smtp_server));
-    g_signal_connect(sdi->tlsm, "changed", G_CALLBACK(smtp_server_changed),
-                     sdi);
+    /* notebook page with advanced options */
+    grid = libbalsa_create_grid();
+    row = 0;
+    gtk_container_set_border_width(GTK_CONTAINER(grid), HIG_PADDING);
+    gtk_notebook_append_page(GTK_NOTEBOOK(notebook), grid,
+                             gtk_label_new_with_mnemonic(_("_Advanced")));
 
-    smtp_server_add_widget(grid, ++row, _("C_ertificate Pass Phrase:"),
-                           sdi->cert = gtk_entry_new());
-    gtk_entry_set_visibility(GTK_ENTRY(sdi->cert), FALSE);
-    if (smtp_server->cert_passphrase)
-        gtk_entry_set_text(GTK_ENTRY(sdi->cert),
-                           smtp_server->cert_passphrase);
-    g_signal_connect(sdi->cert, "changed", G_CALLBACK(smtp_server_changed),
-                     sdi);
+    /* client certificate and passphrase */
+    sdi->cert_button = gtk_check_button_new_with_mnemonic(_("Server requires client certificate"));
+    smtp_server_add_widget(grid, row, _("_Client Certificate:"), sdi->cert_button);
+    g_signal_connect(sdi->cert_button, "toggled", G_CALLBACK(smtp_server_changed), sdi);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(sdi->cert_button), smtp_server->client_cert);
 
-    ++row;
-    sdi->split_button =
-        gtk_check_button_new_with_mnemonic(_("Sp_lit message larger than"));
-    gtk_grid_attach(GTK_GRID(grid), sdi->split_button, 0, row, 1, 1);
+    sdi->cert_file = gtk_file_chooser_button_new(_("Choose Client Certificate"), GTK_FILE_CHOOSER_ACTION_OPEN);
+    gtk_widget_set_hexpand(sdi->cert_file, TRUE);
+    smtp_server_add_widget(grid, ++row, _("Certificate _File:"), sdi->cert_file);
+    if (smtp_server->cert_file != NULL) {
+    	gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(sdi->cert_file), smtp_server->cert_file);
+    }
+    g_signal_connect(sdi->cert_file, "file-set", G_CALLBACK(smtp_server_changed), sdi);
+
+	sdi->cert_pass = gtk_entry_new();
+    smtp_server_add_widget(grid, ++row, _("Certificate _Pass Phrase:"), sdi->cert_pass);
+    g_object_set(G_OBJECT(sdi->cert_pass), "input-purpose", GTK_INPUT_PURPOSE_PASSWORD, NULL);
+    gtk_entry_set_visibility(GTK_ENTRY(sdi->cert_pass), FALSE);
+    if (smtp_server->cert_passphrase != NULL) {
+        gtk_entry_set_text(GTK_ENTRY(sdi->cert_pass), smtp_server->cert_passphrase);
+    }
+    g_signal_connect(sdi->cert_pass, "changed", G_CALLBACK(smtp_server_changed), sdi);
+
+    /* split large messages */
+    sdi->split_button = gtk_check_button_new_with_mnemonic(_("Sp_lit message larger than"));
+    gtk_grid_attach(GTK_GRID(grid), sdi->split_button, 0, ++row, 1, 1);
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 6);
     sdi->big_message = gtk_spin_button_new_with_range(0.1, 100, 0.1);
     gtk_box_pack_start(GTK_BOX(hbox), sdi->big_message, TRUE, TRUE, 0);
     label = gtk_label_new(_("MB"));
     gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, FALSE, 0);
     if (smtp_server->big_message > 0) {
-        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(sdi->split_button),
-                                     TRUE);
+        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(sdi->split_button), TRUE);
         /* The widget is in MB, but big_message is stored in kB. */
         gtk_spin_button_set_value(GTK_SPIN_BUTTON(sdi->big_message),
-                                  ((float) smtp_server->big_message) /
-                                  1024);
+                                  ((gdouble) smtp_server->big_message) / 1024.0);
     } else {
-        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(sdi->split_button),
-                                     FALSE);
+        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(sdi->split_button), FALSE);
         gtk_spin_button_set_value(GTK_SPIN_BUTTON(sdi->big_message), 1);
-        gtk_widget_set_sensitive(sdi->big_message, FALSE);
     }
-    g_signal_connect(sdi->split_button, "toggled",
-                     G_CALLBACK(smtp_server_split_button_changed), sdi);
-    g_signal_connect(sdi->big_message, "changed",
-                     G_CALLBACK(smtp_server_changed), sdi);
+    g_signal_connect(sdi->split_button, "toggled", G_CALLBACK(smtp_server_changed), sdi);
+    g_signal_connect(sdi->big_message, "changed", G_CALLBACK(smtp_server_changed), sdi);
     gtk_grid_attach(GTK_GRID(grid), hbox, 1, row, 1, 1);
+
+    smtp_server_changed(NULL, sdi);
 
     gtk_widget_show_all(dialog);
 }

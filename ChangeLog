@@ -1,5 +1,12 @@
 2017-02-19  Albrecht Dreß
 
+	Make "Select Filters..." dialogue respect the headerbars config
+
+	* src/filter-run-dialog.c (balsa_filter_run_dialog_new): check
+	the BALSA_DIALOG_HEADERBAR environment variable.
+
+2017-02-19  Albrecht Dreß
+
 	Fix unsafe permissions for config-private
 
 	* libbalsa/libbalsa-conf.c (lbc_init), (lbc_lock), (lbc_sync):

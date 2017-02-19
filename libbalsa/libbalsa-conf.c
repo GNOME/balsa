@@ -41,6 +41,7 @@ typedef struct {
     gchar *path;
     guint changes;
     time_t mtime;
+    gboolean private;
 } LibBalsaConf;
 
 static LibBalsaConf lbc_conf;
@@ -77,12 +78,13 @@ lbc_readfile(const gchar * filename)
 
 static void
 lbc_init(LibBalsaConf * conf, const gchar * filename,
-         const gchar * old_dir)
+         const gchar * old_dir, gboolean private)
 {
     struct stat buf;
     GError *error = NULL;
     gint rc;
 
+    conf->private = private;
     if (!conf->path)
         conf->path =
             g_build_filename(g_get_home_dir(), ".balsa", filename, NULL);
@@ -153,8 +155,8 @@ lbc_lock(void)
 
     g_rec_mutex_lock(&lbc_mutex);
     if (!initialized) {
-        lbc_init(&lbc_conf, "config", ".gnome2");
-        lbc_init(&lbc_conf_priv, "config-private", ".gnome2_private");
+        lbc_init(&lbc_conf, "config", ".gnome2", FALSE);
+        lbc_init(&lbc_conf_priv, "config-private", ".gnome2_private", TRUE);
         initialized = TRUE;
     }
 }
@@ -511,6 +513,8 @@ lbc_sync(LibBalsaConf * conf)
                           " changes not saved", conf->path);
 #endif                          /* DEBUG */
         }
+    } else if (conf->private) {
+        g_chmod(conf->path, 0600);
     }
 
     g_free(buf);

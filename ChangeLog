@@ -1,3 +1,11 @@
+2017-02-19  Albrecht Dreß
+
+	Fix unsafe permissions for config-private
+
+	* libbalsa/libbalsa-conf.c (lbc_init), (lbc_lock), (lbc_sync):
+	  ensure that permissons on $HOME/.balsa/config-private are 0600
+	  after saving it.
+
 2017-02-08  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Do not access a stale pointer

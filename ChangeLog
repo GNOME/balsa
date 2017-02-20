@@ -1,3 +1,20 @@
+2017-02-20  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Give the user the option to ignore PIPELINING capability in a
+	POP3 server
+
+	* libbalsa/imap/pop3.c (pop_connect): respect
+	  PopHandle::enable_pipe.
+	* libbalsa/mailbox_pop3.c (libbalsa_mailbox_pop3_check): set
+	  the option in PopHandle;
+	  (libbalsa_mailbox_pop3_save_config): save it;
+	  (libbalsa_mailbox_pop3_load_config): load it;
+	* libbalsa/mailbox_pop3.h: new member
+	  LibBalsaMailboxPop3::enable_pipe;
+	* src/mailbox-conf.c (mailbox_conf_set_values),
+	  (update_pop_mailbox), (create_pop_mailbox_dialog):
+	  new check-box in the UI.
+
 2017-02-19  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	SMTP extensions: TLS client cert; rework config dialog

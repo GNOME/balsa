@@ -104,6 +104,7 @@ struct _MailboxConfWindow {
 	    GtkWidget *delete_from_server;
             BalsaServerConf bsc;
             GtkWidget *disable_apop;
+            GtkWidget *enable_pipe;
 	    GtkWidget *filter;
 	    GtkWidget *filter_cmd;
 	} pop3;
@@ -658,6 +659,8 @@ mailbox_conf_set_values(MailboxConfWindow *mcw)
         balsa_server_conf_set_values(&mcw->mb_data.pop3.bsc, server);
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.disable_apop),
 				     pop3->disable_apop);
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.enable_pipe),
+				     pop3->enable_pipe);
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.check),
 				     pop3->check);
 
@@ -814,6 +817,8 @@ update_pop_mailbox(MailboxConfWindow *mcw)
 	gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.check));
     mailbox->disable_apop =
 	gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.disable_apop));
+    mailbox->enable_pipe =
+	gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.enable_pipe));
     mailbox->delete_from_server =
 	gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
 				     (mcw->mb_data.pop3.delete_from_server));
@@ -1233,6 +1238,10 @@ create_pop_mailbox_dialog(MailboxConfWindow *mcw)
     mcw->mb_data.pop3.disable_apop = 
         balsa_server_conf_add_checkbox(&mcw->mb_data.pop3.bsc,
                                        _("Disable _APOP"));
+    /* toggle for enabling pipeling */
+    mcw->mb_data.pop3.enable_pipe =
+        balsa_server_conf_add_checkbox(&mcw->mb_data.pop3.bsc,
+                                       _("Overlap commands"));
 
     gtk_widget_show_all(notebook);
     gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), 0);

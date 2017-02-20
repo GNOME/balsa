@@ -600,7 +600,7 @@ pop_connect(PopHandle *pop, const char *host, GError **err)
     return FALSE;
 
   pop->max_req_queue_len = 
-    pop_can_do(pop, POP_CAP_PIPELINING) /* && pop->enable_pipe */
+    pop_can_do(pop, POP_CAP_PIPELINING) && pop->enable_pipe
     ? POP_QUEUE_LEN/2 : 1;
   return TRUE;
 }

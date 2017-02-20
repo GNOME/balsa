@@ -50,6 +50,7 @@ struct _LibBalsaMailboxPop3 {
     unsigned filter:1; /* filter through procmail/filter_cmd? */
     unsigned disable_apop:1; /* Some servers claim to support it but
                               * they do not. */
+    unsigned enable_pipe:1;  /* ditto */
 };
 
 LibBalsaMailboxPop3 *libbalsa_mailbox_pop3_new(void);

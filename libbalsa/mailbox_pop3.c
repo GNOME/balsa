@@ -489,6 +489,7 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
     pop_set_option(pop, IMAP_POP_OPT_FILTER_CR, TRUE);
     pop_set_option(pop, IMAP_POP_OPT_OVER_SSL, server->use_ssl);
     pop_set_option(pop, IMAP_POP_OPT_DISABLE_APOP, m->disable_apop);
+    pop_set_option(pop, IMAP_POP_OPT_PIPELINE, m->enable_pipe);
     pop_set_tls_mode(pop, tls_mode);
     pop_set_timeout(pop, 60000); /* wait 1.5 minute for packets */
     pop_set_usercb(pop, libbalsa_server_user_cb, server);
@@ -633,6 +634,7 @@ libbalsa_mailbox_pop3_save_config(LibBalsaMailbox * mailbox,
     libbalsa_conf_set_bool("Check", pop->check);
     libbalsa_conf_set_bool("Delete", pop->delete_from_server);
     libbalsa_conf_set_bool("DisableApop", pop->disable_apop);
+    libbalsa_conf_set_bool("EnablePipe", pop->enable_pipe);
     libbalsa_conf_set_bool("Filter", pop->filter);
     if(pop->filter_cmd)
         libbalsa_conf_set_string("FilterCmd", pop->filter_cmd);
@@ -657,6 +659,7 @@ libbalsa_mailbox_pop3_load_config(LibBalsaMailbox * mailbox,
     pop->check = libbalsa_conf_get_bool("Check=false");
     pop->delete_from_server = libbalsa_conf_get_bool("Delete=false");
     pop->disable_apop = libbalsa_conf_get_bool("DisableApop=false");
+    pop->enable_pipe = libbalsa_conf_get_bool("EnablePipe=false");
     pop->filter = libbalsa_conf_get_bool("Filter=false");
     pop->filter_cmd = libbalsa_conf_get_string("FilterCmd");
     if(pop->filter_cmd && *pop->filter_cmd == '\0') {

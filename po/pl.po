@@ -13,8 +13,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-02-12 14:13+0100\n"
-"PO-Revision-Date: 2017-02-12 14:14+0100\n"
+"POT-Creation-Date: 2017-02-20 01:37+0100\n"
+"PO-Revision-Date: 2017-02-20 01:38+0100\n"
 "Last-Translator: Piotr Drąg <piotrdrag@gmail.com>\n"
 "Language-Team: Polish <community-poland@mozilla.org>\n"
 "Language: pl\n"
@@ -416,14 +416,14 @@ msgid "Signature in %s is not a UTF-8 text."
 msgstr "Podpis w %s nie jest tekstem zakodowanym w UTF-8."
 
 #: ../libbalsa/identity.c:480 ../libbalsa/libbalsa-gpgme-cb.c:157
-#: ../libbalsa/libbalsa-gpgme-cb.c:369 ../libbalsa/smtp-server.c:430
+#: ../libbalsa/libbalsa-gpgme-cb.c:369 ../libbalsa/smtp-server.c:488
 #: ../src/ab-main.c:858 ../src/ab-window.c:141 ../src/address-book-config.c:239
 #: ../src/address-book-config.c:342 ../src/address-book-config.c:388
 #: ../src/balsa-app.c:88 ../src/balsa-index.c:2654 ../src/balsa-mblist.c:1896
 #: ../src/balsa-message.c:1766 ../src/balsa-mime-widget-callbacks.c:85
 #: ../src/filter-edit-callbacks.c:1239 ../src/filter-edit-dialog.c:402
 #: ../src/filter-edit-dialog.c:571 ../src/filter-export-dialog.c:79
-#: ../src/filter-run-dialog.c:311 ../src/folder-conf.c:304
+#: ../src/filter-run-dialog.c:321 ../src/folder-conf.c:304
 #: ../src/folder-conf.c:566 ../src/folder-conf.c:799 ../src/mailbox-conf.c:402
 #: ../src/mailbox-conf.c:423 ../src/mailbox-conf.c:439
 #: ../src/mailbox-conf.c:1123 ../src/pref-manager.c:491
@@ -436,11 +436,11 @@ msgid "_Cancel"
 msgstr "_Anuluj"
 
 #: ../libbalsa/identity.c:481 ../libbalsa/libbalsa-gpgme-cb.c:156
-#: ../libbalsa/libbalsa-gpgme-cb.c:368 ../libbalsa/smtp-server.c:429
+#: ../libbalsa/libbalsa-gpgme-cb.c:368 ../libbalsa/smtp-server.c:487
 #: ../src/ab-window.c:140 ../src/balsa-app.c:87 ../src/balsa-message.c:1767
 #: ../src/balsa-mime-widget-callbacks.c:86 ../src/filter-edit-callbacks.c:1238
 #: ../src/filter-edit-dialog.c:570 ../src/filter-export-dialog.c:78
-#: ../src/filter-run-dialog.c:310 ../src/main-window.c:4038
+#: ../src/filter-run-dialog.c:320 ../src/main-window.c:4038
 #: ../src/pref-manager.c:489 ../src/sendmsg-window.c:1545
 #: ../src/sendmsg-window.c:1999 ../src/sendmsg-window.c:3323
 #: ../src/sendmsg-window.c:4692 ../src/store-address.c:209
@@ -451,7 +451,7 @@ msgstr "_OK"
 msgid "Current"
 msgstr "Bieżąca"
 
-#: ../libbalsa/identity.c:743 ../libbalsa/smtp-server.c:192
+#: ../libbalsa/identity.c:743 ../libbalsa/smtp-server.c:200
 msgid "Default"
 msgstr "Domyślna"
 
@@ -640,11 +640,11 @@ msgstr "Błąd podczas wyświetlania pomocy o tożsamościach: %s\n"
 msgid "Manage Identities"
 msgstr "Zarządzanie tożsamościami"
 
-#: ../libbalsa/identity.c:1705 ../libbalsa/smtp-server.c:431
+#: ../libbalsa/identity.c:1705 ../libbalsa/smtp-server.c:489
 #: ../src/address-book-config.c:237 ../src/address-book-config.c:340
 #: ../src/address-book-config.c:386 ../src/filter-edit-callbacks.c:1240
 #: ../src/filter-edit-dialog.c:572 ../src/filter-export-dialog.c:80
-#: ../src/filter-run-dialog.c:312 ../src/folder-conf.c:305
+#: ../src/filter-run-dialog.c:322 ../src/folder-conf.c:305
 #: ../src/folder-conf.c:567 ../src/folder-conf.c:800 ../src/main-window.c:3944
 #: ../src/pref-manager.c:492 ../src/toolbar-prefs.c:141
 msgid "_Help"
@@ -907,7 +907,7 @@ msgstr "%s: niewystarczająca ważność dla UID %s"
 msgid "could not list keys"
 msgstr "nie można wyświetlić listy kluczy"
 
-#: ../libbalsa/libbalsa-conf.c:141
+#: ../libbalsa/libbalsa-conf.c:143
 msgid "Your Balsa configuration is now stored in “~/.balsa/config”."
 msgstr ""
 "Konfiguracja programu Balsa jest teraz przechowywana w „~/.balsa/config”."
@@ -1886,17 +1886,22 @@ msgstr "Wysyłanie poczty…"
 msgid "_Hide"
 msgstr "_Ukryj"
 
-#: ../libbalsa/send.c:870
+#: ../libbalsa/send.c:721
+#, c-format
+msgid "Cannot load certificate file %s: %s"
+msgstr "Nie można wczytać pliku certyfikatu %s: %s"
+
+#: ../libbalsa/send.c:896
 #, c-format
 msgid "Connected to MTA %s: %s"
 msgstr "Połączono z MTA %s: %s"
 
-#: ../libbalsa/send.c:910
+#: ../libbalsa/send.c:936
 #, c-format
 msgid "Saving sent message to %s failed: %s"
 msgstr "Zapisanie wysłanej wiadomości do %s się nie powiodło: %s"
 
-#: ../libbalsa/send.c:936
+#: ../libbalsa/send.c:962
 #, c-format
 msgid ""
 "Sending message failed: %s\n"
@@ -1905,22 +1910,22 @@ msgstr ""
 "Wysłanie wiadomości się nie powiodło: %s\n"
 "Wiadomość pozostała w skrzynce wychodzącej."
 
-#: ../libbalsa/send.c:947
+#: ../libbalsa/send.c:973
 #, c-format
 msgid "Connecting MTA %s (%s) failed: %s"
 msgstr "Połączenie z MTA %s (%s) się nie powiodło: %s"
 
-#: ../libbalsa/send.c:1128 ../libbalsa/send.c:1194
+#: ../libbalsa/send.c:1154 ../libbalsa/send.c:1220
 #, c-format
 msgid "Cannot read %s: %s"
 msgstr "Nie można odczytać %s: %s"
 
-#: ../libbalsa/send.c:1131 ../libbalsa/send.c:1197
+#: ../libbalsa/send.c:1157 ../libbalsa/send.c:1223
 #, c-format
 msgid "Cannot read %s"
 msgstr "Nie można odczytać %s"
 
-#: ../libbalsa/send.c:1161
+#: ../libbalsa/send.c:1187
 #, c-format
 msgid ""
 "Cannot determine character set for text file “%s”; sending as MIME type “%s”"
@@ -1928,14 +1933,14 @@ msgstr ""
 "Nie można ustalić zestawu znaków dla pliku tekstowego „%s”, wysyłanie jako "
 "typ MIME „%s”"
 
-#: ../libbalsa/send.c:1596
+#: ../libbalsa/send.c:1622
 msgid "This message will not be encrypted for the BCC: recipient."
 msgid_plural "This message will not be encrypted for the BCC: recipients."
 msgstr[0] "Ta wiadomość nie zostanie zaszyfrowana dla odbiorcy z pola „UDW:”."
 msgstr[1] "Ta wiadomość nie zostanie zaszyfrowana dla odbiorców z pola „UDW:”."
 msgstr[2] "Ta wiadomość nie zostanie zaszyfrowana dla odbiorców z pola „UDW:”."
 
-#: ../libbalsa/send.c:1696
+#: ../libbalsa/send.c:1722
 msgid "This message will not be encrypted for the BCC: recipient(s)."
 msgstr "Ta wiadomość nie zostanie zaszyfrowana dla odbiorców z pola „UDW:”."
 
@@ -1945,63 +1950,100 @@ msgstr "Ta wiadomość nie zostanie zaszyfrowana dla odbiorców z pola „UDW:�
 msgid "Logging in to %s using %s"
 msgstr "Logowanie do %s za pomocą %s"
 
-#: ../libbalsa/smtp-server.c:298
+#: ../libbalsa/smtp-server.c:321
 msgid "SMTP over SSL (SMTPS)"
 msgstr "SMTP przez SSL (SMTPS)"
 
-#: ../libbalsa/smtp-server.c:299
+#: ../libbalsa/smtp-server.c:322
 msgid "TLS required"
 msgstr "Wymaganie TLS"
 
-#: ../libbalsa/smtp-server.c:300
+#: ../libbalsa/smtp-server.c:323
 msgid "TLS if possible (not recommended)"
 msgstr "TLS, jeśli to możliwe (niezalecane)"
 
-#: ../libbalsa/smtp-server.c:301
+#: ../libbalsa/smtp-server.c:324
 msgid "None (not recommended)"
 msgstr "Brak (niezalecane)"
 
-#: ../libbalsa/smtp-server.c:324
+#: ../libbalsa/smtp-server.c:347
 #, c-format
 msgid "Error displaying server help: %s\n"
 msgstr "Błąd podczas wyświetlania pomocy serwera: %s\n"
 
-#: ../libbalsa/smtp-server.c:425
+#: ../libbalsa/smtp-server.c:483
 msgid "SMTP Server"
 msgstr "Serwer SMTP"
 
-#: ../libbalsa/smtp-server.c:453
+#: ../libbalsa/smtp-server.c:513 ../src/folder-conf.c:329
+#: ../src/mailbox-conf.c:1178 ../src/mailbox-conf.c:1292
+msgid "_Basic"
+msgstr "_Podstawowe"
+
+#: ../libbalsa/smtp-server.c:518
 msgid "_Descriptive Name:"
 msgstr "_Nazwa opisowa:"
 
 #. pop server
 #. imap server
-#: ../libbalsa/smtp-server.c:460 ../src/folder-conf.c:377
+#: ../libbalsa/smtp-server.c:526 ../src/folder-conf.c:377
 #: ../src/mailbox-conf.c:1186 ../src/mailbox-conf.c:1301
 msgid "_Server:"
 msgstr "_Serwer:"
 
-#: ../libbalsa/smtp-server.c:467
-msgid "_User Name:"
-msgstr "Nazwa _użytkownika:"
-
-#: ../libbalsa/smtp-server.c:474
-msgid "_Pass Phrase:"
-msgstr "_Hasło:"
-
-#: ../libbalsa/smtp-server.c:482
+#: ../libbalsa/smtp-server.c:534
 msgid "Se_curity:"
 msgstr "Zabezpie_czanie:"
 
-#: ../libbalsa/smtp-server.c:487
-msgid "C_ertificate Pass Phrase:"
-msgstr "Hasło c_ertyfikatu:"
+#. authentication or anonymous access
+#: ../libbalsa/smtp-server.c:538
+msgid "Server requires authentication"
+msgstr "Serwer wymaga uwierzytelnienia"
 
-#: ../libbalsa/smtp-server.c:498
+#: ../libbalsa/smtp-server.c:539
+msgid "_Authentication:"
+msgstr "_Uwierzytelnienie:"
+
+#: ../libbalsa/smtp-server.c:545
+msgid "_User Name:"
+msgstr "Nazwa _użytkownika:"
+
+#: ../libbalsa/smtp-server.c:552
+msgid "_Pass Phrase:"
+msgstr "_Hasło:"
+
+#: ../libbalsa/smtp-server.c:565 ../src/folder-conf.c:367
+#: ../src/mailbox-conf.c:1231 ../src/mailbox-conf.c:1357
+msgid "_Advanced"
+msgstr "Z_aawansowane"
+
+#. client certificate and passphrase
+#: ../libbalsa/smtp-server.c:568
+msgid "Server requires client certificate"
+msgstr "Serwer wymaga certyfikatu klienta"
+
+#: ../libbalsa/smtp-server.c:569
+msgid "_Client Certificate:"
+msgstr "_Certyfikat klienta:"
+
+#: ../libbalsa/smtp-server.c:573
+msgid "Choose Client Certificate"
+msgstr "Wybór certyfikatu klienta"
+
+#: ../libbalsa/smtp-server.c:575
+msgid "Certificate _File:"
+msgstr "_Plik certyfikatu:"
+
+#: ../libbalsa/smtp-server.c:582
+msgid "Certificate _Pass Phrase:"
+msgstr "_Hasło certyfikatu:"
+
+#. split large messages
+#: ../libbalsa/smtp-server.c:591
 msgid "Sp_lit message larger than"
 msgstr "_Dzielenie wiadomości większych niż"
 
-#: ../libbalsa/smtp-server.c:503 ../src/pref-manager.c:1880
+#: ../libbalsa/smtp-server.c:596 ../src/pref-manager.c:1880
 msgid "MB"
 msgstr "MB"
 
@@ -2388,8 +2430,8 @@ msgid "F_ilter:"
 msgstr "_Filtr:"
 
 #: ../src/ab-window.c:184 ../src/filter-edit-dialog.c:207
-#: ../src/filter-export-dialog.c:90 ../src/filter-run-dialog.c:224
-#: ../src/filter-run-dialog.c:329
+#: ../src/filter-export-dialog.c:90 ../src/filter-run-dialog.c:234
+#: ../src/filter-run-dialog.c:339
 msgid "Name"
 msgstr "Nazwa"
 
@@ -3803,43 +3845,43 @@ msgstr ""
 "IMAP, co jest realizowane za pomocą bardzo powolnej metody. Jeśli jest to "
 "możliwe, należy używać porównań fragmentów ciągów."
 
-#: ../src/filter-run-dialog.c:192
+#: ../src/filter-run-dialog.c:202
 msgid "Filters of Mailbox: "
 msgstr "Filtry skrzynki: "
 
-#: ../src/filter-run-dialog.c:233
+#: ../src/filter-run-dialog.c:243
 msgid "On reception"
 msgstr "Przy odebraniu"
 
-#: ../src/filter-run-dialog.c:245
+#: ../src/filter-run-dialog.c:255
 msgid "On exit"
 msgstr "Przy zakończeniu"
 
-#: ../src/filter-run-dialog.c:354
+#: ../src/filter-run-dialog.c:364
 msgid "_Apply Selected"
 msgstr "_Zatwierdź zaznaczone"
 
-#: ../src/filter-run-dialog.c:370
+#: ../src/filter-run-dialog.c:380
 msgid "Add selected filter to mailbox"
 msgstr "Dodaj zaznaczony filtr do skrzynki"
 
-#: ../src/filter-run-dialog.c:380
+#: ../src/filter-run-dialog.c:390
 msgid "Remove selected filter from mailbox"
 msgstr "Usuń zaznaczony filtr ze skrzynki"
 
-#: ../src/filter-run-dialog.c:422
+#: ../src/filter-run-dialog.c:432
 msgid "Move selected filter up"
 msgstr "Przenieś zaznaczony filtr do góry"
 
-#: ../src/filter-run-dialog.c:432
+#: ../src/filter-run-dialog.c:442
 msgid "Move selected filter down"
 msgstr "Przenieś zaznaczony filtr w dół"
 
-#: ../src/filter-run-dialog.c:438
+#: ../src/filter-run-dialog.c:448
 msgid "A_pply Now!"
 msgstr "Z_atwierdź teraz"
 
-#: ../src/filter-run-dialog.c:484
+#: ../src/filter-run-dialog.c:494
 msgid ""
 "The filters dialog is opened, close it before you can run filters on any "
 "mailbox"
@@ -3864,11 +3906,6 @@ msgstr "_Zaktualizuj"
 msgid "C_reate"
 msgstr "_Utwórz"
 
-#: ../src/folder-conf.c:329 ../src/mailbox-conf.c:1178
-#: ../src/mailbox-conf.c:1292
-msgid "_Basic"
-msgstr "_Podstawowe"
-
 #: ../src/folder-conf.c:334
 msgid "_Max number of connections:"
 msgstr "_Maksymalna liczba połączeń:"
@@ -3888,11 +3925,6 @@ msgstr "Obejścia _błędów"
 #: ../src/folder-conf.c:361
 msgid "Use STATUS for mailbox checking"
 msgstr "Polecenie STATUS do sprawdzania skrzynki"
-
-#: ../src/folder-conf.c:367 ../src/mailbox-conf.c:1231
-#: ../src/mailbox-conf.c:1357
-msgid "_Advanced"
-msgstr "Z_aawansowane"
 
 #. INPUT FIELD CREATION
 #: ../src/folder-conf.c:370

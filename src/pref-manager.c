@@ -3478,7 +3478,11 @@ balsa_help_pbox_display(void)
     gchar *text, *p;
     GError *err = NULL;
     gchar *uri;
+#if GTK_CHECK_VERSION(3, 22, 0)
+    GtkWidget *toplevel;
+#else /* GTK_CHECK_VERSION(3, 22, 0) */
     GdkScreen *screen;
+#endif /* GTK_CHECK_VERSION(3, 22, 0) */
     GString *string;
 
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(pui->view));
@@ -3502,8 +3506,16 @@ balsa_help_pbox_display(void)
     g_free(text);
 
     uri = g_string_free(string, FALSE);
+#if GTK_CHECK_VERSION(3, 22, 0)
+    toplevel = gtk_widget_get_toplevel(GTK_WIDGET(pui->view));
+    if (gtk_widget_is_toplevel(toplevel)) {
+        gtk_show_uri_on_window(GTK_WINDOW(toplevel), uri,
+                               gtk_get_current_event_time(), &err);
+    }
+#else  /* GTK_CHECK_VERSION(3, 22, 0) */
     screen = gtk_widget_get_screen(pui->view);
     gtk_show_uri(screen, uri, gtk_get_current_event_time(), &err);
+#endif /* GTK_CHECK_VERSION(3, 22, 0) */
     if (err) {
         balsa_information(LIBBALSA_INFORMATION_WARNING,
 		_("Error displaying %s: %s\n"),

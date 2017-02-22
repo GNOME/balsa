@@ -929,12 +929,19 @@ help_activated(GSimpleAction * action,
                gpointer        user_data)
 {
     GtkWindow *window = GTK_WINDOW(user_data);
+#if !GTK_CHECK_VERSION(3, 22, 0)
     GdkScreen *screen;
+#endif /* GTK_CHECK_VERSION(3, 22, 0) */
     GError *err = NULL;
 
+#if GTK_CHECK_VERSION(3, 22, 0)
+    gtk_show_uri_on_window(window, "help:balsa",
+                           gtk_get_current_event_time(), &err);
+#else /* GTK_CHECK_VERSION(3, 22, 0) */
     screen = gtk_window_get_screen(window);
     gtk_show_uri(screen, "help:balsa", gtk_get_current_event_time(),
                  &err);
+#endif /* GTK_CHECK_VERSION(3, 22, 0) */
     if (err) {
         balsa_information(LIBBALSA_INFORMATION_WARNING,
                           _("Error displaying help: %s\n"), err->message);
@@ -3950,7 +3957,9 @@ bw_find_real(BalsaWindow * window, BalsaIndex * bindex, gboolean again)
 	GtkToggleButton *matching_body, *matching_from;
         GtkToggleButton *matching_to, *matching_cc, *matching_subject;
 	gint ok;
+#if !GTK_CHECK_VERSION(3, 22, 0)
         GdkScreen *screen;
+#endif /* GTK_CHECK_VERSION(3, 22, 0) */
 
 #if HAVE_MACOSX_DESKTOP
 	libbalsa_macosx_menu_for_parent(dia, GTK_WINDOW(window));
@@ -4101,9 +4110,15 @@ bw_find_real(BalsaWindow * window, BalsaIndex * bindex, gboolean again)
                     ok = GTK_RESPONSE_CANCEL;
                 break;
 	    case GTK_RESPONSE_HELP:
+#if GTK_CHECK_VERSION(3, 22, 0)
+                gtk_show_uri_on_window(GTK_WINDOW(window),
+                                       "help:balsa/win-search",
+                                       gtk_get_current_event_time(), &err);
+#else /* GTK_CHECK_VERSION(3, 22, 0) */
                 screen = gtk_widget_get_screen(GTK_WIDGET(window));
                 gtk_show_uri(screen, "help:balsa/win-search",
                              gtk_get_current_event_time(), &err);
+#endif /* GTK_CHECK_VERSION(3, 22, 0) */
 		if (err) {
 		    balsa_information(LIBBALSA_INFORMATION_WARNING,
 				      _("Error displaying help: %s\n"),

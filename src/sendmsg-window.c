@@ -1460,7 +1460,11 @@ attachment_menu_vfs_cb(GtkWidget * menu_item, BalsaAttachInfo * info)
 static void
 on_open_url_cb(GtkWidget * menu_item, BalsaAttachInfo * info)
 {
+#if GTK_CHECK_VERSION(3, 22, 0)
+    GtkWidget *toplevel;
+#else /* GTK_CHECK_VERSION(3, 22, 0) */
     GdkScreen *screen;
+#endif /* GTK_CHECK_VERSION(3, 22, 0) */
     GError *err = NULL;
     const gchar * uri;
 
@@ -1469,8 +1473,16 @@ on_open_url_cb(GtkWidget * menu_item, BalsaAttachInfo * info)
     g_return_if_fail(uri != NULL);
 
     g_message("open URL %s", uri);
+#if GTK_CHECK_VERSION(3, 22, 0)
+    toplevel = gtk_widget_get_toplevel(GTK_WIDGET(menu_item));
+    if (gtk_widget_is_toplevel(toplevel)) {
+        gtk_show_uri_on_window(GTK_WINDOW(toplevel), uri,
+                               gtk_get_current_event_time(), &err);
+    }
+#else  /* GTK_CHECK_VERSION(3, 22, 0) */
     screen = gtk_widget_get_screen(menu_item);
     gtk_show_uri(screen, uri, gtk_get_current_event_time(), &err);
+#endif /* GTK_CHECK_VERSION(3, 22, 0) */
     if (err) {
         balsa_information(LIBBALSA_INFORMATION_WARNING,
 			  _("Error showing %s: %s\n"),

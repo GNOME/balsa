@@ -332,16 +332,24 @@ static void
 smtp_server_response(GtkDialog * dialog, gint response,
                      struct smtp_server_dialog_info *sdi)
 {
+#if !GTK_CHECK_VERSION(3, 22, 0)
     GdkScreen *screen;
+#endif /* GTK_CHECK_VERSION(3, 22, 0) */
     LibBalsaServer *server = LIBBALSA_SERVER(sdi->smtp_server);
     GError *error = NULL;
 
     switch (response) {
     case GTK_RESPONSE_HELP:
+#if GTK_CHECK_VERSION(3, 22, 0)
+        gtk_show_uri_on_window(GTK_WINDOW(dialog),
+                               "help:balsa/preferences-mail-options#smtp-server-config",
+                               gtk_get_current_event_time(), &error);
+#else  /* GTK_CHECK_VERSION(3, 22, 0) */
         screen = gtk_widget_get_screen(GTK_WIDGET(dialog));
         gtk_show_uri(screen,
-                     "help:preferences-mail-options#smtp-server-config",
+                     "help:balsa/preferences-mail-options#smtp-server-config",
                      gtk_get_current_event_time(), &error);
+#endif /* GTK_CHECK_VERSION(3, 22, 0) */
         if (error) {
             libbalsa_information(LIBBALSA_INFORMATION_WARNING,
                                  _("Error displaying server help: %s\n"),

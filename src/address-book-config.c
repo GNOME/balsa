@@ -234,9 +234,9 @@ create_local_dialog(AddressBookConfig * abc, const gchar * type)
     dialog =
         gtk_file_chooser_dialog_new(title, abc->parent,
                                     GTK_FILE_CHOOSER_ACTION_SAVE,
+                                    _("_Cancel"), GTK_RESPONSE_CANCEL,
                                     _("_Help"),   GTK_RESPONSE_HELP,
                                     action,       GTK_RESPONSE_APPLY,
-                                    _("_Cancel"), GTK_RESPONSE_CANCEL,
                                     NULL);
     g_free(title);
 #if HAVE_MACOSX_DESKTOP
@@ -582,12 +582,19 @@ create_rubrica_dialog(AddressBookConfig * abc)
 static void
 help_button_cb(AddressBookConfig * abc)
 {
-    GdkScreen *screen;
     GError *err = NULL;
+#if GTK_CHECK_VERSION(3, 22, 0)
+
+    gtk_show_uri_on_window(GTK_WINDOW(abc->window),
+                           "help:balsa/preferences-address-books",
+                           gtk_get_current_event_time(), &err);
+#else /* GTK_CHECK_VERSION(3, 22, 0) */
+    GdkScreen *screen;
 
     screen = gtk_widget_get_screen(abc->window);
     gtk_show_uri(screen, "help:balsa/preferences-address-books",
                  gtk_get_current_event_time(), &err);
+#endif /* GTK_CHECK_VERSION(3, 22, 0) */
 
     if (err) {
         libbalsa_information(LIBBALSA_INFORMATION_WARNING,

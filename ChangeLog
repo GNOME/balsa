@@ -1,5 +1,26 @@
 2017-02-21  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	gtk_show_uri is deprecated in favor of gtk_show_uri_on_window
+
+	* libbalsa/identity.c (help_ident_cb): fix it.
+	* libbalsa/smtp-server.c (smtp_server_response): fix it, and
+	  correct the help file URI.
+	* src/address-book-config.c (create_local_dialog): fix it, and
+	  move the Cancel button to the left;
+	  (help_button_cb): fix it.
+	* src/balsa-mime-widget-message.c (extbody_call_url): fix it.
+	* src/balsa-mime-widget-text.c (handle_url): ditto.
+	* src/filter-edit-callbacks.c (condition_dialog_response),
+	  (fe_dialog_response): ditto.
+	* src/filter-run-callbacks.c (fr_dialog_response): ditto.
+	* src/folder-conf.c (folder_conf_response): ditto.
+	* src/main-window.c (help_activated), (bw_find_real): ditto.
+	* src/pref-manager.c (balsa_help_pbox_display): ditto.
+	* src/sendmsg-window.c (on_open_url_cb): ditto.
+	* src/toolbar-prefs.c (tp_dialog_response_cb): ditto.
+
+2017-02-21  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* libbalsa/imap/imap-tls.c: fix OPENSSL_VERSION_NUMBER check
 
 2017-02-20  Peter Bloomfield  <pbloomfield@bellsouth.net>

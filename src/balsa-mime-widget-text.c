@@ -784,7 +784,9 @@ handle_url(const gchar * url)
         GtkStatusbar *statusbar;
         guint context_id;
         gchar *notice = g_strdup_printf(_("Calling URL %s…"), url);
+#if !GTK_CHECK_VERSION(3, 22, 0)
         GdkScreen *screen;
+#endif /* GTK_CHECK_VERSION(3, 22, 0) */
         GError *err = NULL;
 
         statusbar = GTK_STATUSBAR(balsa_app.main_window->statusbar);
@@ -794,8 +796,13 @@ handle_url(const gchar * url)
         gtk_statusbar_push(statusbar, context_id, notice);
         SCHEDULE_BAR_REFRESH();
         g_free(notice);
+#if GTK_CHECK_VERSION(3, 22, 0)
+        gtk_show_uri_on_window(GTK_WINDOW(balsa_app.main_window), url,
+                               gtk_get_current_event_time(), &err);
+#else  /* GTK_CHECK_VERSION(3, 22, 0) */
         screen = gtk_widget_get_screen(GTK_WIDGET(balsa_app.main_window));
         gtk_show_uri(screen, url, gtk_get_current_event_time(), &err);
+#endif /* GTK_CHECK_VERSION(3, 22, 0) */
         if (err) {
             balsa_information(LIBBALSA_INFORMATION_WARNING,
                               _("Error showing %s: %s\n"),

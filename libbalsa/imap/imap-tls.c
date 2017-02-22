@@ -63,7 +63,7 @@ static SSL_CTX *global_ssl_context = NULL;
 static GMutex global_tls_lock;
 
   /* Setting callbacks is not required any more with 1.1.0-pre4 and newer */
-#if OPENSSL_VERSION_NUMBER < 0x010100040L
+#if OPENSSL_VERSION_NUMBER < 0x010100004L
 /* OpenSSL static locks */
 static GMutex *mutexes = NULL;
 

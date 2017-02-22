@@ -1,3 +1,7 @@
+2017-02-21  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* libbalsa/imap/imap-tls.c: fix OPENSSL_VERSION_NUMBER check
+
 2017-02-20  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Give the user the option to ignore PIPELINING capability in a

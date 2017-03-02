@@ -1444,7 +1444,6 @@ struct _ThreadingInfo {
     GNode *root;
     GHashTable *id_table;
     GHashTable *subject_table;
-    GSList *unthreaded;
     LibBalsaMailboxThreadingType type;
 };
 typedef struct _ThreadingInfo ThreadingInfo;
@@ -1471,8 +1470,6 @@ lbml_info_setup(LibBalsaMailbox * mailbox, ThreadingInfo * ti)
     ti->root = g_node_new(mailbox->msg_tree);
     ti->id_table = g_hash_table_new(g_str_hash, g_str_equal);
     ti->subject_table = NULL;
-    ti->unthreaded =
-        g_object_get_data(G_OBJECT(mailbox), LIBBALSA_MAILBOX_UNTHREADED);
 }
 
 static void

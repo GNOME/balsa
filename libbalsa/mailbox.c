@@ -484,6 +484,11 @@ libbalsa_mailbox_finalize(GObject * object)
         mailbox->queue_check_idle_id = 0;
     }
 
+    if (mailbox->need_threading_idle_id) {
+        g_source_remove(mailbox->need_threading_idle_id);
+        mailbox->need_threading_idle_id = 0;
+    }
+
     G_OBJECT_CLASS(parent_class)->finalize(object);
 }
 
@@ -678,8 +683,6 @@ libbalsa_mailbox_progress_notify(LibBalsaMailbox * mailbox,
 void
 libbalsa_mailbox_check(LibBalsaMailbox * mailbox)
 {
-    GSList *unthreaded;
-
     g_return_if_fail(mailbox != NULL);
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
 
@@ -691,19 +694,7 @@ libbalsa_mailbox_check(LibBalsaMailbox * mailbox)
         mailbox->queue_check_idle_id = 0;
     }
 
-    unthreaded = NULL;
-    if (MAILBOX_OPEN(mailbox))
-        g_object_set_data(G_OBJECT(mailbox), LIBBALSA_MAILBOX_UNTHREADED,
-                          &unthreaded);
     LIBBALSA_MAILBOX_GET_CLASS(mailbox)->check(mailbox);
-    g_object_set_data(G_OBJECT(mailbox), LIBBALSA_MAILBOX_UNTHREADED,
-                      unthreaded);
-    if (unthreaded) {
-        lbm_set_threading(mailbox, mailbox->view->threading_type);
-        g_slist_free(unthreaded);
-        g_object_set_data(G_OBJECT(mailbox), LIBBALSA_MAILBOX_UNTHREADED,
-                          NULL);
-    }
 
     libbalsa_unlock_mailbox(mailbox);
 }
@@ -1325,13 +1316,22 @@ libbalsa_mailbox_msgno_changed(LibBalsaMailbox * mailbox, guint seqno)
     }
 }
 
+static gboolean
+lbm_need_threading_idle_cb(LibBalsaMailbox *mailbox)
+{
+    lbm_set_threading(mailbox, mailbox->view->threading_type);
+
+    mailbox->need_threading_idle_id = 0;
+
+    return FALSE;
+}
+
 void
 libbalsa_mailbox_msgno_inserted(LibBalsaMailbox *mailbox, guint seqno,
                                 GNode * parent, GNode ** sibling)
 {
     GtkTreeIter iter;
     GtkTreePath *path;
-    GSList **unthreaded;
 
     if (!mailbox->msg_tree)
         return;
@@ -1357,11 +1357,10 @@ libbalsa_mailbox_msgno_inserted(LibBalsaMailbox *mailbox, guint seqno,
         gtk_tree_path_free(path);
     }
 
-    unthreaded =
-        g_object_get_data(G_OBJECT(mailbox), LIBBALSA_MAILBOX_UNTHREADED);
-    if (unthreaded)
-        *unthreaded =
-            g_slist_prepend(*unthreaded, GUINT_TO_POINTER(seqno));
+    if (mailbox->need_threading_idle_id == 0) {
+        mailbox->need_threading_idle_id =
+            g_idle_add((GSourceFunc) lbm_need_threading_idle_cb, mailbox);
+    }
 
     mailbox->msg_tree_changed = TRUE;
     gdk_threads_leave();
@@ -1463,7 +1462,6 @@ libbalsa_mailbox_msgno_removed(LibBalsaMailbox * mailbox, guint seqno)
      * simple. */
     parent = dt.node->parent;
     while ((child = dt.node->children)) {
-        GSList **unthreaded;
         /* No need to notify the tree-view about unlinking the child--it
          * will assume we already did that when we notify it about
          * destroying the parent. */
@@ -1479,11 +1477,11 @@ libbalsa_mailbox_msgno_removed(LibBalsaMailbox * mailbox, guint seqno)
                           libbalsa_mbox_model_signals[ROW_HAS_CHILD_TOGGLED],
                           0, path, &iter);
         gtk_tree_path_next(path);
+    }
 
-        unthreaded = g_object_get_data(G_OBJECT(mailbox),
-                                       LIBBALSA_MAILBOX_UNTHREADED);
-        if (unthreaded)
-            *unthreaded = g_slist_prepend(*unthreaded, child->data);
+    if (mailbox->need_threading_idle_id == 0) {
+        mailbox->need_threading_idle_id =
+            g_idle_add((GSourceFunc) lbm_need_threading_idle_cb, mailbox);
     }
 
     /* Now it's safe to destroy the node. */
@@ -1902,21 +1900,9 @@ libbalsa_mailbox_sync_storage(LibBalsaMailbox * mailbox, gboolean expunge)
     /* When called in an idle handler, the mailbox might have been
      * closed, so we must check (with the mailbox locked). */
     if (MAILBOX_OPEN(mailbox)) {
-        GSList *unthreaded = NULL;
-
-        g_object_set_data(G_OBJECT(mailbox), LIBBALSA_MAILBOX_UNTHREADED,
-                          &unthreaded);
         retval =
             LIBBALSA_MAILBOX_GET_CLASS(mailbox)->sync(mailbox, expunge);
-        g_object_set_data(G_OBJECT(mailbox), LIBBALSA_MAILBOX_UNTHREADED,
-                          unthreaded);
-        if (unthreaded) {
-            lbm_set_threading(mailbox, mailbox->view->threading_type);
-            g_slist_free(unthreaded);
-            g_object_set_data(G_OBJECT(mailbox),
-                              LIBBALSA_MAILBOX_UNTHREADED, NULL);
-        } else
-            libbalsa_mailbox_changed(mailbox);
+        libbalsa_mailbox_changed(mailbox);
     }
 
     libbalsa_unlock_mailbox(mailbox);
@@ -4210,8 +4196,8 @@ lbm_check_idle(LibBalsaMailbox * mailbox)
 {
     GThread *check_thread;
 
-    check_thread =
-    	g_thread_new("lbm_check_real", (GThreadFunc) lbm_check_real, mailbox);
+    check_thread = g_thread_new("lbm_check_real", (GThreadFunc) lbm_check_real,
+                                g_object_ref(mailbox));
     g_thread_unref(check_thread);
 
     libbalsa_lock_mailbox(mailbox);
@@ -4227,8 +4213,7 @@ lbm_queue_check(LibBalsaMailbox * mailbox)
     libbalsa_lock_mailbox(mailbox);
     if (!mailbox->queue_check_idle_id)
         mailbox->queue_check_idle_id =
-            g_idle_add((GSourceFunc) lbm_check_idle,
-                       g_object_ref(mailbox));
+            g_idle_add((GSourceFunc) lbm_check_idle, mailbox);
     libbalsa_unlock_mailbox(mailbox);
 }
 

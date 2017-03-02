@@ -68,8 +68,6 @@ do {\
     }\
 } while (0)
 
-#define LIBBALSA_MAILBOX_UNTHREADED "libbalsa-mailbox-unthreaded"
-
 
 typedef enum {
     LB_MAILBOX_SORT_NO, /* == NATURAL */
@@ -251,6 +249,7 @@ struct _LibBalsaMailbox {
 
     guint changed_idle_id;
     guint queue_check_idle_id;
+    guint need_threading_idle_id;
 };
 
 /* Search iter */

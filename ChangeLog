@@ -1,3 +1,22 @@
+2017-03-01  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Use an idle callback to rethread the mailbox display.
+
+	* libbalsa/mailbox.c (libbalsa_mailbox_finalize): remove an
+	  outstanding idle source;
+	  (lbm_need_threading_idle_cb): the idle callback;
+	  (libbalsa_mailbox_check): schedule the idle callback;
+	  (libbalsa_mailbox_msgno_inserted): ditto;
+	  (libbalsa_mailbox_msgno_removed): ditto;
+	  (libbalsa_mailbox_sync_storage): just signal mailbox changed;
+	  (lbm_check_idle): ref the mailbox here...
+	  (lbm_queue_check): not here.
+	* libbalsa/mailbox.h: add guint
+	  LibBalsaMailbox::need_threading_idle_id;
+	  we no longer need LIBBALSA_MAILBOX_UNTHREADED.
+	* libbalsa/mailbox_local.c (lbml_info_setup):
+	  LIBBALSA_MAILBOX_UNTHREADED is now irrelevant.
+
 2017-02-21  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	gtk_show_uri is deprecated in favor of gtk_show_uri_on_window

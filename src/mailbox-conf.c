@@ -560,7 +560,7 @@ run_mailbox_conf(BalsaMailboxNode* mbnode, GType mailbox_type,
     gtk_dialog_set_response_sensitive(mcw->window, MCW_RESPONSE, FALSE);
     mcw->ok_sensitive = FALSE;
     gtk_dialog_set_default_response(mcw->window,
-                                    update ? GTK_RESPONSE_CLOSE :
+                                    update ? GTK_RESPONSE_CANCEL :
                                     MCW_RESPONSE);
 
     if(mbnode)
@@ -1162,7 +1162,7 @@ create_generic_dialog(MailboxConfWindow * mcw)
                                     GTK_DIALOG_DESTROY_WITH_PARENT |
                                     libbalsa_dialog_flags(),
                                     mcw->ok_button_name, MCW_RESPONSE,
-                                    _("_Close"), GTK_RESPONSE_CLOSE,
+                                    _("_Cancel"), GTK_RESPONSE_CANCEL,
                                     NULL);
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu_for_parent(dialog, GTK_WINDOW(balsa_app.main_window));

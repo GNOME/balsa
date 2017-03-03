@@ -1,3 +1,11 @@
+2017-03-03  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+Use dialog buttons more consistently
+
+	* src/mailbox-conf.c
+	(create_generic_dialog): use GTK_RESPONSE_CANCEL instead of CLOSE
+	(run_mailbox_conf): ditto.
+
 2017-03-01  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Use an idle callback to rethread the mailbox display.

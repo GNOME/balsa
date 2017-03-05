@@ -288,7 +288,7 @@ bw_master_position_cb(GtkPaned   * paned_master,
                       GParamSpec * pspec,
                       gpointer     user_data)
 {
-    if (balsa_app.show_mblist && !balsa_app.mw_maximized)
+    if (balsa_app.show_mblist)
         balsa_app.mblist_width = /* FIXME: this makes some assumptions... */
             gtk_paned_get_position(paned_master);
 }
@@ -4345,19 +4345,17 @@ bw_slave_position_cb(GtkPaned   * paned_slave,
                      GParamSpec * pspec,
                      gpointer     user_data)
 {
-    if (balsa_app.previewpane && !balsa_app.mw_maximized)
+    if (balsa_app.previewpane)
         balsa_app.notebook_height =
             gtk_paned_get_position(paned_slave);
 }
 
-static void
+    static void
 bw_size_allocate_cb(GtkWidget * window, GtkAllocation * alloc)
 {
-    if (!balsa_app.mw_maximized) {
-        gtk_window_get_size(GTK_WINDOW(window),
-                            & balsa_app.mw_width,
-                            & balsa_app.mw_height);
-    }
+    gtk_window_get_size(GTK_WINDOW(window),
+                        & balsa_app.mw_width,
+                        & balsa_app.mw_height);
 }
 
 /* When page is switched we change the preview window and the selected

@@ -1,3 +1,9 @@
+2017-03-04  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* src/main-window.c (bw_master_position_cb),
+	(bw_slave_position_cb), (bw_size_allocate_cb): remember the new
+	position even if maximized.
+
 2017-03-03  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 Use dialog buttons more consistently

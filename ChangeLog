@@ -1,3 +1,12 @@
+2017-03-10  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Lock mailbox while accessing an idle callback id
+
+	* libbalsa/mailbox.c (lbm_need_threading_idle_cb),
+	(libbalsa_mailbox_msgno_inserted),
+	(libbalsa_mailbox_msgno_removed): lock mailbox while accessing
+	need_threading_idle_id.
+
 2017-03-04  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* src/main-window.c (bw_master_position_cb),

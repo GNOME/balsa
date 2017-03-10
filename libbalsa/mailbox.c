@@ -1319,9 +1319,13 @@ libbalsa_mailbox_msgno_changed(LibBalsaMailbox * mailbox, guint seqno)
 static gboolean
 lbm_need_threading_idle_cb(LibBalsaMailbox *mailbox)
 {
+    libbalsa_lock_mailbox(mailbox);
+
     lbm_set_threading(mailbox, mailbox->view->threading_type);
 
     mailbox->need_threading_idle_id = 0;
+
+    libbalsa_unlock_mailbox(mailbox);
 
     return FALSE;
 }
@@ -1357,10 +1361,12 @@ libbalsa_mailbox_msgno_inserted(LibBalsaMailbox *mailbox, guint seqno,
         gtk_tree_path_free(path);
     }
 
+    libbalsa_lock_mailbox(mailbox);
     if (mailbox->need_threading_idle_id == 0) {
         mailbox->need_threading_idle_id =
             g_idle_add((GSourceFunc) lbm_need_threading_idle_cb, mailbox);
     }
+    libbalsa_unlock_mailbox(mailbox);
 
     mailbox->msg_tree_changed = TRUE;
     gdk_threads_leave();
@@ -1479,10 +1485,12 @@ libbalsa_mailbox_msgno_removed(LibBalsaMailbox * mailbox, guint seqno)
         gtk_tree_path_next(path);
     }
 
+    libbalsa_lock_mailbox(mailbox);
     if (mailbox->need_threading_idle_id == 0) {
         mailbox->need_threading_idle_id =
             g_idle_add((GSourceFunc) lbm_need_threading_idle_cb, mailbox);
     }
+    libbalsa_unlock_mailbox(mailbox);
 
     /* Now it's safe to destroy the node. */
     g_node_destroy(dt.node);

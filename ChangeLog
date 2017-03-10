@@ -1,5 +1,10 @@
 2017-03-10  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	* libbalsa/mailbox_local.c (lbml_load_messages_idle_cb): clear
+	load_messages_id even when returning early.
+
+2017-03-10  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Lock mailbox while accessing an idle callback id
 
 	* libbalsa/mailbox.c (lbm_need_threading_idle_cb),

@@ -1044,6 +1044,8 @@ lbml_load_messages_idle_cb(LibBalsaMailbox * mailbox)
                                                   guint);
 
     libbalsa_lock_mailbox(mailbox);
+    local = (LibBalsaMailboxLocal *) mailbox;
+    local->load_messages_id = 0;
     gdk_threads_enter();
 
     if (!mailbox->msg_tree) {
@@ -1053,7 +1055,6 @@ lbml_load_messages_idle_cb(LibBalsaMailbox * mailbox)
 	return FALSE;
     }
 
-    local = (LibBalsaMailboxLocal *) mailbox;
     lastno = libbalsa_mailbox_total_messages(mailbox);
     msgno = local->msgno;
     new_messages = lastno - msgno;
@@ -1078,7 +1079,6 @@ lbml_load_messages_idle_cb(LibBalsaMailbox * mailbox)
 						  unread_messages > 0);
     }
 
-    local->load_messages_id = 0;
     libbalsa_unlock_mailbox(mailbox);
     return FALSE;
 }

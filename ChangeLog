@@ -1,3 +1,9 @@
+2017-03-13  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* libbalsa/identity.c (libbalsa_identity_combo_box): compare
+	active name with the identity name, not the parenthesized
+	version
+
 2017-03-10  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* libbalsa/mailbox_local.c (lbml_load_messages_idle_cb): clear

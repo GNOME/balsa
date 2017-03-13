@@ -2224,11 +2224,11 @@ libbalsa_identity_combo_box(GList       * identities,
                            2, ident,
                            -1);
 
-        if (active_name && strcmp(active_name, name) == 0)
-            gtk_combo_box_set_active_iter(GTK_COMBO_BOX(combo_box), &iter);
-
         g_free(from);
         g_free(name);
+
+        if (active_name != NULL && strcmp(active_name, ident->identity_name) == 0)
+            gtk_combo_box_set_active_iter(GTK_COMBO_BOX(combo_box), &iter);
     }
     g_object_unref(store);
 

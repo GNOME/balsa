@@ -1,3 +1,13 @@
+2017-03-15  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Use GMime's native GIO Stream module
+
+	* libbalsa/gmime-stream-gio.h: removed.
+	* libbalsa/libbalsa-vfs.c: do not include it.
+	* libbalsa/gmime-stream-gio.c: removed.
+	* libbalsa/Makefile.am: remove references to them.
+
+
 2017-03-13  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* libbalsa/identity.c (libbalsa_identity_combo_box): compare

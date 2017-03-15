@@ -35,7 +35,6 @@
 #include "misc.h"
 
 #include <gio/gio.h>
-#include "gmime-stream-gio.h"
 
 
 #define LIBBALSA_VFS_ERROR_QUARK (g_quark_from_static_string("libbalsa-vfs"))

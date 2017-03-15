@@ -90,8 +90,6 @@ libbalsa_a_SOURCES = 		\
 	folder-scanners.h	\
 	gmime-filter-header.c      \
 	gmime-filter-header.h      \
-	gmime-stream-gio.c      \
-	gmime-stream-gio.h      \
 	html.c                  \
 	html.h                  \
 	identity.c		\

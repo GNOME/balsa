@@ -152,7 +152,7 @@ g_mime_filter_header_new()
 {
 	GMimeFilterHeader *header;
 
-	header = g_object_newv(GMIME_TYPE_FILTER_HEADER, 0, NULL);
+	header = g_object_new(GMIME_TYPE_FILTER_HEADER, NULL);
 
 	return (GMimeFilter *) header;
 }

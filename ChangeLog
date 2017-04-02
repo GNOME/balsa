@@ -1,3 +1,11 @@
+2017-04-02  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Deprecation cleanup
+
+	* libbalsa/gmime-filter-header.c (g_mime_filter_header_new): use
+	g_object_new instead of g_object_newv, because the latter is
+	deprecated in glib-2.54.
+
 2017-03-15  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Use GMime's native GIO Stream module

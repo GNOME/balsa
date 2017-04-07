@@ -44,7 +44,7 @@ enum _NetClientSmtpError {
 	NET_CLIENT_ERROR_SMTP_PROTOCOL = 1,		/**< A bad server reply has been received. */
 	NET_CLIENT_ERROR_SMTP_TRANSIENT,   		/**< The server replied with a transient error code (code 4yz). */
 	NET_CLIENT_ERROR_SMTP_PERMANENT,   		/**< The server replied with a permanent error code (code 5yz). */
-	NET_CLIENT_ERROR_SMTP_NO_AUTH,      	/**< The server offers no implemented authentication mechanism. */
+	NET_CLIENT_ERROR_SMTP_NO_AUTH,      	/**< The server offers no suitable authentication mechanism. */
 	NET_CLIENT_ERROR_SMTP_NO_STARTTLS		/**< The server does not support STARTTLS. */
 };
 
@@ -118,7 +118,7 @@ GType net_client_smtp_get_type(void)
  * @param host host name or IP address to connect
  * @param port port number to connect
  * @param crypt_mode encryption mode
- * @return the net SMTP network client object
+ * @return the SMTP network client object
  */
 NetClientSmtp *net_client_smtp_new(const gchar *host, guint16 port, NetClientCryptMode crypt_mode);
 

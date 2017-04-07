@@ -11,12 +11,14 @@
 #include <sput.h>
 #include "net-client.h"
 #include "net-client-smtp.h"
+#include "net-client-pop.h"
 #include "net-client-utils.h"
 
 
 static void test_basic(void);
 static void test_basic_crypt(void);
 static void test_smtp(void);
+static void test_pop3(void);
 static void test_utils(void);
 
 
@@ -34,8 +36,8 @@ main(G_GNUC_UNUSED int argc, G_GNUC_UNUSED char **argv)
 	sput_enter_suite("test SMTP");
 	sput_run_test(test_smtp);
 
-	//sput_enter_suite("test POP3");
-	//sput_run_test(test_pop3);
+	sput_enter_suite("test POP3");
+	sput_run_test(test_pop3);
 
 	sput_enter_suite("test utility functions");
 	sput_run_test(test_utils);
@@ -57,7 +59,6 @@ test_basic(void)
 	gchar *read_res;
 
 	sput_fail_unless(net_client_new(NULL, 65000, 42) == NULL, "missing host");
-	sput_fail_unless(net_client_new("localhost", 65000, 0) == NULL, "zero max line length");
 
 	sput_fail_unless((basic = net_client_new("localhost", 65000, 42)) != NULL, "localhost; port 65000");
 	sput_fail_unless(net_client_get_host(NULL) == NULL, "get host w/o client");
@@ -68,7 +69,6 @@ test_basic(void)
 	sput_fail_unless((basic = net_client_new("www.google.com", 80, 1)) != NULL, "www.google.com:80; port 0");
 	sput_fail_unless(net_client_configure(NULL, "localhost", 65000, 42, NULL) == FALSE, "configure w/o client");
 	sput_fail_unless(net_client_configure(basic, NULL, 65000, 42, NULL) == FALSE, "configure w/o host");
-	sput_fail_unless(net_client_configure(basic, "localhost", 65000, 0, NULL) == FALSE, "configure w/ zero max line length");
 	sput_fail_unless(net_client_configure(basic, "localhost", 65000, 42, NULL) == TRUE, "configure localhost:65000 ok");
 
 	sput_fail_unless(net_client_set_timeout(NULL, 3) == FALSE, "set timeout w/o client");
@@ -78,7 +78,7 @@ test_basic(void)
 	sput_fail_unless((op_res == FALSE) && (error->code == NET_CLIENT_ERROR_NOT_CONNECTED), "write w/o connection");
 	g_clear_error(&error);
 	op_res =  net_client_read_line(basic, NULL, &error);
-	sput_fail_unless((op_res == FALSE) && (error->code == NET_CLIENT_ERROR_NOT_CONNECTED), "read w/o connection");
+	sput_fail_unless((op_res == FALSE) && (error->code == NET_CLIENT_ERROR_NOT_CONNECTED), "read line w/o connection");
 	g_clear_error(&error);
 
 	op_res =
@@ -108,11 +108,10 @@ test_basic(void)
 	g_clear_error(&error);
 	sput_fail_unless(net_client_write_line(basic, "%s", NULL, "x") == TRUE, "write ok");
 
-	sput_fail_unless(net_client_read_line(NULL, NULL, NULL) == FALSE, "read w/o client");
-	sput_fail_unless(net_client_read_line(basic, NULL, NULL) == TRUE, "read, data discarded");
+	sput_fail_unless(net_client_read_line(NULL, NULL, NULL) == FALSE, "read line w/o client");
+	sput_fail_unless(net_client_read_line(basic, NULL, NULL) == TRUE, "read line, data discarded");
 	op_res = net_client_read_line(basic, NULL, &error);
-	sput_fail_unless((op_res == FALSE) && (error->code == G_IO_ERROR_TIMED_OUT), "read timeout");
-	g_message("%s %d %s", g_quark_to_string(error->domain), error->code, error->message);
+	sput_fail_unless((op_res == FALSE) && (error->code == G_IO_ERROR_TIMED_OUT), "read line timeout");
 	g_clear_error(&error);
 
 	sput_fail_unless(net_client_execute(NULL, NULL, "Hi There", NULL) == FALSE, "execute w/o client");
@@ -285,7 +284,9 @@ get_auth(NetClient *client, gpointer user_data)
 	g_message("%s(%p, %p)", __func__, client, user_data);
 	result = g_new0(gchar *, 3U);
 	result[0] = g_strdup("john.doe");
-	result[1] = g_strdup("@ C0mplex P@sswd");
+	if (user_data != NULL) {
+		result[1] = g_strdup("@ C0mplex P@sswd");
+	}
 	return result;
 }
 
@@ -318,7 +319,9 @@ test_smtp(void)
 
 
 	// smtp stuff - test various failures
-	sput_fail_unless(net_client_smtp_new(NULL, 0, NET_CLIENT_CRYPT_NONE) == NULL, "missing host");
+	sput_fail_unless(net_client_smtp_new(NULL, 0, NET_CLIENT_CRYPT_NONE) == NULL, "new, missing host");
+	sput_fail_unless(net_client_smtp_new("localhost", 0, 0) == NULL, "new, bad crypt mode");
+	sput_fail_unless(net_client_smtp_new("localhost", 0, 42) == NULL, "new, bad crypt mode");
 
 	sput_fail_unless((smtp = net_client_smtp_new("localhost", 65000, NET_CLIENT_CRYPT_NONE)) != NULL, "localhost; port 65000");
 	sput_fail_unless(net_client_smtp_connect(smtp, NULL, NULL) == FALSE, "no server");
@@ -362,6 +365,12 @@ test_smtp(void)
 	op_res = net_client_smtp_connect(smtp, NULL, &error);
 	sput_fail_unless((op_res == FALSE) && (error->code == NET_CLIENT_ERROR_SMTP_NO_AUTH), "connect: fails");
 	g_clear_error(&error);
+	g_object_unref(smtp);
+
+	// no password: anonymous
+	sput_fail_unless((smtp = net_client_smtp_new("localhost", 65025, NET_CLIENT_CRYPT_NONE)) != NULL, "localhost:65025");
+	g_signal_connect(G_OBJECT(smtp), "auth", G_CALLBACK(get_auth), NULL);
+	sput_fail_unless(net_client_smtp_connect(smtp, NULL, NULL), "connect: anonymous ok (NULL passwd)");
 	g_object_unref(smtp);
 
 	// unencrypted, PLAIN auth
@@ -424,6 +433,226 @@ test_smtp(void)
 
 	net_client_smtp_msg_free(NULL);
 	net_client_smtp_msg_free(msg);
+}
+
+static gboolean
+msg_cb(const gchar *buffer, gssize count, gsize lines, const NetClientPopMessageInfo *info, gpointer user_data, GError **error)
+{
+	g_message("%s(%p, %ld, %lu, %p, %p, %p)", __func__, buffer, count, lines, info, user_data, error);
+	if (((GPOINTER_TO_INT(user_data) == 1) && (count > 0)) ||
+		((GPOINTER_TO_INT(user_data) == 2) && (count == 0))) {
+		return FALSE;
+	} else {
+		return TRUE;
+	}
+}
+
+static void
+test_pop3(void)
+{
+	NetClientPop *pop;
+	GError *error = NULL;
+	gboolean op_res;
+	gchar *read_res;
+	gsize msg_count;
+	gsize mbox_size;
+	GList *msg_list;
+
+	// some error cases
+	sput_fail_unless(net_client_pop_new(NULL, 0, NET_CLIENT_CRYPT_NONE, TRUE) == NULL, "new, missing host");
+	sput_fail_unless(net_client_pop_new("localhost", 0, 0, TRUE) == NULL, "new, bad crypt mode");
+	sput_fail_unless(net_client_pop_new("localhost", 0, 42, TRUE) == NULL, "new, bad crypt mode");
+	sput_fail_unless(net_client_pop_allow_auth(NULL, TRUE, 0U) == FALSE, "allow auth, no client");
+	sput_fail_unless(net_client_pop_connect(NULL, NULL, NULL) == FALSE, "connect, no client");
+	sput_fail_unless(net_client_pop_stat(NULL, NULL, NULL, NULL) == FALSE, "stat, no client");
+	sput_fail_unless(net_client_pop_list(NULL, NULL, FALSE, NULL) == FALSE, "list, no client");
+	sput_fail_unless(net_client_pop_retr(NULL, NULL, NULL, NULL, NULL) == FALSE, "retr, no client");
+	sput_fail_unless(net_client_pop_dele(NULL, NULL, NULL) == FALSE, "dele, no client");
+	net_client_pop_msg_info_free(NULL);		// just for checking
+
+	// some basic stuff
+	sput_fail_unless((pop = net_client_pop_new("localhost", 65000, NET_CLIENT_CRYPT_NONE, TRUE)) != NULL, "localhost; port 65000");
+	sput_fail_unless(net_client_pop_connect(pop, NULL, NULL) == FALSE, "no server");
+	g_object_unref(pop);
+
+	sput_fail_unless((pop = net_client_pop_new("localhost", 64110, NET_CLIENT_CRYPT_NONE, TRUE)) != NULL, "localhost:64110");
+	op_res = net_client_pop_connect(pop, &read_res, NULL);
+	sput_fail_unless((op_res == TRUE) && (strncmp(read_res, "INetSim POP3 Server ready <", 27U) == 0),
+		"connect: success");
+	g_free(read_res);
+	sput_fail_unless(net_client_is_encrypted(NET_CLIENT(pop)) == FALSE, "not encrypted");
+	op_res = net_client_pop_connect(pop, NULL, &error);
+	sput_fail_unless((op_res == FALSE) && (error->code == NET_CLIENT_ERROR_CONNECTED), "cannot reconnect");
+	g_clear_error(&error);
+
+	// not allowed if unauthenticated
+	op_res = net_client_pop_stat(pop, NULL, NULL, &error);
+	sput_fail_unless((op_res == FALSE) && (error->code == NET_CLIENT_ERROR_POP_SERVER_ERR), "STAT not allowed w/o AUTH");
+	g_clear_error(&error);
+	g_object_unref(pop);
+
+	sput_fail_unless((pop = net_client_pop_new("localhost", 64110, NET_CLIENT_CRYPT_NONE, TRUE)) != NULL, "localhost:64110");
+	g_signal_connect(G_OBJECT(pop), "auth", G_CALLBACK(get_auth), NULL);
+	sput_fail_unless(net_client_pop_connect(pop, NULL, NULL) == TRUE, "connect: success");
+	sput_fail_unless(net_client_pop_list(pop, NULL, TRUE, NULL) == FALSE, "list w/ empty target list");
+	op_res = net_client_pop_list(pop, &msg_list, TRUE, &error);
+	sput_fail_unless((op_res == FALSE) && (error->code == NET_CLIENT_ERROR_POP_SERVER_ERR), "LIST not allowed w/ empty AUTH");
+	g_clear_error(&error);
+	g_object_unref(pop);
+
+	// unencrypted, force USER auth
+	sput_fail_unless((pop = net_client_pop_new("localhost", 64110, NET_CLIENT_CRYPT_NONE, TRUE)) != NULL, "localhost:64110");
+	sput_fail_unless(net_client_pop_allow_auth(pop, FALSE, 0U), "no AUTH mechanism");
+	g_signal_connect(G_OBJECT(pop), "auth", G_CALLBACK(get_auth), pop);
+	op_res = net_client_pop_connect(pop, NULL, &error);
+	sput_fail_unless((op_res == FALSE) && (error->code == NET_CLIENT_ERROR_POP_NO_AUTH), "no suitable AUTH mechanism");
+	g_clear_error(&error);
+	g_object_unref(pop);
+
+	// STARTTLS
+	sput_fail_unless((pop = net_client_pop_new("localhost", 64110, NET_CLIENT_CRYPT_STARTTLS, TRUE)) != NULL,
+		"localhost:64110, starttls");
+	op_res = net_client_pop_connect(pop, NULL, &error);
+	sput_fail_unless((op_res == FALSE) && (error != NULL), "connect: fails (untrusted cert)");
+	g_clear_error(&error);
+	g_object_unref(pop);
+
+	sput_fail_unless((pop = net_client_pop_new("localhost", 64110, NET_CLIENT_CRYPT_STARTTLS_OPT, TRUE)) != NULL,
+		"localhost:64110, starttls (opt)");
+	op_res = net_client_pop_connect(pop, NULL, &error);
+	sput_fail_unless((op_res == TRUE) && (error == NULL), "connect: ok, but...");
+	sput_fail_unless(net_client_is_encrypted(NET_CLIENT(pop)) == FALSE, "...not encrypted");
+	g_object_unref(pop);
+
+	// STARTTLS required, USER/PASS auth
+	sput_fail_unless((pop = net_client_pop_new("localhost", 64110, NET_CLIENT_CRYPT_STARTTLS, FALSE)) != NULL,
+		"localhost:64110, starttls, no pipelining");
+	sput_fail_unless(net_client_pop_allow_auth(pop, TRUE, NET_CLIENT_POP_AUTH_USER_PASS) == TRUE, "force auth meth USER/PASS");
+	g_signal_connect(G_OBJECT(pop), "cert-check", G_CALLBACK(check_cert), NULL);
+	g_signal_connect(G_OBJECT(pop), "auth", G_CALLBACK(get_auth), pop);
+	sput_fail_unless(net_client_pop_connect(pop, NULL, NULL) == TRUE, "connect: success");
+	sput_fail_unless(net_client_pop_stat(pop, &msg_count, NULL, NULL) == TRUE, "STAT: success");
+	sput_fail_unless(net_client_pop_list(pop, &msg_list, FALSE, NULL) == TRUE, "LIST: success");
+	g_message("message count: %u", g_list_length(msg_list));
+	if (msg_list != NULL) {
+		sput_fail_unless(net_client_pop_retr(pop, NULL, msg_cb, NULL, NULL) == FALSE, "retr w/o message list");
+		sput_fail_unless(net_client_pop_retr(pop, msg_list, NULL, NULL, NULL) == FALSE, "retr w/o callback");
+		sput_fail_unless(net_client_pop_retr(pop, msg_list, msg_cb, GINT_TO_POINTER(1), NULL) == FALSE, "retr error");
+		g_list_free_full(msg_list, (GDestroyNotify) net_client_pop_msg_info_free);
+	}
+	g_object_unref(pop);
+
+	// STARTTLS optional, APOP auth
+	sput_fail_unless((pop = net_client_pop_new("localhost", 64110, NET_CLIENT_CRYPT_STARTTLS_OPT, TRUE)) != NULL,
+		"localhost:64110, starttls opt, pipelining");
+	sput_fail_unless(net_client_pop_allow_auth(pop, TRUE, NET_CLIENT_POP_AUTH_APOP) == TRUE, "force auth meth APOP");
+	g_signal_connect(G_OBJECT(pop), "cert-check", G_CALLBACK(check_cert), NULL);
+	g_signal_connect(G_OBJECT(pop), "auth", G_CALLBACK(get_auth), pop);
+	sput_fail_unless(net_client_pop_connect(pop, NULL, NULL) == TRUE, "connect: success");
+	sput_fail_unless(net_client_pop_stat(pop, NULL, &mbox_size, NULL) == TRUE, "STAT: success");
+	sput_fail_unless(net_client_pop_list(pop, &msg_list, FALSE, NULL) == TRUE, "LIST: success");
+	g_message("message count: %u", g_list_length(msg_list));
+	if (msg_list != NULL) {
+		sput_fail_unless(net_client_pop_retr(pop, msg_list, msg_cb, GINT_TO_POINTER(2), NULL) == FALSE, "retr error");
+		g_list_free_full(msg_list, (GDestroyNotify) net_client_pop_msg_info_free);
+	}
+	g_object_unref(pop);
+
+	// STARTTLS required, PLAIN auth
+	sput_fail_unless((pop = net_client_pop_new("localhost", 64110, NET_CLIENT_CRYPT_STARTTLS, TRUE)) != NULL,
+		"localhost:64110, starttls, pipelining");
+	sput_fail_unless(net_client_pop_allow_auth(pop, TRUE, NET_CLIENT_POP_AUTH_PLAIN) == TRUE, "force auth meth PLAIN");
+	g_signal_connect(G_OBJECT(pop), "cert-check", G_CALLBACK(check_cert), NULL);
+	g_signal_connect(G_OBJECT(pop), "auth", G_CALLBACK(get_auth), pop);
+	sput_fail_unless(net_client_pop_connect(pop, NULL, NULL) == TRUE, "connect: success");
+	sput_fail_unless(net_client_pop_list(pop, &msg_list, FALSE, NULL) == TRUE, "LIST: success");
+	g_message("message count: %u", g_list_length(msg_list));
+	if (msg_list != NULL) {
+		sput_fail_unless(net_client_pop_retr(pop, msg_list, msg_cb, NULL, NULL) == TRUE, "retr ok");
+		g_list_free_full(msg_list, (GDestroyNotify) net_client_pop_msg_info_free);
+	}
+	g_object_unref(pop);
+
+	// STARTTLS optional, PLAIN auth
+	sput_fail_unless((pop = net_client_pop_new("localhost", 64110, NET_CLIENT_CRYPT_STARTTLS_OPT, FALSE)) != NULL,
+		"localhost:64110, starttls opt, no pipelining");
+	sput_fail_unless(net_client_pop_allow_auth(pop, TRUE, NET_CLIENT_POP_AUTH_PLAIN) == TRUE, "force auth meth PLAIN");
+	g_signal_connect(G_OBJECT(pop), "cert-check", G_CALLBACK(check_cert), NULL);
+	g_signal_connect(G_OBJECT(pop), "auth", G_CALLBACK(get_auth), pop);
+	sput_fail_unless(net_client_pop_connect(pop, NULL, NULL) == TRUE, "connect: success");
+	sput_fail_unless(net_client_pop_list(pop, &msg_list, FALSE, NULL) == TRUE, "LIST: success");
+	g_message("message count: %u", g_list_length(msg_list));
+	if (msg_list != NULL) {
+		sput_fail_unless(net_client_pop_retr(pop, msg_list, msg_cb, NULL, NULL) == TRUE, "retr ok");
+		g_list_free_full(msg_list, (GDestroyNotify) net_client_pop_msg_info_free);
+	}
+	g_object_unref(pop);
+
+	// SSL, LOGIN auth
+	sput_fail_unless((pop = net_client_pop_new("localhost", 64995, NET_CLIENT_CRYPT_ENCRYPTED, FALSE)) != NULL,
+		"localhost:64995, pop3s, no pipelining");
+	sput_fail_unless(net_client_pop_allow_auth(pop, TRUE, NET_CLIENT_POP_AUTH_LOGIN) == TRUE, "force auth meth LOGIN");
+	g_signal_connect(G_OBJECT(pop), "cert-check", G_CALLBACK(check_cert), NULL);
+	g_signal_connect(G_OBJECT(pop), "auth", G_CALLBACK(get_auth), pop);
+	sput_fail_unless(net_client_pop_connect(pop, NULL, &error) == TRUE, "connect: success");
+	sput_fail_unless(net_client_pop_stat(pop, &msg_count, &mbox_size, NULL) == TRUE, "STAT: success");
+	sput_fail_unless(net_client_pop_list(pop, &msg_list, FALSE, NULL) == TRUE, "LIST: success");
+	g_message("message count: %u", g_list_length(msg_list));
+	if (msg_list != NULL) {
+		sput_fail_unless(net_client_pop_retr(pop, msg_list, msg_cb, GINT_TO_POINTER(1), NULL) == FALSE, "retr error");
+		g_list_free_full(msg_list, (GDestroyNotify) net_client_pop_msg_info_free);
+	}
+	g_object_unref(pop);
+
+	// SSL, CRAM-MD5 auth
+	sput_fail_unless((pop = net_client_pop_new("localhost", 64995, NET_CLIENT_CRYPT_ENCRYPTED, TRUE)) != NULL,
+		"localhost:64995, pop3s, pipelining");
+	sput_fail_unless(net_client_pop_allow_auth(pop, TRUE, NET_CLIENT_POP_AUTH_CRAM_MD5) == TRUE, "force auth meth CRAM-MD5");
+	g_signal_connect(G_OBJECT(pop), "cert-check", G_CALLBACK(check_cert), NULL);
+	g_signal_connect(G_OBJECT(pop), "auth", G_CALLBACK(get_auth), pop);
+	sput_fail_unless(net_client_pop_connect(pop, NULL, NULL) == TRUE, "connect: success");
+	sput_fail_unless(net_client_pop_list(pop, &msg_list, TRUE, NULL) == TRUE, "LIST: success");
+	g_message("message count: %u", g_list_length(msg_list));
+	if (msg_list != NULL) {
+		sput_fail_unless(net_client_pop_retr(pop, msg_list, msg_cb, GINT_TO_POINTER(2), NULL) == FALSE, "retr error");
+		g_list_free_full(msg_list, (GDestroyNotify) net_client_pop_msg_info_free);
+	}
+	g_object_unref(pop);
+
+	// SSL, CRAM-SHA1 auth
+	sput_fail_unless((pop = net_client_pop_new("localhost", 64995, NET_CLIENT_CRYPT_ENCRYPTED, FALSE)) != NULL,
+		"localhost:64995, pop3s, no pipelining");
+	sput_fail_unless(net_client_pop_allow_auth(pop, TRUE, NET_CLIENT_POP_AUTH_CRAM_SHA1) == TRUE, "force auth meth CRAM-SHA1");
+	g_signal_connect(G_OBJECT(pop), "cert-check", G_CALLBACK(check_cert), NULL);
+	g_signal_connect(G_OBJECT(pop), "auth", G_CALLBACK(get_auth), pop);
+	sput_fail_unless(net_client_pop_connect(pop, NULL, &error) == TRUE, "connect: success");
+	sput_fail_unless(net_client_pop_list(pop, &msg_list, TRUE, NULL) == TRUE, "LIST: success");
+	g_message("message count: %u", g_list_length(msg_list));
+	if (msg_list != NULL) {
+		sput_fail_unless(net_client_pop_retr(pop, msg_list, msg_cb, NULL, NULL) == TRUE, "retr ok");
+		g_list_free_full(msg_list, (GDestroyNotify) net_client_pop_msg_info_free);
+	}
+	g_object_unref(pop);
+
+	// SSL, CRAM-SHA1 auth
+	sput_fail_unless((pop = net_client_pop_new("localhost", 64995, NET_CLIENT_CRYPT_ENCRYPTED, TRUE)) != NULL,
+		"localhost:64995, pop3s, pipelining");
+	sput_fail_unless(net_client_pop_allow_auth(pop, TRUE, NET_CLIENT_POP_AUTH_CRAM_SHA1) == TRUE, "force auth meth CRAM-SHA1");
+	g_signal_connect(G_OBJECT(pop), "cert-check", G_CALLBACK(check_cert), NULL);
+	g_signal_connect(G_OBJECT(pop), "auth", G_CALLBACK(get_auth), pop);
+	sput_fail_unless(net_client_pop_connect(pop, NULL, &error) == TRUE, "connect: success");
+	sput_fail_unless(net_client_pop_list(pop, &msg_list, TRUE, NULL) == TRUE, "LIST: success");
+	g_message("message count: %u", g_list_length(msg_list));
+	if (msg_list != NULL) {
+		sput_fail_unless(net_client_pop_retr(pop, msg_list, msg_cb, NULL, NULL) == TRUE, "retr ok");
+		sput_fail_unless(net_client_pop_dele(pop, NULL,NULL) == FALSE, "dele w/o message list");
+		sput_fail_unless(net_client_pop_dele(pop, msg_list, NULL) == TRUE, "dele ok");
+		g_list_free_full(msg_list, (GDestroyNotify) net_client_pop_msg_info_free);
+	}
+	op_res = net_client_pop_list(pop, &msg_list, TRUE, NULL);
+	sput_fail_unless((op_res == TRUE) && (msg_list == NULL), "LIST: success, empty");
+	g_object_unref(pop);
+
 }
 
 

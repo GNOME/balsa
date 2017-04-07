@@ -51,7 +51,7 @@ net_client_new(const gchar *host_and_port, guint16 default_port, gsize max_line_
 {
 	NetClient *client;
 
-	g_return_val_if_fail((host_and_port != NULL) && (max_line_len > 0U), NULL);
+	g_return_val_if_fail(host_and_port != NULL, NULL);
 
 	client = NET_CLIENT(g_object_new(NET_CLIENT_TYPE, NULL));
 
@@ -73,7 +73,7 @@ net_client_configure(NetClient *client, const gchar *host_and_port, guint16 defa
 	NetClientPrivate *priv;
 	gboolean result;
 
-	g_return_val_if_fail(NET_IS_CLIENT(client) && (host_and_port != NULL) && (max_line_len > 0U), FALSE);
+	g_return_val_if_fail(NET_IS_CLIENT(client) && (host_and_port != NULL), FALSE);
 
 	priv = client->priv;
 	if (priv->plain_conn != NULL) {
@@ -118,6 +118,7 @@ net_client_connect(NetClient *client, GError **error)
 	} else {
 		priv->plain_conn = g_socket_client_connect_to_host(priv->sock, priv->host_and_port, priv->default_port, NULL, error);
 		if (priv->plain_conn != NULL) {
+			g_debug("connected to %s", priv->host_and_port);
 			priv->istream = g_data_input_stream_new(g_io_stream_get_input_stream(G_IO_STREAM(priv->plain_conn)));
 			g_data_input_stream_set_newline_type(priv->istream, G_DATA_STREAM_NEWLINE_TYPE_CR_LF);
 			priv->ostream = g_io_stream_get_output_stream(G_IO_STREAM(priv->plain_conn));
@@ -139,6 +140,7 @@ net_client_is_encrypted(NetClient *client)
 	} else {
 		result = FALSE;
 	}
+
 	return result;
 }
 
@@ -160,7 +162,7 @@ net_client_read_line(NetClient *client, gchar **recv_line, GError **error)
 		line_buf = g_data_input_stream_read_line(client->priv->istream, &length, NULL, &read_err);
 		if (line_buf != NULL) {
 			/* check that the protocol-specific maximum line length is not exceeded */
-			if (length > client->priv->max_line_len) {
+			if ((client->priv->max_line_len > 0U) && (length > client->priv->max_line_len)) {
 				g_set_error(error, NET_CLIENT_ERROR_QUARK, (gint) NET_CLIENT_ERROR_LINE_TOO_LONG,
 					_("reply length %lu exceeds the maximum allowed length %lu"), length, client->priv->max_line_len);
 				g_free(line_buf);
@@ -224,7 +226,7 @@ net_client_vwrite_line(NetClient *client, const gchar *format, va_list args, GEr
 	g_return_val_if_fail(NET_IS_CLIENT(client) && (format != NULL), FALSE);
 
 	buf_len = g_vsnprintf(buffer, client->priv->max_line_len - 2U, format, args);
-	if ((buf_len < 0) || ((gsize) buf_len > (client->priv->max_line_len - 2U))) {
+	if ((buf_len < 0) || ((client->priv->max_line_len > 0U) && ((gsize) buf_len > (client->priv->max_line_len - 2U)))) {
 		g_set_error(error, NET_CLIENT_ERROR_QUARK, (gint) NET_CLIENT_ERROR_LINE_TOO_LONG, _("line too long"));
 		result = FALSE;
 	} else {
@@ -299,7 +301,7 @@ net_client_set_cert_from_pem(NetClient *client, const gchar *pem_data, GError **
 	} else {
 		gnutls_datum_t data;
 
-		/*lint -e9005	cast'ing away the const is safe as gnutls treas data as const */
+		/*lint -e9005	cast'ing away the const is safe as gnutls treats data as const */
 		data.data = (unsigned char *) pem_data;
 		data.size = strlen(pem_data);
 		res = gnutls_x509_crt_import(cert, &data, GNUTLS_X509_FMT_PEM);
@@ -501,6 +503,7 @@ net_client_finalise(GObject *object)
 		g_object_unref(G_OBJECT(client->priv->certificate));
 		client->priv->certificate = NULL;
 	}
+	g_debug("finalised connection to %s", client->priv->host_and_port);
 	g_free(client->priv->host_and_port);
 	(*parent_class->finalize)(object);
 }

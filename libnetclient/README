@@ -19,7 +19,8 @@ Purpose
 
 This library provides an implementation of CRLF-terminated line-based client
 protocols built on top of GIO.  It provides a base module, containing the
-line-based IO methods, and on top of that a SMTP (RFC5321) client class.
+line-based IO methods, and on top of that POP3 (RFC1939) and SMTP (RFC5321)
+client classes.
 
 
 Coding Style
@@ -71,6 +72,10 @@ are required for running them:
 
 Note that most of these requirements are typically available pre-packaged
 for your favorite distribution.
+
+Unfortunately, INetSim 1.2.6 has two little bugs in POP3 handling and does
+not offer pipelining.  The file test/inetsim-1.2.6-POP3.diff contains a
+patch which fixes these issues.
 
 For running the tests, open two terminal windows, and cd to the test folder
 of this package.

@@ -2,7 +2,7 @@
 
 # Note: the following hack is needed so lcov recognises the paths of the sources...
 libsrcdir = $(shell echo $(abs_srcdir) | sed -e 's;/test$$;;')
-test_src = $(libsrcdir)/net-client.c $(libsrcdir)/net-client-smtp.c $(libsrcdir)/net-client-utils.c
+test_src = $(libsrcdir)/net-client.c $(libsrcdir)/net-client-pop.c $(libsrcdir)/net-client-smtp.c $(libsrcdir)/net-client-utils.c
 
 EXTRA_DIST = 		\
 	tests.c			\
@@ -16,7 +16,8 @@ TESTFLAGS = -DNCAT="\"@NCAT@\"" -DSED="\"@SED@\"" -fprofile-arcs -ftest-coverage
 
 LCOVFLGS	= --rc lcov_branch_coverage=1
 GENHTMLFLGS	= --function-coverage --branch-coverage --num-spaces 4
-VALGRFLAGS  = --tool=memcheck --log-file=$@.vg --suppressions=valgrind.supp --leak-check=full --child-silent-after-fork=yes
+VALGRFLAGS  = --tool=memcheck --log-file=$@.vg --suppressions=valgrind.supp --leak-check=full --track-fds=yes \
+			  --child-silent-after-fork=yes
 
 CLEANFILES = *.gcda *.gcno *.covi *.vg tests
 

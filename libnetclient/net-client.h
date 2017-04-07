@@ -80,7 +80,7 @@ GType net_client_get_type(void)
  *
  * @param host_and_port remote host and port or service, separated by a colon, which shall be connected
  * @param default_port default remote port if host_and_port does not contain a port
- * @param max_line_len maximum line length supported by the underlying protocol
+ * @param max_line_len maximum line length supported by the underlying protocol, 0 for no limit
  * @return the net network client object
  *
  * Create a new network client object with the passed parameters.  Call <tt>g_object_unref()</tt> on it to shut down the connection
@@ -94,7 +94,7 @@ NetClient *net_client_new(const gchar *host_and_port, guint16 default_port, gsiz
  * @param client network client
  * @param host_and_port remote host and port or service, separated by a colon, which shall be connected
  * @param default_port default remote port if host_and_port does not contain a port
- * @param max_line_len maximum line length supported by the underlying protocol
+ * @param max_line_len maximum line length supported by the underlying protocol, 0 for no limit
  * @param error filled with error information on error
  * @return TRUE is the connection was successful, FALSE on error
  *
@@ -184,7 +184,8 @@ gboolean net_client_start_tls(NetClient *client, GError **error);
  *
  * Read a CRLF-terminated line from the remote server and return it in the passed buffer.  The terminating CRLF is always stripped.
  *
- * @note The caller must free the returned buffer when it is not needed any more.
+ * @note If supplied, the response buffer is never NULL on success.  The caller must free the returned buffer when it is not needed
+ *       any more.
  */
 gboolean net_client_read_line(NetClient *client, gchar **recv_line, GError **error);
 
@@ -263,8 +264,9 @@ gboolean net_client_set_timeout(NetClient *client, guint timeout_secs);
  * @mainpage
  *
  * This library provides an implementation of CRLF-terminated line-based client protocols built on top of GIO.  It provides a base
- * module (see file net-client.h), containing the line-based IO methods, and on top of that a SMTP (RFC5321) client class (see
- * file net-client-smtp.h).  The file net-client-utils.h contains some helper functions for authentication.
+ * module (see file net-client.h), containing the line-based IO methods, and on top of that SMTP (RFC 5321) and POP3 (RFC 1939)
+ * client classes (see files net-client-smtp.h and net-client-pop.h, respectively).  The file net-client-utils.h contains some
+ * helper functions for authentication.
  *
  * \author Written by Albrecht Dreß mailto:albrecht.dress@arcor.de
  * \copyright Copyright &copy; Albrecht Dreß 2017<br/>

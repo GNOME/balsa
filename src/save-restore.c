@@ -968,7 +968,8 @@ config_global_load(void)
 	if (passphrase) {
             gchar* tmp = libbalsa_rot(passphrase);
             g_free(passphrase);
-	    libbalsa_smtp_server_set_cert_passphrase(smtp_server, tmp);
+	    g_free(server->cert_passphrase);
+	    server->cert_passphrase = tmp;
 	}
     }
 

@@ -23,26 +23,18 @@
 #endif                          /* HAVE_CONFIG_H */
 
 
-#include <stdio.h>
-#include <fcntl.h>
-#include <string.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <errno.h>
 #include <glib.h>
 #include <string.h>
 
 #include "libbalsa.h"
 #include "libbalsa-conf.h"
-#include "pop3.h"
+#include "net-client-pop.h"
 #include "server.h"
 #include "misc.h"
 #include "mailbox.h"
 #include "mailbox_pop3.h"
 #include <glib/gi18n.h>
-
-int PopDebug = 0;
+#include <glib/gstdio.h>
 
 enum {
     LAST_SIGNAL
@@ -68,6 +60,10 @@ static void libbalsa_mailbox_pop3_save_config(LibBalsaMailbox * mailbox,
 					      const gchar * prefix);
 static void libbalsa_mailbox_pop3_load_config(LibBalsaMailbox * mailbox,
 					      const gchar * prefix);
+
+
+#define MBOX_POP3_ERROR 	(g_quark_from_static_string("mailbox-pop3"))
+
 
 GType
 libbalsa_mailbox_pop3_get_type(void)
@@ -168,106 +164,106 @@ libbalsa_mailbox_pop3_open(LibBalsaMailbox * mailbox, GError **err)
     return TRUE;
 }
 
+
+#define POP_UID_FILE	"/.balsa/pop-uids"
+static GMutex uid_mutex;
+
+
+static GHashTable *
+mp_load_uids(const gchar *prefix)
+{
+	GHashTable *res;
+	gboolean read_res;
+	gchar *fname;
+	gchar *contents;
+
+	res = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, NULL);
+
+	fname = g_strconcat(g_get_home_dir(), POP_UID_FILE, NULL);
+	g_mutex_lock(&uid_mutex);
+	read_res = g_file_get_contents(fname, &contents, NULL, NULL);
+	g_mutex_unlock(&uid_mutex);
+	g_free(fname);
+
+	if (read_res) {
+		gchar **lines;
+		size_t prefix_len;
+		guint n;
+
+		lines = g_strsplit(contents, "\n", -1);
+		g_free(contents);
+		prefix_len = strlen(prefix);
+		for (n = 0; lines[n] != NULL; n++) {
+			if (strncmp(lines[n], prefix, prefix_len) == 0) {
+				g_hash_table_insert(res, g_strdup(lines[n]), GINT_TO_POINTER(1));
+			}
+		}
+
+		g_strfreev(lines);
+	}
+
+	return res;
+}
+
+
+static void
+mp_save_uid(gpointer key, gpointer G_GNUC_UNUSED value, gpointer user_data)
+{
+	FILE *out = (FILE *) user_data;
+
+	fputs((const gchar *) key, out);
+	fputc('\n', out);
+}
+
+
 static gboolean
-move_from_msgdrop(const gchar *tmp_path, LibBalsaMailbox *dest,
-                  gchar *pop_name, unsigned msgno)
+mp_save_uids(GHashTable *uids, const gchar *prefix, GError **error)
 {
-    gint fd;
-    GMimeStream *stream;
-    gboolean success;
-    GError *err = NULL;
-    struct stat buf;
+	gchar *fname;
+	gboolean read_res;
+	gchar *contents = NULL;
+	FILE *out;
+	gboolean result;
 
-    if(stat(tmp_path, &buf) != 0)
-        return FALSE;
-    if(buf.st_size == 0) /* filtered out? Nothing to move in any case */
-        return TRUE;
-    fd = open(tmp_path, O_RDWR);
-    stream = g_mime_stream_fs_new(fd);
-    success =
-        libbalsa_mailbox_add_message(dest, stream,
-                                     LIBBALSA_MESSAGE_FLAG_NEW |
-                                     LIBBALSA_MESSAGE_FLAG_RECENT, &err)
-        && ftruncate(fd, 0) == 0;
-    g_object_unref(stream);
+	fname = g_strconcat(g_get_home_dir(), POP_UID_FILE, NULL);
 
-    if(!success)
-        libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-                             _("Error appending message %d from %s to %s: %s"),
-                             msgno, pop_name, dest->name,
-                             err ? err->message : "?");
-    g_clear_error(&err);
+	g_mutex_lock(&uid_mutex);
+	read_res = g_file_get_contents(fname, &contents, NULL, NULL);
+	out = fopen(fname, "w");
+	g_free(fname);
+	if (out != NULL) {
+		if (read_res) {
+			gchar **lines;
+			size_t prefix_len;
+			guint n;
 
-    return success;
+			lines = g_strsplit(contents, "\n", -1);
+			g_free(contents);
+			prefix_len = strlen(prefix);
+			for (n = 0; lines[n] != NULL; n++) {
+				if ((lines[n][0] != '\0') && (strncmp(lines[n], prefix, prefix_len) != 0)) {
+					fputs(lines[n], out);
+					fputc('\n', out);
+				}
+			}
+
+			g_strfreev(lines);
+		}
+
+		if (uids != NULL) {
+			g_hash_table_foreach(uids, mp_save_uid, out);
+		}
+		fclose(out);
+		result = TRUE;
+	} else {
+		g_set_error(error, MBOX_POP3_ERROR, errno, _("Saving the POP3 message UID list failed: %s"), g_strerror(errno));
+		result = FALSE;
+	}
+
+	g_mutex_unlock(&uid_mutex);
+	return result;
 }
 
-
-static GHashTable*
-mp_load_uids(void)
-{
-    GHashTable *res = g_hash_table_new_full(g_str_hash, g_str_equal,
-                                            g_free, NULL);
-    gchar *fname = g_strconcat(g_get_home_dir(), "/.balsa/pop-uids", NULL);
-    FILE *f = fopen(fname, "r");
-    g_free(fname);
-    if(f) {
-        struct flock lck;
-        char line[1024]; /* arbitrary limit of uid len */
-        memset (&lck, 0, sizeof(struct flock));
-        lck.l_type = F_RDLCK; lck.l_whence = SEEK_SET;
-        fcntl(fileno(f), F_SETLK, &lck);
-        while(fgets(line, sizeof(line), f)) {
-            int len = strlen(line);
-            if(len>0&& line[len-1] == '\n') line[len-1] = '\0';
-            g_hash_table_insert(res, g_strdup(line), GINT_TO_POINTER(1));
-        }
-        lck.l_type = F_UNLCK;
-        fcntl(fileno(f), F_SETLK, &lck);
-        fclose(f);
-    }
-    return res;
-}
-
-struct save_uid_data {
-    FILE *file;
-    const char *exclude_prefix;
-};
-
-static void
-mp_save_uid(gpointer key, gpointer value, gpointer user_data)
-{
-    struct save_uid_data *d = (struct save_uid_data*)user_data;
-    if(d->exclude_prefix &&
-       strncmp(key, d->exclude_prefix, strlen(d->exclude_prefix)) == 0)
-        return;
-    fprintf(d->file, "%s\n", (char*)key);
-}
-
-static void
-mp_save_uids(GHashTable *old_uids, GHashTable *new_uids, const char *prefix)
-{
-    gchar *fname = g_strconcat(g_get_home_dir(), "/.balsa/pop-uids", NULL);
-    FILE *f;
-
-    libbalsa_assure_balsa_dir();
-    f = fopen(fname, "w");
-    g_free(fname);
-    if(f) {
-        struct save_uid_data data;
-        struct flock lck;
-
-        memset (&lck, 0, sizeof (struct flock));
-        lck.l_type = F_WRLCK; lck.l_whence = SEEK_SET;
-        data.file = f; data.exclude_prefix = prefix;
-        g_hash_table_foreach(old_uids, mp_save_uid, &data);
-        data.exclude_prefix = NULL;
-        g_hash_table_foreach(new_uids, mp_save_uid, &data);
-        lck.l_type = F_UNLCK;
-        fcntl(fileno(f), F_SETLK, &lck);
-        fclose(f);
-    } /* else COULD NOT SAVE UIDS! SHOUT! */
-    return;
-}
 
 #ifdef POP_SYNC
 static int
@@ -277,347 +273,420 @@ dump_cb(unsigned len, char *buf, void *arg)
     return fwrite(buf, 1, len, (FILE*)arg) == len;
 }
 #endif /* POP_SYNC */
-/* ===================================================================
-   Functions for direct or filtered saving to the output mailbox.
-*/
-static FILE*
-pop_direct_open(const char *path)
+
+
+typedef struct {
+	gboolean filter;
+	GMimeStream *mbx_stream;	/* used if we store directly to a mailbox only */
+	FILE *filter_pipe;			/* used of we write to a filter pipe only */
+	gchar *path;				/* needed for error reporting only */
+} pop_handler_t;
+
+
+static pop_handler_t *
+pop_handler_new(const gchar *filter_path,
+				GError     **error)
 {
-    return fopen(path, "w");
+	pop_handler_t *res;
+
+	res = g_new0(pop_handler_t, 1U);
+	if (filter_path != NULL) {
+		res->filter = TRUE;
+		res->filter_pipe = popen(filter_path, "w");
+		if (res->filter_pipe == NULL) {
+			g_set_error(error, MBOX_POP3_ERROR, errno, _("Passing POP message to %s failed: %s"), filter_path, g_strerror(errno));
+			g_free(res);
+			res = NULL;
+		} else {
+			res->path = g_strdup(filter_path);
+		}
+	} else {
+		res->mbx_stream = g_mime_stream_mem_new();
+	}
+
+	return res;
 }
 
-static FILE*
-pop_filter_open(const char *command)
+
+static gboolean
+pop_handler_write(pop_handler_t *handler,
+				  const gchar   *buffer,
+				  gsize          count,
+				  GError       **error)
 {
-    return popen(command, "w");
+	gboolean result = TRUE;
+
+	if (handler->filter) {
+		if (fwrite(buffer, 1U, count, handler->filter_pipe) != count) {
+			g_set_error(error, MBOX_POP3_ERROR, errno, _("Passing POP message to %s failed: %s"), handler->path, g_strerror(errno));
+			result = FALSE;
+		}
+	} else {
+		if (g_mime_stream_write(handler->mbx_stream, buffer, count) != (ssize_t) count) {
+			g_set_error(error, MBOX_POP3_ERROR, -1, _("Saving POP message failed"));
+			result = FALSE;
+		}
+	}
+	return result;
 }
 
-struct PopDownloadMode {
-    FILE* (*open)(const char *path);
-    int (*close)(FILE *arg);
-} pop_direct = {
-    pop_direct_open,
-    fclose
-}, pop_filter = {
-    pop_filter_open,
-    pclose
-};
+
+static gboolean
+pop_handler_close(pop_handler_t *handler,
+				  GError       **error)
+{
+	gboolean result = TRUE;
+
+	if (handler->filter) {
+		int res;
+
+		res = pclose(handler->filter_pipe);
+		if (res != 0) {
+			g_set_error(error, MBOX_POP3_ERROR, errno, _("Transferring POP message to %s failed: %s"), handler->path,
+				g_strerror(errno));
+			result = FALSE;
+		}
+	} else {
+		g_object_unref(G_OBJECT(handler->mbx_stream));
+	}
+	g_free(handler->path);
+	g_free(handler);
+	return result;
+}
+
 
 /* ===================================================================
    Functions supporting asynchronous retrival of messages.
 */
 struct fetch_data {
     LibBalsaMailbox *mailbox;
-    PopHandle *pop;
-    GError   **err;
-    const gchar     *tmp_path;
-    const gchar     *dest_path;
-    const struct PopDownloadMode *dm;
-    unsigned   msgno, total_messages;
-    unsigned long *current_pos;
-    unsigned long total_size;
-    FILE      *f;
-    unsigned   error_occured:1;
-    unsigned   delete_on_server:1;
+    const gchar *filter_path;				/* filter path, NULL for storing the message without filtering */
+    gsize total_messages;
+    gsize total_size;
+    gchar *total_size_msg;
+    gsize msgno;
+    gsize received;
+    pop_handler_t *handler;
+    gint64 next_notify;
 };
 
-/* GError arguments - if any - are for one way communication from
-   libimap to the callback.
-   All errors are communicated to UI through fetch_data::err.
- */
 static void
-fetch_async_cb(PopReqCode prc, void *arg, ...)
+notify_progress(const struct fetch_data *fd)
 {
-    static time_t last_update = 0, current_time;
-    static unsigned batch_cnt = 0;
-    struct fetch_data *fd = (struct fetch_data*)arg;
-    va_list alist;
-    char threadbuf[160];
-    
-    va_start(alist, arg);
-    switch(prc) {
-    case POP_REQ_OK: 
-	{/* GError **err = va_arg(alist, GError**); */
-        fd->f  = fd->dm->open(fd->dest_path);
-        if(fd->f == NULL) {
-            if(!*fd->err) {
-                g_set_error(fd->err, IMAP_ERROR, IMAP_POP_SAVE_ERROR,
-                            _("Saving POP message to %s failed"),
-                            fd->dest_path);
-            }
-            fd->error_occured = 1;
-            printf("fopen failed for %s %p\n", fd->dest_path, fd->err);
-        } else {
-            snprintf(threadbuf, sizeof(threadbuf),
-                     _("Retrieving Message %d of %d"),
-                    fd->msgno, fd->total_messages);
-            libbalsa_mailbox_progress_notify(LIBBALSA_MAILBOX(fd->mailbox),
-                                             LIBBALSA_NTFY_MSGINFO, 
-                                             fd->msgno, fd->total_messages,
-                                             threadbuf);
-        }
-        }
-	break;
-    case POP_REQ_ERR:
-	{GError **err = va_arg(alist, GError**);
-	if(!*fd->err) {
-	    *fd->err  = *err;
-	    *err = NULL;
-	}
-	}
-	break;
-    case POP_REQ_DATA:
-	{unsigned len = va_arg(alist, unsigned);
-	char    *buf = va_arg(alist, char*);
-        if( (batch_cnt++ & 0x04) &&
-            last_update != (current_time = time(NULL))) {
-            snprintf(threadbuf, sizeof(threadbuf),
-                     _("Received %ld kB of %ld"),
-                     (long)(*fd->current_pos/1024),
-                     (long)fd->total_size/1024);
-            libbalsa_mailbox_progress_notify(LIBBALSA_MAILBOX(fd->mailbox), 
-                                             LIBBALSA_NTFY_PROGRESS, 
-                                             *fd->current_pos, fd->total_size,
-                                             threadbuf);
-            last_update = current_time;
-        }
-        *fd->current_pos += len;
-	if(fd->f)
-	    if(fwrite(buf, 1, len, fd->f) != len) {
-                if(!*fd->err)
-                    g_set_error(fd->err, IMAP_ERROR, IMAP_POP_SAVE_ERROR,
-                                _("Saving POP message to %s failed."),
-                                fd->dest_path);
-                fd->error_occured = 1;
-            }
-	}
-	break;
-    case POP_REQ_DONE:
-        if(fd->dm->close(fd->f) != 0) {
-            if(!*fd->err)
-                g_set_error(fd->err, IMAP_ERROR, IMAP_POP_SAVE_ERROR,
-                            _("Transferring POP message to %s failed."),
-                            fd->dest_path);
-        } else if(!fd->error_occured &&
-                  move_from_msgdrop
-                  (fd->tmp_path,
-                   LIBBALSA_MAILBOX_POP3(fd->mailbox)->inbox,
-                   fd->mailbox->name, fd->msgno) &&
-                  fd->delete_on_server)
-            pop_delete_message(fd->pop, fd->msgno, NULL, NULL, NULL);
-	fd->f = NULL;
-	break;
-    }
-    va_end(alist);
+	gchar *recvbuf;
+	gchar *msgbuf;
+
+	recvbuf = libbalsa_size_to_gchar(fd->received);
+	msgbuf = g_strdup_printf(_("Message %lu of %lu (%s of %s)"), fd->msgno, fd->total_messages, recvbuf, fd->total_size_msg);
+	g_free(recvbuf);
+	libbalsa_mailbox_progress_notify(LIBBALSA_MAILBOX(fd->mailbox), LIBBALSA_NTFY_PROGRESS, fd->received, fd->total_size, msgbuf);
+	g_free(msgbuf);
 }
 
-static void
-async_notify(struct fetch_data *fd)
+static gboolean
+message_cb(const gchar                    *buffer,
+		   gssize                          count,
+		   gsize                           lines,
+		   const NetClientPopMessageInfo  *info,
+		   gpointer                        user_data,
+		   GError                        **error)
 {
-    /* We need to close the file here only when POP_REQ_ERR
-       arrived. */
-    if (fd->f) {
-        fd->dm->close(fd->f);
-        fd->f = NULL;
-    }
-    g_free(fd);
+	struct fetch_data *fd = (struct fetch_data *) user_data;
+	gboolean result = TRUE;
+
+	if (count > 0) {
+		/* message data chunk - initialise for a new message if the output does not exist */
+		if (fd->handler == NULL) {
+			fd->handler = pop_handler_new(fd->filter_path, error);
+
+			if (fd->handler == NULL) {
+				result = FALSE;
+			} else {
+				fd->msgno++;
+				fd->next_notify = g_get_monotonic_time();		/* force immediate update of the progress dialogue */
+			}
+		}
+
+		/* add data if we were successful so far */
+		if (result) {
+			result = pop_handler_write(fd->handler, buffer, count, error);
+			if (result) {
+				gint64 current_time;
+
+				current_time = g_get_monotonic_time();
+				/* as the cr is removed from line endings, we have to compensate for it - see RFC 1939, sect. 11 */
+				fd->received += (gsize) count + lines;
+				if (current_time >= fd->next_notify) {
+					notify_progress(fd);
+					fd->next_notify = current_time + 500000;
+				}
+			}
+		}
+	} else if (count == 0) {
+		gboolean close_res;
+
+		notify_progress(fd);
+		if (fd->filter_path == NULL) {
+			GError *add_err = NULL;
+
+		    result = libbalsa_mailbox_add_message(LIBBALSA_MAILBOX_POP3(fd->mailbox)->inbox, fd->handler->mbx_stream,
+		    	LIBBALSA_MESSAGE_FLAG_NEW | LIBBALSA_MESSAGE_FLAG_RECENT, &add_err);
+		    if (!result) {
+		        libbalsa_information(LIBBALSA_INFORMATION_WARNING, _("Error appending message %d from %s to %s: %s"),
+		        	info->id, fd->mailbox->name, LIBBALSA_MAILBOX_POP3(fd->mailbox)->inbox->name,
+					(add_err != NULL) ? add_err->message : "?");
+		        g_error_free(add_err);
+		    }
+		}
+
+		/* current message done */
+		close_res = pop_handler_close(fd->handler, error);
+		fd->handler = NULL;
+		result = close_res & result;
+	} else {
+		/* count < 0: error; note that the handler may already be NULL if the error occurred for count == 0 */
+		if (fd->handler != NULL) {
+			(void) pop_handler_close(fd->handler, NULL);
+			fd->handler = NULL;
+		}
+		result = FALSE;
+	}
+
+	return result;
 }
 
-/* libbalsa_mailbox_pop3_check:
-   checks=downloads POP3 mail.
-   LOCKING : assumes gdk lock HELD and other locks (libmutt, mailbox) NOT HELD
-*/
-static void
-monitor_cb(const char *buffer, int length, int direction, void *arg)
-{
-    int i;
-    if(!PopDebug) return;
 
-    if(direction) {
-        if(strncmp(buffer, "Pass ", 5) == 0) {
-            printf("POP C: Pass (passwd hidden)\n");
-            return;
-        }
-    }
-    printf("POP %c: ", direction ? 'C' : 'S');
-    for (i = 0; i < length; i++)
-      putchar(buffer[i]);
-    fflush(NULL);
+static NetClientPop *
+libbalsa_mailbox_pop3_startup(LibBalsaServer            *server,
+							  const LibBalsaMailboxPop3 *mbox,
+							  const gchar               *name,
+							  GList                    **msg_list)
+{
+	NetClientPop *pop;
+	GError *error = NULL;
+
+	/* create the mailbox connection */
+	if (server->security == NET_CLIENT_CRYPT_ENCRYPTED) {
+		pop = net_client_pop_new(server->host, 995U, server->security, mbox->enable_pipe);
+	} else {
+		pop = net_client_pop_new(server->host, 110U, server->security, mbox->enable_pipe);
+	}
+	if (pop == NULL) {
+		return NULL;
+	}
+
+	/* configure the mailbox connection */
+	if (mbox->disable_apop) {
+		net_client_pop_allow_auth(pop, TRUE, NET_CLIENT_POP_AUTH_ALL & ~NET_CLIENT_POP_AUTH_APOP);
+		net_client_pop_allow_auth(pop, FALSE, NET_CLIENT_POP_AUTH_SAFE & ~NET_CLIENT_POP_AUTH_APOP);
+	}
+	net_client_set_timeout(NET_CLIENT(pop), 60U);
+
+	/* load client certificate if configured */
+	if (server->client_cert) {
+		g_signal_connect(G_OBJECT(pop), "cert-pass", G_CALLBACK(libbalsa_server_get_cert_pass), server);
+		if (!net_client_set_cert_from_file(NET_CLIENT(pop), server->cert_file, &error)) {
+			libbalsa_information(LIBBALSA_INFORMATION_ERROR, _("Cannot load certificate file %s: %s"), server->cert_file,
+				error->message);
+			g_error_free(error);
+			g_object_unref(G_OBJECT(pop));
+			return NULL;
+		}
+	}
+
+	/* connect signals */
+	g_signal_connect(G_OBJECT(pop), "cert-check", G_CALLBACK(libbalsa_server_check_cert), pop);
+	g_signal_connect(G_OBJECT(pop), "auth", G_CALLBACK(libbalsa_server_get_auth), server);
+
+	/* connect server */
+	if (!net_client_pop_connect(pop, NULL, &error)) {
+		libbalsa_information(LIBBALSA_INFORMATION_ERROR, _("POP3 mailbox %s: cannot connect %s: %s"), name, server->host,
+			error->message);
+		g_error_free(error);
+		g_object_unref(G_OBJECT(pop));
+		return NULL;
+	}
+
+	/* load message list */
+	if (!net_client_pop_list(pop, msg_list, !mbox->delete_from_server, &error)) {
+		libbalsa_information(LIBBALSA_INFORMATION_ERROR, _("POP3 mailbox %s error: %s"), name, error->message);
+		g_error_free(error);
+		g_object_unref(G_OBJECT(pop));
+		pop = NULL;
+	}
+
+	return pop;
 }
+
+
+static GList *
+update_msg_list(struct fetch_data         *fd,
+				const LibBalsaMailboxPop3 *mbox,
+				GHashTable               **current_uids,
+				LibBalsaServer            *server,
+				GList                     *msg_list)
+{
+	GHashTable *uids = NULL;
+	gchar *uid_prefix = NULL;
+	size_t prefix_len = 0U;
+	GList *p;
+
+	/* load uid's if messages shall be left on the server */
+	if (!mbox->delete_from_server) {
+		uid_prefix = g_strconcat(server->user, "@", server->host, NULL);
+		prefix_len = strlen(uid_prefix);
+		uids = mp_load_uids(uid_prefix);
+		*current_uids = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, NULL);
+	}
+
+	/* calculate totals, remove oversized messages, remember in the hash if required */
+	fd->total_messages = 0U;
+	fd->total_size = 0U;
+	p = msg_list;
+	while (p != NULL) {
+		NetClientPopMessageInfo *msg_info = (NetClientPopMessageInfo*) p->data;
+		gboolean skip = FALSE;
+		GList* next = p->next;
+
+		/* check for oversized message */
+		if ((mbox->msg_size_limit > 0) && (msg_info->size >= (gsize) mbox->msg_size_limit)) {
+			gchar *size_str;
+
+			size_str = libbalsa_size_to_gchar(msg_info->size);
+			libbalsa_information(LIBBALSA_INFORMATION_WARNING, _("POP3 message %d oversized: %s — skipped."), msg_info->id,
+				size_str);
+			g_free(size_str);
+			skip = TRUE;
+		}
+
+		/* check if we already know this message */
+		if (!skip && !mbox->delete_from_server) {
+			gchar *full_uid = g_strconcat(uid_prefix, " ", msg_info->uid, NULL);
+
+			g_hash_table_insert(*current_uids, full_uid, GINT_TO_POINTER(1));
+			if (g_hash_table_lookup(uids, full_uid) != NULL) {
+				skip = TRUE;
+			}
+		}
+
+		/* delete from list if we want to skip the message, update totals otherwise */
+		if (skip) {
+			net_client_pop_msg_info_free(msg_info);
+			msg_list = g_list_delete_link(msg_list, p);
+		} else {
+			fd->total_messages++;
+			fd->total_size += msg_info->size;
+		}
+		p = next;
+	}
+
+	/* copy all keys /not/ starting with the prefix from the old to the current hash table, and drop the old table */
+	if (!mbox->delete_from_server && (msg_list != NULL)) {
+		GHashTableIter iter;
+		gpointer key;
+
+		g_hash_table_iter_init(&iter, uids);
+		while (g_hash_table_iter_next(&iter, &key, NULL)) {
+			if (strncmp((const char *) key, uid_prefix, prefix_len) != 0) {
+				g_hash_table_insert(*current_uids, key, GINT_TO_POINTER(1));
+			}
+		}
+	}
+
+	g_free(uid_prefix);
+	if (uids != NULL) {
+		g_hash_table_destroy(uids);
+	}
+
+	return msg_list;
+}
+
 
 static void
 libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
 {
-    gchar *tmp_path, *dest_path, *uid_prefix = NULL;
-    gint tmp_file;
-    LibBalsaMailboxPop3 *m = LIBBALSA_MAILBOX_POP3(mailbox);
-    LibBalsaServer *server;
-    gchar *msgbuf;
-    GError *err = NULL;
-    unsigned msgcnt, i;
-    GHashTable *uids = NULL, *current_uids = NULL;
-    const struct PopDownloadMode *mode;
-    unsigned long current_pos = 0, total_size;
-    ImapTlsMode tls_mode;
-    PopHandle *pop;
+	LibBalsaMailboxPop3 *mbox = LIBBALSA_MAILBOX_POP3(mailbox);
+	LibBalsaServer *server;
+	gchar *msgbuf;
+	NetClientPop *pop;
+	GList *msg_list;
 
-    if (!m->check || !m->inbox) return;
-
-    server = LIBBALSA_MAILBOX_REMOTE_SERVER(m);
-    switch(server->tls_mode) {
-    case LIBBALSA_TLS_DISABLED: tls_mode = IMAP_TLS_DISABLED; break;
-    default:
-    case LIBBALSA_TLS_ENABLED : tls_mode = IMAP_TLS_ENABLED;  break;
-    case LIBBALSA_TLS_REQUIRED: tls_mode = IMAP_TLS_REQUIRED; break;
-    }
-
-    msgbuf = g_strdup_printf("POP3: %s", mailbox->name);
-    libbalsa_mailbox_progress_notify(mailbox, LIBBALSA_NTFY_SOURCE,0,0,msgbuf);
-    g_free(msgbuf);
-
-    tmp_file = g_file_open_tmp("pop-XXXXXX", &tmp_path, &err);
-    if (tmp_file < 0) {
-	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-			     _("POP3 mailbox %s temp file error:\n%s"), 
-			     mailbox->name, err->message);
-	g_error_free(err);
-	return;
-    }
-    close(tmp_file);
-
-    pop = pop_new();
-    pop_set_option(pop, IMAP_POP_OPT_FILTER_CR, TRUE);
-    pop_set_option(pop, IMAP_POP_OPT_OVER_SSL, server->use_ssl);
-    pop_set_option(pop, IMAP_POP_OPT_DISABLE_APOP, m->disable_apop);
-    pop_set_option(pop, IMAP_POP_OPT_PIPELINE, m->enable_pipe);
-    pop_set_tls_mode(pop, tls_mode);
-    pop_set_timeout(pop, 60000); /* wait 1.5 minute for packets */
-    pop_set_usercb(pop, libbalsa_server_user_cb, server);
-    pop_set_monitorcb(pop, monitor_cb, NULL);
-
-    if(m->filter) {
-        mode       = &pop_filter;
-        dest_path = m->filter_cmd;
-    } else {
-        mode  = &pop_direct;
-        dest_path = tmp_path;
-    }
-    if(!pop_connect(pop, server->host, &err)) {
-	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-			     _("POP3 mailbox %s error: %s\n"), 
-			     mailbox->name, err->message);
-        g_error_free(err);
-        unlink(tmp_path); g_free(tmp_path);
-        pop_destroy(pop, NULL);
-	return;
-    }
-
-    /* ===================================================================
-     * Main download loop...
-     * =================================================================== */
-    msgcnt     = pop_get_exists(pop, NULL);
-    total_size = pop_get_total_size(pop);
-    if(!m->delete_from_server) {
-        uids = mp_load_uids();
-        current_uids = g_hash_table_new_full(g_str_hash, g_str_equal,
-                                             g_free, NULL);
-        uid_prefix = g_strconcat(server->user, "@", server->host, NULL);
-    }
-
-    for(i=1; i<=msgcnt; i++) {
-        unsigned msg_size = pop_get_msg_size(pop, i);
-#if POP_SYNC
-        FILE *f;
-        gboolean retval;
-#endif
-        if(!m->delete_from_server) {
-            const char *uid = pop_get_uid(pop, i, NULL);
-            char *full_uid = g_strconcat(uid_prefix, " ", uid, NULL);
-            g_hash_table_insert(current_uids, full_uid, GINT_TO_POINTER(1));
-            if(g_hash_table_lookup(uids, full_uid)) {
-                total_size -= msg_size;
-                continue;
-            }
-        }
-        if(m->msg_size_limit>0 && msg_size >= (unsigned)m->msg_size_limit) {
-            libbalsa_information
-                (LIBBALSA_INFORMATION_WARNING,
-                 _("POP3 message %d oversized: %d kB — skipped."),
-                 i, msg_size);
-            total_size -= msg_size;
-            continue;
-        }
-#if POP_SYNC
-        libbalsa_mailbox_progress_notify(mailbox,
-                                         LIBBALSA_NTFY_PROGRESS, i, msgcnt,
-                                         "next message");
-        f = mode->open(dest_path);
-        if(!f) {
-            libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-			     _("POP3 error: cannot open %s for writing."), 
-			     dest_path);
-            break;
-        }
-        retval = pop_fetch_message_s(pop, i, dump_cb, f, &err);
-
-        if(mode->close(f) != 0) {
-            libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-			     _("POP3 error: cannot close %s."), 
-			     dest_path);
-            break;
-        }
-        if (!retval)
-            break;
-        if(move_from_msgdrop(tmp_path, m->inbox,
-                             mailbox->name, i) &&
-           m->delete_from_server)
-            pop_delete_message_s(pop, i, NULL);
-#else 
-	{struct fetch_data *fd = g_new0(struct fetch_data, 1);
-        fd->mailbox  = mailbox;
-        fd->tmp_path = tmp_path;
-	fd->pop      = pop; 
-	fd->err      = &err;
-	fd->dest_path= dest_path;
-	fd->dm       = mode;
-	fd->msgno    = i;
-        fd->total_messages = msgcnt;
-        fd->current_pos    = &current_pos;
-        fd->total_size     = total_size;
-	fd->delete_on_server = m->delete_from_server;
-        pop_fetch_message(pop, i, fetch_async_cb, fd, 
-			  (GDestroyNotify)async_notify);
+	if (!mbox->check || (mbox->inbox == NULL)) {
+		return;
 	}
-#endif
-    }
-    pop_destroy(pop, NULL);
-    if(err) {
-        /* 
-        libbalsa_mailbox_progress_notify(mailbox,
-                                         LIBBALSA_NTFY_ERROR, 0,
-                                         1, err->message);*/
-        libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-			     _("POP3 error: %s."), 
-			     err->message);
-        g_error_free(err);
-    }
-    if(!m->delete_from_server) {
-        mp_save_uids(uids, current_uids, uid_prefix);
-        g_hash_table_destroy(uids);
-        g_hash_table_destroy(current_uids);
-        g_free(uid_prefix);
-    }
-    libbalsa_mailbox_progress_notify(mailbox,
-                                     LIBBALSA_NTFY_PROGRESS, 0,
-                                     1, "Finished");
-    
-    /* ===================================================================
-     * Postprocessing...
-     * =================================================================== */
 
-    unlink(tmp_path);
-    g_free(tmp_path);
+	server = LIBBALSA_MAILBOX_REMOTE_SERVER(mbox);
+
+	msgbuf = g_strdup_printf("POP3: %s", mailbox->name);
+	libbalsa_mailbox_progress_notify(mailbox, LIBBALSA_NTFY_SOURCE, 0, 0, msgbuf);
+	g_free(msgbuf);
+
+	/* open the mailbox connection and get the messages list */
+	pop = libbalsa_mailbox_pop3_startup(server, mbox, mailbox->name, &msg_list);
+
+	/* proceed on success only */
+	if (pop != NULL) {
+		struct fetch_data fd;
+		GHashTable *current_uids = NULL;
+		gboolean result = TRUE;
+		GError *err = NULL;
+
+		libbalsa_mailbox_progress_notify(mailbox, LIBBALSA_NTFY_PROGRESS, 0, 1, _("Connected"));
+		memset(&fd, 0, sizeof(fd));
+
+		/* nothing to do if no messages are on the server */
+		if (msg_list != NULL) {
+			/* load uid's if messages shall be left on the server */
+			msg_list = update_msg_list(&fd, mbox, &current_uids, server, msg_list);
+		}
+
+		/* download messages unless the list is empty */
+		if (fd.total_messages > 0U) {
+			fd.mailbox = mailbox;
+			fd.total_size_msg = libbalsa_size_to_gchar(fd.total_size);
+
+			msgbuf = g_strdup_printf(_("%lu new messages (%s)"), fd.total_messages, fd.total_size_msg);
+			libbalsa_mailbox_progress_notify(mailbox, LIBBALSA_NTFY_PROGRESS, 0, 1, msgbuf);
+			g_free(msgbuf);
+
+			if (mbox->filter) {
+				fd.filter_path = mbox->filter_cmd;
+			}
+
+			if (result) {
+				result = net_client_pop_retr(pop, msg_list, message_cb, &fd, &err);
+				if (result && mbox->delete_from_server) {
+					result = net_client_pop_dele(pop, msg_list, &err);
+				}
+			}
+
+			/* clean up */
+			g_free(fd.total_size_msg);
+			g_list_free_full(msg_list, (GDestroyNotify) net_client_pop_msg_info_free);
+		}
+
+		/* store uid list */
+		if (result && !mbox->delete_from_server) {
+			gchar *uid_prefix = g_strconcat(server->user, "@", server->host, NULL);
+
+			mp_save_uids(current_uids, uid_prefix, &err);
+			g_free(uid_prefix);
+			if (current_uids != NULL) {
+				g_hash_table_destroy(current_uids);
+			}
+		}
+
+		if (!result) {
+			libbalsa_information(LIBBALSA_INFORMATION_ERROR, _("POP3 error: %s"), err->message);
+			g_error_free(err);
+		}
+	}
+
+	/* done - clean up */
+	libbalsa_mailbox_progress_notify(mailbox, LIBBALSA_NTFY_PROGRESS, 0, 1, _("Finished"));
+	g_object_unref(G_OBJECT(pop));
 }
+
 
 static void
 libbalsa_mailbox_pop3_save_config(LibBalsaMailbox * mailbox,

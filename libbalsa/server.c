@@ -197,7 +197,18 @@ libbalsa_server_finalize(GObject * object)
 
     g_free(server->host);   server->host = NULL;
     g_free(server->user);   server->user = NULL;
+    if (server->passwd != NULL) {
+    	memset(server->passwd, 0, strlen(server->passwd));
+    }
     libbalsa_free_password(server->passwd); server->passwd = NULL;
+
+    g_free(server->cert_file);
+    server->cert_file = NULL;
+    if (server->cert_passphrase != NULL) {
+    	memset(server->cert_passphrase, 0, strlen(server->cert_passphrase));
+    }
+    g_free(server->cert_passphrase);
+    server->cert_passphrase = NULL;
 
     G_OBJECT_CLASS(parent_class)->finalize(object);
 }
@@ -422,6 +433,19 @@ libbalsa_server_load_config(LibBalsaServer * server)
 	libbalsa_free_password(server->passwd);
 	server->passwd = NULL;
     }
+
+    server->client_cert = libbalsa_conf_get_bool("NeedClientCert=false");
+    server->cert_file = libbalsa_conf_get_string("UserCertificateFile");
+    server->cert_passphrase = libbalsa_conf_private_get_string("CertificatePassphrase");
+    if ((server->cert_passphrase != NULL) && (server->cert_passphrase != '\0')) {
+        gchar *tmp = libbalsa_rot(server->cert_passphrase);
+
+        g_free(server->cert_passphrase);
+        server->cert_passphrase = tmp;
+    } else {
+    	g_free(server->cert_passphrase);
+    	server->cert_passphrase = NULL;
+    }
 }
 
 /* libbalsa_server_save_config:
@@ -470,6 +494,18 @@ libbalsa_server_save_config(LibBalsaServer * server)
 	g_free(buff);
 #endif                          /* defined(HAVE_LIBSECRET) */
     }
+
+    libbalsa_conf_set_bool("NeedClientCert", server->client_cert);
+    if (server->cert_file != NULL) {
+    	libbalsa_conf_set_string("UserCertificateFile", server->cert_file);
+    }
+    if (server->cert_passphrase != NULL) {
+        gchar *tmp = libbalsa_rot(server->cert_passphrase);
+
+        libbalsa_conf_private_set_string("CertificatePassphrase", tmp);
+        g_free(tmp);
+    }
+
     libbalsa_conf_set_bool("SSL", server->use_ssl);
     libbalsa_conf_set_int("TLSMode", server->tls_mode);
     libbalsa_conf_set_int("Security", server->security);
@@ -564,4 +600,89 @@ libbalsa_server_connect_signals(LibBalsaServer * server, GCallback cb,
                                       libbalsa_server_signals
                                       [GET_PASSWORD], 0, TRUE))
         g_signal_connect(server, "get-password", cb, cb_data);
+}
+
+
+gchar **
+libbalsa_server_get_auth(NetClient *client,
+         	 	 	 	 gpointer   user_data)
+{
+    LibBalsaServer *server = LIBBALSA_SERVER(user_data);
+    gchar **result = NULL;
+
+    g_debug("%s: %p %p: encrypted = %d", __func__, client, user_data,
+            net_client_is_encrypted(client));
+    if (server->try_anonymous == 0U) {
+        result = g_new0(gchar *, 3U);
+        result[0] = g_strdup(server->user);
+        if ((server->passwd != NULL) && (server->passwd[0] != '\0')) {
+            result[1] = g_strdup(server->passwd);
+        } else {
+            result[1] = libbalsa_server_get_password(server, NULL);
+        }
+    }
+    return result;
+}
+
+
+gboolean
+libbalsa_server_check_cert(NetClient           *client,
+           	   	   	   	   GTlsCertificate     *peer_cert,
+						   GTlsCertificateFlags errors,
+						   gpointer             user_data)
+{
+    GByteArray *cert_der = NULL;
+    gboolean result = FALSE;
+
+    /* FIXME - this a hack, simulating the (OpenSSL based) input for libbalsa_is_cert_known().
+        If we switch completely to
+     * (GnuTLS based) GTlsCertificate/GTlsClientConnection, we can omit this... */
+    g_debug("%s: %p %p %u %p", __func__, client, peer_cert, errors, user_data);
+
+    /* create a OpenSSL X509 object from the certificate's DER data */
+    g_object_get(G_OBJECT(peer_cert), "certificate", &cert_der, NULL);
+    if (cert_der != NULL) {
+        X509 *ossl_cert;
+        const unsigned char *der_p;
+
+        der_p = (const unsigned char *) cert_der->data;
+        ossl_cert = d2i_X509(NULL, &der_p, cert_der->len);
+        g_byte_array_unref(cert_der);
+
+        if (ossl_cert != NULL) {
+            long vfy_result;
+
+            /* convert the GIO error flags into OpenSSL error flags */
+            if ((errors & G_TLS_CERTIFICATE_UNKNOWN_CA) == G_TLS_CERTIFICATE_UNKNOWN_CA) {
+                vfy_result = X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT;
+            } else if ((errors & G_TLS_CERTIFICATE_BAD_IDENTITY) ==
+                       G_TLS_CERTIFICATE_BAD_IDENTITY) {
+                vfy_result = X509_V_ERR_SUBJECT_ISSUER_MISMATCH;
+            } else if ((errors & G_TLS_CERTIFICATE_NOT_ACTIVATED) ==
+                       G_TLS_CERTIFICATE_NOT_ACTIVATED) {
+                vfy_result = X509_V_ERR_CERT_NOT_YET_VALID;
+            } else if ((errors & G_TLS_CERTIFICATE_EXPIRED) == G_TLS_CERTIFICATE_EXPIRED) {
+                vfy_result = X509_V_ERR_CERT_HAS_EXPIRED;
+            } else if ((errors & G_TLS_CERTIFICATE_REVOKED) == G_TLS_CERTIFICATE_REVOKED) {
+                vfy_result = X509_V_ERR_CERT_REVOKED;
+            } else {
+                vfy_result = X509_V_ERR_APPLICATION_VERIFICATION;
+            }
+
+            result = libbalsa_is_cert_known(ossl_cert, vfy_result);
+            X509_free(ossl_cert);
+        }
+    }
+
+    return result;
+}
+
+
+gchar *
+libbalsa_server_get_cert_pass(NetClient        *client,
+			  	  	  	  	  const GByteArray *cert_der,
+							  gpointer          user_data)
+{
+	/* FIXME - we just return the passphrase from the config, but we may also want to show a dialogue here... */
+	return g_strdup(LIBBALSA_SERVER(user_data)->cert_passphrase);
 }

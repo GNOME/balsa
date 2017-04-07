@@ -592,91 +592,6 @@ send_message_data_cb(gchar   *buffer,
 }
 
 
-static gboolean
-check_cert(NetClient           *client,
-           GTlsCertificate     *peer_cert,
-           GTlsCertificateFlags errors,
-           gpointer             user_data)
-{
-    GByteArray *cert_der = NULL;
-    gboolean result = FALSE;
-
-    /* FIXME - this a hack, simulating the (OpenSSL based) input for libbalsa_is_cert_known().
-        If we switch completely to
-     * (GnuTLS based) GTlsCertificate/GTlsClientConnection, we can omit this... */
-    g_debug("%s: %p %p %u %p", __func__, client, peer_cert, errors, user_data);
-
-    /* create a OpenSSL X509 object from the certificate's DER data */
-    g_object_get(G_OBJECT(peer_cert), "certificate", &cert_der, NULL);
-    if (cert_der != NULL) {
-        X509 *ossl_cert;
-        const unsigned char *der_p;
-
-        der_p = (const unsigned char *) cert_der->data;
-        ossl_cert = d2i_X509(NULL, &der_p, cert_der->len);
-        g_byte_array_unref(cert_der);
-
-        if (ossl_cert != NULL) {
-            long vfy_result;
-
-            /* convert the GIO error flags into OpenSSL error flags */
-            if ((errors & G_TLS_CERTIFICATE_UNKNOWN_CA) == G_TLS_CERTIFICATE_UNKNOWN_CA) {
-                vfy_result = X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT;
-            } else if ((errors & G_TLS_CERTIFICATE_BAD_IDENTITY) ==
-                       G_TLS_CERTIFICATE_BAD_IDENTITY) {
-                vfy_result = X509_V_ERR_SUBJECT_ISSUER_MISMATCH;
-            } else if ((errors & G_TLS_CERTIFICATE_NOT_ACTIVATED) ==
-                       G_TLS_CERTIFICATE_NOT_ACTIVATED) {
-                vfy_result = X509_V_ERR_CERT_NOT_YET_VALID;
-            } else if ((errors & G_TLS_CERTIFICATE_EXPIRED) == G_TLS_CERTIFICATE_EXPIRED) {
-                vfy_result = X509_V_ERR_CERT_HAS_EXPIRED;
-            } else if ((errors & G_TLS_CERTIFICATE_REVOKED) == G_TLS_CERTIFICATE_REVOKED) {
-                vfy_result = X509_V_ERR_CERT_REVOKED;
-            } else {
-                vfy_result = X509_V_ERR_APPLICATION_VERIFICATION;
-            }
-
-            result = libbalsa_is_cert_known(ossl_cert, vfy_result);
-            X509_free(ossl_cert);
-        }
-    }
-
-    return result;
-}
-
-
-static gchar **
-get_auth(NetClient *client,
-         gpointer   user_data)
-{
-    LibBalsaServer *server = LIBBALSA_SERVER(user_data);
-    gchar **result = NULL;
-
-    g_debug("%s: %p %p: encrypted = %d", __func__, client, user_data,
-            net_client_is_encrypted(client));
-    if (server->try_anonymous == 0U) {
-        result = g_new0(gchar *, 3U);
-        result[0] = g_strdup(server->user);
-        if ((server->passwd != NULL) && (server->passwd[0] != '\0')) {
-            result[1] = g_strdup(server->passwd);
-        } else {
-            result[1] = libbalsa_server_get_password(server, NULL);
-        }
-    }
-    return result;
-}
-
-
-static gchar *
-get_cert_pass(NetClient        *client,
-			  const GByteArray *cert_der,
-			  gpointer          user_data)
-{
-	/* FIXME - we just return the passphrase from the config, but we may also want to show a dialogue here... */
-	return g_strdup(libbalsa_smtp_server_get_cert_passphrase(LIBBALSA_SMTP_SERVER(user_data)));
-}
-
-
 /* libbalsa_process_queue:
    treats given mailbox as a set of messages to send. Loads them up and
    launches sending thread/routine.
@@ -711,15 +626,14 @@ lbs_process_queue(LibBalsaMailbox     *outbox,
     }
 
     /* load client certificate if configured */
-    if (libbalsa_smtp_server_require_client_cert(smtp_server)) {
-        const gchar *client_cert = libbalsa_smtp_server_get_cert_file(smtp_server);
+    if (server->client_cert) {
     	GError *error = NULL;
 
-    	g_signal_connect(G_OBJECT(session), "cert-pass", G_CALLBACK(get_cert_pass), smtp_server);
-    	if (!net_client_set_cert_from_file(NET_CLIENT(session), client_cert, &error)) {
+    	g_signal_connect(G_OBJECT(session), "cert-pass", G_CALLBACK(libbalsa_server_get_cert_pass), server);
+    	if (!net_client_set_cert_from_file(NET_CLIENT(session), server->cert_file, &error)) {
             libbalsa_information(LIBBALSA_INFORMATION_ERROR,
                                  _("Cannot load certificate file %s: %s"),
-								 client_cert, error->message);
+								 server->cert_file, error->message);
             g_error_free(error);
             g_mutex_unlock(&send_messages_lock);
     		return FALSE;
@@ -727,8 +641,8 @@ lbs_process_queue(LibBalsaMailbox     *outbox,
     }
 
     /* connect signals */
-    g_signal_connect(G_OBJECT(session), "cert-check", G_CALLBACK(check_cert), session);
-    g_signal_connect(G_OBJECT(session), "auth", G_CALLBACK(get_auth), smtp_server);
+    g_signal_connect(G_OBJECT(session), "cert-check", G_CALLBACK(libbalsa_server_check_cert), session);
+    g_signal_connect(G_OBJECT(session), "auth", G_CALLBACK(libbalsa_server_get_auth), smtp_server);
 
     send_message_info =
         send_message_info_new(outbox, session, libbalsa_smtp_server_get_name(smtp_server));

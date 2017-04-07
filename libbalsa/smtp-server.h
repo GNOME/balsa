@@ -46,13 +46,6 @@ void libbalsa_smtp_server_set_name(LibBalsaSmtpServer * smtp_server,
                                    const gchar * name);
 const gchar *libbalsa_smtp_server_get_name(LibBalsaSmtpServer *
                                            smtp_server);
-gboolean libbalsa_smtp_server_require_client_cert(LibBalsaSmtpServer *smtp_server);
-const gchar *libbalsa_smtp_server_get_cert_file(LibBalsaSmtpServer *smtp_server);
-void libbalsa_smtp_server_set_cert_passphrase(LibBalsaSmtpServer *
-                                              smtp_server,
-                                              const gchar * passphrase);
-const gchar *libbalsa_smtp_server_get_cert_passphrase(LibBalsaSmtpServer *
-                                                      smtp_server);
 guint libbalsa_smtp_server_get_big_message(LibBalsaSmtpServer *
                                            smtp_server);
 void libbalsa_smtp_server_add_to_list(LibBalsaSmtpServer * smtp_server,

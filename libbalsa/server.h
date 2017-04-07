@@ -77,6 +77,9 @@ struct _LibBalsaServer {
     gchar *user;
     gchar *passwd;
     NetClientCryptMode security;
+    gboolean client_cert;
+    gchar *cert_file;
+    gchar *cert_passphrase;
     /* We include SSL support in UI unconditionally to preserve config
      * between SSL and non-SSL builds. We just fail if SSL is requested
      * in non-SSL build. */
@@ -113,6 +116,17 @@ void libbalsa_server_save_config(LibBalsaServer * server);
 
 
 void libbalsa_server_user_cb(ImapUserEventType ue, void *arg, ...);
+
+/* NetClient related signal handlers */
+gchar **libbalsa_server_get_auth(NetClient *client,
+								 gpointer   user_data);
+gboolean libbalsa_server_check_cert(NetClient           *client,
+           	   	   	   	   	   	    GTlsCertificate     *peer_cert,
+									GTlsCertificateFlags errors,
+									gpointer             user_data);
+gchar *libbalsa_server_get_cert_pass(NetClient        *client,
+									 const GByteArray *cert_der,
+									 gpointer          user_data);
 
 void libbalsa_server_connect_signals(LibBalsaServer * server, GCallback cb,
                                      gpointer cb_data);

@@ -45,9 +45,6 @@ struct _LibBalsaSmtpServer {
     LibBalsaServer server;
 
     gchar *name;
-    gboolean client_cert;		// FIXME - maybe move to the server base class?
-    gchar *cert_file;			// FIXME - maybe move to the server base class?
-    gchar *cert_passphrase;		// FIXME - maybe move to the server base class?
     guint big_message; /* size of partial messages; in kB; 0 disables splitting */
 };
 
@@ -69,8 +66,6 @@ libbalsa_smtp_server_finalize(GObject * object)
     smtp_server = LIBBALSA_SMTP_SERVER(object);
 
     g_free(smtp_server->name);
-    g_free(smtp_server->cert_file);
-    g_free(smtp_server->cert_passphrase);
 
     G_OBJECT_CLASS(parent_class)->finalize(object);
 }
@@ -155,15 +150,6 @@ libbalsa_smtp_server_new_from_config(const gchar * name)
 
     libbalsa_server_load_config(LIBBALSA_SERVER(smtp_server));
 
-    smtp_server->client_cert = libbalsa_conf_get_bool("NeedClientCert=false");
-    smtp_server->cert_file = libbalsa_conf_get_string("UserCertificateFile");
-    smtp_server->cert_passphrase = libbalsa_conf_private_get_string("CertificatePassphrase");
-    if (smtp_server->cert_passphrase) {
-        gchar *tmp = libbalsa_rot(smtp_server->cert_passphrase);
-        g_free(smtp_server->cert_passphrase);
-        smtp_server->cert_passphrase = tmp;
-    }
-
     smtp_server->big_message = libbalsa_conf_get_int("BigMessage=0");
 
     return smtp_server;
@@ -174,15 +160,6 @@ libbalsa_smtp_server_save_config(LibBalsaSmtpServer * smtp_server)
 {
     libbalsa_server_save_config(LIBBALSA_SERVER(smtp_server));
 
-    libbalsa_conf_set_bool("NeedClientCert", smtp_server->client_cert);
-    if (smtp_server->cert_file != NULL) {
-    	libbalsa_conf_set_string("UserCertificateFile", smtp_server->cert_file);
-    }
-    if (smtp_server->cert_passphrase) {
-        gchar *tmp = libbalsa_rot(smtp_server->cert_passphrase);
-        libbalsa_conf_private_set_string("CertificatePassphrase", tmp);
-        g_free(tmp);
-    }
     libbalsa_conf_set_int("BigMessage", smtp_server->big_message);
 }
 
@@ -198,32 +175,6 @@ const gchar *
 libbalsa_smtp_server_get_name(LibBalsaSmtpServer * smtp_server)
 {
     return smtp_server ? smtp_server->name : _("Default");
-}
-
-gboolean
-libbalsa_smtp_server_require_client_cert(LibBalsaSmtpServer *smtp_server)
-{
-	return smtp_server->client_cert;
-}
-
-const gchar *
-libbalsa_smtp_server_get_cert_file(LibBalsaSmtpServer *smtp_server)
-{
-	return smtp_server->cert_file;
-}
-
-void
-libbalsa_smtp_server_set_cert_passphrase(LibBalsaSmtpServer * smtp_server,
-                                         const gchar * passphrase)
-{
-    g_free(smtp_server->cert_passphrase);
-    smtp_server->cert_passphrase = g_strdup(passphrase);
-}
-
-const gchar *
-libbalsa_smtp_server_get_cert_passphrase(LibBalsaSmtpServer * smtp_server)
-{
-    return smtp_server->cert_passphrase;
 }
 
 guint
@@ -372,12 +323,11 @@ smtp_server_response(GtkDialog * dialog, gint response,
                                      gtk_entry_get_text(GTK_ENTRY
                                                         (sdi->pass)));
         server->security = (NetClientCryptMode) (gtk_combo_box_get_active(GTK_COMBO_BOX(sdi->tlsm)) + 1);
-        sdi->smtp_server->client_cert = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(sdi->cert_button));
-        g_free(sdi->smtp_server->cert_file);
-        sdi->smtp_server->cert_file = g_strdup(gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(sdi->cert_file)));
-        libbalsa_smtp_server_set_cert_passphrase(sdi->smtp_server,
-                                                 gtk_entry_get_text
-                                                 (GTK_ENTRY(sdi->cert_pass)));
+        server->client_cert = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(sdi->cert_button));
+        g_free(server->cert_file);
+        server->cert_file = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(sdi->cert_file));
+        g_free(server->cert_passphrase);
+        server->cert_passphrase = g_strdup(gtk_entry_get_text(GTK_ENTRY(sdi->cert_pass)));
         if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(sdi->split_button))) {
             /* big_message is stored in kB, but the widget is in MB. */
         	sdi->smtp_server->big_message =
@@ -576,13 +526,13 @@ libbalsa_smtp_server_dialog(LibBalsaSmtpServer * smtp_server,
     sdi->cert_button = gtk_check_button_new_with_mnemonic(_("Server requires client certificate"));
     smtp_server_add_widget(grid, row, _("_Client Certificate:"), sdi->cert_button);
     g_signal_connect(sdi->cert_button, "toggled", G_CALLBACK(smtp_server_changed), sdi);
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(sdi->cert_button), smtp_server->client_cert);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(sdi->cert_button), server->client_cert);
 
     sdi->cert_file = gtk_file_chooser_button_new(_("Choose Client Certificate"), GTK_FILE_CHOOSER_ACTION_OPEN);
     gtk_widget_set_hexpand(sdi->cert_file, TRUE);
     smtp_server_add_widget(grid, ++row, _("Certificate _File:"), sdi->cert_file);
-    if (smtp_server->cert_file != NULL) {
-    	gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(sdi->cert_file), smtp_server->cert_file);
+    if (server->cert_file != NULL) {
+    	gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(sdi->cert_file), server->cert_file);
     }
     g_signal_connect(sdi->cert_file, "file-set", G_CALLBACK(smtp_server_changed), sdi);
 
@@ -590,8 +540,8 @@ libbalsa_smtp_server_dialog(LibBalsaSmtpServer * smtp_server,
     smtp_server_add_widget(grid, ++row, _("Certificate _Pass Phrase:"), sdi->cert_pass);
     g_object_set(G_OBJECT(sdi->cert_pass), "input-purpose", GTK_INPUT_PURPOSE_PASSWORD, NULL);
     gtk_entry_set_visibility(GTK_ENTRY(sdi->cert_pass), FALSE);
-    if (smtp_server->cert_passphrase != NULL) {
-        gtk_entry_set_text(GTK_ENTRY(sdi->cert_pass), smtp_server->cert_passphrase);
+    if (server->cert_passphrase != NULL) {
+        gtk_entry_set_text(GTK_ENTRY(sdi->cert_pass), server->cert_passphrase);
     }
     g_signal_connect(sdi->cert_pass, "changed", G_CALLBACK(smtp_server_changed), sdi);
 

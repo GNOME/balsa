@@ -47,10 +47,10 @@ struct _LibBalsaMailboxPop3 {
     gchar *filter_cmd;
     LibBalsaMailbox *inbox;
     gint msg_size_limit;
-    unsigned filter:1; /* filter through procmail/filter_cmd? */
-    unsigned disable_apop:1; /* Some servers claim to support it but
+    gboolean filter; /* filter through procmail/filter_cmd? */
+    gboolean disable_apop; /* Some servers claim to support it but
                               * they do not. */
-    unsigned enable_pipe:1;  /* ditto */
+    gboolean enable_pipe;  /* ditto */
 };
 
 LibBalsaMailboxPop3 *libbalsa_mailbox_pop3_new(void);
@@ -58,6 +58,5 @@ void libbalsa_mailbox_pop3_set_inbox(LibBalsaMailbox *mailbox,
                                      LibBalsaMailbox *inbox);
 void libbalsa_mailbox_pop3_set_msg_size_limit(LibBalsaMailboxPop3 *mailbox,
                                               gint sz_limit);
-extern int PopDebug;
 
 #endif				/* __LIBBALSA_MAILBOX_POP3_H__ */

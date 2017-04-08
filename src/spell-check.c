@@ -541,8 +541,7 @@ done_cb(GtkButton * button, gpointer data)
  * dictionary to do the checking.
  * */
 
-static GRegex *quoted_rex;
-static gboolean quoted_rex_compiled = FALSE;
+static GRegex *quoted_rex = NULL;
 
 void
 balsa_spell_check_start(BalsaSpellCheck * spell_check)
@@ -617,13 +616,9 @@ balsa_spell_check_start(BalsaSpellCheck * spell_check)
      * balsa_app.quote_regex may change, so compile it new every
      * time!)
      */
-    if (quoted_rex_compiled)
+    if (quoted_rex != NULL)
         g_regex_unref(quoted_rex);
     quoted_rex = balsa_quote_regex_new();
-    if (!quoted_rex)
-        quoted_rex_compiled = FALSE;
-    else
-        quoted_rex_compiled = TRUE;
 
     spell_check->end_iter = start;
 
@@ -832,18 +827,13 @@ balsa_spell_check_destroy(GObject * object)
 	spch_finish(spell_check, FALSE);
     }
 
-    g_free(spell_check->language_tag);
-    spell_check->language_tag = NULL;
-
     if (spell_check->highlight_idle_id) {
         g_source_remove(spell_check->highlight_idle_id);
         spell_check->highlight_idle_id = 0;
     }
 
-    if (quoted_rex_compiled) {
-        g_regex_unref(quoted_rex);
-        quoted_rex_compiled = FALSE;
-    }
+    g_clear_pointer(&spell_check->language_tag, g_free);
+    g_clear_pointer(&quoted_rex, g_regex_unref);
 
     if (G_OBJECT_CLASS(balsa_spell_check_parent_class)->dispose)
         (*G_OBJECT_CLASS(balsa_spell_check_parent_class)->
@@ -1077,8 +1067,8 @@ next_word(BalsaSpellCheck * spell_check)
                                         &line_end, FALSE);
             skip_sig = (!balsa_app.check_sig
                         && strcmp(line, "-- \n") == 0);
-            skip_quoted = (!balsa_app.check_quoted && quoted_rex_compiled
-                           && is_a_quote(line, quoted_rex));
+            skip_quoted = (!balsa_app.check_quoted && quoted_rex != NULL
+                           && is_a_quote(line, quoted_rex) > 0);
             g_free(line);
 
             if (skip_sig)

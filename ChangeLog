@@ -1,3 +1,13 @@
+2017-04-08  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+Streamline code
+
+	* src/spell-check.c: remove redundant gboolean
+	quoted_rex_compiled;
+	(balsa_spell_check_start): do not use it;
+	(next_word): ditto;
+	(balsa_spell_check_destroy): ditto; also use g_clear_pointer.
+
 2017-04-07  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* src/balsa-message.c (select_part): reset adjustments only when

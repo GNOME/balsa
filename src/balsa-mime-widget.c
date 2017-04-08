@@ -249,7 +249,6 @@ balsa_mime_widget_new_unknown(BalsaMessage * bm,
 	 g_ascii_strcasecmp(content_type, "application/octet-stream") == 0)
 	&& LIBBALSA_IS_MAILBOX_LOCAL(mime_body->message->mailbox)) {
         GError *err = NULL;
-	gpointer buffer;
 	GMimeStream *stream = 
             libbalsa_message_body_get_stream(mime_body, &err);
         if(!stream) {
@@ -259,20 +258,25 @@ balsa_mime_widget_new_unknown(BalsaMessage * bm,
             g_clear_error(&err);
             use_content_type = g_strdup(content_type);
         } else {
+        	gpointer buffer;
             ssize_t length = 1024 /* g_mime_stream_length(stream) */ ;
             ssize_t size;
 
-            buffer = g_malloc(length);
+            buffer = g_malloc0(length + 1);
             libbalsa_mime_stream_shared_lock(stream);
             size = g_mime_stream_read(stream, buffer, length);
             libbalsa_mime_stream_shared_unlock(stream);
             g_object_unref(stream);
-            use_content_type = libbalsa_vfs_content_type_of_buffer(buffer, size);
-            if (g_ascii_strncasecmp(use_content_type, "text", 4) == 0
-                && (libbalsa_text_attr_string(buffer) & LIBBALSA_TEXT_HI_BIT)) {
-                /* Hmmm...better stick with application/octet-stream. */
-                g_free(use_content_type);
-                use_content_type = g_strdup("application/octet-stream");
+            if (size != -1) {
+            	use_content_type = libbalsa_vfs_content_type_of_buffer(buffer, size);
+                if (g_ascii_strncasecmp(use_content_type, "text", 4) == 0
+                    && (libbalsa_text_attr_string(buffer) & LIBBALSA_TEXT_HI_BIT)) {
+                    /* Hmmm...better stick with application/octet-stream. */
+                    g_free(use_content_type);
+                    use_content_type = g_strdup("application/octet-stream");
+                }
+            } else {
+            	use_content_type = g_strdup("application/octet-stream");
             }
             g_free(buffer);
         }

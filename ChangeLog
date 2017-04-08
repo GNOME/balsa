@@ -1,3 +1,11 @@
+2017-04-07  Albrecht Dreß
+
+Do not emit a critical warning
+
+	* src/balsa-mime-widget.c (balsa_mime_widget_new_unknown): Do
+	  not emit a critical warning on the console, e.g. when I select
+	  an encrypted message, but cancel the decryption:
+
 2017-04-02  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Deprecation cleanup

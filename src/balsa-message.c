@@ -2283,7 +2283,6 @@ static void
 select_part(BalsaMessage * bm, BalsaPartInfo *info)
 {
     LibBalsaMessageBody *body;
-    GtkAdjustment *hadj, *vadj;
 
     hide_all_parts(bm);
     bm_disable_find_entry(bm);
@@ -2293,10 +2292,14 @@ select_part(BalsaMessage * bm, BalsaPartInfo *info)
 
     g_signal_emit(G_OBJECT(bm), balsa_message_signals[SELECT_PART], 0);
 
-    g_object_get(G_OBJECT(bm->scroll), "hadjustment", &hadj,
-                                              "vadjustment", &vadj, NULL);
-    gtk_adjustment_set_value(hadj, 0);
-    gtk_adjustment_set_value(vadj, 0);
+    if (body != NULL) {
+        GtkAdjustment *hadj, *vadj;
+
+        g_object_get(G_OBJECT(bm->scroll), "hadjustment", &hadj,
+                                           "vadjustment", &vadj, NULL);
+        gtk_adjustment_set_value(hadj, 0);
+        gtk_adjustment_set_value(vadj, 0);
+    }
 }
 
 GtkWidget *

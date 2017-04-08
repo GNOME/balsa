@@ -1,3 +1,8 @@
+2017-04-07  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* src/balsa-message.c (select_part): reset adjustments only when
+	  displaying a real message part.
+
 2017-04-07  Albrecht Dreß
 
 Do not emit a critical warning

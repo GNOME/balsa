@@ -1,5 +1,10 @@
 2017-04-09  Albrecht Dreß
 
+	* libbalsa/mailbox_pop3.c (libbalsa_mailbox_pop3_check): do not
+	unref NULL NetClientPop object.
+
+2017-04-09  Albrecht Dreß
+
 	* libnetclient/net-client.c (net_client_new): do not return
 	pointer to finalized object.
 

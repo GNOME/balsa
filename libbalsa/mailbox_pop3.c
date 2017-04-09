@@ -656,6 +656,7 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
 			if (result) {
 				result = net_client_pop_retr(pop, msg_list, message_cb, &fd, &err);
 				if (result && mbox->delete_from_server) {
+					libbalsa_mailbox_progress_notify(mailbox, LIBBALSA_NTFY_PROGRESS, 1, 1, _("Deleting messages on server…"));
 					result = net_client_pop_dele(pop, msg_list, &err);
 				}
 			}
@@ -680,11 +681,11 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
 			libbalsa_information(LIBBALSA_INFORMATION_ERROR, _("POP3 error: %s"), err->message);
 			g_error_free(err);
 		}
-	}
 
-	/* done - clean up */
-	libbalsa_mailbox_progress_notify(mailbox, LIBBALSA_NTFY_PROGRESS, 0, 1, _("Finished"));
-	g_object_unref(G_OBJECT(pop));
+		/* done - clean up */
+		libbalsa_mailbox_progress_notify(mailbox, LIBBALSA_NTFY_PROGRESS, 0, 1, _("Finished"));
+		g_object_unref(G_OBJECT(pop));
+	}
 }
 
 

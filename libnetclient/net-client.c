@@ -57,6 +57,7 @@ net_client_new(const gchar *host_and_port, guint16 default_port, gsize max_line_
 
 	if (client->priv->sock == NULL) {
 		g_object_unref(G_OBJECT(client));
+		client = NULL;
 	} else {
 		client->priv->host_and_port = g_strdup(host_and_port);
 		client->priv->default_port = default_port;

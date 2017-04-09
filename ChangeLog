@@ -1,3 +1,8 @@
+2017-04-09  Albrecht Dreß
+
+	* libnetclient/net-client.c (net_client_new): do not return
+	pointer to finalized object.
+
 2017-04-08  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 Streamline code

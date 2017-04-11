@@ -11,6 +11,7 @@ imap_tst_SOURCES = imap_tst.c
 
 imap_tst_LDADD = \
 	libimap.a	\
+	${top_srcdir}/libnetclient/libnetclient.a \
         $(BALSA_LIBS)
 
 #libimap_la_SOURCES =  
@@ -41,6 +42,7 @@ EXTRA_DIST = \
 	libimap-marshal.list
 
 AM_CPPFLAGS = -I${top_builddir} -I${top_srcdir} -I${top_srcdir}/libbalsa \
+	-I${top_srcdir}/libnetclient \
 	-I${top_srcdir}/libbalsa/imap \
 	$(BALSA_CFLAGS)
 

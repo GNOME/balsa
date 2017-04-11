@@ -114,7 +114,7 @@ imap_auth_sasl(ImapMboxHandle* handle, ImapCapability cap,
 {
   char *msg = NULL, *msg64;
   ImapResponse rc;
-  int msglen, msg64len;
+  int msglen;
   unsigned cmdno;
   gboolean sasl_ir;
   
@@ -127,9 +127,7 @@ imap_auth_sasl(ImapMboxHandle* handle, ImapCapability cap,
     return IMAP_AUTH_CANCELLED;
   }
   
-  msg64len = 2*(msglen+2);
-  msg64 = g_malloc(msg64len);
-  lit_conv_to_base64(msg64, msg, msglen, msg64len);
+  msg64 = g_base64_encode((const guchar *) msg, msglen);
   g_free(msg);
 
   if(sasl_ir) { /* save one RTT */

@@ -1,3 +1,9 @@
+2017-04-12  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* libbalsa/imap/auth-gssapi.c (ag_get_token), (ag_parse_request),
+	(ag_negotiate_parameters): use existing buffers for base-64
+	conversions.
+
 2017-04-09  Albrecht Dreß
 
 	* libbalsa/mailbox_pop3.c (libbalsa_mailbox_pop3_check): do not

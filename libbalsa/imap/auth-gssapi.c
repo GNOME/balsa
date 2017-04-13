@@ -218,8 +218,10 @@ ag_get_token(gss_ctx_id_t *context, gss_name_t target, gss_buffer_t sec_token,
     OM_uint32 state, min_stat;
     gss_buffer_desc send_token;
     unsigned cflags;
-    gchar *b64buf;
-    
+    gint outlen;
+    gint b64state = 0;
+    gint b64save = 0;
+
     *client_token = '\0';
     state = gss_init_sec_context
         (&min_stat, GSS_C_NO_CREDENTIAL, context,
@@ -230,9 +232,9 @@ ag_get_token(gss_ctx_id_t *context, gss_name_t target, gss_buffer_t sec_token,
     if (state != GSS_S_COMPLETE && state != GSS_S_CONTINUE_NEEDED)
         return state;
 
-    b64buf = g_base64_encode(send_token.value, send_token.length);
-    strncpy(client_token, b64buf, (size_t) token_sz);
-    g_free(b64buf);
+    outlen = g_base64_encode_step(send_token.value, send_token.length, FALSE,
+                                  client_token, &b64state, &b64save);
+    outlen += g_base64_encode_close(FALSE, client_token + outlen, &b64state, &b64save);
     gss_release_buffer(&min_stat, &send_token);
     return state;
 }
@@ -242,12 +244,12 @@ ag_parse_request(ImapMboxHandle *handle, char *buf, ssize_t buf_sz,
                  gss_buffer_desc *request)
 {
     char line[LONG_STRING];
-    guchar *rawbuf;
+    gint b64state = 0;
+    guint b64save = 0;
 
     sio_gets(handle->sio, line, LONG_STRING); /* FIXME: error checking */
-    rawbuf = g_base64_decode(line, &request->length);
-    memcpy(buf, rawbuf, request->length);
-    g_free(rawbuf);
+    request->length =
+        g_base64_decode_step(line, strlen(line), (guchar *) buf, &b64state, &b64save);
     request->value = buf;
 }
 
@@ -267,7 +269,9 @@ ag_negotiate_parameters(ImapMboxHandle *handle, const char * user,
     char server_conf_flags;
     unsigned char *t;
     unsigned long buf_size;
-    gchar *b64buf;
+    gint outlen;
+    gint b64state = 0;
+    gint b64save = 0;
 
     ag_parse_request(handle, buf, sizeof(buf), &request_buf);
     state = gss_unwrap(&min_stat, context, &request_buf, &send_token,
@@ -314,10 +318,12 @@ ag_negotiate_parameters(ImapMboxHandle *handle, const char * user,
         return FALSE;
     }
     
-    b64buf = g_base64_encode(send_token.value, send_token.length);
-    sio_printf(handle->sio, "%s\r\n", b64buf); imap_handle_flush(handle);
-    g_free(b64buf);
-    
+    outlen = g_base64_encode_step(send_token.value,
+                                  MIN(send_token.length, ((sizeof buf - 1) / 4 - 1) * 3),
+                                  FALSE, buf, &b64state, &b64save);
+    outlen += g_base64_encode_close(FALSE, buf + outlen, &b64state, &b64save);
+    buf[outlen] = '\0';
+    sio_printf(handle->sio, "%s\r\n", buf); imap_handle_flush(handle);
     WAIT_FOR_PROMPT(*rc,handle,cmdno,buf,sizeof(buf));
     if (*rc == IMR_RESPOND)
         return FALSE;

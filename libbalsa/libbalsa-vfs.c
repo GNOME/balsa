@@ -491,6 +491,7 @@ libbalsa_vfs_create_stream(const LibbalsaVfs * file, mode_t mode,
                            gboolean rdwr, GError ** err)
 {
     struct _LibbalsaVfsPriv * priv;
+    GMimeStream *stream;
 
     g_return_val_if_fail(file, NULL);
     g_return_val_if_fail(file->priv, NULL);
@@ -500,7 +501,10 @@ libbalsa_vfs_create_stream(const LibbalsaVfs * file, mode_t mode,
     /* use GIO to create a GMime stream */
     g_return_val_if_fail(priv->gio_gfile, NULL);
 
-    return g_mime_stream_gio_new(priv->gio_gfile);
+    stream = g_mime_stream_gio_new(priv->gio_gfile);
+    g_mime_stream_gio_set_owner((GMimeStreamGIO *) stream, FALSE);
+
+    return stream;
 }
 
 

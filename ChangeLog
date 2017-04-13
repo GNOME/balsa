@@ -1,5 +1,10 @@
 2017-04-12  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	* libbalsa/libbalsa-vfs.c (libbalsa_vfs_create_stream): retain
+	ownership of priv->gio_gfile.
+
+2017-04-12  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* libbalsa/imap/auth-gssapi.c (ag_get_token), (ag_parse_request),
 	(ag_negotiate_parameters): use existing buffers for base-64
 	conversions.

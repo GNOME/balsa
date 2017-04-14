@@ -1,3 +1,8 @@
+2017-04-13  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* libbalsa/address-book-ldif.c (string_to_value_spec),
+	(value_spec_to_string): remove custom base64 encode and decode stuff.
+
 2017-04-12  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* libbalsa/libbalsa-vfs.c (libbalsa_vfs_create_stream): retain

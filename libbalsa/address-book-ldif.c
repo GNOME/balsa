@@ -105,115 +105,6 @@ libbalsa_address_book_ldif_new(const gchar * name, const gchar * path)
 
 /* Helpers */
 
-/* BASE64 conversion routines. Let us know if you know a better place
- * for them. These routines are very closely based on GPL libmutt code.
- */
-
-#define BAD     -1
-static int Index_64[128] = {
-    -1,-1,-1,-1, -1,-1,-1,-1, -1,-1,-1,-1, -1,-1,-1,-1,
-    -1,-1,-1,-1, -1,-1,-1,-1, -1,-1,-1,-1, -1,-1,-1,-1,
-    -1,-1,-1,-1, -1,-1,-1,-1, -1,-1,-1,62, -1,-1,-1,63,
-    52,53,54,55, 56,57,58,59, 60,61,-1,-1, -1,-1,-1,-1,
-    -1, 0, 1, 2,  3, 4, 5, 6,  7, 8, 9,10, 11,12,13,14,
-    15,16,17,18, 19,20,21,22, 23,24,25,-1, -1,-1,-1,-1,
-    -1,26,27,28, 29,30,31,32, 33,34,35,36, 37,38,39,40,
-    41,42,43,44, 45,46,47,48, 49,50,51,-1, -1,-1,-1,-1
-};
-
-#define base64val(c) Index_64[(unsigned int)(c)]
-static char B64Chars[64] = {
-  'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O',
-  'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd',
-  'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's',
-  't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7',
-  '8', '9', '+', '/'
-};
-
-/* raw bytes to null-terminated base 64 string */
-static void
-string_to_base64(char *out, const char *in, size_t len, size_t olen)
-{
-  unsigned char in0, in1, in2;
-
-  while (len >= 3 && olen > 10)
-  {
-    in0 = in[0]; in1 = in[1]; in2 = in[2];
-    *out++ = B64Chars[in0 >> 2];
-    *out++ = B64Chars[((in0 << 4) & 0x30) | (in1 >> 4)];
-    *out++ = B64Chars[((in1 << 2) & 0x3c) | (in2 >> 6)];
-    *out++ = B64Chars[in2 & 0x3f];
-    olen  -= 4;
-    len   -= 3;
-    in    += 3;
-  }
-
-  /* clean up remainder */
-  if (len > 0 && olen > 4)
-  {
-    unsigned char fragment;
-
-    in0 = in[0];
-    *out++ = B64Chars[in0 >> 2];
-    fragment = (in0 << 4) & 0x30;
-    if (len > 1) {
-      in1 = in[1];
-      fragment |= in1 >> 4;
-      *out++ = B64Chars[fragment];
-      *out++ = B64Chars[(in1 << 2) & 0x3c];
-    } else {
-      *out++ = B64Chars[fragment];
-      *out++ = '=';
-    }
-    *out++ = '=';
-  }
-  *out = '\0';
-}
-
-/* Convert '\0'-terminated base 64 string to raw bytes.
- * Returns length of returned buffer, or -1 on error */
-static int
-string_from_base64 (char *out, const char *in)
-{
-  int len = 0;
-  register unsigned char digit1, digit2, digit3, digit4;
-
-  do
-  {
-    digit1 = in[0];
-    if (digit1 > 127 || base64val (digit1) == BAD)
-      return -1;
-    digit2 = in[1];
-    if (digit2 > 127 || base64val (digit2) == BAD)
-      return -1;
-    digit3 = in[2];
-    if (digit3 > 127 || ((digit3 != '=') && (base64val (digit3) == BAD)))
-      return -1;
-    digit4 = in[3];
-    if (digit4 > 127 || ((digit4 != '=') && (base64val (digit4) == BAD)))
-      return -1;
-    in += 4;
-
-    /* digits are already sanity-checked */
-    *out++ = (base64val(digit1) << 2) | (base64val(digit2) >> 4);
-    len++;
-    if (digit3 != '=')
-    {
-      *out++ = ((base64val(digit2) << 4) & 0xf0) | (base64val(digit3) >> 2);
-      len++;
-      if (digit4 != '=')
-      {
-	*out++ = ((base64val(digit3) << 6) & 0xc0) | base64val(digit4);
-	len++;
-      }
-    }
-  }
-  while (*in && digit4 != '=');
-
-  *out = '\0';
-  return len;
-}
-
 /* according to rfc2849, value_spec must be either 7-bit ASCII
    (safe-string) or a base64-string. Or an url, which is not
    implemented yet.
@@ -221,20 +112,31 @@ string_from_base64 (char *out, const char *in)
 static gchar*
 string_to_value_spec(const gchar* str)
 {
-    gboolean issafe = 1;
+    gboolean issafe = TRUE;
     const gchar* p;
 
-    for(p=str; *p && issafe; p++)
-	issafe = (*p &0x80) ==0;
+    for(p = str; *p != '\0' && issafe; p++)
+	issafe = (*p &0x80) == 0;
 
-    if(issafe) 
+    if (issafe) {
 	return g_strconcat(" ",str, NULL);
-    else {
-	int len = strlen(str);
-	int sz = (len*4)/3+13;
-	gchar* res = g_malloc(sz+2);
+    } else {
+	gsize len;
+	gsize sz;
+	gchar *res;
+        gsize outlen;
+        gint state = 0;
+        gint save = 0;
+
+	len = strlen(str);
+	sz = (len / 3 + 1) * 4 + 1;
+	res = g_malloc(sz + 2);
 	strcpy(res, ": ");
-	string_to_base64(res+2, str, len, sz);
+        outlen = g_base64_encode_step((const guchar *) str, len, FALSE, res + 2,
+                                      &state, &save);
+        outlen += g_base64_encode_close(FALSE, res + 2 + outlen, &state, &save);
+        res[2 + outlen] = '\0';
+
 	return res;
     }
 }
@@ -244,8 +146,9 @@ value_spec_to_string(gchar* str)
 {
     gchar *res;
     if(str[0] == ':') {
-	res = g_malloc(strlen(str)+1);
-	string_from_base64(res, g_strchug(str+1));
+        gsize out_len;
+
+        res = (gchar *) g_base64_decode(g_strchug(str + 1), &out_len);
     } else
 	res = g_strdup(g_strstrip(str));
     return res;

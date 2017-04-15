@@ -1,3 +1,12 @@
+2017-04-15  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Fix some more conversion specifier mismatches
+
+	* libnetclient/net-client-pop.c (net_client_pop_list): cast gsize
+	  to unsigned long, to print portably with %lu.
+	* libnetclient/net-client.c (net_client_read_line): use
+	  G_GSIZE_FORMAT to scan portably a POP3 message list.
+
 2017-04-14  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* libbalsa/misc.h: define libbalsa_urlencode and libbalsa_decode

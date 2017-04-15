@@ -243,7 +243,7 @@ net_client_pop_list(NetClientPop *client, GList **msg_list, gboolean with_uid, G
 
 				info = g_new0(NetClientPopMessageInfo, 1U);
 				*msg_list = g_list_prepend(*msg_list, info);
-				if (sscanf(reply, "%u %lu", &info->id, &info->size) != 2) {
+				if (sscanf(reply, "%u %" G_GSIZE_FORMAT, &info->id, &info->size) != 2) {
 					result = FALSE;
 					g_set_error(error, NET_CLIENT_POP_ERROR_QUARK, (gint) NET_CLIENT_ERROR_POP_PROTOCOL, _("bad server reply"));
 				}

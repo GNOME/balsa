@@ -129,62 +129,6 @@ libbalsa_get_domainname(void)
     return NULL;
 }
 
-/* libbalsa_urlencode: 
- * Taken from PHP's urlencode()
- */
-gchar*
-libbalsa_urlencode(const gchar* str)
-{
-    static const unsigned char hexchars[] = "0123456789ABCDEF";
-    gchar *retval = NULL;
-    gchar *x = NULL;
-    
-    g_return_val_if_fail(str != NULL, NULL);
-    
-    retval = malloc(strlen(str) * 3 + 1);
-    
-    for (x = retval; *str != '\0'; str++, x++) {
-       *x = *str;
-       if (*x == ' ') {
-           *x = '+';
-       } else if (!isalnum(*x) && strchr("_-.", *x) == NULL) {
-           /* Allow only alnum chars and '_', '-', '.'; escape the rest */
-           *x++ = '%';
-           *x++ = hexchars[(*str >> 4) & 0x0F];
-           *x = hexchars[(*str) & 0x0F];
-       }
-    }
-    
-    *x = '\0';
-    return retval;
-}
-
-gchar *
-libbalsa_urldecode(const gchar * str)
-{
-    gchar *retval;
-    gchar *x;
-
-    retval = g_new(char, strlen(str)+1);
-
-    for (x = retval; *str != '\0'; str++, x++) {
-	*x = *str;
-	if (*x == '+')
-	    *x = ' ';
-	else if (*x == '%') {
-	    if (!*++str || !g_ascii_isxdigit(*str))
-		break;
-	    *x = g_ascii_xdigit_value(*str);
-	    if (!*++str || !g_ascii_isxdigit(*str))
-		break;
-	    *x = *x << 4 | g_ascii_xdigit_value(*str);
-	}
-    }
-
-    *x = '\0';
-    return retval;
-}
-
 /* readfile allocates enough space for the ending '\0' characeter as well.
    returns the number of read characters.
 */

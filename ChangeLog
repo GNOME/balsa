@@ -1,5 +1,12 @@
 2017-04-14  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	* libbalsa/misc.h: define libbalsa_urlencode and libbalsa_decode
+	  to use g_uri_escape_string and g_uri_unescape_string, instead of
+	  declaring the custom functions;
+	* libbalsa/misc.c: remove the custom functions.
+
+2017-04-14  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* libbalsa/mailbox_pop3.c (notify_progress),
 	  (libbalsa_mailbox_pop3_check): cast gsize to unsigned long, to
 	  print portably with %lu.

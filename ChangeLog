@@ -1,3 +1,9 @@
+2017-04-14  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* libbalsa/mailbox_pop3.c (notify_progress),
+	  (libbalsa_mailbox_pop3_check): cast gsize to unsigned long, to
+	  print portably with %lu.
+
 2017-04-13  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* libbalsa/address-book-ldif.c (string_to_value_spec),

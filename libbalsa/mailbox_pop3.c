@@ -377,7 +377,8 @@ notify_progress(const struct fetch_data *fd)
 	gchar *msgbuf;
 
 	recvbuf = libbalsa_size_to_gchar(fd->received);
-	msgbuf = g_strdup_printf(_("Message %lu of %lu (%s of %s)"), fd->msgno, fd->total_messages, recvbuf, fd->total_size_msg);
+	msgbuf = g_strdup_printf(_("Message %lu of %lu (%s of %s)"), (unsigned long) fd->msgno, (unsigned long) fd->total_messages,
+		recvbuf, fd->total_size_msg);
 	g_free(recvbuf);
 	libbalsa_mailbox_progress_notify(LIBBALSA_MAILBOX(fd->mailbox), LIBBALSA_NTFY_PROGRESS, fd->received, fd->total_size, msgbuf);
 	g_free(msgbuf);
@@ -645,7 +646,7 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
 			fd.mailbox = mailbox;
 			fd.total_size_msg = libbalsa_size_to_gchar(fd.total_size);
 
-			msgbuf = g_strdup_printf(_("%lu new messages (%s)"), fd.total_messages, fd.total_size_msg);
+			msgbuf = g_strdup_printf(_("%lu new messages (%s)"), (unsigned long) fd.total_messages, fd.total_size_msg);
 			libbalsa_mailbox_progress_notify(mailbox, LIBBALSA_NTFY_PROGRESS, 0, 1, msgbuf);
 			g_free(msgbuf);
 

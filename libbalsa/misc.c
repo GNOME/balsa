@@ -48,20 +48,6 @@ static const gchar *libbalsa_get_codeset_name(const gchar *txt,
 					      LibBalsaCodeset Codeset);
 static int getdnsdomainname(char *s, size_t l);
 
-gchar *
-libbalsa_get_hostname(void)
-{
-    struct utsname utsname;
-    gchar *p;
-    uname(&utsname);
-
-    /* Some systems return Fqdn rather than just the hostname */
-    if ((p = strchr (utsname.nodename, '.')))
-	*p = 0;
-
-    return g_strdup (utsname.nodename);
-}
-
 static int 
 getdnsdomainname (char *s, size_t l)
 {
@@ -127,58 +113,6 @@ libbalsa_get_domainname(void)
 	return g_strdup(domainname);
     }
     return NULL;
-}
-
-/* readfile allocates enough space for the ending '\0' characeter as well.
-   returns the number of read characters.
-*/
-size_t libbalsa_readfile(FILE * fp, char **buf)
-{
-    size_t size;
-    off_t offset;
-    int r;
-    int fd;
-    struct stat statbuf;
-
-    *buf = NULL;
-    if (!fp)
-	return 0;
-
-    fd = fileno(fp);
-    if (fstat(fd, &statbuf) == -1)
-	return -1;
-
-    size = statbuf.st_size;
-
-    if (!size) {
-	*buf = NULL;
-	return size;
-    }
-
-    lseek(fd, 0, SEEK_SET);
-
-    *buf = (char *) g_malloc(size + 1);
-    if (*buf == NULL)
-	return -1;
-
-    offset = 0;
-    while ((size_t)offset < size) {
-	r = read(fd, *buf + offset, size - offset);
-	if (r == 0) { /* proper EOF */
-            (*buf)[offset] = '\0';
-	    return offset;
-        }
-	if (r > 0) {
-	    offset += r;
-	} else if ((errno != EAGAIN) && (errno != EINTR)) {
-	    perror("Error reading file:");
-            (*buf)[offset] = '\0';
-	    return -1;
-	}
-    }
-    (*buf)[size] = '\0';
-
-    return size;
 }
 
 /* readfile_nostat is identical to readfile except it reads to EOF.

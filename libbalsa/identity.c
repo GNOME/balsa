@@ -340,23 +340,15 @@ libbalsa_identity_get_signature(LibBalsaIdentity* identity, GtkWindow *parent)
                  _("Error executing signature generator %s"),
                  identity->signature_path);
     } else {
-        FILE *fp;
+    	GError *error = NULL;
 
-        /* sign is normal file */
-        fp = fopen(path, "r");
-        if (fp) {
-            libbalsa_readfile_nostat(fp, &ret);
-            fclose(fp);
-        } else
+    	if (!g_file_get_contents(path, &ret, NULL, &error)) {
             libbalsa_information_parented(parent, LIBBALSA_INFORMATION_ERROR,
-                                          _("Cannot open signature file “%s” "
-                                            "for reading"),
-                                          identity->signature_path);
+            	_("Cannot read signature file “%s”: %s"), identity->signature_path, error->message);
+    		g_error_free(error);
+    	}
     }
-    if(!ret)
-        libbalsa_information_parented(parent, LIBBALSA_INFORMATION_ERROR,
-                                   _("Error reading signature from %s"), path);
-    else {
+    if (ret != NULL) {
         if(!libbalsa_utf8_sanitize(&ret, FALSE, NULL))
             libbalsa_information_parented
                 (parent, LIBBALSA_INFORMATION_ERROR,

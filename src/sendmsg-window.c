@@ -81,7 +81,6 @@
 #include <gtksourceview/gtksource.h>
 #endif                          /* HAVE_GTKSOURCEVIEW */
 
-#define GNOME_MIME_BUG_WORKAROUND 1
 typedef struct {
     pid_t pid_editor;
     gchar *filename;
@@ -4625,67 +4624,62 @@ do_insert_string_select_ch(BalsaSendmsg* bsmsg, GtkTextBuffer *buffer,
 }
 
 static void
-insert_file_response(GtkWidget * selector, gint response,
-	             BalsaSendmsg * bsmsg)
+insert_file_response(GtkWidget    *selector,
+					 gint          response,
+					 BalsaSendmsg *bsmsg)
 {
     GtkFileChooser *fc;
     gchar *fname;
-    FILE *fl;
-    GtkTextBuffer *buffer;
-    gchar * string;
-    size_t len;
 
     if (response != GTK_RESPONSE_OK) {
-	gtk_widget_destroy(selector);
-	return;
+    	gtk_widget_destroy(selector);
+    	return;
     }
 
     fc = GTK_FILE_CHOOSER(selector);
     fname = gtk_file_chooser_get_filename(fc);
+    if (fname != NULL) {
+        gchar *string;
+        gsize len;
+        GError *error = NULL;
 
-    if ((fl = fopen(fname, "rt")) ==NULL) {
-	balsa_information_parented(GTK_WINDOW(bsmsg->window),
-                                   LIBBALSA_INFORMATION_WARNING,
-                                   _("Could not open the file %s.\n"), fname);
-	g_free(fname);
-	return;
+    	if (g_file_get_contents(fname, &string, &len, &error)) {
+            LibBalsaTextAttribute attr;
+            GtkTextBuffer *buffer;
+
+            buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
+            attr = libbalsa_text_attr_string(string);
+            if (!attr || (attr & LIBBALSA_TEXT_HI_UTF8)) {
+                /* Ascii or utf-8 */
+                gtk_text_buffer_insert_at_cursor(buffer, string, -1);
+            } else {
+                /* Neither ascii nor utf-8... */
+                gchar *s = NULL;
+                const gchar *charset = sw_preferred_charset(bsmsg);
+
+                if (sw_can_convert(string, -1, "UTF-8", charset, &s)) {
+                    /* ...but seems to be in current charset. */
+                    gtk_text_buffer_insert_at_cursor(buffer, s, -1);
+                    g_free(s);
+                } else
+                    /* ...and can't be decoded from current charset. */
+                    do_insert_string_select_ch(bsmsg, buffer, string, len, fname);
+            }
+            g_free(string);
+
+            /* Use the same folder as for attachments. */
+            g_free(balsa_app.attach_dir);
+            balsa_app.attach_dir = gtk_file_chooser_get_current_folder(fc);
+    	} else {
+    		balsa_information_parented(GTK_WINDOW(bsmsg->window),
+    			LIBBALSA_INFORMATION_WARNING, _("Cannot not read the file “%s”: %s"), fname, error->message);
+    		g_error_free(error);
+    	}
+
+        g_free(fname);
     }
-
-    buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
-    string = NULL;
-    len = libbalsa_readfile(fl, &string);
-    fclose(fl);
-
-    if (string) {
-        LibBalsaTextAttribute attr;
-
-        attr = libbalsa_text_attr_string(string);
-        if (!attr || attr & LIBBALSA_TEXT_HI_UTF8)
-            /* Ascii or utf-8 */
-            gtk_text_buffer_insert_at_cursor(buffer, string, -1);
-        else {
-            /* Neither ascii nor utf-8... */
-            gchar *s = NULL;
-            const gchar *charset = sw_preferred_charset(bsmsg);
-
-            if (sw_can_convert(string, -1, "UTF-8", charset, &s)) {
-                /* ...but seems to be in current charset. */
-                gtk_text_buffer_insert_at_cursor(buffer, s, -1);
-                g_free(s);
-            } else
-                /* ...and can't be decoded from current charset. */
-                do_insert_string_select_ch(bsmsg, buffer, string, len,
-                                           fname);
-        }
-        g_free(string);
-    }
-
-    /* Use the same folder as for attachments. */
-    g_free(balsa_app.attach_dir);
-    balsa_app.attach_dir = gtk_file_chooser_get_current_folder(fc);
 
     gtk_widget_destroy(selector);
-    g_free(fname);
 }
 
 static void

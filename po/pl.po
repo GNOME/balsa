@@ -13,8 +13,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-04-09 16:11+0200\n"
-"PO-Revision-Date: 2017-04-09 16:12+0200\n"
+"POT-Creation-Date: 2017-04-16 15:08+0200\n"
+"PO-Revision-Date: 2017-04-16 15:09+0200\n"
 "Last-Translator: Piotr Drąg <piotrdrag@gmail.com>\n"
 "Language-Team: Polish <community-poland@mozilla.org>\n"
 "Language: pl\n"
@@ -74,14 +74,14 @@ msgid "Unknown error"
 msgstr "Nieznany błąd"
 
 #. The externq database doesn't support Id's, sorry!
-#: ../libbalsa/address-book-extern.c:209 ../libbalsa/address-book-ldif.c:330
+#: ../libbalsa/address-book-extern.c:209 ../libbalsa/address-book-ldif.c:233
 msgid "No-Id"
 msgstr "Brak identyfikatora"
 
 #: ../libbalsa/address-book-extern.c:214 ../libbalsa/address-book-extern.c:372
-#: ../libbalsa/address-book-ldap.c:497 ../libbalsa/address-book-ldif.c:309
-#: ../libbalsa/address-book-ldif.c:333 ../libbalsa/address-book-ldif.c:352
-#: ../libbalsa/address-book-ldif.c:356 ../libbalsa/address-book-vcard.c:158
+#: ../libbalsa/address-book-ldap.c:497 ../libbalsa/address-book-ldif.c:212
+#: ../libbalsa/address-book-ldif.c:236 ../libbalsa/address-book-ldif.c:255
+#: ../libbalsa/address-book-ldif.c:259 ../libbalsa/address-book-vcard.c:158
 #: ../libbalsa/address-book-vcard.c:256 ../libbalsa/address.c:404
 #: ../libbalsa/rfc6350.c:112
 msgid "No-Name"
@@ -1004,22 +1004,22 @@ msgstr ""
 "\n"
 "Klucz: %s"
 
-#: ../libbalsa/libbalsa-vfs.c:553 ../src/sendmsg-window.c:4493
+#: ../libbalsa/libbalsa-vfs.c:557 ../src/sendmsg-window.c:4493
 #, c-format
 msgid "not a regular file"
 msgstr "nie jest zwykłym plikiem"
 
-#: ../libbalsa/libbalsa-vfs.c:605
+#: ../libbalsa/libbalsa-vfs.c:609
 #, c-format
 msgid "Cannot launch, missing application"
 msgstr "Nie można uruchomić, brak programu"
 
-#: ../libbalsa/libbalsa-vfs.c:671
+#: ../libbalsa/libbalsa-vfs.c:675
 #, c-format
 msgid "Open with %s"
 msgstr "Otwórz za pomocą „%s”"
 
-#: ../libbalsa/libbalsa-vfs.c:724
+#: ../libbalsa/libbalsa-vfs.c:728
 #, c-format
 msgid "Open _part with %s"
 msgstr "Otwórz _część za pomocą „%s”"
@@ -1363,47 +1363,51 @@ msgstr "Przesłanie wiadomości POP do %s się nie powiodło: %s"
 msgid "Message %lu of %lu (%s of %s)"
 msgstr "%lu. wiadomość z %lu (%s z %s)"
 
-#: ../libbalsa/mailbox_pop3.c:435
+#: ../libbalsa/mailbox_pop3.c:436
 #, c-format
 msgid "Error appending message %d from %s to %s: %s"
 msgstr "Błąd podczas dołączania wiadomości %d od %s do %s: %s"
 
-#: ../libbalsa/mailbox_pop3.c:489 ../libbalsa/send.c:635
+#: ../libbalsa/mailbox_pop3.c:490 ../libbalsa/send.c:635
 #, c-format
 msgid "Cannot load certificate file %s: %s"
 msgstr "Nie można wczytać pliku certyfikatu %s: %s"
 
-#: ../libbalsa/mailbox_pop3.c:503
+#: ../libbalsa/mailbox_pop3.c:504
 #, c-format
 msgid "POP3 mailbox %s: cannot connect %s: %s"
 msgstr "Skrzynka POP3 %s: nie można połączyć %s: %s"
 
-#: ../libbalsa/mailbox_pop3.c:512
+#: ../libbalsa/mailbox_pop3.c:513
 #, c-format
 msgid "POP3 mailbox %s error: %s"
 msgstr "Błąd skrzynki POP3 %s: %s"
 
-#: ../libbalsa/mailbox_pop3.c:556
+#: ../libbalsa/mailbox_pop3.c:557
 #, c-format
 msgid "POP3 message %d oversized: %s — skipped."
 msgstr "Wiadomość POP3 %d przekroczyła rozmiar: %s — pominięto."
 
-#: ../libbalsa/mailbox_pop3.c:634
+#: ../libbalsa/mailbox_pop3.c:635
 msgid "Connected"
 msgstr "Połączono"
 
-#: ../libbalsa/mailbox_pop3.c:648
+#: ../libbalsa/mailbox_pop3.c:649
 #, c-format
 msgid "%lu new messages (%s)"
 msgstr "Nowe wiadomości: %lu (%s)"
 
-#: ../libbalsa/mailbox_pop3.c:680
+#: ../libbalsa/mailbox_pop3.c:660
+msgid "Deleting messages on server…"
+msgstr "Usuwanie wiadomości na serwerze…"
+
+#: ../libbalsa/mailbox_pop3.c:682
 #, c-format
 msgid "POP3 error: %s"
 msgstr "Błąd POP3: %s"
 
 #. done - clean up
-#: ../libbalsa/mailbox_pop3.c:686
+#: ../libbalsa/mailbox_pop3.c:687
 msgid "Finished"
 msgstr "Ukończono"
 
@@ -1412,107 +1416,107 @@ msgstr "Ukończono"
 msgid "Mailbox (%s) is read-only: cannot change flags."
 msgstr "Skrzynka (%s) jest tylko do odczytu: nie można zmienić etykiet."
 
-#: ../libbalsa/misc.c:596
+#: ../libbalsa/misc.c:540
 msgid "West European"
 msgstr "zachodnioeuropejski"
 
-#: ../libbalsa/misc.c:598 ../libbalsa/misc.c:632
+#: ../libbalsa/misc.c:542 ../libbalsa/misc.c:576
 msgid "East European"
 msgstr "wschodnioeuropejski"
 
-#: ../libbalsa/misc.c:600
+#: ../libbalsa/misc.c:544
 msgid "South European"
 msgstr "południowoeuropejski"
 
-#: ../libbalsa/misc.c:602
+#: ../libbalsa/misc.c:546
 msgid "North European"
 msgstr "północnoeuropejski"
 
-#: ../libbalsa/misc.c:604 ../libbalsa/misc.c:634
+#: ../libbalsa/misc.c:548 ../libbalsa/misc.c:578
 msgid "Cyrillic"
 msgstr "cyrylica"
 
-#: ../libbalsa/misc.c:606 ../libbalsa/misc.c:640
+#: ../libbalsa/misc.c:550 ../libbalsa/misc.c:584
 msgid "Arabic"
 msgstr "arabski"
 
-#: ../libbalsa/misc.c:608 ../libbalsa/misc.c:636
+#: ../libbalsa/misc.c:552 ../libbalsa/misc.c:580
 msgid "Greek"
 msgstr "grecki"
 
-#: ../libbalsa/misc.c:610 ../libbalsa/misc.c:638
+#: ../libbalsa/misc.c:554 ../libbalsa/misc.c:582
 msgid "Hebrew"
 msgstr "hebrajski"
 
-#: ../libbalsa/misc.c:612
+#: ../libbalsa/misc.c:556
 msgid "Turkish"
 msgstr "turecki"
 
-#: ../libbalsa/misc.c:614
+#: ../libbalsa/misc.c:558
 msgid "Nordic"
 msgstr "nordycki"
 
-#: ../libbalsa/misc.c:616
+#: ../libbalsa/misc.c:560
 msgid "Thai"
 msgstr "tajski"
 
-#: ../libbalsa/misc.c:618 ../libbalsa/misc.c:642
+#: ../libbalsa/misc.c:562 ../libbalsa/misc.c:586
 msgid "Baltic"
 msgstr "bałtycki"
 
-#: ../libbalsa/misc.c:620
+#: ../libbalsa/misc.c:564
 msgid "Celtic"
 msgstr "celtycki"
 
-#: ../libbalsa/misc.c:622
+#: ../libbalsa/misc.c:566
 msgid "West European (euro)"
 msgstr "zachodnioeuropejski (euro)"
 
-#: ../libbalsa/misc.c:624
+#: ../libbalsa/misc.c:568
 msgid "Russian"
 msgstr "rosyjski"
 
-#: ../libbalsa/misc.c:626
+#: ../libbalsa/misc.c:570
 msgid "Ukrainian"
 msgstr "ukraiński"
 
-#: ../libbalsa/misc.c:628
+#: ../libbalsa/misc.c:572
 msgid "Japanese"
 msgstr "japoński"
 
-#: ../libbalsa/misc.c:630
+#: ../libbalsa/misc.c:574
 msgid "Korean"
 msgstr "koreański"
 
-#: ../libbalsa/misc.c:823
+#: ../libbalsa/misc.c:767
 #, c-format
 msgid "Cannot open %s: %s"
 msgstr "Nie można otworzyć %s: %s"
 
-#: ../libbalsa/misc.c:832
+#: ../libbalsa/misc.c:776
 #, c-format
 msgid "Cannot open %s: is a symbolic link"
 msgstr "Nie można otworzyć %s: jest dowiązaniem symbolicznym"
 
-#: ../libbalsa/misc.c:959
+#: ../libbalsa/misc.c:903
 msgid "Timeout exceeded while attempting fcntl lock!"
 msgstr "Przekroczono czas oczekiwania podczas próby blokady fcntl."
 
-#: ../libbalsa/misc.c:966
+#: ../libbalsa/misc.c:910
 #, c-format
 msgid "Waiting for fcntl lock… %d"
 msgstr "Oczekiwanie na blokadę fcntl… %d"
 
-#: ../libbalsa/misc.c:994
+#: ../libbalsa/misc.c:938
 msgid "Timeout exceeded while attempting flock lock!"
 msgstr "Przekroczono czas oczekiwania podczas próby blokady flock."
 
-#: ../libbalsa/misc.c:1001
+#: ../libbalsa/misc.c:945
 #, c-format
 msgid "Waiting for flock attempt… %d"
 msgstr "Oczekiwanie na blokadę flock… %d"
 
-#: ../libbalsa/misc.c:1283
+#: ../libbalsa/misc.c:1227
 #, c-format
 msgid "LDAP Directory for %s"
 msgstr "Katalog LDAP dla %s"
@@ -2314,58 +2318,58 @@ msgstr ""
 "• lub administrator sieci w miejscu pracy/uczelni musi połączyć komputer "
 "z Internetem."
 
-#: ../libnetclient/net-client.c:80 ../libnetclient/net-client.c:117
+#: ../libnetclient/net-client.c:81 ../libnetclient/net-client.c:118
 #, c-format
 msgid "network client is already connected"
 msgstr "klient sieciowy jest już połączony"
 
-#: ../libnetclient/net-client.c:156 ../libnetclient/net-client.c:199
+#: ../libnetclient/net-client.c:157 ../libnetclient/net-client.c:200
 #, c-format
 msgid "network client is not connected"
 msgstr "klient sieciowy nie jest połączony"
 
-#: ../libnetclient/net-client.c:167
+#: ../libnetclient/net-client.c:168
 #, c-format
 msgid "reply length %lu exceeds the maximum allowed length %lu"
 msgstr ""
 "długość odpowiedzi (%lu) przekracza maksymalnie dozwoloną długość (%lu)"
 
-#: ../libnetclient/net-client.c:182
+#: ../libnetclient/net-client.c:183
 #, c-format
 msgid "connection lost"
 msgstr "utracono połączenie"
 
-#: ../libnetclient/net-client.c:230
+#: ../libnetclient/net-client.c:231
 #, c-format
 msgid "line too long"
 msgstr "wiersz jest za długi"
 
-#: ../libnetclient/net-client.c:299
+#: ../libnetclient/net-client.c:300
 #, c-format
 msgid "error initializing certificate: %s"
 msgstr "błąd podczas inicjowania certyfikatu: %s"
 
-#: ../libnetclient/net-client.c:309
+#: ../libnetclient/net-client.c:310
 #, c-format
 msgid "error loading certificate: %s"
 msgstr "błąd podczas wczytywania certyfikatu: %s"
 
-#: ../libnetclient/net-client.c:317
+#: ../libnetclient/net-client.c:318
 #, c-format
 msgid "error initializing key: %s"
 msgstr "błąd podczas inicjowania klucza: %s"
 
-#: ../libnetclient/net-client.c:373
+#: ../libnetclient/net-client.c:374
 #, c-format
 msgid "error loading key: %s"
 msgstr "błąd podczas wczytywania klucza: %s"
 
-#: ../libnetclient/net-client.c:413
+#: ../libnetclient/net-client.c:414
 #, c-format
 msgid "not connected"
 msgstr "nie połączono"
 
-#: ../libnetclient/net-client.c:415
+#: ../libnetclient/net-client.c:416
 #, c-format
 msgid "connection is already encrypted"
 msgstr "połączenie jest już zaszyfrowane"

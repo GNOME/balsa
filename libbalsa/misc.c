@@ -228,39 +228,6 @@ libbalsa_delete_directory_contents(const gchar *path)
     return TRUE;
 }
 
-/* libbalsa_truncate_string
- *
- * Arguments:
- *   str    the string to be truncated;
- *   length truncation length;
- *   dots   the number of trailing dots to be used to indicate
- *          truncation.
- *
- * Value:
- *   pointer to a newly allocated string; free with `g_free' when it's
- *   no longer needed.
- */
-gchar *
-libbalsa_truncate_string(const gchar *str, gint length, gint dots)
-{
-    gchar *res;
-    gchar *p;
-
-    if (str == NULL)
-        return NULL;
-
-    if (length <= 0 || strlen(str) <= (guint) length)
-        return g_strdup(str);
-
-    res = g_strndup(str, length);
-
-    p = res + length - dots;
-    while (--dots >= 0)
-        *p++ = '.';
-
-    return res;
-}
-
 /* libbalsa_expand_path:
    We handle only references to ~/.
 */

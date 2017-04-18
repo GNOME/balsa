@@ -1,3 +1,10 @@
+2017-04-18  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Remove unused code
+
+	* libbalsa/misc.c: remove unused function libbalsa_truncate_string;
+	* libbalsa/misc.h: remove obsolete declarations.
+
 2017-04-17  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Clean up identity code

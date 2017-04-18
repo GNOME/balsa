@@ -108,13 +108,8 @@ void libbalsa_wrap_view(GtkTextView * view, gint length);
 void libbalsa_unwrap_buffer(GtkTextBuffer * buffer, GtkTextIter * iter,
                             gint lines);
 
-const char* libbalsa_set_charset(const gchar * charset);
-const char* libbalsa_set_send_charset(const gchar * charset);
-
 gboolean libbalsa_delete_directory_contents(const gchar *path);
-gchar *libbalsa_truncate_string(const gchar * str, gint length, gint dots);
 gchar *libbalsa_expand_path(const gchar *path);
-void libbalsa_contract_path(gchar *path);
 gboolean libbalsa_mktempdir(gchar ** name);
 LibBalsaCodeset libbalsa_set_fallback_codeset(LibBalsaCodeset codeset);
 gboolean libbalsa_utf8_sanitize(gchar ** text, gboolean fallback,

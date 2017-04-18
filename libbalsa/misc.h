@@ -91,8 +91,6 @@ GtkWidget *libbalsa_charset_button_new(void);
 LibBalsaTextAttribute libbalsa_text_attr_string(const gchar * string);
 LibBalsaTextAttribute libbalsa_text_attr_file(const gchar * filename);
 
-size_t libbalsa_readfile_nostat(FILE * fp, char **buf);
-
 gchar *libbalsa_get_domainname(void);
 #define libbalsa_urlencode(str) (g_uri_escape_string((str), NULL, FALSE))
 #define libbalsa_urldecode(str) (g_uri_unescape_string((str), NULL))

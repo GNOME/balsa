@@ -1,3 +1,12 @@
+2017-04-17  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Clean up identity code
+
+	* libbalsa/identity.c (libbalsa_identity_get_signature): use
+	g_spawn_async instead of popen and libbalsa_readfile_nostat.
+	* libbalsa/misc.c: libbalsa_readfile_nostat is no longer needed.
+	* libbalsa/misc.h: ditto.
+
 2017-04-15  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Fix some more conversion specifier mismatches

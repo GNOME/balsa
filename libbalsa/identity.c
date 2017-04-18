@@ -320,6 +320,7 @@ gchar*
 libbalsa_identity_get_signature(LibBalsaIdentity* identity, GtkWindow *parent)
 {
     gchar *ret = NULL, *path;
+    gchar *retval;
 
     if (identity->signature_path == NULL ||
         *identity->signature_path == '\0')
@@ -327,52 +328,47 @@ libbalsa_identity_get_signature(LibBalsaIdentity* identity, GtkWindow *parent)
 
     path = libbalsa_expand_path(identity->signature_path);
     if(identity->sig_executable){
-        FILE *fp;
+        GError *error = NULL;
+        gchar *argv[] = {"/bin/sh", "-c", path, NULL};
 
-        /* signature is executable */
-	fp = popen(path,"r");
-        if (fp) {
-            libbalsa_readfile_nostat(fp, &ret);
-            pclose(fp);
-        } else
-            libbalsa_information_parented
-                (parent, LIBBALSA_INFORMATION_ERROR,
-                 _("Error executing signature generator %s"),
-                 identity->signature_path);
+        if (!g_spawn_sync(NULL, argv, NULL, G_SPAWN_DEFAULT, NULL, NULL,
+                          &ret, NULL, NULL, &error)) {
+            libbalsa_information_parented(parent, LIBBALSA_INFORMATION_ERROR,
+                                          _("Error executing signature generator “%s”: %s"),
+                                          identity->signature_path, error->message);
+            g_error_free(error);
+        }
     } else {
     	GError *error = NULL;
 
     	if (!g_file_get_contents(path, &ret, NULL, &error)) {
             libbalsa_information_parented(parent, LIBBALSA_INFORMATION_ERROR,
-            	_("Cannot read signature file “%s”: %s"), identity->signature_path, error->message);
+                                          _("Cannot read signature file “%s”: %s"),
+                                          identity->signature_path, error->message);
     		g_error_free(error);
     	}
-    }
-    if (ret != NULL) {
-        if(!libbalsa_utf8_sanitize(&ret, FALSE, NULL))
-            libbalsa_information_parented
-                (parent, LIBBALSA_INFORMATION_ERROR,
-                 _("Signature in %s is not a UTF-8 text."),
-                 identity->signature_path);
     }
     g_free(path);
 
     if(ret == NULL) return NULL;
 
+    if (!libbalsa_utf8_sanitize(&ret, FALSE, NULL)) {
+        libbalsa_information_parented(parent, LIBBALSA_INFORMATION_ERROR,
+                                      _("Signature in %s is not a UTF-8 text."),
+                                      identity->signature_path);
+    }
+
     /* Prepend the separator if needed... */
 
     if (identity->sig_separator
-        && strncmp(ret, "--\n", 3)
-        && strncmp(ret, "-- \n", 4)) {
-        gchar *sig_tmp = g_strconcat("\n-- \n", ret, NULL);
-        g_free(ret);
-        ret = sig_tmp;
+        && !(g_str_has_prefix(ret, "--\n") || g_str_has_prefix(ret, "-- \n"))) {
+        retval = g_strconcat("\n-- \n", ret, NULL);
     } else {
-        gchar *sig_tmp = g_strconcat("\n", ret, NULL);
-        g_free(ret);
-        ret = sig_tmp;
+        retval = g_strconcat("\n", ret, NULL);
     }
-    return ret;
+    g_free(ret);
+
+    return retval;
 }
 
 void

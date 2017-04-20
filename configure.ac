@@ -115,10 +115,10 @@ AC_ARG_WITH([gtksourceview],
 		  [with_gtksourceview=$withval],[with_gtksourceview=no])
 
 AC_ARG_WITH([spell-checker],
-            AC_HELP_STRING([--with-spell-checker=(no|gtkspell|gspell)],
-                           [select the external spell checker (default no)]),
+            AC_HELP_STRING([--with-spell-checker=(internal|gtkspell|gspell)],
+                           [select the spell checker (default internal)]),
             [use_spell_checker=$withval],
-            [use_spell_checker=no])
+            [use_spell_checker=internal])
 
 AC_ARG_WITH([ldap],
    AC_HELP_STRING([--with-ldap=DIR],
@@ -703,7 +703,7 @@ case "$use_spell_checker" in
     fi
     AC_DEFINE(HAVE_GTKSPELL,1,[Defined when GtkSpell can be used.])
     ;;
-    no)
+    internal)
     AC_MSG_RESULT([configure enchant])
     PKG_CHECK_MODULES(SPELL, [ enchant ])
     ;;
@@ -713,7 +713,7 @@ case "$use_spell_checker" in
 esac
 BALSA_CFLAGS="$BALSA_CFLAGS $SPELL_CFLAGS"
 BALSA_LIBS="$BALSA_LIBS $SPELL_LIBS"
-AM_CONDITIONAL([BUILD_WITH_SPELL_CHECKER], [test $use_spell_checker != "no"])
+AM_CONDITIONAL([BUILD_WITH_SPELL_CHECKER], [test $use_spell_checker != "internal"])
 
 dnl #####################################################################
 dnl 6. Typedefs, structures and compiler characteristics.
@@ -917,7 +917,7 @@ echo "                 Use GPGME: $gpgmecfg"
 echo "                  Use LDAP: $with_ldap"
 echo "                   Use GSS: $with_gss"
 echo "                Use SQLite: $with_sqlite"
-echo "    External spell checker: $use_spell_checker"
+echo "             Spell checker: $use_spell_checker"
 echo "             Use Libnotify: $with_libnotify"
 echo "         Use GtkSourceView: $with_gtksourceview"
 echo "              Use Compface: $with_compface"

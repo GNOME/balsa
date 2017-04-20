@@ -1,5 +1,10 @@
 2017-04-20  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	* configure.ac: replace --with-spell-checker=no with
+	--with-spell-checker=internal.
+
+2017-04-20  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Fix a bug in the SMTP code, and generally clean up;
 	https://mail.gnome.org/archives/balsa-list/2017-April/msg00040.html
 

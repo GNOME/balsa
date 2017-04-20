@@ -13,7 +13,11 @@ echo "GnuTLS server w/ client checking @ port 65002 as s_server2..."
 @SCREEN@ -ls
 
 echo "inetsim (as root)..."
-@SUDO@ @INETSIM@ --config inetsim.conf
+@SUDO@ -s -- <<EOF
+rm -f debug.log main.log service.log report.*.txt
+@INETSIM@ --config inetsim.conf --report-dir . --log-dir .
+chmod 666 debug.log main.log service.log report.*.txt
+EOF
 
 echo "shut down GnuTLS servers..."
 @SCREEN@ -S s_server1 -X quit

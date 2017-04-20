@@ -237,6 +237,7 @@ test_basic_crypt(void)
 typedef struct {
 	gchar *msg_text;
 	gchar *read_ptr;
+	gboolean sim_error;
 } msg_data_t;
 
 
@@ -248,17 +249,21 @@ msg_data_cb(gchar *buffer, gsize count, gpointer user_data, GError **error)
 	gssize result;
 
 	g_message("%s(%p, %lu, %p, %p)", __func__, buffer, count, user_data, error);
-	msg_len = strlen(msg_data->read_ptr);
-	if (msg_len > 0) {
-		if (msg_len > count) {
-			result = count;
-		} else {
-			result = msg_len;
-		}
-		memcpy(buffer, msg_data->read_ptr, result);
-		msg_data->read_ptr = &msg_data->read_ptr[result];
+	if (msg_data->sim_error) {
+		result = -1;
 	} else {
-		result = 0;
+		msg_len = strlen(msg_data->read_ptr);
+		if (msg_len > 0) {
+			if (msg_len > count) {
+				result = count;
+			} else {
+				result = msg_len;
+			}
+			memcpy(buffer, msg_data->read_ptr, result);
+			msg_data->read_ptr = &msg_data->read_ptr[result];
+		} else {
+			result = 0;
+		}
 	}
 	g_message("%s: return %ld", __func__, result);
 	return result;
@@ -303,6 +308,7 @@ test_smtp(void)
 
 	// message creation
 	msg_buf.msg_text = msg_buf.read_ptr = MSG_TEXT;
+	msg_buf.sim_error = FALSE;
 	sput_fail_unless(net_client_smtp_msg_new(NULL, NULL) == NULL, "create msg: no callback");
 	sput_fail_unless((msg = net_client_smtp_msg_new(msg_data_cb, &msg_buf)) != NULL, "create msg: ok");
 
@@ -379,6 +385,17 @@ test_smtp(void)
 	sput_fail_unless(net_client_smtp_allow_auth(smtp, FALSE, NET_CLIENT_SMTP_AUTH_PLAIN) == TRUE, "force auth meth PLAIN");
 	g_signal_connect(G_OBJECT(smtp), "auth", G_CALLBACK(get_auth), smtp);
 	sput_fail_unless(net_client_smtp_connect(smtp, NULL, NULL) == TRUE, "connect: success");
+	msg_buf.sim_error = TRUE;
+	sput_fail_unless(net_client_smtp_send_msg(smtp, msg, NULL) == FALSE, "send msg: error in callback");
+	msg_buf.sim_error = FALSE;
+	g_object_unref(smtp);
+
+	// unencrypted, PLAIN auth
+	sput_fail_unless((smtp = net_client_smtp_new("localhost", 65025, NET_CLIENT_CRYPT_NONE)) != NULL, "localhost:65025");
+	sput_fail_unless(net_client_smtp_allow_auth(NULL, FALSE, NET_CLIENT_SMTP_AUTH_PLAIN) == FALSE, "set auth meths, no client");
+	sput_fail_unless(net_client_smtp_allow_auth(smtp, FALSE, NET_CLIENT_SMTP_AUTH_PLAIN) == TRUE, "force auth meth PLAIN");
+	g_signal_connect(G_OBJECT(smtp), "auth", G_CALLBACK(get_auth), smtp);
+	sput_fail_unless(net_client_smtp_connect(smtp, NULL, NULL) == TRUE, "connect: success");
 	sput_fail_unless(net_client_smtp_send_msg(smtp, msg, NULL) == TRUE, "send msg: success");
 	g_object_unref(smtp);
 
@@ -407,10 +424,10 @@ test_smtp(void)
 	sput_fail_unless(net_client_smtp_send_msg(smtp, msg, NULL) == TRUE, "send msg: success");
 	g_object_unref(smtp);
 
-	// SSL, CRAM-SHA1 auth
+	// STARTTLS, CRAM-SHA1 auth
 	sput_fail_unless(net_client_smtp_msg_add_recipient(msg, "other3@there.com", NET_CLIENT_SMTP_DSN_DELAY) == TRUE,
 		"add recipient ok (dsn)");
-	sput_fail_unless((smtp = net_client_smtp_new("localhost", 65465, NET_CLIENT_CRYPT_ENCRYPTED)) != NULL, "localhost:65025, ssl");
+	sput_fail_unless((smtp = net_client_smtp_new("localhost", 65025, NET_CLIENT_CRYPT_STARTTLS)) != NULL, "localhost:65025");
 	sput_fail_unless(net_client_smtp_allow_auth(smtp, TRUE, NET_CLIENT_SMTP_AUTH_CRAM_SHA1) == TRUE, "force auth meth CRAM-SHA1");
 	g_signal_connect(G_OBJECT(smtp), "cert-check", G_CALLBACK(check_cert), NULL);
 	g_signal_connect(G_OBJECT(smtp), "auth", G_CALLBACK(get_auth), smtp);
@@ -419,10 +436,22 @@ test_smtp(void)
 	sput_fail_unless(net_client_smtp_send_msg(smtp, msg, NULL) == TRUE, "send msg: success");
 	g_object_unref(smtp);
 
+	// STARTTLS, auto select auth
+	sput_fail_unless(net_client_smtp_msg_add_recipient(msg, "other4@there.com",
+		NET_CLIENT_SMTP_DSN_SUCCESS + NET_CLIENT_SMTP_DSN_FAILURE + NET_CLIENT_SMTP_DSN_DELAY) == TRUE, "add recipient ok (dsn)");
+	sput_fail_unless((smtp = net_client_smtp_new("localhost", 65025, NET_CLIENT_CRYPT_STARTTLS)) != NULL, "localhost:65025");
+	g_signal_connect(G_OBJECT(smtp), "cert-check", G_CALLBACK(check_cert), NULL);
+	g_signal_connect(G_OBJECT(smtp), "auth", G_CALLBACK(get_auth), smtp);
+	sput_fail_unless(net_client_smtp_connect(smtp, NULL, NULL) == TRUE, "connect: success");
+	sput_fail_unless(net_client_smtp_msg_set_dsn_opts(msg, "20170113212711.19833@here.com", TRUE) == TRUE,
+		"dsn: envid, message");
+	sput_fail_unless(net_client_smtp_send_msg(smtp, msg, NULL) == TRUE, "send msg: success");
+	g_object_unref(smtp);
+
 	// SSL, auto select auth
 	sput_fail_unless(net_client_smtp_msg_add_recipient(msg, "other4@there.com",
 		NET_CLIENT_SMTP_DSN_SUCCESS + NET_CLIENT_SMTP_DSN_FAILURE + NET_CLIENT_SMTP_DSN_DELAY) == TRUE, "add recipient ok (dsn)");
-	sput_fail_unless((smtp = net_client_smtp_new("localhost", 65465, NET_CLIENT_CRYPT_ENCRYPTED)) != NULL, "localhost:65025, ssl");
+	sput_fail_unless((smtp = net_client_smtp_new("localhost", 65465, NET_CLIENT_CRYPT_ENCRYPTED)) != NULL, "localhost:65465, ssl");
 	g_signal_connect(G_OBJECT(smtp), "cert-check", G_CALLBACK(check_cert), NULL);
 	g_signal_connect(G_OBJECT(smtp), "auth", G_CALLBACK(get_auth), smtp);
 	sput_fail_unless(net_client_smtp_connect(smtp, NULL, NULL) == TRUE, "connect: success");

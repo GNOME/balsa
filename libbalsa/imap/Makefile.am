@@ -11,8 +11,8 @@ imap_tst_SOURCES = imap_tst.c
 
 imap_tst_LDADD = \
 	libimap.a	\
-	${top_srcdir}/libnetclient/libnetclient.a \
-        $(BALSA_LIBS)
+	${top_builddir}/libnetclient/libnetclient.a \
+	$(BALSA_LIBS)
 
 #libimap_la_SOURCES =  
 libimap_a_SOURCES = \

@@ -1,3 +1,10 @@
+2017-04-23  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* configure.ac: fix a warning about changing the permissions
+	  of a generated file
+	* libbalsa/imap/Makefile.am: fix building outside the source
+	  directory.
+
 2017-04-22  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Fix access to local POP3 server

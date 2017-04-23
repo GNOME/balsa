@@ -899,7 +899,7 @@ libnetclient/test/start-test-env.sh
 src/Makefile
 ui/Makefile
 ],
-[chmod +x libnetclient/test/start-test-env.sh])
+[test -f libnetclient/test/start-test-env.sh && chmod +x libnetclient/test/start-test-env.sh])
 AC_OUTPUT
 
 dnl ##########################################################################

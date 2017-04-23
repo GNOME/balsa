@@ -1,3 +1,13 @@
+2017-04-22  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Fix access to local POP3 server
+
+	* libbalsa/mailbox_pop3.c (libbalsa_mailbox_pop3_startup):
+	  allow all auth methods, in order to allow connections to
+	  localhost;
+	* libnetclient/net-client-pop.c (net_client_pop_get_capa):
+	  cosmetics
+
 2017-04-20  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* configure.ac: replace --with-spell-checker=no with

@@ -696,7 +696,8 @@ net_client_pop_get_capa(NetClientPop *client, guint *auth_supported)
 	 * at least support USER/PASS... */
 	if (*auth_supported == 0U) {
 		*auth_supported = NET_CLIENT_POP_AUTH_USER_PASS;
-	}client->priv->can_pipelining = TRUE;
+	}
+	client->priv->can_pipelining = TRUE;
 }
 
 

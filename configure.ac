@@ -790,36 +790,13 @@ AC_CHECK_FUNCS(getaddrinfo)
 
 dnl ###########################################################################
 dnl Remember our prefixes
-dnl   The way prefix et al are defined makes us jump through some hoops.
 dnl ###########################################################################
 
 if test "x$prefix" = "xNONE"; then
 	prefix=$ac_default_prefix
 fi
-dnl datadir='${prefix}/share', so we must eval it or something. This works
-BALSA_STD_PREFIX=`eval "echo ${prefix}"`
-BALSA_DATA_PREFIX=`eval "echo ${datadir}/balsa"`
-dnl autoconf-2.60 leaves a literal "${prefix}" in BALSA_DATA_PREFIX, so
-dnl we clean it once more.
-BALSA_DATA_PREFIX=`eval "echo ${BALSA_DATA_PREFIX}"`
-AC_SUBST(BALSA_DATA_PREFIX)
-
-dnl Consolidate them!
-AC_PROG_AWK
-BALSA_COMMON_PREFIXES=`sort<<EOF|uniq|${AWK} '{if(l!~/^$/)print l ",";l=$0}END{print l}'
-"${BALSA_STD_PREFIX}"
-"${BALSA_DATA_PREFIX}"
-EOF
-`
-
-dnl Better way to do this?
-AC_DEFINE_UNQUOTED( BALSA_STD_PREFIX, "$BALSA_STD_PREFIX",
-                   [Directory for all balsa files.] )
-AC_DEFINE_UNQUOTED( BALSA_DATA_PREFIX, "$BALSA_DATA_PREFIX",
-	           [Directory for storing balsa data files.] )
-AC_DEFINE_UNQUOTED( BALSA_COMMON_PREFIXES, `echo $BALSA_COMMON_PREFIXES`,
-	           [Common directories for storing balsa icons.] ) 
-dnl bleah
+CPPFLAGS="$CPPFLAGS -DBALSA_STD_PREFIX=\\\"${prefix}\\\""
+CPPFLAGS="$CPPFLAGS -DBALSA_DATA_PREFIX=\\\"${datadir}/balsa\\\""
 
 
 dnl ###########################################################################

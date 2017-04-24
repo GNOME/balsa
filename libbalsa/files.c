@@ -33,12 +33,8 @@
 #include <glib/gi18n.h>
 
 static const gchar *permanent_prefixes[] = {
-/*	BALSA_DATA_PREFIX,
-	BALSA_STD_PREFIX,
-	GNOME_DATA_PREFIX
-	GNOME_STD_PREFIX,
-	GNOME_LIB_PREFIX,*/
-    BALSA_COMMON_PREFIXES,
+    BALSA_DATA_PREFIX,
+    BALSA_STD_PREFIX,
     "src",
     ".",
     NULL

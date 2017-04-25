@@ -1,5 +1,10 @@
 2017-04-24  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	* libbalsa/files.c (libbalsa_icon_finder): more carefully check
+	  names of extra mime icons.
+
+2017-04-24  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* configure.ac: pass install directories on the compile command
 	line instead of in config.h;
 	* libbalsa/files.c: use the directories.

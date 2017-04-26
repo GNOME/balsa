@@ -60,11 +60,16 @@ enum _NetClientSmtpError {
 #define NET_CLIENT_SMTP_AUTH_CRAM_MD5		0x04U
 /** RFC xxxx "CRAM-SHA1" authentication method. */
 #define NET_CLIENT_SMTP_AUTH_CRAM_SHA1		0x08U
+/** RFC 4752 "GSSAPI" authentication method. */
+#define NET_CLIENT_SMTP_AUTH_GSSAPI			0x10U
 /** Mask of all safe authentication methods, i.e. all methods which do not send the cleartext password. */
-#define NET_CLIENT_SMTP_AUTH_SAFE			(NET_CLIENT_SMTP_AUTH_CRAM_MD5 + NET_CLIENT_SMTP_AUTH_CRAM_SHA1)
+#define NET_CLIENT_SMTP_AUTH_SAFE			\
+	(NET_CLIENT_SMTP_AUTH_CRAM_MD5 + NET_CLIENT_SMTP_AUTH_CRAM_SHA1 + NET_CLIENT_SMTP_AUTH_GSSAPI)
 /** Mask of all authentication methods. */
 #define NET_CLIENT_SMTP_AUTH_ALL			\
-	(NET_CLIENT_SMTP_AUTH_PLAIN + NET_CLIENT_SMTP_AUTH_LOGIN + NET_CLIENT_SMTP_AUTH_CRAM_MD5 + NET_CLIENT_SMTP_AUTH_CRAM_SHA1)
+	(NET_CLIENT_SMTP_AUTH_PLAIN + NET_CLIENT_SMTP_AUTH_LOGIN + NET_CLIENT_SMTP_AUTH_SAFE)
+/** Mask of all authentication methods which do not require a password. */
+#define NET_CLIENT_SMTP_AUTH_NO_PWD			NET_CLIENT_SMTP_AUTH_GSSAPI
 /** @} */
 
 
@@ -146,8 +151,14 @@ gboolean net_client_smtp_allow_auth(NetClientSmtp *client, gboolean encrypted, g
  * @return TRUE on success or FALSE if the connection failed
  *
  * Connect the remote SMTP server, initialise the encryption if requested, and emit the @ref auth signal to request authentication
- * information.  Simply ignore the signal for an unauthenticated connection.  In order to shut down a successfully established
- * connection, just call <tt>g_object_unref()</tt> on the SMTP network client object.
+ * information.  Simply ignore the signal for an unauthenticated connection.
+ *
+ * The function will try only @em one authentication method supported by the server and enabled for the current encryption state
+ * (see net_client_smtp_allow_auth() and \ref NET_CLIENT_SMTP_AUTH_ALL etc.).  The priority is, from highest to lowest, GSSAPI (if
+ * configured), CRAM-SHA1, CRAM-MD5, PLAIN or LOGIN.
+ *
+ * In order to shut down a successfully established connection, just call <tt>g_object_unref()</tt> on the SMTP network client
+ * object.
  *
  * @note The caller must free the returned greeting when it is not needed any more.
  */
@@ -249,6 +260,7 @@ void net_client_smtp_msg_free(NetClientSmtpMessage *smtp_msg);
  *   - CRAM-SHA1 according to <a href="https://tools.ietf.org/html/rfc_TBD">TBD</a>
  *   - PLAIN according to <a href="https://tools.ietf.org/html/rfc4616">RFC 4616</a>
  *   - LOGIN
+ *   - GSSAPI according to <a href="https://tools.ietf.org/html/rfc4752">RFC 4752</a> (if configured with gssapi support)
  * - STARTTLS encryption according to <a href="https://tools.ietf.org/html/rfc3207">RFC 3207</a>
  * - Delivery Status Notifications (DSNs) according to <a href="https://tools.ietf.org/html/rfc3461">RFC 3461</a>
  */

@@ -43,7 +43,9 @@ typedef struct {
 } smtp_rcpt_t;
 
 
-#define MAX_SMTP_LINE_LEN			512U
+/* Note: RFC 5321 defines a maximum line length of 512 octets, including the terminating CRLF.  However, RFC 4954, Sect. 4. defines
+ * 12288 octets as safe maximum length for SASL authentication. */
+#define MAX_SMTP_LINE_LEN			12288U
 #define SMTP_DATA_BUF_SIZE			8192U
 
 
@@ -57,10 +59,11 @@ static gboolean net_client_smtp_execute(NetClientSmtp *client, const gchar *requ
 	G_GNUC_PRINTF(2, 5);
 static gboolean net_client_smtp_auth(NetClientSmtp *client, const gchar *user, const gchar *passwd, guint auth_supported,
 									 GError **error);
-static gboolean net_client_smtp_auth_plain(NetClientSmtp *client, const gchar* user, const gchar* passwd, GError** error);
-static gboolean net_client_smtp_auth_login(NetClientSmtp *client, const gchar* user, const gchar* passwd, GError** error);
+static gboolean net_client_smtp_auth_plain(NetClientSmtp *client, const gchar *user, const gchar *passwd, GError **error);
+static gboolean net_client_smtp_auth_login(NetClientSmtp *client, const gchar *user, const gchar *passwd, GError **error);
 static gboolean net_client_smtp_auth_cram(NetClientSmtp *client, GChecksumType chksum_type, const gchar *user, const gchar *passwd,
 										  GError **error);
+static gboolean net_client_smtp_auth_gssapi(NetClientSmtp *client, const gchar *user, GError **error);
 static gboolean net_client_smtp_read_reply(NetClientSmtp *client, gint expect_code, gchar **last_reply, GError **error);
 static gboolean net_client_smtp_eval_rescode(gint res_code, const gchar *reply, GError **error);
 static gchar *net_client_smtp_dsn_to_string(const NetClientSmtp *client, NetClientSmtpDsnMode dsn_mode);
@@ -149,14 +152,18 @@ net_client_smtp_connect(NetClientSmtp *client, gchar **greeting, GError **error)
 	/* authenticate if we were successful so far */
 	if (result) {
 		gchar **auth_data;
+		gboolean need_pwd;
 
 		auth_data = NULL;
+		need_pwd = (auth_supported & NET_CLIENT_SMTP_AUTH_NO_PWD) == 0U;
 		g_debug("emit 'auth' signal for client %p", client);
-		g_signal_emit_by_name(client, "auth", &auth_data);
-		if ((auth_data != NULL) && (auth_data[0] != NULL) && (auth_data[1] != NULL)) {
+		g_signal_emit_by_name(client, "auth", need_pwd, &auth_data);
+		if ((auth_data != NULL) && (auth_data[0] != NULL)) {
 			result = net_client_smtp_auth(client, auth_data[0], auth_data[1], auth_supported, error);
 			memset(auth_data[0], 0, strlen(auth_data[0]));
-			memset(auth_data[1], 0, strlen(auth_data[1]));
+			if (auth_data[1] != NULL) {
+				memset(auth_data[1], 0, strlen(auth_data[1]));
+			}
 		}
 		g_strfreev(auth_data);
 	}
@@ -370,29 +377,34 @@ net_client_smtp_starttls(NetClientSmtp *client, GError **error)
 static gboolean
 net_client_smtp_auth(NetClientSmtp *client, const gchar *user, const gchar *passwd, guint auth_supported, GError **error)
 {
-	gboolean result;
+	gboolean result = FALSE;
 	guint auth_mask;
 
-	g_return_val_if_fail(NET_IS_CLIENT_SMTP(client) && (user != NULL) && (passwd != NULL), FALSE);
-
+	/* calculate the possible authentication methods */
 	if (net_client_is_encrypted(NET_CLIENT(client))) {
 		auth_mask = client->priv->auth_allowed[0] & auth_supported;
 	} else {
 		auth_mask = client->priv->auth_allowed[1] & auth_supported;
 	}
 
-	if ((auth_mask & NET_CLIENT_SMTP_AUTH_CRAM_SHA1) != 0U) {
-		result = net_client_smtp_auth_cram(client, G_CHECKSUM_SHA1, user, passwd, error);
-	} else if ((auth_mask & NET_CLIENT_SMTP_AUTH_CRAM_MD5) != 0U) {
-		result = net_client_smtp_auth_cram(client, G_CHECKSUM_MD5, user, passwd, error);
-	} else if ((auth_mask & NET_CLIENT_SMTP_AUTH_PLAIN) != 0U) {
-		result = net_client_smtp_auth_plain(client, user, passwd, error);
-	} else if ((auth_mask & NET_CLIENT_SMTP_AUTH_LOGIN) != 0U) {
-		result = net_client_smtp_auth_login(client, user, passwd, error);
+	if (((auth_mask & NET_CLIENT_SMTP_AUTH_NO_PWD) == 0U) && (passwd == NULL)) {
+		g_set_error(error, NET_CLIENT_SMTP_ERROR_QUARK, (gint) NET_CLIENT_ERROR_SMTP_NO_AUTH, _("password required"));
 	} else {
-		g_set_error(error, NET_CLIENT_SMTP_ERROR_QUARK, (gint) NET_CLIENT_ERROR_SMTP_NO_AUTH,
-			_("no suitable authentication mechanism"));
-		result = FALSE;
+		/* first try authentication methods w/o password, then safe ones, and finally the plain-text methods */
+		if ((auth_mask & NET_CLIENT_SMTP_AUTH_GSSAPI) != 0U) {
+			result = net_client_smtp_auth_gssapi(client, user, error);
+		} else if ((auth_mask & NET_CLIENT_SMTP_AUTH_CRAM_SHA1) != 0U) {
+			result = net_client_smtp_auth_cram(client, G_CHECKSUM_SHA1, user, passwd, error);
+		} else if ((auth_mask & NET_CLIENT_SMTP_AUTH_CRAM_MD5) != 0U) {
+			result = net_client_smtp_auth_cram(client, G_CHECKSUM_MD5, user, passwd, error);
+		} else if ((auth_mask & NET_CLIENT_SMTP_AUTH_PLAIN) != 0U) {
+			result = net_client_smtp_auth_plain(client, user, passwd, error);
+		} else if ((auth_mask & NET_CLIENT_SMTP_AUTH_LOGIN) != 0U) {
+			result = net_client_smtp_auth_login(client, user, passwd, error);
+		} else {
+			g_set_error(error, NET_CLIENT_SMTP_ERROR_QUARK, (gint) NET_CLIENT_ERROR_SMTP_NO_AUTH,
+				_("no suitable authentication mechanism"));
+		}
 	}
 
 	return result;
@@ -464,6 +476,63 @@ net_client_smtp_auth_cram(NetClientSmtp *client, GChecksumType chksum_type, cons
 }
 
 
+#if defined(HAVE_GSSAPI)
+
+static gboolean
+net_client_smtp_auth_gssapi(NetClientSmtp *client, const gchar *user, GError **error)
+{
+	NetClientGssCtx *gss_ctx;
+	gboolean result = FALSE;
+
+	gss_ctx = net_client_gss_ctx_new("smtp", net_client_get_host(NET_CLIENT(client)), user, error);
+	if (gss_ctx != NULL) {
+		gint state;
+		gboolean initial = TRUE;
+		gchar *input_token = NULL;
+		gchar *output_token = NULL;
+
+		do {
+			state = net_client_gss_auth_step(gss_ctx, input_token, &output_token, error);
+			g_free(input_token);
+			input_token = NULL;
+			if (state >= 0) {
+				if (initial) {
+					result = net_client_smtp_execute(client, "AUTH GSSAPI %s", &input_token, error, output_token);
+					initial = FALSE;
+				} else {
+					result = net_client_smtp_execute(client, "%s", &input_token, error, output_token);
+				}
+			}
+			g_free(output_token);
+		} while (result && (state == 0));
+
+		if (state == 1) {
+			output_token = net_client_gss_auth_finish(gss_ctx, input_token, error);
+			if (output_token != NULL) {
+			    result = net_client_smtp_execute(client, "%s", NULL, error, output_token);
+			    g_free(output_token);
+			}
+		}
+		g_free(input_token);
+		net_client_gss_ctx_free(gss_ctx);
+	}
+
+	return result;
+}
+
+#else
+
+/*lint -e{715} -e{818} */
+static gboolean
+net_client_smtp_auth_gssapi(NetClientSmtp G_GNUC_UNUSED *client, const gchar G_GNUC_UNUSED *user, GError G_GNUC_UNUSED **error)
+{
+	g_assert_not_reached();			/* this should never happen! */
+	return FALSE;					/* never reached, make gcc happy */
+}
+
+#endif  /* HAVE_GSSAPI */
+
+
 /* note: if supplied, last_reply is never NULL on success */
 static gboolean
 net_client_smtp_execute(NetClientSmtp *client, const gchar *request_fmt, gchar **last_reply, GError **error, ...)
@@ -530,6 +599,10 @@ net_client_smtp_ehlo(NetClientSmtp *client, guint *auth_supported, gboolean *can
 							*auth_supported |= NET_CLIENT_SMTP_AUTH_CRAM_MD5;
 						} else if (strcmp(auth[n], "CRAM-SHA1") == 0) {
 							*auth_supported |= NET_CLIENT_SMTP_AUTH_CRAM_SHA1;
+#if defined(HAVE_GSSAPI)
+						} else if (strcmp(auth[n], "GSSAPI") == 0) {
+							*auth_supported |= NET_CLIENT_SMTP_AUTH_GSSAPI;
+#endif
 						} else {
 							/* other auth methods are ignored for the time being */
 						}
@@ -639,6 +712,7 @@ net_client_smtp_dsn_to_string(const NetClientSmtp *client, NetClientSmtpDsnMode 
 
 		dsn_buf = g_string_new(" NOTIFY=");
 		start_len = dsn_buf->len;
+		/*lint -save -e655 -e9027 -e9029	accept logical AND for enum, MISRA C:2012 Rules 10.1, 10.4 */
 		if ((dsn_mode & NET_CLIENT_SMTP_DSN_DELAY) == NET_CLIENT_SMTP_DSN_DELAY) {
 			dsn_buf = g_string_append(dsn_buf, "DELAY");
 		}
@@ -654,6 +728,7 @@ net_client_smtp_dsn_to_string(const NetClientSmtp *client, NetClientSmtpDsnMode 
 			}
 			dsn_buf = g_string_append(dsn_buf, "SUCCESS");
 		}
+		/*lint -restore */
 		result = g_string_free(dsn_buf, FALSE);
 	} else {
 		result = g_strdup("");

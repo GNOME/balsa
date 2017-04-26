@@ -605,6 +605,7 @@ libbalsa_server_connect_signals(LibBalsaServer * server, GCallback cb,
 
 gchar **
 libbalsa_server_get_auth(NetClient *client,
+						 gboolean   need_passwd,
          	 	 	 	 gpointer   user_data)
 {
     LibBalsaServer *server = LIBBALSA_SERVER(user_data);
@@ -615,10 +616,12 @@ libbalsa_server_get_auth(NetClient *client,
     if (server->try_anonymous == 0U) {
         result = g_new0(gchar *, 3U);
         result[0] = g_strdup(server->user);
-        if ((server->passwd != NULL) && (server->passwd[0] != '\0')) {
-            result[1] = g_strdup(server->passwd);
-        } else {
-            result[1] = libbalsa_server_get_password(server, NULL);
+        if (need_passwd) {
+        	if ((server->passwd != NULL) && (server->passwd[0] != '\0')) {
+        		result[1] = g_strdup(server->passwd);
+        	} else {
+        		result[1] = libbalsa_server_get_password(server, NULL);
+        	}
         }
     }
     return result;

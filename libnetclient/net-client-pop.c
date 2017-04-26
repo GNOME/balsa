@@ -63,6 +63,7 @@ static gboolean net_client_pop_auth_user_pass(NetClientPop *client, const gchar*
 static gboolean net_client_pop_auth_apop(NetClientPop *client, const gchar* user, const gchar* passwd, GError** error);
 static gboolean net_client_pop_auth_cram(NetClientPop *client, GChecksumType chksum_type, const gchar *user, const gchar *passwd,
 										  GError **error);
+static gboolean net_client_pop_auth_gssapi(NetClientPop *client, const gchar *user, GError **error);
 static gboolean net_client_pop_retr_msg(NetClientPop *client, const NetClientPopMessageInfo *info, NetClientPopMsgCb callback,
 										gpointer user_data, GError **error);
 
@@ -135,8 +136,8 @@ net_client_pop_connect(NetClientPop *client, gchar **greeting, GError **error)
 
 			ang_close = strchr(ang_open, '>');	/*lint !e9034	accept char literal as int */
 			if (ang_close != NULL) {
-				/*lint -e{946,947}	allowed exception according to MISRA Rules 18.2 and 18.3 */
-				client->priv->apop_banner = g_strndup(ang_open, (ang_close - ang_open) + 1);
+				/*lint -e{737,946,947,9029}	allowed exception according to MISRA Rules 18.2 and 18.3 */
+				client->priv->apop_banner = g_strndup(ang_open, (ang_close - ang_open) + 1U);
 				auth_supported = NET_CLIENT_POP_AUTH_APOP;
 			}
 		}
@@ -166,14 +167,18 @@ net_client_pop_connect(NetClientPop *client, gchar **greeting, GError **error)
 	/* authenticate if we were successful so far */
 	if (result) {
 		gchar **auth_data;
+		gboolean need_pwd;
 
 		auth_data = NULL;
+		need_pwd = (auth_supported & NET_CLIENT_POP_AUTH_NO_PWD) == 0U;
 		g_debug("emit 'auth' signal for client %p", client);
-		g_signal_emit_by_name(client, "auth", &auth_data);
-		if ((auth_data != NULL) && (auth_data[0] != NULL) && (auth_data[1] != NULL)) {
+		g_signal_emit_by_name(client, "auth", need_pwd, &auth_data);
+		if ((auth_data != NULL) && (auth_data[0] != NULL)) {
 			result = net_client_pop_auth(client, auth_data[0], auth_data[1], auth_supported, error);
 			memset(auth_data[0], 0, strlen(auth_data[0]));
-			memset(auth_data[1], 0, strlen(auth_data[1]));
+			if (auth_data[1] != NULL) {
+				memset(auth_data[1], 0, strlen(auth_data[1]));
+			}
 		}
 		g_strfreev(auth_data);
 	}
@@ -263,6 +268,7 @@ net_client_pop_list(NetClientPop *client, GList **msg_list, gboolean with_uid, G
 	}
 
 	if (!result) {
+		/*lint -e{9074,9087}	accept sane pointer conversion */
 		g_list_free_full(*msg_list, (GDestroyNotify) net_client_pop_msg_info_free);
 	}
 
@@ -470,10 +476,8 @@ net_client_pop_starttls(NetClientPop *client, GError **error)
 static gboolean
 net_client_pop_auth(NetClientPop *client, const gchar *user, const gchar *passwd, guint auth_supported, GError **error)
 {
-	gboolean result;
+	gboolean result = FALSE;
 	guint auth_mask;
-
-	g_return_val_if_fail(NET_IS_CLIENT_POP(client) && (user != NULL) && (passwd != NULL), FALSE);
 
 	if (net_client_is_encrypted(NET_CLIENT(client))) {
 		auth_mask = client->priv->auth_allowed[0] & auth_supported;
@@ -481,22 +485,28 @@ net_client_pop_auth(NetClientPop *client, const gchar *user, const gchar *passwd
 		auth_mask = client->priv->auth_allowed[1] & auth_supported;
 	}
 
-	if ((auth_mask & NET_CLIENT_POP_AUTH_CRAM_SHA1) != 0U) {
-		result = net_client_pop_auth_cram(client, G_CHECKSUM_SHA1, user, passwd, error);
-	} else if ((auth_mask & NET_CLIENT_POP_AUTH_CRAM_MD5) != 0U) {
-		result = net_client_pop_auth_cram(client, G_CHECKSUM_MD5, user, passwd, error);
-	} else if ((auth_mask & NET_CLIENT_POP_AUTH_APOP) != 0U) {
-		result = net_client_pop_auth_apop(client, user, passwd, error);
-	} else if ((auth_mask & NET_CLIENT_POP_AUTH_PLAIN) != 0U) {
-		result = net_client_pop_auth_plain(client, user, passwd, error);
-	} else if ((auth_mask & NET_CLIENT_POP_AUTH_USER_PASS) != 0U) {
-		result = net_client_pop_auth_user_pass(client, user, passwd, error);
-	} else if ((auth_mask & NET_CLIENT_POP_AUTH_LOGIN) != 0U) {
-		result = net_client_pop_auth_login(client, user, passwd, error);
+	if (((auth_mask & NET_CLIENT_POP_AUTH_NO_PWD) == 0U) && (passwd == NULL)) {
+		g_set_error(error, NET_CLIENT_POP_ERROR_QUARK, (gint) NET_CLIENT_ERROR_POP_NO_AUTH, _("password required"));
 	} else {
-		g_set_error(error, NET_CLIENT_POP_ERROR_QUARK, (gint) NET_CLIENT_ERROR_POP_NO_AUTH,
-			_("no suitable authentication mechanism"));
-		result = FALSE;
+		/* first try authentication methods w/o password, then safe ones, and finally the plain-text methods */
+		if ((auth_mask & NET_CLIENT_POP_AUTH_GSSAPI) != 0U) {
+			result = net_client_pop_auth_gssapi(client, user, error);
+		} else if ((auth_mask & NET_CLIENT_POP_AUTH_CRAM_SHA1) != 0U) {
+			result = net_client_pop_auth_cram(client, G_CHECKSUM_SHA1, user, passwd, error);
+		} else if ((auth_mask & NET_CLIENT_POP_AUTH_CRAM_MD5) != 0U) {
+			result = net_client_pop_auth_cram(client, G_CHECKSUM_MD5, user, passwd, error);
+		} else if ((auth_mask & NET_CLIENT_POP_AUTH_APOP) != 0U) {
+			result = net_client_pop_auth_apop(client, user, passwd, error);
+		} else if ((auth_mask & NET_CLIENT_POP_AUTH_PLAIN) != 0U) {
+			result = net_client_pop_auth_plain(client, user, passwd, error);
+		} else if ((auth_mask & NET_CLIENT_POP_AUTH_USER_PASS) != 0U) {
+			result = net_client_pop_auth_user_pass(client, user, passwd, error);
+		} else if ((auth_mask & NET_CLIENT_POP_AUTH_LOGIN) != 0U) {
+			result = net_client_pop_auth_login(client, user, passwd, error);
+		} else {
+			g_set_error(error, NET_CLIENT_POP_ERROR_QUARK, (gint) NET_CLIENT_ERROR_POP_NO_AUTH,
+				_("no suitable authentication mechanism"));
+		}
 	}
 
 	return result;
@@ -607,6 +617,66 @@ net_client_pop_auth_cram(NetClientPop *client, GChecksumType chksum_type, const 
 }
 
 
+#if defined(HAVE_GSSAPI)
+
+static gboolean
+net_client_pop_auth_gssapi(NetClientPop *client, const gchar *user, GError **error)
+{
+	NetClientGssCtx *gss_ctx;
+	gboolean result = FALSE;
+
+	gss_ctx = net_client_gss_ctx_new("pop", net_client_get_host(NET_CLIENT(client)), user, error);
+	if (gss_ctx != NULL) {
+		gint state;
+		gboolean initial = TRUE;
+		gchar *input_token = NULL;
+		gchar *output_token = NULL;
+
+		do {
+			state = net_client_gss_auth_step(gss_ctx, input_token, &output_token, error);
+			g_free(input_token);
+			input_token = NULL;
+			if (state >= 0) {
+				if (initial) {
+					/* split the initial auth command as the initial-response argument will typically exceed the 255-octet limit on
+					 * the length of a single command, see RFC 5034, Sect. 4 */
+					initial = FALSE;
+					result = net_client_pop_execute_sasl(client, "AUTH GSSAPI =", NULL, error);
+				}
+				if (result) {
+					result = net_client_pop_execute_sasl(client, "%s", &input_token, error, output_token);
+				}
+			}
+			g_free(output_token);
+		} while (result && (state == 0));
+
+		if (state == 1) {
+			output_token = net_client_gss_auth_finish(gss_ctx, input_token, error);
+			if (output_token != NULL) {
+			    result = net_client_pop_execute(client, "%s", NULL, error, output_token);
+			    g_free(output_token);
+			}
+		}
+		g_free(input_token);
+		net_client_gss_ctx_free(gss_ctx);
+	}
+
+	return result;
+}
+
+#else
+
+/*lint -e{715} -e{818} */
+static gboolean
+net_client_pop_auth_gssapi(NetClientPop G_GNUC_UNUSED *client, const gchar G_GNUC_UNUSED *user, GError G_GNUC_UNUSED **error)
+{
+	g_assert_not_reached();			/* this should never happen! */
+	return FALSE;					/* never reached, make gcc happy */
+}
+
+#endif  /* HAVE_GSSAPI */
+
+
 /* Note: if supplied, challenge is never NULL on success */
 static gboolean
 net_client_pop_execute_sasl(NetClientPop *client, const gchar *request_fmt, gchar **challenge, GError **error, ...)
@@ -675,6 +745,10 @@ net_client_pop_get_capa(NetClientPop *client, guint *auth_supported)
 						*auth_supported |= NET_CLIENT_POP_AUTH_CRAM_MD5;
 					} else if (strcmp(auth[n], "CRAM-SHA1") == 0) {
 						*auth_supported |= NET_CLIENT_POP_AUTH_CRAM_SHA1;
+#if defined(HAVE_GSSAPI)
+					} else if (strcmp(auth[n], "GSSAPI") == 0) {
+						*auth_supported |= NET_CLIENT_POP_AUTH_GSSAPI;
+#endif
 					} else {
 						/* other auth methods are ignored for the time being */
 					}

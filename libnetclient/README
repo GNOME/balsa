@@ -38,6 +38,9 @@ Requirements
 
 Apart from GLib/GIO (at least version 2.40.0) it requires GnuTLS.
 
+For Kerberos V5 single sign-on (GSSAPI, RFC 4752) authentication, a Kerberos
+library (e.g. Heimdal) is required.
+
 
 API Documentation
 =================
@@ -104,5 +107,8 @@ Finally, just terminate the test servers in the first window.  Note that
 INetSim will dump further information in its output files (typically in
 /var/log/inetsim).  You should verify that INetSim recorded the requested
 operations properly.
+
+Note that no unit tests are available for the GSSAPI authentication methods
+as they are not supported by INetSim.
 
 								-oOo-

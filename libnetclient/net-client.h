@@ -68,7 +68,8 @@ enum _NetClientError {
 	NET_CLIENT_ERROR_CONNECTION_LOST,		/**< The connection is lost. */
 	NET_CLIENT_ERROR_TLS_ACTIVE,			/**< TLS is already active for the connection. */
 	NET_CLIENT_ERROR_LINE_TOO_LONG,			/**< The line is too long. */
-	NET_CLIENT_ERROR_GNUTLS					/**< A GnuTLS error occurred. */
+	NET_CLIENT_ERROR_GNUTLS,				/**< A GnuTLS error occurred. */
+	NET_CLIENT_ERROR_GSSAPI					/**< A GSSAPI error occurred. */
 };
 
 
@@ -112,7 +113,7 @@ gboolean net_client_configure(NetClient *client, const gchar *host_and_port, gui
  *
  * @note The function returns the value of @em host_and_port set by net_client_new() or net_client_configure().
  */
-const gchar *net_client_get_host(NetClient *client);
+const gchar *net_client_get_host(const NetClient *client);
 
 
 /** @brief Connect a network client
@@ -294,10 +295,11 @@ gboolean net_client_set_timeout(NetClient *client, guint timeout_secs);
  *   @endcode The server certificate is not trusted.  The received certificate and the errors which occurred during the check are
  *   passed to the signal handler.  The handler shall return TRUE to accept the certificate, or FALSE to reject it.
  * - @anchor auth auth
- *   @code gchar **get_auth(NetClient *client, gpointer user_data) @endcode Authentication is required by the remote server.  The
- *   signal handler shall return a NULL-terminated array of strings, containing the user name in the first and the password in the
- *   second element.  The strings are wiped and freed when they are not needed any more.  Return NULL if no authentication is
- *   required.
+ *   @code gchar **get_auth(NetClient *client, gboolean need_passwd, gpointer user_data) @endcode Authentication is required by the
+ *   remote server.  The signal handler shall return a NULL-terminated array of strings, containing the user name in the first and
+ *   the password in the second element.  If the parameter @em need_passwd is FALSE, no password is required (e.g. for kerberos
+ *   ticket-based authentication).  In this case, the password element must be present in the reply, but it is ignored an may be
+ *   NULL.  The strings are wiped and freed when they are not needed any more.  Return NULL if no authentication is required.
  */
 
 

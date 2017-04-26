@@ -119,6 +119,7 @@ void libbalsa_server_user_cb(ImapUserEventType ue, void *arg, ...);
 
 /* NetClient related signal handlers */
 gchar **libbalsa_server_get_auth(NetClient *client,
+								 gboolean   need_passwd,
 								 gpointer   user_data);
 gboolean libbalsa_server_check_cert(NetClient           *client,
            	   	   	   	   	   	    GTlsCertificate     *peer_cert,

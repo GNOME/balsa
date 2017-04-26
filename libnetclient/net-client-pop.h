@@ -66,12 +66,16 @@ enum _NetClientPopError {
 #define NET_CLIENT_POP_AUTH_CRAM_MD5		0x10U
 /** RFC 5034 SASL "CRAM-SHA1" authentication method. */
 #define NET_CLIENT_POP_AUTH_CRAM_SHA1		0x20U
+/** RFC 4752 "GSSAPI" authentication method. */
+#define NET_CLIENT_POP_AUTH_GSSAPI			0x40U
 /** Mask of all safe authentication methods, i.e. all methods which do not send the cleartext password. */
 #define NET_CLIENT_POP_AUTH_SAFE			\
-	(NET_CLIENT_POP_AUTH_APOP + NET_CLIENT_POP_AUTH_CRAM_MD5 + NET_CLIENT_POP_AUTH_CRAM_SHA1)
+	(NET_CLIENT_POP_AUTH_APOP + NET_CLIENT_POP_AUTH_CRAM_MD5 + NET_CLIENT_POP_AUTH_CRAM_SHA1 + NET_CLIENT_POP_AUTH_GSSAPI)
 /** Mask of all authentication methods. */
 #define NET_CLIENT_POP_AUTH_ALL				\
 	(NET_CLIENT_POP_AUTH_USER_PASS + NET_CLIENT_POP_AUTH_PLAIN + NET_CLIENT_POP_AUTH_LOGIN + NET_CLIENT_POP_AUTH_SAFE)
+/** Mask of all authentication methods which do not require a password. */
+#define NET_CLIENT_POP_AUTH_NO_PWD			NET_CLIENT_POP_AUTH_GSSAPI
 /** @} */
 
 
@@ -149,8 +153,8 @@ NetClientPop *net_client_pop_new(const gchar *host, guint16 port, NetClientCrypt
  * @param allow_auth mask of allowed authentication methods
  * @return TRUE on success or FALSE on error
  *
- * Set the allowed authentication methods for the passed connection.  The default is @ref NET_CLIENT_POP_AUTH_ALL for encrypted and
- * @ref NET_CLIENT_POP_AUTH_SAFE for unencrypted connections, respectively.
+ * Set the allowed authentication methods for the passed connection.  The default is @ref NET_CLIENT_POP_AUTH_ALL for both encrypted
+ * and unencrypted connections.
  *
  * @note Call this function @em before calling net_client_pop_connect().
  */
@@ -165,8 +169,14 @@ gboolean net_client_pop_allow_auth(NetClientPop *client, gboolean encrypted, gui
  * @return TRUE on success or FALSE if the connection failed
  *
  * Connect the remote POP server, initialise the encryption if requested, and emit the @ref auth signal to request authentication
- * information.  Simply ignore the signal for an unauthenticated connection.  In order to shut down a successfully established
- * connection, just call <tt>g_object_unref()</tt> on the POP network client object.
+ * information.  Simply ignore the signal for an unauthenticated connection.
+ *
+ * The function will try only @em one authentication method supported by the server and enabled for the current encryption state
+ * (see net_client_pop_allow_auth() and \ref NET_CLIENT_POP_AUTH_ALL etc.).  The priority is, from highest to lowest, GSSAPI (if
+ * configured), CRAM-SHA1, CRAM-MD5, APOP, PLAIN, USER/PASS or LOGIN.
+ *
+ * In order to shut down a successfully established connection, just call <tt>g_object_unref()</tt> on the POP network client
+ * object.
  *
  * @note The caller must free the returned greeting when it is not needed any more.
  */
@@ -251,8 +261,9 @@ void net_client_pop_msg_info_free(NetClientPopMessageInfo *info);
  * - support for <i>PIPELINING</i> and <i>UIDL</i> as defined by <a href="https://tools.ietf.org/html/rfc2449">RFC 2449</a>;
  * - <i>STLS</i> encryption as defined by <a href="https://tools.ietf.org/html/rfc2595">RFC 2595</a>;
  * - authentication using <i>APOP</i>, <i>USER/PASS</i> (both RFC 1939) or the SASL methods <i>PLAIN</i>, <i>LOGIN</i>,
- *   <i>CRAM-MD5</i> or <i>CRAM-SHA1</i> (see <a href="https://tools.ietf.org/html/rfc5034">RFC 5034</a>), depending upon the
- *   capabilities reported by the server.
+ *   <i>CRAM-MD5</i>, <i>CRAM-SHA1</i> or <i>GSSAPI</i> (see <a href="https://tools.ietf.org/html/rfc4752">RFC 4752</a> and
+ *   <a href="https://tools.ietf.org/html/rfc5034">RFC 5034</a>), depending upon the capabilities reported by the server.  Note the
+ *   <i>GSSAPI</i> is available only if configured with gssapi support.
  */
 
 

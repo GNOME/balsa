@@ -282,14 +282,14 @@ msg_data_cb(gchar *buffer, gsize count, gpointer user_data, GError **error)
 
 
 static gchar **
-get_auth(NetClient *client, gpointer user_data)
+get_auth(NetClient *client, gboolean need_pwd, gpointer user_data)
 {
 	gchar ** result;
 
-	g_message("%s(%p, %p)", __func__, client, user_data);
+	g_message("%s(%p, %d, %p)", __func__, client, need_pwd, user_data);
 	result = g_new0(gchar *, 3U);
 	result[0] = g_strdup("john.doe");
-	if (user_data != NULL) {
+	if (need_pwd && (user_data != NULL)) {
 		result[1] = g_strdup("@ C0mplex P@sswd");
 	}
 	return result;
@@ -376,7 +376,7 @@ test_smtp(void)
 	// no password: anonymous
 	sput_fail_unless((smtp = net_client_smtp_new("localhost", 65025, NET_CLIENT_CRYPT_NONE)) != NULL, "localhost:65025");
 	g_signal_connect(G_OBJECT(smtp), "auth", G_CALLBACK(get_auth), NULL);
-	sput_fail_unless(net_client_smtp_connect(smtp, NULL, NULL), "connect: anonymous ok (NULL passwd)");
+	sput_fail_unless(net_client_smtp_connect(smtp, NULL, NULL) == FALSE, "connect: password required");
 	g_object_unref(smtp);
 
 	// unencrypted, PLAIN auth
@@ -518,15 +518,15 @@ test_pop3(void)
 	op_res = net_client_pop_stat(pop, NULL, NULL, &error);
 	sput_fail_unless((op_res == FALSE) && (error->code == NET_CLIENT_ERROR_POP_SERVER_ERR), "STAT not allowed w/o AUTH");
 	g_clear_error(&error);
+	sput_fail_unless(net_client_pop_list(pop, NULL, TRUE, NULL) == FALSE, "list w/ empty target list");
+	op_res = net_client_pop_list(pop, &msg_list, TRUE, &error);
+	sput_fail_unless((op_res == FALSE) && (error->code == NET_CLIENT_ERROR_POP_SERVER_ERR), "LIST not allowed w/o AUTH");
+	g_clear_error(&error);
 	g_object_unref(pop);
 
 	sput_fail_unless((pop = net_client_pop_new("localhost", 64110, NET_CLIENT_CRYPT_NONE, TRUE)) != NULL, "localhost:64110");
 	g_signal_connect(G_OBJECT(pop), "auth", G_CALLBACK(get_auth), NULL);
-	sput_fail_unless(net_client_pop_connect(pop, NULL, NULL) == TRUE, "connect: success");
-	sput_fail_unless(net_client_pop_list(pop, NULL, TRUE, NULL) == FALSE, "list w/ empty target list");
-	op_res = net_client_pop_list(pop, &msg_list, TRUE, &error);
-	sput_fail_unless((op_res == FALSE) && (error->code == NET_CLIENT_ERROR_POP_SERVER_ERR), "LIST not allowed w/ empty AUTH");
-	g_clear_error(&error);
+	sput_fail_unless(net_client_pop_connect(pop, NULL, NULL) == FALSE, "connect: password required");
 	g_object_unref(pop);
 
 	// unencrypted, force USER auth

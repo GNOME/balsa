@@ -19,9 +19,6 @@
 #include "net-client.h"
 
 
-#define LINE_BUF_LEN					1024U
-
-
 struct _NetClientPrivate {
 	gchar *host_and_port;
 	guint16 default_port;
@@ -92,10 +89,11 @@ net_client_configure(NetClient *client, const gchar *host_and_port, guint16 defa
 
 
 const gchar *
-net_client_get_host(NetClient *client)
+net_client_get_host(const NetClient *client)
 {
 	const gchar *result;
 
+	/*lint -e{9005}		cast'ing away const in the next statement is fine */
 	if (NET_IS_CLIENT(client)) {
 		result = client->priv->host_and_port;
 	} else {
@@ -202,7 +200,7 @@ net_client_write_buffer(NetClient *client, const gchar *buffer, gsize count, GEr
 	} else {
 		gsize bytes_written;
 
-		if ((count > 2U) && (buffer[count - 1U] == '\n')) {
+		if ((count >= 2U) && (buffer[count - 1U] == '\n')) {
 			g_debug("W '%.*s'", (int) count - 2, buffer);
 		} else {
 			g_debug("W '%.*s'", (int) count, buffer);
@@ -221,20 +219,20 @@ gboolean
 net_client_vwrite_line(NetClient *client, const gchar *format, va_list args, GError **error)
 {
 	gboolean result;
-	gchar buffer[LINE_BUF_LEN];
-	gint buf_len;
+	GString *buffer;
 
 	g_return_val_if_fail(NET_IS_CLIENT(client) && (format != NULL), FALSE);
 
-	buf_len = g_vsnprintf(buffer, client->priv->max_line_len - 2U, format, args);
-	if ((buf_len < 0) || ((client->priv->max_line_len > 0U) && ((gsize) buf_len > (client->priv->max_line_len - 2U)))) {
+	buffer = g_string_new(NULL);
+	g_string_vprintf(buffer, format, args);
+	if ((client->priv->max_line_len > 0U) && (buffer->len > client->priv->max_line_len)) {
 		g_set_error(error, NET_CLIENT_ERROR_QUARK, (gint) NET_CLIENT_ERROR_LINE_TOO_LONG, _("line too long"));
 		result = FALSE;
 	} else {
-		buffer[buf_len] = '\r';
-		buffer[buf_len + 1] = '\n';
-		result = net_client_write_buffer(client, buffer, (gsize) buf_len + 2U, error);
+		buffer = g_string_append(buffer, "\r\n");
+		result = net_client_write_buffer(client, buffer->str, buffer->len, error);
 	}
+	(void) g_string_free(buffer, TRUE);
 
 	return result;
 }
@@ -460,7 +458,7 @@ net_client_class_init(NetClientClass *klass)
 	gobject_class->finalize = net_client_finalise;
 	signals[0] = g_signal_new("cert-check", NET_CLIENT_TYPE, G_SIGNAL_RUN_LAST, 0U, NULL, NULL, NULL, G_TYPE_BOOLEAN, 2U,
 		G_TYPE_TLS_CERTIFICATE, G_TYPE_TLS_CERTIFICATE_FLAGS);
-	signals[1] = g_signal_new("auth", NET_CLIENT_TYPE, G_SIGNAL_RUN_LAST, 0U, NULL, NULL, NULL, G_TYPE_STRV, 0U);
+	signals[1] = g_signal_new("auth", NET_CLIENT_TYPE, G_SIGNAL_RUN_LAST, 0U, NULL, NULL, NULL, G_TYPE_STRV, 1U, G_TYPE_BOOLEAN);
 	signals[2] = g_signal_new("cert-pass", NET_CLIENT_TYPE, G_SIGNAL_RUN_LAST, 0U, NULL, NULL, NULL, G_TYPE_STRING, 1U,
 		G_TYPE_BYTE_ARRAY);
 }

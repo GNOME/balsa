@@ -797,25 +797,8 @@ if test "x$prefix" = "xNONE"; then
 fi
 CPPFLAGS="$CPPFLAGS -DBALSA_STD_PREFIX=\\\"${prefix}\\\""
 CPPFLAGS="$CPPFLAGS -DBALSA_DATA_PREFIX=\\\"${datadir}/balsa\\\""
-
-
-dnl ###########################################################################
-dnl determine the base folder for installing the extra icons
-dnl ###########################################################################
-
-AC_ARG_ENABLE(extra-mimeicons,
-        AC_HELP_STRING([--enable-extra-mimeicons],
-                       [Install extra MIME icons (needs write access to the gtk+ icon folder, default=yes)]),[
-	install_mimeicons=$enableval
-],[
-	install_mimeicons=yes
-])
-AM_CONDITIONAL([INSTALL_MIME_ICONS], [test $install_mimeicons = "yes"])
-HICOLOR_ICON_DIR=`$PKG_CONFIG --variable=prefix gtk+-3.0`/share/icons/hicolor
-AC_SUBST(HICOLOR_ICON_DIR)
-dnl however, we do not mess with the icon caches - it messes up more
-dnl things that it fixes, for eg. user installs, package builds etc.
-dnl AC_PATH_PROG(GTK_UPDATE_ICON_CACHE, gtk-update-icon-cache)
+BALSA_DATA_PREFIX="${datadir}/balsa"
+AC_SUBST(BALSA_DATA_PREFIX)
 
 dnl Documentation and Testing requirements for libnetclient
 

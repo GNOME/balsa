@@ -132,6 +132,7 @@ libbalsa_icon_finder(GtkWidget         * widget,
     GdkPixbuf *pixbuf = NULL;
     gint width, height;
     GtkIconTheme *icon_theme;
+    GIcon *icon;
 
     if (!gtk_icon_size_lookup(size, &width, &height))
         width = 16;
@@ -141,15 +142,26 @@ libbalsa_icon_finder(GtkWidget         * widget,
     else if (for_file) {
         content_type = libbalsa_vfs_get_mime_type(for_file);
     } else
-	content_type = "application/octet-stream";
+        content_type = "application/octet-stream";
 
     /* ask GIO for the icon */
-    if ((icon_theme = gtk_icon_theme_get_default())) {
-        GIcon * icon = g_content_type_get_icon(content_type);
+    if ((icon_theme = gtk_icon_theme_get_default()) == NULL)
+        return NULL;
 
-        if (icon != NULL && G_IS_THEMED_ICON(icon)) {
+    icon = g_content_type_get_icon(content_type);
+
+    if (icon != NULL) {
+        if (G_IS_THEMED_ICON(icon)) {
             gint i;
             GStrv icon_names;
+            static gsize appended = 0;
+
+            if (g_once_init_enter(&appended)) {
+                gtk_icon_theme_append_search_path(icon_theme,
+                                                  BALSA_DATA_PREFIX
+                                                  "/hicolor/48x48/mimetypes");
+                g_once_init_leave(&appended, 1);
+            }
 
             g_object_get(G_OBJECT(icon), "names", &icon_names, NULL);
 
@@ -159,45 +171,16 @@ libbalsa_icon_finder(GtkWidget         * widget,
                         gtk_icon_theme_load_icon(icon_theme, icon_names[i], width,
                                                  GTK_ICON_LOOKUP_FORCE_SIZE, NULL);
                 }
+                g_strfreev(icon_names);
             }
-
-            g_strfreev(icon_names);
-            g_object_unref(icon);
-
-            /* last resort: try gnome-mime-<base mime type> */
-            if (pixbuf == NULL) {
-                gchar * base_type_icon = g_strdup_printf("gnome-mime-%s", content_type);
-                gchar * slash = strchr(base_type_icon, '/');
-                gchar *hyphen;
-
-                if (slash)
-                    *slash = '-';
-
-                do {
-                    pixbuf = gtk_icon_theme_load_icon(icon_theme, base_type_icon,
-                                                      width, GTK_ICON_LOOKUP_FORCE_SIZE, NULL);
-                    if (pixbuf != NULL)
-                        break;
-
-                    if ((hyphen = strrchr(base_type_icon, '-')) != NULL) {
-                        *hyphen = '\0';
-                    }
-                } while (hyphen != NULL);
-
-                g_free(base_type_icon);
-            }
-
-            /* return if we found a proper pixbuf */
-	    if (pixbuf) {
-		if (used_type)
-		    *used_type = g_strdup(content_type);
-		return pixbuf;
-	    }
         }
+        g_object_unref(icon);
     }
 
-    /* load the pixbuf */
-    pixbuf = libbalsa_default_attachment_pixbuf(width);
+    if (pixbuf == NULL) {
+        /* load the default pixbuf */
+        pixbuf = libbalsa_default_attachment_pixbuf(width);
+    }
 
     if (used_type)
         *used_type = g_strdup(content_type);

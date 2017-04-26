@@ -1,8 +1,4 @@
-if INSTALL_MIME_ICONS
 SUBDIRS = mimetypes 16x16 24x24
-else
-SUBDIRS = 16x16 24x24
-endif
 
 # balsa_logo.png used by About menu (small one).
 # balsa-logo.png used by the init-druid

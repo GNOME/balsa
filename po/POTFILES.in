@@ -52,6 +52,7 @@ libinit_balsa/assistant_page_welcome.c
 libnetclient/net-client.c
 libnetclient/net-client-pop.c
 libnetclient/net-client-smtp.c
+libnetclient/net-client-utils.c
 sounds/balsa.soundlist.in
 src/ab-main.c
 src/ab-window.c

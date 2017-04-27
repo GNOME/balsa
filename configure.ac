@@ -798,6 +798,7 @@ fi
 BALSA_DATA_PREFIX="${datadir}/balsa"
 AC_SUBST(BALSA_DATA_PREFIX)
 CPPFLAGS="$CPPFLAGS -DBALSA_DATA_PREFIX=\\\"${BALSA_DATA_PREFIX}\\\""
+AC_PATH_PROG(GTK_UPDATE_ICON_CACHE, gtk-update-icon-cache, no)
 
 dnl Documentation and Testing requirements for libnetclient
 

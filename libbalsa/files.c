@@ -153,14 +153,6 @@ libbalsa_icon_finder(GtkWidget         * widget,
         if (G_IS_THEMED_ICON(icon)) {
             gint i;
             GStrv icon_names;
-            static gsize appended = 0;
-
-            if (g_once_init_enter(&appended)) {
-                gtk_icon_theme_append_search_path(icon_theme,
-                                                  BALSA_DATA_PREFIX
-                                                  "/hicolor/48x48/mimetypes");
-                g_once_init_leave(&appended, 1);
-            }
 
             g_object_get(G_OBJECT(icon), "names", &icon_names, NULL);
 

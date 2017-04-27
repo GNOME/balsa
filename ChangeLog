@@ -1,3 +1,13 @@
+2017-04-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Restore updating the icon cache, and remove a redundant action
+
+	* configure.ac: find the path to gtk-update-icon-cache.
+	* images/Makefile.am: re-enable updating the cache.
+	* libbalsa/files.c (libbalsa_icon_finder): do not redundantly
+	  append BALSA_DATA_PREFIX "/hicolor/48x48/mimetypes" to the
+	  default icon theme search path.
+
 2017-04-26  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* src/balsa-icons.c: disable debug output, left enabled by

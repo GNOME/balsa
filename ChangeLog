@@ -1,3 +1,13 @@
+2017-04-26  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Do not define an unused path
+
+	* configure.ac: do not define BALSA_STD_PREFIX, it is not used.
+	* libbalsa/files.c: do not put it in a search path.
+	* src/balsa-icons.c (balsa_register_pixmaps),
+	  (balsa_register_pixbufs): do not append it to the
+	  icon-theme-search-path.
+
 2017-04-24  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* libbalsa/files.c (libbalsa_icon_finder): more carefully check

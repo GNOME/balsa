@@ -34,7 +34,6 @@
 
 static const gchar *permanent_prefixes[] = {
     BALSA_DATA_PREFIX,
-    BALSA_STD_PREFIX,
     "src",
     ".",
     NULL

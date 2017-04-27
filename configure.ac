@@ -795,10 +795,9 @@ dnl ###########################################################################
 if test "x$prefix" = "xNONE"; then
 	prefix=$ac_default_prefix
 fi
-CPPFLAGS="$CPPFLAGS -DBALSA_STD_PREFIX=\\\"${prefix}\\\""
-CPPFLAGS="$CPPFLAGS -DBALSA_DATA_PREFIX=\\\"${datadir}/balsa\\\""
 BALSA_DATA_PREFIX="${datadir}/balsa"
 AC_SUBST(BALSA_DATA_PREFIX)
+CPPFLAGS="$CPPFLAGS -DBALSA_DATA_PREFIX=\\\"${BALSA_DATA_PREFIX}\\\""
 
 dnl Documentation and Testing requirements for libnetclient
 

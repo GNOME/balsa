@@ -29,7 +29,7 @@
 #include "address-view.h"
 
 /* comment out the next line to suppress info about loading images */
-#if 0
+#if 1
 #define BICONS_VERBOSE
 #endif
 
@@ -177,7 +177,6 @@ balsa_register_pixmaps(void)
 
     balsa_icon_table =
         g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
-    gtk_icon_theme_append_search_path(icon_theme, BALSA_STD_PREFIX "/share/icons");
     gtk_icon_theme_append_search_path(icon_theme, BALSA_DATA_PREFIX);
 
     for (i = 0; i < G_N_ELEMENTS(balsa_icons); i++)
@@ -221,10 +220,6 @@ balsa_register_pixbufs(GtkWidget * widget)
     };
     guint i;
     GtkIconTheme *icon_theme = gtk_icon_theme_get_default();
-
-    gtk_icon_theme_append_search_path(icon_theme,
-                                      BALSA_STD_PREFIX "/share/icons");
-    gtk_icon_theme_append_search_path(icon_theme, BALSA_DATA_PREFIX);
 
     for (i = 0; i < G_N_ELEMENTS(icons); i++) {
         GdkPixbuf *pixbuf;

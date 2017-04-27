@@ -1,5 +1,10 @@
 2017-04-26  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	* src/balsa-icons.c: disable debug output, left enabled by
+	mistake.
+
+2017-04-26  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Do not define an unused path
 
 	* configure.ac: do not define BALSA_STD_PREFIX, it is not used.

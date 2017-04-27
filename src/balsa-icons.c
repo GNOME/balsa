@@ -29,7 +29,7 @@
 #include "address-view.h"
 
 /* comment out the next line to suppress info about loading images */
-#if 1
+#if 0
 #define BICONS_VERBOSE
 #endif
 

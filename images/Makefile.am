@@ -18,5 +18,5 @@ install-data-hook:
 	if test -x "$(GTK_UPDATE_ICON_CACHE)" ; then	\
 	    $(GTK_UPDATE_ICON_CACHE)			\
 		--ignore-theme-index			\
-		$(BALSA_DATA_PREFIX) ;			\
+		$(DESTDIR)$(BALSA_DATA_PREFIX) ;	\
 	fi

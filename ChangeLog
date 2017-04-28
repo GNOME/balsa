@@ -1,5 +1,11 @@
 2017-04-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Restore support for $(DESTDIR) installations
+
+	* images/Makefile.am:
+
+2017-04-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Restore updating the icon cache, and remove a redundant action
 
 	* configure.ac: find the path to gtk-update-icon-cache.

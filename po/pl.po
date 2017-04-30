@@ -12,9 +12,10 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-04-23 20:17+0200\n"
-"PO-Revision-Date: 2017-04-23 20:18+0200\n"
+"Report-Msgid-Bugs-To: https://bugzilla.gnome.org/enter_bug.cgi?"
+"product=balsa&keywords=I18N+L10N&component=general\n"
+"POT-Creation-Date: 2017-04-30 19:39+0200\n"
+"PO-Revision-Date: 2017-04-30 19:40+0200\n"
 "Last-Translator: Piotr Drąg <piotrdrag@gmail.com>\n"
 "Language-Team: Polish <community-poland@mozilla.org>\n"
 "Language: pl\n"
@@ -2313,104 +2314,139 @@ msgstr ""
 "• lub administrator sieci w miejscu pracy/uczelni musi połączyć komputer "
 "z Internetem."
 
-#: ../libnetclient/net-client.c:81 ../libnetclient/net-client.c:118
+#: ../libnetclient/net-client.c:78 ../libnetclient/net-client.c:116
 #, c-format
 msgid "network client is already connected"
 msgstr "klient sieciowy jest już połączony"
 
-#: ../libnetclient/net-client.c:157 ../libnetclient/net-client.c:200
+#: ../libnetclient/net-client.c:155 ../libnetclient/net-client.c:198
 #, c-format
 msgid "network client is not connected"
 msgstr "klient sieciowy nie jest połączony"
 
-#: ../libnetclient/net-client.c:168
+#: ../libnetclient/net-client.c:166
 #, c-format
 msgid "reply length %lu exceeds the maximum allowed length %lu"
 msgstr ""
 "długość odpowiedzi (%lu) przekracza maksymalnie dozwoloną długość (%lu)"
 
-#: ../libnetclient/net-client.c:183
+#: ../libnetclient/net-client.c:181
 #, c-format
 msgid "connection lost"
 msgstr "utracono połączenie"
 
-#: ../libnetclient/net-client.c:231
+#: ../libnetclient/net-client.c:229
 #, c-format
 msgid "line too long"
 msgstr "wiersz jest za długi"
 
-#: ../libnetclient/net-client.c:300
+#: ../libnetclient/net-client.c:298
 #, c-format
 msgid "error initializing certificate: %s"
 msgstr "błąd podczas inicjowania certyfikatu: %s"
 
-#: ../libnetclient/net-client.c:310
+#: ../libnetclient/net-client.c:308
 #, c-format
 msgid "error loading certificate: %s"
 msgstr "błąd podczas wczytywania certyfikatu: %s"
 
-#: ../libnetclient/net-client.c:318
+#: ../libnetclient/net-client.c:316
 #, c-format
 msgid "error initializing key: %s"
 msgstr "błąd podczas inicjowania klucza: %s"
 
-#: ../libnetclient/net-client.c:374
+#: ../libnetclient/net-client.c:372
 #, c-format
 msgid "error loading key: %s"
 msgstr "błąd podczas wczytywania klucza: %s"
 
-#: ../libnetclient/net-client.c:414
+#: ../libnetclient/net-client.c:412
 #, c-format
 msgid "not connected"
 msgstr "nie połączono"
 
-#: ../libnetclient/net-client.c:416
+#: ../libnetclient/net-client.c:414
 #, c-format
 msgid "connection is already encrypted"
 msgstr "połączenie jest już zaszyfrowane"
 
 #. unexpected server reply
-#: ../libnetclient/net-client-pop.c:209 ../libnetclient/net-client-pop.c:425
-#: ../libnetclient/net-client-smtp.c:512 ../libnetclient/net-client-smtp.c:579
-#: ../libnetclient/net-client-smtp.c:621
+#: ../libnetclient/net-client-pop.c:214 ../libnetclient/net-client-pop.c:431
+#: ../libnetclient/net-client-smtp.c:581 ../libnetclient/net-client-smtp.c:652
+#: ../libnetclient/net-client-smtp.c:694
 #, c-format
 msgid "bad server reply: %s"
 msgstr "błędna odpowiedź serwera: %s"
 
-#: ../libnetclient/net-client-pop.c:248
+#: ../libnetclient/net-client-pop.c:253
 #, c-format
 msgid "bad server reply"
 msgstr "błędna odpowiedź serwera"
 
-#: ../libnetclient/net-client-pop.c:417 ../libnetclient/net-client-pop.c:632
+#: ../libnetclient/net-client-pop.c:423 ../libnetclient/net-client-pop.c:702
 #, c-format
 msgid "error: %s"
 msgstr "błąd: %s"
 
-#: ../libnetclient/net-client-pop.c:420
+#: ../libnetclient/net-client-pop.c:426
 #, c-format
 msgid "error"
 msgstr "błąd"
 
-#: ../libnetclient/net-client-pop.c:498 ../libnetclient/net-client-smtp.c:394
+#: ../libnetclient/net-client-pop.c:489 ../libnetclient/net-client-smtp.c:391
+#, c-format
+msgid "password required"
+msgstr "wymagane jest hasło"
+
+#: ../libnetclient/net-client-pop.c:508 ../libnetclient/net-client-smtp.c:406
 #, c-format
 msgid "no suitable authentication mechanism"
 msgstr "brak odpowiedniego mechanizmu uwierzytelniania"
 
-#: ../libnetclient/net-client-smtp.c:138
+#: ../libnetclient/net-client-smtp.c:141
 #, c-format
 msgid "remote server does not support STARTTLS"
 msgstr "zdalny serwer nie obsługuje STARTTLS"
 
-#: ../libnetclient/net-client-smtp.c:611
+#: ../libnetclient/net-client-smtp.c:684
 #, c-format
 msgid "transient error %d: %s"
 msgstr "błąd przejściowy %d: %s"
 
-#: ../libnetclient/net-client-smtp.c:616
+#: ../libnetclient/net-client-smtp.c:689
 #, c-format
 msgid "permanent error %d: %s"
 msgstr "trwały błąd %d: %s"
+
+#: ../libnetclient/net-client-utils.c:143
+#, c-format
+msgid "importing GSS service name %s failed: %s"
+msgstr "zaimportowanie nazwy usługi GSS %s się nie powiodło: %s"
+
+#: ../libnetclient/net-client-utils.c:186
+#, c-format
+msgid "cannot initialize GSS security context: %s"
+msgstr "nie można zainicjować kontekstu bezpieczeństwa GSS: %s"
+
+#: ../libnetclient/net-client-utils.c:225
+#, c-format
+msgid "malformed GSS security token: %s"
+msgstr "błędnie sformatowany token bezpieczeństwa GSS: %s"
+
+#: ../libnetclient/net-client-utils.c:234
+#, c-format
+msgid "malformed GSS security token"
+msgstr "błędnie sformatowany token bezpieczeństwa GSS"
+
+#: ../libnetclient/net-client-utils.c:250
+#, c-format
+msgid "cannot create GSS login request: %s"
+msgstr "nie można utworzyć żądania logowania GSS: %s"
+
+#: ../libnetclient/net-client-utils.c:315
+#, c-format
+msgid "unknown error code %u:%u"
+msgstr "nieznany kod błędu %u:%u"
 
 #: ../sounds/balsa.soundlist.in.h:1
 msgid "Balsa Email Reader"

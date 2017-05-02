@@ -38,7 +38,7 @@ G_BEGIN_DECLS
         GtkWidget *page;
         GtkWidget *incoming_srv;
         GtkWidget *incoming_type;
-        GtkWidget *using_ssl;
+        GtkWidget *security;
         GtkWidget *login;
         GtkWidget *passwd;
         GtkWidget *remember_passwd;

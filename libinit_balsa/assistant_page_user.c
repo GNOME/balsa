@@ -64,6 +64,12 @@ balsa_druid_page_user_init(BalsaDruidPageUser * user,
            "this up for you):");
 #endif
     static const char* server_types[] = { "POP3", "IMAP", NULL };
+    static const gchar *security_modes[] = {
+    	N_("SSL"),
+		N_("TLS required"),
+		N_("TLS if possible (not recommended)"),
+		N_("None (not recommended)"),
+		NULL };
     static const char* remember_passwd[] = {
         N_("Yes, remember it"), N_("No, type it in every time"), NULL };
     GtkGrid *grid;
@@ -104,9 +110,10 @@ balsa_druid_page_user_init(BalsaDruidPageUser * user,
                                 _("_Type of mail server:"),
                                server_types, druid, &(user->incoming_type));
 
-    balsa_init_add_grid_checkbox(grid, row++,
-                                  _("Connect using _SSL:"), FALSE,
-                                  druid, &(user->using_ssl));
+    balsa_init_add_grid_option(grid, row++,
+    						   _("Connection _Security"),
+							   security_modes, druid, &(user->security));
+    gtk_combo_box_set_active(GTK_COMBO_BOX(user->security), NET_CLIENT_CRYPT_STARTTLS - 1);
 
     balsa_init_add_grid_entry(grid, row++, _("Your email _login name:"),
                                g_get_user_name(),
@@ -186,7 +193,7 @@ balsa_druid_page_user_prepare(GtkAssistant * druid, GtkWidget * page,
 }
 
 static LibBalsaMailbox*
-create_pop3_mbx(const gchar *name, const gchar* host, gboolean ssl, 
+create_pop3_mbx(const gchar *name, const gchar* host, gint security,
                 const gchar *login, const gchar *passwd,
                 gboolean remember)
 {
@@ -196,8 +203,8 @@ create_pop3_mbx(const gchar *name, const gchar* host, gboolean ssl,
 
     libbalsa_server_set_username(server, login);
     libbalsa_server_set_password(server, passwd);
-    libbalsa_server_set_host(server, host, ssl);
-    server->tls_mode        = LIBBALSA_TLS_ENABLED;
+    libbalsa_server_set_host(server, host, FALSE);
+    server->security        = security;
     server->remember_passwd = remember;
     mbx->name               = g_strdup(name && *name ? name : host);
     pop->check              = TRUE;
@@ -210,7 +217,7 @@ create_pop3_mbx(const gchar *name, const gchar* host, gboolean ssl,
 }
 
 static void
-create_imap_mbx(const gchar *name, const gchar* host, gboolean ssl,
+create_imap_mbx(const gchar *name, const gchar* host, gint security,
                 const gchar *login, const gchar *passwd,
                 gboolean remember)
 {
@@ -219,8 +226,17 @@ create_imap_mbx(const gchar *name, const gchar* host, gboolean ssl,
         LIBBALSA_SERVER(libbalsa_imap_server_new(login, host));
     libbalsa_server_set_username(server, login);
     libbalsa_server_set_password(server, passwd);
-    libbalsa_server_set_host(server, host, ssl);
-    server->tls_mode        = LIBBALSA_TLS_ENABLED;
+    libbalsa_server_set_host(server, host, security == NET_CLIENT_CRYPT_ENCRYPTED);
+    switch (security) {
+    case NET_CLIENT_CRYPT_STARTTLS:
+    	server->tls_mode   = LIBBALSA_TLS_REQUIRED;
+    	break;
+    case NET_CLIENT_CRYPT_STARTTLS_OPT:
+    	server->tls_mode   = LIBBALSA_TLS_ENABLED;
+    	break;
+    default:
+    	server->tls_mode   = LIBBALSA_TLS_DISABLED;
+    }
     server->remember_passwd = remember;
     mbnode = balsa_mailbox_node_new_imap_folder(server, NULL);
     mbnode->name = g_strdup(name && *name ? name : host);
@@ -252,18 +268,17 @@ balsa_druid_page_user_next(GtkAssistant * druid, GtkWidget * page,
         LibBalsaMailbox *mbx = NULL;
         const gchar *login = gtk_entry_get_text(GTK_ENTRY(user->login));
         const gchar *passwd = gtk_entry_get_text(GTK_ENTRY(user->passwd));
-        gboolean ssl = 
-            gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(user->using_ssl));
+        gint security = balsa_option_get_active(user->security) + NET_CLIENT_CRYPT_ENCRYPTED;
         gboolean remember = 
             balsa_option_get_active(user->remember_passwd) == 0;
         switch(balsa_option_get_active(user->incoming_type)) {
         case 0: /* POP */
-            mbx = create_pop3_mbx(host, host, ssl, login, passwd, remember);
+            mbx = create_pop3_mbx(host, host, security, login, passwd, remember);
             if(mbx)
                 config_mailbox_add(mbx, NULL);
             break;
         case 1: /* IMAP */
-            create_imap_mbx(host, host, ssl, login, passwd, remember);
+            create_imap_mbx(host, host, security, login, passwd, remember);
             break; 
         default: /* hm */;
         }

@@ -1,3 +1,13 @@
+2017-05-01  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Assistant improvements
+
+	* libbalsa/libbalsa.c (libbalsa_guess_email_address): read
+	  /etc/mailname using glib, and remove everything starting with
+	  the 1st newline.
+	* libinit_balsa/assistant_page_user.[ch]: replace the "SSL"
+	  checkbox by a combo asking for the requested security mode.
+
 2017-04-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Restore support for $(DESTDIR) installations

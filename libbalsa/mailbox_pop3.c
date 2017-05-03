@@ -683,8 +683,10 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
 		}
 
 		if (!result) {
-			libbalsa_information(LIBBALSA_INFORMATION_ERROR, _("POP3 error: %s"), err->message);
-			g_error_free(err);
+			libbalsa_information(LIBBALSA_INFORMATION_ERROR, _("POP3 error: %s"),
+                                             err != NULL ? err->message : "?");
+			if (err != NULL)
+                            g_error_free(err);
 		}
 
 		/* done - clean up */

@@ -1,3 +1,10 @@
+2017-05-02  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Do not dereference NULL GError pointer
+
+	* libbalsa/mailbox_pop3.c (libbalsa_mailbox_pop3_check): check
+	for err == NULL.
+
 2017-05-01  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Assistant improvements

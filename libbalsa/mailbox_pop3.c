@@ -430,6 +430,7 @@ message_cb(const gchar                    *buffer,
 		if (fd->filter_path == NULL) {
 			GError *add_err = NULL;
 
+		    g_mime_stream_reset(fd->handler->mbx_stream);
 		    result = libbalsa_mailbox_add_message(LIBBALSA_MAILBOX_POP3(fd->mailbox)->inbox, fd->handler->mbx_stream,
 		    	LIBBALSA_MESSAGE_FLAG_NEW | LIBBALSA_MESSAGE_FLAG_RECENT, &add_err);
 		    if (!result) {

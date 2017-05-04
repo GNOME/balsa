@@ -487,8 +487,25 @@ parse_mailbox(LibBalsaMailboxMbox * mbox)
 
         msg_info.status = msg_info.x_status = msg_info.mime_version = -1;
         mime_message   = g_mime_parser_construct_message(gmime_parser);
-        if (!mime_message)
+        if (mime_message == NULL) {
+            /* Skip to the next message, if any */
+            GMimeStream *mbox_stream;
+
+            mbox_stream = mbox->gmime_stream;
+            while (!g_mime_stream_eos(mbox_stream)) {
+                gchar c;
+
+                while (g_mime_stream_read(mbox_stream, &c, 1) == 1)
+                    if (c == '\n')
+                        break;
+
+                if (lbm_mbox_stream_seek_to_message(mbox_stream,
+                                                    g_mime_stream_tell(mbox_stream)))
+                    break;
+            }
+            g_mime_parser_init_with_stream(gmime_parser, mbox_stream);
             continue;
+        }
         msg_info.start = g_mime_parser_get_from_offset(gmime_parser);
         msg_info.end   = g_mime_parser_tell(gmime_parser);
         if (msg_info.end <= msg_info.start

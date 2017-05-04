@@ -1,5 +1,10 @@
 2017-05-04  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	* libbalsa/mailbox_mbox.c (parse_mailbox): try to recover when
+	the GMimeParser returns a NULL GMimeMessage.
+
+2017-05-04  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* libbalsa/mailbox_pop3.c (message_cb): reset the GMimeStream
 	  before passing it to libbalsa_mailbox_add_message.
 

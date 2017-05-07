@@ -14,8 +14,8 @@ msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: https://bugzilla.gnome.org/enter_bug.cgi?"
 "product=balsa&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2017-04-30 19:39+0200\n"
-"PO-Revision-Date: 2017-04-30 19:40+0200\n"
+"POT-Creation-Date: 2017-05-07 09:29+0200\n"
+"PO-Revision-Date: 2017-05-07 09:30+0200\n"
 "Last-Translator: Piotr Drąg <piotrdrag@gmail.com>\n"
 "Language-Team: Polish <community-poland@mozilla.org>\n"
 "Language: pl\n"
@@ -722,32 +722,32 @@ msgstr "Nie można połączyć z serwerem: %s"
 msgid "Exceeded the number of connections per server %s"
 msgstr "Przekroczono liczbę połączeń na serwer %s"
 
-#: ../libbalsa/libbalsa.c:366
+#: ../libbalsa/libbalsa.c:369
 msgid "Invalid date"
 msgstr "Nieprawidłowa data"
 
-#: ../libbalsa/libbalsa.c:383 ../src/pref-manager.c:1370
+#: ../libbalsa/libbalsa.c:386 ../src/pref-manager.c:1370
 #: ../src/pref-manager.c:1466
 msgid "Unknown"
 msgstr "Nieznane"
 
-#: ../libbalsa/libbalsa.c:525 ../libbalsa/libbalsa.c:630
+#: ../libbalsa/libbalsa.c:528 ../libbalsa/libbalsa.c:633
 msgid "SSL/TLS certificate"
 msgstr "Certyfikat SSL/TLS"
 
-#: ../libbalsa/libbalsa.c:529 ../libbalsa/libbalsa.c:634
+#: ../libbalsa/libbalsa.c:532 ../libbalsa/libbalsa.c:637
 msgid "_Accept Once"
 msgstr "_Przyjmij raz"
 
-#: ../libbalsa/libbalsa.c:530 ../libbalsa/libbalsa.c:635
+#: ../libbalsa/libbalsa.c:533 ../libbalsa/libbalsa.c:638
 msgid "Accept & _Save"
 msgstr "Przyjmij i _zapisz"
 
-#: ../libbalsa/libbalsa.c:531 ../libbalsa/libbalsa.c:636
+#: ../libbalsa/libbalsa.c:534 ../libbalsa/libbalsa.c:639
 msgid "_Reject"
 msgstr "_Odrzuć"
 
-#: ../libbalsa/libbalsa.c:541
+#: ../libbalsa/libbalsa.c:544
 #, c-format
 msgid ""
 "<big><b>Authenticity of this certificate could not be verified.</b></big>\n"
@@ -756,7 +756,7 @@ msgstr ""
 "<big><b>Nie można potwierdzić autentyczności tego certyfikatu.</b></big>\n"
 "Powód: %s"
 
-#: ../libbalsa/libbalsa.c:588
+#: ../libbalsa/libbalsa.c:591
 #, c-format
 msgid ""
 "Authenticity of this certificate could not be verified.\n"
@@ -767,7 +767,7 @@ msgstr ""
 "<b>Powód:</b> %s\n"
 "<b>Ten certyfikat należy do:</b>\n"
 
-#: ../libbalsa/libbalsa.c:600
+#: ../libbalsa/libbalsa.c:603
 msgid ""
 "\n"
 "<b>This certificate was issued by:</b>\n"
@@ -775,7 +775,7 @@ msgstr ""
 "\n"
 "<b>Ten certyfikat został wydany przez:</b>\n"
 
-#: ../libbalsa/libbalsa.c:611
+#: ../libbalsa/libbalsa.c:614
 #, c-format
 msgid ""
 "<b>This certificate is valid</b>\n"
@@ -788,28 +788,28 @@ msgstr ""
 "do %s\n"
 "<b>Odcisk:</b> %s"
 
-#: ../libbalsa/libbalsa.c:685
+#: ../libbalsa/libbalsa.c:688
 #, c-format
 msgid "Connection to %s timed out. Abort?"
 msgstr "Połączenie z %s przekroczyło czas oczekiwania. Przerwać?"
 
-#: ../libbalsa/libbalsa.c:842
+#: ../libbalsa/libbalsa.c:845
 #, c-format
 msgid "No image data"
 msgstr "Brak danych obrazu"
 
-#: ../libbalsa/libbalsa.c:876
+#: ../libbalsa/libbalsa.c:879
 #, c-format
 msgid "Invalid input format"
 msgstr "Nieprawidłowy format wejściowy"
 
-#: ../libbalsa/libbalsa.c:880
+#: ../libbalsa/libbalsa.c:883
 #, c-format
 msgid "Internal buffer overrun"
 msgstr "Przepełnienie wewnętrznego bufora"
 
 #. Translators: please do not translate Face.
-#: ../libbalsa/libbalsa.c:897
+#: ../libbalsa/libbalsa.c:900
 #, c-format
 msgid "Bad X-Face data"
 msgstr "Błędne dane X-Face"
@@ -1106,7 +1106,7 @@ msgstr ""
 "ponownie…"
 
 #: ../libbalsa/mailbox_imap.c:1122 ../libbalsa/mailbox_maildir.c:503
-#: ../libbalsa/mailbox_mbox.c:737 ../libbalsa/mailbox_mh.c:539
+#: ../libbalsa/mailbox_mbox.c:754 ../libbalsa/mailbox_mh.c:539
 #, c-format
 msgid "%s: Opening %s Refcount: %d\n"
 msgstr "%s: otwieranie %s. Liczba odwołań: %d\n"
@@ -1240,13 +1240,13 @@ msgstr ""
 "Nie można usunąć %s:\n"
 "%s"
 
-#: ../libbalsa/mailbox_maildir.c:484 ../libbalsa/mailbox_mbox.c:684
+#: ../libbalsa/mailbox_maildir.c:484 ../libbalsa/mailbox_mbox.c:701
 #: ../libbalsa/mailbox_mh.c:522
 #, c-format
 msgid "Mailbox does not exist."
 msgstr "Skrzynka nie istnieje."
 
-#: ../libbalsa/mailbox_maildir.c:924 ../libbalsa/mailbox_mbox.c:1968
+#: ../libbalsa/mailbox_maildir.c:924 ../libbalsa/mailbox_mbox.c:1985
 #: ../libbalsa/mailbox_mh.c:1102
 #, c-format
 msgid "Data copy error"
@@ -1279,32 +1279,32 @@ msgstr ""
 msgid "Could not unlink file %s: %s"
 msgstr "Nie można odwiązać pliku %s: %s"
 
-#: ../libbalsa/mailbox_mbox.c:692
+#: ../libbalsa/mailbox_mbox.c:709
 #, c-format
 msgid "Cannot open mailbox."
 msgstr "Nie można otworzyć skrzynki."
 
-#: ../libbalsa/mailbox_mbox.c:704
+#: ../libbalsa/mailbox_mbox.c:721
 #, c-format
 msgid "Mailbox is not in mbox format."
 msgstr "Skrzynka nie jest w formacie mbox."
 
-#: ../libbalsa/mailbox_mbox.c:712
+#: ../libbalsa/mailbox_mbox.c:729
 #, c-format
 msgid "Cannot lock mailbox."
 msgstr "Nie można zablokować skrzynki."
 
-#: ../libbalsa/mailbox_mbox.c:1924
+#: ../libbalsa/mailbox_mbox.c:1941
 #, c-format
 msgid "%s: could not open %s."
 msgstr "%s: nie można otworzyć %s."
 
-#: ../libbalsa/mailbox_mbox.c:1936
+#: ../libbalsa/mailbox_mbox.c:1953
 #, c-format
 msgid "%s: could not get new MIME stream."
 msgstr "%s: nie można pobrać nowego strumienia MIME."
 
-#: ../libbalsa/mailbox_mbox.c:1944
+#: ../libbalsa/mailbox_mbox.c:1961
 #, c-format
 msgid "%s: %s is not in mbox format."
 msgstr "%s: %s nie jest w formacie mbox."
@@ -1359,51 +1359,51 @@ msgstr "Przesłanie wiadomości POP do %s się nie powiodło: %s"
 msgid "Message %lu of %lu (%s of %s)"
 msgstr "%lu. wiadomość z %lu (%s z %s)"
 
-#: ../libbalsa/mailbox_pop3.c:436
+#: ../libbalsa/mailbox_pop3.c:437
 #, c-format
 msgid "Error appending message %d from %s to %s: %s"
 msgstr "Błąd podczas dołączania wiadomości %d od %s do %s: %s"
 
-#: ../libbalsa/mailbox_pop3.c:494 ../libbalsa/send.c:635
+#: ../libbalsa/mailbox_pop3.c:495 ../libbalsa/send.c:635
 #, c-format
 msgid "Cannot load certificate file %s: %s"
 msgstr "Nie można wczytać pliku certyfikatu %s: %s"
 
-#: ../libbalsa/mailbox_pop3.c:508
+#: ../libbalsa/mailbox_pop3.c:509
 #, c-format
 msgid "POP3 mailbox %s: cannot connect %s: %s"
 msgstr "Skrzynka POP3 %s: nie można połączyć %s: %s"
 
-#: ../libbalsa/mailbox_pop3.c:517
+#: ../libbalsa/mailbox_pop3.c:518
 #, c-format
 msgid "POP3 mailbox %s error: %s"
 msgstr "Błąd skrzynki POP3 %s: %s"
 
-#: ../libbalsa/mailbox_pop3.c:561
+#: ../libbalsa/mailbox_pop3.c:562
 #, c-format
 msgid "POP3 message %d oversized: %s — skipped."
 msgstr "Wiadomość POP3 %d przekroczyła rozmiar: %s — pominięto."
 
-#: ../libbalsa/mailbox_pop3.c:639
+#: ../libbalsa/mailbox_pop3.c:640
 msgid "Connected"
 msgstr "Połączono"
 
-#: ../libbalsa/mailbox_pop3.c:653
+#: ../libbalsa/mailbox_pop3.c:654
 #, c-format
 msgid "%lu new messages (%s)"
 msgstr "Nowe wiadomości: %lu (%s)"
 
-#: ../libbalsa/mailbox_pop3.c:664
+#: ../libbalsa/mailbox_pop3.c:665
 msgid "Deleting messages on server…"
 msgstr "Usuwanie wiadomości na serwerze…"
 
-#: ../libbalsa/mailbox_pop3.c:686
+#: ../libbalsa/mailbox_pop3.c:687
 #, c-format
 msgid "POP3 error: %s"
 msgstr "Błąd POP3: %s"
 
 #. done - clean up
-#: ../libbalsa/mailbox_pop3.c:691
+#: ../libbalsa/mailbox_pop3.c:694
 msgid "Finished"
 msgstr "Ukończono"
 
@@ -1954,15 +1954,18 @@ msgstr "Logowanie do %s za pomocą %s"
 msgid "SMTP over SSL (SMTPS)"
 msgstr "SMTP przez SSL (SMTPS)"
 
-#: ../libbalsa/smtp-server.c:273 ../src/mailbox-conf.c:1295
+#: ../libbalsa/smtp-server.c:273 ../libinit_balsa/assistant_page_user.c:69
+#: ../src/mailbox-conf.c:1295
 msgid "TLS required"
 msgstr "Wymaganie TLS"
 
-#: ../libbalsa/smtp-server.c:274 ../src/mailbox-conf.c:1296
+#: ../libbalsa/smtp-server.c:274 ../libinit_balsa/assistant_page_user.c:70
+#: ../src/mailbox-conf.c:1296
 msgid "TLS if possible (not recommended)"
 msgstr "TLS, jeśli to możliwe (niezalecane)"
 
-#: ../libbalsa/smtp-server.c:275 ../src/mailbox-conf.c:1297
+#: ../libbalsa/smtp-server.c:275 ../libinit_balsa/assistant_page_user.c:71
+#: ../src/mailbox-conf.c:1297
 msgid "None (not recommended)"
 msgstr "Brak (niezalecane)"
 
@@ -2226,63 +2229,67 @@ msgstr ""
 "(administratora sieci mógł je już ustawić):"
 
 #: ../libinit_balsa/assistant_page_user.c:68
+msgid "SSL"
+msgstr "SSL"
+
+#: ../libinit_balsa/assistant_page_user.c:74
 msgid "Yes, remember it"
 msgstr "Tak, zapamiętanie"
 
-#: ../libinit_balsa/assistant_page_user.c:68
+#: ../libinit_balsa/assistant_page_user.c:74
 msgid "No, type it in every time"
 msgstr "Nie, wpisywane za każdym razem"
 
-#: ../libinit_balsa/assistant_page_user.c:99
+#: ../libinit_balsa/assistant_page_user.c:105
 msgid "Name of mail server for incoming _mail:"
 msgstr "_Nazwa serwera poczty przychodzącej:"
 
-#: ../libinit_balsa/assistant_page_user.c:104
+#: ../libinit_balsa/assistant_page_user.c:110
 msgid "_Type of mail server:"
 msgstr "_Typ serwera poczty:"
 
-#: ../libinit_balsa/assistant_page_user.c:108
-msgid "Connect using _SSL:"
-msgstr "Łączenie za pomocą SS_L:"
+#: ../libinit_balsa/assistant_page_user.c:114
+msgid "Connection _Security"
+msgstr "Za_bezpieczanie połączenia"
 
-#: ../libinit_balsa/assistant_page_user.c:111
+#: ../libinit_balsa/assistant_page_user.c:118
 msgid "Your email _login name:"
 msgstr "Nazwa _użytkownika e-mail:"
 
-#: ../libinit_balsa/assistant_page_user.c:114
+#: ../libinit_balsa/assistant_page_user.c:121
 msgid "Your _password:"
 msgstr "_Hasło:"
 
-#: ../libinit_balsa/assistant_page_user.c:121
+#: ../libinit_balsa/assistant_page_user.c:128
 msgid "_SMTP Server:"
 msgstr "_Serwer SMTP:"
 
 #. 2.1
-#: ../libinit_balsa/assistant_page_user.c:125
+#: ../libinit_balsa/assistant_page_user.c:132
 msgid "Your real _name:"
 msgstr "_Imię i nazwisko:"
 
-#: ../libinit_balsa/assistant_page_user.c:131
+#: ../libinit_balsa/assistant_page_user.c:138
 msgid "Your _email address for this email account:"
 msgstr "Adres _e-mail dla tego konta:"
 
-#: ../libinit_balsa/assistant_page_user.c:136
+#: ../libinit_balsa/assistant_page_user.c:143
 msgid "_Remember your password:"
 msgstr "_Zapamiętanie hasła:"
 
-#: ../libinit_balsa/assistant_page_user.c:141
+#: ../libinit_balsa/assistant_page_user.c:148
 msgid "_Local mail directory:"
 msgstr "_Katalog lokalnej poczty:"
 
-#: ../libinit_balsa/assistant_page_user.c:159
+#: ../libinit_balsa/assistant_page_user.c:166
 msgid "User Settings"
 msgstr "Ustawienia użytkownika"
 
-#: ../libinit_balsa/assistant_page_user.c:278
+#: ../libinit_balsa/assistant_page_user.c:293
 msgid "Default Identity"
 msgstr "Domyślna tożsamość"
 
-#: ../libinit_balsa/assistant_page_user.c:316
+#: ../libinit_balsa/assistant_page_user.c:331
 #, c-format
 msgid ""
 "Local Mail Problem\n"
@@ -2426,17 +2433,17 @@ msgstr "zaimportowanie nazwy usługi GSS %s się nie powiodło: %s"
 #: ../libnetclient/net-client-utils.c:186
 #, c-format
 msgid "cannot initialize GSS security context: %s"
-msgstr "nie można zainicjować kontekstu bezpieczeństwa GSS: %s"
+msgstr "nie można zainicjować kontekstu zabezpieczeń GSS: %s"
 
 #: ../libnetclient/net-client-utils.c:225
 #, c-format
 msgid "malformed GSS security token: %s"
-msgstr "błędnie sformatowany token bezpieczeństwa GSS: %s"
+msgstr "błędnie sformatowany token zabezpieczeń GSS: %s"
 
 #: ../libnetclient/net-client-utils.c:234
 #, c-format
 msgid "malformed GSS security token"
-msgstr "błędnie sformatowany token bezpieczeństwa GSS"
+msgstr "błędnie sformatowany token zabezpieczeń GSS"
 
 #: ../libnetclient/net-client-utils.c:250
 #, c-format

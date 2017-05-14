@@ -441,7 +441,7 @@ idle_start(gpointer data)
   if(!g_mutex_trylock(&h->mutex))
     return TRUE;/* Don't block, just try again later. */
   IMAP_REQUIRED_STATE3(h, IMHS_CONNECTED, IMHS_AUTHENTICATED,
-                       IMHS_SELECTED, FALSE);
+                       IMHS_SELECTED, (h->idle_enable_id = 0, FALSE));
 
   asyncno = imap_make_tag(tag); sio_write(h->sio, tag, strlen(tag));
   sio_write(h->sio, " IDLE\r\n", 7); sio_flush(h->sio);

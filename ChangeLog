@@ -1,3 +1,8 @@
+2017-05-14  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* libbalsa/imap/imap-handle.c (idle_start): clear
+	  ImapMboxHandle::enable_idle_id before returning FALSE.
+
 2017-05-04  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* libbalsa/mailbox_mbox.c (parse_mailbox): try to recover when

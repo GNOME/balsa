@@ -23,10 +23,14 @@
 #endif                          /* HAVE_CONFIG_H */
 
 #include "libbalsa.h"
+#include "server.h"
 
 static void libbalsa_mailbox_remote_class_init(LibBalsaMailboxRemoteClass *
 					       klass);
 static void libbalsa_mailbox_remote_init(LibBalsaMailboxRemote * mailbox);
+static void libbalsa_mailbox_remote_test_can_reach(LibBalsaMailbox          * mailbox,
+                                                   LibBalsaCanReachCallback * cb,
+                                                   gpointer                   cb_data);
 
 GType
 libbalsa_mailbox_remote_get_type(void)
@@ -58,6 +62,12 @@ libbalsa_mailbox_remote_get_type(void)
 static void
 libbalsa_mailbox_remote_class_init(LibBalsaMailboxRemoteClass * klass)
 {
+    LibBalsaMailboxClass *libbalsa_mailbox_class;
+
+    libbalsa_mailbox_class = LIBBALSA_MAILBOX_CLASS(klass);
+
+    libbalsa_mailbox_class->test_can_reach =
+        libbalsa_mailbox_remote_test_can_reach;
 }
 
 static void
@@ -65,6 +75,19 @@ libbalsa_mailbox_remote_init(LibBalsaMailboxRemote * mailbox)
 {
     mailbox->server = NULL;
 }
+
+/* Test whether a mailbox is reachable */
+
+static void
+libbalsa_mailbox_remote_test_can_reach(LibBalsaMailbox          * mailbox,
+                                       LibBalsaCanReachCallback * cb,
+                                       gpointer                   cb_data)
+{
+    libbalsa_server_test_can_reach_full(LIBBALSA_MAILBOX_REMOTE(mailbox)->server,
+                                        cb, cb_data, (GObject *) mailbox);
+}
+
+/* Public method */
 
 void 
 libbalsa_mailbox_remote_set_server(LibBalsaMailboxRemote *m, LibBalsaServer *s)

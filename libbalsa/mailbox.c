@@ -230,6 +230,7 @@ libbalsa_mailbox_class_init(LibBalsaMailboxClass * klass)
     klass->total_messages = NULL;
     klass->duplicate_msgnos = NULL;
     klass->lock_store  = libbalsa_mailbox_real_lock_store;
+    klass->test_can_reach = NULL;
 }
 
 static void
@@ -4390,4 +4391,11 @@ libbalsa_mailbox_set_background(LibBalsaMailbox * mailbox, GArray * msgnos,
                                 const gchar * color)
 {
     lbm_set_color(mailbox, msgnos, color, FALSE);
+}
+
+void libbalsa_mailbox_test_can_reach(LibBalsaMailbox          * mailbox,
+                                     LibBalsaCanReachCallback * cb,
+                                     gpointer                   cb_data)
+{
+    LIBBALSA_MAILBOX_GET_CLASS(mailbox)->test_can_reach(mailbox, cb, cb_data);
 }

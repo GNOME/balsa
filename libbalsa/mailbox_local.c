@@ -103,6 +103,9 @@ static gboolean libbalsa_mailbox_local_msgno_has_flags(LibBalsaMailbox *
                                                        set,
                                                        LibBalsaMessageFlag
                                                        unset);
+static void libbalsa_mailbox_local_test_can_reach(LibBalsaMailbox          * mailbox,
+                                                  LibBalsaCanReachCallback * cb,
+                                                  gpointer                   cb_data);
 
 /* LibBalsaMailboxLocal class method: */
 static void lbm_local_real_remove_files(LibBalsaMailboxLocal * local);
@@ -181,6 +184,8 @@ libbalsa_mailbox_local_class_init(LibBalsaMailboxLocalClass * klass)
         libbalsa_mailbox_local_msgno_has_flags;
     libbalsa_mailbox_class->duplicate_msgnos =
         libbalsa_mailbox_local_duplicate_msgnos;
+    libbalsa_mailbox_class->test_can_reach =
+        libbalsa_mailbox_local_test_can_reach;
     klass->check_files  = NULL;
     klass->set_path     = NULL;
     klass->remove_files = lbm_local_real_remove_files;
@@ -2354,6 +2359,14 @@ libbalsa_mailbox_local_duplicate_msgnos(LibBalsaMailbox * mailbox)
     g_hash_table_destroy(table);
 
     return msgnos;
+}
+
+static void
+libbalsa_mailbox_local_test_can_reach(LibBalsaMailbox          * mailbox,
+                                      LibBalsaCanReachCallback * cb,
+                                      gpointer                   cb_data)
+{
+    cb((GObject *) mailbox, TRUE, cb_data);
 }
 
 /* LibBalsaMailboxLocal class method: */

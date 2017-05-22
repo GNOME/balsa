@@ -28,8 +28,6 @@
 #include <gdk/gdk.h>
 #include <gmime/gmime.h>
 
-#include "libbalsa.h"
-
 #define LIBBALSA_TYPE_MAILBOX \
     (libbalsa_mailbox_get_type())
 #define LIBBALSA_MAILBOX(obj) \
@@ -331,6 +329,9 @@ struct _LibBalsaMailboxClass {
     guint (*total_messages)(LibBalsaMailbox * mailbox);
     GArray *(*duplicate_msgnos) (LibBalsaMailbox * mailbox);
     void (*lock_store) (LibBalsaMailbox * mailbox, gboolean lock);
+    void (*test_can_reach) (LibBalsaMailbox          * mailbox,
+                            LibBalsaCanReachCallback * cb,
+                            gpointer                   cb_data);
 };
 
 GType libbalsa_mailbox_get_type(void);
@@ -646,6 +647,11 @@ void libbalsa_mailbox_set_background(LibBalsaMailbox * mailbox,
  */
 void libbalsa_mailbox_lock_store  (LibBalsaMailbox * mailbox);
 void libbalsa_mailbox_unlock_store(LibBalsaMailbox * mailbox);
+
+/* Check whether a mailbox can be reached */
+void libbalsa_mailbox_test_can_reach(LibBalsaMailbox          * mailbox,
+                                     LibBalsaCanReachCallback * cb,
+                                     gpointer                   cb_data);
 
 /* columns ids */
 typedef enum {

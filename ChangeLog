@@ -1,5 +1,21 @@
 2017-05-22  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Test whether a LibBalsaMailbox can be reached by testing its
+	server
+
+	* libbalsa/mailbox.c (libbalsa_mailbox_class_init),
+	  (libbalsa_mailbox_set_background),
+	  (libbalsa_mailbox_test_can_reach): LibBalsaMailbox support.
+	* libbalsa/mailbox.h: ditto.
+	* libbalsa/mailbox_local.c (libbalsa_mailbox_local_class_init),
+	  (libbalsa_mailbox_local_test_can_reach): LibBalsaMailboxLocal
+	  support.
+	* libbalsa/mailbox_remote.c (libbalsa_mailbox_remote_class_init),
+	  (libbalsa_mailbox_remote_test_can_reach):
+	  LibBalsaMailboxRemote support.
+
+2017-05-22  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Needed for previous LibBalsaServer commit
 
 	* libbalsa/libbalsa.h: typedef the callback for testing whether

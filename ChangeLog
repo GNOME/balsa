@@ -1,5 +1,26 @@
 2017-05-22  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Use the LibBalsaMailbox method to test whether we can reach IMAP
+	mailboxes and POP3 hosts
+
+	* src/main-window.c (bw_network_changed_cb):
+	  add a timeout whenever we get the "network-changed" signal,
+	  because the reachability of hosts may have changed even when
+	  the network is still "available"; save the timeout source id;
+	  (balsa_window_destroy): remove the GSource, if any;
+	  (mw_mbox_can_reach_cb): new callback for testing whether we
+	  can reach an IMAP mailbox;
+	  (mw_mbox_change_connection_status): use the new
+	  LibBalsaMailbox method for testing reachability;
+	  (bw_change_connection_status_can_reach_cb): new callback for
+	  testing whether we can reach a POP3 host;
+	  (bw_change_connection_status_idle): use the new
+	  LibBalsaMailbox method for testing reachability.
+	* src/main-window.h: New member guint
+	BalsaWindow::network_changed_source_id.
+
+2017-05-22  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Test whether a LibBalsaMailbox can be reached by testing its
 	server
 

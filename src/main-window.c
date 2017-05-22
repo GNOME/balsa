@@ -242,7 +242,12 @@ bw_network_changed_cb(GNetworkMonitor * monitor,
     if (window->network_available != available) {
         window->network_available = available;
         print_network_status(available);
-        g_idle_add(bw_change_connection_status_idle, window);
+    }
+
+    if (window->network_changed_source_id == 0) {
+        /* Wait 2 seconds or so to let the network stabilize */
+        window->network_changed_source_id =
+            g_timeout_add_seconds(2, bw_change_connection_status_idle, window);
     }
 }
 
@@ -3104,6 +3109,11 @@ balsa_window_destroy(GObject * object)
      * we no longer need it, so we just drop our pointer: */
     window->preview = NULL;
 
+    if (window->network_changed_source_id != 0) {
+        g_source_remove(window->network_changed_source_id);
+        window->network_changed_source_id = 0;
+    }
+
     if (G_OBJECT_CLASS(balsa_window_parent_class)->dispose != NULL)
         G_OBJECT_CLASS(balsa_window_parent_class)->dispose(object);
 
@@ -3838,6 +3848,23 @@ bw_display_new_mail_notification(int num_new, int has_new)
 }
 
 /*Callback to create or disconnect an IMAP mbox. */
+
+static void
+mw_mbox_can_reach_cb(GObject * object,
+                     gboolean  can_reach,
+                     gpointer  user_data)
+{
+    LibBalsaMailboxImap *mailbox = (LibBalsaMailboxImap *) object;
+
+    if (can_reach) {
+        libbalsa_mailbox_imap_reconnect(mailbox);
+    } else {
+        libbalsa_mailbox_imap_force_disconnect(mailbox);
+    }
+
+    g_object_unref(mailbox);
+}
+
 static gboolean
 mw_mbox_change_connection_status(GtkTreeModel * model, GtkTreePath * path,
                                  GtkTreeIter * iter, gpointer arg)
@@ -3849,48 +3876,66 @@ mw_mbox_change_connection_status(GtkTreeModel * model, GtkTreePath * path,
     g_return_val_if_fail(mbnode, FALSE);
 
     if ((mailbox = mbnode->mailbox)) {  /* mailbox, not a folder */
-        if (LIBBALSA_IS_MAILBOX_IMAP(mailbox)) {
-            const gchar *host =
-                LIBBALSA_MAILBOX_REMOTE(mailbox)->server->host;
-            GNetworkMonitor *monitor;
-            GSocketConnectable *address;
-
-            monitor = g_network_monitor_get_default();
-            address = g_network_address_new(host, 0);
-            if (g_network_monitor_can_reach(monitor, address, NULL, NULL)) {
-                libbalsa_mailbox_imap_reconnect
-                    (LIBBALSA_MAILBOX_IMAP(mailbox));
-            } else {
-                libbalsa_mailbox_imap_force_disconnect
-                    (LIBBALSA_MAILBOX_IMAP(mailbox));
-            }
-            g_object_unref(address);
+        if (LIBBALSA_IS_MAILBOX_IMAP(mailbox) &&
+            bw_imap_check_test(mbnode->dir ? mbnode->dir :
+                               libbalsa_mailbox_imap_get_path(LIBBALSA_MAILBOX_IMAP(mailbox)))) {
+            libbalsa_mailbox_test_can_reach(g_object_ref(mailbox),
+                                            mw_mbox_can_reach_cb, NULL);
         }
     }
+
     g_object_unref(mbnode);
 
     return FALSE;
+}
+
+static void
+bw_change_connection_status_can_reach_cb(GObject * object,
+                                         gboolean  can_reach,
+                                         gpointer  user_data)
+{
+    BalsaWindow *window = user_data;
+
+    if (can_reach &&
+        difftime(time(NULL), window->last_check_time) >
+        balsa_app.check_mail_timer * 60) {
+        /* Check the mail now, and reset the timer */
+        bw_check_new_messages(window);
+    }
+
+    g_object_unref(window);
 }
 
 static gboolean
 bw_change_connection_status_idle(gpointer user_data)
 {
     BalsaWindow *window = user_data;
+    BalsaMailboxNode *mbnode;
+    LibBalsaMailbox *mailbox;
+
+    window->network_changed_source_id = 0;
 
     gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
                            (GtkTreeModelForeachFunc)
                            mw_mbox_change_connection_status, NULL);
 
+    if (!window->network_available)
+        return FALSE;
+
     /* GLib timeouts are now triggered by g_get_monotonic_time(),
      * which doesn't increment while we're suspended, so we must
      * check for ourselves whether a scheduled mail check was
      * missed. */
-    if (window->network_available &&
-        difftime(time(NULL), window->last_check_time) >
-        balsa_app.check_mail_timer * 60) {
-        /* Check the mail now, and reset the timer */
-        bw_check_new_messages(window);
-    }
+    /* Test whether the first POP3 mailbox can be reached */
+    if (balsa_app.inbox_input == NULL)
+        return FALSE;
+    if ((mbnode = balsa_app.inbox_input->data) == NULL)
+        return FALSE;
+    if ((mailbox = mbnode->mailbox) == NULL)
+        return FALSE;
+
+    libbalsa_mailbox_test_can_reach(mailbox, bw_change_connection_status_can_reach_cb,
+                                    g_object_ref(window));
 
     return FALSE;
 }

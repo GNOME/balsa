@@ -91,6 +91,7 @@ struct _BalsaWindow {
     /* Support GNetworkMonitor: */
     gboolean network_available;
     time_t last_check_time;
+    guint network_changed_source_id;
 };
 
 struct _BalsaWindowClass {

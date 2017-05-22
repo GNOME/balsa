@@ -689,3 +689,59 @@ libbalsa_server_get_cert_pass(NetClient        *client,
 	/* FIXME - we just return the passphrase from the config, but we may also want to show a dialogue here... */
 	return g_strdup(LIBBALSA_SERVER(user_data)->cert_passphrase);
 }
+
+/* Test whether a server is reachable */
+
+typedef struct {
+    LibBalsaCanReachCallback * cb;
+    gpointer                   cb_data;
+    GObject                  * source_object;
+} CanReachInfo;
+
+static void
+libbalsa_server_can_reach_cb(GObject      * monitor,
+                             GAsyncResult * res,
+                             gpointer       user_data)
+{
+    CanReachInfo *info = user_data;
+    gboolean can_reach;
+
+    can_reach = g_network_monitor_can_reach_finish((GNetworkMonitor *) monitor, res, NULL);
+    info->cb(info->source_object, can_reach, info->cb_data);
+
+    g_object_unref(info->source_object);
+    g_free(info);
+}
+
+void
+libbalsa_server_test_can_reach_full(LibBalsaServer           * server,
+                                    LibBalsaCanReachCallback * cb,
+                                    gpointer                   cb_data,
+                                    GObject                  * source_object)
+{
+    CanReachInfo *info;
+    const gchar *host;
+    GNetworkMonitor *monitor;
+    GSocketConnectable *address;
+
+    info = g_new(CanReachInfo, 1);
+    info->cb              = cb;
+    info->cb_data         = cb_data;
+    info->source_object = g_object_ref(source_object);
+
+    monitor = g_network_monitor_get_default();
+
+    host = server->host;
+    address = g_network_address_new(host, 0);
+    g_network_monitor_can_reach_async(monitor, address, NULL,
+                                      libbalsa_server_can_reach_cb, info);
+    g_object_unref(address);
+}
+
+void
+libbalsa_server_test_can_reach(LibBalsaServer           * server,
+                               LibBalsaCanReachCallback * cb,
+                               gpointer                   cb_data)
+{
+    libbalsa_server_test_can_reach_full(server, cb, cb_data, (GObject *) server);
+}

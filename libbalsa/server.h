@@ -132,4 +132,16 @@ gchar *libbalsa_server_get_cert_pass(NetClient        *client,
 void libbalsa_server_connect_signals(LibBalsaServer * server, GCallback cb,
                                      gpointer cb_data);
 
+/* Check whether a server can be reached */
+
+void libbalsa_server_test_can_reach(LibBalsaServer           * server,
+                                    LibBalsaCanReachCallback * cb,
+                                    gpointer                   cb_data);
+
+/* Private: used only by LibBalsaMailboxRemote */
+void libbalsa_server_test_can_reach_full(LibBalsaServer           * server,
+                                         LibBalsaCanReachCallback * cb,
+                                         gpointer                   cb_data,
+                                         GObject                  * source_object);
+
 #endif				/* __LIBBALSA_SERVER_H__ */

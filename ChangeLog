@@ -1,3 +1,13 @@
+2017-05-22  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Implement testing reachability of a server
+
+	* libbalsa/server.c (libbalsa_server_can_reach_cb),
+	  (libbalsa_server_test_can_reach_full),
+	  (libbalsa_server_test_can_reach): new methods for testing
+	  whether a server's host can be reached over the network;
+	* libbalsa/server.h: declare them.
+
 2017-05-14  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* libbalsa/imap/imap-handle.c (idle_start): clear

@@ -1,5 +1,12 @@
 2017-05-22  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Needed for previous LibBalsaServer commit
+
+	* libbalsa/libbalsa.h: typedef the callback for testing whether
+	  a server can be reached.
+
+2017-05-22  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Implement testing reachability of a server
 
 	* libbalsa/server.c (libbalsa_server_can_reach_cb),

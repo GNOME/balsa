@@ -64,6 +64,11 @@ typedef struct _LibbalsaVfs LibbalsaVfs;
 #include "address-book-osmo.h"
 #endif
 
+/* Callback for testing whether a mailbox or server can be reached: */
+typedef void LibBalsaCanReachCallback(GObject * object,
+                                      gboolean  can_reach,
+                                      gpointer  cb_data);
+
 #include "mailbox.h"
 #include "mailbox_local.h"
 #include "mailbox_remote.h"

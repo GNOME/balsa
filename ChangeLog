@@ -1,3 +1,16 @@
+2017-05-23  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Try to avoid geometry creep
+
+	* src/main-window.c
+	(balsa_window_new): connect to "notify::is-maximized" instead of
+	  "window-state-event"; set the GtkPaned positions in a timeout,
+	  to let the window geometry settle down.
+	(bw_notify_is_maximized_cb): new version of bw_window_state_event_cb.
+	(bw_window_new_idle_cb): the timeout handler.
+	(balsa_window_fix_paned): move connecting to "notify::position"
+	  to the timeout handler.
+
 2017-05-22  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Use the LibBalsaMailbox method to test whether we can reach IMAP

@@ -650,20 +650,16 @@ balsa_window_get_toolbar_model(void)
 }
 
 /*
- * "window-state-event" signal handler
+ * "notify::is-maximized" signal handler
  */
-static gboolean
-bw_window_state_event_cb(BalsaWindow * window,
-                         GdkEventWindowState * event,
-                         GtkStatusbar * statusbar)
+static void
+bw_notify_is_maximized_cb(GtkWindow  * window,
+                          GParamSpec * pspec,
+                          gpointer     user_data)
 {
     /* Note when we are either maximized or fullscreen, to avoid saving
      * nonsensical geometry. */
-    balsa_app.mw_maximized =
-        (event->new_window_state & (GDK_WINDOW_STATE_MAXIMIZED |
-                                    GDK_WINDOW_STATE_FULLSCREEN)) != 0;
-
-    return FALSE;
+    balsa_app.mw_maximized = gtk_window_is_maximized(window);
 }
 
 static void
@@ -2181,6 +2177,32 @@ bw_enable_next_unread(BalsaWindow * window, gboolean has_unread_mailbox)
     bw_action_set_enabled(window, "next-unread", has_unread_mailbox);
 }
 
+static gboolean
+bw_window_new_idle_cb(BalsaWindow * window)
+{
+    if (balsa_app.show_mblist) {
+        gtk_paned_set_position(GTK_PANED(window->paned_master),
+                               balsa_app.mblist_width);
+    } else {
+        gtk_paned_set_position(GTK_PANED(window->paned_master), 0);
+    }
+
+    if (balsa_app.previewpane) {
+        gtk_paned_set_position(GTK_PANED(window->paned_slave),
+                               balsa_app.notebook_height);
+    } else {
+        /* Set it to something really high */
+        gtk_paned_set_position(GTK_PANED(window->paned_slave), G_MAXINT);
+    }
+
+    g_signal_connect(window->paned_master, "notify::position",
+                     G_CALLBACK(bw_master_position_cb), NULL);
+    g_signal_connect(window->paned_slave, "notify::position",
+                     G_CALLBACK(bw_slave_position_cb), NULL);
+
+    return FALSE;
+}
+
 GtkWidget *
 balsa_window_new()
 {
@@ -2233,8 +2255,8 @@ balsa_window_new()
                        0);
 
     window->statusbar = gtk_statusbar_new();
-    g_signal_connect(window, "window-state-event",
-                     G_CALLBACK(bw_window_state_event_cb),
+    g_signal_connect(window, "notify::is-maximized",
+                     G_CALLBACK(bw_notify_is_maximized_cb),
                      window->statusbar);
     gtk_box_pack_start(GTK_BOX(hbox), window->statusbar, TRUE, TRUE, 0);
     gtk_widget_show_all(hbox);
@@ -2292,25 +2314,13 @@ balsa_window_new()
 
     bw_set_panes(window);
 
-    /*PKGW: do it this way, without the usizes. */
     bw_action_set_boolean(window, "show-mailbox-tree",
                           balsa_app.show_mblist);
 
     if (balsa_app.show_mblist) {
         gtk_widget_show(window->mblist);
-        gtk_paned_set_position(GTK_PANED(window->paned_master),
-                               balsa_app.mblist_width);
-    } else {
-        gtk_paned_set_position(GTK_PANED(window->paned_master), 0);
     }
-
-    /*PKGW: do it this way, without the usizes. */
-    if (balsa_app.previewpane)
-        gtk_paned_set_position(GTK_PANED(window->paned_slave),
-                               balsa_app.notebook_height);
-    else
-        /* Set it to something really high */
-        gtk_paned_set_position(GTK_PANED(window->paned_slave), G_MAXINT);
+    g_timeout_add(1000, (GSourceFunc) bw_window_new_idle_cb, window);
 
     gtk_widget_show(window->paned_slave);
     gtk_widget_show(window->paned_master);
@@ -2383,11 +2393,6 @@ balsa_window_fix_paned(BalsaWindow *window)
         gtk_paned_set_position(GTK_PANED(window->paned_slave),
                                balsa_app.notebook_height);
     }
-
-    g_signal_connect(window->paned_master, "notify::position",
-                     G_CALLBACK(bw_master_position_cb), NULL);
-    g_signal_connect(window->paned_slave, "notify::position",
-                     G_CALLBACK(bw_slave_position_cb), NULL);
 
     return FALSE;
 }

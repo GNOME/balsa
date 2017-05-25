@@ -615,7 +615,7 @@ real_main(int argc, char *argv[])
          * to not maximized a couple of times, so we wait until it has
          * stabilized (100 msec is not enough!).
          */
-        g_timeout_add(600, (GSourceFunc) balsa_window_fix_paned, balsa_app.main_window);
+        g_timeout_add(700, (GSourceFunc) balsa_window_fix_paned, balsa_app.main_window);
     } else {
         /* No need to wait. */
         g_idle_add((GSourceFunc) balsa_window_fix_paned, balsa_app.main_window);

@@ -650,20 +650,16 @@ balsa_window_get_toolbar_model(void)
 }
 
 /*
- * "window-state-event" signal handler
+ * "notify::is-maximized" signal handler
  */
-static gboolean
-bw_window_state_event_cb(BalsaWindow * window,
-                         GdkEventWindowState * event,
-                         GtkStatusbar * statusbar)
+static void
+bw_notify_is_maximized_cb(GtkWindow  * window,
+                          GParamSpec * pspec,
+                          gpointer     user_data)
 {
     /* Note when we are either maximized or fullscreen, to avoid saving
      * nonsensical geometry. */
-    balsa_app.mw_maximized =
-        (event->new_window_state & (GDK_WINDOW_STATE_MAXIMIZED |
-                                    GDK_WINDOW_STATE_FULLSCREEN)) != 0;
-
-    return FALSE;
+    balsa_app.mw_maximized = gtk_window_is_maximized(window);
 }
 
 static void
@@ -2233,8 +2229,8 @@ balsa_window_new()
                        0);
 
     window->statusbar = gtk_statusbar_new();
-    g_signal_connect(window, "window-state-event",
-                     G_CALLBACK(bw_window_state_event_cb),
+    g_signal_connect(window, "notify::is-maximized",
+                     G_CALLBACK(bw_notify_is_maximized_cb),
                      window->statusbar);
     gtk_box_pack_start(GTK_BOX(hbox), window->statusbar, TRUE, TRUE, 0);
     gtk_widget_show_all(hbox);

@@ -1,5 +1,16 @@
 2017-05-25  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Use is-maximized property instead of window-state-event signal
+
+	* src/main-window.c (bw_notify_is_maximized_cb),
+	(balsa_window_new): connect to "notify::is-maximized" signal
+	instead of "window-state-event" to avoid irrelevant state
+	changes.
+	* src/main.c (real_main): increase the fix-panes timeout again,
+	from 600 to 700 msec.
+
+2017-05-25  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Revert 45b7ce83a56690beb40c37f911f7c61b553d8828, and just
 	increase the timeout from 500 to 600 msec.
 

@@ -1,3 +1,12 @@
+2017-05-25  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Revert 45b7ce83a56690beb40c37f911f7c61b553d8828, and just
+	increase the timeout from 500 to 600 msec.
+
+	* src/main-window.c (bw_window_state_event_cb), (balsa_window_new),
+	(balsa_window_fix_paned): revert 45b7ce83a56690beb40c37f911f7c61b553d8828.
+	* src/main.c (real_main): increase the fix-panes timeout from 500 to 600 msec.
+
 2017-05-23  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Try to avoid geometry creep

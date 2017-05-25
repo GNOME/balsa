@@ -14,22 +14,21 @@
 # Carlos José Pereira <carlao2005@gmail.com>, 2010.
 # Rafael Fontenelle <rafaelff@gnome.org>, 2016, 2017.
 # Enrico Nicoletto <liverig@gmail.com>, 2017.
-#
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
-"Report-Msgid-Bugs-To: https://bugzilla.gnome.org/enter_bug.cgi?"
-"product=balsa&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2017-04-27 00:19+0000\n"
-"PO-Revision-Date: 2017-04-30 17:47-0300\n"
-"Last-Translator: Enrico Nicoletto <liverig@gmail.com>\n"
+"Report-Msgid-Bugs-To: https://bugzilla.gnome.org/enter_bug.cgi?product=balsa&"
+"keywords=I18N+L10N&component=general\n"
+"POT-Creation-Date: 2017-05-02 00:48+0000\n"
+"PO-Revision-Date: 2017-05-25 08:52-0200\n"
+"Last-Translator: Rafael Fontenelle <rafaelff@gnome.org>\n"
 "Language-Team: Brazilian Portuguese <gnome-pt_br-list@gnome.org>\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Poedit 1.8.12\n"
+"X-Generator: Virtaal 1.0.0-beta1\n"
 "X-Project-Style: gnome\n"
 
 #: ../balsa.desktop.in.in.h:1 ../balsa-mailto-handler.desktop.in.in.h:1
@@ -732,32 +731,32 @@ msgstr "Não é possível conectar ao servidor: %s"
 msgid "Exceeded the number of connections per server %s"
 msgstr "Excedido o número de conexões por servidor %s"
 
-#: ../libbalsa/libbalsa.c:366
+#: ../libbalsa/libbalsa.c:369
 msgid "Invalid date"
 msgstr "Data inválida"
 
-#: ../libbalsa/libbalsa.c:383 ../src/pref-manager.c:1370
+#: ../libbalsa/libbalsa.c:386 ../src/pref-manager.c:1370
 #: ../src/pref-manager.c:1466
 msgid "Unknown"
 msgstr "Desconhecido"
 
-#: ../libbalsa/libbalsa.c:525 ../libbalsa/libbalsa.c:630
+#: ../libbalsa/libbalsa.c:528 ../libbalsa/libbalsa.c:633
 msgid "SSL/TLS certificate"
 msgstr "Certificado SSL/TLS"
 
-#: ../libbalsa/libbalsa.c:529 ../libbalsa/libbalsa.c:634
+#: ../libbalsa/libbalsa.c:532 ../libbalsa/libbalsa.c:637
 msgid "_Accept Once"
 msgstr "_Aceitar agora"
 
-#: ../libbalsa/libbalsa.c:530 ../libbalsa/libbalsa.c:635
+#: ../libbalsa/libbalsa.c:533 ../libbalsa/libbalsa.c:638
 msgid "Accept & _Save"
 msgstr "Aceitar & _salvar"
 
-#: ../libbalsa/libbalsa.c:531 ../libbalsa/libbalsa.c:636
+#: ../libbalsa/libbalsa.c:534 ../libbalsa/libbalsa.c:639
 msgid "_Reject"
 msgstr "_Recusar"
 
-#: ../libbalsa/libbalsa.c:541
+#: ../libbalsa/libbalsa.c:544
 #, c-format
 msgid ""
 "<big><b>Authenticity of this certificate could not be verified.</b></big>\n"
@@ -767,7 +766,7 @@ msgstr ""
 "big>\n"
 "Razão: %s"
 
-#: ../libbalsa/libbalsa.c:588
+#: ../libbalsa/libbalsa.c:591
 #, c-format
 msgid ""
 "Authenticity of this certificate could not be verified.\n"
@@ -778,7 +777,7 @@ msgstr ""
 "<b>Razão:</b> %s\n"
 "<b>Esse certificado pertence a:</b>\n"
 
-#: ../libbalsa/libbalsa.c:600
+#: ../libbalsa/libbalsa.c:603
 msgid ""
 "\n"
 "<b>This certificate was issued by:</b>\n"
@@ -786,7 +785,7 @@ msgstr ""
 "\n"
 "<b>Esse certificado foi emitido por:</b>\n"
 
-#: ../libbalsa/libbalsa.c:611
+#: ../libbalsa/libbalsa.c:614
 #, c-format
 msgid ""
 "<b>This certificate is valid</b>\n"
@@ -799,28 +798,28 @@ msgstr ""
 "para %s\n"
 "<b>Impressão digital:</b> %s"
 
-#: ../libbalsa/libbalsa.c:685
+#: ../libbalsa/libbalsa.c:688
 #, c-format
 msgid "Connection to %s timed out. Abort?"
 msgstr "Conexão com %s falhou. Abortar?"
 
-#: ../libbalsa/libbalsa.c:842
+#: ../libbalsa/libbalsa.c:845
 #, c-format
 msgid "No image data"
 msgstr "Nenhum dado na imagem"
 
-#: ../libbalsa/libbalsa.c:876
+#: ../libbalsa/libbalsa.c:879
 #, c-format
 msgid "Invalid input format"
 msgstr "Formato de entrada inválido"
 
-#: ../libbalsa/libbalsa.c:880
+#: ../libbalsa/libbalsa.c:883
 #, c-format
 msgid "Internal buffer overrun"
 msgstr "Saturação de buffer interno"
 
 #. Translators: please do not translate Face.
-#: ../libbalsa/libbalsa.c:897
+#: ../libbalsa/libbalsa.c:900
 #, c-format
 msgid "Bad X-Face data"
 msgstr "Dados X-Face errados"
@@ -1975,15 +1974,18 @@ msgstr "Conectando-se em %s usando %s"
 msgid "SMTP over SSL (SMTPS)"
 msgstr "SMTP sobre SSL (SMTPS)"
 
-#: ../libbalsa/smtp-server.c:273 ../src/mailbox-conf.c:1295
+#: ../libbalsa/smtp-server.c:273 ../libinit_balsa/assistant_page_user.c:69
+#: ../src/mailbox-conf.c:1295
 msgid "TLS required"
 msgstr "TLS exigido"
 
-#: ../libbalsa/smtp-server.c:274 ../src/mailbox-conf.c:1296
+#: ../libbalsa/smtp-server.c:274 ../libinit_balsa/assistant_page_user.c:70
+#: ../src/mailbox-conf.c:1296
 msgid "TLS if possible (not recommended)"
 msgstr "TLS se possível (não recomendado)"
 
-#: ../libbalsa/smtp-server.c:275 ../src/mailbox-conf.c:1297
+#: ../libbalsa/smtp-server.c:275 ../libinit_balsa/assistant_page_user.c:71
+#: ../src/mailbox-conf.c:1297
 msgid "None (not recommended)"
 msgstr "Nenhuma (não recomendado)"
 
@@ -2250,63 +2252,68 @@ msgstr ""
 "configurado isto pra você):"
 
 #: ../libinit_balsa/assistant_page_user.c:68
+msgid "SSL"
+msgstr "SSL"
+
+#: ../libinit_balsa/assistant_page_user.c:74
 msgid "Yes, remember it"
 msgstr "Sim, memorizá-la"
 
-#: ../libinit_balsa/assistant_page_user.c:68
+#: ../libinit_balsa/assistant_page_user.c:74
 msgid "No, type it in every time"
 msgstr "Não, quero digitá-la todas as vezes"
 
-#: ../libinit_balsa/assistant_page_user.c:99
+#: ../libinit_balsa/assistant_page_user.c:105
 msgid "Name of mail server for incoming _mail:"
 msgstr "Nome do servidor de e-mail para _mensagens de entrada:"
 
-#: ../libinit_balsa/assistant_page_user.c:104
+#: ../libinit_balsa/assistant_page_user.c:110
 msgid "_Type of mail server:"
 msgstr "_Tipo do servidor de e-mail:"
 
-#: ../libinit_balsa/assistant_page_user.c:108
-msgid "Connect using _SSL:"
-msgstr "Conectar usando _SSL:"
+#: ../libinit_balsa/assistant_page_user.c:114
+#| msgid "connection lost"
+msgid "Connection _Security"
+msgstr "_Segurança da conexão"
 
-#: ../libinit_balsa/assistant_page_user.c:111
+#: ../libinit_balsa/assistant_page_user.c:118
 msgid "Your email _login name:"
 msgstr "O _login do seu e-mail:"
 
-#: ../libinit_balsa/assistant_page_user.c:114
+#: ../libinit_balsa/assistant_page_user.c:121
 msgid "Your _password:"
 msgstr "Sua _senha:"
 
-#: ../libinit_balsa/assistant_page_user.c:121
+#: ../libinit_balsa/assistant_page_user.c:128
 msgid "_SMTP Server:"
 msgstr "Servidor _SMTP:"
 
 #. 2.1
-#: ../libinit_balsa/assistant_page_user.c:125
+#: ../libinit_balsa/assistant_page_user.c:132
 msgid "Your real _name:"
 msgstr "Seu _nome real:"
 
-#: ../libinit_balsa/assistant_page_user.c:131
+#: ../libinit_balsa/assistant_page_user.c:138
 msgid "Your _email address for this email account:"
 msgstr "Seu endereço de _e-mail para essa conta:"
 
-#: ../libinit_balsa/assistant_page_user.c:136
+#: ../libinit_balsa/assistant_page_user.c:143
 msgid "_Remember your password:"
 msgstr "_Lembrar sua senha:"
 
-#: ../libinit_balsa/assistant_page_user.c:141
+#: ../libinit_balsa/assistant_page_user.c:148
 msgid "_Local mail directory:"
 msgstr "Diretório de e-mail _local:"
 
-#: ../libinit_balsa/assistant_page_user.c:159
+#: ../libinit_balsa/assistant_page_user.c:166
 msgid "User Settings"
 msgstr "Configurações de Usuário"
 
-#: ../libinit_balsa/assistant_page_user.c:278
+#: ../libinit_balsa/assistant_page_user.c:293
 msgid "Default Identity"
 msgstr "Identidade padrão"
 
-#: ../libinit_balsa/assistant_page_user.c:316
+#: ../libinit_balsa/assistant_page_user.c:331
 #, c-format
 msgid ""
 "Local Mail Problem\n"
@@ -6582,6 +6589,9 @@ msgstr "Adiciona o item selecionado para a barra de ferramentas"
 #: ../src/toolbar-prefs.c:535
 msgid "Move selected item down"
 msgstr "Move o item selecionado para baixo"
+
+#~ msgid "Connect using _SSL:"
+#~ msgstr "Conectar usando _SSL:"
 
 #~ msgid "Error reading signature from %s"
 #~ msgstr "Erro ao ler a assinatura a partir de: %s"

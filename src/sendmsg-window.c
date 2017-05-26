@@ -6640,6 +6640,7 @@ sendmsg_window_new()
                                            win_entries,
                                            G_N_ELEMENTS(win_entries),
                                            ui_file, &error, bsmsg);
+    g_free(ui_file);
     if (error) {
         g_print("%s %s\n", __func__, error->message);
         g_error_free(error);

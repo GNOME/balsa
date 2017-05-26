@@ -380,7 +380,7 @@ extbody_send_mail(GtkWidget * button, LibBalsaMessageBody * mime_body)
 				   balsa_app.current_ident->smtp_server,
                                    GTK_WINDOW(gtk_widget_get_toplevel
                                               (button)),
-				   FALSE, balsa_app.debug, &err);
+				   FALSE, &err);
     if (result != LIBBALSA_MESSAGE_CREATE_OK)
 	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
 			     _("Sending the external body request failed: %s"),

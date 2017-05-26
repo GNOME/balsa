@@ -2479,7 +2479,7 @@ handle_mdn_request(GtkWindow *parent, LibBalsaMessage *message)
 				       balsa_find_sentbox_by_url,
 				       mdn_ident->smtp_server,
                                        parent,
-				       TRUE, balsa_app.debug, &error);
+				       TRUE, &error);
 	if (result != LIBBALSA_MESSAGE_CREATE_OK)
 	    libbalsa_information(LIBBALSA_INFORMATION_ERROR,
 				 _("Sending the disposition notification failed: %s"),
@@ -2620,7 +2620,7 @@ mdn_dialog_response(GtkWidget * dialog, gint response, gpointer user_data)
                                   mdn_ident->smtp_server,
                                   gtk_window_get_transient_for
                                   ((GtkWindow *) dialog),
-                                  TRUE, balsa_app.debug, &error);
+                                  TRUE, &error);
         if (result != LIBBALSA_MESSAGE_CREATE_OK)
             libbalsa_information(LIBBALSA_INFORMATION_ERROR,
                                  _("Sending the disposition notification failed: %s"),

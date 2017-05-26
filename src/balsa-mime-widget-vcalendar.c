@@ -327,7 +327,7 @@ vevent_reply(GObject * button, GtkWidget * box)
 				   ident->smtp_server,
                                    GTK_WINDOW(gtk_widget_get_toplevel
                                               ((GtkWidget *) button)),
-				   FALSE, balsa_app.debug, &error);
+				   FALSE, &error);
     if (result != LIBBALSA_MESSAGE_CREATE_OK)
 	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
 			     _("Sending the iTIP calendar reply failed: %s"),

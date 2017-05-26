@@ -65,13 +65,11 @@ LibBalsaMsgCreateResult libbalsa_message_send(LibBalsaMessage * message,
                                               smtp_server,
                                               GtkWindow * parent,
                                               gboolean flow,
-                                              gboolean debug,
 					      GError ** error);
-gboolean libbalsa_process_queue(LibBalsaMailbox * outbox,
-                                LibBalsaFccboxFinder finder,
-                                GSList * smtp_servers,
-                                GtkWindow * parent,
-                                gboolean debug);
+void libbalsa_process_queue(LibBalsaMailbox * outbox,
+                            LibBalsaFccboxFinder finder,
+							GSList * smtp_servers,
+							GtkWindow * parent);
 
 extern GMutex send_messages_lock;
 extern int send_thread_pipes[2];

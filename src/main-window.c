@@ -1054,8 +1054,7 @@ send_queued_mail_activated(GSimpleAction * action,
 {
     libbalsa_process_queue(balsa_app.outbox, balsa_find_sentbox_by_url,
                            balsa_app.smtp_servers,
-                           (GtkWindow *) balsa_app.main_window,
-			   balsa_app.debug);
+                           (GtkWindow *) balsa_app.main_window);
 }
 
 static void

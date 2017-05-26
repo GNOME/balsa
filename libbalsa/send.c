@@ -63,20 +63,30 @@ struct _MessageQueueItem {
 typedef struct _SendMessageInfo SendMessageInfo;
 
 struct _SendMessageInfo {
+	LibBalsaSmtpServer *smtp_server;
     LibBalsaMailbox *outbox;
     NetClientSmtp *session;
-    gchar *mta_name;
     GList *items;               /* of MessageQueueItem */
     gboolean debug;
 };
 
-static int sending_threads = 0; /* how many sending threads are active? */
+
+typedef struct _SendQueueInfo SendQueueInfo;
+
+struct _SendQueueInfo {
+	LibBalsaMailbox      *outbox;
+	LibBalsaFccboxFinder  finder;
+	GtkWindow            *parent;
+};
+
+
+static gint sending_threads = 0; /* how many sending threads are active, access via g_atomic_* */
 /* end of state variables section */
 
 gboolean
 libbalsa_is_sending_mail(void)
 {
-    return sending_threads > 0;
+    return g_atomic_int_get(&sending_threads) > 0;
 }
 
 
@@ -98,7 +108,7 @@ libbalsa_wait_for_sending_thread(gint max_time)
     } else {
         max_time *= 1000000;  /* convert to microseconds */
     }
-    while (sending_threads > 0 && sleep_time < max_time) {
+    while ((g_atomic_int_get(&sending_threads) > 0) && (sleep_time < max_time)) {
         while (gtk_events_pending()) {
             gtk_main_iteration_do(FALSE);
         }
@@ -136,16 +146,16 @@ msg_queue_item_destroy(MessageQueueItem *mqi)
 
 
 static SendMessageInfo *
-send_message_info_new(LibBalsaMailbox *outbox,
-                      NetClientSmtp   *session,
-                      const gchar     *name)
+send_message_info_new(LibBalsaSmtpServer *smtp_server,
+					  LibBalsaMailbox    *outbox,
+                      NetClientSmtp      *session)
 {
     SendMessageInfo *smi;
 
     smi = g_new0(SendMessageInfo, 1);
     smi->session = session;
     smi->outbox = outbox;
-    smi->mta_name = g_strdup(name);
+    smi->smtp_server = g_object_ref(smtp_server);
     return smi;
 }
 
@@ -159,7 +169,7 @@ send_message_info_destroy(SendMessageInfo *smi)
     if (smi->items != NULL) {
         g_list_free(smi->items);
     }
-    g_free(smi->mta_name);
+    g_object_unref(smi->smtp_server);
     g_free(smi);
 }
 
@@ -493,11 +503,13 @@ libbalsa_message_queue(LibBalsaMessage    *message,
    send the given messsage (if any, it can be NULL) and all the messages
    in given outbox.
  */
-static gboolean lbs_process_queue(LibBalsaMailbox     *outbox,
-                                  LibBalsaFccboxFinder finder,
-                                  LibBalsaSmtpServer  *smtp_server,
-                                  gboolean             debug,
-                                  GtkWindow           *parent);
+static void lbs_process_queue(LibBalsaMailbox     *outbox,
+							  LibBalsaFccboxFinder finder,
+							  LibBalsaSmtpServer  *smtp_server,
+							  GtkWindow           *parent);
+static void lbs_process_queue_real(LibBalsaSmtpServer *smtp_server,
+								   SendQueueInfo      *send_info);
+
 
 LibBalsaMsgCreateResult
 libbalsa_message_send(LibBalsaMessage     *message,
@@ -507,7 +519,6 @@ libbalsa_message_send(LibBalsaMessage     *message,
                       LibBalsaSmtpServer  *smtp_server,
                       GtkWindow           *parent,
                       gboolean             flow,
-                      gboolean             debug,
                       GError             **error)
 {
     LibBalsaMsgCreateResult result = LIBBALSA_MESSAGE_CREATE_OK;
@@ -520,9 +531,8 @@ libbalsa_message_send(LibBalsaMessage     *message,
                                         smtp_server, flow, error);
     }
 
-    if ((result == LIBBALSA_MESSAGE_CREATE_OK)
-        && !lbs_process_queue(outbox, finder, smtp_server, debug, parent)) {
-        return LIBBALSA_MESSAGE_SEND_ERROR;
+    if (result == LIBBALSA_MESSAGE_CREATE_OK) {
+    	lbs_process_queue(outbox, finder, smtp_server, parent);
     }
 
     return result;
@@ -592,18 +602,53 @@ send_message_data_cb(gchar   *buffer,
 }
 
 
+static void
+lbs_check_reachable_cb(GObject  *object,
+					   gboolean  can_reach,
+					   gpointer  cb_data)
+{
+    LibBalsaSmtpServer *smtp_server = LIBBALSA_SMTP_SERVER(object);
+	SendQueueInfo *send_info = (SendQueueInfo *) cb_data;
+
+	if (can_reach) {
+		lbs_process_queue_real(smtp_server, send_info);
+	} else {
+        libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+                             _("Cannot reach SMTP server %s (%s), any queued message will remain in %s."),
+							 libbalsa_smtp_server_get_name(smtp_server),
+							 LIBBALSA_SERVER(smtp_server)->host,
+							 send_info->outbox->name);
+	}
+
+	g_object_unref(send_info->outbox);
+	g_free(send_info);
+}
+
+
+static void
+lbs_process_queue(LibBalsaMailbox      *outbox,
+    			  LibBalsaFccboxFinder  finder,
+				  LibBalsaSmtpServer   *smtp_server,
+				  GtkWindow            *parent)
+{
+	SendQueueInfo *send_info;
+
+	send_info = g_new(SendQueueInfo, 1U);
+	send_info->outbox = g_object_ref(outbox);
+	send_info->finder = finder;
+	send_info->parent = parent;
+	libbalsa_server_test_can_reach(LIBBALSA_SERVER(smtp_server), lbs_check_reachable_cb, send_info);
+}
+
+
 /* libbalsa_process_queue:
    treats given mailbox as a set of messages to send. Loads them up and
    launches sending thread/routine.
    NOTE that we do not close outbox after reading. send_real/thread message
    handler does that.
  */
-static gboolean
-lbs_process_queue(LibBalsaMailbox     *outbox,
-                  LibBalsaFccboxFinder finder,
-                  LibBalsaSmtpServer  *smtp_server,
-                  gboolean             debug,
-                  GtkWindow           *parent)
+static void
+lbs_process_queue_real(LibBalsaSmtpServer *smtp_server, SendQueueInfo *send_info)
 {
     LibBalsaServer *server = LIBBALSA_SERVER(smtp_server);
     SendMessageInfo *send_message_info;
@@ -612,9 +657,9 @@ lbs_process_queue(LibBalsaMailbox     *outbox,
 
     g_mutex_lock(&send_messages_lock);
 
-    if (!libbalsa_mailbox_open(outbox, NULL)) {
+    if (!libbalsa_mailbox_open(send_info->outbox, NULL)) {
         g_mutex_unlock(&send_messages_lock);
-        return FALSE;
+        return;
     }
 
     /* create the SMTP session */
@@ -636,7 +681,7 @@ lbs_process_queue(LibBalsaMailbox     *outbox,
 								 server->cert_file, error->message);
             g_error_free(error);
             g_mutex_unlock(&send_messages_lock);
-    		return FALSE;
+    		return;
     	}
     }
 
@@ -645,22 +690,22 @@ lbs_process_queue(LibBalsaMailbox     *outbox,
     g_signal_connect(G_OBJECT(session), "auth", G_CALLBACK(libbalsa_server_get_auth), smtp_server);
 
     send_message_info =
-        send_message_info_new(outbox, session, libbalsa_smtp_server_get_name(smtp_server));
+        send_message_info_new(smtp_server, send_info->outbox, session);
 
-    for (msgno = libbalsa_mailbox_total_messages(outbox); msgno > 0U; msgno--) {
+    for (msgno = libbalsa_mailbox_total_messages(send_info->outbox); msgno > 0U; msgno--) {
         MessageQueueItem *new_message;
         LibBalsaMessage *msg;
         const gchar *smtp_server_name;
         LibBalsaMsgCreateResult created;
 
         /* Skip this message if it either FLAGGED or DELETED: */
-        if (!libbalsa_mailbox_msgno_has_flags(outbox, msgno, 0,
+        if (!libbalsa_mailbox_msgno_has_flags(send_info->outbox, msgno, 0,
                                               (LIBBALSA_MESSAGE_FLAG_FLAGGED |
                                                LIBBALSA_MESSAGE_FLAG_DELETED))) {
             continue;
         }
 
-        msg = libbalsa_mailbox_get_message(outbox, msgno);
+        msg = libbalsa_mailbox_get_message(send_info->outbox, msgno);
         if (!msg) {       /* error? */
             continue;
         }
@@ -676,7 +721,7 @@ lbs_process_queue(LibBalsaMailbox     *outbox,
         }
         msg->request_dsn = (atoi(libbalsa_message_get_user_header(msg, "X-Balsa-DSN")) != 0);
 
-        new_message = msg_queue_item_new(finder);
+        new_message = msg_queue_item_new(send_info->finder);
         created = libbalsa_fill_msg_queue_item_from_queu(msg, new_message);
         libbalsa_message_body_unref(msg);
 
@@ -739,8 +784,8 @@ lbs_process_queue(LibBalsaMailbox     *outbox,
     if (send_message_info->items != NULL) {
         GThread *send_mail;
 
-        ensure_send_progress_dialog(parent);
-        sending_threads++;
+        ensure_send_progress_dialog(send_info->parent);
+        g_atomic_int_inc(&sending_threads);
         send_mail = g_thread_new("balsa_send_message_real",
                                  (GThreadFunc) balsa_send_message_real,
                                  send_message_info);
@@ -750,26 +795,21 @@ lbs_process_queue(LibBalsaMailbox     *outbox,
     }
 
     g_mutex_unlock(&send_messages_lock);
-    return TRUE;
+    return;
 }
 
 
-gboolean
+void
 libbalsa_process_queue(LibBalsaMailbox     *outbox,
                        LibBalsaFccboxFinder finder,
                        GSList              *smtp_servers,
-                       GtkWindow           *parent,
-                       gboolean             debug)
+                       GtkWindow           *parent)
 {
     for (; smtp_servers; smtp_servers = smtp_servers->next) {
         LibBalsaSmtpServer *smtp_server =
             LIBBALSA_SMTP_SERVER(smtp_servers->data);
-        if (!lbs_process_queue(outbox, finder, smtp_server, debug, parent)) {
-            return FALSE;
-        }
+        lbs_process_queue(outbox, finder, smtp_server, parent);
     }
-
-    return TRUE;
 }
 
 
@@ -807,7 +847,7 @@ balsa_send_message_real(SendMessageInfo *info)
         GList *this_msg;
         gchar *msg;
 
-        msg = g_strdup_printf(_("Connected to MTA %s: %s"), info->mta_name, greeting);
+        msg = g_strdup_printf(_("Connected to SMTP server %s: %s"), libbalsa_smtp_server_get_name(info->smtp_server), greeting);
         MSGSENDTHREAD(threadmsg, MSGSENDTHREADPROGRESS, msg, NULL, NULL, 0);
         g_free(msg);
         for (this_msg = info->items; this_msg != NULL; this_msg = this_msg->next) {
@@ -885,7 +925,7 @@ balsa_send_message_real(SendMessageInfo *info)
     } else {
         libbalsa_information(LIBBALSA_INFORMATION_ERROR,
                              _("Connecting MTA %s (%s) failed: %s"),
-                             info->mta_name,
+                             libbalsa_smtp_server_get_name(info->smtp_server),
                              net_client_get_host(NET_CLIENT(info->session)),
                              error->message);
         g_error_free(error);
@@ -898,10 +938,8 @@ balsa_send_message_real(SendMessageInfo *info)
     /* clean up */
     send_message_info_destroy(info);
 
-    g_mutex_lock(&send_messages_lock);
     MSGSENDTHREAD(threadmsg, MSGSENDTHREADFINISHED, "", NULL, NULL, 0);
-    sending_threads--;
-    g_mutex_unlock(&send_messages_lock);
+    (void) g_atomic_int_dec_and_test(&sending_threads);
 
     return result;
 }

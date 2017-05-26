@@ -720,7 +720,8 @@ libbalsa_server_test_can_reach_full(LibBalsaServer           * server,
                                     GObject                  * source_object)
 {
     CanReachInfo *info;
-    const gchar *host;
+    gchar *host;
+    gchar *colon;
     GNetworkMonitor *monitor;
     GSocketConnectable *address;
 
@@ -731,8 +732,13 @@ libbalsa_server_test_can_reach_full(LibBalsaServer           * server,
 
     monitor = g_network_monitor_get_default();
 
-    host = server->host;
+    host = g_strdup(server->host);
+    colon = strchr(host, ':');
+    if (colon != NULL) {
+    	colon[0] = '\0';
+    }
     address = g_network_address_new(host, 0);
+    g_free(host);
     g_network_monitor_can_reach_async(monitor, address, NULL,
                                       libbalsa_server_can_reach_cb, info);
     g_object_unref(address);

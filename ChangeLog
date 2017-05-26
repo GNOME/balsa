@@ -1,3 +1,19 @@
+2017-05-26  Albrecht Dreß
+
+	Test whether we can reach an SMTP server
+
+	* libbalsa/send.c: use atomic operations for the sending state;
+	  check if the smtp server is reachable before sending;
+	  simplify some API's;
+	  replace the term "MTA" in user dialogues by "SMTP server" which is more common
+	* libbalsa/send.h: export simplified API
+	* libbalsa/server.c: ignore port in server host string
+	* src/balsa-message.c,
+	  src/balsa-mime-widget-message.c,
+	  balsa-mime-widget-vcalendar.c,
+	  src/main-window.c,
+	  src/sendmsg-window.c: use simplified API
+
 2017-05-25  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Use is-maximized property instead of window-state-event signal

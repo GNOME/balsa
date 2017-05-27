@@ -621,6 +621,7 @@ lbs_check_reachable_cb(GObject  *object,
 	}
 
 	g_object_unref(send_info->outbox);
+	g_object_unref(send_info->parent);
 	g_free(send_info);
 }
 
@@ -636,7 +637,7 @@ lbs_process_queue(LibBalsaMailbox      *outbox,
 	send_info = g_new(SendQueueInfo, 1U);
 	send_info->outbox = g_object_ref(outbox);
 	send_info->finder = finder;
-	send_info->parent = parent;
+	send_info->parent = g_object_ref(parent);
 	libbalsa_server_test_can_reach(LIBBALSA_SERVER(smtp_server), lbs_check_reachable_cb, send_info);
 }
 

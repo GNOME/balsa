@@ -1,5 +1,13 @@
 2017-05-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Keep a parent window alive
+
+	* libbalsa/send.c
+	  (lbs_process_queue): object-ref the parent window...
+	  (lbs_check_reachable_cb): and unref it.
+
+2017-05-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Plug leak
 
 	* libbalsa/libbalsa.c (libbalsa_source_view_new): use the

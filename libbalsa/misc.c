@@ -1025,11 +1025,6 @@ qualified_hostname(const char *name)
 }
 
 
-gchar *libbalsa_guess_pop_server()
-{
-    return qualified_hostname(POP_SERVER);
-}
-
 gchar *libbalsa_guess_imap_server()
 {
     return qualified_hostname(IMAP_SERVER);
@@ -1089,32 +1084,6 @@ gchar *libbalsa_guess_ldap_name()
     return NULL;
 }
 
-gchar *libbalsa_guess_ldif_file()
-{
-    int i;
-    gchar *ldif;
-
-    static const gchar *guesses[] = {
-	"address.ldif",
-	".address.ldif",
-	"address-book.ldif",
-	".address-book.ldif",
-	".addressbook.ldif",
-	NULL
-    };
-
-    for (i = 0; guesses[i] != NULL; i++) {
-	ldif =  g_strconcat(g_get_home_dir(), G_DIR_SEPARATOR_S, 
-			    guesses[i], NULL);
-	if (g_file_test(ldif, G_FILE_TEST_EXISTS))
-	     return ldif;
-	  
-	g_free(ldif);
-    }
-    return g_strconcat(g_get_home_dir(), G_DIR_SEPARATOR_S, 
-			guesses[i], NULL); /* *** Or NULL */
-    
-}
 
 gboolean
 libbalsa_path_is_below_dir(const gchar * path, const gchar * dir)

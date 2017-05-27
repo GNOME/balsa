@@ -1,5 +1,14 @@
 2017-05-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Remove unused code
+
+	* libbalsa/misc.c: libbalsa_guess_pop_server and
+	libbalsa_guess_ldif_file are not used.
+	* libbalsa/misc.h: do not export libbalsa_guess_ldif_file.
+	* libbalsa/libbalsa.h: do not export libbalsa_guess_pop_server.
+
+2017-05-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Clean up file finder code
 
 	* libbalsa/files.c (balsa_file_finder): remove unused arguments.

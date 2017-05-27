@@ -35,32 +35,27 @@
 static const gchar *permanent_prefixes[] = {
     BALSA_DATA_PREFIX,
     "src",
-    ".",
-    NULL
+    "."
 };
 
 /* filename is the filename (naw!)
  * splice is what to put in between the prefix and the filename, if desired
- * prefixes is a null-termed array of strings of prefixes to try. There are defaults that are always
- *   tried.
  * We ignore proper slashing of names. Ie, /prefix//splice//file won't be caught.
  */
 gchar *
-balsa_file_finder(const gchar * filename, const gchar * splice,
-		  const gchar ** prefixes, gboolean warn)
+balsa_file_finder(const gchar  * filename,
+                  const gchar  * splice)
 {
     gchar *cat;
-    int i;
+    guint i;
 
     g_return_val_if_fail(filename, NULL);
 
     if (splice == NULL)
 	splice = "";
 
-    for (i = 0; permanent_prefixes[i]; i++) {
-	cat =
-	    g_strconcat(permanent_prefixes[i], G_DIR_SEPARATOR_S, splice,
-			G_DIR_SEPARATOR_S, filename, NULL);
+    for (i = 0; i < G_N_ELEMENTS(permanent_prefixes); i++) {
+	cat = g_build_filename(permanent_prefixes[i], splice, filename, NULL);
 
 	if (g_file_test(cat, G_FILE_TEST_IS_REGULAR))
 	    return cat;
@@ -68,28 +63,13 @@ balsa_file_finder(const gchar * filename, const gchar * splice,
 	g_free(cat);
     }
 
-    if(prefixes) {
-        for (i = 0; prefixes[i]; i++) {
-            cat =
-                g_strconcat(prefixes[i], G_DIR_SEPARATOR_S, splice,
-			    G_DIR_SEPARATOR_S, filename, NULL);
-            
-            if (g_file_test(cat, G_FILE_TEST_IS_REGULAR))
-                return cat;
-            
-            g_free(cat);
-        }
-    }
-    cat =  g_strconcat("images", G_DIR_SEPARATOR_S, filename, NULL);
+    cat = g_build_filename("images", filename, NULL);
     if (g_file_test(cat, G_FILE_TEST_IS_REGULAR))
         return cat;
     g_free(cat);
 
-    if (warn)
-        g_warning("Cannot find expected file “%s” "
-                  "(spliced with “%s”) %s extra prefixes",
-	          filename, splice,
-                  prefixes ? "even with" : "with no");
+    g_warning("Cannot find expected file “%s” (spliced with “%s”)", filename, splice);
+
     return NULL;
 }
 

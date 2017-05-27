@@ -34,13 +34,10 @@
  * We ignore proper slashing of names. Ie, /prefix//splice//file won't be caught.
  */
 
-gchar *balsa_file_finder(const gchar * filename, const gchar * splice,
-			 const gchar ** prefixes, gboolean warn);
+gchar *balsa_file_finder(const gchar  * filename,
+                         const gchar  * splice);
 
-#define balsa_pixmap_finder(filename) \
-    (balsa_file_finder((filename), "pixmaps", NULL, TRUE))
-#define balsa_pixmap_finder_no_warn(filename) \
-    (balsa_file_finder((filename), "pixmaps", NULL, FALSE))
+#define balsa_pixmap_finder(filename) (balsa_file_finder((filename), "pixmaps"))
 
 GdkPixbuf *libbalsa_icon_finder(GtkWidget         * widget,
                                 const char        * mime_type,

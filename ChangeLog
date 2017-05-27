@@ -1,5 +1,12 @@
 2017-05-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Clean up file finder code
+
+	* libbalsa/files.c (balsa_file_finder): remove unused arguments.
+	* libbalsa/files.h: ditto.
+
+2017-05-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Remove unused code
 
 	* libinit_balsa/assistant_helper.c: remove balsa_init_get_png,

@@ -1,5 +1,13 @@
 2017-05-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	After a transient error, leave messages ready to resend
+
+	* libbalsa/send.c (balsa_send_message_real): clear FLAGGED flag
+	  if sending failed because of a transient error, so that the
+	  messages can be resent just using send-queued-mail.
+
+2017-05-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Keep a parent window alive
 
 	* libbalsa/send.c

@@ -830,6 +830,9 @@ balsa_send_message_real_idle_cb(LibBalsaMailbox *outbox)
     return FALSE;
 }
 
+#define ERROR_IS_TRANSIENT(error) \
+    (g_error_matches((error), NET_CLIENT_ERROR_QUARK, NET_CLIENT_ERROR_CONNECTION_LOST) || \
+     g_error_matches((error), NET_CLIENT_SMTP_ERROR_QUARK, NET_CLIENT_ERROR_SMTP_TRANSIENT))
 
 static gboolean
 balsa_send_message_real(SendMessageInfo *info)
@@ -903,14 +906,25 @@ balsa_send_message_real(SendMessageInfo *info)
                                                   0);
                 }
             } else {
-                /* sending message failed - mark it as:
-                 *   - flagged, so it will not be sent again until the error is fixed and the
-                 * user manually clears the flag;
-                 *   - undeleted, in case it was already deleted. */
+                /* sending message failed */
                 if ((mqi->orig != NULL) && (mqi->orig->mailbox != NULL)) {
-                    libbalsa_message_change_flags(mqi->orig,
-                                                  LIBBALSA_MESSAGE_FLAG_FLAGGED,
-                                                  LIBBALSA_MESSAGE_FLAG_DELETED);
+                    if (ERROR_IS_TRANSIENT(error)) {
+                        /* Mark it as:
+                         * - neither flagged nor deleted, so it can be resent later
+                         *   without changing flags. */
+                        libbalsa_message_change_flags(mqi->orig,
+                                                      0,
+                                                      LIBBALSA_MESSAGE_FLAG_FLAGGED |
+                                                      LIBBALSA_MESSAGE_FLAG_DELETED);
+                    } else {
+                        /* Mark it as:
+                         * - flagged, so it will not be sent again until the error is fixed
+                         *   and the user manually clears the flag;
+                         * - undeleted, in case it was already deleted. */
+                        libbalsa_message_change_flags(mqi->orig,
+                                                      LIBBALSA_MESSAGE_FLAG_FLAGGED,
+                                                      LIBBALSA_MESSAGE_FLAG_DELETED);
+                    }
                 }
                 libbalsa_information(LIBBALSA_INFORMATION_ERROR,
                                      _(
@@ -924,8 +938,24 @@ balsa_send_message_real(SendMessageInfo *info)
             g_mutex_unlock(&send_messages_lock);
         }
     } else {
+        if (ERROR_IS_TRANSIENT(error)) {
+            GList *this_msg;
+
+            /* Mark all messages as neither flagged nor deleted, so they can be resent later
+             * without changing flags. */
+            for (this_msg = info->items; this_msg != NULL; this_msg = this_msg->next) {
+                MessageQueueItem *mqi = (MessageQueueItem *) this_msg->data;
+
+                if ((mqi->orig != NULL) && (mqi->orig->mailbox != NULL)) {
+                    libbalsa_message_change_flags(mqi->orig,
+                                                  0,
+                                                  LIBBALSA_MESSAGE_FLAG_FLAGGED |
+                                                  LIBBALSA_MESSAGE_FLAG_DELETED);
+                }
+            }
+        }
         libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-                             _("Connecting MTA %s (%s) failed: %s"),
+                             _("Connecting SMTP server %s (%s) failed: %s"),
                              libbalsa_smtp_server_get_name(info->smtp_server),
                              net_client_get_host(NET_CLIENT(info->session)),
                              error->message);

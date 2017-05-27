@@ -5255,7 +5255,7 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
         result = libbalsa_message_send(message, balsa_app.outbox, fcc,
                                        balsa_find_sentbox_by_url,
 				       bsmsg->ident->smtp_server,
-                                       GTK_WINDOW(bsmsg->window),
+                                       GTK_WINDOW(balsa_app.main_window),
                                        bsmsg->flow, &error);
     if (result == LIBBALSA_MESSAGE_CREATE_OK) {
 	if (bsmsg->parent_message && bsmsg->parent_message->mailbox

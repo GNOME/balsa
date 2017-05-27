@@ -1,5 +1,14 @@
 2017-05-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Use Balsa's main window as parent of a dialog
+
+	* src/sendmsg-window.c (send_message_handler): use
+	  balsa_app.main_window as the parent for the sending progress
+	  dialog, to allow the compose window to close before sending is
+	  finished.
+
+2017-05-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	After a transient error, leave messages ready to resend
 
 	* libbalsa/send.c (balsa_send_message_real): clear FLAGGED flag

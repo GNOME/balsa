@@ -955,7 +955,7 @@ libbalsa_source_view_new(gboolean highlight_phrases)
 	    if ((src_lang =
 		 gtk_source_language_manager_get_language(lm, "balsa"))) {
 		GtkSourceStyleSchemeManager *smgr =
-		    gtk_source_style_scheme_manager_new();
+		    gtk_source_style_scheme_manager_get_default();
 		gchar * sm_paths[] = {
 		    BALSA_DATA_PREFIX "/gtksourceview-3.0",
 		    NULL };

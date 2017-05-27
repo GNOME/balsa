@@ -1,5 +1,13 @@
 2017-05-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Remove unused code
+
+	* libinit_balsa/assistant_helper.c: remove balsa_init_get_png,
+	  as it is not used.
+	* libinit_balsa/assistant_helper.h: do not export it.
+
+2017-05-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Use Balsa's main window as parent of a dialog
 
 	* src/sendmsg-window.c (send_message_handler): use

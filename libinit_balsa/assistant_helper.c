@@ -47,30 +47,6 @@ static void entry_changed_cb(GtkEntry * entry, EntryData * ed);
 
 /* ************************************************************************** */
 
-GdkPixbuf *
-balsa_init_get_png(const gchar * fname)
-{
-    GdkPixbuf *img;
-    GError *err = NULL;
-    gchar *fullpath;
-
-    g_return_val_if_fail(fname != NULL, NULL);
-
-    fullpath = balsa_pixmap_finder(fname);
-
-    if (!fullpath)
-        return NULL;
-
-    img = gdk_pixbuf_new_from_file(fullpath, &err);
-    if (err) {
-        g_print(_("Error loading %s: %s\n"), fullpath, err->message);
-        g_error_free(err);
-    }
-    g_free(fullpath);
-
-    return img;
-}
-
 GtkWidget *
 balsa_init_add_grid_entry(GtkGrid * grid, guint num, const gchar * ltext,
                           const gchar * etext, EntryData * ed,

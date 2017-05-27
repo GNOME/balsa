@@ -44,8 +44,6 @@ struct EntryMaster_s {
 #define ENTRY_MASTER_P_DONE( ep ) ( ((ep)->setbits & (ep)->donemask) == (ep)->donemask )
 #define ENTRY_MASTER_DONE( e ) ( ((e).setbits & (e).donemask) == (e).donemask )
 
-GdkPixbuf *balsa_init_get_png(const gchar * fname);
-
 GtkWidget *balsa_init_add_grid_entry(GtkGrid * grid, guint num,
                                      const gchar * ltext,
                                      const gchar * etext, EntryData * ed,

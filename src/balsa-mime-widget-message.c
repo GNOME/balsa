@@ -620,13 +620,6 @@ add_header_gchar(GtkGrid * grid, const gchar * header, const gchar * label,
         gtk_label_set_line_wrap(GTK_LABEL(value_label), TRUE);
         gtk_label_set_line_wrap_mode(GTK_LABEL(value_label), PANGO_WRAP_WORD_CHAR);
         gtk_label_set_selectable(GTK_LABEL(value_label), TRUE);
-#if GTK_CHECK_VERSION(3, 16, 0)
-        gtk_label_set_xalign((GtkLabel *) value_label, 0.0);
-#else                           /* GTK_CHECK_VERSION(3, 16, 0) */
-G_GNUC_BEGIN_IGNORE_DEPRECATIONS
-        gtk_misc_set_alignment((GtkMisc *) value_label, 0.0, 0.0);
-G_GNUC_END_IGNORE_DEPRECATIONS
-#endif                          /* GTK_CHECK_VERSION(3, 16, 0) */
         gtk_widget_set_halign(value_label, GTK_ALIGN_START);
         gtk_widget_set_hexpand(value_label, TRUE);
 

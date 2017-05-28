@@ -1,3 +1,11 @@
+2017-05-28  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Use widget alignment instead of label alignment
+
+	* src/balsa-mime-widget-message.c (add_header_gchar): use
+	  gtk_widget_set_halign instead of gtk_label_set_xalign or
+	  deprecated gtk_misc_set_alignment.
+
 2017-05-28  Albrecht Dreß
 
 	Adjust SMTP timeouts

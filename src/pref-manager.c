@@ -1497,19 +1497,6 @@ attach_entry(const gchar * label, gint row, GtkGrid * grid)
     return attach_entry_full(label, row, grid, 0, 1, 2);
 }
 
-static void
-set_align(GtkWidget * label, gdouble xalign, gdouble yalign)
-{
-#if GTK_CHECK_VERSION(3, 16, 0)
-    gtk_label_set_xalign((GtkLabel *) label, xalign);
-    gtk_label_set_yalign((GtkLabel *) label, yalign);
-#else                           /* GTK_CHECK_VERSION(3, 16, 0) */
-G_GNUC_BEGIN_IGNORE_DEPRECATIONS
-    gtk_misc_set_alignment((GtkMisc *) label, xalign, yalign);
-G_GNUC_END_IGNORE_DEPRECATIONS
-#endif                          /* GTK_CHECK_VERSION(3, 16, 0) */
-}
-
 static GtkWidget *
 attach_entry_full(const gchar * label, gint row, GtkGrid * grid,
                   gint col_left, gint col_middle, gint col_right)
@@ -1522,7 +1509,7 @@ attach_entry_full(const gchar * label, gint row, GtkGrid * grid,
     page = g_object_get_data(G_OBJECT(grid), BALSA_GRID_PAGE_KEY);
     pm_page_add_to_size_group(page, lw);
 
-    set_align(lw, 0.0, 0.5);
+    gtk_widget_set_halign(lw, GTK_ALIGN_START);
     gtk_grid_attach(grid, lw, col_left, row, col_middle - col_left, 1);
 
     res = gtk_entry_new();
@@ -1556,7 +1543,7 @@ attach_label(const gchar * text, GtkGrid * grid, gint row,
     label = gtk_label_new(text);
     gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
     gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
-    set_align(label, 0.0, 0.5);
+    gtk_widget_set_halign(label, GTK_ALIGN_START);
     gtk_grid_attach(grid, label, 0, row, 1, 1);
     if (page)
         pm_page_add_to_size_group(page, label);
@@ -1844,7 +1831,7 @@ checking_group(GtkWidget * page)
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, COL_SPACING);
 
     label = gtk_label_new(_("When mail arrives:"));
-    set_align(label, 0.0, 0.5);
+    gtk_widget_set_halign(label, GTK_ALIGN_START);
     gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, FALSE, 0);
 
     pui->notify_new_mail_dialog =
@@ -1922,7 +1909,6 @@ quoted_group(GtkWidget * page)
     gtk_widget_set_hexpand(pui->browse_wrap_length, TRUE);
     gtk_grid_attach(grid, pui->browse_wrap_length, 1, row, 1, 1);
     label = gtk_label_new(_("characters"));
-    set_align(label, 0.0, 0.5);
     gtk_widget_set_halign(label, GTK_ALIGN_START);
     gtk_grid_attach(grid, label, 2, row, 1, 1);
 
@@ -2005,7 +1991,7 @@ mdn_group(GtkWidget * page)
                             "send it if:"));
     gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
     gtk_label_set_max_width_chars(GTK_LABEL(label), BALSA_MAX_WIDTH_CHARS);
-    set_align(label, 0.0, 0.5);
+    gtk_widget_set_halign(label, GTK_ALIGN_START);
     pm_group_add(group, label, FALSE);
 
     grid = create_grid(page);
@@ -2016,7 +2002,7 @@ mdn_group(GtkWidget * page)
                             "and I am in the “To:” or “CC:” list)."));
     gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
     gtk_label_set_max_width_chars(GTK_LABEL(label), BALSA_MAX_WIDTH_CHARS);
-    set_align(label, 0.0, 0.5);
+    gtk_widget_set_halign(label, GTK_ALIGN_START);
     gtk_grid_attach(grid, label, 0, 0, 1, 1);
     pm_page_add_to_size_group(page, label);
 
@@ -2028,7 +2014,7 @@ mdn_group(GtkWidget * page)
     label = gtk_label_new(_("The message header looks suspicious."));
     gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
     gtk_label_set_max_width_chars(GTK_LABEL(label), BALSA_MAX_WIDTH_CHARS);
-    set_align(label, 0.0, 0.5);
+    gtk_widget_set_halign(label, GTK_ALIGN_START);
     gtk_grid_attach(grid, label, 0, 1, 1, 1);
     pm_page_add_to_size_group(page, label);
 
@@ -2187,7 +2173,7 @@ main_window_group(GtkWidget * page)
     gtk_widget_set_hexpand(pui->pgdown_percent, TRUE);
     gtk_grid_attach(grid, pui->pgdown_percent, 1, 0, 1, 1);
     label = gtk_label_new(_("percent"));
-    set_align(label, 0.0, 0.5);
+    gtk_widget_set_halign(label, GTK_ALIGN_START);
     gtk_grid_attach(grid, label, 2, 0, 1, 1);
 
     return group;
@@ -2516,7 +2502,7 @@ add_pref_menu(const gchar* label, const gchar *names[], gint size,
 
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, padding);
     lbw = gtk_label_new(label);
-    set_align(lbw, 0.0, 0.5);
+    gtk_widget_set_halign(lbw, GTK_ALIGN_START);
     pm_page_add_to_size_group(page, lbw);
     gtk_box_pack_start(GTK_BOX(hbox), lbw,   FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(hbox), omenu, TRUE,  TRUE,  0);
@@ -2633,7 +2619,8 @@ deleting_messages_group(GtkWidget * page)
     g_free(text);
     gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
     gtk_label_set_max_width_chars(GTK_LABEL(label), BALSA_MAX_WIDTH_CHARS);
-    set_align(label, 0.0, 0.0);
+    gtk_widget_set_halign(label, GTK_ALIGN_START);
+    gtk_widget_set_valign(label, GTK_ALIGN_START);
     pm_group_add(group, label, FALSE);
     pui->hide_deleted =
         pm_group_add_check(group, _("Hide messages marked as deleted"));
@@ -2641,7 +2628,8 @@ deleting_messages_group(GtkWidget * page)
     label = gtk_label_new(_("The following settings are global:"));
     gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
     gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
-    set_align(label, 0.0, 0.0);
+    gtk_widget_set_halign(label, GTK_ALIGN_START);
+    gtk_widget_set_valign(label, GTK_ALIGN_START);
     pm_group_add(group, label, FALSE);
     pui->expunge_on_close =
         pm_group_add_check(group, _("Expunge deleted messages "
@@ -2735,13 +2723,14 @@ folder_scanning_group(GtkWidget * page)
                             "choose a greater depth."));
     gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
     gtk_label_set_max_width_chars(GTK_LABEL(label), BALSA_MAX_WIDTH_CHARS);
-    set_align(label, 0.0, 0.0);
+    gtk_widget_set_halign(label, GTK_ALIGN_START);
+    gtk_widget_set_valign(label, GTK_ALIGN_START);
     pm_group_add(group, label, FALSE);
 
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, COL_SPACING);
     pm_group_add(group, hbox, FALSE);
     label = gtk_label_new(_("Scan local folders to depth"));
-    set_align(label, 0.0, 0.5);
+    gtk_widget_set_halign(label, GTK_ALIGN_START);
     pm_page_add_to_size_group(page, label);
     gtk_box_pack_start(GTK_BOX(hbox), label,
                        FALSE, FALSE, 0);
@@ -2753,7 +2742,7 @@ folder_scanning_group(GtkWidget * page)
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, COL_SPACING);
     pm_group_add(group, hbox, FALSE);
     label = gtk_label_new(_("Scan IMAP folders to depth"));
-    set_align(label, 0.0, 0.5);
+    gtk_widget_set_halign(label, GTK_ALIGN_START);
     pm_page_add_to_size_group(page, label);
     gtk_box_pack_start(GTK_BOX(hbox), label,
                        FALSE, FALSE, 0);
@@ -3609,7 +3598,7 @@ pm_group_new(const gchar * text)
     gtk_label_set_markup(GTK_LABEL(label), markup);
     g_free(markup);
     gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
-    set_align(label, 0.0, 0.5);
+    gtk_widget_set_halign(label, GTK_ALIGN_START);
     gtk_box_pack_start(GTK_BOX(group), label, FALSE, FALSE, 0);
 
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);

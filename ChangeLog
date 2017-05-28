@@ -1,5 +1,12 @@
 2017-05-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Increase a timeout interval
+
+	* src/main.c (real_main): increase the fix-panes timeout again,
+	  from 700 to 800 msec.
+
+2017-05-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Remove unused code
 
 	* libbalsa/misc.c: libbalsa_guess_pop_server and

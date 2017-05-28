@@ -124,6 +124,7 @@ net_client_smtp_connect(NetClientSmtp *client, gchar **greeting, GError **error)
 
 	/* get the greeting */
 	if (result) {
+		net_client_set_timeout(NET_CLIENT(client), 5U * 60U);	/* RFC 5321, Sect. 4.5.3.2.1.: 5 minutes timeout */
 		result = net_client_smtp_read_reply(client, 220, greeting, error);
 	}
 
@@ -190,6 +191,7 @@ net_client_smtp_send_msg(NetClientSmtp *client, const NetClientSmtpMessage *mess
 		(message->recipients != NULL) && (message->data_callback != NULL), FALSE);
 
 	/* set the RFC 5321 sender and recipient(s) */
+	net_client_set_timeout(NET_CLIENT(client), 5U * 60U);	/* RFC 5321, Sect. 4.5.3.2.2., 4.5.3.2.3.: 5 minutes timeout */
 	if (client->priv->can_dsn && message->have_dsn_rcpt) {
 		if (message->dsn_envid != NULL) {
 			result = net_client_smtp_execute(client, "MAIL FROM:<%s> RET=%s ENVID=%s", NULL, error, message->sender,
@@ -215,6 +217,7 @@ net_client_smtp_send_msg(NetClientSmtp *client, const NetClientSmtpMessage *mess
 
 	/* initialise sending the message data */
 	if (result) {
+		net_client_set_timeout(NET_CLIENT(client), 2U * 60U);	/* RFC 5321, Sect. 4.5.3.2.4.: 2 minutes timeout */
 		result = net_client_smtp_execute(client, "DATA", NULL, error);
 	}
 
@@ -224,6 +227,7 @@ net_client_smtp_send_msg(NetClientSmtp *client, const NetClientSmtpMessage *mess
 		gssize count;
 		gchar last_char = '\0';
 
+		net_client_set_timeout(NET_CLIENT(client), 3U * 60U);	/* RFC 5321, Sect. 4.5.3.2.5.: 3 minutes timeout */
 		client->priv->data_state = TRUE;
 		do {
 			count = message->data_callback(buffer, SMTP_DATA_BUF_SIZE, message->user_data, error);
@@ -244,6 +248,7 @@ net_client_smtp_send_msg(NetClientSmtp *client, const NetClientSmtpMessage *mess
 	}
 
 	if (result) {
+		net_client_set_timeout(NET_CLIENT(client), 10U * 60U);	/* RFC 5321, Sect 4.5.3.2.6.: 10 minutes timeout */
 		result = net_client_smtp_read_reply(client, -1, NULL, error);
 		client->priv->data_state = FALSE;
 	}

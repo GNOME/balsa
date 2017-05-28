@@ -1,3 +1,13 @@
+2017-05-28  Albrecht Dreß
+
+	Adjust SMTP timeouts
+
+	* libnetclient/net-client-smtp.c (net_client_smtp_connect),
+	  (net_client_smtp_send_msg): adjust all SMTP client transaction timeouts
+	  to the minimum values (which are *very* long imho!)
+	  required by RFC 5321, sect. 4.5.3.2.1. - 4.5.3.2.6.
+
+
 2017-05-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Increase a timeout interval

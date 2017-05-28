@@ -2,6 +2,17 @@
 
 	Use widget alignment instead of label alignment
 
+	* src/pref-manager.c (attach_entry_full), (attach_label),
+	  (checking_group), (quoted_group), (mdn_group), (main_window_group),
+	  (add_pref_menu), (deleting_messages_group),
+	  (folder_scanning_group), (pm_group_new): scrap set_align, and use
+	  gtk_widget_set_[hv]align instead of gtk_label_set_[xy]align or
+	  deprecated gtk_misc_set_alignment.
+
+2017-05-28  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Use widget alignment instead of label alignment
+
 	* src/balsa-mime-widget-message.c (add_header_gchar): use
 	  gtk_widget_set_halign instead of gtk_label_set_xalign or
 	  deprecated gtk_misc_set_alignment.

@@ -1,3 +1,37 @@
+2017-05-30  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Port preferences window to GtkGrid
+
+	* src/pref-manager.c (add_button_to_box), (pm_grid_new),
+	(pm_grid_attach), (pm_group_label), (pm_grid_attach_check),
+	(pm_grid_attach_label), (pm_grid_attach_pref_menu),
+	(pm_grid_attach_entry), (pm_grid_attach_color_box),
+	(font_button_check_font_size), (pm_grid_attach_font_button),
+	(pm_grid_attach_information_menu),
+	(pm_grid_add_remote_mailbox_servers_group),
+	(pm_grid_add_local_mail_group), (pm_grid_add_outgoing_mail_group),
+	(mailserver_subpage), (pm_grid_add_checking_group),
+	(pm_grid_add_mdn_group), (incoming_subpage),
+	(pm_grid_add_word_wrap_group), (pm_grid_add_other_options_group),
+	(outgoing_subpage), (create_mail_options_page),
+	(pm_grid_add_main_window_group),
+	(pm_grid_add_message_window_group), (display_subpage),
+	(pm_grid_add_threading_group), (threading_subpage),
+	(pm_grid_add_preview_font_group), (pm_grid_add_quoted_group),
+	(pm_grid_add_alternative_group), (message_subpage),
+	(pm_grid_add_message_colors_group), (pm_grid_add_link_color_group),
+	(colors_subpage), (pm_grid_add_display_formats_group),
+	(pm_grid_add_broken_8bit_codeset_group), (format_subpage),
+	(pm_grid_add_information_messages_group),
+	(pm_grid_add_progress_group), (status_messages_subpage),
+	(create_display_page), (pm_grid_add_address_books_group),
+	(create_address_book_page), (pm_grid_add_misc_spelling_group),
+	(create_spelling_page), (pm_grid_add_startup_options_group),
+	(pm_grid_add_folder_scanning_group), (create_startup_page),
+	(pm_grid_add_misc_group), (pm_grid_add_deleting_messages_group),
+	(create_misc_page): make each page a single GtkGrid and use
+	fewer nested GtkBoxes.
+
 2017-05-28  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Use widget alignment instead of label alignment

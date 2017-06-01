@@ -1,5 +1,12 @@
 2017-05-31  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Code cleanup
+
+	* src/pref-manager.c (option_menu_cb), (pgdown_modified_cb):
+	simplify callback placement.
+
+2017-05-31  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Port preferences window from GtkNotebook to GtkStack
 
 	* src/pref-manager.c (pm_combo_box_info_free), (pm_combo_box_new),

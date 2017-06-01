@@ -195,7 +195,6 @@ struct pm_combo_box_info {
 
     /* callbacks */
 static void properties_modified_cb(GtkWidget * widget, GtkWidget * pbox);
-static void option_menu_cb(GtkMenuItem * menuitem, gpointer data);
 static void address_book_change(LibBalsaAddressBook * address_book, gboolean append);
 
 guint pwindow_type[NUM_PWINDOW_MODES] = {
@@ -993,8 +992,6 @@ add_button_to_box(const gchar * label, GCallback cb, gpointer cb_data,
     return button;
 }
 
-static GtkWidget * server_add_menu_widget(void);
-
 static void
 add_show_menu(const char* label, gint level, GtkWidget* menu)
 {
@@ -1003,6 +1000,19 @@ add_show_menu(const char* label, gint level, GtkWidget* menu)
 
     gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(menu), label);
     info->levels = g_slist_append(info->levels, GINT_TO_POINTER(level));
+}
+
+/*
+ * callback for create_pref_option_menu
+ */
+
+static void
+option_menu_cb(GtkMenuItem * widget, gpointer data)
+{
+    /* update the index number */
+    gint *index = (gint *) data;
+
+    *index = gtk_combo_box_get_active(GTK_COMBO_BOX(widget));
 }
 
 static GtkWidget *
@@ -1757,14 +1767,6 @@ pgdown_modified_cb(GtkWidget * widget, GtkWidget * pbox)
 
     gtk_widget_set_sensitive(GTK_WIDGET(pui->pgdown_percent), newstate);
     properties_modified_cb(widget, pbox);
-}
-
-static void
-option_menu_cb(GtkMenuItem * widget, gpointer data)
-{
-    /* update the index number */
-    gint *index = (gint *) data;
-    *index = gtk_combo_box_get_active(GTK_COMBO_BOX(widget));
 }
 
 static void

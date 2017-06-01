@@ -1,3 +1,11 @@
+2017-06-01  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Recent pref-manager changes break display
+
+	* src/pref-manager.c (open_preferences_manager): put a
+	horizontal box in the dialog's content area, instead of making
+	the content area horizontal.
+
 2017-05-31  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Code cleanup

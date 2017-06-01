@@ -3231,6 +3231,7 @@ void
 open_preferences_manager(GtkWidget * widget, gpointer data)
 {
     GtkWidget *hbox;
+    GtkWidget *content_area;
     GtkTreeStore *store;
     GtkWidget *view;
     GtkTreeSelection * selection;
@@ -3263,9 +3264,9 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
     libbalsa_macosx_menu_for_parent(property_box, GTK_WINDOW(active_win));
 #endif
 
-    hbox = gtk_dialog_get_content_area(GTK_DIALOG(property_box));
-    gtk_orientable_set_orientation(GTK_ORIENTABLE(hbox),
-                                   GTK_ORIENTATION_HORIZONTAL);
+	hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+	content_area = gtk_dialog_get_content_area(GTK_DIALOG(property_box));
+	gtk_container_add(GTK_CONTAINER(content_area), hbox);
 
     store = gtk_tree_store_new(PM_NUM_COLS,
                                G_TYPE_STRING,   /* PM_TEXT_COL     */

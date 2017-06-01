@@ -1,5 +1,12 @@
 2017-06-01  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Remove obsolete reference in configure summary
+
+	* configure.ac: $install_mimeicons was removed in commit
+	4400b65d2325e0446cbc45bcf0c250476c8caea7.
+
+2017-06-01  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Recent pref-manager changes break display
 
 	* src/pref-manager.c (open_preferences_manager): put a

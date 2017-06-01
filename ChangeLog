@@ -1,3 +1,46 @@
+2017-05-31  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Port preferences window from GtkNotebook to GtkStack
+
+	* src/pref-manager.c (pm_combo_box_info_free), (pm_combo_box_new),
+	(pm_combo_box_set_level), (pm_combo_box_get_level),
+	(pm_selection_changed), (destroy_pref_window_cb),
+	(update_view_defaults), (check_font_button), (apply_prefs),
+	(set_prefs), (update_address_books), (add_other_server),
+	(add_button_to_box), (add_show_menu), (create_pref_option_menu),
+	(create_layout_types_menu), (create_action_after_move_menu),
+	(balsa_help_pbox_display), (create_information_message_menu),
+	(create_mdn_reply_menu), (update_smtp_servers), (pm_grid_new),
+	(pm_grid_attach), (pm_group_label), (pm_grid_attach_check),
+	(pm_grid_attach_label), (pm_grid_attach_pref_menu),
+	(pm_grid_attach_entry), (pm_grid_attach_color_box),
+	(font_button_check_font_size), (pm_grid_attach_font_button),
+	(pm_grid_attach_information_menu), (properties_modified_cb),
+	(server_edit_cb), (smtp_server_update), (smtp_server_add_cb),
+	(smtp_server_edit_cb), (smtp_server_del_cb), (smtp_server_changed),
+	(address_book_change), (address_book_edit_cb),
+	(address_book_set_default_cb), (add_menu_cb),
+	(address_book_delete_cb), (pop3_add_cb), (server_add_menu_widget),
+	(server_del_cb), (timer_modified_cb), (browse_modified_cb),
+	(mark_quoted_modified_cb), (wrap_modified_cb),
+	(pgdown_modified_cb), (option_menu_cb),
+	(mailbox_close_timer_modified_cb), (filter_modified_cb),
+	(expunge_on_close_cb), (expunge_auto_cb), (imap_toggled_cb),
+	(convert_8bit_cb), (use_system_fonts_cb), (font_modified_cb),
+	(default_font_size_cb), (response_cb),
+	(pm_grid_add_main_window_group), (pm_grid_add_threading_group),
+	(pm_grid_add_progress_group), (pm_append_page),
+	(pm_mailserver_page), (pm_incoming_page), (pm_outgoing_page),
+	(pm_display_page), (pm_threading_page), (pm_message_page),
+	(pm_colors_page), (pm_format_page), (pm_status_messages_page),
+	(create_address_book_page), (pm_spelling_page), (pm_startup_page),
+	(pm_misc_page), (create_mail_options_section),
+	(create_display_section), (open_preferences_manager_idle),
+	(open_preferences_manager), (update_mail_servers): replace
+	mutiple notebooks by a single stack; refactor code into groups
+	of options, pages of one or more groups, and sections where
+	multiple pages are related.
+
 2017-05-30  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Port preferences window to GtkGrid

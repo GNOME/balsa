@@ -170,11 +170,11 @@ typedef struct _PropertyUI {
     GtkRadioButton *convert_unknown_8bit[NUM_CONVERT_8BIT_MODES];
     GtkWidget *convert_unknown_8bit_codeset;
 
-#if !HAVE_GTKSPELL
+#if !(HAVE_GSPELL || HAVE_GTKSPELL)
     /* spell checking */
     GtkWidget *spell_check_sig;
     GtkWidget *spell_check_quoted;
-#endif                          /* HAVE_GTKSPELL */
+#endif                          /* !(HAVE_GSPELL || HAVE_GTKSPELL) */
 
     /* folder scanning */
     GtkWidget *local_scan_depth;
@@ -187,118 +187,16 @@ static PropertyUI *pui = NULL;
 static GtkWidget *property_box;
 static gboolean already_open;
 
-    /* Mail Options page */
-static GtkWidget *create_mail_options_page(GtkTreeStore * store);
-
-static GtkWidget *mailserver_subpage(void);
-static GtkWidget *incoming_subpage(void);
-static GtkWidget *outgoing_subpage(void);
-    /* End of Mail Options page */
-
-    /* Display Options page */
-static GtkWidget *create_display_page(GtkTreeStore * store);
-
-static GtkWidget *display_subpage(void);
-static GtkWidget *threading_subpage(void);
-static GtkWidget *message_subpage(void);
-static GtkWidget *colors_subpage(void);
-static GtkWidget *format_subpage(void);
-static GtkWidget *status_messages_subpage(void);
-    /* End of Display Options page */
-
-    /* Address Books page */
-static GtkWidget *create_address_book_page(GtkTreeStore * store);
-    /* End of Address Books page */
-
-    /* Startup page */
-static GtkWidget *create_startup_page(GtkTreeStore * store);
-    /* End of Startup page */
-
-    /* Misc page */
-static GtkWidget *create_misc_page(GtkTreeStore * store);
-    /* End of Misc page */
-
-#if !HAVE_GTKSPELL
-    /* Spelling page */
-static GtkWidget *create_spelling_page(GtkTreeStore * store);
-#endif                          /* HAVE_GTKSPELL */
-
-    /* general helpers */
-static void add_show_menu(const char *label, gint level, GtkWidget * menu);
-static GtkWidget *create_pref_option_menu(const gchar * names[], gint size,
-                                          gint * index);
-
-    /* page and group object methods */
-static void pm_append_page(GtkWidget * notebook, GtkWidget * widget,
-                           const gchar * text, GtkTreeStore * store,
-                           GtkTreeIter * parent_iter);
-
     /* combo boxes */
 struct pm_combo_box_info {
     GSList *levels;
 };
 #define PM_COMBO_BOX_INFO "balsa-pref-manager-combo-box-info"
 
-static GtkWidget *pm_combo_box_new(void);
-static void pm_combo_box_set_level(GtkWidget * combo_box, gint level);
-static gint pm_combo_box_get_level(GtkWidget * combo_box);
-
-    /* special helpers */
-static GtkWidget *create_layout_types_menu(void);
-static GtkWidget *create_action_after_move_menu(void);
-static GtkWidget *create_information_message_menu(void);
-static GtkWidget *create_mdn_reply_menu(void);
-static void balsa_help_pbox_display(void);
-
-    /* updaters */
-static void set_prefs(void);
-static void apply_prefs(GtkDialog * dialog);
-void update_mail_servers(void); /* public; in pref-manager.h */
-static void smtp_server_update(LibBalsaSmtpServer *, GtkResponseType,
-		               const gchar *);
-static void update_smtp_servers(void);
-
     /* callbacks */
-static void response_cb(GtkDialog * dialog, gint response, gpointer data);
-static void destroy_pref_window_cb(void);
-static void update_address_books(void);
 static void properties_modified_cb(GtkWidget * widget, GtkWidget * pbox);
-
-static void server_edit_cb(GtkTreeView * tree_view);
-static void pop3_add_cb(void);
-static void add_menu_cb(GtkWidget * menu, GtkWidget * widget);
-static void server_del_cb(GtkTreeView * tree_view);
-
-static void smtp_server_edit_cb(GtkTreeView * tree_view);
-static void smtp_server_add_cb(void);
-static void smtp_server_del_cb(GtkTreeView * tree_view);
-static void smtp_server_changed (GtkTreeSelection * selection,
-				 gpointer user_data);
-
-static void address_book_edit_cb(GtkTreeView * tree_view);
-static void address_book_delete_cb(GtkTreeView * tree_view);
-static void address_book_set_default_cb(GtkTreeView * tree_view);
-static void timer_modified_cb(GtkWidget * widget, GtkWidget * pbox);
-static void mailbox_close_timer_modified_cb(GtkWidget * widget,
-                                            GtkWidget * pbox);
-static void browse_modified_cb(GtkWidget * widget, GtkWidget * pbox);
-static void mark_quoted_modified_cb(GtkWidget * widget, GtkWidget * pbox);
-static void wrap_modified_cb(GtkWidget * widget, GtkWidget * pbox);
-
-static void use_system_fonts_cb(GtkWidget * widget, GtkWidget * pbox);
-static void font_modified_cb(GtkWidget * widget, GtkWidget * pbox);
-static void default_font_size_cb(GtkWidget * widget, GtkWidget * pbox);
-
-static void pgdown_modified_cb(GtkWidget * widget, GtkWidget * pbox);
-
 static void option_menu_cb(GtkMenuItem * menuitem, gpointer data);
-static void imap_toggled_cb(GtkWidget * widget, GtkWidget * pbox);
-
-static void convert_8bit_cb(GtkWidget * widget, GtkWidget * pbox);
-
-static void filter_modified_cb(GtkWidget * widget, GtkWidget * pbox);
-static void expunge_on_close_cb(GtkWidget * widget, GtkWidget * pbox);
-static void expunge_auto_cb(GtkWidget * widget, GtkWidget * pbox);
+static void address_book_change(LibBalsaAddressBook * address_book, gboolean append);
 
 guint pwindow_type[NUM_PWINDOW_MODES] = {
     WHILERETR,
@@ -327,371 +225,84 @@ const gchar *threading_type_label[NUM_THREADING_STYLES] = {
     N_("JWZ")
 };
 
-    /* and now the important stuff: */
-static gboolean
-open_preferences_manager_idle(void)
+/* combo boxes */
+
+static void
+pm_combo_box_info_free(struct pm_combo_box_info * info)
 {
-    gchar *name;
+    g_slist_free(info->levels);
+    g_free(info);
+}
 
-    gdk_threads_enter();
+static GtkWidget *
+pm_combo_box_new(void)
+{
+    GtkWidget *combo_box = gtk_combo_box_text_new();
+    struct pm_combo_box_info *info = g_new0(struct pm_combo_box_info, 1);
 
-    if (pui == NULL) {
-        gdk_threads_leave();
-        return FALSE;
-    }
+    gtk_widget_set_hexpand(combo_box, TRUE);
 
-    name = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER
-                                         (pui->mail_directory));
-    if (!name || strcmp(name, balsa_app.local_mail_directory) != 0) {
-        /* Chooser still hasn't been initialized. */
-        g_free(name);
-        gdk_threads_leave();
-        return TRUE;
-    }
-    g_free(name);
-
-    g_signal_connect(pui->mail_directory, "selection-changed",
+    g_object_set_data_full(G_OBJECT(combo_box), PM_COMBO_BOX_INFO, info,
+                           (GDestroyNotify) pm_combo_box_info_free);
+    g_signal_connect(G_OBJECT(combo_box), "changed",
                      G_CALLBACK(properties_modified_cb), property_box);
 
-    gdk_threads_leave();
-    return FALSE;
-}                               /* open_preferences_manager_idle */
+    return combo_box;
+}
+
+static void
+pm_combo_box_set_level(GtkWidget * combo_box, gint level)
+{
+    struct pm_combo_box_info *info =
+        g_object_get_data(G_OBJECT(combo_box), PM_COMBO_BOX_INFO);
+    GSList *list;
+    guint i;
+
+    for (list = info->levels, i = 0; list; list = list->next, ++i)
+	if (GPOINTER_TO_INT(list->data) == level) {
+	    gtk_combo_box_set_active(GTK_COMBO_BOX(combo_box), i);
+	    break;
+	}
+}
+
+static gint
+pm_combo_box_get_level(GtkWidget * combo_box)
+{
+    struct pm_combo_box_info *info =
+        g_object_get_data(G_OBJECT(combo_box), PM_COMBO_BOX_INFO);
+    gint active = gtk_combo_box_get_active(GTK_COMBO_BOX(combo_box));
+
+    return GPOINTER_TO_INT(g_slist_nth_data(info->levels, active));
+}
+
+    /* and now the important stuff: */
 
 enum {
     PM_TEXT_COL,
     PM_HELP_COL,
-    PM_NOTEBOOK_COL,
     PM_CHILD_COL,
-    PM_PAGE_COL,
     PM_NUM_COLS
 };
 
 static void
-pm_selection_changed(GtkTreeSelection * selection, gpointer data)
+pm_selection_changed(GtkTreeSelection * selection, gpointer user_data)
 {
+    GtkStack *stack = user_data;
     GtkTreeModel *model;
-    GtkTreeIter iter, child;
-    GtkNotebook *notebook;
-    guint page;
+    GtkTreeIter iter;
+    GtkWidget *child;
 
     if (!gtk_tree_selection_get_selected(selection, &model, &iter))
         return;
 
     gtk_tree_model_get(model, &iter,
-                       PM_CHILD_COL, &notebook,
+                       PM_CHILD_COL, &child,
                        -1);
-    if (notebook) {
-        gtk_notebook_set_current_page(notebook, 0);
-        g_object_unref(notebook);
-    }
-
-    do {
-        gtk_tree_model_get(model, &iter,
-                           PM_NOTEBOOK_COL, &notebook,
-                           PM_PAGE_COL, &page,
-                           -1);
-        if (notebook) {
-            gtk_notebook_set_current_page(notebook, page);
-            g_object_unref(notebook);
-        }
-        child = iter;
-    } while (gtk_tree_model_iter_parent(model, &iter, &child));
-}
-
-void
-open_preferences_manager(GtkWidget * widget, gpointer data)
-{
-    GtkWidget *hbox;
-    GtkTreeStore *store;
-    GtkWidget *view;
-    GtkTreeSelection * selection;
-    GtkWidget *notebook;
-    GtkWidget *active_win = data;
-    gint i;
-    GtkCellRenderer *renderer;
-    GtkTreeViewColumn *column;
-
-    /* only one preferences manager window */
-    if (already_open) {
-        gtk_window_present(GTK_WINDOW(property_box));
-        return;
-    }
-
-    pui = g_malloc(sizeof(PropertyUI));
-
-    property_box =              /* must NOT be modal */
-        gtk_dialog_new_with_buttons(_("Balsa Preferences"),
-                                    GTK_WINDOW(active_win),
-                                    GTK_DIALOG_DESTROY_WITH_PARENT |
-                                    libbalsa_dialog_flags(),
-                                    _("_OK"), GTK_RESPONSE_OK,
-                                    _("_Apply"), GTK_RESPONSE_APPLY,
-                                    _("_Cancel"), GTK_RESPONSE_CANCEL,
-                                    _("_Help"), GTK_RESPONSE_HELP,
-                                    NULL);
-#if HAVE_MACOSX_DESKTOP
-    libbalsa_macosx_menu_for_parent(property_box, GTK_WINDOW(active_win));
-#endif
-
-    hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 12);
-    gtk_container_add(GTK_CONTAINER
-                      (gtk_dialog_get_content_area
-                       (GTK_DIALOG(property_box))), hbox);
-
-    store = gtk_tree_store_new(PM_NUM_COLS,
-                               G_TYPE_STRING,   /* PM_TEXT_COL     */
-                               G_TYPE_STRING,   /* PM_HELP_COL     */
-                               GTK_TYPE_WIDGET, /* PM_NOTEBOOK_COL */
-                               GTK_TYPE_WIDGET, /* PM_CHILD_COL    */
-                               G_TYPE_INT       /* PM_PAGE_COL     */
-            );
-    pui->view = view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
-    gtk_container_add(GTK_CONTAINER(hbox), view);
-    gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(view), FALSE);
-
-    renderer = gtk_cell_renderer_text_new();
-    column =
-        gtk_tree_view_column_new_with_attributes(NULL, renderer,
-                                                 "text", PM_TEXT_COL,
-                                                 NULL);
-    gtk_tree_view_append_column(GTK_TREE_VIEW(view), column);
-
-    selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(view));
-    g_signal_connect(selection, "changed",
-                     G_CALLBACK(pm_selection_changed), NULL);
-
-    notebook = gtk_notebook_new();
-    gtk_notebook_set_show_tabs(GTK_NOTEBOOK(notebook), FALSE);
-    gtk_notebook_set_show_border(GTK_NOTEBOOK(notebook), FALSE);
-    gtk_container_add(GTK_CONTAINER(hbox), notebook);
-    g_object_set_data(G_OBJECT(property_box), "notebook", notebook);
-
-    already_open = TRUE;
-
-    gtk_window_set_resizable(GTK_WINDOW(property_box), FALSE);
-    g_object_set_data(G_OBJECT(property_box), "balsawindow", active_win);
-
-    /* Create the pages */
-    pm_append_page(notebook, create_mail_options_page(store),
-                   N_("Mail options"), store, NULL);
-    pm_append_page(notebook, create_display_page(store),
-                   N_("Display options"), store, NULL);
-    pm_append_page(notebook, create_address_book_page(store),
-                   N_("Address books"), store, NULL);
-
-#if !HAVE_GTKSPELL
-    pm_append_page(notebook, create_spelling_page(store),
-                   N_("Spelling"), store, NULL);
-#endif                          /* HAVE_GTKSPELL */
-
-    pm_append_page(notebook, create_startup_page(store),
-                   N_("Start-up"), store, NULL);
-    pm_append_page(notebook, create_misc_page(store),
-                   N_("Miscellaneous"), store, NULL);
-
-    gtk_tree_view_expand_all(GTK_TREE_VIEW(view));
-
-    set_prefs();
-    /* Now that all the prefs have been set, we must desensitize the
-     * buttons. */
-    gtk_dialog_set_response_sensitive(GTK_DIALOG(property_box),
-                                      GTK_RESPONSE_OK, FALSE);
-    gtk_dialog_set_response_sensitive(GTK_DIALOG(property_box),
-                                      GTK_RESPONSE_APPLY, FALSE);
-
-    for (i = 0; i < NUM_PWINDOW_MODES; i++) {
-        g_signal_connect(G_OBJECT(pui->pwindow_type[i]), "clicked",
-                         G_CALLBACK(properties_modified_cb), property_box);
-    }
-
-    g_signal_connect(G_OBJECT(pui->previewpane), "toggled",
-                     G_CALLBACK(properties_modified_cb), property_box);
-    g_signal_connect(G_OBJECT(pui->layout_type), "changed",
-                     G_CALLBACK(properties_modified_cb), property_box);
-    g_signal_connect(G_OBJECT(pui->view_message_on_open), "toggled",
-                     G_CALLBACK(properties_modified_cb), property_box);
-    g_signal_connect(G_OBJECT(pui->ask_before_select), "toggled",
-                     G_CALLBACK(properties_modified_cb), property_box);
-    g_signal_connect(G_OBJECT(pui->pgdownmod), "toggled",
-                     G_CALLBACK(pgdown_modified_cb), property_box);
-    g_signal_connect(G_OBJECT(pui->pgdown_percent), "changed",
-                     G_CALLBACK(pgdown_modified_cb), property_box);
-    g_signal_connect(G_OBJECT(pui->debug), "toggled",
-                     G_CALLBACK(properties_modified_cb), property_box);
-
-    g_signal_connect(G_OBJECT(pui->mblist_show_mb_content_info), "toggled",
-                     G_CALLBACK(properties_modified_cb), property_box);
-#if !HAVE_GTKSPELL
-    g_signal_connect(G_OBJECT(pui->spell_check_sig), "toggled",
-                     G_CALLBACK(properties_modified_cb), property_box);
-    g_signal_connect(G_OBJECT(pui->spell_check_quoted), "toggled",
-                     G_CALLBACK(properties_modified_cb), property_box);
-#endif                          /* HAVE_GTKSPELL */
-
-    /* Connect signal in an idle handler, after the file chooser has
-     * been initialized. */
-    g_idle_add_full(G_PRIORITY_LOW,
-                    (GSourceFunc) open_preferences_manager_idle,
-                    NULL, NULL);
-    g_signal_connect(G_OBJECT(pui->check_mail_auto), "toggled",
-                     G_CALLBACK(timer_modified_cb), property_box);
-
-    g_signal_connect(G_OBJECT(pui->check_mail_minutes), "changed",
-                     G_CALLBACK(timer_modified_cb), property_box);
-
-    g_signal_connect(G_OBJECT(pui->quiet_background_check), "toggled",
-                     G_CALLBACK(properties_modified_cb), property_box);
-    g_signal_connect(G_OBJECT(pui->msg_size_limit), "changed",
-                     G_CALLBACK(properties_modified_cb), property_box);
-
-    g_signal_connect(G_OBJECT(pui->check_imap), "toggled",
-                     G_CALLBACK(imap_toggled_cb), property_box);
-
-    g_signal_connect(G_OBJECT(pui->check_imap_inbox), "toggled",
-                     G_CALLBACK(properties_modified_cb), property_box);
-
-    g_signal_connect(G_OBJECT(pui->notify_new_mail_dialog), "toggled",
-                     G_CALLBACK(properties_modified_cb), property_box);
-
-    g_signal_connect(G_OBJECT(pui->notify_new_mail_sound), "toggled",
-                     G_CALLBACK(properties_modified_cb), property_box);
-
-    g_signal_connect(G_OBJECT(pui->notify_new_mail_icon), "toggled",
-                     G_CALLBACK(properties_modified_cb), property_box);
-
-    g_signal_connect(G_OBJECT(pui->close_mailbox_auto), "toggled",
-                     G_CALLBACK(mailbox_close_timer_modified_cb),
-                     property_box);
-    g_signal_connect(G_OBJECT(pui->close_mailbox_minutes), "changed",
-                     G_CALLBACK(mailbox_close_timer_modified_cb),
-                     property_box);
-
-    g_signal_connect(G_OBJECT(pui->hide_deleted), "toggled",
-                     G_CALLBACK(filter_modified_cb), property_box);
-    g_signal_connect(G_OBJECT(pui->expunge_on_close), "toggled",
-                     G_CALLBACK(expunge_on_close_cb), property_box);
-    g_signal_connect(G_OBJECT(pui->expunge_auto), "toggled",
-                     G_CALLBACK(expunge_auto_cb), property_box);
-    g_signal_connect(G_OBJECT(pui->expunge_minutes), "changed",
-                     G_CALLBACK(properties_modified_cb), property_box);
-
-    g_signal_connect(G_OBJECT(pui->browse_wrap), "toggled",
-                     G_CALLBACK(browse_modified_cb), property_box);
-    g_signal_connect(G_OBJECT(pui->browse_wrap_length), "changed",
-                     G_CALLBACK(properties_modified_cb), property_box);
-    g_signal_connect(G_OBJECT(pui->wordwrap), "toggled",
-                     G_CALLBACK(wrap_modified_cb), property_box);
-    g_signal_connect(G_OBJECT(pui->wraplength), "changed",
-                     G_CALLBACK(properties_modified_cb), property_box);
-    g_signal_connect(G_OBJECT(pui->always_queue_sent_mail), "toggled",
-                     G_CALLBACK(properties_modified_cb), property_box);
-    g_signal_connect(G_OBJECT(pui->copy_to_sentbox), "toggled",
-                     G_CALLBACK(properties_modified_cb), property_box);
-    g_signal_connect(G_OBJECT(pui->autoquote), "toggled",
-                     G_CALLBACK(properties_modified_cb), property_box);
-    g_signal_connect(G_OBJECT(pui->reply_include_html_parts), "toggled",
-                     G_CALLBACK(properties_modified_cb), property_box);
-    g_signal_connect(G_OBJECT(pui->forward_attached), "toggled",
-                     G_CALLBACK(properties_modified_cb), property_box);
-
-    /* external editor */
-    g_signal_connect(G_OBJECT(pui->edit_headers), "toggled",
-                     G_CALLBACK(properties_modified_cb), property_box);
-
-    /* arp */
-    g_signal_connect(G_OBJECT(pui->quote_str), "changed",
-                     G_CALLBACK(properties_modified_cb), property_box);
-    g_signal_connect(G_OBJECT(pui->mark_quoted), "toggled",
-                     G_CALLBACK(mark_quoted_modified_cb),
-                     property_box);
-    g_signal_connect(G_OBJECT(pui->quote_pattern), "changed",
-                     G_CALLBACK(properties_modified_cb), property_box);
-
-    /* multipart/alternative */
-    g_signal_connect(G_OBJECT(pui->display_alt_plain), "toggled",
-                     G_CALLBACK(properties_modified_cb), property_box);
-
-    /* convert 8-bit text with no charset header */
-    g_signal_connect(G_OBJECT(pui->convert_unknown_8bit_codeset),
-                     "changed", G_CALLBACK(properties_modified_cb),
-                     property_box);
-
-    /* message font */
-    g_signal_connect(G_OBJECT(pui->use_system_fonts), "toggled",
-                     G_CALLBACK(use_system_fonts_cb), property_box);
-    g_signal_connect(G_OBJECT(pui->message_font_button), "font-set",
-                     G_CALLBACK(font_modified_cb), property_box);
-    g_signal_connect(G_OBJECT(pui->subject_font_button), "font-set",
-                     G_CALLBACK(font_modified_cb), property_box);
-    g_signal_connect(G_OBJECT(pui->use_default_font_size), "toggled",
-                     G_CALLBACK(default_font_size_cb), property_box);
-
-
-    g_signal_connect(G_OBJECT(pui->open_inbox_upon_startup), "toggled",
-                     G_CALLBACK(properties_modified_cb), property_box);
-    g_signal_connect(G_OBJECT(pui->check_mail_upon_startup), "toggled",
-                     G_CALLBACK(properties_modified_cb), property_box);
-    g_signal_connect(G_OBJECT(pui->remember_open_mboxes), "toggled",
-                     G_CALLBACK(properties_modified_cb), property_box);
-
-    g_signal_connect(G_OBJECT(pui->local_scan_depth), "changed",
-                     G_CALLBACK(properties_modified_cb), property_box);
-    g_signal_connect(G_OBJECT(pui->imap_scan_depth), "changed",
-                     G_CALLBACK(properties_modified_cb), property_box);
-
-    g_signal_connect(G_OBJECT(pui->empty_trash), "toggled",
-                     G_CALLBACK(properties_modified_cb), property_box);
-
-    /* threading */
-    g_signal_connect(G_OBJECT(pui->tree_expand_check), "toggled",
-                     G_CALLBACK(properties_modified_cb), property_box);
-
-
-    /* Date format */
-    g_signal_connect(G_OBJECT(pui->date_format), "changed",
-                     G_CALLBACK(properties_modified_cb), property_box);
-
-    /* Selected headers */
-    g_signal_connect(G_OBJECT(pui->selected_headers), "changed",
-                     G_CALLBACK(properties_modified_cb), property_box);
-
-    /* Colour */
-    for (i = 0; i < MAX_QUOTED_COLOR; i++)
-        g_signal_connect(G_OBJECT(pui->quoted_color[i]), "released",
-                         G_CALLBACK(properties_modified_cb), property_box);
-
-    g_signal_connect(G_OBJECT(pui->url_color), "released",
-                     G_CALLBACK(properties_modified_cb), property_box);
-
-    /* handling of message parts with 8-bit chars without codeset headers */
-    for (i = 0; i < NUM_CONVERT_8BIT_MODES; i++)
-        g_signal_connect(G_OBJECT(pui->convert_unknown_8bit[i]), "toggled",
-                         G_CALLBACK(convert_8bit_cb), property_box);
-
-    /* Gnome Property Box Signals */
-    g_signal_connect(G_OBJECT(property_box), "response",
-                     G_CALLBACK(response_cb), NULL);
-
-    gtk_widget_show_all(GTK_WIDGET(property_box));
-
-}                               /* open_preferences_manager */
-
-static void
-response_cb(GtkDialog * dialog, gint response, gpointer data)
-{
-    switch (response) {
-    case GTK_RESPONSE_APPLY:
-        apply_prefs(dialog);
-        break;
-    case GTK_RESPONSE_HELP:
-        balsa_help_pbox_display();
-        break;
-    case GTK_RESPONSE_OK:
-        apply_prefs(dialog);
-        /* and fall through to... */
-    default:
-        destroy_pref_window_cb();
-        gtk_widget_destroy(GTK_WIDGET(dialog));
+    if (child != NULL) {
+        gtk_stack_set_visible_child(stack, child);
+        g_object_unref(child);
+    } else {
+        g_print("%s no child\n", G_STRLOC);
     }
 }
 
@@ -961,7 +572,7 @@ apply_prefs(GtkDialog * pbox)
     balsa_app.empty_trash_on_exit =
         gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pui->empty_trash));
 
-#if !HAVE_GSPELL && !HAVE_GTKSPELL
+#if !(HAVE_GSPELL || HAVE_GTKSPELL)
     /* spell checking */
     balsa_app.check_sig =
         gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
@@ -969,7 +580,7 @@ apply_prefs(GtkDialog * pbox)
     balsa_app.check_quoted =
         gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
                                      (pui->spell_check_quoted));
-#endif                          /* HAVE_GTKSPELL */
+#endif                          /* !(HAVE_GSPELL || HAVE_GTKSPELL) */
 
     /* date format */
     g_free(balsa_app.date_string);
@@ -1033,7 +644,7 @@ apply_prefs(GtkDialog * pbox)
 /*
  * refresh data in the preferences window
  */
-void
+static void
 set_prefs(void)
 {
     unsigned i;
@@ -1203,14 +814,14 @@ set_prefs(void)
     pm_combo_box_set_level(pui->default_threading_type,
                            pui->threading_type_index);
 
-#if !HAVE_GSPELL && !HAVE_GTKSPELL
+#if !(HAVE_GSPELL || HAVE_GTKSPELL)
     /* spelling */
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->spell_check_sig),
                                  balsa_app.check_sig);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
                                  (pui->spell_check_quoted),
                                  balsa_app.check_quoted);
-#endif                          /* HAVE_GTKSPELL */
+#endif                          /* !(HAVE_GSPELL || HAVE_GTKSPELL) */
 
 
     /* date format */
@@ -1369,65 +980,6 @@ add_other_server(BalsaMailboxNode * mbnode, GtkTreeModel * model)
     }
 }
 
-/* update_mail_servers:
-   update mail server list in the preferences window.
-   NOTE: it can be called even when the preferences window is closed (via
-   mailbox context menu) - and it should check for it.
- */
-void
-update_mail_servers(void)
-{
-    GtkTreeView *tree_view;
-    GtkTreeModel *model;
-    GtkTreeIter iter;
-    GList *list;
-    gchar *protocol;
-    GtkTreeModel *app_model;
-    gboolean valid;
-    BalsaMailboxNode *mbnode;
-
-    if (pui == NULL)
-        return;
-
-    tree_view = GTK_TREE_VIEW(pui->mail_servers);
-    model = gtk_tree_view_get_model(tree_view);
-
-    gtk_list_store_clear(GTK_LIST_STORE(model));
-    for (list = balsa_app.inbox_input; list; list = list->next) {
-        if (!(mbnode = list->data))
-            continue;
-        if (LIBBALSA_IS_MAILBOX_POP3(mbnode->mailbox))
-            protocol = "POP3";
-        else if (LIBBALSA_IS_MAILBOX_IMAP(mbnode->mailbox))
-            protocol = "IMAP";
-        else
-            protocol = _("Unknown");
-
-        gtk_list_store_append(GTK_LIST_STORE(model), &iter);
-        gtk_list_store_set(GTK_LIST_STORE(model), &iter,
-                           MS_PROT_COLUMN, protocol,
-                           MS_NAME_COLUMN, mbnode->mailbox->name,
-                           MS_DATA_COLUMN, mbnode, -1);
-    }
-    /*
-     * add other remote servers
-     *
-     * we'll check everything at the top level in the mailbox_nodes
-     * list:
-     */
-    app_model = GTK_TREE_MODEL(balsa_app.mblist_tree_store);
-    for (valid = gtk_tree_model_get_iter_first(app_model, &iter);
-         valid; valid = gtk_tree_model_iter_next(app_model, &iter)) {
-        gtk_tree_model_get(app_model, &iter, 0, &mbnode, -1);
-        add_other_server(mbnode, model);
-        g_object_unref(mbnode);
-    }
-
-    if (gtk_tree_model_get_iter_first(model, &iter))
-        gtk_tree_selection_select_iter(gtk_tree_view_get_selection
-                                       (tree_view), &iter);
-}
-
 /* helper functions that simplify often performed actions */
 
 static GtkWidget *
@@ -1442,6 +994,176 @@ add_button_to_box(const gchar * label, GCallback cb, gpointer cb_data,
 }
 
 static GtkWidget * server_add_menu_widget(void);
+
+static void
+add_show_menu(const char* label, gint level, GtkWidget* menu)
+{
+    struct pm_combo_box_info *info =
+        g_object_get_data(G_OBJECT(menu), PM_COMBO_BOX_INFO);
+
+    gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(menu), label);
+    info->levels = g_slist_append(info->levels, GINT_TO_POINTER(level));
+}
+
+static GtkWidget *
+create_pref_option_menu(const gchar * names[], gint size, gint * index)
+{
+    GtkWidget *combo_box;
+    gint i;
+
+    combo_box = pm_combo_box_new();
+    g_signal_connect(G_OBJECT(combo_box), "changed",
+                     G_CALLBACK(option_menu_cb), index);
+
+    for (i = 0; i < size; i++)
+	add_show_menu(_(names[i]), i, combo_box);
+
+    return combo_box;
+}
+
+static GtkWidget *
+create_layout_types_menu(void)
+{
+    GtkWidget *combo_box = pm_combo_box_new();
+    add_show_menu(_("Default layout"), LAYOUT_DEFAULT, combo_box);
+    add_show_menu(_("Wide message layout"), LAYOUT_WIDE_MSG, combo_box);
+    add_show_menu(_("Wide screen layout"), LAYOUT_WIDE_SCREEN, combo_box);
+    return combo_box;
+}
+
+static GtkWidget *
+create_action_after_move_menu(void)
+{
+    GtkWidget *combo_box = pm_combo_box_new();
+    add_show_menu(_("Show next unread message"), NEXT_UNREAD, combo_box);
+    add_show_menu(_("Show next message"), NEXT, combo_box);
+    add_show_menu(_("Close message window"), CLOSE, combo_box);
+    return combo_box;
+}
+
+static void
+balsa_help_pbox_display(void)
+{
+    GtkTreeSelection *selection;
+    GtkTreeModel *model;
+    GtkTreeIter iter;
+    GtkTreeIter parent;
+    gchar *text, *p;
+    GError *err = NULL;
+    gchar *uri;
+#if GTK_CHECK_VERSION(3, 22, 0)
+    GtkWidget *toplevel;
+#else /* GTK_CHECK_VERSION(3, 22, 0) */
+    GdkScreen *screen;
+#endif /* GTK_CHECK_VERSION(3, 22, 0) */
+    GString *string;
+
+    selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(pui->view));
+    if (!gtk_tree_selection_get_selected(selection, &model, &iter))
+        return;
+
+    string = g_string_new("help:balsa/preferences-");
+
+    if (gtk_tree_model_iter_parent(model, &parent, &iter)) {
+        gtk_tree_model_get(model, &parent, PM_HELP_COL, &text, -1);
+        for (p = text; *p; p++)
+            *p = (*p == ' ') ? '-' : g_ascii_tolower(*p);
+        g_string_append(string, text);
+        g_free(text);
+        g_string_append_c(string, '#');
+    }
+    gtk_tree_model_get(model, &iter, PM_HELP_COL, &text, -1);
+    for (p = text; *p; p++)
+        *p = (*p == ' ') ? '-' : g_ascii_tolower(*p);
+    g_string_append(string, text);
+    g_free(text);
+
+    uri = g_string_free(string, FALSE);
+#if GTK_CHECK_VERSION(3, 22, 0)
+    toplevel = gtk_widget_get_toplevel(GTK_WIDGET(pui->view));
+    if (gtk_widget_is_toplevel(toplevel)) {
+        gtk_show_uri_on_window(GTK_WINDOW(toplevel), uri,
+                               gtk_get_current_event_time(), &err);
+    }
+#else  /* GTK_CHECK_VERSION(3, 22, 0) */
+    screen = gtk_widget_get_screen(pui->view);
+    gtk_show_uri(screen, uri, gtk_get_current_event_time(), &err);
+#endif /* GTK_CHECK_VERSION(3, 22, 0) */
+    if (err) {
+        balsa_information(LIBBALSA_INFORMATION_WARNING,
+		_("Error displaying %s: %s\n"),
+		uri, err->message);
+        g_error_free(err);
+    }
+
+    g_free(uri);
+}
+
+static GtkWidget *
+create_information_message_menu(void)
+{
+    GtkWidget *combo_box = pm_combo_box_new();
+
+    add_show_menu(_("Show nothing"),       BALSA_INFORMATION_SHOW_NONE,
+                  combo_box);
+    add_show_menu(_("Show dialog"),        BALSA_INFORMATION_SHOW_DIALOG,
+                  combo_box);
+    add_show_menu(_("Show in list"),       BALSA_INFORMATION_SHOW_LIST,
+                  combo_box);
+    add_show_menu(_("Show in status bar"), BALSA_INFORMATION_SHOW_BAR,
+                  combo_box);
+    add_show_menu(_("Print to console"),   BALSA_INFORMATION_SHOW_STDERR,
+                  combo_box);
+
+    return combo_box;
+}
+
+static GtkWidget *
+create_mdn_reply_menu(void)
+{
+    GtkWidget *combo_box = pm_combo_box_new();
+
+    add_show_menu(_("Never"),  BALSA_MDN_REPLY_NEVER,  combo_box);
+    add_show_menu(_("Ask me"), BALSA_MDN_REPLY_ASKME,  combo_box);
+    add_show_menu(_("Always"), BALSA_MDN_REPLY_ALWAYS, combo_box);
+
+    return combo_box;
+}
+
+/* Clear and populate the list. */
+static void
+update_smtp_servers(void)
+{
+    GtkTreeView *tree_view;
+    GtkTreeSelection *selection;
+    GtkTreeIter iter;
+    GtkTreePath *path = NULL;
+    GtkTreeModel *model;
+    GSList *list;
+
+    if (pui == NULL)
+        return;
+
+    tree_view = GTK_TREE_VIEW(pui->smtp_servers);
+    selection = gtk_tree_view_get_selection(tree_view);
+    if (gtk_tree_selection_get_selected(selection, &model, &iter))
+        path = gtk_tree_model_get_path(model, &iter);
+
+    gtk_list_store_clear(GTK_LIST_STORE(model));
+
+    for (list = balsa_app.smtp_servers; list; list = list->next) {
+        LibBalsaSmtpServer *smtp_server = LIBBALSA_SMTP_SERVER(list->data);
+        gtk_list_store_append(GTK_LIST_STORE(model), &iter);
+        gtk_list_store_set(GTK_LIST_STORE(model), &iter,
+                           0, libbalsa_smtp_server_get_name(smtp_server),
+                           1, smtp_server, -1);
+    }
+
+    if (path) {
+        gtk_tree_selection_select_path(selection, path);
+        gtk_tree_path_free(path);
+    }
+}
 
 /***************************
  *
@@ -1694,1203 +1416,6 @@ pm_grid_attach_information_menu(GtkGrid     * grid,
  * End of helpers for GtkGrid pages
  */
 
-/*******************
- *
- * Mail options page
- *
- ******************/
-
-/*
- * Mail server subpage
- */
-
-static void
-pm_grid_add_remote_mailbox_servers_group(GtkWidget * grid_widget)
-{
-    GtkGrid *grid = (GtkGrid *) grid_widget;
-    gint row = pm_grid_get_next_row(grid);
-    GtkWidget *vbox;
-    GtkWidget *scrolledwindow;
-    GtkWidget *tree_view;
-    GtkListStore *store;
-    GtkCellRenderer *renderer;
-    GtkTreeViewColumn *column;
-    GtkWidget *server_add_menu;
-
-    pm_grid_attach(grid, pm_group_label(_("Remote mailbox servers")), 0, row, 3, 1);
-
-    scrolledwindow = gtk_scrolled_window_new(NULL, NULL);
-    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolledwindow),
-                                   GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
-    gtk_widget_set_size_request(scrolledwindow, -1, 100);
-
-    store = gtk_list_store_new(MS_N_COLUMNS,
-                               G_TYPE_STRING,   /* MS_PROT_COLUMN */
-                               G_TYPE_STRING,   /* MS_NAME_COLUMN */
-                               G_TYPE_POINTER); /* MS_DATA_COLUMN */
-    pui->mail_servers = tree_view =
-        gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
-    g_object_unref(store);
-
-    renderer = gtk_cell_renderer_text_new();
-    column =
-        gtk_tree_view_column_new_with_attributes(_("Type"),
-                                                 renderer,
-                                                 "text", MS_PROT_COLUMN,
-                                                 NULL);
-    gtk_tree_view_append_column(GTK_TREE_VIEW(tree_view), column);
-
-    renderer = gtk_cell_renderer_text_new();
-    column =
-        gtk_tree_view_column_new_with_attributes(_("Mailbox name"),
-                                                 renderer,
-                                                 "text", MS_NAME_COLUMN,
-                                                 NULL);
-    gtk_tree_view_append_column(GTK_TREE_VIEW(tree_view), column);
-
-    gtk_container_add(GTK_CONTAINER(scrolledwindow), tree_view);
-
-    g_signal_connect(G_OBJECT(pui->mail_servers), "row-activated",
-                     G_CALLBACK(server_edit_cb), NULL);
-
-    pm_grid_attach(grid, scrolledwindow, 1, ++row, 1, 1);
-
-    vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, ROW_SPACING);
-
-    server_add_menu = server_add_menu_widget();
-    g_object_weak_ref(G_OBJECT(vbox), (GWeakNotify) g_object_unref,
-                      server_add_menu);
-    g_object_ref_sink(server_add_menu);
-    add_button_to_box(_("_Add"), G_CALLBACK(add_menu_cb),
-                      server_add_menu, vbox);
-
-    add_button_to_box(_("_Modify"), G_CALLBACK(server_edit_cb),
-                      tree_view, vbox);
-    add_button_to_box(_("_Delete"), G_CALLBACK(server_del_cb),
-                      tree_view, vbox);
-
-    pm_grid_attach(grid, vbox, 2, row, 1, 1);
-    pm_grid_set_next_row(grid, ++row);
-
-    /* fill in data */
-    update_mail_servers();
-}
-
-static void
-pm_grid_add_local_mail_group(GtkWidget * grid_widget)
-{
-    GtkGrid *grid = (GtkGrid *) grid_widget;
-    gint row = pm_grid_get_next_row(grid);
-
-    pm_grid_attach(grid, pm_group_label(_("Local mail directory")), 0, row, 3, 1);
-
-    pui->mail_directory =
-        gtk_file_chooser_button_new(_("Select your local mail directory"),
-                                    GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER);
-
-    pm_grid_attach(grid, pui->mail_directory, 1, ++row, 2, 1);
-    pm_grid_set_next_row(grid, ++row);
-}
-
-static void
-pm_grid_add_outgoing_mail_group(GtkWidget * grid_widget)
-{
-    GtkGrid *grid = (GtkGrid *) grid_widget;
-    gint row = pm_grid_get_next_row(grid);
-    GtkWidget *scrolled_window;
-    GtkListStore *store;
-    GtkWidget *tree_view;
-    GtkTreeSelection *selection;
-    GtkCellRenderer *renderer;
-    GtkTreeViewColumn *column;
-    GtkWidget *vbox;
-
-    pm_grid_attach(grid, pm_group_label(_("Outgoing mail servers")), 0, row, 3, 1);
-
-    scrolled_window = gtk_scrolled_window_new(NULL, NULL);
-    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolled_window),
-                                   GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
-    gtk_widget_set_size_request(scrolled_window, -1, 100);
-
-    store = gtk_list_store_new(2, G_TYPE_STRING,        /* Server name    */
-                               G_TYPE_POINTER); /* Object address */
-    pui->smtp_servers = tree_view =
-        gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
-    g_object_unref(store);
-
-    selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree_view));
-    g_signal_connect(selection, "changed",
-                     G_CALLBACK(smtp_server_changed), NULL);
-
-    renderer = gtk_cell_renderer_text_new();
-    column = gtk_tree_view_column_new_with_attributes(_("Server name"),
-                                                      renderer,
-                                                      "text", 0, NULL);
-    gtk_tree_view_append_column(GTK_TREE_VIEW(tree_view), column);
-
-    gtk_container_add(GTK_CONTAINER(scrolled_window), tree_view);
-
-    g_signal_connect(G_OBJECT(pui->smtp_servers), "row-activated",
-                     G_CALLBACK(smtp_server_edit_cb), NULL);
-
-    pm_grid_attach(grid, scrolled_window, 1, ++row, 1, 1);
-
-    vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, HIG_PADDING);
-    add_button_to_box(_("_Add"), G_CALLBACK(smtp_server_add_cb),
-                      NULL, vbox);
-    pui->smtp_server_edit_button =
-        add_button_to_box(_("_Modify"), G_CALLBACK(smtp_server_edit_cb),
-                          tree_view, vbox);
-    gtk_widget_set_sensitive(pui->smtp_server_edit_button, FALSE);
-    pui->smtp_server_del_button =
-        add_button_to_box(_("_Delete"), G_CALLBACK(smtp_server_del_cb),
-                          tree_view, vbox);
-    gtk_widget_set_sensitive(pui->smtp_server_del_button, FALSE);
-
-    pm_grid_attach(grid, vbox, 2, row, 1, 1);
-    pm_grid_set_next_row(grid, ++row);
-
-    /* fill in data */
-    update_smtp_servers();
-}
-
-static GtkWidget *
-mailserver_subpage()
-{
-    GtkWidget *grid = pm_grid_new();
-
-    pm_grid_add_remote_mailbox_servers_group(grid);
-    pm_grid_add_local_mail_group(grid);
-    pm_grid_add_outgoing_mail_group(grid);
-
-    return grid;
-}
-
-/*
- * Incoming sub-page
- */
-
-static void
-pm_grid_add_checking_group(GtkWidget * grid_widget)
-{
-    GtkGrid *grid = (GtkGrid *) grid_widget;
-    gint row = pm_grid_get_next_row(grid);
-    GtkAdjustment *spinbutton_adj;
-    GtkWidget *label;
-    GtkWidget *hbox;
-
-    pm_grid_attach(grid, pm_group_label(_("Checking")), 0, row, 3, 1);
-
-    pui->check_mail_auto = gtk_check_button_new_with_mnemonic(
-	_("_Check mail automatically every"));
-    pm_grid_attach(grid, pui->check_mail_auto, 1, ++row, 1, 1);
-
-    spinbutton_adj = gtk_adjustment_new(10, 1, 100, 1, 10, 0);
-    pui->check_mail_minutes = gtk_spin_button_new(spinbutton_adj, 1, 0);
-    gtk_widget_set_hexpand(pui->check_mail_minutes, TRUE);
-    pm_grid_attach(grid, pui->check_mail_minutes, 2, row, 1, 1);
-
-    label = gtk_label_new(_("minutes"));
-    gtk_widget_set_halign(label, GTK_ALIGN_START);
-    pm_grid_attach(grid, label, 3, row, 1, 1);
-
-    pui->check_imap = gtk_check_button_new_with_mnemonic(
-	_("Check _IMAP mailboxes"));
-    pm_grid_attach(grid, pui->check_imap, 1, ++row, 1, 1);
-
-    pui->check_imap_inbox =
-        gtk_check_button_new_with_mnemonic(_("Check Inbox _only"));
-    pm_grid_attach(grid, pui->check_imap_inbox, 2, row, 2, 1);
-
-    hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, COL_SPACING);
-
-    label = gtk_label_new(_("When mail arrives:"));
-    gtk_widget_set_halign(label, GTK_ALIGN_START);
-    gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, FALSE, 0);
-
-    pui->notify_new_mail_dialog =
-        gtk_check_button_new_with_label(_("Display message"));
-    gtk_box_pack_start(GTK_BOX(hbox), pui->notify_new_mail_dialog,
-                       FALSE, FALSE, 0);
-
-    pui->notify_new_mail_sound =
-        gtk_check_button_new_with_label(_("Play sound"));
-    gtk_box_pack_start(GTK_BOX(hbox), pui->notify_new_mail_sound,
-                       FALSE, FALSE, 0);
-
-    pui->notify_new_mail_icon =
-        gtk_check_button_new_with_label(_("Show icon"));
-    gtk_box_pack_start(GTK_BOX(hbox), pui->notify_new_mail_icon,
-                       FALSE, FALSE, 0);
-
-    pm_grid_attach(grid, hbox, 1, ++row, 3, 1);
-
-    pui->quiet_background_check = gtk_check_button_new_with_label(
-	_("Do background check quietly (no messages in status bar)"));
-    pm_grid_attach(grid, pui->quiet_background_check, 1, ++row, 3, 1);
-
-    label = gtk_label_new_with_mnemonic(_("_POP message size limit:"));
-    gtk_widget_set_halign(label, GTK_ALIGN_START);
-    pm_grid_attach(grid, label, 1, ++row, 1, 1);
-
-    pui->msg_size_limit = gtk_spin_button_new_with_range(0.1, 100, 0.1);
-    gtk_label_set_mnemonic_widget(GTK_LABEL(label), pui->msg_size_limit);
-    gtk_widget_set_hexpand(pui->msg_size_limit, TRUE);
-    pm_grid_attach(grid, pui->msg_size_limit, 2, row, 1, 1);
-    label = gtk_label_new(_("MB"));
-    gtk_widget_set_halign(label, GTK_ALIGN_START);
-    pm_grid_attach(grid, label, 3, row, 1, 1);
-
-    pm_grid_set_next_row(grid, ++row);
-}
-
-static void
-pm_grid_add_mdn_group(GtkWidget * grid_widget)
-{
-    GtkGrid *grid = (GtkGrid *) grid_widget;
-    gint row = pm_grid_get_next_row(grid);
-    GtkWidget *label;
-
-    /* How to handle received MDN requests */
-
-    pm_grid_attach(grid,
-                   pm_group_label(_("Message disposition notification requests")),
-                   0, row, 3, 1);
-
-    label =
-        pm_grid_attach_label(grid, 1, ++row, 2, 1,
-                             _("When I receive a message whose sender "
-                               "requested a "
-                               "Message Disposition Notification (MDN), "
-                               "send it if:"));
-    gtk_widget_set_halign(label, GTK_ALIGN_START);
-
-    label =
-        pm_grid_attach_label(grid, 1, ++row, 1, 1,
-                             _("The message header looks clean "
-                               "(the notify-to address is the return path, "
-                               "and I am in the “To:” or “CC:” list)."));
-    gtk_label_set_max_width_chars((GtkLabel *) label, BALSA_MAX_WIDTH_CHARS_MDN);
-    gtk_widget_set_halign(label, GTK_ALIGN_START);
-
-    pui->mdn_reply_clean_menu = create_mdn_reply_menu();
-    pm_combo_box_set_level(pui->mdn_reply_clean_menu,
-                           balsa_app.mdn_reply_clean);
-    gtk_widget_set_valign(pui->mdn_reply_clean_menu, GTK_ALIGN_CENTER);
-    pm_grid_attach(grid, pui->mdn_reply_clean_menu, 2, row, 1, 1);
-
-    label =
-        pm_grid_attach_label(grid, 1, ++row, 1, 1,
-                             _("The message header looks suspicious."));
-    gtk_label_set_max_width_chars((GtkLabel *) label, BALSA_MAX_WIDTH_CHARS_MDN);
-    gtk_widget_set_halign(label, GTK_ALIGN_START);
-
-    pui->mdn_reply_notclean_menu = create_mdn_reply_menu();
-    pm_combo_box_set_level(pui->mdn_reply_notclean_menu,
-                           balsa_app.mdn_reply_notclean);
-    pm_grid_attach(grid, pui->mdn_reply_notclean_menu, 2, row, 1, 1);
-
-    pm_grid_set_next_row(grid, ++row);
-}
-
-static GtkWidget *
-incoming_subpage(void)
-{
-    GtkWidget *grid = pm_grid_new();
-
-    pm_grid_add_checking_group(grid);
-    pm_grid_add_mdn_group(grid);
-
-    return grid;
-}
-
-/*
- * Outgoing subpage
- */
-
-static void
-pm_grid_add_word_wrap_group(GtkWidget * grid_widget)
-{
-    GtkGrid *grid = (GtkGrid *) grid_widget;
-    gint row = pm_grid_get_next_row(grid);
-    GtkAdjustment *spinbutton_adj;
-    GtkWidget *label;
-
-    pm_grid_attach(grid, pm_group_label(_("Word wrap")), 0, row, 3, 1);
-
-    pui->wordwrap =
-	gtk_check_button_new_with_label(_("Wrap outgoing text at"));
-    pm_grid_attach(grid, pui->wordwrap, 1, ++row, 1, 1);
-
-    spinbutton_adj = gtk_adjustment_new(1.0, 40.0, 998.0, 1.0, 5.0, 0.0);
-    pui->wraplength = gtk_spin_button_new(spinbutton_adj, 1, 0);
-    gtk_widget_set_hexpand(pui->wraplength, TRUE);
-    gtk_widget_set_sensitive(pui->wraplength, FALSE);
-    pm_grid_attach(grid, pui->wraplength, 2, row, 1, 1);
-
-    label = gtk_label_new(_("characters"));
-    gtk_widget_set_halign(label, GTK_ALIGN_START);
-    pm_grid_attach(grid, label, 3, row, 1, 1);
-
-    pm_grid_set_next_row(grid, ++row);
-}
-
-static void
-pm_grid_add_other_options_group(GtkWidget * grid_widget)
-{
-    GtkGrid *grid = (GtkGrid *) grid_widget;
-    gint row = pm_grid_get_next_row(grid);
-
-    pm_grid_attach(grid, pm_group_label(_("Other options")), 0, row, 3, 1);
-
-    pui->quote_str = pm_grid_attach_entry(grid, 1, ++row, 1, 1, _("Reply prefix:"));
-
-    pui->autoquote =
-        pm_grid_attach_check(grid, 1, ++row, 2, 1, _("Automatically quote original "
-                                                     "when replying"));
-    pui->forward_attached =
-        pm_grid_attach_check(grid, 1, ++row, 2, 1, _("Forward a mail as attachment "
-                                                     "instead of quoting it"));
-    pui->copy_to_sentbox =
-        pm_grid_attach_check(grid, 1, ++row, 2, 1, _("Copy outgoing messages to sentbox"));
-    pui->always_queue_sent_mail =
-        pm_grid_attach_check(grid, 1, ++row, 2, 1, _("Send button always queues "
-                                                     "outgoing mail in outbox"));
-    pui->edit_headers =
-        pm_grid_attach_check(grid, 1, ++row, 2, 1, _("Edit headers in external editor"));
-    pui->reply_include_html_parts =
-        pm_grid_attach_check(grid, 1, ++row, 2, 1, _("Include HTML parts as text "
-                                                     "when replying or forwarding"));
-
-    pm_grid_set_next_row(grid, ++row);
-}
-
-static GtkWidget *
-outgoing_subpage(void)
-{
-    GtkWidget *grid = pm_grid_new();
-
-    pm_grid_add_word_wrap_group(grid);
-    pm_grid_add_other_options_group(grid);
-
-    return grid;
-}
-
-/*
- * The page
- */
-
-static GtkWidget *
-create_mail_options_page(GtkTreeStore * store)
-{
-    GtkWidget *notebook;
-    GtkTreeIter iter;
-
-    notebook = gtk_notebook_new();
-    gtk_notebook_set_show_tabs(GTK_NOTEBOOK(notebook), FALSE);
-    gtk_notebook_set_show_border(GTK_NOTEBOOK(notebook), FALSE);
-
-    gtk_tree_store_append(store, &iter, NULL);
-    pm_append_page(notebook, mailserver_subpage(), _("Mail servers"),
-                   store, &iter);
-    pm_append_page(notebook, incoming_subpage(), _("Incoming"),
-                   store, &iter);
-    pm_append_page(notebook, outgoing_subpage(), _("Outgoing"),
-                   store, &iter);
-
-    return notebook;
-}
-
-/**********************
- *
- * Display options page
- *
- *********************/
-
-/*
- * Display subpage
- */
-
-static void
-pm_grid_add_main_window_group(GtkWidget * grid_widget)
-{
-    GtkGrid *grid = (GtkGrid *) grid_widget;
-    gint row = pm_grid_get_next_row(grid);
-    GtkAdjustment *scroll_adj;
-    GtkWidget *label;
-
-    pm_grid_attach(grid, pm_group_label(_("Main window")), 0, row, 3, 1);
-
-    pui->previewpane =
-        pm_grid_attach_check(grid, 1, ++row, 3, 1, _("Use preview pane"));
-
-    pui->mblist_show_mb_content_info =
-        pm_grid_attach_check(grid, 1, ++row, 3, 1, _("Show mailbox statistics in left pane"));
-
-    pui->layout_type = create_layout_types_menu();
-    pm_grid_attach(grid, pui->layout_type, 1, ++row, 2, 1);
-
-    pui->view_message_on_open =
-        pm_grid_attach_check(grid, 1, ++row, 3, 1, _("Automatically view message "
-                                                     "when mailbox opened"));
-    pui->ask_before_select =
-        pm_grid_attach_check(grid, 1, ++row, 3, 1, _("Ask me before selecting a different "
-                                                     "mailbox to show an unread message"));
-
-    pui->pgdownmod =
-        pm_grid_attach_check(grid, 1, ++row, 1, 1, _("Page Up/Page Down keys "
-                                                     "scroll text by"));
-    scroll_adj = gtk_adjustment_new(50.0, 10.0, 100.0, 5.0, 10.0, 0.0);
-    pui->pgdown_percent = gtk_spin_button_new(scroll_adj, 1, 0);
-    gtk_widget_set_sensitive(pui->pgdown_percent, FALSE);
-    gtk_widget_set_hexpand(pui->pgdown_percent, TRUE);
-    pm_grid_attach(grid, pui->pgdown_percent, 2, row, 1, 1);
-
-    label = gtk_label_new(_("percent"));
-    gtk_widget_set_halign(label, GTK_ALIGN_START);
-    pm_grid_attach(grid, label, 2, row, 1, 1);
-
-    pm_grid_set_next_row(grid, ++row);
-}
-
-static void
-pm_grid_add_message_window_group(GtkWidget * grid_widget)
-{
-    GtkGrid *grid = (GtkGrid *) grid_widget;
-    gint row = pm_grid_get_next_row(grid);
-
-    pm_grid_attach(grid, pm_group_label(_("Message window")), 0, row, 3, 1);
-
-    pm_grid_attach_label(grid, 1, ++row, 1, 1, _("After moving a message:"));
-
-    pui->action_after_move_menu = create_action_after_move_menu();
-    pm_combo_box_set_level(pui->action_after_move_menu,
-                           balsa_app.mw_action_after_move);
-    pm_grid_attach(grid, pui->action_after_move_menu, 2, row, 1, 1);
-
-    pm_grid_set_next_row(grid, ++row);
-}
-
-static GtkWidget *
-display_subpage(void)
-{
-    GtkWidget *grid = pm_grid_new();
-
-    pm_grid_add_main_window_group(grid);
-    pm_grid_add_message_window_group(grid);
-
-    return grid;
-}
-
-/*
- * Threading subpage
- */
-
-static void
-pm_grid_add_threading_group(GtkWidget * grid_widget)
-{
-    GtkGrid *grid = (GtkGrid *) grid_widget;
-    gint row = pm_grid_get_next_row(grid);
-
-    pm_grid_attach(grid, pm_group_label(_("Sorting and threading")), 0, row, 3, 1);
-
-    pm_grid_attach_label(grid, 1, ++row, 1, 1, _("Default sort column:"));
-    pui->default_sort_field =
-        pm_grid_attach_pref_menu(grid, 2, row, 1, 1,
-                                 sort_field_label, G_N_ELEMENTS(sort_field_label),
-                                 &pui->sort_field_index);
-
-    pm_grid_attach_label(grid, 1, ++row, 1, 1, _("Default threading style:"));
-    pui->default_threading_type =
-        pm_grid_attach_pref_menu(grid, 2, row, 1, 1,
-                                 threading_type_label, NUM_THREADING_STYLES,
-                                 &pui->threading_type_index);
-
-    pui->tree_expand_check =
-        pm_grid_attach_check(grid, 1, ++row, 2, 1, _("Expand threads on open"));
-
-    pm_grid_set_next_row(grid, ++row);
-}
-
-static GtkWidget *
-threading_subpage(void)
-{
-    GtkWidget *grid = pm_grid_new();
-
-    pm_grid_add_threading_group(grid);
-
-    return grid;
-}
-
-/*
- * Message subpage
- */
-
-/*
- * Font group
- */
-
-/*
- * Create the group, with two font buttons and a check box for using
- * the default size; if either font does not specify a point size,
- * initially check the box.
- *
- * If the box is checked when the prefs are applied, both fonts will be
- * saved with no point size specification.
- */
-
-static void
-pm_grid_add_preview_font_group(GtkWidget * grid_widget)
-{
-    GtkGrid *grid = (GtkGrid *) grid_widget;
-    gint row = pm_grid_get_next_row(grid);
-    gboolean use_default_font_size = FALSE;
-
-    pm_grid_attach(grid, pm_group_label(_("Fonts")), 0, row, 3, 1);
-
-    pui->use_system_fonts =
-        gtk_check_button_new_with_label(_("Use system fonts"));
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->use_system_fonts),
-                                 balsa_app.use_system_fonts);
-    gtk_widget_set_hexpand(pui->use_system_fonts, TRUE);
-    pm_grid_attach(grid, pui->use_system_fonts,
-                   1, ++row, 1, 1);
-
-    pui->use_default_font_size =
-        gtk_check_button_new_with_label(_("Use default font size"));
-    gtk_widget_set_hexpand(pui->use_default_font_size, FALSE);
-    pm_grid_attach(grid, pui->use_default_font_size,
-                   2, row, 1, 1);
-
-    if (pm_grid_attach_font_button(grid, 1, ++row, 1, 1,
-                                  _("Message font:"),
-                                  balsa_app.message_font,
-                                  &pui->message_font_label,
-                                  &pui->message_font_button))
-        use_default_font_size = TRUE;
-
-    if (pm_grid_attach_font_button(grid, 1, ++row, 1, 1,
-                                   _("Subject font:"),
-                                   balsa_app.subject_font,
-                                   &pui->subject_font_label,
-                                   &pui->subject_font_button))
-        use_default_font_size = TRUE;
-
-    if (use_default_font_size) {
-        gtk_font_button_set_show_size(GTK_FONT_BUTTON
-                                      (pui->message_font_button), FALSE);
-        gtk_font_button_set_show_size(GTK_FONT_BUTTON
-                                      (pui->subject_font_button), FALSE);
-        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
-                                     (pui->use_default_font_size), TRUE);
-    }
-
-    if (balsa_app.use_system_fonts) {
-        gtk_widget_set_sensitive(pui->message_font_label, FALSE);
-        gtk_widget_set_sensitive(pui->message_font_button, FALSE);
-        gtk_widget_set_sensitive(pui->subject_font_label, FALSE);
-        gtk_widget_set_sensitive(pui->subject_font_button, FALSE);
-        gtk_widget_set_sensitive(pui->use_default_font_size, FALSE);
-    }
-
-    pm_grid_set_next_row(grid, ++row);
-}
-
-/*
- * End of font group
- */
-
-static void
-pm_grid_add_quoted_group(GtkWidget * grid_widget)
-{
-    GtkGrid *grid = (GtkGrid *) grid_widget;
-    gint row = pm_grid_get_next_row(grid);
-    GtkAdjustment *spinbutton_adj;
-
-    /* Quoted text regular expression */
-    /* and RFC2646-style flowed text  */
-
-    pm_grid_attach(grid, pm_group_label(_("Quoted and flowed text")), 0, row, 3, 1);
-
-    pui->mark_quoted =
-        pm_grid_attach_check(grid, 1, ++row, 2, 1, _("Mark quoted text"));
-
-    pui->quote_pattern =
-        pm_grid_attach_entry(grid, 1, ++row, 1, 1, _("Quoted text regular expression:"));
-
-    pui->browse_wrap =
-        pm_grid_attach_check(grid, 1, ++row, 1, 1, _("Wrap text at"));
-
-    spinbutton_adj = gtk_adjustment_new(1.0, 40.0, 200.0, 1.0, 5.0, 0.0);
-    pui->browse_wrap_length = gtk_spin_button_new(spinbutton_adj, 1, 0);
-    gtk_widget_set_hexpand(pui->browse_wrap_length, TRUE);
-    pm_grid_attach(grid, pui->browse_wrap_length, 2, row, 1, 1);
-    pm_grid_attach_label(grid, 3, row, 1, 1, _("characters"));
-
-    pm_grid_set_next_row(grid, ++row);
-}
-
-static void
-pm_grid_add_alternative_group(GtkWidget * grid_widget)
-{
-    GtkGrid *grid = (GtkGrid *) grid_widget;
-    gint row = pm_grid_get_next_row(grid);
-
-    /* handling of multipart/alternative */
-
-    pm_grid_attach(grid, pm_group_label(_("Display of multipart/alternative parts")),
-                   0, row, 3, 1);
-
-    pui->display_alt_plain =
-	pm_grid_attach_check(grid, 1, ++row, 1, 1, _("Prefer text/plain over HTML"));
-
-    pm_grid_set_next_row(grid, ++row);
-}
-
-static GtkWidget *
-message_subpage(void)
-{
-    GtkWidget *grid = pm_grid_new();
-
-    pm_grid_add_preview_font_group(grid);
-    pm_grid_add_quoted_group(grid);
-    pm_grid_add_alternative_group(grid);
-
-    return grid;
-}
-
-/*
- * Colors subpage
- */
-
-static void
-pm_grid_add_message_colors_group(GtkWidget * grid_widget)
-{
-    GtkGrid *grid = (GtkGrid *) grid_widget;
-    gint row = pm_grid_get_next_row(grid);
-    gint i;
-
-    pm_grid_attach(grid, pm_group_label(_("Message colors")), 0, row, 3, 1);
-
-    for(i = 0; i < MAX_QUOTED_COLOR; i++) {
-        gchar *text;
-
-        text = g_strdup_printf(_("Quote level %d color"), i+1);
-        pui->quoted_color[i] = pm_grid_attach_color_box(grid, 1, ++row, 1, 1, text);
-        g_free(text);
-    }
-
-    pm_grid_set_next_row(grid, ++row);
-}
-
-static void
-pm_grid_add_link_color_group(GtkWidget * grid_widget)
-{
-    GtkGrid *grid = (GtkGrid *) grid_widget;
-    gint row = pm_grid_get_next_row(grid);
-
-    pm_grid_attach(grid, pm_group_label(_("Link color")), 0, row, 3, 1);
-    pui->url_color =
-        pm_grid_attach_color_box(grid, 1, ++row, 1, 1, _("Hyperlink color"));
-
-    pm_grid_set_next_row(grid, ++row);
-}
-
-static GtkWidget *
-colors_subpage(void)
-{
-    GtkWidget *grid = pm_grid_new();
-
-    pm_grid_add_message_colors_group(grid);
-    pm_grid_add_link_color_group(grid);
-
-    return grid;
-}
-
-/*
- * Format subpage
- */
-
-static void
-pm_grid_add_display_formats_group(GtkWidget * grid_widget)
-{
-    GtkGrid *grid = (GtkGrid *) grid_widget;
-    gint row = pm_grid_get_next_row(grid);
-
-    pm_grid_attach(grid, pm_group_label(_("Format")), 0, row, 3, 1);
-
-    pui->date_format =
-        pm_grid_attach_entry(grid, 1, ++row, 1, 1, _("Date encoding (for strftime):"));
-    pui->selected_headers =
-        pm_grid_attach_entry(grid, 1, ++row, 1, 1, _("Selected headers:"));
-
-    pm_grid_set_next_row(grid, ++row);
-}
-
-static void
-pm_grid_add_broken_8bit_codeset_group(GtkWidget * grid_widget)
-{
-    GtkGrid *grid = (GtkGrid *) grid_widget;
-    gint row = pm_grid_get_next_row(grid);
-    GSList *radio_group = NULL;
-
-    /* treatment of messages with 8-bit chars, but without proper MIME encoding */
-
-    pm_grid_attach(grid, pm_group_label(_("National (8-bit) characters in broken messages "
-                                          "without codeset header")), 0, row, 3, 1);
-
-    pui->convert_unknown_8bit[0] =
-	GTK_RADIO_BUTTON(gtk_radio_button_new_with_label(radio_group,
-							 _("display as “?”")));
-    pm_grid_attach(grid, GTK_WIDGET(pui->convert_unknown_8bit[0]),
-                   1, ++row, 2, 1);
-    radio_group =
-	gtk_radio_button_get_group(GTK_RADIO_BUTTON(pui->convert_unknown_8bit[0]));
-
-    pui->convert_unknown_8bit[1] =
-	GTK_RADIO_BUTTON(gtk_radio_button_new_with_label(radio_group,
-							 _("display in codeset")));
-    pm_grid_attach(grid, GTK_WIDGET(pui->convert_unknown_8bit[1]),
-                    1, ++row, 1, 1);
-
-    pui->convert_unknown_8bit_codeset = libbalsa_charset_button_new();
-    gtk_combo_box_set_active(GTK_COMBO_BOX
-                             (pui->convert_unknown_8bit_codeset),
-                             balsa_app.convert_unknown_8bit_codeset);
-    gtk_widget_set_hexpand(pui->convert_unknown_8bit_codeset, TRUE);
-    pm_grid_attach(grid, pui->convert_unknown_8bit_codeset,
-                   2, row, 1, 1);
-
-    pm_grid_set_next_row(grid, ++row);
-}
-
-static GtkWidget *
-format_subpage(void)
-{
-    GtkWidget *grid = pm_grid_new();
-
-    pm_grid_add_display_formats_group(grid);
-    pm_grid_add_broken_8bit_codeset_group(grid);
-
-    return grid;
-}
-
-/*
- * Status messages subpage
- */
-
-static void
-pm_grid_add_information_messages_group(GtkWidget * grid_widget)
-{
-    GtkGrid *grid = (GtkGrid *) grid_widget;
-    gint row = pm_grid_get_next_row(grid);
-
-    pm_grid_attach(grid, pm_group_label(_("Information messages")), 0, row, 3, 1);
-
-    pui->information_message_menu =
-	pm_grid_attach_information_menu(grid, 1, ++row, 1, 1,
-                                        _("Information messages:"),
-                                        balsa_app.information_message);
-    pui->warning_message_menu =
-	pm_grid_attach_information_menu(grid, 1, ++row, 1, 1,
-                                        _("Warning messages:"),
-                                        balsa_app.warning_message);
-    pui->error_message_menu =
-	pm_grid_attach_information_menu(grid, 1, ++row, 1, 1,
-                                        _("Error messages:"),
-                                        balsa_app.error_message);
-    pui->fatal_message_menu =
-	pm_grid_attach_information_menu(grid, 1, ++row, 1, 1,
-	                                _("Fatal error messages:"),
-                                        balsa_app.fatal_message);
-    pui->debug_message_menu =
-	pm_grid_attach_information_menu(grid, 1, ++row, 1, 1,
-                                        _("Debug messages:"),
-                                        balsa_app.debug_message);
-
-    pm_grid_set_next_row(grid, ++row);
-}
-
-static void
-pm_grid_add_progress_group(GtkWidget * grid_widget)
-{
-    GtkGrid *grid = (GtkGrid *) grid_widget;
-    gint row = pm_grid_get_next_row(grid);
-    GSList *radio_group;
-    gint i;
-
-    pm_grid_attach(grid, pm_group_label(_("Display progress dialog")), 0, row, 3, 1);
-
-    radio_group = NULL;
-    for (i = 0; i < NUM_PWINDOW_MODES; i++) {
-	pui->pwindow_type[i] =
-	    GTK_RADIO_BUTTON(gtk_radio_button_new_with_label
-			     (radio_group, _(pwindow_type_label[i])));
-	pm_grid_attach(grid, GTK_WIDGET(pui->pwindow_type[i]), 1, ++row, 2, 1);
-	radio_group = gtk_radio_button_get_group(pui->pwindow_type[i]);
-    }
-
-    pm_grid_set_next_row(grid, ++row);
-}
-
-static GtkWidget *
-status_messages_subpage(void)
-{
-    GtkWidget *grid = pm_grid_new();
-
-    pm_grid_add_information_messages_group(grid);
-    pm_grid_add_progress_group(grid);
-
-    return grid;
-}
-
-/*
- * The page
- */
-
-static GtkWidget *
-create_display_page(GtkTreeStore * store)
-{
-    GtkWidget *notebook;
-    GtkTreeIter iter;
-
-    notebook = gtk_notebook_new();
-    gtk_notebook_set_show_tabs(GTK_NOTEBOOK(notebook), FALSE);
-    gtk_notebook_set_show_border(GTK_NOTEBOOK(notebook), FALSE);
-
-    gtk_tree_store_append(store, &iter, NULL);
-    pm_append_page(notebook, display_subpage(), _("Layout"),
-                   store, &iter);
-    pm_append_page(notebook, threading_subpage(), _("Sort and thread"),
-                   store, &iter);
-    pm_append_page(notebook, message_subpage(), _("Message"),
-                   store, &iter);
-    pm_append_page(notebook, colors_subpage(), _("Colors"),
-                   store, &iter);
-    pm_append_page(notebook, format_subpage(), _("Format"),
-                   store, &iter);
-    pm_append_page(notebook, status_messages_subpage(), _("Status messages"),
-                   store, &iter);
-
-    return notebook;
-}
-
-/********************
- *
- * Address books page
- *
- *******************/
-
-static void address_book_change(LibBalsaAddressBook * address_book,
-                                gboolean append);
-
-static void
-pm_grid_add_address_books_group(GtkWidget * grid_widget)
-{
-    GtkGrid *grid = (GtkGrid *) grid_widget;
-    gint row = pm_grid_get_next_row(grid);
-    GtkWidget *tree_view;
-    GtkListStore *store;
-    GtkCellRenderer *renderer;
-    GtkTreeViewColumn *column;
-    GtkWidget *scrolledwindow;
-    GtkWidget *address_book_add_menu;
-    GtkWidget *vbox;
-
-    pm_grid_attach(grid, pm_group_label(_("Address books")), 0, row, 3, 1);
-
-    scrolledwindow = gtk_scrolled_window_new(NULL, NULL);
-    gtk_widget_set_vexpand(scrolledwindow, TRUE);
-    pm_grid_attach(grid, scrolledwindow, 1, ++row, 1, 1);
-    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolledwindow),
-				   GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
-    gtk_widget_set_size_request(scrolledwindow, -1, 150);
-
-    store = gtk_list_store_new(AB_N_COLUMNS,
-                               G_TYPE_STRING,   /* AB_TYPE_COLUMN */
-                               G_TYPE_STRING,   /* AB_NAME_COLUMN */
-                               G_TYPE_BOOLEAN,  /* AB_XPND_COLUMN */
-                               G_TYPE_POINTER); /* AB_DATA_COLUMN */
-    pui->address_books = tree_view =
-        gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
-    g_object_unref(store);
-
-    renderer = gtk_cell_renderer_text_new();
-    column =
-        gtk_tree_view_column_new_with_attributes(_("Type"),
-                                                 renderer,
-                                                 "text", AB_TYPE_COLUMN,
-                                                 NULL);
-    gtk_tree_view_append_column(GTK_TREE_VIEW(tree_view), column);
-
-    renderer = gtk_cell_renderer_text_new();
-    column =
-        gtk_tree_view_column_new_with_attributes(_("Address book name"),
-                                                 renderer,
-                                                 "text", AB_NAME_COLUMN,
-                                                 NULL);
-    gtk_tree_view_append_column(GTK_TREE_VIEW(tree_view), column);
-
-    renderer = gtk_cell_renderer_toggle_new();
-    column =
-        gtk_tree_view_column_new_with_attributes(_("Auto-complete"),
-                                                 renderer,
-                                                 "active",
-                                                 AB_XPND_COLUMN,
-                                                 NULL);
-    gtk_tree_view_append_column(GTK_TREE_VIEW(tree_view), column);
-    gtk_tree_selection_set_mode(gtk_tree_view_get_selection
-                                (GTK_TREE_VIEW(tree_view)),
-                                GTK_SELECTION_BROWSE);
-
-    g_signal_connect(tree_view, "row-activated", 
-                     G_CALLBACK(address_book_edit_cb), NULL);
-
-    gtk_container_add(GTK_CONTAINER(scrolledwindow), tree_view);
-
-    address_book_add_menu =
-        balsa_address_book_add_menu(address_book_change,
-                                    GTK_WINDOW(property_box));
-    g_object_weak_ref(G_OBJECT(grid), (GWeakNotify) g_object_unref,
-                      address_book_add_menu);
-    g_object_ref_sink(address_book_add_menu);
-
-    vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, HIG_PADDING);
-    add_button_to_box(_("_Add"),
-                      G_CALLBACK(add_menu_cb),
-                      address_book_add_menu, vbox);
-
-    add_button_to_box(_("_Modify"),
-                      G_CALLBACK(address_book_edit_cb),
-                      tree_view, vbox);
-    add_button_to_box(_("_Delete"),
-                      G_CALLBACK(address_book_delete_cb),
-                      tree_view, vbox);
-    add_button_to_box(_("_Set as default"), 
-                      G_CALLBACK(address_book_set_default_cb),
-                      tree_view, vbox);
-    pm_grid_attach(grid, vbox, 2, row, 1, 1);
-
-    update_address_books();
-
-    pm_grid_set_next_row(grid, ++row);
-}
-
-static GtkWidget *
-create_address_book_page(GtkTreeStore * store)
-{
-    GtkWidget *grid = pm_grid_new();
-
-    pm_grid_add_address_books_group(grid);
-
-    return grid;
-}
-
-#if !HAVE_GTKSPELL
-
-/***************
- *
- * Spelling page
- *
- **************/
-
-static void
-pm_grid_add_misc_spelling_group(GtkWidget * grid_widget)
-{
-    GtkGrid *grid = (GtkGrid *) grid_widget;
-    gint row = pm_grid_get_next_row(grid);
-
-    pm_grid_attach(grid, pm_group_label(_("Miscellaneous spelling settings")),
-                   0, row, 3, 1);
-
-    pui->spell_check_sig =
-        pm_grid_attach_check(grid, 1, ++row, 1, 1 , _("Check signature"));
-    pui->spell_check_quoted =
-        pm_grid_attach_check(grid, 1, ++row, 1, 1, _("Check quoted"));
-
-    pm_grid_set_next_row(grid, ++row);
-}
-
-static GtkWidget *
-create_spelling_page(GtkTreeStore * store)
-{
-    GtkWidget *grid = pm_grid_new();
-
-    pm_grid_add_misc_spelling_group(grid);
-
-    return grid;
-}
-#endif                          /* HAVE_GTKSPELL */
-
-/***************
- *
- * Start-up page
- *
- **************/
-
-static void
-pm_grid_add_startup_options_group(GtkWidget * grid_widget)
-{
-    GtkGrid *grid = (GtkGrid *) grid_widget;
-    gint row = pm_grid_get_next_row(grid);
-
-    pm_grid_attach(grid, pm_group_label(_("Start-up options")), 0, row, 3, 1);
-
-    pui->open_inbox_upon_startup =
-        pm_grid_attach_check(grid, 1, ++row, 3, 1, _("Open Inbox upon start-up"));
-    pui->check_mail_upon_startup =
-        pm_grid_attach_check(grid, 1, ++row, 3, 1, _("Check mail upon start-up"));
-    pui->remember_open_mboxes =
-        pm_grid_attach_check(grid, 1, ++row, 3, 1, _("Remember open mailboxes "
-                                    "between sessions"));
-
-    pm_grid_set_next_row(grid, ++row);
-}
-
-static void
-pm_grid_add_folder_scanning_group(GtkWidget * grid_widget)
-{
-    GtkGrid *grid = (GtkGrid *) grid_widget;
-    gint row = pm_grid_get_next_row(grid);
-    GtkWidget *label;
-    GtkAdjustment *scan_adj;
-
-    pm_grid_attach(grid, pm_group_label(_("Folder scanning")), 0, row, 3, 1);
-
-    pm_grid_attach_label(grid, 1, ++row, 3, 1,
-                        _("Choose depth 1 for fast start-up; "
-                          "this defers scanning some folders. "
-                          "To see more of the tree at start-up, "
-                          "choose a greater depth."));
-
-    label =
-        pm_grid_attach_label(grid, 1, ++row, 1, 1,
-                             _("Scan local folders to depth"));
-    gtk_widget_set_hexpand(label, FALSE);
-    scan_adj = gtk_adjustment_new(1.0, 1.0, 99.0, 1.0, 5.0, 0.0);
-    pui->local_scan_depth = gtk_spin_button_new(scan_adj, 1, 0);
-    gtk_widget_set_hexpand(pui->local_scan_depth, TRUE);
-    pm_grid_attach(grid, pui->local_scan_depth, 2, row, 1, 1);
-
-    label =
-        pm_grid_attach_label(grid, 1, ++row, 1, 1,
-                             _("Scan IMAP folders to depth"));
-    gtk_widget_set_hexpand(label, FALSE);
-
-    scan_adj = gtk_adjustment_new(1.0, 1.0, 99.0, 1.0, 5.0, 0.0);
-    pui->imap_scan_depth = gtk_spin_button_new(scan_adj, 1, 0);
-    gtk_widget_set_hexpand(pui->imap_scan_depth, TRUE);
-    pm_grid_attach(grid, pui->imap_scan_depth, 2, row, 1, 1);
-
-    pm_grid_set_next_row(grid, ++row);
-}
-
-static GtkWidget *
-create_startup_page(GtkTreeStore * store)
-{
-    GtkWidget *grid = pm_grid_new();
-
-    pm_grid_add_startup_options_group(grid);
-    pm_grid_add_folder_scanning_group(grid);
-
-    return grid;
-}
-
-/********************
- *
- * Miscellaneous page
- *
- *******************/
-
-static void
-pm_grid_add_misc_group(GtkWidget * grid_widget)
-{
-    GtkGrid *grid = (GtkGrid *) grid_widget;
-    gint row = pm_grid_get_next_row(grid);
-    GtkAdjustment *close_spinbutton_adj;
-
-    pm_grid_attach(grid, pm_group_label(_("Miscellaneous")), 0, row, 3, 1);
-
-    pui->debug =
-        pm_grid_attach_check(grid, 1, ++row, 3, 1, _("Debug"));
-    pui->empty_trash =
-        pm_grid_attach_check(grid, 1, ++row, 3, 1, _("Empty trash on exit"));
-
-    pui->close_mailbox_auto =
-        pm_grid_attach_check(grid, 1, ++row, 1, 1,
-                             _("Close mailbox if unused more than"));
-    gtk_widget_set_hexpand(pui->close_mailbox_auto, FALSE);
-
-    close_spinbutton_adj = gtk_adjustment_new(10, 1, 100, 1, 10, 0);
-    pui->close_mailbox_minutes =
-	gtk_spin_button_new(close_spinbutton_adj, 1, 0);
-    gtk_widget_set_hexpand(pui->close_mailbox_minutes, TRUE);
-    gtk_widget_show(pui->close_mailbox_minutes);
-    gtk_widget_set_sensitive(pui->close_mailbox_minutes, FALSE);
-    pm_grid_attach(grid, pui->close_mailbox_minutes, 2, row, 1, 1);
-
-    pm_grid_attach_label(grid, 3, row, 1, 1, _("minutes"));
-
-    pm_grid_set_next_row(grid, ++row);
-}
-
-static void
-pm_grid_add_deleting_messages_group(GtkWidget * grid_widget)
-{
-    GtkGrid *grid = (GtkGrid *) grid_widget;
-    gint row = pm_grid_get_next_row(grid);
-    gchar *text;
-    GtkAdjustment *expunge_spinbutton_adj;
-
-    pm_grid_attach(grid, pm_group_label(_("Deleting messages")), 0, row, 3, 1);
-
-    /* Translators: this used to be "using Mailbox -> Hide messages";
-     * the UTF-8 string for the right-arrow symbol is broken out to
-     * avoid msgconv problems. */
-    text = g_strdup_printf(_("The following setting is global, "
-			     "but may be overridden "
-			     "for the selected mailbox "
-			     "using Mailbox %s Hide messages:"),
-			   "\342\226\272");
-    pm_grid_attach_label(grid, 1, ++row, 3, 1, text);
-    g_free(text);
-    pui->hide_deleted =
-        pm_grid_attach_check(grid, 1, ++row, 3, 1, _("Hide messages marked as deleted"));
-
-    pm_grid_attach_label(grid, 1, ++row, 3, 1, _("The following settings are global:"));
-
-    pui->expunge_on_close =
-        pm_grid_attach_check(grid, 1, ++row, 3, 1, _("Expunge deleted messages "
-                                                     "when mailbox is closed"));
-
-    pui->expunge_auto =
-        pm_grid_attach_check(grid, 1, ++row, 1, 1, _("…and if unused more than"));
-    gtk_widget_set_hexpand(pui->expunge_auto, FALSE);
-
-    expunge_spinbutton_adj = gtk_adjustment_new(120, 1, 1440, 1, 10, 0);
-    pui->expunge_minutes = gtk_spin_button_new(expunge_spinbutton_adj, 1, 0);
-    gtk_widget_set_hexpand(pui->expunge_minutes, TRUE);
-    gtk_widget_show(pui->expunge_minutes);
-    gtk_widget_set_sensitive(pui->expunge_minutes, FALSE);
-    pm_grid_attach(grid, pui->expunge_minutes, 2, row, 1, 1);
-
-    pm_grid_attach_label(grid, 3, row, 1, 1, _("minutes"));
-
-    pm_grid_set_next_row(grid, ++row);
-}
-
-static GtkWidget *
-create_misc_page(GtkTreeStore * store)
-{
-    GtkWidget *grid = pm_grid_new();
-
-    pm_grid_add_misc_group(grid);
-    pm_grid_add_deleting_messages_group(grid);
-
-    return grid;
-}
-
-
 /*
  * callbacks
  */
@@ -2917,41 +1442,6 @@ server_edit_cb(GtkTreeView * tree_view)
     gtk_tree_model_get(model, &iter, MS_DATA_COLUMN, &mbnode, -1);
     g_return_if_fail(mbnode);
     balsa_mailbox_node_show_prop_dialog(mbnode);
-}
-
-/* Clear and populate the list. */
-static void
-update_smtp_servers(void)
-{
-    GtkTreeView *tree_view;
-    GtkTreeSelection *selection;
-    GtkTreeIter iter;
-    GtkTreePath *path = NULL;
-    GtkTreeModel *model;
-    GSList *list;
-
-    if (pui == NULL)
-        return;
-
-    tree_view = GTK_TREE_VIEW(pui->smtp_servers);
-    selection = gtk_tree_view_get_selection(tree_view);
-    if (gtk_tree_selection_get_selected(selection, &model, &iter))
-        path = gtk_tree_model_get_path(model, &iter);
-
-    gtk_list_store_clear(GTK_LIST_STORE(model));
-
-    for (list = balsa_app.smtp_servers; list; list = list->next) {
-        LibBalsaSmtpServer *smtp_server = LIBBALSA_SMTP_SERVER(list->data);
-        gtk_list_store_append(GTK_LIST_STORE(model), &iter);
-        gtk_list_store_set(GTK_LIST_STORE(model), &iter,
-                           0, libbalsa_smtp_server_get_name(smtp_server),
-                           1, smtp_server, -1);
-    }
-
-    if (path) {
-        gtk_tree_selection_select_path(selection, path);
-        gtk_tree_path_free(path);
-    }
 }
 
 #define SMTP_SERVER_SECTION_PREFIX "smtp-server-"
@@ -3218,7 +1708,7 @@ server_del_cb(GtkTreeView * tree_view)
 	folder_conf_delete(mbnode);
 }
 
-void
+static void
 timer_modified_cb(GtkWidget * widget, GtkWidget * pbox)
 {
     gboolean newstate = 
@@ -3277,65 +1767,7 @@ option_menu_cb(GtkMenuItem * widget, gpointer data)
     *index = gtk_combo_box_get_active(GTK_COMBO_BOX(widget));
 }
 
-static GtkWidget *
-create_pref_option_menu(const gchar * names[], gint size, gint * index)
-{
-    GtkWidget *combo_box;
-    gint i;
-
-    combo_box = pm_combo_box_new();
-    g_signal_connect(G_OBJECT(combo_box), "changed",
-                     G_CALLBACK(option_menu_cb), index);
-
-    for (i = 0; i < size; i++)
-	add_show_menu(_(names[i]), i, combo_box);
-
-    return combo_box;
-}
-
-
 static void
-add_show_menu(const char* label, gint level, GtkWidget* menu)
-{
-    struct pm_combo_box_info *info =
-        g_object_get_data(G_OBJECT(menu), PM_COMBO_BOX_INFO);
-
-    gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(menu), label);
-    info->levels = g_slist_append(info->levels, GINT_TO_POINTER(level));
-}
-
-static GtkWidget *
-create_information_message_menu(void)
-{
-    GtkWidget *combo_box = pm_combo_box_new();
-
-    add_show_menu(_("Show nothing"),       BALSA_INFORMATION_SHOW_NONE,
-                  combo_box);
-    add_show_menu(_("Show dialog"),        BALSA_INFORMATION_SHOW_DIALOG,
-                  combo_box);
-    add_show_menu(_("Show in list"),       BALSA_INFORMATION_SHOW_LIST,
-                  combo_box);
-    add_show_menu(_("Show in status bar"), BALSA_INFORMATION_SHOW_BAR,
-                  combo_box);
-    add_show_menu(_("Print to console"),   BALSA_INFORMATION_SHOW_STDERR,
-                  combo_box);
-
-    return combo_box;
-}
-
-static GtkWidget *
-create_mdn_reply_menu(void)
-{
-    GtkWidget *combo_box = pm_combo_box_new();
-
-    add_show_menu(_("Never"),  BALSA_MDN_REPLY_NEVER,  combo_box);
-    add_show_menu(_("Ask me"), BALSA_MDN_REPLY_ASKME,  combo_box);
-    add_show_menu(_("Always"), BALSA_MDN_REPLY_ALWAYS, combo_box);
-
-    return combo_box;
-}
-
-void
 mailbox_close_timer_modified_cb(GtkWidget * widget, GtkWidget * pbox)
 {
     gboolean newstate =
@@ -3382,7 +1814,8 @@ expunge_auto_cb(GtkWidget * widget, GtkWidget * pbox)
     properties_modified_cb(widget, pbox);
 }
 
-static void imap_toggled_cb(GtkWidget * widget, GtkWidget * pbox)
+static void
+imap_toggled_cb(GtkWidget * widget, GtkWidget * pbox)
 {
     properties_modified_cb(widget, pbox);
 
@@ -3395,7 +1828,7 @@ static void imap_toggled_cb(GtkWidget * widget, GtkWidget * pbox)
     }
 }
 
-static void 
+static void
 convert_8bit_cb(GtkWidget * widget, GtkWidget * pbox)
 {
     properties_modified_cb(widget, pbox);
@@ -3457,25 +1890,1624 @@ default_font_size_cb(GtkWidget * widget, GtkWidget * pbox)
  * End of callbacks for the font group
  */
 
-static GtkWidget *
-create_layout_types_menu(void)
+
+static void
+response_cb(GtkDialog * dialog, gint response, gpointer data)
 {
-    GtkWidget *combo_box = pm_combo_box_new();
-    add_show_menu(_("Default layout"), LAYOUT_DEFAULT, combo_box);
-    add_show_menu(_("Wide message layout"), LAYOUT_WIDE_MSG, combo_box);
-    add_show_menu(_("Wide screen layout"), LAYOUT_WIDE_SCREEN, combo_box);
-    return combo_box;
+    switch (response) {
+    case GTK_RESPONSE_APPLY:
+        apply_prefs(dialog);
+        break;
+    case GTK_RESPONSE_HELP:
+        balsa_help_pbox_display();
+        break;
+    case GTK_RESPONSE_OK:
+        apply_prefs(dialog);
+        /* and fall through to... */
+    default:
+        destroy_pref_window_cb();
+        gtk_widget_destroy(GTK_WIDGET(dialog));
+    }
+}
+
+/*
+ * End of callbacks
+ */
+
+/**************************************************************
+ *
+ * Preference groups
+ *
+ * Each group is given a GtkGrid, and appends a row containing
+ * the group title, followed by rows with the group's controls.
+ *
+ *************************************************************/
+
+/*
+ * Remote mailbox servers group
+ */
+
+static void
+pm_grid_add_remote_mailbox_servers_group(GtkWidget * grid_widget)
+{
+    GtkGrid *grid = (GtkGrid *) grid_widget;
+    gint row = pm_grid_get_next_row(grid);
+    GtkWidget *vbox;
+    GtkWidget *scrolledwindow;
+    GtkWidget *tree_view;
+    GtkListStore *store;
+    GtkCellRenderer *renderer;
+    GtkTreeViewColumn *column;
+    GtkWidget *server_add_menu;
+
+    pm_grid_attach(grid, pm_group_label(_("Remote mailbox servers")), 0, row, 3, 1);
+
+    scrolledwindow = gtk_scrolled_window_new(NULL, NULL);
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolledwindow),
+                                   GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
+    gtk_widget_set_size_request(scrolledwindow, -1, 100);
+
+    store = gtk_list_store_new(MS_N_COLUMNS,
+                               G_TYPE_STRING,   /* MS_PROT_COLUMN */
+                               G_TYPE_STRING,   /* MS_NAME_COLUMN */
+                               G_TYPE_POINTER); /* MS_DATA_COLUMN */
+    pui->mail_servers = tree_view =
+        gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
+    g_object_unref(store);
+
+    renderer = gtk_cell_renderer_text_new();
+    column =
+        gtk_tree_view_column_new_with_attributes(_("Type"),
+                                                 renderer,
+                                                 "text", MS_PROT_COLUMN,
+                                                 NULL);
+    gtk_tree_view_append_column(GTK_TREE_VIEW(tree_view), column);
+
+    renderer = gtk_cell_renderer_text_new();
+    column =
+        gtk_tree_view_column_new_with_attributes(_("Mailbox name"),
+                                                 renderer,
+                                                 "text", MS_NAME_COLUMN,
+                                                 NULL);
+    gtk_tree_view_append_column(GTK_TREE_VIEW(tree_view), column);
+
+    gtk_container_add(GTK_CONTAINER(scrolledwindow), tree_view);
+
+    g_signal_connect(G_OBJECT(pui->mail_servers), "row-activated",
+                     G_CALLBACK(server_edit_cb), NULL);
+
+    pm_grid_attach(grid, scrolledwindow, 1, ++row, 1, 1);
+
+    vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, ROW_SPACING);
+
+    server_add_menu = server_add_menu_widget();
+    g_object_weak_ref(G_OBJECT(vbox), (GWeakNotify) g_object_unref,
+                      server_add_menu);
+    g_object_ref_sink(server_add_menu);
+    add_button_to_box(_("_Add"), G_CALLBACK(add_menu_cb),
+                      server_add_menu, vbox);
+
+    add_button_to_box(_("_Modify"), G_CALLBACK(server_edit_cb),
+                      tree_view, vbox);
+    add_button_to_box(_("_Delete"), G_CALLBACK(server_del_cb),
+                      tree_view, vbox);
+
+    pm_grid_attach(grid, vbox, 2, row, 1, 1);
+    pm_grid_set_next_row(grid, ++row);
+
+    /* fill in data */
+    update_mail_servers();
+}
+
+/*
+ * Local mail directory group
+ */
+
+static void
+pm_grid_add_local_mail_group(GtkWidget * grid_widget)
+{
+    GtkGrid *grid = (GtkGrid *) grid_widget;
+    gint row = pm_grid_get_next_row(grid);
+
+    pm_grid_attach(grid, pm_group_label(_("Local mail directory")), 0, row, 3, 1);
+
+    pui->mail_directory =
+        gtk_file_chooser_button_new(_("Select your local mail directory"),
+                                    GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER);
+
+    pm_grid_attach(grid, pui->mail_directory, 1, ++row, 2, 1);
+    pm_grid_set_next_row(grid, ++row);
+}
+
+/*
+ * Outgoing mail servers group
+ */
+
+static void
+pm_grid_add_outgoing_mail_group(GtkWidget * grid_widget)
+{
+    GtkGrid *grid = (GtkGrid *) grid_widget;
+    gint row = pm_grid_get_next_row(grid);
+    GtkWidget *scrolled_window;
+    GtkListStore *store;
+    GtkWidget *tree_view;
+    GtkTreeSelection *selection;
+    GtkCellRenderer *renderer;
+    GtkTreeViewColumn *column;
+    GtkWidget *vbox;
+
+    pm_grid_attach(grid, pm_group_label(_("Outgoing mail servers")), 0, row, 3, 1);
+
+    scrolled_window = gtk_scrolled_window_new(NULL, NULL);
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolled_window),
+                                   GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
+    gtk_widget_set_size_request(scrolled_window, -1, 100);
+
+    store = gtk_list_store_new(2, G_TYPE_STRING,        /* Server name    */
+                               G_TYPE_POINTER); /* Object address */
+    pui->smtp_servers = tree_view =
+        gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
+    g_object_unref(store);
+
+    selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree_view));
+    g_signal_connect(selection, "changed",
+                     G_CALLBACK(smtp_server_changed), NULL);
+
+    renderer = gtk_cell_renderer_text_new();
+    column = gtk_tree_view_column_new_with_attributes(_("Server name"),
+                                                      renderer,
+                                                      "text", 0, NULL);
+    gtk_tree_view_append_column(GTK_TREE_VIEW(tree_view), column);
+
+    gtk_container_add(GTK_CONTAINER(scrolled_window), tree_view);
+
+    g_signal_connect(G_OBJECT(pui->smtp_servers), "row-activated",
+                     G_CALLBACK(smtp_server_edit_cb), NULL);
+
+    pm_grid_attach(grid, scrolled_window, 1, ++row, 1, 1);
+
+    vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, HIG_PADDING);
+    add_button_to_box(_("_Add"), G_CALLBACK(smtp_server_add_cb),
+                      NULL, vbox);
+    pui->smtp_server_edit_button =
+        add_button_to_box(_("_Modify"), G_CALLBACK(smtp_server_edit_cb),
+                          tree_view, vbox);
+    gtk_widget_set_sensitive(pui->smtp_server_edit_button, FALSE);
+    pui->smtp_server_del_button =
+        add_button_to_box(_("_Delete"), G_CALLBACK(smtp_server_del_cb),
+                          tree_view, vbox);
+    gtk_widget_set_sensitive(pui->smtp_server_del_button, FALSE);
+
+    pm_grid_attach(grid, vbox, 2, row, 1, 1);
+    pm_grid_set_next_row(grid, ++row);
+
+    /* fill in data */
+    update_smtp_servers();
+}
+
+/*
+ * Checking group
+ */
+
+static void
+pm_grid_add_checking_group(GtkWidget * grid_widget)
+{
+    GtkGrid *grid = (GtkGrid *) grid_widget;
+    gint row = pm_grid_get_next_row(grid);
+    GtkAdjustment *spinbutton_adj;
+    GtkWidget *label;
+    GtkWidget *hbox;
+
+    pm_grid_attach(grid, pm_group_label(_("Checking")), 0, row, 3, 1);
+
+    pui->check_mail_auto = gtk_check_button_new_with_mnemonic(
+	_("_Check mail automatically every"));
+    pm_grid_attach(grid, pui->check_mail_auto, 1, ++row, 1, 1);
+
+    spinbutton_adj = gtk_adjustment_new(10, 1, 100, 1, 10, 0);
+    pui->check_mail_minutes = gtk_spin_button_new(spinbutton_adj, 1, 0);
+    gtk_widget_set_hexpand(pui->check_mail_minutes, TRUE);
+    pm_grid_attach(grid, pui->check_mail_minutes, 2, row, 1, 1);
+
+    label = gtk_label_new(_("minutes"));
+    gtk_widget_set_halign(label, GTK_ALIGN_START);
+    pm_grid_attach(grid, label, 3, row, 1, 1);
+
+    pui->check_imap = gtk_check_button_new_with_mnemonic(
+	_("Check _IMAP mailboxes"));
+    pm_grid_attach(grid, pui->check_imap, 1, ++row, 1, 1);
+
+    pui->check_imap_inbox =
+        gtk_check_button_new_with_mnemonic(_("Check Inbox _only"));
+    pm_grid_attach(grid, pui->check_imap_inbox, 2, row, 2, 1);
+
+    hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, COL_SPACING);
+
+    label = gtk_label_new(_("When mail arrives:"));
+    gtk_widget_set_halign(label, GTK_ALIGN_START);
+    gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, FALSE, 0);
+
+    pui->notify_new_mail_dialog =
+        gtk_check_button_new_with_label(_("Display message"));
+    gtk_box_pack_start(GTK_BOX(hbox), pui->notify_new_mail_dialog,
+                       FALSE, FALSE, 0);
+
+    pui->notify_new_mail_sound =
+        gtk_check_button_new_with_label(_("Play sound"));
+    gtk_box_pack_start(GTK_BOX(hbox), pui->notify_new_mail_sound,
+                       FALSE, FALSE, 0);
+
+    pui->notify_new_mail_icon =
+        gtk_check_button_new_with_label(_("Show icon"));
+    gtk_box_pack_start(GTK_BOX(hbox), pui->notify_new_mail_icon,
+                       FALSE, FALSE, 0);
+
+    pm_grid_attach(grid, hbox, 1, ++row, 3, 1);
+
+    pui->quiet_background_check = gtk_check_button_new_with_label(
+	_("Do background check quietly (no messages in status bar)"));
+    pm_grid_attach(grid, pui->quiet_background_check, 1, ++row, 3, 1);
+
+    label = gtk_label_new_with_mnemonic(_("_POP message size limit:"));
+    gtk_widget_set_halign(label, GTK_ALIGN_START);
+    pm_grid_attach(grid, label, 1, ++row, 1, 1);
+
+    pui->msg_size_limit = gtk_spin_button_new_with_range(0.1, 100, 0.1);
+    gtk_label_set_mnemonic_widget(GTK_LABEL(label), pui->msg_size_limit);
+    gtk_widget_set_hexpand(pui->msg_size_limit, TRUE);
+    pm_grid_attach(grid, pui->msg_size_limit, 2, row, 1, 1);
+    label = gtk_label_new(_("MB"));
+    gtk_widget_set_halign(label, GTK_ALIGN_START);
+    pm_grid_attach(grid, label, 3, row, 1, 1);
+
+    pm_grid_set_next_row(grid, ++row);
+}
+
+/*
+ * MDN request group
+ */
+
+static void
+pm_grid_add_mdn_group(GtkWidget * grid_widget)
+{
+    GtkGrid *grid = (GtkGrid *) grid_widget;
+    gint row = pm_grid_get_next_row(grid);
+    GtkWidget *label;
+
+    /* How to handle received MDN requests */
+
+    pm_grid_attach(grid,
+                   pm_group_label(_("Message disposition notification requests")),
+                   0, row, 3, 1);
+
+    label =
+        pm_grid_attach_label(grid, 1, ++row, 2, 1,
+                             _("When I receive a message whose sender "
+                               "requested a "
+                               "Message Disposition Notification (MDN), "
+                               "send it if:"));
+    gtk_widget_set_halign(label, GTK_ALIGN_START);
+
+    label =
+        pm_grid_attach_label(grid, 1, ++row, 1, 1,
+                             _("The message header looks clean "
+                               "(the notify-to address is the return path, "
+                               "and I am in the “To:” or “CC:” list)."));
+    gtk_label_set_max_width_chars((GtkLabel *) label, BALSA_MAX_WIDTH_CHARS_MDN);
+    gtk_widget_set_halign(label, GTK_ALIGN_START);
+
+    pui->mdn_reply_clean_menu = create_mdn_reply_menu();
+    pm_combo_box_set_level(pui->mdn_reply_clean_menu,
+                           balsa_app.mdn_reply_clean);
+    gtk_widget_set_valign(pui->mdn_reply_clean_menu, GTK_ALIGN_CENTER);
+    pm_grid_attach(grid, pui->mdn_reply_clean_menu, 2, row, 1, 1);
+
+    label =
+        pm_grid_attach_label(grid, 1, ++row, 1, 1,
+                             _("The message header looks suspicious."));
+    gtk_label_set_max_width_chars((GtkLabel *) label, BALSA_MAX_WIDTH_CHARS_MDN);
+    gtk_widget_set_halign(label, GTK_ALIGN_START);
+
+    pui->mdn_reply_notclean_menu = create_mdn_reply_menu();
+    pm_combo_box_set_level(pui->mdn_reply_notclean_menu,
+                           balsa_app.mdn_reply_notclean);
+    pm_grid_attach(grid, pui->mdn_reply_notclean_menu, 2, row, 1, 1);
+
+    pm_grid_set_next_row(grid, ++row);
+}
+
+/*
+ * Word wrap group
+ */
+
+static void
+pm_grid_add_word_wrap_group(GtkWidget * grid_widget)
+{
+    GtkGrid *grid = (GtkGrid *) grid_widget;
+    gint row = pm_grid_get_next_row(grid);
+    GtkAdjustment *spinbutton_adj;
+    GtkWidget *label;
+
+    pm_grid_attach(grid, pm_group_label(_("Word wrap")), 0, row, 3, 1);
+
+    pui->wordwrap =
+	gtk_check_button_new_with_label(_("Wrap outgoing text at"));
+    pm_grid_attach(grid, pui->wordwrap, 1, ++row, 1, 1);
+
+    spinbutton_adj = gtk_adjustment_new(1.0, 40.0, 998.0, 1.0, 5.0, 0.0);
+    pui->wraplength = gtk_spin_button_new(spinbutton_adj, 1, 0);
+    gtk_widget_set_hexpand(pui->wraplength, TRUE);
+    gtk_widget_set_sensitive(pui->wraplength, FALSE);
+    pm_grid_attach(grid, pui->wraplength, 2, row, 1, 1);
+
+    label = gtk_label_new(_("characters"));
+    gtk_widget_set_halign(label, GTK_ALIGN_START);
+    pm_grid_attach(grid, label, 3, row, 1, 1);
+
+    pm_grid_set_next_row(grid, ++row);
+}
+
+/*
+ * Other options group
+ */
+
+static void
+pm_grid_add_other_options_group(GtkWidget * grid_widget)
+{
+    GtkGrid *grid = (GtkGrid *) grid_widget;
+    gint row = pm_grid_get_next_row(grid);
+
+    pm_grid_attach(grid, pm_group_label(_("Other options")), 0, row, 3, 1);
+
+    pui->quote_str = pm_grid_attach_entry(grid, 1, ++row, 1, 1, _("Reply prefix:"));
+
+    pui->autoquote =
+        pm_grid_attach_check(grid, 1, ++row, 2, 1, _("Automatically quote original "
+                                                     "when replying"));
+    pui->forward_attached =
+        pm_grid_attach_check(grid, 1, ++row, 2, 1, _("Forward a mail as attachment "
+                                                     "instead of quoting it"));
+    pui->copy_to_sentbox =
+        pm_grid_attach_check(grid, 1, ++row, 2, 1, _("Copy outgoing messages to sentbox"));
+    pui->always_queue_sent_mail =
+        pm_grid_attach_check(grid, 1, ++row, 2, 1, _("Send button always queues "
+                                                     "outgoing mail in outbox"));
+    pui->edit_headers =
+        pm_grid_attach_check(grid, 1, ++row, 2, 1, _("Edit headers in external editor"));
+    pui->reply_include_html_parts =
+        pm_grid_attach_check(grid, 1, ++row, 2, 1, _("Include HTML parts as text "
+                                                     "when replying or forwarding"));
+
+    pm_grid_set_next_row(grid, ++row);
+}
+
+/*
+ * Main window group
+ */
+
+static void
+pm_grid_add_main_window_group(GtkWidget * grid_widget)
+{
+    GtkGrid *grid = (GtkGrid *) grid_widget;
+    gint row = pm_grid_get_next_row(grid);
+    GtkAdjustment *scroll_adj;
+    GtkWidget *label;
+
+    pm_grid_attach(grid, pm_group_label(_("Main window")), 0, row, 3, 1);
+
+    pui->previewpane =
+        pm_grid_attach_check(grid, 1, ++row, 3, 1, _("Use preview pane"));
+
+    pui->mblist_show_mb_content_info =
+        pm_grid_attach_check(grid, 1, ++row, 3, 1,
+                             _("Show message counts in mailbox list"));
+
+    pui->layout_type = create_layout_types_menu();
+    pm_grid_attach(grid, pui->layout_type, 1, ++row, 2, 1);
+
+    pui->view_message_on_open =
+        pm_grid_attach_check(grid, 1, ++row, 3, 1, _("Automatically view message "
+                                                     "when mailbox opened"));
+    pui->ask_before_select =
+        pm_grid_attach_check(grid, 1, ++row, 3, 1, _("Ask me before selecting a different "
+                                                     "mailbox to show an unread message"));
+
+    pui->pgdownmod =
+        pm_grid_attach_check(grid, 1, ++row, 1, 1, _("Page Up/Page Down keys "
+                                                     "scroll text by"));
+    scroll_adj = gtk_adjustment_new(50.0, 10.0, 100.0, 5.0, 10.0, 0.0);
+    pui->pgdown_percent = gtk_spin_button_new(scroll_adj, 1, 0);
+    gtk_widget_set_sensitive(pui->pgdown_percent, FALSE);
+    gtk_widget_set_hexpand(pui->pgdown_percent, TRUE);
+    pm_grid_attach(grid, pui->pgdown_percent, 2, row, 1, 1);
+
+    label = gtk_label_new(_("percent"));
+    gtk_widget_set_halign(label, GTK_ALIGN_START);
+    pm_grid_attach(grid, label, 3, row, 1, 1);
+
+    pm_grid_set_next_row(grid, ++row);
+}
+
+/*
+ * Message window group
+ */
+
+static void
+pm_grid_add_message_window_group(GtkWidget * grid_widget)
+{
+    GtkGrid *grid = (GtkGrid *) grid_widget;
+    gint row = pm_grid_get_next_row(grid);
+
+    pm_grid_attach(grid, pm_group_label(_("Message window")), 0, row, 3, 1);
+
+    pm_grid_attach_label(grid, 1, ++row, 1, 1, _("After moving a message:"));
+
+    pui->action_after_move_menu = create_action_after_move_menu();
+    pm_combo_box_set_level(pui->action_after_move_menu,
+                           balsa_app.mw_action_after_move);
+    pm_grid_attach(grid, pui->action_after_move_menu, 2, row, 1, 1);
+
+    pm_grid_set_next_row(grid, ++row);
+}
+
+/*
+ * Sorting and threading group
+ */
+
+static void
+pm_grid_add_threading_group(GtkWidget * grid_widget)
+{
+    GtkGrid *grid = (GtkGrid *) grid_widget;
+    gint row = pm_grid_get_next_row(grid);
+    GtkWidget *label;
+
+    pm_grid_attach(grid, pm_group_label(_("Sorting and threading")), 0, row, 3, 1);
+
+    label = pm_grid_attach_label(grid, 1, ++row, 1, 1, _("Default sort column:"));
+    gtk_widget_set_hexpand(label, FALSE);
+    pui->default_sort_field =
+        pm_grid_attach_pref_menu(grid, 2, row, 1, 1,
+                                 sort_field_label, G_N_ELEMENTS(sort_field_label),
+                                 &pui->sort_field_index);
+
+    label = pm_grid_attach_label(grid, 1, ++row, 1, 1, _("Default threading style:"));
+    gtk_widget_set_hexpand(label, FALSE);
+    pui->default_threading_type =
+        pm_grid_attach_pref_menu(grid, 2, row, 1, 1,
+                                 threading_type_label, NUM_THREADING_STYLES,
+                                 &pui->threading_type_index);
+
+    pui->tree_expand_check =
+        pm_grid_attach_check(grid, 1, ++row, 2, 1, _("Expand threads on open"));
+
+    pm_grid_set_next_row(grid, ++row);
+}
+
+/*
+ * Fonts group
+ */
+
+/*
+ * Create the group, with two font buttons and a check box for using
+ * the default size; if either font does not specify a point size,
+ * initially check the box.
+ *
+ * If the box is checked when the prefs are applied, both fonts will be
+ * saved with no point size specification.
+ */
+
+static void
+pm_grid_add_preview_font_group(GtkWidget * grid_widget)
+{
+    GtkGrid *grid = (GtkGrid *) grid_widget;
+    gint row = pm_grid_get_next_row(grid);
+    gboolean use_default_font_size = FALSE;
+
+    pm_grid_attach(grid, pm_group_label(_("Fonts")), 0, row, 3, 1);
+
+    pui->use_system_fonts =
+        gtk_check_button_new_with_label(_("Use system fonts"));
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->use_system_fonts),
+                                 balsa_app.use_system_fonts);
+    gtk_widget_set_hexpand(pui->use_system_fonts, TRUE);
+    pm_grid_attach(grid, pui->use_system_fonts,
+                   1, ++row, 1, 1);
+
+    pui->use_default_font_size =
+        gtk_check_button_new_with_label(_("Use default font size"));
+    gtk_widget_set_hexpand(pui->use_default_font_size, FALSE);
+    pm_grid_attach(grid, pui->use_default_font_size,
+                   2, row, 1, 1);
+
+    if (pm_grid_attach_font_button(grid, 1, ++row, 1, 1,
+                                  _("Message font:"),
+                                  balsa_app.message_font,
+                                  &pui->message_font_label,
+                                  &pui->message_font_button))
+        use_default_font_size = TRUE;
+
+    if (pm_grid_attach_font_button(grid, 1, ++row, 1, 1,
+                                   _("Subject font:"),
+                                   balsa_app.subject_font,
+                                   &pui->subject_font_label,
+                                   &pui->subject_font_button))
+        use_default_font_size = TRUE;
+
+    if (use_default_font_size) {
+        gtk_font_button_set_show_size(GTK_FONT_BUTTON
+                                      (pui->message_font_button), FALSE);
+        gtk_font_button_set_show_size(GTK_FONT_BUTTON
+                                      (pui->subject_font_button), FALSE);
+        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
+                                     (pui->use_default_font_size), TRUE);
+    }
+
+    if (balsa_app.use_system_fonts) {
+        gtk_widget_set_sensitive(pui->message_font_label, FALSE);
+        gtk_widget_set_sensitive(pui->message_font_button, FALSE);
+        gtk_widget_set_sensitive(pui->subject_font_label, FALSE);
+        gtk_widget_set_sensitive(pui->subject_font_button, FALSE);
+        gtk_widget_set_sensitive(pui->use_default_font_size, FALSE);
+    }
+
+    pm_grid_set_next_row(grid, ++row);
+}
+
+/*
+ * Quoted and flowed text group
+ */
+
+static void
+pm_grid_add_quoted_group(GtkWidget * grid_widget)
+{
+    GtkGrid *grid = (GtkGrid *) grid_widget;
+    gint row = pm_grid_get_next_row(grid);
+    GtkAdjustment *spinbutton_adj;
+
+    /* Quoted text regular expression */
+    /* and RFC2646-style flowed text  */
+
+    pm_grid_attach(grid, pm_group_label(_("Quoted and flowed text")), 0, row, 3, 1);
+
+    pui->mark_quoted =
+        pm_grid_attach_check(grid, 1, ++row, 2, 1, _("Mark quoted text"));
+
+    pui->quote_pattern =
+        pm_grid_attach_entry(grid, 1, ++row, 1, 1, _("Quoted text regular expression:"));
+
+    pui->browse_wrap =
+        pm_grid_attach_check(grid, 1, ++row, 1, 1, _("Wrap text at"));
+
+    spinbutton_adj = gtk_adjustment_new(1.0, 40.0, 200.0, 1.0, 5.0, 0.0);
+    pui->browse_wrap_length = gtk_spin_button_new(spinbutton_adj, 1, 0);
+    gtk_widget_set_hexpand(pui->browse_wrap_length, TRUE);
+    pm_grid_attach(grid, pui->browse_wrap_length, 2, row, 1, 1);
+    pm_grid_attach_label(grid, 3, row, 1, 1, _("characters"));
+
+    pm_grid_set_next_row(grid, ++row);
+}
+
+/*
+ * Multipart group
+ */
+
+static void
+pm_grid_add_alternative_group(GtkWidget * grid_widget)
+{
+    GtkGrid *grid = (GtkGrid *) grid_widget;
+    gint row = pm_grid_get_next_row(grid);
+
+    /* handling of multipart/alternative */
+
+    pm_grid_attach(grid, pm_group_label(_("Display of multipart/alternative parts")),
+                   0, row, 3, 1);
+
+    pui->display_alt_plain =
+	pm_grid_attach_check(grid, 1, ++row, 1, 1, _("Prefer text/plain over HTML"));
+
+    pm_grid_set_next_row(grid, ++row);
+}
+
+/*
+ * Message colors group
+ */
+
+static void
+pm_grid_add_message_colors_group(GtkWidget * grid_widget)
+{
+    GtkGrid *grid = (GtkGrid *) grid_widget;
+    gint row = pm_grid_get_next_row(grid);
+    gint i;
+
+    pm_grid_attach(grid, pm_group_label(_("Message colors")), 0, row, 3, 1);
+
+    for(i = 0; i < MAX_QUOTED_COLOR; i++) {
+        gchar *text;
+
+        text = g_strdup_printf(_("Quote level %d color"), i+1);
+        pui->quoted_color[i] = pm_grid_attach_color_box(grid, 1, ++row, 1, 1, text);
+        g_free(text);
+    }
+
+    pm_grid_set_next_row(grid, ++row);
+}
+
+/*
+ * Link color group
+ */
+
+static void
+pm_grid_add_link_color_group(GtkWidget * grid_widget)
+{
+    GtkGrid *grid = (GtkGrid *) grid_widget;
+    gint row = pm_grid_get_next_row(grid);
+
+    pm_grid_attach(grid, pm_group_label(_("Link color")), 0, row, 3, 1);
+    pui->url_color =
+        pm_grid_attach_color_box(grid, 1, ++row, 1, 1, _("Hyperlink color"));
+
+    pm_grid_set_next_row(grid, ++row);
+}
+
+/*
+ * Format group
+ */
+
+static void
+pm_grid_add_display_formats_group(GtkWidget * grid_widget)
+{
+    GtkGrid *grid = (GtkGrid *) grid_widget;
+    gint row = pm_grid_get_next_row(grid);
+
+    pm_grid_attach(grid, pm_group_label(_("Format")), 0, row, 3, 1);
+
+    pui->date_format =
+        pm_grid_attach_entry(grid, 1, ++row, 1, 1, _("Date encoding (for strftime):"));
+    pui->selected_headers =
+        pm_grid_attach_entry(grid, 1, ++row, 1, 1, _("Selected headers:"));
+
+    pm_grid_set_next_row(grid, ++row);
+}
+
+/*
+ * Broken 8-bit group
+ */
+
+static void
+pm_grid_add_broken_8bit_codeset_group(GtkWidget * grid_widget)
+{
+    GtkGrid *grid = (GtkGrid *) grid_widget;
+    gint row = pm_grid_get_next_row(grid);
+    GSList *radio_group = NULL;
+
+    /* treatment of messages with 8-bit chars, but without proper MIME encoding */
+
+    pm_grid_attach(grid, pm_group_label(_("National (8-bit) characters in broken messages "
+                                          "without codeset header")), 0, row, 3, 1);
+
+    pui->convert_unknown_8bit[0] =
+	GTK_RADIO_BUTTON(gtk_radio_button_new_with_label(radio_group,
+							 _("display as “?”")));
+    pm_grid_attach(grid, GTK_WIDGET(pui->convert_unknown_8bit[0]),
+                   1, ++row, 2, 1);
+    radio_group =
+	gtk_radio_button_get_group(GTK_RADIO_BUTTON(pui->convert_unknown_8bit[0]));
+
+    pui->convert_unknown_8bit[1] =
+	GTK_RADIO_BUTTON(gtk_radio_button_new_with_label(radio_group,
+							 _("display in codeset")));
+    pm_grid_attach(grid, GTK_WIDGET(pui->convert_unknown_8bit[1]),
+                    1, ++row, 1, 1);
+
+    pui->convert_unknown_8bit_codeset = libbalsa_charset_button_new();
+    gtk_combo_box_set_active(GTK_COMBO_BOX
+                             (pui->convert_unknown_8bit_codeset),
+                             balsa_app.convert_unknown_8bit_codeset);
+    gtk_widget_set_hexpand(pui->convert_unknown_8bit_codeset, TRUE);
+    pm_grid_attach(grid, pui->convert_unknown_8bit_codeset,
+                   2, row, 1, 1);
+
+    pm_grid_set_next_row(grid, ++row);
+}
+
+/*
+ * Information messages group
+ */
+
+static void
+pm_grid_add_information_messages_group(GtkWidget * grid_widget)
+{
+    GtkGrid *grid = (GtkGrid *) grid_widget;
+    gint row = pm_grid_get_next_row(grid);
+
+    pm_grid_attach(grid, pm_group_label(_("Information messages")), 0, row, 3, 1);
+
+    pui->information_message_menu =
+	pm_grid_attach_information_menu(grid, 1, ++row, 1, 1,
+                                        _("Information messages:"),
+                                        balsa_app.information_message);
+    pui->warning_message_menu =
+	pm_grid_attach_information_menu(grid, 1, ++row, 1, 1,
+                                        _("Warning messages:"),
+                                        balsa_app.warning_message);
+    pui->error_message_menu =
+	pm_grid_attach_information_menu(grid, 1, ++row, 1, 1,
+                                        _("Error messages:"),
+                                        balsa_app.error_message);
+    pui->fatal_message_menu =
+	pm_grid_attach_information_menu(grid, 1, ++row, 1, 1,
+	                                _("Fatal error messages:"),
+                                        balsa_app.fatal_message);
+    pui->debug_message_menu =
+	pm_grid_attach_information_menu(grid, 1, ++row, 1, 1,
+                                        _("Debug messages:"),
+                                        balsa_app.debug_message);
+
+    pm_grid_set_next_row(grid, ++row);
+}
+
+/*
+ * Progress dialog group
+ */
+
+static void
+pm_grid_add_progress_group(GtkWidget * grid_widget)
+{
+    GtkGrid *grid = (GtkGrid *) grid_widget;
+    gint row = pm_grid_get_next_row(grid);
+    GSList *radio_group;
+    gint i;
+
+    pm_grid_attach(grid, pm_group_label(_("Display progress dialog")), 0, row, 3, 1);
+
+    radio_group = NULL;
+    for (i = 0; i < NUM_PWINDOW_MODES; i++) {
+	pui->pwindow_type[i] =
+	    GTK_RADIO_BUTTON(gtk_radio_button_new_with_label
+			     (radio_group, _(pwindow_type_label[i])));
+	pm_grid_attach(grid, GTK_WIDGET(pui->pwindow_type[i]), 1, ++row, 2, 1);
+	radio_group = gtk_radio_button_get_group(pui->pwindow_type[i]);
+    }
+
+    pm_grid_set_next_row(grid, ++row);
+}
+
+/*
+ * Address books group
+ */
+
+static void
+pm_grid_add_address_books_group(GtkWidget * grid_widget)
+{
+    GtkGrid *grid = (GtkGrid *) grid_widget;
+    gint row = pm_grid_get_next_row(grid);
+    GtkWidget *tree_view;
+    GtkListStore *store;
+    GtkCellRenderer *renderer;
+    GtkTreeViewColumn *column;
+    GtkWidget *scrolledwindow;
+    GtkWidget *address_book_add_menu;
+    GtkWidget *vbox;
+
+    pm_grid_attach(grid, pm_group_label(_("Address books")), 0, row, 3, 1);
+
+    scrolledwindow = gtk_scrolled_window_new(NULL, NULL);
+    gtk_widget_set_vexpand(scrolledwindow, TRUE);
+    pm_grid_attach(grid, scrolledwindow, 1, ++row, 1, 1);
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolledwindow),
+				   GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
+    gtk_widget_set_size_request(scrolledwindow, -1, 150);
+
+    store = gtk_list_store_new(AB_N_COLUMNS,
+                               G_TYPE_STRING,   /* AB_TYPE_COLUMN */
+                               G_TYPE_STRING,   /* AB_NAME_COLUMN */
+                               G_TYPE_BOOLEAN,  /* AB_XPND_COLUMN */
+                               G_TYPE_POINTER); /* AB_DATA_COLUMN */
+    pui->address_books = tree_view =
+        gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
+    g_object_unref(store);
+
+    renderer = gtk_cell_renderer_text_new();
+    column =
+        gtk_tree_view_column_new_with_attributes(_("Type"),
+                                                 renderer,
+                                                 "text", AB_TYPE_COLUMN,
+                                                 NULL);
+    gtk_tree_view_append_column(GTK_TREE_VIEW(tree_view), column);
+
+    renderer = gtk_cell_renderer_text_new();
+    column =
+        gtk_tree_view_column_new_with_attributes(_("Address book name"),
+                                                 renderer,
+                                                 "text", AB_NAME_COLUMN,
+                                                 NULL);
+    gtk_tree_view_append_column(GTK_TREE_VIEW(tree_view), column);
+
+    renderer = gtk_cell_renderer_toggle_new();
+    column =
+        gtk_tree_view_column_new_with_attributes(_("Auto-complete"),
+                                                 renderer,
+                                                 "active",
+                                                 AB_XPND_COLUMN,
+                                                 NULL);
+    gtk_tree_view_append_column(GTK_TREE_VIEW(tree_view), column);
+    gtk_tree_selection_set_mode(gtk_tree_view_get_selection
+                                (GTK_TREE_VIEW(tree_view)),
+                                GTK_SELECTION_BROWSE);
+
+    g_signal_connect(tree_view, "row-activated", 
+                     G_CALLBACK(address_book_edit_cb), NULL);
+
+    gtk_container_add(GTK_CONTAINER(scrolledwindow), tree_view);
+
+    address_book_add_menu =
+        balsa_address_book_add_menu(address_book_change,
+                                    GTK_WINDOW(property_box));
+    g_object_weak_ref(G_OBJECT(grid), (GWeakNotify) g_object_unref,
+                      address_book_add_menu);
+    g_object_ref_sink(address_book_add_menu);
+
+    vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, HIG_PADDING);
+    add_button_to_box(_("_Add"),
+                      G_CALLBACK(add_menu_cb),
+                      address_book_add_menu, vbox);
+
+    add_button_to_box(_("_Modify"),
+                      G_CALLBACK(address_book_edit_cb),
+                      tree_view, vbox);
+    add_button_to_box(_("_Delete"),
+                      G_CALLBACK(address_book_delete_cb),
+                      tree_view, vbox);
+    add_button_to_box(_("_Set as default"), 
+                      G_CALLBACK(address_book_set_default_cb),
+                      tree_view, vbox);
+    pm_grid_attach(grid, vbox, 2, row, 1, 1);
+
+    update_address_books();
+
+    pm_grid_set_next_row(grid, ++row);
+}
+
+#if !(HAVE_GSPELL || HAVE_GTKSPELL)
+static void
+pm_grid_add_misc_spelling_group(GtkWidget * grid_widget)
+{
+    GtkGrid *grid = (GtkGrid *) grid_widget;
+    gint row = pm_grid_get_next_row(grid);
+
+    pm_grid_attach(grid, pm_group_label(_("Miscellaneous spelling settings")),
+                   0, row, 3, 1);
+
+    pui->spell_check_sig =
+        pm_grid_attach_check(grid, 1, ++row, 1, 1 , _("Check signature"));
+    pui->spell_check_quoted =
+        pm_grid_attach_check(grid, 1, ++row, 1, 1, _("Check quoted"));
+
+    pm_grid_set_next_row(grid, ++row);
+}
+#endif                          /* !(HAVE_GSPELL || HAVE_GTKSPELL) */
+
+/*
+ * Startup options group
+ */
+
+static void
+pm_grid_add_startup_options_group(GtkWidget * grid_widget)
+{
+    GtkGrid *grid = (GtkGrid *) grid_widget;
+    gint row = pm_grid_get_next_row(grid);
+
+    pm_grid_attach(grid, pm_group_label(_("Start-up options")), 0, row, 3, 1);
+
+    pui->open_inbox_upon_startup =
+        pm_grid_attach_check(grid, 1, ++row, 3, 1, _("Open Inbox upon start-up"));
+    pui->check_mail_upon_startup =
+        pm_grid_attach_check(grid, 1, ++row, 3, 1, _("Check mail upon start-up"));
+    pui->remember_open_mboxes =
+        pm_grid_attach_check(grid, 1, ++row, 3, 1, _("Remember open mailboxes "
+                                    "between sessions"));
+
+    pm_grid_set_next_row(grid, ++row);
+}
+
+/*
+ * Folder scanning group
+ */
+
+static void
+pm_grid_add_folder_scanning_group(GtkWidget * grid_widget)
+{
+    GtkGrid *grid = (GtkGrid *) grid_widget;
+    gint row = pm_grid_get_next_row(grid);
+    GtkWidget *label;
+    GtkAdjustment *scan_adj;
+
+    pm_grid_attach(grid, pm_group_label(_("Folder scanning")), 0, row, 3, 1);
+
+    pm_grid_attach_label(grid, 1, ++row, 3, 1,
+                        _("Choose depth 1 for fast start-up; "
+                          "this defers scanning some folders. "
+                          "To see more of the tree at start-up, "
+                          "choose a greater depth."));
+
+    label =
+        pm_grid_attach_label(grid, 1, ++row, 1, 1,
+                             _("Scan local folders to depth"));
+    gtk_widget_set_hexpand(label, FALSE);
+    scan_adj = gtk_adjustment_new(1.0, 1.0, 99.0, 1.0, 5.0, 0.0);
+    pui->local_scan_depth = gtk_spin_button_new(scan_adj, 1, 0);
+    gtk_widget_set_hexpand(pui->local_scan_depth, TRUE);
+    pm_grid_attach(grid, pui->local_scan_depth, 2, row, 1, 1);
+
+    label =
+        pm_grid_attach_label(grid, 1, ++row, 1, 1,
+                             _("Scan IMAP folders to depth"));
+    gtk_widget_set_hexpand(label, FALSE);
+
+    scan_adj = gtk_adjustment_new(1.0, 1.0, 99.0, 1.0, 5.0, 0.0);
+    pui->imap_scan_depth = gtk_spin_button_new(scan_adj, 1, 0);
+    gtk_widget_set_hexpand(pui->imap_scan_depth, TRUE);
+    pm_grid_attach(grid, pui->imap_scan_depth, 2, row, 1, 1);
+
+    pm_grid_set_next_row(grid, ++row);
+}
+
+/*
+ * Miscellaneous group
+ */
+
+static void
+pm_grid_add_misc_group(GtkWidget * grid_widget)
+{
+    GtkGrid *grid = (GtkGrid *) grid_widget;
+    gint row = pm_grid_get_next_row(grid);
+    GtkAdjustment *close_spinbutton_adj;
+
+    pm_grid_attach(grid, pm_group_label(_("Miscellaneous")), 0, row, 3, 1);
+
+    pui->debug =
+        pm_grid_attach_check(grid, 1, ++row, 3, 1, _("Debug"));
+    pui->empty_trash =
+        pm_grid_attach_check(grid, 1, ++row, 3, 1, _("Empty trash on exit"));
+
+    pui->close_mailbox_auto =
+        pm_grid_attach_check(grid, 1, ++row, 1, 1,
+                             _("Close mailbox if unused more than"));
+    gtk_widget_set_hexpand(pui->close_mailbox_auto, FALSE);
+
+    close_spinbutton_adj = gtk_adjustment_new(10, 1, 100, 1, 10, 0);
+    pui->close_mailbox_minutes =
+	gtk_spin_button_new(close_spinbutton_adj, 1, 0);
+    gtk_widget_set_hexpand(pui->close_mailbox_minutes, TRUE);
+    gtk_widget_show(pui->close_mailbox_minutes);
+    gtk_widget_set_sensitive(pui->close_mailbox_minutes, FALSE);
+    pm_grid_attach(grid, pui->close_mailbox_minutes, 2, row, 1, 1);
+
+    pm_grid_attach_label(grid, 3, row, 1, 1, _("minutes"));
+
+    pm_grid_set_next_row(grid, ++row);
+}
+
+/*
+ * Message deleting group
+ */
+
+static void
+pm_grid_add_deleting_messages_group(GtkWidget * grid_widget)
+{
+    GtkGrid *grid = (GtkGrid *) grid_widget;
+    gint row = pm_grid_get_next_row(grid);
+    gchar *text;
+    GtkAdjustment *expunge_spinbutton_adj;
+
+    pm_grid_attach(grid, pm_group_label(_("Deleting messages")), 0, row, 3, 1);
+
+    /* Translators: this used to be "using Mailbox -> Hide messages";
+     * the UTF-8 string for the right-arrow symbol is broken out to
+     * avoid msgconv problems. */
+    text = g_strdup_printf(_("The following setting is global, "
+			     "but may be overridden "
+			     "for the selected mailbox "
+			     "using Mailbox %s Hide messages:"),
+			   "\342\226\272");
+    pm_grid_attach_label(grid, 1, ++row, 3, 1, text);
+    g_free(text);
+    pui->hide_deleted =
+        pm_grid_attach_check(grid, 1, ++row, 3, 1, _("Hide messages marked as deleted"));
+
+    pm_grid_attach_label(grid, 1, ++row, 3, 1, _("The following settings are global:"));
+
+    pui->expunge_on_close =
+        pm_grid_attach_check(grid, 1, ++row, 3, 1, _("Expunge deleted messages "
+                                                     "when mailbox is closed"));
+
+    pui->expunge_auto =
+        pm_grid_attach_check(grid, 1, ++row, 1, 1, _("…and if unused more than"));
+    gtk_widget_set_hexpand(pui->expunge_auto, FALSE);
+
+    expunge_spinbutton_adj = gtk_adjustment_new(120, 1, 1440, 1, 10, 0);
+    pui->expunge_minutes = gtk_spin_button_new(expunge_spinbutton_adj, 1, 0);
+    gtk_widget_set_hexpand(pui->expunge_minutes, TRUE);
+    gtk_widget_show(pui->expunge_minutes);
+    gtk_widget_set_sensitive(pui->expunge_minutes, FALSE);
+    pm_grid_attach(grid, pui->expunge_minutes, 2, row, 1, 1);
+
+    pm_grid_attach_label(grid, 3, row, 1, 1, _("minutes"));
+
+    pm_grid_set_next_row(grid, ++row);
+}
+
+/***************************
+ *
+ * End of preferences groups
+ *
+ **************************/
+
+/*
+ * pm_append_page
+ *
+ * Put the child on the stack, and populate the tree store data
+ */
+
+static void
+pm_append_page(GtkWidget    * stack,
+               GtkWidget    * child,
+               const gchar  * text,
+               GtkTreeStore * store,
+               GtkTreeIter  * iter)
+{
+    gtk_stack_add_named((GtkStack *) stack, child, text);
+
+    gtk_tree_store_set(store, iter,
+                       PM_TEXT_COL, gettext(text),
+                       PM_HELP_COL, text,
+                       PM_CHILD_COL, child,
+                       -1);
+}
+
+/********************************************************
+ *
+ * The pages
+ *
+ * Each page consists of its own GtkGrid, which it passes
+ * to the various groups that belong on that page.
+ *
+ *******************************************************/
+
+static GtkWidget *
+pm_mailserver_page(void)
+{
+    GtkWidget *grid = pm_grid_new();
+
+    pm_grid_add_remote_mailbox_servers_group(grid);
+    pm_grid_add_local_mail_group(grid);
+    pm_grid_add_outgoing_mail_group(grid);
+
+    return grid;
 }
 
 static GtkWidget *
-create_action_after_move_menu(void)
+pm_incoming_page(void)
 {
-    GtkWidget *combo_box = pm_combo_box_new();
-    add_show_menu(_("Show next unread message"), NEXT_UNREAD, combo_box);
-    add_show_menu(_("Show next message"), NEXT, combo_box);
-    add_show_menu(_("Close message window"), CLOSE, combo_box);
-    return combo_box;
+    GtkWidget *grid = pm_grid_new();
+
+    pm_grid_add_checking_group(grid);
+    pm_grid_add_mdn_group(grid);
+
+    return grid;
 }
+
+static GtkWidget *
+pm_outgoing_page(void)
+{
+    GtkWidget *grid = pm_grid_new();
+
+    pm_grid_add_word_wrap_group(grid);
+    pm_grid_add_other_options_group(grid);
+
+    return grid;
+}
+
+static GtkWidget *
+pm_display_page(void)
+{
+    GtkWidget *grid = pm_grid_new();
+
+    pm_grid_add_main_window_group(grid);
+    pm_grid_add_message_window_group(grid);
+
+    return grid;
+}
+
+static GtkWidget *
+pm_threading_page(void)
+{
+    GtkWidget *grid = pm_grid_new();
+
+    pm_grid_add_threading_group(grid);
+
+    return grid;
+}
+
+static GtkWidget *
+pm_message_page(void)
+{
+    GtkWidget *grid = pm_grid_new();
+
+    pm_grid_add_preview_font_group(grid);
+    pm_grid_add_quoted_group(grid);
+    pm_grid_add_alternative_group(grid);
+
+    return grid;
+}
+
+static GtkWidget *
+pm_colors_page(void)
+{
+    GtkWidget *grid = pm_grid_new();
+
+    pm_grid_add_message_colors_group(grid);
+    pm_grid_add_link_color_group(grid);
+
+    return grid;
+}
+
+static GtkWidget *
+pm_format_page(void)
+{
+    GtkWidget *grid = pm_grid_new();
+
+    pm_grid_add_display_formats_group(grid);
+    pm_grid_add_broken_8bit_codeset_group(grid);
+
+    return grid;
+}
+
+static GtkWidget *
+pm_status_messages_page(void)
+{
+    GtkWidget *grid = pm_grid_new();
+
+    pm_grid_add_information_messages_group(grid);
+    pm_grid_add_progress_group(grid);
+
+    return grid;
+}
+
+static GtkWidget *
+create_address_book_page(void)
+{
+    GtkWidget *grid = pm_grid_new();
+
+    pm_grid_add_address_books_group(grid);
+
+    return grid;
+}
+
+#if !(HAVE_GSPELL || HAVE_GTKSPELL)
+static GtkWidget *
+pm_spelling_page(void)
+{
+    GtkWidget *grid = pm_grid_new();
+
+    pm_grid_add_misc_spelling_group(grid);
+
+    return grid;
+}
+#endif                          /* !(HAVE_GSPELL || HAVE_GTKSPELL) */
+
+static GtkWidget *
+pm_startup_page(void)
+{
+    GtkWidget *grid = pm_grid_new();
+
+    pm_grid_add_startup_options_group(grid);
+    pm_grid_add_folder_scanning_group(grid);
+
+    return grid;
+}
+
+static GtkWidget *
+pm_misc_page(void)
+{
+    GtkWidget *grid = pm_grid_new();
+
+    pm_grid_add_misc_group(grid);
+    pm_grid_add_deleting_messages_group(grid);
+
+    return grid;
+}
+
+/*
+ * End of pages
+ */
+
+/*********************************************************************
+ *
+ * Sections
+ *
+ * A section consists of several pages (that is, more than one)
+ * covering a given part of the UI. It is given an iter for the parent
+ * node in the GtkTreeView, and creates child iters for the children.
+ *
+ ********************************************************************/
+
+static void
+create_mail_options_section(GtkTreeStore * store,
+                            GtkTreeIter  * parent,
+                            GtkWidget    * stack)
+{
+    GtkTreeIter iter;
+
+    pm_append_page(stack, pm_mailserver_page(), N_("Mail options"),
+                   store, parent);
+
+    gtk_tree_store_append(store, &iter, parent);
+    pm_append_page(stack, pm_incoming_page(), N_("Incoming"),
+                   store, &iter);
+
+    gtk_tree_store_append(store, &iter, parent);
+    pm_append_page(stack, pm_outgoing_page(), N_("Outgoing"),
+                   store, &iter);
+}
+
+static void
+create_display_section(GtkTreeStore * store,
+                       GtkTreeIter  * parent,
+                       GtkWidget    * stack)
+{
+    GtkTreeIter iter;
+
+    pm_append_page(stack, pm_display_page(), N_("Display options"),
+                   store, parent);
+
+    gtk_tree_store_append(store, &iter, parent);
+    pm_append_page(stack, pm_threading_page(), N_("Sort and thread"),
+                   store, &iter);
+
+    gtk_tree_store_append(store, &iter, parent);
+    pm_append_page(stack, pm_message_page(), N_("Message"),
+                   store, &iter);
+
+    gtk_tree_store_append(store, &iter, parent);
+    pm_append_page(stack, pm_colors_page(), N_("Colors"),
+                   store, &iter);
+
+    gtk_tree_store_append(store, &iter, parent);
+    pm_append_page(stack, pm_format_page(), N_("Format"),
+                   store, &iter);
+
+    gtk_tree_store_append(store, &iter, parent);
+    pm_append_page(stack, pm_status_messages_page(), N_("Status messages"),
+                   store, &iter);
+}
+
+/*
+ * End of sections
+ */
+
+/*
+ * Idle handler for open_preferences_manager
+ */
+
+static gboolean
+open_preferences_manager_idle(void)
+{
+    gchar *name;
+
+    gdk_threads_enter();
+
+    if (pui == NULL) {
+        gdk_threads_leave();
+        return FALSE;
+    }
+
+    name = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER
+                                         (pui->mail_directory));
+    if (!name || strcmp(name, balsa_app.local_mail_directory) != 0) {
+        /* Chooser still hasn't been initialized. */
+        g_free(name);
+        gdk_threads_leave();
+        return TRUE;
+    }
+    g_free(name);
+
+    g_signal_connect(pui->mail_directory, "selection-changed",
+                     G_CALLBACK(properties_modified_cb), property_box);
+
+    gdk_threads_leave();
+    return FALSE;
+}                               /* open_preferences_manager_idle */
+
+/****************
+ *
+ * Public methods
+ *
+ ***************/
+
+void
+open_preferences_manager(GtkWidget * widget, gpointer data)
+{
+    GtkWidget *hbox;
+    GtkTreeStore *store;
+    GtkWidget *view;
+    GtkTreeSelection * selection;
+    GtkWidget *stack;
+    GtkWidget *active_win = data;
+    gint i;
+    GtkCellRenderer *renderer;
+    GtkTreeViewColumn *column;
+    GtkTreeIter iter;
+
+    /* only one preferences manager window */
+    if (already_open) {
+        gtk_window_present(GTK_WINDOW(property_box));
+        return;
+    }
+
+    pui = g_malloc(sizeof(PropertyUI));
+
+    property_box =              /* must NOT be modal */
+        gtk_dialog_new_with_buttons(_("Balsa Preferences"),
+                                    GTK_WINDOW(active_win),
+                                    GTK_DIALOG_DESTROY_WITH_PARENT |
+                                    libbalsa_dialog_flags(),
+                                    _("_OK"), GTK_RESPONSE_OK,
+                                    _("_Apply"), GTK_RESPONSE_APPLY,
+                                    _("_Cancel"), GTK_RESPONSE_CANCEL,
+                                    _("_Help"), GTK_RESPONSE_HELP,
+                                    NULL);
+#if HAVE_MACOSX_DESKTOP
+    libbalsa_macosx_menu_for_parent(property_box, GTK_WINDOW(active_win));
+#endif
+
+    hbox = gtk_dialog_get_content_area(GTK_DIALOG(property_box));
+    gtk_orientable_set_orientation(GTK_ORIENTABLE(hbox),
+                                   GTK_ORIENTATION_HORIZONTAL);
+
+    store = gtk_tree_store_new(PM_NUM_COLS,
+                               G_TYPE_STRING,   /* PM_TEXT_COL     */
+                               G_TYPE_STRING,   /* PM_HELP_COL     */
+                               GTK_TYPE_WIDGET  /* PM_CHILD_COL    */
+            );
+    pui->view = view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
+    g_object_set(view, "margin", BORDER_WIDTH, NULL);
+    gtk_container_add(GTK_CONTAINER(hbox), view);
+    gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(view), FALSE);
+
+    renderer = gtk_cell_renderer_text_new();
+    column =
+        gtk_tree_view_column_new_with_attributes(NULL, renderer,
+                                                 "text", PM_TEXT_COL,
+                                                 NULL);
+    gtk_tree_view_append_column(GTK_TREE_VIEW(view), column);
+
+    stack = gtk_stack_new();
+    gtk_stack_set_transition_type((GtkStack *) stack,
+                                  GTK_STACK_TRANSITION_TYPE_SLIDE_UP_DOWN);
+    gtk_stack_set_transition_duration((GtkStack *) stack, 400);
+    gtk_container_add(GTK_CONTAINER(hbox), stack);
+
+    selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(view));
+    g_signal_connect(selection, "changed",
+                     G_CALLBACK(pm_selection_changed), stack);
+
+    already_open = TRUE;
+
+    gtk_window_set_resizable(GTK_WINDOW(property_box), FALSE);
+    g_object_set_data(G_OBJECT(property_box), "balsawindow", active_win);
+
+    /* Create the pages */
+    gtk_tree_store_append(store, &iter, NULL);
+    create_mail_options_section(store, &iter, stack);
+
+    gtk_tree_store_append(store, &iter, NULL);
+    create_display_section(store, &iter, stack);
+
+    gtk_tree_store_append(store, &iter, NULL);
+    pm_append_page(stack, create_address_book_page(),
+                   N_("Address books"), store, &iter);
+
+#if !(HAVE_GSPELL || HAVE_GTKSPELL)
+    gtk_tree_store_append(store, &iter, NULL);
+    pm_append_page(stack, pm_spelling_page(),
+                   N_("Spelling"), store, &iter);
+#endif                          /* !(HAVE_GSPELL || HAVE_GTKSPELL) */
+
+    gtk_tree_store_append(store, &iter, NULL);
+    pm_append_page(stack, pm_startup_page(),
+                   N_("Start-up"), store, &iter);
+
+    gtk_tree_store_append(store, &iter, NULL);
+    pm_append_page(stack, pm_misc_page(),
+                   N_("Miscellaneous"), store, &iter);
+
+    gtk_tree_view_expand_all(GTK_TREE_VIEW(view));
+
+    set_prefs();
+    /* Now that all the prefs have been set, we must desensitize the
+     * buttons. */
+    gtk_dialog_set_response_sensitive(GTK_DIALOG(property_box),
+                                      GTK_RESPONSE_OK, FALSE);
+    gtk_dialog_set_response_sensitive(GTK_DIALOG(property_box),
+                                      GTK_RESPONSE_APPLY, FALSE);
+
+    for (i = 0; i < NUM_PWINDOW_MODES; i++) {
+        g_signal_connect(G_OBJECT(pui->pwindow_type[i]), "clicked",
+                         G_CALLBACK(properties_modified_cb), property_box);
+    }
+
+    g_signal_connect(G_OBJECT(pui->previewpane), "toggled",
+                     G_CALLBACK(properties_modified_cb), property_box);
+    g_signal_connect(G_OBJECT(pui->layout_type), "changed",
+                     G_CALLBACK(properties_modified_cb), property_box);
+    g_signal_connect(G_OBJECT(pui->view_message_on_open), "toggled",
+                     G_CALLBACK(properties_modified_cb), property_box);
+    g_signal_connect(G_OBJECT(pui->ask_before_select), "toggled",
+                     G_CALLBACK(properties_modified_cb), property_box);
+    g_signal_connect(G_OBJECT(pui->pgdownmod), "toggled",
+                     G_CALLBACK(pgdown_modified_cb), property_box);
+    g_signal_connect(G_OBJECT(pui->pgdown_percent), "changed",
+                     G_CALLBACK(pgdown_modified_cb), property_box);
+    g_signal_connect(G_OBJECT(pui->debug), "toggled",
+                     G_CALLBACK(properties_modified_cb), property_box);
+
+    g_signal_connect(G_OBJECT(pui->mblist_show_mb_content_info), "toggled",
+                     G_CALLBACK(properties_modified_cb), property_box);
+#if !(HAVE_GSPELL || HAVE_GTKSPELL)
+    g_signal_connect(G_OBJECT(pui->spell_check_sig), "toggled",
+                     G_CALLBACK(properties_modified_cb), property_box);
+    g_signal_connect(G_OBJECT(pui->spell_check_quoted), "toggled",
+                     G_CALLBACK(properties_modified_cb), property_box);
+#endif                          /* !(HAVE_GSPELL || HAVE_GTKSPELL) */
+
+    /* Connect signal in an idle handler, after the file chooser has
+     * been initialized. */
+    g_idle_add_full(G_PRIORITY_LOW,
+                    (GSourceFunc) open_preferences_manager_idle,
+                    NULL, NULL);
+    g_signal_connect(G_OBJECT(pui->check_mail_auto), "toggled",
+                     G_CALLBACK(timer_modified_cb), property_box);
+
+    g_signal_connect(G_OBJECT(pui->check_mail_minutes), "changed",
+                     G_CALLBACK(timer_modified_cb), property_box);
+
+    g_signal_connect(G_OBJECT(pui->quiet_background_check), "toggled",
+                     G_CALLBACK(properties_modified_cb), property_box);
+    g_signal_connect(G_OBJECT(pui->msg_size_limit), "changed",
+                     G_CALLBACK(properties_modified_cb), property_box);
+
+    g_signal_connect(G_OBJECT(pui->check_imap), "toggled",
+                     G_CALLBACK(imap_toggled_cb), property_box);
+
+    g_signal_connect(G_OBJECT(pui->check_imap_inbox), "toggled",
+                     G_CALLBACK(properties_modified_cb), property_box);
+
+    g_signal_connect(G_OBJECT(pui->notify_new_mail_dialog), "toggled",
+                     G_CALLBACK(properties_modified_cb), property_box);
+
+    g_signal_connect(G_OBJECT(pui->notify_new_mail_sound), "toggled",
+                     G_CALLBACK(properties_modified_cb), property_box);
+
+    g_signal_connect(G_OBJECT(pui->notify_new_mail_icon), "toggled",
+                     G_CALLBACK(properties_modified_cb), property_box);
+
+    g_signal_connect(G_OBJECT(pui->close_mailbox_auto), "toggled",
+                     G_CALLBACK(mailbox_close_timer_modified_cb),
+                     property_box);
+    g_signal_connect(G_OBJECT(pui->close_mailbox_minutes), "changed",
+                     G_CALLBACK(mailbox_close_timer_modified_cb),
+                     property_box);
+
+    g_signal_connect(G_OBJECT(pui->hide_deleted), "toggled",
+                     G_CALLBACK(filter_modified_cb), property_box);
+    g_signal_connect(G_OBJECT(pui->expunge_on_close), "toggled",
+                     G_CALLBACK(expunge_on_close_cb), property_box);
+    g_signal_connect(G_OBJECT(pui->expunge_auto), "toggled",
+                     G_CALLBACK(expunge_auto_cb), property_box);
+    g_signal_connect(G_OBJECT(pui->expunge_minutes), "changed",
+                     G_CALLBACK(properties_modified_cb), property_box);
+
+    g_signal_connect(G_OBJECT(pui->browse_wrap), "toggled",
+                     G_CALLBACK(browse_modified_cb), property_box);
+    g_signal_connect(G_OBJECT(pui->browse_wrap_length), "changed",
+                     G_CALLBACK(properties_modified_cb), property_box);
+    g_signal_connect(G_OBJECT(pui->wordwrap), "toggled",
+                     G_CALLBACK(wrap_modified_cb), property_box);
+    g_signal_connect(G_OBJECT(pui->wraplength), "changed",
+                     G_CALLBACK(properties_modified_cb), property_box);
+    g_signal_connect(G_OBJECT(pui->always_queue_sent_mail), "toggled",
+                     G_CALLBACK(properties_modified_cb), property_box);
+    g_signal_connect(G_OBJECT(pui->copy_to_sentbox), "toggled",
+                     G_CALLBACK(properties_modified_cb), property_box);
+    g_signal_connect(G_OBJECT(pui->autoquote), "toggled",
+                     G_CALLBACK(properties_modified_cb), property_box);
+    g_signal_connect(G_OBJECT(pui->reply_include_html_parts), "toggled",
+                     G_CALLBACK(properties_modified_cb), property_box);
+    g_signal_connect(G_OBJECT(pui->forward_attached), "toggled",
+                     G_CALLBACK(properties_modified_cb), property_box);
+
+    /* external editor */
+    g_signal_connect(G_OBJECT(pui->edit_headers), "toggled",
+                     G_CALLBACK(properties_modified_cb), property_box);
+
+    /* arp */
+    g_signal_connect(G_OBJECT(pui->quote_str), "changed",
+                     G_CALLBACK(properties_modified_cb), property_box);
+    g_signal_connect(G_OBJECT(pui->mark_quoted), "toggled",
+                     G_CALLBACK(mark_quoted_modified_cb),
+                     property_box);
+    g_signal_connect(G_OBJECT(pui->quote_pattern), "changed",
+                     G_CALLBACK(properties_modified_cb), property_box);
+
+    /* multipart/alternative */
+    g_signal_connect(G_OBJECT(pui->display_alt_plain), "toggled",
+                     G_CALLBACK(properties_modified_cb), property_box);
+
+    /* convert 8-bit text with no charset header */
+    g_signal_connect(G_OBJECT(pui->convert_unknown_8bit_codeset),
+                     "changed", G_CALLBACK(properties_modified_cb),
+                     property_box);
+
+    /* message font */
+    g_signal_connect(G_OBJECT(pui->use_system_fonts), "toggled",
+                     G_CALLBACK(use_system_fonts_cb), property_box);
+    g_signal_connect(G_OBJECT(pui->message_font_button), "font-set",
+                     G_CALLBACK(font_modified_cb), property_box);
+    g_signal_connect(G_OBJECT(pui->subject_font_button), "font-set",
+                     G_CALLBACK(font_modified_cb), property_box);
+    g_signal_connect(G_OBJECT(pui->use_default_font_size), "toggled",
+                     G_CALLBACK(default_font_size_cb), property_box);
+
+
+    g_signal_connect(G_OBJECT(pui->open_inbox_upon_startup), "toggled",
+                     G_CALLBACK(properties_modified_cb), property_box);
+    g_signal_connect(G_OBJECT(pui->check_mail_upon_startup), "toggled",
+                     G_CALLBACK(properties_modified_cb), property_box);
+    g_signal_connect(G_OBJECT(pui->remember_open_mboxes), "toggled",
+                     G_CALLBACK(properties_modified_cb), property_box);
+
+    g_signal_connect(G_OBJECT(pui->local_scan_depth), "changed",
+                     G_CALLBACK(properties_modified_cb), property_box);
+    g_signal_connect(G_OBJECT(pui->imap_scan_depth), "changed",
+                     G_CALLBACK(properties_modified_cb), property_box);
+
+    g_signal_connect(G_OBJECT(pui->empty_trash), "toggled",
+                     G_CALLBACK(properties_modified_cb), property_box);
+
+    /* threading */
+    g_signal_connect(G_OBJECT(pui->tree_expand_check), "toggled",
+                     G_CALLBACK(properties_modified_cb), property_box);
+
+
+    /* Date format */
+    g_signal_connect(G_OBJECT(pui->date_format), "changed",
+                     G_CALLBACK(properties_modified_cb), property_box);
+
+    /* Selected headers */
+    g_signal_connect(G_OBJECT(pui->selected_headers), "changed",
+                     G_CALLBACK(properties_modified_cb), property_box);
+
+    /* Colour */
+    for (i = 0; i < MAX_QUOTED_COLOR; i++)
+        g_signal_connect(G_OBJECT(pui->quoted_color[i]), "released",
+                         G_CALLBACK(properties_modified_cb), property_box);
+
+    g_signal_connect(G_OBJECT(pui->url_color), "released",
+                     G_CALLBACK(properties_modified_cb), property_box);
+
+    /* handling of message parts with 8-bit chars without codeset headers */
+    for (i = 0; i < NUM_CONVERT_8BIT_MODES; i++)
+        g_signal_connect(G_OBJECT(pui->convert_unknown_8bit[i]), "toggled",
+                         G_CALLBACK(convert_8bit_cb), property_box);
+
+    /* Gnome Property Box Signals */
+    g_signal_connect(G_OBJECT(property_box), "response",
+                     G_CALLBACK(response_cb), NULL);
+
+    gtk_widget_show_all(GTK_WIDGET(property_box));
+
+}                               /* open_preferences_manager */
 
 /* refresh any data displayed in the preferences manager
  * window in case it has changed */
@@ -3488,149 +3520,61 @@ refresh_preferences_manager(void)
                                  balsa_app.browse_wrap);
 }
 
-static void
-balsa_help_pbox_display(void)
+/* update_mail_servers:
+   update mail server list in the preferences window.
+   NOTE: it can be called even when the preferences window is closed (via
+   mailbox context menu) - and it should check for it.
+ */
+void
+update_mail_servers(void)
 {
-    GtkTreeSelection *selection;
+    GtkTreeView *tree_view;
     GtkTreeModel *model;
     GtkTreeIter iter;
-    GtkTreeIter parent;
-    gchar *text, *p;
-    GError *err = NULL;
-    gchar *uri;
-#if GTK_CHECK_VERSION(3, 22, 0)
-    GtkWidget *toplevel;
-#else /* GTK_CHECK_VERSION(3, 22, 0) */
-    GdkScreen *screen;
-#endif /* GTK_CHECK_VERSION(3, 22, 0) */
-    GString *string;
+    GList *list;
+    gchar *protocol;
+    GtkTreeModel *app_model;
+    gboolean valid;
+    BalsaMailboxNode *mbnode;
 
-    selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(pui->view));
-    if (!gtk_tree_selection_get_selected(selection, &model, &iter))
+    if (pui == NULL)
         return;
 
-    string = g_string_new("help:balsa/preferences-");
+    tree_view = GTK_TREE_VIEW(pui->mail_servers);
+    model = gtk_tree_view_get_model(tree_view);
 
-    if (gtk_tree_model_iter_parent(model, &parent, &iter)) {
-        gtk_tree_model_get(model, &parent, PM_HELP_COL, &text, -1);
-        for (p = text; *p; p++)
-            *p = (*p == ' ') ? '-' : g_ascii_tolower(*p);
-        g_string_append(string, text);
-        g_free(text);
-        g_string_append_c(string, '#');
+    gtk_list_store_clear(GTK_LIST_STORE(model));
+    for (list = balsa_app.inbox_input; list; list = list->next) {
+        if (!(mbnode = list->data))
+            continue;
+        if (LIBBALSA_IS_MAILBOX_POP3(mbnode->mailbox))
+            protocol = "POP3";
+        else if (LIBBALSA_IS_MAILBOX_IMAP(mbnode->mailbox))
+            protocol = "IMAP";
+        else
+            protocol = _("Unknown");
+
+        gtk_list_store_append(GTK_LIST_STORE(model), &iter);
+        gtk_list_store_set(GTK_LIST_STORE(model), &iter,
+                           MS_PROT_COLUMN, protocol,
+                           MS_NAME_COLUMN, mbnode->mailbox->name,
+                           MS_DATA_COLUMN, mbnode, -1);
     }
-    gtk_tree_model_get(model, &iter, PM_HELP_COL, &text, -1);
-    for (p = text; *p; p++)
-        *p = (*p == ' ') ? '-' : g_ascii_tolower(*p);
-    g_string_append(string, text);
-    g_free(text);
-
-    uri = g_string_free(string, FALSE);
-#if GTK_CHECK_VERSION(3, 22, 0)
-    toplevel = gtk_widget_get_toplevel(GTK_WIDGET(pui->view));
-    if (gtk_widget_is_toplevel(toplevel)) {
-        gtk_show_uri_on_window(GTK_WINDOW(toplevel), uri,
-                               gtk_get_current_event_time(), &err);
-    }
-#else  /* GTK_CHECK_VERSION(3, 22, 0) */
-    screen = gtk_widget_get_screen(pui->view);
-    gtk_show_uri(screen, uri, gtk_get_current_event_time(), &err);
-#endif /* GTK_CHECK_VERSION(3, 22, 0) */
-    if (err) {
-        balsa_information(LIBBALSA_INFORMATION_WARNING,
-		_("Error displaying %s: %s\n"),
-		uri, err->message);
-        g_error_free(err);
-    }
-
-    g_free(uri);
-}
-
-
-/* combo boxes */
-
-static void
-pm_combo_box_info_free(struct pm_combo_box_info * info)
-{
-    g_slist_free(info->levels);
-    g_free(info);
-}
-
-static GtkWidget *
-pm_combo_box_new(void)
-{
-    GtkWidget *combo_box = gtk_combo_box_text_new();
-    struct pm_combo_box_info *info = g_new0(struct pm_combo_box_info, 1);
-
-    gtk_widget_set_hexpand(combo_box, TRUE);
-
-    g_object_set_data_full(G_OBJECT(combo_box), PM_COMBO_BOX_INFO, info,
-                           (GDestroyNotify) pm_combo_box_info_free);
-    g_signal_connect(G_OBJECT(combo_box), "changed",
-                     G_CALLBACK(properties_modified_cb), property_box);
-
-    return combo_box;
-}
-
-static void
-pm_combo_box_set_level(GtkWidget * combo_box, gint level)
-{
-    struct pm_combo_box_info *info =
-        g_object_get_data(G_OBJECT(combo_box), PM_COMBO_BOX_INFO);
-    GSList *list;
-    guint i;
-
-    for (list = info->levels, i = 0; list; list = list->next, ++i)
-	if (GPOINTER_TO_INT(list->data) == level) {
-	    gtk_combo_box_set_active(GTK_COMBO_BOX(combo_box), i);
-	    break;
-	}
-}
-
-static gint
-pm_combo_box_get_level(GtkWidget * combo_box)
-{
-    struct pm_combo_box_info *info =
-        g_object_get_data(G_OBJECT(combo_box), PM_COMBO_BOX_INFO);
-    gint active = gtk_combo_box_get_active(GTK_COMBO_BOX(combo_box));
-
-    return GPOINTER_TO_INT(g_slist_nth_data(info->levels, active));
-}
-
-static void
-pm_append_page(GtkWidget * notebook, GtkWidget * widget,
-               const gchar * text, GtkTreeStore * store,
-               GtkTreeIter * parent_iter)
-{
-    GtkTreeIter iter;
-    guint page = gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook));
-
-    gtk_notebook_append_page(GTK_NOTEBOOK(notebook),
-                             widget, gtk_label_new(text));
-
-    if (parent_iter && page == 0) {
-        /* We'll show the first child when the parent row is selected,
-         * so we don't create a row for it. */
-        gtk_tree_store_set(store, parent_iter,
-                           PM_CHILD_COL, notebook,
-                           -1);
-        return;
+    /*
+     * add other remote servers
+     *
+     * we'll check everything at the top level in the mailbox_nodes
+     * list:
+     */
+    app_model = GTK_TREE_MODEL(balsa_app.mblist_tree_store);
+    for (valid = gtk_tree_model_get_iter_first(app_model, &iter);
+         valid; valid = gtk_tree_model_iter_next(app_model, &iter)) {
+        gtk_tree_model_get(app_model, &iter, 0, &mbnode, -1);
+        add_other_server(mbnode, model);
+        g_object_unref(mbnode);
     }
 
-    if (GTK_IS_NOTEBOOK(widget)) {
-        /* The row for this widget was already created, to be the parent
-         * of the notebook's pages. */
-        GtkTreeModel *model = GTK_TREE_MODEL(store);
-        gint n_children =
-            gtk_tree_model_iter_n_children(model, parent_iter);
-        gtk_tree_model_iter_nth_child(model, &iter, parent_iter,
-                                      n_children - 1);
-    } else
-        gtk_tree_store_append(store, &iter, parent_iter);
-    gtk_tree_store_set(store, &iter,
-                       PM_TEXT_COL, _(text),
-                       PM_HELP_COL, text,
-                       PM_NOTEBOOK_COL, notebook,
-                       PM_PAGE_COL, page,
-                       -1);
+    if (gtk_tree_model_get_iter_first(model, &iter))
+        gtk_tree_selection_select_iter(gtk_tree_view_get_selection
+                                       (tree_view), &iter);
 }

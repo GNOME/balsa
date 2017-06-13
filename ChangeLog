@@ -1,3 +1,11 @@
+2017-06-12  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Use a wrapper for an environment variable
+
+	* src/filter-run-dialog.c (balsa_filter_run_dialog_new): use
+	  libbalsa_dialog_flags() instead of directly checking the
+	  BALSA_DIALOG_HEADERBAR environment variable.
+
 2017-06-01  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Remove obsolete reference in configure summary

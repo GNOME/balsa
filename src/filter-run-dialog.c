@@ -179,11 +179,13 @@ balsa_filter_run_dialog_new(LibBalsaMailbox * mbox, GtkWindow * parent)
 {
     BalsaFilterRunDialog *p;
     gchar * dialog_title;
-    gboolean use_headerbar;
+    gboolean use_headerbar = TRUE;
 
     g_return_val_if_fail(mbox, NULL);
 
+#if GTK_CHECK_VERSION(3, 12, 0)
     use_headerbar = (libbalsa_dialog_flags() & GTK_DIALOG_USE_HEADER_BAR) != 0;
+#endif
     p = g_object_new(BALSA_TYPE_FILTER_RUN_DIALOG,
                      "transient-for", parent,
                      "use-header-bar", use_headerbar,

@@ -13,12 +13,14 @@ extra_appicons_IMGS = \
 	balsa-previous-part.png	\
 	balsa-previous.png	\
 	balsa-reply-all.png	\
+	balsa-send-queued.png \
 	balsa-signature-bad.png	\
 	balsa-signature-good.png	\
 	balsa-signature-notrust.png	\
 	balsa-signature-unknown.png	\
 	balsa-sign.png	\
 	balsa-trash-empty.png	\
+	mail-queue.png		\
 	stock_mail-receive.png	\
 	stock_contact.png	\
 	stock_mail.png		\

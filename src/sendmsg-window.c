@@ -4187,7 +4187,8 @@ static const BalsaToolbarEntry compose_toolbar_extras[] = {
     { "sign",        BALSA_PIXMAP_GPG_SIGN    },
     { "encrypt",     BALSA_PIXMAP_GPG_ENCRYPT },
 #endif /* HAVE_GPGME */
-    { "edit",       "gtk-edit"                }
+    { "edit",        "gtk-edit"               },
+	{ "queue",		 BALSA_PIXMAP_QUEUE		  }
 };
 
 /* Create the toolbar model for the compose window's toolbar.

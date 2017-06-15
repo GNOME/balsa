@@ -1,3 +1,16 @@
+2017-06-14  Albrecht Dreß
+
+	Use John Jack John's new icons for "mail-queue" and
+	"balsa-send-queued" actions
+
+	* images/16x16/Makefile.am: add the file names.
+	* images/24x24/Makefile.am: ditto.
+	* src/balsa-icons.c (balsa_register_pixmaps): use them.
+	* src/balsa-icons.h: ditto.
+	* src/main-window.c: ditto.
+	* src/sendmsg-window.c: ditto.
+	* src/toolbar-factory.c: ditto.
+
 2017-06-13  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* src/filter-run-dialog.c (balsa_filter_run_dialog_new): build

@@ -13,6 +13,7 @@ extra_appicons_IMGS = \
 	balsa-previous-part.png	\
 	balsa-previous.png	\
 	balsa-reply-all.png	\
+	balsa-send-queued.png \
 	balsa-signature-bad.png	\
 	balsa-signature-good.png	\
 	balsa-signature-notrust.png	\
@@ -22,6 +23,7 @@ extra_appicons_IMGS = \
 	stock_mail.png		\
 	stock_book_red.png	\
 	stock_book_open.png	\
+	mail-queue.png		\
 	mail-inbox.png		\
 	mail-outbox.png
 

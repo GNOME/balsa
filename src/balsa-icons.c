@@ -107,6 +107,8 @@ balsa_register_pixmaps(void)
 	{ BALSA_PIXMAP_SEND,            "mail-send" },
 	{ BALSA_PIXMAP_RECEIVE,         "stock_mail-receive" },
 	{ BALSA_PIXMAP_SEND_RECEIVE,    "mail-send-receive" },
+	{ BALSA_PIXMAP_QUEUE,           "mail-queue" },
+	{ BALSA_PIXMAP_SEND_QUEUED,		"balsa-send-queued" },
 	{ BALSA_PIXMAP_FORWARD,         "mail-forward" },
 	{ BALSA_PIXMAP_IDENTITY,        "stock_contact" },
 	{ BALSA_PIXMAP_CONTINUE,	"stock_mail" },

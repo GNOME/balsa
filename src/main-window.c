@@ -618,7 +618,7 @@ static const BalsaToolbarEntry main_toolbar_extras[] = {
     { "next-flagged",       BALSA_PIXMAP_NEXT_FLAGGED  },
     { "previous-part",      BALSA_PIXMAP_PREVIOUS_PART },
     { "next-part",          BALSA_PIXMAP_NEXT_PART     },
-    { "send-queued-mail",   BALSA_PIXMAP_SEND          },
+    { "send-queued-mail",   BALSA_PIXMAP_SEND_QUEUED   },
     { "send-and-receive-mail", BALSA_PIXMAP_SEND_RECEIVE  },
     { "save-part",         "document-save"             },
     { "identities",         BALSA_PIXMAP_IDENTITY      },

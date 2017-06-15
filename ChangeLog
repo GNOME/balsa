@@ -1,6 +1,6 @@
 2017-06-14  Albrecht Dreß
 
-	Use John Jack John's new icons for "mail-queue" and
+	Use John Jack's new icons for "mail-queue" and
 	"balsa-send-queued" actions
 
 	* images/16x16/Makefile.am: add the file names.

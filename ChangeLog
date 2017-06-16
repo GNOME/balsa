@@ -1,3 +1,17 @@
+2017-06-15  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Simplify popping up a toolbar's context menu, and make icons
+	visible after changing style
+
+	* src/toolbar-factory.c
+	  (tm_populate): set the toolbar style before showing-all;
+	  (tm_changed_cb): tm_set_style is redundant and has been removed;
+	  (tm_popup_context_menu_cb): new callback for
+	    "popup-context-menu" signal;
+	  (balsa_toolbar_new): no need to connect to "realized" signal;
+	    connect to GtkToolbar's "popup-context-menu" signal instead of
+	    GtkWidget's "button-press-event" and "popup-menu" signals.
+
 2017-06-14  Albrecht Dreß
 
 	Use John Jack's new icons for "mail-queue" and

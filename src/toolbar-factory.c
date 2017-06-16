@@ -527,14 +527,6 @@ tm_default_style(void)
     return default_style;
 }
 
-static void
-tm_set_style(GtkWidget * toolbar, BalsaToolbarModel * model)
-{
-    gtk_toolbar_set_style(GTK_TOOLBAR(toolbar),
-                          model->style != (GtkToolbarStyle) (-1) ?
-                          model->style : tm_default_style());
-}
-
 /* Populate a model
  */
 #define BALSA_TOOLBAR_ACTION_MAP "balsa-toolbar-action-map"
@@ -591,6 +583,11 @@ tm_populate(GtkWidget * toolbar, BalsaToolbarModel * model)
         }
         gtk_toolbar_insert((GtkToolbar *) toolbar, item, -1);
     }
+
+    gtk_toolbar_set_style(GTK_TOOLBAR(toolbar),
+                          model->style != (GtkToolbarStyle) (-1) ?
+                          model->style : tm_default_style());
+
     gtk_widget_show_all(toolbar);
 }
 
@@ -601,7 +598,6 @@ tm_changed_cb(BalsaToolbarModel * model, GtkWidget * toolbar)
 {
     balsa_toolbar_remove_all(toolbar);
     tm_populate(toolbar, model);
-    tm_set_style(toolbar, model);
     tm_save_model(model);
 }
 
@@ -702,18 +698,22 @@ tm_popup_position_func(GtkMenu * menu, gint * x, gint * y,
 #endif                          /*GTK_CHECK_VERSION(3, 22, 0) */
 
 static gboolean
-tm_do_popup_menu(GtkWidget * toolbar, GdkEventButton * event,
-                 toolbar_info * info)
+tm_popup_context_menu_cb(GtkWidget    * toolbar,
+                         gint           x,
+                         gint           y,
+                         gint           button,
+                         toolbar_info * info)
 {
     GtkWidget *menu;
 #if !GTK_CHECK_VERSION(3, 22, 0)
-    int button, event_time;
+    int event_time;
 #endif                          /*GTK_CHECK_VERSION(3, 22, 0) */
     guint i;
     GSList *group = NULL;
-    GtkToolbarStyle default_style = tm_default_style();
+    GtkToolbarStyle default_style;
+    GdkEvent *event;
 
-    if (info->menu)
+    if (info->menu != NULL)
         return FALSE;
 
     info->menu = menu = gtk_menu_new();
@@ -743,6 +743,8 @@ tm_do_popup_menu(GtkWidget * toolbar, GdkEventButton * event,
         g_signal_connect(item, "toggled", G_CALLBACK(menu_item_toggled_cb),
                          info);
     }
+
+    default_style = tm_default_style();
 
     for (i = 0; i < G_N_ELEMENTS(tm_toolbar_options); i++) {
 
@@ -797,28 +799,27 @@ tm_do_popup_menu(GtkWidget * toolbar, GdkEventButton * event,
     }
 
     gtk_widget_show_all(menu);
-
-#if GTK_CHECK_VERSION(3, 22, 0)
     gtk_menu_attach_to_widget(GTK_MENU(menu), toolbar, NULL);
-    if (event)
-        gtk_menu_popup_at_pointer(GTK_MENU(menu),
-                                  (GdkEvent *) event);
-    else
+
+    event = gtk_get_current_event();
+#if GTK_CHECK_VERSION(3, 22, 0)
+    if (event != NULL && event->type == GDK_BUTTON_PRESS) {
+        gtk_menu_popup_at_pointer(GTK_MENU(menu), event);
+    } else {
         gtk_menu_popup_at_widget(GTK_MENU(menu),
                                  GTK_WIDGET(toolbar),
-                                 GDK_GRAVITY_CENTER, GDK_GRAVITY_CENTER,
+                                 GDK_GRAVITY_NORTH,
+                                 GDK_GRAVITY_SOUTH,
                                  NULL);
+    }
 #else                           /*GTK_CHECK_VERSION(3, 22, 0) */
     if (event) {
-        button = event->button;
         event_time = event->time;
     } else {
-        button = 0;
         event_time = gtk_get_current_event_time();
     }
 
-    gtk_menu_attach_to_widget(GTK_MENU(menu), toolbar, NULL);
-    if (button)
+    if (button >= 0)
         gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL, button,
                        event_time);
     else
@@ -826,30 +827,10 @@ tm_do_popup_menu(GtkWidget * toolbar, GdkEventButton * event,
                        toolbar, button, event_time);
 #endif                          /*GTK_CHECK_VERSION(3, 22, 0) */
 
+    if (event != NULL)
+        gdk_event_free(event);
+
     return TRUE;
-}
-
-static gboolean
-tm_button_press_cb(GtkWidget * toolbar, GdkEventButton * event,
-                   toolbar_info * info)
-{
-    /* Ignore double-clicks and triple-clicks */
-    if (event->button == 3 && event->type == GDK_BUTTON_PRESS)
-        return tm_do_popup_menu(toolbar, event, info);
-
-    return FALSE;
-}
-
-static gboolean
-tm_popup_menu_cb(GtkWidget * toolbar, toolbar_info * info)
-{
-    return tm_do_popup_menu(toolbar, NULL, info);
-}
-
-static void
-tm_realize_cb(GtkWidget * toolbar, BalsaToolbarModel * model)
-{
-    tm_set_style(toolbar, model);
 }
 
 GtkWidget *balsa_toolbar_new(BalsaToolbarModel * model,
@@ -869,14 +850,11 @@ GtkWidget *balsa_toolbar_new(BalsaToolbarModel * model,
     tm_populate(toolbar, model);
 
     g_signal_connect(model, "changed", G_CALLBACK(tm_changed_cb), toolbar);
-    g_signal_connect(toolbar, "realize", G_CALLBACK(tm_realize_cb), model);
     g_object_weak_ref(G_OBJECT(toolbar),
                       (GWeakNotify) tm_toolbar_weak_notify, info);
 
-    g_signal_connect(toolbar, "button-press-event",
-                     G_CALLBACK(tm_button_press_cb), info);
-    g_signal_connect(toolbar, "popup-menu", G_CALLBACK(tm_popup_menu_cb),
-                     info);
+    g_signal_connect(toolbar, "popup-context-menu",
+                     G_CALLBACK(tm_popup_context_menu_cb), info);
 
     gtk_widget_show_all(toolbar);
 

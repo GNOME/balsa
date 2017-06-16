@@ -1,3 +1,10 @@
+2017-06-16  Albrecht Dreß
+
+	Build with Gtk version < 3.22
+
+	* src/toolbar-factory.c (tm_popup_context_menu_cb): GdkEvent has
+	no member "time"; use gtk_get_current_event_time.
+
 2017-06-15  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Use gdk_event_triggers_context_menu instead of checking event

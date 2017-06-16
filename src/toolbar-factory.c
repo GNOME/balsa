@@ -813,11 +813,7 @@ tm_popup_context_menu_cb(GtkWidget    * toolbar,
                                  NULL);
     }
 #else                           /*GTK_CHECK_VERSION(3, 22, 0) */
-    if (event) {
-        event_time = event->time;
-    } else {
-        event_time = gtk_get_current_event_time();
-    }
+    event_time = gtk_get_current_event_time();
 
     if (button >= 0)
         gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL, button,

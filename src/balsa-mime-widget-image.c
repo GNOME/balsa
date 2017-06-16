@@ -176,7 +176,7 @@ static gboolean
 balsa_image_button_press_cb(GtkWidget * widget, GdkEventButton * event,
                             GtkMenu * menu)
 {
-    if (menu && event->type == GDK_BUTTON_PRESS && event->button == 3) {
+    if (gdk_event_triggers_context_menu((GdkEvent *) event)) {
 #if GTK_CHECK_VERSION(3, 22, 0)
         gtk_menu_popup_at_pointer(menu, (GdkEvent *) event);
 #else                           /*GTK_CHECK_VERSION(3, 22, 0) */

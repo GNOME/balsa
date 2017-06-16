@@ -691,7 +691,7 @@ bmbl_button_press_cb(GtkWidget * widget, GdkEventButton * event,
     GtkTreeView *tree_view = GTK_TREE_VIEW(widget);
     GtkTreePath *path;
 
-    if (event->type != GDK_BUTTON_PRESS || event->button != 3
+    if (!gdk_event_triggers_context_menu((GdkEvent *) event)
         || event->window != gtk_tree_view_get_bin_window(tree_view))
         return FALSE;
 

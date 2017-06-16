@@ -1149,7 +1149,7 @@ static gboolean
 balsa_gtk_html_button_press_cb(GtkWidget * html, GdkEventButton * event,
                                BalsaMessage * bm)
 {
-    return ((event->type == GDK_BUTTON_PRESS && event->button == 3)
+    return (gdk_event_triggers_context_menu((GdkEvent *) event)
             ? balsa_gtk_html_popup(html, bm) : FALSE);
 }
 

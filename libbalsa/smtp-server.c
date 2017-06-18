@@ -46,6 +46,8 @@ struct _LibBalsaSmtpServer {
 
     gchar *name;
     guint big_message; /* size of partial messages; in kB; 0 disables splitting */
+    gint lock_state;	/* 0 means unlocked; access via atomic operations */
+    // FIXME - add an atomic flag if an operation is running on this server
 };
 
 typedef struct _LibBalsaSmtpServerClass {
@@ -210,6 +212,30 @@ libbalsa_smtp_server_add_to_list(LibBalsaSmtpServer * smtp_server,
     }
 
     *server_list = g_slist_prepend(*server_list, smtp_server);
+}
+
+gboolean
+libbalsa_smtp_server_trylock(LibBalsaSmtpServer *smtp_server)
+{
+	gint prev_state;
+	gboolean result;
+
+	prev_state = g_atomic_int_add(&smtp_server->lock_state, 1);
+	if (prev_state == 0) {
+		result = TRUE;
+	} else {
+		result = FALSE;
+		(void) g_atomic_int_dec_and_test(&smtp_server->lock_state);
+	}
+	g_debug("%s: lock %s: %d", __func__, libbalsa_smtp_server_get_name(smtp_server), result);
+	return result;
+}
+
+void
+libbalsa_smtp_server_unlock(LibBalsaSmtpServer *smtp_server)
+{
+	(void) g_atomic_int_dec_and_test(&smtp_server->lock_state);
+	g_debug("%s: unlock %s", __func__, libbalsa_smtp_server_get_name(smtp_server));
 }
 
 /* SMTP server dialog */

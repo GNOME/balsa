@@ -40,6 +40,7 @@
 #include "threads.h"
 
 #include "smtp-server.h"
+#include "send.h"
 
 #define FOLDER_SECTION_PREFIX "folder-"
 #define MAILBOX_SECTION_PREFIX "mailbox-"
@@ -989,6 +990,13 @@ config_global_load(void)
 
     balsa_app.autoquote = 
 	libbalsa_conf_get_bool("AutoQuote=true");
+    balsa_app.send_mail_auto = libbalsa_conf_get_bool("AutoSend=true");
+    balsa_app.send_mail_timer = libbalsa_conf_get_int("AutoSendDelay=15");
+    if ((balsa_app.send_mail_timer < 1U) || (balsa_app.send_mail_timer > 120U)) {
+    	balsa_app.send_mail_timer = 15U;
+    }
+    libbalsa_auto_send_config(balsa_app.send_mail_auto, balsa_app.send_mail_timer);
+
     balsa_app.reply_strip_html = 
 	libbalsa_conf_get_bool("StripHtmlInReply=true");
     balsa_app.forward_attached = 
@@ -1418,6 +1426,8 @@ config_save(void)
     libbalsa_conf_set_bool("ForwardAttached", balsa_app.forward_attached);
 
 	libbalsa_conf_set_int("AlwaysQueueSentMail", balsa_app.always_queue_sent_mail);
+    libbalsa_conf_set_bool("AutoSend", balsa_app.send_mail_auto);
+    libbalsa_conf_set_int("AutoSendDelay", balsa_app.send_mail_timer);
 	libbalsa_conf_set_int("CopyToSentbox", balsa_app.copy_to_sentbox);
     libbalsa_conf_pop_group();
 

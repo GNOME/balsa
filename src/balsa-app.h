@@ -328,6 +328,10 @@ extern struct BalsaApplication {
     gboolean always_queue_sent_mail;
     gboolean copy_to_sentbox;
 
+    /* timer for sending mail every xx minutes */
+    gboolean send_mail_auto;
+    guint send_mail_timer;
+
     /* mailbox indices */
     GtkWidget *notebook;
 

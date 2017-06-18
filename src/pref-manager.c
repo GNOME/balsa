@@ -33,6 +33,7 @@
 #include "address-book-config.h"
 #include "quote-color.h"
 #include "misc.h"
+#include "send.h"
 #include "imap-server.h"
 
 #if HAVE_MACOSX_DESKTOP
@@ -115,6 +116,8 @@ typedef struct _PropertyUI {
     GtkWidget *remember_open_mboxes;
     GtkWidget *mblist_show_mb_content_info;
     GtkWidget *always_queue_sent_mail;
+    GtkWidget *send_mail_auto;
+    GtkWidget *send_mail_minutes;
     GtkWidget *copy_to_sentbox;
     GtkWidget *autoquote;
     GtkWidget *reply_include_html_parts;
@@ -490,8 +493,15 @@ apply_prefs(GtkDialog * pbox)
     balsa_app.always_queue_sent_mail =
         gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
                                      (pui->always_queue_sent_mail));
-    if (balsa_app.always_queue_sent_mail != save_setting)
+    if (balsa_app.always_queue_sent_mail != save_setting) {
         balsa_toolbar_model_changed(balsa_window_get_toolbar_model());
+    }
+
+	balsa_app.send_mail_auto =
+		gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pui->send_mail_auto));
+	balsa_app.send_mail_timer =
+		gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(pui->send_mail_minutes));
+	libbalsa_auto_send_config(balsa_app.send_mail_auto, balsa_app.send_mail_timer);
 
     balsa_app.copy_to_sentbox =
         gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
@@ -748,6 +758,12 @@ set_prefs(void)
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
                                  (pui->always_queue_sent_mail),
                                  balsa_app.always_queue_sent_mail);
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->send_mail_auto),
+								 balsa_app.send_mail_auto);
+	gtk_spin_button_set_value(GTK_SPIN_BUTTON(pui->send_mail_minutes),
+							  (float) balsa_app.send_mail_timer);
+	gtk_widget_set_sensitive(pui->send_mail_minutes,
+							 gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pui->send_mail_auto)));
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->copy_to_sentbox),
                                  balsa_app.copy_to_sentbox);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->autoquote),
@@ -1730,6 +1746,15 @@ timer_modified_cb(GtkWidget * widget, GtkWidget * pbox)
 }
 
 static void
+send_timer_modified_cb(GtkWidget * widget, GtkWidget * pbox)
+{
+	gboolean newstate = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pui->send_mail_auto));
+
+	gtk_widget_set_sensitive(GTK_WIDGET(pui->send_mail_minutes), newstate);
+	properties_modified_cb(widget, pbox);
+}
+
+static void
 browse_modified_cb(GtkWidget * widget, GtkWidget * pbox)
 {
     gboolean newstate =
@@ -2258,6 +2283,8 @@ pm_grid_add_other_options_group(GtkWidget * grid_widget)
 {
     GtkGrid *grid = (GtkGrid *) grid_widget;
     gint row = pm_grid_get_next_row(grid);
+	GtkWidget *label;
+	GtkAdjustment *spinbutton_adj;
 
     pm_grid_attach(grid, pm_group_label(_("Other options")), 0, row, 3, 1);
 
@@ -2274,6 +2301,17 @@ pm_grid_add_other_options_group(GtkWidget * grid_widget)
     pui->always_queue_sent_mail =
         pm_grid_attach_check(grid, 1, ++row, 2, 1, _("Send button always queues "
                                                      "outgoing mail in outbox"));
+
+    pui->send_mail_auto =
+    	pm_grid_attach_check(grid, 1, ++row, 1, 1, _("_Send queued mail automatically every"));
+	spinbutton_adj = gtk_adjustment_new(10, 1, 120, 1, 10, 0);
+	pui->send_mail_minutes = gtk_spin_button_new(spinbutton_adj, 1, 0);
+	gtk_widget_set_hexpand(pui->send_mail_minutes, TRUE);
+	pm_grid_attach(grid, pui->send_mail_minutes, 2, row, 1, 1);
+	label = gtk_label_new(_("minutes"));
+	gtk_widget_set_halign(label, GTK_ALIGN_START);
+	pm_grid_attach(grid, label, 3, row, 1, 1);
+
     pui->edit_headers =
         pm_grid_attach_check(grid, 1, ++row, 2, 1, _("Edit headers in external editor"));
     pui->reply_include_html_parts =
@@ -3421,6 +3459,10 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
                      G_CALLBACK(properties_modified_cb), property_box);
     g_signal_connect(G_OBJECT(pui->always_queue_sent_mail), "toggled",
                      G_CALLBACK(properties_modified_cb), property_box);
+    g_signal_connect(G_OBJECT(pui->send_mail_auto), "toggled",
+                     G_CALLBACK(send_timer_modified_cb), property_box);
+    g_signal_connect(G_OBJECT(pui->send_mail_minutes), "changed",
+                     G_CALLBACK(send_timer_modified_cb), property_box);
     g_signal_connect(G_OBJECT(pui->copy_to_sentbox), "toggled",
                      G_CALLBACK(properties_modified_cb), property_box);
     g_signal_connect(G_OBJECT(pui->autoquote), "toggled",

@@ -57,14 +57,10 @@
 #endif
 
 /* Globals for Thread creation, messaging, pipe I/O */
-GMutex send_messages_lock;
 gboolean checking_mail;
 int mail_thread_pipes[2];
-int send_thread_pipes[2];
 GIOChannel *mail_thread_msg_send;
 GIOChannel *mail_thread_msg_receive;
-GIOChannel *send_thread_msg_send;
-GIOChannel *send_thread_msg_receive;
 
 static void threads_init(void);
 static void threads_destroy(void);
@@ -177,7 +173,6 @@ GMutex checking_mail_lock;
 static void
 threads_init(void)
 {
-    g_mutex_init(&send_messages_lock);
     if (pipe(mail_thread_pipes) < 0) {
 	g_log("BALSA Init", G_LOG_LEVEL_DEBUG,
 	      "Error opening pipes.\n");
@@ -188,24 +183,12 @@ threads_init(void)
     g_io_add_watch(mail_thread_msg_receive, G_IO_IN,
 		   (GIOFunc) mail_progress_notify_cb,
                    &balsa_app.main_window);
-
-    if (pipe(send_thread_pipes) < 0) {
-	g_log("BALSA Init", G_LOG_LEVEL_DEBUG,
-	      "Error opening pipes.\n");
-    }
-    send_thread_msg_send = g_io_channel_unix_new(send_thread_pipes[1]);
-    send_thread_msg_receive =
-	g_io_channel_unix_new(send_thread_pipes[0]);
-    g_io_add_watch(send_thread_msg_receive, G_IO_IN,
-		   (GIOFunc) send_progress_notify_cb,
-                   &balsa_app.main_window);
 }
 
 static void
 threads_destroy(void)
 {
     g_mutex_clear(&checking_mail_lock);
-    g_mutex_clear(&send_messages_lock);
 }
 
 /* initial_open_mailboxes:

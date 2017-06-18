@@ -30,12 +30,6 @@ extern gboolean checking_mail;
 extern int mail_thread_pipes[2];
 extern GIOChannel *mail_thread_msg_send;
 extern GIOChannel *mail_thread_msg_receive;
-extern GIOChannel *send_thread_msg_send;
-extern GIOChannel *send_thread_msg_receive;
-
-extern GtkWidget *send_progress_message;
-extern GtkWidget *send_dialog;
-extern GtkWidget *send_dialog_bar;
 
 typedef struct {
     LibBalsaMailboxNotify message_type;

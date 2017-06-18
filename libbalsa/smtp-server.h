@@ -58,4 +58,7 @@ void libbalsa_smtp_server_dialog(LibBalsaSmtpServer * smtp_server,
                                  GtkWindow * parent,
                                  LibBalsaSmtpServerUpdate update);
 
+gboolean libbalsa_smtp_server_trylock(LibBalsaSmtpServer *smtp_server);
+void libbalsa_smtp_server_unlock(LibBalsaSmtpServer *smtp_server);
+
 #endif                          /* __SMTP_SERVER_H__ */

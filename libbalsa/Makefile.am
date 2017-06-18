@@ -102,6 +102,8 @@ libbalsa_a_SOURCES = 		\
 	libbalsa-conf.h		\
 	libbalsa-marshal.c	\
 	libbalsa-marshal.h	\
+	libbalsa-progress.c	\
+	libbalsa-progress.h	\
 	macosx-helpers.c	\
 	macosx-helpers.h	\
 	missing.h		\

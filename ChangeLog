@@ -1,3 +1,25 @@
+2017-06-18  Albrecht Dreß
+
+	Implement automatic sending in background
+
+	* libbalsa/libbalsa-progress.[ch]: new files, implementing the progress dialogue.
+	    Its update operation shall be called using idle callbacks.  For the time being,
+	    it is used for SMTP only, but it might also be useful for receiving messages.
+	* libbalsa/Makefile.am: add the aforementioned new files
+	* libbalsa/send.c: implement the core of the patch, and do some re-factoring
+	    to make the source better readable.  Add functions for the auto-send timer stuff.
+	    Remove the old send message dialogue implementation.
+	* libbalsa/send.h: export functions for controlling the auto-send feature,
+	    and remove the old progress dialogue stuff
+	* libbalsa/smtp-server.[ch]: extend the smtp server class by a lock flag,
+	    implemented as atomic variable
+	* src/balsa-app.c: implement auto-send callback, and initialise the feature
+	* src/balsa-app.h: add auto-send application variables
+	* src/main-window.c: remove old progress dialogue callback
+	* src/main.c, src/threads.h: remove old progress dialogue globals and initialisation
+	* src/pref-manager.c: configuration of the auto-send feature
+	* src/save-restore.c: load and save the configuration of the auto-send feature
+
 2017-06-16  Albrecht Dreß
 
 	Build with Gtk version < 3.22

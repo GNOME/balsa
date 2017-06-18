@@ -71,34 +71,8 @@ void libbalsa_process_queue(LibBalsaMailbox * outbox,
 							GSList * smtp_servers,
 							GtkWindow * parent);
 
-extern GMutex send_messages_lock;
-extern int send_thread_pipes[2];
-
-typedef struct {
-    int message_type;
-    char message_string[256];
-    LibBalsaMessage *msg;
-    LibBalsaMailbox *mbox;
-    float of_total;
-} SendThreadMessage;
-
-#define  MSGSENDTHREAD(t_message, type, string, s_msg, s_mbox, messof) \
-  t_message = g_new(SendThreadMessage, 1); \
-  t_message->message_type = type; \
-  strncpy(t_message->message_string, string, sizeof(t_message->message_string)); \
-  t_message->msg = s_msg; \
-  t_message->mbox = s_mbox; \
-  t_message->of_total = messof; \
-  if (write( send_thread_pipes[1], (void *) &t_message, sizeof(void *) ) \
-      < (ssize_t) sizeof(void *)) \
-    g_warning("pipe error");
-
-enum {
-    MSGSENDTHREADERROR,
-    MSGSENDTHREADPROGRESS,
-    MSGSENDTHREADPOSTPONE,
-    MSGSENDTHREADDELETE,
-    MSGSENDTHREADFINISHED
-};
+void libbalsa_auto_send_init(GSourceFunc auto_send_cb);
+void libbalsa_auto_send_config(gboolean enable,
+					           guint    timeout_minutes);
 
 #endif /* __SEND_H__ */

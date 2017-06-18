@@ -34,6 +34,7 @@
 #include "filter-funcs.h"
 #include "libbalsa-conf.h"
 #include "misc.h"
+#include "send.h"
 #include "server.h"
 #include "smtp-server.h"
 #include "save-restore.h"
@@ -251,6 +252,17 @@ ask_password(LibBalsaServer *server, LibBalsaMailbox *mbox)
 	return password;
 }
 
+
+/* Note: data indicates if the function shall be re-scheduled (NULL) or not (!= NULL) */
+static gboolean
+send_queued_messages_auto_cb(gpointer data)
+{
+	g_debug("%s: %p", __func__, data);
+	libbalsa_process_queue(balsa_app.outbox, balsa_find_sentbox_by_url, balsa_app.smtp_servers, NULL);
+    return (data == NULL);
+}
+
+
 void
 balsa_app_init(void)
 {
@@ -395,6 +407,8 @@ balsa_app_init(void)
     /* Message filing */
     balsa_app.folder_mru=NULL;
     balsa_app.fcc_mru=NULL;
+
+    libbalsa_auto_send_init(send_queued_messages_auto_cb);
 }
 
 void
@@ -429,7 +443,7 @@ balsa_app_destroy(void)
     if(balsa_app.debug) g_print("balsa_app: Finished cleaning up.\n");
 }
 
-static gint
+static gboolean
 check_new_messages_auto_cb(gpointer data)
 {
     check_new_messages_real(balsa_app.main_window, TYPE_BACKGROUND);
@@ -450,7 +464,7 @@ update_timer(gboolean update, guint minutes)
 
     balsa_app.check_mail_timer_id = update ?
         g_timeout_add_seconds(minutes * 60,
-                              (GSourceFunc) check_new_messages_auto_cb,
+                              check_new_messages_auto_cb,
                               NULL) : 0;
 }
 

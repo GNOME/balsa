@@ -14,8 +14,8 @@ msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: https://bugzilla.gnome.org/enter_bug.cgi?"
 "product=balsa&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2017-06-04 09:55+0200\n"
-"PO-Revision-Date: 2017-06-04 09:57+0200\n"
+"POT-Creation-Date: 2017-06-18 21:07+0200\n"
+"PO-Revision-Date: 2017-06-18 21:08+0200\n"
 "Last-Translator: Piotr Drąg <piotrdrag@gmail.com>\n"
 "Language-Team: Polish <community-poland@mozilla.org>\n"
 "Language: pl\n"
@@ -419,14 +419,14 @@ msgstr "Podpis w %s nie jest tekstem zakodowanym w UTF-8."
 #: ../src/balsa-message.c:1766 ../src/balsa-mime-widget-callbacks.c:85
 #: ../src/filter-edit-callbacks.c:1247 ../src/filter-edit-dialog.c:402
 #: ../src/filter-edit-dialog.c:571 ../src/filter-export-dialog.c:79
-#: ../src/filter-run-dialog.c:321 ../src/folder-conf.c:311
+#: ../src/filter-run-dialog.c:316 ../src/folder-conf.c:311
 #: ../src/folder-conf.c:573 ../src/folder-conf.c:806 ../src/mailbox-conf.c:462
 #: ../src/mailbox-conf.c:483 ../src/mailbox-conf.c:499
 #: ../src/mailbox-conf.c:1222 ../src/mailbox-conf.c:1259
 #: ../src/pref-manager.c:3260 ../src/sendmsg-window.c:532
 #: ../src/sendmsg-window.c:1557 ../src/sendmsg-window.c:2009
-#: ../src/sendmsg-window.c:3335 ../src/sendmsg-window.c:4697
-#: ../src/sendmsg-window.c:4994 ../src/sendmsg-window.c:5151
+#: ../src/sendmsg-window.c:3335 ../src/sendmsg-window.c:4698
+#: ../src/sendmsg-window.c:4995 ../src/sendmsg-window.c:5152
 #: ../src/spell-check.c:382 ../src/store-address.c:208
 msgid "_Cancel"
 msgstr "_Anuluj"
@@ -436,10 +436,10 @@ msgstr "_Anuluj"
 #: ../src/ab-window.c:140 ../src/balsa-app.c:87 ../src/balsa-message.c:1767
 #: ../src/balsa-mime-widget-callbacks.c:86 ../src/filter-edit-callbacks.c:1246
 #: ../src/filter-edit-dialog.c:570 ../src/filter-export-dialog.c:78
-#: ../src/filter-run-dialog.c:320 ../src/main-window.c:4087
+#: ../src/filter-run-dialog.c:315 ../src/main-window.c:4087
 #: ../src/pref-manager.c:3258 ../src/sendmsg-window.c:1556
 #: ../src/sendmsg-window.c:2010 ../src/sendmsg-window.c:3334
-#: ../src/sendmsg-window.c:4698 ../src/store-address.c:209
+#: ../src/sendmsg-window.c:4699 ../src/store-address.c:209
 msgid "_OK"
 msgstr "_OK"
 
@@ -640,7 +640,7 @@ msgstr "Zarządzanie tożsamościami"
 #: ../src/address-book-config.c:238 ../src/address-book-config.c:340
 #: ../src/address-book-config.c:386 ../src/filter-edit-callbacks.c:1248
 #: ../src/filter-edit-dialog.c:572 ../src/filter-export-dialog.c:80
-#: ../src/filter-run-dialog.c:322 ../src/folder-conf.c:312
+#: ../src/filter-run-dialog.c:317 ../src/folder-conf.c:312
 #: ../src/folder-conf.c:574 ../src/folder-conf.c:807 ../src/main-window.c:3991
 #: ../src/pref-manager.c:3261 ../src/toolbar-prefs.c:141
 msgid "_Help"
@@ -1000,7 +1000,7 @@ msgstr ""
 "\n"
 "Klucz: %s"
 
-#: ../libbalsa/libbalsa-vfs.c:557 ../src/sendmsg-window.c:4492
+#: ../libbalsa/libbalsa-vfs.c:557 ../src/sendmsg-window.c:4493
 #, c-format
 msgid "not a regular file"
 msgstr "nie jest zwykłym plikiem"
@@ -2493,8 +2493,8 @@ msgid "F_ilter:"
 msgstr "_Filtr:"
 
 #: ../src/ab-window.c:184 ../src/filter-edit-dialog.c:207
-#: ../src/filter-export-dialog.c:90 ../src/filter-run-dialog.c:234
-#: ../src/filter-run-dialog.c:339
+#: ../src/filter-export-dialog.c:90 ../src/filter-run-dialog.c:229
+#: ../src/filter-run-dialog.c:334
 msgid "Name"
 msgstr "Nazwa"
 
@@ -3301,7 +3301,7 @@ msgstr "Serwer IMAP nie zgłosił struktury wiadomości"
 #: ../src/balsa-mime-widget-message.c:724
 #: ../src/balsa-print-object-header.c:156 ../src/sendmsg-window.c:747
 #: ../src/sendmsg-window.c:749 ../src/sendmsg-window.c:841
-#: ../src/sendmsg-window.c:3513 ../src/sendmsg-window.c:5029
+#: ../src/sendmsg-window.c:3513 ../src/sendmsg-window.c:5030
 msgid "Subject:"
 msgstr "Temat:"
 
@@ -3908,43 +3908,43 @@ msgstr ""
 "IMAP, co jest realizowane za pomocą bardzo powolnej metody. Jeśli jest to "
 "możliwe, należy używać porównań fragmentów ciągów."
 
-#: ../src/filter-run-dialog.c:202
+#: ../src/filter-run-dialog.c:197
 msgid "Filters of Mailbox: "
 msgstr "Filtry skrzynki: "
 
-#: ../src/filter-run-dialog.c:243
+#: ../src/filter-run-dialog.c:238
 msgid "On reception"
 msgstr "Przy odebraniu"
 
-#: ../src/filter-run-dialog.c:255
+#: ../src/filter-run-dialog.c:250
 msgid "On exit"
 msgstr "Przy zakończeniu"
 
-#: ../src/filter-run-dialog.c:364
+#: ../src/filter-run-dialog.c:359
 msgid "_Apply Selected"
 msgstr "_Zatwierdź zaznaczone"
 
-#: ../src/filter-run-dialog.c:380
+#: ../src/filter-run-dialog.c:375
 msgid "Add selected filter to mailbox"
 msgstr "Dodaj zaznaczony filtr do skrzynki"
 
-#: ../src/filter-run-dialog.c:390
+#: ../src/filter-run-dialog.c:385
 msgid "Remove selected filter from mailbox"
 msgstr "Usuń zaznaczony filtr ze skrzynki"
 
-#: ../src/filter-run-dialog.c:432
+#: ../src/filter-run-dialog.c:427
 msgid "Move selected filter up"
 msgstr "Przenieś zaznaczony filtr do góry"
 
-#: ../src/filter-run-dialog.c:442
+#: ../src/filter-run-dialog.c:437
 msgid "Move selected filter down"
 msgstr "Przenieś zaznaczony filtr w dół"
 
-#: ../src/filter-run-dialog.c:448
+#: ../src/filter-run-dialog.c:443
 msgid "A_pply Now!"
 msgstr "Z_atwierdź teraz"
 
-#: ../src/filter-run-dialog.c:494
+#: ../src/filter-run-dialog.c:489
 msgid ""
 "The filters dialog is opened, close it before you can run filters on any "
 "mailbox"
@@ -5392,7 +5392,7 @@ msgstr "Komunikaty stanu"
 msgid "Balsa Preferences"
 msgstr "Preferencje programu Balsa"
 
-#: ../src/pref-manager.c:3317 ../src/toolbar-factory.c:164
+#: ../src/pref-manager.c:3317 ../src/toolbar-factory.c:166
 msgid "Spelling"
 msgstr "Pisownia"
 
@@ -5783,7 +5783,7 @@ msgstr "Załączenie jako typ MIME:"
 msgid "Character set for file %s changed from “%s” to “%s”."
 msgstr "Kodowanie dla pliku %s zmieniło się z „%s” na „%s”."
 
-#: ../src/sendmsg-window.c:1684 ../src/sendmsg-window.c:5033
+#: ../src/sendmsg-window.c:1684 ../src/sendmsg-window.c:5034
 msgid "(no subject)"
 msgstr "(brak tematu)"
 
@@ -5822,7 +5822,7 @@ msgid "Attach file"
 msgstr "Załącz plik"
 
 #: ../src/sendmsg-window.c:2119 ../src/sendmsg-window.c:2222
-#: ../src/sendmsg-window.c:6864
+#: ../src/sendmsg-window.c:6865
 msgid ""
 "Attaching message failed.\n"
 "Possible reason: not enough temporary space"
@@ -5947,30 +5947,30 @@ msgstr "Nie można otworzyć Szkiców: %s"
 msgid "Message saved."
 msgstr "Zapisano wiadomość."
 
-#: ../src/sendmsg-window.c:4469 ../src/sendmsg-window.c:4477
-#: ../src/sendmsg-window.c:4484 ../src/sendmsg-window.c:4491
-#: ../src/sendmsg-window.c:4515
+#: ../src/sendmsg-window.c:4470 ../src/sendmsg-window.c:4478
+#: ../src/sendmsg-window.c:4485 ../src/sendmsg-window.c:4492
+#: ../src/sendmsg-window.c:4516
 #, c-format
 msgid "Could not attach the file %s: %s."
 msgstr "Nie można załączyć pliku %s: %s."
 
-#: ../src/sendmsg-window.c:4470
+#: ../src/sendmsg-window.c:4471
 msgid "not an absolute path"
 msgstr "nie jest ścieżką bezwzględną"
 
-#: ../src/sendmsg-window.c:4478
+#: ../src/sendmsg-window.c:4479
 msgid "not in your directory"
 msgstr "brak w katalogu użytkownika"
 
-#: ../src/sendmsg-window.c:4485
+#: ../src/sendmsg-window.c:4486
 msgid "does not exist"
 msgstr "nie istnieje"
 
-#: ../src/sendmsg-window.c:4516
+#: ../src/sendmsg-window.c:4517
 msgid "not in current directory"
 msgstr "brak w bieżącym katalogu"
 
-#: ../src/sendmsg-window.c:4566
+#: ../src/sendmsg-window.c:4567
 msgid ""
 "The link that you selected created\n"
 "a “Blind copy” (BCC) address.\n"
@@ -5982,44 +5982,44 @@ msgstr ""
 "Proszę sprawdzić, czy adres\n"
 "jest właściwy."
 
-#: ../src/sendmsg-window.c:4675
+#: ../src/sendmsg-window.c:4676
 #, c-format
 msgid "Cannot not read the file “%s”: %s"
 msgstr "Nie można odczytać pliku „%s”: %s"
 
-#: ../src/sendmsg-window.c:4694
+#: ../src/sendmsg-window.c:4695
 msgid "Include file"
 msgstr "Dołącz plik"
 
 #. Translators: please do not translate Face.
-#: ../src/sendmsg-window.c:4879
+#: ../src/sendmsg-window.c:4880
 #, c-format
 msgid "Could not load Face header file %s: %s"
 msgstr "Nie można wczytać pliku nagłówka „Face” %s: %s"
 
 #. Translators: please do not translate Face.
-#: ../src/sendmsg-window.c:4882
+#: ../src/sendmsg-window.c:4883
 #, c-format
 msgid "Could not load X-Face header file %s: %s"
 msgstr "Nie można wczytać pliku nagłówka „X-Face” %s: %s"
 
-#: ../src/sendmsg-window.c:4990
+#: ../src/sendmsg-window.c:4991
 msgid "No Subject"
 msgstr "Brak tematu"
 
-#: ../src/sendmsg-window.c:4995
+#: ../src/sendmsg-window.c:4996
 msgid "_Send"
 msgstr "_Wyślij"
 
-#: ../src/sendmsg-window.c:5016
+#: ../src/sendmsg-window.c:5017
 msgid "You did not specify a subject for this message"
 msgstr "Nie podano tematu tej wiadomości"
 
-#: ../src/sendmsg-window.c:5017
+#: ../src/sendmsg-window.c:5018
 msgid "If you would like to provide one, enter it below."
 msgstr "Aby podać temat wiadomości, należy wpisać go poniżej."
 
-#: ../src/sendmsg-window.c:5110
+#: ../src/sendmsg-window.c:5111
 #, c-format
 msgid ""
 "You did not select encryption for this message, although %s public keys are "
@@ -6030,19 +6030,19 @@ msgstr ""
 "dostępne dla wszystkich odbiorców. Aby chronić swoją prywatność, wiadomość "
 "mogłaby zostać zaszyfrowana za pomocą %s."
 
-#: ../src/sendmsg-window.c:5132
+#: ../src/sendmsg-window.c:5133
 msgid "Send _encrypted"
 msgstr "Wyślij _zaszyfrowane"
 
-#: ../src/sendmsg-window.c:5147
+#: ../src/sendmsg-window.c:5148
 msgid "Send _unencrypted"
 msgstr "Wyślij _niezaszyfrowane"
 
-#: ../src/sendmsg-window.c:5207
+#: ../src/sendmsg-window.c:5208
 msgid "You selected OpenPGP security for this message.\n"
 msgstr "Wybrano zabezpieczenie OpenPGP dla tej wiadomości.\n"
 
-#: ../src/sendmsg-window.c:5212
+#: ../src/sendmsg-window.c:5213
 msgid ""
 "The message text will be sent as plain text and as HTML, but only the plain "
 "part can be signed.\n"
@@ -6050,13 +6050,13 @@ msgstr ""
 "Tekst wiadomości zostanie wysłany jako zwykły tekst i jako HTML, ale tylko "
 "część zawierająca zwykły tekst może zostać podpisana.\n"
 
-#: ../src/sendmsg-window.c:5217
+#: ../src/sendmsg-window.c:5218
 msgid ""
 "The message contains attachments, which cannot be signed or encrypted.\n"
 msgstr ""
 "Wiadomość zawiera załączniki, których nie można podpisać ani zaszyfrować.\n"
 
-#: ../src/sendmsg-window.c:5221
+#: ../src/sendmsg-window.c:5222
 msgid ""
 "You should select MIME mode if the complete message shall be protected. Do "
 "you really want to proceed?"
@@ -6064,36 +6064,36 @@ msgstr ""
 "Jeśli cała wiadomości ma być chroniona, należy wybrać tryb MIME. Na pewno "
 "kontynuować?"
 
-#: ../src/sendmsg-window.c:5246
+#: ../src/sendmsg-window.c:5247
 #, c-format
 msgid "sending message with GPG mode %d"
 msgstr "wysyłanie wiadomości w trybie GPG %d"
 
-#: ../src/sendmsg-window.c:5274
+#: ../src/sendmsg-window.c:5275
 msgid "Message could not be created"
 msgstr "Nie można utworzyć wiadomości"
 
-#: ../src/sendmsg-window.c:5276
+#: ../src/sendmsg-window.c:5277
 msgid "Message could not be queued in outbox"
 msgstr "Nie można dodać wiadomości do kolejki w skrzynce wychodzącej"
 
-#: ../src/sendmsg-window.c:5278
+#: ../src/sendmsg-window.c:5279
 msgid "Message could not be saved in sentbox"
 msgstr "Nie można zapisać wiadomości w Wysłanych"
 
-#: ../src/sendmsg-window.c:5280
+#: ../src/sendmsg-window.c:5281
 msgid "Message could not be sent"
 msgstr "Nie można wysłać wiadomości"
 
-#: ../src/sendmsg-window.c:5283
+#: ../src/sendmsg-window.c:5284
 msgid "Message could not be signed"
 msgstr "Nie można podpisać wiadomości"
 
-#: ../src/sendmsg-window.c:5285
+#: ../src/sendmsg-window.c:5286
 msgid "Message could not be encrypted"
 msgstr "Nie można zaszyfrować wiadomości"
 
-#: ../src/sendmsg-window.c:5291
+#: ../src/sendmsg-window.c:5292
 #, c-format
 msgid ""
 "Send failed: %s\n"
@@ -6102,45 +6102,45 @@ msgstr ""
 "Wysłanie się nie powiodło: %s\n"
 "%s"
 
-#: ../src/sendmsg-window.c:5296
+#: ../src/sendmsg-window.c:5297
 #, c-format
 msgid "Send failed: %s"
 msgstr "Wysłanie się nie powiodło: %s"
 
-#: ../src/sendmsg-window.c:5395
+#: ../src/sendmsg-window.c:5396
 #, c-format
 msgid "Could not postpone message: %s"
 msgstr "Nie można odłożyć wiadomości: %s"
 
-#: ../src/sendmsg-window.c:5416
+#: ../src/sendmsg-window.c:5417
 msgid "Message postponed."
 msgstr "Odłożono wiadomość."
 
-#: ../src/sendmsg-window.c:5421
+#: ../src/sendmsg-window.c:5422
 msgid "Could not postpone message."
 msgstr "Nie można odłożyć wiadomości."
 
-#: ../src/sendmsg-window.c:5633
+#: ../src/sendmsg-window.c:5634
 #, c-format
 msgid "Error starting spell checker: %s"
 msgstr "Błąd podczas uruchamiania sprawdzania pisowni: %s"
 
-#: ../src/sendmsg-window.c:6384
+#: ../src/sendmsg-window.c:6385
 #, c-format
 msgid "Reply to %s: %s"
 msgstr "Odpowiedź do %s: %s"
 
-#: ../src/sendmsg-window.c:6389
+#: ../src/sendmsg-window.c:6390
 #, c-format
 msgid "Forward message to %s: %s"
 msgstr "Przekazanie wiadomości do %s: %s"
 
-#: ../src/sendmsg-window.c:6393
+#: ../src/sendmsg-window.c:6394
 #, c-format
 msgid "New message to %s: %s"
 msgstr "Nowa wiadomość do %s: %s"
 
-#: ../src/sendmsg-window.c:6563
+#: ../src/sendmsg-window.c:6564
 msgid "_Language"
 msgstr "_Język"
 
@@ -6359,26 +6359,34 @@ msgid "Send"
 msgstr "Wyślij"
 
 #: ../src/toolbar-factory.c:160
+msgid "Send queued"
+msgstr "Wyślij z kolejki"
+
+#: ../src/toolbar-factory.c:161
 msgid "Exchange"
 msgstr "Wymień"
 
-#: ../src/toolbar-factory.c:161
+#: ../src/toolbar-factory.c:162 ../src/toolbar-factory.c:194
+msgid "Queue"
+msgstr "Dodaj do kolejki"
+
+#: ../src/toolbar-factory.c:163
 msgid "Attach"
 msgstr "Załącz"
 
-#: ../src/toolbar-factory.c:162
+#: ../src/toolbar-factory.c:164
 msgid "Save"
 msgstr "Zapisz"
 
-#: ../src/toolbar-factory.c:163
+#: ../src/toolbar-factory.c:165
 msgid "Identity"
 msgstr "Tożsamość"
 
-#: ../src/toolbar-factory.c:165
+#: ../src/toolbar-factory.c:167
 msgid "Close"
 msgstr "Zamknij"
 
-#: ../src/toolbar-factory.c:166
+#: ../src/toolbar-factory.c:168
 msgid ""
 "Toggle\n"
 "new"
@@ -6386,11 +6394,11 @@ msgstr ""
 "Przełącz\n"
 "nowy"
 
-#: ../src/toolbar-factory.c:167
+#: ../src/toolbar-factory.c:169
 msgid "Mark all"
 msgstr "Oznacz wszystkie"
 
-#: ../src/toolbar-factory.c:168
+#: ../src/toolbar-factory.c:170
 msgid ""
 "All\n"
 "headers"
@@ -6398,7 +6406,7 @@ msgstr ""
 "Wszystkie\n"
 "nagłówki"
 
-#: ../src/toolbar-factory.c:169
+#: ../src/toolbar-factory.c:171
 msgid ""
 "Reset\n"
 "Filter"
@@ -6406,31 +6414,31 @@ msgstr ""
 "Przywróć\n"
 "filtr"
 
-#: ../src/toolbar-factory.c:170
+#: ../src/toolbar-factory.c:172
 msgid "Message Preview"
 msgstr "Podgląd wiadomości"
 
-#: ../src/toolbar-factory.c:172
+#: ../src/toolbar-factory.c:174
 msgid "Sign"
 msgstr "Podpisz"
 
-#: ../src/toolbar-factory.c:173
+#: ../src/toolbar-factory.c:175
 msgid "Encrypt"
 msgstr "Zaszyfruj"
 
-#: ../src/toolbar-factory.c:175
+#: ../src/toolbar-factory.c:177
 msgid "Undo"
 msgstr "Cofnij"
 
-#: ../src/toolbar-factory.c:176
+#: ../src/toolbar-factory.c:178
 msgid "Redo"
 msgstr "Ponów"
 
-#: ../src/toolbar-factory.c:177
+#: ../src/toolbar-factory.c:179
 msgid "Expunge"
 msgstr "Wyczyść"
 
-#: ../src/toolbar-factory.c:178
+#: ../src/toolbar-factory.c:180
 msgid ""
 "Empty\n"
 "Trash"
@@ -6438,45 +6446,41 @@ msgstr ""
 "Opróżnij\n"
 "kosz"
 
-#: ../src/toolbar-factory.c:179
+#: ../src/toolbar-factory.c:181
 msgid "Edit"
 msgstr "Edycja"
 
-#: ../src/toolbar-factory.c:192
-msgid "Queue"
-msgstr "Dodaj do kolejki"
-
-#: ../src/toolbar-factory.c:405
+#: ../src/toolbar-factory.c:407
 #, c-format
 msgid "Unknown toolbar icon “%s”"
 msgstr "Nieznana ikona paska narzędziowego „%s”"
 
-#: ../src/toolbar-factory.c:482
+#: ../src/toolbar-factory.c:484
 msgid "Queue this message for sending"
 msgstr "Dodaj tę wiadomość do kolejki do wysłania"
 
-#: ../src/toolbar-factory.c:494
+#: ../src/toolbar-factory.c:496
 msgid "Text Be_low Icons"
 msgstr "Tekst pod i_konami"
 
-#: ../src/toolbar-factory.c:495
+#: ../src/toolbar-factory.c:497
 msgid "Priority Text Be_side Icons"
 msgstr "Priorytetowy tek_st obok ikon"
 
-#: ../src/toolbar-factory.c:497
+#: ../src/toolbar-factory.c:499
 msgid "_Icons Only"
 msgstr "Tylko _ikony"
 
-#: ../src/toolbar-factory.c:498
+#: ../src/toolbar-factory.c:500
 msgid "_Text Only"
 msgstr "Tylko _tekst"
 
-#: ../src/toolbar-factory.c:760
+#: ../src/toolbar-factory.c:764
 #, c-format
 msgid "Use Desktop _Default (%s)"
 msgstr "_Domyślne wartości środowiska (%s)"
 
-#: ../src/toolbar-factory.c:786
+#: ../src/toolbar-factory.c:790
 msgid "_Customize Toolbars…"
 msgstr "_Dopasuj paski narzędziowe…"
 

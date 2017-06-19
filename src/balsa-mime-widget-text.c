@@ -758,14 +758,17 @@ find_url(GtkWidget * widget, gint x, gint y, GList * url_list)
 static gboolean
 statusbar_pop(gpointer data)
 {
-    GtkStatusbar *statusbar;
-    guint context_id;
-
     gdk_threads_enter();
 
-    statusbar = GTK_STATUSBAR(balsa_app.main_window->statusbar);
-    context_id = gtk_statusbar_get_context_id(statusbar, "BalsaMimeWidget message");
-    gtk_statusbar_pop(statusbar, context_id);
+    if (BALSA_IS_WINDOW(balsa_app.main_window)
+        && GTK_IS_STATUSBAR(balsa_app.main_window->statusbar)) {
+        GtkStatusbar *statusbar;
+        guint context_id;
+
+        statusbar = (GtkStatusbar *) balsa_app.main_window->statusbar;
+        context_id = gtk_statusbar_get_context_id(statusbar, "BalsaMimeWidget message");
+        gtk_statusbar_pop(statusbar, context_id);
+    }
 
     gdk_threads_leave();
     return FALSE;

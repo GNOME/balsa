@@ -1,3 +1,10 @@
+2017-06-19  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Possible fix for Red Hat Bugzilla #1462546, reported by jamesbdonovan@rambler.ru
+
+	* src/balsa-mime-widget-text.c (statusbar_pop): check that the
+	  main window and the status bar are still valid.
+
 2017-06-18  Albrecht Dreß
 
 	Implement automatic sending in background

@@ -15,8 +15,8 @@ msgstr ""
 "Project-Id-Version: balsa.HEAD\n"
 "Report-Msgid-Bugs-To: https://bugzilla.gnome.org/enter_bug.cgi?"
 "product=balsa&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2017-06-19 00:23+0000\n"
-"PO-Revision-Date: 2017-06-19 14:38+0200\n"
+"POT-Creation-Date: 2017-06-19 12:41+0000\n"
+"PO-Revision-Date: 2017-06-21 09:26+0200\n"
 "Last-Translator: Daniel Mustieles <daniel.mustieles@gmail.com>\n"
 "Language-Team: es <gnome-es-list@gnome.org>\n"
 "Language: es\n"
@@ -500,15 +500,14 @@ msgstr "Identidad nueva"
 
 #: ../libbalsa/identity.c:337
 #, c-format
-#| msgid "Error executing signature generator %s"
 msgid "Error executing signature generator “%s”: %s"
 msgstr "Error al ejecutar el generador de firmas «%s»: %s"
 
 #: ../libbalsa/identity.c:346
-#, fuzzy, c-format
+#, c-format
 #| msgid "Cannot open signature file '%s' for reading"
 msgid "Cannot read signature file “%s”: %s"
-msgstr "No se pudo abrir el archivo de firma «%s» para lectura"
+msgstr "No se puede leer el archivo de firma «%s»: %s"
 
 #: ../libbalsa/identity.c:357
 #, c-format
@@ -644,10 +643,11 @@ msgstr "enviar mensajes tanto en formato texto plano como en _HTML"
 # src/filter-edit-dialog.c:626
 # src/filter-edit-dialog.c:538
 #: ../libbalsa/identity.c:988
-#, fuzzy
 #| msgid "request _Message Disposition Notification by default"
 msgid "request positive (successful) _Delivery Status Notification by default"
-msgstr "Solicitar notificación de entrega de _mensaje de forma predeterminada"
+msgstr ""
+"Solicitar notificación de entrega de _mensaje (correcta) de forma "
+"predeterminada"
 
 # src/filter-edit-dialog.c:626
 # src/filter-edit-dialog.c:538
@@ -707,7 +707,6 @@ msgid "Prepend si_gnature"
 msgstr "An_teponer firma"
 
 #: ../libbalsa/identity.c:1032
-#, fuzzy
 #| msgid ""
 #| "Signing and encrypting messages are possible\n"
 #| "only if Balsa is built with cryptographic support."
@@ -715,8 +714,8 @@ msgid ""
 "Signing and encrypting messages are possible only if Balsa is built with "
 "cryptographic support."
 msgstr ""
-"Sólo es posible firmar y cifrar mensajes\n"
-"si Balsa se construye con soporte criptográfico."
+"Sólo es posible firmar y cifrar mensajes si Balsa se construye con soporte "
+"criptográfico."
 
 #: ../libbalsa/identity.c:1037
 msgid "Security"
@@ -860,15 +859,15 @@ msgstr "Error del servidor de correo IMAP %s: %s"
 # src/sendmsg-window.c:1694
 # src/sendmsg-window.c:1749
 #: ../libbalsa/imap-server.c:527 ../libbalsa/server.c:368
-#, fuzzy, c-format
+#, c-format
 #| msgid "Error loading %s: %s\n"
 msgid "Error looking up password for %s@%s: %s\n"
-msgstr "Ha ocurrido un error al cargar %s: %s\n"
+msgstr "Error al buscar la contraseña para %s@%s: %s\n"
 
 #: ../libbalsa/imap-server.c:529 ../libbalsa/server.c:370
 #, c-format
 msgid "Falling back\n"
-msgstr ""
+msgstr "Volviendo atrás\n"
 
 # src/mailbox-conf.c:827 src/mailbox-conf.c:886
 # src/mailbox-conf.c:904 src/mailbox-conf.c:961
@@ -882,10 +881,10 @@ msgstr "Contraseñas de Balsa"
 # src/sendmsg-window.c:1749
 #: ../libbalsa/imap-server.c:548 ../libbalsa/server.c:388
 #: ../libbalsa/server.c:478
-#, fuzzy, c-format
+#, c-format
 #| msgid "Error showing %s: %s\n"
 msgid "Error storing password for %s@%s: %s\n"
-msgstr "Error al mostrar %s:%s\n"
+msgstr "Error al guardar la contraseña para %s@%s: %s\n"
 
 # libmutt/imap/imap_ssl.c:229
 # libmutt/imap/imap_ssl.c:229
@@ -939,10 +938,6 @@ msgstr "_Rechazar"
 
 #: ../libbalsa/libbalsa.c:544
 #, c-format
-#| msgid ""
-#| "Authenticity of this certificate could not be verified.\n"
-#| "<b>Reason:</b> %s\n"
-#| "<b>This certificate belongs to:</b>\n"
 msgid ""
 "<big><b>Authenticity of this certificate could not be verified.</b></big>\n"
 "Reason: %s"
@@ -1070,10 +1065,10 @@ msgstr "no se pudo crear contexto"
 # src/balsa-message.c:301
 # src/balsa-message.c:331
 #: ../libbalsa/libbalsa-gpgme.c:693
-#, fuzzy, c-format
+#, c-format
 #| msgid "Could not get a part: %s"
 msgid "could not set protocol “%s”"
-msgstr "No se pudo obtener una parte: %s"
+msgstr "No se pudo establecer el protocolo «%s»"
 
 # src/balsa-message.c:301
 # src/balsa-message.c:331
@@ -1121,10 +1116,10 @@ msgid "%s: multiple keys for %s"
 msgstr "%s: claves múltiples para %s"
 
 #: ../libbalsa/libbalsa-gpgme.c:873
-#, fuzzy, c-format
+#, c-format
 #| msgid "%s: insufficient validity for uid %s"
 msgid "%s: insufficient validity for UID %s"
-msgstr "%s: validez insuficiente para el uid %s"
+msgstr "%s: validez insuficiente para el UID %s"
 
 # src/balsa-message.c:301
 # src/balsa-message.c:331
@@ -1179,6 +1174,10 @@ msgid ""
 "If you are sure that the recipient owns a different key, select it from the "
 "list."
 msgstr ""
+"Esto no parece ser una clave pública para el destinatario %s en su depósito "
+"de claves.\n"
+"Si está seguro de que el destinatario tiene una clave diferente, "
+"selecciónela en la lista."
 
 #: ../libbalsa/libbalsa-gpgme-cb.c:324
 #, c-format
@@ -1186,7 +1185,7 @@ msgid "Insufficient trust for recipient %s"
 msgstr "No hay suficiente confianza en el destinatario %s"
 
 #: ../libbalsa/libbalsa-gpgme-cb.c:328
-#, fuzzy, c-format
+#, c-format
 #| msgid "The validity of the key with user ID \"%s\" is \"%s\"."
 msgid "The validity of the key with user ID “%s” is “%s”."
 msgstr "La validez de la clave con ID de usuario «%s» es «%s»."
@@ -1197,12 +1196,11 @@ msgstr "¿Quiere usar esta clave de todos modos?"
 
 #. FIXME: create dialog according to the Gnome HIG
 #: ../libbalsa/libbalsa-gpgme-cb.c:365
-#| msgid "_Pass Phrase:"
 msgid "Enter Passphrase"
 msgstr "Introduzca la frase de paso"
 
 #: ../libbalsa/libbalsa-gpgme-cb.c:393
-#, fuzzy, c-format
+#, c-format
 #| msgid ""
 #| "The passphrase for this key was bad, please try again!\n"
 #| "\n"
@@ -1213,12 +1211,13 @@ msgid ""
 "\n"
 "Key: %s"
 msgstr ""
+"%s\n"
 "La frase de paso de esta clave era incorrecta. Inténtelo de nuevo.\n"
 "\n"
 "Clave: %s"
 
 #: ../libbalsa/libbalsa-gpgme-cb.c:398
-#, fuzzy, c-format
+#, c-format
 #| msgid ""
 #| "Please enter the passphrase for the secret key!\n"
 #| "\n"
@@ -1229,6 +1228,7 @@ msgid ""
 "\n"
 "Key: %s"
 msgstr ""
+"%s\n"
 "Introduzca la frase de paso para la clave secreta:\n"
 "\n"
 "Clave: %s"
@@ -1282,7 +1282,6 @@ msgstr "No existe ese tipo de buzón: %s"
 # libbalsa/mailbox.c:275
 #: ../libbalsa/mailbox.c:534
 #, c-format
-#| msgid "Bad local mailbox path \"%s\""
 msgid "Bad local mailbox path “%s”"
 msgstr "Ruta errónea al buzón local «%s»"
 
@@ -1351,7 +1350,6 @@ msgstr "Ha fallado la búsqueda de mensajes duplicados en el buzón de origen"
 #. LIBBALSA_INFORMATION_MESSAGE here but it would be overwritten by
 #. login information...
 #: ../libbalsa/mailbox_imap.c:613
-#| msgid "IMAP connection has been severed. Reconnecting..."
 msgid "IMAP connection has been severed. Reconnecting…"
 msgstr "La conexión IMAP se ha cortado. Volviendo a conectar…"
 
@@ -1362,14 +1360,13 @@ msgstr ""
 "alternativas."
 
 #: ../libbalsa/mailbox_imap.c:619
-#, fuzzy, c-format
+#, c-format
 #| msgid "IMAP server has shut the connection: %s Reconnecting..."
 msgid "IMAP server has shut the connection: %s Reconnecting…"
-msgstr "El servidor IMAP ha terminado la conexión: %s re-conectando…"
+msgstr "El servidor IMAP ha terminado la conexión: %s volviendo a conectar…"
 
 #: ../libbalsa/mailbox_imap.c:631
 #, c-format
-#| msgid "Async IMAP cmd %s could not be executed. Reconnecting..."
 msgid "Async IMAP cmd %s could not be executed. Reconnecting…"
 msgstr ""
 "No se pudo ejecutar el comando IMAP asíncrono %s. Volviendo a conectar…"
@@ -1398,7 +1395,6 @@ msgstr ""
 
 #: ../libbalsa/mailbox_imap.c:1668
 #, c-format
-#| msgid "No path found for mailbox \"%s\", using \"%s\""
 msgid "No path found for mailbox “%s”, using “%s”"
 msgstr "No se encontró ruta para el buzón «%s», usando «%s»"
 
@@ -1443,7 +1439,6 @@ msgstr "Los hilos de conversación en el lado del servidor no están soportados.
 # libmutt/mbox.c:712
 #: ../libbalsa/mailbox_local.c:569
 #, c-format
-#| msgid "Failed to save cache file \"%s\": %s."
 msgid "Failed to save cache file “%s”: %s."
 msgstr "Falló al guardar el archivo de caché «%s»: %s."
 
@@ -1485,7 +1480,6 @@ msgstr "Falló la apertura de %s. Nº de error = %d, "
 # libmutt/mbox.c:712
 #: ../libbalsa/mailbox_local.c:2155
 #, c-format
-#| msgid "Failed to sync mailbox \"%s\""
 msgid "Failed to sync mailbox “%s”"
 msgstr "Falló al sincronizar buzón «%s»"
 
@@ -1500,7 +1494,6 @@ msgstr "El buzón %s aparentemente no es un buzón Maildir válido."
 # libbalsa/mailbox.c:290
 #: ../libbalsa/mailbox_maildir.c:200
 #, c-format
-#| msgid "Could not create a MailDir directory at %s (%s)"
 msgid "Could not create a Maildir directory at %s (%s)"
 msgstr "No se pudo crear una carpeta Maildir en %s (%s)"
 
@@ -1509,7 +1502,6 @@ msgstr "No se pudo crear una carpeta Maildir en %s (%s)"
 #: ../libbalsa/mailbox_maildir.c:208 ../libbalsa/mailbox_maildir.c:217
 #: ../libbalsa/mailbox_maildir.c:228
 #, c-format
-#| msgid "Could not create a MailDir at %s (%s)"
 msgid "Could not create a Maildir at %s (%s)"
 msgstr "No se pudo crear un Maildir en %s (%s)"
 
@@ -1553,10 +1545,10 @@ msgstr "Error al copiar datos"
 # libinit_balsa/balsa-druid-page-directory.gob:101
 # libinit_balsa/balsa-druid-page-directory.gob:101
 #: ../libbalsa/mailbox_mbox.c:199
-#, fuzzy, c-format
+#, c-format
 #| msgid "Mailbox %s does not appear to be an Mbox mailbox."
 msgid "Mailbox %s does not appear to be an mbox mailbox."
-msgstr "El buzón %s aparentemente no es un buzón Mbox válido."
+msgstr "El buzón %s no parece ser no es un buzón mbox válido."
 
 # src/balsa-message.c:1316
 # src/balsa-message.c:1474
@@ -1573,11 +1565,11 @@ msgid "Failed to create temporary file “%s”: %s"
 msgstr "falló al crear el archivo temporal «%s»: %s"
 
 #: ../libbalsa/mailbox_mbox.c:441
-#, fuzzy, c-format
+#, c-format
 #| msgid "Failed to save cache file \"%s\": %s.  New version saved as \"%s\""
 msgid "Failed to save cache file “%s”: %s. New version saved as “%s”"
 msgstr ""
-"Falló al guardar el archivo de caché «%s»: %s. La nueva versión guadada como "
+"Falló al guardar el archivo de caché «%s»: %s. Nueva versión guardada como "
 "«%s»"
 
 # src/balsa-message.c:301
@@ -1619,7 +1611,6 @@ msgstr "%s: no se pudo abrir  %s."
 # src/balsa-message.c:331
 #: ../libbalsa/mailbox_mbox.c:1953
 #, c-format
-#| msgid "%s: could not get new mime stream."
 msgid "%s: could not get new MIME stream."
 msgstr "%s: no se pudo obtener el flujo MIME nuevo."
 
@@ -1633,10 +1624,10 @@ msgstr "%s: %s no está en formato mbox."
 # libinit_balsa/balsa-druid-page-directory.gob:101
 # libinit_balsa/balsa-druid-page-directory.gob:101
 #: ../libbalsa/mailbox_mh.c:170
-#, fuzzy, c-format
+#, c-format
 #| msgid "Mailbox %s does not appear to be a Mh mailbox."
 msgid "Mailbox %s does not appear to be an MH mailbox."
-msgstr "El buzón %s aparentemente no es un buzón Mh válido."
+msgstr "El buzón %s no parece ser no es un buzón MH válido."
 
 # libbalsa/address-book.c:176
 # libbalsa/address-book.c:186
@@ -1669,38 +1660,37 @@ msgstr "Error al renombrar el mensaje"
 # libmutt/mx.c:848
 # libmutt/mx.c:848
 #: ../libbalsa/mailbox_pop3.c:259
-#, fuzzy, c-format
+#, c-format
 #| msgid "Saving sent message to %s failed: %s"
 msgid "Saving the POP3 message UID list failed: %s"
-msgstr "Ha fallado al guardar el mensaje %s: %s"
+msgstr "Falló al guardar la lista de UID de mensajes POP3: %s"
 
 # libmutt/mx.c:848
 # libmutt/mx.c:848
 #: ../libbalsa/mailbox_pop3.c:297 ../libbalsa/mailbox_pop3.c:321
-#, fuzzy, c-format
+#, c-format
 #| msgid "Saving POP message to %s failed"
 msgid "Passing POP message to %s failed: %s"
-msgstr "Ha fallado al guardar el mensaje POP en %s"
+msgstr "Falló al pasar el mensaje POP a %s: %s"
 
 # libmutt/mx.c:848
 # libmutt/mx.c:848
 #: ../libbalsa/mailbox_pop3.c:326
-#, fuzzy, c-format
+#, c-format
 #| msgid "Saving POP message to %s failed"
 msgid "Saving POP message failed"
-msgstr "Ha fallado al guardar el mensaje POP en %s"
+msgstr "Falló al guardar el mensaje POP"
 
 #: ../libbalsa/mailbox_pop3.c:345
-#, fuzzy, c-format
+#, c-format
 #| msgid "Transferring POP message to %s failed."
 msgid "Transferring POP message to %s failed: %s"
-msgstr "La transferencia del mensaje POP a %s falló."
+msgstr "Falló la transferencia del mensaje POP a %s: %s"
 
 # libmutt/mx.c:848
 # libmutt/mx.c:848
 #: ../libbalsa/mailbox_pop3.c:380
 #, c-format
-#| msgid "Message from %s: %s"
 msgid "Message %lu of %lu (%s of %s)"
 msgstr "Mensaje %lu de %lu (%s de %s)"
 
@@ -1712,46 +1702,44 @@ msgstr "Ha ocurrido un error al añadir el mensaje %d de %s a %s: %s"
 # src/balsa-message.c:1316
 # src/balsa-message.c:1474
 #: ../libbalsa/mailbox_pop3.c:495 ../libbalsa/send.c:787
-#, fuzzy, c-format
+#, c-format
 #| msgid "Could not load Face header file %s: %s"
 msgid "Cannot load certificate file %s: %s"
-msgstr "No se pudo cargar el archivo de cabeceras de la cara %s: %s"
+msgstr "No se pudo cargar el archivo de certificado %s: %s"
 
 #: ../libbalsa/mailbox_pop3.c:509
-#, fuzzy, c-format
+#, c-format
 #| msgid "POP3 mailbox %s error: %s\n"
 msgid "POP3 mailbox %s: cannot connect %s: %s"
-msgstr "Error al acceder al buzón POP3 %s:%s\n"
+msgstr "Buzón POP3 %s: no se puede conectar %s: %s"
 
 #: ../libbalsa/mailbox_pop3.c:518
-#, fuzzy, c-format
+#, c-format
 #| msgid "POP3 mailbox %s error: %s\n"
 msgid "POP3 mailbox %s error: %s"
-msgstr "Error al acceder al buzón POP3 %s:%s\n"
+msgstr "Error del buzón POP3 %s: %s"
 
 #: ../libbalsa/mailbox_pop3.c:562
-#, fuzzy, c-format
+#, c-format
 #| msgid "POP3 message %d oversized: %d kB — skipped."
 msgid "POP3 message %d oversized: %s — skipped."
-msgstr "El mensaje POP3 %d sobrepasa el tamaño: %d kB - se omite."
+msgstr "El mensaje POP3 %d sobrepasa el tamaño: %s - se omite."
 
 #: ../libbalsa/mailbox_pop3.c:640
-#| msgid "Disconnected"
 msgid "Connected"
 msgstr "Conectado"
 
 # libmutt/mx.c:848
 # libmutt/mx.c:848
 #: ../libbalsa/mailbox_pop3.c:654
-#, fuzzy, c-format
+#, c-format
 #| msgid "New message to %s: %s"
 msgid "%lu new messages (%s)"
-msgstr "Mensaje nuevo a %s: %s"
+msgstr "%lu mensajes nuevo (%s)"
 
 # libmutt/imap/browse.c:93
 # libmutt/imap/browse.c:93
 #: ../libbalsa/mailbox_pop3.c:665
-#| msgid "Deleting messages"
 msgid "Deleting messages on server…"
 msgstr "Eliminación de mensajes en el servidor…"
 
@@ -1759,23 +1747,20 @@ msgstr "Eliminación de mensajes en el servidor…"
 # libmutt/imap/imap_ssl.c:481
 #: ../libbalsa/mailbox_pop3.c:687
 #, c-format
-#| msgid "POP3 error: %s."
 msgid "POP3 error: %s"
 msgstr "Error POP3: %s"
 
 #. done - clean up
 #: ../libbalsa/mailbox_pop3.c:694 ../libbalsa/send.c:1085
 #, c-format
-#| msgid "_Finnish"
 msgid "Finished"
 msgstr "Terminado"
 
 #: ../libbalsa/message.c:615
-#, fuzzy, c-format
+#, c-format
 #| msgid "Mailbox (%s) is readonly: cannot change flags."
 msgid "Mailbox (%s) is read-only: cannot change flags."
-msgstr ""
-"El buzón de origen (%s) es de sólo lectura. No se pueden cambiar las marcas."
+msgstr "El buzón (%s) es de sólo lectura. No se pueden cambiar las marcas."
 
 #: ../libbalsa/misc.c:395
 msgid "West European"
@@ -2093,7 +2078,7 @@ msgid "(unknown protocol) "
 msgstr "(protocolo desconocido)"
 
 #: ../libbalsa/rfc3156.c:774
-#, fuzzy, c-format
+#, c-format
 #| msgid ""
 #| "\n"
 #| "User ID validity: %s"
@@ -2102,7 +2087,7 @@ msgid ""
 "Signature validity: %s"
 msgstr ""
 "\n"
-"Validez del ID de usuario: %s"
+"Validez de la firma: %s"
 
 #: ../libbalsa/rfc3156.c:777
 #, c-format
@@ -2275,12 +2260,12 @@ msgstr "Inténtelo más tarde."
 #: ../libbalsa/rfc6350.c:62
 #, c-format
 msgid "malformed card, BEGIN:VCARD expected"
-msgstr ""
+msgstr "tarjeta mal formada, se esperaba BEGIN:VCARD"
 
 #: ../libbalsa/rfc6350.c:100
 #, c-format
 msgid "malformed card, END:VCARD missing"
-msgstr ""
+msgstr "tarjeta mal formada, falta END:VCARD"
 
 #: ../libbalsa/rfc6350.c:259
 #, c-format
@@ -2290,19 +2275,17 @@ msgstr "línea «%s» mal formada, falta «:»"
 #: ../libbalsa/rfc6350.c:270
 #, c-format
 msgid "malformed line “%s”, empty name or value"
-msgstr ""
+msgstr "Línea «%s» mal formada,  valor o nombre vacío"
 
 # libinit_balsa/balsa-druid-page-user.gob:91
 # libinit_balsa/balsa-druid-page-user.gob:91
 #: ../libbalsa/send.c:206
 #, c-format
-#| msgid "SMT_P server:"
 msgid "SMTP server %s"
 msgstr "Servidor SMTP %s"
 
 #: ../libbalsa/send.c:627
 #, c-format
-#| msgid "Page %d of %d"
 msgid "Message %u of %u"
 msgstr "Mensaje %u de %u"
 
@@ -2310,11 +2293,12 @@ msgstr "Mensaje %u de %u"
 #, c-format
 msgid "Cannot reach SMTP server %s (%s), any queued message will remain in %s."
 msgstr ""
+"No se puede conectar al servidor SMTP %s (%s), y cualquier mensaje encolado "
+"permanecerá en %s."
 
 # src/pref-manager.c:971
 # src/pref-manager.c:1099
 #: ../libbalsa/send.c:840
-#| msgid "Sending Mail…"
 msgid "Sending Mail"
 msgstr "Enviando correo"
 
@@ -2322,7 +2306,6 @@ msgstr "Enviando correo"
 # libmutt/imap/browse.c:93
 #: ../libbalsa/send.c:946
 #, c-format
-#| msgid "Save this message and close"
 msgid "Save message in %s…"
 msgstr "Guardar mensaje en %s…"
 
@@ -2334,7 +2317,7 @@ msgid "Saving sent message to %s failed: %s"
 msgstr "Ha fallado al guardar el mensaje %s: %s"
 
 #: ../libbalsa/send.c:985
-#, fuzzy, c-format
+#, c-format
 #| msgid ""
 #| "Relaying refused:\n"
 #| "%d: %s\n"
@@ -2343,42 +2326,40 @@ msgid ""
 "Sending message failed: %s\n"
 "Message left in your outbox."
 msgstr ""
-"Reenvío rechazado:\n"
-"%d: %s\n"
-"El mensaje se ha dejado en la bandeja de salida.\n"
+"Falló al enviar el mensaje: %s\n"
+"El mensaje se ha dejado en la bandeja de salida."
 
 # libmutt/mx.c:848
 # libmutt/mx.c:848
 #: ../libbalsa/send.c:1006
-#, fuzzy, c-format
+#, c-format
 #| msgid "Continue message to %s: %s"
 msgid "Sending queued messages to %s"
-msgstr "Continuar mensaje a %s: %s"
+msgstr "Enviando mensajes encolados a %s"
 
 # libmutt/imap/imap_ssl.c:229
 # libmutt/imap/imap_ssl.c:229
 #: ../libbalsa/send.c:1014
 #, c-format
-#| msgid "Connected to MTA"
 msgid "Connected to %s"
 msgstr "Conectado a %s"
 
 # src/mailbox-conf.c:581
 #: ../libbalsa/send.c:1068
-#, fuzzy, c-format
+#, c-format
 #| msgid "Scanning of %s failed: %s"
 msgid "Connecting SMTP server %s (%s) failed: %s"
-msgstr "Falló el escrutinio de %s: %s"
+msgstr "Falló al conectar al servidor SMTP %s (%s): %s"
 
 # libmutt/mx.c:848
 # libmutt/mx.c:848
 #: ../libbalsa/send.c:1091
-#, fuzzy, c-format
+#, c-format
 #| msgid "Forward message to %s: %s"
 msgid "Transmitted %u message to %s"
 msgid_plural "Transmitted %u messages to %s"
-msgstr[0] "Reenviar mensaje a %s: %s"
-msgstr[1] "Reenviar mensaje a %s: %s"
+msgstr[0] "Enviado %u mensaje a %s"
+msgstr[1] "Enviados %u mensajes a %s"
 
 # libmutt/mx.c:1375
 # libmutt/mx.c:1375
@@ -2426,7 +2407,6 @@ msgstr "SMTP sobre SSL (SMTPS)"
 # src/main-window.c:455
 #: ../libbalsa/smtp-server.c:299 ../libinit_balsa/assistant_page_user.c:69
 #: ../src/mailbox-conf.c:1295
-#| msgid "Required"
 msgid "TLS required"
 msgstr "Se requiere TLS"
 
@@ -2438,7 +2418,7 @@ msgstr "TLS si es posible (no recomendado)"
 #: ../libbalsa/smtp-server.c:301 ../libinit_balsa/assistant_page_user.c:71
 #: ../src/mailbox-conf.c:1297
 msgid "None (not recommended)"
-msgstr ""
+msgstr "Nada (no recomendado)"
 
 #: ../libbalsa/smtp-server.c:332
 #, c-format
@@ -2473,7 +2453,6 @@ msgstr "_Servidor:"
 
 #. security
 #: ../libbalsa/smtp-server.c:518 ../src/mailbox-conf.c:1290
-#| msgid "Security"
 msgid "Se_curity:"
 msgstr "_Seguridad:"
 
@@ -2485,7 +2464,6 @@ msgstr "El servidor requiere autenticación"
 # src/filter-edit-dialog.c:626
 # src/filter-edit-dialog.c:538
 #: ../libbalsa/smtp-server.c:523
-#| msgid "Notification:"
 msgid "_Authentication:"
 msgstr "_Autenticación:"
 
@@ -2527,14 +2505,12 @@ msgstr "Elegir certificado de cliente"
 # libmutt/imap/imap_ssl.c:523
 # libmutt/imap/imap_ssl.c:523
 #: ../libbalsa/smtp-server.c:559 ../src/mailbox-conf.c:266
-#| msgid "C_ertificate Pass Phrase:"
 msgid "Certificate _File:"
 msgstr "Archivo del _certificado:"
 
 # libmutt/imap/imap_ssl.c:523
 # libmutt/imap/imap_ssl.c:523
 #: ../libbalsa/smtp-server.c:566 ../src/mailbox-conf.c:272
-#| msgid "C_ertificate Pass Phrase:"
 msgid "Certificate _Pass Phrase:"
 msgstr "Frase de paso del _certificado:"
 
@@ -2684,7 +2660,7 @@ msgstr "_Papelera:"
 # libinit_balsa/balsa-druid-page-directory.gob:78
 # libinit_balsa/balsa-druid-page-directory.gob:78
 #: ../libinit_balsa/assistant_page_directory.c:83
-#, fuzzy, c-format
+#, c-format
 #| msgid ""
 #| "The pathname \"%s\" must be specified canonically -- it must start with a "
 #| "'/'."
@@ -2711,7 +2687,7 @@ msgstr "El buzón «%s» aparentemente no es válido."
 # libinit_balsa/balsa-druid-page-directory.gob:267
 # libinit_balsa/balsa-druid-page-directory.gob:267
 #: ../libinit_balsa/assistant_page_directory.c:189
-#, fuzzy, c-format
+#, c-format
 #| msgid ""
 #| "Problem Creating Mailboxes\n"
 #| "%s"
@@ -2719,18 +2695,16 @@ msgid ""
 "Problem verifying path “%s”:\n"
 "%s"
 msgstr ""
-"Problema al crear los buzones\n"
+"Problema al verificar la ruta «%s»:\n"
 "%s"
 
 #: ../libinit_balsa/assistant_page_directory.c:222
-#| msgid "Other options"
 msgid "_Verify locations"
 msgstr "_Verificar ubicaciones"
 
 # libinit_balsa/balsa-druid-page-directory.gob:151
 # libinit_balsa/balsa-druid-page-directory.gob:151
 #: ../libinit_balsa/assistant_page_directory.c:256
-#, fuzzy
 #| msgid ""
 #| "Please verify the locations of your default mail files.\n"
 #| "These will be created if necessary."
@@ -2738,8 +2712,8 @@ msgid ""
 "Please verify the locations of your default mail files. These will be "
 "created if necessary."
 msgstr ""
-"Verifique la ubicación predeterminada de sus archivos de correo.\n"
-"Éstos serán creados si es necesario."
+"Verifique la ubicación predeterminada de sus archivos de correo. Éstos se "
+"crearán si es necesario."
 
 # libinit_balsa/balsa-druid-page-directory.gob:194
 # libinit_balsa/balsa-druid-page-directory.gob:194
@@ -2750,7 +2724,6 @@ msgstr "Archivos de correo"
 # libinit_balsa/balsa-druid-page-finish.gob:45
 # libinit_balsa/balsa-druid-page-finish.gob:45
 #: ../libinit_balsa/assistant_page_finish.c:42
-#, fuzzy
 #| msgid ""
 #| "You've successfully set up Balsa. Have fun!\n"
 #| "   -- The Balsa development team"
@@ -2768,7 +2741,6 @@ msgid "All Done!"
 msgstr "Ya está todo hecho."
 
 #: ../libinit_balsa/assistant_page_user.c:55
-#, fuzzy
 #| msgid ""
 #| "The following settings are also needed (and you can find them later, if "
 #| "need be, in the Email application in the 'Preferences' and 'Identities' "
@@ -2778,9 +2750,9 @@ msgid ""
 "be, in the Email application in the “Preferences” and “Identities” menu "
 "items)"
 msgstr ""
-"La siguiente configuración también se necesita ( y puede encontrarla más "
+"La siguiente configuración también se necesita (y puede encontrarla más "
 "tarde, si la necesita, en la aplicación de correo electrónico en los "
-"comandos de «Preferencias» e «Identidades» en el menú «Herramientas»)"
+"elementos de menú de «Preferencias» e «Identidades»)"
 
 #: ../libinit_balsa/assistant_page_user.c:61
 msgid ""
@@ -2813,7 +2785,6 @@ msgid "_Type of mail server:"
 msgstr "_Tipo de servidor de correo:"
 
 #: ../libinit_balsa/assistant_page_user.c:114
-#| msgid "Connect using _SSL:"
 msgid "Connection _Security"
 msgstr "_Seguridad de la conexión"
 
@@ -2839,7 +2810,6 @@ msgid "Your real _name:"
 msgstr "Su nombre _real:"
 
 #: ../libinit_balsa/assistant_page_user.c:138
-#, fuzzy
 #| msgid "Your _Email Address, for this email account:"
 msgid "Your _email address for this email account:"
 msgstr "Su dirección de _correo-e, para esta cuenta de correo:"
@@ -2884,7 +2854,6 @@ msgid "Welcome to Balsa!"
 msgstr "¡Bienvenido a Balsa!"
 
 #: ../libinit_balsa/assistant_page_welcome.c:30
-#, fuzzy
 #| msgid ""
 #| "Before you can send or receive email:\n"
 #| "\n"
@@ -2906,11 +2875,11 @@ msgid ""
 msgstr ""
 "Antes de que pueda enviar o recibir correo-e:\n"
 "\n"
-" --debería tener ya acceso a Internet y una cuenta de correo, proporcionada  "
+"• debería tener ya acceso a Internet y una cuenta de correo, proporcionada  "
 "por un proveedor de servicios de Internet, y debería hacer esa conexión a "
 "Internet en su equipo\n"
 "\n"
-"--o su administrador de red en su lugar de trabajo/estudio/similar quizá "
+"• o su administrador de red en su lugar de trabajo/estudio/similar quizá "
 "haya configurado su equipo para conectarse a la red."
 
 #: ../libnetclient/net-client.c:78 ../libnetclient/net-client.c:116
@@ -2926,7 +2895,7 @@ msgstr "el cliente de red no está conectado"
 #: ../libnetclient/net-client.c:166
 #, c-format
 msgid "reply length %lu exceeds the maximum allowed length %lu"
-msgstr ""
+msgstr "la longitud %lu de la respuesta supera la el máximo %lu permitido"
 
 #: ../libnetclient/net-client.c:181
 #, c-format
@@ -2942,7 +2911,6 @@ msgstr "línea demasiado larga"
 # src/message-window.c:114
 #: ../libnetclient/net-client.c:298
 #, c-format
-#| msgid "Error printing message: %s"
 msgid "error initializing certificate: %s"
 msgstr "error al inicializar el certificado: %s"
 
@@ -2950,7 +2918,6 @@ msgstr "error al inicializar el certificado: %s"
 # src/sendmsg-window.c:1749
 #: ../libnetclient/net-client.c:308
 #, c-format
-#| msgid "Error loading Face: %s"
 msgid "error loading certificate: %s"
 msgstr "error al cargar el certificado: %s"
 
@@ -2958,7 +2925,6 @@ msgstr "error al cargar el certificado: %s"
 # src/message-window.c:114
 #: ../libnetclient/net-client.c:316
 #, c-format
-#| msgid "Error printing message: %s"
 msgid "error initializing key: %s"
 msgstr "error al inicializar la clave: %s"
 
@@ -2966,13 +2932,11 @@ msgstr "error al inicializar la clave: %s"
 # src/sendmsg-window.c:1749
 #: ../libnetclient/net-client.c:372
 #, c-format
-#| msgid "Error loading Face: %s"
 msgid "error loading key: %s"
 msgstr "error al cargar la clave: %s"
 
 #: ../libnetclient/net-client.c:412
 #, c-format
-#| msgid "Disconnected"
 msgid "not connected"
 msgstr "no conectado"
 
@@ -2987,10 +2951,10 @@ msgstr "la conexión ya está cifrada"
 #: ../libnetclient/net-client-pop.c:214 ../libnetclient/net-client-pop.c:431
 #: ../libnetclient/net-client-smtp.c:586 ../libnetclient/net-client-smtp.c:657
 #: ../libnetclient/net-client-smtp.c:699
-#, fuzzy, c-format
+#, c-format
 #| msgid "Mail server: %s\n"
 msgid "bad server reply: %s"
-msgstr "Servidor de correo: %s\n"
+msgstr "respuesta del servidor incorrecta: %s"
 
 #: ../libnetclient/net-client-pop.c:253
 #, c-format
@@ -3001,13 +2965,11 @@ msgstr "respuesta del servidor incorrecta"
 # libmutt/imap/imap_ssl.c:481
 #: ../libnetclient/net-client-pop.c:423 ../libnetclient/net-client-pop.c:702
 #, c-format
-#| msgid "POP3 error: %s."
 msgid "error: %s"
 msgstr "error: %s"
 
 #: ../libnetclient/net-client-pop.c:426
 #, c-format
-#| msgid "No error"
 msgid "error"
 msgstr "error"
 
@@ -3015,48 +2977,44 @@ msgstr "error"
 # src/mailbox-conf.c:904 src/mailbox-conf.c:961
 #: ../libnetclient/net-client-pop.c:489 ../libnetclient/net-client-smtp.c:396
 #, c-format
-#| msgid "Password needed"
 msgid "password required"
 msgstr "se necesita contraseña"
 
 #: ../libnetclient/net-client-pop.c:508 ../libnetclient/net-client-smtp.c:411
 #, c-format
 msgid "no suitable authentication mechanism"
-msgstr ""
+msgstr "no hay un mecanismo de autenticación adecuado"
 
 #: ../libnetclient/net-client-smtp.c:142
-#, fuzzy, c-format
+#, c-format
 #| msgid ""
 #| "\n"
 #| "the server does not support ACLs"
 msgid "remote server does not support STARTTLS"
-msgstr ""
-"\n"
-"el servidor no soporta listas de control de acceso (ACL)"
+msgstr "el servidor no soporta STARTTLS"
 
 # libmutt/imap/imap_ssl.c:481
 # libmutt/imap/imap_ssl.c:481
 #: ../libnetclient/net-client-smtp.c:689
-#, fuzzy, c-format
+#, c-format
 #| msgid "Sending error: %s"
 msgid "transient error %d: %s"
-msgstr "Enviando error: %s"
+msgstr "error temporal %d: %s"
 
 # libmutt/imap/imap_ssl.c:481
 # libmutt/imap/imap_ssl.c:481
 #: ../libnetclient/net-client-smtp.c:694
 #, c-format
-#| msgid "Sending error: %s"
 msgid "permanent error %d: %s"
 msgstr "error permanente %d: %s"
 
 # libmutt/imap/auth.c:373
 # libmutt/imap/auth.c:373
 #: ../libnetclient/net-client-utils.c:143
-#, fuzzy, c-format
+#, c-format
 #| msgid "Removing duplicates failed: %s"
 msgid "importing GSS service name %s failed: %s"
-msgstr "La eliminación de duplicados falló: %s"
+msgstr "falló al importar el nombre del servicio GSS %s: %s"
 
 #: ../libnetclient/net-client-utils.c:186
 #, c-format
@@ -3082,7 +3040,6 @@ msgstr "no se puede crear la solicitud de inicio de sesión GSS :%s"
 # libmutt/imap/imap_ssl.c:254
 #: ../libnetclient/net-client-utils.c:315
 #, c-format
-#| msgid "unknown error"
 msgid "unknown error code %u:%u"
 msgstr "código de error desconocido %u:%u"
 
@@ -3365,10 +3322,9 @@ msgid "Osmo Address Book"
 msgstr "Libreta de direcciones Osmo"
 
 #: ../src/balsa-app.c:64 ../src/folder-conf.c:281 ../src/mailbox-conf.c:1378
-#, fuzzy
 #| msgid "_Remember password in keyring"
 msgid "_Remember password in Secret Service"
-msgstr "_Recordar la contraseña en el depósito de claves"
+msgstr "_Recordar la contraseña en el servicio secreto"
 
 #: ../src/balsa-app.c:67 ../src/folder-conf.c:284 ../src/mailbox-conf.c:1381
 msgid "_Remember password in keyring"
@@ -3795,7 +3751,7 @@ msgid "Sending the disposition notification failed: %s"
 msgstr "El envío de la notificación de entrega ha fallado: %s"
 
 #: ../src/balsa-message.c:2582
-#, fuzzy, c-format
+#, c-format
 #| msgid ""
 #| "The sender of this mail, %s, requested \n"
 #| "a Message Disposition Notification(MDN) to be returned to `%s'.\n"
@@ -3805,8 +3761,9 @@ msgid ""
 "a Message Disposition Notification (MDN) to be returned to “%s”.\n"
 "Do you want to send this notification?"
 msgstr ""
-"El remitente de este correo, %s, pidió que se le devolviera a «%s» una "
-"Notificación de Entrega del Mensaje (MDN). ¿Quiere enviar esta notificación?"
+"El remitente de este correo, %s, pidió que se le \n"
+"devolviera a «%s» una Notificación de Entrega del Mensaje (MDN).\n"
+"¿Quiere enviar esta notificación?"
 
 # src/sendmsg-window.c:1129
 # src/sendmsg-window.c:1180
@@ -3837,7 +3794,7 @@ msgid "Possible disk space problem."
 msgstr "Posible problema de espacio en el disco."
 
 #: ../src/balsa-message.c:2838
-#, fuzzy, c-format
+#, c-format
 #| msgid ""
 #| "The message sent by %s with subject \"%s\" contains an encrypted part, "
 #| "but it's structure is invalid."
@@ -3846,10 +3803,10 @@ msgid ""
 "structure is invalid."
 msgstr ""
 "El mensaje enviado por %s con el asunto «%s» contiene una parte cifrada, "
-"pero la estructura es inválida."
+"pero la estructura no es válida."
 
 #: ../src/balsa-message.c:2846
-#, fuzzy, c-format
+#, c-format
 #| msgid ""
 #| "The message sent by %s with subject \"%s\" contains a PGP encrypted part, "
 #| "but this crypto protocol is not available."
@@ -3915,7 +3872,7 @@ msgid "Detected a good signature with insufficient validity/trust"
 msgstr "Se detectó una firma buena con validez/confianza insuficiente"
 
 #: ../src/balsa-message.c:2984 ../src/balsa-message.c:3103
-#, fuzzy, c-format
+#, c-format
 #| msgid ""
 #| "Checking the signature of the message sent by %s with subject \"%s\" "
 #| "returned:\n"
@@ -4291,7 +4248,7 @@ msgid "Email Address:"
 msgstr "Dirección de correo-e:"
 
 #: ../src/balsa-mime-widget-text.c:1274
-#, fuzzy, c-format
+#, c-format
 #| msgid ""
 #| "The message sent by %s with subject \"%s\" contains 8-bit characters, but "
 #| "no header describing the used codeset (converted to %s)"
@@ -4300,7 +4257,7 @@ msgid ""
 "header describing the used codeset (converted to %s)"
 msgstr ""
 "El mensaje enviado por %s con el asunto «%s» contiene caracteres de 8 bits, "
-"pero no contiene ninguna cabecera describiendo el conjunto de caracteres "
+"pero no contiene ninguna cabecera que describa el conjunto de caracteres "
 "usado (convertido a %s)"
 
 #: ../src/balsa-mime-widget-vcalendar.c:65
@@ -4901,18 +4858,16 @@ msgid "_Apply Selected"
 msgstr "_Aplicar seleccionados"
 
 #: ../src/filter-run-dialog.c:375
-#, fuzzy
 #| msgid "Edit the selected mailbox"
 msgid "Add selected filter to mailbox"
-msgstr "Editar el buzón seleccionado"
+msgstr "Añadir el filtro seleccionado al buzón"
 
 # src/main-window.c:403
 # src/main-window.c:406
 #: ../src/filter-run-dialog.c:385
-#, fuzzy
 #| msgid "Remove duplicated messages from the current mailbox"
 msgid "Remove selected filter from mailbox"
-msgstr "Eliminar los mensajes duplicados del buzón actual"
+msgstr "Quitar el filtro seleccionado del buzón"
 
 # src/main-window.c:392
 # src/main-window.c:389
@@ -5200,9 +5155,6 @@ msgstr ""
 # src/mailbox-conf.c:157
 #: ../src/folder-conf.c:1012
 #, c-format
-#| msgid ""
-#| "This will remove the folder \"%s\" from the list.\n"
-#| "You may use \"New IMAP Folder\" later to add this folder again.\n"
 msgid ""
 "This will remove the folder “%s” from the list.\n"
 "You may use “New IMAP Folder” later to add this folder again.\n"
@@ -5292,12 +5244,6 @@ msgstr ""
 # src/mailbox-conf.c:157
 #: ../src/mailbox-conf.c:448
 #, c-format
-#| msgid ""
-#| "This will remove the mailbox \"%s\" from the list of mailboxes.  You may "
-#| "also delete the disk file or files associated with this mailbox.\n"
-#| "If you do not remove the file on disk you may \"Add  Mailbox\" to access "
-#| "the mailbox again.\n"
-#| "What would you like to do?"
 msgid ""
 "This will remove the mailbox “%s” from the list of mailboxes. You may also "
 "delete the disk file or files associated with this mailbox.\n"
@@ -5323,13 +5269,6 @@ msgstr "Eliminar el buzón de la lista y el _disco"
 
 #: ../src/mailbox-conf.c:469
 #, c-format
-#| msgid ""
-#| "This will remove the mailbox \"%s\" and all its messages from your IMAP "
-#| "server.  If %s has subfolders, it will still appear as a node in the "
-#| "folder tree.\n"
-#| "You may use \"New IMAP subfolder\" later to add a mailbox with this "
-#| "name.\n"
-#| "What would you like to do?"
 msgid ""
 "This will remove the mailbox “%s” and all its messages from your IMAP "
 "server. If %s has subfolders, it will still appear as a node in the folder "
@@ -5353,10 +5292,6 @@ msgstr "_Eliminar del servidor"
 # src/mailbox-conf.c:157
 #: ../src/mailbox-conf.c:489
 #, c-format
-#| msgid ""
-#| "This will remove the mailbox \"%s\" from the list of mailboxes.\n"
-#| "You may use \"Add Mailbox\" later to access this mailbox again.\n"
-#| "What would you like to do?"
 msgid ""
 "This will remove the mailbox “%s” from the list of mailboxes.\n"
 "You may use “Add Mailbox” later to access this mailbox again.\n"
@@ -5466,7 +5401,7 @@ msgstr "Desactivar _APOP"
 #. toggle for enabling pipeling
 #: ../src/mailbox-conf.c:1336
 msgid "Overlap commands"
-msgstr ""
+msgstr "Superponer comandos"
 
 # src/mailbox-conf.c:822 src/mailbox-conf.c:882
 # src/mailbox-conf.c:899 src/mailbox-conf.c:957
@@ -6271,7 +6206,6 @@ msgid "Send button always queues outgoing mail in outbox"
 msgstr "El botón de envío siempre encola el correo en la bandeja de salida"
 
 #: ../src/pref-manager.c:2306
-#| msgid "_Check mail automatically every"
 msgid "_Send queued mail automatically every"
 msgstr "_Enviar el correo encolado automáticamente cada"
 
@@ -6292,10 +6226,9 @@ msgid "Use preview pane"
 msgstr "Usar panel de vista previa"
 
 #: ../src/pref-manager.c:2343
-#, fuzzy
 #| msgid "Select all messages in current mailbox"
 msgid "Show message counts in mailbox list"
-msgstr "Seleccionar todos los mensajes en el buzón actual"
+msgstr "Mostrar contadores de mensajes en la lista de buzones"
 
 #: ../src/pref-manager.c:2349
 msgid "Automatically view message when mailbox opened"
@@ -6678,7 +6611,6 @@ msgid "Signed matter"
 msgstr "Impreso firmado"
 
 #: ../src/print-gtk.c:154
-#| msgid "encrypted parts"
 msgid "Encrypted matter"
 msgstr "Parte cifrada"
 
@@ -7292,7 +7224,6 @@ msgid "not in current directory"
 msgstr "no está en el directorio actual"
 
 #: ../src/sendmsg-window.c:4567
-#, fuzzy
 #| msgid ""
 #| "The link that you selected created\n"
 #| "a \"Blind copy\" (Bcc) address.\n"
@@ -7304,13 +7235,13 @@ msgid ""
 "Please check that the address\n"
 "is appropriate."
 msgstr ""
-"El enlace que selección creó una dirección de \n"
-"Copia oculta (Cco). Compruebe que la\n"
+"El enlace que selección creó\n"
+"una dirección de Copia oculta (Cco).\n"
+"Compruebe que la\n"
 "dirección es apropiada."
 
 #: ../src/sendmsg-window.c:4676
 #, c-format
-#| msgid "attached file “%s” (%s)"
 msgid "Cannot not read the file “%s”: %s"
 msgstr "No se puede leer el archivo «%s»: %s"
 
@@ -7757,7 +7688,6 @@ msgid "Send"
 msgstr "Enviar"
 
 #: ../src/toolbar-factory.c:160
-#| msgid "_Send Queued Mail"
 msgid "Send queued"
 msgstr "Enviar encolados"
 
@@ -7947,7 +7877,6 @@ msgstr "Subir el elemento seleccionado"
 # src/main-window.c:392
 # src/main-window.c:389
 #: ../src/toolbar-prefs.c:520
-#| msgid "Save selected to folder..."
 msgid "Remove selected item from toolbar"
 msgstr "Quitar el elemento seleccionado de la barra de herramientas"
 

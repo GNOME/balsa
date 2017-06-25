@@ -1,3 +1,11 @@
+2017-06-25  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Decode all RFC-2047-encoded headers
+
+	* libbalsa/message.c
+	  (prepend_header_misc): decode header value;
+	  (libbalsa_message_user_hdrs_from_gmime): streamline code.
+
 2017-06-19  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Possible fix for Red Hat Bugzilla #1462546, reported by jamesbdonovan@rambler.ru

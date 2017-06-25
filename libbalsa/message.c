@@ -429,9 +429,10 @@ libbalsa_message_set_user_header(LibBalsaMessage * message,
                                                     g_strdup(value)));
 }
 
-static void
-prepend_header_misc(const char *name, const char *value,
-                    gpointer user_data)
+static GList *
+prepend_header_misc(GList      *res,
+                    const char *name,
+                    const char *value)
 {
     char lcname[28]; /* one byte longer than the longest ignored header */
     static const char ignored_headers[] =
@@ -439,22 +440,24 @@ prepend_header_misc(const char *name, const char *value,
         "message-id references in-reply-to status lines"
         "disposition-notification-to";
     unsigned i;
-    GList *res = *(GList **)user_data;
-    if (!*value)
-	/* Empty header */
-	return;
-    /* Standard Headers*/
-    for(i=0; i<sizeof(lcname)-1 && name[i]; i++)
-        lcname[i] = tolower(name[i]);
-    if (i < sizeof(lcname)) {
-	/* short enough to be on the ignored-headers list */
-        lcname[i] = '\0';
-        if(strstr(ignored_headers, lcname))
-            return;
-    }
 
-    res = g_list_prepend(res, libbalsa_create_hdr_pair(name, g_strdup(value)));
-    *(GList **)user_data = res;
+    if (value[0] == '\0')
+	/* Empty header */
+	return res;
+
+    /* Standard Headers*/
+    for(i = 0; i < sizeof(lcname) - 1 && name[i] != '\0'; i++) {
+        lcname[i] = tolower(name[i]);
+    }
+    lcname[i] = '\0';
+
+    if(strstr(ignored_headers, lcname) != NULL)
+        return res;
+
+    return
+        g_list_prepend(res,
+                       libbalsa_create_hdr_pair(name,
+                                                g_mime_utils_header_decode_text(value)));
 }
 
 /* 
@@ -523,9 +526,9 @@ libbalsa_message_user_hdrs_from_gmime(GMimeMessage * message)
     hdrlist = g_mime_object_get_header_list (GMIME_OBJECT(message));
     if (g_mime_header_list_get_iter (hdrlist, &iter)) {
 	do {
-	    prepend_header_misc (g_mime_header_iter_get_name (&iter),
-				 g_mime_header_iter_get_value (&iter),
-				 &res);
+            res = prepend_header_misc(res,
+                                      g_mime_header_iter_get_name (&iter),
+                                      g_mime_header_iter_get_value (&iter));
 	} while (g_mime_header_iter_next (&iter));
     }
     

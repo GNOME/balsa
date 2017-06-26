@@ -846,7 +846,7 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
                                    sdd, row, sdd->old_folder, label);
 
     ++row;
-    label = libbalsa_create_grid_label(_("Host:"), grid, row);
+    (void) libbalsa_create_grid_label(_("Host:"), grid, row);
     sdd->host_label =
         gtk_label_new(sdd->mbnode && sdd->mbnode->server
                       ? sdd->mbnode->server->host : "");
@@ -855,7 +855,7 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
     gtk_grid_attach(GTK_GRID(grid), sdd->host_label, 1, row, 1, 1);
 
     ++row;
-    label = libbalsa_create_grid_label(_("Subfolder of:"), grid, row);
+    (void) libbalsa_create_grid_label(_("Subfolder of:"), grid, row);
     sdd->parent_folder = gtk_entry_new();
     gtk_editable_set_editable(GTK_EDITABLE(sdd->parent_folder), FALSE);
     gtk_entry_set_text(GTK_ENTRY(sdd->parent_folder), sdd->old_parent);
@@ -886,7 +886,7 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
         gchar * quotas;
 
         ++row;
-        label = libbalsa_create_grid_label(_("Permissions:"), grid, row);
+        (void) libbalsa_create_grid_label(_("Permissions:"), grid, row);
 
         /* mailbox closed: no detailed permissions available */
         if (!libbalsa_mailbox_imap_is_connected(LIBBALSA_MAILBOX_IMAP(mn->mailbox))) {
@@ -947,7 +947,7 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
         g_free(rights);
 
         ++row;
-        label = libbalsa_create_grid_label(_("Quota:"), grid, row);
+        (void) libbalsa_create_grid_label(_("Quota:"), grid, row);
 
         /* mailbox closed: no quota available */
         if (!libbalsa_mailbox_imap_is_connected(LIBBALSA_MAILBOX_IMAP(mn->mailbox)))

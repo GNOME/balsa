@@ -1,5 +1,11 @@
 2017-06-25  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Do not store label values that are never read
+
+	* src/folder-conf.c (folder_conf_imap_sub_node):
+
+2017-06-25  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Remove unused initializer
 
 	* src/toolbar-prefs.c (tp_page_swap_rows):

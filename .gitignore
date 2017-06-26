@@ -58,3 +58,4 @@ stamp-h1
 autoscan.log
 configure.scan
 gnome-doc-utils.make
+libnetclient/test/start-test-env.sh

@@ -3426,8 +3426,12 @@ bw_mailbox_check(LibBalsaMailbox * mailbox, BalsaWindow * window)
 	string = g_strdup_printf(_("IMAP mailbox: %s"), mailbox->url);
         if (balsa_app.debug)
             fprintf(stderr, "%s\n", string);
-    } else if (LIBBALSA_IS_MAILBOX_LOCAL(mailbox))
+    } else if (LIBBALSA_IS_MAILBOX_LOCAL(mailbox)) {
 	string = g_strdup_printf(_("Local mailbox: %s"), mailbox->name);
+    } else {
+        g_assert_not_reached();
+    }
+
     MSGMAILTHREAD(threadmessage, LIBBALSA_NTFY_SOURCE, NULL, string, 0, 0);
     g_free(string);
 

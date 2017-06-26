@@ -1035,12 +1035,17 @@ gpg_updates_trustdb(void)
     struct passwd *pwent;
     struct stat stat_buf;
 
-    if (!lockname)
-	if ((pwent = getpwuid(getuid())))
+    if (lockname == NULL) {
+	if ((pwent = getpwuid(getuid())) != NULL) {
 	    lockname =
 		g_strdup_printf("%s/.gnupg/trustdb.gpg.lock",
 				pwent->pw_dir);
-    if (!stat(lockname, &stat_buf)) {
+        } else {
+            g_assert_not_reached();
+        }
+    }
+
+    if (stat(lockname, &stat_buf) == 0) {
 	libbalsa_information(LIBBALSA_INFORMATION_ERROR, "%s%s",
 			     _
 			     ("GnuPG is rebuilding the trust database and is currently unavailable."),

@@ -1,5 +1,11 @@
 2017-06-25  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Remove unused initializer
+
+	* src/toolbar-prefs.c (tp_page_swap_rows):
+
+2017-06-25  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Decode all RFC-2047-encoded headers
 
 	* libbalsa/message.c

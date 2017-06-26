@@ -789,8 +789,7 @@ tp_page_swap_rows(ToolbarPage * page, gboolean forward)
 {
     GtkTreeModel *model =
         gtk_tree_view_get_model(GTK_TREE_VIEW(page->current));
-    GtkTreeSelection *selection =
-        gtk_tree_view_get_selection(GTK_TREE_VIEW(page->current));
+    GtkTreeSelection *selection;
     GtkTreeIter iter;
     GtkTreeIter tmp_iter;
     GtkTreePath *tmp_path;

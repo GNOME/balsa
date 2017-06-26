@@ -1,5 +1,12 @@
 2017-06-26  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Assert that getpwuid returns a valid passwd structure
+
+	* libbalsa/rfc3156.c (gpg_updates_trustdb): Assert that
+	  getpwuid returns a valid passwd structure.
+
+2017-06-26  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Assert that a mailbox is either IMAP or local
 
 	* src/main-window.c (bw_mailbox_check): assert that a mailbox is

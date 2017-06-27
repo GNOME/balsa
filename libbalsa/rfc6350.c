@@ -268,7 +268,6 @@ rfc6350_eval_line(gchar			  *line,
 		value = &value[1];
 		if ((name[0] == '\0') || (value[0] == '\0')) {
 			g_set_error(error, RFC6350_ERROR_QUARK, RFC6350_ERROR_EMPTY, _("malformed line “%s”, empty name or value"), line);
-			result = FALSE;
 		} else {
 			g_debug("%s: line='%s' name='%s', value='%s'", __func__, line, name, value);
 			if (g_ascii_strcasecmp(name, "FN") == 0) {

@@ -2317,6 +2317,17 @@ pipe_in_watch(GIOChannel *channel, GIOCondition condition, gpointer data)
     gsize chars_written;
     gboolean rc;
 
+    if ((condition & (G_IO_HUP | G_IO_ERR)) != 0) {
+        if ((condition & G_IO_HUP) != 0) {
+            fprintf(stderr, "pipe_in_watch: broken pipe. Aborts writing.\n");
+        }
+        if ((condition & G_IO_ERR) != 0) {
+            fprintf(stderr, "pipe_in_watch encountered error. Aborts writing.\n");
+        }
+	pipe_data_destroy(pipe);
+        return FALSE;
+    }
+
     if( (condition & G_IO_OUT) == G_IO_OUT) {
 	status =
 	    g_io_channel_write_chars(channel,
@@ -2346,15 +2357,7 @@ pipe_in_watch(GIOChannel *channel, GIOCondition condition, gpointer data)
 	    break;
 	}
     }
-    if( (condition & G_IO_HUP) == G_IO_HUP) {
-	pipe_data_destroy(pipe);
-	rc = FALSE;
-    }
-    if( (condition & G_IO_ERR) == G_IO_ERR) {
-	fprintf(stderr,
-		"pipe_in_watch encountered error. Aborts writing.\n");
-	return FALSE;
-    }
+
     rc = pipe->message_length > pipe->chars_written;
     if(!rc) {
 	g_io_channel_unref(pipe->in_channel); pipe->in_channel = NULL;

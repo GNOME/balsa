@@ -1,3 +1,10 @@
+2017-06-28  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Handle broken pipe and other errors before writing to pipe
+
+	* src/balsa-index.c (pipe_in_watch): handle G_IO_HUP or G_IO_ERR
+	and return, before writing to the pipe.
+
 2017-06-26  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Remove dead assignment

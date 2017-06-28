@@ -769,6 +769,8 @@ bw_action_set_enabled(BalsaWindow * window,
 {
     GAction *action;
 
+    g_assert(window != NULL);
+
     /* Is the window being destroyed? */
     if (window->preview == NULL)
         return;

@@ -1,5 +1,12 @@
 2017-06-28  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Assert that the BalsaWindow is not NULL
+
+	* src/main-window.c (bw_action_set_enabled): assert that the
+	BalsaWindow is not NULL.
+
+2017-06-28  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Handle GError pointer more carefully
 
 	* libbalsa/body.c

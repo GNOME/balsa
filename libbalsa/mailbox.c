@@ -1735,6 +1735,7 @@ lbm_next(GNode * node)
         if (node->next)
             return node->next;
         node = node->parent;
+        g_assert(node != NULL);
     } while (!G_NODE_IS_ROOT(node));
 
     return node;

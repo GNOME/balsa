@@ -1,5 +1,13 @@
 2017-06-28  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Assert that a node is not NULL
+
+	* libbalsa/mailbox.c (lbm_next): assert that node is not NULL
+	before testing whether it is the root node
+
+
+2017-06-28  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Check for NULL pointer
 
 	* libbalsa/mailbox.c (lbm_sort): check for NULL prev.

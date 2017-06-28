@@ -3508,7 +3508,8 @@ lbm_sort(LibBalsaMailbox * mbox, GNode * parent)
             g_assert(prev == NULL || prev->next == tmp_node);
         prev = tmp_node;
     }
-    prev->next = NULL;
+    if (prev != NULL)
+        prev->next = NULL;
 
     /* Let the world know about our new order */
     new_order = g_new(gint, node_array->len);

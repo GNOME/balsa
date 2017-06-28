@@ -1,5 +1,11 @@
 2017-06-28  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Check for NULL pointer
+
+	* libbalsa/mailbox.c (lbm_sort): check for NULL prev.
+
+2017-06-28  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Handle broken pipe and other errors before writing to pipe
 
 	* src/balsa-index.c (pipe_in_watch): handle G_IO_HUP or G_IO_ERR

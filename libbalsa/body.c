@@ -217,13 +217,9 @@ static void
 libbalsa_message_body_set_text_rfc822headers(LibBalsaMessageBody *body)
 {
     GMimeStream *headers;
-    GError *err = NULL;
 
     libbalsa_mailbox_lock_store(body->message->mailbox);
-    headers = libbalsa_message_body_get_stream(body, &err);
-    if (err != NULL) {
-	g_error_free(err);
-    }
+    headers = libbalsa_message_body_get_stream(body, NULL);
 
     if (headers != NULL) {
 	GMimeMessage *dummy_msg;
@@ -584,21 +580,33 @@ libbalsa_message_body_get_stream(LibBalsaMessageBody * body, GError **err)
     g_return_val_if_fail(body->message != NULL, NULL);
 
     if (!body->message->mailbox) {
-        g_set_error(err, LIBBALSA_MAILBOX_ERROR,
-                    LIBBALSA_MAILBOX_ACCESS_ERROR,
-                    "Internal error in get_stream");
+        if (err != NULL && *err == NULL) {
+            g_set_error(err, LIBBALSA_MAILBOX_ERROR,
+                        LIBBALSA_MAILBOX_ACCESS_ERROR,
+                        "Internal error in get_stream");
+        }
         return NULL;
     }
 
     if (!libbalsa_mailbox_get_message_part(body->message, body, err)
-        || !(GMIME_IS_PART(body->mime_part)
-             || GMIME_IS_MESSAGE_PART(body->mime_part))) {
-        if (err && !*err)
+        || body->mime_part == NULL) {
+        if (err != NULL && *err == NULL) {
+            g_set_error(err, LIBBALSA_MAILBOX_ERROR,
+                        LIBBALSA_MAILBOX_ACCESS_ERROR,
+                        "Cannot get stream for part");
+        }
+        return NULL;
+    }
+
+    if (!(GMIME_IS_PART(body->mime_part)
+          || GMIME_IS_MESSAGE_PART(body->mime_part))) {
+        if (err != NULL && *err == NULL) {
             g_set_error(err, LIBBALSA_MAILBOX_ERROR,
                         LIBBALSA_MAILBOX_ACCESS_ERROR,
                         "Cannot get stream for part of type %s",
                         g_type_name(G_TYPE_FROM_INSTANCE
                                     (body->mime_part)));
+        }
         return NULL;
     }
 

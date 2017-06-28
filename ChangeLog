@@ -1,5 +1,15 @@
 2017-06-28  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Handle GError pointer more carefully
+
+	* libbalsa/body.c
+	(libbalsa_message_body_set_text_rfc822headers): do not create a
+	GError and then ignore it;
+	(libbalsa_message_body_get_stream): allow NULL GError pointer,
+	and take more care in setting errors when it is non-NULL.
+
+2017-06-28  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Assert that a node is not NULL
 
 	* libbalsa/mailbox.c (lbm_next): assert that node is not NULL

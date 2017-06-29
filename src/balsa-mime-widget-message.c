@@ -676,6 +676,8 @@ add_header_address_list(BalsaMessage * bm, GtkGrid * grid,
 static void
 foreach_label(GtkWidget * widget, LibBalsaMessageBody * part)
 {
+    g_assert(widget != NULL);
+
     if (GTK_IS_CONTAINER(widget))
         gtk_container_foreach(GTK_CONTAINER(widget),
                               (GtkCallback) foreach_label, part);

@@ -1,5 +1,12 @@
 2017-06-28  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Assert that a child widget is non-NULL
+
+	* src/balsa-mime-widget-message.c (foreach_label): assert that
+	the widget is non-NULL.
+
+2017-06-28  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Assert that the BalsaWindow is not NULL
 
 	* src/main-window.c (bw_action_set_enabled): assert that the

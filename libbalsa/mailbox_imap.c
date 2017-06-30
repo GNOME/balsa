@@ -943,6 +943,8 @@ imap_expunge_cb(ImapMboxHandle *handle, unsigned seqno,
     for (i = seqno - 1; i < mimap->messages_info->len; i++) {
 	struct message_info *msg_info =
 	    &g_array_index(mimap->messages_info, struct message_info, i);
+
+        g_assert(msg_info != NULL);
 	if (msg_info->message)
 	    msg_info->message->msgno = i + 1;
     }
@@ -2206,6 +2208,7 @@ get_struct_from_cache(LibBalsaMailbox *mailbox, LibBalsaMessage *message,
                                             message->mime_msg);
     }
     if(flags & LB_FETCH_RFC822_HEADERS) {
+        g_assert(message->headers != NULL);
         message->headers->user_hdrs = 
             libbalsa_message_user_hdrs_from_gmime(message->mime_msg);
         message->has_all_headers = 1;

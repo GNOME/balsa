@@ -349,6 +349,8 @@ lb_imap_server_info_new(LibBalsaServer *server)
 static void
 lb_imap_server_info_free(struct handle_info *info)
 {
+    g_assert(info != NULL);
+
     imap_handle_force_disconnect(info->handle);
     g_object_unref(info->handle);
     g_free(info);

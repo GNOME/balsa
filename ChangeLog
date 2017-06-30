@@ -1,3 +1,17 @@
+2017-06-30  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Add assertions to remove some clang-static-analyzer false
+	positives
+
+	* libbalsa/imap-server.c (lb_imap_server_info_free): assert that
+	info is non-NULL.
+	* libbalsa/mailbox_imap.c (imap_expunge_cb): assert that
+	msg_info is non-NULL;
+	(get_struct_from_cache): assert that message->headers is
+	non-NULL.
+	* libbalsa/mailbox_local.c (libbalsa_mailbox_local_set_path):
+	assert that klass is non-NULL.
+
 2017-06-28  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Assert that a child widget is non-NULL

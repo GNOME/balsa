@@ -234,11 +234,13 @@ libbalsa_mailbox_local_set_path(LibBalsaMailboxLocal * mailbox,
                                 const gchar * path, gboolean create)
 {
     int i;
-    LibBalsaMailboxLocalClass *klass =
-        LIBBALSA_MAILBOX_LOCAL_GET_CLASS(mailbox);
+    LibBalsaMailboxLocalClass *klass;
 
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX_LOCAL(mailbox), -1);
     g_return_val_if_fail(path != NULL, -1);
+
+    klass = LIBBALSA_MAILBOX_LOCAL_GET_CLASS(mailbox);
+    g_assert(klass != NULL);
 
     if (LIBBALSA_MAILBOX(mailbox)->url != NULL) {
         const gchar *cur_path = libbalsa_mailbox_local_get_path(mailbox);

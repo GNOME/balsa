@@ -25,6 +25,8 @@ libbalsa/libbalsa.c
 libbalsa/libbalsa-conf.c
 libbalsa/libbalsa-gpgme.c
 libbalsa/libbalsa-gpgme-cb.c
+libbalsa/libbalsa-gpgme-keys.c
+libbalsa/libbalsa-gpgme-widgets.c
 libbalsa/libbalsa-progress.c
 libbalsa/libbalsa-vfs.c
 libbalsa/mailbox.c

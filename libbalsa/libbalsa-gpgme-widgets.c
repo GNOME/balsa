@@ -104,7 +104,7 @@ libbalsa_gpgme_key(gpgme_key_t           key,
 		GtkWidget *uid_box;
 		gpgme_user_id_t uid;
 
-		uid_expander = gtk_expander_new(_("Additional User ID's"));
+		uid_expander = gtk_expander_new(_("Additional User IDs"));
 		gtk_expander_set_expanded(GTK_EXPANDER(uid_expander), expanded);
 		gtk_grid_attach(GTK_GRID(key_data), uid_expander, 0, row++, 2, 1);
 

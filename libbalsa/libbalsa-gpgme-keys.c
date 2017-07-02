@@ -340,7 +340,7 @@ gpgme_import_key(gpgme_ctx_t   ctx,
 				info = g_string_new(_("The key was updated in the local key ring:"));
 				if (import_result->new_user_ids > 0) {
 					g_string_append_printf(info,
-						ngettext("\n\342\200\242 %d new user ID", "\n\342\200\242 %d new user ID's", import_result->new_user_ids),
+						ngettext("\n\342\200\242 %d new user ID", "\n\342\200\242 %d new user IDs", import_result->new_user_ids),
 						import_result->new_user_ids);
 				}
 				if (import_result->new_sub_keys > 0) {

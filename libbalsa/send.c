@@ -1785,17 +1785,12 @@ do_multipart_crypto(LibBalsaMessage *message,
     /* check which protocol should be used */
     if (message->gpg_mode & LIBBALSA_PROTECT_RFC3156) {
         protocol = GPGME_PROTOCOL_OpenPGP;
-    }
-#   ifdef HAVE_SMIME
-    else if (message->gpg_mode & LIBBALSA_PROTECT_SMIMEV3) {
+    } else if (message->gpg_mode & LIBBALSA_PROTECT_SMIMEV3) {
         protocol = GPGME_PROTOCOL_CMS;
-    }
-#   endif
-    else if (message->gpg_mode & LIBBALSA_PROTECT_OPENPGP) {
+    } else if (message->gpg_mode & LIBBALSA_PROTECT_OPENPGP) {
         return LIBBALSA_MESSAGE_CREATE_OK;  /* already done... */
     } else {
         return LIBBALSA_MESSAGE_ENCRYPT_ERROR;  /* hmmm.... */
-
     }
     always_trust = (message->gpg_mode & LIBBALSA_PROTECT_ALWAYS_TRUST) != 0;
     /* sign and/or encrypt */

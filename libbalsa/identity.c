@@ -2045,11 +2045,9 @@ display_frame_set_gpg_mode(GObject * dialog, const gchar* key, gint * value)
         case LIBBALSA_PROTECT_OPENPGP:
 	    gtk_combo_box_set_active(opt_menu, 1);
             break;
-#ifdef HAVE_SMIME
         case LIBBALSA_PROTECT_SMIMEV3:
 	    gtk_combo_box_set_active(opt_menu, 2);
             break;
-#endif
         case LIBBALSA_PROTECT_RFC3156:
         default:
 	    gtk_combo_box_set_active(opt_menu, 0);
@@ -2086,10 +2084,8 @@ ident_dialog_add_gpg_menu(GtkWidget * grid, gint row, GtkDialog * dialog,
                   GINT_TO_POINTER(LIBBALSA_PROTECT_RFC3156), opt_menu);
     add_show_menu(_("GnuPG OpenPGP mode"),
                   GINT_TO_POINTER(LIBBALSA_PROTECT_OPENPGP), opt_menu);
-#ifdef HAVE_SMIME
     add_show_menu(_("GpgSM S/MIME mode"),
                   GINT_TO_POINTER(LIBBALSA_PROTECT_SMIMEV3), opt_menu);
-#endif
 }
 
 /* add_show_menu: helper function */

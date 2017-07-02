@@ -6437,12 +6437,10 @@ bsmsg_update_gpg_ui_on_ident_change(BalsaSendmsg * bsmsg,
         bsmsg->gpg_mode |= LIBBALSA_PROTECT_OPENPGP;
         g_action_change_state(action, g_variant_new_string("open-pgp"));
         break;
-#ifdef HAVE_SMIME
     case LIBBALSA_PROTECT_SMIMEV3:
         bsmsg->gpg_mode |= LIBBALSA_PROTECT_SMIMEV3;
         g_action_change_state(action, g_variant_new_string("smime"));
         break;
-#endif
     case LIBBALSA_PROTECT_RFC3156:
     default:
         bsmsg->gpg_mode |= LIBBALSA_PROTECT_RFC3156;
@@ -6472,12 +6470,9 @@ bsmsg_setup_gpg_ui_by_mode(BalsaSendmsg *bsmsg, gint mode)
     sw_action_set_active(bsmsg, "encrypt", mode & LIBBALSA_PROTECT_ENCRYPT);
 
     action = sw_get_action(bsmsg, "gpg-mode");
-#ifdef HAVE_SMIME
     if (mode & LIBBALSA_PROTECT_SMIMEV3)
         g_action_change_state(action, g_variant_new_string("smime"));
-    else
-#endif
-    if (mode & LIBBALSA_PROTECT_OPENPGP)
+    else if (mode & LIBBALSA_PROTECT_OPENPGP)
         g_action_change_state(action, g_variant_new_string("open-pgp"));
     else
         g_action_change_state(action, g_variant_new_string("mime"));

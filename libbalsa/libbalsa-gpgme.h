@@ -46,39 +46,47 @@ G_BEGIN_DECLS
 /** Callback to select a key from a list
  * Parameters:
  * - user name
- * - TRUE is a secret key shall be selected
+ * - key selection mode
  * - list of available keys (gpgme_key_t data elements)
  * - protocol
  * - parent window
+ * Return: the key the user selected, or NULL if the operation shall be cancelled
  */
 typedef gpgme_key_t(*lbgpgme_select_key_cb) (const gchar *,
-						 lb_key_sel_md_t,
-						 GList *,
-						 gpgme_protocol_t,
-						 GtkWindow *);
+						 	 	 	 	 	 lb_key_sel_md_t,
+											 GList *,
+											 gpgme_protocol_t,
+											 GtkWindow *);
 
 /** Callback to ask the user whether a key with low trust shall be accepted
  * Parameters:
- * - user name
- * - GpgME user ID
+ * - recipient user name (email address)
+ * - the key with insufficient trust
  * - parent window
+ * Return: TRUE to accept the key, FALSE to reject it
  */
 typedef gboolean(*lbgpgme_accept_low_trust_cb) (const gchar *,
-						const gpgme_user_id_t,
-						GtkWindow *);
+												gpgme_key_t,
+												GtkWindow *);
 
 
 
-void libbalsa_gpgme_init(gpgme_passphrase_cb_t get_passphrase,
-			 lbgpgme_select_key_cb select_key_cb,
-			 lbgpgme_accept_low_trust_cb accept_low_trust);
+void libbalsa_gpgme_init(gpgme_passphrase_cb_t       get_passphrase,
+			 	 	 	 lbgpgme_select_key_cb       select_key_cb,
+						 lbgpgme_accept_low_trust_cb accept_low_trust);
 gboolean libbalsa_gpgme_check_crypto_engine(gpgme_protocol_t protocol);
+gpgme_ctx_t libbalsa_gpgme_new_with_proto(gpgme_protocol_t        protocol,
+										  gpgme_passphrase_cb_t   callback,
+										  GtkWindow				 *parent,
+										  GError                **error)
+	G_GNUC_WARN_UNUSED_RESULT;
 
 GMimeGpgmeSigstat *libbalsa_gpgme_verify(GMimeStream * content,
 					 GMimeStream * sig_plain,
 					 gpgme_protocol_t protocol,
 					 gboolean singlepart_mode,
-					 GError ** error);
+					 GError ** error)
+	G_GNUC_WARN_UNUSED_RESULT;
 
 gpgme_hash_algo_t libbalsa_gpgme_sign(const gchar * userid,
 				      GMimeStream * istream,
@@ -100,7 +108,14 @@ GMimeGpgmeSigstat *libbalsa_gpgme_decrypt(GMimeStream * crypted,
 					  GMimeStream * plain,
 					  gpgme_protocol_t protocol,
 					  GtkWindow * parent,
-					  GError ** error);
+					  GError ** error)
+	G_GNUC_WARN_UNUSED_RESULT;
+
+void libbalsa_gpgme_set_error(GError        **error,
+					          gpgme_error_t   gpgme_err,
+							  const gchar    *format,
+							  ...)
+	G_GNUC_PRINTF(3, 4);
 
 
 G_END_DECLS

@@ -26,12 +26,12 @@
 #include "balsa-app.h"
 #include "balsa-icons.h"
 #include <glib/gi18n.h>
+#include "libbalsa-gpgme-widgets.h"
+#include "libbalsa-gpgme-keys.h"
 #include "balsa-mime-widget.h"
 
 
-#ifdef HAVE_GPG
-static void on_gpg_key_button(GtkButton * button, const gchar * fingerprint);
-#endif
+static void on_gpg_key_button(GtkWidget *button, const gchar *fingerprint);
 
 
 BalsaMimeWidget *
@@ -67,39 +67,40 @@ balsa_mime_widget_signature_widget(LibBalsaMessageBody * mime_body,
 	return NULL;
 
     infostr =
-        libbalsa_signature_info_to_gchar(mime_body->sig_info,
-                                         balsa_app.date_string);
-    if (!infostr)
+        libbalsa_signature_info_to_gchar_short(mime_body->sig_info, balsa_app.date_string);
+    if (infostr == NULL) {
         return NULL;
+    }
     lines = g_strsplit(infostr, "\n", 2);
     g_free(infostr);
 
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, BMW_VBOX_SPACE);
-    label = gtk_label_new(lines[1] ? lines[1] : lines[0]);
+    label = gtk_label_new((lines[1] != NULL) ? lines[1] : lines[0]);
     gtk_label_set_selectable(GTK_LABEL(label), TRUE);
     gtk_widget_set_halign(label, GTK_ALIGN_START);
     gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 0);
-#ifdef HAVE_GPG
+    if (mime_body->sig_info->key != NULL) {
+    	GtkWidget *key_widget;
+
+    	/* show only the subkey which has been used to sign the message */
+    	key_widget = libbalsa_gpgme_key(mime_body->sig_info->key, mime_body->sig_info->fingerprint, 0U, FALSE);
+        gtk_box_pack_start(GTK_BOX(vbox), key_widget, FALSE, FALSE, 0);
+    }
     if (mime_body->sig_info->protocol == GPGME_PROTOCOL_OpenPGP) {
         GtkWidget *button;
 
         if (mime_body->sig_info->status == GPG_ERR_NO_PUBKEY) {
-            button = gtk_button_new_with_mnemonic(_("_Run GnuPG to import this key"));
-            g_object_set_data(G_OBJECT(button), "gpg-keyserver-op",
-                              GINT_TO_POINTER(GPG_KEYSERVER_IMPORT));
+            button = gtk_button_new_with_mnemonic(_("_Search key server for this key"));
         } else {
-            button = gtk_button_new_with_mnemonic(_("_Run GnuPG to check for an update of this key"));
-            g_object_set_data(G_OBJECT(button), "gpg-keyserver-op",
-                              GINT_TO_POINTER(GPG_KEYSERVER_UPDATE));
+            button = gtk_button_new_with_mnemonic(_("_Search key server for updates of this key"));
         }
         g_signal_connect(G_OBJECT(button), "clicked",
                          G_CALLBACK(on_gpg_key_button),
                          (gpointer)mime_body->sig_info->fingerprint);
         gtk_box_pack_start(GTK_BOX(vbox), button, FALSE, FALSE, 0);
     }
-#endif /* HAVE_GPG */
 
-    if (lines[1]) {
+    if (lines[1] != NULL) {
         /* Hack alert: if we omit the box below and use the expander as signature widget
          * directly, setting the container border width of the container = the expander
          * causes its sensitive area to shrink to an almost unusable narrow line above
@@ -182,21 +183,17 @@ balsa_mime_widget_signature_icon_name(LibBalsaMsgProtectState protect_state)
 }
 
 
-#ifdef HAVE_GPG
-/*
- * We need gnupg to retreive a key from a key server...
- */
-
-/* Callback: run gpg to import a public key */
+/* Callback: try to import a public key */
 static void
-on_gpg_key_button(GtkButton * button, const gchar * fingerprint)
+on_gpg_key_button(GtkWidget   *button,
+				  const gchar *fingerprint)
 {
-    gpg_keyserver_action_t action =
-        GPOINTER_TO_INT(g_object_get_data(G_OBJECT(button), "gpg-keyserver-op"));
+	GError *error = NULL;
 
-    gpg_keyserver_op(fingerprint, action,
-                     balsa_get_parent_window(GTK_WIDGET(button)));
+    if (!libbalsa_gpgme_keyserver_op(fingerprint, balsa_get_parent_window(button), &error)) {
+    	libbalsa_information(LIBBALSA_INFORMATION_ERROR, "%s", error->message);
+    	g_error_free(error);
+    }
 }
-#endif /* HAVE_GPG */
 
 #endif  /* HAVE_GPGME */

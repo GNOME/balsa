@@ -151,10 +151,8 @@ balsa_print_objects_append_from_body(GList * list,
         { "message/rfc822",                -1, balsa_print_object_emb_message },
 #ifdef HAVE_GPGME
         { "application/pgp-signature",     -1, balsa_print_object_mp_crypto },
-#ifdef HAVE_SMIME
         { "application/pkcs7-signature",   -1, balsa_print_object_mp_crypto },
         { "application/x-pkcs7-signature", -1, balsa_print_object_mp_crypto },
-#endif				/* HAVE_SMIME */
 #endif				/* HAVE_GPGME */
         { NULL,                            -1, balsa_print_object_default }
     };

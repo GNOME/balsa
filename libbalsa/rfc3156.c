@@ -25,21 +25,18 @@
 
 #include <string.h>
 #include <gpgme.h>
-#include <pwd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <stdlib.h>
 
 #include "libbalsa.h"
 #include "libbalsa_private.h"
+#include "libbalsa-gpgme-widgets.h"
+#include "libbalsa-gpgme-keys.h"
+#include "libbalsa-gpgme.h"
 
 #include "gmime-multipart-crypt.h"
 #include "gmime-gpgme-signature.h"
 #include "gmime-part-rfc2440.h"
 
-#ifdef HAVE_SMIME
-#  include "gmime-application-pkcs7.h"
-#endif
+#include "gmime-application-pkcs7.h"
 
 #if HAVE_MACOSX_DESKTOP
 #  include "macosx-helpers.h"
@@ -88,26 +85,20 @@ libbalsa_can_encrypt_for_all(InternetAddressList * recipients,
     /* silent paranoia checks */
     if (!recipients)
 	return TRUE;  /* we can of course encrypt for nobody... */
-#ifndef HAVE_SMIME
-    if (protocol == GPGME_PROTOCOL_OpenPGP)
-	return FALSE;
-#endif
 
     /* check if gpg is currently available */
     if (protocol == GPGME_PROTOCOL_OpenPGP && gpg_updates_trustdb())
 	return FALSE;
 
     /* create the gpgme context and set the protocol */
-    if (gpgme_new(&gpgme_ctx) != GPG_ERR_NO_ERROR)
-	return FALSE;
-    if (gpgme_set_protocol(gpgme_ctx, protocol) != GPG_ERR_NO_ERROR) {
-	gpgme_release(gpgme_ctx);
-	return FALSE;
+    gpgme_ctx = libbalsa_gpgme_new_with_proto(protocol, NULL, NULL, NULL);
+    if (gpgme_ctx == NULL) {
+    	result = FALSE;
+    } else {
+    	/* loop over all recipients and try to find valid keys */
+    	result = have_pub_key_for(gpgme_ctx, recipients);
+    	gpgme_release(gpgme_ctx);
     }
-
-    /* loop over all recipients and try to find valid keys */
-    result = have_pub_key_for(gpgme_ctx, recipients);
-    gpgme_release(gpgme_ctx);
 
     return result;
 }
@@ -208,9 +199,6 @@ libbalsa_sign_mime_object(GMimeObject ** content, const gchar * rfc822_for,
     /* paranoia checks */
     g_return_val_if_fail(rfc822_for != NULL, FALSE);
     g_return_val_if_fail(content != NULL, FALSE);
-#ifndef HAVE_SMIME
-    g_return_val_if_fail(protocol == GPGME_PROTOCOL_OpenPGP, FALSE);
-#endif
 
     /* check if gpg is currently available */
     if (protocol == GPGME_PROTOCOL_OpenPGP && gpg_updates_trustdb())
@@ -249,9 +237,6 @@ libbalsa_encrypt_mime_object(GMimeObject ** content, GList * rfc822_for,
     /* paranoia checks */
     g_return_val_if_fail(rfc822_for != NULL, FALSE);
     g_return_val_if_fail(content != NULL, FALSE);
-#ifndef HAVE_SMIME
-    g_return_val_if_fail(protocol == GPGME_PROTOCOL_OpenPGP, FALSE);
-#endif
 
     /* check if gpg is currently available */
     if (protocol == GPGME_PROTOCOL_OpenPGP && gpg_updates_trustdb())
@@ -271,16 +256,12 @@ libbalsa_encrypt_mime_object(GMimeObject ** content, GList * rfc822_for,
 
 	encrypted_obj = GMIME_OBJECT(mpe);
 	result = g_mime_gpgme_mpe_encrypt(mpe, *content, recipients, always_trust, parent, error);
-    }
-#ifdef HAVE_SMIME
-    else {
-	GMimePart *pkcs7 =
-	    g_mime_part_new_with_type("application", "pkcs7-mime");
-	encrypted_obj = GMIME_OBJECT(pkcs7);
+    } else {
+    	GMimePart *pkcs7 = g_mime_part_new_with_type("application", "pkcs7-mime");
+    	encrypted_obj = GMIME_OBJECT(pkcs7);
 
-	result = g_mime_application_pkcs7_encrypt(pkcs7, *content, recipients, always_trust, parent, error);
+    	result = g_mime_application_pkcs7_encrypt(pkcs7, *content, recipients, always_trust, parent, error);
     }
-#endif
     g_ptr_array_free(recipients, FALSE);
 
     /* error checking */
@@ -315,9 +296,6 @@ libbalsa_sign_encrypt_mime_object(GMimeObject ** content,
     g_return_val_if_fail(rfc822_signer != NULL, FALSE);
     g_return_val_if_fail(rfc822_for != NULL, FALSE);
     g_return_val_if_fail(content != NULL, FALSE);
-#ifndef HAVE_SMIME
-    g_return_val_if_fail(protocol == GPGME_PROTOCOL_OpenPGP, FALSE);
-#endif
 
     /* check if gpg is currently available */
     if (protocol == GPGME_PROTOCOL_OpenPGP && gpg_updates_trustdb())
@@ -363,9 +341,6 @@ libbalsa_body_check_signature(LibBalsaMessageBody * body,
     g_return_val_if_fail(body, FALSE);
     g_return_val_if_fail(body->mime_part != NULL, FALSE);
     g_return_val_if_fail(body->message, FALSE);
-#ifndef HAVE_SMIME
-    g_return_val_if_fail(protocol == GPGME_PROTOCOL_OpenPGP, FALSE);
-#endif
 
     /* check if gpg is currently available */
     if (protocol == GPGME_PROTOCOL_OpenPGP && gpg_updates_trustdb())
@@ -411,17 +386,12 @@ libbalsa_body_decrypt(LibBalsaMessageBody *body, gpgme_protocol_t protocol, GtkW
     GError *error = NULL;
     LibBalsaMessage *message;
     GMimeGpgmeSigstat *sig_state = NULL;
-#ifdef HAVE_SMIME
     gboolean smime_encrypted = FALSE;
-#endif
 
     /* paranoia checks */
     g_return_val_if_fail(body != NULL, body);
     g_return_val_if_fail(body->mime_part != NULL, body);
     g_return_val_if_fail(body->message != NULL, body);
-#ifndef HAVE_SMIME
-    g_return_val_if_fail(protocol == GPGME_PROTOCOL_OpenPGP, FALSE);
-#endif
 
     /* check if gpg is currently available */
     if (protocol == GPGME_PROTOCOL_OpenPGP && gpg_updates_trustdb())
@@ -431,33 +401,29 @@ libbalsa_body_decrypt(LibBalsaMessageBody *body, gpgme_protocol_t protocol, GtkW
     if (protocol == GPGME_PROTOCOL_OpenPGP) {
 	if (!GMIME_IS_MULTIPART_ENCRYPTED(body->mime_part))
 	    return body;
-    }
-#ifdef HAVE_SMIME
-    else {
-	const char * smime_type = 
-	    g_mime_object_get_content_type_parameter(body->mime_part,
-						     "smime-type");
+    } else {
+    	const char * smime_type =
+    		g_mime_object_get_content_type_parameter(body->mime_part,
+    			"smime-type");
 
-	if (!smime_type || !GMIME_IS_PART(body->mime_part))
-	    return body;
-	if (!g_ascii_strcasecmp(smime_type, "enveloped-data"))
-	    smime_encrypted = TRUE;
-	else
-            smime_encrypted = body->was_encrypted;
+    	if (!smime_type || !GMIME_IS_PART(body->mime_part))
+    		return body;
+    	if (!g_ascii_strcasecmp(smime_type, "enveloped-data"))
+    		smime_encrypted = TRUE;
+    	else
+    		smime_encrypted = body->was_encrypted;
     }
-#endif
 
     libbalsa_mailbox_lock_store(body->message->mailbox);
-    if (protocol == GPGME_PROTOCOL_OpenPGP)
-	mime_obj =
-	    g_mime_gpgme_mpe_decrypt(GMIME_MULTIPART_ENCRYPTED(body->mime_part),
-				     &sig_state, parent, &error);
-#ifdef HAVE_SMIME
-    else
-	mime_obj =
-	    g_mime_application_pkcs7_decrypt_verify(GMIME_PART(body->mime_part),
-						    &sig_state, parent, &error);
-#endif
+    if (protocol == GPGME_PROTOCOL_OpenPGP) {
+    	mime_obj =
+    		g_mime_gpgme_mpe_decrypt(GMIME_MULTIPART_ENCRYPTED(body->mime_part),
+    			&sig_state, parent, &error);
+    } else {
+    	mime_obj =
+    		g_mime_application_pkcs7_decrypt_verify(GMIME_PART(body->mime_part),
+    			&sig_state, parent, &error);
+    }
     libbalsa_mailbox_unlock_store(body->message->mailbox);
 
     /* check the result */
@@ -478,12 +444,11 @@ libbalsa_body_decrypt(LibBalsaMessageBody *body, gpgme_protocol_t protocol, GtkW
     body = libbalsa_message_body_new(message);
 
     /* remember that is was encrypted */
-    if (protocol == GPGME_PROTOCOL_OpenPGP)
-	body->was_encrypted = TRUE;
-#ifdef HAVE_SMIME
-    else
-	body->was_encrypted = smime_encrypted;
-#endif
+    if (protocol == GPGME_PROTOCOL_OpenPGP) {
+    	body->was_encrypted = TRUE;
+    } else {
+    	body->was_encrypted = smime_encrypted;
+    }
     if (body->was_encrypted)
         body->message->prot_state = LIBBALSA_MSG_PROTECT_CRYPT;
 
@@ -759,8 +724,8 @@ append_time_t(GString *str, const gchar *format, time_t when,
 }
 
 gchar *
-libbalsa_signature_info_to_gchar(GMimeGpgmeSigstat * info,
-				 const gchar * date_string)
+libbalsa_signature_info_to_gchar_short(GMimeGpgmeSigstat *info,
+				 	 	 	 	 	   const gchar       *date_string)
 {
     GString *msg;
     gchar *retval;
@@ -768,25 +733,37 @@ libbalsa_signature_info_to_gchar(GMimeGpgmeSigstat * info,
     g_return_val_if_fail(info != NULL, NULL);
     g_return_val_if_fail(date_string != NULL, NULL);
     msg = g_string_new(libbalsa_gpgme_sig_protocol_name(info->protocol));
-    msg =
-	g_string_append(msg,
-			libbalsa_gpgme_sig_stat_to_gchar(info->status));
-    g_string_append_printf(msg, _("\nSignature validity: %s"),
-			   libbalsa_gpgme_validity_to_gchar(info->
-							    validity));
+    msg = g_string_append(msg, libbalsa_gpgme_sig_stat_to_gchar(info->status));
+    g_string_append_printf(msg, _("\nSignature validity: %s"), libbalsa_gpgme_validity_to_gchar(info-> validity));
     append_time_t(msg, _("\nSigned on: %s"), info->sign_time, date_string);
-    if (info->protocol == GPGME_PROTOCOL_OpenPGP && info->key)
-	g_string_append_printf(msg, _("\nKey owner trust: %s"),
-			       libbalsa_gpgme_validity_to_gchar_short
-			       (info->key->owner_trust));
-    if (info->fingerprint)
-	g_string_append_printf(msg, _("\nKey fingerprint: %s"),
-			       info->fingerprint);
+    if (info->fingerprint) {
+    	g_string_append_printf(msg, _("\nKey fingerprint: %s"), info->fingerprint);
+    }
+
+    retval = msg->str;
+    g_string_free(msg, FALSE);
+    return retval;
+}
+
+gchar *
+libbalsa_signature_info_to_gchar(GMimeGpgmeSigstat *info,
+				 	 	 	 	 const gchar       *date_string)
+{
+    GString *msg;
+    gchar *retval;
+
+    g_return_val_if_fail(info != NULL, NULL);
+    g_return_val_if_fail(date_string != NULL, NULL);
+    msg = g_string_new(libbalsa_signature_info_to_gchar_short(info, date_string));
 
     /* add key information */
-    if (info->key) {
+    if (info->key != NULL) {
         gpgme_user_id_t uid;
         gpgme_subkey_t subkey;
+
+        if (info->protocol == GPGME_PROTOCOL_OpenPGP) {
+        	g_string_append_printf(msg, _("\nKey owner trust: %s"), libbalsa_gpgme_validity_to_gchar_short(info->key->owner_trust));
+        }
 
         /* user ID's */
         if ((uid = info->key->uids)) {
@@ -895,132 +872,6 @@ libbalsa_signature_info_to_gchar(GMimeGpgmeSigstat * info,
 }
 
 
-#ifdef HAVE_GPG
-
-#include <sys/wait.h>
-#include <fcntl.h>
-
-/* run gpg asynchronously to import or update a key */
-typedef struct _spawned_gpg_T {
-    gint child_pid;
-    gint standard_error;
-    GString *stderr_buf;
-    GtkWindow *parent;
-} spawned_gpg_T;
-
-static gboolean check_gpg_child(gpointer data);
-
-gboolean
-gpg_keyserver_op(const gchar * fingerprint, gpg_keyserver_action_t action,
-                 GtkWindow * parent)
-{
-    gchar **argv;
-    spawned_gpg_T *spawned_gpg;
-    gboolean spawnres;
-
-    /* launch gpg... */
-    argv = g_new(gchar *, 5);
-    argv[0] = g_strdup(GPG_PATH);
-    argv[1] = g_strdup("--no-greeting");
-    switch (action) {
-    case GPG_KEYSERVER_IMPORT:
-        argv[2] = g_strdup("--recv-keys");
-        break;
-    case GPG_KEYSERVER_UPDATE:
-        argv[2] = g_strdup("--refresh-keys");
-        break;
-    default:
-        g_assert_not_reached();
-    }
-    argv[3] = g_strdup(fingerprint);
-    argv[4] = NULL;
-    spawned_gpg = g_new0(spawned_gpg_T, 1);
-    spawnres =
-	g_spawn_async_with_pipes(NULL, argv, NULL,
-				 G_SPAWN_DO_NOT_REAP_CHILD |
-				 G_SPAWN_STDOUT_TO_DEV_NULL, NULL, NULL,
-				 &spawned_gpg->child_pid, NULL, NULL,
-				 &spawned_gpg->standard_error, NULL);
-    g_strfreev(argv);
-    if (spawnres == FALSE) {
-	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-			     _
-			     ("Could not launch %s to query the public key %s."),
-			     GPG_PATH, fingerprint);
-	g_free(spawned_gpg);
-	return FALSE;
-    }
-
-    /* install an idle handler to check if the child returnd successfully. */
-    fcntl(spawned_gpg->standard_error, F_SETFL, O_NONBLOCK);
-    spawned_gpg->stderr_buf = g_string_new("");
-    spawned_gpg->parent = parent;
-    g_timeout_add(250, check_gpg_child, spawned_gpg);
-
-    return TRUE;
-}
-
-
-static gboolean
-check_gpg_child(gpointer data)
-{
-    spawned_gpg_T *spawned_gpg = (spawned_gpg_T *) data;
-    int status;
-    ssize_t bytes_read;
-    gchar buffer[1024], *gpg_message;
-    GtkWidget *dialog;
-
-    /* read input from the child and append it to the buffer */
-    while ((bytes_read =
-	    read(spawned_gpg->standard_error, buffer, 1023)) > 0) {
-	buffer[bytes_read] = '\0';
-	g_string_append(spawned_gpg->stderr_buf, buffer);
-    }
-
-    /* check if the child exited */
-    if (waitpid(spawned_gpg->child_pid, &status, WNOHANG) !=
-	spawned_gpg->child_pid)
-	return TRUE;
-
-    /* child exited, display some information... */
-    close(spawned_gpg->standard_error);
-
-    gpg_message =
-	g_locale_to_utf8(spawned_gpg->stderr_buf->str, -1, NULL,
-			 NULL, NULL);
-    gdk_threads_enter();
-    if (WEXITSTATUS(status) > 0)
-	dialog =
-	    gtk_message_dialog_new(spawned_gpg->parent,
-				   GTK_DIALOG_DESTROY_WITH_PARENT,
-				   GTK_MESSAGE_WARNING, GTK_BUTTONS_CLOSE,
-				   _
-				   ("Running %s failed with return value %d:\n%s"),
-				   GPG_PATH, WEXITSTATUS(status), gpg_message);
-    else
-	dialog =
-	    gtk_message_dialog_new(spawned_gpg->parent,
-				   GTK_DIALOG_DESTROY_WITH_PARENT,
-				   GTK_MESSAGE_INFO, GTK_BUTTONS_CLOSE,
-				   _("Running %s successful:\n%s"),
-				   GPG_PATH, gpg_message);
-#if HAVE_MACOSX_DESKTOP
-    libbalsa_macosx_menu_for_parent(dialog, spawned_gpg->parent);
-#endif
-    g_free(gpg_message);
-    g_string_free(spawned_gpg->stderr_buf, TRUE);
-    g_free(spawned_gpg);
-
-    gtk_dialog_run(GTK_DIALOG(dialog));
-    gtk_widget_destroy(dialog);
-    gdk_threads_leave();
-
-    return FALSE;
-}
-
-#endif				/* HAVE_GPG */
-
-
 /* ==== local stuff ======================================================== */
 
 
@@ -1031,76 +882,54 @@ check_gpg_child(gpointer data)
 static gboolean
 gpg_updates_trustdb(void)
 {
-    static gchar *lockname = NULL;
-    struct passwd *pwent;
-    struct stat stat_buf;
+	static gchar *lockname = NULL;
+	gboolean result;
 
-    if (lockname == NULL) {
-	if ((pwent = getpwuid(getuid())) != NULL) {
-	    lockname =
-		g_strdup_printf("%s/.gnupg/trustdb.gpg.lock",
-				pwent->pw_dir);
-        } else {
-            g_assert_not_reached();
-        }
-    }
+	if (lockname == NULL) {
+		lockname = g_build_filename(g_get_home_dir(), ".gnupg", "trustdb.gpg.lock", NULL);
+	}
 
-    if (stat(lockname, &stat_buf) == 0) {
-	libbalsa_information(LIBBALSA_INFORMATION_ERROR, "%s%s",
-			     _
-			     ("GnuPG is rebuilding the trust database and is currently unavailable."),
-			     _("Try again later."));
-	return TRUE;
-    } else
-	return FALSE;
+	if (g_file_test(lockname, G_FILE_TEST_EXISTS)) {
+		libbalsa_information(LIBBALSA_INFORMATION_ERROR, "%s %s",
+			_("GnuPG is rebuilding the trust database and is currently unavailable."),
+			_("Try again later."));
+		result = TRUE;
+	} else {
+		result = FALSE;
+	}
+	return result;
 }
 
 
-/* check if the context contains a public key for the passed recipients */
-#define KEY_IS_OK(k)   (!((k)->expired || (k)->revoked || \
-                          (k)->disabled || (k)->invalid))
+/* check if the local key ring contains a public key for the passed recipients */
 static gboolean
-have_pub_key_for(gpgme_ctx_t gpgme_ctx, InternetAddressList * recipients)
+have_pub_key_for(gpgme_ctx_t          gpgme_ctx,
+				 InternetAddressList *recipients)
 {
-    gpgme_key_t key;
     gboolean result = TRUE;
-    time_t now = time(NULL);
     gint i;
 
-    for (i = 0; result && i < internet_address_list_length(recipients);
-         i++) {
-        InternetAddress *ia =
-            internet_address_list_get_address(recipients, i);
+    for (i = 0; result && (i < internet_address_list_length(recipients)); i++) {
+    	InternetAddress *ia = internet_address_list_get_address(recipients, i);
 
-	/* check all entries in the list, handle groups recursively */
-	if (INTERNET_ADDRESS_IS_GROUP(ia))
-	    result =
-                have_pub_key_for(gpgme_ctx,
-                                 INTERNET_ADDRESS_GROUP(ia)->members);
-	else {
-	    if (gpgme_op_keylist_start(gpgme_ctx,
-                                       INTERNET_ADDRESS_MAILBOX(ia)->addr,
-                                       FALSE) != GPG_ERR_NO_ERROR)
-		return FALSE;
+    	/* check all entries in the list, handle groups recursively */
+    	if (INTERNET_ADDRESS_IS_GROUP(ia)) {
+    		result = have_pub_key_for(gpgme_ctx, INTERNET_ADDRESS_GROUP(ia)->members);
+    	} else {
+    		gchar *mail_name;
+    		GList *keys = NULL;
 
-	    result = FALSE;
-	    while (!result &&
-		   gpgme_op_keylist_next(gpgme_ctx, &key) == GPG_ERR_NO_ERROR) {
-		/* check if this key and the relevant subkey are usable */
-		if (KEY_IS_OK(key)) {
-		    gpgme_subkey_t subkey = key->subkeys;
-
-		    while (subkey && !subkey->can_encrypt)
-			subkey = subkey->next;
-
-		    if (subkey && KEY_IS_OK(subkey) && 
-			(subkey->expires == 0 || subkey->expires > now))
-			result = TRUE;
-		}
-		gpgme_key_unref(key);
-	    }
-	    gpgme_op_keylist_end(gpgme_ctx);
-	}
+    		result = FALSE;
+    		/* enclose the mail address into "<...>" to perform an exact search */
+    		mail_name = g_strconcat("<", INTERNET_ADDRESS_MAILBOX(ia)->addr, ">", NULL);
+    		if (libbalsa_gpgme_list_keys(gpgme_ctx, &keys, NULL, mail_name, FALSE, FALSE, NULL)) {
+    			if (keys != NULL) {
+    				result = TRUE;
+    				g_list_free_full(keys, (GDestroyNotify) gpgme_key_unref);
+    			}
+    		}
+    		g_free(mail_name);
+    	}
     }
 
     return result;

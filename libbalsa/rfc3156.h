@@ -105,20 +105,12 @@ const gchar *libbalsa_gpgme_sig_protocol_name(gpgme_protocol_t protocol);
 const gchar *libbalsa_gpgme_sig_stat_to_gchar(gpgme_error_t stat);
 const gchar *libbalsa_gpgme_validity_to_gchar(gpgme_validity_t validity);
 const gchar *libbalsa_gpgme_validity_to_gchar_short(gpgme_validity_t validity);
-gchar *libbalsa_signature_info_to_gchar(GMimeGpgmeSigstat * info,
-					const gchar * date_string);
+gchar *libbalsa_signature_info_to_gchar(GMimeGpgmeSigstat *info,
+										const gchar 	  *date_string)
+	G_GNUC_WARN_UNUSED_RESULT;
+gchar *libbalsa_signature_info_to_gchar_short(GMimeGpgmeSigstat *info,
+				 	 	 	 	 	   	      const gchar       *date_string)
+	G_GNUC_WARN_UNUSED_RESULT;
 
-#ifdef HAVE_GPG
-
-typedef enum {
-    GPG_KEYSERVER_IMPORT = 1,
-    GPG_KEYSERVER_UPDATE
-} gpg_keyserver_action_t;
-
-gboolean gpg_keyserver_op(const gchar * fingerprint,
-                          gpg_keyserver_action_t action,
-                          GtkWindow * parent);
-
-#endif
 #endif				/* HAVE_GPGME */
-#endif				/* __RFC3156_GPG_H__ */
+#endif				/* __RFC3156_H__ */

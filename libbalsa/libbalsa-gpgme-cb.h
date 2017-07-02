@@ -46,9 +46,9 @@ gpgme_error_t lb_gpgme_passphrase(void *hook, const gchar * uid_hint,
 gpgme_key_t lb_gpgme_select_key(const gchar * user_name, lb_key_sel_md_t mode,
 				GList * keys, gpgme_protocol_t protocol,
 				GtkWindow * parent);
-gboolean lb_gpgme_accept_low_trust_key(const gchar * user_name,
-				       const gpgme_user_id_t user_id,
-				       GtkWindow * parent);
+gboolean lb_gpgme_accept_low_trust_key(const gchar *user_name,
+				       	   	   	   	   gpgme_key_t  key,
+									   GtkWindow   *parent);
 
 
 G_END_DECLS

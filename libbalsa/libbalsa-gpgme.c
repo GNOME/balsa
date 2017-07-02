@@ -37,16 +37,10 @@
 #include <gtk/gtk.h>
 #include <gmime/gmime.h>
 #include "gmime-gpgme-signature.h"
+#include "libbalsa-gpgme-keys.h"
 #include "libbalsa-gpgme.h"
 
 
-static void g_set_error_from_gpgme(GError ** error,
-				   gpgme_error_t gpgme_err,
-				   const gchar * message);
-static gpgme_error_t gpgme_new_with_protocol(gpgme_ctx_t * ctx,
-					     gpgme_protocol_t protocol,
-					     GtkWindow * parent,
-					     GError ** error);
 static gboolean gpgme_add_signer(gpgme_ctx_t ctx, const gchar * signer,
 				 GtkWindow * parent, GError ** error);
 static gpgme_key_t *gpgme_build_recipients(gpgme_ctx_t ctx,
@@ -63,6 +57,8 @@ static ssize_t g_mime_gpgme_stream_wr(GMimeStream * stream, void *buffer,
 				      size_t size);
 static void cb_data_release(void *handle);
 
+static gchar *utf8_valid_str(const char *gpgme_str)
+	G_GNUC_WARN_UNUSED_RESULT;
 
 #if defined(ENABLE_NLS)
 static const gchar *get_utf8_locale(int category);
@@ -105,12 +101,6 @@ libbalsa_gpgme_init(gpgme_passphrase_cb_t get_passphrase,
     /* initialise the gpgme library */
     g_message("init gpgme version %s", gpgme_check_version(NULL));
 
-#ifdef HAVE_GPG
-    /* configure the GnuPG engine if a specific gpg path has been
-     * detected */
-    gpgme_set_engine_info(GPGME_PROTOCOL_OpenPGP, GPG_PATH, NULL);
-#endif
-
 #ifdef ENABLE_NLS
     gpgme_set_locale(NULL, LC_CTYPE, get_utf8_locale(LC_CTYPE));
     gpgme_set_locale(NULL, LC_MESSAGES, get_utf8_locale(LC_MESSAGES));
@@ -146,19 +136,13 @@ libbalsa_gpgme_init(gpgme_passphrase_cb_t get_passphrase,
 	has_proto_openpgp = FALSE;
     }
 
-#ifdef HAVE_SMIME
-    if (gpgme_engine_check_version(GPGME_PROTOCOL_CMS) ==
-	GPG_ERR_NO_ERROR) {
-	g_message("CMS (aka S/MIME) protocol supported");
-	has_proto_cms = TRUE;
+    if (gpgme_engine_check_version(GPGME_PROTOCOL_CMS) == GPG_ERR_NO_ERROR) {
+    	g_message("CMS (aka S/MIME) protocol supported");
+    	has_proto_cms = TRUE;
     } else {
-	g_message("CMS protocol not supported, S/MIME will not work!");
-	has_proto_cms = FALSE;
+    	g_message("CMS protocol not supported, S/MIME will not work!");
+    	has_proto_cms = FALSE;
     }
-#else
-    g_message("built without CMS (aka S/MIME) protocol support");
-    has_proto_cms = FALSE;
-#endif
 
     /* remember callbacks */
     select_key_cb = select_key;
@@ -184,6 +168,44 @@ libbalsa_gpgme_check_crypto_engine(gpgme_protocol_t protocol)
     default:
 	return FALSE;
     }
+}
+
+
+/** \brief Create a new GpgME context for a protocol
+ *
+ * \param protocol requested protocol
+ * \param callback callback to request a passphrase, may be NULL to use pinentry (recommended)
+ * \param parent parent window, passed to the callback function
+ * \param error Filled with error information on error.
+ * \return the new gpgme context on success, or NULL on error
+ *
+ * This helper function creates a new GpgME context for the specified protocol.
+ */
+gpgme_ctx_t
+libbalsa_gpgme_new_with_proto(gpgme_protocol_t        protocol,
+	  	  	  	  	  	  	  gpgme_passphrase_cb_t   callback,
+							  GtkWindow				 *parent,
+							  GError                **error)
+{
+	gpgme_error_t err;
+	gpgme_ctx_t ctx = NULL;
+
+    /* create the GpgME context */
+	err = gpgme_new(&ctx);
+	if (err != GPG_ERR_NO_ERROR) {
+		libbalsa_gpgme_set_error(error, err, _("could not create context"));
+	} else {
+		err = gpgme_set_protocol(ctx, protocol);
+		if (err != GPG_ERR_NO_ERROR) {
+			libbalsa_gpgme_set_error(error, err, _("could not set protocol “%s”"), gpgme_get_protocol_name(protocol));
+		    gpgme_release(ctx);
+		    ctx = NULL;
+		} else {
+			gpgme_set_passphrase_cb(ctx, callback, parent);
+		}
+	}
+
+	return ctx;
 }
 
 
@@ -224,17 +246,17 @@ libbalsa_gpgme_verify(GMimeStream * content, GMimeStream * sig_plain,
     g_return_val_if_fail(protocol == GPGME_PROTOCOL_OpenPGP ||
 			 protocol == GPGME_PROTOCOL_CMS, NULL);
 
-    /* create the GpgME context */
-    if ((err =
-	 gpgme_new_with_protocol(&ctx, protocol, NULL,
-				 error)) != GPG_ERR_NO_ERROR)
-	return NULL;
+    /* create the GpgME context (no passphrase callback needed) */
+    ctx = libbalsa_gpgme_new_with_proto(protocol, NULL, NULL, error);
+    if (ctx == NULL) {
+    	return NULL;
+    }
 
     /* create the message stream */
     if ((err =
 	 gpgme_data_new_from_cbs(&cont_data, &cbs,
 				 content)) != GPG_ERR_NO_ERROR) {
-	g_set_error_from_gpgme(error, err,
+    	libbalsa_gpgme_set_error(error, err,
 			       _("could not get data from stream"));
 	gpgme_release(ctx);
 	return NULL;
@@ -245,7 +267,7 @@ libbalsa_gpgme_verify(GMimeStream * content, GMimeStream * sig_plain,
     if ((err =
 	 gpgme_data_new_from_cbs(&sig_plain_data, &cbs,
 				 sig_plain)) != GPG_ERR_NO_ERROR) {
-	g_set_error_from_gpgme(error, err,
+    	libbalsa_gpgme_set_error(error, err,
 			       _("could not get data from stream"));
 	gpgme_data_release(cont_data);
 	gpgme_release(ctx);
@@ -258,7 +280,7 @@ libbalsa_gpgme_verify(GMimeStream * content, GMimeStream * sig_plain,
     else
 	err = gpgme_op_verify(ctx, sig_plain_data, cont_data, NULL);
     if (err != GPG_ERR_NO_ERROR) {
-	g_set_error_from_gpgme(error, err,
+    	libbalsa_gpgme_set_error(error, err,
 			       _("signature verification failed"));
 	result = g_mime_gpgme_sigstat_new();
 	result->status = err;
@@ -319,10 +341,11 @@ libbalsa_gpgme_sign(const gchar * userid, GMimeStream * istream,
     g_return_val_if_fail(protocol == GPGME_PROTOCOL_OpenPGP ||
 			 protocol == GPGME_PROTOCOL_CMS, GPGME_MD_NONE);
 
-    /* create the GpgME context */
-    if (gpgme_new_with_protocol(&ctx, protocol, parent,
-				 error) != GPG_ERR_NO_ERROR)
-	return GPGME_MD_NONE;
+    /* create the GpgME context (passphrase callback required) */
+    ctx = libbalsa_gpgme_new_with_proto(protocol, gpgme_passphrase_cb, parent, error);
+    if (ctx == NULL) {
+    	return GPGME_MD_NONE;
+    }
 
     /* set the signature mode */
     if (singlepart_mode) {
@@ -346,7 +369,7 @@ libbalsa_gpgme_sign(const gchar * userid, GMimeStream * istream,
     if ((err =
 	 gpgme_data_new_from_cbs(&in, &cbs,
 				 istream)) != GPG_ERR_NO_ERROR) {
-	g_set_error_from_gpgme(error, err,
+    	libbalsa_gpgme_set_error(error, err,
 			       _("could not get data from stream"));
 	gpgme_release(ctx);
 	return GPGME_MD_NONE;
@@ -354,7 +377,7 @@ libbalsa_gpgme_sign(const gchar * userid, GMimeStream * istream,
     if ((err =
 	 gpgme_data_new_from_cbs(&out, &cbs,
 				 ostream)) != GPG_ERR_NO_ERROR) {
-	g_set_error_from_gpgme(error, err,
+    	libbalsa_gpgme_set_error(error, err,
 			       _("could not create new data object"));
 	gpgme_data_release(in);
 	gpgme_release(ctx);
@@ -364,7 +387,7 @@ libbalsa_gpgme_sign(const gchar * userid, GMimeStream * istream,
     /* sign and get the used hash algorithm */
     err = gpgme_op_sign(ctx, in, out, sig_mode);
     if (err != GPG_ERR_NO_ERROR) {
-	g_set_error_from_gpgme(error, err, _("signing failed"));
+    	libbalsa_gpgme_set_error(error, err, _("signing failed"));
 	hash_algo = GPGME_MD_NONE;
     } else
 	hash_algo = gpgme_op_sign_result(ctx)->signatures->hash_algo;
@@ -426,10 +449,11 @@ libbalsa_gpgme_encrypt(GPtrArray * recipients, const char *sign_for,
     g_return_val_if_fail(protocol == GPGME_PROTOCOL_OpenPGP ||
 			 protocol == GPGME_PROTOCOL_CMS, FALSE);
 
-    /* create the GpgME context */
-    if (gpgme_new_with_protocol(&ctx, protocol, parent,
-				 error) != GPG_ERR_NO_ERROR)
-	return FALSE;
+    /* create the GpgME context (passphrase callback required) */
+    ctx = libbalsa_gpgme_new_with_proto(protocol, gpgme_passphrase_cb, parent, error);
+    if (ctx == NULL) {
+    	return FALSE;
+    }
 
     /* sign & encrypt is valid only for single-part OpenPGP */
     if (sign_for != NULL
@@ -468,7 +492,7 @@ libbalsa_gpgme_encrypt(GPtrArray * recipients, const char *sign_for,
     if ((err =
 	 gpgme_data_new_from_cbs(&plain, &cbs,
 				 istream)) != GPG_ERR_NO_ERROR) {
-	g_set_error_from_gpgme(error, err,
+    	libbalsa_gpgme_set_error(error, err,
 			       _("could not get data from stream"));
 	release_keylist(rcpt_keys);
 	gpgme_release(ctx);
@@ -477,7 +501,7 @@ libbalsa_gpgme_encrypt(GPtrArray * recipients, const char *sign_for,
     if ((err =
 	 gpgme_data_new_from_cbs(&crypt, &cbs,
 				 ostream)) != GPG_ERR_NO_ERROR) {
-	g_set_error_from_gpgme(error, err,
+    	libbalsa_gpgme_set_error(error, err,
 			       _("could not create new data object"));
 	release_keylist(rcpt_keys);
 	gpgme_data_release(plain);
@@ -504,10 +528,10 @@ libbalsa_gpgme_encrypt(GPtrArray * recipients, const char *sign_for,
     gpgme_release(ctx);
     if (err != GPG_ERR_NO_ERROR) {
 	if (sign_for)
-	    g_set_error_from_gpgme(error, err,
+		libbalsa_gpgme_set_error(error, err,
 				   _("signing and encryption failed"));
 	else
-	    g_set_error_from_gpgme(error, err, _("encryption failed"));
+		libbalsa_gpgme_set_error(error, err, _("encryption failed"));
 	return FALSE;
     } else
 	return TRUE;
@@ -551,16 +575,17 @@ libbalsa_gpgme_decrypt(GMimeStream * crypted, GMimeStream * plain,
     g_return_val_if_fail(protocol == GPGME_PROTOCOL_OpenPGP ||
 			 protocol == GPGME_PROTOCOL_CMS, NULL);
 
-    /* create the GpgME context */
-    if (gpgme_new_with_protocol(&ctx, protocol, parent,
-				 error) != GPG_ERR_NO_ERROR)
-	return NULL;
+    /* create the GpgME context (passphrase callback required) */
+    ctx = libbalsa_gpgme_new_with_proto(protocol, gpgme_passphrase_cb, parent, error);
+    if (ctx == NULL) {
+    	return NULL;
+    }
 
     /* create the data streams */
     if ((err =
 	 gpgme_data_new_from_cbs(&crypt_data, &cbs,
 				 crypted)) != GPG_ERR_NO_ERROR) {
-	g_set_error_from_gpgme(error, err,
+    	libbalsa_gpgme_set_error(error, err,
 			       _("could not get data from stream"));
 	gpgme_release(ctx);
 	return NULL;
@@ -568,7 +593,7 @@ libbalsa_gpgme_decrypt(GMimeStream * crypted, GMimeStream * plain,
     if ((err =
 	 gpgme_data_new_from_cbs(&plain_data, &cbs,
 				 plain)) != GPG_ERR_NO_ERROR) {
-	g_set_error_from_gpgme(error, err,
+    	libbalsa_gpgme_set_error(error, err,
 			       _("could not create new data object"));
 	gpgme_data_release(crypt_data);
 	gpgme_release(ctx);
@@ -579,7 +604,7 @@ libbalsa_gpgme_decrypt(GMimeStream * crypted, GMimeStream * plain,
     if ((err =
 	 gpgme_op_decrypt_verify(ctx, crypt_data,
 				 plain_data)) != GPG_ERR_NO_ERROR) {
-	g_set_error_from_gpgme(error, err, _("decryption failed"));
+    	libbalsa_gpgme_set_error(error, err, _("decryption failed"));
 	result = NULL;
     } else {
 	/* decryption successful, check for signature */
@@ -593,6 +618,37 @@ libbalsa_gpgme_decrypt(GMimeStream * crypted, GMimeStream * plain,
 
     return result;
 }
+
+
+/*
+ * set a GError form GpgME information
+ */
+void
+libbalsa_gpgme_set_error(GError        **error,
+					     gpgme_error_t   gpgme_err,
+						 const gchar    *format,
+						 ...)
+{
+    if (error != NULL) {
+    	gchar errbuf[4096];		/* should be large enough... */
+        gchar *errstr;
+        gchar *srcstr;
+        gchar *msgstr;
+        va_list ap;
+
+        srcstr = utf8_valid_str(gpgme_strsource(gpgme_err));
+        gpgme_strerror_r(gpgme_err, errbuf, sizeof(errbuf));
+        errstr = utf8_valid_str(errbuf);
+        va_start(ap, format);
+        msgstr = g_strdup_vprintf(format, ap);
+        va_end(ap);
+        g_set_error(error, GPGME_ERROR_QUARK, gpgme_err, "%s: %s: %s", srcstr, msgstr, errstr);
+        g_free(msgstr);
+        g_free(errstr);
+        g_free(srcstr);
+    }
+}
+
 
 /* ---- local stuff ---------------------------------------------------- */
 
@@ -612,29 +668,6 @@ utf8_valid_str(const char *gpgme_str)
 		result = NULL;
 	}
 	return result;
-}
-
-
-/*
- * set a GError form GpgME information
- */
-static void
-g_set_error_from_gpgme(GError ** error, gpgme_error_t gpgme_err,
-		       const gchar * message)
-{
-    if (error != NULL) {
-    	gchar errbuf[4096];		/* should be large enough... */
-        gchar *errstr;
-        gchar *srcstr;
-
-        srcstr = utf8_valid_str(gpgme_strsource(gpgme_err));
-        gpgme_strerror_r(gpgme_err, errbuf, sizeof(errbuf));
-        errstr = utf8_valid_str(errbuf);
-        g_set_error(error, GPGME_ERROR_QUARK, gpgme_err, "%s: %s: %s", srcstr,
-        	message, errstr);
-        g_free(srcstr);
-        g_free(errstr);
-    }
 }
 
 
@@ -674,320 +707,223 @@ cb_data_release(void *handle)
 }
 
 
-/*
- * create a GpgME context for the passed protocol
+/** \brief Get a key for a name or fingerprint
+ *
+ * \param ctx GpgME context
+ * \param key filled with the key on success
+ * \param name pattern (mail address or fingerprint) of the requested key
+ * \param secret TRUE to select a secret (private) key for signing, FALSE to select a public key for encryption
+ * \param accept_all TRUE to accept a low-trust public key without confirmation
+ * \param parent transient parent window
+ * \param error filled with a human-readable error on error, may be NULL
+ * \return GPG_ERR_GENERAL if listing the keys failed, GPG_ERR_NO_KEY if no suitable key is available, GPG_ERR_CANCELED if the user
+ *         cancelled the operation, GPG_ERR_AMBIGUOUS if multiple keys exist, or GPG_ERR_NOT_TRUSTED if the key is not trusted
+ *
+ * Get a key for a name or a fingerprint.  A name will always be enclosed in "<...>" to get an exact match.  If \em secret is set,
+ * choose only secret (private) keys (signing).  Otherwise, choose only public keys (encryption).  If multiple keys would match,
+ * call the key selection CB \ref select_key_cb (if present).  If no matching key could be found or if any error occurs, return an
+ * appropriate error code.
  */
 static gpgme_error_t
-gpgme_new_with_protocol(gpgme_ctx_t * ctx, gpgme_protocol_t protocol,
-			GtkWindow * parent, GError ** error)
+get_key_from_name(gpgme_ctx_t   ctx,
+				  gpgme_key_t  *key,
+				  const gchar  *name,
+				  gboolean      secret,
+				  gboolean      accept_all,
+				  GtkWindow    *parent,
+				  GError      **error)
 {
-    gpgme_error_t err;
+	gchar *mail_name;
+	gboolean list_res;
+	GList *keys = NULL;
+	gpgme_key_t selected;
+	guint bad_keys = 0U;
+	gpgme_error_t result;
 
-
-    /* create the GpgME context */
-    if ((err = gpgme_new(ctx)) != GPG_ERR_NO_ERROR) {
-	g_set_error_from_gpgme(error, err, _("could not create context"));
-    } else {
-	if ((err = gpgme_set_protocol(*ctx, protocol)) != GPG_ERR_NO_ERROR) {
-	    gchar *errmsg =
-		g_strdup_printf(_("could not set protocol “%s”"),
-				gpgme_get_protocol_name(protocol));
-
-	    g_set_error_from_gpgme(error, err, errmsg);
-	    g_free(errmsg);
-	    gpgme_release(*ctx);
+	/* enclose a mail address into "<...>" to perform an exact search */
+	if (strchr(name, '@') != NULL) {
+		mail_name = g_strconcat("<", name, ">", NULL);
 	} else {
-	    if (protocol == GPGME_PROTOCOL_OpenPGP)
-		gpgme_set_passphrase_cb(*ctx, gpgme_passphrase_cb, parent);
+		mail_name = g_strdup(name);
 	}
-    }
 
-    return err;
-}
+	/* let gpgme list keys */
+	list_res = libbalsa_gpgme_list_keys(ctx, &keys, &bad_keys, mail_name, secret, FALSE, error);
+	g_free(mail_name);
+	if (!list_res) {
+		return GPG_ERR_GENERAL;
+	}
 
-/* return TRUE if the passed key is not expired, not revoked, not disabled
- * and not invalid, and has at least one subkey which can be used for signing
- * if secret is TRUE, or one subkey which can be used for encryption if secret
- * is FALSE, and the particular subkey is not expired, not revoked, not
- * disabled and not invalid */
-static gboolean
-check_key(const gpgme_key_t key, gboolean secret, time_t now)
-{
-	gboolean result = FALSE;
+	if (keys == NULL) {
+		if (bad_keys > 0U) {
+			g_set_error(error, GPGME_ERROR_QUARK, GPG_ERR_KEY_SELECTION,
+				_("A key for “%s” is present, but it is expired, disabled, revoked or invalid"), name);
+		} else {
+			g_set_error(error, GPGME_ERROR_QUARK, GPG_ERR_KEY_SELECTION,
+				_("Could not find a key for “%s”"), name);
+		}
+		return secret ? GPG_ERR_NO_SECKEY : GPG_ERR_NO_PUBKEY;
+	}
 
-	if (!key->expired && !key->revoked && !key->disabled && !key->invalid) {
-		gpgme_subkey_t subkey = key->subkeys;
-
-		while (!result && (subkey != NULL)) {
-			if (((secret && subkey->can_sign) || (!secret && subkey->can_encrypt)) &&
-				!subkey->expired && !subkey->revoked && !subkey->disabled && !subkey->invalid &&
-				(subkey->expires == 0 || subkey->expires > now)) {
-				result = TRUE;
-			} else {
-				subkey = subkey->next;
+	/* let the user select a key from the list if there is more than one */
+	result = GPG_ERR_NO_ERROR;
+	if (g_list_length(keys) > 1U) {
+		if (select_key_cb != NULL) {
+			selected = select_key_cb(name, secret ? LB_SELECT_PRIVATE_KEY : LB_SELECT_PUBLIC_KEY_USER,
+				keys, gpgme_get_protocol(ctx), parent);
+			if (selected == NULL) {
+				result = GPG_ERR_CANCELED;
 			}
+		} else {
+			g_set_error(error, GPGME_ERROR_QUARK, GPG_ERR_KEY_SELECTION, _("Multiple keys for “%s”"), name);
+			selected = NULL;
+			result = GPG_ERR_AMBIGUOUS;
+		}
+	} else {
+		selected = (gpgme_key_t) keys->data;
+	}
+
+	/* ref the selected key, free all others and the list */
+	if (selected != NULL) {
+		gpgme_key_ref(selected);
+	}
+	g_list_free_full(keys, (GDestroyNotify) gpgme_key_unref);
+
+	/* OpenPGP: ask the user if a low-validity key should be trusted for encryption */
+	// FIXME - shouldn't we do the same for S/MIME?
+	if ((result == GPG_ERR_NO_ERROR) && !secret && !accept_all && (gpgme_get_protocol(ctx) == GPGME_PROTOCOL_OpenPGP) &&
+		(selected->owner_trust < GPGME_VALIDITY_FULL)) {
+		if ((accept_low_trust_cb == NULL) || !accept_low_trust_cb(name, selected, parent)) {
+			gpgme_key_unref(selected);
+			selected = NULL;
+			g_set_error(error, GPGME_ERROR_QUARK, GPG_ERR_KEY_SELECTION, _("Insufficient key validity"));
+			result = GPG_ERR_NOT_TRUSTED;
 		}
 	}
 
+	*key = selected;
 	return result;
 }
 
-/*
- * Get a key for name. If secret_only is set, choose only secret (private)
- * keys (signing). Otherwise, choose only public keys (encryption).
- * If multiple keys would match, call the key selection CB (if present). If
- * no matching key could be found or if any error occurs, return NULL and
- * set error.
+
+/** \brief Select a public key from all available keys
+ *
+ * \param ctx GpgME context
+ * \param name recipient's mail address, used only for display
+ * \param parent transient parent window
+ * \param error filled with a human-readable error on error, may be NULL
+ * \return the selected key or NULL if the user cancelled the operation
+ *
+ * This helper function loads all available keys and calls \ref select_key_cb to let the user choose one of them.
  */
 static gpgme_key_t
-get_key_from_name(gpgme_ctx_t ctx, const gchar * name, gboolean secret,
-		  gboolean accept_all, GtkWindow * parent, GError ** error)
-{
-    GList *keys = NULL;
-    gpgme_key_t key;
-    gpgme_error_t err;
-    gboolean found_bad;
-    time_t now = time(NULL);
-
-    /* let gpgme list keys */
-    if ((err =
-	 gpgme_op_keylist_start(ctx, name, secret)) != GPG_ERR_NO_ERROR) {
-	gchar *msg =
-	    g_strdup_printf(_("could not list keys for “%s”"), name);
-
-	g_set_error_from_gpgme(error, err, msg);
-	g_free(msg);
-	return NULL;
-    }
-
-    found_bad = FALSE;
-    while ((err = gpgme_op_keylist_next(ctx, &key)) == GPG_ERR_NO_ERROR) {
-	/* check if this key and the relevant subkey are usable */
-	if (check_key(key, secret, now)) {
-		keys = g_list_append(keys, key);
-	} else
-	    found_bad = TRUE;
-    }
-
-    if (gpg_err_code(err) != GPG_ERR_EOF) {
-	gchar *msg =
-	    g_strdup_printf(_("could not list keys for “%s”"), name);
-
-	g_set_error_from_gpgme(error, err, msg);
-	g_free(msg);
-	gpgme_op_keylist_end(ctx);
-	g_list_foreach(keys, (GFunc) gpgme_key_unref, NULL);
-	g_list_free(keys);
-	return NULL;
-    }
-    gpgme_op_keylist_end(ctx);
-
-    if (!keys) {
-	if (error) {
-	    if (strchr(name, '@')) {
-		if (found_bad)
-		    g_set_error(error, GPGME_ERROR_QUARK,
-				GPG_ERR_KEY_SELECTION,
-				_
-				("%s: a key for %s is present, but it is expired, disabled, revoked or invalid"),
-				"gmime-gpgme", name);
-		else
-		    g_set_error(error, GPGME_ERROR_QUARK,
-				GPG_ERR_KEY_SELECTION,
-				_("%s: could not find a key for %s"),
-				"gmime-gpgme", name);
-	    } else {
-		if (found_bad)
-		    g_set_error(error, GPGME_ERROR_QUARK,
-				GPG_ERR_KEY_SELECTION,
-				_
-				("%s: a key with id %s is present, but it is expired, disabled, revoked or invalid"),
-				"gmime-gpgme", name);
-		else
-		    g_set_error(error, GPGME_ERROR_QUARK,
-				GPG_ERR_KEY_SELECTION,
-				_("%s: could not find a key with id %s"),
-				"gmime-gpgme", name);
-	    }
-	}
-	return NULL;
-    }
-
-    /* let the user select a key from the list if there is more than one */
-    if (g_list_length(keys) > 1) {
-	if (select_key_cb)
-	    key =
-		select_key_cb(name,
-					  secret ? LB_SELECT_PRIVATE_KEY : LB_SELECT_PUBLIC_KEY_USER,
-					  keys, gpgme_get_protocol(ctx), parent);
-	else {
-	    if (error)
-		g_set_error(error, GPGME_ERROR_QUARK,
-			    GPG_ERR_KEY_SELECTION,
-			    _("%s: multiple keys for %s"), "gmime-gpgme",
-			    name);
-	    key = NULL;
-	}
-	if (key)
-	    gpgme_key_ref(key);
-	g_list_foreach(keys, (GFunc) gpgme_key_unref, NULL);
-    } else
-	key = (gpgme_key_t) keys->data;
-    g_list_free(keys);
-
-    /* OpenPGP: ask the user if a low-validity key should be trusted for
-     * encryption */
-    // FIXME - shouldn't we do the same for S/MIME?
-    if (key && !secret && !accept_all
-	&& gpgme_get_protocol(ctx) == GPGME_PROTOCOL_OpenPGP) {
-	gpgme_user_id_t uid = key->uids;
-	gchar *upcase_name = g_ascii_strup(name, -1);
-	gboolean found = FALSE;
-
-	while (!found && uid) {
-	    /* check the email field which may or may not be present */
-	    if (uid->email && !g_ascii_strcasecmp(uid->email, name))
-		found = TRUE;
-	    else {
-		/* no email or no match, check the uid */
-		gchar *upcase_uid = g_ascii_strup(uid->uid, -1);
-
-		if (strstr(upcase_uid, upcase_name))
-		    found = TRUE;
-		else
-		    uid = uid->next;
-		g_free(upcase_uid);
-	    }
-	}
-	g_free(upcase_name);
-
-	/* ask the user if a low-validity key shall be used */
-	if (uid && uid->validity < GPGME_VALIDITY_FULL) {
-	    if (!accept_low_trust_cb
-		|| !accept_low_trust_cb(name, uid, parent)) {
-		gpgme_key_unref(key);
-		key = NULL;
-		if (error)
-		    g_set_error(error, GPGME_ERROR_QUARK,
-				GPG_ERR_KEY_SELECTION,
-				_("%s: insufficient validity for UID %s"),
-				"gmime-gpgme", name);
-	    }
-	}
-    }
-
-    return key;
-}
-
-
-static gpgme_key_t
-get_pubkey(gpgme_ctx_t ctx, const gchar * name, gboolean accept_all,
-	GtkWindow * parent, GError ** error)
+get_pubkey(gpgme_ctx_t   ctx,
+		   const gchar  *name,
+		   GtkWindow    *parent,
+		   GError      **error)
 {
 	GList *keys = NULL;
-	gpgme_key_t key;
-	gpgme_error_t err;
-	time_t now = time(NULL);
+	gpgme_key_t key = NULL;
 
-	/* let gpgme list keys */
-	if ((err = gpgme_op_keylist_start(ctx, NULL, 0)) != GPG_ERR_NO_ERROR) {
-		gchar *msg = g_strdup_printf(_("could not list keys"));
-
-		g_set_error_from_gpgme(error, err, msg);
-		g_free(msg);
-		return NULL;
+	/* let gpgme list all available keys */
+	if (libbalsa_gpgme_list_keys(ctx, &keys, NULL, NULL, FALSE, FALSE, error)) {
+		if (keys != NULL) {
+			/* let the user select a key from the list, even if there is only one */
+			if (select_key_cb != NULL) {
+				key = select_key_cb(name, LB_SELECT_PUBLIC_KEY_ANY, keys, gpgme_get_protocol(ctx), parent);
+				if (key != NULL) {
+					gpgme_key_ref(key);
+				}
+			}
+			g_list_free_full(keys, (GDestroyNotify) gpgme_key_unref);
+		}
 	}
 
-	while ((err = gpgme_op_keylist_next(ctx, &key)) == GPG_ERR_NO_ERROR) {
-		/* check if this key and the relevant subkey are usable */
-		if (check_key(key, 0, now))
-			keys = g_list_append(keys, key);
-	}
-
-	if (gpg_err_code(err) != GPG_ERR_EOF || !keys) {
-		gchar *msg = g_strdup_printf(_("could not list keys"));
-
-		g_set_error_from_gpgme(error, err, msg);
-		g_free(msg);
-		gpgme_op_keylist_end(ctx);
-		g_list_foreach(keys, (GFunc) gpgme_key_unref, NULL);
-		g_list_free(keys);
-		return NULL;
-	}
-	gpgme_op_keylist_end(ctx);
-
-	/* let the user select a key from the list, even if there is only one */
-	if (select_key_cb)
-		key = select_key_cb(name, LB_SELECT_PUBLIC_KEY_ANY, keys,
-							gpgme_get_protocol(ctx), parent);
-	else
-		key = NULL;
-	if (key) {
-		gpgme_key_ref(key);
-		g_list_foreach(keys, (GFunc) gpgme_key_unref, NULL);
-	}
-	g_list_free(keys);
 	return key;
 }
 
 
-/*
- * Add signer to ctx's list of signers and return TRUE on success or FALSE
- * on error.
+/** \brief Add the private key for signing
+ *
+ * \param ctx GpgME context
+ * \param signer sender's (signers) mail address or key fingerprint
+ * \param parent transient parent window
+ * \param error filled with a human-readable error on error, may be NULL
+ * \return TRUE on success or FALSE if no suitable key is available
+ *
+ * Add the signer's key to the list of signers of the passed context.
  */
 static gboolean
-gpgme_add_signer(gpgme_ctx_t ctx, const gchar * signer, GtkWindow * parent,
-		 GError ** error)
+gpgme_add_signer(gpgme_ctx_t   ctx,
+				 const gchar  *signer,
+				 GtkWindow    *parent,
+				 GError      **error)
 {
-	gboolean result = FALSE;
-	gpgme_key_t key;
+	gpgme_error_t result;
+	gpgme_key_t key = NULL;
 
     /* note: private (secret) key has never low trust... */
-	key = get_key_from_name(ctx, signer, TRUE, FALSE, parent, error);
-	if (key != NULL) {
-		/* set the key (the previous operation guaranteed that it exists, no
-		 * need 2 check return values...) */
-		gpgme_signers_add(ctx, key);
+	result = get_key_from_name(ctx, &key, signer, TRUE, FALSE, parent, error);
+	if (result == GPG_ERR_NO_ERROR) {
+		/* set the key (the previous operation guaranteed that it exists, no need 2 check return values...) */
+		(void) gpgme_signers_add(ctx, key);
 		gpgme_key_unref(key);
-		result = TRUE;
 	}
 
-    return result;
+    return (result == GPG_ERR_NO_ERROR);
 }
 
 
-/*
- * Build a NULL-terminated array of keys for all recipients in rcpt_list
- * and return it. The caller has to take care that it's released. If
- * something goes wrong, NULL is returned.
+/** \brief Find public keys for a list of recipients
+ *
+ * \param ctx GpgME context
+ * \param rcpt_list array of <i>gchar *</i> elements, each containing a recipient's mailbox
+ * \param accept_low_trust TRUE to accept low-trust keys without confirmation
+ * \param parent transient parent window
+ * \param error filled with a human-readable error on error, may be NULL
+ * \return a newly allocated, NULL-terminated array of keys on success, NULL if any error occurred
+ *
+ * Build an array of keys for all recipients in rcpt_list and return it.
+ *
+ * \note The caller shall free the returned list by calling release_keylist().
  */
 static gpgme_key_t *
-gpgme_build_recipients(gpgme_ctx_t ctx, GPtrArray * rcpt_list,
-		       gboolean accept_low_trust, GtkWindow * parent,
-		       GError ** error)
+gpgme_build_recipients(gpgme_ctx_t   ctx,
+					   GPtrArray    *rcpt_list,
+					   gboolean      accept_low_trust,
+					   GtkWindow    *parent,
+					   GError      **error)
 {
-    gpgme_key_t *rcpt = g_new0(gpgme_key_t, rcpt_list->len + 1);
-    guint num_rcpts;
+	gpgme_key_t *rcpt = g_new0(gpgme_key_t, rcpt_list->len + 1U);
+	gpgme_error_t select_res;
+	guint num_rcpts;
 
-    /* try to find the public key for every recipient */
-    for (num_rcpts = 0; num_rcpts < rcpt_list->len; num_rcpts++) {
-	gchar *name = (gchar *) g_ptr_array_index(rcpt_list, num_rcpts);
-	gpgme_key_t key;
+	/* try to find the public key for every recipient */
+	select_res = GPG_ERR_NO_ERROR;
+	for (num_rcpts = 0U; (select_res == GPG_ERR_NO_ERROR) && (num_rcpts < rcpt_list->len); num_rcpts++) {
+		gchar *name = (gchar *) g_ptr_array_index(rcpt_list, num_rcpts);
+		gpgme_key_t key = NULL;
 
-		key = get_key_from_name(ctx, name, FALSE, accept_low_trust, parent, error);
-		if (key == NULL) {
-			key = get_pubkey(ctx, name, accept_low_trust, parent, error);
-			if (key == NULL) {
-				release_keylist(rcpt);
-				return NULL;
+		select_res = get_key_from_name(ctx, &key, name, FALSE, accept_low_trust, parent, error);
+
+		/* if no public key exists for the user, as fallback list all keys so an other one may be selected */
+		if (select_res == GPG_ERR_NO_PUBKEY) {
+			key = get_pubkey(ctx, name, parent, error);
+			if (key != NULL) {
+				select_res = GPG_ERR_NO_ERROR;		/* got one, clear error state */
 			}
+		}
+
+		/* set the recipient */
+		rcpt[num_rcpts] = key;
 	}
 
-	/* set the recipient */
-	rcpt[num_rcpts] = key;
-    }
+	if (select_res != GPG_ERR_NO_ERROR) {
+		release_keylist(rcpt);
+		rcpt = NULL;
+	}
 
-    return rcpt;
+	return rcpt;
 }
 
 

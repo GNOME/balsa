@@ -36,6 +36,7 @@
 #include <gtk/gtk.h>
 #include <stdlib.h>
 #include "rfc3156.h"
+#include "libbalsa-gpgme-widgets.h"
 #include "libbalsa-gpgme-cb.h"
 
 
@@ -307,36 +308,22 @@ lb_gpgme_select_key(const gchar * user_name, lb_key_sel_md_t mode, GList * keys,
 
 
 gboolean
-lb_gpgme_accept_low_trust_key(const gchar * user_name,
-			      const gpgme_user_id_t user_id,
-			      GtkWindow * parent)
+lb_gpgme_accept_low_trust_key(const gchar *user_name,
+				  	  	  	  gpgme_key_t  key,
+							  GtkWindow   *parent)
 {
     GtkWidget *dialog;
     gint result;
-    gchar *message1;
     gchar *message2;
 
     /* paranoia checks */
-    g_return_val_if_fail(user_id != NULL, FALSE);
+    g_return_val_if_fail((user_name != NULL) && (key != NULL), FALSE);
 
-    /* build the message */
-    message1 =
-	g_strdup_printf(_("Insufficient trust for recipient %s"),
-			user_name);
-    message2 =
-	g_strdup_printf(_
-			("The validity of the key with user ID “%s” is “%s”."),
-			user_id->uid,
-			libbalsa_gpgme_validity_to_gchar_short(user_id->
-							       validity));
-    dialog =
-	gtk_message_dialog_new_with_markup(parent,
-					   GTK_DIALOG_DESTROY_WITH_PARENT,
-					   GTK_MESSAGE_WARNING,
-					   GTK_BUTTONS_YES_NO,
-					   "<b>%s</b>\n\n%s\n%s", message1,
-					   message2,
-					   _("Use this key anyway?"));
+    /* create the dialog */
+    message2 = g_strdup_printf(_("The owner trust for this key is “%s” only.\nUse this key anyway?"),
+    	libbalsa_gpgme_validity_to_gchar_short(key->owner_trust));
+    dialog = libbalsa_key_dialog(parent, GTK_BUTTONS_YES_NO, key, GPG_SUBKEY_CAP_ENCRYPT, _("Insufficient key owner trust"),
+    	message2);
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu_for_parent(dialog, parent);
 #endif
@@ -346,13 +333,16 @@ lb_gpgme_accept_low_trust_key(const gchar * user_name,
     gtk_widget_destroy(dialog);
 
     return result == GTK_RESPONSE_YES;
-
 }
 
 
 #include "padlock-keyhole.xpm"
 
-
+/*
+ * FIXME - usually, the passphrase should /never/ be requested using this function, but directly by GnuPG using pinentry which
+ * guarantees, inter alia, the use of safe (unpagable) memory.  For GnuPG >= 2.1 the pinentry mode has to be set to
+ * GPGME_PINENTRY_MODE_LOOPBACK to enable the passphrase callback.  Consider to remove this function completely...
+ */
 static gchar *
 get_passphrase_real(const gchar * uid_hint, const gchar * passphrase_info,
 		    int prev_was_bad, GtkWindow * parent)

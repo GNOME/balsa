@@ -9,12 +9,18 @@ libbalsa_gpgme_extra = 		\
 	libbalsa-gpgme.c		\
 	libbalsa-gpgme-cb.h		\
 	libbalsa-gpgme-cb.c		\
+	libbalsa-gpgme-keys.h	\
+	libbalsa-gpgme-keys.c	\
+	libbalsa-gpgme-widgets.h\
+	libbalsa-gpgme-widgets.c\
 	gmime-multipart-crypt.h	\
 	gmime-multipart-crypt.c	\
 	gmime-part-rfc2440.h	\
 	gmime-part-rfc2440.c	\
 	gmime-gpgme-signature.h	\
-	gmime-gpgme-signature.c
+	gmime-gpgme-signature.c	\
+	gmime-application-pkcs7.h	\
+	gmime-application-pkcs7.c
 libbalsa_gpgme_extra_dist =
 else
 libbalsa_gpgme_extra =
@@ -23,22 +29,16 @@ libbalsa_gpgme_extra_dist =	\
 	libbalsa-gpgme.c		\
 	libbalsa-gpgme-cb.h		\
 	libbalsa-gpgme-cb.c		\
+	libbalsa-gpgme-keys.h	\
+	libbalsa-gpgme-keys.c	\
+	libbalsa-gpgme-widgets.h\
+	libbalsa-gpgme-widgets.c\
 	gmime-multipart-crypt.h	\
 	gmime-multipart-crypt.c	\
 	gmime-part-rfc2440.h	\
 	gmime-part-rfc2440.c	\
 	gmime-gpgme-signature.h	\
-	gmime-gpgme-signature.c
-endif
-
-if BUILD_WITH_SMIME
-libbalsa_smime_extra =			\
-	gmime-application-pkcs7.h	\
-	gmime-application-pkcs7.c
-libbalsa_smime_extra_dist =
-else
-libbalsa_smime_extra =
-libbalsa_smime_extra_dist =		\
+	gmime-gpgme-signature.c	\
 	gmime-application-pkcs7.h	\
 	gmime-application-pkcs7.c
 endif
@@ -155,15 +155,13 @@ libbalsa_a_SOURCES = 		\
 	source-viewer.c		\
 	url.c			\
 	url.h			\
-	${libbalsa_gpgme_extra}	\
-	${libbalsa_smime_extra}
+	${libbalsa_gpgme_extra}
 
 
 EXTRA_DIST = 				\
 	libbalsa-marshal.list		\
 	padlock-keyhole.xpm		\
-	${libbalsa_gpgme_extra_dist}	\
-	${libbalsa_smime_extra_dist}
+	${libbalsa_gpgme_extra_dist}
 
 AM_CPPFLAGS = -I${top_builddir} -I${top_srcdir} -I${top_srcdir}/libbalsa \
 	-I${top_srcdir}/libnetclient \

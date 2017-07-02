@@ -77,15 +77,6 @@ AC_ARG_WITH([gpgme],
    AC_HELP_STRING([--with-gpgme=gpgme-config],
                   [build with gpgme/GnuPG support (default=no, path to gpgme-config optional)]),
 	          [ gpgmecfg=$withval ], [ gpgmecfg=no ])
-AC_ARG_ENABLE([smime],
-   AC_HELP_STRING([--enable-smime],
-                  [include S/MIME support (needs gpgme and gpgsm, experimental for gpg < 2.0.4)]),
-	          [ have_smime=$enableval ], [ have_smime=check ])
-AC_ARG_WITH([gpg-app],
-   AC_HELP_STRING([--with-gpg-app=PATH],
-                  [use PATH as GnuPG application (default=gpg2 if >= 2.0.4, otherwise gpg 1.x)]),
-	          [ gpgapp=$withval ], [ gpgapp=no ])
-
 
 
 AC_ARG_WITH(canberra,
@@ -396,11 +387,9 @@ if test x"$gpgmecfg" != xno ; then
         gpgme_mi=`echo $gpgmever|sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)/\3/'`
 	if test $gpgme_ve -lt 1; then
 		gpgmecfg=no
-		have_smime=no
 	fi
 	if test \( $gpgme_ve -eq 1 \) -a \( $gpgme_ma -lt 2 \) ; then
 		gpgmecfg=no
-		have_smime=no
 	fi
 	if test x"$gpgmecfg" != xno ; then
 	        if test \( $gpgme_ve -eq 1 \) -a \( $gpgme_ma -lt 8 \) ; then
@@ -417,80 +406,8 @@ if test x"$gpgmecfg" != xno ; then
 	else
 		AC_MSG_WARN([sorry, you need at least gpgme version 1.2.0])
 	fi
-else
-	have_smime=no
 fi
 AM_CONDITIONAL([BUILD_WITH_GPGME], [test $gpgmecfg = "yes"])
-
-# check the GnuPG engine application version
-# note: gpg2 interacts fine with gpgme only since version 2.0.4
-AC_DEFUN([AC_CHECK_GPG_VER],[
-	if ! test -x $1 ; then
-		AC_MSG_ERROR([$1 is not executable])
-	fi
-	AC_MSG_CHECKING([$1 version])
-	gpgver=`$1 --version | sed -e 's/.* //' -e q`
-	AC_MSG_RESULT($gpgver)
-        gpg_ve=`echo $gpgver|sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)/\1/'`
-        gpg_ma=`echo $gpgver|sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)/\2/'`
-        gpg_mi=`echo $gpgver|sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)/\3/'`
-	HAVE_GPG2=no
-	if test \( $gpg_ve -eq 2 \) -a \( $gpg_ma -eq 0 \) -a \( $gpg_mi -lt 4 \) ; then
-    		ifelse([$3], , :, [$3])
-	else
-		if test $gpg_ve -eq 2 ; then
-			HAVE_GPG2=yes
-		fi
-    		ifelse([$2], , :, [$2])
-	fi])
-
-# find a suitable GnuPG engine if gpgme is enabled
-if test x"$gpgmecfg" != xno ; then
-	if test x"$gpgapp" != xno ; then
-		AC_CHECK_GPG_VER($gpgapp, , 
-				 AC_MSG_ERROR([gpg2 < 2.0.4 does not communicate properly with gpgme]))
-	else
-		AC_PATH_PROG(gpg2, gpg2, [no])
-		if test x"$gpg2" != xno ; then
-			AC_CHECK_GPG_VER($gpg2, [gpgapp=$gpg2],
-					 AC_MSG_WARN([gpg2 < 2.0.4 does not communicate properly with gpgme]))
-		fi
-		if test x"$gpgapp" = xno ; then
-			AC_PATH_PROG(gpg, gpg, [no])
-			if test x"$gpg" != xno ; then
-				AC_CHECK_GPG_VER($gpg, [gpgapp=$gpg],
-					 	AC_MSG_WARN([gpg2 < 2.0.4 does not communicate properly with gpgme]))
-			fi
-		fi
-		if test x"$gpgapp" = xno ; then
-			AC_PATH_PROG(gpg1, gpg1, [no])
-			if test x"$gpg1" != xno ; then
-				AC_CHECK_GPG_VER($gpg1, [gpgapp=$gpg1],
-					 	AC_MSG_WARN([gpg2 < 2.0.4 does not communicate properly with gpgme]))
-			fi
-		fi
-	fi
-	if test x"$gpgapp" != xno ; then
-		AC_DEFINE(HAVE_GPG,1,[Defined when gpg is available.])
-		AC_DEFINE_UNQUOTED(GPG_PATH,["$gpgapp"],[Path of gpg.])
-	else
-		AC_MSG_WARN([cannot find a suitable gpg application])
-		AC_MSG_WARN([please consider using --with-gpg-app to specify it])
-	fi
-else
-	AC_MSG_RESULT([no])
-fi
-
-# s/mime is mature for gpg >= 2.0.4
-AC_MSG_CHECKING(whether to include S/MIME support)
-if test \( x"$have_smime" = xyes \) -o \( \( x"$HAVE_GPG2" = xyes \) -a \( x"$have_smime" = xcheck \) \) ; then
-	AC_MSG_RESULT([yes])
-	have_smime=yes
-	AC_DEFINE(HAVE_SMIME,1,[Defined when supporting S/MIME])
-else
-	AC_MSG_RESULT([no])
-fi
-AM_CONDITIONAL([BUILD_WITH_SMIME], [test $have_smime = "yes"])
 
 
 # OpenLDAP configuration.

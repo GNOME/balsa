@@ -1,3 +1,28 @@
+2017-07-02  Albrecht Dreß
+
+	Gpgme-related improvements
+
+	* libbalsa/libbalsa-gpgme-keys.[ch]: (new) implement key listing
+	  and key server operations
+	* libbalsa/libbalsa-gpgme-widgets.[ch]: (new) implement key widget and dialogue
+	* configure.ac: drop otions "--with-gpg-app" and "--enable-smime"
+	* libbalsa/Makefile.am: remove option for building without s/mime support
+	* libbalsa/gmime-multipart-crypt.c, libbalsa/identity.c,
+	libbalsa/send.c, src/balsa-print-object.c, src/sendmsg-window.c: remove conditionals
+	  for s/mime support
+	* libbalsa/libbalsa-gpgme-cb.[ch]: use new key dialogue, fix prototype indent
+	* libbalsa/libbalsa-gpgme.[ch]: export functions for setting a gpgme error
+	  and creating a context, do not set gpg application, remove conditionals
+	  for s/mime support, fix loading a key for a name or fingerprint,
+	  use new key listing function
+	* libbalsa/rfc3156.[ch}: remove conditionals for s/mime support,
+	  use convenience functions exported by libbalsa-gpgme.c,
+	  export new function creating a short signature status,
+	  remove functions talking to the keyserver through gpg directly,
+	  use GLib functions to check to the trust db update lock,
+	  check for public key availibility by using the new key list function
+	* src/balsa-mime-widget-crypto.c: use new key widget, drop GPG-related conditionals
+
 2017-06-30  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Add assertions to remove some clang-static-analyzer false

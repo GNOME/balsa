@@ -228,13 +228,11 @@ g_mime_gpgme_mps_verify(GMimeMultipartSigned * mps, GError ** error)
     if (protocol) {
 	if (g_ascii_strcasecmp("application/pgp-signature", protocol) == 0)
 	    crypto_prot = GPGME_PROTOCOL_OpenPGP;
-#if defined(HAVE_SMIME)
 	else if (g_ascii_strcasecmp
 		 ("application/pkcs7-signature", protocol) == 0
 		 || g_ascii_strcasecmp("application/x-pkcs7-signature",
 				       protocol) == 0)
 	    crypto_prot = GPGME_PROTOCOL_CMS;
-#endif
 	else
 	    crypto_prot = GPGME_PROTOCOL_UNKNOWN;
     } else

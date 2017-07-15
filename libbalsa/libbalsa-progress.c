@@ -96,6 +96,11 @@ libbalsa_progress_dialog_ensure(GtkWidget   **progress_dialog,
 	g_mutex_unlock(&progress_mutex);
 }
 
+static void
+revealer_destroy_notify(gpointer timer_id)
+{
+    g_source_remove(GPOINTER_TO_UINT(timer_id));
+}
 
 gboolean
 libbalsa_progress_dialog_update(gpointer user_data)
@@ -130,8 +135,14 @@ libbalsa_progress_dialog_update(gpointer user_data)
 				gtk_progress_bar_set_fraction(progress, ctrl_data->fraction);
 			}
 			if (ctrl_data->finished) {
+				guint timer_id;
+
 				gtk_revealer_set_reveal_child(GTK_REVEALER(progress_widget), FALSE);
-				g_timeout_add(500, remove_progress_widget, progress_widget);
+
+				/* set a timer and remember it's id so we can remove it properly if the user destroys the whole dialogue */
+                                timer_id = g_timeout_add(500, remove_progress_widget, progress_widget);
+                                g_object_set_data_full(G_OBJECT(progress_widget), "timer", GUINT_TO_POINTER(timer_id),
+                                                       revealer_destroy_notify);
 			}
 		}
 	}
@@ -240,6 +251,8 @@ remove_progress_widget(gpointer user_data)
 	GtkWidget *parent_dialog;
 	GtkWidget *content_box;
 	guint rev_children = 0U;
+
+        (void) g_object_steal_data(G_OBJECT(progress), "timer");
 
 	parent_dialog = gtk_widget_get_toplevel(progress);
 	gtk_widget_destroy(progress);

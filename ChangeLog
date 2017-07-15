@@ -1,3 +1,8 @@
+2017-07-15  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* libbalsa/address.c (libbalsa_address_get_edit_widget): do not
+	use old style declaration.
+
 2017-07-15  Albrecht Dreß
 
 	* libbalsa/libbalsa-progress.c (revealer_destroy_notify),

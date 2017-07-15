@@ -948,7 +948,7 @@ libbalsa_address_get_edit_widget(const LibBalsaAddress *address,
                                  GtkWidget **entries,
                                  GCallback changed_cb, gpointer changed_data)
 {
-    const static gchar *labels[NUM_FIELDS] = {
+    static const gchar *labels[NUM_FIELDS] = {
 	N_("D_isplayed Name:"),
 	N_("_First Name:"),
 	N_("_Last Name:"),

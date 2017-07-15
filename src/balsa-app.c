@@ -638,8 +638,9 @@ balsa_find_dir(LibBalsaServer *server, const gchar * path)
     BalsaFind bf;
     gboolean is_sub_thread = libbalsa_am_i_subthread();
 
-    if (is_sub_thread)
+    if (is_sub_thread) {
 	gdk_threads_enter();
+    }
 
     bf.data = path;
     bf.server = server;
@@ -647,8 +648,9 @@ balsa_find_dir(LibBalsaServer *server, const gchar * path)
     gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
 			   (GtkTreeModelForeachFunc) find_path, &bf);
 
-    if (is_sub_thread)
+    if (is_sub_thread) {
 	gdk_threads_leave();
+    }
 
     return bf.mbnode;
 }

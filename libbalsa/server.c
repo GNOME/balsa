@@ -437,7 +437,7 @@ libbalsa_server_load_config(LibBalsaServer * server)
     server->client_cert = libbalsa_conf_get_bool("NeedClientCert=false");
     server->cert_file = libbalsa_conf_get_string("UserCertificateFile");
     server->cert_passphrase = libbalsa_conf_private_get_string("CertificatePassphrase");
-    if ((server->cert_passphrase != NULL) && (server->cert_passphrase != '\0')) {
+    if ((server->cert_passphrase != NULL) && (server->cert_passphrase[0] != '\0')) {
         gchar *tmp = libbalsa_rot(server->cert_passphrase);
 
         g_free(server->cert_passphrase);

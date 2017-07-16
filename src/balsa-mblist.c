@@ -883,7 +883,6 @@ static void
 bmbl_select_mailbox(GtkTreeSelection * selection, gpointer data)
 {
     GdkEvent *event = gtk_get_current_event();
-    GtkTreeIter iter;
     GtkTreeView *tree_view =
         gtk_tree_selection_get_tree_view(selection);
     GtkTreeModel *model =
@@ -891,10 +890,9 @@ bmbl_select_mailbox(GtkTreeSelection * selection, gpointer data)
     GtkTreePath *path;
 
     if (!event) {
-	GtkTreeModel *model;
 	GtkTreeIter iter;
 
-	if (gtk_tree_selection_get_selected(selection, &model, &iter)) {
+	if (gtk_tree_selection_get_selected(selection, NULL, &iter)) {
 	    BalsaMailboxNode *mbnode;
 	    LibBalsaMailbox *mailbox;
 	    gtk_tree_model_get(model, &iter, MBNODE_COLUMN, &mbnode, -1);
@@ -937,6 +935,7 @@ bmbl_select_mailbox(GtkTreeSelection * selection, gpointer data)
 
     if (gtk_tree_selection_path_is_selected(selection, path)) {
         BalsaMailboxNode *mbnode;
+        GtkTreeIter iter;
 
         gtk_tree_model_get_iter(model, &iter, path);
         gtk_tree_model_get(model, &iter, MBNODE_COLUMN, &mbnode, -1);

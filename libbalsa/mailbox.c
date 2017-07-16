@@ -1847,7 +1847,7 @@ libbalsa_mailbox_add_message(LibBalsaMailbox * mailbox,
 
 guint
 libbalsa_mailbox_add_messages(LibBalsaMailbox * mailbox,
-			      LibBalsaAddMessageIterator msg_iterator,
+			      LibBalsaAddMessageIterator iterator,
 			      void *arg,
 			      GError ** err)
 {
@@ -1859,7 +1859,7 @@ libbalsa_mailbox_add_messages(LibBalsaMailbox * mailbox,
 
     retval =
         LIBBALSA_MAILBOX_GET_CLASS(mailbox)->add_messages(mailbox, 
-							  msg_iterator, arg,
+							  iterator, arg,
 							  err);
 
     if (retval) {

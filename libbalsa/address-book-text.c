@@ -344,8 +344,6 @@ lbab_text_load_file(LibBalsaAddressBookText * ab_text, FILE * stream)
 #if MAKE_GROUP_BY_ORGANIZATION
         gchar **groups, **group;
 #endif                          /* MAKE_GROUP_BY_ORGANIZATION */
-        GList *l;
-
         if (!address)
             continue;
 
@@ -354,6 +352,7 @@ lbab_text_load_file(LibBalsaAddressBookText * ab_text, FILE * stream)
             /* Create a group address. */
             InternetAddress *ia =
                 internet_address_group_new(address->full_name);
+            GList *l;
 
             for (l = address->address_list; l; l = l->next) {
                 InternetAddress *member =

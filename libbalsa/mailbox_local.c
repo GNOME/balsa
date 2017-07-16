@@ -1356,8 +1356,6 @@ libbalsa_mailbox_local_prepare_threading(LibBalsaMailbox * mailbox,
     libbalsa_progress_set_text(&progress, NULL, 0);
 
     if (retval && need_thread && !local->thread_id) {
-        LibBalsaMailbox *mailbox = LIBBALSA_MAILBOX(local);
-
         if (libbalsa_mailbox_get_threading_type(mailbox) !=
             LB_MAILBOX_THREADING_FLAT
             || libbalsa_mailbox_get_sort_field(mailbox) !=

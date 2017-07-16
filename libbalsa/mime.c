@@ -1217,10 +1217,11 @@ libbalsa_text_to_html(const gchar * title, const gchar * body, const gchar * lan
     gchar * html_subject;
     const gchar * start = body;
     gchar * html_lang;
-    gchar * p;
 
     /* set the html header, including the primary language and the title */
     if (lang) {
+        gchar * p;
+
         html_lang = g_strdup(lang);
         if ((p = strchr(html_lang, '_')))
             *p = '-';

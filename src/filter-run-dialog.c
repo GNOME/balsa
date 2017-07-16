@@ -492,8 +492,8 @@ filters_run_dialog(LibBalsaMailbox * mbox,
     }
     /* We look for an existing dialog box for this mailbox */
     for (lst = fr_dialogs_opened; lst; lst = g_list_next(lst)) {
-        BalsaFilterRunDialog *p = lst->data;
-        if (strcmp(p->mbox->url, mbox->url) == 0)
+        BalsaFilterRunDialog *dialog = lst->data;
+        if (strcmp(dialog->mbox->url, mbox->url) == 0)
             break;
     }
     if (lst) {

@@ -1252,7 +1252,7 @@ libbalsa_message_create_mime_message(LibBalsaMessage *message,
             } else if (g_ascii_strcasecmp(mime_type[0], "message") == 0) {
                 GMimeStream *stream;
                 GMimeParser *parser;
-                GMimeMessage *mime_message;
+                GMimeMessage *mime_msg;
                 GError *err = NULL;
 
                 stream = libbalsa_vfs_create_stream(body->file_uri, 0, FALSE, &err);
@@ -1273,12 +1273,12 @@ libbalsa_message_create_mime_message(LibBalsaMessage *message,
                 }
                 parser = g_mime_parser_new_with_stream(stream);
                 g_object_unref(stream);
-                mime_message = g_mime_parser_construct_message(parser);
+                mime_msg = g_mime_parser_construct_message(parser);
                 g_object_unref(parser);
                 mime_part =
                     GMIME_OBJECT(g_mime_message_part_new_with_message
-                                     (mime_type[1], mime_message));
-                g_object_unref(mime_message);
+                                     (mime_type[1], mime_msg));
+                g_object_unref(mime_msg);
             } else {
                 const gchar *charset = NULL;
                 GMimeStream *stream;

@@ -249,12 +249,12 @@ imap_check_server_identity(SSL *ssl, const char *host,
     int i;
 
     for (i=0; i< sk_GENERAL_NAME_num(altnames); i++) {
-      const GENERAL_NAME *name = sk_GENERAL_NAME_value(altnames, i);
+      const GENERAL_NAME *current_name = sk_GENERAL_NAME_value(altnames, i);
 
       /* We handle only GEN_DNS. GEN_IP (certificates for IP numbers)
          are too weird to be real in IMAP case. */
-      if (name->type == GEN_DNS) {
-        const ASN1_IA5STRING *ia5 = name->d.ia5;
+      if (current_name->type == GEN_DNS) {
+        const ASN1_IA5STRING *ia5 = current_name->d.ia5;
         const char *name = (const char*)ia5->data;
         has_extension_with_dns_name = 1;
 

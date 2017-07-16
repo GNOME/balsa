@@ -1,5 +1,38 @@
 2017-07-15  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Do not use local variables that shadow other variables
+
+	* libbalsa/address-book-text.c (lbab_text_load_file):
+	* libbalsa/address-view.c (lbav_set_text):
+	* libbalsa/gmime-part-rfc2440.c (g_mime_part_rfc2440_verify),
+	(g_mime_part_rfc2440_decrypt):
+	* libbalsa/imap/imap-tls.c (imap_check_server_identity):
+	* libbalsa/libbalsa-conf.c (lbc_init):
+	* libbalsa/libbalsa.c (libbalsa_is_cert_known):
+	* libbalsa/mailbox.c (libbalsa_mailbox_add_messages):
+	* libbalsa/mailbox_imap.c (imap_expunge_cb),
+	(internet_address_new_list_from_imap_address),
+	(libbalsa_mailbox_imap_add_messages), (icm_restore_from_cache):
+	* libbalsa/mailbox_local.c
+	(libbalsa_mailbox_local_prepare_threading):
+	* libbalsa/mailbox_mh.c (libbalsa_mailbox_mh_get_message_stream),
+	(libbalsa_mailbox_mh_check), (libbalsa_mailbox_mh_sync),
+	(libbalsa_mailbox_mh_fetch_message_structure),
+	(lbm_mh_add_message):
+	* libbalsa/mime.c (libbalsa_text_to_html):
+	* libbalsa/send.c (libbalsa_message_create_mime_message):
+	* src/balsa-mblist.c (bmbl_select_mailbox):
+	* src/balsa-message.c (balsa_part_info_free):
+	* src/filter-run-dialog.c (filters_run_dialog):
+	* src/main-window.c:
+	* src/save-restore.c (config_global_load):
+	* src/sendmsg-window.c (sw_edit_activated),
+	(update_bsmsg_identity), (scan_bodies), (create_lang_menu),
+	(send_message_handler), (sendmsg_window_new_from_list),
+	(sendmsg_window_continue):
+
+2017-07-15  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* src/balsa-app.c (balsa_find_dir): put braces around empty "if"
 	block.
 

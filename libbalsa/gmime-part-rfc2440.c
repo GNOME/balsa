@@ -257,8 +257,7 @@ g_mime_part_rfc2440_verify(GMimePart * part, GError ** err)
 
     /* upon success, replace the signed content by the checked one */
     if (result && g_mime_stream_length(plainstream) > 0) {
-	GMimeDataWrapper *wrapper = g_mime_data_wrapper_new();
-
+	wrapper = g_mime_data_wrapper_new();
 	g_mime_data_wrapper_set_stream(wrapper, plainstream);
 	g_mime_part_set_content_object(GMIME_PART(part), wrapper);
 	g_object_unref(wrapper);
@@ -318,7 +317,6 @@ g_mime_part_rfc2440_decrypt(GMimePart * part, GtkWindow * parent,
 	GMimeStream *filter_stream;
 	GMimeStream *out_stream;
 	GMimeFilter *filter;
-	GMimeDataWrapper *wrapper = g_mime_data_wrapper_new();
 
 	/* strip crlf off encrypted stuff coming from Winbloze crap */
 	filter_stream = g_mime_stream_filter_new(plainstream);
@@ -329,8 +327,10 @@ g_mime_part_rfc2440_decrypt(GMimePart * part, GtkWindow * parent,
 
 	/* replace the old contents by the decrypted stuff */
 	out_stream = g_mime_stream_mem_new();
+	wrapper = g_mime_data_wrapper_new();
 	g_mime_data_wrapper_set_stream(wrapper, out_stream);
 	g_mime_part_set_content_object(part, wrapper);
+        g_object_unref(wrapper);
 	g_mime_stream_reset(filter_stream);
 	g_mime_stream_write_to_stream(filter_stream, out_stream);
 	g_object_unref(filter_stream);

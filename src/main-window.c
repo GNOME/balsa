@@ -95,7 +95,6 @@ GtkWidget *progress_dialog = NULL;
 GtkWidget *progress_dialog_source = NULL;
 GtkWidget *progress_dialog_message = NULL;
 GtkWidget *progress_dialog_bar = NULL;
-GSList *list = NULL;
 static int quiet_check=0;
 
 struct check_messages_thread_info {

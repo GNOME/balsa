@@ -106,7 +106,7 @@ lbc_init(LibBalsaConf * conf, const gchar * filename,
     if (!g_key_file_load_from_file
         (conf->key_file, conf->path, G_KEY_FILE_NONE, &error)) {
         gchar *old_path;
-        gchar *buf;
+        gchar *key_file_text;
         static gboolean warn = TRUE;
 
         old_path =
@@ -117,18 +117,18 @@ lbc_init(LibBalsaConf * conf, const gchar * filename,
 #endif                          /* DEBUG */
         g_clear_error(&error);
 
-        buf = lbc_readfile(old_path);
-        if (buf) {
+        key_file_text = lbc_readfile(old_path);
+        if (key_file_text != NULL) {
             /* GnomeConfig used ' ' as the list separator... */
             g_key_file_set_list_separator(conf->key_file, ' ');
-            g_key_file_load_from_data(conf->key_file, buf, -1,
+            g_key_file_load_from_data(conf->key_file, key_file_text, -1,
                                       G_KEY_FILE_KEEP_COMMENTS, &error);
-            g_free(buf);
+            g_free(key_file_text);
             /* ...but GKeyFile doesn't handle it properly, so we'll
              * revert to the default ';'. */
             g_key_file_set_list_separator(conf->key_file, ';');
         }
-        if (!buf || error) {
+        if (key_file_text == NULL || error != NULL) {
 #if DEBUG
             g_message("Could not load key file from file “%s”: %s",
                       old_path,

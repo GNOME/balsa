@@ -264,15 +264,15 @@ libbalsa_mailbox_mh_get_message_stream(LibBalsaMailbox * mailbox,
 {
     GMimeStream *stream;
     struct message_info *msg_info;
-    gchar *tmp;
+    gchar *base_name;
 
     g_return_val_if_fail(MAILBOX_OPEN(mailbox), NULL);
 
     msg_info = lbm_mh_message_info_from_msgno(LIBBALSA_MAILBOX_MH(mailbox),
 					      msgno);
-    tmp = MH_BASENAME(msg_info);
-    stream = libbalsa_mailbox_local_get_message_stream(mailbox, tmp, NULL);
-    g_free(tmp);
+    base_name = MH_BASENAME(msg_info);
+    stream = libbalsa_mailbox_local_get_message_stream(mailbox, base_name, NULL);
+    g_free(base_name);
 
     return stream;
 }
@@ -625,14 +625,14 @@ libbalsa_mailbox_mh_check(LibBalsaMailbox * mailbox)
     /* create .mh_sequences when there isn't one. */
     if (stat(mh->sequences_filename, &st_sequences) == -1) {
 	if (errno == ENOENT) {
-	    gchar *tmp;
-	    int fd = libbalsa_mailbox_mh_open_temp(path, &tmp);
+	    gchar *name_used;
+	    int fd = libbalsa_mailbox_mh_open_temp(path, &name_used);
 	    if (fd != -1) {
 		close(fd);
-		if (libbalsa_safe_rename(tmp,
+		if (libbalsa_safe_rename(name_used,
 					 mh->sequences_filename) == -1)
-		    unlink(tmp);
-		g_free(tmp);
+		    unlink(name_used);
+		g_free(name_used);
 	    }
 	    if (stat(mh->sequences_filename, &st_sequences) == -1)
 		modified = 1;
@@ -668,12 +668,12 @@ libbalsa_mailbox_mh_check(LibBalsaMailbox * mailbox)
     /* Was any message removed? */
     renumber = mh->msgno_2_msg_info->len + 1;
     for (msgno = 1; msgno <= mh->msgno_2_msg_info->len; ) {
-	gchar *tmp, *filename;
+	gchar *base_name, *filename;
 
 	msg_info = lbm_mh_message_info_from_msgno(mh, msgno);
-	tmp = MH_BASENAME(msg_info);
-	filename = g_build_filename(path, tmp, NULL);
-	g_free(tmp);
+	base_name = MH_BASENAME(msg_info);
+	filename = g_build_filename(path, base_name, NULL);
+	g_free(base_name);
 	if (access(filename, F_OK) == 0)
 	    msgno++;
 	else {
@@ -784,7 +784,7 @@ libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox, gboolean expunge)
     LibBalsaMailboxMh *mh;
     struct line_info unseen, flagged, replied, recent;
     const gchar *path;
-    gchar *tmp;
+    gchar *name_used;
     guint msgno;
     struct message_info *msg_info;
 
@@ -834,9 +834,9 @@ libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 	    /* MH just moves files out of the way when you delete them */
 	    /* chbm: not quite, however this is probably a good move for
 	       flag deleted */
-	    char *tmp = MH_BASENAME(msg_info);
-	    char *orig = g_build_filename(path, tmp, NULL);
-	    g_free(tmp);
+	    char *base_name = MH_BASENAME(msg_info);
+	    char *orig = g_build_filename(path, base_name, NULL);
+	    g_free(base_name);
 	    unlink(orig);
 	    g_free(orig);
 	    /* free old information */
@@ -851,20 +851,20 @@ libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 	    lbm_mh_flag_line(msg_info, LIBBALSA_MESSAGE_FLAG_RECENT, &recent);
 	    if ((msg_info->local_info.flags ^ msg_info->orig_flags) &
 		LIBBALSA_MESSAGE_FLAG_DELETED) {
-		gchar *tmp;
+		gchar *base_name;
 		gchar *old_file;
 		gchar *new_file;
 
-		tmp = MH_BASENAME(msg_info);
-		old_file = g_build_filename(path, tmp, NULL);
-		g_free(tmp);
+		base_name = MH_BASENAME(msg_info);
+		old_file = g_build_filename(path, base_name, NULL);
+		g_free(base_name);
 
                 msg_info->orig_flags =
                     REAL_FLAGS(msg_info->local_info.flags);
 
-		tmp = MH_BASENAME(msg_info);
-		new_file = g_build_filename(path, tmp, NULL);
-		g_free(tmp);
+		base_name = MH_BASENAME(msg_info);
+		new_file = g_build_filename(path, base_name, NULL);
+		g_free(base_name);
 
 		if (libbalsa_safe_rename(old_file, new_file) == -1) {
 		    /* FIXME: report error ... */
@@ -892,10 +892,10 @@ libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 
     /* open tempfile */
     path = libbalsa_mailbox_local_get_path(mailbox);
-    fd = libbalsa_mailbox_mh_open_temp(path, &tmp);
+    fd = libbalsa_mailbox_mh_open_temp(path, &name_used);
     if (fd == -1)
     {
-        g_free(tmp);
+        g_free(name_used);
 	g_object_unref(unseen.line);
 	g_object_unref(flagged.line);
 	g_object_unref(replied.line);
@@ -918,18 +918,18 @@ libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox, gboolean expunge)
         g_object_unref(gmime_stream);
         line = g_byte_array_new();
         do {
-            gchar *tmp;
+            gchar *buf;
 
             line->len = 0;
             g_mime_stream_buffer_readln(gmime_stream_buffer, line);
-            tmp = (gchar *) line->data;
-            if (tmp &&
-                !libbalsa_str_has_prefix(tmp, LibBalsaMailboxMhUnseen) &&
-                !libbalsa_str_has_prefix(tmp, LibBalsaMailboxMhFlagged) &&
-                !libbalsa_str_has_prefix(tmp, LibBalsaMailboxMhReplied) &&
-                !libbalsa_str_has_prefix(tmp, LibBalsaMailboxMhRecent)) {
+            buf = (gchar *) line->data;
+            if (buf &&
+                !libbalsa_str_has_prefix(buf, LibBalsaMailboxMhUnseen) &&
+                !libbalsa_str_has_prefix(buf, LibBalsaMailboxMhFlagged) &&
+                !libbalsa_str_has_prefix(buf, LibBalsaMailboxMhReplied) &&
+                !libbalsa_str_has_prefix(buf, LibBalsaMailboxMhRecent)) {
                 /* unknown sequence */
-                g_mime_stream_write(temp_stream, tmp, line->len);
+                g_mime_stream_write(temp_stream, buf, line->len);
             }
         } while (!g_mime_stream_eos(gmime_stream_buffer));
         g_object_unref(gmime_stream_buffer);
@@ -942,8 +942,8 @@ libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 	!lbm_mh_finish_line(&replied, temp_stream, LibBalsaMailboxMhReplied) ||
 	!lbm_mh_finish_line(&recent, temp_stream, LibBalsaMailboxMhRecent)) {
 	g_object_unref(temp_stream);
-	unlink(tmp);
-	g_free(tmp);
+	unlink(name_used);
+	g_free(name_used);
 	g_object_unref(unseen.line);
 	g_object_unref(flagged.line);
 	g_object_unref(replied.line);
@@ -963,20 +963,20 @@ libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox, gboolean expunge)
     unlink(sequences_filename);
 
     /* rename tempfile to '.mh_sequences' */
-    retval = (libbalsa_safe_rename(tmp, sequences_filename) != -1);
+    retval = (libbalsa_safe_rename(name_used, sequences_filename) != -1);
 #ifdef DEBUG
     if (!retval)
         g_print("MH sync “%s”: error renaming sequences file.\n", path);
 #endif
     if (!retval)
-	unlink (tmp);
+	unlink (name_used);
 
     /* Record the mtimes; we'll just use the current time--someone else
      * might have changed something since we did, despite the file
      * locking, but we'll find out eventually. */
     libbalsa_mailbox_set_mtime(mailbox, mh->mtime_sequences = time(NULL));
 
-    g_free(tmp);
+    g_free(name_used);
     g_object_unref(unseen.line);
     g_object_unref(flagged.line);
     g_object_unref(replied.line);
@@ -1004,16 +1004,16 @@ libbalsa_mailbox_mh_fetch_message_structure(LibBalsaMailbox * mailbox,
 {
     if (!message->mime_msg) {
 	struct message_info *msg_info;
-	gchar *tmp;
+	gchar *base_name;
 
 	msg_info =
 	    lbm_mh_message_info_from_msgno(LIBBALSA_MAILBOX_MH(mailbox),
 					   message->msgno);
 
-	tmp = MH_BASENAME(msg_info);
+	base_name = MH_BASENAME(msg_info);
 	message->mime_msg =
-	    libbalsa_mailbox_local_get_mime_message(mailbox, tmp, NULL);
-	g_free(tmp);
+	    libbalsa_mailbox_local_get_mime_message(mailbox, base_name, NULL);
+	g_free(base_name);
 
 	if (message->mime_msg) {
 	    g_mime_object_remove_header(GMIME_OBJECT(message->mime_msg),
@@ -1061,7 +1061,7 @@ lbm_mh_add_message(LibBalsaMailboxLocal * local,
 {
     LibBalsaMailboxMh *mh;
     const char *path;
-    char *tmp;
+    char *name_used;
     int fd;
     GMimeStream *out_stream;
     GMimeFilter *crlffilter;
@@ -1076,12 +1076,12 @@ lbm_mh_add_message(LibBalsaMailboxLocal * local,
 
     /* open tempfile */
     path = libbalsa_mailbox_local_get_path(local);
-    fd = libbalsa_mailbox_mh_open_temp(path, &tmp);
+    fd = libbalsa_mailbox_mh_open_temp(path, &name_used);
     if (fd == -1) {
         g_set_error(err, LIBBALSA_MAILBOX_ERROR,
                     LIBBALSA_MAILBOX_APPEND_ERROR,
                     _("Cannot create message"));
-	g_free(tmp);
+	g_free(name_used);
 	return FALSE;
     }
     out_stream = g_mime_stream_fs_new(fd);
@@ -1100,8 +1100,8 @@ lbm_mh_add_message(LibBalsaMailboxLocal * local,
         g_set_error(err, LIBBALSA_MAILBOX_ERROR,
                     LIBBALSA_MAILBOX_APPEND_ERROR,
                     _("Data copy error"));
-	unlink(tmp);
-	g_free(tmp);
+	unlink(name_used);
+	g_free(name_used);
 	return FALSE;
     }
     g_object_unref(out_stream);
@@ -1116,7 +1116,7 @@ lbm_mh_add_message(LibBalsaMailboxLocal * local,
 	gint rename_status;
 
 	new_filename = g_strdup_printf("%s/%d", path, ++fileno);
-	rename_status = libbalsa_safe_rename(tmp, new_filename);
+	rename_status = libbalsa_safe_rename(name_used, new_filename);
 	g_free(new_filename);
 	if (rename_status != -1)
 	    break;
@@ -1125,12 +1125,12 @@ lbm_mh_add_message(LibBalsaMailboxLocal * local,
             g_set_error(err, LIBBALSA_MAILBOX_ERROR,
                         LIBBALSA_MAILBOX_APPEND_ERROR,
                         _("Message rename error"));
-	    unlink (tmp);
-	    g_free(tmp);
+	    unlink (name_used);
+	    g_free(name_used);
 	    return FALSE;
 	}
     } while (--retries > 0);
-    g_free(tmp);
+    g_free(name_used);
 
     if (retries == 0) {
         g_set_error(err, LIBBALSA_MAILBOX_ERROR,

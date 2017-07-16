@@ -444,8 +444,8 @@ libbalsa_is_cert_known(X509* cert, long vfy_result)
 
     g_mutex_lock(&certificate_lock);
     for(lst = accepted_certs; lst; lst = lst->next) {
-        int res = X509_cmp(cert, lst->data);
-        if(res == 0) {
+        int X509_res = X509_cmp(cert, lst->data);
+        if(X509_res == 0) {
         	g_mutex_unlock(&certificate_lock);
             return TRUE;
 	}

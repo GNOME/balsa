@@ -614,10 +614,10 @@ mi_reconnect(ImapMboxHandle *h)
     else if(rc==IMR_PROTOCOL)                               \
     libbalsa_information(LIBBALSA_INFORMATION_WARNING, \
     _("IMAP protocol error. Try enabling bug workarounds.")); \
-    else if(rc==IMR_BYE) {char *msg = imap_mbox_handle_get_last_msg(h); \
+    else if(rc==IMR_BYE) {char *text = imap_mbox_handle_get_last_msg(h); \
     libbalsa_information(LIBBALSA_INFORMATION_WARNING, \
-    _("IMAP server has shut the connection: %s Reconnecting…"), msg); \
-    g_free(msg);}\
+    _("IMAP server has shut the connection: %s Reconnecting…"), text); \
+    g_free(text);}\
     else break;}while(trials-->0);}
 #define IIA(rc,h,line,cmd)                         \
    {int trials=2;do{\
@@ -941,12 +941,12 @@ imap_expunge_cb(ImapMboxHandle *handle, unsigned seqno,
     }
 
     for (i = seqno - 1; i < mimap->messages_info->len; i++) {
-	struct message_info *msg_info =
+	struct message_info *info =
 	    &g_array_index(mimap->messages_info, struct message_info, i);
 
-        g_assert(msg_info != NULL);
-	if (msg_info->message)
-	    msg_info->message->msgno = i + 1;
+        g_assert(info != NULL);
+	if (info->message)
+	    info->message->msgno = i + 1;
     }
 
     libbalsa_unlock_mailbox(mailbox);
@@ -1958,19 +1958,19 @@ internet_address_new_list_from_imap_address(ImapAddress *list,
             /* Group */
             if (list->name) {
                 /* Group head */
-                ImapAddress *tail = NULL;
+                ImapAddress *imap_addr = NULL;
                 InternetAddressList *l;
                 gchar *tmp = g_mime_utils_header_decode_text(list->name);
                 addr = internet_address_group_new(tmp);
                 g_free(tmp);
                 l = internet_address_new_list_from_imap_address(list->next,
-                                                                &tail);
+                                                                &imap_addr);
                 if (l) {
                     internet_address_group_set_members
                         (INTERNET_ADDRESS_GROUP(addr), l);
                     g_object_unref(l);
                 }
-                list = tail;
+                list = imap_addr;
             } else {
                 /* tail */
                 if (tail)
@@ -2990,7 +2990,6 @@ libbalsa_mailbox_imap_add_messages(LibBalsaMailbox * mailbox,
     if(!imap_sequence_empty(&uid_sequence) &&
        g_list_length(macd.outfiles) == imap_sequence_length(&uid_sequence)) {
 	/* Hurray, server returned UID data on appended messages! */
-	LibBalsaMailboxImap *mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
 	LibBalsaServer *s      = LIBBALSA_MAILBOX_REMOTE(mailbox)->server;
 	LibBalsaImapServer *is = LIBBALSA_IMAP_SERVER(s);
 	gboolean is_persistent = libbalsa_imap_server_has_persistent_cache(is);
@@ -3559,7 +3558,7 @@ icm_restore_from_cache(ImapMboxHandle *h, struct ImapCacheManager *icm)
         GArray *uidmap = g_array_sized_new(FALSE, TRUE,
                                            sizeof(uint32_t), icm->exists);
         ImapSearchKey *k;
-        unsigned lo = icm->uidmap->len+1, hi = 0, i;
+        unsigned lo = icm->uidmap->len+1, hi = 0;
         /* printf("UIDSYNC:Searching range [1:%u]\n", icm->uidmap->len); */
         for(i=1; i<=icm->uidmap->len; i++)
             if(g_array_index(icm->uidmap, uint32_t, i-1)) {lo=i; break; }

@@ -520,11 +520,11 @@ lbav_set_text(LibBalsaAddressView * address_view, const gchar * text)
         else {
             /* No valid addresses found; just set the new text and keep
              * the focus in this line. */
-            gchar *name = g_strdup(text);
-            lbav_clean_text(name);
+            gchar *text_dup = g_strdup(text);
+            lbav_clean_text(text_dup);
             gtk_list_store_set(address_store, &iter,
-                               ADDRESS_NAME_COL, name, -1);
-            g_free(name);
+                               ADDRESS_NAME_COL, text_dup, -1);
+            g_free(text_dup);
         }
         return;
     }

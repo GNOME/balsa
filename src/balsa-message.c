@@ -1716,7 +1716,7 @@ static void
 balsa_part_info_free(GObject * object)
 {
     BalsaPartInfo * info;
-    GObjectClass *parent_class;
+    GObjectClass *part_info_parent_class;
 
     g_return_if_fail(object != NULL);
     g_return_if_fail(IS_BALSA_PART_INFO(object));
@@ -1731,8 +1731,8 @@ balsa_part_info_free(GObject * object)
 
     gtk_tree_path_free(info->path);
 
-    parent_class = g_type_class_peek_parent(G_OBJECT_GET_CLASS(object));
-    parent_class->finalize(object);
+    part_info_parent_class = g_type_class_peek_parent(G_OBJECT_GET_CLASS(object));
+    part_info_parent_class->finalize(object);
 }
 
 static void

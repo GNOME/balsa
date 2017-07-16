@@ -844,10 +844,10 @@ sw_edit_activated(GSimpleAction * action,
             InternetAddressList *list =
                 libbalsa_address_view_get_list(bsmsg->recipient_view,
                                                address_types[type]);
-            gchar *p = internet_address_list_to_string(list, FALSE);
+            gchar *addr_string = internet_address_list_to_string(list, FALSE);
             g_object_unref(list);
-            fprintf(tmp, "%s %s\n", _(address_types[type]), p);
-            g_free(p);
+            fprintf(tmp, "%s %s\n", _(address_types[type]), addr_string);
+            g_free(addr_string);
         }
         fprintf(tmp, "\n");
     }
@@ -1075,7 +1075,6 @@ update_bsmsg_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity* ident)
 
     gint replace_offset = 0;
     gint siglen;
-    gint i = 0;
 
     gboolean found_sig = FALSE;
     gchar* old_sig;
@@ -1236,8 +1235,10 @@ update_bsmsg_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity* ident)
                                        &replace_offset, siglen - 1, new_sig);
 	    found_sig = TRUE;
 	} else {
-	    g_free(compare_str);
-	while (message_split[i]) {
+            gint i;
+
+            g_free(compare_str);
+            for (i = 0; message_split[i] != NULL; i++) {
 		/* put sig separator back to search */
 		compare_str = g_strconcat("\n-- \n", message_split[i], NULL);
 
@@ -1252,7 +1253,6 @@ update_bsmsg_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity* ident)
 		replace_offset +=
 		    g_utf8_strlen(i ? compare_str : message_split[i], -1);
 		g_free(compare_str);
-		i++;
 	    }
         }
         /* if no sig seperators found, do a slower brute force
@@ -3120,7 +3120,6 @@ scan_bodies(GtkTreeStore * bodies, GtkTreeIter * parent, LibBalsaMessageBody * b
 	switch (libbalsa_message_body_type(body)) {
 	case LIBBALSA_MESSAGE_BODY_TYPE_TEXT:
 	    {
-		gchar *mime_type;
 		LibBalsaHTMLType html_type;
 
 		mime_type = libbalsa_message_body_get_mime_type(body);
@@ -4030,7 +4029,7 @@ sw_broker_cb(const gchar * lang_tag,
 static void
 create_lang_menu(GtkWidget * parent, BalsaSendmsg * bsmsg)
 {
-    unsigned i;
+    guint i;
     GtkWidget *langs = gtk_menu_new();
     static gboolean locales_sorted = FALSE;
     GSList *group = NULL;
@@ -4116,10 +4115,10 @@ create_lang_menu(GtkWidget * parent, BalsaSendmsg * bsmsg)
 #else                           /* HAVE_GSPELL */
         const gchar *lang = l->data;
 #endif                          /* HAVE_GSPELL */
-        gint i;
+        gint j;
 
-        i = find_locale_index_by_locale(lang);
-        if (i < 0 || strcmp(lang, locales[i].locale) != 0) {
+        j = find_locale_index_by_locale(lang);
+        if (j < 0 || strcmp(lang, locales[j].locale) != 0) {
             GtkWidget *w;
 
 #ifdef CAN_SEPARATE_RADIO_MENU_ITEMS
@@ -5204,32 +5203,32 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
              * RFC2440 sign a multipart/alternative... */
             GtkWidget *dialog;
             gint choice;
-            GString * message =
+            GString * string =
                 g_string_new(_("You selected OpenPGP security for this message.\n"));
 
             if (warn_html_sign)
-                message =
-                    g_string_append(message,
+                string =
+                    g_string_append(string,
                         _("The message text will be sent as plain text and as "
                           "HTML, but only the plain part can be signed.\n"));
             if (warn_mp)
-                message =
-                    g_string_append(message,
+                string =
+                    g_string_append(string,
                         _("The message contains attachments, which cannot be "
                           "signed or encrypted.\n"));
-            message =
-                g_string_append(message,
+            string =
+                g_string_append(string,
                     _("You should select MIME mode if the complete "
                       "message shall be protected. Do you really want to proceed?"));
             dialog = gtk_message_dialog_new
                 (GTK_WINDOW(bsmsg->window),
                  GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_MODAL,
                  GTK_MESSAGE_QUESTION,
-                 GTK_BUTTONS_OK_CANCEL, "%s", message->str);
+                 GTK_BUTTONS_OK_CANCEL, "%s", string->str);
 #if HAVE_MACOSX_DESKTOP
 	    libbalsa_macosx_menu_for_parent(dialog, GTK_WINDOW(bsmsg->window));
 #endif
-            g_string_free(message, TRUE);
+            g_string_free(string, TRUE);
             choice = gtk_dialog_run(GTK_DIALOG(dialog));
             gtk_widget_destroy(dialog);
             if (choice != GTK_RESPONSE_OK)
@@ -6238,8 +6237,6 @@ sendmsg_window_new_from_list(LibBalsaMailbox * mailbox,
     buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
 
     for (i = 1; i < selected->len; i++) {
-        LibBalsaMessage *message;
-
 	msgno = g_array_index(selected, guint, i);
         message = libbalsa_mailbox_get_message(mailbox, msgno);
         if (!message)
@@ -6930,7 +6927,7 @@ sendmsg_window_continue(LibBalsaMailbox * mailbox, guint msgno)
         GtkWidget *langs =
             gtk_menu_item_get_submenu(GTK_MENU_ITEM
                                       (bsmsg->current_language_menu));
-        GList *list, *children =
+        GList *children =
             gtk_container_get_children(GTK_CONTAINER(langs));
         set_locale(bsmsg, postpone_hdr);
         for (list = children; list; list = list->next) {

@@ -572,7 +572,7 @@ static gint
 config_global_load(void)
 {
     gboolean def_used;
-    guint tmp;
+    guint filter_mask;
     static gboolean new_user = FALSE;
 
     config_address_books_load();
@@ -677,10 +677,11 @@ config_global_load(void)
 
     g_free(balsa_app.selected_headers);
     {                           /* scope */
-        gchar *tmp = libbalsa_conf_get_string("SelectedHeaders="
-                                             DEFAULT_SELECTED_HDRS);
-        balsa_app.selected_headers = g_ascii_strdown(tmp, -1);
-        g_free(tmp);
+        gchar *selected_headers =
+            libbalsa_conf_get_string("SelectedHeaders="
+                                     DEFAULT_SELECTED_HDRS);
+        balsa_app.selected_headers = g_ascii_strdown(selected_headers, -1);
+        g_free(selected_headers);
     }
 
     balsa_app.expand_tree = libbalsa_conf_get_bool("ExpandTree=false");
@@ -793,12 +794,12 @@ config_global_load(void)
     balsa_app.pwindow_option = d_get_gint("ProgressWindow", WHILERETR);
 
     /* ... deleting messages: defaults enshrined here */
-    tmp = libbalsa_mailbox_get_filter(NULL);
+    filter_mask = libbalsa_mailbox_get_filter(NULL);
     if (libbalsa_conf_get_bool("HideDeleted=true"))
-	tmp |= (1 << 0);
+	filter_mask |= (1 << 0);
     else
-	tmp &= ~(1 << 0);
-    libbalsa_mailbox_set_filter(NULL, tmp);
+	filter_mask &= ~(1 << 0);
+    libbalsa_mailbox_set_filter(NULL, filter_mask);
 
     balsa_app.expunge_on_close =
         libbalsa_conf_get_bool("ExpungeOnClose=true");
@@ -955,10 +956,10 @@ config_global_load(void)
 
         passphrase = libbalsa_conf_private_get_string("ESMTPPassphrase");
 	if (passphrase) {
-            gchar* tmp = libbalsa_rot(passphrase);
+            gchar* passphrase_rot = libbalsa_rot(passphrase);
             g_free(passphrase); 
-            libbalsa_server_set_password(server, tmp);
-	    g_free(tmp);
+            libbalsa_server_set_password(server, passphrase_rot);
+	    g_free(passphrase_rot);
         }
 
         /* default set to "Use TLS if possible" */
@@ -967,10 +968,10 @@ config_global_load(void)
 	passphrase =
 	    libbalsa_conf_private_get_string("ESMTPCertificatePassphrase");
 	if (passphrase) {
-            gchar* tmp = libbalsa_rot(passphrase);
+            gchar* passphrase_rot = libbalsa_rot(passphrase);
             g_free(passphrase);
 	    g_free(server->cert_passphrase);
-	    server->cert_passphrase = tmp;
+	    server->cert_passphrase = passphrase_rot;
 	}
     }
 

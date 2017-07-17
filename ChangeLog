@@ -1,5 +1,10 @@
 2017-07-17  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	* libbalsa/libbalsa-gpgme.c (get_key_from_name): do not
+	dereference a NULL pointer.
+
+2017-07-17  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Avoid some whining from the clang static analyzer
 
 	* libbalsa/libbalsa-gpgme-keys.c (gpgme_import_key):

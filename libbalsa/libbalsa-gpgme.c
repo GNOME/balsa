@@ -791,7 +791,8 @@ get_key_from_name(gpgme_ctx_t   ctx,
 
 	/* OpenPGP: ask the user if a low-validity key should be trusted for encryption */
 	// FIXME - shouldn't we do the same for S/MIME?
-	if ((result == GPG_ERR_NO_ERROR) && !secret && !accept_all && (gpgme_get_protocol(ctx) == GPGME_PROTOCOL_OpenPGP) &&
+	if ((selected != NULL) &&
+                (result == GPG_ERR_NO_ERROR) && !secret && !accept_all && (gpgme_get_protocol(ctx) == GPGME_PROTOCOL_OpenPGP) &&
 		(selected->owner_trust < GPGME_VALIDITY_FULL)) {
 		if ((accept_low_trust_cb == NULL) || !accept_low_trust_cb(name, selected, parent)) {
 			gpgme_key_unref(selected);

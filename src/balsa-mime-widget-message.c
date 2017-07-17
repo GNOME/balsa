@@ -679,10 +679,9 @@ foreach_label(GtkWidget * widget, LibBalsaMessageBody * part)
     g_assert(widget != NULL);
 
     if (GTK_IS_CONTAINER(widget))
-        gtk_container_foreach(GTK_CONTAINER(widget),
+        gtk_container_foreach((GtkContainer *) widget,
                               (GtkCallback) foreach_label, part);
-    else if (g_signal_lookup("populate-popup",
-                             G_TYPE_FROM_INSTANCE(widget)))
+    else if (GTK_IS_LABEL(widget))
         g_signal_connect(widget, "populate-popup",
                          G_CALLBACK(bm_header_extend_popup), part);
 }

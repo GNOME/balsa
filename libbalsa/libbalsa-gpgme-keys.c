@@ -375,7 +375,8 @@ gpgme_import_key(gpgme_ctx_t   ctx,
 				kl_mode |= GPGME_KEYLIST_MODE_LOCAL;
 				gpgme_err = gpgme_set_keylist_mode(ctx, kl_mode);
 				if (gpgme_err == GPG_ERR_NO_ERROR) {
-					gpgme_err = gpgme_get_key(ctx, key->subkeys->fpr, imported_key, 0);
+					/* gpgme_err = gpgme_get_key(ctx, key->subkeys->fpr, imported_key, 0); */
+					(void) gpgme_get_key(ctx, key->subkeys->fpr, imported_key, 0);
 				}
 			}
 		}

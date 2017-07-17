@@ -1,5 +1,14 @@
 2017-07-17  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Avoid some whining from the clang static analyzer
+
+	* libbalsa/libbalsa-gpgme-keys.c (gpgme_import_key):
+	value stored to 'gpgme_err' is never read.
+	* libbalsa/libbalsa-gpgme-widgets.c (create_subkey_widget):
+	value stored to 'subkey_row' is never read.
+
+2017-07-17  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* src/balsa-mime-widget-message.c (foreach_label): the only
 	children that have a "populate-popup" signal are GtkLabels.
 

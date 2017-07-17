@@ -468,7 +468,8 @@ create_subkey_widget(gpgme_subkey_t subkey)
 	} else {
 		timebuf = libbalsa_date_to_utf8(subkey->expires, "%x %X");
 	}
-	subkey_row = create_key_grid_row(GTK_GRID(subkey_grid), subkey_row, _("Expires:"), timebuf, FALSE);
+	/* subkey_row = create_key_grid_row(GTK_GRID(subkey_grid), subkey_row, _("Expires:"), timebuf, FALSE); */
+	(void) create_key_grid_row(GTK_GRID(subkey_grid), subkey_row, _("Expires:"), timebuf, FALSE);
 	g_free(timebuf);
 
 	return subkey_grid;

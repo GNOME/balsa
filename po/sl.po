@@ -5,22 +5,23 @@
 # Andraž Tori <andraz.tori1@guest.arnes.si>, 2002.
 # Tadej Janež <tadej_janez@email.si>, 2003.
 # Andrej Žnidaršič <andrej.znidarsic@gmail.com>, 2010.
-# Matej Urbančič <mateju@svn.gnome.org>, 2006-2017.
+# Matej Urbančič <mateju@svn.gnome.org>, 2006–2017.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa master\n"
 "Report-Msgid-Bugs-To: https://bugzilla.gnome.org/enter_bug.cgi?"
 "product=balsa&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2017-07-24 22:44+0200\n"
-"PO-Revision-Date: 2017-07-24 22:47+0200\n"
+"POT-Creation-Date: 2017-07-28 08:56+0200\n"
+"PO-Revision-Date: 2017-07-28 08:57+0200\n"
 "Last-Translator: Matej Urbančič <mateju@svn.gnome.org>\n"
 "Language-Team: Slovenščina <gnome-si@googlegroups.com>\n"
 "Language: sl_SI\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=4; plural=(n%100==1 ? 1 : n%100==2 ? 2 : n%100==3 || n%100==4 ? 3 : 0);\n"
+"Plural-Forms: nplurals=4; plural=(n%100==1 ? 1 : n%100==2 ? 2 : n%100==3 || n"
+"%100==4 ? 3 : 0);\n"
 "X-Poedit-SourceCharset: utf-8\n"
 "X-Generator: Poedit 2.0.1\n"
 
@@ -3760,10 +3761,8 @@ msgid "Sending the external body request failed: %s"
 msgstr "Pošiljanje zahteve zunanjega telesa je spodletelo: %s"
 
 #: ../src/balsa-mime-widget-message.c:439
-#, fuzzy
-#| msgid "Reply"
 msgid "Reply…"
-msgstr "Odgovo_ri"
+msgstr "Odgovori ..."
 
 #. Gmail sometimes fails to do that.
 #: ../src/balsa-mime-widget-message.c:711
@@ -3820,16 +3819,12 @@ msgid "Open link"
 msgstr "Odpri povezavo"
 
 #: ../src/balsa-mime-widget-text.c:517
-#, fuzzy
-#| msgid "Send link..."
 msgid "Send link…"
-msgstr "Povezava #"
+msgstr "Pošlji povezavo ..."
 
 #: ../src/balsa-mime-widget-text.c:548 ../src/balsa-mime-widget-text.c:1089
-#, fuzzy
-#| msgid "Save"
 msgid "Save…"
-msgstr "&Shrani"
+msgstr "Shrani ..."
 
 #: ../src/balsa-mime-widget-text.c:558
 msgid "Highlight structured phrases"
@@ -3860,48 +3855,34 @@ msgid "Select _All"
 msgstr "Izberi _vse"
 
 #: ../src/balsa-mime-widget-text.c:1098
-#, fuzzy
-#| msgid "Print"
 msgid "Print…"
-msgstr "Natisni:"
+msgstr "Natisni ..."
 
 #: ../src/balsa-mime-widget-text.c:1236
-#, fuzzy
-#| msgid "Store Address"
 msgid "S_tore Address"
-msgstr "Naslov: %s"
+msgstr "_Shrani naslov"
 
 #: ../src/balsa-mime-widget-text.c:1243
 msgid "Full Name:"
 msgstr "Polno Ime:"
 
 #: ../src/balsa-mime-widget-text.c:1244
-#, fuzzy
-#| msgid "Nick Name"
 msgid "Nick Name:"
-msgstr "Vzdevek"
+msgstr "Vzdevek:"
 
 #: ../src/balsa-mime-widget-text.c:1245
-#, fuzzy
-#| msgid "_First Name:"
 msgid "First Name:"
-msgstr "_Ime"
+msgstr "Ime:"
 
 #: ../src/balsa-mime-widget-text.c:1246
-#, fuzzy
-#| msgid "_Last Name:"
 msgid "Last Name:"
-msgstr "_Priimek"
+msgstr "Priimek"
 
 #: ../src/balsa-mime-widget-text.c:1247
-#, fuzzy
-#| msgid "O_rganization:"
 msgid "Organization:"
-msgstr "Organizacija"
+msgstr "Ustanova:"
 
 #: ../src/balsa-mime-widget-text.c:1249
-#, fuzzy
-#| msgid "_Email Address:"
 msgid "Email Address:"
 msgstr "Elektronski naslov:"
 

@@ -96,3 +96,8 @@ src/spell-check.c
 src/store-address.c
 src/toolbar-factory.c
 src/toolbar-prefs.c
+[type: gettext/glade]ui/ab-main.ui
+[type: gettext/glade]ui/main-window.ui
+[type: gettext/glade]ui/message-window.ui
+[type: gettext/glade]ui/sendmsg-window.ui
+[type: gettext/glade]ui/source-viewer.ui

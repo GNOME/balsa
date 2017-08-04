@@ -340,8 +340,8 @@ extern struct BalsaApplication {
     LibBalsaAddressBook *default_address_book;
 
     /* spell checking */
-#if HAVE_GSPELL || HAVE_GTKSPELL
     gchar   *spell_check_lang;
+#if HAVE_GSPELL || HAVE_GTKSPELL
     gboolean spell_check_active;
 #else                           /* HAVE_GSPELL */
     gboolean check_sig;

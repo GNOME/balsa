@@ -4056,12 +4056,8 @@ create_lang_menu(GtkWidget * parent, BalsaSendmsg * bsmsg)
     }
 
     /* find the preferred charset... */
-#if HAVE_GSPELL || HAVE_GTKSPELL
     preferred_lang = balsa_app.spell_check_lang ?
         balsa_app.spell_check_lang : setlocale(LC_CTYPE, NULL);
-#else                           /* HAVE_GTKSPELL */
-    preferred_lang = setlocale(LC_CTYPE, NULL);
-#endif                          /* HAVE_GTKSPELL */
 
 #if HAVE_GTKSPELL_3_0_3
     lang_list = gtk_spell_checker_get_language_list();
@@ -6191,9 +6187,9 @@ lang_set_cb(GtkWidget * w, BalsaSendmsg * bsmsg)
 
         lang = g_object_get_data(G_OBJECT(w), BALSA_LANGUAGE_MENU_LANG);
         set_locale(bsmsg, lang);
-#if HAVE_GSPELL || HAVE_GTKSPELL
         g_free(balsa_app.spell_check_lang);
         balsa_app.spell_check_lang = g_strdup(lang);
+#if HAVE_GSPELL || HAVE_GTKSPELL
         sw_action_set_active(bsmsg, "spell-check", TRUE);
 #endif                          /* HAVE_GTKSPELL */
     }

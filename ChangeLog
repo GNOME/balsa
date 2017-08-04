@@ -1,3 +1,15 @@
+2017-08-03  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Save and restore the spell checking language when built with the
+	internal checker
+
+	* src/balsa-app.h: include the spell_check_lang member in all
+	builds.
+	* src/save-restore.c (config_global_load), (config_save): save
+	and restore it in all builds.
+	* src/sendmsg-window.c (create_lang_menu), (lang_set_cb): use it
+	in all builds.
+
 2017-07-17  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* libbalsa/libbalsa-gpgme.c (get_key_from_name): do not

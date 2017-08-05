@@ -5964,8 +5964,7 @@ msgstr ""
 #~ msgstr "Salek"
 
 #~ msgid "This is version 2.721 of the Balsa manual."
-#~ msgstr ""
-#~ "Dies ist Version 2.721 des <application>Balsa</application>-Handbuchs."
+#~ msgstr "Dies ist Version 2.721 des Balsa-Handbuchs."
 
 #~ msgid "2.721"
 #~ msgstr "2.721"

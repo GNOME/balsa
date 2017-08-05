@@ -177,6 +177,11 @@ imap_create_ssl(void)
     /* Note: SSLv23_client_method() actually enables *all* protocols, including
      * SSLv(2|3) and TLSv1.(0|1|2), so we must switch all unsafe ones off */
     global_ssl_context = SSL_CTX_new (SSLv23_client_method ());
+    if(!global_ssl_context) {
+        fprintf(stderr, "Could not initialize SSL Context.\n");
+        return NULL;
+    }
+
 #ifdef ENABLE_SSL3
     SSL_CTX_set_options(global_ssl_context, SSL_OP_ALL|SSL_OP_NO_SSLv2);
 #else

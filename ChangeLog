@@ -1,3 +1,8 @@
+2017-08-05  Zhouyang Jia <jiazhouyang09@gmail.com>
+
+	* libbalsa/imap/imap-tls.c (imap_create_ssl): check for NULL
+	value from SSL_CTX_new.
+
 2017-08-03  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Save and restore the spell checking language when built with the

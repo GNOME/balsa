@@ -179,6 +179,9 @@ imap_create_ssl(void)
     global_ssl_context = SSL_CTX_new (SSLv23_client_method ());
     if(!global_ssl_context) {
         fprintf(stderr, "Could not initialize SSL Context.\n");
+        ERR_print_errors_fp(stderr);
+        fprintf(stderr, "\nEnd of print_errors\n");
+        g_mutex_unlock(&global_tls_lock);
         return NULL;
     }
 

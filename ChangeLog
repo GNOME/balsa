@@ -1,3 +1,8 @@
+2017-08-05  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* libbalsa/imap/imap-tls.c (imap_create_ssl): unlock
+	global_tls_lock and print the SSL error stack before returning.
+
 2017-08-05  Zhouyang Jia <jiazhouyang09@gmail.com>
 
 	* libbalsa/imap/imap-tls.c (imap_create_ssl): check for NULL

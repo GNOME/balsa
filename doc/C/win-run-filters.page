@@ -31,7 +31,7 @@ id="win-run-filters">
   only the first match counts: the filters are applied in the
   specified order and the first that matches on the current message
   will be applied but not the following ones.</p>
-  <p>There are two buttons between the filters lists:
+  <p>There are two buttons between the filters lists:</p>
   <list>
     <item>
       <p>The
@@ -45,7 +45,7 @@ id="win-run-filters">
       filter in the right list and puts it back in the left
       list.</p>
     </item>
-  </list></p>
+  </list>
   <p>The
   <gui>Up</gui> and
   <gui>Down</gui> buttons under the right list serve to reorder the
@@ -59,7 +59,7 @@ id="win-run-filters">
   without actually attaching it to the mailbox. Select one or more
   filters in the left hand list, and click the
   <gui>Apply Selected</gui> button below that list.</p>
-  <p>There are three buttons below the filters lists:
+  <p>There are three buttons below the filters lists:</p>
   <list>
     <item>
       <p>The
@@ -80,5 +80,5 @@ id="win-run-filters">
       <p>The
       <gui>Help</gui> button: opens this help window.</p>
     </item>
-  </list></p>
+  </list>
 </page>

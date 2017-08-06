@@ -1,3 +1,11 @@
+2017-08-05  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Fix Mallard structure errors
+
+	* C/win-filters.page: the "p" element does not allow block
+	content.
+	* C/win-run-filters.page: ditto.
+
 2016-11-01  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* cs/cs.po: fix XML tags.

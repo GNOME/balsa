@@ -13,7 +13,7 @@ id="win-filters">
   <link xref="win-filters#wf-match-page">match page</link>, and the
   <link xref="win-filters#wf-action-page">action page</link>); their
   descriptions follow.</p>
-  <p>There are two buttons under the filters list:
+  <p>There are two buttons under the filters list:</p>
   <list>
     <item>
       <p>The
@@ -32,13 +32,13 @@ id="win-filters">
       <gui>Remove</gui> button: removes the currently selected
       filter.</p>
     </item>
-  </list></p>
+  </list>
   <section id="wf-match-page">
     <title>The Match Page</title>
     <p>Each filter is made of one or several conditions; each
     condition represents a test to be applied to the messages. The
     results of these tests is then combined following the type of
-    operation specified:
+    operation specified:</p>
     <list>
       <item>
         <p>AND: all condition tests must be true to make the
@@ -48,11 +48,11 @@ id="win-filters">
         <p>OR: one condition test must be true to make the
         match.</p>
       </item>
-    </list></p>
+    </list>
     <p>Then the page displays the name of the filter and the
     conditions that describes how the filters matches a message.
     The list displays the type of the conditions (the conditions
-    will be described later):
+    will be described later):</p>
     <list>
       <item>
         <p>
@@ -75,7 +75,8 @@ id="win-filters">
         the flags of the message: unread, replied, deleted,
         flagged.</p>
       </item>
-    </list>The three buttons under the list allows you to edit the
+    </list>
+    <p>The three buttons under the list allows you to edit the
     selected condition, add a new one, or remove one. Editing or
     creating a condition is done in the
     <link xref="win-condition">condition window</link>, which
@@ -115,7 +116,7 @@ id="win-filters">
     <gui>New</gui> buttons under the conditions list in the match
     page of the notebook in the right part of the
     <link xref="win-filters">filters window</link>.</p>
-    <p>This window is made of three frames:
+    <p>This window is made of three frames:</p>
     <list>
       <item>
         <p>The
@@ -126,11 +127,11 @@ id="win-filters">
         <gui>From</gui> box, or if you want to match all messages
         about &Balsa;, check the
         <gui>Subject</gui> box.</p>
-        <warning>
+        <note style="warning">
           <p>Be careful with
           <gui>Body</gui> match, this can take time for large
           messages.</p>
-        </warning>
+        </note>
         <p>For advanced use you can also specify directly the name
         of the header to match on. A standard example the
         "X-Mailer" is a header added to your message by the MUAs
@@ -145,10 +146,10 @@ id="win-filters">
         you should check the
         <gui>Body</gui> and the
         <gui>Subject</gui> boxes, so that all mails with the word
-        <quote>Balsa</quote> in its subject or its body will match.
+        “Balsa” in its subject or its body will match.
         You can also, if you're fed up with &Balsa; ;-), match
         all mails that do NOT contain the word
-        <quote>Balsa</quote> in their subject and in their body
+        “Balsa” in their subject and in their body
         neither. See the description of the search types to see how
         to do this.</p>
       </item>
@@ -164,7 +165,7 @@ id="win-filters">
         type of match chosen.</p>
       </item>
       <item>
-        <p>This part depends on the search type you've chosen:
+        <p>This part depends on the search type you've chosen:</p>
         <list>
           <item>
             <p>
@@ -210,8 +211,8 @@ id="win-filters">
             <gui>unread</gui> and
             <gui>replied</gui> boxes, and click on the button.</p>
           </item>
-        </list></p>
+        </list>
       </item>
-    </list></p>
+    </list>
   </section>
 </page>

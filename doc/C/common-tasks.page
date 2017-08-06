@@ -116,8 +116,8 @@ id="common-tasks">
     </screenshot>
   </figure>
 
-  <p>The example shows what it looks like if "Balsa Mailing
-  List" is in your address book, and you have typed
+  <p>The example shows what it looks like if “Balsa Mailing
+  List” is in your address book, and you have typed
   &quot;ba&quot;</p>
 -->
     <p>To enable this feature, you must select which address books
@@ -158,7 +158,7 @@ id="common-tasks">
     <p>&Balsa; searches for objects having
     <sys>mail</sys> attribute. The search is done on the
     <sys>cn</sys> attribute and the search filter has a form
-    "(&amp;(mail=*)(cn=John D))". &Balsa; uses
+    “(&amp;(mail=*)(cn=John D))”. &Balsa; uses
     <sys>cn</sys>(common name),
     <sys>givenName</sys>(given name),
     <sys>sn</sys>(surname) and

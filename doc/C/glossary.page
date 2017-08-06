@@ -8,7 +8,7 @@ id="glossary">
   <title>Glossary</title>
     <section id="pop">
       <title>POP</title>
-      <p>An acronym for "Post Office Protocol", a simple method of
+      <p>An acronym for “Post Office Protocol”, a simple method of
       retrieving mail messages from a remote mail server. Widely
       used by mail clients from an Internet Service Provider's mail
       server to a user's machine for viewing. Currently most people
@@ -18,15 +18,15 @@ id="glossary">
     </section>
     <section id="imap">
       <title>IMAP</title>
-      <p>An acronym that stands for "Internet Mail Access
-      Protocol". It is a newer method of accessing mail over the
+      <p>An acronym that stands for “Internet Mail Access
+      Protocol”. It is a newer method of accessing mail over the
       internet. It is far more featureful than &POP3;, allowing
       for remote folders on the mail server, and more control over
       mail delivery. However it is not as widely supported.</p>
     </section>
     <section id="ldap">
       <title>LDAP</title>
-      <p>An acronym for "Lightweight Directory Access Protocol". It
+      <p>An acronym for “Lightweight Directory Access Protocol”. It
       is a widely-accepted standard for accessing contact
       information over a network. This enables organizations to
       store address information in a central database, but have
@@ -55,7 +55,7 @@ id="glossary">
     </section>
     <section id="mda">
       <title>MDA</title>
-      <p>An acronym for "Mail Delivery Agent", this type of program
+      <p>An acronym for “Mail Delivery Agent”, this type of program
       is also known as a Local Delivery Agent (LDA). It is
       responsible for delivering the mail recieved for someone on a
       machine to the mail folder of that person. &procmail; is
@@ -65,7 +65,7 @@ id="glossary">
     </section>
     <section id="mta">
       <title>MTA</title>
-      <p>An acronym for "Mail Transfer Agent", this class of
+      <p>An acronym for “Mail Transfer Agent”, this class of
       program is responsible for moving mail around between people,
       be they on the same computer, on on completely separate
       networks. Examples of this type of program include
@@ -75,7 +75,7 @@ id="glossary">
     </section>
     <section id="mua">
       <title>MUA</title>
-      <p>An acronym for "Mail User Agent", this the program a user
+      <p>An acronym for “Mail User Agent”, this the program a user
       would use to read existing mail and create new messages. MUAs
       are one of three types of programs that allow internet email
       to work. The other two types of programs are
@@ -96,8 +96,8 @@ id="glossary">
     </section>
     <section id="smtp">
       <title>SMTP</title>
-      <p>An acronym that stands for "Simple Mail Transfer
-      Protocol", it is exactly that. A standard that defines a
+      <p>An acronym that stands for “Simple Mail Transfer
+      Protocol”, it is exactly that. A standard that defines a
       simple an reliable way to transfer messages between computers
       on a network. It is used by most, if not all, mail programs
       to transfer mail.</p>

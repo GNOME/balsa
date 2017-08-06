@@ -56,7 +56,7 @@ id="preferences-miscellaneous">
       <title>
         <gui>Expunge deleted messages on close</gui>
       </title>
-      <p>"Expunging" is the act of physically removing from the
+      <p>“Expunging” is the act of physically removing from the
       backing mailstore all messages marked as deleted. You can
       expunge messages manually:
       <guiseq>

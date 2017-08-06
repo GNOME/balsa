@@ -39,8 +39,8 @@ id="preferences-mail-options">
           <p>Corresponding password.</p>
         </item>
         <item>
-          <p>You can select the 'delete from server' button to
-          remove the downoladed messages from the server.</p>
+          <p>You can select the “delete from server” button to
+          remove the downloaded messages from the server.</p>
         </item>
         <item>
           <p>You can choose to have messages filtered through
@@ -82,7 +82,7 @@ id="preferences-mail-options">
       is hostname[:port]. Port can be a decimal number or the name
       of the service as specified in
       <file>/etc/services</file> . Typically you can just set this
-      to "localhost:smtp". &Balsa; can also break up a large
+      to “localhost:smtp”. &Balsa; can also break up a large
       message into fragments, which can be reassembled by
       &Balsa; or any RFC 2046-compliant mailer. This dialog
       allows you to set this option, and the size above which a
@@ -169,26 +169,26 @@ id="preferences-mail-options">
           <gui>Reflow messages of type
           `text/plain;format=flowed'</gui>
         </title>
-        <p>The `format' parameter distinguishes two ways of
-        representing paragraphs in messages of type `text/plain'
-        (that is, simple text). The value `flowed' indicates that
-        paragraphs have been broken into lines ended with `soft'
+        <p>The <gui>format</gui> parameter distinguishes two ways of
+        representing paragraphs in messages of type “text/plain”
+        (that is, simple text). The value “flowed” indicates that
+        paragraphs have been broken into lines ended with “soft”
         line breaks: a space is left at the end of the line. A
-        `hard' line break (one that is not preceded by a space)
+        “hard” line break (one that is not preceded by a space)
         indicates the end of a paragraph.</p>
         <p>&Balsa; can reflow the paragraphs, quoted or
         otherwise, in a message of this type. Reflowing eliminates
         the line fragments that are left when text is first wrapped
         at one length and then rewrapped to a shorter length, which
         are often misquoted.</p>
-        <p>The only other value of `format' is `fixed', which is
-        the value assumed by default when `format' is not
+        <p>The only other value of <gui>format</gui> is “fixed”, which is
+        the value assumed by default when <gui>format</gui> is not
         specified, as with older mailers. In this case, all line
         breaks must be respected. If you do not select the
-        `Reflow...' option, &Balsa; will treat all messages of
-        type `text/plain' as if they were `format=fixed'. Long
-        lines will still be wrapped, if the `Wrap Incoming
-        Messages' option is selected, but this will usually leave
+        <gui>Reflow…</gui> option, &Balsa; will treat all messages of
+        type “text/plain” as if they were “format=fixed”. Long
+        lines will still be wrapped, if the <gui>Wrap Incoming
+        Messages</gui> option is selected, but this will usually leave
         unquoted line fragments.</p>
       </item>
       <item>
@@ -222,7 +222,7 @@ id="preferences-mail-options">
         <p>The string that &Balsa; should use as a prefix when
         quoting a message. Note: When you send a message with 
         <gui>format=flowed</gui>, &Balsa; is required to use
-        the one-character string "&gt;".</p>
+        the one-character string “&gt;”.</p>
       </item>
       <item>
         <title>
@@ -231,10 +231,10 @@ id="preferences-mail-options">
         <p>Have &Balsa; include the text of a message in the
         reply. The text will be prefixed as shown above.</p>
         <p>You can instead include the original message using an
-        option on the `Edit' menu, or by dragging the message from
+        option on the <gui>Edit</gui> menu, or by dragging the message from
         the message index into the text area of the reply. If you
         prefer to include text this way, do not select the
-        `Automatically quote...' option.</p>
+        <gui>Automatically quote…</gui> option.</p>
       </item>
       <item>
         <title>
@@ -249,7 +249,7 @@ id="preferences-mail-options">
           it</gui>
         </title>
         <p>If this option is selected, messages that are
-        `Automatically quoted' will actually be attached
+        “Automatically quoted” will actually be attached
         unmodified, instead of included in the text of the reply,
         prefixed by the reply string.</p>
         <p>You can also attach any message to a new message by
@@ -271,7 +271,7 @@ id="preferences-mail-options">
           <gui>Copy outgoing messages to sentbox</gui>
         </title>
         <p>Have &Balsa; save a copy of each message you send in
-        the mailbox marked as the `Sentbox'.</p>
+        the mailbox marked as the “Sentbox”.</p>
       </item>
       <item>
         <title>

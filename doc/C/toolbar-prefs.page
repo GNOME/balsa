@@ -14,7 +14,7 @@ id="toolbar-prefs">
   dialog with the
   <guiseq>
     <gui>Settings</gui>
-    <gui>Toolbars...</gui>
+    <gui>Toolbars…</gui>
   </guiseq> menu item.</p>
   <p>The dialog contains a notebook with a page for each type of
   window. On each page, you'll see a Preview of the toolbar, which
@@ -29,7 +29,7 @@ id="toolbar-prefs">
   labels (the text that may accompany the buttons). This option
   applies to the toolbars on all three types of window. If you
   choose wrapping, long labels will be shown on two lines.</p>
-  <p>This is an "instant apply" dialog: the changes you make take
+  <p>This is an “instant apply” dialog: the changes you make take
   effect immediately, as shown in the Preview toolbar. Below the
   Preview toolbar you'll find a button that restores the standard
   layout for that toolbar.</p>
@@ -42,5 +42,5 @@ id="toolbar-prefs">
   gives you control over what is shown in the toolbar: icons, text,
   or both. The popup (right click) menu for any actual toolbar
   offers the same choices, as well as the option to open up this
-  dialog ("Customize Toolbars...").</p>
+  dialog (“Customize Toolbars…”).</p>
 </page>

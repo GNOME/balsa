@@ -43,7 +43,7 @@ id="folder-config">
         <p>Prefix is the root mailbox on the server. You may leave
         it empty if you want to show all the folders on your server
         but if your IMAP server stores also other kind of files you
-        may specify for instance "mail".</p>
+        may specify for instance “mail”.</p>
       </item>
     </list>
   </section>
@@ -159,7 +159,7 @@ id="folder-config">
       <gui>Edit</gui>
     </guiseq> with an IMAP folder selected, or by right-clicking on
     an IMAP mailbox and selecting
-    <gui>Properties...</gui>, the mailbox may be:</p>
+    <gui>Properties…</gui>, the mailbox may be:</p>
     <list>
       <item>
         <p>Renamed, by editing the folder name;</p>

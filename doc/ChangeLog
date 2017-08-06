@@ -1,3 +1,22 @@
+2017-08-06  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Use Unicode quotation marks and ellipses, and mark some strings
+	as GUI items
+
+	* C/ab-conf.page:
+	* C/common-tasks.page:
+	* C/folder-config.page:
+	* C/glossary.page:
+	* C/identities.page:
+	* C/preferences-address-books.page:
+	* C/preferences-display-options.page:
+	* C/preferences-mail-options.page:
+	* C/preferences-miscellaneous.page:
+	* C/toolbar-prefs.page:
+	* C/win-composer.page:
+	* C/win-filters.page:
+	* C/win-main.page:
+
 2017-08-05  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Fix Mallard structure errors

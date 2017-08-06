@@ -29,7 +29,7 @@ id="identities">
       <title>
         <gui>Mailing Address</gui>
       </title>
-      <p>As you wish it to appear in your "From" header.</p>
+      <p>As you wish it to appear in your “From” header.</p>
     </item>
     <item>
       <title>
@@ -50,7 +50,7 @@ id="identities">
       Expansion</link> for this to work.</p>
     </item>
   </terms>
-  <p>The "Messages" page shows various initial settings for the new
+  <p>The “Messages” page shows various initial settings for the new
   message:</p>
   <terms>
     <item>
@@ -86,7 +86,7 @@ id="identities">
       <title>
         <gui>Face Path</gui>
       </title>
-      <p>Whether a "Face" header should be attached to a program.
+      <p>Whether a “Face” header should be attached to a program.
       Specified path points out to a file containing a textual
       representation of the face icon. Please see
       <link href="http://quimby.gnus.org/circus/face/">a
@@ -98,7 +98,7 @@ id="identities">
       <title>
         <gui>X-Face Path</gui>
       </title>
-      <p>Whether a "Face" header should be attached to a program.
+      <p>Whether a “Face” header should be attached to a program.
       Specified path points out to a file containing a textual
       representation of the face icon.</p>
     </item>
@@ -113,7 +113,7 @@ id="identities">
     </item>
   </terms>
   <p>You control the signature that &Balsa; appends to your
-  messages on the "Signature" page:</p>
+  messages on the “Signature” page:</p>
   <terms>
     <item>
       <title>
@@ -136,9 +136,9 @@ id="identities">
         <item>
           <p>An executable program. &Balsa; will execute the
           program and read its output, appending that text to the
-          message. List the path to the program with a "|"
+          message. List the path to the program with a “|”
           prepended to it. For example:</p>
-          <p>"|/home/user/dynsig.pl"</p>
+          <p>“|/home/user/dynsig.pl”</p>
         </item>
       </list>
     </item>
@@ -192,14 +192,14 @@ id="identities">
       </title>
       <p>By default enable the cryptographic signature for every
       new message. The default protocol is determined by the
-      "Default protocol" option.</p>
+      <gui>Default protocol</gui> option.</p>
     </item>
     <item>
       <title>
         <gui>Encrypt messages by default.</gui>
       </title>
       <p>By default encrypt every new message. The default protocol
-      is determined by the "Default protocol" option.</p>
+      is determined by the <gui>Default protocol</gui> option.</p>
     </item>
     <item>
       <title>

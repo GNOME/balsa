@@ -62,7 +62,7 @@ currently not used by balsa, but might be in the future. It is also
 kept to ensure compatibility with mutt. </p>
 
 <p>&Balsa; executes your script with one argument: the pattern to
-search for. A space (" ") is used as the first argument when creating
+search for. A space (“ ”) is used as the first argument when creating
 a list of all users.</p>
 
 <p>All characters are allowed, except the tab (\t), since that

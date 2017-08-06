@@ -232,7 +232,7 @@ id="preferences-display-options">
         </title>
         <p>Some messages contain national characters without
         specifying how they are encoded. You can choose whether
-        &Balsa; displays such characters as '?', or tries a
+        &Balsa; displays such characters as “?”, or tries a
         specific character set to display such messages.</p>
       </item>
     </terms>
@@ -253,7 +253,7 @@ id="preferences-display-options">
           <gui>Display Progress</gui>
         </title>
         <p>This sets the behaviour of the dialog that is shown when
-        &Balsa; retrieves messages from it's specified
+        &Balsa; retrieves messages from its specified
         &POP3; servers. The dialog can be shown only while the
         messages are being retrieved, automatically closing after
         &Balsa; is finished. Or it can be set to stay active

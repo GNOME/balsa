@@ -60,7 +60,7 @@ id="win-composer">
             <p>
             <guiseq>
               <gui>File</gui>
-              <gui>Include File...</gui>
+              <gui>Include File…</gui>
             </guiseq> &mdash; Include a text file in the body of the
             message; only works for plain text files.</p>
           </item>
@@ -68,7 +68,7 @@ id="win-composer">
             <p>
             <guiseq>
               <gui>File</gui>
-              <gui>Attach File...</gui>
+              <gui>Attach File…</gui>
             </guiseq> &mdash; Attach any kind of file to the
             message.</p>
           </item>
@@ -135,7 +135,7 @@ id="win-composer">
             <p>
             <guiseq>
               <gui>File</gui>
-              <gui>Print...</gui>
+              <gui>Print…</gui>
             </guiseq>
             <keyseq>
               <key>Ctrl</key>
@@ -356,11 +356,11 @@ id="win-composer">
             <guiseq>
               <gui>Options</gui>
               <gui>Format = Flowed</gui>
-            </guiseq> &mdash; The "Flowed" format (RFC 3676) breaks
+            </guiseq> &mdash; The “Flowed” format (RFC 3676) breaks
             the message text into paragraphs, which you type
             continuously using the
             <key>Enter</key> key only to mark the end of a
-            paragraph, and "fixed" lines which you mark
+            paragraph, and “fixed” lines which you mark
             individually using the
             <key>Enter</key> key. This allows other mailers that
             recognize the format to display the text appropriately
@@ -369,8 +369,8 @@ id="win-composer">
             is also displayed intelligibly by a non-flowed-aware
             mailer.</p>
             <note>
-              <p>Using "Format=Flowed" is strongly recommended. It
-              helps to avert the "embarrassing line wrap" that you
+              <p>Using “Format=Flowed” is strongly recommended. It
+              helps to avert the “embarrassing line wrap” that you
               see when quoted text is broken across lines and shown
               with the wrong level of quoting.</p>
             </note>
@@ -384,7 +384,7 @@ id="win-composer">
             messages in right-to-left languages such as Arabic,
             Hebrew, and Persian, but some other agents such as
             mailing lists may mangle them when translating into
-            HTML. If the "Send as plain text and HTML" option is
+            HTML. If the “Send as plain text and HTML” option is
             selected, &Balsa; will generate a correct HTML
             message part that such agents will use instead.</p>
           </item>
@@ -464,8 +464,9 @@ id="win-composer">
   <section id="win-composer-toolbar">
     <title>Toolbar</title>
     <p>The toolbar contains buttons for the most commonly used
-    functions when sending messages, including Send, Attach
-    File..., and Save. As with the menu bar, some buttons are
+    functions when sending messages, including <gui>Send</gui>,
+    <gui>Attach</gui>
+    <gui>File…</gui>, and <gui>Save</gui>. As with the menu bar, some buttons are
     disabled if the message is not correctly setup to be sent.</p>
     <figure>
       <title>Toolbar</title>
@@ -566,7 +567,7 @@ id="win-composer">
         <title>
           <gui>Cc</gui>
         </title>
-        <p>The "Carbon Copy" header. A comma separated list of
+        <p>The “Carbon Copy” header. A comma separated list of
         recipients other than the main recipient should go
         here.</p>
       </item>
@@ -575,17 +576,17 @@ id="win-composer">
           <gui>Bcc</gui>
         </title>
         <p>The
-        <code>Bcc</code> , or "Blind Carbon Copy" header. Similar to
+        <code>Bcc</code> , or “Blind Carbon Copy” header. Similar to
         the Cc header, except that email addresses placed in this
         header will not appear as recipients to readers of the
-        message. Also known as a "silent" carbon copy.</p>
+        message. Also known as a “silent” carbon copy.</p>
       </item>
       <item>
         <title>
           <gui>Fcc</gui>
         </title>
         <p>The
-        <code>Fcc</code> header stands for "Folder Carbon Copy", and
+        <code>Fcc</code> header stands for “Folder Carbon Copy”, and
         it is used to specify any folders that you want the message
         copied to after being sent. It is presented as a drop-down
         combo box with a list of all available mailboxes, simply

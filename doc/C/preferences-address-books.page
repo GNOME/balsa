@@ -55,8 +55,8 @@ id="preferences-address-books">
       <file>/etc/openldap/ldap.conf</file>). If this does not work,
       you may need to ask your administrator for the value of this.
       The usual values are usually similar to:
-      "dc=theochem,dc=KTH,dc=se" or "o=Theoretical Chemistry,
-      c=SE".</p>
+      “dc=theochem,dc=KTH,dc=se” or “o=Theoretical Chemistry,
+      c=SE”.</p>
     </item>
     <item>
       <title>

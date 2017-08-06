@@ -61,7 +61,7 @@ id="win-main">
                 <guiseq>
                   <gui> File</gui>
                   <gui> New</gui>
-                  <gui> Message...</gui>
+                  <gui> Message…</gui>
                 </guiseq>
                 <key>M</key> &mdash; Create a new message, and
                 display a new window to type the message in.</p>
@@ -71,7 +71,7 @@ id="win-main">
                 <guiseq>
                   <gui> File</gui>
                   <gui> New</gui>
-                  <gui> Mailbox...</gui>
+                  <gui> Mailbox…</gui>
                 </guiseq> &mdash; Open a dialog box to create a new
                 mailbox. There are various items like this,
                 corresponding to the different types of mailbox
@@ -85,7 +85,7 @@ id="win-main">
                 <guiseq>
                   <gui> File</gui>
                   <gui> New</gui>
-                  <gui> Remote IMAP folder...</gui>
+                  <gui> Remote IMAP folder…</gui>
                 </guiseq> &mdash; Open a dialog box to create a
                 folder for an account on an IMAP server. This
                 <link xref="folder-config"> IMAP folder
@@ -97,7 +97,7 @@ id="win-main">
                 <guiseq>
                   <gui> File</gui>
                   <gui> New</gui>
-                  <gui> Remote IMAP subfolder...</gui>
+                  <gui> Remote IMAP subfolder…</gui>
                 </guiseq> &mdash; Open a dialog box to create a new
                 subfolder in an existing IMAP folder tree. This
                 <link xref="subfolder-config"> IMAP subfolder
@@ -241,8 +241,8 @@ id="win-main">
               <gui> Edit</gui>
               <gui> Find in Message</gui>
             </guiseq> <key>/</key>&mdash;
-            Selecting this option opens a "search
-            bar" at the foot of the message preview, in which you
+            Selecting this option opens a “search
+            bar” at the foot of the message preview, in which you
             can type text for which &Balsa; will search in the
             current message.</p>
           </item>
@@ -266,7 +266,7 @@ id="win-main">
             <p>
             <guiseq>
               <gui> Edit</gui>
-              <gui> Preferences...</gui>
+              <gui> Preferences…</gui>
             </guiseq> &mdash; Open the
             <link xref="preferences"> Preferences</link> window to
             change the settings of &Balsa; .</p>
@@ -443,14 +443,14 @@ id="win-main">
             <p>
             <guiseq>
               <gui> Mailbox</gui>
-              <gui> Edit...</gui>
+              <gui> Edit…</gui>
             </guiseq> &mdash; Edit mailbox properties.</p>
           </item>
           <item>
             <p>
             <guiseq>
               <gui> Mailbox</gui>
-              <gui> Delete...</gui>
+              <gui> Delete…</gui>
             </guiseq> &mdash; Delete the currently selected
             mailbox.</p>
           </item>
@@ -510,7 +510,7 @@ id="win-main">
             <guiseq>
               <key> R</key>
               <gui> Message</gui>
-              <gui> Reply...</gui>
+              <gui> Reply…</gui>
             </guiseq> <key>R</key> &mdash; Reply to the currently selected
             message(s).</p>
           </item>
@@ -519,7 +519,7 @@ id="win-main">
             <guiseq>
               <key> A</key>
               <gui> Message</gui>
-              <gui> Reply to All...</gui>
+              <gui> Reply to All…</gui>
             </guiseq> <key>A</key> &mdash; Reply to the currently selected
             message(s), sending the reply to all senders and
             recipients of the message.</p>
@@ -529,7 +529,7 @@ id="win-main">
             <guiseq>
               <key> G</key>
               <gui> Message</gui>
-              <gui> Reply to Group...</gui>
+              <gui> Reply to Group…</gui>
             </guiseq> <key>G</key> &mdash; Reply to a mailing list, instead of
             the sender to that list.</p>
           </item>
@@ -538,7 +538,7 @@ id="win-main">
             <guiseq>
               <key> F</key>
               <gui> Message</gui>
-              <gui> Forward attached...</gui>
+              <gui> Forward attached…</gui>
             </guiseq> &mdash; Forward the currently selected
             message(s) as an attachment.</p>
           </item>
@@ -546,7 +546,7 @@ id="win-main">
             <p>
             <guiseq>
               <gui> Message</gui>
-              <gui> Forward inline...</gui>
+              <gui> Forward inline…</gui>
             </guiseq> &mdash; Forward the currently selected
             message(s), quoted inline.</p>
           </item>
@@ -580,7 +580,7 @@ id="win-main">
             <p>
             <guiseq>
               <gui> Message</gui>
-              <gui> Save Current Part...</gui>
+              <gui> Save Current Part…</gui>
             </guiseq>
             <keyseq><key>Ctrl</key><key>S</key></keyseq>&mdash;
             Save the currently selected part of
@@ -596,7 +596,7 @@ id="win-main">
                 </keycombo>
               </shortcut>
               <gui> Message</gui>
-              <gui> View Source...</gui>
+              <gui> View Source…</gui>
             </guiseq>
             <keyseq><key>Ctrl</key><key>U</key></keyseq> &mdash;
             Opens a new window that displays the
@@ -665,7 +665,7 @@ id="win-main">
                 <keyseq><key>Ctrl</key><key>D</key></keyseq> &mdash;
                 Marks the message as set for
                 deletion. The message will be actually removed from
-                the backing mailstore when it is "expunged" either
+                the backing mailstore when it is “expunged” either
                 manually, or as specified in the
                 <link xref="preferences">Preferences</link>.</p>
               </item>
@@ -703,7 +703,7 @@ id="win-main">
             <guiseq>
               <key> S</key>
               <gui> Message</gui>
-              <gui> Store Address...</gui>
+              <gui> Store Address…</gui>
             </guiseq> <key>S</key>&mdash; Add the sender of the currently
             selected message to your address book.</p>
           </item>
@@ -719,7 +719,7 @@ id="win-main">
             <p>
             <guiseq>
               <gui> Settings</gui>
-              <gui> Toolbars...</gui>
+              <gui> Toolbars…</gui>
             </guiseq> &mdash; Open the
             <link xref="toolbar-prefs"> Toolbars</link> window to
             modify the content and arrangement of the toolbars in
@@ -729,7 +729,7 @@ id="win-main">
             <p>
             <guiseq>
               <gui> Settings</gui>
-              <gui> Identities...</gui>
+              <gui> Identities…</gui>
             </guiseq> &mdash; Open the
             <link xref="identities"> Identities</link> window to
             customize how you present yourself to the rest of the

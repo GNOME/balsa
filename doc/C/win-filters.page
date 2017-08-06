@@ -18,7 +18,7 @@ id="win-filters">
     <item>
       <p>The
       <gui>New</gui> button: you click on it to create a new filter;
-      the filter is initially named "New Filter", and contains no
+      the filter is initially named “New Filter”, and contains no
       condition. Then you fill in the different fields in the
       notebook pages (in particular remember to change the name of
       the filter), add the conditions that will describe how this
@@ -134,7 +134,7 @@ id="win-filters">
         </note>
         <p>For advanced use you can also specify directly the name
         of the header to match on. A standard example the
-        "X-Mailer" is a header added to your message by the MUAs
+        “X-Mailer” is a header added to your message by the MUAs
         with their name and versions.</p>
         <p>The
         <gui>All</gui> button will check all boxes, whereas the

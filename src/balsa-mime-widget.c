@@ -123,6 +123,7 @@ static mime_delegate_t mime_delegate[] =
       {FALSE, "application/pgp-signature",     balsa_mime_widget_new_signature},
       {FALSE, "application/pkcs7-signature",   balsa_mime_widget_new_signature},
       {FALSE, "application/x-pkcs7-signature", balsa_mime_widget_new_signature},
+	  {FALSE, "application/pgp-keys",		   balsa_mime_widget_new_pgpkey},
 #endif
       {FALSE, NULL,         NULL}
     };

@@ -36,6 +36,10 @@ G_BEGIN_DECLS
 BalsaMimeWidget *balsa_mime_widget_new_signature(BalsaMessage * bm,
 						 LibBalsaMessageBody * mime_body,
 						 const gchar * content_type, gpointer data);
+BalsaMimeWidget *balsa_mime_widget_new_pgpkey(BalsaMessage        *bm,
+	 	 	 	 	 	 	 	 	 	 	  LibBalsaMessageBody *mime_body,
+											  const gchar 		  *content_type,
+											  gpointer			   data);
 GtkWidget * balsa_mime_widget_signature_widget(LibBalsaMessageBody * mime_body,
 					       const gchar * content_type);
 GtkWidget * balsa_mime_widget_crypto_frame(LibBalsaMessageBody * mime_body, GtkWidget * child,

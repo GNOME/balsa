@@ -95,6 +95,7 @@ G_BEGIN_DECLS
 	                        /* is closed.                          */
 #ifdef HAVE_GPGME
 	guint gpg_mode;
+	gboolean attach_pubkey;
 #endif
 
 #if !HAVE_GTKSOURCEVIEW

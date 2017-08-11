@@ -47,7 +47,6 @@ struct _LibBalsaSmtpServer {
     gchar *name;
     guint big_message; /* size of partial messages; in kB; 0 disables splitting */
     gint lock_state;	/* 0 means unlocked; access via atomic operations */
-    // FIXME - add an atomic flag if an operation is running on this server
 };
 
 typedef struct _LibBalsaSmtpServerClass {

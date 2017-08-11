@@ -163,7 +163,8 @@ net_client_read_line(NetClient *client, gchar **recv_line, GError **error)
 			/* check that the protocol-specific maximum line length is not exceeded */
 			if ((client->priv->max_line_len > 0U) && (length > client->priv->max_line_len)) {
 				g_set_error(error, NET_CLIENT_ERROR_QUARK, (gint) NET_CLIENT_ERROR_LINE_TOO_LONG,
-					_("reply length %lu exceeds the maximum allowed length %lu"), (unsigned long) length, (unsigned long) client->priv->max_line_len);
+					_("reply length %lu exceeds the maximum allowed length %lu"),
+					(unsigned long) length, (unsigned long) client->priv->max_line_len);
 				g_free(line_buf);
 			} else {
 				g_debug("R '%s'", line_buf);

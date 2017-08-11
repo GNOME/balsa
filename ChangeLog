@@ -1,3 +1,35 @@
+2017-08-10  Albrecht Dreß
+
+	Crypto-related (mostly) fixes and improvements
+
+	* libbalsa/gmime-multipart-crypt.c: do not qp-encode 7-bit parts for encryption
+	* libbalsa/identity.[ch]: implement separate forced signing key id's
+	  for gpg and s/mime including selection from the key list; clarify option text
+	* libbalsa/libbalsa-gpgme-cb.c: simplify key list, show key details on double-click
+	* libbalsa/libbalsa-gpgme-keys.[ch]: add functions for exporting
+	  and importing ascii-armoured keys; re-factor import result evaluation
+	* libbalsa/libbalsa-gpgme-widgets.c: extend subkey details
+	* libbalsa/libbalsa-gpgme.[ch]: fix context creation for s/mime;
+	  add helpers for configuring the gpgme context's home folder,
+	  for exporting a key to ASCII and for identifying the proper key id of a secret key;
+	  fix confusing comment
+	* libbalsa/message.[ch]: use a reference to the sending identity
+	  instead of copying the key id
+	* libbalsa/misc.c: re-factor deleting a folder and creating a temp folder
+	  (re-sent from last week's patch)
+	* libbalsa/rfc3156.c: fix mem leak when encrypting a message
+	  (re-sent from last week's patch)
+	* libbalsa/send.c: add helper for creating a gpg public key attachment
+	  and attach the key on request; fix mem leak in encryption
+	* libbalsa/smtp-server.c: remove misleading/confusing comment
+	  (re-sent from last week's patch)
+	* src/balsa-mime-widget-crypto.[ch]: implement display of application/pgp-keys parts
+	  and the import of the keys within them
+	* src/balsa-mime-widget.c: call handler for application/pgp-keys parts
+	* src/information-dialog.c: add missing dialogue flags
+	* src/sendmsg-window.[ch], ui/sendmsg-window.ui: add user interface
+	  for attaching the GnuPG public key
+
 2017-08-05  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* libbalsa/imap/imap-tls.c (imap_create_ssl): unlock

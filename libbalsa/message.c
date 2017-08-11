@@ -101,7 +101,7 @@ libbalsa_message_init(LibBalsaMessage * message)
     message->has_all_headers = 0;
 #ifdef HAVE_GPGME
     message->prot_state = LIBBALSA_MSG_PROTECT_NONE;
-    message->force_key_id = NULL;
+    message->ident = NULL;
 #endif
 }
 
@@ -180,7 +180,9 @@ libbalsa_message_finalize(GObject * object)
     }
 
 #ifdef HAVE_GPGME
-    g_free(message->force_key_id);
+    if (message->ident != NULL) {
+    	g_object_unref(message->ident);
+    }
 #endif
 
     if (message->tempdir) {

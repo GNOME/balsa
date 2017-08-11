@@ -203,11 +203,14 @@ struct _LibBalsaMessage {
     /* GPG sign and/or encrypt message (sending) */
     guint gpg_mode;
 
+    /* attach the GnuPG public key to the message (sending) */
+    gboolean att_pubkey;
+
     /* protection (i.e. sign/encrypt) status (received message) */
     LibBalsaMsgProtectState prot_state;
 
-    /* forced id of the senders secret key, empty to choose it from the mail address */
-    gchar * force_key_id;
+    /* sender identity, required for choosing a forced GnuPG or S/MIME key */
+    LibBalsaIdentity *ident;
 #endif
 
     /* request a DSN (sending) */

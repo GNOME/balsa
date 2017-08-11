@@ -83,7 +83,8 @@ G_BEGIN_DECLS
 	gboolean always_trust;
 	gboolean warn_send_plain;
 	gint crypt_protocol;
-        gchar *force_key_id;
+        gchar *force_gpg_key_id;
+        gchar *force_smime_key_id;
 	LibBalsaSmtpServer *smtp_server;
     };
 

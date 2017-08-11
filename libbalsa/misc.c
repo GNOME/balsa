@@ -29,7 +29,6 @@
 
 #define _SVID_SOURCE           1
 #include <ctype.h>
-#include <dirent.h>
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -43,6 +42,7 @@
 #include "libbalsa_private.h"
 #include "html.h"
 #include <glib/gi18n.h>
+#include <glib/gstdio.h>
 
 static const gchar *libbalsa_get_codeset_name(const gchar *txt, 
 					      LibBalsaCodeset Codeset);
@@ -191,41 +191,39 @@ libbalsa_wrap_string(gchar * str, int width)
 gboolean
 libbalsa_delete_directory_contents(const gchar *path)
 {
-    struct stat sb;
-    DIR *d;
-    struct dirent *de;
-    gchar *new_path;
+	GDir *dir;
+	gboolean result;
 
-    d = opendir(path);
-    g_return_val_if_fail(d, FALSE);
+    g_return_val_if_fail(path != NULL, FALSE);
+    dir = g_dir_open(path, 0, NULL);
+    if (dir == NULL) {
+    	result = FALSE;
+    } else {
+    	const gchar *item;
 
-    for (de = readdir(d); de; de = readdir(d)) {
-	if (strcmp(de->d_name, ".") == 0 ||
-	    strcmp(de->d_name, "..") == 0)
-	    continue;
-	new_path = g_strdup_printf("%s/%s", path, de->d_name);
+    	result = TRUE;
+    	item = g_dir_read_name(dir);
+    	while (result && (item != NULL)) {
+    		gchar *full_path;
 
-	stat(new_path, &sb);
-	if (S_ISDIR(sb.st_mode)) {
-	    if (!libbalsa_delete_directory_contents(new_path) ||
-		rmdir(new_path) == -1) {
-		g_free(new_path);
-		closedir(d);
-		return FALSE;
-	    }
-	} else {
-	    if (unlink( new_path ) == -1) {
-		g_free(new_path);
-		closedir(d);
-		return FALSE;
-	    }
-	}
-	g_free(new_path);
-	new_path = 0;
+    		full_path = g_build_filename(path, item, NULL);
+    		if (g_file_test(full_path, G_FILE_TEST_IS_DIR)) {
+    	   		result = libbalsa_delete_directory_contents(full_path);
+    			if (g_rmdir(full_path) != 0) {
+    				result = FALSE;
+    			}
+    		} else {
+    	   		if (g_unlink(full_path) != 0) {
+    				result = FALSE;
+    			}
+    		}
+    		g_free(full_path);
+    		item = g_dir_read_name(dir);
+    	}
+    	g_dir_close(dir);
     }
 
-    closedir(d);
-    return TRUE;
+    return result;
 }
 
 /* libbalsa_expand_path:
@@ -252,29 +250,9 @@ libbalsa_expand_path(const gchar * path)
 gboolean 
 libbalsa_mktempdir (char **s)
 {
-    gchar *name;
-    int fd;
-
     g_return_val_if_fail(s != NULL, FALSE);
-
-    do {
-	GError *error = NULL;
-	fd = g_file_open_tmp("balsa-tmpdir-XXXXXX", &name, &error);
-	close(fd);
-	unlink(name);
-	/* Here is a short time that the name could be reused */
-	fd = mkdir(name, 0700);
-	if (fd == -1) {
-	    g_free(name);
-	    if (!g_error_matches(error, G_FILE_ERROR, G_FILE_ERROR_EXIST))
-		return FALSE;
-	}
-	if (error)
-	    g_error_free(error);
-    } while (fd == -1);
-    *s = name;
-    /* FIXME: rmdir(name) at sometime */
-    return TRUE;
+    *s = g_build_filename(g_get_tmp_dir(), "balsa-tmpdir-XXXXXX", NULL);
+    return g_mkdtemp_full(*s, 0700) != NULL;
 }
 
 /* libbalsa_set_fallback_codeset: sets the codeset for incorrectly

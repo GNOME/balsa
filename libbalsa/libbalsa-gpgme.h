@@ -80,6 +80,9 @@ gpgme_ctx_t libbalsa_gpgme_new_with_proto(gpgme_protocol_t        protocol,
 										  GtkWindow				 *parent,
 										  GError                **error)
 	G_GNUC_WARN_UNUSED_RESULT;
+gboolean libbalsa_gpgme_ctx_set_home(gpgme_ctx_t   ctx,
+									 const gchar  *home_dir,
+									 GError      **error);
 
 GMimeGpgmeSigstat *libbalsa_gpgme_verify(GMimeStream * content,
 					 GMimeStream * sig_plain,
@@ -109,6 +112,18 @@ GMimeGpgmeSigstat *libbalsa_gpgme_decrypt(GMimeStream * crypted,
 					  gpgme_protocol_t protocol,
 					  GtkWindow * parent,
 					  GError ** error)
+	G_GNUC_WARN_UNUSED_RESULT;
+
+gchar *libbalsa_gpgme_get_pubkey(gpgme_protocol_t   protocol,
+								 const gchar       *name,
+								 GtkWindow 		   *parent,
+								 GError           **error)
+	G_GNUC_WARN_UNUSED_RESULT;
+
+gchar *libbalsa_gpgme_get_seckey(gpgme_protocol_t   protocol,
+  	  	  	  	  	  	  	  	 const gchar       *name,
+								 GtkWindow 		   *parent,
+								 GError           **error)
 	G_GNUC_WARN_UNUSED_RESULT;
 
 void libbalsa_gpgme_set_error(GError        **error,

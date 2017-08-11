@@ -43,9 +43,6 @@
 /* stuff to get a key fingerprint from a selection list */
 enum {
     GPG_KEY_USER_ID_COLUMN = 0,
-    GPG_KEY_ID_COLUMN,
-    GPG_KEY_LENGTH_COLUMN,
-    GPG_KEY_VALIDITY_COLUMN,
     GPG_KEY_PTR_COLUMN,
     GPG_KEY_NUM_COLUMNS
 };
@@ -128,12 +125,48 @@ lb_gpgme_passphrase(void *hook, const gchar * uid_hint,
 }
 
 
+static gboolean
+key_button_event_press_cb(GtkWidget      *widget,
+						  GdkEventButton *event,
+						  gpointer        data)
+{
+    GtkTreeView *tree_view = GTK_TREE_VIEW(widget);
+    GtkTreeSelection *selection = gtk_tree_view_get_selection(tree_view);
+    GtkTreePath *path;
+    GtkTreeIter iter;
+    GtkTreeModel *model;
+
+    g_return_val_if_fail(event != NULL, FALSE);
+    if ((event->type != GDK_2BUTTON_PRESS) || event->window != gtk_tree_view_get_bin_window(tree_view)) {
+        return FALSE;
+    }
+
+    if (gtk_tree_view_get_path_at_pos(tree_view, event->x, event->y, &path, NULL, NULL, NULL)) {
+        if (!gtk_tree_selection_path_is_selected(selection, path)) {
+            gtk_tree_view_set_cursor(tree_view, path, NULL, FALSE);
+            gtk_tree_view_scroll_to_cell(tree_view, path, NULL, FALSE, 0, 0);
+        }
+        gtk_tree_path_free(path);
+    }
+
+    if (gtk_tree_selection_get_selected(selection, &model, &iter)) {
+    	gpgme_key_t key;
+    	GtkWidget *dialog;
+
+		gtk_tree_model_get(model, &iter, GPG_KEY_PTR_COLUMN, &key, -1);
+		dialog = libbalsa_key_dialog(GTK_WINDOW(data), GTK_BUTTONS_CLOSE, key, GPG_SUBKEY_CAP_ALL, NULL, NULL);
+		(void) gtk_dialog_run(GTK_DIALOG(dialog));
+		gtk_widget_destroy(dialog);
+    }
+
+    return TRUE;
+}
+
+
 gpgme_key_t
 lb_gpgme_select_key(const gchar * user_name, lb_key_sel_md_t mode, GList * keys,
 		    gpgme_protocol_t protocol, GtkWindow * parent)
 {
-    static const gchar *col_titles[] =
-	{ N_("User ID"), N_("Key ID"), N_("Length"), N_("Validity") };
     GtkWidget *dialog;
     GtkWidget *vbox;
     GtkWidget *label;
@@ -143,11 +176,11 @@ lb_gpgme_select_key(const gchar * user_name, lb_key_sel_md_t mode, GList * keys,
 	GtkTreeSortable *sortable;
     GtkTreeSelection *selection;
     GtkTreeIter iter;
-    gint i, last_col;
     gchar *prompt;
-    gchar *upcase_name;
     gpgme_key_t use_key = NULL;
     gint width, height;
+	GtkCellRenderer *renderer;
+	GtkTreeViewColumn *column;
 
     /* FIXME: create dialog according to the Gnome HIG */
     dialog = gtk_dialog_new_with_buttons(_("Select key"),
@@ -171,18 +204,18 @@ lb_gpgme_select_key(const gchar * user_name, lb_key_sel_md_t mode, GList * keys,
     switch (mode) {
     	case LB_SELECT_PRIVATE_KEY:
     		prompt =
-    			g_strdup_printf(_("Select the private key for the signer %s"),
+    			g_strdup_printf(_("Select the private key for the signer “%s”"),
     							user_name);
     		break;
     	case LB_SELECT_PUBLIC_KEY_USER:
     		prompt =
-    			g_strdup_printf(_("Select the public key for the recipient %s"),
+    			g_strdup_printf(_("Select the public key for the recipient “%s”"),
                          		user_name);
     		break;
     	case LB_SELECT_PUBLIC_KEY_ANY:
     		prompt =
     			g_strdup_printf(_("There seems to be no public key for recipient "
-    	                          "%s in your key ring.\nIf you are sure that the "
+    	                          "“%s” in your key ring.\nIf you are sure that the "
     							  "recipient owns a different key, select it from "
     							  "the list."), user_name);
     		break;
@@ -194,6 +227,10 @@ lb_gpgme_select_key(const gchar * user_name, lb_key_sel_md_t mode, GList * keys,
     g_free(prompt);
     gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, TRUE, 0);
 
+    label = gtk_label_new(_("Double-click key to show details"));
+    gtk_widget_set_halign(label, GTK_ALIGN_START);
+    gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, TRUE, 0);
+
     scrolled_window = gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_set_shadow_type(GTK_SCROLLED_WINDOW
 					(scrolled_window),
@@ -203,9 +240,6 @@ lb_gpgme_select_key(const gchar * user_name, lb_key_sel_md_t mode, GList * keys,
     gtk_box_pack_start(GTK_BOX(vbox), scrolled_window, TRUE, TRUE, 0);
 
     model = gtk_list_store_new(GPG_KEY_NUM_COLUMNS, G_TYPE_STRING,	/* user ID */
-			       G_TYPE_STRING,	/* key ID */
-			       G_TYPE_INT,	/* length */
-			       G_TYPE_STRING,	/* validity (gpg encrypt only) */
 			       G_TYPE_POINTER);	/* key */
     sortable = GTK_TREE_SORTABLE(model);
     gtk_tree_sortable_set_sort_func(sortable, 0, sort_iter_cmp_fn, NULL, NULL);
@@ -220,87 +254,44 @@ lb_gpgme_select_key(const gchar * user_name, lb_key_sel_md_t mode, GList * keys,
 		     G_CALLBACK(key_selection_changed_cb), &use_key);
 
     /* add the keys */
-    upcase_name = g_ascii_strup(user_name, -1);
-    while (keys) {
-	gpgme_key_t key = (gpgme_key_t) keys->data;
-	gpgme_subkey_t subkey = key->subkeys;
-	gpgme_user_id_t uid = key->uids;
-	gchar *uid_info = NULL;
-	gboolean uid_found;
+    while (keys != NULL) {
+    	gpgme_key_t key = (gpgme_key_t) keys->data;
 
-	/* find the relevant subkey */
-	while (subkey &&
-		   (((mode == LB_SELECT_PRIVATE_KEY) && !subkey->can_sign) ||
-			((mode != LB_SELECT_PRIVATE_KEY) && !subkey->can_encrypt))) {
-	    subkey = subkey->next;
-	}
+    	/* simply add the primary uid -- the user can show the full key details */
+    	if ((key->uids != NULL) && (key->uids->uid != NULL)) {
+    		gchar *uid_info;
 
-	/* find the relevant uid */
-	uid_found = FALSE;
-	while (uid && !uid_found) {
-	    g_free(uid_info);
-	    uid_info = libbalsa_cert_subject_readable(uid->uid);
-
-	    /* check the email field which may or may not be present */
-	    if (uid->email &&
-	    	((mode == LB_SELECT_PUBLIC_KEY_ANY) ||
-	    	 !g_ascii_strcasecmp(uid->email, user_name)))
-		uid_found = TRUE;
-	    else {
-		/* no email or no match, check the uid */
-		gchar *upcase_uid = g_ascii_strup(uid_info, -1);
-
-		if (strstr(upcase_uid, upcase_name))
-		    uid_found = TRUE;
-		else
-		    uid = uid->next;
-		g_free(upcase_uid);
-	    }
-	}
-
-	/* append the element */
-	if (subkey && uid && uid_info) {
-		gtk_list_store_append(model, &iter);
-		gtk_list_store_set(model, &iter,
-			       GPG_KEY_USER_ID_COLUMN, uid_info,
-			       GPG_KEY_ID_COLUMN, subkey->keyid,
-			       GPG_KEY_LENGTH_COLUMN, subkey->length,
-			       GPG_KEY_VALIDITY_COLUMN,
-			       libbalsa_gpgme_validity_to_gchar_short(uid->
-								      validity),
-			       GPG_KEY_PTR_COLUMN, key, -1);
-	}
-	g_free(uid_info);
-	keys = g_list_next(keys);
+    		uid_info = libbalsa_cert_subject_readable(key->uids->uid);
+    		gtk_list_store_append(model, &iter);
+    		gtk_list_store_set(model, &iter,
+    			GPG_KEY_USER_ID_COLUMN, uid_info,
+				GPG_KEY_PTR_COLUMN, key, -1);
+    		g_free(uid_info);
+    	}
+    	keys = g_list_next(keys);
     }
-    g_free(upcase_name);
 
     g_object_unref(G_OBJECT(model));
-    /* show the validity only if we are asking for a gpg public key */
-    last_col = (protocol == GPGME_PROTOCOL_CMS || (mode == LB_SELECT_PRIVATE_KEY)) ?
-	GPG_KEY_LENGTH_COLUMN : GPG_KEY_VALIDITY_COLUMN;
-    for (i = 0; i <= last_col; i++) {
-	GtkCellRenderer *renderer;
-	GtkTreeViewColumn *column;
 
 	renderer = gtk_cell_renderer_text_new();
 	column =
-	    gtk_tree_view_column_new_with_attributes(_(col_titles[i]),
-						     renderer, "text", i,
+	    gtk_tree_view_column_new_with_attributes(_("User ID"),
+						     renderer, "text", 0,
 						     NULL);
 	gtk_tree_view_append_column(GTK_TREE_VIEW(tree_view), column);
-	gtk_tree_view_column_set_resizable(column, (i == 0) ? TRUE : FALSE);
-    }
+	gtk_tree_view_column_set_resizable(column, TRUE);
 
     gtk_container_add(GTK_CONTAINER(scrolled_window), tree_view);
+    g_signal_connect(tree_view, "button_press_event", G_CALLBACK(key_button_event_press_cb), dialog);
 
     /* set window size to 2/3 of the parent */
     gtk_window_get_size(parent, &width, &height);
     gtk_window_set_default_size(GTK_WINDOW(dialog), (2 * width) / 3, (2 * height) / 3);
     gtk_widget_show_all(gtk_dialog_get_content_area(GTK_DIALOG(dialog)));
 
-    if (gtk_dialog_run(GTK_DIALOG(dialog)) != GTK_RESPONSE_OK)
-	use_key = NULL;
+    if (gtk_dialog_run(GTK_DIALOG(dialog)) != GTK_RESPONSE_OK) {
+    	use_key = NULL;
+    }
     gtk_widget_destroy(dialog);
 
     return use_key;

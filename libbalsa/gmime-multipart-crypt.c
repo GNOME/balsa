@@ -42,7 +42,9 @@
  *
  * Prepare a part (and all subparts) to be signed. To do this we need
  * to set the encoding of all parts (that are not already encoded to
- * either QP or Base64) to QP.
+ * either QP or Base64 or 7-bit) to QP.
+ *
+ * Ref: RFC 3156, sect. 3.
  **/
 static void
 sign_prepare(GMimeObject * mime_part)
@@ -72,7 +74,7 @@ sign_prepare(GMimeObject * mime_part)
 	sign_prepare(subpart);
     } else {
 	encoding = g_mime_part_get_content_encoding(GMIME_PART(mime_part));
-	if (encoding != GMIME_CONTENT_ENCODING_BASE64)
+	if ((encoding != GMIME_CONTENT_ENCODING_BASE64) && (encoding != GMIME_CONTENT_ENCODING_7BIT))
 	    g_mime_part_set_content_encoding(GMIME_PART(mime_part),
 					     GMIME_CONTENT_ENCODING_QUOTEDPRINTABLE);
     }

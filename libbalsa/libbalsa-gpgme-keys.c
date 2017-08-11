@@ -48,6 +48,8 @@ static gboolean gpgme_import_key(gpgme_ctx_t   ctx,
 								 gchar       **import_info,
 								 gpgme_key_t  *imported_key,
 								 GError      **error);
+static gchar *gpgme_import_res_to_gchar(gpgme_import_result_t import_result)
+	G_GNUC_WARN_UNUSED_RESULT;
 static gboolean show_keyserver_dialog(gpointer user_data);
 static void keyserver_op_free(keyserver_op_t *keyserver_op);
 
@@ -168,6 +170,81 @@ libbalsa_gpgme_keyserver_op(const gchar *fingerprint,
     return result;
 }
 
+
+/* documentation: see header file */
+gchar *
+libbalsa_gpgme_export_key(gpgme_ctx_t   ctx,
+						  gpgme_key_t   key,
+						  const gchar  *name,
+						  GError      **error)
+{
+	gpgme_error_t gpgme_err;
+	gpgme_data_t buffer;
+	gchar *result = NULL;
+
+	g_return_val_if_fail((ctx != NULL) && (key != NULL), FALSE);
+
+	gpgme_set_armor(ctx, 1);
+	gpgme_err = gpgme_data_new(&buffer);
+	if (gpgme_err != GPG_ERR_NO_ERROR) {
+		libbalsa_gpgme_set_error(error, gpgme_err, _("cannot create data buffer"));
+	} else {
+		gpgme_key_t keys[2];
+
+		keys[0] = key;
+		keys[1] = NULL;
+		gpgme_err = gpgme_op_export_keys(ctx, keys, 0, buffer);
+		if (gpgme_err != GPG_ERR_NO_ERROR) {
+			libbalsa_gpgme_set_error(error, gpgme_err, _("exporting key for “%s” failed"), name);
+		} else {
+			off_t key_size;
+
+			/* as we are working on a memory buffer, we can omit error checking... */
+			key_size = gpgme_data_seek(buffer, 0, SEEK_END);
+			result = g_malloc0(key_size + 1);
+			(void) gpgme_data_seek(buffer, 0, SEEK_SET);
+			(void) gpgme_data_read(buffer, result, key_size);
+		}
+		gpgme_data_release(buffer);
+	}
+
+	return result;
+}
+
+
+/* documentation: see header file */
+gboolean
+libbalsa_gpgme_import_ascii_key(gpgme_ctx_t   ctx,
+								const gchar  *key_buf,
+								gchar       **import_info,
+								GError      **error)
+{
+	gpgme_data_t buffer;
+	gpgme_error_t gpgme_err;
+	gboolean result = FALSE;
+
+	g_return_val_if_fail((ctx != NULL) && (key_buf != NULL), FALSE);
+
+	gpgme_err = gpgme_data_new_from_mem(&buffer, key_buf, strlen(key_buf), 1);
+	if (gpgme_err != GPG_ERR_NO_ERROR) {
+		libbalsa_gpgme_set_error(error, gpgme_err, _("cannot create data buffer"));
+	} else {
+		gpgme_err = gpgme_op_import(ctx, buffer);
+		if (gpgme_err != GPG_ERR_NO_ERROR) {
+			libbalsa_gpgme_set_error(error, gpgme_err, _("importing ASCII-armored key data failed"));
+		} else {
+			result = TRUE;
+			if (import_info != NULL) {
+				*import_info = gpgme_import_res_to_gchar(gpgme_op_import_result(ctx));
+			}
+		}
+		gpgme_data_release(buffer);
+	}
+
+	return result;
+}
+
+
 /* ---- local functions ------------------------------------------------------ */
 
 /** \brief Check if a key is usable
@@ -235,7 +312,7 @@ gpgme_keyserver_run(gpointer user_data)
 		} else if (keys->next != NULL) {
 			dialog = gtk_message_dialog_new(keyserver_op->parent,
 				GTK_DIALOG_DESTROY_WITH_PARENT | libbalsa_dialog_flags(), GTK_MESSAGE_WARNING, GTK_BUTTONS_CLOSE,
-				_("Found %u keys with fingerprint %s on the key server. Please check and import the proper key manually"),
+				_("Found %u keys with fingerprint %s on the key server. Please check and import the proper key manually."),
 				g_list_length(keys), keyserver_op->fingerprint);
 		} else {
 			dialog = gpgme_keyserver_do_import(keyserver_op, (gpgme_key_t) keys->data);
@@ -282,7 +359,7 @@ gpgme_keyserver_do_import(keyserver_op_t *keyserver_op,
 				GTK_MESSAGE_INFO, GTK_BUTTONS_CLOSE, "%s", import_msg);
 		} else {
 			dialog = libbalsa_key_dialog(keyserver_op->parent, GTK_BUTTONS_CLOSE, imported_key, GPG_SUBKEY_CAP_ALL,
-				_("Key imported"), import_msg);
+				NULL, import_msg);
 			gpgme_key_unref(imported_key);
 		}
 		g_free(import_msg);
@@ -329,61 +406,80 @@ gpgme_import_key(gpgme_ctx_t   ctx,
 		gpgme_import_result_t import_result;
 
 		import_result = gpgme_op_import_result(ctx);
-		if (import_result->considered == 0) {
-			*import_info = g_strdup(_("No key was imported or updated."));
-		} else {
-			if (import_result->imported != 0) {
-				*import_info = g_strdup(_("The key was imported into the local key ring."));
-			} else if (import_result->unchanged == 0) {
-				GString *info;
+		*import_info = gpgme_import_res_to_gchar(import_result);
 
-				info = g_string_new(_("The key was updated in the local key ring:"));
-				if (import_result->new_user_ids > 0) {
-					g_string_append_printf(info,
-						ngettext("\n\342\200\242 %d new user ID", "\n\342\200\242 %d new user IDs", import_result->new_user_ids),
-						import_result->new_user_ids);
-				}
-				if (import_result->new_sub_keys > 0) {
-					g_string_append_printf(info,
-						ngettext("\n\342\200\242 %d new subkey", "\n\342\200\242 %d new subkeys", import_result->new_sub_keys),
-						import_result->new_sub_keys);
-				}
-				if (import_result->new_signatures > 0) {
-					g_string_append_printf(info,
-						ngettext("\n\342\200\242 %d new signature", "\n\342\200\242 %d new signatures",
-							import_result->new_signatures),
-						import_result->new_signatures);
-				}
-				if (import_result->new_revocations > 0) {
-					g_string_append_printf(info,
-						ngettext("\n\342\200\242 %d new revocation", "\n\342\200\242 %d new revocations",
-							import_result->new_revocations),
-							import_result->new_revocations);
-				}
-				*import_info = g_string_free(info, FALSE);
-			} else {
-				*import_info = g_strdup(_("No changes for the key were found on the key server."));
-			}
+		/* the key has been considered: load the possibly changed key from the local ring, ignoring any errors */
+		if ((import_result->considered != 0) && (key->subkeys != NULL)) {
+			gpgme_keylist_mode_t kl_mode;
 
-			/* load the possibly changed key from the local ring, ignoring any errors */
-			if (key->subkeys != NULL) {
-				gpgme_keylist_mode_t kl_mode;
-
-				/* ensure local key list mode */
-				kl_mode = gpgme_get_keylist_mode(ctx);
-				kl_mode &= ~GPGME_KEYLIST_MODE_EXTERN;
-				kl_mode |= GPGME_KEYLIST_MODE_LOCAL;
-				gpgme_err = gpgme_set_keylist_mode(ctx, kl_mode);
-				if (gpgme_err == GPG_ERR_NO_ERROR) {
-					/* gpgme_err = gpgme_get_key(ctx, key->subkeys->fpr, imported_key, 0); */
-					(void) gpgme_get_key(ctx, key->subkeys->fpr, imported_key, 0);
-				}
+			/* ensure local key list mode */
+			kl_mode = gpgme_get_keylist_mode(ctx);
+			kl_mode &= ~GPGME_KEYLIST_MODE_EXTERN;
+			kl_mode |= GPGME_KEYLIST_MODE_LOCAL;
+			gpgme_err = gpgme_set_keylist_mode(ctx, kl_mode);
+			if (gpgme_err == GPG_ERR_NO_ERROR) {
+				(void) gpgme_get_key(ctx, key->subkeys->fpr, imported_key, 0);
 			}
 		}
+
 		result = TRUE;
 	}
 
 	return result;
+}
+
+
+/** \brief Create a human-readable import result message
+ *
+ * \param import_result GpgME import result data
+ * \return a newly allocated human-readable string containing the key import results
+ *
+ * This helper function collects the information about the last import operation using the passed context into a human-readable
+ * string.
+ */
+static gchar *
+gpgme_import_res_to_gchar(gpgme_import_result_t import_result)
+{
+	gchar *import_info;
+
+	if (import_result->considered == 0) {
+		import_info = g_strdup(_("No key was imported or updated."));
+	} else {
+		if (import_result->imported != 0) {
+			import_info = g_strdup(_("The key was imported into the local key ring."));
+		} else if (import_result->unchanged == 0) {
+			GString *info;
+
+			info = g_string_new(_("The key was updated in the local key ring:"));
+			if (import_result->new_user_ids > 0) {
+				g_string_append_printf(info,
+					ngettext("\n\342\200\242 %d new user ID", "\n\342\200\242 %d new user IDs", import_result->new_user_ids),
+					import_result->new_user_ids);
+			}
+			if (import_result->new_sub_keys > 0) {
+				g_string_append_printf(info,
+					ngettext("\n\342\200\242 %d new subkey", "\n\342\200\242 %d new subkeys", import_result->new_sub_keys),
+					import_result->new_sub_keys);
+			}
+			if (import_result->new_signatures > 0) {
+				g_string_append_printf(info,
+					ngettext("\n\342\200\242 %d new signature", "\n\342\200\242 %d new signatures",
+						import_result->new_signatures),
+					import_result->new_signatures);
+			}
+			if (import_result->new_revocations > 0) {
+				g_string_append_printf(info,
+					ngettext("\n\342\200\242 %d new revocation", "\n\342\200\242 %d new revocations",
+						import_result->new_revocations),
+						import_result->new_revocations);
+			}
+			import_info = g_string_free(info, FALSE);
+		} else {
+			import_info = g_strdup(_("The existing key in the key ring was not changed."));
+		}
+	}
+
+	return import_info;
 }
 
 

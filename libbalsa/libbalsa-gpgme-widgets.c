@@ -48,6 +48,8 @@ static gchar *create_purpose_str(gboolean can_sign,
 								 gboolean can_certify,
 								 gboolean can_auth)
 	G_GNUC_WARN_UNUSED_RESULT;
+static gchar *create_subkey_type_str(gpgme_subkey_t subkey)
+	G_GNUC_WARN_UNUSED_RESULT;
 
 
 /* documentation: see header file */
@@ -431,27 +433,31 @@ create_subkey_widget(gpgme_subkey_t subkey)
 {
 	GtkWidget *subkey_grid;
 	gint subkey_row = 0;
-	gchar *status_str;
+	gchar *details_str;
 	gchar *timebuf;
 
 	subkey_grid = gtk_grid_new();
 	gtk_grid_set_column_spacing(GTK_GRID(subkey_grid), 6);
 
 	/* print a warning for a bad subkey status */
-	status_str = create_status_str(subkey->expired != 0U, subkey->revoked != 0U, subkey->disabled != 0U, subkey->invalid != 0U);
-	if (strlen(status_str) > 0U) {
-		subkey_row = create_key_grid_row(GTK_GRID(subkey_grid), subkey_row, _("Status:"), status_str, TRUE);
+	details_str = create_status_str(subkey->expired != 0U, subkey->revoked != 0U, subkey->disabled != 0U, subkey->invalid != 0U);
+	if (strlen(details_str) > 0U) {
+		subkey_row = create_key_grid_row(GTK_GRID(subkey_grid), subkey_row, _("Status:"), details_str, TRUE);
 	}
-	g_free(status_str);
+	g_free(details_str);
 
 	subkey_row = create_key_grid_row(GTK_GRID(subkey_grid), subkey_row, _("Fingerprint:"), subkey->fpr, FALSE);
 
-	status_str = create_purpose_str(subkey->can_sign != 0U, subkey->can_encrypt != 0, subkey->can_certify != 0U,
+	details_str = create_subkey_type_str(subkey);
+	subkey_row = create_key_grid_row(GTK_GRID(subkey_grid), subkey_row, _("Type:"), details_str, FALSE);
+	g_free(details_str);
+
+	details_str = create_purpose_str(subkey->can_sign != 0U, subkey->can_encrypt != 0, subkey->can_certify != 0U,
 		subkey->can_authenticate != 0U);
-	if (strlen(status_str) > 0U) {
-		subkey_row = create_key_grid_row(GTK_GRID(subkey_grid), subkey_row, _("Capabilities:"), status_str, FALSE);
+	if (strlen(details_str) > 0U) {
+		subkey_row = create_key_grid_row(GTK_GRID(subkey_grid), subkey_row, _("Capabilities:"), details_str, FALSE);
 	}
-	g_free(status_str);
+	g_free(details_str);
 
 	if (subkey->timestamp == -1) {
 		timebuf = g_strdup(_("invalid timestamp"));
@@ -468,7 +474,6 @@ create_subkey_widget(gpgme_subkey_t subkey)
 	} else {
 		timebuf = libbalsa_date_to_utf8(subkey->expires, "%x %X");
 	}
-	/* subkey_row = create_key_grid_row(GTK_GRID(subkey_grid), subkey_row, _("Expires:"), timebuf, FALSE); */
 	(void) create_key_grid_row(GTK_GRID(subkey_grid), subkey_row, _("Expires:"), timebuf, FALSE);
 	g_free(timebuf);
 
@@ -511,4 +516,34 @@ create_purpose_str(gboolean can_sign,
 		g_string_append_printf(purpose, "%s%s", (purpose->len > 0U) ? ", " : "", _("authenticate"));
 	}
 	return g_string_free(purpose, FALSE);
+}
+
+
+/** \brief Create a subkey type string
+ *
+ * \param subkey the subkey
+ * \return a newly allocated string containing a human-readable description of the subkey type
+ *
+ * Create a string containing the length of the subkey in bits, the public key algorithm supported by it and for ECC algorithms the
+ * name of the curve.  Note that the latter is available for Gpgme >= 1.5.0 only.
+ */
+static gchar *
+create_subkey_type_str(gpgme_subkey_t subkey)
+{
+	GString *type_str;
+	const gchar *algo;
+
+	type_str = g_string_new(NULL);
+	g_string_append_printf(type_str, _("%u bits"), subkey->length);
+	algo = gpgme_pubkey_algo_name(subkey->pubkey_algo);
+	if (algo != NULL) {
+		g_string_append_printf(type_str, " %s", algo);
+	}
+#if GPGME_VERSION_NUMBER >= 0x010500
+	if (subkey->curve != NULL) {
+		g_string_append_printf(type_str, _(" curve “%s”"), subkey->curve);
+	}
+#endif
+
+	return g_string_free(type_str, FALSE);
 }

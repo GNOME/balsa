@@ -26,12 +26,16 @@
 #include "balsa-app.h"
 #include "balsa-icons.h"
 #include <glib/gi18n.h>
+#include <glib/gstdio.h>
+#include "libbalsa-gpgme.h"
 #include "libbalsa-gpgme-widgets.h"
 #include "libbalsa-gpgme-keys.h"
 #include "balsa-mime-widget.h"
 
 
 static void on_gpg_key_button(GtkWidget *button, const gchar *fingerprint);
+static void on_key_import_button(GtkButton *button, gpointer user_data);
+static gboolean create_import_keys_widget(GtkBox *box, const gchar *key_buf, GError **error);
 
 
 BalsaMimeWidget *
@@ -50,6 +54,41 @@ balsa_mime_widget_new_signature(BalsaMessage * bm,
     mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
     mw->widget = balsa_mime_widget_signature_widget(mime_body, content_type);
     
+    return mw;
+}
+
+BalsaMimeWidget *
+balsa_mime_widget_new_pgpkey(BalsaMessage        *bm,
+							 LibBalsaMessageBody *mime_body,
+							 const gchar 		 *content_type,
+							 gpointer			  data)
+{
+    gssize body_size;
+    gchar *body_buf = NULL;
+    GError *err = NULL;
+	BalsaMimeWidget *mw = NULL;
+
+    g_return_val_if_fail(mime_body != NULL, NULL);
+    g_return_val_if_fail(content_type != NULL, NULL);
+
+    body_size = libbalsa_message_body_get_content(mime_body, &body_buf, &err);
+    if (body_size < 0) {
+        balsa_information(LIBBALSA_INFORMATION_ERROR, _("Could not save a text part: %s"),
+                          err ? err->message : "Unknown error");
+        g_clear_error(&err);
+    } else {
+		mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
+		mw->widget = gtk_box_new(GTK_ORIENTATION_VERTICAL, BMW_VBOX_SPACE);
+		if (!create_import_keys_widget(GTK_BOX(mw->widget), body_buf, &err)) {
+            balsa_information(LIBBALSA_INFORMATION_ERROR, _("Could not process GnuPG keys: %s"),
+                              err ? err->message : "Unknown error");
+            g_clear_error(&err);
+            g_object_unref(G_OBJECT(mw));
+            mw = NULL;
+		}
+    	g_free(body_buf);
+    }
+
     return mw;
 }
 
@@ -193,7 +232,111 @@ on_gpg_key_button(GtkWidget   *button,
     if (!libbalsa_gpgme_keyserver_op(fingerprint, balsa_get_parent_window(button), &error)) {
     	libbalsa_information(LIBBALSA_INFORMATION_ERROR, "%s", error->message);
     	g_error_free(error);
+    } else {
+		gtk_widget_set_sensitive(GTK_WIDGET(button), FALSE);
     }
+}
+
+
+/* Callback: import an attached key */
+static void
+on_key_import_button(GtkButton *button,
+					 gpointer   user_data)
+{
+	gpgme_ctx_t ctx;
+	gboolean success;
+	GError *error = NULL;
+	gchar *import_info = NULL;
+	GtkWidget *dialog;
+
+	ctx = libbalsa_gpgme_new_with_proto(GPGME_PROTOCOL_OpenPGP, NULL, NULL, &error);
+	if (ctx != NULL) {
+		success = libbalsa_gpgme_import_ascii_key(ctx, g_object_get_data(G_OBJECT(button), "keydata"), &import_info, &error);
+		gpgme_release(ctx);
+	} else {
+		success = FALSE;
+	}
+
+	if (success) {
+		dialog = gtk_message_dialog_new(GTK_WINDOW(balsa_app.main_window),
+			GTK_DIALOG_DESTROY_WITH_PARENT | libbalsa_dialog_flags(),
+			GTK_MESSAGE_INFO,
+			GTK_BUTTONS_CLOSE,
+			_("Import GnuPG key:\n%s"), import_info);
+		gtk_widget_set_sensitive(GTK_WIDGET(button), FALSE);
+	} else {
+		dialog = gtk_message_dialog_new(GTK_WINDOW(balsa_app.main_window),
+			GTK_DIALOG_DESTROY_WITH_PARENT | libbalsa_dialog_flags(),
+			GTK_MESSAGE_ERROR,
+			GTK_BUTTONS_CLOSE,
+			_("Error importing key data: %s"), error->message);
+		g_clear_error(&error);
+	}
+	g_free(import_info);
+	(void) gtk_dialog_run(GTK_DIALOG(dialog));
+	gtk_widget_destroy(dialog);
+}
+
+
+static gboolean
+create_import_keys_widget(GtkBox *box, const gchar *key_buf, GError **error)
+{
+	gboolean success = FALSE;
+	gpgme_ctx_t ctx;
+
+	ctx = libbalsa_gpgme_new_with_proto(GPGME_PROTOCOL_OpenPGP, NULL, NULL, error);
+	if (ctx != NULL) {
+		gchar *temp_dir = NULL;
+
+		if (!libbalsa_mktempdir(&temp_dir)) {
+			g_warning("Failed to create a temporary folder");
+		} else {
+			GList *keys = NULL;
+
+			success = libbalsa_gpgme_ctx_set_home(ctx, temp_dir, error) &&
+				libbalsa_gpgme_import_ascii_key(ctx, key_buf, NULL, error) &&
+				libbalsa_gpgme_list_keys(ctx, &keys, NULL, NULL, FALSE, FALSE, error);
+
+			if (success && (keys != NULL)) {
+				GList *item;
+
+				for (item = keys; success && (item != NULL); item = item->next) {
+					gpgme_key_t this_key = (gpgme_key_t) item->data;
+					gchar *key_ascii;
+					GtkWidget *key_widget;
+					GtkWidget *import_btn;
+
+					key_ascii = libbalsa_gpgme_export_key(ctx, this_key, _("(imported)"), error);
+
+					if (key_ascii == NULL) {
+						success = FALSE;
+					} else {
+						key_widget = libbalsa_gpgme_key(this_key, NULL, GPG_SUBKEY_CAP_ALL, FALSE);
+						gtk_box_pack_start(box, key_widget, FALSE, FALSE, 0);
+
+						import_btn = gtk_button_new_with_label(_("Import key into the local key ring"));
+						g_object_set_data_full(G_OBJECT(import_btn), "keydata", key_ascii, (GDestroyNotify) g_free);
+						g_signal_connect(G_OBJECT(import_btn), "clicked", (GCallback) on_key_import_button, NULL);
+						gtk_box_pack_start(box, import_btn, FALSE, FALSE, 0);
+
+						if (item->next != NULL) {
+							gtk_box_pack_start(box, gtk_separator_new(GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE,
+								BMW_VBOX_SPACE);
+						}
+					}
+				}
+
+				g_list_free_full(keys, (GDestroyNotify) gpgme_key_release);
+			}
+
+			libbalsa_delete_directory_contents(temp_dir);
+			g_rmdir(temp_dir);
+		}
+
+		gpgme_release(ctx);
+	}
+
+	return success;
 }
 
 #endif  /* HAVE_GPGME */

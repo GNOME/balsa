@@ -4938,13 +4938,15 @@ bsmsg2message(BalsaSendmsg * bsmsg)
 
     message->headers->date = time(NULL);
 #ifdef HAVE_GPGME
-    if (balsa_app.has_openpgp || balsa_app.has_smime)
+    if (balsa_app.has_openpgp || balsa_app.has_smime) {
         message->gpg_mode =
             (bsmsg->gpg_mode & LIBBALSA_PROTECT_MODE) != 0 ? bsmsg->gpg_mode : 0;
-    else
+        message->att_pubkey = bsmsg->attach_pubkey;
+        message->ident = g_object_ref(ident);
+    } else {
         message->gpg_mode = 0;
-    if (ident->force_key_id && *ident->force_key_id)
-        message->force_key_id = g_strdup(ident->force_key_id);
+        message->att_pubkey = FALSE;
+    }
 #endif
 
     /* remember the parent window */
@@ -5350,6 +5352,8 @@ message_postpone(BalsaSendmsg * bsmsg)
 #ifdef HAVE_GPGME
     g_ptr_array_add(headers, g_strdup("X-Balsa-Crypto"));
     g_ptr_array_add(headers, g_strdup_printf("%d", bsmsg->gpg_mode));
+    g_ptr_array_add(headers, g_strdup("X-Balsa-Att-Pubkey"));
+    g_ptr_array_add(headers, g_strdup_printf("%d", bsmsg->attach_pubkey));
 #endif
 
 #if HAVE_GSPELL || HAVE_GTKSPELL
@@ -6001,6 +6005,15 @@ sw_encrypt_change_state(GSimpleAction * action, GVariant * state, gpointer data)
 }
 
 static void
+sw_att_pubkey_change_state(GSimpleAction * action, GVariant * state, gpointer data)
+{
+    BalsaSendmsg *bsmsg = (BalsaSendmsg *) data;
+
+    bsmsg->attach_pubkey = g_variant_get_boolean(state);
+    g_simple_action_set_state(action, state);
+}
+
+static void
 sw_gpg_mode_change_state(GSimpleAction  * action,
                          GVariant       * state,
                          gpointer         data)
@@ -6447,6 +6460,7 @@ bsmsg_setup_gpg_ui(BalsaSendmsg *bsmsg)
     /* make everything insensitive if we don't have crypto support */
     sw_action_set_enabled(bsmsg, "gpg-mode", balsa_app.has_openpgp ||
                           balsa_app.has_smime);
+    sw_action_set_enabled(bsmsg, "attpubkey", balsa_app.has_openpgp);
 }
 
 static void
@@ -6531,6 +6545,8 @@ static GActionEntry win_entries[] = {
                          sw_gpg_mode_change_state       },
     {"gpg-mode",         libbalsa_radio_activated, "s", "'smime'",
                          sw_gpg_mode_change_state       },
+	{"attpubkey",        libbalsa_toggle_activated, NULL, "false",
+						 sw_att_pubkey_change_state     },
 #endif /* HAVE_GPGME */
     /* Only a toolbar button: */
     {"toolbar-send",     sw_toolbar_send_activated      }
@@ -6603,6 +6619,7 @@ sendmsg_window_new()
 #endif                          /* HAVE_GTKSPELL */
 #ifdef HAVE_GPGME
     bsmsg->gpg_mode = LIBBALSA_PROTECT_RFC3156;
+    bsmsg->attach_pubkey = FALSE;
 #endif
     bsmsg->autosave_timeout_id = /* autosave every 5 minutes */
         g_timeout_add_seconds(60*5, (GSourceFunc)sw_autosave_timeout_cb, bsmsg);
@@ -6911,6 +6928,10 @@ sendmsg_window_continue(LibBalsaMailbox * mailbox, guint msgno)
     if ((postpone_hdr =
          libbalsa_message_get_user_header(message, "X-Balsa-Crypto")))
         bsmsg_setup_gpg_ui_by_mode(bsmsg, atoi(postpone_hdr));
+    postpone_hdr = libbalsa_message_get_user_header(message, "X-Balsa-Att-Pubkey");
+    if (postpone_hdr != NULL) {
+    	sw_action_set_active(bsmsg, "attpubkey", atoi(postpone_hdr) != 0);
+    }
 #endif
     if ((postpone_hdr =
          libbalsa_message_get_user_header(message, "X-Balsa-MDN")))

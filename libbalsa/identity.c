@@ -33,6 +33,10 @@
 #  include "macosx-helpers.h"
 #endif
 
+#ifdef HAVE_GPGME
+#  include "libbalsa-gpgme.h"
+#endif
+
 #include <string.h>
 #include "smtp-server.h"
 
@@ -111,7 +115,8 @@ libbalsa_identity_init(LibBalsaIdentity* ident)
     ident->always_trust = FALSE;
     ident->warn_send_plain = TRUE;
     ident->crypt_protocol = LIBBALSA_PROTECT_OPENPGP;
-    ident->force_key_id = NULL;
+    ident->force_gpg_key_id = NULL;
+    ident->force_smime_key_id = NULL;
     ident->request_mdn = FALSE;
     ident->request_dsn = FALSE;
     /*
@@ -141,7 +146,8 @@ libbalsa_identity_finalize(GObject * object)
         g_object_unref(ident->smtp_server);
     g_free(ident->face);
     g_free(ident->x_face);
-    g_free(ident->force_key_id);
+    g_free(ident->force_gpg_key_id);
+    g_free(ident->force_smime_key_id);
 
     G_OBJECT_CLASS(parent_class)->finalize(object);
 }
@@ -584,6 +590,11 @@ static void ident_dialog_add_check_and_entry(GtkWidget *, gint, GtkDialog *,
                                              const gchar *, const gchar *);
 static void ident_dialog_add_entry(GtkWidget *, gint, GtkDialog *,
                                    const gchar *, const gchar *);
+static void ident_dialog_add_keysel_entry(GtkWidget   *grid,
+							  	  	  	  gint         row,
+										  GtkDialog   *dialog,
+										  const gchar *label_name,
+										  const gchar *entry_key);
 typedef enum LibBalsaIdentityPathType_ {
     LBI_PATH_TYPE_FACE,
     LBI_PATH_TYPE_XFACE
@@ -1046,15 +1057,19 @@ setup_ident_frame(GtkDialog * dialog, gboolean createp, gpointer tree,
 				 _("default protocol"),
 				 "identity-crypt-protocol");
     ident_dialog_add_checkbutton(grid, row++, dialog,
-                                 _("always trust GnuPG keys when encrypting"),
+                                 _("always trust GnuPG keys to encrypt messages"),
                                  "identity-trust-always", TRUE);
     ident_dialog_add_checkbutton(grid, row++, dialog,
                                  _("remind me if messages can be encrypted"),
                                  "identity-warn-send-plain", TRUE);
-    ident_dialog_add_entry(grid, row++, dialog,
-                           _("use secret key with this id for signing\n"
-                             "(leave empty for automatic selection)"),
-                           "identity-keyid");
+    ident_dialog_add_keysel_entry(grid, row++, dialog,
+                           	   	  _("use secret key with this id for signing GnuPG messages\n"
+                           	   		"(leave empty for automatic selection)"),
+								  "identity-keyid");
+    ident_dialog_add_keysel_entry(grid, row++, dialog,
+                           	   	  _("use certificate with this id for signing S/MIME messages\n"
+                           	   		"(leave empty for automatic selection)"),
+								  "identity-keyid-sm");
 #ifndef HAVE_GPGME
     gtk_widget_set_sensitive(grid, FALSE);
 #endif
@@ -1147,6 +1162,64 @@ ident_dialog_add_entry(GtkWidget * grid, gint row, GtkDialog * dialog,
     if (row == 0)
         gtk_widget_grab_focus(entry);
 }
+
+
+#ifdef HAVE_GPGME
+static void
+choose_key(GtkButton *button, gpointer user_data)
+{
+	const gchar *target;
+	gpgme_protocol_t protocol;
+	gchar *email;
+	gchar *keyid;
+	GError *error = NULL;
+
+	target = g_object_get_data(G_OBJECT(button), "target");
+	if (strcmp(target, "identity-keyid") == 0) {
+		protocol = GPGME_PROTOCOL_OpenPGP;
+	} else {
+		protocol = GPGME_PROTOCOL_CMS;
+	}
+
+	email = ident_dialog_get_text(G_OBJECT(user_data), "identity-address");
+	keyid = libbalsa_gpgme_get_seckey(protocol, email, GTK_WINDOW(user_data), &error);
+	if (keyid != NULL) {
+		display_frame_set_field(G_OBJECT(user_data), target, keyid);
+		g_free(keyid);
+	}
+	if (error != NULL) {
+        libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+                             _("Error selecting key: %s"), error->message);
+        g_clear_error(&error);
+	}
+}
+#endif
+
+
+/*
+ * Add a GtkEntry to the given dialog with a label next to it
+ * explaining the contents.  A reference to the entry is stored as
+ * object data attached to the dialog with the given key.  A button
+ * is added behind the entry to choose a key.
+ */
+static void
+ident_dialog_add_keysel_entry(GtkWidget   *grid,
+							  gint         row,
+							  GtkDialog   *dialog,
+                       	   	  const gchar *label_name,
+							  const gchar *entry_key)
+{
+	GtkWidget *button;
+
+	ident_dialog_add_entry(grid, row, dialog, label_name, entry_key);
+	button = gtk_button_new_with_label(_("Choose…"));
+#ifdef HAVE_GPGME
+	g_object_set_data_full(G_OBJECT(button), "target", g_strdup(entry_key), (GDestroyNotify) g_free);
+	g_signal_connect(button, "clicked", G_CALLBACK(choose_key), dialog);
+#endif
+	gtk_grid_attach(GTK_GRID(grid), button, 2, row, 1, 1);
+}
+
 
 /*
  * Add a GtkFileChooserButton to the given dialog with a label next to it
@@ -1472,8 +1545,10 @@ ident_dialog_update(GObject * dlg)
     id->warn_send_plain = ident_dialog_get_bool(dlg, "identity-warn-send-plain");
     id->crypt_protocol  = GPOINTER_TO_INT(ident_dialog_get_value
                                           (dlg, "identity-crypt-protocol"));
-    g_free(id->force_key_id);
-    id->force_key_id    = g_strstrip(ident_dialog_get_text(dlg, "identity-keyid"));
+    g_free(id->force_gpg_key_id);
+    id->force_gpg_key_id = g_strstrip(ident_dialog_get_text(dlg, "identity-keyid"));
+    g_free(id->force_smime_key_id);
+    id->force_smime_key_id = g_strstrip(ident_dialog_get_text(dlg, "identity-keyid-sm"));
 
     return TRUE;
 }
@@ -1856,7 +1931,8 @@ display_frame_update(GObject * dialog, LibBalsaIdentity* ident)
                               ident->warn_send_plain);
     display_frame_set_gpg_mode(dialog, "identity-crypt-protocol",
 			   &ident->crypt_protocol);
-    display_frame_set_field(dialog, "identity-keyid", ident->force_key_id);
+    display_frame_set_field(dialog, "identity-keyid", ident->force_gpg_key_id);
+    display_frame_set_field(dialog, "identity-keyid-sm", ident->force_smime_key_id);
 }
 
 
@@ -1957,7 +2033,8 @@ libbalsa_identity_new_config(const gchar* name)
     ident->always_trust = libbalsa_conf_get_bool("GpgTrustAlways");
     ident->warn_send_plain = libbalsa_conf_get_bool("GpgWarnSendPlain=true");
     ident->crypt_protocol = libbalsa_conf_get_int("CryptProtocol=16");
-    ident->force_key_id = libbalsa_conf_get_string("ForceKeyID");
+    ident->force_gpg_key_id = libbalsa_conf_get_string("ForceKeyID");
+    ident->force_smime_key_id = libbalsa_conf_get_string("ForceKeyIDSMime");
 
     return ident;
 }
@@ -2002,7 +2079,8 @@ libbalsa_identity_save(LibBalsaIdentity* ident, const gchar* group)
     libbalsa_conf_set_bool("GpgTrustAlways", ident->always_trust);
     libbalsa_conf_set_bool("GpgWarnSendPlain", ident->warn_send_plain);
     libbalsa_conf_set_int("CryptProtocol", ident->crypt_protocol);
-    libbalsa_conf_set_string("ForceKeyID", ident->force_key_id);
+    libbalsa_conf_set_string("ForceKeyID", ident->force_gpg_key_id);
+    libbalsa_conf_set_string("ForceKeyIDSMime", ident->force_smime_key_id);
 
     libbalsa_conf_pop_group();
 }

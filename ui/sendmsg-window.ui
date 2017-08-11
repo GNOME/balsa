@@ -250,6 +250,13 @@
           <attribute name='target'>smime</attribute>
         </item>
       </section>
+      <section>
+        <item>
+          <attribute name='label'
+            translatable='yes'>Attach GnuPG _Public Key</attribute>
+          <attribute name='action'>win.attpubkey</attribute>
+        </item>
+      </section>
     </submenu>
   </menu>
 </interface>

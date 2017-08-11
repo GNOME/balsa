@@ -41,8 +41,13 @@
 #include "net-client-smtp.h"
 #include "gmime-filter-header.h"
 #include "smtp-server.h"
+#include "identity.h"
 
 #include "libbalsa-progress.h"
+
+#ifdef HAVE_GPGME
+#include "libbalsa-gpgme.h"
+#endif
 
 #include <glib/gi18n.h>
 
@@ -238,6 +243,9 @@ static LibBalsaMsgCreateResult do_multipart_crypto(LibBalsaMessage *message,
                                                    GtkWindow       *parent,
                                                    GError         **error);
 
+static GMimePart *lb_create_pubkey_part(LibBalsaMessage  *message,
+				      	  	  	  	  	GtkWindow        *parent,
+										GError          **error);
 #endif
 
 static gpointer balsa_send_message_real(SendMessageInfo *info);
@@ -1205,12 +1213,20 @@ libbalsa_message_create_mime_message(LibBalsaMessage *message,
     InternetAddressList *ia_list;
     gchar *tmp;
     GList *list;
+    gboolean attach_pubkey = FALSE;
 #ifdef HAVE_GPGME
     GtkWindow *parent = g_object_get_data(G_OBJECT(message), "parent-window");
 #endif
 
+#ifdef HAVE_GPGME
+    /* attach the public key only if we send the message, not if we just postpone it */
+    if (!postponing && message->att_pubkey && ((message->gpg_mode & LIBBALSA_PROTECT_PROTOCOL) != 0)) {
+    	attach_pubkey = TRUE;
+    }
+#endif
+
     body = message->body_list;
-    if ((body != NULL) && (body->next != NULL)) {
+    if ((body != NULL) && ((body->next != NULL) || attach_pubkey)) {
         mime_root = GMIME_OBJECT(g_mime_multipart_new_with_subtype(message->subtype));
     }
 
@@ -1382,6 +1398,26 @@ libbalsa_message_create_mime_message(LibBalsaMessage *message,
 
         body = body->next;
     }
+
+#ifdef HAVE_GPGME
+    if (attach_pubkey) {
+    	GMimePart *pubkey_part;
+
+    	pubkey_part = lb_create_pubkey_part(message, parent, error);
+    	if (pubkey_part == NULL) {
+            if (mime_root != NULL) {
+                g_object_unref(G_OBJECT(mime_root));
+            }
+            return LIBBALSA_MESSAGE_CREATE_ERROR;
+    	}
+        if (mime_root != NULL) {
+            g_mime_multipart_add(GMIME_MULTIPART(mime_root), GMIME_OBJECT(pubkey_part));
+            g_object_unref(G_OBJECT(pubkey_part));
+        } else {
+            mime_root = GMIME_OBJECT(pubkey_part);
+        }
+    }
+#endif
 
 #ifdef HAVE_GPGME
     if ((message->body_list != NULL) && !postponing) {
@@ -1672,22 +1708,71 @@ libbalsa_fill_msg_queue_item_from_queu(LibBalsaMessage  *message,
 
 
 #ifdef HAVE_GPGME
+/*
+ * If the identity contains a forced key ID for the passed protocol, return the key ID.  Otherwise, return the email address of the
+ * "From:" address list to let GpeME automagically select the proper key.
+ */
 static const gchar *
-lb_send_from(LibBalsaMessage *message)
+lb_send_from(LibBalsaMessage  *message,
+			 gpgme_protocol_t  protocol)
 {
-    InternetAddress *ia =
-        internet_address_list_get_address(message->headers->from, 0);
+	const gchar *from_id;
 
-    if (message->force_key_id != NULL) {
-        return message->force_key_id;
-    }
+	if ((protocol == GPGME_PROTOCOL_OpenPGP) &&
+		(message->ident->force_gpg_key_id != NULL) &&
+		(message->ident->force_gpg_key_id[0] != '\0')) {
+		from_id = message->ident->force_gpg_key_id;
+	} else if ((protocol == GPGME_PROTOCOL_CMS) &&
+		(message->ident->force_smime_key_id != NULL) &&
+		(message->ident->force_smime_key_id[0] != '\0')) {
+		from_id = message->ident->force_smime_key_id;
+	} else {
+		InternetAddress *ia = internet_address_list_get_address(message->headers->from, 0);
 
-    while (INTERNET_ADDRESS_IS_GROUP(ia)) {
-        ia = internet_address_list_get_address(((InternetAddressGroup *)
-                                                ia)->members, 0);
-    }
+		while (INTERNET_ADDRESS_IS_GROUP(ia)) {
+			ia = internet_address_list_get_address(((InternetAddressGroup *) ia)->members, 0);
+		}
+		from_id = ((InternetAddressMailbox *) ia)->addr;
+	}
 
-    return ((InternetAddressMailbox *) ia)->addr;
+    return from_id;
+}
+
+
+static GMimePart *
+lb_create_pubkey_part(LibBalsaMessage  *message,
+				      GtkWindow        *parent,
+				      GError          **error)
+{
+	const gchar *key_id;
+	gchar *keybuf;
+	GMimePart *mime_part = NULL;
+
+	key_id = lb_send_from(message, GPGME_PROTOCOL_OpenPGP);
+	keybuf = libbalsa_gpgme_get_pubkey(GPGME_PROTOCOL_OpenPGP, key_id, parent, error);
+	if (keybuf != NULL) {
+	    GMimeStream *stream;
+	    GMimeDataWrapper *wrapper;
+	    gchar *filename;
+
+	    mime_part = g_mime_part_new_with_type("application", "pgp-keys");
+	    filename = g_strconcat(key_id, ".asc", NULL);
+		g_mime_object_set_content_type_parameter(GMIME_OBJECT(mime_part), "name", filename);
+		g_mime_object_set_disposition(GMIME_OBJECT(mime_part), GMIME_DISPOSITION_ATTACHMENT);
+	    g_mime_object_set_content_disposition_parameter(GMIME_OBJECT(mime_part), "filename", filename);
+		g_free(filename);
+	    g_mime_part_set_content_encoding(mime_part, GMIME_CONTENT_ENCODING_7BIT);
+	    stream = g_mime_stream_mem_new();
+	    g_mime_stream_write(stream, keybuf, strlen(keybuf));
+	    g_free(keybuf);
+	    wrapper = g_mime_data_wrapper_new();
+	    g_mime_data_wrapper_set_stream(wrapper, stream);
+	    g_object_unref(stream);
+	    g_mime_part_set_content_object(mime_part, wrapper);
+	    g_object_unref(wrapper);
+	}
+
+	return mime_part;
 }
 
 
@@ -1703,7 +1788,7 @@ libbalsa_create_rfc2440_buffer(LibBalsaMessage *message,
     switch (mode & LIBBALSA_PROTECT_MODE) {
     case LIBBALSA_PROTECT_SIGN:       /* sign only */
         if (!libbalsa_rfc2440_sign_encrypt(mime_part,
-                                           lb_send_from(message),
+                                           lb_send_from(message, GPGME_PROTOCOL_OpenPGP),
                                            NULL, FALSE,
                                            parent, error)) {
             return LIBBALSA_MESSAGE_SIGN_ERROR;
@@ -1739,7 +1824,7 @@ libbalsa_create_rfc2440_buffer(LibBalsaMessage *message,
         if (mode & LIBBALSA_PROTECT_SIGN) {
             result =
                 libbalsa_rfc2440_sign_encrypt(mime_part,
-                                              lb_send_from(message),
+                                              lb_send_from(message, GPGME_PROTOCOL_OpenPGP),
                                               encrypt_for,
                                               always_trust,
                                               parent, error);
@@ -1797,7 +1882,7 @@ do_multipart_crypto(LibBalsaMessage *message,
     switch (message->gpg_mode & LIBBALSA_PROTECT_MODE) {
     case LIBBALSA_PROTECT_SIGN:       /* sign message */
         if (!libbalsa_sign_mime_object(mime_root,
-                                       lb_send_from(message),
+                                       lb_send_from(message, protocol),
                                        protocol, parent, error)) {
             return LIBBALSA_MESSAGE_SIGN_ERROR;
         }
@@ -1817,7 +1902,7 @@ do_multipart_crypto(LibBalsaMessage *message,
         encrypt_for = get_mailbox_names(encrypt_for,
                                         message->headers->cc_list);
         encrypt_for = g_list_append(encrypt_for,
-                                    g_strdup(lb_send_from(message)));
+                                    g_strdup(lb_send_from(message, protocol)));
         if (message->headers->bcc_list
             && (internet_address_list_length(message->headers->
                                              bcc_list) > 0)) {
@@ -1829,7 +1914,7 @@ do_multipart_crypto(LibBalsaMessage *message,
         if (message->gpg_mode & LIBBALSA_PROTECT_SIGN) {
             success =
                 libbalsa_sign_encrypt_mime_object(mime_root,
-                                                  lb_send_from(message),
+                                                  lb_send_from(message, protocol),
                                                   encrypt_for, protocol,
                                                   always_trust, parent,
                                                   error);
@@ -1839,7 +1924,7 @@ do_multipart_crypto(LibBalsaMessage *message,
                                              protocol, always_trust,
                                              parent, error);
         }
-        g_list_free(encrypt_for);
+        g_list_free_full(encrypt_for, (GDestroyNotify) g_free);
 
         if (!success) {
             return LIBBALSA_MESSAGE_ENCRYPT_ERROR;

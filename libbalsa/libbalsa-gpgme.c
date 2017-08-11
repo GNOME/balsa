@@ -39,6 +39,7 @@
 #include "gmime-gpgme-signature.h"
 #include "libbalsa-gpgme-keys.h"
 #include "libbalsa-gpgme.h"
+#include "libbalsa.h"
 
 
 static gboolean gpgme_add_signer(gpgme_ctx_t ctx, const gchar * signer,
@@ -48,6 +49,13 @@ static gpgme_key_t *gpgme_build_recipients(gpgme_ctx_t ctx,
 					   gboolean accept_low_trust,
 					   GtkWindow * parent,
 					   GError ** error);
+static gpgme_error_t get_key_from_name(gpgme_ctx_t   ctx,
+				  	  	  	  	  	   gpgme_key_t  *key,
+									   const gchar  *name,
+									   gboolean      secret,
+									   gboolean      accept_all,
+									   GtkWindow    *parent,
+									   GError      **error);
 static void release_keylist(gpgme_key_t * keylist);
 
 /* callbacks for gpgme file handling */
@@ -201,11 +209,62 @@ libbalsa_gpgme_new_with_proto(gpgme_protocol_t        protocol,
 		    gpgme_release(ctx);
 		    ctx = NULL;
 		} else {
-			gpgme_set_passphrase_cb(ctx, callback, parent);
+			if (protocol == GPGME_PROTOCOL_CMS) {
+				/* s/mime signing fails with error "not implemented" if a passphrase callback has been set... */
+				gpgme_set_passphrase_cb(ctx, NULL, NULL);
+				/* ...but make sure the user certificate is always included when signing */
+				gpgme_set_include_certs(ctx, 1);
+			} else {
+				gpgme_set_passphrase_cb(ctx, callback, parent);
+			}
 		}
 	}
 
 	return ctx;
+}
+
+
+/** \brief Set the configuration folder for a GpgME context
+ *
+ * \param ctx GpgME context
+ * \param home_dir configuration directory for the crypto engine, or NULL for the default one
+ * \param error Filled with error information on error.
+ * \return TRUE on success, or FALSE on error
+ *
+ * Set the configuration and key ring folder for a GpgME context.
+ */
+gboolean
+libbalsa_gpgme_ctx_set_home(gpgme_ctx_t   ctx,
+							const gchar  *home_dir,
+							GError      **error)
+{
+	gpgme_protocol_t protocol;
+	gpgme_engine_info_t engine_info;
+	gpgme_engine_info_t this_engine;
+	gboolean result = FALSE;
+
+	g_return_val_if_fail(ctx != NULL, FALSE);
+
+	protocol = gpgme_get_protocol(ctx);
+    engine_info = gpgme_ctx_get_engine_info(ctx);
+    for (this_engine = engine_info;
+    	 (this_engine != NULL) && (this_engine->protocol != protocol);
+    	 this_engine = this_engine->next) {
+    	/* nothing to do */
+    }
+    if (this_engine != NULL) {
+    	gpgme_error_t err;
+
+    	err = gpgme_ctx_set_engine_info(ctx, protocol, this_engine->file_name, home_dir);
+    	if (err == GPG_ERR_NO_ERROR) {
+    		result = TRUE;
+    	} else {
+    		libbalsa_gpgme_set_error(error, err, _("could not set folder “%s” for engine “%s”"), home_dir,
+    			gpgme_get_protocol_name(protocol));
+    	}
+    }
+
+    return result;
 }
 
 
@@ -620,6 +679,108 @@ libbalsa_gpgme_decrypt(GMimeStream * crypted, GMimeStream * plain,
 }
 
 
+/** \brief Export a public key
+ *
+ * \param protocol GpgME crypto protocol to use
+ * \param name pattern (mail address or fingerprint) of the requested key
+ * \param parent parent window to be passed to the callback functions
+ * \param error Filled with error information on error
+ * \return a newly allocated string containing the ASCII-armored public key on success
+ *
+ * Return the ASCII-armored key matching the passed pattern.  If necessary, the user is asked to select a key from a list of
+ * multiple matching keys.
+ */
+gchar *
+libbalsa_gpgme_get_pubkey(gpgme_protocol_t   protocol,
+						  const gchar       *name,
+						  GtkWindow 		*parent,
+						  GError           **error)
+{
+	gpgme_ctx_t ctx;
+	gchar *armored_key = NULL;
+
+	g_return_val_if_fail(name != NULL, NULL);
+
+	ctx = libbalsa_gpgme_new_with_proto(protocol, NULL, NULL, error);
+	if (ctx != NULL) {
+		gpgme_error_t gpgme_err;
+		gpgme_key_t key = NULL;
+
+		gpgme_err = get_key_from_name(ctx, &key, name, FALSE, FALSE, parent, error);
+		if (gpgme_err == GPG_ERR_NO_ERROR) {
+			armored_key = libbalsa_gpgme_export_key(ctx, key, name, error);
+			gpgme_key_unref(key);
+		}
+	    gpgme_release(ctx);
+	}
+
+	return armored_key;
+}
+
+
+/** \brief Get the key id of a secret key
+ *
+ * \param protocol GpgME protocol (OpenPGP or CMS)
+ * \param name email address for which the key shall be selected
+ * \param parent parent window to be passed to the callback functions
+ * \param error Filled with error information on error
+ * \return a newly allocated string containing the key id key on success, shall be freed by the caller
+ *
+ * Call libbalsa_gpgme_list_keys() to list all secret keys for the passed protocol, and \em always call \ref select_key_cb to let
+ * the user choose the secret key, even if only one is available.
+ */
+gchar *
+libbalsa_gpgme_get_seckey(gpgme_protocol_t   protocol,
+	  	  	  	  	  	  const gchar       *name,
+						  GtkWindow 		*parent,
+						  GError           **error)
+{
+	gpgme_ctx_t ctx;
+	gchar *keyid = NULL;
+
+	ctx = libbalsa_gpgme_new_with_proto(protocol, NULL, NULL, error);
+	if (ctx != NULL) {
+		GList *keys = NULL;
+
+		/* let gpgme list all available keys */
+		if (libbalsa_gpgme_list_keys(ctx, &keys, NULL, name, TRUE, FALSE, error)) {
+			if (keys != NULL) {
+				gpgme_key_t key;
+
+				/* let the user select a key from the list, even if there is only one */
+				if (select_key_cb != NULL) {
+					key = select_key_cb(name, LB_SELECT_PRIVATE_KEY, keys, gpgme_get_protocol(ctx), parent);
+					if (key != NULL) {
+						gpgme_subkey_t subkey;
+
+						for (subkey = key->subkeys; (subkey != NULL) && (keyid == NULL); subkey = subkey->next) {
+							if ((subkey->can_sign != 0) && (subkey->expired == 0U) && (subkey->revoked == 0U) &&
+								(subkey->disabled == 0U) && (subkey->invalid == 0U)) {
+								keyid = g_strdup(subkey->keyid);
+							}
+						}
+					}
+				}
+				g_list_free_full(keys, (GDestroyNotify) gpgme_key_unref);
+			} else {
+				GtkWidget *dialog;
+
+				dialog = gtk_message_dialog_new(parent,
+					GTK_DIALOG_DESTROY_WITH_PARENT | libbalsa_dialog_flags(),
+					GTK_MESSAGE_INFO, GTK_BUTTONS_CLOSE,
+					_("No private key for protocol %s is available for the signer “%s”"),
+					gpgme_get_protocol_name(protocol), name);
+				(void) gtk_dialog_run(GTK_DIALOG(dialog));
+				gtk_widget_destroy(dialog);
+			}
+		}
+	    gpgme_release(ctx);
+	}
+
+	return keyid;
+}
+
+
 /*
  * set a GError form GpgME information
  */
@@ -789,8 +950,8 @@ get_key_from_name(gpgme_ctx_t   ctx,
 	}
 	g_list_free_full(keys, (GDestroyNotify) gpgme_key_unref);
 
-	/* OpenPGP: ask the user if a low-validity key should be trusted for encryption */
-	// FIXME - shouldn't we do the same for S/MIME?
+	/* OpenPGP: ask the user if a low-validity key should be trusted for encryption (Note: owner_trust is not applicable to
+	 * S/MIME certificates) */
 	if ((selected != NULL) &&
                 (result == GPG_ERR_NO_ERROR) && !secret && !accept_all && (gpgme_get_protocol(ctx) == GPGME_PROTOCOL_OpenPGP) &&
 		(selected->owner_trust < GPGME_VALIDITY_FULL)) {

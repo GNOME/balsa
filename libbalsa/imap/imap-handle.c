@@ -436,12 +436,19 @@ idle_start(gpointer data)
   ImapCmdTag tag;
   unsigned asyncno;
 
-  /* The test below can probably be weaker since it is ok for the
-     channel to get disconnected before IDLE gets activated */
+  g_assert(h != NULL);
+
   if(!g_mutex_trylock(&h->mutex))
     return TRUE;/* Don't block, just try again later. */
+
+  /* One way or another, we are now going to return FALSE,
+   * so clear the idle id: */
+  h->idle_enable_id = 0;
+
+  /* The test below can probably be weaker since it is ok for the
+     channel to get disconnected before IDLE gets activated */
   IMAP_REQUIRED_STATE3(h, IMHS_CONNECTED, IMHS_AUTHENTICATED,
-                       IMHS_SELECTED, (h->idle_enable_id = 0, FALSE));
+                       IMHS_SELECTED, FALSE);
 
   asyncno = imap_make_tag(tag); sio_write(h->sio, tag, strlen(tag));
   sio_write(h->sio, " IDLE\r\n", 7); sio_flush(h->sio);
@@ -453,7 +460,6 @@ idle_start(gpointer data)
   if(ASYNC_DEBUG) printf("async_process() registered\n");
   h->async_watch_id = g_io_add_watch(h->iochannel, G_IO_IN|G_IO_HUP,
 				     async_process, h);
-  h->idle_enable_id = 0;
   h->idle_state = IDLE_RESPONSE_PENDING;
 
   g_mutex_unlock(&h->mutex);

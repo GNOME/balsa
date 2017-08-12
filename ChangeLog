@@ -1,3 +1,9 @@
+2017-08-11  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* libbalsa/imap/imap-handle.c (idle_start): assert that the
+	  handle is not NULL, to avoid the appearance of dereferencing a
+	  NULL pointer.
+
 2017-08-10  Albrecht Dreß
 
 	Crypto-related (mostly) fixes and improvements

@@ -14,8 +14,8 @@ msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: https://bugzilla.gnome.org/enter_bug.cgi?"
 "product=balsa&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2017-08-06 22:09+0200\n"
-"PO-Revision-Date: 2017-08-06 22:10+0200\n"
+"POT-Creation-Date: 2017-08-13 18:55+0200\n"
+"PO-Revision-Date: 2017-08-13 18:58+0200\n"
 "Last-Translator: Piotr Drąg <piotrdrag@gmail.com>\n"
 "Language-Team: Polish <community-poland@mozilla.org>\n"
 "Language: pl\n"
@@ -155,7 +155,7 @@ msgid "Reply To:"
 msgstr "Odpowiedź do:"
 
 #: ../libbalsa/body.c:121 ../libbalsa/mailbox_local.c:1841
-#: ../libbalsa/message.c:846
+#: ../libbalsa/message.c:848
 msgid "(No subject)"
 msgstr "(Brak tematu)"
 
@@ -287,18 +287,18 @@ msgstr "Lub"
 msgid "Failed to decrypt MIME part: parse error"
 msgstr "Odszyfrowanie części MIME się nie powiodło: błąd podczas przetwarzania"
 
-#: ../libbalsa/gmime-multipart-crypt.c:220
+#: ../libbalsa/gmime-multipart-crypt.c:222
 msgid "Cannot verify multipart/signed part due to missing subparts."
 msgstr ""
 "Nie można sprawdzić poprawności wielu części/podpisanej części z powodu "
 "brakujących części podrzędnych."
 
-#: ../libbalsa/gmime-multipart-crypt.c:244
+#: ../libbalsa/gmime-multipart-crypt.c:246
 #, c-format
 msgid "unsupported protocol “%s”"
 msgstr "nieobsługiwany protokół „%s”"
 
-#: ../libbalsa/gmime-multipart-crypt.c:257
+#: ../libbalsa/gmime-multipart-crypt.c:259
 msgid ""
 "Cannot verify multipart/signed part: signature content-type does not match "
 "protocol."
@@ -306,7 +306,7 @@ msgstr ""
 "Nie można sprawdzić poprawności wielu części/podpisanej części: „content-"
 "type” podpisu nie pasuje do protokołu."
 
-#: ../libbalsa/gmime-multipart-crypt.c:453
+#: ../libbalsa/gmime-multipart-crypt.c:455
 #, c-format
 msgid ""
 "Cannot decrypt multipart/encrypted part: unsupported encryption protocol "
@@ -315,11 +315,11 @@ msgstr ""
 "Nie można odszyfrować wielu części/zaszyfrowanej części: nieobsługiwany "
 "protokół szyfrowania „%s”."
 
-#: ../libbalsa/gmime-multipart-crypt.c:454
+#: ../libbalsa/gmime-multipart-crypt.c:456
 msgid "(none)"
 msgstr "(brak)"
 
-#: ../libbalsa/gmime-multipart-crypt.c:467
+#: ../libbalsa/gmime-multipart-crypt.c:469
 msgid ""
 "Cannot decrypt multipart/encrypted part: content-type does not match "
 "protocol."
@@ -327,13 +327,13 @@ msgstr ""
 "Nie można odszyfrować wielu części/zaszyfrowanej części: „content-type” "
 "podpisu nie pasuje do protokołu."
 
-#: ../libbalsa/gmime-multipart-crypt.c:482
+#: ../libbalsa/gmime-multipart-crypt.c:484
 msgid "Cannot decrypt multipart/encrypted part: unexpected content type"
 msgstr ""
 "Nie można odszyfrować wielu części/zaszyfrowanej części: nieoczekiwany typ "
 "treści"
 
-#: ../libbalsa/gmime-multipart-crypt.c:524
+#: ../libbalsa/gmime-multipart-crypt.c:526
 msgid ""
 "Cannot decrypt multipart/encrypted part: failed to parse decrypted content"
 msgstr ""
@@ -374,7 +374,7 @@ msgstr ""
 msgid "_Download images"
 msgstr "_Pobierz obrazy"
 
-#: ../libbalsa/html.c:419 ../libbalsa/html.c:1089 ../libbalsa/identity.c:1702
+#: ../libbalsa/html.c:419 ../libbalsa/html.c:1089 ../libbalsa/identity.c:1777
 #: ../src/ab-window.c:148 ../src/mailbox-node.c:1113 ../src/main-window.c:3911
 #: ../src/toolbar-prefs.c:140 ../ui/main-window.ui.h:71
 #: ../ui/message-window.ui.h:4 ../ui/sendmsg-window.ui.h:12
@@ -383,38 +383,38 @@ msgid "_Close"
 msgstr "Za_mknij"
 
 #. should "re" be localized ?
-#: ../libbalsa/identity.c:99 ../libbalsa/mailbox_local.c:1964
+#: ../libbalsa/identity.c:103 ../libbalsa/mailbox_local.c:1964
 #: ../libbalsa/mailbox_local.c:1966 ../src/sendmsg-window.c:3768
 #: ../src/sendmsg-window.c:3770
 msgid "Re:"
 msgstr "Re:"
 
-#: ../libbalsa/identity.c:100 ../src/sendmsg-window.c:3708
+#: ../libbalsa/identity.c:104 ../src/sendmsg-window.c:3708
 #: ../src/sendmsg-window.c:3709 ../src/sendmsg-window.c:3710
 msgid "Fwd:"
 msgstr "Fwd:"
 
-#: ../libbalsa/identity.c:160
+#: ../libbalsa/identity.c:166
 msgid "New Identity"
 msgstr "Nowa tożsamość"
 
-#: ../libbalsa/identity.c:337
+#: ../libbalsa/identity.c:343
 #, c-format
 msgid "Error executing signature generator “%s”: %s"
 msgstr "Błąd podczas wykonywania generatora podpisów „%s”: %s"
 
-#: ../libbalsa/identity.c:346
+#: ../libbalsa/identity.c:352
 #, c-format
 msgid "Cannot read signature file “%s”: %s"
 msgstr "Nie można odczytać pliku z podpisem „%s”: %s"
 
-#: ../libbalsa/identity.c:357
+#: ../libbalsa/identity.c:363
 #, c-format
 msgid "Signature in %s is not a UTF-8 text."
 msgstr "Podpis w %s nie jest tekstem zakodowanym w UTF-8."
 
-#: ../libbalsa/identity.c:468 ../libbalsa/libbalsa-gpgme-cb.c:158
-#: ../libbalsa/libbalsa-gpgme-cb.c:359 ../libbalsa/smtp-server.c:472
+#: ../libbalsa/identity.c:474 ../libbalsa/libbalsa-gpgme-cb.c:191
+#: ../libbalsa/libbalsa-gpgme-cb.c:350 ../libbalsa/smtp-server.c:471
 #: ../src/ab-main.c:858 ../src/ab-window.c:141 ../src/address-book-config.c:237
 #: ../src/address-book-config.c:342 ../src/address-book-config.c:388
 #: ../src/balsa-app.c:89 ../src/balsa-index.c:2657 ../src/balsa-mblist.c:1895
@@ -428,13 +428,13 @@ msgstr "Podpis w %s nie jest tekstem zakodowanym w UTF-8."
 #: ../src/pref-manager.c:3298 ../src/sendmsg-window.c:532
 #: ../src/sendmsg-window.c:1557 ../src/sendmsg-window.c:2009
 #: ../src/sendmsg-window.c:3334 ../src/sendmsg-window.c:4693
-#: ../src/sendmsg-window.c:4990 ../src/sendmsg-window.c:5147
+#: ../src/sendmsg-window.c:4992 ../src/sendmsg-window.c:5149
 #: ../src/spell-check.c:382 ../src/store-address.c:208
 msgid "_Cancel"
 msgstr "_Anuluj"
 
-#: ../libbalsa/identity.c:469 ../libbalsa/libbalsa-gpgme-cb.c:157
-#: ../libbalsa/libbalsa-gpgme-cb.c:358 ../libbalsa/smtp-server.c:471
+#: ../libbalsa/identity.c:475 ../libbalsa/libbalsa-gpgme-cb.c:190
+#: ../libbalsa/libbalsa-gpgme-cb.c:349 ../libbalsa/smtp-server.c:470
 #: ../src/ab-window.c:140 ../src/balsa-app.c:88 ../src/balsa-message.c:1767
 #: ../src/balsa-mime-widget-callbacks.c:86 ../src/filter-edit-callbacks.c:1246
 #: ../src/filter-edit-dialog.c:570 ../src/filter-export-dialog.c:78
@@ -445,116 +445,116 @@ msgstr "_Anuluj"
 msgid "_OK"
 msgstr "_OK"
 
-#: ../libbalsa/identity.c:481
+#: ../libbalsa/identity.c:487
 msgid "Current"
 msgstr "Bieżąca"
 
-#: ../libbalsa/identity.c:731 ../libbalsa/smtp-server.c:179
+#: ../libbalsa/identity.c:742 ../libbalsa/smtp-server.c:178
 msgid "Default"
 msgstr "Domyślna"
 
 #. Translators: please do not translate Face.
-#: ../libbalsa/identity.c:933
+#: ../libbalsa/identity.c:944
 msgid "_Face Path"
 msgstr "Ścieżka do _Face"
 
 #. Translators: please do not translate Face.
-#: ../libbalsa/identity.c:939
+#: ../libbalsa/identity.c:950
 msgid "_X-Face Path"
 msgstr "Ścieżka do _X-Face"
 
 #. create the "General" tab
-#: ../libbalsa/identity.c:962
+#: ../libbalsa/identity.c:973
 msgid "General"
 msgstr "Ogólne"
 
-#: ../libbalsa/identity.c:964
+#: ../libbalsa/identity.c:975
 msgid "_Identity name:"
 msgstr "_Nazwa tożsamości:"
 
-#: ../libbalsa/identity.c:966
+#: ../libbalsa/identity.c:977
 msgid "_Full name:"
 msgstr "_Imię i nazwisko:"
 
-#: ../libbalsa/identity.c:968
+#: ../libbalsa/identity.c:979
 msgid "_Mailing address:"
 msgstr "_Adres e-mail:"
 
-#: ../libbalsa/identity.c:970
+#: ../libbalsa/identity.c:981
 msgid "Reply _to:"
 msgstr "Odpowiedź _do:"
 
-#: ../libbalsa/identity.c:972
+#: ../libbalsa/identity.c:983
 msgid "_Domain:"
 msgstr "_Domena:"
 
 #. create the "Messages" tab
-#: ../libbalsa/identity.c:976
+#: ../libbalsa/identity.c:987
 msgid "Messages"
 msgstr "Wiadomości"
 
-#: ../libbalsa/identity.c:978
+#: ../libbalsa/identity.c:989
 msgid "_BCC:"
 msgstr "_UDW:"
 
-#: ../libbalsa/identity.c:980
+#: ../libbalsa/identity.c:991
 msgid "Reply _string:"
 msgstr "_Ciąg odpowiedzi:"
 
-#: ../libbalsa/identity.c:982
+#: ../libbalsa/identity.c:993
 msgid "F_orward string:"
 msgstr "Ciąg p_rzekazania:"
 
-#: ../libbalsa/identity.c:985
+#: ../libbalsa/identity.c:996
 msgid "send messages in both plain text and _HTML format"
 msgstr "wysyłanie wiadomości w zwykłym tekście i _HTML"
 
-#: ../libbalsa/identity.c:988
+#: ../libbalsa/identity.c:999
 msgid "request positive (successful) _Delivery Status Notification by default"
 msgstr "_domyślne żądanie pomyślnego powiadomienia o stanie otrzymania"
 
-#: ../libbalsa/identity.c:992
+#: ../libbalsa/identity.c:1003
 msgid "request _Message Disposition Notification by default"
 msgstr "d_omyślne żądanie powiadomienia o otrzymaniu"
 
-#: ../libbalsa/identity.c:1001
+#: ../libbalsa/identity.c:1012
 msgid "SMT_P server:"
 msgstr "Serwer SMT_P:"
 
 #. create the "Signature" tab
-#: ../libbalsa/identity.c:1005
+#: ../libbalsa/identity.c:1016
 msgid "Signature"
 msgstr "Podpis"
 
-#: ../libbalsa/identity.c:1008
+#: ../libbalsa/identity.c:1019
 msgid "Signature _path"
 msgstr "Ścieżka _do pliku z podpisem"
 
-#: ../libbalsa/identity.c:1011
+#: ../libbalsa/identity.c:1022
 msgid "_Execute signature"
 msgstr "_Złożenie podpisu"
 
-#: ../libbalsa/identity.c:1014
+#: ../libbalsa/identity.c:1025
 msgid "Incl_ude signature"
 msgstr "D_ołączanie podpisu"
 
-#: ../libbalsa/identity.c:1017
+#: ../libbalsa/identity.c:1028
 msgid "Include signature when for_warding"
 msgstr "Dołączanie podpisu podczas p_rzekazywania"
 
-#: ../libbalsa/identity.c:1020
+#: ../libbalsa/identity.c:1031
 msgid "Include signature when rep_lying"
 msgstr "Dołączanie podpisu podczas odpo_wiadania"
 
-#: ../libbalsa/identity.c:1023
+#: ../libbalsa/identity.c:1034
 msgid "_Add signature separator"
 msgstr "_Oddzielenie podpisu"
 
-#: ../libbalsa/identity.c:1026
+#: ../libbalsa/identity.c:1037
 msgid "Prepend si_gnature"
 msgstr "_Podpis na początku"
 
-#: ../libbalsa/identity.c:1032
+#: ../libbalsa/identity.c:1043
 msgid ""
 "Signing and encrypting messages are possible only if Balsa is built with "
 "cryptographic support."
@@ -562,83 +562,102 @@ msgstr ""
 "Podpisywanie i szyfrowanie wiadomości jest możliwe, jeśli program Balsa "
 "został skompilowany z obsługą kryptografii."
 
-#: ../libbalsa/identity.c:1037
+#: ../libbalsa/identity.c:1048
 msgid "Security"
 msgstr "Zabezpieczanie"
 
-#: ../libbalsa/identity.c:1040
+#: ../libbalsa/identity.c:1051
 msgid "sign messages by default"
 msgstr "domyślne podpisywanie wiadomości"
 
-#: ../libbalsa/identity.c:1043
+#: ../libbalsa/identity.c:1054
 msgid "encrypt messages by default"
 msgstr "domyślnie szyfrowanie wiadomości"
 
-#: ../libbalsa/identity.c:1046
+#: ../libbalsa/identity.c:1057
 msgid "default protocol"
 msgstr "domyślny protokół"
 
-#: ../libbalsa/identity.c:1049
-msgid "always trust GnuPG keys when encrypting"
-msgstr "ufanie wszystkim kluczom GnuPG podczas szyfrowania"
+#: ../libbalsa/identity.c:1060
+msgid "always trust GnuPG keys to encrypt messages"
+msgstr "ufanie wszystkim kluczom GnuPG do szyfrowania wiadomości"
 
-#: ../libbalsa/identity.c:1052
+#: ../libbalsa/identity.c:1063
 msgid "remind me if messages can be encrypted"
 msgstr "przypominanie, jeśli można zaszyfrować wiadomości"
 
-#: ../libbalsa/identity.c:1055
+#: ../libbalsa/identity.c:1066
 msgid ""
-"use secret key with this id for signing\n"
+"use secret key with this id for signing GnuPG messages\n"
 "(leave empty for automatic selection)"
 msgstr ""
-"używanie tajnego klucza o tym identyfikatorze do podpisywania\n"
+"używanie tajnego klucza o tym identyfikatorze do podpisywania wiadomości "
+"GnuPG\n"
 "(pozostawienie pustego pola wybierze automatycznie)"
 
-#: ../libbalsa/identity.c:1189
+#: ../libbalsa/identity.c:1070
+msgid ""
+"use certificate with this id for signing S/MIME messages\n"
+"(leave empty for automatic selection)"
+msgstr ""
+"używanie certyfikatu o tym identyfikatorze do podpisywania wiadomości S/"
+"MIME\n"
+"(pozostawienie pustego pola wybierze automatycznie)"
+
+#: ../libbalsa/identity.c:1192
+#, c-format
+msgid "Error selecting key: %s"
+msgstr "błąd podczas wybierania klucza: %s"
+
+#: ../libbalsa/identity.c:1215
+msgid "Choose…"
+msgstr "Wybierz…"
+
+#: ../libbalsa/identity.c:1262
 #, c-format
 msgid "Error reading file %s: %s"
 msgstr "Błąd podczas odczytywania pliku %s: %s"
 
 #. Translators: please do not translate Face.
-#: ../libbalsa/identity.c:1199
+#: ../libbalsa/identity.c:1272
 #, c-format
 msgid "Face header file %s is too long (%lu bytes)."
 msgstr "Plik nagłówka Face %s jest za długi (%lu B)."
 
 #. Translators: please do not translate Face.
-#: ../libbalsa/identity.c:1209
+#: ../libbalsa/identity.c:1282
 #, c-format
 msgid "Face header file %s contains binary data."
 msgstr "Plik nagłówka Face %s zawiera dane binarne."
 
 #. Translators: please do not translate Face.
-#: ../libbalsa/identity.c:1229 ../src/balsa-message.c:1591
+#: ../libbalsa/identity.c:1302 ../src/balsa-message.c:1591
 #, c-format
 msgid "Error loading Face: %s"
 msgstr "Błąd podczas wczytywania Face: %s"
 
-#: ../libbalsa/identity.c:1408
+#: ../libbalsa/identity.c:1481
 msgid "Error: The identity does not have a name"
 msgstr "Błąd: tożsamość nie ma nazwy"
 
-#: ../libbalsa/identity.c:1418
+#: ../libbalsa/identity.c:1491
 msgid "Error: An identity with that name already exists"
 msgstr "Błąd: tożsamość o tej nazwie już istnieje"
 
-#: ../libbalsa/identity.c:1611
+#: ../libbalsa/identity.c:1686
 msgid "Do you really want to delete the selected identity?"
 msgstr "Na pewno usunąć zaznaczoną tożsamość?"
 
-#: ../libbalsa/identity.c:1656
+#: ../libbalsa/identity.c:1731
 #, c-format
 msgid "Error displaying help for identities: %s\n"
 msgstr "Błąd podczas wyświetlania pomocy o tożsamościach: %s\n"
 
-#: ../libbalsa/identity.c:1695
+#: ../libbalsa/identity.c:1770
 msgid "Manage Identities"
 msgstr "Zarządzanie tożsamościami"
 
-#: ../libbalsa/identity.c:1699 ../libbalsa/smtp-server.c:473
+#: ../libbalsa/identity.c:1774 ../libbalsa/smtp-server.c:472
 #: ../src/address-book-config.c:238 ../src/address-book-config.c:340
 #: ../src/address-book-config.c:386 ../src/filter-edit-callbacks.c:1248
 #: ../src/filter-edit-dialog.c:572 ../src/filter-export-dialog.c:80
@@ -650,25 +669,25 @@ msgid "_Help"
 msgstr "Pomo_c"
 
 #. new button
-#: ../libbalsa/identity.c:1700 ../src/filter-edit-dialog.c:224
+#: ../libbalsa/identity.c:1775 ../src/filter-edit-dialog.c:224
 #: ../src/mailbox-node.c:1078 ../ui/ab-main.ui.h:2 ../ui/main-window.ui.h:1
 msgid "_New"
 msgstr "_Nowy"
 
-#: ../libbalsa/identity.c:1701 ../src/ab-main.c:853
+#: ../libbalsa/identity.c:1776 ../src/ab-main.c:853
 #: ../src/filter-edit-callbacks.c:1081 ../src/filter-edit-dialog.c:318
 msgid "_Remove"
 msgstr "_Usuń"
 
-#: ../libbalsa/identity.c:2083
+#: ../libbalsa/identity.c:2161
 msgid "GnuPG MIME mode"
 msgstr "Tryb MIME biblioteki GnuPG"
 
-#: ../libbalsa/identity.c:2085
+#: ../libbalsa/identity.c:2163
 msgid "GnuPG OpenPGP mode"
 msgstr "Tryb OpenPGP biblioteki GnuPG"
 
-#: ../libbalsa/identity.c:2087
+#: ../libbalsa/identity.c:2165
 msgid "GpgSM S/MIME mode"
 msgstr "Tryb S/MIME biblioteki GpgSM"
 
@@ -822,55 +841,66 @@ msgid "Your Balsa configuration is now stored in “~/.balsa/config”."
 msgstr ""
 "Konfiguracja programu Balsa jest teraz przechowywana w „~/.balsa/config”."
 
-#: ../libbalsa/libbalsa-gpgme.c:196
+#: ../libbalsa/libbalsa-gpgme.c:204
 msgid "could not create context"
 msgstr "nie można utworzyć kontekstu"
 
-#: ../libbalsa/libbalsa-gpgme.c:200
+#: ../libbalsa/libbalsa-gpgme.c:208
 #, c-format
 msgid "could not set protocol “%s”"
 msgstr "nie można ustawić protokołu „%s”"
 
-#: ../libbalsa/libbalsa-gpgme.c:260 ../libbalsa/libbalsa-gpgme.c:271
-#: ../libbalsa/libbalsa-gpgme.c:373 ../libbalsa/libbalsa-gpgme.c:496
-#: ../libbalsa/libbalsa-gpgme.c:589
+#: ../libbalsa/libbalsa-gpgme.c:262
+#, c-format
+msgid "could not set folder “%s” for engine “%s”"
+msgstr "nie można ustawić katalogu „%s” dla mechanizmu „%s”"
+
+#: ../libbalsa/libbalsa-gpgme.c:319 ../libbalsa/libbalsa-gpgme.c:330
+#: ../libbalsa/libbalsa-gpgme.c:432 ../libbalsa/libbalsa-gpgme.c:555
+#: ../libbalsa/libbalsa-gpgme.c:648
 msgid "could not get data from stream"
 msgstr "nie można pobrać danych ze strumienia"
 
-#: ../libbalsa/libbalsa-gpgme.c:284 ../libbalsa/rfc3156.c:363
+#: ../libbalsa/libbalsa-gpgme.c:343 ../libbalsa/rfc3156.c:363
 #: ../libbalsa/rfc3156.c:368 ../libbalsa/rfc3156.c:534
 #: ../libbalsa/rfc3156.c:540
 msgid "signature verification failed"
 msgstr "sprawdzenie poprawności podpisu się nie powiodło"
 
-#: ../libbalsa/libbalsa-gpgme.c:381 ../libbalsa/libbalsa-gpgme.c:505
-#: ../libbalsa/libbalsa-gpgme.c:597
+#: ../libbalsa/libbalsa-gpgme.c:440 ../libbalsa/libbalsa-gpgme.c:564
+#: ../libbalsa/libbalsa-gpgme.c:656
 msgid "could not create new data object"
 msgstr "nie można utworzyć nowego obiektu danych"
 
-#: ../libbalsa/libbalsa-gpgme.c:390
+#: ../libbalsa/libbalsa-gpgme.c:449
 msgid "signing failed"
 msgstr "sprawdzenie podpisu się nie powiodło"
 
-#: ../libbalsa/libbalsa-gpgme.c:464
+#: ../libbalsa/libbalsa-gpgme.c:523
 #, c-format
 msgid "combined signing and encryption is defined only for RFC 2440"
 msgstr "połączone podpisywanie i szyfrowanie jest określone tylko dla RFC 2440"
 
-#: ../libbalsa/libbalsa-gpgme.c:532
+#: ../libbalsa/libbalsa-gpgme.c:591
 msgid "signing and encryption failed"
 msgstr "podpisanie i zaszyfrowanie się nie powiodło"
 
-#: ../libbalsa/libbalsa-gpgme.c:534
+#: ../libbalsa/libbalsa-gpgme.c:593
 msgid "encryption failed"
 msgstr "zaszyfrowanie się nie powiodło"
 
-#: ../libbalsa/libbalsa-gpgme.c:607 ../libbalsa/rfc3156.c:434
+#: ../libbalsa/libbalsa-gpgme.c:666 ../libbalsa/rfc3156.c:434
 #: ../libbalsa/rfc3156.c:439
 msgid "decryption failed"
 msgstr "odszyfrowanie się nie powiodło"
 
-#: ../libbalsa/libbalsa-gpgme.c:760
+#: ../libbalsa/libbalsa-gpgme.c:771
+#, c-format
+msgid "No private key for protocol %s is available for the signer “%s”"
+msgstr ""
+"Brak kluczy prywatnych dla protokołu %s dostępnych dla podpisującego „%s”"
+
+#: ../libbalsa/libbalsa-gpgme.c:921
 #, c-format
 msgid ""
 "A key for “%s” is present, but it is expired, disabled, revoked or invalid"
@@ -878,64 +908,56 @@ msgstr ""
 "Klucz %s jest obecny, ale wygasł, jest wyłączony, unieważniony lub "
 "nieprawidłowy"
 
-#: ../libbalsa/libbalsa-gpgme.c:763
+#: ../libbalsa/libbalsa-gpgme.c:924
 #, c-format
 msgid "Could not find a key for “%s”"
 msgstr "Nie można odnaleźć klucza dla „%s”"
 
-#: ../libbalsa/libbalsa-gpgme.c:778
+#: ../libbalsa/libbalsa-gpgme.c:939
 #, c-format
 msgid "Multiple keys for “%s”"
 msgstr "Wiele kluczy dla „%s”"
 
-#: ../libbalsa/libbalsa-gpgme.c:800
+#: ../libbalsa/libbalsa-gpgme.c:961
 #, c-format
 msgid "Insufficient key validity"
 msgstr "Niewystarczająca ważność klucza"
 
-#: ../libbalsa/libbalsa-gpgme-cb.c:136
-msgid "User ID"
-msgstr "Identyfikator użytkownika"
-
-#: ../libbalsa/libbalsa-gpgme-cb.c:136
-msgid "Key ID"
-msgstr "Identyfikator klucza"
-
-#: ../libbalsa/libbalsa-gpgme-cb.c:136
-msgid "Length"
-msgstr "Długość"
-
-#: ../libbalsa/libbalsa-gpgme-cb.c:136
-msgid "Validity"
-msgstr "Ważność"
-
 #. FIXME: create dialog according to the Gnome HIG
-#: ../libbalsa/libbalsa-gpgme-cb.c:153
+#: ../libbalsa/libbalsa-gpgme-cb.c:186
 msgid "Select key"
 msgstr "Wybór klucza"
 
-#: ../libbalsa/libbalsa-gpgme-cb.c:174
+#: ../libbalsa/libbalsa-gpgme-cb.c:207
 #, c-format
-msgid "Select the private key for the signer %s"
-msgstr "Wybór klucza prywatnego dla podpisującego %s"
+msgid "Select the private key for the signer “%s”"
+msgstr "Wybór klucza prywatnego dla podpisującego „%s”"
 
-#: ../libbalsa/libbalsa-gpgme-cb.c:179
+#: ../libbalsa/libbalsa-gpgme-cb.c:212
 #, c-format
-msgid "Select the public key for the recipient %s"
-msgstr "Wybór klucza publicznego dla odbiorcy %s"
+msgid "Select the public key for the recipient “%s”"
+msgstr "Wybór klucza publicznego dla odbiorcy „%s”"
 
-#: ../libbalsa/libbalsa-gpgme-cb.c:184
+#: ../libbalsa/libbalsa-gpgme-cb.c:217
 #, c-format
 msgid ""
-"There seems to be no public key for recipient %s in your key ring.\n"
+"There seems to be no public key for recipient “%s” in your key ring.\n"
 "If you are sure that the recipient owns a different key, select it from the "
 "list."
 msgstr ""
-"W bazie kluczy nie ma klucza publicznego dla odbiorcy %s.\n"
+"W bazie kluczy nie ma klucza publicznego dla odbiorcy „%s”.\n"
 "Jeśli odbiorca posiada inny klucz, należy go wybrać z listy."
 
+#: ../libbalsa/libbalsa-gpgme-cb.c:230
+msgid "Double-click key to show details"
+msgstr "Podwójne kliknięcia klucza wyświetli informacje"
+
+#: ../libbalsa/libbalsa-gpgme-cb.c:278
+msgid "User ID"
+msgstr "Identyfikator użytkownika"
+
 #. create the dialog
-#: ../libbalsa/libbalsa-gpgme-cb.c:323
+#: ../libbalsa/libbalsa-gpgme-cb.c:314
 #, c-format
 msgid ""
 "The owner trust for this key is “%s” only.\n"
@@ -944,16 +966,16 @@ msgstr ""
 "Zaufanie do właściciela tego klucza to tylko „%s”.\n"
 "Użyć go mimo to?"
 
-#: ../libbalsa/libbalsa-gpgme-cb.c:325
+#: ../libbalsa/libbalsa-gpgme-cb.c:316
 msgid "Insufficient key owner trust"
 msgstr "Niewystarczające zaufanie do właściciela klucza"
 
 #. FIXME: create dialog according to the Gnome HIG
-#: ../libbalsa/libbalsa-gpgme-cb.c:355
+#: ../libbalsa/libbalsa-gpgme-cb.c:346
 msgid "Enter Passphrase"
 msgstr "Hasło"
 
-#: ../libbalsa/libbalsa-gpgme-cb.c:383
+#: ../libbalsa/libbalsa-gpgme-cb.c:374
 #, c-format
 msgid ""
 "%s\n"
@@ -966,7 +988,7 @@ msgstr ""
 "\n"
 "Klucz: %s"
 
-#: ../libbalsa/libbalsa-gpgme-cb.c:388
+#: ../libbalsa/libbalsa-gpgme-cb.c:379
 #, c-format
 msgid ""
 "%s\n"
@@ -979,55 +1001,64 @@ msgstr ""
 "\n"
 "Klucz: %s"
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:81
+#: ../libbalsa/libbalsa-gpgme-keys.c:83
 msgid "error setting key list mode"
 msgstr "błąd podczas ustawiania trybu listy kluczy"
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:88 ../libbalsa/libbalsa-gpgme-keys.c:113
+#: ../libbalsa/libbalsa-gpgme-keys.c:90 ../libbalsa/libbalsa-gpgme-keys.c:115
 #, c-format
 msgid "could not list keys for “%s”"
 msgstr "nie można wyświetlić listy kluczy dla „%s”"
 
+#: ../libbalsa/libbalsa-gpgme-keys.c:190 ../libbalsa/libbalsa-gpgme-keys.c:230
+msgid "cannot create data buffer"
+msgstr "nie można utworzyć bufora danych"
+
+#: ../libbalsa/libbalsa-gpgme-keys.c:198
+#, c-format
+msgid "exporting key for “%s” failed"
+msgstr "eksport klucza dla „%s” się nie powiódł"
+
 #: ../libbalsa/libbalsa-gpgme-keys.c:234
+msgid "importing ASCII-armored key data failed"
+msgstr "import danych klucza chronionych ASCII się nie powiódł"
+
+#: ../libbalsa/libbalsa-gpgme-keys.c:311
 #, c-format
 msgid "Cannot find a key with fingerprint %s on the key server."
 msgstr "Nie można odnaleźć klucza o odcisku %s na tym serwerze kluczy."
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:238
+#: ../libbalsa/libbalsa-gpgme-keys.c:315
 #, c-format
 msgid ""
 "Found %u keys with fingerprint %s on the key server. Please check and import "
-"the proper key manually"
+"the proper key manually."
 msgstr ""
 "Odnaleziono %u kluczy o odcisku %s na serwerze kluczy. Proszę ręcznie "
-"sprawdzić i zaimportować właściwy klucz"
+"sprawdzić i zaimportować właściwy klucz."
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:246
+#: ../libbalsa/libbalsa-gpgme-keys.c:323
 #, c-format
 msgid "Searching the key server failed: %s"
 msgstr "Wyszukanie serwera kluczy się nie powiodło: %s"
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:285
-msgid "Key imported"
-msgstr "Zaimportowano klucz"
-
-#: ../libbalsa/libbalsa-gpgme-keys.c:325
+#: ../libbalsa/libbalsa-gpgme-keys.c:402
 msgid "error importing key"
 msgstr "błąd podczas importowania klucza"
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:333
+#: ../libbalsa/libbalsa-gpgme-keys.c:446
 msgid "No key was imported or updated."
 msgstr "Nie zaimportowano i zaktualizowano żadnego klucza."
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:336
+#: ../libbalsa/libbalsa-gpgme-keys.c:449
 msgid "The key was imported into the local key ring."
 msgstr "Zaimportowano klucz do lokalnej bazy kluczy."
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:340
+#: ../libbalsa/libbalsa-gpgme-keys.c:453
 msgid "The key was updated in the local key ring:"
 msgstr "Zaktualizowano klucz w lokalnej bazy kluczy:"
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:343
+#: ../libbalsa/libbalsa-gpgme-keys.c:456
 #, c-format
 msgid ""
 "\n"
@@ -1045,7 +1076,7 @@ msgstr[2] ""
 "\n"
 "• %d nowych identyfikatorów użytkownika"
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:348
+#: ../libbalsa/libbalsa-gpgme-keys.c:461
 #, c-format
 msgid ""
 "\n"
@@ -1063,7 +1094,7 @@ msgstr[2] ""
 "\n"
 "• %d nowych podkluczy"
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:353
+#: ../libbalsa/libbalsa-gpgme-keys.c:466
 #, c-format
 msgid ""
 "\n"
@@ -1081,7 +1112,7 @@ msgstr[2] ""
 "\n"
 "• %d nowych podpisów"
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:359
+#: ../libbalsa/libbalsa-gpgme-keys.c:472
 #, c-format
 msgid ""
 "\n"
@@ -1099,141 +1130,157 @@ msgstr[2] ""
 "\n"
 "• %d nowych unieważnień"
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:365
-msgid "No changes for the key were found on the key server."
-msgstr "Nie odnaleziono żadnych zmian klucza na serwerze kluczy."
+#: ../libbalsa/libbalsa-gpgme-keys.c:478
+msgid "The existing key in the key ring was not changed."
+msgstr "Istniejący klucz w bazie kluczy nie został zmieniony."
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:74
+#: ../libbalsa/libbalsa-gpgme-widgets.c:76
 msgid "Key status:"
 msgstr "Stan klucza:"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:80
-#: ../libbalsa/libbalsa-gpgme-widgets.c:87
+#: ../libbalsa/libbalsa-gpgme-widgets.c:82
+#: ../libbalsa/libbalsa-gpgme-widgets.c:89
 msgid "User ID:"
 msgstr "Identyfikator użytkownika:"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:80
+#: ../libbalsa/libbalsa-gpgme-widgets.c:82
 msgid "None"
 msgstr "Brak"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:85
+#: ../libbalsa/libbalsa-gpgme-widgets.c:87
 msgid "Primary user ID:"
 msgstr "Główny identyfikator użytkownika:"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:97
+#: ../libbalsa/libbalsa-gpgme-widgets.c:99
 msgid "Key owner trust:"
 msgstr "Zaufanie do właściciela klucza:"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:107
+#: ../libbalsa/libbalsa-gpgme-widgets.c:109
 msgid "Additional User IDs"
 msgstr "Dodatkowe identyfikatory użytkownika"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:125
+#: ../libbalsa/libbalsa-gpgme-widgets.c:127
 msgid "Issuer"
 msgstr "Wystawca"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:136
+#: ../libbalsa/libbalsa-gpgme-widgets.c:138
 msgid "Name:"
 msgstr "Nazwa:"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:140
+#: ../libbalsa/libbalsa-gpgme-widgets.c:142
 msgid "Serial number:"
 msgstr "Numer seryjny:"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:143
+#: ../libbalsa/libbalsa-gpgme-widgets.c:145
 msgid "Chain ID:"
 msgstr "Identyfikator łańcucha:"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:154
+#: ../libbalsa/libbalsa-gpgme-widgets.c:156
 msgid "Subkey used"
 msgstr "Użyty podklucz"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:162
+#: ../libbalsa/libbalsa-gpgme-widgets.c:164
 #, c-format
 msgid "Subkeys (%s only)"
 msgstr "Podklucze (tylko %s)"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:167
+#: ../libbalsa/libbalsa-gpgme-widgets.c:169
 msgid "Subkeys"
 msgstr "Podklucze"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:217 ../src/toolbar-factory.c:167
+#: ../libbalsa/libbalsa-gpgme-widgets.c:219 ../src/toolbar-factory.c:167
 msgid "Close"
 msgstr "Zamknij"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:221
+#: ../libbalsa/libbalsa-gpgme-widgets.c:223
 msgid "No"
 msgstr "Nie"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:221
+#: ../libbalsa/libbalsa-gpgme-widgets.c:223
 msgid "Yes"
 msgstr "Tak"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:296
+#: ../libbalsa/libbalsa-gpgme-widgets.c:298
 msgid "revoked"
 msgstr "unieważniony"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:299
+#: ../libbalsa/libbalsa-gpgme-widgets.c:301
 msgid "expired"
 msgstr "wygasł"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:302
+#: ../libbalsa/libbalsa-gpgme-widgets.c:304
 msgid "disabled"
 msgstr "wyłączony"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:305
+#: ../libbalsa/libbalsa-gpgme-widgets.c:307
 msgid "invalid"
 msgstr "nieprawidłowy"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:443
+#: ../libbalsa/libbalsa-gpgme-widgets.c:445
 msgid "Status:"
 msgstr "Stan:"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:447
+#: ../libbalsa/libbalsa-gpgme-widgets.c:449
 msgid "Fingerprint:"
 msgstr "Odcisk klucza:"
 
 #: ../libbalsa/libbalsa-gpgme-widgets.c:452
+#: ../src/balsa-print-object-default.c:152
+#: ../src/balsa-print-object-default.c:154
+#: ../src/balsa-print-object-default.c:157
+msgid "Type:"
+msgstr "Typ:"
+
+#: ../libbalsa/libbalsa-gpgme-widgets.c:458
 msgid "Capabilities:"
 msgstr "Możliwości:"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:457
+#: ../libbalsa/libbalsa-gpgme-widgets.c:463
 msgid "invalid timestamp"
 msgstr "nieprawidłowa data"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:459
+#: ../libbalsa/libbalsa-gpgme-widgets.c:465
 msgid "not available"
 msgstr "niedostępne"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:463
+#: ../libbalsa/libbalsa-gpgme-widgets.c:469
 msgid "Created:"
 msgstr "Utworzono:"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:467 ../libbalsa/rfc3156.c:687
+#: ../libbalsa/libbalsa-gpgme-widgets.c:473 ../libbalsa/rfc3156.c:687
 #: ../libbalsa/rfc3156.c:722 ../src/address-book-config.c:197
 msgid "never"
 msgstr "nigdy"
 
-#. subkey_row = create_key_grid_row(GTK_GRID(subkey_grid), subkey_row, _("Expires:"), timebuf, FALSE);
-#: ../libbalsa/libbalsa-gpgme-widgets.c:472
+#: ../libbalsa/libbalsa-gpgme-widgets.c:477
 msgid "Expires:"
 msgstr "Wygasa:"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:502
+#: ../libbalsa/libbalsa-gpgme-widgets.c:507
 msgid "sign"
 msgstr "podpisz"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:505
+#: ../libbalsa/libbalsa-gpgme-widgets.c:510
 msgid "encrypt"
 msgstr "zaszyfruj"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:508
+#: ../libbalsa/libbalsa-gpgme-widgets.c:513
 msgid "certify"
 msgstr "certyfikuj"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:511
+#: ../libbalsa/libbalsa-gpgme-widgets.c:516
 msgid "authenticate"
 msgstr "uwierzytelnij"
+
+#: ../libbalsa/libbalsa-gpgme-widgets.c:537
+#, c-format
+msgid "%u bits"
+msgstr "%u b"
+
+#: ../libbalsa/libbalsa-gpgme-widgets.c:544
+#, c-format
+msgid " curve “%s”"
+msgstr " krzywa „%s”"
 
 #: ../libbalsa/libbalsa-progress.c:65 ../src/main-window.c:3273
 msgid "_Hide"
@@ -1603,7 +1650,7 @@ msgstr "%lu. wiadomość z %lu (%s z %s)"
 msgid "Error appending message %d from %s to %s: %s"
 msgstr "Błąd podczas dołączania wiadomości %d od %s do %s: %s"
 
-#: ../libbalsa/mailbox_pop3.c:495 ../libbalsa/send.c:787
+#: ../libbalsa/mailbox_pop3.c:495 ../libbalsa/send.c:795
 #, c-format
 msgid "Cannot load certificate file %s: %s"
 msgstr "Nie można wczytać pliku certyfikatu %s: %s"
@@ -1642,117 +1689,117 @@ msgid "POP3 error: %s"
 msgstr "Błąd POP3: %s"
 
 #. done - clean up
-#: ../libbalsa/mailbox_pop3.c:694 ../libbalsa/send.c:1085
+#: ../libbalsa/mailbox_pop3.c:694 ../libbalsa/send.c:1093
 #, c-format
 msgid "Finished"
 msgstr "Ukończono"
 
-#: ../libbalsa/message.c:618
+#: ../libbalsa/message.c:620
 #, c-format
 msgid "Mailbox (%s) is read-only: cannot change flags."
 msgstr "Skrzynka (%s) jest tylko do odczytu: nie można zmienić etykiet."
 
-#: ../libbalsa/misc.c:395
+#: ../libbalsa/misc.c:373
 msgid "West European"
 msgstr "zachodnioeuropejski"
 
-#: ../libbalsa/misc.c:397 ../libbalsa/misc.c:431
+#: ../libbalsa/misc.c:375 ../libbalsa/misc.c:409
 msgid "East European"
 msgstr "wschodnioeuropejski"
 
-#: ../libbalsa/misc.c:399
+#: ../libbalsa/misc.c:377
 msgid "South European"
 msgstr "południowoeuropejski"
 
-#: ../libbalsa/misc.c:401
+#: ../libbalsa/misc.c:379
 msgid "North European"
 msgstr "północnoeuropejski"
 
-#: ../libbalsa/misc.c:403 ../libbalsa/misc.c:433
+#: ../libbalsa/misc.c:381 ../libbalsa/misc.c:411
 msgid "Cyrillic"
 msgstr "cyrylica"
 
-#: ../libbalsa/misc.c:405 ../libbalsa/misc.c:439
+#: ../libbalsa/misc.c:383 ../libbalsa/misc.c:417
 msgid "Arabic"
 msgstr "arabski"
 
-#: ../libbalsa/misc.c:407 ../libbalsa/misc.c:435
+#: ../libbalsa/misc.c:385 ../libbalsa/misc.c:413
 msgid "Greek"
 msgstr "grecki"
 
-#: ../libbalsa/misc.c:409 ../libbalsa/misc.c:437
+#: ../libbalsa/misc.c:387 ../libbalsa/misc.c:415
 msgid "Hebrew"
 msgstr "hebrajski"
 
-#: ../libbalsa/misc.c:411
+#: ../libbalsa/misc.c:389
 msgid "Turkish"
 msgstr "turecki"
 
-#: ../libbalsa/misc.c:413
+#: ../libbalsa/misc.c:391
 msgid "Nordic"
 msgstr "nordycki"
 
-#: ../libbalsa/misc.c:415
+#: ../libbalsa/misc.c:393
 msgid "Thai"
 msgstr "tajski"
 
-#: ../libbalsa/misc.c:417 ../libbalsa/misc.c:441
+#: ../libbalsa/misc.c:395 ../libbalsa/misc.c:419
 msgid "Baltic"
 msgstr "bałtycki"
 
-#: ../libbalsa/misc.c:419
+#: ../libbalsa/misc.c:397
 msgid "Celtic"
 msgstr "celtycki"
 
-#: ../libbalsa/misc.c:421
+#: ../libbalsa/misc.c:399
 msgid "West European (euro)"
 msgstr "zachodnioeuropejski (euro)"
 
-#: ../libbalsa/misc.c:423
+#: ../libbalsa/misc.c:401
 msgid "Russian"
 msgstr "rosyjski"
 
-#: ../libbalsa/misc.c:425
+#: ../libbalsa/misc.c:403
 msgid "Ukrainian"
 msgstr "ukraiński"
 
-#: ../libbalsa/misc.c:427
+#: ../libbalsa/misc.c:405
 msgid "Japanese"
 msgstr "japoński"
 
-#: ../libbalsa/misc.c:429
+#: ../libbalsa/misc.c:407
 msgid "Korean"
 msgstr "koreański"
 
-#: ../libbalsa/misc.c:622
+#: ../libbalsa/misc.c:600
 #, c-format
 msgid "Cannot open %s: %s"
 msgstr "Nie można otworzyć %s: %s"
 
-#: ../libbalsa/misc.c:631
+#: ../libbalsa/misc.c:609
 #, c-format
 msgid "Cannot open %s: is a symbolic link"
 msgstr "Nie można otworzyć %s: jest dowiązaniem symbolicznym"
 
-#: ../libbalsa/misc.c:758
+#: ../libbalsa/misc.c:736
 msgid "Timeout exceeded while attempting fcntl lock!"
 msgstr "Przekroczono czas oczekiwania podczas próby blokady fcntl."
 
-#: ../libbalsa/misc.c:765
+#: ../libbalsa/misc.c:743
 #, c-format
 msgid "Waiting for fcntl lock… %d"
 msgstr "Oczekiwanie na blokadę fcntl… %d"
 
-#: ../libbalsa/misc.c:793
+#: ../libbalsa/misc.c:771
 msgid "Timeout exceeded while attempting flock lock!"
 msgstr "Przekroczono czas oczekiwania podczas próby blokady flock."
 
-#: ../libbalsa/misc.c:800
+#: ../libbalsa/misc.c:778
 #, c-format
 msgid "Waiting for flock attempt… %d"
 msgstr "Oczekiwanie na blokadę flock… %d"
 
-#: ../libbalsa/misc.c:1077
+#: ../libbalsa/misc.c:1055
 #, c-format
 msgid "LDAP Directory for %s"
 msgstr "Katalog LDAP dla %s"
@@ -2095,38 +2142,38 @@ msgstr "błędnie sformatowany wiersz „%s”, brak „:”"
 msgid "malformed line “%s”, empty name or value"
 msgstr "błędnie sformatowany wiersz „%s”, brak nazwy lub wartości"
 
-#: ../libbalsa/send.c:206
+#: ../libbalsa/send.c:211
 #, c-format
 msgid "SMTP server %s"
 msgstr "Serwer SMTP %s"
 
-#: ../libbalsa/send.c:627
+#: ../libbalsa/send.c:635
 #, c-format
 msgid "Message %u of %u"
 msgstr "%u. wiadomość z %u"
 
-#: ../libbalsa/send.c:650
+#: ../libbalsa/send.c:658
 #, c-format
 msgid "Cannot reach SMTP server %s (%s), any queued message will remain in %s."
 msgstr ""
 "Nie można połączyć się z serwerem SMTP %s (%s), wszystkie wiadomości "
 "w kolejce pozostaną w %s."
 
-#: ../libbalsa/send.c:840
+#: ../libbalsa/send.c:848
 msgid "Sending Mail"
 msgstr "Wysyłanie poczty"
 
-#: ../libbalsa/send.c:946
+#: ../libbalsa/send.c:954
 #, c-format
 msgid "Save message in %s…"
 msgstr "Zapisz wiadomość w %s…"
 
-#: ../libbalsa/send.c:954
+#: ../libbalsa/send.c:962
 #, c-format
 msgid "Saving sent message to %s failed: %s"
 msgstr "Zapisanie wysłanej wiadomości do %s się nie powiodło: %s"
 
-#: ../libbalsa/send.c:985
+#: ../libbalsa/send.c:993
 #, c-format
 msgid ""
 "Sending message failed: %s\n"
@@ -2135,22 +2182,22 @@ msgstr ""
 "Wysłanie wiadomości się nie powiodło: %s\n"
 "Wiadomość pozostała w skrzynce wychodzącej."
 
-#: ../libbalsa/send.c:1006
+#: ../libbalsa/send.c:1014
 #, c-format
 msgid "Sending queued messages to %s"
 msgstr "Wysyłanie wiadomości z kolejki do %s"
 
-#: ../libbalsa/send.c:1014
+#: ../libbalsa/send.c:1022
 #, c-format
 msgid "Connected to %s"
 msgstr "Połączono z %s"
 
-#: ../libbalsa/send.c:1068
+#: ../libbalsa/send.c:1076
 #, c-format
 msgid "Connecting SMTP server %s (%s) failed: %s"
 msgstr "Połączenie z serwerem SMTP %s (%s) się nie powiodło: %s"
 
-#: ../libbalsa/send.c:1091
+#: ../libbalsa/send.c:1099
 #, c-format
 msgid "Transmitted %u message to %s"
 msgid_plural "Transmitted %u messages to %s"
@@ -2158,17 +2205,17 @@ msgstr[0] "Przesłano %u wiadomość do %s"
 msgstr[1] "Przesłano %u wiadomości do %s"
 msgstr[2] "Przesłano %u wiadomości do %s"
 
-#: ../libbalsa/send.c:1263 ../libbalsa/send.c:1329
+#: ../libbalsa/send.c:1279 ../libbalsa/send.c:1345
 #, c-format
 msgid "Cannot read %s: %s"
 msgstr "Nie można odczytać %s: %s"
 
-#: ../libbalsa/send.c:1266 ../libbalsa/send.c:1332
+#: ../libbalsa/send.c:1282 ../libbalsa/send.c:1348
 #, c-format
 msgid "Cannot read %s"
 msgstr "Nie można odczytać %s"
 
-#: ../libbalsa/send.c:1296
+#: ../libbalsa/send.c:1312
 #, c-format
 msgid ""
 "Cannot determine character set for text file “%s”; sending as MIME type “%s”"
@@ -2176,14 +2223,14 @@ msgstr ""
 "Nie można ustalić zestawu znaków dla pliku tekstowego „%s”, wysyłanie jako "
 "typ MIME „%s”"
 
-#: ../libbalsa/send.c:1731
+#: ../libbalsa/send.c:1816
 msgid "This message will not be encrypted for the BCC: recipient."
 msgid_plural "This message will not be encrypted for the BCC: recipients."
 msgstr[0] "Ta wiadomość nie zostanie zaszyfrowana dla odbiorcy z pola „UDW:”."
 msgstr[1] "Ta wiadomość nie zostanie zaszyfrowana dla odbiorców z pola „UDW:”."
 msgstr[2] "Ta wiadomość nie zostanie zaszyfrowana dla odbiorców z pola „UDW:”."
 
-#: ../libbalsa/send.c:1826
+#: ../libbalsa/send.c:1911
 msgid "This message will not be encrypted for the BCC: recipient(s)."
 msgstr "Ta wiadomość nie zostanie zaszyfrowana dla odbiorców z pola „UDW:”."
 
@@ -2193,105 +2240,105 @@ msgstr "Ta wiadomość nie zostanie zaszyfrowana dla odbiorców z pola „UDW:�
 msgid "Logging in to %s using %s"
 msgstr "Logowanie do %s za pomocą %s"
 
-#: ../libbalsa/smtp-server.c:298
+#: ../libbalsa/smtp-server.c:297
 msgid "SMTP over SSL (SMTPS)"
 msgstr "SMTP przez SSL (SMTPS)"
 
-#: ../libbalsa/smtp-server.c:299 ../libinit_balsa/assistant_page_user.c:69
+#: ../libbalsa/smtp-server.c:298 ../libinit_balsa/assistant_page_user.c:69
 #: ../src/mailbox-conf.c:1295
 msgid "TLS required"
 msgstr "Wymaganie TLS"
 
-#: ../libbalsa/smtp-server.c:300 ../libinit_balsa/assistant_page_user.c:70
+#: ../libbalsa/smtp-server.c:299 ../libinit_balsa/assistant_page_user.c:70
 #: ../src/mailbox-conf.c:1296
 msgid "TLS if possible (not recommended)"
 msgstr "TLS, jeśli to możliwe (niezalecane)"
 
-#: ../libbalsa/smtp-server.c:301 ../libinit_balsa/assistant_page_user.c:71
+#: ../libbalsa/smtp-server.c:300 ../libinit_balsa/assistant_page_user.c:71
 #: ../src/mailbox-conf.c:1297
 msgid "None (not recommended)"
 msgstr "Brak (niezalecane)"
 
-#: ../libbalsa/smtp-server.c:332
+#: ../libbalsa/smtp-server.c:331
 #, c-format
 msgid "Error displaying server help: %s\n"
 msgstr "Błąd podczas wyświetlania pomocy serwera: %s\n"
 
-#: ../libbalsa/smtp-server.c:467
+#: ../libbalsa/smtp-server.c:466
 msgid "SMTP Server"
 msgstr "Serwer SMTP"
 
-#: ../libbalsa/smtp-server.c:497 ../src/folder-conf.c:336
+#: ../libbalsa/smtp-server.c:496 ../src/folder-conf.c:336
 #: ../src/mailbox-conf.c:1278 ../src/mailbox-conf.c:1391
 msgid "_Basic"
 msgstr "_Podstawowe"
 
-#: ../libbalsa/smtp-server.c:502
+#: ../libbalsa/smtp-server.c:501
 msgid "_Descriptive Name:"
 msgstr "_Nazwa opisowa:"
 
 #. pop server
 #. imap server
-#: ../libbalsa/smtp-server.c:510 ../src/folder-conf.c:384
+#: ../libbalsa/smtp-server.c:509 ../src/folder-conf.c:384
 #: ../src/mailbox-conf.c:1285 ../src/mailbox-conf.c:1400
 msgid "_Server:"
 msgstr "_Serwer:"
 
 #. security
-#: ../libbalsa/smtp-server.c:518 ../src/mailbox-conf.c:1290
+#: ../libbalsa/smtp-server.c:517 ../src/mailbox-conf.c:1290
 msgid "Se_curity:"
 msgstr "Zabezpie_czanie:"
 
 #. authentication or anonymous access
-#: ../libbalsa/smtp-server.c:522
+#: ../libbalsa/smtp-server.c:521
 msgid "Server requires authentication"
 msgstr "Serwer wymaga uwierzytelnienia"
 
-#: ../libbalsa/smtp-server.c:523
+#: ../libbalsa/smtp-server.c:522
 msgid "_Authentication:"
 msgstr "_Uwierzytelnienie:"
 
-#: ../libbalsa/smtp-server.c:529
+#: ../libbalsa/smtp-server.c:528
 msgid "_User Name:"
 msgstr "Nazwa _użytkownika:"
 
-#: ../libbalsa/smtp-server.c:536
+#: ../libbalsa/smtp-server.c:535
 msgid "_Pass Phrase:"
 msgstr "_Hasło:"
 
-#: ../libbalsa/smtp-server.c:549 ../src/folder-conf.c:374
+#: ../libbalsa/smtp-server.c:548 ../src/folder-conf.c:374
 #: ../src/mailbox-conf.c:1329 ../src/mailbox-conf.c:1456
 msgid "_Advanced"
 msgstr "Z_aawansowane"
 
 #. client certificate and passphrase
 #. client certificate configuration
-#: ../libbalsa/smtp-server.c:552 ../src/mailbox-conf.c:264
+#: ../libbalsa/smtp-server.c:551 ../src/mailbox-conf.c:264
 msgid "Server requires client certificate"
 msgstr "Serwer wymaga certyfikatu klienta"
 
-#: ../libbalsa/smtp-server.c:553
+#: ../libbalsa/smtp-server.c:552
 msgid "_Client Certificate:"
 msgstr "_Certyfikat klienta:"
 
-#: ../libbalsa/smtp-server.c:557 ../src/mailbox-conf.c:267
+#: ../libbalsa/smtp-server.c:556 ../src/mailbox-conf.c:267
 msgid "Choose Client Certificate"
 msgstr "Wybór certyfikatu klienta"
 
-#: ../libbalsa/smtp-server.c:559 ../src/mailbox-conf.c:266
+#: ../libbalsa/smtp-server.c:558 ../src/mailbox-conf.c:266
 msgid "Certificate _File:"
 msgstr "_Plik certyfikatu:"
 
-#: ../libbalsa/smtp-server.c:566 ../src/mailbox-conf.c:272
+#: ../libbalsa/smtp-server.c:565 ../src/mailbox-conf.c:272
 msgid "Certificate _Pass Phrase:"
 msgstr "_Hasło certyfikatu:"
 
 #. split large messages
-#: ../libbalsa/smtp-server.c:575
+#: ../libbalsa/smtp-server.c:574
 msgid "Sp_lit message larger than"
 msgstr "_Dzielenie wiadomości większych niż"
 
-#: ../libbalsa/smtp-server.c:580 ../src/pref-manager.c:2186
+#: ../libbalsa/smtp-server.c:579 ../src/pref-manager.c:2186
 msgid "MB"
 msgstr "MB"
 
@@ -2564,7 +2611,7 @@ msgstr ""
 msgid "network client is already connected"
 msgstr "klient sieciowy jest już połączony"
 
-#: ../libnetclient/net-client.c:155 ../libnetclient/net-client.c:198
+#: ../libnetclient/net-client.c:155 ../libnetclient/net-client.c:199
 #, c-format
 msgid "network client is not connected"
 msgstr "klient sieciowy nie jest połączony"
@@ -2575,42 +2622,42 @@ msgid "reply length %lu exceeds the maximum allowed length %lu"
 msgstr ""
 "długość odpowiedzi (%lu) przekracza maksymalnie dozwoloną długość (%lu)"
 
-#: ../libnetclient/net-client.c:181
+#: ../libnetclient/net-client.c:182
 #, c-format
 msgid "connection lost"
 msgstr "utracono połączenie"
 
-#: ../libnetclient/net-client.c:229
+#: ../libnetclient/net-client.c:230
 #, c-format
 msgid "line too long"
 msgstr "wiersz jest za długi"
 
-#: ../libnetclient/net-client.c:298
+#: ../libnetclient/net-client.c:299
 #, c-format
 msgid "error initializing certificate: %s"
 msgstr "błąd podczas inicjowania certyfikatu: %s"
 
-#: ../libnetclient/net-client.c:308
+#: ../libnetclient/net-client.c:309
 #, c-format
 msgid "error loading certificate: %s"
 msgstr "błąd podczas wczytywania certyfikatu: %s"
 
-#: ../libnetclient/net-client.c:316
+#: ../libnetclient/net-client.c:317
 #, c-format
 msgid "error initializing key: %s"
 msgstr "błąd podczas inicjowania klucza: %s"
 
-#: ../libnetclient/net-client.c:372
+#: ../libnetclient/net-client.c:373
 #, c-format
 msgid "error loading key: %s"
 msgstr "błąd podczas wczytywania klucza: %s"
 
-#: ../libnetclient/net-client.c:412
+#: ../libnetclient/net-client.c:413
 #, c-format
 msgid "not connected"
 msgstr "nie połączono"
 
-#: ../libnetclient/net-client.c:414
+#: ../libnetclient/net-client.c:415
 #, c-format
 msgid "connection is already encrypted"
 msgstr "połączenie jest już zaszyfrowane"
@@ -3384,32 +3431,32 @@ msgstr ""
 msgid "Please close the other instances of this message and try again."
 msgstr "Proszę zamknąć inne okna z tą wiadomością i spróbować ponownie."
 
-#: ../src/balsa-mime-widget.c:240 ../src/balsa-mime-widget-message.c:176
+#: ../src/balsa-mime-widget.c:241 ../src/balsa-mime-widget-message.c:176
 #: ../src/balsa-mime-widget-message.c:222
 #, c-format
 msgid "File name: %s"
 msgstr "Nazwa pliku: %s"
 
-#: ../src/balsa-mime-widget.c:256
+#: ../src/balsa-mime-widget.c:257
 #, c-format
 msgid "Error reading message part: %s"
 msgstr "Błąd podczas odczytywania części wiadomości: %s"
 
-#: ../src/balsa-mime-widget.c:288
+#: ../src/balsa-mime-widget.c:289
 #, c-format
 msgid "Type: %s (%s)"
 msgstr "Typ: %s (%s)"
 
-#: ../src/balsa-mime-widget.c:292
+#: ../src/balsa-mime-widget.c:293
 #, c-format
 msgid "Content Type: %s"
 msgstr "Typ treści: %s"
 
-#: ../src/balsa-mime-widget.c:306
+#: ../src/balsa-mime-widget.c:307
 msgid "No open or view action defined for this content type"
 msgstr "Dla tego typu treści nie określono działania otwarcia lub wyświetlenia"
 
-#: ../src/balsa-mime-widget.c:311
+#: ../src/balsa-mime-widget.c:312
 msgid "S_ave part"
 msgstr "Z_apisz część"
 
@@ -3437,13 +3484,45 @@ msgstr "Plik już istnieje. Zastąpić?"
 msgid "Unlink %s: %s"
 msgstr "Odwiązanie %s: %s"
 
-#: ../src/balsa-mime-widget-crypto.c:93
+#: ../src/balsa-mime-widget-crypto.c:76 ../src/balsa-mime-widget-text.c:156
+#, c-format
+msgid "Could not save a text part: %s"
+msgstr "Nie można zapisać części tekstowej: %s"
+
+#: ../src/balsa-mime-widget-crypto.c:83
+#, c-format
+msgid "Could not process GnuPG keys: %s"
+msgstr "Nie można przetworzyć kluczy GnuPG: %s"
+
+#: ../src/balsa-mime-widget-crypto.c:132
 msgid "_Search key server for this key"
 msgstr "_Wyszukiwanie serwera kluczy dla tego klucza"
 
-#: ../src/balsa-mime-widget-crypto.c:95
+#: ../src/balsa-mime-widget-crypto.c:134
 msgid "_Search key server for updates of this key"
 msgstr "_Wyszukiwanie serwera kluczy dla aktualizacji tego klucza"
+
+#: ../src/balsa-mime-widget-crypto.c:265
+#, c-format
+msgid ""
+"Import GnuPG key:\n"
+"%s"
+msgstr ""
+"Import klucza GnuPG:\n"
+"%s"
+
+#: ../src/balsa-mime-widget-crypto.c:272
+#, c-format
+msgid "Error importing key data: %s"
+msgstr "Błąd podczas importowania danych klucza: %s"
+
+#: ../src/balsa-mime-widget-crypto.c:309
+msgid "(imported)"
+msgstr "(zaimportowano)"
+
+#: ../src/balsa-mime-widget-crypto.c:317
+msgid "Import key into the local key ring"
+msgstr "Zaimportuj klucz do lokalnej bazy kluczy"
 
 #: ../src/balsa-mime-widget-image.c:119 ../src/balsa-mime-widget-image.c:252
 #, c-format
@@ -3541,7 +3620,7 @@ msgstr "Serwer IMAP nie zgłosił struktury wiadomości"
 #: ../src/balsa-mime-widget-message.c:725
 #: ../src/balsa-print-object-header.c:156 ../src/sendmsg-window.c:747
 #: ../src/sendmsg-window.c:749 ../src/sendmsg-window.c:841
-#: ../src/sendmsg-window.c:3512 ../src/sendmsg-window.c:5025
+#: ../src/sendmsg-window.c:3512 ../src/sendmsg-window.c:5027
 msgid "Subject:"
 msgstr "Temat:"
 
@@ -3569,11 +3648,6 @@ msgstr "DW:"
 #: ../src/balsa-print-object-header.c:180
 msgid "Disposition-Notification-To:"
 msgstr "Powiadomienie o otrzymaniu:"
-
-#: ../src/balsa-mime-widget-text.c:156
-#, c-format
-msgid "Could not save a text part: %s"
-msgstr "Nie można zapisać części tekstowej: %s"
 
 #: ../src/balsa-mime-widget-text.c:507
 msgid "Copy link"
@@ -3718,12 +3792,6 @@ msgstr "Prośba kalendarza iTIP"
 #, c-format
 msgid "Sending the iTIP calendar reply failed: %s"
 msgstr "Wysłanie odpowiedzi kalendarza iTIP się nie powiodło: %s"
-
-#: ../src/balsa-print-object-default.c:152
-#: ../src/balsa-print-object-default.c:154
-#: ../src/balsa-print-object-default.c:157
-msgid "Type:"
-msgstr "Typ:"
 
 #: ../src/balsa-print-object-default.c:162
 #: ../src/balsa-print-object-default.c:166
@@ -6025,7 +6093,7 @@ msgstr "Załączenie jako typ MIME:"
 msgid "Character set for file %s changed from “%s” to “%s”."
 msgstr "Kodowanie dla pliku %s zmieniło się z „%s” na „%s”."
 
-#: ../src/sendmsg-window.c:1684 ../src/sendmsg-window.c:5029
+#: ../src/sendmsg-window.c:1684 ../src/sendmsg-window.c:5031
 msgid "(no subject)"
 msgstr "(brak tematu)"
 
@@ -6064,7 +6132,7 @@ msgid "Attach file"
 msgstr "Załącz plik"
 
 #: ../src/sendmsg-window.c:2119 ../src/sendmsg-window.c:2222
-#: ../src/sendmsg-window.c:6853
+#: ../src/sendmsg-window.c:6870
 msgid ""
 "Attaching message failed.\n"
 "Possible reason: not enough temporary space"
@@ -6245,23 +6313,23 @@ msgstr "Nie można wczytać pliku nagłówka „Face” %s: %s"
 msgid "Could not load X-Face header file %s: %s"
 msgstr "Nie można wczytać pliku nagłówka „X-Face” %s: %s"
 
-#: ../src/sendmsg-window.c:4986
+#: ../src/sendmsg-window.c:4988
 msgid "No Subject"
 msgstr "Brak tematu"
 
-#: ../src/sendmsg-window.c:4991
+#: ../src/sendmsg-window.c:4993
 msgid "_Send"
 msgstr "_Wyślij"
 
-#: ../src/sendmsg-window.c:5012
+#: ../src/sendmsg-window.c:5014
 msgid "You did not specify a subject for this message"
 msgstr "Nie podano tematu tej wiadomości"
 
-#: ../src/sendmsg-window.c:5013
+#: ../src/sendmsg-window.c:5015
 msgid "If you would like to provide one, enter it below."
 msgstr "Aby podać temat wiadomości, należy wpisać go poniżej."
 
-#: ../src/sendmsg-window.c:5106
+#: ../src/sendmsg-window.c:5108
 #, c-format
 msgid ""
 "You did not select encryption for this message, although %s public keys are "
@@ -6272,19 +6340,19 @@ msgstr ""
 "dostępne dla wszystkich odbiorców. Aby chronić swoją prywatność, wiadomość "
 "mogłaby zostać zaszyfrowana za pomocą %s."
 
-#: ../src/sendmsg-window.c:5128
+#: ../src/sendmsg-window.c:5130
 msgid "Send _encrypted"
 msgstr "Wyślij _zaszyfrowane"
 
-#: ../src/sendmsg-window.c:5143
+#: ../src/sendmsg-window.c:5145
 msgid "Send _unencrypted"
 msgstr "Wyślij _niezaszyfrowane"
 
-#: ../src/sendmsg-window.c:5203
+#: ../src/sendmsg-window.c:5205
 msgid "You selected OpenPGP security for this message.\n"
 msgstr "Wybrano zabezpieczenie OpenPGP dla tej wiadomości.\n"
 
-#: ../src/sendmsg-window.c:5208
+#: ../src/sendmsg-window.c:5210
 msgid ""
 "The message text will be sent as plain text and as HTML, but only the plain "
 "part can be signed.\n"
@@ -6292,13 +6360,13 @@ msgstr ""
 "Tekst wiadomości zostanie wysłany jako zwykły tekst i jako HTML, ale tylko "
 "część zawierająca zwykły tekst może zostać podpisana.\n"
 
-#: ../src/sendmsg-window.c:5213
+#: ../src/sendmsg-window.c:5215
 msgid ""
 "The message contains attachments, which cannot be signed or encrypted.\n"
 msgstr ""
 "Wiadomość zawiera załączniki, których nie można podpisać ani zaszyfrować.\n"
 
-#: ../src/sendmsg-window.c:5217
+#: ../src/sendmsg-window.c:5219
 msgid ""
 "You should select MIME mode if the complete message shall be protected. Do "
 "you really want to proceed?"
@@ -6306,36 +6374,36 @@ msgstr ""
 "Jeśli cała wiadomości ma być chroniona, należy wybrać tryb MIME. Na pewno "
 "kontynuować?"
 
-#: ../src/sendmsg-window.c:5242
+#: ../src/sendmsg-window.c:5244
 #, c-format
 msgid "sending message with GPG mode %d"
 msgstr "wysyłanie wiadomości w trybie GPG %d"
 
-#: ../src/sendmsg-window.c:5270
+#: ../src/sendmsg-window.c:5272
 msgid "Message could not be created"
 msgstr "Nie można utworzyć wiadomości"
 
-#: ../src/sendmsg-window.c:5272
+#: ../src/sendmsg-window.c:5274
 msgid "Message could not be queued in outbox"
 msgstr "Nie można dodać wiadomości do kolejki w skrzynce wychodzącej"
 
-#: ../src/sendmsg-window.c:5274
+#: ../src/sendmsg-window.c:5276
 msgid "Message could not be saved in sentbox"
 msgstr "Nie można zapisać wiadomości w Wysłanych"
 
-#: ../src/sendmsg-window.c:5276
+#: ../src/sendmsg-window.c:5278
 msgid "Message could not be sent"
 msgstr "Nie można wysłać wiadomości"
 
-#: ../src/sendmsg-window.c:5279
+#: ../src/sendmsg-window.c:5281
 msgid "Message could not be signed"
 msgstr "Nie można podpisać wiadomości"
 
-#: ../src/sendmsg-window.c:5281
+#: ../src/sendmsg-window.c:5283
 msgid "Message could not be encrypted"
 msgstr "Nie można zaszyfrować wiadomości"
 
-#: ../src/sendmsg-window.c:5287
+#: ../src/sendmsg-window.c:5289
 #, c-format
 msgid ""
 "Send failed: %s\n"
@@ -6344,45 +6412,45 @@ msgstr ""
 "Wysłanie się nie powiodło: %s\n"
 "%s"
 
-#: ../src/sendmsg-window.c:5292
+#: ../src/sendmsg-window.c:5294
 #, c-format
 msgid "Send failed: %s"
 msgstr "Wysłanie się nie powiodło: %s"
 
-#: ../src/sendmsg-window.c:5391
+#: ../src/sendmsg-window.c:5395
 #, c-format
 msgid "Could not postpone message: %s"
 msgstr "Nie można odłożyć wiadomości: %s"
 
-#: ../src/sendmsg-window.c:5412
+#: ../src/sendmsg-window.c:5416
 msgid "Message postponed."
 msgstr "Odłożono wiadomość."
 
-#: ../src/sendmsg-window.c:5417
+#: ../src/sendmsg-window.c:5421
 msgid "Could not postpone message."
 msgstr "Nie można odłożyć wiadomości."
 
-#: ../src/sendmsg-window.c:5629
+#: ../src/sendmsg-window.c:5633
 #, c-format
 msgid "Error starting spell checker: %s"
 msgstr "Błąd podczas uruchamiania sprawdzania pisowni: %s"
 
-#: ../src/sendmsg-window.c:6378
+#: ../src/sendmsg-window.c:6391
 #, c-format
 msgid "Reply to %s: %s"
 msgstr "Odpowiedź do %s: %s"
 
-#: ../src/sendmsg-window.c:6383
+#: ../src/sendmsg-window.c:6396
 #, c-format
 msgid "Forward message to %s: %s"
 msgstr "Przekazanie wiadomości do %s: %s"
 
-#: ../src/sendmsg-window.c:6387
+#: ../src/sendmsg-window.c:6400
 #, c-format
 msgid "New message to %s: %s"
 msgstr "Nowa wiadomość do %s: %s"
 
-#: ../src/sendmsg-window.c:6552 ../ui/sendmsg-window.ui.h:33
+#: ../src/sendmsg-window.c:6568 ../ui/sendmsg-window.ui.h:33
 msgid "_Language"
 msgstr "_Język"
 
@@ -7235,6 +7303,10 @@ msgstr "G_nuPG używa starego trybu OpenPGP"
 #: ../ui/sendmsg-window.ui.h:43
 msgid "S/MIME mode (_GpgSM)"
 msgstr "Tryb S/MIME (_GpgSM)"
+
+#: ../ui/sendmsg-window.ui.h:44
+msgid "Attach GnuPG _Public Key"
+msgstr "_Załącz klucz publiczny GnuPG"
 
 #: ../ui/source-viewer.ui.h:7
 msgid "_Escape Special Characters"

@@ -4,22 +4,22 @@
     <id>balsa.desktop</id>
     <metadata_licence>CC0-1.0</metadata_licence>
     <description>
-        <p>
+        <_p>
             Balsa is a graphical mail client. While it is in active development,
             Balsa has many features such as:
-        </p>
+        </_p>
         <ul>
-            <li>IMAP and POP3 support;</li>
-            <li>sendmail or direct SMTP support;</li>
-            <li>optional multi-threaded retrieval and sending of messages;</li>
-            <li>support for all configurations of local mail folders;</li>
-            <li>automatic mail checking;</li>
-            <li>mail printing;</li>
-            <li>inline attachment viewing;</li>
+            <_li>IMAP and POP3 support;</_li>
+            <_li>sendmail or direct SMTP support;</_li>
+            <_li>optional multi-threaded retrieval and sending of messages;</_li>
+            <_li>support for all configurations of local mail folders;</_li>
+            <_li>automatic mail checking;</_li>
+            <_li>mail printing;</_li>
+            <_li>inline attachment viewing;</_li>
         </ul>
-        <p>
+        <_p>
             and the proverbial much, much more.
-        </p>
+        </_p>
     </description>
     <url type="homepage">http://pawsa.fedorapeople.org/balsa/</url>
     <updatecontact>balsa-list_at_gnome.org</updatecontact>

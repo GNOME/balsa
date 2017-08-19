@@ -402,7 +402,7 @@ msgstr "Грешка извршавања творца потписа „%s“: 
 #, c-format
 #| msgid "Cannot open signature file “%s” for reading"
 msgid "Cannot read signature file “%s”: %s"
-msgstr "Не могу да прочитам датотеку потписа „%s“"
+msgstr "Не могу да прочитам датотеку потписа „%s“: %s"
 
 #: ../libbalsa/identity.c:363
 #, c-format
@@ -2283,7 +2283,7 @@ msgid_plural "Transmitted %u messages to %s"
 msgstr[0] "Одаслао сам %u поруку за „%s“"
 msgstr[1] "Одаслао сам %u поруке за „%s“"
 msgstr[2] "Одаслао сам %u порука за „%s“"
-msgstr[3] "Одаслао сам једну поруку за „%s“"
+msgstr[3] "Одаслао сам %u поруку за „%s“"
 
 #: ../libbalsa/send.c:1279 ../libbalsa/send.c:1345
 #, c-format

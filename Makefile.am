@@ -12,10 +12,15 @@ desktopdir = $(datadir)/applications
 desktop_in_files = balsa.desktop.in balsa-mailto-handler.desktop.in
 desktop_DATA = balsa.desktop balsa-mailto-handler.desktop
 
+@INTLTOOL_DESKTOP_RULE@
+
+# Appdata files
+
 appdatadir = $(datarootdir)/appdata
+appdata_in_files = balsa.appdata.xml.in
 dist_appdata_DATA = balsa.appdata.xml
 
-@INTLTOOL_DESKTOP_RULE@
+@INTLTOOL_XML_RULE@
 
 balsa_extra_dist =		\
 	HACKING			\
@@ -28,6 +33,7 @@ balsa_extra_dist =		\
 	docs/pine2vcard		\
 	docs/vconvert.awk	\
 	$(desktop_in_files)	\
+	$(appdata_in_files)	\
 	gnome-balsa2.png	\
 	intltool-extract.in	\
 	intltool-merge.in	\
@@ -42,7 +48,7 @@ gtksourceview_DATA = balsa-mail.lang		\
 	balsa-mail-style.xml
 endif
 
-DISTCLEANFILES = $(desktop_DATA) $(server_DATA) \
+DISTCLEANFILES = $(desktop_DATA) $(server_DATA) $(dist_appdata_DATA) \
 	intltool-extract intltool-merge intltool-update
 
 

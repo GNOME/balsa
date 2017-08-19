@@ -21,6 +21,7 @@ autom4te.cache/
 balsa-mailto-handler.desktop
 balsa-mailto-handler.desktop.in
 balsa.1
+balsa.appdata.xml
 balsa.desktop
 balsa.desktop.in
 balsa.spec

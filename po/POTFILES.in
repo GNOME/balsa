@@ -1,7 +1,7 @@
 [encoding: UTF-8]
 # List of source files containing translatable strings.
 # Please keep this list in alphabetical order.
-balsa.appdata.xml
+balsa.appdata.xml.in
 balsa.desktop.in.in
 balsa-mailto-handler.desktop.in.in
 libbalsa/address-book.c

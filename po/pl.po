@@ -14,8 +14,8 @@ msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: https://bugzilla.gnome.org/enter_bug.cgi?"
 "product=balsa&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2017-08-13 18:55+0200\n"
-"PO-Revision-Date: 2017-08-13 18:58+0200\n"
+"POT-Creation-Date: 2017-08-21 00:22+0200\n"
+"PO-Revision-Date: 2017-08-21 00:23+0200\n"
 "Last-Translator: Piotr Drąg <piotrdrag@gmail.com>\n"
 "Language-Team: Polish <community-poland@mozilla.org>\n"
 "Language: pl\n"
@@ -24,6 +24,46 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
 "|| n%100>=20) ? 1 : 2);\n"
+
+#: ../balsa.appdata.xml.in.h:1
+msgid ""
+"Balsa is a graphical mail client. While it is in active development, Balsa "
+"has many features such as:"
+msgstr ""
+"Balsa to graficzny klient poczty. Chociaż jest aktywnie rozwijana, Balsa ma "
+"wiele funkcji:"
+
+#: ../balsa.appdata.xml.in.h:2
+msgid "IMAP and POP3 support;"
+msgstr "obsługa IMAP i POP3,"
+
+#: ../balsa.appdata.xml.in.h:3
+msgid "sendmail or direct SMTP support;"
+msgstr "obsługa usługi sendmail i bezpośredniego SMTP,"
+
+#: ../balsa.appdata.xml.in.h:4
+msgid "optional multi-threaded retrieval and sending of messages;"
+msgstr "opcjonalne wielowątkowe pobieranie i wysyłanie wiadomości,"
+
+#: ../balsa.appdata.xml.in.h:5
+msgid "support for all configurations of local mail folders;"
+msgstr "obsługa wszystkich konfiguracji katalogów lokalnej poczty,"
+
+#: ../balsa.appdata.xml.in.h:6
+msgid "automatic mail checking;"
+msgstr "automatyczne sprawdzanie poczty,"
+
+#: ../balsa.appdata.xml.in.h:7
+msgid "mail printing;"
+msgstr "drukowanie wiadomości,"
+
+#: ../balsa.appdata.xml.in.h:8
+msgid "inline attachment viewing;"
+msgstr "wyświetlanie załączników w wiadomościach,"
+
+#: ../balsa.appdata.xml.in.h:9
+msgid "and the proverbial much, much more."
+msgstr "oraz wiele, wiele więcej."
 
 #: ../balsa.desktop.in.in.h:1 ../balsa-mailto-handler.desktop.in.in.h:1
 msgid "Balsa"

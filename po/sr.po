@@ -9,8 +9,8 @@ msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: https://bugzilla.gnome.org/enter_bug.cgi?product=balsa&"
 "keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2017-08-11 01:37+0000\n"
-"PO-Revision-Date: 2017-08-19 16:42+0200\n"
+"POT-Creation-Date: 2017-08-19 17:55+0000\n"
+"PO-Revision-Date: 2017-08-20 20:07+0200\n"
 "Last-Translator: Мирослав Николић <miroslavnikolic@rocketmail.com>\n"
 "Language-Team: српски <gnome-sr@googlegroups.org>\n"
 "Language: sr\n"
@@ -20,6 +20,47 @@ msgstr ""
 "Plural-Forms: nplurals=4; plural=n==1? 3 : n%10==1 && n%100!=11 ? 0 : "
 "n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
 "X-Project-Style: gnome\n"
+
+#: ../balsa.appdata.xml.h:1
+msgid ""
+"Balsa is a graphical mail client. While it is in active development, Balsa "
+"has many features such as:"
+msgstr ""
+"Балса је графички клијент за пошту. Иако је у активном развоју, Балса има "
+"много функција као што су:"
+
+#: ../balsa.appdata.xml.h:2
+msgid "IMAP and POP3 support;"
+msgstr "ИМАП и ПОП3 подршка;"
+
+#: ../balsa.appdata.xml.h:3
+msgid "sendmail or direct SMTP support;"
+msgstr "„sendmail“ или директна СМТП подршка;"
+
+#: ../balsa.appdata.xml.h:4
+msgid "optional multi-threaded retrieval and sending of messages;"
+msgstr "изборно вишенитно довлачење и слање порука;"
+
+#: ../balsa.appdata.xml.h:5
+msgid "support for all configurations of local mail folders;"
+msgstr "подршка за сва подешавања месних фасцикли поште;"
+
+#: ../balsa.appdata.xml.h:6
+msgid "automatic mail checking;"
+msgstr "аутоматска провера поште;"
+
+#: ../balsa.appdata.xml.h:7
+#| msgid "Mail options"
+msgid "mail printing;"
+msgstr "штампање поште;"
+
+#: ../balsa.appdata.xml.h:8
+msgid "inline attachment viewing;"
+msgstr "преглед прилога на мрежи;"
+
+#: ../balsa.appdata.xml.h:9
+msgid "and the proverbial much, much more."
+msgstr "и још много, много тога."
 
 #: ../balsa.desktop.in.in.h:1 ../balsa-mailto-handler.desktop.in.in.h:1
 msgid "Balsa"
@@ -394,13 +435,11 @@ msgstr "Нови идентитет"
 
 #: ../libbalsa/identity.c:343
 #, c-format
-#| msgid "Error executing signature generator %s"
 msgid "Error executing signature generator “%s”: %s"
 msgstr "Грешка извршавања творца потписа „%s“: %s"
 
 #: ../libbalsa/identity.c:352
 #, c-format
-#| msgid "Cannot open signature file “%s” for reading"
 msgid "Cannot read signature file “%s”: %s"
 msgstr "Не могу да прочитам датотеку потписа „%s“: %s"
 
@@ -575,7 +614,6 @@ msgid "default protocol"
 msgstr "основни протокол"
 
 #: ../libbalsa/identity.c:1060
-#| msgid "always trust GnuPG keys when encrypting"
 msgid "always trust GnuPG keys to encrypt messages"
 msgstr "увек веруј ГнуПГ кључевима за шифровање порука"
 
@@ -584,9 +622,6 @@ msgid "remind me if messages can be encrypted"
 msgstr "подсети ме уколико је могуће потписати поруку"
 
 #: ../libbalsa/identity.c:1066
-#| msgid ""
-#| "use secret key with this id for signing\n"
-#| "(leave empty for automatic selection)"
 msgid ""
 "use secret key with this id for signing GnuPG messages\n"
 "(leave empty for automatic selection)"
@@ -595,9 +630,6 @@ msgstr ""
 "(оставите празно за самостално бирање)"
 
 #: ../libbalsa/identity.c:1070
-#| msgid ""
-#| "use secret key with this id for signing\n"
-#| "(leave empty for automatic selection)"
 msgid ""
 "use certificate with this id for signing S/MIME messages\n"
 "(leave empty for automatic selection)"
@@ -607,7 +639,6 @@ msgstr ""
 
 #: ../libbalsa/identity.c:1192
 #, c-format
-#| msgid "error loading key: %s"
 msgid "Error selecting key: %s"
 msgstr "Грешка бирања кључа: %s"
 
@@ -853,7 +884,6 @@ msgstr "не могу да подесим протокол „%s“"
 
 #: ../libbalsa/libbalsa-gpgme.c:262
 #, c-format
-#| msgid "could not list keys for “%s”"
 msgid "could not set folder “%s” for engine “%s”"
 msgstr "не могу да поподесим фасциклу „%s“ за погон „%s“"
 
@@ -903,9 +933,6 @@ msgstr "Није доступан приватни кључ за протоко�
 
 #: ../libbalsa/libbalsa-gpgme.c:921
 #, c-format
-#| msgid ""
-#| "%s: a key for %s is present, but it is expired, disabled, revoked or "
-#| "invalid"
 msgid ""
 "A key for “%s” is present, but it is expired, disabled, revoked or invalid"
 msgstr ""
@@ -913,19 +940,16 @@ msgstr ""
 
 #: ../libbalsa/libbalsa-gpgme.c:924
 #, c-format
-#| msgid "could not list keys for “%s”"
 msgid "Could not find a key for “%s”"
 msgstr "Не могу да нађем кључ за „%s“"
 
 #: ../libbalsa/libbalsa-gpgme.c:939
 #, c-format
-#| msgid "%s: multiple keys for %s"
 msgid "Multiple keys for “%s”"
 msgstr "Више кључева за „%s“"
 
 #: ../libbalsa/libbalsa-gpgme.c:961
 #, c-format
-#| msgid "%s: insufficient validity for UID %s"
 msgid "Insufficient key validity"
 msgstr "Недовољно ваљаности за кључ"
 
@@ -936,22 +960,16 @@ msgstr "Изаберите кључ"
 
 #: ../libbalsa/libbalsa-gpgme-cb.c:207
 #, c-format
-#| msgid "Select the private key for the signer %s"
 msgid "Select the private key for the signer “%s”"
 msgstr "Изаберите приватни кључ за потписника „%s“"
 
 #: ../libbalsa/libbalsa-gpgme-cb.c:212
 #, c-format
-#| msgid "Select the public key for the recipient %s"
 msgid "Select the public key for the recipient “%s”"
 msgstr "Изаберите јавни кључ за примаоца „%s“"
 
 #: ../libbalsa/libbalsa-gpgme-cb.c:217
 #, c-format
-#| msgid ""
-#| "There seems to be no public key for recipient %s in your key ring.\n"
-#| "If you are sure that the recipient owns a different key, select it from "
-#| "the list."
 msgid ""
 "There seems to be no public key for recipient “%s” in your key ring.\n"
 "If you are sure that the recipient owns a different key, select it from the "
@@ -979,7 +997,6 @@ msgstr ""
 "Да ипак користим овај кључ?"
 
 #: ../libbalsa/libbalsa-gpgme-cb.c:316
-#| msgid "Insufficient trust for recipient %s"
 msgid "Insufficient key owner trust"
 msgstr "Недовољно поверења власника кључа"
 
@@ -1015,7 +1032,6 @@ msgstr ""
 "Кључ: %s"
 
 #: ../libbalsa/libbalsa-gpgme-keys.c:83
-#| msgid "error loading key: %s"
 msgid "error setting key list mode"
 msgstr "грешка подешавања режима списка кључа"
 
@@ -1025,13 +1041,11 @@ msgid "could not list keys for “%s”"
 msgstr "не могу да побројим кључеве за „%s“"
 
 #: ../libbalsa/libbalsa-gpgme-keys.c:190 ../libbalsa/libbalsa-gpgme-keys.c:230
-#| msgid "Cannot create temporary file"
 msgid "cannot create data buffer"
 msgstr "не могу да направим међумеморију података"
 
 #: ../libbalsa/libbalsa-gpgme-keys.c:198
 #, c-format
-#| msgid "could not list keys for “%s”"
 msgid "exporting key for “%s” failed"
 msgstr "извоз кључа за „%s“ није успео"
 
@@ -1055,12 +1069,10 @@ msgstr ""
 
 #: ../libbalsa/libbalsa-gpgme-keys.c:323
 #, c-format
-#| msgid "Sending the external body request failed: %s"
 msgid "Searching the key server failed: %s"
 msgstr "Нисам успео да претражим сервер кључа: %s"
 
 #: ../libbalsa/libbalsa-gpgme-keys.c:402
-#| msgid "error loading key: %s"
 msgid "error importing key"
 msgstr "грешка увоза кључа"
 
@@ -1120,7 +1132,6 @@ msgstr[3] ""
 
 #: ../libbalsa/libbalsa-gpgme-keys.c:466
 #, c-format
-#| msgid "Incl_ude signature"
 msgid ""
 "\n"
 "• %d new signature"
@@ -1171,9 +1182,6 @@ msgstr "Стање кључа:"
 
 #: ../libbalsa/libbalsa-gpgme-widgets.c:82
 #: ../libbalsa/libbalsa-gpgme-widgets.c:89
-#| msgid ""
-#| "\n"
-#| "User ID:"
 msgid "User ID:"
 msgstr "ИБ корисника:"
 
@@ -1186,9 +1194,6 @@ msgid "Primary user ID:"
 msgstr "Главни ИБ корисника:"
 
 #: ../libbalsa/libbalsa-gpgme-widgets.c:99
-#| msgid ""
-#| "\n"
-#| "Key owner trust: %s"
 msgid "Key owner trust:"
 msgstr "Поверење власнику кључа:"
 
@@ -1201,21 +1206,14 @@ msgid "Issuer"
 msgstr "Издавач"
 
 #: ../libbalsa/libbalsa-gpgme-widgets.c:138
-#| msgid "Name"
 msgid "Name:"
 msgstr "Назив:"
 
 #: ../libbalsa/libbalsa-gpgme-widgets.c:142
-#| msgid ""
-#| "\n"
-#| "Issuer serial number: %s"
 msgid "Serial number:"
 msgstr "Серијски број:"
 
 #: ../libbalsa/libbalsa-gpgme-widgets.c:145
-#| msgid ""
-#| "\n"
-#| "Chain ID: %s"
 msgid "Chain ID:"
 msgstr "ИБ ланца:"
 
@@ -1237,32 +1235,26 @@ msgid "Close"
 msgstr "Затвори"
 
 #: ../libbalsa/libbalsa-gpgme-widgets.c:223
-#| msgid "_No"
 msgid "No"
 msgstr "Не"
 
 #: ../libbalsa/libbalsa-gpgme-widgets.c:223
-#| msgid "_Yes"
 msgid "Yes"
 msgstr "Да"
 
 #: ../libbalsa/libbalsa-gpgme-widgets.c:298
-#| msgid " revoked"
 msgid "revoked"
 msgstr "повучен"
 
 #: ../libbalsa/libbalsa-gpgme-widgets.c:301
-#| msgid " expired"
 msgid "expired"
 msgstr "истекао"
 
 #: ../libbalsa/libbalsa-gpgme-widgets.c:304
-#| msgid " disabled"
 msgid "disabled"
 msgstr "искључен"
 
 #: ../libbalsa/libbalsa-gpgme-widgets.c:307
-#| msgid " invalid"
 msgid "invalid"
 msgstr "неисправан"
 
@@ -1271,9 +1263,6 @@ msgid "Status:"
 msgstr "Стање:"
 
 #: ../libbalsa/libbalsa-gpgme-widgets.c:449
-#| msgid ""
-#| "\n"
-#| "Key fingerprint: %s"
 msgid "Fingerprint:"
 msgstr "Отисак кључа:"
 
@@ -1289,7 +1278,6 @@ msgid "Capabilities:"
 msgstr "Могућности:"
 
 #: ../libbalsa/libbalsa-gpgme-widgets.c:463
-#| msgid "Invalid date"
 msgid "invalid timestamp"
 msgstr "погрешна временска ознака"
 
@@ -1298,7 +1286,6 @@ msgid "not available"
 msgstr "није доступан"
 
 #: ../libbalsa/libbalsa-gpgme-widgets.c:469
-#| msgid "_Create"
 msgid "Created:"
 msgstr "Направљен:"
 
@@ -1308,7 +1295,6 @@ msgid "never"
 msgstr "никад"
 
 #: ../libbalsa/libbalsa-gpgme-widgets.c:477
-#| msgid " expired"
 msgid "Expires:"
 msgstr "Истиче:"
 
@@ -1317,7 +1303,6 @@ msgid "sign"
 msgstr "потпиши"
 
 #: ../libbalsa/libbalsa-gpgme-widgets.c:510
-#| msgid "Encrypt"
 msgid "encrypt"
 msgstr "шифруј"
 
@@ -1326,7 +1311,6 @@ msgid "certify"
 msgstr "потврди"
 
 #: ../libbalsa/libbalsa-gpgme-widgets.c:516
-#| msgid "_Authentication:"
 msgid "authenticate"
 msgstr "потврди идентитет"
 
@@ -1337,7 +1321,6 @@ msgstr "%u бита"
 
 #: ../libbalsa/libbalsa-gpgme-widgets.c:544
 #, c-format
-#| msgid "Moved to “%s”."
 msgid " curve “%s”"
 msgstr " крива „%s“"
 
@@ -1681,31 +1664,26 @@ msgstr "Грешка преименовања поруке"
 
 #: ../libbalsa/mailbox_pop3.c:259
 #, c-format
-#| msgid "Saving sent message to %s failed: %s"
 msgid "Saving the POP3 message UID list failed: %s"
 msgstr "Нисам успео да сачувам списак УИД-а ПОП3 поруке: „%s“"
 
 #: ../libbalsa/mailbox_pop3.c:297 ../libbalsa/mailbox_pop3.c:321
 #, c-format
-#| msgid "Saving POP message to %s failed"
 msgid "Passing POP message to %s failed: %s"
 msgstr "Нисам успео да проследим ПОП поруку за „%s“: %s"
 
 #: ../libbalsa/mailbox_pop3.c:326
 #, c-format
-#| msgid "Saving POP message to %s failed"
 msgid "Saving POP message failed"
 msgstr "Нисам успео да сачувам ПОП поруку"
 
 #: ../libbalsa/mailbox_pop3.c:345
 #, c-format
-#| msgid "Transferring POP message to %s failed."
 msgid "Transferring POP message to %s failed: %s"
 msgstr "Нисам успео да пренесем ПОП поруку до „%s“: %s"
 
 #: ../libbalsa/mailbox_pop3.c:380
 #, c-format
-#| msgid "Message from %s: %s"
 msgid "Message %lu of %lu (%s of %s)"
 msgstr "%lu. порука од %lu (%s од %s)"
 
@@ -1721,48 +1699,40 @@ msgstr "Не могу да учитам датотеку уверења „%s“
 
 #: ../libbalsa/mailbox_pop3.c:509
 #, c-format
-#| msgid "POP3 mailbox %s error: %s\n"
 msgid "POP3 mailbox %s: cannot connect %s: %s"
 msgstr "ПОП3 сандучете „%s“: не могу да се повежем са „%s“: %s"
 
 #: ../libbalsa/mailbox_pop3.c:518
 #, c-format
-#| msgid "POP3 mailbox %s error: %s\n"
 msgid "POP3 mailbox %s error: %s"
 msgstr "Грешка ПОП3 сандучета %s: %s"
 
 #: ../libbalsa/mailbox_pop3.c:562
 #, c-format
-#| msgid "POP3 message %d oversized: %d kB — skipped."
 msgid "POP3 message %d oversized: %s — skipped."
 msgstr "Премашена је величина ПОП3 поруке %d: %s — прескачем."
 
 #: ../libbalsa/mailbox_pop3.c:640
-#| msgid "not connected"
 msgid "Connected"
 msgstr "Повезан"
 
 #: ../libbalsa/mailbox_pop3.c:654
 #, c-format
-#| msgid "New message to %s: %s"
 msgid "%lu new messages (%s)"
 msgstr "%lu нове поруке (%s)"
 
 #: ../libbalsa/mailbox_pop3.c:665
-#| msgid "Deleting messages"
 msgid "Deleting messages on server…"
 msgstr "Бришем поруке на серверу…"
 
 #: ../libbalsa/mailbox_pop3.c:687
 #, c-format
-#| msgid "POP3 error: %s."
 msgid "POP3 error: %s"
 msgstr "ПОП3 грешка: %s"
 
 #. done - clean up
 #: ../libbalsa/mailbox_pop3.c:694 ../libbalsa/send.c:1093
 #, c-format
-#| msgid "_Finnish"
 msgid "Finished"
 msgstr "Завршено"
 
@@ -2215,13 +2185,11 @@ msgstr "лош ред „%s“, празан назив или вредност"
 
 #: ../libbalsa/send.c:211
 #, c-format
-#| msgid "SMT_P server:"
 msgid "SMTP server %s"
 msgstr "СМТП сервер „%s“"
 
 #: ../libbalsa/send.c:635
 #, c-format
-#| msgid "Page %d of %d"
 msgid "Message %u of %u"
 msgstr "%u. порука од %u"
 
@@ -2233,13 +2201,11 @@ msgstr ""
 "„%s“."
 
 #: ../libbalsa/send.c:848
-#| msgid "Sending Mail…"
 msgid "Sending Mail"
 msgstr "Шаљем пошту"
 
 #: ../libbalsa/send.c:954
 #, c-format
-#| msgid "Save this message and close"
 msgid "Save message in %s…"
 msgstr "Сачувај поруку у „%s“…"
 
@@ -2259,25 +2225,21 @@ msgstr ""
 
 #: ../libbalsa/send.c:1014
 #, c-format
-#| msgid "Reading embedded message failed: %s"
 msgid "Sending queued messages to %s"
 msgstr "Шаљем заказане поруке за „%s“"
 
 #: ../libbalsa/send.c:1022
 #, c-format
-#| msgid "Connected to MTA %s: %s"
 msgid "Connected to %s"
 msgstr "Повезан сам са „%s“"
 
 #: ../libbalsa/send.c:1076
 #, c-format
-#| msgid "Connecting MTA %s (%s) failed: %s"
 msgid "Connecting SMTP server %s (%s) failed: %s"
 msgstr "Нисам успео да се повежем са СМТП сервером „%s“ (%s): %s"
 
 #: ../libbalsa/send.c:1099
 #, c-format
-#| msgid "Forward message to %s: %s"
 msgid "Transmitted %u message to %s"
 msgid_plural "Transmitted %u messages to %s"
 msgstr[0] "Одаслао сам %u поруку за „%s“"
@@ -2616,7 +2578,6 @@ msgid "_Type of mail server:"
 msgstr "_Врста сервера поште:"
 
 #: ../libinit_balsa/assistant_page_user.c:114
-#| msgid "connection lost"
 msgid "Connection _Security"
 msgstr "Безбедност _везе"
 
@@ -2755,25 +2716,21 @@ msgstr "лош одговор сервера: %s"
 
 #: ../libnetclient/net-client-pop.c:253
 #, c-format
-#| msgid "bad server reply: %s"
 msgid "bad server reply"
 msgstr "лош одговор сервера"
 
 #: ../libnetclient/net-client-pop.c:423 ../libnetclient/net-client-pop.c:702
 #, c-format
-#| msgid "POP3 error: %s."
 msgid "error: %s"
 msgstr "грешка: %s"
 
 #: ../libnetclient/net-client-pop.c:426
 #, c-format
-#| msgid "No error"
 msgid "error"
 msgstr "грешка"
 
 #: ../libnetclient/net-client-pop.c:489 ../libnetclient/net-client-smtp.c:396
 #, c-format
-#| msgid "Password needed"
 msgid "password required"
 msgstr "потребна је лозинка"
 
@@ -2799,7 +2756,6 @@ msgstr "стална грешка %d: %s"
 
 #: ../libnetclient/net-client-utils.c:143
 #, c-format
-#| msgid "Removing duplicates failed: %s"
 msgid "importing GSS service name %s failed: %s"
 msgstr "нисам успео да увезем назив ГСС услуге „%s“: %s"
 
@@ -2825,7 +2781,6 @@ msgstr "не могу да направим захтев ГСС пријаве: 
 
 #: ../libnetclient/net-client-utils.c:315
 #, c-format
-#| msgid "unknown error"
 msgid "unknown error code %u:%u"
 msgstr "непознат код грешке %u:%u"
 
@@ -3579,7 +3534,6 @@ msgstr "Не могу да сачувам текстуални део: %s"
 
 #: ../src/balsa-mime-widget-crypto.c:83
 #, c-format
-#| msgid "Could not open trash: %s"
 msgid "Could not process GnuPG keys: %s"
 msgstr "Не могу да обрадим ГнуПГ кључеве: %s"
 
@@ -3588,7 +3542,6 @@ msgid "_Search key server for this key"
 msgstr "Потражи овај кључ на _серверу кључева"
 
 #: ../src/balsa-mime-widget-crypto.c:134
-#| msgid "_Run GnuPG to check for an update of this key"
 msgid "_Search key server for updates of this key"
 msgstr "Потражи ажурирања овог кључа на _серверу кључева"
 
@@ -3603,12 +3556,10 @@ msgstr ""
 
 #: ../src/balsa-mime-widget-crypto.c:272
 #, c-format
-#| msgid "Error printing message: %s"
 msgid "Error importing key data: %s"
 msgstr "Грешка увоза података кључева: %s"
 
 #: ../src/balsa-mime-widget-crypto.c:309
-#| msgid "_Re-import"
 msgid "(imported)"
 msgstr "(увезен)"
 
@@ -4758,7 +4709,6 @@ msgid "Mailbox _name:"
 msgstr "Назив _сандучета:"
 
 #: ../src/mailbox-conf.c:1294
-#| msgid "SMTP over SSL (SMTPS)"
 msgid "POP3 over SSL (POP3S)"
 msgstr "ПОП3 преко ССЛ-а (ПОП3С)"
 
@@ -5468,7 +5418,6 @@ msgid "Send button always queues outgoing mail in outbox"
 msgstr "Дугме за слање увек смешта поруку у „Одлазно“"
 
 #: ../src/pref-manager.c:2306
-#| msgid "_Check mail automatically every"
 msgid "_Send queued mail automatically every"
 msgstr "_Сам пошаљи спремну пошту сваких"
 
@@ -5489,7 +5438,6 @@ msgid "Use preview pane"
 msgstr "Користи површ за преглед"
 
 #: ../src/pref-manager.c:2343
-#| msgid "Select all messages in current mailbox"
 msgid "Show message counts in mailbox list"
 msgstr "Прикажи број порука на списку сандучета"
 
@@ -6393,7 +6341,6 @@ msgstr ""
 
 #: ../src/sendmsg-window.c:4671
 #, c-format
-#| msgid "attached file “%s” (%s)"
 msgid "Cannot not read the file “%s”: %s"
 msgstr "Не могу да прочитам датотеку „%s“: %s"
 
@@ -6768,7 +6715,6 @@ msgid "Send"
 msgstr "Пошаљи"
 
 #: ../src/toolbar-factory.c:160
-#| msgid "_Send Queued Mail"
 msgid "Send queued"
 msgstr "Пошаљи припремљено"
 
@@ -6956,37 +6902,30 @@ msgid "_File"
 msgstr "_Датотека"
 
 #: ../ui/ab-main.ui.h:3
-#| msgid "vCard Address Book (GnomeCard)"
 msgid "_VCard Address Book (GnomeCard)"
 msgstr "Адресар _Вкартице (Гномова картица)"
 
 #: ../ui/ab-main.ui.h:4
-#| msgid "External query (a program)"
 msgid "_External query (a program)"
 msgstr "_Спољни упит (програм)"
 
 #: ../ui/ab-main.ui.h:5
-#| msgid "LDIF Address Book"
 msgid "_LDIF Address Book"
 msgstr "_ЛДИФ адресар"
 
 #: ../ui/ab-main.ui.h:6
-#| msgid "LDAP Address Book"
 msgid "_LDAP Address Book"
 msgstr "_ЛДАП адресар"
 
 #: ../ui/ab-main.ui.h:7
-#| msgid "GPE Address Book"
 msgid "_GPE Address Book"
 msgstr "_ГПЕ адресар"
 
 #: ../ui/ab-main.ui.h:8
-#| msgid "Rubrica Address Book"
 msgid "_Rubrica Address Book"
 msgstr "Адресар _рубрике"
 
 #: ../ui/ab-main.ui.h:9 ../ui/main-window.ui.h:68
-#| msgid "_Properties…"
 msgid "_Properties"
 msgstr "_Својства"
 
@@ -7015,22 +6954,18 @@ msgid "_Message"
 msgstr "_Порука"
 
 #: ../ui/main-window.ui.h:3
-#| msgid "Local _mbox mailbox…"
 msgid "Local mbox mailbox…"
 msgstr "Месно сандуче „mbox“…"
 
 #: ../ui/main-window.ui.h:4
-#| msgid "Local Mail_dir mailbox…"
 msgid "Local Maildir mailbox…"
 msgstr "Месно сандуче „Maildir“…"
 
 #: ../ui/main-window.ui.h:5
-#| msgid "Local M_H mailbox…"
 msgid "Local MH mailbox…"
 msgstr "Месно сандуче „MH“…"
 
 #: ../ui/main-window.ui.h:8
-#| msgid "Remote IMAP _subfolder…"
 msgid "Remote IMAP subfolder…"
 msgstr "Удаљена подфасцикла ИМАП-а…"
 
@@ -7039,27 +6974,22 @@ msgid "_Settings"
 msgstr "_Подешавања"
 
 #: ../ui/main-window.ui.h:10
-#| msgid "Toolbar _style…"
 msgid "_Toolbars…"
 msgstr "_Траке алата…"
 
 #: ../ui/main-window.ui.h:11
-#| msgid "_Identities..."
 msgid "_Identities…"
 msgstr "_Личности…"
 
 #: ../ui/main-window.ui.h:12
-#| msgid "Address Book"
 msgid "_Address Book"
 msgstr "_Адресар"
 
 #: ../ui/main-window.ui.h:13
-#| msgid "Prefere_nces"
 msgid "_Preferences"
 msgstr "_Поставке"
 
 #: ../ui/main-window.ui.h:18
-#| msgid "Next Message"
 msgid "New _Message"
 msgstr "Нова _порука"
 
@@ -7085,7 +7015,6 @@ msgstr "_Подеси страницу"
 
 #: ../ui/main-window.ui.h:24 ../ui/message-window.ui.h:3
 #: ../ui/sendmsg-window.ui.h:11
-#| msgid "Print…"
 msgid "_Print…"
 msgstr "_Штампај…"
 
@@ -7111,12 +7040,10 @@ msgid "Find in _Message"
 msgstr "_Нађи унутар поруке"
 
 #: ../ui/main-window.ui.h:32
-#| msgid "F_ilters"
 msgid "F_ilters…"
 msgstr "Ф_илтери_"
 
 #: ../ui/main-window.ui.h:33
-#| msgid "Export Filters"
 msgid "_Export Filters…"
 msgstr "_Извези филтере…"
 
@@ -7183,18 +7110,15 @@ msgid "_Collapse All"
 msgstr "_Скупи све"
 
 #: ../ui/main-window.ui.h:49 ../ui/message-window.ui.h:15
-#| msgid "Zoom In"
 msgid "Zoom _In"
 msgstr "У_већај"
 
 #: ../ui/main-window.ui.h:50 ../ui/message-window.ui.h:16
-#| msgid "Zoom Out"
 msgid "Zoom _Out"
 msgstr "У_мањи"
 
 #: ../ui/main-window.ui.h:52 ../ui/message-window.ui.h:18
 #, no-c-format
-#| msgid "Zoom 100%"
 msgid "Zoom _100%"
 msgstr "Увећај на _100%"
 
@@ -7227,7 +7151,6 @@ msgid "_Deleted"
 msgstr "_Обрисана"
 
 #: ../ui/main-window.ui.h:60
-#| msgid "Un_Deleted"
 msgid "Un_deleted"
 msgstr "Поништено _брисање"
 
@@ -7265,7 +7188,6 @@ msgid "Empty _Trash"
 msgstr "Испразни _смеће"
 
 #: ../ui/main-window.ui.h:73
-#| msgid "Select _Filters"
 msgid "Select _Filters…"
 msgstr "Изабери _филтере…"
 
@@ -7274,12 +7196,10 @@ msgid "_Remove Duplicates"
 msgstr "_Уклони дупликате"
 
 #: ../ui/main-window.ui.h:76 ../ui/message-window.ui.h:22
-#| msgid "Reply To _All…"
 msgid "Reply to _All…"
 msgstr "Одговори _свима…"
 
 #: ../ui/main-window.ui.h:77 ../ui/message-window.ui.h:23
-#| msgid "Reply To _Group…"
 msgid "Reply to _Group…"
 msgstr "Одговори _групи…"
 
@@ -7292,12 +7212,10 @@ msgid "_Previous Part"
 msgstr "_Претходни део"
 
 #: ../ui/main-window.ui.h:83 ../ui/message-window.ui.h:28
-#| msgid "Save Current Part..."
 msgid "Save Current Part…"
 msgstr "Сачувај текући део…"
 
 #: ../ui/main-window.ui.h:84 ../ui/message-window.ui.h:29
-#| msgid "_View Source"
 msgid "_View Source…"
 msgstr "_Погледај извор…"
 
@@ -7314,32 +7232,26 @@ msgid "_Toggle Flag"
 msgstr "_Измени ознаку"
 
 #: ../ui/sendmsg-window.ui.h:2
-#| msgid "_Include File..."
 msgid "_Include File…"
 msgstr "_Укључи датотеку…"
 
 #: ../ui/sendmsg-window.ui.h:3
-#| msgid "_Attach File..."
 msgid "_Attach File…"
 msgstr "Приложи _датотеку…"
 
 #: ../ui/sendmsg-window.ui.h:4
-#| msgid "I_nclude Message(s)"
 msgid "I_nclude Messages…"
 msgstr "_Укључи поруке…"
 
 #: ../ui/sendmsg-window.ui.h:5
-#| msgid "Attach _Message(s)"
 msgid "Attach _Messages…"
 msgstr "_Приложи поруке…"
 
 #: ../ui/sendmsg-window.ui.h:9
-#| msgid "Save"
 msgid "_Save"
 msgstr "_Сачувај"
 
 #: ../ui/sendmsg-window.ui.h:10
-#| msgid "Page _Setup"
 msgid "Page S_etup"
 msgstr "_Подеси страницу"
 
@@ -7372,12 +7284,10 @@ msgid "C_heck Spelling"
 msgstr "Про_вери правопис"
 
 #: ../ui/sendmsg-window.ui.h:25
-#| msgid "Select Identity"
 msgid "Select _Identity…"
 msgstr "_Изабери личност…"
 
 #: ../ui/sendmsg-window.ui.h:26
-#| msgid "_Edit with Gnome-Editor"
 msgid "Edit with Gnome-Editor"
 msgstr "Уреди помоћу Гномовог уређивача"
 
@@ -7410,7 +7320,6 @@ msgid "_Request Disposition Notification"
 msgstr "_Захтевај обавештење о приспећу"
 
 #: ../ui/sendmsg-window.ui.h:36
-#| msgid "_Request Disposition Notification"
 msgid "_Request Delivery Status Notification"
 msgstr "_Захтевај обавештење о приспећу"
 
@@ -7431,17 +7340,14 @@ msgid "_Encrypt Message"
 msgstr "_Шифруј поруку"
 
 #: ../ui/sendmsg-window.ui.h:41
-#| msgid "_GnuPG uses MIME mode"
 msgid "GnuPG uses _MIME mode"
 msgstr "ГнуПГ користи _МИМЕ режим"
 
 #: ../ui/sendmsg-window.ui.h:42
-#| msgid "_GnuPG uses old OpenPGP mode"
 msgid "GnuPG uses old _OpenPGP mode"
 msgstr "ГнуПГ користи стари _ОпенПГП режим"
 
 #: ../ui/sendmsg-window.ui.h:43
-#| msgid "_S/MIME mode (GpgSM)"
 msgid "S/MIME mode (_GpgSM)"
 msgstr "С/МИМЕ режим (_ГпгСМ)"
 

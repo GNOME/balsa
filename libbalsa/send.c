@@ -704,6 +704,7 @@ lbs_process_queue_msg(guint 		   msgno,
 	LibBalsaMessage* msg;
 	const gchar* smtp_server_name;
 	LibBalsaMsgCreateResult created;
+        const gchar *dsn_header;
 
 	/* Skip this message if it either FLAGGED or DELETED: */
 	if (!libbalsa_mailbox_msgno_has_flags(send_message_info->outbox, msgno, 0,
@@ -729,7 +730,8 @@ lbs_process_queue_msg(guint 		   msgno,
 		return;
 	}
 
-	msg->request_dsn = (atoi(libbalsa_message_get_user_header(msg, "X-Balsa-DSN")) != 0);
+        dsn_header = libbalsa_message_get_user_header(msg, "X-Balsa-DSN");
+        msg->request_dsn = dsn_header != NULL ? atoi(dsn_header) != 0 : FALSE;
 	new_message = msg_queue_item_new(send_message_info);
 	created = libbalsa_fill_msg_queue_item_from_queu(msg, new_message);
 	libbalsa_message_body_unref(msg);

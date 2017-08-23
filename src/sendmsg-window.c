@@ -4156,7 +4156,7 @@ create_lang_menu(GtkWidget * parent, BalsaSendmsg * bsmsg)
 
 /* Standard buttons; "" means a separator. */
 static const BalsaToolbarEntry compose_toolbar[] = {
-    { "send",         BALSA_PIXMAP_SEND       },
+    { "toolbar-send", BALSA_PIXMAP_SEND       },
     { "", ""                                  },
     { "attach-file",  BALSA_PIXMAP_ATTACHMENT },
     { "", ""                                  },

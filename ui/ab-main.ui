@@ -4,10 +4,10 @@
             <attribute name='label' translatable='yes'>_File</attribute>
             <section>
                 <submenu>
-                    <!-- Translators: main menu item "New" address book -->
                     <attribute name='label'
                         translatable='yes'
-                        context='address book'>_New</attribute>
+                        context='address book'
+                        comments='Translators: main menu item - New address book'>_New</attribute>
                     <item>
                         <attribute name='label'
                             translatable='yes'>_VCard Address Book (GnomeCard)</attribute>

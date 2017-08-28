@@ -956,7 +956,7 @@ bab_window_new(GtkApplication * application)
     gtk_container_add(GTK_CONTAINER(scroll), contacts_app.entry_list);
 
     gtk_notebook_append_page(GTK_NOTEBOOK(contacts_app.notebook), browse_widget,
-			     gtk_label_new("Browse"));
+			     gtk_label_new(_("Browse")));
 
     edit_widget = gtk_box_new(GTK_ORIENTATION_VERTICAL, 1);
     contacts_app.edit_widget =
@@ -970,7 +970,7 @@ bab_window_new(GtkApplication * application)
                        FALSE, FALSE, 1);
 
     gtk_notebook_append_page(GTK_NOTEBOOK(contacts_app.notebook), edit_widget,
-			     gtk_label_new("Edit"));
+			     gtk_label_new(_("Edit")));
 
     /*
     g_signal_connect(G_OBJECT(find_entry), "changed",

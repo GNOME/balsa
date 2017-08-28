@@ -156,7 +156,7 @@
       <section>
         <item>
           <attribute name='label'
-            translatable='yes'>Edit with Gnome-Editor</attribute>
+            translatable='yes'>Edit with GNOME-Editor</attribute>
           <attribute name='action'>win.edit</attribute>
         </item>
       </section>

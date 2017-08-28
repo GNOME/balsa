@@ -815,7 +815,7 @@ sw_edit_activated(GSimpleAction * action,
     if (!app) {
         balsa_information_parented(GTK_WINDOW(bsmsg->window),
                                    LIBBALSA_INFORMATION_ERROR,
-                                   _("Gnome editor is not defined"
+                                   _("GNOME editor is not defined"
                                      " in your preferred applications."));
         return;
     }

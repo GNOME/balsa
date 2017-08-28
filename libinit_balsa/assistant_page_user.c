@@ -111,7 +111,7 @@ balsa_druid_page_user_init(BalsaDruidPageUser * user,
                                server_types, druid, &(user->incoming_type));
 
     balsa_init_add_grid_option(grid, row++,
-    						   _("Connection _Security"),
+    						   _("Connection _Security:"),
 							   security_modes, druid, &(user->security));
     gtk_combo_box_set_active(GTK_COMBO_BOX(user->security), NET_CLIENT_CRYPT_STARTTLS - 1);
 

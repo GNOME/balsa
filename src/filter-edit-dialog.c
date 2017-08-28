@@ -221,7 +221,8 @@ build_left_side(void)
     gtk_box_pack_start(GTK_BOX(vbox), bbox, FALSE, FALSE, 2);
 
     /* new button */
-    fe_new_button = gtk_button_new_with_mnemonic(_("_New"));
+    /* Translators: button "New" filter */
+    fe_new_button = gtk_button_new_with_mnemonic(C_("filter", "_New"));
     g_signal_connect(G_OBJECT(fe_new_button), "clicked",
 		     G_CALLBACK(fe_new_pressed), NULL);
     gtk_container_add(GTK_CONTAINER(bbox), fe_new_button);
@@ -311,7 +312,8 @@ build_match_page()
     gtk_container_add(GTK_CONTAINER(box), fe_condition_edit_button);
     g_signal_connect(G_OBJECT(fe_condition_edit_button), "clicked",
                      G_CALLBACK(fe_edit_condition), GINT_TO_POINTER(0));
-    button = gtk_button_new_with_mnemonic(_("Ne_w"));
+    /* Translators: button "New" filter match */
+    button = gtk_button_new_with_mnemonic(C_("filter match", "Ne_w"));
     gtk_container_add(GTK_CONTAINER(box), button);
     g_signal_connect(G_OBJECT(button), "clicked",
                      G_CALLBACK(fe_edit_condition), GINT_TO_POINTER(1));

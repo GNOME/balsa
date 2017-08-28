@@ -1075,7 +1075,8 @@ balsa_mailbox_node_get_context_menu(BalsaMailboxNode * mbnode)
 		   G_CALLBACK(folder_conf_add_imap_sub_cb), NULL);
     gtk_widget_show(submenu);
     
-    menuitem = gtk_menu_item_new_with_mnemonic(_("_New"));
+    /* Translators: popup menu item "New" mailbox or folder */
+    menuitem = gtk_menu_item_new_with_mnemonic(C_("mailbox", "_New"));
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(menuitem), submenu);
     gtk_widget_show(menuitem);
     

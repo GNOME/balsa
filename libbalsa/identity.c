@@ -1771,10 +1771,11 @@ libbalsa_identity_config_dialog(GtkWindow *parent, GList **identities,
                                     parent, /* must NOT be modal */
                                     GTK_DIALOG_DESTROY_WITH_PARENT |
                                     libbalsa_dialog_flags(),
-                                    _("_Help"),   IDENTITY_RESPONSE_HELP,
-                                    _("_New"),    IDENTITY_RESPONSE_NEW,
-                                    _("_Remove"), IDENTITY_RESPONSE_REMOVE,
-                                    _("_Close"),  IDENTITY_RESPONSE_CLOSE,
+                                    _("_Help"),             IDENTITY_RESPONSE_HELP,
+                                    /* Translators: button "New" identity */
+                                    C_("identity", "_New"), IDENTITY_RESPONSE_NEW,
+                                    _("_Remove"),           IDENTITY_RESPONSE_REMOVE,
+                                    _("_Close"),            IDENTITY_RESPONSE_CLOSE,
                                     NULL);
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu_for_parent(dialog, parent);

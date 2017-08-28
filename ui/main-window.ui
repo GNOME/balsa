@@ -1,7 +1,8 @@
 <interface>
   <menu id='app-menu'>
     <submenu>
-      <attribute name='label' translatable='yes'>_New</attribute>
+      <!-- Translators: app menu item "New" message or mailbox -->
+      <attribute name='label' translatable='yes' context='appmenu'>_New</attribute>
       <section>
         <item>
           <attribute name='label' translatable='yes'>_Message</attribute>

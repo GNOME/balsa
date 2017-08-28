@@ -16,8 +16,8 @@ msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: https://bugzilla.gnome.org/enter_bug.cgi?"
 "product=balsa&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2017-08-28 11:09+0000\n"
-"PO-Revision-Date: 2017-08-28 13:26+0200\n"
+"POT-Creation-Date: 2017-08-28 13:30+0000\n"
+"PO-Revision-Date: 2017-08-28 15:34+0200\n"
 "Last-Translator: Marek Černocký <marek@manet.cz>\n"
 "Language-Team: čeština <gnome-cs-list@gnome.org>\n"
 "Language: cs\n"
@@ -411,8 +411,8 @@ msgstr ""
 msgid "_Download images"
 msgstr "_Stáhnout obrázky"
 
-#: ../libbalsa/html.c:419 ../libbalsa/html.c:1089 ../libbalsa/identity.c:1777
-#: ../src/ab-window.c:148 ../src/mailbox-node.c:1113 ../src/main-window.c:3911
+#: ../libbalsa/html.c:419 ../libbalsa/html.c:1089 ../libbalsa/identity.c:1778
+#: ../src/ab-window.c:148 ../src/mailbox-node.c:1114 ../src/main-window.c:3911
 #: ../src/toolbar-prefs.c:140 ../ui/main-window.ui.h:71
 #: ../ui/message-window.ui.h:4 ../ui/sendmsg-window.ui.h:12
 #: ../ui/source-viewer.ui.h:2
@@ -456,8 +456,8 @@ msgstr "Podpis v %s není text v UTF-8."
 #: ../src/address-book-config.c:342 ../src/address-book-config.c:388
 #: ../src/balsa-app.c:89 ../src/balsa-index.c:2657 ../src/balsa-mblist.c:1895
 #: ../src/balsa-message.c:1766 ../src/balsa-mime-widget-callbacks.c:85
-#: ../src/filter-edit-callbacks.c:1247 ../src/filter-edit-dialog.c:402
-#: ../src/filter-edit-dialog.c:571 ../src/filter-export-dialog.c:79
+#: ../src/filter-edit-callbacks.c:1247 ../src/filter-edit-dialog.c:404
+#: ../src/filter-edit-dialog.c:573 ../src/filter-export-dialog.c:79
 #: ../src/filter-run-dialog.c:316 ../src/folder-conf.c:311
 #: ../src/folder-conf.c:573 ../src/folder-conf.c:806 ../src/mailbox-conf.c:462
 #: ../src/mailbox-conf.c:483 ../src/mailbox-conf.c:499
@@ -474,7 +474,7 @@ msgstr "_Zrušit"
 #: ../libbalsa/libbalsa-gpgme-cb.c:349 ../libbalsa/smtp-server.c:470
 #: ../src/ab-window.c:140 ../src/balsa-app.c:88 ../src/balsa-message.c:1767
 #: ../src/balsa-mime-widget-callbacks.c:86 ../src/filter-edit-callbacks.c:1246
-#: ../src/filter-edit-dialog.c:570 ../src/filter-export-dialog.c:78
+#: ../src/filter-edit-dialog.c:572 ../src/filter-export-dialog.c:78
 #: ../src/filter-run-dialog.c:315 ../src/main-window.c:4006
 #: ../src/pref-manager.c:3296 ../src/sendmsg-window.c:1556
 #: ../src/sendmsg-window.c:2010 ../src/sendmsg-window.c:3333
@@ -695,7 +695,7 @@ msgstr "Správa identit"
 #: ../libbalsa/identity.c:1774 ../libbalsa/smtp-server.c:472
 #: ../src/address-book-config.c:238 ../src/address-book-config.c:340
 #: ../src/address-book-config.c:386 ../src/filter-edit-callbacks.c:1248
-#: ../src/filter-edit-dialog.c:572 ../src/filter-export-dialog.c:80
+#: ../src/filter-edit-dialog.c:574 ../src/filter-export-dialog.c:80
 #: ../src/filter-run-dialog.c:317 ../src/folder-conf.c:312
 #: ../src/folder-conf.c:574 ../src/folder-conf.c:807 ../src/main-window.c:3910
 #: ../src/pref-manager.c:3299 ../src/toolbar-prefs.c:141 ../ui/ab-main.ui.h:15
@@ -703,26 +703,27 @@ msgstr "Správa identit"
 msgid "_Help"
 msgstr "_Nápověda"
 
-#. new button
-#: ../libbalsa/identity.c:1775 ../src/filter-edit-dialog.c:224
-#: ../src/mailbox-node.c:1078 ../ui/ab-main.ui.h:2 ../ui/main-window.ui.h:1
+#. Translators: button "New" identity
+#: ../libbalsa/identity.c:1776
+#| msgid "_New"
+msgctxt "identity"
 msgid "_New"
 msgstr "_Nová"
 
-#: ../libbalsa/identity.c:1776 ../src/ab-main.c:853
-#: ../src/filter-edit-callbacks.c:1081 ../src/filter-edit-dialog.c:318
+#: ../libbalsa/identity.c:1777 ../src/ab-main.c:853
+#: ../src/filter-edit-callbacks.c:1081 ../src/filter-edit-dialog.c:320
 msgid "_Remove"
 msgstr "Odst_ranit"
 
-#: ../libbalsa/identity.c:2161
+#: ../libbalsa/identity.c:2162
 msgid "GnuPG MIME mode"
 msgstr "Režim GnuPG MIME"
 
-#: ../libbalsa/identity.c:2163
+#: ../libbalsa/identity.c:2164
 msgid "GnuPG OpenPGP mode"
 msgstr "Režim GnuPG OpenPGP"
 
-#: ../libbalsa/identity.c:2165
+#: ../libbalsa/identity.c:2166
 msgid "GpgSM S/MIME mode"
 msgstr "Režim GpgSM S/MIME"
 
@@ -1376,7 +1377,7 @@ msgstr "Nelze vytvořit poštovní schránku typu %s"
 #: ../libbalsa/mailbox.c:854
 #, c-format
 msgid "Applying filter rules to %s"
-msgstr "Aplikovat pravidla filtrování na %s"
+msgstr "Použít pravidla filtrování na %s"
 
 #: ../libbalsa/mailbox.c:1019
 #, c-format
@@ -2812,7 +2813,7 @@ msgstr "_Adresa"
 
 #: ../src/ab-main.c:848 ../src/address-book-config.c:226
 #: ../src/address-book-config.c:331 ../src/address-book-config.c:375
-#: ../src/filter-edit-dialog.c:498 ../src/main-window.c:3970
+#: ../src/filter-edit-dialog.c:500 ../src/main-window.c:3970
 #: ../src/pref-manager.c:3297
 msgid "_Apply"
 msgstr "_Použít"
@@ -3089,12 +3090,12 @@ msgstr "Přeposlat v_ložené…"
 msgid "_Pipe through…"
 msgstr "_Filtrovat programem…"
 
-#: ../src/balsa-index.c:1823 ../ui/main-window.ui.h:88
+#: ../src/balsa-index.c:1823 ../ui/main-window.ui.h:89
 msgid "_Store Address…"
 msgstr "_Uložit adresu…"
 
-#: ../src/balsa-index.c:1837 ../src/mailbox-node.c:1105
-#: ../src/mailbox-node.c:1121 ../src/pref-manager.c:2019
+#: ../src/balsa-index.c:1837 ../src/mailbox-node.c:1106
+#: ../src/mailbox-node.c:1122 ../src/pref-manager.c:2019
 #: ../src/pref-manager.c:2104 ../src/pref-manager.c:2798 ../ui/ab-main.ui.h:10
 #: ../ui/main-window.ui.h:69
 msgid "_Delete"
@@ -4136,84 +4137,95 @@ msgstr "NEBO"
 msgid "AND"
 msgstr "A"
 
+#. new button
+#. Translators: button "New" filter
+#: ../src/filter-edit-dialog.c:225
+#| msgid "_New"
+msgctxt "filter"
+msgid "_New"
+msgstr "_Nový"
+
 #. The name entry
-#: ../src/filter-edit-dialog.c:258
+#: ../src/filter-edit-dialog.c:259
 msgid "_Filter name:"
 msgstr "Název _filtru:"
 
 #. The filter op-code : "OR" or "AND" all the conditions
-#: ../src/filter-edit-dialog.c:272
+#: ../src/filter-edit-dialog.c:273
 msgid "Operation between conditions:"
 msgstr "Operace mezi podmínkami:"
 
-#: ../src/filter-edit-dialog.c:309 ../ui/main-window.ui.h:25
+#: ../src/filter-edit-dialog.c:310 ../ui/main-window.ui.h:25
 #: ../ui/message-window.ui.h:5 ../ui/sendmsg-window.ui.h:13
 #: ../ui/source-viewer.ui.h:3
 msgid "_Edit"
 msgstr "_Upravit"
 
-#: ../src/filter-edit-dialog.c:314
+#. Translators: button "New" filter match
+#: ../src/filter-edit-dialog.c:316
+#| msgid "Ne_w"
+msgctxt "filter match"
 msgid "Ne_w"
-msgstr "No_vý"
+msgstr "No_vé"
 
-#: ../src/filter-edit-dialog.c:346
+#: ../src/filter-edit-dialog.c:348
 msgid "Foreground"
 msgstr "Popředí"
 
-#: ../src/filter-edit-dialog.c:357
+#: ../src/filter-edit-dialog.c:359
 msgid "Background"
 msgstr "Pozadí"
 
 #. The notification area
-#: ../src/filter-edit-dialog.c:383
+#: ../src/filter-edit-dialog.c:385
 msgid "Notification:"
 msgstr "Oznámení:"
 
 #. Notification buttons
-#: ../src/filter-edit-dialog.c:395
+#: ../src/filter-edit-dialog.c:397
 msgid "Play sound:"
 msgstr "Přehrát zvuk:"
 
-#: ../src/filter-edit-dialog.c:400
+#: ../src/filter-edit-dialog.c:402
 msgid "Use Sound…"
 msgstr "Použít zvuk…"
 
-#: ../src/filter-edit-dialog.c:403 ../src/mailbox-node.c:1111
+#: ../src/filter-edit-dialog.c:405 ../src/mailbox-node.c:1112
 msgid "_Open"
 msgstr "_Otevřít"
 
-#: ../src/filter-edit-dialog.c:418
+#: ../src/filter-edit-dialog.c:420
 msgid "Pop-up text:"
 msgstr "Vyskakovací text:"
 
 #. The action area
-#: ../src/filter-edit-dialog.c:435
+#: ../src/filter-edit-dialog.c:437
 msgid "Action to perform:"
 msgstr "Provést akci:"
 
-#: ../src/filter-edit-dialog.c:489
+#: ../src/filter-edit-dialog.c:491
 msgid "Match"
-msgstr "Shoda"
+msgstr "Pravidlo"
 
-#: ../src/filter-edit-dialog.c:492
+#: ../src/filter-edit-dialog.c:494
 msgid "Action"
-msgstr "Činnost"
+msgstr "Akce"
 
-#: ../src/filter-edit-dialog.c:503
+#: ../src/filter-edit-dialog.c:505
 msgid "Re_vert"
 msgstr "_Vrátit zpět"
 
-#: ../src/filter-edit-dialog.c:554
+#: ../src/filter-edit-dialog.c:556
 msgid "A filter run dialog is open. Close it before you can modify filters."
 msgstr ""
 "Je otevřeno dialogové okno s běžícím filtrem. Před úpravou filtrů jej prosím "
 "zavřete."
 
-#: ../src/filter-edit-dialog.c:567
+#: ../src/filter-edit-dialog.c:569
 msgid "Filters"
 msgstr "Filtry"
 
-#: ../src/filter-edit-dialog.c:635
+#: ../src/filter-edit-dialog.c:637
 #, c-format
 msgid "Filter “%s” has no condition."
 msgstr "Filtr „%s“ nemá podmínku."
@@ -4305,15 +4317,15 @@ msgstr "Posunout vybraný filtr níž"
 
 #: ../src/filter-run-dialog.c:443
 msgid "A_pply Now!"
-msgstr "_Aplikovat teď!"
+msgstr "_Použít teď!"
 
 #: ../src/filter-run-dialog.c:489
 msgid ""
 "The filters dialog is opened, close it before you can run filters on any "
 "mailbox"
 msgstr ""
-"Dialog s filtry je otevřen. Než budete moci na schránky aplikovat filtry, "
-"musíte jej uzavřít."
+"Je otevřené dialogové okno s filtry. Než budete moci na schránky použít "
+"filtry, musíte jej uzavřít."
 
 #: ../src/folder-conf.c:117
 #, c-format
@@ -4835,58 +4847,65 @@ msgstr "_Vzdálená složka typu IMAP…"
 msgid "Remote IMAP _subfolder…"
 msgstr "Vzdálená pod_složka typu IMAP…"
 
+#. Translators: popup menu item "New" mailbox or folder
+#: ../src/mailbox-node.c:1079
+#| msgid "_New"
+msgctxt "mailbox"
+msgid "_New"
+msgstr "_Nová"
+
 #. clicked on the empty space
-#: ../src/mailbox-node.c:1085 ../src/mailbox-node.c:1101
+#: ../src/mailbox-node.c:1086 ../src/mailbox-node.c:1102
 msgid "_Rescan"
 msgstr "_Přezkoumat"
 
-#: ../src/mailbox-node.c:1095
+#: ../src/mailbox-node.c:1096
 msgid "_Properties…"
 msgstr "Vlas_tnosti…"
 
-#: ../src/mailbox-node.c:1125
+#: ../src/mailbox-node.c:1126
 msgid "_Subscribe"
 msgstr "Přihlá_sit se"
 
-#: ../src/mailbox-node.c:1127
+#: ../src/mailbox-node.c:1128
 msgid "_Unsubscribe"
 msgstr "_Odhlásit se"
 
-#: ../src/mailbox-node.c:1133
+#: ../src/mailbox-node.c:1134
 msgid "Mark as _Inbox"
 msgstr "Označ_it jako „Doručená pošta“"
 
-#: ../src/mailbox-node.c:1135
+#: ../src/mailbox-node.c:1136
 msgid "_Mark as Sentbox"
 msgstr "Označit _jako „Odeslaná pošta“"
 
-#: ../src/mailbox-node.c:1137
+#: ../src/mailbox-node.c:1138
 msgid "Mark as _Trash"
 msgstr "Označi_t jako „Koš“"
 
-#: ../src/mailbox-node.c:1139
+#: ../src/mailbox-node.c:1140
 msgid "Mark as D_raftbox"
 msgstr "Označit jako „_Rozepsaná pošta“"
 
-#: ../src/mailbox-node.c:1142
+#: ../src/mailbox-node.c:1143
 msgid "_Empty trash"
 msgstr "Vy_sypat koš"
 
-#: ../src/mailbox-node.c:1147
+#: ../src/mailbox-node.c:1148
 msgid "_Edit/Apply filters"
-msgstr "U_pravit/Aplikovat filtry"
+msgstr "U_pravit/použít filtry"
 
-#: ../src/mailbox-node.c:1234
+#: ../src/mailbox-node.c:1235
 #, c-format
 msgid "The path “%s” does not lead to a mailbox."
 msgstr "Cesta „%s“ nevede k poštovní schránce."
 
-#: ../src/mailbox-node.c:1247
+#: ../src/mailbox-node.c:1248
 #, c-format
 msgid "Local mailbox %s loaded as: %s\n"
 msgstr "Místní poštovní schránka %s načtena jako: %s\n"
 
-#: ../src/mailbox-node.c:1278
+#: ../src/mailbox-node.c:1279
 #, c-format
 msgid "Local folder %s\n"
 msgstr "Místní složka %s\n"
@@ -5022,7 +5041,7 @@ msgstr "Balsa zavírá soubory a spojení. Počkejte prosím…"
 
 #: ../src/main-window.c:1402
 msgid "You can apply filters only on mailbox\n"
-msgstr "Filtry lze aplikovat pouze na poštovní schránky\n"
+msgstr "Filtry lze použít pouze na poštovní schránky\n"
 
 #: ../src/main-window.c:1422
 #, c-format
@@ -6904,6 +6923,12 @@ msgstr "Posunout vybrané položky níž"
 msgid "_File"
 msgstr "_Soubor"
 
+#: ../ui/ab-main.ui.h:2
+#| msgid "_New"
+msgctxt "address book"
+msgid "_New"
+msgstr "_Nový"
+
 #: ../ui/ab-main.ui.h:3
 msgid "_VCard Address Book (GnomeCard)"
 msgstr "Adresář typu _vCard (GnomeCard)"
@@ -6951,6 +6976,12 @@ msgstr "O_dstranit záznam"
 #: ../ui/ab-main.ui.h:16 ../ui/main-window.ui.h:15
 msgid "_About"
 msgstr "O _aplikaci"
+
+#: ../ui/main-window.ui.h:1
+#| msgid "_New"
+msgctxt "appmenu"
+msgid "_New"
+msgstr "_Nová"
 
 #: ../ui/main-window.ui.h:2 ../ui/message-window.ui.h:20
 msgid "_Message"
@@ -7233,6 +7264,10 @@ msgstr "Přesu_nout do koše"
 #: ../ui/main-window.ui.h:87
 msgid "_Toggle Flag"
 msgstr "Přepnout _příznak"
+
+#: ../ui/main-window.ui.h:88
+msgid "_New"
+msgstr "_Nová"
 
 #: ../ui/sendmsg-window.ui.h:2
 msgid "_Include File…"

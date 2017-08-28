@@ -651,7 +651,6 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
 			fd.mailbox = mailbox;
 			fd.total_size_msg = libbalsa_size_to_gchar(fd.total_size);
 
-			msgbuf = g_strdup_printf(_("%lu new messages (%s)"), (unsigned long) fd.total_messages, fd.total_size_msg);
 			msgbuf = g_strdup_printf(ngettext("%lu new message (%s)", "%lu new messages (%s)", fd.total_messages),
 			                         (unsigned long) fd.total_messages, fd.total_size_msg);
 			libbalsa_mailbox_progress_notify(mailbox, LIBBALSA_NTFY_PROGRESS, 0, 1, msgbuf);

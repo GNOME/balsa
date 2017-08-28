@@ -534,7 +534,7 @@ create_subkey_type_str(gpgme_subkey_t subkey)
 	const gchar *algo;
 
 	type_str = g_string_new(NULL);
-	g_string_append_printf(type_str, _("%u bits"), subkey->length);
+	g_string_append_printf(type_str, ngettext("%u bit", "%u bits", subkey->length), subkey->length);
 	algo = gpgme_pubkey_algo_name(subkey->pubkey_algo);
 	if (algo != NULL) {
 		g_string_append_printf(type_str, " %s", algo);

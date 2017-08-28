@@ -312,7 +312,9 @@ gpgme_keyserver_run(gpointer user_data)
 		} else if (keys->next != NULL) {
 			dialog = gtk_message_dialog_new(keyserver_op->parent,
 				GTK_DIALOG_DESTROY_WITH_PARENT | libbalsa_dialog_flags(), GTK_MESSAGE_WARNING, GTK_BUTTONS_CLOSE,
-				_("Found %u keys with fingerprint %s on the key server. Please check and import the proper key manually."),
+				ngettext("Found %u key with fingerprint %s on the key server. Please check and import the proper key manually.",
+				         "Found %u keys with fingerprint %s on the key server. Please check and import the proper key manually.",
+				         g_list_length(keys)),
 				g_list_length(keys), keyserver_op->fingerprint);
 		} else {
 			dialog = gpgme_keyserver_do_import(keyserver_op, (gpgme_key_t) keys->data);

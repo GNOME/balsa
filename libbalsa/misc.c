@@ -46,6 +46,7 @@
 
 static const gchar *libbalsa_get_codeset_name(const gchar *txt, 
 					      LibBalsaCodeset Codeset);
+#ifndef HAVE_STRUCT_UTSNAME_DOMAINNAME
 static int getdnsdomainname(char *s, size_t l);
 
 static int 
@@ -95,12 +96,19 @@ getdnsdomainname (char *s, size_t l)
   fclose (f);
   return (-1);
 }
+#endif                          /* !HAVE_STRUCT_UTSNAME_DOMAINNAME */
 
 gchar *
 libbalsa_get_domainname(void)
 {
-    char domainname[256]; /* arbitrary length */
     struct utsname utsname;
+#ifdef HAVE_STRUCT_UTSNAME_DOMAINNAME
+
+    uname(&utsname);
+
+    return g_strdup(utsname.domainname);
+#else                           /* HAVE_STRUCT_UTSNAME_DOMAINNAME */
+    char domainname[256]; /* arbitrary length */
     gchar *d;
  
     uname(&utsname);
@@ -113,6 +121,7 @@ libbalsa_get_domainname(void)
 	return g_strdup(domainname);
     }
     return NULL;
+#endif                          /* HAVE_STRUCT_UTSNAME_DOMAINNAME */
 }
 
 /* libbalsa_find_word:

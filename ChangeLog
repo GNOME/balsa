@@ -1,5 +1,10 @@
 2017-08-29  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	* libbalsa/misc.c (libbalsa_get_domainname): use
+	utsname.domainname if it is available.
+
+2017-08-29  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* libbalsa/libbalsa.c (libbalsa_init): drop unused call to
 	uname.
 

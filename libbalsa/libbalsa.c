@@ -27,7 +27,6 @@
 
 #include <string.h>
 #include <stdlib.h>
-#include <sys/utsname.h>
 #include <sys/stat.h>
 #include <stdarg.h>
 #include <unistd.h>
@@ -77,15 +76,11 @@ libbalsa_message(const char *fmt, ...)
 void
 libbalsa_init(LibBalsaInformationFunc information_callback)
 {
-    struct utsname utsname;
-
 #ifdef HAVE_NOTIFY
     notify_init("Basics");
 #endif
 
     main_thread_id = g_thread_self();
-
-    uname(&utsname);
 
     libbalsa_real_information_func = information_callback;
 

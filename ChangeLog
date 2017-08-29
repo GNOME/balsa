@@ -1,3 +1,8 @@
+2017-08-29  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* libbalsa/libbalsa.c (libbalsa_init): drop unused call to
+	uname.
+
 2017-08-22  Tony Nelson <tonynelson@georgeanelson.com>
 
 	Fix https://bugzilla.redhat.com/show_bug.cgi?id=1483354,

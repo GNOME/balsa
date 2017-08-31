@@ -2852,7 +2852,7 @@ msgstr "S'ha detectat una signatura correcta amb validesa insuficient"
 #: ../src/balsa-message.c:2902 ../src/balsa-message.c:3022
 msgid "Detected a good signature with insufficient validity/trust"
 msgstr ""
-"D'ha detectat una signatura correcta amb validesa/confiança insuficient"
+"S'ha detectat una signatura correcta amb validesa/confiança insuficient"
 
 #: ../src/balsa-message.c:2909 ../src/balsa-message.c:3028
 #, c-format
@@ -3278,7 +3278,7 @@ msgstr "Coincideix quan cap d'aquests senyaladors està definit:"
 
 #: ../src/filter-edit-callbacks.c:540
 msgid "You must specify the name of the user header to match on"
-msgstr "Heu d'especificar el nom de a capçalera d'usuari amb la qual coincidir"
+msgstr "Heu d'especificar el nom de la capçalera d'usuari amb la qual coincidir"
 
 #: ../src/filter-edit-callbacks.c:551
 msgid "You must specify at least one field for matching"
@@ -3702,7 +3702,7 @@ msgstr "Habilita les _solucions temporals per als errors"
 
 #: ../src/folder-conf.c:361
 msgid "Use STATUS for mailbox checking"
-msgstr "Utilitza STATUS per a comprobar les bústies de correu"
+msgstr "Utilitza STATUS per a comprovar les bústies de correu"
 
 #: ../src/folder-conf.c:367 ../src/mailbox-conf.c:1248
 #: ../src/mailbox-conf.c:1373
@@ -4901,7 +4901,7 @@ msgid ""
 "%s."
 msgstr ""
 "No es pot obrir la bústia!\n"
-"%s"
+"%s."
 
 #: ../src/main-window.c:2651
 msgid "translator-credits"
@@ -5720,11 +5720,11 @@ msgstr ""
 
 #: ../src/pref-manager.c:2692
 msgid "Scan local folders to depth"
-msgstr "Escaneja les carpetes locals fins el nivell de profunditat"
+msgstr "Escaneja les carpetes locals fins al nivell de profunditat"
 
 #: ../src/pref-manager.c:2705
 msgid "Scan IMAP folders to depth"
-msgstr "Escaneja les carpetes d'IMAP fins el nivell de profunditat"
+msgstr "Escaneja les carpetes d'IMAP fins al nivell de profunditat"
 
 #: ../src/pref-manager.c:2770
 msgid "Address book name"

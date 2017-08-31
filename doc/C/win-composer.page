@@ -465,9 +465,9 @@ id="win-composer">
     <title>Toolbar</title>
     <p>The toolbar contains buttons for the most commonly used
     functions when sending messages, including <gui>Send</gui>,
-    <gui>Attach</gui>
-    <gui>File…</gui>, and <gui>Save</gui>. As with the menu bar, some buttons are
-    disabled if the message is not correctly setup to be sent.</p>
+    <gui>Attach File…</gui>, and <gui>Save</gui>. As with the
+    menu bar, some buttons are disabled if the message is not
+    correctly setup to be sent.</p>
     <figure>
       <title>Toolbar</title>
       <media type="image"

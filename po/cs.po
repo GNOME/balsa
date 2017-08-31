@@ -1833,7 +1833,7 @@ msgstr "Nelze otevřít %s: je to symbolický odkaz"
 
 #: ../libbalsa/misc.c:736
 msgid "Timeout exceeded while attempting fcntl lock!"
-msgstr "Časový interval vypršel při pokusu vytvořit zámek fcntl!"
+msgstr "Časový limit vypršel při pokusu vytvořit zámek fcntl!"
 
 #: ../libbalsa/misc.c:743
 #, c-format
@@ -1842,7 +1842,7 @@ msgstr "Čekám na zámek fcntl… %d"
 
 #: ../libbalsa/misc.c:771
 msgid "Timeout exceeded while attempting flock lock!"
-msgstr "Časový interval vypršel při pokusu vytvořit zámek flock!"
+msgstr "Časový limit vypršel při pokusu vytvořit zámek flock!"
 
 #: ../libbalsa/misc.c:778
 #, c-format
@@ -4036,7 +4036,7 @@ msgstr "Odpovídá, pokud je datum zprávy v rozmezí:"
 
 #: ../src/filter-edit-callbacks.c:1124
 msgid "Inside/outside the date interval"
-msgstr "Uvnitř/Mimo časový interval"
+msgstr "Uvnitř/Mimo časové rozmezí"
 
 #: ../src/filter-edit-callbacks.c:1165
 msgid "Match when one flag is set/when no flag is set"
@@ -4099,7 +4099,7 @@ msgstr "regulární výraz"
 
 #: ../src/filter-edit-dialog.c:97
 msgid "Date interval"
-msgstr "časový interval"
+msgstr "časové rozmezí"
 
 #: ../src/filter-edit-dialog.c:98
 msgid "Flag condition"

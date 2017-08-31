@@ -192,7 +192,7 @@ id="win-filters">
           </item>
           <item>
             <p>
-            <gui>Date</gui> interval: you can input the interval by
+            <gui>Date interval</gui>: you can input the interval by
             the mean of the two text entries. A blank entry means
             no bound. The button tells to match when the message
             date is within the bounds or not. The sentence above

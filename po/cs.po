@@ -3696,7 +3696,7 @@ msgstr "Odpověď komu:"
 #: ../src/balsa-mime-widget-message.c:756
 #: ../src/balsa-print-object-header.c:177
 msgid "FCC:"
-msgstr "Automatická kopie:"
+msgstr "Kopie do složky:"
 
 #: ../src/balsa-mime-widget-message.c:764
 #: ../src/balsa-print-object-header.c:180

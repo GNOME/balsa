@@ -1,13 +1,13 @@
 # Czech translation for balsa.
 # Copyright (C) 2013 balsa's COPYRIGHT HOLDER
 # This file is distributed under the same license as the balsa package.
-# Marek Černocký <marek@manet.cz>, 2013, 2015, 2016.
+# Marek Černocký <marek@manet.cz>, 2013, 2015, 2016, 2017.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa master\n"
-"POT-Creation-Date: 2016-10-06 17:14+0000\n"
-"PO-Revision-Date: 2016-10-16 12:56+0200\n"
+"POT-Creation-Date: 2017-08-06 12:48+0000\n"
+"PO-Revision-Date: 2017-09-01 00:21+0200\n"
 "Last-Translator: Marek Černocký <marek@manet.cz>\n"
 "Language-Team: čeština <gnome-cs-list@gnome.org>\n"
 "Language: cs\n"
@@ -136,12 +136,12 @@ msgstr ""
 #: C/ab-conf.page:64
 msgid ""
 "<app>Balsa</app> executes your script with one argument: the pattern to "
-"search for. A space (\" \") is used as the first argument when creating a "
-"list of all users."
+"search for. A space (“ ”) is used as the first argument when creating a list "
+"of all users."
 msgstr ""
 "<app>Balsa</app> spouští váš skript s jedním argumentem: vzorem, co se má "
-"hledat. Mezera (\" \") je použita jako první argument, když se vytváří "
-"seznam všech uživatelů."
+"hledat. Mezera („ “) je použita jako první argument, když se vytváří seznam "
+"všech uživatelů."
 
 #. (itstool) path: section/p
 #: C/ab-conf.page:68
@@ -659,13 +659,13 @@ msgstr ""
 msgid ""
 "<app>Balsa</app> searches for objects having <sys>mail</sys> attribute. The "
 "search is done on the <sys>cn</sys> attribute and the search filter has a "
-"form \"(&amp;(mail=*)(cn=John D))\". <app>Balsa</app> uses <sys>cn</"
+"form “(&amp;(mail=*)(cn=John D))”. <app>Balsa</app> uses <sys>cn</"
 "sys>(common name), <sys>givenName</sys>(given name), <sys>sn</sys>(surname) "
 "and <sys>mail</sys>(e-mail address) attributes of the found objects."
 msgstr ""
 "<app>Balsa</app> hledá objekty, které mají atribut <sys>mail</sys>. Hledání "
-"se provádí na atributu <sys>cn</sys> a vyhledávací filtr má formu \"(&amp;"
-"(mail=*)(cn=Honza))\". U nalezených objektů <app>Balsa</app> používá <sys>cn</"
+"se provádí na atributu <sys>cn</sys> a vyhledávací filtr má formu „(&amp;"
+"(mail=*)(cn=Honza))“. U nalezených objektů <app>Balsa</app> používá <sys>cn</"
 "sys> (common name = běžné jméno), <sys>givenName</sys> (given name = dané "
 "jméno), <sys>sn</sys> (surname = příjmení) a <sys>mail</sys> (e-mailová "
 "adresa)."
@@ -750,7 +750,7 @@ msgstr ""
 msgid ""
 "Prefix is the root mailbox on the server. You may leave it empty if you want "
 "to show all the folders on your server but if your IMAP server stores also "
-"other kind of files you may specify for instance \"mail\"."
+"other kind of files you may specify for instance “mail”."
 msgstr ""
 "<guilabel>Začít v</guilabel> je kořenová poštovní schránka na serveru. "
 "Jestli chcete zobrazit všechny složky na serveru, můžete pole ponechat "
@@ -936,7 +936,7 @@ msgstr ""
 msgid ""
 "When the dialog is opened from <guiseq> <gui>Mailbox</gui> <gui>Edit</gui> </"
 "guiseq> with an IMAP folder selected, or by right-clicking on an IMAP "
-"mailbox and selecting <gui>Properties...</gui>, the mailbox may be:"
+"mailbox and selecting <gui>Properties…</gui>, the mailbox may be:"
 msgstr ""
 "Když dialogové okno otevřete z <guiseq><gui>Schránka</gui> <gui>Upravit</"
 "gui></guiseq> a máte vybranou složku IMAP, nebo na poštovní schránku IMAP "
@@ -952,18 +952,6 @@ msgstr "přejmenovat úpravou názvu složky"
 #: C/folder-config.page:168
 msgid "Moved, by browsing for a different parent folder in the same tree."
 msgstr "přesunout výběrem jiné rodičovské složky ve stejném stromu"
-
-#. (itstool) path: media
-#. This is a reference to an external file such as an image or video. When
-#. the file changes, the md5 hash will change to let you know you need to
-#. update your localized copy. The msgstr is not used at all. Set it to
-#. whatever you like once you have updated your copy of the file.
-#: C/getting-started.page:17
-msgctxt "_"
-msgid ""
-"external ref='figures/druid-start.png' md5='68bf6bf83a3f6fa5a4099bad2d2706a5'"
-msgstr ""
-"external ref='figures/druid-start.png' md5='68bf6bf83a3f6fa5a4099bad2d2706a5'"
 
 #. (itstool) path: page/title
 #: C/getting-started.page:9
@@ -986,6 +974,18 @@ msgstr ""
 "standardních místních schránek: Přijatá, Odeslaná, K odeslání, Koncepty a "
 "Koš. (Později mohou být změněny na poštovní schránky <link xref="
 "\"glossary#imap\">IMAP</link>.)"
+
+#. (itstool) path: figure/media
+#. This is a reference to an external file such as an image or video. When
+#. the file changes, the md5 hash will change to let you know you need to
+#. update your localized copy. The msgstr is not used at all. Set it to
+#. whatever you like once you have updated your copy of the file.
+#: C/getting-started.page:17
+msgctxt "_"
+msgid ""
+"external ref='figures/druid-start.png' md5='68bf6bf83a3f6fa5a4099bad2d2706a5'"
+msgstr ""
+"external ref='figures/druid-start.png' md5='68bf6bf83a3f6fa5a4099bad2d2706a5'"
 
 #. (itstool) path: figure/title
 #: C/getting-started.page:18
@@ -1039,7 +1039,7 @@ msgstr "POP"
 #. (itstool) path: section/p
 #: C/glossary.page:11
 msgid ""
-"An acronym for \"Post Office Protocol\", a simple method of retrieving mail "
+"An acronym for “Post Office Protocol”, a simple method of retrieving mail "
 "messages from a remote mail server. Widely used by mail clients from an "
 "Internet Service Provider's mail server to a user's machine for viewing. "
 "Currently most people use version three of the protocol, otherwise known as "
@@ -1062,7 +1062,7 @@ msgstr "IMAP"
 #. (itstool) path: section/p
 #: C/glossary.page:21
 msgid ""
-"An acronym that stands for \"Internet Mail Access Protocol\". It is a newer "
+"An acronym that stands for “Internet Mail Access Protocol”. It is a newer "
 "method of accessing mail over the internet. It is far more featureful than "
 "<link xref=\"glossary#pop\">POP3</link>, allowing for remote folders on the "
 "mail server, and more control over mail delivery. However it is not as "
@@ -1082,7 +1082,7 @@ msgstr "LDAP"
 #. (itstool) path: section/p
 #: C/glossary.page:29
 msgid ""
-"An acronym for \"Lightweight Directory Access Protocol\". It is a widely-"
+"An acronym for “Lightweight Directory Access Protocol”. It is a widely-"
 "accepted standard for accessing contact information over a network. This "
 "enables organizations to store address information in a central database, "
 "but have many people able to access it."
@@ -1146,8 +1146,8 @@ msgstr "MDA"
 #. (itstool) path: section/p
 #: C/glossary.page:58
 msgid ""
-"An acronym for \"Mail Delivery Agent\", this type of program is also known "
-"as a Local Delivery Agent (LDA). It is responsible for delivering the mail "
+"An acronym for “Mail Delivery Agent”, this type of program is also known as "
+"a Local Delivery Agent (LDA). It is responsible for delivering the mail "
 "recieved for someone on a machine to the mail folder of that person. "
 "<app>procmail</app> is an example of this type of program, although many "
 "<link xref=\"glossary#mta\">MTA</link>'s have their own MDA implementations."
@@ -1167,7 +1167,7 @@ msgstr "MTA"
 #. (itstool) path: section/p
 #: C/glossary.page:68
 msgid ""
-"An acronym for \"Mail Transfer Agent\", this class of program is responsible "
+"An acronym for “Mail Transfer Agent”, this class of program is responsible "
 "for moving mail around between people, be they on the same computer, on on "
 "completely separate networks. Examples of this type of program include "
 "<app>sendmail</app>, <app>qmail</app>, and <app>postfix</app>."
@@ -1185,8 +1185,8 @@ msgstr "MUA"
 #. (itstool) path: section/p
 #: C/glossary.page:78
 msgid ""
-"An acronym for \"Mail User Agent\", this the program a user would use to "
-"read existing mail and create new messages. MUAs are one of three types of "
+"An acronym for “Mail User Agent”, this the program a user would use to read "
+"existing mail and create new messages. MUAs are one of three types of "
 "programs that allow internet email to work. The other two types of programs "
 "are <link xref=\"glossary#mta\">MTA</link> s and <link xref=\"glossary#mda"
 "\">MDA</link> s. <app>Balsa</app> is primarily an MUA, but it also functions "
@@ -1228,13 +1228,15 @@ msgstr "SMTP"
 #. (itstool) path: section/p
 #: C/glossary.page:99
 msgid ""
-"An acronym that stands for \"Simple Mail Transfer Protocol\", it is exactly "
+"An acronym that stands for “Simple Mail Transfer Protocol”, it is exactly "
 "that. A standard that defines a simple an reliable way to transfer messages "
 "between computers on a network. It is used by most, if not all, mail "
 "programs to transfer mail."
 msgstr ""
 "Zkratka z „Simple Mail Transfer Protocol“, což znamená „jednoduchý protokol "
-"pro přenos pošty“. "
+"pro přenos pošty“. Jedná se o standard, který definuje jednoduchý a "
+"spolehlivý způsob přenosu zpráv mezi počítači v síti. Používá jej většina, "
+"ne-li všechny, programy pro přenost pošty."
 
 #. (itstool) path: section/title
 #: C/glossary.page:106
@@ -1302,7 +1304,7 @@ msgstr "<gui>Poštovní adresa</gui>"
 
 #. (itstool) path: item/p
 #: C/identities.page:32
-msgid "As you wish it to appear in your \"From\" header."
+msgid "As you wish it to appear in your “From” header."
 msgstr "Tak, jak si přejete, aby se objevila v hlavičce „Od“."
 
 #. (itstool) path: item/title
@@ -1339,12 +1341,11 @@ msgstr ""
 
 #. (itstool) path: page/p
 #: C/identities.page:53
-msgid ""
-"The \"Messages\" page shows various initial settings for the new message:"
+msgid "The “Messages” page shows various initial settings for the new message:"
 msgstr "Stránka „Zpráva“ zobrazuje různá počáteční nastavení pro novou zprávu:"
 
 #. (itstool) path: item/title
-#: C/identities.page:57 C/win-composer.page:574
+#: C/identities.page:57 C/win-composer.page:575
 msgid "<gui>Bcc</gui>"
 msgstr "<gui>Skrytá kopie</gui>"
 
@@ -1399,7 +1400,7 @@ msgstr "<gui>Cesta k ikoně Face</gui>"
 #. (itstool) path: item/p
 #: C/identities.page:89
 msgid ""
-"Whether a \"Face\" header should be attached to a program. Specified path "
+"Whether a “Face” header should be attached to a program. Specified path "
 "points out to a file containing a textual representation of the face icon. "
 "Please see <link href=\"http://quimby.gnus.org/circus/face/\">a description "
 "of Face and X-Face</link> headers for more details as well as the list of "
@@ -1419,7 +1420,7 @@ msgstr "<gui>Cesta k ikoně X-Face</gui>"
 #. (itstool) path: item/p
 #: C/identities.page:101
 msgid ""
-"Whether a \"Face\" header should be attached to a program. Specified path "
+"Whether a “Face” header should be attached to a program. Specified path "
 "points out to a file containing a textual representation of the face icon."
 msgstr ""
 "Jestli má být ke zprávě přidána hlavička „X-Face“. Zadaná cesta ukazuje na "
@@ -1443,7 +1444,7 @@ msgstr ""
 #: C/identities.page:115
 msgid ""
 "You control the signature that <app>Balsa</app> appends to your messages on "
-"the \"Signature\" page:"
+"the “Signature” page:"
 msgstr ""
 "Podpis, který <app>Balsa</app> připojuje k vašim zprávám, můžete určovat na "
 "stránce „Podpis“:"
@@ -1487,7 +1488,7 @@ msgstr ""
 msgid ""
 "An executable program. <app>Balsa</app> will execute the program and read "
 "its output, appending that text to the message. List the path to the program "
-"with a \"|\" prepended to it. For example:"
+"with a “|” prepended to it. For example:"
 msgstr ""
 "Spustitelný program. <app>Balsa</app> spustí program a přečte jeho výstup a "
 "ten připojí do zprávy. Do pole uveďte cestu k programu a na její začátek "
@@ -1495,7 +1496,7 @@ msgstr ""
 
 #. (itstool) path: item/p
 #: C/identities.page:141
-msgid "\"|/home/user/dynsig.pl\""
+msgid "“|/home/user/dynsig.pl”"
 msgstr "|/home/user/dynampodpis.pl"
 
 #. (itstool) path: item/title
@@ -1582,7 +1583,7 @@ msgstr "<gui>Jako výchozí zprávy podepisovat</gui>"
 #: C/identities.page:193
 msgid ""
 "By default enable the cryptographic signature for every new message. The "
-"default protocol is determined by the \"Default protocol\" option."
+"default protocol is determined by the <gui>Default protocol</gui> option."
 msgstr ""
 "Jako výchozí chování zapnout kryptografické podepisování všech nových zpráv. "
 "Výchozí protokol je dán volbou <gui>Výchozí protokol</gui>."
@@ -1596,7 +1597,7 @@ msgstr "<gui>Jako výchozí zprávy šifrovat</gui>"
 #: C/identities.page:201
 msgid ""
 "By default encrypt every new message. The default protocol is determined by "
-"the \"Default protocol\" option."
+"the <gui>Default protocol</gui> option."
 msgstr ""
 "Jako výchozí chování šifrovat všechny nové zprávy. Výchozí protokol je dán "
 "volbou <gui>Výchozí protokol</gui>."
@@ -1795,7 +1796,12 @@ msgstr ""
 "nebo navštívit <link href=\"http://www.cs.queensu.ca/FAQs/email/\" type="
 "\"http\">Email FAQ</link> (odkazovaný text je v angličtině)."
 
-#. (itstool) path: media
+#. (itstool) path: page/title
+#: C/introduction.page:9
+msgid "Introduction"
+msgstr "Úvod"
+
+#. (itstool) path: page/media
 #. This is a reference to an external file such as an image or video. When
 #. the file changes, the md5 hash will change to let you know you need to
 #. update your localized copy. The msgstr is not used at all. Set it to
@@ -1806,11 +1812,6 @@ msgid ""
 "external ref='figures/balsa_logo.png' md5='9598e9795c931dc2e4396d41d660f916'"
 msgstr ""
 "external ref='figures/balsa_logo.png' md5='9598e9795c931dc2e4396d41d660f916'"
-
-#. (itstool) path: page/title
-#: C/introduction.page:9
-msgid "Introduction"
-msgstr "Úvod"
 
 #. (itstool) path: page/p
 #: C/introduction.page:12
@@ -2112,48 +2113,6 @@ msgstr ""
 "Administrator-HOWTO-3.html#ss3.5\"> http://linuxdocs.org/HOWTOs/Mail-"
 "Administrator-HOWTO-3.html#ss3.5</link>"
 
-#. (itstool) path: media
-#. This is a reference to an external file such as an image or video. When
-#. the file changes, the md5 hash will change to let you know you need to
-#. update your localized copy. The msgstr is not used at all. Set it to
-#. whatever you like once you have updated your copy of the file.
-#: C/preferences-address-books.page:39
-msgctxt "_"
-msgid ""
-"external ref='figures/address-book-vcard.png' "
-"md5='c9eeb6585d9cb0eba42fd02b649c7239'"
-msgstr ""
-"external ref='figures/address-book-vcard.png' "
-"md5='c9eeb6585d9cb0eba42fd02b649c7239'"
-
-#. (itstool) path: media
-#. This is a reference to an external file such as an image or video. When
-#. the file changes, the md5 hash will change to let you know you need to
-#. update your localized copy. The msgstr is not used at all. Set it to
-#. whatever you like once you have updated your copy of the file.
-#: C/preferences-address-books.page:46
-msgctxt "_"
-msgid ""
-"external ref='figures/address-book-ldap.png' "
-"md5='8482f8bc4a698338fb4f36b40dd35204'"
-msgstr ""
-"external ref='figures/address-book-ldap.png' "
-"md5='8482f8bc4a698338fb4f36b40dd35204'"
-
-#. (itstool) path: media
-#. This is a reference to an external file such as an image or video. When
-#. the file changes, the md5 hash will change to let you know you need to
-#. update your localized copy. The msgstr is not used at all. Set it to
-#. whatever you like once you have updated your copy of the file.
-#: C/preferences-address-books.page:70
-msgctxt "_"
-msgid ""
-"external ref='figures/address-book-modify.png' "
-"md5='5b5b5ea63419ea2843c9ef4ceaa5077e'"
-msgstr ""
-"external ref='figures/address-book-modify.png' "
-"md5='5b5b5ea63419ea2843c9ef4ceaa5077e'"
-
 #. (itstool) path: page/title
 #: C/preferences-address-books.page:9
 msgid "Address Book Preferences"
@@ -2225,6 +2184,20 @@ msgstr ""
 msgid "VCARD Address Book Dialog"
 msgstr "Dialogové okno adresáře VCARD"
 
+#. (itstool) path: figure/media
+#. This is a reference to an external file such as an image or video. When
+#. the file changes, the md5 hash will change to let you know you need to
+#. update your localized copy. The msgstr is not used at all. Set it to
+#. whatever you like once you have updated your copy of the file.
+#: C/preferences-address-books.page:39
+msgctxt "_"
+msgid ""
+"external ref='figures/address-book-vcard.png' "
+"md5='c9eeb6585d9cb0eba42fd02b649c7239'"
+msgstr ""
+"external ref='figures/address-book-vcard.png' "
+"md5='c9eeb6585d9cb0eba42fd02b649c7239'"
+
 #. (itstool) path: item/p
 #: C/preferences-address-books.page:41
 msgid ""
@@ -2241,6 +2214,20 @@ msgstr ""
 msgid "<link xref=\"glossary#ldap\">LDAP</link> Address Book Dialog"
 msgstr "Dialogové okno adresáře <link xref=\"glossary#ldap\">LDAP</link>"
 
+#. (itstool) path: figure/media
+#. This is a reference to an external file such as an image or video. When
+#. the file changes, the md5 hash will change to let you know you need to
+#. update your localized copy. The msgstr is not used at all. Set it to
+#. whatever you like once you have updated your copy of the file.
+#: C/preferences-address-books.page:46
+msgctxt "_"
+msgid ""
+"external ref='figures/address-book-ldap.png' "
+"md5='8482f8bc4a698338fb4f36b40dd35204'"
+msgstr ""
+"external ref='figures/address-book-ldap.png' "
+"md5='8482f8bc4a698338fb4f36b40dd35204'"
+
 #. (itstool) path: item/p
 #: C/preferences-address-books.page:48
 msgid ""
@@ -2251,7 +2238,7 @@ msgid ""
 "used (OpenLDAP stores the default Base Domain Name in <file>/etc/openldap/"
 "ldap.conf</file>). If this does not work, you may need to ask your "
 "administrator for the value of this. The usual values are usually similar "
-"to: \"dc=theochem,dc=KTH,dc=se\" or \"o=Theoretical Chemistry, c=SE\"."
+"to: “dc=theochem,dc=KTH,dc=se” or “o=Theoretical Chemistry, c=SE”."
 msgstr ""
 "Abyste mohli používat adresář LDAP, potřebujete znát název serveru LDAP. V "
 "závislosti na nastavení serveru, můžete také potřebovat tzv. Název základní "
@@ -2276,6 +2263,20 @@ msgstr "Umožní vám změnit vlastnosti vybraného adresáře."
 #: C/preferences-address-books.page:68
 msgid "Modify an Address Book"
 msgstr "Úprava adresáře"
+
+#. (itstool) path: figure/media
+#. This is a reference to an external file such as an image or video. When
+#. the file changes, the md5 hash will change to let you know you need to
+#. update your localized copy. The msgstr is not used at all. Set it to
+#. whatever you like once you have updated your copy of the file.
+#: C/preferences-address-books.page:70
+msgctxt "_"
+msgid ""
+"external ref='figures/address-book-modify.png' "
+"md5='5b5b5ea63419ea2843c9ef4ceaa5077e'"
+msgstr ""
+"external ref='figures/address-book-modify.png' "
+"md5='5b5b5ea63419ea2843c9ef4ceaa5077e'"
 
 #. (itstool) path: item/p
 #: C/preferences-address-books.page:72
@@ -2671,7 +2672,7 @@ msgstr "<gui>Záložní sada kódování</gui>"
 msgid ""
 "Some messages contain national characters without specifying how they are "
 "encoded. You can choose whether <app>Balsa</app> displays such characters as "
-"'?', or tries a specific character set to display such messages."
+"“?”, or tries a specific character set to display such messages."
 msgstr ""
 "Některé zprávy obsahují národní znaky, aniž by bylo specifikováno, jak jsou "
 "kódované. Můžete zvolit, jestli má v takových případech <app>Balsa</app> "
@@ -2707,7 +2708,7 @@ msgstr "<gui>Zobrazovat průběh</gui>"
 #: C/preferences-display-options.page:255
 msgid ""
 "This sets the behaviour of the dialog that is shown when <app>Balsa</app> "
-"retrieves messages from it's specified <link xref=\"glossary#pop\">POP3</"
+"retrieves messages from its specified <link xref=\"glossary#pop\">POP3</"
 "link> servers. The dialog can be shown only while the messages are being "
 "retrieved, automatically closing after <app>Balsa</app> is finished. Or it "
 "can be set to stay active until manually closed. Finally, the dialog can not "
@@ -2787,7 +2788,7 @@ msgstr "Příslušné heslo."
 #. (itstool) path: item/p
 #: C/preferences-mail-options.page:42
 msgid ""
-"You can select the 'delete from server' button to remove the downoladed "
+"You can select the “delete from server” button to remove the downloaded "
 "messages from the server."
 msgstr ""
 "Výběrem „smazat ze serveru“ zajistíte, že stažené zprávy se smažou ze "
@@ -2849,7 +2850,7 @@ msgid ""
 "Please note that the default port number is 587. The syntax is hostname[:"
 "port]. Port can be a decimal number or the name of the service as specified "
 "in <file>/etc/services</file> . Typically you can just set this to "
-"\"localhost:smtp\". <app>Balsa</app> can also break up a large message into "
+"“localhost:smtp”. <app>Balsa</app> can also break up a large message into "
 "fragments, which can be reassembled by <app>Balsa</app> or any RFC 2046-"
 "compliant mailer. This dialog allows you to set this option, and the size "
 "above which a message should be split."
@@ -3015,16 +3016,17 @@ msgstr "<gui>Přeformátovat zprávy typu „text/plain;format=flowed“</gui>"
 #. (itstool) path: item/p
 #: C/preferences-mail-options.page:172
 msgid ""
-"The `format' parameter distinguishes two ways of representing paragraphs in "
-"messages of type `text/plain' (that is, simple text). The value `flowed' "
-"indicates that paragraphs have been broken into lines ended with `soft' line "
-"breaks: a space is left at the end of the line. A `hard' line break (one "
-"that is not preceded by a space) indicates the end of a paragraph."
+"The <gui>format</gui> parameter distinguishes two ways of representing "
+"paragraphs in messages of type “text/plain” (that is, simple text). The "
+"value “flowed” indicates that paragraphs have been broken into lines ended "
+"with “soft” line breaks: a space is left at the end of the line. A “hard” "
+"line break (one that is not preceded by a space) indicates the end of a "
+"paragraph."
 msgstr ""
-"Parametr „format“ rozlišuje dva způsoby podání odstavců ve zprávách typu "
-"prostý text (typ MIME „text/plain“). Hodnota „flowed“ říká, že jsou do řádků "
-"zalomené „měkkým“ zalomením: na konci řádku je mezera. „Tvrdé“ zalomení (to "
-"které před sebou nemá mezeru) označuje konec odstavce."
+"Parametr <gui>format</gui> rozlišuje dva způsoby podání odstavců ve zprávách "
+"typu prostý text (typ MIME „text/plain“). Hodnota „flowed“ říká, že jsou do "
+"řádků zalomené „měkkým“ zalomením: na konci řádku je mezera. „Tvrdé“ "
+"zalomení (to, které před sebou nemá mezeru) označuje konec odstavce."
 
 #. (itstool) path: item/p
 #: C/preferences-mail-options.page:179
@@ -3042,21 +3044,22 @@ msgstr ""
 #. (itstool) path: item/p
 #: C/preferences-mail-options.page:184
 msgid ""
-"The only other value of `format' is `fixed', which is the value assumed by "
-"default when `format' is not specified, as with older mailers. In this case, "
-"all line breaks must be respected. If you do not select the `Reflow...' "
-"option, <app>Balsa</app> will treat all messages of type `text/plain' as if "
-"they were `format=fixed'. Long lines will still be wrapped, if the `Wrap "
-"Incoming Messages' option is selected, but this will usually leave unquoted "
-"line fragments."
+"The only other value of <gui>format</gui> is “fixed”, which is the value "
+"assumed by default when <gui>format</gui> is not specified, as with older "
+"mailers. In this case, all line breaks must be respected. If you do not "
+"select the <gui>Reflow…</gui> option, <app>Balsa</app> will treat all "
+"messages of type “text/plain” as if they were “format=fixed”. Long lines "
+"will still be wrapped, if the <gui>Wrap Incoming Messages</gui> option is "
+"selected, but this will usually leave unquoted line fragments."
 msgstr ""
-"Jedinou další hodnotou parametru „format“ je „fixed“, který je předpokládán, "
-"když parametr „format“ není uveden, což dělají starší poštovní programy. V "
-"takovém případě musí být respektována všechna zalomení řádků. Když "
-"nevyberete volbu „Reflow…“, bude <app>Balsa</app> se všemi zprávami typu "
-"prostý text zacházet, jako by měly „format=fixed“. Pokud máte zapnutou volbu "
-"„Zalamovat příchozí zprávy“, budou dlouhé řádky i tak dodatečně zalomeny, "
-"ale v zobrazení zůstanou nevyřešené fragmenty textu."
+"Jedinou další hodnotou parametru <gui>format</gui> je „fixed“, který je "
+"předpokládán, když parametr <gui>format</gui> není uveden, což dělají starší "
+"poštovní programy. V takovém případě musí být respektována všechna zalomení "
+"řádků. Když nevyberete volbu <gui>Reflow…</gui>, bude <app>Balsa</app> se "
+"všemi zprávami typu prostý text zacházet, jako by měly „format=fixed“. Pokud "
+"máte zapnutou volbu <gui>Zalamovat příchozí zprávy</gui>, budou dlouhé řádky "
+"i tak dodatečně zalomeny, ale v zobrazení zůstanou nevyřešené fragmenty "
+"textu."
 
 #. (itstool) path: item/title
 #: C/preferences-mail-options.page:195
@@ -3101,7 +3104,7 @@ msgstr "<gui>Uvození odpovědi</gui>"
 msgid ""
 "The string that <app>Balsa</app> should use as a prefix when quoting a "
 "message. Note: When you send a message with <gui>format=flowed</gui>, "
-"<app>Balsa</app> is required to use the one-character string \"&gt;\"."
+"<app>Balsa</app> is required to use the one-character string “&gt;”."
 msgstr ""
 "Řetězec, který by měla <app>Balsa</app> používat, když cituje zprávu. "
 "Upozornění: Když posíláte zprávu s <gui>format=flowed</gui>, vyžaduje "
@@ -3124,15 +3127,15 @@ msgstr ""
 #. (itstool) path: item/p
 #: C/preferences-mail-options.page:233
 msgid ""
-"You can instead include the original message using an option on the `Edit' "
-"menu, or by dragging the message from the message index into the text area "
-"of the reply. If you prefer to include text this way, do not select the "
-"`Automatically quote...' option."
+"You can instead include the original message using an option on the "
+"<gui>Edit</gui> menu, or by dragging the message from the message index into "
+"the text area of the reply. If you prefer to include text this way, do not "
+"select the <gui>Automatically quote…</gui> option."
 msgstr ""
-"Jinou možností je vložit původní zprávu pomocí volby v nabídce „Upravit“ "
-"nebo přetažením zprávy ze seznamu zpráv do textové oblasti s odpovědí. Pokud "
-"dáváte přednost vkládání textu tímto způsobem, nezapínejte volbu "
-"„Automaticky citovat…“."
+"Jinou možností je vložit původní zprávu pomocí volby v nabídce <gui>Upravit</"
+"gui> nebo přetažením zprávy ze seznamu zpráv do textové oblasti s odpovědí. "
+"Pokud dáváte přednost vkládání textu tímto způsobem, nezapínejte volbu "
+"<gui>Automaticky citovat</gui>."
 
 #. (itstool) path: item/title
 #: C/preferences-mail-options.page:240
@@ -3155,7 +3158,7 @@ msgstr "<gui>Přeposílat zprávu jako přílohu místo jejího citování</gui>
 #. (itstool) path: item/p
 #: C/preferences-mail-options.page:251
 msgid ""
-"If this option is selected, messages that are `Automatically quoted' will "
+"If this option is selected, messages that are “Automatically quoted” will "
 "actually be attached unmodified, instead of included in the text of the "
 "reply, prefixed by the reply string."
 msgstr ""
@@ -3198,7 +3201,7 @@ msgstr "<gui>Kopírovat odchozí zprávu do Odeslané pošty</gui>"
 #: C/preferences-mail-options.page:273
 msgid ""
 "Have <app>Balsa</app> save a copy of each message you send in the mailbox "
-"marked as the `Sentbox'."
+"marked as the “Sentbox”."
 msgstr ""
 "Přiměje poštovního klienta <app>Balsa</app> ukládat kopii každé odeslané "
 "zprávy do poštovní schránky označené jako „Odchozí“."
@@ -3308,8 +3311,8 @@ msgstr "<gui>Odstraňovat smazané zprávy při zavření poštovní schránky</
 #. (itstool) path: item/p
 #: C/preferences-miscellaneous.page:59
 msgid ""
-"\"Expunging\" is the act of physically removing from the backing mailstore "
-"all messages marked as deleted. You can expunge messages manually: <guiseq> "
+"“Expunging” is the act of physically removing from the backing mailstore all "
+"messages marked as deleted. You can expunge messages manually: <guiseq> "
 "<gui>Mailbox</gui> <gui>Expunge deleted messages</gui> </guiseq>, or you can "
 "set <app>Balsa</app> to expunge deleted messages when the mailbox is closed "
 "(all mailboxes are closed when you exit <app>Balsa</app>)."
@@ -3443,7 +3446,7 @@ msgid ""
 "three main types of window: the <link xref=\"win-main\">main window</link>, "
 "<link xref=\"win-message\">message windows</link>, and <link xref=\"win-"
 "composer\">compose windows</link>. You open the dialog with the <guiseq> "
-"<gui>Settings</gui> <gui>Toolbars...</gui> </guiseq> menu item."
+"<gui>Settings</gui> <gui>Toolbars…</gui> </guiseq> menu item."
 msgstr ""
 "<app>Balsa</app> umožňuje změnit rozvržení nástrojových lišt u tří hlavních "
 "typů oken: <link xref=\"win-main\">hlavního okna</link>, <link xref=\"win-"
@@ -3486,7 +3489,7 @@ msgstr ""
 #. (itstool) path: page/p
 #: C/toolbar-prefs.page:32
 msgid ""
-"This is an \"instant apply\" dialog: the changes you make take effect "
+"This is an “instant apply” dialog: the changes you make take effect "
 "immediately, as shown in the Preview toolbar. Below the Preview toolbar "
 "you'll find a button that restores the standard layout for that toolbar."
 msgstr ""
@@ -3512,7 +3515,7 @@ msgid ""
 "A second button below the Preview toolbar pops up a menu that gives you "
 "control over what is shown in the toolbar: icons, text, or both. The popup "
 "(right click) menu for any actual toolbar offers the same choices, as well "
-"as the option to open up this dialog (\"Customize Toolbars...\")."
+"as the option to open up this dialog (“Customize Toolbars…”)."
 msgstr ""
 "Druhé tlačítko pod náhledem nástrojové lišty je rozbalovací nabídka, pomocí "
 "které můžete řídit, co má nástrojová lišta zobrazovat: ikony, text nebo "
@@ -3520,7 +3523,17 @@ msgstr ""
 "nabízí ty samé volby, jako jsou v tomto dialogovém okně („Přizpůsobit "
 "nástrojové lišty…“)."
 
-#. (itstool) path: media
+#. (itstool) path: page/title
+#: C/win-composer.page:8
+msgid "The Message Composer"
+msgstr "Editor zpráv"
+
+#. (itstool) path: figure/title
+#: C/win-composer.page:10
+msgid "Message Composition Window"
+msgstr "Okno pro psaní zpráv"
+
+#. (itstool) path: figure/media
 #. This is a reference to an external file such as an image or video. When
 #. the file changes, the md5 hash will change to let you know you need to
 #. update your localized copy. The msgstr is not used at all. Set it to
@@ -3533,70 +3546,6 @@ msgid ""
 msgstr ""
 "external ref='figures/newmsg-window.png' "
 "md5='3e4d93b3b504b11160981d7ffff3a4d0'"
-
-#. (itstool) path: media
-#. This is a reference to an external file such as an image or video. When
-#. the file changes, the md5 hash will change to let you know you need to
-#. update your localized copy. The msgstr is not used at all. Set it to
-#. whatever you like once you have updated your copy of the file.
-#: C/win-composer.page:473
-msgctxt "_"
-msgid ""
-"external ref='figures/newmsg-window-toolbar.png' "
-"md5='9a3d497c60c021ccee42871d6a700683'"
-msgstr ""
-"external ref='figures/newmsg-window-toolbar.png' "
-"md5='9a3d497c60c021ccee42871d6a700683'"
-
-#. (itstool) path: media
-#. This is a reference to an external file such as an image or video. When
-#. the file changes, the md5 hash will change to let you know you need to
-#. update your localized copy. The msgstr is not used at all. Set it to
-#. whatever you like once you have updated your copy of the file.
-#: C/win-composer.page:629
-msgctxt "_"
-msgid ""
-"external ref='figures/newmsg-window-attachments.png' "
-"md5='afd5a47d787b0c1a1d32867bec9cb8ee'"
-msgstr ""
-"external ref='figures/newmsg-window-attachments.png' "
-"md5='afd5a47d787b0c1a1d32867bec9cb8ee'"
-
-#. (itstool) path: media
-#. This is a reference to an external file such as an image or video. When
-#. the file changes, the md5 hash will change to let you know you need to
-#. update your localized copy. The msgstr is not used at all. Set it to
-#. whatever you like once you have updated your copy of the file.
-#: C/win-composer.page:667
-msgctxt "_"
-msgid ""
-"external ref='figures/spell-check.png' md5='99eea5d4372fe11ce809fba8da61569c'"
-msgstr ""
-"external ref='figures/spell-check.png' md5='99eea5d4372fe11ce809fba8da61569c'"
-
-#. (itstool) path: media
-#. This is a reference to an external file such as an image or video. When
-#. the file changes, the md5 hash will change to let you know you need to
-#. update your localized copy. The msgstr is not used at all. Set it to
-#. whatever you like once you have updated your copy of the file.
-#: C/win-composer.page:743
-msgctxt "_"
-msgid ""
-"external ref='figures/address-book.png' "
-"md5='7fe1a6d0c0960ec16337685ccddf8fff'"
-msgstr ""
-"external ref='figures/address-book.png' "
-"md5='7fe1a6d0c0960ec16337685ccddf8fff'"
-
-#. (itstool) path: page/title
-#: C/win-composer.page:8
-msgid "The Message Composer"
-msgstr "Editor zpráv"
-
-#. (itstool) path: figure/title
-#: C/win-composer.page:10
-msgid "Message Composition Window"
-msgstr "Okno pro psaní zpráv"
 
 #. (itstool) path: page/p
 #: C/win-composer.page:13
@@ -3631,7 +3580,7 @@ msgstr "Nabídková lišta"
 #. (itstool) path: item/p
 #. (itstool) path: section/title
 #. (itstool) path: figure/title
-#: C/win-composer.page:31 C/win-composer.page:465 C/win-composer.page:471
+#: C/win-composer.page:31 C/win-composer.page:465 C/win-composer.page:472
 msgid "Toolbar"
 msgstr "Nástrojová lišta"
 
@@ -3687,7 +3636,7 @@ msgstr "Nabídka Soubor obsahuje příkazy pro práci se zprávou jako celkem."
 #. (itstool) path: item/p
 #: C/win-composer.page:60
 msgid ""
-"<guiseq> <gui>File</gui> <gui>Include File...</gui> </guiseq> -- Include a "
+"<guiseq> <gui>File</gui> <gui>Include File…</gui> </guiseq> -- Include a "
 "text file in the body of the message; only works for plain text files."
 msgstr ""
 "<guiseq><gui>Soubor</gui> <gui>Vložit soubor…</gui></guiseq> – Vloží do těla "
@@ -3696,7 +3645,7 @@ msgstr ""
 #. (itstool) path: item/p
 #: C/win-composer.page:68
 msgid ""
-"<guiseq> <gui>File</gui> <gui>Attach File...</gui> </guiseq> -- Attach any "
+"<guiseq> <gui>File</gui> <gui>Attach File…</gui> </guiseq> -- Attach any "
 "kind of file to the message."
 msgstr ""
 "<guiseq><gui>Soubor</gui> <gui>Přiložit soubor…</gui></guiseq> – Připojí ke "
@@ -3767,7 +3716,7 @@ msgstr ""
 #. (itstool) path: item/p
 #: C/win-composer.page:135
 msgid ""
-"<guiseq> <gui>File</gui> <gui>Print...</gui> </guiseq> <keyseq> <key>Ctrl</"
+"<guiseq> <gui>File</gui> <gui>Print…</gui> </guiseq> <keyseq> <key>Ctrl</"
 "key> <key>P</key> </keyseq> -- Print a hard-copy of the current message."
 msgstr ""
 "<guiseq><gui>Soubor</gui> <gui>Tisk…</gui></guiseq> – Vytiskne kopii "
@@ -3983,9 +3932,9 @@ msgstr ""
 #: C/win-composer.page:355
 msgid ""
 "<guiseq> <gui>Options</gui> <gui>Format = Flowed</gui> </guiseq> -- The "
-"\"Flowed\" format (RFC 3676) breaks the message text into paragraphs, which "
+"“Flowed” format (RFC 3676) breaks the message text into paragraphs, which "
 "you type continuously using the <key>Enter</key> key only to mark the end of "
-"a paragraph, and \"fixed\" lines which you mark individually using the "
+"a paragraph, and “fixed” lines which you mark individually using the "
 "<key>Enter</key> key. This allows other mailers that recognize the format to "
 "display the text appropriately for the width of the recipient's screen, and "
 "to quote the text correctly when constructing a reply. The text is also "
@@ -4003,8 +3952,8 @@ msgstr ""
 #. (itstool) path: note/p
 #: C/win-composer.page:372
 msgid ""
-"Using \"Format=Flowed\" is strongly recommended. It helps to avert the "
-"\"embarrassing line wrap\" that you see when quoted text is broken across "
+"Using “Format=Flowed” is strongly recommended. It helps to avert the "
+"“embarrassing line wrap” that you see when quoted text is broken across "
 "lines and shown with the wrong level of quoting."
 msgstr ""
 "Používání „Format=Flowed“ se výrazně doporučuje. Pomáhá totiž zabránit "
@@ -4017,9 +3966,9 @@ msgid ""
 "<guiseq> <gui>Options</gui> <gui>Send as plain text and HTML</gui> </guiseq> "
 "-- <app>Balsa</app> can send and receive messages in right-to-left languages "
 "such as Arabic, Hebrew, and Persian, but some other agents such as mailing "
-"lists may mangle them when translating into HTML. If the \"Send as plain "
-"text and HTML\" option is selected, <app>Balsa</app> will generate a correct "
-"HTML message part that such agents will use instead."
+"lists may mangle them when translating into HTML. If the “Send as plain text "
+"and HTML” option is selected, <app>Balsa</app> will generate a correct HTML "
+"message part that such agents will use instead."
 msgstr ""
 "<guiseq><gui>Volby</gui> <gui>Odeslat jako prostý text i HTML</gui></guiseq> "
 "– <app>Balsa</app> umí odesílat a přijímat zprávy v jazycích psaný zprava "
@@ -4123,22 +4072,36 @@ msgstr ""
 #: C/win-composer.page:466
 msgid ""
 "The toolbar contains buttons for the most commonly used functions when "
-"sending messages, including Send, Attach File..., and Save. As with the menu "
-"bar, some buttons are disabled if the message is not correctly setup to be "
-"sent."
+"sending messages, including <gui>Send</gui>, <gui>Attach</gui> <gui>File…</"
+"gui>, and <gui>Save</gui>. As with the menu bar, some buttons are disabled "
+"if the message is not correctly setup to be sent."
 msgstr ""
 "Nástrojová lišta obsahuje tlačítka pro většinu běžně používaných funkcí při "
-"posílání zprávy, včetně Odeslat, Přiložit soubor… a Uložit. Obdobně, jako v "
-"nabídkové liště, jsou některá tlačítka nepřístupná, když není zpráva správně "
-"přichystaná k odeslání."
+"posílání zprávy, včetně <gui>Odeslat</gui>, <gui>Přiložit soubor…</gui> a "
+"<gui>Uložit</gui>. Obdobně, jako v nabídkové liště, jsou některá tlačítka "
+"nepřístupná, když není zpráva správně přichystaná k odeslání."
+
+#. (itstool) path: figure/media
+#. This is a reference to an external file such as an image or video. When
+#. the file changes, the md5 hash will change to let you know you need to
+#. update your localized copy. The msgstr is not used at all. Set it to
+#. whatever you like once you have updated your copy of the file.
+#: C/win-composer.page:474
+msgctxt "_"
+msgid ""
+"external ref='figures/newmsg-window-toolbar.png' "
+"md5='9a3d497c60c021ccee42871d6a700683'"
+msgstr ""
+"external ref='figures/newmsg-window-toolbar.png' "
+"md5='9a3d497c60c021ccee42871d6a700683'"
 
 #. (itstool) path: item/title
-#: C/win-composer.page:477
+#: C/win-composer.page:478
 msgid "<gui>Send</gui>"
 msgstr "<gui>Odeslat</gui>"
 
 #. (itstool) path: item/p
-#: C/win-composer.page:480
+#: C/win-composer.page:481
 msgid ""
 "Send the current message. Only available if the message is legal to be sent "
 "(i.e. proper email addresses). This button may also be configured to queue "
@@ -4151,32 +4114,32 @@ msgstr ""
 "okno <link xref=\"preferences-outgoing\">Předvolby</link>)."
 
 #. (itstool) path: item/title
-#: C/win-composer.page:488
+#: C/win-composer.page:489
 msgid "<gui>Attach</gui>"
 msgstr "<gui>Připojit</gui>"
 
 #. (itstool) path: item/p
-#: C/win-composer.page:491
+#: C/win-composer.page:492
 msgid "Open a dialog to attach a file to the current message."
 msgstr "Otevře dialogové okno pro přiložení souboru do aktuální zprávy."
 
 #. (itstool) path: item/title
-#: C/win-composer.page:495
+#: C/win-composer.page:496
 msgid "<gui>Postpone</gui>"
 msgstr "<gui>Odložit</gui>"
 
 #. (itstool) path: item/p
-#: C/win-composer.page:498
+#: C/win-composer.page:499
 msgid "Postpone the message to the Draftbox for later revision and sending."
 msgstr "Odloží zprávu do konceptů pro pozdější doplnění a odeslání."
 
 #. (itstool) path: item/title
-#: C/win-composer.page:502
+#: C/win-composer.page:503
 msgid "<gui>Check Spelling</gui>"
 msgstr "<gui>Pravopis</gui>"
 
 #. (itstool) path: item/p
-#: C/win-composer.page:505
+#: C/win-composer.page:506
 msgid ""
 "Start a spell check on the current message. If <app>Balsa</app> is built "
 "with support for <app>GtkSpell</app> , your spelling is checked in place. "
@@ -4191,22 +4154,22 @@ msgstr ""
 "dialogovém okně <link xref=\"preferences-spelling\">Předvolby</link>."
 
 #. (itstool) path: item/title
-#: C/win-composer.page:516
+#: C/win-composer.page:517
 msgid "<gui>Print</gui>"
 msgstr "<gui>Tisk</gui>"
 
 #. (itstool) path: item/p
-#: C/win-composer.page:519
+#: C/win-composer.page:520
 msgid "Print out the draft of the message."
 msgstr "Vytiskne koncept zprávy."
 
 #. (itstool) path: item/title
-#: C/win-composer.page:522 C/win-composer.page:726
+#: C/win-composer.page:523 C/win-composer.page:727
 msgid "<gui>Cancel</gui>"
 msgstr "<gui>Zrušit</gui>"
 
 #. (itstool) path: item/p
-#: C/win-composer.page:525
+#: C/win-composer.page:526
 msgid ""
 "Close the composition window without saving or sending the message within."
 msgstr ""
@@ -4214,12 +4177,12 @@ msgstr ""
 "odeslala."
 
 #. (itstool) path: section/title
-#: C/win-composer.page:531
+#: C/win-composer.page:532
 msgid "Headers"
 msgstr "Hlavičky"
 
 #. (itstool) path: section/p
-#: C/win-composer.page:532
+#: C/win-composer.page:533
 msgid ""
 "The headers area is where the information regarding where the message is "
 "being sent to and from, as well as comments and keywords can be entered. All "
@@ -4232,12 +4195,12 @@ msgstr ""
 "vypnout pomocí nabídky."
 
 #. (itstool) path: item/title
-#: C/win-composer.page:539
+#: C/win-composer.page:540
 msgid "<gui>From</gui>"
 msgstr "<gui>Od</gui>"
 
 #. (itstool) path: item/p
-#: C/win-composer.page:542
+#: C/win-composer.page:543
 msgid ""
 "<code>From</code> is used to indicate the origin of the message, <app>Balsa</"
 "app> automatically fills this in for you if you have entered your name and "
@@ -4248,12 +4211,12 @@ msgstr ""
 "mailovou adresu, <app>Balsa</app> vám je zde automaticky vyplní ."
 
 #. (itstool) path: item/title
-#: C/win-composer.page:549
+#: C/win-composer.page:550
 msgid "<gui>To</gui>"
 msgstr "<gui>Komu</gui>"
 
 #. (itstool) path: item/p
-#: C/win-composer.page:552
+#: C/win-composer.page:553
 msgid ""
 "The <code>To</code> header is used to indicate the intended recipient of the "
 "message; <app>Balsa</app> automatically fills this in for you if you are "
@@ -4264,37 +4227,37 @@ msgstr ""
 "zprávu."
 
 #. (itstool) path: item/title
-#: C/win-composer.page:558
+#: C/win-composer.page:559
 msgid "<gui>Subject</gui>"
 msgstr "<gui>Předmět</gui>"
 
 #. (itstool) path: item/p
-#: C/win-composer.page:561
+#: C/win-composer.page:562
 msgid ""
 "The <code>Subject</code> header is used to summarize the topic of the "
 "message."
 msgstr "Hlavička „Předmět“ (<code>Subject</code>) shrnuje téma zprávy."
 
 #. (itstool) path: item/title
-#: C/win-composer.page:566
+#: C/win-composer.page:567
 msgid "<gui>Cc</gui>"
 msgstr "<gui>Kopie</gui>"
 
 #. (itstool) path: item/p
-#: C/win-composer.page:569
+#: C/win-composer.page:570
 msgid ""
-"The \"Carbon Copy\" header. A comma separated list of recipients other than "
+"The “Carbon Copy” header. A comma separated list of recipients other than "
 "the main recipient should go here."
 msgstr ""
 "Hlavička „Kopie“ (<literal>Cc</literal>). Zde by se měl zadat čárkami "
 "oddělený seznam příjemců, kteří nejsou hlavními příjemci zprávy."
 
 #. (itstool) path: item/p
-#: C/win-composer.page:577
+#: C/win-composer.page:578
 msgid ""
-"The <code>Bcc</code> , or \"Blind Carbon Copy\" header. Similar to the Cc "
+"The <code>Bcc</code> , or “Blind Carbon Copy” header. Similar to the Cc "
 "header, except that email addresses placed in this header will not appear as "
-"recipients to readers of the message. Also known as a \"silent\" carbon copy."
+"recipients to readers of the message. Also known as a “silent” carbon copy."
 msgstr ""
 "Hlavička „Skrytá kopie“ (<code>Bcc</code>). Účel je podobný jako u hlavičky "
 "„Kopie“, s tím rozdílem, že e-mailové adresy uvedené v této hlavičce "
@@ -4302,16 +4265,16 @@ msgstr ""
 "„Slepá kopie“ nebo „Tichá kopie“."
 
 #. (itstool) path: item/title
-#: C/win-composer.page:584
+#: C/win-composer.page:585
 msgid "<gui>Fcc</gui>"
 msgstr "<gui>Kopie do složky</gui>"
 
 #. (itstool) path: item/p
-#: C/win-composer.page:587
+#: C/win-composer.page:588
 msgid ""
-"The <code>Fcc</code> header stands for \"Folder Carbon Copy\", and it is "
-"used to specify any folders that you want the message copied to after being "
-"sent. It is presented as a drop-down combo box with a list of all available "
+"The <code>Fcc</code> header stands for “Folder Carbon Copy”, and it is used "
+"to specify any folders that you want the message copied to after being sent. "
+"It is presented as a drop-down combo box with a list of all available "
 "mailboxes, simply select the destination."
 msgstr ""
 "Hlavička „Kopie do složky“ (<code>Fcc</code>) se používá k určení "
@@ -4320,12 +4283,12 @@ msgstr ""
 "si jednoduše vyberete."
 
 #. (itstool) path: item/title
-#: C/win-composer.page:595
+#: C/win-composer.page:596
 msgid "<gui>Reply-To</gui>"
 msgstr "<gui>Komu odpovědět</gui>"
 
 #. (itstool) path: item/p
-#: C/win-composer.page:598
+#: C/win-composer.page:599
 msgid ""
 "The <code>Reply-To</code> header is for specifying what email address you "
 "want any replies to go to."
@@ -4334,12 +4297,12 @@ msgstr ""
 "adresu chcete posílat odpovědi."
 
 #. (itstool) path: section/title
-#: C/win-composer.page:604
+#: C/win-composer.page:605
 msgid "Specifying Addresses"
 msgstr "Zadávání adres"
 
 #. (itstool) path: section/p
-#: C/win-composer.page:605
+#: C/win-composer.page:606
 msgid ""
 "<app>Balsa</app> supports many different methods of selecting email "
 "addresss. All of the headers that can contain addresses have a small colored "
@@ -4350,7 +4313,7 @@ msgstr ""
 "knížku, která otevře adresář <app>Balsa</app>."
 
 #. (itstool) path: section/p
-#: C/win-composer.page:609
+#: C/win-composer.page:610
 msgid ""
 "However, <app>Balsa</app> will also attempt to guess what the headers should "
 "contain depending on what context the composition window is opened in, so it "
@@ -4361,7 +4324,7 @@ msgstr ""
 "vyplňováním hlaviček nemusíte zabývat."
 
 #. (itstool) path: note/p
-#: C/win-composer.page:614
+#: C/win-composer.page:615
 msgid ""
 "Also, <app>Balsa</app> supports alias expansion. As you type a name, "
 "<app>Balsa</app> will guess the e-mail address from all the entries in the "
@@ -4378,22 +4341,36 @@ msgstr ""
 "„táhni a upusť“."
 
 #. (itstool) path: section/section
-#: C/win-composer.page:603
+#: C/win-composer.page:604
 msgid "<_:title-1/> <_:p-2/> <_:p-3/> <_:note-4/> &gt;"
 msgstr "<_:title-1/> <_:p-2/> <_:p-3/> <_:note-4/> &gt;"
 
 #. (itstool) path: section/title
-#: C/win-composer.page:625
+#: C/win-composer.page:626
 msgid "Attachments"
 msgstr "Přílohy"
 
 #. (itstool) path: figure/title
-#: C/win-composer.page:627
+#: C/win-composer.page:628
 msgid "List of Attachments"
 msgstr "Seznam příloh"
 
+#. (itstool) path: figure/media
+#. This is a reference to an external file such as an image or video. When
+#. the file changes, the md5 hash will change to let you know you need to
+#. update your localized copy. The msgstr is not used at all. Set it to
+#. whatever you like once you have updated your copy of the file.
+#: C/win-composer.page:630
+msgctxt "_"
+msgid ""
+"external ref='figures/newmsg-window-attachments.png' "
+"md5='afd5a47d787b0c1a1d32867bec9cb8ee'"
+msgstr ""
+"external ref='figures/newmsg-window-attachments.png' "
+"md5='afd5a47d787b0c1a1d32867bec9cb8ee'"
+
 #. (itstool) path: section/p
-#: C/win-composer.page:631
+#: C/win-composer.page:632
 msgid ""
 "Below the headers may be a large box displaying a list of attachments; this "
 "view can be toggled in the <gui>Show</gui> menu."
@@ -4402,7 +4379,7 @@ msgstr ""
 "lze přepínat v nabídce <gui>Zobrazit</gui>."
 
 #. (itstool) path: section/p
-#: C/win-composer.page:634
+#: C/win-composer.page:635
 msgid ""
 "When there are attachments displayed, it is possible to right-click on one "
 "of them to access an option menu. <gui>Inline</gui> and <gui>Attachment</"
@@ -4422,12 +4399,12 @@ msgstr ""
 "pomocí</gui>."
 
 #. (itstool) path: section/title
-#: C/win-composer.page:646
+#: C/win-composer.page:647
 msgid "Message Body"
 msgstr "Tělo zprávy"
 
 #. (itstool) path: section/p
-#: C/win-composer.page:647
+#: C/win-composer.page:648
 msgid ""
 "Finally, below the attachment list is the main area of the window where the "
 "text of the message is displayed. The text editing capabilities are very "
@@ -4440,7 +4417,7 @@ msgstr ""
 "pak ji jednoduše vložit."
 
 #. (itstool) path: section/p
-#: C/win-composer.page:652
+#: C/win-composer.page:653
 msgid ""
 "If the message is a reply or forward, the referenced message will be "
 "displayed in the body text widget, with the prefix specified in the <link "
@@ -4451,12 +4428,12 @@ msgstr ""
 "<link xref=\"preferences-outgoing\">Předvolby</link>."
 
 #. (itstool) path: section/title
-#: C/win-composer.page:658
+#: C/win-composer.page:659
 msgid "Spell Checker"
 msgstr "Kontrola pravopisu"
 
 #. (itstool) path: section/p
-#: C/win-composer.page:659
+#: C/win-composer.page:660
 msgid ""
 "Once the spell check has been started, it will take a moment to load the "
 "text and spell checking module, and then it will automatically begin "
@@ -4470,12 +4447,24 @@ msgstr ""
 "dostupné činnosti."
 
 #. (itstool) path: figure/title
-#: C/win-composer.page:666
+#: C/win-composer.page:667
 msgid "Spell Checking Panel"
 msgstr "Panel kontroly pravopisu"
 
+#. (itstool) path: figure/media
+#. This is a reference to an external file such as an image or video. When
+#. the file changes, the md5 hash will change to let you know you need to
+#. update your localized copy. The msgstr is not used at all. Set it to
+#. whatever you like once you have updated your copy of the file.
+#: C/win-composer.page:668
+msgctxt "_"
+msgid ""
+"external ref='figures/spell-check.png' md5='99eea5d4372fe11ce809fba8da61569c'"
+msgstr ""
+"external ref='figures/spell-check.png' md5='99eea5d4372fe11ce809fba8da61569c'"
+
 #. (itstool) path: section/p
-#: C/win-composer.page:669
+#: C/win-composer.page:670
 msgid ""
 "As shown above, the panel consists of a list of two panes, one the left "
 "containing a list of suggestions and an entry box, while the right contains "
@@ -4497,7 +4486,7 @@ msgstr ""
 "a případně jej ručně upravíte."
 
 #. (itstool) path: section/p
-#: C/win-composer.page:681
+#: C/win-composer.page:682
 msgid ""
 "The buttons on the left control the actions to take for each incorrect word. "
 "The buttons include:"
@@ -4506,12 +4495,12 @@ msgstr ""
 "slovu. Mezi tlačítky najdete:"
 
 #. (itstool) path: item/title
-#: C/win-composer.page:685
+#: C/win-composer.page:686
 msgid "<gui>Change</gui>"
 msgstr "<gui>Změnit</gui>"
 
 #. (itstool) path: item/p
-#: C/win-composer.page:688
+#: C/win-composer.page:689
 msgid ""
 "Change the incorrect word with the currently selected suggested word or the "
 "user's edited word."
@@ -4520,12 +4509,12 @@ msgstr ""
 "upravené slovo."
 
 #. (itstool) path: item/title
-#: C/win-composer.page:692
+#: C/win-composer.page:693
 msgid "<gui>Change All</gui>"
 msgstr "<gui>Změnit vše</gui>"
 
 #. (itstool) path: item/p
-#: C/win-composer.page:695
+#: C/win-composer.page:696
 msgid ""
 "Change all occurances of the current incorrect word with the currently "
 "selected suggestion."
@@ -4533,17 +4522,17 @@ msgstr ""
 "Změní všechny výskyty aktuálního nesprávného slova na právě vybraný návrh."
 
 #. (itstool) path: item/title
-#: C/win-composer.page:699
+#: C/win-composer.page:700
 msgid "<gui>Ignore</gui>"
 msgstr "<gui>Ignorovat</gui>"
 
 #. (itstool) path: item/p
-#: C/win-composer.page:702
+#: C/win-composer.page:703
 msgid "Ignore the current incorrect word and continue to the next one."
 msgstr "Ignorovat aktuální nesprávné slovo a pokračovat na další."
 
 #. (itstool) path: item/p
-#: C/win-composer.page:706
+#: C/win-composer.page:707
 msgid ""
 "Ignore all occurrances of the current word, and continue to the next "
 "incorrect word."
@@ -4552,12 +4541,12 @@ msgstr ""
 "nesprávné slovo."
 
 #. (itstool) path: item/title
-#: C/win-composer.page:710
+#: C/win-composer.page:711
 msgid "<gui>Learn</gui>"
 msgstr "<gui>Naučit</gui>"
 
 #. (itstool) path: item/p
-#: C/win-composer.page:713
+#: C/win-composer.page:714
 msgid ""
 "Add the current incorrect word to your personal dictionary. This will cause "
 "it to be considered correct for all future spell checks."
@@ -4566,12 +4555,12 @@ msgstr ""
 "považováno za správné při všech následujících kontrolách pravopisu."
 
 #. (itstool) path: item/title
-#: C/win-composer.page:718
+#: C/win-composer.page:719
 msgid "<gui>Done</gui>"
 msgstr "<gui>Hotovo</gui>"
 
 #. (itstool) path: item/p
-#: C/win-composer.page:721
+#: C/win-composer.page:722
 msgid ""
 "Stop the spell check at the current point, keeping all changes so far and "
 "returning to the normal message window interface."
@@ -4580,7 +4569,7 @@ msgstr ""
 "zachová a vrátí se do normálního rozhraní okna se zprávou."
 
 #. (itstool) path: item/p
-#: C/win-composer.page:729
+#: C/win-composer.page:730
 msgid ""
 "Stop the spell check at the current point, reverting all changes so far, "
 "including any words added to your personal dictionary."
@@ -4589,12 +4578,12 @@ msgstr ""
 "změny, včetně případných slov přidaných do vašeho osobního slovníku."
 
 #. (itstool) path: section/title
-#: C/win-composer.page:736
+#: C/win-composer.page:737
 msgid "Address Book"
 msgstr "Adresář"
 
 #. (itstool) path: section/p
-#: C/win-composer.page:737
+#: C/win-composer.page:738
 msgid ""
 "When composing a message, clicking on any of the colored book icons next to "
 "a destination field (To, Cc, Bcc) will bring up the <app>Balsa</app> address "
@@ -4606,12 +4595,26 @@ msgstr ""
 "zprávy."
 
 #. (itstool) path: figure/title
-#: C/win-composer.page:742
+#: C/win-composer.page:743
 msgid "Address Book Window"
 msgstr "Okno s adresářem"
 
+#. (itstool) path: figure/media
+#. This is a reference to an external file such as an image or video. When
+#. the file changes, the md5 hash will change to let you know you need to
+#. update your localized copy. The msgstr is not used at all. Set it to
+#. whatever you like once you have updated your copy of the file.
+#: C/win-composer.page:744
+msgctxt "_"
+msgid ""
+"external ref='figures/address-book.png' "
+"md5='7fe1a6d0c0960ec16337685ccddf8fff'"
+msgstr ""
+"external ref='figures/address-book.png' "
+"md5='7fe1a6d0c0960ec16337685ccddf8fff'"
+
 #. (itstool) path: section/p
-#: C/win-composer.page:745
+#: C/win-composer.page:746
 msgid ""
 "The address book provides two panes, the one on the left consisting of all "
 "available addresses, while the one on the right contains the intended "
@@ -4633,7 +4636,7 @@ msgstr ""
 "nebo na ni jen dvojite klikněte. Tím se přesune zpět."
 
 #. (itstool) path: section/p
-#: C/win-composer.page:756
+#: C/win-composer.page:757
 msgid ""
 "If, while selecting people to send your message to, you decide to add "
 "someone new to the address book, it is a simple matter to click on the "
@@ -4671,25 +4674,29 @@ msgstr ""
 
 #. (itstool) path: page/p
 #: C/win-filters.page:16
+msgid "There are two buttons under the filters list:"
+msgstr "Pod seznamem filtrů jsou dvě tlačítka:"
+
+#. (itstool) path: item/p
+#: C/win-filters.page:19
 msgid ""
-"There are two buttons under the filters list: <list> <item> <p>The <gui>New</"
-"gui> button: you click on it to create a new filter; the filter is initially "
-"named \"New Filter\", and contains no condition. Then you fill in the "
-"different fields in the notebook pages (in particular remember to change the "
-"name of the filter), add the conditions that will describe how this filters "
-"matches a message, and to confirm the modifications push the <gui>Apply</"
-"gui> button on the right hand side of the Filters window.</p> </item> <item> "
-"<p>The <gui>Remove</gui> button: removes the currently selected filter.</p> "
-"</item> </list>"
+"The <gui>New</gui> button: you click on it to create a new filter; the "
+"filter is initially named “New Filter”, and contains no condition. Then you "
+"fill in the different fields in the notebook pages (in particular remember "
+"to change the name of the filter), add the conditions that will describe how "
+"this filters matches a message, and to confirm the modifications push the "
+"<gui>Apply</gui> button on the right hand side of the Filters window."
 msgstr ""
-"Pod seznamem filtrů jsou dvě tlačítka: <list><item><p>Tlačítko <gui>Nový</"
-"gui>: kliknutím na něj vytvoříte nový filtr. Filtr je po vytvoření nazvaný "
-"„Nový filtr“ a neobsahuje žádné podmínky. Až vyplníte další pole na kartě "
-"(obzvláště nezapomeňte změnit název filtru), přidejte podmínky, které "
-"určují, jak má filtr hledat vyhovující zprávy, a změny potvrďte zmáčknutím "
-"tlačítka <gui>Použít</gui> na spodní straně okna.</p></"
-"item><item><p>Tlačítko <gui>Smazat</gui>: odstraní právě vybraný filtr.</p></"
-"item></list>"
+"Tlačítko <gui>Nový</gui>: kliknutím na něj vytvoříte nový filtr. Filtr je po "
+"vytvoření nazvaný „Nový filtr“ a neobsahuje žádné podmínky. Až vyplníte "
+"další pole na kartě (obzvláště nezapomeňte změnit název filtru), přidejte "
+"podmínky, které určují, jak má filtr hledat vyhovující zprávy, a změny "
+"potvrďte zmáčknutím tlačítka <gui>Použít</gui> na spodní straně okna."
+
+#. (itstool) path: item/p
+#: C/win-filters.page:31
+msgid "The <gui>Remove</gui> button: removes the currently selected filter."
+msgstr "Tlačítko <gui>Smazat</gui>: odstraní právě vybraný filtr."
 
 #. (itstool) path: section/title
 #: C/win-filters.page:37
@@ -4701,50 +4708,82 @@ msgstr "Karta Porovnávání"
 msgid ""
 "Each filter is made of one or several conditions; each condition represents "
 "a test to be applied to the messages. The results of these tests is then "
-"combined following the type of operation specified: <list> <item> <p>AND: "
-"all condition tests must be true to make the match.</p> </item> <item> "
-"<p>OR: one condition test must be true to make the match.</p> </item> </list>"
+"combined following the type of operation specified:"
 msgstr ""
 "Každý filtr se skládá z jedné nebo několika podmínek: každá podmínka "
 "představuje test, který se na zprávy použije. Výsledky těchto testů se "
-"zkombinují určenými následujícími typy operací: <list><item><p>A: aby test "
-"vyhověl, všechny podmínky testu musí být splněny</p></item><item><p>NEBO: "
-"aby test vyhověl, stačí splnění jediné podmínky testu</p></item></list>"
+"zkombinují určenými následujícími typy operací:"
+
+#. (itstool) path: item/p
+#: C/win-filters.page:44
+msgid "AND: all condition tests must be true to make the match."
+msgstr "A: všechny podmínky testu musí být splněny, aby test vyhověl."
+
+#. (itstool) path: item/p
+#: C/win-filters.page:48
+msgid "OR: one condition test must be true to make the match."
+msgstr "NEBO: stačí splnění jediné podmínky testu, aby test vyhověl."
 
 #. (itstool) path: section/p
 #: C/win-filters.page:52
 msgid ""
 "Then the page displays the name of the filter and the conditions that "
 "describes how the filters matches a message. The list displays the type of "
-"the conditions (the conditions will be described later): <list> <item> <p> "
-"<gui>Simple</gui>: the match is done by a simple substring test.</p> </item> "
-"<item> <p> <gui>Regular expression</gui>: the match uses regular expressions "
-"on the message headers.</p> </item> <item> <p> <gui>Date interval</gui>: the "
-"match is done by checking if the date of the message is within certain "
-"bounds.</p> </item> <item> <p> <gui>Flag condition</gui>: the match is done "
-"by checking the flags of the message: unread, replied, deleted, flagged.</p> "
-"</item> </list>The three buttons under the list allows you to edit the "
-"selected condition, add a new one, or remove one. Editing or creating a "
-"condition is done in the <link xref=\"win-condition\">condition window</"
-"link>, which pops up when you click on the <gui>Edit</gui> or the <gui>New</"
-"gui> button."
+"the conditions (the conditions will be described later):"
 msgstr ""
 "Dále stránka zobrazuje název filtru a podmínky, které určují, jak má filtr "
-"hledat vyhovující zprávy. Seznam zobrazuje typ podmínky (bude popsáno dále): "
-"<list><item><p><gui>Jednoduchý</gui>: shoda je dána jednoduchým porovnáním "
-"podřetězců.</p></item> <item><p><gui>Regulární výraz</gui>: k porovnání "
-"používá regulární výraz na hlavičky zprávy.</p></item> <item><p><gui>Rozsah "
-"dat</gui>: k porovnání se používá kontrola data zprávy vůči určenému rozsahu."
-"</p></item> <item><p><gui>Stav příznaku</gui>: shoda je dána kontrolou "
-"příznaku zprávy: nepřečtená, odpovězená, smazaná, označená.</p></item></"
-"list> Tři tlačítka pod seznamem vám umožňují upravit vybranou podmínku, "
-"přidat novou a smazat vybranou. Úpravy a vytváření podmínek se dělají v "
-"<link linkend=\"win-condition\">okně podmínek</link>, které se objeví po "
-"kliknutí na tlačítko <guibutton>Upravit</guibutton> nebo <guibutton>Nová</"
-"guibutton>."
+"hledat vyhovující zprávy. Seznam zobrazuje typ podmínky (vlastní podmínky "
+"budou popsány dále):"
+
+#. (itstool) path: item/p
+#: C/win-filters.page:58
+msgid "<gui>Simple</gui>: the match is done by a simple substring test."
+msgstr ""
+"<gui>Jednoduchý</gui>: shoda je dána jednoduchým porovnáním podřetězců."
+
+#. (itstool) path: item/p
+#: C/win-filters.page:63
+msgid ""
+"<gui>Regular expression</gui>: the match uses regular expressions on the "
+"message headers."
+msgstr ""
+"<gui>Regulární výraz</gui>: k porovnání používá regulární výraz na hlavičky "
+"zprávy."
+
+#. (itstool) path: item/p
+#: C/win-filters.page:68
+msgid ""
+"<gui>Date interval</gui>: the match is done by checking if the date of the "
+"message is within certain bounds."
+msgstr ""
+"<gui>Časový interval</gui>: k porovnání se používá kontrola data zprávy vůči "
+"určenému rozsahu."
+
+#. (itstool) path: item/p
+#: C/win-filters.page:73
+msgid ""
+"<gui>Flag condition</gui>: the match is done by checking the flags of the "
+"message: unread, replied, deleted, flagged."
+msgstr ""
+"<gui>Stav příznaku</gui>: shoda je dána kontrolou příznaku zprávy: "
+"nepřečtená, zodpovězená, smazaná, označená."
 
 #. (itstool) path: section/p
-#: C/win-filters.page:85
+#: C/win-filters.page:79
+msgid ""
+"The three buttons under the list allows you to edit the selected condition, "
+"add a new one, or remove one. Editing or creating a condition is done in the "
+"<link xref=\"win-condition\">condition window</link>, which pops up when you "
+"click on the <gui>Edit</gui> or the <gui>New</gui> button."
+msgstr ""
+"Tři tlačítka pod seznamem vám umožňují upravit pravidla vybrané podmínky, "
+"přidat nové a smazat vybranou podmínku. Úpravy a vytváření podmínek se "
+"dělají v <link linkend=\\\"win-condition\\\">okně podmínek</link>, které se "
+"objeví po kliknutí na tlačítko <guibutton>Upravit</guibutton> nebo "
+"<guibutton>Nové</guibutton>."
+
+#. (itstool) path: section/p
+#: C/win-filters.page:86
 msgid ""
 "The two buttons under the notebook at the right hand side of the window lets "
 "you manipulate the currently selected filter. The <gui>Apply</gui> button is "
@@ -4759,7 +4798,7 @@ msgstr ""
 "zahozeny."
 
 #. (itstool) path: section/p
-#: C/win-filters.page:92
+#: C/win-filters.page:93
 msgid ""
 "The <gui>Revert</gui> button cancels all previous changes: the current "
 "filter is reverted to its state just before the last click on the "
@@ -4770,12 +4809,12 @@ msgstr ""
 "<gui>Použít</gui>."
 
 #. (itstool) path: section/title
-#: C/win-filters.page:99
+#: C/win-filters.page:100
 msgid "The Action Page"
 msgstr "Karta Činnost"
 
 #. (itstool) path: section/p
-#: C/win-filters.page:100
+#: C/win-filters.page:101
 msgid ""
 "This page describes the actions to take in case the filter matches. First "
 "you specify the notification to inform you that the one or several messages "
@@ -4792,12 +4831,12 @@ msgstr ""
 "schránky nebo poslala do koše. Další činnosti zatím nejsou implementovány."
 
 #. (itstool) path: section/title
-#: C/win-filters.page:110
+#: C/win-filters.page:111
 msgid "The Condition Window"
 msgstr "Okno s podmínkou"
 
 #. (itstool) path: section/p
-#: C/win-filters.page:111
+#: C/win-filters.page:112
 msgid ""
 "This window is used to edit an existing condition or to create a new one. It "
 "displays all the information needed to describe the condition, it is "
@@ -4812,107 +4851,165 @@ msgstr ""
 "filtrů</link>."
 
 #. (itstool) path: section/p
-#: C/win-filters.page:118
+#: C/win-filters.page:119
+msgid "This window is made of three frames:"
+msgstr "Toto okno se skládá ze tří částí:"
+
+#. (itstool) path: item/p
+#: C/win-filters.page:122
 msgid ""
-"This window is made of three frames: <list> <item> <p>The <gui>Match in</"
-"gui> frame: it's a set of check boxes, one per match field. For example if "
-"you want to match all messages that was sent by hotmail users, you just have "
-"to check the <gui>From</gui> box, or if you want to match all messages about "
-"<app>Balsa</app>, check the <gui>Subject</gui> box.</p> <warning> <p>Be "
-"careful with <gui>Body</gui> match, this can take time for large messages.</"
-"p> </warning> <p>For advanced use you can also specify directly the name of "
-"the header to match on. A standard example the \"X-Mailer\" is a header "
-"added to your message by the MUAs with their name and versions.</p> <p>The "
-"<gui>All</gui> button will check all boxes, whereas the <gui>Clear</gui> "
-"button will uncheck all boxes (as you might have guessed).</p> <p>If you "
-"specify several headers, a message will match this condition if one of the "
-"header matches. For example if you want to filter all messages talking about "
-"<app>Balsa</app>, you should check the <gui>Body</gui> and the <gui>Subject</"
-"gui> boxes, so that all mails with the word <quote>Balsa</quote> in its "
+"The <gui>Match in</gui> frame: it's a set of check boxes, one per match "
+"field. For example if you want to match all messages that was sent by "
+"hotmail users, you just have to check the <gui>From</gui> box, or if you "
+"want to match all messages about <app>Balsa</app>, check the <gui>Subject</"
+"gui> box."
+msgstr ""
+"V části <gui>Porovnávat pole</gui> je sada zaškrtávacích políček, po jednom "
+"pro každé z polí. Například, když chcete vyhledat všechny zprávy, které byly "
+"odeslány uživateli Seznamu, zaškrtněte políčko <gui>Od</gui>, nebo pro "
+"vyhledání zpráv zabývající se herní konzolou Steam, zaškrtněte políčko "
+"<gui>Předmět</gui>."
+
+#. (itstool) path: note/p
+#: C/win-filters.page:131
+msgid ""
+"Be careful with <gui>Body</gui> match, this can take time for large messages."
+msgstr ""
+"Buďte zdrženliví s možností <gui>Tělo</gui> zprávy, protože to může zabrat "
+"hodně času."
+
+#. (itstool) path: item/p
+#: C/win-filters.page:135
+msgid ""
+"For advanced use you can also specify directly the name of the header to "
+"match on. A standard example the “X-Mailer” is a header added to your "
+"message by the MUAs with their name and versions."
+msgstr ""
+"Jako pokročilé použití můžete zadat přímo název hlavičky, která se má "
+"porovnávat. Klasickým příkladem je hlavička „X-Mailer“, kterou do zprávy "
+"přidává poštovní agent MUA a která obsahuje jeho název a verzi."
+
+#. (itstool) path: item/p
+#: C/win-filters.page:139
+msgid ""
+"The <gui>All</gui> button will check all boxes, whereas the <gui>Clear</gui> "
+"button will uncheck all boxes (as you might have guessed)."
+msgstr ""
+"Tlačítko <gui>Všechna</gui> zaškrtne všechna políčka, zatímco tlačítko "
+"<gui>Vymazat</gui> u všech políček zaškrtnutí zruší (jak asi předpokládáte)."
+
+#. (itstool) path: item/p
+#: C/win-filters.page:143
+msgid ""
+"If you specify several headers, a message will match this condition if one "
+"of the header matches. For example if you want to filter all messages "
+"talking about <app>Balsa</app>, you should check the <gui>Body</gui> and the "
+"<gui>Subject</gui> boxes, so that all mails with the word “Balsa” in its "
 "subject or its body will match. You can also, if you're fed up with "
-"<app>Balsa</app> ;-), match all mails that do NOT contain the word "
-"<quote>Balsa</quote> in their subject and in their body neither. See the "
-"description of the search types to see how to do this.</p> </item> <item> "
-"<p>The <gui>Search Type</gui> frame: it's a list of the different condition "
+"<app>Balsa</app> ;-), match all mails that do NOT contain the word “Balsa” "
+"in their subject and in their body neither. See the description of the "
+"search types to see how to do this."
+msgstr ""
+"Když určíte několik hlaviček, vyhoví zpráva této podmínce, pokud vyhoví "
+"jedna z těchto hlaviček. Například, když chcete filtrovat všechny zprávy na "
+"téma „GNOME“, měli byste zaškrtnout políčka <guilabel>Tělo</guilabel> a "
+"<guilabel>Předmět</guilabel>, aby vyhověly všechny zprávy, které mají slovo "
+"„GNOME“ ve svém předmětu nebo ve svém těle. Můžete také, když jste na GNOME "
+"vysazení, nechat vyhovět všechny zprávy, které NEMAJÍ slovo „GNOME“ ve svém "
+"předmětu, ani ve svém těle. Podívejte se na popisy typů hledání, abyste "
+"věděli, jak na to."
+
+#. (itstool) path: item/p
+#: C/win-filters.page:157
+msgid ""
+"The <gui>Search Type</gui> frame: it's a list of the different condition "
 "types. You choose <gui>Simple</gui>, <gui>Regular expression</gui>, "
 "<gui>Date interval</gui>, or <gui>flag condition</gui>. Your choice will "
 "change the third frame so that it displays the fields needed by the type of "
-"match chosen.</p> </item> <item> <p>This part depends on the search type "
-"you've chosen: <list> <item> <p> <gui>Simple</gui> type: a text entry lets "
-"you input the string to look for (case does not matter, the search is case-"
-"insensitive). The button lets you specify if a message matches when the "
-"string is or is NOT a substring of the specified headers, the sentence above "
-"the text entry will be updated accordingly.</p> </item> <item> <p> "
+"match chosen."
+msgstr ""
+"Část <gui>Typ vyhledávání</gui>: jedná se o seznam různých typů podmínek. "
+"Můžete zvolit <gui>jednoduchý</gui>, <gui>regulární výraz</gui>, <gui>časový "
+"interval</gui> nebo <gui>stav příznaku</gui>. Vaše volba změní třetí "
+"rámeček, aby obsahoval pole potřebná pro zvolený typ porovnávání."
+
+#. (itstool) path: item/p
+#: C/win-filters.page:168
+msgid "This part depends on the search type you've chosen:"
+msgstr "Tato část závisí na typu hledání, který jste zvolili:"
+
+#. (itstool) path: item/p
+#: C/win-filters.page:171
+msgid ""
+"<gui>Simple</gui> type: a text entry lets you input the string to look for "
+"(case does not matter, the search is case-insensitive). The button lets you "
+"specify if a message matches when the string is or is NOT a substring of the "
+"specified headers, the sentence above the text entry will be updated "
+"accordingly."
+msgstr ""
+"<gui>Jednoduchý</gui> typ: textové pole vám umožňuje zadat řetězec, který se "
+"bude hledat (velikost písmen nerozhoduje, hledání na ně nebere ohled). "
+"Tlačítka vám umožňují určit, jestli zpráva vyhovuje, když řetězec je nebo "
+"NENÍ podřetězcem určené hlavičky. Věta nad polem s textem se příslušně změní."
+
+#. (itstool) path: item/p
+#: C/win-filters.page:180
+msgid ""
 "<gui>Regular expression</gui>: you can input a list of regular expressions. "
 "You type your regular expression in the text entry, then you click on the "
 "<gui>Add</gui> button to put it into the list. Of course the <gui>Remove</"
 "gui> button destroys the selected regular expression in the list. The last "
 "button <gui>One matches/None matches</gui> lets you specify when a message "
 "matches the condition: when one of the regular expression matches or when "
-"none matches. The sentence above te list will be updated accordingly.</p> </"
-"item> <item> <p> <gui>Date</gui> interval: you can input the interval by the "
-"mean of the two text entries. A blank entry means no bound. The button tells "
-"to match when the message date is within the bounds or not. The sentence "
-"above the text entries will be updated accordingly.</p> </item> <item> <p> "
+"none matches. The sentence above te list will be updated accordingly."
+msgstr ""
+"<gui>Regulární výraz</gui>: můžete zadat seznam regulárních výrazů. Do "
+"textového pole napište svůj regulární výraz a pak klikněte na tlačítko "
+"<gui>Přidat</gui>, aby se vložil do seznamu. Samozřejmě tlačítko "
+"<gui>Odstranit</gui> vybraný regulární výraz v seznamu zlikviduje. Poslední "
+"tlačítko <gui>Jedna shoda/žádná shoda</gui> umožňuje určit, kdy zpráva "
+"podmínce vyhovuje: když vyhovuje jednomu z regulárních výrazů nebo "
+"nevyhovuje žádnému z nich. Věta nad seznamem se příslušně změní."
+
+#. (itstool) path: item/p
+#: C/win-filters.page:194
+msgid ""
+"<gui>Date</gui> interval: you can input the interval by the mean of the two "
+"text entries. A blank entry means no bound. The button tells to match when "
+"the message date is within the bounds or not. The sentence above the text "
+"entries will be updated accordingly."
+msgstr ""
+"<gui>Časové rozmezí</gui>: ve dvou textových polích můžete zadat rozmezí. "
+"Prázdné pole znamená, že žádná hranice není. Tlačítko určuje, jestli má být "
+"datum zprávy uvnitř tohoto rozmezí nebo naopak mimo. Věta nad seznamem se "
+"příslušně změní."
+
+#. (itstool) path: item/p
+#: C/win-filters.page:202
+msgid ""
 "<gui>Flag condition</gui>: the four check boxes let you select which "
 "messages will match this condition. If you want to match all replied OR "
 "unread messages, check the corresponding boxes. The button let you specify "
 "that the match will be done when none of the specified flags are set, the "
 "sentence above the check boxes will be updated accordingly. For example if "
 "you want to filter all read and replied messages, check the <gui>unread</"
-"gui> and <gui>replied</gui> boxes, and click on the button.</p> </item> </"
-"list></p> </item> </list>"
+"gui> and <gui>replied</gui> boxes, and click on the button."
 msgstr ""
-"Toto okno se skládá ze tří částí: \n"
-"<list><item><p>V části <gui>Porovnávat pole</gui> je sada zaškrtávacích "
-"políček, po jednom pro každé z polí. Například, když chcete vyhledat všechny "
-"zprávy, které byly odeslány uživateli Seznamu, zaškrtněte políčko <gui>Od</"
-"gui>, nebo pro vyhledání zpráv zabývající se herní konzolou Steam, "
-"zaškrtněte políčko <gui>Předmět</gui>.</p> <warning>Buďte zdrženliví s "
-"porovnáváním <gui>Těla</gui> zprávy, protože to může zabrat hodně času.</"
-"warning><p>Jako pokročilé použití můžete zadat přímo název hlavičky, která se "
-"má porovnávat. Klasickým příkladem je hlavička „X-Mailer“, kterou do zprávy "
-"přidává poštovní agent MUA a která obsahuje jeho název a verzi.</"
-"p><p>Tlačítko <gui>Všechna</gui> zaškrtne všechna políčka, zatímco tlačítko "
-"<gui>Vymazat</gui> u všech políček zaškrtnutí zruší (jak asi předpokládáte)."
-"</p><p>Když určíte několik hlaviček, vyhoví zpráva této podmínce, pokud "
-"vyhoví jedna z těchto hlaviček. Například, když chcete filtrovat všechny "
-"zprávy na téma „GNOME“, měli byste zaškrtnout políčka <gui>Tělo</gui> a "
-"<gui>Předmět</gui>, aby vyhověly všechny zprávy, které mají slovo „GNOME“ ve "
-"svém předmětu nebo ve svém těle. Můžete také, když jste na GNOME vysazení, "
-"nechat vyhovět všechny zprávy, které NEMAJÍ slovo „GNOME“ ve svém předmětu, "
-"ani ve svém těle. Podívejte se na popisy typů hledání, abyste věděli, jak na "
-"to.</p></item> <item><p>Část <gui>Typ vyhledávání</gui>: jedná se o seznam "
-"různých typů podmínek. Můžete zvolit <gui>Jednoduchý</gui>, <gui>Regulární "
-"výraz</gui>, <gui>Rozmezí dat</gui> nebo <gui>Stav příznaku</gui>. Vaše "
-"volba změní třetí rámeček, aby obsahoval pole potřebná pro zvolený typ "
-"porovnávání.</p></item> <item><p>Tato část závisí na typu hledání, který "
-"jste zvolili: <list><item><p><gui>Jednoduchý</gui> typ: textové pole vám "
-"umožňuje zadat řetězec, který se bude hledat (velikost písmen nerozhoduje, "
-"hledání na ně nebere ohled). Tlačítka vám umožňují určit, jestli zpráva "
-"vyhovuje, když řetězec je nebo NENÍ podřetězcem určené hlavičky. Věta nad "
-"polem s textem se příslušně změní.</p></item> <item><p><gui>Regulární výraz</"
-"gui>: můžete zadat seznam regulárních výrazů. Do textového pole napište svůj "
-"regulární výraz a pak klikněte na tlačítko <gui>Přidat</gui>, aby se vložil "
-"do seznamu. Samozřejmě tlačítko <gui>Odstranit</gui> vybraný regulární výraz "
-"v seznamu zlikviduje. Poslední tlačítko <gui>Jedna shoda/žádná shoda</gui> "
-"umožňuje určit, kdy zpráva podmínce vyhovuje: když vyhovuje jednomu z "
-"regulárních výrazů nebo nevyhovuje žádnému z nich. Věta nad seznamem se "
-"příslušně změní.</p></item> <item><p><gui>Rozmezí dat</gui>: ve dvou "
-"textových polích můžete zadat rozmezí. Prázdné pole znamená, že žádná "
-"hranice není. Tlačítko určuje, jestli má být datum zprávy uvnitř tohoto "
-"rozmezí nebo naopak mimo. Věta nad seznamem se příslušně změní.</p></item> "
-"<item><p><gui>Stav příznaku</gui>: pomocí čtyř zaškrtávacích políček si "
-"můžete vybrat, které zprávy budou podmínce vyhovovat. Když například budete "
-"chtít vyhledat všechny zodpovězené NEBO nepřečtené zprávy, zaškrtněte "
-"příslušná políčka. Tlačítkem můžete význam otočit, a shoda pak nastane, když "
-"ani jeden z vybraných příznaků není nastaven. Věta nad seznamem se příslušně "
-"změní. Například budete chtít odfiltrovat všechny zprávy, které jsou "
-"přečtené a zodpovězené. V takovém případě zaškrtněte <gui>Nepřečtené</gui> a "
-"<gui>Zodpovězené</gui> a klikněte na tlačítko.</p></item></list></p></item></"
-"list>"
+"<gui>Stav příznaku</gui>: pomocí čtyř zaškrtávacích políček si můžete "
+"vybrat, které zprávy budou podmínce vyhovovat. Když například budete chtít "
+"vyhledat všechny zodpovězené NEBO nepřečtené zprávy, zaškrtněte příslušná "
+"políčka. Tlačítkem můžete význam otočit, a shoda pak nastane, když ani jeden "
+"z vybraných příznaků není nastaven. Věta nad seznamem se příslušně změní. "
+"Například budete chtít odfiltrovat všechny zprávy, které jsou přečtené a "
+"zodpovězené. V takovém případě zaškrtněte <gui>Nepřečtené</gui> a "
+"<gui>Zodpovězené</gui> a klikněte na tlačítko."
 
-#. (itstool) path: media
+#. (itstool) path: page/title
+#: C/win-main.page:8
+msgid "The Main Window"
+msgstr "Hlavní okno"
+
+#. (itstool) path: figure/media
 #. This is a reference to an external file such as an image or video. When
 #. the file changes, the md5 hash will change to let you know you need to
 #. update your localized copy. The msgstr is not used at all. Set it to
@@ -4923,25 +5020,6 @@ msgid ""
 "external ref='figures/main-window.png' md5='19fb1edfaade98c5786473ea9d46afaf'"
 msgstr ""
 "external ref='figures/main-window.png' md5='19fb1edfaade98c5786473ea9d46afaf'"
-
-#. (itstool) path: media
-#. This is a reference to an external file such as an image or video. When
-#. the file changes, the md5 hash will change to let you know you need to
-#. update your localized copy. The msgstr is not used at all. Set it to
-#. whatever you like once you have updated your copy of the file.
-#: C/win-main.page:37
-msgctxt "_"
-msgid ""
-"external ref='figures/main-window-toolbar.png' "
-"md5='16ba548c7bbdb8ad4d9354bb212787db'"
-msgstr ""
-"external ref='figures/main-window-toolbar.png' "
-"md5='16ba548c7bbdb8ad4d9354bb212787db'"
-
-#. (itstool) path: page/title
-#: C/win-main.page:8
-msgid "The Main Window"
-msgstr "Hlavní okno"
 
 #. (itstool) path: page/p
 #: C/win-main.page:13
@@ -5000,6 +5078,20 @@ msgstr ""
 msgid "Menu &amp; Toolbar"
 msgstr "Nabídka a nástrojová lišta"
 
+#. (itstool) path: figure/media
+#. This is a reference to an external file such as an image or video. When
+#. the file changes, the md5 hash will change to let you know you need to
+#. update your localized copy. The msgstr is not used at all. Set it to
+#. whatever you like once you have updated your copy of the file.
+#: C/win-main.page:37
+msgctxt "_"
+msgid ""
+"external ref='figures/main-window-toolbar.png' "
+"md5='16ba548c7bbdb8ad4d9354bb212787db'"
+msgstr ""
+"external ref='figures/main-window-toolbar.png' "
+"md5='16ba548c7bbdb8ad4d9354bb212787db'"
+
 #. (itstool) path: figure/title
 #: C/win-main.page:38
 msgid "Main Window Toolbar"
@@ -5032,7 +5124,7 @@ msgstr "<guiseq><gui>Soubor</gui> <gui>Nová</gui></guiseq>"
 #. (itstool) path: item/p
 #: C/win-main.page:60
 msgid ""
-"<guiseq> <gui> File</gui> <gui> New</gui> <gui> Message...</gui> </guiseq> "
+"<guiseq> <gui> File</gui> <gui> New</gui> <gui> Message…</gui> </guiseq> "
 "<key>M</key> -- Create a new message, and display a new window to type the "
 "message in."
 msgstr ""
@@ -5043,8 +5135,8 @@ msgstr ""
 #. (itstool) path: item/p
 #: C/win-main.page:70
 msgid ""
-"<guiseq> <gui> File</gui> <gui> New</gui> <gui> Mailbox...</gui> </guiseq> "
-"-- Open a dialog box to create a new mailbox. There are various items like "
+"<guiseq> <gui> File</gui> <gui> New</gui> <gui> Mailbox…</gui> </guiseq> -- "
+"Open a dialog box to create a new mailbox. There are various items like "
 "this, corresponding to the different types of mailbox that <app>Balsa</app> "
 "supports. See the <link xref=\"mbox-formats\"> discussion of different "
 "mailbox formats</link> and their advantages and disadvantages."
@@ -5058,8 +5150,8 @@ msgstr ""
 #. (itstool) path: item/p
 #: C/win-main.page:84
 msgid ""
-"<guiseq> <gui> File</gui> <gui> New</gui> <gui> Remote IMAP folder...</gui> "
-"</guiseq> -- Open a dialog box to create a folder for an account on an IMAP "
+"<guiseq> <gui> File</gui> <gui> New</gui> <gui> Remote IMAP folder…</gui> </"
+"guiseq> -- Open a dialog box to create a folder for an account on an IMAP "
 "server. This <link xref=\"folder-config\"> IMAP folder properties</link> "
 "dialog can also be used to change the details of the account."
 msgstr ""
@@ -5071,9 +5163,9 @@ msgstr ""
 #. (itstool) path: item/p
 #: C/win-main.page:96
 msgid ""
-"<guiseq> <gui> File</gui> <gui> New</gui> <gui> Remote IMAP subfolder...</"
-"gui> </guiseq> -- Open a dialog box to create a new subfolder in an existing "
-"IMAP folder tree. This <link xref=\"subfolder-config\"> IMAP subfolder "
+"<guiseq> <gui> File</gui> <gui> New</gui> <gui> Remote IMAP subfolder…</gui> "
+"</guiseq> -- Open a dialog box to create a new subfolder in an existing IMAP "
+"folder tree. This <link xref=\"subfolder-config\"> IMAP subfolder "
 "properties</link> dialog can also be used to rename or move a subfolder."
 msgstr ""
 "<guiseq><gui>Soubor</gui> <gui>Nová</gui> <gui>Vzdálená podsložka typu IMAP…"
@@ -5221,9 +5313,9 @@ msgstr ""
 #: C/win-main.page:239
 msgid ""
 "<guiseq> <gui> Edit</gui> <gui> Find in Message</gui> </guiseq> <key>/</"
-"key>-- Selecting this option opens a \"search bar\" at the foot of the "
-"message preview, in which you can type text for which <app>Balsa</app> will "
-"search in the current message."
+"key>-- Selecting this option opens a “search bar” at the foot of the message "
+"preview, in which you can type text for which <app>Balsa</app> will search "
+"in the current message."
 msgstr ""
 "<guiseq><gui>Upravit</gui> <gui>Najít ve zprávě</gui></guiseq> – Výběrem "
 "této volby otevřete „vyhledací lištu“ ve spodní části zobrazené zprávy. Do "
@@ -5251,7 +5343,7 @@ msgstr ""
 #. (itstool) path: item/p
 #: C/win-main.page:266
 msgid ""
-"<guiseq> <gui> Edit</gui> <gui> Preferences...</gui> </guiseq> -- Open the "
+"<guiseq> <gui> Edit</gui> <gui> Preferences…</gui> </guiseq> -- Open the "
 "<link xref=\"preferences\"> Preferences</link> window to change the settings "
 "of <app>Balsa</app> ."
 msgstr ""
@@ -5437,7 +5529,7 @@ msgstr ""
 #. (itstool) path: item/p
 #: C/win-main.page:443
 msgid ""
-"<guiseq> <gui> Mailbox</gui> <gui> Edit...</gui> </guiseq> -- Edit mailbox "
+"<guiseq> <gui> Mailbox</gui> <gui> Edit…</gui> </guiseq> -- Edit mailbox "
 "properties."
 msgstr ""
 "<guiseq><gui>Schránka</gui> <gui>Upravit…</gui></guiseq> – Upravit "
@@ -5446,7 +5538,7 @@ msgstr ""
 #. (itstool) path: item/p
 #: C/win-main.page:450
 msgid ""
-"<guiseq> <gui> Mailbox</gui> <gui> Delete...</gui> </guiseq> -- Delete the "
+"<guiseq> <gui> Mailbox</gui> <gui> Delete…</gui> </guiseq> -- Delete the "
 "currently selected mailbox."
 msgstr ""
 "<guiseq><gui>Schránka</gui> <gui>Odstranit…</gui></guiseq> – Smaže právě "
@@ -5518,47 +5610,47 @@ msgstr "Tato nabídka obsahuje příkazy pro práci se zprávami."
 #. (itstool) path: item/p
 #: C/win-main.page:509
 msgid ""
-"<guiseq> <key> R</key> <gui> Message</gui> <gui> Reply...</gui> </guiseq> "
+"<guiseq> <key> R</key> <gui> Message</gui> <gui> Reply…</gui> </guiseq> "
 "<key>R</key> -- Reply to the currently selected message(s)."
 msgstr ""
 "<guiseq><gui>Zpráva</gui> <gui>Odpovědět…</gui> </guiseq> <key>R</key> – "
-"Odpovědět na aktuálně vybranou zprávu či zprávy."
+"Pošle odpověď na aktuálně vybranou zprávu či zprávy."
 
 #. (itstool) path: item/p
 #: C/win-main.page:518
 msgid ""
-"<guiseq> <key> A</key> <gui> Message</gui> <gui> Reply to All...</gui> </"
+"<guiseq> <key> A</key> <gui> Message</gui> <gui> Reply to All…</gui> </"
 "guiseq> <key>A</key> -- Reply to the currently selected message(s), sending "
 "the reply to all senders and recipients of the message."
 msgstr ""
 "<guiseq><gui>Zpráva</gui> <gui>Odpovědět všem…</gui></guiseq> <key>A</key> – "
-"Odpovědět na právě vybranou zprávu čí více zpráv, přičemž odeslat odpověď "
-"všem odesilatelům a příjemcům zprávy."
+"Pošle odpověď na právě vybranou zprávu čí více zpráv, přičemž odeslat "
+"odpověď všem odesilatelům a příjemcům zprávy."
 
 #. (itstool) path: item/p
 #: C/win-main.page:528
 msgid ""
-"<guiseq> <key> G</key> <gui> Message</gui> <gui> Reply to Group...</gui> </"
+"<guiseq> <key> G</key> <gui> Message</gui> <gui> Reply to Group…</gui> </"
 "guiseq> <key>G</key> -- Reply to a mailing list, instead of the sender to "
 "that list."
 msgstr ""
 "<guiseq><gui>Zpráva</gui> <gui>Odpovědět skupině…</gui></guiseq> <key>G</"
-"key> – Odpovědět do diskuzní skupiny místo odesilateli, který zprávu do "
+"key> – Pošle odpověď do diskuzní skupiny místo odesilateli, který zprávu do "
 "diskuzní skupiny poslal."
 
 #. (itstool) path: item/p
 #: C/win-main.page:537
 msgid ""
-"<guiseq> <key> F</key> <gui> Message</gui> <gui> Forward attached...</gui> </"
+"<guiseq> <key> F</key> <gui> Message</gui> <gui> Forward attached…</gui> </"
 "guiseq> -- Forward the currently selected message(s) as an attachment."
 msgstr ""
-"<guiseq><gui>Zpráva</gui> <gui>Přeposlat jako přílohu…</gui></guiseq> – "
-"Přepošle právě vybranou zprávu(y) jako přílohu."
+"<guiseq><gui>Zpráva</gui> <gui>Přeposlat jako přílohu…</gui></guiseq> "
+"<key>F</key>– Přepošle právě vybranou zprávu(y) jako přílohu."
 
 #. (itstool) path: item/p
 #: C/win-main.page:546
 msgid ""
-"<guiseq> <gui> Message</gui> <gui> Forward inline...</gui> </guiseq> -- "
+"<guiseq> <gui> Message</gui> <gui> Forward inline…</gui> </guiseq> -- "
 "Forward the currently selected message(s), quoted inline."
 msgstr ""
 "<guiseq><gui>Zpráva</gui> <gui>Přeposlat jako citaci…</gui></guiseq> – "
@@ -5589,7 +5681,7 @@ msgstr ""
 #. (itstool) path: item/p
 #: C/win-main.page:580
 msgid ""
-"<guiseq> <gui> Message</gui> <gui> Save Current Part...</gui> </guiseq> "
+"<guiseq> <gui> Message</gui> <gui> Save Current Part…</gui> </guiseq> "
 "<keyseq><key>Ctrl</key><key>S</key></keyseq>-- Save the currently selected "
 "part of the message to a file."
 msgstr ""
@@ -5601,7 +5693,7 @@ msgstr ""
 #: C/win-main.page:590
 msgid ""
 "<guiseq> <shortcut> <keycombo> <sys> Ctrl</sys> <sys> U</sys> </keycombo> </"
-"shortcut> <gui> Message</gui> <gui> View Source...</gui> </guiseq> "
+"shortcut> <gui> Message</gui> <gui> View Source…</gui> </guiseq> "
 "<keyseq><key>Ctrl</key><key>U</key></keyseq> -- Opens a new window that "
 "displays the raw message as received from the <link xref=\"glossary#mta"
 "\">MTA</link> ."
@@ -5663,7 +5755,7 @@ msgid ""
 "shortcut> <gui> Message</gui> <gui> Toggle flag</gui> <gui> Deleted</gui> </"
 "guiseq> <keyseq><key>Ctrl</key><key>D</key></keyseq> -- Marks the message as "
 "set for deletion. The message will be actually removed from the backing "
-"mailstore when it is \"expunged\" either manually, or as specified in the "
+"mailstore when it is “expunged” either manually, or as specified in the "
 "<link xref=\"preferences\">Preferences</link>."
 msgstr ""
 "<guiseq><gui>Zpráva</gui> <gui>Přepnout příznak</gui> <gui>Smazáno</gui></"
@@ -5699,7 +5791,7 @@ msgstr ""
 #. (itstool) path: item/p
 #: C/win-main.page:702
 msgid ""
-"<guiseq> <key> S</key> <gui> Message</gui> <gui> Store Address...</gui> </"
+"<guiseq> <key> S</key> <gui> Message</gui> <gui> Store Address…</gui> </"
 "guiseq> <key>S</key>-- Add the sender of the currently selected message to "
 "your address book."
 msgstr ""
@@ -5719,7 +5811,7 @@ msgstr "Nabídka pro změnu nastavení aplikace <app>Balsa</app>."
 #. (itstool) path: item/p
 #: C/win-main.page:719
 msgid ""
-"<guiseq> <gui> Settings</gui> <gui> Toolbars...</gui> </guiseq> -- Open the "
+"<guiseq> <gui> Settings</gui> <gui> Toolbars…</gui> </guiseq> -- Open the "
 "<link xref=\"toolbar-prefs\"> Toolbars</link> window to modify the content "
 "and arrangement of the toolbars in <app>Balsa</app> ."
 msgstr ""
@@ -5730,8 +5822,8 @@ msgstr ""
 #. (itstool) path: item/p
 #: C/win-main.page:729
 msgid ""
-"<guiseq> <gui> Settings</gui> <gui> Identities...</gui> </guiseq> -- Open "
-"the <link xref=\"identities\"> Identities</link> window to customize how you "
+"<guiseq> <gui> Settings</gui> <gui> Identities…</gui> </guiseq> -- Open the "
+"<link xref=\"identities\"> Identities</link> window to customize how you "
 "present yourself to the rest of the world."
 msgstr ""
 "<guiseq><gui>Nastavení</gui> <gui>Identity…</gui></guiseq> – Otevře okno "
@@ -5938,34 +6030,6 @@ msgstr ""
 "zpráv nebo zmáčknutím <key>mezerníku</key> nebo <key>Enter</key> se otevře "
 "zpráva v <link xref=\"win-message\">samostatném okně</link>."
 
-#. (itstool) path: media
-#. This is a reference to an external file such as an image or video. When
-#. the file changes, the md5 hash will change to let you know you need to
-#. update your localized copy. The msgstr is not used at all. Set it to
-#. whatever you like once you have updated your copy of the file.
-#: C/win-message.page:28
-msgctxt "_"
-msgid ""
-"external ref='figures/message-window.png' "
-"md5='b72ce86097d5b8bc4ea8ca52f48b3205'"
-msgstr ""
-"external ref='figures/message-window.png' "
-"md5='b72ce86097d5b8bc4ea8ca52f48b3205'"
-
-#. (itstool) path: media
-#. This is a reference to an external file such as an image or video. When
-#. the file changes, the md5 hash will change to let you know you need to
-#. update your localized copy. The msgstr is not used at all. Set it to
-#. whatever you like once you have updated your copy of the file.
-#: C/win-message.page:50
-msgctxt "_"
-msgid ""
-"external ref='figures/msg-part-select.png' "
-"md5='8265967b3acae486db6f90bddec897e1'"
-msgstr ""
-"external ref='figures/msg-part-select.png' "
-"md5='8265967b3acae486db6f90bddec897e1'"
-
 #. (itstool) path: page/title
 #: C/win-message.page:8
 msgid "The Message Window"
@@ -5997,6 +6061,20 @@ msgstr ""
 "se k jednotlivé zprávě. Příkazy jsou popsány u <link xref=\"win-main"
 "\">hlavního okna</link>. Pod nabídkou a nástrojovou lištou je blok s "
 "hlavičkami zprávy, následován tělem zprávy."
+
+#. (itstool) path: figure/media
+#. This is a reference to an external file such as an image or video. When
+#. the file changes, the md5 hash will change to let you know you need to
+#. update your localized copy. The msgstr is not used at all. Set it to
+#. whatever you like once you have updated your copy of the file.
+#: C/win-message.page:28
+msgctxt "_"
+msgid ""
+"external ref='figures/message-window.png' "
+"md5='b72ce86097d5b8bc4ea8ca52f48b3205'"
+msgstr ""
+"external ref='figures/message-window.png' "
+"md5='b72ce86097d5b8bc4ea8ca52f48b3205'"
 
 #. (itstool) path: page/p
 #: C/win-message.page:31
@@ -6030,6 +6108,20 @@ msgstr ""
 #: C/win-message.page:49
 msgid "Selecting a Message Part"
 msgstr "Výběr části zprávy"
+
+#. (itstool) path: figure/media
+#. This is a reference to an external file such as an image or video. When
+#. the file changes, the md5 hash will change to let you know you need to
+#. update your localized copy. The msgstr is not used at all. Set it to
+#. whatever you like once you have updated your copy of the file.
+#: C/win-message.page:50
+msgctxt "_"
+msgid ""
+"external ref='figures/msg-part-select.png' "
+"md5='8265967b3acae486db6f90bddec897e1'"
+msgstr ""
+"external ref='figures/msg-part-select.png' "
+"md5='8265967b3acae486db6f90bddec897e1'"
 
 #. (itstool) path: page/p
 #: C/win-message.page:53
@@ -6124,19 +6216,26 @@ msgstr ""
 
 #. (itstool) path: page/p
 #: C/win-run-filters.page:34
+msgid "There are two buttons between the filters lists:"
+msgstr "Mezi seznamy filtrů jsou dvě tlačítka:"
+
+#. (itstool) path: item/p
+#: C/win-run-filters.page:37
 msgid ""
-"There are two buttons between the filters lists: <list> <item> <p>The "
-"<gui>Add</gui> button: moves the selected filters from the left list to the "
-"right one, adding more filters to be applied to the mailbox.</p> </item> "
-"<item> <p>The <gui>Remove</gui> button: removes the currently selected "
-"filter in the right list and puts it back in the left list.</p> </item> </"
-"list>"
+"The <gui>Add</gui> button: moves the selected filters from the left list to "
+"the right one, adding more filters to be applied to the mailbox."
 msgstr ""
-"Mezi seznamy filtrů jsou dvě tlačítka: <list><item><p>Tlačítko <gui>Přidat</"
-"gui>: přesouvá vybrané filtry z levého seznamu do pravého, tím se přidá více "
-"filtrů, které se u poštovní schránky použijí.</p></item> <item><p>Tlačítko "
-"<gui>Odebrat</gui>: odebere právě vybrané filtry z pravého seznamu a vloží "
-"je zpět do levého seznamu.</p></item></list>"
+"Tlačítko <gui>Přidat</gui>: přesouvá vybrané filtry z levého seznamu do "
+"pravého, tím se přidá více filtrů, které se u poštovní schránky použijí."
+
+#. (itstool) path: item/p
+#: C/win-run-filters.page:43
+msgid ""
+"The <gui>Remove</gui> button: removes the currently selected filter in the "
+"right list and puts it back in the left list."
+msgstr ""
+"Tlačítko <gui>Odebrat</gui>: odebere právě vybrané filtry z pravého seznamu "
+"a vloží je zpět do levého seznamu."
 
 #. (itstool) path: page/p
 #: C/win-run-filters.page:49
@@ -6168,26 +6267,38 @@ msgstr ""
 
 #. (itstool) path: page/p
 #: C/win-run-filters.page:62
+msgid "There are three buttons below the filters lists:"
+msgstr "Pod seznamem filtrů následují tyto tři tlačítka:"
+
+#. (itstool) path: item/p
+#: C/win-run-filters.page:65
 msgid ""
-"There are three buttons below the filters lists: <list> <item> <p>The "
-"<gui>OK</gui> button: saves the list of filters associated to the mailbox. "
-"Note that this does not apply the filters to the mailbox. It is useful only "
-"when you have set up automatic filters, or when you have to manually apply a "
-"lot of filters frequently to this mailbox: the next time <app>Balsa</app> "
-"will reload the saved filters and you will only have to press the "
-"<gui>Apply</gui> button.</p> </item> <item> <p>The <gui>Cancel</gui> button: "
-"this discards any changes and closes the dialog box.</p> </item> <item> "
-"<p>The <gui>Help</gui> button: opens this help window.</p> </item> </list>"
+"The <gui>OK</gui> button: saves the list of filters associated to the "
+"mailbox. Note that this does not apply the filters to the mailbox. It is "
+"useful only when you have set up automatic filters, or when you have to "
+"manually apply a lot of filters frequently to this mailbox: the next time "
+"<app>Balsa</app> will reload the saved filters and you will only have to "
+"press the <gui>Apply</gui> button."
 msgstr ""
-"Pod seznamem filtrů následují tyto tři tlačítka: <list><item><p>Tlačítko "
-"<gui>Budiž</gui>: uloží seznam filtrů přiřazený k poštovní schránce. "
-"Pamatujte, že tím se filtry u poštovní schránky přímo nepoužijí. Význam to "
-"tak má jen v případě, že máte nastavené automatické filtrování nebo když "
-"potřebujete u poštovní schránky často ručně použít hodně filtrů: až "
-"<app>Balsa</app> příště znovu načte uložené filtry, stačí vám jen zmáčknout "
-"tlačítko <gui>Použít</gui>.</p></item> <item><p>Tlačítko <gui>Zrušit</gui>: "
-"zahodí případné změny a zavře dialogové okno.</p></item> <item><p>Tlačítko "
-"<gui>Nápověda</gui>: otevře toto okno s nápovědou.</p></item></list>"
+"Tlačítko <gui>Budiž</gui>: uloží seznam filtrů přiřazený k poštovní "
+"schránce. Pamatujte, že tím se filtry u poštovní schránky přímo nepoužijí. "
+"Význam to tak má jen v případě, že máte nastavené automatické filtrování "
+"nebo když potřebujete u poštovní schránky často ručně použít hodně filtrů: "
+"až <app>Balsa</app> příště znovu načte uložené filtry, stačí vám jen "
+"zmáčknout tlačítko <gui>Použít</gui>."
+
+#. (itstool) path: item/p
+#: C/win-run-filters.page:75
+msgid ""
+"The <gui>Cancel</gui> button: this discards any changes and closes the "
+"dialog box."
+msgstr ""
+"Tlačítko <gui>Zrušit</gui>: zahodí případné změny a zavře dialogové okno."
+
+#. (itstool) path: item/p
+#: C/win-run-filters.page:80
+msgid "The <gui>Help</gui> button: opens this help window."
+msgstr "Tlačítko <gui>Nápověda</gui>: otevře toto okno s nápovědou."
 
 #. (itstool) path: page/title
 #: C/win-search.page:8
@@ -6259,813 +6370,3 @@ msgstr ""
 "procházení vyhovujících zpráv můžete používat <guiseq><gui>Upravit</gui> "
 "<gui>Najít další</gui></guiseq> nebo <keyseq><key>Ctrl</key><key>G</key></"
 "keyseq>."
-
-#~ msgid ""
-#~ "<application><application>Balsa</application></application> User's Guide"
-#~ msgstr ""
-#~ "Uživatelská přiručka aplikace <application><application>Balsa</"
-#~ "application></application>"
-
-#~ msgid "Salek"
-#~ msgstr "Salek"
-
-#~ msgid "This is version 2.721 of the Balsa manual."
-#~ msgstr "Toto je verze 2.721 příručky k aplikaci Balsa."
-
-#~ msgid "2.721"
-#~ msgstr "2.721"
-
-#~ msgid "26 February 2006"
-#~ msgstr "26 února 2006"
-
-#~ msgid "This document is the extensive balsa manual."
-#~ msgstr "Tento dokument je rozšířenou příručkou k aplikaci Balsa."
-
-#~ msgid "File"
-#~ msgstr "Soubor"
-
-#~ msgid "New"
-#~ msgstr "Nová"
-
-#~ msgid ""
-#~ "<menuchoice><shortcut><keycombo><keysym>Ctrl</keysym><keysym>M</keysym></"
-#~ "keycombo></shortcut><guimenu>File</guimenu><guimenuitem>Get New Mail</"
-#~ "guimenuitem></menuchoice> -- This causes <application>Balsa</application> "
-#~ "to attempt to retrieve any new messages from the <glossterm linkend="
-#~ "\"glossary-pop\"><acronym>POP3</acronym></glossterm> server."
-#~ msgstr ""
-#~ "<menuchoice><shortcut><keycombo><keysym>Ctrl</keysym><keysym>M</keysym></"
-#~ "keycombo></shortcut><guimenu>Soubor</guimenu><guimenuitem>Přijmout novou "
-#~ "poštu</guimenuitem></menuchoice> – Přiměje <application>Balsu</"
-#~ "application> zkusit získat nové zprávy ze serveru <glossterm linkend="
-#~ "\"glossary-pop\"><acronym>POP3</acronym></glossterm>."
-
-#~ msgid ""
-#~ "<menuchoice><guimenu>File</guimenu><guimenuitem>Exit</guimenuitem></"
-#~ "menuchoice> -- Exit the program."
-#~ msgstr ""
-#~ "<menuchoice><guimenu>Soubor</guimenu><guimenuitem>Ukončit</guimenuitem></"
-#~ "menuchoice> – Ukončit program."
-
-#~ msgid "Edit"
-#~ msgstr "Upravit"
-
-#~ msgid "View"
-#~ msgstr "Zobrazit"
-
-#~ msgid ""
-#~ "<menuchoice><shortcut><keycombo><keysym>Ctrl</keysym><keysym>E</keysym></"
-#~ "keycombo></shortcut><guimenu>View</guimenu><guimenuitem>Expand All</"
-#~ "guimenuitem></menuchoice> -- "
-#~ "<menuchoice><shortcut><keycombo><keysym>Ctrl</keysym><keysym>L</keysym></"
-#~ "keycombo></shortcut><guimenu>View</guimenu><guimenuitem>Collapse All</"
-#~ "guimenuitem></menuchoice> -- Expand or collapse all threads in the "
-#~ "currently displayed mailbox."
-#~ msgstr ""
-#~ "<menuchoice><shortcut><keycombo><keysym>Ctrl</keysym><keysym>E</keysym></"
-#~ "keycombo></shortcut><guimenu>Zobrazit</guimenu><guimenuitem>Rozbalit vše</"
-#~ "guimenuitem></menuchoice> – <menuchoice><shortcut><keycombo><keysym>Ctrl</"
-#~ "keysym><keysym>L</keysym></keycombo></shortcut><guimenu>Zobrazit</"
-#~ "guimenu><guimenuitem>Sbalit vše</guimenuitem></menuchoice> – Rozbalí nebo "
-#~ "sbalí všechna vlákna v právě zobrazené poštovní schránce."
-
-#~ msgid ""
-#~ "<menuchoice><shortcut><keysym>N</keysym></shortcut><guimenu>Mailbox</"
-#~ "guimenu><guimenuitem>Next</guimenuitem></menuchoice> -- Select the next "
-#~ "message in the current mailbox."
-#~ msgstr ""
-#~ "<menuchoice><shortcut><keysym>N</keysym></shortcut><guimenu>Poštovní "
-#~ "schránka</guimenu><guimenuitem>Následující zpráva</guimenuitem></"
-#~ "menuchoice> – Vybere následující zprávu v aktuální poštovní schránce."
-
-#~ msgid ""
-#~ "<menuchoice><shortcut><keycombo><keysym>Ctrl</keysym><keysym>N</keysym></"
-#~ "keycombo></shortcut><guimenu>Mailbox</guimenu><guimenuitem>Next Unread</"
-#~ "guimenuitem></menuchoice> -- Select the next unread message in the "
-#~ "current mailbox."
-#~ msgstr ""
-#~ "<menuchoice><shortcut><keycombo><keysym>Ctrl</keysym><keysym>N</keysym></"
-#~ "keycombo></shortcut><guimenu>Schránka</guimenu><guimenuitem>Následující "
-#~ "nepřečtená</guimenuitem></menuchoice> – Vybere následující nepřečtenou "
-#~ "zprávu v aktuální poštovní schránce."
-
-#~ msgid ""
-#~ "<menuchoice><shortcut><keycombo><keysym>Ctrl</keysym><keysym>Alt</"
-#~ "keysym><keysym>F</keysym></keycombo></shortcut><guimenu>Mailbox</"
-#~ "guimenu><guimenuitem>Next Flagged</guimenuitem></menuchoice> -- Select "
-#~ "the next flagged message in the current mailbox."
-#~ msgstr ""
-#~ "<menuchoice><shortcut><keycombo><keysym>Ctrl</keysym><keysym>Alt</"
-#~ "keysym><keysym>F</keysym></keycombo></shortcut><guimenu>Schránka</"
-#~ "guimenu><guimenuitem>Následující označená</guimenuitem></menuchoice> – "
-#~ "Vybere následující označenou zprávu v aktuální poštovní schránce."
-
-#~ msgid "Message Menu"
-#~ msgstr "Zpráva"
-
-#~ msgid ""
-#~ "<menuchoice><shortcut><keycombo><keysym>Ctrl</keysym><keysym>.</keysym></"
-#~ "keycombo></shortcut><guimenu>Message</guimenu><guimenuitem>Next Part</"
-#~ "guimenuitem></menuchoice> -- View the next part of the message (if the "
-#~ "message is multi-part)."
-#~ msgstr ""
-#~ "<menuchoice><shortcut><keycombo><keysym>Ctrl</keysym><keysym>.</keysym></"
-#~ "keycombo></shortcut><guimenu>Zpráva</guimenu><guimenuitem>Následující "
-#~ "část</guimenuitem></menuchoice> – Zobrazí následující část zprávy (pokud "
-#~ "má zpráva více částí)."
-
-#~ msgid ""
-#~ "<menuchoice><shortcut><keycombo><keysym>Ctrl</keysym><keysym>S</keysym></"
-#~ "keycombo></shortcut><guimenu>Message</guimenu><guimenuitem>Save Current "
-#~ "Part...</guimenuitem></menuchoice> -- Save the currently selected part of "
-#~ "the message to a file."
-#~ msgstr ""
-#~ "<menuchoice><shortcut><keycombo><keysym>Ctrl</keysym><keysym>S</keysym></"
-#~ "keycombo></shortcut> <guimenu>Zpráva</guimenu><guimenuitem>Uložit tuto "
-#~ "část…</guimenuitem></menuchoice> – Uloží právě vybranou část zprávy do "
-#~ "souboru."
-
-#~ msgid "Toggle flag"
-#~ msgstr "Přepnout příznak"
-
-#~ msgid "Settings"
-#~ msgstr "Nastavení"
-
-#~ msgid ""
-#~ "<menuchoice><guimenu>File</guimenu><guimenuitem>Send</guimenuitem></"
-#~ "menuchoice> -- Send the message."
-#~ msgstr ""
-#~ "<menuchoice><guimenu>Soubor</guimenu><guimenuitem>Odeslat</guimenuitem></"
-#~ "menuchoice> – Odešle zprávu."
-
-#~ msgid ""
-#~ "<menuchoice><shortcut><keycombo><keysym>Ctrl</keysym><keysym>W</keysym></"
-#~ "keycombo></shortcut><guimenu>File</guimenu><guimenuitem>Close</"
-#~ "guimenuitem></menuchoice> -- Close and discard the current message."
-#~ msgstr ""
-#~ "<menuchoice><shortcut><keycombo><keysym>Ctrl</keysym><keysym>W</keysym></"
-#~ "keycombo></shortcut> <guimenu>Soubor</guimenu><guimenuitem>Zavřít</"
-#~ "guimenuitem></menuchoice> – Zavře a zahodí aktuílní zprávu."
-
-#~ msgid ""
-#~ "<menuchoice><shortcut><keycombo><keysym>Ctrl</keysym><keysym>X</keysym></"
-#~ "keycombo></shortcut><guimenu>Edit</guimenu><guimenuitem>Cut</"
-#~ "guimenuitem></menuchoice> -- Cut the selected text to the clipboard."
-#~ msgstr ""
-#~ "<menuchoice><shortcut><keycombo><keysym>Ctrl</keysym><keysym>X</keysym></"
-#~ "keycombo></shortcut><guimenu>Upravit</guimenu><guimenuitem>Vyjmout</"
-#~ "guimenuitem></menuchoice> – Vyjmout vybraný text do schránky."
-
-#~ msgid ""
-#~ "<menuchoice><shortcut><keycombo><keysym>Ctrl</keysym><keysym>C</keysym></"
-#~ "keycombo></shortcut><guimenu>Edit</guimenu><guimenuitem>Copy</"
-#~ "guimenuitem></menuchoice> -- Copy the selected text to the clipboard."
-#~ msgstr ""
-#~ "<menuchoice><shortcut><keycombo><keysym>Ctrl</keysym><keysym>C</keysym></"
-#~ "keycombo></shortcut><guimenu>Upravit</guimenu><guimenuitem>Kopírovat</"
-#~ "guimenuitem></menuchoice> – Kopírovat vybraný text do schránky."
-
-#~ msgid "Ctrl"
-#~ msgstr "Ctrl"
-
-#~ msgid "A"
-#~ msgstr "A"
-
-#~ msgid "Select All"
-#~ msgstr "Vybrat vše"
-
-#~ msgid ""
-#~ "<menuchoice><shortcut><keycombo><keysym>Ctrl</keysym><keysym>Shift</"
-#~ "keysym><keysym>R</keysym></keycombo></shortcut><guimenu>Edit</"
-#~ "guimenu><guimenuitem>Reflow Message</guimenuitem></menuchoice> -- Cause "
-#~ "all the lines in the message to be wrapped to the specified outgoing mail "
-#~ "wrap column."
-#~ msgstr ""
-#~ "<menuchoice><shortcut><keycombo><keysym>Ctrl</keysym><keysym>Shift</"
-#~ "keysym><keysym>R</keysym></keycombo></shortcut><guimenu>Upravit</"
-#~ "guimenu><guimenuitem>Přeformátovat zprávu</guimenuitem></menuchoice> – "
-#~ "Způsobí, že všechny řádky zprávy budou zalomeny na šířku určenou pro "
-#~ "odchozí poštu."
-
-#~ msgid ""
-#~ "<menuchoice><shortcut><keycombo><keysym>Ctrl</keysym><keysym>Shift</"
-#~ "keysym><keysym>S</keysym></keycombo></shortcut><guimenu>Edit</"
-#~ "guimenu><guimenuitem>Check Spelling</guimenuitem></menuchoice> -- Start "
-#~ "spell checking the current message."
-#~ msgstr ""
-#~ "<menuchoice><shortcut><keycombo><keysym>Ctrl</keysym><keysym>Shift</"
-#~ "keysym><keysym>S</keysym></keycombo></shortcut><guimenu>Upravit</"
-#~ "guimenu><guimenuitem>Zkontrolovat pravopis</guimenuitem></menuchoice> – "
-#~ "Spustit kontrolu pravopisu v aktuální zprávě."
-
-#~ msgid "Show"
-#~ msgstr "Zobrazit"
-
-#~ msgid "Language"
-#~ msgstr "Jazyk"
-
-#~ msgid "The available languages include:"
-#~ msgstr "Mezi dostupné jazyky patří:"
-
-#~ msgid "Brazilian"
-#~ msgstr "Brazilština"
-
-#~ msgid "Catalan"
-#~ msgstr "Katalánština"
-
-#~ msgid "Chinese (Simplified or Traditional)"
-#~ msgstr "Čínština (zjednodušená nebo tradiční)"
-
-#~ msgid "Czech"
-#~ msgstr "Čeština"
-
-#~ msgid "Danish"
-#~ msgstr "Dánština"
-
-#~ msgid "Dutch"
-#~ msgstr "Holandština"
-
-#~ msgid "English (American or British)"
-#~ msgstr "Angličtina (americká nebo britská)"
-
-#~ msgid "Esperanto"
-#~ msgstr "Esperanto"
-
-#~ msgid "Estonian"
-#~ msgstr "Estonština"
-
-#~ msgid "Finnish"
-#~ msgstr "Finština"
-
-#~ msgid "French"
-#~ msgstr "Francouzština"
-
-#~ msgid "German (including Austrian and Swiss)"
-#~ msgstr "Němčina (včetně rakouské a švýcarské)"
-
-#~ msgid "Greek"
-#~ msgstr "Řečtina"
-
-#~ msgid "Hebrew"
-#~ msgstr "Hebrejština"
-
-#~ msgid "Hungarian"
-#~ msgstr "Maďarština"
-
-#~ msgid "Italian"
-#~ msgstr "Italština"
-
-#~ msgid "Japanese"
-#~ msgstr "Japonština"
-
-#~ msgid "Kazakh"
-#~ msgstr "Kazaština"
-
-#~ msgid "Korean"
-#~ msgstr "Korejština"
-
-#~ msgid "Latvian"
-#~ msgstr "Lotyština"
-
-#~ msgid "Lithuanian"
-#~ msgstr "Litevština"
-
-#~ msgid "Norwegian"
-#~ msgstr "Norština"
-
-#~ msgid "Polish"
-#~ msgstr "Polština"
-
-#~ msgid "Portugese"
-#~ msgstr "Portugalština"
-
-#~ msgid "Romanian"
-#~ msgstr "Rumunština"
-
-#~ msgid "Russian"
-#~ msgstr "Ruština"
-
-#~ msgid "Serbian (including Latin)"
-#~ msgstr "Srbština (včetně latinky)"
-
-#~ msgid "Slovak"
-#~ msgstr "Slovenština"
-
-#~ msgid "Spanish"
-#~ msgstr "Španělština"
-
-#~ msgid "Swedish"
-#~ msgstr "Švédština"
-
-#~ msgid "Tatar"
-#~ msgstr "Tatarština"
-
-#~ msgid "Turkish"
-#~ msgstr "Turečtina"
-
-#~ msgid "Ukrainian"
-#~ msgstr "Ukrajinština"
-
-#~ msgid "and more may have been added."
-#~ msgstr "a možná byly doplněny další."
-
-#~ msgid "Options"
-#~ msgstr "Volby"
-
-#~ msgid "Send"
-#~ msgstr "Odeslat"
-
-#~ msgid "Attach"
-#~ msgstr "Připojit"
-
-#~ msgid "Postpone"
-#~ msgstr "Odložit"
-
-#~ msgid "Print"
-#~ msgstr "Tisk"
-
-#~ msgid "Cancel"
-#~ msgstr "Zrušit"
-
-#~ msgid "From"
-#~ msgstr "Od"
-
-#~ msgid "To"
-#~ msgstr "Komu"
-
-#~ msgid "Subject"
-#~ msgstr "Subject"
-
-#~ msgid "Cc"
-#~ msgstr "Kopie"
-
-#~ msgid "Bcc"
-#~ msgstr "Skrytá kopie"
-
-#~ msgid "Fcc"
-#~ msgstr "Kopie do složky"
-
-#~ msgid "Reply-To"
-#~ msgstr "Komu odpovědět"
-
-#~ msgid "Comments"
-#~ msgstr "Komentáře"
-
-#~ msgid ""
-#~ "Although not widely used, the <literal>Comments</literal> header can be "
-#~ "used to specify short comments for email's."
-#~ msgstr ""
-#~ "Ačkoliv není příliš používaná, může být hlavička <literal>Komentáře</"
-#~ "literal> použita k stručnému okomentování zpráv."
-
-#~ msgid "Keywords"
-#~ msgstr "Klíčová slova"
-
-#~ msgid ""
-#~ "Again, not a very widely used header, this can be used to embed general "
-#~ "information about the content of the message in the email, to allow for "
-#~ "easier searching or filtering at a later date."
-#~ msgstr ""
-#~ "Opět nepříliš používaná hlavička. Může být použita k vložení obecných "
-#~ "informací o obsahu zprávy, aby se později dala snáze vyhledat nebo "
-#~ "vyfiltrovat."
-
-#~ msgid "Change"
-#~ msgstr "Změnit"
-
-#~ msgid "Ignore"
-#~ msgstr "Ignorovat"
-
-#~ msgid "Ignore All"
-#~ msgstr "Ignorovat vše"
-
-#~ msgid "Learn"
-#~ msgstr "Naučit"
-
-#~ msgid "Done"
-#~ msgstr "Hotovo"
-
-#~ msgid "Incoming and Outgoing Mail"
-#~ msgstr "Příchozí a odchozí pošta"
-
-#~ msgid ""
-#~ "Use this page to set the <application>Balsa</application>'s behaviour "
-#~ "regarding incoming and outgoing messages."
-#~ msgstr ""
-#~ "Tuto stránku použijte k nastavení chování poštovního klienta "
-#~ "<application>Balsa</application> ohledně příchozích a odchozích zpráv."
-
-#~ msgid "Encoding"
-#~ msgstr "Kódování"
-
-#~ msgid "Display Options"
-#~ msgstr "Možnosti zobrazení"
-
-#~ msgid "Fonts"
-#~ msgstr "Písma"
-
-#~ msgid ""
-#~ "Choose the fonts that you want to be used to display a message. You can "
-#~ "choose a distinct font for the message's subject line."
-#~ msgstr ""
-#~ "Zvolte si písmo, které chcete používat k zobrazení zpráv. Můžete si také "
-#~ "zvolit odlišné písmo pro pole s předmětem zprávy."
-
-#~ msgid "Composition Window"
-#~ msgstr "Okno editoru"
-
-#~ msgid ""
-#~ "When you are composing a message, <application>Balsa</application> uses "
-#~ "color to show when one of the address fields is incomplete. Choose that "
-#~ "color here."
-#~ msgstr ""
-#~ "Když píšete zprávu, používá <application>Balsa</application> odlišnou "
-#~ "barvu k zobrazení, když je jedno z polí s adresou neúplné. Zde si můžete "
-#~ "barvu zvolit."
-
-#~ msgid "Spelling"
-#~ msgstr "Kontrola pravopisu"
-
-#~ msgid ""
-#~ "If <application>Balsa</application> is using GtkSpell, you can choose to "
-#~ "have your spelling checked as you type. <application>Balsa</application> "
-#~ "uses GtkSpell's default settings."
-#~ msgstr ""
-#~ "Když <application>Balsa</application> používá GtkSpell, můžete si zvolit, "
-#~ "aby se vám pravopis kontroloval během psaní. GtkSpell používá "
-#~ "<application>Balsa</application> jako výchozí nastavení."
-
-#~ msgid ""
-#~ "If <application>Balsa</application> is not using GtkSpell, you can use "
-#~ "this pane to setup <application>Balsa</application> spell check options. "
-#~ "<application>Balsa</application> uses the Portable Spell Checking library "
-#~ "(<ulink url=\"http://pspell.sourceforge.net\">pspell</ulink>) to provide "
-#~ "an interface to the spell checking program of your choice. Currently "
-#~ "there are modules for ispell or aspell, both of which can be found at the "
-#~ "pspell website. For more information visit the <application>Balsa</"
-#~ "application> homepage."
-#~ msgstr ""
-#~ "Když <application>Balsa</application> nepoužívá GtkSpell, můžete použít "
-#~ "tento panel k nastavení voleb kontroly pravopisu. <application>Balsa</"
-#~ "application> používá knihovnu pspell (<ulink url=\"http://pspell."
-#~ "sourceforge.net\">Portable Spell Checking</ulink>) k poskytnutí rozhraní "
-#~ "k programu pro kontrolu pravopisu podle vaší volby. V současnosti "
-#~ "existují moduly pro ispell a aspell, oba můžete najít na webových "
-#~ "stránkách knihovny pspell. Další informace se dozvíte na webových "
-#~ "stránkách aplikace <application>Balsa</application>"
-
-#~ msgid "Pspell Module"
-#~ msgstr "Modul Pspell"
-
-#~ msgid ""
-#~ "The Pspell library allows you to use whatever spell checking engine you "
-#~ "prefer, though the use of loadable modules. Currently Pspell has support "
-#~ "for two modules, the traditional ispell, and the newer and more advanced "
-#~ "aspell."
-#~ msgstr ""
-#~ "Knihovna Pspell vám umožňuje použít tu výkonnou část pro kontrolu "
-#~ "pravopisu, které dáváte přednost, protože používá zaveditelné moduly. V "
-#~ "současnosti Pspell podporuje dva moduly, tradiční ispell a novější a "
-#~ "pokročilejší aspell."
-
-#~ msgid ""
-#~ "<application>Ispell</application> is most likely available on your system "
-#~ "as it is a Unix standard; however <application>Aspell</application> is "
-#~ "more advanced as it uses an advanced phonetics engine and adaptive "
-#~ "techniques to learn how you tend to misspell words. More information is "
-#~ "available at the <ulink url=\"http://aspell.sourceforge.net\">Aspell "
-#~ "website</ulink>."
-#~ msgstr ""
-#~ "<application>Ispell</application> pravděpodobněji najdete ve své "
-#~ "distribuci, protože se jedná o unixový standard. Oproti tomu "
-#~ "<application>Aspell</application> je pokročilejší, protože používá "
-#~ "pokročilejší fonetické jádro a adaptivní techniky k učení, co jste "
-#~ "chybným slovem zamýšleli. Další informace jsou k dispozici na <ulink url="
-#~ "\"http://aspell.sourceforge.net\">na webových stránkách knihovny Aspell</"
-#~ "ulink>."
-
-#~ msgid ""
-#~ "<application>Balsa</application> will attempt to use whatever module you "
-#~ "specify here, however if the module is not installed it will not work and "
-#~ "generate an error."
-#~ msgstr ""
-#~ "<application>Balsa</application> se pokusí použít jakýkoliv modul, který "
-#~ "zde zadáte, ale pokud nebude nainstalovaný, nebude fungovat a skončí to "
-#~ "chybovým hlášením."
-
-#~ msgid "Suggestion Mode"
-#~ msgstr "Režim doporučování"
-
-#~ msgid ""
-#~ "The suggestion mode determines how hard the computer will search for "
-#~ "suggestions for misspelled words. There are three options:"
-#~ msgstr ""
-#~ "Režim doporučování určuje, jak moc se bude počítač snažit najít "
-#~ "doporučení pro chybná slova. Na výběr jsou tři volby:"
-
-#~ msgid "Fast"
-#~ msgstr "Rychlý"
-
-#~ msgid ""
-#~ "This mode quickly scans for replacements, which means it might be used by "
-#~ "a good speller who occasionally makes typographical errors."
-#~ msgstr ""
-#~ "Tento režim rychle vyhledá náhrady, což znamená, že jej může používat "
-#~ "dobrý znalec pravopisu, který dělá sem tam typografické chyby."
-
-#~ msgid "Normal"
-#~ msgstr "Normální"
-
-#~ msgid ""
-#~ "The Normal mode is probably good enough for most people; it should "
-#~ "produce the correct suggestion in the majority of cases."
-#~ msgstr ""
-#~ "Normální režim je nejspíše dostatečně dobrý pro většinu lidí. Měl by "
-#~ "poskytovat správná doporučení ve většině případů."
-
-#~ msgid "Bad Spellers"
-#~ msgstr "Pro chybující"
-
-#~ msgid ""
-#~ "The Bad Spellers mode is the most thorough and accurate mode; however, it "
-#~ "also takes the longest to find a list of suggestions."
-#~ msgstr ""
-#~ "Režim pro chybující je nejdůkladnější a nejpřesnější režim, ale také mu "
-#~ "nejdéle trvá vyhledat seznam doporučení."
-
-#~ msgid "Ignore Length"
-#~ msgstr "Ignorovat délku"
-
-#~ msgid ""
-#~ "This provides the ability to ignore words shorter than a certain length. "
-#~ "It may be useful to automatically skip short acronyms that are normally "
-#~ "flagged as incorrect."
-#~ msgstr ""
-#~ "Nabízí možnost ignorovat slova kratší než zadaná délka. To se hodí pro "
-#~ "automatické přeskakování zkratek, které by jinak byly označené jako "
-#~ "chybné."
-
-#~ msgid "Add"
-#~ msgstr "Přidat"
-
-#~ msgid "Modify"
-#~ msgstr "Upravit"
-
-#~ msgid "Delete"
-#~ msgstr "Odstranit"
-
-#~ msgid "Startup"
-#~ msgstr "Spouštění"
-
-#~ msgid "Debug"
-#~ msgstr "Ladění"
-
-#~ msgid ""
-#~ "The <guibutton>Remove</guibutton> button: removes the currently selected "
-#~ "filter."
-#~ msgstr ""
-#~ "Tlačítko <guibutton>Smazat</guibutton>: odstraní právě vybraný filtr."
-
-#~ msgid "There are two buttons under the filters list: <placeholder-1/>"
-#~ msgstr "Pod seznamem filtrů jsou dvě tlačítka: <placeholder-1/>"
-
-#~ msgid "AND: all condition tests must be true to make the match."
-#~ msgstr "A: všechny podmínky testu musí být splněny, aby test vyhověl."
-
-#~ msgid "OR: one condition test must be true to make the match."
-#~ msgstr "NEBO: stačí splnění jediné podmínky testu, aby test vyhověl."
-
-#~ msgid ""
-#~ "<guilabel>Simple</guilabel>: the match is done by a simple substring test."
-#~ msgstr ""
-#~ "<guilabel>Jednoduchý</guilabel>: shoda je dána jednoduchým porovnáním "
-#~ "podřetězců."
-
-#~ msgid ""
-#~ "<guilabel>Regular expression</guilabel>: the match uses regular "
-#~ "expressions on the message headers."
-#~ msgstr ""
-#~ "<guilabel>Regulární výraz</guilabel>: k porovnání používá regulární výraz "
-#~ "na hlavičky zprávy."
-
-#~ msgid ""
-#~ "<guilabel>Date interval</guilabel>: the match is done by checking if the "
-#~ "date of the message is within certain bounds."
-#~ msgstr ""
-#~ "<guilabel>Rozsah dat</guilabel>: k porovnání se používá kontrola data "
-#~ "zprávy vůči určenému rozsahu."
-
-#~ msgid ""
-#~ "<guilabel>Flag condition</guilabel>: the match is done by checking the "
-#~ "flags of the message: unread, replied, deleted, flagged."
-#~ msgstr ""
-#~ "<guilabel>Stav příznaku</guilabel>: shoda je dána kontrolou příznaku "
-#~ "zprávy: nepřečtená, odpovězená, smazaná, označená."
-
-#~ msgid ""
-#~ "The <guilabel>Match in</guilabel> frame: it's a set of check boxes, one "
-#~ "per match field. For example if you want to match all messages that was "
-#~ "sent by hotmail users, you just have to check the <guilabel>From</"
-#~ "guilabel> box, or if you want to match all messages about "
-#~ "<application>Balsa</application>, check the <guilabel>Subject</guilabel> "
-#~ "box."
-#~ msgstr ""
-#~ "V části <guilabel>Porovnávat pole</guilabel> je sada zaškrtávacích "
-#~ "políček, po jednom pro každé z polí. Například, když chcete vyhledat "
-#~ "všechny zprávy, které byly odeslány uživateli Seznamu, zaškrtněte políčko "
-#~ "<guilabel>Od</guilabel>, nebo pro vyhledání zpráv zabývající se herní "
-#~ "konzolou Steam, zaškrtněte políčko <guilabel>Předmět</guilabel>."
-
-#~ msgid ""
-#~ "Be careful with <guilabel>Body</guilabel> match, this can take time for "
-#~ "large messages."
-#~ msgstr ""
-#~ "Buďte zdrženliví s porovnáváním <guilabel>Těla</guilabel> zprávy, protože "
-#~ "to může zabrat hodně času."
-
-#~ msgid ""
-#~ "For advanced use you can also specify directly the name of the header to "
-#~ "match on. A standard example the \"X-Mailer\" is a header added to your "
-#~ "message by the MUAs with their name and versions."
-#~ msgstr ""
-#~ "Jako pokročilé použití můžete zadat přímo název hlavičky, která se má "
-#~ "porovnávat. Klasickým příkladem je hlavička „X-Mailer“, kterou do zprávy "
-#~ "přidává poštovní agent MUA a která obsahuje jeho název a verzi."
-
-#~ msgid ""
-#~ "The <guibutton>All</guibutton> button will check all boxes, whereas the "
-#~ "<guibutton>Clear</guibutton> button will uncheck all boxes (as you might "
-#~ "have guessed)."
-#~ msgstr ""
-#~ "Tlačítko <guibutton>Všechna</guibutton> zaškrtne všechna políčka, zatímco "
-#~ "tlačítko <guibutton>Vymazat</guibutton> u všech políček zaškrtnutí zruší "
-#~ "(jak asi předpokládáte)."
-
-#~ msgid ""
-#~ "If you specify several headers, a message will match this condition if "
-#~ "one of the header matches. For example if you want to filter all messages "
-#~ "talking about <application>Balsa</application>, you should check the "
-#~ "<guilabel>Body</guilabel> and the <guilabel>Subject</guilabel> boxes, so "
-#~ "that all mails with the word <quote>Balsa</quote> in its subject or its "
-#~ "body will match. You can also, if you're fed up with <application>Balsa</"
-#~ "application> ;-), match all mails that do NOT contain the word "
-#~ "<quote>Balsa</quote> in their subject and in their body neither. See the "
-#~ "description of the search types to see how to do this."
-#~ msgstr ""
-#~ "Když určíte několik hlaviček, vyhoví zpráva této podmínce, pokud vyhoví "
-#~ "jedna z těchto hlaviček. Například, když chcete filtrovat všechny zprávy "
-#~ "na téma „GNOME“, měli byste zaškrtnout políčka <guilabel>Tělo</guilabel> "
-#~ "a <guilabel>Předmět</guilabel>, aby vyhověly všechny zprávy, které mají "
-#~ "slovo „GNOME“ ve svém předmětu nebo ve svém těle. Můžete také, když jste "
-#~ "na GNOME vysazení, nechat vyhovět všechny zprávy, které NEMAJÍ slovo "
-#~ "„GNOME“ ve svém předmětu, ani ve svém těle. Podívejte se na popisy typů "
-#~ "hledání, abyste věděli, jak na to."
-
-#~ msgid ""
-#~ "The <guilabel>Search Type</guilabel> frame: it's a list of the different "
-#~ "condition types. You choose <guimenuitem>Simple</guimenuitem>, "
-#~ "<guimenuitem>Regular expression</guimenuitem>, <guimenuitem>Date "
-#~ "interval</guimenuitem>, or <guimenuitem>flag condition</guimenuitem>. "
-#~ "Your choice will change the third frame so that it displays the fields "
-#~ "needed by the type of match chosen."
-#~ msgstr ""
-#~ "Část <guilabel>Typ vyhledávání</guilabel>: jedná se o seznam různých typů "
-#~ "podmínek. Můžete zvolit <guimenuitem>Jednoduchý</guimenuitem>, "
-#~ "<guimenuitem>Regulární výraz</guimenuitem>, <guimenuitem>Rozmezí dat</"
-#~ "guimenuitem> nebo <guimenuitem>Stav příznaku</guimenuitem>. Vaše volba "
-#~ "změní třetí rámeček, aby obsahoval pole potřebná pro zvolený typ "
-#~ "porovnávání."
-
-#~ msgid ""
-#~ "<guimenuitem>Simple</guimenuitem> type: a text entry lets you input the "
-#~ "string to look for (case does not matter, the search is case-"
-#~ "insensitive). The button lets you specify if a message matches when the "
-#~ "string is or is NOT a substring of the specified headers, the sentence "
-#~ "above the text entry will be updated accordingly."
-#~ msgstr ""
-#~ "<guimenuitem>Jednoduchý</guimenuitem> typ: textové pole vám umožňuje "
-#~ "zadat řetězec, který se bude hledat (velikost písmen nerozhoduje, hledání "
-#~ "na ně nebere ohled). Tlačítka vám umožňují určit, jestli zpráva vyhovuje, "
-#~ "když řetězec je nebo NENÍ podřetězcem určené hlavičky. Věta nad polem s "
-#~ "textem se příslušně změní."
-
-#~ msgid ""
-#~ "<guimenuitem>Regular expression</guimenuitem>: you can input a list of "
-#~ "regular expressions. You type your regular expression in the text entry, "
-#~ "then you click on the <guibutton>Add</guibutton> button to put it into "
-#~ "the list. Of course the <guibutton>Remove</guibutton> button destroys the "
-#~ "selected regular expression in the list. The last button <guibutton>One "
-#~ "matches/None matches</guibutton> lets you specify when a message matches "
-#~ "the condition: when one of the regular expression matches or when none "
-#~ "matches. The sentence above te list will be updated accordingly."
-#~ msgstr ""
-#~ "<guimenuitem>Regulární výraz</guimenuitem>: můžete zadat seznam "
-#~ "regulárních výrazů. Do textového pole napište svůj regulární výraz a pak "
-#~ "klikněte na tlačítko <guibutton>Přidat</guibutton>, aby se vložil do "
-#~ "seznamu. Samozřejmě tlačítko <guibutton>Odstranit</guibutton> vybraný "
-#~ "regulární výraz v seznamu zlikviduje. Poslední tlačítko <guibutton>Jedna "
-#~ "shoda/žádná shoda</guibutton> umožňuje určit, kdy zpráva podmínce "
-#~ "vyhovuje: když vyhovuje jednomu z regulárních výrazů nebo nevyhovuje "
-#~ "žádnému z nich. Věta nad seznamem se příslušně změní."
-
-#~ msgid ""
-#~ "<guimenuitem>Date</guimenuitem> interval: you can input the interval by "
-#~ "the mean of the two text entries. A blank entry means no bound. The "
-#~ "button tells to match when the message date is within the bounds or not. "
-#~ "The sentence above the text entries will be updated accordingly."
-#~ msgstr ""
-#~ "<guimenuitem>Rozmezí dat</guimenuitem>: ve dvou textových polích můžete "
-#~ "zadat rozmezí. Prázdné pole znamená, že žádná hranice není. Tlačítko "
-#~ "určuje, jestli má být datum zprávy uvnitř tohoto rozmezí nebo naopak "
-#~ "mimo. Věta nad seznamem se příslušně změní."
-
-#~ msgid ""
-#~ "<guimenuitem>Flag condition</guimenuitem>: the four check boxes let you "
-#~ "select which messages will match this condition. If you want to match all "
-#~ "replied OR unread messages, check the corresponding boxes. The button let "
-#~ "you specify that the match will be done when none of the specified flags "
-#~ "are set, the sentence above the check boxes will be updated accordingly. "
-#~ "For example if you want to filter all read and replied messages, check "
-#~ "the <guilabel>unread</guilabel> and <guilabel>replied</guilabel> boxes, "
-#~ "and click on the button."
-#~ msgstr ""
-#~ "<guimenuitem>Stav příznaku</guimenuitem>: pomocí čtyř zaškrtávacích "
-#~ "políček si můžete vybrat, které zprávy budou podmínce vyhovovat. Když "
-#~ "například budete chtít vyhledat všechny zodpovězené NEBO nepřečtené "
-#~ "zprávy, zaškrtněte příslušná políčka. Tlačítkem můžete význam otočit, a "
-#~ "shoda pak nastane, když ani jeden z vybraných příznaků není nastaven. "
-#~ "Věta nad seznamem se příslušně změní. Například budete chtít odfiltrovat "
-#~ "všechny zprávy, které jsou přečtené a zodpovězené. V takovém případě "
-#~ "zaškrtněte <guimenuitem>Nepřečtené</guimenuitem> a <guilabel>Zodpovězené</"
-#~ "guilabel> a klikněte na tlačítko."
-
-#~ msgid "This part depends on the search type you've chosen: <placeholder-1/>"
-#~ msgstr ""
-#~ "Tato část závisí na typu hledání, který jste zvolili: <placeholder-1/>"
-
-#~ msgid "This window is made of three frames: <placeholder-1/>"
-#~ msgstr "Toto okno se skládá ze tří částí: <placeholder-1/>"
-
-#~ msgid ""
-#~ "The <guibutton>Add</guibutton> button: moves the selected filters from "
-#~ "the left list to the right one, adding more filters to be applied to the "
-#~ "mailbox."
-#~ msgstr ""
-#~ "Tlačítko <guibutton>Přidat</guibutton>: přesouvá vybrané filtry z levého "
-#~ "seznamu do pravého, tím se přidá více filtrů, které se u poštovní "
-#~ "schránky použijí."
-
-#~ msgid ""
-#~ "The <guibutton>Remove</guibutton> button: removes the currently selected "
-#~ "filter in the right list and puts it back in the left list."
-#~ msgstr ""
-#~ "Tlačítko <guibutton>Odebrat</guibutton>: odebere právě vybrané filtry z "
-#~ "pravého seznamu a vloží je zpět do levého seznamu."
-
-#~ msgid "There are two buttons between the filters lists: <placeholder-1/>"
-#~ msgstr "Mezi seznamy filtrů jsou dvě tlačítka: <placeholder-1/>"
-
-#~ msgid ""
-#~ "The <guibutton>Cancel</guibutton> button: this discards any changes and "
-#~ "closes the dialog box."
-#~ msgstr ""
-#~ "Tlačítko <guibutton>Zrušit</guibutton>: zahodí případné změny a zavře "
-#~ "dialogové okno."
-
-#~ msgid "The <guibutton>Help</guibutton> button: opens this help window."
-#~ msgstr ""
-#~ "Tlačítko <guibutton>Nápověda</guibutton>: otevře toto okno s nápovědou."
-
-#~ msgid "There are three buttons below the filters lists: <placeholder-1/>"
-#~ msgstr "Pod seznamem filtrů následují tyto tři tlačítka: <placeholder-1/>"
-
-#~ msgid ""
-#~ "The further information can be found in the following documents: "
-#~ "<placeholder-1/>"
-#~ msgstr ""
-#~ "Další informace můžete najít v těchto následujících dokumentech (všechny "
-#~ "odkazované dokumenty jsou v angličtině): <placeholder-1/>"
-
-#~ msgid "Creating new mailboxes"
-#~ msgstr "Vytváření nových poštovních schránek"
-
-#~ msgid "Moving messages around"
-#~ msgstr "Přesouvání zpráv"
-
-#~ msgid ""
-#~ "Under <application>Sawfish</application>, this dialog has been known to "
-#~ "become obscured, causing the appearance that <application>Balsa</"
-#~ "application> has locked up. Move the configuration dialog and see if the "
-#~ "new dialog was hidden."
-#~ msgstr ""
-#~ "Je známo, že pod okenním správcem <application>Sawfish</application> je "
-#~ "toto dialogové okno zakryto jiným, což na pohled působí, že "
-#~ "<application>Balse</application> zatuhla. Posuňte dialogové okno s "
-#~ "nastavením a podívejte se, jestli není nové dialogové okno schované za "
-#~ "ním."
-
-#~ msgid "Balsa"
-#~ msgstr "Balsa"
-
-#~ msgid "<placeholder-1/>'s frozen!"
-#~ msgstr "<placeholder-1/> zatuhla!"

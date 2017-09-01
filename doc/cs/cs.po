@@ -4778,7 +4778,7 @@ msgid ""
 msgstr ""
 "Tři tlačítka pod seznamem vám umožňují upravit pravidla vybrané podmínky, "
 "přidat nové a smazat vybranou podmínku. Úpravy a vytváření podmínek se "
-"dělají v <link linkend=\\\"win-condition\\\">okně podmínek</link>, které se "
+"dělají v <link linkend=\"win-condition\">okně podmínek</link>, které se "
 "objeví po kliknutí na tlačítko <guibutton>Upravit</guibutton> nebo "
 "<guibutton>Nové</guibutton>."
 

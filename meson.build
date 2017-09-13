@@ -792,8 +792,8 @@ endforeach
 
 if with_gtksourceview
   gtksourceview_files = ['balsa-mail.lang', 'balsa-mail-style.xml']
-  gtksourceviewdir = join_paths(get_option('datadir'), 'gtksourceview-3.0')
-  install_data(gtksourceview_files, install_dir : gtksourceviewdir)
+  gtksourceview_dir = join_paths(get_option('datadir'), 'balsa', 'gtksourceview-3.0')
+  install_data(gtksourceview_files, install_dir : gtksourceview_dir)
 endif
 ####################### Autotools stuff below this line #######################
 #

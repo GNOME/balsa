@@ -8,5 +8,5 @@ balsa_ui_files = [
   'ab-main.ui'
   ]
 
-balsa_uidir = get_option('datadir') + 'ui'
-install_data(balsa_ui_files, install_dir : balsa_uidir)
+balsa_ui_dir = join_paths(get_option('datadir'), 'balsa', 'ui')
+install_data(balsa_ui_files, install_dir : balsa_ui_dir)

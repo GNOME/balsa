@@ -1,3 +1,8 @@
+2017-09-13  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* meson.build: fix install directory.
+	* ui/meson.build: ditto.
+
 2017-08-29  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* libbalsa/misc.c (libbalsa_get_domainname): use

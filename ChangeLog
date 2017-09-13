@@ -1,5 +1,9 @@
 2017-09-13  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	* src/meson.build: make balsa and balsa_ab installable.
+
+2017-09-13  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* meson.build: fix install directory.
 	* ui/meson.build: ditto.
 

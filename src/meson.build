@@ -111,7 +111,8 @@ real_balsa_libs = [libinit_balsa_a, libbalsa_a, libimap_a, libnetclient_a]
 
 executable('balsa', balsa_sources,
            dependencies : real_balsa_deps,
-           link_with    : real_balsa_libs)
+           link_with    : real_balsa_libs,
+           install      : true)
 
 balsa_ab_sources = [
   'ab-main.c',
@@ -126,4 +127,5 @@ real_balsa_ab_deps = declare_dependency(compile_args : balsa_ab_compile_args,
 
 executable('balsa_ab', balsa_ab_sources,
            dependencies : real_balsa_ab_deps,
-           link_with    : libbalsa_a)
+           link_with    : libbalsa_a,
+           install      : true)

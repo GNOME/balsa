@@ -1,0 +1,119 @@
+option('with-gnome',
+  type        : 'boolean',
+  value       : true,
+  description : 'Use GNOME libraries (default=true)')
+
+option('enable-flock',
+  type        : 'boolean',
+  value       : false,
+  description : 'Use flock() to lock files (default=false)')
+
+option('enable-fcntl',
+  type        : 'boolean',
+  value       : true,
+  description : 'Use fcntl() to lock files (default=true)')
+
+option('enable-debug-threads',
+  type        : 'boolean',
+  value       : false,
+  description : 'Debug threads (default=false)')
+
+option('with-gpgme',
+  type        : 'string',
+  value       : 'no',
+  description : 'build with gpgme/GnuPG support (default=no, path to gpgme-config optional)')
+
+option('enable-smime',
+  type        : 'string',
+  value       : 'check',
+  description : 'include S/MIME support (needs gpgme and gpgsm, experimental for gpg < 2.0.4)')
+
+option('with-gpg-app',
+  type        : 'string',
+  value       : 'no',
+  description : 'use PATH as GnuPG application (default=gpg2 if >= 2.0.4, otherwise gpg 1.x)')
+
+option('with-canberra',
+  type        : 'boolean',
+  value       : false,
+  description : 'Use libcanberra-gtk3 for filter sounds (default=false)')
+
+option('with-compface',
+  type        : 'string',
+  value       : 'no',
+  description : 'Enable Compface (default=no, path to compface installation optional)')
+
+option('with-gss',
+  type        : 'boolean',
+  value       : false,
+  description : 'Enable GSS (default=false)')
+
+option('with-html-widget',
+  type        : 'string',
+  value       : 'webkit2',
+  description : 'select the HTML renderer (default webkit2)')
+
+option('with-gtksourceview',
+  type        : 'boolean',
+  value       : false,
+  description : 'Use GtkSourceView-3 if available (default=false)')
+
+option('with-spell-checker',
+  type        : 'string',
+  value       : 'no',
+  description : 'select the external spell checker (default no)')
+
+option('with-ldap',
+  type        : 'string',
+  value       : 'no',
+  description : 'Use OpenLDAP if available (default=no)')
+
+option('with-libnotify',
+  type        : 'boolean',
+  value       : true,
+  description : 'Use libnotify if available (default=true)')
+
+option('with-macosx-desktop',
+  type        : 'boolean',
+  value       : false,
+  description : 'Use Mac OS X Desktop Integration (default=no, extremely experimental)')
+
+option('with-rubrica',
+  type        : 'boolean',
+  value       : false,
+  description : 'add Rubrica2 address book support (needs libxml2, default=false)')
+
+option('with-osmo',
+  type        : 'boolean',
+  value       : false,
+  description : 'add Osmo address book support (experimental, needs osmo > svn rev. 1099, default=no)')
+
+option('with-sqlite',
+  type        : 'string',
+  value       : 'no',
+  description : 'Use SQLite for GPE address books (default=no)')
+
+option('with-libsecret',
+  type        : 'boolean',
+  value       : false,
+  description : 'Link to libsecret instead of gnome-keyring (default=false)')
+
+option('with-gcr',
+  type        : 'boolean',
+  value       : false,
+  description : 'Use libgcr-3 for dealing with TLS certificates (experimental, default=false)')
+
+option('enable-more-warnings',
+  type        : 'boolean',
+  value       : true,
+  description : 'Enable maximum compiler warnings (default=true)')
+
+option('with-libnetclient-docs',
+  type        : 'boolean',
+  value       : false,
+  description : 'Check requirements for building the libnetclient API docs (see libnetclient/README; default=false)')
+
+option('with-libnetclient-test',
+  type        : 'boolean',
+  value       : false,
+  description : 'Check requirements for running libnetclient tests (see libnetclient/README; default=false)')

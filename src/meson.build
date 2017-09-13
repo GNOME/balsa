@@ -1,0 +1,129 @@
+# src/meson.build
+
+balsa_base_srclist = [
+  'address-book-config.c',
+  'address-book-config.h',
+  'ab-window.c',
+  'ab-window.h',
+  'balsa-app.c',
+  'balsa-app.h',
+  'balsa-icons.c',
+  'balsa-icons.h',
+  'balsa-index.c',
+  'balsa-index.h',
+  'balsa-mblist.c',
+  'balsa-mblist.h',
+  'balsa-message.c',
+  'balsa-message.h',
+  'balsa-mime-widget.c',
+  'balsa-mime-widget.h',
+  'balsa-mime-widget-callbacks.c',
+  'balsa-mime-widget-callbacks.h',
+  'balsa-mime-widget-crypto.c',
+  'balsa-mime-widget-crypto.h',
+  'balsa-mime-widget-image.c',
+  'balsa-mime-widget-image.h',
+  'balsa-mime-widget-message.c',
+  'balsa-mime-widget-message.h',
+  'balsa-mime-widget-multipart.c',
+  'balsa-mime-widget-multipart.h',
+  'balsa-mime-widget-text.c',
+  'balsa-mime-widget-text.h',
+  'balsa-mime-widget-vcalendar.c',
+  'balsa-mime-widget-vcalendar.h',
+  'balsa-cite-bar.c',
+  'balsa-cite-bar.h',
+  'filter-edit-callbacks.c',
+  'filter-edit-dialog.c',
+  'filter-edit.h',
+  'filter-export-callbacks.c',
+  'filter-export-dialog.c',
+  'filter-export.h',
+  'filter-run-callbacks.c',
+  'filter-run-dialog.c',
+  'filter-run.h',
+  'folder-conf.c',
+  'folder-conf.h',
+  'information-dialog.c',
+  'information-dialog.h',
+  'mailbox-conf.c',
+  'mailbox-conf.h',
+  'mailbox-node.c',
+  'mailbox-node.h',
+  'main-window.c',
+  'main-window.h',
+  'main.c',
+  'message-window.c',
+  'message-window.h',
+  'pref-manager.c',
+  'pref-manager.h',
+  'print.h',
+  'quote-color.c',
+  'quote-color.h',
+  'save-restore.c',
+  'save-restore.h',
+  'sendmsg-window.c',
+  'sendmsg-window.h',
+  'store-address.c',
+  'store-address.h',
+  'threads.h',
+  'toolbar-factory.c',
+  'toolbar-factory.h',
+  'toolbar-prefs.c',
+  'toolbar-prefs.h'
+  ]
+
+balsa_print_source = [
+  'print-gtk.c',
+  'balsa-print-object.c',
+  'balsa-print-object.h',
+  'balsa-print-object-decor.c',
+  'balsa-print-object-decor.h',
+  'balsa-print-object-default.c',
+  'balsa-print-object-default.h',
+  'balsa-print-object-header.c',
+  'balsa-print-object-header.h',
+  'balsa-print-object-image.c',
+  'balsa-print-object-image.h',
+  'balsa-print-object-text.c',
+  'balsa-print-object-text.h'
+  ]
+
+balsa_sources = balsa_base_srclist + balsa_print_source
+if use_spell_checker == 'internal'
+  balsa_spell_extra = [
+    'spell-check.c',
+    'spell-check.h'
+    ]
+  balsa_sources += balsa_spell_extra
+endif
+
+locale_dir = join_paths(get_option('prefix'), get_option('datadir'), 'locale')
+balsa_compile_args = ['-DGNOMELOCALEDIR="' + locale_dir + '"',
+                      '-I' + meson.build_root(),
+                      '-I' + meson.source_root(),
+                      '-I' + join_paths(meson.source_root(), 'libbalsa'),
+                      '-I' + join_paths(meson.source_root(), 'libnetclient')]
+
+real_balsa_deps = declare_dependency(compile_args : balsa_compile_args,
+                                     dependencies : balsa_deps)
+real_balsa_libs = [libinit_balsa_a, libbalsa_a, libimap_a, libnetclient_a]
+
+executable('balsa', balsa_sources,
+           dependencies : real_balsa_deps,
+           link_with    : real_balsa_libs)
+
+balsa_ab_sources = [
+  'ab-main.c',
+  'address-book-config.c'
+  ]
+
+balsa_ab_compile_args = ['-I' + meson.build_root(),
+                         '-I' + join_paths(meson.source_root(), 'libbalsa')]
+
+real_balsa_ab_deps = declare_dependency(compile_args : balsa_ab_compile_args,
+                                        dependencies : balsa_ab_deps)
+
+executable('balsa_ab', balsa_ab_sources,
+           dependencies : real_balsa_ab_deps,
+           link_with    : libbalsa_a)

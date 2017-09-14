@@ -90,7 +90,7 @@ balsa_print_source = [
   ]
 
 balsa_sources = balsa_base_srclist + balsa_print_source
-if use_spell_checker == 'internal'
+if spell_checker == 'internal'
   balsa_spell_extra = [
     'spell-check.c',
     'spell-check.h'

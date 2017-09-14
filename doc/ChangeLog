@@ -1,3 +1,9 @@
+2017-09-14  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	reviewed by: <delete if not using a buddy>
+
+	* meson.build:
+
 2017-08-06  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Use Unicode quotation marks and ellipses, and mark some strings

@@ -55,7 +55,7 @@ with_compface      = get_option('with-compface')
 with_gss           = get_option('with-gss')
 use_html_widget    = get_option('with-html-widget')
 with_gtksourceview = get_option('with-gtksourceview')
-use_spell_checker  = get_option('with-spell-checker')
+spell_checker      = get_option('with-spell-checker')
 with_ldap          = get_option('with-ldap')
 with_libnotify     = get_option('with-libnotify')
 use_igemacint      = get_option('with-macosx-desktop')
@@ -543,7 +543,7 @@ endif # with_libsecret
 
 # Spell check detection.
 #
-if use_spell_checker == 'gspell'
+if spell_checker == 'gspell'
   spell_dep = dependency('gspell-1')
   conf.set('HAVE_GSPELL', 1,
     description : 'Defined when Gspell can be used.')
@@ -551,7 +551,7 @@ if use_spell_checker == 'gspell'
     conf.set('HAVE_GSPELL_1_2', 1,
       description : 'Defined when Gspell API is version 1.2.')
   endif
-elif use_spell_checker == 'gtkspell'
+elif spell_checker == 'gtkspell'
   spell_dep = dependency('gtkspell3-3.0',
                          version  : '>= 3.0.3',
                          required : false)
@@ -565,10 +565,10 @@ elif use_spell_checker == 'gtkspell'
   endif
   conf.set('HAVE_GTKSPELL', 1,
     description : 'Defined when GtkSpell can be used.')
-elif use_spell_checker == 'internal'
+elif spell_checker == 'internal'
   spell_dep = dependency('enchant')
-elif use_spell_checker != 'no'
-  error('bad option' + use_spell_checker)
+elif spell_checker != 'no'
+  error('bad option' + spell_checker)
 endif
 
 if is_variable('spell_dep')
@@ -743,7 +743,7 @@ message('                 Use GPGME: ' + gpgmecfg)
 message('                  Use LDAP: ' + with_ldap)
 message('                   Use GSS: ' + (with_gss           ? 'true' : 'false'))
 message('                Use SQLite: ' + with_sqlite)
-message('             Spell checker: ' + use_spell_checker)
+message('             Spell checker: ' + spell_checker)
 message('             Use Libnotify: ' + (with_libnotify     ? 'true' : 'false'))
 message('         Use GtkSourceView: ' + (with_gtksourceview ? 'true' : 'false'))
 message('              Use Compface: ' + with_compface)

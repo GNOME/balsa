@@ -50,8 +50,6 @@ endif
 
 with_gnome         = get_option('with-gnome')
 gpgmecfg           = get_option('with-gpgme')
-have_smime         = get_option('enable-smime')
-gpgapp             = get_option('with-gpg-app')
 with_canberra      = get_option('with-canberra')
 with_compface      = get_option('with-compface')
 with_gss           = get_option('with-gss')
@@ -67,6 +65,7 @@ with_sqlite        = get_option('with-sqlite')
 with_libsecret     = get_option('with-libsecret')
 with_gcr           = get_option('with-gcr')
 set_more_warnings  = get_option('enable-more-warnings')
+make_help_files    = get_option('enable-help-files')
 
 # Documentation and Testing requirements for libnetclient
 with_libnetclient_docs = get_option('with-libnetclient-docs')
@@ -102,11 +101,14 @@ glib_genmarshal = run_command('pkg-config',
 
 # yelp
 
-yelptool = find_program('yelp-build', required : false)
-if not yelptool.found()
-  message('*** The tools to build the documentation are not found.')
-  message('    To build it, please install the yelp-tools package.')
-  message('    Continuing with build. ****')
+if make_help_files
+  yelptool = find_program('yelp-build', required : false)
+  if not yelptool.found()
+    message('*** The tools to build the documentation are not found.')
+    message('    To build it, please install the yelp-tools package.')
+    message('    Continuing with build. ****')
+    make_help_files = false
+  endif
 endif
 
 # _NL_MEASUREMENT_MEASUREMENT is an enum and not a define
@@ -274,7 +276,6 @@ if gpgmecfg != 'no'
   gpgmever = run_command(gpgmecfg, '--version').stdout().strip()
   if gpgmever.version_compare('< 1.2.0')
     gpgmecfg   = 'no'
-    have_smime = 'no'
     message('Sorry, you need at least gpgme version 1.2.0')
   else
     if gpgmever.version_compare('< 1.8.0')
@@ -302,8 +303,6 @@ if gpgmecfg != 'no'
     balsa_deps += gpgme_dep
     gpgmecfg = 'yes'
   endif
-else
-  have_smime = 'no'
 endif
 
 # OpenLDAP configuration.
@@ -708,8 +707,8 @@ subdir('po')
 
 desktop_files = ['balsa.desktop', 'balsa-mailto-handler.desktop']
 foreach file : desktop_files
-  file_in = configure_file(input         : file + '.in.in',
-                           output        : file + 'in',
+  file_in = configure_file(input         : file + '.meson',
+                           output        : file + '.in',
                            configuration : conf)
   i18n.merge_file(
     input       : file_in,
@@ -780,12 +779,15 @@ endif
 
 subdirs = ['sounds',
            'images',
-           'doc',
            'libnetclient',
            'libbalsa',
            'libinit_balsa',
            'src',
            'ui']
+if make_help_files
+  subdirs += 'doc'
+endif
+
 foreach dir : subdirs
   subdir(dir)
 endforeach

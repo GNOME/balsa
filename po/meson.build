@@ -1,10 +1,3 @@
 # po/meson.build
 
-langs = ['am', 'ar', 'az', 'bg', 'ca', 'cs', 'da', 'de', 'dz', 'el',
-         'en_CA', 'en_GB', 'es', 'et', 'eu', 'fi', 'fr', 'ga', 'gl',
-         'he', 'hi', 'hr', 'hu', 'id', 'it', 'ja', 'ko', 'lt', 'lv',
-         'mk', 'ml', 'ms', 'nb', 'ne', 'nl', 'nn', 'oc', 'pa', 'pl',
-         'pt', 'pt_BR', 'ro', 'ru', 'rw', 'sk', 'sl', 'sq', 'sr', 'sr@latin',
-         'sv', 'tr', 'uk', 'vi', 'wa', 'zh_CN', 'zh_HK', 'zh_TW']
-
-i18n.gettext(gettext_package, preset : 'glib', languages : langs)
+i18n.gettext(gettext_package, preset : 'glib')

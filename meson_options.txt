@@ -21,17 +21,7 @@ option('enable-debug-threads',
 option('with-gpgme',
   type        : 'string',
   value       : 'no',
-  description : 'build with gpgme/GnuPG support (default=no, path to gpgme-config optional)')
-
-option('enable-smime',
-  type        : 'string',
-  value       : 'check',
-  description : 'include S/MIME support (needs gpgme and gpgsm, experimental for gpg < 2.0.4)')
-
-option('with-gpg-app',
-  type        : 'string',
-  value       : 'no',
-  description : 'use PATH as GnuPG application (default=gpg2 if >= 2.0.4, otherwise gpg 1.x)')
+  description : 'build with gpgme/GnuPG support (yes|no|path to gpgme-config, default=no)')
 
 option('with-canberra',
   type        : 'boolean',
@@ -41,7 +31,7 @@ option('with-canberra',
 option('with-compface',
   type        : 'string',
   value       : 'no',
-  description : 'Enable Compface (default=no, path to compface installation optional)')
+  description : 'Enable Compface (yes|no|path to compface installation, default=no)')
 
 option('with-gss',
   type        : 'boolean',
@@ -49,7 +39,8 @@ option('with-gss',
   description : 'Enable GSS (default=false)')
 
 option('with-html-widget',
-  type        : 'string',
+  type        : 'combo',
+  choices     : ['webkit2', 'webkit', 'gtkhtml4'],
   value       : 'webkit2',
   description : 'select the HTML renderer (default webkit2)')
 
@@ -59,14 +50,15 @@ option('with-gtksourceview',
   description : 'Use GtkSourceView-3 if available (default=false)')
 
 option('with-spell-checker',
-  type        : 'string',
-  value       : 'no',
-  description : 'select the external spell checker (default no)')
+  type        : 'combo',
+  choices     : ['internal', 'gspell', 'gtkspell'],
+  value       : 'internal',
+  description : 'select the spell checker (default internal)')
 
 option('with-ldap',
   type        : 'string',
   value       : 'no',
-  description : 'Use OpenLDAP if available (default=no)')
+  description : 'Use OpenLDAP if available (yes|no|path to LDAP installation, default=no)')
 
 option('with-libnotify',
   type        : 'boolean',
@@ -91,7 +83,7 @@ option('with-osmo',
 option('with-sqlite',
   type        : 'string',
   value       : 'no',
-  description : 'Use SQLite for GPE address books (default=no)')
+  description : 'Use SQLite for GPE address books (yes|no|path to SQLite installation, default=no)')
 
 option('with-libsecret',
   type        : 'boolean',
@@ -107,6 +99,11 @@ option('enable-more-warnings',
   type        : 'boolean',
   value       : true,
   description : 'Enable maximum compiler warnings (default=true)')
+
+option('enable-help-files',
+  type        : 'boolean',
+  value       : false,
+  description : 'Install the help files (default=false)')
 
 option('with-libnetclient-docs',
   type        : 'boolean',

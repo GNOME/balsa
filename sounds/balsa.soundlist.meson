@@ -1,0 +1,10 @@
+[__section_info__]
+description=The Balsa E-Mail Client
+
+[startup]
+file=balsa/startup.wav
+description=Program start-up
+
+[newmail]
+file=balsa/newmail.wav
+description=New mail notification

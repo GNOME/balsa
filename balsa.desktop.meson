@@ -1,0 +1,13 @@
+[Desktop Entry]
+Name=Balsa
+Comment=Email utility
+GenericName=Mail Client
+X-GNOME-FullName=Balsa Mail Client
+TryExec=balsa
+Exec=balsa
+Icon=gnome-balsa2
+Terminal=false
+Type=Application
+StartupNotify=true
+Categories=@TOOLKIT_CATEGORIES@Network;Email;
+X-GNOME-UsesNotifications=true

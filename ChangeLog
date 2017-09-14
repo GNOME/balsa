@@ -1,5 +1,14 @@
 2017-09-13  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Meson uses msgfmt rather than intltool-merge, so we do not use
+	underscore prefixes to mark strings for translation.
+
+	* balsa-mailto-handler.desktop.meson: new file
+	* balsa.desktop.meson: ditto
+	* sounds/balsa.soundlist.meson: ditto
+
+2017-09-13  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* src/meson.build: make balsa and balsa_ab installable.
 
 2017-09-13  Peter Bloomfield  <pbloomfield@bellsouth.net>

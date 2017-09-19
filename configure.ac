@@ -233,26 +233,8 @@ dnl #####################################################################
 
 if test x$with_gnome != xno; then
    TOOLKIT_CATEGORIES="GNOME;GTK;"
-   gnome_extras="$gnome_extras gio-unix-2.0"
-   if test x$with_libsecret == xno; then
-     AC_MSG_CHECKING([whether we have gnome-keyring])
-     if $PKG_CONFIG --atleast-version=1.0 gnome-keyring-1; then
-        gnome_extras="$gnome_extras gnome-keyring-1"
-        AC_DEFINE(HAVE_GNOME_KEYRING,1,[Defined when gnome-keyring is there.])
-        # Work around http://bugzilla.gnome.org/show_bug.cgi?id=556530
-        if $PKG_CONFIG --atleast-version=2.24.1 gnome-keyring-1; then
-           AC_DEFINE(HAVE_GNOME_KEYRING_24,1,
-                     [Defined with gnome-keyring-2.24 or newer.])
-        fi
-        with_gnome_keyring=yes
-     else
-        with_gnome_keyring=no
-     fi
-     AC_MSG_RESULT($with_gnome_keyring)
-   fi
 else
    TOOLKIT_CATEGORIES="GTK;"
-   gnome_extras=""
 fi
 AC_SUBST(TOOLKIT_CATEGORIES)
 
@@ -270,14 +252,12 @@ gmime-2.6
 gio-2.0
 gthread-2.0
 gnutls
-$gnome_extras
 ])
 
 PKG_CHECK_MODULES(BALSA_AB, [
    glib-2.0
    gtk+-3.0
    gmime-2.6
-   $gnome_extras
 ])
 
 PKG_CHECK_MODULES(LIBNETCLIENT, [
@@ -809,11 +789,6 @@ if test x"$BALSA_FROM_GIT" = xyes ; then
 	echo "or just plain not work. Use it at your own risk. You have been warned."
 	echo "======================================================================"
 	echo ""
-        if test x$with_gnome_keyring == xyes ; then
-            AC_MSG_ERROR([Cannot build in a git tree with deprecated GnomeKeyring.
-                  Either install and configure with libsecret
-                  or configure --without-gnome.])
-        fi
 fi
 
 if test x"$use_html_widget" = xwebkit ; then

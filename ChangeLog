@@ -1,5 +1,20 @@
 2017-09-19  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Remove obsolete option to build with deprecated GnomeKeyring
+
+	* configure.ac: do not check for the lib and do not define
+	HAVE_GNOME_KEYRING and friends.
+	* libbalsa/imap-server.c (libbalsa_imap_server_new_from_config):
+	do not use it.
+	* libbalsa/server.c (libbalsa_server_load_config),
+	(libbalsa_server_save_config): ditto.
+	* libbalsa/server.h: ditto.
+	* src/balsa-app.c (ask_password_real): ditto.
+	* src/folder-conf.c (folder_conf_imap_node): ditto.
+	* src/mailbox-conf.c (create_imap_mailbox_dialog): ditto.
+
+2017-09-19  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	HAVE_GNOME is redundant
 
 	* configure.ac: do not define it.

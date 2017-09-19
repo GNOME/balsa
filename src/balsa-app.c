@@ -62,9 +62,6 @@ ask_password_real(LibBalsaServer * server, LibBalsaMailbox * mbox)
 #if defined(HAVE_LIBSECRET)
     static const gchar *remember_password_message =
         N_("_Remember password in Secret Service");
-#elif defined (HAVE_GNOME_KEYRING)
-    static const gchar *remember_password_message =
-        N_("_Remember password in keyring");
 #else
     static const gchar *remember_password_message =
         N_("_Remember password");

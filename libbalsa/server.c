@@ -28,8 +28,6 @@
 
 #if defined(HAVE_LIBSECRET)
 #include <libsecret/secret.h>
-#elif defined(HAVE_GNOME_KEYRING)
-#include <gnome-keyring.h>
 #endif                          /* defined(HAVE_LIBSECRET) */
 
 #include <openssl/err.h>
@@ -51,18 +49,6 @@ static const SecretSchema server_schema = {
     }
 };
 const SecretSchema *LIBBALSA_SERVER_SECRET_SCHEMA = &server_schema;
-#elif defined(HAVE_GNOME_KEYRING) && !defined(HAVE_GNOME_KEYRING_24)
-static const GnomeKeyringPasswordSchema server_schema = {
-    GNOME_KEYRING_ITEM_GENERIC_SECRET,
-    {
-	{ "protocol", GNOME_KEYRING_ATTRIBUTE_TYPE_STRING },
-	{ "server",   GNOME_KEYRING_ATTRIBUTE_TYPE_STRING },
-	{ "user",     GNOME_KEYRING_ATTRIBUTE_TYPE_STRING },
-	{ NULL, 0 }
-    }
-};
-const GnomeKeyringPasswordSchema* LIBBALSA_SERVER_KEYRING_SCHEMA =
-    &server_schema;
 #endif                          /* defined(HAVE_LIBSECRET) */
 
 static GObjectClass *parent_class = NULL;
@@ -391,35 +377,6 @@ libbalsa_server_load_config(LibBalsaServer * server)
                 }
             }
         }
-#elif defined (HAVE_GNOME_KEYRING)
-	GnomeKeyringResult res =
-	    gnome_keyring_find_password_sync(LIBBALSA_SERVER_KEYRING_SCHEMA,
-					     &server->passwd,
-					     "protocol", server->protocol,
-					     "server", server->host,
-					     "user", server->user,
-					     NULL);
-	if(res != GNOME_KEYRING_RESULT_OK) {
-	    gnome_keyring_free_password(server->passwd);
-	    server->passwd = NULL;
-	    printf("Error retrieving password from key ring. Falling back\n");
-	    server->passwd = libbalsa_conf_private_get_string("Password");
-	    if (server->passwd != NULL) {
-		gchar *buff = libbalsa_rot(server->passwd);
-		libbalsa_free_password(server->passwd);
-		server->passwd = buff;
-		gnome_keyring_store_password_sync
-		    (LIBBALSA_SERVER_KEYRING_SCHEMA, NULL,
-		     _("Balsa passwords"), server->passwd,
-		     "protocol", server->protocol,
-		     "server", server->host,
-		     "user", server->user,
-		     NULL);
-		    /* We could in principle clear the password in the
-		       config file here but we do not for the backward
-		       compatibility. */
-	    }
-	}
 #else
 	server->passwd = libbalsa_conf_private_get_string("Password");
 	if (server->passwd != NULL) {
@@ -479,15 +436,6 @@ libbalsa_server_save_config(LibBalsaServer * server)
                    server->user, server->host, err->message);
             g_error_free(err);
         }
-#elif defined (HAVE_GNOME_KEYRING)
-	gnome_keyring_store_password_sync(LIBBALSA_SERVER_KEYRING_SCHEMA,
-				     NULL,
-				     _("Balsa passwords"),
-				     server->passwd,
-				     "protocol", server->protocol,
-				     "server", server->host,
-				     "user", server->user,
-				     NULL);
 #else
 	gchar *buff = libbalsa_rot(server->passwd);
 	libbalsa_conf_private_set_string("Password", buff);

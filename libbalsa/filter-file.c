@@ -201,7 +201,6 @@ libbalsa_mailbox_filters_save_config(LibBalsaMailbox * mbox)
     g_free(filters_names);
 }
 
-/* FIXME: #ifdef HAVE_GNOME ?? */
 /* Temporary code for transition from 2.0.x */
 static LibBalsaCondition *
 libbalsa_condition_new_from_config()
@@ -387,4 +386,3 @@ libbalsa_condition_new_2_0(const gchar * filter_section_name,
     /* else we leak the list and structures?? */
     return cond_2_0;
 }
-/* #endif *//* HAVE_GNOME */

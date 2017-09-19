@@ -250,7 +250,6 @@ if test x$with_gnome != xno; then
      fi
      AC_MSG_RESULT($with_gnome_keyring)
    fi
-   AC_DEFINE(HAVE_GNOME,1,[Defined when building for GNOME.])
 else
    TOOLKIT_CATEGORIES="GTK;"
    gnome_extras=""

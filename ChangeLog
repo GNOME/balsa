@@ -1,3 +1,14 @@
+2017-09-19  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	HAVE_GNOME is redundant
+
+	* configure.ac: do not define it.
+	* libbalsa/filter-file.c (libbalsa_condition_new_2_0): do not
+	refer to it.
+	* src/toolbar-factory.c (balsa_toolbar_model_finalize),
+	(tm_gsettings_change_cb), (balsa_toolbar_model_new),
+	(tm_default_style): use GSettings without checking it.
+
 2017-09-14  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Allow installing the help files

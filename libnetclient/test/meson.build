@@ -18,12 +18,11 @@ if with_libnetclient_test
                    '--track-fds=yes',
                    '--child-silent-after-fork=yes']
 
-  test_deps = declare_dependency(compile_args : test_flags + ['-I.', '-I..'],
-                                 dependencies : libnetclient_deps)
-  test_executable = executable('tests', 'tests.c',
-                               link_with    : libnetclient_a,
-                               dependencies : test_deps,
-                               install      : false)
+  test_compile_dep = declare_dependency(compile_args : test_flags + ['-I.', '-I..'])
+  test_executable  = executable('tests', 'tests.c',
+                                link_with    : libnetclient_a,
+                                dependencies : libnetclient_deps + [test_compile_dep],
+                                install      : false)
   test('libnetclient-test', test_executable)
   # now run the test with:
   #   meson test --wrap='valgrind --tool=memcheck --leak-check=full --track-fds=yes --child-silent-after-fork=yes --suppressions=valgrind.supp' libnetclient-test

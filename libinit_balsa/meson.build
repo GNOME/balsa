@@ -21,9 +21,8 @@ libinit_balsa_compile_args = ['-I' + meson.build_root(),
                               '-I' + join_paths(meson.source_root(), 'libbalsa'),
                               '-I' + join_paths(meson.source_root(), 'libnetclient'),
                               '-I' + join_paths(meson.source_root(), 'src')]
-libinit_balsa_deps = declare_dependency(compile_args : libinit_balsa_compile_args,
-                                        dependencies : balsa_deps)
+libinit_balsa_compile_dep = declare_dependency(compile_args : libinit_balsa_compile_args)
 
 libinit_balsa_a = static_library('init_balsa', libinit_balsa_sources,
-                                 dependencies : libinit_balsa_deps,
+                                 dependencies : balsa_deps + [libinit_balsa_compile_dep],
                                  install      : false)

@@ -1,3 +1,14 @@
+2017-09-20  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Do not include internal dependencies in declare_dependency()
+
+	* libbalsa/imap/meson.build:
+	* libbalsa/meson.build:
+	* libinit_balsa/meson.build:
+	* libnetclient/meson.build:
+	* libnetclient/test/meson.build:
+	* src/meson.build:
+
 2017-09-19  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* meson.build: adapt the meson build to reflect the GNOME option

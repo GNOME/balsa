@@ -12,10 +12,10 @@ libnetclient_a_sources = [
   ]
 
 libnetclient_compile_args = '-I' + meson.build_root()
-netclient_deps = declare_dependency(compile_args : libnetclient_compile_args,
-                                    dependencies : libnetclient_deps)
+libbetclient_compile_dep  = declare_dependency(compile_args : libnetclient_compile_args)
+
 libnetclient_a = static_library('netclient', libnetclient_a_sources,
-                                dependencies : netclient_deps,
+                                dependencies : libnetclient_deps + [libbetclient_compile_dep],
                                 install      : false)
 
 if with_libnetclient_docs

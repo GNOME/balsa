@@ -140,8 +140,7 @@ libbalsa_compile_args = ['-I' + meson.build_root(),
                          '-I' + join_paths(meson.source_root(), 'libbalsa'),
                          '-I' + join_paths(meson.source_root(), 'libnetclient'),
                          '-I' + join_paths(meson.source_root(), 'libbalsa', 'imap')]
-libbalsa_deps = declare_dependency(compile_args : libbalsa_compile_args,
-                                   dependencies : balsa_deps)
+libbalsa_compile_dep  = declare_dependency(compile_args : libbalsa_compile_args)
 
 # genmarshal
 #
@@ -164,8 +163,8 @@ libbalsa_marshal_c = custom_target('libbalsa_marshal_c',
   output  : 'libbalsa-marshal.c',
   command : [
     'sh', '-c',
-    'echo \'#include "libbalsa-marshal.h"\' > libbalsa/libbalsa-marshal.c && ' +
     glib_genmarshal +
+    ' --header' +
     ' --body' +
     ' --prefix=libbalsa' +
     ' @INPUT@' +
@@ -175,7 +174,7 @@ libbalsa_marshal_c = custom_target('libbalsa_marshal_c',
 
 libbalsa_a = static_library('balsa', libbalsa_a_sources,
                             libbalsa_marshal_c, libbalsa_marshal_h,
-                            dependencies : libbalsa_deps,
+                            dependencies : balsa_deps + [libbalsa_compile_dep],
                             install      : false)
 
 subdir('imap')

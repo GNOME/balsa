@@ -105,13 +105,12 @@ balsa_compile_args = ['-DGNOMELOCALEDIR="' + locale_dir + '"',
                       '-I' + join_paths(meson.source_root(), 'libbalsa'),
                       '-I' + join_paths(meson.source_root(), 'libnetclient')]
 
-real_balsa_deps = declare_dependency(compile_args : balsa_compile_args,
-                                     dependencies : balsa_deps)
-real_balsa_libs = [libinit_balsa_a, libbalsa_a, libimap_a, libnetclient_a]
+balsa_compile_dep = declare_dependency(compile_args : balsa_compile_args)
+balsa_libs = [libinit_balsa_a, libbalsa_a, libimap_a, libnetclient_a]
 
 executable('balsa', balsa_sources,
-           dependencies : real_balsa_deps,
-           link_with    : real_balsa_libs,
+           dependencies : balsa_deps + [balsa_compile_dep],
+           link_with    : balsa_libs,
            install      : true)
 
 balsa_ab_sources = [
@@ -122,10 +121,9 @@ balsa_ab_sources = [
 balsa_ab_compile_args = ['-I' + meson.build_root(),
                          '-I' + join_paths(meson.source_root(), 'libbalsa')]
 
-real_balsa_ab_deps = declare_dependency(compile_args : balsa_ab_compile_args,
-                                        dependencies : balsa_ab_deps)
+balsa_ab_compile_dep  = declare_dependency(compile_args : balsa_ab_compile_args)
 
 executable('balsa_ab', balsa_ab_sources,
-           dependencies : real_balsa_ab_deps,
+           dependencies : balsa_ab_deps + [balsa_ab_compile_dep],
            link_with    : libbalsa_a,
            install      : true)

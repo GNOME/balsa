@@ -168,7 +168,7 @@ libbalsa_marshal_c = custom_target('libbalsa_marshal_c',
     ' --body' +
     ' --prefix=libbalsa' +
     ' @INPUT@' +
-    ' >> libbalsa/libbalsa-marshal.c'
+    ' > libbalsa/libbalsa-marshal.c'
   ]
 )
 

@@ -52,12 +52,12 @@ libimap_marshal_c = custom_target('libimap_marshal_c',
   output  : 'libimap-marshal.c',
   command : [
     'sh', '-c',
-    'echo \'#include "libimap-marshal.h"\' > libbalsa/imap/libimap-marshal.c && ' +
     glib_genmarshal +
+    ' --header' +
     ' --body' +
     ' --prefix=libimap' +
     ' @INPUT@' +
-    ' >> libbalsa/imap/libimap-marshal.c'
+    ' > libbalsa/imap/libimap-marshal.c'
   ]
 )
 

@@ -1,5 +1,13 @@
 2017-09-20  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Use 'glib-genmarshal --header --body' to generate marshal.c
+	files, instead of catting a header line to the file
+
+	* libbalsa/imap/meson.build:
+	* libbalsa/meson.build:
+
+2017-09-20  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Do not include internal dependencies in declare_dependency()
 
 	* libbalsa/imap/meson.build:

@@ -1,7 +1,7 @@
 option('with-gnome',
   type        : 'boolean',
   value       : true,
-  description : 'Use GNOME libraries (default=true)')
+  description : 'Set GNOME desktop category (default=true)')
 
 option('enable-flock',
   type        : 'boolean',
@@ -88,7 +88,7 @@ option('with-sqlite',
 option('with-libsecret',
   type        : 'boolean',
   value       : false,
-  description : 'Link to libsecret instead of gnome-keyring (default=false)')
+  description : 'Link to libsecret (default=false)')
 
 option('with-gcr',
   type        : 'boolean',

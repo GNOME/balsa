@@ -131,30 +131,10 @@ endif
 # GNOME libs
 # #####################################################################
 
-with_gnome_keyring = false
 if with_gnome
   TOOLKIT_CATEGORIES = 'GNOME;GTK;'
-  gnome_extras = ['gio-unix-2.0']
-  if not with_libsecret
-    gnome_keyring_dep = dependency('gnome-keyring-1', version : '>= 1.0')
-    if gnome_keyring_dep.found()
-      gnome_extras += 'gnome-keyring-1'
-      conf.set('HAVE_GNOME_KEYRING', 1,
-        description : 'Defined when gnome-keyring is there.')
-      # Work around http://bugzilla.gnome.org/show_bug.cgi?id=556530
-      gnome_keyring_24_dep = dependency('gnome-keyring-1', version : '>= 2.24.1')
-      if gnome_keyring_24_dep.found()
-        conf.set('HAVE_GNOME_KEYRING_24', 1,
-          description : 'Defined with gnome-keyring-2.24 or newer.')
-      endif
-      with_gnome_keyring = true
-    endif
-  endif
-  conf.set('HAVE_GNOME', 1,
-    description : 'Defined when building for GNOME.')
 else
   TOOLKIT_CATEGORIES = 'GTK;'
-  gnome_extras = []
 endif # with_gnome
 
 conf.set('TOOLKIT_CATEGORIES', TOOLKIT_CATEGORIES)
@@ -173,10 +153,6 @@ gmime_dep   = dependency('gmime-2.6')
 gio_dep     = dependency('gio-2.0')
 gthread_dep = dependency('gthread-2.0')
 gnutls_dep  = dependency('gnutls')
-gnome_dependencies = []
-foreach extra : gnome_extras
-  gnome_dependencies += dependency(extra)
-endforeach
 
 # Dependencies for balsa
 balsa_deps = [glib_dep,
@@ -184,14 +160,12 @@ balsa_deps = [glib_dep,
               gmime_dep,
               gio_dep,
               gthread_dep,
-              gnutls_dep,
-              gnome_dependencies]
+              gnutls_dep]
 
 # Dependencies for balsa_ab:
 balsa_ab_deps = [glib_dep,
                  gtk_dep,
-                 gmime_dep,
-                 gnome_dependencies]
+                 gmime_dep]
 
 # Dependencies for libnetclient:
 libnetclient_deps = [glib_dep,
@@ -759,12 +733,6 @@ or just plain not work. Use it at your own risk. You have been warned.
 ======================================================================
 ''')
 
-  if with_gnome_keyring
-    message('''
-*** Cannot build in a git tree with deprecated GnomeKeyring.
-*** Either install and configure with libsecret or configure --without-gnome.
-      ''')
-  endif
 endif
 
 if use_html_widget == 'webkit'

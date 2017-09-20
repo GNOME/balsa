@@ -1,5 +1,11 @@
 2017-09-19  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	* meson.build: adapt the meson build to reflect the GNOME option
+	changes.
+	* meson_options.txt: ditto.
+
+2017-09-19  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Remove obsolete option to build with deprecated GnomeKeyring
 
 	* configure.ac: do not check for the lib and do not define

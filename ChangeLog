@@ -1,5 +1,13 @@
 2017-09-20  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Pass '-lz' link argument as a dependency of libimap instead of through
+	add_global_link_arguments
+
+	* libbalsa/imap/meson.build: add the dependency.
+	* meson.build: do not use add_global_link_arguments.
+
+2017-09-20  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Use 'glib-genmarshal --header --body' to generate marshal.c
 	files, instead of catting a header line to the file
 

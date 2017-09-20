@@ -29,7 +29,8 @@ libimap_compile_args = ['-I' + meson.build_root(),
                         '-I' + join_paths(meson.source_root(), 'libnetclient'),
                         '-I' + join_paths(meson.source_root(), 'libbalsa', 'imap'),
                         '-ansi']
-libimap_compile_dep  = declare_dependency(compile_args : libimap_compile_args)
+libimap_compile_dep  = declare_dependency(compile_args : libimap_compile_args,
+                                          link_args    : '-lz')
 
 # genmarshal
 #

@@ -143,9 +143,6 @@ conf.set('TOOLKIT_CATEGORIES', TOOLKIT_CATEGORIES)
 # Libraries.
 # #####################################################################
 
-# Make sure ld finds zlib:
-add_global_link_arguments('-lz', language : 'c')
-
 # Dependencies for balsa and balsa_ab:
 glib_dep    = dependency('glib-2.0', version : '>= 2.40.0')
 gtk_dep     = dependency('gtk+-3.0', version : '>= 3.10.0')

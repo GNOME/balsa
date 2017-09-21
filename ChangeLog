@@ -1,3 +1,7 @@
+2017-09-21  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* sounds/meson.build: make an absolute path to the po dir.
+
 2017-09-20  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Pass '-lz' link argument as a dependency of libimap instead of through

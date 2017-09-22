@@ -1,6 +1,6 @@
 # libbalsa/meson.build
 
-if gpgmecfg == 'yes'
+if gpgmecfg == 'true'
   libbalsa_gpgme_extra = [
     'libbalsa-gpgme.h',
     'libbalsa-gpgme.c',

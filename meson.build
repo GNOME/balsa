@@ -235,7 +235,7 @@ endif
 
 # GPGME detection.
 
-if gpgmecfg == 'yes'
+if gpgmecfg == 'true'
   gpgmecfg_program = find_program('gpgme-config', required : false)
   if not gpgmecfg_program.found()
     error('GPGme build requested but gpgme-config program not found.')
@@ -243,10 +243,10 @@ if gpgmecfg == 'yes'
   gpgmecfg = gpgmecfg_program.path()
 endif
 
-if gpgmecfg != 'no'
+if gpgmecfg != 'false'
   gpgmever = run_command(gpgmecfg, '--version').stdout().strip()
   if gpgmever.version_compare('< 1.2.0')
-    gpgmecfg   = 'no'
+    gpgmecfg   = 'false'
     message('Sorry, you need at least gpgme version 1.2.0')
   else
     if gpgmever.version_compare('< 1.8.0')
@@ -272,16 +272,16 @@ if gpgmecfg != 'no'
     conf.set('HAVE_GPGME', 1,
              description : 'Defined when gpgme is available.')
     balsa_deps += gpgme_dep
-    gpgmecfg = 'yes'
+    gpgmecfg = 'true'
   endif
 endif
 
 # OpenLDAP configuration.
 #
-if with_ldap != 'no'
+if with_ldap != 'false'
   ldap_compile_args = []
   ldap_link_args    = ['-lldap', '-llber', '-lresolv']
-  if with_ldap != 'yes'
+  if with_ldap != 'true'
     ldap_compile_args += '-I' + with_ldap + '/include'
     ldap_link_args    += '-L' + with_ldap + '/lib'
   endif
@@ -304,11 +304,11 @@ if with_ldap != 'no'
                                 link_args    : ldap_link_args)
   balsa_deps += ldap_dep
   balsa_ab_deps += ldap_dep
-endif # with_ldap != 'no'
+endif # with_ldap != 'false'
 
 # SQLite configuration.
 #
-if with_sqlite != 'no'
+if with_sqlite != 'false'
   sqlite_dep = dependency('sqlite3', required : false)
   if sqlite_dep.found()
     conf.set('HAVE_SQLITE3', 1,
@@ -319,7 +319,7 @@ if with_sqlite != 'no'
   conf.set('HAVE_SQLITE', 1,
     description : 'If defined, enable GPE address book support.')
 
-  if with_sqlite != 'yes'
+  if with_sqlite != 'true'
     # If sqlite is installed in a nonstandard location, PKG_CONFIG_PATH
     # would probably need to be set appropriately in the environment.
     # There doesn't seem to be a way to do that within dependency().
@@ -332,7 +332,7 @@ if with_sqlite != 'no'
 
   balsa_deps += real_dep
   balsa_ab_deps += real_dep
-endif # with_sqlite != 'no'
+endif # with_sqlite != 'false'
 
 # Rubrica (libxml2) configuration
 #
@@ -447,10 +447,10 @@ endif # with_gcr
 
 # Compface configuration
 #
-if with_compface != 'no'
+if with_compface != 'false'
   compface_compile_args = []
   compface_link_args    = ['-lcompface']
-  if with_compface != 'yes'
+  if with_compface != 'true'
     compface_compile_args += '-I' + with_compface + '/include'
     compface_link_args    += '-L' + with_compface + '/lib'
   endif
@@ -466,7 +466,7 @@ if with_compface != 'no'
   compface_dep = declare_dependency(compile_args : compface_compile_args,
                                     link_args    : compface_link_args)
   balsa_deps += compface_dep
-endif # with_compface != 'no'
+endif # with_compface != 'false'
 
 # GtkSourceView configuration
 #
@@ -523,28 +523,21 @@ if spell_checker == 'gspell'
       description : 'Defined when Gspell API is version 1.2.')
   endif
 elif spell_checker == 'gtkspell'
-  spell_dep = dependency('gtkspell3-3.0',
-                         version  : '>= 3.0.3',
-                         required : false)
-  if spell_dep.found()
+  spell_dep = dependency('gtkspell3-3.0')
+  if spell_dep.version().version_compare('>= 3.0.3')
     conf.set('HAVE_GTKSPELL_3_0_3', 1,
       description : 'Defined when GtkSpell version is at least 3.0.3.')
   else
-    spell3_dep = dependency('gtkspell3-3.0')
     enchant_dep = dependency('enchant')
-    spell_dep = declare_dependency(dependencies : [spell3_dep, enchant_dep])
+    spell_dep = [spell_dep, enchant_dep]
   endif
   conf.set('HAVE_GTKSPELL', 1,
     description : 'Defined when GtkSpell can be used.')
 elif spell_checker == 'internal'
   spell_dep = dependency('enchant')
-elif spell_checker != 'no'
-  error('bad option' + spell_checker)
 endif
 
-if is_variable('spell_dep')
-  balsa_deps += spell_dep
-endif
+balsa_deps += spell_dep
 
 #####################################################################
 # Typedefs, structures and compiler characteristics.

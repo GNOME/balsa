@@ -1,5 +1,14 @@
 2017-09-21  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Replace 'yes'|'no' option values inherited from autotools with
+	'true'|'false' string values.
+
+	* libbalsa/meson.build:
+	* meson.build:
+	* meson_options.txt:
+
+2017-09-21  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* sounds/meson.build: make an absolute path to the po dir.
 
 2017-09-20  Peter Bloomfield  <pbloomfield@bellsouth.net>

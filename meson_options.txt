@@ -20,8 +20,8 @@ option('enable-debug-threads',
 
 option('with-gpgme',
   type        : 'string',
-  value       : 'no',
-  description : 'build with gpgme/GnuPG support (yes|no|path to gpgme-config, default=no)')
+  value       : 'false',
+  description : 'build with gpgme/GnuPG support (true|false|path to gpgme-config, default=false)')
 
 option('with-canberra',
   type        : 'boolean',
@@ -30,8 +30,8 @@ option('with-canberra',
 
 option('with-compface',
   type        : 'string',
-  value       : 'no',
-  description : 'Enable Compface (yes|no|path to compface installation, default=no)')
+  value       : 'false',
+  description : 'Enable Compface (true|false|path to compface installation, default=false)')
 
 option('with-gss',
   type        : 'boolean',
@@ -57,8 +57,8 @@ option('with-spell-checker',
 
 option('with-ldap',
   type        : 'string',
-  value       : 'no',
-  description : 'Use OpenLDAP if available (yes|no|path to LDAP installation, default=no)')
+  value       : 'false',
+  description : 'Use OpenLDAP if available (true|false|path to LDAP installation, default=false)')
 
 option('with-libnotify',
   type        : 'boolean',
@@ -68,7 +68,7 @@ option('with-libnotify',
 option('with-macosx-desktop',
   type        : 'boolean',
   value       : false,
-  description : 'Use Mac OS X Desktop Integration (default=no, extremely experimental)')
+  description : 'Use Mac OS X Desktop Integration (default=false, extremely experimental)')
 
 option('with-rubrica',
   type        : 'boolean',
@@ -78,12 +78,12 @@ option('with-rubrica',
 option('with-osmo',
   type        : 'boolean',
   value       : false,
-  description : 'add Osmo address book support (experimental, needs osmo > svn rev. 1099, default=no)')
+  description : 'add Osmo address book support (experimental, needs osmo > svn rev. 1099, default=false)')
 
 option('with-sqlite',
   type        : 'string',
-  value       : 'no',
-  description : 'Use SQLite for GPE address books (yes|no|path to SQLite installation, default=no)')
+  value       : 'false',
+  description : 'Use SQLite for GPE address books (true|false|path to SQLite installation, default=false)')
 
 option('with-libsecret',
   type        : 'boolean',

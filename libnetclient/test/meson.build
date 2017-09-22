@@ -1,6 +1,6 @@
 # libnetclient/test/meson.build
 
-if with_libnetclient_test
+if libnetclient_test
 
   test_flags    = ['-DNCAT="' + ncat + '"',
                    '-DSED="'  + sed  + '"',
@@ -59,4 +59,4 @@ if with_libnetclient_test
   html_out_path = join_paths(build_path, 'gcov')
   run_command(genhtml, [genhtml_flags, '-o', html_out_path, lcov_out_path])
 
-endif # with_libnetclient_test
+endif # libnetclient_test

@@ -33,43 +33,43 @@ conf.set('_GNU_SOURCE', 1)
 # Options
 # #####################################################################
 
-if get_option('enable-flock')
+if get_option('flock')
   conf.set('USE_FLOCK', 1,
     description : 'Define if flock locking should be used.')
 endif
 
-if get_option('enable-fcntl')
+if get_option('fcntl')
   conf.set('USE_FCNTL', 1,
     description : 'Define if fcntl locking should be used.')
 endif
 
-if get_option('enable-debug-threads')
+if get_option('debug-threads')
   conf.set('BALSA_DEBUG_THREADS', 1,
     description : 'Defined to debug threads.')
 endif
 
-with_gnome         = get_option('with-gnome')
-gpgmecfg           = get_option('with-gpgme')
-with_canberra      = get_option('with-canberra')
-with_compface      = get_option('with-compface')
-with_gss           = get_option('with-gss')
-use_html_widget    = get_option('with-html-widget')
-with_gtksourceview = get_option('with-gtksourceview')
-spell_checker      = get_option('with-spell-checker')
-with_ldap          = get_option('with-ldap')
-with_libnotify     = get_option('with-libnotify')
-use_igemacint      = get_option('with-macosx-desktop')
-with_rubrica       = get_option('with-rubrica')
-with_osmo          = get_option('with-osmo')
-with_sqlite        = get_option('with-sqlite')
-with_libsecret     = get_option('with-libsecret')
-with_gcr           = get_option('with-gcr')
-set_more_warnings  = get_option('enable-more-warnings')
-make_help_files    = get_option('enable-help-files')
+gnome_desktop = get_option('gnome-desktop')
+gpgmecfg      = get_option('gpgme')
+canberra      = get_option('canberra')
+compface      = get_option('compface')
+gss           = get_option('gss')
+html_widget   = get_option('html-widget')
+gtksourceview = get_option('gtksourceview')
+spell_checker = get_option('spell-checker')
+ldap          = get_option('ldap')
+libnotify     = get_option('libnotify')
+igemacint     = get_option('macosx-desktop')
+rubrica       = get_option('rubrica')
+osmo          = get_option('osmo')
+sqlite        = get_option('sqlite')
+libsecret     = get_option('libsecret')
+gcr           = get_option('gcr')
+more_warnings = get_option('more-warnings')
+help_files    = get_option('help-files')
 
 # Documentation and Testing requirements for libnetclient
-with_libnetclient_docs = get_option('with-libnetclient-docs')
-with_libnetclient_test = get_option('with-libnetclient-test')
+libnetclient_docs = get_option('libnetclient-docs')
+libnetclient_test = get_option('libnetclient-test')
 
 # #####################################################################
 # Programs: compilers and their options.
@@ -101,13 +101,13 @@ glib_genmarshal = run_command('pkg-config',
 
 # yelp
 
-if make_help_files
+if help_files
   yelptool = find_program('yelp-build', required : false)
   if not yelptool.found()
     message('*** The tools to build the documentation are not found.')
     message('    To build it, please install the yelp-tools package.')
     message('    Continuing with build. ****')
-    make_help_files = false
+    help_files = false
   endif
 endif
 
@@ -131,11 +131,11 @@ endif
 # GNOME libs
 # #####################################################################
 
-if with_gnome
+if gnome_desktop
   TOOLKIT_CATEGORIES = 'GNOME;GTK;'
 else
   TOOLKIT_CATEGORIES = 'GTK;'
-endif # with_gnome
+endif # gnome_desktop
 
 conf.set('TOOLKIT_CATEGORIES', TOOLKIT_CATEGORIES)
 
@@ -191,19 +191,19 @@ endif
 
 # HTML widget
 #
-if use_html_widget == 'gtkhtml4'
+if html_widget == 'gtkhtml4'
   html_dep = dependency('libgtkhtml-4.0')
   conf.set('HAVE_GTKHTML4', 1,
     description : 'Defined when GtkHtml-4 can be used.')
-elif use_html_widget == 'webkit' or use_html_widget == 'webkit2'
-  if use_html_widget == 'webkit2'
+elif html_widget == 'webkit' or html_widget == 'webkit2'
+  if html_widget == 'webkit2'
     html_dep = dependency('webkit2gtk-4.0')
     conf.set('USE_WEBKIT2', 1,
       description : 'Defined when WebKit2 is requested.')
   else
     html_dep = dependency('webkit2gtk-3.0',
-                                 version  : '>= 1.5.1',
-                                 required : false)
+                          version  : '>= 1.5.1',
+                          required : false)
     if html_dep.found()
       java_dep = dependency('javascriptcoregtk-3.0')
     else
@@ -278,12 +278,12 @@ endif
 
 # OpenLDAP configuration.
 #
-if with_ldap != 'false'
+if ldap != 'false'
   ldap_compile_args = []
   ldap_link_args    = ['-lldap', '-llber', '-lresolv']
-  if with_ldap != 'true'
-    ldap_compile_args += '-I' + with_ldap + '/include'
-    ldap_link_args    += '-L' + with_ldap + '/lib'
+  if ldap != 'true'
+    ldap_compile_args += '-I' + ldap + '/include'
+    ldap_link_args    += '-L' + ldap + '/lib'
   endif
 
   result = compiler.has_function('ldap_search', args : ldap_link_args)
@@ -304,11 +304,11 @@ if with_ldap != 'false'
                                 link_args    : ldap_link_args)
   balsa_deps += ldap_dep
   balsa_ab_deps += ldap_dep
-endif # with_ldap != 'false'
+endif # ldap != 'false'
 
 # SQLite configuration.
 #
-if with_sqlite != 'false'
+if sqlite != 'false'
   sqlite_dep = dependency('sqlite3', required : false)
   if sqlite_dep.found()
     conf.set('HAVE_SQLITE3', 1,
@@ -319,37 +319,37 @@ if with_sqlite != 'false'
   conf.set('HAVE_SQLITE', 1,
     description : 'If defined, enable GPE address book support.')
 
-  if with_sqlite != 'true'
+  if sqlite != 'true'
     # If sqlite is installed in a nonstandard location, PKG_CONFIG_PATH
     # would probably need to be set appropriately in the environment.
     # There doesn't seem to be a way to do that within dependency().
     real_dep = declare_dependency(dependencies : sqlite_dep,
-                                  compile_args : '-I' + with_sqlite + '/include',
-                                  link_args    : '-L' + with_sqlite + '/lib')
+                                  compile_args : '-I' + sqlite + '/include',
+                                  link_args    : '-L' + sqlite + '/lib')
   else
     real_dep = sqlite_dep
   endif
 
   balsa_deps += real_dep
   balsa_ab_deps += real_dep
-endif # with_sqlite != 'false'
+endif # sqlite != 'false'
 
 # Rubrica (libxml2) configuration
 #
-if with_rubrica
+if rubrica
   xml_dep = dependency('libxml-2.0')
   conf.set('HAVE_RUBRICA', 1,
     description : 'If defined, enable Rubrica2 address book support.')
   balsa_deps += xml_dep
   balsa_ab_deps += xml_dep
-endif # with_rubrica
+endif # rubrica
 
 # Osmo address book support
 #
-if with_osmo
+if osmo
   conf.set('HAVE_OSMO', 1,
     description : 'If defined, enable Osmo address book support.')
-endif # with_osmo
+endif # osmo
 
 # OpenSSL configuration.
 #
@@ -386,7 +386,7 @@ balsa_ab_deps += ssl_dep
 
 # KRB5/GSSAPI configuration.
 #
-if with_gss
+if gss
   krb5_config_program = find_program('krb5-config',
                                      '/usr/kerberos/bin/krb5-config',
                                      '/usr/lib/mit/bin/krb5-config',
@@ -408,11 +408,11 @@ if with_gss
   krb5_dep = declare_dependency(compile_args : krb5_cflags,
                                 link_args    : krb5_libs)
   balsa_deps += krb5_dep
-endif # with_gss
+endif # gss
 
 # Libnotify configuration
 #
-if with_libnotify
+if libnotify
   notify_dep = dependency('libnotify',
                           version  : '>= 0.7.0',
                           required : false)
@@ -432,27 +432,27 @@ if with_libnotify
     description : 'Defined when libnotify can be used.')
   balsa_deps += notify_dep
   balsa_ab_deps += notify_dep
-endif # with_libnotify
+endif # libnotify
 
 # gcr configuration
 #
-if with_gcr
+if gcr
   gcr_dep = dependency('gcr-3')
   if gcr_dep.found()
     conf.set('HAVE_GCR', 1,
       description : 'Defined when gcr-3 can be used.')
   endif
   balsa_deps += gcr_dep
-endif # with_gcr
+endif # gcr
 
 # Compface configuration
 #
-if with_compface != 'false'
+if compface != 'false'
   compface_compile_args = []
   compface_link_args    = ['-lcompface']
-  if with_compface != 'true'
-    compface_compile_args += '-I' + with_compface + '/include'
-    compface_link_args    += '-L' + with_compface + '/lib'
+  if compface != 'true'
+    compface_compile_args += '-I' + compface + '/include'
+    compface_link_args    += '-L' + compface + '/lib'
   endif
 
   result = compiler.has_function('uncompface', args : compface_link_args)
@@ -466,39 +466,39 @@ if with_compface != 'false'
   compface_dep = declare_dependency(compile_args : compface_compile_args,
                                     link_args    : compface_link_args)
   balsa_deps += compface_dep
-endif # with_compface != 'false'
+endif # compface != 'false'
 
 # GtkSourceView configuration
 #
-if with_gtksourceview
+if gtksourceview
   gsv_dep = dependency('gtksourceview-3.0', version : '>= 3.2.0')
   conf.set('HAVE_GTKSOURCEVIEW', 1,
     description : 'Defined when GtkSourceView-3 can be used.')
   balsa_deps += gsv_dep
-endif # with_gtksourceview
+endif # gtksourceview
 
 # libcanberra configuration
 #
-if with_canberra
+if canberra
   canberra_dep = dependency('libcanberra-gtk3')
   conf.set('HAVE_CANBERRA', 1,
     description : 'Defined when canberra can be used.')
   balsa_deps += canberra_dep
-endif # with_canberra
+endif # canberra
 
 # ige-mac-integration (Mac OS X desktop only)
 #
-if use_igemacint
+if igemacint
   igemacint_dep = dependency('ige-mac-integration', version  : '>= 0.8')
   conf.set('HAVE_MACOSX_DESKTOP', 1,
     description : 'Defined when menus can be integrated into the Mac OS X desktop')
   balsa_deps    += igemacint_dep
   balsa_ab_deps += igemacint_dep
-endif # use_igemacint
+endif # igemacint
 
 # Libsecret configuration
 #
-if with_libsecret
+if libsecret
   secret_dep = dependency('libsecret-1', required : false)
   if not secret_dep.found()
     error('You asked to link to libsecret, but the development tool is not installed')
@@ -506,7 +506,7 @@ if with_libsecret
   conf.set('HAVE_LIBSECRET', 1,
     description : 'Defined when libsecret can be used.')
   balsa_deps += secret_dep
-endif # with_libsecret
+endif # libsecret
 
 #####################################################################
 # Headers.
@@ -558,7 +558,7 @@ endif
 # set more warnings.
 #
 
-if compiler.get_id() == 'gcc' and set_more_warnings
+if compiler.get_id() == 'gcc' and more_warnings
   foreach argument : ['-Wsign-compare',
                       '-Wpointer-arith',
                       '-Wnested-externs',
@@ -602,14 +602,14 @@ gtk_update_icon_cache_program = find_program('gtk-update-icon-cache')
 # Documentation and Testing requirements for libnetclient
 ###########################################################################
 
-if with_libnetclient_docs
+if libnetclient_docs
   doxygen_program = find_program('doxygen', required : false)
   if not doxygen_program.found()
     error('*** Cannot build libnetclient API documentation, see libnetclient/README for fixing this issue ***')
   endif
-endif # with_libnetclient_docs
+endif # libnetclient_docs
 
-if with_libnetclient_test
+if libnetclient_test
   have_sput           = compiler.has_header('sput.h')
   sed_program         = find_program('sed',         required : false)
   ncat_program        = find_program('ncat',        required : false)
@@ -643,7 +643,7 @@ if with_libnetclient_test
   gnutls_serv = gnutls_serv_program.path()
   sudo        = sudo_program.path()
   inetsim     = inetsim_program.path()
-endif # with_libnetclient_test
+endif # libnetclient_test
 
 #####################################################################
 # Output
@@ -699,20 +699,20 @@ i18n.merge_file(
 message('')
 message('================ Final configuration ===================')
 message('    Installing into prefix: ' + get_option('prefix'))
-message('   Enable compile warnings: ' + (set_more_warnings  ? 'true' : 'false'))
-message('               HTML widget: ' + use_html_widget)
-message('                 Use GNOME: ' + (with_gnome         ? 'true' : 'false'))
-message('              Use Canberra: ' + (with_canberra      ? 'true' : 'false'))
+message('   Enable compile warnings: ' + (more_warnings ? 'true' : 'false'))
+message('               HTML widget: ' + html_widget)
+message('                 Use GNOME: ' + (gnome_desktop ? 'true' : 'false'))
+message('              Use Canberra: ' + (canberra      ? 'true' : 'false'))
 message('                 Use GPGME: ' + gpgmecfg)
-message('                  Use LDAP: ' + with_ldap)
-message('                   Use GSS: ' + (with_gss           ? 'true' : 'false'))
-message('                Use SQLite: ' + with_sqlite)
+message('                  Use LDAP: ' + ldap)
+message('                   Use GSS: ' + (gss           ? 'true' : 'false'))
+message('                Use SQLite: ' + sqlite)
 message('             Spell checker: ' + spell_checker)
-message('             Use Libnotify: ' + (with_libnotify     ? 'true' : 'false'))
-message('         Use GtkSourceView: ' + (with_gtksourceview ? 'true' : 'false'))
-message('              Use Compface: ' + with_compface)
-message('             Use libsecret: ' + (with_libsecret     ? 'true' : 'false'))
-message('                   Use gcr: ' + (with_gcr           ? 'true' : 'false'))
+message('             Use Libnotify: ' + (libnotify     ? 'true' : 'false'))
+message('         Use GtkSourceView: ' + (gtksourceview ? 'true' : 'false'))
+message('              Use Compface: ' + compface)
+message('             Use libsecret: ' + (libsecret     ? 'true' : 'false'))
+message('                   Use gcr: ' + (gcr           ? 'true' : 'false'))
 
 if balsa_from_git
   message('''
@@ -725,7 +725,7 @@ or just plain not work. Use it at your own risk. You have been warned.
 
 endif
 
-if use_html_widget == 'webkit'
+if html_widget == 'webkit'
   message('''
 *** You have configured Balsa to use the old webkitgtk HTML widget.
 *** This widget is no longer being actively developed, and likely
@@ -742,7 +742,7 @@ subdirs = ['sounds',
            'libinit_balsa',
            'src',
            'ui']
-if make_help_files
+if help_files
   subdirs += 'doc'
 endif
 
@@ -750,7 +750,7 @@ foreach dir : subdirs
   subdir(dir)
 endforeach
 
-if with_gtksourceview
+if gtksourceview
   gtksourceview_files = ['balsa-mail.lang', 'balsa-mail-style.xml']
   gtksourceview_dir = join_paths(get_option('datadir'), 'balsa', 'gtksourceview-3.0')
   install_data(gtksourceview_files, install_dir : gtksourceview_dir)

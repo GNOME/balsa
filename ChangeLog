@@ -1,5 +1,15 @@
 2017-09-22  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Drop 'enable-' and 'with-', inherited from autotools,
+	from option names.
+
+	* libnetclient/meson.build:
+	* libnetclient/test/meson.build:
+	* meson.build:
+	* meson_options.txt:
+
+2017-09-22  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* sounds/meson.build: use documented option syntax for msgfmt.
 
 2017-09-21  Peter Bloomfield  <pbloomfield@bellsouth.net>

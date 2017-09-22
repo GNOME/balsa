@@ -1,116 +1,116 @@
-option('with-gnome',
+option('gnome-desktop',
   type        : 'boolean',
   value       : true,
   description : 'Set GNOME desktop category (default=true)')
 
-option('enable-flock',
+option('flock',
   type        : 'boolean',
   value       : false,
   description : 'Use flock() to lock files (default=false)')
 
-option('enable-fcntl',
+option('fcntl',
   type        : 'boolean',
   value       : true,
   description : 'Use fcntl() to lock files (default=true)')
 
-option('enable-debug-threads',
+option('debug-threads',
   type        : 'boolean',
   value       : false,
   description : 'Debug threads (default=false)')
 
-option('with-gpgme',
+option('gpgme',
   type        : 'string',
   value       : 'false',
   description : 'build with gpgme/GnuPG support (true|false|path to gpgme-config, default=false)')
 
-option('with-canberra',
+option('canberra',
   type        : 'boolean',
   value       : false,
   description : 'Use libcanberra-gtk3 for filter sounds (default=false)')
 
-option('with-compface',
+option('compface',
   type        : 'string',
   value       : 'false',
   description : 'Enable Compface (true|false|path to compface installation, default=false)')
 
-option('with-gss',
+option('gss',
   type        : 'boolean',
   value       : false,
   description : 'Enable GSS (default=false)')
 
-option('with-html-widget',
+option('html-widget',
   type        : 'combo',
   choices     : ['webkit2', 'webkit', 'gtkhtml4'],
   value       : 'webkit2',
   description : 'select the HTML renderer (default webkit2)')
 
-option('with-gtksourceview',
+option('gtksourceview',
   type        : 'boolean',
   value       : false,
   description : 'Use GtkSourceView-3 if available (default=false)')
 
-option('with-spell-checker',
+option('spell-checker',
   type        : 'combo',
   choices     : ['internal', 'gspell', 'gtkspell'],
   value       : 'internal',
   description : 'select the spell checker (default internal)')
 
-option('with-ldap',
+option('ldap',
   type        : 'string',
   value       : 'false',
   description : 'Use OpenLDAP if available (true|false|path to LDAP installation, default=false)')
 
-option('with-libnotify',
+option('libnotify',
   type        : 'boolean',
   value       : true,
   description : 'Use libnotify if available (default=true)')
 
-option('with-macosx-desktop',
+option('macosx-desktop',
   type        : 'boolean',
   value       : false,
   description : 'Use Mac OS X Desktop Integration (default=false, extremely experimental)')
 
-option('with-rubrica',
+option('rubrica',
   type        : 'boolean',
   value       : false,
   description : 'add Rubrica2 address book support (needs libxml2, default=false)')
 
-option('with-osmo',
+option('osmo',
   type        : 'boolean',
   value       : false,
   description : 'add Osmo address book support (experimental, needs osmo > svn rev. 1099, default=false)')
 
-option('with-sqlite',
+option('sqlite',
   type        : 'string',
   value       : 'false',
   description : 'Use SQLite for GPE address books (true|false|path to SQLite installation, default=false)')
 
-option('with-libsecret',
+option('libsecret',
   type        : 'boolean',
   value       : false,
   description : 'Link to libsecret (default=false)')
 
-option('with-gcr',
+option('gcr',
   type        : 'boolean',
   value       : false,
   description : 'Use libgcr-3 for dealing with TLS certificates (experimental, default=false)')
 
-option('enable-more-warnings',
+option('more-warnings',
   type        : 'boolean',
   value       : true,
   description : 'Enable maximum compiler warnings (default=true)')
 
-option('enable-help-files',
+option('help-files',
   type        : 'boolean',
   value       : false,
   description : 'Install the help files (default=false)')
 
-option('with-libnetclient-docs',
+option('libnetclient-docs',
   type        : 'boolean',
   value       : false,
   description : 'Check requirements for building the libnetclient API docs (see libnetclient/README; default=false)')
 
-option('with-libnetclient-test',
+option('libnetclient-test',
   type        : 'boolean',
   value       : false,
   description : 'Check requirements for running libnetclient tests (see libnetclient/README; default=false)')

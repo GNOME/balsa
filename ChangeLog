@@ -1,3 +1,7 @@
+2017-09-22  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* sounds/meson.build: use documented option syntax for msgfmt.
+
 2017-09-21  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Replace 'yes'|'no' option values inherited from autotools with

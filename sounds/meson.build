@@ -21,7 +21,7 @@ custom_target('soundlist-file',
               install     : true,
               install_dir : sound_list_dir,
               command     : ['msgfmt', '--desktop',
-                             '--keyword',     'description',
-                             '--template',    '@INPUT@',
-                             '-d',             join_paths(meson.current_source_dir(), '../po'),
-                             '--output-file', '@OUTPUT@'])
+                             '--keyword=description',
+                             '--template=@INPUT@',
+                             '-d', join_paths(meson.current_source_dir(), '../po'),
+                             '--output-file=@OUTPUT@'])

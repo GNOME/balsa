@@ -1,6 +1,19 @@
+2017-09-23  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Remove 'debug-threads' option
+
+	* meson.build: do not use it.
+	* meson_options.txt: do not define it.
+
 2017-09-23  Albrecht Dreß <albrecht.dress@arcor.de>
 
 	Remove deprecated gdk_threads_* stuff
+
+	In an attempt to clean up the code and to simplify the configure
+	file, this patch:
+	* removes gdk_threads_(enter|leave) calls from the code,
+	* removes the related “--enable-debug-threads” configure option and
+	* replaces the calls to gdk_threads_add_idle() by g_idle_add().
 
 	* configure.ac:
 	* libbalsa/address-view.c (lbav_ensure_blank_line):

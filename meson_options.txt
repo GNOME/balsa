@@ -13,11 +13,6 @@ option('fcntl',
   value       : true,
   description : 'Use fcntl() to lock files (default=true)')
 
-option('debug-threads',
-  type        : 'boolean',
-  value       : false,
-  description : 'Debug threads (default=false)')
-
 option('gpgme',
   type        : 'string',
   value       : 'false',

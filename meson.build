@@ -43,11 +43,6 @@ if get_option('fcntl')
     description : 'Define if fcntl locking should be used.')
 endif
 
-if get_option('debug-threads')
-  conf.set('BALSA_DEBUG_THREADS', 1,
-    description : 'Defined to debug threads.')
-endif
-
 gnome_desktop = get_option('gnome-desktop')
 gpgmecfg      = get_option('gpgme')
 canberra      = get_option('canberra')

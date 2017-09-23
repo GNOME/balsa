@@ -304,8 +304,6 @@ static guint bar_timeout_id = 0;
 static gboolean
 status_bar_refresh(gpointer data)
 {
-    gdk_threads_enter();
-
     if (balsa_app.main_window) {
         GtkStatusbar *statusbar;
         guint context_id;
@@ -316,8 +314,6 @@ status_bar_refresh(gpointer data)
     }
 
     bar_timeout_id = 0;
-
-    gdk_threads_leave();
 
     return FALSE;
 }

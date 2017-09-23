@@ -192,11 +192,9 @@ libbalsa_information_parented(GtkWindow *parent, LibBalsaInformationType type,
 static gboolean
 libbalsa_information_idle_handler(struct information_data *data)
 {
-    gdk_threads_enter();
     libbalsa_real_information_func(data->parent,
                                    data->message_type,
                                    data->msg);
-    gdk_threads_leave();
 
     if(data->parent)
         g_object_remove_weak_pointer(G_OBJECT(data->parent), 

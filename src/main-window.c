@@ -2977,13 +2977,11 @@ balsa_window_real_open_mbnode(BalsaWindow * window,
 static gboolean
 bw_focus_idle(LibBalsaMailbox ** mailbox)
 {
-    gdk_threads_enter();
     if (*mailbox)
 	g_object_remove_weak_pointer(G_OBJECT(*mailbox), (gpointer) mailbox);
     if (balsa_app.mblist_tree_store)
         balsa_mblist_focus_mailbox(balsa_app.mblist, *mailbox);
     g_free(mailbox);
-    gdk_threads_leave();
     return FALSE;
 }
 
@@ -3525,8 +3523,6 @@ mail_progress_notify_cb(GIOChannel * source, GIOCondition condition,
         return TRUE;
     }
 
-    gdk_threads_enter();
-
     statusbar = GTK_STATUSBAR((*window)->statusbar);
     context_id = gtk_statusbar_get_context_id(statusbar, "BalsaWindow mail progress");
 
@@ -3622,7 +3618,6 @@ mail_progress_notify_cb(GIOChannel * source, GIOCondition condition,
         count -= sizeof(void *);
     }
     g_free(msgbuffer);
-    gdk_threads_leave();
 
     return TRUE;
 }
@@ -4415,8 +4410,7 @@ bw_idle_replace(BalsaWindow * window, BalsaIndex * bindex)
         bw_idle_remove(window);
         /* Skip if the window is being destroyed: */
         if (window->preview != NULL) {
-            window->set_message_id =
-                gdk_threads_add_idle((GSourceFunc) bw_idle_cb, window);
+            window->set_message_id = g_idle_add((GSourceFunc) bw_idle_cb, window);
             if (BALSA_MESSAGE(window->preview)->message != NULL)
                 gtk_widget_hide(window->preview);
         }
@@ -4593,21 +4587,15 @@ static gboolean bw_notebook_drag_motion_cb(GtkWidget * widget,
  *
  * This function is called at a preset interval to cause the progress
  * bar to move in activity mode.
- * this routine is called from g_timeout_dispatch() and needs to take care
- * of GDK locking itself using gdk_threads_{enter,leave}
  *
  * Use of the progress bar to show a fraction of a task takes priority.
  **/
 static gint
 bw_progress_timeout(BalsaWindow ** window)
 {
-    gdk_threads_enter();
-
     if (balsa_app.show_statusbar
         && *window && (*window)->progress_type == BALSA_PROGRESS_ACTIVITY)
         gtk_progress_bar_pulse(GTK_PROGRESS_BAR((*window)->progress_bar));
-
-    gdk_threads_leave();
 
     /* return true so it continues to be called */
     return *window != NULL;

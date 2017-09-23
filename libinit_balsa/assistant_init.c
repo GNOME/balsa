@@ -139,9 +139,7 @@ balsa_init_begin(void)
     balsa_initdruid(GTK_ASSISTANT(assistant));
     gtk_widget_show_all(assistant);
 
-    gdk_threads_enter();
     gtk_main();
-    gdk_threads_leave();
 
     /* we do not want to destroy wizard immediately to avoid confusing
        delay between the wizard that left and balsa that entered. */

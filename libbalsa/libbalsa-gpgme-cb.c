@@ -409,12 +409,10 @@ get_passphrase_idle(gpointer data)
 {
     ask_passphrase_data_t *apd = (ask_passphrase_data_t *) data;
 
-    gdk_threads_enter();
     apd->res =
 	get_passphrase_real(apd->uid_hint, apd->passphrase_info,
 			    apd->was_bad, apd->parent);
     apd->done = TRUE;
-    gdk_threads_leave();
     g_cond_signal(&apd->cond);
     return FALSE;
 }

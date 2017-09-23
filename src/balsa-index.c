@@ -223,9 +223,7 @@ bndx_destroy(GObject * obj)
 						 G_SIGNAL_MATCH_DATA,
 						 0, 0, NULL, NULL, index);
 	    gtk_tree_view_set_model(GTK_TREE_VIEW(index), NULL);
-            gdk_threads_leave();
 	    libbalsa_mailbox_close(mailbox, balsa_app.expunge_on_close);
-            gdk_threads_enter();
 	}
 
 	if (index->mailbox_node) {
@@ -884,7 +882,6 @@ static gboolean
 bndx_mailbox_row_inserted_idle(struct bndx_mailbox_row_inserted_info *info)
 {
     GtkTreePath *path;
-    gdk_threads_enter();
     if (libbalsa_mailbox_msgno_find(info->mailbox, info->msgno,
                                     &path, NULL)) {
         bndx_expand_to_row(info->index, path);
@@ -893,7 +890,6 @@ bndx_mailbox_row_inserted_idle(struct bndx_mailbox_row_inserted_info *info)
     g_object_unref(info->mailbox);
     g_object_unref(info->index);
     g_free(info);
-    gdk_threads_leave();
     return FALSE;
 }
 
@@ -974,7 +970,6 @@ balsa_index_load_mailbox_node(BalsaIndex * index,
     /*
      * rename "from" column to "to" for outgoing mail
      */
-    gdk_threads_enter();
     tree_view = GTK_TREE_VIEW(index);
     if (libbalsa_mailbox_get_show(mailbox) == LB_MAILBOX_SHOW_TO) {
         GtkTreeViewColumn *column =
@@ -995,7 +990,6 @@ balsa_index_load_mailbox_node(BalsaIndex * index,
     g_object_set_data(G_OBJECT(mailbox), "tree-view", tree_view);
 #endif
     gtk_tree_view_set_model(tree_view, GTK_TREE_MODEL(mailbox));
-    gdk_threads_leave();
 
     /* Create a search-iter for SEARCH UNDELETED. */
     if (!cond_undeleted)
@@ -2225,9 +2219,7 @@ balsa_index_expunge(BalsaIndex * index)
     if (mailbox->readonly)
 	return;
 
-    gdk_threads_leave();
     rc = libbalsa_mailbox_sync_storage(mailbox, TRUE);
-    gdk_threads_enter();
     if (!rc)
 	balsa_information(LIBBALSA_INFORMATION_WARNING,
 			  _("Committing mailbox %s failed."),

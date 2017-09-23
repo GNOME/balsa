@@ -758,8 +758,6 @@ find_url(GtkWidget * widget, gint x, gint y, GList * url_list)
 static gboolean
 statusbar_pop(gpointer data)
 {
-    gdk_threads_enter();
-
     if (BALSA_IS_WINDOW(balsa_app.main_window)
         && GTK_IS_STATUSBAR(balsa_app.main_window->statusbar)) {
         GtkStatusbar *statusbar;
@@ -770,7 +768,6 @@ statusbar_pop(gpointer data)
         gtk_statusbar_pop(statusbar, context_id);
     }
 
-    gdk_threads_leave();
     return FALSE;
 }
 

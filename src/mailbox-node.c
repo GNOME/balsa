@@ -866,11 +866,8 @@ bmbn_scan_children_idle(BalsaMailboxNode ** mbnode)
     GSList *list;
     GSList *l;
 
-    gdk_threads_enter();
-
     if (!*mbnode) {
         g_free(mbnode);
-        gdk_threads_leave();
         return FALSE;
     }
 
@@ -906,8 +903,6 @@ bmbn_scan_children_idle(BalsaMailboxNode ** mbnode)
         g_object_remove_weak_pointer(G_OBJECT(*mbnode), (gpointer) mbnode);
     }
     g_free(mbnode);
-
-    gdk_threads_leave();
 
     return FALSE;
 }

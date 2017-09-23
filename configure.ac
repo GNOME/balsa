@@ -60,19 +60,6 @@ if test x$balsa_cv_fcntl = xyes; then
 	AC_DEFINE(USE_FCNTL,1,[Define if fcntl locking should be used.])
 fi
 
-AC_ARG_ENABLE(debug-threads,
-        AC_HELP_STRING([--enable-debug-threads],
-                       [Debug threads (default=no)]),[
-	debug_threads=$enableval
-],[
-	debug_threads=no
-])
-
-if test x"$debug_threads" = xyes; then
-        AC_DEFINE(BALSA_DEBUG_THREADS, 1,[Defined to debug threads.])
-fi
-
-
 AC_ARG_WITH([gpgme],
    AC_HELP_STRING([--with-gpgme=gpgme-config],
                   [build with gpgme/GnuPG support (default=no, path to gpgme-config optional)]),

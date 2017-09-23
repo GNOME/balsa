@@ -143,15 +143,6 @@ gboolean libbalsa_abort_on_timeout(const char *host);
 
 GThread *libbalsa_get_main_thread(void);
 gboolean libbalsa_am_i_subthread(void);
-#if defined(BALSA_DEBUG_THREADS)
-#define gdk_threads_enter()                       \
-    do if (libbalsa_am_i_subthread())             \
-        g_warning("%s: sub-thread!\n", __func__); \
-    while (0)
-#else
-#define gdk_threads_enter()
-#endif
-#define gdk_threads_leave()
 void libbalsa_message(const char *fmt, ...)
 	G_GNUC_PRINTF(1, 2);
 gchar * libbalsa_rot(const gchar * pass);

@@ -112,19 +112,15 @@ message_window_idle_handler(MessageWindow * mw)
 {
     BalsaMessage *msg;
 
-    gdk_threads_enter();
-
     mw->idle_handler_id = 0;
 
     msg = BALSA_MESSAGE(mw->bmessage);
     if (!balsa_message_set(msg, mw->message->mailbox, mw->message->msgno)) {
         gtk_widget_destroy(mw->window);
-        gdk_threads_leave();
         return FALSE;
     }
     balsa_message_grab_focus(msg);
 
-    gdk_threads_leave();
     return FALSE;
 }
 

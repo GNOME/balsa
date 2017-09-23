@@ -696,7 +696,6 @@ highlight_idle(BalsaSpellCheck * spell_check)
 {
     GtkTextBuffer *buffer;
 
-    gdk_threads_enter();
     if (spell_check->highlight_idle_id) {
         spch_restore_word_iters(spell_check);
         buffer = gtk_text_view_get_buffer(spell_check->text_view);
@@ -704,7 +703,6 @@ highlight_idle(BalsaSpellCheck * spell_check)
                                           &spell_check->end_iter);
         spell_check->highlight_idle_id = 0;
     }
-    gdk_threads_leave();
     return FALSE;
 }
 

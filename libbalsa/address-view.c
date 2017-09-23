@@ -264,9 +264,6 @@ lbav_entry_setup_matches(LibBalsaAddressView * address_view,
 
 /*
  *     Idle callback to set the GtkTreeView's cursor.
- *
- *     Scheduled with gdk_threads_add_idle, so it already holds the GDK
- *     lock, and its GSource has not been removed.
  */
 static gboolean
 lbav_ensure_blank_line_idle_cb(LibBalsaAddressView * address_view)
@@ -349,9 +346,7 @@ lbav_ensure_blank_line(LibBalsaAddressView * address_view,
 
     if (!address_view->focus_idle_id)
         address_view->focus_idle_id =
-            gdk_threads_add_idle((GSourceFunc)
-                                 lbav_ensure_blank_line_idle_cb,
-                                 address_view);
+        	g_idle_add((GSourceFunc) lbav_ensure_blank_line_idle_cb, address_view);
 }
 
 /*

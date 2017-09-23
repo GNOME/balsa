@@ -306,10 +306,8 @@ ask_idle(gpointer data)
 {
     AskData* ad = (AskData*)data;
     printf("ask_idle: ENTER %p\n", data);
-    gdk_threads_enter();
     ad->res = (ad->cb)(ad->arg);
     ad->done = TRUE;
-    gdk_threads_leave();
     g_cond_signal(&ad->condvar);
     printf("ask_idle: LEAVE %p\n", data);
     return FALSE;
@@ -327,9 +325,7 @@ libbalsa_ask(gboolean (*cb)(void *arg), void *arg)
     if (!libbalsa_am_i_subthread()) {
         int ret;
         printf("Main thread asks the following question.\n");
-        gdk_threads_enter();
         ret = cb(arg);
-        gdk_threads_leave();
         return ret;
     }
     printf("Side thread asks the following question.\n");

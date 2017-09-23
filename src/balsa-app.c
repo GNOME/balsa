@@ -136,10 +136,8 @@ static gboolean
 ask_passwd_idle(gpointer data)
 {
     AskPasswdData* apd = (AskPasswdData*)data;
-    gdk_threads_enter();
     apd->res = ask_password_real(apd->server, apd->mbox);
     apd->done = TRUE;
-    gdk_threads_leave();
     g_cond_signal(&apd->cond);
     return FALSE;
 }
@@ -529,8 +527,6 @@ balsa_open_mailbox_list(gchar ** urls)
 
     g_return_if_fail(urls != NULL);
 
-    gdk_threads_enter();
-
     for (tmp = urls; *tmp; ++tmp) {
         gchar **p;
 
@@ -545,8 +541,6 @@ balsa_open_mailbox_list(gchar ** urls)
     }
 
     g_strfreev(urls);
-
-    gdk_threads_leave();
 }
 
 void
@@ -595,15 +589,11 @@ balsa_find_mailbox(LibBalsaMailbox * mailbox)
 {
     BalsaFind bf;
 
-    gdk_threads_enter();
-
     bf.data = mailbox;
     bf.mbnode = NULL;
     if (balsa_app.mblist_tree_store)
         gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
                                find_mailbox, &bf);
-
-    gdk_threads_leave();
 
     return bf.mbnode;
 }
@@ -633,21 +623,12 @@ BalsaMailboxNode *
 balsa_find_dir(LibBalsaServer *server, const gchar * path)
 {
     BalsaFind bf;
-    gboolean is_sub_thread = libbalsa_am_i_subthread();
-
-    if (is_sub_thread) {
-	gdk_threads_enter();
-    }
 
     bf.data = path;
     bf.server = server;
     bf.mbnode = NULL;
     gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
 			   (GtkTreeModelForeachFunc) find_path, &bf);
-
-    if (is_sub_thread) {
-	gdk_threads_leave();
-    }
 
     return bf.mbnode;
 }

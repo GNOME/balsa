@@ -3235,10 +3235,7 @@ open_preferences_manager_idle(void)
 {
     gchar *name;
 
-    gdk_threads_enter();
-
     if (pui == NULL) {
-        gdk_threads_leave();
         return FALSE;
     }
 
@@ -3247,7 +3244,6 @@ open_preferences_manager_idle(void)
     if (!name || strcmp(name, balsa_app.local_mail_directory) != 0) {
         /* Chooser still hasn't been initialized. */
         g_free(name);
-        gdk_threads_leave();
         return TRUE;
     }
     g_free(name);
@@ -3255,7 +3251,6 @@ open_preferences_manager_idle(void)
     g_signal_connect(pui->mail_directory, "selection-changed",
                      G_CALLBACK(properties_modified_cb), property_box);
 
-    gdk_threads_leave();
     return FALSE;
 }                               /* open_preferences_manager_idle */
 

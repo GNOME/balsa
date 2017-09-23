@@ -911,8 +911,7 @@ libbalsa_process_queue(LibBalsaMailbox     *outbox,
 
 /* balsa_send_message_real:
    does the actual message sending.
-   This function may be called as a thread and should therefore do
-   proper gdk_threads_{enter/leave} stuff around GTK or libbalsa calls.
+   This function may be called as a thread.
    Also, structure info should be freed before exiting.
  */
 

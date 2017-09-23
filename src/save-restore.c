@@ -479,9 +479,7 @@ config_folder_init(const gchar * prefix)
 static gboolean
 config_warning_idle(const gchar * text)
 {
-    gdk_threads_enter();
     balsa_information(LIBBALSA_INFORMATION_WARNING, "%s", text);
-    gdk_threads_leave();
     return FALSE;
 }
 

@@ -637,8 +637,6 @@ lbm_local_restore_tree(LibBalsaMailboxLocal * local, guint * total)
     }
     *total = info->value.total;
 
-    gdk_threads_enter();
-
     seen = g_new0(guint8, *total);
     parent = mailbox->msg_tree;
     sibling = NULL;
@@ -653,7 +651,6 @@ lbm_local_restore_tree(LibBalsaMailboxLocal * local, guint * total)
             g_free(seen);
             g_free(contents);
             g_free(name);
-            gdk_threads_leave();
             return FALSE;
         }
         seen[info->msgno - 1] = TRUE;
@@ -677,7 +674,6 @@ lbm_local_restore_tree(LibBalsaMailboxLocal * local, guint * total)
                     g_free(seen);
                     g_free(contents);
                     g_free(name);
-    		    gdk_threads_leave();
                     return FALSE;
                 }
             }
@@ -702,8 +698,6 @@ lbm_local_restore_tree(LibBalsaMailboxLocal * local, guint * total)
     g_free(seen);
     g_free(contents);
     g_free(name);
-
-    gdk_threads_leave();
 
     return TRUE;
 }
@@ -1053,11 +1047,9 @@ lbml_load_messages_idle_cb(LibBalsaMailbox * mailbox)
     libbalsa_lock_mailbox(mailbox);
     local = (LibBalsaMailboxLocal *) mailbox;
     local->load_messages_id = 0;
-    gdk_threads_enter();
 
     if (!mailbox->msg_tree) {
 	/* Mailbox is closed, or no view has been created. */
-        gdk_threads_leave();
         libbalsa_unlock_mailbox(mailbox);
 	return FALSE;
     }
@@ -1076,8 +1068,6 @@ lbml_load_messages_idle_cb(LibBalsaMailbox * mailbox)
             libbalsa_mailbox_local_cache_message(local, msgno,
                                                  msg_info->message);
     }
-
-    gdk_threads_leave();
 
     if (new_messages) {
 	libbalsa_mailbox_run_filters_on_reception(mailbox);
@@ -1200,11 +1190,9 @@ libbalsa_mailbox_local_set_threading(LibBalsaMailbox * mailbox,
         info = g_slice_new(LbmlSetThreadingInfo);
         info->mailbox = g_object_ref(mailbox);
         info->thread_type = thread_type;
-        gdk_threads_add_idle((GSourceFunc) lbml_set_threading_idle_cb, info);
+        g_idle_add((GSourceFunc) lbml_set_threading_idle_cb, info);
     } else {
-        gdk_threads_enter();
         lbml_set_threading(mailbox, thread_type);
-        gdk_threads_leave();
     }
 #if defined(DEBUG_LOADING_AND_THREADING)
     printf("after threading time=%lu\n", (unsigned long) time(NULL));

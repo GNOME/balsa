@@ -216,8 +216,6 @@ bmbl_set_property_node_style(GSList * list)
     GSList *l;
     GtkTreePath *path;
 
-    gdk_threads_enter();
-
     for (l = list; l; l = l->next) {
         GtkTreeRowReference *reference = l->data;
         path = gtk_tree_row_reference_get_path(reference);
@@ -234,7 +232,6 @@ bmbl_set_property_node_style(GSList * list)
     }
 
     g_slist_free(list);
-    gdk_threads_leave();
 }
 
 static gboolean
@@ -1251,9 +1248,7 @@ balsa_mblist_close_lru_peer_mbx(BalsaMBList * mblist,
     dt.mbnode = NULL;
     gtk_tree_model_foreach(model, get_lru_descendant, &dt);
     if(dt.mbnode) {
-        gdk_threads_enter();
         balsa_window_close_mbnode(balsa_app.main_window, dt.mbnode);
-        gdk_threads_leave();
         g_object_unref(dt.mbnode);
     }
     return dt.mbnode != NULL;
@@ -2246,15 +2241,11 @@ bmbl_sort_idle(gpointer data)
 {
     GtkTreeSortable *sortable = data;
 
-    gdk_threads_enter();
-
     gtk_tree_sortable_set_sort_column_id(sortable,
                                          balsa_app.mblist->sort_column_id,
                                          GTK_SORT_ASCENDING);
     balsa_app.mblist->sort_idle_id = 0;
     g_object_unref(sortable);
-
-    gdk_threads_leave();
 
     return FALSE;
 }
@@ -2267,8 +2258,6 @@ balsa_mblist_mailbox_node_append(BalsaMailboxNode * root,
     GtkTreeIter parent;
     GtkTreeIter *parent_iter = NULL;
     GtkTreeIter iter;
-
-    gdk_threads_enter();
 
     model = GTK_TREE_MODEL(balsa_app.mblist_tree_store);
 
@@ -2304,8 +2293,6 @@ balsa_mblist_mailbox_node_append(BalsaMailboxNode * root,
 
     /* The tree-store owns mbnode. */
     g_object_unref(mbnode);
-
-    gdk_threads_leave();
 }
 
 /* Rerender a row after its properties have changed. */

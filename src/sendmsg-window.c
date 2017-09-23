@@ -736,7 +736,6 @@ edit_with_gnome_check(gpointer data) {
         perror("fopen");
         return TRUE;
     }
-    gdk_threads_enter();
     if (balsa_app.edit_headers) {
         while (fgets(line, sizeof(line), tmp)) {
             guint type;
@@ -778,7 +777,6 @@ edit_with_gnome_check(gpointer data) {
     unlink(data_real->filename);
     gtk_widget_set_sensitive(data_real->bsmsg->text, TRUE);
     g_free(data);
-    gdk_threads_leave();
 
     return FALSE;
 }
@@ -3849,14 +3847,10 @@ sw_save_draft(BalsaSendmsg * bsmsg)
 static gboolean
 sw_autosave_timeout_cb(BalsaSendmsg * bsmsg)
 {
-    gdk_threads_enter();
-
     if (bsmsg->state == SENDMSG_STATE_MODIFIED) {
         if (sw_save_draft(bsmsg))
             bsmsg->state = SENDMSG_STATE_AUTO_SAVED;
     }
-
-    gdk_threads_leave();
 
     return TRUE;                /* do repeat it */
 }
@@ -4382,10 +4376,8 @@ set_identity(BalsaSendmsg * bsmsg, LibBalsaMessage * message)
 static gboolean
 sw_grab_focus_to_text(GtkWidget * text)
 {
-    gdk_threads_enter();
     gtk_widget_grab_focus(text);
     g_object_unref(text);
-    gdk_threads_leave();
     return FALSE;
 }
 

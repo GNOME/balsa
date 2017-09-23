@@ -198,12 +198,9 @@ img_check_size(GtkImage ** widget_p)
     gint curr_w, dst_w;
     GtkAllocation allocation;
 
-    gdk_threads_enter();
-
     widget = *widget_p;
     g_free(widget_p);
     if (!widget) {
-        gdk_threads_leave();
 	return FALSE;
     }
     g_object_remove_weak_pointer(G_OBJECT(widget), (gpointer) widget_p);
@@ -217,7 +214,6 @@ img_check_size(GtkImage ** widget_p)
                       GINT_TO_POINTER(FALSE));
     g_warn_if_fail(viewport && mime_body && orig_width > 0);
     if (!(viewport && mime_body && orig_width > 0)) {
-        gdk_threads_leave();
         return FALSE;
     }
 
@@ -253,7 +249,6 @@ img_check_size(GtkImage ** widget_p)
 			          load_err->message);
 		g_error_free(load_err);
 	    }
-            gdk_threads_leave();
 	    return FALSE;
 	}
 	dst_h = (gfloat)dst_w /
@@ -265,6 +260,5 @@ img_check_size(GtkImage ** widget_p)
 	g_object_unref(scaled_pixbuf);
     }
 
-    gdk_threads_leave();
     return FALSE;
 }

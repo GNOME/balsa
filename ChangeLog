@@ -1,3 +1,53 @@
+2017-09-23  Albrecht Dreß <albrecht.dress@arcor.de>
+
+	Remove deprecated gdk_threads_* stuff
+
+	* configure.ac:
+	* libbalsa/address-view.c (lbav_ensure_blank_line):
+	* libbalsa/identity.c (sd_response_ok):
+	* libbalsa/information.c (libbalsa_information_idle_handler):
+	* libbalsa/libbalsa-gpgme-cb.c (get_passphrase_idle):
+	* libbalsa/libbalsa.c (ask_idle), (libbalsa_ask):
+	* libbalsa/libbalsa.h:
+	* libbalsa/mailbox.c (libbalsa_mailbox_close),
+	(libbalsa_mailbox_msgno_inserted),
+	(libbalsa_mailbox_msgno_filt_in), (libbalsa_mailbox_msgno_removed),
+	(libbalsa_mailbox_msgno_filt_out), (lbm_set_threading),
+	(mbox_set_sort_column_id), (libbalsa_mailbox_unlink_and_prepend),
+	(lbm_set_msg_tree), (libbalsa_mailbox_set_msg_tree):
+	* libbalsa/mailbox_imap.c (idle_unread_update_cb),
+	(imap_exists_idle):
+	* libbalsa/mailbox_local.c (lbm_local_restore_tree),
+	(lbml_load_messages_idle_cb),
+	(libbalsa_mailbox_local_set_threading):
+	* libbalsa/send.c:
+	* libinit_balsa/assistant_init.c (balsa_init_begin):
+	* src/balsa-app.c (ask_passwd_idle), (balsa_open_mailbox_list),
+	(balsa_find_mailbox), (balsa_find_dir):
+	* src/balsa-index.c (bndx_destroy),
+	(bndx_mailbox_row_inserted_idle), (balsa_index_load_mailbox_node),
+	(balsa_index_expunge):
+	* src/balsa-mblist.c (bmbl_set_property_node_style),
+	(balsa_mblist_close_lru_peer_mbx), (bmbl_sort_idle),
+	(balsa_mblist_mailbox_node_append):
+	* src/balsa-mime-widget-image.c (img_check_size):
+	* src/balsa-mime-widget-text.c (statusbar_pop):
+	* src/balsa-mime-widget.c (resize_idle):
+	* src/information-dialog.c (status_bar_refresh):
+	* src/mailbox-node.c (bmbn_scan_children_idle):
+	* src/main-window.c (bw_focus_idle), (mail_progress_notify_cb),
+	(bw_idle_replace), (bw_progress_timeout):
+	* src/main.c (initial_open_unread_mailboxes), (initial_open_inbox),
+	(balsa_get_stats), (scan_mailboxes_idle_cb), (periodic_expunge_cb),
+	(balsa_progress_set_fraction), (balsa_progress_set_activity),
+	(real_main), (handle_remote):
+	* src/message-window.c (message_window_idle_handler):
+	* src/pref-manager.c (open_preferences_manager_idle):
+	* src/save-restore.c (config_warning_idle):
+	* src/sendmsg-window.c (edit_with_gnome_check),
+	(sw_autosave_timeout_cb), (sw_grab_focus_to_text):
+	* src/spell-check.c (highlight_idle):
+
 2017-09-22  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Drop 'enable-' and 'with-', inherited from autotools,

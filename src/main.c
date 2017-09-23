@@ -193,13 +193,12 @@ threads_destroy(void)
 
 /* initial_open_mailboxes:
    open mailboxes on startup if requested so.
-   This is an idle handler. Be sure to use gdk_threads_{enter/leave}
+   This is an idle handler.
  */
 static gboolean
 initial_open_unread_mailboxes()
 {
     GList *l, *gl;
-    gdk_threads_enter();
     gl = balsa_mblist_find_all_unread_mboxes(NULL);
 
     if (gl) {
@@ -211,7 +210,6 @@ initial_open_unread_mailboxes()
         }
         g_list_free(gl);
     }
-    gdk_threads_leave();
     return FALSE;
 }
 
@@ -223,9 +221,7 @@ initial_open_inbox()
 	return FALSE;
 
     printf("opening %s..\n", balsa_app.inbox->name);
-    gdk_threads_enter();
     balsa_mblist_open_mailbox_hidden(balsa_app.inbox);
-    gdk_threads_leave();
 
     return FALSE;
 }
@@ -236,10 +232,8 @@ balsa_get_stats(long *unread, long *unsent)
 
     if(balsa_app.inbox && libbalsa_mailbox_open(balsa_app.inbox, NULL) ) {
         /* set threading type to load messages */
-        gdk_threads_enter();
         libbalsa_mailbox_set_threading(balsa_app.inbox,
                                        balsa_app.inbox->view->threading_type);
-        gdk_threads_leave();
         *unread = balsa_app.inbox->unread_messages;
         libbalsa_mailbox_close(balsa_app.inbox, FALSE);
     } else *unread = -1;
@@ -282,7 +276,6 @@ scan_mailboxes_idle_cb()
     GtkTreeIter iter;
     GPtrArray *url_array;
 
-    gdk_threads_enter();
     model = GTK_TREE_MODEL(balsa_app.mblist_tree_store);
     /* The model contains only nodes from config. */
     for (valid = gtk_tree_model_get_iter_first(model, &iter); valid;
@@ -296,7 +289,6 @@ scan_mailboxes_idle_cb()
     /* The root-node (typically ~/mail) isn't in the model, so its
      * children will be appended to the top level. */
     balsa_mailbox_node_append_subtree(balsa_app.root_node);
-    gdk_threads_leave();
 
     url_array = g_ptr_array_new();
     if (cmd_open_unread_mailbox || balsa_app.open_unread_mailbox){
@@ -379,13 +371,11 @@ periodic_expunge_cb(void)
     /* should we enforce expunging now and then? Perhaps not... */
     if(!balsa_app.expunge_auto) return TRUE;
 
-    gdk_threads_enter();
     libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
                          _("Compressing mail folders…"));
     gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
 			   (GtkTreeModelForeachFunc)mbnode_expunge_func,
 			   &list);
-    gdk_threads_leave();
 
     for (l = list; l; l = l->next) {
         BalsaMailboxNode *mbnode = l->data;
@@ -461,24 +451,20 @@ balsa_progress_set_fraction(LibBalsaProgress * progress, gdouble fraction)
     g_time_val_add(&time_val, LIBBALSA_PROGRESS_MIN_UPDATE_USECS);
     min_fraction += LIBBALSA_PROGRESS_MIN_UPDATE_STEP;
 
-    gdk_threads_enter();
     if (balsa_app.main_window)
         balsa_window_increment_progress(balsa_app.main_window, fraction,
                                         !libbalsa_am_i_subthread());
-    gdk_threads_leave();
 }
 
 static void
 balsa_progress_set_activity(gboolean set, const gchar * text)
 {
-    gdk_threads_enter();
     if (balsa_app.main_window) {
         if (set)
             balsa_window_increase_activity(balsa_app.main_window, text);
         else
             balsa_window_decrease_activity(balsa_app.main_window, text);
     }
-    gdk_threads_leave();
 }
 
 static gboolean
@@ -610,9 +596,7 @@ real_main(int argc, char *argv[])
                    balsa_app.main_window);
 
     accel_map_load();
-    gdk_threads_enter();
     gtk_main();
-    gdk_threads_leave();
 
     balsa_cleanup();
     accel_map_save();
@@ -753,8 +737,6 @@ handle_remote(int argc, char **argv,
                                          "Unread: %ld Unsent: %ld\n",
                                          unread, unsent);
     } else {
-        gdk_threads_enter();
-
         if (cmd_check_mail_on_startup)
             balsa_main_check_new_messages(balsa_app.main_window);
 
@@ -771,8 +753,6 @@ handle_remote(int argc, char **argv,
             /* Move the main window to the request's screen */
             gtk_window_present(GTK_WINDOW(balsa_app.main_window));
         }
-
-        gdk_threads_leave();
     }
 }
 

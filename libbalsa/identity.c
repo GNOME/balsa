@@ -553,12 +553,10 @@ sd_idle_add_response_ok(SelectDialogInfo * sdi)
 static gboolean
 sd_response_ok(SelectDialogInfo * sdi)
 {
-    gdk_threads_enter();
     if (sdi->idle_handler_id) {
         sdi->idle_handler_id = 0;
         gtk_dialog_response(GTK_DIALOG(sdi->dialog), GTK_RESPONSE_OK);
     }
-    gdk_threads_leave();
     return FALSE;
 }
 

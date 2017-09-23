@@ -329,12 +329,10 @@ static gdouble old_upper, new_upper;
 static gboolean
 resize_idle(GtkWidget * widget)
 {
-    gdk_threads_enter();
     resize_idle_id = 0;
     gtk_widget_queue_resize(widget);
     old_widget = new_widget;
     old_upper = new_upper;
-    gdk_threads_leave();
 
     return FALSE;
 }

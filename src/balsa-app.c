@@ -752,10 +752,6 @@ balsa_find_iter_by_data(GtkTreeIter * iter , gpointer data)
 
     /* We may call it from initial config, it's ok for
        mblist_tree_store not to exist. */
-#ifdef BALSA_DEBUG_THREADS
-    if (libbalsa_am_i_subthread())
-        g_warning("%s sub-thread!\n", __func__);
-#endif
     if(!balsa_app.mblist_tree_store)
         return FALSE;
 

@@ -1,5 +1,10 @@
 2017-09-23  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	* src/balsa-app.c (balsa_find_iter_by_data): we no longer ever define
+	BALSA_DEBUG_THREADS.
+
+2017-09-23  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Remove 'debug-threads' option
 
 	* meson.build: do not use it.

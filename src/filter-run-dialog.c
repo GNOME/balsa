@@ -28,7 +28,7 @@
 #include "filter-run.h"
 #include "mailbox-filter.h"
 #include "save-restore.h"
-#include "libbalsa/filter-funcs.h"
+#include "filter-funcs.h"
 #include <glib/gi18n.h>
 
 /* fe_already_open is TRUE when the filters dialog is opened, we use

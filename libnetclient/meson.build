@@ -11,12 +11,10 @@ libnetclient_a_sources = [
   'net-client-utils.h'
   ]
 
-libnetclient_compile_args = '-I' + meson.build_root()
-libbetclient_compile_dep  = declare_dependency(compile_args : libnetclient_compile_args)
-
 libnetclient_a = static_library('netclient', libnetclient_a_sources,
-                                dependencies : libnetclient_deps + [libbetclient_compile_dep],
-                                install      : false)
+                                dependencies        : libnetclient_deps,
+                                include_directories : top_include,
+                                install             : false)
 
 if libnetclient_docs
   doxygen = doxygen_program.path()

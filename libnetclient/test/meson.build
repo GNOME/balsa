@@ -8,6 +8,7 @@ if libnetclient_test
                    '-ftest-coverage',
                    '-g',
                    '-Wno-error']
+  link_arg      = '-lgcov'
   lcov_flags    = ['--rc',
                    'lcov_branch_coverage=1']
   genhtml_flags = ['--function-coverage',
@@ -18,11 +19,13 @@ if libnetclient_test
                    '--track-fds=yes',
                    '--child-silent-after-fork=yes']
 
-  test_compile_dep = declare_dependency(compile_args : test_flags + ['-I.', '-I..'])
+  test_compile_dep = declare_dependency(compile_args : test_flags,
+                                        link_args    : link_arg)
   test_executable  = executable('tests', 'tests.c',
-                                link_with    : libnetclient_a,
-                                dependencies : libnetclient_deps + [test_compile_dep],
-                                install      : false)
+                                include_directories : [top_include, libnetclient_include],
+                                link_with           : libnetclient_a,
+                                dependencies        : libnetclient_deps + [test_compile_dep],
+                                install             : false)
   test('libnetclient-test', test_executable)
   # now run the test with:
   #   meson test --wrap='valgrind --tool=memcheck --leak-check=full --track-fds=yes --child-silent-after-fork=yes --suppressions=valgrind.supp' libnetclient-test

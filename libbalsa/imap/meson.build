@@ -22,16 +22,6 @@ libimap_a_sources = [
   'util.h'
   ]
 
-libimap_compile_args = ['-I' + meson.build_root(),
-                        '-I' + meson.current_build_dir(),
-                        '-I' + meson.source_root(),
-                        '-I' + join_paths(meson.source_root(), 'libbalsa'),
-                        '-I' + join_paths(meson.source_root(), 'libnetclient'),
-                        '-I' + join_paths(meson.source_root(), 'libbalsa', 'imap'),
-                        '-ansi']
-libimap_compile_dep  = declare_dependency(compile_args : libimap_compile_args,
-                                          link_args    : '-lz')
-
 # genmarshal
 #
 
@@ -62,10 +52,18 @@ libimap_marshal_c = custom_target('libimap_marshal_c',
   ]
 )
 
+#
+
+libimap_compile_arg = '-ansi'
+libimap_link_arg    = '-lz'
+libimap_compile_dep  = declare_dependency(compile_args : libimap_compile_arg,
+                                          link_args    : libimap_link_arg)
+
 libimap_a = static_library('imap', libimap_a_sources,
                            libimap_marshal_c, libimap_marshal_h,
-                           dependencies : balsa_deps + [libimap_compile_dep],
-                           install      : false)
+                           dependencies        : balsa_deps + [libimap_compile_dep],
+                           include_directories : [top_include, libnetclient_include],
+                           install             : false)
 
 imap_tst_sources = 'imap_tst.c'
 

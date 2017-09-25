@@ -277,8 +277,8 @@ if ldap != 'false'
   ldap_compile_args = []
   ldap_link_args    = ['-lldap', '-llber', '-lresolv']
   if ldap != 'true'
-    ldap_compile_args += '-I' + ldap + '/include'
-    ldap_link_args    += '-L' + ldap + '/lib'
+    ldap_compile_args += '-I' + join_paths(ldap, 'include')
+    ldap_link_args    += '-L' + join_paths(ldap, 'lib')
   endif
 
   result = compiler.has_function('ldap_search', args : ldap_link_args)
@@ -319,8 +319,8 @@ if sqlite != 'false'
     # would probably need to be set appropriately in the environment.
     # There doesn't seem to be a way to do that within dependency().
     real_dep = declare_dependency(dependencies : sqlite_dep,
-                                  compile_args : '-I' + sqlite + '/include',
-                                  link_args    : '-L' + sqlite + '/lib')
+                                  compile_args : '-I' + join_paths(sqlite, 'include'),
+                                  link_args    : '-L' + join_paths(sqlite, 'lib'))
   else
     real_dep = sqlite_dep
   endif
@@ -446,8 +446,8 @@ if compface != 'false'
   compface_compile_args = []
   compface_link_args    = ['-lcompface']
   if compface != 'true'
-    compface_compile_args += '-I' + compface + '/include'
-    compface_link_args    += '-L' + compface + '/lib'
+    compface_compile_args += '-I' + join_paths(compface, 'include')
+    compface_link_args    += '-L' + join_paths(compface, 'lib')
   endif
 
   result = compiler.has_function('uncompface', args : compface_link_args)
@@ -730,20 +730,22 @@ if html_widget == 'webkit'
   ''')
 endif
 
-subdirs = ['sounds',
-           'images',
-           'libnetclient',
-           'libbalsa',
-           'libinit_balsa',
-           'src',
-           'ui']
-if help_files
-  subdirs += 'doc'
-endif
+top_include           = include_directories('.')
+libnetclient_include  = include_directories('libnetclient')
+libbalsa_include      = include_directories('libbalsa')
+libinit_balsa_include = include_directories('libinit_balsa')
+src_include           = include_directories('src')
 
-foreach dir : subdirs
-  subdir(dir)
-endforeach
+subdir('sounds')
+subdir('images')
+subdir('libnetclient')
+subdir('libbalsa')
+subdir('libinit_balsa')
+subdir('src')
+subdir('ui')
+if help_files
+  subdir('doc')
+endif
 
 if gtksourceview
   gtksourceview_files = ['balsa-mail.lang', 'balsa-mail-style.xml']

@@ -135,13 +135,6 @@ libbalsa_a_sources = [
 
 libbalsa_a_sources += libbalsa_gpgme_extra
 
-libbalsa_compile_args = ['-I' + meson.build_root(),
-                         '-I' + meson.current_build_dir(),
-                         '-I' + join_paths(meson.source_root(), 'libbalsa'),
-                         '-I' + join_paths(meson.source_root(), 'libnetclient'),
-                         '-I' + join_paths(meson.source_root(), 'libbalsa', 'imap')]
-libbalsa_compile_dep  = declare_dependency(compile_args : libbalsa_compile_args)
-
 # genmarshal
 #
 
@@ -172,9 +165,14 @@ libbalsa_marshal_c = custom_target('libbalsa_marshal_c',
   ]
 )
 
+libimap_include = include_directories('imap')
+
 libbalsa_a = static_library('balsa', libbalsa_a_sources,
                             libbalsa_marshal_c, libbalsa_marshal_h,
-                            dependencies : balsa_deps + [libbalsa_compile_dep],
-                            install      : false)
+                            dependencies        : balsa_deps,
+                            include_directories : [top_include,
+                                                   libnetclient_include,
+                                                   libimap_include],
+                            install             : false)
 
 subdir('imap')

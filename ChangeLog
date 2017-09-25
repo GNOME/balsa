@@ -1,5 +1,17 @@
 2017-09-25  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Use include_directories instead of explicit -I…
+
+	* libbalsa/imap/meson.build:
+	* libbalsa/meson.build:
+	* libinit_balsa/meson.build:
+	* libnetclient/meson.build:
+	* libnetclient/test/meson.build:
+	* meson.build:
+	* src/meson.build:
+
+2017-09-25  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* src/filter-run-dialog.c: include filter-funcs.h instead of
 	libbalsa/filter-funcs.h, same as elsewhere.
 

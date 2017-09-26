@@ -33,8 +33,8 @@ libimap_marshal_h = custom_target('libimap_marshal_h',
     glib_genmarshal +
     ' --header' +
     ' --prefix=libimap' +
-    ' @INPUT@' +
-    ' > libbalsa/imap/libimap-marshal.h'
+    ' --output=@OUTPUT@' +
+    ' @INPUT@'
   ]
 )
 
@@ -47,8 +47,8 @@ libimap_marshal_c = custom_target('libimap_marshal_c',
     ' --header' +
     ' --body' +
     ' --prefix=libimap' +
-    ' @INPUT@' +
-    ' > libbalsa/imap/libimap-marshal.c'
+    ' --output=@OUTPUT@' +
+    ' @INPUT@'
   ]
 )
 

@@ -146,8 +146,8 @@ libbalsa_marshal_h = custom_target('libbalsa_marshal_h',
     glib_genmarshal +
     ' --header' +
     ' --prefix=libbalsa' +
-    ' @INPUT@' +
-    ' > libbalsa/libbalsa-marshal.h'
+    ' --output=@OUTPUT@' +
+    ' @INPUT@'
   ]
 )
 
@@ -160,8 +160,8 @@ libbalsa_marshal_c = custom_target('libbalsa_marshal_c',
     ' --header' +
     ' --body' +
     ' --prefix=libbalsa' +
-    ' @INPUT@' +
-    ' > libbalsa/libbalsa-marshal.c'
+    ' --output=@OUTPUT@' +
+    ' @INPUT@'
   ]
 )
 

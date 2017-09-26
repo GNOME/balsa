@@ -1,3 +1,10 @@
+2017-09-26  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Use --output option of glib-genmarshal
+
+	* libbalsa/imap/meson.build:
+	* libbalsa/meson.build:
+
 2017-09-25  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Use include_directories instead of explicit -I…

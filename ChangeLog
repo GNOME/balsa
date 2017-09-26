@@ -1,5 +1,15 @@
 2017-09-26  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Use gnome.genmarshal if glib is new enough
+
+	* meson.build: check whether glib version >= 2.53.4.
+	* libbalsa/imap/meson.build: use gnome.genmarshal if glib is new
+	enough; otherwise, use glib-genmarshal directly instead of in a
+	sh command.
+	* libbalsa/meson.build: ditto.
+
+2017-09-26  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Use --output option of glib-genmarshal
 
 	* libbalsa/imap/meson.build:

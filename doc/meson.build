@@ -1,7 +1,5 @@
 # doc/meson.build
 
-gnome = import('gnome')
-
 HELP_ID      = 'balsa'
 
 HELP_LINGUAS = [ 'cs', 'de', 'el', 'es', 'fr', 'sl' ]

@@ -25,42 +25,44 @@ libimap_a_sources = [
 # genmarshal
 #
 
-libimap_marshal_h = custom_target('libimap_marshal_h',
-  input   : 'libimap-marshal.list',
-  output  : 'libimap-marshal.h',
-  command : [
-    'sh', '-c',
-    glib_genmarshal +
-    ' --header' +
-    ' --prefix=libimap' +
-    ' --output=@OUTPUT@' +
-    ' @INPUT@'
-  ]
-)
+if use_gnome_genmarshal
+  libimap_marshal_files = gnome.genmarshal('libimap_marshal',
+                                           sources : 'libimap-marshal.list')
+else # use_gnome_genmarshal
+  libimap_marshal_h = custom_target('libimap_marshal_h',
+    input   : 'libimap-marshal.list',
+    output  : 'libimap-marshal.h',
+    command : [
+      glib_genmarshal,
+      '--header',
+      '--prefix=libimap',
+      '--output=@OUTPUT@',
+      '@INPUT@'
+    ]
+  )
 
-libimap_marshal_c = custom_target('libimap_marshal_c',
-  input   : 'libimap-marshal.list',
-  output  : 'libimap-marshal.c',
-  command : [
-    'sh', '-c',
-    glib_genmarshal +
-    ' --header' +
-    ' --body' +
-    ' --prefix=libimap' +
-    ' --output=@OUTPUT@' +
-    ' @INPUT@'
-  ]
-)
+  libimap_marshal_c = custom_target('libimap_marshal_c',
+    input   : 'libimap-marshal.list',
+    output  : 'libimap-marshal.c',
+    command : [
+      glib_genmarshal,
+      '--header',
+      '--body',
+      '--prefix=libimap',
+      '--output=@OUTPUT@',
+      '@INPUT@'
+    ]
+  )
 
-#
+  libimap_marshal_files = [libimap_marshal_c, libimap_marshal_h]
+endif # use_gnome_genmarshal
 
 libimap_compile_arg = '-ansi'
 libimap_link_arg    = '-lz'
 libimap_compile_dep  = declare_dependency(compile_args : libimap_compile_arg,
                                           link_args    : libimap_link_arg)
 
-libimap_a = static_library('imap', libimap_a_sources,
-                           libimap_marshal_c, libimap_marshal_h,
+libimap_a = static_library('imap', libimap_a_sources, libimap_marshal_files,
                            dependencies        : balsa_deps + [libimap_compile_dep],
                            include_directories : [top_include, libnetclient_include],
                            install             : false)

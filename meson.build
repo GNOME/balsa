@@ -81,19 +81,6 @@ if compiler.has_member('struct utsname', 'domainname', prefix : uts_prefix)
     description : 'Defined if domainname is a member of struct utsname')
 endif
 
-# glib-genmarshal
-#
-# We cannot use gnome.genmarshal because it generates a source file that
-# does not include the header file, which causes an error when compiling
-# with -Wmissing-prototypes and -Werror.
-#
-# If gnome.genmarshal is ever enhanced by adding the --include-header
-# option that is implemented in glib's internal build system, we should
-# use instead of this:
-
-glib_genmarshal = run_command('pkg-config',
-                              ['--variable=glib_genmarshal', 'glib-2.0']).stdout().strip()
-
 # yelp
 
 if help_files
@@ -163,6 +150,18 @@ balsa_ab_deps = [glib_dep,
 libnetclient_deps = [glib_dep,
                      gio_dep,
                      gnutls_dep]
+
+# glib-genmarshal
+#
+# If glib is too old, we cannot use gnome.genmarshal
+# because it generates a source file that does not include the header file,
+# which causes an error when compiling with -Wmissing-prototypes and -Werror.
+
+use_gnome_genmarshal = glib_dep.version().version_compare('>= 2.53.4')
+if not use_gnome_genmarshal
+  glib_genmarshal = run_command('pkg-config',
+                                ['--variable=glib_genmarshal', 'glib-2.0']).stdout().strip()
+endif
 
 # Check whether res_init is available
 result = compiler.has_function('res_init', prefix : '#include <resolv.h>')
@@ -735,6 +734,8 @@ libnetclient_include  = include_directories('libnetclient')
 libbalsa_include      = include_directories('libbalsa')
 libinit_balsa_include = include_directories('libinit_balsa')
 src_include           = include_directories('src')
+
+gnome = import('gnome')
 
 subdir('sounds')
 subdir('images')

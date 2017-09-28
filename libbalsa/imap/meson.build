@@ -26,7 +26,7 @@ libimap_a_sources = [
 #
 
 if use_gnome_genmarshal
-  libimap_marshal_files = gnome.genmarshal('libimap_marshal',
+  libimap_marshal_files = gnome.genmarshal('libimap-marshal',
                                            sources : 'libimap-marshal.list')
 else # use_gnome_genmarshal
   libimap_marshal_h = custom_target('libimap_marshal_h',

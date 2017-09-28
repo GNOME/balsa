@@ -139,8 +139,8 @@ libbalsa_a_sources += libbalsa_gpgme_extra
 #
 
 if use_gnome_genmarshal
-  libbalsa_marshal_files = gnome.genmarshal('libbalsa_marshal',
-                                             sources : 'libbalsa-marshal.list')
+  libbalsa_marshal_files = gnome.genmarshal('libbalsa-marshal',
+                                            sources : 'libbalsa-marshal.list')
 else # use_gnome_genmarshal
   libbalsa_marshal_h = custom_target('libbalsa_marshal_h',
     input   : 'libbalsa-marshal.list',

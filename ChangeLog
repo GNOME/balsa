@@ -1,3 +1,8 @@
+2017-09-28  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* libbalsa/imap/meson.build: fix basename of marshal files.
+	* libbalsa/meson.build: ditto.
+
 2017-09-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* meson.build: .split() strings returned by custom config commands.

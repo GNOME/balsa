@@ -1,5 +1,10 @@
 2017-09-28  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	* libbalsa/imap/meson.build: fix prefix in marshal files.
+	* libbalsa/meson.build: ditto.
+
+2017-09-28  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* libbalsa/imap/meson.build: fix basename of marshal files.
 	* libbalsa/meson.build: ditto.
 

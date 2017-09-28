@@ -1,3 +1,7 @@
+2017-09-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* meson.build: .split() strings returned by custom config commands.
+
 2017-09-26  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Use gnome.genmarshal if glib is new enough

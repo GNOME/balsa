@@ -253,16 +253,10 @@ if gpgmecfg != 'false'
     endif
 
     gpgme_cflags = run_command(gpgmecfg, '--cflags')
-    gpgme_cflags = gpgme_cflags.stdout().strip()
-    gpgme_libs   = gpgme_libs.stdout().strip()
-    gpgme_libs   = gpgme_libs.split(' ')
+    gpgme_cflags = gpgme_cflags.stdout().strip().split()
+    gpgme_libs   = gpgme_libs.stdout().strip().split()
 
-    if gpgme_cflags != ''
-      gpgme_dep = declare_dependency(compile_args : gpgme_cflags,
-                                     link_args    : gpgme_libs)
-    else
-      gpgme_dep = declare_dependency(link_args    : gpgme_libs)
-    endif
+    gpgme_dep = declare_dependency(compile_args : gpgme_cflags, link_args : gpgme_libs)
     conf.set('HAVE_GPGME', 1,
              description : 'Defined when gpgme is available.')
     balsa_deps += gpgme_dep
@@ -391,8 +385,8 @@ if gss
   conf.set('HAVE_GSSAPI', 1,
     description : 'Defined when GSSAPI support is to be compiled.')
   krb5_config = krb5_config_program.path()
-  krb5_cflags = run_command(krb5_config, '--cflags gssapi').stdout().strip()
-  krb5_libs = run_command(krb5_config, '--libs gssapi').stdout().strip()
+  krb5_cflags = run_command(krb5_config, ['--cflags', 'gssapi']).stdout().strip().split()
+  krb5_libs   = run_command(krb5_config, ['--libs',   'gssapi']).stdout().strip().split()
   if compiler.has_header('gssapi.h')
     conf.set('HAVE_HEIMDAL', 1,
       description : 'Defined for Heimdal.')

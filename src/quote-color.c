@@ -26,28 +26,6 @@
 
 
 /*
- * void make_gradient()
- *
- * Makes a gradient color on the array, from the first entry to the last.
- */
-void
-make_gradient(GdkColor colors[], gint first, gint last)
-{
-    gint /*add, */ i;
-    double dr, dg, db;
-
-    dr = (double) (colors[last].red - colors[first].red) / (last - first + 1);
-    dg = (double) (colors[last].green - colors[first].green) / (last - first + 1);
-    db = (double) (colors[last].blue - colors[first].blue) / (last - first + 1);
-
-    for (i = (first + 1); i < last; i++) {
-	colors[i].red = colors[i - 1].red + dr;
-	colors[i].blue = colors[i - 1].blue + db;
-	colors[i].green = colors[i - 1].green + dg;
-    }
-}
-
-/*
  * static gint is_a_quote (const gchar *str, const regex_t *rex)
  *
  * Returns how deep a quotation is nested in str.  Uses quoted regex

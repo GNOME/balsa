@@ -1,3 +1,14 @@
+2017-09-30  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Remove unused make_gradient function, and build with
+	quote-color.[ch] only if spell-checker == internal
+
+	* src/Makefile.am: move quote-color.[ch] to
+	balsa_spell_extra[,_dist]
+	* src/meson.build: move quote-color.[ch] to balsa_spell_extra
+	* src/quote-color.c: remove unused make_gradient function.
+	* src/quote-color.h: ditto.
+
 2017-09-28  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* libbalsa/imap/meson.build: fix prefix in marshal files.

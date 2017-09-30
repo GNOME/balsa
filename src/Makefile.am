@@ -58,8 +58,6 @@ balsa_BASE_SRCLIST =	\
 	pref-manager.c		\
 	pref-manager.h		\
 	print.h			\
-	quote-color.c		\
-	quote-color.h		\
 	save-restore.c		\
 	save-restore.h		\
 	sendmsg-window.c	\
@@ -89,11 +87,15 @@ balsa_print_source = print-gtk.c	\
 if BUILD_WITH_SPELL_CHECKER
 balsa_spell_extra =
 balsa_spell_extra_dist =	\
+		quote-color.c		\
+		quote-color.h		\
 		spell-check.c		\
 		spell-check.h
 else
 balsa_spell_extra_dist =
 balsa_spell_extra =		\
+		quote-color.c		\
+		quote-color.h		\
 		spell-check.c		\
 		spell-check.h
 endif

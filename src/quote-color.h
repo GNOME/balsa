@@ -28,7 +28,6 @@
 
 G_BEGIN_DECLS
 
-    extern void make_gradient(GdkColor colors[], gint, gint);
     extern guint is_a_quote(const gchar *, GRegex * rex);
 
 G_END_DECLS

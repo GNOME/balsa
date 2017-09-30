@@ -58,8 +58,6 @@ balsa_base_srclist = [
   'pref-manager.c',
   'pref-manager.h',
   'print.h',
-  'quote-color.c',
-  'quote-color.h',
   'save-restore.c',
   'save-restore.h',
   'sendmsg-window.c',
@@ -92,6 +90,8 @@ balsa_print_source = [
 balsa_sources = balsa_base_srclist + balsa_print_source
 if spell_checker == 'internal'
   balsa_spell_extra = [
+    'quote-color.c',
+    'quote-color.h',
     'spell-check.c',
     'spell-check.h'
     ]

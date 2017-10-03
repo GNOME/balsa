@@ -578,7 +578,7 @@ tm_populate(GtkWidget * toolbar, BalsaToolbarModel * model)
                           model->style != (GtkToolbarStyle) (-1) ?
                           model->style : tm_default_style());
 
-    gtk_widget_show_all(toolbar);
+    gtk_widget_show(toolbar);
 }
 
 /* Update a real toolbar when the model has changed.
@@ -695,9 +695,6 @@ tm_popup_context_menu_cb(GtkWidget    * toolbar,
                          toolbar_info * info)
 {
     GtkWidget *menu;
-#if !GTK_CHECK_VERSION(3, 22, 0)
-    int event_time;
-#endif                          /*GTK_CHECK_VERSION(3, 22, 0) */
     guint i;
     GSList *group = NULL;
     GtkToolbarStyle default_style;
@@ -788,12 +785,11 @@ tm_popup_context_menu_cb(GtkWidget    * toolbar,
                           GINT_TO_POINTER(info->model->type));
     }
 
-    gtk_widget_show_all(menu);
+    gtk_widget_show(menu);
     gtk_menu_attach_to_widget(GTK_MENU(menu), toolbar, NULL);
 
     event = gtk_get_current_event();
-#if GTK_CHECK_VERSION(3, 22, 0)
-    if (event != NULL && event->type == GDK_BUTTON_PRESS) {
+    if (event != NULL && gdk_event_get_event_type(event) == GDK_BUTTON_PRESS) {
         gtk_menu_popup_at_pointer(GTK_MENU(menu), event);
     } else {
         gtk_menu_popup_at_widget(GTK_MENU(menu),
@@ -802,16 +798,6 @@ tm_popup_context_menu_cb(GtkWidget    * toolbar,
                                  GDK_GRAVITY_SOUTH,
                                  NULL);
     }
-#else                           /*GTK_CHECK_VERSION(3, 22, 0) */
-    event_time = gtk_get_current_event_time();
-
-    if (button >= 0)
-        gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL, button,
-                       event_time);
-    else
-        gtk_menu_popup(GTK_MENU(menu), NULL, NULL, tm_popup_position_func,
-                       toolbar, button, event_time);
-#endif                          /*GTK_CHECK_VERSION(3, 22, 0) */
 
     if (event != NULL)
         gdk_event_free(event);
@@ -842,7 +828,7 @@ GtkWidget *balsa_toolbar_new(BalsaToolbarModel * model,
     g_signal_connect(toolbar, "popup-context-menu",
                      G_CALLBACK(tm_popup_context_menu_cb), info);
 
-    gtk_widget_show_all(toolbar);
+    gtk_widget_show(toolbar);
 
     return toolbar;
 }

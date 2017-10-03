@@ -191,7 +191,7 @@ balsa_mime_widget_new(BalsaMessage * bm, LibBalsaMessageBody * mime_body, gpoint
 				 G_CALLBACK(vadj_change_cb), mw->widget);
             }
 
-            gtk_widget_show_all(mw->widget);
+            gtk_widget_show(mw->widget);
 	}
     }
     g_free(content_type);
@@ -234,13 +234,11 @@ balsa_mime_widget_new_unknown(BalsaMessage * bm,
     mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
 
     mw->widget = gtk_box_new(GTK_ORIENTATION_VERTICAL, BMW_VBOX_SPACE);
-    gtk_container_set_border_width(GTK_CONTAINER(mw->widget),
-				   BMW_CONTAINER_BORDER);
+    g_object_set(G_OBJECT(mw->widget), "margin", BMW_CONTAINER_BORDER, NULL);
 
     if (mime_body->filename) {
 	msg = g_strdup_printf(_("File name: %s"), mime_body->filename);
-	gtk_box_pack_start(GTK_BOX(mw->widget), gtk_label_new(msg), FALSE,
-			   FALSE, 0);
+	gtk_box_pack_start(GTK_BOX(mw->widget), gtk_label_new(msg));
 	g_free(msg);
     }
 
@@ -294,28 +292,30 @@ balsa_mime_widget_new_unknown(BalsaMessage * bm,
     msg_label = gtk_label_new(msg);
     g_free(msg);
     gtk_label_set_ellipsize(GTK_LABEL(msg_label), PANGO_ELLIPSIZE_END);
-    gtk_box_pack_start(GTK_BOX(mw->widget), msg_label, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(mw->widget), msg_label);
 
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, BMW_HBOX_SPACE);
     gtk_box_set_homogeneous(GTK_BOX(hbox), TRUE);
     if ((button = libbalsa_vfs_mime_button(mime_body, use_content_type,
                                            G_CALLBACK(balsa_mime_widget_ctx_menu_cb),
-                                           (gpointer) mime_body)))
-	gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 0);
-    else
+                                           (gpointer) mime_body))) {
+        gtk_widget_set_hexpand(button, TRUE);
+	gtk_box_pack_start(GTK_BOX(hbox), button);
+    } else {
 	gtk_box_pack_start(GTK_BOX(mw->widget),
 			   gtk_label_new(_("No open or view action "
-					   "defined for this content type")),
-			   FALSE, FALSE, 0);
+					   "defined for this content type")));
+    }
     g_free(use_content_type);
 
     button = gtk_button_new_with_mnemonic(_("S_ave part"));
-    gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 0);
+    gtk_widget_set_hexpand(button, TRUE);
+    gtk_box_pack_start(GTK_BOX(hbox), button);
     g_signal_connect(G_OBJECT(button), "clicked",
 		     G_CALLBACK(balsa_mime_widget_ctx_menu_save),
 		     (gpointer) mime_body);
 
-    gtk_box_pack_start(GTK_BOX(mw->widget), hbox, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(mw->widget), hbox);
 
     return mw;
 }

@@ -515,6 +515,7 @@ ask_cert_real(void *data)
     int der_len;
     GcrCertificate *gcr_cert;
     GtkWidget *label;
+    GtkBox *vbox;
 
     dialog = gtk_dialog_new_with_buttons(_("SSL/TLS certificate"),
                                          NULL, /* FIXME: NULL parent */
@@ -539,11 +540,13 @@ ask_cert_real(void *data)
     label = gtk_label_new(str->str);
     g_string_free(str, TRUE);
     gtk_label_set_use_markup(GTK_LABEL(label), TRUE);
-    gtk_box_pack_start(GTK_BOX(gtk_dialog_get_content_area(GTK_DIALOG(dialog))),
-                       label, FALSE, FALSE, 1);
+    vbox = GTK_BOX(gtk_dialog_get_content_area(GTK_DIALOG(dialog)));
+    gtk_box_set_spacing(vbox, 1);
+    gtk_box_pack_start(vbox, label);
     gtk_widget_show(label);
-    gtk_box_pack_start(GTK_BOX(gtk_dialog_get_content_area(GTK_DIALOG(dialog))),
-                       cert_widget, TRUE, TRUE, 1);
+
+    gtk_widget_set_vexpand(cert_widget, TRUE);
+    gtk_box_pack_start(vbox, cert_widget);
     gtk_widget_show(cert_widget);
 
     switch(gtk_dialog_run(GTK_DIALOG(dialog))) {
@@ -576,6 +579,7 @@ ask_cert_real(void *data)
     char *name = NULL, *c, *valid_from, *valid_until;
     GtkWidget* dialog, *label;
     unsigned i;
+    GtkBox *vbox;
 
     GString* str = g_string_new("");
 
@@ -633,9 +637,13 @@ ask_cert_real(void *data)
     label = gtk_label_new(str->str);
     g_string_free(str, TRUE);
     gtk_label_set_use_markup(GTK_LABEL(label), TRUE);
-    gtk_box_pack_start(GTK_BOX
-                       (gtk_dialog_get_content_area(GTK_DIALOG(dialog))),
-                       label, TRUE, TRUE, 1);
+
+    vbox = GTK_BOX(gtk_dialog_get_content_area(GTK_DIALOG(dialog)));
+    gtk_box_set_spacing(vbox, 1);
+
+    gtk_widget_set_vexpand(label, TRUE);
+    gtk_box_pack_start(vbox, label);
+
     gtk_widget_show(label);
 
     switch(gtk_dialog_run(GTK_DIALOG(dialog))) {

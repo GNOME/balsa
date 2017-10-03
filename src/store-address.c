@@ -133,7 +133,7 @@ balsa_store_address(const LibBalsaAddress *address)
 
     g_signal_connect(G_OBJECT(info->dialog), "response",
                      G_CALLBACK(store_address_response), info);
-    gtk_widget_show_all(GTK_WIDGET(info->dialog));
+    gtk_widget_show(GTK_WIDGET(info->dialog));
 }
 
 /* Weak notify that a message was deleted; remove it from our list. */
@@ -221,13 +221,14 @@ store_address_dialog(StoreAddressInfo * info)
     if (balsa_app.address_book_list && balsa_app.address_book_list->next) {
         /* User has more than one address book, so show the options */
         frame = store_address_book_frame(info);
-        gtk_widget_show_all(frame);
-        gtk_box_pack_start(GTK_BOX(vbox), frame, FALSE, FALSE, 0);
+        gtk_widget_show(frame);
+        gtk_box_pack_start(GTK_BOX(vbox), frame);
     }
 
     frame = store_address_note_frame(info);
-    gtk_widget_show_all(frame);
-    gtk_box_pack_start(GTK_BOX(vbox), frame, TRUE, TRUE, 0);
+    gtk_widget_show(frame);
+    gtk_widget_set_vexpand(frame, TRUE);
+    gtk_box_pack_start(GTK_BOX(vbox), frame);
 
     return dialog;
 }
@@ -286,9 +287,8 @@ store_address_book_frame(StoreAddressInfo * info)
     GList *ab_list;
 
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 12);
-    gtk_container_set_border_width(GTK_CONTAINER(hbox), 4);
-    gtk_box_pack_start(GTK_BOX(hbox), gtk_label_new(_("Address Book:")),
-                       FALSE, FALSE, 0);
+    g_object_set(G_OBJECT(hbox), "margin", 4, NULL);
+    gtk_box_pack_start(GTK_BOX(hbox), gtk_label_new(_("Address Book:")));
 
     combo_box = gtk_combo_box_text_new();
     g_signal_connect(combo_box, "changed",
@@ -313,7 +313,8 @@ store_address_book_frame(StoreAddressInfo * info)
     }
     gtk_combo_box_set_active(GTK_COMBO_BOX(combo_box), default_ab_offset);
 
-    gtk_box_pack_start(GTK_BOX(hbox), combo_box, TRUE, TRUE, 0);
+    gtk_widget_set_hexpand(combo_box, TRUE);
+    gtk_box_pack_start(GTK_BOX(hbox), combo_box);
 
     return hbox;
 }
@@ -328,7 +329,7 @@ store_address_note_frame(StoreAddressInfo *info)
 
     info->notebook = gtk_notebook_new();
     gtk_notebook_set_scrollable(GTK_NOTEBOOK(info->notebook), TRUE);
-    gtk_container_set_border_width(GTK_CONTAINER(info->notebook), 4);
+    g_object_set(G_OBJECT(info->notebook), "margin", 4, NULL);
 
     for (list = info->message_list; list; list = list->next) {
         message = LIBBALSA_MESSAGE(list->data);

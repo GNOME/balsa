@@ -103,7 +103,7 @@ ask_password_real(LibBalsaServer * server, LibBalsaMailbox * mbox)
     if(server->remember_passwd)
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(rememb), TRUE);
 
-    gtk_widget_show_all(content_area);
+    gtk_widget_show(content_area);
     gtk_entry_set_activates_default(GTK_ENTRY(entry), TRUE);
     gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
     gtk_widget_grab_focus (entry);

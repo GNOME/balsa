@@ -325,10 +325,11 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
     }
 
     notebook = gtk_notebook_new();
+    gtk_widget_set_vexpand(notebook, TRUE);
     gtk_box_pack_start(GTK_BOX(gtk_dialog_get_content_area(fcw->dialog)),
-                       notebook, TRUE, TRUE, 0);
+                       notebook);
     grid = libbalsa_create_grid();
-    gtk_container_set_border_width(GTK_CONTAINER(grid), 12);
+    g_object_set(G_OBJECT(grid), "margin", 12, NULL);
     gtk_notebook_append_page(GTK_NOTEBOOK(notebook), grid,
                              gtk_label_new_with_mnemonic(_("_Basic")));
     advanced = balsa_server_conf_get_advanced_widget(&fcw->bsc, s, 3);
@@ -421,7 +422,7 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
         libbalsa_create_grid_entry(grid, NULL, NULL, r++,
                                    mn ? mn->dir : NULL, label);
 
-    gtk_widget_show_all(GTK_WIDGET(fcw->dialog));
+    gtk_widget_show(GTK_WIDGET(fcw->dialog));
 
     validate_folder(NULL, fcw);
     gtk_widget_grab_focus(fcw->folder_name);
@@ -433,7 +434,7 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
 
     g_signal_connect(G_OBJECT(fcw->dialog), "response",
                      G_CALLBACK(folder_conf_response), fcw);
-    gtk_widget_show_all(GTK_WIDGET(fcw->dialog));
+    gtk_widget_show(GTK_WIDGET(fcw->dialog));
 }
 
 /* folder_conf_imap_sub_node:
@@ -575,9 +576,10 @@ browse_button_cb(GtkWidget * widget, SubfolderDialogData * sdd)
 #endif
     
     scroll = gtk_scrolled_window_new(NULL, NULL);
+    gtk_widget_set_vexpand(scroll, TRUE);
     gtk_box_pack_start(GTK_BOX
                        (gtk_dialog_get_content_area(GTK_DIALOG(dialog))),
-                       scroll, TRUE, TRUE, 0);
+                       scroll);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll),
                                    GTK_POLICY_AUTOMATIC,
                                    GTK_POLICY_ALWAYS);
@@ -613,7 +615,7 @@ browse_button_cb(GtkWidget * widget, SubfolderDialogData * sdd)
 
     g_signal_connect(G_OBJECT(dialog), "response",
                      G_CALLBACK(browse_button_response), bbd);
-    gtk_widget_show_all(GTK_WIDGET(dialog));
+    gtk_widget_show(GTK_WIDGET(dialog));
 }
 
 static gboolean
@@ -825,15 +827,16 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
     grid = libbalsa_create_grid();
     gtk_grid_set_row_spacing(GTK_GRID(grid), 6);
     gtk_grid_set_column_spacing(GTK_GRID(grid), 12);
-    gtk_container_set_border_width(GTK_CONTAINER(grid), 12);
+    g_object_set(G_OBJECT(grid), "margin", 12, NULL);
     if (mn)
         content = grid;
     else {
         content = gtk_frame_new(_("Create subfolder"));
         gtk_container_add(GTK_CONTAINER(content), grid);
     }
+    gtk_widget_set_vexpand(content, TRUE);
     gtk_box_pack_start(GTK_BOX(gtk_dialog_get_content_area(sdd->dialog)),
-                       content, TRUE, TRUE, 0);
+                       content);
  
     row = 0;
     /* INPUT FIELD CREATION */
@@ -862,9 +865,10 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
 		     G_CALLBACK(browse_button_cb), (gpointer) sdd);
 
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 12);
+    gtk_widget_set_hexpand(sdd->parent_folder, TRUE);
+    gtk_box_pack_start(GTK_BOX(hbox), sdd->parent_folder);
+    gtk_box_pack_start(GTK_BOX(hbox), button);
     gtk_widget_set_hexpand(hbox, TRUE);
-    gtk_box_pack_start(GTK_BOX(hbox), sdd->parent_folder, TRUE, TRUE, 0);
-    gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, FALSE, 0);
     gtk_grid_attach(GTK_GRID(grid), hbox, 1, row, 1, 1);
 
     if (!mn)
@@ -978,7 +982,7 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
                                          G_CALLBACK(set_ok_sensitive));
     }
 
-    gtk_widget_show_all(GTK_WIDGET(sdd->dialog));
+    gtk_widget_show(GTK_WIDGET(sdd->dialog));
 
     gtk_widget_grab_focus(sdd->folder_name);
 
@@ -986,7 +990,7 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
                      G_CALLBACK(folder_conf_response), sdd);
     gtk_dialog_set_response_sensitive(GTK_DIALOG(sdd->dialog),
                                       GTK_RESPONSE_OK, FALSE);
-    gtk_widget_show_all(GTK_WIDGET(sdd->dialog));
+    gtk_widget_show(GTK_WIDGET(sdd->dialog));
 }
 
 void

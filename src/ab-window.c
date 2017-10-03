@@ -229,13 +229,13 @@ static void
 balsa_ab_window_init(BalsaAbWindow *ab)
 {
     GtkWidget *find_label,
-	*vbox,
 	*w,
 	*grid,
 	*hbox,
 	*box2,
 	*scrolled_window,
 	*frame;
+    GtkBox *vbox;
 
     ab->current_address_book = NULL;
 
@@ -245,13 +245,13 @@ balsa_ab_window_init(BalsaAbWindow *ab)
     g_signal_connect(G_OBJECT(ab), "response",
 		     G_CALLBACK(balsa_ab_window_response_cb), NULL);
 
-    vbox = gtk_dialog_get_content_area(GTK_DIALOG(ab));
+    vbox = (GtkBox *) gtk_dialog_get_content_area(GTK_DIALOG(ab));
 
     gtk_window_set_role(GTK_WINDOW(ab), "addressbook");
 
     /* hig defaults */
-    gtk_container_set_border_width(GTK_CONTAINER(ab), 6);
-    gtk_box_set_spacing(GTK_BOX(vbox), 12);
+    g_object_set(G_OBJECT(vbox), "margin", 6, NULL);
+    gtk_box_set_spacing(vbox, 12);
 
 
     /* The main address list */
@@ -279,13 +279,14 @@ balsa_ab_window_init(BalsaAbWindow *ab)
 	/* More than one address book. */
 	gtk_widget_show(ab->combo_box);
 
-    gtk_box_pack_start(GTK_BOX(vbox), ab->combo_box, FALSE, FALSE, 0);
+    gtk_box_pack_start(vbox, ab->combo_box);
 
     /* layout grid */
     grid = gtk_grid_new();
     gtk_grid_set_row_spacing(GTK_GRID(grid), 6);
     gtk_grid_set_column_spacing(GTK_GRID(grid), 12);
-    gtk_box_pack_start(GTK_BOX(vbox), grid, TRUE, TRUE, 0);
+    gtk_widget_set_vexpand(grid, TRUE);
+    gtk_box_pack_start(vbox, grid);
     gtk_widget_show(grid);
 
     /* -- grid column 1 -- */
@@ -302,8 +303,9 @@ balsa_ab_window_init(BalsaAbWindow *ab)
     /* Pack the find stuff into the grid */
     box2 = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 1);
     gtk_grid_attach(GTK_GRID(grid), box2, 0, 0, 1, 1);
-    gtk_box_pack_start(GTK_BOX(box2), find_label, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(box2), ab->filter_entry, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(box2), find_label);
+    gtk_widget_set_hexpand(ab->filter_entry, TRUE);
+    gtk_box_pack_start(GTK_BOX(box2), ab->filter_entry);
     gtk_widget_show(GTK_WIDGET(box2));
 
 
@@ -347,7 +349,8 @@ balsa_ab_window_init(BalsaAbWindow *ab)
 
     w = gtk_button_new_from_icon_name("go-next-symbolic",
                                       GTK_ICON_SIZE_BUTTON);
-    gtk_box_pack_start(GTK_BOX(ab->arrow_box), w, TRUE, FALSE, 0);
+    gtk_widget_set_hexpand(w, TRUE);
+    gtk_box_pack_start(GTK_BOX(ab->arrow_box), w);
     gtk_widget_show(w);
     g_signal_connect(G_OBJECT(w), "clicked",
 		     G_CALLBACK(balsa_ab_window_move_to_recipient_list),
@@ -355,7 +358,8 @@ balsa_ab_window_init(BalsaAbWindow *ab)
 
     w = gtk_button_new_from_icon_name("go-previous-symbolic",
                                       GTK_ICON_SIZE_BUTTON);
-    gtk_box_pack_start(GTK_BOX(ab->arrow_box), w, TRUE, FALSE, 0);
+    gtk_widget_set_hexpand(w, TRUE);
+    gtk_box_pack_start(GTK_BOX(ab->arrow_box), w);
     gtk_widget_show(w);
     g_signal_connect(G_OBJECT(w), "clicked",
 		     G_CALLBACK(balsa_ab_window_remove_from_recipient_list),
@@ -400,15 +404,14 @@ balsa_ab_window_init(BalsaAbWindow *ab)
 	    ab->current_address_book->dist_list_mode);
 
     /* Pack them into a box  */
-    box2 = gtk_box_new(GTK_ORIENTATION_VERTICAL, 1);
+    box2 = gtk_box_new(GTK_ORIENTATION_VERTICAL, 2);
     gtk_box_set_homogeneous(GTK_BOX(box2), TRUE);
     gtk_container_add(GTK_CONTAINER(frame), box2);
-    gtk_box_pack_start(GTK_BOX(box2), ab->single_address_mode_radio,
-		       FALSE, FALSE, 1);
-    gtk_box_pack_start(GTK_BOX(box2), ab->dist_address_mode_radio,
-		       FALSE, FALSE, 1);
+    gtk_box_pack_start(GTK_BOX(box2), ab->single_address_mode_radio);
+    gtk_box_pack_start(GTK_BOX(box2), ab->dist_address_mode_radio);
     gtk_widget_show(box2);
-    gtk_box_pack_start(GTK_BOX(vbox), frame, FALSE, FALSE, 1);
+    gtk_widget_set_margin_top(frame, 1);
+    gtk_box_pack_start(vbox, frame);
 
     gtk_widget_grab_focus(ab->filter_entry);
 }

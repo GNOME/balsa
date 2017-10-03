@@ -30,8 +30,8 @@ G_BEGIN_DECLS
 void balsa_mime_widget_ctx_menu_cb(GtkWidget * menu_item, LibBalsaMessageBody * mime_body);
 void balsa_mime_widget_ctx_menu_save(GtkWidget * parent_widget,
                                      LibBalsaMessageBody * mime_body);
-gint balsa_mime_widget_key_press_event(GtkWidget * widget, GdkEventKey * event,
-				       BalsaMessage * bm);
+gboolean balsa_mime_widget_key_press_event(GtkWidget * widget, GdkEvent * event,
+                                           BalsaMessage * bm);
 gint balsa_mime_widget_limit_focus(GtkWidget * widget, GdkEventFocus * event, BalsaMessage * bm);
 gint balsa_mime_widget_unlimit_focus(GtkWidget * widget, GdkEventFocus * event, BalsaMessage * bm);
 

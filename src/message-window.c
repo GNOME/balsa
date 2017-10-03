@@ -852,7 +852,7 @@ message_window_new(LibBalsaMailbox * mailbox, guint msgno)
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu(window, GTK_MENU_SHELL(menubar));
 #else
-    gtk_box_pack_start(GTK_BOX(vbox), menubar, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(vbox), menubar);
 #endif
 
     mw->headers_shown = balsa_app.shown_headers;
@@ -861,7 +861,7 @@ message_window_new(LibBalsaMailbox * mailbox, guint msgno)
     model = message_window_get_toolbar_model();
 
     mw->toolbar = balsa_toolbar_new(model, G_ACTION_MAP(window));
-    gtk_box_pack_start(GTK_BOX(vbox), mw->toolbar, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(vbox), mw->toolbar);
 
     gtk_window_set_role(GTK_WINDOW(window), "message");
 
@@ -895,7 +895,8 @@ message_window_new(LibBalsaMailbox * mailbox, guint msgno)
 	mw_disable_trash(mw);
     mw->bmessage = balsa_message_new();
     
-    gtk_box_pack_start(GTK_BOX(vbox), mw->bmessage, TRUE, TRUE, 0);
+    gtk_widget_set_vexpand(mw->bmessage, TRUE);
+    gtk_box_pack_start(GTK_BOX(vbox), mw->bmessage);
     gtk_widget_show(vbox);
 
     g_signal_connect(mw->bmessage, "select-part",

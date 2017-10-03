@@ -126,7 +126,7 @@ static void select_part(BalsaMessage * bm, BalsaPartInfo *info);
 static void tree_activate_row_cb(GtkTreeView *treeview, GtkTreePath *arg1,
                                  GtkTreeViewColumn *arg2, gpointer user_data);
 static gboolean tree_menu_popup_key_cb(GtkWidget *widget, gpointer user_data);
-static gboolean tree_button_press_cb(GtkWidget * widget, GdkEventButton * event,
+static gboolean tree_button_press_cb(GtkWidget * widget, GdkEvent * event,
                                      gpointer data);
 
 static void part_info_init(BalsaMessage * bm, BalsaPartInfo * info);
@@ -605,12 +605,11 @@ bm_find_bar_new(BalsaMessage * bm)
     gtk_toolbar_set_style(GTK_TOOLBAR(toolbar), GTK_TOOLBAR_BOTH_HORIZ);
 
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 6);
-    gtk_box_pack_start(GTK_BOX(hbox), gtk_label_new(_("Find:")),
-                       FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(hbox), gtk_label_new(_("Find:")));
     bm->find_entry = gtk_entry_new();
     g_signal_connect(bm->find_entry, "changed",
                      G_CALLBACK(bm_find_entry_changed_cb), bm);
-    gtk_box_pack_start(GTK_BOX(hbox), bm->find_entry, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(hbox), bm->find_entry);
 
     tool_item = gtk_tool_item_new();
     gtk_container_add(GTK_CONTAINER(tool_item), hbox);
@@ -644,19 +643,25 @@ bm_find_bar_new(BalsaMessage * bm)
 static void bm_disable_find_entry(BalsaMessage * bm);
 
 static gboolean
-bm_find_pass_to_entry(BalsaMessage * bm, GdkEventKey * event)
+bm_find_pass_to_entry(BalsaMessage * bm, GdkEvent * event)
 {
     gboolean res = TRUE;
+    guint keyval;
+    GdkModifierType state;
 
-    switch (event->keyval) {
+    if (!gdk_event_get_keyval(event, &keyval) ||
+        !gdk_event_get_state(event, &state))
+        return FALSE;
+
+    switch (keyval) {
     case GDK_KEY_Escape:
     case GDK_KEY_Return:
     case GDK_KEY_KP_Enter:
         bm_disable_find_entry(bm);
         return res;
     case GDK_KEY_g:
-        if ((event->state & (GDK_SHIFT_MASK | GDK_CONTROL_MASK)) ==
-            GDK_CONTROL_MASK && gtk_widget_get_sensitive(bm->find_next)) {
+        if ((state & (GDK_SHIFT_MASK | GDK_CONTROL_MASK)) == GDK_CONTROL_MASK &&
+            gtk_widget_get_sensitive(bm->find_next)) {
             bm_find_again(bm, bm->find_forward);
             return res;
         }
@@ -697,14 +702,15 @@ balsa_message_init(BalsaMessage * bm)
     GtkTreeSelection *selection;
 
     bm->switcher = gtk_stack_switcher_new();
-    gtk_box_pack_start(GTK_BOX(bm), bm->switcher, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(bm), bm->switcher);
 
     bm->stack = gtk_stack_new();
     stack = GTK_STACK(bm->stack);
     gtk_stack_set_transition_type(stack,
                                   GTK_STACK_TRANSITION_TYPE_SLIDE_UP_DOWN);
     gtk_stack_switcher_set_stack(GTK_STACK_SWITCHER(bm->switcher), stack);
-    gtk_box_pack_start(GTK_BOX(bm), bm->stack, TRUE, TRUE, 0);
+    gtk_widget_set_vexpand(bm->stack, TRUE);
+    gtk_box_pack_start(GTK_BOX(bm), bm->stack);
 
     /* Box to hold the scrolled window and the find bar */
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
@@ -717,7 +723,8 @@ balsa_message_init(BalsaMessage * bm)
                                    GTK_POLICY_AUTOMATIC);
     g_signal_connect(scroll, "key_press_event",
 		     G_CALLBACK(balsa_mime_widget_key_press_event), bm);
-    gtk_box_pack_start(GTK_BOX(vbox), scroll, TRUE, TRUE, 0);
+    gtk_widget_set_vexpand(scroll, TRUE);
+    gtk_box_pack_start(GTK_BOX(vbox), scroll);
 #if !GTK_CHECK_VERSION(3, 15, 0)
     g_signal_connect_after(bm, "style-updated",
 			   G_CALLBACK(bm_on_set_style), bm);
@@ -806,11 +813,11 @@ balsa_message_init(BalsaMessage * bm)
     bm->wrap_text = balsa_app.browse_wrap;
     bm->shown_headers = balsa_app.shown_headers;
 
-    gtk_widget_show_all(GTK_WIDGET(bm));
+    gtk_widget_show(GTK_WIDGET(bm));
 
     /* Find-in-message toolbar that is hidden by default. */
     bm->find_bar = bm_find_bar_new(bm);
-    gtk_box_pack_start(GTK_BOX(vbox), bm->find_bar, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(vbox), bm->find_bar);
 }
 
 static void
@@ -936,7 +943,7 @@ collect_selected_info(GtkTreeModel * model, GtkTreePath * path,
 }
 
 static void
-tree_mult_selection_popup(BalsaMessage * bm, GdkEventButton * event,
+tree_mult_selection_popup(BalsaMessage * bm, GdkEvent * event,
                           GtkTreeSelection * selection)
 {
     gint selected;
@@ -960,23 +967,14 @@ tree_mult_selection_popup(BalsaMessage * bm, GdkEventButton * event,
     if (selected == 1) {
         BalsaPartInfo *info = BALSA_PART_INFO(bm->save_all_list->data);
         if (info->popup_menu) {
-#if GTK_CHECK_VERSION(3, 22, 0)
-            if (event)
-                gtk_menu_popup_at_pointer(GTK_MENU(info->popup_menu),
-                                          (GdkEvent *) event);
-            else
+            if (event != NULL) {
+                gtk_menu_popup_at_pointer(GTK_MENU(info->popup_menu), event);
+            } else {
                 gtk_menu_popup_at_widget(GTK_MENU(info->popup_menu),
                                          GTK_WIDGET(bm),
                                          GDK_GRAVITY_CENTER, GDK_GRAVITY_CENTER,
                                          NULL);
-#else                           /*GTK_CHECK_VERSION(3, 22, 0) */
-            if (event)
-                gtk_menu_popup(GTK_MENU(info->popup_menu), NULL, NULL, NULL,
-                               NULL, event->button, event->time);
-            else
-                gtk_menu_popup(GTK_MENU(info->popup_menu), NULL, NULL, NULL,
-                               NULL, 0, gtk_get_current_event_time());
-#endif                          /*GTK_CHECK_VERSION(3, 22, 0) */
+            }
         }
         g_list_free(bm->save_all_list);
         bm->save_all_list = NULL;
@@ -1031,17 +1029,15 @@ tree_menu_popup_key_cb(GtkWidget *widget, gpointer user_data)
 }
 
 static gboolean
-tree_button_press_cb(GtkWidget * widget, GdkEventButton * event,
-                     gpointer data)
+tree_button_press_cb(GtkWidget * widget, GdkEvent * event, gpointer data)
 {
     BalsaMessage * bm = (BalsaMessage *)data;
     GtkTreeView *tree_view = GTK_TREE_VIEW(widget);
     GtkTreePath *path;
+    gdouble x_win, y_win;
 
-    g_return_val_if_fail(bm, FALSE);
-    g_return_val_if_fail(event, FALSE);
-    if (!gdk_event_triggers_context_menu((GdkEvent *) event)
-        || event->window != gtk_tree_view_get_bin_window(tree_view))
+    if (!gdk_event_triggers_context_menu(event) ||
+        !gdk_event_get_coords(event, &x_win, &y_win))
         return FALSE;
 
     /* If the part which received the click is already selected, don't change
@@ -1050,7 +1046,7 @@ tree_button_press_cb(GtkWidget * widget, GdkEventButton * event,
      * If the receiving part is not selected, select (only) this part and pop
      * up its menu.
      */
-    if (gtk_tree_view_get_path_at_pos(tree_view, event->x, event->y,
+    if (gtk_tree_view_get_path_at_pos(tree_view, (gint) x_win, (gint) y_win,
                                       &path, NULL, NULL, NULL)) {
         GtkTreeIter iter;
         GtkTreeSelection * selection =
@@ -1066,15 +1062,9 @@ tree_button_press_cb(GtkWidget * widget, GdkEventButton * event,
                                      FALSE);
             if (gtk_tree_model_get_iter (model, &iter, path)) {
                 gtk_tree_model_get(model, &iter, PART_INFO_COLUMN, &info, -1);
-                if (info) {
-                    if (info->popup_menu) {
-#if GTK_CHECK_VERSION(3, 22, 0)
-                        gtk_menu_popup_at_pointer(GTK_MENU(info->popup_menu),
-                                                  (GdkEvent *) event);
-#else                           /*GTK_CHECK_VERSION(3, 22, 0) */
-                        gtk_menu_popup(GTK_MENU(info->popup_menu), NULL, NULL,
-                                       NULL, NULL, event->button, event->time);
-#endif                          /*GTK_CHECK_VERSION(3, 22, 0) */
+                if (info != NULL) {
+                    if (info->popup_menu != NULL) {
+                        gtk_menu_popup_at_pointer(GTK_MENU(info->popup_menu), event);
                     }
                     g_object_unref(info);
                 }
@@ -1286,7 +1276,7 @@ balsa_message_set_displayed_headers(BalsaMessage * bmessage,
              balsa_message_set_embedded_hdr, bmessage);
 	if (bm_header_widget_att_button(bmessage)) {
 	    if (bmessage->info_count > 1)
-		gtk_widget_show_all
+		gtk_widget_show
 		    (GTK_WIDGET(bm_header_widget_att_button(bmessage)));
 	    else
 		gtk_widget_hide
@@ -1593,8 +1583,8 @@ display_face(BalsaMessage * bm)
         return;
     }
 
-    gtk_box_pack_start(GTK_BOX(face_box), image, FALSE, FALSE, 0);
-    gtk_widget_show_all(face_box);
+    gtk_box_pack_start(GTK_BOX(face_box), image);
+    gtk_widget_show(face_box);
 }
 
 static void
@@ -1607,8 +1597,8 @@ display_content(BalsaMessage * bm)
     g_object_ref_sink(bm->parts_popup);
     display_parts(bm, bm->message->body_list, NULL, NULL);
     if (bm->info_count > 1) {
- 	gtk_widget_show_all(bm->parts_popup);
- 	gtk_widget_show_all
+ 	gtk_widget_show(bm->parts_popup);
+ 	gtk_widget_show
 	    (GTK_WIDGET(bm_header_widget_att_button(bm)));
     } else
  	gtk_widget_hide
@@ -1688,7 +1678,7 @@ part_create_menu (BalsaPartInfo* info)
         gtk_menu_item_set_submenu(GTK_MENU_ITEM(menu_item), submenu);
     }
 
-    gtk_widget_show_all (info->popup_menu);
+    gtk_widget_show (info->popup_menu);
     g_free (content_type);
 }
 
@@ -2227,8 +2217,10 @@ add_part(BalsaMessage * bm, BalsaPartInfo * info, GtkWidget * container)
     if (info->mime_widget == NULL)
 	part_info_init(bm, info);
 
-    if ((widget = info->mime_widget->widget))
-        gtk_box_pack_start(GTK_BOX(container), widget, TRUE, TRUE, 0);
+    if ((widget = info->mime_widget->widget)) {
+        gtk_widget_set_vexpand(widget, TRUE);
+        gtk_box_pack_start(GTK_BOX(container), widget);
+    }
 
     body =
         add_multipart(bm, info->body,
@@ -2467,7 +2459,7 @@ handle_mdn_request(GtkWindow *parent, LibBalsaMessage *message)
         reply_to =
             internet_address_list_to_string (message->headers->dispnotify_to,
 		                             FALSE);
-        gtk_widget_show_all (create_mdn_dialog (parent, sender, reply_to, mdn,
+        gtk_widget_show (create_mdn_dialog (parent, sender, reply_to, mdn,
                                                 mdn_ident));
         g_free (reply_to);
         g_free (sender);
@@ -3304,7 +3296,7 @@ balsa_message_find_in_message(BalsaMessage * bm)
 
         bm_find_set_status(bm, BM_FIND_STATUS_INIT);
 
-        gtk_widget_show_all(bm->find_bar);
+        gtk_widget_show(bm->find_bar);
         if (gtk_widget_get_window(bm->find_entry))
             gtk_widget_grab_focus(bm->find_entry);
     }

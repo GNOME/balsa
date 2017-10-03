@@ -1013,7 +1013,8 @@ build_type_notebook()
 
     box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
     g_object_set(box, "margin", 5, NULL);
-    gtk_box_pack_start(GTK_BOX(box), grid, TRUE, TRUE, 0);
+    gtk_widget_set_vexpand(grid, TRUE);
+    gtk_box_pack_start(GTK_BOX(box), grid);
 
     fe_type_simple_label = 
 	gtk_label_new_with_mnemonic(_("One of the specified f_ields contains"));
@@ -1043,7 +1044,8 @@ build_type_notebook()
 
 #if REGULAR_EXPRESSION_FILTERING_IS_IMPLEMENTED
     page = gtk_table_new(5, 6, FALSE);
-    gtk_box_pack_start(GTK_BOX(box), page, TRUE, TRUE, 0);
+    gtk_widget_set_vexpand(page, TRUE);
+    gtk_box_pack_start(GTK_BOX(box), page);
 
     fe_type_regex_label = 
         gtk_label_new_with_mnemonic(_("_One of the regular expressions matches"));
@@ -1075,15 +1077,18 @@ build_type_notebook()
                      0, 5, 4, 5,
                      GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 2, 2);
     button = gtk_button_new_with_mnemonic(_("A_dd"));
-    gtk_box_pack_start(GTK_BOX(box), button, TRUE, TRUE, 0);
+    gtk_widget_set_vexpand(button, TRUE);
+    gtk_box_pack_start(GTK_BOX(box), button);
     g_signal_connect(G_OBJECT(button), "clicked",
                      G_CALLBACK(fe_add_pressed), NULL);
     fe_regex_remove_button = gtk_button_new_with_mnemonic(_("_Remove"));
-    gtk_box_pack_start(GTK_BOX(box), fe_regex_remove_button, TRUE, TRUE, 0);
+    gtk_widget_set_vexpand(fe_regex_remove_button, TRUE);
+    gtk_box_pack_start(GTK_BOX(box), fe_regex_remove_button);
     g_signal_connect(G_OBJECT(fe_regex_remove_button), "clicked",
                      G_CALLBACK(fe_remove_pressed), NULL);
     button = gtk_button_new_with_mnemonic(_("One _Matches/None Matches"));
-    gtk_box_pack_start(GTK_BOX(box), button, TRUE, TRUE, 0);
+    gtk_widget_set_vexpand(button, TRUE);
+    gtk_box_pack_start(GTK_BOX(box), button);
     g_signal_connect(G_OBJECT(button), "clicked",
                      G_CALLBACK(fe_negate_condition), NULL);
 
@@ -1095,7 +1100,8 @@ build_type_notebook()
 #else                   /* REGULAR_EXPRESSION_FILTERING_IS_IMPLEMENTED */
     msg = _("Filtering using regular expressions is not yet implemented.");
     label = gtk_label_new(msg);
-    gtk_box_pack_start(GTK_BOX(box), label, TRUE, TRUE, 0);
+    gtk_widget_set_vexpand(label, TRUE);
+    gtk_box_pack_start(GTK_BOX(box), label);
 #endif                  /* REGULAR_EXPRESSION_FILTERING_IS_IMPLEMENTED */
 
     /* The date page of the notebook */
@@ -1182,20 +1188,23 @@ void build_condition_dialog(GtkWidget * condition_dialog)
      * conditions of the filter */
     box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
     label = gtk_label_new_with_mnemonic(_("Search T_ype:"));
-    gtk_box_pack_start(GTK_BOX(box), label, FALSE, FALSE, 5);
-    fe_search_option_menu = 
+    gtk_box_pack_start(GTK_BOX(box), label);
+    fe_search_option_menu =
         fe_build_option_menu(fe_search_type, ELEMENTS(fe_search_type),
                              G_CALLBACK(fe_typesmenu_cb), field_frame);
-    gtk_box_pack_start(GTK_BOX(box), fe_search_option_menu, FALSE, FALSE, 5);
+    gtk_box_pack_start(GTK_BOX(box), fe_search_option_menu);
     gtk_label_set_mnemonic_widget(GTK_LABEL(label), fe_search_option_menu);
 
     content_box =
         GTK_BOX(gtk_dialog_get_content_area(GTK_DIALOG(condition_dialog)));
-    gtk_box_pack_start(content_box, box, FALSE, FALSE, 2);
-    gtk_box_pack_start(content_box, field_frame, FALSE, FALSE, 2);
+    gtk_widget_set_margin_top(box, 2);
+    gtk_box_pack_start(content_box, box);
+    gtk_widget_set_margin_top(field_frame, 2);
+    gtk_box_pack_start(content_box, field_frame);
 
     build_type_notebook();
-    gtk_box_pack_start(content_box, fe_type_notebook, FALSE, FALSE, 2);
+    gtk_widget_set_margin_top(fe_type_notebook, 2);
+    gtk_box_pack_start(content_box, fe_type_notebook);
 }
 
 /*
@@ -1264,7 +1273,7 @@ fe_edit_condition(GtkWidget * throwaway,gpointer is_new_cnd)
     g_free(title);
     /* We fire the dialog box */
     gtk_widget_set_sensitive(fe_window, FALSE);
-    gtk_widget_show_all(condition_dialog);
+    gtk_widget_show(condition_dialog);
     if (cnd) fill_condition_widgets(cnd);
     else clear_condition_widgets();
 }
@@ -1536,7 +1545,7 @@ fe_action_selected(GtkWidget * widget, gpointer data)
         (FilterActionType) fe_combo_box_get_value(widget);
     if (type == FILTER_COLOR) {
         gtk_widget_hide(fe_mailboxes);
-        gtk_widget_show_all(fe_color_buttons);
+        gtk_widget_show(fe_color_buttons);
     } else {
         gtk_widget_hide(fe_color_buttons);
         gtk_widget_show(fe_mailboxes);

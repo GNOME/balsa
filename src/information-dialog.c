@@ -256,11 +256,13 @@ balsa_information_list(GtkWindow *parent, LibBalsaInformationType type,
 				       (scrolled_window),
 				       GTK_POLICY_AUTOMATIC,
 				       GTK_POLICY_AUTOMATIC);
+        gtk_widget_set_vexpand(scrolled_window, TRUE);
+        gtk_widget_set_margin_top(scrolled_window, 1); /* Seriously? */
         gtk_box_pack_start(GTK_BOX
                            (gtk_dialog_get_content_area
                             (GTK_DIALOG(information_dialog))),
-                           scrolled_window, TRUE, TRUE, 1);
-	gtk_container_set_border_width(GTK_CONTAINER(scrolled_window), 6);
+                           scrolled_window);
+	g_object_set(G_OBJECT(scrolled_window), "margin", 6, NULL);
 	gtk_widget_show(scrolled_window);
 
 	/* The list itself */
@@ -271,7 +273,7 @@ balsa_information_list(GtkWindow *parent, LibBalsaInformationType type,
                          G_CALLBACK(balsa_information_list_response_cb),
                          information_list);
 
-	gtk_widget_show_all(information_dialog);
+	gtk_widget_show(information_dialog);
     }
 
     buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(information_list));

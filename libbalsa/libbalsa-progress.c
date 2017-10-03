@@ -68,7 +68,7 @@ libbalsa_progress_dialog_ensure(GtkWidget   **progress_dialog,
         hints.min_height = 1;
         hints.max_width = PROGRESS_DIALOG_WIDTH;
         hints.max_height = -1;
-        gtk_window_set_geometry_hints(GTK_WINDOW(*progress_dialog), NULL, &hints, GDK_HINT_MIN_SIZE + GDK_HINT_MAX_SIZE);
+        gdk_window_set_geometry_hints(gtk_widget_get_window(*progress_dialog), &hints, GDK_HINT_MIN_SIZE + GDK_HINT_MAX_SIZE);
         gtk_window_set_resizable(GTK_WINDOW(*progress_dialog), FALSE);
         g_signal_connect(G_OBJECT(*progress_dialog), "response", G_CALLBACK(progress_dialog_response_cb), NULL);
         g_signal_connect(G_OBJECT(*progress_dialog), "destroy", G_CALLBACK(progress_dialog_destroy_cb), progress_dialog);
@@ -76,7 +76,7 @@ libbalsa_progress_dialog_ensure(GtkWidget   **progress_dialog,
     	content_box = gtk_dialog_get_content_area(GTK_DIALOG(*progress_dialog));
     	gtk_box_set_spacing(GTK_BOX(content_box), 6);
 
-        gtk_widget_show_all(*progress_dialog);
+        gtk_widget_show(*progress_dialog);
     } else {
     	content_box = gtk_dialog_get_content_area(GTK_DIALOG(*progress_dialog));
     }
@@ -89,8 +89,8 @@ libbalsa_progress_dialog_ensure(GtkWidget   **progress_dialog,
     } else {
     	progress_widget = create_progress_widget(progress_id, progress_id);
     	gtk_revealer_set_reveal_child(GTK_REVEALER(progress_widget), TRUE);
-    	gtk_box_pack_start(GTK_BOX(content_box), progress_widget, FALSE, FALSE, 0);
-    	gtk_widget_show_all(progress_widget);
+    	gtk_box_pack_start(GTK_BOX(content_box), progress_widget);
+    	gtk_widget_show(progress_widget);
     }
 
 	g_mutex_unlock(&progress_mutex);
@@ -217,16 +217,16 @@ create_progress_widget(const gchar *progress_id,
 	gtk_container_add(GTK_CONTAINER(result), box);
 
 	label = gtk_label_new(title);
-	gtk_box_pack_start(GTK_BOX(box), label, FALSE, FALSE, 0);
+	gtk_box_pack_start(GTK_BOX(box), label);
 
 	label = gtk_label_new(" ");
 	gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
 	g_object_set_data(G_OBJECT(result), "label", label);
-	gtk_box_pack_start(GTK_BOX(box), label, FALSE, FALSE, 0);
+	gtk_box_pack_start(GTK_BOX(box), label);
 
 	progress = gtk_progress_bar_new();
 	g_object_set_data(G_OBJECT(result), "progress", progress);
-	gtk_box_pack_start(GTK_BOX(box), progress, FALSE, FALSE, 0);
+	gtk_box_pack_start(GTK_BOX(box), progress);
 
 	return result;
 }

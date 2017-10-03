@@ -1003,7 +1003,7 @@ add_button_to_box(const gchar * label, GCallback cb, gpointer cb_data,
 {
     GtkWidget *button = gtk_button_new_with_mnemonic(label);
     g_signal_connect_swapped(button, "clicked", cb, cb_data);
-    gtk_box_pack_start(GTK_BOX(box), button, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(box), button);
 
     return button;
 }
@@ -1647,7 +1647,7 @@ address_book_set_default_cb(GtkTreeView * tree_view)
 static void
 add_menu_cb(GtkWidget * menu, GtkWidget * widget)
 {
-    gtk_widget_show_all(menu);
+    gtk_widget_show(menu);
 #if GTK_CHECK_VERSION(3, 22, 0)
     gtk_menu_popup_at_widget(GTK_MENU(menu), GTK_WIDGET(widget),
                              GDK_GRAVITY_NORTH_WEST, GDK_GRAVITY_NORTH_WEST,
@@ -2152,22 +2152,19 @@ pm_grid_add_checking_group(GtkWidget * grid_widget)
 
     label = gtk_label_new(_("When mail arrives:"));
     gtk_widget_set_halign(label, GTK_ALIGN_START);
-    gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(hbox), label);
 
     pui->notify_new_mail_dialog =
         gtk_check_button_new_with_label(_("Display message"));
-    gtk_box_pack_start(GTK_BOX(hbox), pui->notify_new_mail_dialog,
-                       FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(hbox), pui->notify_new_mail_dialog);
 
     pui->notify_new_mail_sound =
         gtk_check_button_new_with_label(_("Play sound"));
-    gtk_box_pack_start(GTK_BOX(hbox), pui->notify_new_mail_sound,
-                       FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(hbox), pui->notify_new_mail_sound);
 
     pui->notify_new_mail_icon =
         gtk_check_button_new_with_label(_("Show icon"));
-    gtk_box_pack_start(GTK_BOX(hbox), pui->notify_new_mail_icon,
-                       FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(hbox), pui->notify_new_mail_icon);
 
     pm_grid_attach(grid, hbox, 1, ++row, 3, 1);
 
@@ -3545,7 +3542,7 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
     g_signal_connect(G_OBJECT(property_box), "response",
                      G_CALLBACK(response_cb), NULL);
 
-    gtk_widget_show_all(GTK_WIDGET(property_box));
+    gtk_widget_show(GTK_WIDGET(property_box));
 
 }                               /* open_preferences_manager */
 

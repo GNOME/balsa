@@ -91,9 +91,9 @@ filters_export_dialog(GtkWindow * parent)
                                  NULL, TRUE);
 
     gtk_container_add(GTK_CONTAINER(sw), GTK_WIDGET(list));
-    gtk_box_pack_start(GTK_BOX
-                       (gtk_dialog_get_content_area(GTK_DIALOG(fex_window))),
-                       sw, TRUE, TRUE, 2);
+    gtk_widget_set_vexpand(sw, TRUE);
+    gtk_widget_set_margin_top(sw, 2);
+    gtk_box_pack_start(GTK_BOX(gtk_dialog_get_content_area(GTK_DIALOG(fex_window))), sw);
 
     /* Populate the list of filters */
 
@@ -116,5 +116,5 @@ filters_export_dialog(GtkWindow * parent)
     g_signal_connect(G_OBJECT(fex_window), "destroy",
 		     G_CALLBACK(fex_destroy_window_cb), NULL);
 
-    gtk_widget_show_all(GTK_WIDGET(fex_window));
+    gtk_widget_show(GTK_WIDGET(fex_window));
 }

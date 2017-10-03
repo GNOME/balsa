@@ -295,11 +295,10 @@ balsa_druid_page_directory_init(BalsaDruidPageDirectory * dir,
         g_free(preset);
     }
 
-    gtk_box_pack_start(GTK_BOX(page), GTK_WIDGET(grid), FALSE, TRUE,
-                       0);
-    gtk_widget_show_all(GTK_WIDGET(grid));
+    gtk_box_pack_start(GTK_BOX(page), GTK_WIDGET(grid));
+    gtk_widget_show(GTK_WIDGET(grid));
 
-    gtk_box_pack_end(GTK_BOX(page), verify_button(dir), FALSE, FALSE, 0);
+    gtk_box_pack_end(GTK_BOX(page), verify_button(dir));
 
     g_signal_connect(G_OBJECT(druid), "prepare",
                      G_CALLBACK(balsa_druid_page_directory_prepare),

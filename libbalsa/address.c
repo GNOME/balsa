@@ -964,7 +964,7 @@ libbalsa_address_get_edit_widget(const LibBalsaAddress *address,
 #define HIG_PADDING 6
     gtk_grid_set_row_spacing(GTK_GRID(grid), HIG_PADDING);
     gtk_grid_set_column_spacing(GTK_GRID(grid), HIG_PADDING);
-    gtk_container_set_border_width(GTK_CONTAINER(grid), HIG_PADDING);
+    g_object_set(G_OBJECT(grid), "margin", HIG_PADDING, NULL);
 
     for (cnt = 0; cnt < NUM_FIELDS; cnt++) {
         if (!labels[cnt])
@@ -972,12 +972,12 @@ libbalsa_address_get_edit_widget(const LibBalsaAddress *address,
 	label = gtk_label_new_with_mnemonic(_(labels[cnt]));
 	gtk_widget_set_halign(label, GTK_ALIGN_END);
         if (cnt == EMAIL_ADDRESS) {
-            GtkWidget *box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+            GtkWidget *box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 1);
             GtkWidget *but = gtk_button_new_with_mnemonic(_("A_dd"));
             entries[cnt] = lba_address_list_widget(changed_cb,
                                                    changed_data);
-            gtk_box_pack_start(GTK_BOX(box), label, FALSE, FALSE, 1);
-            gtk_box_pack_start(GTK_BOX(box), but,   FALSE, FALSE, 1);
+            gtk_box_pack_start(GTK_BOX(box), label);
+            gtk_box_pack_start(GTK_BOX(box), but);
             lhs = box;
             g_signal_connect(but, "clicked", G_CALLBACK(add_row),
                              entries[cnt]);
@@ -1025,6 +1025,7 @@ libbalsa_address_get_edit_widget(const LibBalsaAddress *address,
         g_signal_connect_swapped(G_OBJECT(model), "row-deleted",
                                  changed_cb, changed_data);
     }
+
     return grid;
 }
 

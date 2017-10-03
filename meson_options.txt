@@ -35,7 +35,7 @@ option('gss',
 
 option('html-widget',
   type        : 'combo',
-  choices     : ['webkit2', 'webkit', 'gtkhtml4'],
+  choices     : ['webkit2', 'webkit', 'gtkhtml4', 'none'],
   value       : 'webkit2',
   description : 'select the HTML renderer (default webkit2)')
 

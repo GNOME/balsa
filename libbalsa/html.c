@@ -144,13 +144,9 @@ html2text(gchar ** text, gsize len)
 /* WebKitContextMenuItem uses GtkAction, which is deprecated.
  * We don't use it, but it breaks the git-tree build, so we just mangle
  * it: */
-#if defined(GTK_DISABLE_DEPRECATED)
 #define GtkAction GAction
 #include <webkit2/webkit2.h>
 #undef GtkAction
-#else  /* defined(GTK_DISABLE_DEPRECATED) */
-#include <webkit2/webkit2.h>
-#endif /* defined(GTK_DISABLE_DEPRECATED) */
 
 typedef struct {
     LibBalsaMessageBody  *body;
@@ -638,12 +634,13 @@ libbalsa_html_new(LibBalsaMessageBody * body,
 
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     g_object_set_data(G_OBJECT(vbox), "libbalsa-html-web-view", web_view);
-    gtk_box_pack_end(GTK_BOX(vbox), widget, TRUE, TRUE, 0);
+    gtk_widget_set_vexpand(widget, TRUE);
+    gtk_box_pack_end(GTK_BOX(vbox), widget);
 
     /* Simple check for possible resource requests: */
     if (g_regex_match_simple(src_regex, text, G_REGEX_CASELESS, 0)) {
         info->info_bar = lbh_info_bar(info);
-        gtk_box_pack_start(GTK_BOX(vbox), info->info_bar, FALSE, FALSE, 0);
+        gtk_box_pack_start(GTK_BOX(vbox), info->info_bar);
         d(g_print("%s shows info_bar\n", __func__));
     }
 
@@ -1088,8 +1085,7 @@ lbh_show_info_bar(LibBalsaWebKitInfo * info)
                                      GTK_RESPONSE_OK,
                                      _("_Close"), GTK_RESPONSE_CLOSE,
                                      NULL);
-    gtk_box_pack_start(GTK_BOX(info->vbox), info_bar_widget,
-                       FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(info->vbox), info_bar_widget);
 
     info_bar = GTK_INFO_BAR(info_bar_widget);
 
@@ -1269,7 +1265,8 @@ libbalsa_html_new(LibBalsaMessageBody * body,
     info->vbox = vbox     = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 
     widget = webkit_web_view_new();
-    gtk_box_pack_end(GTK_BOX(vbox), widget, TRUE, TRUE, 0);
+    gtk_widget_set_vexpand(widget, TRUE);
+    gtk_box_pack_end(GTK_BOX(vbox), widget);
 
     info->web_view = web_view = WEBKIT_WEB_VIEW(widget);
     g_object_set_data(G_OBJECT(vbox), "libbalsa-html-web-view", web_view);

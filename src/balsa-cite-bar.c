@@ -35,14 +35,15 @@ struct _BalsaCiteBarClass {
     GtkWidgetClass parent_class;
 };
 
-static void balsa_cite_bar_get_preferred_width (GtkWidget * widget,
-                                                gint      * minimum_width,
-                                                gint      * natural_width);
-static void balsa_cite_bar_get_preferred_height(GtkWidget * widget,
-                                                gint      * minimum_height,
-                                                gint      * natural_height);
-static gboolean balsa_cite_bar_draw            (GtkWidget * widget,
-                                                cairo_t   * cr);
+static void balsa_cite_bar_measure  (GtkWidget    * widget,
+                                     GtkOrientation orientation,
+                                     gint           for_size,
+                                     gint         * minimum,
+                                     gint         * natural,
+                                     gint         * minimum_baseline,
+                                     gint         * natural_baseline);
+static gboolean balsa_cite_bar_draw (GtkWidget    * widget,
+                                     cairo_t      * cr);
 
 G_DEFINE_TYPE(BalsaCiteBar, balsa_cite_bar, GTK_TYPE_WIDGET)
 
@@ -57,9 +58,8 @@ balsa_cite_bar_class_init(BalsaCiteBarClass * class)
 
     parent_class = g_type_class_peek_parent(class);
 
-    widget_class->get_preferred_width  = balsa_cite_bar_get_preferred_width;
-    widget_class->get_preferred_height = balsa_cite_bar_get_preferred_height;
-    widget_class->draw                 = balsa_cite_bar_draw;
+    widget_class->measure = balsa_cite_bar_measure;
+    widget_class->draw    = balsa_cite_bar_draw;
 }
 
 static void
@@ -100,27 +100,26 @@ balsa_cite_bar_resize(BalsaCiteBar * cite_bar, gint height)
 }
 
 static void
-balsa_cite_bar_get_preferred_width(GtkWidget * widget,
-                                   gint      * minimum_width,
-                                   gint      * natural_width)
+balsa_cite_bar_measure(GtkWidget    * widget,
+                       GtkOrientation orientation,
+                       gint           for_size,
+                       gint         * minimum,
+                       gint         * natural,
+                       gint         * minimum_baseline,
+                       gint         * natural_baseline)
 {
     BalsaCiteBar *cite_bar;
 
     cite_bar = BALSA_CITE_BAR(widget);
-    *minimum_width = *natural_width =
-        cite_bar->bars * (cite_bar->width + cite_bar->space) -
-        cite_bar->space;
-}
 
-static void
-balsa_cite_bar_get_preferred_height(GtkWidget * widget,
-                                    gint      * minimum_height,
-                                    gint      * natural_height)
-{
-    BalsaCiteBar *cite_bar;
-
-    cite_bar = BALSA_CITE_BAR(widget);
-    *minimum_height = *natural_height = cite_bar->height;
+    if (orientation == GTK_ORIENTATION_HORIZONTAL) {
+        *minimum = *natural =
+            cite_bar->bars * (cite_bar->width + cite_bar->space) -
+            cite_bar->space;
+    } else {
+        *minimum = *natural = cite_bar->height;
+    }
+    *minimum_baseline = *natural_baseline = 0;
 }
 
 static gboolean
@@ -132,7 +131,7 @@ balsa_cite_bar_draw(GtkWidget * widget, cairo_t * cr)
     int n, x;
 
     context = gtk_widget_get_style_context(widget);
-    gtk_style_context_get_color(context, GTK_STATE_FLAG_NORMAL, &rgba);
+    gtk_style_context_get_color(context, &rgba);
     gdk_cairo_set_source_rgba(cr, &rgba);
 
     cite_bar = BALSA_CITE_BAR(widget);

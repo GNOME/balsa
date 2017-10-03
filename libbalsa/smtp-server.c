@@ -491,7 +491,7 @@ libbalsa_smtp_server_dialog(LibBalsaSmtpServer * smtp_server,
     /* notebook page with basic options */
     grid = libbalsa_create_grid();
     row = 0;
-    gtk_container_set_border_width(GTK_CONTAINER(grid), HIG_PADDING);
+    g_object_set(G_OBJECT(grid), "margin", HIG_PADDING, NULL);
     gtk_notebook_append_page(GTK_NOTEBOOK(notebook), grid,
                              gtk_label_new_with_mnemonic(_("_Basic")));
 
@@ -543,7 +543,7 @@ libbalsa_smtp_server_dialog(LibBalsaSmtpServer * smtp_server,
     /* notebook page with advanced options */
     grid = libbalsa_create_grid();
     row = 0;
-    gtk_container_set_border_width(GTK_CONTAINER(grid), HIG_PADDING);
+    g_object_set(G_OBJECT(grid), "margin", HIG_PADDING, NULL);
     gtk_notebook_append_page(GTK_NOTEBOOK(notebook), grid,
                              gtk_label_new_with_mnemonic(_("_Advanced")));
 
@@ -575,9 +575,10 @@ libbalsa_smtp_server_dialog(LibBalsaSmtpServer * smtp_server,
     gtk_grid_attach(GTK_GRID(grid), sdi->split_button, 0, ++row, 1, 1);
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 6);
     sdi->big_message = gtk_spin_button_new_with_range(0.1, 100, 0.1);
-    gtk_box_pack_start(GTK_BOX(hbox), sdi->big_message, TRUE, TRUE, 0);
+    gtk_widget_set_hexpand(sdi->big_message, TRUE);
+    gtk_box_pack_start(GTK_BOX(hbox), sdi->big_message);
     label = gtk_label_new(_("MB"));
-    gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(hbox), label);
     if (smtp_server->big_message > 0) {
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(sdi->split_button), TRUE);
         /* The widget is in MB, but big_message is stored in kB. */
@@ -593,5 +594,5 @@ libbalsa_smtp_server_dialog(LibBalsaSmtpServer * smtp_server,
 
     smtp_server_changed(NULL, sdi);
 
-    gtk_widget_show_all(dialog);
+    gtk_widget_show(dialog);
 }

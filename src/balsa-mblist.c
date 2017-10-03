@@ -109,7 +109,7 @@ static gint bmbl_row_compare(GtkTreeModel * model,
                              GtkTreeIter * iter1,
                              GtkTreeIter * iter2, gpointer data);
 static gboolean bmbl_button_press_cb(GtkWidget * widget,
-                                     GdkEventButton * event,
+                                     GdkEvent * event,
                                      gpointer data);
 static void bmbl_column_resize(GtkWidget * widget,
                                GtkAllocation * allocation, gpointer data);
@@ -135,7 +135,7 @@ static gboolean bmbl_store_redraw_mbnode(GtkTreeIter * iter,
 static void bmbl_node_style(GtkTreeModel * model, GtkTreeIter * iter);
 static gint bmbl_core_mailbox(LibBalsaMailbox * mailbox);
 static void bmbl_do_popup(GtkTreeView * tree_view, GtkTreePath * path,
-                          GdkEventButton * event);
+                          GdkEvent * event);
 static void bmbl_expand_to_row(BalsaMBList * mblist, GtkTreePath * path);
 /* end of prototypes */
 
@@ -682,17 +682,18 @@ bmbl_row_compare(GtkTreeModel * model, GtkTreeIter * iter1,
    (clicking on folders is passed to GtkTreeView and may trigger expand events
 */
 static gboolean
-bmbl_button_press_cb(GtkWidget * widget, GdkEventButton * event,
+bmbl_button_press_cb(GtkWidget * widget, GdkEvent * event,
                      gpointer data)
 {
     GtkTreeView *tree_view = GTK_TREE_VIEW(widget);
     GtkTreePath *path;
+    gdouble x_win, y_win;
 
     if (!gdk_event_triggers_context_menu((GdkEvent *) event)
-        || event->window != gtk_tree_view_get_bin_window(tree_view))
+        || !gdk_event_get_coords(event, &x_win, &y_win))
         return FALSE;
 
-    if (!gtk_tree_view_get_path_at_pos(tree_view, event->x, event->y,
+    if (!gtk_tree_view_get_path_at_pos(tree_view, (gint) x_win, (gint) y_win,
                                        &path, NULL, NULL, NULL))
         path = NULL;
     bmbl_do_popup(tree_view, path, event);
@@ -722,13 +723,9 @@ bmbl_popup_menu(GtkWidget * widget)
  */
 static void
 bmbl_do_popup(GtkTreeView * tree_view, GtkTreePath * path,
-              GdkEventButton * event)
+              GdkEvent * event)
 {
     BalsaMailboxNode *mbnode = NULL;
-#if !GTK_CHECK_VERSION(3, 22, 0)
-    gint event_button;
-    guint event_time;
-#endif                          /*GTK_CHECK_VERSION(3, 22, 0) */
     GtkWidget *menu;
 
     if (path) {
@@ -740,30 +737,16 @@ bmbl_do_popup(GtkTreeView * tree_view, GtkTreePath * path,
         gtk_tree_path_free(path);
     }
 
-#if !GTK_CHECK_VERSION(3, 22, 0)
-    if (event) {
-        event_button = event->button;
-        event_time = event->time;
-    } else {
-        event_button = 0;
-        event_time = gtk_get_current_event_time();
-    }
-#endif                          /*GTK_CHECK_VERSION(3, 22, 0) */
 
     menu = balsa_mailbox_node_get_context_menu(mbnode);
     g_object_ref(menu);
     g_object_ref_sink(menu);
-#if GTK_CHECK_VERSION(3, 22, 0)
     if (event)
-        gtk_menu_popup_at_pointer(GTK_MENU(menu), (GdkEvent *) event);
+        gtk_menu_popup_at_pointer(GTK_MENU(menu), event);
     else
         gtk_menu_popup_at_widget(GTK_MENU(menu), GTK_WIDGET(tree_view),
                                  GDK_GRAVITY_CENTER, GDK_GRAVITY_CENTER,
                                  NULL);
-#else                           /*GTK_CHECK_VERSION(3, 22, 0) */
-    gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL,
-		   event_button, event_time);
-#endif                          /*GTK_CHECK_VERSION(3, 22, 0) */
     g_object_unref(menu);
 
     if (mbnode)
@@ -885,6 +868,8 @@ bmbl_select_mailbox(GtkTreeSelection * selection, gpointer data)
     GtkTreeModel *model =
         gtk_tree_view_get_model(tree_view);
     GtkTreePath *path;
+    guint button;
+    gdouble x_win, y_win;
 
     if (!event) {
 	GtkTreeIter iter;
@@ -906,18 +891,17 @@ bmbl_select_mailbox(GtkTreeSelection * selection, gpointer data)
 	g_signal_handlers_unblock_by_func(selection, bmbl_select_mailbox, NULL);
         return;
     }
-    if (event->type != GDK_BUTTON_PRESS
+    if (gdk_event_get_event_type(event) != GDK_BUTTON_PRESS
             /* keyboard navigation */
-        || event->button.button != 1
+        || !(gdk_event_get_button(event, &button) && button == 1)
             /* soft select */
-        || event->button.window != gtk_tree_view_get_bin_window(tree_view)
-            /* click on a different widget */ ) {
+        || !gdk_event_get_coords(event, &x_win, &y_win)) {
         gdk_event_free(event);
         return;
     }
 
-    if (!gtk_tree_view_get_path_at_pos(tree_view, event->button.x,
-                                       event->button.y, &path,
+    if (!gtk_tree_view_get_path_at_pos(tree_view, (gint) x_win,
+                                       (gint) y_win, &path,
                                        NULL, NULL, NULL)) {
         /* GtkTreeView selects the first node in the tree when the
          * widget first gets the focus, whether it's a keyboard event or
@@ -1772,7 +1756,7 @@ bmbl_mru_menu(GtkWindow * window, GList ** url_list,
                           G_CALLBACK(bmbl_mru_show_tree), mru,
                           (GClosureNotify) g_free, (GConnectFlags) 0);
 
-    gtk_widget_show_all(menu);
+    gtk_widget_show(menu);
 
     return menu;
 }
@@ -1880,7 +1864,7 @@ bmbl_mru_show_tree(GtkWidget * widget, gpointer data)
                                    GTK_POLICY_AUTOMATIC,
                                    GTK_POLICY_AUTOMATIC);
     gtk_container_add(GTK_CONTAINER(scroll), mblist);
-    gtk_widget_show_all(scroll);
+    gtk_widget_show(scroll);
 
     dialog =
         gtk_dialog_new_with_buttons(_("Choose destination folder"),
@@ -1892,9 +1876,10 @@ bmbl_mru_show_tree(GtkWidget * widget, gpointer data)
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu_for_parent(dialog, mru->window);
 #endif
+    gtk_widget_set_vexpand(scroll, TRUE);
     gtk_box_pack_start(GTK_BOX
                       (gtk_dialog_get_content_area(GTK_DIALOG(dialog))),
-                      scroll, TRUE, TRUE, 0);
+                      scroll);
 
     g_signal_connect(dialog, "size-allocate",
                      G_CALLBACK(bmbl_mru_size_allocate_cb), NULL);
@@ -1922,6 +1907,7 @@ bmbl_mru_selected_cb(GtkTreeSelection * selection, gpointer data)
     GdkEvent *event;
     GtkTreeView *tree_view;
     GtkTreePath *path;
+    gdouble x_win, y_win;
 
     if (!data)
         return;
@@ -1931,9 +1917,10 @@ bmbl_mru_selected_cb(GtkTreeSelection * selection, gpointer data)
         return;
 
     tree_view = gtk_tree_selection_get_tree_view(selection);
-    if (event->type != GDK_BUTTON_PRESS ||
-        !gtk_tree_view_get_path_at_pos(tree_view, event->button.x,
-                                       event->button.y, &path,
+    if (gdk_event_get_event_type(event) != GDK_BUTTON_PRESS ||
+        !gdk_event_get_coords(event, &x_win, &y_win) ||
+        !gtk_tree_view_get_path_at_pos(tree_view, (gint) x_win,
+                                       (gint) y_win, &path,
                                        NULL, NULL, NULL)) {
         gtk_tree_selection_unselect_all(selection);
         gdk_event_free(event);

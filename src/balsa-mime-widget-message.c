@@ -130,12 +130,11 @@ balsa_mime_widget_new_message(BalsaMessage * bm,
 	mw->widget = gtk_frame_new(NULL);
 
 	mw->container = gtk_box_new(GTK_ORIENTATION_VERTICAL, BMW_MESSAGE_PADDING);
-	gtk_container_set_border_width(GTK_CONTAINER(mw->container),
-				       BMW_MESSAGE_PADDING);
+	g_object_set(G_OBJECT(mw->container), "margin", BMW_MESSAGE_PADDING, NULL);
 	gtk_container_add(GTK_CONTAINER(mw->widget), mw->container);
 
         mw->header_widget = emb_hdrs = bm_header_widget_new(bm, NULL);
-	gtk_box_pack_start(GTK_BOX(mw->container), emb_hdrs, FALSE, FALSE, 0);
+	gtk_box_pack_start(GTK_BOX(mw->container), emb_hdrs);
 
         bmw_message_set_headers(bm, mw, mime_body,
                                 bm->shown_headers == HEADERS_ALL);
@@ -227,18 +226,16 @@ bmw_message_extbody_url(LibBalsaMessageBody * mime_body,
 
     /* now create & return the widget... */
     mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
-    
-    mw->widget = gtk_box_new(GTK_ORIENTATION_VERTICAL, BMW_VBOX_SPACE);
-    gtk_container_set_border_width(GTK_CONTAINER(mw->widget),
-				   BMW_CONTAINER_BORDER);
 
-    gtk_box_pack_start(GTK_BOX(mw->widget), gtk_label_new(msg->str), FALSE,
-		       FALSE, 0);
+    mw->widget = gtk_box_new(GTK_ORIENTATION_VERTICAL, BMW_VBOX_SPACE);
+    g_object_set(G_OBJECT(mw->widget), "margin", BMW_CONTAINER_BORDER, NULL);
+
+    gtk_box_pack_start(GTK_BOX(mw->widget), gtk_label_new(msg->str));
     g_string_free(msg, TRUE);
 
     button = gtk_button_new_with_label(url);
-    gtk_box_pack_start(GTK_BOX(mw->widget), button, FALSE, FALSE,
-		       BMW_BUTTON_PACK_SPACE);
+    gtk_widget_set_margin_top(button, BMW_BUTTON_PACK_SPACE);
+    gtk_box_pack_start(GTK_BOX(mw->widget), button);
     g_object_set_data_full(G_OBJECT(button), "call_url", url,
 			   (GDestroyNotify) g_free);
     g_signal_connect(G_OBJECT(button), "clicked",
@@ -276,18 +273,16 @@ bmw_message_extbody_mail(LibBalsaMessageBody * mime_body)
     mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
     
     mw->widget = gtk_box_new(GTK_ORIENTATION_VERTICAL, BMW_VBOX_SPACE);
-    gtk_container_set_border_width(GTK_CONTAINER(mw->widget),
-				   BMW_CONTAINER_BORDER);
+    g_object_set(G_OBJECT(mw->widget), "margin", BMW_CONTAINER_BORDER, NULL);
 
-    gtk_box_pack_start(GTK_BOX(mw->widget), gtk_label_new(msg->str), FALSE,
-		       FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(mw->widget), gtk_label_new(msg->str));
     g_string_free(msg, TRUE);
 
     button =
 	gtk_button_new_with_mnemonic(_
 				     ("Se_nd message to obtain this part"));
-    gtk_box_pack_start(GTK_BOX(mw->widget), button, FALSE, FALSE,
-		       BMW_BUTTON_PACK_SPACE);
+    gtk_widget_set_margin_top(button, BMW_BUTTON_PACK_SPACE);
+    gtk_box_pack_start(GTK_BOX(mw->widget), button);
     g_signal_connect(G_OBJECT(button), "clicked",
 		     G_CALLBACK(extbody_send_mail), (gpointer) mime_body);
 
@@ -402,14 +397,16 @@ balsa_mime_widget_new_message_tl(BalsaMessage * bm,
     mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
 
     mw->widget = gtk_box_new(GTK_ORIENTATION_VERTICAL, BMW_MESSAGE_PADDING);
-    gtk_container_set_border_width(GTK_CONTAINER(mw->widget), BMW_MESSAGE_PADDING);
+    g_object_set(G_OBJECT(mw->widget), "margin", BMW_MESSAGE_PADDING, NULL);
 
     mw->header_widget = headers = bm_header_widget_new(bm, tl_buttons);
-    gtk_box_pack_start(GTK_BOX(mw->widget), headers, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(mw->widget), headers);
 
     mw->container = gtk_box_new(GTK_ORIENTATION_VERTICAL, BMW_MESSAGE_PADDING);
-    gtk_box_pack_start(GTK_BOX(mw->widget), mw->container, TRUE, TRUE,
-		       BMW_CONTAINER_BORDER - BMW_MESSAGE_PADDING);
+    gtk_widget_set_vexpand(mw->container, TRUE);
+    gtk_widget_set_margin_top(mw->container,
+                              BMW_CONTAINER_BORDER - BMW_MESSAGE_PADDING);
+    gtk_box_pack_start(GTK_BOX(mw->widget), mw->container);
 
     return mw;
 }
@@ -455,7 +452,7 @@ bm_header_extend_popup(GtkWidget * widget, GtkMenu * menu, gpointer arg)
                               G_CALLBACK(balsa_message_copy_part), arg);
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(menu_item),
                               submenu);
-    gtk_widget_show_all(submenu);
+    gtk_widget_show(submenu);
 }
 
 static GtkWidget *
@@ -486,12 +483,12 @@ bm_header_widget_new(BalsaMessage * bm, GtkWidget * const * buttons)
 #ifdef GTK_INFO_BAR_WRAPPING_IS_BROKEN
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
     gtk_container_add(GTK_CONTAINER(hbox), grid);
-    gtk_container_set_border_width(GTK_CONTAINER(hbox), 6);
+    g_object_set(G_OBJECT(hbox), "margin", 6, NULL);
 
     action_area = gtk_button_box_new(GTK_ORIENTATION_VERTICAL);
     gtk_button_box_set_layout(GTK_BUTTON_BOX(action_area),
                               GTK_BUTTONBOX_START);
-    gtk_box_pack_end(GTK_BOX(hbox), action_area, FALSE, TRUE, 0);
+    gtk_box_pack_end(GTK_BOX(hbox), action_area);
 #else                           /* GTK_INFO_BAR_WRAPPING_IS_BROKEN */
     info_bar_widget = gtk_info_bar_new();
     info_bar = GTK_INFO_BAR(info_bar_widget);
@@ -584,7 +581,7 @@ add_header_gchar(GtkGrid * grid, const gchar * header, const gchar * label,
     }
 
     css_provider = gtk_css_provider_new();
-    gtk_css_provider_load_from_data(css_provider, css, -1, NULL);
+    gtk_css_provider_load_from_data(css_provider, css, -1);
     g_free(css);
 
     lab = gtk_label_new(label);
@@ -644,7 +641,7 @@ add_header_gchar(GtkGrid * grid, const gchar * header, const gchar * label,
         hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
         gtk_container_add(GTK_CONTAINER(hbox), value_label);
         gtk_container_add(GTK_CONTAINER(hbox), expander);
-        gtk_widget_show_all(hbox);
+        gtk_widget_show(hbox);
         gtk_grid_attach_next_to(grid, hbox, lab, GTK_POS_RIGHT, 1, 1);
     }
 

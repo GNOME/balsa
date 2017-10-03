@@ -137,7 +137,7 @@ balsa_init_begin(void)
     gtk_window_set_title(GTK_WINDOW(assistant), _("Configure Balsa"));
 
     balsa_initdruid(GTK_ASSISTANT(assistant));
-    gtk_widget_show_all(assistant);
+    gtk_widget_show(assistant);
 
     gtk_main();
 

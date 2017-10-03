@@ -87,7 +87,7 @@ balsa_druid_page_user_init(BalsaDruidPageUser * user,
     user->ed4.master = &(user->emaster);
     label = GTK_LABEL(gtk_label_new(_(header2)));
     gtk_label_set_line_wrap(label, TRUE);
-    gtk_box_pack_start(GTK_BOX(page), GTK_WIDGET(label), FALSE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(page), GTK_WIDGET(label));
 
     grid = GTK_GRID(gtk_grid_new());
     gtk_grid_set_row_spacing(grid, 2);
@@ -150,7 +150,8 @@ balsa_druid_page_user_init(BalsaDruidPageUser * user,
                                &(user->ed4), druid, page,
                                &(user->localmaildir));
     g_free(preset);
-    gtk_box_pack_start(GTK_BOX(page), GTK_WIDGET(grid), FALSE, FALSE, 3);
+    gtk_widget_set_margin_top(GTK_WIDGET(grid), 3);
+    gtk_box_pack_start(GTK_BOX(page), GTK_WIDGET(grid));
 
     user->need_set = FALSE;
 }

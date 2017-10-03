@@ -5,14 +5,14 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option) 
+ * the Free Software Foundation; either version 2, or (at your option)
  * any later version.
- *  
+ *
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
@@ -211,14 +211,15 @@ build_left_side(void)
 
     gtk_container_add(GTK_CONTAINER(sw), GTK_WIDGET(fe_filters_list));
 
-    gtk_box_pack_start(GTK_BOX(vbox), sw, TRUE, TRUE, 2);
+    gtk_widget_set_vexpand(sw, TRUE);
+    gtk_box_pack_start(GTK_BOX(vbox), sw);
 
     /* new and delete buttons */
     bbox = gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL);
     gtk_box_set_spacing(GTK_BOX(bbox), 2);
     gtk_button_box_set_layout(GTK_BUTTON_BOX(bbox), GTK_BUTTONBOX_SPREAD);
 
-    gtk_box_pack_start(GTK_BOX(vbox), bbox, FALSE, FALSE, 2);
+    gtk_box_pack_start(GTK_BOX(vbox), bbox);
 
     /* new button */
     /* Translators: button "New" filter */
@@ -283,8 +284,7 @@ build_match_page()
 						NULL, NULL);
     g_signal_connect(fe_op_codes_option_menu, "changed",
                      G_CALLBACK(fe_action_changed), NULL);
-    gtk_box_pack_start(GTK_BOX(box), fe_op_codes_option_menu, FALSE, FALSE,
-		       2);
+    gtk_box_pack_start(GTK_BOX(box), fe_op_codes_option_menu);
 
     /* list of conditions defining how this filter matches */
 
@@ -385,12 +385,12 @@ build_action_page(GtkWindow * window)
     frame = gtk_frame_new(_("Notification:"));
     gtk_frame_set_label_align(GTK_FRAME(frame), GTK_POS_LEFT, GTK_POS_TOP);
     gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_ETCHED_IN);
-    gtk_box_pack_start(GTK_BOX(page), frame, FALSE, FALSE, 0);
-    gtk_container_set_border_width(GTK_CONTAINER(frame), 3);
+    gtk_box_pack_start(GTK_BOX(page), frame);
 
     grid = gtk_grid_new();
     gtk_grid_set_row_spacing(GTK_GRID(grid), 5);
     gtk_grid_set_column_spacing(GTK_GRID(grid), 5);
+    g_object_set(G_OBJECT(grid), "margin", 3, NULL);
     gtk_container_add(GTK_CONTAINER(frame), grid);
 
     /* Notification buttons */
@@ -422,7 +422,7 @@ build_action_page(GtkWindow * window)
     gtk_grid_attach(GTK_GRID(grid), fe_popup_button, 0, 1, 1, 1);
     fe_popup_entry = gtk_entry_new();
     gtk_widget_set_hexpand(fe_popup_entry, TRUE);
-    gtk_entry_set_max_length(GTK_ENTRY(fe_popup_entry), 
+    gtk_entry_set_max_length(GTK_ENTRY(fe_popup_entry),
                              FILTER_EDIT_ENTRY_MAX_LENGTH);
     gtk_grid_attach(GTK_GRID(grid), fe_popup_entry, 1, 1, 1, 1);
     /* fe_popup_entry is initially sensitive, so to be consistent
@@ -437,18 +437,18 @@ build_action_page(GtkWindow * window)
     frame = gtk_frame_new(_("Action to perform:"));
     gtk_frame_set_label_align(GTK_FRAME(frame), GTK_POS_LEFT, GTK_POS_TOP);
     gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_ETCHED_IN);
-    gtk_box_pack_start(GTK_BOX(page), frame, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(page), frame);
 
     box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 2);
     gtk_box_set_homogeneous(GTK_BOX(box), TRUE);
-    gtk_container_set_border_width(GTK_CONTAINER(frame), 3);
+    g_object_set(G_OBJECT(box), "margin", 3, NULL);
     gtk_container_add(GTK_CONTAINER(frame), box);
 
     fe_action_option_menu =
         fe_build_option_menu(fe_actions, ELEMENTS(fe_actions),
                              G_CALLBACK(fe_action_selected), NULL);
-    gtk_box_pack_start(GTK_BOX(box), fe_action_option_menu,
-                       TRUE, FALSE, 1);
+    gtk_widget_set_vexpand(fe_action_option_menu, TRUE);
+    gtk_box_pack_start(GTK_BOX(box), fe_action_option_menu);
 
     /* FIXME : we use the global mru folder list, perhaps we should use
        our own. We'll see this later, for now let's make something usable
@@ -459,10 +459,12 @@ build_action_page(GtkWindow * window)
 						&balsa_app.folder_mru);
     g_signal_connect(G_OBJECT(fe_mailboxes), "changed",
                      G_CALLBACK(fe_action_changed), NULL);
-    gtk_box_pack_start(GTK_BOX(box), fe_mailboxes, TRUE, FALSE, 1);
+    gtk_widget_set_vexpand(fe_mailboxes, TRUE);
+    gtk_box_pack_start(GTK_BOX(box), fe_mailboxes);
 
     fe_color_buttons = fe_make_color_buttons();
-    gtk_box_pack_start(GTK_BOX(box), fe_color_buttons, TRUE, FALSE, 1);
+    gtk_widget_set_vexpand(fe_color_buttons, TRUE);
+    gtk_box_pack_start(GTK_BOX(box), fe_color_buttons);
     return page;
 }				/* end build_action_page() */
 
@@ -484,7 +486,8 @@ build_right_side(GtkWindow * window)
     /* the main notebook */
     notebook = gtk_notebook_new();
     gtk_notebook_set_tab_pos(GTK_NOTEBOOK(notebook), GTK_POS_TOP);
-    gtk_box_pack_start(GTK_BOX(rightside), notebook, TRUE, TRUE, 0);
+    gtk_widget_set_vexpand(notebook, TRUE);
+    gtk_box_pack_start(GTK_BOX(rightside), notebook);
 
     page = build_match_page();
     gtk_notebook_append_page(GTK_NOTEBOOK(notebook),
@@ -495,7 +498,7 @@ build_right_side(GtkWindow * window)
 
     /* button box */
     bbox = gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL);
-    gtk_box_pack_start(GTK_BOX(rightside), bbox, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(rightside), bbox);
 
     fe_apply_button = gtk_button_new_with_mnemonic(_("_Apply"));
     g_signal_connect(G_OBJECT(fe_apply_button), "clicked",
@@ -561,7 +564,7 @@ filters_edit_dialog(GtkWindow * parent)
 	gtk_window_present(GTK_WINDOW(fe_window));
 	return;
     }
-    
+
     fe_already_open=TRUE;
 
     piece = build_left_side();
@@ -585,26 +588,25 @@ filters_edit_dialog(GtkWindow * parent)
 
     /* main hbox */
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, FILTER_EDIT_PADDING);
-    gtk_box_pack_start(GTK_BOX
-                       (gtk_dialog_get_content_area(GTK_DIALOG(fe_window))),
-                       hbox, TRUE, TRUE, FILTER_EDIT_PADDING);
-    gtk_box_pack_start(GTK_BOX(hbox), piece, FALSE, FALSE,
-                       FILTER_EDIT_PADDING);
+    gtk_widget_set_vexpand(hbox, TRUE);
+    gtk_box_pack_start(GTK_BOX(gtk_dialog_get_content_area(GTK_DIALOG(fe_window))), hbox);
+    gtk_widget_set_margin_top(piece, FILTER_EDIT_PADDING);
+    gtk_box_pack_start(GTK_BOX(hbox), piece);
 
     gtk_box_pack_start(GTK_BOX(hbox),
-                       gtk_separator_new(GTK_ORIENTATION_VERTICAL),
-                       FALSE, FALSE, 0);
+                       gtk_separator_new(GTK_ORIENTATION_VERTICAL));
 
     fe_right_page = build_right_side(GTK_WINDOW(fe_window));
     gtk_widget_set_sensitive(fe_right_page, FALSE);
-    gtk_box_pack_start(GTK_BOX(hbox), fe_right_page, TRUE, TRUE,
-                       FILTER_EDIT_PADDING);
+    gtk_widget_set_hexpand(fe_right_page, TRUE);
+    gtk_widget_set_margin_top(fe_right_page, FILTER_EDIT_PADDING);
+    gtk_box_pack_start(GTK_BOX(hbox), fe_right_page);
 
     fe_user_headers_list = NULL;
 
     /* Populate the list of filters */
     model = gtk_tree_view_get_model(fe_filters_list);
-    for(filter_list=balsa_app.filters; 
+    for(filter_list=balsa_app.filters;
         filter_list; filter_list=g_slist_next(filter_list)) {
 
 	fil=(LibBalsaFilter*)filter_list->data;
@@ -640,11 +642,11 @@ filters_edit_dialog(GtkWindow * parent)
 	fe_collect_user_headers(fil->condition);
 
 	cpfil->action=fil->action;
-	if (fil->action_string) 
-            cpfil->action_string=g_strdup(fil->action_string);	
+	if (fil->action_string)
+            cpfil->action_string=g_strdup(fil->action_string);
 
         gtk_list_store_append(GTK_LIST_STORE(model), &iter);
-        gtk_list_store_set(GTK_LIST_STORE(model), &iter, 
+        gtk_list_store_set(GTK_LIST_STORE(model), &iter,
                            0, cpfil->name, 1, cpfil, -1);
     }
 
@@ -654,7 +656,7 @@ filters_edit_dialog(GtkWindow * parent)
 	return;
     }
 
-    gtk_widget_show_all(GTK_WIDGET(fe_window));
+    gtk_widget_show(GTK_WIDGET(fe_window));
     if (gtk_tree_model_get_iter_first(model, &iter)) {
         GtkTreeSelection *selection =
             gtk_tree_view_get_selection(fe_filters_list);

@@ -82,7 +82,7 @@ static void bndx_mailbox_changed_cb(LibBalsaMailbox * mailbox,
 static void bndx_selection_changed(GtkTreeSelection * selection,
                                    BalsaIndex * index);
 static gboolean bndx_button_event_press_cb(GtkWidget * tree_view,
-                                           GdkEventButton * event,
+                                           GdkEvent * event,
                                            gpointer data);
 static void bndx_row_activated(GtkTreeView * tree_view, GtkTreePath * path,
                                GtkTreeViewColumn * column,
@@ -118,7 +118,7 @@ static void bndx_drag_cb(GtkWidget* widget,
 
 /* Popup menu */
 static GtkWidget* bndx_popup_menu_create(BalsaIndex * index);
-static void bndx_do_popup(BalsaIndex * index, GdkEventButton * event);
+static void bndx_do_popup(BalsaIndex * index, GdkEvent * event);
 static GtkWidget *create_stock_menu_item(GtkWidget * menu,
                                          const gchar * label,
                                          GCallback cb, gpointer data);
@@ -277,20 +277,16 @@ static gint
 bndx_string_width(const gchar * text)
 {
     GtkWidget *label;
-    GtkWidget *window;
-    GtkAllocation allocation;
+    gint natural_width;
 
     label = gtk_label_new(NULL);
     gtk_label_set_markup((GtkLabel *) label, text);
+    gtk_widget_measure(label, GTK_ORIENTATION_HORIZONTAL,
+                       300, NULL, &natural_width, NULL, NULL);
+    g_object_ref_sink(label);
+    g_object_unref(label);
 
-    window = gtk_offscreen_window_new();
-    gtk_container_add(GTK_CONTAINER(window), label);
-    gtk_widget_show_all(window);
-
-    gtk_widget_get_allocation(window, &allocation);
-    gtk_widget_destroy(window);
-
-    return allocation.width;
+    return natural_width;
 }
 
 /* BalsaIndex instance init method; no tree store is set on the tree
@@ -460,7 +456,7 @@ bndx_instance_init(BalsaIndex * index)
                      G_CALLBACK(bndx_drag_cb), NULL);
 
     balsa_index_set_column_widths(index);
-    gtk_widget_show_all (GTK_WIDGET(index));
+    gtk_widget_show (GTK_WIDGET(index));
 }
 
 /*
@@ -606,16 +602,17 @@ bndx_selection_changed(GtkTreeSelection * selection, BalsaIndex * index)
 }
 
 static gboolean
-bndx_button_event_press_cb(GtkWidget * widget, GdkEventButton * event,
+bndx_button_event_press_cb(GtkWidget * widget, GdkEvent * event,
                            gpointer data)
 {
     GtkTreeView *tree_view = GTK_TREE_VIEW(widget);
     GtkTreePath *path;
     BalsaIndex *index = BALSA_INDEX(widget);
+    gdouble x_win, y_win;
 
     g_return_val_if_fail(event, FALSE);
     if (!gdk_event_triggers_context_menu((GdkEvent *) event)
-        || event->window != gtk_tree_view_get_bin_window(tree_view))
+        || !gdk_event_get_coords(event, &x_win, &y_win))
         return FALSE;
 
     /* pop up the context menu:
@@ -623,7 +620,7 @@ bndx_button_event_press_cb(GtkWidget * widget, GdkEventButton * event,
      *   the selection;
      * - if it isn't, select it (cancelling any previous selection)
      * - then create and show the menu */
-    if (gtk_tree_view_get_path_at_pos(tree_view, event->x, event->y,
+    if (gtk_tree_view_get_path_at_pos(tree_view, (gint) x_win, (gint) y_win,
                                       &path, NULL, NULL, NULL)) {
         GtkTreeSelection *selection =
             gtk_tree_view_get_selection(tree_view);
@@ -1912,7 +1909,7 @@ bndx_popup_position_func(GtkMenu * menu, gint * x, gint * y,
 #endif                          /*GTK_CHECK_VERSION(3, 22, 0) */
 
 static void
-bndx_do_popup(BalsaIndex * index, GdkEventButton * event)
+bndx_do_popup(BalsaIndex * index, GdkEvent * event)
 {
     GtkWidget *menu = index->popup_menu;
     GtkWidget *submenu;
@@ -1965,24 +1962,15 @@ bndx_do_popup(BalsaIndex * index, GdkEventButton * event)
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(index->move_to_item),
                               submenu);
 
-    gtk_widget_show_all(menu);
+    gtk_widget_show(menu);
 
-#if GTK_CHECK_VERSION(3, 22, 0)
-    if (event)
-        gtk_menu_popup_at_pointer(GTK_MENU(menu), (GdkEvent *) event);
-    else
+    if (event != NULL) {
+        gtk_menu_popup_at_pointer(GTK_MENU(menu), event);
+    } else {
         gtk_menu_popup_at_widget(GTK_MENU(menu), GTK_WIDGET(index),
                                  GDK_GRAVITY_CENTER, GDK_GRAVITY_CENTER,
                                  NULL);
-#else                           /*GTK_CHECK_VERSION(3, 22, 0) */
-    if (event)
-        gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL,
-                       event->button, event->time);
-    else
-        gtk_menu_popup(GTK_MENU(menu), NULL, NULL,
-                       bndx_popup_position_func, index,
-                       0, gtk_get_current_event_time());
-#endif                          /*GTK_CHECK_VERSION(3, 22, 0) */
+    }
 }
 
 static GtkWidget *
@@ -2652,9 +2640,9 @@ balsa_index_pipe(BalsaIndex * index)
     libbalsa_macosx_menu_for_parent(dialog, GTK_WINDOW(balsa_app.main_window));
 #endif
     gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
-    gtk_container_set_border_width(GTK_CONTAINER(dialog), 5);
 
     vbox = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
+    g_object_set(G_OBJECT(vbox), "margin", 5, NULL);
     gtk_box_set_spacing(GTK_BOX(vbox), HIG_PADDING);
     gtk_container_add(GTK_CONTAINER(vbox), label =
                       gtk_label_new(_("Specify the program to run:")));

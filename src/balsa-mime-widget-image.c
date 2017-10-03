@@ -126,18 +126,11 @@ balsa_mime_widget_new_image(BalsaMessage * bm,
     mwi = g_object_new(BALSA_TYPE_MIME_WIDGET_IMAGE, NULL);
     mw = (BalsaMimeWidget *) mwi;
 
+#ifdef WE_STILL_NEED_AN_EVENT_BOX
     mw->widget = gtk_event_box_new();
+#endif
     g_signal_connect(G_OBJECT(mw->widget), "button-press-event",
                      G_CALLBACK(balsa_image_button_press_cb), data);
-
-#if !GTK_CHECK_VERSION(3, 15, 0)
-    mwi->context =
-        gtk_widget_get_style_context(GTK_WIDGET(bm->scroll));
-    bmwi_context_changed_cb(mwi->context, mw);
-    mwi->context_changed_handler_id =
-        g_signal_connect(mwi->context, "changed",
-                         G_CALLBACK(bmwi_context_changed_cb), mw);
-#endif
 
     image = gtk_image_new_from_icon_name("image-missing",
                                          GTK_ICON_SIZE_BUTTON);
@@ -145,7 +138,11 @@ balsa_mime_widget_new_image(BalsaMessage * bm,
 		      GINT_TO_POINTER(gdk_pixbuf_get_width(pixbuf)));
     g_object_set_data(G_OBJECT(image), "mime-body", mime_body);
     g_object_unref(pixbuf);
+#ifdef WE_STILL_NEED_AN_EVENT_BOX
     gtk_container_add(GTK_CONTAINER(mw->widget), image);
+#else
+    mw->widget = image;
+#endif
 
     return mw;
 }

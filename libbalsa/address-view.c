@@ -592,12 +592,13 @@ lbav_entry_changed_cb(GtkEntry * entry, LibBalsaAddressView * address_view)
  */
 static gboolean
 lbav_key_pressed_cb(GtkEntry * entry,
-                    GdkEventKey * event,
+                    GdkEvent * event,
                     LibBalsaAddressView * address_view)
 {
     GtkEntryCompletion *completion;
+    guint keyval;
 
-    if (event->keyval != GDK_KEY_Escape)
+    if (!gdk_event_get_keyval(event, &keyval) || keyval != GDK_KEY_Escape)
         return FALSE;
 
     if (address_view->last_was_escape) {
@@ -946,26 +947,20 @@ lbav_selection_changed_cb(GtkTreeSelection * selection,
 {
     GdkEvent *event = gtk_get_current_event();
 
-    if (event) {
-        if (event->type == GDK_BUTTON_PRESS) {
-            GdkEventButton *event_button = (GdkEventButton *) event;
+    if (event != NULL) {
+        gdouble x_win, y_win;
+
+        if (gdk_event_get_event_type(event) == GDK_BUTTON_PRESS &&
+            gdk_event_get_coords(event, &x_win, &y_win)) {
             GtkTreeView *tree_view = (GtkTreeView *) address_view;
+            gint x, y;
+            GtkTreePath *path;
+            GtkTreeViewColumn *column;
 
-            if (event_button->window ==
-                gtk_tree_view_get_bin_window(tree_view)) {
-                gint x, y;
-                GtkTreePath *path;
-                GtkTreeViewColumn *column;
-
-                gtk_tree_view_convert_widget_to_bin_window_coords
-                    (tree_view, (gint) event_button->x,
-                     (gint) event_button->y, &x, &y);
-
-                if (gtk_tree_view_get_path_at_pos
-                    (tree_view, x, y, &path, &column, NULL, NULL)) {
-                    gtk_tree_view_row_activated(tree_view, path, column);
-                    gtk_tree_path_free(path);
-                }
+            gtk_tree_view_convert_widget_to_bin_window_coords(tree_view, x_win, y_win, &x, &y);
+            if (gtk_tree_view_get_path_at_pos (tree_view, x, y, &path, &column, NULL, NULL)) {
+                gtk_tree_view_row_activated(tree_view, path, column);
+                gtk_tree_path_free(path);
             }
         }
         gdk_event_free(event);

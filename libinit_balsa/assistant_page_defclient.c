@@ -43,29 +43,35 @@ balsa_druid_page_defclient_init(BalsaDruidPageDefclient * defclient,
                                 GtkWidget * page,
                                 GtkAssistant * druid)
 {
-    GtkLabel *label;
+    GtkWidget *label;
     GtkWidget *yes, *no;
 
     defclient->default_client = 1;
     balsa_app.default_client = defclient->default_client;
 
-    label =
-        GTK_LABEL(gtk_label_new
-                  (_("Use Balsa as default email client?")));
-    gtk_label_set_justify(label, GTK_JUSTIFY_CENTER);
-    gtk_label_set_line_wrap(label, TRUE);
+    label = gtk_label_new(_("Use Balsa as default email client?"));
+    gtk_label_set_justify((GtkLabel *) label, GTK_JUSTIFY_CENTER);
+    gtk_label_set_line_wrap((GtkLabel *) label, TRUE);
 
     yes = gtk_radio_button_new_with_mnemonic(NULL, _("_Yes"));
-    no = gtk_radio_button_new_with_mnemonic_from_widget(GTK_RADIO_BUTTON(yes),
-                                                         _("_No"));    
+    no  = gtk_radio_button_new_with_mnemonic_from_widget(GTK_RADIO_BUTTON(yes),
+                                                         _("_No"));
 
-    g_signal_connect(G_OBJECT(yes), "toggled",
-                       G_CALLBACK(balsa_druid_page_defclient_toggle),
-                       defclient);
+    g_signal_connect(yes, "toggled",
+                     G_CALLBACK(balsa_druid_page_defclient_toggle),
+                     defclient);
 
-    gtk_box_pack_start(GTK_BOX(page), GTK_WIDGET(label), TRUE, TRUE, 8);
-    gtk_box_pack_start(GTK_BOX(page), GTK_WIDGET(yes),   TRUE, TRUE, 2);
-    gtk_box_pack_start(GTK_BOX(page), GTK_WIDGET(no),    TRUE, TRUE, 2);
+    gtk_widget_set_margin_top(label, 8);
+    gtk_widget_set_vexpand(label, TRUE);
+    gtk_box_pack_start((GtkBox *) page, label);
+
+    gtk_widget_set_margin_top(yes, 2);
+    gtk_widget_set_vexpand(yes, TRUE);
+    gtk_box_pack_start((GtkBox *) page, yes);
+
+    gtk_widget_set_margin_top(no, 2);
+    gtk_widget_set_vexpand(no, TRUE);
+    gtk_box_pack_start((GtkBox *) page, no);
 
     return;
 }
@@ -99,7 +105,7 @@ balsa_druid_page_defclient(GtkAssistant *druid)
 }
 
 static void
-balsa_druid_page_defclient_toggle(GtkWidget * page, 
+balsa_druid_page_defclient_toggle(GtkWidget * page,
                                   BalsaDruidPageDefclient * defclient)
 {
     defclient->default_client = ! (defclient->default_client);

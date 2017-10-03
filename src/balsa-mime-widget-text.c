@@ -91,13 +91,13 @@ static GdkCursor *url_cursor_normal = NULL;
 static GdkCursor *url_cursor_over_url = NULL;
 
 
-static gboolean store_button_coords(GtkWidget * widget, GdkEventButton * event, gpointer data);
-static gboolean check_over_url(GtkWidget * widget, GdkEventMotion * event, GList * url_list);
+static gboolean store_button_coords(GtkWidget * widget, GdkEvent * event, gpointer data);
+static gboolean check_over_url(GtkWidget * widget, GdkEvent * event, GList * url_list);
 static void pointer_over_url(GtkWidget * widget, message_url_t * url, gboolean set);
 static void prepare_url_offsets(GtkTextBuffer * buffer, GList * url_list);
 static void url_found_cb(GtkTextBuffer * buffer, GtkTextIter * iter,
                          const gchar * buf, guint len, gpointer data);
-static gboolean check_call_url(GtkWidget * widget, GdkEventButton * event, GList * url_list);
+static gboolean check_call_url(GtkWidget * widget, GdkEvent * event, GList * url_list);
 static message_url_t * find_url(GtkWidget * widget, gint x, gint y, GList * url_list);
 static void handle_url(const gchar* url);
 static void free_url_list(GList * url_list);
@@ -312,7 +312,7 @@ bm_modify_font_from_string(GtkWidget * widget, const char *font)
     css = libbalsa_font_string_to_css(font, BALSA_MESSAGE_TEXT_HEADER);
 
     css_provider = gtk_css_provider_new();
-    gtk_css_provider_load_from_data(css_provider, css, -1, NULL);
+    gtk_css_provider_load_from_data(css_provider, css, -1);
     g_free(css);
 
     gtk_style_context_add_provider(gtk_widget_get_style_context(widget) ,
@@ -519,7 +519,7 @@ text_view_url_popup(GtkTextView *textview, GtkMenu *menu)
                       G_CALLBACK (url_send_cb), (gpointer)url);
     gtk_menu_shell_append (GTK_MENU_SHELL (menu), menu_item);
 
-    gtk_widget_show_all(GTK_WIDGET(menu));
+    gtk_widget_show(GTK_WIDGET(menu));
 
     return TRUE;
 }
@@ -564,20 +564,29 @@ text_view_populate_popup(GtkTextView *textview, GtkMenu *menu,
 	gtk_menu_shell_append (GTK_MENU_SHELL (menu), menu_item);
     }
 
-    gtk_widget_show_all(GTK_WIDGET(menu));
+    gtk_widget_show(GTK_WIDGET(menu));
 }
 
 
 /* -- URL related stuff -- */
 
 static gboolean
-store_button_coords(GtkWidget * widget, GdkEventButton * event,
+store_button_coords(GtkWidget * widget, GdkEvent * event,
                     gpointer data)
 {
-    if (event->type == GDK_BUTTON_PRESS && event->button == 1) {
-        stored_x = event->x;
-        stored_y = event->y;
-        stored_mask = event->state;
+    guint button;
+
+    if (gdk_event_get_event_type(event) == GDK_BUTTON_PRESS &&
+        gdk_event_get_button(event, &button) && button == 1) {
+        gdouble x_win, y_win;
+        GdkModifierType state;
+
+        if (gdk_event_get_coords(event, &x_win, &y_win) &&
+            gdk_event_get_state(event, &state)) {
+            stored_x = (gint) x_win;
+            stored_y = (gint) y_win;
+            stored_mask = state;
+        }
 
         /* compare only shift, ctrl, and mod1-mod5 */
         stored_mask &= STORED_MASK_BITS;
@@ -587,20 +596,22 @@ store_button_coords(GtkWidget * widget, GdkEventButton * event,
 
 /* check if we are over an url and change the cursor in this case */
 static gboolean
-check_over_url(GtkWidget * widget, GdkEventMotion * event,
+check_over_url(GtkWidget * widget, GdkEvent * event,
                GList * url_list)
 {
     static gboolean was_over_url = FALSE;
     static message_url_t *current_url = NULL;
     GdkWindow *window;
-    message_url_t *url;
+    message_url_t *url = NULL;
 
     window = gtk_text_view_get_window(GTK_TEXT_VIEW(widget),
                                       GTK_TEXT_WINDOW_TEXT);
-    if (event->type == GDK_LEAVE_NOTIFY)
-        url = NULL;
-    else {
-        url = find_url(widget, (gint) event->x, (gint) event->y, url_list);
+    if (gdk_event_get_event_type(event) != GDK_LEAVE_NOTIFY) {
+        gdouble x_win, y_win;
+
+        if (gdk_event_get_coords(event, &x_win, &y_win)) {
+            url = find_url(widget, (gint) x_win, (gint) y_win, url_list);
+        }
     }
 
     if (url) {
@@ -709,22 +720,28 @@ url_found_cb(GtkTextBuffer * buffer, GtkTextIter * iter,
 /* if the mouse button was released over an URL, and the mouse hasn't
  * moved since the button was pressed, try to call the URL */
 static gboolean
-check_call_url(GtkWidget * widget, GdkEventButton * event,
-               GList * url_list)
+check_call_url(GtkWidget * widget, GdkEvent * event, GList * url_list)
 {
+    guint button;
+    gdouble x_win, y_win;
+    GdkModifierType state;
     gint x, y;
     message_url_t *url;
 
-    if (event->type != GDK_BUTTON_RELEASE || event->button != 1)
+    if (gdk_event_get_event_type(event) != GDK_BUTTON_RELEASE ||
+        !gdk_event_get_button(event, &button) || button != 1 ||
+        !gdk_event_get_coords(event, &x_win, &y_win) ||
+        !gdk_event_get_state(event, &state)) {
         return FALSE;
+    }
 
-    x = event->x;
-    y = event->y;
+    x = (gint) x_win;
+    y = (gint) y_win;
     /* 2-pixel motion tolerance */
     if (abs(x - stored_x) <= 2 && abs(y - stored_y) <= 2
-        && (event->state & STORED_MASK_BITS) == stored_mask) {
+        && (state & STORED_MASK_BITS) == stored_mask) {
         url = find_url(widget, x, y, url_list);
-        if (url)
+        if (url != NULL)
             handle_url(url->url);
     }
     return FALSE;
@@ -963,7 +980,7 @@ draw_cite_bar_real(cite_bar_t * bar, cite_bar_draw_mode_t * draw_mode)
         g_free(color);
 
         css_provider = gtk_css_provider_new();
-        gtk_css_provider_load_from_data(css_provider, css, -1, NULL);
+        gtk_css_provider_load_from_data(css_provider, css, -1);
         g_free(css);
 
         gtk_style_context_add_provider(gtk_widget_get_style_context(bar->bar) ,
@@ -1113,7 +1130,7 @@ balsa_gtk_html_popup(GtkWidget * html, BalsaMessage * bm)
     menu = gtk_menu_new();
     bmwt_populate_popup_menu(bm, html, GTK_MENU(menu));
 
-    gtk_widget_show_all(menu);
+    gtk_widget_show(menu);
 
     /* In WebKit2, the context menu signal is asynchronous, so the
      * GdkEvent is no longer current; instead it is preserved and passed
@@ -1164,7 +1181,7 @@ bmwt_populate_popup_cb(GtkWidget * widget, GtkMenu * menu, gpointer data)
     gtk_container_foreach(GTK_CONTAINER(menu),
                           (GtkCallback) gtk_widget_destroy, NULL);
     bmwt_populate_popup_menu(bm, html, menu);
-    gtk_widget_show_all(GTK_WIDGET(menu));
+    gtk_widget_show(GTK_WIDGET(menu));
 }
 
 static BalsaMimeWidget *

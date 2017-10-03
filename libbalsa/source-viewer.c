@@ -217,7 +217,7 @@ libbalsa_show_message_source(GtkApplication  * application,
     css = libbalsa_font_string_to_css(font, BALSA_SOURCE_VIEWER);
 
     css_provider = gtk_css_provider_new();
-    gtk_css_provider_load_from_data(css_provider, css, -1, NULL);
+    gtk_css_provider_load_from_data(css_provider, css, -1);
     g_free(css);
 
     gtk_style_context_add_provider(gtk_widget_get_style_context(text) ,
@@ -259,10 +259,11 @@ libbalsa_show_message_source(GtkApplication  * application,
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu(window, GTK_MENU_SHELL(menu_bar));
 #else
-    gtk_box_pack_start(GTK_BOX(vbox), menu_bar, FALSE, TRUE, 1);
+    gtk_box_pack_start(GTK_BOX(vbox), menu_bar);
 #endif
 
-    gtk_box_pack_start(GTK_BOX(vbox), interior, TRUE, TRUE, 0);
+    gtk_widget_set_vexpand(interior, TRUE);
+    gtk_box_pack_start(GTK_BOX(vbox), interior);
     gtk_container_add(GTK_CONTAINER(window), vbox);
 
     lsvi = g_new(LibBalsaSourceViewerInfo, 1);
@@ -278,7 +279,7 @@ libbalsa_show_message_source(GtkApplication  * application,
     g_signal_connect(window, "size-allocate",
                      G_CALLBACK(lsv_size_allocate_cb), lsvi);
 
-    gtk_widget_show_all(window);
+    gtk_widget_show(window);
 
     escape_action =
         g_action_map_lookup_action(G_ACTION_MAP(window), "lsv-escape");

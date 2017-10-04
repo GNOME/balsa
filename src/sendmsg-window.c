@@ -120,7 +120,7 @@ static void replace_identity_signature(BalsaSendmsg* bsmsg,
                                        const gchar* new_sig);
 static void update_bsmsg_identity(BalsaSendmsg*, LibBalsaIdentity*);
 
-static void sw_size_alloc_cb(GtkWidget * window, GtkAllocation * alloc);
+static void sw_size_alloc_cb(GtkWidget * window);
 static GString *quote_message_body(BalsaSendmsg * bsmsg,
                                    LibBalsaMessage * message,
                                    QuoteType type);
@@ -1304,7 +1304,7 @@ update_bsmsg_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity* ident)
 
 
 static void
-sw_size_alloc_cb(GtkWidget * window, GtkAllocation * alloc)
+sw_size_alloc_cb(GtkWidget * window)
 {
     GdkWindow *gdk_window;
 
@@ -6636,7 +6636,7 @@ sendmsg_window_new()
     g_signal_connect(G_OBJECT(window), "destroy",
 		     G_CALLBACK(destroy_event_cb), bsmsg);
     g_signal_connect(G_OBJECT(window), "size_allocate",
-		     G_CALLBACK(sw_size_alloc_cb), bsmsg);
+		     G_CALLBACK(sw_size_alloc_cb), NULL);
     /* If any compose windows are open when Balsa is closed, we want
      * them also to be closed. */
     g_object_weak_ref(G_OBJECT(balsa_app.main_window),

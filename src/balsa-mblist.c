@@ -111,8 +111,9 @@ static gint bmbl_row_compare(GtkTreeModel * model,
 static gboolean bmbl_button_press_cb(GtkWidget * widget,
                                      GdkEvent * event,
                                      gpointer data);
-static void bmbl_column_resize(GtkWidget * widget,
-                               GtkAllocation * allocation, gpointer data);
+static void bmbl_column_resize(GtkWidget * widget, GtkAllocation * allocation,
+                               gint baseline, GtkAllocation * clip,
+                               gpointer data);
 static void bmbl_drag_cb(GtkWidget * widget, GdkDragContext * context,
                          gint x, gint y,
                          GtkSelectionData * selection_data, guint info,
@@ -764,8 +765,9 @@ bmbl_do_popup(GtkTreeView * tree_view, GtkTreePath * path,
  * so they can be saved and restored between sessions.
  * */
 static void
-bmbl_column_resize(GtkWidget * widget,
-                           GtkAllocation * allocation, gpointer data)
+bmbl_column_resize(GtkWidget * widget, GtkAllocation * allocation,
+                   gint baseline, GtkAllocation * clip,
+                   gpointer data)
 {
     GtkTreeView *tree_view = GTK_TREE_VIEW(widget);
     gint name_width =

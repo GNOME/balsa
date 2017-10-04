@@ -156,7 +156,7 @@ static void bw_find_real(BalsaWindow * window, BalsaIndex * bindex,
 static void bw_slave_position_cb(GtkPaned   * paned_slave,
                                  GParamSpec * pspec,
                                  gpointer     user_data);
-static void bw_size_allocate_cb(GtkWidget * window, GtkAllocation * alloc);
+static void bw_size_allocate_cb(GtkWidget * window);
 
 static void bw_notebook_switch_page_cb(GtkWidget * notebook,
                                        void * page,
@@ -4319,7 +4319,7 @@ bw_slave_position_cb(GtkPaned   * paned_slave,
 }
 
     static void
-bw_size_allocate_cb(GtkWidget * window, GtkAllocation * alloc)
+bw_size_allocate_cb(GtkWidget * window)
 {
     gtk_window_get_size(GTK_WINDOW(window),
                         & balsa_app.mw_width,

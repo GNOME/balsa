@@ -511,7 +511,7 @@ mw_close_activated(GSimpleAction * action, GVariant * parameter,
 }
 
 static void
-size_alloc_cb(GtkWidget * window, GtkAllocation * alloc)
+size_alloc_cb(GtkWidget * window)
 {
     GdkWindow *gdk_window;
 

@@ -338,6 +338,7 @@ bm_on_set_style(GtkWidget * widget,
 
 static void
 on_content_size_alloc(GtkWidget * widget, GtkAllocation * allocation,
+                      gint baseline, GtkAllocation * clip,
 		      gpointer user_data)
 {
     gtk_container_foreach (GTK_CONTAINER(widget), balsa_mime_widget_image_resize_all, NULL);

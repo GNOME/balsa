@@ -126,22 +126,25 @@ lb_gpgme_passphrase(void *hook, const gchar * uid_hint,
 
 
 static gboolean
-key_button_event_press_cb(GtkWidget      *widget,
-						  GdkEventButton *event,
-						  gpointer        data)
+key_button_event_press_cb(GtkWidget * widget,
+                          GdkEvent  * event,
+                          gpointer    data)
 {
     GtkTreeView *tree_view = GTK_TREE_VIEW(widget);
     GtkTreeSelection *selection = gtk_tree_view_get_selection(tree_view);
     GtkTreePath *path;
     GtkTreeIter iter;
     GtkTreeModel *model;
+    gdouble x_win, y_win;
 
     g_return_val_if_fail(event != NULL, FALSE);
-    if ((event->type != GDK_2BUTTON_PRESS) || event->window != gtk_tree_view_get_bin_window(tree_view)) {
+
+    if (gdk_event_get_event_type(event) != GDK_2BUTTON_PRESS ||
+        !gdk_event_get_coords(event, &x_win, &y_win)) {
         return FALSE;
     }
 
-    if (gtk_tree_view_get_path_at_pos(tree_view, event->x, event->y, &path, NULL, NULL, NULL)) {
+    if (gtk_tree_view_get_path_at_pos(tree_view, (gint) x_win, (gint) y_win, &path, NULL, NULL, NULL)) {
         if (!gtk_tree_selection_path_is_selected(selection, path)) {
             gtk_tree_view_set_cursor(tree_view, path, NULL, FALSE);
             gtk_tree_view_scroll_to_cell(tree_view, path, NULL, FALSE, 0, 0);
@@ -200,7 +203,7 @@ lb_gpgme_select_key(const gchar * user_name, lb_key_sel_md_t mode, GList * keys,
     gtk_container_add(GTK_CONTAINER
 		      (gtk_dialog_get_content_area(GTK_DIALOG(dialog))),
 		      vbox);
-   gtk_container_set_border_width(GTK_CONTAINER(vbox), 12);
+    g_object_set(G_OBJECT(vbox), "margin", 12, NULL);
     switch (mode) {
     	case LB_SELECT_PRIVATE_KEY:
     		prompt =
@@ -354,7 +357,7 @@ get_passphrase_real(const gchar * uid_hint, const gchar * passphrase_info,
     libbalsa_macosx_menu_for_parent(dialog, parent);
 #endif
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 12);
-    gtk_container_set_border_width(GTK_CONTAINER(hbox), 12);
+    g_object_set(G_OBJECT(hbox), "margin", 12, NULL);
     gtk_container_add(GTK_CONTAINER
 		      (gtk_dialog_get_content_area(GTK_DIALOG(dialog))),
 		      hbox);

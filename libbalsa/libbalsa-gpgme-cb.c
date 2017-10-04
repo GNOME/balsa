@@ -225,11 +225,11 @@ lb_gpgme_select_key(const gchar * user_name, lb_key_sel_md_t mode, GList * keys,
     label = gtk_label_new(prompt);
     gtk_widget_set_halign(label, GTK_ALIGN_START);
     g_free(prompt);
-    gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(vbox), label);
 
     label = gtk_label_new(_("Double-click key to show details"));
     gtk_widget_set_halign(label, GTK_ALIGN_START);
-    gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(vbox), label);
 
     scrolled_window = gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_set_shadow_type(GTK_SCROLLED_WINDOW
@@ -237,7 +237,8 @@ lb_gpgme_select_key(const gchar * user_name, lb_key_sel_md_t mode, GList * keys,
 					GTK_SHADOW_ETCHED_IN);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolled_window),
     	GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-    gtk_box_pack_start(GTK_BOX(vbox), scrolled_window, TRUE, TRUE, 0);
+    gtk_widget_set_vexpand(scrolled_window, TRUE);
+    gtk_box_pack_start(GTK_BOX(vbox), scrolled_window);
 
     model = gtk_list_store_new(GPG_KEY_NUM_COLUMNS, G_TYPE_STRING,	/* user ID */
 			       G_TYPE_POINTER);	/* key */
@@ -287,7 +288,7 @@ lb_gpgme_select_key(const gchar * user_name, lb_key_sel_md_t mode, GList * keys,
     /* set window size to 2/3 of the parent */
     gtk_window_get_size(parent, &width, &height);
     gtk_window_set_default_size(GTK_WINDOW(dialog), (2 * width) / 3, (2 * height) / 3);
-    gtk_widget_show_all(gtk_dialog_get_content_area(GTK_DIALOG(dialog)));
+    gtk_widget_show(gtk_dialog_get_content_area(GTK_DIALOG(dialog)));
 
     if (gtk_dialog_run(GTK_DIALOG(dialog)) != GTK_RESPONSE_OK) {
     	use_key = NULL;
@@ -363,9 +364,7 @@ get_passphrase_real(const gchar * uid_hint, const gchar * passphrase_info,
     if (!padlock_keyhole)
 	padlock_keyhole =
 	    gdk_pixbuf_new_from_xpm_data(padlock_keyhole_xpm);
-    gtk_box_pack_start(GTK_BOX(vbox),
-		       gtk_image_new_from_pixbuf(padlock_keyhole), FALSE,
-		       FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(vbox), gtk_image_new_from_pixbuf(padlock_keyhole));
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 12);
     gtk_container_add(GTK_CONTAINER(hbox), vbox);
     if (prev_was_bad)
@@ -383,7 +382,7 @@ get_passphrase_real(const gchar * uid_hint, const gchar * passphrase_info,
     entry = gtk_entry_new();
     gtk_container_add(GTK_CONTAINER(vbox), entry);
 
-    gtk_widget_show_all(gtk_dialog_get_content_area(GTK_DIALOG(dialog)));
+    gtk_widget_show(gtk_dialog_get_content_area(GTK_DIALOG(dialog)));
     gtk_entry_set_width_chars(GTK_ENTRY(entry), 40);
     gtk_entry_set_visibility(GTK_ENTRY(entry), FALSE);
 

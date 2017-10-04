@@ -117,13 +117,13 @@ balsa_mime_widget_signature_widget(LibBalsaMessageBody * mime_body,
     label = gtk_label_new((lines[1] != NULL) ? lines[1] : lines[0]);
     gtk_label_set_selectable(GTK_LABEL(label), TRUE);
     gtk_widget_set_halign(label, GTK_ALIGN_START);
-    gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(vbox), label);
     if (mime_body->sig_info->key != NULL) {
     	GtkWidget *key_widget;
 
     	/* show only the subkey which has been used to sign the message */
     	key_widget = libbalsa_gpgme_key(mime_body->sig_info->key, mime_body->sig_info->fingerprint, 0U, FALSE);
-        gtk_box_pack_start(GTK_BOX(vbox), key_widget, FALSE, FALSE, 0);
+        gtk_box_pack_start(GTK_BOX(vbox), key_widget);
     }
     if (mime_body->sig_info->protocol == GPGME_PROTOCOL_OpenPGP) {
         GtkWidget *button;
@@ -136,7 +136,7 @@ balsa_mime_widget_signature_widget(LibBalsaMessageBody * mime_body,
         g_signal_connect(G_OBJECT(button), "clicked",
                          G_CALLBACK(on_gpg_key_button),
                          (gpointer)mime_body->sig_info->fingerprint);
-        gtk_box_pack_start(GTK_BOX(vbox), button, FALSE, FALSE, 0);
+        gtk_box_pack_start(GTK_BOX(vbox), button);
     }
 
     if (lines[1] != NULL) {
@@ -153,7 +153,7 @@ balsa_mime_widget_signature_widget(LibBalsaMessageBody * mime_body,
     } else {
         signature_widget = vbox;
     }
-    gtk_container_set_border_width(GTK_CONTAINER(signature_widget), BMW_CONTAINER_BORDER);
+    g_object_set(G_OBJECT(signature_widget), "margin", BMW_CONTAINER_BORDER, NULL);
 
     g_strfreev(lines);
 
@@ -178,8 +178,7 @@ balsa_mime_widget_crypto_frame(LibBalsaMessageBody * mime_body, GtkWidget * chil
         gtk_box_pack_start(GTK_BOX(icon_box),
                            gtk_image_new_from_icon_name
                            (balsa_icon_id(BALSA_PIXMAP_ENCR),
-                            GTK_ICON_SIZE_MENU),
-                           FALSE, FALSE, 0);
+                            GTK_ICON_SIZE_MENU));
     if (!no_signature) {
 	const gchar * icon_name =
 	    balsa_mime_widget_signature_icon_name(libbalsa_message_body_protect_state(mime_body));
@@ -187,16 +186,15 @@ balsa_mime_widget_crypto_frame(LibBalsaMessageBody * mime_body, GtkWidget * chil
 	    icon_name = BALSA_PIXMAP_SIGN;
         gtk_box_pack_start(GTK_BOX(icon_box),
                            gtk_image_new_from_icon_name
-                           (balsa_icon_id(icon_name), GTK_ICON_SIZE_MENU),
-                           FALSE, FALSE, 0);
+                           (balsa_icon_id(icon_name), GTK_ICON_SIZE_MENU));
     }
     gtk_frame_set_label_widget(GTK_FRAME(frame), icon_box);
-    gtk_container_set_border_width(GTK_CONTAINER(vbox), BMW_MESSAGE_PADDING);
+    g_object_set(G_OBJECT(vbox), "margin", BMW_MESSAGE_PADDING, NULL);
 
-    gtk_box_pack_start(GTK_BOX(vbox), child, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(vbox), child);
 
     if (signature) {
-	gtk_box_pack_end(GTK_BOX(vbox), signature, FALSE, FALSE, 0);
+	gtk_box_pack_end(GTK_BOX(vbox), signature);
     }
 
     return frame;
@@ -312,16 +310,19 @@ create_import_keys_widget(GtkBox *box, const gchar *key_buf, GError **error)
 						success = FALSE;
 					} else {
 						key_widget = libbalsa_gpgme_key(this_key, NULL, GPG_SUBKEY_CAP_ALL, FALSE);
-						gtk_box_pack_start(box, key_widget, FALSE, FALSE, 0);
+						gtk_box_pack_start(box, key_widget);
 
 						import_btn = gtk_button_new_with_label(_("Import key into the local key ring"));
 						g_object_set_data_full(G_OBJECT(import_btn), "keydata", key_ascii, (GDestroyNotify) g_free);
 						g_signal_connect(G_OBJECT(import_btn), "clicked", (GCallback) on_key_import_button, NULL);
-						gtk_box_pack_start(box, import_btn, FALSE, FALSE, 0);
+						gtk_box_pack_start(box, import_btn);
 
 						if (item->next != NULL) {
-							gtk_box_pack_start(box, gtk_separator_new(GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE,
-								BMW_VBOX_SPACE);
+                                                    GtkWidget *separator;
+
+							separator = gtk_separator_new(GTK_ORIENTATION_HORIZONTAL);
+                                                        gtk_widget_set_margin_top(separator, BMW_VBOX_SPACE);
+							gtk_box_pack_start(box, separator);
 						}
 					}
 				}

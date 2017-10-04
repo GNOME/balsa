@@ -118,8 +118,8 @@ balsa_cite_bar_measure(GtkWidget    * widget,
             cite_bar->space;
     } else {
         *minimum = *natural = cite_bar->height;
+        *minimum_baseline = *natural_baseline = 0;
     }
-    *minimum_baseline = *natural_baseline = 0;
 }
 
 static gboolean

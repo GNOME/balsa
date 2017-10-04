@@ -139,7 +139,7 @@ key_button_event_press_cb(GtkWidget * widget,
 
     g_return_val_if_fail(event != NULL, FALSE);
 
-    if (gdk_event_get_event_type(event) != GDK_2BUTTON_PRESS ||
+    if (gdk_event_get_event_type(event) != GDK_DOUBLE_BUTTON_PRESS ||
         !gdk_event_get_coords(event, &x_win, &y_win)) {
         return FALSE;
     }

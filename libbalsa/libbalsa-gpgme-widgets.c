@@ -114,7 +114,7 @@ libbalsa_gpgme_key(gpgme_key_t           key,
 		gtk_widget_set_margin_start(uid_box, 12);
 		gtk_container_add(GTK_CONTAINER(uid_expander), uid_box);
 		for (uid = key->uids->next; uid != NULL; uid = uid->next) {
-			gtk_box_pack_end(GTK_BOX(uid_box), create_key_uid_widget(uid), FALSE, FALSE, 0U);
+			gtk_box_pack_end(GTK_BOX(uid_box), create_key_uid_widget(uid));
 		}
 	}
 
@@ -171,20 +171,20 @@ libbalsa_gpgme_key(gpgme_key_t           key,
 		gtk_expander_set_expanded(GTK_EXPANDER(subkey_expander), expanded);
 		gtk_grid_attach(GTK_GRID(key_data), subkey_expander, 0, row++, 2, 1);
 
-		subkey_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 2);
+		subkey_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 4);
 		gtk_widget_set_margin_start(subkey_box, 12);
 		gtk_container_add(GTK_CONTAINER(subkey_expander), subkey_box);
 
 		for (subkey = key->subkeys; subkey != NULL; subkey = subkey->next) {
 			if (fingerprint != NULL) {
 				if (strcmp(fingerprint, subkey->fpr) == 0) {
-					gtk_box_pack_end(GTK_BOX(subkey_box), create_subkey_widget(subkey), FALSE, FALSE, 2);
+					gtk_box_pack_end(GTK_BOX(subkey_box), create_subkey_widget(subkey));
 				}
 			} else if ((((subkey_capa & GPG_SUBKEY_CAP_SIGN) != 0U) && (subkey->can_sign != 0)) ||
 					   (((subkey_capa & GPG_SUBKEY_CAP_ENCRYPT) != 0U) && (subkey->can_encrypt != 0)) ||
 					   (((subkey_capa & GPG_SUBKEY_CAP_CERTIFY) != 0U) && (subkey->can_certify != 0)) ||
 					   (((subkey_capa & GPG_SUBKEY_CAP_AUTH) != 0U) && (subkey->can_authenticate != 0))) {
-				gtk_box_pack_end(GTK_BOX(subkey_box), create_subkey_widget(subkey), FALSE, FALSE, 2);
+				gtk_box_pack_end(GTK_BOX(subkey_box), create_subkey_widget(subkey));
 			} else {
 				/* do not print this subkey */
 			}
@@ -228,17 +228,19 @@ libbalsa_key_dialog(GtkWindow            *parent,
 	gtk_window_set_resizable(GTK_WINDOW(dialog), TRUE);
 
 	hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 12);
-	gtk_container_set_border_width(GTK_CONTAINER(hbox), 6);
-	gtk_box_pack_start(GTK_BOX(gtk_dialog_get_content_area(GTK_DIALOG(dialog))), hbox, TRUE, TRUE, 0);
+	g_object_set(G_OBJECT(hbox), "margin", 6, NULL);
+        gtk_widget_set_vexpand(hbox, TRUE);
+	gtk_box_pack_start(GTK_BOX(gtk_dialog_get_content_area(GTK_DIALOG(dialog))), hbox);
 	gtk_box_set_homogeneous(GTK_BOX(hbox), FALSE);
 
 	/* standard key icon; "application-certificate" would be an alternative... */
 	icon = gtk_image_new_from_icon_name("dialog-password", GTK_ICON_SIZE_DIALOG);
-	gtk_box_pack_start(GTK_BOX(hbox), icon, FALSE, FALSE, 0);
+	gtk_box_pack_start(GTK_BOX(hbox), icon);
 	gtk_widget_set_valign(icon, GTK_ALIGN_START);
 
 	vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 6);
-	gtk_box_pack_start(GTK_BOX(hbox), vbox, TRUE, TRUE, 0);
+        gtk_widget_set_hexpand(vbox, TRUE);
+	gtk_box_pack_start(GTK_BOX(hbox), vbox);
 	gtk_box_set_homogeneous(GTK_BOX(vbox), FALSE);
 
 	if (message1 != NULL) {
@@ -248,26 +250,28 @@ libbalsa_key_dialog(GtkWindow            *parent,
 		markup = g_markup_printf_escaped("<b><big>%s</big></b>", message1);
 		gtk_label_set_markup(GTK_LABEL(label), markup);
 		g_free(markup);
-		gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 0);
+		gtk_box_pack_start(GTK_BOX(vbox), label);
 		gtk_label_set_line_wrap(GTK_LABEL(label), FALSE);
 	}
 
 	if (message2 != NULL) {
 		label = gtk_label_new(message2);
 		gtk_widget_set_halign(label, GTK_ALIGN_START);
-		gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 0);
+		gtk_box_pack_start(GTK_BOX(vbox), label);
 		gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
 	}
 
 	scrolledw = gtk_scrolled_window_new(NULL, NULL);
-	gtk_box_pack_start(GTK_BOX(vbox), scrolledw, TRUE, TRUE, 6);
+        gtk_widget_set_vexpand(scrolledw, TRUE);
+        gtk_widget_set_margin_top(scrolledw, 6);
+	gtk_box_pack_start(GTK_BOX(vbox), scrolledw);
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolledw), GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
 	gtk_scrolled_window_set_min_content_height(GTK_SCROLLED_WINDOW(scrolledw), 120);
 
 	key_data = libbalsa_gpgme_key(key, NULL, subkey_capa, TRUE);
 	gtk_container_add(GTK_CONTAINER(scrolledw), key_data);
 
-	gtk_widget_show_all(hbox);
+	gtk_widget_show(hbox);
 
 	return dialog;
 }
@@ -398,7 +402,7 @@ create_key_label_with_warn(const gchar *text,
 
 		result = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 6);
 		icon = gtk_image_new_from_icon_name("gtk-dialog-warning", GTK_ICON_SIZE_MENU);
-		gtk_box_pack_start(GTK_BOX(result), icon, FALSE, FALSE, 0U);
+		gtk_box_pack_start(GTK_BOX(result), icon);
 		buf = g_markup_printf_escaped("<span fgcolor=\"red\">%s</span>", text);
 		label = gtk_label_new(NULL);
 		gtk_label_set_markup(GTK_LABEL(label), buf);
@@ -407,7 +411,7 @@ create_key_label_with_warn(const gchar *text,
 		gtk_widget_set_hexpand(label, TRUE);
 		gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
 		gtk_label_set_selectable(GTK_LABEL(label), TRUE);
-		gtk_box_pack_start(GTK_BOX(result), label, FALSE, TRUE, 0U);
+		gtk_box_pack_start(GTK_BOX(result), label);
 	} else {
 		result = gtk_label_new(text);
 		gtk_widget_set_halign(result, GTK_ALIGN_START);

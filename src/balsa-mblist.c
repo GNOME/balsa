@@ -872,6 +872,7 @@ bmbl_select_mailbox(GtkTreeSelection * selection, gpointer data)
     GtkTreePath *path;
     guint button;
     gdouble x_win, y_win;
+    gint tx, ty;
 
     if (!event) {
 	GtkTreeIter iter;
@@ -902,9 +903,10 @@ bmbl_select_mailbox(GtkTreeSelection * selection, gpointer data)
         return;
     }
 
-    if (!gtk_tree_view_get_path_at_pos(tree_view, (gint) x_win,
-                                       (gint) y_win, &path,
-                                       NULL, NULL, NULL)) {
+    gtk_tree_view_convert_widget_to_tree_coords(tree_view, (gint) x_win, (gint) y_win,
+                                                &tx, &ty);
+
+    if (!gtk_tree_view_get_path_at_pos(tree_view, tx, ty, &path, NULL, NULL, NULL)) {
         /* GtkTreeView selects the first node in the tree when the
          * widget first gets the focus, whether it's a keyboard event or
          * a button event. If it's a button event, but no mailbox was
@@ -916,8 +918,7 @@ bmbl_select_mailbox(GtkTreeSelection * selection, gpointer data)
         return;
     }
 
-    /* if (gtk_tree_selection_path_is_selected(selection, path)) */
-    {
+    if (gtk_tree_selection_path_is_selected(selection, path)) {
         BalsaMailboxNode *mbnode;
         GtkTreeIter iter;
 

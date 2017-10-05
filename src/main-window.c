@@ -1003,8 +1003,7 @@ quit_activated(GSimpleAction * action,
                GVariant      * parameter,
                gpointer        user_data)
 {
-    GtkWindow *window = GTK_WINDOW(user_data);
-    GdkEvent *event;
+    GtkWidget *window = user_data;
 
     libbalsa_information_parented(window,
                                   LIBBALSA_INFORMATION_MESSAGE,
@@ -1013,11 +1012,7 @@ quit_activated(GSimpleAction * action,
     while(gtk_events_pending())
         gtk_main_iteration_do(FALSE);
 
-    event = gtk_get_current_event();
-    g_signal_emit_by_name(window, "delete-event", event);
-    if (event != NULL) {
-        gdk_event_free(event);
-    }
+    gtk_widget_destroy(window);
 }
 
 static void

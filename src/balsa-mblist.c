@@ -903,8 +903,9 @@ bmbl_select_mailbox(GtkTreeSelection * selection, gpointer data)
         return;
     }
 
-    gtk_tree_view_convert_widget_to_tree_coords(tree_view, (gint) x_win, (gint) y_win,
-                                                &tx, &ty);
+    gtk_tree_view_convert_widget_to_bin_window_coords(tree_view,
+                                                      (gint) x_win, (gint) y_win,
+                                                      &tx, &ty);
 
     if (!gtk_tree_view_get_path_at_pos(tree_view, tx, ty, &path, NULL, NULL, NULL)) {
         /* GtkTreeView selects the first node in the tree when the

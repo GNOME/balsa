@@ -916,7 +916,8 @@ bmbl_select_mailbox(GtkTreeSelection * selection, gpointer data)
         return;
     }
 
-    if (gtk_tree_selection_path_is_selected(selection, path)) {
+    /* if (gtk_tree_selection_path_is_selected(selection, path)) */
+    {
         BalsaMailboxNode *mbnode;
         GtkTreeIter iter;
 

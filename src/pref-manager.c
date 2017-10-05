@@ -3527,10 +3527,10 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
 
     /* Colour */
     for (i = 0; i < MAX_QUOTED_COLOR; i++)
-        g_signal_connect(G_OBJECT(pui->quoted_color[i]), "released",
+        g_signal_connect(G_OBJECT(pui->quoted_color[i]), "color-set",
                          G_CALLBACK(properties_modified_cb), property_box);
 
-    g_signal_connect(G_OBJECT(pui->url_color), "released",
+    g_signal_connect(G_OBJECT(pui->url_color), "color-set",
                      G_CALLBACK(properties_modified_cb), property_box);
 
     /* handling of message parts with 8-bit chars without codeset headers */

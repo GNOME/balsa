@@ -874,7 +874,7 @@ bmbl_select_mailbox(GtkTreeSelection * selection, gpointer data)
     gdouble x_win, y_win;
     gint tx, ty;
 
-    if (!event) {
+    if (event == NULL) {
 	GtkTreeIter iter;
 
 	if (gtk_tree_selection_get_selected(selection, NULL, &iter)) {
@@ -894,6 +894,7 @@ bmbl_select_mailbox(GtkTreeSelection * selection, gpointer data)
 	g_signal_handlers_unblock_by_func(selection, bmbl_select_mailbox, NULL);
         return;
     }
+
     if (gdk_event_get_event_type(event) != GDK_BUTTON_PRESS
             /* keyboard navigation */
         || !(gdk_event_get_button(event, &button) && button == 1)
@@ -903,9 +904,9 @@ bmbl_select_mailbox(GtkTreeSelection * selection, gpointer data)
         return;
     }
 
-    gtk_tree_view_convert_widget_to_bin_window_coords(tree_view,
-                                                      (gint) x_win, (gint) y_win,
-                                                      &tx, &ty);
+    gtk_tree_view_convert_widget_to_tree_coords(tree_view,
+                                                (gint) x_win, (gint) y_win,
+                                                &tx, &ty);
 
     if (!gtk_tree_view_get_path_at_pos(tree_view, tx, ty, &path, NULL, NULL, NULL)) {
         /* GtkTreeView selects the first node in the tree when the

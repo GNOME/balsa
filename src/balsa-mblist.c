@@ -1162,8 +1162,6 @@ balsa_mblist_close_lru_peer_mbx(BalsaMBList * mblist,
 void
 balsa_mblist_default_signal_bindings(BalsaMBList * mblist)
 {
-    GtkTreeSelection *selection;
-
     g_signal_connect(G_OBJECT(mblist), "button_press_event",
                      G_CALLBACK(bmbl_button_press_cb), NULL);
     g_signal_connect_after(G_OBJECT(mblist), "size-allocate",
@@ -1177,7 +1175,6 @@ balsa_mblist_default_signal_bindings(BalsaMBList * mblist)
     g_signal_connect(G_OBJECT(mblist), "drag-data-received",
                      G_CALLBACK(bmbl_drag_cb), NULL);
 
-    selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(mblist));
     gtk_tree_view_set_activate_on_single_click(GTK_TREE_VIEW(mblist), TRUE);
     g_signal_connect(G_OBJECT(mblist), "row-activated",
                      G_CALLBACK(bmbl_row_activated_cb), NULL);

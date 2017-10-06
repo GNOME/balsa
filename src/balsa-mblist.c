@@ -1178,7 +1178,7 @@ balsa_mblist_default_signal_bindings(BalsaMBList * mblist)
                      G_CALLBACK(bmbl_drag_cb), NULL);
 
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(mblist));
-    gtk_tree_view_set_activate_on_single_click(tree_view, TRUE);
+    gtk_tree_view_set_activate_on_single_click(GTK_TREE_VIEW(mblist), TRUE);
     g_signal_connect(G_OBJECT(mblist), "row-activated",
                      G_CALLBACK(bmbl_row_activated_cb), NULL);
 }

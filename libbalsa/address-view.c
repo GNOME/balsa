@@ -938,36 +938,6 @@ lbav_sort_func(GtkTreeModel * model, GtkTreeIter * a, GtkTreeIter * b,
 }
 
 /*
- * Callback for the tree-view's selection "changed" signal.
- * Implement one-click actions.
- */
-static void
-lbav_selection_changed_cb(GtkTreeSelection * selection,
-                          LibBalsaAddressView * address_view)
-{
-    GdkEvent *event = gtk_get_current_event();
-
-    if (event != NULL) {
-        gdouble x_win, y_win;
-
-        if (gdk_event_get_event_type(event) == GDK_BUTTON_PRESS &&
-            gdk_event_get_coords(event, &x_win, &y_win)) {
-            GtkTreeView *tree_view = (GtkTreeView *) address_view;
-            gint x, y;
-            GtkTreePath *path;
-            GtkTreeViewColumn *column;
-
-            gtk_tree_view_convert_widget_to_bin_window_coords(tree_view, x_win, y_win, &x, &y);
-            if (gtk_tree_view_get_path_at_pos (tree_view, x, y, &path, &column, NULL, NULL)) {
-                gtk_tree_view_row_activated(tree_view, path, column);
-                gtk_tree_path_free(path);
-            }
-        }
-        gdk_event_free(event);
-    }
-}
-
-/*
  *     Public API.
  */
 
@@ -984,7 +954,6 @@ libbalsa_address_view_new(const gchar * const *types,
     LibBalsaAddressView *address_view;
     GtkCellRenderer *renderer;
     GtkTreeViewColumn *column;
-    GtkTreeSelection *selection;
 
     /* List store for the widget: */
     address_store = gtk_list_store_new(4,
@@ -1016,9 +985,7 @@ libbalsa_address_view_new(const gchar * const *types,
     address_view->fallback = fallback;
 
     tree_view = GTK_TREE_VIEW(address_view);
-    selection = gtk_tree_view_get_selection(tree_view);
-    g_signal_connect(selection, "changed",
-                     G_CALLBACK(lbav_selection_changed_cb), address_view);
+    gtk_tree_view_set_activate_on_single_click(tree_view, TRUE);
 
     /* The button: */
     column = gtk_tree_view_column_new();

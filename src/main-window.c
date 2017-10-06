@@ -2221,8 +2221,8 @@ balsa_window_new()
 
     window->progress_bar = gtk_progress_bar_new();
     gtk_widget_set_valign(window->progress_bar, GTK_ALIGN_CENTER);
-    gtk_progress_bar_set_pulse_step(GTK_PROGRESS_BAR(window->progress_bar),
-                                    0.01);
+    gtk_progress_bar_set_pulse_step(GTK_PROGRESS_BAR(window->progress_bar), 0.01);
+    gtk_widget_set_size_request(window->progress_bar, balsa_app.mblist_width, -1);
     gtk_box_pack_start(GTK_BOX(hbox), window->progress_bar);
 
     window->statusbar = gtk_statusbar_new();
@@ -2232,11 +2232,6 @@ balsa_window_new()
     gtk_widget_set_hexpand(window->statusbar, TRUE);
     gtk_box_pack_start(GTK_BOX(hbox), window->statusbar);
     gtk_widget_show(hbox);
-
-#if 0
-    gnome_app_install_appbar_menu_hints(GNOME_APPBAR(balsa_app.appbar),
-                                        main_menu);
-#endif
 
     gtk_window_set_resizable(GTK_WINDOW(window), TRUE);
     gtk_window_set_default_size(GTK_WINDOW(window), balsa_app.mw_width,

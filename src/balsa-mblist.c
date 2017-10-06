@@ -91,8 +91,6 @@ static gboolean bmbl_drag_motion(GtkWidget * mblist,
                                  GdkDragContext * context, gint x, gint y,
                                  guint time);
 static gboolean bmbl_popup_menu(GtkWidget * widget);
-static void bmbl_select_mailbox(GtkTreeSelection * selection,
-                                gpointer data);
 static void bmbl_init(BalsaMBList * mblist);
 static gboolean bmbl_selection_func(GtkTreeSelection * selection,
                                     GtkTreeModel * model,
@@ -569,13 +567,7 @@ bmbl_tree_expand(GtkTreeView * tree_view, GtkTreeIter * iter,
 		if (mbnode->mailbox == current_mailbox) {
 		    GtkTreeSelection *selection =
 			gtk_tree_view_get_selection(tree_view);
-		    g_signal_handlers_block_by_func(selection,
-						    bmbl_select_mailbox,
-						    NULL);
 		    gtk_tree_selection_select_iter(selection, &child_iter);
-		    g_signal_handlers_unblock_by_func(selection,
-						      bmbl_select_mailbox,
-						      NULL);
 		}
 	    }
 	    g_object_unref(mbnode);
@@ -853,87 +845,6 @@ bmbl_drag_cb(GtkWidget * widget, GdkDragContext * context,
 
     if (balsa_find_iter_by_data(&iter, orig_mailbox))
         gtk_tree_selection_select_iter(selection, &iter);
-}
-
-/* bmbl_select_mailbox
- *
- * This function is called when the user clicks on the mailbox list,
- * to open the mailbox. It's also called if the user uses the keyboard
- * to focus on the mailbox, in which case we don't open the mailbox.
- */
-static void
-bmbl_select_mailbox(GtkTreeSelection * selection, gpointer data)
-{
-    GdkEvent *event = gtk_get_current_event();
-    GtkTreeView *tree_view =
-        gtk_tree_selection_get_tree_view(selection);
-    GtkTreeModel *model =
-        gtk_tree_view_get_model(tree_view);
-    GtkTreePath *path;
-    guint button;
-    gdouble x_win, y_win;
-    gint tx, ty;
-
-    if (event == NULL) {
-	GtkTreeIter iter;
-
-	if (gtk_tree_selection_get_selected(selection, NULL, &iter)) {
-	    BalsaMailboxNode *mbnode;
-	    LibBalsaMailbox *mailbox;
-	    gtk_tree_model_get(model, &iter, MBNODE_COLUMN, &mbnode, -1);
-	    mailbox = mbnode->mailbox;
-	    g_object_unref(mbnode);
-	    if (MAILBOX_OPEN(mailbox))
-		/* Opening a mailbox under program control. */
-		return;
-	}
-	/* Not opening a mailbox--must be the initial selection of the
-	 * first mailbox in the list, so we'll unselect it again. */
-	g_signal_handlers_block_by_func(selection, bmbl_select_mailbox, NULL);
-	gtk_tree_selection_unselect_all(selection);
-	g_signal_handlers_unblock_by_func(selection, bmbl_select_mailbox, NULL);
-        return;
-    }
-
-    if (gdk_event_get_event_type(event) != GDK_BUTTON_PRESS
-            /* keyboard navigation */
-        || !(gdk_event_get_button(event, &button) && button == 1)
-            /* soft select */
-        || !gdk_event_get_coords(event, &x_win, &y_win)) {
-        gdk_event_free(event);
-        return;
-    }
-
-    gtk_tree_view_convert_widget_to_tree_coords(tree_view,
-                                                (gint) x_win, (gint) y_win,
-                                                &tx, &ty);
-
-    if (!gtk_tree_view_get_path_at_pos(tree_view, tx, ty, &path, NULL, NULL, NULL)) {
-        /* GtkTreeView selects the first node in the tree when the
-         * widget first gets the focus, whether it's a keyboard event or
-         * a button event. If it's a button event, but no mailbox was
-         * clicked, we'll just undo that selection and return. */
-	g_signal_handlers_block_by_func(selection, bmbl_select_mailbox, NULL);
-        gtk_tree_selection_unselect_all(selection);
-	g_signal_handlers_unblock_by_func(selection, bmbl_select_mailbox, NULL);
-        gdk_event_free(event);
-        return;
-    }
-
-    if (gtk_tree_selection_path_is_selected(selection, path)) {
-        BalsaMailboxNode *mbnode;
-        GtkTreeIter iter;
-
-        gtk_tree_model_get_iter(model, &iter, path);
-        gtk_tree_model_get(model, &iter, MBNODE_COLUMN, &mbnode, -1);
-        g_return_if_fail(mbnode != NULL);
-
-        if (mbnode->mailbox)
-            balsa_mblist_open_mailbox(mbnode->mailbox);
-	g_object_unref(mbnode);
-    }
-    gtk_tree_path_free(path);
-    gdk_event_free(event);
 }
 
 /*
@@ -1267,8 +1178,7 @@ balsa_mblist_default_signal_bindings(BalsaMBList * mblist)
                      G_CALLBACK(bmbl_drag_cb), NULL);
 
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(mblist));
-    g_signal_connect(G_OBJECT(selection), "changed",
-                     G_CALLBACK(bmbl_select_mailbox), NULL);
+    gtk_tree_view_set_activate_on_single_click(tree_view, TRUE);
     g_signal_connect(G_OBJECT(mblist), "row-activated",
                      G_CALLBACK(bmbl_row_activated_cb), NULL);
 }

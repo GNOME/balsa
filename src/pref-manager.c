@@ -1236,12 +1236,15 @@ pm_grid_attach(GtkGrid   * grid,
         gtk_widget_set_margin_start(child, INDENT_WIDTH);
         gtk_widget_set_hexpand(child, TRUE);
     }
+
     if (GTK_IS_LABEL(child)) {
-#if GTK_CHECK_VERSION(3, 16, 0)
         gtk_label_set_xalign((GtkLabel *) child, 0.0);
-#else
-        gtk_widget_set_halign(child, GTK_ALIGN_START);
-#endif
+    } else if (GTK_IS_BUTTON(child)) {
+        GtkWidget * label;
+
+        label = gtk_bin_get_child((GtkBin *) child);
+        if (GTK_IS_LABEL(label))
+            gtk_label_set_xalign((GtkLabel *) label, 0.0);
     }
 
     gtk_grid_attach(grid, child, left, top, width, height);
@@ -1291,11 +1294,17 @@ pm_grid_attach_label(GtkGrid     * grid,
 {
     GtkWidget *label;
 
-    label = gtk_label_new(text);
-    gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
-    gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
-    gtk_label_set_max_width_chars(GTK_LABEL(label), BALSA_MAX_WIDTH_CHARS);
-    gtk_widget_set_halign(label, GTK_ALIGN_START);
+    if (strchr(text, '_') == NULL) {
+        label = gtk_label_new(text);
+    } else {
+        label = gtk_label_new_with_mnemonic(text);
+    }
+
+    gtk_label_set_justify((GtkLabel *) label, GTK_JUSTIFY_LEFT);
+    gtk_label_set_line_wrap((GtkLabel *) label, TRUE);
+    gtk_label_set_max_width_chars((GtkLabel *) label, BALSA_MAX_WIDTH_CHARS);
+    gtk_label_set_xalign((GtkLabel *) label, 0.0);
+    gtk_label_set_yalign((GtkLabel *) label, 0.5);
 
     pm_grid_attach(grid, label, left, top, width, height);
 
@@ -1335,7 +1344,7 @@ pm_grid_attach_entry(GtkGrid     * grid,
 
     entry = gtk_entry_new();
     gtk_widget_set_hexpand(entry, TRUE);
-    pm_grid_attach(grid, entry, ++left, top, width, height);
+    pm_grid_attach(grid, entry, left + width, top, width, height);
 
     return entry;
 }
@@ -2136,9 +2145,7 @@ pm_grid_add_checking_group(GtkWidget * grid_widget)
     gtk_widget_set_hexpand(pui->check_mail_minutes, TRUE);
     pm_grid_attach(grid, pui->check_mail_minutes, 2, row, 1, 1);
 
-    label = gtk_label_new(_("minutes"));
-    gtk_widget_set_halign(label, GTK_ALIGN_START);
-    pm_grid_attach(grid, label, 3, row, 1, 1);
+    pm_grid_attach_label(grid, 3, row, 1, 1, _("minutes"));
 
     pui->check_imap = gtk_check_button_new_with_mnemonic(
 	_("Check _IMAP mailboxes"));
@@ -2172,17 +2179,14 @@ pm_grid_add_checking_group(GtkWidget * grid_widget)
 	_("Do background check quietly (no messages in status bar)"));
     pm_grid_attach(grid, pui->quiet_background_check, 1, ++row, 3, 1);
 
-    label = gtk_label_new_with_mnemonic(_("_POP message size limit:"));
-    gtk_widget_set_halign(label, GTK_ALIGN_START);
-    pm_grid_attach(grid, label, 1, ++row, 1, 1);
+    pm_grid_attach_label(grid, 1, ++row, 1, 1, _("_POP message size limit:"));
 
     pui->msg_size_limit = gtk_spin_button_new_with_range(0.1, 100, 0.1);
     gtk_label_set_mnemonic_widget(GTK_LABEL(label), pui->msg_size_limit);
     gtk_widget_set_hexpand(pui->msg_size_limit, TRUE);
     pm_grid_attach(grid, pui->msg_size_limit, 2, row, 1, 1);
-    label = gtk_label_new(_("MB"));
-    gtk_widget_set_halign(label, GTK_ALIGN_START);
-    pm_grid_attach(grid, label, 3, row, 1, 1);
+
+    pm_grid_attach_label(grid, 3, row, 1, 1, _("MB"));
 
     pm_grid_set_next_row(grid, ++row);
 }
@@ -2250,7 +2254,6 @@ pm_grid_add_word_wrap_group(GtkWidget * grid_widget)
     GtkGrid *grid = (GtkGrid *) grid_widget;
     gint row = pm_grid_get_next_row(grid);
     GtkAdjustment *spinbutton_adj;
-    GtkWidget *label;
 
     pm_grid_attach(grid, pm_group_label(_("Word wrap")), 0, row, 3, 1);
 
@@ -2264,9 +2267,7 @@ pm_grid_add_word_wrap_group(GtkWidget * grid_widget)
     gtk_widget_set_sensitive(pui->wraplength, FALSE);
     pm_grid_attach(grid, pui->wraplength, 2, row, 1, 1);
 
-    label = gtk_label_new(_("characters"));
-    gtk_widget_set_halign(label, GTK_ALIGN_START);
-    pm_grid_attach(grid, label, 3, row, 1, 1);
+    pm_grid_attach_label(grid, 3, row, 1, 1, _("characters"));
 
     pm_grid_set_next_row(grid, ++row);
 }
@@ -2280,8 +2281,7 @@ pm_grid_add_other_options_group(GtkWidget * grid_widget)
 {
     GtkGrid *grid = (GtkGrid *) grid_widget;
     gint row = pm_grid_get_next_row(grid);
-	GtkWidget *label;
-	GtkAdjustment *spinbutton_adj;
+    GtkAdjustment *spinbutton_adj;
 
     pm_grid_attach(grid, pm_group_label(_("Other options")), 0, row, 3, 1);
 
@@ -2301,13 +2301,11 @@ pm_grid_add_other_options_group(GtkWidget * grid_widget)
 
     pui->send_mail_auto =
     	pm_grid_attach_check(grid, 1, ++row, 1, 1, _("_Send queued mail automatically every"));
-	spinbutton_adj = gtk_adjustment_new(10, 1, 120, 1, 10, 0);
-	pui->send_mail_minutes = gtk_spin_button_new(spinbutton_adj, 1, 0);
-	gtk_widget_set_hexpand(pui->send_mail_minutes, TRUE);
-	pm_grid_attach(grid, pui->send_mail_minutes, 2, row, 1, 1);
-	label = gtk_label_new(_("minutes"));
-	gtk_widget_set_halign(label, GTK_ALIGN_START);
-	pm_grid_attach(grid, label, 3, row, 1, 1);
+    spinbutton_adj = gtk_adjustment_new(10, 1, 120, 1, 10, 0);
+    pui->send_mail_minutes = gtk_spin_button_new(spinbutton_adj, 1, 0);
+    gtk_widget_set_hexpand(pui->send_mail_minutes, TRUE);
+    pm_grid_attach(grid, pui->send_mail_minutes, 2, row, 1, 1);
+    pm_grid_attach_label(grid, 3, row, 1, 1, _("minutes"));
 
     pui->edit_headers =
         pm_grid_attach_check(grid, 1, ++row, 2, 1, _("Edit headers in external editor"));
@@ -2328,7 +2326,6 @@ pm_grid_add_main_window_group(GtkWidget * grid_widget)
     GtkGrid *grid = (GtkGrid *) grid_widget;
     gint row = pm_grid_get_next_row(grid);
     GtkAdjustment *scroll_adj;
-    GtkWidget *label;
 
     pm_grid_attach(grid, pm_group_label(_("Main window")), 0, row, 3, 1);
 
@@ -2357,10 +2354,7 @@ pm_grid_add_main_window_group(GtkWidget * grid_widget)
     gtk_widget_set_sensitive(pui->pgdown_percent, FALSE);
     gtk_widget_set_hexpand(pui->pgdown_percent, TRUE);
     pm_grid_attach(grid, pui->pgdown_percent, 2, row, 1, 1);
-
-    label = gtk_label_new(_("percent"));
-    gtk_widget_set_halign(label, GTK_ALIGN_START);
-    pm_grid_attach(grid, label, 3, row, 1, 1);
+    pm_grid_attach_label(grid, 3, row, 1, 1, _("percent"));
 
     pm_grid_set_next_row(grid, ++row);
 }

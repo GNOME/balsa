@@ -421,6 +421,7 @@ create_toolbar_page(BalsaToolbarModel * model, GActionMap * map)
 
     /* Preview display */
     toolbar_frame=gtk_frame_new(_("Preview"));
+    g_object_set((GObject *) toolbar_frame, "margin", 5, NULL);
     gtk_box_pack_start(GTK_BOX(outer_box), toolbar_frame);
 
     toolbar_ctlbox=gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
@@ -438,7 +439,6 @@ create_toolbar_page(BalsaToolbarModel * model, GActionMap * map)
                                    GTK_POLICY_NEVER);
 
     g_object_set(G_OBJECT(toolbar_scroll), "margin", 5, NULL);
-    gtk_widget_set_vexpand(toolbar_scroll, TRUE);
     gtk_box_pack_start(GTK_BOX(toolbar_ctlbox), toolbar_scroll);
 
     gtk_container_add(GTK_CONTAINER(toolbar_scroll), page->toolbar);

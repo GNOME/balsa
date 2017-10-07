@@ -1394,7 +1394,7 @@ ident_dialog_add_file_chooser_button(GtkWidget * grid, gint row,
     g_free(filename);
 
     gtk_widget_set_hexpand(button, TRUE);
-    gtk_widget_set_vexpand(button, TRUE);
+    gtk_widget_set_vexpand(button, FALSE);
     gtk_grid_attach(GTK_GRID(grid), button, 1, row, 1, 1);
 
     g_object_set_data(G_OBJECT(dialog), path_info[type].path_key, button);

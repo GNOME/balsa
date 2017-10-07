@@ -918,8 +918,14 @@ libbalsa_create_grid_check(const gchar * text, GtkWidget * grid, gint row,
                            gboolean initval)
 {
     GtkWidget *check_button;
+    GtkWidget *label;
 
     check_button = gtk_check_button_new_with_mnemonic(text);
+    label = gtk_bin_get_child((GtkBin *) check_button);
+    if (GTK_IS_LABEL(label)) {
+        gtk_label_set_xalign((GtkLabel *) label, 0.0);
+        gtk_label_set_yalign((GtkLabel *) label, 0.5);
+    }
 
     gtk_grid_attach(GTK_GRID(grid), check_button, 0, row, 2, 1);
 

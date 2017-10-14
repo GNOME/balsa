@@ -234,7 +234,7 @@ LIBS="$LIBS -lz"
 
 PKG_CHECK_MODULES(BALSA, [
 glib-2.0 >= 2.40.0
-gtk+-3.0 >= 3.10.0
+gtk+-4.0
 gmime-2.6
 gio-2.0
 gthread-2.0

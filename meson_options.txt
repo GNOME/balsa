@@ -15,7 +15,7 @@ option('fcntl',
 
 option('gpgme',
   type        : 'string',
-  value       : 'false',
+  value       : 'true',
   description : 'build with gpgme/GnuPG support (true|false|path to gpgme-config, default=false)')
 
 option('canberra',
@@ -36,7 +36,7 @@ option('gss',
 option('html-widget',
   type        : 'combo',
   choices     : ['webkit2', 'webkit', 'gtkhtml4', 'none'],
-  value       : 'webkit2',
+  value       : 'none',
   description : 'select the HTML renderer (default webkit2)')
 
 option('gtksourceview',
@@ -82,7 +82,7 @@ option('sqlite',
 
 option('libsecret',
   type        : 'boolean',
-  value       : false,
+  value       : true,
   description : 'Link to libsecret (default=false)')
 
 option('gcr',

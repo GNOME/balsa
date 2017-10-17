@@ -254,15 +254,10 @@ static void
 balsa_headers_attachments_popup(GtkButton * button, BalsaMessage * bm)
 {
     if (bm->parts_popup) {
-#if GTK_CHECK_VERSION(3, 22, 0)
         gtk_menu_popup_at_widget(GTK_MENU(bm->parts_popup),
                                  GTK_WIDGET(bm),
                                  GDK_GRAVITY_CENTER, GDK_GRAVITY_CENTER,
                                  NULL);
-#else                           /*GTK_CHECK_VERSION(3, 22, 0) */
-	gtk_menu_popup(GTK_MENU(bm->parts_popup), NULL, NULL, NULL, NULL, 0,
-		       gtk_get_current_event_time());
-#endif                          /*GTK_CHECK_VERSION(3, 22, 0) */
     }
 }
 
@@ -316,25 +311,6 @@ bm_header_tl_buttons(BalsaMessage * bm)
 
     return (GtkWidget **) g_ptr_array_free(array, FALSE);
 }
-
-
-#if !GTK_CHECK_VERSION(3, 15, 0)
-/* Callback for the "style-updated" signal; set the message background to
- * match the base color of the content in the tree-view. */
-static void
-bm_on_set_style(GtkWidget * widget,
-	        BalsaMessage * bm)
-{
-    GtkStyleContext *context;
-    GdkRGBA rgba;
-
-    context = gtk_widget_get_style_context(bm->treeview);
-    gtk_style_context_get_background_color(context, GTK_STATE_FLAG_NORMAL,
-                                           &rgba);
-    gtk_widget_override_background_color(bm->scroll,
-                                         GTK_STATE_FLAG_NORMAL, &rgba);
-}
-#endif
 
 static void
 on_content_size_alloc(GtkWidget * widget, GtkAllocation * allocation,
@@ -726,10 +702,6 @@ balsa_message_init(BalsaMessage * bm)
 		     G_CALLBACK(balsa_mime_widget_key_press_event), bm);
     gtk_widget_set_vexpand(scroll, TRUE);
     gtk_box_pack_start(GTK_BOX(vbox), scroll);
-#if !GTK_CHECK_VERSION(3, 15, 0)
-    g_signal_connect_after(bm, "style-updated",
-			   G_CALLBACK(bm_on_set_style), bm);
-#endif
     g_signal_connect(bm->scroll, "size-allocate",
 		     G_CALLBACK(on_content_size_alloc), NULL);
 
@@ -998,7 +970,6 @@ tree_mult_selection_popup(BalsaMessage * bm, GdkEvent * event,
                           G_CALLBACK (part_context_dump_all_cb),
                           (gpointer) bm->save_all_list);
         gtk_menu_shell_append (GTK_MENU_SHELL (bm->save_all_popup), menu_item);
-#if GTK_CHECK_VERSION(3, 22, 0)
         if (event)
             gtk_menu_popup_at_pointer(GTK_MENU(bm->save_all_popup),
                                       (GdkEvent *) event);
@@ -1007,14 +978,6 @@ tree_mult_selection_popup(BalsaMessage * bm, GdkEvent * event,
                                      GTK_WIDGET(bm),
                                      GDK_GRAVITY_CENTER, GDK_GRAVITY_CENTER,
                                      NULL);
-#else                           /*GTK_CHECK_VERSION(3, 22, 0) */
-        if (event)
-            gtk_menu_popup(GTK_MENU(bm->save_all_popup), NULL, NULL, NULL,
-                           NULL, event->button, event->time);
-        else
-            gtk_menu_popup(GTK_MENU(bm->save_all_popup), NULL, NULL, NULL,
-                           NULL, 0, gtk_get_current_event_time());
-#endif                          /*GTK_CHECK_VERSION(3, 22, 0) */
     }
 }
 

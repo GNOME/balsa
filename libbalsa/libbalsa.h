@@ -194,11 +194,7 @@ enum LibBalsaImageError {
 #endif                          /* HAVE_COMPFACE */
 };
 
-#if GTK_CHECK_VERSION(3, 12, 0)
 GtkDialogFlags libbalsa_dialog_flags(void);
-#else
-#define libbalsa_dialog_flags()		(GtkDialogFlags) (0)
-#endif
 
 #if HAVE_GTKSOURCEVIEW
 GtkWidget *libbalsa_source_view_new(gboolean highlight_phrases);

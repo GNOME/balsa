@@ -295,24 +295,16 @@ static void
 extbody_call_url(GtkWidget * button, gpointer data)
 {
     gchar *url = g_object_get_data(G_OBJECT(button), "call_url");
-#if GTK_CHECK_VERSION(3, 22, 0)
     GtkWidget *toplevel;
-#else /* GTK_CHECK_VERSION(3, 22, 0) */
-    GdkScreen *screen;
-#endif /* GTK_CHECK_VERSION(3, 22, 0) */
     GError *err = NULL;
 
     g_return_if_fail(url);
-#if GTK_CHECK_VERSION(3, 22, 0)
     toplevel = gtk_widget_get_toplevel(GTK_WIDGET(button));
     if (gtk_widget_is_toplevel(toplevel)) {
         gtk_show_uri_on_window(GTK_WINDOW(toplevel), url,
                                gtk_get_current_event_time(), &err);
     }
-#else  /* GTK_CHECK_VERSION(3, 22, 0) */
-    screen = gtk_widget_get_screen(button);
-    gtk_show_uri(screen, url, gtk_get_current_event_time(), &err);
-#endif /* GTK_CHECK_VERSION(3, 22, 0) */
+
     if (err) {
 	balsa_information(LIBBALSA_INFORMATION_WARNING,
 			  _("Error showing %s: %s\n"), url, err->message);

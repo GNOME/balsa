@@ -33,11 +33,6 @@
  */
 struct _BalsaMimeWidgetImage {
     BalsaMimeWidget  parent;
-
-#if !GTK_CHECK_VERSION(3, 15, 0)
-    GtkStyleContext *context;
-    gulong           context_changed_handler_id;
-#endif
 };
 
 struct _BalsaMimeWidgetImageClass {
@@ -56,16 +51,6 @@ balsa_mime_widget_image_init(BalsaMimeWidgetImage * mwi)
 static void
 balsa_mime_widget_image_dispose(GObject * obj)
 {
-#if !GTK_CHECK_VERSION(3, 15, 0)
-    BalsaMimeWidgetImage *mwi = BALSA_MIME_WIDGET_IMAGE(obj);
-
-    if (mwi->context_changed_handler_id) {
-        g_signal_handler_disconnect(mwi->context,
-                                    mwi->context_changed_handler_id);
-        mwi->context_changed_handler_id = 0;
-    }
-#endif
-
     (*G_OBJECT_CLASS(balsa_mime_widget_image_parent_class)->
           dispose) (obj);
 }
@@ -84,19 +69,6 @@ balsa_mime_widget_image_class_init(BalsaMimeWidgetImageClass * klass)
 static gboolean balsa_image_button_press_cb(GtkWidget * widget, GdkEventButton * event,
 					    GtkMenu * menu);
 static gboolean img_check_size(GtkImage ** widget_p);
-
-#if !GTK_CHECK_VERSION(3, 15, 0)
-static void
-bmwi_context_changed_cb(GtkStyleContext * context, BalsaMimeWidget * mw)
-{
-    GdkRGBA rgba;
-
-    gtk_style_context_get_background_color(context,
-                                           GTK_STATE_FLAG_NORMAL, &rgba);
-    gtk_widget_override_background_color(mw->widget,
-                                         GTK_STATE_FLAG_NORMAL, &rgba);
-}
-#endif
 
 BalsaMimeWidget *
 balsa_mime_widget_new_image(BalsaMessage * bm,
@@ -174,12 +146,7 @@ balsa_image_button_press_cb(GtkWidget * widget, GdkEventButton * event,
                             GtkMenu * menu)
 {
     if (gdk_event_triggers_context_menu((GdkEvent *) event)) {
-#if GTK_CHECK_VERSION(3, 22, 0)
         gtk_menu_popup_at_pointer(menu, (GdkEvent *) event);
-#else                           /*GTK_CHECK_VERSION(3, 22, 0) */
-        gtk_menu_popup(menu, NULL, NULL, NULL, NULL,
-                       event->button, event->time);
-#endif                          /*GTK_CHECK_VERSION(3, 22, 0) */
         return TRUE;
     } else
         return FALSE;

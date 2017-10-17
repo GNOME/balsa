@@ -91,9 +91,6 @@ static void
 folder_conf_response(GtkDialog * dialog, int response,
                      CommonDialogData * cdd)
 {
-#if !GTK_CHECK_VERSION(3, 22, 0)
-    GdkScreen *screen;
-#endif /* GTK_CHECK_VERSION(3, 22, 0) */
     GError *err = NULL;
 
     /* If mbnode's parent gets rescanned, mbnode will be finalized,
@@ -104,14 +101,8 @@ folder_conf_response(GtkDialog * dialog, int response,
 	g_object_ref(cdd->mbnode);
     switch (response) {
     case GTK_RESPONSE_HELP:
-#if GTK_CHECK_VERSION(3, 22, 0)
         gtk_show_uri_on_window(GTK_WINDOW(dialog), "help:balsa/folder-config",
                                gtk_get_current_event_time(), &err);
-#else /* GTK_CHECK_VERSION(3, 22, 0) */
-        screen = gtk_widget_get_screen(GTK_WIDGET(dialog));
-        gtk_show_uri(screen, "help:balsa/folder-config",
-                     gtk_get_current_event_time(), &err);
-#endif /* GTK_CHECK_VERSION(3, 22, 0) */
         if (err) {
             balsa_information(LIBBALSA_INFORMATION_WARNING,
                               _("Error displaying config help: %s\n"),

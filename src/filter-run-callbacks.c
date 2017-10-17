@@ -159,9 +159,6 @@ void fr_dialog_response(GtkWidget * widget, gint response,
 			gpointer throwaway)
 {
     BalsaFilterRunDialog * p;
-#if !GTK_CHECK_VERSION(3, 22, 0)
-    GdkScreen *screen;
-#endif /* GTK_CHECK_VERSION(3, 22, 0) */
     GError *err = NULL;
 
     p=BALSA_FILTER_RUN_DIALOG(widget);
@@ -177,15 +174,9 @@ void fr_dialog_response(GtkWidget * widget, gint response,
 
 	break;
     case GTK_RESPONSE_HELP:     /* Help button */
-#if GTK_CHECK_VERSION(3, 22, 0)
         gtk_show_uri_on_window(GTK_WINDOW(widget),
                                "help:balsa/win-run-filters",
                                gtk_get_current_event_time(), &err);
-#else /* GTK_CHECK_VERSION(3, 22, 0) */
-        screen = gtk_widget_get_screen(widget);
-        gtk_show_uri(screen, "help:balsa/win-run-filters",
-                     gtk_get_current_event_time(), &err);
-#endif /* GTK_CHECK_VERSION(3, 22, 0) */
 	if (err) {
 	    balsa_information_parented(GTK_WINDOW(widget),
 		    LIBBALSA_INFORMATION_WARNING,

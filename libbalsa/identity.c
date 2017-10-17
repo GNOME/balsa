@@ -1713,17 +1713,9 @@ static void
 help_ident_cb(GtkWidget * widget)
 {
     GError *err = NULL;
-#if GTK_CHECK_VERSION(3, 22, 0)
 
     gtk_show_uri_on_window(GTK_WINDOW(widget), "help:balsa/identities",
                            gtk_get_current_event_time(), &err);
-#else /* GTK_CHECK_VERSION(3, 22, 0) */
-    GdkScreen *screen;
-
-    screen = gtk_widget_get_screen(widget);
-    gtk_show_uri(screen, "help:balsa/identities",
-                 gtk_get_current_event_time(), &err);
-#endif /* GTK_CHECK_VERSION(3, 22, 0) */
 
     if (err) {
         g_print(_("Error displaying help for identities: %s\n"),

@@ -835,9 +835,6 @@ condition_dialog_response(GtkWidget * dialog, gint response,
 {
     LibBalsaCondition *new_cnd;
     GError *err = NULL;
-#if !GTK_CHECK_VERSION(3, 22, 0)
-    GdkScreen *screen;
-#endif /* GTK_CHECK_VERSION(3, 22, 0) */
 
     switch (response) {
     case GTK_RESPONSE_OK:       /* OK button */
@@ -893,15 +890,9 @@ condition_dialog_response(GtkWidget * dialog, gint response,
         gtk_widget_hide(dialog);
         break;
     case GTK_RESPONSE_HELP:     /* Help button */
-#if GTK_CHECK_VERSION(3, 22, 0)
         gtk_show_uri_on_window(GTK_WINDOW(dialog),
                                "help:balsa/win-filters#win-condition",
                                gtk_get_current_event_time(), &err);
-#else  /* GTK_CHECK_VERSION(3, 22, 0) */
-        screen = gtk_widget_get_screen(dialog);
-        gtk_show_uri(screen, "help:balsa/win-filters#win-condition",
-                     gtk_get_current_event_time(), &err);
-#endif  /* GTK_CHECK_VERSION(3, 22, 0) */
 	if (err) {
 	    balsa_information_parented(GTK_WINDOW(dialog),
 		    LIBBALSA_INFORMATION_WARNING,
@@ -1469,9 +1460,6 @@ fe_dialog_response(GtkWidget * dialog, gint response, gpointer data)
     GtkTreeIter iter;
     gboolean valid;
     GError *err = NULL;
-#if !GTK_CHECK_VERSION(3, 22, 0)
-    GdkScreen *screen;
-#endif /* GTK_CHECK_VERSION(3, 22, 0) */
 
     switch (response) {
     case GTK_RESPONSE_OK:       /* OK button */
@@ -1510,14 +1498,9 @@ fe_dialog_response(GtkWidget * dialog, gint response, gpointer data)
         break;
 
     case GTK_RESPONSE_HELP:     /* Help button */
-#if GTK_CHECK_VERSION(3, 22, 0)
         gtk_show_uri_on_window(GTK_WINDOW(dialog), "help:balsa/win-filters",
                                    gtk_get_current_event_time(), &err);
-#else  /* GTK_CHECK_VERSION(3, 22, 0) */
-        screen = gtk_widget_get_screen(dialog);
-        gtk_show_uri(screen, "help:balsa/win-filters",
-                     gtk_get_current_event_time(), &err);
-#endif  /* GTK_CHECK_VERSION(3, 22, 0) */
+
 	if (err) {
 	    balsa_information_parented(GTK_WINDOW(dialog),
 		    LIBBALSA_INFORMATION_WARNING,

@@ -649,44 +649,6 @@ tm_remove_underscore(const gchar * text)
     return r;
 }
 
-#if !GTK_CHECK_VERSION(3, 22, 0)
-/* If the menu is popped up in response to a keystroke, center it
- * immediately below the toolbar.
- */
-static void
-tm_popup_position_func(GtkMenu * menu, gint * x, gint * y,
-                       gboolean * push_in, gpointer user_data)
-{
-    GtkWidget *toolbar = GTK_WIDGET(user_data);
-    GdkScreen *screen = gtk_widget_get_screen(toolbar);
-    GtkRequisition req;
-    gint monitor_num;
-    GdkRectangle monitor;
-    GtkAllocation allocation;
-
-    g_return_if_fail(gtk_widget_get_window(toolbar));
-
-    gdk_window_get_origin(gtk_widget_get_window(toolbar), x, y);
-
-    gtk_widget_get_preferred_size(GTK_WIDGET(menu), NULL, &req);
-
-    gtk_widget_get_allocation(toolbar, &allocation);
-    *x += (allocation.width - req.width) / 2;
-    *y += allocation.height;
-
-    monitor_num = gdk_screen_get_monitor_at_point(screen, *x, *y);
-    gtk_menu_set_monitor(menu, monitor_num);
-    gdk_screen_get_monitor_geometry(screen, monitor_num, &monitor);
-
-    *x = CLAMP(*x, monitor.x,
-               monitor.x + MAX(0, monitor.width - req.width));
-    *y = CLAMP(*y, monitor.y,
-               monitor.y + MAX(0, monitor.height - req.height));
-
-    *push_in = FALSE;
-}
-#endif                          /*GTK_CHECK_VERSION(3, 22, 0) */
-
 static gboolean
 tm_popup_context_menu_cb(GtkWidget    * toolbar,
                          gint           x,

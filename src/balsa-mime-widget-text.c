@@ -472,11 +472,7 @@ text_view_url_popup(GtkTextView *textview, GtkMenu *menu)
     gint x, y;
     GdkWindow *window;
     GdkDisplay *display;
-#if GTK_CHECK_VERSION(3, 19, 0)
     GdkSeat *seat;
-#else                           /* GTK_CHECK_VERSION(3, 20, 0) */
-    GdkDeviceManager *manager;
-#endif                          /* GTK_CHECK_VERSION(3, 20, 0) */
     GdkDevice *device;
     GtkWidget *menu_item;
 
@@ -487,13 +483,8 @@ text_view_url_popup(GtkTextView *textview, GtkMenu *menu)
     /* check if we are over an url */
     window = gtk_text_view_get_window(textview, GTK_TEXT_WINDOW_TEXT);
     display = gdk_window_get_display(window);
-#if GTK_CHECK_VERSION(3, 19, 0)
     seat = gdk_display_get_default_seat(display);
     device = gdk_seat_get_pointer(seat);
-#else                           /* GTK_CHECK_VERSION(3, 20, 0) */
-    manager = gdk_display_get_device_manager(display);
-    device = gdk_device_manager_get_client_pointer(manager);
-#endif                          /* GTK_CHECK_VERSION(3, 20, 0) */
     gdk_window_get_device_position(window, device, &x, &y, NULL);
 
     url = find_url(GTK_WIDGET(textview), x, y, url_list);
@@ -690,13 +681,8 @@ prepare_url_offsets(GtkTextBuffer * buffer, GList * url_list)
         gtk_text_iter_backward_to_tag_toggle(&iter, url_tag);
 #else
         while (gtk_text_iter_backward_char(&iter)) {
-#if GTK_CHECK_VERSION(3, 19, 0)
             if (gtk_text_iter_starts_tag(&iter, url_tag))
                 break;
-#else                           /* GTK_CHECK_VERSION(3, 20, 0) */
-            if (gtk_text_iter_begins_tag(&iter, url_tag))
-                break;
-#endif                          /* GTK_CHECK_VERSION(3, 20, 0) */
         }
 #endif                          /* BUG_102711_FIXED */
         url->start = gtk_text_iter_get_offset(&iter);
@@ -801,9 +787,6 @@ handle_url(const gchar * url)
         GtkStatusbar *statusbar;
         guint context_id;
         gchar *notice = g_strdup_printf(_("Calling URL %s…"), url);
-#if !GTK_CHECK_VERSION(3, 22, 0)
-        GdkScreen *screen;
-#endif /* GTK_CHECK_VERSION(3, 22, 0) */
         GError *err = NULL;
 
         statusbar = GTK_STATUSBAR(balsa_app.main_window->statusbar);
@@ -813,13 +796,9 @@ handle_url(const gchar * url)
         gtk_statusbar_push(statusbar, context_id, notice);
         SCHEDULE_BAR_REFRESH();
         g_free(notice);
-#if GTK_CHECK_VERSION(3, 22, 0)
         gtk_show_uri_on_window(GTK_WINDOW(balsa_app.main_window), url,
                                gtk_get_current_event_time(), &err);
-#else  /* GTK_CHECK_VERSION(3, 22, 0) */
-        screen = gtk_widget_get_screen(GTK_WIDGET(balsa_app.main_window));
-        gtk_show_uri(screen, url, gtk_get_current_event_time(), &err);
-#endif /* GTK_CHECK_VERSION(3, 22, 0) */
+
         if (err) {
             balsa_information(LIBBALSA_INFORMATION_WARNING,
                               _("Error showing %s: %s\n"),
@@ -1122,10 +1101,6 @@ balsa_gtk_html_popup(GtkWidget * html, BalsaMessage * bm)
     GtkWidget *menu;
     const GdkEvent *event;
     GdkEvent *current_event = NULL;
-#if !GTK_CHECK_VERSION(3, 22, 0)
-    guint32 time;
-    guint button;
-#endif                          /*GTK_CHECK_VERSION(3, 22, 0) */
 
     menu = gtk_menu_new();
     bmwt_populate_popup_menu(bm, html, GTK_MENU(menu));
@@ -1138,7 +1113,6 @@ balsa_gtk_html_popup(GtkWidget * html, BalsaMessage * bm)
     event = g_object_get_data(G_OBJECT(html), LIBBALSA_HTML_POPUP_EVENT);
     if (!event)
         event = current_event = gtk_get_current_event();
-#if GTK_CHECK_VERSION(3, 22, 0)
     if (event)
         gtk_menu_popup_at_pointer(GTK_MENU(menu),
                                   (GdkEvent *) event);
@@ -1149,15 +1123,6 @@ balsa_gtk_html_popup(GtkWidget * html, BalsaMessage * bm)
                                  NULL);
     if (current_event)
         gdk_event_free(current_event);
-#else                           /*GTK_CHECK_VERSION(3, 22, 0) */
-    time = gdk_event_get_time(event);
-    button = 0;
-    gdk_event_get_button(event, &button);
-    if (current_event)
-        gdk_event_free(current_event);
-
-    gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL, button, time);
-#endif                          /*GTK_CHECK_VERSION(3, 22, 0) */
 
     return TRUE;
 }

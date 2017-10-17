@@ -1,7 +1,9 @@
-project('balsa', 'c', default_options : 'sysconfdir=/etc')
+project('balsa', 'c',
+        version         : '2.5.3',
+        default_options : 'sysconfdir=/etc')
 
-# if meson is used not in a git source tree, use version=2.5.3
-balsa_version = '2.5.3'
+# if meson is used not in a git source tree, use project version:
+balsa_version = meson.project_version()
 
 balsa_from_git = run_command('sh', '-c', 'test -d ${MESON_SOURCE_ROOT}/.git').returncode() == 0
 
@@ -17,8 +19,8 @@ endif
 # ###########################################################################
 
 conf = configuration_data()
-conf.set_quoted('BALSA_VERSION', balsa_version)
-conf.set_quoted('VERSION', balsa_version)
+conf.set_quoted('BALSA_VERSION',   balsa_version)
+conf.set_quoted('VERSION',         balsa_version)
 conf.set_quoted('PACKAGE_VERSION', balsa_version)
 conf.set_quoted('PACKAGE', 'balsa',
                 description : 'Name of package')
@@ -684,23 +686,29 @@ i18n.merge_file(
 # Summary
 ##########################################################################
 
-message('')
-message('================ Final configuration ===================')
-message('    Installing into prefix: ' + get_option('prefix'))
-message('   Enable compile warnings: ' + (more_warnings ? 'true' : 'false'))
-message('               HTML widget: ' + html_widget)
-message('                 Use GNOME: ' + (gnome_desktop ? 'true' : 'false'))
-message('              Use Canberra: ' + (canberra      ? 'true' : 'false'))
-message('                 Use GPGME: ' + gpgmecfg)
-message('                  Use LDAP: ' + ldap)
-message('                   Use GSS: ' + (gss           ? 'true' : 'false'))
-message('                Use SQLite: ' + sqlite)
-message('             Spell checker: ' + spell_checker)
-message('             Use Libnotify: ' + (libnotify     ? 'true' : 'false'))
-message('         Use GtkSourceView: ' + (gtksourceview ? 'true' : 'false'))
-message('              Use Compface: ' + compface)
-message('             Use libsecret: ' + (libsecret     ? 'true' : 'false'))
-message('                   Use gcr: ' + (gcr           ? 'true' : 'false'))
+summary = [
+  '',
+  '======= Final configuration =======',
+  ' Installing into prefix: @0@'.format(get_option('prefix')),
+  'Enable compile warnings: @0@'.format(more_warnings),
+  '            HTML widget: @0@'.format(html_widget),
+  '              Use GNOME: @0@'.format(gnome_desktop),
+  '           Use Canberra: @0@'.format(canberra),
+  '              Use GPGME: @0@'.format(gpgmecfg),
+  '               Use LDAP: @0@'.format(ldap),
+  '                Use GSS: @0@'.format(gss),
+  '             Use SQLite: @0@'.format(sqlite),
+  '          Spell checker: @0@'.format(spell_checker),
+  '          Use Libnotify: @0@'.format(libnotify),
+  '      Use GtkSourceView: @0@'.format(gtksourceview),
+  '           Use Compface: @0@'.format(compface),
+  '          Use libsecret: @0@'.format(libsecret),
+  '                Use gcr: @0@'.format(gcr),
+  '===================================',
+  ''
+  ]
+
+message('\n'.join(summary))
 
 if balsa_from_git
   message('''

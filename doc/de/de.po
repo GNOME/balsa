@@ -4,8 +4,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa help master\n"
-"POT-Creation-Date: 2017-08-31 15:02+0000\n"
-"PO-Revision-Date: 2017-10-19 21:45+0200\n"
+"POT-Creation-Date: 2017-10-19 19:47+0000\n"
+"PO-Revision-Date: 2017-10-20 15:44+0200\n"
 "Last-Translator: Mario Blättermann <mario.blaettermann@gmail.com>\n"
 "Language-Team: German <gnome-de@gnome.org>\n"
 "Language: de\n"
@@ -84,6 +84,12 @@ msgid ""
 "abook program, mutt addressbook, pine addressbook, palm addressbook, "
 "gnomecard addressbook, big brother database, ldap database."
 msgstr ""
+"<link href=\"http://www.spinnaker.de/lbdb/\" type=\"http\">http://www."
+"spinnaker.de/lbdb/</link> – Die »Little Brother Database«. Liest E-Mail-"
+"Adressen und Namen aus finger, /etc/passwd, eingehenden Procmail-"
+"Nachrichten, NIS, fido, Abook, dem Mutt-Adressbuch, dem Pine-Adressbuch, dem "
+"Palm-Adressbuch, dem Gnomecard-Adressbuch, der »Big Brother Database« und "
+"der LDAP-Datenbank."
 
 #. (itstool) path: item/p
 #: C/ab-conf.page:43
@@ -461,6 +467,12 @@ msgid ""
 "gui>. This will start a dialog that will let you name the mailbox and "
 "specify its location."
 msgstr ""
+"Sie können neue lokale und <link xref=\"glossary#imap\">IMAP</link>-"
+"Postfächer über das Menü über <guiseq><gui>Datei</gui><gui>Neu</gui></"
+"guiseq> erstellen, oder Sie klicken mit der rechten Maustaste in die "
+"Postfachliste und wählen <gui>Neues Postfach</gui>. Daraufhin wird ein "
+"Dialog geöffnet, in dem Sie das Postfach benennen und dessen Ort angeben "
+"können."
 
 #. (itstool) path: section/p
 #: C/common-tasks.page:51
@@ -471,6 +483,11 @@ msgid ""
 "servers</gui> area. A dialog will be displayed that will let you set up the "
 "new mailbox."
 msgstr ""
+"Um ein neues <link xref=\"glossary#pop\">POP3</link>-Postfach anzulegen, "
+"öffnen Sie das <link xref=\"preferences\">Einstellungsfenster</link> mit der "
+"Seite <gui>E-Mail-Einstellungen</gui> und klicken auf <gui>Hinzufügen</gui> "
+"im Bereich <gui>Postfachserver im Netz</gui>. Ein Dialog wird geöffnet, in "
+"dem Sie das Postfach einrichten können."
 
 #. (itstool) path: section/title
 #: C/common-tasks.page:59
@@ -484,6 +501,9 @@ msgid ""
 "mailbox to another. The first is via the <gui>Transfer</gui> context menu, "
 "and the second is using drag and drop."
 msgstr ""
+"Es gibt verschiedene Methoden zum Verschieben oder Kopieren von Nachrichten "
+"von einem Postfach in ein anderes. Eine Möglichkeit finden Sie unter "
+"<gui>Übertragen</gui>, eine weitere besteht im Ziehen und Ablegen."
 
 #. (itstool) path: section/p
 #: C/common-tasks.page:64
@@ -497,6 +517,14 @@ msgid ""
 "collapsed, although these changes will not be reflected in the main list. "
 "Selecting a mailbox will start the transfer."
 msgstr ""
+"Um Nachrichten mit dem <gui>Übertragen</gui>-Kontextmenü zu verschieben oder "
+"zu kopieren, wählen Sie einfach die gewünschten Nachrichten in einem "
+"Postfach aus und drücken <keyseq><key>Umschalttaste</key><key>F10</key></"
+"keyseq> oder <key>Menü</key> oder klicken mit der rechten Maustaste, um das "
+"Kontextmenü zu öffnen, wo Sie das Untermenü <gui>Verschieben nach</gui> "
+"anklicken. Die Liste ist rollbar, und die Baumeinträge können aus- und "
+"eingeklappt werden, obwohl diese Änderungen in der Hauptliste nicht sichtbar "
+"werden. Durch die Auswahl eines Postfachs wird mit der Übertragung begonnen."
 
 #. (itstool) path: section/p
 #: C/common-tasks.page:77
@@ -508,11 +536,18 @@ msgid ""
 "list in the main window, or if open mailbox tabs are enabled the messages "
 "can be dragged to them."
 msgstr ""
+"Die andere Methode zum Übertragen von Nachrichten besteht im einfachen "
+"Ziehen und Ablegen einer oder mehrerer Nachrichten aus dem Nachrichtenindex "
+"zum gewünschten Zielort. Wählen Sie die zu übertragende(n) Nachricht(en) aus "
+"und ziehen Sie sie mit der Maus, bis sich der Mauszeiger über dem "
+"gewünschten Postfach befindet. Der Zielort kann entweder in einer der "
+"Postfachlisten im Hauptfenster sein oder auch ein in einem Reiter geöffnetes "
+"Postfach, sofern dies aktiviert ist."
 
 #. (itstool) path: section/title
 #: C/common-tasks.page:86
 msgid "I want one of the main folders to be IMAP"
-msgstr ""
+msgstr "Einer meiner Hauptordner soll ein IMAP-Ordner sein"
 
 #. (itstool) path: section/p
 #: C/common-tasks.page:87
@@ -521,6 +556,9 @@ msgid ""
 "mouse button on the mailbox entry and select <gui>Mark as Inbox</gui>. That "
 "is all!"
 msgstr ""
+"Zuerst erstellen Sie den IMAP-Ordner und richten ihn ein. Dann klicken Sie "
+"mit der rechten Maustaste auf den Postfacheintrag und wählen <gui>Als "
+"Eingang verwenden</gui>. Das ist alles!"
 
 #. (itstool) path: section/title
 #: C/common-tasks.page:92
@@ -1215,6 +1253,8 @@ msgid ""
 "The address that you wish people to reply to your email with (if you have a "
 "home and a work address, for instance)."
 msgstr ""
+"Die Adresse, an die Antworten auf Ihre Nachrichten geschickt werden sollen "
+"(wenn Sie beispielsweise eine Privat- und eine Arbeitsadresse haben)."
 
 #. (itstool) path: item/title
 #: C/identities.page:43
@@ -1377,7 +1417,6 @@ msgstr ""
 
 #. (itstool) path: item/p
 #: C/identities.page:141
-#| msgid "\"|/home/user/dynsig.pl\""
 msgid "“|/home/user/dynsig.pl”"
 msgstr "“|/home/user/dynsig.pl”"
 
@@ -1437,6 +1476,8 @@ msgid ""
 "When checked, this has <app>Balsa</app> insert the standard signature "
 "separator before your signature."
 msgstr ""
+"Wenn ausgewählt, fügt <app>Balsa</app> den vorgegebenen Signaturtrenner vor "
+"Ihrer Signatur ein."
 
 #. (itstool) path: item/title
 #: C/identities.page:180
@@ -1446,7 +1487,7 @@ msgstr "<gui>Signatur voranstellen</gui>"
 #. (itstool) path: item/p
 #: C/identities.page:183
 msgid "Add the signature before the message text, rather than after it."
-msgstr ""
+msgstr "Fügt die Signatur vor dem Nachrichtentext ein anstatt danach."
 
 #. (itstool) path: page/p
 #: C/identities.page:187
@@ -1464,6 +1505,9 @@ msgid ""
 "By default enable the cryptographic signature for every new message. The "
 "default protocol is determined by the <gui>Default protocol</gui> option."
 msgstr ""
+"Aktiviert per Vorgabe die kryptografische Signatur für jede neue Nachricht. "
+"Das Vorgabeprotokoll wird in der Option <gui>Vorgabeprotokoll</gui> "
+"festgelegt."
 
 #. (itstool) path: item/title
 #: C/identities.page:198
@@ -1476,6 +1520,8 @@ msgid ""
 "By default encrypt every new message. The default protocol is determined by "
 "the <gui>Default protocol</gui> option."
 msgstr ""
+"Verschlüsselt per Vorgabe jede neue Nachricht. Das Vorgabeprotokoll wird in "
+"der Option <gui>Vorgabeprotokoll</gui> festgelegt."
 
 #. (itstool) path: item/title
 #: C/identities.page:205
@@ -1488,6 +1534,8 @@ msgid ""
 "Choose the default protocol for the cryptographic signature and message "
 "encryption."
 msgstr ""
+"Wählt das Vorgabeprotokoll für die kryptografische Signatur und die "
+"Nachrichtenverschlüsselung."
 
 #. (itstool) path: item/title
 #: C/identities.page:212
@@ -1501,6 +1549,9 @@ msgid ""
 "Do not ask for confirmation when encrypting for a recipient whose GnuPG key "
 "is not fully trusted."
 msgstr ""
+"Bittet nicht um Bestätigung, wenn eine Nachricht an einen Empfänger "
+"verschlüsselt werden soll, dessen GnuPG-Schlüssel nicht absolut "
+"vertrauenswürdig ist."
 
 #. (itstool) path: item/title
 #: C/identities.page:219
@@ -1701,17 +1752,6 @@ msgstr ""
 
 #. (itstool) path: page/p
 #: C/introduction.page:20
-#, fuzzy
-#| msgid ""
-#| "If you want to learn more about <application>Balsa</application>, your "
-#| "best bet is the mailing list <email>balsa-list@gnome.org</email>, to "
-#| "which you can subscribe by going to the website <ulink url=\"http://mail."
-#| "gnome.org/mailman/listinfo/balsa-list\">http://mail.gnome.org/mailman/"
-#| "listinfo/balsa-list</ulink> or by sending a message with a subject of "
-#| "<emphasis>subscribe</emphasis> to <email>balsa-list-request@gnome.org</"
-#| "email>. Bugs can be reported via <application>bug-buddy</application>, "
-#| "<application>gnome-bug </application> or to <email>submit@bugs.gnome.org</"
-#| "email>."
 msgid ""
 "If you want to learn more about <app>Balsa</app>, your best bet is the "
 "mailing list <code>balsa-list@gnome.org</code>, to which you can subscribe "
@@ -1723,15 +1763,16 @@ msgid ""
 "to the <link href=\"http://bugzilla.gnome.org/enter_bug.cgi?product=balsa\"> "
 "Gnome bug tool</link>."
 msgstr ""
-"Wenn Sie mehr über <application>Balsa</application> erfahren wollen, sollten "
-"Sie sich die Balsa-Mailingliste <email>balsa-list@gnome.org</email> "
-"anschauen. Diese können Sie auf der Balsa-Webseite <ulink url=\"http://mail."
-"gnome.org/mailman/listinfo/balsa-list\">http://mail.gnome.org/mailman/"
-"listinfo/balsa-list</ulink> abonnieren, oder durch Senden einer E-Mail mit "
-"dem Betreff <emphasis>subscribe</emphasis> an <email>balsa-list-"
-"request@gnome.org</email>. Fehler können Sie über das Fehlererfassungssystem "
-"<application>bug-buddy</application> melden oder durch Senden einer "
-"Nachricht an <email>submit@bugs.gnome.org</email>."
+"Wenn Sie mehr über <app>Balsa</app> erfahren wollen, sollten Sie sich die "
+"Balsa-Mailingliste <code>balsa-list@gnome.org</code> anschauen. Diese können "
+"Sie auf der Balsa-Webseite <link href=\"https://mail.gnome.org/mailman/"
+"listinfo/balsa-list\">https://mail.gnome.org/mailman/listinfo/balsa-list</"
+"link> abonnieren, oder durch Senden einer E-Mail mit dem Betreff "
+"<em>subscribe</em> an <link href=\"mailto:balsa-list-request@gnome.org?"
+"subject=Subscribe\"> balsa-list-request@gnome.org</link>. Fehler können Sie "
+"über das Fehlererfassungssystem <app>bug-buddy</app> melden oder über das "
+"<link href=\"http://bugzilla.gnome.org/enter_bug.cgi?product=balsa\"> Gnome "
+"Bug Tool</link>."
 
 #. (itstool) path: page/title
 #: C/its-not-working.page:8
@@ -2073,7 +2114,7 @@ msgstr ""
 #. (itstool) path: item/title
 #: C/preferences-address-books.page:62
 msgid "<gui>Modify</gui>"
-msgstr ""
+msgstr "<gui>Bearbeiten</gui>"
 
 #. (itstool) path: item/p
 #: C/preferences-address-books.page:65
@@ -2173,6 +2214,11 @@ msgid ""
 "will then show the number of unread messages (in parentheses) after the "
 "mailbox name."
 msgstr ""
+"Dadurch werden die Anzahlen der gesamten und der ungelesenen Nachrichten in "
+"jedem Postfach links im Hauptfenster von <app>Balsa</app> angezeigt. Sie "
+"können Platz sparen, indem Sie dies nicht anzeigen lassen. In diesem Fall "
+"zeigt <app>Balsa</app> die Anzahl der ungelesenen Nachrichten in Klammern "
+"nach dem Postfachnamen an."
 
 #. (itstool) path: item/title
 #: C/preferences-display-options.page:33
@@ -2201,6 +2247,9 @@ msgid ""
 "message when you open a mailbox. If no message is unread, <app>Balsa</app> "
 "opens the most recent message."
 msgstr ""
+"Wählen Sie diese Option, wenn <app>Balsa</app> die erste ungelesene "
+"Nachricht direkt beim Öffnen eines Postfachs öffnen soll. Wenn es keine "
+"ungelesenen Nachrichten gibt, öffnet <app>Balsa</app> die neueste Nachricht."
 
 #. (itstool) path: item/title
 #: C/preferences-display-options.page:52
@@ -2213,6 +2262,9 @@ msgid ""
 "By default, the <key>Page Up</key> and <key>Page Down</key> keys scroll the "
 "message by whole pages. Use this option to choose a different amount."
 msgstr ""
+"In der Voreinstellung rollen die Tasten <key>Bild auf</key> und <key>Bild "
+"ab</key> die Nachricht um eine Anzeigeseite nach oben oder unten. Wählen Sie "
+"diese Option, um eine andere Bildlaufgröße anzugeben."
 
 #. (itstool) path: section/title
 #. (itstool) path: figure/title
@@ -2251,6 +2303,7 @@ msgstr "<gui>Nach dieser Spalte sortieren</gui>"
 #: C/preferences-display-options.page:84
 msgid "Choose the column by which you would like a new mailbox to be sorted."
 msgstr ""
+"Wählen Sie die Spalte, nach der ein neues Postfach sortiert werden soll."
 
 #. (itstool) path: item/title
 #: C/preferences-display-options.page:88
@@ -2304,6 +2357,11 @@ msgid ""
 "such as tables or <link href=\"https://en.wikipedia.org/wiki/ASCII_art"
 "\">ASCII art</link>."
 msgstr ""
+"Alternativ können Sie Ihre eigene Schrift zum Anzeigen oder Verfassen einer "
+"Nachricht wählen, mit einer anderen Schriftstärke oder Schriftart für die "
+"Betreffzeile. Eine Schrift fester Breite wie Monospace kann zum Betrachten "
+"von Quellcode oder formatiertem Text wie <link href=\"https://de.wikipedia."
+"org/wiki/ASCII-Art\">ASCII art</link> sinnvoll sein."
 
 #. (itstool) path: item/title
 #: C/preferences-display-options.page:122
@@ -2633,7 +2691,7 @@ msgstr "Sie werden um folgende Eingaben gebeten:"
 #. (itstool) path: item/p
 #: C/preferences-mail-options.page:93
 msgid "A descriptive name that will identify the server"
-msgstr "Ein aussagekräftger Name, der den Server identifiziert"
+msgstr "Ein aussagekräftiger Name, der den Server identifiziert"
 
 #. (itstool) path: item/p
 #: C/preferences-mail-options.page:96
@@ -2669,7 +2727,7 @@ msgstr ""
 #. (itstool) path: item/p
 #: C/preferences-mail-options.page:113
 msgid "When you want <app>Balsa</app> to use TLS."
-msgstr ""
+msgstr "Legt fest, ob <app>Balsa</app> TLS verwenden soll."
 
 #. (itstool) path: item/p
 #: C/preferences-mail-options.page:116
@@ -3359,6 +3417,9 @@ msgid ""
 "<key>S</key> </keyseq> -- Save the message in the <code>Draftbox</code> and "
 "continue editing."
 msgstr ""
+"<guiseq> <gui>Datei</gui> <gui>Speichern</gui> </guiseq> <keyseq> <key>Strg</"
+"key> <key>S</key> </keyseq> – Speichert die Nachricht als <code>Entwurf</"
+"code>. Sie können die Bearbeitung direkt fortsetzen."
 
 #. (itstool) path: item/p
 #: C/win-composer.page:127
@@ -3407,6 +3468,9 @@ msgid ""
 "<guiseq> <gui>Edit</gui> <gui>Undo</gui> </guiseq> <keyseq> <key>Ctrl</key> "
 "<key>Z</key> </keyseq> -- Undo the most recent editing action."
 msgstr ""
+"<guiseq> <gui>Bearbeiten</gui> <gui>Rückgängig</gui> </guiseq> <keyseq> "
+"<key>Strg</key> <key>Z</key> </keyseq> – Macht den letzten "
+"Bearbeitungsvorgang rückgängig."
 
 #. (itstool) path: item/p
 #: C/win-composer.page:180
@@ -3414,6 +3478,9 @@ msgid ""
 "<guiseq> <gui>Edit</gui> <gui>Redo</gui> </guiseq> <keyseq> <key>Shift</key> "
 "<key>Ctrl</key> <key>Z</key> </keyseq> -- Redo an undone editing action."
 msgstr ""
+"<guiseq> <gui>Bearbeiten</gui> <gui>Wiederholen</gui> </guiseq> <keyseq> "
+"<key>Umschalttaste</key> <key>Strg</key> <key>Z</key> </keyseq> – Wiederholt "
+"den letzten rückgängig gemachten Bearbeitungsvorgang."
 
 #. (itstool) path: item/p
 #: C/win-composer.page:192
@@ -3451,6 +3518,8 @@ msgid ""
 "<guiseq> <gui>Edit</gui> <gui>Select All</gui> </guiseq> <keyseq> <key>Ctrl</"
 "key> <key>A</key> </keyseq>"
 msgstr ""
+"<guiseq> <gui>Bearbeiten</gui> <gui>Alles auswählen</gui> </guiseq> <keyseq> "
+"<key>Strg</key> <key>A</key> </keyseq>"
 
 #. (itstool) path: item/p
 #: C/win-composer.page:240
@@ -3459,31 +3528,24 @@ msgid ""
 "key> <key>B</key> </keyseq> -- Cause all the lines in the message to be "
 "wrapped to the specified outgoing mail wrap column."
 msgstr ""
+"<guiseq> <gui>Bearbeiten</gui> <gui>Nachrichtentext umbrechen</gui> </"
+"guiseq> <keyseq> <key>Strg</key> <key>B</key> </keyseq> – Bricht alle Zeilen "
+"der Nachricht an der angegebenen Umbruchposition in der Nachricht um."
 
 #. (itstool) path: item/p
 #: C/win-composer.page:253
-#, fuzzy
-#| msgid ""
-#| "<menuchoice><shortcut><keycombo><keysym>Ctrl</keysym><keysym>R</keysym></"
-#| "keycombo></shortcut><guimenu>Edit</guimenu><guimenuitem>Reflow Paragraph</"
-#| "guimenuitem></menuchoice> -- Cause all selected lines to be wrapped to "
-#| "the specified outgoing mail wrap column."
 msgid ""
 "<guiseq> <gui>Edit</gui> <gui>Reflow Paragraph</gui> </guiseq> <keyseq> "
 "<key>Ctrl</key> <key>R</key> </keyseq> -- Cause all selected lines to be "
 "wrapped to the specified outgoing mail wrap column."
 msgstr ""
-"<menuchoice><shortcut><keycombo><keysym>Strg</keysym><keysym>R</keysym></"
-"keycombo></shortcut><guimenu>Bearbeiten</guimenu><guimenuitem>Markierten "
-"Text neu umbrechen</guimenuitem></menuchoice> -- Erzeugt für alle "
-"ausgewählten Zeilen einen Umbruch an der für ausgehende Nachrichten "
-"festgelegten Umbruchstelle."
+"<guiseq> <gui>Bearbeiten</gui> <gui>Markierten Text neu umbrechen</"
+"guimenuitem></menuchoice> <keyseq> <key>Ctrl</key> <key>R</key> </keyseq> – "
+"Erzeugt für alle ausgewählten Zeilen einen Umbruch an der für ausgehende "
+"Nachrichten festgelegten Umbruchstelle."
 
 #. (itstool) path: item/p
 #: C/win-composer.page:265
-#| msgid ""
-#| "<menuchoice><guimenu>Edit</guimenu><guimenuitem>Select All</guimenuitem></"
-#| "menuchoice> -- Select all text in the currently displayed message."
 msgid ""
 "<guiseq> <gui>Edit</gui> <gui>Check Spelling</gui> </guiseq> -- Start spell "
 "checking the current message."
@@ -3494,7 +3556,7 @@ msgstr ""
 #. (itstool) path: item/title
 #: C/win-composer.page:275
 msgid "<gui>Show</gui>"
-msgstr ""
+msgstr "<gui>Anzeigen</gui>"
 
 #. (itstool) path: item/p
 #: C/win-composer.page:278
@@ -3511,6 +3573,8 @@ msgid ""
 "<guiseq> <gui>Show</gui> <gui>Toolbar</gui> </guiseq> -- Show or hide the "
 "toolbar."
 msgstr ""
+"<guiseq> <gui>Anzeigen</gui> <gui>Werkzeugleiste</gui> </guiseq> – Zeigt die "
+"Werkzeugleiste an oder verbirgt sie."
 
 #. (itstool) path: item/p
 #: C/win-composer.page:289
@@ -3532,16 +3596,12 @@ msgstr ""
 
 #. (itstool) path: item/p
 #: C/win-composer.page:307
-#, fuzzy
-#| msgid ""
-#| "<menuchoice><guimenu>Show</guimenu><guimenuitem>From</guimenuitem></"
-#| "menuchoice> -- Display the <literal>From</literal> header."
 msgid ""
 "<guiseq> <gui>Show</gui> <gui>Reply To</gui> </guiseq> -- Display the "
 "<code>Reply-To</code> header."
 msgstr ""
-"<menuchoice><guimenu>Anzeige</guimenu><guimenuitem>Von</guimenuitem></"
-"menuchoice> -- Zeigt die <literal>Von</literal>-Kopfzeile an."
+"<guiseq> <gui>Anzeige</gui> <gui>Antwort an</gui> </guiseq> – Zeigt die "
+"<code>Antwort an</code>-Kopfzeile an."
 
 #. (itstool) path: item/p
 #: C/win-composer.page:315
@@ -3550,6 +3610,9 @@ msgid ""
 "code> header; this is the folder to which your copy of the sent message will "
 "be saved. The default is your Sentbox."
 msgstr ""
+"<guiseq> <gui>Anzeigen</gui> <gui>Fcc</gui> </guiseq> – Zeigt die <code>Fcc</"
+"code>-Kopfzeile an; dies ist der Ordner, in dem Kopien Ihrer gesendeten "
+"Nachrichten gespeichert werden. Voreinstellung ist der Gesendet-Ordner."
 
 #. (itstool) path: item/title
 #: C/win-composer.page:327
@@ -3597,15 +3660,14 @@ msgstr ""
 
 #. (itstool) path: note/p
 #: C/win-composer.page:372
-#, fuzzy
 msgid ""
 "Using “Format=Flowed” is strongly recommended. It helps to avert the "
 "“embarrassing line wrap” that you see when quoted text is broken across "
 "lines and shown with the wrong level of quoting."
 msgstr ""
 "Die Verwendung von »Format=Flowed« wird ausdrücklich empfohlen. Dies hilft "
-"Ihnen, den »? Zeilenumbruch« zu vermeiden, der in zitiertem Text auftritt. "
-"Die Zitierebene wird dabei inkorrekt dargestellt."
+"Ihnen, den »peinlichen Zeilenumbruch« zu vermeiden, der in zitiertem Text "
+"auftritt. Die Zitierebene wird dabei inkorrekt dargestellt."
 
 #. (itstool) path: item/p
 #: C/win-composer.page:379
@@ -3617,6 +3679,13 @@ msgid ""
 "and HTML” option is selected, <app>Balsa</app> will generate a correct HTML "
 "message part that such agents will use instead."
 msgstr ""
+"<guiseq> <gui>Optionen</gui> <gui>Als einfachen Text und HTML senden</gui> </"
+"guiseq> – <app>Balsa</app> kann Nachrichten in linksläufigen Schriften "
+"empfangen und senden, wie Arabisch, Hebräisch oder Persisch. Allerdings "
+"könnten andere Beteiligte, wie beispielsweise Mailinglisten, bei der "
+"Übersetzung in HTML verfälschen. Wenn diese Option aktiviert ist, erzeugt "
+"<app>Balsa</app> einen korrekten HTML-Teil der Nachricht, den solche "
+"Instanzen verwenden können."
 
 #. (itstool) path: item/p
 #: C/win-composer.page:392
@@ -3626,6 +3695,10 @@ msgid ""
 "to prove the sender's (=your) identity or to detect any tampering with the "
 "message."
 msgstr ""
+"<guiseq> <gui>Optionen</gui> <gui>Nachricht signieren</gui> </guiseq> – Die "
+"Nachricht wird kryptografisch signiert. Die Empfänger können diese Signatur "
+"überprüfen, um die Identität des Absenders (= Ihre) zu bestätigen oder um "
+"Veränderungen der Nachricht erkennen zu können."
 
 #. (itstool) path: item/p
 #: C/win-composer.page:402
@@ -3634,6 +3707,9 @@ msgid ""
 "the message. Only the intended recipient(s) can decrypt and read the "
 "contents."
 msgstr ""
+"<guiseq> <gui>Optionen</gui> <gui>Nachricht verschlüsseln</gui> </guiseq> – "
+"Die Nachricht wird verschlüsselt. Nur der/die tatsächliche(n) Empfänger "
+"können sie entschlüsseln und den Inhalt lesen."
 
 #. (itstool) path: item/p
 #: C/win-composer.page:410
@@ -3692,12 +3768,6 @@ msgstr ""
 
 #. (itstool) path: section/p
 #: C/win-composer.page:466
-#, fuzzy
-#| msgid ""
-#| "The toolbar contains buttons for the most commonly used functions when "
-#| "sending messages, including Send, Attach File..., and Save. As with the "
-#| "menu bar, some buttons are disabled if the message is not correctly setup "
-#| "to be sent."
 msgid ""
 "The toolbar contains buttons for the most commonly used functions when "
 "sending messages, including <gui>Send</gui>, <gui>Attach File…</gui>, and "
@@ -3705,9 +3775,10 @@ msgid ""
 "message is not correctly setup to be sent."
 msgstr ""
 "Die Werkzeugleiste enthält Knöpfe für die meistbenutzten Funktionen zum "
-"Senden von Nachrichten, einschließlich Beilegen von Dateien und Speichern. "
-"Wie in der Menüleiste, sind auch hier einige Knöpfe deaktiviert, falls die "
-"Nachricht noch nicht korrekt sendefähig ist."
+"Senden von Nachrichten, einschließlich <gui>Senden</gui>, <gui>Datei "
+"beilegen …</gui> und <gui>Speichern</gui>. Wie in der Menüleiste sind auch "
+"hier einige Knöpfe deaktiviert, falls die Nachricht noch nicht korrekt "
+"sendefähig ist."
 
 #. (itstool) path: figure/media
 #. This is a reference to an external file such as an image or video. When
@@ -3734,6 +3805,11 @@ msgid ""
 "the message in the outbox to be sent later (see the <link xref=\"preferences-"
 "outgoing\"> Preferences</link> dialog)."
 msgstr ""
+"Verschickt die aktuelle Nachricht. Dies ist nur verfügbar, wenn die "
+"Nachricht zum Versand bereit ist (zum Beispiel wenn Sie eine E-Mail-Adresse "
+"enthält). Diesen Knopf können Sie so einrichten, dass die Nachricht zunächst "
+"in die Warteschlange gestellt wird, um später verschickt zu werden (siehe "
+"den <link xref=\"preferences-outgoing\">Einstellungsdialog</link>)."
 
 #. (itstool) path: item/title
 #: C/win-composer.page:489
@@ -3786,7 +3862,7 @@ msgstr "<gui>Drucken</gui>"
 #. (itstool) path: item/p
 #: C/win-composer.page:520
 msgid "Print out the draft of the message."
-msgstr ""
+msgstr "Gibt den Entwurf der Nachricht aus."
 
 #. (itstool) path: item/title
 #: C/win-composer.page:523 C/win-composer.page:727
@@ -4498,21 +4574,6 @@ msgstr ""
 
 #. (itstool) path: page/p
 #: C/win-main.page:13
-#, fuzzy
-#| msgid ""
-#| "<application>Balsa</application>'s main window has three major areas. To "
-#| "the left is the <link linkend=\"subwin-mblist\">mailbox list</link>. This "
-#| "displays all the mailboxes <application>Balsa</application> knows about; "
-#| "it will scan for ones in your local mail directory. (This means "
-#| "<application>Balsa</application> works well with <application>procmail</"
-#| "application>.) It will also list <glossterm linkend=\"glossary-imap"
-#| "\"><acronym>IMAP</acronym></glossterm> mailboxes that you have "
-#| "configured. If the <guilabel>Show Mailbox Info</guilabel> preference is "
-#| "set, two columns will also be displayed next to the mailbox names "
-#| "containing the number of unread and total messages in each mailbox that "
-#| "has unread messages; otherwise, the number of unread messages is shown in "
-#| "parentheses after the mailbox name. Also, any mailboxes that contain "
-#| "unread messages will be shown in a bold font."
 msgid ""
 "<app>Balsa</app> 's main window has three major areas. To the left is the "
 "<link xref=\"win-main#subwin-mblist\"> mailbox list</link> . This displays "
@@ -4526,21 +4587,20 @@ msgid ""
 "is shown in parentheses after the mailbox name. Also, any mailboxes that "
 "contain unread messages will be shown in a bold font."
 msgstr ""
-"Das Hauptfenster von <application>Balsa</application> gliedert sich in drei "
-"Teilbereiche. An der linken Seite befindet sich die <link linkend=\"subwin-"
-"mblist\">Postfachliste</link>. Diese stellt alle Postfächer dar, die "
-"<application>Balsa</application> kennt, es wird in Ihrem lokalen Mailordner "
-"danach gesucht. Das bedeutet, dass <application>Balsa</application> recht "
-"gut mit <application>procmail</application> zusammenarbeitet. Außerdem "
-"werden die von Ihnen konfigurierten <glossterm linkend=\"glossary-imap"
-"\"><acronym>IMAP</acronym></glossterm>-Postfächer aufgelistet. Wenn die "
-"Option <guilabel>Zeige Postfach-Informationen</guilabel> aktiviert ist, "
-"werden neben den Namen der Postfächer zwei weitere Spalten mit der "
-"Gesamtzahl der Nachrichten und der Anzahl der ungelesenen Nachrichten "
-"angezeigt, sofern ungelesene Nachrichten existieren, anderenfalls wird die "
-"Anzahl der ungelesenen Nachrichten in Klammern hinter dem Namen des "
-"Postfacchs angezeigt. Jedes Postfach, das ungelesene Nachrichten enthält, "
-"wird in Fettschrift dargestellt."
+"Das Hauptfenster von <app>Balsa</app> gliedert sich in drei Teilbereiche. An "
+"der linken Seite befindet sich die <link xref=\"subwin-mblist"
+"\">Postfachliste</link>. Diese stellt alle Postfächer dar, die <app>Balsa</"
+"app> kennt, es wird in Ihrem lokalen Mailordner danach gesucht. Das "
+"bedeutet, dass <app>Balsa</app> recht gut mit <app>procmail</app> "
+"zusammenarbeitet. Außerdem werden die von Ihnen konfigurierten <link xref="
+"\"glossary#imap\">IMAP</link>-Postfächer aufgelistet. Wenn die Option "
+"<gui>Zeige Postfach-Informationen</gui> aktiviert ist, werden neben den "
+"Namen der Postfächer zwei weitere Spalten mit der Gesamtzahl der Nachrichten "
+"und der Anzahl der ungelesenen Nachrichten angezeigt, sofern ungelesene "
+"Nachrichten existieren, anderenfalls wird die Anzahl der ungelesenen "
+"Nachrichten in Klammern hinter dem Namen des Postfachs angezeigt. Jedes "
+"Postfach, das ungelesene Nachrichten enthält, wird in Fettschrift "
+"dargestellt."
 
 #. (itstool) path: page/p
 #: C/win-main.page:26
@@ -4625,15 +4685,6 @@ msgstr ""
 
 #. (itstool) path: item/p
 #: C/win-main.page:70
-#, fuzzy
-#| msgid ""
-#| "<menuchoice><guimenu>File</guimenu><guisubmenu>New</"
-#| "guisubmenu><guimenuitem>Mailbox...</guimenuitem></menuchoice> -- Open a "
-#| "dialog box to create a new mailbox. There are various items like this, "
-#| "corresponding to the different types of mailbox that <application>Balsa</"
-#| "application> supports. See the <link linkend=\"mbox-formats\">discussion "
-#| "of different mailbox formats</link> and their advantages and "
-#| "disadvantages."
 msgid ""
 "<guiseq> <gui> File</gui> <gui> New</gui> <gui> Mailbox…</gui> </guiseq> -- "
 "Open a dialog box to create a new mailbox. There are various items like "
@@ -4641,71 +4692,49 @@ msgid ""
 "supports. See the <link xref=\"mbox-formats\"> discussion of different "
 "mailbox formats</link> and their advantages and disadvantages."
 msgstr ""
-"<menuchoice><guimenu>Datei</guimenu><guisubmenu>Neu</"
-"guisubmenu><guimenuitem>Postfach</guimenuitem></menuchoice> -- Öffnet einen "
-"Dialog zum Anlegen eines neuen Postfachs. Es kann mehrere Einträge dieser "
-"Art geben, abhängig von den Postfachtypen, die <application>Balsa</"
-"application> unterstützt. Informationen über Postfachtypen und deren Vor- "
-"und Nachteile finden Sie in der  <link linkend=\"mbox-formats\">Diskussion "
-"zu den verschiedenen Postfachformaten</link>."
+"<guiseq> <gui> Datei</gui> <gui> Neu</gui> <gui> Postfach …</gui> </guiseq> "
+"– Öffnet einen Dialog zum Anlegen eines neuen Postfachs. Es kann mehrere "
+"Einträge dieser Art geben, abhängig von den Postfachtypen, die <app>Balsa</"
+"app> unterstützt. Informationen über Postfachtypen und deren Vor- und "
+"Nachteile finden Sie in der <link xref=\"mbox-formats\">Diskussion zu den "
+"verschiedenen Postfachformaten</link>."
 
 #. (itstool) path: item/p
 #: C/win-main.page:84
-#, fuzzy
-#| msgid ""
-#| "<menuchoice><guimenu>File</guimenu><guisubmenu>New</"
-#| "guisubmenu><guimenuitem>Remote IMAP folder...</guimenuitem></menuchoice> "
-#| "-- Open a dialog box to create a folder for an account on an IMAP server. "
-#| "This <link linkend=\"folder-config\">IMAP folder properties</link> dialog "
-#| "can also be used to change the details of the account."
 msgid ""
 "<guiseq> <gui> File</gui> <gui> New</gui> <gui> Remote IMAP folder…</gui> </"
 "guiseq> -- Open a dialog box to create a folder for an account on an IMAP "
 "server. This <link xref=\"folder-config\"> IMAP folder properties</link> "
 "dialog can also be used to change the details of the account."
 msgstr ""
-"<menuchoice><guimenu>Datei</guimenu><guisubmenu>Neu</"
-"guisubmenu><guimenuitem>IMAP-Ordner im Netz</guimenuitem></menuchoice> -- "
-"Öffnet einen Dialog zum Anlegen eines Ordners für ein Konto auf einem IMAP-"
-"Server. In diesem <link linkend=\"folder-config\">IMAP-Ordnereigenschaften</"
-"link>-Dialog können Sie auch die Einzelheiten zu einem Konto ändern."
+"<guiseq> <gui> Datei</gui> <gui> Neu</gui> <gui> IMAP-Ordner im Netz</gui></"
+"guiseq> – Öffnet einen Dialog zum Anlegen eines Ordners für ein Konto auf "
+"einem IMAP-Server. In diesem <link xref=\"folder-config\">IMAP-"
+"Ordnereigenschaften</link>-Dialog können Sie auch die Einzelheiten zu einem "
+"Konto ändern."
 
 #. (itstool) path: item/p
 #: C/win-main.page:96
-#, fuzzy
-#| msgid ""
-#| "<menuchoice><guimenu>File</guimenu><guisubmenu>New</"
-#| "guisubmenu><guimenuitem>Remote IMAP subfolder...</guimenuitem></"
-#| "menuchoice> -- Open a dialog box to create a new subfolder in an existing "
-#| "IMAP folder tree. This <link linkend=\"subfolder-config\">IMAP subfolder "
-#| "properties</link> dialog can also be used to rename or move a subfolder."
 msgid ""
 "<guiseq> <gui> File</gui> <gui> New</gui> <gui> Remote IMAP subfolder…</gui> "
 "</guiseq> -- Open a dialog box to create a new subfolder in an existing IMAP "
 "folder tree. This <link xref=\"subfolder-config\"> IMAP subfolder "
 "properties</link> dialog can also be used to rename or move a subfolder."
 msgstr ""
-"<menuchoice><guimenu>Datei</guimenu><guisubmenu>Neu</"
-"guisubmenu><guimenuitem>IMAP-Unterordner im Netz</guimenuitem></menuchoice> "
-"-- Öffnet einen Dialog zumanlegen eines neuen Unterordners zu einem "
-"existierenden IMAP-Ordner. In diesem <link linkend=\"subfolder-config\">IMAP-"
-"Unterordner-Eigenschaften</link>-Dialog können Sie den Unterordner auch "
-"umbenennen oder verschieben."
+"<guiseq> <gui> Datei</gui> <gui> Neu</gui> <gui> IMAP-Unterordner im Netz</"
+"gui></guiseq> – Öffnet einen Dialog zum Anlegen eines neuen Unterordners zu "
+"einem existierenden IMAP-Ordner. In diesem <link xref=\"subfolder-config"
+"\">IMAP-Unterordner-Eigenschaften</link>-Dialog können Sie den Unterordner "
+"auch umbenennen oder verschieben."
 
 #. (itstool) path: item/p
 #: C/win-main.page:110
-#, fuzzy
-#| msgid ""
-#| "<menuchoice><shortcut><keysym>C</keysym></shortcut><guimenu>File</"
-#| "guimenu><guimenuitem>Continue</guimenuitem></menuchoice> -- Continue a "
-#| "postponed message."
 msgid ""
 "<guiseq> <gui> File</gui> <gui> Continue</gui> </guiseq> <key>C</key> -- "
 "Continue a postponed message."
 msgstr ""
-"<menuchoice><shortcut><keysym>C</keysym></shortcut><guimenu>Datei</"
-"guimenu><guimenuitem>Fortsetzen</guimenuitem></menuchoice> -- Die "
-"Bearbeitung einer begonnenen Nachricht fortsetzen."
+"<guiseq> <gui> Datei</gui> <gui> Fortsetzen</gui> </guiseq> <key>C</key> – "
+"Die Bearbeitung einer begonnenen Nachricht fortsetzen."
 
 #. (itstool) path: item/p
 #: C/win-main.page:118
@@ -4718,84 +4747,53 @@ msgstr ""
 
 #. (itstool) path: item/p
 #: C/win-main.page:129
-#, fuzzy
-#| msgid ""
-#| "<menuchoice><shortcut><keycombo><keysym>Ctrl</keysym><keysym>T</keysym></"
-#| "keycombo></shortcut><guimenu>File</guimenu><guimenuitem>Send Queued Mail</"
-#| "guimenuitem></menuchoice> -- Send all mail waiting in the Outbox mailbox "
-#| "to the mail server now."
 msgid ""
 "<guiseq> <gui> File</gui> <gui> Send Queued Mail</gui> </guiseq> "
 "<keyseq><key>Ctrl</key><key>T</key></keyseq> -- Send all mail waiting in the "
 "Outbox mailbox to the mail server now."
 msgstr ""
-"<menuchoice><shortcut><keycombo><keysym>Strg</keysym><keysym>T</keysym></"
-"keycombo></shortcut><guimenu>Datei</guimenu><guimenuitem>Wartende Mails "
-"verschicken</guimenuitem></menuchoice> -- Sämtliche im Ausgangsordner "
+"<guiseq> <gui> Datei</gui> <gui> Wartende Mails verschicken</gui> </guiseq> "
+"<keyseq><key>Strg</key><key>T</key></keyseq> – Sämtliche im Ausgangsordner "
 "befindliche Nachrichten verschicken."
 
 #. (itstool) path: item/p
 #: C/win-main.page:139
-#, fuzzy
-#| msgid ""
-#| "<menuchoice><shortcut><keycombo><keysym>Ctrl</keysym><keysym>B</keysym></"
-#| "keycombo></shortcut><guimenu>File</guimenu><guimenuitem>Send and Receive "
-#| "Mail</guimenuitem></menuchoice> -- Send all mail waiting in the Outbox "
-#| "mailbox to the mail server now and retrieve any new messages."
 msgid ""
 "<guiseq> <gui> File</gui> <gui> Send and Receive Mail</gui> </guiseq> "
 "<keyseq><key>Ctrl</key><key>B</key></keyseq> -- Send all mail waiting in the "
 "Outbox mailbox to the mail server now and retrieve any new messages."
 msgstr ""
-"<menuchoice><shortcut><keycombo><keysym>Strg</keysym><keysym>B</keysym></"
-"keycombo></shortcut><guimenu>Datei</guimenu><guimenuitem>Verschicken / "
-"Empfangen</guimenuitem></menuchoice> -- Sämtliche im Ausgangsordner "
+"<guiseq> <gui> Datei</gui> <gui> Verschicken / Empfangen</gui> </guiseq> "
+"<keyseq><key>Strg</key><key>B</key></keyseq> – Sämtliche im Ausgangsordner "
 "befindliche Nachrichten verschicken sowie eventuell vorhandene neue "
 "Nachrichten abholen."
 
 #. (itstool) path: item/p
 #: C/win-main.page:150
-#, fuzzy
-#| msgid ""
-#| "<menuchoice><guimenu>File</guimenu><guimenuitem>Page Setup</guimenuitem></"
-#| "menuchoice> -- Set print options such as paper size and print orientation."
 msgid ""
 "<guiseq> <gui> File</gui> <gui> Page Setup</gui> </guiseq> -- Set print "
 "options such as paper size and print orientation."
 msgstr ""
-"<menuchoice><guimenu>Datei</guimenu><guimenuitem>Seite einrichten</"
-"guimenuitem></menuchoice> -- Legt Druckoptionen wie Papiergröße und -"
-"ausrichtung fest."
+"<guiseq> <gui> Datei</gui> <gui> Seite einrichten</gui> </guiseq> – Legt "
+"Druckoptionen wie Papiergröße und -ausrichtung fest."
 
 #. (itstool) path: item/p
 #: C/win-main.page:158
-#, fuzzy
-#| msgid ""
-#| "<menuchoice><guimenu>File</guimenu><guimenuitem>Print</guimenuitem></"
-#| "menuchoice> -- Print the currently selected message (displayed in the "
-#| "message view pane.)"
 msgid ""
 "<guiseq> <gui> File</gui> <gui> Print</gui> </guiseq> -- Print the currently "
 "selected message (displayed in the message view pane.)"
 msgstr ""
-"<menuchoice><guimenu>Datei</guimenu><guimenuitem>Drucken</guimenuitem></"
-"menuchoice> -- Druckt die gegenwärtig in der Nachrichtenanzeige geöffnete "
-"Nachricht."
+"<guiseq> <gui> Datei</gui> <gui> Drucken</gui> </guiseq> – Druckt die "
+"gegenwärtig in der Nachrichtenanzeige geöffnete Nachricht."
 
 #. (itstool) path: item/p
 #: C/win-main.page:166
-#, fuzzy
-#| msgid ""
-#| "<menuchoice><shortcut><keysym>B</keysym></shortcut><guimenu>File</"
-#| "guimenu><guimenuitem>Address Book</guimenuitem></menuchoice> -- Open "
-#| "<application>Balsa</application>'s address book."
 msgid ""
 "<guiseq> <gui> File</gui> <gui> Address Book</gui> </guiseq> <key>B</key> -- "
 "Open <app>Balsa</app> 's address book."
 msgstr ""
-"<menuchoice><shortcut><keysym>B</keysym></shortcut><guimenu>Datei</"
-"guimenu><guimenuitem>Adressbuch</guimenuitem></menuchoice> -- Öffnet das "
-"Adressbuch von <application>Balsa</application>."
+"<guiseq> <gui> Datei</gui> <gui> Adressbuch</gui> </guiseq> <key>B</key> – "
+"Öffnet das Adressbuch von <app>Balsa</app>."
 
 #. (itstool) path: item/p
 #: C/win-main.page:175
@@ -4811,9 +4809,6 @@ msgstr "<gui> Bearbeiten</gui>"
 
 #. (itstool) path: item/p
 #: C/win-main.page:191
-#| msgid ""
-#| "<menuchoice><guimenu>Edit</guimenu><guimenuitem>Copy</guimenuitem></"
-#| "menuchoice> -- Copy selected text to the clipboard."
 msgid ""
 "<guiseq> <gui> Edit</gui> <gui> Copy</gui> </guiseq> <keyseq><key>Ctrl&gt;</"
 "key><key>C</key></keyseq> -- Copy selected text to the clipboard."
@@ -4845,56 +4840,39 @@ msgstr ""
 
 #. (itstool) path: item/p
 #: C/win-main.page:218
-#, fuzzy
-#| msgid ""
-#| "<menuchoice><guimenu>Edit</guimenu><guimenuitem>Find</guimenuitem></"
-#| "menuchoice> -- Find messages in the current mailbox that match a given "
-#| "set of conditions, using the <link linkend=\"win-search\">search mailbox "
-#| "window</link>."
 msgid ""
 "<guiseq> <gui> Edit</gui> <gui> Find</gui> </guiseq> <keyseq><key>Ctrl</"
 "key><key>F</key></keyseq> -- Find messages in the current mailbox that match "
 "a given set of conditions, using the <link xref=\"win-search\"> search "
 "mailbox window</link> ."
 msgstr ""
-"<menuchoice><guimenu>Bearbeiten</guimenu><guimenuitem>Suchen</guimenuitem></"
-"menuchoice> -- Sucht im aktuell geöffneten Postfach gemäß den angegebenen "
-"Bedingungen, wobei das <link linkend=\"win-search\">Postfach-Suchfenster</"
-"link> benutzt wird."
+"<guiseq> <gui> Bearbeiten</gui> <gui> Suchen</gui> </guiseq> "
+"<keyseq><key>Strg</key><key>F</key></keyseq> – Sucht im aktuell geöffneten "
+"Postfach gemäß den angegebenen Bedingungen, wobei das <link xref=\"win-search"
+"\">Postfach-Suchfenster</link> benutzt wird."
 
 #. (itstool) path: item/p
 #: C/win-main.page:230
-#, fuzzy
-#| msgid ""
-#| "<menuchoice><guimenu>Edit</guimenu><guimenuitem>Find Next</guimenuitem></"
-#| "menuchoice> -- Find the next matching message."
 msgid ""
 "<guiseq> <gui> Edit</gui> <gui> Find Next</gui> </guiseq> <keyseq><key>Ctrl</"
 "key><key>G</key></keyseq> -- Find the next matching message."
 msgstr ""
-"<menuchoice><guimenu>Bearbeiten</guimenu><guimenuitem>Weitersuchen</"
-"guimenuitem></menuchoice> -- Sucht nach der nächsten passenden Nachricht."
+"<guiseq> <gui> Bearbeiten</gui> <gui> Weitersuchen</gui> </guiseq> "
+"<keyseq><key>Strg</key><key>G</key></keyseq> – Sucht nach der nächsten "
+"passenden Nachricht."
 
 #. (itstool) path: item/p
 #: C/win-main.page:239
-#, fuzzy
-#| msgid ""
-#| "<menuchoice><guimenu>Edit</guimenu><guimenuitem>Find in Message</"
-#| "guimenuitem></menuchoice> -- Selecting this option opens a <quote>search "
-#| "bar</quote> at the foot of the message preview, in which you can type "
-#| "text for which <application>Balsa</application> will search in the "
-#| "current message."
 msgid ""
 "<guiseq> <gui> Edit</gui> <gui> Find in Message</gui> </guiseq> <key>/</"
 "key>-- Selecting this option opens a “search bar” at the foot of the message "
 "preview, in which you can type text for which <app>Balsa</app> will search "
 "in the current message."
 msgstr ""
-"<menuchoice><guimenu>Bearbeiten</guimenu><guimenuitem>In Nachricht suchen</"
-"guimenuitem></menuchoice> -- Durch Auswahl dieses Eintrages wird eine "
-"»Suchleiste« am unteren Rand der Nachrichtenvorschau geöffnet, in der Sie "
-"Text eingeben können, nach welchem <application>Balsa</application> in der "
-"aktuellen Nachricht suchen soll."
+"<guiseq> <gui> Bearbeiten</gui> <gui> In Nachricht suchen</gui> </guiseq> "
+"<key>/</key> – Durch Auswahl dieses Eintrages wird eine »Suchleiste« am "
+"unteren Rand der Nachrichtenvorschau geöffnet, in der Sie Text eingeben "
+"können, nach welchem <app>Balsa</app> in der aktuellen Nachricht suchen soll."
 
 #. (itstool) path: item/p
 #: C/win-main.page:250
@@ -4969,42 +4947,27 @@ msgstr ""
 
 #. (itstool) path: item/p
 #: C/win-main.page:310
-#, fuzzy
-#| msgid ""
-#| "<menuchoice><guimenu>View</guimenu><guimenuitem>No Headers</guimenuitem></"
-#| "menuchoice>, <menuchoice><guimenuitem>Selected Headers</guimenuitem></"
-#| "menuchoice>, <menuchoice><guimenuitem>All Headers</guimenuitem></"
-#| "menuchoice> -- Select the headers to display in the message pane."
 msgid ""
 "<guiseq> <gui> View</gui> <gui> No Headers</gui> </guiseq> , <guiseq> <gui> "
 "Selected Headers</gui> </guiseq> , <guiseq> <gui> All Headers</gui> </"
 "guiseq> -- Select the headers to display in the message pane."
 msgstr ""
-"<menuchoice><guimenu>Ansicht</guimenu><guimenuitem>Keine Kopfzeilen</"
-"guimenuitem></menuchoice>, <menuchoice><guimenuitem>Ausgewählte Kopfzeilen</"
-"guimenuitem></menuchoice>, <menuchoice><guimenuitem>Alle Kopfzeilen</"
-"guimenuitem></menuchoice> -- Wählt die anzuzeigenden Nachrichtenkopfzeilen "
-"in der Nachrichtenansicht aus."
+"<guiseq> <gui>Ansicht</gui> <gui> Keine Kopfzeilen</gui> </guiseq>, <guiseq> "
+"<gui>Ausgewählte Kopfzeilen</gui> </guiseq>, <guiseq> <gui> Alle Kopfzeilen</"
+"gui> </guiseq> – Wählt die anzuzeigenden Nachrichtenkopfzeilen in der "
+"Nachrichtenansicht aus."
 
 #. (itstool) path: item/p
 #: C/win-main.page:324
-#, fuzzy
-#| msgid ""
-#| "<menuchoice><guimenu>View</guimenu><guimenuitem>Flat index</guimenuitem></"
-#| "menuchoice>, <menuchoice><guimenuitem>Simple threading</guimenuitem></"
-#| "menuchoice>, <menuchoice><guimenuitem>JWZ threading</guimenuitem></"
-#| "menuchoice> -- Select the type of threading used to display the messages "
-#| "in the message index."
 msgid ""
 "<guiseq> <gui> View</gui> <gui> Flat index</gui> </guiseq> , <guiseq> <gui> "
 "Simple threading</gui> </guiseq> , <guiseq> <gui> JWZ threading</gui> </"
 "guiseq> -- Select the type of threading used to display the messages in the "
 "message index."
 msgstr ""
-"<menuchoice><guimenu>Ansicht</guimenu><guimenuitem>Flacher Index</"
-"guimenuitem></menuchoice>, <menuchoice><guimenuitem>Einfache "
-"Themendarstellung</guimenuitem></menuchoice>, <menuchoice><guimenuitem>JWZ-"
-"Themendarstellung</guimenuitem></menuchoice> -- Wählt den Darstellungstyp im "
+"<guiseq> <gui> Ansicht</gui> <gui> Flacher Index</gui> </guiseq>, <guiseq> "
+"<gui> Einfache Themendarstellung</gui> </guiseq>, <guiseq> <gui> JWZ-"
+"Themendarstellung</gui> </guiseq> -- Wählt den Darstellungstyp im "
 "Listenfenster aus, der für das Sortieren der Nachrichten verwendet wird."
 
 #. (itstool) path: item/p
@@ -5018,14 +4981,6 @@ msgstr ""
 
 #. (itstool) path: item/p
 #: C/win-main.page:353
-#, fuzzy
-#| msgid ""
-#| "<menuchoice><guimenu>View</guimenu><guimenuitem>Zoom In</guimenuitem></"
-#| "menuchoice>, <menuchoice><guimenuitem>Zoom Out</guimenuitem></"
-#| "menuchoice>, <menuchoice><guimenuitem>Zoom 100%</guimenuitem></"
-#| "menuchoice> -- Alter the font size of HTML messages. Plain text messages "
-#| "will always use the font specified in the <link linkend=\"preferences"
-#| "\">Preferences</link> window."
 msgid ""
 "<guiseq> <gui> View</gui> <gui> Zoom In</gui> </guiseq> <keyseq><key>Ctrl</"
 "key><key>+</key></keyseq>, <guiseq> <gui> Zoom Out</gui> </guiseq> "
@@ -5034,12 +4989,12 @@ msgid ""
 "always use the font specified in the <link xref=\"preferences\"> "
 "Preferences</link> window."
 msgstr ""
-"<menuchoice><guimenu>Ansicht</guimenu><guimenuitem>Vergrößern</guimenuitem></"
-"menuchoice>, <menuchoice><guimenuitem>Verkleinern</guimenuitem></"
-"menuchoice>, <menuchoice><guimenuitem>Auf 100% vergrößern</guimenuitem></"
-"menuchoice> -- Ändert die Schriftgröße von HTML-Nachrichten. Einfacher Text "
-"wird immer mit der im <link linkend=\"preferences\">Einstellungsfenster</"
-"link> festgelegten Schrift angezeigt."
+"<guiseq> <gui> Ansicht</gui> <gui> Vergrößern</gui> </guiseq> "
+"<keyseq><key>Strg</key><key>+</key></keyseq>, <guiseq> <gui> Verkleinern</"
+"gui> </guiseq> <keyseq><key>Strg</key><key>-</key></keyseq>, <guiseq> <gui> "
+"Auf 100% vergrößern</gui> </guiseq> – Ändert die Schriftgröße von HTML-"
+"Nachrichten. Einfacher Text wird immer mit der im <link xref=\"preferences"
+"\">Einstellungsfenster</link> festgelegten Schrift angezeigt."
 
 #. (itstool) path: item/title
 #: C/win-main.page:373
@@ -5053,36 +5008,24 @@ msgstr "Zum Bearbeiten von Postfächern."
 
 #. (itstool) path: item/p
 #: C/win-main.page:379
-#, fuzzy
-#| msgid ""
-#| "<menuchoice><guimenu>Mailbox</guimenu><guimenuitem>Select All</"
-#| "guimenuitem></menuchoice> -- Selects all messages in the current mailbox."
 msgid ""
 "<guiseq> <gui> Mailbox</gui> <gui> Next</gui> </guiseq> <key>N</key>-- "
 "Select the next message in the current mailbox."
 msgstr ""
-"<menuchoice><guimenu>Postfach</guimenu><guimenuitem>Alles auswählen</"
-"guimenuitem></menuchoice> -- Wählt alle Nachrichten im gegenwärtig "
-"angezeigten Postfach aus."
+"<guiseq> <gui> Postfach</gui> <gui> Nächste</gui> </guiseq> <key>N</key> – "
+"Wählt die nächste Nachricht im gegenwärtig geöffneten Postfach."
 
 #. (itstool) path: item/p
 #: C/win-main.page:388
-#, fuzzy
-#| msgid ""
-#| "<menuchoice><shortcut><keysym>P</keysym></shortcut><guimenu>Mailbox</"
-#| "guimenu><guimenuitem>Previous</guimenuitem></menuchoice> -- Select the "
-#| "previous message in the current mailbox."
 msgid ""
 "<guiseq> <gui> Mailbox</gui> <gui> Previous</gui> </guiseq> <key> P</key> -- "
 "Select the previous message in the current mailbox."
 msgstr ""
-"<menuchoice><shortcut><keysym>P</keysym></shortcut><guimenu>Postfach</"
-"guimenu><guimenuitem>Vorherige</guimenuitem></menuchoice> -- Wählt die "
-"vorherige Nachricht im gegenwärtig geöffneten Postfach."
+"<guiseq> <gui> Postfach</gui> <gui> Vorherige</gui> </guiseq> <key> P</key> "
+"– Wählt die vorherige Nachricht im gegenwärtig geöffneten Postfach."
 
 #. (itstool) path: item/p
 #: C/win-main.page:397
-#, fuzzy
 #| msgid ""
 #| "<menuchoice><guimenu>Mailbox</guimenu><guimenuitem>Select All</"
 #| "guimenuitem></menuchoice> -- Selects all messages in the current mailbox."
@@ -5091,9 +5034,9 @@ msgid ""
 "<keyseq><key>Ctrl</key><key>N</key></keyseq> -- Select the next unread "
 "message in the current mailbox."
 msgstr ""
-"<menuchoice><guimenu>Postfach</guimenu><guimenuitem>Alles auswählen</"
-"guimenuitem></menuchoice> -- Wählt alle Nachrichten im gegenwärtig "
-"angezeigten Postfach aus."
+"<guiseq> <gui> Postfach</gui> <gui> Nächste ungelesene</gui> </guiseq> "
+"<keyseq><key>Strg</key><key>N</key></keyseq> – Wählt die nächste ungelesene "
+"Nachricht im gegenwärtig geöffneten Postfach."
 
 #. (itstool) path: item/p
 #: C/win-main.page:407
@@ -5102,27 +5045,23 @@ msgid ""
 "<keyseq><key>Ctrl</key><key>Alt</key><key>F</key></keyseq> -- Select the "
 "next flagged message in the current mailbox."
 msgstr ""
+"<guiseq> <gui> Postfach</gui> <gui> Nächste markierte</gui> </guiseq> "
+"<keyseq><key>Strg</key><key>Alt</key><key>F</key></keyseq> – Wählt die "
+"nächste markierte Nachricht im gegenwärtig geöffneten Postfach."
 
 #. (itstool) path: item/p
 #: C/win-main.page:417
-#, fuzzy
-#| msgid ""
-#| "<menuchoice><guimenu>Mailbox</guimenu><guimenuitem>Hide messages</"
-#| "guimenuitem></menuchoice> -- A submenu listing all the types of messages "
-#| "that may be hidden and unhidden in the current mailbox. Types in the "
-#| "submenu are toggled when selected. A Checkmark indicates it is currently "
-#| "hidden."
 msgid ""
 "<guiseq> <gui> Mailbox</gui> <gui> Hide messages</gui> </guiseq> -- A "
 "submenu listing all the types of messages that may be hidden and unhidden in "
 "the current mailbox. Types in the submenu are toggled when selected. A "
 "Checkmark indicates it is currently hidden."
 msgstr ""
-"<menuchoice><guimenu>Postfach</guimenu><guimenuitem>Nachrichten verbergen</"
-"guimenuitem></menuchoice> -- Ein Untermenü listet alle Nachrichtentypen auf, "
-"die im aktuellen Postfach angezeigt oder verborgen werden sollen. Die Typen "
-"im Untermenü werden beim Auswählen ein- und ausgeschaltet. Ein aktiviertes "
-"Ankreuzfeld bedeutet, dass der jeweilige Typ derzeit verborgen wird."
+"<guiseq> <gui> Postfach</gui> <gui> Nachrichten verbergen</gui> </guiseq> – "
+"Ein Untermenü listet alle Nachrichtentypen auf, die im aktuellen Postfach "
+"angezeigt oder verborgen werden sollen. Die Typen im Untermenü werden beim "
+"Auswählen ein- und ausgeschaltet. Ein aktiviertes Ankreuzfeld bedeutet, dass "
+"der jeweilige Typ derzeit verborgen wird."
 
 #. (itstool) path: item/p
 #: C/win-main.page:428
@@ -5144,10 +5083,6 @@ msgstr ""
 
 #. (itstool) path: item/p
 #: C/win-main.page:443
-#, fuzzy
-#| msgid ""
-#| "<guiseq> <gui> Mailbox</gui> <gui> Edit...</gui> </guiseq> -- Edit "
-#| "mailbox properties."
 msgid ""
 "<guiseq> <gui> Mailbox</gui> <gui> Edit…</gui> </guiseq> -- Edit mailbox "
 "properties."
@@ -5157,32 +5092,23 @@ msgstr ""
 
 #. (itstool) path: item/p
 #: C/win-main.page:450
-#, fuzzy
-#| msgid ""
-#| "<guiseq> <gui> Mailbox</gui> <gui> Delete...</gui> </guiseq> -- Delete "
-#| "the currently selected mailbox."
 msgid ""
 "<guiseq> <gui> Mailbox</gui> <gui> Delete…</gui> </guiseq> -- Delete the "
 "currently selected mailbox."
 msgstr ""
-"<guiseq> <gui> Postfach</gui> <gui> Löschen …</gui> </guiseq> -- Löscht das "
+"<guiseq> <gui> Postfach</gui> <gui> Löschen …</gui> </guiseq> – Löscht das "
 "aktuell ausgewählte Postfach."
 
 #. (itstool) path: item/p
 #: C/win-main.page:458
-#, fuzzy
-#| msgid ""
-#| "<menuchoice><guimenu>Mailbox</guimenu><guimenuitem>Expunge Deleted "
-#| "Messages</guimenuitem></menuchoice> -- Physically remove from the backing "
-#| "mailstore all messages marked as deleted."
 msgid ""
 "<guiseq> <gui> Mailbox</gui> <gui> Expunge Deleted Messages</gui> </guiseq> "
 "-- Physically remove from the backing mailstore all messages marked as "
 "deleted."
 msgstr ""
-"<menuchoice><guimenu>Postfach</guimenu><guimenuitem>Gelöschte Nachrichten "
-"entfernen</guimenuitem></menuchoice> -- Löscht alle Nachrichten physikalisch "
-"aus dem Nachrichtenspeicher, die als gelöscht markiert worden sind."
+"<guiseq> <gui> Postfach</gui> <gui> Gelöschte Nachrichten entfernen</gui> </"
+"guiseq> – Löscht alle Nachrichten physikalisch aus dem Nachrichtenspeicher, "
+"die als gelöscht markiert worden sind."
 
 #. (itstool) path: item/p
 #: C/win-main.page:466
@@ -5238,83 +5164,54 @@ msgstr "Dieses Menü verfügt über Befehle zum Bearbeiten von Nachrichten."
 
 #. (itstool) path: item/p
 #: C/win-main.page:509
-#, fuzzy
-#| msgid ""
-#| "<menuchoice><shortcut><keysym>R</keysym></shortcut><guimenu>Message</"
-#| "guimenu><guimenuitem>Reply...</guimenuitem></menuchoice> -- Reply to the "
-#| "currently selected message(s)."
 msgid ""
 "<guiseq> <key> R</key> <gui> Message</gui> <gui> Reply…</gui> </guiseq> "
 "<key>R</key> -- Reply to the currently selected message(s)."
 msgstr ""
-"<menuchoice><shortcut><keysym>R</keysym></shortcut><guimenu>Nachricht</"
-"guimenu><guimenuitem>Antworten</guimenuitem></menuchoice> -- Antwortet auf "
-"die gegenwärtig ausgewählte(n) Nachricht(en)."
+"<guiseq> <key> R</key> <gui> Nachricht</gui> <gui> Antworten …</gui> </"
+"guiseq> <key>R</key> – Antwortet auf die gegenwärtig ausgewählte(n) "
+"Nachricht(en)."
 
 #. (itstool) path: item/p
 #: C/win-main.page:518
-#, fuzzy
-#| msgid ""
-#| "<menuchoice><shortcut><keysym>A</keysym></shortcut><guimenu>Message</"
-#| "guimenu><guimenuitem>Reply to All...</guimenuitem></menuchoice> -- Reply "
-#| "to the currently selected message(s), sending the reply to all senders "
-#| "and recipients of the message."
 msgid ""
 "<guiseq> <key> A</key> <gui> Message</gui> <gui> Reply to All…</gui> </"
 "guiseq> <key>A</key> -- Reply to the currently selected message(s), sending "
 "the reply to all senders and recipients of the message."
 msgstr ""
-"<menuchoice><shortcut><keysym>A</keysym></shortcut><guimenu>Nachricht</"
-"guimenu><guimenuitem>Antwort an alle</guimenuitem></menuchoice> -- Antwortet "
-"auf die gegenwärtig ausgewählte(n) Nachricht(en), wobei die Anwort an alle "
-"Absender und Empfänger der Nachricht gesendet wird."
+"<guiseq> <key> A</key> <gui> Nachricht</gui> <gui> Antwort an alle …</gui> </"
+"guiseq> <key>A</key> – Antwortet auf die gegenwärtig ausgewählte(n) "
+"Nachricht(en), wobei die Anwort an alle Absender und Empfänger der Nachricht "
+"gesendet wird."
 
 #. (itstool) path: item/p
 #: C/win-main.page:528
-#, fuzzy
-#| msgid ""
-#| "<menuchoice><shortcut><keysym>G</keysym></shortcut><guimenu>Message</"
-#| "guimenu><guimenuitem>Reply to Group...</guimenuitem></menuchoice> -- "
-#| "Reply to a mailing list, instead of the sender to that list."
 msgid ""
 "<guiseq> <key> G</key> <gui> Message</gui> <gui> Reply to Group…</gui> </"
 "guiseq> <key>G</key> -- Reply to a mailing list, instead of the sender to "
 "that list."
 msgstr ""
-"<menuchoice><shortcut><keysym>G</keysym></shortcut><guimenu>Nachricht</"
-"guimenu><guimenuitem>Antwort an Gruppe</guimenuitem></menuchoice> -- "
-"Anwortet an die Mailingliste anstatt an den Absender, der seine Nachricht an "
-"die Mailingliste geschickt hat."
+"<guiseq> <key> G</key> <gui> Nachricht</gui> <gui> Antwort an Gruppe …</gui> "
+"</guiseq> <key>G</key> – Anwortet an die Mailingliste anstatt an den "
+"Absender, der seine Nachricht an die Mailingliste geschickt hat."
 
 #. (itstool) path: item/p
 #: C/win-main.page:537
-#, fuzzy
-#| msgid ""
-#| "<menuchoice><shortcut><keysym>F</keysym></shortcut><guimenu>Message</"
-#| "guimenu><guimenuitem>Forward attached...</guimenuitem></menuchoice> -- "
-#| "Forward the currently selected message(s) as an attachment."
 msgid ""
 "<guiseq> <key> F</key> <gui> Message</gui> <gui> Forward attached…</gui> </"
 "guiseq> -- Forward the currently selected message(s) as an attachment."
 msgstr ""
-"<menuchoice><shortcut><keysym>F</keysym></shortcut><guimenu>Nachricht</"
-"guimenu><guimenuitem>Als Anlage weiterleiten</guimenuitem></menuchoice> -- "
-"Leitet die ausgewählte(n) Nachricht(en) als Anlage weiter."
+"<guiseq> <key> F</key> <gui> Nachricht</gui> <gui> Als Anlage weiterleiten …"
+"</gui> </guiseq> – Leitet die ausgewählte(n) Nachricht(en) als Anlage weiter."
 
 #. (itstool) path: item/p
 #: C/win-main.page:546
-#, fuzzy
-#| msgid ""
-#| "<menuchoice><guimenu>Message</guimenu><guimenuitem>Forward inline...</"
-#| "guimenuitem></menuchoice> -- Forward the currently selected message(s), "
-#| "quoted inline."
 msgid ""
 "<guiseq> <gui> Message</gui> <gui> Forward inline…</gui> </guiseq> -- "
 "Forward the currently selected message(s), quoted inline."
 msgstr ""
-"<menuchoice><guimenu>Nachricht</guimenu><guimenuitem>Inline weiterleiten</"
-"guimenuitem></menuchoice> -- Leitet die ausgewählte(n) Nachricht(en) als "
-"eingebettetes Zitat weiter."
+"<guiseq> <gui> Message</gui> <gui> Inline weiterleiten …</gui> </guiseq> – "
+"Leitet die ausgewählte(n) Nachricht(en) als eingebettetes Zitat weiter."
 
 #. (itstool) path: item/p
 #: C/win-main.page:554
@@ -5326,25 +5223,18 @@ msgstr ""
 
 #. (itstool) path: item/p
 #: C/win-main.page:564
-#, fuzzy
-#| msgid ""
-#| "<menuchoice><shortcut><keycombo><keysym>Ctrl</keysym><keysym>,</keysym></"
-#| "keycombo></shortcut><guimenu>Message</guimenu><guimenuitem>Previous Part</"
-#| "guimenuitem></menuchoice> -- View the previous part of the message."
 msgid ""
 "<guiseq> <shortcut> <keycombo> <sys> Ctrl</sys> <sys> ,</sys> </keycombo> </"
 "shortcut> <gui> Message</gui> <gui> Previous Part</gui> </guiseq> "
 "<keyseq><key>Ctrl</key><key>,</key></keyseq> -- View the previous part of "
 "the message."
 msgstr ""
-"<menuchoice><shortcut><keycombo><keysym>Strg</keysym><keysym>,</keysym></"
-"keycombo></shortcut><guimenu>Nachricht</guimenu><guimenuitem>Vorheriger "
-"Teil</guimenuitem></menuchoice> -- Zeigt den vorherigen Teil der Nachricht "
-"an."
+"<guiseq> <shortcut> <keycombo> <sys> Strg</sys> <sys> ,</sys> </keycombo> </"
+"shortcut> <gui> Nachricht</gui> <gui>Vorheriger Teil</gui> </guiseq> – Zeigt "
+"den vorherigen Teil der Nachricht an."
 
 #. (itstool) path: item/p
 #: C/win-main.page:580
-#, fuzzy
 #| msgid ""
 #| "<menuchoice><guimenu>Edit</guimenu><guimenuitem>Select All</guimenuitem></"
 #| "menuchoice> -- Select all text in the currently displayed message."
@@ -5353,19 +5243,12 @@ msgid ""
 "<keyseq><key>Ctrl</key><key>S</key></keyseq>-- Save the currently selected "
 "part of the message to a file."
 msgstr ""
-"<menuchoice><guimenu>Bearbeiten</guimenu><guimenuitem>Alles auswählen</"
-"guimenuitem></menuchoice> -- Wählt den gesamten Text in der gegenwärtig "
-"angezeigten Nachricht aus."
+"<guiseq> <gui> Nachricht</gui> <gui> Aktuellen Teil speichern …</gui> </"
+"guiseq> <keyseq><key>Strg</key><key>S</key></keyseq> – Speichert den aktuell "
+"ausgewählten Teil der Nachricht in eine Datei."
 
 #. (itstool) path: item/p
 #: C/win-main.page:590
-#, fuzzy
-#| msgid ""
-#| "<menuchoice><shortcut><keycombo><keysym>Ctrl</keysym><keysym>U</keysym></"
-#| "keycombo></shortcut><guimenu>Message</guimenu><guimenuitem>View Source..."
-#| "</guimenuitem></menuchoice> -- Opens a new window that displays the raw "
-#| "message as received from the <glossterm linkend=\"glossary-mta\">MTA</"
-#| "glossterm>."
 msgid ""
 "<guiseq> <shortcut> <keycombo> <sys> Ctrl</sys> <sys> U</sys> </keycombo> </"
 "shortcut> <gui> Message</gui> <gui> View Source…</gui> </guiseq> "
@@ -5373,57 +5256,42 @@ msgid ""
 "displays the raw message as received from the <link xref=\"glossary#mta"
 "\">MTA</link> ."
 msgstr ""
-"<menuchoice><shortcut><keycombo><keysym>Strg</keysym><keysym>U</keysym></"
-"keycombo></shortcut><guimenu>Nachricht</guimenu><guimenuitem>Quelltext "
-"anzeigen</guimenuitem></menuchoice> -- Öffnet ein Fenster, in dem die "
-"Nachricht in der Rohfassung angezeigt wird, so wie sie vom <glossterm "
-"linkend=\"glossary-mta\">MTA</glossterm> empfangen wurde."
+"<guiseq> <shortcut> <keycombo> <sys> Strg</sys> <sys> U</sys> </keycombo> </"
+"shortcut> <gui> Nachricht</gui> <gui> Quelltext anzeigen …</gui> </guiseq> "
+"<keyseq><key>Strg</key><key>U</key></keyseq> – Öffnet ein Fenster, in dem "
+"die Nachricht in der Rohfassung angezeigt wird, so wie sie vom <link xref="
+"\"glossary#mta\">MTA</link> empfangen wurde."
 
 #. (itstool) path: item/p
 #: C/win-main.page:607
-#, fuzzy
-#| msgid ""
-#| "<menuchoice><guimenu>Message</guimenu><guimenuitem>Copy</guimenuitem></"
-#| "menuchoice> -- Copies to the clipboard any text selected in the message "
-#| "view of the current message."
 msgid ""
 "<guiseq> <gui> Message</gui> <gui> Copy</gui> </guiseq> <keyseq><key>Ctrl</"
 "key><key>C</key></keyseq> -- Copies to the clipboard any text selected in "
 "the message view of the current message."
 msgstr ""
-"<menuchoice><guimenu>Nachricht</guimenu><guimenuitem>Kopieren</guimenuitem></"
-"menuchoice> -- Kopiert den in der Nachrichtenansicht markierten Text in die "
-"Zwischenablage."
+"<guiseq> <gui> Nachricht</gui> <gui> Kopieren</gui> </guiseq> "
+"<keyseq><key>Strg</key><key>C</key></keyseq> – Kopiert den in der "
+"Nachrichtenansicht markierten Text in die Zwischenablage."
 
 #. (itstool) path: item/p
 #: C/win-main.page:618
-#, fuzzy
-#| msgid ""
-#| "<menuchoice><guimenu>Message</guimenu><guimenuitem>Select Text</"
-#| "guimenuitem></menuchoice> -- Selects the entire text of the current "
-#| "message in the message view."
 msgid ""
 "<guiseq> <gui> Message</gui> <gui> Select Text</gui> </guiseq> -- Selects "
 "the entire text of the current message in the message view."
 msgstr ""
-"<menuchoice><guimenu>Nachricht</guimenu><guimenuitem>Alles auswählen</"
-"guimenuitem></menuchoice> -- Wählt den gesamten Text der gegenwärtig in der "
-"Nachrichtenansicht angezeigten Nachricht aus."
+"<guiseq> <gui> Nachricht</gui> <gui> Text auswählen</gui> </guiseq> – Wählt "
+"den gesamten Text der gegenwärtig in der Nachrichtenansicht angezeigten "
+"Nachricht aus."
 
 #. (itstool) path: item/p
 #: C/win-main.page:626
-#, fuzzy
-#| msgid ""
-#| "<menuchoice><shortcut><keysym>D</keysym></shortcut><guimenu>Message</"
-#| "guimenu><guimenuitem>Move to Trash</guimenuitem></menuchoice> -- Moves "
-#| "the currently selected message(s) to the Trash."
 msgid ""
 "<guiseq> <gui> Message</gui> <gui> Move to Trash</gui> </guiseq> <key>D</"
 "key> -- Moves the currently selected message(s) to the Trash."
 msgstr ""
-"<menuchoice><shortcut><keysym>D</keysym></shortcut><guimenu>Nachricht</"
-"guimenu><guimenuitem>In den Müll verschieben</guimenuitem></menuchoice> -- "
-"Verschiebt die gegenwärtig ausgewählte(n) Nachricht(en) in den Müll."
+"<guiseq> <gui> Nachricht</gui> <gui> In den Papierkorb verschieben</gui> </"
+"guiseq> <key>D</key> – Verschiebt die gegenwärtig ausgewählte(n) "
+"Nachricht(en) in den Papierkorb."
 
 #. (itstool) path: item/p
 #: C/win-main.page:634
@@ -5432,29 +5300,18 @@ msgstr ""
 
 #. (itstool) path: item/p
 #: C/win-main.page:642
-#, fuzzy
 msgid ""
 "<guiseq> <gui> Message</gui> <gui> Toggle flag</gui> <gui> Flagged</gui> </"
 "guiseq> <key>X</key> -- Toggle the flag on the currently selected "
 "message(s). This is shown as an exclamation mark next in the message index."
 msgstr ""
-"<menuchoice><shortcut><keysym>X</keysym></shortcut><guimenu>Nachricht</"
-"guimenu><guisubmenu>Markierung aktivieren/deaktivieren</"
-"guisubmenu><guimenuitem>Markiert</guimenuitem></menuchoice> -- Die "
-"Markierung der ausgewählten Nachricht(en) umschalten. Dies wird als ? neben "
-"dem Nachrichtenindex angezeigt."
+"<guiseq> <gui> Nachricht</gui> <gui> Markierung umschalten</gui> <gui> "
+"Markiert</gui> </guiseq> <key>X</key> – Die Markierung der ausgewählten "
+"Nachricht(en) umschalten. Dies wird als Ausrufezeichen neben dem "
+"Nachrichtenindex angezeigt."
 
 #. (itstool) path: item/p
 #: C/win-main.page:653
-#, fuzzy
-#| msgid ""
-#| "<menuchoice><shortcut><keycombo><keysym>Ctrl</keysym><keysym>D</keysym></"
-#| "keycombo></shortcut><guimenu>Message</guimenu><guisubmenu>Toggle flag</"
-#| "guisubmenu><guimenuitem>Deleted</guimenuitem></menuchoice> -- Marks the "
-#| "message as set for deletion. The message will be actually removed from "
-#| "the backing mailstore when it is <quote>expunged</quote> either manually, "
-#| "or as specified in the <link linkend=\"preferences\">Preferences</link>. "
-#| "The icon is a small trash can."
 msgid ""
 "<guiseq> <shortcut> <keycombo> <sys> Ctrl</sys> <sys> D</sys> </keycombo> </"
 "shortcut> <gui> Message</gui> <gui> Toggle flag</gui> <gui> Deleted</gui> </"
@@ -5463,23 +5320,16 @@ msgid ""
 "mailstore when it is “expunged” either manually, or as specified in the "
 "<link xref=\"preferences\">Preferences</link>."
 msgstr ""
-"<menuchoice><shortcut><keycombo><keysym>Strg</keysym><keysym>D</keysym></"
-"keycombo></shortcut><guimenu>Nachricht</guimenu><guisubmenu>Markierung "
-"umschalten</guisubmenu><guimenuitem>Gelöscht</guimenuitem></menuchoice> -- "
-"Markiert die Nachricht als zum Löschen vorgesehen. Die Nachricht wird erst "
-"durch »Säubern« aus dem Nachrichtenspeicher entfernt. Dies geschieht "
-"entweder manuell oder wie in den <link linkend=\"preferences"
-"\">Einstellungen</link> definiert. Das Symbol ist ein kleiner Mülleimer."
+"<guiseq> <shortcut> <keycombo> <sys> Strg</sys> <sys> D</sys> </keycombo> </"
+"shortcut> <gui> Nachricht</gui> <gui> Markierung umschalten</gui> <gui> "
+"Gelöscht</gui> </guiseq> – Markiert die Nachricht als zum Löschen "
+"vorgesehen. Die Nachricht wird erst durch »Säubern« aus dem "
+"Nachrichtenspeicher entfernt. Dies geschieht entweder manuell oder wie in "
+"den <link xref=\"preferences\">Einstellungen</link> definiert. Das Symbol "
+"ist ein kleiner Papierkorb."
 
 #. (itstool) path: item/p
 #: C/win-main.page:673
-#, fuzzy
-#| msgid ""
-#| "<menuchoice><shortcut><keycombo><keysym>Ctrl</keysym><keysym>R</keysym></"
-#| "keycombo></shortcut><guimenu>Message</guimenu><guisubmenu>Toggle flag</"
-#| "guisubmenu><guimenuitem>New</guimenuitem></menuchoice> -- Marks a message "
-#| "that has been read as new, and vice-versa. The message will display the "
-#| "standard icon and font for a new message."
 msgid ""
 "<guiseq> <shortcut> <keycombo> <sys> Ctrl</sys> <sys> R</sys> </keycombo> </"
 "shortcut> <gui> Message</gui> <gui> Toggle flag</gui> <gui> New</gui> </"
@@ -5487,43 +5337,33 @@ msgid ""
 "has been read as new, and vice-versa. The message will display the standard "
 "icon and font for a new message."
 msgstr ""
-"<menuchoice><shortcut><keycombo><keysym>Strg</keysym><keysym>R</keysym></"
-"keycombo></shortcut><guimenu>Nachricht</guimenu><guisubmenu>Markierung "
-"umschalten</guisubmenu><guimenuitem>Neu</guimenuitem></menuchoice> -- "
-"Markiert eine bereits gelesene Nachricht als neu (und im umgekehrten Fall "
-"eine ungelesene Nachricht als gelesen). Die Nachricht wird in der Schriftart "
-"und mit dem Symbol einer ungelesenen Nachricht angezeigt."
+"<guiseq> <shortcut> <keycombo> <sys> Strg</sys> <sys> R</sys> </keycombo> </"
+"shortcut> <gui> Nachricht</gui> <gui> Markierung umschalten</gui> <gui> Neu</"
+"gui> </guiseq> <keyseq><key>Strg</key><key>R</key></keyseq> – Markiert eine "
+"bereits gelesene Nachricht als neu (und im umgekehrten Fall eine ungelesene "
+"Nachricht als gelesen). Die Nachricht wird in der Schriftart und mit dem "
+"Symbol einer ungelesenen Nachricht angezeigt."
 
 #. (itstool) path: item/p
 #: C/win-main.page:691
-#, fuzzy
-#| msgid ""
-#| "<menuchoice><guimenu>Message</guimenu><guisubmenu>Toggle flag</"
-#| "guisubmenu><guimenuitem>Answered</guimenuitem></menuchoice> -- Toggles "
-#| "the reply icon for a message."
 msgid ""
 "<guiseq> <gui> Message</gui> <gui> Toggle flag</gui> <gui> Answered</gui> </"
 "guiseq> -- Toggles the reply icon for a message."
 msgstr ""
-"<menuchoice><guimenu>Nachricht</guimenu><guisubmenu>Markierung umschalten</"
-"guisubmenu><guimenuitem>Beantwortet</guimenuitem></menuchoice> -- Schaltet "
-"das Beantwortet-Symbol einer Nachricht ein oder aus."
+"<guiseq> <gui> Nachricht</gui> <gui> Markierung umschalten</gui> <gui> "
+"Beantwortet</gui> </guiseq> – Schaltet das Beantwortet-Symbol einer "
+"Nachricht ein oder aus."
 
 #. (itstool) path: item/p
 #: C/win-main.page:702
-#, fuzzy
-#| msgid ""
-#| "<menuchoice><shortcut><keysym>S</keysym></shortcut><guimenu>Message</"
-#| "guimenu><guimenuitem>Store Address...</guimenuitem></menuchoice> -- Add "
-#| "the sender of the currently selected message to your address book."
 msgid ""
 "<guiseq> <key> S</key> <gui> Message</gui> <gui> Store Address…</gui> </"
 "guiseq> <key>S</key>-- Add the sender of the currently selected message to "
 "your address book."
 msgstr ""
-"<menuchoice><shortcut><keysym>S</keysym></shortcut><guimenu>Nachricht</"
-"guimenu><guimenuitem>Adresse speichern</guimenuitem></menuchoice> -- Den "
-"Absender der aktuellen Nachricht zum Adressbuch hinzufügen."
+"<guiseq> <key> S</key> <gui> Nachricht</gui> <gui> Adresse speichern …</gui> "
+"</guiseq> <key>S</key> – Den Absender der aktuellen Nachricht zum Adressbuch "
+"hinzufügen."
 
 #. (itstool) path: item/title
 #: C/win-main.page:713
@@ -5537,22 +5377,15 @@ msgstr "Menü zum Ändern der Konfiguration von <app>Balsa</app>."
 
 #. (itstool) path: item/p
 #: C/win-main.page:719
-#, fuzzy
-#| msgid ""
-#| "<menuchoice><guimenu>Settings</guimenu><guimenuitem>Toolbars...</"
-#| "guimenuitem></menuchoice> -- Open the <link linkend=\"toolbar-prefs"
-#| "\">Toolbars</link> window to modify the content and arrangement of the "
-#| "toolbars in <application>Balsa</application>."
 msgid ""
 "<guiseq> <gui> Settings</gui> <gui> Toolbars…</gui> </guiseq> -- Open the "
 "<link xref=\"toolbar-prefs\"> Toolbars</link> window to modify the content "
 "and arrangement of the toolbars in <app>Balsa</app> ."
 msgstr ""
-"<menuchoice><guimenu>Einstellungen</guimenu><guimenuitem>Werkzeugleisten</"
-"guimenuitem></menuchoice> -- Öffnet das <link linkend=\"toolbar-prefs"
-"\">Werkzeugleisten</link>-Fenster, in welchem Sie den Inhalt und dessen "
-"Anordnung der Werkzeugleisten in <application>Balsa</application> anpassen "
-"können."
+"<guiseq> <gui> Einstellungen</gui> <gui> Werkzeugleisten …</gui> </guiseq> "
+"-- Öffnet das <link xref=\"toolbar-prefs\">Werkzeugleisten</link>-Fenster, "
+"in welchem Sie den Inhalt und dessen Anordnung der Werkzeugleisten in "
+"<app>Balsa</app> anpassen können."
 
 #. (itstool) path: item/p
 #: C/win-main.page:729
@@ -5862,6 +5695,8 @@ msgstr ""
 #: C/win-run-filters.page:27
 msgid "Note: the <gui>On exit</gui> feature is not yet implemented."
 msgstr ""
+"Hinweis: Das Funktionsmerkmal <gui>Beim Beenden</gui> ist noch nicht "
+"implementiert."
 
 #. (itstool) path: page/p
 #: C/win-run-filters.page:29

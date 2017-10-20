@@ -4,8 +4,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa help master\n"
-"POT-Creation-Date: 2017-10-19 19:47+0000\n"
-"PO-Revision-Date: 2017-10-20 15:44+0200\n"
+"POT-Creation-Date: 2017-10-20 13:47+0000\n"
+"PO-Revision-Date: 2017-10-20 23:07+0200\n"
 "Last-Translator: Mario Blättermann <mario.blaettermann@gmail.com>\n"
 "Language-Team: German <gnome-de@gnome.org>\n"
 "Language: de\n"
@@ -17,8 +17,7 @@ msgstr ""
 #. Put one translator per line, in the form NAME <EMAIL>, YEAR1, YEAR2
 msgctxt "_"
 msgid "translator-credits"
-msgstr ""
-"Mario Blättermann <mario.blaettermann@gmail.com>, 2008, 2010, 2016, 2017"
+msgstr "Mario Blättermann <mario.blaettermann@gmail.com>, 2008-2010, 2016-2017"
 
 #. (itstool) path: page/title
 #: C/ab-conf.page:8
@@ -98,6 +97,9 @@ msgid ""
 "fiction.net/blong/programs/mutt/</link> - palm address database, ldapsearch "
 "wrapper, ph/qi server, UIUC, ph,"
 msgstr ""
+"<link href=\"http://www.fiction.net/blong/programs/mutt/\">http://www."
+"fiction.net/blong/programs/mutt/</link> – Palm-Adressdatenbank, ldapsearch-"
+"Wrapper, ph/qi-Server, UIUC, ph,"
 
 #. (itstool) path: section/title
 #: C/ab-conf.page:51
@@ -705,6 +707,8 @@ msgid ""
 "Descriptive name is the name of the root node that will be shown in the "
 "mailbox tree on the left side."
 msgstr ""
+"Der beschreibende Name ist der Name des Basisknotens, der im Postfachbaum an "
+"der linken Seite angezeigt wird."
 
 #. (itstool) path: item/p
 #: C/folder-config.page:22
@@ -753,6 +757,10 @@ msgid ""
 "to show all the folders on your server but if your IMAP server stores also "
 "other kind of files you may specify for instance “mail”."
 msgstr ""
+"Das Präfix ist das Wurzel-Postfach auf dem Server. Sie können dies leer "
+"lassen, wenn Sie alle Ordner auf Ihrem Server anzeigen lassen wollen, aber "
+"falls Ihr IMAP-Server auch andere Dateitypen speichert, können Sie die "
+"Instanz »mail« angeben."
 
 #. (itstool) path: section/title
 #: C/folder-config.page:51
@@ -767,6 +775,11 @@ msgid ""
 "performance. This functionality is provided by the Advanced IMAP folder "
 "configuration tab."
 msgstr ""
+"Gelegentlich ist es nötig die Ordnerkonfiguration anzupassen, um eine "
+"sichere Verbindung zu gewährleisten, die Beschränkungen des Servers "
+"einzustellen oder einfach die Performance zu verbessern. Diese "
+"Funktionalität finden Sie im Reiter zur fortgeschrittenen IMAP-Ordner-"
+"Konfiguration."
 
 #. (itstool) path: item/p
 #: C/folder-config.page:58
@@ -789,6 +802,11 @@ msgid ""
 "negotiate it, can start TLS encryption whenever it is supported by server, "
 "or can abort the connection if TLS is inavailable or fails for some reason."
 msgstr ""
+"Die Option <gui>TLS-Verschlüsselung verwenden</gui> legt fest, wie Balsa die "
+"TLS-Verschlüsselung aushandeln soll. <app>Balsa</app> kann entweder niemals "
+"Aushandlungen vornehmen, die TLS-Verschlüsselung immer dann aktivieren, wenn "
+"sie vom Server unterstützt wird, oder die Verbindung abbrechen, wenn TLS "
+"nicht verfügbar ist oder aus irgendwelchen Gründen fehlschlägt."
 
 #. (itstool) path: item/p
 #: C/folder-config.page:74
@@ -800,6 +818,13 @@ msgid ""
 "connections open from single IP number to 4 by default. The limit in balsa "
 "has to be in such a case adjusted accordingly."
 msgstr ""
+"Die <gui>Maximale Anzahl von Verbindungen</gui> beschränkt die Anzahl der "
+"gleichzeitigen zum IMAP-Server geöffneten Verbindungen. Eine Anzahl von 15 "
+"bis 40 ist eine vernünftige Option und vermeidet zeitaufwändige und viel "
+"Datenverkehr verursachende Auswahl von IMAP-Postfächern. Einige IMAP-Server "
+"– insbesondere Courier – beschränken die Anzahl der von einer einzelnen IP-"
+"Adresse ausgehenden Verbindungen auf 4 als Vorgabe. Die Beschränkung in "
+"<gui>Balsa</gui> muss in solchen Fällen entsprechend angepasst werden."
 
 #. (itstool) path: item/p
 #: C/folder-config.page:85
@@ -813,6 +838,16 @@ msgid ""
 "and the connection to the imap server - fast, persistent cache becomes just "
 "a burden and should be disabled."
 msgstr ""
+"Das Ankreuzfeld <gui>Dauerhaften Zwischenspeicher aktivieren</gui> legt "
+"fest, ob <app>Balsa</app> heruntergeladene Nachrichten sitzungsübergreifend "
+"speichern oder beim Schließen des Programms löschen soll. Die optimale Wahl "
+"hängt von der lokalen Konfiguration ab. Bei einer langsamen Verbindung zum "
+"IMAP-Server und gleichzeitig einer schnellen und wenig aufwändigen "
+"Speicherung im lokalen Ordner wird empfohlen, den dauerhaften "
+"Zwischenspeicher zu aktivieren. Falls der Speicher langsam ist (zum Beispiel "
+"über NFS eingehängt) und die Verbindung zum IMAP-Server dagegen schhnell, "
+"ist die dauerhafte Zwischenspeicherung eine Belastung und sollte deaktiviert "
+"werden."
 
 #. (itstool) path: item/p
 #: C/folder-config.page:98
@@ -826,6 +861,15 @@ msgid ""
 "routers with NAT translation have notoriously this bug. In such case, it may "
 "be safer to disable this command."
 msgstr ""
+"Im Ankreuzfeld <gui>IDLE-Befehl verwenden</gui> legen Sie fest, ob "
+"<app>Balsa</app> den IDLE-Befehl verwenden soll, sofern verfügbar. Mit "
+"diesem Befehl senden einige Server eine Benachrichtigung, wenn ein neuer "
+"Befehl eintrifft. Dieser Befehl kann außerdem den Netzwerkverkehr "
+"verringern. Aber es gibt auch Nachteile: Einige Firewalls verfolgen IMAP-"
+"Verbindungen nicht korrekt und könnten eine Sitzung im IDLE-Zustand "
+"fälschlicherweise abbrechen. Speziell haben Heim-Netzwerkrouter mit NAT-"
+"Übersetzung häufig diesen Fehler. In einem solchen Fall sollten Sie "
+"sicherheitshalber diesen Befehl deaktivieren."
 
 #. (itstool) path: item/p
 #: C/folder-config.page:111
@@ -834,6 +878,10 @@ msgid ""
 "even with an IMAP server that cannot provide selected message parts. "
 "<app>Balsa</app> in such a case will try to fetch entire messages instead."
 msgstr ""
+"Das Ankreuzfeld <gui>Fehler-Hilfskonstruktionen aktivieren</gui> lässt "
+"<app>Balsa</app> auch mit IMAP-Servern zusammenarbeiten, die keine "
+"ausgewählten Nachrichtenteile bereitstellen können. <app>Balsa</app> "
+"versucht in solchen Fällen die gesamte Nachricht abzuholen."
 
 #. (itstool) path: item/p
 #: C/folder-config.page:118
@@ -843,6 +891,11 @@ msgid ""
 "server. This method can be consume many resources on the server and should "
 "be used <em>only</em> on IMAP servers that have optimized STATUS command."
 msgstr ""
+"Im Ankreuzfeld <gui>STATUS für die Postfachüberprüfung verwenden</gui> "
+"aktivieren Sie eine gründlichere aber aufwändigere Überprüfung von "
+"Postfächern auf dem Server. Diese Methode kann weitaus mehr Ressourcen auf "
+"dem Server verbrauchen und sollte <em>nur dann</em> verwendet werden, wenn "
+"der IMAP-Server über einen optimierten STATUS-Befehl verfügt."
 
 #. (itstool) path: section/title
 #: C/folder-config.page:129
@@ -857,6 +910,10 @@ msgid ""
 "em> an existing subfolder, or <em>move</em> a subfolder within the folder "
 "tree."
 msgstr ""
+"Im Dialog zu den Unterordner-Eigenschaften können Sie Ordner auf entfernten "
+"IMAP-Servern verwalten. Im Einzelnen können Sie einen neuen Unterordner "
+"<em>anlegen</em>, einen vorhandenen Unterordner <em>umbenennen</em> oder "
+"einen Unterordner innerhalb des Ordnerbaums <em>verschieben</em>."
 
 #. (itstool) path: item/p
 #: C/folder-config.page:137
@@ -883,6 +940,12 @@ msgid ""
 "a mailbox in an IMAP tree, only that tree is shown for browsing; otherwise, "
 "all IMAP trees will be shown."
 msgstr ""
+"Wenn der Dialog über <guiseq> <gui>Datei</gui> <gui>Neu</gui> <gui>IMAP-"
+"Unterordner im Netz</gui> </guiseq> geöffnet wird, können Sie den "
+"Ordnernamen eingeben und die IMAP-Bäume durchsuchen, um den übergeordneten "
+"Ordner zu finden. Wenn Sie bereits ein Postfach im Ordnerbaum ausgewählt "
+"haben, wird nur dieser Baum zum Durchsuchen angezeigt, anderenfalls werden "
+"alle IMAP-Bäume angezeigt."
 
 #. (itstool) path: section/p
 #: C/folder-config.page:156
@@ -891,16 +954,22 @@ msgid ""
 "guiseq> with an IMAP folder selected, or by right-clicking on an IMAP "
 "mailbox and selecting <gui>Properties…</gui>, the mailbox may be:"
 msgstr ""
+"Wenn der Dialog über <guiseq> <gui>Postfach</gui> <gui>Bearbeiten</gui> </"
+"guiseq> mit einem ausgewählten IMAP-Ordner oder durch einen Klick mit der "
+"rechten Maustaste auf ein IMAP-Postfach und Auswahl von <gui>Eigenschaften …"
+"</gui> geöffnet wird, kann das Postfach:"
 
 #. (itstool) path: item/p
 #: C/folder-config.page:165
 msgid "Renamed, by editing the folder name;"
-msgstr ""
+msgstr "umbenannt werden, durch Bearbeiten des Ordnernamens;"
 
 #. (itstool) path: item/p
 #: C/folder-config.page:168
 msgid "Moved, by browsing for a different parent folder in the same tree."
 msgstr ""
+"oder verschoben werden, durch Suchen nach einem übergeordneten Ordner im "
+"gleichen Ordnerbaum."
 
 #. (itstool) path: page/title
 #: C/getting-started.page:9
@@ -934,7 +1003,7 @@ msgstr ""
 msgctxt "_"
 msgid ""
 "external ref='figures/druid-start.png' md5='68bf6bf83a3f6fa5a4099bad2d2706a5'"
-msgstr "translated"
+msgstr "translated'"
 
 #. (itstool) path: figure/title
 #: C/getting-started.page:18
@@ -1107,6 +1176,12 @@ msgid ""
 "<app>procmail</app> is an example of this type of program, although many "
 "<link xref=\"glossary#mta\">MTA</link>'s have their own MDA implementations."
 msgstr ""
+"Eine Abkürzung für »Mail Delivery Agent«. Dieser Programmtyp ist auch als "
+"»Local Delivery Agent« (LDA) bekannt. Es ist für die Zustellung von an einen "
+"Empfänger gerichteten Nachrichten in dessen Postfach auf einem Rechner "
+"zuständig. Ein Beispiel für diesen Programmtyp ist <app>procmail</app>, "
+"wobei viele <link xref=\"glossary#mta\">MTA</link>s über ihre eigenen MDA-"
+"Implementationen verfügen."
 
 #. (itstool) path: section/title
 #: C/glossary.page:67
@@ -1121,6 +1196,11 @@ msgid ""
 "completely separate networks. Examples of this type of program include "
 "<app>sendmail</app>, <app>qmail</app>, and <app>postfix</app>."
 msgstr ""
+"Eine Abkürzung für »Mail Transfer Agent«. Dieser Programmtyp ist für das "
+"Versenden von Nachrichten zwischen Personen zuständig, sei es auf dem "
+"gleichen Rechner oder in völlig verschiedenen Netzen. Beispiele für diesen "
+"Programmtyp sind <app>sendmail</app>, <app>qmail</app> und <app>postfix</"
+"app>."
 
 #. (itstool) path: section/title
 #: C/glossary.page:77
@@ -1137,6 +1217,13 @@ msgid ""
 "\">MDA</link> s. <app>Balsa</app> is primarily an MUA, but it also functions "
 "as an MDA/MTA when retrieving mail from a remote server."
 msgstr ""
+"Eine Abkürzung für »Mail User Agent«. Mit einem solchen Programm liest ein "
+"Benutzer vorhandene Nachrichten und erstellt neue Nahcrichten. MUAs sind "
+"einer der drei Programmtypen, die für das Funktionieren von E-Mail im "
+"Internet sorgen. Die beiden anderen Programmtypen sind <link xref="
+"\"glossary#mta\">MTA</link>s und <link xref=\"glossary#mda\">MDA</link>s. "
+"<app>Balsa</app> ist in erster Linie ein MUA, bietet aber beim Abholen von "
+"Nachrichten von einem entfernten Server auch Funktionen von MDAs oder MTAs."
 
 #. (itstool) path: section/title
 #: C/glossary.page:88
@@ -1171,6 +1258,12 @@ msgid ""
 "between computers on a network. It is used by most, if not all, mail "
 "programs to transfer mail."
 msgstr ""
+"Eine Abkürzung für »Simple Mail Transfer Protocol« (einfaches "
+"Nachrichtenübertragungsprotokoll), und es ist genau das, nicht mehr und "
+"nicht weniger. Es ist ein Standard für einen einfachen und zuverlässigen Weg "
+"für die Übertragung von Nachrichten zwischen Rechnern in einem Netzwerk. Es "
+"wird von vielen, aber doch nicht allen E-Mail-Programmen zum Übertragen von "
+"E-Mails verwendet."
 
 #. (itstool) path: section/title
 #: C/glossary.page:106
@@ -1240,7 +1333,7 @@ msgstr "<gui>E-Mail-Adresse</gui>"
 #. (itstool) path: item/p
 #: C/identities.page:32
 msgid "As you wish it to appear in your “From” header."
-msgstr ""
+msgstr "Die Adresse, so wie sie in der »Von«-Kopfzeile erscheinen soll."
 
 #. (itstool) path: item/title
 #: C/identities.page:35
@@ -1269,11 +1362,17 @@ msgid ""
 "enable <link xref=\"preferences-address-books\">Alias Expansion</link> for "
 "this to work."
 msgstr ""
+"Die Domäne, die Sie an alle E-Mail-Einträge anhängen wollen, bei denen keine "
+"Domäne angegeben ist. Normalerweise wird dies die lokale Domäne sein. Sie "
+"müssen die <link xref=\"preferences-address-books\">Alias-Erweiterung</link> "
+"aktivieren, damit dies funktioniert."
 
 #. (itstool) path: page/p
 #: C/identities.page:53
 msgid "The “Messages” page shows various initial settings for the new message:"
 msgstr ""
+"Die »Nachrichten«-Seite zeigt verschiedene initiale Einstellungen für die "
+"neue Nachricht an:"
 
 #. (itstool) path: item/title
 #: C/identities.page:57 C/win-composer.page:575
@@ -1330,6 +1429,7 @@ msgstr "<gui>Face-Pfad</gui>"
 
 #. (itstool) path: item/p
 #: C/identities.page:89
+#, fuzzy
 msgid ""
 "Whether a “Face” header should be attached to a program. Specified path "
 "points out to a file containing a textual representation of the face icon. "
@@ -1337,6 +1437,7 @@ msgid ""
 "of Face and X-Face</link> headers for more details as well as the list of "
 "mail programs supporting this feature."
 msgstr ""
+"Legt fest, ob eine »Face«-Kopfzeile an ein Programm angehängt werden soll. "
 
 #. (itstool) path: item/title
 #: C/identities.page:98
@@ -1403,6 +1504,10 @@ msgid ""
 "normal, but in reality, it is a pipe to a program that is generating the "
 "content. List the path to the pipe."
 msgstr ""
+"Aus einer benannten Weiterleitung oder FIFO. In diesem Fall erscheint die "
+"Datei für <app>Balsa</app> als normal, aber tatsächlich ist es eine "
+"Weiterleitung zu einem Programm, das den Inhalt erzeugt. Geben Sie hier den "
+"Pfad zur Weiterleitung an."
 
 #. (itstool) path: item/p
 #: C/identities.page:137
@@ -1411,7 +1516,7 @@ msgid ""
 "its output, appending that text to the message. List the path to the program "
 "with a “|” prepended to it. For example:"
 msgstr ""
-"Ein ausführbares Programm. <app>Balsa</app> führt das Programm aus und liest "
+"Als ausführbares Programm. <app>Balsa</app> führt das Programm aus und liest "
 "dessen Ausgabe, die als Text an die Nachricht angehängt wird. Geben Sie den "
 "Pfad zum Programm mit einem führenden »|« an. Beispiel:"
 
@@ -1432,6 +1537,10 @@ msgid ""
 "signature to append to outgoing mail. Select this when generating the "
 "signature from an executable program as outlined above in Signature Path."
 msgstr ""
+"Führt die Anweisungen in der Signaturdatei aus und verwendet die Ergebnisse "
+"als Signatur, die an die ausgehende Nachricht angehängt wird. Wählen Sie "
+"diese Option, wenn Sie die Signatur von einem ausführbaren Programm "
+"erstellen lassen wollen, wie oben im Signaturpfad beschrieben."
 
 #. (itstool) path: item/title
 #: C/identities.page:155
@@ -1571,6 +1680,8 @@ msgstr ""
 #: C/identities.page:226
 msgid "<gui>Use secret key with this id for signing.</gui>"
 msgstr ""
+"<gui>Geheimen Schlüssel mit dieser Kennung zum Unterschreiben von GnuPG-"
+"Nachrichten verwenden</gui>"
 
 #. (itstool) path: item/p
 #: C/identities.page:229
@@ -1581,6 +1692,13 @@ msgid ""
 "secret key for cryptographic signatures, enter the key id here. You can get "
 "the key id by running the command <cmd>gpg --list-secret-keys</cmd>."
 msgstr ""
+"Normalerweise wählt <app>Balsa</app> automatisch einen passenden Schlüssel "
+"für kryptografische Signaturen aus der zur E-Mail-Adresse zugehörigen "
+"Identität aus. Daher sollten die meisten Benutzer diesen Eintrag leer "
+"lassen. Wenn Sie die Verwendung eines spezifischen geheimen Schlüssels für "
+"kryptografische Signaturen erzwingen wollen, geben Sie hier die "
+"Schlüsselkennung ein. Diese erhalten Sie mit dem Befehl <cmd>gpg --list-"
+"secret-keys</cmd>."
 
 #. (itstool) path: note/p
 #: C/identities.page:239
@@ -1724,7 +1842,7 @@ msgstr "Einführung"
 msgctxt "_"
 msgid ""
 "external ref='figures/balsa_logo.png' md5='9598e9795c931dc2e4396d41d660f916'"
-msgstr "original"
+msgstr "original'"
 
 #. (itstool) path: page/p
 #: C/introduction.page:12
@@ -1786,6 +1904,11 @@ msgid ""
 "that you think should be happening aren't. If you can't figure out how to do "
 "something but <app>Balsa</app> lets you do it, that's a bug. Report it."
 msgstr ""
+"Dies ist eine Sammlung häufig gestellter Fragen, die auftauchen, wenn "
+"<app>Balsa</app> sich falsch zu verhalten scheint, oder andere Dinge "
+"passieren, von denen Sie denken, dass sie nicht passieren sollten – oder "
+"umgekehrt. Wenn Sie nicht herausfinden können, warum etwas passiert, aber "
+"<app>Balsa</app> tut es trotzdem, dann ist es ein Fehler – melden Sie ihn."
 
 #. (itstool) path: item/p
 #: C/its-not-working.page:15
@@ -1793,6 +1916,8 @@ msgid ""
 "<link xref=\"its-not-working#main-to-imap\">i I want one of the main folders "
 "to be IMAP</link>"
 msgstr ""
+"<link xref=\"its-not-working#main-to-imap\">Ich möchte einen meiner "
+"Hauptordner als IMAP-Ordner einrichten</link>"
 
 #. (itstool) path: item/p
 #: C/its-not-working.page:22
@@ -1964,11 +2089,14 @@ msgid ""
 "manual-html/man5/maildir.html\"> http://www.qmail.org/qmail-manual-html/man5/"
 "maildir.html</link>"
 msgstr ""
+"maildir(5)-Handbuchseite (aus qmail): <link href=\"http://www.qmail.org/"
+"qmail-manual-html/man5/maildir.html\"> http://www.qmail.org/qmail-manual-"
+"html/man5/maildir.html</link>"
 
 #. (itstool) path: item/title
 #: C/mbox-formats.page:33
 msgid "Using Maildir format"
-msgstr ""
+msgstr "Das Maildir-Format verwenden"
 
 #. (itstool) path: item/p
 #: C/mbox-formats.page:34
@@ -1976,6 +2104,8 @@ msgid ""
 "<link href=\"http://cr.yp.to/proto/maildir.html\"> http://cr.yp.to/proto/"
 "maildir.html</link>"
 msgstr ""
+"<link href=\"http://cr.yp.to/proto/maildir.html\"> http://cr.yp.to/proto/"
+"maildir.html</link>"
 
 #. (itstool) path: item/title
 #: C/mbox-formats.page:40
@@ -2005,6 +2135,9 @@ msgid ""
 "Mail-Administrator-HOWTO-3.html#ss3.5\"> http://linuxdocs.org/HOWTOs/Mail-"
 "Administrator-HOWTO-3.html#ss3.5</link>"
 msgstr ""
+"(Aus dem Mail-Administrator-HOWTO): <link href=\"http://linuxdocs.org/HOWTOs/"
+"Mail-Administrator-HOWTO-3.html#ss3.5\"> http://linuxdocs.org/HOWTOs/Mail-"
+"Administrator-HOWTO-3.html#ss3.5</link>"
 
 #. (itstool) path: page/title
 #: C/preferences-address-books.page:9
@@ -2028,6 +2161,10 @@ msgid ""
 "GPE address books, when SQLite is available, and Rubrica address books. "
 "Which types are supported depends on how <app>Balsa</app> was built."
 msgstr ""
+"<app>Balsa</app> unterstützt auch LDIF- und Rubrica-Adressbücher, und kann "
+"mit Unterstützung für GPE-Adressbücher erstellt werden, wenn SQLite "
+"verfügbar ist. Welche Typen unterstützt werden, hängt davon ab, wie "
+"<app>Balsa</app> erstellt wurde."
 
 #. (itstool) path: page/p
 #: C/preferences-address-books.page:21
@@ -2052,6 +2189,11 @@ msgid ""
 "types is shown. Click one to begin the process. <app>Balsa</app> pops up a "
 "dialog, which, if you choose VCARD, looks like this:"
 msgstr ""
+"Damit fügen Sie ein neues Adressbuch für <app>Balsa</app> hinzu, das zum "
+"Suchen nach Adressen verwendet werden soll. Wenn Sie es anklicken, erscheint "
+"ein Auswahlmenü, in dem die unterstützten Adressbuchtypen angezeigt werden. "
+"Klicken Sie auf einen Typ, um mit der Einrichtung zu beginnen. <app>Balsa</"
+"app> öffnet einen Dialog, welcher bei Nutzung von VCARD so aussieht:"
 
 #. (itstool) path: figure/title
 #: C/preferences-address-books.page:38
@@ -2110,6 +2252,15 @@ msgid ""
 "administrator for the value of this. The usual values are usually similar "
 "to: “dc=theochem,dc=KTH,dc=se” or “o=Theoretical Chemistry, c=SE”."
 msgstr ""
+"Um ein LDAP-Adressbuch nutzen zu können, müssen Sie den Rechnernamen des "
+"LDAP-Servers kennen. Abhängig von der Serverkonfiguration benötigen Sie auch "
+"den sogenannten »Base Domain Name«, der Ihre bestimmte Abteilung "
+"identifiziert. Sie können immer versuchen, dieses Feld leer zu lassen, wofür "
+"dann ein Standardwert verwendet wird (OpenLDAP speichert den vorgegebenen "
+"Base Domain Name in <file>/etc/openldap/ldap.conf</file>). Falls dies nicht "
+"funktioniert, fragen Sie Ihren Administrator nach dem entsprechenden Wert. "
+"Die Werte sehen üblicherweise etwa so aus: »dc=theochem,dc=KTH,dc=se« oder "
+"»o=Theoretical Chemistry, c=SE«."
 
 #. (itstool) path: item/title
 #: C/preferences-address-books.page:62
@@ -2199,6 +2350,9 @@ msgid ""
 "Set whether to use the preview pane to display messages, or rely on the "
 "separate mail viewing window."
 msgstr ""
+"Legt fest, ob ein Vorschau-Teilfenster zum Anzeigen von Nachrichten "
+"verwendet werden soll, oder die Nachricht in einem separaten "
+"Betrachtungsfenster geöffnet werden soll."
 
 #. (itstool) path: item/title
 #: C/preferences-display-options.page:22
@@ -2234,6 +2388,12 @@ msgid ""
 "occupy the upper part of the window, and the preview pane is full-width "
 "below them."
 msgstr ""
+"Die vorgegebene Anordnung der Teilfenster in <app>Balsa</app> ist eine sich "
+"über die ganze Fensterhöhe erstreckende Postfachliste an der linken Seite "
+"und und eine Nachrichtenliste oberhalb des Vorschau-Teilfensters an der "
+"rechten Seite. Sie können eine alternative Aufteilung wählen, in welchem die "
+"Postfachliste und die Nachrichtenliste sich den oberen Bereich teilen und "
+"der Vorschaubereich die ganze Breite darunter belegt."
 
 #. (itstool) path: item/title
 #: C/preferences-display-options.page:44
@@ -2308,12 +2468,13 @@ msgstr ""
 #. (itstool) path: item/title
 #: C/preferences-display-options.page:88
 msgid "<gui>Default threading style</gui>"
-msgstr ""
+msgstr "<gui>Vorgabestil für Themen</gui>"
 
 #. (itstool) path: item/p
 #: C/preferences-display-options.page:91
 msgid "Choose the default threading style for a new mailbox."
 msgstr ""
+"Wählt den vorgegebenen Stil der Themensortierung für ein neues Postfach."
 
 #. (itstool) path: item/title
 #: C/preferences-display-options.page:95
@@ -2326,6 +2487,9 @@ msgid ""
 "If you choose a threaded view of a mailbox, you can decide whether the "
 "threads should be expanded or collapsed when the mailbox is opened."
 msgstr ""
+"Wenn Sie eine nach Themen sortierte Ansicht für das Postfach wählen, können "
+"Sie entscheiden, ob die Themen aus- oder eingeklappt erscheinen sollen, wenn "
+"das Postfach geöffnet wird."
 
 #. (itstool) path: section/title
 #: C/preferences-display-options.page:105
@@ -2618,6 +2782,8 @@ msgid ""
 "You can select the “delete from server” button to remove the downloaded "
 "messages from the server."
 msgstr ""
+"Sie können »Vom Server löschen« wählen, um die heruntergeladenen Nachrichten "
+"auf dem Server zu löschen."
 
 #. (itstool) path: item/p
 #: C/preferences-mail-options.page:46
@@ -2991,7 +3157,7 @@ msgstr ""
 #. (itstool) path: item/title
 #: C/preferences-mail-options.page:277
 msgid "<gui>Encoding</gui>"
-msgstr ""
+msgstr "<gui>Zeichenkodierung</gui>"
 
 #. (itstool) path: item/p
 #: C/preferences-mail-options.page:280
@@ -2999,6 +3165,8 @@ msgid ""
 "Set the character encoding method to either 7 bit, 8 bit, or what the quoted "
 "message is using."
 msgstr ""
+"Setzt die Methode der Zeichenkodierung auf entweder 7 bit oder 8 bit oder "
+"auf diejenige, die die zitierte Nachricht verwendet."
 
 #. (itstool) path: page/title
 #: C/preferences-miscellaneous.page:9
@@ -3017,6 +3185,10 @@ msgid ""
 "priority set for it in the <link xref=\"preferences-display-options\"> "
 "Display</link> page, it can show up in list or dialog as the program runs."
 msgstr ""
+"Schaltet die Ausgabe von Fehlerdiagnoseinformationen ein oder aus. Abhängig "
+"von der in <link xref=\"preferences-display-options\"> Anzeige</link> "
+"festgelegten Benachrichtigungspriorität kann dies in Form einer Liste oder "
+"als Dialog bei der Ausführung des Programms angezeigt werden."
 
 #. (itstool) path: item/title
 #: C/preferences-miscellaneous.page:22
@@ -3062,6 +3234,12 @@ msgid ""
 "index, with the trashcan icon indicating that they are deleted, or hidden. "
 "This item controls which of those actions is taken."
 msgstr ""
+"Wenn eine Nachricht in ein anderes Postfach verschoben wird, einschließlich "
+"das <code>Papierkorb</code>-Postfach, wird sie eigentlich an den Zielort "
+"kopiert und am ursprünglichen Ort als gelöscht markiert. Gelöschte "
+"Nachrichten können entweder im Postfachindex mit einem Papierkorbsymbol "
+"dargestellt werden, das den Glöscht-Status anzeigt, oder verborgen werden. "
+"Hier können Sie einstellen, welche dieser Aktionen ausgeführt wird."
 
 #. (itstool) path: item/p
 #: C/preferences-miscellaneous.page:46
@@ -3071,6 +3249,10 @@ msgid ""
 "<gui>Deleted</gui> </guiseq>. Again, this item controls whether such a "
 "message is hidden."
 msgstr ""
+"Eine Nachricht kann auch einfach als gelöscht markiert werden, ohne Sie in "
+"ein anderes Postfach zu verschieben: <guiseq> <gui>Nachricht</gui> "
+"<gui>Markierung umschalten</gui> <gui>Gelöscht</gui> </guiseq>. Wiederum "
+"können Sie hier einstellen, ob eine solche Nachricht verborgen werden soll."
 
 #. (itstool) path: item/title
 #: C/preferences-miscellaneous.page:56
@@ -5026,9 +5208,6 @@ msgstr ""
 
 #. (itstool) path: item/p
 #: C/win-main.page:397
-#| msgid ""
-#| "<menuchoice><guimenu>Mailbox</guimenu><guimenuitem>Select All</"
-#| "guimenuitem></menuchoice> -- Selects all messages in the current mailbox."
 msgid ""
 "<guiseq> <gui> Mailbox</gui> <gui> Next Unread</gui> </guiseq> "
 "<keyseq><key>Ctrl</key><key>N</key></keyseq> -- Select the next unread "
@@ -5235,9 +5414,6 @@ msgstr ""
 
 #. (itstool) path: item/p
 #: C/win-main.page:580
-#| msgid ""
-#| "<menuchoice><guimenu>Edit</guimenu><guimenuitem>Select All</guimenuitem></"
-#| "menuchoice> -- Select all text in the currently displayed message."
 msgid ""
 "<guiseq> <gui> Message</gui> <gui> Save Current Part…</gui> </guiseq> "
 "<keyseq><key>Ctrl</key><key>S</key></keyseq>-- Save the currently selected "

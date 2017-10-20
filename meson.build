@@ -461,7 +461,7 @@ endif # compface != 'false'
 # GtkSourceView configuration
 #
 if gtksourceview
-  gsv_dep = dependency('gtksourceview-4.0')
+  gsv_dep = dependency('gtksourceview-4')
   conf.set('HAVE_GTKSOURCEVIEW', 1,
     description : 'Defined when GtkSourceView-4 can be used.')
   balsa_deps += gsv_dep

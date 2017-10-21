@@ -234,6 +234,7 @@ balsa_ab_window_init(BalsaAbWindow *ab)
 	*scrolled_window,
 	*frame;
     GtkBox *vbox;
+    GtkWidget *label;
 
     ab->current_address_book = NULL;
 
@@ -281,7 +282,7 @@ balsa_ab_window_init(BalsaAbWindow *ab)
 
     /* layout grid */
     grid = gtk_grid_new();
-    gtk_grid_set_row_spacing(GTK_GRID(grid), 6);
+    gtk_grid_set_row_spacing(GTK_GRID(grid), 12);
     gtk_grid_set_column_spacing(GTK_GRID(grid), 12);
     gtk_widget_set_vexpand(grid, TRUE);
     gtk_box_pack_start(vbox, grid);
@@ -307,11 +308,12 @@ balsa_ab_window_init(BalsaAbWindow *ab)
     gtk_widget_show(GTK_WIDGET(box2));
 
 
-    /* A scrolled window for the address clist */
+    /* A scrolled window for the address list */
     scrolled_window = gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolled_window),
 				   GTK_POLICY_AUTOMATIC,
 				   GTK_POLICY_AUTOMATIC);
+    gtk_widget_set_vexpand(scrolled_window, TRUE);
     gtk_grid_attach(GTK_GRID(grid), scrolled_window, 0, 1, 1, 1);
     gtk_widget_show(scrolled_window);
     gtk_container_add(GTK_CONTAINER(scrolled_window), ab->address_list);
@@ -320,6 +322,7 @@ balsa_ab_window_init(BalsaAbWindow *ab)
     /* Buttons ... */
     hbox = gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL);
     gtk_button_box_set_layout(GTK_BUTTON_BOX(hbox), GTK_BUTTONBOX_SPREAD);
+    gtk_widget_set_vexpand(hbox, FALSE);
     gtk_grid_attach(GTK_GRID(grid), hbox, 0, 2, 1, 1);
     gtk_widget_show(GTK_WIDGET(hbox));
 
@@ -327,7 +330,7 @@ balsa_ab_window_init(BalsaAbWindow *ab)
     g_signal_connect(w, "clicked",
                      G_CALLBACK(balsa_ab_window_run_editor), NULL);
     gtk_container_add(GTK_CONTAINER(hbox), w);
-    gtk_widget_show(GTK_WIDGET(w));
+    gtk_widget_show(w);
 
     w = gtk_button_new_with_mnemonic(_("_Re-import"));
     g_signal_connect(G_OBJECT(w), "clicked",
@@ -384,11 +387,15 @@ balsa_ab_window_init(BalsaAbWindow *ab)
 
     ab->single_address_mode_radio = gtk_radio_button_new_with_label
 	(NULL, _("alternative addresses for the same person"));
+    label = gtk_bin_get_child(GTK_BIN(ab->single_address_mode_radio));
+    gtk_label_set_xalign((GtkLabel *) label, 0.0);
     gtk_widget_show(ab->single_address_mode_radio);
 
     ab->dist_address_mode_radio = gtk_radio_button_new_with_label_from_widget
 	(GTK_RADIO_BUTTON(ab->single_address_mode_radio),
 	 _("a distribution list"));
+    label = gtk_bin_get_child(GTK_BIN(ab->dist_address_mode_radio));
+    gtk_label_set_xalign((GtkLabel *) label, 0.0);
     gtk_widget_show(ab->dist_address_mode_radio);
     ab->toggle_handler_id =
         g_signal_connect(G_OBJECT(ab->single_address_mode_radio),
@@ -408,7 +415,6 @@ balsa_ab_window_init(BalsaAbWindow *ab)
     gtk_box_pack_start(GTK_BOX(box2), ab->single_address_mode_radio);
     gtk_box_pack_start(GTK_BOX(box2), ab->dist_address_mode_radio);
     gtk_widget_show(box2);
-    gtk_widget_set_margin_top(frame, 1);
     gtk_box_pack_start(vbox, frame);
 
     gtk_widget_grab_focus(ab->filter_entry);

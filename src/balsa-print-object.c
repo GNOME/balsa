@@ -441,7 +441,7 @@ split_for_layout(PangoLayout * layout, const gchar * text,
 /* print a cairo_surface_t to cairo at the specified position and with the
  * specified scale */
 gboolean
-cairo_print_surface(cairo_t * cairo_ctx, const cairo_surface_t * surface,
+cairo_print_surface(cairo_t * cairo_ctx, cairo_surface_t * surface,
 		    gdouble c_at_x, gdouble c_at_y, gdouble scale)
 {
     gint width;

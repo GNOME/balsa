@@ -446,7 +446,6 @@ cairo_print_pixbuf(cairo_t * cairo_ctx, const cairo_surface_t * surface,
 {
     gint width;
     gint height;
-    gint rowstride;
     guint32 *dest;
     cairo_format_t format;
     cairo_surface_t *surface;

@@ -446,9 +446,7 @@ cairo_print_surface(cairo_t * cairo_ctx, const cairo_surface_t * surface,
 {
     gint width;
     gint height;
-    guint32 *dest;
     cairo_format_t format;
-    cairo_surface_t *surface;
     cairo_pattern_t *pattern;
     cairo_matrix_t matrix;
 
@@ -462,7 +460,7 @@ cairo_print_surface(cairo_t * cairo_ctx, const cairo_surface_t * surface,
                          format == CAIRO_FORMAT_RGB24,
                          FALSE);
 
-    width = cairo_image_surface_get_width(surface);
+    width  = cairo_image_surface_get_width(surface);
     height = cairo_image_surface_get_height(surface);
 
     /* save current state */

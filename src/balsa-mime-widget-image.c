@@ -181,8 +181,8 @@ img_check_size(GtkImage ** widget_p)
         return FALSE;
     }
 
-    if (gtk_image_get_storage_type(widget) == GTK_IMAGE_PIXBUF)
-	curr_w = gdk_pixbuf_get_width(gtk_image_get_pixbuf(widget));
+    if (gtk_image_get_storage_type(widget) == GTK_IMAGE_SURFACE)
+	curr_w = cairo_image_surface_get_width(gtk_image_get_surface(widget));
     else
 	curr_w = 0;
 

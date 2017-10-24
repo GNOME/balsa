@@ -254,8 +254,6 @@ cairo_print_pixbuf(cairo_t * cairo_ctx, const GdkPixbuf * pixbuf,
     guint32 *dest;
     cairo_format_t format;
     cairo_surface_t *surface;
-    cairo_pattern_t *pattern;
-    cairo_matrix_t matrix;
 
     /* paranoia checks */
     g_return_val_if_fail(cairo_ctx && pixbuf, FALSE);
@@ -306,38 +304,15 @@ cairo_print_pixbuf(cairo_t * cairo_ctx, const GdkPixbuf * pixbuf,
 	}
     }
 
-    /* save current state */
-    cairo_save(cairo_ctx);
-
     /* create the curface */
     surface =
 	cairo_image_surface_create_for_data((unsigned char *) surface_buf,
 					    format, width, height,
 					    4 * width);
-    cairo_set_source_surface(cairo_ctx, surface, c_at_x, c_at_y);
 
-    /* scale */
-    pattern = cairo_get_source(cairo_ctx);
-    cairo_pattern_get_matrix(pattern, &matrix);
-    matrix.xx /= scale;
-    matrix.yy /= scale;
-    matrix.x0 /= scale;
-    matrix.y0 /= scale;
-    cairo_pattern_set_matrix(pattern, &matrix);
+    cairo_print_surface(cairo_ctx, surface, c_at_x, c_at_y, scale)
 
-    /* clip around the image */
-    cairo_new_path(cairo_ctx);
-    cairo_move_to(cairo_ctx, c_at_x, c_at_y);
-    cairo_line_to(cairo_ctx, c_at_x + width * scale, c_at_y);
-    cairo_line_to(cairo_ctx, c_at_x + width * scale,
-		  c_at_y + height * scale);
-    cairo_line_to(cairo_ctx, c_at_x, c_at_y + height * scale);
-    cairo_close_path(cairo_ctx);
-    cairo_clip(cairo_ctx);
-
-    /* paint, restore and clean up */
-    cairo_paint(cairo_ctx);
-    cairo_restore(cairo_ctx);
+    /* clean up */
     cairo_surface_destroy(surface);
     g_free(surface_buf);
 
@@ -488,7 +463,7 @@ cairo_print_surface(cairo_t * cairo_ctx, cairo_surface_t * surface,
     cairo_close_path(cairo_ctx);
     cairo_clip(cairo_ctx);
 
-    /* paint, restore and clean up */
+    /* paint and restore */
     cairo_paint(cairo_ctx);
     cairo_restore(cairo_ctx);
 

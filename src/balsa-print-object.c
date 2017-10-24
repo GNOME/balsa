@@ -310,7 +310,7 @@ cairo_print_pixbuf(cairo_t * cairo_ctx, const GdkPixbuf * pixbuf,
 					    format, width, height,
 					    4 * width);
 
-    cairo_print_surface(cairo_ctx, surface, c_at_x, c_at_y, scale)
+    cairo_print_surface(cairo_ctx, surface, c_at_x, c_at_y, scale);
 
     /* clean up */
     cairo_surface_destroy(surface);

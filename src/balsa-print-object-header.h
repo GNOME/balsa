@@ -48,7 +48,7 @@ struct _BalsaPrintObjectHeader {
     gint p_label_width;
     gint p_layout_width;
     gchar *headers;
-    GdkPixbuf *face;
+    cairo_surface_t *face;
 };
 
 

@@ -106,8 +106,9 @@ balsa_print_object_header_destroy(GObject * self)
     BalsaPrintObjectHeader *po = BALSA_PRINT_OBJECT_HEADER(self);
 
     g_free(po->headers);
-    if (po->face)
-	g_object_unref(po->face);
+    if (po->face) {
+	g_clear_pointer(&po->face, (GDestroyNotify) cairo_surface_destroy);
+    }
 
     G_OBJECT_CLASS(parent_class)->finalize(self);
 }
@@ -137,7 +138,7 @@ balsa_print_object_header_new_real(GList * list,
     gint p_label_width;
     gint p_layout_width;
     gdouble c_face_height;
-    GdkPixbuf *face;
+    cairo_surface_t *face;
 
     g_return_val_if_fail(headers != NULL, NULL);
 
@@ -207,8 +208,8 @@ balsa_print_object_header_new_real(GList * list,
 		g_error_free(err);
 
 	    if (f_widget) {
-		face = gtk_image_get_pixbuf(GTK_IMAGE(f_widget));
-		g_object_ref(G_OBJECT(face));
+		face = gtk_image_get_surface(GTK_IMAGE(f_widget));
+		cairo_surface_reference(face);
 		gtk_widget_destroy(f_widget);
 	    }
 	}
@@ -244,8 +245,8 @@ balsa_print_object_header_new_real(GList * list,
     /* check if we have a face */
     c_use_width = psetup->c_width - 2 * psetup->curr_depth * C_LABEL_SEP;
     if (face) {
-	p_layout_width = C_TO_P(c_use_width - gdk_pixbuf_get_width(face) - C_LABEL_SEP);
-	c_face_height = gdk_pixbuf_get_height(face);
+	p_layout_width = C_TO_P(c_use_width - cairo_image_surface_get_width(face) - C_LABEL_SEP);
+	c_face_height = cairo_image_surface_get_height(face);
     } else {
 	p_layout_width = C_TO_P(c_use_width);
 	c_face_height = 0;
@@ -478,12 +479,12 @@ balsa_print_object_header_draw(BalsaPrintObject * self,
 	gdouble c_face_h;
 	gdouble c_face_w;
 
-	c_face_h = gdk_pixbuf_get_height(po->face);
-	c_face_w = gdk_pixbuf_get_width(po->face);
+	c_face_h = cairo_image_surface_get_height(po->face);
+	c_face_w = cairo_image_surface_get_width(po->face);
 
-	cairo_print_pixbuf(cairo_ctx, po->face,
-			   self->c_at_x + self->c_width - c_face_w,
-			   self->c_at_y, 1.0);
+	cairo_print_surface(cairo_ctx, po->face,
+			    self->c_at_x + self->c_width - c_face_w,
+			    self->c_at_y, 1.0);
 	if (c_face_h > self->c_height)
 	    self->c_height = c_face_h;
     }

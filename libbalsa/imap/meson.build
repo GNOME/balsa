@@ -33,11 +33,11 @@ else # use_gnome_genmarshal
   libimap_marshal_h = custom_target('libimap_marshal_h',
     input   : 'libimap-marshal.list',
     output  : 'libimap-marshal.h',
+    capture : true,
     command : [
       glib_genmarshal,
       '--header',
       '--prefix=libimap',
-      '--output=@OUTPUT@',
       '@INPUT@'
     ]
   )
@@ -45,12 +45,12 @@ else # use_gnome_genmarshal
   libimap_marshal_c = custom_target('libimap_marshal_c',
     input   : 'libimap-marshal.list',
     output  : 'libimap-marshal.c',
+    capture : true,
     command : [
       glib_genmarshal,
       '--header',
       '--body',
       '--prefix=libimap',
-      '--output=@OUTPUT@',
       '@INPUT@'
     ]
   )

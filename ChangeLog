@@ -1,3 +1,15 @@
+2017-11-05  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Old glib-genmarshal has no --output option
+
+	Thanks to Jack for the report
+	<URL:https://mail.gnome.org/archives/balsa-list/2017-November/msg00003.html>
+
+	* libbalsa/imap/meson.build: use the 'capture' option of
+	customtarget, because the old glib-genmarshal has no --output
+	option.
+	* libbalsa/meson.build: ditto.
+
 2017-09-30  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Remove unused make_gradient function, and build with

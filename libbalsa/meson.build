@@ -146,11 +146,11 @@ else # use_gnome_genmarshal
   libbalsa_marshal_h = custom_target('libbalsa_marshal_h',
     input   : 'libbalsa-marshal.list',
     output  : 'libbalsa-marshal.h',
+    capture : true,
     command : [
       glib_genmarshal,
       '--header',
       '--prefix=libbalsa',
-      '--output=@OUTPUT@',
       '@INPUT@'
     ]
   )
@@ -158,12 +158,12 @@ else # use_gnome_genmarshal
   libbalsa_marshal_c = custom_target('libbalsa_marshal_c',
     input   : 'libbalsa-marshal.list',
     output  : 'libbalsa-marshal.c',
+    capture : true,
     command : [
       glib_genmarshal,
       '--header',
       '--body',
       '--prefix=libbalsa',
-      '--output=@OUTPUT@',
       '@INPUT@'
     ]
   )

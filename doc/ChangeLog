@@ -1,12 +1,13 @@
-2017-09-26  Peter Bloomfield  <pbloomfield@bellsouth.net>
+2017-11-05  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
-	reviewed by: <delete if not using a buddy>
+	* meson.build: drop the deprecated 'languages' option of
+	gnome.yelp().
+
+2017-09-26  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* meson.build:
 
 2017-09-14  Peter Bloomfield  <pbloomfield@bellsouth.net>
-
-	reviewed by: <delete if not using a buddy>
 
 	* meson.build:
 

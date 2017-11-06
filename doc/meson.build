@@ -61,8 +61,7 @@ HELP_MEDIA   = [
 
 gnome.yelp(HELP_ID,
            sources   : HELP_FILES,
-           media     : HELP_MEDIA,
-           languages : HELP_LINGUAS)
+           media     : HELP_MEDIA)
 
 # Ugly!
 # gnome.yelp needs '--extra : HELP_EXTRA' for included files

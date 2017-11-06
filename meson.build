@@ -128,7 +128,7 @@ conf.set('TOOLKIT_CATEGORIES', TOOLKIT_CATEGORIES)
 # #####################################################################
 
 # Dependencies for balsa and balsa_ab:
-glib_dep    = dependency('glib-2.0', version : '>= 2.40.0')
+glib_dep    = dependency('glib-2.0', version : '>= 2.54.0')
 gtk_dep     = dependency('gtk+-4.0')
 gmime_dep   = dependency('gmime-2.6')
 gio_dep     = dependency('gio-2.0')
@@ -152,18 +152,6 @@ balsa_ab_deps = [glib_dep,
 libnetclient_deps = [glib_dep,
                      gio_dep,
                      gnutls_dep]
-
-# glib-genmarshal
-#
-# If glib is too old, we cannot use gnome.genmarshal
-# because it generates a source file that does not include the header file,
-# which causes an error when compiling with -Wmissing-prototypes and -Werror.
-
-use_gnome_genmarshal = glib_dep.version().version_compare('>= 2.53.4')
-if not use_gnome_genmarshal
-  glib_genmarshal = run_command('pkg-config',
-                                ['--variable=glib_genmarshal', 'glib-2.0']).stdout().strip()
-endif
 
 # Check whether res_init is available
 result = compiler.has_function('res_init', prefix : '#include <resolv.h>')

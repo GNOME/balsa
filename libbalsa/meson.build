@@ -135,41 +135,9 @@ libbalsa_a_sources = [
 
 libbalsa_a_sources += libbalsa_gpgme_extra
 
-# genmarshal
-#
-
-if use_gnome_genmarshal
-  libbalsa_marshal_files = gnome.genmarshal('libbalsa-marshal',
-                                            prefix  : 'libbalsa',
-                                            sources : 'libbalsa-marshal.list')
-else # use_gnome_genmarshal
-  libbalsa_marshal_h = custom_target('libbalsa_marshal_h',
-    input   : 'libbalsa-marshal.list',
-    output  : 'libbalsa-marshal.h',
-    command : [
-      glib_genmarshal,
-      '--header',
-      '--prefix=libbalsa',
-      '--output=@OUTPUT@',
-      '@INPUT@'
-    ]
-  )
-
-  libbalsa_marshal_c = custom_target('libbalsa_marshal_c',
-    input   : 'libbalsa-marshal.list',
-    output  : 'libbalsa-marshal.c',
-    command : [
-      glib_genmarshal,
-      '--header',
-      '--body',
-      '--prefix=libbalsa',
-      '--output=@OUTPUT@',
-      '@INPUT@'
-    ]
-  )
-
-  libbalsa_marshal_files = [libbalsa_marshal_c, libbalsa_marshal_h]
-endif # use_gnome_genmarshal
+libbalsa_marshal_files = gnome.genmarshal('libbalsa-marshal',
+                                          prefix  : 'libbalsa',
+                                          sources : 'libbalsa-marshal.list')
 
 libimap_include = include_directories('imap')
 

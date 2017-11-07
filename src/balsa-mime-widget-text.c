@@ -1284,15 +1284,12 @@ fill_text_buf_cited(GtkWidget *widget, const gchar *text_body,
     GList *url_list = NULL;
     GtkTextBuffer *buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(widget));
     GRegex *rex = NULL;
-    gboolean have_regex;
     GdkRGBA *rgba;
 
     /* prepare citation regular expression for plain bodies */
     if (is_plain) {
         rex = balsa_quote_regex_new();
-        have_regex = rex ? TRUE : FALSE;
-    } else
-        have_regex = FALSE;
+    }
 
     /* Get the width in pixels of a character in the current font.
      * These vary widely in a proportionally spaced font, but digits all
@@ -1311,12 +1308,13 @@ fill_text_buf_cited(GtkWidget *widget, const gchar *text_body,
                                "foreground", "red",
                                "underline", PANGO_UNDERLINE_SINGLE,
                                NULL);
-    if (have_regex)
+    if (rex != NULL) {
         invisible = gtk_text_buffer_create_tag(buffer, "hide-cite",
                                                "size-points", (gdouble) 0.01,
                                                NULL);
-    else
+    } else {
         invisible = NULL;
+    }
 
     url_info.callback = url_found_cb;
     url_info.callback_data = &url_list;
@@ -1334,7 +1332,7 @@ fill_text_buf_cited(GtkWidget *widget, const gchar *text_body,
         if (!(line_end = strchr(text_body, '\n')))
             line_end = text_body + strlen(text_body);
 
-        if (have_regex) {
+        if (rex != NULL) {
             guint quote_level;
             guint cite_idx;
 
@@ -1409,7 +1407,7 @@ fill_text_buf_cited(GtkWidget *widget, const gchar *text_body,
                                G_CALLBACK(draw_cite_bars), cite_bars_list);
     }
 
-    if (have_regex)
+    if (rex != NULL)
         g_regex_unref(rex);
 
     return url_list;

@@ -381,9 +381,6 @@ fix_text_widget(GtkWidget *widget, gpointer data)
                               GDK_POINTER_MOTION_MASK |
                               GDK_LEAVE_NOTIFY_MASK);
     if (!url_cursor_normal || !url_cursor_over_url) {
-        GdkDisplay *display;
-
-        display = gdk_window_get_display(w);
         url_cursor_normal =
             gdk_cursor_new_from_name("text", NULL);
         url_cursor_over_url =
@@ -607,9 +604,6 @@ check_over_url(GtkWidget * widget, GdkEvent * event,
 
     if (url) {
         if (!url_cursor_normal || !url_cursor_over_url) {
-            GdkDisplay *display;
-
-            display = gdk_window_get_display(window);
             url_cursor_normal =
                 gdk_cursor_new_from_name("default", NULL);
             url_cursor_over_url =

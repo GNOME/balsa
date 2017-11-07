@@ -43,7 +43,7 @@ static GtkWidget * create_text_widget(const char * content_type);
 static void bm_modify_font_from_string(GtkWidget * widget, const char *font);
 static GtkTextTag * quote_tag(GtkTextBuffer * buffer, gint level, gint margin);
 static gboolean fix_text_widget(GtkWidget *widget, gpointer data);
-static void text_view_populate_popup(GtkTextView *textview, GtkMenu *menu,
+static void text_view_populate_popup(GtkWidget *widget, GtkMenu *menu,
 				     LibBalsaMessageBody * mime_body);
 
 #ifdef HAVE_HTML_WIDGET
@@ -371,22 +371,22 @@ quote_tag(GtkTextBuffer * buffer, gint level, gint margin)
 static gboolean
 fix_text_widget(GtkWidget *widget, gpointer data)
 {
-    GdkWindow *w =
-        gtk_text_view_get_window(GTK_TEXT_VIEW(widget),
-                                 GTK_TEXT_WINDOW_TEXT);
+    if (data != NULL) {
+        GdkWindow *window = gtk_widget_get_window(widget);
 
-    if (data)
-        gdk_window_set_events(w,
-                              gdk_window_get_events(w) |
+        gdk_window_set_events(window,
+                              gdk_window_get_events(window) |
                               GDK_POINTER_MOTION_MASK |
                               GDK_LEAVE_NOTIFY_MASK);
+    }
+
     if (!url_cursor_normal || !url_cursor_over_url) {
         url_cursor_normal =
             gdk_cursor_new_from_name("text", NULL);
         url_cursor_over_url =
             gdk_cursor_new_from_name("pointer", NULL);
     }
-    gdk_window_set_cursor(w, url_cursor_normal);
+    gtk_widget_set_cursor(widget, url_cursor_normal);
 
     return FALSE;
 }
@@ -462,9 +462,9 @@ url_send_cb(GtkWidget * menu_item, message_url_t * uri)
 }
 
 static gboolean
-text_view_url_popup(GtkTextView *textview, GtkMenu *menu)
+text_view_url_popup(GtkWidget *widget, GtkMenu *menu)
 {
-    GList *url_list = g_object_get_data(G_OBJECT(textview), "url-list");
+    GList *url_list = g_object_get_data(G_OBJECT(widget), "url-list");
     message_url_t *url;
     gint x, y;
     GdkWindow *window;
@@ -478,13 +478,13 @@ text_view_url_popup(GtkTextView *textview, GtkMenu *menu)
 	return FALSE;
 
     /* check if we are over an url */
-    window = gtk_text_view_get_window(textview, GTK_TEXT_WINDOW_TEXT);
+    window = gtk_widget_get_window(widget);
     display = gdk_window_get_display(window);
     seat = gdk_display_get_default_seat(display);
     device = gdk_seat_get_pointer(seat);
     gdk_window_get_device_position(window, device, &x, &y, NULL);
 
-    url = find_url(GTK_WIDGET(textview), x, y, url_list);
+    url = find_url(widget, x, y, url_list);
     if (!url)
 	return FALSE;
 
@@ -513,7 +513,7 @@ text_view_url_popup(GtkTextView *textview, GtkMenu *menu)
 }
 
 static void
-text_view_populate_popup(GtkTextView *textview, GtkMenu *menu,
+text_view_populate_popup(GtkWidget *widget, GtkMenu *menu,
                          LibBalsaMessageBody * mime_body)
 {
     GtkWidget *menu_item;
@@ -522,7 +522,7 @@ text_view_populate_popup(GtkTextView *textview, GtkMenu *menu,
     gtk_widget_hide(GTK_WIDGET(menu));
     gtk_container_foreach(GTK_CONTAINER(menu),
                           (GtkCallback) gtk_widget_hide, NULL);
-    if (text_view_url_popup(textview, menu))
+    if (text_view_url_popup(widget, menu))
 	return;
 
     gtk_container_foreach(GTK_CONTAINER(menu),
@@ -538,8 +538,7 @@ text_view_populate_popup(GtkTextView *textview, GtkMenu *menu,
                       G_CALLBACK (balsa_mime_widget_ctx_menu_save), (gpointer)mime_body);
     gtk_menu_shell_append (GTK_MENU_SHELL (menu), menu_item);
 
-    phrase_hl = GPOINTER_TO_INT(g_object_get_data
-                                (G_OBJECT(textview), "phrase-highlight"));
+    phrase_hl = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(widget), "phrase-highlight"));
     if (phrase_hl != 0) {
 	gtk_menu_shell_append(GTK_MENU_SHELL(menu),
 			      gtk_separator_menu_item_new ());
@@ -548,7 +547,7 @@ text_view_populate_popup(GtkTextView *textview, GtkMenu *menu,
 					phrase_hl == PHRASE_HIGHLIGHT_ON);
 	g_signal_connect (G_OBJECT (menu_item), "toggled",
 			  G_CALLBACK (structured_phrases_toggle),
-			  (gpointer)textview);
+			  (gpointer) widget);
 	gtk_menu_shell_append (GTK_MENU_SHELL (menu), menu_item);
     }
 
@@ -589,11 +588,8 @@ check_over_url(GtkWidget * widget, GdkEvent * event,
 {
     static gboolean was_over_url = FALSE;
     static message_url_t *current_url = NULL;
-    GdkWindow *window;
     message_url_t *url = NULL;
 
-    window = gtk_text_view_get_window(GTK_TEXT_VIEW(widget),
-                                      GTK_TEXT_WINDOW_TEXT);
     if (gdk_event_get_event_type(event) != GDK_LEAVE_NOTIFY) {
         gdouble x_win, y_win;
 
@@ -610,7 +606,7 @@ check_over_url(GtkWidget * widget, GdkEvent * event,
                 gdk_cursor_new_from_name("pointer", NULL);
         }
         if (!was_over_url) {
-            gdk_window_set_cursor(window, url_cursor_over_url);
+            gtk_widget_set_cursor(widget, url_cursor_over_url);
             was_over_url = TRUE;
         }
         if (url != current_url) {
@@ -618,7 +614,7 @@ check_over_url(GtkWidget * widget, GdkEvent * event,
             pointer_over_url(widget, url, TRUE);
         }
     } else if (was_over_url) {
-        gdk_window_set_cursor(window, url_cursor_normal);
+        gtk_widget_set_cursor(widget, url_cursor_normal);
         pointer_over_url(widget, current_url, FALSE);
         was_over_url = FALSE;
     }

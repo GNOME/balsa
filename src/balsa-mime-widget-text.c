@@ -385,9 +385,9 @@ fix_text_widget(GtkWidget *widget, gpointer data)
 
         display = gdk_window_get_display(w);
         url_cursor_normal =
-            gdk_cursor_new_from_name(display, "text");
+            gdk_cursor_new_from_name("text", NULL);
         url_cursor_over_url =
-            gdk_cursor_new_from_name(display, "pointer");
+            gdk_cursor_new_from_name("pointer", NULL);
     }
     gdk_window_set_cursor(w, url_cursor_normal);
 
@@ -611,9 +611,9 @@ check_over_url(GtkWidget * widget, GdkEvent * event,
 
             display = gdk_window_get_display(window);
             url_cursor_normal =
-                gdk_cursor_new_from_name(display, "default");
+                gdk_cursor_new_from_name("default", NULL);
             url_cursor_over_url =
-                gdk_cursor_new_from_name(display, "pointer");
+                gdk_cursor_new_from_name("pointer", NULL);
         }
         if (!was_over_url) {
             gdk_window_set_cursor(window, url_cursor_over_url);

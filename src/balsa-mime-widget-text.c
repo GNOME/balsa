@@ -1274,17 +1274,14 @@ static GList *
 fill_text_buf_cited(GtkWidget *widget, const gchar *text_body,
                     gboolean is_flowed, gboolean is_plain)
 {
+    GtkWidget *label;
     LibBalsaUrlInsertInfo url_info;
     GList * cite_bars_list;
     guint cite_level;
-    GdkScreen *screen;
     guint cite_start;
     gint margin;
-    gdouble char_width;
     GtkTextTag *invisible;
     GList *url_list = NULL;
-    PangoContext *context = gtk_widget_get_pango_context(widget);
-    PangoFontDescription *desc = pango_context_get_font_description(context);
     GtkTextBuffer *buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(widget));
     GRegex *rex = NULL;
     gboolean have_regex;
@@ -1297,14 +1294,15 @@ fill_text_buf_cited(GtkWidget *widget, const gchar *text_body,
     } else
         have_regex = FALSE;
 
-    /* width of monospace characters is 3/5 of the size */
-    char_width = 0.6 * pango_font_description_get_size(desc);
-    if (!pango_font_description_get_size_is_absolute(desc))
-        char_width = char_width / PANGO_SCALE;
-
-    /* convert char_width from points to pixels */
-    screen = gtk_widget_get_screen(widget);
-    margin = (char_width / 72.0) * gdk_screen_get_resolution(screen);
+    /* Get the width in pixels of a character in the current font.
+     * These vary widely in a proportionally spaced font, but digits all
+     * have the same width and it matches the previous calculation based
+     * on the PangoFontDescription. */
+    label = gtk_label_new("0");
+    gtk_widget_measure(label, GTK_ORIENTATION_HORIZONTAL,
+                       300, NULL, &margin, NULL, NULL);
+    g_object_ref_sink(label);
+    g_object_unref(label);
 
     rgba = &balsa_app.url_color;
     gtk_text_buffer_create_tag(buffer, "url",

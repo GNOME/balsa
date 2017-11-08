@@ -300,7 +300,7 @@ libbalsa_condition_new_from_string(gchar **string)
         *string += 4;
     } else negated = FALSE;
 
-    for(i=0; i<ELEMENTS(cond_types); i++)
+    for(i=0; i<G_N_ELEMENTS(cond_types); i++)
         if(strncmp(*string, cond_types[i].key, cond_types[i].keylen) == 0) {
             *string += cond_types[i].keylen;
             return cond_types[i].parser(negated, string);
@@ -390,7 +390,7 @@ append_header_names(LibBalsaCondition *cond, GString *res)
         g_string_append_printf(res, _("Header:%s"),
                                cond->match.string.user_header);
     }
-    for (i=0; i<ELEMENTS(header_name_map); ++i) {
+    for (i=0; i<G_N_ELEMENTS(header_name_map); ++i) {
         if (CONDITION_CHKMATCH(cond, header_name_map[i].header)) {
             if (res->len>0) {
                 g_string_append_printf(res, ",%s",
@@ -416,7 +416,7 @@ append_flag_names(LibBalsaCondition *cond, GString *res)
     };
     unsigned i;
     gsize len = res->len;
-    for (i=0; i<ELEMENTS(flag_name_map); ++i) {
+    for (i=0; i<G_N_ELEMENTS(flag_name_map); ++i) {
         if (cond->match.flags & flag_name_map[i].flag) {
             if (res->len == len) {
                 res = g_string_append(res, _(flag_name_map[i].flag_name));

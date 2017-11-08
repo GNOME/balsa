@@ -280,7 +280,7 @@ build_match_page()
     gtk_grid_attach(GTK_GRID(page), box, 1, 1, 1, 1);
 
     fe_op_codes_option_menu = fe_build_option_menu(fe_op_codes,
-						ELEMENTS(fe_op_codes),
+						G_N_ELEMENTS(fe_op_codes),
 						NULL, NULL);
     g_signal_connect(fe_op_codes_option_menu, "changed",
                      G_CALLBACK(fe_action_changed), NULL);
@@ -445,7 +445,7 @@ build_action_page(GtkWindow * window)
     gtk_container_add(GTK_CONTAINER(frame), box);
 
     fe_action_option_menu =
-        fe_build_option_menu(fe_actions, ELEMENTS(fe_actions),
+        fe_build_option_menu(fe_actions, G_N_ELEMENTS(fe_actions),
                              G_CALLBACK(fe_action_selected), NULL);
     gtk_widget_set_vexpand(fe_action_option_menu, TRUE);
     gtk_box_pack_start(GTK_BOX(box), fe_action_option_menu);

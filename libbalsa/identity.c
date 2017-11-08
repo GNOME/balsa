@@ -565,7 +565,6 @@ sd_response_ok(SelectDialogInfo * sdi)
  * The Manage Identities dialog; called from main window.
  */
 
-#define ELEMENTS(x) (sizeof (x) / sizeof (x[0]))
 typedef struct _IdentityDeleteInfo IdentityDeleteInfo;
 
 /* button actions */
@@ -1328,7 +1327,7 @@ md_sig_path_changed(gboolean active, GObject * dialog)
         "identity-sigpath",
     };
 
-    for (i = 0; i < ELEMENTS(button_key); i++) {
+    for (i = 0; i < G_N_ELEMENTS(button_key); i++) {
         GtkWidget *button = g_object_get_data(dialog, button_key[i]);
         gtk_widget_set_sensitive(button, active);
     }

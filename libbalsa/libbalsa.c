@@ -590,14 +590,14 @@ ask_cert_real(void *data)
                     acd->explanation);
 
     name = X509_NAME_oneline(X509_get_subject_name (cert), buf, sizeof (buf));
-    for (i = 0; i < ELEMENTS(part); i++) {
+    for (i = 0; i < G_N_ELEMENTS(part); i++) {
         g_string_append(str, x509_get_part (name, part[i]));
         g_string_append_c(str, '\n');
     }
 
     g_string_append(str, _("\n<b>This certificate was issued by:</b>\n"));
     name = X509_NAME_oneline(X509_get_issuer_name(cert), buf, sizeof (buf));
-    for (i = 0; i < ELEMENTS(part); i++) {
+    for (i = 0; i < G_N_ELEMENTS(part); i++) {
         g_string_append(str, x509_get_part (name, part[i]));
         g_string_append_c(str, '\n');
     }

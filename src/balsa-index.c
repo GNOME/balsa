@@ -449,7 +449,7 @@ bndx_instance_init(BalsaIndex * index)
 
     gtk_drag_source_set(GTK_WIDGET (index),
                         GDK_BUTTON1_MASK | GDK_SHIFT_MASK | GDK_CONTROL_MASK,
-                        index_drag_types, ELEMENTS(index_drag_types),
+                        index_drag_types, G_N_ELEMENTS(index_drag_types),
                         GDK_ACTION_DEFAULT | GDK_ACTION_COPY |
                         GDK_ACTION_MOVE);
     g_signal_connect(index, "drag-data-get",
@@ -1818,7 +1818,7 @@ bndx_popup_menu_create(BalsaIndex * index)
 
     menu = gtk_menu_new();
 
-    for (i = 0; i < ELEMENTS(entries); i++)
+    for (i = 0; i < G_N_ELEMENTS(entries); i++)
         create_stock_menu_item(menu, _(entries[i].label),
                                entries[i].func, index);
 

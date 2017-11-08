@@ -463,7 +463,7 @@ bw_create_index_widget(BalsaWindow *bw)
     GList *focusable_widgets;
 
     if(!view_filters_translated) {
-        for(i=0; i<ELEMENTS(view_filters); i++)
+        for(i=0; i<G_N_ELEMENTS(view_filters); i++)
             view_filters[i].str = _(view_filters[i].str);
         view_filters_translated = TRUE;
     }
@@ -472,7 +472,7 @@ bw_create_index_widget(BalsaWindow *bw)
 
     bw->filter_choice = gtk_combo_box_text_new();
     gtk_box_pack_start(GTK_BOX(bw->sos_bar), bw->filter_choice);
-    for(i=0; i<ELEMENTS(view_filters); i++)
+    for(i=0; i<G_N_ELEMENTS(view_filters); i++)
         gtk_combo_box_text_insert_text(GTK_COMBO_BOX_TEXT(bw->filter_choice),
                                        i, view_filters[i].str);
     gtk_combo_box_set_active(GTK_COMBO_BOX(bw->filter_choice), 0);

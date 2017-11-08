@@ -683,7 +683,7 @@ find_locale_index_by_locale(const gchar * locale)
 
     if (!locale || strcmp(locale, "C") == 0)
         locale = "en_US";
-    for (i = 0; i < ELEMENTS(locales); i++) {
+    for (i = 0; i < G_N_ELEMENTS(locales); i++) {
 	for (j = 0; locale[j] && locales[i].locale[j] == locale[j]; j++);
 	if (j > maxfit) {
 	    maxfit = j;
@@ -2399,7 +2399,7 @@ create_email_entry(BalsaSendmsg         * bsmsg,
 		     G_CALLBACK(address_book_cb), bsmsg);
     gtk_drag_dest_set(GTK_WIDGET(*view), GTK_DEST_DEFAULT_ALL,
 		      email_field_drop_types,
-		      ELEMENTS(email_field_drop_types),
+		      G_N_ELEMENTS(email_field_drop_types),
 		      GDK_ACTION_COPY | GDK_ACTION_MOVE);
 
     libbalsa_address_view_set_domain(*view, bsmsg->ident->domain);
@@ -2707,7 +2707,7 @@ sw_attachment_list(BalsaSendmsg *bsmsg)
     g_signal_connect(G_OBJECT(bsmsg->window), "drag_data_received",
 		     G_CALLBACK(attachments_add), bsmsg);
     gtk_drag_dest_set(GTK_WIDGET(bsmsg->window), GTK_DEST_DEFAULT_ALL,
-		      drop_types, ELEMENTS(drop_types),
+		      drop_types, G_N_ELEMENTS(drop_types),
 		      GDK_ACTION_COPY | GDK_ACTION_MOVE | GDK_ACTION_LINK);
 
     frame = gtk_frame_new(NULL);
@@ -2916,7 +2916,7 @@ create_text_area(BalsaSendmsg * bsmsg)
 		     G_CALLBACK(drag_data_quote), bsmsg);
     /* GTK_DEST_DEFAULT_ALL in drag_set would trigger bug 150141 */
     gtk_drag_dest_set(GTK_WIDGET(bsmsg->text), 0,
-		      drop_types, ELEMENTS(drop_types),
+		      drop_types, G_N_ELEMENTS(drop_types),
 		      GDK_ACTION_COPY | GDK_ACTION_MOVE | GDK_ACTION_LINK);
 
     gtk_widget_show(scroll);
@@ -4033,9 +4033,9 @@ create_lang_menu(GtkWidget * parent, BalsaSendmsg * bsmsg)
 #endif                          /* CAN_SEPARATE_RADIO_MENU_ITEMS */
 
     if (!locales_sorted) {
-        for (i = 0; i < ELEMENTS(locales); i++)
+        for (i = 0; i < G_N_ELEMENTS(locales); i++)
             locales[i].lang_name = _(locales[i].lang_name);
-        qsort(locales, ELEMENTS(locales), sizeof(struct SendLocales),
+        qsort(locales, G_N_ELEMENTS(locales), sizeof(struct SendLocales),
               comp_send_locales);
         locales_sorted = TRUE;
     }
@@ -4054,7 +4054,7 @@ create_lang_menu(GtkWidget * parent, BalsaSendmsg * bsmsg)
     enchant_broker_list_dicts(broker, sw_broker_cb, &lang_list);
 #endif                          /* HAVE_GTKSPELL_3_0_3 */
 
-    for (i = 0; i < ELEMENTS(locales); i++) {
+    for (i = 0; i < G_N_ELEMENTS(locales); i++) {
         gconstpointer found;
 
         if (locales[i].locale == NULL || locales[i].locale[0] == '\0')

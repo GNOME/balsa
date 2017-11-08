@@ -1168,7 +1168,7 @@ balsa_mblist_default_signal_bindings(BalsaMBList * mblist)
                            G_CALLBACK(bmbl_column_resize), NULL);
     gtk_tree_view_enable_model_drag_dest(GTK_TREE_VIEW(mblist),
                                          bmbl_drop_types,
-                                         ELEMENTS(bmbl_drop_types),
+                                         G_N_ELEMENTS(bmbl_drop_types),
                                          GDK_ACTION_DEFAULT |
                                          GDK_ACTION_COPY |
                                          GDK_ACTION_MOVE);

@@ -230,7 +230,7 @@ balsa_server_conf_get_advanced_widget(BalsaServerConf *bsc, LibBalsaServer *s,
     bsc->tls_option = gtk_combo_box_text_new();
     gtk_widget_set_hexpand(bsc->tls_option, TRUE);
     mailbox_conf_combo_box_make(GTK_COMBO_BOX_TEXT(bsc->tls_option),
-                                ELEMENTS(tls_menu), tls_menu);
+                                G_N_ELEMENTS(tls_menu), tls_menu);
     gtk_combo_box_set_active(GTK_COMBO_BOX(bsc->tls_option),
                              s ? s->tls_mode : LIBBALSA_TLS_ENABLED);
     gtk_grid_attach(bsc->grid, bsc->tls_option, 1, 1, 1, 1);
@@ -1544,7 +1544,7 @@ mailbox_conf_view_new_full(LibBalsaMailbox * mailbox,
         view_info->chk_crypt = gtk_combo_box_text_new();
         gtk_label_set_mnemonic_widget(GTK_LABEL(label), view_info->chk_crypt);
         mailbox_conf_combo_box_make(GTK_COMBO_BOX_TEXT(view_info->chk_crypt),
-                                    ELEMENTS(chk_crypt_menu),
+                                    G_N_ELEMENTS(chk_crypt_menu),
                                     chk_crypt_menu);
         gtk_combo_box_set_active(GTK_COMBO_BOX(view_info->chk_crypt),
                                  libbalsa_mailbox_get_crypto_mode

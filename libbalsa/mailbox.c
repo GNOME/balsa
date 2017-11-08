@@ -2936,7 +2936,7 @@ mbox_model_get_value(GtkTreeModel *tree_model,
     
     g_return_if_fail(VALID_ITER(iter, tree_model));
     g_return_if_fail(column >= 0 &&
-                     column < (int) ELEMENTS(mbox_model_col_type));
+                     column < (gint) G_N_ELEMENTS(mbox_model_col_type));
  
     g_value_init (value, mbox_model_col_type[column]);
     msgno = GPOINTER_TO_UINT( ((GNode*)iter->user_data)->data );

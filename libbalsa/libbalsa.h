@@ -78,8 +78,6 @@ typedef void LibBalsaCanReachCallback(GObject * object,
 #include "mailbox_mh.h"
 #include "mailbox_maildir.h"
 
-#define ELEMENTS(x) (sizeof (x) / sizeof (x[0]))
-
 /*
  * Error domains for GError:
  */

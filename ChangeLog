@@ -1,5 +1,12 @@
 2017-11-08  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Fix some icon issues
+
+	* images/meson.build: remove pointless comment.
+	* meson.build: install desktop icon.
+
+2017-11-08  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Install appstream metadata to non-deprecated location
 
 	Fixes bgo 790076, thanks to Jeremy Bicha

@@ -743,6 +743,11 @@ if gtksourceview
   gtksourceview_dir = join_paths(get_option('datadir'), 'balsa', 'gtksourceview-3.0')
   install_data(gtksourceview_files, install_dir : gtksourceview_dir)
 endif
+
+# desktop icon:
+install_data('gnome-balsa2.png',
+             install_dir : join_paths(get_option('datadir'), 'pixmaps'))
+
 ####################### Autotools stuff below this line #######################
 #
 #dist-hook: balsa.spec

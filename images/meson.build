@@ -14,7 +14,7 @@ balsa_imgs = [
   'balsa_logo.png'
   ]
 
-balsabitmapsdir = join_paths(get_option('datadir'), 'pixmaps')
+balsabitmapsdir = join_paths(get_option('datadir'), 'balsa', 'pixmaps')
 install_data(balsa_imgs, install_dir : balsabitmapsdir)
 
 if gtk_update_icon_cache_program.found()

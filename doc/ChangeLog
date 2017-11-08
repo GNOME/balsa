@@ -1,3 +1,7 @@
+2017-11-08  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* de/de.po: fix XML tags
+
 2017-11-05  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* meson.build: drop the deprecated 'languages' option of

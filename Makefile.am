@@ -16,7 +16,7 @@ desktop_DATA = balsa.desktop balsa-mailto-handler.desktop
 
 # Appdata files
 
-appdatadir = $(datarootdir)/appdata
+appdatadir = $(datarootdir)/metainfo
 appdata_in_files = balsa.appdata.xml.in
 dist_appdata_DATA = balsa.appdata.xml
 

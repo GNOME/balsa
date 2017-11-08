@@ -1,3 +1,13 @@
+2017-11-08  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Install appstream metadata to non-deprecated location
+
+	Fixes bgo 790076, thanks to Jeremy Bicha
+	<URL:https://bugzilla.gnome.org/show_bug.cgi?id=790076>
+
+	* Makefile.am: install balsa.appdata.xml in $(datarootdir)/metainfo.
+	* meson.build: ditto.
+
 2017-11-05  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Old glib-genmarshal has no --output option

@@ -51,7 +51,7 @@ balsa_mime_widget_image_init(BalsaMimeWidgetImage * mwi)
 static void
 balsa_mime_widget_image_dispose(GObject * obj)
 {
-    (*G_OBJECT_CLASS(balsa_mime_widget_widget_parent_class)->
+    (*G_OBJECT_CLASS(balsa_mime_widget_image_parent_class)->
           dispose) (obj);
 }
 

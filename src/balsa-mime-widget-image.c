@@ -101,8 +101,6 @@ balsa_mime_widget_new_image(BalsaMessage * bm,
 #ifdef WE_STILL_NEED_AN_EVENT_BOX
     mw->widget = gtk_event_box_new();
 #endif
-    g_signal_connect(G_OBJECT(mw->widget), "button-press-event",
-                     G_CALLBACK(balsa_image_button_press_cb), data);
 
     image = gtk_image_new_from_icon_name("image-missing",
                                          GTK_ICON_SIZE_BUTTON);
@@ -115,6 +113,8 @@ balsa_mime_widget_new_image(BalsaMessage * bm,
 #else
     mw->widget = image;
 #endif
+    g_signal_connect(G_OBJECT(mw->widget), "button-press-event",
+                     G_CALLBACK(balsa_image_button_press_cb), data);
 
     return mw;
 }

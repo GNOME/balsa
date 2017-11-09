@@ -963,10 +963,23 @@ about_activated(GSimpleAction * action,
     };
 
     const gchar *translator_credits = _("translator-credits");
-    /* FIXME: do we need error handling for this? */
-    GdkPixbuf *balsa_logo =
-        gdk_pixbuf_new_from_file(BALSA_DATA_PREFIX
-                                 "/pixmaps/balsa_logo.png", NULL);
+    gchar *logo_path;
+    GFile *logo_file;
+    GdkTexture *balsa_logo;
+    GError *err = NULL;
+
+    logo_path = g_build_filename(BALSA_DATA_PREFIX, "pixmaps", "balsa_logo.png", NULL);
+    logo_file = g_file_new_for_path(logo_path);
+
+    balsa_logo = gdk_texture_new_from_file(logo_file, &err);
+    g_object_unref(logo_file);
+
+    if (err) {
+        balsa_information(LIBBALSA_INFORMATION_WARNING,
+                          _("Error loading %s: %s\n"), logo_path, err->message);
+        g_error_free(err);
+    }
+    g_free(logo_path);
 
     gtk_show_about_dialog(window,
                           "version", BALSA_VERSION,

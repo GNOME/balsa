@@ -43,6 +43,6 @@ GdkPixbuf *libbalsa_icon_finder(GtkWidget         * widget,
                                 const char        * mime_type,
                                 const LibbalsaVfs * for_file,
                                 gchar            ** used_type,
-                                GtkIconSize         size);
+                                gint                width);
 
 #endif

@@ -1162,16 +1162,21 @@ balsa_mblist_close_lru_peer_mbx(BalsaMBList * mblist,
 void
 balsa_mblist_default_signal_bindings(BalsaMBList * mblist)
 {
+    GtkTargetList *list;
+
     g_signal_connect(G_OBJECT(mblist), "button_press_event",
                      G_CALLBACK(bmbl_button_press_cb), NULL);
     g_signal_connect_after(G_OBJECT(mblist), "size-allocate",
                            G_CALLBACK(bmbl_column_resize), NULL);
+
+    list = gtk_target_list_new(bmbl_drop_types, G_N_ELEMENTS(bmbl_drop_types));
     gtk_tree_view_enable_model_drag_dest(GTK_TREE_VIEW(mblist),
-                                         bmbl_drop_types,
-                                         G_N_ELEMENTS(bmbl_drop_types),
+                                         list,
                                          GDK_ACTION_DEFAULT |
                                          GDK_ACTION_COPY |
                                          GDK_ACTION_MOVE);
+    gtk_target_list_unref(list);
+
     g_signal_connect(G_OBJECT(mblist), "drag-data-received",
                      G_CALLBACK(bmbl_drag_cb), NULL);
 

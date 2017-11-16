@@ -234,7 +234,7 @@ libbalsa_key_dialog(GtkWindow            *parent,
 	gtk_box_set_homogeneous(GTK_BOX(hbox), FALSE);
 
 	/* standard key icon; "application-certificate" would be an alternative... */
-	icon = gtk_image_new_from_icon_name("dialog-password", GTK_ICON_SIZE_DIALOG);
+	icon = gtk_image_new_from_icon_name("dialog-password");
 	gtk_box_pack_start(GTK_BOX(hbox), icon);
 	gtk_widget_set_valign(icon, GTK_ALIGN_START);
 
@@ -401,7 +401,7 @@ create_key_label_with_warn(const gchar *text,
 		gchar *buf;
 
 		result = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 6);
-		icon = gtk_image_new_from_icon_name("gtk-dialog-warning", GTK_ICON_SIZE_MENU);
+		icon = gtk_image_new_from_icon_name("gtk-dialog-warning");
 		gtk_box_pack_start(GTK_BOX(result), icon);
 		buf = g_markup_printf_escaped("<span fgcolor=\"red\">%s</span>", text);
 		label = gtk_label_new(NULL);

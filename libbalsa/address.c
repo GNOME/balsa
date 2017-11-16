@@ -861,7 +861,7 @@ add_row(GtkWidget*button, gpointer data)
     gtk_tree_path_free(path);
 }
 
-GtkTargetEntry libbalsa_address_target_list[2] = {
+GtkTargetEntry libbalsa_address_target_list[] = {
     {"text/plain",           0, LIBBALSA_ADDRESS_TRG_STRING },
     {"x-application/x-addr", GTK_TARGET_SAME_APP,LIBBALSA_ADDRESS_TRG_ADDRESS}
 };
@@ -974,6 +974,8 @@ libbalsa_address_get_edit_widget(const LibBalsaAddress *address,
         if (cnt == EMAIL_ADDRESS) {
             GtkWidget *box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 1);
             GtkWidget *but = gtk_button_new_with_mnemonic(_("A_dd"));
+            GtkTargetList *list;
+
             entries[cnt] = lba_address_list_widget(changed_cb,
                                                    changed_data);
             gtk_box_pack_start(GTK_BOX(box), label);
@@ -981,12 +983,15 @@ libbalsa_address_get_edit_widget(const LibBalsaAddress *address,
             lhs = box;
             g_signal_connect(but, "clicked", G_CALLBACK(add_row),
                              entries[cnt]);
-             gtk_drag_dest_set(entries[cnt],
-                               GTK_DEST_DEFAULT_MOTION |
-                               GTK_DEST_DEFAULT_HIGHLIGHT,
-                               libbalsa_address_target_list,
-                               2,              /* size of list */
-                               GDK_ACTION_COPY);
+
+            list = gtk_target_list_new(libbalsa_address_target_list,
+                                       G_N_ELEMENTS(libbalsa_address_target_list));
+            gtk_drag_dest_set(entries[cnt],
+                              GTK_DEST_DEFAULT_MOTION | GTK_DEST_DEFAULT_HIGHLIGHT,
+                              list,
+                              GDK_ACTION_COPY);
+            gtk_target_list_unref(list);
+
             g_signal_connect(G_OBJECT(entries[cnt]), "drag-data-received",
                              G_CALLBACK(addrlist_drag_received_cb), NULL);
             g_signal_connect (G_OBJECT(entries[cnt]), "drag-drop",

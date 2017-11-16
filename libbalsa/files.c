@@ -105,16 +105,12 @@ libbalsa_icon_finder(GtkWidget         * widget,
                      const char        * mime_type,
                      const LibbalsaVfs * for_file,
                      gchar            ** used_type,
-                     GtkIconSize         size)
+                     gint                width)
 {
     const gchar *content_type;
     GdkPixbuf *pixbuf = NULL;
-    gint width, height;
     GtkIconTheme *icon_theme;
     GIcon *icon;
-
-    if (!gtk_icon_size_lookup(size, &width, &height))
-        width = 16;
 
     if (mime_type)
         content_type = mime_type;
@@ -132,9 +128,9 @@ libbalsa_icon_finder(GtkWidget         * widget,
     if (icon != NULL) {
         if (G_IS_THEMED_ICON(icon)) {
             gint i;
-            GStrv icon_names;
+            const gchar * const *icon_names;
 
-            g_object_get(G_OBJECT(icon), "names", &icon_names, NULL);
+            icon_names = g_themed_icon_get_names((GThemedIcon *) icon);
 
             if (icon_names != NULL) {
                 for (i = 0; pixbuf == NULL && icon_names[i] != NULL; i++) {
@@ -142,7 +138,6 @@ libbalsa_icon_finder(GtkWidget         * widget,
                         gtk_icon_theme_load_icon(icon_theme, icon_names[i], width,
                                                  GTK_ICON_LOOKUP_FORCE_SIZE, NULL);
                 }
-                g_strfreev(icon_names);
             }
         }
         g_object_unref(icon);

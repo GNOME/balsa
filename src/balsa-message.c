@@ -271,9 +271,7 @@ bm_header_tl_buttons(BalsaMessage * bm)
     array = g_ptr_array_new();
 
 #ifdef HAVE_GPGME
-    button =
-        gtk_button_new_from_icon_name(balsa_icon_id(BALSA_PIXMAP_GPG_RECHECK),
-                                      GTK_ICON_SIZE_BUTTON);
+    button = gtk_button_new_from_icon_name(balsa_icon_id(BALSA_PIXMAP_GPG_RECHECK));
     gtk_widget_set_tooltip_text(button,
 			        _("Check cryptographic signature"));
     g_signal_connect(G_OBJECT(button), "focus_in_event",
@@ -288,9 +286,7 @@ bm_header_tl_buttons(BalsaMessage * bm)
     g_ptr_array_add(array, button);
 #endif
 
-    button =
-        gtk_button_new_from_icon_name(balsa_icon_id(BALSA_PIXMAP_ATTACHMENT),
-                                      GTK_ICON_SIZE_BUTTON);
+    button = gtk_button_new_from_icon_name(balsa_icon_id(BALSA_PIXMAP_ATTACHMENT));
     gtk_widget_set_tooltip_text(button,
 			        _("Select message part to display"));
     g_signal_connect(G_OBJECT(button), "focus_in_event",
@@ -592,14 +588,14 @@ bm_find_bar_new(BalsaMessage * bm)
     gtk_container_add(GTK_CONTAINER(tool_item), hbox);
     gtk_toolbar_insert(GTK_TOOLBAR(toolbar), tool_item, -1);
 
-    image = gtk_image_new_from_icon_name("pan-up-symbolic", GTK_ICON_SIZE_BUTTON);
+    image = gtk_image_new_from_icon_name("pan-up-symbolic");
     tool_item = gtk_tool_button_new(image, _("Previous"));
     bm->find_prev = GTK_WIDGET(tool_item);
     gtk_tool_item_set_is_important(tool_item, TRUE);
     g_signal_connect(tool_item, "clicked", G_CALLBACK(bm_find_prev_cb), bm);
     gtk_toolbar_insert(GTK_TOOLBAR(toolbar), tool_item, -1);
 
-    image = gtk_image_new_from_icon_name("pan-down-symbolic", GTK_ICON_SIZE_BUTTON);
+    image = gtk_image_new_from_icon_name("pan-down-symbolic");
     tool_item = gtk_tool_button_new(image, _("Next"));
     bm->find_next = GTK_WIDGET(tool_item);
     gtk_tool_item_set_is_important(tool_item, TRUE);
@@ -1454,9 +1450,7 @@ display_part(BalsaMessage * bm, LibBalsaMessageBody * body,
 #endif
         if (!content_icon)
 	    content_icon =
-		libbalsa_icon_finder(GTK_WIDGET(bm),
-                                     content_type, NULL, NULL,
-				     GTK_ICON_SIZE_LARGE_TOOLBAR);
+		libbalsa_icon_finder(GTK_WIDGET(bm), content_type, NULL, NULL, 24);
         gtk_tree_store_set (GTK_TREE_STORE(model), iter,
                             PART_INFO_COLUMN, info,
 			    PART_NUM_COLUMN, part_id,
@@ -1467,9 +1461,7 @@ display_part(BalsaMessage * bm, LibBalsaMessageBody * body,
         g_free(icon_title);
     } else {
 	content_icon =
-	    libbalsa_icon_finder(GTK_WIDGET(bm),
-                                 content_type, NULL, NULL,
-				 GTK_ICON_SIZE_LARGE_TOOLBAR);
+	    libbalsa_icon_finder(GTK_WIDGET(bm), content_type, NULL, NULL, 24);
         gtk_tree_store_set (GTK_TREE_STORE(model), iter,
                             PART_INFO_COLUMN, NULL,
 			    PART_NUM_COLUMN, part_id,
@@ -2687,8 +2679,7 @@ get_crypto_content_icon(LibBalsaMessageBody * body, const gchar * content_type,
     if (!icon_name)
         return NULL;
     icon =
-        gtk_icon_theme_load_icon(gtk_icon_theme_get_default(), icon_name,
-                                 GTK_ICON_SIZE_LARGE_TOOLBAR, 0, NULL);
+        gtk_icon_theme_load_icon(gtk_icon_theme_get_default(), icon_name, 24, 0, NULL);
     if (!icon_title)
         return icon;
 

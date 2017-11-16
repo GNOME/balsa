@@ -490,8 +490,7 @@ bw_create_index_widget(BalsaWindow *bw)
     button = gtk_button_new();
     gtk_box_pack_start(GTK_BOX(bw->sos_bar), button);
     gtk_container_add(GTK_CONTAINER(button),
-                      gtk_image_new_from_icon_name("gtk-ok",
-                                                    GTK_ICON_SIZE_BUTTON));
+                      gtk_image_new_from_icon_name("gtk-ok"));
     g_signal_connect(G_OBJECT(bw->sos_entry), "activate",
                      G_CALLBACK(bw_filter_entry_activate),
                      button);
@@ -2215,6 +2214,7 @@ balsa_window_new()
 #endif
     GtkAdjustment *hadj, *vadj;
     GAction *action;
+    GtkTargetList *list;
 
     /* Call to register custom balsa pixmaps with GNOME_STOCK_PIXMAPS
      * - allows for grey out */
@@ -2273,9 +2273,13 @@ balsa_window_new()
     gtk_notebook_set_scrollable (GTK_NOTEBOOK (window->notebook), TRUE);
     g_signal_connect(G_OBJECT(window->notebook), "switch_page",
                      G_CALLBACK(bw_notebook_switch_page_cb), window);
+
+    list = gtk_target_list_new(notebook_drop_types, NUM_DROP_TYPES);
     gtk_drag_dest_set (GTK_WIDGET (window->notebook), GTK_DEST_DEFAULT_ALL,
-                       notebook_drop_types, NUM_DROP_TYPES,
+                       list,
                        GDK_ACTION_DEFAULT | GDK_ACTION_COPY | GDK_ACTION_MOVE);
+    gtk_target_list_unref(list);
+
     g_signal_connect(G_OBJECT (window->notebook), "drag-data-received",
                      G_CALLBACK (bw_notebook_drag_received_cb), NULL);
     g_signal_connect(G_OBJECT (window->notebook), "drag-motion",
@@ -2801,8 +2805,7 @@ bw_notebook_label_new(BalsaMailboxNode * mbnode)
     g_signal_connect(but, "clicked",
                      G_CALLBACK(bw_mailbox_tab_close_cb), mbnode);
 
-    close_pix = gtk_image_new_from_icon_name("window-close-symbolic",
-                                             GTK_ICON_SIZE_MENU);
+    close_pix = gtk_image_new_from_icon_name("window-close-symbolic");
     gtk_container_add(GTK_CONTAINER(but), close_pix);
     gtk_box_pack_start(GTK_BOX(box), but);
 

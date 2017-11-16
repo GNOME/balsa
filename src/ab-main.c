@@ -715,6 +715,7 @@ bab_window_list_new(void)
     GtkCellRenderer *renderer;
     GtkTreeViewColumn *column;
     GtkTreeSelection *selection;
+    GtkTargetList *list;
 
     store =
         gtk_list_store_new(N_COLUMNS,
@@ -747,10 +748,14 @@ bab_window_list_new(void)
     gtk_tree_view_append_column(GTK_TREE_VIEW(tree), column);
 
 
+    list = gtk_target_list_new(libbalsa_address_target_list,
+                               G_N_ELEMENTS(libbalsa_address_target_list));
     gtk_drag_source_set(GTK_WIDGET(tree),
                         GDK_BUTTON1_MASK,
-                        libbalsa_address_target_list, 2,
+                        list,
                         GDK_ACTION_COPY);
+    gtk_target_list_unref(list);
+
     g_signal_connect(G_OBJECT(tree), "drag-data-get",
                      G_CALLBACK(addrlist_drag_get_cb), NULL);
 
@@ -893,8 +898,7 @@ bab_get_filter_box(void)
     gtk_label_set_mnemonic_widget(GTK_LABEL(find_label), find_entry);
     button = gtk_button_new();
     gtk_container_add(GTK_CONTAINER(button),
-                      gtk_image_new_from_icon_name("gtk-ok",
-                                                   GTK_ICON_SIZE_BUTTON));
+                      gtk_image_new_from_icon_name("gtk-ok"));
     gtk_box_pack_start(GTK_BOX(search_hbox), button);
 
     g_signal_connect(G_OBJECT(find_entry), "activate",

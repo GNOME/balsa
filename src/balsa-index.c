@@ -298,6 +298,7 @@ bndx_instance_init(BalsaIndex * index)
     GtkTreeSelection *selection = gtk_tree_view_get_selection(tree_view);
     GtkCellRenderer *renderer;
     GtkTreeViewColumn *column;
+    GtkTargetList *list;
 
 #if defined(TREE_VIEW_FIXED_HEIGHT)
     gtk_tree_view_set_fixed_height_mode(tree_view, TRUE);
@@ -447,11 +448,14 @@ bndx_instance_init(BalsaIndex * index)
                            NULL);
     gtk_tree_view_set_enable_search(tree_view, FALSE);
 
+    list = gtk_target_list_new(index_drag_types, G_N_ELEMENTS(index_drag_types));
     gtk_drag_source_set(GTK_WIDGET (index),
                         GDK_BUTTON1_MASK | GDK_SHIFT_MASK | GDK_CONTROL_MASK,
-                        index_drag_types, G_N_ELEMENTS(index_drag_types),
+                        list,
                         GDK_ACTION_DEFAULT | GDK_ACTION_COPY |
                         GDK_ACTION_MOVE);
+    gtk_target_list_unref(list);
+
     g_signal_connect(index, "drag-data-get",
                      G_CALLBACK(bndx_drag_cb), NULL);
 
@@ -1304,7 +1308,7 @@ void
 balsa_index_set_column_widths(BalsaIndex * index)
 {
     GtkTreeView *tree_view = GTK_TREE_VIEW(index);
-    gint icon_w;
+    gint icon_w = 16;
 
 #if defined(TREE_VIEW_FIXED_HEIGHT)
     /* so that fixed width works properly */
@@ -1314,7 +1318,6 @@ balsa_index_set_column_widths(BalsaIndex * index)
 #endif
     /* I have no idea why we must add 5 pixels to the icon width - otherwise,
        the icon will be clipped... */
-    gtk_icon_size_lookup(GTK_ICON_SIZE_MENU, &icon_w, NULL);
     gtk_tree_view_column_set_fixed_width(gtk_tree_view_get_column
                                          (tree_view, LB_MBOX_MARKED_COL),
                                          icon_w + 5);

@@ -550,8 +550,8 @@ tm_populate(GtkWidget * toolbar, BalsaToolbarModel * model)
             const GVariantType *type;
             gchar *prefixed_action;
 
-            icon = gtk_image_new_from_icon_name
-                (balsa_icon_id(entry->icon), GTK_ICON_SIZE_SMALL_TOOLBAR);
+            icon = gtk_image_new_from_icon_name(balsa_icon_id(entry->icon));
+            gtk_image_set_pixel_size((GtkImage *) icon, 24);
             action = g_action_map_lookup_action(action_map, entry->action);
             if (action &&
                 (type = g_action_get_state_type(action)) &&

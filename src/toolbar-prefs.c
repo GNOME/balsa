@@ -495,9 +495,7 @@ create_toolbar_page(BalsaToolbarModel * model, GActionMap * map)
 
     gtk_box_pack_start(GTK_BOX(center_button_box), button_box);
 
-    page->back_button =
-        gtk_button_new_from_icon_name("go-up-symbolic",
-                                      GTK_ICON_SIZE_BUTTON);
+    page->back_button = gtk_button_new_from_icon_name("go-up-symbolic");
     gtk_widget_set_tooltip_text(page->back_button,
                                 _("Move selected item up"));
     gtk_box_pack_start(GTK_BOX(button_box), page->back_button);
@@ -505,23 +503,17 @@ create_toolbar_page(BalsaToolbarModel * model, GActionMap * map)
     move_button_box=gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
     gtk_box_pack_start(GTK_BOX(button_box), move_button_box);
 
-    page->remove_button =
-        gtk_button_new_from_icon_name("go-previous-symbolic",
-                                      GTK_ICON_SIZE_BUTTON);
+    page->remove_button = gtk_button_new_from_icon_name("go-previous-symbolic");
     gtk_widget_set_tooltip_text(page->remove_button,
                                 _("Remove selected item from toolbar"));
     gtk_box_pack_start(GTK_BOX(move_button_box), page->remove_button);
 
-    page->add_button =
-        gtk_button_new_from_icon_name("go-next-symbolic",
-                                      GTK_ICON_SIZE_BUTTON);
+    page->add_button = gtk_button_new_from_icon_name("go-next-symbolic");
     gtk_widget_set_tooltip_text(page->add_button,
                                 _("Add selected item to toolbar"));
     gtk_box_pack_start(GTK_BOX(move_button_box), page->add_button);
 
-    page->forward_button =
-        gtk_button_new_from_icon_name("go-down-symbolic",
-                                      GTK_ICON_SIZE_BUTTON);
+    page->forward_button = gtk_button_new_from_icon_name("go-down-symbolic");
     gtk_widget_set_tooltip_text(page->forward_button,
                                 _("Move selected item down"));
     gtk_box_pack_start(GTK_BOX(button_box), page->forward_button);
@@ -835,7 +827,7 @@ tp_store_set(GtkListStore * store, GtkTreeIter * iter, gint item)
         (item > 0
          ? gtk_icon_theme_load_icon(gtk_icon_theme_get_default(),
                                     toolbar_buttons[item].pixmap_id,
-                                    GTK_ICON_SIZE_LARGE_TOOLBAR, 0, NULL)
+                                    24, 0, NULL)
          : NULL);
     gtk_list_store_set(store, iter,
                        TP_TEXT_COLUMN, text,

@@ -370,8 +370,7 @@ void balsa_filter_run_dialog_init(BalsaFilterRunDialog * p)
 
     /* Right/Add button */
     p->add_button = button =
-        gtk_button_new_from_icon_name("go-next-symbolic",
-                                      GTK_ICON_SIZE_BUTTON);
+        gtk_button_new_from_icon_name("go-next-symbolic");
     gtk_widget_set_tooltip_text(button,
                                 _("Add selected filter to mailbox"));
     gtk_widget_set_sensitive(button, FALSE);
@@ -380,8 +379,7 @@ void balsa_filter_run_dialog_init(BalsaFilterRunDialog * p)
     gtk_container_add(GTK_CONTAINER(bbox), button);
     /* Left/Remove button */
     p->remove_button = button =
-        gtk_button_new_from_icon_name("go-previous-symbolic",
-                                      GTK_ICON_SIZE_BUTTON);
+        gtk_button_new_from_icon_name("go-previous-symbolic");
     gtk_widget_set_tooltip_text(button,
                                 _("Remove selected filter from mailbox"));
     gtk_widget_set_sensitive(button, FALSE);
@@ -424,8 +422,7 @@ void balsa_filter_run_dialog_init(BalsaFilterRunDialog * p)
 
     /* up button */
     p->move_up_button = button =
-        gtk_button_new_from_icon_name("go-up-symbolic",
-                                      GTK_ICON_SIZE_BUTTON);
+        gtk_button_new_from_icon_name("go-up-symbolic");
     gtk_widget_set_sensitive(button, FALSE);
     gtk_widget_set_tooltip_text(button,
                                 _("Move selected filter up"));
@@ -434,8 +431,7 @@ void balsa_filter_run_dialog_init(BalsaFilterRunDialog * p)
     gtk_container_add(GTK_CONTAINER(bbox), button);
     /* down button */
     p->move_down_button = button =
-        gtk_button_new_from_icon_name("go-down-symbolic",
-                                      GTK_ICON_SIZE_BUTTON);
+        gtk_button_new_from_icon_name("go-down-symbolic");
     gtk_widget_set_sensitive(button, FALSE);
     gtk_widget_set_tooltip_text(button,
                                 _("Move selected filter down"));

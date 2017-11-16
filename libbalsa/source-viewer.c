@@ -64,7 +64,7 @@ lsv_copy_activated(GSimpleAction * action,
     GtkClipboard *clipboard;
 
     display = gtk_widget_get_display(GTK_WIDGET(text));
-    clipboard = gtk_clipboard_get_for_display(display, GDK_NONE);
+    clipboard = gtk_clipboard_get_for_display(display, GDK_SELECTION_CLIPBOARD);
 
     gtk_text_buffer_copy_clipboard(buffer, clipboard);
 }

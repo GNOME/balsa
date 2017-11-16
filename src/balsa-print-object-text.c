@@ -470,8 +470,7 @@ balsa_print_object_text_vcard(GList * list,
     if (!pod->pixbuf) {
 	gchar *conttype = libbalsa_message_body_get_mime_type(body);
 
-	pod->pixbuf = libbalsa_icon_finder(NULL, conttype, NULL, NULL,
-                                           GTK_ICON_SIZE_DND);
+	pod->pixbuf = libbalsa_icon_finder(NULL, conttype, NULL, NULL, 48);
     }
     pod->c_image_width = gdk_pixbuf_get_width(pod->pixbuf);
     pod->c_image_height = gdk_pixbuf_get_height(pod->pixbuf);
@@ -617,8 +616,7 @@ balsa_print_object_text_calendar(GList * list,
     if (!pod->pixbuf) {
 	gchar *conttype = libbalsa_message_body_get_mime_type(body);
 
-	pod->pixbuf = libbalsa_icon_finder(NULL, conttype, NULL, NULL,
-                                           GTK_ICON_SIZE_DND);
+	pod->pixbuf = libbalsa_icon_finder(NULL, conttype, NULL, NULL, 48);
     }
     pod->c_image_width = gdk_pixbuf_get_width(pod->pixbuf);
     pod->c_image_height = gdk_pixbuf_get_height(pod->pixbuf);

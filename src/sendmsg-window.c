@@ -1734,8 +1734,7 @@ add_attachment(BalsaSendmsg * bsmsg, const gchar *filename,
 	content_type = g_strdup(forced_mime_type);
     pixbuf =
         libbalsa_icon_finder(GTK_WIDGET(bsmsg->window), forced_mime_type,
-                             file_uri, &content_type,
-                             GTK_ICON_SIZE_LARGE_TOOLBAR);
+                             file_uri, &content_type, 24);
     if (!content_type)
 	/* Last ditch. */
 	content_type = g_strdup("application/octet-stream");
@@ -1898,7 +1897,7 @@ add_urlref_attachment(BalsaSendmsg * bsmsg, gchar *url)
     /* get the pixbuf for the attachment's content type */
     pixbuf =
         gtk_icon_theme_load_icon(gtk_icon_theme_get_default(),
-                                 "go-jump", GTK_ICON_SIZE_MENU, 0, NULL);
+                                 "go-jump", 16, 0, NULL);
 
     /* create a new attachment info block */
     attach_data = balsa_attach_info_new(bsmsg);
@@ -2372,6 +2371,7 @@ create_email_entry(BalsaSendmsg         * bsmsg,
                    guint                  n_types)
 {
     GtkWidget *scroll;
+    GtkTargetList *list;
 
     *view = libbalsa_address_view_new(types, n_types,
                                       balsa_app.address_book_list,
@@ -2397,10 +2397,12 @@ create_email_entry(BalsaSendmsg         * bsmsg,
                      G_CALLBACK(to_add), NULL);
     g_signal_connect(*view, "open-address-book",
 		     G_CALLBACK(address_book_cb), bsmsg);
+
+    list = gtk_target_list_new(email_field_drop_types, G_N_ELEMENTS(email_field_drop_types));
     gtk_drag_dest_set(GTK_WIDGET(*view), GTK_DEST_DEFAULT_ALL,
-		      email_field_drop_types,
-		      G_N_ELEMENTS(email_field_drop_types),
+		      list,
 		      GDK_ACTION_COPY | GDK_ACTION_MOVE);
+    gtk_target_list_unref(list);
 
     libbalsa_address_view_set_domain(*view, bsmsg->ident->domain);
     g_signal_connect_swapped(gtk_tree_view_get_model(GTK_TREE_VIEW(*view)),
@@ -2619,6 +2621,7 @@ sw_attachment_list(BalsaSendmsg *bsmsg)
     GtkTreeView *view;
     GtkTreeViewColumn *column;
     GtkWidget *frame;
+    GtkTargetList *list;
 
     grid = gtk_grid_new();
     gtk_grid_set_row_spacing(GTK_GRID(grid), 6);
@@ -2706,9 +2709,12 @@ sw_attachment_list(BalsaSendmsg *bsmsg)
 
     g_signal_connect(G_OBJECT(bsmsg->window), "drag_data_received",
 		     G_CALLBACK(attachments_add), bsmsg);
+
+    list = gtk_target_list_new(drop_types, G_N_ELEMENTS(drop_types));
     gtk_drag_dest_set(GTK_WIDGET(bsmsg->window), GTK_DEST_DEFAULT_ALL,
-		      drop_types, G_N_ELEMENTS(drop_types),
+		      list,
 		      GDK_ACTION_COPY | GDK_ACTION_MOVE | GDK_ACTION_LINK);
+    gtk_target_list_unref(list);
 
     frame = gtk_frame_new(NULL);
     gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_IN);
@@ -2853,6 +2859,7 @@ create_text_area(BalsaSendmsg * bsmsg)
 #endif                          /* HAVE_GSPELL_1_2 */
 #endif                          /* HAVE_GSPELL */
     GtkWidget *scroll;
+    GtkTargetList *list;
 
 #if HAVE_GTKSOURCEVIEW
     bsmsg->text = libbalsa_source_view_new(TRUE);
@@ -2914,10 +2921,13 @@ create_text_area(BalsaSendmsg * bsmsg)
     gtk_container_add(GTK_CONTAINER(scroll), bsmsg->text);
     g_signal_connect(G_OBJECT(bsmsg->text), "drag_data_received",
 		     G_CALLBACK(drag_data_quote), bsmsg);
+
+    list = gtk_target_list_new(drop_types, G_N_ELEMENTS(drop_types));
     /* GTK_DEST_DEFAULT_ALL in drag_set would trigger bug 150141 */
     gtk_drag_dest_set(GTK_WIDGET(bsmsg->text), 0,
-		      drop_types, G_N_ELEMENTS(drop_types),
+		      list,
 		      GDK_ACTION_COPY | GDK_ACTION_MOVE | GDK_ACTION_LINK);
+    gtk_target_list_unref(list);
 
     gtk_widget_show(scroll);
 
@@ -3329,8 +3339,7 @@ quote_parts_select_dlg(GtkTreeStore *tree_store, GtkWindow * parent)
     gtk_widget_set_halign(label, GTK_ALIGN_START);
     gtk_widget_set_valign(label, GTK_ALIGN_START);
 
-    image = gtk_image_new_from_icon_name("dialog-question",
-                                         GTK_ICON_SIZE_DIALOG);
+    image = gtk_image_new_from_icon_name("dialog-question");
     gtk_widget_set_valign(image, GTK_ALIGN_START);
 
     /* stolen form gtk/gtkmessagedialog.c */
@@ -4986,8 +4995,7 @@ subject_not_empty(BalsaSendmsg * bsmsg)
     gtk_box_pack_start (GTK_BOX (dialog_vbox), hbox);
     g_object_set(G_OBJECT(hbox), "margin", 6, NULL);
 
-    image = gtk_image_new_from_icon_name("dialog-question",
-                                         GTK_ICON_SIZE_DIALOG);
+    image = gtk_image_new_from_icon_name("dialog-question");
     gtk_box_pack_start (GTK_BOX (hbox), image);
     gtk_widget_set_valign(image, GTK_ALIGN_START);
 
@@ -5110,8 +5118,7 @@ check_suggest_encryption(BalsaSendmsg * bsmsg)
         gtk_widget_set_halign(hbox, GTK_ALIGN_CENTER);
         gtk_widget_set_valign(hbox, GTK_ALIGN_CENTER);
 	gtk_container_add(GTK_CONTAINER(button), hbox);
-	image = gtk_image_new_from_icon_name(balsa_icon_id(BALSA_PIXMAP_GPG_ENCRYPT),
-                                             GTK_ICON_SIZE_BUTTON);
+	image = gtk_image_new_from_icon_name(balsa_icon_id(BALSA_PIXMAP_GPG_ENCRYPT));
 	gtk_box_pack_start(GTK_BOX(hbox), image);
 	label = gtk_label_new_with_mnemonic(_("Send _encrypted"));
 	gtk_box_pack_start(GTK_BOX(hbox), label);
@@ -5125,8 +5132,7 @@ check_suggest_encryption(BalsaSendmsg * bsmsg)
         gtk_widget_set_halign(hbox, GTK_ALIGN_CENTER);
         gtk_widget_set_valign(hbox, GTK_ALIGN_CENTER);
 	gtk_container_add(GTK_CONTAINER(button), hbox);
-	image = gtk_image_new_from_icon_name(balsa_icon_id(BALSA_PIXMAP_SEND),
-                                             GTK_ICON_SIZE_BUTTON);
+	image = gtk_image_new_from_icon_name(balsa_icon_id(BALSA_PIXMAP_SEND));
 	gtk_box_pack_start(GTK_BOX(hbox), image);
 	label = gtk_label_new_with_mnemonic(_("Send _unencrypted"));
 	gtk_box_pack_start(GTK_BOX(hbox), label);

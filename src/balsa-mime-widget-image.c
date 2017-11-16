@@ -94,8 +94,7 @@ balsa_mime_widget_new_image(BalsaMessage * bm,
 	return NULL;
     }
 
-    image = gtk_image_new_from_icon_name("image-missing",
-                                         GTK_ICON_SIZE_BUTTON);
+    image = gtk_image_new_from_icon_name("image-missing");
 
     g_object_set_data_full(G_OBJECT(image), "pixbuf", pixbuf, g_object_unref);
 

@@ -1,3 +1,7 @@
+2017-11-16  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* src/toolbar-prefs.c (tp_store_set): map the pixmap id.
+
 2017-11-08  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Fix some icon issues

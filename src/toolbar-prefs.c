@@ -842,7 +842,7 @@ tp_store_set(GtkListStore * store, GtkTreeIter * iter, gint item)
     pixbuf =
         (item > 0
          ? gtk_icon_theme_load_icon(gtk_icon_theme_get_default(),
-                                    toolbar_buttons[item].pixmap_id,
+                                    balsa_icon_id(toolbar_buttons[item].pixmap_id),
                                     GTK_ICON_SIZE_LARGE_TOOLBAR, 0, NULL)
          : NULL);
     gtk_list_store_set(store, iter,

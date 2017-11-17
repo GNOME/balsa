@@ -118,7 +118,8 @@ void libbalsa_address_set_edit_entries(const LibBalsaAddress * address,
 
 enum {
     LIBBALSA_ADDRESS_TRG_STRING,
-    LIBBALSA_ADDRESS_TRG_ADDRESS
+    LIBBALSA_ADDRESS_TRG_ADDRESS,
+    LIBBALSA_ADDRESS_TRG_NONE
 };
 
 extern GtkTargetEntry libbalsa_address_target_list[2];

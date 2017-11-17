@@ -106,13 +106,12 @@ enum {
 };
 
 static GtkTargetEntry index_drag_types[] = {
-    {"x-application/x-message-list", GTK_TARGET_SAME_APP, TARGET_MESSAGES}
+    {"x-application/x-message-list", GTK_TARGET_SAME_APP}
 };
 
 static void bndx_drag_cb(GtkWidget* widget,
                          GdkDragContext* drag_context,
                          GtkSelectionData* data,
-                         guint info,
                          guint time,
                          gpointer user_data);
 
@@ -768,9 +767,11 @@ bndx_column_resize(GtkWidget * widget, GtkAllocation * allocation,
  * Currently supports DND only within the application.
  */
 static void
-bndx_drag_cb(GtkWidget * widget, GdkDragContext * drag_context,
-             GtkSelectionData * data, guint info, guint time,
-             gpointer user_data)
+bndx_drag_cb(GtkWidget        * widget,
+             GdkDragContext   * drag_context,
+             GtkSelectionData * data,
+             guint              time,
+             gpointer           user_data)
 {
     BalsaIndex *index;
 

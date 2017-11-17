@@ -81,13 +81,9 @@ enum {
     LAST_SIGNAL
 };
 
-enum {
-    TARGET_MESSAGES
-};
-
 #define NUM_DROP_TYPES 1
 static GtkTargetEntry notebook_drop_types[NUM_DROP_TYPES] = {
-    {"x-application/x-message-list", GTK_TARGET_SAME_APP, TARGET_MESSAGES}
+    {"x-application/x-message-list", GTK_TARGET_SAME_APP}
 };
 
 /* Define thread-related globals, including dialogs */
@@ -165,16 +161,19 @@ static void bw_notebook_switch_page_cb(GtkWidget * notebook,
 static void bw_send_msg_window_destroy_cb(GtkWidget * widget, gpointer data);
 static BalsaIndex *bw_notebook_find_page(GtkNotebook * notebook,
                                          gint x, gint y);
-static void bw_notebook_drag_received_cb(GtkWidget* widget,
-                                         GdkDragContext* context,
-                                         gint x, gint y,
-                                         GtkSelectionData* selection_data,
-                                         guint info, guint32 time,
-                                         gpointer data);
-static gboolean bw_notebook_drag_motion_cb(GtkWidget* widget,
-                                           GdkDragContext* context,
-                                           gint x, gint y, guint time,
-                                           gpointer user_data);
+static void bw_notebook_drag_received_cb(GtkWidget        * widget,
+                                         GdkDragContext   * context,
+                                         gint               x,
+                                         gint               y,
+                                         GtkSelectionData * selection_data,
+                                         guint32            time,
+                                         gpointer           data);
+static gboolean bw_notebook_drag_motion_cb(GtkWidget      * widget,
+                                           GdkDragContext * context,
+                                           gint             x,
+                                           gint             y,
+                                           guint            time,
+                                           gpointer         user_data);
 
 
 static GtkWidget *bw_notebook_label_new (BalsaMailboxNode* mbnode);
@@ -4547,10 +4546,13 @@ bw_notebook_find_page (GtkNotebook* notebook, gint x, gint y)
  * over, then transfers them.
  **/
 static void
-bw_notebook_drag_received_cb(GtkWidget * widget, GdkDragContext * context,
-                             gint x, gint y,
-                             GtkSelectionData * selection_data, guint info,
-                             guint32 time, gpointer data)
+bw_notebook_drag_received_cb(GtkWidget        * widget,
+                             GdkDragContext   * context,
+                             gint               x,
+                             gint               y,
+                             GtkSelectionData * selection_data,
+                             guint32            time,
+                             gpointer           data)
 {
     BalsaIndex* index;
     LibBalsaMailbox* mailbox;

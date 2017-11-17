@@ -674,36 +674,39 @@ list_row_activated_cb(GtkTreeView *tree, gpointer data)
 }
 
 static void
-addrlist_drag_get_cb(GtkWidget* widget, GdkDragContext* drag_context,
-                     GtkSelectionData* sel_data, guint target_type,
-                     guint time, gpointer user_data)
+addrlist_drag_get_cb(GtkWidget        * widget,
+                     GdkDragContext   * drag_context,
+                     GtkSelectionData * sel_data,
+                     guint              time,
+                     gpointer           user_data)
 {
-    GtkTreeView *addrlist;
-    GtkTreeModel *model;
-    GtkTreeSelection *selection;
-    GtkTreeIter iter;
-    LibBalsaAddress *address;
-    GValue gv = {0,};
+    GdkAtom target;
 
-    g_return_if_fail (widget != NULL);
-    addrlist = GTK_TREE_VIEW(widget);
+    target = gtk_selection_data_get_target(sel_data);
 
-    switch (target_type) {
-    case LIBBALSA_ADDRESS_TRG_ADDRESS:
+    if (target == gdk_atom_intern("x-application/x-addr", TRUE)) {
+        GtkTreeView *addrlist;
+        GtkTreeSelection *selection;
+        GtkTreeModel *model;
+        GtkTreeIter iter;
+        GValue gv = {0,};
+        LibBalsaAddress *address;
+
+        addrlist = GTK_TREE_VIEW(widget);
         selection = gtk_tree_view_get_selection(addrlist);
         if(!gtk_tree_selection_get_selected(selection, &model, &iter))
             return;
         gtk_tree_model_get_value(model, &iter, LIST_COLUMN_ADDRESS, &gv);
         address = LIBBALSA_ADDRESS(g_value_get_object(&gv));
         gtk_selection_data_set(sel_data,
-                               gtk_selection_data_get_target(sel_data),
+                               target,
                                8, (const guchar *) &address,
                                sizeof(LibBalsaAddress*));
-        break;
-    case LIBBALSA_ADDRESS_TRG_STRING:
+    } else if (target == gdk_atom_intern("text/plain", TRUE) ||
+               target == gdk_atom_intern("STRING", TRUE)) {
         g_print("Text/plain cannot be sent.\n");
-        break;
-    default: g_print("Do not know what to do!\n");
+    } else {
+        g_print("Do not know what to do!\n");
     }
 }
 

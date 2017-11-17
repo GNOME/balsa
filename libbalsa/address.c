@@ -862,14 +862,18 @@ add_row(GtkWidget*button, gpointer data)
 }
 
 GtkTargetEntry libbalsa_address_target_list[] = {
-    {"text/plain",           0, LIBBALSA_ADDRESS_TRG_STRING },
-    {"x-application/x-addr", GTK_TARGET_SAME_APP,LIBBALSA_ADDRESS_TRG_ADDRESS}
+    {"text/plain",           0                  },
+    {"x-application/x-addr", GTK_TARGET_SAME_APP}
 };
 
 static void
-addrlist_drag_received_cb(GtkWidget * widget, GdkDragContext * context,
-                          gint x, gint y, GtkSelectionData * selection_data,
-                          guint target_type, guint32 time, gpointer data)
+addrlist_drag_received_cb(GtkWidget        * widget,
+                          GdkDragContext   * context,
+                          gint               x,
+                          gint               y,
+                          GtkSelectionData * selection_data,
+                          guint32            time,
+                          gpointer           data)
 {
     GtkTreeView *tree_view = GTK_TREE_VIEW(widget);
     GtkTreeModel *model = gtk_tree_view_get_model(tree_view);
@@ -879,14 +883,17 @@ addrlist_drag_received_cb(GtkWidget * widget, GdkDragContext * context,
 
     printf("drag_received:\n");
     /* Deal with what we are given from source */
-    if(selection_data
-       && gtk_selection_data_get_length(selection_data) >= 0) {
-        switch (target_type) {
-        case LIBBALSA_ADDRESS_TRG_ADDRESS:
-            addr = *(LibBalsaAddress **)
-                gtk_selection_data_get_data(selection_data);
-            if(addr && addr->address_list) {
-                g_print ("string: %s\n", (gchar*)addr->address_list->data);
+    if (selection_data != NULL
+        && gtk_selection_data_get_length(selection_data) >= 0) {
+        GdkAtom target;
+
+        target = gtk_selection_data_get_target(selection_data);
+
+        if (target == gdk_atom_intern("x-application/x-addr", TRUE)) {
+            addr = *(LibBalsaAddress **) gtk_selection_data_get_data(selection_data);
+
+            if (addr != NULL && addr->address_list != NULL) {
+                g_print ("string: %s\n", (gchar*) addr->address_list->data);
                 gtk_list_store_insert_with_values(GTK_LIST_STORE(model),
                                                   &iter, 99999,
                                                   0,
@@ -894,11 +901,11 @@ addrlist_drag_received_cb(GtkWidget * widget, GdkDragContext * context,
                                                   -1);
                 dnd_success = TRUE;
             }
-            break;
-        case LIBBALSA_ADDRESS_TRG_STRING:
+        } else if (target == gdk_atom_intern("text/plain", TRUE) ||
+                   target == gdk_atom_intern("STRING", TRUE)) {
             g_print("text/plain target not implemented.\n");
-            break;
-        default: g_print ("nothing good");
+        } else {
+            g_print ("nothing good");
         }
     }
 

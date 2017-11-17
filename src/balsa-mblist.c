@@ -76,7 +76,7 @@ enum {
 static gint balsa_mblist_signals[LAST_SIGNAL] = { 0 };
 
 static GtkTargetEntry bmbl_drop_types[] = {
-    {"x-application/x-message-list", GTK_TARGET_SAME_APP, TARGET_MESSAGES}
+    {"x-application/x-message-list", GTK_TARGET_SAME_APP}
 };
 
 static GtkTreeViewClass *parent_class = NULL;
@@ -112,10 +112,13 @@ static gboolean bmbl_button_press_cb(GtkWidget * widget,
 static void bmbl_column_resize(GtkWidget * widget, GtkAllocation * allocation,
                                gint baseline, GtkAllocation * clip,
                                gpointer data);
-static void bmbl_drag_cb(GtkWidget * widget, GdkDragContext * context,
-                         gint x, gint y,
-                         GtkSelectionData * selection_data, guint info,
-                         guint32 time, gpointer data);
+static void bmbl_drag_cb(GtkWidget        * widget,
+                         GdkDragContext   * context,
+                         gint               x,
+                         gint               y,
+                         GtkSelectionData * selection_data,
+                         guint32            time,
+                         gpointer           data);
 static void bmbl_row_activated_cb(GtkTreeView * tree_view,
                                   GtkTreePath * path,
                                   GtkTreeViewColumn * column,
@@ -789,9 +792,13 @@ bmbl_column_resize(GtkWidget * widget, GtkAllocation * allocation,
  * to copy.
  * */
 static void
-bmbl_drag_cb(GtkWidget * widget, GdkDragContext * context,
-             gint x, gint y, GtkSelectionData * selection_data,
-             guint info, guint32 time, gpointer data)
+bmbl_drag_cb(GtkWidget        * widget,
+             GdkDragContext   * context,
+             gint               x,
+             gint               y,
+             GtkSelectionData * selection_data,
+             guint32            time,
+             gpointer           data)
 {
     GtkTreeView *tree_view = GTK_TREE_VIEW(widget);
     GtkTreeModel *model = gtk_tree_view_get_model(tree_view);
@@ -803,7 +810,7 @@ bmbl_drag_cb(GtkWidget * widget, GdkDragContext * context,
     BalsaIndex *orig_index;
     GArray *selected;
 
-    if (!selection_data || !gtk_selection_data_get_data(selection_data))
+    if (selection_data == NULL || gtk_selection_data_get_data(selection_data) == NULL)
 	/* Drag'n'drop is weird... */
 	return;
 

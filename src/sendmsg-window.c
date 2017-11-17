@@ -148,20 +148,19 @@ static void sw_buffer_set_undo(BalsaSendmsg * bsmsg, gboolean undo,
 enum {
     TARGET_MESSAGES,
     TARGET_URI_LIST,
-    TARGET_EMAIL,
     TARGET_STRING
 };
 
 static GtkTargetEntry drop_types[] = {
-    {"x-application/x-message-list", GTK_TARGET_SAME_APP, TARGET_MESSAGES},
-    {"text/uri-list", 0, TARGET_URI_LIST},
-    { "STRING",     0, TARGET_STRING },
-    { "text/plain", 0, TARGET_STRING },
+    { "x-application/x-message-list", GTK_TARGET_SAME_APP},
+    { "text/uri-list", 0},
+    { "STRING",     0},
+    { "text/plain", 0}
 };
 
 static GtkTargetEntry email_field_drop_types[] = {
-    { "STRING",     0, TARGET_STRING },
-    { "text/plain", 0, TARGET_STRING }
+    { "STRING",     0},
+    { "text/plain", 0}
 };
 
 static void lang_set_cb(GtkWidget *widget, BalsaSendmsg *bsmsg);
@@ -2191,11 +2190,15 @@ attachments_add(GtkWidget * widget,
 		GtkSelectionData * selection_data,
 		guint info, guint32 time, BalsaSendmsg * bsmsg)
 {
+    GdkAtom target;
     gboolean drag_result = TRUE;
 
     if (balsa_app.debug)
         printf("attachments_add: info %d\n", info);
-    if (info == TARGET_MESSAGES) {
+
+    target = gtk_selection_data_get_target(selection_data);
+
+    if (target == gdk_atom_intern("x-application/x-message-list", TRUE)) {
 	BalsaIndex *index =
             *(BalsaIndex **) gtk_selection_data_get_data(selection_data);
 	LibBalsaMailbox *mailbox = index->mailbox_node->mailbox;
@@ -2217,37 +2220,38 @@ attachments_add(GtkWidget * widget,
 	    g_object_unref(message);
         }
         balsa_index_selected_msgnos_free(index, selected);
-    } else if (info == TARGET_URI_LIST) {
-        GSList *uri_list =
-            uri2gslist((gchar *)
-                       gtk_selection_data_get_data(selection_data));
-        for (; uri_list; uri_list = g_slist_next(uri_list)) {
+    } else if (target == gdk_atom_intern("text/uri-list", TRUE)) {
+        GSList *uri_list, *list;
+
+        list = uri2gslist((gchar *) gtk_selection_data_get_data(selection_data));
+        for (uri_list = list; uri_list != NULL; uri_list = uri_list->next) {
 	    add_attachment(bsmsg, uri_list->data, FALSE, NULL);
             g_free(uri_list->data);
         }
-        g_slist_free(uri_list);
-    } else if( info == TARGET_STRING) {
-	gchar *url =
-            rfc2396_uri((gchar *)
-                        gtk_selection_data_get_data(selection_data));
+        g_slist_free(list);
+    } else if (target == gdk_atom_intern("STRING", TRUE) ||
+               target == gdk_atom_intern("text/plain", TRUE)) {
+	gchar *url = rfc2396_uri((gchar *) gtk_selection_data_get_data(selection_data));
 
 	if (url)
 	    add_urlref_attachment(bsmsg, url);
 	else
 	    drag_result = FALSE;
     }
+
     gtk_drag_finish(context, drag_result, FALSE, time);
 }
 
 /* to_add - address-view D&D callback; we assume it's a To: address */
 static void
-to_add(GtkWidget * widget,
-       GdkDragContext * context,
-       gint x,
-       gint y,
+to_add(GtkWidget        * widget,
+       GdkDragContext   * context,
+       gint               x,
+       gint               y,
        GtkSelectionData * selection_data,
-       guint info, guint32 time)
+       guint32            time)
 {
+    GdkAtom target;
     gboolean drag_result = FALSE;
 
 #ifdef DEBUG
@@ -2255,13 +2259,16 @@ to_add(GtkWidget * widget,
     g_print("%s atom name %s\n", __func__,
             gdk_atom_name(gtk_selection_data_get_target(selection_data)));
 #endif
-    if (info == TARGET_STRING) {
+
+    target = gtk_selection_data_get_target(selection_data);
+
+    if (target == gdk_atom_intern("STRING", TRUE) ||
+        target == gdk_atom_intern("text/plain", TRUE)) {
         const gchar *address;
 
         address =
             (const gchar *) gtk_selection_data_get_data(selection_data);
-        libbalsa_address_view_add_from_string(LIBBALSA_ADDRESS_VIEW
-                                              (widget), "To:", address);
+        libbalsa_address_view_add_from_string(LIBBALSA_ADDRESS_VIEW(widget), "To:", address);
         drag_result = TRUE;
     }
     gtk_drag_finish(context, drag_result, FALSE, time);
@@ -2753,21 +2760,24 @@ has_file_attached(GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter,
 
 /* drag_data_quote - text area D&D callback */
 static void
-drag_data_quote(GtkWidget * widget,
-                GdkDragContext * context,
-                gint x,
-                gint y,
+drag_data_quote(GtkWidget        * widget,
+                GdkDragContext   * context,
+                gint               x,
+                gint               y,
                 GtkSelectionData * selection_data,
-                guint info, guint32 time, BalsaSendmsg * bsmsg)
+                guint32            time,
+                BalsaSendmsg     * bsmsg)
 {
+    GdkAtom target;
     GtkTextBuffer *buffer;
     BalsaIndex *index;
     LibBalsaMailbox *mailbox;
     GArray *selected;
     guint i;
 
-    switch(info) {
-    case TARGET_MESSAGES:
+    target = gtk_selection_data_get_target(selection_data);
+
+    if (target == gdk_atom_intern(drop_types[TARGET_MESSAGES].target, TRUE)) {
 	index =
             *(BalsaIndex **) gtk_selection_data_get_data(selection_data);
 	mailbox = index->mailbox_node->mailbox;
@@ -2789,8 +2799,7 @@ drag_data_quote(GtkWidget * widget,
             g_string_free(body, TRUE);
         }
         balsa_index_selected_msgnos_free(index, selected);
-        break;
-    case TARGET_URI_LIST: {
+    } else if (target == gdk_atom_intern(drop_types[TARGET_URI_LIST].target, TRUE)) {
         GSList *uri_list =
             uri2gslist((gchar *)
                        gtk_selection_data_get_data(selection_data));
@@ -2811,11 +2820,7 @@ drag_data_quote(GtkWidget * widget,
         g_slist_foreach(uri_list, (GFunc) g_free, NULL);
         g_slist_free(uri_list);
     }
-        break;
-    case TARGET_EMAIL:
-    case TARGET_STRING: /* perhaps we should allow dropping in these, too? */
-    default: return;
-    }
+
     gtk_drag_finish(context, TRUE, FALSE, time);
 }
 

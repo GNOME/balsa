@@ -684,7 +684,7 @@ addrlist_drag_get_cb(GtkWidget        * widget,
 
     target = gtk_selection_data_get_target(sel_data);
 
-    if (target == gdk_atom_intern("x-application/x-addr", TRUE)) {
+    if (target == gdk_atom_intern_static_string("x-application/x-addr")) {
         GtkTreeView *addrlist;
         GtkTreeSelection *selection;
         GtkTreeModel *model;
@@ -702,8 +702,8 @@ addrlist_drag_get_cb(GtkWidget        * widget,
                                target,
                                8, (const guchar *) &address,
                                sizeof(LibBalsaAddress*));
-    } else if (target == gdk_atom_intern("text/plain", TRUE) ||
-               target == gdk_atom_intern("STRING", TRUE)) {
+    } else if (target == gdk_atom_intern_static_string("text/plain") ||
+               target == gdk_atom_intern_static_string("STRING")) {
         g_print("Text/plain cannot be sent.\n");
     } else {
         g_print("Do not know what to do!\n");

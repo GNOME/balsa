@@ -889,7 +889,7 @@ addrlist_drag_received_cb(GtkWidget        * widget,
 
         target = gtk_selection_data_get_target(selection_data);
 
-        if (target == gdk_atom_intern("x-application/x-addr", TRUE)) {
+        if (target == gdk_atom_intern_static_string("x-application/x-addr")) {
             addr = *(LibBalsaAddress **) gtk_selection_data_get_data(selection_data);
 
             if (addr != NULL && addr->address_list != NULL) {
@@ -901,8 +901,8 @@ addrlist_drag_received_cb(GtkWidget        * widget,
                                                   -1);
                 dnd_success = TRUE;
             }
-        } else if (target == gdk_atom_intern("text/plain", TRUE) ||
-                   target == gdk_atom_intern("STRING", TRUE)) {
+        } else if (target == gdk_atom_intern_static_string("text/plain") ||
+                   target == gdk_atom_intern_static_string("STRING")) {
             g_print("text/plain target not implemented.\n");
         } else {
             g_print ("nothing good");

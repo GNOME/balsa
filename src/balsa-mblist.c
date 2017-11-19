@@ -1653,7 +1653,7 @@ bmbl_mru_menu(GtkWindow * window, GList ** url_list,
     GList *list;
     BalsaMBListMRUEntry *mru;
 
-    for (list = *url_list; list; list = g_list_next(list)) {
+    for (list = *url_list; list != NULL; list = list->next) {
         gchar *url = list->data;
         LibBalsaMailbox *mailbox = balsa_find_mailbox_by_url(url);
 
@@ -1933,7 +1933,7 @@ balsa_mblist_mru_drop(GList ** list, const gchar * url)
 {
     GList *tmp;
 
-    for (tmp = *list; tmp; tmp = g_list_next(tmp)) {
+    for (tmp = *list; tmp != NULL; tmp = tmp->next) {
         if (!strcmp((char *) tmp->data, url)) {
             g_free(tmp->data);
             *list = g_list_delete_link(*list, tmp);

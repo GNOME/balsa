@@ -947,7 +947,7 @@ update_address_books(void)
                            AB_DATA_COLUMN, address_book, -1);
 
         g_free(name);
-        list = g_list_next(list);
+        list = list->next;
     }
 
     if (gtk_tree_model_get_iter_first(model, &iter))

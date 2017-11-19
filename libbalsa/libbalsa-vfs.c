@@ -700,7 +700,7 @@ libbalsa_vfs_fill_menu_by_content_type(GtkMenu * menu,
         gio_add_vfs_menu_item(menu, def_app, callback, data);
 
     app_list = g_app_info_get_all_for_type(content_type);
-    for (list = app_list; list; list = g_list_next(list)) {
+    for (list = app_list; list != NULL; list = list->next) {
         GAppInfo *app = G_APP_INFO(list->data);
 
         if (app && g_app_info_should_show(app) &&

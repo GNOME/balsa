@@ -182,7 +182,7 @@ balsa_print_object_header_new_real(GList * list,
 		    headers->dispnotify_to, &p_label_width, print_all_headers);
 
     /* user headers */
-    p = g_list_first(headers->user_hdrs);
+    p = headers->user_hdrs;
     face = NULL;
     while (p) {
 	gchar **pair, *curr_hdr;
@@ -215,7 +215,7 @@ balsa_print_object_header_new_real(GList * list,
 	}
 
 	/* next */
-	p = g_list_next(p);
+	p = p->next;
     }
 
     /* add a small space between label and value */
@@ -314,7 +314,7 @@ balsa_print_object_header_new_real(GList * list,
 	}
 	list = g_list_append(list, po);
 
-	this_chunk = g_list_next(this_chunk);
+	this_chunk = this_chunk->next;
     }
     g_list_free(chunks);
     g_object_unref(G_OBJECT(test_layout));
@@ -429,7 +429,7 @@ balsa_print_object_header_crypto(GList *list, GtkPrintContext * context,
 	po->p_layout_width = C_TO_P(c_use_width);
 	list = g_list_append(list, po);
 
-	this_chunk = g_list_next(this_chunk);
+	this_chunk = this_chunk->next;
     }
     g_list_free(chunks);
 

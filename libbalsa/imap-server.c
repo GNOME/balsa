@@ -637,7 +637,7 @@ libbalsa_imap_server_get_handle(LibBalsaImapServer *imap_server, GError **err)
         conn = g_list_find_custom(imap_server->free_handles, NULL,
                                   by_last_user);
         if (!conn)
-            conn = g_list_first(imap_server->free_handles);
+            conn = imap_server->free_handles;
         info = (struct handle_info*)conn->data;
         imap_server->free_handles =
             g_list_delete_link(imap_server->free_handles, conn);
@@ -743,7 +743,7 @@ libbalsa_imap_server_get_handle_with_user(LibBalsaImapServer *imap_server,
     /* reuse a free connection */
     if (!info && imap_server->free_handles) {
         GList *conn;
-        conn = g_list_first(imap_server->free_handles);
+        conn = imap_server->free_handles;
         info = (struct handle_info*)conn->data;
         imap_server->free_handles =
             g_list_delete_link(imap_server->free_handles, conn);

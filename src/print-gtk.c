@@ -372,7 +372,7 @@ draw_page(GtkPrintOperation * operation, GtkPrintContext * context,
 	if (po->on_page == page_nr)
 	    balsa_print_object_draw(po, context, cairo_ctx);
 
-	p = g_list_next(p);
+	p = p->next;
     }
 }
 

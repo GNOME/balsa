@@ -789,7 +789,7 @@ balsa_ab_window_load_cb(LibBalsaAddressBook *libbalsa_ab,
                                LIST_COLUMN_WHICH, count,
                                -1);
 
-	    address_list = g_list_next(address_list);
+	    address_list = address_list->next;
 	    count++;
 	}
     }

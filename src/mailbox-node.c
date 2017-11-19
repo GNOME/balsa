@@ -530,7 +530,7 @@ imap_dir_cb(BalsaMailboxNode* mb)
     /* phase b. */
 
     imap_tree.list = g_slist_reverse(imap_tree.list);
-    for (list = imap_tree.list; list; list = g_slist_next(list)) {
+    for (list = imap_tree.list; list != NULL; list = list->next) {
         imap_scan_item *item = list->data;
 	
 	n = imap_scan_create_mbnode(mb, item, imap_tree.delim);
@@ -872,9 +872,9 @@ bmbn_scan_children_idle(BalsaMailboxNode ** mbnode)
     }
 
     list = g_object_get_data(G_OBJECT(*mbnode), BALSA_MAILBOX_NODE_LIST_KEY);
-    for (l = list; l; l = g_slist_next(l)) {
+    for (l = list; l != NULL; l = l->next) {
         BalsaMailboxNode *mn;
-        
+
         if (!l->data)
             continue;
         mn = l->data;
@@ -1381,7 +1381,7 @@ imap_scan_destroy_tree(imap_scan_tree * tree)
 {
     GSList *list;
 
-    for (list = tree->list; list; list = g_slist_next(list)) {
+    for (list = tree->list; list != NULL; list = list->next) {
         imap_scan_item *item = list->data;
 
         g_free(item->fn);

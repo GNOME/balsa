@@ -757,7 +757,7 @@ bmw_message_set_headers_d(BalsaMessage           * bm,
     }
 
     /* remaining headers */
-    for (p = g_list_first(headers->user_hdrs); p; p = g_list_next(p)) {
+    for (p = headers->user_hdrs; p != NULL; p = p->next) {
 	gchar **pair = p->data;
 	gchar *hdr;
 

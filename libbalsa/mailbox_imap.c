@@ -424,7 +424,7 @@ libbalsa_imap_get_acls(LibBalsaMailboxImap * mailbox)
         return NULL;
     acls = g_new0(char *, 2 * g_list_length(mailbox->acls) + 1);
     n = 0;
-    for (p = g_list_first(mailbox->acls); p; p = g_list_next(p), n += 2) {
+    for (p = mailbox->acls; p != NULL; p = p->next, n += 2) {
         acls[n] = g_strdup(((ImapUserAclType *)p->data)->uid);
         acls[n + 1] = imap_acl_to_str(((ImapUserAclType *)p->data)->acl);
     }
@@ -2945,7 +2945,7 @@ append_to_cache(unsigned uid, void *arg)
 				  uid, "body");
     gchar *msg = atcd->curr_name->data;
 
-    atcd->curr_name = g_list_next(atcd->curr_name);
+    atcd->curr_name = atcd->curr_name->next;
 
     g_return_if_fail(msg);
 

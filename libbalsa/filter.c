@@ -225,7 +225,7 @@ filters_prepare_to_run(GSList * filters)
     LibBalsaFilter* fil;
     gboolean ok=TRUE;
 
-    for(;filters;filters=g_slist_next(filters)) {
+    for(; filters != NULL; filters = filters->next) {
 	fil=(LibBalsaFilter*) filters->data;
 	if (!FILTER_CHKFLAG(fil,FILTER_VALID)) {
 		libbalsa_information(LIBBALSA_INFORMATION_ERROR,
@@ -348,7 +348,7 @@ libbalsa_filter_get_by_name(const gchar * fname)
     if (!fname || fname[0]=='\0') return NULL;
 
     fnamelen = strlen(fname);
-    for (list = *filter_list;list;list = g_slist_next(list)) {
+    for (list = *filter_list; list != NULL; list = list->next) {
 	gint len = strlen(((LibBalsaFilter*)list->data)->name);
 
 	if (strncmp(fname,((LibBalsaFilter*)list->data)->name,

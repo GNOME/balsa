@@ -246,7 +246,7 @@ libbalsa_encrypt_mime_object(GMimeObject ** content, GList * rfc822_for,
     recipients = g_ptr_array_new();
     while (rfc822_for) {
 	g_ptr_array_add(recipients, rfc822_for->data);
-	rfc822_for = g_list_next(rfc822_for);
+	rfc822_for = rfc822_for->next;
     }
 
     /* encrypt: multipart/encrypted for RFC 3156, application/pkcs7-mime for
@@ -487,7 +487,7 @@ libbalsa_rfc2440_sign_encrypt(GMimePart *part, const gchar *sign_for,
 	recipients = g_ptr_array_new();
 	while (encrypt_for) {
 	    g_ptr_array_add(recipients, encrypt_for->data);
-	    encrypt_for = g_list_next(encrypt_for);
+	    encrypt_for = encrypt_for->next;
 	}
     } else
 	recipients = NULL;

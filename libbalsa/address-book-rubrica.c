@@ -531,7 +531,7 @@ lbab_insert_address_node(const LibBalsaAddress * address,
 
     /* create the Net section of the card */
     new_data = xmlNewChild(new_addr, NULL, CXMLCHARP("Net"), NULL);
-    for (l = address->address_list; l; l = g_list_next(l)) {
+    for (l = address->address_list; l != NULL; l = l->next) {
 	xmlNodePtr new_mail =
 	    xmlNewChild(new_data, NULL, CXMLCHARP("Uri"),
 			CXMLCHARP(l->data));

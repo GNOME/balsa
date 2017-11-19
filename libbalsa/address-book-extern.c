@@ -300,7 +300,7 @@ libbalsa_address_book_externq_add_address(LibBalsaAddressBook * ab,
     if(ex->save) {
         g_snprintf(command, sizeof(command), "%s \"%s\" \"%s\" \"%s\"", 
                    ex->save, 
-                   (gchar *)g_list_first(new_address->address_list)->data, 
+                   (gchar *) new_address->address_list->data, 
                    new_address->full_name, "TODO");
         
         if( (gc = popen(command, "r")) == NULL)

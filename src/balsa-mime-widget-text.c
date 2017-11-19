@@ -661,7 +661,7 @@ prepare_url_offsets(GtkTextBuffer * buffer, GList * url_list)
     GtkTextTagTable *table = gtk_text_buffer_get_tag_table(buffer);
     GtkTextTag *url_tag = gtk_text_tag_table_lookup(table, "url");
 
-    for (; url_list; url_list = g_list_next(url_list)) {
+    for (; url_list != NULL; url_list = url_list->next) {
         message_url_t *url = url_list->data;
         GtkTextIter iter;
 
@@ -739,7 +739,7 @@ find_url(GtkWidget * widget, gint x, gint y, GList * url_list)
     gtk_text_view_get_iter_at_location(GTK_TEXT_VIEW(widget), &iter, x, y);
     offset = gtk_text_iter_get_offset(&iter);
 
-    for (; url_list; url_list = g_list_next(url_list)) {
+    for (; url_list != NULL; url_list = url_list->next) {
         url = (message_url_t *) url_list->data;
         if (url->start <= offset && offset < url->end)
             return url;
@@ -803,7 +803,7 @@ free_url_list(GList * url_list)
 {
     GList *list;
 
-    for (list = url_list; list; list = g_list_next(list)) {
+    for (list = url_list; list != NULL; list = list->next) {
         message_url_t *url_data = (message_url_t *) list->data;
 
         g_free(url_data->url);

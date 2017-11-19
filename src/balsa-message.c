@@ -1687,7 +1687,7 @@ part_context_save_all_cb(GtkWidget * menu_item, GList * info_list)
     while (info_list) {
 	balsa_mime_widget_ctx_menu_save(menu_item,
                                         BALSA_PART_INFO(info_list->data)->body);
-        info_list = g_list_next(info_list);
+        info_list = info_list->next;
     }
 }
 
@@ -1795,7 +1795,7 @@ part_context_dump_all_cb(GtkWidget * menu_item, GList * info_list)
                                   err->message : "Unknown error");
             g_clear_error(&err);
 	    g_object_unref(save_uri);
-	    info_list = g_list_next(info_list);
+	    info_list = info_list->next;
 	}
 	g_object_unref(dir_uri);
     }

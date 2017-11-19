@@ -98,8 +98,8 @@ filters_export_dialog(GtkWindow * parent)
     /* Populate the list of filters */
 
     model = gtk_tree_view_get_model(list);
-    for (filter_list = balsa_app.filters; filter_list;
-         filter_list = g_slist_next(filter_list)) {
+    for (filter_list = balsa_app.filters; filter_list != NULL;
+         filter_list = filter_list->next) {
         fil = (LibBalsaFilter *) filter_list->data;
         gtk_list_store_prepend(GTK_LIST_STORE(model), &iter);
         gtk_list_store_set(GTK_LIST_STORE(model), &iter, 0, fil->name, 1,

@@ -415,8 +415,8 @@ dowrap_rfc2646(GList * list, gint width, gboolean to_screen,
 
         g_free(text->str);
         g_free(text);
-        list = g_list_next(list);
-        if (list)               /* paragraph separator */
+        list = list->next;
+        if (list != NULL)       /* paragraph separator */
             g_string_append_c(result, '\n');
     }                           /* end of paragraph */
 }

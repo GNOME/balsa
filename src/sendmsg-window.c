@@ -2068,7 +2068,7 @@ insert_selected_messages(BalsaSendmsg *bsmsg, QuoteType type)
     if (index && (l = balsa_index_selected_list(BALSA_INDEX(index)))) {
 	GList *node;
 
-	for (node = l; node; node = g_list_next(node)) {
+	for (node = l; node != NULL; node = node->next) {
 	    LibBalsaMessage *message = node->data;
             GString *body = quote_message_body(bsmsg, message, type);
             gtk_text_buffer_insert_at_cursor(buffer, body->str, body->len);
@@ -2102,7 +2102,7 @@ sw_attach_messages_activated(GSimpleAction * action,
     if (index) {
 	GList *node, *l = balsa_index_selected_list(BALSA_INDEX(index));
 
-	for (node = l; node; node = g_list_next(node)) {
+	for (node = l; node != NULL; node = node->next) {
 	    LibBalsaMessage *message = node->data;
 
 	    if(!attach_message(bsmsg, message)) {
@@ -2803,7 +2803,7 @@ drag_data_quote(GtkWidget        * widget,
         GSList *uri_list =
             uri2gslist((gchar *)
                        gtk_selection_data_get_data(selection_data));
-        for (; uri_list; uri_list = g_slist_next(uri_list)) {
+        for (; uri_list != NULL; uri_list = uri_list->next) {
             /* Since current GtkTextView gets this signal twice for
              * every action (#150141) we need to check for duplicates,
              * which is a good idea anyway. */
@@ -3547,8 +3547,8 @@ quote_body(BalsaSendmsg * bsmsg, LibBalsaMessageHeaders *headers,
 
 	    g_string_append(body, _("References:"));
 
-	    for (ref_list = references; ref_list;
-                 ref_list = g_list_next(ref_list))
+	    for (ref_list = references; ref_list != NULL;
+                 ref_list = ref_list->next)
 		g_string_append_printf(body, " <%s>",
 				       (gchar *) ref_list->data);
 
@@ -3902,7 +3902,7 @@ set_identity_from_mailbox(BalsaSendmsg* bsmsg, LibBalsaMessage * message)
         if(!identity) return FALSE;
         for (ilist = balsa_app.identities;
              ilist != NULL;
-             ilist = g_list_next(ilist)) {
+             ilist = ilist->next) {
             ident = LIBBALSA_IDENTITY(ilist->data);
             if (!g_ascii_strcasecmp(identity, ident->identity_name)) {
                 bsmsg->ident = ident;

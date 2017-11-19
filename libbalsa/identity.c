@@ -788,7 +788,7 @@ identity_list_update_real(GtkTreeView * tree,
 
     sorted = g_list_sort(g_list_copy(identities),
                          (GCompareFunc) compare_identities);
-    for (list = sorted; list; list = g_list_next(list)) {
+    for (list = sorted; list != NULL; list = list->next) {
         LibBalsaIdentity* ident = LIBBALSA_IDENTITY(list->data);
         gtk_list_store_append(store, &iter);
         gtk_list_store_set(store, &iter,
@@ -1479,7 +1479,7 @@ ident_dialog_update(GObject * dlg)
         return FALSE;
     }
 
-    for (list = *identities; list; list = g_list_next(list)) {
+    for (list = *identities; list != NULL; list = list->next) {
         exist_ident = list->data;
 
         if (g_ascii_strcasecmp(exist_ident->identity_name, text) == 0

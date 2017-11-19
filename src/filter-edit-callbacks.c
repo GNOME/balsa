@@ -441,7 +441,7 @@ fe_add_new_user_header(const gchar * str)
 {
     GList *lst;
 
-    for (lst = fe_user_headers_list; lst; lst = g_list_next(lst))
+    for (lst = fe_user_headers_list; lst != NULL; lst = lst->next)
         if (g_ascii_strcasecmp(str, (gchar *) lst->data) == 0)
             return;
 
@@ -1363,7 +1363,7 @@ update_filters_mailbox(GtkTreeModel * model, GtkTreePath * path,
 		     lst &&
 		     strcmp(((filters_names_rec *) lst->data)->old_name,
 			    filters_names[i]) != 0;
-		     lst = g_list_next(lst));
+		     lst = lst->next);
 
 		if (lst) {
 		    g_free(filters_names[i]);
@@ -1422,7 +1422,7 @@ void fe_destroy_window_cb(GtkWidget * widget,gpointer throwaway)
     else
         fe_free_associated_filters();
 
-    for (lst=filters_names_changes;lst;lst=g_list_next(lst)) {
+    for (lst = filters_names_changes; lst != NULL; lst = lst->next) {
         g_free(((filters_names_rec *)lst->data)->old_name);
         g_free(((filters_names_rec *)lst->data)->new_name);
         g_free((filters_names_rec *)lst->data);
@@ -1431,7 +1431,7 @@ void fe_destroy_window_cb(GtkWidget * widget,gpointer throwaway)
     g_list_free(filters_names_changes);
     filters_names_changes=NULL;
 
-    for (lst=new_filters_names;lst;lst=g_list_next(lst)) {
+    for (lst = new_filters_names; lst != NULL; lst = lst->next) {
         g_free((gchar *)lst->data);
     }
 
@@ -1552,7 +1552,7 @@ fe_button_toggled(GtkWidget * widget, gpointer data)
     if (GTK_IS_CONTAINER(data)) {
         GList *list;
         for (list = gtk_container_get_children(GTK_CONTAINER(data));
-             list; list = g_list_next(list)) 
+             list != NULL; list = list->next)
             gtk_widget_set_sensitive(GTK_WIDGET(list->data), active);
     } else
         gtk_widget_set_sensitive(GTK_WIDGET(data), active);
@@ -1647,9 +1647,9 @@ change_filter_name(gchar * old_name,gchar * new_name)
          * reference to it in any mailbox, because it's new
          */
 
-        for (lst=new_filters_names;
-             lst && strcmp(old_name,(gchar*)lst->data)!=0;
-             lst=g_list_next(lst));
+        for (lst = new_filters_names;
+             lst != NULL && strcmp(old_name,(gchar*)lst->data) != 0;
+             lst = lst->next);
         if (lst) {          
             /* Found it ! Update new_filters_names */
             g_free(lst->data);
@@ -1664,7 +1664,7 @@ change_filter_name(gchar * old_name,gchar * new_name)
           if yes we must change it to : any name -> new_name
           else we create a new record
 	*/
-	for (lst=filters_names_changes;lst;lst=g_list_next(lst))
+	for (lst = filters_names_changes; lst != NULL; lst = lst->next)
             if (((filters_names_rec *)lst->data)->new_name && 
                 strcmp(((filters_names_rec *)lst->data)->new_name,old_name)==0) {
                 p=(filters_names_rec *)lst->data;

@@ -444,8 +444,8 @@ file_delete_activated(GSimpleAction * action,
     LibBalsaAddressBook *address_book;
     GList *list;
 
-    if (!(address_book = contacts_app.address_book)
-        || !g_list_next(contacts_app.address_book_list))
+    if ((address_book = contacts_app.address_book) == NULL
+        || contacts_app.address_book_list->next == NULL)
         return;
 
     if (address_book->config_prefix) {

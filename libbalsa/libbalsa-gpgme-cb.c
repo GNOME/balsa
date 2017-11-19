@@ -272,7 +272,7 @@ lb_gpgme_select_key(const gchar * user_name, lb_key_sel_md_t mode, GList * keys,
 				GPG_KEY_PTR_COLUMN, key, -1);
     		g_free(uid_info);
     	}
-    	keys = g_list_next(keys);
+    	keys = keys->next;
     }
 
     g_object_unref(G_OBJECT(model));

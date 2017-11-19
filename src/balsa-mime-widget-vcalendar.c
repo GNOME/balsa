@@ -88,7 +88,7 @@ balsa_mime_widget_new_vcalendar(BalsaMessage * bm,
     }
 
     /* add events */
-    for (l = vcal_obj->vevent; l; l = g_list_next(l)) {
+    for (l = vcal_obj->vevent; l != NULL; l = l->next) {
 	GtkWidget *event =
 	    balsa_vevent_widget((LibBalsaVEvent *) l->data, may_reply,
 				sender);

@@ -306,7 +306,7 @@ balsa_print_object_text_plain(GList *list, GtkPrintContext * context,
 
 	    list = g_list_append(list, pot);
 	    g_array_remove_index(attr_offs, 0);
-	    this_par_part = g_list_next(this_par_part);
+	    this_par_part = this_par_part->next;
 	}
 	if (attr_list) {
 	    g_list_foreach(attr_list, (GFunc) g_free, NULL);
@@ -400,7 +400,7 @@ balsa_print_object_text(GList *list, GtkPrintContext * context,
 	pot->attributes = NULL;
 
 	list = g_list_append(list, pot);
-	this_par_part = g_list_next(this_par_part);
+	this_par_part = this_par_part->next;
     }
     g_list_free(par_parts);
 
@@ -638,7 +638,7 @@ balsa_print_object_text_calendar(GList * list,
     /* add fields from the events*/
     desc_buf = g_string_new("");
     pod->p_label_width = 0;
-    for (this_ev = vcal_obj->vevent; this_ev; this_ev = g_list_next(this_ev)) {
+    for (this_ev = vcal_obj->vevent; this_ev != NULL; this_ev = this_ev->next) {
         LibBalsaVEvent * event = (LibBalsaVEvent *) this_ev->data;
 
         if (desc_buf->len > 0)
@@ -659,11 +659,11 @@ balsa_print_object_text_calendar(GList * list,
 
             this_att =
                 libbalsa_vcal_attendee_to_str(LIBBALSA_ADDRESS(att->data));
-            att = g_list_next(att);
+            att = att->next;
             ADD_VCAL_FIELD(desc_buf, pod->p_label_width, test_layout,
                            this_att, att ? _("Attendees") : _("Attendee"));
             g_free(this_att);
-            for (; att; att = g_list_next(att)) {
+            for (; att != NULL; att = att->next) {
                 this_att =
                     libbalsa_vcal_attendee_to_str(LIBBALSA_ADDRESS(att->data));
                 g_string_append_printf(desc_buf, "\n\t%s", this_att);
@@ -716,8 +716,8 @@ balsa_print_object_text_calendar(GList * list,
     list = g_list_append(list, pod);
 
     /* add more parts */
-    for (this_par_part = g_list_next(par_parts); this_par_part;
-         this_par_part = g_list_next(this_par_part)) {
+    for (this_par_part = par_parts->next; this_par_part != NULL;
+         this_par_part = this_par_part->next) {
         BalsaPrintObjectDefault * new_pod;
         BalsaPrintObject *new_po;
         
@@ -899,7 +899,7 @@ phrase_list_to_pango(GList * phrase_list)
 	new_attr->end_index = region->end_index;
 	pango_attr_list_insert(attr_list, new_attr);
 
-	phrase_list = g_list_next(phrase_list);
+	phrase_list = phrase_list->next;
     }
 
     for (n = 0; n < PHRASE_TYPE_COUNT; n++)
@@ -934,7 +934,7 @@ collect_attrs(GList * all_attr, guint offset, guint len)
 		this_reg->end_index -= offset;
 	    attr = g_list_prepend(attr, this_reg);
 	}
-	all_attr = g_list_next(all_attr);
+	all_attr = all_attr->next;
     }
 
     return attr;

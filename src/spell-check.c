@@ -209,7 +209,6 @@ balsa_spell_check_new(GtkWindow * parent)
                                "transient-for", parent,
                                "destroy-with-parent", TRUE,
                                "title", _("Spell check"),
-                               "margin", BALSA_SPELL_CHECK_PADDING,
                                NULL);
 
     return (GtkWidget *) spell_check;
@@ -297,6 +296,7 @@ balsa_spell_check_init(BalsaSpellCheck * spell_check)
     spell_check->entry = GTK_ENTRY(widget);
     box_widget =
         gtk_box_new(GTK_ORIENTATION_VERTICAL, BALSA_SPELL_CHECK_PADDING);
+    g_object_set(G_OBJECT(box_widget), "margin", BALSA_SPELL_CHECK_PADDING, NULL);
     gtk_container_add((GtkContainer *) spell_check, box_widget);
 
     box = (GtkBox *) box_widget;

@@ -676,7 +676,7 @@ i18n.merge_file(
 
 summary = [
   '',
-  '======= Final configuration =======',
+  '============= Final configuration =============',
   ' Installing into prefix: @0@'.format(get_option('prefix')),
   'Enable compile warnings: @0@'.format(more_warnings),
   '            HTML widget: @0@'.format(html_widget),
@@ -692,7 +692,7 @@ summary = [
   '           Use Compface: @0@'.format(compface),
   '          Use libsecret: @0@'.format(libsecret),
   '                Use gcr: @0@'.format(gcr),
-  '===================================',
+  '===============================================',
   ''
   ]
 

@@ -209,7 +209,7 @@ balsa_spell_check_new(GtkWindow * parent)
                                "transient-for", parent,
                                "destroy-with-parent", TRUE,
                                "title", _("Spell check"),
-                               "border-width", BALSA_SPELL_CHECK_PADDING,
+                               "margin", BALSA_SPELL_CHECK_PADDING,
                                NULL);
 
     return (GtkWidget *) spell_check;

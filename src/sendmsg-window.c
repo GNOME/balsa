@@ -1010,7 +1010,7 @@ sw_actions_set_enabled(BalsaSendmsg        * bsmsg,
         sw_action_set_enabled(bsmsg, *actions++, enabled);
 }
 
-#if !HAVE_GTKSOURCEVIEW
+#if !HAVE_GTKSOURCEVIEW || HAVE_GSPELL || HAVE_GTKSPELL
 static gboolean
 sw_action_get_enabled(BalsaSendmsg * bsmsg,
                       const gchar  * action_name)
@@ -2910,15 +2910,17 @@ create_text_area(BalsaSendmsg * bsmsg)
     gtk_text_view_set_wrap_mode(text_view, GTK_WRAP_WORD_CHAR);
 
 #if HAVE_GSPELL
-    gspell_buffer = gspell_text_buffer_get_from_gtk_text_buffer(buffer);
-    checker = gspell_checker_new(NULL);
-    gspell_text_buffer_set_spell_checker(gspell_buffer, checker);
-    g_object_unref(checker);
+    if (sw_action_get_enabled(bsmsg, "spell-check")) {
+        gspell_buffer = gspell_text_buffer_get_from_gtk_text_buffer(buffer);
+        checker = gspell_checker_new(NULL);
+        gspell_text_buffer_set_spell_checker(gspell_buffer, checker);
+        g_object_unref(checker);
 
 #if HAVE_GSPELL_1_2
-    gspell_view = gspell_text_view_get_from_gtk_text_view(text_view);
-    gspell_text_view_set_enable_language_menu(gspell_view, TRUE);
+        gspell_view = gspell_text_view_get_from_gtk_text_view(text_view);
+        gspell_text_view_set_enable_language_menu(gspell_view, TRUE);
 #endif                          /* HAVE_GSPELL_1_2 */
+    }
 #endif                          /* HAVE_GSPELL */
 
     scroll = gtk_scrolled_window_new(NULL, NULL);
@@ -4003,6 +4005,11 @@ comp_send_locales(const void* a, const void* b)
 /* create_lang_menu:
    create language menu for the compose window. The order cannot be
    hardcoded because it depends on the current locale.
+
+   Returns the current locale if any dictionaries were found
+   and the menu was created;
+   returns NULL if no dictionaries were found,
+   in which case spell-checking must be disabled.
 */
 #define BALSA_LANGUAGE_MENU_LANG "balsa-language-menu-lang"
 #if !HAVE_GSPELL && !HAVE_GTKSPELL_3_0_3
@@ -4020,11 +4027,11 @@ sw_broker_cb(const gchar * lang_tag,
 }
 #endif                          /* HAVE_GTKSPELL_3_0_3 */
 
-static void
+static const gchar *
 create_lang_menu(GtkWidget * parent, BalsaSendmsg * bsmsg)
 {
     guint i;
-    GtkWidget *langs = gtk_menu_new();
+    GtkWidget *langs;
     static gboolean locales_sorted = FALSE;
     GSList *group = NULL;
 #if HAVE_GSPELL
@@ -4037,9 +4044,21 @@ create_lang_menu(GtkWidget * parent, BalsaSendmsg * bsmsg)
 #endif                          /* HAVE_GTKSPELL_3_0_3 */
     const gchar *preferred_lang;
     GtkWidget *active_item = NULL;
-#ifdef CAN_SEPARATE_RADIO_MENU_ITEMS
-    gboolean has_separator = FALSE;
-#endif                          /* CAN_SEPARATE_RADIO_MENU_ITEMS */
+
+#if HAVE_GTKSPELL_3_0_3
+    lang_list = gtk_spell_checker_get_language_list();
+#elif HAVE_GSPELL
+    lang_list = gspell_language_get_available();
+#else                           /* HAVE_GTKSPELL_3_0_3 */
+    broker = enchant_broker_init();
+    lang_list = NULL;
+    enchant_broker_list_dicts(broker, sw_broker_cb, &lang_list);
+    enchant_broker_free(broker);
+#endif                          /* HAVE_GTKSPELL_3_0_3 */
+
+    if (lang_list == NULL) {
+        return NULL;
+    }
 
     if (!locales_sorted) {
         for (i = 0; i < ELEMENTS(locales); i++)
@@ -4053,16 +4072,7 @@ create_lang_menu(GtkWidget * parent, BalsaSendmsg * bsmsg)
     preferred_lang = balsa_app.spell_check_lang ?
         balsa_app.spell_check_lang : setlocale(LC_CTYPE, NULL);
 
-#if HAVE_GTKSPELL_3_0_3
-    lang_list = gtk_spell_checker_get_language_list();
-#elif HAVE_GSPELL
-    lang_list = gspell_language_get_available();
-#else                           /* HAVE_GTKSPELL_3_0_3 */
-    broker = enchant_broker_init();
-    lang_list = NULL;
-    enchant_broker_list_dicts(broker, sw_broker_cb, &lang_list);
-#endif                          /* HAVE_GTKSPELL_3_0_3 */
-
+    langs = gtk_menu_new();
     for (i = 0; i < ELEMENTS(locales); i++) {
         gconstpointer found;
 
@@ -4111,14 +4121,6 @@ create_lang_menu(GtkWidget * parent, BalsaSendmsg * bsmsg)
         if (j < 0 || strcmp(lang, locales[j].locale) != 0) {
             GtkWidget *w;
 
-#ifdef CAN_SEPARATE_RADIO_MENU_ITEMS
-            if (!has_separator) {
-                w = gtk_separator_menu_item_new();
-                gtk_menu_shell_append(GTK_MENU_SHELL(langs), w);
-                has_separator = TRUE;
-            }
-#endif                          /* CAN_SEPARATE_RADIO_MENU_ITEMS */
-
             w = gtk_radio_menu_item_new_with_label(group, lang);
             group = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(w));
             g_signal_connect(G_OBJECT(w), "activate",
@@ -4134,18 +4136,15 @@ create_lang_menu(GtkWidget * parent, BalsaSendmsg * bsmsg)
     }
 #if !HAVE_GSPELL
     g_list_free_full(lang_list, (GDestroyNotify) g_free);
-#if !HAVE_GTKSPELL_3_0_3
-    enchant_broker_free(broker);
-#endif                          /* HAVE_GTKSPELL_3_0_3 */
 #endif                          /* HAVE_GSPELL */
 
     g_signal_handlers_block_by_func(active_item, lang_set_cb, bsmsg);
     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(active_item), TRUE);
     g_signal_handlers_unblock_by_func(active_item, lang_set_cb, bsmsg);
-    set_locale(bsmsg, g_object_get_data(G_OBJECT(active_item),
-                                        BALSA_LANGUAGE_MENU_LANG));
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(parent), langs);
     gtk_widget_show(parent);
+
+    return g_object_get_data(G_OBJECT(active_item), BALSA_LANGUAGE_MENU_LANG);
 }
 
 /* Standard buttons; "" means a separator. */
@@ -6080,18 +6079,20 @@ static void
 set_locale(BalsaSendmsg * bsmsg, const gchar * locale)
 {
 #if HAVE_GSPELL
-    const GspellLanguage *language;
+    if (sw_action_get_enabled(bsmsg, "spell-check")) {
+        const GspellLanguage *language;
 
-    language = gspell_language_lookup(locale);
-    if (language != NULL) {
-        GtkTextBuffer *buffer;
-        GspellTextBuffer *gspell_buffer;
-        GspellChecker *checker;
+        language = gspell_language_lookup(locale);
+        if (language != NULL) {
+            GtkTextBuffer *buffer;
+            GspellTextBuffer *gspell_buffer;
+            GspellChecker *checker;
 
-        buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
-        gspell_buffer = gspell_text_buffer_get_from_gtk_text_buffer(buffer);
-        checker = gspell_text_buffer_get_spell_checker(gspell_buffer);
-        gspell_checker_set_language(checker, language);
+            buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
+            gspell_buffer = gspell_text_buffer_get_from_gtk_text_buffer(buffer);
+            checker = gspell_text_buffer_get_spell_checker(gspell_buffer);
+            gspell_checker_set_language(checker, language);
+        }
     }
 
 #endif                          /* HAVE_GSPELL */
@@ -6099,8 +6100,10 @@ set_locale(BalsaSendmsg * bsmsg, const gchar * locale)
     bsmsg->spell_check_lang = g_strdup(locale);
 
 #if HAVE_GTKSPELL
-    if (sw_spell_detach(bsmsg))
-        sw_spell_attach(bsmsg);
+    if (sw_action_get_enabled(bsmsg, "spell-check")) {
+        if (sw_spell_detach(bsmsg))
+            sw_spell_attach(bsmsg);
+    }
 #endif                          /* HAVE_GTKSPELL */
 }
 
@@ -6575,6 +6578,7 @@ sendmsg_window_new()
     GtkWidget *menubar;
     GtkWidget *paned;
     gchar *ui_file;
+    const gchar *current_locale;
 
     bsmsg = g_malloc(sizeof(BalsaSendmsg));
     bsmsg->in_reply_to = NULL;
@@ -6629,8 +6633,6 @@ sendmsg_window_new()
     g_object_weak_ref(G_OBJECT(balsa_app.main_window),
                       (GWeakNotify) gtk_widget_destroy, window);
 
-    model = sendmsg_window_get_toolbar_model();
-
     /* Set up the GMenu structures */
     ui_file = g_build_filename(BALSA_DATA_PREFIX, "ui",
                                "sendmsg-window.ui", NULL);
@@ -6652,6 +6654,17 @@ sendmsg_window_new()
     gtk_box_pack_start(GTK_BOX(main_box), menubar, FALSE, FALSE, 0);
 #endif
 
+    /*
+     * Set up the spell-checker language menu
+     */
+    gtk_container_foreach(GTK_CONTAINER(menubar), sw_menubar_foreach,
+                          &bsmsg->current_language_menu);
+    current_locale = create_lang_menu(bsmsg->current_language_menu, bsmsg);
+    if (current_locale == NULL) {
+        sw_action_set_enabled(bsmsg, "spell-check", FALSE);
+    }
+
+    model = sendmsg_window_get_toolbar_model();
     bsmsg->toolbar = balsa_toolbar_new(model, G_ACTION_MAP(window));
     gtk_box_pack_start(GTK_BOX(main_box), bsmsg->toolbar,
                        FALSE, FALSE, 0);
@@ -6719,14 +6732,15 @@ sendmsg_window_new()
 	g_signal_connect(G_OBJECT(balsa_app.main_window), "delete-event",
 			 G_CALLBACK(delete_event_cb), bsmsg);
 
-    gtk_container_foreach(GTK_CONTAINER(menubar), sw_menubar_foreach,
-                          &bsmsg->current_language_menu);
-    create_lang_menu(bsmsg->current_language_menu, bsmsg);
-
-#if HAVE_GSPELL || HAVE_GTKSPELL
-    sw_action_set_active(bsmsg, "spell-check", balsa_app.spell_check_active);
-#endif
     setup_headers_from_identity(bsmsg, bsmsg->ident);
+
+    /* Finish setting up the spell checker */
+#if HAVE_GSPELL || HAVE_GTKSPELL
+    if (current_locale != NULL) {
+        sw_action_set_active(bsmsg, "spell-check", balsa_app.spell_check_active);
+    }
+#endif
+    set_locale(bsmsg, current_locale);
 
     return bsmsg;
 }

@@ -1,3 +1,16 @@
+2017-11-26  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Do not crash if no spell-checker dictionaries are found
+
+	* src/sendmsg-window.c (create_text_area): do not set up
+	spell checker if no dictionary is found;
+	(create_lang_menu): return value is now the current locale;
+	first check whether any dictionaries can be found, and return
+	NULL if none;
+	(set_locale): check whether spell-checking is disabled;
+	(sendmsg_window_new): set up language menu early, so that we can
+	find out whether any dictionaries are found.
+
 2017-11-16  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* src/toolbar-prefs.c (tp_store_set): map the pixmap id.

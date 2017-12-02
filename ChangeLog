@@ -1,3 +1,12 @@
+2017-12-02  Albrecht Dreß <albrecht.dress@arcor.de>
+
+	Expand lists in address book window
+
+	* src/ab-window.c (balsa_ab_window_init): use GtkWidget's
+	hexpand and vexpand functions to properly expand the
+	address lists in the address book window when the dialogue is
+	enlarged.
+
 2017-11-26  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Do not crash if no spell-checker dictionaries are found

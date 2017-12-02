@@ -310,6 +310,8 @@ balsa_ab_window_init(BalsaAbWindow *ab)
 
     /* A scrolled window for the address list */
     scrolled_window = gtk_scrolled_window_new(NULL, NULL);
+    gtk_widget_set_vexpand(scrolled_window, TRUE);
+    gtk_widget_set_hexpand(scrolled_window, TRUE);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolled_window),
 				   GTK_POLICY_AUTOMATIC,
 				   GTK_POLICY_AUTOMATIC);
@@ -345,6 +347,7 @@ balsa_ab_window_init(BalsaAbWindow *ab)
     /* Column for arrows in compose mode */
     ab->arrow_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
     gtk_widget_set_vexpand(ab->arrow_box, TRUE);
+    gtk_widget_set_hexpand(ab->arrow_box, FALSE);
     gtk_grid_attach(GTK_GRID(grid), ab->arrow_box, 1, 1, 1, 1);
     gtk_widget_show(ab->arrow_box);
 
@@ -372,6 +375,8 @@ balsa_ab_window_init(BalsaAbWindow *ab)
 
     /* list for selected addresses in compose mode */
     ab->send_to_list = gtk_scrolled_window_new(NULL, NULL);
+    gtk_widget_set_vexpand(ab->send_to_list, TRUE);
+    gtk_widget_set_hexpand(ab->send_to_list, TRUE);
     gtk_widget_show(ab->send_to_list);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(ab->send_to_list),
 				   GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);

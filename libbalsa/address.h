@@ -122,7 +122,7 @@ enum {
     LIBBALSA_ADDRESS_TRG_NONE
 };
 
-extern GtkTargetEntry libbalsa_address_target_list[2];
+extern const gchar *libbalsa_address_target_list[2];
 
 GtkWidget *libbalsa_address_get_edit_widget(const LibBalsaAddress *addr,
                                             GtkWidget **entries,

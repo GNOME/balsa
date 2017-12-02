@@ -75,8 +75,8 @@ enum {
 };
 static gint balsa_mblist_signals[LAST_SIGNAL] = { 0 };
 
-static GtkTargetEntry bmbl_drop_types[] = {
-    {"x-application/x-message-list", GTK_TARGET_SAME_APP}
+static const gchar * bmbl_drop_types[] = {
+    "x-application/x-message-list"
 };
 
 static GtkTreeViewClass *parent_class = NULL;
@@ -1169,20 +1169,20 @@ balsa_mblist_close_lru_peer_mbx(BalsaMBList * mblist,
 void
 balsa_mblist_default_signal_bindings(BalsaMBList * mblist)
 {
-    GtkTargetList *list;
+    GdkContentFormats *formats;
 
     g_signal_connect(G_OBJECT(mblist), "button_press_event",
                      G_CALLBACK(bmbl_button_press_cb), NULL);
     g_signal_connect_after(G_OBJECT(mblist), "size-allocate",
                            G_CALLBACK(bmbl_column_resize), NULL);
 
-    list = gtk_target_list_new(bmbl_drop_types, G_N_ELEMENTS(bmbl_drop_types));
+    formats = gdk_content_formats_new(bmbl_drop_types, G_N_ELEMENTS(bmbl_drop_types));
     gtk_tree_view_enable_model_drag_dest(GTK_TREE_VIEW(mblist),
-                                         list,
+                                         formats,
                                          GDK_ACTION_DEFAULT |
                                          GDK_ACTION_COPY |
                                          GDK_ACTION_MOVE);
-    gtk_target_list_unref(list);
+    gdk_content_formats_unref(formats);
 
     g_signal_connect(G_OBJECT(mblist), "drag-data-received",
                      G_CALLBACK(bmbl_drag_cb), NULL);

@@ -82,8 +82,8 @@ enum {
 };
 
 #define NUM_DROP_TYPES 1
-static GtkTargetEntry notebook_drop_types[NUM_DROP_TYPES] = {
-    {"x-application/x-message-list", GTK_TARGET_SAME_APP}
+static const gchar * notebook_drop_types[NUM_DROP_TYPES] = {
+    "x-application/x-message-list"
 };
 
 /* Define thread-related globals, including dialogs */
@@ -2213,7 +2213,7 @@ balsa_window_new()
 #endif
     GtkAdjustment *hadj, *vadj;
     GAction *action;
-    GtkTargetList *list;
+    GdkContentFormats *formats;
 
     /* Call to register custom balsa pixmaps with GNOME_STOCK_PIXMAPS
      * - allows for grey out */
@@ -2273,11 +2273,11 @@ balsa_window_new()
     g_signal_connect(G_OBJECT(window->notebook), "switch_page",
                      G_CALLBACK(bw_notebook_switch_page_cb), window);
 
-    list = gtk_target_list_new(notebook_drop_types, NUM_DROP_TYPES);
+    formats = gdk_content_formats_new(notebook_drop_types, NUM_DROP_TYPES);
     gtk_drag_dest_set (GTK_WIDGET (window->notebook), GTK_DEST_DEFAULT_ALL,
-                       list,
+                       formats,
                        GDK_ACTION_DEFAULT | GDK_ACTION_COPY | GDK_ACTION_MOVE);
-    gtk_target_list_unref(list);
+    gdk_content_formats_unref(formats);
 
     g_signal_connect(G_OBJECT (window->notebook), "drag-data-received",
                      G_CALLBACK (bw_notebook_drag_received_cb), NULL);

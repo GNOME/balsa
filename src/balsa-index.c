@@ -105,8 +105,8 @@ enum {
     TARGET_MESSAGES
 };
 
-static GtkTargetEntry index_drag_types[] = {
-    {"x-application/x-message-list", GTK_TARGET_SAME_APP}
+static const gchar * index_drag_types[] = {
+    "x-application/x-message-list"
 };
 
 static void bndx_drag_cb(GtkWidget* widget,
@@ -297,7 +297,7 @@ bndx_instance_init(BalsaIndex * index)
     GtkTreeSelection *selection = gtk_tree_view_get_selection(tree_view);
     GtkCellRenderer *renderer;
     GtkTreeViewColumn *column;
-    GtkTargetList *list;
+    GdkContentFormats *formats;
 
 #if defined(TREE_VIEW_FIXED_HEIGHT)
     gtk_tree_view_set_fixed_height_mode(tree_view, TRUE);
@@ -447,13 +447,13 @@ bndx_instance_init(BalsaIndex * index)
                            NULL);
     gtk_tree_view_set_enable_search(tree_view, FALSE);
 
-    list = gtk_target_list_new(index_drag_types, G_N_ELEMENTS(index_drag_types));
+    formats = gdk_content_formats_new(index_drag_types, G_N_ELEMENTS(index_drag_types));
     gtk_drag_source_set(GTK_WIDGET (index),
                         GDK_BUTTON1_MASK | GDK_SHIFT_MASK | GDK_CONTROL_MASK,
-                        list,
+                        formats,
                         GDK_ACTION_DEFAULT | GDK_ACTION_COPY |
                         GDK_ACTION_MOVE);
-    gtk_target_list_unref(list);
+    gdk_content_formats_unref(formats);
 
     g_signal_connect(index, "drag-data-get",
                      G_CALLBACK(bndx_drag_cb), NULL);

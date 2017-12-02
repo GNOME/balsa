@@ -718,7 +718,7 @@ bab_window_list_new(void)
     GtkCellRenderer *renderer;
     GtkTreeViewColumn *column;
     GtkTreeSelection *selection;
-    GtkTargetList *list;
+    GdkContentFormats *formats;
 
     store =
         gtk_list_store_new(N_COLUMNS,
@@ -751,13 +751,13 @@ bab_window_list_new(void)
     gtk_tree_view_append_column(GTK_TREE_VIEW(tree), column);
 
 
-    list = gtk_target_list_new(libbalsa_address_target_list,
-                               G_N_ELEMENTS(libbalsa_address_target_list));
+    formats = gdk_content_formats_new(libbalsa_address_target_list,
+                                      G_N_ELEMENTS(libbalsa_address_target_list));
     gtk_drag_source_set(GTK_WIDGET(tree),
                         GDK_BUTTON1_MASK,
-                        list,
+                        formats,
                         GDK_ACTION_COPY);
-    gtk_target_list_unref(list);
+    gdk_content_formats_unref(formats);
 
     g_signal_connect(G_OBJECT(tree), "drag-data-get",
                      G_CALLBACK(addrlist_drag_get_cb), NULL);

@@ -151,16 +151,16 @@ enum {
     TARGET_STRING
 };
 
-static GtkTargetEntry drop_types[] = {
-    { "x-application/x-message-list", GTK_TARGET_SAME_APP},
-    { "text/uri-list", 0},
-    { "STRING",     0},
-    { "text/plain", 0}
+static const gchar * drop_types[] = {
+    "x-application/x-message-list",
+    "text/uri-list",
+    "STRING",
+    "text/plain"
 };
 
-static GtkTargetEntry email_field_drop_types[] = {
-    { "STRING",     0},
-    { "text/plain", 0}
+static const gchar * email_field_drop_types[] = {
+    "STRING",
+    "text/plain"
 };
 
 static void lang_set_cb(GtkWidget *widget, BalsaSendmsg *bsmsg);
@@ -2378,7 +2378,7 @@ create_email_entry(BalsaSendmsg         * bsmsg,
                    guint                  n_types)
 {
     GtkWidget *scroll;
-    GtkTargetList *list;
+    GdkContentFormats *formats;
 
     *view = libbalsa_address_view_new(types, n_types,
                                       balsa_app.address_book_list,
@@ -2405,11 +2405,11 @@ create_email_entry(BalsaSendmsg         * bsmsg,
     g_signal_connect(*view, "open-address-book",
 		     G_CALLBACK(address_book_cb), bsmsg);
 
-    list = gtk_target_list_new(email_field_drop_types, G_N_ELEMENTS(email_field_drop_types));
+    formats = gdk_content_formats_new(email_field_drop_types, G_N_ELEMENTS(email_field_drop_types));
     gtk_drag_dest_set(GTK_WIDGET(*view), GTK_DEST_DEFAULT_ALL,
-		      list,
+		      formats,
 		      GDK_ACTION_COPY | GDK_ACTION_MOVE);
-    gtk_target_list_unref(list);
+    gdk_content_formats_unref(formats);
 
     libbalsa_address_view_set_domain(*view, bsmsg->ident->domain);
     g_signal_connect_swapped(gtk_tree_view_get_model(GTK_TREE_VIEW(*view)),
@@ -2628,7 +2628,7 @@ sw_attachment_list(BalsaSendmsg *bsmsg)
     GtkTreeView *view;
     GtkTreeViewColumn *column;
     GtkWidget *frame;
-    GtkTargetList *list;
+    GdkContentFormats *formats;
 
     grid = gtk_grid_new();
     gtk_grid_set_row_spacing(GTK_GRID(grid), 6);
@@ -2717,11 +2717,11 @@ sw_attachment_list(BalsaSendmsg *bsmsg)
     g_signal_connect(G_OBJECT(bsmsg->window), "drag_data_received",
 		     G_CALLBACK(attachments_add), bsmsg);
 
-    list = gtk_target_list_new(drop_types, G_N_ELEMENTS(drop_types));
+    formats = gdk_content_formats_new(drop_types, G_N_ELEMENTS(drop_types));
     gtk_drag_dest_set(GTK_WIDGET(bsmsg->window), GTK_DEST_DEFAULT_ALL,
-		      list,
+		      formats,
 		      GDK_ACTION_COPY | GDK_ACTION_MOVE | GDK_ACTION_LINK);
-    gtk_target_list_unref(list);
+    gdk_content_formats_unref(formats);
 
     frame = gtk_frame_new(NULL);
     gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_IN);
@@ -2777,7 +2777,7 @@ drag_data_quote(GtkWidget        * widget,
 
     target = gtk_selection_data_get_target(selection_data);
 
-    if (target == gdk_atom_intern_static_string(drop_types[TARGET_MESSAGES].target)) {
+    if (target == gdk_atom_intern_static_string(drop_types[TARGET_MESSAGES])) {
 	index =
             *(BalsaIndex **) gtk_selection_data_get_data(selection_data);
 	mailbox = index->mailbox_node->mailbox;
@@ -2799,7 +2799,7 @@ drag_data_quote(GtkWidget        * widget,
             g_string_free(body, TRUE);
         }
         balsa_index_selected_msgnos_free(index, selected);
-    } else if (target == gdk_atom_intern_static_string(drop_types[TARGET_URI_LIST].target)) {
+    } else if (target == gdk_atom_intern_static_string(drop_types[TARGET_URI_LIST])) {
         GSList *uri_list =
             uri2gslist((gchar *)
                        gtk_selection_data_get_data(selection_data));
@@ -2864,7 +2864,7 @@ create_text_area(BalsaSendmsg * bsmsg)
 #endif                          /* HAVE_GSPELL_1_2 */
 #endif                          /* HAVE_GSPELL */
     GtkWidget *scroll;
-    GtkTargetList *list;
+    GdkContentFormats *formats;
 
 #if HAVE_GTKSOURCEVIEW
     bsmsg->text = libbalsa_source_view_new(TRUE);
@@ -2929,12 +2929,12 @@ create_text_area(BalsaSendmsg * bsmsg)
     g_signal_connect(G_OBJECT(bsmsg->text), "drag_data_received",
 		     G_CALLBACK(drag_data_quote), bsmsg);
 
-    list = gtk_target_list_new(drop_types, G_N_ELEMENTS(drop_types));
+    formats = gdk_content_formats_new(drop_types, G_N_ELEMENTS(drop_types));
     /* GTK_DEST_DEFAULT_ALL in drag_set would trigger bug 150141 */
     gtk_drag_dest_set(GTK_WIDGET(bsmsg->text), 0,
-		      list,
+		      formats,
 		      GDK_ACTION_COPY | GDK_ACTION_MOVE | GDK_ACTION_LINK);
-    gtk_target_list_unref(list);
+    gdk_content_formats_unref(formats);
 
     gtk_widget_show(scroll);
 
@@ -4077,16 +4077,7 @@ create_lang_menu(GtkWidget * parent, BalsaSendmsg * bsmsg)
     preferred_lang = balsa_app.spell_check_lang ?
         balsa_app.spell_check_lang : setlocale(LC_CTYPE, NULL);
 
-#if HAVE_GTKSPELL_3_0_3
-    lang_list = gtk_spell_checker_get_language_list();
-#elif HAVE_GSPELL
-    lang_list = gspell_language_get_available();
-#else                           /* HAVE_GTKSPELL_3_0_3 */
-    broker = enchant_broker_init();
-    lang_list = NULL;
-    enchant_broker_list_dicts(broker, sw_broker_cb, &lang_list);
-#endif                          /* HAVE_GTKSPELL_3_0_3 */
-
+    langs = gtk_menu_new();
     for (i = 0; i < G_N_ELEMENTS(locales); i++) {
         gconstpointer found;
 

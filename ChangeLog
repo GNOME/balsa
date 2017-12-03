@@ -1,3 +1,10 @@
+2017-12-03  Albrecht Dreß <albrecht.dress@arcor.de>
+
+	Fix documentation
+
+	* README: remove description of two configure options (--with-gpg-app,
+	--enable-smime) that have gone away.
+
 2017-12-02  Albrecht Dreß <albrecht.dress@arcor.de>
 
 	Expand lists in address book window

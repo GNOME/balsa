@@ -462,12 +462,10 @@ static gboolean
 text_view_url_popup(GtkWidget *widget, GtkMenu *menu)
 {
     GList *url_list = g_object_get_data(G_OBJECT(widget), "url-list");
+    GdkEvent *event;
+    gboolean fetched = FALSE;
     message_url_t *url;
     gint x, y;
-    GdkWindow *window;
-    GdkDisplay *display;
-    GdkSeat *seat;
-    GdkDevice *device;
     GtkWidget *menu_item;
 
     /* no url list: no check... */
@@ -475,11 +473,32 @@ text_view_url_popup(GtkWidget *widget, GtkMenu *menu)
 	return FALSE;
 
     /* check if we are over an url */
-    window = gtk_widget_get_window(widget);
-    display = gdk_window_get_display(window);
-    seat = gdk_display_get_default_seat(display);
-    device = gdk_seat_get_pointer(seat);
-    gdk_window_get_device_position(window, device, &x, &y, NULL);
+    event = gtk_get_current_event();
+    if (event != NULL) {
+        gdouble x_win;
+        gdouble y_win;
+
+        fetched = gdk_event_get_coords(event, &x_win, &y_win);
+        if (fetched) {
+            x = (gint) x_win;
+            y = (gint) y_win;
+        }
+        gdk_event_free(event);
+    }
+
+    if (!fetched) {
+        GdkWindow *window;
+        GdkDisplay *display;
+        GdkSeat *seat;
+        GdkDevice *device;
+
+        window = gtk_widget_get_window(widget);
+        display = gdk_window_get_display(window);
+        seat = gdk_display_get_default_seat(display);
+        device = gdk_seat_get_pointer(seat);
+        /* This seems to be off by a few pixels: */
+        gdk_window_get_device_position(window, device, &x, &y, NULL);
+    }
 
     url = find_url(widget, x, y, url_list);
     if (!url)

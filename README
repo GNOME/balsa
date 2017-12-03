@@ -60,16 +60,6 @@ installed in an uncommon place.  See the (rather outdated) web page
 http://home.arcor.de/dralbrecht.dress/balsa/UsingGnuPG.html#FAQ
 for more details.
 
---enable-smime
-	Include support for S/MIME signed and encrypted messages.
-This option requires GPGME (see above).
-
---with-gpg-app=PATH
-	Specify the GnuPG application which shall be used by GPGME.
-Typically, configure will automatically detect gpg, so this option
-should be given only if the desired gpg version is installed in an
-uncommon place.
-
 --with-gss[=/usr/kerberos]
 	This enables GSSAPI Kerberos based authentication scheme. 
 Specify the kerberos directory as the argument.

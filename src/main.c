@@ -798,12 +798,6 @@ main(int argc, char **argv)
     GtkApplication *application;
     int status;
 
-# if defined(USE_WEBKIT2)
-    /* temporary fix to avoid some webkit warnings, if the user has not
-     * set it: */
-    g_setenv("WEBKIT_DISABLE_COMPOSITING_MODE", "1", FALSE);
-#endif                          /* defined(USE_WEBKIT2) */
-
     balsa_app.application = application =
         gtk_application_new("org.desktop.Balsa",
                             G_APPLICATION_HANDLES_COMMAND_LINE);

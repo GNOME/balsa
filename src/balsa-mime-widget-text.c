@@ -437,13 +437,10 @@ structured_phrases_toggle(GtkCheckMenuItem *checkmenuitem,
 static void
 url_copy_cb(GtkWidget * menu_item, message_url_t * uri)
 {
-    GdkDisplay *display;
-    GtkClipboard *clipboard;
+    GdkClipboard *clipboard;
 
-    display = gtk_widget_get_display(menu_item);
-    clipboard =
-        gtk_clipboard_get_for_display(display, GDK_SELECTION_PRIMARY);
-    gtk_clipboard_set_text(clipboard, uri->url, -1);
+    clipboard = gtk_widget_get_clipboard(menu_item);
+    gdk_clipboard_set_text(clipboard, uri->url);
 }
 
 static void

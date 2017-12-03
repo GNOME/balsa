@@ -60,12 +60,10 @@ lsv_copy_activated(GSimpleAction * action,
         g_object_get_data(G_OBJECT(user_data), "lsvi");
     GtkTextView *text = GTK_TEXT_VIEW(lsvi->text);
     GtkTextBuffer *buffer = gtk_text_view_get_buffer(text);
-    GdkDisplay *display;
-    GtkClipboard *clipboard;
+    GdkClipboard *clipboard;
+    GtkWidget *window = user_data;
 
-    display = gtk_widget_get_display(GTK_WIDGET(text));
-    clipboard = gtk_clipboard_get_for_display(display, GDK_SELECTION_CLIPBOARD);
-
+    clipboard = gtk_widget_get_clipboard(window);
     gtk_text_buffer_copy_clipboard(buffer, clipboard);
 }
 

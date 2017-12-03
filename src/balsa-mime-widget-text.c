@@ -461,46 +461,11 @@ url_send_cb(GtkWidget * menu_item, message_url_t * uri)
 static gboolean
 text_view_url_popup(GtkWidget *widget, GtkMenu *menu)
 {
-    GList *url_list = g_object_get_data(G_OBJECT(widget), "url-list");
-    GdkEvent *event;
-    gboolean fetched = FALSE;
     message_url_t *url;
-    gint x, y;
     GtkWidget *menu_item;
 
-    /* no url list: no check... */
-    if (!url_list)
-	return FALSE;
-
     /* check if we are over an url */
-    event = gtk_get_current_event();
-    if (event != NULL) {
-        gdouble x_win;
-        gdouble y_win;
-
-        fetched = gdk_event_get_coords(event, &x_win, &y_win);
-        if (fetched) {
-            x = (gint) x_win;
-            y = (gint) y_win;
-        }
-        gdk_event_free(event);
-    }
-
-    if (!fetched) {
-        GdkWindow *window;
-        GdkDisplay *display;
-        GdkSeat *seat;
-        GdkDevice *device;
-
-        window = gtk_widget_get_window(widget);
-        display = gdk_window_get_display(window);
-        seat = gdk_display_get_default_seat(display);
-        device = gdk_seat_get_pointer(seat);
-        /* This seems to be off by a few pixels: */
-        gdk_window_get_device_position(window, device, &x, &y, NULL);
-    }
-
-    url = find_url(widget, x, y, url_list);
+    url = g_object_get_data(G_OBJECT(widget), "current-url");
     if (!url)
 	return FALSE;
 
@@ -636,6 +601,7 @@ check_over_url(GtkWidget * widget, GdkEvent * event,
     }
 
     current_url = url;
+    g_object_set_data(G_OBJECT(widget), "current-url", current_url);
     return FALSE;
 }
 

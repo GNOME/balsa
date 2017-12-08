@@ -205,9 +205,9 @@ send_message_info_new(LibBalsaSmtpServer   *smtp_server,
 
     smi = g_new0(SendMessageInfo, 1);
     smi->session = session;
-    smi->outbox = g_object_ref(G_OBJECT(outbox));
+    smi->outbox = g_object_ref(outbox);
     smi->finder = finder;
-    smi->smtp_server = g_object_ref(G_OBJECT(smtp_server));
+    smi->smtp_server = g_object_ref(smtp_server);
     smi->progress_id = g_strdup_printf(_("SMTP server %s"), libbalsa_smtp_server_get_name(smtp_server));
     return smi;
 }

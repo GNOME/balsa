@@ -4724,7 +4724,7 @@ balsa_window_setup_progress(BalsaWindow * window, const gchar * text)
     /* Update the display in an idle callback, in case we were called in
      * a sub-thread.*/
     info = g_new(BalsaWindowSetupProgressInfo, 1);
-    info->progress_bar = g_object_ref(window->progress_bar);
+    info->progress_bar = g_object_ref(GTK_PROGRESS_BAR(window->progress_bar));
     info->text = g_strdup(text);
     g_idle_add((GSourceFunc) bw_setup_progress_idle_cb, info);
 

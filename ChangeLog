@@ -1,3 +1,15 @@
+2017-12-08  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	In glib-2.56, g_object_ref() propagates the type from its argument
+	to its return type, which can raise incompatible-pointer-type
+	warnings; previously it returned a gpointer, which could conceal
+	a coding error.
+
+	* libbalsa/send.c (send_message_info_new): do not cast arguments
+	to GObject.
+	* src/main-window.c (balsa_window_setup_progress): cast argument
+	window->progress_bar to GtkProgressBar.
+
 2017-12-03  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Remove a webkitgtk workaround

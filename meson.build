@@ -524,7 +524,12 @@ elif spell_checker == 'gtkspell'
   conf.set('HAVE_GTKSPELL', 1,
     description : 'Defined when GtkSpell can be used.')
 elif spell_checker == 'internal'
-  spell_dep = dependency('enchant')
+  spell_dep = dependency('enchant-2',
+                         required : false)
+  if not spell_dep.found()
+    spell_dep = dependency('enchant',
+                           version : '<= 1.6.0')
+  endif
 endif
 
 balsa_deps += spell_dep

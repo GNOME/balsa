@@ -588,7 +588,11 @@ case "$use_spell_checker" in
     ;;
     internal)
     AC_MSG_RESULT([configure enchant])
-    PKG_CHECK_MODULES(SPELL, [ enchant ])
+    if $PKG_CONFIG enchant-2 ; then
+        PKG_CHECK_MODULES(SPELL, [ enchant-2 ])
+    else
+        PKG_CHECK_MODULES(SPELL, [ enchant <= 1.6.0 ])
+    fi
     ;;
     *)
     AC_MSG_ERROR([bad option $use_spell_checker])

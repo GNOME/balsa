@@ -912,7 +912,7 @@ addrlist_drag_received_cb(GtkWidget        * widget,
     if (!dnd_success)
         g_print ("DnD data transfer failed!\n");
 
-    gtk_drag_finish(context, dnd_success, FALSE, time);
+    gtk_drag_finish(context, dnd_success, time);
 }
 
 static gboolean

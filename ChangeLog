@@ -1,3 +1,10 @@
+2017-12-11  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Avoid possible repeated dynamic cast
+
+	* src/main-window.c (balsa_window_setup_progress): cast the
+	result of g_object_ref() instead of its argument.
+
 2017-12-10  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Revise configuration of enchant spell-checking lib

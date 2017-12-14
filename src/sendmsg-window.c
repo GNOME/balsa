@@ -2183,22 +2183,20 @@ rfc2396_uri(const gchar *instr)
 }
 
 static void
-attachments_add(GtkWidget * widget,
-		GdkDragContext * context,
-		gint x,
-		gint y,
+attachments_add(GtkWidget        * widget,
+		GdkDragContext   * context,
 		GtkSelectionData * selection_data,
-		guint info, guint32 time, BalsaSendmsg * bsmsg)
+		guint32 time,
+                BalsaSendmsg     * bsmsg)
 {
-    GdkAtom target;
+    const gchar *target;
     gboolean drag_result = TRUE;
 
-    if (balsa_app.debug)
-        printf("attachments_add: info %d\n", info);
-
     target = gtk_selection_data_get_target(selection_data);
+    if (balsa_app.debug)
+        printf("attachments_add: target %s\n", target);
 
-    if (target == gdk_atom_intern_static_string("x-application/x-message-list")) {
+    if (target == g_intern_static_string("x-application/x-message-list")) {
 	BalsaIndex *index =
             *(BalsaIndex **) gtk_selection_data_get_data(selection_data);
 	LibBalsaMailbox *mailbox = index->mailbox_node->mailbox;
@@ -2220,7 +2218,7 @@ attachments_add(GtkWidget * widget,
 	    g_object_unref(message);
         }
         balsa_index_selected_msgnos_free(index, selected);
-    } else if (target == gdk_atom_intern_static_string("text/uri-list")) {
+    } else if (target == g_intern_static_string("text/uri-list")) {
         GSList *uri_list, *list;
 
         list = uri2gslist((gchar *) gtk_selection_data_get_data(selection_data));
@@ -2229,8 +2227,8 @@ attachments_add(GtkWidget * widget,
             g_free(uri_list->data);
         }
         g_slist_free(list);
-    } else if (target == gdk_atom_intern_static_string("STRING") ||
-               target == gdk_atom_intern_static_string("text/plain")) {
+    } else if (target == g_intern_static_string("STRING") ||
+               target == g_intern_static_string("text/plain")) {
 	gchar *url = rfc2396_uri((gchar *) gtk_selection_data_get_data(selection_data));
 
 	if (url)
@@ -2246,12 +2244,10 @@ attachments_add(GtkWidget * widget,
 static void
 to_add(GtkWidget        * widget,
        GdkDragContext   * context,
-       gint               x,
-       gint               y,
        GtkSelectionData * selection_data,
        guint32            time)
 {
-    GdkAtom target;
+    const gchar *target;
     gboolean drag_result = FALSE;
 
 #ifdef DEBUG
@@ -2262,8 +2258,8 @@ to_add(GtkWidget        * widget,
 
     target = gtk_selection_data_get_target(selection_data);
 
-    if (target == gdk_atom_intern_static_string("STRING") ||
-        target == gdk_atom_intern_static_string("text/plain")) {
+    if (target == g_intern_static_string("STRING") ||
+        target == g_intern_static_string("text/plain")) {
         const gchar *address;
 
         address =
@@ -2762,13 +2758,11 @@ has_file_attached(GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter,
 static void
 drag_data_quote(GtkWidget        * widget,
                 GdkDragContext   * context,
-                gint               x,
-                gint               y,
                 GtkSelectionData * selection_data,
                 guint32            time,
                 BalsaSendmsg     * bsmsg)
 {
-    GdkAtom target;
+    const gchar *target;
     GtkTextBuffer *buffer;
     BalsaIndex *index;
     LibBalsaMailbox *mailbox;
@@ -2777,7 +2771,7 @@ drag_data_quote(GtkWidget        * widget,
 
     target = gtk_selection_data_get_target(selection_data);
 
-    if (target == gdk_atom_intern_static_string(drop_types[TARGET_MESSAGES])) {
+    if (target == g_intern_static_string(drop_types[TARGET_MESSAGES])) {
 	index =
             *(BalsaIndex **) gtk_selection_data_get_data(selection_data);
 	mailbox = index->mailbox_node->mailbox;
@@ -2799,7 +2793,7 @@ drag_data_quote(GtkWidget        * widget,
             g_string_free(body, TRUE);
         }
         balsa_index_selected_msgnos_free(index, selected);
-    } else if (target == gdk_atom_intern_static_string(drop_types[TARGET_URI_LIST])) {
+    } else if (target == g_intern_static_string(drop_types[TARGET_URI_LIST])) {
         GSList *uri_list =
             uri2gslist((gchar *)
                        gtk_selection_data_get_data(selection_data));

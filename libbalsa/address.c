@@ -869,8 +869,6 @@ const gchar *libbalsa_address_target_list[] = {
 static void
 addrlist_drag_received_cb(GtkWidget        * widget,
                           GdkDragContext   * context,
-                          gint               x,
-                          gint               y,
                           GtkSelectionData * selection_data,
                           guint32            time,
                           gpointer           data)
@@ -885,11 +883,11 @@ addrlist_drag_received_cb(GtkWidget        * widget,
     /* Deal with what we are given from source */
     if (selection_data != NULL
         && gtk_selection_data_get_length(selection_data) >= 0) {
-        GdkAtom target;
+        const gchar *target;
 
         target = gtk_selection_data_get_target(selection_data);
 
-        if (target == gdk_atom_intern_static_string("x-application/x-addr")) {
+        if (target == g_intern_static_string("x-application/x-addr")) {
             addr = *(LibBalsaAddress **) gtk_selection_data_get_data(selection_data);
 
             if (addr != NULL && addr->address_list != NULL) {
@@ -901,8 +899,8 @@ addrlist_drag_received_cb(GtkWidget        * widget,
                                                   -1);
                 dnd_success = TRUE;
             }
-        } else if (target == gdk_atom_intern_static_string("text/plain") ||
-                   target == gdk_atom_intern_static_string("STRING")) {
+        } else if (target == g_intern_static_string("text/plain") ||
+                   target == g_intern_static_string("STRING")) {
             g_print("text/plain target not implemented.\n");
         } else {
             g_print ("nothing good");
@@ -930,14 +928,14 @@ addrlist_drag_drop_cb(GtkWidget *widget, GdkDragContext *context,
   if (formats != NULL) {
       const gchar * const *mime_types;
       gsize                n_mime_types;
-      GdkAtom              target_type;
+      const gchar         *target_type;
 
       mime_types = gdk_content_formats_get_mime_types(formats, &n_mime_types);
       g_assert(n_mime_types > LIBBALSA_ADDRESS_TRG_ADDRESS);
 
       /* Choose the best target type */
       target_type =
-          gdk_atom_intern_static_string(mime_types[LIBBALSA_ADDRESS_TRG_ADDRESS]);
+          g_intern_static_string(mime_types[LIBBALSA_ADDRESS_TRG_ADDRESS]);
 
       /* Request the data from the source. */
       printf("drag_drop requests target=%p\n", target_type);

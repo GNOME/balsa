@@ -132,8 +132,8 @@ tree_view_multi_press_cb(GtkGestureMultiPress * gesture,
                          gdouble                y,
                          gpointer               user_data)
 {
-    GtkTreeView *tree_view = g_object_get_data(G_OBJECT(gesture), "tree-view-gesture");
-    GtkTreeSelection *selection = gtk_tree_view_get_selection(tree_view);
+    GtkTreeView *tree_view;
+    GtkTreeSelection *selection;
     GtkTreePath *path;
     GtkTreeIter iter;
     GtkTreeModel *model;
@@ -143,6 +143,8 @@ tree_view_multi_press_cb(GtkGestureMultiPress * gesture,
     }
     gtk_gesture_set_state(GTK_GESTURE(gesture), GTK_EVENT_SEQUENCE_CLAIMED);
 
+    tree_view = GTK_TREE_VIEW(gtk_event_controller_get_widget(GTK_EVENT_CONTROLLER(gesture)));
+    selection = gtk_tree_view_get_selection(tree_view);
     if (gtk_tree_view_get_path_at_pos(tree_view, (gint) x, (gint) y, &path, NULL, NULL, NULL)) {
         if (!gtk_tree_selection_path_is_selected(selection, path)) {
             gtk_tree_view_set_cursor(tree_view, path, NULL, FALSE);
@@ -160,8 +162,6 @@ tree_view_multi_press_cb(GtkGestureMultiPress * gesture,
         (void) gtk_dialog_run(GTK_DIALOG(dialog));
         gtk_widget_destroy(dialog);
     }
-
-    return;
 }
 
 
@@ -290,7 +290,6 @@ lb_gpgme_select_key(const gchar * user_name, lb_key_sel_md_t mode, GList * keys,
     gesture = gtk_gesture_multi_press_new(tree_view);
     g_object_set_data_full(G_OBJECT(tree_view), "tree-view-gesture",
                            gesture, g_object_unref);
-    g_object_set_data(G_OBJECT(gesture), "tree-view-gesture", tree_view);
     g_signal_connect(gesture, "pressed", G_CALLBACK(tree_view_multi_press_cb), dialog);
 
     /* set window size to 2/3 of the parent */

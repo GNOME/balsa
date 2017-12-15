@@ -1747,6 +1747,7 @@ bmbl_mru_activate_cb(GtkWidget * item, gpointer data)
  */
 static void
 bmbl_mru_size_allocate_cb(GtkWidget * widget, GdkRectangle * allocation,
+                          gint baseline, GtkAllocation * clip,
                           gpointer user_data)
 {
     GdkWindow *gdk_window;

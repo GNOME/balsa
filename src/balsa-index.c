@@ -734,6 +734,7 @@ bndx_tree_collapse_cb(GtkTreeView * tree_view, GtkTreeIter * iter,
 /* When a column is resized, store the new size for later use */
 static void
 bndx_column_resize(GtkWidget * widget, GtkAllocation * allocation,
+                   gint baseline, GtkAllocation * clip,
                    gpointer data)
 {
     GtkTreeView *tree_view = GTK_TREE_VIEW(widget);

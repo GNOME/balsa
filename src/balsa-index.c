@@ -87,8 +87,11 @@ static gboolean bndx_button_event_press_cb(GtkWidget * tree_view,
 static void bndx_row_activated(GtkTreeView * tree_view, GtkTreePath * path,
                                GtkTreeViewColumn * column,
                                gpointer user_data);
-static void bndx_column_resize(GtkWidget * widget,
-                               GtkAllocation * allocation, gpointer data);
+static void bndx_column_resize(GtkWidget     * widget,
+                               GtkAllocation * allocation,
+                               gint            baseline,
+                               GtkAllocation * clip,
+                               gpointer        user_data);
 static void bndx_tree_expand_cb(GtkTreeView * tree_view,
                                 GtkTreeIter * iter, GtkTreePath * path,
                                 gpointer user_data);
@@ -735,7 +738,7 @@ bndx_tree_collapse_cb(GtkTreeView * tree_view, GtkTreeIter * iter,
 static void
 bndx_column_resize(GtkWidget * widget, GtkAllocation * allocation,
                    gint baseline, GtkAllocation * clip,
-                   gpointer data)
+                   gpointer user_data)
 {
     GtkTreeView *tree_view = GTK_TREE_VIEW(widget);
 

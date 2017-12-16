@@ -106,9 +106,6 @@ static void bmbl_tree_collapse(GtkTreeView * tree_view, GtkTreeIter * iter,
 static gint bmbl_row_compare(GtkTreeModel * model,
                              GtkTreeIter * iter1,
                              GtkTreeIter * iter2, gpointer data);
-static gboolean bmbl_button_press_cb(GtkWidget * widget,
-                                     GdkEvent * event,
-                                     gpointer data);
 static void bmbl_column_resize(GtkWidget * widget, GtkAllocation * allocation,
                                gint baseline, GtkAllocation * clip,
                                gpointer data);
@@ -137,7 +134,7 @@ static gboolean bmbl_store_redraw_mbnode(GtkTreeIter * iter,
 static void bmbl_node_style(GtkTreeModel * model, GtkTreeIter * iter);
 static gint bmbl_core_mailbox(LibBalsaMailbox * mailbox);
 static void bmbl_do_popup(GtkTreeView * tree_view, GtkTreePath * path,
-                          GdkEvent * event);
+                          const GdkEvent * event);
 static void bmbl_expand_to_row(BalsaMBList * mblist, GtkTreePath * path);
 /* end of prototypes */
 
@@ -673,29 +670,35 @@ bmbl_row_compare(GtkTreeModel * model, GtkTreeIter * iter1,
     return ret_val;
 }
 
-/* bmbl_button_press_cb:
+/* bmbl_gesture_pressed_cb:
    handle mouse button press events that occur on mailboxes
    (clicking on folders is passed to GtkTreeView and may trigger expand events
 */
-static gboolean
-bmbl_button_press_cb(GtkWidget * widget, GdkEvent * event,
-                     gpointer data)
+static void
+bmbl_gesture_pressed_cb(GtkGestureMultiPress *multi_press,
+                        gint                  n_press,
+                        gdouble               x,
+                        gdouble               y,
+                        gpointer              user_data)
 {
-    GtkTreeView *tree_view = GTK_TREE_VIEW(widget);
+    GtkGesture *gesture;
+    const GdkEvent *event;
+    GtkTreeView *tree_view;
     GtkTreePath *path;
-    gdouble x_win, y_win;
 
-    if (!gdk_event_triggers_context_menu((GdkEvent *) event)
-        || !gdk_event_get_coords(event, &x_win, &y_win))
-        return FALSE;
+    gesture = GTK_GESTURE(multi_press);
+    event = gtk_gesture_get_last_event(gesture, gtk_gesture_get_last_updated_sequence(gesture));
+    g_return_if_fail(event != NULL);
+    if (!gdk_event_triggers_context_menu(event))
+        return;
 
-    if (!gtk_tree_view_get_path_at_pos(tree_view, (gint) x_win, (gint) y_win,
+    tree_view = GTK_TREE_VIEW(gtk_event_controller_get_widget(GTK_EVENT_CONTROLLER(gesture)));
+
+    if (!gtk_tree_view_get_path_at_pos(tree_view, (gint) x, (gint) y,
                                        &path, NULL, NULL, NULL))
         path = NULL;
     bmbl_do_popup(tree_view, path, event);
     /* bmbl_do_popup frees path */
-
-    return TRUE;
 }
 
 /* bmbl_popup_menu:
@@ -719,7 +722,7 @@ bmbl_popup_menu(GtkWidget * widget)
  */
 static void
 bmbl_do_popup(GtkTreeView * tree_view, GtkTreePath * path,
-              GdkEvent * event)
+              const GdkEvent * event)
 {
     BalsaMailboxNode *mbnode = NULL;
     GtkWidget *menu;
@@ -1169,10 +1172,15 @@ balsa_mblist_close_lru_peer_mbx(BalsaMBList * mblist,
 void
 balsa_mblist_default_signal_bindings(BalsaMBList * mblist)
 {
+    GtkGesture *gesture;
     GdkContentFormats *formats;
 
-    g_signal_connect(G_OBJECT(mblist), "button_press_event",
-                     G_CALLBACK(bmbl_button_press_cb), NULL);
+    gesture = gtk_gesture_multi_press_new(GTK_WIDGET(mblist));
+    gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(gesture), 0);
+    g_object_set_data_full(G_OBJECT(mblist), "bmbl-gesture", gesture, g_object_unref);
+    g_signal_connect(gesture, "pressed",
+                     G_CALLBACK(bmbl_gesture_pressed_cb), NULL);
+
     g_signal_connect_after(G_OBJECT(mblist), "size-allocate",
                            G_CALLBACK(bmbl_column_resize), NULL);
 

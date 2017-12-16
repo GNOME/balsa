@@ -126,8 +126,11 @@ static void select_part(BalsaMessage * bm, BalsaPartInfo *info);
 static void tree_activate_row_cb(GtkTreeView *treeview, GtkTreePath *arg1,
                                  GtkTreeViewColumn *arg2, gpointer user_data);
 static gboolean tree_menu_popup_key_cb(GtkWidget *widget, gpointer user_data);
-static gboolean tree_button_press_cb(GtkWidget * widget, GdkEvent * event,
-                                     gpointer data);
+static void bm_gesture_pressed_cb(GtkGestureMultiPress *multi_press,
+                                  gint                  n_press,
+                                  gdouble               x,
+                                  gdouble               y,
+                                  gpointer              user_data);
 
 static void part_info_init(BalsaMessage * bm, BalsaPartInfo * info);
 static void part_context_save_all_cb(GtkWidget * menu_item, GList * info_list);
@@ -671,6 +674,7 @@ balsa_message_init(BalsaMessage * bm)
     GtkWidget *scroll;
     GtkWidget **buttons;
     GtkTreeStore *model;
+    GtkGesture *gesture;
     GtkCellRenderer *renderer;
     GtkTreeSelection *selection;
 
@@ -725,8 +729,13 @@ balsa_message_init(BalsaMessage * bm)
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW (bm->treeview));
     g_signal_connect(bm->treeview, "row-activated",
                      G_CALLBACK(tree_activate_row_cb), bm);
-    g_signal_connect(bm->treeview, "button_press_event",
-                     G_CALLBACK(tree_button_press_cb), bm);
+
+    gesture = gtk_gesture_multi_press_new(GTK_WIDGET(bm->treeview));
+    gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(gesture), 0);
+    g_object_set_data_full(G_OBJECT(bm->treeview), "bm-gesture", gesture, g_object_unref);
+    g_signal_connect(gesture, "pressed",
+                     G_CALLBACK(bm_gesture_pressed_cb), NULL);
+
     g_signal_connect(bm->treeview, "popup-menu",
                      G_CALLBACK(tree_menu_popup_key_cb), bm);
     g_object_unref (G_OBJECT (model));
@@ -912,7 +921,7 @@ collect_selected_info(GtkTreeModel * model, GtkTreePath * path,
 }
 
 static void
-tree_mult_selection_popup(BalsaMessage * bm, GdkEvent * event,
+tree_mult_selection_popup(BalsaMessage * bm, const GdkEvent * event,
                           GtkTreeSelection * selection)
 {
     gint selected;
@@ -988,25 +997,34 @@ tree_menu_popup_key_cb(GtkWidget *widget, gpointer user_data)
     return TRUE;
 }
 
-static gboolean
-tree_button_press_cb(GtkWidget * widget, GdkEvent * event, gpointer data)
+static void
+bm_gesture_pressed_cb(GtkGestureMultiPress *multi_press,
+                      gint                  n_press,
+                      gdouble               x,
+                      gdouble               y,
+                      gpointer              user_data)
 {
-    BalsaMessage * bm = (BalsaMessage *)data;
-    GtkTreeView *tree_view = GTK_TREE_VIEW(widget);
+    GtkGesture *gesture;
+    const GdkEvent *event;
+    GtkTreeView *tree_view;
+    BalsaMessage * bm = (BalsaMessage *) user_data;
     GtkTreePath *path;
-    gdouble x_win, y_win;
 
-    if (!gdk_event_triggers_context_menu(event) ||
-        !gdk_event_get_coords(event, &x_win, &y_win))
-        return FALSE;
+    gesture = GTK_GESTURE(multi_press);
+    event = gtk_gesture_get_last_event(gesture, gtk_gesture_get_last_updated_sequence(gesture));
+    g_return_if_fail(event != NULL);
+    if (!gdk_event_triggers_context_menu(event))
+        return;
+
+    tree_view = GTK_TREE_VIEW(gtk_event_controller_get_widget(GTK_EVENT_CONTROLLER(gesture)));
 
     /* If the part which received the click is already selected, don't change
-     * the selection and check if more than on part is selected. Pop up the
+     * the selection and check if more than one part is selected. Pop up the
      * "save all" menu in this case and the "normal" popup otherwise.
      * If the receiving part is not selected, select (only) this part and pop
      * up its menu.
      */
-    if (gtk_tree_view_get_path_at_pos(tree_view, (gint) x_win, (gint) y_win,
+    if (gtk_tree_view_get_path_at_pos(tree_view, (gint) x, (gint) y,
                                       &path, NULL, NULL, NULL)) {
         GtkTreeIter iter;
         GtkTreeSelection * selection =
@@ -1033,8 +1051,6 @@ tree_button_press_cb(GtkWidget * widget, GdkEvent * event, gpointer data)
             tree_mult_selection_popup(bm, event, selection);
         gtk_tree_path_free(path);
     }
-
-    return TRUE;
 }
 
 /* balsa_message_set:

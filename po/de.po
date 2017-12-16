@@ -17,14 +17,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa HEAD\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-03-17 00:20+0100\n"
-"PO-Revision-Date: 2009-02-17 00:24+0100\n"
-"Last-Translator: Mario Blättermann <mariobl@gnome.org>\n"
+"POT-Creation-Date: 2017-12-16 21:12+0100\n"
+"PO-Revision-Date: 2017-12-16 21:17+0100\n"
+"Last-Translator: Christian Kirbach <christian.kirbach@gmail.com>\n"
 "Language-Team: German <gnome-de@gnome.org>\n"
+"Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 2.0.5\n"
 
 #: ../balsa.desktop.in.h:1
 msgid "Balsa"
@@ -628,7 +630,7 @@ msgstr "Verbindung mit Server konnte nicht aufgebaut werden: %s"
 msgid "Exceeded the number of connections per server %s"
 msgstr "Die maximale Anzahl an Verbindungen wurden für den Server %s erreicht"
 
-#: ../libbalsa/libbalsa-conf.c:137
+#: ../libbalsa/libbalsa-conf.c:141
 msgid "Your Balsa configuration is now stored in \"~/.balsa/config\"."
 msgstr "Ihre Konfiguration von Balsa wurde in »~/.balsa/config« gesichert"
 
@@ -1833,9 +1835,8 @@ msgstr "MB"
 
 #. Top level
 #. Menus
-#: ../libbalsa/source-viewer.c:45 ../src/ab-main.c:553
-#: ../src/main-window.c:319 ../src/message-window.c:235
-#: ../src/sendmsg-window.c:327
+#: ../libbalsa/source-viewer.c:45 ../src/ab-main.c:553 ../src/main-window.c:319
+#: ../src/message-window.c:235 ../src/sendmsg-window.c:327
 msgid "_File"
 msgstr "_Datei"
 
@@ -1924,7 +1925,7 @@ msgstr ""
 msgid "The file with pathname \"%s\" is not a directory."
 msgstr "Die Datei mit dem Pfadnamen »%s« ist kein Ordner."
 
-#: ../libinit_balsa/assistant_init.c:48 ../libinit_balsa/balsa-initdruid.c:81
+#: ../libinit_balsa/assistant_init.c:51 ../libinit_balsa/balsa-initdruid.c:81
 msgid ""
 "This will exit Balsa.\n"
 "Do you really want to do this?"
@@ -1932,37 +1933,37 @@ msgstr ""
 "Dies wird Balsa beenden.\n"
 "Wollen Sie das wirklich?"
 
-#: ../libinit_balsa/assistant_init.c:71
+#: ../libinit_balsa/assistant_init.c:74
 #: ../libinit_balsa/balsa-druid-page-finish.c:79
 msgid "GnomeCard Address Book"
 msgstr "GnomeCard-Adressbuch"
 
-#: ../libinit_balsa/assistant_init.c:78 ../libinit_balsa/assistant_init.c:86
+#: ../libinit_balsa/assistant_init.c:81 ../libinit_balsa/assistant_init.c:89
 #: ../libinit_balsa/balsa-druid-page-finish.c:86
 #: ../libinit_balsa/balsa-druid-page-finish.c:94 ../src/ab-window.c:231
 msgid "Address Book"
 msgstr "Adressbuch"
 
-#: ../libinit_balsa/assistant_init.c:147 ../libinit_balsa/init_balsa.c:50
+#: ../libinit_balsa/assistant_init.c:150 ../libinit_balsa/init_balsa.c:50
 msgid "Configure Balsa"
 msgstr "Balsa konfigurieren"
 
-#: ../libinit_balsa/assistant_page_defclient.c:56
+#: ../libinit_balsa/assistant_page_defclient.c:59
 #: ../libinit_balsa/balsa-druid-page-defclient.c:58
 msgid "Use balsa as default email client?"
 msgstr "Möchten Sie Balsa als Ihr Standard-E-Mail-Programm verwenden?"
 
-#: ../libinit_balsa/assistant_page_defclient.c:60
+#: ../libinit_balsa/assistant_page_defclient.c:63
 #: ../libinit_balsa/balsa-druid-page-defclient.c:62
 msgid "_Yes"
 msgstr "_Ja"
 
-#: ../libinit_balsa/assistant_page_defclient.c:62
+#: ../libinit_balsa/assistant_page_defclient.c:65
 #: ../libinit_balsa/balsa-druid-page-defclient.c:64
 msgid "_No"
 msgstr "_Nein"
 
-#: ../libinit_balsa/assistant_page_defclient.c:99
+#: ../libinit_balsa/assistant_page_defclient.c:102
 #: ../libinit_balsa/balsa-druid-page-defclient.c:100
 msgid "Default Client"
 msgstr "Standardprogramm"
@@ -2182,12 +2183,12 @@ msgid "Balsa E-mail reader"
 msgstr "Balsa E-Mail Programm"
 
 #: ../sounds/balsa.soundlist.in.h:2
-msgid "New mail notification"
-msgstr "Neue E-Mail eingetroffen"
-
-#: ../sounds/balsa.soundlist.in.h:3
 msgid "Program startup"
 msgstr "Programmstart"
+
+#: ../sounds/balsa.soundlist.in.h:3
+msgid "New mail notification"
+msgstr "Neue E-Mail eingetroffen"
 
 #: ../src/ab-main.c:228 ../src/ab-window.c:691
 msgid " address book: "
@@ -2203,8 +2204,8 @@ msgstr "_Hilfe"
 
 #. new button
 #: ../src/ab-main.c:556 ../src/filter-edit-dialog.c:218
-#: ../src/mailbox-node.c:1053 ../src/main-window.c:327
-#: ../src/main-window.c:557 ../src/main-window.c:566
+#: ../src/mailbox-node.c:1053 ../src/main-window.c:327 ../src/main-window.c:557
+#: ../src/main-window.c:566
 msgid "_New"
 msgstr "_Neu"
 
@@ -2922,8 +2923,8 @@ msgid ""
 "Checking the signature of the message sent by %s with subject \"%s\" failed "
 "with an error!"
 msgstr ""
-"Die Überprüfung der von %s mit dem Betreff »%s« verschickten Nachricht schlug "
-"fehl und lieferte einen Fehler!"
+"Die Überprüfung der von %s mit dem Betreff »%s« verschickten Nachricht "
+"schlug fehl und lieferte einen Fehler!"
 
 #: ../src/balsa-message.c:2994
 msgid ""
@@ -3011,7 +3012,7 @@ msgid "Access type: local-file\n"
 msgstr "Verbindungstyp: Lokale Datei\n"
 
 #: ../src/balsa-mime-widget-message.c:167
-#: ../src/balsa-mime-widget-message.c:213 ../src/balsa-mime-widget.c:235
+#: ../src/balsa-mime-widget-message.c:213 ../src/balsa-mime-widget.c:236
 #, c-format
 msgid "File name: %s"
 msgstr "Dateiname: %s"
@@ -3192,27 +3193,27 @@ msgstr "Organisation"
 msgid "Email Address"
 msgstr "E-Mail-Adresse"
 
-#: ../src/balsa-mime-widget.c:254
+#: ../src/balsa-mime-widget.c:255
 #, c-format
 msgid "Error reading message part: %s"
 msgstr "Fehler beim Lesen des Nachrichtenteil: %s"
 
-#: ../src/balsa-mime-widget.c:278
+#: ../src/balsa-mime-widget.c:279
 #, c-format
 msgid "Type: %s (%s)"
 msgstr "Typ: %s (%s)"
 
-#: ../src/balsa-mime-widget.c:282
+#: ../src/balsa-mime-widget.c:283
 #, c-format
 msgid "Content Type: %s"
 msgstr "Inhaltstyp: %s"
 
-#: ../src/balsa-mime-widget.c:294
+#: ../src/balsa-mime-widget.c:296
 msgid "No open or view action defined for this content type"
 msgstr ""
 "Mit diesem Inhaltstyp ist keine Aktion zum Öffnen oder Anzeigen verknüpft"
 
-#: ../src/balsa-mime-widget.c:299
+#: ../src/balsa-mime-widget.c:301
 msgid "S_ave part"
 msgstr "Teil s_peichern"
 
@@ -3229,35 +3230,35 @@ msgstr "Typ:"
 msgid "File name:"
 msgstr "Dateiname:"
 
-#: ../src/balsa-print-object-text.c:656
+#: ../src/balsa-print-object-text.c:665
 msgid "Summary"
 msgstr "Zusammenfassung"
 
-#: ../src/balsa-print-object-text.c:658
+#: ../src/balsa-print-object-text.c:667
 msgid "Organizer"
 msgstr "Organizer"
 
-#: ../src/balsa-print-object-text.c:660
+#: ../src/balsa-print-object-text.c:669
 msgid "Start"
 msgstr "Start"
 
-#: ../src/balsa-print-object-text.c:662
+#: ../src/balsa-print-object-text.c:671
 msgid "End"
 msgstr "Ende"
 
-#: ../src/balsa-print-object-text.c:664
+#: ../src/balsa-print-object-text.c:673
 msgid "Location"
 msgstr "Ort"
 
-#: ../src/balsa-print-object-text.c:673
+#: ../src/balsa-print-object-text.c:682
 msgid "Attendees"
 msgstr "Teilnehmer"
 
-#: ../src/balsa-print-object-text.c:673
+#: ../src/balsa-print-object-text.c:682
 msgid "Attendee"
 msgstr "Teilnehmer"
 
-#: ../src/balsa-print-object-text.c:687 ../src/sendmsg-window.c:3022
+#: ../src/balsa-print-object-text.c:696 ../src/sendmsg-window.c:3022
 msgid "Description"
 msgstr "Beschreibung"
 
@@ -5100,7 +5101,8 @@ msgstr "Datei zur Adresse beilegen"
 #, c-format
 msgid "Run '%s --help' to see a full list of available command line options.\n"
 msgstr ""
-"Rufen Sie »%s --help« auf, um eine vollständige Liste der Befehlszeilenoptionen zu erhalten.\n"
+"Rufen Sie »%s --help« auf, um eine vollständige Liste der "
+"Befehlszeilenoptionen zu erhalten.\n"
 
 #: ../src/main.c:580 ../src/main.c:585 ../src/main.c:591 ../src/main.c:597
 #: ../src/main.c:603
@@ -5439,7 +5441,7 @@ msgstr "Layout"
 msgid "Sort and thread"
 msgstr "Sortierung und Themen"
 
-#: ../src/pref-manager.c:2111 ../src/print-gtk.c:486
+#: ../src/pref-manager.c:2111 ../src/print-gtk.c:485
 msgid "Message"
 msgstr "Nachricht"
 
@@ -5544,7 +5546,7 @@ msgstr "Editor-Fenster"
 msgid "Invalid or incomplete address label color"
 msgstr "Ungültige oder unvollständige Farbe für Adress-Etikett"
 
-#: ../src/pref-manager.c:2337 ../src/print-gtk.c:495
+#: ../src/pref-manager.c:2337 ../src/print-gtk.c:494
 msgid "Fonts"
 msgstr "Schriften"
 
@@ -5767,7 +5769,7 @@ msgstr "Signieren"
 msgid "This is an inline %s signed %s message part:"
 msgstr "Dies ist ein integrierter %s signierter %s Nachrichtenteil:"
 
-#: ../src/print-gtk.c:347
+#: ../src/print-gtk.c:346
 #, c-format
 msgid "Cannot print page %d because the document has only %d pages."
 msgstr ""
@@ -5779,63 +5781,63 @@ msgstr ""
 #. * Do *not* translate it to "predefinito:mm", if it
 #. * it isn't default:mm or default:inch it will not work
 #.
-#: ../src/print-gtk.c:381
+#: ../src/print-gtk.c:380
 msgid "default:mm"
 msgstr "default:mm"
 
-#: ../src/print-gtk.c:438
+#: ../src/print-gtk.c:437
 msgid "inch"
 msgstr "Zoll"
 
-#: ../src/print-gtk.c:445
+#: ../src/print-gtk.c:444
 msgid "mm"
 msgstr "mm"
 
-#: ../src/print-gtk.c:516
+#: ../src/print-gtk.c:515
 msgid "_Header Font:"
 msgstr "_Kopfzeilen-Schriftart:"
 
-#: ../src/print-gtk.c:519
+#: ../src/print-gtk.c:518
 msgid "B_ody Font:"
 msgstr "_Nachrichtenrumpf-Schriftart:"
 
-#: ../src/print-gtk.c:522
+#: ../src/print-gtk.c:521
 msgid "_Footer Font:"
 msgstr "_Fußzeilen-Schriftart:"
 
-#: ../src/print-gtk.c:529
+#: ../src/print-gtk.c:528
 msgid "Highlighting"
 msgstr "Hervorhebungen"
 
-#: ../src/print-gtk.c:544
+#: ../src/print-gtk.c:543
 msgid "Highlight _cited text"
 msgstr "_Zitierten Text hervorheben"
 
-#: ../src/print-gtk.c:553
+#: ../src/print-gtk.c:552
 msgid "Highlight _structured phrases"
 msgstr "_Strukturierte Phrasen hervorheben"
 
-#: ../src/print-gtk.c:564
+#: ../src/print-gtk.c:563
 msgid "Margins"
 msgstr "Ränder"
 
-#: ../src/print-gtk.c:586
+#: ../src/print-gtk.c:585
 msgid "_Top"
 msgstr "_Oben"
 
-#: ../src/print-gtk.c:592
+#: ../src/print-gtk.c:591
 msgid "_Bottom"
 msgstr "_Unten"
 
-#: ../src/print-gtk.c:604
+#: ../src/print-gtk.c:603
 msgid "_Left"
 msgstr "_Links"
 
-#: ../src/print-gtk.c:610
+#: ../src/print-gtk.c:609
 msgid "_Right"
 msgstr "_Rechts"
 
-#: ../src/print-gtk.c:734
+#: ../src/print-gtk.c:733
 #, c-format
 msgid "Error printing message: %s"
 msgstr "Fehler beim Drucken der Nachricht: %s"
@@ -5943,8 +5945,8 @@ msgstr ""
 msgid ""
 "The option to request a MDN is now on the Options menu of the compose window."
 msgstr ""
-"Die Möglichkeit, eine Empfangsbestätigung zu erbitten, befindet sich nun im "
-"Einstellungsmenü des Editorfensters."
+"Die Möglichkeit, eine Empfangsbestätigung (MDN) zu erbitten, befindet sich "
+"nun im Einstellungsmenü des Editorfensters."
 
 #: ../src/save-restore.c:1132
 msgid ""
@@ -6312,11 +6314,11 @@ msgstr "_Kopie an:"
 
 #: ../src/sendmsg-window.c:434
 msgid "_Request Disposition Notification"
-msgstr "Um _Empfangsbestätigung bitten"
+msgstr "Um _Empfangsbestätigung (MDN) bitten"
 
 #: ../src/sendmsg-window.c:435
 msgid "Request Message Disposition Notification"
-msgstr "Um Empfangsbestätigung bitten"
+msgstr "Um Empfangsbestätigung (MDN) bitten"
 
 #: ../src/sendmsg-window.c:437
 msgid "_Format = Flowed"

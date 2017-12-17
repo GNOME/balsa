@@ -732,7 +732,7 @@ balsa_message_init(BalsaMessage * bm)
 
     gesture = gtk_gesture_multi_press_new(GTK_WIDGET(bm->treeview));
     gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(gesture), 0);
-    g_object_set_data_full(G_OBJECT(bm->treeview), "bm-gesture", gesture, g_object_unref);
+    g_object_set_data_full(G_OBJECT(bm->treeview), "balsa-gesture", gesture, g_object_unref);
     g_signal_connect(gesture, "pressed",
                      G_CALLBACK(bm_gesture_pressed_cb), NULL);
 

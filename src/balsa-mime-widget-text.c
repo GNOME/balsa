@@ -271,7 +271,7 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
         GtkGesture *gesture;
 
         gesture = gtk_gesture_multi_press_new(mw->widget);
-        g_object_set_data_full(G_OBJECT(mw->widget), "mwt-gesture", gesture, g_object_unref);
+        g_object_set_data_full(G_OBJECT(mw->widget), "balsa-gesture", gesture, g_object_unref);
         g_signal_connect(gesture, "pressed",
                          G_CALLBACK(store_button_coords), bm);
 

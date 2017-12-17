@@ -106,7 +106,7 @@ balsa_mime_widget_new_image(BalsaMessage * bm,
 
     gesture = gtk_gesture_multi_press_new(GTK_WIDGET(image));
     gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(gesture), 0);
-    g_object_set_data_full(G_OBJECT(image), "mwi-gesture", gesture, g_object_unref);
+    g_object_set_data_full(G_OBJECT(image), "balsa-gesture", gesture, g_object_unref);
     g_signal_connect(gesture, "pressed",
                      G_CALLBACK(balsa_mime_widget_image_gesture_pressed_cb), data);
 

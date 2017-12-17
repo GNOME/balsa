@@ -288,7 +288,7 @@ lb_gpgme_select_key(const gchar * user_name, lb_key_sel_md_t mode, GList * keys,
     gtk_container_add(GTK_CONTAINER(scrolled_window), tree_view);
 
     gesture = gtk_gesture_multi_press_new(tree_view);
-    g_object_set_data_full(G_OBJECT(tree_view), "tree-view-gesture",
+    g_object_set_data_full(G_OBJECT(tree_view), "balsa-gesture",
                            gesture, g_object_unref);
     g_signal_connect(gesture, "pressed", G_CALLBACK(tree_view_multi_press_cb), dialog);
 

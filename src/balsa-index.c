@@ -435,7 +435,7 @@ bndx_instance_init(BalsaIndex * index)
      * necessary */
     gesture = gtk_gesture_multi_press_new(GTK_WIDGET(index));
     gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(gesture), 0);
-    g_object_set_data_full(G_OBJECT(index), "bndx-gesture", gesture, g_object_unref);
+    g_object_set_data_full(G_OBJECT(index), "balsa-gesture", gesture, g_object_unref);
     g_signal_connect(gesture, "pressed",
 		     G_CALLBACK(bndx_gesture_pressed_cb), NULL);
 

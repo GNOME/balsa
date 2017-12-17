@@ -1177,7 +1177,7 @@ balsa_mblist_default_signal_bindings(BalsaMBList * mblist)
 
     gesture = gtk_gesture_multi_press_new(GTK_WIDGET(mblist));
     gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(gesture), 0);
-    g_object_set_data_full(G_OBJECT(mblist), "bmbl-gesture", gesture, g_object_unref);
+    g_object_set_data_full(G_OBJECT(mblist), "balsa-gesture", gesture, g_object_unref);
     g_signal_connect(gesture, "pressed",
                      G_CALLBACK(bmbl_gesture_pressed_cb), NULL);
 

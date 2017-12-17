@@ -2714,7 +2714,7 @@ sw_attachment_list(BalsaSendmsg *bsmsg)
 
     gesture = gtk_gesture_multi_press_new(tree_view);
     gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(gesture), 0);
-    g_object_set_data_full(G_OBJECT(tree_view), "sw-gesture", gesture, g_object_unref);
+    g_object_set_data_full(G_OBJECT(tree_view), "balsa-gesture", gesture, g_object_unref);
     g_signal_connect(gesture, "pressed",
                      G_CALLBACK(sw_gesture_pressed_cb), NULL);
 

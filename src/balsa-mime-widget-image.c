@@ -66,8 +66,13 @@ balsa_mime_widget_image_class_init(BalsaMimeWidgetImageClass * klass)
  * End of GObject class definitions
  */
 
-static gboolean balsa_image_button_press_cb(GtkWidget * widget, GdkEventButton * event,
-					    GtkMenu * menu);
+static void balsa_mime_widget_image_gesture_pressed_cb(GtkGestureMultiPress *multi_press,
+                                                       gint                  n_press,
+                                                       gdouble               x,
+                                                       gdouble               y,
+                                                       gpointer              user_data);
+static gboolean balsa_mime_widget_image_popup_menu_cb(GtkWidget * widget,
+                                                      gpointer    user_data);
 static gboolean img_check_size(GtkImage ** widget_p);
 
 BalsaMimeWidget *
@@ -78,6 +83,7 @@ balsa_mime_widget_new_image(BalsaMessage * bm,
     GdkPixbuf *pixbuf;
     GtkWidget *image;
     GError * load_err = NULL;
+    GtkGesture *gesture;
     BalsaMimeWidget *mw;
 
     g_return_val_if_fail(mime_body != NULL, NULL);
@@ -98,8 +104,17 @@ balsa_mime_widget_new_image(BalsaMessage * bm,
 
     g_object_set_data_full(G_OBJECT(image), "pixbuf", pixbuf, g_object_unref);
 
-    g_signal_connect(image, "button-press-event",
-                     G_CALLBACK(balsa_image_button_press_cb), data);
+    gesture = gtk_gesture_multi_press_new(GTK_WIDGET(image));
+    gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(gesture), 0);
+    g_object_set_data_full(G_OBJECT(image), "mwi-gesture", gesture, g_object_unref);
+    g_signal_connect(gesture, "pressed",
+                     G_CALLBACK(balsa_mime_widget_image_gesture_pressed_cb), data);
+
+#if 0
+    gtk_widget_add_events(GTK_WIDGET(image), GDK_KEY_PRESS_MASK | GDK_KEY_RELEASE_MASK);
+#endif
+    g_signal_connect(image, "popup-menu",
+                     G_CALLBACK(balsa_mime_widget_image_popup_menu_cb), data);
 
     mw = (BalsaMimeWidget *) g_object_new(BALSA_TYPE_MIME_WIDGET_IMAGE, NULL);
     mw->widget = image;
@@ -128,15 +143,37 @@ balsa_mime_widget_image_resize_all(GtkWidget * widget, gpointer user_data)
 }
 
 
-static gboolean
-balsa_image_button_press_cb(GtkWidget * widget, GdkEventButton * event,
-                            GtkMenu * menu)
+static void
+balsa_mime_widget_image_gesture_pressed_cb(GtkGestureMultiPress *multi_press,
+                                           gint                  n_press,
+                                           gdouble               x,
+                                           gdouble               y,
+                                           gpointer              user_data)
 {
-    if (gdk_event_triggers_context_menu((GdkEvent *) event)) {
-        gtk_menu_popup_at_pointer(menu, (GdkEvent *) event);
-        return TRUE;
-    } else
-        return FALSE;
+    GtkMenu *menu = user_data;
+    GtkGesture *gesture;
+    const GdkEvent *event;
+
+    gesture = GTK_GESTURE(multi_press);
+    event = gtk_gesture_get_last_event(gesture, gtk_gesture_get_last_updated_sequence(gesture));
+    g_return_if_fail(event != NULL);
+
+    if (gdk_event_triggers_context_menu(event)) {
+        gtk_menu_popup_at_pointer(menu, event);
+    }
+}
+
+static gboolean
+balsa_mime_widget_image_popup_menu_cb(GtkWidget * widget,
+                                      gpointer    user_data)
+{
+    GtkMenu *menu = user_data;
+
+    gtk_menu_popup_at_widget(GTK_MENU(menu), widget,
+                             GDK_GRAVITY_CENTER, GDK_GRAVITY_CENTER,
+                             NULL);
+
+    return TRUE;
 }
 
 static gboolean

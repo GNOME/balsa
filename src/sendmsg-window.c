@@ -2440,20 +2440,27 @@ create_from_entry(GtkWidget * grid, BalsaSendmsg * bsmsg)
     create_email_or_string_entry(bsmsg, grid, _("F_rom:"), 0, bsmsg->from);
 }
 
-static gboolean
-attachment_button_press_cb(GtkWidget * widget, GdkEvent * event,
-			   gpointer data)
+static void
+sw_gesture_pressed_cb(GtkGestureMultiPress *multi_press,
+                      gint                  n_press,
+                      gdouble               x,
+                      gdouble               y,
+                      gpointer              user_data)
 {
-    GtkTreeView *tree_view = GTK_TREE_VIEW(widget);
+    GtkGesture *gesture;
+    const GdkEvent *event;
+    GtkTreeView *tree_view;
     GtkTreePath *path;
-    gdouble x_win, y_win;
 
-    g_return_val_if_fail(event, FALSE);
-    if (!gdk_event_triggers_context_menu(event)
-        || !gdk_event_get_coords(event, &x_win, &y_win))
-        return FALSE;
+    gesture = GTK_GESTURE(multi_press);
+    event = gtk_gesture_get_last_event(gesture, gtk_gesture_get_last_updated_sequence(gesture));
+    g_return_if_fail(event != NULL);
+    if (!gdk_event_triggers_context_menu(event))
+        return;
 
-    if (gtk_tree_view_get_path_at_pos(tree_view, (gint) x_win, (gint) y_win,
+    tree_view = GTK_TREE_VIEW(gtk_event_controller_get_widget(GTK_EVENT_CONTROLLER(gesture)));
+
+    if (gtk_tree_view_get_path_at_pos(tree_view, (gint) x, (gint) y,
                                       &path, NULL, NULL, NULL)) {
         GtkTreeIter iter;
         GtkTreeSelection * selection =
@@ -2478,8 +2485,6 @@ attachment_button_press_cb(GtkWidget * widget, GdkEvent * event,
         }
         gtk_tree_path_free(path);
     }
-
-    return TRUE;
 }
 
 
@@ -2625,6 +2630,7 @@ sw_attachment_list(BalsaSendmsg *bsmsg)
     GtkTreeViewColumn *column;
     GtkWidget *frame;
     GdkContentFormats *formats;
+    GtkGesture *gesture;
 
     grid = gtk_grid_new();
     gtk_grid_set_row_spacing(GTK_GRID(grid), 6);
@@ -2705,10 +2711,15 @@ sw_attachment_list(BalsaSendmsg *bsmsg)
 
     gtk_tree_selection_set_mode(gtk_tree_view_get_selection(view),
 				GTK_SELECTION_SINGLE);
+
+    gesture = gtk_gesture_multi_press_new(tree_view);
+    gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(gesture), 0);
+    g_object_set_data_full(G_OBJECT(tree_view), "sw-gesture", gesture, g_object_unref);
+    g_signal_connect(gesture, "pressed",
+                     G_CALLBACK(sw_gesture_pressed_cb), NULL);
+
     g_signal_connect(view, "popup-menu",
                      G_CALLBACK(attachment_popup_cb), NULL);
-    g_signal_connect(view, "button_press_event",
-                     G_CALLBACK(attachment_button_press_cb), NULL);
 
     g_signal_connect(G_OBJECT(bsmsg->window), "drag_data_received",
 		     G_CALLBACK(attachments_add), bsmsg);

@@ -91,7 +91,11 @@ static GdkCursor *url_cursor_normal = NULL;
 static GdkCursor *url_cursor_over_url = NULL;
 
 
-static gboolean store_button_coords(GtkWidget * widget, GdkEvent * event, gpointer data);
+static void store_button_coords(GtkGestureMultiPress *multi_press,
+                                gint                  n_press,
+                                gdouble               x,
+                                gdouble               y,
+                                gpointer              user_data);
 static gboolean check_over_url(GtkWidget           * widget,
                                GdkEvent            * event,
                                BalsaMimeWidgetText * mwt);
@@ -264,8 +268,13 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
     g_signal_connect_after(G_OBJECT(mw->widget), "realize",
 			   G_CALLBACK(fix_text_widget), mwt->url_list);
     if (mwt->url_list != NULL) {
-	g_signal_connect(G_OBJECT(mw->widget), "button_press_event",
-			 G_CALLBACK(store_button_coords), NULL);
+        GtkGesture *gesture;
+
+        gesture = gtk_gesture_multi_press_new(mw->widget);
+        g_object_set_data_full(G_OBJECT(mw->widget), "mwt-gesture", gesture, g_object_unref);
+        g_signal_connect(gesture, "pressed",
+                         G_CALLBACK(store_button_coords), bm);
+
 	g_signal_connect(G_OBJECT(mw->widget), "button_release_event",
 			 G_CALLBACK(check_call_url), mwt->url_list);
 	g_signal_connect(G_OBJECT(mw->widget), "motion-notify-event",
@@ -584,28 +593,29 @@ text_view_populate_popup(GtkWidget *widget, GtkMenu *menu,
 
 /* -- URL related stuff -- */
 
-static gboolean
-store_button_coords(GtkWidget * widget, GdkEvent * event,
-                    gpointer data)
+static void
+store_button_coords(GtkGestureMultiPress *multi_press,
+                    gint                  n_press,
+                    gdouble               x,
+                    gdouble               y,
+                    gpointer              user_data)
 {
-    guint button;
+    GtkGesture *gesture;
+    const GdkEvent *event;
+    GdkModifierType state;
 
-    if (gdk_event_get_event_type(event) == GDK_BUTTON_PRESS &&
-        gdk_event_get_button(event, &button) && button == 1) {
-        gdouble x_win, y_win;
-        GdkModifierType state;
+    gesture = GTK_GESTURE(multi_press);
+    event = gtk_gesture_get_last_event(gesture, gtk_gesture_get_last_updated_sequence(gesture));
+    g_return_if_fail(event != NULL);
 
-        if (gdk_event_get_coords(event, &x_win, &y_win) &&
-            gdk_event_get_state(event, &state)) {
-            stored_x = (gint) x_win;
-            stored_y = (gint) y_win;
-            stored_mask = state;
-        }
+    stored_x = (gint) x;
+    stored_y = (gint) y;
 
+    if (gdk_event_get_state(event, &state)) {
         /* compare only shift, ctrl, and mod1-mod5 */
-        stored_mask &= STORED_MASK_BITS;
+        state &= STORED_MASK_BITS;
+        stored_mask = state;
     }
-    return FALSE;
 }
 
 /* check if we are over an url and change the cursor in this case */
@@ -1144,12 +1154,25 @@ balsa_gtk_html_popup(GtkWidget * html, BalsaMessage * bm)
     return TRUE;
 }
 
-static gboolean
-balsa_gtk_html_button_press_cb(GtkWidget * html, GdkEventButton * event,
-                               BalsaMessage * bm)
+static void
+mwt_gesture_pressed_cb(GtkGestureMultiPress *multi_press,
+                       gint                  n_press,
+                       gdouble               x,
+                       gdouble               y,
+                       gpointer              user_data)
 {
-    return (gdk_event_triggers_context_menu((GdkEvent *) event)
-            ? balsa_gtk_html_popup(html, bm) : FALSE);
+    GtkGesture *gesture;
+    const GdkEvent *event;
+    GtkWidget *html;
+    BalsaMessage *bm = user_data;
+
+    gesture = GTK_GESTURE(multi_press);
+    event = gtk_gesture_get_last_event(gesture, gtk_gesture_get_last_updated_sequence(gesture));
+    g_return_if_fail(event != NULL);
+    html = gtk_event_controller_get_widget(GTK_EVENT_CONTROLLER(gesture));
+
+    if (gdk_event_triggers_context_menu(event))
+        balsa_gtk_html_popup(html, bm);
 }
 
 static void
@@ -1186,8 +1209,14 @@ bm_widget_new_html(BalsaMessage * bm, LibBalsaMessageBody * mime_body)
         g_signal_connect(widget, "populate-popup",
                          G_CALLBACK(bmwt_populate_popup_cb), mw->widget);
     } else {
-        g_signal_connect(mw->widget, "button-press-event",
-                         G_CALLBACK(balsa_gtk_html_button_press_cb), bm);
+        GtkGesture *gesture;
+
+        gesture = gtk_gesture_multi_press_new(mw->widget);
+        gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(gesture), 0);
+        g_object_set_data_full(G_OBJECT(mw->widget), "mwt-gesture", gesture, g_object_unref);
+        g_signal_connect(gesture, "pressed",
+                         G_CALLBACK(mwt_gesture_pressed_cb), bm);
+
         g_signal_connect(mw->widget, "popup-menu",
                          G_CALLBACK(balsa_gtk_html_popup), bm);
     }

@@ -103,7 +103,11 @@ static void pointer_over_url(GtkWidget * widget, message_url_t * url, gboolean s
 static void prepare_url_offsets(GtkTextBuffer * buffer, GList * url_list);
 static void url_found_cb(GtkTextBuffer * buffer, GtkTextIter * iter,
                          const gchar * buf, guint len, gpointer data);
-static gboolean check_call_url(GtkWidget * widget, GdkEvent * event, GList * url_list);
+static void check_call_url(GtkGestureMultiPress *multi_press,
+                           gint                  n_press,
+                           gdouble               x,
+                           gdouble               y,
+                           gpointer              user_data);
 static message_url_t * find_url(GtkWidget * widget, gint x, gint y, GList * url_list);
 static void handle_url(const gchar* url);
 static void free_url_list(GList * url_list);
@@ -274,9 +278,9 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
         g_object_set_data_full(G_OBJECT(mw->widget), "balsa-gesture", gesture, g_object_unref);
         g_signal_connect(gesture, "pressed",
                          G_CALLBACK(store_button_coords), bm);
-
-	g_signal_connect(G_OBJECT(mw->widget), "button_release_event",
+	g_signal_connect(gesture, "released",
 			 G_CALLBACK(check_call_url), mwt->url_list);
+
 	g_signal_connect(G_OBJECT(mw->widget), "motion-notify-event",
 			 G_CALLBACK(check_over_url), mwt);
 	g_signal_connect(G_OBJECT(mw->widget), "leave-notify-event",
@@ -732,32 +736,37 @@ url_found_cb(GtkTextBuffer * buffer, GtkTextIter * iter,
 
 /* if the mouse button was released over an URL, and the mouse hasn't
  * moved since the button was pressed, try to call the URL */
-static gboolean
-check_call_url(GtkWidget * widget, GdkEvent * event, GList * url_list)
+static void
+check_call_url(GtkGestureMultiPress *multi_press,
+               gint                  n_press,
+               gdouble               x,
+               gdouble               y,
+               gpointer              user_data)
 {
-    guint button;
-    gdouble x_win, y_win;
+    GtkGesture *gesture;
+    const GdkEvent *event;
     GdkModifierType state;
-    gint x, y;
-    message_url_t *url;
 
-    if (gdk_event_get_event_type(event) != GDK_BUTTON_RELEASE ||
-        !gdk_event_get_button(event, &button) || button != 1 ||
-        !gdk_event_get_coords(event, &x_win, &y_win) ||
-        !gdk_event_get_state(event, &state)) {
-        return FALSE;
+    gesture = GTK_GESTURE(multi_press);
+    event = gtk_gesture_get_last_event(gesture, gtk_gesture_get_last_updated_sequence(gesture));
+    g_return_if_fail(event != NULL);
+
+    if (!gdk_event_get_state(event, &state)) {
+        return;
     }
 
-    x = (gint) x_win;
-    y = (gint) y_win;
     /* 2-pixel motion tolerance */
-    if (abs(x - stored_x) <= 2 && abs(y - stored_y) <= 2
+    if (abs(((gint) x) - stored_x) <= 2 && abs(((gint) y) - stored_y) <= 2
         && (state & STORED_MASK_BITS) == stored_mask) {
-        url = find_url(widget, x, y, url_list);
+        GtkWidget *widget;
+        message_url_t *url;
+        GList *url_list = user_data;
+
+        widget = gtk_event_controller_get_widget(GTK_EVENT_CONTROLLER(gesture));
+        url = find_url(widget, (gint) x, (gint) y, url_list);
         if (url != NULL)
             handle_url(url->url);
     }
-    return FALSE;
 }
 
 /* find_url:

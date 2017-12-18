@@ -96,9 +96,9 @@ static void store_button_coords(GtkGestureMultiPress *multi_press,
                                 gdouble               x,
                                 gdouble               y,
                                 gpointer              user_data);
-static gboolean check_over_url(GtkWidget           * widget,
-                               GdkEvent            * event,
-                               BalsaMimeWidgetText * mwt);
+static void check_over_url(GtkWidget           * widget,
+                           message_url_t       * url,
+                           BalsaMimeWidgetText * mwt);
 static void pointer_over_url(GtkWidget * widget, message_url_t * url, gboolean set);
 static void prepare_url_offsets(GtkTextBuffer * buffer, GList * url_list);
 static void url_found_cb(GtkTextBuffer * buffer, GtkTextIter * iter,
@@ -175,6 +175,40 @@ balsa_mime_widget_text_init(BalsaMimeWidgetText * self)
 /*
  * End of class definition
  */
+
+/*
+ * Callbacks
+ */
+
+static void
+mwt_controller_motion_cb(GtkEventControllerMotion * motion,
+                         gdouble                    x,
+                         gdouble                    y,
+                         gpointer                   user_data)
+{
+    BalsaMimeWidgetText *mwt = user_data;
+    GtkWidget *widget;
+    message_url_t *url;
+
+    widget = gtk_event_controller_get_widget(GTK_EVENT_CONTROLLER(motion));
+    url = find_url(widget, (gint) x, (gint) y, mwt->url_list);
+
+    check_over_url(widget, url, mwt);
+}
+
+static void
+mwt_controller_leave_cb(GtkEventControllerMotion * motion,
+                        gdouble                    x,
+                        gdouble                    y,
+                        gpointer                   user_data)
+{
+    BalsaMimeWidgetText *mwt = user_data;
+    GtkWidget *widget;
+
+    widget = gtk_event_controller_get_widget(GTK_EVENT_CONTROLLER(motion));
+
+    check_over_url(widget, NULL, mwt);
+}
 
 BalsaMimeWidget *
 balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
@@ -273,18 +307,22 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
 			   G_CALLBACK(fix_text_widget), mwt->url_list);
     if (mwt->url_list != NULL) {
         GtkGesture *gesture;
+        GtkEventController *controller;
 
         gesture = gtk_gesture_multi_press_new(mw->widget);
         g_object_set_data_full(G_OBJECT(mw->widget), "balsa-gesture", gesture, g_object_unref);
         g_signal_connect(gesture, "pressed",
-                         G_CALLBACK(store_button_coords), bm);
+                         G_CALLBACK(store_button_coords), NULL);
 	g_signal_connect(gesture, "released",
 			 G_CALLBACK(check_call_url), mwt->url_list);
 
-	g_signal_connect(G_OBJECT(mw->widget), "motion-notify-event",
-			 G_CALLBACK(check_over_url), mwt);
-	g_signal_connect(G_OBJECT(mw->widget), "leave-notify-event",
-			 G_CALLBACK(check_over_url), mwt);
+        controller = gtk_event_controller_motion_new(mw->widget);
+        g_object_set_data_full(G_OBJECT(mw->widget),
+                               "balsa-controller", controller, g_object_unref);
+        g_signal_connect(controller, "motion",
+                         G_CALLBACK(mwt_controller_motion_cb), mwt);
+        g_signal_connect(controller, "leave",
+                         G_CALLBACK(mwt_controller_leave_cb), mwt);
     }
 
     if (is_text_plain) {
@@ -623,20 +661,12 @@ store_button_coords(GtkGestureMultiPress *multi_press,
 }
 
 /* check if we are over an url and change the cursor in this case */
-static gboolean
-check_over_url(GtkWidget * widget, GdkEvent * event,
+static void
+check_over_url(GtkWidget           * widget,
+               message_url_t       * url,
                BalsaMimeWidgetText * mwt)
 {
     static gboolean was_over_url = FALSE;
-    message_url_t *url = NULL;
-
-    if (gdk_event_get_event_type(event) != GDK_LEAVE_NOTIFY) {
-        gdouble x_win, y_win;
-
-        if (gdk_event_get_coords(event, &x_win, &y_win)) {
-            url = find_url(widget, (gint) x_win, (gint) y_win, mwt->url_list);
-        }
-    }
 
     if (url) {
         if (!url_cursor_normal || !url_cursor_over_url) {
@@ -660,9 +690,8 @@ check_over_url(GtkWidget * widget, GdkEvent * event,
     }
 
     mwt->current_url = url;
-
-    return FALSE;
 }
+
 
 /* pointer_over_url:
  * change style of a url and set/clear the status bar.

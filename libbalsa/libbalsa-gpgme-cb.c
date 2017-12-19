@@ -126,34 +126,16 @@ lb_gpgme_passphrase(void *hook, const gchar * uid_hint,
 
 
 static void
-tree_view_multi_press_cb(GtkGestureMultiPress * gesture,
-                         gint                   n_press,
-                         gdouble                x,
-                         gdouble                y,
-                         gpointer               user_data)
+lb_gpgme_row_activated_cb(GtkTreeView       * tree_view,
+                          GtkTreePath       * path,
+                          GtkTreeViewColumn * column,
+                          gpointer            user_data)
 {
-    GtkTreeView *tree_view;
-    GtkTreeSelection *selection;
-    GtkTreePath *path;
     GtkTreeIter iter;
     GtkTreeModel *model;
 
-    if (n_press != 2) {
-        return;
-    }
-    gtk_gesture_set_state(GTK_GESTURE(gesture), GTK_EVENT_SEQUENCE_CLAIMED);
-
-    tree_view = GTK_TREE_VIEW(gtk_event_controller_get_widget(GTK_EVENT_CONTROLLER(gesture)));
-    selection = gtk_tree_view_get_selection(tree_view);
-    if (gtk_tree_view_get_path_at_pos(tree_view, (gint) x, (gint) y, &path, NULL, NULL, NULL)) {
-        if (!gtk_tree_selection_path_is_selected(selection, path)) {
-            gtk_tree_view_set_cursor(tree_view, path, NULL, FALSE);
-            gtk_tree_view_scroll_to_cell(tree_view, path, NULL, FALSE, 0, 0);
-        }
-        gtk_tree_path_free(path);
-    }
-
-    if (gtk_tree_selection_get_selected(selection, &model, &iter)) {
+    model = gtk_tree_view_get_model(tree_view);
+    if (gtk_tree_model_get_iter(model, &iter, path)) {
     	gpgme_key_t key;
     	GtkWidget *dialog;
 
@@ -163,7 +145,6 @@ tree_view_multi_press_cb(GtkGestureMultiPress * gesture,
         gtk_widget_destroy(dialog);
     }
 }
-
 
 gpgme_key_t
 lb_gpgme_select_key(const gchar * user_name, lb_key_sel_md_t mode, GList * keys,
@@ -183,7 +164,6 @@ lb_gpgme_select_key(const gchar * user_name, lb_key_sel_md_t mode, GList * keys,
     gint width, height;
 	GtkCellRenderer *renderer;
 	GtkTreeViewColumn *column;
-    GtkGesture *gesture;
 
     /* FIXME: create dialog according to the Gnome HIG */
     dialog = gtk_dialog_new_with_buttons(_("Select key"),
@@ -250,6 +230,8 @@ lb_gpgme_select_key(const gchar * user_name, lb_key_sel_md_t mode, GList * keys,
     gtk_tree_sortable_set_sort_column_id(sortable, 0, GTK_SORT_ASCENDING);
 
     tree_view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(model));
+    g_signal_connect(tree_view, "row-activated",
+                     G_CALLBACK(lb_gpgme_row_activated_cb), dialog);
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree_view));
     g_object_set_data(G_OBJECT(selection), "dialog", dialog);
     g_object_set_data(G_OBJECT(selection), "first", GUINT_TO_POINTER(1));
@@ -286,11 +268,6 @@ lb_gpgme_select_key(const gchar * user_name, lb_key_sel_md_t mode, GList * keys,
 	gtk_tree_view_column_set_resizable(column, TRUE);
 
     gtk_container_add(GTK_CONTAINER(scrolled_window), tree_view);
-
-    gesture = gtk_gesture_multi_press_new(tree_view);
-    g_object_set_data_full(G_OBJECT(tree_view), "balsa-gesture",
-                           gesture, g_object_unref);
-    g_signal_connect(gesture, "pressed", G_CALLBACK(tree_view_multi_press_cb), dialog);
 
     /* set window size to 2/3 of the parent */
     gtk_window_get_size(parent, &width, &height);

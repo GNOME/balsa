@@ -3507,7 +3507,7 @@ lbm_sort(LibBalsaMailbox * mbox, GNode * parent)
     iter.user_data = parent;
     path = parent->parent ? mbox_model_get_path(GTK_TREE_MODEL(mbox), &iter)
                           : gtk_tree_path_new();
-    gtk_tree_model_rows_reordered(GTK_TREE_MODEL(mbox),
+    g_signal_emit(mbox, libbalsa_mbox_model_signals[ROWS_REORDERED], 0,
                                   path, &iter, new_order);
     gtk_tree_path_free(path);
     g_free(new_order);

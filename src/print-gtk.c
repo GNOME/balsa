@@ -646,16 +646,13 @@ message_prefs_apply(GtkPrintOperation * operation, GtkWidget * widget,
 {
     g_free(balsa_app.print_header_font);
     balsa_app.print_header_font =
-	g_strdup(gtk_font_button_get_font_name
-		 (GTK_FONT_BUTTON(print_prefs->header_font)));
+	gtk_font_chooser_get_font(GTK_FONT_CHOOSER(print_prefs->header_font));
     g_free(balsa_app.print_body_font);
     balsa_app.print_body_font =
-	g_strdup(gtk_font_button_get_font_name
-		 (GTK_FONT_BUTTON(print_prefs->body_font)));
+	gtk_font_chooser_get_font(GTK_FONT_CHOOSER(print_prefs->body_font));
     g_free(balsa_app.print_footer_font);
     balsa_app.print_footer_font =
-	g_strdup(gtk_font_button_get_font_name
-		 (GTK_FONT_BUTTON(print_prefs->footer_font)));
+	gtk_font_chooser_get_font(GTK_FONT_CHOOSER(print_prefs->footer_font));
     balsa_app.print_highlight_cited =
 	gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
                                      (print_prefs->highlight_cited));

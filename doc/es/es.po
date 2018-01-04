@@ -4,14 +4,15 @@
 # Joaquín Ignacio Aramendía <samsagax@gmail.com>, 2011.
 # 
 # 
-# Daniel Mustieles <daniel.mustieles@gmail.com>, 2011.# Juan Matías Olmos <colonizare@yahoo.com.ar>, 2016, 2017.
+# Daniel Mustieles <daniel.mustieles@gmail.com>, 2011.
+# Juan Matías Olmos <colonizare@yahoo.com.ar>, 2016, 2017.
 # Carlos Córdova <carlosab1802@gmail.com>, 2017.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa-help.master\n"
-"POT-Creation-Date: 2017-08-31 15:02+0000\n"
-"PO-Revision-Date: 2017-12-14 18:01-0200\n"
+"POT-Creation-Date: 2017-12-18 11:32+0000\n"
+"PO-Revision-Date: 2017-12-29 16:10-0500\n"
 "Last-Translator: Carlos Córdova <carlosab1802@gmail.com>\n"
 "Language-Team: Español; Castellano <gnome-es-list@gnome.org>\n"
 "Language: es\n"
@@ -57,11 +58,6 @@ msgstr "Libreta de direcciones externa"
 
 #. (itstool) path: section/p
 #: C/ab-conf.page:21
-#| msgid ""
-#| "The balsa addressbook supports input from programs. Thus, you can use (no "
-#| "importing needed!) for example your pine or mutt addressbook. The mutt "
-#| "mailer (<ulink url=\"http://www.mutt.org/\">www.mutt.org</ulink>) uses an "
-#| "identical system to retrieve addresses from programs."
 msgid ""
 "The balsa addressbook supports input from programs. Thus, you can use (no "
 "importing needed!) for example your pine or mutt addressbook. The mutt "
@@ -81,9 +77,6 @@ msgstr "Programas existentes"
 
 #. (itstool) path: section/p
 #: C/ab-conf.page:30
-#| msgid ""
-#| "The following programs are compatible with the mutt mail reader and /"
-#| "should/ be with balsa. Submit links to more programs."
 msgid ""
 "The following programs are compatible with the mutt mail reader and "
 "<em>should</em> be with balsa. Submit links to more programs."
@@ -93,13 +86,6 @@ msgstr ""
 
 #. (itstool) path: item/p
 #: C/ab-conf.page:34
-#| msgid ""
-#| "<ulink url=\"http://www.spinnaker.de/lbdb/\" type=\"http\">http://www."
-#| "spinnaker.de/lbdb/</ulink> - The little brother database. Read "
-#| "emailaddresses and names from: finger, /etc/passwd, incoming procmail "
-#| "email, NIS, fido, the abook program, mutt addressbook, pine addressbook, "
-#| "palm addressbook, gnomecard addressbook, big brother database, ldap "
-#| "database."
 msgid ""
 "<link href=\"http://www.spinnaker.de/lbdb/\" type=\"http\">http://www."
 "spinnaker.de/lbdb/</link> - The little brother database. Read emailaddresses "
@@ -116,10 +102,6 @@ msgstr ""
 
 #. (itstool) path: item/p
 #: C/ab-conf.page:43
-#| msgid ""
-#| "<ulink url=\"http://www.fiction.net/blong/programs/mutt/\" type=\"http"
-#| "\">http://www.fiction.net/blong/programs/mutt/</ulink> - palm address "
-#| "database, ldapsearch wrapper, ph/qi server, UIUC, ph,"
 msgid ""
 "<link href=\"http://www.fiction.net/blong/programs/mutt/\">http://www."
 "fiction.net/blong/programs/mutt/</link> - palm address database, ldapsearch "
@@ -136,10 +118,6 @@ msgstr "Escribir sus propios scripts de carga"
 
 #. (itstool) path: section/p
 #: C/ab-conf.page:53
-#| msgid ""
-#| "<application>Balsa</application> ignores the first line of output from "
-#| "your program. You might want to write comments or debug output on this "
-#| "line. The remaining lines should have this format:"
 msgid ""
 "<app>Balsa</app> ignores the first line of output from your program. You "
 "might want to write comments or debug output on this line. The remaining "
@@ -168,10 +146,6 @@ msgstr ""
 
 #. (itstool) path: section/p
 #: C/ab-conf.page:64
-#| msgid ""
-#| "<application>Balsa</application> executes your script with one argument: "
-#| "the pattern to search for. A space (\" \") is used as the first argument "
-#| "when creating a list of all users."
 msgid ""
 "<app>Balsa</app> executes your script with one argument: the pattern to "
 "search for. A space (“ ”) is used as the first argument when creating a list "
@@ -221,8 +195,6 @@ msgstr ""
 
 #. (itstool) path: note/p
 #: C/ab-conf.page:85
-#| msgid ""
-#| "Your script/program should write it's output to stdout and not to stderr!"
 msgid ""
 "Your script/program should write its output to stdout and not to stderr!"
 msgstr ""
@@ -256,7 +228,6 @@ msgstr ""
 
 #. (itstool) path: section/p
 #: C/ab-conf.page:99
-#| msgid "Comments are welcome: <email>jelmer@nl.linux.org</email>"
 msgid ""
 "Comments are welcome: <link href=\"mailto:jelmer@nl.linux.org\">jelmer@nl."
 "linux.org</link>"
@@ -271,9 +242,6 @@ msgstr "Autores"
 
 #. (itstool) path: page/p
 #: C/authors.page:9
-#| msgid ""
-#| "<application>Balsa</application> is currently developed by (in "
-#| "alphabetical order): <placeholder-1/>"
 msgid "<app>Balsa</app> is currently developed by (in alphabetical order):"
 msgstr "Actualmente <app>Balsa</app> lo desarrollan, en orden alfabético:"
 
@@ -374,18 +342,6 @@ msgstr ""
 
 #. (itstool) path: page/p
 #: C/authors.page:66
-#| msgid ""
-#| "In the past, numerous people contributed to balsa, including (in "
-#| "alphabetical order): <placeholder-1/> To find more information about it, "
-#| "please visit the <application>Balsa</application><ulink url=\"http://"
-#| "balsa.gnome.org/\" type=\"http\">Web page</ulink>. Please send all "
-#| "comments, suggestions, and bug reports to the <ulink url=\"http://bugs."
-#| "gnome.org/\" type=\"http\"><acronym>GNOME</acronym> bug tracking "
-#| "database</ulink>. Instructions for submitting bug reports can be found on-"
-#| "line at <ulink url=\"http://balsa.gnome.org/bugs.html\" type=\"http\"> "
-#| "http://balsa.gnome.org/bugs.html</ulink>. If you are using "
-#| "<acronym>GNOME</acronym> 1.1 or later, you can also use command "
-#| "<command>bug-buddy</command> for submitting bug reports."
 msgid ""
 "To find more information about it, please visit the <app>Balsa</app> <link "
 "href=\"http://balsa.gnome.org/\">Web page</link>. Please send all comments, "
@@ -439,15 +395,6 @@ msgstr ""
 
 #. (itstool) path: page/p
 #: C/authors.page:115
-#| msgid ""
-#| "The following people contributed to this manual: <placeholder-1/> Please "
-#| "send all comments and suggestions regarding the manual to the "
-#| "<acronym>GNOME</acronym> Documentation Project at <email>docs@gnome.org</"
-#| "email> and the <application>Balsa</application> Discussion List "
-#| "<email>balsa-list@gnome.org</email>. You can also add your comments "
-#| "online by using <ulink url=\"http://library.gnome.org/devel/gdp-handbook/"
-#| "stable/gettingstarted.html.en\" type=\"http\"><acronym>GNOME</acronym> "
-#| "Documentation Status Table</ulink>."
 msgid ""
 "Please send all comments and suggestions regarding the manual to the GNOME "
 "Documentation Project at <link href=\"mailto:docs@gnome.org\">docs@gnome."
@@ -472,9 +419,6 @@ msgstr "Tareas comunes con <app>Balsa</app>"
 
 #. (itstool) path: page/p
 #: C/common-tasks.page:9
-#| msgid ""
-#| "This section explains many of the things you might want to do with "
-#| "<application>Balsa</application>."
 msgid ""
 "This section explains many of the things you might want to do with "
 "<app>Balsa</app>."
@@ -508,7 +452,6 @@ msgstr ""
 
 #. (itstool) path: item/p
 #: C/common-tasks.page:30
-#| msgid "Expanding e-mail addresses automatically"
 msgid ""
 "<link xref=\"common-tasks#ct-alias-expansion\">Expanding e-mail addresses "
 "automatically</link>"
@@ -521,6 +464,8 @@ msgstr ""
 msgid ""
 "<link xref=\"common-tasks#ct-ldap\">Setting up LDAP address books</link>"
 msgstr ""
+"<link xref=\"common-tasks#ct-ldap\">Configurar libreta de direcciones LDAP</"
+"link>"
 
 #. (itstool) path: section/title
 #: C/common-tasks.page:43
@@ -529,11 +474,6 @@ msgstr "Crear buzones de correo nuevos"
 
 #. (itstool) path: section/p
 #: C/common-tasks.page:44
-#, fuzzy
-#| msgid ""
-#| "You can create new local and IMAP mailboxes by right-clicking in the "
-#| "mailbox list and selecting New Mailbox. This will start a dialog that "
-#| "will let you name the mailbox and specify its location."
 msgid ""
 "You can create new local and <link xref=\"glossary#imap\">IMAP</link> "
 "mailboxes using the <guiseq><gui>File</gui><gui>New</gui></guiseq> command, "
@@ -541,18 +481,14 @@ msgid ""
 "gui>. This will start a dialog that will let you name the mailbox and "
 "specify its location."
 msgstr ""
-"Se pueden crear buzones locales o IMAP nuevos al pulsar el botón derecho del "
-"ratón en la lista de buzones y seleccionado «Buzón nuevo». Esto iniciará un "
-"cuadro de diálogo que permite nombrar al buzón y establecer su ubicación."
+"Se pueden crear buzones locales o <link xref=\"glossary#imap\">IMAP</link> "
+"nuevos al pulsar con el botón derecho del ratón en la lista de buzones y "
+"seleccionado <guiseq><gui>Buzón</gui><gui>Nuevo</gui></guiseq>. Esto "
+"abrirá un cuadro de diálogo que permite nombrar al buzón y establecer su "
+"ubicación."
 
 #. (itstool) path: section/p
 #: C/common-tasks.page:51
-#, fuzzy
-#| msgid ""
-#| "To create a new <glossterm linkend=\"glossary-pop\"><acronym>POP3</"
-#| "acronym></glossterm> mailbox, go to the configuration dialog, select the "
-#| "Mailboxes section, and click Add in the POP3 area. A dialog will be "
-#| "displayed that will let you set up the new mailbox."
 msgid ""
 "To create a new <link xref=\"glossary#pop\">POP3</link> mailbox, go to the "
 "<link xref=\"preferences\">preferences window</link>, select the <gui>Mail "
@@ -560,10 +496,11 @@ msgid ""
 "servers</gui> area. A dialog will be displayed that will let you set up the "
 "new mailbox."
 msgstr ""
-"Para crear un buzón <glossterm linkend=\"glossary-pop\"><acronym>POP3</"
-"acronym></glossterm> nuevo, vaya al diálogo de configuración, seleccione la "
-"sección de «Buzones» y pulse «Añadir» en el área de POP3. Se mostrará un "
-"cuadro de diálogo que permitirá configurar un buzón nuevo."
+"Para crear un buzón <link xref=\"glossary#pop\">POP3</link> nuevo, vaya a la "
+"<link xref=\"preferences\">ventana de preferencias</link>, seleccione la "
+"página de <gui>Opciones de correo</gui> y pulse <gui>Añadir</gui> en el área "
+"de <gui>Servidores de buzones de correo remotos</gui>. Se mostrará un cuadro "
+"de diálogo que permitirá configurar un buzón nuevo."
 
 #. (itstool) path: section/title
 #: C/common-tasks.page:59
@@ -572,31 +509,17 @@ msgstr "Mover mensajes"
 
 #. (itstool) path: section/p
 #: C/common-tasks.page:60
-#, fuzzy
-#| msgid ""
-#| "There are several methods available for moving or copying messages from "
-#| "one mailbox to another. The first is via the <guimenuitem>Transfer</"
-#| "guimenuitem> context menu, and the second is using drag and drop."
 msgid ""
 "There are several methods available for moving or copying messages from one "
 "mailbox to another. The first is via the <gui>Transfer</gui> context menu, "
 "and the second is using drag and drop."
 msgstr ""
 "Hay varios métodos disponibles para mover o copiar mensajes de un buzón a "
-"otro. El primero es a través del menú contextual <guimenuitem>Mover a</"
-"guimenuitem>, y el segundo es arrastrando y soltando."
+"otro. El primero es a través del menú contextual <gui>Mover a</gui>, y el "
+"segundo es arrastrando y soltando."
 
 #. (itstool) path: section/p
 #: C/common-tasks.page:64
-#, fuzzy
-#| msgid ""
-#| "To transfer messages using the <guimenuitem>Transfer</guimenuitem> menu, "
-#| "simply select the messages you desire to move from one mailbox, then "
-#| "bring up the context menu and select the <guimenuitem>Transfer</"
-#| "guimenuitem> submenu. This will display a list of mailboxes similar to "
-#| "the mailbox list in the main window. The list can be scrolled and trees "
-#| "expanded and collapsed, although these changes will not be reflected in "
-#| "the main list. Selecting a mailbox will start the transfer."
 msgid ""
 "To transfer messages using the <gui>Transfer</gui> menu, simply select the "
 "messages you desire to move from one mailbox, then press <keyseq><key>Shift</"
@@ -607,26 +530,17 @@ msgid ""
 "collapsed, although these changes will not be reflected in the main list. "
 "Selecting a mailbox will start the transfer."
 msgstr ""
-"Para mover mensajes utilizando el menú <guimenuitem>Mover a</guimenuitem>, "
-"simplemente seleccione los mensajes que desee mover de un buzón, luego abra "
-"el menú contextual y seleccione el submenú <guimenuitem>Mover a</"
-"guimenuitem>. Esto mostrará una lista de los buzones similar a la lista de "
-"la ventana principal. La lista se puede desplazar, y los árboles expandir y "
-"contraer, aunque estos cambios no se reflejarán en la lista principal. Al "
-"seleccionar un buzón, se iniciará la tranferencia."
+"Para mover mensajes utilizando el menú <gui>Mover a</gui>, simplemente "
+"seleccione los mensajes que desee mover de un buzón, luego pulse "
+"<keyseq><key>Mayús</key><key>F10</key></keyseq> o <key>Menu</key>, o pulse "
+"el botón derecho del ratón para abrir el menú contextual y seleccione el "
+"submenú <gui>Mover a</gui>. Esto mostrará una lista de los buzones similar a "
+"la lista de la ventana principal. La lista se puede desplazar, y los árboles "
+"expandir y contraer, aunque estos cambios no se reflejarán en la lista "
+"principal. Al seleccionar un buzón, se iniciará la tranferencia."
 
 #. (itstool) path: section/p
 #: C/common-tasks.page:77
-#, fuzzy
-#| msgid ""
-#| "The other method of transferring messages is to simply drag and drop the "
-#| "message(s) from the message index to the desired destination. Select the "
-#| "message(s) you wish to transfer, then drag them using the mouse until "
-#| "they are over the intended mailbox. The destination can either be in the "
-#| "mailbox list in the main window, or if open mailbox tabs are enabled the "
-#| "messages can be dragged to them. Messages are copied by default, but "
-#| "holding down the <keysym>Shift</keysym> key when dropping the messages "
-#| "will move them instead."
 msgid ""
 "The other method of transferring messages is to simply drag and drop the "
 "message(s) from the message index to the desired destination. Select the "
@@ -639,10 +553,8 @@ msgstr ""
 "mensajes desde el índice al destino deseado. Seleccione los mensajes para "
 "transferir, luego arrástrelos usando el ratón hasta que se encuentren sobre "
 "el buzón deseado. El destino puede estar en la lista de buzones de la "
-"ventana principal o, si están activas, en las pestañas de buzones abiertos. "
-"De manera predeterminada, los mensajes se copian, pero manteniendo "
-"presionada la tecla <keysym>Mayús</keysym>, al soltar un mensaje se moverá "
-"en vez de copiarse."
+"ventana principal o, si están activas, los mensajes se pueden arrastrar a "
+"las pestañas de buzones abiertos para copiarlos."
 
 #. (itstool) path: section/title
 #: C/common-tasks.page:86

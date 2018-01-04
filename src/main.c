@@ -540,6 +540,8 @@ real_main(int argc, char *argv[])
     libbalsa_progress_set_fraction = balsa_progress_set_fraction;
     libbalsa_progress_set_activity = balsa_progress_set_activity;
 
+    libbalsa_mailbox_date_format = &balsa_app.date_string;
+
     /* checking for valid config files */
     config_init(cmd_get_stats);
 

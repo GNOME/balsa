@@ -108,7 +108,8 @@ typedef struct _PropertyUI {
     GtkWidget *view_allheaders;
     GtkWidget *debug;           /* enable/disable debugging */
     GtkWidget *empty_trash;
-    GtkRadioButton *pwindow_type[NUM_PWINDOW_MODES];
+    GtkWidget *recv_progress_dlg;
+    GtkWidget *send_progress_dlg;
     GtkWidget *wordwrap;
     GtkWidget *wraplength;
     GtkWidget *open_inbox_upon_startup;
@@ -397,12 +398,8 @@ apply_prefs(GtkDialog * pbox)
     /* 
      * display page 
      */
-    for (i = 0; i < NUM_PWINDOW_MODES; i++)
-        if (gtk_toggle_button_get_active
-                (GTK_TOGGLE_BUTTON(pui->pwindow_type[i]))) {
-            balsa_app.pwindow_option = pwindow_type[i];
-            break;
-        }
+    balsa_app.recv_progress_dialog = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pui->recv_progress_dlg));
+    balsa_app.send_progress_dialog = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pui->send_progress_dlg));
 
     balsa_app.debug =
         gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pui->debug));
@@ -655,12 +652,8 @@ set_prefs(void)
     unsigned i;
     gchar *tmp;
 
-    for (i = 0; i < NUM_PWINDOW_MODES; i++)
-        if (balsa_app.pwindow_option == pwindow_type[i]) {
-            gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
-                                         (pui->pwindow_type[i]), TRUE);
-            break;
-        }
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->recv_progress_dlg), balsa_app.recv_progress_dialog);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->send_progress_dlg), balsa_app.send_progress_dialog);
 
     gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER
                                         (pui->mail_directory),
@@ -2669,19 +2662,10 @@ pm_grid_add_progress_group(GtkWidget * grid_widget)
 {
     GtkGrid *grid = (GtkGrid *) grid_widget;
     gint row = pm_grid_get_next_row(grid);
-    GSList *radio_group;
-    gint i;
 
     pm_grid_attach(grid, pm_group_label(_("Display progress dialog")), 0, row, 3, 1);
-
-    radio_group = NULL;
-    for (i = 0; i < NUM_PWINDOW_MODES; i++) {
-	pui->pwindow_type[i] =
-	    GTK_RADIO_BUTTON(gtk_radio_button_new_with_label
-			     (radio_group, _(pwindow_type_label[i])));
-	pm_grid_attach(grid, GTK_WIDGET(pui->pwindow_type[i]), 1, ++row, 2, 1);
-	radio_group = gtk_radio_button_get_group(pui->pwindow_type[i]);
-    }
+    pui->send_progress_dlg = pm_grid_attach_check(grid, 1, ++row, 2, 1, _("Display progress dialog when sending messages"));
+    pui->recv_progress_dlg = pm_grid_attach_check(grid, 1, ++row, 2, 1, _("Display progress dialog when retrieving messages"));
 
     pm_grid_set_next_row(grid, ++row);
 }
@@ -3342,11 +3326,10 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
     gtk_dialog_set_response_sensitive(GTK_DIALOG(property_box),
                                       GTK_RESPONSE_APPLY, FALSE);
 
-    for (i = 0; i < NUM_PWINDOW_MODES; i++) {
-        g_signal_connect(G_OBJECT(pui->pwindow_type[i]), "clicked",
-                         G_CALLBACK(properties_modified_cb), property_box);
-    }
-
+    g_signal_connect(G_OBJECT(pui->recv_progress_dlg), "toggled",
+                     G_CALLBACK(properties_modified_cb), property_box);
+    g_signal_connect(G_OBJECT(pui->send_progress_dlg), "toggled",
+                     G_CALLBACK(properties_modified_cb), property_box);
     g_signal_connect(G_OBJECT(pui->previewpane), "toggled",
                      G_CALLBACK(properties_modified_cb), property_box);
     g_signal_connect(G_OBJECT(pui->layout_type), "changed",

@@ -365,6 +365,7 @@ extbody_send_mail(GtkWidget * button, LibBalsaMessageBody * mime_body)
     result = libbalsa_message_send(message, balsa_app.outbox, NULL,
 				   balsa_find_sentbox_by_url,
 				   balsa_app.current_ident->smtp_server,
+				   balsa_app.send_progress_dialog,
                                    GTK_WINDOW(gtk_widget_get_toplevel
                                               (button)),
 				   FALSE, &err);

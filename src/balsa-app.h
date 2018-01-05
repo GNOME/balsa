@@ -237,7 +237,8 @@ extern struct BalsaApplication {
     /* text color of URL's */
     GdkRGBA url_color;
 
-    guint pwindow_option;
+    gboolean send_progress_dialog;
+    gboolean recv_progress_dialog;
     gboolean wordwrap;
     gint wraplength;
     gboolean browse_wrap;

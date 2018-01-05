@@ -25,6 +25,7 @@
 
 #include <glib.h>
 #include <string.h>
+#include <math.h>
 
 #include "libbalsa.h"
 #include "libbalsa-conf.h"
@@ -356,7 +357,7 @@ pop_handler_close(pop_handler_t *handler,
 
 
 /* ===================================================================
-   Functions supporting asynchronous retrival of messages.
+   Functions supporting asynchronous retrieval of messages.
 */
 struct fetch_data {
     LibBalsaMailbox *mailbox;
@@ -373,15 +374,14 @@ struct fetch_data {
 static void
 notify_progress(const struct fetch_data *fd)
 {
+    gdouble fraction;
 	gchar *recvbuf;
-	gchar *msgbuf;
 
+	fraction = (gdouble) fd->received / (gdouble) fd->total_size;
 	recvbuf = libbalsa_size_to_gchar(fd->received);
-	msgbuf = g_strdup_printf(_("Message %lu of %lu (%s of %s)"), (unsigned long) fd->msgno, (unsigned long) fd->total_messages,
-		recvbuf, fd->total_size_msg);
+	libbalsa_mailbox_progress_notify(fd->mailbox, LIBBALSA_NTFY_UPDATE, fraction, _("Message %lu of %lu (%s of %s)"),
+		(unsigned long) fd->msgno, (unsigned long) fd->total_messages, recvbuf, fd->total_size_msg);
 	g_free(recvbuf);
-	libbalsa_mailbox_progress_notify(LIBBALSA_MAILBOX(fd->mailbox), LIBBALSA_NTFY_PROGRESS, fd->received, fd->total_size, msgbuf);
-	g_free(msgbuf);
 }
 
 static gboolean
@@ -505,6 +505,7 @@ libbalsa_mailbox_pop3_startup(LibBalsaServer            *server,
 	g_signal_connect(G_OBJECT(pop), "auth", G_CALLBACK(libbalsa_server_get_auth), server);
 
 	/* connect server */
+	libbalsa_mailbox_progress_notify(LIBBALSA_MAILBOX(mbox), LIBBALSA_NTFY_INIT, INFINITY, _("Connecting %s…"), server->host);
 	if (!net_client_pop_connect(pop, NULL, &error)) {
 		libbalsa_information(LIBBALSA_INFORMATION_ERROR, _("POP3 mailbox %s: cannot connect %s: %s"), name, server->host,
 			error->message);
@@ -514,6 +515,7 @@ libbalsa_mailbox_pop3_startup(LibBalsaServer            *server,
 	}
 
 	/* load message list */
+	libbalsa_mailbox_progress_notify(LIBBALSA_MAILBOX(mbox), LIBBALSA_NTFY_UPDATE, INFINITY, _("List messages…"));
 	if (!net_client_pop_list(pop, msg_list, !mbox->delete_from_server, &error)) {
 		libbalsa_information(LIBBALSA_INFORMATION_ERROR, _("POP3 mailbox %s error: %s"), name, error->message);
 		g_error_free(error);
@@ -613,7 +615,6 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
 {
 	LibBalsaMailboxPop3 *mbox = LIBBALSA_MAILBOX_POP3(mailbox);
 	LibBalsaServer *server;
-	gchar *msgbuf;
 	NetClientPop *pop;
 	GList *msg_list;
 
@@ -622,10 +623,6 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
 	}
 
 	server = LIBBALSA_MAILBOX_REMOTE_SERVER(mbox);
-
-	msgbuf = g_strdup_printf("POP3: %s", mailbox->name);
-	libbalsa_mailbox_progress_notify(mailbox, LIBBALSA_NTFY_SOURCE, 0, 0, msgbuf);
-	g_free(msgbuf);
 
 	/* open the mailbox connection and get the messages list */
 	pop = libbalsa_mailbox_pop3_startup(server, mbox, mailbox->name, &msg_list);
@@ -637,7 +634,8 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
 		gboolean result = TRUE;
 		GError *err = NULL;
 
-		libbalsa_mailbox_progress_notify(mailbox, LIBBALSA_NTFY_PROGRESS, 0, 1, _("Connected"));
+		libbalsa_mailbox_progress_notify(mailbox, LIBBALSA_NTFY_UPDATE, INFINITY,
+			_("Connected to %s"), net_client_get_host(NET_CLIENT(pop)));
 		memset(&fd, 0, sizeof(fd));
 
 		/* nothing to do if no messages are on the server */
@@ -651,10 +649,9 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
 			fd.mailbox = mailbox;
 			fd.total_size_msg = libbalsa_size_to_gchar(fd.total_size);
 
-			msgbuf = g_strdup_printf(ngettext("%lu new message (%s)", "%lu new messages (%s)", fd.total_messages),
-			                         (unsigned long) fd.total_messages, fd.total_size_msg);
-			libbalsa_mailbox_progress_notify(mailbox, LIBBALSA_NTFY_PROGRESS, 0, 1, msgbuf);
-			g_free(msgbuf);
+			libbalsa_mailbox_progress_notify(mailbox, LIBBALSA_NTFY_UPDATE, 0.0,
+				ngettext("%lu new message (%s)", "%lu new messages (%s)", fd.total_messages),
+				(unsigned long) fd.total_messages, fd.total_size_msg);
 
 			if (mbox->filter) {
 				fd.filter_path = mbox->filter_cmd;
@@ -663,7 +660,8 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
 			if (result) {
 				result = net_client_pop_retr(pop, msg_list, message_cb, &fd, &err);
 				if (result && mbox->delete_from_server) {
-					libbalsa_mailbox_progress_notify(mailbox, LIBBALSA_NTFY_PROGRESS, 1, 1, _("Deleting messages on server…"));
+					libbalsa_mailbox_progress_notify(mailbox, LIBBALSA_NTFY_UPDATE, INFINITY,
+						_("Deleting messages on server…"));
 					result = net_client_pop_dele(pop, msg_list, &err);
 				}
 			}
@@ -692,8 +690,8 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
 		}
 
 		/* done - clean up */
-		libbalsa_mailbox_progress_notify(mailbox, LIBBALSA_NTFY_PROGRESS, 0, 1, _("Finished"));
 		g_object_unref(G_OBJECT(pop));
+		libbalsa_mailbox_progress_notify(mailbox, LIBBALSA_NTFY_FINISHED, 1.0, _("Finished"));
 	}
 }
 

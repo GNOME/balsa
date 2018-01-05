@@ -57,19 +57,20 @@ LibBalsaMsgCreateResult libbalsa_message_queue(LibBalsaMessage* message,
                                                smtp_server,
 					       gboolean flow,
 					       GError ** error);
-LibBalsaMsgCreateResult libbalsa_message_send(LibBalsaMessage * message,
-                                              LibBalsaMailbox * outbox,
-                                              LibBalsaMailbox * fccbox,
+LibBalsaMsgCreateResult libbalsa_message_send(LibBalsaMessage     *message,
+                                              LibBalsaMailbox     *outbox,
+                                              LibBalsaMailbox     *fccbox,
                                               LibBalsaFccboxFinder finder,
-                                              LibBalsaSmtpServer *
-                                              smtp_server,
-                                              GtkWindow * parent,
-                                              gboolean flow,
-					      GError ** error);
-void libbalsa_process_queue(LibBalsaMailbox * outbox,
+                                              LibBalsaSmtpServer  *smtp_server,
+											  gboolean			   show_progress,
+                                              GtkWindow           *parent,
+                                              gboolean             flow,
+					                          GError             **error);
+void libbalsa_process_queue(LibBalsaMailbox     *outbox,
                             LibBalsaFccboxFinder finder,
-							GSList * smtp_servers,
-							GtkWindow * parent);
+							GSList              *smtp_servers,
+							gboolean			 show_progress,
+							GtkWindow           *parent);
 
 void libbalsa_auto_send_init(GSourceFunc auto_send_cb);
 void libbalsa_auto_send_config(gboolean enable,

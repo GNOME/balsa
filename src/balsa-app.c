@@ -253,7 +253,7 @@ static gboolean
 send_queued_messages_auto_cb(gpointer data)
 {
 	g_debug("%s: %p", __func__, data);
-	libbalsa_process_queue(balsa_app.outbox, balsa_find_sentbox_by_url, balsa_app.smtp_servers, NULL);
+	libbalsa_process_queue(balsa_app.outbox, balsa_find_sentbox_by_url, balsa_app.smtp_servers, FALSE, NULL);
     return (data == NULL);
 }
 
@@ -299,7 +299,8 @@ balsa_app_init(void)
     balsa_app.sw_maximized = FALSE;
 
     balsa_app.toolbar_wrap_button_text = TRUE;
-    balsa_app.pwindow_option = WHILERETR;
+    balsa_app.send_progress_dialog = TRUE;
+    balsa_app.recv_progress_dialog = TRUE;
     balsa_app.wordwrap = FALSE; /* default to format=flowed. */
     balsa_app.wraplength = 72;
     balsa_app.browse_wrap = FALSE; /* GtkTextView will wrap for us. */
@@ -441,7 +442,7 @@ balsa_app_destroy(void)
 static gboolean
 check_new_messages_auto_cb(gpointer data)
 {
-    check_new_messages_real(balsa_app.main_window, TYPE_BACKGROUND);
+    check_new_messages_real(balsa_app.main_window, TRUE);
 
     if (balsa_app.debug)
         fprintf(stderr, "Auto-checked for new messages…\n");

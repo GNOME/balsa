@@ -47,7 +47,6 @@
 #include "information.h"
 #include "imap-server.h"
 #include "libbalsa-conf.h"
-#include "threads.h"
 
 #include "libinit_balsa/assistant_init.h"
 
@@ -55,15 +54,6 @@
 #include "libbalsa-gpgme.h"
 #include "libbalsa-gpgme-cb.h"
 #endif
-
-/* Globals for Thread creation, messaging, pipe I/O */
-gboolean checking_mail;
-int mail_thread_pipes[2];
-GIOChannel *mail_thread_msg_send;
-GIOChannel *mail_thread_msg_receive;
-
-static void threads_init(void);
-static void threads_destroy(void);
 
 static void config_init(gboolean check_only);
 static void mailboxes_init(gboolean check_only);
@@ -103,7 +93,7 @@ accel_map_save(void)
 static gboolean
 balsa_main_check_new_messages(gpointer data)
 {
-    check_new_messages_real(data, TYPE_CALLBACK);
+    check_new_messages_real(data, FALSE);
     return FALSE;
 }
 
@@ -168,28 +158,6 @@ mailboxes_init(gboolean check_only)
     }
 }
 
-GMutex checking_mail_lock;
-
-static void
-threads_init(void)
-{
-    if (pipe(mail_thread_pipes) < 0) {
-	g_log("BALSA Init", G_LOG_LEVEL_DEBUG,
-	      "Error opening pipes.\n");
-    }
-    mail_thread_msg_send = g_io_channel_unix_new(mail_thread_pipes[1]);
-    mail_thread_msg_receive =
-	g_io_channel_unix_new(mail_thread_pipes[0]);
-    g_io_add_watch(mail_thread_msg_receive, G_IO_IN,
-		   (GIOFunc) mail_progress_notify_cb,
-                   &balsa_app.main_window);
-}
-
-static void
-threads_destroy(void)
-{
-    g_mutex_clear(&checking_mail_lock);
-}
 
 /* initial_open_mailboxes:
    open mailboxes on startup if requested so.
@@ -515,9 +483,6 @@ real_main(int argc, char *argv[])
     setlocale(LC_ALL, "");
 #endif
 
-    /* initiate thread mutexs, variables */
-    threads_init();
-
 #ifdef HAVE_RUBRICA
     /* initialise libxml */
     LIBXML_TEST_VERSION
@@ -602,8 +567,6 @@ real_main(int argc, char *argv[])
 
     balsa_cleanup();
     accel_map_save();
-
-    threads_destroy();
 
     libbalsa_imap_server_close_all_connections();
     return 0;

@@ -90,12 +90,9 @@ typedef enum {
 } LibBalsaMailboxSortType;
 
 typedef enum {
-    LIBBALSA_NTFY_SOURCE,
-    LIBBALSA_NTFY_FINISHED,
-    LIBBALSA_NTFY_MSGINFO,
-    LIBBALSA_NTFY_PROGRESS,
-    LIBBALSA_NTFY_UPDATECONFIG,
-    LIBBALSA_NTFY_ERROR
+	LIBBALSA_NTFY_INIT,
+	LIBBALSA_NTFY_UPDATE,
+	LIBBALSA_NTFY_FINISHED
 } LibBalsaMailboxNotify;
 
 
@@ -272,8 +269,7 @@ struct _LibBalsaMailboxClass {
     /* Signals */
     void (*changed) (LibBalsaMailbox * mailbox);
     void (*message_expunged) (LibBalsaMailbox * mailbox, guint seqno);
-    void (*progress_notify) (LibBalsaMailbox * mailbox, int type,
-                             int prog, int tot, const gchar* msg);
+    void (*progress_notify) (LibBalsaMailbox * mailbox, gint action, gdouble fraction, gchar *message);
 
     /* Virtual Functions */
     gboolean (*open_mailbox) (LibBalsaMailbox * mailbox, GError **err);
@@ -351,9 +347,12 @@ void libbalsa_mailbox_check(LibBalsaMailbox * mailbox);
 void libbalsa_mailbox_changed(LibBalsaMailbox * mailbox);
 void libbalsa_mailbox_set_unread_messages_flag(LibBalsaMailbox * mailbox,
 					       gboolean has_unread);
-void libbalsa_mailbox_progress_notify(LibBalsaMailbox * mailbox,
-                                      int type, int prog, int tot,
-                                      const gchar* msg);
+void libbalsa_mailbox_progress_notify(LibBalsaMailbox       *mailbox,
+									  LibBalsaMailboxNotify  action,
+									  gdouble		         fraction,
+									  const gchar           *message,
+									  ...)
+	G_GNUC_PRINTF(4, 5);
 
 /** Message access functions.
  */

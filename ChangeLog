@@ -1,3 +1,30 @@
+2018-01-05  Albrecht Dreß <albrecht.dress@arcor.de>
+
+	Enable multi-threaded POP3 retrieval
+
+	* libbalsa/libbalsa-marshal.list, libbalsa/mailbox.[ch]:
+	new simplified signature for the mailbox '' signal
+	and the related helper libbalsa_mailbox_progress_notify()
+	* libbalsa/libbalsa-progress.[ch]: heavy re-factoring of the progress dialogue,
+	including a fully thread-safe interface, simplified access functions,
+	and a new activity mode
+	* libbalsa/mailbox_pop3.c, libbalsa/send.[ch]:
+	use new progress dialogue interface,
+	pass option to disable send progress dialogue
+	* src/balsa-app.[ch]: define and initialise enable progress dialogue settings,
+	use changed send function signature
+	* src/balsa-message.c, src/balsa-mime-widget-message.c,
+	src/balsa-mime-widget-vcalendar.c, src/sendmsg-window.c:
+	use changed send function signature
+	* src/main-window.[ch]: implement multi-threaded POP3 retrieval,
+	remove old progress implementation, use changed send function signature,
+	replace two-state enum by bool
+	* src/main.c: remove old progress implementation stuff
+	* src/pref-manager.c: replace progress dialogue settings
+	by two new bool values and related check boxes
+	* src/save-restore.c: save/restore new progress dialogue bool values
+	* src/threads.h: completely remove the file
+
 2018-01-04  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Fix a use-after-free bug

@@ -31,6 +31,7 @@
 #include "main-window.h"
 
 #include <string.h>
+#include <math.h>
 #include <gdk/gdkkeysyms.h>
 #include <gdk-pixbuf/gdk-pixbuf.h>
 
@@ -65,7 +66,7 @@
 #include "save-restore.h"
 #include "toolbar-prefs.h"
 #include "toolbar-factory.h"
-#include "threads.h"
+#include "libbalsa-progress.h"
 
 #include "filter.h"
 #include "filter-funcs.h"
@@ -87,14 +88,12 @@ static const gchar * notebook_drop_types[NUM_DROP_TYPES] = {
 };
 
 /* Define thread-related globals, including dialogs */
-GtkWidget *progress_dialog = NULL;
-GtkWidget *progress_dialog_source = NULL;
-GtkWidget *progress_dialog_message = NULL;
-GtkWidget *progress_dialog_bar = NULL;
-static int quiet_check=0;
+static ProgressDialog progress_dialog;
 
 struct check_messages_thread_info {
     BalsaWindow *window;
+    gboolean with_progress_dialog;
+    gboolean with_activity_bar;
     GSList *list;
 };
 static void bw_check_messages_thread(struct check_messages_thread_info
@@ -119,7 +118,7 @@ static void bw_idle_remove(BalsaWindow * window);
 static gboolean bw_idle_cb(BalsaWindow * window);
 
 
-static void bw_check_mailbox_list(BalsaWindow * window, GList * list);
+static void bw_check_mailbox_list(struct check_messages_thread_info *info, GList * list);
 static gboolean bw_add_mbox_to_checklist(GtkTreeModel * model,
                                          GtkTreePath * path,
                                          GtkTreeIter * iter,
@@ -190,6 +189,9 @@ static void bw_reset_filter(BalsaWindow * bw);
 G_DEFINE_TYPE (BalsaWindow, balsa_window, GTK_TYPE_APPLICATION_WINDOW)
 
 static guint window_signals[LAST_SIGNAL] = { 0 };
+
+/* note: access with g_atomic_* functions, not checking mail when 1 */
+static gint checking_mail = 1;
 
 static void
 balsa_window_class_init(BalsaWindowClass * klass)
@@ -1041,7 +1043,7 @@ get_new_mail_activated(GSimpleAction * action,
 {
     BalsaWindow *window = BALSA_WINDOW(user_data);
 
-    check_new_messages_real(window, TYPE_CALLBACK);
+    check_new_messages_real(window, FALSE);
 
     if (balsa_app.check_mail_auto) {
         /* restart the timer */
@@ -1056,6 +1058,7 @@ send_queued_mail_activated(GSimpleAction * action,
 {
     libbalsa_process_queue(balsa_app.outbox, balsa_find_sentbox_by_url,
                            balsa_app.smtp_servers,
+						   balsa_app.send_progress_dialog,
                            (GtkWindow *) balsa_app.main_window);
 }
 
@@ -2383,7 +2386,7 @@ balsa_window_new()
                      G_CALLBACK(bw_is_active_notify), NULL);
 
     /* set initial state of Get-New-Mail button */
-    bw_action_set_enabled(window, "get-new-mail", !checking_mail);
+    bw_action_set_enabled(window, "get-new-mail", g_atomic_int_get(&checking_mail) == 1);
 
     g_timeout_add_seconds(30, (GSourceFunc) bw_close_mailbox_on_timer, window);
 
@@ -3197,20 +3200,75 @@ bw_is_open_mailbox(LibBalsaMailbox *m)
  *
  */
 static void
-bw_check_mailbox_list(BalsaWindow * window, GList * mailbox_list)
+bw_check_mailbox_progress_cb(LibBalsaMailbox* mailbox, gint action, gdouble fraction, const gchar *message)
 {
-    if (window && !window->network_available) {
+	gchar *progress_id;
+
+	progress_id = g_strdup_printf("POP3: %s", mailbox->name);
+	if (action == LIBBALSA_NTFY_INIT) {
+		libbalsa_progress_dialog_ensure(&progress_dialog, _("Checking Mail…"), GTK_WINDOW(balsa_app.main_window), progress_id);
+	}
+	libbalsa_progress_dialog_update(&progress_dialog, progress_id, action == LIBBALSA_NTFY_FINISHED, fraction, "%s", message);
+	g_free(progress_id);
+}
+
+static void
+bw_check_mailbox(LibBalsaMailbox *mailbox)
+{
+	libbalsa_mailbox_check(mailbox);
+	g_thread_exit(NULL);
+}
+
+typedef struct {
+	LibBalsaMailbox *mailbox;
+	GThread *thread;
+	gulong notify;
+} bw_pop_mbox_t;
+
+static void
+bw_check_mailbox_done(bw_pop_mbox_t *bw_pop_mbox)
+{
+	if (bw_pop_mbox->thread != NULL) {
+		g_thread_join(bw_pop_mbox->thread);
+		g_debug("joined thread %p", bw_pop_mbox->thread);
+	}
+	if (bw_pop_mbox->notify > 0U) {
+		g_signal_handler_disconnect(bw_pop_mbox->mailbox, bw_pop_mbox->notify);
+	}
+	g_object_unref(bw_pop_mbox->mailbox);
+}
+
+static void
+bw_check_mailbox_list(struct check_messages_thread_info *info, GList *mailbox_list)
+{
+	GList *check_mbx = NULL;
+
+    if ((info->window != NULL) && !info->window->network_available) {
         return;
     }
 
     for ( ; mailbox_list; mailbox_list = mailbox_list->next) {
-        LibBalsaMailbox *mailbox =
-            BALSA_MAILBOX_NODE(mailbox_list->data)->mailbox;
+        LibBalsaMailbox *mailbox = BALSA_MAILBOX_NODE(mailbox_list->data)->mailbox;
+        LibBalsaMailboxPop3 *pop3 = LIBBALSA_MAILBOX_POP3(mailbox);
+        bw_pop_mbox_t *bw_pop_mbox;
+
+        bw_pop_mbox = g_malloc0(sizeof(bw_pop_mbox_t));
+        bw_pop_mbox->mailbox = g_object_ref(mailbox);
         libbalsa_mailbox_pop3_set_inbox(mailbox, balsa_app.inbox);
-        libbalsa_mailbox_pop3_set_msg_size_limit
-            (LIBBALSA_MAILBOX_POP3(mailbox), balsa_app.msg_size_limit*1024);
-        libbalsa_mailbox_check(mailbox);
+        libbalsa_mailbox_pop3_set_msg_size_limit(pop3, balsa_app.msg_size_limit * 1024);
+        if (info->with_progress_dialog) {
+        	bw_pop_mbox->notify =
+        		g_signal_connect(G_OBJECT(mailbox), "progress-notify", G_CALLBACK(bw_check_mailbox_progress_cb), mailbox);
+        }
+        bw_pop_mbox->thread = g_thread_new(NULL, (GThreadFunc) bw_check_mailbox, mailbox);
+        g_debug("launched thread %p for checking POP3 mailbox %s", bw_pop_mbox->thread, mailbox->name);
+        check_mbx = g_list_prepend(check_mbx, bw_pop_mbox);
     }
+
+    /* join all threads, i.e. proceed only after all threads have finished, and disconnect progress notify handlers */
+    g_list_foreach(check_mbx, (GFunc) bw_check_mailbox_done, NULL);
+    g_debug("all POP3 mailbox threads done");
+    g_list_free_full(check_mbx, (GDestroyNotify) g_free);
 }
 
 /*Callback to check a mailbox in a balsa-mblist */
@@ -3247,66 +3305,6 @@ bw_imap_check_test(const gchar * path)
         strcmp(path, "INBOX") == 0 : balsa_app.check_imap;
 }
 
-static void
-bw_mailbox_check(LibBalsaMailbox * mailbox, BalsaWindow * window);
-
-static void
-bw_progress_dialog_destroy_cb(GtkWidget * widget, gpointer data)
-{
-    progress_dialog = NULL;
-    progress_dialog_source = NULL;
-    progress_dialog_message = NULL;
-    progress_dialog_bar = NULL;
-}
-static void
-bw_progress_dialog_response_cb(GtkWidget* dialog, gint response)
-{
-    if(response == GTK_RESPONSE_CLOSE)
-        /* this should never be done in response handler, but... */
-        gtk_widget_destroy(dialog);
-}
-
-/* ensure_check_mail_dialog:
-   make sure that mail checking dialog exists.
-*/
-static void
-ensure_check_mail_dialog(BalsaWindow * window)
-{
-    GtkBox *content_box;
-
-    if (progress_dialog && GTK_IS_WIDGET(progress_dialog))
-	gtk_widget_destroy(GTK_WIDGET(progress_dialog));
-
-    progress_dialog =
-	gtk_dialog_new_with_buttons(_("Checking Mail…"),
-                                    GTK_WINDOW(window),
-                                    GTK_DIALOG_DESTROY_WITH_PARENT |
-                                    libbalsa_dialog_flags(),
-                                    _("_Hide"), GTK_RESPONSE_CLOSE,
-                                    NULL);
-#if HAVE_MACOSX_DESKTOP
-    libbalsa_macosx_menu_for_parent(progress_dialog, GTK_WINDOW(window));
-#endif
-    gtk_window_set_role(GTK_WINDOW(progress_dialog), "progress_dialog");
-
-    g_signal_connect(G_OBJECT(progress_dialog), "destroy",
-		     G_CALLBACK(bw_progress_dialog_destroy_cb), NULL);
-    g_signal_connect(G_OBJECT(progress_dialog), "response",
-		     G_CALLBACK(bw_progress_dialog_response_cb), NULL);
-
-    content_box =
-        GTK_BOX(gtk_dialog_get_content_area(GTK_DIALOG(progress_dialog)));
-    progress_dialog_source = gtk_label_new(_("Checking Mail…"));
-    gtk_box_pack_start(content_box, progress_dialog_source);
-
-    progress_dialog_message = gtk_label_new("");
-    gtk_box_pack_start(content_box, progress_dialog_message);
-
-    progress_dialog_bar = gtk_progress_bar_new();
-    gtk_box_pack_start(content_box, progress_dialog_bar);
-    gtk_window_set_default_size(GTK_WINDOW(progress_dialog), 250, 100);
-    gtk_widget_show(progress_dialog);
-}
 
 /*
  * Callbacks
@@ -3317,7 +3315,7 @@ ensure_check_mail_dialog(BalsaWindow * window)
    or NULL.
 */
 void
-check_new_messages_real(BalsaWindow * window, int type)
+check_new_messages_real(BalsaWindow * window, gboolean background_check)
 {
     GSList *list;
     struct check_messages_thread_info *info;
@@ -3328,36 +3326,34 @@ check_new_messages_real(BalsaWindow * window, int type)
 
     list = NULL;
     /*  Only Run once -- If already checking mail, return.  */
-    g_mutex_lock(&checking_mail_lock);
-    if (checking_mail) {
-        g_mutex_unlock(&checking_mail_lock);
-        fprintf(stderr, "Already Checking Mail!\n");
-	if (progress_dialog)
-	    gtk_window_present(GTK_WINDOW(progress_dialog));
+    if (!g_atomic_int_dec_and_test(&checking_mail)) {
+    	g_atomic_int_inc(&checking_mail);
+        g_debug("Already Checking Mail!");
+        g_mutex_lock(&progress_dialog.mutex);
+        if (progress_dialog.dialog != NULL) {
+        	gtk_window_present(GTK_WINDOW(progress_dialog.dialog));
+        }
+        g_mutex_unlock(&progress_dialog.mutex);
         return;
     }
-    checking_mail = TRUE;
+
     if (window)
         bw_action_set_enabled(window, "get-new-mail", FALSE);
-
-    quiet_check = (type == TYPE_CALLBACK)
-        ? 0 : balsa_app.quiet_background_check;
-
-    g_mutex_unlock(&checking_mail_lock);
-
-    if (type == TYPE_CALLBACK &&
-        (balsa_app.pwindow_option == WHILERETR ||
-         (balsa_app.pwindow_option == UNTILCLOSED && progress_dialog)))
-	ensure_check_mail_dialog(window);
 
     gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
 			   (GtkTreeModelForeachFunc) bw_add_mbox_to_checklist,
 			   &list);
 
-    /* initiate threads */
+    /* initiate thread */
     info = g_new(struct check_messages_thread_info, 1);
     info->list = list;
+    info->with_progress_dialog = !background_check && balsa_app.recv_progress_dialog;
     info->window = window ? g_object_ref(window) : window;
+    info->with_activity_bar = background_check && !balsa_app.quiet_background_check && (info->window != NULL);
+	if (info->with_activity_bar) {
+		balsa_window_increase_activity(info->window, _("Checking Mail…"));
+	}
+
     get_mail_thread =
     	g_thread_new("bw_check_messages_thread",
     				 (GThreadFunc) bw_check_messages_thread,
@@ -3373,7 +3369,7 @@ check_new_messages_real(BalsaWindow * window, int type)
 static void
 bw_check_new_messages(gpointer data)
 {
-    check_new_messages_real(data, TYPE_CALLBACK);
+    check_new_messages_real(data, FALSE);
 
     if (balsa_app.check_mail_auto) {
         /* restart the timer */
@@ -3420,30 +3416,29 @@ check_new_messages_count(LibBalsaMailbox * mailbox, gboolean notify)
 
 /* this one is called only in the threaded code */
 static void
-bw_mailbox_check(LibBalsaMailbox * mailbox, BalsaWindow * window)
+bw_mailbox_check(LibBalsaMailbox * mailbox, struct check_messages_thread_info *info)
 {
-    MailThreadMessage *threadmessage;
-    gchar *string = NULL;
-
     if (libbalsa_mailbox_get_subscribe(mailbox) == LB_MAILBOX_SUBSCRIBE_NO)
         return;
 
+    g_debug("checking mailbox %s", mailbox->name);
     if (LIBBALSA_IS_MAILBOX_IMAP(mailbox)) {
-        if (window && !window->network_available) {
-                return;
-        }
+    	if ((info->window != NULL) && !info->window->network_available) {
+    		return;
+    	}
 
-	string = g_strdup_printf(_("IMAP mailbox: %s"), mailbox->url);
-        if (balsa_app.debug)
-            fprintf(stderr, "%s\n", string);
+    	if (info->with_progress_dialog) {
+    		libbalsa_progress_dialog_update(&progress_dialog, _("Mailboxes"), FALSE, INFINITY,
+    			_("IMAP mailbox: %s"), mailbox->url);
+    	}
     } else if (LIBBALSA_IS_MAILBOX_LOCAL(mailbox)) {
-	string = g_strdup_printf(_("Local mailbox: %s"), mailbox->name);
+    	if (info->with_progress_dialog) {
+    		libbalsa_progress_dialog_update(&progress_dialog, _("Mailboxes"), FALSE, INFINITY,
+    			_("Local mailbox: %s"), mailbox->name);
+    	}
     } else {
-        g_assert_not_reached();
+    	g_assert_not_reached();
     }
-
-    MSGMAILTHREAD(threadmessage, LIBBALSA_NTFY_SOURCE, NULL, string, 0, 0);
-    g_free(string);
 
     libbalsa_mailbox_check(mailbox);
 }
@@ -3465,21 +3460,27 @@ bw_check_messages_thread(struct check_messages_thread_info *info)
      *  and that the calling procedure will check for an existing lock
      *  and set checking_mail to true before calling.
      */
-    MailThreadMessage *threadmessage;
-    GSList *list = info->list;
+    bw_check_mailbox_list(info, balsa_app.inbox_input);
 
-    MSGMAILTHREAD(threadmessage, LIBBALSA_NTFY_SOURCE, NULL, "POP3", 0, 0);
-    bw_check_mailbox_list(info->window, balsa_app.inbox_input);
+    if (info->list!= NULL) {
+        GSList *list = info->list;
 
-    g_slist_foreach(list, (GFunc) bw_mailbox_check, info->window);
-    g_slist_foreach(list, (GFunc) g_object_unref, NULL);
-    g_slist_free(list);
+    	if (info->with_progress_dialog) {
+    		libbalsa_progress_dialog_ensure(&progress_dialog, _("Checking Mail…"), GTK_WINDOW(info->window), _("Mailboxes"));
+    	}
+    	g_slist_foreach(list, (GFunc) bw_mailbox_check, info);
+    	g_slist_foreach(list, (GFunc) g_object_unref, NULL);
+    	g_slist_free(list);
+    	if (info->with_progress_dialog) {
+    		libbalsa_progress_dialog_update(&progress_dialog, _("Mailboxes"), TRUE, 1.0, NULL);
+    	}
+    }
 
-    MSGMAILTHREAD(threadmessage, LIBBALSA_NTFY_FINISHED, NULL, "Finished",
-                  0, 0);
+	if (info->with_activity_bar) {
+		balsa_window_decrease_activity(info->window, _("Checking Mail…"));
+	}
 
-    g_mutex_lock(&checking_mail_lock);
-    checking_mail = FALSE;
+    g_atomic_int_inc(&checking_mail);
 
     if (info->window) {
         g_idle_add((GSourceFunc) bw_check_messages_thread_idle_cb,
@@ -3488,149 +3489,9 @@ bw_check_messages_thread(struct check_messages_thread_info *info)
             time(&info->window->last_check_time);
         g_object_unref(info->window);
     }
-    g_mutex_unlock(&checking_mail_lock);
 
     g_free(info);
     g_thread_exit(0);
-}
-
-/* mail_progress_notify_cb:
-   called from the thread checking the new mail. Basically does the GUI
-   interaction because checking thread cannot do it.
-*/
-gboolean
-mail_progress_notify_cb(GIOChannel * source, GIOCondition condition,
-                        BalsaWindow ** window)
-{
-    const int MSG_BUFFER_SIZE = 512 * sizeof(MailThreadMessage *);
-    MailThreadMessage *threadmessage;
-    MailThreadMessage **currentpos;
-    void *msgbuffer;
-    ssize_t count;
-    gfloat fraction;
-    GtkStatusbar *statusbar;
-    guint context_id;
-
-    msgbuffer = g_malloc(MSG_BUFFER_SIZE);
-    count = read(mail_thread_pipes[0], msgbuffer, MSG_BUFFER_SIZE);
-
-    /* FIXME: imagine reading just half of the pointer. The sync is gone.. */
-    if (count % sizeof(MailThreadMessage *)) {
-        g_free(msgbuffer);
-        return TRUE;
-    }
-
-    currentpos = (MailThreadMessage **) msgbuffer;
-
-    if (quiet_check || !*window) {
-        /* Eat messages */
-        while (count) {
-            threadmessage = *currentpos;
-            g_free(threadmessage);
-            currentpos++;
-            count -= sizeof(void *);
-        }
-        g_free(msgbuffer);
-        return TRUE;
-    }
-
-    statusbar = GTK_STATUSBAR((*window)->statusbar);
-    context_id = gtk_statusbar_get_context_id(statusbar, "BalsaWindow mail progress");
-
-    while (count) {
-        threadmessage = *currentpos;
-
-        if (balsa_app.debug)
-            fprintf(stderr, "Message: %lu, %d, %s\n",
-                    (unsigned long) threadmessage,
-                    threadmessage->message_type,
-                    threadmessage->message_string);
-
-        if (!progress_dialog)
-            gtk_statusbar_pop(statusbar, context_id);
-
-        switch (threadmessage->message_type) {
-        case LIBBALSA_NTFY_SOURCE:
-            if (progress_dialog) {
-                gtk_label_set_text(GTK_LABEL(progress_dialog_source),
-                                   threadmessage->message_string);
-                gtk_label_set_text(GTK_LABEL(progress_dialog_message), "");
-                gtk_widget_show(progress_dialog);
-            } else
-                gtk_statusbar_push(statusbar, context_id,
-                                   threadmessage->message_string);
-            break;
-        case LIBBALSA_NTFY_MSGINFO:
-            if (progress_dialog) {
-                gtk_label_set_text(GTK_LABEL(progress_dialog_message),
-                                   threadmessage->message_string);
-                gtk_widget_show(progress_dialog);
-            } else
-                gtk_statusbar_push(statusbar, context_id,
-                                   threadmessage->message_string);
-            break;
-        case LIBBALSA_NTFY_UPDATECONFIG:
-            config_mailbox_update(threadmessage->mailbox);
-            break;
-
-        case LIBBALSA_NTFY_PROGRESS:
-            fraction = (gfloat) threadmessage->num_bytes /
-                (gfloat) threadmessage->tot_bytes;
-            if (fraction > 1.0 || fraction < 0.0) {
-                if (balsa_app.debug)
-                    fprintf(stderr,
-                            "progress bar fraction out of range %f\n",
-                            fraction);
-                fraction = 1.0;
-            }
-            if (progress_dialog) {
-                gtk_label_set_text(GTK_LABEL(progress_dialog_message),
-                                   threadmessage->message_string);
-                gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR
-                                              (progress_dialog_bar),
-					      fraction);
-            } else {
-                gtk_statusbar_push(statusbar, context_id,
-                                   threadmessage->message_string);
-                gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR
-                                              ((*window)->progress_bar),
-                                              fraction);
-            }
-            break;
-        case LIBBALSA_NTFY_FINISHED:
-
-            if (balsa_app.pwindow_option == WHILERETR && progress_dialog) {
-                gtk_widget_destroy(progress_dialog);
-            } else if (progress_dialog) {
-                gtk_label_set_text(GTK_LABEL(progress_dialog_source),
-                                   _("Finished Checking."));
-                gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR
-                                              (progress_dialog_bar), 0.0);
-            } else {
-                gtk_statusbar_pop(statusbar, context_id);
-                gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR
-                                              ((*window)->progress_bar), 0.0);
-            }
-            break;
-
-        case LIBBALSA_NTFY_ERROR:
-            balsa_information(LIBBALSA_INFORMATION_ERROR,
-                              "%s",
-                              threadmessage->message_string);
-            break;
-
-        default:
-            fprintf(stderr, " Unknown check mail message(%d): %s\n",
-                    threadmessage->message_type,
-                    threadmessage->message_string);
-        }
-        g_free(threadmessage);
-        currentpos++;
-        count -= sizeof(void *);
-    }
-    g_free(msgbuffer);
-
-    return TRUE;
 }
 
 

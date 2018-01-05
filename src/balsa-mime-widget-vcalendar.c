@@ -325,6 +325,7 @@ vevent_reply(GObject * button, GtkWidget * box)
     result = libbalsa_message_send(message, balsa_app.outbox, NULL,
 				   balsa_find_sentbox_by_url,
 				   ident->smtp_server,
+				   balsa_app.send_progress_dialog,
                                    GTK_WINDOW(gtk_widget_get_toplevel
                                               ((GtkWidget *) button)),
 				   FALSE, &error);

@@ -37,7 +37,6 @@
 #include "filter-funcs.h"
 #include "mailbox-filter.h"
 #include "libbalsa-conf.h"
-#include "threads.h"
 
 #include "smtp-server.h"
 #include "send.h"
@@ -369,28 +368,6 @@ gint config_folder_update(BalsaMailboxNode * mbnode)
     return res;
 }				/* config_folder_update */
 
-static void
-pop3_progress_notify(LibBalsaMailbox* mailbox, int msg_type, int prog, int tot,
-                     const char* msg)
-{
-    MailThreadMessage *message;
-
-    message = g_new(MailThreadMessage, 1);
-    message->message_type = msg_type;
-    memcpy(message->message_string, msg, strlen(msg) + 1);
-    message->num_bytes = prog;
-    message->tot_bytes = tot;
-
-    /* FIXME: There is potential for a timeout with 
-       * the server here, if we don't get the lock back
-       * soon enough.. But it prevents the main thread from
-       * blocking on the mutt_lock, andthe pipe filling up.
-       * This would give us a deadlock.
-     */
-    if (write(mail_thread_pipes[1], (void *) &message, sizeof(void *))
-        != sizeof(void *))
-        g_warning("pipe error");
-}
 
 /* Initialize the specified mailbox, creating the internal data
    structures which represent the mailbox. */
@@ -415,9 +392,6 @@ config_mailbox_init(const gchar * prefix)
     }
 
     if (LIBBALSA_IS_MAILBOX_POP3(mailbox)) {
-        g_signal_connect(G_OBJECT(mailbox),
-                         "progress-notify", G_CALLBACK(pop3_progress_notify),
-                         mailbox);
 	balsa_app.inbox_input =
             g_list_prepend(balsa_app.inbox_input,
                            balsa_mailbox_node_new_from_mailbox(mailbox));
@@ -787,8 +761,9 @@ config_global_load(void)
     balsa_app.show_sos_bar =
         libbalsa_conf_get_bool("ShowSOSbar=true");
 
-    /* ... Progress Window Dialog */
-    balsa_app.pwindow_option = d_get_gint("ProgressWindow", WHILERETR);
+    /* ... Progress Window Dialogs */
+	balsa_app.recv_progress_dialog = libbalsa_conf_get_bool("ShowRecvProgressDlg=true");
+    balsa_app.send_progress_dialog = libbalsa_conf_get_bool("ShowSendProgressDlg=true");
 
     /* ... deleting messages: defaults enshrined here */
     filter_mask = libbalsa_mailbox_get_filter(NULL);
@@ -1275,7 +1250,8 @@ config_save(void)
     libbalsa_conf_set_bool("ShowPreviewPane", balsa_app.previewpane);
     libbalsa_conf_set_bool("ShowMailboxList", balsa_app.show_mblist);
     libbalsa_conf_set_bool("ShowTabs", balsa_app.show_notebook_tabs);
-    libbalsa_conf_set_int("ProgressWindow", balsa_app.pwindow_option);
+	libbalsa_conf_set_bool("ShowRecvProgressDlg", balsa_app.recv_progress_dialog);
+    libbalsa_conf_set_bool("ShowSendProgressDlg", balsa_app.send_progress_dialog);
     libbalsa_conf_set_int("LayoutType",     balsa_app.layout_type);
     libbalsa_conf_set_bool("ViewMessageOnOpen", balsa_app.view_message_on_open);
     libbalsa_conf_set_bool("AskBeforeSelect", balsa_app.ask_before_select);

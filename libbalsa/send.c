@@ -94,7 +94,7 @@ static guint send_mail_time = 0U;
 static guint send_mail_timer_id = 0U;
 static gint retrigger_send = 0;		/* # of messages added to outbox while the smtp server was locked, access via g_atomic_* */
 
-static GtkWidget *send_progress_dialog;
+static ProgressDialog send_progress_dialog;
 
 
 /* end of state variables section */
@@ -538,6 +538,7 @@ libbalsa_message_send(LibBalsaMessage     *message,
                       LibBalsaMailbox     *fccbox,
                       LibBalsaFccboxFinder finder,
                       LibBalsaSmtpServer  *smtp_server,
+					  gboolean			   show_progress,
                       GtkWindow           *parent,
                       gboolean             flow,
                       GError             **error)
@@ -555,7 +556,7 @@ libbalsa_message_send(LibBalsaMessage     *message,
 
         if (result == LIBBALSA_MESSAGE_CREATE_OK) {
         	if (libbalsa_smtp_server_trylock(smtp_server)) {
-        		lbs_process_queue(outbox, finder, smtp_server, parent);
+        		lbs_process_queue(outbox, finder, smtp_server, show_progress ? parent : NULL);
         	} else {
         		g_atomic_int_inc(&retrigger_send);
         	}
@@ -620,21 +621,15 @@ send_message_data_cb(gchar   *buffer,
         gint ipercent;
 
     	smi->total_sent += read_res;
-    	fraction = (gfloat) smi->total_sent / (gfloat) smi->total_size;
+    	fraction = (gdouble) smi->total_sent / (gdouble) smi->total_size;
     	g_debug("%s: s=%lu t=%lu %g", __func__, (unsigned long) smi->total_sent, (unsigned long) smi->total_size, fraction);
     	if (fraction > 1.0) {
             fraction = 1.0;
         }
     	ipercent = (gint) (100.0 * (fraction + 0.5));
-    	if (ipercent > smi->last_report) {
-        	LibbalsaProgressData *progress;
-
-        	progress = g_new0(LibbalsaProgressData, 1U);
-        	progress->progress_id = g_strdup(smi->progress_id);
-        	progress->progress_dialog = send_progress_dialog;
-        	progress->message = g_strdup_printf(_("Message %u of %u"), smi->curr_msg, smi->msg_count);
-        	progress->fraction = fraction;
-        	g_idle_add(libbalsa_progress_dialog_update, progress);
+    	if (!smi->no_dialog && (ipercent > smi->last_report)) {
+    		libbalsa_progress_dialog_update(&send_progress_dialog, smi->progress_id, FALSE, fraction,
+    			_("Message %u of %u"), smi->curr_msg, smi->msg_count);
     		smi->last_report = ipercent;
         }
     }
@@ -675,7 +670,8 @@ lbs_check_reachable_cb(GObject  *object,
 }
 
 
-/* note: the following function is called with the passed smtp server being locked */
+/* note: the following function is called with the passed smtp server being locked
+ * parent != NULL indicates that the progress dialogue shall be shown */
 static void
 lbs_process_queue(LibBalsaMailbox      *outbox,
     			  LibBalsaFccboxFinder  finder,
@@ -849,6 +845,7 @@ lbs_process_queue_real(LibBalsaSmtpServer *smtp_server, SendQueueInfo *send_info
     			if (send_info->parent != NULL) {
     				libbalsa_progress_dialog_ensure(&send_progress_dialog, _("Sending Mail"), send_info->parent,
     					send_message_info->progress_id);
+    				send_message_info->no_dialog = FALSE;
     			} else {
     				send_message_info->no_dialog = TRUE;
     			}
@@ -876,6 +873,7 @@ void
 libbalsa_process_queue(LibBalsaMailbox     *outbox,
                        LibBalsaFccboxFinder finder,
                        GSList              *smtp_servers,
+					   gboolean				show_progress,
                        GtkWindow           *parent)
 {
 	if (libbalsa_mailbox_open(outbox, NULL)) {
@@ -896,7 +894,7 @@ libbalsa_process_queue(LibBalsaMailbox     *outbox,
 				LibBalsaSmtpServer *smtp_server = LIBBALSA_SMTP_SERVER(smtp_servers->data);
 
 				if (libbalsa_smtp_server_trylock(smtp_server)) {
-					lbs_process_queue(outbox, finder, smtp_server, parent);
+					lbs_process_queue(outbox, finder, smtp_server, show_progress ? parent : NULL);
 				}
 			}
 		} else {
@@ -947,14 +945,11 @@ balsa_send_message_success(MessageQueueItem *mqi,
 		if (fccurl != NULL) {
 			LibBalsaMailbox *fccbox = info->finder(fccurl);
 			GError *err = NULL;
-			LibbalsaProgressData *progress;
 
-			progress = g_new0(LibbalsaProgressData, 1U);
-			progress->progress_id = g_strdup(info->progress_id);
-			progress->progress_dialog = send_progress_dialog;
-			progress->message = g_strdup_printf(_("Save message in %s…"), fccbox->name);
-			progress->fraction = NAN;
-			g_idle_add(libbalsa_progress_dialog_update, progress);
+			if (!info->no_dialog) {
+				libbalsa_progress_dialog_update(&send_progress_dialog, info->progress_id, FALSE, NAN,
+					_("Save message in %s…"), fccbox->name);
+			}
 
 			libbalsa_message_change_flags(mqi->orig, 0, LIBBALSA_MESSAGE_FLAG_NEW | LIBBALSA_MESSAGE_FLAG_FLAGGED);
 			libbalsa_mailbox_sync_storage(mqi->orig->mailbox, FALSE);
@@ -1005,23 +1000,19 @@ balsa_send_message_real(SendMessageInfo *info)
     g_debug("%s: starting", __func__);
 
     /* connect the SMTP server */
+    if (!info->no_dialog) {
+		libbalsa_progress_dialog_update(&send_progress_dialog, info->progress_id, FALSE, INFINITY,
+			_("Connecting %s…"), net_client_get_host(NET_CLIENT(info->session)));
+    }
     result = net_client_smtp_connect(info->session, &greeting, &error);
     g_debug("%s: connect = %d [%p]: '%s'", __func__, result, info->items, greeting);
     g_free(greeting);
     if (result) {
         GList *this_msg;
 
-        if (info->no_dialog) {
-        	libbalsa_information(LIBBALSA_INFORMATION_MESSAGE, _("Sending queued messages to %s"),
-        		libbalsa_smtp_server_get_name(info->smtp_server));
-        } else {
-        	LibbalsaProgressData *progress;
-
-        	progress = g_new0(LibbalsaProgressData, 1U);
-        	progress->progress_id = g_strdup(info->progress_id);
-        	progress->progress_dialog = send_progress_dialog;
-        	progress->message = g_strdup_printf(_("Connected to %s"), net_client_get_host(NET_CLIENT(info->session)));
-        	g_idle_add(libbalsa_progress_dialog_update, progress);
+        if (!info->no_dialog) {
+    		libbalsa_progress_dialog_update(&send_progress_dialog, info->progress_id, FALSE, 0.0,
+    			_("Connected to %s"), net_client_get_host(NET_CLIENT(info->session)));
         }
 
         for (this_msg = info->items; this_msg != NULL; this_msg = this_msg->next) {
@@ -1084,17 +1075,13 @@ balsa_send_message_real(SendMessageInfo *info)
     /* close outbox in an idle callback, as it might affect the display */
     g_idle_add((GSourceFunc) balsa_send_message_real_idle_cb, g_object_ref(info->outbox));
 
+    /* finalise the SMTP session (which may be slow) */
+    g_object_unref(G_OBJECT(info->session));
+    info->session = NULL;
+
     /* clean up */
     if (!info->no_dialog) {
-    	LibbalsaProgressData *progress;
-
-    	progress = g_new0(LibbalsaProgressData, 1U);
-    	progress->progress_id = g_strdup(info->progress_id);
-    	progress->progress_dialog = send_progress_dialog;
-    	progress->message = g_strdup_printf(_("Finished"));
-    	progress->fraction = 1.0;
-    	progress->finished = TRUE;
-    	g_idle_add(libbalsa_progress_dialog_update, progress);
+		libbalsa_progress_dialog_update(&send_progress_dialog, info->progress_id, TRUE, 1.0, _("Finished"));
     } else if (result) {
     	libbalsa_information(LIBBALSA_INFORMATION_MESSAGE,
     		ngettext("Transmitted %u message to %s", "Transmitted %u messages to %s", info->msg_count),

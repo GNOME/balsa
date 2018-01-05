@@ -42,12 +42,6 @@
     (G_TYPE_INSTANCE_GET_CLASS ((window), BALSA_TYPE_WINDOW, \
 				BalsaWindowClass))
 
-/* Type values for mailbox checking */
-enum MailboxCheckType {
-    TYPE_BACKGROUND,
-    TYPE_CALLBACK
-};
-
 typedef struct _BalsaWindow BalsaWindow;
 typedef struct _BalsaWindowClass BalsaWindowClass;
 typedef enum {
@@ -140,7 +134,7 @@ gboolean mail_progress_notify_cb(GIOChannel * source,
 gboolean send_progress_notify_cb(GIOChannel * source,
                                  GIOCondition condition,
                                  BalsaWindow ** window);
-void check_new_messages_real(BalsaWindow * window, int type);
+void check_new_messages_real(BalsaWindow * window, gboolean background_check);
 void check_new_messages_count(LibBalsaMailbox * mailbox, gboolean notify);
 void empty_trash(BalsaWindow * window);
 void update_view_menu(BalsaWindow * window);

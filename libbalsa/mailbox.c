@@ -194,8 +194,8 @@ libbalsa_mailbox_class_init(LibBalsaMailboxClass * klass)
                      G_STRUCT_OFFSET(LibBalsaMailboxClass,
                                      progress_notify),
                      NULL, NULL,
-                     libbalsa_VOID__INT_INT_INT_STRING, G_TYPE_NONE,
-                     4, G_TYPE_INT, G_TYPE_INT, G_TYPE_INT, G_TYPE_STRING);
+                     libbalsa_VOID__INT_DOUBLE_STRING, G_TYPE_NONE,
+                     3U, G_TYPE_INT, G_TYPE_DOUBLE, G_TYPE_STRING);
 
     object_class->dispose = libbalsa_mailbox_dispose;
     object_class->finalize = libbalsa_mailbox_finalize;
@@ -667,16 +667,28 @@ libbalsa_mailbox_set_unread_messages_flag(LibBalsaMailbox * mailbox,
    there has been a progress in current operation.
 */
 void
-libbalsa_mailbox_progress_notify(LibBalsaMailbox * mailbox,
-                                 int type, int prog, int tot, const gchar* msg)
+libbalsa_mailbox_progress_notify(LibBalsaMailbox       *mailbox,
+								 LibBalsaMailboxNotify  action,
+								 gdouble		        fraction,
+								 const gchar           *message,
+								 ...)
 {
+	gchar *full_msg;
+
     g_return_if_fail(mailbox != NULL);
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
 
-    /* OK to emit in a subthread, because the handler expects it. */
-    g_signal_emit(G_OBJECT(mailbox),
-                  libbalsa_mailbox_signals[PROGRESS_NOTIFY],
-                  0, type, prog, tot, msg);
+    if (message != NULL) {
+    	va_list args;
+
+    	va_start(args, message);
+    	full_msg = g_strdup_vprintf(message, args);
+    	va_end(args);
+    } else {
+    	full_msg = NULL;
+    }
+    g_signal_emit(G_OBJECT(mailbox), libbalsa_mailbox_signals[PROGRESS_NOTIFY], 0, (gint) action, fraction, full_msg);
+	g_free(full_msg);
 }
 
 void

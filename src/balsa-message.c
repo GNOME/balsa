@@ -2478,6 +2478,7 @@ handle_mdn_request(GtkWindow *parent, LibBalsaMessage *message)
         result = libbalsa_message_send(mdn, balsa_app.outbox, NULL,
 				       balsa_find_sentbox_by_url,
 				       mdn_ident->smtp_server,
+					   balsa_app.send_progress_dialog,
                                        parent,
 				       TRUE, &error);
 	if (result != LIBBALSA_MESSAGE_CREATE_OK)
@@ -2618,6 +2619,7 @@ mdn_dialog_response(GtkWidget * dialog, gint response, gpointer user_data)
             libbalsa_message_send(send_msg, balsa_app.outbox, NULL,
                                   balsa_find_sentbox_by_url,
                                   mdn_ident->smtp_server,
+								  balsa_app.send_progress_dialog,
                                   gtk_window_get_transient_for
                                   ((GtkWindow *) dialog),
                                   TRUE, &error);

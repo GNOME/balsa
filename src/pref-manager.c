@@ -355,20 +355,15 @@ static void
 check_font_button(GtkWidget * button, gchar ** font)
 {
     if (GPOINTER_TO_INT(g_object_get_data(G_OBJECT(button), "font-modified"))) {
-        gchar *fontname;
-
-        fontname = gtk_font_chooser_get_font(GTK_FONT_CHOOSER(button));
-
         g_free(*font);
+
         if (!gtk_toggle_button_get_active
             (GTK_TOGGLE_BUTTON(pui->use_default_font_size))) {
-            *font = fontname;
+            *font = gtk_font_chooser_get_font(GTK_FONT_CHOOSER(button));
         } else {
             PangoFontDescription *desc;
 
-            desc = pango_font_description_from_string(fontname);
-            g_free(fontname);
-
+            desc = gtk_font_chooser_get_font_desc(GTK_FONT_CHOOSER(button));
             pango_font_description_unset_fields(desc, PANGO_FONT_MASK_SIZE);
             *font = pango_font_description_to_string(desc);
             pango_font_description_free(desc);
@@ -1369,28 +1364,21 @@ static gboolean
 font_button_check_font_size(GtkWidget * button, GtkWidget * widget)
 {
     GtkFontChooser *chooser = GTK_FONT_CHOOSER(button);
-    gchar *fontname;
     PangoFontDescription *desc;
     gboolean retval = FALSE;
 
-    fontname = gtk_font_chooser_get_font(chooser);
-    desc = pango_font_description_from_string(fontname);
-    g_free(fontname);
-
+    desc = gtk_font_chooser_get_font_desc(chooser);
     if (pango_font_description_get_size(desc) <= 0) {
         PangoContext *context;
-        PangoFontDescription *desc2;
+        const PangoFontDescription *desc2;
         gint size;
-        gchar *desc_string;
 
         context = gtk_widget_get_pango_context(widget);
         desc2 = pango_context_get_font_description(context);
         size = pango_font_description_get_size(desc2);
 
         pango_font_description_set_size(desc, size);
-        desc_string = pango_font_description_to_string(desc);
-        gtk_font_chooser_set_font(chooser, desc_string);
-        g_free(desc_string);
+        gtk_font_chooser_set_font_desc(chooser, desc);
         retval = TRUE;
     }
     pango_font_description_free(desc);

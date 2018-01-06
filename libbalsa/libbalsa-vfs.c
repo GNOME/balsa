@@ -136,10 +136,8 @@ libbalsa_vfs_finalize(LibbalsaVfs * self)
         g_free(priv->folder_uri);
         g_free(priv->mime_type);
         g_free(priv->charset);
-        if (priv->gio_gfile)
-            g_object_unref(priv->gio_gfile);
-        if (priv->info)
-            g_object_unref(priv->info);
+        g_clear_object(&priv->gio_gfile);
+        g_clear_object(&priv->info);
         g_free(priv);
     }
 

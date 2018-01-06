@@ -70,10 +70,8 @@ balsa_toolbar_model_finalize(GObject * object)
         g_hash_table_destroy(model->legal);
         model->legal = NULL;
     }
-    if (model->settings) {
-        g_object_unref(model->settings);
-        model->settings = NULL;
-    }
+    g_clear_object(&model->settings);
+
     G_OBJECT_CLASS(parent_class)->finalize(object);
 }
 

@@ -153,7 +153,7 @@ static void mdn_dialog_response(GtkWidget * dialog, gint response,
 
 static void balsa_part_info_init(GObject *object, gpointer data);
 static BalsaPartInfo* balsa_part_info_new(LibBalsaMessageBody* body);
-static void balsa_part_info_free(GObject * object);
+static void balsa_part_info_finalize(GObject * object);
 
 
 #ifdef HAVE_GPGME
@@ -171,7 +171,7 @@ balsa_part_info_class_init(BalsaPartInfoClass *klass)
 {
     GObjectClass *object_class = G_OBJECT_CLASS(klass);
 
-    object_class->finalize = balsa_part_info_free;
+    object_class->finalize = balsa_part_info_finalize;
 }
 
 static GType
@@ -812,21 +812,11 @@ balsa_message_destroy(GObject * object)
     g_list_free(bm->save_all_list);
     bm->save_all_list = NULL;
 
-    if (bm->save_all_popup) {
-        g_object_unref(bm->save_all_popup);
-	bm->save_all_popup = NULL;
-    }
-
-    if (bm->parts_popup) {
-	g_object_unref(bm->parts_popup);
-	bm->parts_popup = NULL;
-    }
+    g_clear_object(&bm->save_all_popup);
+    g_clear_object(&bm->parts_popup);
 
 #ifdef HAVE_HTML_WIDGET
-    if (bm->html_find_info) {
-        g_free(bm->html_find_info);
-        bm->html_find_info = NULL;
-    }
+    g_clear_object(&bm->html_find_info);
 #endif                          /* HAVE_HTML_WIDGET */
 
     if (G_OBJECT_CLASS(parent_class)->dispose)
@@ -1675,7 +1665,7 @@ balsa_part_info_new(LibBalsaMessageBody* body)
 }
 
 static void
-balsa_part_info_free(GObject * object)
+balsa_part_info_finalize(GObject * object)
 {
     BalsaPartInfo * info;
     GObjectClass *part_info_parent_class;
@@ -1684,13 +1674,8 @@ balsa_part_info_free(GObject * object)
     g_return_if_fail(IS_BALSA_PART_INFO(object));
     info = BALSA_PART_INFO(object);
 
-    if (info->mime_widget) {
-	g_object_unref(G_OBJECT(info->mime_widget));
-	info->mime_widget = NULL;
-    }
-    if (info->popup_menu)
-        g_object_unref(info->popup_menu);
-
+    g_clear_object(&info->mime_widget);
+    g_clear_object(&info->popup_menu);
     gtk_tree_path_free(info->path);
 
     part_info_parent_class = g_type_class_peek_parent(G_OBJECT_GET_CLASS(object));
@@ -2909,10 +2894,7 @@ libbalsa_msg_try_mp_signed(LibBalsaMessage * message, LibBalsaMessageBody *body,
     }
 
     /* force creating the protection info */
-    if (body->parts->next->sig_info) {
-	g_object_unref(body->parts->next->sig_info);
-	body->parts->next->sig_info = NULL;
-    }
+    g_clear_object(&body->parts->next->sig_info);
     if (!libbalsa_body_check_signature(body,
 				       signres & LIBBALSA_PROTECT_RFC3156 ?
 				       GPGME_PROTOCOL_OpenPGP : GPGME_PROTOCOL_CMS))

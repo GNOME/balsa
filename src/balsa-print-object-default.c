@@ -97,8 +97,7 @@ balsa_print_object_default_destroy(GObject * self)
 {
     BalsaPrintObjectDefault *po = BALSA_PRINT_OBJECT_DEFAULT(self);
 
-    if (po->pixbuf)
-	g_object_unref(po->pixbuf);
+    g_clear_object(&po->pixbuf);
     g_free(po->description);
 
     G_OBJECT_CLASS(parent_class)->finalize(self);

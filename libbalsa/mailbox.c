@@ -945,10 +945,7 @@ static void
 libbalsa_mailbox_real_release_message(LibBalsaMailbox * mailbox,
                                       LibBalsaMessage * message)
 {
-    if (message->mime_msg) {
-	g_object_unref(message->mime_msg);
-	message->mime_msg = NULL;
-    }
+    g_clear_object(&message->mime_msg);
 }
 
 struct MsgCopyData {
@@ -972,10 +969,7 @@ copy_iterator(LibBalsaMessageFlag *flags, GMimeStream **stream, void * arg)
     if(mcd->current_idx >= mcd->msgnos->len)
 	return FALSE; /* no more messages */
 	
-    if(mcd->stream) {
-	g_object_unref(mcd->stream);
-	mcd->stream = NULL;
-    }
+    g_clear_object(&mcd->stream);
     msgno_has_flags = LIBBALSA_MAILBOX_GET_CLASS(mailbox)->msgno_has_flags;
     msgno = g_array_index(mcd->msgnos, guint, mcd->current_idx);
 
@@ -1042,8 +1036,7 @@ libbalsa_mailbox_real_messages_copy(LibBalsaMailbox * mailbox,
 						       copy_iterator,
 						       &mcd,
 						       err);
-    if(mcd.stream)
-	g_object_unref(mcd.stream);
+    g_clear_object(&mcd.stream);
 
     libbalsa_progress_set_text(&mcd.progress, NULL, 0);
 
@@ -3150,86 +3143,59 @@ mbox_model_iter_parent(GtkTreeModel     * tree_model,
 }
 
 /* Set icons used in tree view. */
-static void
-libbalsa_mailbox_set_icon(GdkPixbuf * pixbuf, GdkPixbuf ** pixbuf_store)
-{
-    if (*pixbuf_store)
-        g_object_unref(*pixbuf_store);
-    *pixbuf_store = pixbuf;
-}
 
 /* Icons for status column. */
 void
 libbalsa_mailbox_set_unread_icon(GdkPixbuf * pixbuf)
 {
-    libbalsa_mailbox_set_icon(pixbuf,
-                              &status_icons
-                              [LIBBALSA_MESSAGE_STATUS_UNREAD]);
+    g_set_object(&status_icons[LIBBALSA_MESSAGE_STATUS_UNREAD], pixbuf);
 }
 
 void libbalsa_mailbox_set_trash_icon(GdkPixbuf * pixbuf)
 {
-    libbalsa_mailbox_set_icon(pixbuf,
-                              &status_icons
-                              [LIBBALSA_MESSAGE_STATUS_DELETED]);
+    g_set_object(&status_icons[LIBBALSA_MESSAGE_STATUS_DELETED], pixbuf);
 }
 
 void libbalsa_mailbox_set_flagged_icon(GdkPixbuf * pixbuf)
 {
-    libbalsa_mailbox_set_icon(pixbuf,
-                              &status_icons
-                              [LIBBALSA_MESSAGE_STATUS_FLAGGED]);
+    g_set_object(&status_icons[LIBBALSA_MESSAGE_STATUS_FLAGGED], pixbuf);
 }
 
 void libbalsa_mailbox_set_replied_icon(GdkPixbuf * pixbuf)
 {
-    libbalsa_mailbox_set_icon(pixbuf,
-                              &status_icons
-                              [LIBBALSA_MESSAGE_STATUS_REPLIED]);
+    g_set_object(&status_icons[LIBBALSA_MESSAGE_STATUS_REPLIED], pixbuf);
 }
 
 /* Icons for attachment column. */
 void libbalsa_mailbox_set_attach_icon(GdkPixbuf * pixbuf)
 {
-    libbalsa_mailbox_set_icon(pixbuf,
-                              &attach_icons
-                              [LIBBALSA_MESSAGE_ATTACH_ATTACH]);
+    g_set_object(&status_icons[LIBBALSA_MESSAGE_ATTACH_ATTACH], pixbuf);
 }
 
 #ifdef HAVE_GPGME
 void libbalsa_mailbox_set_good_icon(GdkPixbuf * pixbuf)
 {
-    libbalsa_mailbox_set_icon(pixbuf,
-                              &attach_icons
-                              [LIBBALSA_MESSAGE_ATTACH_GOOD]);
+    g_set_object(&status_icons[LIBBALSA_MESSAGE_ATTACH_GOOD], pixbuf);
 }
 
 void libbalsa_mailbox_set_notrust_icon(GdkPixbuf * pixbuf)
 {
-    libbalsa_mailbox_set_icon(pixbuf,
-                              &attach_icons
-                              [LIBBALSA_MESSAGE_ATTACH_NOTRUST]);
+    g_set_object(&status_icons[LIBBALSA_MESSAGE_ATTACH_NOTRUST], pixbuf);
 }
 
 void libbalsa_mailbox_set_bad_icon(GdkPixbuf * pixbuf)
 {
-    libbalsa_mailbox_set_icon(pixbuf,
-                              &attach_icons
-                              [LIBBALSA_MESSAGE_ATTACH_BAD]);
+    g_set_object(&status_icons[LIBBALSA_MESSAGE_ATTACH_BAD], pixbuf);
 }
 
 void libbalsa_mailbox_set_sign_icon(GdkPixbuf * pixbuf)
 {
-    libbalsa_mailbox_set_icon(pixbuf,
-                              &attach_icons
-                              [LIBBALSA_MESSAGE_ATTACH_SIGN]);
+    g_set_object(&status_icons[LIBBALSA_MESSAGE_ATTACH_SIGN], pixbuf);
 }
 
 void libbalsa_mailbox_set_encr_icon(GdkPixbuf * pixbuf)
 {
-    libbalsa_mailbox_set_icon(pixbuf,
-                              &attach_icons
-                              [LIBBALSA_MESSAGE_ATTACH_ENCR]);
+    g_set_object(&status_icons[LIBBALSA_MESSAGE_ATTACH_ENCR], pixbuf);
 }
 #endif /* HAVE_GPGME */
 

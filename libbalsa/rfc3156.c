@@ -516,12 +516,6 @@ libbalsa_rfc2440_verify(GMimePart * part, GMimeGpgmeSigstat ** sig_info)
     /* paranoia checks */
     g_return_val_if_fail(part != NULL, FALSE);
 
-    /* free any old signature */
-    if (sig_info && *sig_info) {
-	g_object_unref(*sig_info);
-	*sig_info = NULL;
-    }
-
     /* check if gpg is currently available */
     if (gpg_updates_trustdb())
 	return GPG_ERR_TRY_AGAIN;
@@ -544,12 +538,13 @@ libbalsa_rfc2440_verify(GMimePart * part, GMimeGpgmeSigstat ** sig_info)
 	retval = result->status;
 
     /* return the signature info if requested */
-    if (result) {
-	if (sig_info)
-	    *sig_info = result;
-	else
-	    g_object_unref(G_OBJECT(result));
+    if (sig_info != NULL) {
+        g_set_object(sig_info, result);
     }
+    if (result != NULL) {
+        g_object_unref(result);
+    }
+
     return retval;
 }
 
@@ -571,9 +566,8 @@ libbalsa_rfc2440_decrypt(GMimePart * part, GMimeGpgmeSigstat ** sig_info,
     g_return_val_if_fail(part != NULL, FALSE);
 
     /* free any old signature */
-    if (sig_info && *sig_info) {
-	g_object_unref(*sig_info);
-	*sig_info = NULL;
+    if (sig_info != NULL) {
+        g_clear_object(sig_info);
     }
 
     /* check if gpg is currently available */

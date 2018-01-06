@@ -849,9 +849,7 @@ imap_exists_idle(gpointer data)
                     message_info_from_msgno(mimap, i+1);
                 if(!msg_info)
                     continue;
-                if(msg_info->message)
-                    g_object_unref(msg_info->message);
-                msg_info->message = NULL;
+                g_clear_object(&msg_info->message);
                 msgid = g_ptr_array_index(mimap->msgids, i);
                 if(msgid) { 
                     g_free(msgid);

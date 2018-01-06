@@ -690,10 +690,8 @@ message_print_page_setup(GtkWindow * parent)
 	gtk_print_run_page_setup_dialog(parent, balsa_app.page_setup,
 					balsa_app.print_settings);
 
-    if (balsa_app.page_setup)
-	g_object_unref(G_OBJECT(balsa_app.page_setup));
-
-    balsa_app.page_setup = new_page_setup;
+    g_set_object(&balsa_app.page_setup, new_page_setup);
+    g_object_unref(new_page_setup);
 }
 
 
@@ -739,10 +737,7 @@ message_print(LibBalsaMessage * msg, GtkWindow * parent)
 				parent, &err);
 
     if (res == GTK_PRINT_OPERATION_RESULT_APPLY) {
-	if (balsa_app.print_settings != NULL)
-	    g_object_unref(balsa_app.print_settings);
-	balsa_app.print_settings =
-	    g_object_ref(gtk_print_operation_get_print_settings(print));
+        g_set_object(&balsa_app.print_settings, gtk_print_operation_get_print_settings(print));
     } else if (res == GTK_PRINT_OPERATION_RESULT_ERROR)
 	balsa_information(LIBBALSA_INFORMATION_ERROR,
 			  _("Error printing message: %s"), err->message);

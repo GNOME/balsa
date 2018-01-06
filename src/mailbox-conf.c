@@ -1089,8 +1089,7 @@ mailbox_conf_add(MailboxConfWindow * mcw)
 
         if (libbalsa_mailbox_local_set_path(ml, path, TRUE) != 0) {
             g_free(path);
-	    g_object_unref(G_OBJECT(mcw->mailbox));
-	    mcw->mailbox = NULL;
+            g_clear_object(&mcw->mailbox);
 	    return;
 	}
 

@@ -99,10 +99,7 @@ libbalsa_address_book_osmo_finalize(GObject *object)
 	LibBalsaAddressBookOsmo *osmo;
 
 	osmo = LIBBALSA_ADDRESS_BOOK_OSMO(object);
-	if (osmo->proxy != NULL) {
-		g_object_unref(osmo->proxy);
-		osmo->proxy = NULL;
-	}
+        g_clear_object(&osmo->proxy);
 
 	G_OBJECT_CLASS(libbalsa_address_book_osmo_parent_class)->finalize(object);
 }

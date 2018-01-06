@@ -79,8 +79,7 @@ net_client_pop_new(const gchar *host, guint16 port, NetClientCryptMode crypt_mod
 	client = NET_CLIENT_POP(g_object_new(NET_CLIENT_POP_TYPE, NULL));
 	if (client != NULL) {
 		if (!net_client_configure(NET_CLIENT(client), host, port, MAX_POP_LINE_LEN, NULL)) {
-			g_object_unref(G_OBJECT(client));
-			client = NULL;
+			g_clear_object(&client);
 		} else {
 			client->priv->crypt_mode = crypt_mode;
 			client->priv->use_pipelining = use_pipelining;

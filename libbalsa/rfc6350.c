@@ -86,8 +86,7 @@ rfc6350_parse_from_stream(GDataInputStream *stream,
 
 				/* evaluate unfolded line, drop address on error */
 				if (!rfc6350_eval_line(line, result, error)) {
-					g_object_unref(result);
-					result = NULL;
+					g_clear_object(&result);
 				}
 
 				/* process next line */
@@ -98,16 +97,14 @@ rfc6350_parse_from_stream(GDataInputStream *stream,
 
 		if (!parse_done) {
 			g_set_error(error, RFC6350_ERROR_QUARK, RFC6350_ERROR_END, _("malformed card, END:VCARD missing"));
-			g_object_unref(result);
-			result = NULL;
+                        g_clear_object(&result);
 		}
 	}
 
 	/* ignore items without an Email address, fill empty full name if necessary */
 	if (result != NULL) {
 		if (result->address_list == NULL) {
-			g_object_unref(result);
-			result = NULL;
+                        g_clear_object(&result);
 		} else if (result->full_name == NULL) {
 			result->full_name = g_strdup(_("No-Name"));
 		}

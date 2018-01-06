@@ -244,10 +244,7 @@ bndx_destroy(GObject * obj)
         index->search_iter = NULL;
     }
 
-    if (index->popup_menu) {
-        g_object_unref(index->popup_menu);
-        index->popup_menu = NULL;
-    }
+    g_clear_object(&index->popup_menu);
 
     g_free(index->filter_string); index->filter_string = NULL;
 

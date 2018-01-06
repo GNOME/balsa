@@ -302,6 +302,7 @@ balsa_druid_page_user_next(GtkAssistant * druid, GtkWidget * page,
     
     ia = internet_address_mailbox_new (mailbox, gtk_entry_get_text(GTK_ENTRY(user->email)));
     libbalsa_identity_set_address (ident, ia);
+    g_object_unref(ia);
 
     /* outgoing mail */
     if (balsa_app.smtp_servers == NULL) {

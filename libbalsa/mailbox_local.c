@@ -295,9 +295,7 @@ lbml_add_message_to_pool(LibBalsaMailboxLocal * local,
             oldest = item;
     }
 
-    if (oldest->message)
-        g_object_unref(oldest->message);
-    oldest->message = g_object_ref(message);
+    g_set_object(&oldest->message, message);
     oldest->pool_seqno = local->pool_seqno;
 }
 
@@ -784,10 +782,7 @@ libbalsa_mailbox_local_close_mailbox(LibBalsaMailbox * mailbox,
 
     for (item = &local->message_pool[0];
          item < &local->message_pool[LBML_POOL_SIZE]; item++) {
-        if (item->message) {
-            g_object_unref(item->message);
-            item->message = NULL;
-        }
+        g_clear_object(&item->message);
         item->pool_seqno = 0;
     }
     local->pool_seqno = 0;

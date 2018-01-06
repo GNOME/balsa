@@ -92,7 +92,5 @@ libbalsa_mailbox_remote_test_can_reach(LibBalsaMailbox          * mailbox,
 void 
 libbalsa_mailbox_remote_set_server(LibBalsaMailboxRemote *m, LibBalsaServer *s)
 {
-    if(m->server) g_object_unref(G_OBJECT(m->server));
-    m->server = s;
-    if(s) g_object_ref(G_OBJECT(s));
+    g_set_object(&m->server, s);
 }

@@ -238,6 +238,7 @@ balsa_register_pixbufs(GtkWidget * widget)
             g_clear_error(&err);
         } else {
             icons[i].set_icon(pixbuf);
+            g_object_unref(pixbuf);
         }
     }
 }

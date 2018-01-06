@@ -143,10 +143,7 @@ libbalsa_message_finalize(GObject * object)
     libbalsa_message_headers_destroy(message->headers);
     message->headers = NULL;
 
-    if (message->sender) {
-	g_object_unref(message->sender);
-	message->sender = NULL;
-    }
+    g_clear_object(&message->sender);
 
 #if MESSAGE_COPY_CONTENT
     g_free(message->subj);
@@ -174,15 +171,10 @@ libbalsa_message_finalize(GObject * object)
     libbalsa_message_body_free(message->body_list);
     message->body_list = NULL;
 
-    if (message->mime_msg) {
-	g_object_unref(message->mime_msg);
-	message->mime_msg = NULL;
-    }
+    g_clear_object(&message->mime_msg);
 
 #ifdef HAVE_GPGME
-    if (message->ident != NULL) {
-    	g_object_unref(message->ident);
-    }
+    g_clear_object(&message->ident);
 #endif
 
     if (message->tempdir) {
@@ -217,40 +209,13 @@ libbalsa_message_headers_destroy(LibBalsaMessageHeaders * headers)
     g_free(headers->subject);
     headers->subject = NULL;
 
-    if (headers->from) {
-	g_object_unref(headers->from);
-	headers->from = NULL;
-    }
-
-    if (headers->to_list) {
-	g_object_unref(headers->to_list);
-	headers->to_list = NULL;
-    }
-
-    if (headers->content_type) {
-	g_object_unref(headers->content_type);
-	headers->content_type = NULL;
-    }
-
-    if (headers->cc_list) {
-	g_object_unref(headers->cc_list);
-	headers->cc_list = NULL;
-    }
-
-    if (headers->bcc_list) {
-	g_object_unref(headers->bcc_list);
-	headers->bcc_list = NULL;
-    }
-
-    if (headers->reply_to) {
-	g_object_unref(headers->reply_to);
-	headers->reply_to = NULL;
-    }
-
-    if(headers->dispnotify_to) {
-	g_object_unref(headers->dispnotify_to);
-	headers->dispnotify_to = NULL;
-    }
+    g_clear_object(&headers->from);
+    g_clear_object(&headers->to_list);
+    g_clear_object(&headers->content_type);
+    g_clear_object(&headers->cc_list);
+    g_clear_object(&headers->bcc_list);
+    g_clear_object(&headers->reply_to);
+    g_clear_object(&headers->dispnotify_to);
 
     lb_message_headers_extra_destroy(headers);
 

@@ -93,8 +93,7 @@ balsa_print_object_image_destroy(GObject * self)
 {
     BalsaPrintObjectImage *po = BALSA_PRINT_OBJECT_IMAGE(self);
 
-    if (po->pixbuf)
-	g_object_unref(po->pixbuf);
+    g_clear_object(&po->pixbuf);
 
     G_OBJECT_CLASS(parent_class)->finalize(self);
 }

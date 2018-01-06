@@ -53,13 +53,13 @@ net_client_new(const gchar *host_and_port, guint16 default_port, gsize max_line_
 	client = NET_CLIENT(g_object_new(NET_CLIENT_TYPE, NULL));
 
 	if (client->priv->sock == NULL) {
-		g_object_unref(G_OBJECT(client));
-		client = NULL;
-	} else {
-		client->priv->host_and_port = g_strdup(host_and_port);
-		client->priv->default_port = default_port;
-		client->priv->max_line_len = max_line_len;
+		g_object_unref(client);
+		return NULL;
 	}
+
+	client->priv->host_and_port = g_strdup(host_and_port);
+	client->priv->default_port = default_port;
+	client->priv->max_line_len = max_line_len;
 
 	return client;
 }
@@ -288,10 +288,7 @@ net_client_set_cert_from_pem(NetClient *client, const gchar *pem_data, GError **
 	g_return_val_if_fail(NET_IS_CLIENT(client) && (pem_data != NULL), FALSE);
 
 	/* always free any existing certificate */
-	if (client->priv->certificate != NULL) {
-		g_object_unref(G_OBJECT(client->priv->certificate));
-		client->priv->certificate = NULL;
-	}
+	g_clear_object(&client->priv->certificate);
 
 	/* load the certificate */
 	res = gnutls_x509_crt_init(&cert);
@@ -483,26 +480,12 @@ net_client_finalise(GObject *object)
 	const GObjectClass *parent_class = G_OBJECT_CLASS(net_client_parent_class);
 
 	/* note: we must unref the GDataInputStream, but *not* the GOutputStream! */
-	if (client->priv->istream != NULL) {
-		g_object_unref(G_OBJECT(client->priv->istream));
-		client->priv->istream = NULL;
-	}
-	if (client->priv->tls_conn != NULL) {
-		g_object_unref(G_OBJECT(client->priv->tls_conn));
-		client->priv->tls_conn = NULL;
-	}
-	if (client->priv->plain_conn != NULL) {
-		g_object_unref(G_OBJECT(client->priv->plain_conn));
-		client->priv->plain_conn = NULL;
-	}
-	if (client->priv->sock != NULL) {
-		g_object_unref(G_OBJECT(client->priv->sock));
-		client->priv->sock = NULL;
-	}
-	if (client->priv->certificate != NULL) {
-		g_object_unref(G_OBJECT(client->priv->certificate));
-		client->priv->certificate = NULL;
-	}
+        g_clear_object(&client->priv->istream);
+
+        g_clear_object(&client->priv->tls_conn);
+        g_clear_object(&client->priv->plain_conn);
+        g_clear_object(&client->priv->sock);
+        g_clear_object(&client->priv->certificate);
 	g_debug("finalised connection to %s", client->priv->host_and_port);
 	g_free(client->priv->host_and_port);
 	(*parent_class->finalize)(object);

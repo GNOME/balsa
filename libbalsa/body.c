@@ -76,8 +76,7 @@ libbalsa_message_body_free(LibBalsaMessageBody * body)
     libbalsa_message_headers_destroy(body->embhdrs);
     g_free(body->content_type);
     g_free(body->filename);
-    if (body->file_uri)
-        g_object_unref(body->file_uri);
+    g_clear_object(&body->file_uri);
     if (body->temp_filename) {
 	unlink(body->temp_filename);
         g_free(body->temp_filename);
@@ -86,16 +85,14 @@ libbalsa_message_body_free(LibBalsaMessageBody * body)
     g_free(body->charset);
 
 #ifdef HAVE_GPGME
-    if (body->sig_info)
-	g_object_unref(G_OBJECT(body->sig_info));
+    g_clear_object(&body->sig_info);
 #endif
 
     libbalsa_message_body_free(body->next);
     libbalsa_message_body_free(body->parts);
 
-    if (body->mime_part)
-	g_object_unref(body->mime_part);	
-    
+    g_clear_object(&body->mime_part);
+
     g_free(body);
 }
 
@@ -273,10 +270,7 @@ libbalsa_message_body_set_mime_body(LibBalsaMessageBody * body,
     g_return_if_fail(body != NULL);
     g_return_if_fail(GMIME_IS_OBJECT(mime_part));
 
-    g_object_ref(mime_part);
-    if (body->mime_part)
-	g_object_unref(body->mime_part);
-    body->mime_part = mime_part;
+    g_set_object(&body->mime_part, mime_part);
 
     libbalsa_message_body_set_filename(body);
     libbalsa_message_body_set_types(body);

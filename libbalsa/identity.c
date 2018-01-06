@@ -133,8 +133,7 @@ libbalsa_identity_finalize(GObject * object)
 {
     LibBalsaIdentity *ident = LIBBALSA_IDENTITY(object);
 
-    if (ident->ia)
-	g_object_unref(ident->ia);
+    g_clear_object(&ident->ia);
     g_free(ident->identity_name);
     g_free(ident->replyto);
     g_free(ident->domain);
@@ -142,8 +141,7 @@ libbalsa_identity_finalize(GObject * object)
     g_free(ident->reply_string);
     g_free(ident->forward_string);
     g_free(ident->signature_path);
-    if (ident->smtp_server)
-        g_object_unref(ident->smtp_server);
+    g_clear_object(&ident->smtp_server);
     g_free(ident->face);
     g_free(ident->x_face);
     g_free(ident->force_gpg_key_id);
@@ -199,9 +197,7 @@ libbalsa_identity_set_address(LibBalsaIdentity * ident,
 {
     g_return_if_fail(ident != NULL);
 
-    if (ident->ia)
-	g_object_unref(ident->ia);
-    ident->ia = ia;
+    g_set_object(&ident->ia, ia);
 }
 
 
@@ -383,11 +379,7 @@ libbalsa_identity_set_smtp_server(LibBalsaIdentity * ident,
 {
     g_return_if_fail(ident != NULL);
 
-    if (ident->smtp_server)
-	g_object_unref(ident->smtp_server);
-    ident->smtp_server = smtp_server;
-    if (smtp_server)
-	g_object_ref(smtp_server);
+    g_set_object(&ident->smtp_server, smtp_server);
 }
 
 
@@ -1503,6 +1495,7 @@ ident_dialog_update(GObject * dlg)
     internet_address_set_name(ia, text);
     libbalsa_identity_set_address(id, ia);
     g_free(text);
+    g_object_unref(ia);
 
     g_free(id->replyto);
     id->replyto         = ident_dialog_get_text(dlg, "identity-replyto");
@@ -1515,9 +1508,7 @@ ident_dialog_update(GObject * dlg)
     g_free(id->forward_string);
     id->forward_string  = ident_dialog_get_text(dlg, "identity-forwardstring");
     id->send_mp_alternative = ident_dialog_get_bool(dlg, "identity-sendmpalternative");
-    if(id->smtp_server) g_object_unref(id->smtp_server);
-    id->smtp_server = ident_dialog_get_value(dlg, "identity-smtp-server");
-    g_object_ref(id->smtp_server);
+    g_set_object(&id->smtp_server, ident_dialog_get_value(dlg, "identity-smtp-server"));
 
     g_free(id->signature_path);
     id->signature_path  = ident_dialog_get_text(dlg, "identity-sigpath");

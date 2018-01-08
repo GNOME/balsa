@@ -1248,17 +1248,17 @@ libbalsa_address_view_get_list(LibBalsaAddressView * address_view,
 void
 libbalsa_address_view_set_book_icon(GdkPixbuf * book_icon)
 {
-    lbav_book_icon = book_icon;
+    g_set_object(&lbav_book_icon, book_icon);
 }
 
 void
 libbalsa_address_view_set_close_icon(GdkPixbuf * close_icon)
 {
-    lbav_close_icon = close_icon;
+    g_set_object(&lbav_close_icon, close_icon);
 }
 
 void
 libbalsa_address_view_set_drop_down_icon(GdkPixbuf * drop_down_icon)
 {
-    lbav_drop_down_icon = drop_down_icon;
+    g_set_object(&lbav_drop_down_icon, drop_down_icon);
 }

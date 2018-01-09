@@ -3465,8 +3465,7 @@ bw_check_messages_thread(struct check_messages_thread_info *info)
     		libbalsa_progress_dialog_ensure(&progress_dialog, _("Checking Mail…"), GTK_WINDOW(info->window), _("Mailboxes"));
     	}
     	g_slist_foreach(list, (GFunc) bw_mailbox_check, info);
-    	g_slist_foreach(list, (GFunc) g_object_unref, NULL);
-    	g_slist_free(list);
+    	g_slist_free_full(list, g_object_unref);
     	if (info->with_progress_dialog) {
     		libbalsa_progress_dialog_update(&progress_dialog, _("Mailboxes"), TRUE, 1.0, NULL);
     	}

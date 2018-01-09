@@ -4002,8 +4002,7 @@ lbm_try_reassemble_idle(LibBalsaMailbox * mailbox)
     for (id = ids; id; id = id->next)
         lbm_try_reassemble(mailbox, id->data);
 
-    g_slist_foreach(ids, (GFunc) g_free, NULL);
-    g_slist_free(ids);
+    g_slist_free_full(ids, g_free);
     g_object_set_data(G_OBJECT(mailbox), LBM_TRY_REASSEMBLE_IDS, NULL);
 
     libbalsa_unlock_mailbox(mailbox);

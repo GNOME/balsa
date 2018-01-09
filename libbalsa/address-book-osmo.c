@@ -40,6 +40,7 @@
 #include "address-book.h"
 #include "rfc6350.h"
 #include "address-book-osmo.h"
+#include "misc.h"
 
 
 /* for the time being, osmo svn rev. 1099 accepts only reading via DBus, not writing new or modified records */
@@ -337,8 +338,7 @@ osmo_read_addresses(LibBalsaAddressBookOsmo *osmo,
 			/* drop list on error, reverse order otherwise */
 			if (addresses != NULL) {
 				if (*error != NULL) {
-					g_list_free_full(addresses, g_object_unref);
-					addresses = NULL;
+					libbalsa_clear_list(&addresses, g_object_unref);
 				} else {
 					addresses = g_list_reverse(addresses);
 				}

@@ -1221,12 +1221,32 @@ libbalsa_clear_source_id(guint * tag)
 {
     gboolean retval;
 
-    g_return_val_if_fail(tag != NULL, FALSE);
-
-    if ((retval = (*tag != 0U))) {
+    retval = *tag != 0U;
+    if (retval) {
         g_source_remove(*tag);
         *tag = 0U;
     }
 
     return retval;
+}
+
+/*
+ * Convenience functions for freeing list items' data and clearing the
+ * list
+ *
+ * If the data do not need to be freed, just use
+ * g_clear_pointer(&list, (GDestroyNotify) g_list_free);
+ */
+void
+libbalsa_clear_list(GList ** list, GDestroyNotify free_func)
+{
+    g_list_free_full(*list, free_func);
+    *list = NULL;
+}
+
+void
+libbalsa_clear_slist(GSList ** list, GDestroyNotify free_func)
+{
+    g_slist_free_full(*list, free_func);
+    *list = NULL;
 }

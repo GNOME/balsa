@@ -511,8 +511,7 @@ libbalsa_address_new_from_vcard(const gchar *str, const gchar *charset)
     g_free(first_name);
     g_free(nick_name);
     g_free(org);
-    g_list_foreach(address_list, (GFunc) g_free, NULL);
-    g_list_free(address_list);
+    g_list_free_full(address_list, g_free);
 
     return NULL;
 }
@@ -535,8 +534,7 @@ libbalsa_address_set_copy(LibBalsaAddress * dest, LibBalsaAddress * src)
     dest->last_name = g_strdup(src->last_name);
     g_free(dest->organization);
     dest->organization = g_strdup(src->organization);
-    g_list_foreach(dest->address_list, (GFunc) g_free, NULL);
-    g_list_free(dest->address_list);
+    g_list_free_full(dest->address_list, g_free);
 
     dst_al = NULL;
     for (src_al = src->address_list; src_al; src_al = src_al->next)

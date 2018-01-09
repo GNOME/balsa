@@ -500,10 +500,7 @@ libbalsa_condition_regex_free(LibBalsaConditionRegex* reg, gpointer throwaway)
 void 
 regexs_free(GSList * regexs)
 {
-    if (regexs) {
-	g_slist_foreach(regexs, (GFunc) libbalsa_condition_regex_free, NULL);
-	g_slist_free(regexs);
-    }
+    g_slist_free_full(regexs, (GDestroyNotify) libbalsa_condition_regex_free);
 }                               /* end condition_free_regexs() */
 
 void 

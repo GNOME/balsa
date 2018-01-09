@@ -418,10 +418,7 @@ lbab_rubrica_load_xml(LibBalsaAddressBookRubrica * ab_rubrica,
     }
 
     /* free old data */
-    g_slist_foreach(ab_text->item_list, (GFunc) g_object_unref, NULL);
-    g_slist_free(ab_text->item_list);
-    ab_text->item_list = NULL;
-
+    libbalsa_clear_slist(&ab_text->item_list, g_object_unref);
     libbalsa_completion_clear_items(ab_text->name_complete);
 
 

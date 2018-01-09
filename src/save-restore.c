@@ -1549,8 +1549,7 @@ config_address_books_load(void)
     libbalsa_conf_pop_group();
 
     /* Free old data in case address books were set by eg. config druid. */
-    g_list_free_full(balsa_app.address_book_list, g_object_unref);
-    balsa_app.address_book_list = NULL;
+    libbalsa_clear_list(&balsa_app.address_book_list, g_object_unref);
 
     libbalsa_conf_foreach_group(ADDRESS_BOOK_SECTION_PREFIX,
                                 config_address_book_load,
@@ -1619,8 +1618,7 @@ config_identities_load()
     gchar *default_ident;
 
     /* Free old data in case identities were set by eg. config druid. */
-    g_list_free_full(balsa_app.identities, g_object_unref);
-    balsa_app.identities = NULL;
+    libbalsa_clear_list(&balsa_app.identities, g_object_unref);
 
     libbalsa_conf_push_group("identity");
     default_ident = libbalsa_conf_get_string("CurrentIdentity");

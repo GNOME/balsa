@@ -369,10 +369,9 @@ libbalsa_condition_new_2_0(const gchar * filter_section_name,
            we create the combined condition. */
         info.tmp_list =
             g_list_sort(info.tmp_list, compare_conditions_order);
-        l = info.tmp_list;
-        for (; info.tmp_list; info.tmp_list = info.tmp_list->next) {
+        for (l = info.tmp_list; l != NULL; l = l->next) {
             LibBalsaTempCondition *tmp =
-                (LibBalsaTempCondition *) (info.tmp_list->data);
+                (LibBalsaTempCondition *) (l->data);
             LibBalsaCondition *res = 
                 libbalsa_condition_new_bool_ptr(FALSE, cmt, tmp->cnd,
                                                 cond_2_0);
@@ -381,7 +380,7 @@ libbalsa_condition_new_2_0(const gchar * filter_section_name,
             cond_2_0 = res;
             g_free(tmp);
         }
-        g_list_free(l);
+        g_list_free(info.tmp_list);
     }
     /* else we leak the list and structures?? */
     return cond_2_0;

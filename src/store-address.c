@@ -177,8 +177,7 @@ store_address_response(GtkWidget * dialog, gint response,
         g_object_weak_unref(G_OBJECT(list->data),
                             (GWeakNotify) store_address_weak_notify, info);
     }
-    g_list_foreach(info->entries_list, (GFunc) g_free, NULL);
-    g_list_free(info->entries_list);
+    g_list_free_full(info->entries_list, g_free);
     store_address_free(info);
 }
 

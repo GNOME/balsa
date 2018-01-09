@@ -412,29 +412,16 @@ balsa_app_destroy(void)
 {
     config_save();
 
-    g_list_foreach(balsa_app.address_book_list, (GFunc)g_object_unref, NULL);
-    g_list_free(balsa_app.address_book_list);
-    balsa_app.address_book_list = NULL;
+    libbalsa_clear_list(&balsa_app.address_book_list, g_object_unref);
 
     /* now free filters */
-    g_slist_foreach(balsa_app.filters, (GFunc)libbalsa_filter_free, 
+    g_slist_foreach(balsa_app.filters, (GFunc)libbalsa_filter_free,
 		    GINT_TO_POINTER(TRUE));
-    g_slist_free(balsa_app.filters);
-    balsa_app.filters = NULL;
+    g_clear_pointer(&balsa_app.filters, (GDestroyNotify) g_slist_free);
 
-    g_list_foreach(balsa_app.identities, (GFunc)g_object_unref, NULL);
-    g_list_free(balsa_app.identities);
-    balsa_app.identities = NULL;
-
-
-    g_list_foreach(balsa_app.folder_mru, (GFunc)g_free, NULL);
-    g_list_free(balsa_app.folder_mru);
-    balsa_app.folder_mru = NULL;
-
-    g_list_foreach(balsa_app.fcc_mru, (GFunc)g_free, NULL);
-    g_list_free(balsa_app.fcc_mru);
-    balsa_app.fcc_mru = NULL;
-
+    libbalsa_clear_list(&balsa_app.identities, g_object_unref);
+    libbalsa_clear_list(&balsa_app.folder_mru, g_free);
+    libbalsa_clear_list(&balsa_app.fcc_mru, g_free);
 
     if(balsa_app.debug) g_print("balsa_app: Finished cleaning up.\n");
 }

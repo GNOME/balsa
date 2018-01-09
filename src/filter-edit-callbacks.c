@@ -1336,9 +1336,7 @@ update_filters_mailbox(GtkTreeModel * model, GtkTreePath * path,
 	return FALSE;
 
     /* First we free the filters list (which is now obsolete) */
-    g_slist_foreach(mailbox->filters, (GFunc) g_free, NULL);
-    g_slist_free(mailbox->filters);
-    mailbox->filters = NULL;
+    libbalsa_clear_slist(&mailbox->filters, g_free);
     /* Second we replace old filters name by the new ones
      * Note : deleted filters are also removed */
     if (!filters_names_changes)
@@ -1427,21 +1425,12 @@ void fe_destroy_window_cb(GtkWidget * widget,gpointer throwaway)
         g_free(((filters_names_rec *)lst->data)->new_name);
         g_free((filters_names_rec *)lst->data);
     }
+    g_clear_pointer(&filters_names_changes, (GDestroyNotify) g_list_free);
 
-    g_list_free(filters_names_changes);
-    filters_names_changes=NULL;
-
-    for (lst = new_filters_names; lst != NULL; lst = lst->next) {
-        g_free((gchar *)lst->data);
-    }
-
-    g_list_free(new_filters_names);
-    new_filters_names=NULL;
+    libbalsa_clear_list(&new_filters_names, g_free);
 
     /* free all strings in fe_user_headers_list */
-    g_list_foreach(fe_user_headers_list,(GFunc)g_free,NULL);
-    g_list_free(fe_user_headers_list);
-    fe_user_headers_list = NULL;
+    libbalsa_clear_list(&fe_user_headers_list, g_free);
 
     fe_already_open=FALSE;
 }

@@ -157,8 +157,7 @@ struct _LibBalsaMessageHeaders {
 };
 
 /** FREE_HEADER_LIST() frees user_hdrs */
-#define FREE_HEADER_LIST(l) do{ g_list_foreach((l),(GFunc)g_strfreev,NULL);\
-                                g_list_free(l); } while(0)
+#define FREE_HEADER_LIST(l) g_list_free_full((l),(GDestroyNotify)g_strfreev)
 
 struct _LibBalsaMessage {
     GObject object;

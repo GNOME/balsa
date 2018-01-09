@@ -1977,9 +1977,7 @@ bmbl_mru_combo_box_setup(GtkComboBox * combo_box)
     gtk_combo_box_set_active(combo_box, -1);
     store = GTK_LIST_STORE(gtk_combo_box_get_model(combo_box));
     gtk_list_store_clear(store);
-    g_slist_foreach(mro->real_urls, (GFunc) g_free, NULL);
-    g_slist_free(mro->real_urls);
-    mro->real_urls = NULL;
+    libbalsa_clear_slist(&mro->real_urls, g_free);
 
     for (list = *mro->url_list; list; list = list->next) {
         const gchar *url = list->data;
@@ -2035,8 +2033,7 @@ bmbl_mru_combo_box_changed(GtkComboBox * combo_box,
 static void
 bmbl_mru_combo_box_destroy_cb(BalsaMBListMRUOption * mro)
 {
-    g_slist_foreach(mro->real_urls, (GFunc) g_free, NULL);
-    g_slist_free(mro->real_urls);
+    g_slist_free_full(mro->real_urls, g_free);
     g_free(mro);
 }
 

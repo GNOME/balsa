@@ -399,8 +399,7 @@ libbalsa_address_book_ldif_parse_address(FILE * stream,
                     g_free(line);
                     return LBABERR_OK;
                 }
-                g_list_foreach(address_list, (GFunc) g_free, NULL);
-                g_list_free(address_list);
+                g_list_free_full(address_list, g_free);
 	    } 
             /* Record without e-mail address, or we're not creating
              * addresses: free memory. */

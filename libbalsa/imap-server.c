@@ -855,15 +855,11 @@ libbalsa_imap_server_has_persistent_cache(LibBalsaImapServer *srv)
 void
 libbalsa_imap_server_force_disconnect(LibBalsaImapServer *imap_server)
 {
-	g_mutex_lock(&imap_server->lock);
-    g_list_foreach(imap_server->used_handles,
-                   (GFunc) lb_imap_server_info_free, NULL);
-    g_list_free(imap_server->used_handles);
-    imap_server->used_handles = NULL;
-    g_list_foreach(imap_server->free_handles,
-                   (GFunc) lb_imap_server_info_free, NULL);
-    g_list_free(imap_server->free_handles);
-    imap_server->free_handles = NULL;
+    g_mutex_lock(&imap_server->lock);
+
+    libbalsa_clear_list(&imap_server->used_handles, (GDestroyNotify) lb_imap_server_info_free);
+    libbalsa_clear_list(&imap_server->free_handles, (GDestroyNotify) lb_imap_server_info_free);
+
     g_mutex_unlock(&imap_server->lock);
 }
 

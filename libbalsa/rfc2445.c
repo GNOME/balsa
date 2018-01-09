@@ -148,9 +148,7 @@ libbalsa_vcal_finalize(LibBalsaVCal * self)
 {
     g_return_if_fail(self != NULL);
 
-    if (self->vevent) {
-	g_list_free_full(self->vevent, g_object_unref);
-    }
+    g_list_free_full(self->vevent, g_object_unref);
 
     libbalsa_vcal_parent_class->finalize(G_OBJECT(self));
 }
@@ -215,12 +213,10 @@ libbalsa_vevent_finalize(LibBalsaVEvent * self)
 {
     g_return_if_fail(self != NULL);
 
-    if (self->organizer)
+    if (self->organizer) {
 	g_object_unref(self->organizer);
-    if (self->attendee) {
-	g_list_foreach(self->attendee, (GFunc) g_object_unref, NULL);
-	g_list_free(self->attendee);
     }
+    g_list_free_full(self->attendee, g_object_unref);
     g_free(self->uid);
     g_free(self->summary);
     g_free(self->location);

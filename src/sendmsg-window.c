@@ -627,11 +627,7 @@ balsa_sendmsg_destroy_handler(BalsaSendmsg * bsmsg)
     quit_on_close = bsmsg->quit_on_close;
     g_free(bsmsg->fcc_url);
     g_free(bsmsg->in_reply_to);
-    if(bsmsg->references) {
-        g_list_foreach(bsmsg->references, (GFunc) g_free, NULL);
-        g_list_free(bsmsg->references);
-        bsmsg->references = NULL;
-    }
+    libbalsa_clear_list(&bsmsg->references, g_free);
 
 #if !(HAVE_GSPELL || HAVE_GTKSPELL)
     if (bsmsg->spell_checker)
@@ -2070,8 +2066,7 @@ insert_selected_messages(BalsaSendmsg *bsmsg, QuoteType type)
             gtk_text_buffer_insert_at_cursor(buffer, body->str, body->len);
             g_string_free(body, TRUE);
 	}
-	g_list_foreach(l, (GFunc)g_object_unref, NULL);
-        g_list_free(l);
+	g_list_free_full(l, g_object_unref);
     }
 }
 
@@ -2109,8 +2104,7 @@ sw_attach_messages_activated(GSimpleAction * action,
                 break;
             }
 	}
-	g_list_foreach(l, (GFunc)g_object_unref, NULL);
-        g_list_free(l);
+	g_list_free_full(l, g_object_unref);
     }
 }
 
@@ -2217,12 +2211,12 @@ attachments_add(GtkWidget        * widget,
     } else if (target == g_intern_static_string("text/uri-list")) {
         GSList *uri_list, *list;
 
-        list = uri2gslist((gchar *) gtk_selection_data_get_data(selection_data));
-        for (uri_list = list; uri_list != NULL; uri_list = uri_list->next) {
-	    add_attachment(bsmsg, uri_list->data, FALSE, NULL);
-            g_free(uri_list->data);
+        uri_list = uri2gslist((gchar *) gtk_selection_data_get_data(selection_data));
+        for (list = uri_list; list != NULL; list = list->next) {
+	    add_attachment(bsmsg, list->data, FALSE, NULL);
+            g_free(list->data);
         }
-        g_slist_free(list);
+        g_slist_free(uri_list);
     } else if (target == g_intern_static_string("STRING") ||
                target == g_intern_static_string("text/plain")) {
 	gchar *url = rfc2396_uri((gchar *) gtk_selection_data_get_data(selection_data));
@@ -2801,24 +2795,24 @@ drag_data_quote(GtkWidget        * widget,
         }
         balsa_index_selected_msgnos_free(index, selected);
     } else if (target == g_intern_static_string(drop_types[TARGET_URI_LIST])) {
-        GSList *uri_list =
-            uri2gslist((gchar *)
-                       gtk_selection_data_get_data(selection_data));
-        for (; uri_list != NULL; uri_list = uri_list->next) {
+        GSList *uri_list, *list;
+
+        uri_list = uri2gslist((gchar *) gtk_selection_data_get_data(selection_data));
+        for (list = uri_list; list != NULL; list = list->next) {
             /* Since current GtkTextView gets this signal twice for
              * every action (#150141) we need to check for duplicates,
              * which is a good idea anyway. */
 	    has_file_attached_t find_file;
 
-	    find_file.name = uri_list->data;
+	    find_file.name = list->data;
 	    find_file.found = FALSE;
             if (bsmsg->tree_view)
                 gtk_tree_model_foreach(BALSA_MSG_ATTACH_MODEL(bsmsg),
                                        has_file_attached, &find_file);
             if (!find_file.found)
-                add_attachment(bsmsg, uri_list->data, FALSE, NULL);
+                add_attachment(bsmsg, list->data, FALSE, NULL);
+            g_free(list->data);
         }
-        g_slist_foreach(uri_list, (GFunc) g_free, NULL);
         g_slist_free(uri_list);
     }
 
@@ -6851,8 +6845,7 @@ sendmsg_window_reply_embedded(LibBalsaMessageBody *part,
                              in_reply_to, message_id);
         fill_body_from_part(bsmsg, part->embhdrs, message_id, references,
                             part->parts, QUOTE_ALL);
-        g_list_foreach(references, (GFunc) g_free, NULL);
-        g_list_free(references);
+        g_list_free_full(references, g_free);
     }
 
     if (reply_type == SEND_REPLY_ALL)

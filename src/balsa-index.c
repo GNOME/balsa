@@ -1494,8 +1494,7 @@ bndx_store_address(gpointer data)
     GList *messages = balsa_index_selected_list(BALSA_INDEX(data));
 
     balsa_store_address_from_messages(messages);
-    g_list_foreach(messages, (GFunc)g_object_unref, NULL);
-    g_list_free(messages);
+    g_list_free_full(messages, g_object_unref);
 }
 
 static void

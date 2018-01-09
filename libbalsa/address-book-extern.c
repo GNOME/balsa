@@ -48,6 +48,7 @@
 #include "address-book.h"
 #include "libbalsa-conf.h"
 #include "information.h"
+#include "misc.h"
 #include "abook-completion.h"
 #include <glib/gi18n.h>
 
@@ -224,9 +225,7 @@ libbalsa_address_book_externq_load(LibBalsaAddressBook * ab,
     LibBalsaAddressBookExtern *addr_externq = LIBBALSA_ADDRESS_BOOK_EXTERN(ab);
 
     /* Erase the current address list */
-    g_list_foreach(addr_externq->address_list, (GFunc) g_object_unref, NULL);
-    g_list_free(addr_externq->address_list);
-    addr_externq->address_list = NULL;
+    libbalsa_clear_list(&addr_externq->address_list, g_object_unref);
     if(callback) {
         data.ab = ab;
         data.callback = callback;

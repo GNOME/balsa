@@ -745,8 +745,7 @@ message_print(LibBalsaMessage * msg, GtkWindow * parent)
     /* clean up */
     if (err)
 	g_error_free(err);
-    g_list_foreach(print_data->print_parts, (GFunc) g_object_unref, NULL);
-    g_list_free(print_data->print_parts);
+    g_list_free_full(print_data->print_parts, g_object_unref);
     g_free(print_data->footer);
     g_free(print_data);
     g_object_unref(G_OBJECT(print));

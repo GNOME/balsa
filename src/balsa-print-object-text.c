@@ -307,10 +307,7 @@ balsa_print_object_text_plain(GList *list, GtkPrintContext * context,
 	    g_array_remove_index(attr_offs, 0);
 	    this_par_part = this_par_part->next;
 	}
-	if (attr_list) {
-	    g_list_foreach(attr_list, (GFunc) g_free, NULL);
-	    g_list_free(attr_list);
-	}
+	g_list_free_full(attr_list, g_free);
 	g_list_free(par_parts);
 	g_array_free(attr_offs, TRUE);
     }

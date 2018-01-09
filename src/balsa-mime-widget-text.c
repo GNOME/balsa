@@ -110,7 +110,7 @@ static void check_call_url(GtkGestureMultiPress *multi_press,
                            gpointer              user_data);
 static message_url_t * find_url(GtkWidget * widget, gint x, gint y, GList * url_list);
 static void handle_url(const gchar* url);
-static void free_url_list(GList * url_list);
+static void free_url(message_url_t * url);
 static void bm_widget_on_url(const gchar *url);
 static void phrase_highlight(GtkTextBuffer * buffer, const gchar * id,
 			     gunichar tag_char, const gchar * property,
@@ -154,7 +154,7 @@ balsa_mime_widget_text_finalize(GObject * gobject) {
     BalsaMimeWidgetText *mwt;
 
     mwt = BALSA_MIME_WIDGET_TEXT(gobject);
-    free_url_list(mwt->url_list);
+    g_list_free_full(mwt->url_list, (GDestroyNotify) free_url);
 
     G_OBJECT_CLASS(balsa_mime_widget_text_parent_class)->finalize(gobject);
 }
@@ -874,17 +874,10 @@ handle_url(const gchar * url)
 }
 
 static void
-free_url_list(GList * url_list)
+free_url(message_url_t * url)
 {
-    GList *list;
-
-    for (list = url_list; list != NULL; list = list->next) {
-        message_url_t *url_data = (message_url_t *) list->data;
-
-        g_free(url_data->url);
-        g_free(url_data);
-    }
-    g_list_free(url_list);
+    g_free(url->url);
+    g_free(url);
 }
 
 /* --- Hacker's Jargon highlighting --- */

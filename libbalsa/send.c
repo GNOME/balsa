@@ -213,19 +213,16 @@ send_message_info_new(LibBalsaSmtpServer   *smtp_server,
 static void
 send_message_info_destroy(SendMessageInfo *smi)
 {
-	if (smi->outbox != NULL) {
-		g_object_unref(G_OBJECT(smi->outbox));
-	}
+    if (smi->outbox != NULL) {
+        g_object_unref(G_OBJECT(smi->outbox));
+    }
     if (smi->session != NULL) {
         g_object_unref(G_OBJECT(smi->session));
     }
-    if (smi->items != NULL) {
-        g_list_free_full(smi->items, (GDestroyNotify) msg_queue_item_destroy);
-    }
-    if (smi->progress_id != NULL) {
-    	g_free(smi->progress_id);
-    }
+    g_list_free_full(smi->items, (GDestroyNotify) msg_queue_item_destroy);
+    g_free(smi->progress_id);
     g_object_unref(smi->smtp_server);
+
     g_free(smi);
 }
 
@@ -1821,8 +1818,7 @@ libbalsa_create_rfc2440_buffer(LibBalsaMessage *message,
                                               always_trust,
                                               parent, error);
         }
-        g_list_foreach(encrypt_for, (GFunc) g_free, NULL);
-        g_list_free(encrypt_for);
+        g_list_free_full(encrypt_for, g_free);
         if (!result) {
             return LIBBALSA_MESSAGE_ENCRYPT_ERROR;
         }
@@ -1909,7 +1905,7 @@ do_multipart_crypto(LibBalsaMessage *message,
                                              protocol, always_trust,
                                              parent, error);
         }
-        g_list_free_full(encrypt_for, (GDestroyNotify) g_free);
+        g_list_free_full(encrypt_for, g_free);
 
         if (!success) {
             return LIBBALSA_MESSAGE_ENCRYPT_ERROR;

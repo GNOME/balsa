@@ -373,10 +373,9 @@ typedef struct {
 static void
 lbm_local_free_info(LibBalsaMailboxLocalInfo * info)
 {
-    if (info) {
+    if (info != NULL) {
         g_free(info->message_id);
-        g_list_foreach(info->refs_for_threading, (GFunc) g_free, NULL);
-        g_list_free(info->refs_for_threading);
+        g_list_free_full(info->refs_for_threading, g_free);
         g_free(info->sender);
         g_free(info);
     }

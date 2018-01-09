@@ -298,10 +298,7 @@ lbab_text_load_file(LibBalsaAddressBookText * ab_text, FILE * stream)
     if (!lbab_text_address_book_need_reload(ab_text))
         return TRUE;
 
-    g_slist_foreach(ab_text->item_list, (GFunc) lbab_text_item_free, NULL);
-    g_slist_free(ab_text->item_list);
-    ab_text->item_list = NULL;
-
+    libbalsa_clear_slist(&ab_text->item_list, (GDestroyNotify) lbab_text_item_free);
     libbalsa_completion_clear_items(ab_text->name_complete);
 
     parse_address =

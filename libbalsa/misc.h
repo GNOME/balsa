@@ -159,5 +159,7 @@ GString * libbalsa_html_encode_hyperlinks(GString * paragraph);
 gchar *libbalsa_font_string_to_css(const gchar * font_string, const gchar * name);
 
 gboolean libbalsa_clear_source_id(guint * tag);
+void libbalsa_clear_list(GList ** list, GDestroyNotify free_func);
+void libbalsa_clear_slist(GSList ** list, GDestroyNotify free_func);
 
 #endif				/* __LIBBALSA_MISC_H__ */

@@ -1730,8 +1730,7 @@ help_ident_cb(GtkWidget * widget)
 static void
 lbi_free_smtp_server_list(GSList ** smtp_server_list)
 {
-    g_slist_foreach(*smtp_server_list, (GFunc) g_object_unref, NULL);
-    g_slist_free(*smtp_server_list);
+    g_slist_free_full(*smtp_server_list, g_object_unref);
     g_free(smtp_server_list);
 }
 

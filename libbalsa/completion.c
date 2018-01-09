@@ -56,8 +56,10 @@
 #include <string.h>
 
 #include <glib.h>
+#include "config.h"
 #include "completion.h"
 #include "abook-completion.h"
+#include "misc.h"
 
 /**
  * SECTION: completion
@@ -166,20 +168,11 @@ libbalsa_completion_add_items(LibBalsaCompletion * cmp,
     g_return_if_fail(cmp != NULL);
 
     /* optimize adding to cache? */
-    if (cmp->cache) {
-        g_list_free(cmp->cache);
-        cmp->cache = NULL;
-    }
+    g_clear_pointer(&cmp->cache, (GDestroyNotify) g_list_free);
+    g_clear_pointer(&cmp->prefix, (GDestroyNotify) g_free);
 
-    if (cmp->prefix) {
-        g_free(cmp->prefix);
-        cmp->prefix = NULL;
-    }
-
-    it = items;
-    while (it) {
+    for (it = items; it != NULL; it = it->next) {
         cmp->items = g_list_prepend(cmp->items, it->data);
-        it = it->next;
     }
 }
 
@@ -194,12 +187,9 @@ libbalsa_completion_clear_items(LibBalsaCompletion * cmp)
 {
     g_return_if_fail(cmp != NULL);
 
-    g_list_free_full(cmp->items, (GDestroyNotify) completion_data_free);
-    cmp->items = NULL;
-    g_list_free(cmp->cache);
-    cmp->cache = NULL;
-    g_free(cmp->prefix);
-    cmp->prefix = NULL;
+    libbalsa_clear_list(&cmp->items, (GDestroyNotify) completion_data_free);
+    g_clear_pointer(&cmp->cache, (GDestroyNotify) g_list_free);
+    g_clear_pointer(&cmp->prefix, (GDestroyNotify) g_free);
 }
 
 /**
@@ -248,26 +238,21 @@ libbalsa_completion_complete(LibBalsaCompletion * cmp,
 
     if (!done) {
         /* normal code */
-        g_list_free(cmp->cache);
-        cmp->cache = NULL;
-        list = cmp->items;
-        while (*prefix && list) {
-            if (!cmp->strncmp_func(prefix,
-                                   cmp->func ? cmp->func(list->
-                                                         data) : (gchar *)
-                                   list->data, len))
+        g_clear_pointer(&cmp->cache, (GDestroyNotify) g_list_free);
+        for (list = cmp->items; list != NULL && *prefix != '\0'; list = list->next) {
+            if (cmp->strncmp_func(prefix,
+                                  cmp->func ? cmp->func(list->data)
+                                            : (gchar *) list->data,
+                                  len) == 0) {
                 cmp->cache = g_list_prepend(cmp->cache, list->data);
-            list = list->next;
+            }
         }
     }
-    if (cmp->prefix) {
-        g_free(cmp->prefix);
-        cmp->prefix = NULL;
-    }
-    if (cmp->cache)
+    g_clear_pointer(&cmp->prefix, (GDestroyNotify) g_free);
+    if (cmp->cache != NULL)
         cmp->prefix = g_strdup(prefix);
 
-    return *prefix ? cmp->cache : cmp->items;
+    return *prefix != '\0' ? cmp->cache : cmp->items;
 }
 
 /**

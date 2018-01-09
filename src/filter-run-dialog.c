@@ -450,15 +450,17 @@ void balsa_filter_run_dialog_init(BalsaFilterRunDialog * p)
 }
 
 /* balsa_filter_run_dispose:
-   FIXME: why is it called twice? Is it a problem?
 */
 static void
 balsa_filter_run_dispose(GObject * object)
 {
     BalsaFilterRunDialog* bfrd = BALSA_FILTER_RUN_DIALOG(object);
-    if (bfrd->mbox)
+
+    if (bfrd->mbox != NULL) {
         libbalsa_mailbox_close(bfrd->mbox, balsa_app.expunge_on_close);
-    bfrd->mbox = NULL;
+        bfrd->mbox = NULL;
+    }
+
     G_OBJECT_CLASS(parent_class)->dispose(object);
 }
 

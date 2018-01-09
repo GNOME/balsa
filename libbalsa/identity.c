@@ -49,6 +49,7 @@ static GObjectClass* parent_class;
 /* Forward references. */
 static void libbalsa_identity_class_init(LibBalsaIdentityClass* klass);
 static void libbalsa_identity_init(LibBalsaIdentity* ident);
+static void libbalsa_identity_dispose(GObject* object);
 static void libbalsa_identity_finalize(GObject* object);
 
 GType
@@ -86,6 +87,7 @@ libbalsa_identity_class_init(LibBalsaIdentityClass* klass)
     parent_class = g_type_class_peek_parent(klass);
 
     object_class = G_OBJECT_CLASS(klass);
+    object_class->dispose  = libbalsa_identity_dispose;
     object_class->finalize = libbalsa_identity_finalize;
 }
 
@@ -129,11 +131,21 @@ libbalsa_identity_init(LibBalsaIdentity* ident)
  * Destroy the object, freeing all the values in the process.
  */
 static void
-libbalsa_identity_finalize(GObject * object)
+libbalsa_identity_dispose(GObject * object)
 {
     LibBalsaIdentity *ident = LIBBALSA_IDENTITY(object);
 
     g_clear_object(&ident->ia);
+    g_clear_object(&ident->smtp_server);
+
+    G_OBJECT_CLASS(parent_class)->dispose(object);
+}
+
+static void
+libbalsa_identity_finalize(GObject * object)
+{
+    LibBalsaIdentity *ident = LIBBALSA_IDENTITY(object);
+
     g_free(ident->identity_name);
     g_free(ident->replyto);
     g_free(ident->domain);
@@ -141,7 +153,6 @@ libbalsa_identity_finalize(GObject * object)
     g_free(ident->reply_string);
     g_free(ident->forward_string);
     g_free(ident->signature_path);
-    g_clear_object(&ident->smtp_server);
     g_free(ident->face);
     g_free(ident->x_face);
     g_free(ident->force_gpg_key_id);

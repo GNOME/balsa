@@ -197,11 +197,11 @@ libbalsa_address_book_ldap_finalize(GObject * object)
 
     libbalsa_address_book_ldap_close_connection(addr_ldap);
 
-    g_free(addr_ldap->host);    addr_ldap->host = NULL;
-    g_free(addr_ldap->base_dn); addr_ldap->base_dn = NULL;
-    g_free(addr_ldap->bind_dn); addr_ldap->bind_dn = NULL;
-    g_free(addr_ldap->priv_book_dn); addr_ldap->priv_book_dn = NULL;
-    g_free(addr_ldap->passwd);  addr_ldap->passwd  = NULL;
+    g_free(addr_ldap->host);
+    g_free(addr_ldap->base_dn);
+    g_free(addr_ldap->bind_dn);
+    g_free(addr_ldap->priv_book_dn);
+    g_free(addr_ldap->passwd);
 
     G_OBJECT_CLASS(parent_class)->finalize(object);
 }

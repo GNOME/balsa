@@ -62,15 +62,24 @@ static GObjectClass* parent_class;
 static guint model_signals[LAST_SIGNAL] = { 0 };
 
 static void
+balsa_toolbar_model_dispose(GObject * object)
+{
+    BalsaToolbarModel *model = BALSA_TOOLBAR_MODEL(object);
+
+    g_clear_object(&model->settings);
+
+    G_OBJECT_CLASS(parent_class)->dispose(object);
+}
+
+
+static void
 balsa_toolbar_model_finalize(GObject * object)
 {
     BalsaToolbarModel *model = BALSA_TOOLBAR_MODEL(object);
 
     if (model->legal) {
         g_hash_table_destroy(model->legal);
-        model->legal = NULL;
     }
-    g_clear_object(&model->settings);
 
     G_OBJECT_CLASS(parent_class)->finalize(object);
 }
@@ -90,6 +99,7 @@ balsa_toolbar_model_class_init(BalsaToolbarModelClass* klass)
                      g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
 
     object_class = G_OBJECT_CLASS(klass);
+    object_class->dispose = balsa_toolbar_model_dispose;
     object_class->finalize = balsa_toolbar_model_finalize;
 }
 

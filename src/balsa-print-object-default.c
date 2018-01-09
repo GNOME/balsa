@@ -34,7 +34,8 @@ balsa_print_object_default_class_init(BalsaPrintObjectDefaultClass *
 				      klass);
 static void balsa_print_object_default_init(GTypeInstance * instance,
 					    gpointer g_class);
-static void balsa_print_object_default_destroy(GObject * self);
+static void balsa_print_object_default_dispose(GObject * self);
+static void balsa_print_object_default_finalize(GObject * self);
 
 static void balsa_print_object_default_draw(BalsaPrintObject * self,
 					    GtkPrintContext * context,
@@ -78,7 +79,8 @@ balsa_print_object_default_class_init(BalsaPrintObjectDefaultClass * klass)
     parent_class = g_type_class_ref(BALSA_TYPE_PRINT_OBJECT);
     BALSA_PRINT_OBJECT_CLASS(klass)->draw =
 	balsa_print_object_default_draw;
-    G_OBJECT_CLASS(klass)->finalize = balsa_print_object_default_destroy;
+    G_OBJECT_CLASS(klass)->dispose = balsa_print_object_default_dispose;
+    G_OBJECT_CLASS(klass)->finalize = balsa_print_object_default_finalize;
 }
 
 
@@ -93,11 +95,21 @@ balsa_print_object_default_init(GTypeInstance * instance, gpointer g_class)
 
 
 static void
-balsa_print_object_default_destroy(GObject * self)
+balsa_print_object_default_dispose(GObject * self)
 {
     BalsaPrintObjectDefault *po = BALSA_PRINT_OBJECT_DEFAULT(self);
 
     g_clear_object(&po->pixbuf);
+
+    G_OBJECT_CLASS(parent_class)->dispose(self);
+}
+
+
+static void
+balsa_print_object_default_finalize(GObject * self)
+{
+    BalsaPrintObjectDefault *po = BALSA_PRINT_OBJECT_DEFAULT(self);
+
     g_free(po->description);
 
     G_OBJECT_CLASS(parent_class)->finalize(self);

@@ -47,6 +47,7 @@ struct _NetClientPopPrivate {
 G_DEFINE_TYPE(NetClientPop, net_client_pop, NET_CLIENT_TYPE)
 
 
+static void net_client_pop_dispose(GObject *object);
 static void net_client_pop_finalise(GObject *object);
 static void net_client_pop_get_capa(NetClientPop *client, guint *auth_supported);
 static gboolean net_client_pop_read_reply(NetClientPop *client, gchar **reply, GError **error);
@@ -374,6 +375,7 @@ net_client_pop_class_init(NetClientPopClass *klass)
 {
 	GObjectClass *gobject_class = G_OBJECT_CLASS(klass);
 
+	gobject_class->dispose = net_client_pop_dispose;
 	gobject_class->finalize = net_client_pop_finalise;
 }
 
@@ -388,7 +390,7 @@ net_client_pop_init(NetClientPop *self)
 
 
 static void
-net_client_pop_finalise(GObject *object)
+net_client_pop_dispose(GObject *object)
 {
 	const NetClientPop *client = NET_CLIENT_POP(object);
 	const GObjectClass *parent_class = G_OBJECT_CLASS(net_client_pop_parent_class);
@@ -396,10 +398,21 @@ net_client_pop_finalise(GObject *object)
 	/* send the 'QUIT' command - no need to evaluate the reply or check for errors */
 	(void) net_client_execute(NET_CLIENT(client), NULL, "QUIT", NULL);
 
+	(*parent_class->dispose)(object);
+}
+
+
+static void
+net_client_pop_finalise(GObject *object)
+{
+	const NetClientPop *client = NET_CLIENT_POP(object);
+	const GObjectClass *parent_class = G_OBJECT_CLASS(net_client_pop_parent_class);
+
 	if (client->priv != NULL) {
 		g_free(client->priv->apop_banner);
 		g_free(client->priv);
 	}
+
 	(*parent_class->finalize)(object);
 }
 

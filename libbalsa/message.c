@@ -52,6 +52,7 @@
 static void libbalsa_message_class_init(LibBalsaMessageClass * klass);
 static void libbalsa_message_init(LibBalsaMessage * message);
 
+static void libbalsa_message_dispose(GObject * object);
 static void libbalsa_message_finalize(GObject * object);
 
 
@@ -113,6 +114,7 @@ libbalsa_message_class_init(LibBalsaMessageClass * klass)
 
     parent_class = g_type_class_peek_parent(klass);
 
+    object_class->dispose = libbalsa_message_dispose;
     object_class->finalize = libbalsa_message_finalize;
 }
 
@@ -126,62 +128,52 @@ libbalsa_message_new(void)
     return message;
 }
 
+/*
+ * libbalsa_message_dispose: must leave object in a sane state
+ */
+static void
+libbalsa_message_dispose(GObject * object)
+{
+    LibBalsaMessage *message;
+
+    message = LIBBALSA_MESSAGE(object);
+
+    g_clear_object(&message->sender);
+    g_clear_object(&message->mime_msg);
+#ifdef HAVE_GPGME
+    g_clear_object(&message->ident);
+#endif
+
+    G_OBJECT_CLASS(parent_class)->dispose(object);
+}
+
+
 /* libbalsa_message_finalize:
-   finalize methods must leave object in 'sane' state. 
-   This means NULLifing released pointers.
 */
 static void
 libbalsa_message_finalize(GObject * object)
 {
     LibBalsaMessage *message;
 
-    g_return_if_fail(object != NULL);
-    g_return_if_fail(LIBBALSA_IS_MESSAGE(object));
-
     message = LIBBALSA_MESSAGE(object);
-
-    libbalsa_message_headers_destroy(message->headers);
-    message->headers = NULL;
-
-    g_clear_object(&message->sender);
 
 #if MESSAGE_COPY_CONTENT
     g_free(message->subj);
-    message->subj = NULL;
 #endif
-    g_list_foreach(message->references, (GFunc) g_free, NULL);
-    g_list_free(message->references);
-    message->references = NULL;
-
-    g_list_foreach(message->in_reply_to, (GFunc) g_free, NULL);
-    g_list_free(message->in_reply_to);
-    message->in_reply_to = NULL;
-
     g_free(message->message_id);
-    message->message_id = NULL;
-
     g_free(message->subtype);
-    message->subtype = NULL;
 
-    g_list_foreach(message->parameters, (GFunc) g_strfreev, NULL);
-    g_list_free(message->parameters);
-    message->parameters = NULL;
+    g_list_free_full(message->references, g_free);
+    g_list_free_full(message->in_reply_to, g_free);
+    g_list_free_full(message->parameters, (GDestroyNotify) g_strfreev);
 
-
+    libbalsa_message_headers_destroy(message->headers);
     libbalsa_message_body_free(message->body_list);
-    message->body_list = NULL;
-
-    g_clear_object(&message->mime_msg);
-
-#ifdef HAVE_GPGME
-    g_clear_object(&message->ident);
-#endif
 
     if (message->tempdir) {
-        if (rmdir(message->tempdir))
+        if (rmdir(message->tempdir) != 0)
             g_warning("Could not remove %s", message->tempdir);
         g_free(message->tempdir);
-        message->tempdir = NULL;
     }
 
     G_OBJECT_CLASS(parent_class)->finalize(object);

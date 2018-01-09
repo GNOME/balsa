@@ -29,7 +29,7 @@
 static void
 balsa_print_object_decor_class_init(BalsaPrintObjectDecorClass *klass);
 static void balsa_print_object_decor_init (GTypeInstance *instance, gpointer g_class);
-static void balsa_print_object_decor_destroy(GObject * self);
+static void balsa_print_object_decor_finalize(GObject * self);
 
 static void balsa_print_object_decor_draw(BalsaPrintObject * self,
 					  GtkPrintContext * context,
@@ -73,7 +73,7 @@ balsa_print_object_decor_class_init(BalsaPrintObjectDecorClass *klass)
     parent_class = g_type_class_ref(BALSA_TYPE_PRINT_OBJECT);
     BALSA_PRINT_OBJECT_CLASS(klass)->draw =
 	balsa_print_object_decor_draw;
-    G_OBJECT_CLASS(klass)->finalize = balsa_print_object_decor_destroy;
+    G_OBJECT_CLASS(klass)->finalize = balsa_print_object_decor_finalize;
 }
 
 
@@ -88,7 +88,7 @@ balsa_print_object_decor_init(GTypeInstance * instance,
 
 
 static void
-balsa_print_object_decor_destroy(GObject * self)
+balsa_print_object_decor_finalize(GObject * self)
 {
     BalsaPrintObjectDecor *po = BALSA_PRINT_OBJECT_DECOR(self);
 

@@ -96,6 +96,7 @@ static off_t ImapCacheSize = 30*1024*1024; /* 30MB */
 
  /* issue message if downloaded part has more than this size */
 static unsigned SizeMsgThreshold = 50*1024;
+static void libbalsa_mailbox_imap_dispose(GObject * object);
 static void libbalsa_mailbox_imap_finalize(GObject * object);
 static void libbalsa_mailbox_imap_class_init(LibBalsaMailboxImapClass *
 					     klass);
@@ -241,6 +242,7 @@ libbalsa_mailbox_imap_class_init(LibBalsaMailboxImapClass * klass)
 
     parent_class = g_type_class_peek_parent(klass);
 
+    object_class->dispose  = libbalsa_mailbox_imap_dispose;
     object_class->finalize = libbalsa_mailbox_imap_finalize;
 
     libbalsa_mailbox_class->open_mailbox = libbalsa_mailbox_imap_open;
@@ -301,6 +303,30 @@ libbalsa_mailbox_imap_init(LibBalsaMailboxImap * mailbox)
     mailbox->sort_field = -1;	/* Initially invalid. */
 }
 
+static void
+libbalsa_mailbox_imap_dispose(GObject * object)
+{
+    LibBalsaMailboxRemote *remote;
+    LibBalsaMailboxImap *mailbox;
+
+    remote = LIBBALSA_MAILBOX_REMOTE(object);
+    if (remote->server != NULL) {
+        g_signal_handlers_disconnect_matched(remote->server,
+                                             G_SIGNAL_MATCH_DATA, 0,
+                                             (GQuark) 0, NULL, NULL,
+                                             remote);
+	g_clear_object(&remote->server);
+    }
+
+    mailbox = LIBBALSA_MAILBOX_IMAP(object);
+    if (mailbox->unread_update_id != 0) {
+        g_source_remove(mailbox->unread_update_id);
+        mailbox->unread_update_id = 0;
+    }
+
+    G_OBJECT_CLASS(parent_class)->dispose(object);
+}
+
 /* libbalsa_mailbox_imap_finalize:
    NOTE: we have to close mailbox ourselves without waiting for
    LibBalsaMailbox::finalize because we want to destroy server as well,
@@ -310,7 +336,6 @@ static void
 libbalsa_mailbox_imap_finalize(GObject * object)
 {
     LibBalsaMailboxImap *mailbox;
-    LibBalsaMailboxRemote *remote;
 
     g_return_if_fail(LIBBALSA_IS_MAILBOX_IMAP(object));
 
@@ -318,29 +343,11 @@ libbalsa_mailbox_imap_finalize(GObject * object)
 
     g_assert(LIBBALSA_MAILBOX(mailbox)->open_ref == 0);
 
-    remote = LIBBALSA_MAILBOX_REMOTE(object);
-    g_free(mailbox->path); mailbox->path = NULL;
+    g_free(mailbox->path);
+    g_array_free(mailbox->sort_ranks, TRUE);
+    g_list_free_full(mailbox->acls, (GDestroyNotify) imap_user_acl_free);
 
-    if(remote->server) {
-        g_signal_handlers_disconnect_matched(remote->server,
-                                             G_SIGNAL_MATCH_DATA, 0,
-                                             (GQuark) 0, NULL, NULL,
-                                             remote);
-	g_object_unref(G_OBJECT(remote->server));
-	remote->server = NULL;
-    }
-
-    g_array_free(mailbox->sort_ranks, TRUE); mailbox->sort_ranks = NULL;
-    if(mailbox->unread_update_id) {
-        g_source_remove(mailbox->unread_update_id);
-        mailbox->unread_update_id = 0;
-    }
-
-    g_list_foreach(mailbox->acls, (GFunc)imap_user_acl_free, NULL);
-    g_list_free(mailbox->acls);
-
-    if (G_OBJECT_CLASS(parent_class)->finalize)
-	G_OBJECT_CLASS(parent_class)->finalize(object);
+    G_OBJECT_CLASS(parent_class)->finalize(object);
 }
 
 LibBalsaMailbox*

@@ -49,7 +49,7 @@
 #define LOOKUP_MIN_LEN					2U
 
 
-static void libbalsa_address_book_osmo_finalize(GObject *object);
+static void libbalsa_address_book_osmo_dispose(GObject *object);
 static LibBalsaABErr libbalsa_address_book_osmo_load(LibBalsaAddressBook 		 *ab,
                                                      const gchar				 *filter,
                                                      LibBalsaAddressBookLoadFunc callback,
@@ -73,7 +73,7 @@ libbalsa_address_book_osmo_class_init(LibBalsaAddressBookOsmoClass *klass)
 	object_class = G_OBJECT_CLASS(klass);
 	address_book_class = LIBBALSA_ADDRESS_BOOK_CLASS(klass);
 
-	object_class->finalize = libbalsa_address_book_osmo_finalize;
+	object_class->dispose = libbalsa_address_book_osmo_dispose;
 
 	address_book_class->load = libbalsa_address_book_osmo_load;
 #if defined(OSMO_CAN_WRITE)
@@ -94,14 +94,14 @@ libbalsa_address_book_osmo_init(LibBalsaAddressBookOsmo *ab)
 
 
 static void
-libbalsa_address_book_osmo_finalize(GObject *object)
+libbalsa_address_book_osmo_dispose(GObject *object)
 {
 	LibBalsaAddressBookOsmo *osmo;
 
 	osmo = LIBBALSA_ADDRESS_BOOK_OSMO(object);
         g_clear_object(&osmo->proxy);
 
-	G_OBJECT_CLASS(libbalsa_address_book_osmo_parent_class)->finalize(object);
+	G_OBJECT_CLASS(libbalsa_address_book_osmo_parent_class)->dispose(object);
 }
 
 

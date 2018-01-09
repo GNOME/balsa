@@ -266,6 +266,10 @@ libbalsa_mailbox_init(LibBalsaMailbox * mailbox)
  * called just before finalize, when ref_count is about to be
  * decremented to 0
  */
+
+static void lbm_get_index_entry_expunged_cb(LibBalsaMailbox * mailbox, guint seqno);
+static void lbm_msgno_changed_expunged_cb(LibBalsaMailbox * mailbox, guint seqno);
+
 static void
 libbalsa_mailbox_dispose(GObject * object)
 {
@@ -273,6 +277,26 @@ libbalsa_mailbox_dispose(GObject * object)
 
     while (mailbox->open_ref > 0)
         libbalsa_mailbox_close(mailbox, FALSE);
+
+    if (mailbox->msgnos_pending != NULL) {
+        g_signal_handlers_disconnect_by_func(mailbox,
+                                             lbm_get_index_entry_expunged_cb,
+                                             mailbox->msgnos_pending);
+        g_array_free(mailbox->msgnos_pending, TRUE);
+        mailbox->msgnos_pending = NULL;
+    }
+
+    if (mailbox->msgnos_changed != NULL) {
+        g_signal_handlers_disconnect_by_func(mailbox,
+                                             lbm_msgno_changed_expunged_cb,
+                                             mailbox->msgnos_changed);
+        g_array_free(mailbox->msgnos_changed, TRUE);
+        mailbox->msgnos_changed = NULL;
+    }
+
+    libbalsa_clear_source_id(&mailbox->changed_idle_id);
+    libbalsa_clear_source_id(&mailbox->queue_check_idle_id);
+    libbalsa_clear_source_id(&mailbox->need_threading_idle_id);
 
     G_OBJECT_CLASS(parent_class)->dispose(object);
 }
@@ -419,13 +443,8 @@ libbalsa_mailbox_index_set_flags(LibBalsaMailbox *mailbox,
 }
 
 /* libbalsa_mailbox_finalize:
-   destroys mailbox. Must leave it in sane state.
+   destroys mailbox.
 */
-
-static void lbm_msgno_changed_expunged_cb(LibBalsaMailbox * mailbox,
-                                          guint seqno);
-static void lbm_get_index_entry_expunged_cb(LibBalsaMailbox * mailbox,
-                                            guint seqno);
 
 static void
 libbalsa_mailbox_finalize(GObject * object)
@@ -437,58 +456,15 @@ libbalsa_mailbox_finalize(GObject * object)
     mailbox = LIBBALSA_MAILBOX(object);
 
     g_free(mailbox->config_prefix);
-    mailbox->config_prefix = NULL;
-
     g_free(mailbox->name);
-    mailbox->name = NULL;
-
     g_free(mailbox->url);
-    mailbox->url = NULL;
 
     libbalsa_condition_unref(mailbox->view_filter);
-    mailbox->view_filter = NULL;
-
     libbalsa_condition_unref(mailbox->persistent_view_filter);
-    mailbox->persistent_view_filter = NULL;
 
-    g_slist_foreach(mailbox->filters, (GFunc) g_free, NULL);
-    g_slist_free(mailbox->filters);
-    mailbox->filters = NULL;
-    mailbox->filters_loaded = FALSE;
-
-    if (mailbox->msgnos_pending) {
-        g_signal_handlers_disconnect_by_func(mailbox,
-                                             lbm_get_index_entry_expunged_cb,
-                                             mailbox->msgnos_pending);
-        g_array_free(mailbox->msgnos_pending, TRUE);
-        mailbox->msgnos_pending = NULL;
-    }
-
-    if (mailbox->msgnos_changed) {
-        g_signal_handlers_disconnect_by_func(mailbox,
-                                             lbm_msgno_changed_expunged_cb,
-                                             mailbox->msgnos_changed);
-        g_array_free(mailbox->msgnos_changed, TRUE);
-        mailbox->msgnos_changed = NULL;
-    }
+    g_slist_free_full(mailbox->filters, g_free);
 
     libbalsa_mailbox_view_free(mailbox->view);
-    mailbox->view = NULL;
-
-    if (mailbox->changed_idle_id) {
-        g_source_remove(mailbox->changed_idle_id);
-        mailbox->changed_idle_id = 0;
-    }
-
-    if (mailbox->queue_check_idle_id) {
-        g_source_remove(mailbox->queue_check_idle_id);
-        mailbox->queue_check_idle_id = 0;
-    }
-
-    if (mailbox->need_threading_idle_id) {
-        g_source_remove(mailbox->need_threading_idle_id);
-        mailbox->need_threading_idle_id = 0;
-    }
 
     G_OBJECT_CLASS(parent_class)->finalize(object);
 }

@@ -101,14 +101,15 @@ libbalsa_address_view_finalize(GObject * object)
     g_free(address_view->domain);
     g_free(address_view->path_string);
 
-    if (address_view->focus_row)
+    if (address_view->focus_row != NULL) {
         gtk_tree_row_reference_free(address_view->focus_row);
+    }
 
-    if (address_view->focus_idle_id)
+    if (address_view->focus_idle_id != 0) {
         g_source_remove(address_view->focus_idle_id);
+    }
 
-    (*G_OBJECT_CLASS(libbalsa_address_view_parent_class)->
-     finalize) (object);
+    G_OBJECT_CLASS(libbalsa_address_view_parent_class)->finalize(object);
 }
 
 static void

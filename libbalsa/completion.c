@@ -57,6 +57,7 @@
 
 #include <glib.h>
 #include "completion.h"
+#include "abook-completion.h"
 
 /**
  * SECTION: completion
@@ -193,7 +194,7 @@ libbalsa_completion_clear_items(LibBalsaCompletion * cmp)
 {
     g_return_if_fail(cmp != NULL);
 
-    g_list_free(cmp->items);
+    g_list_free_full(cmp->items, (GDestroyNotify) completion_data_free);
     cmp->items = NULL;
     g_list_free(cmp->cache);
     cmp->cache = NULL;

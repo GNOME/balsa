@@ -289,7 +289,7 @@ struct _BalsaAttachInfoClass {
 static GType balsa_attach_info_get_type();
 static void balsa_attach_info_init(GObject *object, gpointer data);
 static BalsaAttachInfo* balsa_attach_info_new();
-static void balsa_attach_info_destroy(GObject * object);
+static void balsa_attach_info_finalize(GObject * object);
 
 
 #define BALSA_MSG_ATTACH_MODEL(x)   gtk_tree_view_get_model(GTK_TREE_VIEW((x)->tree_view))
@@ -307,7 +307,7 @@ balsa_attach_info_class_init(BalsaAttachInfoClass *klass)
 {
     GObjectClass *object_class = G_OBJECT_CLASS(klass);
 
-    object_class->finalize = balsa_attach_info_destroy;
+    object_class->finalize = balsa_attach_info_finalize;
 }
 
 static GType
@@ -359,7 +359,7 @@ balsa_attach_info_new(BalsaSendmsg *bm)
 }
 
 static void
-balsa_attach_info_destroy(GObject * object)
+balsa_attach_info_finalize(GObject * object)
 {
     BalsaAttachInfo * info;
     GObjectClass *parent_class;

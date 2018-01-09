@@ -142,12 +142,9 @@ libbalsa_address_book_rubrica_finalize(GObject * object)
 
     /* item_list is different from the default
      * LibBalsaAddressBookText::item_list, so we free it here. */
-    g_slist_foreach(ab_text->item_list, (GFunc) g_object_unref, NULL);
-    g_slist_free(ab_text->item_list);
-    ab_text->item_list = NULL;
+    g_slist_free_full(ab_text->item_list, g_object_unref);
 
-    (*G_OBJECT_CLASS(libbalsa_address_book_rubrica_parent_class)->
-     finalize) (object);
+    G_OBJECT_CLASS(libbalsa_address_book_rubrica_parent_class)->finalize(object);
 }
 
 /* Public method */
@@ -425,8 +422,6 @@ lbab_rubrica_load_xml(LibBalsaAddressBookRubrica * ab_rubrica,
     g_slist_free(ab_text->item_list);
     ab_text->item_list = NULL;
 
-    g_list_foreach(ab_text->name_complete->items,
-		   (GFunc) completion_data_free, NULL);
     libbalsa_completion_clear_items(ab_text->name_complete);
 
 

@@ -166,10 +166,7 @@ libbalsa_address_book_externq_finalize(GObject * object)
 
     g_free(addr_externq->load);
     g_free(addr_externq->save);
-	
-    g_list_foreach(addr_externq->address_list, (GFunc) g_object_unref, NULL);
-    g_list_free(addr_externq->address_list);
-    addr_externq->address_list = NULL;
+    g_list_free_full(addr_externq->address_list, g_object_unref);
 
     G_OBJECT_CLASS(parent_class)->finalize(object);
 }

@@ -66,6 +66,7 @@ static GObjectClass *libbalsa_vfs_parent_class = NULL;
 
 static void libbalsa_vfs_class_init(LibbalsaVfsClass * klass);
 static void libbalsa_vfs_init(LibbalsaVfs * self);
+static void libbalsa_vfs_dispose(LibbalsaVfs * self);
 static void libbalsa_vfs_finalize(LibbalsaVfs * self);
 
 
@@ -110,6 +111,8 @@ libbalsa_vfs_class_init(LibbalsaVfsClass * klass)
     GObjectClass *gobject_klass = G_OBJECT_CLASS(klass);
 
     libbalsa_vfs_parent_class = g_type_class_peek(G_TYPE_OBJECT);
+    gobject_klass->dispose =
+        (GObjectFinalizeFunc) libbalsa_vfs_dispose;
     gobject_klass->finalize =
         (GObjectFinalizeFunc) libbalsa_vfs_finalize;
 }
@@ -123,6 +126,23 @@ libbalsa_vfs_init(LibbalsaVfs * self)
 
 
 static void
+libbalsa_vfs_dispose(LibbalsaVfs * self)
+{
+    struct _LibbalsaVfsPriv * priv;
+
+    g_return_if_fail(self != NULL);
+    priv = self->priv;
+
+    if (priv != NULL) {
+        g_clear_object(&priv->gio_gfile);
+        g_clear_object(&priv->info);
+    }
+
+    libbalsa_vfs_parent_class->dispose(G_OBJECT(self));
+}
+
+
+static void
 libbalsa_vfs_finalize(LibbalsaVfs * self)
 {
     struct _LibbalsaVfsPriv * priv;
@@ -130,14 +150,12 @@ libbalsa_vfs_finalize(LibbalsaVfs * self)
     g_return_if_fail(self != NULL);
     priv = self->priv;
 
-    if (priv) {
+    if (priv != NULL) {
         g_free(priv->file_uri);
         g_free(priv->file_utf8);
         g_free(priv->folder_uri);
         g_free(priv->mime_type);
         g_free(priv->charset);
-        g_clear_object(&priv->gio_gfile);
-        g_clear_object(&priv->info);
         g_free(priv);
     }
 

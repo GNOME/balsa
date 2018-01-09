@@ -108,7 +108,7 @@ static void balsa_window_real_open_mbnode(BalsaWindow *window,
                                           gboolean set_current);
 static void balsa_window_real_close_mbnode(BalsaWindow *window,
 					   BalsaMailboxNode *mbnode);
-static void balsa_window_destroy(GObject * object);
+static void balsa_window_dispose(GObject * object);
 
 static gboolean bw_close_mailbox_on_timer(BalsaWindow * window);
 
@@ -206,7 +206,7 @@ balsa_window_class_init(BalsaWindowClass * klass)
                      NULL, NULL,
                      g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
 
-    object_class->dispose = balsa_window_destroy;
+    object_class->dispose = balsa_window_dispose;
 
     klass->open_mbnode  = balsa_window_real_open_mbnode;
     klass->close_mbnode = balsa_window_real_close_mbnode;
@@ -3110,7 +3110,7 @@ bw_close_mailbox_on_timer(BalsaWindow * window)
 }
 
 static void
-balsa_window_destroy(GObject * object)
+balsa_window_dispose(GObject * object)
 {
     BalsaWindow *window;
 
@@ -3120,15 +3120,11 @@ balsa_window_destroy(GObject * object)
      * we no longer need it, so we just drop our pointer: */
     window->preview = NULL;
 
-    if (window->network_changed_source_id != 0) {
-        g_source_remove(window->network_changed_source_id);
-        window->network_changed_source_id = 0;
-    }
-
-    if (G_OBJECT_CLASS(balsa_window_parent_class)->dispose != NULL)
-        G_OBJECT_CLASS(balsa_window_parent_class)->dispose(object);
+    libbalsa_clear_source_id(&window->network_changed_source_id);
 
     balsa_unregister_pixmaps();
+
+    G_OBJECT_CLASS(balsa_window_parent_class)->dispose(object);
 }
 
 

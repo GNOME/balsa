@@ -39,6 +39,7 @@ static guint signals[3];
 G_DEFINE_TYPE(NetClient, net_client, G_TYPE_OBJECT)
 
 
+static void net_client_dispose(GObject *object);
 static void net_client_finalise(GObject *object);
 static gboolean cert_accept_cb(GTlsConnection *conn, GTlsCertificate *peer_cert, GTlsCertificateFlags errors, gpointer user_data);
 
@@ -453,6 +454,7 @@ net_client_class_init(NetClientClass *klass)
 	GObjectClass *gobject_class = G_OBJECT_CLASS(klass);
 
 	g_type_class_add_private(klass, sizeof(NetClientPrivate));
+	gobject_class->dispose = net_client_dispose;
 	gobject_class->finalize = net_client_finalise;
 	signals[0] = g_signal_new("cert-check", NET_CLIENT_TYPE, G_SIGNAL_RUN_LAST, 0U, NULL, NULL, NULL, G_TYPE_BOOLEAN, 2U,
 		G_TYPE_TLS_CERTIFICATE, G_TYPE_TLS_CERTIFICATE_FLAGS);
@@ -474,7 +476,7 @@ net_client_init(NetClient *self)
 
 
 static void
-net_client_finalise(GObject *object)
+net_client_dispose(GObject *object)
 {
 	const NetClient *client = NET_CLIENT(object);
 	const GObjectClass *parent_class = G_OBJECT_CLASS(net_client_parent_class);
@@ -486,6 +488,17 @@ net_client_finalise(GObject *object)
         g_clear_object(&client->priv->plain_conn);
         g_clear_object(&client->priv->sock);
         g_clear_object(&client->priv->certificate);
+
+	(*parent_class->dispose)(object);
+}
+
+
+static void
+net_client_finalise(GObject *object)
+{
+	const NetClient *client = NET_CLIENT(object);
+	const GObjectClass *parent_class = G_OBJECT_CLASS(net_client_parent_class);
+
 	g_debug("finalised connection to %s", client->priv->host_and_port);
 	g_free(client->priv->host_and_port);
 	(*parent_class->finalize)(object);

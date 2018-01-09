@@ -153,6 +153,7 @@ static void mdn_dialog_response(GtkWidget * dialog, gint response,
 
 static void balsa_part_info_init(GObject *object, gpointer data);
 static BalsaPartInfo* balsa_part_info_new(LibBalsaMessageBody* body);
+static void balsa_part_info_dispose(GObject * object);
 static void balsa_part_info_finalize(GObject * object);
 
 
@@ -165,12 +166,16 @@ static GdkPixbuf * get_crypto_content_icon(LibBalsaMessageBody * body,
 static void message_recheck_crypto_cb(GtkWidget * button, BalsaMessage * bm);
 #endif /* HAVE_GPGME */
 
+static GObjectClass *part_info_parent_class;
 
 static void
 balsa_part_info_class_init(BalsaPartInfoClass *klass)
 {
     GObjectClass *object_class = G_OBJECT_CLASS(klass);
 
+    part_info_parent_class = g_type_class_peek_parent(object_class);
+
+    object_class->dispose  = balsa_part_info_dispose;
     object_class->finalize = balsa_part_info_finalize;
 }
 
@@ -814,6 +819,7 @@ balsa_message_destroy(GObject * object)
 
     g_clear_object(&bm->save_all_popup);
     g_clear_object(&bm->parts_popup);
+    g_clear_object(&bm->bm_widget);
 
 #ifdef HAVE_HTML_WIDGET
     g_clear_object(&bm->html_find_info);
@@ -1665,20 +1671,28 @@ balsa_part_info_new(LibBalsaMessageBody* body)
 }
 
 static void
+balsa_part_info_dispose(GObject * object)
+{
+    BalsaPartInfo * info;
+
+    info = BALSA_PART_INFO(object);
+    g_clear_object(&info->mime_widget);
+    g_clear_object(&info->popup_menu);
+
+    part_info_parent_class->dispose(object);
+}
+
+static void
 balsa_part_info_finalize(GObject * object)
 {
     BalsaPartInfo * info;
-    GObjectClass *part_info_parent_class;
 
     g_return_if_fail(object != NULL);
     g_return_if_fail(IS_BALSA_PART_INFO(object));
     info = BALSA_PART_INFO(object);
 
-    g_clear_object(&info->mime_widget);
-    g_clear_object(&info->popup_menu);
     gtk_tree_path_free(info->path);
 
-    part_info_parent_class = g_type_class_peek_parent(G_OBJECT_GET_CLASS(object));
     part_info_parent_class->finalize(object);
 }
 

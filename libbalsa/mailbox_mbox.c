@@ -184,6 +184,8 @@ libbalsa_mailbox_mbox_dispose(GObject * object)
 {
     if(MAILBOX_OPEN(LIBBALSA_MAILBOX(object)))
 	libbalsa_mailbox_mbox_close_mailbox(LIBBALSA_MAILBOX(object), FALSE);
+
+    G_OBJECT_CLASS(parent_class)->dispose(object);
 }
 
 static gint

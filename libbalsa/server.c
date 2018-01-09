@@ -171,7 +171,6 @@ libbalsa_server_init(LibBalsaServer * server)
     server->security		= NET_CLIENT_CRYPT_STARTTLS;
 }
 
-/* leave object in sane state (NULLified fields) */
 static void
 libbalsa_server_finalize(GObject * object)
 {
@@ -181,20 +180,19 @@ libbalsa_server_finalize(GObject * object)
 
     server = LIBBALSA_SERVER(object);
 
-    g_free(server->host);   server->host = NULL;
-    g_free(server->user);   server->user = NULL;
+    g_free(server->host);
+    g_free(server->user);
+    g_free(server->cert_file);
+
     if (server->passwd != NULL) {
     	memset(server->passwd, 0, strlen(server->passwd));
     }
-    libbalsa_free_password(server->passwd); server->passwd = NULL;
+    libbalsa_free_password(server->passwd);
 
-    g_free(server->cert_file);
-    server->cert_file = NULL;
     if (server->cert_passphrase != NULL) {
     	memset(server->cert_passphrase, 0, strlen(server->cert_passphrase));
     }
     g_free(server->cert_passphrase);
-    server->cert_passphrase = NULL;
 
     G_OBJECT_CLASS(parent_class)->finalize(object);
 }

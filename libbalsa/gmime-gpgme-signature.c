@@ -130,10 +130,8 @@ static void
 g_mime_gpgme_sigstat_finalize(GMimeGpgmeSigstat * self)
 {
     g_free(self->fingerprint);
-    self->fingerprint = NULL;
     if (self->key)
 	gpgme_key_unref(self->key);
-    self->key = NULL;
 
     g_mime_gpgme_sigstat_parent_class->finalize(G_OBJECT(self));
 }

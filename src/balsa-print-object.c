@@ -38,7 +38,6 @@
 static void balsa_print_object_init(GTypeInstance * instance,
 				    gpointer g_class);
 static void balsa_print_object_class_init(BalsaPrintObjectClass * klass);
-static void balsa_print_object_destroy(GObject * object);
 
 
 static GObjectClass *parent_class = NULL;
@@ -88,10 +87,7 @@ balsa_print_object_init(GTypeInstance * instance, gpointer g_class)
 static void
 balsa_print_object_class_init(BalsaPrintObjectClass * klass)
 {
-    GObjectClass *object_class = G_OBJECT_CLASS(klass);
-
     parent_class = g_type_class_ref(G_TYPE_OBJECT);
-    object_class->finalize = balsa_print_object_destroy;
     klass->draw = balsa_print_object_draw;
 }
 
@@ -203,13 +199,6 @@ balsa_print_object_draw(BalsaPrintObject * self, GtkPrintContext * context,
     }
     cairo_stroke(cairo_ctx);
     cairo_restore(cairo_ctx);
-}
-
-
-static void
-balsa_print_object_destroy(GObject * object)
-{
-    parent_class->finalize(object);
 }
 
 

@@ -147,9 +147,9 @@ static void
 libbalsa_vcal_finalize(LibBalsaVCal * self)
 {
     g_return_if_fail(self != NULL);
+
     if (self->vevent) {
-	g_list_foreach(self->vevent, (GFunc) g_object_unref, NULL);
-	g_list_free(self->vevent);
+	g_list_free_full(self->vevent, g_object_unref);
     }
 
     libbalsa_vcal_parent_class->finalize(G_OBJECT(self));

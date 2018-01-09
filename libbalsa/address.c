@@ -94,15 +94,13 @@ libbalsa_address_finalize(GObject * object)
 
     addr = LIBBALSA_ADDRESS(object);
 
-    g_free(addr->nick_name);    addr->nick_name = NULL;
-    g_free(addr->full_name);    addr->full_name = NULL;
-    g_free(addr->first_name);   addr->first_name = NULL;
-    g_free(addr->last_name);    addr->last_name = NULL;
-    g_free(addr->organization); addr->organization = NULL;
+    g_free(addr->nick_name);
+    g_free(addr->full_name);
+    g_free(addr->first_name);
+    g_free(addr->last_name);
+    g_free(addr->organization);
 
-    g_list_foreach(addr->address_list, (GFunc) g_free, NULL);
-    g_list_free(addr->address_list);
-    addr->address_list = NULL;
+    g_list_free_full(addr->address_list, g_free);
 
     G_OBJECT_CLASS(parent_class)->finalize(object);
 }

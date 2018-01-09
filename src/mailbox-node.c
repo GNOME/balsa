@@ -192,14 +192,14 @@ balsa_mailbox_node_dispose(GObject * object)
     BalsaMailboxNode *mn = BALSA_MAILBOX_NODE(object);
     LibBalsaMailbox *mailbox = mn->mailbox;
 
-    if (mailbox) {
+    if (mailbox != NULL) {
         libbalsa_mailbox_set_open(mailbox,
                                   libbalsa_mailbox_is_open(mailbox));
         config_save_mailbox_view(mailbox->url, mailbox->view);
-	if (balsa_app.main_window)
+	if (balsa_app.main_window != NULL) {
 	    balsa_window_close_mbnode(balsa_app.main_window, mn);
-	g_object_unref(mailbox);
-	mn->mailbox = NULL;
+        }
+        g_clear_object(&mn->mailbox);
     }
 
     G_OBJECT_CLASS(parent_class)->dispose(object);
@@ -213,19 +213,18 @@ balsa_mailbox_node_finalize(GObject * object)
     mn = BALSA_MAILBOX_NODE(object);
 
     balsa_mailbox_node_clear_children_cache(mn);
-    mn->parent  = NULL; 
-    g_free(mn->name);          mn->name = NULL;
-    g_free(mn->dir);           mn->dir = NULL;
-    g_free(mn->config_prefix); mn->config_prefix = NULL;
+    mn->parent  = NULL;
+    g_free(mn->name);
+    g_free(mn->dir);
+    g_free(mn->config_prefix);
 
-    if (mn->server) {
+    if (mn->server != NULL) {
 	g_signal_handlers_disconnect_matched(mn->server,
                                              G_SIGNAL_MATCH_DATA, 0,
 					     (GQuark) 0, NULL, NULL, mn);
-	mn->server = NULL;
     }
 
-    G_OBJECT_CLASS(parent_class)->finalize(G_OBJECT(object));
+    G_OBJECT_CLASS(parent_class)->finalize(object);
 }
 
 static void

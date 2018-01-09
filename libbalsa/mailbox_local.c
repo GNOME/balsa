@@ -41,6 +41,7 @@ static LibBalsaMailboxClass *parent_class = NULL;
 
 static void libbalsa_mailbox_local_class_init(LibBalsaMailboxLocalClass *klass);
 static void libbalsa_mailbox_local_init(LibBalsaMailboxLocal * mailbox);
+static void libbalsa_mailbox_local_dispose(GObject * object);
 static void libbalsa_mailbox_local_finalize(GObject * object);
 
 static void libbalsa_mailbox_local_changed(LibBalsaMailbox * mailbox);
@@ -148,6 +149,7 @@ libbalsa_mailbox_local_class_init(LibBalsaMailboxLocalClass * klass)
 
     parent_class = g_type_class_peek_parent(klass);
 
+    object_class->dispose  = libbalsa_mailbox_local_dispose;
     object_class->finalize = libbalsa_mailbox_local_finalize;
 
     libbalsa_mailbox_class->changed =
@@ -381,6 +383,23 @@ lbm_local_free_info(LibBalsaMailboxLocalInfo * info)
 }
 
 static void
+libbalsa_mailbox_local_dispose(GObject * object)
+{
+    LibBalsaMailboxLocal *ml;
+
+    g_return_if_fail(LIBBALSA_IS_MAILBOX_LOCAL(object));
+
+    ml = LIBBALSA_MAILBOX_LOCAL(object);
+
+    libbalsa_clear_source_id(&ml->sync_id);
+    libbalsa_clear_source_id(&ml->thread_id);
+    libbalsa_clear_source_id(&ml->save_tree_id);
+    libbalsa_clear_source_id(&ml->load_messages_id);
+
+    G_OBJECT_CLASS(parent_class)->dispose(object);
+}
+
+static void
 libbalsa_mailbox_local_finalize(GObject * object)
 {
     LibBalsaMailboxLocal *ml;
@@ -388,36 +407,16 @@ libbalsa_mailbox_local_finalize(GObject * object)
     g_return_if_fail(LIBBALSA_IS_MAILBOX_LOCAL(object));
 
     ml = LIBBALSA_MAILBOX_LOCAL(object);
-    if(ml->sync_id) {
-        g_source_remove(ml->sync_id);
-        ml->sync_id = 0;
-    }
 
-    if(ml->thread_id) {
-        g_source_remove(ml->thread_id);
-        ml->thread_id = 0;
-    }
-
-    if(ml->save_tree_id) {
-        g_source_remove(ml->save_tree_id);
-        ml->save_tree_id = 0;
-    }
-
-    if (ml->threading_info) {
+    if (ml->threading_info != NULL) {
 	/* The memory owned by ml->threading_info was freed on closing,
 	 * so we free only the array itself. */
 	g_ptr_array_free(ml->threading_info, TRUE);
-	ml->threading_info = NULL;
     }
 
-    if (ml->load_messages_id) {
-        g_source_remove(ml->load_messages_id);
-        ml->load_messages_id = 0;
-    }
-
-    if (G_OBJECT_CLASS(parent_class)->finalize)
-	G_OBJECT_CLASS(parent_class)->finalize(object);
+    G_OBJECT_CLASS(parent_class)->finalize(object);
 }
+
 
 static void lbm_local_queue_save_tree(LibBalsaMailboxLocal * local);
 

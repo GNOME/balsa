@@ -33,7 +33,7 @@
 static void balsa_print_object_header_class_init(BalsaPrintObjectHeaderClass * klass);
 static void balsa_print_object_header_init(GTypeInstance * instance,
 					    gpointer g_class);
-static void balsa_print_object_header_destroy(GObject * self);
+static void balsa_print_object_header_finalize(GObject * self);
 
 static void balsa_print_object_header_draw(BalsaPrintObject * self,
 					    GtkPrintContext * context,
@@ -87,7 +87,7 @@ balsa_print_object_header_class_init(BalsaPrintObjectHeaderClass * klass)
     parent_class = g_type_class_ref(BALSA_TYPE_PRINT_OBJECT);
     BALSA_PRINT_OBJECT_CLASS(klass)->draw =
 	balsa_print_object_header_draw;
-    G_OBJECT_CLASS(klass)->finalize = balsa_print_object_header_destroy;
+    G_OBJECT_CLASS(klass)->finalize = balsa_print_object_header_finalize;
 }
 
 
@@ -101,7 +101,7 @@ balsa_print_object_header_init(GTypeInstance * instance, gpointer g_class)
 
 
 static void
-balsa_print_object_header_destroy(GObject * self)
+balsa_print_object_header_finalize(GObject * self)
 {
     BalsaPrintObjectHeader *po = BALSA_PRINT_OBJECT_HEADER(self);
 

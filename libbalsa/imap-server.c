@@ -201,7 +201,6 @@ libbalsa_imap_server_init(LibBalsaImapServer * imap_server)
                               connection_cleanup, imap_server);
 }
 
-/* leave object in sane state (NULLified fields) */
 static void
 libbalsa_imap_server_finalize(GObject * object)
 {
@@ -219,7 +218,7 @@ libbalsa_imap_server_finalize(GObject * object)
 
     libbalsa_imap_server_force_disconnect(imap_server);
     g_mutex_clear(&imap_server->lock);
-    g_free(imap_server->key); imap_server->key = NULL;
+    g_free(imap_server->key);
 
     G_OBJECT_CLASS(parent_class)->finalize(object);
 }

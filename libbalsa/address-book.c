@@ -108,10 +108,7 @@ libbalsa_address_book_finalize(GObject * object)
     ab = LIBBALSA_ADDRESS_BOOK(object);
 
     g_free(ab->config_prefix);
-    ab->config_prefix = NULL;
-
     g_free(ab->name);
-    ab->name = NULL;
 
     G_OBJECT_CLASS(parent_class)->finalize(object);
 }

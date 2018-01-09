@@ -20,7 +20,6 @@
 #include "gmime-filter-header.h"
 
 static void g_mime_filter_header_class_init(GMimeFilterHeaderClass *klass);
-static void g_mime_filter_header_finalize(GObject *object);
 
 static GMimeFilter *filter_copy(GMimeFilter *filter);
 static void filter_filter(GMimeFilter *filter, char *in, size_t len, size_t prespace, char **out, size_t *outlen,
@@ -33,18 +32,10 @@ static void filter_reset(GMimeFilter *filter);
 G_DEFINE_TYPE(GMimeFilterHeader, g_mime_filter_header, GMIME_TYPE_FILTER)
 
 
-static GMimeFilterClass *parent_class = NULL;
-
-
 static void
 g_mime_filter_header_class_init(GMimeFilterHeaderClass *klass)
 {
-	GObjectClass *object_class = G_OBJECT_CLASS(klass);
 	GMimeFilterClass *filter_class = GMIME_FILTER_CLASS(klass);
-
-	parent_class = g_type_class_ref(GMIME_TYPE_FILTER);
-
-	object_class->finalize = g_mime_filter_header_finalize;
 
 	filter_class->copy = filter_copy;
 	filter_class->filter = filter_filter;
@@ -57,12 +48,6 @@ g_mime_filter_header_init(GMimeFilterHeader *self)
 {
 	self->headers_done = FALSE;
 	self->drop_header = FALSE;
-}
-
-static void
-g_mime_filter_header_finalize(GObject *object)
-{
-	G_OBJECT_CLASS(parent_class)->finalize(object);
 }
 
 static GMimeFilter *

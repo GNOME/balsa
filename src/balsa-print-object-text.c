@@ -51,7 +51,7 @@ typedef struct {
 static void balsa_print_object_text_class_init(BalsaPrintObjectTextClass * klass);
 static void balsa_print_object_text_init(GTypeInstance * instance,
 					 gpointer g_class);
-static void balsa_print_object_text_destroy(GObject * self);
+static void balsa_print_object_text_finalize(GObject * self);
 
 static void balsa_print_object_text_draw(BalsaPrintObject * self,
 					 GtkPrintContext * context,
@@ -100,7 +100,7 @@ balsa_print_object_text_class_init(BalsaPrintObjectTextClass * klass)
     parent_class = g_type_class_ref(BALSA_TYPE_PRINT_OBJECT);
     BALSA_PRINT_OBJECT_CLASS(klass)->draw =
 	balsa_print_object_text_draw;
-    G_OBJECT_CLASS(klass)->finalize = balsa_print_object_text_destroy;
+    G_OBJECT_CLASS(klass)->finalize = balsa_print_object_text_finalize;
 }
 
 
@@ -115,12 +115,11 @@ balsa_print_object_text_init(GTypeInstance * instance, gpointer g_class)
 
 
 static void
-balsa_print_object_text_destroy(GObject * self)
+balsa_print_object_text_finalize(GObject * self)
 {
     BalsaPrintObjectText *po = BALSA_PRINT_OBJECT_TEXT(self);
 
-    g_list_foreach(po->attributes, (GFunc) g_free, NULL);
-    g_list_free(po->attributes);
+    g_list_free_full(po->attributes, g_free);
     g_free(po->text);
 
     G_OBJECT_CLASS(parent_class)->finalize(self);

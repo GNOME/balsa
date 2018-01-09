@@ -3142,33 +3142,33 @@ void libbalsa_mailbox_set_replied_icon(GdkPixbuf * pixbuf)
 /* Icons for attachment column. */
 void libbalsa_mailbox_set_attach_icon(GdkPixbuf * pixbuf)
 {
-    g_set_object(&status_icons[LIBBALSA_MESSAGE_ATTACH_ATTACH], pixbuf);
+    g_set_object(&attach_icons[LIBBALSA_MESSAGE_ATTACH_ATTACH], pixbuf);
 }
 
 #ifdef HAVE_GPGME
 void libbalsa_mailbox_set_good_icon(GdkPixbuf * pixbuf)
 {
-    g_set_object(&status_icons[LIBBALSA_MESSAGE_ATTACH_GOOD], pixbuf);
+    g_set_object(&attach_icons[LIBBALSA_MESSAGE_ATTACH_GOOD], pixbuf);
 }
 
 void libbalsa_mailbox_set_notrust_icon(GdkPixbuf * pixbuf)
 {
-    g_set_object(&status_icons[LIBBALSA_MESSAGE_ATTACH_NOTRUST], pixbuf);
+    g_set_object(&attach_icons[LIBBALSA_MESSAGE_ATTACH_NOTRUST], pixbuf);
 }
 
 void libbalsa_mailbox_set_bad_icon(GdkPixbuf * pixbuf)
 {
-    g_set_object(&status_icons[LIBBALSA_MESSAGE_ATTACH_BAD], pixbuf);
+    g_set_object(&attach_icons[LIBBALSA_MESSAGE_ATTACH_BAD], pixbuf);
 }
 
 void libbalsa_mailbox_set_sign_icon(GdkPixbuf * pixbuf)
 {
-    g_set_object(&status_icons[LIBBALSA_MESSAGE_ATTACH_SIGN], pixbuf);
+    g_set_object(&attach_icons[LIBBALSA_MESSAGE_ATTACH_SIGN], pixbuf);
 }
 
 void libbalsa_mailbox_set_encr_icon(GdkPixbuf * pixbuf)
 {
-    g_set_object(&status_icons[LIBBALSA_MESSAGE_ATTACH_ENCR], pixbuf);
+    g_set_object(&attach_icons[LIBBALSA_MESSAGE_ATTACH_ENCR], pixbuf);
 }
 #endif /* HAVE_GPGME */
 

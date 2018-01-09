@@ -826,10 +826,7 @@ balsa_spell_check_destroy(GObject * object)
 	spch_finish(spell_check, FALSE);
     }
 
-    if (spell_check->highlight_idle_id) {
-        g_source_remove(spell_check->highlight_idle_id);
-        spell_check->highlight_idle_id = 0;
-    }
+    libbalsa_clear_source_id(&spell_check->highlight_idle_id);
 
     g_clear_pointer(&spell_check->language_tag, g_free);
     g_clear_pointer(&quoted_rex, g_regex_unref);

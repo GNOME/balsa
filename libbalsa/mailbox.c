@@ -675,11 +675,8 @@ libbalsa_mailbox_check(LibBalsaMailbox * mailbox)
 
     libbalsa_lock_mailbox(mailbox);
 
-    if (mailbox->queue_check_idle_id) {
-	/* Remove scheduled idle callback. */
-        g_source_remove(mailbox->queue_check_idle_id);
-        mailbox->queue_check_idle_id = 0;
-    }
+    /* Remove any scheduled idle callback. */
+    libbalsa_clear_source_id(&mailbox->queue_check_idle_id);
 
     LIBBALSA_MAILBOX_GET_CLASS(mailbox)->check(mailbox);
 

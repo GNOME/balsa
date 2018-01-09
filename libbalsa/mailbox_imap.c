@@ -319,10 +319,7 @@ libbalsa_mailbox_imap_dispose(GObject * object)
     }
 
     mailbox = LIBBALSA_MAILBOX_IMAP(object);
-    if (mailbox->unread_update_id != 0) {
-        g_source_remove(mailbox->unread_update_id);
-        mailbox->unread_update_id = 0;
-    }
+    libbalsa_clear_source_id(&mailbox->unread_update_id);
 
     G_OBJECT_CLASS(parent_class)->dispose(object);
 }

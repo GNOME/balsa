@@ -245,14 +245,8 @@ static void
 progress_data_destroy_cb(GtkWidget G_GNUC_UNUSED *widget,
 						 progress_widget_data_t  *progress_data)
 {
-	if (progress_data->activity_id != 0U) {
-		g_source_remove(progress_data->activity_id);
-		progress_data->activity_id = 0U;
-	}
-	if (progress_data->fadeout_id != 0U) {
-		g_source_remove(progress_data->fadeout_id);
-		progress_data->fadeout_id = 0U;
-	}
+	libbalsa_clear_source_id(&progress_data->activity_id);
+	libbalsa_clear_source_id(&progress_data->fadeout_id);
 }
 
 
@@ -392,10 +386,7 @@ libbalsa_progress_dialog_update_real(ProgressDialog *progress_dialog,
 							g_timeout_add(ACTIVITY_DURATION, (GSourceFunc) progress_activity, progress_data->progress);
 					}
 				} else {
-					if (progress_data->activity_id != 0U) {
-						g_source_remove(progress_data->activity_id);
-						progress_data->activity_id = 0U;
-					}
+					libbalsa_clear_source_id(&progress_data->activity_id);
 					gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(progress_data->progress), fraction);
 				}
 			}

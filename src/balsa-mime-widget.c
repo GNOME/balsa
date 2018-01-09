@@ -290,7 +290,7 @@ balsa_mime_widget_new_unknown(BalsaMessage * bm,
 }
 
 
-static gint resize_idle_id;
+static guint resize_idle_id;
 
 static GtkWidget *old_widget, *new_widget;
 static gdouble old_upper, new_upper;
@@ -331,7 +331,6 @@ vadj_change_cb(GtkAdjustment *vadj, GtkWidget *widget)
         return;
     new_widget = widget;
     new_upper = upper;
-    if (resize_idle_id) 
-        g_source_remove(resize_idle_id);
+    libbalsa_clear_source_id(&resize_idle_id);
     balsa_mime_widget_schedule_resize(widget);
 }

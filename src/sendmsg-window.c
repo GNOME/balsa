@@ -637,10 +637,7 @@ balsa_sendmsg_destroy_handler(BalsaSendmsg * bsmsg)
     if (bsmsg->spell_checker)
         gtk_widget_destroy(bsmsg->spell_checker);
 #endif                          /* HAVE_GTKSPELL */
-    if (bsmsg->autosave_timeout_id) {
-        g_source_remove(bsmsg->autosave_timeout_id);
-        bsmsg->autosave_timeout_id = 0;
-    }
+    libbalsa_clear_source_id(&bsmsg->autosave_timeout_id);
 
 #if !HAVE_GTKSOURCEVIEW
     g_object_unref(bsmsg->buffer2);

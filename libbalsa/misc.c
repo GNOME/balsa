@@ -1219,8 +1219,8 @@ libbalsa_clear_source_id(guint * tag)
 {
     g_return_if_fail(tag != NULL);
 
-    if (*tag != 0) {
+    if (*tag != 0U) {
         g_source_remove(*tag);
-        *tag = 0;
+        *tag = 0U;
     }
 }

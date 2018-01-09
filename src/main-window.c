@@ -4293,10 +4293,7 @@ bw_idle_replace(BalsaWindow * window, BalsaIndex * bindex)
 static void
 bw_idle_remove(BalsaWindow * window)
 {
-    if (window->set_message_id) {
-        g_source_remove(window->set_message_id);
-        window->set_message_id = 0;
-    }
+    libbalsa_clear_source_id(&window->set_message_id);
 }
 
 
@@ -4542,8 +4539,7 @@ balsa_window_decrease_activity(BalsaWindow * window, const gchar * message)
     /* decrement the counter if positive */
     if (window->activity_counter > 0 && --window->activity_counter == 0) {
         /* clear the bar and make it available for others to use */
-        g_source_remove(window->activity_handler);
-        window->activity_handler = 0;
+        libbalsa_clear_source_id(&window->activity_handler);
         if (window->progress_type == BALSA_PROGRESS_ACTIVITY) {
             window->progress_type = BALSA_PROGRESS_NONE;
             gtk_progress_bar_set_fraction(progress_bar, 0);

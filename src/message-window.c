@@ -331,10 +331,9 @@ mw_set_buttons_sensitive(MessageWindow * mw)
 static void
 mw_set_message(MessageWindow * mw, LibBalsaMessage * message)
 {
-    if (mw->idle_handler_id && !message) {
-	g_source_remove(mw->idle_handler_id);
-	mw->idle_handler_id = 0;
-    } 
+    if (message == NULL) {
+	libbalsa_clear_source_id(&mw->idle_handler_id);
+    }
 
     if (mw->message) {
         g_object_set_data(G_OBJECT(mw->message), BALSA_MESSAGE_WINDOW_KEY, NULL);
@@ -345,7 +344,7 @@ mw_set_message(MessageWindow * mw, LibBalsaMessage * message)
 
     if (message) {
         g_object_set_data(G_OBJECT(message), BALSA_MESSAGE_WINDOW_KEY, mw);
-        if (!mw->idle_handler_id)
+        if (mw->idle_handler_id == 0U)
             mw->idle_handler_id =
                 g_idle_add((GSourceFunc) message_window_idle_handler, mw);
         mw_set_buttons_sensitive(mw);

@@ -508,10 +508,7 @@ libbalsa_identity_select_dialog(GtkWindow * parent,
 static void
 sd_destroy_notify(SelectDialogInfo * sdi)
 {
-    if (sdi->idle_handler_id) {
-        g_source_remove(sdi->idle_handler_id);
-        sdi->idle_handler_id = 0;
-    }
+    libbalsa_clear_source_id(&sdi->idle_handler_id);
     g_free(sdi);
 }
 

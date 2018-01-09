@@ -106,10 +106,7 @@ static ProgressDialog send_progress_dialog;
 static void
 update_send_timer(gboolean start)
 {
-    if (send_mail_timer_id != 0U) {
-        g_source_remove(send_mail_timer_id);
-        send_mail_timer_id = 0U;
-    }
+    libbalsa_clear_source_id(&send_mail_timer_id);
 
     if (start && send_mail_auto && (auto_send_cb != NULL)) {
     	send_mail_timer_id = g_timeout_add_seconds(send_mail_time, auto_send_cb, NULL);

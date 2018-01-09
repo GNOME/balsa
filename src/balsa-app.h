@@ -165,7 +165,7 @@ extern struct BalsaApplication {
     /* timer for checking mail every xx minutes */
     gboolean check_mail_auto;
     gint check_mail_timer;
-    gint check_mail_timer_id;
+    guint check_mail_timer_id;
 
     /* This can be configured from the gnome control panel */
     /* It's here just in case some other app also uses the same */

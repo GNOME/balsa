@@ -743,10 +743,7 @@ libbalsa_mailbox_local_close_mailbox(LibBalsaMailbox * mailbox,
     guint i;
     LibBalsaMailboxLocalPool *item;
 
-    if(local->sync_id) {
-        g_source_remove(local->sync_id);
-        local->sync_id = 0;
-    }
+    libbalsa_clear_source_id(&local->sync_id);
 
     /* Restore the persistent view before saving the tree. */
     libbalsa_mailbox_set_view_filter(mailbox,
@@ -756,16 +753,13 @@ libbalsa_mailbox_local_close_mailbox(LibBalsaMailbox * mailbox,
         /* Rethread immediately. */
         LibBalsaMailboxThreadingType cur_type =
             libbalsa_mailbox_get_threading_type(mailbox);
-        g_source_remove(local->thread_id);
-        local->thread_id = 0;
+
+        libbalsa_clear_source_id(&local->thread_id);
         libbalsa_mailbox_set_threading(mailbox, cur_type);
     }
 
-    if (local->save_tree_id) {
         /* Save immediately. */
-        g_source_remove(local->save_tree_id);
-        local->save_tree_id = 0;
-    }
+    libbalsa_clear_source_id(&local->save_tree_id);
     lbm_local_save_tree(local);
 
     if (local->threading_info) {

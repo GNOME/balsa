@@ -530,10 +530,7 @@ libbalsa_conf_sync(void)
 #if DEBUG
     g_print("%s id %d, will be cleared\n", __func__, lbc_sync_idle_id);
 #endif                          /* DEBUG */
-    if (lbc_sync_idle_id) {
-        g_source_remove(lbc_sync_idle_id);
-        lbc_sync_idle_id = 0;
-    }
+    libbalsa_clear_source_id(&lbc_sync_idle_id);
     G_UNLOCK(lbc_sync_idle_id);
     lbc_lock();
     lbc_sync(&lbc_conf);

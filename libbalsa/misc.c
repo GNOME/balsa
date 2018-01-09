@@ -1213,14 +1213,20 @@ libbalsa_font_string_to_css(const gchar * font_string,
 
 /*
  * Convenience function for removing and clearing a GSource id
+ *
+ * Returns TRUE if the GSource was removed
  */
-void
+gboolean
 libbalsa_clear_source_id(guint * tag)
 {
-    g_return_if_fail(tag != NULL);
+    gboolean retval;
 
-    if (*tag != 0U) {
+    g_return_val_if_fail(tag != NULL, FALSE);
+
+    if ((retval = (*tag != 0U))) {
         g_source_remove(*tag);
         *tag = 0U;
     }
+
+    return retval;
 }

@@ -302,7 +302,7 @@ balsa_information_list(GtkWindow *parent, LibBalsaInformationType type,
     }
 }
 
-static guint bar_timeout_id = 0;
+static guint bar_timeout_id = 0U;
 static gboolean
 status_bar_refresh(gpointer data)
 {
@@ -315,7 +315,7 @@ status_bar_refresh(gpointer data)
         gtk_statusbar_pop(statusbar, context_id);
     }
 
-    bar_timeout_id = 0;
+    bar_timeout_id = 0U;
 
     return FALSE;
 }
@@ -335,9 +335,8 @@ balsa_information_bar(GtkWindow *parent, LibBalsaInformationType type,
     context_id = gtk_statusbar_get_context_id(statusbar, "Information bar");
 
     /* First clear any current message. */
-    if (bar_timeout_id) {
+    if (libbalsa_clear_source_id(&bar_timeout_id)) {
         gtk_statusbar_pop(statusbar, context_id);
-        g_source_remove(bar_timeout_id);
     }
 
     line = g_strdup(msg);

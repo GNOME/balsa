@@ -52,6 +52,7 @@ typedef struct {
 G_DEFINE_TYPE(NetClientSmtp, net_client_smtp, NET_CLIENT_TYPE)
 
 
+static void net_client_smtp_dispose(GObject *object);
 static void net_client_smtp_finalise(GObject *object);
 static gboolean net_client_smtp_ehlo(NetClientSmtp *client, guint *auth_supported, gboolean *can_starttls, GError **error);
 static gboolean net_client_smtp_starttls(NetClientSmtp *client, GError **error);
@@ -335,6 +336,7 @@ net_client_smtp_class_init(NetClientSmtpClass *klass)
 {
 	GObjectClass *gobject_class = G_OBJECT_CLASS(klass);
 
+	gobject_class->dispose  = net_client_smtp_dispose;
 	gobject_class->finalize = net_client_smtp_finalise;
 }
 
@@ -349,7 +351,7 @@ net_client_smtp_init(NetClientSmtp *self)
 
 
 static void
-net_client_smtp_finalise(GObject *object)
+net_client_smtp_dispose(GObject *object)
 {
 	const NetClientSmtp *client = NET_CLIENT_SMTP(object);
 	const GObjectClass *parent_class = G_OBJECT_CLASS(net_client_smtp_parent_class);
@@ -358,9 +360,21 @@ net_client_smtp_finalise(GObject *object)
 	 * reply or check for errors */
 	if (!client->priv->data_state) {
 		(void) net_client_execute(NET_CLIENT(client), NULL, "QUIT", NULL);
+                client->priv->data_state = TRUE;
 	}
 
+	(*parent_class->dispose)(object);
+}
+
+
+static void
+net_client_smtp_finalise(GObject *object)
+{
+	const NetClientSmtp *client = NET_CLIENT_SMTP(object);
+	const GObjectClass *parent_class = G_OBJECT_CLASS(net_client_smtp_parent_class);
+
 	g_free(client->priv);
+
 	(*parent_class->finalize)(object);
 }
 

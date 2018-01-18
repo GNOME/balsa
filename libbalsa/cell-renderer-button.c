@@ -57,7 +57,6 @@ static void
 libbalsa_cell_renderer_button_class_init(LibBalsaCellRendererButtonClass *
                                          klass)
 {
-    GObjectClass         *object_class = G_OBJECT_CLASS(klass);
     GtkCellRendererClass *cell_class   = GTK_CELL_RENDERER_CLASS(klass);
 
     cell_class->activate = libbalsa_cell_renderer_button_activate;
@@ -72,7 +71,7 @@ libbalsa_cell_renderer_button_class_init(LibBalsaCellRendererButtonClass *
    **/
     cell_button_signals[ACTIVATED] =
         g_signal_new("activated",
-                     G_OBJECT_CLASS_TYPE(object_class),
+                     G_OBJECT_CLASS_TYPE(klass),
                      0, 0, NULL, NULL,
                      g_cclosure_marshal_VOID__STRING,
                      G_TYPE_NONE,

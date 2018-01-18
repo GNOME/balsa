@@ -266,7 +266,7 @@ balsa_window_init(BalsaWindow * window)
 }
 
 static gboolean
-bw_delete_cb(GtkWidget* main_window)
+bw_close_request_cb(GtkWidget * main_window)
 {
     /* we cannot leave main window disabled because compose windows
      * (for example) could refuse to get deleted and we would be left
@@ -318,20 +318,20 @@ bw_pass_to_filter(BalsaWindow *bw, GdkEventKey *event, gpointer data)
     g_signal_emit_by_name(bw->sos_entry, "key_press_event", event, &res, data);
     return res;
 }
-static gboolean
-bw_enable_filter(GtkWidget *widget, GdkEventFocus *event, gpointer data)
+
+static void
+bw_check_filter(GtkWidget *widget, GParamSpec *pspec, gpointer data)
 {
-    g_signal_connect(G_OBJECT(data), "key_press_event",
-                     G_CALLBACK(bw_pass_to_filter), NULL);
-    return FALSE;
-}
-static gboolean
-bw_disable_filter(GtkWidget *widget, GdkEventFocus *event, gpointer data)
-{
-    g_signal_handlers_disconnect_by_func(G_OBJECT(data),
-                                         G_CALLBACK(bw_pass_to_filter),
-                                         NULL);
-    return FALSE;
+    BalsaWindow *window = data;
+
+    if (gtk_widget_has_focus(widget)) {
+        g_signal_connect(window, "key_press_event",
+                         G_CALLBACK(bw_pass_to_filter), NULL);
+    } else {
+        g_signal_handlers_disconnect_by_func(window,
+                                             G_CALLBACK(bw_pass_to_filter),
+                                             NULL);
+    }
 }
 
 static void
@@ -481,10 +481,8 @@ bw_create_index_widget(BalsaWindow *bw)
     bw->sos_entry = gtk_entry_new();
     /* gtk_label_set_mnemonic_widget(GTK_LABEL(bw->filter_choice),
        bw->sos_entry); */
-    g_signal_connect(G_OBJECT(bw->sos_entry), "focus_in_event",
-                     G_CALLBACK(bw_enable_filter), bw);
-    g_signal_connect(G_OBJECT(bw->sos_entry), "focus_out_event",
-                     G_CALLBACK(bw_disable_filter), bw);
+    g_signal_connect(G_OBJECT(bw->sos_entry), "notify::has-focus",
+                     G_CALLBACK(bw_check_filter), bw);
     gtk_widget_set_hexpand(bw->sos_entry, TRUE);
     gtk_box_pack_start(GTK_BOX(bw->sos_bar), bw->sos_entry);
     gtk_widget_show(bw->sos_entry);
@@ -2378,8 +2376,8 @@ balsa_window_new()
                      G_CALLBACK(bw_size_allocate_cb), NULL);
     g_signal_connect(window, "destroy",
                      G_CALLBACK (gtk_main_quit), NULL);
-    g_signal_connect(window, "delete-event",
-                     G_CALLBACK(bw_delete_cb), NULL);
+    g_signal_connect(window, "close-request",
+                     G_CALLBACK(bw_close_request_cb), NULL);
 
     /* Cancel new-mail notification when we get the focus. */
     g_signal_connect(window, "notify::is-active",

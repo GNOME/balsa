@@ -265,32 +265,29 @@ balsa_mime_widget_key_press_event(GtkWidget * widget, GdkEvent * event,
 }
 
 
-gint
-balsa_mime_widget_limit_focus(GtkWidget * widget, GdkEventFocus * event, BalsaMessage * bm)
+void
+balsa_mime_widget_check_focus(GtkWidget * widget, GParamSpec * pspec, BalsaMessage * bm)
 {
-    /* Disable can_focus on other message parts so that TAB does not
-     * attempt to move the focus on them. */
-    GList *list = g_list_append(NULL, widget);
+    if (gtk_widget_has_focus(widget)) {
+        /* Disable can_focus on other message parts so that TAB does not
+         * attempt to move the focus on them. */
+        GList *list;
 
-    gtk_container_set_focus_chain(GTK_CONTAINER(bm->bm_widget->container), list);
-    g_list_free(list);
-    if (bm->focus_state == BALSA_MESSAGE_FOCUS_STATE_NO)
-        bm->focus_state = BALSA_MESSAGE_FOCUS_STATE_YES;
-    return FALSE;
-}
+        list = g_list_append(NULL, widget);
+        gtk_container_set_focus_chain(GTK_CONTAINER(bm->bm_widget->container), list);
+        g_list_free(list);
 
-
-gint
-balsa_mime_widget_unlimit_focus(GtkWidget * widget, GdkEventFocus * event, BalsaMessage * bm)
-{
-    gtk_container_unset_focus_chain(GTK_CONTAINER(bm->bm_widget->container));
-    if (bm->message) {
-        BalsaMessageFocusState focus_state = bm->focus_state;
-        if (focus_state == BALSA_MESSAGE_FOCUS_STATE_HOLD) {
-            balsa_message_grab_focus(bm);
+        if (bm->focus_state == BALSA_MESSAGE_FOCUS_STATE_NO)
             bm->focus_state = BALSA_MESSAGE_FOCUS_STATE_YES;
-        } else
-            bm->focus_state = BALSA_MESSAGE_FOCUS_STATE_NO;
+    } else {
+        gtk_container_unset_focus_chain(GTK_CONTAINER(bm->bm_widget->container));
+
+        if (bm->message != NULL) {
+            if (bm->focus_state == BALSA_MESSAGE_FOCUS_STATE_HOLD) {
+                balsa_message_grab_focus(bm);
+                bm->focus_state = BALSA_MESSAGE_FOCUS_STATE_YES;
+            } else
+                bm->focus_state = BALSA_MESSAGE_FOCUS_STATE_NO;
+        }
     }
-    return FALSE;
 }

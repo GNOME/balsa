@@ -992,11 +992,6 @@ bab_window_new(GtkApplication * application)
     return wnd;
 }
 
-static gboolean
-bab_delete_ok(void)
-{
-    return FALSE;
-}
 /* -------------------------- main --------------------------------- */
 static void
 ab_warning(const char *fmt, ...)
@@ -1112,8 +1107,6 @@ main(int argc, char *argv[])
 
     g_signal_connect(G_OBJECT(ab_window), "destroy",
                      G_CALLBACK(bab_cleanup), NULL);
-    g_signal_connect(G_OBJECT(ab_window), "delete-event",
-                     G_CALLBACK(bab_delete_ok), NULL);
     bab_set_intial_address_book(ab, ab_window);
 
     /* session management */

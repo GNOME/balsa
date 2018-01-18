@@ -466,10 +466,8 @@ bm_header_widget_new(BalsaMessage * bm, GtkWidget * const * buttons)
     gtk_grid_set_column_spacing(GTK_GRID(grid), 12);
     gtk_widget_show(grid);
 
-    g_signal_connect(grid, "focus_in_event",
-		     G_CALLBACK(balsa_mime_widget_limit_focus), bm);
-    g_signal_connect(grid, "focus_out_event",
-		     G_CALLBACK(balsa_mime_widget_unlimit_focus), bm);
+    g_signal_connect(grid, "notify::has-focus",
+		     G_CALLBACK(balsa_mime_widget_check_focus), bm);
     g_signal_connect(grid, "key_press_event",
 		     G_CALLBACK(balsa_mime_widget_key_press_event), bm);
 

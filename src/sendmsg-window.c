@@ -488,8 +488,8 @@ sw_delete_draft(BalsaSendmsg * bsmsg)
                                       LIBBALSA_MESSAGE_FLAG_DELETED, 0);
 }
 
-static gint
-delete_handler(BalsaSendmsg * bsmsg)
+static gboolean
+close_handler(BalsaSendmsg * bsmsg)
 {
     InternetAddressList *list;
     InternetAddress *ia;
@@ -548,12 +548,12 @@ delete_handler(BalsaSendmsg * bsmsg)
     return FALSE;
 }
 
-static gint
-delete_event_cb(GtkWidget * widget, GdkEvent * e, gpointer data)
+static gboolean
+close_request_cb(GtkWidget * widget, gpointer data)
 {
     BalsaSendmsg *bsmsg = data;
 
-    return delete_handler(bsmsg);
+    return close_handler(bsmsg);
 }
 
 static void
@@ -566,7 +566,7 @@ sw_close_activated(GSimpleAction * action,
     BALSA_DEBUG_MSG("close_window_cb: start\n");
     g_object_set_data(G_OBJECT(bsmsg->window), "destroying",
                       GINT_TO_POINTER(TRUE));
-    if(!delete_handler(bsmsg))
+    if(!close_handler(bsmsg))
 	gtk_widget_destroy(bsmsg->window);
     BALSA_DEBUG_MSG("close_window_cb: end\n");
 }
@@ -6623,8 +6623,8 @@ sendmsg_window_new()
 
     bsmsg->draft_message = NULL;
     bsmsg->parent_message = NULL;
-    g_signal_connect(G_OBJECT(window), "delete-event",
-		     G_CALLBACK(delete_event_cb), bsmsg);
+    g_signal_connect(window, "close-request",
+		     G_CALLBACK(close_request_cb), bsmsg);
     g_signal_connect(G_OBJECT(window), "destroy",
 		     G_CALLBACK(destroy_event_cb), bsmsg);
     g_signal_connect(G_OBJECT(window), "size_allocate",
@@ -6730,8 +6730,8 @@ sendmsg_window_new()
     bsmsg->update_config = TRUE;
 
     bsmsg->delete_sig_id =
-	g_signal_connect(G_OBJECT(balsa_app.main_window), "delete-event",
-			 G_CALLBACK(delete_event_cb), bsmsg);
+	g_signal_connect(G_OBJECT(balsa_app.main_window), "close-request",
+			 G_CALLBACK(close_request_cb), bsmsg);
 
     setup_headers_from_identity(bsmsg, bsmsg->ident);
 

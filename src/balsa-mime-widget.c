@@ -144,12 +144,8 @@ balsa_mime_widget_new(BalsaMessage * bm, LibBalsaMessageBody * mime_body, gpoint
 
     if (mw) {
 	if (mw->widget) {
-	    g_signal_connect(G_OBJECT(mw->widget), "focus_in_event",
-			     G_CALLBACK(balsa_mime_widget_limit_focus),
-			     (gpointer) bm);
-	    g_signal_connect(G_OBJECT(mw->widget), "focus_out_event",
-			     G_CALLBACK(balsa_mime_widget_unlimit_focus),
-			     (gpointer) bm);
+	    g_signal_connect(mw->widget, "notify::has-focus",
+			     G_CALLBACK(balsa_mime_widget_check_focus), bm);
 #ifdef HAVE_GPGME
 	    if (mime_body->sig_info &&
 		g_ascii_strcasecmp("application/pgp-signature", content_type) &&

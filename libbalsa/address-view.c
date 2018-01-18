@@ -742,43 +742,56 @@ lbav_editing_done(GtkCellEditable * cell_editable,
 
 
 /*
- * Focus Out callback
+ * notify::has-focus callback
  * If only one completion matches, fill it into the entry
  */
-static gboolean
-lbav_focus_out_cb(GtkEntry * entry, GdkEventFocus * event,
-                  LibBalsaAddressView * address_view)
+static void
+lbav_notify_has_focus_cb(GtkEntry            *entry,
+                         GParamSpec          *pspec,
+                         LibBalsaAddressView *address_view)
 {
-    const gchar *the_entry = gtk_entry_get_text(entry);
+    const gchar *the_entry;
+    GList *match;
 
-    if (the_entry && *the_entry) {
-        GList *match;
-
-        match = lbav_get_matching_addresses(address_view,
-                                            the_entry,
-                                            LIBBALSA_ADDRESS_VIEW_MATCH_ALL);
-
-        if (match) {
-            if (!match->next) {
-                gchar *the_addr =
-                    internet_address_to_string((InternetAddress *) match->
-                                               data, FALSE);
-
-                g_signal_handlers_block_by_func(entry,
-                                                lbav_entry_changed_cb,
-                                                address_view);
-                gtk_entry_set_text(entry, the_addr);
-                g_signal_handlers_unblock_by_func(entry,
-                                                  lbav_entry_changed_cb,
-                                                  address_view);
-                gtk_cell_editable_editing_done(GTK_CELL_EDITABLE(entry));
-                g_free(the_addr);
-            }
-            g_list_free_full(match, g_object_unref);
-        }
+    if (gtk_widget_has_focus(GTK_WIDGET(entry))) {
+        /* Not a focus-out event */
+        return;
     }
 
-    return FALSE;
+    the_entry = gtk_entry_get_text(entry);
+
+    if (the_entry == NULL || the_entry[0] == '\0') {
+        /* No text to match */
+        return;
+    }
+
+    match = lbav_get_matching_addresses(address_view, the_entry,
+                                        LIBBALSA_ADDRESS_VIEW_MATCH_ALL);
+
+    if (match == NULL) {
+        /* No matching addresses */
+        return;
+    }
+
+    if (match->next == NULL) {
+        /* Only one match */
+        gchar *the_addr;
+
+        g_signal_handlers_block_by_func(entry,
+                                        lbav_entry_changed_cb,
+                                        address_view);
+
+        the_addr = internet_address_to_string(match->data, FALSE);
+        gtk_entry_set_text(entry, the_addr);
+        g_free(the_addr);
+
+        g_signal_handlers_unblock_by_func(entry,
+                                          lbav_entry_changed_cb,
+                                          address_view);
+        gtk_cell_editable_editing_done(GTK_CELL_EDITABLE(entry));
+    }
+
+    g_list_free_full(match, g_object_unref);
 }
 
 
@@ -820,8 +833,8 @@ lbav_row_editing_cb(GtkCellRenderer * renderer,
                      G_CALLBACK(lbav_insert_text_cb), address_view);
     g_signal_connect(editable, "editing-done",
                      G_CALLBACK(lbav_editing_done), address_view);
-    g_signal_connect_after(GTK_ENTRY(editable), "focus-out-event",
-			   G_CALLBACK(lbav_focus_out_cb), address_view);
+    g_signal_connect_after(editable, "notify::has-focus",
+			   G_CALLBACK(lbav_notify_has_focus_cb), address_view);
     gtk_entry_set_completion(GTK_ENTRY(editable), completion);
     g_object_unref(completion);
 

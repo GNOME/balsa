@@ -127,10 +127,28 @@ const gchar *net_client_get_host(const NetClient *client);
 gboolean net_client_connect(NetClient *client, GError **error);
 
 
+/** @brief Shut down the connection to a network client
+ *
+ * @param client network client
+ *
+ * Shut down the connection.  Note that it is usually not necessary to call this function, as the connection will be shut down when
+ * the client is destroyed by calling <tt>g_object_unref()</tt>.
+ */
+void net_client_shutdown(const NetClient *client);
+
+
 /** @brief Check if a network client is connected
  *
  * @param client network client
  * @return TRUE if the passed network client is connected, FALSE if not
+ */
+gboolean net_client_is_connected(NetClient *client);
+
+
+/** @brief Check if a network client is encrypted
+ *
+ * @param client network client
+ * @return TRUE if the passed network client is encrypted, FALSE if not
  */
 gboolean net_client_is_encrypted(NetClient *client);
 

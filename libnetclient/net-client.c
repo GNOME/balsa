@@ -129,12 +129,48 @@ net_client_connect(NetClient *client, GError **error)
 }
 
 
+void
+net_client_shutdown(const NetClient *client)
+{
+	if (NET_IS_CLIENT(client)) {
+		/* note: we must unref the GDataInputStream, but *not* the GOutputStream! */
+		if (client->priv->istream != NULL) {
+			g_object_unref(G_OBJECT(client->priv->istream));
+			client->priv->istream = NULL;
+		}
+		if (client->priv->tls_conn != NULL) {
+			g_object_unref(G_OBJECT(client->priv->tls_conn));
+			client->priv->tls_conn = NULL;
+		}
+		if (client->priv->plain_conn != NULL) {
+			g_object_unref(G_OBJECT(client->priv->plain_conn));
+			client->priv->plain_conn = NULL;
+		}
+	}
+}
+
+
+gboolean
+net_client_is_connected(NetClient *client)
+{
+	gboolean result;
+
+	if (NET_IS_CLIENT(client) && (client->priv->plain_conn != NULL)) {
+		result = TRUE;
+	} else {
+		result = FALSE;
+	}
+
+	return result;
+}
+
+
 gboolean
 net_client_is_encrypted(NetClient *client)
 {
 	gboolean result;
 
-	if (NET_IS_CLIENT(client) && (client->priv->plain_conn != NULL) && (client->priv->tls_conn != NULL)) {
+	if (net_client_is_connected(client) && (client->priv->tls_conn != NULL)) {
 		result = TRUE;
 	} else {
 		result = FALSE;
@@ -427,6 +463,7 @@ net_client_start_tls(NetClient *client, GError **error)
 				client->priv->istream = g_data_input_stream_new(g_io_stream_get_input_stream(G_IO_STREAM(client->priv->tls_conn)));
 				g_data_input_stream_set_newline_type(client->priv->istream, G_DATA_STREAM_NEWLINE_TYPE_CR_LF);
 				client->priv->ostream = g_io_stream_get_output_stream(G_IO_STREAM(client->priv->tls_conn));
+				g_debug("connection is encrypted");
 			} else {
 				g_object_unref(G_OBJECT(client->priv->tls_conn));
 				client->priv->tls_conn = NULL;
@@ -482,19 +519,7 @@ net_client_finalise(GObject *object)
 	const NetClient *client = NET_CLIENT(object);
 	const GObjectClass *parent_class = G_OBJECT_CLASS(net_client_parent_class);
 
-	/* note: we must unref the GDataInputStream, but *not* the GOutputStream! */
-	if (client->priv->istream != NULL) {
-		g_object_unref(G_OBJECT(client->priv->istream));
-		client->priv->istream = NULL;
-	}
-	if (client->priv->tls_conn != NULL) {
-		g_object_unref(G_OBJECT(client->priv->tls_conn));
-		client->priv->tls_conn = NULL;
-	}
-	if (client->priv->plain_conn != NULL) {
-		g_object_unref(G_OBJECT(client->priv->plain_conn));
-		client->priv->plain_conn = NULL;
-	}
+	net_client_shutdown(client);
 	if (client->priv->sock != NULL) {
 		g_object_unref(G_OBJECT(client->priv->sock));
 		client->priv->sock = NULL;

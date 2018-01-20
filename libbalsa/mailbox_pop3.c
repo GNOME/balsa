@@ -510,6 +510,7 @@ libbalsa_mailbox_pop3_startup(LibBalsaServer            *server,
 		libbalsa_information(LIBBALSA_INFORMATION_ERROR, _("POP3 mailbox %s: cannot connect %s: %s"), name, server->host,
 			error->message);
 		g_error_free(error);
+		net_client_shutdown(NET_CLIENT(pop));
 		g_object_unref(G_OBJECT(pop));
 		return NULL;
 	}
@@ -519,6 +520,7 @@ libbalsa_mailbox_pop3_startup(LibBalsaServer            *server,
 	if (!net_client_pop_list(pop, msg_list, !mbox->delete_from_server, &error)) {
 		libbalsa_information(LIBBALSA_INFORMATION_ERROR, _("POP3 mailbox %s error: %s"), name, error->message);
 		g_error_free(error);
+		net_client_shutdown(NET_CLIENT(pop));
 		g_object_unref(G_OBJECT(pop));
 		pop = NULL;
 	}
@@ -683,10 +685,11 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
 		}
 
 		if (!result) {
+			net_client_shutdown(NET_CLIENT(pop));
 			libbalsa_information(LIBBALSA_INFORMATION_ERROR, _("POP3 error: %s"),
                                              err != NULL ? err->message : "?");
 			if (err != NULL)
-                            g_error_free(err);
+				g_error_free(err);
 		}
 
 		/* done - clean up */

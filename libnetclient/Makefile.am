@@ -13,6 +13,7 @@ libnetclient_a_SOURCES =	\
 CLEANFILES = doxygen.log
 SUBDIRS = test
 AM_CFLAGS = $(LIBNETCLIENT_CFLAGS)
+AM_CPPFLAGS = -DG_LOG_DOMAIN=\"libnetclient\"
 
 clean-local:
 	-rm -rf html

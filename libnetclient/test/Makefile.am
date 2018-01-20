@@ -12,7 +12,7 @@ EXTRA_DIST = 		\
 	cert_u.pem 		\
 	valgrind.supp
 
-TESTFLAGS = -DNCAT="\"@NCAT@\"" -DSED="\"@SED@\"" -fprofile-arcs -ftest-coverage -g -Wno-error
+TESTFLAGS = -fprofile-arcs -ftest-coverage -g -Wno-error
 
 LCOVFLGS	= --rc lcov_branch_coverage=1
 GENHTMLFLGS	= --function-coverage --branch-coverage --num-spaces 4
@@ -25,7 +25,7 @@ clean-local:
 	-rm -rf gcov
 
 tests:	tests.c
-	$(CC) $(LIBNETCLIENT_CFLAGS) $(CPPFLAGS) $(TESTFLAGS) -I. -I.. $< $(test_src) -o $@ $(LIBNETCLIENT_LIBS)
+	$(CC) $(LIBNETCLIENT_CFLAGS) $(CPPFLAGS) $(TESTFLAGS) -I. -I.. -I../.. $< $(test_src) -o $@ $(LIBNETCLIENT_LIBS)
 	$(VALGRIND) $(VALGRFLAGS) ./$@
 	$(LCOV) $(LCOVFLGS) -c -b $(libsrcdir) -d $(abs_srcdir) --no-external -o $@.covi
 	$(LCOV) $(LCOVFLGS) -r $@.covi $< -o $@.covi

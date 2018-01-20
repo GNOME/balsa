@@ -1,3 +1,26 @@
+2018-01-20  Albrecht Dreß <albrecht.dress@arcor.de>
+
+	Improve low-level network library, POP3 responsiveness on error
+
+	* configure.ac: add missing flags and libs for libnetclient unit tests,
+	drop sed and ncat prerequisites
+	* libbalsa/mailbox_pop3.c: shut down the connection on error,
+	so un'refing it does not wait for the QUIT command
+	* libnetclient/Makefile.am: fix log domain
+	* libnetclient/README: update documentation
+	* libnetclient/net-client-pop.c: execute QUIT only if the connection exists
+	* libnetclient/net-client-smtp.c: fix FlexeLint warnings
+	about ignored function return values,
+	execute QUIT only if the connection exists
+	* libnetclient/net-client.[ch]: implement new methods
+	for shutting down the network connection
+	and for checking the connection status
+	* libnetclient/test/Makefile.am: drop sed and ncat requirements,
+	fix test application build error
+	* libnetclient/test/echoserver.py: (new file) trivial echo server in Python
+	* libnetclient/test/start-test-env.sh.in: control the echo server for testing
+	* libnetclient/test/tests.c: improve unit tests
+
 2018-01-11  Albrecht Dreß <albrecht.dress@arcor.de>
 
 	Fix progress dialogue on error

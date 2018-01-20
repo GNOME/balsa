@@ -396,7 +396,9 @@ net_client_pop_dispose(GObject *object)
 	const GObjectClass *parent_class = G_OBJECT_CLASS(net_client_pop_parent_class);
 
 	/* send the 'QUIT' command - no need to evaluate the reply or check for errors */
-	(void) net_client_execute(NET_CLIENT(client), NULL, "QUIT", NULL);
+	if (net_client_is_connected(NET_CLIENT(client))) {
+		(void) net_client_execute(NET_CLIENT(client), NULL, "QUIT", NULL);
+	}
 
 	(*parent_class->dispose)(object);
 }

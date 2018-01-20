@@ -3,6 +3,8 @@
 
 echo "starting test environment:"
 
+echo "echo server @ port 65000 as e_echo..."
+@SCREEN@ -d -m -S e_echo @abs_srcdir@/echoserver.py
 echo "GnuTLS server w/o client checking @ port 65001 as s_server1..."
 @SCREEN@ -d -m -S s_server1 \
 	@GTLSSRV@ -a --x509keyfile=cert_u.pem --x509certfile=cert_u.pem --echo -p 65001
@@ -19,6 +21,7 @@ rm -f debug.log main.log service.log report.*.txt
 chmod 666 debug.log main.log service.log report.*.txt
 EOF
 
-echo "shut down GnuTLS servers..."
+echo "shut down echo and GnuTLS servers..."
+@SCREEN@ -S e_echo -X quit
 @SCREEN@ -S s_server1 -X quit
 @SCREEN@ -S s_server2 -X quit

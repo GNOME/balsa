@@ -1,8 +1,15 @@
-/*
- * tests.c
+/* NetClient - simple line-based network client library
  *
- *  Created on: 07.01.2017
- *      Author: albrecht
+ * Copyright (C) Albrecht Dreß <mailto:albrecht.dress@arcor.de> 2017
+ *
+ * This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License
+ * as published by the Free Software Foundation; either version 3 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License along with this library. If not, see
+ * <http://www.gnu.org/licenses/>.
  */
 
 #include <sys/types.h>
@@ -22,9 +29,17 @@ static void test_pop3(void);
 static void test_utils(void);
 
 
+static void
+log_dummy(const gchar G_GNUC_UNUSED *log_domain, GLogLevelFlags G_GNUC_UNUSED log_level,
+          const gchar G_GNUC_UNUSED *message, gpointer G_GNUC_UNUSED user_data)
+{
+}
+
 int
 main(G_GNUC_UNUSED int argc, G_GNUC_UNUSED char **argv)
 {
+	g_log_set_default_handler(log_dummy, NULL);
+
 	sput_start_testing();
 
 	sput_enter_suite("test basic (plain)");
@@ -51,16 +66,14 @@ main(G_GNUC_UNUSED int argc, G_GNUC_UNUSED char **argv)
 static void
 test_basic(void)
 {
-	static gchar *nc_args[] = { NCAT, "-l", "65000", "--exec", SED " -u -e s/x/ThisIsLong/g", NULL };
 	NetClient *basic;
-	GPid child;
 	GError *error = NULL;
 	gboolean op_res;
 	gchar *read_res;
 
 	sput_fail_unless(net_client_new(NULL, 65000, 42) == NULL, "missing host");
 
-	sput_fail_unless((basic = net_client_new("localhost", 65000, 42)) != NULL, "localhost; port 65000");
+	sput_fail_unless((basic = net_client_new("localhost", 64999, 42)) != NULL, "localhost; port 64999");
 	sput_fail_unless(net_client_get_host(NULL) == NULL, "get host w/o client");
 	sput_fail_unless(strcmp(net_client_get_host(basic), "localhost") == 0, "read host ok");
 	sput_fail_unless(net_client_connect(basic, NULL) == FALSE, "connect failed");
@@ -80,14 +93,6 @@ test_basic(void)
 	op_res =  net_client_read_line(basic, NULL, &error);
 	sput_fail_unless((op_res == FALSE) && (error->code == NET_CLIENT_ERROR_NOT_CONNECTED), "read line w/o connection");
 	g_clear_error(&error);
-
-	op_res =
-		g_spawn_async(NULL, nc_args, NULL, G_SPAWN_STDOUT_TO_DEV_NULL + G_SPAWN_STDERR_TO_DEV_NULL, NULL, NULL, &child, &error);
-	if (!op_res) {
-		g_error("launching %s failed: %s", nc_args[0], error->message);
-		g_assert_not_reached();
-	}
-	sleep(1);
 
 	sput_fail_unless(net_client_connect(basic, NULL) == TRUE, "connect succeeded");
 	op_res = net_client_connect(basic, &error);
@@ -132,7 +137,7 @@ test_basic(void)
 	sput_fail_unless((op_res == FALSE) && (error->code == NET_CLIENT_ERROR_LINE_TOO_LONG), "read line too long");
 	g_clear_error(&error);
 
-	kill(child, SIGTERM);
+	sput_fail_unless(net_client_write_buffer(basic, "DISCONNECT\r\n", 12U, NULL) == TRUE, "disconnect");
 
 	op_res = net_client_read_line(basic, NULL, &error);
 	sput_fail_unless((op_res == FALSE) && (error->code = NET_CLIENT_ERROR_CONNECTION_LOST), "read line, client lost");
@@ -185,9 +190,9 @@ test_basic_crypt(void)
 	op_res = net_client_start_tls(basic, &error);
 	sput_fail_unless((op_res == FALSE) && (error != NULL), "start tls: bad server cert");
 	g_clear_error(&error);
-	g_object_unref(basic);
 
-	sput_fail_unless((basic = net_client_new("localhost", 65001, 42)) != NULL, "localhost; port 65001");
+	net_client_shutdown(basic);
+
 	g_signal_connect(G_OBJECT(basic), "cert-check", G_CALLBACK(check_cert), NULL);
 	sput_fail_unless(net_client_connect(basic, NULL) == TRUE, "connect ok");
 	sput_fail_unless(net_client_start_tls(basic, NULL) == TRUE, "start tls: success");
@@ -329,7 +334,7 @@ test_smtp(void)
 	sput_fail_unless(net_client_smtp_new("localhost", 0, 0) == NULL, "new, bad crypt mode");
 	sput_fail_unless(net_client_smtp_new("localhost", 0, 42) == NULL, "new, bad crypt mode");
 
-	sput_fail_unless((smtp = net_client_smtp_new("localhost", 65000, NET_CLIENT_CRYPT_NONE)) != NULL, "localhost; port 65000");
+	sput_fail_unless((smtp = net_client_smtp_new("localhost", 65024, NET_CLIENT_CRYPT_NONE)) != NULL, "localhost; port 65024");
 	sput_fail_unless(net_client_smtp_connect(smtp, NULL, NULL) == FALSE, "no server");
 	g_object_unref(smtp);
 
@@ -500,7 +505,7 @@ test_pop3(void)
 	net_client_pop_msg_info_free(NULL);		// just for checking
 
 	// some basic stuff
-	sput_fail_unless((pop = net_client_pop_new("localhost", 65000, NET_CLIENT_CRYPT_NONE, TRUE)) != NULL, "localhost; port 65000");
+	sput_fail_unless((pop = net_client_pop_new("localhost", 65109, NET_CLIENT_CRYPT_NONE, TRUE)) != NULL, "localhost; port 65109");
 	sput_fail_unless(net_client_pop_connect(pop, NULL, NULL) == FALSE, "no server");
 	g_object_unref(pop);
 

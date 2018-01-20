@@ -62,7 +62,7 @@ are required for running them:
 
 - the Sput Unit Testing Framework for C/C++, available from
   <http://www.use-strict.de/sput-unit-testing/>
-- ncat, available from <https://nmap.org/ncat/>
+- python2
 - screen, available from <https://www.gnu.org/software/screen/>
 - sudo, available from <https://www.sudo.ws/>
 - Valgrind, avilable from <http://valgrind.org/>
@@ -76,9 +76,9 @@ are required for running them:
 Note that most of these requirements are typically available pre-packaged
 for your favorite distribution.
 
-Unfortunately, INetSim 1.2.6 has two little bugs in POP3 handling and does
-not offer pipelining.  The file test/inetsim-1.2.6-POP3.diff contains a
-patch which fixes these issues.
+Unfortunately, INetSim 1.2.6 and 1.2.7 have two little bugs in POP3 handling
+and do not offer pipelining.  The file test/inetsim-1.2.6-POP3.diff contains
+a patch which fixes these issues.
 
 For running the tests, open two terminal windows, and cd to the test folder
 of this package.
@@ -94,9 +94,7 @@ Then, in the second terminal, call
 
 	make tests
 
-to build the test application, and run it in Valgrind.  Note that the test
-application will report many CRITICAL glib errors.  This is normal, as the
-behaviour of the library's parameter checks is verified.
+to build the test application, and run it in Valgrind.
 
 The test produces the following output:
 - stdout/stderr: unit test results, which shall report zero failed
@@ -104,9 +102,9 @@ The test produces the following output:
 - gcov/index.html: results of the coverage analysis
 
 Finally, just terminate the test servers in the first window.  Note that
-INetSim will dump further information in its output files (typically in
-/var/log/inetsim).  You should verify that INetSim recorded the requested
-operations properly.
+INetSim will dump further information in its output files in the test
+folder.  You should verify that INetSim recorded the requested operations
+properly.
 
 Note that no unit tests are available for the GSSAPI authentication methods
 as they are not supported by INetSim.

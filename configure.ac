@@ -457,6 +457,8 @@ if test "x$with_gss" != xno  ; then
       AC_DEFINE(HAVE_GSSAPI,1,[Defined when GSSAPI support is to be compiled.])
       BALSA_CFLAGS="$BALSA_CFLAGS `$KRB5_CONFIG --cflags gssapi`"
       BALSA_LIBS="$BALSA_LIBS `$KRB5_CONFIG --libs gssapi`"
+      LIBNETCLIENT_CFLAGS="$LIBNETCLIENT_CFLAGS `$KRB5_CONFIG --cflags gssapi`"
+      LIBNETCLIENT_LIBS="$LIBNETCLIENT_LIBS `$KRB5_CONFIG --libs gssapi`"
       SAVE_CFLAGS="$CFLAGS"; CFLAGS="$BALSA_CFLAGS"
       AC_CHECK_HEADER([gssapi.h],
                       [AC_DEFINE([HAVE_HEIMDAL],1,[Defined for Heimdal.])],
@@ -698,8 +700,6 @@ fi
 
 if test x$with_libncdtest != xno; then
 	AC_CHECK_HEADER([sput.h],[have_sput_h=yes],[have_sput_h=no])
-	AC_PROG_SED
-	AC_PATH_PROGS(NCAT, ncat, no)
 	AC_PATH_PROGS(VALGRIND, valgrind, no)
 	AC_PATH_PROGS(LCOV, lcov, no)
 	AC_PATH_PROGS(GENHTML, genhtml, no)
@@ -708,7 +708,6 @@ if test x$with_libncdtest != xno; then
 	AC_PATH_PROGS(SUDO, sudo, no)
 	AC_PATH_PROGS(INETSIM, inetsim, no)
 	if test "x$have_sput_h" = "xno" || \
-	   test "x$NCAT" = "xno" || \
 	   test "x$VALGRIND" = "xno" || \
 	   test "x$LCOV" = "xno" || \
 	   test "x$GENHTML" = "xno" || \

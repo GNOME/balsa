@@ -410,10 +410,8 @@ net_client_pop_finalise(GObject *object)
 	const NetClientPop *client = NET_CLIENT_POP(object);
 	const GObjectClass *parent_class = G_OBJECT_CLASS(net_client_pop_parent_class);
 
-	if (client->priv != NULL) {
-		g_free(client->priv->apop_banner);
-		g_free(client->priv);
-	}
+	g_free(client->priv->apop_banner);
+	g_free(client->priv);
 
 	(*parent_class->finalize)(object);
 }

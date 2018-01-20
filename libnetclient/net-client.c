@@ -54,13 +54,13 @@ net_client_new(const gchar *host_and_port, guint16 default_port, gsize max_line_
 	client = NET_CLIENT(g_object_new(NET_CLIENT_TYPE, NULL));
 
 	if (client->priv->sock == NULL) {
-		g_object_unref(client);
-		return NULL;
+		g_object_unref(G_OBJECT(client));
+		client = NULL;
+	} else {
+		client->priv->host_and_port = g_strdup(host_and_port);
+		client->priv->default_port = default_port;
+		client->priv->max_line_len = max_line_len;
 	}
-
-	client->priv->host_and_port = g_strdup(host_and_port);
-	client->priv->default_port = default_port;
-	client->priv->max_line_len = max_line_len;
 
 	return client;
 }
@@ -325,7 +325,10 @@ net_client_set_cert_from_pem(NetClient *client, const gchar *pem_data, GError **
 	g_return_val_if_fail(NET_IS_CLIENT(client) && (pem_data != NULL), FALSE);
 
 	/* always free any existing certificate */
-	g_clear_object(&client->priv->certificate);
+	if (client->priv->certificate != NULL) {
+		g_object_unref(G_OBJECT(client->priv->certificate));
+		client->priv->certificate = NULL;
+	}
 
 	/* load the certificate */
 	res = gnutls_x509_crt_init(&cert);
@@ -504,10 +507,12 @@ net_client_class_init(NetClientClass *klass)
 static void
 net_client_init(NetClient *self)
 {
-	self->priv = G_TYPE_INSTANCE_GET_PRIVATE(self, NET_CLIENT_TYPE, NetClientPrivate);
-	self->priv->sock = g_socket_client_new();
-	if (self->priv->sock != NULL) {
-		g_socket_client_set_timeout(self->priv->sock, 180U);
+        NetClientPrivate *priv;
+
+	self->priv = priv = G_TYPE_INSTANCE_GET_PRIVATE(self, NET_CLIENT_TYPE, NetClientPrivate);
+	priv->sock = g_socket_client_new();
+	if (priv->sock != NULL) {
+		g_socket_client_set_timeout(priv->sock, 180U);
 	}
 }
 
@@ -516,19 +521,28 @@ static void
 net_client_dispose(GObject *object)
 {
 	const NetClient *client = NET_CLIENT(object);
+        NetClientPrivate *priv = client->priv;
 	const GObjectClass *parent_class = G_OBJECT_CLASS(net_client_parent_class);
 
 	net_client_shutdown(client);
-	if (client->priv->sock != NULL) {
-		g_object_unref(G_OBJECT(client->priv->sock));
-		client->priv->sock = NULL;
-	}
-	if (client->priv->certificate != NULL) {
-		g_object_unref(G_OBJECT(client->priv->certificate));
-		client->priv->certificate = NULL;
-	}
-	g_debug("finalised connection to %s", client->priv->host_and_port);
-	g_free(client->priv->host_and_port);
+	g_clear_object(&priv->sock);
+	g_clear_object(&priv->certificate);
+	g_debug("disposed connection to %s", priv->host_and_port);
+
+	(*parent_class->dispose)(object);
+}
+
+
+static void
+net_client_finalise(GObject *object)
+{
+	const NetClient *client = NET_CLIENT(object);
+        NetClientPrivate *priv = client->priv;
+	const GObjectClass *parent_class = G_OBJECT_CLASS(net_client_parent_class);
+
+	g_debug("finalised connection to %s", priv->host_and_port);
+	g_free(priv->host_and_port);
+
 	(*parent_class->finalize)(object);
 }
 

@@ -397,7 +397,8 @@ if gss
   endif
   krb5_dep = declare_dependency(compile_args : krb5_cflags,
                                 link_args    : krb5_libs)
-  balsa_deps += krb5_dep
+  balsa_deps        += krb5_dep
+  libnetclient_deps += krb5_dep
 endif # gss
 
 # Libnotify configuration
@@ -606,8 +607,6 @@ endif # libnetclient_docs
 
 if libnetclient_test
   have_sput           = compiler.has_header('sput.h')
-  sed_program         = find_program('sed',         required : false)
-  ncat_program        = find_program('ncat',        required : false)
   valgrind_program    = find_program('valgrind',    required : false)
   lcov_program        = find_program('lcov',        required : false)
   genhtml_program     = find_program('genhtml',     required : false)
@@ -617,8 +616,6 @@ if libnetclient_test
   inetsim_program     = find_program('inetsim',     required : false)
 
   if not (have_sput
-          and sed_program.found()
-          and ncat_program.found()
           and valgrind_program.found()
           and lcov_program.found()
           and genhtml_program.found()
@@ -629,8 +626,6 @@ if libnetclient_test
     error('*** Cannot run libnetclient tests, see libnetclient/README for fixing this issue ***')
   endif
 
-  sed         = sed_program.path()
-  ncat        = ncat_program.path()
   valgrind    = valgrind_program.path()
   lcov        = lcov_program.path()
   genhtml     = genhtml_program.path()

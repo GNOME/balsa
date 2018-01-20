@@ -84,7 +84,7 @@ lbh_get_body_content(LibBalsaMessageBody * body, gchar ** buf)
 static void
 html2text(gchar ** text, gsize len)
 {
-    gchar *html2text[] = { HTML2TEXT, NULL, NULL };
+    gchar *html2text[] = { HTML2TEXT, NULL, NULL, NULL };
     GFile *html_data;
     GFileIOStream *stream;
     GError *err = NULL;
@@ -98,16 +98,23 @@ html2text(gchar ** text, gsize len)
         if (g_output_stream_write_all(ostream, *text, len,
                                       &bytes_written, NULL, &err)) {
             gchar *result = NULL;
+            gint pathidx;
 
             g_output_stream_flush(ostream, NULL, NULL);
-            html2text[1] = g_file_get_path(html_data);
+#if defined(HTML2TEXT_UCOPT)
+            html2text[1] = "--unicode-snob";
+            pathidx = 2;
+#else
+            pathidx = 1;
+#endif
+            html2text[pathidx] = g_file_get_path(html_data);
             if (g_spawn_sync(NULL, html2text, NULL,
                              G_SPAWN_STDERR_TO_DEV_NULL, NULL, NULL,
                              &result, NULL, NULL, &err)) {
                 g_free(*text);
                 *text = result;
             }
-            g_free(html2text[1]);
+            g_free(html2text[pathidx]);
         }
         g_output_stream_close(ostream, NULL, NULL);
         g_object_unref(G_OBJECT(stream));

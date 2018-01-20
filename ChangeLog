@@ -1,5 +1,23 @@
 2018-01-20  Albrecht Dreß <albrecht.dress@arcor.de>
 
+	 Improve replying to html-only messages
+
+	* configure.ac: check if the selected conversion tool
+	accepts “--unicode-snob”.
+	* libbalsa/html.c (html2text): run the conversion tool
+	with “--unicode-snob” if supported.
+
+2018-01-20  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Meson build system changes to mirror the autotools changes in
+	the previous commit
+
+	* libnetclient/meson.build: add c_args: '-DG_LOG_DOMAIN="libnetclient"'
+	to static_library arguments.
+	* meson.build: drop sed and ncat prerequisites.
+
+2018-01-20  Albrecht Dreß <albrecht.dress@arcor.de>
+
 	Improve low-level network library, POP3 responsiveness on error
 
 	* configure.ac: add missing flags and libs for libnetclient unit tests,

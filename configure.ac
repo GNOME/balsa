@@ -316,6 +316,16 @@ case "$use_html_widget" in
         if test x"$HTML2TEXT" != "xno" ; then
             AC_DEFINE_UNQUOTED(HTML2TEXT, "$HTML2TEXT",
 				[Path to html2text program.])
+			AC_MSG_CHECKING([whether $HTML2TEXT accepts the --unicode-snob option])
+			echo "<html/>" > conftest.htm
+			$HTML2TEXT --unicode-snob conftest.htm > /dev/null 2>&1
+			if test $? = 0 ; then
+				AC_MSG_RESULT([yes])
+				AC_DEFINE(HTML2TEXT_UCOPT,1,[Defined when $HTML2TEXT accepts the --unicode-snob option.])
+			else
+				AC_MSG_RESULT([no])
+			fi
+			rm -f conftest.htm
 		else
 			AC_MSG_WARN([You cannot properly quote html-only messags.])
 		fi

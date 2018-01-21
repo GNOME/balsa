@@ -591,12 +591,6 @@ add_global_arguments('-DBALSA_DATA_PREFIX="' + balsa_data_prefix + '"', language
 gtk_update_icon_cache_program = find_program('gtk-update-icon-cache')
 
 ###########################################################################
-# Set the log domain
-###########################################################################
-
-add_global_arguments('-DG_LOG_DOMAIN="Balsa"', language : 'c')
-
-###########################################################################
 # Documentation and Testing requirements for libnetclient
 ###########################################################################
 

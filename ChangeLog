@@ -1,3 +1,11 @@
+2018-01-21  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Meson build system changes to mirror the autotools changes in
+	the previous commit
+
+	* meson.build: check if the selected conversion tool
+	accepts “--unicode-snob”.
+
 2018-01-20  Albrecht Dreß <albrecht.dress@arcor.de>
 
 	 Improve replying to html-only messages

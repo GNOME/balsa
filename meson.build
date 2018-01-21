@@ -218,6 +218,14 @@ elif html_widget == 'webkit' or html_widget == 'webkit2'
   if html2text.found()
     conf.set_quoted('HTML2TEXT', html2text.path(),
       description : 'Path to html2text program.')
+    conftest_htm = join_paths(meson.current_build_dir(), 'conftest.htm')
+    run_command('sh', '-c', 'echo "<html/>" > ' + conftest_htm)
+    unicode_snob = run_command(html2text.path(), '--unicode-snob', conftest_htm)
+    if unicode_snob.returncode() == 0
+      conf.set('HTML2TEXT_UCOPT', 1,
+        description : 'Defined when HTML2TEXT accepts the --unicode-snob option.')
+    endif
+    run_command('rm', '-f', conftest_htm)
   else
     message('You cannot properly quote html-only messags.')
   endif

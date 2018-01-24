@@ -105,7 +105,7 @@ static void sw_spell_check_weak_notify(BalsaSendmsg * bsmsg);
 #endif                          /* HAVE_GTKSPELL */
 
 static void address_book_cb(LibBalsaAddressView * address_view,
-                            GtkTreeRowReference * row_ref,
+                            GtkWidget * widget,
                             BalsaSendmsg * bsmsg);
 static void address_book_response(GtkWidget * ab, gint response,
                                   LibBalsaAddressView * address_view);
@@ -426,19 +426,18 @@ append_comma_separated(GtkEditable *editable, const gchar * text)
 
 /* the callback handlers */
 #define BALSA_SENDMSG_ADDRESS_BOOK_KEY "balsa-sendmsg-address-book"
-#define BALSA_SENDMSG_ROW_REF_KEY      "balsa-sendmsg-row-ref"
+#define BALSA_SENDMSG_BUTTON_KEY       "balsa-sendmsg-button"
 static void
 address_book_cb(LibBalsaAddressView * address_view,
-                GtkTreeRowReference * row_ref,
+                GtkWidget * widget,
                 BalsaSendmsg * bsmsg)
 {
     GtkWidget *ab;
-    GtkTreeRowReference *row_ref_copy;
 
     /* Show only one dialog per window. */
     ab = g_object_get_data(G_OBJECT(bsmsg->window),
                            BALSA_SENDMSG_ADDRESS_BOOK_KEY);
-    if (ab) {
+    if (ab != NULL) {
         gtk_window_present(GTK_WINDOW(ab));
         return;
     }
@@ -449,10 +448,8 @@ address_book_cb(LibBalsaAddressView * address_view,
     gtk_window_set_destroy_with_parent(GTK_WINDOW(ab), TRUE);
     g_signal_connect(G_OBJECT(ab), "response",
                      G_CALLBACK(address_book_response), address_view);
-    row_ref_copy = gtk_tree_row_reference_copy(row_ref);
-    g_object_set_data_full(G_OBJECT(ab), BALSA_SENDMSG_ROW_REF_KEY,
-                           row_ref_copy,
-                           (GDestroyNotify) gtk_tree_row_reference_free);
+    g_object_set_data_full(G_OBJECT(ab), BALSA_SENDMSG_BUTTON_KEY,
+                           g_object_ref(widget), g_object_unref);
     g_object_set_data(G_OBJECT(bsmsg->window),
                       BALSA_SENDMSG_ADDRESS_BOOK_KEY, ab);
     gtk_widget_show(ab);
@@ -464,12 +461,12 @@ address_book_response(GtkWidget * ab, gint response,
                       LibBalsaAddressView * address_view)
 {
     GtkWindow *parent = gtk_window_get_transient_for(GTK_WINDOW(ab));
-    GtkTreeRowReference *row_ref =
-        g_object_get_data(G_OBJECT(ab), BALSA_SENDMSG_ROW_REF_KEY);
+    GtkWidget *button =
+        g_object_get_data(G_OBJECT(ab), BALSA_SENDMSG_BUTTON_KEY);
 
     if (response == GTK_RESPONSE_OK) {
         gchar *t = balsa_ab_window_get_recipients(BALSA_AB_WINDOW(ab));
-        libbalsa_address_view_add_to_row(address_view, row_ref, t);
+        libbalsa_address_view_add_to_row(address_view, button, t);
         g_free(t);
     }
 
@@ -2377,7 +2374,7 @@ create_email_entry(BalsaSendmsg         * bsmsg,
     /* This is a horrible hack, but we need to make sure that the
      * recipient list is more than one line high: */
     gtk_scrolled_window_set_min_content_height(GTK_SCROLLED_WINDOW(scroll),
-                                               60);
+                                               80);
     gtk_container_add(GTK_CONTAINER(scroll), GTK_WIDGET(*view));
 
     widget[1] = gtk_frame_new(NULL);
@@ -2391,19 +2388,16 @@ create_email_entry(BalsaSendmsg         * bsmsg,
     g_signal_connect(*view, "open-address-book",
 		     G_CALLBACK(address_book_cb), bsmsg);
 
-    formats = gdk_content_formats_new(email_field_drop_types, G_N_ELEMENTS(email_field_drop_types));
+    formats = gdk_content_formats_new(email_field_drop_types,
+                                      G_N_ELEMENTS(email_field_drop_types));
     gtk_drag_dest_set(GTK_WIDGET(*view), GTK_DEST_DEFAULT_ALL,
 		      formats,
 		      GDK_ACTION_COPY | GDK_ACTION_MOVE);
     gdk_content_formats_unref(formats);
 
     libbalsa_address_view_set_domain(*view, bsmsg->ident->domain);
-    g_signal_connect_swapped(gtk_tree_view_get_model(GTK_TREE_VIEW(*view)),
-                             "row-changed", G_CALLBACK(check_readiness),
-                             bsmsg);
-    g_signal_connect_swapped(gtk_tree_view_get_model(GTK_TREE_VIEW(*view)),
-                             "row-deleted", G_CALLBACK(check_readiness),
-                             bsmsg);
+    g_signal_connect_swapped(*view, "view-changed",
+                             G_CALLBACK(check_readiness), bsmsg);
 }
 
 static void
@@ -2563,13 +2557,8 @@ create_info_pane(BalsaSendmsg * bsmsg)
                        bsmsg->recipients, "Rec_ipients:", address_types,
                        G_N_ELEMENTS(address_types));
     gtk_widget_set_vexpand(bsmsg->recipients[1], TRUE);
-    g_signal_connect_swapped(gtk_tree_view_get_model
-                             (GTK_TREE_VIEW(bsmsg->recipient_view)),
-                             "row-changed",
-                             G_CALLBACK(sendmsg_window_set_title), bsmsg);
-    g_signal_connect_swapped(gtk_tree_view_get_model
-                             (GTK_TREE_VIEW(bsmsg->recipient_view)),
-                             "row-deleted",
+    g_signal_connect_swapped(bsmsg->recipient_view,
+                             "view-changed",
                              G_CALLBACK(sendmsg_window_set_title), bsmsg);
 
     /* Subject: */

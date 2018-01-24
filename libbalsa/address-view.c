@@ -21,7 +21,7 @@
 
 /*
  *     Address entry widget
- *     A GtkTreeView with one line per address
+ *     A GtkGrid with one row per address
  */
 
 
@@ -38,40 +38,30 @@
  * LibBalsa includes.
  */
 #include "address-book.h"
-#include "cell-renderer-button.h"
 #include "misc.h"
 
 struct _LibBalsaAddressView {
-    GtkTreeView parent;
+    GtkGrid parent;
 
     /*
      * Permanent data
      */
     const gchar *const *types;
-    guint n_types;
+    gint n_types;
     gboolean fallback;
     GList *address_book_list;
 
     gchar *domain;
 
-    GtkTreeViewColumn *type_column;
-    GtkTreeViewColumn *focus_column;
-    GtkCellRenderer   *renderer_combo;
-
     /*
      * Ephemera
      */
+    GtkWidget *changed_combo;
     gboolean last_was_escape;   /* keystroke    */
-
-    GtkTreeRowReference *focus_row;     /* set cursor   */
-    guint focus_idle_id;        /* ditto        */
-
-    GtkCellEditable *editable;  /* cell editing */
-    gchar *path_string;         /* ditto        */
 };
 
 struct _LibBalsaAddressViewClass {
-    GtkTreeViewClass parent_class;
+    GtkGridClass parent_class;
 };
 
 /*
@@ -80,13 +70,13 @@ struct _LibBalsaAddressViewClass {
 
 enum {
     OPEN_ADDRESS_BOOK,
+    VIEW_CHANGED,
     LAST_SIGNAL
 };
 
 static guint address_view_signals[LAST_SIGNAL] = { 0 };
 
-G_DEFINE_TYPE(LibBalsaAddressView, libbalsa_address_view,
-              GTK_TYPE_TREE_VIEW)
+G_DEFINE_TYPE(LibBalsaAddressView, libbalsa_address_view, GTK_TYPE_GRID)
 
 static void
 libbalsa_address_view_init(LibBalsaAddressView * address_view)
@@ -99,10 +89,6 @@ libbalsa_address_view_finalize(GObject * object)
     LibBalsaAddressView *address_view = LIBBALSA_ADDRESS_VIEW(object);
 
     g_free(address_view->domain);
-    g_free(address_view->path_string);
-
-    g_clear_pointer(&address_view->focus_row, (GDestroyNotify) gtk_tree_row_reference_free);
-    libbalsa_clear_source_id(&address_view->focus_idle_id);
 
     G_OBJECT_CLASS(libbalsa_address_view_parent_class)->finalize(object);
 }
@@ -117,7 +103,7 @@ libbalsa_address_view_class_init(LibBalsaAddressViewClass * klass)
   /**
    * LibBalsaAddressView::open-address-book:
    * @address_view: the object which received the signal
-   * @row_ref:      a #GtkTreeRowReference to the row in @address_view
+   * @widget:       a #GtkWidget in the row in @address_view
    *                that will contain the address
    *
    * The ::open-address-book signal is emitted when the address book
@@ -127,8 +113,22 @@ libbalsa_address_view_class_init(LibBalsaAddressViewClass * klass)
         g_signal_new("open-address-book",
                      G_OBJECT_CLASS_TYPE(object_class),
                      0, 0, NULL, NULL,
-                     g_cclosure_marshal_VOID__POINTER,
-                     G_TYPE_NONE, 1, G_TYPE_POINTER);
+                     g_cclosure_marshal_VOID__OBJECT,
+                     G_TYPE_NONE, 1, G_TYPE_OBJECT);
+
+  /**
+   * LibBalsaAddressView::view-changed:
+   * @address_view: the object which received the signal
+   *
+   * The ::view-changed signal is emitted when an address in the view
+   * has been edited or removed.
+   **/
+    address_view_signals[VIEW_CHANGED] =
+        g_signal_new("view-changed",
+                     G_OBJECT_CLASS_TYPE(object_class),
+                     0, 0, NULL, NULL,
+                     g_cclosure_marshal_VOID__VOID,
+                     G_TYPE_NONE, 0);
 }
 
 /*
@@ -136,20 +136,13 @@ libbalsa_address_view_class_init(LibBalsaAddressViewClass * klass)
  */
 
 enum {
-    COMPLETION_NAME_COL,
-};
-enum {
-    ADDRESS_TYPE_COL,
-    ADDRESS_TYPESTRING_COL,
-    ADDRESS_NAME_COL,
-    ADDRESS_ICON_COL
+    COMPLETION_NAME_COL
 };
 
-typedef enum LibBalsaAddressViewMatchType_ LibBalsaAddressViewMatchType;
-enum LibBalsaAddressViewMatchType_ {
+typedef enum {
     LIBBALSA_ADDRESS_VIEW_MATCH_FAST,
     LIBBALSA_ADDRESS_VIEW_MATCH_ALL
-};
+} LibBalsaAddressViewMatchType;
 
 /* Must be consistent with LibBalsaAddressType enum: */
 const gchar *const libbalsa_address_view_types[] = {
@@ -159,8 +152,59 @@ const gchar *const libbalsa_address_view_types[] = {
     N_("Reply To:"),
 };
 
+enum {
+    LIBBALSA_ADDRESS_VIEW_BUTTON_COLUMN,
+    LIBBALSA_ADDRESS_VIEW_COMBO_COLUMN,
+    LIBBALSA_ADDRESS_VIEW_ENTRY_COLUMN
+};
+
+#define lbav_get_button_at(grid, row) \
+        gtk_grid_get_child_at((grid), LIBBALSA_ADDRESS_VIEW_BUTTON_COLUMN, (row))
+#define lbav_get_combo_at(grid, row) \
+        gtk_grid_get_child_at((grid), LIBBALSA_ADDRESS_VIEW_COMBO_COLUMN, (row))
+#define lbav_get_entry_at(grid, row) \
+        gtk_grid_get_child_at((grid), LIBBALSA_ADDRESS_VIEW_ENTRY_COLUMN, (row))
+
+typedef enum {
+    WITH_BOOK_ICON,
+    WITH_CLOSE_ICON
+} LibbalsaAddressViewIcon;
+
 /* Pixbufs */
 static GdkPixbuf *lbav_book_icon, *lbav_close_icon, *lbav_drop_down_icon;
+
+/*
+ * Forward references
+ */
+static gboolean lbav_completion_match_func(GtkEntryCompletion * completion,
+                                           const gchar * key,
+                                           GtkTreeIter * iter,
+                                           LibBalsaAddressView * address_view);
+
+static gboolean lbav_completion_match_selected_cb(GtkEntryCompletion * completion,
+                                                  GtkTreeModel * model,
+                                                  GtkTreeIter * iter,
+                                                  LibBalsaAddressView * address_view);
+
+static void lbav_entry_changed_cb(GtkEntry * entry, LibBalsaAddressView * address_view);
+
+static gboolean lbav_key_pressed_cb(GtkEntry * entry,
+                                    GdkEvent * event,
+                                    LibBalsaAddressView * address_view);
+
+static void lbav_insert_text_cb(GtkEditable * editable,
+                                const gchar * text,
+                                gint length,
+                                gint * position, LibBalsaAddressView * address_view);
+
+static void lbav_notify_has_focus_cb(GtkEntry            *entry,
+                                     GParamSpec          *pspec,
+                                     LibBalsaAddressView *address_view);
+
+static void lbav_insert_row(LibBalsaAddressView * address_view, gint row,
+                            gint type, LibbalsaAddressViewIcon icon);
+
+static gint lbav_ensure_blank_row(LibBalsaAddressView * address_view, gint type);
 
 /*
  *     Helpers
@@ -258,90 +302,301 @@ lbav_entry_setup_matches(LibBalsaAddressView * address_view,
 }
 
 /*
- *     Idle callback to set the GtkTreeView's cursor.
- */
-static gboolean
-lbav_ensure_blank_line_idle_cb(LibBalsaAddressView * address_view)
-{
-    GtkTreePath *focus_path;
-
-    focus_path = gtk_tree_row_reference_get_path(address_view->focus_row);
-    gtk_tree_row_reference_free(address_view->focus_row);
-    address_view->focus_row = NULL;
-
-    /* This will open the entry for editing */
-    gtk_tree_view_set_cursor(GTK_TREE_VIEW(address_view), focus_path,
-                             address_view->focus_column, TRUE);
-    gtk_tree_path_free(focus_path);
-
-    address_view->focus_idle_id = 0;
-
-    return FALSE;
-}
-
-/*
  *     Get a type-string
  */
 static const gchar *
-lbav_type_string(LibBalsaAddressView * address_view, guint type)
+lbav_type_string(LibBalsaAddressView * address_view, gint type)
 {
     return address_view->n_types > 0 ? address_view->types[type] : "";
 }
 
 /*
- *     Make sure we have a blank line; use the specified type.
- *     On return, if iter != NULL, iter points to the blank line.
+ * Callback for the address-book button
  */
 static void
-lbav_ensure_blank_line(LibBalsaAddressView * address_view,
-                       GtkTreeIter * iter, guint type)
+lbav_book_button_clicked(GtkButton           * button,
+                         LibBalsaAddressView * address_view)
 {
-    GtkTreeView *tree_view = GTK_TREE_VIEW(address_view);
-    GtkTreeModel *model = gtk_tree_view_get_model(tree_view);
-    GtkTreeIter tmp_iter;
-    GtkListStore *address_store = GTK_LIST_STORE(model);
-    guint this_type;
-    gchar *name;
-    gboolean valid;
-    GtkTreePath *path;
+    g_signal_emit(address_view,
+                  address_view_signals[OPEN_ADDRESS_BOOK], 0, button);
+}
+
+/*
+ * Callback for the close button
+ */
+
+static void
+lbav_close_button_clicked(GtkWidget           * button,
+                          LibBalsaAddressView * address_view)
+{
+    GtkGrid *grid = (GtkGrid *) address_view;
+    gint row;
+    GtkWidget *child;
+    gint type;
+
+    for (row = 0; (child = lbav_get_button_at(grid, row)) != NULL; row++) {
+        if (child == button) {
+            break;
+        }
+    }
+
+    child = lbav_get_combo_at(grid, row);
+    type = gtk_combo_box_get_active(GTK_COMBO_BOX(child));
+
+    gtk_grid_remove_row(grid, row);
+
+    /* Make sure the view has at least one row: */
+    lbav_ensure_blank_row(address_view, type);
+    g_signal_emit(address_view, address_view_signals[VIEW_CHANGED], 0);
+}
+
+/*
+ * Create an action button for a row
+ */
+
+static void
+lbav_set_button(LibBalsaAddressView * address_view, gint row,
+                LibbalsaAddressViewIcon icon)
+{
+    GtkGrid *grid = (GtkGrid *) address_view;
+    GtkWidget *button;
+    GtkWidget *image;
+
+    /*
+     * Attach a button with the requested icon
+     */
+    button = gtk_button_new();
+
+    if (icon == WITH_BOOK_ICON) {
+        image = gtk_image_new_from_pixbuf(lbav_book_icon);
+        g_signal_connect(button, "clicked",
+                         G_CALLBACK(lbav_book_button_clicked), address_view);
+    } else { /*icon == WITH_CLOSE_ICON */
+        image = gtk_image_new_from_pixbuf(lbav_close_icon);
+        g_signal_connect(button, "clicked",
+                         G_CALLBACK(lbav_close_button_clicked), address_view);
+    }
+
+    gtk_container_add(GTK_CONTAINER(button), image);
+    gtk_grid_attach(grid, button,
+                    LIBBALSA_ADDRESS_VIEW_BUTTON_COLUMN, row, 1, 1);
+}
+
+/*
+ * Callback for the combo_box "changed"signal
+ */
+static gboolean
+lbav_combo_changed_idle(LibBalsaAddressView * address_view)
+{
+    /* The type of an address was changed. We make it the last address
+     * of the new type, moving the row if necessary. */
+    GtkGrid *grid = (GtkGrid *) address_view;
+    GtkWidget *combo_box = address_view->changed_combo;
+    gint row;
+    GtkWidget *child;
+    gint old_row;
+    const gchar *name;
+    gint new_type;
+
+    for (row = 0; (child = lbav_get_combo_at(grid, row)) != NULL; row++) {
+        if (child == combo_box) {
+            break;
+        }
+    }
+    old_row = row;
+
+    child = lbav_get_entry_at(grid, row);
+    name = gtk_entry_get_text(GTK_ENTRY(child));
+
+    new_type = gtk_combo_box_get_active(GTK_COMBO_BOX(combo_box));
+    for (row = 0; (child = lbav_get_combo_at(grid, row)) != NULL; row++) {
+        gint type;
+
+        if (row == old_row) {
+            continue;
+        }
+
+        type = gtk_combo_box_get_active(GTK_COMBO_BOX(child));
+        if (type > new_type) {
+            break;
+        }
+    }
+
+    if (row != old_row) {
+        LibbalsaAddressViewIcon icon;
+
+        icon = (name == NULL || name[0] == '\0') ? WITH_BOOK_ICON : WITH_CLOSE_ICON;
+        lbav_insert_row(address_view, row, new_type, icon);
+        child = lbav_get_entry_at(grid, row);
+        gtk_entry_set_text(GTK_ENTRY(child), name);
+
+        if (old_row > row) {
+            ++old_row;
+        }
+        gtk_grid_remove_row(grid, old_row);
+
+        lbav_ensure_blank_row(address_view, new_type);
+        g_signal_emit(address_view, address_view_signals[VIEW_CHANGED], 0);
+    }
+
+    g_object_unref(combo_box);
+    g_object_unref(address_view);
+    return G_SOURCE_REMOVE;
+}
+
+static void
+lbav_combo_changed(GtkComboBox *combo_box, LibBalsaAddressView * address_view)
+{
+    address_view->changed_combo = (GtkWidget *) g_object_ref(combo_box);
+    g_idle_add((GSourceFunc) lbav_combo_changed_idle, g_object_ref(address_view));
+}
+
+/*
+ * Callback for the entry "activate" signal
+ */
+static void
+lbav_entry_activated(GtkEntry            * entry,
+                     LibBalsaAddressView * address_view)
+{
+    GtkGrid *grid = (GtkGrid *) address_view;
+    gint row;
+    GtkWidget *child;
+    gint type;
+
+    for (row = 0; (child = lbav_get_entry_at(grid, row)) != NULL; row++) {
+        if (child == (GtkWidget *) entry) {
+            break;
+        }
+    }
+
+    child = lbav_get_button_at(grid, row);
+    gtk_widget_destroy(child);
+    lbav_set_button(address_view, row, WITH_CLOSE_ICON);
+
+    child = lbav_get_combo_at(grid, row);
+    type = gtk_combo_box_get_active(GTK_COMBO_BOX(child));
+    lbav_ensure_blank_row(address_view, type);
+
+    g_signal_emit(address_view, address_view_signals[VIEW_CHANGED], 0);
+}
+
+/*
+ * Insert and populate a row
+ */
+
+static void
+lbav_insert_row(LibBalsaAddressView * address_view, gint row,
+                gint type, LibbalsaAddressViewIcon icon)
+{
+    GtkGrid *grid = (GtkGrid *) address_view;
+    GtkWidget *entry;
+    GtkEntryCompletion *completion;
+    GtkListStore *store;
+
+    gtk_grid_insert_row(grid, row);
+
+    /*
+     * Attach a button with the requested icon
+     */
+    lbav_set_button(address_view, row, icon);
+
+    /*
+     * Attach a combo-box for choosing the type of address, if there are
+     * more than one type
+     */
+    if (address_view->n_types > 0) {
+        GtkWidget *combo_box;
+        gint i;
+
+        combo_box = gtk_combo_box_text_new();
+        for (i = 0; i < address_view->n_types; i++) {
+            gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(combo_box),
+                                      NULL, _(address_view->types[i]));
+        }
+
+        gtk_combo_box_set_active(GTK_COMBO_BOX(combo_box), type);
+        g_signal_connect(combo_box, "changed",
+                         G_CALLBACK(lbav_combo_changed), address_view);
+        gtk_grid_attach(grid, combo_box,
+                        LIBBALSA_ADDRESS_VIEW_COMBO_COLUMN, row, 1, 1);
+    }
+
+    /*
+     * Attach an entry for the address
+     */
+    entry = gtk_entry_new();
+    gtk_widget_set_hexpand(entry, TRUE);
+
+    completion = gtk_entry_completion_new();
+    store = gtk_list_store_new(1, G_TYPE_STRING);
+    gtk_entry_completion_set_model(completion, GTK_TREE_MODEL(store));
+    g_object_unref(store);
+
+    gtk_entry_completion_set_match_func(completion,
+                                        (GtkEntryCompletionMatchFunc)
+                                        lbav_completion_match_func,
+                                        address_view, NULL);
+    gtk_entry_completion_set_text_column(completion, COMPLETION_NAME_COL);
+    g_signal_connect(completion, "match-selected",
+                     G_CALLBACK(lbav_completion_match_selected_cb),
+                     address_view);
+
+    g_signal_connect(entry, "activate",
+                     G_CALLBACK(lbav_entry_activated), address_view);
+    g_signal_connect(entry, "changed",
+                     G_CALLBACK(lbav_entry_changed_cb), address_view);
+    g_signal_connect(entry, "key-press-event",
+                     G_CALLBACK(lbav_key_pressed_cb), address_view);
+    g_signal_connect(entry, "insert-text",
+                     G_CALLBACK(lbav_insert_text_cb), address_view);
+    g_signal_connect_after(entry, "notify::has-focus",
+			   G_CALLBACK(lbav_notify_has_focus_cb), address_view);
+
+    gtk_entry_set_completion(GTK_ENTRY(entry), completion);
+    g_object_unref(completion);
+
+    gtk_grid_attach(grid, entry,
+                    LIBBALSA_ADDRESS_VIEW_ENTRY_COLUMN, row, 1, 1);
+    gtk_widget_grab_focus(entry);
+}
+
+/*
+ *     Make sure we have a blank line; use the specified type.
+ */
+
+static gint
+lbav_ensure_blank_row(LibBalsaAddressView * address_view, gint type)
+{
+    GtkGrid *grid = (GtkGrid *) address_view;
+    gint row;
+    GtkWidget *child;
 
     g_assert(address_view->n_types == 0 || type < address_view->n_types);
 
-    if (!iter)
-        iter = &tmp_iter;
+    /* Remove all existing blank rows */
+    for (row = 0; (child = lbav_get_entry_at(grid, row)) != NULL; /* nothing */) {
+        const gchar *name;
 
-    this_type = 0;
-    name = NULL;
-    for (valid = gtk_tree_model_get_iter_first(model, iter);
-         valid; valid = gtk_tree_model_iter_next(model, iter)) {
-        g_free(name);
-        gtk_tree_model_get(model, iter,
-                           ADDRESS_TYPE_COL, &this_type,
-                           ADDRESS_NAME_COL, &name, -1);
-        if (!name || !*name)
-            break;
+        name = gtk_entry_get_text(GTK_ENTRY(child));
+        if (name == NULL || name[0] == '\0') {
+            gtk_grid_remove_row(grid, row);
+        } else {
+            ++row;
+        }
     }
-    g_free(name);
 
-    if (!valid)
-        gtk_list_store_append(address_store, iter);
-    if (!valid || this_type != type)
-        gtk_list_store_set(address_store, iter,
-                           ADDRESS_TYPE_COL, type,
-                           ADDRESS_TYPESTRING_COL,
-                           _(lbav_type_string(address_view, type)),
-                           ADDRESS_ICON_COL, lbav_book_icon,
-                           -1);
+    /* Find the last row matching type */
+    for (row = 0; (child = lbav_get_combo_at(grid, row)) != NULL; row++) {
+        if (gtk_combo_box_get_active(GTK_COMBO_BOX(child)) > type) {
+            break;
+        }
+    }
 
-    if (address_view->focus_row)
-        gtk_tree_row_reference_free(address_view->focus_row);
-    path = gtk_tree_model_get_path(model, iter);
-    address_view->focus_row = gtk_tree_row_reference_new(model, path);
-    gtk_tree_path_free(path);
+    lbav_insert_row(address_view, row, type, WITH_BOOK_ICON);
 
-    if (!address_view->focus_idle_id)
-        address_view->focus_idle_id =
-        	g_idle_add((GSourceFunc) lbav_ensure_blank_line_idle_cb, address_view);
+    address_view->last_was_escape = FALSE;
+
+    return row;
 }
 
 /*
@@ -372,57 +627,60 @@ lbav_clean_text(gchar * text)
 }
 
 /*
- *     Add the addresses in an InternetAddressList, starting at iter and
+ *     Add the addresses in an InternetAddressList, starting at row and
  *     inserting lines of the same type as necessary;
- *     on return, iter points to the last line inserted.
+ *     on return, row points to the last line inserted.
  */
 static void
 lbav_add_from_list(LibBalsaAddressView * address_view,
-                   GtkTreeIter * iter, InternetAddressList * list)
+                   gint row, InternetAddressList * list)
 {
-    GtkTreeModel *model =
-        gtk_tree_view_get_model(GTK_TREE_VIEW(address_view));
-    GtkListStore *address_store = GTK_LIST_STORE(model);
-    guint type;
+    GtkGrid *grid = (GtkGrid *) address_view;
+    gint type;
     int i;
-
-    gtk_tree_model_get(model, iter, ADDRESS_TYPE_COL, &type, -1);
 
     for (i = 0; i < internet_address_list_length(list); i++) {
         InternetAddress *ia = internet_address_list_get_address(list, i);
         gchar *name = internet_address_to_string(ia, FALSE);
+        GtkWidget *child;
 
         libbalsa_utf8_sanitize(&name, address_view->fallback, NULL);
         lbav_clean_text(name);
 
-        if (i > 0)
-            gtk_list_store_insert_after(address_store, iter, iter);
-        gtk_list_store_set(address_store, iter,
-                           ADDRESS_TYPE_COL, type,
-                           ADDRESS_TYPESTRING_COL,
-                           _(lbav_type_string(address_view, type)),
-                           ADDRESS_NAME_COL, name,
-                           ADDRESS_ICON_COL, lbav_close_icon, -1);
+        if (i == 0) {
+            child = lbav_get_combo_at(grid, row);
+            type = gtk_combo_box_get_active(GTK_COMBO_BOX(child));
+
+            child = lbav_get_button_at(grid, row);
+            gtk_widget_destroy(child);
+            lbav_set_button(address_view, row, WITH_CLOSE_ICON);
+        } else {
+            lbav_insert_row(address_view, ++row, type, WITH_CLOSE_ICON);
+        }
+
+        child = lbav_get_entry_at(grid, row);
+        gtk_entry_set_text(GTK_ENTRY(child), name);
         g_free(name);
     }
+    g_signal_emit(address_view, address_view_signals[VIEW_CHANGED], 0);
 }
 
 /*
- *     Add the addresses in a string, starting at iter and
+ *     Add the addresses in a string, starting at row and
  *     inserting lines of the same type as necessary;
- *     on return, iter points to the last line inserted;
  *     returns TRUE if any valid addresses were found.
  */
 static gboolean
 lbav_add_from_string(LibBalsaAddressView * address_view,
-                     GtkTreeIter * iter, const gchar * string)
+                     gint row, const gchar * string)
 {
-    InternetAddressList *list = internet_address_list_parse_string(string);
+    InternetAddressList *list;
     gboolean retval = FALSE;
 
-    if (list) {
+    list = internet_address_list_parse_string(string);
+    if (list != NULL) {
         if ((retval = (internet_address_list_length(list) > 0)))
-            lbav_add_from_list(address_view, iter, list);
+            lbav_add_from_list(address_view, row, list);
         g_object_unref(list);
     }
 
@@ -433,116 +691,43 @@ lbav_add_from_string(LibBalsaAddressView * address_view,
  *     Remove addresses of the given type
  */
 static void
-lbav_remove(LibBalsaAddressView * address_view, guint type)
+lbav_remove_type(LibBalsaAddressView * address_view, gint type)
 {
-    GtkTreeModel *model =
-        gtk_tree_view_get_model(GTK_TREE_VIEW(address_view));
-    GtkListStore *address_store = GTK_LIST_STORE(model);
-    GtkTreeIter iter;
-    gboolean valid;
+    GtkGrid *grid = (GtkGrid *) address_view;
+    gint row;
+    GtkWidget *child;
 
-    valid = gtk_tree_model_get_iter_first(model, &iter);
-    while (valid) {
-        guint this_type;
+    for (row = 0; (child = lbav_get_combo_at(grid, row)) != NULL; /* nothing */) {
+        gint this_type;
 
-        gtk_tree_model_get(model, &iter, ADDRESS_TYPE_COL, &this_type, -1);
-        valid = this_type == type ?
-            gtk_list_store_remove(address_store, &iter) :
-            gtk_tree_model_iter_next(model, &iter);
-    }
-}
+        this_type = gtk_combo_box_get_active(GTK_COMBO_BOX(child));
 
-/*
- *     Set (clear == TRUE) or add (clear == FALSE) the address
- */
-static void
-lbav_set_or_add(LibBalsaAddressView * address_view, guint type,
-                const gchar * address, gboolean clear)
-{
-    if (clear)
-        lbav_remove(address_view, type);
-
-    if (address && *address) {
-        GtkTreeModel *model =
-            gtk_tree_view_get_model(GTK_TREE_VIEW(address_view));
-        GtkListStore *address_store = GTK_LIST_STORE(model);
-        GtkTreeIter iter;
-
-        lbav_ensure_blank_line(address_view, &iter, type);
-        gtk_list_store_set(address_store, &iter,
-                           ADDRESS_TYPE_COL, type,
-                           ADDRESS_TYPESTRING_COL,
-                           _(libbalsa_address_view_types[type]), -1);
-        lbav_add_from_string(address_view, &iter, address);
-        lbav_ensure_blank_line(address_view, &iter, type);
-    } else
-        lbav_ensure_blank_line(address_view, NULL, 0);
-}
-
-/*
- * Parse new text and set it in the address store.
- */
-static void
-lbav_set_text(LibBalsaAddressView * address_view, const gchar * text)
-{
-    GtkTreeView *tree_view = GTK_TREE_VIEW(address_view);
-    GtkTreeModel *model = gtk_tree_view_get_model(tree_view);
-    GtkListStore *address_store = GTK_LIST_STORE(model);
-    GtkTreePath *path;
-    GtkTreeIter iter, tmp_iter;
-    guint type;
-    gchar *name;
-    gboolean valid;
-    guint count;
-
-    path = gtk_tree_path_new_from_string(address_view->path_string);
-    valid = gtk_tree_model_get_iter(model, &iter, path);
-    gtk_tree_path_free(path);
-    if (!valid)
-        return;
-
-    gtk_tree_model_get(model, &iter, ADDRESS_TYPE_COL, &type, -1);
-
-    if (text && *text) {
-        /* Parse the new text and store it in this line. */
-        if (lbav_add_from_string(address_view, &iter, text))
-            lbav_ensure_blank_line(address_view, &iter, type);
-        else {
-            /* No valid addresses found; just set the new text and keep
-             * the focus in this line. */
-            gchar *text_dup = g_strdup(text);
-            lbav_clean_text(text_dup);
-            gtk_list_store_set(address_store, &iter,
-                               ADDRESS_NAME_COL, text_dup, -1);
-            g_free(text_dup);
+        if (this_type == type) {
+            gtk_grid_remove_row(grid, row);
+        } else {
+            ++row;
         }
-        return;
     }
 
-    gtk_tree_model_get(model, &iter, ADDRESS_NAME_COL, &name, -1);
-    if (!name || !*name) {
-        /* The line was already blank--just return. */
-        g_free(name);
-        return;
-    }
-    g_free(name);
+    g_signal_emit(address_view, address_view_signals[VIEW_CHANGED], 0);
+}
 
-    /* Clear the text. */
-    gtk_list_store_set(address_store, &iter, ADDRESS_NAME_COL, NULL, -1);
+/*
+ *     Add the addresses
+ */
+static void
+lbav_add_addresses(LibBalsaAddressView * address_view, gint type,
+                   const gchar * addresses)
+{
+    if (addresses != NULL && addresses[0] != '\0') {
+        gint row;
 
-    /* If this is not the only blank line, remove it. */
-    count = 0;
-    for (valid = gtk_tree_model_get_iter_first(model, &tmp_iter);
-         valid; valid = gtk_tree_model_iter_next(model, &tmp_iter)) {
-        gtk_tree_model_get(model, &iter, ADDRESS_NAME_COL, &name, -1);
-        if (!name || !*name)
-            ++count;
-        g_free(name);
-    }
-
-    if (count > 1) {
-        gtk_list_store_remove(address_store, &iter);
-        lbav_ensure_blank_line(address_view, &iter, type);
+        row = lbav_ensure_blank_row(address_view, type);
+        lbav_add_from_string(address_view, row, addresses);
+        lbav_ensure_blank_row(address_view, type);
+        g_signal_emit(address_view, address_view_signals[VIEW_CHANGED], 0);
+    } else {
+        lbav_ensure_blank_row(address_view, 0);
     }
 }
 
@@ -553,12 +738,13 @@ static guint
 lbav_get_type(LibBalsaAddressView * address_view,
               const gchar * address_type)
 {
-    guint type;
+    gint type;
 
-    for (type = 0; type < address_view->n_types; type++)
-        if (strcmp(address_type, lbav_type_string(address_view, type))
-            == 0)
+    for (type = 0; type < address_view->n_types; type++) {
+        if (strcmp(address_type, lbav_type_string(address_view, type)) == 0) {
             break;
+        }
+    }
 
     return type;
 }
@@ -692,56 +878,6 @@ lbav_completion_match_selected_cb(GtkEntryCompletion * completion,
 }
 
 /*
- *     Callback for the combo's "edited" signal
- *     Store the new text.
- */
-static void
-lbav_combo_edited_cb(GtkCellRendererText * renderer,
-                     const gchar * path_string,
-                     const gchar * new_text,
-                     LibBalsaAddressView * address_view)
-{
-    GtkTreeView *tree_view = GTK_TREE_VIEW(address_view);
-    GtkTreeModel *model = gtk_tree_view_get_model(tree_view);
-    GtkListStore *address_store = GTK_LIST_STORE(model);
-    GtkTreePath *path;
-    GtkTreeIter iter;
-    guint type;
-    gboolean valid;
-
-    for (type = 0; type < address_view->n_types; type++)
-        if (strcmp(new_text, _(lbav_type_string(address_view, type)))
-            == 0)
-            break;
-
-    path = gtk_tree_path_new_from_string(path_string);
-    valid = gtk_tree_model_get_iter(model, &iter, path);
-    gtk_tree_path_free(path);
-    if (!valid)
-        return;
-
-    gtk_list_store_set(address_store, &iter,
-                       ADDRESS_TYPE_COL, type,
-                       ADDRESS_TYPESTRING_COL, new_text, -1);
-
-    gtk_widget_grab_focus(GTK_WIDGET(address_view));
-}
-
-/*
- *     Callback for the cell-editable's "editing-done" signal
- *     Store the new text.
- */
-static void
-lbav_editing_done(GtkCellEditable * cell_editable,
-                  LibBalsaAddressView * address_view)
-{
-    const gchar *text = gtk_entry_get_text(GTK_ENTRY(cell_editable));
-
-    lbav_set_text(address_view, text);
-}
-
-
-/*
  * notify::has-focus callback
  * If only one completion matches, fill it into the entry
  */
@@ -750,7 +886,7 @@ lbav_notify_has_focus_cb(GtkEntry            *entry,
                          GParamSpec          *pspec,
                          LibBalsaAddressView *address_view)
 {
-    const gchar *the_entry;
+    const gchar *name;
     GList *match;
 
     if (gtk_widget_has_focus(GTK_WIDGET(entry))) {
@@ -758,14 +894,14 @@ lbav_notify_has_focus_cb(GtkEntry            *entry,
         return;
     }
 
-    the_entry = gtk_entry_get_text(entry);
+    name = gtk_entry_get_text(entry);
 
-    if (the_entry == NULL || the_entry[0] == '\0') {
+    if (name == NULL || name[0] == '\0') {
         /* No text to match */
         return;
     }
 
-    match = lbav_get_matching_addresses(address_view, the_entry,
+    match = lbav_get_matching_addresses(address_view, name,
                                         LIBBALSA_ADDRESS_VIEW_MATCH_ALL);
 
     if (match == NULL) {
@@ -777,171 +913,20 @@ lbav_notify_has_focus_cb(GtkEntry            *entry,
         /* Only one match */
         gchar *the_addr;
 
+        the_addr = internet_address_to_string(match->data, FALSE);
+
         g_signal_handlers_block_by_func(entry,
                                         lbav_entry_changed_cb,
                                         address_view);
-
-        the_addr = internet_address_to_string(match->data, FALSE);
         gtk_entry_set_text(entry, the_addr);
-        g_free(the_addr);
-
         g_signal_handlers_unblock_by_func(entry,
                                           lbav_entry_changed_cb,
                                           address_view);
-        gtk_cell_editable_editing_done(GTK_CELL_EDITABLE(entry));
+
+        g_free(the_addr);
     }
 
     g_list_free_full(match, g_object_unref);
-}
-
-
-/*
- *     Callback for the tree-view's "editing-started" signal
- *     Set up the GtkEntryCompletion.
- */
-static void
-lbav_row_editing_cb(GtkCellRenderer * renderer,
-                    GtkCellEditable * editable,
-                    const gchar * path_string,
-                    LibBalsaAddressView * address_view)
-{
-    GtkEntryCompletion *completion;
-    GtkListStore *store;
-
-    if (!GTK_IS_ENTRY(editable))
-        return;
-
-    store = gtk_list_store_new(1, G_TYPE_STRING);
-
-    completion = gtk_entry_completion_new();
-    gtk_entry_completion_set_model(completion, GTK_TREE_MODEL(store));
-    g_object_unref(store);
-    gtk_entry_completion_set_match_func(completion,
-                                        (GtkEntryCompletionMatchFunc)
-                                        lbav_completion_match_func,
-                                        address_view, NULL);
-    gtk_entry_completion_set_text_column(completion, COMPLETION_NAME_COL);
-    g_signal_connect(completion, "match-selected",
-                     G_CALLBACK(lbav_completion_match_selected_cb),
-                     address_view);
-
-    g_signal_connect(editable, "changed",
-                     G_CALLBACK(lbav_entry_changed_cb), address_view);
-    g_signal_connect(editable, "key-press-event",
-                     G_CALLBACK(lbav_key_pressed_cb), address_view);
-    g_signal_connect(editable, "insert-text",
-                     G_CALLBACK(lbav_insert_text_cb), address_view);
-    g_signal_connect(editable, "editing-done",
-                     G_CALLBACK(lbav_editing_done), address_view);
-    g_signal_connect_after(editable, "notify::has-focus",
-			   G_CALLBACK(lbav_notify_has_focus_cb), address_view);
-    gtk_entry_set_completion(GTK_ENTRY(editable), completion);
-    g_object_unref(completion);
-
-    address_view->last_was_escape = FALSE;
-    address_view->editable = editable;
-    g_free(address_view->path_string);
-    address_view->path_string = g_strdup(path_string);
-}
-
-/*
- *     Callback for the button's "activated" signal
- */
-static void
-lbav_button_activated_cb(LibBalsaCellRendererButton * button,
-                         const gchar * path_string,
-                         LibBalsaAddressView * address_view)
-{
-    GtkTreeView *tree_view = GTK_TREE_VIEW(address_view);
-    GtkTreeModel *model = gtk_tree_view_get_model(tree_view);
-    GtkTreePath *path;
-    GtkTreeIter iter;
-    GdkPixbuf *pixbuf;
-
-    path = gtk_tree_path_new_from_string(path_string);
-    if (!gtk_tree_model_get_iter(model, &iter, path)) {
-        gtk_tree_path_free(path);
-        return;
-    }
-
-    gtk_tree_model_get(model, &iter, ADDRESS_ICON_COL, &pixbuf, -1);
-
-    if (pixbuf == lbav_close_icon) {
-        /* User clicked a remove button. */
-        GtkListStore *address_store = GTK_LIST_STORE(model);
-        guint type;
-
-        gtk_tree_model_get(model, &iter, ADDRESS_TYPE_COL, &type, -1);
-        gtk_list_store_remove(address_store, &iter);
-
-        /* Make sure the view has at least one row: */
-        lbav_ensure_blank_line(address_view, NULL, type);
-    } else {
-        /* User clicked the address book button. */
-        GtkTreeRowReference *row_ref =
-            gtk_tree_row_reference_new(model, path);
-
-        g_signal_emit(address_view,
-                      address_view_signals[OPEN_ADDRESS_BOOK], 0, row_ref);
-        gtk_tree_row_reference_free(row_ref);
-    }
-
-    g_object_unref(pixbuf);
-    gtk_tree_path_free(path);
-}
-
-/*
- *     Callback for the drop_down's "activated" signal
- *
- *     Pop up the address type combo-box
- */
-static void
-lbav_drop_down_activated_cb(LibBalsaCellRendererButton * drop_down,
-                            const gchar * path_string,
-                            LibBalsaAddressView * address_view)
-{
-    GtkTreePath *path;
-
-    path = gtk_tree_path_new_from_string(path_string);
-    gtk_tree_view_set_cursor_on_cell(GTK_TREE_VIEW(address_view),
-                                     path,
-                                     address_view->type_column,
-                                     address_view->renderer_combo,
-                                     TRUE);
-    gtk_tree_path_free(path);
-}
-
-/*
- * Sort function for the address store
- */
-static gint
-lbav_sort_func(GtkTreeModel * model, GtkTreeIter * a, GtkTreeIter * b,
-               gpointer user_data)
-{
-    guint type_a, type_b;
-    gint retval;
-    gchar *name;
-    gboolean is_blank_a, is_blank_b;
-
-    gtk_tree_model_get(model, a, ADDRESS_TYPE_COL, &type_a, -1);
-    gtk_tree_model_get(model, b, ADDRESS_TYPE_COL, &type_b, -1);
-
-    /* Sort by type. */
-    retval = type_a - type_b;
-    if (retval)
-        return retval;
-
-    /* Within type, make sure a blank line sorts to the bottom. */
-
-    gtk_tree_model_get(model, a, ADDRESS_NAME_COL, &name, -1);
-    is_blank_a = !name || !*name;
-    g_free(name);
-
-    gtk_tree_model_get(model, b, ADDRESS_NAME_COL, &name, -1);
-    is_blank_b = !name || !*name;
-    g_free(name);
-
-    return is_blank_a - is_blank_b;
 }
 
 /*
@@ -956,114 +941,17 @@ libbalsa_address_view_new(const gchar * const *types,
                           guint n_types,
                           GList * address_book_list, gboolean fallback)
 {
-    GtkListStore *address_store;
-    GtkTreeView *tree_view;
     LibBalsaAddressView *address_view;
-    GtkCellRenderer *renderer;
-    GtkTreeViewColumn *column;
-
-    /* List store for the widget: */
-    address_store = gtk_list_store_new(4,
-                                       /* ADDRESS_TYPE_COL: */
-                                       G_TYPE_INT,
-                                       /* ADDRESS_TYPESTRING_COL: */
-                                       G_TYPE_STRING,
-                                       /* ADDRESS_NAME_COL: */
-                                       G_TYPE_STRING,
-                                       /* ADDRESS_ICON_COL: */
-                                       GDK_TYPE_PIXBUF);
-
-    gtk_tree_sortable_set_default_sort_func(GTK_TREE_SORTABLE
-                                            (address_store),
-                                            lbav_sort_func, NULL, NULL);
-    gtk_tree_sortable_set_sort_column_id
-        (GTK_TREE_SORTABLE(address_store),
-         GTK_TREE_SORTABLE_DEFAULT_SORT_COLUMN_ID, GTK_SORT_ASCENDING);
 
     /* The widget: */
-    address_view =
-        g_object_new(LIBBALSA_TYPE_ADDRESS_VIEW, "model", address_store,
-                     "headers-visible", FALSE, NULL);
-    g_object_unref(address_store);
+    address_view = g_object_new(LIBBALSA_TYPE_ADDRESS_VIEW, NULL);
 
     address_view->types = types;
-    address_view->n_types = n_types;
+    address_view->n_types = (gint) n_types;
     address_view->address_book_list = address_book_list;
     address_view->fallback = fallback;
 
-    tree_view = GTK_TREE_VIEW(address_view);
-    gtk_tree_view_set_activate_on_single_click(tree_view, TRUE);
-
-    /* The button: */
-    column = gtk_tree_view_column_new();
-    renderer = libbalsa_cell_renderer_button_new();
-    g_signal_connect(renderer, "activated",
-                     G_CALLBACK(lbav_button_activated_cb), address_view);
-    gtk_tree_view_column_pack_start(column, renderer, FALSE);
-    gtk_tree_view_column_set_attributes(column, renderer,
-                                        "pixbuf", ADDRESS_ICON_COL,
-                                        NULL);
-    gtk_tree_view_append_column(tree_view, column);
-
-    if (n_types > 0) {
-        /* List-store for the address type combo: */
-        GtkListStore *type_store = gtk_list_store_new(1, G_TYPE_STRING);
-        guint i;
-
-        for (i = 0; i < n_types; i++) {
-            GtkTreeIter iter;
-
-            gtk_list_store_append(type_store, &iter);
-            gtk_list_store_set(type_store, &iter, 0, _(types[i]), -1);
-        }
-
-        address_view->type_column = column = gtk_tree_view_column_new();
-
-        /* The address type combo: */
-        address_view->renderer_combo = renderer =
-            gtk_cell_renderer_combo_new();
-        g_object_set(renderer,
-                     "editable", TRUE,
-                     "has-entry", FALSE,
-                     "model", type_store,
-                     "text-column", 0,
-                     NULL);
-        g_object_unref(type_store);
-
-        g_signal_connect(renderer, "edited",
-                         G_CALLBACK(lbav_combo_edited_cb), address_view);
-
-        gtk_tree_view_column_pack_start(column, renderer, TRUE);
-        gtk_tree_view_column_set_attributes(column, renderer,
-                                            "text", ADDRESS_TYPESTRING_COL,
-                                            NULL);
-
-        /* Add a drop-down icon to indicate that this is in fact a
-         * combo: */
-        renderer = libbalsa_cell_renderer_button_new();
-        g_signal_connect(renderer, "activated",
-                         G_CALLBACK(lbav_drop_down_activated_cb),
-                         address_view);
-        g_object_set(renderer, "pixbuf", lbav_drop_down_icon, NULL);
-        gtk_tree_view_column_pack_start(column, renderer, FALSE);
-
-        gtk_tree_view_append_column(tree_view, column);
-    }
-
-    /* Column for the entry widget. */
-    address_view->focus_column = column = gtk_tree_view_column_new();
-
-    /* The address entry: */
-    renderer = gtk_cell_renderer_text_new();
-    g_object_set(renderer, "editable", TRUE, NULL);
-    g_signal_connect(renderer, "editing-started",
-                     G_CALLBACK(lbav_row_editing_cb), address_view);
-    gtk_tree_view_column_pack_start(column, renderer, TRUE);
-    gtk_tree_view_column_set_attributes(column, renderer,
-                                        "text", ADDRESS_NAME_COL, NULL);
-    gtk_tree_view_append_column(tree_view, column);
-
-    lbav_ensure_blank_line(address_view, NULL, 0);
+    lbav_ensure_blank_row(address_view, 0);
 
     return address_view;
 }
@@ -1089,7 +977,7 @@ libbalsa_address_view_set_from_string(LibBalsaAddressView * address_view,
                                       const gchar * address_type,
                                       const gchar * addresses)
 {
-    guint type;
+    gint type;
 
     g_return_if_fail(LIBBALSA_IS_ADDRESS_VIEW(address_view));
 
@@ -1097,7 +985,8 @@ libbalsa_address_view_set_from_string(LibBalsaAddressView * address_view,
     g_return_if_fail(address_view->n_types == 0
                      || type < address_view->n_types);
 
-    lbav_set_or_add(address_view, type, addresses, TRUE);
+    lbav_remove_type(address_view, type);
+    lbav_add_addresses(address_view, type, addresses);
 }
 
 /*
@@ -1108,7 +997,7 @@ libbalsa_address_view_add_from_string(LibBalsaAddressView * address_view,
                                       const gchar * address_type,
                                       const gchar * addresses)
 {
-    guint type;
+    gint type;
 
     g_return_if_fail(LIBBALSA_IS_ADDRESS_VIEW(address_view));
 
@@ -1116,7 +1005,7 @@ libbalsa_address_view_add_from_string(LibBalsaAddressView * address_view,
     g_return_if_fail(address_view->n_types == 0
                      || type < address_view->n_types);
 
-    lbav_set_or_add(address_view, type, addresses, FALSE);
+    lbav_add_addresses(address_view, type, addresses);
 }
 
 /*
@@ -1124,28 +1013,27 @@ libbalsa_address_view_add_from_string(LibBalsaAddressView * address_view,
  */
 void
 libbalsa_address_view_add_to_row(LibBalsaAddressView * address_view,
-                                 GtkTreeRowReference * row_ref,
+                                 GtkWidget * button,
                                  const gchar * addresses)
 {
-    GtkTreeModel *model;
-    GtkTreePath *path;
-    GtkTreeIter iter;
-    guint type;
-    gboolean valid;
+    GtkGrid *grid = (GtkGrid *) address_view;
+    gint row;
+    GtkWidget *child;
+    gint type;
 
     g_return_if_fail(LIBBALSA_IS_ADDRESS_VIEW(address_view));
 
-    model = gtk_tree_view_get_model(GTK_TREE_VIEW(address_view));
-    path = gtk_tree_row_reference_get_path(row_ref);
-    valid = gtk_tree_model_get_iter(model, &iter, path);
-    gtk_tree_path_free(path);
-    if (!valid)
-        return;
+    for (row = 0; (child = lbav_get_button_at(grid, row)) != NULL; row++) {
+        if (child == button) {
+            break;
+        }
+    }
 
-    lbav_add_from_string(address_view, &iter, addresses);
+    lbav_add_from_string(address_view, row, addresses);
 
-    gtk_tree_model_get(model, &iter, ADDRESS_TYPE_COL, &type, -1);
-    lbav_ensure_blank_line(address_view, &iter, type);
+    child = lbav_get_combo_at(grid, row);
+    type = gtk_combo_box_get_active(GTK_COMBO_BOX(child));
+    lbav_ensure_blank_row(address_view, type);
 }
 
 /*
@@ -1156,7 +1044,7 @@ libbalsa_address_view_set_from_list(LibBalsaAddressView * address_view,
                                     const gchar * address_type,
                                     InternetAddressList * list)
 {
-    guint type;
+    gint type;
 
     g_return_if_fail(LIBBALSA_IS_ADDRESS_VIEW(address_view));
 
@@ -1164,23 +1052,17 @@ libbalsa_address_view_set_from_list(LibBalsaAddressView * address_view,
     g_return_if_fail(address_view->n_types == 0
                      || type < address_view->n_types);
 
-    lbav_remove(address_view, type);
+    lbav_remove_type(address_view, type);
 
-    if (list && internet_address_list_length(list) > 0) {
-        GtkTreeModel *model =
-            gtk_tree_view_get_model(GTK_TREE_VIEW(address_view));
-        GtkListStore *address_store = GTK_LIST_STORE(model);
-        GtkTreeIter iter;
+    if (list != NULL && internet_address_list_length(list) > 0) {
+        gint row;
 
-        lbav_ensure_blank_line(address_view, &iter, type);
-        gtk_list_store_set(address_store, &iter,
-                           ADDRESS_TYPE_COL, type,
-                           ADDRESS_TYPESTRING_COL,
-                           _(libbalsa_address_view_types[type]), -1);
-        lbav_add_from_list(address_view, &iter, list);
-        lbav_ensure_blank_line(address_view, &iter, type);
-    } else
-        lbav_ensure_blank_line(address_view, NULL, 0);
+        row = lbav_ensure_blank_row(address_view, type);
+        lbav_add_from_list(address_view, row, list);
+        lbav_ensure_blank_row(address_view, type);
+    } else {
+        lbav_ensure_blank_row(address_view, 0);
+    }
 }
 
 /*
@@ -1190,15 +1072,14 @@ gint
 libbalsa_address_view_n_addresses(LibBalsaAddressView * address_view)
 {
     gint addresses = 0;
-    guint type;
+    gint type;
 
     g_return_val_if_fail(LIBBALSA_IS_ADDRESS_VIEW(address_view), -1);
 
     for (type = 0; type < address_view->n_types; type++) {
         InternetAddressList *list =
             libbalsa_address_view_get_list(address_view,
-                                           lbav_type_string(address_view,
-                                                            type));
+                                           lbav_type_string(address_view, type));
         addresses += libbalsa_address_n_mailboxes_in_list(list);
         g_object_unref(list);
     }
@@ -1215,11 +1096,11 @@ InternetAddressList *
 libbalsa_address_view_get_list(LibBalsaAddressView * address_view,
                                const gchar * address_type)
 {
-    guint type;
-    GtkTreeModel *model;
+    GtkGrid *grid = (GtkGrid *) address_view;
+    gint type;
     InternetAddressList *address_list;
-    gboolean valid;
-    GtkTreeIter iter;
+    gint row;
+    GtkWidget *child;
 
     g_return_val_if_fail(LIBBALSA_IS_ADDRESS_VIEW(address_view), NULL);
 
@@ -1227,26 +1108,24 @@ libbalsa_address_view_get_list(LibBalsaAddressView * address_view,
     g_return_val_if_fail(address_view->n_types == 0
                          || type < address_view->n_types, NULL);
 
-    model = gtk_tree_view_get_model(GTK_TREE_VIEW(address_view));
     address_list = internet_address_list_new();
-    for (valid = gtk_tree_model_get_iter_first(model, &iter);
-         valid; valid = gtk_tree_model_iter_next(model, &iter)) {
-        guint this_type;
-        gchar *name;
+    for (row = 0; (child = lbav_get_combo_at(grid, row)) != NULL; row++) {
+        gint this_type;
 
-        gtk_tree_model_get(model, &iter,
-                           ADDRESS_TYPE_COL, &this_type,
-                           ADDRESS_NAME_COL, &name, -1);
+        this_type = gtk_combo_box_get_active(GTK_COMBO_BOX(child));
 
         if (this_type == type) {
-            InternetAddressList *tmp_list =
-                internet_address_list_parse_string(name);
-            if (tmp_list) {
+            const gchar *name;
+            InternetAddressList *tmp_list;
+
+            child = lbav_get_entry_at(grid, row);
+            name = gtk_entry_get_text(GTK_ENTRY(child));
+            tmp_list = internet_address_list_parse_string(name);
+            if (tmp_list != NULL) {
                 internet_address_list_append(address_list, tmp_list);
                 g_object_unref(tmp_list);
             }
         }
-        g_free(name);
     }
 
     return address_list;

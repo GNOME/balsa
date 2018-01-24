@@ -66,7 +66,7 @@ void libbalsa_address_view_add_from_string(LibBalsaAddressView *
                                            const gchar * address_type,
                                            const gchar * addresses);
 void libbalsa_address_view_add_to_row(LibBalsaAddressView * address_view,
-                                      GtkTreeRowReference * row_ref,
+                                      GtkWidget * button,
                                       const gchar * addresses);
 void libbalsa_address_view_set_from_list(LibBalsaAddressView *
                                          address_view,

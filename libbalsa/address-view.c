@@ -541,6 +541,9 @@ lbav_insert_row(LibBalsaAddressView * address_view, gint row,
                      G_CALLBACK(lbav_completion_match_selected_cb),
                      address_view);
 
+    gtk_entry_set_completion(GTK_ENTRY(entry), completion);
+    g_object_unref(completion);
+
     g_signal_connect(entry, "activate",
                      G_CALLBACK(lbav_entry_activated), address_view);
     g_signal_connect(entry, "changed",
@@ -552,12 +555,11 @@ lbav_insert_row(LibBalsaAddressView * address_view, gint row,
     g_signal_connect_after(entry, "notify::has-focus",
 			   G_CALLBACK(lbav_notify_has_focus_cb), address_view);
 
-    gtk_entry_set_completion(GTK_ENTRY(entry), completion);
-    g_object_unref(completion);
-
     gtk_grid_attach(grid, entry,
                     LIBBALSA_ADDRESS_VIEW_ENTRY_COLUMN, row, 1, 1);
-    gtk_widget_grab_focus(entry);
+    if (icon == WITH_BOOK_ICON) {
+        gtk_widget_grab_focus(entry);
+    }
 }
 
 /*

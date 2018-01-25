@@ -158,12 +158,14 @@ enum {
     LIBBALSA_ADDRESS_VIEW_ENTRY_COLUMN
 };
 
-#define lbav_get_button_at(grid, row) \
-        gtk_grid_get_child_at((grid), LIBBALSA_ADDRESS_VIEW_BUTTON_COLUMN, (row))
-#define lbav_get_combo_at(grid, row) \
-        gtk_grid_get_child_at((grid), LIBBALSA_ADDRESS_VIEW_COMBO_COLUMN, (row))
-#define lbav_get_entry_at(grid, row) \
-        gtk_grid_get_child_at((grid), LIBBALSA_ADDRESS_VIEW_ENTRY_COLUMN, (row))
+#define lbav_get_button(a,r) \
+        gtk_grid_get_child_at((GtkGrid*)(a),LIBBALSA_ADDRESS_VIEW_BUTTON_COLUMN,(r))
+#define lbav_get_combo(a,r) \
+        gtk_grid_get_child_at((GtkGrid*)(a),LIBBALSA_ADDRESS_VIEW_COMBO_COLUMN,(r))
+#define lbav_get_entry(a,r) \
+        gtk_grid_get_child_at((GtkGrid*)(a),LIBBALSA_ADDRESS_VIEW_ENTRY_COLUMN,(r))
+#define lbav_remove_row(a,r) \
+        gtk_grid_remove_row((GtkGrid*)(a),(r))
 
 typedef enum {
     WITH_BOOK_ICON,
@@ -329,21 +331,20 @@ static void
 lbav_close_button_clicked(GtkWidget           * button,
                           LibBalsaAddressView * address_view)
 {
-    GtkGrid *grid = (GtkGrid *) address_view;
     gint row;
     GtkWidget *child;
     gint type;
 
-    for (row = 0; (child = lbav_get_button_at(grid, row)) != NULL; row++) {
+    for (row = 0; (child = lbav_get_button(address_view, row)) != NULL; row++) {
         if (child == button) {
             break;
         }
     }
 
-    child = lbav_get_combo_at(grid, row);
+    child = lbav_get_combo(address_view, row);
     type = gtk_combo_box_get_active(GTK_COMBO_BOX(child));
 
-    gtk_grid_remove_row(grid, row);
+    lbav_remove_row(address_view, row);
 
     /* Make sure the view has at least one row: */
     lbav_ensure_blank_row(address_view, type);
@@ -390,7 +391,6 @@ lbav_combo_changed_idle(LibBalsaAddressView * address_view)
 {
     /* The type of an address was changed. We make it the last address
      * of the new type, moving the row if necessary. */
-    GtkGrid *grid = (GtkGrid *) address_view;
     GtkWidget *combo_box = address_view->changed_combo;
     gint row;
     GtkWidget *child;
@@ -398,18 +398,21 @@ lbav_combo_changed_idle(LibBalsaAddressView * address_view)
     const gchar *name;
     gint new_type;
 
-    for (row = 0; (child = lbav_get_combo_at(grid, row)) != NULL; row++) {
+    /* Find the row of the address whose type was changed */
+    for (row = 0; (child = lbav_get_combo(address_view, row)) != NULL; row++) {
         if (child == combo_box) {
             break;
         }
     }
     old_row = row;
 
-    child = lbav_get_entry_at(grid, row);
+    /* Save the address */
+    child = lbav_get_entry(address_view, row);
     name = gtk_entry_get_text(GTK_ENTRY(child));
 
+    /* Find the new row for the addrress */
     new_type = gtk_combo_box_get_active(GTK_COMBO_BOX(combo_box));
-    for (row = 0; (child = lbav_get_combo_at(grid, row)) != NULL; row++) {
+    for (row = 0; (child = lbav_get_combo(address_view, row)) != NULL; row++) {
         gint type;
 
         if (row == old_row) {
@@ -423,17 +426,18 @@ lbav_combo_changed_idle(LibBalsaAddressView * address_view)
     }
 
     if (row != old_row) {
+        /* Move the address to the new row */
         LibbalsaAddressViewIcon icon;
 
         icon = (name == NULL || name[0] == '\0') ? WITH_BOOK_ICON : WITH_CLOSE_ICON;
         lbav_insert_row(address_view, row, new_type, icon);
-        child = lbav_get_entry_at(grid, row);
+        child = lbav_get_entry(address_view, row);
         gtk_entry_set_text(GTK_ENTRY(child), name);
 
         if (old_row > row) {
             ++old_row;
         }
-        gtk_grid_remove_row(grid, old_row);
+        lbav_remove_row(address_view, old_row);
 
         lbav_ensure_blank_row(address_view, new_type);
         g_signal_emit(address_view, address_view_signals[VIEW_CHANGED], 0);
@@ -441,6 +445,7 @@ lbav_combo_changed_idle(LibBalsaAddressView * address_view)
 
     g_object_unref(combo_box);
     g_object_unref(address_view);
+
     return G_SOURCE_REMOVE;
 }
 
@@ -458,22 +463,21 @@ static void
 lbav_entry_activated(GtkEntry            * entry,
                      LibBalsaAddressView * address_view)
 {
-    GtkGrid *grid = (GtkGrid *) address_view;
     gint row;
     GtkWidget *child;
     gint type;
 
-    for (row = 0; (child = lbav_get_entry_at(grid, row)) != NULL; row++) {
+    for (row = 0; (child = lbav_get_entry(address_view, row)) != NULL; row++) {
         if (child == (GtkWidget *) entry) {
             break;
         }
     }
 
-    child = lbav_get_button_at(grid, row);
+    child = lbav_get_button(address_view, row);
     gtk_widget_destroy(child);
     lbav_set_button(address_view, row, WITH_CLOSE_ICON);
 
-    child = lbav_get_combo_at(grid, row);
+    child = lbav_get_combo(address_view, row);
     type = gtk_combo_box_get_active(GTK_COMBO_BOX(child));
     lbav_ensure_blank_row(address_view, type);
 
@@ -569,26 +573,29 @@ lbav_insert_row(LibBalsaAddressView * address_view, gint row,
 static gint
 lbav_ensure_blank_row(LibBalsaAddressView * address_view, gint type)
 {
-    GtkGrid *grid = (GtkGrid *) address_view;
     gint row;
     GtkWidget *child;
 
     g_assert(address_view->n_types == 0 || type < address_view->n_types);
 
     /* Remove all existing blank rows */
-    for (row = 0; (child = lbav_get_entry_at(grid, row)) != NULL; /* nothing */) {
+    for (row = 0; (child = lbav_get_entry(address_view, row)) != NULL; /* nothing */) {
         const gchar *name;
 
         name = gtk_entry_get_text(GTK_ENTRY(child));
         if (name == NULL || name[0] == '\0') {
-            gtk_grid_remove_row(grid, row);
+            lbav_remove_row(address_view, row);
         } else {
+            /* Make sure the row has a close button. */
+            child = lbav_get_button(address_view, row);
+            gtk_widget_destroy(child);
+            lbav_set_button(address_view, row, WITH_CLOSE_ICON);
             ++row;
         }
     }
 
     /* Find the last row matching type */
-    for (row = 0; (child = lbav_get_combo_at(grid, row)) != NULL; row++) {
+    for (row = 0; (child = lbav_get_combo(address_view, row)) != NULL; row++) {
         if (gtk_combo_box_get_active(GTK_COMBO_BOX(child)) > type) {
             break;
         }
@@ -637,7 +644,6 @@ static void
 lbav_add_from_list(LibBalsaAddressView * address_view,
                    gint row, InternetAddressList * list)
 {
-    GtkGrid *grid = (GtkGrid *) address_view;
     gint type;
     int i;
 
@@ -650,17 +656,17 @@ lbav_add_from_list(LibBalsaAddressView * address_view,
         lbav_clean_text(name);
 
         if (i == 0) {
-            child = lbav_get_combo_at(grid, row);
+            child = lbav_get_combo(address_view, row);
             type = gtk_combo_box_get_active(GTK_COMBO_BOX(child));
 
-            child = lbav_get_button_at(grid, row);
+            child = lbav_get_button(address_view, row);
             gtk_widget_destroy(child);
             lbav_set_button(address_view, row, WITH_CLOSE_ICON);
         } else {
             lbav_insert_row(address_view, ++row, type, WITH_CLOSE_ICON);
         }
 
-        child = lbav_get_entry_at(grid, row);
+        child = lbav_get_entry(address_view, row);
         gtk_entry_set_text(GTK_ENTRY(child), name);
         g_free(name);
     }
@@ -695,17 +701,16 @@ lbav_add_from_string(LibBalsaAddressView * address_view,
 static void
 lbav_remove_type(LibBalsaAddressView * address_view, gint type)
 {
-    GtkGrid *grid = (GtkGrid *) address_view;
     gint row;
     GtkWidget *child;
 
-    for (row = 0; (child = lbav_get_combo_at(grid, row)) != NULL; /* nothing */) {
+    for (row = 0; (child = lbav_get_combo(address_view, row)) != NULL; /* nothing */) {
         gint this_type;
 
         this_type = gtk_combo_box_get_active(GTK_COMBO_BOX(child));
 
         if (this_type == type) {
-            gtk_grid_remove_row(grid, row);
+            lbav_remove_row(address_view, row);
         } else {
             ++row;
         }
@@ -768,6 +773,7 @@ lbav_entry_changed_cb(GtkEntry * entry, LibBalsaAddressView * address_view)
     if (gtk_widget_get_window(GTK_WIDGET(entry)))
         lbav_entry_setup_matches(address_view, entry, completion,
                                  LIBBALSA_ADDRESS_VIEW_MATCH_FAST);
+    address_view->last_was_escape = FALSE;
 }
 
 /*
@@ -782,11 +788,11 @@ lbav_key_pressed_cb(GtkEntry * entry,
     guint keyval;
 
     if (!gdk_event_get_keyval(event, &keyval) || keyval != GDK_KEY_Escape)
-        return FALSE;
+        return GDK_EVENT_PROPAGATE;
 
     if (address_view->last_was_escape) {
         address_view->last_was_escape = FALSE;
-        return FALSE;
+        return GDK_EVENT_PROPAGATE;
     }
     address_view->last_was_escape = TRUE;
 
@@ -799,7 +805,7 @@ lbav_key_pressed_cb(GtkEntry * entry,
     g_signal_handlers_unblock_by_func(entry, lbav_entry_changed_cb,
                                       address_view);
 
-    return TRUE;
+    return GDK_EVENT_STOP;
 }
 
 /*
@@ -903,8 +909,13 @@ lbav_notify_has_focus_cb(GtkEntry            *entry,
         return;
     }
 
+    /* If the user touched Esc, all matches were shown, so that is the
+     * list that we check; otherwise, the user has seen only fast matches,
+     * so that is the list we check. */
     match = lbav_get_matching_addresses(address_view, name,
-                                        LIBBALSA_ADDRESS_VIEW_MATCH_ALL);
+                                        address_view->last_was_escape ?
+                                        LIBBALSA_ADDRESS_VIEW_MATCH_ALL :
+                                        LIBBALSA_ADDRESS_VIEW_MATCH_FAST);
 
     if (match == NULL) {
         /* No matching addresses */
@@ -926,6 +937,8 @@ lbav_notify_has_focus_cb(GtkEntry            *entry,
                                           address_view);
 
         g_free(the_addr);
+
+        lbav_entry_activated(entry, address_view);
     }
 
     g_list_free_full(match, g_object_unref);
@@ -1018,14 +1031,13 @@ libbalsa_address_view_add_to_row(LibBalsaAddressView * address_view,
                                  GtkWidget * button,
                                  const gchar * addresses)
 {
-    GtkGrid *grid = (GtkGrid *) address_view;
     gint row;
     GtkWidget *child;
     gint type;
 
     g_return_if_fail(LIBBALSA_IS_ADDRESS_VIEW(address_view));
 
-    for (row = 0; (child = lbav_get_button_at(grid, row)) != NULL; row++) {
+    for (row = 0; (child = lbav_get_button(address_view, row)) != NULL; row++) {
         if (child == button) {
             break;
         }
@@ -1033,7 +1045,7 @@ libbalsa_address_view_add_to_row(LibBalsaAddressView * address_view,
 
     lbav_add_from_string(address_view, row, addresses);
 
-    child = lbav_get_combo_at(grid, row);
+    child = lbav_get_combo(address_view, row);
     type = gtk_combo_box_get_active(GTK_COMBO_BOX(child));
     lbav_ensure_blank_row(address_view, type);
 }
@@ -1098,7 +1110,6 @@ InternetAddressList *
 libbalsa_address_view_get_list(LibBalsaAddressView * address_view,
                                const gchar * address_type)
 {
-    GtkGrid *grid = (GtkGrid *) address_view;
     gint type;
     InternetAddressList *address_list;
     gint row;
@@ -1111,7 +1122,7 @@ libbalsa_address_view_get_list(LibBalsaAddressView * address_view,
                          || type < address_view->n_types, NULL);
 
     address_list = internet_address_list_new();
-    for (row = 0; (child = lbav_get_combo_at(grid, row)) != NULL; row++) {
+    for (row = 0; (child = lbav_get_combo(address_view, row)) != NULL; row++) {
         gint this_type;
 
         this_type = gtk_combo_box_get_active(GTK_COMBO_BOX(child));
@@ -1120,7 +1131,7 @@ libbalsa_address_view_get_list(LibBalsaAddressView * address_view,
             const gchar *name;
             InternetAddressList *tmp_list;
 
-            child = lbav_get_entry_at(grid, row);
+            child = lbav_get_entry(address_view, row);
             name = gtk_entry_get_text(GTK_ENTRY(child));
             tmp_list = internet_address_list_parse_string(name);
             if (tmp_list != NULL) {

@@ -559,6 +559,11 @@ if not compiler.has_header('zlib.h')
   error('zlib library required')
 endif
 
+if compiler.has_header('locale.h')
+  conf.set('HAVE_LOCALE_H', 1,
+    description : 'Define to 1 if you have the <locale.h> header')
+endif
+
 # set more warnings.
 #
 

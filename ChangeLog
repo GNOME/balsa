@@ -1,5 +1,9 @@
 2018-01-26  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	* meson.build: fix the definition of HAVE_CTIME_R.
+
+2018-01-26  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* meson.build: test for <locale.h> and set HAVE_LOCALE_H if
 	found.
 

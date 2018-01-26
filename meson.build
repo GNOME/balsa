@@ -539,9 +539,10 @@ conf.set('HAVE_DECL_CTIME_R',
   compiler.has_header_symbol('time.h', 'ctime_r') ? 1 : 0,
   description : 'Define to 1 if you have the declaration of ctime_r, and to 0 if you do not.')
 
-conf.set('HAVE_CTIME_R',
-  compiler.has_function('ctime_r') ? 1 : 0,
-  description : 'Define to 1 if you have the ctime_r function.')
+if compiler.has_function('ctime_r')
+  conf.set('HAVE_CTIME_R', 1,
+    description : 'Define to 1 if you have the ctime_r function.')
+endif
 
 if not compiler.has_header('zlib.h')
   error('zlib library required')

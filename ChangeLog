@@ -1,3 +1,8 @@
+2018-01-26  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* meson.build: test for <locale.h> and set HAVE_LOCALE_H if
+	found.
+
 2018-01-21  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Meson build system changes to mirror the autotools changes in

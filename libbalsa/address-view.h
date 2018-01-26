@@ -26,30 +26,10 @@
 #include <gmime/gmime.h>
 
 G_BEGIN_DECLS
-#define LIBBALSA_TYPE_ADDRESS_VIEW                              \
-    (libbalsa_address_view_get_type())
-#define LIBBALSA_ADDRESS_VIEW(obj)                              \
-    (G_TYPE_CHECK_INSTANCE_CAST((obj),                          \
-                                LIBBALSA_TYPE_ADDRESS_VIEW,     \
-                                LibBalsaAddressView))
-#define LIBBALSA_ADDRESS_VIEW_CLASS(klass)                      \
-    (G_TYPE_CHECK_CLASS_CAST((klass),                           \
-                             LIBBALSA_TYPE_ADDRESS_VIEW,        \
-                             LibBalsaAddressViewClass))
-#define LIBBALSA_IS_ADDRESS_VIEW(obj)                           \
-    (G_TYPE_CHECK_INSTANCE_TYPE((obj),                          \
-                                LIBBALSA_TYPE_ADDRESS_VIEW))
-#define LIBBALSA_IS_ADDRESS_VIEW_CLASS(klass)                   \
-    (G_TYPE_CHECK_CLASS_TYPE((klass),                           \
-                             LIBBALSA_TYPE_ADDRESS_VIEW))
-#define LIBBALSA_ADDRESS_VIEW_GET_CLASS(obj)                    \
-    (G_TYPE_INSTANCE_GET_CLASS((obj),                           \
-                               LIBBALSA_TYPE_ADDRESS_VIEW,      \
-                               LibBalsaAddressViewClass))
-typedef struct _LibBalsaAddressView LibBalsaAddressView;
-typedef struct _LibBalsaAddressViewClass LibBalsaAddressViewClass;
 
-GType libbalsa_address_view_get_type(void) G_GNUC_CONST;
+#define LIBBALSA_TYPE_ADDRESS_VIEW (libbalsa_address_view_get_type())
+G_DECLARE_FINAL_TYPE(LibBalsaAddressView, libbalsa_address_view,
+                     LIBBALSA, ADDRESS_VIEW, GtkGrid)
 
 LibBalsaAddressView *libbalsa_address_view_new(const gchar * const *types,
                                                guint n_types,
@@ -84,4 +64,5 @@ void libbalsa_address_view_set_close_icon(GdkPixbuf * close_icon);
 void libbalsa_address_view_set_drop_down_icon(GdkPixbuf * drop_down_icon);
 
 G_END_DECLS
+
 #endif                          /* __LIBBALSA_ADDRESS_VIEW_H__ */

@@ -80,7 +80,7 @@ uts_prefix = '''
 '''
 if compiler.has_member('struct utsname', 'domainname', prefix : uts_prefix)
   conf.set('HAVE_STRUCT_UTSNAME_DOMAINNAME', 1,
-    description : 'Defined if domainname is a member of struct utsname')
+    description : 'Define to 1 if ‘domainname’ is a member of ‘struct utsname’.')
 endif
 
 # yelp
@@ -549,11 +549,11 @@ balsa_deps += spell_dep
 
 conf.set('HAVE_DECL_CTIME_R',
   compiler.has_header_symbol('time.h', 'ctime_r') ? 1 : 0,
-  description : 'Define to 1 if you have the declaration of ctime_r, and to 0 if you do not.')
+  description : 'Define to 1 if you have the declaration of ‘ctime_r’, and to 0 if you don’t.')
 
 if compiler.has_function('ctime_r')
   conf.set('HAVE_CTIME_R', 1,
-    description : 'Define to 1 if you have the ctime_r function.')
+    description : 'Define to 1 if you have the ‘ctime_r’ function.')
 endif
 
 if not compiler.has_header('zlib.h')
@@ -597,7 +597,7 @@ endif # balsa_from_git
 
 conf.set('HAVE_GETADDRINFO',
   compiler.has_function('getaddrinfo') ? 1 : 0,
-  description : 'Define to 1 if you have the getaddrinfo function.')
+  description : 'Define to 1 if you have the ‘getaddrinfo’ function.')
 
 ###########################################################################
 # Remember our prefixes

@@ -370,7 +370,8 @@ bm_find_scroll_to_rectangle(BalsaMessage * bm,
     gint x, y;
     GtkAdjustment *hadj, *vadj;
 
-    gtk_widget_translate_coordinates(widget, bm->bm_widget->widget,
+    gtk_widget_translate_coordinates(widget,
+                                     balsa_mime_widget_get_widget(bm->bm_widget),
                                      rectangle->x, rectangle->y,
                                      &x, &y);
 
@@ -447,7 +448,7 @@ bm_find_entry_changed_cb(GtkEditable * editable, gpointer data)
 {
     const gchar *text = gtk_entry_get_text(GTK_ENTRY(editable));
     BalsaMessage *bm = data;
-    GtkWidget *widget = bm->current_part->mime_widget->widget;
+    GtkWidget *widget = balsa_mime_widget_get_widget(bm->current_part->mime_widget);
     gboolean found = FALSE;
 
     if (GTK_IS_TEXT_VIEW(widget)) {
@@ -507,7 +508,7 @@ static void
 bm_find_again(BalsaMessage * bm, gboolean find_forward)
 {
     const gchar *text = gtk_entry_get_text(GTK_ENTRY(bm->find_entry));
-    GtkWidget *widget = bm->current_part->mime_widget->widget;
+    GtkWidget *widget = balsa_mime_widget_get_widget(bm->current_part->mime_widget);
     gboolean found;
 
     bm->find_forward = find_forward;
@@ -676,6 +677,7 @@ balsa_message_init(BalsaMessage * bm)
     GtkGesture *gesture;
     GtkCellRenderer *renderer;
     GtkTreeSelection *selection;
+    GtkWidget *widget;
 
     bm->switcher = gtk_stack_switcher_new();
     gtk_box_pack_start(GTK_BOX(bm), bm->switcher);
@@ -710,9 +712,10 @@ balsa_message_init(BalsaMessage * bm)
     g_free(buttons);
 
     /* Widget to hold message */
-    g_signal_connect(bm->bm_widget->widget, "notify::has-focus",
+    widget = balsa_mime_widget_get_widget(bm->bm_widget);
+    g_signal_connect(widget, "notify::has-focus",
                      G_CALLBACK(balsa_mime_widget_check_focus), bm);
-    gtk_container_add(GTK_CONTAINER(bm->scroll), bm->bm_widget->widget);
+    gtk_container_add(GTK_CONTAINER(bm->scroll), widget);
 
     /* structure view */
     model = gtk_tree_store_new (NUM_COLUMNS,
@@ -2158,6 +2161,7 @@ add_part(BalsaMessage * bm, BalsaPartInfo * info, GtkWidget * container)
     GtkTreeSelection *selection;
     GtkWidget *widget;
     LibBalsaMessageBody *body;
+    GtkWidget *bm_container;
 
     if (!info)
 	return NULL;
@@ -2171,15 +2175,14 @@ add_part(BalsaMessage * bm, BalsaPartInfo * info, GtkWidget * container)
     if (info->mime_widget == NULL)
 	part_info_init(bm, info);
 
-    if ((widget = info->mime_widget->widget)) {
+    if ((widget = balsa_mime_widget_get_widget(info->mime_widget)) != NULL) {
         gtk_widget_set_vexpand(widget, TRUE);
         gtk_box_pack_start(GTK_BOX(container), widget);
     }
 
-    body =
-        add_multipart(bm, info->body,
-                      info->mime_widget->container ?
-                      info->mime_widget->container : container);
+    bm_container = balsa_mime_widget_get_container(info->mime_widget);
+    body = add_multipart(bm, info->body,
+                         bm_container != NULL ?  bm_container : container);
 
     return body;
 }
@@ -2195,9 +2198,11 @@ gtk_tree_hide_func(GtkTreeModel * model, GtkTreePath * path,
     if (info) {
         GtkWidget *widget, *parent;
 
-        if (info->mime_widget && (widget = info->mime_widget->widget)
-            && (parent = gtk_widget_get_parent(widget)))
+        if (info->mime_widget != NULL
+            && (widget = balsa_mime_widget_get_widget(info->mime_widget)) != NULL
+            && (parent = gtk_widget_get_parent(widget)) != NULL) {
             gtk_container_remove(GTK_CONTAINER(parent), widget);
+        }
         g_object_unref(info);
     }
 
@@ -2217,7 +2222,7 @@ hide_all_parts(BalsaMessage * bm)
 	bm->current_part = NULL;
     }
 
-    gtk_container_foreach(GTK_CONTAINER(bm->bm_widget->container),
+    gtk_container_foreach(GTK_CONTAINER(balsa_mime_widget_get_container(bm->bm_widget)),
                           (GtkCallback) gtk_widget_destroy, NULL);
 }
 
@@ -2233,7 +2238,7 @@ select_part(BalsaMessage * bm, BalsaPartInfo *info)
     hide_all_parts(bm);
     bm_disable_find_entry(bm);
 
-    body = add_part(bm, info, bm->bm_widget->container);
+    body = add_part(bm, info, balsa_mime_widget_get_container(bm->bm_widget));
     bm->current_part = part_info_from_body(bm, body);
 
     g_signal_emit(G_OBJECT(bm), balsa_message_signals[SELECT_PART], 0);
@@ -2253,7 +2258,7 @@ balsa_message_current_part_widget(BalsaMessage * bmessage)
 {
     if (bmessage && bmessage->current_part &&
 	bmessage->current_part->mime_widget)
-	return bmessage->current_part->mime_widget->widget;
+	return balsa_mime_widget_get_widget(bmessage->current_part->mime_widget);
     else
 	return NULL;
 }
@@ -2279,17 +2284,22 @@ balsa_get_parent_window(GtkWidget * widget)
 gboolean
 balsa_message_can_select(BalsaMessage * bmessage)
 {
-    GtkWidget *w;
+    GtkWidget *widget;
 
     g_return_val_if_fail(bmessage != NULL, FALSE);
 
-    if (bmessage->current_part == NULL
-        || (w = bmessage->current_part->mime_widget->widget) == NULL)
+    if (bmessage->current_part == NULL) {
         return FALSE;
+    }
 
-    return GTK_IS_EDITABLE(w) || GTK_IS_TEXT_VIEW(w)
+    widget = balsa_mime_widget_get_widget(bmessage->current_part->mime_widget);
+    if (widget == NULL) {
+        return FALSE;
+    }
+
+    return GTK_IS_EDITABLE(widget) || GTK_IS_TEXT_VIEW(widget)
 #ifdef    HAVE_HTML_WIDGET
-        || libbalsa_html_can_select(w)
+        || libbalsa_html_can_select(widget)
 #endif /* HAVE_HTML_WIDGET */
         ;
 }
@@ -2302,7 +2312,7 @@ balsa_message_grab_focus(BalsaMessage * bmessage)
     g_return_val_if_fail(bmessage != NULL, FALSE);
     g_return_val_if_fail(bmessage->current_part != NULL, FALSE);
 
-    widget = bmessage->current_part->mime_widget->widget;
+    widget = balsa_mime_widget_get_widget(bmessage->current_part->mime_widget);
     g_return_val_if_fail(widget != NULL, FALSE);
 
     gtk_widget_set_can_focus(widget, TRUE);
@@ -3224,17 +3234,17 @@ message_recheck_crypto_cb(GtkWidget * button, BalsaMessage * bm)
 void
 balsa_message_find_in_message(BalsaMessage * bm)
 {
-    GtkWidget *w;
+    GtkWidget *widget;
 
-    if (bm->current_part
-        && (w = bm->current_part->mime_widget->widget)
-        && (GTK_IS_TEXT_VIEW(w)
+    if (bm->current_part != NULL
+        && (widget = balsa_mime_widget_get_widget(bm->current_part->mime_widget)) != NULL
+        && (GTK_IS_TEXT_VIEW(widget)
 #ifdef HAVE_HTML_WIDGET
-            || libbalsa_html_can_search(w)
+            || libbalsa_html_can_search(widget)
 #endif                          /* HAVE_HTML_WIDGET */
             )) {
-        if (GTK_IS_TEXT_VIEW(w)) {
-            GtkTextView *text_view = (GtkTextView *) w;
+        if (GTK_IS_TEXT_VIEW(widget)) {
+            GtkTextView *text_view = (GtkTextView *) widget;
             GtkTextBuffer *buffer = gtk_text_view_get_buffer(text_view);
 
             gtk_text_buffer_get_start_iter(buffer, &bm->find_iter);

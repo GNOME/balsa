@@ -268,19 +268,22 @@ balsa_mime_widget_key_press_event(GtkWidget * widget, GdkEvent * event,
 void
 balsa_mime_widget_check_focus(GtkWidget * widget, GParamSpec * pspec, BalsaMessage * bm)
 {
+    GtkContainer *container =
+        GTK_CONTAINER(balsa_mime_widget_get_container(bm->bm_widget));
+
     if (gtk_widget_has_focus(widget)) {
         /* Disable can_focus on other message parts so that TAB does not
          * attempt to move the focus on them. */
         GList *list;
 
         list = g_list_append(NULL, widget);
-        gtk_container_set_focus_chain(GTK_CONTAINER(bm->bm_widget->container), list);
+        gtk_container_set_focus_chain(container, list);
         g_list_free(list);
 
         if (bm->focus_state == BALSA_MESSAGE_FOCUS_STATE_NO)
             bm->focus_state = BALSA_MESSAGE_FOCUS_STATE_YES;
     } else {
-        gtk_container_unset_focus_chain(GTK_CONTAINER(bm->bm_widget->container));
+        gtk_container_unset_focus_chain(container);
 
         if (bm->message != NULL) {
             if (bm->focus_state == BALSA_MESSAGE_FOCUS_STATE_HOLD) {

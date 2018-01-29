@@ -29,34 +29,12 @@ G_BEGIN_DECLS
 /*
  * GObject class definitions
  */
-#define BALSA_TYPE_MIME_WIDGET_IMAGE                                    \
-    (balsa_mime_widget_image_get_type())
 
-#define BALSA_MIME_WIDGET_IMAGE(obj)                                    \
-    (G_TYPE_CHECK_INSTANCE_CAST((obj),                                  \
-                                BALSA_TYPE_MIME_WIDGET_IMAGE,           \
-                                BalsaMimeWidgetImage))
+#define BALSA_TYPE_MIME_WIDGET_IMAGE balsa_mime_widget_image_get_type()
 
-#define BALSA_IS_MIME_WIDGET_IMAGE(obj)                                 \
-    (G_TYPE_CHECK_INSTANCE_TYPE((obj), BALSA_TYPE_MIME_WIDGET_IMAGE))
+G_DECLARE_FINAL_TYPE(BalsaMimeWidgetImage, balsa_mime_widget_image,
+                     BALSA, MIME_WIDGET_IMAGE, BalsaMimeWidget)
 
-#define BALSA_MIME_WIDGET_IMAGE_CLASS(klass)                            \
-    (G_TYPE_CHECK_CLASS_CAST((klass),                                   \
-                             BALSA_TYPE_MIME_WIDGET_IMAGE,              \
-                             BalsaMimeWidgetImageClass))
-
-#define BALSA_IS_MIME_WIDGET_IMAGE_CLASS(klass)                         \
-    (G_TYPE_CHECK_CLASS_TYPE((klass), BALSA_TYPE_MIME_WIDGET_IMAGE))
-
-#define BALSA_MIME_WIDGET_IMAGE_GET_CLASS(obj)                          \
-    (G_TYPE_INSTANCE_GET_CLASS((obj),                                   \
-                               BALSA_TYPE_MIME_WIDGET_IMAGE,            \
-                               BalsaMimeWidgetImageClass))
-
-GType balsa_mime_widget_image_get_type(void);
-
-typedef struct _BalsaMimeWidgetImage        BalsaMimeWidgetImage;
-typedef struct _BalsaMimeWidgetImageClass   BalsaMimeWidgetImageClass;
 /*
  * End of GObject class definitions
  */

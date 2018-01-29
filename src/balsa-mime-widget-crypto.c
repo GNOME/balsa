@@ -52,7 +52,9 @@ balsa_mime_widget_new_signature(BalsaMessage * bm,
 	return NULL;
 
     mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
-    mw->widget = balsa_mime_widget_signature_widget(mime_body, content_type);
+    balsa_mime_widget_set_widget(mw,
+                                 balsa_mime_widget_signature_widget(mime_body,
+                                                                    content_type));
     
     return mw;
 }
@@ -73,19 +75,26 @@ balsa_mime_widget_new_pgpkey(BalsaMessage        *bm,
 
     body_size = libbalsa_message_body_get_content(mime_body, &body_buf, &err);
     if (body_size < 0) {
-        balsa_information(LIBBALSA_INFORMATION_ERROR, _("Could not save a text part: %s"),
+        balsa_information(LIBBALSA_INFORMATION_ERROR,
+                          _("Could not save a text part: %s"),
                           err ? err->message : "Unknown error");
         g_clear_error(&err);
     } else {
-		mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
-		mw->widget = gtk_box_new(GTK_ORIENTATION_VERTICAL, BMW_VBOX_SPACE);
-		if (!create_import_keys_widget(GTK_BOX(mw->widget), body_buf, &err)) {
-            balsa_information(LIBBALSA_INFORMATION_ERROR, _("Could not process GnuPG keys: %s"),
-                              err ? err->message : "Unknown error");
+        GtkWidget *box;
+
+        mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
+        box = gtk_box_new(GTK_ORIENTATION_VERTICAL, BMW_VBOX_SPACE);
+        balsa_mime_widget_set_widget(mw, box);
+        if (!create_import_keys_widget(GTK_BOX(box), body_buf, &err)) {
+            balsa_information(LIBBALSA_INFORMATION_ERROR,
+                              _("Could not process GnuPG keys: %s"),
+                              err != NULL ? err->message : "Unknown error");
             g_clear_error(&err);
-            g_object_unref(G_OBJECT(mw));
+            g_object_ref_sink(box);
+            g_object_unref(box);
+            g_object_unref(mw);
             mw = NULL;
-		}
+        }
     	g_free(body_buf);
     }
 

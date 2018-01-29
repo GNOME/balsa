@@ -35,41 +35,42 @@ G_BEGIN_DECLS
 #define BMW_HEADER_MARGIN_LEFT       2
 #define BMW_HEADER_MARGIN_RIGHT     15
 
-
-#define BALSA_TYPE_MIME_WIDGET          (balsa_mime_widget_get_type ())
-#define BALSA_MIME_WIDGET(obj)          G_TYPE_CHECK_INSTANCE_CAST (obj, BALSA_TYPE_MIME_WIDGET, BalsaMimeWidget)
-#define BALSA_MIME_WIDGET_CLASS(klass)  G_TYPE_CHECK_CLASS_CAST (klass, BALSA_TYPE_MIME_WIDGET, BalsaMimeWidgetClass)
-#define BALSA_IS_MIME_WIDGET(obj)       G_TYPE_CHECK_INSTANCE_TYPE (obj, BALSA_TYPE_MIME_WIDGET)
-
-
-typedef struct _BalsaMimeWidgetClass BalsaMimeWidgetClass;
-
-
-struct _BalsaMimeWidget {
-    GObject parent;
-
-    /* display widget */
-    GtkWidget *widget;
-
-    /* container widget if more sub-parts can be added */
-    GtkWidget *container;
-
-    /* headers */
-    GtkWidget *header_widget;
-};
-
+/*
+ * GObject class definitions
+ */
 
 struct _BalsaMimeWidgetClass {
     GObjectClass parent;
 };
 
+#define BALSA_TYPE_MIME_WIDGET balsa_mime_widget_get_type()
 
-GType balsa_mime_widget_get_type (void);
+G_DECLARE_DERIVABLE_TYPE(BalsaMimeWidget, balsa_mime_widget, BALSA, MIME_WIDGET, GObject)
+
+/*
+ * Method definitions.
+ */
+
 BalsaMimeWidget *balsa_mime_widget_new(BalsaMessage * bm,
 				       LibBalsaMessageBody * mime_body,
 				       gpointer data);
 void balsa_mime_widget_schedule_resize(GtkWidget * widget);
 
+/*
+ * Getters
+ */
+
+GtkWidget *balsa_mime_widget_get_widget       (BalsaMimeWidget * mw);
+GtkWidget *balsa_mime_widget_get_container    (BalsaMimeWidget * mw);
+GtkWidget *balsa_mime_widget_get_header_widget(BalsaMimeWidget * mw);
+
+/*
+ * Setters
+ */
+
+void balsa_mime_widget_set_widget       (BalsaMimeWidget * mw, GtkWidget * widget);
+void balsa_mime_widget_set_container    (BalsaMimeWidget * mw, GtkWidget * widget);
+void balsa_mime_widget_set_header_widget(BalsaMimeWidget * mw, GtkWidget * widget);
 
 G_END_DECLS
 

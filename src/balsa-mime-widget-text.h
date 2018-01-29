@@ -29,12 +29,11 @@ G_BEGIN_DECLS
 /*
  * Type declaration.
  */
-GType balsa_mime_widget_text_get_type(void);
+
 #define BALSA_TYPE_MIME_WIDGET_TEXT balsa_mime_widget_text_get_type()
-#define BALSA_MIME_WIDGET_TEXT(obj) \
-    G_TYPE_CHECK_INSTANCE_CAST (obj, BALSA_TYPE_MIME_WIDGET_TEXT, BalsaMimeWidgetText)
-typedef struct _BalsaMimeWidgetText BalsaMimeWidgetText;
-typedef struct _BalsaMimeWidgetTextClass BalsaMimeWidgetTextClass;
+
+G_DECLARE_FINAL_TYPE(BalsaMimeWidgetText, balsa_mime_widget_text,
+                     BALSA, MIME_WIDGET_TEXT, BalsaMimeWidget)
 
 /*
  * Method definitions.

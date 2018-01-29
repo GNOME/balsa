@@ -44,6 +44,7 @@ balsa_mime_widget_new_vcalendar(BalsaMessage * bm,
 {
     LibBalsaVCal *vcal_obj;
     BalsaMimeWidget *mw;
+    GtkWidget *widget;
     GtkWidget *label;
     gchar *text;
     GList *l;
@@ -60,7 +61,8 @@ balsa_mime_widget_new_vcalendar(BalsaMessage * bm,
 	return NULL;
 
     mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
-    mw->widget = gtk_box_new(GTK_ORIENTATION_VERTICAL, 12);
+    widget = gtk_box_new(GTK_ORIENTATION_VERTICAL, 12);
+    balsa_mime_widget_set_widget(mw, widget);
 
     text = g_strdup_printf(_("This is an iTIP calendar “%s” message."),
 			   libbalsa_vcal_method_to_str(vcal_obj->method));
@@ -68,7 +70,7 @@ balsa_mime_widget_new_vcalendar(BalsaMessage * bm,
     g_free(text);
     gtk_widget_set_halign(label, GTK_ALIGN_START);
     gtk_widget_set_valign(label, GTK_ALIGN_START);
-    gtk_container_add(GTK_CONTAINER(mw->widget), label);
+    gtk_container_add(GTK_CONTAINER(widget), label);
 
     /* a reply may be created only for unread requests */
     if ((vcal_obj->method == ITIP_REQUEST) &&
@@ -92,7 +94,7 @@ balsa_mime_widget_new_vcalendar(BalsaMessage * bm,
 	GtkWidget *event =
 	    balsa_vevent_widget((LibBalsaVEvent *) l->data, may_reply,
 				sender);
-	gtk_container_add(GTK_CONTAINER(mw->widget), event);
+	gtk_container_add(GTK_CONTAINER(widget), event);
     }
 
     g_object_unref(vcal_obj);

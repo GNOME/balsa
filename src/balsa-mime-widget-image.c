@@ -109,7 +109,7 @@ balsa_mime_widget_new_image(BalsaMessage * bm,
                      G_CALLBACK(balsa_mime_widget_image_gesture_pressed_cb), data);
 
     mw = (BalsaMimeWidget *) g_object_new(BALSA_TYPE_MIME_WIDGET_IMAGE, NULL);
-    mw->widget = image;
+    balsa_mime_widget_set_widget(mw, image);
 
     return mw;
 }

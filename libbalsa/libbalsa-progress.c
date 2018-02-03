@@ -101,7 +101,7 @@ libbalsa_progress_dialog_ensure(ProgressDialog *progress_dialog,
 		dlgdata.id = progress_id;
 		dlgdata.done = FALSE;
 		g_cond_init(&dlgdata.cond);
-		gdk_threads_add_idle((GSourceFunc) libbalsa_progress_dialog_create_cb, &dlgdata);
+		g_idle_add((GSourceFunc) libbalsa_progress_dialog_create_cb, &dlgdata);
 
 		while (!dlgdata.done) {
 			g_cond_wait(&dlgdata.cond, &progress_dialog->mutex);
@@ -150,7 +150,7 @@ libbalsa_progress_dialog_update(ProgressDialog *progress_dialog,
 			update_data->finished = finished;
 			update_data->fraction = fraction;
 			update_data->message = real_msg;
-			gdk_threads_add_idle((GSourceFunc) libbalsa_progress_dialog_update_cb, update_data);
+			g_idle_add((GSourceFunc) libbalsa_progress_dialog_update_cb, update_data);
 		} else {
 			libbalsa_progress_dialog_update_real(progress_dialog, progress_id, finished, fraction, real_msg);
 			g_free(real_msg);
@@ -217,7 +217,7 @@ libbalsa_progress_dialog_create_cb(create_progress_dlg_t *dlg_data)
 	g_cond_signal(&dlg_data->cond);
 	g_mutex_unlock(&dlg_data->dialog->mutex);
 
-	return FALSE;
+	return G_SOURCE_REMOVE;
 }
 
 
@@ -352,7 +352,7 @@ libbalsa_progress_dialog_update_cb(update_progress_data_t *upd_data)
 	g_free(upd_data->id);
 	g_free(upd_data->message);
 	g_free(upd_data);
-	return FALSE;
+	return G_SOURCE_REMOVE;
 }
 
 

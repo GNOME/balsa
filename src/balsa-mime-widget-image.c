@@ -28,43 +28,6 @@
 #include "balsa-mime-widget-callbacks.h"
 #include <glib/gi18n.h>
 
-/*
- * GObject class definitions
- */
-struct _BalsaMimeWidgetImage {
-    BalsaMimeWidget  parent;
-};
-
-struct _BalsaMimeWidgetImageClass {
-    BalsaMimeWidgetClass parent;
-};
-
-G_DEFINE_TYPE(BalsaMimeWidgetImage,
-              balsa_mime_widget_image,
-              BALSA_TYPE_MIME_WIDGET);
-
-static void
-balsa_mime_widget_image_init(BalsaMimeWidgetImage * mwi)
-{
-}
-
-static void
-balsa_mime_widget_image_dispose(GObject * obj)
-{
-    (*G_OBJECT_CLASS(balsa_mime_widget_image_parent_class)->
-          dispose) (obj);
-}
-
-static void
-balsa_mime_widget_image_class_init(BalsaMimeWidgetImageClass * klass)
-{
-    GObjectClass *object_class = G_OBJECT_CLASS(klass);
-
-    object_class->dispose = balsa_mime_widget_image_dispose;
-}
-/*
- * End of GObject class definitions
- */
 
 static void balsa_mime_widget_image_gesture_pressed_cb(GtkGestureMultiPress *multi_press,
                                                        gint                  n_press,
@@ -108,7 +71,7 @@ balsa_mime_widget_new_image(BalsaMessage * bm,
     g_signal_connect(gesture, "pressed",
                      G_CALLBACK(balsa_mime_widget_image_gesture_pressed_cb), data);
 
-    mw = (BalsaMimeWidget *) g_object_new(BALSA_TYPE_MIME_WIDGET_IMAGE, NULL);
+    mw = (BalsaMimeWidget *) g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
     balsa_mime_widget_set_widget(mw, image);
 
     return mw;

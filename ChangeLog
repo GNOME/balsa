@@ -1,3 +1,10 @@
+2018-02-07  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Fix a use-after-free bug
+
+	* src/sendmsg-window.c (edit_with_gnome_check): unlink the file
+	before freeing its name.
+
 2018-01-26  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* meson.build: use Unicode quotation marks.

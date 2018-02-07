@@ -760,9 +760,9 @@ edit_with_gnome_check(gpointer data) {
         gtk_text_buffer_insert_at_cursor(buffer, line, -1);
     sw_buffer_signals_unblock(data_real->bsmsg, buffer);
 
-    g_free(data_real->filename);
     fclose(tmp);
     unlink(data_real->filename);
+    g_free(data_real->filename);
     gtk_widget_set_sensitive(data_real->bsmsg->text, TRUE);
     g_free(data);
 

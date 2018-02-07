@@ -1,5 +1,13 @@
 2018-02-07  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Fix two use-after-free false positives
+
+	* src/filter-edit-callbacks.c (change_filter_name): Use
+	g_list_delete_link() with a valid link instead of
+	g_list_remove() with the address of freed data.
+
+2018-02-07  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Fix a use-after-free bug
 
 	* src/sendmsg-window.c (edit_with_gnome_check): unlink the file

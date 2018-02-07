@@ -1664,7 +1664,7 @@ change_filter_name(gchar * old_name,gchar * new_name)
             if (new_name)
                 lst->data=g_strdup(new_name);
             else
-                new_filters_names=g_list_remove(new_filters_names,lst->data);
+                new_filters_names=g_list_delete_link(new_filters_names,lst);
             return;
         }
 	
@@ -1692,7 +1692,7 @@ change_filter_name(gchar * old_name,gchar * new_name)
 	    g_free(p->old_name);
 	    g_free(p);
             filters_names_changes=
-                g_list_remove(filters_names_changes,lst->data);
+                g_list_delete_link(filters_names_changes,lst);
             return;
         }
 

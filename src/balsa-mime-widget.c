@@ -66,9 +66,7 @@ balsa_mime_widget_class_init(BalsaMimeWidgetClass * klass)
 static void
 balsa_mime_widget_init(BalsaMimeWidget * self)
 {
-    BalsaMimeWidgetPrivate *priv =
-        G_TYPE_INSTANCE_GET_PRIVATE(self, BALSA_TYPE_MIME_WIDGET,
-                                    BalsaMimeWidgetPrivate);
+    BalsaMimeWidgetPrivate *priv = balsa_mime_widget_get_instance_private(self);
 
     priv->widget = NULL;
     priv->container = NULL;
@@ -132,9 +130,7 @@ balsa_mime_widget_new(BalsaMessage * bm, LibBalsaMessageBody * mime_body, gpoint
 	mw = balsa_mime_widget_new_unknown(bm, mime_body, content_type);
 
     if (mw != NULL) {
-        BalsaMimeWidgetPrivate *priv =
-            G_TYPE_INSTANCE_GET_PRIVATE(mw, BALSA_TYPE_MIME_WIDGET,
-                                        BalsaMimeWidgetPrivate);
+        BalsaMimeWidgetPrivate *priv = balsa_mime_widget_get_instance_private(mw);
 
 	if (priv->widget != NULL) {
 	    g_signal_connect(priv->widget, "notify::has-focus",
@@ -189,8 +185,7 @@ balsa_mime_widget_new_unknown(BalsaMessage * bm,
 
     g_return_val_if_fail(mime_body, NULL);
     mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
-    priv = G_TYPE_INSTANCE_GET_PRIVATE(mw, BALSA_TYPE_MIME_WIDGET,
-                                       BalsaMimeWidgetPrivate);
+    priv = balsa_mime_widget_get_instance_private(mw);
 
     priv->widget = gtk_box_new(GTK_ORIENTATION_VERTICAL, BMW_VBOX_SPACE);
     g_object_set(G_OBJECT(priv->widget), "margin", BMW_CONTAINER_BORDER, NULL);
@@ -332,9 +327,7 @@ vadj_change_cb(GtkAdjustment *vadj, GtkWidget *widget)
 GtkWidget *
 balsa_mime_widget_get_widget(BalsaMimeWidget * mw)
 {
-    BalsaMimeWidgetPrivate *priv =
-        G_TYPE_INSTANCE_GET_PRIVATE(mw, BALSA_TYPE_MIME_WIDGET,
-                                    BalsaMimeWidgetPrivate);
+    BalsaMimeWidgetPrivate *priv = balsa_mime_widget_get_instance_private(mw);
 
     return priv->widget;
 }
@@ -342,9 +335,7 @@ balsa_mime_widget_get_widget(BalsaMimeWidget * mw)
 GtkWidget *
 balsa_mime_widget_get_container(BalsaMimeWidget * mw)
 {
-    BalsaMimeWidgetPrivate *priv =
-        G_TYPE_INSTANCE_GET_PRIVATE(mw, BALSA_TYPE_MIME_WIDGET,
-                                    BalsaMimeWidgetPrivate);
+    BalsaMimeWidgetPrivate *priv = balsa_mime_widget_get_instance_private(mw);
 
     return priv->container;
 }
@@ -352,9 +343,7 @@ balsa_mime_widget_get_container(BalsaMimeWidget * mw)
 GtkWidget *
 balsa_mime_widget_get_header_widget(BalsaMimeWidget * mw)
 {
-    BalsaMimeWidgetPrivate *priv =
-        G_TYPE_INSTANCE_GET_PRIVATE(mw, BALSA_TYPE_MIME_WIDGET,
-                                    BalsaMimeWidgetPrivate);
+    BalsaMimeWidgetPrivate *priv = balsa_mime_widget_get_instance_private(mw);
 
     return priv->header_widget;
 }
@@ -366,9 +355,7 @@ balsa_mime_widget_get_header_widget(BalsaMimeWidget * mw)
 void
 balsa_mime_widget_set_widget(BalsaMimeWidget * mw, GtkWidget * widget)
 {
-    BalsaMimeWidgetPrivate *priv =
-        G_TYPE_INSTANCE_GET_PRIVATE(mw, BALSA_TYPE_MIME_WIDGET,
-                                    BalsaMimeWidgetPrivate);
+    BalsaMimeWidgetPrivate *priv = balsa_mime_widget_get_instance_private(mw);
 
     priv->widget = widget;
 }
@@ -376,9 +363,7 @@ balsa_mime_widget_set_widget(BalsaMimeWidget * mw, GtkWidget * widget)
 void
 balsa_mime_widget_set_container(BalsaMimeWidget * mw, GtkWidget * widget)
 {
-    BalsaMimeWidgetPrivate *priv =
-        G_TYPE_INSTANCE_GET_PRIVATE(mw, BALSA_TYPE_MIME_WIDGET,
-                                    BalsaMimeWidgetPrivate);
+    BalsaMimeWidgetPrivate *priv = balsa_mime_widget_get_instance_private(mw);
 
     priv->container = widget;
 }
@@ -386,9 +371,7 @@ balsa_mime_widget_set_container(BalsaMimeWidget * mw, GtkWidget * widget)
 void
 balsa_mime_widget_set_header_widget(BalsaMimeWidget * mw, GtkWidget * widget)
 {
-    BalsaMimeWidgetPrivate *priv =
-        G_TYPE_INSTANCE_GET_PRIVATE(mw, BALSA_TYPE_MIME_WIDGET,
-                                    BalsaMimeWidgetPrivate);
+    BalsaMimeWidgetPrivate *priv = balsa_mime_widget_get_instance_private(mw);
 
     priv->header_widget = widget;
 }

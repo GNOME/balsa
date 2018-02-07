@@ -1,5 +1,9 @@
 2018-02-07  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	* libbalsa/mailbox.c (lbm_sort): check for zero-length array.
+
+2018-02-07  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Fix two use-after-free false positives
 
 	* src/filter-edit-callbacks.c (change_filter_name): Use

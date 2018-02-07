@@ -3370,13 +3370,10 @@ lbm_has_valid_index_entry(LibBalsaMailbox * mailbox, guint msgno)
 static void
 lbm_sort(LibBalsaMailbox * mbox, GNode * parent)
 {
-    GtkTreeIter iter;
     GArray *sort_array;
     GPtrArray *node_array;
     GNode *node, *tmp_node, *prev;
     guint i, j;
-    gint *new_order;
-    GtkTreePath *path;
     gboolean sort_no = mbox->view->sort_field == LB_MAILBOX_SORT_NO;
 #if !defined(LOCAL_MAILBOX_SORTED_JUST_ONCE_ON_OPENING)
     gboolean can_sort_all = sort_no || LIBBALSA_IS_MAILBOX_IMAP(mbox);
@@ -3444,24 +3441,31 @@ lbm_sort(LibBalsaMailbox * mbox, GNode * parent)
         prev->next = NULL;
 
     /* Let the world know about our new order */
-    new_order = g_new(gint, node_array->len);
-    i = j = 0;
-    for (tmp_node = node; tmp_node; tmp_node = tmp_node->next) {
-        guint msgno = GPOINTER_TO_UINT(tmp_node->data);
-        new_order[j] = can_sort_all || lbm_has_valid_index_entry(mbox, msgno)
-            ? g_array_index(sort_array, SortTuple, i++).offset
-            : j;
-        j++;
+    if (node_array->len > 0) {
+        gint *new_order;
+        GtkTreeIter iter;
+        GtkTreePath *path;
+
+        new_order = g_new(gint, node_array->len);
+        i = j = 0;
+        for (tmp_node = node; tmp_node; tmp_node = tmp_node->next) {
+            guint msgno = GPOINTER_TO_UINT(tmp_node->data);
+            new_order[j] = can_sort_all || lbm_has_valid_index_entry(mbox, msgno)
+                ? g_array_index(sort_array, SortTuple, i++).offset
+                : j;
+            j++;
+        }
+
+        iter.stamp = mbox->stamp;
+        iter.user_data = parent;
+        path = parent->parent ? mbox_model_get_path(GTK_TREE_MODEL(mbox), &iter)
+                              : gtk_tree_path_new();
+        gtk_tree_model_rows_reordered(GTK_TREE_MODEL(mbox),
+                                      path, &iter, new_order);
+        gtk_tree_path_free(path);
+        g_free(new_order);
     }
 
-    iter.stamp = mbox->stamp;
-    iter.user_data = parent;
-    path = parent->parent ? mbox_model_get_path(GTK_TREE_MODEL(mbox), &iter)
-                          : gtk_tree_path_new();
-    g_signal_emit(mbox, libbalsa_mbox_model_signals[ROWS_REORDERED], 0,
-                                  path, &iter, new_order);
-    gtk_tree_path_free(path);
-    g_free(new_order);
     g_array_free(sort_array, TRUE);
     g_ptr_array_free(node_array, TRUE);
 

@@ -2280,8 +2280,8 @@ libbalsa_mailbox_view_new(void)
 {
     LibBalsaMailboxView *view;
 
-    view = g_memdup(&libbalsa_mailbox_view_default,
-		    sizeof libbalsa_mailbox_view_default);
+    view = g_new(LibBalsaMailboxView, 1);
+    *view = libbalsa_mailbox_view_default;
 
     return view;
 }

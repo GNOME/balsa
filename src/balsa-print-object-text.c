@@ -917,17 +917,18 @@ collect_attrs(GList * all_attr, guint offset, guint len)
 	     && region->start_index <= offset + len)
 	    || (region->end_index >= offset
 		&& region->end_index <= offset + len)) {
+            /* scan-build does not see this as initializing this_reg:
 	    PhraseRegion *this_reg =
 		g_memdup(region, sizeof(PhraseRegion));
+             */
+            PhraseRegion *this_reg;
 
-	    if (this_reg->start_index < offset)
-		this_reg->start_index = 0;
-	    else
-		this_reg->start_index -= offset;
-	    if (this_reg->end_index > offset + len)
-		this_reg->end_index = len;
-	    else
-		this_reg->end_index -= offset;
+            this_reg = g_new(PhraseRegion, 1);
+            *this_reg = *region;
+
+            this_reg->start_index = MAX(0,   this_reg->start_index - offset);
+            this_reg->end_index   = MIN(len, this_reg->end_index   - offset);
+
 	    attr = g_list_prepend(attr, this_reg);
 	}
 	all_attr = all_attr->next;

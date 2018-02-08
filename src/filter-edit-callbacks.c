@@ -1719,6 +1719,7 @@ fe_new_pressed(GtkWidget * widget, gpointer data)
 
     if (filter_errno!=FILTER_NOERR) {
         filter_perror(filter_strerror(filter_errno));
+        g_free(new_item);
         return;
     }
 
@@ -1737,7 +1738,8 @@ fe_new_pressed(GtkWidget * widget, gpointer data)
     gtk_tree_selection_select_iter(selection, &iter);
 
     /* Adds "New Filter" to the list of actual new filters names */
-    new_filters_names=g_list_prepend(new_filters_names,g_strdup(new_item));
+    /* new_filters_names takes ownership of new_item */
+    new_filters_names=g_list_prepend(new_filters_names, new_item);
     gtk_widget_grab_focus(fe_name_entry);
 }                       /* end fe_new_pressed() */
 

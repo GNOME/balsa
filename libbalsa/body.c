@@ -592,6 +592,7 @@ libbalsa_message_body_get_stream(LibBalsaMessageBody * body, GError **err)
         return NULL;
     }
 
+    g_assert(GMIME_PART_GET_CLASS(body->mime_part) != NULL);
     if (!(GMIME_IS_PART(body->mime_part)
           || GMIME_IS_MESSAGE_PART(body->mime_part))) {
         if (err != NULL && *err == NULL) {

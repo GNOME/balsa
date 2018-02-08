@@ -155,6 +155,7 @@ libbalsa_address_book_load(LibBalsaAddressBook * ab,
                            gpointer closure)
 {
     g_return_val_if_fail(LIBBALSA_IS_ADDRESS_BOOK(ab), LBABERR_OK);
+    g_assert(LIBBALSA_ADDRESS_BOOK_GET_CLASS(ab) != NULL);
 
     return LIBBALSA_ADDRESS_BOOK_GET_CLASS(ab)->load(ab, filter, callback,
                                                      closure);
@@ -166,6 +167,7 @@ libbalsa_address_book_add_address(LibBalsaAddressBook * ab,
 {
     g_return_val_if_fail(LIBBALSA_IS_ADDRESS_BOOK(ab), LBABERR_OK);
     g_return_val_if_fail(LIBBALSA_IS_ADDRESS(address), LBABERR_OK);
+    g_assert(LIBBALSA_ADDRESS_BOOK_GET_CLASS(ab) != NULL);
 
     return LIBBALSA_ADDRESS_BOOK_GET_CLASS(ab)->add_address(ab, address);
 }
@@ -176,6 +178,7 @@ libbalsa_address_book_remove_address(LibBalsaAddressBook * ab,
 {
     g_return_val_if_fail(LIBBALSA_IS_ADDRESS_BOOK(ab), LBABERR_OK);
     g_return_val_if_fail(LIBBALSA_IS_ADDRESS(address), LBABERR_OK);
+    g_assert(LIBBALSA_ADDRESS_BOOK_GET_CLASS(ab) != NULL);
 
     return LIBBALSA_ADDRESS_BOOK_GET_CLASS(ab)->remove_address(ab,
                                                                address);
@@ -190,6 +193,7 @@ libbalsa_address_book_modify_address(LibBalsaAddressBook * ab,
 
     g_return_val_if_fail(LIBBALSA_IS_ADDRESS_BOOK(ab), LBABERR_OK);
     g_return_val_if_fail(LIBBALSA_IS_ADDRESS(address), LBABERR_OK);
+    g_assert(LIBBALSA_ADDRESS_BOOK_GET_CLASS(ab) != NULL);
 
     res =
         LIBBALSA_ADDRESS_BOOK_GET_CLASS(ab)->modify_address(ab, address,
@@ -214,6 +218,7 @@ libbalsa_address_book_save_config(LibBalsaAddressBook * ab,
                                   const gchar * group)
 {
     g_return_if_fail(LIBBALSA_IS_ADDRESS_BOOK(ab));
+    g_assert(LIBBALSA_ADDRESS_BOOK_GET_CLASS(ab) != NULL);
 
     libbalsa_conf_private_remove_group(group);
     libbalsa_conf_remove_group(group);
@@ -228,6 +233,7 @@ libbalsa_address_book_load_config(LibBalsaAddressBook * ab,
 				  const gchar * group)
 {
     g_return_if_fail(LIBBALSA_IS_ADDRESS_BOOK(ab));
+    g_assert(LIBBALSA_ADDRESS_BOOK_GET_CLASS(ab) != NULL);
 
     libbalsa_conf_push_group(group);
     LIBBALSA_ADDRESS_BOOK_GET_CLASS(ab)->load_config(ab, group);
@@ -242,6 +248,7 @@ libbalsa_address_book_alias_complete(LibBalsaAddressBook * ab,
                                      const gchar * prefix)
 {
     g_return_val_if_fail(LIBBALSA_IS_ADDRESS_BOOK(ab), NULL);
+    g_assert(LIBBALSA_ADDRESS_BOOK_GET_CLASS(ab) != NULL);
 
     return LIBBALSA_ADDRESS_BOOK_GET_CLASS(ab)->alias_complete(ab, prefix);
 }
@@ -260,6 +267,7 @@ libbalsa_address_book_real_save_config(LibBalsaAddressBook * ab,
 				       const gchar * group)
 {
     g_return_if_fail(LIBBALSA_IS_ADDRESS_BOOK(ab));
+    g_assert(LIBBALSA_ADDRESS_BOOK_GET_CLASS(ab) != NULL);
 
     libbalsa_conf_set_string("Type", g_type_name(G_OBJECT_TYPE(ab)));
     libbalsa_conf_set_string("Name", ab->name);

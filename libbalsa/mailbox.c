@@ -510,12 +510,14 @@ libbalsa_mailbox_new_from_config(const gchar * group)
                                  _("Bad local mailbox path “%s”"), path);
     }
     mailbox = (type != G_TYPE_OBJECT ? g_object_new(type, NULL) : NULL);
-    if (mailbox == NULL)
+    if (mailbox == NULL) {
         libbalsa_information(LIBBALSA_INFORMATION_WARNING,
                              _("Could not create a mailbox of type %s"),
                              type_str);
-    else
+    } else {
+        g_assert(LIBBALSA_MAILBOX_GET_CLASS(mailbox) != NULL);
 	LIBBALSA_MAILBOX_GET_CLASS(mailbox)->load_config(mailbox, group);
+    }
 
     libbalsa_conf_pop_group();
     g_free(type_str);
@@ -546,6 +548,7 @@ libbalsa_mailbox_open(LibBalsaMailbox * mailbox, GError **err)
 
     g_return_val_if_fail(mailbox != NULL, FALSE);
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
+    g_assert(LIBBALSA_MAILBOX_GET_CLASS(mailbox) != NULL);
 
     libbalsa_lock_mailbox(mailbox);
 
@@ -606,6 +609,7 @@ libbalsa_mailbox_close(LibBalsaMailbox * mailbox, gboolean expunge)
     g_return_if_fail(mailbox != NULL);
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
     g_return_if_fail(MAILBOX_OPEN(mailbox));
+    g_assert(LIBBALSA_MAILBOX_GET_CLASS(mailbox) != NULL);
 
     g_object_ref(mailbox);
     libbalsa_lock_mailbox(mailbox);
@@ -672,6 +676,7 @@ libbalsa_mailbox_check(LibBalsaMailbox * mailbox)
 {
     g_return_if_fail(mailbox != NULL);
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
+    g_assert(LIBBALSA_MAILBOX_GET_CLASS(mailbox) != NULL);
 
     libbalsa_lock_mailbox(mailbox);
 
@@ -750,6 +755,7 @@ libbalsa_mailbox_message_match(LibBalsaMailbox * mailbox,
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
     g_return_val_if_fail(msgno <= libbalsa_mailbox_total_messages(mailbox),
                          FALSE);
+    g_assert(LIBBALSA_MAILBOX_GET_CLASS(mailbox) != NULL);
 
     if (libbalsa_condition_is_flag_only(search_iter->condition,
                                         mailbox, msgno, &match))
@@ -773,6 +779,7 @@ libbalsa_mailbox_can_match(LibBalsaMailbox * mailbox,
 {
     g_return_val_if_fail(mailbox != NULL, FALSE);
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
+    g_assert(LIBBALSA_MAILBOX_GET_CLASS(mailbox) != NULL);
 
     return LIBBALSA_MAILBOX_GET_CLASS(mailbox)->can_match(mailbox,
                                                           condition);
@@ -900,6 +907,7 @@ libbalsa_mailbox_save_config(LibBalsaMailbox * mailbox,
 {
     g_return_if_fail(mailbox != NULL);
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
+    g_assert(LIBBALSA_MAILBOX_GET_CLASS(mailbox) != NULL);
 
     /* These are incase this section was used for another
      * type of mailbox that has now been deleted...
@@ -938,10 +946,12 @@ copy_iterator(LibBalsaMessageFlag *flags, GMimeStream **stream, void * arg)
     gboolean (*msgno_has_flags)(LibBalsaMailbox *, guint,
 				LibBalsaMessageFlag, LibBalsaMessageFlag);
     LibBalsaMailbox *mailbox = mcd->src_mailbox;
-	
+
+    g_assert(LIBBALSA_MAILBOX_GET_CLASS(mailbox) != NULL);
+
     if(mcd->current_idx >= mcd->msgnos->len)
 	return FALSE; /* no more messages */
-	
+
     g_clear_object(&mcd->stream);
     msgno_has_flags = LIBBALSA_MAILBOX_GET_CLASS(mailbox)->msgno_has_flags;
     msgno = g_array_index(mcd->msgnos, guint, mcd->current_idx);
@@ -991,6 +1001,7 @@ libbalsa_mailbox_real_messages_copy(LibBalsaMailbox * mailbox,
 
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(dest), FALSE);
+    g_assert(LIBBALSA_MAILBOX_GET_CLASS(dest) != NULL);
     g_return_val_if_fail(dest != mailbox, FALSE);
 
     text = g_strdup_printf(_("Copying from %s to %s"), mailbox->name,
@@ -1037,9 +1048,10 @@ libbalsa_mailbox_real_save_config(LibBalsaMailbox * mailbox,
                                   const gchar * group)
 {
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
+    g_assert(LIBBALSA_MAILBOX_GET_CLASS(mailbox) != NULL);
 
     libbalsa_conf_set_string("Type",
-                            g_type_name(G_OBJECT_TYPE(mailbox)));
+                             g_type_name(G_OBJECT_TYPE(mailbox)));
     libbalsa_conf_set_string("Name", mailbox->name);
 }
 
@@ -1784,6 +1796,7 @@ libbalsa_mailbox_add_message(LibBalsaMailbox * mailbox,
     guint retval;
     struct AddMessageData amd;
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
+    g_assert(LIBBALSA_MAILBOX_GET_CLASS(mailbox) != NULL);
 
     libbalsa_lock_mailbox(mailbox);
 
@@ -1815,6 +1828,7 @@ libbalsa_mailbox_add_messages(LibBalsaMailbox * mailbox,
     guint retval;
 
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
+    g_assert(LIBBALSA_MAILBOX_GET_CLASS(mailbox) != NULL);
 
     libbalsa_lock_mailbox(mailbox);
 
@@ -1844,6 +1858,7 @@ libbalsa_mailbox_close_backend(LibBalsaMailbox * mailbox)
 {
     g_return_val_if_fail(mailbox != NULL, FALSE);
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
+    g_assert(LIBBALSA_MAILBOX_GET_CLASS(mailbox) != NULL);
 
     return LIBBALSA_MAILBOX_GET_CLASS(mailbox)->close_backend(mailbox);
 }
@@ -1853,6 +1868,7 @@ libbalsa_mailbox_total_messages(LibBalsaMailbox * mailbox)
 {
     g_return_val_if_fail(mailbox != NULL, 0);
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), 0);
+    g_assert(LIBBALSA_MAILBOX_GET_CLASS(mailbox) != NULL);
 
     return LIBBALSA_MAILBOX_GET_CLASS(mailbox)->total_messages(mailbox);
 }
@@ -1865,6 +1881,7 @@ libbalsa_mailbox_sync_storage(LibBalsaMailbox * mailbox, gboolean expunge)
     g_return_val_if_fail(mailbox != NULL, FALSE);
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
     g_return_val_if_fail(!mailbox->readonly, TRUE);
+    g_assert(LIBBALSA_MAILBOX_GET_CLASS(mailbox) != NULL);
 
     libbalsa_lock_mailbox(mailbox);
 
@@ -1907,6 +1924,7 @@ libbalsa_mailbox_get_message(LibBalsaMailbox * mailbox, guint msgno)
 
     g_return_val_if_fail(mailbox != NULL, NULL);
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), NULL);
+    g_assert(LIBBALSA_MAILBOX_GET_CLASS(mailbox) != NULL);
 
     libbalsa_lock_mailbox(mailbox);
 
@@ -1939,6 +1957,7 @@ libbalsa_mailbox_prepare_threading(LibBalsaMailbox * mailbox, guint start)
 {
     g_return_val_if_fail(mailbox != NULL, FALSE);
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
+    g_assert(LIBBALSA_MAILBOX_GET_CLASS(mailbox) != NULL);
 
     return LIBBALSA_MAILBOX_GET_CLASS(mailbox)->prepare_threading(mailbox,
                                                                   start);
@@ -1952,6 +1971,7 @@ libbalsa_mailbox_fetch_message_structure(LibBalsaMailbox *mailbox,
     g_return_val_if_fail(mailbox != NULL, FALSE);
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
     g_return_val_if_fail(message != NULL, FALSE);
+    g_assert(LIBBALSA_MAILBOX_GET_CLASS(mailbox) != NULL);
 
     return LIBBALSA_MAILBOX_GET_CLASS(mailbox)
         ->fetch_message_structure(mailbox, message, flags);
@@ -1966,9 +1986,9 @@ libbalsa_mailbox_release_message(LibBalsaMailbox * mailbox,
     g_return_if_fail(message != NULL);
     g_return_if_fail(LIBBALSA_IS_MESSAGE(message));
     g_return_if_fail(mailbox == message->mailbox);
+    g_assert(LIBBALSA_MAILBOX_GET_CLASS(mailbox) != NULL);
 
-    LIBBALSA_MAILBOX_GET_CLASS(mailbox)
-        ->release_message(mailbox, message);
+    LIBBALSA_MAILBOX_GET_CLASS(mailbox)->release_message(mailbox, message);
 }
 
 void
@@ -1978,6 +1998,7 @@ libbalsa_mailbox_set_msg_headers(LibBalsaMailbox *mailbox,
     g_return_if_fail(mailbox != NULL);
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
     g_return_if_fail(message != NULL);
+    g_assert(LIBBALSA_MAILBOX_GET_CLASS(mailbox) != NULL);
 
     if(!message->has_all_headers) {
         LIBBALSA_MAILBOX_GET_CLASS(mailbox)->fetch_headers(mailbox, message);
@@ -1993,6 +2014,7 @@ libbalsa_mailbox_get_message_part(LibBalsaMessage    *message,
     g_return_val_if_fail(message != NULL, FALSE);
     g_return_val_if_fail(message->mailbox != NULL, FALSE);
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(message->mailbox), FALSE);
+    g_assert(LIBBALSA_MAILBOX_GET_CLASS(message->mailbox) != NULL);
     g_return_val_if_fail(part != NULL, FALSE);
 
     return LIBBALSA_MAILBOX_GET_CLASS(message->mailbox)
@@ -2006,6 +2028,7 @@ libbalsa_mailbox_get_message_stream(LibBalsaMailbox * mailbox, guint msgno,
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), NULL);
     g_return_val_if_fail(msgno <= libbalsa_mailbox_total_messages(mailbox),
                          NULL);
+    g_assert(LIBBALSA_MAILBOX_GET_CLASS(mailbox) != NULL);
 
     return LIBBALSA_MAILBOX_GET_CLASS(mailbox)->get_message_stream(mailbox,
                                                                    msgno,
@@ -2026,6 +2049,7 @@ libbalsa_mailbox_messages_change_flags(LibBalsaMailbox * mailbox,
     gboolean real_flag;
 
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
+    g_assert(LIBBALSA_MAILBOX_GET_CLASS(mailbox) != NULL);
 
     real_flag = (set | clear) & LIBBALSA_MESSAGE_FLAGS_REAL;
     g_return_val_if_fail(!mailbox->readonly || !real_flag, FALSE);
@@ -2088,10 +2112,10 @@ libbalsa_mailbox_messages_copy(LibBalsaMailbox * mailbox, GArray * msgnos,
 
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
     g_return_val_if_fail(msgnos->len > 0, TRUE);
+    g_assert(LIBBALSA_MAILBOX_GET_CLASS(mailbox) != NULL);
 
     libbalsa_lock_mailbox(mailbox);
-    retval = LIBBALSA_MAILBOX_GET_CLASS(mailbox)->
-	messages_copy(mailbox, msgnos, dest, err);
+    retval = LIBBALSA_MAILBOX_GET_CLASS(mailbox)->messages_copy(mailbox, msgnos, dest, err);
     libbalsa_unlock_mailbox(mailbox);
 
     return retval;
@@ -2140,6 +2164,8 @@ libbalsa_mailbox_set_view_filter(LibBalsaMailbox *mailbox,
 {
     gboolean retval = FALSE;
 
+    g_assert(LIBBALSA_MAILBOX_GET_CLASS(mailbox) != NULL);
+
     libbalsa_lock_mailbox(mailbox);
 
     if (!libbalsa_condition_compare(mailbox->view_filter, cond))
@@ -2176,6 +2202,7 @@ libbalsa_mailbox_msgno_has_flags(LibBalsaMailbox * mailbox, guint msgno,
 {
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
     g_return_val_if_fail(msgno > 0, FALSE);
+    g_assert(LIBBALSA_MAILBOX_GET_CLASS(mailbox) != NULL);
 
     return LIBBALSA_MAILBOX_GET_CLASS(mailbox)->msgno_has_flags(mailbox,
                                                                 msgno, set,
@@ -2197,6 +2224,8 @@ gboolean
 libbalsa_mailbox_can_do(LibBalsaMailbox *mailbox,
                         enum LibBalsaMailboxCapability cap)
 {
+    g_assert(LIBBALSA_MAILBOX_GET_CLASS(mailbox) != NULL);
+
     return LIBBALSA_MAILBOX_GET_CLASS(mailbox)->can_do(mailbox, cap);
 }
 
@@ -2224,6 +2253,8 @@ static gboolean
 lbm_set_threading(LibBalsaMailbox * mailbox,
                   LibBalsaMailboxThreadingType thread_type)
 {
+    g_assert(LIBBALSA_MAILBOX_GET_CLASS(mailbox) != NULL);
+
     if (!MAILBOX_OPEN(mailbox))
         return FALSE;
 
@@ -3380,6 +3411,9 @@ lbm_sort(LibBalsaMailbox * mbox, GNode * parent)
 #else
     gboolean can_sort_all = 1;
 #endif
+
+    g_assert(LIBBALSA_MAILBOX_GET_CLASS(mbox) != NULL);
+
     node = parent->children;
     if (!node)
         return;
@@ -4209,6 +4243,8 @@ libbalsa_mailbox_search_iter_step(LibBalsaMailbox * mailbox,
 gboolean
 libbalsa_mailbox_can_move_duplicates(LibBalsaMailbox * mailbox)
 {
+    g_assert(LIBBALSA_MAILBOX_GET_CLASS(mailbox) != NULL);
+
     return LIBBALSA_MAILBOX_GET_CLASS(mailbox)->duplicate_msgnos != NULL;
 }
 
@@ -4218,6 +4254,8 @@ libbalsa_mailbox_move_duplicates(LibBalsaMailbox * mailbox,
 {
     GArray *msgnos = NULL;
     gint retval;
+
+    g_assert(LIBBALSA_MAILBOX_GET_CLASS(mailbox) != NULL);
 
     if (libbalsa_mailbox_can_move_duplicates(mailbox))
         msgnos =
@@ -4251,15 +4289,21 @@ libbalsa_mailbox_move_duplicates(LibBalsaMailbox * mailbox,
 void 
 libbalsa_mailbox_lock_store(LibBalsaMailbox * mailbox)
 {
-    if (mailbox)
+    if (mailbox != NULL) {
+        g_assert(LIBBALSA_MAILBOX_GET_CLASS(mailbox) != NULL);
+
         LIBBALSA_MAILBOX_GET_CLASS(mailbox)->lock_store(mailbox, TRUE);
+    }
 }
 
 void 
 libbalsa_mailbox_unlock_store(LibBalsaMailbox * mailbox)
 {
-    if (mailbox)
+    if (mailbox != NULL) {
+        g_assert(LIBBALSA_MAILBOX_GET_CLASS(mailbox) != NULL);
+
         LIBBALSA_MAILBOX_GET_CLASS(mailbox)->lock_store(mailbox, FALSE);
+    }
 }
 
 void
@@ -4323,5 +4367,7 @@ void libbalsa_mailbox_test_can_reach(LibBalsaMailbox          * mailbox,
                                      LibBalsaCanReachCallback * cb,
                                      gpointer                   cb_data)
 {
+    g_assert(LIBBALSA_MAILBOX_GET_CLASS(mailbox) != NULL);
+
     LIBBALSA_MAILBOX_GET_CLASS(mailbox)->test_can_reach(mailbox, cb, cb_data);
 }

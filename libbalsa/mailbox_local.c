@@ -271,6 +271,7 @@ void
 libbalsa_mailbox_local_remove_files(LibBalsaMailboxLocal * local)
 {
     g_return_if_fail(LIBBALSA_IS_MAILBOX_LOCAL(local));
+    g_assert(LIBBALSA_MAILBOX_LOCAL_GET_CLASS(local) != NULL);
 
     LIBBALSA_MAILBOX_LOCAL_GET_CLASS(local)->remove_files(local);
 }
@@ -532,6 +533,8 @@ lbm_local_save_tree(LibBalsaMailboxLocal * local)
     LibBalsaMailboxLocalSaveTreeInfo save_info;
     GError *err = NULL;
 
+    g_assert(LIBBALSA_MAILBOX_LOCAL_GET_CLASS(local) != NULL);
+
     if (!mailbox->msg_tree || !mailbox->msg_tree_changed)
         return;
     mailbox->msg_tree_changed = FALSE;
@@ -587,6 +590,8 @@ lbm_local_restore_tree(LibBalsaMailboxLocal * local, guint * total)
     guint8 *seen;
     LibBalsaMailboxLocalMessageInfo *(*get_info) (LibBalsaMailboxLocal *,
                                                   guint);
+
+    g_assert(LIBBALSA_MAILBOX_LOCAL_GET_CLASS(local) != NULL);
 
     filename = lbm_local_get_cache_filename(local);
     name = mailbox->name ? g_strdup(mailbox->name) :
@@ -790,8 +795,10 @@ static LibBalsaMessage *
 libbalsa_mailbox_local_get_message(LibBalsaMailbox * mailbox, guint msgno)
 {
     LibBalsaMailboxLocal *local = LIBBALSA_MAILBOX_LOCAL(mailbox);
-    LibBalsaMailboxLocalMessageInfo *msg_info =
-        LIBBALSA_MAILBOX_LOCAL_GET_CLASS(local)->get_info(local, msgno);
+    LibBalsaMailboxLocalMessageInfo *msg_info;
+
+    g_assert(LIBBALSA_MAILBOX_LOCAL_GET_CLASS(local) != NULL);
+    msg_info = LIBBALSA_MAILBOX_LOCAL_GET_CLASS(local)->get_info(local, msgno);
 
     if (msg_info->message)
         return g_object_ref(msg_info->message);
@@ -1028,11 +1035,12 @@ lbml_load_messages_idle_cb(LibBalsaMailbox * mailbox)
     LibBalsaMailboxLocal *local;
     guint lastno;
     GNode *lastn;
-    LibBalsaMailboxLocalMessageInfo *(*get_info) (LibBalsaMailboxLocal *,
-                                                  guint);
+    LibBalsaMailboxLocalMessageInfo *(*get_info) (LibBalsaMailboxLocal *, guint);
+
+    local = (LibBalsaMailboxLocal *) mailbox;
+    g_assert(LIBBALSA_MAILBOX_LOCAL_GET_CLASS(local) != NULL);
 
     libbalsa_lock_mailbox(mailbox);
-    local = (LibBalsaMailboxLocal *) mailbox;
     local->load_messages_id = 0;
 
     if (!mailbox->msg_tree) {
@@ -2175,6 +2183,8 @@ lbm_local_sync_queue(LibBalsaMailboxLocal * local)
 static void
 lbm_local_sort(LibBalsaMailbox * mailbox, GArray *sort_array)
 {
+    g_assert(LIBBALSA_MAILBOX_CLASS(parent_class) != NULL);
+
     LIBBALSA_MAILBOX_CLASS(parent_class)->sort(mailbox, sort_array);
     lbm_local_queue_save_tree(LIBBALSA_MAILBOX_LOCAL(mailbox));
 }
@@ -2192,6 +2202,8 @@ libbalsa_mailbox_local_add_messages(LibBalsaMailbox          * mailbox,
     LibBalsaMailboxLocalAddMessageFunc *add_message;
 
     local = LIBBALSA_MAILBOX_LOCAL(mailbox);
+    g_assert(LIBBALSA_MAILBOX_LOCAL_GET_CLASS(local) != NULL);
+
     cnt = 0;
     add_message = LIBBALSA_MAILBOX_LOCAL_GET_CLASS(local)->add_message;
     while (msg_iterator(&flag, &stream, iter_data)) {
@@ -2217,11 +2229,13 @@ libbalsa_mailbox_local_messages_change_flags(LibBalsaMailbox * mailbox,
                                              LibBalsaMessageFlag clear)
 {
     LibBalsaMailboxLocal *local = LIBBALSA_MAILBOX_LOCAL(mailbox);
-    LibBalsaMailboxLocalMessageInfo *(*get_info) (LibBalsaMailboxLocal *,
-                                                  guint) =
-        LIBBALSA_MAILBOX_LOCAL_GET_CLASS(local)->get_info;
+    LibBalsaMailboxLocalMessageInfo *(*get_info) (LibBalsaMailboxLocal *, guint);
     guint i;
     guint changed = 0;
+
+    g_assert(LIBBALSA_MAILBOX_LOCAL_GET_CLASS(local) != NULL);
+    get_info = LIBBALSA_MAILBOX_LOCAL_GET_CLASS(local)->get_info;
+
     libbalsa_lock_mailbox(mailbox);
     for (i = 0; i < msgnos->len; i++) {
         guint msgno = g_array_index(msgnos, guint, i);
@@ -2280,8 +2294,10 @@ libbalsa_mailbox_local_msgno_has_flags(LibBalsaMailbox * mailbox,
                                        LibBalsaMessageFlag unset)
 {
     LibBalsaMailboxLocal *local = LIBBALSA_MAILBOX_LOCAL(mailbox);
-    LibBalsaMailboxLocalMessageInfo *msg_info =
-        LIBBALSA_MAILBOX_LOCAL_GET_CLASS(local)->get_info(local, msgno);
+    LibBalsaMailboxLocalMessageInfo *msg_info;
+
+    g_assert(LIBBALSA_MAILBOX_LOCAL_GET_CLASS(local) != NULL);
+    msg_info = LIBBALSA_MAILBOX_LOCAL_GET_CLASS(local)->get_info(local, msgno);
 
     return (msg_info->flags & set) == set && (msg_info->flags & unset) == 0;
 }

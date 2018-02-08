@@ -2448,8 +2448,8 @@ bndx_pipe_queue_last(struct BndxPipeQueue *queue)
 	    libbalsa_information(LIBBALSA_INFORMATION_ERROR,
 				 _("Cannot read message %u to pass to %s"),
 				 msgno, queue->pipe_cmd);
-	g_free(pipe);
 	bndx_pipe_queue_last(queue);
+	g_free(pipe);
 	return;
     }
 
@@ -2490,6 +2490,7 @@ bndx_pipe_queue_last(struct BndxPipeQueue *queue)
 	printf("Could not spawn pipe %s : %s\n", queue->pipe_cmd,
 	       error ? error->message : "unknown");
 	g_clear_error(&error);
+	g_free(pipe);
     }
 }
 

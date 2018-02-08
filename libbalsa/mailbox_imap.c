@@ -1570,6 +1570,7 @@ GHashTable * libbalsa_mailbox_imap_get_matchings(LibBalsaMailboxImap* mbox,
     ImapSearchKey* query;
     ImapResponse rc = IMR_NO;
     ImapSearchData * cbdata;
+    GHashTable * res;
 
     *err = FALSE;
     
@@ -1609,7 +1610,9 @@ GHashTable * libbalsa_mailbox_imap_get_matchings(LibBalsaMailboxImap* mbox,
 			       "falling back to default searching method"),
 			     LIBBALSA_MAILBOX(mbox)->url);
     };
-    return cbdata->res;
+    res = cbdata->res;
+    g_free(cbdata);
+    return res;
 }
 
 /* Returns false if the conditions contain regex matches

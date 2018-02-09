@@ -3206,7 +3206,7 @@ bw_check_mailbox(LibBalsaMailbox *mailbox)
 }
 
 typedef struct {
-	GObject *object;
+	LibBalsaMailbox *mailbox;
 	GThread *thread;
 	gulong notify;
 } bw_pop_mbox_t;
@@ -3219,9 +3219,9 @@ bw_check_mailbox_done(bw_pop_mbox_t *bw_pop_mbox)
 		g_debug("joined thread %p", bw_pop_mbox->thread);
 	}
 	if (bw_pop_mbox->notify > 0U) {
-		g_signal_handler_disconnect(bw_pop_mbox->object, bw_pop_mbox->notify);
+		g_signal_handler_disconnect(bw_pop_mbox->mailbox, bw_pop_mbox->notify);
 	}
-	g_object_unref(bw_pop_mbox->object);
+	g_object_unref(bw_pop_mbox->mailbox);
 }
 
 static void
@@ -3239,7 +3239,7 @@ bw_check_mailbox_list(struct check_messages_thread_info *info, GList *mailbox_li
         bw_pop_mbox_t *bw_pop_mbox;
 
         bw_pop_mbox = g_malloc0(sizeof(bw_pop_mbox_t));
-        bw_pop_mbox->object = g_object_ref(mailbox);
+        bw_pop_mbox->mailbox = g_object_ref(mailbox);
         libbalsa_mailbox_pop3_set_inbox(mailbox, balsa_app.inbox);
         libbalsa_mailbox_pop3_set_msg_size_limit(pop3, balsa_app.msg_size_limit * 1024);
         if (info->with_progress_dialog) {

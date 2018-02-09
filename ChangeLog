@@ -1,3 +1,16 @@
+2018-02-09  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	In glib-2.56, g_object_ref() propagates the type from its argument
+	to its return type, which can raise incompatible-pointer-type
+	warnings; previously it returned a gpointer, which could conceal
+	a coding error.
+
+	* src/main-window.c (bw_check_mailbox_done),
+	(bw_check_mailbox_list): make the mailbox member of
+	bw_pop_mbox_t a LibBalsaMailbox, so that it can accept the value
+	of g_object_ref(mailbox) without a warning; rename it from
+	'object' to 'mailbox' because, well, that's what it is.
+
 2018-02-07  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* libbalsa/mailbox.c (lbm_sort): check for zero-length array.

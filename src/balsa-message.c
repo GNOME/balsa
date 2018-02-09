@@ -310,14 +310,6 @@ bm_header_tl_buttons(BalsaMessage * bm)
     return (GtkWidget **) g_ptr_array_free(array, FALSE);
 }
 
-static void
-on_content_size_alloc(GtkWidget * widget, GtkAllocation * allocation,
-                      gint baseline, GtkAllocation * clip,
-		      gpointer user_data)
-{
-    gtk_container_foreach (GTK_CONTAINER(widget), balsa_mime_widget_image_resize_all, NULL);
-}
-
 /*
  * Callbacks and helpers for the find bar.
  */
@@ -703,8 +695,6 @@ balsa_message_init(BalsaMessage * bm)
 		     G_CALLBACK(balsa_mime_widget_key_press_event), bm);
     gtk_widget_set_vexpand(scroll, TRUE);
     gtk_box_pack_start(GTK_BOX(vbox), scroll);
-    g_signal_connect(bm->scroll, "size-allocate",
-		     G_CALLBACK(on_content_size_alloc), NULL);
 
     /* Widget to hold headers */
     buttons = bm_header_tl_buttons(bm);

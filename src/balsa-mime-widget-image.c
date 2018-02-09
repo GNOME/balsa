@@ -29,75 +29,6 @@
 #include <glib/gi18n.h>
 
 
-static void balsa_mime_widget_image_gesture_pressed_cb(GtkGestureMultiPress *multi_press,
-                                                       gint                  n_press,
-                                                       gdouble               x,
-                                                       gdouble               y,
-                                                       gpointer              user_data);
-static gboolean img_check_size(GtkImage ** widget_p);
-
-BalsaMimeWidget *
-balsa_mime_widget_new_image(BalsaMessage * bm,
-                            LibBalsaMessageBody * mime_body,
-			    const gchar * content_type, gpointer data)
-{
-    GdkPixbuf *pixbuf;
-    GtkWidget *image;
-    GError * load_err = NULL;
-    GtkGesture *gesture;
-    BalsaMimeWidget *mw;
-
-    g_return_val_if_fail(mime_body != NULL, NULL);
-    g_return_val_if_fail(content_type != NULL, NULL);
-
-    pixbuf = libbalsa_message_body_get_pixbuf(mime_body, &load_err);
-    if (pixbuf == NULL) {
-	if (load_err != NULL) {
-            balsa_information(LIBBALSA_INFORMATION_ERROR,
-			      _("Error loading attached image: %s\n"),
-			      load_err->message);
-	    g_error_free(load_err);
-	}
-	return NULL;
-    }
-
-    image = gtk_image_new_from_icon_name("image-missing");
-
-    g_object_set_data_full(G_OBJECT(image), "pixbuf", pixbuf, g_object_unref);
-
-    gesture = gtk_gesture_multi_press_new(GTK_WIDGET(image));
-    gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(gesture), 0);
-    g_object_set_data_full(G_OBJECT(image), "balsa-gesture", gesture, g_object_unref);
-    g_signal_connect(gesture, "pressed",
-                     G_CALLBACK(balsa_mime_widget_image_gesture_pressed_cb), data);
-
-    mw = (BalsaMimeWidget *) g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
-    balsa_mime_widget_set_widget(mw, image);
-
-    return mw;
-}
-
-
-void
-balsa_mime_widget_image_resize_all(GtkWidget * widget, gpointer user_data)
-{
-    if (GTK_IS_CONTAINER(widget))
-        gtk_container_foreach(GTK_CONTAINER(widget),
-			      balsa_mime_widget_image_resize_all, NULL);
-    else if (GTK_IS_IMAGE(widget) &&
-             g_object_get_data(G_OBJECT(widget), "pixbuf") != NULL &&
-             !GPOINTER_TO_INT(g_object_get_data
-                              (G_OBJECT(widget), "check_size_sched"))) {
-        GtkWidget **widget_p = g_new(GtkWidget *, 1);
-        g_object_set_data(G_OBJECT(widget), "check_size_sched",
-                          GINT_TO_POINTER(TRUE));
-        *widget_p = widget;
-        g_object_add_weak_pointer(G_OBJECT(widget), (gpointer *) widget_p);
-        g_idle_add((GSourceFunc) img_check_size, widget_p);
-    }
-}
-
-
 static void
 balsa_mime_widget_image_gesture_pressed_cb(GtkGestureMultiPress *multi_press,
                                            gint                  n_press,
@@ -181,4 +112,66 @@ img_check_size(GtkImage ** widget_p)
     }
 
     return FALSE;
+}
+
+static void
+img_realize_cb(GtkWidget * widget, gpointer user_data)
+{
+    if (g_object_get_data(G_OBJECT(widget), "pixbuf") != NULL &&
+        !GPOINTER_TO_INT(g_object_get_data(G_OBJECT(widget), "check_size_sched"))) {
+        GtkWidget **widget_p;
+
+        widget_p = g_new(GtkWidget *, 1);
+        g_object_set_data(G_OBJECT(widget), "check_size_sched",
+                          GINT_TO_POINTER(TRUE));
+        *widget_p = widget;
+        g_object_add_weak_pointer(G_OBJECT(widget), (gpointer *) widget_p);
+        g_idle_add((GSourceFunc) img_check_size, widget_p);
+    }
+}
+
+/*
+ * Public method
+ */
+
+BalsaMimeWidget *
+balsa_mime_widget_new_image(BalsaMessage * bm,
+                            LibBalsaMessageBody * mime_body,
+			    const gchar * content_type, gpointer data)
+{
+    GdkPixbuf *pixbuf;
+    GtkWidget *image;
+    GError * load_err = NULL;
+    GtkGesture *gesture;
+    BalsaMimeWidget *mw;
+
+    g_return_val_if_fail(mime_body != NULL, NULL);
+    g_return_val_if_fail(content_type != NULL, NULL);
+
+    pixbuf = libbalsa_message_body_get_pixbuf(mime_body, &load_err);
+    if (pixbuf == NULL) {
+	if (load_err != NULL) {
+            balsa_information(LIBBALSA_INFORMATION_ERROR,
+			      _("Error loading attached image: %s\n"),
+			      load_err->message);
+	    g_error_free(load_err);
+	}
+	return NULL;
+    }
+
+    image = gtk_image_new_from_icon_name("image-missing");
+
+    g_object_set_data_full(G_OBJECT(image), "pixbuf", pixbuf, g_object_unref);
+
+    gesture = gtk_gesture_multi_press_new(GTK_WIDGET(image));
+    gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(gesture), 0);
+    g_object_set_data_full(G_OBJECT(image), "balsa-gesture", gesture, g_object_unref);
+    g_signal_connect(gesture, "pressed",
+                     G_CALLBACK(balsa_mime_widget_image_gesture_pressed_cb), data);
+
+    mw = (BalsaMimeWidget *) g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
+    balsa_mime_widget_set_widget(mw, image);
+    g_signal_connect(image, "realize", G_CALLBACK(img_realize_cb), NULL);
+
+    return mw;
 }

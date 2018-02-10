@@ -96,9 +96,8 @@ static void store_button_coords(GtkGestureMultiPress *multi_press,
                                 gdouble               x,
                                 gdouble               y,
                                 gpointer              user_data);
-static void check_over_url(GtkWidget           * widget,
-                           message_url_t       * url,
-                           BalsaMimeWidgetText * mwt);
+static void check_over_url(BalsaMimeWidgetText * mwt,
+                           message_url_t       * url);
 static void pointer_over_url(GtkWidget * widget, message_url_t * url, gboolean set);
 static void prepare_url_offsets(GtkTextBuffer * buffer, GList * url_list);
 static void url_found_cb(GtkTextBuffer * buffer, GtkTextIter * iter,
@@ -108,18 +107,24 @@ static void check_call_url(GtkGestureMultiPress *multi_press,
                            gdouble               x,
                            gdouble               y,
                            gpointer              user_data);
-static message_url_t * find_url(GtkWidget * widget, gint x, gint y, GList * url_list);
+static message_url_t * find_url(BalsaMimeWidgetText *mwt,
+                                gint                 x,
+                                gint                 y);
 static void handle_url(const gchar* url);
 static void free_url(message_url_t * url);
 static void bm_widget_on_url(const gchar *url);
 static void phrase_highlight(GtkTextBuffer * buffer, const gchar * id,
 			     gunichar tag_char, const gchar * property,
 			     gint value);
-static void destroy_cite_bars(GList * cite_bars);
-static gboolean draw_cite_bars(GtkWidget * widget, GdkEventExpose *event, GList * cite_bars);
+static gboolean draw_cite_bars(GtkWidget      *widget,
+                               GdkEventExpose *event,
+                               gpointer        user_data);
 static gchar *check_text_encoding(BalsaMessage * bm, gchar *text_buf);
-static GList *fill_text_buf_cited(GtkWidget *widget, const gchar *text_body,
-                                  gboolean is_flowed, gboolean is_plain);
+static void fill_text_buf_cited(BalsaMimeWidgetText *mwt,
+                                GtkWidget           *widget,
+                                const gchar         *text_body,
+                                gboolean             is_flowed,
+                                gboolean             is_plain);
 
 
 #define PHRASE_HIGHLIGHT_ON    1
@@ -142,21 +147,40 @@ struct _BalsaMimeWidgetTextClass {
 struct _BalsaMimeWidgetText {
     BalsaMimeWidget      parent_instance;
 
+    GtkWidget           *text_widget;
     GList               *url_list;
     message_url_t       *current_url;
     LibBalsaMessageBody *mime_body;
+    GtkGesture          *gesture;
+    GtkEventController  *controller;
+    GList               *cite_bar_list;
+    gint                 cite_bar_dimension;
+    gint                 phrase_hl;
 };
 
 G_DEFINE_TYPE(BalsaMimeWidgetText, balsa_mime_widget_text, BALSA_TYPE_MIME_WIDGET)
 
 static void
-balsa_mime_widget_text_finalize(GObject * gobject) {
+balsa_mime_widget_text_dispose(GObject * object) {
     BalsaMimeWidgetText *mwt;
 
-    mwt = BALSA_MIME_WIDGET_TEXT(gobject);
-    g_list_free_full(mwt->url_list, (GDestroyNotify) free_url);
+    mwt = BALSA_MIME_WIDGET_TEXT(object);
 
-    G_OBJECT_CLASS(balsa_mime_widget_text_parent_class)->finalize(gobject);
+    g_clear_object(&mwt->gesture);
+    g_clear_object(&mwt->controller);
+
+    G_OBJECT_CLASS(balsa_mime_widget_text_parent_class)->dispose(object);
+}
+
+static void
+balsa_mime_widget_text_finalize(GObject * object) {
+    BalsaMimeWidgetText *mwt;
+
+    mwt = BALSA_MIME_WIDGET_TEXT(object);
+    g_list_free_full(mwt->url_list, (GDestroyNotify) free_url);
+    g_list_free_full(mwt->cite_bar_list, (GDestroyNotify) g_free);
+
+    G_OBJECT_CLASS(balsa_mime_widget_text_parent_class)->finalize(object);
 }
 
 static void
@@ -164,6 +188,7 @@ balsa_mime_widget_text_class_init(BalsaMimeWidgetTextClass * klass)
 {
     GObjectClass *object_class = (GObjectClass *) klass;
 
+    object_class->dispose  = balsa_mime_widget_text_dispose;
     object_class->finalize = balsa_mime_widget_text_finalize;
 }
 
@@ -187,13 +212,10 @@ mwt_controller_motion_cb(GtkEventControllerMotion * motion,
                          gpointer                   user_data)
 {
     BalsaMimeWidgetText *mwt = user_data;
-    GtkWidget *widget;
     message_url_t *url;
 
-    widget = gtk_event_controller_get_widget(GTK_EVENT_CONTROLLER(motion));
-    url = find_url(widget, (gint) x, (gint) y, mwt->url_list);
-
-    check_over_url(widget, url, mwt);
+    url = find_url(mwt, (gint) x, (gint) y);
+    check_over_url(mwt, url);
 }
 
 static void
@@ -203,11 +225,8 @@ mwt_controller_leave_cb(GtkEventControllerMotion * motion,
                         gpointer                   user_data)
 {
     BalsaMimeWidgetText *mwt = user_data;
-    GtkWidget *widget;
 
-    widget = gtk_event_controller_get_widget(GTK_EVENT_CONTROLLER(motion));
-
-    check_over_url(widget, NULL, mwt);
+    check_over_url(mwt, NULL);
 }
 
 BalsaMimeWidget *
@@ -265,7 +284,7 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
 
     /* create the mime object and the text/source view widget */
     mwt = g_object_new(BALSA_TYPE_MIME_WIDGET_TEXT, NULL);
-    widget = create_text_widget(content_type);
+    mwt->text_widget = widget = create_text_widget(content_type);
 
     /* configure text or source view */
     gtk_text_view_set_editable(GTK_TEXT_VIEW(widget), FALSE);
@@ -298,37 +317,30 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
 
     buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(widget));
 
-    mwt->url_list = fill_text_buf_cited(widget, ptr,
-                                        libbalsa_message_body_is_flowed(mime_body),
-                                        is_text_plain);
+    fill_text_buf_cited(mwt, widget, ptr,
+                        libbalsa_message_body_is_flowed(mime_body),
+                        is_text_plain);
 
     prepare_url_offsets(buffer, mwt->url_list);
     g_signal_connect_after(G_OBJECT(widget), "realize",
 			   G_CALLBACK(fix_text_widget), mwt->url_list);
     if (mwt->url_list != NULL) {
-        GtkGesture *gesture;
-        GtkEventController *controller;
-
-        gesture = gtk_gesture_multi_press_new(widget);
-        g_object_set_data_full(G_OBJECT(widget), "balsa-gesture", gesture, g_object_unref);
-        g_signal_connect(gesture, "pressed",
+        mwt->gesture = gtk_gesture_multi_press_new(widget);
+        g_signal_connect(mwt->gesture, "pressed",
                          G_CALLBACK(store_button_coords), NULL);
-	g_signal_connect(gesture, "released",
-			 G_CALLBACK(check_call_url), mwt->url_list);
+	g_signal_connect(mwt->gesture, "released",
+			 G_CALLBACK(check_call_url), mwt);
 
-        controller = gtk_event_controller_motion_new(widget);
-        g_object_set_data_full(G_OBJECT(widget),
-                               "balsa-controller", controller, g_object_unref);
-        g_signal_connect(controller, "motion",
+        mwt->controller = gtk_event_controller_motion_new(widget);
+        g_signal_connect(mwt->controller, "motion",
                          G_CALLBACK(mwt_controller_motion_cb), mwt);
-        g_signal_connect(controller, "leave",
+        g_signal_connect(mwt->controller, "leave",
                          G_CALLBACK(mwt_controller_leave_cb), mwt);
     }
 
     if (is_text_plain) {
 	/* plain-text highlighting */
-	g_object_set_data(G_OBJECT(widget), "phrase-highlight",
-			  GINT_TO_POINTER(PHRASE_HIGHLIGHT_ON));
+        mwt->phrase_hl = PHRASE_HIGHLIGHT_ON;
 	phrase_highlight(buffer, "hp-bold", '*', "weight", PANGO_WEIGHT_BOLD);
 	phrase_highlight(buffer, "hp-underline", '_', "underline", PANGO_UNDERLINE_SINGLE);
 	phrase_highlight(buffer, "hp-italic", '/', "style", PANGO_STYLE_ITALIC);
@@ -502,19 +514,20 @@ gtk_widget_destroy_insensitive(GtkWidget * widget)
 
 static void
 structured_phrases_toggle(GtkCheckMenuItem *checkmenuitem,
-			  GtkTextView *textview)
+			  gpointer          user_data)
 {
+    BalsaMimeWidgetText *mwt = user_data;
+    GtkTextView * text_view;
     GtkTextTagTable * table;
     GtkTextTag * tag;
-    gint phrase_hl =
-        GPOINTER_TO_INT(g_object_get_data
-                        (G_OBJECT(textview), "phrase-highlight"));
-    gboolean new_hl = gtk_check_menu_item_get_active(checkmenuitem);
+    gboolean new_hl;
 
-    table = gtk_text_buffer_get_tag_table(gtk_text_view_get_buffer(textview));
-    if (!table || phrase_hl == 0 ||
-	(phrase_hl == PHRASE_HIGHLIGHT_ON && new_hl) ||
-	(phrase_hl == PHRASE_HIGHLIGHT_OFF && !new_hl))
+    text_view = GTK_TEXT_VIEW(mwt->text_widget);
+    table = gtk_text_buffer_get_tag_table(gtk_text_view_get_buffer(text_view));
+    new_hl = gtk_check_menu_item_get_active(checkmenuitem);
+    if (!table || mwt->phrase_hl == 0 ||
+	(mwt->phrase_hl == PHRASE_HIGHLIGHT_ON && new_hl) ||
+	(mwt->phrase_hl == PHRASE_HIGHLIGHT_OFF && !new_hl))
 	return;
 
     if ((tag = gtk_text_tag_table_lookup(table, "hp-bold")))
@@ -530,9 +543,7 @@ structured_phrases_toggle(GtkCheckMenuItem *checkmenuitem,
 		     new_hl ? PANGO_STYLE_ITALIC : PANGO_STYLE_NORMAL,
 		     NULL);
 
-    g_object_set_data(G_OBJECT(textview), "phrase-highlight",
-                      GINT_TO_POINTER(new_hl ? PHRASE_HIGHLIGHT_ON :
-                                      PHRASE_HIGHLIGHT_OFF));
+    mwt->phrase_hl = new_hl ? PHRASE_HIGHLIGHT_ON : PHRASE_HIGHLIGHT_OFF;
 }
 
 static void
@@ -598,7 +609,6 @@ text_view_populate_popup(GtkWidget *widget, GtkMenu *menu,
 {
     BalsaMimeWidgetText *mwt = user_data;
     GtkWidget *menu_item;
-    gint phrase_hl;
 
     gtk_widget_hide(GTK_WIDGET(menu));
     gtk_container_foreach(GTK_CONTAINER(menu),
@@ -619,16 +629,14 @@ text_view_populate_popup(GtkWidget *widget, GtkMenu *menu,
                       G_CALLBACK (balsa_mime_widget_ctx_menu_save), mwt->mime_body);
     gtk_menu_shell_append (GTK_MENU_SHELL (menu), menu_item);
 
-    phrase_hl = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(widget), "phrase-highlight"));
-    if (phrase_hl != 0) {
+    if (mwt->phrase_hl != 0) {
 	gtk_menu_shell_append(GTK_MENU_SHELL(menu),
 			      gtk_separator_menu_item_new ());
 	menu_item = gtk_check_menu_item_new_with_label (_("Highlight structured phrases"));
 	gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM(menu_item),
-					phrase_hl == PHRASE_HIGHLIGHT_ON);
+                                        mwt->phrase_hl == PHRASE_HIGHLIGHT_ON);
 	g_signal_connect (G_OBJECT (menu_item), "toggled",
-			  G_CALLBACK (structured_phrases_toggle),
-			  (gpointer) widget);
+			  G_CALLBACK (structured_phrases_toggle), mwt);
 	gtk_menu_shell_append (GTK_MENU_SHELL (menu), menu_item);
     }
 
@@ -665,9 +673,8 @@ store_button_coords(GtkGestureMultiPress *multi_press,
 
 /* check if we are over an url and change the cursor in this case */
 static void
-check_over_url(GtkWidget           * widget,
-               message_url_t       * url,
-               BalsaMimeWidgetText * mwt)
+check_over_url(BalsaMimeWidgetText * mwt,
+               message_url_t       * url)
 {
     static gboolean was_over_url = FALSE;
 
@@ -679,16 +686,16 @@ check_over_url(GtkWidget           * widget,
                 gdk_cursor_new_from_name("pointer", NULL);
         }
         if (!was_over_url) {
-            gtk_widget_set_cursor(widget, url_cursor_over_url);
+            gtk_widget_set_cursor(mwt->text_widget, url_cursor_over_url);
             was_over_url = TRUE;
         }
         if (url != mwt->current_url) {
-            pointer_over_url(widget, mwt->current_url, FALSE);
-            pointer_over_url(widget, url, TRUE);
+            pointer_over_url(mwt->text_widget, mwt->current_url, FALSE);
+            pointer_over_url(mwt->text_widget, url, TRUE);
         }
     } else if (was_over_url) {
-        gtk_widget_set_cursor(widget, url_cursor_normal);
-        pointer_over_url(widget, mwt->current_url, FALSE);
+        gtk_widget_set_cursor(mwt->text_widget, url_cursor_normal);
+        pointer_over_url(mwt->text_widget, mwt->current_url, FALSE);
         was_over_url = FALSE;
     }
 
@@ -775,6 +782,7 @@ check_call_url(GtkGestureMultiPress *multi_press,
                gdouble               y,
                gpointer              user_data)
 {
+    BalsaMimeWidgetText *mwt = user_data;
     GtkGesture *gesture;
     const GdkEvent *event;
     GdkModifierType state;
@@ -790,12 +798,9 @@ check_call_url(GtkGestureMultiPress *multi_press,
     /* 2-pixel motion tolerance */
     if (abs(((gint) x) - stored_x) <= 2 && abs(((gint) y) - stored_y) <= 2
         && (state & STORED_MASK_BITS) == stored_mask) {
-        GtkWidget *widget;
         message_url_t *url;
-        GList *url_list = user_data;
 
-        widget = gtk_event_controller_get_widget(GTK_EVENT_CONTROLLER(gesture));
-        url = find_url(widget, (gint) x, (gint) y, url_list);
+        url = find_url(mwt, (gint) x, (gint) y);
         if (url != NULL)
             handle_url(url->url);
     }
@@ -805,18 +810,19 @@ check_call_url(GtkGestureMultiPress *multi_press,
  * look in widget at coordinates x, y for a URL in url_list.
  */
 static message_url_t *
-find_url(GtkWidget * widget, gint x, gint y, GList * url_list)
+find_url(BalsaMimeWidgetText * mwt, gint x, gint y)
 {
     GtkTextIter iter;
     gint offset;
+    GList *url_list;
 
-    gtk_text_view_window_to_buffer_coords(GTK_TEXT_VIEW(widget),
+    gtk_text_view_window_to_buffer_coords(GTK_TEXT_VIEW(mwt->text_widget),
                                           GTK_TEXT_WINDOW_TEXT,
                                           x, y, &x, &y);
-    gtk_text_view_get_iter_at_location(GTK_TEXT_VIEW(widget), &iter, x, y);
+    gtk_text_view_get_iter_at_location(GTK_TEXT_VIEW(mwt->text_widget), &iter, x, y);
     offset = gtk_text_iter_get_offset(&iter);
 
-    for (; url_list != NULL; url_list = url_list->next) {
+    for (url_list = mwt->url_list; url_list != NULL; url_list = url_list->next) {
         message_url_t *url = (message_url_t *) url_list->data;
 
         if (url->start <= offset && offset < url->end)
@@ -955,13 +961,6 @@ phrase_highlight(GtkTextBuffer * buffer, const gchar * id, gunichar tag_char,
 }
 
 /* --- citation bar stuff --- */
-static void
-destroy_cite_bars(GList * cite_bars)
-{
-    /* note: the widgets are destroyed by the text view */
-    g_list_foreach(cite_bars, (GFunc) g_free, NULL);
-    g_list_free(cite_bars);
-}
 
 typedef struct {
     GtkTextView * view;
@@ -1044,15 +1043,17 @@ draw_cite_bar_real(cite_bar_t * bar, cite_bar_draw_mode_t * draw_mode)
 
 
 static gboolean
-draw_cite_bars(GtkWidget * widget, GdkEventExpose *event, GList * cite_bars)
+draw_cite_bars(GtkWidget      * widget,
+               GdkEventExpose * event,
+               gpointer         user_data)
 {
+    BalsaMimeWidgetText *mwt = user_data;
     cite_bar_draw_mode_t draw_mode;
 
     draw_mode.view = GTK_TEXT_VIEW(widget);
     draw_mode.buffer = gtk_text_view_get_buffer(draw_mode.view);
-    draw_mode.dimension =
-	GPOINTER_TO_INT(g_object_get_data(G_OBJECT(widget), "cite-margin"));
-    g_list_foreach(cite_bars, (GFunc)draw_cite_bar_real, &draw_mode);
+    draw_mode.dimension = mwt->cite_bar_dimension;
+    g_list_foreach(mwt->cite_bar_list, (GFunc)draw_cite_bar_real, &draw_mode);
     return FALSE;
 }
 
@@ -1243,12 +1244,9 @@ bm_widget_new_html(BalsaMessage * bm, LibBalsaMessageBody * mime_body)
         g_signal_connect(widget, "populate-popup",
                          G_CALLBACK(bmwt_populate_popup_cb), mw->widget);
     } else {
-        GtkGesture *gesture;
-
-        gesture = gtk_gesture_multi_press_new(mw->widget);
-        gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(gesture), 0);
-        g_object_set_data_full(G_OBJECT(mw->widget), "mwt-gesture", gesture, g_object_unref);
-        g_signal_connect(gesture, "pressed",
+        mwt->gesture = gtk_gesture_multi_press_new(mw->widget);
+        gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(mwt->gesture), 0);
+        g_signal_connect(mwt->gesture, "pressed",
                          G_CALLBACK(mwt_gesture_pressed_cb), bm);
 
         g_signal_connect(mw->widget, "popup-menu",
@@ -1354,18 +1352,18 @@ check_text_encoding(BalsaMessage * bm, gchar *text_buf)
 }
 
 
-static GList *
-fill_text_buf_cited(GtkWidget *widget, const gchar *text_body,
-                    gboolean is_flowed, gboolean is_plain)
+static void
+fill_text_buf_cited(BalsaMimeWidgetText *mwt,
+                    GtkWidget           *widget,
+                    const gchar         *text_body,
+                    gboolean             is_flowed,
+                    gboolean             is_plain)
 {
     GtkWidget *label;
     LibBalsaUrlInsertInfo url_info;
-    GList * cite_bars_list;
     guint cite_level;
     guint cite_start;
-    gint margin;
     GtkTextTag *invisible;
-    GList *url_list = NULL;
     GtkTextBuffer *buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(widget));
     GRegex *rex = NULL;
     GdkRGBA *rgba;
@@ -1381,7 +1379,7 @@ fill_text_buf_cited(GtkWidget *widget, const gchar *text_body,
      * on the PangoFontDescription. */
     label = gtk_label_new("0");
     gtk_widget_measure(label, GTK_ORIENTATION_HORIZONTAL,
-                       300, NULL, &margin, NULL, NULL);
+                       300, NULL, &mwt->cite_bar_dimension, NULL, NULL);
     g_object_ref_sink(label);
     g_object_unref(label);
 
@@ -1400,12 +1398,12 @@ fill_text_buf_cited(GtkWidget *widget, const gchar *text_body,
         invisible = NULL;
     }
 
+    mwt->url_list = NULL;
     url_info.callback = url_found_cb;
-    url_info.callback_data = &url_list;
+    url_info.callback_data = &mwt->url_list;
     url_info.buffer_is_flowed = is_flowed;
     url_info.ml_url_buffer = NULL;
 
-    cite_bars_list = NULL;
     cite_level = 0;
     cite_start = 0;
     while (*text_body) {
@@ -1432,7 +1430,8 @@ fill_text_buf_cited(GtkWidget *widget, const gchar *text_body,
                     cite_bar->start_offs = cite_start;
                     cite_bar->end_offs = gtk_text_buffer_get_char_count(buffer);
                     cite_bar->depth = cite_level;
-                    cite_bars_list = g_list_append(cite_bars_list, cite_bar);
+                    mwt->cite_bar_list =
+                        g_list_append(mwt->cite_bar_list, cite_bar);
                 }
                 if (quote_level > 0)
                     cite_start = gtk_text_buffer_get_char_count(buffer);
@@ -1440,7 +1439,7 @@ fill_text_buf_cited(GtkWidget *widget, const gchar *text_body,
             }
 
             /* skip the citation prefix */
-            tag = quote_tag(buffer, quote_level, margin);
+            tag = quote_tag(buffer, quote_level, mwt->cite_bar_dimension);
             if (quote_level) {
                 GtkTextIter cite_iter;
 
@@ -1479,20 +1478,15 @@ fill_text_buf_cited(GtkWidget *widget, const gchar *text_body,
         cite_bar->start_offs = cite_start;
         cite_bar->end_offs = gtk_text_buffer_get_char_count(buffer);
         cite_bar->depth = cite_level;
-        cite_bars_list = g_list_append(cite_bars_list, cite_bar);
+        mwt->cite_bar_list = g_list_append(mwt->cite_bar_list, cite_bar);
     }
 
     /* add list of citation bars (if any) */
-    if (cite_bars_list) {
-        g_object_set_data_full(G_OBJECT(widget), "cite-bars", cite_bars_list,
-                               (GDestroyNotify) destroy_cite_bars);
-        g_object_set_data(G_OBJECT(widget), "cite-margin", GINT_TO_POINTER(margin));
+    if (mwt->cite_bar_list != NULL) {
         g_signal_connect_after(G_OBJECT(widget), "draw",
-                               G_CALLBACK(draw_cite_bars), cite_bars_list);
+                               G_CALLBACK(draw_cite_bars), mwt);
     }
 
     if (rex != NULL)
         g_regex_unref(rex);
-
-    return url_list;
 }

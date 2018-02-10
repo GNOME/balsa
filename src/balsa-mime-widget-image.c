@@ -167,7 +167,6 @@ img_check_size(BalsaMimeWidgetImage * mwi)
 static void
 img_size_allocate_cb(BalsaMimeWidgetImage *mwi)
 {
-
     if (mwi->pixbuf != NULL && mwi->img_check_size_id == 0) {
         mwi->img_check_size_id = g_idle_add((GSourceFunc) img_check_size, mwi);
     }

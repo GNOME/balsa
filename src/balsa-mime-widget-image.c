@@ -28,6 +28,55 @@
 #include "balsa-mime-widget-callbacks.h"
 #include <glib/gi18n.h>
 
+/*
+ * GObject class definitions
+ */
+struct _BalsaMimeWidgetImage {
+    BalsaMimeWidget  parent;
+
+    guint img_check_size_id;
+    GdkPixbuf *pixbuf;
+    GtkGesture *gesture;
+};
+
+struct _BalsaMimeWidgetImageClass {
+    BalsaMimeWidgetClass parent;
+};
+
+G_DEFINE_TYPE(BalsaMimeWidgetImage,
+              balsa_mime_widget_image,
+              BALSA_TYPE_MIME_WIDGET);
+
+static void
+balsa_mime_widget_image_init(BalsaMimeWidgetImage * mwi)
+{
+    mwi->img_check_size_id = 0;
+    mwi->pixbuf = NULL;
+    mwi->gesture = NULL;
+}
+
+static void
+balsa_mime_widget_image_dispose(GObject * object)
+{
+    BalsaMimeWidgetImage *mwi = (BalsaMimeWidgetImage *) object;
+
+    libbalsa_clear_source_id(&mwi->img_check_size_id);
+    g_clear_object(&mwi->pixbuf);
+    g_clear_object(&mwi->gesture);
+
+    G_OBJECT_CLASS(balsa_mime_widget_image_parent_class)->dispose(object);
+}
+
+static void
+balsa_mime_widget_image_class_init(BalsaMimeWidgetImageClass * klass)
+{
+    GObjectClass *object_class = G_OBJECT_CLASS(klass);
+
+    object_class->dispose = balsa_mime_widget_image_dispose;
+}
+/*
+ * End of GObject class definitions
+ */
 
 static void
 balsa_mime_widget_image_gesture_pressed_cb(GtkGestureMultiPress *multi_press,
@@ -50,8 +99,9 @@ balsa_mime_widget_image_gesture_pressed_cb(GtkGestureMultiPress *multi_press,
 }
 
 static gboolean
-img_check_size(GtkImage ** widget_p)
+img_check_size(BalsaMimeWidgetImage * mwi)
 {
+    GtkWidget *widget;
     GtkImage *image;
     GtkWidget *viewport;
     gint orig_width;
@@ -59,25 +109,25 @@ img_check_size(GtkImage ** widget_p)
     gint curr_w, dst_w;
     GtkAllocation allocation;
 
-    image = *widget_p;
-    if (image == NULL) {
-        g_free(widget_p);
-	return FALSE;
+    mwi->img_check_size_id = 0;
+
+    widget = balsa_mime_widget_get_widget((BalsaMimeWidget *) mwi);
+    viewport = gtk_widget_get_ancestor(widget, GTK_TYPE_VIEWPORT);
+    if (viewport == NULL) {
+        return G_SOURCE_REMOVE;
     }
-    g_object_remove_weak_pointer(G_OBJECT(image), (gpointer *) widget_p);
-    g_free(widget_p);
 
-    viewport = gtk_widget_get_ancestor(GTK_WIDGET(image), GTK_TYPE_VIEWPORT);
+    pixbuf = mwi->pixbuf;
+    if (pixbuf == NULL) {
+        return G_SOURCE_REMOVE;
+    }
 
-    pixbuf = g_object_get_data(G_OBJECT(image), "pixbuf");
     orig_width = gdk_pixbuf_get_width(pixbuf);
-
-    g_object_set_data(G_OBJECT(image), "check_size_sched",
-                      GINT_TO_POINTER(FALSE));
-    if (!(viewport != NULL && pixbuf != NULL && orig_width > 0)) {
-        return FALSE;
+    if (orig_width <= 0) {
+        return G_SOURCE_REMOVE;
     }
 
+    image = GTK_IMAGE(widget);
     switch (gtk_image_get_storage_type(image)) {
         case GTK_IMAGE_SURFACE:
             curr_w = cairo_image_surface_get_width(gtk_image_get_surface(image));
@@ -111,22 +161,15 @@ img_check_size(GtkImage ** widget_p)
 	g_object_unref(scaled_pixbuf);
     }
 
-    return FALSE;
+    return G_SOURCE_REMOVE;
 }
 
 static void
-img_realize_cb(GtkWidget * widget, gpointer user_data)
+img_size_allocate_cb(BalsaMimeWidgetImage *mwi)
 {
-    if (g_object_get_data(G_OBJECT(widget), "pixbuf") != NULL &&
-        !GPOINTER_TO_INT(g_object_get_data(G_OBJECT(widget), "check_size_sched"))) {
-        GtkWidget **widget_p;
 
-        widget_p = g_new(GtkWidget *, 1);
-        g_object_set_data(G_OBJECT(widget), "check_size_sched",
-                          GINT_TO_POINTER(TRUE));
-        *widget_p = widget;
-        g_object_add_weak_pointer(G_OBJECT(widget), (gpointer *) widget_p);
-        g_idle_add((GSourceFunc) img_check_size, widget_p);
+    if (mwi->pixbuf != NULL && mwi->img_check_size_id == 0) {
+        mwi->img_check_size_id = g_idle_add((GSourceFunc) img_check_size, mwi);
     }
 }
 
@@ -139,39 +182,39 @@ balsa_mime_widget_new_image(BalsaMessage * bm,
                             LibBalsaMessageBody * mime_body,
 			    const gchar * content_type, gpointer data)
 {
-    GdkPixbuf *pixbuf;
     GtkWidget *image;
     GError * load_err = NULL;
-    GtkGesture *gesture;
+    BalsaMimeWidgetImage *mwi;
     BalsaMimeWidget *mw;
 
     g_return_val_if_fail(mime_body != NULL, NULL);
     g_return_val_if_fail(content_type != NULL, NULL);
 
-    pixbuf = libbalsa_message_body_get_pixbuf(mime_body, &load_err);
-    if (pixbuf == NULL) {
+    mwi = g_object_new(BALSA_TYPE_MIME_WIDGET_IMAGE, NULL);
+
+    mwi->pixbuf = libbalsa_message_body_get_pixbuf(mime_body, &load_err);
+    if (mwi->pixbuf == NULL) {
 	if (load_err != NULL) {
             balsa_information(LIBBALSA_INFORMATION_ERROR,
 			      _("Error loading attached image: %s\n"),
 			      load_err->message);
 	    g_error_free(load_err);
 	}
+        g_object_unref(mwi);
 	return NULL;
     }
 
     image = gtk_image_new_from_icon_name("image-missing");
+    g_signal_connect_swapped(image, "size-allocate",
+                             G_CALLBACK(img_size_allocate_cb), mwi);
 
-    g_object_set_data_full(G_OBJECT(image), "pixbuf", pixbuf, g_object_unref);
-
-    gesture = gtk_gesture_multi_press_new(GTK_WIDGET(image));
-    gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(gesture), 0);
-    g_object_set_data_full(G_OBJECT(image), "balsa-gesture", gesture, g_object_unref);
-    g_signal_connect(gesture, "pressed",
+    mwi->gesture = gtk_gesture_multi_press_new(GTK_WIDGET(image));
+    gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(mwi->gesture), 0);
+    g_signal_connect(mwi->gesture, "pressed",
                      G_CALLBACK(balsa_mime_widget_image_gesture_pressed_cb), data);
 
-    mw = (BalsaMimeWidget *) g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
+    mw = (BalsaMimeWidget *) mwi;
     balsa_mime_widget_set_widget(mw, image);
-    g_signal_connect(image, "realize", G_CALLBACK(img_realize_cb), NULL);
 
     return mw;
 }

@@ -20,10 +20,24 @@
 #ifndef __BALSA_MIME_WIDGET_IMAGE_H__
 #define __BALSA_MIME_WIDGET_IMAGE_H__
 
+#include <glib-object.h>
 #include "balsa-message.h"
 #include "balsa-mime-widget.h"
 
 G_BEGIN_DECLS
+
+/*
+ * GObject class definitions
+ */
+
+#define BALSA_TYPE_MIME_WIDGET_IMAGE balsa_mime_widget_image_get_type()
+
+G_DECLARE_FINAL_TYPE(BalsaMimeWidgetImage, balsa_mime_widget_image,
+                     BALSA, MIME_WIDGET_IMAGE, BalsaMimeWidget)
+
+/*
+ * End of GObject class definitions
+ */
 
 BalsaMimeWidget *balsa_mime_widget_new_image(BalsaMessage * bm,
 					     LibBalsaMessageBody * mime_body,

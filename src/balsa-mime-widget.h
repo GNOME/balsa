@@ -54,7 +54,6 @@ G_DECLARE_DERIVABLE_TYPE(BalsaMimeWidget, balsa_mime_widget, BALSA, MIME_WIDGET,
 BalsaMimeWidget *balsa_mime_widget_new(BalsaMessage * bm,
 				       LibBalsaMessageBody * mime_body,
 				       gpointer data);
-void balsa_mime_widget_schedule_resize(GtkWidget * widget);
 
 /*
  * Getters

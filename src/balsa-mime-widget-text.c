@@ -346,9 +346,6 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
 	phrase_highlight(buffer, "hp-italic", '/', "style", PANGO_STYLE_ITALIC);
     }
 
-    /* size allocation may not be correct, so we'll check back later */
-    balsa_mime_widget_schedule_resize(widget);
-
     g_free(ptr);
 
     mw = (BalsaMimeWidget *) mwt;

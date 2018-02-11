@@ -43,8 +43,6 @@ static BalsaMimeWidget *balsa_mime_widget_new_unknown(BalsaMessage * bm,
 						      const gchar *
 						      content_type);
 
-static void vadj_change_cb(GtkAdjustment *vadj, GtkWidget *widget);
-
 typedef struct {
     /* display widget */
     GtkWidget *widget;
@@ -152,15 +150,6 @@ balsa_mime_widget_new(BalsaMessage * bm, LibBalsaMessageBody * mime_body, gpoint
 	    }
 #endif
             g_object_ref_sink(priv->widget);
-
-	    if (GTK_IS_LAYOUT(priv->widget)) {
-                GtkAdjustment *vadj;
-
-                g_object_get(G_OBJECT(priv->widget), "vadjustment", &vadj,
-                             NULL);
-		g_signal_connect(vadj, "changed",
-                                 G_CALLBACK(vadj_change_cb), priv->widget);
-            }
 	}
     }
     g_free(content_type);
@@ -272,52 +261,6 @@ balsa_mime_widget_new_unknown(BalsaMessage * bm,
     gtk_box_pack_start(GTK_BOX(priv->widget), hbox);
 
     return mw;
-}
-
-
-static guint resize_idle_id;
-
-static GtkWidget *old_widget, *new_widget;
-static gdouble old_upper, new_upper;
-
-static gboolean
-resize_idle(GtkWidget * widget)
-{
-    resize_idle_id = 0;
-    gtk_widget_queue_resize(widget);
-    old_widget = new_widget;
-    old_upper = new_upper;
-
-    return FALSE;
-}
-
-
-void
-balsa_mime_widget_schedule_resize(GtkWidget * widget)
-{
-    g_object_ref(widget);
-    resize_idle_id = g_idle_add_full(G_PRIORITY_DEFAULT_IDLE,
-                                     (GSourceFunc) resize_idle,
-                                     widget, g_object_unref);
-}
-
-
-static void 
-vadj_change_cb(GtkAdjustment *vadj, GtkWidget *widget)
-{
-    gdouble upper = gtk_adjustment_get_upper(vadj);
-
-    /* do nothing if it's the same widget and the height hasn't changed
-     *
-     * an HtmlView widget seems to grow by 4 pixels each time we resize
-     * it, whence the following unobvious test: */
-    if (widget == old_widget
-        && upper >= old_upper && upper <= old_upper + 4)
-        return;
-    new_widget = widget;
-    new_upper = upper;
-    libbalsa_clear_source_id(&resize_idle_id);
-    balsa_mime_widget_schedule_resize(widget);
 }
 
 /*

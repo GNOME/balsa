@@ -182,4 +182,6 @@ libbalsa-marshal.c: libbalsa-marshal.h
 	&& mv libbalsa-marshal.tmp libbalsa-marshal.c ) \
 	|| ( rm -f libbalsa-marshal.tmp && exit 1 )
 
+CLEANFILES = libbalsa-marshal.c libbalsa-marshal.h
+
 $(libbalsa_a_OBJECTS): libbalsa-marshal.h

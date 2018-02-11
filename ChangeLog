@@ -1,3 +1,10 @@
+2018-02-10  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Clean up generated marshalling files
+
+	* libbalsa/Makefile.am: create a CLEANFILES variable to arrange
+	for libbalsa-marshal.[ch] to be removed with "make clean".
+
 2018-02-09  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	In glib-2.56, g_object_ref() propagates the type from its argument

@@ -428,8 +428,6 @@ balsa_mime_widget_new_message_tl(BalsaMessage * bm,
 }
 
 
-/* Callback for the "realized" signal; set header frame and text base
- * color when first realized. */
 #define BALSA_MESSAGE_GRID "balsa-message-grid"
 #define bm_header_widget_get_grid(header_widget) \
     g_object_get_data(G_OBJECT(header_widget), BALSA_MESSAGE_GRID)

@@ -18,6 +18,7 @@ libbalsa/filter-error.c
 libbalsa/filter-file.c
 libbalsa/filter-funcs.c
 libbalsa/gmime-application-pkcs7.c
+libbalsa/gmime-gpgme-signature.c
 libbalsa/gmime-multipart-crypt.c
 libbalsa/html.c
 libbalsa/identity.c

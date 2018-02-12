@@ -59,6 +59,7 @@ The path of the gpgme-config tool must be specified only if it is
 installed in an uncommon place.  See the (rather outdated) web page
 http://home.arcor.de/dralbrecht.dress/balsa/UsingGnuPG.html#FAQ
 for more details.
+Note: requires GpgME version >= 1.5.0
 
 --with-gss[=/usr/kerberos]
 	This enables GSSAPI Kerberos based authentication scheme. 

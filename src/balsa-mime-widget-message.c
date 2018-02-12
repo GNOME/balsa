@@ -849,7 +849,7 @@ add_header_sigstate(GtkGrid * grid, GMimeGpgmeSigstat * siginfo)
         GPG_ERR_NO_ERROR ? "<i>%s%s</i>" : "<b><i>%s%s</i></b>";
     msg = g_markup_printf_escaped
         (format,
-         libbalsa_gpgme_sig_protocol_name(siginfo->protocol),
+        	g_mime_gpgme_sigstat_protocol_name(siginfo),
          libbalsa_gpgme_sig_stat_to_gchar(siginfo->status));
 
     label = gtk_label_new(NULL);

@@ -40,6 +40,12 @@
 #include "libbalsa-gpgme-cb.h"
 
 
+#ifdef G_LOG_DOMAIN
+#  undef G_LOG_DOMAIN
+#endif
+#define G_LOG_DOMAIN "crypto"
+
+
 /* stuff to get a key fingerprint from a selection list */
 enum {
     GPG_KEY_USER_ID_COLUMN = 0,

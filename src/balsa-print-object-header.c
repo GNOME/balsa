@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  * Copyright (C) 1997-2016 Stuart Parmenter and others
- * Written by (C) Albrecht Dreﬂ <albrecht.dress@arcor.de> 2007
+ * Written by (C) Albrecht Dre√ü <albrecht.dress@arcor.de> 2007
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -232,7 +232,7 @@ balsa_print_object_header_new_real(GList * list,
 	    GMimeGpgmeSigstat *siginfo = sig_body->parts->next->sig_info;
 
 	    g_string_append_printf(header_buf, "%s%s\n",
-                                   libbalsa_gpgme_sig_protocol_name(siginfo->protocol),
+	    	g_mime_gpgme_sigstat_protocol_name(siginfo),
                                    libbalsa_gpgme_sig_stat_to_gchar(siginfo->status));
 	}
     }
@@ -387,10 +387,14 @@ balsa_print_object_header_crypto(GList *list, GtkPrintContext * context,
     pango_layout_set_font_description(test_layout, header_font);
     pango_font_description_free(header_font);
 
+    /* check if the key needs to be loaded */
+    if (((body->sig_info->summary & GPGME_SIGSUM_KEY_MISSING) == 0) &&
+    	(body->sig_info->key == NULL)) {
+    	g_mime_gpgme_sigstat_load_key(body->sig_info);
+    }
+
     /* create a buffer with the signature info */
-    textbuf =
-	libbalsa_signature_info_to_gchar(body->sig_info,
-					 balsa_app.date_string);
+    textbuf = g_mime_gpgme_sigstat_to_gchar(body->sig_info, TRUE, balsa_app.date_string);
     if (label) {
 	gchar *newbuf = g_strconcat(label, "\n", textbuf, NULL);
 

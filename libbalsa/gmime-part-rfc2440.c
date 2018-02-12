@@ -29,6 +29,12 @@
 #include "gmime-part-rfc2440.h"
 
 
+#ifdef G_LOG_DOMAIN
+#  undef G_LOG_DOMAIN
+#endif
+#define G_LOG_DOMAIN "crypto"
+
+
 #define RFC2440_BUF_LEN    4096
 
 

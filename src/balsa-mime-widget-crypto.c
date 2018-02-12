@@ -36,6 +36,7 @@
 static void on_gpg_key_button(GtkWidget *button, const gchar *fingerprint);
 static void on_key_import_button(GtkButton *button, gpointer user_data);
 static gboolean create_import_keys_widget(GtkBox *box, const gchar *key_buf, GError **error);
+static void show_public_key_data(GtkExpander *expander, gpointer user_data);
 
 
 BalsaMimeWidget *
@@ -97,6 +98,7 @@ balsa_mime_widget_signature_widget(LibBalsaMessageBody * mime_body,
 				   const gchar * content_type)
 {
     gchar *infostr;
+    GtkWidget *expander;
     GtkWidget *vbox, *label;
     GtkWidget *signature_widget;
     gchar **lines;
@@ -105,8 +107,7 @@ balsa_mime_widget_signature_widget(LibBalsaMessageBody * mime_body,
 	mime_body->sig_info->status == GPG_ERR_NOT_SIGNED)
 	return NULL;
 
-    infostr =
-        libbalsa_signature_info_to_gchar_short(mime_body->sig_info, balsa_app.date_string);
+    infostr = g_mime_gpgme_sigstat_to_gchar(mime_body->sig_info, FALSE, balsa_app.date_string);
     if (infostr == NULL) {
         return NULL;
     }
@@ -118,13 +119,6 @@ balsa_mime_widget_signature_widget(LibBalsaMessageBody * mime_body,
     gtk_label_set_selectable(GTK_LABEL(label), TRUE);
     gtk_widget_set_halign(label, GTK_ALIGN_START);
     gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 0);
-    if (mime_body->sig_info->key != NULL) {
-    	GtkWidget *key_widget;
-
-    	/* show only the subkey which has been used to sign the message */
-    	key_widget = libbalsa_gpgme_key(mime_body->sig_info->key, mime_body->sig_info->fingerprint, 0U, FALSE);
-        gtk_box_pack_start(GTK_BOX(vbox), key_widget, FALSE, FALSE, 0);
-    }
     if (mime_body->sig_info->protocol == GPGME_PROTOCOL_OpenPGP) {
         GtkWidget *button;
 
@@ -139,19 +133,22 @@ balsa_mime_widget_signature_widget(LibBalsaMessageBody * mime_body,
         gtk_box_pack_start(GTK_BOX(vbox), button, FALSE, FALSE, 0);
     }
 
-    if (lines[1] != NULL) {
-        /* Hack alert: if we omit the box below and use the expander as signature widget
-         * directly, setting the container border width of the container = the expander
-         * causes its sensitive area to shrink to an almost unusable narrow line above
-         * the label... */
-        GtkWidget *expander;
+    /* Hack alert: if we omit the box below and use the expander as signature widget
+     * directly, setting the container border width of the container = the expander
+     * causes its sensitive area to shrink to an almost unusable narrow line above
+     * the label... */
+    signature_widget = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+    expander = gtk_expander_new(lines[0]);
+    gtk_container_add(GTK_CONTAINER(signature_widget), expander);
+    gtk_container_add(GTK_CONTAINER(expander), vbox);
 
-        signature_widget = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-        expander = gtk_expander_new(lines[0]);
-        gtk_container_add(GTK_CONTAINER(signature_widget), expander);
-        gtk_container_add(GTK_CONTAINER(expander), vbox);
-    } else {
-        signature_widget = vbox;
+    /* add a callback to load the key when the user wants to show the details
+     * Note: do *not* pass mime_body->sig_info to the callback, as it will be replaced when the user re-checks the signature or
+     * opens the message again in a separate window */
+    if (((mime_body->sig_info->summary & GPGME_SIGSUM_KEY_MISSING) == 0) &&
+    	(mime_body->sig_info->key == NULL)) {
+    	g_signal_connect(expander, "activate", (GCallback) show_public_key_data, mime_body);
+    	g_object_set_data(G_OBJECT(expander), "vbox", vbox);
     }
     gtk_container_set_border_width(GTK_CONTAINER(signature_widget), BMW_CONTAINER_BORDER);
 
@@ -337,6 +334,31 @@ create_import_keys_widget(GtkBox *box, const gchar *key_buf, GError **error)
 	}
 
 	return success;
+}
+
+static void
+show_public_key_data(GtkExpander *expander,
+                     gpointer     user_data)
+{
+	LibBalsaMessageBody *body = (LibBalsaMessageBody *) user_data;
+
+	g_message("%s: %p %p %p", __func__, expander, body, body->sig_info);
+	if (body->sig_info != NULL) {
+		if (body->sig_info->key == NULL) {
+			g_mime_gpgme_sigstat_load_key(body->sig_info);
+		}
+
+		if ((g_object_get_data(G_OBJECT(expander), "vbox") != NULL) && (body->sig_info->key != NULL)) {
+			GtkWidget *key_widget;
+			GtkBox *vbox;
+
+			vbox = GTK_BOX(g_object_steal_data(G_OBJECT(expander), "vbox"));
+			key_widget = libbalsa_gpgme_key(body->sig_info->key, body->sig_info->fingerprint, 0U, FALSE);
+			gtk_box_pack_start(vbox, key_widget, FALSE, FALSE, 0);
+			gtk_box_reorder_child(vbox, key_widget, 1U);
+			gtk_widget_show_all(key_widget);
+		}
+	}
 }
 
 #endif  /* HAVE_GPGME */

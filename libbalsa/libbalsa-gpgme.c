@@ -42,6 +42,12 @@
 #include "libbalsa.h"
 
 
+#ifdef G_LOG_DOMAIN
+#  undef G_LOG_DOMAIN
+#endif
+#define G_LOG_DOMAIN "crypto"
+
+
 static gboolean gpgme_add_signer(gpgme_ctx_t ctx, const gchar * signer,
 				 GtkWindow * parent, GError ** error);
 static gpgme_key_t *gpgme_build_recipients(gpgme_ctx_t ctx,
@@ -107,7 +113,7 @@ libbalsa_gpgme_init(gpgme_passphrase_cb_t get_passphrase,
     const gchar *agent_info;
 
     /* initialise the gpgme library */
-    g_message("init gpgme version %s", gpgme_check_version(NULL));
+    g_debug("init gpgme version %s", gpgme_check_version(NULL));
 
 #ifdef ENABLE_NLS
     gpgme_set_locale(NULL, LC_CTYPE, get_utf8_locale(LC_CTYPE));
@@ -117,7 +123,7 @@ libbalsa_gpgme_init(gpgme_passphrase_cb_t get_passphrase,
     /* dump the available engines */
     if (gpgme_get_engine_info(&e) == GPG_ERR_NO_ERROR) {
 	while (e) {
-	    g_message("protocol %s: engine %s (home %s, version %s)",
+		g_debug("protocol %s: engine %s (home %s, version %s)",
 		      gpgme_get_protocol_name(e->protocol),
 		      e->file_name, e->home_dir, e->version);
 	    e = e->next;
@@ -127,8 +133,8 @@ libbalsa_gpgme_init(gpgme_passphrase_cb_t get_passphrase,
     /* check for gpg-agent */
     agent_info = g_getenv("GPG_AGENT_INFO");
     if (agent_info) {
-	g_message("gpg-agent found: %s", agent_info);
-	gpgme_passphrase_cb = NULL;
+    	g_debug("gpg-agent found: %s", agent_info);
+    	gpgme_passphrase_cb = NULL;
     } else {
 	gpgme_passphrase_cb = get_passphrase;
     }
@@ -136,19 +142,18 @@ libbalsa_gpgme_init(gpgme_passphrase_cb_t get_passphrase,
     /* verify that the engines we need are there */
     if (gpgme_engine_check_version(GPGME_PROTOCOL_OpenPGP) ==
 	GPG_ERR_NO_ERROR) {
-	g_message("OpenPGP protocol supported");
-	has_proto_openpgp = TRUE;
+    	g_debug("OpenPGP protocol supported");
+    	has_proto_openpgp = TRUE;
     } else {
-	g_message
-	    ("OpenPGP protocol not supported, basic crypto will not work!");
-	has_proto_openpgp = FALSE;
+    	g_warning("OpenPGP protocol not supported, basic crypto will not work!");
+    	has_proto_openpgp = FALSE;
     }
 
     if (gpgme_engine_check_version(GPGME_PROTOCOL_CMS) == GPG_ERR_NO_ERROR) {
-    	g_message("CMS (aka S/MIME) protocol supported");
+    	g_debug("CMS (aka S/MIME) protocol supported");
     	has_proto_cms = TRUE;
     } else {
-    	g_message("CMS protocol not supported, S/MIME will not work!");
+    	g_warning("CMS protocol not supported, S/MIME will not work!");
     	has_proto_cms = FALSE;
     }
 
@@ -341,9 +346,8 @@ libbalsa_gpgme_verify(GMimeStream * content, GMimeStream * sig_plain,
     if (err != GPG_ERR_NO_ERROR) {
     	libbalsa_gpgme_set_error(error, err,
 			       _("signature verification failed"));
-	result = g_mime_gpgme_sigstat_new();
+	result = g_mime_gpgme_sigstat_new(ctx);
 	result->status = err;
-	result->protocol = gpgme_get_protocol(ctx);
     } else
 	result = g_mime_gpgme_sigstat_new_from_gpgme_ctx(ctx);
 

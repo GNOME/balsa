@@ -36,6 +36,12 @@
 #include "gmime-multipart-crypt.h"
 
 
+#ifdef G_LOG_DOMAIN
+#  undef G_LOG_DOMAIN
+#endif
+#define G_LOG_DOMAIN "crypto"
+
+
 /**
  * sign_prepare:
  * @mime_part: MIME part

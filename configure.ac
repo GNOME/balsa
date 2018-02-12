@@ -364,7 +364,7 @@ if test x"$gpgmecfg" != xno ; then
 	if test $gpgme_ve -lt 1; then
 		gpgmecfg=no
 	fi
-	if test \( $gpgme_ve -eq 1 \) -a \( $gpgme_ma -lt 2 \) ; then
+	if test \( $gpgme_ve -eq 1 \) -a \( $gpgme_ma -lt 5 \) ; then
 		gpgmecfg=no
 	fi
 	if test x"$gpgmecfg" != xno ; then
@@ -380,7 +380,7 @@ if test x"$gpgmecfg" != xno ; then
 		BALSA_CFLAGS="$BALSA_CFLAGS `$gpgmecfg --cflags`"
 		gpgmecfg=yes
 	else
-		AC_MSG_WARN([sorry, you need at least gpgme version 1.2.0])
+		AC_MSG_WARN([sorry, you need at least gpgme version 1.5.0])
 	fi
 fi
 AM_CONDITIONAL([BUILD_WITH_GPGME], [test $gpgmecfg = "yes"])

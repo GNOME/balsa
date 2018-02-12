@@ -2,7 +2,7 @@
 /*
  * Balsa E-Mail Client
  *
- * gpgme -related widgets
+ * gpgme key related widgets and display functions
  * Copyright (C) 2017 Albrecht Dreß <albrecht.dress@arcor.de>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -48,7 +48,7 @@ typedef enum {
 /** \brief Create a key widget
  *
  * \param key GnuPG or S/MIME key
- * \param fingerprint fingerprint of the subkey which shall be displayed, NULL to display all subkeys
+ * \param fingerprint fingerprint of the subkey which shall be displayed, NULL to display all subkeys with certain capabilities
  * \param subkey_capa mask of capabilities for which subkeys shall be included, used only if \em fingerprint is NULL
  * \param expanded whether the expanders shall be initially expanded
  * \return a new widget containing details about the key
@@ -61,6 +61,21 @@ GtkWidget *libbalsa_gpgme_key(gpgme_key_t           key,
 							  const gchar          *fingerprint,
 							  lb_gpg_subkey_capa_t  subkey_capa,
 							  gboolean              expanded)
+	G_GNUC_WARN_UNUSED_RESULT;
+
+
+/** \brief Key details as human-readable string
+ *
+ * \param key GnuPG or S/MIME key
+ * \param fingerprint fingerprint of the subkey which shall be printed, <i>must not</i> be NULL
+ * \return a newly allocated string containing the key details
+ *
+ * Create a human-readable multiline string containing the key details, including the details of the subkey identified by the
+ * passed fingerprint.  The string is basically a printable version of libbalsa_gpgme_key() for the same key and fingerprint, with
+ * the expanders opened.
+ */
+gchar *libbalsa_gpgme_key_to_gchar(gpgme_key_t  key,
+							  	   const gchar *fingerprint)
 	G_GNUC_WARN_UNUSED_RESULT;
 
 

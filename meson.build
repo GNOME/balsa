@@ -249,9 +249,9 @@ endif
 
 if gpgmecfg != 'false'
   gpgmever = run_command(gpgmecfg, '--version').stdout().strip()
-  if gpgmever.version_compare('< 1.2.0')
+  if gpgmever.version_compare('< 1.5.0')
     gpgmecfg   = 'false'
-    message('Sorry, you need at least gpgme version 1.2.0')
+    message('Sorry, you need at least gpgme version 1.5.0')
   else
     if gpgmever.version_compare('< 1.8.0')
       gpgme_libs = run_command(gpgmecfg, '--thread=pthread', '--libs')

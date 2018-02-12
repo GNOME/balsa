@@ -875,22 +875,19 @@ libbalsa_message_body_get_by_id(LibBalsaMessageBody * body,
 LibBalsaMsgProtectState
 libbalsa_message_body_protect_state(LibBalsaMessageBody *body)
 {
-    if (!body || !body->sig_info ||
-	body->sig_info->status == GPG_ERR_NOT_SIGNED ||
-	body->sig_info->status == GPG_ERR_CANCELED)
-	return LIBBALSA_MSG_PROTECT_NONE;
+	LibBalsaMsgProtectState state;
 
-    if (body->sig_info->status == GPG_ERR_NO_ERROR) {
-	/* good signature, check if the validity and trust (OpenPGP only) are
-	   at least marginal */
-	if (body->sig_info->validity >= GPGME_VALIDITY_MARGINAL &&
-	    (body->sig_info->protocol == GPGME_PROTOCOL_CMS ||
-	     body->sig_info->key->owner_trust >= GPGME_VALIDITY_MARGINAL))
-	    return LIBBALSA_MSG_PROTECT_SIGN_GOOD;
-	else
-	    return LIBBALSA_MSG_PROTECT_SIGN_NOTRUST;
-    }
-    
-    return LIBBALSA_MSG_PROTECT_SIGN_BAD;
+	if ((body == NULL) || (body->sig_info == NULL) || (body->sig_info->status == GPG_ERR_NOT_SIGNED) ||
+		(body->sig_info->status == GPG_ERR_CANCELED)) {
+		state = LIBBALSA_MSG_PROTECT_NONE;
+	} else if (body->sig_info->status != GPG_ERR_NO_ERROR) {
+		state = LIBBALSA_MSG_PROTECT_SIGN_BAD;
+	} else if ((body->sig_info->summary & GPGME_SIGSUM_VALID) == GPGME_SIGSUM_VALID) {
+		state = LIBBALSA_MSG_PROTECT_SIGN_GOOD;
+	} else {
+		state = LIBBALSA_MSG_PROTECT_SIGN_NOTRUST;
+	}
+
+	return state;
 }
 #endif

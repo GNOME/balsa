@@ -27,6 +27,12 @@
 #include "libbalsa-gpgme.h"
 
 
+#ifdef G_LOG_DOMAIN
+#  undef G_LOG_DOMAIN
+#endif
+#define G_LOG_DOMAIN "crypto"
+
+
 /* key server thread data */
 typedef struct _keyserver_op_t {
 	gpgme_ctx_t gpgme_ctx;
@@ -64,19 +70,18 @@ libbalsa_gpgme_list_keys(gpgme_ctx_t   ctx,
 						 gboolean      on_keyserver,
 						 GError      **error)
 {
-	gpgme_error_t gpgme_err = GPG_ERR_NO_ERROR;
+	gpgme_error_t gpgme_err;
+	gpgme_keylist_mode_t kl_save;
 	gpgme_keylist_mode_t kl_mode;
 
 	g_return_val_if_fail((ctx != NULL) && (keys != NULL), FALSE);
 
 	/* set key list mode to external if we want to search a remote key server, or to the local key ring */
-	kl_mode = gpgme_get_keylist_mode(ctx);
+	kl_save = gpgme_get_keylist_mode(ctx);
 	if (on_keyserver) {
-		kl_mode &= ~GPGME_KEYLIST_MODE_LOCAL;
-		kl_mode |= GPGME_KEYLIST_MODE_EXTERN;
+		kl_mode = (kl_save & ~GPGME_KEYLIST_MODE_LOCAL) | GPGME_KEYLIST_MODE_EXTERN;
 	} else {
-		kl_mode &= ~GPGME_KEYLIST_MODE_EXTERN;
-		kl_mode |= GPGME_KEYLIST_MODE_LOCAL;
+		kl_mode = (kl_save & ~GPGME_KEYLIST_MODE_EXTERN) | GPGME_KEYLIST_MODE_LOCAL;
 	}
 	gpgme_err = gpgme_set_keylist_mode(ctx, kl_mode);
 	if (gpgme_err != GPG_ERR_NO_ERROR) {
@@ -127,8 +132,55 @@ libbalsa_gpgme_list_keys(gpgme_ctx_t   ctx,
 			}
 		}
 	}
+	gpgme_set_keylist_mode(ctx, kl_save);
 
 	return (gpgme_err_code(gpgme_err) == GPG_ERR_EOF);
+}
+
+
+gpgme_key_t
+libbalsa_gpgme_load_key(gpgme_ctx_t   ctx,
+						const gchar  *fingerprint,
+						GError      **error)
+{
+	gpgme_key_t key = NULL;
+	gpgme_error_t gpgme_err;
+	gpgme_keylist_mode_t kl_mode;
+
+	g_return_val_if_fail((ctx != NULL) && (fingerprint != NULL), NULL);
+
+	/* only use the local key ring */
+	kl_mode = gpgme_get_keylist_mode(ctx);
+	gpgme_err = gpgme_set_keylist_mode(ctx, (kl_mode & ~GPGME_KEYLIST_MODE_EXTERN) | GPGME_KEYLIST_MODE_LOCAL);
+	if (gpgme_err != GPG_ERR_NO_ERROR) {
+		libbalsa_gpgme_set_error(error, gpgme_err, _("error setting key list mode"));
+	}
+
+	if (gpgme_err == GPG_ERR_NO_ERROR) {
+		gpgme_err = gpgme_op_keylist_start(ctx, fingerprint, 0);
+		if (gpgme_err != GPG_ERR_NO_ERROR) {
+			libbalsa_gpgme_set_error(error, gpgme_err, _("could not list keys for “%s”"), fingerprint);
+		} else {
+			gpgme_err = gpgme_op_keylist_next(ctx, &key);
+			if (gpgme_err != GPG_ERR_NO_ERROR) {
+				libbalsa_gpgme_set_error(error, gpgme_err, _("could not list keys for “%s”"), fingerprint);
+			} else {
+				gpgme_key_t next_key;
+
+				/* verify this is the only one */
+				gpgme_err = gpgme_op_keylist_next(ctx, &next_key);
+				if (gpgme_err == GPG_ERR_NO_ERROR) {
+					libbalsa_gpgme_set_error(error, GPG_ERR_AMBIGUOUS, _("ambiguous keys for “%s”"), fingerprint);
+					gpgme_key_unref(next_key);
+					gpgme_key_unref(key);
+					key = NULL;
+				}
+			}
+		}
+	}
+	gpgme_set_keylist_mode(ctx, kl_mode);
+
+	return key;
 }
 
 
@@ -412,16 +464,7 @@ gpgme_import_key(gpgme_ctx_t   ctx,
 
 		/* the key has been considered: load the possibly changed key from the local ring, ignoring any errors */
 		if ((import_result->considered != 0) && (key->subkeys != NULL)) {
-			gpgme_keylist_mode_t kl_mode;
-
-			/* ensure local key list mode */
-			kl_mode = gpgme_get_keylist_mode(ctx);
-			kl_mode &= ~GPGME_KEYLIST_MODE_EXTERN;
-			kl_mode |= GPGME_KEYLIST_MODE_LOCAL;
-			gpgme_err = gpgme_set_keylist_mode(ctx, kl_mode);
-			if (gpgme_err == GPG_ERR_NO_ERROR) {
-				(void) gpgme_get_key(ctx, key->subkeys->fpr, imported_key, 0);
-			}
+			*imported_key = libbalsa_gpgme_load_key(ctx, key->subkeys->fpr, error);
 		}
 
 		result = TRUE;

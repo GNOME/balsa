@@ -2688,11 +2688,11 @@ get_crypto_content_icon(LibBalsaMessageBody * body, const gchar * content_type,
 	g_ascii_strcasecmp(content_type, "application/pkcs7-signature") &&
 	g_ascii_strcasecmp(content_type, "application/x-pkcs7-signature"))
 	new_title = g_strconcat(*icon_title, "; ",
-				libbalsa_gpgme_sig_protocol_name(body->sig_info->protocol),
+		g_mime_gpgme_sigstat_protocol_name(body->sig_info),
 				libbalsa_gpgme_sig_stat_to_gchar(body->sig_info->status),
 				NULL);
     else
-	new_title = g_strconcat(libbalsa_gpgme_sig_protocol_name(body->sig_info->protocol),
+	new_title = g_strconcat(g_mime_gpgme_sigstat_protocol_name(body->sig_info),
 				libbalsa_gpgme_sig_stat_to_gchar(body->sig_info->status),
 				NULL);
 
@@ -3031,15 +3031,14 @@ libbalsa_msg_part_2440(LibBalsaMessage * message, LibBalsaMessageBody * body,
     libbalsa_mailbox_unlock_store(body->message->mailbox);
 
     if (body->sig_info && sig_res == GPG_ERR_NO_ERROR) {
-        if (body->sig_info->validity >= GPGME_VALIDITY_MARGINAL &&
-            body->sig_info->key->owner_trust >= GPGME_VALIDITY_MARGINAL)
-            libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
-                                 _("Detected a good signature"));
-        else
+        if ((body->sig_info->summary & GPGME_SIGSUM_VALID) == GPGME_SIGSUM_VALID) {
+        	g_debug("%s: detected a good signature", __func__);
+        } else {
             libbalsa_information
 		(LIBBALSA_INFORMATION_MESSAGE,
 		 _("Detected a good signature with insufficient "
 		   "validity/trust"));
+        }
     } else if (sig_res != GPG_ERR_NO_ERROR && sig_res != GPG_ERR_CANCELED)
 	libbalsa_information
 	    (chk_crypto->chk_mode == LB_MAILBOX_CHK_CRYPT_ALWAYS ?

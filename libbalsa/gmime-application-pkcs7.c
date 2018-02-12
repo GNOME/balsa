@@ -38,6 +38,12 @@
 #include <glib/gi18n.h>
 
 
+#ifdef G_LOG_DOMAIN
+#  undef G_LOG_DOMAIN
+#endif
+#define G_LOG_DOMAIN "crypto"
+
+
 #define GMIME_PKCS7_ERR_QUARK (g_quark_from_static_string ("gmime-app-pkcs7"))
 
 

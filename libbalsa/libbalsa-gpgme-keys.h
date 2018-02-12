@@ -63,6 +63,21 @@ gboolean libbalsa_gpgme_list_keys(gpgme_ctx_t   ctx,
 								  gboolean      on_keyserver,
 								  GError      **error);
 
+/** \brief Load a key
+ *
+ * \param ctx GpgME context
+ * \param fingerprint key fingerprint to search for
+ * \param error filled with error information on error, may be NULL
+ * \return the key matching the passed fingerprint, or NULL on error
+ *
+ * Return the key matching the passed fingerprint from the local key ring. The function returns NULL if either no or more than one
+ * key is available.
+ */
+gpgme_key_t libbalsa_gpgme_load_key(gpgme_ctx_t   ctx,
+									const gchar  *fingerprint,
+									GError      **error)
+	G_GNUC_WARN_UNUSED_RESULT;
+
 /** \brief Search the key server for a key
  *
  * \param fingerprint key fingerprint to search for

@@ -42,6 +42,7 @@ struct _GMimeGpgmeSigstat {
 
     /* results form gpgme's verify operation */
     gpgme_protocol_t protocol;
+    gpgme_sigsum_t summary;
     gpgme_error_t status;
     gpgme_validity_t validity;
     gchar *fingerprint;
@@ -57,11 +58,20 @@ struct _GMimeGpgmeSigstatClass {
 
 
 GType g_mime_gpgme_sigstat_get_type(void);
-GMimeGpgmeSigstat *g_mime_gpgme_sigstat_new(void);
-GMimeGpgmeSigstat *g_mime_gpgme_sigstat_new_from_gpgme_ctx(gpgme_ctx_t
-							   ctx);
+GMimeGpgmeSigstat *g_mime_gpgme_sigstat_new(gpgme_ctx_t ctx)
+	G_GNUC_WARN_UNUSED_RESULT;
+GMimeGpgmeSigstat *g_mime_gpgme_sigstat_new_from_gpgme_ctx(gpgme_ctx_t ctx)
+	G_GNUC_WARN_UNUSED_RESULT;
+void g_mime_gpgme_sigstat_load_key(GMimeGpgmeSigstat *sigstat);
 
-gchar *libbalsa_cert_subject_readable(const gchar *subject);
+const gchar *g_mime_gpgme_sigstat_protocol_name(const GMimeGpgmeSigstat *sigstat);
+gchar *g_mime_gpgme_sigstat_to_gchar(const GMimeGpgmeSigstat *info,
+							  	  	 gboolean                 full_details,
+									 const gchar             *date_string)
+	G_GNUC_WARN_UNUSED_RESULT;
+
+gchar *libbalsa_cert_subject_readable(const gchar *subject)
+	G_GNUC_WARN_UNUSED_RESULT;
 
 
 G_END_DECLS

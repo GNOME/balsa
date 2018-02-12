@@ -45,6 +45,12 @@
 #include <glib/gi18n.h>
 
 
+#ifdef G_LOG_DOMAIN
+#  undef G_LOG_DOMAIN
+#endif
+#define G_LOG_DOMAIN "crypto"
+
+
 /* local prototypes */
 static gboolean gpg_updates_trustdb(void);
 static gboolean have_pub_key_for(gpgme_ctx_t gpgme_ctx,
@@ -640,7 +646,7 @@ libbalsa_gpgme_sig_stat_to_gchar(gpgme_error_t stat)
 	gchar errbuf[4096];		/* should be large enough... */
 
 	gpgme_strerror_r(stat, errbuf, sizeof(errbuf));
-	g_message("stat %d: %s %s", stat, gpgme_strsource(stat), errbuf);
+	g_debug("%s: stat %d: %s %s", __func__, stat, gpgme_strsource(stat), errbuf);
 	return _("An error prevented the signature verification.");
     }
     }
@@ -688,181 +694,6 @@ libbalsa_gpgme_validity_to_gchar_short(gpgme_validity_t validity)
     default:
 	return _("bad validity");
     }
-}
-
-
-const gchar *
-libbalsa_gpgme_sig_protocol_name(gpgme_protocol_t protocol)
-{
-    switch (protocol) {
-    case GPGME_PROTOCOL_OpenPGP:
-	return _("PGP signature: ");
-    case GPGME_PROTOCOL_CMS:
-	return _("S/MIME signature: ");
-    default:
-	return _("(unknown protocol) ");
-    }
-}
-
-static inline void
-append_time_t(GString *str, const gchar *format, time_t when,
-              const gchar * date_string)
-{
-    if (when != (time_t) 0) {
-        gchar *tbuf = libbalsa_date_to_utf8(when, date_string);
-        g_string_append_printf(str, format, tbuf);
-        g_free(tbuf);
-    } else {
-        g_string_append_printf(str, format, _("never"));
-    }
-}
-
-gchar *
-libbalsa_signature_info_to_gchar_short(GMimeGpgmeSigstat *info,
-				 	 	 	 	 	   const gchar       *date_string)
-{
-    GString *msg;
-    gchar *retval;
-
-    g_return_val_if_fail(info != NULL, NULL);
-    g_return_val_if_fail(date_string != NULL, NULL);
-    msg = g_string_new(libbalsa_gpgme_sig_protocol_name(info->protocol));
-    msg = g_string_append(msg, libbalsa_gpgme_sig_stat_to_gchar(info->status));
-    g_string_append_printf(msg, _("\nSignature validity: %s"), libbalsa_gpgme_validity_to_gchar(info-> validity));
-    append_time_t(msg, _("\nSigned on: %s"), info->sign_time, date_string);
-    if (info->fingerprint) {
-    	g_string_append_printf(msg, _("\nKey fingerprint: %s"), info->fingerprint);
-    }
-
-    retval = msg->str;
-    g_string_free(msg, FALSE);
-    return retval;
-}
-
-gchar *
-libbalsa_signature_info_to_gchar(GMimeGpgmeSigstat *info,
-				 	 	 	 	 const gchar       *date_string)
-{
-    GString *msg;
-    gchar *retval;
-
-    g_return_val_if_fail(info != NULL, NULL);
-    g_return_val_if_fail(date_string != NULL, NULL);
-    msg = g_string_new(libbalsa_signature_info_to_gchar_short(info, date_string));
-
-    /* add key information */
-    if (info->key != NULL) {
-        gpgme_user_id_t uid;
-        gpgme_subkey_t subkey;
-
-        if (info->protocol == GPGME_PROTOCOL_OpenPGP) {
-        	g_string_append_printf(msg, _("\nKey owner trust: %s"), libbalsa_gpgme_validity_to_gchar_short(info->key->owner_trust));
-        }
-
-        /* user ID's */
-        if ((uid = info->key->uids)) {
-            gchar *lead_text;
-
-            uid = info->key->uids;
-            if (uid->next) {
-        	msg = g_string_append(msg, _("\nUser IDs:"));
-        	lead_text = "\n\342\200\242";
-            } else {
-        	msg = g_string_append(msg, _("\nUser ID:"));
-        	lead_text = "";
-            }
-
-            /* Note: there is no way to determine which user id has been used
-             * to create the signature.  A broken client may even use an
-             * invalid and/or revoked one.  We therefore add all to the
-             * result. */
-            while (uid) {
-        	msg = g_string_append(msg, lead_text);
-        	if (uid->revoked)
-        	    msg = g_string_append(msg, _(" [Revoked]"));
-        	if (uid->invalid)
-        	    msg = g_string_append(msg, _(" [Invalid]"));
-
-        	if (uid->uid && *(uid->uid)) {
-        	    gchar *uid_readable =
-        	    	libbalsa_cert_subject_readable(uid->uid);
-        	    g_string_append_printf(msg, " %s", uid_readable);
-        	    g_free(uid_readable);
-        	} else {
-        	    if (uid->name && *(uid->name))
-        		g_string_append_printf(msg, " %s", uid->name);
-        	    if (uid->email && *(uid->email))
-        		g_string_append_printf(msg, " <%s>", uid->email);
-        	    if (uid->comment && *(uid->comment))
-        		g_string_append_printf(msg, " (%s)", uid->comment);
-        	}
-
-        	uid = uid->next;
-            }
-        }
-
-        /* subkey */
-        if ((subkey = info->key->subkeys)) {
-            /* find the one which can sign */
-            while (subkey && !subkey->can_sign)
-        	subkey = subkey->next;
-
-            if (subkey) {
-        	append_time_t(msg, _("\nSubkey created on: %s"),
-        		      subkey->timestamp, date_string);
-        	append_time_t(msg, _("\nSubkey expires on: %s"),
-        		      subkey->expires, date_string);
-        	if (subkey->revoked || subkey->expired || subkey->disabled ||
-        	    subkey->invalid) {
-       GString * attrs = g_string_new("");
-       int count = 0;
-
-        	    if (subkey->revoked) {
-           count++;
-           attrs = g_string_append(attrs, _(" revoked"));
-       }
-        	    if (subkey->expired) {
-           if (count++)
-               attrs = g_string_append_c(attrs, ',');
-           attrs = g_string_append(attrs, _(" expired"));
-       }
-        	    if (subkey->disabled) {
-           if (count)
-               attrs = g_string_append_c(attrs, ',');
-           attrs = g_string_append(attrs, _(" disabled"));
-       }
-        	    if (subkey->invalid) {
-           if (count)
-               attrs = g_string_append_c(attrs, ',');
-           attrs = g_string_append(attrs, _(" invalid"));
-       }
-        	    /* ngettext: string begins with a single space, so no space
-        	     * after the colon is correct punctuation (in English). */
-       g_string_append_printf(msg, ngettext("\nSubkey attribute:%s",
-                                            "\nSubkey attributes:%s",
-                                            count),
-                              attrs->str);
-       g_string_free(attrs, TRUE);
-    }
-            }
-        }
-
-        if (info->key->issuer_name) {
-            gchar *issuer_name =
-        	libbalsa_cert_subject_readable(info->key->issuer_name);
-            g_string_append_printf(msg, _("\nIssuer name: %s"), issuer_name);
-            g_free(issuer_name);
-    }
-        if (info->key->issuer_serial)
-	g_string_append_printf(msg, _("\nIssuer serial number: %s"),
-				   info->key->issuer_serial);
-        if (info->key->chain_id)
-            g_string_append_printf(msg, _("\nChain ID: %s"), info->key->chain_id);
-    }
-
-    retval = msg->str;
-    g_string_free(msg, FALSE);
-    return retval;
 }
 
 

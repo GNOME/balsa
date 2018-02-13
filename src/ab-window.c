@@ -214,7 +214,7 @@ balsa_ab_window_load_books(BalsaAbWindow * ab)
         LibBalsaAddressBook *address_book = ab_list->data;
 
         gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(ab->combo_box),
-                                  address_book->name);
+                                  libbalsa_address_book_get_name(address_book));
 
         if (ab->current_address_book == NULL)
             ab->current_address_book = address_book;
@@ -409,7 +409,7 @@ balsa_ab_window_init(BalsaAbWindow *ab)
     if(ab->current_address_book)
 	gtk_toggle_button_set_active(
 	    GTK_TOGGLE_BUTTON(ab->dist_address_mode_radio),
-	    ab->current_address_book->dist_list_mode);
+	    libbalsa_address_book_get_dist_list_mode(ab->current_address_book));
 
     /* Pack them into a box  */
     box2 = gtk_box_new(GTK_ORIENTATION_VERTICAL, 2);
@@ -709,7 +709,8 @@ balsa_ab_window_set_title(BalsaAbWindow *ab)
 #endif
 
     title =
-        g_strconcat(type, _(" address book: "), address_book->name, NULL);
+        g_strconcat(type, _(" address book: "),
+                    libbalsa_address_book_get_name(address_book), NULL);
     gtk_window_set_title(GTK_WINDOW(ab), title);
     g_free(title);
 }
@@ -733,12 +734,14 @@ balsa_ab_window_load(BalsaAbWindow *ab)
                                      (LibBalsaAddressBookLoadFunc)
                                      balsa_ab_window_load_cb, ab);
     if (err != LBABERR_OK && err != LBABERR_CANNOT_READ) {
+	const gchar *name =
+            libbalsa_address_book_get_name(ab->current_address_book);
 	const gchar *desc =
 	    libbalsa_address_book_strerror(ab->current_address_book, err);
         balsa_information_parented(GTK_WINDOW(ab),
 				   LIBBALSA_INFORMATION_ERROR,
 				   _("Error opening address book “%s”:\n%s"),
-				   ab->current_address_book->name, desc);
+				   name, desc);
     }
     balsa_ab_window_set_title(ab);
 }
@@ -866,7 +869,7 @@ balsa_ab_window_dist_mode_toggled(GtkWidget * w, BalsaAbWindow *ab)
     active = gtk_toggle_button_get_active
 	(GTK_TOGGLE_BUTTON(ab->single_address_mode_radio));
 
-    ab->current_address_book->dist_list_mode = !active;
+    libbalsa_address_book_set_dist_list_mode(ab->current_address_book, !active);
 
     balsa_ab_window_load(ab);
 }
@@ -887,7 +890,7 @@ balsa_ab_window_menu_changed(GtkWidget * widget, BalsaAbWindow *ab)
 
     g_signal_handler_block(G_OBJECT(ab->single_address_mode_radio),
 			   ab->toggle_handler_id);
-    if ( ab->current_address_book->dist_list_mode )
+    if (libbalsa_address_book_get_dist_list_mode(ab->current_address_book))
 	gtk_toggle_button_set_active(
 	    GTK_TOGGLE_BUTTON(ab->dist_address_mode_radio), TRUE);
     else

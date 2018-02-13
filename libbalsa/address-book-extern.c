@@ -185,7 +185,7 @@ libbalsa_address_book_externq_new(const gchar * name, const gchar * load,
                                       NULL));
     ab = LIBBALSA_ADDRESS_BOOK(abvc);
 
-    ab->name = g_strdup(name);
+    libbalsa_address_book_set_name(ab, name);
     abvc->load = g_strdup(load);
     abvc->save = g_strdup(save);
 
@@ -382,7 +382,7 @@ libbalsa_address_book_externq_alias_complete(LibBalsaAddressBook * ab,
 
     ex = LIBBALSA_ADDRESS_BOOK_EXTERN(ab);
 
-    if ( !ab->expand_aliases )
+    if (!libbalsa_address_book_get_expand_aliases(ab))
 	return NULL;
 
     if(!parse_externq_file(ex, (gchar *)prefix, lbe_expand_cb, &res))

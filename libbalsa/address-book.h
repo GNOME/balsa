@@ -23,14 +23,9 @@
 
 #include "address.h"
 
-#define LIBBALSA_TYPE_ADDRESS_BOOK			(libbalsa_address_book_get_type())
-#define LIBBALSA_ADDRESS_BOOK(obj)			(G_TYPE_CHECK_INSTANCE_CAST (obj, LIBBALSA_TYPE_ADDRESS_BOOK, LibBalsaAddressBook))
-#define LIBBALSA_ADDRESS_BOOK_CLASS(klass)		(G_TYPE_CHECK_CLASS_CAST (klass, LIBBALSA_TYPE_ADDRESS_BOOK, LibBalsaAddressBookClass))
-#define LIBBALSA_IS_ADDRESS_BOOK(obj)			(G_TYPE_CHECK_INSTANCE_TYPE (obj, LIBBALSA_TYPE_ADDRESS_BOOK))
-#define LIBBALSA_IS_ADDRESS_BOOK_CLASS(klass)		(G_TYPE_CHECK_CLASS_TYPE (klass, LIBBALSA_TYPE_ADDRESS_BOOK))
-#define LIBBALSA_ADDRESS_BOOK_GET_CLASS(obj) \
-    (G_TYPE_INSTANCE_GET_CLASS ((obj), LIBBALSA_TYPE_ADDRESS_BOOK, \
-				LibBalsaAddressBookClass))
+#define LIBBALSA_TYPE_ADDRESS_BOOK (libbalsa_address_book_get_type())
+G_DECLARE_DERIVABLE_TYPE(LibBalsaAddressBook, libbalsa_address_book,
+                         LIBBALSA, ADDRESS_BOOK, GObject)
 
 typedef enum {
     LBABERR_OK = 0,
@@ -48,20 +43,6 @@ typedef struct _LibBalsaAddressBookClass LibBalsaAddressBookClass;
 typedef LibBalsaABErr (*LibBalsaAddressBookLoadFunc)(LibBalsaAddressBook *ab,
                                                      LibBalsaAddress *address,
                                                      gpointer closure);
-
-struct _LibBalsaAddressBook {
-    GObject parent;
-
-    /* The gnome_config prefix where we save this address book */
-    gchar *config_prefix;
-    gchar *name;
-    gchar *ext_op_code;    /* extra description for last operation */
-    gboolean is_expensive; /* is lookup to the address book expensive? 
-			      e.g. LDAP address book */
-    gboolean expand_aliases;
-
-    gboolean dist_list_mode;
-};
 
 struct _LibBalsaAddressBookClass {
     GObjectClass parent;
@@ -92,8 +73,6 @@ struct _LibBalsaAddressBookClass {
 
     GList* (*alias_complete) (LibBalsaAddressBook * ab, const gchar *prefix);
 };
-
-GType libbalsa_address_book_get_type(void);
 
 LibBalsaAddressBook *libbalsa_address_book_new_from_config(const gchar *
 							   prefix);
@@ -141,6 +120,27 @@ GList *libbalsa_address_book_alias_complete(LibBalsaAddressBook * ab,
 					    const gchar *prefix);
 gboolean libbalsa_address_is_dist_list(const LibBalsaAddressBook *ab,
 				       const LibBalsaAddress *address);
+
+/*
+ * Getters
+ */
+gboolean      libbalsa_address_book_get_dist_list_mode(LibBalsaAddressBook * ab);
+gboolean      libbalsa_address_book_get_expand_aliases(LibBalsaAddressBook * ab);
+gboolean      libbalsa_address_book_get_is_expensive  (LibBalsaAddressBook * ab);
+const gchar * libbalsa_address_book_get_name          (LibBalsaAddressBook * ab);
+const gchar * libbalsa_address_book_get_config_prefix (LibBalsaAddressBook * ab);
+
+/*
+ * Setters
+ */
+void libbalsa_address_book_set_dist_list_mode(LibBalsaAddressBook * ab,
+                                              gboolean              dist_list_mode);
+void libbalsa_address_book_set_expand_aliases(LibBalsaAddressBook * ab,
+                                              gboolean              expand_aliases);
+void libbalsa_address_book_set_is_expensive  (LibBalsaAddressBook * ab,
+                                              gboolean              is_expensive);
+void libbalsa_address_book_set_name          (LibBalsaAddressBook * ab,
+                                              const gchar         * name);
 
 #endif
 

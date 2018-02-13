@@ -893,6 +893,9 @@ update_address_books(void)
     gtk_list_store_clear(GTK_LIST_STORE(model));
 
     while (list) {
+        const gchar *address_book_name;
+        gboolean expand;
+
         address_book = LIBBALSA_ADDRESS_BOOK(list->data);
 
         g_assert(address_book != NULL);
@@ -922,17 +925,20 @@ update_address_books(void)
         else
             type = _("Unknown");
 
+        address_book_name = libbalsa_address_book_get_name(address_book);
         if (address_book == balsa_app.default_address_book) {
-            name = g_strdup_printf(_("%s (default)"), address_book->name);
+            name = g_strdup_printf(_("%s (default)"), address_book_name);
         } else {
-            name = g_strdup(address_book->name);
+            name = g_strdup(address_book_name);
         }
+
+        expand = libbalsa_address_book_get_expand_aliases(address_book)
+            && !libbalsa_address_book_get_is_expensive(address_book);
         gtk_list_store_append(GTK_LIST_STORE(model), &iter);
         gtk_list_store_set(GTK_LIST_STORE(model), &iter,
                            AB_TYPE_COLUMN, type,
                            AB_NAME_COLUMN, name,
-                           AB_XPND_COLUMN, (address_book->expand_aliases
-                                            && !address_book->is_expensive),
+                           AB_XPND_COLUMN, expand,
                            AB_DATA_COLUMN, address_book, -1);
 
         g_free(name);

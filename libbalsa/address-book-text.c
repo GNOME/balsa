@@ -337,7 +337,7 @@ lbab_text_load_file(LibBalsaAddressBookText * ab_text, FILE * stream)
             continue;
 
         if (address->address_list->next
-            && LIBBALSA_ADDRESS_BOOK(ab_text)->dist_list_mode) {
+            && libbalsa_address_book_get_dist_list_mode(LIBBALSA_ADDRESS_BOOK(ab_text))) {
             /* Create a group address. */
             InternetAddress *ia =
                 internet_address_group_new(address->full_name);
@@ -695,7 +695,7 @@ libbalsa_address_book_text_alias_complete(LibBalsaAddressBook * ab,
     GList *list;
     GList *res = NULL;
 
-    if (ab->expand_aliases == FALSE)
+    if (!libbalsa_address_book_get_expand_aliases(ab))
         return NULL;
 
     stream = fopen(ab_text->path, "r");

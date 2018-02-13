@@ -308,7 +308,8 @@ lbav_get_matching_addresses(LibBalsaAddressView * address_view,
 
         ab = LIBBALSA_ADDRESS_BOOK(list->data);
         if (type == LIBBALSA_ADDRESS_VIEW_MATCH_FAST
-            && (!ab->expand_aliases || ab->is_expensive))
+            && (!libbalsa_address_book_get_expand_aliases(ab) ||
+                libbalsa_address_book_get_is_expensive(ab)))
             continue;
 
         match =

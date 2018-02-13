@@ -300,13 +300,14 @@ store_address_book_frame(StoreAddressInfo * info)
          ab_list != NULL;
          off++, ab_list = ab_list->next) {
         LibBalsaAddressBook *address_book;
+        const gchar *name;
 
         address_book = LIBBALSA_ADDRESS_BOOK(ab_list->data);
         if (info->current_address_book == NULL)
             info->current_address_book = address_book;
 
-        gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(combo_box),
-                                       address_book->name);
+        name = libbalsa_address_book_get_name(address_book);
+        gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(combo_box), name);
         if (address_book == balsa_app.default_address_book)
             default_ab_offset = off;
     }
@@ -450,11 +451,13 @@ store_address_add_list(StoreAddressInfo    * info,
 
     for (i = 0; i < internet_address_list_length(list); i++) {
         InternetAddress *ia = internet_address_list_get_address(list, i);
+        gboolean dist_list_mode =
+            libbalsa_address_book_get_dist_list_mode(info->current_address_book);
 
         if (INTERNET_ADDRESS_IS_MAILBOX(ia)) {
             store_address_add_address(info, label, ia, NULL);
-        } else if (info->current_address_book->dist_list_mode) {
-            store_address_add_address(info, label, ia, ia);
+        } else if (dist_list_mode) {
+                store_address_add_address(info, label, ia, ia);
         } else {
             InternetAddressList *members =
                 INTERNET_ADDRESS_GROUP(ia)->members;

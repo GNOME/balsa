@@ -29,8 +29,6 @@
 #include "libbalsa-marshal.h"
 #include "libbalsa-conf.h"
 
-static GObjectClass *parent_class = NULL;
-
 static void libbalsa_address_book_class_init(LibBalsaAddressBookClass *
 					     klass);
 static void libbalsa_address_book_init(LibBalsaAddressBook * ab);
@@ -43,38 +41,24 @@ static void libbalsa_address_book_real_load_config(LibBalsaAddressBook *
 						   ab,
 						   const gchar * group);
 
-GType libbalsa_address_book_get_type(void)
-{
-    static GType address_book_type = 0;
+typedef struct {
+    /* The gnome_config prefix where we save this address book */
+    gchar *config_prefix;
+    gchar *name;
+    gchar *ext_op_code;    /* extra description for last operation */
+    gboolean is_expensive; /* is lookup to the address book expensive? 
+			      e.g. LDAP address book */
+    gboolean expand_aliases;
 
-    if (!address_book_type) {
-	static const GTypeInfo address_book_info = {
-	    sizeof(LibBalsaAddressBookClass),
-            NULL,               /* base_init */
-            NULL,               /* base_finalize */
-	    (GClassInitFunc) libbalsa_address_book_class_init,
-            NULL,               /* class_finalize */
-            NULL,               /* class_data */
-	    sizeof(LibBalsaAddressBook),
-            0,                  /* n_preallocs */
-	    (GInstanceInitFunc) libbalsa_address_book_init
-	};
+    gboolean dist_list_mode;
+} LibBalsaAddressBookPrivate;
 
-	address_book_type =
-	    g_type_register_static(G_TYPE_OBJECT,
-                                   "LibBalsaAddressBook",
-                                   &address_book_info, 0);
-    }
-
-    return address_book_type;
-}
+G_DEFINE_TYPE_WITH_PRIVATE(LibBalsaAddressBook, libbalsa_address_book, G_TYPE_OBJECT)
 
 static void
 libbalsa_address_book_class_init(LibBalsaAddressBookClass * klass)
 {
     GObjectClass *object_class;
-
-    parent_class = g_type_class_peek_parent(klass);
 
     object_class = G_OBJECT_CLASS(klass);
 
@@ -92,25 +76,26 @@ libbalsa_address_book_class_init(LibBalsaAddressBookClass * klass)
 static void
 libbalsa_address_book_init(LibBalsaAddressBook * ab)
 {
-    ab->config_prefix = NULL;
+    LibBalsaAddressBookPrivate *priv = libbalsa_address_book_get_instance_private(ab);
 
-    ab->name = NULL;
-    ab->expand_aliases = TRUE;
-    ab->dist_list_mode = FALSE;
-    ab->is_expensive   = FALSE;
+    priv->config_prefix = NULL;
+
+    priv->name = NULL;
+    priv->expand_aliases = TRUE;
+    priv->dist_list_mode = FALSE;
+    priv->is_expensive   = FALSE;
 }
 
 static void
 libbalsa_address_book_finalize(GObject * object)
 {
-    LibBalsaAddressBook *ab;
+    LibBalsaAddressBook *ab = LIBBALSA_ADDRESS_BOOK(object);
+    LibBalsaAddressBookPrivate *priv = libbalsa_address_book_get_instance_private(ab);
 
-    ab = LIBBALSA_ADDRESS_BOOK(object);
+    g_free(priv->config_prefix);
+    g_free(priv->name);
 
-    g_free(ab->config_prefix);
-    g_free(ab->name);
-
-    G_OBJECT_CLASS(parent_class)->finalize(object);
+    G_OBJECT_CLASS(libbalsa_address_book_parent_class)->finalize(object);
 }
 
 LibBalsaAddressBook *
@@ -208,9 +193,11 @@ libbalsa_address_book_modify_address(LibBalsaAddressBook * ab,
 void
 libbalsa_address_book_set_status(LibBalsaAddressBook * ab, gchar *str)
 {
+    LibBalsaAddressBookPrivate *priv = libbalsa_address_book_get_instance_private(ab);
+
     g_return_if_fail(ab);
-    g_free(ab->ext_op_code);
-    ab->ext_op_code = str;
+    g_free(priv->ext_op_code);
+    priv->ext_op_code = str;
 }
 
 void
@@ -232,6 +219,8 @@ void
 libbalsa_address_book_load_config(LibBalsaAddressBook * ab,
 				  const gchar * group)
 {
+    LibBalsaAddressBookPrivate *priv = libbalsa_address_book_get_instance_private(ab);
+
     g_return_if_fail(LIBBALSA_IS_ADDRESS_BOOK(ab));
     g_assert(LIBBALSA_ADDRESS_BOOK_GET_CLASS(ab) != NULL);
 
@@ -239,8 +228,8 @@ libbalsa_address_book_load_config(LibBalsaAddressBook * ab,
     LIBBALSA_ADDRESS_BOOK_GET_CLASS(ab)->load_config(ab, group);
     libbalsa_conf_pop_group();
 
-    if (ab->is_expensive < 0)
-        ab->is_expensive = FALSE;
+    if (priv->is_expensive < 0)
+        priv->is_expensive = FALSE;
 }
 
 GList *
@@ -257,7 +246,10 @@ libbalsa_address_book_alias_complete(LibBalsaAddressBook * ab,
 gboolean libbalsa_address_is_dist_list(const LibBalsaAddressBook *ab,
 				       const LibBalsaAddress *address)
 {
-    return (ab->dist_list_mode && g_list_length(address->address_list)>1);
+    LibBalsaAddressBookPrivate *priv =
+        libbalsa_address_book_get_instance_private((LibBalsaAddressBook *) ab);
+
+    return (priv->dist_list_mode && g_list_length(address->address_list)>1);
 }
 
 
@@ -266,52 +258,57 @@ static void
 libbalsa_address_book_real_save_config(LibBalsaAddressBook * ab,
 				       const gchar * group)
 {
+    LibBalsaAddressBookPrivate *priv = libbalsa_address_book_get_instance_private(ab);
+
     g_return_if_fail(LIBBALSA_IS_ADDRESS_BOOK(ab));
     g_assert(LIBBALSA_ADDRESS_BOOK_GET_CLASS(ab) != NULL);
 
     libbalsa_conf_set_string("Type", g_type_name(G_OBJECT_TYPE(ab)));
-    libbalsa_conf_set_string("Name", ab->name);
-    libbalsa_conf_set_bool("ExpandAliases", ab->expand_aliases);
-    libbalsa_conf_set_bool("IsExpensive", ab->is_expensive);
-    libbalsa_conf_set_bool("DistListMode", ab->dist_list_mode);
+    libbalsa_conf_set_string("Name", priv->name);
+    libbalsa_conf_set_bool("ExpandAliases", priv->expand_aliases);
+    libbalsa_conf_set_bool("IsExpensive", priv->is_expensive);
+    libbalsa_conf_set_bool("DistListMode", priv->dist_list_mode);
 
-    g_free(ab->config_prefix);
-    ab->config_prefix = g_strdup(group);
+    g_free(priv->config_prefix);
+    priv->config_prefix = g_strdup(group);
 }
 
 static void
 libbalsa_address_book_real_load_config(LibBalsaAddressBook * ab,
 				       const gchar * group)
 {
+    LibBalsaAddressBookPrivate *priv = libbalsa_address_book_get_instance_private(ab);
     gboolean def;
 
     g_return_if_fail(LIBBALSA_IS_ADDRESS_BOOK(ab));
 
-    g_free(ab->config_prefix);
-    ab->config_prefix = g_strdup(group);
+    g_free(priv->config_prefix);
+    priv->config_prefix = g_strdup(group);
 
-    ab->expand_aliases = libbalsa_conf_get_bool("ExpandAliases=false");
+    priv->expand_aliases = libbalsa_conf_get_bool("ExpandAliases=false");
 
-    ab->is_expensive =
+    priv->is_expensive =
         libbalsa_conf_get_bool_with_default("IsExpensive", &def);
     if (def)
         /* Default will be supplied by the backend, or in
          * libbalsa_address_book_load_config. */
-        ab->is_expensive = -1;
+        priv->is_expensive = -1;
 
-    ab->dist_list_mode = libbalsa_conf_get_bool("DistListMode=false");
+    priv->dist_list_mode = libbalsa_conf_get_bool("DistListMode=false");
 
-    g_free(ab->name);
-    ab->name = libbalsa_conf_get_string("Name=Address Book");
+    g_free(priv->name);
+    priv->name = libbalsa_conf_get_string("Name=Address Book");
 }
 
 const gchar*
 libbalsa_address_book_strerror(LibBalsaAddressBook * ab, LibBalsaABErr err)
 {
+    LibBalsaAddressBookPrivate *priv = libbalsa_address_book_get_instance_private(ab);
     const gchar *s;
+
     g_return_val_if_fail(ab, NULL);
-    if(ab->ext_op_code)
-	return ab->ext_op_code;
+    if(priv->ext_op_code)
+	return priv->ext_op_code;
 
     switch(err) {
     case LBABERR_OK:             s= _("No error"); break;
@@ -328,4 +325,87 @@ libbalsa_address_book_strerror(LibBalsaAddressBook * ab, LibBalsaABErr err)
     return s;
 }
 
+/*
+ * Getters
+ */
 
+gboolean
+libbalsa_address_book_get_dist_list_mode(LibBalsaAddressBook * ab)
+{
+    LibBalsaAddressBookPrivate *priv = libbalsa_address_book_get_instance_private(ab);
+
+    return priv->dist_list_mode;
+}
+
+gboolean
+libbalsa_address_book_get_expand_aliases(LibBalsaAddressBook * ab)
+{
+    LibBalsaAddressBookPrivate *priv = libbalsa_address_book_get_instance_private(ab);
+
+    return priv->expand_aliases;
+}
+
+gboolean
+libbalsa_address_book_get_is_expensive(LibBalsaAddressBook * ab)
+{
+    LibBalsaAddressBookPrivate *priv = libbalsa_address_book_get_instance_private(ab);
+
+    return priv->is_expensive;
+}
+
+const gchar *
+libbalsa_address_book_get_name(LibBalsaAddressBook * ab)
+{
+    LibBalsaAddressBookPrivate *priv = libbalsa_address_book_get_instance_private(ab);
+
+    return priv->name;
+}
+
+const gchar *
+libbalsa_address_book_get_config_prefix(LibBalsaAddressBook * ab)
+{
+    LibBalsaAddressBookPrivate *priv = libbalsa_address_book_get_instance_private(ab);
+
+    return priv->config_prefix;
+}
+
+/*
+ * Setters
+ */
+
+void
+libbalsa_address_book_set_dist_list_mode(LibBalsaAddressBook * ab,
+                                         gboolean              dist_list_mode)
+{
+    LibBalsaAddressBookPrivate *priv = libbalsa_address_book_get_instance_private(ab);
+
+    priv->dist_list_mode = dist_list_mode;
+}
+
+void
+libbalsa_address_book_set_expand_aliases(LibBalsaAddressBook * ab,
+                                         gboolean              expand_aliases)
+{
+    LibBalsaAddressBookPrivate *priv = libbalsa_address_book_get_instance_private(ab);
+
+    priv->expand_aliases = expand_aliases;
+}
+
+void
+libbalsa_address_book_set_is_expensive(LibBalsaAddressBook * ab,
+                                       gboolean              is_expensive)
+{
+    LibBalsaAddressBookPrivate *priv = libbalsa_address_book_get_instance_private(ab);
+
+    priv->is_expensive = is_expensive;
+}
+
+void
+libbalsa_address_book_set_name(LibBalsaAddressBook * ab,
+                               const gchar         * name)
+{
+    LibBalsaAddressBookPrivate *priv = libbalsa_address_book_get_instance_private(ab);
+
+    g_free(priv->name);
+    priv->name = g_strdup(name);
+}

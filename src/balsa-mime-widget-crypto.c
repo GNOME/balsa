@@ -363,9 +363,9 @@ show_public_key_data(GtkExpander *expander,
 
 			vbox = GTK_BOX(g_object_steal_data(G_OBJECT(expander), "vbox"));
 			key_widget = libbalsa_gpgme_key(body->sig_info->key, body->sig_info->fingerprint, 0U, FALSE);
-			gtk_box_pack_start(vbox, key_widget, FALSE, FALSE, 0);
+			gtk_box_pack_start(vbox, key_widget);
 			gtk_box_reorder_child(vbox, key_widget, 1U);
-			gtk_widget_show_all(key_widget);
+			gtk_widget_show(key_widget);
 		}
 	}
 }

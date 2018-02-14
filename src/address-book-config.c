@@ -254,7 +254,8 @@ create_local_dialog(AddressBookConfig * abc, const gchar * type)
     add_radio_buttons(grid, 1, abc);
 
     if (ab) {
-        const gchar *path = LIBBALSA_ADDRESS_BOOK_TEXT(ab)->path;
+        LibBalsaAddressBookText *abt = (LibBalsaAddressBookText *) ab;
+        const gchar *path = libbalsa_address_book_text_get_path(abt);
         gchar *folder;
         gchar *utf8name;
 
@@ -786,10 +787,8 @@ modify_book(AddressBookConfig * abc)
         gchar *path =
             gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(abc->window));
 
-        if (path) {
-            g_free(ab_text->path);
-            ab_text->path = path;
-        }
+        if (path != NULL)
+            libbalsa_address_book_text_set_path(ab_text, path);
     } else if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_EXTERN) {
         LibBalsaAddressBookExtern *externq;
         gchar *load =

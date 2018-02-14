@@ -33,33 +33,9 @@
 #include "address-book.h"
 #include "completion.h"
 
-#define LIBBALSA_TYPE_ADDRESS_BOOK_TEXT	                               \
-    (libbalsa_address_book_text_get_type())
-#define LIBBALSA_ADDRESS_BOOK_TEXT(obj)	                               \
-    (G_TYPE_CHECK_INSTANCE_CAST(obj, LIBBALSA_TYPE_ADDRESS_BOOK_TEXT,  \
-                                LibBalsaAddressBookText))
-#define LIBBALSA_ADDRESS_BOOK_TEXT_CLASS(klass)	                       \
-    (G_TYPE_CHECK_CLASS_CAST(klass, LIBBALSA_TYPE_ADDRESS_BOOK_TEXT,   \
-                             LibBalsaAddressBookTextClass))
-#define LIBBALSA_IS_ADDRESS_BOOK_TEXT(obj)                             \
-    (G_TYPE_CHECK_INSTANCE_TYPE(obj, LIBBALSA_TYPE_ADDRESS_BOOK_TEXT))
-#define LIBBALSA_IS_ADDRESS_BOOK_TEXT_CLASS(klass)                     \
-    (G_TYPE_CHECK_CLASS_TYPE(klass, LIBBALSA_TYPE_ADDRESS_BOOK_TEXT))
-#define LIBBALSA_ADDRESS_BOOK_TEXT_GET_CLASS(obj)                      \
-    (G_TYPE_INSTANCE_GET_CLASS((obj), LIBBALSA_TYPE_ADDRESS_BOOK_TEXT, \
-			       LibBalsaAddressBookTextClass))
-
-struct _LibBalsaAddressBookText {
-    LibBalsaAddressBook parent;
-
-    gchar *path;
-
-    GSList *item_list;
-
-    time_t mtime;
-
-    LibBalsaCompletion *name_complete;
-};
+#define LIBBALSA_TYPE_ADDRESS_BOOK_TEXT	(libbalsa_address_book_text_get_type())
+G_DECLARE_DERIVABLE_TYPE(LibBalsaAddressBookText, libbalsa_address_book_text,
+        LIBBALSA, ADDRESS_BOOK_TEXT, LibBalsaAddressBook)
 
 struct _LibBalsaAddressBookTextClass {
     LibBalsaAddressBookClass parent_class;
@@ -74,6 +50,17 @@ struct _LibBalsaAddressBookTextClass {
 typedef struct _LibBalsaAddressBookText LibBalsaAddressBookText;
 typedef struct _LibBalsaAddressBookTextClass LibBalsaAddressBookTextClass;
 
-GType libbalsa_address_book_text_get_type(void);
+/*
+ * Getter
+ */
+
+const gchar * libbalsa_address_book_text_get_path(LibBalsaAddressBookText * ab_text);
+
+/*
+ * Setter
+ */
+
+void libbalsa_address_book_text_set_path(LibBalsaAddressBookText * ab_text,
+                                         const gchar             * path);
 
 #endif                          /* __LIBBALSA_ADDRESS_BOOK_TEXT_H__ */

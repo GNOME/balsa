@@ -562,9 +562,12 @@ create_gpe_dialog(AddressBookConfig * abc)
     /* mailbox name */
 
     label = libbalsa_create_grid_label(_("A_ddress Book Name:"), grid, 0);
-    abc->name_entry = libbalsa_create_grid_entry(grid, NULL, NULL, 0, 
-				   ab ? ab->name : _("GPE Address Book"), 
-				   label);
+    abc->name_entry =
+        libbalsa_create_grid_entry(grid, NULL, NULL, 0,
+                                   ab != NULL ?
+                                   libbalsa_address_book_get_name(ab) :
+                                   _("GPE Address Book"),
+                                   label);
 
     add_radio_buttons(grid, 1, abc);
 

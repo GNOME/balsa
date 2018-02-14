@@ -47,12 +47,10 @@
     do {gchar* dir = g_strconcat(g_get_home_dir(), "/.gpe", NULL);\
  mkdir(dir, S_IRUSR|S_IWUSR|S_IXUSR); g_free(dir);}while(0)
 
-static LibBalsaAddressBookClass *parent_class = NULL;
-
 static void
 libbalsa_address_book_gpe_class_init(LibBalsaAddressBookGpeClass *
 				      klass);
-static void libbalsa_address_book_gpe_init(LibBalsaAddressBookGpe * ab);
+static void libbalsa_address_book_gpe_init(LibBalsaAddressBookGpe * ab_gpe);
 static void libbalsa_address_book_gpe_finalize(GObject * object);
 
 static LibBalsaABErr libbalsa_address_book_gpe_load(LibBalsaAddressBook * ab, 
@@ -61,7 +59,7 @@ static LibBalsaABErr libbalsa_address_book_gpe_load(LibBalsaAddressBook * ab,
                                                     gpointer closure);
 
 static void
-libbalsa_address_book_gpe_close_db(LibBalsaAddressBookGpe *ab);
+libbalsa_address_book_gpe_close_db(LibBalsaAddressBookGpe *ab_gpe);
 static LibBalsaABErr
 libbalsa_address_book_gpe_add_address(LibBalsaAddressBook *ab,
                                       LibBalsaAddress *address);
@@ -77,39 +75,27 @@ libbalsa_address_book_gpe_modify_address(LibBalsaAddressBook *ab,
 static GList *libbalsa_address_book_gpe_alias_complete(LibBalsaAddressBook *ab,
                                                        const gchar *prefix);
 
-GType libbalsa_address_book_gpe_get_type(void)
-{
-    static GType address_book_gpe_type = 0;
+struct _LibBalsaAddressBookGpe {
+    LibBalsaAddressBook parent;
+#ifdef HAVE_SQLITE3
+    sqlite3 *db;
+#else                           /* HAVE_SQLITE3 */
+    sqlite *db;
+#endif                          /* HAVE_SQLITE3 */
+};
 
-    if (!address_book_gpe_type) {
-	static const GTypeInfo address_book_gpe_info = {
-	    sizeof(LibBalsaAddressBookGpeClass),
-            NULL,               /* base_init */
-            NULL,               /* base_finalize */
-	    (GClassInitFunc) libbalsa_address_book_gpe_class_init,
-            NULL,               /* class_finalize */
-            NULL,               /* class_data */
-	    sizeof(LibBalsaAddressBookGpe),
-            0,                  /* n_preallocs */
-	    (GInstanceInitFunc) libbalsa_address_book_gpe_init
-	};
+struct _LibBalsaAddressBookGpeClass {
+    LibBalsaAddressBookClass parent_class;
+};
 
-	address_book_gpe_type =
-            g_type_register_static(LIBBALSA_TYPE_ADDRESS_BOOK,
-	                           "LibBalsaAddressBookGpe",
-			           &address_book_gpe_info, 0);
-    }
-
-    return address_book_gpe_type;
-}
+G_DEFINE_TYPE(LibBalsaAddressBookGpe, libbalsa_address_book_gpe,
+        LIBBALSA_TYPE_ADDRESS_BOOK)
 
 static void
 libbalsa_address_book_gpe_class_init(LibBalsaAddressBookGpeClass * klass)
 {
     LibBalsaAddressBookClass *address_book_class;
     GObjectClass *object_class;
-
-    parent_class = g_type_class_peek_parent(klass);
 
     object_class = G_OBJECT_CLASS(klass);
     address_book_class = LIBBALSA_ADDRESS_BOOK_CLASS(klass);
@@ -128,10 +114,14 @@ libbalsa_address_book_gpe_class_init(LibBalsaAddressBookGpeClass * klass)
 }
 
 static void
-libbalsa_address_book_gpe_init(LibBalsaAddressBookGpe * ab)
+libbalsa_address_book_gpe_init(LibBalsaAddressBookGpe * ab_gpe)
 {
-    ab->db = NULL;
-    LIBBALSA_ADDRESS_BOOK(ab)->is_expensive = FALSE;
+    LibBalsaAddressBook *ab;
+
+    ab_gpe->db = NULL;
+
+    ab = LIBBALSA_ADDRESS_BOOK(ab_gpe);
+    libbalsa_address_book_set_is_expensive(ab, FALSE);
 }
 
 static void
@@ -139,23 +129,24 @@ libbalsa_address_book_gpe_finalize(GObject * object)
 {
     libbalsa_address_book_gpe_close_db(LIBBALSA_ADDRESS_BOOK_GPE(object));
 
-    G_OBJECT_CLASS(parent_class)->finalize(object);
+    G_OBJECT_CLASS(libbalsa_address_book_gpe_parent_class)->finalize(object);
 }
 
 LibBalsaAddressBook *
 libbalsa_address_book_gpe_new(const gchar *name)
 {
-    LibBalsaAddressBookGpe *gpe;
+    LibBalsaAddressBookGpe *ab_gpe;
     LibBalsaAddressBook *ab;
 
-    gpe = LIBBALSA_ADDRESS_BOOK_GPE(g_object_new
-                                    (LIBBALSA_TYPE_ADDRESS_BOOK_GPE,
-                                     NULL));
-    ab = LIBBALSA_ADDRESS_BOOK(gpe);
+    ab_gpe = LIBBALSA_ADDRESS_BOOK_GPE(g_object_new
+                                       (LIBBALSA_TYPE_ADDRESS_BOOK_GPE,
+                                        NULL));
+    ab = LIBBALSA_ADDRESS_BOOK(ab_gpe);
+    libbalsa_address_book_set_name(ab, name);
 
-    ab->name = g_strdup(name);
     /* We open on demand... */
-    gpe->db = NULL;
+    ab_gpe->db = NULL;
+
     return ab;
 }
 
@@ -163,15 +154,15 @@ libbalsa_address_book_gpe_new(const gchar *name)
  * Close the SQLite db....
  */
 static void
-libbalsa_address_book_gpe_close_db(LibBalsaAddressBookGpe * ab)
+libbalsa_address_book_gpe_close_db(LibBalsaAddressBookGpe * ab_gpe)
 {
-    if (ab->db) {
+    if (ab_gpe->db) {
 #ifdef HAVE_SQLITE3
-	sqlite3_close(ab->db);
+	sqlite3_close(ab_gpe->db);
 #else                           /* HAVE_SQLITE3 */
-	sqlite_close(ab->db);
+	sqlite_close(ab_gpe->db);
 #endif                          /* HAVE_SQLITE3 */
-	ab->db = NULL;
+	ab_gpe->db = NULL;
     }
 }
 
@@ -189,7 +180,7 @@ static const char *schema2_str =
 "create table contacts_urn (urn INTEGER PRIMARY KEY)";
 
 static int
-libbalsa_address_book_gpe_open_db(LibBalsaAddressBookGpe * ab)
+libbalsa_address_book_gpe_open_db(LibBalsaAddressBookGpe * ab_gpe)
 {
 #ifdef HAVE_SQLITE3
     gchar *dir, *name;
@@ -199,31 +190,31 @@ libbalsa_address_book_gpe_open_db(LibBalsaAddressBookGpe * ab)
     name = g_build_filename(dir, "contacts", NULL);
     g_free(dir);
 
-    if (sqlite3_open(name, &ab->db) != SQLITE_OK) {
-        printf("Cannot open “%s”: %s\n", name, sqlite3_errmsg(ab->db));
+    if (sqlite3_open(name, &ab_gpe->db) != SQLITE_OK) {
+        printf("Cannot open “%s”: %s\n", name, sqlite3_errmsg(ab_gpe->db));
         g_free(name);
-        sqlite3_close(ab->db);
-        ab->db = NULL;
+        sqlite3_close(ab_gpe->db);
+        ab_gpe->db = NULL;
         return 0;
     }
     g_free(name);
 
-    sqlite3_exec(ab->db, schema_str,  NULL, NULL, NULL);
-    sqlite3_exec(ab->db, schema2_str, NULL, NULL, NULL);
+    sqlite3_exec(ab_gpe->db, schema_str,  NULL, NULL, NULL);
+    sqlite3_exec(ab_gpe->db, schema2_str, NULL, NULL, NULL);
 #else                           /* HAVE_SQLITE3 */
     gchar *name, *errmsg = NULL;
 
     ASSURE_GPE_DIR;
     name = g_strconcat(g_get_home_dir(), DB_NAME, NULL);
-    ab->db = sqlite_open(name, 0, &errmsg);
+    ab_gpe->db = sqlite_open(name, 0, &errmsg);
     g_free(name);
-    if(ab->db == NULL) {
+    if(ab_gpe->db == NULL) {
         printf("Cannot open: %s\n", errmsg);
         free(errmsg);
         return 0;
     }
-    sqlite_exec (ab->db, schema_str,  NULL, NULL, NULL);
-    sqlite_exec (ab->db, schema2_str, NULL, NULL, NULL);
+    sqlite_exec (ab_gpe->db, schema_str,  NULL, NULL, NULL);
+    sqlite_exec (ab_gpe->db, schema2_str, NULL, NULL, NULL);
 #endif                          /* HAVE_SQLITE3 */
 
     return 1;
@@ -295,7 +286,7 @@ struct gpe_closure {
     gpointer closure;
     LibBalsaAddressBookGpe *gpe;
 };
-                                             
+
 static int
 gpe_read_address(void *arg, int argc, char **argv, char **names)
 {
@@ -337,26 +328,26 @@ libbalsa_address_book_gpe_load(LibBalsaAddressBook * ab,
                                LibBalsaAddressBookLoadFunc callback,
                                gpointer closure)
 {
-    LibBalsaAddressBookGpe *gpe_ab;
+    LibBalsaAddressBookGpe *ab_gpe;
     gchar *err = NULL;
     struct gpe_closure gc;
     int r;
     LibBalsaABErr ret;
 
-    g_return_val_if_fail ( LIBBALSA_IS_ADDRESS_BOOK_GPE(ab), LBABERR_OK);
+    g_return_val_if_fail(LIBBALSA_IS_ADDRESS_BOOK_GPE(ab), LBABERR_OK);
 
     if (callback == NULL)
 	return LBABERR_OK;
 
-    gpe_ab = LIBBALSA_ADDRESS_BOOK_GPE(ab);
+    ab_gpe = LIBBALSA_ADDRESS_BOOK_GPE(ab);
     
-    if (gpe_ab->db == NULL)
-        if (!libbalsa_address_book_gpe_open_db(gpe_ab))
+    if (ab_gpe->db == NULL)
+        if (!libbalsa_address_book_gpe_open_db(ab_gpe))
             return LBABERR_CANNOT_CONNECT;
 
     gc.callback = callback;
     gc.closure  = closure;
-    gc.gpe      = gpe_ab;
+    gc.gpe      = ab_gpe;
     /* FIXME: error reporting */
 #ifdef HAVE_SQLITE3
     if (filter && *filter) {
@@ -369,17 +360,17 @@ libbalsa_address_book_gpe_load(LibBalsaAddressBook * ab,
                             " upper(tag)='HOME.EMAIL') "
                             "and value LIKE '%q%%'",
                             filter);
-        r = sqlite3_exec(gpe_ab->db, sql, gpe_read_address, &gc, &err);
+        r = sqlite3_exec(ab_gpe->db, sql, gpe_read_address, &gc, &err);
         sqlite3_free(sql);
     } else {
-        r = sqlite3_exec(gpe_ab->db,
+        r = sqlite3_exec(ab_gpe->db,
                          "select distinct urn from contacts_urn",
                          gpe_read_address, &gc, &err);
     }
 #else                           /* HAVE_SQLITE3 */
     if(filter && *filter) {
         r = sqlite_exec_printf
-            (gpe_ab->db, 
+            (ab_gpe->db, 
              "select distinct urn from contacts where "
              "(upper(tag)='FAMILY_NAME' or upper(tag)='GIVEN_NAME' or "
              "upper(tag)='NAME' or "
@@ -387,7 +378,7 @@ libbalsa_address_book_gpe_load(LibBalsaAddressBook * ab,
              "and value LIKE '%q%%'",
              gpe_read_address, &gc, &err, filter);
     } else {
-        r = sqlite_exec(gpe_ab->db, "select distinct urn from contacts_urn",
+        r = sqlite_exec(ab_gpe->db, "select distinct urn from contacts_urn",
                         gpe_read_address, &gc, &err);
     }
 #endif                          /* HAVE_SQLITE3 */
@@ -428,7 +419,7 @@ static LibBalsaABErr
 libbalsa_address_book_gpe_add_address(LibBalsaAddressBook *ab,
                                        LibBalsaAddress *address)
 {
-    LibBalsaAddressBookGpe *gpe_ab = LIBBALSA_ADDRESS_BOOK_GPE(ab);
+    LibBalsaAddressBookGpe *ab_gpe = LIBBALSA_ADDRESS_BOOK_GPE(ab);
     int r;
     guint id;
     char *err = NULL;
@@ -439,18 +430,18 @@ libbalsa_address_book_gpe_add_address(LibBalsaAddressBook *ab,
     g_return_val_if_fail(address, LBABERR_CANNOT_WRITE);
     g_return_val_if_fail(address->address_list, LBABERR_CANNOT_WRITE);
 
-    if (gpe_ab->db == NULL) {
-        if(!libbalsa_address_book_gpe_open_db(gpe_ab))
+    if (ab_gpe->db == NULL) {
+        if(!libbalsa_address_book_gpe_open_db(ab_gpe))
 	    return LBABERR_CANNOT_CONNECT;
     }
 #ifdef HAVE_SQLITE3
-    r = sqlite3_exec(gpe_ab->db, "insert into contacts_urn values (NULL)",
+    r = sqlite3_exec(ab_gpe->db, "insert into contacts_urn values (NULL)",
                      NULL, NULL, &err);
     if (r != SQLITE_OK) {
         libbalsa_address_book_set_status(ab, g_strdup(err));
         sqlite3_free(err);
 #else                           /* HAVE_SQLITE3 */
-    r = sqlite_exec(gpe_ab->db, "insert into contacts_urn values (NULL)",
+    r = sqlite_exec(ab_gpe->db, "insert into contacts_urn values (NULL)",
                     NULL, NULL, &err);
     if (r != SQLITE_OK) {
         libbalsa_address_book_set_status(ab, g_strdup(err));
@@ -461,25 +452,25 @@ libbalsa_address_book_gpe_add_address(LibBalsaAddressBook *ab,
     /* FIXME: duplicate detection! */
 
 #ifdef HAVE_SQLITE3
-    id = sqlite3_last_insert_rowid(gpe_ab->db);
+    id = sqlite3_last_insert_rowid(ab_gpe->db);
 #else                           /* HAVE_SQLITE3 */
-    id = sqlite_last_insert_rowid(gpe_ab->db);
+    id = sqlite_last_insert_rowid(ab_gpe->db);
 #endif                          /* HAVE_SQLITE3 */
-    INSERT_ATTR(gpe_ab->db,id, "NAME",        address->full_name);
-    INSERT_ATTR(gpe_ab->db,id, "GIVEN_NAME",  address->first_name);
-    INSERT_ATTR(gpe_ab->db,id, "FAMILY_NAME", address->last_name);
-    INSERT_ATTR(gpe_ab->db,id, "NICKNAME",    address->nick_name);
-    INSERT_ATTR(gpe_ab->db,id, "WORK.ORGANIZATION", address->organization);
-    INSERT_ATTR(gpe_ab->db,id, "WORK.EMAIL",
+    INSERT_ATTR(ab_gpe->db,id, "NAME",        address->full_name);
+    INSERT_ATTR(ab_gpe->db,id, "GIVEN_NAME",  address->first_name);
+    INSERT_ATTR(ab_gpe->db,id, "FAMILY_NAME", address->last_name);
+    INSERT_ATTR(ab_gpe->db,id, "NICKNAME",    address->nick_name);
+    INSERT_ATTR(ab_gpe->db,id, "WORK.ORGANIZATION", address->organization);
+    INSERT_ATTR(ab_gpe->db,id, "WORK.EMAIL",
                 (char*)address->address_list->data);
 #ifdef HAVE_SQLITE3
     sql = sqlite3_mprintf("insert into contacts values "
                           "('%d', 'MODIFIED', %d)",
                           id, time(NULL));
-    sqlite3_exec(gpe_ab->db, sql, NULL, NULL, NULL);
+    sqlite3_exec(ab_gpe->db, sql, NULL, NULL, NULL);
     sqlite3_free(sql);
 #else                           /* HAVE_SQLITE3 */
-    sqlite_exec_printf(gpe_ab->db, "insert into contacts values "
+    sqlite_exec_printf(ab_gpe->db, "insert into contacts values "
                        "('%d', 'MODIFIED', %d)", NULL, NULL, NULL,
                        id, time(NULL));
 #endif                          /* HAVE_SQLITE3 */
@@ -548,21 +539,21 @@ static LibBalsaABErr
 libbalsa_address_book_gpe_remove_address(LibBalsaAddressBook *ab,
                                           LibBalsaAddress *address)
 {
-    LibBalsaAddressBookGpe *gpe_ab = LIBBALSA_ADDRESS_BOOK_GPE(ab);
+    LibBalsaAddressBookGpe *ab_gpe = LIBBALSA_ADDRESS_BOOK_GPE(ab);
     guint uid;
     char *err;
     g_return_val_if_fail(address, LBABERR_CANNOT_WRITE);
     g_return_val_if_fail(address->address_list, LBABERR_CANNOT_WRITE);
 
-    if (gpe_ab->db == NULL) {
-        if( !libbalsa_address_book_gpe_open_db(gpe_ab))
+    if (ab_gpe->db == NULL) {
+        if( !libbalsa_address_book_gpe_open_db(ab_gpe))
 	    return LBABERR_CANNOT_CONNECT;
     }
     uid = GPOINTER_TO_UINT(g_object_get_data(G_OBJECT(address), "urn"));
     if(!uid)/* safety check, perhaps unnecessary */
         return LBABERR_CANNOT_WRITE;
         
-    err = db_delete_by_uid(gpe_ab->db, uid);
+    err = db_delete_by_uid(ab_gpe->db, uid);
     if(err) {
         libbalsa_address_book_set_status(ab, g_strdup(err));
 #ifdef HAVE_SQLITE3
@@ -600,7 +591,7 @@ libbalsa_address_book_gpe_modify_address(LibBalsaAddressBook *ab,
                                          LibBalsaAddress *address,
                                          LibBalsaAddress *newval)
 {
-    LibBalsaAddressBookGpe *gpe_ab = LIBBALSA_ADDRESS_BOOK_GPE(ab);
+    LibBalsaAddressBookGpe *ab_gpe = LIBBALSA_ADDRESS_BOOK_GPE(ab);
     guint uid;
     int r;
     char *err;
@@ -612,8 +603,8 @@ libbalsa_address_book_gpe_modify_address(LibBalsaAddressBook *ab,
     g_return_val_if_fail(address->address_list, LBABERR_CANNOT_WRITE);
     g_return_val_if_fail(newval->address_list, LBABERR_CANNOT_WRITE);
 
-    if (gpe_ab->db == NULL) {
-        if( !libbalsa_address_book_gpe_open_db(gpe_ab))
+    if (ab_gpe->db == NULL) {
+        if( !libbalsa_address_book_gpe_open_db(ab_gpe))
 	    return LBABERR_CANNOT_CONNECT;
     }
     uid = GPOINTER_TO_UINT(g_object_get_data(G_OBJECT(address), "urn"));
@@ -622,7 +613,7 @@ libbalsa_address_book_gpe_modify_address(LibBalsaAddressBook *ab,
 
     /* do the real work here */
 #ifdef HAVE_SQLITE3
-    if ((r = sqlite3_exec(gpe_ab->db, "begin transaction",
+    if ((r = sqlite3_exec(ab_gpe->db, "begin transaction",
                           NULL, NULL, &err)) != SQLITE_OK) {
         libbalsa_address_book_set_status(ab, g_strdup(err));
         sqlite3_free(err);              /* failed, so soon!? */
@@ -636,12 +627,12 @@ libbalsa_address_book_gpe_modify_address(LibBalsaAddressBook *ab,
                           " upper(tag)='WORK.ORGANIZATION' or"
                           " upper(tag)='WORK.EMAIL' or"
                           " upper(tag)='MODIFIED')", uid);
-    r = sqlite3_exec(gpe_ab->db, sql, NULL, NULL, &err);
+    r = sqlite3_exec(ab_gpe->db, sql, NULL, NULL, &err);
     sqlite3_free(sql);
     if (r != SQLITE_OK)
         goto rollback;
 #else                           /* HAVE_SQLITE3 */
-    if( (r=sqlite_exec(gpe_ab->db, "begin transaction",
+    if( (r=sqlite_exec(ab_gpe->db, "begin transaction",
                        NULL, NULL, &err)) != SQLITE_OK) {
         libbalsa_address_book_set_status(ab, g_strdup(err));
         free(err); /* failed, so soon!? */
@@ -649,7 +640,7 @@ libbalsa_address_book_gpe_modify_address(LibBalsaAddressBook *ab,
     }
 
     if( (r=sqlite_exec_printf
-         (gpe_ab->db,
+         (ab_gpe->db,
           "delete from contacts where urn='%d' and "
           "(upper(tag)='NAME' or upper(tag)='GIVEN_NAME' or "
           "upper(tag)='NICKNAME' or upper(tag)='WORK.ORGANIZATION' or "
@@ -657,31 +648,31 @@ libbalsa_address_book_gpe_modify_address(LibBalsaAddressBook *ab,
           NULL, NULL, &err, uid)) != SQLITE_OK)
         goto rollback;
 #endif                          /* HAVE_SQLITE3 */
-    INSERT_ATTR_R(gpe_ab->db,uid, "NAME",        newval->full_name);
-    INSERT_ATTR_R(gpe_ab->db,uid, "GIVEN_NAME",  newval->first_name);
-    INSERT_ATTR_R(gpe_ab->db,uid, "FAMILY_NAME", newval->last_name);
-    INSERT_ATTR_R(gpe_ab->db,uid, "NICKNAME",    newval->nick_name);
-    INSERT_ATTR_R(gpe_ab->db,uid, "WORK.ORGANIZATION", newval->organization);
-    INSERT_ATTR_R(gpe_ab->db,uid, "WORK.EMAIL",
+    INSERT_ATTR_R(ab_gpe->db,uid, "NAME",        newval->full_name);
+    INSERT_ATTR_R(ab_gpe->db,uid, "GIVEN_NAME",  newval->first_name);
+    INSERT_ATTR_R(ab_gpe->db,uid, "FAMILY_NAME", newval->last_name);
+    INSERT_ATTR_R(ab_gpe->db,uid, "NICKNAME",    newval->nick_name);
+    INSERT_ATTR_R(ab_gpe->db,uid, "WORK.ORGANIZATION", newval->organization);
+    INSERT_ATTR_R(ab_gpe->db,uid, "WORK.EMAIL",
                 (char*)newval->address_list->data);
 #ifdef HAVE_SQLITE3
     sql = sqlite3_mprintf("insert into contacts values "
                           "('%d', 'MODIFIED', %d)", uid, time(NULL));
-    r = sqlite3_exec(gpe_ab->db, sql, NULL, NULL, &err);
+    r = sqlite3_exec(ab_gpe->db, sql, NULL, NULL, &err);
     sqlite3_free(sql);
     if (r != SQLITE_OK)
         goto rollback;
 
-    if (sqlite3_exec(gpe_ab->db, "commit transaction", NULL, NULL, &err) ==
+    if (sqlite3_exec(ab_gpe->db, "commit transaction", NULL, NULL, &err) ==
         SQLITE_OK)
         return LBABERR_OK;
 #else                           /* HAVE_SQLITE3 */
-    if( (r=sqlite_exec_printf(gpe_ab->db, "insert into contacts values "
+    if( (r=sqlite_exec_printf(ab_gpe->db, "insert into contacts values "
                               "('%d', 'MODIFIED', %d)", NULL, NULL, &err,
                               uid, time(NULL))) != SQLITE_OK)
         goto rollback;
     
-    if( (r=sqlite_exec(gpe_ab->db, "commit transaction", NULL,
+    if( (r=sqlite_exec(ab_gpe->db, "commit transaction", NULL,
                        NULL, &err)) == SQLITE_OK) return LBABERR_OK;
 #endif                          /* HAVE_SQLITE3 */
 
@@ -689,10 +680,10 @@ libbalsa_address_book_gpe_modify_address(LibBalsaAddressBook *ab,
     libbalsa_address_book_set_status(ab, g_strdup(err));
 #ifdef HAVE_SQLITE3
     sqlite3_free(err);
-    sqlite3_exec(gpe_ab->db, "rollback transaction", NULL, NULL, NULL);
+    sqlite3_exec(ab_gpe->db, "rollback transaction", NULL, NULL, NULL);
 #else                           /* HAVE_SQLITE3 */
     free(err);
-    sqlite_exec(gpe_ab->db, "rollback transaction", NULL, NULL, NULL);
+    sqlite_exec(ab_gpe->db, "rollback transaction", NULL, NULL, NULL);
 #endif                          /* HAVE_SQLITE3 */
 
     return LBABERR_CANNOT_WRITE;
@@ -756,30 +747,31 @@ libbalsa_address_book_gpe_alias_complete(LibBalsaAddressBook * ab,
         "upper(tag)='WORK.EMAIL' or upper(tag)='HOME.EMAIL') "
         "and upper(value) LIKE '%q%%'";
     struct gpe_completion_closure gcc;
-    LibBalsaAddressBookGpe *gpe_ab;
+    LibBalsaAddressBookGpe *ab_gpe;
     char *err = NULL;
     int r;
 
-    g_return_val_if_fail ( LIBBALSA_ADDRESS_BOOK_GPE(ab), NULL);
+    g_return_val_if_fail(LIBBALSA_IS_ADDRESS_BOOK_GPE(ab), NULL);
 
-    gpe_ab = LIBBALSA_ADDRESS_BOOK_GPE(ab);
+    ab_gpe = LIBBALSA_ADDRESS_BOOK_GPE(ab);
 
-    if (!ab->expand_aliases) return NULL;
-    if (gpe_ab->db == NULL) {
-        if( !libbalsa_address_book_gpe_open_db(gpe_ab))
+    if (!libbalsa_address_book_get_expand_aliases(ab))
+        return NULL;
+    if (ab_gpe->db == NULL) {
+        if( !libbalsa_address_book_gpe_open_db(ab_gpe))
 	    return NULL;
     }
 
-    gcc.db = gpe_ab->db;
+    gcc.db = ab_gpe->db;
     gcc.prefix = prefix;
     gcc.res = NULL;
 #ifdef HAVE_SQLITE3
     if (prefix) {
         gchar *sql = sqlite3_mprintf(query, prefix);
-        r = sqlite3_exec(gpe_ab->db, sql, gpe_read_completion, &gcc, &err);
+        r = sqlite3_exec(ab_gpe->db, sql, gpe_read_completion, &gcc, &err);
         sqlite3_free(sql);
     } else
-        r = sqlite3_exec(gpe_ab->db,
+        r = sqlite3_exec(ab_gpe->db,
                          "select distinct urn from contacts_urn",
                          gpe_read_completion, &gcc, &err);
     if(err) {
@@ -788,11 +780,11 @@ libbalsa_address_book_gpe_alias_complete(LibBalsaAddressBook * ab,
     }
 #else                           /* HAVE_SQLITE3 */
     if(prefix)
-        r = sqlite_exec_printf(gpe_ab->db, query,
+        r = sqlite_exec_printf(ab_gpe->db, query,
                                gpe_read_completion, &gcc, &err,
                                prefix);
     else
-        r = sqlite_exec(gpe_ab->db, "select distinct urn from contacts_urn",
+        r = sqlite_exec(ab_gpe->db, "select distinct urn from contacts_urn",
                         gpe_read_completion, &gcc, &err);
     if(err) {
         printf("r=%d err=%s\n", r, err);

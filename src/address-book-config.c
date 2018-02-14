@@ -460,10 +460,10 @@ create_externq_dialog(AddressBookConfig * abc)
     if (ab) {
         gtk_file_chooser_set_filename(GTK_FILE_CHOOSER
                                       (abc->ab_specific.externq.load),
-                                      ab->load);
+                                      libbalsa_address_book_extern_get_load(ab));
         gtk_file_chooser_set_filename(GTK_FILE_CHOOSER
                                       (abc->ab_specific.externq.save),
-                                      ab->save);
+                                      libbalsa_address_book_extern_get_save(ab));
     }
 
     dialog = create_generic_dialog(abc, "Extern");
@@ -800,12 +800,12 @@ modify_book(AddressBookConfig * abc)
 
         externq = LIBBALSA_ADDRESS_BOOK_EXTERN(address_book);
         if (load) {
-            g_free(externq->load);
-            externq->load = load;;
+            libbalsa_address_book_extern_set_load(externq, load);
+            g_free(load);
         }
         if (save) {
-            g_free(externq->save);
-            externq->save = save;
+            libbalsa_address_book_extern_set_save(externq, save);
+            g_free(save);
         }
 #ifdef ENABLE_LDAP
     } else if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_LDAP) {

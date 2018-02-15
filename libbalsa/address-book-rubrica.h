@@ -30,25 +30,9 @@
 
 #include "address-book-text.h"
 
-#define LIBBALSA_TYPE_ADDRESS_BOOK_RUBRICA		(libbalsa_address_book_rubrica_get_type())
-#define LIBBALSA_ADDRESS_BOOK_RUBRICA(obj)		(G_TYPE_CHECK_INSTANCE_CAST (obj, LIBBALSA_TYPE_ADDRESS_BOOK_RUBRICA, LibBalsaAddressBookRubrica))
-#define LIBBALSA_ADDRESS_BOOK_RUBRICA_CLASS(klass)	(G_TYPE_CHECK_CLASS_CAST (klass, LIBBALSA_TYPE_ADDRESS_BOOK_RUBRICA, LibBalsaAddressBookRubricaClass))
-#define LIBBALSA_IS_ADDRESS_BOOK_RUBRICA(obj)	        (G_TYPE_CHECK_INSTANCE_TYPE (obj, LIBBALSA_TYPE_ADDRESS_BOOK_RUBRICA))
-#define LIBBALSA_IS_ADDRESS_BOOK_RUBRICA_CLASS(klass)   (G_TYPE_CHECK_CLASS_TYPE (klass, LIBBALSA_TYPE_ADDRESS_BOOK_RUBRICA))
-
-struct _LibBalsaAddressBookRubrica {
-    LibBalsaAddressBookText parent;
-};
-
-struct _LibBalsaAddressBookRubricaClass {
-    LibBalsaAddressBookTextClass parent_class;
-};
-
-typedef struct _LibBalsaAddressBookRubrica LibBalsaAddressBookRubrica;
-typedef struct _LibBalsaAddressBookRubricaClass
-    LibBalsaAddressBookRubricaClass;
-
-GType libbalsa_address_book_rubrica_get_type(void);
+#define LIBBALSA_TYPE_ADDRESS_BOOK_RUBRICA (libbalsa_address_book_rubrica_get_type())
+G_DECLARE_FINAL_TYPE(LibBalsaAddressBookRubrica, libbalsa_address_book_rubrica,
+                     LIBBALSA, ADDRESS_BOOK_RUBRICA, LibBalsaAddressBookText)
 
 LibBalsaAddressBook *libbalsa_address_book_rubrica_new(const gchar * name,
 						       const gchar * path);

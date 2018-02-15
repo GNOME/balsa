@@ -372,7 +372,7 @@ create_osmo_dialog(AddressBookConfig *abc)
     if (ab) {
         title = g_strdup_printf(_("Modify Osmo Address Book"));
         action = _("_Apply");
-        name = ab->name;
+        name = libbalsa_address_book_get_name(ab);
     } else {
         title = g_strdup_printf(_("Add Osmo Address Book"));
         action = _("_Add");

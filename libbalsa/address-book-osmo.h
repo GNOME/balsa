@@ -31,24 +31,9 @@
 #include <gio/gio.h>
 #include "address-book.h"
 
-#define LIBBALSA_TYPE_ADDRESS_BOOK_OSMO     		(libbalsa_address_book_osmo_get_type())
-#define LIBBALSA_ADDRESS_BOOK_OSMO(obj)     		(G_TYPE_CHECK_INSTANCE_CAST(obj, LIBBALSA_TYPE_ADDRESS_BOOK_OSMO, LibBalsaAddressBookOsmo))
-#define LIBBALSA_ADDRESS_BOOK_OSMO_CLASS(klass) 	(G_TYPE_CHECK_CLASS_CAST(klass, LIBBALSA_TYPE_ADDRESS_BOOK_OSMO, LibBalsaAddressBookOsmoClass))
-#define LIBBALSA_IS_ADDRESS_BOOK_OSMO(obj)      	(G_TYPE_CHECK_INSTANCE_TYPE(obj, LIBBALSA_TYPE_ADDRESS_BOOK_OSMO))
-#define LIBBALSA_IS_ADDRESS_BOOK_OSMO_CLASS(klass)  (G_TYPE_CHECK_CLASS_TYPE(klass, LIBBALSA_TYPE_ADDRESS_BOOK_OSMO))
-
-typedef struct _LibBalsaAddressBookOsmo LibBalsaAddressBookOsmo;
-typedef struct _LibBalsaAddressBookOsmoClass LibBalsaAddressBookOsmoClass;
-
-struct _LibBalsaAddressBookOsmo {
-	LibBalsaAddressBook parent;
-
-	GDBusProxy *proxy;
-};
-
-struct _LibBalsaAddressBookOsmoClass {
-	LibBalsaAddressBookClass parent_class;
-};
+#define LIBBALSA_TYPE_ADDRESS_BOOK_OSMO (libbalsa_address_book_osmo_get_type())
+G_DECLARE_FINAL_TYPE(LibBalsaAddressBookOsmo, libbalsa_address_book_osmo,
+                     LIBBALSA, ADDRESS_BOOK_OSMO, LibBalsaAddressBook)
 
 GType libbalsa_address_book_osmo_get_type(void);
 

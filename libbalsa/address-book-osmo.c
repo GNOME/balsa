@@ -62,6 +62,16 @@ static GList *osmo_read_addresses(LibBalsaAddressBookOsmo *osmo,
 								  GError				  **error);
 
 
+struct _LibBalsaAddressBookOsmo {
+	LibBalsaAddressBook parent;
+
+	GDBusProxy *proxy;
+};
+
+struct _LibBalsaAddressBookOsmoClass {
+	LibBalsaAddressBookClass parent_class;
+};
+
 G_DEFINE_TYPE(LibBalsaAddressBookOsmo, libbalsa_address_book_osmo, LIBBALSA_TYPE_ADDRESS_BOOK);
 
 
@@ -88,9 +98,9 @@ libbalsa_address_book_osmo_class_init(LibBalsaAddressBookOsmoClass *klass)
 
 
 static void
-libbalsa_address_book_osmo_init(LibBalsaAddressBookOsmo *ab)
+libbalsa_address_book_osmo_init(LibBalsaAddressBookOsmo *osmo)
 {
-	LIBBALSA_ADDRESS_BOOK(ab)->is_expensive = FALSE;
+    libbalsa_address_book_set_is_expensive(LIBBALSA_ADDRESS_BOOK(osmo), FALSE);
 }
 
 
@@ -114,7 +124,7 @@ libbalsa_address_book_osmo_new(const gchar *name)
 
 	osmo = LIBBALSA_ADDRESS_BOOK_OSMO(g_object_new(LIBBALSA_TYPE_ADDRESS_BOOK_OSMO, NULL));
 	ab = LIBBALSA_ADDRESS_BOOK(osmo);
-	ab->name = g_strdup(name);
+        libbalsa_address_book_set_name(ab, name);
 
 	return ab;
 }
@@ -218,7 +228,8 @@ libbalsa_address_book_osmo_alias_complete(LibBalsaAddressBook *ab,
 
 	osmo = LIBBALSA_ADDRESS_BOOK_OSMO(ab);
 
-	if (!ab->expand_aliases || strlen(prefix) < LOOKUP_MIN_LEN) {
+	if (!libbalsa_address_book_get_expand_aliases(ab) ||
+            strlen(prefix) < LOOKUP_MIN_LEN) {
 		return NULL;
 	}
 

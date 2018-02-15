@@ -45,31 +45,20 @@ static LibBalsaABErr
 libbalsa_address_book_ldif_save_address(FILE * stream,
                                         LibBalsaAddress * address);
 
+struct _LibBalsaAddressBookLdif {
+    LibBalsaAddressBookText parent;
+};
 
-GType libbalsa_address_book_ldif_get_type(void)
+struct _LibBalsaAddressBookLdifClass {
+    LibBalsaAddressBookTextClass parent_class;
+};
+
+G_DEFINE_TYPE(LibBalsaAddressBookLdif, libbalsa_address_book_ldif,
+              LIBBALSA_TYPE_ADDRESS_BOOK_TEXT)
+
+static void
+libbalsa_address_book_ldif_init(LibBalsaAddressBookLdif * ab_ldif)
 {
-    static GType address_book_ldif_type = 0;
-
-    if (!address_book_ldif_type) {
-	static const GTypeInfo address_book_ldif_info = {
-	    sizeof(LibBalsaAddressBookLdifClass),
-            NULL,               /* base_init */
-            NULL,               /* base_finalize */
-	    (GClassInitFunc) libbalsa_address_book_ldif_class_init,
-            NULL,               /* class_finalize */
-            NULL,               /* class_data */
-	    sizeof(LibBalsaAddressBookLdif),
-            0,                  /* n_preallocs */
-	    NULL
-	};
-
-	address_book_ldif_type =
-            g_type_register_static(LIBBALSA_TYPE_ADDRESS_BOOK_TEXT,
-	                           "LibBalsaAddressBookLdif",
-			           &address_book_ldif_info, 0);
-    }
-
-    return address_book_ldif_type;
 }
 
 static void
@@ -89,16 +78,14 @@ LibBalsaAddressBook *
 libbalsa_address_book_ldif_new(const gchar * name, const gchar * path)
 {
     LibBalsaAddressBookLdif *ab_ldif;
-    LibBalsaAddressBook *ab;
 
     ab_ldif =
         LIBBALSA_ADDRESS_BOOK_LDIF(g_object_new
                                    (LIBBALSA_TYPE_ADDRESS_BOOK_LDIF,
                                     NULL));
-    ab = LIBBALSA_ADDRESS_BOOK(ab_ldif);
 
-    libbalsa_address_book_set_name(ab, name);
-    libbalsa_address_book_text_set_path(LIBBALSA_ADDRESS_BOOK_TEXT(ab), path);
+    libbalsa_address_book_set_name(LIBBALSA_ADDRESS_BOOK(ab_ldif), name);
+    libbalsa_address_book_text_set_path(LIBBALSA_ADDRESS_BOOK_TEXT(ab_ldif), path);
 
     return ab;
 }

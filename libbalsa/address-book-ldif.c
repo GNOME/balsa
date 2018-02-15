@@ -87,7 +87,7 @@ libbalsa_address_book_ldif_new(const gchar * name, const gchar * path)
     libbalsa_address_book_set_name(LIBBALSA_ADDRESS_BOOK(ab_ldif), name);
     libbalsa_address_book_text_set_path(LIBBALSA_ADDRESS_BOOK_TEXT(ab_ldif), path);
 
-    return ab;
+    return LIBBALSA_ADDRESS_BOOK(ab_ldif);
 }
 
 /* Helpers */

@@ -27,25 +27,9 @@
 
 #include "address-book-text.h"
 
-#define LIBBALSA_TYPE_ADDRESS_BOOK_VCARD		(libbalsa_address_book_vcard_get_type())
-#define LIBBALSA_ADDRESS_BOOK_VCARD(obj)		(G_TYPE_CHECK_INSTANCE_CAST (obj, LIBBALSA_TYPE_ADDRESS_BOOK_VCARD, LibBalsaAddressBookVcard))
-#define LIBBALSA_ADDRESS_BOOK_VCARD_CLASS(klass)	(G_TYPE_CHECK_CLASS_CAST (klass, LIBBALSA_TYPE_ADDRESS_BOOK_VCARD, LibBalsaAddressBookVcardClass))
-#define LIBBALSA_IS_ADDRESS_BOOK_VCARD(obj)		(G_TYPE_CHECK_INSTANCE_TYPE (obj, LIBBALSA_TYPE_ADDRESS_BOOK_VCARD))
-#define LIBBALSA_IS_ADDRESS_BOOK_VCARD_CLASS(klass)	(G_TYPE_CHECK_CLASS_TYPE (klass, LIBBALSA_TYPE_ADDRESS_BOOK_VCARD))
-
-struct _LibBalsaAddressBookVcard {
-    LibBalsaAddressBookText parent;
-};
-
-struct _LibBalsaAddressBookVcardClass {
-    LibBalsaAddressBookTextClass parent_class;
-};
-
-typedef struct _LibBalsaAddressBookVcard LibBalsaAddressBookVcard;
-typedef struct _LibBalsaAddressBookVcardClass
-    LibBalsaAddressBookVcardClass;
-
-GType libbalsa_address_book_vcard_get_type(void);
+#define LIBBALSA_TYPE_ADDRESS_BOOK_VCARD (libbalsa_address_book_vcard_get_type())
+G_DECLARE_FINAL_TYPE(LibBalsaAddressBookVcard, libbalsa_address_book_vcard,
+                     LIBBALSA, ADDRESS_BOOK_VCARD, LibBalsaAddressBookText)
 
 LibBalsaAddressBook *libbalsa_address_book_vcard_new(const gchar * name,
 						     const gchar * path);

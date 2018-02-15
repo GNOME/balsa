@@ -50,7 +50,7 @@ struct _AddressBookConfig {
 	
 #ifdef ENABLE_LDAP
 	struct {
-	    GtkWidget *host_name;
+	    GtkWidget *host;
 	    GtkWidget *base_dn;
 	    GtkWidget *bind_dn;
 	    GtkWidget *book_dn;
@@ -499,34 +499,34 @@ create_ldap_dialog(AddressBookConfig * abc)
 				   label);
 
     label = libbalsa_create_grid_label(_("_Host Name"), grid, 1);
-    abc->ab_specific.ldap.host_name = 
+    abc->ab_specific.ldap.host = 
 	libbalsa_create_grid_entry(grid, NULL, NULL, 1, 
-		     ab ? ab->host : host, label);
+		     ab ? libbalsa_address_book_ldap_get_host(ab) : host, label);
 
     label = libbalsa_create_grid_label(_("Base Domain _Name"), grid, 2);
     abc->ab_specific.ldap.base_dn = 
 	libbalsa_create_grid_entry(grid, NULL, NULL, 2, 
-		     ab ? ab->base_dn : base, label);
+		     ab ? libbalsa_address_book_ldap_get_base_dn(ab) : base, label);
 
     label = libbalsa_create_grid_label(_("_User Name (Bind DN)"), grid, 3);
     abc->ab_specific.ldap.bind_dn = 
 	libbalsa_create_grid_entry(grid, NULL, NULL, 3, 
-		     ab ? ab->bind_dn : "", label);
+		     ab ? libbalsa_address_book_ldap_get_bind_dn(ab) : "", label);
 
     label = libbalsa_create_grid_label(_("_Password"), grid, 4);
     abc->ab_specific.ldap.passwd = 
 	libbalsa_create_grid_entry(grid, NULL, NULL, 4, 
-		     ab ? ab->passwd : "", label);
+		     ab ? libbalsa_address_book_ldap_get_passwd(ab) : "", label);
     gtk_entry_set_visibility(GTK_ENTRY(abc->ab_specific.ldap.passwd), FALSE);
 
     label = libbalsa_create_grid_label(_("_User Address Book DN"), grid, 5);
     abc->ab_specific.ldap.book_dn = 
 	libbalsa_create_grid_entry(grid, NULL, NULL, 5,
-		     ab ? ab->priv_book_dn : "", label);
+		     ab ? libbalsa_address_book_ldap_get_book_dn(ab) : "", label);
 
     abc->ab_specific.ldap.enable_tls =
 	libbalsa_create_grid_check(_("Enable _TLS"), grid, 6,
-		     ab ? ab->enable_tls : FALSE);
+		     ab ? libbalsa_address_book_ldap_get_enable_tls(ab) : FALSE);
 
     add_radio_buttons(grid, 7, abc);
 
@@ -717,8 +717,8 @@ create_book(AddressBookConfig * abc)
         g_free(path);
 #ifdef ENABLE_LDAP
     } else if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_LDAP) {
-        const gchar *host_name =
-            gtk_entry_get_text(GTK_ENTRY(abc->ab_specific.ldap.host_name));
+        const gchar *host =
+            gtk_entry_get_text(GTK_ENTRY(abc->ab_specific.ldap.host));
         const gchar *base_dn =
             gtk_entry_get_text(GTK_ENTRY(abc->ab_specific.ldap.base_dn));
         const gchar *bind_dn =
@@ -731,7 +731,7 @@ create_book(AddressBookConfig * abc)
             gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
                                          (abc->ab_specific.ldap.enable_tls));
         address_book =
-            libbalsa_address_book_ldap_new(name, host_name, base_dn,
+            libbalsa_address_book_ldap_new(name, host, base_dn,
                                            bind_dn, passwd, book_dn,
                                            enable_tls);
 #endif
@@ -813,8 +813,8 @@ modify_book(AddressBookConfig * abc)
 #ifdef ENABLE_LDAP
     } else if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_LDAP) {
         LibBalsaAddressBookLdap *ldap;
-        const gchar *host_name =
-            gtk_entry_get_text(GTK_ENTRY(abc->ab_specific.ldap.host_name));
+        const gchar *host =
+            gtk_entry_get_text(GTK_ENTRY(abc->ab_specific.ldap.host));
         const gchar *base_dn =
             gtk_entry_get_text(GTK_ENTRY(abc->ab_specific.ldap.base_dn));
         const gchar *bind_dn =
@@ -829,13 +829,13 @@ modify_book(AddressBookConfig * abc)
 
         ldap = LIBBALSA_ADDRESS_BOOK_LDAP(address_book);
 
-        g_free(ldap->host);     ldap->host = g_strdup(host_name);
-        g_free(ldap->base_dn);  ldap->base_dn = g_strdup(base_dn);
-        g_free(ldap->bind_dn);  ldap->bind_dn = g_strdup(bind_dn);
-        g_free(ldap->passwd);   ldap->passwd  = g_strdup(passwd);
-        g_free(ldap->priv_book_dn);
-        ldap->priv_book_dn = g_strdup(book_dn && *book_dn ? book_dn : bind_dn);
-        ldap->enable_tls = enable_tls;
+        libbalsa_address_book_ldap_set_host(ldap, host);
+        libbalsa_address_book_ldap_set_base_dn(ldap, base_dn);
+        libbalsa_address_book_ldap_set_bind_dn(ldap, bind_dn);
+        libbalsa_address_book_ldap_set_passwd(ldap, passwd);
+        libbalsa_address_book_ldap_set_book_dn(ldap,
+                                               book_dn && *book_dn ? book_dn : bind_dn);
+        libbalsa_address_book_ldap_set_enable_tls(ldap, enable_tls);
         libbalsa_address_book_ldap_close_connection(ldap);
 #endif
 #if HAVE_SQLITE

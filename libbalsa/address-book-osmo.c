@@ -151,7 +151,11 @@ libbalsa_address_book_osmo_load(LibBalsaAddressBook 		*ab,
 
 		addresses = osmo_read_addresses(osmo, filter, &error);
 		if (error != NULL) {
-			libbalsa_address_book_set_status(ab, g_strdup_printf(_("Reading Osmo contacts failed: %s"), error->message));
+                        gchar *status =
+                            g_strdup_printf(_("Reading Osmo contacts failed: %s"),
+                                            error->message);
+			libbalsa_address_book_set_status(ab, status);
+                        g_free(status);
 			g_error_free(error);
 			result = LBABERR_CANNOT_SEARCH;
 		} else {

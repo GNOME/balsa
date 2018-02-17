@@ -189,15 +189,15 @@ libbalsa_address_book_modify_address(LibBalsaAddressBook * ab,
     return res;
 }
 
-/* set_status takes over the string ownership */
 void
-libbalsa_address_book_set_status(LibBalsaAddressBook * ab, gchar *str)
+libbalsa_address_book_set_status(LibBalsaAddressBook * ab,
+                                 const gchar         * status)
 {
     LibBalsaAddressBookPrivate *priv = libbalsa_address_book_get_instance_private(ab);
 
     g_return_if_fail(ab);
     g_free(priv->ext_op_code);
-    priv->ext_op_code = str;
+    priv->ext_op_code = g_strdup(status);
 }
 
 void

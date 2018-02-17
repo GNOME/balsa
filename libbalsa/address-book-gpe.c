@@ -402,7 +402,7 @@ libbalsa_address_book_gpe_load(LibBalsaAddressBook * ab,
 
     if(r != SQLITE_OK) {
         printf("r=%d err=%s\n", r, err);
-        libbalsa_address_book_set_status(ab, g_strdup(err));
+        libbalsa_address_book_set_status(ab, err);
 #ifdef HAVE_SQLITE3
         sqlite3_free(err);
 #else                           /* HAVE_SQLITE3 */
@@ -457,13 +457,13 @@ libbalsa_address_book_gpe_add_address(LibBalsaAddressBook *ab,
     r = sqlite3_exec(ab_gpe->db, "insert into contacts_urn values (NULL)",
                      NULL, NULL, &err);
     if (r != SQLITE_OK) {
-        libbalsa_address_book_set_status(ab, g_strdup(err));
+        libbalsa_address_book_set_status(ab, err);
         sqlite3_free(err);
 #else                           /* HAVE_SQLITE3 */
     r = sqlite_exec(ab_gpe->db, "insert into contacts_urn values (NULL)",
                     NULL, NULL, &err);
     if (r != SQLITE_OK) {
-        libbalsa_address_book_set_status(ab, g_strdup(err));
+        libbalsa_address_book_set_status(ab, err);
         free(err);
 #endif                          /* HAVE_SQLITE3 */
         return LBABERR_CANNOT_WRITE;
@@ -578,7 +578,7 @@ libbalsa_address_book_gpe_remove_address(LibBalsaAddressBook *ab,
 
     err = db_delete_by_uid(ab_gpe->db, uid);
     if(err) {
-        libbalsa_address_book_set_status(ab, g_strdup(err));
+        libbalsa_address_book_set_status(ab, err);
 #ifdef HAVE_SQLITE3
         sqlite3_free(err);
 #else                           /* HAVE_SQLITE3 */
@@ -641,7 +641,7 @@ libbalsa_address_book_gpe_modify_address(LibBalsaAddressBook *ab,
 #ifdef HAVE_SQLITE3
     if ((r = sqlite3_exec(ab_gpe->db, "begin transaction",
                           NULL, NULL, &err)) != SQLITE_OK) {
-        libbalsa_address_book_set_status(ab, g_strdup(err));
+        libbalsa_address_book_set_status(ab, err);
         sqlite3_free(err);              /* failed, so soon!? */
         return LBABERR_CANNOT_WRITE;
     }
@@ -660,7 +660,7 @@ libbalsa_address_book_gpe_modify_address(LibBalsaAddressBook *ab,
 #else                           /* HAVE_SQLITE3 */
     if( (r=sqlite_exec(ab_gpe->db, "begin transaction",
                        NULL, NULL, &err)) != SQLITE_OK) {
-        libbalsa_address_book_set_status(ab, g_strdup(err));
+        libbalsa_address_book_set_status(ab, err);
         free(err); /* failed, so soon!? */
         return LBABERR_CANNOT_WRITE;
     }
@@ -707,7 +707,7 @@ libbalsa_address_book_gpe_modify_address(LibBalsaAddressBook *ab,
 #endif                          /* HAVE_SQLITE3 */
 
  rollback:
-    libbalsa_address_book_set_status(ab, g_strdup(err));
+    libbalsa_address_book_set_status(ab, err);
 #ifdef HAVE_SQLITE3
     sqlite3_free(err);
     sqlite3_exec(ab_gpe->db, "rollback transaction", NULL, NULL, NULL);

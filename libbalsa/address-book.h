@@ -100,7 +100,8 @@ LibBalsaABErr libbalsa_address_book_modify_address(LibBalsaAddressBook *ab,
                                                    LibBalsaAddress *newval);
 
 /* set_status takes over the string ownership */
-void libbalsa_address_book_set_status(LibBalsaAddressBook * ab, gchar *str);
+void libbalsa_address_book_set_status(LibBalsaAddressBook * ab,
+                                      const gchar         * status);
 void libbalsa_address_book_save_config(LibBalsaAddressBook * ab,
 				       const gchar * prefix);
 void libbalsa_address_book_load_config(LibBalsaAddressBook * ab,

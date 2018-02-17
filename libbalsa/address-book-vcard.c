@@ -128,21 +128,25 @@ lbab_vcard_write_begin(FILE * stream)
 static void
 lbab_vcard_write_fn(FILE * stream, LibBalsaAddress * address)
 {
-    if (address->full_name && *address->full_name != '\0')
-        fprintf(stream, "FN:%s\n", address->full_name);
+    const gchar *full_name = libbalsa_address_get_full_name(address);
+
+    if (full_name && *full_name != '\0')
+        fprintf(stream, "FN:%s\n", full_name);
 }
 
 static void
 lbab_vcard_write_n(FILE * stream, LibBalsaAddress * address)
 {
-    if (address->first_name && *address->first_name != '\0') {
-        if (address->last_name && *address->last_name != '\0') {
-            fprintf(stream, "N:%s;%s\n", address->last_name,
-                    address->first_name);
+    const gchar *first_name = libbalsa_address_get_first_name(address);
+    const gchar *last_name = libbalsa_address_get_last_name(address);
+
+    if (first_name && *first_name != '\0') {
+        if (last_name && *last_name != '\0') {
+            fprintf(stream, "N:%s;%s\n", last_name, first_name);
         } else
-            fprintf(stream, "N:;%s\n", address->first_name);
-    } else if (address->last_name && *address->last_name != '\0') {
-        fprintf(stream, "N:%s\n", address->last_name);
+            fprintf(stream, "N:;%s\n", first_name);
+    } else if (last_name && *last_name != '\0') {
+        fprintf(stream, "N:%s\n", last_name);
     } else
         fprintf(stream, "N:%s\n", _("No-Name"));
 }
@@ -150,15 +154,19 @@ lbab_vcard_write_n(FILE * stream, LibBalsaAddress * address)
 static void
 lbab_vcard_write_nickname(FILE * stream, LibBalsaAddress * address)
 {
-    if (address->nick_name && *address->nick_name != '\0')
-        fprintf(stream, "NICKNAME:%s\n", address->nick_name);
+    const gchar *nick_name = libbalsa_address_get_nick_name(address);
+
+    if (nick_name && *nick_name != '\0')
+        fprintf(stream, "NICKNAME:%s\n", nick_name);
 }
 
 static void
 lbab_vcard_write_org(FILE * stream, LibBalsaAddress * address)
 {
-    if (address->organization && *address->organization != '\0')
-        fprintf(stream, "ORG:%s\n", address->organization);
+    const gchar *organization = libbalsa_address_get_organization(address);
+
+    if (organization && *organization != '\0')
+        fprintf(stream, "ORG:%s\n", organization);
 }
 
 static void
@@ -166,7 +174,8 @@ lbab_vcard_write_addresses(FILE * stream, LibBalsaAddress * address)
 {
     GList *list;
 
-    for (list = address->address_list; list; list = list->next)
+    for (list = libbalsa_address_get_addr_list(address);
+         list != NULL; list = list->next)
         fprintf(stream, "EMAIL;INTERNET:%s\n", (gchar *) list->data);
 }
 
@@ -201,7 +210,7 @@ libbalsa_address_book_vcard_parse_address(FILE * stream,
     gchar *name = NULL, *nick_name = NULL, *org = NULL;
     gchar *full_name = NULL, *last_name = NULL, *first_name = NULL;
     gint in_vcard = FALSE;
-    GList *address_list = NULL;
+    GList *addr_list = NULL;
     guint wrote = 0;
 
     while (fgets(string, sizeof(string), stream)) {
@@ -220,7 +229,7 @@ libbalsa_address_book_vcard_parse_address(FILE * stream,
             /*
              * We are done loading a card.
              */
-	    if (address_list) {
+	    if (addr_list) {
                 if (stream_out) {
                     if (!(wrote & (1 << FULL_NAME)))
                         lbab_vcard_write_fn(stream_out, address_out);
@@ -234,25 +243,33 @@ libbalsa_address_book_vcard_parse_address(FILE * stream,
                     res = lbab_vcard_write_end(stream_out);
                 }
                 if (address) {
-                    if (full_name) {
-                        address->full_name = full_name;
-                        g_free(name);
-                    } else if (name)
-                        address->full_name = name;
+                    if (full_name)
+                        libbalsa_address_set_full_name(address, full_name);
+                    else if (name)
+                        libbalsa_address_set_full_name(address, name);
                     else if (nick_name)
-                        address->full_name = g_strdup(nick_name);
+                        libbalsa_address_set_full_name(address, nick_name);
                     else
-                        address->full_name = g_strdup(_("No-Name"));
+                        libbalsa_address_set_full_name(address, _("No-Name"));
 
-                    address->last_name = last_name;
-                    address->first_name = first_name;
-                    address->nick_name = nick_name;
-                    address->organization = org;
-                    address->address_list = g_list_reverse(address_list);
+                    libbalsa_address_set_last_name(address, last_name);
+                    libbalsa_address_set_first_name(address, first_name);
+                    libbalsa_address_set_nick_name(address, nick_name);
+                    libbalsa_address_set_organization(address, org);
+                    libbalsa_address_set_addr_list(address,
+                                                   g_list_reverse(addr_list));
 
-                    return LBABERR_OK;
+                    res = LBABERR_OK;
+                    g_free(full_name);
+                    g_free(name);
+                    g_free(last_name);
+                    g_free(first_name);
+                    g_free(nick_name);
+                    g_free(org);
+
+                    return res;
                 }
-                g_list_free_full(address_list, g_free);
+                g_list_free_full(addr_list, g_free);
 	    }
             /* Record without e-mail address, or we're not creating
              * addresses: free memory. */
@@ -320,8 +337,7 @@ libbalsa_address_book_vcard_parse_address(FILE * stream,
 	if (g_ascii_strncasecmp(string, "EMAIL", 5) == 0) {
 	    gchar *ptr = strchr(string + 5, ':');
 	    if (ptr) {
-		address_list =
-		    g_list_prepend(address_list, g_strdup(ptr + 1));
+		addr_list = g_list_prepend(addr_list, g_strdup(ptr + 1));
 	    }
 	    continue;
 	}

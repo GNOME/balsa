@@ -217,8 +217,8 @@ libbalsa_address_book_rubrica_load(LibBalsaAddressBook * ab,
 
 	if (callback &&
 	    (!filter_hi ||
-	     lbab_rubrica_starts_from(address->last_name, filter_hi) ||
-	     lbab_rubrica_starts_from(address->full_name, filter_hi)))
+	     lbab_rubrica_starts_from(libbalsa_address_get_last_name(address), filter_hi) ||
+	     lbab_rubrica_starts_from(libbalsa_address_get_full_name(address), filter_hi)))
 	    callback(ab, address, data);
     }
     if (callback)
@@ -277,7 +277,7 @@ libbalsa_address_book_rubrica_add_address(LibBalsaAddressBook * ab,
 
     /* eject if we already have this address */
     if (g_slist_find_custom(ab_rubrica->item_list, new_address,
-			    (GCompareFunc) address_compare)) {
+			    (GCompareFunc) libbalsa_address_compare)) {
 	xmlFreeDoc(doc);
 	return LBABERR_DUPLICATE;
     }
@@ -366,7 +366,7 @@ libbalsa_address_book_rubrica_modify_address(LibBalsaAddressBook * ab,
 	    gchar *full_name = xml_node_get_attr(card, CXMLCHARP("name"));
 
 	    if (full_name) {
-		found = !g_ascii_strcasecmp(address->full_name, full_name);
+		found = !g_ascii_strcasecmp(libbalsa_address_get_full_name(address), full_name);
 		g_free(full_name);
 	    }
 	}
@@ -415,8 +415,8 @@ static LibBalsaABErr
 lbab_rubrica_load_xml(LibBalsaAddressBookRubrica * ab_rubrica,
 		      xmlDocPtr * docptr)
 {
-    LibBalsaAddressBookText *ab_text =
-        LIBBALSA_ADDRESS_BOOK_TEXT(ab_rubrica);
+    LibBalsaAddressBook *ab = LIBBALSA_ADDRESS_BOOK(ab_rubrica);
+    LibBalsaAddressBookText *ab_text = LIBBALSA_ADDRESS_BOOK_TEXT(ab_rubrica);
     struct stat stat_buf;
     const gchar *path;
     int fd;
@@ -475,34 +475,36 @@ lbab_rubrica_load_xml(LibBalsaAddressBookRubrica * ab_rubrica,
     for (list = ab_rubrica->item_list; list; list = list->next) {
 	LibBalsaAddress *address = LIBBALSA_ADDRESS(list->data);
 	GList *l;
+        GList *addr_list;
 
 	if (!address)
 	    continue;
 
-	if (address->address_list->next
-	    && libbalsa_address_book_get_dist_list_mode(LIBBALSA_ADDRESS_BOOK(ab_rubrica))) {
+        addr_list = libbalsa_address_get_addr_list(address);
+	if (libbalsa_address_book_get_dist_list_mode(ab)
+            && addr_list != NULL && addr_list->next != NULL) {
 	    /* Create a group address. */
 	    InternetAddress *ia =
-		internet_address_group_new(address->full_name);
+		internet_address_group_new(libbalsa_address_get_full_name(address));
             InternetAddressGroup *group = (InternetAddressGroup *) ia;
 
-	    for (l = address->address_list; l; l = l->next) {
+	    for (l = addr_list; l != NULL; l = l->next) {
 		InternetAddress *member =
 		    internet_address_mailbox_new(NULL, l->data);
 		internet_address_group_add_member(group, member);
 		g_object_unref(member);
 	    }
-	    cmp_data = completion_data_new(ia, address->nick_name);
+	    cmp_data = completion_data_new(ia, libbalsa_address_get_nick_name(address));
 	    completion_list = g_list_prepend(completion_list, cmp_data);
 	    g_object_unref(ia);
 	} else {
 	    /* Create name addresses. */
 	    GList *l;
 
-	    for (l = address->address_list; l; l = l->next) {
+	    for (l = addr_list; l != NULL; l = l->next) {
 		InternetAddress *ia =
-		    internet_address_mailbox_new(address->full_name, l->data);
-		cmp_data = completion_data_new(ia, address->nick_name);
+		    internet_address_mailbox_new(libbalsa_address_get_full_name(address), l->data);
+		cmp_data = completion_data_new(ia, libbalsa_address_get_nick_name(address));
 		completion_list =
 		    g_list_prepend(completion_list, cmp_data);
 		g_object_unref(ia);
@@ -527,25 +529,25 @@ lbab_insert_address_node(const LibBalsaAddress * address,
 
     /* create a new card */
     new_addr = xmlNewChild(parent, NULL, CXMLCHARP("Card"), NULL);
-    xmlNewProp(new_addr, CXMLCHARP("name"), CXMLCHARP(address->full_name));
+    xmlNewProp(new_addr, CXMLCHARP("name"), CXMLCHARP(libbalsa_address_get_full_name(address)));
 
     /* create the Data section of the card */
     new_data = xmlNewChild(new_addr, NULL, CXMLCHARP("Data"), NULL);
     xmlNewChild(new_data, NULL, CXMLCHARP("FirstName"),
-		CXMLCHARP(address->first_name));
+		CXMLCHARP(libbalsa_address_get_first_name(address)));
     xmlNewChild(new_data, NULL, CXMLCHARP("LastName"),
-		CXMLCHARP(address->last_name));
+		CXMLCHARP(libbalsa_address_get_last_name(address)));
     xmlNewChild(new_data, NULL, CXMLCHARP("NickName"),
-		CXMLCHARP(address->nick_name));
+		CXMLCHARP(libbalsa_address_get_nick_name(address)));
 
     /* create the Work section of the card */
     new_data = xmlNewChild(new_addr, NULL, CXMLCHARP("Work"), NULL);
     xmlNewChild(new_data, NULL, CXMLCHARP("Organization"),
-		CXMLCHARP(address->organization));
+		CXMLCHARP(libbalsa_address_get_organization(address)));
 
     /* create the Net section of the card */
     new_data = xmlNewChild(new_addr, NULL, CXMLCHARP("Net"), NULL);
-    for (l = address->address_list; l != NULL; l = l->next) {
+    for (l = libbalsa_address_get_addr_list(address); l != NULL; l = l->next) {
 	xmlNodePtr new_mail =
 	    xmlNewChild(new_data, NULL, CXMLCHARP("Uri"),
 			CXMLCHARP(l->data));
@@ -581,25 +583,45 @@ extract_cards(xmlNodePtr card)
 	if (!xmlStrcmp(card->name, CXMLCHARP("Card"))) {
 	    LibBalsaAddress *address = libbalsa_address_new();
 	    xmlNodePtr children;
+            gchar *full_name;
+            GList *address_list = NULL;
 
-	    address->full_name =
-		xml_node_get_attr(card, CXMLCHARP("name"));
+            full_name = xml_node_get_attr(card, CXMLCHARP("name"));
+	    libbalsa_address_set_full_name(address, full_name);
+            g_free(full_name);
+
 	    children = card->children;
 	    while (children) {
-		if (!xmlStrcmp(children->name, CXMLCHARP("Data")))
-		    extract_data(children->children, &address->first_name,
-				 &address->last_name, &address->nick_name);
-		else if (!xmlStrcmp(children->name, CXMLCHARP("Work")))
-		    extract_work(children->children,
-				 &address->organization);
-		else if (!xmlStrcmp(children->name, CXMLCHARP("Net")))
-		    extract_net(children->children,
-				&address->address_list);
+		if (!xmlStrcmp(children->name, CXMLCHARP("Data"))) {
+                    gchar *first_name;
+                    gchar *last_name = NULL;
+                    gchar *nick_name = NULL;
+
+		    extract_data(children->children,
+                                 &first_name, &last_name, &nick_name);
+
+                    libbalsa_address_set_first_name(address, first_name);
+                    libbalsa_address_set_last_name(address, last_name);
+                    libbalsa_address_set_nick_name(address, nick_name);
+
+                    g_free(first_name);
+                    g_free(last_name);
+                    g_free(nick_name);
+                } else if (!xmlStrcmp(children->name, CXMLCHARP("Work"))) {
+                    gchar *organization = NULL;
+
+		    extract_work(children->children, &organization);
+                    libbalsa_address_set_organization(address, organization);
+                    g_free(organization);
+                } else if (!xmlStrcmp(children->name, CXMLCHARP("Net"))) {
+		    extract_net(children->children, &address_list);
+                    libbalsa_address_set_addr_list(address, address_list);
+                }
 
 		children = children->next;
 	    }
 
-	    if (address->address_list)
+	    if (address_list != NULL)
 		addrlist = g_slist_prepend(addrlist, address);
 	    else
 		g_object_unref(address);

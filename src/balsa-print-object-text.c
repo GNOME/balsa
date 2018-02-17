@@ -432,7 +432,7 @@ balsa_print_object_text_vcard(GList * list,
     PangoTabArray *tabs;
     GString *desc_buf;
     gdouble c_max_height;
-    LibBalsaAddress * addr = NULL;
+    LibBalsaAddress *address = NULL;
     gchar *textbuf;
 
     /* check if we can create an address from the body and fall back to default if 
@@ -442,8 +442,8 @@ balsa_print_object_text_vcard(GList * list,
     else
 	libbalsa_message_body_get_content(body, &textbuf, NULL);
     if (textbuf)
-        addr = libbalsa_address_new_from_vcard(textbuf, body->charset);
-    if (!addr) {
+        address = libbalsa_address_new_from_vcard(textbuf, body->charset);
+    if (address == NULL) {
 	g_free(textbuf);
 	return balsa_print_object_text(list, context, body, psetup);
     }
@@ -483,19 +483,19 @@ balsa_print_object_text_vcard(GList * list,
     desc_buf = g_string_new("");
     pod->p_label_width = 0;
     ADD_VCARD_FIELD(desc_buf, pod->p_label_width, test_layout,
-		    addr->full_name,    _("Full Name"));
+		    libbalsa_address_get_full_name(address),    _("Full Name"));
     ADD_VCARD_FIELD(desc_buf, pod->p_label_width, test_layout,
-		    addr->nick_name,    _("Nick Name"));
+		    libbalsa_address_get_nick_name(address),    _("Nick Name"));
     ADD_VCARD_FIELD(desc_buf, pod->p_label_width, test_layout,
-		    addr->first_name,   _("First Name"));
+		    libbalsa_address_get_first_name(address),   _("First Name"));
     ADD_VCARD_FIELD(desc_buf, pod->p_label_width, test_layout,
-		    addr->last_name,    _("Last Name"));
+		    libbalsa_address_get_last_name(address),    _("Last Name"));
     ADD_VCARD_FIELD(desc_buf, pod->p_label_width, test_layout,
-		    addr->organization, _("Organization"));
-    if (addr->address_list)
-        ADD_VCARD_FIELD(desc_buf, pod->p_label_width, test_layout,
-			(const gchar *) addr->address_list->data, _("Email Address"));
-    g_object_unref(addr);
+		    libbalsa_address_get_organization(address), _("Organization"));
+    ADD_VCARD_FIELD(desc_buf, pod->p_label_width, test_layout,
+                    libbalsa_address_get_addr(address),         _("Email Address"));
+
+    g_object_unref(address);
 
     /* add a small space between label and value */
     pod->p_label_width += C_TO_P(C_LABEL_SEP);

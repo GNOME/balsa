@@ -21,17 +21,11 @@
 #ifndef __LIBBALSA_ADDRESS_H__
 #define __LIBBALSA_ADDRESS_H__
 
-#include <gtk/gtk.h>
 #include <gmime/gmime.h>
+#include <gtk/gtk.h>
 
-#define LIBBALSA_TYPE_ADDRESS				(libbalsa_address_get_type())
-#define LIBBALSA_ADDRESS(obj)				(G_TYPE_CHECK_INSTANCE_CAST (obj, LIBBALSA_TYPE_ADDRESS, LibBalsaAddress))
-#define LIBBALSA_ADDRESS_CLASS(klass)			(G_TYPE_CHECK_CLASS_CAST (klass, LIBBALSA_TYPE_ADDRESS, LibBalsaAddressClass))
-#define LIBBALSA_IS_ADDRESS(obj)			(G_TYPE_CHECK_INSTANCE_TYPE (obj, LIBBALSA_TYPE_ADDRESS))
-#define LIBBALSA_IS_ADDRESS_CLASS(klass)		(G_TYPE_CHECK_CLASS_TYPE (klass, LIBBALSA_TYPE_ADDRESS))
-
-typedef struct _LibBalsaAddress LibBalsaAddress;
-typedef struct _LibBalsaAddressClass LibBalsaAddressClass;
+#define LIBBALSA_TYPE_ADDRESS (libbalsa_address_get_type())
+G_DECLARE_FINAL_TYPE(LibBalsaAddress, libbalsa_address, LIBBALSA, ADDRESS, GObject)
 
 typedef enum _LibBalsaAddressField LibBalsaAddressField;
 
@@ -45,44 +39,6 @@ enum _LibBalsaAddressField {
     NUM_FIELDS
 };
 
-/* General address structure to be used with address books.
-*/
-struct _LibBalsaAddress {
-    GObject parent;
-
-    /*
-     * ID
-     * VCard FN: Field
-     * LDAP/LDIF: xmozillanickname
-     */
-    gchar *nick_name;
-
-    /* First and last names
-     * VCard: parsed from N: field
-     * LDAP/LDIF: cn, givenName, surName.
-     */
-    gchar *full_name;
-    gchar *first_name;
-    gchar *last_name;
-
-    /* Organisation
-     * VCard: ORG: field
-     * ldif: o: attribute.
-     */
-    gchar *organization;
-
-    /* Email addresses
-     * A list of mailboxes, ie. user@domain.
-     */
-    GList *address_list;
-};
-
-struct _LibBalsaAddressClass {
-    GObjectClass parent_class;
-};
-
-GType libbalsa_address_get_type(void);
- 
 LibBalsaAddress *libbalsa_address_new(void);
 LibBalsaAddress *libbalsa_address_new_from_vcard(const gchar *str,
 						 const gchar *charset);
@@ -94,11 +50,11 @@ void libbalsa_address_set_copy(LibBalsaAddress *dest, LibBalsaAddress *src);
 gchar *libbalsa_address_to_gchar(LibBalsaAddress * address, gint n);
 
 const gchar *libbalsa_address_get_name_from_list(InternetAddressList
-                                                 * address_list);
+                                                 * addr_list);
 const gchar *libbalsa_address_get_mailbox_from_list(InternetAddressList *
-                                                    address_list);
+                                                    addr_list);
 gint libbalsa_address_n_mailboxes_in_list(InternetAddressList *
-                                          address_list);
+                                          addr_list);
 
 /* =================================================================== */
 /*                                UI PART                              */
@@ -129,4 +85,42 @@ GtkWidget *libbalsa_address_get_edit_widget(const LibBalsaAddress *addr,
                                             GCallback changed_cb,
                                             gpointer changed_data);
 LibBalsaAddress *libbalsa_address_new_from_edit_entries(GtkWidget **widget);
+
+/*
+ * Comparison func
+ */
+gint libbalsa_address_compare(LibBalsaAddress *a,
+                              LibBalsaAddress *b);
+
+/*
+ * Getters
+ */
+
+const gchar * libbalsa_address_get_full_name   (const LibBalsaAddress * address);
+const gchar * libbalsa_address_get_first_name  (const LibBalsaAddress * address);
+const gchar * libbalsa_address_get_last_name   (const LibBalsaAddress * address);
+const gchar * libbalsa_address_get_nick_name   (const LibBalsaAddress * address);
+const gchar * libbalsa_address_get_organization(const LibBalsaAddress * address);
+const gchar * libbalsa_address_get_addr        (const LibBalsaAddress * address);
+GList       * libbalsa_address_get_addr_list   (const LibBalsaAddress * address);
+
+/*
+ * Setters
+ */
+
+void libbalsa_address_set_full_name   (LibBalsaAddress * address,
+                                       const gchar     * full_name);
+void libbalsa_address_set_first_name  (LibBalsaAddress * address,
+                                       const gchar     * first_name);
+void libbalsa_address_set_last_name   (LibBalsaAddress * address,
+                                       const gchar     * last_name);
+void libbalsa_address_set_nick_name   (LibBalsaAddress * address,
+                                       const gchar     * nick_name);
+void libbalsa_address_set_organization(LibBalsaAddress * address,
+                                       const gchar     * organization);
+void libbalsa_address_set_addr_list   (LibBalsaAddress * address,
+                                       GList           * addr_list);
+void libbalsa_address_add_addr        (LibBalsaAddress * address,
+                                       const gchar     * addr);
+
 #endif				/* __LIBBALSA_ADDRESS_H__ */

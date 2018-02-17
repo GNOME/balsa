@@ -376,29 +376,24 @@ store_address_add_address(StoreAddressInfo * info,
 
     text = internet_address_to_string(ia, FALSE);
     address = libbalsa_address_new();
-    address->full_name =
-        g_strdup(ia->name ? ia->name : group ? group->name : NULL);
+    libbalsa_address_set_full_name(address,
+                                   ia->name != NULL ? ia->name :
+                                   group != NULL ? group->name : NULL);
     if (INTERNET_ADDRESS_IS_GROUP(ia)) {
         InternetAddressList *members;
         int j;
 
-        address->address_list = NULL;
         members = INTERNET_ADDRESS_GROUP(ia)->members;
 
         for (j = 0; j < internet_address_list_length(members); j++) {
             InternetAddress *member_address =
                 internet_address_list_get_address(members, j);
             if (INTERNET_ADDRESS_IS_MAILBOX(member_address))
-                address->address_list =
-                    g_list_prepend(address->address_list,
-                                   g_strdup(INTERNET_ADDRESS_MAILBOX
-                                            (member_address)->addr));
+                libbalsa_address_add_addr
+                    (address, INTERNET_ADDRESS_MAILBOX(member_address)->addr);
         }
-        address->address_list = g_list_reverse(address->address_list);
     } else {
-        address->address_list =
-            g_list_prepend(NULL,
-                           g_strdup(INTERNET_ADDRESS_MAILBOX(ia)->addr));
+        libbalsa_address_add_addr(address, INTERNET_ADDRESS_MAILBOX(ia)->addr);
     }
     ew = libbalsa_address_get_edit_widget(address, entries, NULL, NULL);
     g_object_unref(address);
@@ -419,15 +414,19 @@ store_address_add_lbaddress(StoreAddressInfo * info,
 {
     gchar *label_text;
     GtkWidget **entries, *ew;
+    const gchar *addr;
+    const gchar *full_name;
 
-    g_return_if_fail(address->address_list);
+    addr = libbalsa_address_get_addr(address);
+    g_return_if_fail(addr != NULL);
+
     entries = g_new(GtkWidget *, NUM_FIELDS);
     info->entries_list = g_list_append(info->entries_list, entries);
 
     ew = libbalsa_address_get_edit_widget(address, entries, NULL, NULL);
 
-    label_text = g_strdup(address->full_name ? address->full_name :
-                          address->address_list->data);
+    full_name = libbalsa_address_get_full_name(address);
+    label_text = g_strdup(full_name != NULL ? full_name : addr);
     if (g_utf8_strlen(label_text, -1) > 15)
         /* truncate to an arbitrary length: */
         *g_utf8_offset_to_pointer(label_text, 15) = '\0';

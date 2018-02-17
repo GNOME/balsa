@@ -103,10 +103,10 @@ rfc6350_parse_from_stream(GDataInputStream *stream,
 
 	/* ignore items without an Email address, fill empty full name if necessary */
 	if (result != NULL) {
-		if (result->address_list == NULL) {
+		if (libbalsa_address_get_addr_list(result) == NULL) {
                         g_clear_object(&result);
-		} else if (result->full_name == NULL) {
-			result->full_name = g_strdup(_("No-Name"));
+		} else if (libbalsa_address_get_full_name(result) == NULL) {
+                        libbalsa_address_set_full_name(result, _("No-Name"));
 		}
 	}
 
@@ -269,42 +269,30 @@ rfc6350_eval_line(gchar			  *line,
 			g_debug("%s: line='%s' name='%s', value='%s'", __func__, line, name, value);
 			if (g_ascii_strcasecmp(name, "FN") == 0) {
 				rfc6350_unescape(value);
-				g_free(address->full_name);
-				address->full_name = g_strdup(value);
+                                libbalsa_address_set_full_name(address, value);
 			} else if (g_ascii_strcasecmp(name, "N") == 0) {
 				gchar **n_items;
 
 				n_items = rfc6350_strsplit(value, 5U);
-				g_free(address->first_name);
-				g_free(address->last_name);
-				if (n_items[1] != NULL) {
-					address->first_name = g_strdup(n_items[1]);
-				} else {
-					address->first_name = NULL;
-				}
-				if (n_items[0] != NULL) {
-					address->last_name = g_strdup(n_items[0]);
-				} else {
-					address->last_name = NULL;
-				}
-				if (address->full_name == NULL) {
-					address->full_name = rfc6350_fn_from_n(n_items);
+                                libbalsa_address_set_first_name(address, n_items[1]);
+                                libbalsa_address_set_last_name(address, n_items[0]);
+				if (libbalsa_address_get_full_name(address) == NULL) {
+                                        libbalsa_address_set_full_name
+                                            (address, rfc6350_fn_from_n(n_items));
 				}
 				g_strfreev(n_items);
 			} else if (g_ascii_strcasecmp(name, "NICKNAME") == 0) {
 				rfc6350_unescape(value);
-				g_free(address->nick_name);
-				address->nick_name = g_strdup(value);
+                                libbalsa_address_set_nick_name(address, value);
 			} else if (g_ascii_strcasecmp(name, "ORG") == 0) {
 				gchar **n_items;
 
 				n_items = rfc6350_strsplit(value, 2U);
-				g_free(address->organization);
-				address->organization = g_strdup(n_items[0]);
+                                libbalsa_address_set_organization(address, n_items[0]);
 				g_strfreev(n_items);
 			} else if (g_ascii_strcasecmp(name, "EMAIL") == 0) {
 				rfc6350_unescape(value);
-				address->address_list = g_list_prepend(address->address_list, g_strdup(value));
+                                libbalsa_address_add_addr(address, value);
 			} else {
 				/* ignore any other items */
 			}

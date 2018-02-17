@@ -190,9 +190,8 @@ balsa_vevent_widget(LibBalsaVEvent * event, gboolean may_reply,
 	    g_free(this_att);
 
 	    if (may_reply && libbalsa_vcal_attendee_rsvp(lba)) {
-		InternetAddress *ia =
-                    internet_address_mailbox_new(NULL,
-                                                 lba->address_list->data);
+                const gchar *addr = libbalsa_address_get_addr(lba);
+		InternetAddress *ia = internet_address_mailbox_new(NULL, addr);
                 GList *list;
 
                 for (list = balsa_app.identities; list; list = list->next) {

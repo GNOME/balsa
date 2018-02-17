@@ -485,10 +485,12 @@ libbalsa_vevent_reply(const LibBalsaVEvent * event, const gchar * sender,
 			   pstats[(int) new_stat].str_2445, sender);
     if (event->uid)
 	g_string_append_printf(retval, "UID:%s\n", event->uid);
-    if (event->organizer && event->organizer->address_list)
-	g_string_append_printf(retval, "ORGANIZER:mailto:%s\n",
-			       (gchar *) event->organizer->address_list->
-			       data);
+    if (event->organizer != NULL) {
+        const gchar *addr = libbalsa_address_get_addr(event->organizer);
+
+        if (addr != NULL)
+            g_string_append_printf(retval, "ORGANIZER:mailto:%s\n", addr);
+    }
     if (event->summary) {
 	buf = text_2445_escape(event->summary);
 	g_string_append_printf(retval, "SUMMARY:%s\n", buf);
@@ -630,7 +632,7 @@ cal_address_2445_to_lbaddress(const gchar * uri, gchar ** attributes,
 	return NULL;
 
     retval = libbalsa_address_new();
-    retval->address_list = g_list_prepend(NULL, g_strdup(uri + 7));
+    libbalsa_address_add_addr(retval, uri + 7);
     if (!is_organizer)
 	g_object_set_data(G_OBJECT(retval), RFC2445_ROLE,
 			  LB_ROLE2PTR(VCAL_ROLE_REQ_PART));
@@ -642,7 +644,7 @@ cal_address_2445_to_lbaddress(const gchar * uri, gchar ** attributes,
 	/* scan attributes for extra information */
 	for (n = 0; (the_attr = attributes[n]); n++) {
 	    if (!g_ascii_strncasecmp(the_attr, "CN=", 3))
-		retval->full_name = g_strdup(the_attr + 3);
+		libbalsa_address_set_full_name(retval, the_attr + 3);
 	    else if (!g_ascii_strncasecmp(the_attr, "ROLE=", 5))
 		g_object_set_data(G_OBJECT(retval), RFC2445_ROLE,
 				  LB_ROLE2PTR(vcal_str_to_role(the_attr + 5)));

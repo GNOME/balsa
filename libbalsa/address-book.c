@@ -243,17 +243,6 @@ libbalsa_address_book_alias_complete(LibBalsaAddressBook * ab,
 }
 
 
-gboolean libbalsa_address_is_dist_list(const LibBalsaAddressBook *ab,
-				       const LibBalsaAddress *address)
-{
-    LibBalsaAddressBookPrivate *priv =
-        libbalsa_address_book_get_instance_private((LibBalsaAddressBook *) ab);
-
-    return (priv->dist_list_mode && g_list_length(address->address_list)>1);
-}
-
-
-
 static void
 libbalsa_address_book_real_save_config(LibBalsaAddressBook * ab,
 				       const gchar * group)

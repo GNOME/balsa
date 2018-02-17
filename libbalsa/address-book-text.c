@@ -233,10 +233,10 @@ lbab_text_group_address(const gchar * group_name,
         GList *mailbox;
         LibBalsaAddress *address = LIBBALSA_ADDRESS(l->data);
 
-        for (mailbox = address->address_list; mailbox;
+        for (mailbox = libbalsa_address_get_addr_list(address); mailbox;
              mailbox = mailbox->next) {
             InternetAddress *member =
-                internet_address_mailbox_new(address->full_name,
+                internet_address_mailbox_new(libbalsa_address_get_full_name(address),
 					     mailbox->data);
             internet_address_group_add_member((InternetAddressGroup *)ia, member);
             g_object_unref(member);
@@ -258,13 +258,13 @@ lbab_text_item_compare(LibBalsaAddressBookTextItem * a,
     g_return_val_if_fail(a != NULL, -1);
     g_return_val_if_fail(b != NULL, 1);
 
-    if (!a->address)
+    if (a->address == NULL)
         return -1;
-    if (!b->address)
+    if (b->address == NULL)
         return 1;
 
-    return g_ascii_strcasecmp(a->address->full_name,
-                              b->address->full_name);
+    return g_ascii_strcasecmp(libbalsa_address_get_full_name(a->address),
+                              libbalsa_address_get_full_name(b->address));
 }
 
 /* Load the book from the stream */
@@ -273,6 +273,7 @@ lbab_text_load_file(LibBalsaAddressBookText * ab_text, FILE * stream)
 {
     LibBalsaAddressBookTextPrivate *priv =
         libbalsa_address_book_text_get_instance_private(ab_text);
+    LibBalsaAddressBook *ab = ( LibBalsaAddressBook *) ab_text;
     LibBalsaABErr(*parse_address) (FILE * stream_in,
                                    LibBalsaAddress * address,
                                    FILE * stream_out,
@@ -322,33 +323,38 @@ lbab_text_load_file(LibBalsaAddressBookText * ab_text, FILE * stream)
 #if MAKE_GROUP_BY_ORGANIZATION
         gchar **groups, **group;
 #endif                          /* MAKE_GROUP_BY_ORGANIZATION */
+        GList *addr_list;
+
         if (!address)
             continue;
 
-        if (address->address_list->next
-            && libbalsa_address_book_get_dist_list_mode(LIBBALSA_ADDRESS_BOOK(ab_text))) {
+        addr_list = libbalsa_address_get_addr_list(address);
+	if (libbalsa_address_book_get_dist_list_mode(ab)
+            && addr_list != NULL && addr_list->next != NULL) {
             /* Create a group address. */
             InternetAddress *ia =
-                internet_address_group_new(address->full_name);
+                internet_address_group_new(libbalsa_address_get_full_name(address));
             GList *l;
 
-            for (l = address->address_list; l; l = l->next) {
+            for (l = addr_list; l; l = l->next) {
                 InternetAddress *member =
                     internet_address_mailbox_new(NULL, l->data);
                 internet_address_group_add_member((InternetAddressGroup *)ia, member);
                 g_object_unref(member);
             }
-            cmp_data = completion_data_new(ia, address->nick_name);
+            cmp_data = completion_data_new(ia, libbalsa_address_get_nick_name(address));
             completion_list = g_list_prepend(completion_list, cmp_data);
             g_object_unref(ia);
         } else {
             /* Create name addresses. */
             GList *l;
 
-            for (l = address->address_list; l; l = l->next) {
+            for (l = addr_list; l; l = l->next) {
                 InternetAddress *ia =
-                    internet_address_mailbox_new(address->full_name, l->data);
-                cmp_data = completion_data_new(ia, address->nick_name);
+                    internet_address_mailbox_new(libbalsa_address_get_full_name(address),
+                                                 l->data);
+                cmp_data =
+                    completion_data_new(ia, libbalsa_address_get_nick_name(address));
                 completion_list =
                     g_list_prepend(completion_list, cmp_data);
                 g_object_unref(ia);
@@ -530,11 +536,14 @@ libbalsa_address_book_text_load(LibBalsaAddressBook * ab,
         if (!address)
             continue;
 
-        if (callback && (!filter_hi
-                         || lbab_text_starts_from(address->last_name,
-                                                  filter_hi)
-                         || lbab_text_starts_from(address->full_name,
-                                                  filter_hi)))
+        if (callback
+            && (!filter_hi
+                ||
+                lbab_text_starts_from(libbalsa_address_get_last_name
+                                      (address), filter_hi)
+                ||
+                lbab_text_starts_from(libbalsa_address_get_full_name
+                                      (address), filter_hi)))
             callback(ab, address, data);
     }
     if (callback)

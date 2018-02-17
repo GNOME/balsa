@@ -195,12 +195,9 @@ lbe_load_cb(const gchar *email, const gchar *name, void *data)
     LibBalsaAddress *address = libbalsa_address_new();
 
     /* The extern database doesn't support Id's, sorry! */
-    address->nick_name = g_strdup(_("No-Id"));
-    address->address_list = g_list_append(address->address_list,
-                                          g_strdup(email));
-    
-    if (name) address->full_name = g_strdup(name);
-    else address->full_name = g_strdup(_("No-Name"));
+    libbalsa_address_set_nick_name(address, _("No-Id"));
+    libbalsa_address_add_addr(address, email);
+    libbalsa_address_set_full_name(address, name != NULL ? name : _("No-Name"));
     d->callback(d->ab, address, d->closure);
     g_object_unref(G_OBJECT(address));
 }
@@ -285,10 +282,11 @@ libbalsa_address_book_externq_add_address(LibBalsaAddressBook * ab,
 
     ex = LIBBALSA_ADDRESS_BOOK_EXTERN(ab);
     if(ex->save) {
+        const gchar *addr = libbalsa_address_get_addr(new_address);
         g_snprintf(command, sizeof(command), "%s \"%s\" \"%s\" \"%s\"", 
-                   ex->save, 
-                   (gchar *) new_address->address_list->data, 
-                   new_address->full_name, "TODO");
+                   ex->save,
+                   addr,
+                   libbalsa_address_get_full_name(new_address), "TODO");
         
         if( (gc = popen(command, "r")) == NULL)
             return LBABERR_CANNOT_WRITE;

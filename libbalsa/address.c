@@ -29,46 +29,54 @@
 #include "misc.h"
 #include <glib/gi18n.h>
 
-static GObjectClass *parent_class;
-
 static void libbalsa_address_class_init(LibBalsaAddressClass * klass);
 static void libbalsa_address_init(LibBalsaAddress * ab);
 static void libbalsa_address_finalize(GObject * object);
 
 static gchar ** vcard_strsplit(const gchar * string);
 
-GType libbalsa_address_get_type(void)
-{
-    static GType address_type = 0;
+/* General address structure to be used with address books.
+*/
+struct _LibBalsaAddress {
+    GObject parent;
 
-    if (!address_type) {
-	static const GTypeInfo address_info = {
-	    sizeof(LibBalsaAddressClass),
-            NULL,               /* base_init */
-            NULL,               /* base_finalize */
-	    (GClassInitFunc) libbalsa_address_class_init,
-            NULL,               /* class_finalize */
-            NULL,               /* class_data */
-	    sizeof(LibBalsaAddress),
-            0,                  /* n_preallocs */
-	    (GInstanceInitFunc) libbalsa_address_init
-	};
+    /*
+     * ID
+     * VCard FN: Field
+     * LDAP/LDIF: xmozillanickname
+     */
+    gchar *nick_name;
 
-	address_type =
-	    g_type_register_static(G_TYPE_OBJECT,
-	                           "LibBalsaAddress",
-                                   &address_info, 0);
-    }
+    /* First and last names
+     * VCard: parsed from N: field
+     * LDAP/LDIF: cn, givenName, surName.
+     */
+    gchar *full_name;
+    gchar *first_name;
+    gchar *last_name;
 
-    return address_type;
-}
+    /* Organisation
+     * VCard: ORG: field
+     * ldif: o: attribute.
+     */
+    gchar *organization;
+
+    /* Email addresses
+     * A list of mailboxes, ie. user@domain.
+     */
+    GList *addr_list;
+};
+
+struct _LibBalsaAddressClass {
+    GObjectClass parent_class;
+};
+
+G_DEFINE_TYPE(LibBalsaAddress, libbalsa_address, G_TYPE_OBJECT)
 
 static void
 libbalsa_address_class_init(LibBalsaAddressClass * klass)
 {
     GObjectClass *object_class;
-
-    parent_class = g_type_class_peek_parent(klass);
 
     object_class = G_OBJECT_CLASS(klass);
     object_class->finalize = libbalsa_address_finalize;
@@ -82,7 +90,7 @@ libbalsa_address_init(LibBalsaAddress * addr)
     addr->first_name = NULL;
     addr->last_name = NULL;
     addr->organization = NULL;
-    addr->address_list = NULL;
+    addr->addr_list = NULL;
 }
 
 static void
@@ -100,9 +108,9 @@ libbalsa_address_finalize(GObject * object)
     g_free(addr->last_name);
     g_free(addr->organization);
 
-    g_list_free_full(addr->address_list, g_free);
+    g_list_free_full(addr->addr_list, g_free);
 
-    G_OBJECT_CLASS(parent_class)->finalize(object);
+    G_OBJECT_CLASS(libbalsa_address_parent_class)->finalize(object);
 }
 
 LibBalsaAddress *
@@ -327,7 +335,7 @@ libbalsa_address_new_from_vcard(const gchar *str, const gchar *charset)
     gchar *name = NULL, *nick_name = NULL, *org = NULL;
     gchar *full_name = NULL, *last_name = NULL, *first_name = NULL;
     gint in_vcard = FALSE;
-    GList *address_list = NULL;
+    GList *addr_list = NULL;
     const gchar *string, *next_line;
     gchar * vcard;
 
@@ -386,7 +394,7 @@ libbalsa_address_new_from_vcard(const gchar *str, const gchar *charset)
 		 */
 		LibBalsaAddress *address;
 
-		if (!address_list)
+		if (!addr_list)
                     break;
 
 		address = g_object_new(LIBBALSA_TYPE_ADDRESS, NULL);
@@ -405,7 +413,7 @@ libbalsa_address_new_from_vcard(const gchar *str, const gchar *charset)
                 address->first_name = first_name;
                 address->nick_name = nick_name;
                 address->organization = org;
-                address->address_list = g_list_reverse(address_list);
+                address->addr_list = g_list_reverse(addr_list);
 
                 return address;
             }
@@ -498,8 +506,8 @@ libbalsa_address_new_from_vcard(const gchar *str, const gchar *charset)
 
             } else if (g_ascii_strncasecmp(line, "EMAIL:", 6) == 0) {
 
-		address_list =
-		    g_list_prepend(address_list, g_strdup(line + 6));
+		addr_list =
+		    g_list_prepend(addr_list, g_strdup(line + 6));
             }
             g_free(line);
         }
@@ -511,7 +519,7 @@ libbalsa_address_new_from_vcard(const gchar *str, const gchar *charset)
     g_free(first_name);
     g_free(nick_name);
     g_free(org);
-    g_list_free_full(address_list, g_free);
+    g_list_free_full(addr_list, g_free);
 
     return NULL;
 }
@@ -534,12 +542,12 @@ libbalsa_address_set_copy(LibBalsaAddress * dest, LibBalsaAddress * src)
     dest->last_name = g_strdup(src->last_name);
     g_free(dest->organization);
     dest->organization = g_strdup(src->organization);
-    g_list_free_full(dest->address_list, g_free);
+    g_list_free_full(dest->addr_list, g_free);
 
     dst_al = NULL;
-    for (src_al = src->address_list; src_al; src_al = src_al->next)
+    for (src_al = src->addr_list; src_al; src_al = src_al->next)
         dst_al = g_list_prepend(dst_al, g_strdup(src_al->data));
-    dest->address_list = g_list_reverse(dst_al);
+    dest->addr_list = g_list_reverse(dst_al);
 }
 
 static gchar *
@@ -588,16 +596,16 @@ libbalsa_address_to_gchar(LibBalsaAddress * address, gint n)
 
     g_return_val_if_fail(LIBBALSA_IS_ADDRESS(address), NULL);
 
-    if(!address->address_list)
+    if (address->addr_list == NULL)
         return NULL;
-    if(n==-1) {
-        if(address->address_list->next)
-            retc = rfc2822_group(address->full_name, address->address_list);
+    if (n == -1) {
+        if (address->addr_list->next != NULL)
+            retc = rfc2822_group(address->full_name, address->addr_list);
         else
             retc = rfc2822_mailbox(address->full_name,
-                                   address->address_list->data);
+                                   address->addr_list->data);
     } else {
-	const gchar *mailbox = g_list_nth_data(address->address_list, n);
+	const gchar *mailbox = g_list_nth_data(address->addr_list, n);
 	g_return_val_if_fail(mailbox != NULL, NULL);
 
 	retc = rfc2822_mailbox(address->full_name, mailbox);
@@ -608,19 +616,19 @@ libbalsa_address_to_gchar(LibBalsaAddress * address, gint n)
 
 /* Helper */
 static const gchar *
-lba_get_name_or_mailbox(InternetAddressList * address_list,
+lba_get_name_or_mailbox(InternetAddressList * addr_list,
                         gboolean get_name, gboolean in_group)
 {
     const gchar *retval = NULL;
     InternetAddress *ia;
     gint i, len;
 
-    if (address_list == NULL)
+    if (addr_list == NULL)
 	return NULL;
 
-    len = internet_address_list_length(address_list);
+    len = internet_address_list_length(addr_list);
     for (i = 0; i < len; i++) {
-        ia = internet_address_list_get_address (address_list, i);
+        ia = internet_address_list_get_address (addr_list, i);
 
         if (get_name && ia->name && *ia->name)
             return ia->name;
@@ -643,30 +651,30 @@ lba_get_name_or_mailbox(InternetAddressList * address_list,
 
 /* Get either a name or a mailbox from an InternetAddressList. */
 const gchar *
-libbalsa_address_get_name_from_list(InternetAddressList *address_list)
+libbalsa_address_get_name_from_list(InternetAddressList *addr_list)
 {
-    return lba_get_name_or_mailbox(address_list, TRUE, FALSE);
+    return lba_get_name_or_mailbox(addr_list, TRUE, FALSE);
 }
 
 /* Get a mailbox from an InternetAddressList. */
 const gchar *
-libbalsa_address_get_mailbox_from_list(InternetAddressList *address_list)
+libbalsa_address_get_mailbox_from_list(InternetAddressList *addr_list)
 {
-    return lba_get_name_or_mailbox(address_list, FALSE, FALSE);
+    return lba_get_name_or_mailbox(addr_list, FALSE, FALSE);
 }
 
 /* Number of individual mailboxes in an InternetAddressList. */
 gint
-libbalsa_address_n_mailboxes_in_list(InternetAddressList * address_list)
+libbalsa_address_n_mailboxes_in_list(InternetAddressList * addr_list)
 {
     gint i, len, n_mailboxes = 0;
 
-    g_return_val_if_fail(IS_INTERNET_ADDRESS_LIST(address_list), -1);
+    g_return_val_if_fail(IS_INTERNET_ADDRESS_LIST(addr_list), -1);
 
-    len = internet_address_list_length(address_list);
+    len = internet_address_list_length(addr_list);
     for (i = 0; i < len; i++) {
         const InternetAddress *ia =
-            internet_address_list_get_address(address_list, i);
+            internet_address_list_get_address(addr_list, i);
 
         if (INTERNET_ADDRESS_IS_MAILBOX(ia))
             ++n_mailboxes;
@@ -701,9 +709,9 @@ libbalsa_address_set_edit_entries(const LibBalsaAddress * address,
     GtkTreeIter iter;
 
     new_email = g_strdup(address
-                         && address->address_list
-                         && address->address_list->data ?
-                         address->address_list->data : "");
+                         && address->addr_list
+                         && address->addr_list->data ?
+                         address->addr_list->data : "");
     /* initialize the organization... */
     if (!address || address->organization == NULL)
 	new_organization = g_strdup("");
@@ -765,7 +773,7 @@ libbalsa_address_set_edit_entries(const LibBalsaAddress * address,
     if (address) {
         GList *list;
 
-        for (list = address->address_list; list; list = list->next) {
+        for (list = address->addr_list; list; list = list->next) {
             gtk_list_store_append(store, &iter);
             gtk_list_store_set(store, &iter, 0, list->data, -1);
         }
@@ -816,7 +824,7 @@ lba_cell_edited(GtkCellRendererText * cell, const gchar * path_string,
 }
 
 static GtkWidget *
-lba_address_list_widget(GCallback changed_cb, gpointer changed_data)
+lba_addr_list_widget(GCallback changed_cb, gpointer changed_data)
 {
     GtkListStore *store;
     GtkWidget *tree_view;
@@ -886,12 +894,12 @@ addrlist_drag_received_cb(GtkWidget        * widget,
         if (target == g_intern_static_string("x-application/x-addr")) {
             addr = *(LibBalsaAddress **) gtk_selection_data_get_data(selection_data);
 
-            if (addr != NULL && addr->address_list != NULL) {
-                g_print ("string: %s\n", (gchar*) addr->address_list->data);
+            if (addr != NULL && addr->addr_list != NULL) {
+                g_print ("string: %s\n", (gchar*) addr->addr_list->data);
                 gtk_list_store_insert_with_values(GTK_LIST_STORE(model),
                                                   &iter, 99999,
                                                   0,
-                                                  addr->address_list->data,
+                                                  addr->addr_list->data,
                                                   -1);
                 dnd_success = TRUE;
             }
@@ -983,7 +991,7 @@ libbalsa_address_get_edit_widget(const LibBalsaAddress *address,
             GtkWidget *but = gtk_button_new_with_mnemonic(_("A_dd"));
             GdkContentFormats *formats;
 
-            entries[cnt] = lba_address_list_widget(changed_cb,
+            entries[cnt] = lba_addr_list_widget(changed_cb,
                                                    changed_data);
             gtk_box_pack_start(GTK_BOX(box), label);
             gtk_box_pack_start(GTK_BOX(box), but);
@@ -1084,7 +1092,124 @@ libbalsa_address_new_from_edit_entries(GtkWidget ** entries)
         if (email && *email)
             list = g_list_prepend(list, email);
     }
-    address->address_list = g_list_reverse(list);
+    address->addr_list = g_list_reverse(list);
 
     return address;
+}
+
+/*
+ * Comparison func
+ */
+
+gint
+libbalsa_address_compare(LibBalsaAddress *a, LibBalsaAddress *b)
+{
+    g_return_val_if_fail(a != NULL, -1);
+    g_return_val_if_fail(b != NULL, 1);
+
+    return g_ascii_strcasecmp(a->full_name, b->full_name);
+}
+
+/*
+ * Getters
+ */
+
+const gchar *
+libbalsa_address_get_full_name(const LibBalsaAddress * address)
+{
+    return address->full_name;
+}
+
+const gchar *
+libbalsa_address_get_first_name(const LibBalsaAddress * address)
+{
+    return address->first_name;
+}
+
+const gchar *
+libbalsa_address_get_last_name(const LibBalsaAddress * address)
+{
+    return address->last_name;
+}
+
+const gchar *
+libbalsa_address_get_nick_name(const LibBalsaAddress * address)
+{
+    return address->nick_name;
+}
+
+const gchar *
+libbalsa_address_get_organization(const LibBalsaAddress * address)
+{
+    return address->organization;
+}
+
+const gchar *
+libbalsa_address_get_addr(const LibBalsaAddress * address)
+{
+    return address->addr_list != NULL ? address->addr_list->data : NULL;
+}
+
+GList *
+libbalsa_address_get_addr_list(const LibBalsaAddress * address)
+{
+    return address->addr_list;
+}
+
+/*
+ * Setters
+ */
+
+void
+libbalsa_address_set_full_name(LibBalsaAddress * address,
+                               const gchar     * full_name)
+{
+    g_free(address->full_name);
+    address->full_name = g_strdup(full_name);
+}
+
+void
+libbalsa_address_set_first_name(LibBalsaAddress * address,
+                                const gchar     * first_name)
+{
+    g_free(address->first_name);
+    address->first_name = g_strdup(first_name);
+}
+
+void
+libbalsa_address_set_last_name(LibBalsaAddress * address,
+                               const gchar     * last_name)
+{
+    g_free(address->last_name);
+    address->last_name = g_strdup(last_name);
+}
+
+void
+libbalsa_address_set_nick_name(LibBalsaAddress * address,
+                               const gchar     * nick_name)
+{
+    g_free(address->nick_name);
+    address->nick_name = g_strdup(nick_name);
+}
+
+void
+libbalsa_address_set_organization(LibBalsaAddress * address,
+                                  const gchar     * organization)
+{
+    g_free(address->organization);
+    address->organization = g_strdup(organization);
+}
+
+void
+libbalsa_address_set_addr_list(LibBalsaAddress * address,
+                               GList           * addr_list)
+{
+    g_list_free_full(address->addr_list, g_free);
+    address->addr_list = addr_list;
+}
+
+void libbalsa_address_add_addr(LibBalsaAddress * address,
+                               const gchar     * addr)
+{
+    address->addr_list = g_list_prepend(address->addr_list, g_strdup(addr));
 }

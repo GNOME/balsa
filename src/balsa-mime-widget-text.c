@@ -1271,16 +1271,16 @@ bm_widget_new_vcard(BalsaMessage *bm, LibBalsaMessageBody *mime_body,
                     gchar *ptr, size_t len)
 {
     BalsaMimeWidget *mw;
-    LibBalsaAddress *addr;
+    LibBalsaAddress *address;
     GtkWidget *widget;
     GtkGrid *grid;
     GtkWidget *w;
     int row = 1;
 
-    addr =
+    address =
         libbalsa_address_new_from_vcard(ptr, mime_body->charset ?
                                         mime_body-> charset : "us-ascii");
-    if (!addr)
+    if (address == NULL)
         return NULL;
 
     mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
@@ -1295,18 +1295,15 @@ bm_widget_new_vcard(BalsaMessage *bm, LibBalsaMessageBody *mime_body,
     w = gtk_button_new_with_mnemonic(_("S_tore Address"));
     gtk_grid_attach(grid, w, 0, 0, 2, 1);
     g_signal_connect_swapped(w, "clicked",
-                             G_CALLBACK(balsa_store_address), addr);
-    g_object_weak_ref(G_OBJECT(mw), (GWeakNotify)g_object_unref, addr);
+                             G_CALLBACK(balsa_store_address), address);
+    g_object_weak_ref(G_OBJECT(mw), (GWeakNotify)g_object_unref, address);
 
-
-    GRID_ATTACH(grid, addr->full_name,    _("Full Name:"));
-    GRID_ATTACH(grid, addr->nick_name,    _("Nick Name:"));
-    GRID_ATTACH(grid, addr->first_name,   _("First Name:"));
-    GRID_ATTACH(grid, addr->last_name,    _("Last Name:"));
-    GRID_ATTACH(grid, addr->organization, _("Organization:"));
-    if(addr->address_list) {
-        GRID_ATTACH(grid, addr->address_list->data, _("Email Address:"));
-    }
+    GRID_ATTACH(grid, libbalsa_address_get_full_name(address),    _("Full Name:"));
+    GRID_ATTACH(grid, libbalsa_address_get_nick_name(address),    _("Nick Name:"));
+    GRID_ATTACH(grid, libbalsa_address_get_first_name(address),   _("First Name:"));
+    GRID_ATTACH(grid, libbalsa_address_get_last_name(address),    _("Last Name:"));
+    GRID_ATTACH(grid, libbalsa_address_get_organization(address), _("Organization:"));
+    GRID_ATTACH(grid, libbalsa_address_get_addr(address),         _("Email Address:"));
 
     return mw;
 }

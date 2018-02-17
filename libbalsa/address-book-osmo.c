@@ -205,13 +205,13 @@ utf8_strstr(const gchar *haystack, const gchar *utf8_needle)
  * LibBalsaAddress::nick_name and LibBalsaAddress::organization.
  */
 static inline gboolean
-utf8_lba_strstr(const LibBalsaAddress *address, const gchar *utf8_needle)
+utf8_lba_strstr(LibBalsaAddress *address, const gchar *utf8_needle)
 {
-	return utf8_strstr(address->full_name, utf8_needle) ||
-		utf8_strstr(address->first_name, utf8_needle) ||
-		utf8_strstr(address->last_name, utf8_needle) ||
-		utf8_strstr(address->nick_name, utf8_needle) ||
-		utf8_strstr(address->organization, utf8_needle);
+	return utf8_strstr(libbalsa_address_get_full_name(address), utf8_needle) ||
+		utf8_strstr(libbalsa_address_get_first_name(address), utf8_needle) ||
+		utf8_strstr(libbalsa_address_get_last_name(address), utf8_needle) ||
+		utf8_strstr(libbalsa_address_get_nick_name(address), utf8_needle) ||
+		utf8_strstr(libbalsa_address_get_organization(address), utf8_needle);
 }
 
 
@@ -249,27 +249,29 @@ libbalsa_address_book_osmo_alias_complete(LibBalsaAddressBook *ab,
 			gboolean names_match;
 
 			names_match = utf8_lba_strstr(this_addr, utf8_filter);
-			for (this_mail = this_addr->address_list; this_mail != NULL; this_mail = this_mail->next) {
+			for (this_mail = libbalsa_address_get_addr_list(this_addr);
+                             this_mail != NULL; this_mail = this_mail->next) {
 				const gchar *mail_addr = (gchar *) this_mail->data;
 
 				if (names_match || (strstr(mail_addr, prefix) != NULL)) {
+                                        const gchar *full_name;
 					InternetAddress *addr;
 
-					g_debug("%s: found %s <%s>", __func__, this_addr->full_name, mail_addr);
-					addr = internet_address_mailbox_new(this_addr->full_name, g_strdup(mail_addr));
+                                        full_name =
+                                            libbalsa_address_get_full_name(this_addr),
+					g_debug("%s: found %s <%s>", __func__,
+                                                full_name, mail_addr);
+					addr = internet_address_mailbox_new(full_name,
+                                                mail_addr);
 					result = g_list_prepend(result, g_object_ref(addr));
 				}
 			}
 		}
 		g_free(utf8_filter);
 		g_list_free_full(addresses, g_object_unref);
-
-		if (result != NULL) {
-			result = g_list_reverse(result);
-		}
 	}
 
-	return result;
+	return g_list_reverse(result);
 }
 
 
@@ -332,7 +334,7 @@ osmo_read_addresses(LibBalsaAddressBookOsmo *osmo,
 
 				this_addr = rfc6350_parse_from_stream(data, &eos, error);
 				if (this_addr != NULL) {
-					if (this_addr->address_list != NULL) {
+					if (libbalsa_address_get_addr(this_addr) != NULL) {
 						addresses = g_list_prepend(addresses, this_addr);
 					} else {
 						g_object_unref(G_OBJECT(this_addr));

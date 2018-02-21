@@ -556,25 +556,25 @@ endif
 # set more warnings.
 #
 
-if compiler.get_id() == 'gcc' and more_warnings
-  foreach argument : ['-Wsign-compare',
-                      '-Wpointer-arith',
-                      '-Wnested-externs',
-                      '-Wchar-subscripts',
-                      '-Wuninitialized',
-                      '-Wmissing-prototypes',
-                      '-Wreturn-type',
-                      '-Wdeclaration-after-statement']
-    if compiler.has_argument(argument)
-      add_global_arguments(argument, language : 'c')
-    endif
-  endforeach
-endif
+if more_warnings
+  test_cflags = ['-Wsign-compare',
+                 '-Wpointer-arith',
+                 '-Wnested-externs',
+                 '-Wchar-subscripts',
+                 '-Wuninitialized',
+                 '-Wmissing-prototypes',
+                 '-Wreturn-type',
+                 '-Wdeclaration-after-statement']
+  add_global_arguments(compiler.get_supported_arguments(test_cflags), language : 'c')
+endif # more_warnings
 
 # extra warnings for GIT.
 #
 if balsa_from_git
-  add_global_arguments('-Wall', '-Werror', '-Wdeprecated-declarations', language : 'c')
+  test_cflags = ['-Wall',
+                 '-Werror',
+                 '-Wdeprecated-declarations']
+  add_global_arguments(compiler.get_supported_arguments(test_cflags), language : 'c')
   add_global_arguments('-DGMIME_DISABLE_DEPRECATED', language : 'c')
   add_global_arguments('-O2', '-U_FORTIFY_SOURCE', '-D_FORTIFY_SOURCE=2', language : 'c')
 endif # balsa_from_git

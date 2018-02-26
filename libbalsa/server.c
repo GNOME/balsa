@@ -225,9 +225,7 @@ libbalsa_server_set_password(LibBalsaServer * server,
     g_return_if_fail(LIBBALSA_IS_SERVER(server));
 
     libbalsa_free_password(server->passwd);
-    if(passwd && passwd[0])
-	server->passwd = g_strdup(passwd);
-    else server->passwd = NULL;
+    server->passwd = g_strdup(passwd);
 }
 
 void

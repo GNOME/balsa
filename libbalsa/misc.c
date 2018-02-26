@@ -47,9 +47,7 @@
 static const gchar *libbalsa_get_codeset_name(const gchar *txt, 
 					      LibBalsaCodeset Codeset);
 #ifndef HAVE_STRUCT_UTSNAME_DOMAINNAME
-static int getdnsdomainname(char *s, size_t l);
-
-static int 
+static int
 getdnsdomainname (char *s, size_t l)
 {
   FILE *f;

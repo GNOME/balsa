@@ -615,8 +615,8 @@ filters_edit_dialog(GtkWindow * parent)
 	
 	cpfil->name=g_strdup(fil->name);
 	cpfil->flags=fil->flags;
-	if (fil->sound) cpfil->sound=g_strdup(fil->sound);
-	if (fil->popup_text) cpfil->popup_text=g_strdup(fil->popup_text);
+	cpfil->sound=g_strdup(fil->sound);
+	cpfil->popup_text=g_strdup(fil->popup_text);
 	/* FIXME: cpfil->conditions_op=fil->conditions_op; */
 	cpfil->flags=fil->flags;
 
@@ -642,8 +642,7 @@ filters_edit_dialog(GtkWindow * parent)
 	fe_collect_user_headers(fil->condition);
 
 	cpfil->action=fil->action;
-	if (fil->action_string)
-            cpfil->action_string=g_strdup(fil->action_string);
+        cpfil->action_string=g_strdup(fil->action_string);
 
         gtk_list_store_append(GTK_LIST_STORE(model), &iter);
         gtk_list_store_set(GTK_LIST_STORE(model), &iter,

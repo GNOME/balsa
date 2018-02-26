@@ -735,8 +735,10 @@ static gchar *
 xml_node_get_text(xmlNodePtr node)
 {
     g_return_val_if_fail(node != NULL, NULL);
-    if ((node = node->children) && node->type == XML_TEXT_NODE)
+
+    if ((node = node->children) != NULL && node->type == XML_TEXT_NODE)
 	return g_strdup((const gchar *) node->content);
+
     return NULL;
 }
 
@@ -747,14 +749,14 @@ xml_node_get_attr(xmlNodePtr node, const xmlChar * attname)
     xmlAttrPtr props;
 
     g_return_val_if_fail(node != NULL, NULL);
+
     props = node->properties;
-    while (props) {
+    while (props != NULL) {
 	if (props->type == XML_ATTRIBUTE_NODE
 	    && !xmlStrcmp(props->name, attname) && props->children
-	    && props->children->type == XML_TEXT_NODE)
-	    return props->children->
-		content ? g_strdup((const gchar *) props->children->
-				   content) : NULL;
+	    && props->children->type == XML_TEXT_NODE) {
+	    return g_strdup((const gchar *) props->children->content);
+        }
 	props = props->next;
     }
 

@@ -351,7 +351,7 @@ libbalsa_vcal_new_from_body(LibBalsaMessageBody * body)
     in_embedded = FALSE;
     for (k = 0; lines[k]; k++) {
 	if (!event) {
-            if (!method && !g_ascii_strncasecmp("METHOD:", lines[k], 7))
+            if (method == NULL && g_str_has_prefix(lines[k], "METHOD:"))
                 method = g_strdup(lines[k] + 7);
 	    if (!g_ascii_strcasecmp("BEGIN:VEVENT", lines[k]))
 		event = libbalsa_vevent_new();

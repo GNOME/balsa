@@ -1,3 +1,14 @@
+* Balsa-2.5.5 release. Release date 2018-02-26
+
+Changes wrt to 2.5.4 tag:
+
+- crypto performance improvements
+- updates to match glib-2.56 API changes.
+- fix use-after-free bugs.
+- improve replying to HTML-only messages.
+- low level networking re-done.
+- multiple bugfixes.
+
 * Balsa-2.5.1 release. Release date 2013-04-27
 
 - new message header widget

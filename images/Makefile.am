@@ -20,3 +20,6 @@ install-data-hook:
 		--ignore-theme-index			\
 		$(DESTDIR)$(BALSA_DATA_PREFIX) ;	\
 	fi
+
+uninstall-hook:
+	rm $(DESTDIR)$(BALSA_DATA_PREFIX)/icon-theme.cache || true

@@ -620,7 +620,7 @@ condition_validate(LibBalsaCondition* new_cnd)
     switch (new_cnd->type) {
     case CONDITION_STRING:
         new_cnd->match.string.string =
-            g_strdup(gtk_entry_get_text(GTK_ENTRY(fe_type_simple_entry)));
+            gtk_editable_get_chars(GTK_EDITABLE(fe_type_simple_entry), 0, -1);
         break;
 
     case CONDITION_REGEX:

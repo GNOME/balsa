@@ -339,7 +339,8 @@ smtp_server_response(GtkDialog * dialog, gint response,
         g_free(server->cert_file);
         server->cert_file = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(sdi->cert_file));
         g_free(server->cert_passphrase);
-        server->cert_passphrase = g_strdup(gtk_entry_get_text(GTK_ENTRY(sdi->cert_pass)));
+        server->cert_passphrase =
+            gtk_editable_get_chars(GTK_EDITABLE(sdi->cert_pass), 0, -1);
         if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(sdi->split_button))) {
             /* big_message is stored in kB, but the widget is in MB. */
         	sdi->smtp_server->big_message =

@@ -380,7 +380,7 @@ get_passphrase_real(const gchar * uid_hint, const gchar * passphrase_info,
     gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
     gtk_widget_grab_focus(entry);
     if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_OK)
-	passwd = g_strdup(gtk_entry_get_text(GTK_ENTRY(entry)));
+	passwd = gtk_editable_get_chars(GTK_EDITABLE(entry), 0, -1);
     else
 	passwd = NULL;
 

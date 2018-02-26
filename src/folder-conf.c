@@ -225,10 +225,10 @@ folder_conf_clicked_ok(FolderDialogData * fcw)
     }
 
     g_free(fcw->mbnode->dir);
-    fcw->mbnode->dir = g_strdup(gtk_entry_get_text(GTK_ENTRY(fcw->prefix)));
+    fcw->mbnode->dir = gtk_editable_get_chars(GTK_EDITABLE(fcw->prefix), 0, -1);
     g_free(fcw->mbnode->name);
     fcw->mbnode->name =
-        g_strdup(gtk_entry_get_text(GTK_ENTRY(fcw->folder_name)));
+        gtk_editable_get_chars(GTK_EDITABLE(fcw->folder_name), 0, -1);
     fcw->mbnode->subscribed =
         gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fcw->subscribed));
     fcw->mbnode->list_inbox =

@@ -3917,7 +3917,7 @@ bw_find_real(BalsaWindow * window, BalsaIndex * bindex, gboolean again)
                                                        (wrap_button));
 		g_free(cnd->match.string.string);
 		cnd->match.string.string =
-                    g_strdup(gtk_entry_get_text(GTK_ENTRY(search_entry)));
+                    gtk_editable_get_chars(GTK_EDITABLE(search_entry), 0, -1);
 		cnd->match.string.fields=CONDITION_EMPTY;
 
 		if (gtk_toggle_button_get_active(matching_body))

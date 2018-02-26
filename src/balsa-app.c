@@ -110,8 +110,8 @@ ask_password_real(LibBalsaServer * server, LibBalsaMailbox * mbox)
 
     if(gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_OK) {
         unsigned old_rem = server->remember_passwd;
-        passwd = g_strdup(gtk_entry_get_text(GTK_ENTRY(entry)));
-        server->remember_passwd = 
+        passwd = gtk_editable_get_chars(GTK_EDITABLE(entry), 0, -1);
+        server->remember_passwd =
             !!gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(rememb));
         libbalsa_server_set_password(server, passwd);
         if( server->remember_passwd || old_rem )

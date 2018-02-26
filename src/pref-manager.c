@@ -527,7 +527,7 @@ apply_prefs(GtkDialog * pbox)
     /* arp */
     g_free(balsa_app.quote_str);
     balsa_app.quote_str =
-        g_strdup(gtk_entry_get_text(GTK_ENTRY(pui->quote_str)));
+        gtk_editable_get_chars(GTK_EDITABLE(pui->quote_str), 0, -1);
 
     /* fonts */
     balsa_app.use_system_fonts =
@@ -587,7 +587,7 @@ apply_prefs(GtkDialog * pbox)
     /* date format */
     g_free(balsa_app.date_string);
     balsa_app.date_string =
-        g_strdup(gtk_entry_get_text(GTK_ENTRY(pui->date_format)));
+        gtk_editable_get_chars(GTK_EDITABLE(pui->date_format), 0, -1);
 
     /* selected headers */
     g_free(balsa_app.selected_headers);

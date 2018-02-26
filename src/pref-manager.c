@@ -3205,17 +3205,17 @@ open_preferences_manager_idle(void)
 
     name = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER
                                          (pui->mail_directory));
-    if (!name || strcmp(name, balsa_app.local_mail_directory) != 0) {
+    if (g_strcmp0(name, balsa_app.local_mail_directory) != 0) {
         /* Chooser still hasn't been initialized. */
         g_free(name);
-        return TRUE;
+        return G_SOURCE_CONTINUE;
     }
     g_free(name);
 
     g_signal_connect(pui->mail_directory, "selection-changed",
                      G_CALLBACK(properties_modified_cb), property_box);
 
-    return FALSE;
+    return G_SOURCE_REMOVE;
 }                               /* open_preferences_manager_idle */
 
 /****************

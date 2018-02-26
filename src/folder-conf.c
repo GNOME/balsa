@@ -628,10 +628,10 @@ subfolder_conf_clicked_ok(SubfolderDialogData * sdd)
             mailbox_conf_view_check(sdd->mcv, sdd->mbnode->mailbox);
         
         /* rename */
-        if ((sdd->old_parent && strcmp(parent, sdd->old_parent)) ||
-            (sdd->old_folder && strcmp(folder, sdd->old_folder))) {
+        if ((g_strcmp0(parent, sdd->old_parent) != 0) ||
+            (g_strcmp0(folder, sdd->old_folder) != 0)) {
             gint button = GTK_RESPONSE_OK;
-            if (sdd->old_folder && !strcmp(sdd->old_folder, "INBOX") &&
+            if (g_strcmp0(sdd->old_folder, "INBOX") == 0 &&
                 (!sdd->old_parent || !*sdd->old_parent)) {
                 gchar *msg =
                     g_strdup_printf(_
@@ -899,7 +899,7 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
 
                 /* my rights */
                 for (n = 0;
-                     std_acls[n] && strcmp(std_acls[n], rights);
+                     std_acls[n] && strcmp(std_acls[n], rights) != 0;
                      n += 2);
                 rights_str = g_string_new(_("mine: "));
                 if (std_acls[n])

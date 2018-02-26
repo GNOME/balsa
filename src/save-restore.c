@@ -1531,8 +1531,7 @@ config_address_book_load(const gchar * key, const gchar * value,
         balsa_app.address_book_list =
             g_list_prepend(balsa_app.address_book_list, address_book);
 
-        if (default_address_book_prefix
-            && strcmp(key, default_address_book_prefix) == 0) {
+        if (g_strcmp0(key, default_address_book_prefix) == 0) {
             balsa_app.default_address_book = address_book;
         }
     }

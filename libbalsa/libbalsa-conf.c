@@ -320,8 +320,7 @@ libbalsa_conf_get_bool_with_default_(const char *path, gboolean * def,
     g_free(key);
     if (error) {
         g_error_free(error);
-        if (defval)
-            retval = strcmp(defval, "true") == 0;
+        retval = g_strcmp0(defval, "true") == 0;
     }
 
     if (def)

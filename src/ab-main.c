@@ -92,8 +92,7 @@ bab_config_init(const gchar * group, const gchar * value, gpointer data)
         contacts_app.address_book_list =
             g_list_append(contacts_app.address_book_list, address_book);
 
-        if (contacts_app.default_address_book_prefix
-            && strcmp(group,
+        if (g_strcmp0(group,
                       contacts_app.default_address_book_prefix) == 0)
             contacts_app.default_address_book = address_book;
     }

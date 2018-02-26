@@ -191,10 +191,7 @@ smtp_server_compare(gconstpointer a, gconstpointer b)
     const LibBalsaSmtpServer *smtp_server_a = a;
     const LibBalsaSmtpServer *smtp_server_b = b;
 
-    if (smtp_server_a->name && smtp_server_b->name)
-        return strcmp(smtp_server_a->name, smtp_server_b->name);
-
-    return smtp_server_a->name - smtp_server_b->name;
+    return g_strcmp0(smtp_server_a->name, smtp_server_b->name);
 }
 
 void

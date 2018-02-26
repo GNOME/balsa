@@ -1626,7 +1626,7 @@ fe_remove_pressed(GtkWidget * widget, gpointer throwaway)
 static void
 change_filter_name(gchar * old_name,gchar * new_name)
 {
-    if (!new_name || strcmp(old_name,new_name)!=0) {
+    if (g_strcmp0(old_name, new_name) != 0) {
         GList * lst;
         filters_names_rec * p=NULL;
 
@@ -1654,8 +1654,7 @@ change_filter_name(gchar * old_name,gchar * new_name)
           else we create a new record
 	*/
 	for (lst = filters_names_changes; lst != NULL; lst = lst->next)
-            if (((filters_names_rec *)lst->data)->new_name && 
-                strcmp(((filters_names_rec *)lst->data)->new_name,old_name)==0) {
+            if (g_strcmp0(((filters_names_rec *) lst->data)->new_name, old_name) == 0) {
                 p=(filters_names_rec *)lst->data;
                 g_free(p->new_name);
                 break;
@@ -1669,7 +1668,7 @@ change_filter_name(gchar * old_name,gchar * new_name)
         /* Record exists yet, test if we can collapse it (in case his
          * old_name==new_name) It's only a small optimization
          */
-        else if (new_name && strcmp(p->old_name,new_name)==0) {
+        else if (g_strcmp0(p->old_name, new_name) == 0) {
 	    g_free(p->old_name);
 	    g_free(p);
             filters_names_changes=

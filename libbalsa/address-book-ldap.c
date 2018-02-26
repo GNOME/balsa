@@ -730,7 +730,7 @@ libbalsa_address_book_ldap_remove_address(LibBalsaAddressBook *ab,
 /** libbalsa_address_book_ldap_modify_address:
     modify given address. If mail address has changed, remove and add.
 */
-#define STREQ(a,b) ((a) && (b) && strcmp((a),(b))==0)
+#define STREQ(a,b) (g_strcmp0((a),(b))==0)
 static LibBalsaABErr
 libbalsa_address_book_ldap_modify_address(LibBalsaAddressBook *ab,
                                           LibBalsaAddress *address,

@@ -713,16 +713,18 @@ extract_work(xmlNodePtr entry, gchar ** org)
 static void
 extract_net(xmlNodePtr entry, GList ** mail_addrs)
 {
-    while (entry) {
-	gchar *uri_type = NULL;
-	gchar *mail_addr;
+    while (entry != NULL) {
+	if (!xmlStrcmp(entry->name, CXMLCHARP("Uri"))) {
+            gchar *uri_type = NULL;
+            gchar *mail_addr;
 
-	if (!xmlStrcmp(entry->name, CXMLCHARP("Uri"))
-	    && (uri_type = xml_node_get_attr(entry, CXMLCHARP("type")))
-	    && !strcmp(uri_type, "email")
-	    && (mail_addr = xml_node_get_text(entry)))
-	    *mail_addrs = g_list_prepend(*mail_addrs, mail_addr);
-	g_free(uri_type);
+	    uri_type = xml_node_get_attr(entry, CXMLCHARP("type"));
+	    if (g_strcmp0(uri_type, "email") == 0
+                && (mail_addr = xml_node_get_text(entry)) != NULL) {
+                *mail_addrs = g_list_prepend(*mail_addrs, mail_addr);
+            }
+            g_free(uri_type);
+        }
 
 	entry = entry->next;
     }
@@ -733,11 +735,9 @@ static gchar *
 xml_node_get_text(xmlNodePtr node)
 {
     g_return_val_if_fail(node != NULL, NULL);
-    if ((node = node->children) && node->type == XML_TEXT_NODE
-	&& node->content)
+    if ((node = node->children) && node->type == XML_TEXT_NODE)
 	return g_strdup((const gchar *) node->content);
-    else
-	return NULL;
+    return NULL;
 }
 
 

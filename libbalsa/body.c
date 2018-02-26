@@ -852,17 +852,18 @@ libbalsa_message_body_get_by_id(LibBalsaMessageBody * body,
 {
     LibBalsaMessageBody *res;
     gchar *cid;
+    gboolean matches;
 
     g_return_val_if_fail(id != NULL, NULL);
 
-    if (!body)
+    if (body == NULL)
 	return NULL;
 
-    if ((cid = libbalsa_message_body_get_cid(body))) {
-        gboolean matches = !strcmp(id, cid);
-        g_free(cid);
-        if (matches)
-            return body;
+    cid = libbalsa_message_body_get_cid(body);
+    matches = (g_strcmp0(id, cid) == 0);
+    g_free(cid);
+    if (matches) {
+        return body;
     }
 
     if ((res = libbalsa_message_body_get_by_id(body->parts, id)) != NULL)

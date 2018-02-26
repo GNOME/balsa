@@ -2348,7 +2348,7 @@ libbalsa_mailbox_set_identity_name(LibBalsaMailbox * mailbox,
 {
     LibBalsaMailboxView *view = lbm_get_view(mailbox);
 
-    if (!view->identity_name || strcmp(view->identity_name, identity_name)) {
+    if (g_strcmp0(view->identity_name, identity_name) != 0) {
 	g_free(view->identity_name);
 	view->identity_name = g_strdup(identity_name);
 	if (mailbox)

@@ -64,7 +64,6 @@ balsa_BASE_SRCLIST =	\
 	sendmsg-window.h	\
 	store-address.c		\
 	store-address.h		\
-	threads.h		\
 	toolbar-factory.c	\
 	toolbar-factory.h	\
 	toolbar-prefs.c		\

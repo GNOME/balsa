@@ -1,3 +1,9 @@
+2018-02-27  Pawel Salek <pawsa0@gmail.com>
+
+	* src/main-window.c: update a date.
+	* meson.build, configure.ac: update version strings.
+	* NEWS: balsa-2.5.5 release notes
+
 2018-02-12  Albrecht Dreß <albrecht.dress@arcor.de>
 
 	Crypto performance improvements

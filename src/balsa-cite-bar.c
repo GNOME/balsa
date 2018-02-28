@@ -42,8 +42,8 @@ static void balsa_cite_bar_measure  (GtkWidget    * widget,
                                      gint         * natural,
                                      gint         * minimum_baseline,
                                      gint         * natural_baseline);
-static gboolean balsa_cite_bar_draw (GtkWidget    * widget,
-                                     cairo_t      * cr);
+static void balsa_cite_bar_snapshot (GtkWidget * widget,
+                                     GtkSnapshot * snapshot);
 
 G_DEFINE_TYPE(BalsaCiteBar, balsa_cite_bar, GTK_TYPE_WIDGET)
 
@@ -58,8 +58,8 @@ balsa_cite_bar_class_init(BalsaCiteBarClass * class)
 
     parent_class = g_type_class_peek_parent(class);
 
-    widget_class->measure = balsa_cite_bar_measure;
-    widget_class->draw    = balsa_cite_bar_draw;
+    widget_class->measure  = balsa_cite_bar_measure;
+    widget_class->snapshot = balsa_cite_bar_snapshot;
 }
 
 static void
@@ -122,24 +122,23 @@ balsa_cite_bar_measure(GtkWidget    * widget,
     }
 }
 
-static gboolean
-balsa_cite_bar_draw(GtkWidget * widget, cairo_t * cr)
+static void
+balsa_cite_bar_snapshot(GtkWidget * widget, GtkSnapshot * snapshot)
 {
+    BalsaCiteBar *cite_bar = BALSA_CITE_BAR(widget);
+    graphene_rect_t bounds =
+        { {0.0, 0.0}, {(float) cite_bar->width, (float) cite_bar->height} };
     GtkStyleContext *context;
     GdkRGBA rgba;
-    BalsaCiteBar *cite_bar;
     int n, x;
 
     context = gtk_widget_get_style_context(widget);
     gtk_style_context_get_color(context, &rgba);
-    gdk_cairo_set_source_rgba(cr, &rgba);
 
-    cite_bar = BALSA_CITE_BAR(widget);
     for (n = x = 0; n < cite_bar->bars; n++) {
-        cairo_rectangle(cr, x, 0, cite_bar->width, cite_bar->height);
-        cairo_fill(cr);
+        bounds.origin.x = (float) x;
+        gtk_snapshot_append_color(snapshot, &rgba, &bounds, "CiteBar");
+
         x += cite_bar->width + cite_bar->space;
     }
-
-    return FALSE;
 }

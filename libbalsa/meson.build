@@ -51,8 +51,6 @@ libbalsa_a_sources = [
   'application-helpers.h',
   'body.c',
   'body.h',
-  'cell-renderer-button.c',
-  'cell-renderer-button.h',
   'completion.c',
   'completion.h',
   'files.c',

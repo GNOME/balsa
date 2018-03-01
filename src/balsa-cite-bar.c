@@ -125,20 +125,21 @@ balsa_cite_bar_measure(GtkWidget    * widget,
 static void
 balsa_cite_bar_snapshot(GtkWidget * widget, GtkSnapshot * snapshot)
 {
-    BalsaCiteBar *cite_bar = BALSA_CITE_BAR(widget);
-    graphene_rect_t bounds =
-        { {0.0, 0.0}, {(float) cite_bar->width, (float) cite_bar->height} };
     GtkStyleContext *context;
     GdkRGBA rgba;
-    int n, x;
+    int n;
+    BalsaCiteBar *cite_bar;
+    graphene_rect_t bounds;
 
     context = gtk_widget_get_style_context(widget);
     gtk_style_context_get_color(context, &rgba);
 
-    for (n = x = 0; n < cite_bar->bars; n++) {
-        bounds.origin.x = (float) x;
-        gtk_snapshot_append_color(snapshot, &rgba, &bounds, "CiteBar");
+    cite_bar = BALSA_CITE_BAR(widget);
+    graphene_rect_init(&bounds, 0.0, 0.0,
+                       (float) cite_bar->width, (float) cite_bar->height);
 
-        x += cite_bar->width + cite_bar->space;
+    for (n = 0; n < cite_bar->bars; n++) {
+        gtk_snapshot_append_color(snapshot, &rgba, &bounds, "CiteBar");
+        bounds.origin.x += (float) (cite_bar->width + cite_bar->space);
     }
 }

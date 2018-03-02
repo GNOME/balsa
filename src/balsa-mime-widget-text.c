@@ -116,9 +116,9 @@ static void bm_widget_on_url(const gchar *url);
 static void phrase_highlight(GtkTextBuffer * buffer, const gchar * id,
 			     gunichar tag_char, const gchar * property,
 			     gint value);
-static gboolean draw_cite_bars(GtkWidget      *widget,
-                               GdkEventExpose *event,
-                               gpointer        user_data);
+static gboolean draw_cite_bars(GtkWidget * widget,
+                               cairo_t   * cr,
+                               gpointer    user_data);
 static gchar *check_text_encoding(BalsaMessage * bm, gchar *text_buf);
 static void fill_text_buf_cited(BalsaMimeWidgetText *mwt,
                                 GtkWidget           *widget,
@@ -959,42 +959,40 @@ phrase_highlight(GtkTextBuffer * buffer, const gchar * id, gunichar tag_char,
 
 /* --- citation bar stuff --- */
 
-typedef struct {
+static void
+draw_cite_bar_real(cite_bar_t * bar, BalsaMimeWidgetText * mwt)
+{
     GtkTextView * view;
     GtkTextBuffer * buffer;
     gint dimension;
-} cite_bar_draw_mode_t;
-
-
-static void
-draw_cite_bar_real(cite_bar_t * bar, cite_bar_draw_mode_t * draw_mode)
-{
     GdkRectangle location;
     gint x_pos;
     gint y_pos;
     gint height;
 
+    view = GTK_TEXT_VIEW(mwt->text_widget);
+    buffer = gtk_text_view_get_buffer(view);
+    dimension = mwt->cite_bar_dimension;
+
     /* initialise iters if we don't have the widget yet */
     if (!bar->bar) {
-        gtk_text_buffer_get_iter_at_offset(draw_mode->buffer,
+        gtk_text_buffer_get_iter_at_offset(buffer,
                                            &bar->start_iter,
                                            bar->start_offs);
-        gtk_text_buffer_get_iter_at_offset(draw_mode->buffer,
+        gtk_text_buffer_get_iter_at_offset(buffer,
                                            &bar->end_iter,
                                            bar->end_offs);
     }
 
     /* get the locations */
-    gtk_text_view_get_iter_location(draw_mode->view, &bar->start_iter,
-                                    &location);
-    gtk_text_view_buffer_to_window_coords(draw_mode->view,
-                                          GTK_TEXT_WINDOW_TEXT, location.x,
-                                          location.y, &x_pos, &y_pos);
-    gtk_text_view_get_iter_location(draw_mode->view, &bar->end_iter,
-                                    &location);
-    gtk_text_view_buffer_to_window_coords(draw_mode->view,
-                                          GTK_TEXT_WINDOW_TEXT, location.x,
-                                          location.y, &x_pos, &height);
+    gtk_text_view_get_iter_location(view, &bar->start_iter, &location);
+    gtk_text_view_buffer_to_window_coords(view, GTK_TEXT_WINDOW_TEXT,
+                                          location.x, location.y,
+                                          &x_pos, &y_pos);
+    gtk_text_view_get_iter_location(view, &bar->end_iter, &location);
+    gtk_text_view_buffer_to_window_coords(view, GTK_TEXT_WINDOW_TEXT,
+                                          location.x, location.y,
+                                          &x_pos, &height);
     height -= y_pos;
 
     /* add a new widget if necessary */
@@ -1004,14 +1002,12 @@ draw_cite_bar_real(cite_bar_t * bar, cite_bar_draw_mode_t * draw_mode)
         gchar *css;
         GtkCssProvider *css_provider;
 
-        bar->bar =
-            balsa_cite_bar_new(height, bar->depth, draw_mode->dimension);
+        bar->bar = balsa_cite_bar_new(height, bar->depth, dimension);
         gtk_widget_set_name(bar->bar, BALSA_MESSAGE_CITE_BAR);
 
         color =
-            gdk_rgba_to_string(&balsa_app.
-                               quoted_color[(bar->depth -
-                                             1) % MAX_QUOTED_COLOR]);
+            gdk_rgba_to_string(&balsa_app.quoted_color[(bar->depth - 1)
+                                                       % MAX_QUOTED_COLOR]);
         css = g_strconcat("#" BALSA_MESSAGE_CITE_BAR " {color:", color, "}", NULL);
         g_free(color);
 
@@ -1025,12 +1021,12 @@ draw_cite_bar_real(cite_bar_t * bar, cite_bar_draw_mode_t * draw_mode)
         g_object_unref(css_provider);
 
         gtk_widget_show(bar->bar);
-        gtk_text_view_add_child_in_window(draw_mode->view, bar->bar,
+        gtk_text_view_add_child_in_window(view, bar->bar,
                                           GTK_TEXT_WINDOW_TEXT, 0, y_pos);
     } else if (bar->y_pos != y_pos || bar->height != height) {
         /* shift/resize existing widget */
         balsa_cite_bar_resize(BALSA_CITE_BAR(bar->bar), height);
-        gtk_text_view_move_child(draw_mode->view, bar->bar, 0, y_pos);
+        gtk_text_view_move_child(view, bar->bar, 0, y_pos);
     }
 
     /* remember current values */
@@ -1040,18 +1036,15 @@ draw_cite_bar_real(cite_bar_t * bar, cite_bar_draw_mode_t * draw_mode)
 
 
 static gboolean
-draw_cite_bars(GtkWidget      * widget,
-               GdkEventExpose * event,
-               gpointer         user_data)
+draw_cite_bars(GtkWidget * widget,
+               cairo_t   * cr,
+               gpointer    user_data)
 {
     BalsaMimeWidgetText *mwt = user_data;
-    cite_bar_draw_mode_t draw_mode;
 
-    draw_mode.view = GTK_TEXT_VIEW(widget);
-    draw_mode.buffer = gtk_text_view_get_buffer(draw_mode.view);
-    draw_mode.dimension = mwt->cite_bar_dimension;
-    g_list_foreach(mwt->cite_bar_list, (GFunc)draw_cite_bar_real, &draw_mode);
-    return FALSE;
+    g_list_foreach(mwt->cite_bar_list, (GFunc) draw_cite_bar_real, mwt);
+
+    return G_SOURCE_REMOVE;
 }
 
 
@@ -1477,8 +1470,7 @@ fill_text_buf_cited(BalsaMimeWidgetText *mwt,
 
     /* add list of citation bars (if any) */
     if (mwt->cite_bar_list != NULL) {
-        g_signal_connect_after(G_OBJECT(widget), "draw",
-                               G_CALLBACK(draw_cite_bars), mwt);
+        g_signal_connect_after(widget, "draw", G_CALLBACK(draw_cite_bars), mwt);
     }
 
     if (rex != NULL)

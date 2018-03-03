@@ -1044,7 +1044,7 @@ draw_cite_bars(GtkWidget * widget,
 
     g_list_foreach(mwt->cite_bar_list, (GFunc) draw_cite_bar_real, mwt);
 
-    return G_SOURCE_REMOVE;
+    return FALSE;
 }
 
 

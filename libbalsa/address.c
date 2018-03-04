@@ -132,15 +132,13 @@ libbalsa_address_extract_name(const gchar * string, gchar ** last_name,
                               gchar ** first_name)
 {
     enum GCardFieldOrder { LAST = 0, FIRST, MIDDLE, PREFIX, SUFFIX };
-    gint cpt, j;
+    guint cpt, j;
     gchar **fld, **name_arr;
     gchar *res = NULL;
 
     fld = vcard_strsplit(string);
 
-    cpt = 0;
-    while (fld[cpt] != NULL)
-	cpt++;
+    cpt = g_strv_length(fld);
 
     if (cpt == 0) {
         /* insane empty name */

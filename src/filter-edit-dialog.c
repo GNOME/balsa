@@ -226,12 +226,12 @@ build_left_side(void)
     fe_new_button = gtk_button_new_with_mnemonic(C_("filter", "_New"));
     g_signal_connect(G_OBJECT(fe_new_button), "clicked",
 		     G_CALLBACK(fe_new_pressed), NULL);
-    gtk_container_add(GTK_CONTAINER(bbox), fe_new_button);
+    gtk_box_pack_start(GTK_BOX(bbox), fe_new_button);
     /* delete button */
     fe_delete_button = gtk_button_new_with_mnemonic(("_Delete"));
     g_signal_connect(G_OBJECT(fe_delete_button), "clicked",
 		     G_CALLBACK(fe_delete_pressed), NULL);
-    gtk_container_add(GTK_CONTAINER(bbox), fe_delete_button);
+    gtk_box_pack_start(GTK_BOX(bbox), fe_delete_button);
     gtk_widget_set_sensitive(fe_delete_button, FALSE);
 
     return vbox;
@@ -309,17 +309,17 @@ build_match_page()
     gtk_grid_attach(GTK_GRID(page), box, 0, 3, 2, 1);
     fe_condition_edit_button = gtk_button_new_with_mnemonic(_("_Edit"));
     gtk_widget_set_sensitive(fe_condition_edit_button,FALSE);
-    gtk_container_add(GTK_CONTAINER(box), fe_condition_edit_button);
+    gtk_box_pack_start(GTK_BOX(box), fe_condition_edit_button);
     g_signal_connect(G_OBJECT(fe_condition_edit_button), "clicked",
                      G_CALLBACK(fe_edit_condition), GINT_TO_POINTER(0));
     /* Translators: button "New" filter match */
     button = gtk_button_new_with_mnemonic(C_("filter match", "Ne_w"));
-    gtk_container_add(GTK_CONTAINER(box), button);
+    gtk_box_pack_start(GTK_BOX(box), button);
     g_signal_connect(G_OBJECT(button), "clicked",
                      G_CALLBACK(fe_edit_condition), GINT_TO_POINTER(1));
     fe_condition_delete_button = gtk_button_new_with_mnemonic(_("_Remove"));
     gtk_widget_set_sensitive(fe_condition_delete_button,FALSE);
-    gtk_container_add(GTK_CONTAINER(box), fe_condition_delete_button);
+    gtk_box_pack_start(GTK_BOX(box), fe_condition_delete_button);
     g_signal_connect(G_OBJECT(fe_condition_delete_button), "clicked",
 		     G_CALLBACK(fe_condition_remove_pressed), NULL);
 
@@ -503,12 +503,12 @@ build_right_side(GtkWindow * window)
     fe_apply_button = gtk_button_new_with_mnemonic(_("_Apply"));
     g_signal_connect(G_OBJECT(fe_apply_button), "clicked",
 		     G_CALLBACK(fe_apply_pressed), NULL);
-    gtk_container_add(GTK_CONTAINER(bbox), fe_apply_button);
+    gtk_box_pack_start(GTK_BOX(bbox), fe_apply_button);
 
     fe_revert_button = gtk_button_new_with_mnemonic(_("Re_vert"));
     g_signal_connect(G_OBJECT(fe_revert_button), "clicked",
 		     G_CALLBACK(fe_revert_pressed), NULL);
-    gtk_container_add(GTK_CONTAINER(bbox), fe_revert_button);
+    gtk_box_pack_start(GTK_BOX(bbox), fe_revert_button);
     gtk_widget_set_sensitive(fe_apply_button, FALSE);
     gtk_widget_set_sensitive(fe_revert_button, FALSE);
 

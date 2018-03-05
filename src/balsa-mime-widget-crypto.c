@@ -148,7 +148,7 @@ balsa_mime_widget_signature_widget(LibBalsaMessageBody * mime_body,
      * the label... */
     signature_widget = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     expander = gtk_expander_new(lines[0]);
-    gtk_container_add(GTK_CONTAINER(signature_widget), expander);
+    gtk_box_pack_start(GTK_BOX(signature_widget), expander);
     gtk_container_add(GTK_CONTAINER(expander), vbox);
 
     /* add a callback to load the key when the user wants to show the details

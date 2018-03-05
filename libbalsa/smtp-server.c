@@ -472,7 +472,8 @@ libbalsa_smtp_server_dialog(LibBalsaSmtpServer * smtp_server,
                                       FALSE);
 
     notebook = gtk_notebook_new();
-    gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(GTK_DIALOG(dialog))), notebook);
+    gtk_box_pack_start(GTK_BOX(gtk_dialog_get_content_area(GTK_DIALOG(dialog))),
+                       notebook);
 
 #define HIG_PADDING 12
 

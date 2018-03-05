@@ -486,10 +486,8 @@ bw_create_index_widget(BalsaWindow *bw)
     gtk_widget_set_hexpand(bw->sos_entry, TRUE);
     gtk_box_pack_start(GTK_BOX(bw->sos_bar), bw->sos_entry);
     gtk_widget_show(bw->sos_entry);
-    button = gtk_button_new();
+    button = gtk_button_new_from_icon_name("gtk-ok");
     gtk_box_pack_start(GTK_BOX(bw->sos_bar), button);
-    gtk_container_add(GTK_CONTAINER(button),
-                      gtk_image_new_from_icon_name("gtk-ok"));
     g_signal_connect(G_OBJECT(bw->sos_entry), "activate",
                      G_CALLBACK(bw_filter_entry_activate),
                      button);
@@ -2769,7 +2767,6 @@ static GtkWidget *
 bw_notebook_label_new(BalsaMailboxNode * mbnode)
 {
     GtkWidget *lab;
-    GtkWidget *close_pix;
     GtkWidget *box;
     GtkWidget *but;
     GtkCssProvider *css_provider;
@@ -2800,15 +2797,11 @@ bw_notebook_label_new(BalsaMailboxNode * mbnode)
     gtk_widget_set_hexpand(lab, TRUE);
     gtk_box_pack_start(GTK_BOX(box), lab);
 
-    but = gtk_button_new();
+    but = gtk_button_new_from_icon_name("window-close-symbolic");
     gtk_widget_set_focus_on_click(but, FALSE);
     gtk_button_set_relief(GTK_BUTTON(but), GTK_RELIEF_NONE);
-
     g_signal_connect(but, "clicked",
                      G_CALLBACK(bw_mailbox_tab_close_cb), mbnode);
-
-    close_pix = gtk_image_new_from_icon_name("window-close-symbolic");
-    gtk_container_add(GTK_CONTAINER(but), close_pix);
     gtk_box_pack_start(GTK_BOX(box), but);
 
     gtk_widget_show(box);
@@ -3833,14 +3826,14 @@ bw_find_real(BalsaWindow * window, BalsaIndex * bindex, gboolean again)
 			 G_CALLBACK(bw_find_button_clicked),
 			 GINT_TO_POINTER(FIND_RESPONSE_FILTER));
 	g_object_set(G_OBJECT(button), "margin", 6, NULL);
-	gtk_container_add(GTK_CONTAINER(box), button);
+	gtk_box_pack_start(GTK_BOX(box), button);
 
 	button = gtk_button_new_with_mnemonic(_("_Clear"));
 	g_signal_connect(G_OBJECT(button), "clicked",
 			 G_CALLBACK(bw_find_button_clicked),
 			 GINT_TO_POINTER(FIND_RESPONSE_RESET));
 	g_object_set(G_OBJECT(button), "margin", 6, NULL);
-	gtk_container_add(GTK_CONTAINER(box), button);
+	gtk_box_pack_start(GTK_BOX(box), button);
 
 	g_object_set(G_OBJECT(box), "margin", 6, NULL);
 	gtk_container_add(GTK_CONTAINER(frame), box);

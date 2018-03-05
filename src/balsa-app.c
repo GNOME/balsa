@@ -90,16 +90,17 @@ ask_password_real(LibBalsaServer * server, LibBalsaMailbox * mbox)
 #endif
     content_area = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
     gtk_box_set_spacing(GTK_BOX(content_area), HIG_PADDING);
-    gtk_container_add(GTK_CONTAINER(content_area),
-                      gtk_label_new_with_mnemonic(prompt));
+    gtk_box_pack_start(GTK_BOX(content_area),
+                       gtk_label_new_with_mnemonic(prompt));
     g_free(prompt);
-    gtk_container_add(GTK_CONTAINER(content_area),
-                      entry = gtk_entry_new());
+
+    entry = gtk_entry_new();
+    gtk_box_pack_start(GTK_BOX(content_area), entry);
     gtk_entry_set_width_chars(GTK_ENTRY(entry), 20);
     gtk_entry_set_visibility(GTK_ENTRY(entry), FALSE);
 
     rememb =  gtk_check_button_new_with_mnemonic(_(remember_password_message));
-    gtk_container_add(GTK_CONTAINER(content_area), rememb);
+    gtk_box_pack_start(GTK_BOX(content_area), rememb);
     if(server->remember_passwd)
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(rememb), TRUE);
 

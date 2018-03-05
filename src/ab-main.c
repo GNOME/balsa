@@ -862,24 +862,28 @@ cancel_button_cb(GtkWidget * w, gpointer data)
 static GtkWidget*
 bab_get_edit_button_box(struct ABMainWindow *abmw)
 {
-    GtkWidget *box;
-    box = gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL);
-    gtk_container_add(GTK_CONTAINER(box),
-                      abmw->apply_button =
-                      gtk_button_new_with_mnemonic(_("_Apply")));
-    g_signal_connect(G_OBJECT(abmw->apply_button), "clicked",
+    GtkWidget *box_widget;
+    GtkBox *box;
+
+    box_widget = gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL);
+    box = GTK_BOX(box_widget);
+
+    abmw->apply_button = gtk_button_new_with_mnemonic(_("_Apply"));
+    gtk_box_pack_start(box, abmw->apply_button);
+    g_signal_connect(abmw->apply_button, "clicked",
                      G_CALLBACK(apply_button_cb), (gpointer) NULL);
-    gtk_container_add(GTK_CONTAINER(box),
-                      abmw->remove_button =
-                      gtk_button_new_with_mnemonic(_("_Remove")));
-    g_signal_connect(G_OBJECT(abmw->remove_button), "clicked",
+
+    abmw->remove_button = gtk_button_new_with_mnemonic(_("_Remove"));
+    gtk_box_pack_start(box, abmw->remove_button);
+    g_signal_connect(abmw->remove_button, "clicked",
                      G_CALLBACK(remove_button_cb), (gpointer) NULL);
-    gtk_container_add(GTK_CONTAINER(box),
-                      abmw->cancel_button =
-                      gtk_button_new_with_mnemonic(_("_Cancel")));
-    g_signal_connect(G_OBJECT(abmw->cancel_button), "clicked",
+
+    abmw->cancel_button = gtk_button_new_with_mnemonic(_("_Cancel"));
+    gtk_box_pack_start(box, abmw->cancel_button);
+    g_signal_connect(abmw->cancel_button, "clicked",
                      G_CALLBACK(cancel_button_cb), abmw);
-    return box;
+
+    return box_widget;
 }
 
 static void
@@ -913,9 +917,7 @@ bab_get_filter_box(void)
     gtk_box_pack_start(GTK_BOX(search_hbox), find_entry);
     gtk_widget_show(search_hbox);
     gtk_label_set_mnemonic_widget(GTK_LABEL(find_label), find_entry);
-    button = gtk_button_new();
-    gtk_container_add(GTK_CONTAINER(button),
-                      gtk_image_new_from_icon_name("gtk-ok"));
+    button = gtk_button_new_from_icon_name("gtk-ok");
     gtk_box_pack_start(GTK_BOX(search_hbox), button);
 
     g_signal_connect(G_OBJECT(find_entry), "activate",

@@ -1304,7 +1304,7 @@ md_face_path_changed(const gchar * filename, gboolean active,
 
     gtk_container_foreach(GTK_CONTAINER(face_box),
                           (GtkCallback) gtk_widget_destroy, NULL);
-    gtk_container_add(GTK_CONTAINER(face_box), image);
+    gtk_box_pack_start(GTK_BOX(face_box), image);
     gtk_widget_show(face_box);
 
     g_free(content);
@@ -1416,10 +1416,10 @@ ident_dialog_add_boxes(GtkWidget * grid, gint row, GtkDialog * dialog,
     gtk_grid_attach(GTK_GRID(grid), hbox, 1, row, 1, 1);
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     g_object_set_data(G_OBJECT(dialog), key1, vbox);
-    gtk_container_add(GTK_CONTAINER(hbox), vbox);
+    gtk_box_pack_start(GTK_BOX(hbox), vbox);
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     g_object_set_data(G_OBJECT(dialog), key2, vbox);
-    gtk_container_add(GTK_CONTAINER(hbox), vbox);
+    gtk_box_pack_start(GTK_BOX(hbox), vbox);
 }
 
 /* set_identity_name_in_tree:

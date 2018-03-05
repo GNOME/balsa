@@ -443,11 +443,11 @@ create_toolbar_page(BalsaToolbarModel * model, GActionMap * map)
     /* Standard button */
     page->standard_button =
         gtk_button_new_with_mnemonic(_("_Restore toolbar to standard buttons"));
-    gtk_container_add(GTK_CONTAINER(button_box), page->standard_button);
+    gtk_box_pack_start(GTK_BOX(button_box), page->standard_button);
 
     /* Style button */
     style_button = gtk_button_new_with_mnemonic(_("Toolbar _style…"));
-    gtk_container_add(GTK_CONTAINER(button_box), style_button);
+    gtk_box_pack_start(GTK_BOX(button_box), style_button);
 
     /* Done with preview */
 

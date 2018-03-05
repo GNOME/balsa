@@ -1804,9 +1804,7 @@ bmbl_mru_show_tree(GtkWidget * widget, gpointer data)
     libbalsa_macosx_menu_for_parent(dialog, mru->window);
 #endif
     gtk_widget_set_vexpand(scroll, TRUE);
-    gtk_box_pack_start(GTK_BOX
-                      (gtk_dialog_get_content_area(GTK_DIALOG(dialog))),
-                      scroll);
+    gtk_box_pack_start(GTK_BOX(gtk_dialog_get_content_area(GTK_DIALOG(dialog))), scroll);
 
     g_signal_connect(dialog, "size-allocate",
                      G_CALLBACK(bmbl_mru_size_allocate_cb), NULL);

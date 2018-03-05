@@ -3263,7 +3263,7 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
 
 	hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
 	content_area = gtk_dialog_get_content_area(GTK_DIALOG(property_box));
-	gtk_container_add(GTK_CONTAINER(content_area), hbox);
+	gtk_box_pack_start(GTK_BOX(content_area), hbox);
 
     store = gtk_tree_store_new(PM_NUM_COLS,
                                G_TYPE_STRING,   /* PM_TEXT_COL     */
@@ -3272,7 +3272,7 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
             );
     pui->view = view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
     g_object_set(view, "margin", BORDER_WIDTH, NULL);
-    gtk_container_add(GTK_CONTAINER(hbox), view);
+    gtk_box_pack_start(GTK_BOX(hbox), view);
     gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(view), FALSE);
 
     renderer = gtk_cell_renderer_text_new();
@@ -3286,7 +3286,7 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
     gtk_stack_set_transition_type((GtkStack *) stack,
                                   GTK_STACK_TRANSITION_TYPE_SLIDE_UP_DOWN);
     gtk_stack_set_transition_duration((GtkStack *) stack, 400);
-    gtk_container_add(GTK_CONTAINER(hbox), stack);
+    gtk_box_pack_start(GTK_BOX(hbox), stack);
 
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(view));
     g_signal_connect(selection, "changed",

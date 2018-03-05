@@ -361,7 +361,7 @@ void balsa_filter_run_dialog_init(BalsaFilterRunDialog * p)
     gtk_widget_set_sensitive(button, FALSE);
     g_signal_connect_swapped(G_OBJECT(button), "clicked",
                              G_CALLBACK(fr_apply_selected_pressed), p);
-    gtk_container_add(GTK_CONTAINER(bbox), button);
+    gtk_box_pack_start(GTK_BOX(bbox), button);
 
     /* Buttons between the 2 lists */
     bbox = gtk_button_box_new(GTK_ORIENTATION_VERTICAL);
@@ -376,7 +376,7 @@ void balsa_filter_run_dialog_init(BalsaFilterRunDialog * p)
     gtk_widget_set_sensitive(button, FALSE);
     g_signal_connect_swapped(G_OBJECT(button), "clicked",
                              G_CALLBACK(fr_add_pressed), G_OBJECT(p));
-    gtk_container_add(GTK_CONTAINER(bbox), button);
+    gtk_box_pack_start(GTK_BOX(bbox), button);
     /* Left/Remove button */
     p->remove_button = button =
         gtk_button_new_from_icon_name("go-previous-symbolic");
@@ -385,7 +385,7 @@ void balsa_filter_run_dialog_init(BalsaFilterRunDialog * p)
     gtk_widget_set_sensitive(button, FALSE);
     g_signal_connect_swapped(G_OBJECT(button), "clicked",
                              G_CALLBACK(fr_remove_pressed), G_OBJECT(p));
-    gtk_container_add(GTK_CONTAINER(bbox), button);
+    gtk_box_pack_start(GTK_BOX(bbox), button);
 
     gtk_widget_set_margin_start(bbox, 4);
     gtk_box_pack_start(GTK_BOX(hbox), bbox);
@@ -428,7 +428,7 @@ void balsa_filter_run_dialog_init(BalsaFilterRunDialog * p)
                                 _("Move selected filter up"));
     g_signal_connect(G_OBJECT(button), "clicked",
 		     G_CALLBACK(fr_up_pressed), p);
-    gtk_container_add(GTK_CONTAINER(bbox), button);
+    gtk_box_pack_start(GTK_BOX(bbox), button);
     /* down button */
     p->move_down_button = button =
         gtk_button_new_from_icon_name("go-down-symbolic");
@@ -437,14 +437,14 @@ void balsa_filter_run_dialog_init(BalsaFilterRunDialog * p)
                                 _("Move selected filter down"));
     g_signal_connect(G_OBJECT(button), "clicked",
 		     G_CALLBACK(fr_down_pressed), p);
-    gtk_container_add(GTK_CONTAINER(bbox), button);
+    gtk_box_pack_start(GTK_BOX(bbox), button);
 
     p->apply_now_button = button =
         gtk_button_new_with_mnemonic(_("A_pply Now!"));
     gtk_widget_set_sensitive(button, FALSE);
     g_signal_connect_swapped(G_OBJECT(button), "clicked",
                              G_CALLBACK(fr_apply_now_pressed), G_OBJECT(p));
-    gtk_container_add(GTK_CONTAINER(bbox), button);
+    gtk_box_pack_start(GTK_BOX(bbox), button);
 
     p->filters_modified=FALSE;
 }

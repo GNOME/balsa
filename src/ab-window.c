@@ -331,14 +331,14 @@ balsa_ab_window_init(BalsaAbWindow *ab)
     w = gtk_button_new_with_mnemonic(_("Run _Editor"));
     g_signal_connect(w, "clicked",
                      G_CALLBACK(balsa_ab_window_run_editor), NULL);
-    gtk_container_add(GTK_CONTAINER(hbox), w);
+    gtk_box_pack_start(GTK_BOX(hbox), w);
     gtk_widget_show(w);
 
     w = gtk_button_new_with_mnemonic(_("_Re-import"));
     g_signal_connect(G_OBJECT(w), "clicked",
                      G_CALLBACK(balsa_ab_window_reload),
 		       ab);
-    gtk_container_add(GTK_CONTAINER(hbox), w);
+    gtk_box_pack_start(GTK_BOX(hbox), w);
     gtk_widget_show(w);
 
     balsa_ab_window_load(ab);

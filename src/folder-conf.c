@@ -317,8 +317,7 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
 
     notebook = gtk_notebook_new();
     gtk_widget_set_vexpand(notebook, TRUE);
-    gtk_box_pack_start(GTK_BOX(gtk_dialog_get_content_area(fcw->dialog)),
-                       notebook);
+    gtk_box_pack_start(GTK_BOX(gtk_dialog_get_content_area(fcw->dialog)), notebook);
     grid = libbalsa_create_grid();
     g_object_set(G_OBJECT(grid), "margin", 12, NULL);
     gtk_notebook_append_page(GTK_NOTEBOOK(notebook), grid,
@@ -568,9 +567,7 @@ browse_button_cb(GtkWidget * widget, SubfolderDialogData * sdd)
     
     scroll = gtk_scrolled_window_new(NULL, NULL);
     gtk_widget_set_vexpand(scroll, TRUE);
-    gtk_box_pack_start(GTK_BOX
-                       (gtk_dialog_get_content_area(GTK_DIALOG(dialog))),
-                       scroll);
+    gtk_box_pack_start(GTK_BOX(gtk_dialog_get_content_area(GTK_DIALOG(dialog))), scroll);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll),
                                    GTK_POLICY_AUTOMATIC,
                                    GTK_POLICY_ALWAYS);
@@ -654,7 +651,7 @@ folder, parent);
 #if HAVE_MACOSX_DESKTOP
 		libbalsa_macosx_menu_for_parent(ask, GTK_WINDOW(sdd->dialog));
 #endif
-                gtk_container_add(GTK_CONTAINER
+                gtk_box_pack_start(GTK_BOX
                                   (gtk_dialog_get_content_area
                                    (GTK_DIALOG(ask))), gtk_label_new(msg));
                 g_free(msg);
@@ -826,8 +823,7 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
         gtk_container_add(GTK_CONTAINER(content), grid);
     }
     gtk_widget_set_vexpand(content, TRUE);
-    gtk_box_pack_start(GTK_BOX(gtk_dialog_get_content_area(sdd->dialog)),
-                       content);
+    gtk_box_pack_start(GTK_BOX(gtk_dialog_get_content_area(sdd->dialog)), content);
  
     row = 0;
     /* INPUT FIELD CREATION */

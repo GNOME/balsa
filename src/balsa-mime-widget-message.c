@@ -494,7 +494,7 @@ bm_header_widget_new(BalsaMessage * bm, GtkWidget * const * buttons)
 
 #ifdef GTK_INFO_BAR_WRAPPING_IS_BROKEN
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-    gtk_container_add(GTK_CONTAINER(hbox), grid);
+    gtk_box_pack_start(GTK_BOX(hbox), grid);
     g_object_set(G_OBJECT(hbox), "margin", 6, NULL);
 
     action_area = gtk_button_box_new(GTK_ORIENTATION_VERTICAL);
@@ -506,7 +506,7 @@ bm_header_widget_new(BalsaMessage * bm, GtkWidget * const * buttons)
     info_bar = GTK_INFO_BAR(info_bar_widget);
 
     content_area = gtk_info_bar_get_content_area(info_bar);
-    gtk_container_add(GTK_CONTAINER(content_area), grid);
+    gtk_box_pack_start(GTK_BOX(content_area), grid);
 
     action_area = gtk_info_bar_get_action_area(info_bar);
     gtk_orientable_set_orientation(GTK_ORIENTABLE(action_area),
@@ -516,14 +516,14 @@ bm_header_widget_new(BalsaMessage * bm, GtkWidget * const * buttons)
 #endif                          /* GTK_INFO_BAR_WRAPPING_IS_BROKEN */
     if (!bm->face_box) {
         bm->face_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-        gtk_container_add(GTK_CONTAINER(action_area), bm->face_box);
+        gtk_box_pack_start(GTK_BOX(action_area), bm->face_box);
         gtk_button_box_set_child_non_homogeneous(GTK_BUTTON_BOX(action_area),
                                                  bm->face_box, TRUE);
     }
 
     if (buttons) {
         while (*buttons) {
-            gtk_container_add(GTK_CONTAINER(action_area), *buttons++);
+            gtk_box_pack_start(GTK_BOX(action_area), *buttons++);
         }
     }
 
@@ -652,8 +652,8 @@ add_header_gchar(GtkGrid * grid, const gchar * header, const gchar * label,
                          G_CALLBACK(label_size_allocate_cb), expander);
 
         hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-        gtk_container_add(GTK_CONTAINER(hbox), value_label);
-        gtk_container_add(GTK_CONTAINER(hbox), expander);
+        gtk_box_pack_start(GTK_BOX(hbox), value_label);
+        gtk_box_pack_start(GTK_BOX(hbox), expander);
         gtk_widget_show(hbox);
         gtk_grid_attach_next_to(grid, hbox, lab, GTK_POS_RIGHT, 1, 1);
     }

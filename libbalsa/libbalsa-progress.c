@@ -249,28 +249,28 @@ progress_data_destroy_cb(GtkWidget G_GNUC_UNUSED *widget,
 	libbalsa_clear_source_id(&progress_data->fadeout_id);
 }
 
+typedef struct {
+    const gchar            *id;
+    progress_widget_data_t *data;
+} find_progress_data_info;
+
+static void
+find_progress_data_func(GtkWidget               * child,
+                        find_progress_data_info * info)
+{
+    if (info->data == NULL && strcmp(gtk_widget_get_name(child), info->id) == 0)
+        info->data = g_object_get_data(G_OBJECT(child), "data");
+}
 
 static progress_widget_data_t *
 find_progress_data_by_name(GtkContainer *container,
 						   const gchar  *id)
 {
-	GList *children;
-	GList *this_child;
-	progress_widget_data_t *data;
+        find_progress_data_info info = {id, NULL};
 
-	children = gtk_container_get_children(container);
-	data = NULL;
-	this_child = children;
-	while ((data == NULL) && (this_child != NULL)) {
-		if (strcmp(gtk_widget_get_name(GTK_WIDGET(this_child->data)), id) == 0) {
-			data = g_object_get_data(G_OBJECT(this_child->data), "data");
-		} else {
-			this_child = this_child->next;
-		}
-	}
-	g_list_free(children);
+        gtk_container_foreach(container, (GtkCallback) find_progress_data_func, &info);
 
-	return data;
+        return info.data;
 }
 
 

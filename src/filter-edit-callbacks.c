@@ -1532,6 +1532,12 @@ fe_action_selected(GtkWidget * widget, gpointer data)
  *
  * Callback for the "toggled" signal of the action buttons.
  */
+static void
+fe_button_toggled_func(GtkWidget * child, gpointer active)
+{
+    gtk_widget_set_sensitive(child, GPOINTER_TO_INT(active));
+}
+
 void
 fe_button_toggled(GtkWidget * widget, gpointer data)
 {
@@ -1539,10 +1545,9 @@ fe_button_toggled(GtkWidget * widget, gpointer data)
     gboolean active = gtk_toggle_button_get_active(button);
 
     if (GTK_IS_CONTAINER(data)) {
-        GList *list;
-        for (list = gtk_container_get_children(GTK_CONTAINER(data));
-             list != NULL; list = list->next)
-            gtk_widget_set_sensitive(GTK_WIDGET(list->data), active);
+        gtk_container_foreach(GTK_CONTAINER(data),
+                              fe_button_toggled_func,
+                              GINT_TO_POINTER(active));
     } else
         gtk_widget_set_sensitive(GTK_WIDGET(data), active);
     set_button_sensitivities(TRUE);

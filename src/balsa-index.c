@@ -1893,12 +1893,17 @@ bndx_popup_menu_create(BalsaIndex * index)
  */
 
 static void
+bndx_set_sensitive_func(GtkWidget * item, gpointer sensitive)
+{
+    gtk_widget_set_sensitive(item, GPOINTER_TO_INT(sensitive));
+}
+
+static void
 bndx_do_popup(BalsaIndex * index, const GdkEvent * event)
 {
     GtkWidget *menu = index->popup_menu;
     GtkWidget *submenu;
     LibBalsaMailbox* mailbox;
-    GList *list, *l;
     gboolean any;
     gboolean any_deleted = FALSE;
     gboolean any_not_deleted = FALSE;
@@ -1920,10 +1925,8 @@ bndx_do_popup(BalsaIndex * index, const GdkEvent * event)
     any = selected->len > 0;
     balsa_index_selected_msgnos_free(index, selected);
 
-    l = gtk_container_get_children(GTK_CONTAINER(menu));
-    for (list = l; list; list = list->next)
-        gtk_widget_set_sensitive(GTK_WIDGET(list->data), any);
-    g_list_free(l);
+    gtk_container_foreach(GTK_CONTAINER(menu), bndx_set_sensitive_func,
+                          GINT_TO_POINTER(any));
 
     mailbox = index->mailbox_node->mailbox;
     gtk_widget_set_sensitive(index->delete_item,

@@ -1492,14 +1492,12 @@ show_attachment_widget(BalsaSendmsg *bsmsg)
                              g_object_ref(child));
 
         paned = gtk_paned_new(GTK_ORIENTATION_VERTICAL);
-        gtk_widget_show(paned);
 
         inner_paned = GTK_PANED(paned);
         gtk_paned_add1(inner_paned, child);
         g_object_unref(child);
 
         child = sw_attachment_list(bsmsg);
-        gtk_widget_show(child);
         gtk_paned_add2(inner_paned, child);
         gtk_paned_set_position(inner_paned, position);
 
@@ -1551,8 +1549,6 @@ sw_get_user_codeset(BalsaSendmsg * bsmsg, gboolean * change_type,
     gtk_box_pack_start(content_box, info);
     gtk_widget_set_vexpand(charset_button, TRUE);
     gtk_box_pack_start(content_box, charset_button);
-    gtk_widget_show(info);
-    gtk_widget_show(charset_button);
     gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
 
     if (change_type) {
@@ -1574,7 +1570,6 @@ sw_get_user_codeset(BalsaSendmsg * bsmsg, gboolean * change_type,
                          charset_button);
         gtk_widget_set_hexpand(combo_box, TRUE);
         gtk_box_pack_start(GTK_BOX(hbox), combo_box);
-        gtk_widget_show(hbox);
     }
 
     if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_OK) {
@@ -1845,7 +1840,6 @@ add_attachment(BalsaSendmsg * bsmsg, const gchar *filename,
 					       content_type,
 					       G_CALLBACK(attachment_menu_vfs_cb),
 					       (gpointer)attach_data);
-    gtk_widget_show(attach_data->popup_menu);
 
     /* append to the list store */
     content_desc =libbalsa_vfs_content_description(content_type);
@@ -1922,7 +1916,6 @@ add_urlref_attachment(BalsaSendmsg * bsmsg, gchar *url)
 		     (gpointer)attach_data);
     gtk_menu_shell_append(GTK_MENU_SHELL(attach_data->popup_menu),
 			  menu_item);
-    gtk_widget_show(attach_data->popup_menu);
 
     /* append to the list store */
     gtk_list_store_set(GTK_LIST_STORE(model), &iter,
@@ -2592,7 +2585,6 @@ create_info_pane(BalsaSendmsg * bsmsg)
     create_email_or_string_entry(bsmsg, grid, _("F_CC:"), ++row,
                                  bsmsg->fcc);
 
-    gtk_widget_show(grid);
     return grid;
 }
 
@@ -2919,8 +2911,6 @@ create_text_area(BalsaSendmsg * bsmsg)
 		      formats,
 		      GDK_ACTION_COPY | GDK_ACTION_MOVE | GDK_ACTION_LINK);
     gdk_content_formats_unref(formats);
-
-    gtk_widget_show(scroll);
 
     return scroll;
 }
@@ -3380,7 +3370,6 @@ quote_parts_select_dlg(GtkTreeStore *tree_store, GtkWindow * parent)
 
     /* add, show & run */
     gtk_container_add(GTK_CONTAINER(scroll), tree_view);
-    gtk_widget_show(hbox);
     result = gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_OK;
     gtk_widget_destroy(dialog);
     return result;
@@ -4087,7 +4076,6 @@ create_lang_menu(GtkWidget * parent, BalsaSendmsg * bsmsg)
                              G_CALLBACK(lang_set_cb), bsmsg);
             g_object_set_data_full(G_OBJECT(w), BALSA_LANGUAGE_MENU_LANG,
                                    g_strdup(locales[i].locale), g_free);
-            gtk_widget_show(w);
             gtk_menu_shell_append(GTK_MENU_SHELL(langs), w);
 
             if (!active_item || strcmp(preferred_lang, locales[i].locale) == 0)
@@ -4116,7 +4104,6 @@ create_lang_menu(GtkWidget * parent, BalsaSendmsg * bsmsg)
                              G_CALLBACK(lang_set_cb), bsmsg);
             g_object_set_data_full(G_OBJECT(w), BALSA_LANGUAGE_MENU_LANG,
                                    g_strdup(lang), g_free);
-            gtk_widget_show(w);
             gtk_menu_shell_append(GTK_MENU_SHELL(langs), w);
 
             if (!active_item || strcmp(preferred_lang, lang) == 0)
@@ -4131,7 +4118,6 @@ create_lang_menu(GtkWidget * parent, BalsaSendmsg * bsmsg)
     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(active_item), TRUE);
     g_signal_handlers_unblock_by_func(active_item, lang_set_cb, bsmsg);
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(parent), langs);
-    gtk_widget_show(parent);
 
     return g_object_get_data(G_OBJECT(active_item), BALSA_LANGUAGE_MENU_LANG);
 }
@@ -4520,8 +4506,6 @@ sendmsg_window_set_field(BalsaSendmsg * bsmsg, const gchar * key,
 #endif
     if(g_ascii_strcasecmp(key, "subject") == 0) {
         append_comma_separated(GTK_EDITABLE(bsmsg->subject[1]), val);
-        gtk_widget_show(bsmsg->subject[0]);
-        gtk_widget_show(bsmsg->subject[1]);
         return;
     }
 
@@ -5018,7 +5002,6 @@ subject_not_empty(BalsaSendmsg * bsmsg)
 
     gtk_widget_grab_focus (subj_entry);
     gtk_editable_select_region(GTK_EDITABLE(subj_entry), 0, -1);
-    gtk_widget_show(dialog_vbox);
 
     response = gtk_dialog_run(GTK_DIALOG(no_subj_dialog));
 
@@ -5110,7 +5093,6 @@ check_suggest_encryption(BalsaSendmsg * bsmsg)
 	gtk_box_pack_start(GTK_BOX(hbox), image);
 	label = gtk_label_new_with_mnemonic(_("Send _encrypted"));
 	gtk_box_pack_start(GTK_BOX(hbox), label);
-	gtk_widget_show(button);
 
 	button = gtk_button_new();
 	gtk_dialog_add_action_widget(GTK_DIALOG(dialog), button, GTK_RESPONSE_NO);
@@ -5124,10 +5106,8 @@ check_suggest_encryption(BalsaSendmsg * bsmsg)
 	gtk_box_pack_start(GTK_BOX(hbox), image);
 	label = gtk_label_new_with_mnemonic(_("Send _unencrypted"));
 	gtk_box_pack_start(GTK_BOX(hbox), label);
-	gtk_widget_show(button);
 
 	button = gtk_button_new_with_mnemonic(_("_Cancel"));
-	gtk_widget_show(button);
 	gtk_dialog_add_action_widget(GTK_DIALOG(dialog), button, GTK_RESPONSE_CANCEL);
         gtk_widget_set_can_default(button, TRUE);
 
@@ -6636,7 +6616,6 @@ sendmsg_window_new()
         g_error_free(error);
         return NULL;
     }
-    gtk_widget_show(menubar);
 
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu(window, GTK_MENU_SHELL(menubar));
@@ -6689,7 +6668,6 @@ sendmsg_window_new()
     bsmsg->paned = paned = gtk_paned_new(GTK_ORIENTATION_VERTICAL);
     gtk_widget_set_vexpand(paned, TRUE);
     gtk_box_pack_start(GTK_BOX(main_box), paned);
-    gtk_widget_show(paned);
 
     /* create the top portion with the to, from, etc in it */
     gtk_paned_add1(GTK_PANED(paned), create_info_pane(bsmsg));

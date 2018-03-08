@@ -784,7 +784,6 @@ bab_window_list_new(void)
                                                  LIST_COLUMN_ADDRSPEC, NULL);
     gtk_tree_view_append_column(GTK_TREE_VIEW(tree), column);
 
-    gtk_widget_show(tree);
     return tree;
 }
 
@@ -907,15 +906,11 @@ bab_get_filter_box(void)
     GtkWidget *search_hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 2);
     GtkWidget *find_label, *find_entry, *button;
 
-    gtk_widget_show(search_hbox);
     find_label = gtk_label_new_with_mnemonic(_("F_ilter:"));
-    gtk_widget_show(find_label);
     gtk_box_pack_start(GTK_BOX(search_hbox), find_label);
     find_entry = gtk_entry_new();
-    gtk_widget_show(find_entry);
     gtk_widget_set_hexpand(find_entry, TRUE);
     gtk_box_pack_start(GTK_BOX(search_hbox), find_entry);
-    gtk_widget_show(search_hbox);
     gtk_label_set_mnemonic_widget(GTK_LABEL(find_label), find_entry);
     button = gtk_button_new_from_icon_name("gtk-ok");
     gtk_box_pack_start(GTK_BOX(search_hbox), button);
@@ -973,7 +968,6 @@ bab_window_new(GtkApplication * application)
     gtk_box_pack_start(GTK_BOX(browse_widget), bab_get_filter_box());
 
     scroll = gtk_scrolled_window_new(NULL, NULL);
-    gtk_widget_show(scroll);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll),
 				   GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
     gtk_widget_set_hexpand(scroll, TRUE);

@@ -923,7 +923,6 @@ add_menu_entry(GtkWidget * menu, const gchar * label, GCallback cb,
 			 G_CALLBACK(cb), mbnode);
 
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
-    gtk_widget_show(menuitem);
 }
 
 static void
@@ -1067,12 +1066,10 @@ balsa_mailbox_node_get_context_menu(BalsaMailboxNode * mbnode)
 		   G_CALLBACK(folder_conf_add_imap_cb), NULL);
     add_menu_entry(submenu, _("Remote IMAP _subfolder…"), 
 		   G_CALLBACK(folder_conf_add_imap_sub_cb), NULL);
-    gtk_widget_show(submenu);
     
     /* Translators: popup menu item "New" mailbox or folder */
     menuitem = gtk_menu_item_new_with_mnemonic(C_("mailbox", "_New"));
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(menuitem), submenu);
-    gtk_widget_show(menuitem);
     
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
     

@@ -1687,8 +1687,6 @@ bmbl_mru_menu(GtkWindow * window, GList ** url_list,
                           G_CALLBACK(bmbl_mru_show_tree), mru,
                           (GClosureNotify) g_free, (GConnectFlags) 0);
 
-    gtk_widget_show(menu);
-
     return menu;
 }
 
@@ -1791,7 +1789,6 @@ bmbl_mru_show_tree(GtkWidget * widget, gpointer data)
                                    GTK_POLICY_AUTOMATIC,
                                    GTK_POLICY_AUTOMATIC);
     gtk_container_add(GTK_CONTAINER(scroll), mblist);
-    gtk_widget_show(scroll);
 
     dialog =
         gtk_dialog_new_with_buttons(_("Choose destination folder"),

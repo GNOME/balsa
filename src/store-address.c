@@ -220,12 +220,10 @@ store_address_dialog(StoreAddressInfo * info)
     if (balsa_app.address_book_list && balsa_app.address_book_list->next) {
         /* User has more than one address book, so show the options */
         frame = store_address_book_frame(info);
-        gtk_widget_show(frame);
         gtk_box_pack_start(GTK_BOX(vbox), frame);
     }
 
     frame = store_address_note_frame(info);
-    gtk_widget_show(frame);
     gtk_widget_set_vexpand(frame, TRUE);
     gtk_box_pack_start(GTK_BOX(vbox), frame);
 

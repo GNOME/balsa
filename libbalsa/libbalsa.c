@@ -543,11 +543,9 @@ ask_cert_real(void *data)
     vbox = GTK_BOX(gtk_dialog_get_content_area(GTK_DIALOG(dialog)));
     gtk_box_set_spacing(vbox, 1);
     gtk_box_pack_start(vbox, label);
-    gtk_widget_show(label);
 
     gtk_widget_set_vexpand(cert_widget, TRUE);
     gtk_box_pack_start(vbox, cert_widget);
-    gtk_widget_show(cert_widget);
 
     switch(gtk_dialog_run(GTK_DIALOG(dialog))) {
     case 0:
@@ -643,8 +641,6 @@ ask_cert_real(void *data)
 
     gtk_widget_set_vexpand(label, TRUE);
     gtk_box_pack_start(vbox, label);
-
-    gtk_widget_show(label);
 
     switch(gtk_dialog_run(GTK_DIALOG(dialog))) {
     case 0: i = 1; break;

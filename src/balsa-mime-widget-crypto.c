@@ -365,7 +365,6 @@ show_public_key_data(GtkExpander *expander,
 			key_widget = libbalsa_gpgme_key(body->sig_info->key, body->sig_info->fingerprint, 0U, FALSE);
 			gtk_box_pack_start(vbox, key_widget);
 			gtk_box_reorder_child(vbox, key_widget, 1U);
-			gtk_widget_show(key_widget);
 		}
 	}
 }

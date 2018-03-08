@@ -276,7 +276,6 @@ lb_gpgme_select_key(const gchar * user_name, lb_key_sel_md_t mode, GList * keys,
     /* set window size to 2/3 of the parent */
     gtk_window_get_size(parent, &width, &height);
     gtk_window_set_default_size(GTK_WINDOW(dialog), (2 * width) / 3, (2 * height) / 3);
-    gtk_widget_show(gtk_dialog_get_content_area(GTK_DIALOG(dialog)));
 
     if (gtk_dialog_run(GTK_DIALOG(dialog)) != GTK_RESPONSE_OK) {
     	use_key = NULL;
@@ -368,7 +367,6 @@ get_passphrase_real(const gchar * uid_hint, const gchar * passphrase_info,
     entry = gtk_entry_new();
     gtk_box_pack_start(GTK_BOX(vbox), entry);
 
-    gtk_widget_show(gtk_dialog_get_content_area(GTK_DIALOG(dialog)));
     gtk_entry_set_width_chars(GTK_ENTRY(entry), 40);
     gtk_entry_set_visibility(GTK_ENTRY(entry), FALSE);
 

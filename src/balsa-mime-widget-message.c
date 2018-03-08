@@ -446,18 +446,15 @@ bm_header_extend_popup(GtkWidget * widget, GtkMenu * menu, gpointer arg)
     GtkWidget *separator = gtk_separator_menu_item_new();
 
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), separator);
-    gtk_widget_show(separator);
     menu_item = gtk_menu_item_new_with_label(_("Reply…"));
     g_signal_connect(G_OBJECT(menu_item), "activate",
                      G_CALLBACK(bm_header_ctx_menu_reply),
                      arg);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
-    gtk_widget_show(menu_item);
 
 
     menu_item = gtk_menu_item_new_with_mnemonic(_("_Copy to folder…"));
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
-    gtk_widget_show(menu_item);
 
     submenu =
         balsa_mblist_mru_menu(GTK_WINDOW
@@ -466,7 +463,6 @@ bm_header_extend_popup(GtkWidget * widget, GtkMenu * menu, gpointer arg)
                               G_CALLBACK(balsa_message_copy_part), arg);
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(menu_item),
                               submenu);
-    gtk_widget_show(submenu);
 }
 
 static GtkWidget *
@@ -485,7 +481,6 @@ bm_header_widget_new(BalsaMessage * bm, GtkWidget * const * buttons)
 
     grid = gtk_grid_new();
     gtk_grid_set_column_spacing(GTK_GRID(grid), 12);
-    gtk_widget_show(grid);
 
     g_signal_connect(grid, "notify::has-focus",
 		     G_CALLBACK(balsa_mime_widget_check_focus), bm);
@@ -607,7 +602,6 @@ add_header_gchar(GtkGrid * grid, const gchar * header, const gchar * label,
     gtk_label_set_selectable(GTK_LABEL(lab), TRUE);
     gtk_widget_set_halign(lab, GTK_ALIGN_START);
     gtk_widget_set_valign(lab, GTK_ALIGN_START);
-    gtk_widget_show(lab);
 
     if (value && *value != '\0') {
         gchar *sanitized;
@@ -654,7 +648,6 @@ add_header_gchar(GtkGrid * grid, const gchar * header, const gchar * label,
         hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
         gtk_box_pack_start(GTK_BOX(hbox), value_label);
         gtk_box_pack_start(GTK_BOX(hbox), expander);
-        gtk_widget_show(hbox);
         gtk_grid_attach_next_to(grid, hbox, lab, GTK_POS_RIGHT, 1, 1);
     }
 
@@ -867,7 +860,6 @@ add_header_sigstate(GtkGrid * grid, GMimeGpgmeSigstat * siginfo)
     gtk_label_set_markup(GTK_LABEL(label), msg);
     g_free(msg);
     gtk_widget_set_halign(label, GTK_ALIGN_START);
-    gtk_widget_show(label);
 
     gtk_grid_attach_next_to(grid, label, NULL, GTK_POS_BOTTOM, 2, 1);
 }

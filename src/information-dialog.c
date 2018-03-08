@@ -263,7 +263,6 @@ balsa_information_list(GtkWindow *parent, LibBalsaInformationType type,
                             (GTK_DIALOG(information_dialog))),
                            scrolled_window);
 	g_object_set(G_OBJECT(scrolled_window), "margin", 6, NULL);
-	gtk_widget_show(scrolled_window);
 
 	/* The list itself */
 	information_list = balsa_information_list_new();

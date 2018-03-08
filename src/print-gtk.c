@@ -634,8 +634,6 @@ message_prefs_widget(GtkPrintOperation * operation,
 		     "value-changed", G_CALLBACK(check_margins),
 		     gtk_spin_button_get_adjustment(GTK_SPIN_BUTTON(print_prefs->margin_left)));
 
-    gtk_widget_show(page);
-
     return page;
 }
 

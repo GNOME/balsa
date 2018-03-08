@@ -935,14 +935,12 @@ tree_mult_selection_popup(BalsaMessage * bm, const GdkEvent * event,
         g_object_ref_sink(bm->save_all_popup);
         menu_item =
             gtk_menu_item_new_with_label (_("Save selected as…"));
-        gtk_widget_show(menu_item);
         g_signal_connect (G_OBJECT (menu_item), "activate",
                           G_CALLBACK (part_context_save_all_cb),
                           (gpointer) bm->save_all_list);
         gtk_menu_shell_append (GTK_MENU_SHELL (bm->save_all_popup), menu_item);
         menu_item =
             gtk_menu_item_new_with_label (_("Save selected to folder…"));
-        gtk_widget_show(menu_item);
         g_signal_connect (G_OBJECT (menu_item), "activate",
                           G_CALLBACK (part_context_dump_all_cb),
                           (gpointer) bm->save_all_list);
@@ -1528,7 +1526,6 @@ display_face(BalsaMessage * bm)
     }
 
     gtk_box_pack_start(GTK_BOX(face_box), image);
-    gtk_widget_show(face_box);
 }
 
 static void
@@ -1622,7 +1619,6 @@ part_create_menu (BalsaPartInfo* info)
         gtk_menu_item_set_submenu(GTK_MENU_ITEM(menu_item), submenu);
     }
 
-    gtk_widget_show (info->popup_menu);
     g_free (content_type);
 }
 

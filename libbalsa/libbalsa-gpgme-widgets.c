@@ -413,8 +413,6 @@ libbalsa_key_dialog(GtkWindow            *parent,
 	key_data = libbalsa_gpgme_key(key, NULL, subkey_capa, TRUE);
 	gtk_container_add(GTK_CONTAINER(scrolledw), key_data);
 
-	gtk_widget_show(hbox);
-
 	return dialog;
 }
 

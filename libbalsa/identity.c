@@ -1305,7 +1305,6 @@ md_face_path_changed(const gchar * filename, gboolean active,
     gtk_container_foreach(GTK_CONTAINER(face_box),
                           (GtkCallback) gtk_widget_destroy, NULL);
     gtk_box_pack_start(GTK_BOX(face_box), image);
-    gtk_widget_show(face_box);
 
     g_free(content);
 }

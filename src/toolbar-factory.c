@@ -585,8 +585,6 @@ tm_populate(GtkWidget * toolbar, BalsaToolbarModel * model)
     gtk_toolbar_set_style(GTK_TOOLBAR(toolbar),
                           model->style != (GtkToolbarStyle) (-1) ?
                           model->style : tm_default_style());
-
-    gtk_widget_show(toolbar);
 }
 
 /* Update a real toolbar when the model has changed.
@@ -755,7 +753,6 @@ tm_popup_context_menu_cb(GtkWidget    * toolbar,
                           GINT_TO_POINTER(info->model->type));
     }
 
-    gtk_widget_show(menu);
     gtk_menu_attach_to_widget(GTK_MENU(menu), toolbar, NULL);
 
     event = gtk_get_current_event();
@@ -797,8 +794,6 @@ GtkWidget *balsa_toolbar_new(BalsaToolbarModel * model,
 
     g_signal_connect(toolbar, "popup-context-menu",
                      G_CALLBACK(tm_popup_context_menu_cb), info);
-
-    gtk_widget_show(toolbar);
 
     return toolbar;
 }

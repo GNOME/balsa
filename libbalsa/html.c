@@ -1107,7 +1107,6 @@ lbh_show_info_bar(LibBalsaWebKitInfo * info)
     gtk_info_bar_set_message_type(info_bar, GTK_MESSAGE_QUESTION);
 
     info->has_info_bar = TRUE;
-    gtk_widget_show_all(info_bar_widget);
 }
 
 /*

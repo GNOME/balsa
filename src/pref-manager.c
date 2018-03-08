@@ -1641,7 +1641,6 @@ address_book_set_default_cb(GtkTreeView * tree_view)
 static void
 add_menu_cb(GtkWidget * menu, GtkWidget * widget)
 {
-    gtk_widget_show(menu);
     gtk_menu_popup_at_widget(GTK_MENU(menu), GTK_WIDGET(widget),
                              GDK_GRAVITY_NORTH_WEST, GDK_GRAVITY_NORTH_WEST,
                              NULL);
@@ -2883,7 +2882,6 @@ pm_grid_add_misc_group(GtkWidget * grid_widget)
     pui->close_mailbox_minutes =
 	gtk_spin_button_new(close_spinbutton_adj, 1, 0);
     gtk_widget_set_hexpand(pui->close_mailbox_minutes, TRUE);
-    gtk_widget_show(pui->close_mailbox_minutes);
     gtk_widget_set_sensitive(pui->close_mailbox_minutes, FALSE);
     pm_grid_attach(grid, pui->close_mailbox_minutes, 2, row, 1, 1);
 
@@ -2932,7 +2930,6 @@ pm_grid_add_deleting_messages_group(GtkWidget * grid_widget)
     expunge_spinbutton_adj = gtk_adjustment_new(120, 1, 1440, 1, 10, 0);
     pui->expunge_minutes = gtk_spin_button_new(expunge_spinbutton_adj, 1, 0);
     gtk_widget_set_hexpand(pui->expunge_minutes, TRUE);
-    gtk_widget_show(pui->expunge_minutes);
     gtk_widget_set_sensitive(pui->expunge_minutes, FALSE);
     pm_grid_attach(grid, pui->expunge_minutes, 2, row, 1, 1);
 

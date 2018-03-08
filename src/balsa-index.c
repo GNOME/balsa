@@ -1949,8 +1949,6 @@ bndx_do_popup(BalsaIndex * index, const GdkEvent * event)
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(index->move_to_item),
                               submenu);
 
-    gtk_widget_show(menu);
-
     if (event != NULL) {
         gtk_menu_popup_at_pointer(GTK_MENU(menu), event);
     } else {

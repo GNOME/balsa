@@ -528,8 +528,6 @@ create_ldap_dialog(AddressBookConfig * abc)
 
     add_radio_buttons(grid, 7, abc);
 
-    gtk_widget_show(grid);
-
     g_free(base);
     g_free(name);
     g_free(host);

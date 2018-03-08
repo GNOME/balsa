@@ -197,7 +197,6 @@ balsa_ab_window_list(BalsaAbWindow * ab, GCallback row_activated_cb)
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree));
     gtk_tree_selection_set_mode(selection, GTK_SELECTION_MULTIPLE);
 
-    gtk_widget_show(tree);
     g_signal_connect(G_OBJECT(tree), "row-activated", row_activated_cb,
                      ab);
     return tree;
@@ -286,15 +285,12 @@ balsa_ab_window_init(BalsaAbWindow *ab)
     gtk_grid_set_column_spacing(GTK_GRID(grid), 12);
     gtk_widget_set_vexpand(grid, TRUE);
     gtk_box_pack_start(vbox, grid);
-    gtk_widget_show(grid);
 
     /* -- grid column 1 -- */
     /* Entry widget for finding an address */
     find_label = gtk_label_new_with_mnemonic(_("_Search for Name:"));
-    gtk_widget_show(find_label);
 
     ab->filter_entry = gtk_entry_new();
-    gtk_widget_show(ab->filter_entry);
     gtk_label_set_mnemonic_widget(GTK_LABEL(find_label), ab->filter_entry);
     g_signal_connect(G_OBJECT(ab->filter_entry), "changed",
 		     G_CALLBACK(balsa_ab_window_find), ab);
@@ -305,7 +301,6 @@ balsa_ab_window_init(BalsaAbWindow *ab)
     gtk_box_pack_start(GTK_BOX(box2), find_label);
     gtk_widget_set_hexpand(ab->filter_entry, TRUE);
     gtk_box_pack_start(GTK_BOX(box2), ab->filter_entry);
-    gtk_widget_show(GTK_WIDGET(box2));
 
 
     /* A scrolled window for the address list */
@@ -317,7 +312,6 @@ balsa_ab_window_init(BalsaAbWindow *ab)
 				   GTK_POLICY_AUTOMATIC);
     gtk_widget_set_vexpand(scrolled_window, TRUE);
     gtk_grid_attach(GTK_GRID(grid), scrolled_window, 0, 1, 1, 1);
-    gtk_widget_show(scrolled_window);
     gtk_container_add(GTK_CONTAINER(scrolled_window), ab->address_list);
     gtk_widget_set_size_request(scrolled_window, 300, 250);
 
@@ -326,20 +320,17 @@ balsa_ab_window_init(BalsaAbWindow *ab)
     gtk_button_box_set_layout(GTK_BUTTON_BOX(hbox), GTK_BUTTONBOX_SPREAD);
     gtk_widget_set_vexpand(hbox, FALSE);
     gtk_grid_attach(GTK_GRID(grid), hbox, 0, 2, 1, 1);
-    gtk_widget_show(GTK_WIDGET(hbox));
 
     w = gtk_button_new_with_mnemonic(_("Run _Editor"));
     g_signal_connect(w, "clicked",
                      G_CALLBACK(balsa_ab_window_run_editor), NULL);
     gtk_box_pack_start(GTK_BOX(hbox), w);
-    gtk_widget_show(w);
 
     w = gtk_button_new_with_mnemonic(_("_Re-import"));
     g_signal_connect(G_OBJECT(w), "clicked",
                      G_CALLBACK(balsa_ab_window_reload),
 		       ab);
     gtk_box_pack_start(GTK_BOX(hbox), w);
-    gtk_widget_show(w);
 
     balsa_ab_window_load(ab);
 
@@ -349,12 +340,10 @@ balsa_ab_window_init(BalsaAbWindow *ab)
     gtk_widget_set_vexpand(ab->arrow_box, TRUE);
     gtk_widget_set_hexpand(ab->arrow_box, FALSE);
     gtk_grid_attach(GTK_GRID(grid), ab->arrow_box, 1, 1, 1, 1);
-    gtk_widget_show(ab->arrow_box);
 
     w = gtk_button_new_from_icon_name("go-next-symbolic");
     gtk_widget_set_hexpand(w, TRUE);
     gtk_box_pack_start(GTK_BOX(ab->arrow_box), w);
-    gtk_widget_show(w);
     g_signal_connect(G_OBJECT(w), "clicked",
 		     G_CALLBACK(balsa_ab_window_move_to_recipient_list),
 		       ab);
@@ -362,7 +351,6 @@ balsa_ab_window_init(BalsaAbWindow *ab)
     w = gtk_button_new_from_icon_name("go-previous-symbolic");
     gtk_widget_set_hexpand(w, TRUE);
     gtk_box_pack_start(GTK_BOX(ab->arrow_box), w);
-    gtk_widget_show(w);
     g_signal_connect(G_OBJECT(w), "clicked",
 		     G_CALLBACK(balsa_ab_window_remove_from_recipient_list),
 		       ab);
@@ -370,14 +358,12 @@ balsa_ab_window_init(BalsaAbWindow *ab)
     /* -- grid column 3 -- */
     /* label for selected addresses in compose mode */
     ab->send_to_label = gtk_label_new(_("Send-To"));
-    gtk_widget_show(ab->send_to_label);
     gtk_grid_attach(GTK_GRID(grid), ab->send_to_label, 2, 0, 1, 1);
 
     /* list for selected addresses in compose mode */
     ab->send_to_list = gtk_scrolled_window_new(NULL, NULL);
     gtk_widget_set_vexpand(ab->send_to_list, TRUE);
     gtk_widget_set_hexpand(ab->send_to_list, TRUE);
-    gtk_widget_show(ab->send_to_list);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(ab->send_to_list),
 				   GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
     gtk_grid_attach(GTK_GRID(grid), ab->send_to_list, 2, 1, 1, 1);
@@ -386,20 +372,17 @@ balsa_ab_window_init(BalsaAbWindow *ab)
 
     /* mode switching stuff */
     frame = gtk_frame_new(_("Treat multiple addresses as:"));
-    gtk_widget_show(frame);
 
     ab->single_address_mode_radio = gtk_radio_button_new_with_label
 	(NULL, _("alternative addresses for the same person"));
     label = gtk_bin_get_child(GTK_BIN(ab->single_address_mode_radio));
     gtk_label_set_xalign((GtkLabel *) label, 0.0);
-    gtk_widget_show(ab->single_address_mode_radio);
 
     ab->dist_address_mode_radio = gtk_radio_button_new_with_label_from_widget
 	(GTK_RADIO_BUTTON(ab->single_address_mode_radio),
 	 _("a distribution list"));
     label = gtk_bin_get_child(GTK_BIN(ab->dist_address_mode_radio));
     gtk_label_set_xalign((GtkLabel *) label, 0.0);
-    gtk_widget_show(ab->dist_address_mode_radio);
     ab->toggle_handler_id =
         g_signal_connect(G_OBJECT(ab->single_address_mode_radio),
                          "toggled",
@@ -417,7 +400,6 @@ balsa_ab_window_init(BalsaAbWindow *ab)
     gtk_container_add(GTK_CONTAINER(frame), box2);
     gtk_box_pack_start(GTK_BOX(box2), ab->single_address_mode_radio);
     gtk_box_pack_start(GTK_BOX(box2), ab->dist_address_mode_radio);
-    gtk_widget_show(box2);
     gtk_box_pack_start(vbox, frame);
 
     gtk_widget_grab_focus(ab->filter_entry);

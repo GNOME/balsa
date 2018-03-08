@@ -238,7 +238,6 @@ balsa_server_conf_get_advanced_widget(BalsaServerConf *bsc, LibBalsaServer *s,
 
     g_signal_connect(G_OBJECT (bsc->use_ssl), "toggled",
                      G_CALLBACK (bsc_ssl_toggled_cb), bsc);
-    gtk_widget_show(GTK_WIDGET(bsc->grid));
     bsc->used_rows = 2;
     gtk_widget_set_sensitive(bsc->tls_option, !use_ssl);
 
@@ -1335,7 +1334,6 @@ create_pop_mailbox_dialog(MailboxConfWindow *mcw)
     /* toggle for enabling pipeling */
     mcw->mb_data.pop3.enable_pipe = balsa_server_conf_add_checkbox(&mcw->mb_data.pop3.bsc, _("Overlap commands"));
 
-    gtk_widget_show(notebook);
     gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), 0);
     gtk_widget_grab_focus(mcw->mailbox_name);
 
@@ -1453,7 +1451,6 @@ create_imap_mailbox_dialog(MailboxConfWindow *mcw)
     gtk_notebook_append_page(GTK_NOTEBOOK(notebook), advanced,
                              gtk_label_new_with_mnemonic(_("_Advanced")));
 
-    gtk_widget_show(notebook);
     gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), 0);
     gtk_widget_grab_focus(mcw->mailbox_name? 
                           mcw->mailbox_name : mcw->mb_data.imap.bsc.server);

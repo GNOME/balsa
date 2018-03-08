@@ -202,7 +202,6 @@ libbalsa_progress_dialog_ensure_real(ProgressDialog *progress_dialog,
     	progress_widget = create_progress_widget(progress_id);
     	gtk_revealer_set_reveal_child(GTK_REVEALER(progress_widget), TRUE);
     	gtk_box_pack_start(GTK_BOX(content_box), progress_widget);
-    	gtk_widget_show(progress_widget);
     }
 }
 

@@ -595,8 +595,6 @@ text_view_url_popup(GtkWidget *widget, GtkMenu *menu, message_url_t *url)
                       G_CALLBACK (url_send_cb), (gpointer)url);
     gtk_menu_shell_append (GTK_MENU_SHELL (menu), menu_item);
 
-    gtk_widget_show(GTK_WIDGET(menu));
-
     return TRUE;
 }
 
@@ -636,8 +634,6 @@ text_view_populate_popup(GtkWidget *widget, GtkMenu *menu,
 			  G_CALLBACK (structured_phrases_toggle), mwt);
 	gtk_menu_shell_append (GTK_MENU_SHELL (menu), menu_item);
     }
-
-    gtk_widget_show(GTK_WIDGET(menu));
 }
 
 
@@ -1020,7 +1016,6 @@ draw_cite_bar_real(cite_bar_t * bar, BalsaMimeWidgetText * mwt)
                                        GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
         g_object_unref(css_provider);
 
-        gtk_widget_show(bar->bar);
         gtk_text_view_add_child_in_window(view, bar->bar,
                                           GTK_TEXT_WINDOW_TEXT, 0, y_pos);
     } else if (bar->y_pos != y_pos || bar->height != height) {
@@ -1157,8 +1152,6 @@ balsa_gtk_html_popup(GtkWidget * html, BalsaMessage * bm)
     menu = gtk_menu_new();
     bmwt_populate_popup_menu(bm, html, GTK_MENU(menu));
 
-    gtk_widget_show(menu);
-
     /* In WebKit2, the context menu signal is asynchronous, so the
      * GdkEvent is no longer current; instead it is preserved and passed
      * to us: */
@@ -1211,7 +1204,6 @@ bmwt_populate_popup_cb(GtkWidget * widget, GtkMenu * menu, gpointer data)
     gtk_container_foreach(GTK_CONTAINER(menu),
                           (GtkCallback) gtk_widget_destroy, NULL);
     bmwt_populate_popup_menu(bm, html, menu);
-    gtk_widget_show(GTK_WIDGET(menu));
 }
 
 static BalsaMimeWidget *

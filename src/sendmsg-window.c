@@ -50,6 +50,7 @@
 #endif
 #include <errno.h>
 #include "application-helpers.h"
+#include "identity-widgets.h"
 #include "libbalsa.h"
 #include "misc.h"
 #include "send.h"
@@ -1185,8 +1186,7 @@ update_bsmsg_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity* ident)
      * the signature if path changed */
 
     /* reconstruct the old signature to search with */
-    old_sig = libbalsa_identity_get_signature(old_ident,
-                                              GTK_WINDOW(bsmsg->window));
+    old_sig = libbalsa_identity_get_signature(old_ident, NULL);
 
     /* switch identities in bsmsg here so we can use read_signature
      * again */
@@ -1194,8 +1194,7 @@ update_bsmsg_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity* ident)
     if ( (reply_type && ident->sig_whenreply)
          || (forward_type && ident->sig_whenforward)
          || (bsmsg->type == SEND_NORMAL && ident->sig_sending))
-        new_sig = libbalsa_identity_get_signature(ident,
-                                                  GTK_WINDOW(bsmsg->window));
+        new_sig = libbalsa_identity_get_signature(ident, NULL);
     else
         new_sig = NULL;
     if(!new_sig) new_sig = g_strdup("");
@@ -3627,11 +3626,10 @@ sw_insert_sig_activated(GSimpleAction * action,
 {
     BalsaSendmsg *bsmsg = data;
     gchar *signature;
+    GError *error = NULL;
 
-    if(!bsmsg->ident->signature_path || !bsmsg->ident->signature_path[0])
-        return;
-    signature = libbalsa_identity_get_signature(bsmsg->ident,
-                                                GTK_WINDOW(bsmsg->window));
+    signature = libbalsa_identity_get_signature(bsmsg->ident, &error);
+
     if (signature != NULL) {
         GtkTextBuffer *buffer =
             gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
@@ -3643,10 +3641,12 @@ sw_insert_sig_activated(GSimpleAction * action,
         sw_buffer_signals_unblock(bsmsg, buffer);
 
 	g_free(signature);
-    } else
+    } else if (error != NULL) {
         balsa_information_parented(GTK_WINDOW(bsmsg->window),
                                    LIBBALSA_INFORMATION_ERROR,
-                                   _("No signature found!"));
+                                   error->message);
+        g_error_free(error);
+    }
 }
 
 

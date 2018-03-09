@@ -71,6 +71,8 @@ libbalsa_a_sources = [
   'html.h',
   'identity.c',
   'identity.h',
+  'identity-widgets.c',
+  'identity-widgets.h',
   'imap-server.c',
   'imap-server.h',
   'information.c',

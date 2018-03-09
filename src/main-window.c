@@ -36,6 +36,7 @@
 #include <gdk-pixbuf/gdk-pixbuf.h>
 
 #include "application-helpers.h"
+#include "identity-widgets.h"
 #include "imap-server.h"
 #include "libbalsa.h"
 #include "misc.h"

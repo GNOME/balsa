@@ -51,6 +51,7 @@
 #include "pref-manager.h"
 #include "save-restore.h"
 
+#include "identity-widgets.h"
 #include "libbalsa.h"
 #include "imap-server.h"
 #include "mailbox-filter.h"

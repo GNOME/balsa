@@ -5,14 +5,14 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option) 
+ * the Free Software Foundation; either version 2, or (at your option)
  * any later version.
- *  
+ *
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
@@ -25,7 +25,6 @@
 # error "Include config.h before this file."
 #endif
 
-#include <gtk/gtk.h>
 #include <gmime/internet-address.h>
 
 #include "libbalsa.h"
@@ -33,31 +32,15 @@
 
 G_BEGIN_DECLS
 
+#define LIBBALSA_TYPE_IDENTITY (libbalsa_identity_get_type ())
+G_DECLARE_FINAL_TYPE(LibBalsaIdentity, libbalsa_identity, LIBBALSA, IDENTITY, GObject)
 
-    GType libbalsa_identity_get_type(void);
-
-#define LIBBALSA_TYPE_IDENTITY \
-    (libbalsa_identity_get_type ())
-#define LIBBALSA_IDENTITY(obj) \
-    (G_TYPE_CHECK_INSTANCE_CAST (obj, LIBBALSA_TYPE_IDENTITY, \
-                                 LibBalsaIdentity))
-#define LIBBALSA_IDENTITY_CLASS(klass) \
-    (G_TYPE_CHECK_CLASS_CAST (klass, LIBBALSA_TYPE_IDENTITY, \
-                              LibBalsaIdentityClass))
-#define LIBBALSA_IS_IDENTITY(obj) \
-    (G_TYPE_CHECK_INSTANCE_TYPE (obj, LIBBALSA_TYPE_IDENTITY))
-#define LIBBALSA_IS_IDENTITY_CLASS(klass) \
-    (G_TYPE_CHECK_CLASS_TYPE (klass, LIBBALSA_TYPE_IDENTITY))
-
-    typedef struct _LibBalsaIdentityClass LibBalsaIdentityClass;
-    
-    
-    struct _LibBalsaIdentity 
+    struct _LibBalsaIdentity
     {
         GObject object;
-        
+
         gchar* identity_name;
-        
+
         InternetAddress *ia;
         gchar* replyto;
         gchar* domain;
@@ -88,7 +71,7 @@ G_BEGIN_DECLS
 	LibBalsaSmtpServer *smtp_server;
     };
 
-    struct _LibBalsaIdentityClass 
+    struct _LibBalsaIdentityClass
     {
         GObjectClass parent_class;
     };
@@ -97,7 +80,7 @@ G_BEGIN_DECLS
 /* Function prototypes */
     GObject* libbalsa_identity_new(void);
     GObject* libbalsa_identity_new_with_name(const gchar* ident_name);
-    
+
     void libbalsa_identity_set_identity_name(LibBalsaIdentity*, const gchar*);
     void libbalsa_identity_set_address(LibBalsaIdentity*, InternetAddress*);
     void libbalsa_identity_set_replyto(LibBalsaIdentity*, const gchar*);
@@ -113,8 +96,17 @@ G_BEGIN_DECLS
     void libbalsa_identity_set_sig_whenreply(LibBalsaIdentity*, gboolean);
     void libbalsa_identity_set_sig_separator(LibBalsaIdentity*, gboolean);
     void libbalsa_identity_set_sig_prepend(LibBalsaIdentity*, gboolean);
-    gchar* libbalsa_identity_get_signature(LibBalsaIdentity*, 
-                                           GtkWindow *parent);
+    void libbalsa_identity_set_face_path(LibBalsaIdentity*, const gchar*);
+    void libbalsa_identity_set_x_face_path(LibBalsaIdentity*, const gchar*);
+    void libbalsa_identity_set_request_mdn(LibBalsaIdentity*, gboolean);
+    void libbalsa_identity_set_request_dsn(LibBalsaIdentity*, gboolean);
+    void libbalsa_identity_set_always_trust(LibBalsaIdentity*, gboolean);
+    void libbalsa_identity_set_warn_send_plain(LibBalsaIdentity*, gboolean);
+    void libbalsa_identity_set_force_gpg_key_id(LibBalsaIdentity*, const gchar *);
+    void libbalsa_identity_set_force_smime_key_id(LibBalsaIdentity*, const gchar *);
+
+    gchar* libbalsa_identity_get_signature(LibBalsaIdentity *,
+                                           GError **);
     void libbalsa_identity_set_smtp_server(LibBalsaIdentity * ident,
                                            LibBalsaSmtpServer *
                                            smtp_server);
@@ -122,25 +114,6 @@ G_BEGIN_DECLS
     void libbalsa_identity_set_gpg_sign(LibBalsaIdentity*, gboolean);
     void libbalsa_identity_set_gpg_encrypt(LibBalsaIdentity*, gboolean);
     void libbalsa_identity_set_crypt_protocol(LibBalsaIdentity* ident, gint);
-
-    void libbalsa_identity_config_dialog(GtkWindow * parent,
-                                         GList ** identities,
-                                         LibBalsaIdentity ** current,
-										 GSList * smtp_servers,
-                                         void (*changed_cb)(gpointer));
-
-    typedef void (*LibBalsaIdentityCallback) (gpointer data,
-                                              LibBalsaIdentity * identity);
-    void libbalsa_identity_select_dialog(GtkWindow * parent,
-                                         const gchar * prompt,
-                                         GList * identities,
-                                         LibBalsaIdentity * initial_id,
-                                         LibBalsaIdentityCallback update,
-                                         gpointer data);
-    GtkWidget * libbalsa_identity_combo_box(GList       * identities,
-                                            const gchar * active_name,
-                                            GCallback     changed_cb,
-                                            gpointer      changed_data);
 
     LibBalsaIdentity* libbalsa_identity_new_config(const gchar* name);
     void libbalsa_identity_save(LibBalsaIdentity* id, const gchar* prefix);
